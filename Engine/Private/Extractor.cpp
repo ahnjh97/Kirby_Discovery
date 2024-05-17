@@ -18,14 +18,14 @@ HRESULT CExtractor::Initialize()
 
 	m_pContext->RSGetViewports(&iNumViewports, &ViewportDesc);
 
-	m_iViewportWidth = ViewportDesc.Width;
-	m_iViewportHeight = ViewportDesc.Height;
+	m_iViewportWidth = (_uint)ViewportDesc.Width;
+	m_iViewportHeight = (_uint)ViewportDesc.Height;
 
 	D3D11_TEXTURE2D_DESC	TextureDesc;
 	ZeroMemory(&TextureDesc, sizeof(D3D11_TEXTURE2D_DESC));
 
-	TextureDesc.Width = ViewportDesc.Width;
-	TextureDesc.Height = ViewportDesc.Height;
+	TextureDesc.Width = (_uint)ViewportDesc.Width;
+	TextureDesc.Height = (_uint)ViewportDesc.Height;
 	TextureDesc.MipLevels = 1;
 	TextureDesc.ArraySize = 1;
 	TextureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -65,7 +65,7 @@ _vector CExtractor::Compute_WorldPos(const _float2 & vViewportPos, const wstring
 
 	m_pContext->Map(m_pTextureHub, 0, D3D11_MAP_READ, 0, &SubResource);
 
-	_uint			iPixelIndex = vViewportPos.y * m_iViewportWidth + vViewportPos.x;
+	_uint			iPixelIndex = (_uint)(vViewportPos.y * m_iViewportWidth + vViewportPos.x);
 	
 	_ubyte*			pAddress = ((_ubyte*)(((_float4*)SubResource.pData) + iPixelIndex));
 

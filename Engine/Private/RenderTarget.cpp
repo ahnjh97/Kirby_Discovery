@@ -116,8 +116,6 @@ CRenderTarget * CRenderTarget::Create(ID3D11Device * pDevice, ID3D11DeviceContex
 
 void CRenderTarget::Free()
 {
-	SaveDDSTextureToFile(m_pContext, m_pTexture2D, TEXT("../Bin/Diffuse.dds"));
-
 	Safe_Release(m_pSRV);
 	Safe_Release(m_pRTV);
 	Safe_Release(m_pTexture2D);
