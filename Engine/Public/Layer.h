@@ -19,8 +19,13 @@ public:
 public:
 	HRESULT Initialize();
 	HRESULT	Add_GameObject(class CGameObject* pGameObject);
-	void Tick(_float fTimeDelta);
-	void Late_Tick(_float fTimeDelta);
+	void	Tick(_float fTimeDelta);
+	void	Late_Tick(_float fTimeDelta);
+
+public:
+	class CGameObject*				Get_GameObject(_uint iIndex);
+	class CGameObject*				Get_GameObject_ByTag(wstring _tag);
+	const list<class CGameObject*>& Get_GameObjectList() { return m_GameObjects; }
 
 private:
 	list<class CGameObject*>		m_GameObjects;

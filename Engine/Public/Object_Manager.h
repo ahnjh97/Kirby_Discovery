@@ -17,26 +17,38 @@ private:
 
 public:
 	const class CComponent* Get_Component(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strComTag, _uint iIndex);
+	class CGameObject*		Get_GameObject(_uint iLevelIndex, const wstring& strLayerTag, _uint iIndex);
+	class CGameObject*		Get_GameObject_ByTag(_uint iLevelIndex, const wstring& strLayerTag, wstring _tag);
+	void					Set_CurrentLevel(_int _CurrentLevel) { m_iCurrentLevel = _CurrentLevel; }
 
 public:
-	HRESULT Initialize(_uint iNumLevels);
-	HRESULT Add_Prototype(const wstring& strPrototypeTag, class CGameObject* pPrototype);
-	HRESULT Add_Clone(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strPrototypeTag, void* pArg);
-	class CGameObject* Clone_GameObject(const wstring& strPrototypeTag, void* pArg);
-	void Tick(_float fTimeDelta);
-	void Late_Tick(_float fTimeDelta);
-	void Clear(_uint iLevelIndex);
+	HRESULT					Initialize(_uint iNumLevels);
+	HRESULT					Add_Prototype(const wstring& strPrototypeTag, class CGameObject* pPrototype);
+	HRESULT					Add_Clone(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strPrototypeTag, void* pArg);
+	class CGameObject*		Clone_GameObject(const wstring& strPrototypeTag, void* pArg);
+	void					Tick(_float fTimeDelta);
+	void					Late_Tick(_float fTimeDelta);
+	void					Clear(_uint iLevelIndex);
+
+	// IMGUI에 출력할 친구들
+	//HRESULT					Add_Clone(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strPrototypeTag, void* pArg);
 
 
 private:	
 	map<const wstring, class CGameObject*>				m_Prototypes;
+	unordered_map<class CGameObject*, const wstring>	m_mapCloneObjs;
 
 	_uint												m_iNumLevels = { 0 };
+	// 현재 레벨
+	_int												m_iCurrentLevel = { -1 };
 	map<const wstring, class CLayer*>*					m_pLayers = { nullptr };
 
 private:
-	class CGameObject* Find_Prototype(const wstring& strPrototypeTag);
-	class CLayer* Find_Layer(_uint iLevelIndex, const wstring& strLayerTag);
+	class CGameObject*		Find_Prototype(const wstring& strPrototypeTag);
+	class CLayer*			Find_Layer(_uint iLevelIndex, const wstring& strLayerTag);
+
+	// IMGUI TICK 및 RENDER
+	void					IMGUI_Tick();
 
 public:
 	static CObject_Manager* Create(_uint iNumLevels);

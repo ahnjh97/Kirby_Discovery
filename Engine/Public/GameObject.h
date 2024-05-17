@@ -17,15 +17,20 @@ protected:
 	virtual ~CGameObject() = default;
 
 public:
-	class CComponent* Get_Component(const wstring& strComTag);
+	class CComponent*	Get_Component(const wstring& strComTag);
+
+	// prototypeTag
+	const wstring&		Get_PrototypeTag() { return m_wstrPrototypeTag; }
+	void				Set_PrototypeTag(wstring _wstrProtoTag) { m_wstrPrototypeTag = _wstrProtoTag; }
 
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
-	virtual void Tick(_float fTimeDelta);
-	virtual void Late_Tick(_float fTimeDelta);
+	virtual void	Tick(_float fTimeDelta);
+	virtual void	Late_Tick(_float fTimeDelta);
 	virtual HRESULT Render();
 	virtual HRESULT Render_LightDepth() { return S_OK; }
+	virtual void	Render_IMGUI() {}
 
 protected:
 	ID3D11Device*						m_pDevice = { nullptr };
@@ -33,6 +38,9 @@ protected:
 
 	class CGameInstance*				m_pGameInstance = { nullptr };
 	CTransform*							m_pTransformCom = { nullptr };
+
+	// prototypeName을 들고 있는다.
+	wstring								m_wstrPrototypeTag = wstring();
 
 protected:
 	map<const wstring, class CComponent*>		m_Components;

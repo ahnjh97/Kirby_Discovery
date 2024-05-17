@@ -50,3 +50,4 @@ Client/Bin/DataFiles/Navigation.dat
 Engine/Bin/Shader_Deferred.cso
 Client/Default/x64/
 Engine/Default/x64/
+Client/Default/imgui.ini

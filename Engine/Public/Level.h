@@ -13,7 +13,7 @@ protected:
 
 public:
 	virtual HRESULT Initialize();
-	virtual void Tick(_float fTimeDelta);
+	virtual void	Tick(_float fTimeDelta);
 	virtual HRESULT Render();
 
 protected:
