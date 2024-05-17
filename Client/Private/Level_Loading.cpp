@@ -43,6 +43,7 @@ void CLevel_Loading::Tick(_float fTimeDelta)
 			{
 			case LEVEL_LOGO:
 				pLevel = CLevel_Logo::Create(m_pDevice, m_pContext);
+
 				break;
 			case LEVEL_GAMEPLAY:
 				pLevel = CLevel_GamePlay::Create(m_pDevice, m_pContext);
@@ -70,12 +71,12 @@ HRESULT CLevel_Loading::Render()
 
 HRESULT CLevel_Loading::Ready_Layer_BackGround()
 {
-	return E_NOTIMPL;
+	return S_OK;
 }
 
 HRESULT CLevel_Loading::Ready_Layer_UI()
 {
-	return E_NOTIMPL;
+	return S_OK;
 }
 
 CLevel_Loading * CLevel_Loading::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID)
