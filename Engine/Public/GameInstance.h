@@ -104,6 +104,24 @@ public: /* For.Extractor */
 
 #endif
 
+public: // Sound Manager
+	_int SetVolume(CHANNELID eID, _float _vol);
+	_int  VolumeUp(CHANNELID eID, _float _vol);
+	_int  VolumeDown(CHANNELID eID, _float _vol);
+	_int  BGMVolumeUp(_float _vol);
+	_int  BGMVolumeDown(_float _vol);
+	_int  Pause(CHANNELID eID);
+	void PlayMySound(TCHAR* pSoundKey, CHANNELID eID, _float _vol);
+	void PlayBGM(TCHAR* pSoundKey);
+	void StopSound(CHANNELID eID);
+	void StopAll();
+	void ApplyLowPass(_bool bSet);
+	void AddLowPass();
+	_int  VolumeMin(CHANNELID eID);
+	_int  VolumeRestore(CHANNELID eID);
+	void PlaySound_Free(TCHAR* pSoundKey, _float _vol);
+
+
 private:
 	class CGraphic_Device*			m_pGraphic_Device = { nullptr };
 	class CInput_Device*			m_pInput_Device = { nullptr };
@@ -118,6 +136,7 @@ private:
 	class CTarget_Manager*			m_pTarget_Manager = { nullptr };
 	class CFrustum*					m_pFrustum = { nullptr };
 	class CExtractor*				m_pExtractor = { nullptr };
+	class CSound_Manager*			m_pSound_Manager = { nullptr };
 
 
 	_uint	m_iCurrentLevelID = { 0 };

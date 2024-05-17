@@ -77,6 +77,13 @@ using namespace DirectX;
 #include <iostream>
 #include <utility>
 
+//// for Fmod
+#include "fmod.h"
+#include "fmod.hpp"
+#include "fmod_errors.h"
+#include <io.h>
+#pragma comment (lib, "fmod_vc.lib")
+
 using namespace std;
 using namespace rapidjson;
 
@@ -84,6 +91,15 @@ namespace Engine
 {
 	const wstring g_strTransformTag = TEXT("Com_Transform");
 	const wstring g_strColliderTag = TEXT("Com_Collider");
+
+	enum CHANNELID {
+		CHANNEL_PLAYERVOICE = 100,
+		CHANNEL_BOSSVOICE,
+		CHANNEL_SOUND1, CHANNEL_SOUND2, CHANNEL_SOUND3, CHANNEL_SOUND4, CHANNEL_SOUND5, 
+		CHANNEL_SOUND6, CHANNEL_SOUND7, CHANNEL_SOUND8, CHANNEL_SOUND9, CHANNEL_SOUND10,
+		CHANNEL_SOUND11, CHANNEL_SOUND12, CHANNEL_SOUND13, CHANNEL_SOUND14, CHANNEL_SOUND15,
+		CHANNEL_BGM, CHANNEL_END
+	};
 }
 
 #include "Engine_Macro.h"

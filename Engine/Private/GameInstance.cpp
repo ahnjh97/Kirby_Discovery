@@ -8,6 +8,7 @@
 #include "Timer_Manager.h"
 #include "Light_Manager.h"
 #include "Font_Manager.h"
+#include "SoundManager.h"
 
 #include "Extractor.h"
 #include "Renderer.h"
@@ -506,6 +507,70 @@ HRESULT CGameInstance::Draw_RTVDebug(const wstring& strMRTTag, CShader * pShader
 }
 #endif
 
+
+
+_int CGameInstance::SetVolume(CHANNELID eID, _float _vol)
+{
+	return m_pSound_Manager->SetVolume(eID, _vol);
+}
+_int CGameInstance::VolumeUp(CHANNELID eID, _float _vol)
+{
+	return m_pSound_Manager->VolumeUp(eID, _vol);
+}
+_int CGameInstance::VolumeDown(CHANNELID eID, _float _vol)
+{
+	return m_pSound_Manager->VolumeDown(eID, _vol);
+}
+_int CGameInstance::BGMVolumeUp(_float _vol)
+{
+	return m_pSound_Manager->BGMVolumeUp(_vol);
+}
+_int CGameInstance::BGMVolumeDown(_float _vol)
+{
+	return m_pSound_Manager->BGMVolumeDown(_vol);
+}
+_int CGameInstance::Pause(CHANNELID eID)
+{
+	return m_pSound_Manager->Pause(eID);
+}
+void CGameInstance::PlayMySound(TCHAR* pSoundKey, CHANNELID eID, _float _vol)
+{
+	m_pSound_Manager->PlayMySound(pSoundKey, eID, _vol);
+}
+void CGameInstance::PlayBGM(TCHAR* pSoundKey)
+{
+	m_pSound_Manager->PlayBGM(pSoundKey);
+}
+void CGameInstance::StopSound(CHANNELID eID)
+{
+	m_pSound_Manager->StopSound(eID);
+}
+void CGameInstance::StopAll()
+{
+	m_pSound_Manager->StopAll();
+}
+void CGameInstance::ApplyLowPass(_bool bSet)
+{
+	m_pSound_Manager->ApplyLowPass(bSet);
+}
+void CGameInstance::AddLowPass()
+{
+	m_pSound_Manager->AddLowPass();
+}
+_int CGameInstance::VolumeMin(CHANNELID eID)
+{
+	return m_pSound_Manager->VolumeMin(eID);
+}
+_int CGameInstance::VolumeRestore(CHANNELID eID)
+{
+	return m_pSound_Manager->VolumeRestore(eID);
+}
+
+void CGameInstance::PlaySound_Free(TCHAR* pSoundKey, _float _vol)
+{
+	m_pSound_Manager->PlaySound_Free(pSoundKey, _vol);
+}
+
 void CGameInstance::Release_Engine()
 {
 	CGameInstance::Get_Instance()->Free();
@@ -526,5 +591,8 @@ void CGameInstance::Free()
 	Safe_Release(m_pComponent_Manager);
 	Safe_Release(m_pLevel_Manager);
 	Safe_Release(m_pInput_Device);
+	Safe_Release(m_pSound_Manager);
+
 	Safe_Release(m_pGraphic_Device);
+
 }

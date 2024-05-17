@@ -205,7 +205,7 @@ HRESULT CRenderer::Initialize()
 		return E_FAIL;
 
 	// RadialBlur
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_RadialBlur"), 725.f, 695.f, 50.f, 50.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_RadialBlur"), 675.f, 695.f, 50.f, 50.f)))
 		return E_FAIL;
 #endif
 
