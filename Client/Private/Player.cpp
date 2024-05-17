@@ -42,7 +42,7 @@ HRESULT CPlayer::Initialize(void * pArg)
 	return S_OK;
 }
 
-void CPlayer::Tick(_float fTimeDelta)
+_int CPlayer::Tick(_float fTimeDelta)
 {
 	if (GetKeyState(VK_LEFT) & 0x8000)
 	{
@@ -96,6 +96,8 @@ void CPlayer::Tick(_float fTimeDelta)
 
 	m_pColliderCom->Tick(m_pTransformCom->Get_WorldMatrix());
 	
+
+	return OBJ_NOEVENT;
 }
 
 void CPlayer::Late_Tick(_float fTimeDelta)

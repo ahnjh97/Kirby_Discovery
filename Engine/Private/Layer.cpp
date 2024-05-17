@@ -33,10 +33,19 @@ HRESULT CLayer::Add_GameObject(CGameObject * pGameObject)
 
 void CLayer::Tick(_float fTimeDelta)
 {
-	for (auto& pGameObject : m_GameObjects)
+	for (auto iter = m_GameObjects.begin(); iter != m_GameObjects.end();)
 	{
-		if (nullptr != pGameObject)
-			pGameObject->Tick(fTimeDelta);
+		_int iObjState = { OBJ_NOEVENT };
+		if (nullptr != *iter)
+			iObjState = (*iter)->Tick(fTimeDelta);
+
+		if (OBJ_DEAD == iObjState)
+		{
+			Safe_Release(*iter);
+			iter = m_GameObjects.erase(iter);
+		}
+		else
+			iter++;
 	}
 }
 

@@ -1,5 +1,4 @@
-#include "..\Public\Light_Manager.h"
-
+#include "Light_Manager.h"
 #include "Light.h"
 
 CLight_Manager::CLight_Manager()
@@ -20,7 +19,6 @@ const LIGHT_DESC * CLight_Manager::Get_LightDesc(_uint iIndex)
 	return (*iter)->Get_LightDesc();	
 }
 
-/* ¤¤¤¸¤· ¤¾¤·¤· ¤µ¤¡*/
 HRESULT CLight_Manager::Initialize()
 {
 	return S_OK;
@@ -39,10 +37,35 @@ HRESULT CLight_Manager::Add_Light(const LIGHT_DESC & LightDesc)
 
 HRESULT CLight_Manager::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer)
 {
-	for (auto& pLight : m_Lights)
-		pLight->Render(pShader, pVIBuffer);
+	// ºû ¼øÈ¸¸¦ µ·´Ù.
+	for (auto Light = m_Lights.begin(); Light != m_Lights.end();)
+	{
+		_bool	LightDead = { false };
+		LightDead = static_cast<CLight*>(*Light)->Get_DeadLight();
 
+		// ºû ÄÃ¸µ
+		if ((*Light)->Compute_RenderCull())
+			(*Light)->Render(pShader, pVIBuffer);
+
+		// ºû »çÇü ¼±°í
+		if (LightDead == true)
+		{
+			Safe_Release(*Light);
+			Light = m_Lights.erase(Light);
+		}
+		else
+			Light++;
+	}
 	return S_OK;
+}
+
+void CLight_Manager::Clear_Light()
+{
+	// ¸ðµç ºûÀ» Á×ÀÎ´Ù.
+	for (auto& pLight : m_Lights)
+		Safe_Release(pLight);
+
+	m_Lights.clear();
 }
 
 CLight_Manager * CLight_Manager::Create()

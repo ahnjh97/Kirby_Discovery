@@ -38,6 +38,7 @@ void CLevel_Loading::Tick(_float fTimeDelta)
 		if (GetKeyState(VK_SPACE) & 0x8000)
 		{
 			CLevel*		pLevel = { nullptr };
+			m_pGameInstance->Set_CurrentLevelID((_uint)m_eNextLevelID);
 
 			switch (m_eNextLevelID)
 			{

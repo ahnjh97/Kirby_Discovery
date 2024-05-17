@@ -56,12 +56,17 @@ HRESULT CGameObject::Initialize(void* pArg)
 	m_Components.emplace(g_strTransformTag, m_pTransformCom);
 
 	Safe_AddRef(m_pTransformCom);
+
+	m_pCurrentLevelID = m_pGameInstance->Get_CurrentLevelID();
 	
 	return S_OK;
 }
 
-void CGameObject::Tick(_float fTimeDelta)
+_int CGameObject::Tick(_float fTimeDelta)
 {
+
+
+	return OBJ_NOEVENT;
 }
 
 void CGameObject::Late_Tick(_float fTimeDelta)
@@ -90,6 +95,20 @@ HRESULT CGameObject::Add_Component(_uint iLevelIndex, const wstring & strPrototy
 	*ppOut = pComponent;
 
 	Safe_AddRef(pComponent);
+
+	return S_OK;
+}
+
+// fViewZ와 ViewPos를 업데이트 한다.
+HRESULT CGameObject::Compute_ViewZ()
+{
+	_vector	vPosition = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+
+	m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW);
+	vPosition = XMVector3TransformCoord(vPosition, m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW));
+
+	m_fViewZ = XMVectorGetZ(vPosition);
+	XMStoreFloat3(&m_vViewPos, vPosition);
 
 	return S_OK;
 }

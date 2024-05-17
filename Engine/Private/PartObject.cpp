@@ -30,8 +30,10 @@ HRESULT CPartObject::Initialize(void * pArg)
 	return S_OK;
 }
 
-void CPartObject::Tick(_float fTimeDelta)
+_int CPartObject::Tick(_float fTimeDelta)
 {
+
+	return OBJ_NOEVENT;
 }
 
 void CPartObject::Late_Tick(_float fTimeDelta)

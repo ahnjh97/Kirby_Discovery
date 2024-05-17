@@ -45,14 +45,14 @@ void CMainApp::Tick(_float fTimeDelta)
 
 }
 
-HRESULT CMainApp::Render()
+HRESULT CMainApp::Render(_float fTimeDelta)
 {
 	if (nullptr == m_pGameInstance)
 		return E_FAIL;
 	
 	m_pGameInstance->Begin_Draw(_float4(0.f, 0.f, 1.f, 1.f));
 
-	m_pGameInstance->Draw();
+	m_pGameInstance->Draw(fTimeDelta);
 
 	m_pGameInstance->End_Draw();
 

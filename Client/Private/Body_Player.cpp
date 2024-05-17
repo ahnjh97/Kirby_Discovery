@@ -39,7 +39,7 @@ HRESULT CBody_Player::Initialize(void * pArg)
 	return S_OK;
 }
 
-void CBody_Player::Tick(_float fTimeDelta)
+_int CBody_Player::Tick(_float fTimeDelta)
 {
 	if (*m_pState & CPlayer::STATE_IDLE)
 	{
@@ -55,6 +55,8 @@ void CBody_Player::Tick(_float fTimeDelta)
 	
 	m_pColliderCom->Tick(XMLoadFloat4x4(&m_WorldMatrix));
 	
+	return OBJ_NOEVENT;
+
 }
 
 void CBody_Player::Late_Tick(_float fTimeDelta)

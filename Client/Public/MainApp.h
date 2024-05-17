@@ -18,7 +18,7 @@ private:
 public:
 	HRESULT Initialize();
 	void Tick(_float fTimeDelta);
-	HRESULT Render();
+	HRESULT Render(_float fTimeDelta);
 
 private:
 	CGameInstance*			m_pGameInstance = { nullptr };

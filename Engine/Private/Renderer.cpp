@@ -1,4 +1,4 @@
-#include "..\Public\Renderer.h"
+#include "Renderer.h"
 #include "GameObject.h"
 #include "GameInstance.h"
 
@@ -22,54 +22,97 @@ HRESULT CRenderer::Initialize()
 
 	m_pContext->RSGetViewports(&iNumViewports, &ViewportDesc);
 
-	/* 디퍼드 쉐이딩을 위한 렌더타겟들을 생성하자. */
+#pragma region MRT_GameObjects
 	/* For.Target_Diffuse */
 	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Diffuse"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R8G8B8A8_UNORM, _float4(0.f, 0.f, 0.f, 0.f))))
 		return E_FAIL;
-
 	/* For.Target_Normal */
 	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Normal"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 1.f))))
 		return E_FAIL;
-
 	/* For.Target_Depth */
 	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Depth"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 1.f, 0.f, 1.f))))
 		return E_FAIL;
-
+	/* For.Target_RimLight */
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_RimLight"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 1.f))))
+		return E_FAIL;
 	/* For.Target_FieldDepth */
 	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_FieldDepth"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 1.f))))
 		return E_FAIL;
-
-	/* For.Target_Shade */
-	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Shade"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 1.f))))
+	/* For.Target_Stencil */
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Stencil"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 1.f))))
 		return E_FAIL;
 
-	/* For.Target_Specular */
-	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Specular"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 0.f))))
-		return E_FAIL;
-
-	/* For.Target_LightDepth */
-	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_LightDepth"), g_iSizeX, g_iSizeY, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(1.f, 1.f, 1.f, 1.f))))
-		return E_FAIL;
-
-	/* MRT_GameObjects : 객체들의 특정 정보를 받아오기위한 렌더타겟들이다. */	
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Diffuse"))))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Normal"))))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Depth"))))
 		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_RimLight"))))
+		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_FieldDepth"))))
-		return E_FAIL;	
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Stencil"))))
+		return E_FAIL;
+#pragma endregion
 
-	/* MRT_LightAcc : 빛들의 연산결과 정보를 받아오기위한 렌더타겟들이다. */
+
+#pragma region MRT_LightAcc
+	/* For.Target_Shade */
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Shade"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 1.f))))
+		return E_FAIL;
+	/* For.Target_Specular */
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Specular"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 0.f))))
+		return E_FAIL;
+
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Shade"))))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Specular"))))
 		return E_FAIL;
+#pragma endregion
 
-	/* MRT_ShadowObject : 객체들의 특정 정보를 받아오기위한 렌더타겟들이다. */
+
+#pragma region MRT_ShadowObject
+	/* For.Target_LightDepth */
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_LightDepth"), g_iSizeX, g_iSizeY, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(1.f, 1.f, 1.f, 1.f))))
+		return E_FAIL;
+
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_ShadowObject"), TEXT("Target_LightDepth"))))
 		return E_FAIL;
+#pragma endregion
+
+#pragma region MRT_Sky
+	// 스카이와 블룸이 공존할 수 있게 랜더타겟으로 별도로 스카이박스를 처리한다.
+	/* For.Target_Sky */
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Sky"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_Sky"), TEXT("Target_Sky"))))
+		return E_FAIL;
+#pragma endregion
+
+#pragma region MRT_RadialBlur
+	/* For.Target_RadialBlur */
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_RadialBlur"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_RadialBlur"), TEXT("Target_RadialBlur"))))
+		return E_FAIL;
+#pragma endregion
+
+#pragma region MRT_Bloom
+	/* For.Target_Blur */
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Effect"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_Effect"), TEXT("Target_Effect"))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Blur_X"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_Blur_X"), TEXT("Target_Blur_X"))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Blur_Y"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_Blur_Y"), TEXT("Target_Blur_Y"))))
+		return E_FAIL;
+#pragma endregion
 
 
 	m_pVIBuffer = CVIBuffer_Rect::Create(m_pDevice, m_pContext);
@@ -124,22 +167,48 @@ HRESULT CRenderer::Initialize()
 
 
 #ifdef _DEBUG
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Diffuse"), 100.0f, 100.0f, 200.f, 200.f)))
+
+	// GameObject
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Diffuse"), 25.f, 695.f, 50.f, 50.f)))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Normal"), 100.0f, 300.0f, 200.f, 200.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Normal"), 75.f, 695.f, 50.f, 50.f)))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Depth"), 100.0f, 500.0f, 200.f, 200.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Depth"), 125.0f, 695.f, 50.f, 50.f)))
 		return E_FAIL;
-	
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Shade"), 300.0f, 100.0f, 200.f, 200.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_FieldDepth"), 175.f, 695.f, 50.f, 50.f)))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Specular"), 300.0f, 300.0f, 200.f, 200.f)))
-		return E_FAIL;	
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_LightDepth"), ViewportDesc.Width - 150.f, 150.0f, 300.f, 300.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Stencil"), 225.f, 695.f, 50.f, 50.f)))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_RimLight"), 275.f, 695.f, 50.f, 50.f)))
 		return E_FAIL;
 
+	// LightAcc
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Shade"), 325.f, 695.f, 50.f, 50.f)))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Specular"), 375.f, 695.f, 50.f, 50.f)))
+		return E_FAIL;
 
+	// ShadowObject
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_LightDepth"), 425.f, 695.f, 50.f, 50.f)))
+		return E_FAIL;
+
+	// Bloom (Blur)
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Blur_X"), 475.f, 695.f, 50.f, 50.f)))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Blur_Y"), 525.f, 695.f, 50.f, 50.f)))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Effect"), 575.f, 695.f, 50.f, 50.f)))
+		return E_FAIL;
+
+	// Sky
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Sky"), 625.f, 695.f, 50.f, 50.f)))
+		return E_FAIL;
+
+	// RadialBlur
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_RadialBlur"), 725.f, 695.f, 50.f, 50.f)))
+		return E_FAIL;
 #endif
+
 
 	return S_OK;
 }
@@ -156,7 +225,7 @@ HRESULT CRenderer::Add_RenderGroup(RENDERGROUP eRenderGroup, CGameObject * pRend
 	return S_OK;
 }
 
-HRESULT CRenderer::Render()
+HRESULT CRenderer::Render(_float fTimeDelta)
 {
 	if (FAILED(Render_Priority()))
 		return E_FAIL;
@@ -170,17 +239,28 @@ HRESULT CRenderer::Render()
 	if (FAILED(Render_Lights()))
 		return E_FAIL;
 
+	/////////////////////// 빛 처리가 완료되었다.
+
+	if (FAILED(Render_Bloom()))
+		return E_FAIL;
+	if (FAILED(Render_BloomResult()))
+		return E_FAIL;
 	if (FAILED(Render_Result()))
 		return E_FAIL;
-
-	if (FAILED(Render_NonLight()))
+	if (FAILED(Render_Blur_Result(fTimeDelta)))
 		return E_FAIL;
-	
+
+	/////////////////////// 블룸 및 Sky와의 결합과 레디얼 블러까지 완료되었다.
+
 	if (FAILED(Render_Blend()))
 		return E_FAIL;
 
 	if (FAILED(Render_UI()))
 		return E_FAIL;
+
+	if (FAILED(Render_SuperUI()))
+		return E_FAIL;
+
 
 #ifdef _DEBUG
 	if (FAILED(Render_Debug()))
@@ -189,6 +269,24 @@ HRESULT CRenderer::Render()
 
 	return S_OK;
 }
+
+void CRenderer::Setting_RadialBlur(_fvector vWorldPos, _float fRadial)
+{
+	_matrix ViewProjectionMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW) * m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
+	_vector vScreenPos = XMVector3TransformCoord(vWorldPos, ViewProjectionMatrix);
+	_float fScreenX = (XMVectorGetX(vScreenPos) + 1.f) * 0.5f;
+	_float fScreenY = (XMVectorGetY(vScreenPos) + 1.f) * 0.5f;
+
+	m_vScreenPos = _float2(fScreenX, fScreenY);
+	m_fRadialBlurRadius = fRadial;
+}
+
+void CRenderer::Setting_RadialBlur(_float fRadial)
+{
+	m_vScreenPos = _float2(0.5f, 0.5f);
+	m_fRadialBlurRadius = fRadial;
+}
+
 
 #ifdef _DEBUG
 
@@ -205,6 +303,9 @@ HRESULT CRenderer::Add_DebugComponents(CComponent * pRenderComponent)
 
 HRESULT CRenderer::Render_Priority()
 {
+	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_Sky"))))
+		return E_FAIL;
+
 	for (auto& pRenderObject : m_RenderObjects[RENDER_PRIORITY])
 	{
 		if(nullptr != pRenderObject)
@@ -212,6 +313,9 @@ HRESULT CRenderer::Render_Priority()
 		Safe_Release(pRenderObject);
 	}
 	m_RenderObjects[RENDER_PRIORITY].clear();
+
+	if (FAILED(m_pGameInstance->End_MRT()))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -266,15 +370,6 @@ HRESULT CRenderer::Render_NonBlend()
 	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_GameObjects"))))
 		return E_FAIL;
 
-	for (auto& pRenderObject : m_RenderObjects[RENDER_FIELD])
-	{
-		if (nullptr != pRenderObject)
-			pRenderObject->Render();
-		Safe_Release(pRenderObject);
-	}
-	m_RenderObjects[RENDER_FIELD].clear();
-
-
 	for (auto& pRenderObject : m_RenderObjects[RENDER_NONBLEND])
 	{
 		if (nullptr != pRenderObject)
@@ -289,22 +384,80 @@ HRESULT CRenderer::Render_NonBlend()
 	return S_OK;
 }
 
-HRESULT CRenderer::Render_NonLight()
+HRESULT CRenderer::Render_Bloom()
 {
-	for (auto& pRenderObject : m_RenderObjects[RENDER_NONLIGHT])
+	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_Effect"))))
+		return E_FAIL;
+
+	m_RenderObjects[RENDER_BLOOM].sort([](CGameObject* pSour, CGameObject* pDest)->_bool
+		{
+			return ((CGameObject*)pSour)->Get_ViewZ() > ((CGameObject*)pDest)->Get_ViewZ();
+		});
+
+	for (auto& pRenderObject : m_RenderObjects[RENDER_BLOOM])
 	{
 		if (nullptr != pRenderObject)
 			pRenderObject->Render();
 		Safe_Release(pRenderObject);
 	}
 
-	m_RenderObjects[RENDER_NONLIGHT].clear();
+	m_RenderObjects[RENDER_BLOOM].clear();
+
+	if (FAILED(m_pGameInstance->End_MRT()))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CRenderer::Render_BloomResult()
+{
+	if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_Blur_X"))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Effect"), "g_EffectTexture")))
+		return E_FAIL;
+
+	m_pVIBuffer->Bind_Buffers();
+
+	m_pShader->Begin(4);
+
+	m_pVIBuffer->Render();
+
+	if (FAILED(m_pGameInstance->End_MRT()))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_Blur_Y"))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Blur_X"), "g_EffectTexture")))
+		return E_FAIL;
+
+	m_pVIBuffer->Bind_Buffers();
+
+	m_pShader->Begin(5);
+
+	m_pVIBuffer->Render();
+
+	if (FAILED(m_pGameInstance->End_MRT()))
+		return E_FAIL;
 
 	return S_OK;
 }
 
 HRESULT CRenderer::Render_Blend()
 {	
+	m_RenderObjects[RENDER_BLEND].sort([](CGameObject* pSour, CGameObject* pDest)->_bool
+		{
+			return ((CGameObject*)pSour)->Get_ViewZ() > ((CGameObject*)pDest)->Get_ViewZ();
+		});
+
 	for (auto& pRenderObject : m_RenderObjects[RENDER_BLEND])
 	{
 		if (nullptr != pRenderObject)
@@ -321,10 +474,23 @@ HRESULT CRenderer::Render_UI()
 	for (auto& pRenderObject : m_RenderObjects[RENDER_UI])
 	{
 		if (nullptr != pRenderObject)
-			pRenderObject->Render();	
+			pRenderObject->Render();
 		Safe_Release(pRenderObject);
 	}
 	m_RenderObjects[RENDER_UI].clear();
+
+	return S_OK;
+}
+
+HRESULT CRenderer::Render_SuperUI()
+{
+	for (auto& pRenderObject : m_RenderObjects[RENDER_SUPERUI])
+	{
+		if (nullptr != pRenderObject)
+			pRenderObject->Render();
+		Safe_Release(pRenderObject);
+	}
+	m_RenderObjects[RENDER_SUPERUI].clear();
 
 	return S_OK;
 }
@@ -354,7 +520,6 @@ HRESULT CRenderer::Render_Lights()
 	if (FAILED(m_pVIBuffer->Bind_Buffers()))
 		return E_FAIL;
 
-	/* Shade */
 	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_LightAcc"))))
 		return E_FAIL;
 	
@@ -369,7 +534,10 @@ HRESULT CRenderer::Render_Lights()
 
 HRESULT CRenderer::Render_Result()
 {
-	/* 백버퍼에다가 디퍼드 방식으로 연산된 최종 결과물을 찍어준다. */
+	// 최종적으로 레디얼 블러 및 다른 블러를 먹일 생각이다.
+	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_RadialBlur"))))
+		return E_FAIL;
+
 	if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
 		return E_FAIL;
 	if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
@@ -379,14 +547,31 @@ HRESULT CRenderer::Render_Result()
 
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Diffuse"), "g_DiffuseTexture")))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Shade"), "g_ShadeTexture")))
-		return E_FAIL;
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Specular"), "g_SpecularTexture")))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Depth"), "g_DepthTexture")))
 		return E_FAIL;
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_FieldDepth"), "g_FieldDepthTexture")))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Shade"), "g_ShadeTexture")))
+		return E_FAIL;
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_LightDepth"), "g_LightDepthTexture")))
 		return E_FAIL;
+
+	// 그림자 안 그려지게끔 하는 용도이다.
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Stencil"), "g_StencilTexture")))
+		return E_FAIL;
+
+	// 블러 처리. Effect는 원본 블러는 가중치로 그린것이다. (Y는 X와 같이 그린것임.)
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Blur_Y"), "g_BlurTexture")))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Effect"), "g_EffectTexture")))
+		return E_FAIL;
+
+	// 섞을 스카이 박스
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Sky"), "g_SkyTexture")))
+		return E_FAIL;
+
 
 	_float4x4		ViewMatrix, ProjMatrix;
 
@@ -404,7 +589,44 @@ HRESULT CRenderer::Render_Result()
 	m_pVIBuffer->Bind_Buffers();
 
 	m_pVIBuffer->Render();
+
+	if (FAILED(m_pGameInstance->End_MRT()))
+		return E_FAIL;
+
 		
+	return S_OK;
+}
+
+HRESULT CRenderer::Render_Blur_Result(_float fTimeDelta)
+{
+	if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+		return E_FAIL;
+
+	// 최종 작업물 던지기
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_RadialBlur"), "g_RadialBlur")))
+		return E_FAIL;
+
+
+	if (m_fRadialBlurRadius > 0.f)
+		m_fRadialBlurRadius -= fTimeDelta * 90.f;
+
+	if (m_fRadialBlurRadius < 0.f)
+		m_fRadialBlurRadius = 0.f;
+
+	if (FAILED(m_pShader->Bind_RawValue("g_fRadialblurRaduis", &m_fRadialBlurRadius, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fRadialblurCenter", &m_vScreenPos, sizeof(_float2))))
+		return E_FAIL;
+
+	m_pShader->Begin(6);
+
+	m_pVIBuffer->Bind_Buffers();
+
+	m_pVIBuffer->Render();
 	return S_OK;
 }
 
@@ -434,6 +656,16 @@ HRESULT CRenderer::Render_Debug()
 	if (FAILED(m_pGameInstance->Draw_RTVDebug(TEXT("MRT_LightAcc"), m_pShader, m_pVIBuffer)))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Draw_RTVDebug(TEXT("MRT_ShadowObject"), m_pShader, m_pVIBuffer)))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Draw_RTVDebug(TEXT("MRT_Effect"), m_pShader, m_pVIBuffer)))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Draw_RTVDebug(TEXT("MRT_Blur_X"), m_pShader, m_pVIBuffer)))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Draw_RTVDebug(TEXT("MRT_Blur_Y"), m_pShader, m_pVIBuffer)))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Draw_RTVDebug(TEXT("MRT_Sky"), m_pShader, m_pVIBuffer)))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Draw_RTVDebug(TEXT("MRT_RadialBlur"), m_pShader, m_pVIBuffer)))
 		return E_FAIL;
 
 	return S_OK;	

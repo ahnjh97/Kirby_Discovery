@@ -19,8 +19,12 @@ public:
 	void Tick_Engine(_float fTimeDelta);
 	HRESULT Begin_Draw(const _float4 & vClearColor);
 	HRESULT End_Draw();
-	HRESULT Draw();
+	HRESULT Draw(_float fTimeDelta);
 	HRESULT Clear(_uint iClearLevelIndex);
+
+	_uint* Get_CurrentLevelID() { return &m_iCurrentLevelID; }
+	void Set_CurrentLevelID(_uint iLevelIndex) { m_iCurrentLevelID = iLevelIndex; }
+
 
 public: /* For.Input_Device */
 	_bool	Get_DIKeyState(_ubyte byKeyID, KEYSTATE eState);
@@ -44,6 +48,7 @@ public: /* For.Object_Manager */
 	HRESULT Add_Clone(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strPrototypeTag, void* pArg = nullptr);
 	class CGameObject* Clone_GameObject(const wstring& strPrototypeTag, void* pArg = nullptr);
 	const CComponent* Get_Component(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strComTag, _uint iIndex = 0);
+	list<CGameObject*>* Get_List(_uint iLevelIndex, const wstring& strLayerTag);
 
 public: /* For.Component_Manager */
 	HRESULT Add_Prototype(_uint iLevelIndex, const wstring& strPrototypeTag, class CComponent* pPrototype);
@@ -67,6 +72,8 @@ public: /* For.Light_Manager */
 	const LIGHT_DESC* Get_LightDesc(_uint iIndex);
 	HRESULT Add_Light(const LIGHT_DESC& LightDesc);
 	HRESULT Render_Lights(class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
+	void Clear_Light();
+	class CLight* Get_LightLastAddress();
 
 
 public: /* For.Font_Manager */
@@ -113,6 +120,7 @@ private:
 	class CExtractor*				m_pExtractor = { nullptr };
 
 
+	_uint	m_iCurrentLevelID = { 0 };
 
 public:		
 	static void Release_Engine();

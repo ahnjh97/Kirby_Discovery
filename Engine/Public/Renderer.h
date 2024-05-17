@@ -10,19 +10,31 @@ BEGIN(Engine)
 class CRenderer final : public CBase
 {
 public:
-	enum RENDERGROUP { RENDER_PRIORITY, RENDER_SHADOW, RENDER_FIELD, RENDER_NONBLEND, RENDER_NONLIGHT,  RENDER_BLEND, RENDER_UI, RENDER_END };
+	enum RENDERGROUP { 
+		RENDER_PRIORITY,
+		RENDER_SHADOW,
+		RENDER_NONBLEND, 
+		RENDER_BLOOM,  
+		RENDER_BLEND, 
+		RENDER_UI,
+		RENDER_SUPERUI,
+		RENDER_END };
 private:
 	CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual ~CRenderer() = default;
 public:
 	HRESULT Initialize();
 	HRESULT Add_RenderGroup(RENDERGROUP eRenderGroup, class CGameObject* pRenderObject);
-	HRESULT Render();
+	HRESULT Render(_float fTimeDelta);
+
+	// 잠깐의 레디얼 블러를 세팅한다.
+	void Setting_RadialBlur(_fvector vWorldPos, _float fRadial);
+	void Setting_RadialBlur(_float fRadial);
+
 
 #ifdef _DEBUG
 public:
 	HRESULT Add_DebugComponents(class CComponent* pRenderObject);
-
 #endif
 
 private:
@@ -48,13 +60,19 @@ private:
 	HRESULT Render_Priority();
 	HRESULT Render_Shadow();
 	HRESULT Render_NonBlend();
-	HRESULT Render_NonLight();
+	HRESULT Render_Bloom();
+	HRESULT Render_BloomResult();
+
 	HRESULT Render_Blend();
 	HRESULT Render_UI();
+	HRESULT Render_SuperUI();
 
 private:
 	HRESULT Render_Lights();
 	HRESULT Render_Result();
+	HRESULT Render_Blur_Result(_float fTimeDelta);
+	_float2 m_vScreenPos = { 0.f, 0.f };
+	_float m_fRadialBlurRadius = { 0.f };
 
 #ifdef _DEBUG
 private:

@@ -18,6 +18,15 @@ public:
 	HRESULT Add_Light(const LIGHT_DESC& LightDesc);
 	HRESULT Render(class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
 
+	// 방금 추가한 놈의 주소를 뜯어온다. ( 빛을 따라오게 하는 용도 )
+	class CLight* Get_LightLastAddress() {
+		return m_Lights.back();
+	}
+
+	// 빛을 초기화 한다.
+	void	Clear_Light();
+
+
 private:
 	list<class CLight*>				m_Lights;
 

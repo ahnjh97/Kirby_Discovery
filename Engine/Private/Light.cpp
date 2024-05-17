@@ -17,8 +17,6 @@ HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer)
 {
 	_uint		iPassIndex = { 0 };
 
-	/* 빛 연산을 위한 정보들을 던져주낟. */
-
 	if (LIGHT_DESC::TYPE_DIRECTIONAL == m_LightDesc.eType)
 	{
 		iPassIndex = 1;
@@ -37,6 +35,49 @@ HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer)
 
 		iPassIndex = 2;
 	}
+	else if (LIGHT_DESC::TYPE_FLASH == m_LightDesc.eType)
+	{
+		m_LightDesc.fRange -= (m_LightDesc.fRange / 20.f);
+		_vector vLightAmbient = XMLoadFloat4(&m_LightDesc.vAmbient);
+		vLightAmbient -= (vLightAmbient / 30.f);
+		XMStoreFloat4(&m_LightDesc.vAmbient, vLightAmbient);
+
+		if (m_LightDesc.fRange < 0.1f)
+		{
+			m_bDead = true;
+		}
+
+		if (FAILED(pShader->Bind_RawValue("g_vLightPos", &m_LightDesc.vPosition, sizeof(_float4))))
+			return E_FAIL;
+
+		if (FAILED(pShader->Bind_RawValue("g_fLightRange", &m_LightDesc.fRange, sizeof(_float))))
+			return E_FAIL;
+
+		iPassIndex = 2;
+	}
+	else if (LIGHT_DESC::TYPE_SUPERFLASH == m_LightDesc.eType)
+	{
+		m_iLifeTime++;
+
+		if (m_iLifeTime > 2)
+			m_bDead = true;
+
+		if (m_iLifeTime == 3)
+		{
+			m_LightDesc.fRange *= 0.4f;
+			m_LightDesc.vAmbient.x *= 0.5f;
+			m_LightDesc.vAmbient.y *= 0.5f;
+			m_LightDesc.vAmbient.z *= 0.5f;
+		}
+
+		if (FAILED(pShader->Bind_RawValue("g_vLightPos", &m_LightDesc.vPosition, sizeof(_float4))))
+			return E_FAIL;
+		if (FAILED(pShader->Bind_RawValue("g_fLightRange", &m_LightDesc.fRange, sizeof(_float))))
+			return E_FAIL;
+
+		iPassIndex = 2;
+	}
+
 
 	if (FAILED(pShader->Bind_RawValue("g_vLightDiffuse", &m_LightDesc.vDiffuse, sizeof(_float4))))
 		return E_FAIL;
@@ -51,6 +92,40 @@ HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer)
 
 	return S_OK;
 }
+
+void CLight::Update_LightPos(_fvector vPos)
+{
+	XMStoreFloat4(&m_LightDesc.vPosition, vPos);
+}
+
+_bool CLight::Compute_RenderCull()
+{
+	if (m_LightDesc.eType != m_LightDesc.TYPE_POINT)
+		return true;
+
+
+	_vector vLightPos = XMLoadFloat4(&m_LightDesc.vPosition);
+	_vector vCamPos = CGameInstance::Get_Instance()->Get_CamPosition_Vector();
+
+	if (m_LightDesc.fRange > XMVectorGetX(XMVector3Length(vLightPos - vCamPos)))
+		return true;
+
+	_matrix ViewProjectMatrix = CGameInstance::Get_Instance()->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW) * CGameInstance::Get_Instance()->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
+	_vector vLightScreenPos = XMVector3TransformCoord(vLightPos, ViewProjectMatrix);
+
+	_float X = XMVectorGetX(vLightScreenPos);
+	_float Y = XMVectorGetY(vLightScreenPos);
+
+	_float fLightRange = m_LightDesc.fRange;
+	_float fScreenRange = fLightRange / XMVectorGetW(vLightScreenPos);
+
+	if (X - fScreenRange > 1.f || X + fScreenRange < -1.f
+		|| Y - fScreenRange > 1.f || Y + fScreenRange < -1.f)
+		return false;
+
+	return true;
+}
+
 
 CLight * CLight::Create(const LIGHT_DESC & LightDesc)
 {

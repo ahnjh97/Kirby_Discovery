@@ -27,6 +27,8 @@ public:
 	void Late_Tick(_float fTimeDelta);
 	void Clear(_uint iLevelIndex);
 
+	list<CGameObject*>* CObject_Manager::Get_List(_uint iLevelIndex, const wstring& strLayerTag);
+
 
 private:	
 	map<const wstring, class CGameObject*>				m_Prototypes;

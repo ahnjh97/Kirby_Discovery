@@ -50,8 +50,10 @@ HRESULT CBackGround::Initialize(void * pArg)
 	return S_OK;
 }
 
-void CBackGround::Tick(_float fTimeDelta)
+_int CBackGround::Tick(_float fTimeDelta)
 {
+
+	return OBJ_NOEVENT;
 }
 
 void CBackGround::Late_Tick(_float fTimeDelta)

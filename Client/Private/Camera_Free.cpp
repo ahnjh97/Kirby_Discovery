@@ -33,7 +33,7 @@ HRESULT CCamera_Free::Initialize(void * pArg)
 	return S_OK;
 }
 
-void CCamera_Free::Tick(_float fTimeDelta)
+_int CCamera_Free::Tick(_float fTimeDelta)
 {
 	//if (m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80)
 	//{
@@ -71,6 +71,9 @@ void CCamera_Free::Tick(_float fTimeDelta)
 	//m_fFovy = XMConvertToRadians(120.f);
 
 	__super::Bind_PipeLines();
+
+
+	return OBJ_NOEVENT;
 }
 
 void CCamera_Free::Late_Tick(_float fTimeDelta)

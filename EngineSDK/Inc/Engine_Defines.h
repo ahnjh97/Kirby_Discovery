@@ -20,6 +20,10 @@ namespace Engine
 	enum MOUSEMOVESTATE { DIMMS_X, DIMMS_Y, DIMMS_WHEEL, DIMMS_END };
 }
 
+// Set_Dead() ∏≈≈©∑Œ
+#define OBJ_NOEVENT 0
+#define OBJ_DEAD 1
+
 // IMGUI
 #include "imgui.h"
 #include "imgui_impl_dx11.h"
