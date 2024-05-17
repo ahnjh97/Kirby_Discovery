@@ -30,8 +30,6 @@
 *.exe
 *.out
 *.app
-Engine/Default/
-Client/Default/
 Engine/Bin/Engine.exp
 Engine/Bin/Engine.ilk
 Engine/Bin/Engine.pdb
@@ -49,3 +47,5 @@ Client/Bin/Client.pdb
 Client/Bin/Diffuse.dds
 Client/Bin/DataFiles/Navigation.dat
 Engine/Bin/Shader_Deferred.cso
+Client/Default/x64/
+Engine/Default/x64/
