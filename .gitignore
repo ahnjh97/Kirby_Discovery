@@ -34,6 +34,8 @@
 Engine/Bin/Engine.exp
 Engine/Bin/Engine.ilk
 Engine/Bin/Engine.pdb
+Engine/Bin/Engine.dll
+Engine/Bin/Engine.lib
 Framework.VC.db
 .vs/
 Client/Bin/Shader_VtxAnimModel.cso
@@ -47,6 +49,8 @@ Client/Bin/Test.dds
 Client/Bin/Client.pdb
 Client/Bin/Diffuse.dds
 Client/Bin/DataFiles/Navigation.dat
+Client/Bin/Engine.dll
 Engine/Bin/Shader_Deferred.cso
+
 Client/Default/x64/
 Engine/Default/x64/
