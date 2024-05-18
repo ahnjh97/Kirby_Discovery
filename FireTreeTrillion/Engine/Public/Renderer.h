@@ -28,8 +28,8 @@ public:
 	HRESULT Render(_float fTimeDelta);
 
 	// 잠깐의 레디얼 블러를 세팅한다.
-	void Setting_RadialBlur(_fvector vWorldPos, _float fRadial);
-	void Setting_RadialBlur(_float fRadial);
+	void Setting_RadialBlur(_fvector vWorldPos, _float fRadial, _float fSubtraction);
+	void Setting_RadialBlur(_float fRadial, _float fSubtraction);
 
 
 #ifdef _DEBUG
@@ -73,6 +73,7 @@ private:
 	HRESULT Render_Blur_Result(_float fTimeDelta);
 	_float2 m_vScreenPos = { 0.f, 0.f };
 	_float m_fRadialBlurRadius = { 0.f };
+	_float m_fRadialRadiusSubtraction = { 0.f };
 
 #ifdef _DEBUG
 private:

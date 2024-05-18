@@ -133,12 +133,18 @@ namespace Engine
 
 	struct ENGINE_DLL MODEL
 	{
+		string strModelName = "";
+		TYPE eType = { TYPE_END };
+
 		_float fScale = { 1.f };
 		_float fDegree = { 0.f };
 		_uint iRootNode = { 4 };
 
-		MODEL(_float _fScale = { 1.f },
+		MODEL(string _strModelName = "",
+			TYPE _eType = { TYPE_END },
+			_float _fScale = { 1.f },
 			_float _fDegree = { 0.f },
-			_uint _iRootNode = { 4 }) : fScale(_fScale), fDegree(_fDegree), iRootNode(_iRootNode) {}
+			_uint _iRootNode = { 4 }
+		) : strModelName(_strModelName), eType(_eType), fScale(_fScale), fDegree(_fDegree), iRootNode(_iRootNode) {}
 	};
 }

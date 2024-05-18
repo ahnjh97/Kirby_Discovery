@@ -4,6 +4,7 @@
 #include "Renderer.h"
 #include "Component_Manager.h"
 #include "PipeLine.h"
+#include "Utils.h"
 
 BEGIN(Engine)
 
@@ -34,6 +35,9 @@ public: /* For.Input_Device */
 
 public: /* For.Renderer */
 	HRESULT Add_RenderGroup(CRenderer::RENDERGROUP eRenderGroup, class CGameObject* pRenderObject);
+	void Setting_RadialBlur(_fvector vWorldPos, _float fRadial, _float fSubtraction = 70.f);
+	void Setting_RadialBlur(_float fRadial, _float fSubtraction = 70.f);
+
 
 #ifdef _DEBUG
 public:

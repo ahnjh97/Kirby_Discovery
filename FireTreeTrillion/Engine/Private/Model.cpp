@@ -4,6 +4,7 @@
 #include "Model.h"
 #include "Bone.h"
 #include "Mesh.h"
+#include "Utils.h"
 
 CModel::CModel(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CComponent{ pDevice, pContext }
@@ -18,9 +19,7 @@ CModel::CModel(const CModel & rhs)
 	, m_Materials { rhs.m_Materials }
 	, m_TransformMatrix { rhs.m_TransformMatrix }	
 	, m_iNumAnimations { rhs.m_iNumAnimations }	
-	, m_eModelType{ rhs.m_eModelType }
 	, m_tModel{ rhs.m_tModel }
-	, m_strModelName{ rhs.m_strModelName }
 {
 	for (auto& pPrototypeAnimation : rhs.m_Animations)	
 		m_Animations.push_back(pPrototypeAnimation->Clone());
@@ -48,34 +47,30 @@ CBone * CModel::Get_BonePtr(const _char * pBoneName) const
 	return *iter;
 }
 
-HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelName, _fmatrix TransformMatrix, MODEL tModel, _bool bNonAnimVersion)
+HRESULT CModel::Initialize_Prototype(_fmatrix TransformMatrix, MODEL tModel)
 {
-	m_eModelType = eType;
-	m_strModelName = strModelName;
-	m_bIsNonAnimVersion = bNonAnimVersion;
 	m_tModel = tModel;
 
 	string strFolderName = "Anim/";
 	string strTxt = ".txt";
 
-	if (eType == TYPE_NONANIM)
+	if (m_tModel.eType == TYPE_NONANIM)
 		strFolderName = "Non" + strFolderName;
 
-	m_strDirectory = "../../../model_txt/" + strFolderName + strModelName + strTxt;
+	m_strDirectory = "../../../model_txt/" + strFolderName + m_tModel.strModelName + strTxt;
 
 	m_InputFile.open(m_strDirectory.c_str(), ios::in | ios::binary);
 	if (!m_InputFile.is_open())
 	{	// StrToWstr 필요
-		/*wstring tempstr = "Failed To Open : " + m_strDirectory;
-		MSG_BOX(tempstr.c_str());*/
-		MSG_BOX(TEXT("Failed To Open File."));
+		wstring tempstr = L"Failed To Open : " + CUtils::StrToWstr(m_strDirectory);
+		MSG_BOX(tempstr.c_str());
 		return E_FAIL;
 	}
 
 	::XMStoreFloat4x4(&m_TransformMatrix, TransformMatrix);
 
 	/* 읽은 정보를 바탕으로해서 내가 사용하기 좋게 정리한다.  */
-	if (eType == TYPE_ANIM)
+	if (m_tModel.eType == TYPE_ANIM)
 	{
 		if (FAILED(Ready_Bones()))
 			return E_FAIL;
@@ -86,10 +81,10 @@ HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelName, _fm
 	if (FAILED(Ready_Meshes()))
 		return E_FAIL;
 
-	if (FAILED(Ready_Materials(strModelName.c_str())))
+	if (FAILED(Ready_Materials(m_tModel.strModelName.c_str())))
 		return E_FAIL;
 
-	if (eType == TYPE_ANIM)
+	if (m_tModel.eType == TYPE_ANIM)
 	{
 		if (FAILED(Ready_Animations()))
 			return E_FAIL;
@@ -164,7 +159,7 @@ HRESULT CModel::Ready_Meshes()
 
 	for (size_t i = 0; i < m_iNumMeshes; i++)
 	{
-		CMesh* pMesh = CMesh::Create(m_pDevice, m_pContext, m_eModelType, m_strDirectory, m_InputFile, m_Bones, XMLoadFloat4x4(&m_TransformMatrix));
+		CMesh* pMesh = CMesh::Create(m_pDevice, m_pContext, m_tModel.eType, m_strDirectory, m_InputFile, m_Bones, XMLoadFloat4x4(&m_TransformMatrix));
 		if (nullptr == pMesh)
 			return E_FAIL;
 
@@ -242,11 +237,11 @@ HRESULT CModel::Ready_Animations()
 	return S_OK;
 }
 
-CModel * CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eType, const string& strModelName, _fmatrix TransformMatrix, MODEL tModel, _bool bNonAnimVersion)
+CModel * CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _fmatrix TransformMatrix, MODEL tModel)
 {
 	CModel* pInstance = new CModel(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype(eType, strModelName, TransformMatrix, tModel, bNonAnimVersion)))
+	if (FAILED(pInstance->Initialize_Prototype(TransformMatrix, tModel)))
 	{
 		MSG_BOX(TEXT("Failed To Create : CModel"));
 

@@ -7,6 +7,7 @@
 #include "GameInstance.h"
 #include "Camera_Free.h"
 #include "BackGround.h"
+#include "TestModel.h"
 
 //#include "Body_Player.h"
 //#include "Weapon.h"
@@ -48,6 +49,7 @@ HRESULT CLoader::Initialize(LEVEL eNextLevelID)
 	if (0 == m_hThread)
 		return E_FAIL;
 
+
 	return S_OK;
 }
 
@@ -56,7 +58,7 @@ HRESULT CLoader::Start()
 	EnterCriticalSection(&m_Critical_Section);
 
 	HRESULT		hr = { 0 };
-
+	SetUp_ModelScaleRotation(m_eNextLevelID);
 	switch (m_eNextLevelID)
 	{
 	case LEVEL_LOGO:
@@ -128,20 +130,18 @@ HRESULT CLoader::Loading_For_GamePlay()
 {
 	HRESULT hr;
 	LEVEL eLevel = LEVEL_GAMEPLAY;
-
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
 
 
-
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
-	_matrix		TransformMatrix = XMMatrixIdentity();
-
-
+	hr = Add_Models(eLevel);
+	CHECK_FAILED(hr);
 
 	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
 	hr = Add_Shaders(eLevel);
 	CHECK_FAILED(hr);
 
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 
 	m_IsFinished = true;
@@ -149,14 +149,35 @@ HRESULT CLoader::Loading_For_GamePlay()
 	return S_OK;
 }
 
-HRESULT CLoader::Add_Model(LEVEL eLevel, TYPE eModelType, string strModelName)
+HRESULT CLoader::Add_Models(LEVEL eLevel)
 {
+	for (auto& ModelInfo : m_vecModelInfo)
+	{
+		_matrix      TransformMatrix = XMMatrixIdentity();
+		TransformMatrix = XMMatrixScaling(ModelInfo.fScale, ModelInfo.fScale, ModelInfo.fScale) * XMMatrixRotationY(XMConvertToRadians(ModelInfo.fDegree));
+
+		wstring wstrModelName = CUtils::StrToWstr(ModelInfo.strModelName);
+		wstring wstrPrototypeTag = L"Prototype_Component_Model_" + wstrModelName;
+
+		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag,
+			CModel::Create(m_pDevice, m_pContext, TransformMatrix, ModelInfo))))
+			return E_FAIL;
+	}
+
 	return S_OK;
 }
 
-HRESULT CLoader::Add_Models(LEVEL eLevel, vector<string> _vecAnimModelNames, vector<string> _vecNonAnimModelNames)
+void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel) // Scale, Degree, RootIndex
 {
-	return S_OK;
+	if (eLevel == LEVEL_LOGO)
+	{
+
+	}
+	else if (eLevel == LEVEL_GAMEPLAY)
+	{
+		m_vecModelInfo.emplace_back(MODEL{"Fiona", TYPE_ANIM });
+	}
+
 }
 
 HRESULT CLoader::Add_Shaders(LEVEL eLevel)

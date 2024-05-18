@@ -83,8 +83,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		if (fTimeAcc > 1.f / 60.0f)
 		{
-			pMainApp->Tick(pGameInstance->Compute_TimeDelta(TEXT("Timer_60")));
-			pMainApp->Render(pGameInstance->Compute_TimeDelta(TEXT("Timer_60")));
+            _float fTickTimeDelta = pGameInstance->Compute_TimeDelta(TEXT("Timer_60"));
+			pMainApp->Tick(fTickTimeDelta);
+			pMainApp->Render(fTickTimeDelta);
 
 			fTimeAcc = 0.f;
 		}		

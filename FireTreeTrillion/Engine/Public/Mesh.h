@@ -17,7 +17,7 @@ public:
 	_uint Get_MaterialIndex() const { return m_iMaterialIndex; }
 
 public:
-	virtual HRESULT Initialize_Prototype(CModel::TYPE eModelType, string strDirectory, const vector<CBone*>& Bones, _fmatrix TransformMatrix);
+	virtual HRESULT Initialize_Prototype(TYPE eModelType, string strDirectory, const vector<CBone*>& Bones, _fmatrix TransformMatrix);
 	virtual HRESULT Initialize(void* pArg) override;
 
 public:
@@ -49,7 +49,7 @@ private:
 	HRESULT Ready_Vertices_For_AnimModel(const vector<CBone*>& Bones);
 
 public:
-	static CMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CModel::TYPE eModelType, string strDirectory
+	static CMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eModelType, string strDirectory
 		, ifstream& fileStream, const vector<class CBone*>& Bones, _fmatrix TransformMatrix);
 	virtual CMesh* Clone(void* pArg);
 	virtual void Free() override;

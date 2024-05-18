@@ -23,7 +23,19 @@ CAnimation::CAnimation(const CAnimation & rhs)
 
 HRESULT CAnimation::Initialize(const vector<class CBone*>& Bones, ifstream& fileStream)
 {
-	return E_NOTIMPL;
+	Read_AnimationData(fileStream);
+	m_CurrentKeyFrameIndices.resize(m_iNumChannels);
+
+	for (_int i = 0; i < m_iNumChannels; i++)
+	{
+		CChannel* pChannel = CChannel::Create(Bones, fileStream);
+		if (nullptr == pChannel)
+			return E_FAIL;
+
+		m_Channels.emplace_back(pChannel);
+	}
+
+	return S_OK;
 }
 
 void CAnimation::Invalidate_TransformationMatrix(_float fTimeDelta, const vector<CBone*>& Bones, _bool isLoop)

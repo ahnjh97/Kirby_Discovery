@@ -21,8 +21,8 @@ HRESULT CLevel_GamePlay::Initialize()
 	if(FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
 		return E_FAIL;
 
-	/*if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))
-		return E_FAIL;*/
+	if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))
+		return E_FAIL;
 
 	///* 구한정보들을 각 랜드오브젝트르 생성할 때 던진다. */
 	//if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
@@ -78,6 +78,9 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
 
 HRESULT CLevel_GamePlay::Ready_Layer_Player(const wstring & strLayerTag)
 {
+
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_TestModel"))))
+		return E_FAIL;
 
 	return S_OK;
 }

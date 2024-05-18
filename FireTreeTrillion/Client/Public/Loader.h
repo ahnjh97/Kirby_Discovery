@@ -36,8 +36,8 @@ private:
 	HRESULT Loading_For_GamePlay();
 
 	// 240518
-	HRESULT Add_Model(LEVEL eLevel, TYPE eModelType, string strModelName);
-	HRESULT Add_Models(LEVEL eLevel, vector<string> _vecAnimModelNames, vector<string> _vecNonAnimModelNames);
+	HRESULT Add_Models(LEVEL eLevel);
+	void SetUp_ModelScaleRotation(LEVEL eLevel);
 
 	// 셰이더 추가하고
 	HRESULT Add_Shaders(LEVEL eLevel);
@@ -52,6 +52,8 @@ private:
 	LEVEL						m_eNextLevelID = { LEVEL_END };
 	wstring						m_strLoadingText;
 	_bool						m_IsFinished = { false };
+
+	vector<MODEL>				m_vecModelInfo;
 
 	CGameInstance*				m_pGameInstance = { nullptr };
 

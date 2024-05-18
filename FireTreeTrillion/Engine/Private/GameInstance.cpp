@@ -219,6 +219,22 @@ HRESULT CGameInstance::Add_RenderGroup(CRenderer::RENDERGROUP eRenderGroup, CGam
 	return m_pRenderer->Add_RenderGroup(eRenderGroup, pRenderObject);	
 }
 
+void CGameInstance::Setting_RadialBlur(_fvector vWorldPos, _float fRadial, _float fSubtraction)
+{
+	if (nullptr == m_pRenderer)
+		return;
+
+	m_pRenderer->Setting_RadialBlur(vWorldPos, fRadial, fSubtraction);
+}
+
+void CGameInstance::Setting_RadialBlur(_float fRadial, _float fSubtraction)
+{
+	if (nullptr == m_pRenderer)
+		return;
+
+	m_pRenderer->Setting_RadialBlur(fRadial, fSubtraction);
+}
+
 HRESULT CGameInstance::Add_DebugComponents(CComponent * pRenderComponent)
 {
 

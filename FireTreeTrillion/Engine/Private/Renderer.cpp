@@ -270,21 +270,23 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 	return S_OK;
 }
 
-void CRenderer::Setting_RadialBlur(_fvector vWorldPos, _float fRadial)
+void CRenderer::Setting_RadialBlur(_fvector vWorldPos, _float fRadial, _float fSubtraction)
 {
 	_matrix ViewProjectionMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW) * m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
 	_vector vScreenPos = XMVector3TransformCoord(vWorldPos, ViewProjectionMatrix);
 	_float fScreenX = (XMVectorGetX(vScreenPos) + 1.f) * 0.5f;
 	_float fScreenY = (XMVectorGetY(vScreenPos) + 1.f) * 0.5f;
 
-	m_vScreenPos = _float2(fScreenX, fScreenY);
+	m_vScreenPos = _float2(fScreenX, 1.f - fScreenY);
 	m_fRadialBlurRadius = fRadial;
+	m_fRadialRadiusSubtraction = fSubtraction;
 }
 
-void CRenderer::Setting_RadialBlur(_float fRadial)
+void CRenderer::Setting_RadialBlur(_float fRadial, _float fSubtraction)
 {
 	m_vScreenPos = _float2(0.5f, 0.5f);
 	m_fRadialBlurRadius = fRadial;
+	m_fRadialRadiusSubtraction = fSubtraction;
 }
 
 
@@ -612,7 +614,7 @@ HRESULT CRenderer::Render_Blur_Result(_float fTimeDelta)
 
 
 	if (m_fRadialBlurRadius > 0.f)
-		m_fRadialBlurRadius -= fTimeDelta * 90.f;
+		m_fRadialBlurRadius -= fTimeDelta * m_fRadialRadiusSubtraction;
 
 	if (m_fRadialBlurRadius < 0.f)
 		m_fRadialBlurRadius = 0.f;
