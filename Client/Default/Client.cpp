@@ -14,6 +14,7 @@ HINSTANCE g_hInst;                                // 현재 인스턴스입니다.
 HWND g_hWnd;
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
+CMainApp* pMainApp;
 
 // 이 코드 모듈에 들어 있는 함수의 정방향 선언입니다.
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -50,7 +51,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     MSG msg;	
 
-	CMainApp*		pMainApp = CMainApp::Create();
+	pMainApp = CMainApp::Create();
 	if (nullptr == pMainApp)
 		return FALSE;
 
@@ -188,6 +189,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             case IDM_EXIT:
                 DestroyWindow(hWnd);
                 break;
+
+            case ID_32772 : // LEVEL_GAMEPLAY
+            {
+                HRESULT hr;
+                hr = pMainApp->Open_Level(LEVEL_GAMEPLAY);
+                CHECK_FAILED(hr);
+            }
+            break;
+
+            /* LEVEL 추가 */
+            
             default:
                 return DefWindowProc(hWnd, message, wParam, lParam);
             }
@@ -238,6 +250,7 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
             return (INT_PTR)TRUE;
         }
         break;
+
     }
     return (INT_PTR)FALSE;
 }

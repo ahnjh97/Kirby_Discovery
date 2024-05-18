@@ -38,9 +38,6 @@ private:
 	map<const wstring, class CGameObject*>				m_Prototypes;
 	unordered_map<class CGameObject*, const wstring>	m_mapCloneObjs;
 
-	// IMGUI 개인창 만들기
-	map<const string, vector<class CGameObject*>>		m_mapEditedObjs;
-
 	_uint												m_iNumLevels = { 0 };
 	// 현재 레벨
 	_int												m_iCurrentLevel = { -1 };
@@ -52,7 +49,6 @@ private:
 
 	// IMGUI TICK 및 RENDER
 	void					IMGUI_Tick();
-	void					IMGUI_Personal_Tick();
 
 public:
 	static CObject_Manager* Create(_uint iNumLevels);

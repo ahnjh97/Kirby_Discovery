@@ -17,8 +17,9 @@ private:
 
 public:
 	HRESULT Initialize();
-	void Tick(_float fTimeDelta);
+	void	Tick(_float fTimeDelta);
 	HRESULT Render();
+	HRESULT Open_Level(LEVEL eLevelID);
 
 private:
 	CGameInstance*			m_pGameInstance = { nullptr };
@@ -27,8 +28,18 @@ private:
 
 private:	
 	HRESULT Ready_Fonts();
-	HRESULT Open_Level(LEVEL eLevelID);
 	HRESULT Ready_Prototype_Component_For_Static();
+
+	//Parsing TEST
+	void		CreateXML();
+	void		Read_XML();
+	void		Create_N_ReadJSON();
+	void		Create_JSON();
+
+	_bool	ParseJson(Document& doc, const string& jsonData);
+	string	JsonDocToString(Document& doc, bool isPretty = false);
+	void	TestJson_Parse();
+	void	TestJson_AddMember();
 
 public:	
 	static CMainApp* Create();

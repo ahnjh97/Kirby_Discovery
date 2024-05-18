@@ -46,6 +46,12 @@
     <Filter Include="02.GameObjects\Player\Weapon">
       <UniqueIdentifier>{b3b00c76-db29-40f1-91c2-575d98ee7852}</UniqueIdentifier>
     </Filter>
+    <Filter Include="90.Utils">
+      <UniqueIdentifier>{b950e84f-4eac-4d0f-a16d-60f2661e798e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="90.Utils\XML">
+      <UniqueIdentifier>{952aa0f7-ec8e-42be-b8ec-701d80f0ec38}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -96,6 +102,9 @@
     <ClInclude Include="..\Public\Weapon.h">
       <Filter>02.GameObjects\Player\Weapon</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\tinyxml2.h">
+      <Filter>90.Utils\XML</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -133,6 +142,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Weapon.cpp">
       <Filter>02.GameObjects\Player\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\tinyxml2.cpp">
+      <Filter>90.Utils\XML</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
