@@ -5,7 +5,7 @@
 #include "Object_Manager.h"
 #include "Level_Manager.h"
 #include "Timer_Manager.h"
-#include "ImGui_Manager.h"
+//#include "ImGui_Manager.h"
 #include "Picking.h"
 
 #include "Renderer.h"
@@ -69,10 +69,10 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 
 HRESULT CGameInstance::Initialize_ImGui(CMyImGui* pImGui)
 {
-	m_pImGui_Manager = CImGui_Manager::Create(pImGui);
+	/*m_pImGui_Manager = CImGui_Manager::Create(pImGui);
 
 	if (nullptr == m_pImGui_Manager)
-		return E_FAIL;
+		return E_FAIL;*/
 
 	return S_OK;
 }
@@ -95,8 +95,8 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 	/* 반복적인 갱신이 필요한 객체들의 Tick함수를 호출한다. */
 	m_pLevel_Manager->Tick(fTimeDelta);
 
-	if (nullptr != m_pImGui_Manager)
-		m_pImGui_Manager->Tick(fTimeDelta);
+	//if (nullptr != m_pImGui_Manager)
+	//	m_pImGui_Manager->Tick(fTimeDelta);
 }
 
 HRESULT CGameInstance::Draw(const _float4& vClearColor)

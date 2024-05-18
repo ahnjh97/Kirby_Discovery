@@ -26,7 +26,7 @@ HRESULT CAnimation::Initialize(const vector<class CBone*>& Bones, ifstream& file
 	Read_AnimationData(fileStream);
 	m_CurrentKeyFrameIndices.resize(m_iNumChannels);
 
-	for (_int i = 0; i < m_iNumChannels; i++)
+	for (_uint i = 0; i < m_iNumChannels; i++)
 	{
 		CChannel* pChannel = CChannel::Create(Bones, fileStream);
 		if (nullptr == pChannel)

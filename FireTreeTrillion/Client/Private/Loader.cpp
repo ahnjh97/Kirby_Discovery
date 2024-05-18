@@ -177,8 +177,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel) // Scale, Degree, RootIndex
 	}
 	else if (eLevel == LEVEL_GAMEPLAY)
 	{
-		m_vecModelInfo.emplace_back(MODEL{"Fiona", TYPE_ANIM, 0.05f });
-		m_vecModelInfo.emplace_back(MODEL{"TestMap", TYPE_NONANIM });
+		m_vecModelInfo.emplace_back(MODEL{ "Fiona", TYPE_ANIM, 0.5f });
+		m_vecModelInfo.emplace_back(MODEL{ "TestMap", TYPE_NONANIM });
 	}
 
 }

@@ -98,8 +98,8 @@ HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelFilePath,
 	if(FAILED(RenameBinaryFile())) // 파일 닫고, 임시파일-> 최종파일 이름
 		return E_FAIL;
 
-	if (eType == TYPE_ANIM)
-		Create_NonAnimVersion(strModelFilePath , TransformMatrix);
+	/*if (eType == TYPE_ANIM)
+		Create_NonAnimVersion(strModelFilePath , TransformMatrix);*/
 
 	return S_OK;
 }
