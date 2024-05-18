@@ -22,6 +22,9 @@ public:
 	void Set_Dead() { m_bDead = true; }
 	_bool Get_Dead() { return m_bDead; }
 
+	// prototypeTag
+	const wstring&		Get_PrototypeTag() { return m_wstrPrototypeTag; }
+	void				Set_PrototypeTag(wstring _wstrProtoTag) { m_wstrPrototypeTag = _wstrProtoTag; }
 
 public:
 	virtual HRESULT Initialize_Prototype();
@@ -30,6 +33,7 @@ public:
 	virtual void Late_Tick(_float fTimeDelta);
 	virtual HRESULT Render();
 	virtual HRESULT Render_LightDepth() { return S_OK; }
+	virtual void	Render_IMGUI() {}
 
 protected:
 	ID3D11Device*						m_pDevice = { nullptr };
@@ -40,6 +44,8 @@ protected:
 
 	// 현재 레벨을 알 수 있는 포인터.
 	_uint*								m_pCurrentLevelID = { nullptr };
+	// prototypeName을 들고 있는다.
+	wstring								m_wstrPrototypeTag = wstring();
 
 protected:
 	map<const wstring, class CComponent*>		m_Components;

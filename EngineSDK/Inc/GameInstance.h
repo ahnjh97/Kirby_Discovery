@@ -46,12 +46,17 @@ public: /* For.Level_Manager */
 public: /* For.Object_Manager */
 	HRESULT Add_Prototype(const wstring& strPrototypeTag, class CGameObject* pPrototype);
 	HRESULT Add_Clone(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strPrototypeTag, void* pArg = nullptr);
+
 	class CGameObject* Clone_GameObject(const wstring& strPrototypeTag, void* pArg = nullptr);
 	const CComponent* Get_Component(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strComTag, _uint iIndex = 0);
 	list<CGameObject*>* Get_List(_uint iLevelIndex, const wstring& strLayerTag);
 
+	class CGameObject*	Get_GameObject(_uint iLevelIndex, const wstring& strLayerTag, _uint iIndex);
+	class CGameObject*	Get_GameObject_ByTag(_uint iLevelIndex, const wstring& strLayerTag, wstring _tag);
+	void				Set_CurrentLevel(_int CurrentLevel);
+
 public: /* For.Component_Manager */
-	HRESULT Add_Prototype(_uint iLevelIndex, const wstring& strPrototypeTag, class CComponent* pPrototype);
+	HRESULT			  Add_Prototype(_uint iLevelIndex, const wstring& strPrototypeTag, class CComponent* pPrototype);
 	class CComponent* Clone_Component(_uint iLevelIndex, const wstring& strPrototypeTag, void* pArg = nullptr);
 
 
@@ -121,6 +126,9 @@ public: // Sound Manager
 	_int  VolumeRestore(CHANNELID eID);
 	void PlaySound_Free(TCHAR* pSoundKey, _float _vol);
 
+public: /* For.ImGui_Manager */
+	void		ImGui_Render();
+	void		EditTransform(/*const CCamera& camera,*/ _float4x4& _matrix);
 
 private:
 	class CGraphic_Device*			m_pGraphic_Device = { nullptr };
@@ -137,7 +145,7 @@ private:
 	class CFrustum*					m_pFrustum = { nullptr };
 	class CExtractor*				m_pExtractor = { nullptr };
 	class CSound_Manager*			m_pSound_Manager = { nullptr };
-
+	class CImGUI_Manager*			m_pIMGUI_Manager = { nullptr };
 
 	_uint	m_iCurrentLevelID = { 0 };
 
