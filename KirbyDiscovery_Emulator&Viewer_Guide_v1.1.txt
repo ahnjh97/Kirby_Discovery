@@ -8,6 +8,10 @@
                                           /\___/                                                                       /\___/
                                           \/__/                                                                        \/__/ 
 
+<<<<<<<< HEAD:KirbyDiscovery_Emulator&Viewer_Guide_v1.1.txt
+========
+
+>>>>>>>> main:FireTreeTrillion/KirbyDiscovery_Emulator&Viewer_Guide_v1.0.txt
  ____                        __                                   _            _     
 /\  _`\              __     /\ \                                /' \         /' \    
 \ \ \L\_\   __  __  /\_\    \_\ \      __              __  __  /\_, \       /\_, \   
@@ -138,6 +142,10 @@ https://aps.autodesk.com/developer/overview/fbx-converter-archives
 정상적으로 변환했을 경우 블렌더에서 애니메이션 이식 시 문제없이 재생
 
 
+<<<<<<<< HEAD:KirbyDiscovery_Emulator&Viewer_Guide_v1.1.txt
+========
+
+>>>>>>>> main:FireTreeTrillion/KirbyDiscovery_Emulator&Viewer_Guide_v1.0.txt
 
 ✨✨✨블렌더 플러그인(애드온)✨✨✨
 [io_anim_seanim]
