@@ -18,15 +18,31 @@ private:
 	virtual ~CLoader() = default;
 
 public:
+
 	HRESULT Initialize(LEVEL eNextLevelID);
 	HRESULT Start();
 	_bool IsFinished() const {
 		return m_IsFinished;
 	}
-	void Output() {
+	void Output() 
+	{
 		SetWindowText(g_hWnd, m_strLoadingText.c_str());
 	}
-	
+
+private:
+	HRESULT Loading_ObjectAll();
+
+	HRESULT Loading_For_Logo();
+	HRESULT Loading_For_GamePlay();
+
+	// 240518
+	HRESULT Add_Model(LEVEL eLevel, TYPE eModelType, string strModelName);
+	HRESULT Add_Models(LEVEL eLevel, vector<string> _vecAnimModelNames, vector<string> _vecNonAnimModelNames);
+
+	// 셰이더 추가하고
+	HRESULT Add_Shaders(LEVEL eLevel);
+
+	HRESULT Add_Texture(LEVEL eLevel, string strPrototypeName, string strFolderAndFileName, _uint iNumTextures = 1);
 
 private:
 	ID3D11Device*				m_pDevice = { nullptr };
@@ -38,11 +54,6 @@ private:
 	_bool						m_IsFinished = { false };
 
 	CGameInstance*				m_pGameInstance = { nullptr };
-
-
-private:
-	HRESULT Loading_For_Logo();
-	HRESULT Loading_For_GamePlay();
 
 public:
 	static CLoader* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID);

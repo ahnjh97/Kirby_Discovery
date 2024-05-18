@@ -1,0 +1,15 @@
+{
+  "title": "Example Title",
+  "description": "This is an example JSON file.",
+  "version": 1,
+  "authors": [
+    {
+      "name": "John Doe",
+      "email": "johndoe@example.com"
+    },
+    {
+      "name": "Jane Doe",
+      "email": "janedoe@example.com"
+    }
+  ]
+}

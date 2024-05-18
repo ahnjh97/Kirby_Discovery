@@ -24,7 +24,6 @@ HRESULT CCamera_Free::Initialize(void * pArg)
 		return E_FAIL;
 	
 	CAMERA_FREE_DESC*	pCameraFree = (CAMERA_FREE_DESC*)pArg;
-
 	m_fMouseSensor = pCameraFree->fMouseSensor;
 
 	if (FAILED(__super::Initialize(pArg)))
@@ -52,8 +51,6 @@ _int CCamera_Free::Tick(_float fTimeDelta)
 	//	m_pTransformCom->Go_Backward(fTimeDelta);
 	//}
 
-	
-
 	_long	MouseMove = { 0 };
 
 	if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMMS_X))
@@ -78,11 +75,35 @@ _int CCamera_Free::Tick(_float fTimeDelta)
 
 void CCamera_Free::Late_Tick(_float fTimeDelta)
 {
+
+	ImGui::Begin("test");
+	ImGui::Text("test");
+	ImGui::End();
+
 }
 
 HRESULT CCamera_Free::Render()
 {
 	return S_OK;
+}
+
+void CCamera_Free::Render_IMGUI()
+{
+	static _float fSpeed = 10.f;
+	_float4 fPosition = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+
+	ImGui::SliderFloat("CameraFree Speed", &fSpeed, 0.f, 50.f);
+	//m_pTransformCom->Set_Speed(fSpeed);
+	/*
+	ImGui::SliderFloat("CameraFree Smooth Speed", &m_fSmoothSpeed, 0.f, 0.3f);
+	m_pTransformCom->Set_Speed(fSpeed);
+
+	ImGui::Separator();
+	ImGui::DragFloat3("CameraFree Position", &fPosition.x);
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, fPosition);
+
+	ImGui::Separator();
+	ImGui::DragFloat3("CameraFree Offset", &m_vOffset.x);*/
 }
 
 CCamera_Free * CCamera_Free::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

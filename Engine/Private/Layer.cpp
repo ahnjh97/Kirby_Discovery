@@ -27,8 +27,31 @@ HRESULT CLayer::Add_GameObject(CGameObject * pGameObject)
 		return E_FAIL;
 
 	m_GameObjects.push_back(pGameObject);	
-
+	/*m_GameObjects.sort([](CGameObject* lhs, CGameObject* rhs)
+		{
+			return lhs->Get_RenderPriority() < rhs->Get_RenderPriority();
+		});*/
 	return S_OK;
+}
+
+CGameObject* CLayer::Get_GameObject(_uint iIndex)
+{
+	auto	iter = m_GameObjects.begin();
+	std::advance(iter, iIndex);
+	/*for (size_t i = 0; i < iIndex; i++)
+		++iter;*/
+
+	return *iter;
+}
+
+CGameObject* CLayer::Get_GameObject_ByTag(wstring _tag)
+{
+	for (auto& obj : m_GameObjects)
+	{
+		if (obj->Get_PrototypeTag() == _tag)
+			return obj;
+	}
+	return nullptr;
 }
 
 void CLayer::Tick(_float fTimeDelta)

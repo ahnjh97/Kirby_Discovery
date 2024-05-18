@@ -16,10 +16,10 @@ public:
 	HRESULT Render();
 	HRESULT	RenderUpdate();
 	
+
 public:
-	//void IMGUI_Start();
 	void SetDockSpace();
-	void EditTransform(/*const ccamera& camera, */_float4x4& matrix);
+	void EditTransform(_float4x4& matrix);
 
 private:
 	ID3D11Device*		 m_pDevice = { nullptr };
