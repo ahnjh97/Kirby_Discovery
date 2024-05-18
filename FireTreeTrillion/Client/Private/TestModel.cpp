@@ -52,18 +52,18 @@ HRESULT CTestModel::Initialize(void* pArg)
 
 
 
-    // 예시코드 2 : 따라다니게 하기 예시 코드 + 점 광원 예시 코드
-    LightDesc.eType = LIGHT_DESC::TYPE_POINT;
-    LightDesc.vPosition = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
-    LightDesc.fRange = 5.f;
-    LightDesc.vDiffuse = _float4(1.f, 0.8f, 0.1f, 1.f);
-    LightDesc.vAmbient = _float4(1.f, 1.f, 1.f, 1.f);
-    LightDesc.vSpecular = _float4(0.f, 0.f, 0.0f, 1.f);
-    if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
-        return E_FAIL;
+    //// 예시코드 2 : 따라다니게 하기 예시 코드 + 점 광원 예시 코드
+    //LightDesc.eType = LIGHT_DESC::TYPE_POINT;
+    //LightDesc.vPosition = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+    //LightDesc.fRange = 5.f;
+    //LightDesc.vDiffuse = _float4(1.f, 0.8f, 0.1f, 1.f);
+    //LightDesc.vAmbient = _float4(1.f, 1.f, 1.f, 1.f);
+    //LightDesc.vSpecular = _float4(0.f, 0.f, 0.0f, 1.f);
+    //if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
+    //    return E_FAIL;
 
-    m_pLight = CGameInstance::Get_Instance()->Get_LightLastAddress();
-    Safe_AddRef(m_pLight);
+    //m_pLight = CGameInstance::Get_Instance()->Get_LightLastAddress();
+    //Safe_AddRef(m_pLight);
 
     return S_OK;
 
@@ -83,7 +83,7 @@ _int CTestModel::Tick(_float fTimeDelta)
 
     // 예시코드 5 : 계산기 예시 코드 (월드 매트리스로 예시든거임 이건 정신나간 코드이므로 참고해주셈)
     // 예시코드 6 : DInput + KeyPress 예시 코드
-    if (m_pGameInstance->Get_DIKeyState(DIK_W, KEY_PRESS))
+    if (m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_PRESS))
     {
         _float4x4 Worldmatrix = m_pTransformCom->Get_WorldFloat4x4();
         _vector vLook = CUtils::Get_State_Vector_Matrix(Worldmatrix, CUtils::STATE_LOOK);
@@ -132,6 +132,8 @@ void CTestModel::Late_Tick(_float fTimeDelta)
     if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
     {
         m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+        m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
+
     }
 
 
@@ -172,7 +174,7 @@ HRESULT CTestModel::Render_LightDepth()
 
     _float4x4		ViewMatrix, ProjMatrix;
 
-    XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMVectorSet(0.f, 10.f, -10.f, 1.f), XMVectorSet(0.f, 0.f, 0.f, 1.f), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
+    XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMVectorSet(0.f, 5.f, -1.f, 1.f), XMVectorSet(0.f, 0.f, 0.f, 1.f), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
     XMStoreFloat4x4(&ProjMatrix, XMMatrixPerspectiveFovLH(XMConvertToRadians(120.0f), (_float)g_iWinSizeX / g_iWinSizeY, 0.1f, 2000.f));
 
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
@@ -268,6 +270,6 @@ void CTestModel::Free()
     Safe_Release(m_pShaderCom);
     Safe_Release(m_pModelCom);
 
-    Safe_Release(m_pLight);
+    //Safe_Release(m_pLight);
 
 }

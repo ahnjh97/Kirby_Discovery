@@ -1,26 +1,2 @@
-﻿  Loader.cpp
-C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(26,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
-  (소스 파일 '/Private/Loader.cpp'을(를) 컴파일하는 중)
-  
-C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(35,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
-  (소스 파일 '/Private/Loader.cpp'을(를) 컴파일하는 중)
-  
-C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(45,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
-  (소스 파일 '/Private/Loader.cpp'을(를) 컴파일하는 중)
-  
-C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(57,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
-  (소스 파일 '/Private/Loader.cpp'을(를) 컴파일하는 중)
-  
-C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Transform.h(11,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
-  (소스 파일 '/Private/Loader.cpp'을(를) 컴파일하는 중)
-  
-C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\GameObject.h(10,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
-  (소스 파일 '/Private/Loader.cpp'을(를) 컴파일하는 중)
-  
-C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Camera.h(14,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
-  (소스 파일 '/Private/Loader.cpp'을(를) 컴파일하는 중)
-  
-C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\Client_Assimp\Public\Camera_Free.h(11,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
-  (소스 파일 '/Private/Loader.cpp'을(를) 컴파일하는 중)
-  
-  Client_Assimp.vcxproj -> C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\Client_Assimp\Bin\Client_Assimp.exe
+﻿  LINK : ..\Bin\Client_Assimp.exe을(를) 찾을 수 없거나 마지막 증분 링크에 의해 빌드되지 않았습니다. 전체 링크를 수행하고 있습니다.
+  Client_Assimp.vcxproj -> C:\Users\K1211\Desktop\Kirby_Discovery\Assimp\Client_Assimp\Bin\Client_Assimp.exe

@@ -155,7 +155,7 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
     float4 vNormal = float4(vNormalDesc.xyz * 2.f - 1.f, 0.f);
 
     vector vDepthDesc = g_DepthTexture.Sample(PointSampler, In.vTexcoord);
-    float fViewZ = vDepthDesc.y * 100000.0f;
+    float fViewZ = vDepthDesc.y * 1000.0f;
 	
     Out.vShade = g_vLightDiffuse * saturate(max(dot(normalize(g_vLightDir) * -1.f, vNormal), 0.f) + g_vLightAmbient * g_vMtrlAmbient);
 
@@ -194,7 +194,7 @@ PS_OUT_LIGHT PS_MAIN_POINT(PS_IN In)
     float4 vNormal = float4(vNormalDesc.xyz * 2.f - 1.f, 0.f);
 
     vector vDepthDesc = g_DepthTexture.Sample(PointSampler, In.vTexcoord);
-    float fViewZ = vDepthDesc.y * 100000.f;
+    float fViewZ = vDepthDesc.y * 1000.0f;
 
     float4 vWorldPos;
 
@@ -247,7 +247,7 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
 	/* ProjPos.w == View.Z */
     vector vDepthDesc = g_DepthTexture.Sample(PointSampler, In.vTexcoord);
     
-    float fViewZ = vDepthDesc.y * 100000.f;
+    float fViewZ = vDepthDesc.y * 1000.0f;
 
     float4 vWorldPos;
 
@@ -279,12 +279,12 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
 
 	/* vPosition.w : 현재 내가 그릴려고 했던 픽셀의 광원기준의 깊이. */
 	/* vLightDepthDesc.x * 2000.f : 현재 픽셀을 광원기준으로  그릴려고 했던 위치에 이미 그려져있떤 광원 기준의 깊이.  */
-    if (vPosition.w > (vLightDepthDesc.x * 100000.f) && g_StencilTexture.Sample(LinearSampler, In.vTexcoord).x == 0.f)
+    if (vPosition.w > (vLightDepthDesc.x * 1000.0f) && g_StencilTexture.Sample(LinearSampler, In.vTexcoord).x == 0.f)
     {
-        if (vPosition.w - (vLightDepthDesc.x * 100000.f) < 3.f)
-        {
+        //if (vPosition.w - (vLightDepthDesc.x * 1000.0f) < 3.f)
+        //{
             Out.vColor *= 0.3f;
-        }
+        //}
     }
         
     vector vBlur = g_BlurTexture.Sample(LinearSampler, In.vTexcoord);

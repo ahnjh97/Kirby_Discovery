@@ -8,6 +8,7 @@
 #include "Camera_Free.h"
 #include "BackGround.h"
 #include "TestModel.h"
+#include "TestTerrain.h"
 
 //#include "Body_Player.h"
 //#include "Weapon.h"
@@ -87,6 +88,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	m_strLoadingText = TEXT("객체의 원형를(을) 로딩 중 입니다.");
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BackGround"),  CBackGround);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestMap"), CTestTerrain);
 
 	///* For.Prototype_GameObject_Player */
 	//if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Player"),
@@ -175,7 +177,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel) // Scale, Degree, RootIndex
 	}
 	else if (eLevel == LEVEL_GAMEPLAY)
 	{
-		m_vecModelInfo.emplace_back(MODEL{"Fiona", TYPE_ANIM });
+		m_vecModelInfo.emplace_back(MODEL{"Fiona", TYPE_ANIM, 0.05f });
+		m_vecModelInfo.emplace_back(MODEL{"TestMap", TYPE_NONANIM });
 	}
 
 }

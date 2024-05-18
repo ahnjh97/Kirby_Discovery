@@ -8,6 +8,7 @@ class CModel;
 class CShader;
 END
 
+BEGIN(Client)
 
 class CTestModel final : public CGameObject
 {
@@ -38,6 +39,6 @@ public:
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 
-
 };
 
+END
