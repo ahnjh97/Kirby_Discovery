@@ -14,6 +14,8 @@
 #include "Renderer.h"
 #include "Frustum.h"
 
+#include "ImGUI_Manager.h"
+
 IMPLEMENT_SINGLETON(CGameInstance)
 
 CGameInstance::CGameInstance()	
@@ -65,6 +67,8 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 	/* 인풋 디바이스를 초기화한다 .*/
 
 	/* 사운드 디바이스를 초기화한다 .*/
+	m_pSound_Manager = CSound_Manager::Create();
+	CHECK_NULLPTR(m_pSound_Manager);
 
 	/* 오브젝트 매니져의 공간 예약을 한다. */
 	m_pObject_Manager = CObject_Manager::Create(iNumLevels);
@@ -88,7 +92,9 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 	if (nullptr == m_pExtractor)
 		return E_FAIL;
 	
-
+	/* IMGUI 매니저의 공간 예약을 한다. */
+	m_pIMGUI_Manager = CImGUI_Manager::Create(EngineDesc.hWnd, *ppDevice, *ppContext);
+	CHECK_NULLPTR(m_pIMGUI_Manager);
 
 	return S_OK;
 }
@@ -107,6 +113,7 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 	m_pPipeLine->Tick();
 
 	m_pFrustum->Tick();
+	m_pIMGUI_Manager->Late_Tick(fTimeDelta);
 
 	m_pObject_Manager->Late_Tick(fTimeDelta);
 	
@@ -147,6 +154,9 @@ HRESULT CGameInstance::Draw(_float fTimeDelta)
 	m_pRenderer->Render(fTimeDelta);
 
 	m_pLevel_Manager->Render();	
+
+	m_pIMGUI_Manager->Render();
+	m_pIMGUI_Manager->RenderUpdate();
 
 	return S_OK;
 }
@@ -252,9 +262,7 @@ CGameObject * CGameInstance::Clone_GameObject(const wstring & strPrototypeTag, v
 
 const CComponent * CGameInstance::Get_Component(_uint iLevelIndex, const wstring & strLayerTag, const wstring & strComTag, _uint iIndex)
 {
-	if (nullptr == m_pObject_Manager)
-		return nullptr;
-
+	CHECK_NULLPTR(m_pObject_Manager);
 	return m_pObject_Manager->Get_Component(iLevelIndex, strLayerTag, strComTag, iIndex);
 }
 
@@ -266,19 +274,33 @@ list<CGameObject*>* CGameInstance::Get_List(_uint iLevelIndex, const wstring& st
 	return m_pObject_Manager->Get_List(iLevelIndex, strLayerTag);
 }
 
+void CGameInstance::Set_CurrentLevel(_int CurrentLevel)
+{
+	CHECK_NULLPTR(m_pObject_Manager);
+	m_pObject_Manager->Set_CurrentLevel(CurrentLevel);
+}
+
+CGameObject* CGameInstance::Get_GameObject(_uint iLevelIndex, const wstring& strLayerTag, _uint iIndex)
+{
+	CHECK_NULLPTR(m_pObject_Manager);
+	return m_pObject_Manager->Get_GameObject(iLevelIndex, strLayerTag, iIndex);
+}
+
+CGameObject* CGameInstance::Get_GameObject_ByTag(_uint iLevelIndex, const wstring& strLayerTag, wstring _tag)
+{
+	CHECK_NULLPTR(m_pObject_Manager);
+	return m_pObject_Manager->Get_GameObject_ByTag(iLevelIndex, strLayerTag, _tag);
+}
+
 HRESULT CGameInstance::Add_Prototype(_uint iLevelIndex, const wstring & strPrototypeTag, CComponent * pPrototype)
 {
-	if (nullptr == m_pComponent_Manager)
-		return E_FAIL;
-
+	CHECK_NULLPTR(m_pComponent_Manager);
 	return m_pComponent_Manager->Add_Prototype(iLevelIndex, strPrototypeTag, pPrototype);
 }
 
 CComponent * CGameInstance::Clone_Component(_uint iLevelIndex, const wstring & strPrototypeTag, void * pArg)
 {
-	if (nullptr == m_pComponent_Manager)
-		return nullptr;
-
+	CHECK_NULLPTR(m_pComponent_Manager);
 	return m_pComponent_Manager->Clone_Component(iLevelIndex, strPrototypeTag, pArg);
 }
 
@@ -508,7 +530,6 @@ HRESULT CGameInstance::Draw_RTVDebug(const wstring& strMRTTag, CShader * pShader
 #endif
 
 
-
 _int CGameInstance::SetVolume(CHANNELID eID, _float _vol)
 {
 	return m_pSound_Manager->SetVolume(eID, _vol);
@@ -571,6 +592,20 @@ void CGameInstance::PlaySound_Free(TCHAR* pSoundKey, _float _vol)
 	m_pSound_Manager->PlaySound_Free(pSoundKey, _vol);
 }
 
+void CGameInstance::ImGui_Render()
+{
+	CHECK_NULLPTR(m_pIMGUI_Manager);
+	m_pIMGUI_Manager->Render();
+}
+
+
+void CGameInstance::EditTransform(_float4x4& _matrix)
+{
+	CHECK_NULLPTR(m_pIMGUI_Manager);
+	m_pIMGUI_Manager->EditTransform(_matrix);
+}
+
+
 void CGameInstance::Release_Engine()
 {
 	CGameInstance::Get_Instance()->Free();
@@ -582,6 +617,7 @@ void CGameInstance::Free()
 	Safe_Release(m_pFrustum);
 	Safe_Release(m_pExtractor);
 	Safe_Release(m_pTarget_Manager);
+	Safe_Release(m_pIMGUI_Manager);
 	Safe_Release(m_pFont_Manager);
 	Safe_Release(m_pLight_Manager);
 	Safe_Release(m_pPipeLine);

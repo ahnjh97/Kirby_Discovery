@@ -15,9 +15,9 @@ HRESULT CLevel_Manager::Initialize()
 HRESULT CLevel_Manager::Open_Level(_uint iNewLevelID, CLevel * pNewLevel)
 {
 	/* 최초레벨할당시에는 수행하지 않는다. */
+	CGameInstance*		pGameInstance = CGameInstance::Get_Instance();
 	if (nullptr != m_pCurrentLevel)
 	{
-		CGameInstance*		pGameInstance = CGameInstance::Get_Instance();
 		Safe_AddRef(pGameInstance);
 
 		/* 기존 레벨용 자원을 파괴한다 .*/
@@ -33,6 +33,7 @@ HRESULT CLevel_Manager::Open_Level(_uint iNewLevelID, CLevel * pNewLevel)
 	m_pCurrentLevel = pNewLevel;
 
 	m_iCurrentLevelID = iNewLevelID;
+	pGameInstance->Set_CurrentLevel(iNewLevelID);
 
 	return S_OK;
 }

@@ -78,6 +78,7 @@ HRESULT CImGUI_Manager::RenderUpdate()
 	return S_OK;
 }
 
+
 void CImGUI_Manager::SetDockSpace()
 {
 	ImGuiWindowFlags         WindowFlag = ImGuiWindowFlags_NoDocking;
@@ -113,18 +114,7 @@ void CImGUI_Manager::SetDockSpace()
 	ImGui::End();
 }
 
-/*
-	카메라 세팅안했을 때 가라로 행렬을 만들어주는 함수들
-	# XMMatrixLookAtLH()
-	: 뷰행렬을 만들어주는 함수
-	// vector float 4개 맞음.
-
-	# XMMatrixPerspectiveFovLH()
-	: 투영행렬을 만들어주는 함수
-	- 1인자 : 시야각도
-*/
-
-void CImGUI_Manager::EditTransform(/*const CCamera& camera, */_float4x4& matrix)
+void CImGUI_Manager::EditTransform(_float4x4& matrix)
 {
 #ifndef _DEBUG
 	return;

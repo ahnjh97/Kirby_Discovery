@@ -1,6 +1,7 @@
 #include "..\Public\Object_Manager.h"
 #include "GameObject.h"
 #include "Layer.h"
+#include "Utils.h"
 
 CObject_Manager::CObject_Manager()
 {
@@ -17,6 +18,24 @@ const CComponent * CObject_Manager::Get_Component(_uint iLevelIndex, const wstri
 	return pLayer->Get_Component(strComTag, iIndex);	
 }
 
+CGameObject* CObject_Manager::Get_GameObject(_uint iLevelIndex, const wstring& strLayerTag, _uint iIndex)
+{
+	CLayer* pLayer = Find_Layer(iLevelIndex, strLayerTag);
+	if (nullptr == pLayer)
+		return nullptr;
+
+	return pLayer->Get_GameObject(iIndex);
+}
+
+CGameObject* CObject_Manager::Get_GameObject_ByTag(_uint iLevelIndex, const wstring& strLayerTag, wstring _tag)
+{
+	CLayer* pLayer = Find_Layer(iLevelIndex, strLayerTag);
+	if (nullptr == pLayer)
+		return nullptr;
+
+	return pLayer->Get_GameObject_ByTag(_tag);
+}
+
 HRESULT CObject_Manager::Initialize(_uint iNumLevels)
 {
 	m_iNumLevels = iNumLevels;
@@ -31,6 +50,8 @@ HRESULT CObject_Manager::Add_Prototype(const wstring & strPrototypeTag, CGameObj
 	if (nullptr != Find_Prototype(strPrototypeTag))
 		return E_FAIL;
 
+	pPrototype->Set_PrototypeTag(strPrototypeTag);
+
 	m_Prototypes.emplace(strPrototypeTag, pPrototype);
 
 	return S_OK;
@@ -40,12 +61,10 @@ HRESULT CObject_Manager::Add_Clone(_uint iLevelIndex, const wstring & strLayerTa
 {
 	/* 복제해야할 원형객체를 검색한다. */
 	CGameObject*	pPrototype = Find_Prototype(strPrototypeTag);
-	if (nullptr == pPrototype)
-		return E_FAIL;
+	CHECK_NULLPTR(pPrototype);
 
 	CGameObject*	pGameObject = pPrototype->Clone(pArg);
-	if (nullptr == pGameObject)
-		return E_FAIL;
+	CHECK_NULLPTR(pGameObject);
 
 	/* 복제한 사본객체를 추가해야할 레이어를 찾는다.*/
 	CLayer*		pLayer = Find_Layer(iLevelIndex, strLayerTag);
@@ -54,8 +73,7 @@ HRESULT CObject_Manager::Add_Clone(_uint iLevelIndex, const wstring & strLayerTa
 	if (nullptr == pLayer)
 	{
 		pLayer = CLayer::Create();
-		if (nullptr == pLayer)
-			return E_FAIL;
+		CHECK_NULLPTR(pLayer);
 		pLayer->Add_GameObject(pGameObject);
 
 		m_pLayers[iLevelIndex].emplace(strLayerTag, pLayer);
@@ -64,6 +82,8 @@ HRESULT CObject_Manager::Add_Clone(_uint iLevelIndex, const wstring & strLayerTa
 	else	
 		pLayer->Add_GameObject(pGameObject);
 
+	m_mapCloneObjs.emplace(pGameObject, strPrototypeTag);
+
 	return S_OK;
 }
 
@@ -71,12 +91,10 @@ CGameObject * CObject_Manager::Clone_GameObject(const wstring & strPrototypeTag,
 {
 	/* 복제해야할 원형객체를 검색한다. */
 	CGameObject*	pPrototype = Find_Prototype(strPrototypeTag);
-	if (nullptr == pPrototype)
-		return nullptr;
+	CHECK_NULLPTR(pPrototype);
 
 	CGameObject*	pGameObject = pPrototype->Clone(pArg);
-	if (nullptr == pGameObject)
-		return nullptr;
+	CHECK_NULLPTR(pGameObject);
 
 	return pGameObject;
 }
@@ -103,6 +121,8 @@ void CObject_Manager::Late_Tick(_float fTimeDelta)
 			Pair.second->Late_Tick(fTimeDelta);
 		}
 	}
+
+	IMGUI_Tick();
 }
 
 void CObject_Manager::Clear(_uint iLevelIndex)
@@ -114,7 +134,7 @@ void CObject_Manager::Clear(_uint iLevelIndex)
 	m_pLayers[iLevelIndex].clear();
 }
 
-list<CGameObject*>* CObject_Manager::Get_List(_uint iLevelIndex, const wstring& strLayerTag)
+list<CGameObject*>*CObject_Manager::Get_List(_uint iLevelIndex, const wstring & strLayerTag)
 {
 	CLayer* pLayer = Find_Layer(iLevelIndex, strLayerTag);
 
@@ -122,6 +142,58 @@ list<CGameObject*>* CObject_Manager::Get_List(_uint iLevelIndex, const wstring& 
 		return nullptr;
 
 	return pLayer->Get_list();
+}
+
+/// <summary> 객체를 Clone할 당시에 자동으로 추가되어 관리되는 IMGUI 함수 </summary>
+void CObject_Manager::IMGUI_Tick()
+{
+	// LEVEL_LOGO까지의 LEVEL에서는 IMGUI_Tick을 돌리지 않는다.
+	if (m_iCurrentLevel <= 2) return;
+
+	ImGui::Begin("MainImGuiEditor");
+
+	for (auto& map : m_pLayers[m_iCurrentLevel])
+	{
+		auto ObjList = map.second->Get_GameObjectList();
+
+		string LayerName = CUtils::WstrToStr(map.first);
+		if (ImGui::TreeNode(LayerName.c_str()))
+		{
+			int index = 0;
+			for (auto& obj : ObjList)
+			{
+				auto iter = m_mapCloneObjs.find(obj);
+				if (iter == m_mapCloneObjs.end())
+				{
+					MSG_BOX(TEXT("오브젝트 매니저에서 IMGUI 못찾고있음!!"));
+					continue;
+				}
+
+				const string& ProtoName = CUtils::WstrToStr(iter->second) + to_string(index);
+				if (ImGui::TreeNode(ProtoName.c_str()))
+				{
+					obj->Render_IMGUI();
+					ImGui::TreePop();
+				}
+
+				++index;
+			}
+
+			ImGui::TreePop();
+		}
+	}
+
+	ImGui::End();
+
+	ImGui::Begin("Manage IMGUI Window");
+	static char buffer[64] = ""; ImGui::InputText("Window Name", buffer, 64);
+	if (ImGui::Button("Add"))
+	{
+
+	}
+	ImGui::NewLine(); ImGui::Separator();
+	
+	ImGui::End();
 }
 
 CGameObject * CObject_Manager::Find_Prototype(const wstring & strPrototypeTag)
