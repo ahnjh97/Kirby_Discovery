@@ -27,7 +27,7 @@ namespace Engine
 
 	typedef struct 
 	{
-		//class CTexture*	MaterialTextures[AI_TEXTURE_TYPE_MAX];
+		class CTexture*	MaterialTextures[AI_TEXTURE_TYPE_MAX];
 	}MESH_MATERIAL;
 
 	typedef struct
@@ -131,7 +131,14 @@ namespace Engine
 		static const D3D11_INPUT_ELEMENT_DESC	Elements[6];
 	}VTXANIMMESH;
 
-	
+	struct ENGINE_DLL MODEL
+	{
+		_float fScale = { 1.f };
+		_float fDegree = { 0.f };
+		_uint iRootNode = { 4 };
 
-
+		MODEL(_float _fScale = { 1.f },
+			_float _fDegree = { 0.f },
+			_uint _iRootNode = { 4 }) : fScale(_fScale), fDegree(_fDegree), iRootNode(_iRootNode) {}
+	};
 }

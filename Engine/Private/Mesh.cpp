@@ -1,22 +1,34 @@
-#include "..\Public\Mesh.h"
+#include "Mesh.h"
 #include "Bone.h"
 
-CMesh::CMesh(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
-	: CVIBuffer(pDevice, pContext)
+CMesh::CMesh(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, ifstream& fileStream)
+	: CVIBuffer(pDevice, pContext), m_InputFile(fileStream)
 {
 }
 
 CMesh::CMesh(const CMesh & rhs)
-	: CVIBuffer(rhs)
+	: CVIBuffer(rhs), m_iFaces{ rhs.m_iFaces }, m_InputFile(ifstream())
 {
 }
 
-HRESULT CMesh::Initialize_Prototype(CModel::TYPE eModelType, const aiMesh * pAIMesh, const vector<CBone*>& Bones, _fmatrix TransformMatrix)
+HRESULT CMesh::Initialize_Prototype(CModel::TYPE eModelType, string strDirectory, const vector<CBone*>& Bones, _fmatrix TransformMatrix)
 {
-	strcpy_s(m_szName, pAIMesh->mName.data);
-	m_iMaterialIndex = pAIMesh->mMaterialIndex;
-	m_iNumVertices = pAIMesh->mNumVertices;
-	m_iNumIndices = pAIMesh->mNumFaces * 3;
+	m_strDirectory = strDirectory;
+	if (!m_InputFile.is_open())
+	{
+		string tempstr = "Failed To Open : " + m_strDirectory;
+		MessageBoxA(nullptr, tempstr.c_str(), "error", MB_OK);
+		return E_FAIL;
+	}
+
+	m_InputFile.read(reinterpret_cast<char*>(&m_szName), sizeof(m_szName));
+	m_InputFile.read(reinterpret_cast<char*>(&m_iMaterialIndex), sizeof(m_iMaterialIndex));
+	m_InputFile.read(reinterpret_cast<char*>(&m_iNumVertices), sizeof(m_iNumVertices));
+	m_InputFile.read(reinterpret_cast<char*>(&m_iFaces), sizeof(m_iFaces));
+
+	m_pVerticesPos = new _float3[m_iNumVertices];
+
+	m_iNumIndices = m_iFaces * 3;
 	m_iIndexStride = sizeof(_uint);
 	m_iNumVertexBuffers = 1;
 	m_eIndexFormat = DXGI_FORMAT_R32_UINT;
@@ -24,7 +36,7 @@ HRESULT CMesh::Initialize_Prototype(CModel::TYPE eModelType, const aiMesh * pAIM
 
 #pragma region VERTEX_BUFFER
 
-	HRESULT hr = CModel::TYPE_NONANIM == eModelType ? Ready_Vertices_For_NonAnimModel(pAIMesh, TransformMatrix) : Ready_Vertices_For_AnimModel(pAIMesh, Bones);
+	HRESULT hr = CModel::TYPE_NONANIM == eModelType ? Ready_Vertices_For_NonAnimModel(TransformMatrix) : Ready_Vertices_For_AnimModel(Bones);
 	if (FAILED(hr))
 		return E_FAIL;
 
@@ -43,20 +55,17 @@ HRESULT CMesh::Initialize_Prototype(CModel::TYPE eModelType, const aiMesh * pAIM
 	m_BufferDesc.MiscFlags = 0;
 	m_BufferDesc.StructureByteStride = 0;
 
-
-
-	_uint*		pIndices = new _uint[m_iNumIndices];
+	_uint* pIndices = new _uint[m_iNumIndices];
+	m_pIndices = new _uint[m_iNumIndices];
 	ZeroMemory(pIndices, sizeof(_uint) * m_iNumIndices);
 
-	_uint		iNumIndices = { 0 };
 
-	for (size_t i = 0; i < pAIMesh->mNumFaces; i++)
+	for (size_t i = 0; i < m_iNumIndices; i++)
 	{
-		pIndices[iNumIndices++] = pAIMesh->mFaces[i].mIndices[0];
-		pIndices[iNumIndices++] = pAIMesh->mFaces[i].mIndices[1];
-		pIndices[iNumIndices++] = pAIMesh->mFaces[i].mIndices[2];
+		m_InputFile.read(reinterpret_cast<char*>(&pIndices[i]), sizeof(_uint));
+		m_pIndices[i] = pIndices[i];
 	}
-	
+
 	ZeroMemory(&m_InitialData, sizeof m_InitialData);
 	m_InitialData.pSysMem = pIndices;
 
@@ -85,7 +94,7 @@ HRESULT CMesh::Stock_Matrices(const vector<CBone*>& Bones, _float4x4 * pMeshBone
 	return S_OK;
 }
 
-HRESULT CMesh::Ready_Vertices_For_NonAnimModel(const aiMesh * pAIMesh, _fmatrix TransformMatrix)
+HRESULT CMesh::Ready_Vertices_For_NonAnimModel(_fmatrix TransformMatrix)
 {
 	m_iVertexStride = sizeof(VTXMESH);
 
@@ -99,21 +108,15 @@ HRESULT CMesh::Ready_Vertices_For_NonAnimModel(const aiMesh * pAIMesh, _fmatrix 
 	m_BufferDesc.MiscFlags = 0;
 	m_BufferDesc.StructureByteStride = m_iVertexStride;
 
-	VTXMESH*		pVertices = new VTXMESH[m_iNumVertices];
-	ZeroMemory(pVertices, sizeof(VTXMESH) * m_iNumVertices);
 
+	VTXMESH* pVertices = new VTXMESH[m_iNumVertices];
+	ZeroMemory(pVertices, sizeof(VTXMESH) * m_iNumVertices);
 	for (size_t i = 0; i < m_iNumVertices; i++)
 	{
-		memcpy(&pVertices[i].vPosition, &pAIMesh->mVertices[i], sizeof(_float3));
+		m_InputFile.read(reinterpret_cast<char*>(&pVertices[i]), sizeof(VTXMESH));
 		XMStoreFloat3(&pVertices[i].vPosition, XMVector3TransformCoord(XMLoadFloat3(&pVertices[i].vPosition), TransformMatrix));
-
-		memcpy(&pVertices[i].vNormal, &pAIMesh->mNormals[i], sizeof(_float3));
 		XMStoreFloat3(&pVertices[i].vNormal, XMVector3TransformNormal(XMLoadFloat3(&pVertices[i].vNormal), TransformMatrix));
-
-		memcpy(&pVertices[i].vTexcoord, &pAIMesh->mTextureCoords[0][i], sizeof(_float2));
-		memcpy(&pVertices[i].vTangent, &pAIMesh->mTangents[i], sizeof(_float3));
-		XMStoreFloat3(&pVertices[i].vTangent, XMVector3TransformNormal(XMLoadFloat3(&pVertices[i].vTangent), TransformMatrix));
-
+		m_pVerticesPos[i] = pVertices[i].vPosition;
 	}
 
 	ZeroMemory(&m_InitialData, sizeof m_InitialData);
@@ -127,10 +130,9 @@ HRESULT CMesh::Ready_Vertices_For_NonAnimModel(const aiMesh * pAIMesh, _fmatrix 
 	return S_OK;
 }
 
-HRESULT CMesh::Ready_Vertices_For_AnimModel(const aiMesh * pAIMesh, const vector<CBone*>& Bones)
+HRESULT CMesh::Ready_Vertices_For_AnimModel(const vector<CBone*>& Bones)
 {	
 	m_iVertexStride = sizeof(VTXANIMMESH);
-
 	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
 
 	/* 정점버퍼의 byte크기 */
@@ -141,90 +143,47 @@ HRESULT CMesh::Ready_Vertices_For_AnimModel(const aiMesh * pAIMesh, const vector
 	m_BufferDesc.MiscFlags = 0;
 	m_BufferDesc.StructureByteStride = m_iVertexStride;
 
-	VTXANIMMESH*		pVertices = new VTXANIMMESH[m_iNumVertices];
+	VTXANIMMESH* pVertices = new VTXANIMMESH[m_iNumVertices];
 	ZeroMemory(pVertices, sizeof(VTXANIMMESH) * m_iNumVertices);
 
-	for (size_t i = 0; i < m_iNumVertices; i++)
+
+	m_InputFile.read(reinterpret_cast<char*>(&m_iNumBones), sizeof(m_iNumBones));
+	m_OffsetMatrices.reserve(m_iNumBones);
+
+	_float4x4 offsetMat = {};
+	_char szBoneName[MAX_PATH] = {};
+	for (_uint i = 0; i < m_iNumBones; i++)
 	{
-		memcpy(&pVertices[i].vPosition, &pAIMesh->mVertices[i], sizeof(_float3));	
-		memcpy(&pVertices[i].vNormal, &pAIMesh->mNormals[i], sizeof(_float3));
-		memcpy(&pVertices[i].vTexcoord, &pAIMesh->mTextureCoords[0][i], sizeof(_float2));
-		memcpy(&pVertices[i].vTangent, &pAIMesh->mTangents[i], sizeof(_float3));
-	}
-
-	m_iNumBones = pAIMesh->mNumBones;
-
-	for (size_t i = 0; i < m_iNumBones; i++)
-	{
-		aiBone*		pAIBone = pAIMesh->mBones[i];
-
-		_float4x4	OffsetMatrix;
-		memcpy(&OffsetMatrix, &pAIBone->mOffsetMatrix, sizeof(_float4x4));
-		XMStoreFloat4x4(&OffsetMatrix, XMMatrixTranspose(XMLoadFloat4x4(&OffsetMatrix)));
-
-		m_OffsetMatrices.push_back(OffsetMatrix);
+		m_InputFile.read(reinterpret_cast<char*>(&szBoneName), sizeof(szBoneName));
+		m_InputFile.read(reinterpret_cast<char*>(&offsetMat), sizeof(offsetMat));
+		m_OffsetMatrices.push_back(offsetMat);
 
 		_int	iBoneIndex = { -1 };
-
-		auto	iter = find_if(Bones.begin(), Bones.end(), [&](CBone* pBone)->_bool
-		{
+		auto	iter = find_if(Bones.begin(), Bones.end(), [&](CBone* pBone)->_bool {
 			++iBoneIndex;
-			return pBone->Compare_Name(pAIBone->mName.data);
-		});
+			return pBone->Compare_Name(szBoneName); });
 
-		m_Bones.push_back(iBoneIndex);		
-
-		/* 이 뼈는 몇개의 정점들에게 영향을 준다. */
-		_uint		iNumWeights = pAIBone->mNumWeights;
-
-		for (size_t j = 0; j < iNumWeights; j++)
-		{
-			if (0.0f == pVertices[pAIBone->mWeights[j].mVertexId].vBlendWeights.x)
-			{
-				pVertices[pAIBone->mWeights[j].mVertexId].vBlendIndices.x = i;
-				pVertices[pAIBone->mWeights[j].mVertexId].vBlendWeights.x = pAIBone->mWeights[j].mWeight;
-			}
-
-			else if (0.0f == pVertices[pAIBone->mWeights[j].mVertexId].vBlendWeights.y)
-			{
-				pVertices[pAIBone->mWeights[j].mVertexId].vBlendIndices.y = i;
-				pVertices[pAIBone->mWeights[j].mVertexId].vBlendWeights.y = pAIBone->mWeights[j].mWeight;
-			}
-
-			else if (0.0f == pVertices[pAIBone->mWeights[j].mVertexId].vBlendWeights.z)
-			{
-				pVertices[pAIBone->mWeights[j].mVertexId].vBlendIndices.z = i;
-				pVertices[pAIBone->mWeights[j].mVertexId].vBlendWeights.z = pAIBone->mWeights[j].mWeight;
-			}
-
-			else if (0.0f == pVertices[pAIBone->mWeights[j].mVertexId].vBlendWeights.w)
-			{
-				pVertices[pAIBone->mWeights[j].mVertexId].vBlendIndices.w = i;
-				pVertices[pAIBone->mWeights[j].mVertexId].vBlendWeights.w = pAIBone->mWeights[j].mWeight;
-			}
-		}
+		m_Bones.push_back(iBoneIndex);
 	}
 
 	if (0 == m_iNumBones)
 	{
 		m_iNumBones = 1;
-
 		_int	iBoneIndex = { -1 };
-
-		auto	iter = find_if(Bones.begin(), Bones.end(), [&](CBone* pBone)->_bool
-		{
+		auto	iter = find_if(Bones.begin(), Bones.end(), [&](CBone* pBone)->_bool {
 			++iBoneIndex;
-			return pBone->Compare_Name(m_szName);
-		});
+			return pBone->Compare_Name(m_szName);	});
 
 		m_Bones.push_back(iBoneIndex);
 
 		_float4x4		OffsetMatrix;
-
 		XMStoreFloat4x4(&OffsetMatrix, XMMatrixIdentity());
-
 		m_OffsetMatrices.push_back(OffsetMatrix);
+	}
 
+	for (size_t i = 0; i < m_iNumVertices; i++)
+	{
+		m_InputFile.read(reinterpret_cast<char*>(&pVertices[i]), sizeof(VTXANIMMESH));
 	}
 
 	ZeroMemory(&m_InitialData, sizeof m_InitialData);
@@ -234,17 +193,16 @@ HRESULT CMesh::Ready_Vertices_For_AnimModel(const aiMesh * pAIMesh, const vector
 		return E_FAIL;
 
 	Safe_Delete_Array(pVertices);
-
 	return S_OK;
 }
 
-CMesh * CMesh::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, CModel::TYPE eModelType, const aiMesh * pAIMesh, const vector<CBone*>& Bones, _fmatrix TransformMatrix)
+CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CModel::TYPE eModelType, string strDirectory, ifstream& fileStream, const vector<CBone*>& Bones, _fmatrix TransformMatrix)
 {
-	CMesh*		pInstance = new CMesh(pDevice, pContext);
+	CMesh* pInstance = new CMesh(pDevice, pContext, fileStream);
 
-	if (FAILED(pInstance->Initialize_Prototype(eModelType, pAIMesh, Bones, TransformMatrix)))
+	if (FAILED(pInstance->Initialize_Prototype(eModelType, strDirectory, Bones, TransformMatrix)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CMesh"));
+		MSG_BOX(TEXT("Failed To Create : CMesh"));
 
 		Safe_Release(pInstance);
 	}
@@ -259,6 +217,11 @@ CMesh * CMesh::Clone(void * pArg)
 
 void CMesh::Free()
 {
-
 	__super::Free();
+
+	if (false == m_isCloned)
+	{
+		Safe_Delete_Array(m_pIndices);
+		Safe_Delete_Array(m_pVerticesPos);
+	}
 }

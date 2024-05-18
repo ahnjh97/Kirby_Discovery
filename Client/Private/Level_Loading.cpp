@@ -33,7 +33,7 @@ void CLevel_Loading::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
-	if (true == m_pLoader->isFinished())
+	if (true == m_pLoader->IsFinished())
 	{
 		if (GetKeyState(VK_SPACE) & 0x8000)
 		{

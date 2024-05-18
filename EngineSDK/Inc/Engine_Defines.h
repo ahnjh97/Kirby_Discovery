@@ -52,7 +52,8 @@ namespace Engine
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/prettywriter.h"
 
-
+// Assimp 
+#define AI_TEXTURE_TYPE_MAX 21
 using namespace DirectX;
 
 #include <algorithm>

@@ -1,6 +1,6 @@
 #pragma once
-
 #include "Base.h"
+#include <fstream>
 
 /* 특정 애니메이션이 사용하고 있는 뼈들 중, 하나의 정보를 표현한다.. */
 /* 이 뼈는 시간에 따라 어떤 상태(KeyFrame)를 취해야하는가? */
@@ -14,7 +14,7 @@ private:
 	virtual ~CChannel() = default;
 
 public:
-	HRESULT Initialize(const aiNodeAnim* pAIChannel, const vector<class CBone*>& Bones);
+	HRESULT Initialize(const vector<class CBone*>& Bones, ifstream& fileStream);
 	void Invalidate_TransformationMatrix(const vector<class CBone*>& Bones, _float fTrackPosition, _uint* pCurrentKeyFrameIndex);
 
 private:
@@ -27,7 +27,7 @@ private:
 	
 
 public:
-	static CChannel* Create(const aiNodeAnim* pAIChannel, const vector<class CBone*>& Bones);
+	static CChannel* Create(const vector<class CBone*>& Bones, ifstream& fileStream);
 	virtual void Free() override;
 };
 

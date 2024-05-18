@@ -20,8 +20,8 @@ private:
 public:
 	HRESULT Initialize(LEVEL eNextLevelID);
 	HRESULT Start();
-	_bool isFinished() const {
-		return m_isFinished;
+	_bool IsFinished() const {
+		return m_IsFinished;
 	}
 	void Output() {
 		SetWindowText(g_hWnd, m_strLoadingText.c_str());
@@ -35,7 +35,7 @@ private:
 	CRITICAL_SECTION			m_Critical_Section;
 	LEVEL						m_eNextLevelID = { LEVEL_END };
 	wstring						m_strLoadingText;
-	_bool						m_isFinished = { false };
+	_bool						m_IsFinished = { false };
 
 	CGameInstance*				m_pGameInstance = { nullptr };
 

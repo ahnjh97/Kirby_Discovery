@@ -96,7 +96,7 @@ HRESULT CLoader::Loading_For_Logo()
 	
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 
-	m_isFinished = true;
+	m_IsFinished = true;
 
 	return S_OK;
 }
@@ -163,7 +163,7 @@ HRESULT CLoader::Loading_For_GamePlay()
 
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 
-	m_isFinished = true;
+	m_IsFinished = true;
 
 	return S_OK;
 }

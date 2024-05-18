@@ -1,6 +1,6 @@
 #pragma once
-
 #include "Base.h"
+#include <fstream>
 
 /* 하나의 애니메이션이 몇개의 뼈를 컨트롤해야하는지. 그 뼈들은 무엇인지.  */
 /* 이 애니메이션을 재생하는데 걸리는 총 거리.. */
@@ -16,13 +16,14 @@ private:
 	virtual ~CAnimation() = default;
 
 public:
-	_bool isFinished() const {
-		return m_isFinished;
-	}
+	_bool IsFinished() const {	return m_IsFinished; }
 
 public:
-	HRESULT Initialize(const aiAnimation* pAIAnimation, const vector<class CBone*>& Bones);
+	HRESULT Initialize(const vector<class CBone*>& Bones, ifstream& fileStream);
 	void Invalidate_TransformationMatrix(_float fTimeDelta, const vector<class CBone*>& Bones, _bool isLoop);
+
+public:
+	void Read_AnimationData(ifstream& fileStream);
 
 private:
 	_char								m_szName[MAX_PATH] = { "" };
@@ -35,10 +36,10 @@ private:
 	vector<class CChannel*>				m_Channels;
 	vector<_uint>						m_CurrentKeyFrameIndices;
 
-	_bool								m_isFinished = { false };	
+	_bool								m_IsFinished = { false };	
 
 public:
-	static CAnimation* Create(const aiAnimation* pAIAnimation, const vector<class CBone*>& Bones);
+	static CAnimation* Create(const vector<class CBone*>& Bones, ifstream& fileStream);
 	CAnimation* Clone();
 	virtual void Free() override;
 };

@@ -2,6 +2,7 @@
 
 #include "Component.h"
 #include "Animation.h"
+#include <fstream>
 
 BEGIN(Engine)
 
@@ -16,37 +17,27 @@ private:
 	virtual ~CModel() = default;
 
 public:
-	_uint Get_NumMeshes() const {
-		return m_iNumMeshes;
-	}
-
+	_uint Get_NumMeshes() const { return m_iNumMeshes; }
 	class CBone* Get_BonePtr(const _char* pBoneName) const;
 
-	_bool isFinished() {
-		return m_Animations[m_iCurrentAnimIndex]->isFinished();
-	}
+	_bool IsFinished() { return m_Animations[m_iCurrentAnimIndex]->IsFinished(); }
 
 public:
-	void Set_Animation(_uint iAnimIndex, _bool isLoop) {
-		m_iCurrentAnimIndex = iAnimIndex;
-		m_isLoop = isLoop;
-	}
+	void Set_Animation(_uint iAnimIndex, _bool isLoop) { m_iCurrentAnimIndex = iAnimIndex;	m_isLoop = isLoop; }
 
 public:
-	virtual HRESULT Initialize_Prototype(TYPE eType, const string& strModelFilePath, _fmatrix TransformMatrix);
+	virtual HRESULT Initialize_Prototype(TYPE eType, const string& strModelName, _fmatrix TransformMatrix, MODEL tModel, _bool bNonAnimVersion);
 	virtual HRESULT Initialize(void* pArg) override;
 
 public:
 	HRESULT Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex);
-	HRESULT Bind_ShaderResource(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType);
+	HRESULT Bind_ShaderResource(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, _uint iTextureType);
 	
 	HRESULT Play_Animation(_float fTimeDelta);
 	HRESULT Render(_uint iMeshIndex);
 
 private:
 	TYPE						m_eModelType = { TYPE_END };
-	const aiScene*				m_pAIScene = { nullptr };
-	Assimp::Importer			m_Importer;
 
 private:
 	_uint						m_iNumMeshes = { 0 };
@@ -66,17 +57,24 @@ private:
 
 	_float4x4					m_MeshBoneMatrices[512];
 
+	// 파일입출력 변수
+	string						m_strDirectory;
+	ifstream					m_InputFile;
+
+	// 모델 정보
+	string						m_strModelName;
+	MODEL						m_tModel;
+	_bool						m_bIsNonAnimVersion = { false };
 
 private:
 	HRESULT Ready_Meshes();
 	HRESULT Ready_Materials(const _char* pModelFilePath);
-	HRESULT Ready_Bones(aiNode* pAINode, _int iParentIndex = -1);	
+	HRESULT Ready_Bones();
 	HRESULT Ready_Animations();
 
-
-
 public:
-	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eType, const string& strModelFilePath, _fmatrix TransformMatrix);
+	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eType, const string& strModelName, _fmatrix TransformMatrix
+						,MODEL tModel, _bool bNonAnimVersion = false);
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Free() override;
 };

@@ -1,18 +1,13 @@
-#include "..\Public\Bone.h"
-
-
+#include "Bone.h"
 
 CBone::CBone()
 {
 }
 
-HRESULT CBone::Initialize(const aiNode * pAINode, _int  iParentIndex)
+HRESULT CBone::Initialize(ifstream& fileStream)
 {
-	m_iParentBoneIndex = iParentIndex;
+	Read_BoneData(fileStream);
 
-	strcpy_s(m_szName, pAINode->mName.data);
-
-	memcpy(&m_TransformationMatrix, &pAINode->mTransformation, sizeof(_float4x4));
 	XMStoreFloat4x4(&m_TransformationMatrix, XMMatrixTranspose(XMLoadFloat4x4(&m_TransformationMatrix)));
 	XMStoreFloat4x4(&m_CombinedTransformationMatrix, XMMatrixIdentity());
 
@@ -28,17 +23,22 @@ void CBone::Invalidate_CombinedTransformationMatrix(const vector<CBone*>& Bones,
 		XMStoreFloat4x4(&m_CombinedTransformationMatrix, 
 			XMLoadFloat4x4(&m_TransformationMatrix) * XMLoadFloat4x4(&Bones[m_iParentBoneIndex]->m_CombinedTransformationMatrix));
 	}
-
-	
 }
 
-CBone * CBone::Create(const aiNode * pAINode, _int  iParentIndex)
+void CBone::Read_BoneData(ifstream& fileStream)
 {
-	CBone*		pInstance = new CBone();
+	fileStream.read(reinterpret_cast<char*>(&m_iParentBoneIndex), sizeof(m_iParentBoneIndex));
+	fileStream.read(reinterpret_cast<char*>(&m_szName), sizeof(m_szName));
+	fileStream.read(reinterpret_cast<char*>(&m_TransformationMatrix), sizeof(m_TransformationMatrix));
+}
 
-	if (FAILED(pInstance->Initialize(pAINode, iParentIndex)))
+CBone* CBone::Create(ifstream& fileStream)
+{
+	CBone* pInstance = new CBone();
+
+	if (FAILED(pInstance->Initialize(fileStream)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CBone"));
+		MSG_BOX(TEXT("Failed To Create : CBone"));
 
 		Safe_Release(pInstance);
 	}

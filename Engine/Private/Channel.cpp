@@ -1,61 +1,28 @@
-#include "..\Public\Channel.h"
+#include "Channel.h"
 #include "Bone.h"
 
 CChannel::CChannel()
 {
 }
 
-HRESULT CChannel::Initialize(const aiNodeAnim * pAIChannel, const vector<class CBone*>& Bones)
+HRESULT CChannel::Initialize(const vector<class CBone*>& Bones, ifstream& fileStream)
 {
-	strcpy_s(m_szName, pAIChannel->mNodeName.data);
-	
+	fileStream.read(reinterpret_cast<char*>(&m_szName), sizeof(m_szName));
+	fileStream.read(reinterpret_cast<char*>(&m_iNumKeyFrames), sizeof(m_iNumKeyFrames));
+
 	auto	iter = find_if(Bones.begin(), Bones.end(), [&](CBone* pBone)->_bool
+		{
+			++m_iBoneIndex;
+			return pBone->Compare_Name(m_szName);
+		});
+
+	m_KeyFrames.reserve(m_iNumKeyFrames);
+
+	for (_uint i = 0; i < m_iNumKeyFrames; i++)
 	{
-		++m_iBoneIndex;
-		return pBone->Compare_Name(m_szName);
-	});
-
-	m_iNumKeyFrames = max(pAIChannel->mNumScalingKeys, pAIChannel->mNumRotationKeys);
-	m_iNumKeyFrames = max(m_iNumKeyFrames, pAIChannel->mNumPositionKeys);
-
-	_float3			vScale;
-	_float4			vRotation;
-	_float3			vTranslation;
-	_float			fTime;
-	
-	for (size_t i = 0; i < m_iNumKeyFrames; i++)
-	{
-		KEYFRAME			KeyFrame{};
-
-		if (i < pAIChannel->mNumScalingKeys)
-		{
-			memcpy(&vScale, &pAIChannel->mScalingKeys[i].mValue, sizeof(_float3));
-			fTime = pAIChannel->mScalingKeys[i].mTime;
-		}
-
-		if (i < pAIChannel->mNumRotationKeys)
-		{
-			/*memcpy(&vRotation, &pAIChannel->mRotationKeys[i].mValue, sizeof(_float4));*/			
-			vRotation.x = pAIChannel->mRotationKeys[i].mValue.x;
-			vRotation.y = pAIChannel->mRotationKeys[i].mValue.y;
-			vRotation.z = pAIChannel->mRotationKeys[i].mValue.z;
-			vRotation.w = pAIChannel->mRotationKeys[i].mValue.w;
-
-			fTime = pAIChannel->mRotationKeys[i].mTime;
-		}
-
-		if (i < pAIChannel->mNumPositionKeys)
-		{
-			memcpy(&vTranslation, &pAIChannel->mPositionKeys[i].mValue, sizeof(_float3));
-			fTime = pAIChannel->mPositionKeys[i].mTime;
-		}
-
-		KeyFrame.vScale = vScale;
-		KeyFrame.vRotation = vRotation;
-		KeyFrame.vTranslation = vTranslation;
-		KeyFrame.fTime = fTime;
-
-		m_KeyFrames.push_back(KeyFrame);
+		KEYFRAME tempKeyFrame = {};
+		fileStream.read(reinterpret_cast<char*>(&tempKeyFrame), sizeof(tempKeyFrame));
+		m_KeyFrames.push_back(tempKeyFrame);
 	}
 
 	return S_OK;
@@ -98,20 +65,19 @@ void CChannel::Invalidate_TransformationMatrix(const vector<class CBone*>& Bones
 	Bones[m_iBoneIndex]->Set_TransformationMatrix(TransformationMatrix);
 }
 
-CChannel * CChannel::Create(const aiNodeAnim * pAIChannel, const vector<class CBone*>& Bones)
+CChannel* CChannel::Create(const vector<class CBone*>& Bones, ifstream& fileStream)
 {
-	CChannel*		pInstance = new CChannel();
+	CChannel* pInstance = new CChannel();
 
-	if (FAILED(pInstance->Initialize(pAIChannel, Bones)))
+	if (FAILED(pInstance->Initialize(Bones, fileStream)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CChannel"));
+		MSG_BOX(TEXT("Failed To Create : CChannel"));
 
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
-
 
 void CChannel::Free()
 {

@@ -1,4 +1,4 @@
-#include "..\Public\Animation.h"
+#include "Animation.h"
 #include "Channel.h"
 #include "Bone.h"
 
@@ -14,41 +14,21 @@ CAnimation::CAnimation(const CAnimation & rhs)
 	, m_iNumChannels{ rhs.m_iNumChannels }
 	, m_Channels{ rhs.m_Channels }
 	, m_CurrentKeyFrameIndices{ rhs.m_CurrentKeyFrameIndices }
-	, m_isFinished{ rhs.m_isFinished }
+	, m_IsFinished{ rhs.m_IsFinished }
 
 {
 	for (auto& pChannel : m_Channels)
 		Safe_AddRef(pChannel);
 }
 
-HRESULT CAnimation::Initialize(const aiAnimation * pAIAnimation, const vector<CBone*>& Bones)
+HRESULT CAnimation::Initialize(const vector<class CBone*>& Bones, ifstream& fileStream)
 {
-	strcpy_s(m_szName, pAIAnimation->mName.data);
-
-	m_fDuration = pAIAnimation->mDuration;
-
-	m_fTickPerSecond = pAIAnimation->mTicksPerSecond;	
-
-	/* 이 애니메이션은 몇개의 뼈를 컨트롤해야하는가? */
-	m_iNumChannels = pAIAnimation->mNumChannels;
-
-	m_CurrentKeyFrameIndices.resize(m_iNumChannels);
-
-	for (size_t i = 0; i < m_iNumChannels; i++)
-	{
-		CChannel*		pChannel = CChannel::Create(pAIAnimation->mChannels[i], Bones);
-		if (nullptr == pChannel)
-			return E_FAIL;
-
-		m_Channels.push_back(pChannel);
-	}
-
-	return S_OK;
+	return E_NOTIMPL;
 }
 
 void CAnimation::Invalidate_TransformationMatrix(_float fTimeDelta, const vector<CBone*>& Bones, _bool isLoop)
 {
-	m_isFinished = false;
+	m_IsFinished = false;
 
 	m_fTrackPosition += m_fTickPerSecond * fTimeDelta;
 
@@ -56,7 +36,7 @@ void CAnimation::Invalidate_TransformationMatrix(_float fTimeDelta, const vector
 	{
 		if (false == isLoop)
 		{
-			m_isFinished = true;			
+			m_IsFinished = true;			
 			return;
 		}			
 
@@ -71,13 +51,29 @@ void CAnimation::Invalidate_TransformationMatrix(_float fTimeDelta, const vector
 
 }
 
-CAnimation * CAnimation::Create(const aiAnimation * pAIAnimation, const vector<CBone*>& Bones)
+void CAnimation::Read_AnimationData(ifstream& fileStream)
 {
-	CAnimation*		pInstance = new CAnimation();
-
-	if (FAILED(pInstance->Initialize(pAIAnimation, Bones)))
+	fileStream.read(reinterpret_cast<char*>(&m_szName), sizeof(m_szName));
+	string strName = m_szName;
+	size_t pos = strName.find('|');
+	if (pos != string::npos)
 	{
-		MSG_BOX(TEXT("Failed To Created : CAnimation"));
+		strName = strName.substr(pos + 1);
+		strcpy_s(m_szName, strName.c_str());
+	}
+
+	fileStream.read(reinterpret_cast<char*>(&m_fDuration), sizeof(m_fDuration));
+	fileStream.read(reinterpret_cast<char*>(&m_fTickPerSecond), sizeof(m_fTickPerSecond));
+	fileStream.read(reinterpret_cast<char*>(&m_iNumChannels), sizeof(m_iNumChannels));
+}
+
+CAnimation* CAnimation::Create(const vector<class CBone*>& Bones, ifstream& fileStream)
+{
+	CAnimation* pInstance = new CAnimation();
+
+	if (FAILED(pInstance->Initialize(Bones, fileStream)))
+	{
+		MSG_BOX(TEXT("Failed To Create : CAnimation"));
 
 		Safe_Release(pInstance);
 	}
