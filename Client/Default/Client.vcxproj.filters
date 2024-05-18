@@ -104,7 +104,10 @@
     </ClInclude>
     <ClInclude Include="..\Public\tinyxml2.h">
       <Filter>90.Utils\XML</Filter>
-    </ClInclude>
+	</ClInclude>
+	<ClInclude Include="..\public\Camera_Main.h">
+      <Filter>02.GameObjects\Camera</Filter>
+	</ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -145,6 +148,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\tinyxml2.cpp">
       <Filter>90.Utils\XML</Filter>
+	</ClCompile>
+	<ClCompile Include="..\private\Camera_Main.cpp">
+      <Filter>02.GameObjects\Camera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

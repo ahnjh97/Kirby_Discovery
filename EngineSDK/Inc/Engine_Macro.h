@@ -14,6 +14,20 @@
 #define ALARM_FAIL(message)				assert(0 && message)
 
 
+//빠름 - 느림
+#define EASE_OUT(t) (_float)(1 - pow(1 - t, 3))
+#define EASE_OUT_FAST(t) (_float)(1 - pow(1 - t, 6))
+//느림 - 빠름
+#define EASE_IN(t)	(_float)pow(t, 4)
+#define EASE_IN_FAST(t)	(_float)pow(t, 6)
+
+//느림 - 빠름 - 느림
+#define EASE_INOUT(t) (_float)(-(cos(3.14159f * t) - 1) / 2)
+#define EASE_INOUT_FAST(t) (_float)((t < 0.5) ? (4 * t * t * t) : 1 - pow(-2 * t + 2, 3) / 2)
+
+
+
+
 #define BEGIN(NAMESPACE)	namespace NAMESPACE {
 #define END					}
 
