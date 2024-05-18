@@ -100,11 +100,12 @@ void CCamera_Main::Make_Sequence_FromQuat(EASING eEaseFlag, _float fDuration, _v
 }
 
 
-void CCamera_Main::Tick(_float fTimeDelta)
+_int CCamera_Main::Tick(_float fTimeDelta)
 {
 	Control(fTimeDelta);
 	UpdatePos_FromAnchor(fTimeDelta);
 	Orbit_Target(fTimeDelta);
+	return OBJ_NOEVENT;
 }
 
 void CCamera_Main::Late_Tick(_float fTimeDelta)
