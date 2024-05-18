@@ -101,6 +101,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	//	CWeapon::Create(m_pDevice, m_pContext))))
 	//	return E_FAIL;
 
+	return S_OK;
 }
 
 HRESULT CLoader::Loading_For_Logo()
