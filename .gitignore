@@ -31,20 +31,20 @@
 *.app
 
 
-Engine/Bin/Engine.exp
-Engine/Bin/Engine.ilk
-Engine/Bin/Engine.pdb
-Engine/Bin/Engine.dll
-Engine/Bin/Engine.lib
+FireTreeTrillion/Engine/Bin/Engine.exp
+FireTreeTrillion/Engine/Bin/Engine.ilk
+FireTreeTrillion/Engine/Bin/Engine.pdb
+FireTreeTrillion/Engine/Bin/Engine.dll
+FireTreeTrillion/Engine/Bin/Engine.lib
 Framework.VC.db
 .vs/
-Client/Bin/Shader_VtxAnimModel.cso
-Client/Bin/Shader_VtxCube.cso
-Client/Bin/Shader_VtxInstance_Point.cso
-Client/Bin/Shader_VtxInstance_Rect.cso
-Client/Bin/Shader_VtxModel.cso
-Client/Bin/Shader_VtxNorTex.cso
-Client/Bin/Shader_VtxPosTex.cso
+FireTreeTrillion/Client/Bin/Shader_VtxAnimModel.cso
+FireTreeTrillion/Client/Bin/Shader_VtxCube.cso
+FireTreeTrillion/Client/Bin/Shader_VtxInstance_Point.cso
+FireTreeTrillion/Client/Bin/Shader_VtxInstance_Rect.cso
+FireTreeTrillion/Client/Bin/Shader_VtxModel.cso
+FireTreeTrillion/Client/Bin/Shader_VtxNorTex.cso
+FireTreeTrillion/Client/Bin/Shader_VtxPosTex.cso
 Client/Bin/Test.dds
 Client/Bin/Client.pdb
 Client/Bin/Diffuse.dds
@@ -59,3 +59,8 @@ Client/Default/Client.aps
 
 EngineSDK/
 
+FireTreeTrillion/Engine/Default/x64/
+FireTreeTrillion/Client/Default/x64/
+FireTreeTrillion/Client/Bin/Client.pdb
+FireTreeTrillion/Client/Bin/Engine.dll
+FireTreeTrillion/Engine/Bin/Shader_Deferred.cso
