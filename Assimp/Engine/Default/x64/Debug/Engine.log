@@ -1,0 +1,27 @@
+﻿  Animation.cpp
+C:\Users\Chelsea0427\Desktop\PumpkinJack\Assimp\Engine\Public\Engine_Struct.h(26,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '../Private/Animation.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\PumpkinJack\Assimp\Engine\Public\Engine_Struct.h(35,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '../Private/Animation.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\PumpkinJack\Assimp\Engine\Public\Engine_Struct.h(45,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '../Private/Animation.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\PumpkinJack\Assimp\Engine\Public\Engine_Struct.h(57,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '../Private/Animation.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\PumpkinJack\Assimp\Engine\Private\Animation.cpp(27,28): warning C4244: '=': 'const double'에서 'Engine::_float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\Chelsea0427\Desktop\PumpkinJack\Assimp\Engine\Private\Animation.cpp(29,33): warning C4244: '=': 'const double'에서 'Engine::_float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  LINK : ..\Bin\Engine.dll을(를) 찾을 수 없거나 마지막 증분 링크에 의해 빌드되지 않았습니다. 전체 링크를 수행하고 있습니다.
+Effects11d.lib(EffectAPI.obj) : warning LNK4099: '' PDB를 'Effects11d.lib(EffectAPI.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+Effects11d.lib(d3dxGlobal.obj) : warning LNK4099: '' PDB를 'Effects11d.lib(d3dxGlobal.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+Effects11d.lib(EffectNonRuntime.obj) : warning LNK4099: '' PDB를 'Effects11d.lib(EffectNonRuntime.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+Effects11d.lib(EffectLoad.obj) : warning LNK4099: '' PDB를 'Effects11d.lib(EffectLoad.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+Effects11d.lib(EffectReflection.obj) : warning LNK4099: '' PDB를 'Effects11d.lib(EffectReflection.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+Effects11d.lib(EffectRuntime.obj) : warning LNK4099: '' PDB를 'Effects11d.lib(EffectRuntime.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+DirectXTKd.lib(DDSTextureLoader.obj) : warning LNK4099: '' PDB를 'DirectXTKd.lib(DDSTextureLoader.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+DirectXTKd.lib(WICTextureLoader.obj) : warning LNK4099: '' PDB를 'DirectXTKd.lib(WICTextureLoader.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+DirectXTKd.lib(pch.obj) : warning LNK4099: '' PDB를 'DirectXTKd.lib(pch.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+     ../Bin/Engine.lib 라이브러리 및 ../Bin/Engine.exp 개체를 생성하고 있습니다.
+  Engine.vcxproj -> C:\Users\Chelsea0427\Desktop\PumpkinJack\Assimp\Engine\Bin\Engine.dll
