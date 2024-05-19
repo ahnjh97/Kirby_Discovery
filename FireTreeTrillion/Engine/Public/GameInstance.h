@@ -37,6 +37,7 @@ public: /* For.Renderer */
 	HRESULT Add_RenderGroup(CRenderer::RENDERGROUP eRenderGroup, class CGameObject* pRenderObject);
 	void Setting_RadialBlur(_fvector vWorldPos, _float fRadial, _float fSubtraction = 70.f);
 	void Setting_RadialBlur(_float fRadial, _float fSubtraction = 70.f);
+	HRESULT Render_LightDepth_For_GameObject(class CShader* pShader, class CTransform* pTransform, class CModel* pModel);
 
 
 #ifdef _DEBUG

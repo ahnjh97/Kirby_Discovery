@@ -52,18 +52,18 @@ HRESULT CTestModel::Initialize(void* pArg)
 
 
 
-    //// 예시코드 2 : 따라다니게 하기 예시 코드 + 점 광원 예시 코드
-    //LightDesc.eType = LIGHT_DESC::TYPE_POINT;
-    //LightDesc.vPosition = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
-    //LightDesc.fRange = 5.f;
-    //LightDesc.vDiffuse = _float4(1.f, 0.8f, 0.1f, 1.f);
-    //LightDesc.vAmbient = _float4(1.f, 1.f, 1.f, 1.f);
-    //LightDesc.vSpecular = _float4(0.f, 0.f, 0.0f, 1.f);
-    //if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
-    //    return E_FAIL;
+    // 예시코드 2 : 따라다니게 하기 예시 코드 + 점 광원 예시 코드
+    LightDesc.eType = LIGHT_DESC::TYPE_POINT;
+    LightDesc.vPosition = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+    LightDesc.fRange = 5.f;
+    LightDesc.vDiffuse = _float4(1.f, 0.8f, 0.1f, 1.f);
+    LightDesc.vAmbient = _float4(1.f, 1.f, 1.f, 1.f);
+    LightDesc.vSpecular = _float4(0.f, 0.f, 0.0f, 1.f);
+    if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
+        return E_FAIL;
 
-    //m_pLight = CGameInstance::Get_Instance()->Get_LightLastAddress();
-    //Safe_AddRef(m_pLight);
+    m_pLight = CGameInstance::Get_Instance()->Get_LightLastAddress();
+    Safe_AddRef(m_pLight);
 
     return S_OK;
 
@@ -112,7 +112,7 @@ _int CTestModel::Tick(_float fTimeDelta)
     // 예시코드 9 : Radial Blur Center
     if (m_pGameInstance->Get_DIKeyState(DIK_1, KEY_DOWN))
     {
-        m_pGameInstance->Setting_RadialBlur(5.f, 10.f);
+        m_pGameInstance->Setting_RadialBlur(10.f, 10.f);
     }
 
     // 예시코드 10 : Radial Blur Player
@@ -131,9 +131,9 @@ void CTestModel::Late_Tick(_float fTimeDelta)
 
     if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
     {
+        m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
         m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
         m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
-
     }
 
 
@@ -148,7 +148,7 @@ HRESULT CTestModel::Render()
 
     for (size_t i = 0; i < iNumMeshes; i++)
     {
-        if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, 1)))
+        if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
             return E_FAIL;
 
         if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
@@ -166,40 +166,8 @@ HRESULT CTestModel::Render()
 
 HRESULT CTestModel::Render_LightDepth()
 {
-    if (nullptr == m_pShaderCom)
+    if (FAILED(m_pGameInstance->Render_LightDepth_For_GameObject(m_pShaderCom, m_pTransformCom, m_pModelCom)))
         return E_FAIL;
-
-    if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
-        return E_FAIL;
-
-    _float4x4		ViewMatrix, ProjMatrix;
-
-    XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMVectorSet(0.f, 5.f, -1.f, 1.f), XMVectorSet(0.f, 0.f, 0.f, 1.f), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
-    XMStoreFloat4x4(&ProjMatrix, XMMatrixPerspectiveFovLH(XMConvertToRadians(120.0f), (_float)g_iWinSizeX / g_iWinSizeY, 0.1f, 2000.f));
-
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
-        return E_FAIL;
-
-
-    _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
-
-    for (size_t i = 0; i < iNumMeshes; i++)
-    {
-        if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, 1)))
-            return E_FAIL;
-
-        if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
-            return E_FAIL;
-
-        /* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-        if (FAILED(m_pShaderCom->Begin(2)))
-            return E_FAIL;
-
-        m_pModelCom->Render(i);
-    }
 
     return S_OK;
 }
@@ -270,6 +238,6 @@ void CTestModel::Free()
     Safe_Release(m_pShaderCom);
     Safe_Release(m_pModelCom);
 
-    //Safe_Release(m_pLight);
+    Safe_Release(m_pLight);
 
 }

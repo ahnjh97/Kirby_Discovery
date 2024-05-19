@@ -10,15 +10,16 @@ BEGIN(Engine)
 class CRenderer final : public CBase
 {
 public:
-	enum RENDERGROUP { 
+	enum RENDERGROUP {
 		RENDER_PRIORITY,
 		RENDER_SHADOW,
-		RENDER_NONBLEND, 
-		RENDER_BLOOM,  
-		RENDER_BLEND, 
+		RENDER_NONBLEND,
+		RENDER_BLOOM,
+		RENDER_BLEND,
 		RENDER_UI,
 		RENDER_SUPERUI,
-		RENDER_END };
+		RENDER_END
+	};
 private:
 	CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual ~CRenderer() = default;
@@ -31,6 +32,8 @@ public:
 	void Setting_RadialBlur(_fvector vWorldPos, _float fRadial, _float fSubtraction);
 	void Setting_RadialBlur(_float fRadial, _float fSubtraction);
 
+	HRESULT Render_LightDepth_For_GameObject(class CShader* pShader, class CTransform* pTransform, class CModel* pModel);
+
 
 #ifdef _DEBUG
 public:
@@ -38,18 +41,25 @@ public:
 #endif
 
 private:
-	ID3D11Device*						m_pDevice = { nullptr };
-	ID3D11DeviceContext*				m_pContext = { nullptr };
-	class CGameInstance*				m_pGameInstance = { nullptr };
+	ID3D11Device* m_pDevice = { nullptr };
+	ID3D11DeviceContext* m_pContext = { nullptr };
+	class CGameInstance* m_pGameInstance = { nullptr };
 	list<class CGameObject*>			m_RenderObjects[RENDER_END];
 
 
 
 private:
-	class CVIBuffer_Rect*				m_pVIBuffer = { nullptr };
-	class CShader*						m_pShader = { nullptr };
+	class CVIBuffer_Rect* m_pVIBuffer = { nullptr };
+	class CShader* m_pShader = { nullptr };
 	_float4x4							m_WorldMatrix{}, m_ViewMatrix{}, m_ProjMatrix{};
-	ID3D11DepthStencilView*				m_pLightDepthDSV = { nullptr };
+	ID3D11DepthStencilView* m_pLightDepthDSV = { nullptr };
+
+	_float4								m_vShadowEyePos = { 0.f, 0.f, 0.f, 0.f };
+	_float4								m_vShadowFocusPos = { 0.f, 0.f, 0.f, 0.f };
+	_float								m_fShadowAngle = { 0.f };
+	_float								m_fShadowFar = { 0.f };
+
+
 
 #ifdef _DEBUG
 private:

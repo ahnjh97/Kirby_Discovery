@@ -17,6 +17,8 @@ public:
 	_uint Get_NumMeshes() const { return m_iNumMeshes; }
 	class CBone* Get_BonePtr(const _char* pBoneName) const;
 
+	MODEL Get_ModelInfo() { return m_tModel; }
+
 	_bool IsFinished() { return m_Animations[m_iCurrentAnimIndex]->IsFinished(); }
 
 public:
