@@ -145,10 +145,24 @@ HRESULT CModel::Play_Animation(_float fTimeDelta)
 
 HRESULT CModel::Render(_uint iMeshIndex)
 {
-
-
 	m_Meshes[iMeshIndex]->Bind_Buffers();
 	m_Meshes[iMeshIndex]->Render();
+
+	return S_OK;
+}
+
+HRESULT CModel::CreateDynamicActor(_float4 vPos)
+{
+	for (auto& mesh : m_Meshes)
+		mesh->CreateDynamicActor(vPos);
+
+	return S_OK;
+}
+
+HRESULT CModel::CreateStaticActor(_float4 vPos)
+{
+	for (auto& mesh : m_Meshes)
+		mesh->CreateStaticActor(vPos);
 
 	return S_OK;
 }

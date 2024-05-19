@@ -23,6 +23,9 @@ public:
 public:
 	HRESULT Stock_Matrices(const vector<CBone*>& Bones, _float4x4* pMeshBoneMatrices);
 
+	HRESULT CreateDynamicActor(_float4 vPos);
+	HRESULT CreateStaticActor(_float4 vPos);
+
 private:
 	_char					m_szName[MAX_PATH] = { "" };
 
@@ -40,9 +43,13 @@ private:
 	_uint		m_iFaces = { 0 };
 	string		m_strDirectory;
 	streampos	m_filePointerPos;
-	ifstream&	m_InputFile;
-	_float3*	m_pVerticesPos = { nullptr }; // 정점 위치 
-	_uint*		m_pIndices = { nullptr }; // 인덱스 버퍼 
+	ifstream& m_InputFile;
+	_float3* m_pVerticesPos = { nullptr }; // 정점 위치 
+	_uint* m_pIndices = { nullptr }; // 인덱스 버퍼 
+
+	class PxTriangleMeshGeometry m_TriangleMeshGeometry;
+	class PxTriangleMesh* m_pTriangleMesh = { nullptr };
+	class PxRigidActor* m_pActor = { nullptr };
 
 private:
 	HRESULT Ready_Vertices_For_NonAnimModel(_fmatrix TransformationMatrix);

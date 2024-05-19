@@ -65,6 +65,9 @@ HRESULT CTestModel::Initialize(void* pArg)
     m_pLight = CGameInstance::Get_Instance()->Get_LightLastAddress();
     Safe_AddRef(m_pLight);
 
+    //if (FAILED(m_pModelCom->CreateDynamicActor(m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION))))
+    //    return E_FAIL;
+
     return S_OK;
 
 }

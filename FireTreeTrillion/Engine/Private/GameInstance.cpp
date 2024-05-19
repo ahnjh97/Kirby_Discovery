@@ -635,6 +635,21 @@ void CGameInstance::EditTransform(_float4x4& _matrix)
 	m_pIMGUI_Manager->EditTransform(_matrix);
 }
 
+PxRigidDynamic* CGameInstance::CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)
+{
+	if (nullptr == m_pPhysx)
+		return nullptr;
+
+	return m_pPhysx->CreateDynamicActor(vPos, pVerticesPos, iNumVertices, pIndices, iNumIndices, pMaterial);
+}
+
+PxRigidStatic* CGameInstance::CreateStaticActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)
+{
+	if (nullptr == m_pPhysx)
+		return nullptr;
+
+	return m_pPhysx->CreateStaticActor(vPos, pVerticesPos, iNumVertices, pIndices, iNumIndices, pMaterial);
+}
 
 void CGameInstance::Release_Engine()
 {

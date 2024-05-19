@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Base.h"
 
 BEGIN(Engine)
@@ -13,6 +12,10 @@ private:
 public:
     HRESULT Initialize();
     void Tick();
+
+public:
+    PxRigidDynamic* CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
+    PxRigidStatic* CreateStaticActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
 
 private:
     PxDefaultAllocator          mDefaultAllocatorCallback;
