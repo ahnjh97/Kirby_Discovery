@@ -15,6 +15,7 @@
 #include "Frustum.h"
 
 #include "ImGUI_Manager.h"
+#include "PhysX.h"
 
 IMPLEMENT_SINGLETON(CGameInstance)
 
@@ -62,7 +63,9 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 	if (nullptr == m_pLevel_Manager)
 		return E_FAIL;
 
-	
+	m_pPhysx = CPhysX::Create();
+	if (nullptr == m_pPhysx)
+		return E_FAIL;
 
 	/* 인풋 디바이스를 초기화한다 .*/
 
@@ -109,6 +112,7 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 	m_pInput_Device->Tick();
 
 	m_pObject_Manager->Tick(fTimeDelta);	
+	m_pPhysx->Tick();
 
 	m_pPipeLine->Tick();
 
@@ -644,7 +648,6 @@ void CGameInstance::Free()
 	Safe_Release(m_pLevel_Manager);
 	Safe_Release(m_pInput_Device);
 	Safe_Release(m_pSound_Manager);
-
+	Safe_Release(m_pPhysx);
 	Safe_Release(m_pGraphic_Device);
-
 }
