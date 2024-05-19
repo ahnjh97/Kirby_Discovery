@@ -186,6 +186,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel) // Scale, Degree, RootIndex
 	{
 		m_vecModelInfo.emplace_back(MODEL{ "Fiona", TYPE_ANIM});
 		m_vecModelInfo.emplace_back(MODEL{ "TestMap", TYPE_NONANIM });
+		m_vecModelInfo.emplace_back(MODEL{ "TestMap2", TYPE_NONANIM, 0.01f });
 	}
 
 }

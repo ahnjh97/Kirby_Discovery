@@ -1,3 +1,4 @@
+#include "GameInstance.h"
 #include "Mesh.h"
 #include "Bone.h"
 
@@ -9,6 +10,7 @@ CMesh::CMesh(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, ifstream& f
 CMesh::CMesh(const CMesh & rhs)
 	: CVIBuffer(rhs), m_iFaces{ rhs.m_iFaces }, m_InputFile(ifstream())
 {
+
 }
 
 HRESULT CMesh::Initialize_Prototype(TYPE eModelType, string strDirectory, const vector<CBone*>& Bones, _fmatrix TransformMatrix)
@@ -90,6 +92,24 @@ HRESULT CMesh::Stock_Matrices(const vector<CBone*>& Bones, _float4x4 * pMeshBone
 	{
 		XMStoreFloat4x4(&pMeshBoneMatrices[i], XMLoadFloat4x4(&m_OffsetMatrices[i]) * XMLoadFloat4x4(Bones[m_Bones[i]]->Get_CombinedTransformationMatrix()));
 	}
+
+	return S_OK;
+}
+
+HRESULT CMesh::CreateDynamicActor(_float4 vPos)
+{
+	m_pActor = m_pGameInstance->CreateDynamicActor(vPos, m_pVerticesPos, m_iNumVertices, m_pIndices, m_iNumIndices);
+	if (m_pActor == nullptr)
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CMesh::CreateStaticActor(_float4 vPos)
+{
+	m_pActor = m_pGameInstance->CreateStaticActor(vPos, m_pVerticesPos, m_iNumVertices, m_pIndices, m_iNumIndices);
+	if (m_pActor == nullptr)
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -223,5 +243,19 @@ void CMesh::Free()
 	{
 		Safe_Delete_Array(m_pIndices);
 		Safe_Delete_Array(m_pVerticesPos);
+
+		if (nullptr != m_pActor) {
+			PxScene* scene = m_pActor->getScene();
+			if (nullptr != scene) {
+				scene->removeActor(*m_pActor);
+				m_pActor->release();
+				m_pActor = nullptr;
+			}
+		}
+
+		if (nullptr != m_pTriangleMesh) {
+			m_pTriangleMesh->release();
+			m_pActor = nullptr;
+		}
 	}
 }

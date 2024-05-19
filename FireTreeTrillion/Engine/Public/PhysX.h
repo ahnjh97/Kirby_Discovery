@@ -34,6 +34,10 @@ public:
     //_float4x4                         To_Float4x4(const physx::PxMat44& mat);
     class CComponent*                   Get_Component(physx::PxActor* pActor);
 
+public:
+    PxRigidDynamic* CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
+    PxRigidStatic* CreateStaticActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
+
 private:
     PxDefaultAllocator                  mDefaultAllocatorCallback;
     PxDefaultErrorCallback              mDefaultErrorCallback;

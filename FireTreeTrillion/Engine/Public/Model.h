@@ -35,6 +35,9 @@ public:
 	HRESULT Play_Animation(_float fTimeDelta);
 	HRESULT Render(_uint iMeshIndex);
 
+	HRESULT CreateDynamicActor(_float4 vPos);
+	HRESULT CreateStaticActor(_float4 vPos);
+
 private:
 	_uint						m_iNumMeshes = { 0 };
 	vector<class CMesh*>		m_Meshes;

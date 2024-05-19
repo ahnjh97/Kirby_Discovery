@@ -62,6 +62,7 @@ namespace Engine
 // PhysX
 #include "PxPhysics.h"
 #include "PxPhysicsAPI.h"
+#include "cooking/PxCooking.h"
 
 // Assimp 
 #define AI_TEXTURE_TYPE_MAX 21

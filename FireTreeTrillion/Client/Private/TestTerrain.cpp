@@ -29,16 +29,18 @@ HRESULT CTestTerrain::Initialize(void* pArg)
     if (FAILED(Add_Components()))
         return E_FAIL;
 
-    _vector vPos = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+    _vector vPos = XMVectorSet(0.f, 10.f, 0.f, 1.f);
     m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 
+    if (FAILED(m_pModelCom->CreateStaticActor(m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION))))
+        return E_FAIL;
 
     return S_OK;
 }
 
 _int CTestTerrain::Tick(_float fTimeDelta)
 {
-
+    
     return OBJ_NOEVENT;
 }
 
