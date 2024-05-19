@@ -4,6 +4,8 @@
 
 _uint		g_iSizeX = 8192;
 _uint		g_iSizeY = 4608;
+_uint		g_iOriginSizeX = 1280;
+_uint		g_iOriginSizeY = 720;
 
 CRenderer::CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
@@ -19,6 +21,11 @@ HRESULT CRenderer::Initialize()
 {
 	_uint				iNumViewports = { 1 };
 	D3D11_VIEWPORT		ViewportDesc{};
+
+	m_vShadowEyePos = { 0.f, 20.f, -1.f, 1.f };
+	m_vShadowFocusPos = { 0.f, 0.f, 0.f, 1.f };
+	m_fShadowAngle = { 120.f };
+	m_fShadowFar = { 2000.f };
 
 	m_pContext->RSGetViewports(&iNumViewports, &ViewportDesc);
 
@@ -287,6 +294,46 @@ void CRenderer::Setting_RadialBlur(_float fRadial, _float fSubtraction)
 	m_vScreenPos = _float2(0.5f, 0.5f);
 	m_fRadialBlurRadius = fRadial;
 	m_fRadialRadiusSubtraction = fSubtraction;
+}
+
+HRESULT CRenderer::Render_LightDepth_For_GameObject(CShader* pShader, CTransform* pTransform, CModel* pModel)
+{
+	if (nullptr == pShader || nullptr == pTransform || nullptr == pModel)
+		return E_FAIL;
+
+	if (FAILED(pTransform->Bind_ShaderResource(pShader, "g_WorldMatrix")))
+		return E_FAIL;
+
+	_float4x4		ViewMatrix, ProjMatrix;
+	XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMLoadFloat4(&m_vShadowEyePos), XMLoadFloat4(&m_vShadowFocusPos), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
+	XMStoreFloat4x4(&ProjMatrix, XMMatrixPerspectiveFovLH(XMConvertToRadians(m_fShadowAngle), (_float)g_iOriginSizeX / g_iOriginSizeY, 0.1f, m_fShadowFar));
+
+	if (FAILED(pShader->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
+		return E_FAIL;
+	if (FAILED(pShader->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
+		return E_FAIL;
+
+	_uint iNumMeshes = pModel->Get_NumMeshes();
+
+	for (size_t i = 0; i < iNumMeshes; i++)
+	{
+		if (FAILED(pModel->Bind_ShaderResource(pShader, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
+			return E_FAIL;
+
+		if (pModel->Get_ModelInfo().eType == TYPE_ANIM)
+		{
+			if (FAILED(pModel->Bind_BoneMatrices(pShader, "g_BoneMatrices", i)))
+				return E_FAIL;
+		}
+
+		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
+		if (FAILED(pShader->Begin(2)))
+			return E_FAIL;
+
+		pModel->Render(i);
+	}
+
+	return S_OK;
 }
 
 
@@ -577,8 +624,8 @@ HRESULT CRenderer::Render_Result()
 
 	_float4x4		ViewMatrix, ProjMatrix;
 
-	XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMVectorSet(0.f, 5.f, -1.f, 1.f), XMVectorSet(0.f, 0.f, 0.f, 1.f), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
-	XMStoreFloat4x4(&ProjMatrix, XMMatrixPerspectiveFovLH(XMConvertToRadians(120.0f), (_float)1280.0f / 720.0f, 0.1f, 2000.f));
+	XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMLoadFloat4(&m_vShadowEyePos), XMLoadFloat4(&m_vShadowFocusPos), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
+	XMStoreFloat4x4(&ProjMatrix, XMMatrixPerspectiveFovLH(XMConvertToRadians(m_fShadowAngle), (_float)g_iOriginSizeX / g_iOriginSizeY, 0.1f, m_fShadowFar));
 
 	if (FAILED(m_pShader->Bind_Matrix("g_LightViewMatrix", &ViewMatrix)))
 		return E_FAIL;
@@ -586,16 +633,18 @@ HRESULT CRenderer::Render_Result()
 	if (FAILED(m_pShader->Bind_Matrix("g_LightProjMatrix", &ProjMatrix)))
 		return E_FAIL;
 
-	m_pShader->Begin(3);
+	if (FAILED(m_pShader->Begin(3)))
+		return E_FAIL;
 
-	m_pVIBuffer->Bind_Buffers();
+	if (FAILED(m_pVIBuffer->Bind_Buffers()))
+		return E_FAIL;
 
-	m_pVIBuffer->Render();
+	if (FAILED(m_pVIBuffer->Render()))
+		return  E_FAIL;
 
 	if (FAILED(m_pGameInstance->End_MRT()))
 		return E_FAIL;
 
-		
 	return S_OK;
 }
 

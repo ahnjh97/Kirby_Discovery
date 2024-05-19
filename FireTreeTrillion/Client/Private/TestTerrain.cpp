@@ -58,9 +58,9 @@ HRESULT CTestTerrain::Render()
     // 파악된 나의 Mesh 개수에 따라 여러번 그려서(왼팔, 오른팔, 무기) 하나의 객체를 만든다.
     for (size_t i = 0; i < iNumMeshes; i++)
     {
-        if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, 1)))
+        if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
             return E_FAIL;
-        if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, 5)))
+        if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_HEIGHT)))
             return E_FAIL;
         if (FAILED(m_pShaderCom->Begin(0)))
             return E_FAIL;

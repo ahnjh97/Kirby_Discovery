@@ -161,14 +161,14 @@ void CMainApp::Read_XML()
 	tinyxml2::XMLError error = m_xmlDocument.LoadFile("../Bin/Resources/Data/ItemInfo.xml");
 	m_pNode = m_xmlDocument.FirstChild();
 
-	_int	iRead, iCnt, iEA;
+	_int	iRead, iCnt/*, iEA*/;
 
 	m_pElement = m_pNode->FirstChildElement("Version");
 	m_pElement->QueryIntText(&iRead);
 	m_pElement = m_pNode->FirstChildElement("Count");
 	m_pElement->QueryIntText(&iCnt);
 
-	for (_uint i = 0; i < iCnt; ++i)
+	for (_int i = 0; i < iCnt; ++i)
 	{
 		string strData = "Data" + to_string(i);
 		m_pElement = m_pNode->FirstChildElement(strData.c_str());

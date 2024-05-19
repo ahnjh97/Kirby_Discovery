@@ -235,6 +235,16 @@ void CGameInstance::Setting_RadialBlur(_float fRadial, _float fSubtraction)
 	m_pRenderer->Setting_RadialBlur(fRadial, fSubtraction);
 }
 
+HRESULT CGameInstance::Render_LightDepth_For_GameObject(CShader* pShader, CTransform* pTransform, CModel* pModel)
+{
+	if (nullptr == m_pRenderer)
+		return E_FAIL;
+
+	m_pRenderer->Render_LightDepth_For_GameObject(pShader, pTransform, pModel);
+
+	return S_OK;
+}
+
 HRESULT CGameInstance::Add_DebugComponents(CComponent * pRenderComponent)
 {
 
