@@ -65,9 +65,9 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
 	CameraDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	CameraDesc.fNear = 0.1f;
 	CameraDesc.fFar = 1000.0f;
-	CameraDesc.vEye = _float4(0.f, 10.f, -7.f, 1.f);
+	CameraDesc.vEye = _float4(0.f, 2.f, -1.f, 1.f);
 	CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
-	CameraDesc.fSpeedPerSec = 10.f;
+	CameraDesc.fSpeedPerSec = 0.5f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
@@ -92,6 +92,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const wstring & strLayerTag)
 
 HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const wstring & strLayerTag)
 {
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_TestMap"))))
+		return E_FAIL;
 
 	return S_OK;
 }

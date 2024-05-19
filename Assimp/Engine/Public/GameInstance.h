@@ -63,7 +63,7 @@ private:
 	class CRenderer*				m_pRenderer = { nullptr };
 	class CTimer_Manager*			m_pTimer_Manager = { nullptr };	
 	class CPipeLine*				m_pPipeLine = { nullptr };
-	class CImGui_Manager*			m_pImGui_Manager = { nullptr };
+	//class CImGui_Manager*			m_pImGui_Manager = { nullptr };
 
 
 

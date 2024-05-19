@@ -52,6 +52,9 @@
     <Filter Include="90.Utils\XML">
       <UniqueIdentifier>{952aa0f7-ec8e-42be-b8ec-701d80f0ec38}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Terrain">
+      <UniqueIdentifier>{790e4632-66f1-4e07-b217-df971b3f85d4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -111,6 +114,9 @@
     <ClInclude Include="..\Public\TestModel.h">
       <Filter>02.GameObjects\Player</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\TestTerrain.h">
+      <Filter>02.GameObjects\Terrain</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -157,6 +163,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\TestModel.cpp">
       <Filter>02.GameObjects\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TestTerrain.cpp">
+      <Filter>02.GameObjects\Terrain</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
