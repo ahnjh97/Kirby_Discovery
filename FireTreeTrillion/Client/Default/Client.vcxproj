@@ -103,7 +103,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../Public/;../../EngineSDK/Inc/;../../EngineSDK/Inc/ImGui/;../Bin/core/inc/;../Default/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Public/;../../EngineSDK/Inc/;../../EngineSDK/Inc/ImGui/;../Bin/core/inc/;../Default/;../../EngineSDK/Inc/physx/</AdditionalIncludeDirectories>
       <AdditionalOptions>/MP /Zm200 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
