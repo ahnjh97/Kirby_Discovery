@@ -123,7 +123,7 @@ void CUtils::Turn_OtherMatrix(_Inout_ _float4x4& matrix, _fvector vAxis, _float 
 	}
 }
 
-physx::PxMat44 CUtils::To_Float4x4(const _float4x4_sm& mat)
+physx::PxMat44 CUtils::To_Float4x4(const _float4x4& mat)
 {
 	physx::PxMat44 out;
 	memcpy(&out.column0, &mat.m[0], sizeof(_float4));
@@ -133,9 +133,9 @@ physx::PxMat44 CUtils::To_Float4x4(const _float4x4_sm& mat)
 	return out;
 }
 
-_float4x4_sm CUtils::To_Float4x4(const physx::PxMat44& mat)
+_float4x4 CUtils::To_Float4x4(const physx::PxMat44& mat)
 {
-	_float4x4_sm out;
+	_float4x4 out;
 	memcpy(&out.m[0], &mat.column0, sizeof(_float4));
 	memcpy(&out.m[1], &mat.column1, sizeof(_float4));
 	memcpy(&out.m[2], &mat.column2, sizeof(_float4));

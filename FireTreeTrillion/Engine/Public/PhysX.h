@@ -15,7 +15,7 @@ public:
     
     // test 
     void Test();
-    _float4x4_sm Update(_fmatrix matrix);
+    _float4x4 Update(_fmatrix matrix);
 
     // Actor °ü¸®
     void AddActor(physx::PxActor& pActor);

@@ -33,8 +33,8 @@ public:
 	static void		Turn_OtherMatrix(_Inout_ _float4x4& matrix, _fvector vAxis, _float fTimeDelta, _float fAngle);
 
 	// physX 관련 함수
-	static physx::PxMat44  To_Float4x4(const _float4x4_sm& mat);
-	static _float4x4_sm    To_Float4x4(const physx::PxMat44& mat);
+	static physx::PxMat44  To_Float4x4(const _float4x4& mat);
+	static _float4x4    To_Float4x4(const physx::PxMat44& mat);
 
 		
 };

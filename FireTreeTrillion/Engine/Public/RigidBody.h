@@ -35,7 +35,7 @@ public:
 public:
 	physx::PxTransform	Get_PxTransform();
 
-	void				Set_PxWorldMatrix(const _float4x4_sm& worldMatrix);
+	void				Set_PxWorldMatrix(const _float4x4& worldMatrix);
 	_float4x4			Get_PxWorldMatrix();
 
 	_bool				Is_Activated();
@@ -57,7 +57,7 @@ protected:
 
 	// 현 RigidBody의 형태
 	SHAPE					m_eShapeType	= TYPE_SPHERE;
-	_float4x4_sm			m_OriginTransformMatrix;
+	_float4x4			m_OriginTransformMatrix;
 
 public:
 	static CRigidBody*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

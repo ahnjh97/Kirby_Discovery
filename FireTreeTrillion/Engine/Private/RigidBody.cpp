@@ -94,7 +94,7 @@ void CRigidBody::Create_Actor()
 	Release_Actor();
 
 	auto pPhysics = m_pGameInstance->Get_Physics();
-	auto pxMat = CUtils::To_Float4x4(_float4x4_sm::Identity);
+	auto pxMat = CUtils::To_Float4x4(_float4x4::Identity);
 	if (m_pObject != nullptr)
 		pxMat = CUtils::To_Float4x4(m_pObject->Get_TransformCom()->Get_WorldMatrix());
 	auto pMtrl = m_pGameInstance->Get_Material();
@@ -210,7 +210,7 @@ physx::PxTransform CRigidBody::Get_PxTransform()
 }
 
 // 현 actor의 physX에서의 행렬을 지정해준다.
-void CRigidBody::Set_PxWorldMatrix(const _float4x4_sm& _worldMatrix)
+void CRigidBody::Set_PxWorldMatrix(const _float4x4& _worldMatrix)
 {
 	m_pActor->setGlobalPose(physx::PxTransform{CUtils::To_Float4x4(_worldMatrix)});
 }

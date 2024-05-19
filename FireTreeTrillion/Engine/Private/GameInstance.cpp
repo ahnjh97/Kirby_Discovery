@@ -572,7 +572,7 @@ void CGameInstance::Test()
 	m_pPhysx->Test();
 }
 
-_float4x4_sm CGameInstance::Update(_fmatrix matrix)
+_float4x4 CGameInstance::Update(_fmatrix matrix)
 {
 	return m_pPhysx->Update(matrix);
 }

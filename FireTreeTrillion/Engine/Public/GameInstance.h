@@ -115,7 +115,7 @@ public: /* For.PhysX */
 	void		RemoveActor(physx::PxActor& pActor);
 
 	void Test();
-	_float4x4_sm Update(_fmatrix matrix);
+	_float4x4 Update(_fmatrix matrix);
 
 #ifdef _DEBUG
 	HRESULT Ready_RTVDebug(const wstring& strRenderTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY);

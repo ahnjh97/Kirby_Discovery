@@ -88,13 +88,13 @@ void CPhysX::Test()
     m_pScene->addActor(*m_pRigidDynamic);
 }
 
-_float4x4_sm CPhysX::Update(_fmatrix matrix)
+_float4x4 CPhysX::Update(_fmatrix matrix)
 {
     //PxVec3 pos = CUtils::To_Float4x4(matrix).getPosition();
     //PxTransform newPose(pos);
     //m_pRigidDynamic->setGlobalPose(newPose);
     PxTransform trans = m_pRigidDynamic->getGlobalPose();
-    _float4x4_sm matPos = CUtils::To_Float4x4(trans);
+    _float4x4 matPos = CUtils::To_Float4x4(trans);
     return matPos;
 }
 
