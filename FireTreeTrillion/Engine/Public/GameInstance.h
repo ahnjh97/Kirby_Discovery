@@ -150,6 +150,7 @@ private:
 	class CExtractor*				m_pExtractor = { nullptr };
 	class CSound_Manager*			m_pSound_Manager = { nullptr };
 	class CImGUI_Manager*			m_pIMGUI_Manager = { nullptr };
+	class CPhysX*					m_pPhysx = { nullptr };
 
 	_uint	m_iCurrentLevelID = { 0 };
 

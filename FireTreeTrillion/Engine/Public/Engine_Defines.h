@@ -54,9 +54,14 @@ namespace Engine
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/prettywriter.h"
 
+// PhysX
+#include "PxPhysics.h"
+#include "PxPhysicsAPI.h"
+
 // Assimp 
 #define AI_TEXTURE_TYPE_MAX 21
 using namespace DirectX;
+using namespace physx;
 
 #include <algorithm>
 #include <string>

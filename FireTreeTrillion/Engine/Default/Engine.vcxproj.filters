@@ -157,6 +157,9 @@
     <Filter Include="01.Utility\10.Sound">
       <UniqueIdentifier>{e3b3ea35-4a7d-4218-9501-4ec07b162d11}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. PhysX">
+      <UniqueIdentifier>{d6077c32-15aa-4495-afe9-721e481bbcbb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Base.cpp">
@@ -332,6 +335,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Utils.cpp">
       <Filter>90.Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PhysX.cpp">
+      <Filter>02. PhysX</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -535,6 +541,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Utils.h">
       <Filter>90.Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PhysX.h">
+      <Filter>02. PhysX</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
