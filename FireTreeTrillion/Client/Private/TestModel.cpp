@@ -141,6 +141,13 @@ void CTestModel::Late_Tick(_float fTimeDelta)
         m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
     }
 
+    if (m_pGameInstance->Get_DIKeyState(DIK_L, KEY_DOWN))
+    {
+        _float4 vForce = m_pTransformCom->Get_State_Float4(CTransform::STATE_UP);
+        _float3 force = _float3{ vForce.x * 10000.f, vForce.y * 10000.f, vForce.z * 10000.f };
+        m_pRigidBodyCom->Add_Force(force);
+    }
+
     m_pRigidBodyCom->Update(m_pTransformCom);
     m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
 }

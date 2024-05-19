@@ -32,6 +32,9 @@ public:
 
 	void			Activate(_bool _bActive);
 
+	// 날리기
+	void			Add_Force(_float3 vForce);
+
 public:
 	physx::PxTransform	Get_PxTransform();
 
@@ -57,7 +60,7 @@ protected:
 
 	// 현 RigidBody의 형태
 	SHAPE					m_eShapeType	= TYPE_SPHERE;
-	_float4x4			m_OriginTransformMatrix;
+	_float4x4				m_OriginTransformMatrix;
 
 public:
 	static CRigidBody*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -204,6 +204,16 @@ void CRigidBody::Activate(_bool _bActive)
 	}
 }
 
+void CRigidBody::Add_Force(_float3 vForce)
+{
+	// Trigger는 어떻게 사용할 지 추후 의논 예정
+	if (false == (m_bKinematic))
+	{
+		physx::PxVec3 PxForce = physx::PxVec3(vForce.x, vForce.y, vForce.z);
+		m_pActor->addForce(PxForce, physx::PxForceMode::eFORCE);
+	}
+}
+
 physx::PxTransform CRigidBody::Get_PxTransform()
 {
 	return physx::PxShapeExt::getGlobalPose(*m_pShape, *m_pActor);
