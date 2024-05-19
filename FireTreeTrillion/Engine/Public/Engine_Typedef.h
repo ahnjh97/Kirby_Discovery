@@ -24,6 +24,10 @@ namespace Engine
 
 	typedef bool						_bool;
 
+	typedef	SimpleMath::Vector2			_float2_sm;
+	typedef	SimpleMath::Vector3			_float3_sm;
+	typedef	SimpleMath::Vector4			_float4_sm;
+
 	typedef XMFLOAT2					_float2;
 	typedef XMFLOAT3					_float3;
 	typedef XMFLOAT4					_float4;
@@ -33,6 +37,7 @@ namespace Engine
 	typedef HXMVECTOR					_hvector;
 	typedef CXMVECTOR					_cvector;
 
+	typedef	SimpleMath::Matrix			_float4x4_sm;
 	typedef XMFLOAT4X4					_float4x4;
 	typedef XMMATRIX					_matrix;
 	typedef FXMMATRIX					_fmatrix;

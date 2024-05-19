@@ -24,13 +24,16 @@ public:
 
 
 	// Matrix 계산기
-	static void Set_State_Matrix(_Inout_ _float4x4& matrix, STATE eState, _fvector vState);
-	static void Set_State_Matrix(_Inout_ _float4x4& matrix, STATE eState, const _float4& vState);
-	static void Set_Scaled_Matrix(_Inout_ _float4x4& matrix, _float fScaleX, _float fScaleY, _float fScaleZ);
-	static _vector Get_State_Vector_Matrix(_Inout_ _float4x4& matrix, STATE eState);
-	static _float3 Get_Scaled_Matrix(_Inout_ _float4x4& matrix);
-	static void Turn_OtherMatrix(_Inout_ _float4x4& matrix, _fvector vAxis, _float fTimeDelta, _float fAngle);
+	static void		Set_State_Matrix(_Inout_ _float4x4& matrix, STATE eState, _fvector vState);
+	static void		Set_State_Matrix(_Inout_ _float4x4& matrix, STATE eState, const _float4& vState);
+	static void		Set_Scaled_Matrix(_Inout_ _float4x4& matrix, _float fScaleX, _float fScaleY, _float fScaleZ);
+	static _vector	Get_State_Vector_Matrix(_Inout_ _float4x4& matrix, STATE eState);
+	static _float3	Get_Scaled_Matrix(_Inout_ _float4x4& matrix);
+	static void		Turn_OtherMatrix(_Inout_ _float4x4& matrix, _fvector vAxis, _float fTimeDelta, _float fAngle);
 
+	// physX 관련 함수
+	static physx::PxMat44  To_Float4x4(const _float4x4_sm& mat);
+	static _float4x4_sm    To_Float4x4(const physx::PxMat44& mat);
 
 };
 

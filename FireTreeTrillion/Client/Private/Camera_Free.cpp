@@ -75,11 +75,6 @@ _int CCamera_Free::Tick(_float fTimeDelta)
 
 void CCamera_Free::Late_Tick(_float fTimeDelta)
 {
-
-	ImGui::Begin("test");
-	ImGui::Text("test");
-	ImGui::End();
-
 }
 
 HRESULT CCamera_Free::Render()

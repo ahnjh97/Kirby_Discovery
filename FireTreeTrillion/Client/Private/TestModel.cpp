@@ -3,6 +3,8 @@
 #include "Light.h"
 //#include "Utils.h"
 
+#include "RigidBody.h"
+
 CTestModel::CTestModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject{ pDevice, pContext }
 {
@@ -64,6 +66,8 @@ HRESULT CTestModel::Initialize(void* pArg)
 
     m_pLight = CGameInstance::Get_Instance()->Get_LightLastAddress();
     Safe_AddRef(m_pLight);
+
+    CGameInstance::Get_Instance()->Test();
 
     return S_OK;
 
@@ -136,6 +140,7 @@ void CTestModel::Late_Tick(_float fTimeDelta)
         m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
     }
 
+    CGameInstance::Get_Instance()->Update(m_pTransformCom->Get_WorldMatrix());
 
 }
 
@@ -184,8 +189,28 @@ HRESULT CTestModel::Add_Components()
         TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
         return E_FAIL;
 
-    return S_OK;
+    ///* For.Com_RigidBody */
+    //if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_RigidBody"),
+    //    TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom)))
+    //    return E_FAIL;
+    
+    //CRigidBody::RIGIDBODY_DESC desc{};
+    //desc.eType = CRigidBody::TYPE_SPHERE;
+    //Add_RigidBody(TEXT("Com_RigidBody"), &desc);
 
+    return S_OK;
+}
+
+void CTestModel::Add_RigidBody(const wstring& KeyName, void* pArg)
+{
+    HRESULT hr;
+
+    CRigidBody* pRigidBody = nullptr;
+    hr = Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_RigidBody"), KeyName,
+                       (CComponent**)&pRigidBody, pArg);
+    CHECK_FAILED(hr);
+
+    //m_mapRigidBodies.emplace(KeyName, pRigidBody);
 }
 
 HRESULT CTestModel::Bind_ShaderResources()
@@ -211,7 +236,6 @@ CTestModel* CTestModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pCont
     if (FAILED(pInstance->Initialize_Prototype()))
     {
         MSG_BOX(TEXT("Failed To Created : CTestModel"));
-
         Safe_Release(pInstance);
     }
 
@@ -225,7 +249,6 @@ CGameObject* CTestModel::Clone(void* pArg)
     if (FAILED(pInstance->Initialize(pArg)))
     {
         MSG_BOX(TEXT("Failed To Created : CTestModel"));
-
         Safe_Release(pInstance);
     }
 
@@ -235,9 +258,13 @@ CGameObject* CTestModel::Clone(void* pArg)
 void CTestModel::Free()
 {
     __super::Free();
+
     Safe_Release(m_pShaderCom);
     Safe_Release(m_pModelCom);
-
+    Safe_Release(m_pRigidBodyCom);
+    
     Safe_Release(m_pLight);
 
+    //for (auto& iter : m_mapRigidBodies)
+    //    Safe_Release(iter.second);
 }

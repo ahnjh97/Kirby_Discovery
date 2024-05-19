@@ -6,6 +6,7 @@
 BEGIN(Engine)
 class CModel;
 class CShader;
+class CRigidBody;
 END
 
 BEGIN(Client)
@@ -26,13 +27,17 @@ public:
 	virtual HRESULT Render_LightDepth() override;
 
 private:
-	CModel* m_pModelCom = { nullptr };
-	CShader* m_pShaderCom = { nullptr };
-
-	class CLight* m_pLight = { nullptr };
-
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
+	void	Add_RigidBody(const wstring& KeyName, void* pArg);
+
+private:
+	CModel*			m_pModelCom = { nullptr };
+	CShader*		m_pShaderCom = { nullptr };
+	CRigidBody*		m_pRigidBodyCom = { nullptr };
+	//map<string, CRigidBody*> m_mapRigidBodies;
+
+	class CLight*	m_pLight = { nullptr };
 
 public:
 	static CTestModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

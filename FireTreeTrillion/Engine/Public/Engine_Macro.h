@@ -12,7 +12,14 @@
 #define CHECK_FAILED_MSG(p, message)	assert(SUCCEEDED(p && message))
 #define CHECK_NULLPTR(p)				assert(p != nullptr && "This pointer" #p "is a nullptr.")
 #define ALARM_FAIL(message)				assert(0 && message)
+#define Assert(expression)				assert(expression)
 
+// switch-case문에서 default로 빠지면 안되는 경우 error처리
+#ifdef DEBUG
+# define NODEFAULT   assert(0)
+#else
+# define NODEFAULT   __assume(0)
+#endif
 
 //빠름 - 느림
 #define EASE_OUT(t) (_float)(1 - pow(1 - t, 3))

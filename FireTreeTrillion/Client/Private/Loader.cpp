@@ -10,6 +10,8 @@
 #include "TestModel.h"
 #include "TestTerrain.h"
 
+#include "RigidBody.h"
+
 //#include "Body_Player.h"
 //#include "Weapon.h"
 //#include "Player.h"
@@ -137,6 +139,11 @@ HRESULT CLoader::Loading_For_GamePlay()
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
 	hr = Add_Models(eLevel);
+	CHECK_FAILED(hr);
+
+	m_strLoadingText = TEXT("물리 컴포넌트(을) 로딩 중 입니다.");
+	// 리지드바디
+	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_RigidBody"), CRigidBody::Create(m_pDevice, m_pContext));
 	CHECK_FAILED(hr);
 
 	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
