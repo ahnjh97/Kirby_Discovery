@@ -88,11 +88,24 @@ void CPhysX::Test()
     m_pScene->addActor(*m_pRigidDynamic);
 }
 
-void CPhysX::Update(_fmatrix matrix)
+_float4x4_sm CPhysX::Update(_fmatrix matrix)
 {
-    PxVec3 pos = CUtils::To_Float4x4(matrix).getPosition();
-    PxTransform newPose(pos);
-    m_pRigidDynamic->setGlobalPose(newPose);
+    //PxVec3 pos = CUtils::To_Float4x4(matrix).getPosition();
+    //PxTransform newPose(pos);
+    //m_pRigidDynamic->setGlobalPose(newPose);
+    PxTransform trans = m_pRigidDynamic->getGlobalPose();
+    _float4x4_sm matPos = CUtils::To_Float4x4(trans);
+    return matPos;
+}
+
+void CPhysX::AddActor(physx::PxActor& pActor)
+{
+    m_pScene->addActor(pActor);
+}
+
+void CPhysX::RemoveActor(physx::PxActor& pActor)
+{
+    m_pScene->removeActor(pActor);
 }
 
 
@@ -156,7 +169,7 @@ PxRigidDynamic* CPhysX::CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, 
     PxConvexMeshGeometry meshGeometry(pMesh);
 
     PxTransform pxTransform(PxVec3(vPos.x, vPos.y, vPos.z));
-    PxRigidDynamic* pDynamicActor = mPhysics->createRigidDynamic(pxTransform);
+    PxRigidDynamic* pDynamicActor = m_pPhysics->createRigidDynamic(pxTransform);
     if (nullptr == pDynamicActor) {
         MSG_BOX(TEXT("Failed to Create RigidDynamic."));
         return nullptr;
@@ -164,9 +177,9 @@ PxRigidDynamic* CPhysX::CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, 
 
     PxShape* pShape = { nullptr };
     if(nullptr == pMaterial)
-        pShape = mPhysics->createShape(meshGeometry, *mMaterial);
+        pShape = m_pPhysics->createShape(meshGeometry, *m_pMaterial);
     else
-        pShape = mPhysics->createShape(meshGeometry, *pMaterial);
+        pShape = m_pPhysics->createShape(meshGeometry, *pMaterial);
 
     if (nullptr == pShape) {
         MSG_BOX(TEXT("Failed to Create Shape."));
@@ -175,7 +188,7 @@ PxRigidDynamic* CPhysX::CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, 
     }
 
     pDynamicActor->attachShape(*pShape);
-    mScene->addActor(*pDynamicActor);
+    m_pScene->addActor(*pDynamicActor);
     pMesh->release();
     pShape->release(); 
 
@@ -200,7 +213,7 @@ PxRigidStatic* CPhysX::CreateStaticActor(_float4 vPos, _float3* pVerticesPos, _u
     PxTriangleMeshGeometry triGeom(pTriMesh, meshScale, meshFlags);
 
     PxTransform pxTransform(PxVec3(vPos.x, vPos.y, vPos.z));
-    PxRigidStatic* pStaticActor = mPhysics->createRigidStatic(pxTransform);
+    PxRigidStatic* pStaticActor = m_pPhysics->createRigidStatic(pxTransform);
     if (nullptr == pStaticActor) {
         MSG_BOX(TEXT("Failed to Create RigidStatic."));
         return nullptr;
@@ -208,12 +221,12 @@ PxRigidStatic* CPhysX::CreateStaticActor(_float4 vPos, _float3* pVerticesPos, _u
 
     PxShape* pShape = { nullptr };
     if (nullptr == pMaterial)
-        pShape = mPhysics->createShape(triGeom, *mMaterial);
+        pShape = m_pPhysics->createShape(triGeom, *m_pMaterial);
     else
-        pShape = mPhysics->createShape(triGeom, *pMaterial);
+        pShape = m_pPhysics->createShape(triGeom, *pMaterial);
 
     pStaticActor->attachShape(*pShape);
-    mScene->addActor(*pStaticActor);
+    m_pScene->addActor(*pStaticActor);
     pTriMesh->release();
     pShape->release();
 
@@ -239,7 +252,7 @@ void CPhysX::Free()
 
     m_pPvd->disconnect();
 
-    if(nullptr != shape)
+    if(nullptr != m_pShape)
         m_pShape->release();
 
     // 2. Scene «ÿ¡¶

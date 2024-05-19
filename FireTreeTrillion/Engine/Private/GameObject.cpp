@@ -79,6 +79,18 @@ HRESULT CGameObject::Render()
 	return S_OK;
 }
 
+void CGameObject::Render_IMGUI()
+{
+	for (auto& com : m_Components)
+	{
+		char szName[256];
+		CUtils::WCharToChar(com.first.c_str(), szName);
+
+		if (ImGui::CollapsingHeader(szName))
+			com.second->Render_IMGUI();
+	}
+}
+
 
 HRESULT CGameObject::Add_Component(_uint iLevelIndex, const wstring & strPrototypeTag, const wstring & strComponentTag, CComponent** ppOut, void * pArg)
 {

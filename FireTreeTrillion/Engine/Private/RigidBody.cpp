@@ -1,5 +1,7 @@
 #include "RigidBody.h"
 #include "GameInstance.h"
+#include "GameObject.h"
+#include "Transform.h"
 
 CRigidBody::CRigidBody(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CComponent{ pDevice, pContext }
@@ -22,12 +24,79 @@ HRESULT CRigidBody::Initialize(void * pArg)
 	return S_OK;
 }
 
+// start_tick은 한번만 실행
+// rigidBody를 추가하는 순간 physX에서 작동하는 Actor가 추가된다.
+void CRigidBody::Start_Tick()
+{
+	//__super::Start_Tick();
+	CHECK_NULLPTR(m_pObject);
+	m_pActor->setGlobalPose(physx::PxTransform{CUtils::To_Float4x4(m_pObject->Get_TransformCom()->Get_WorldMatrix())});
+	m_pGameInstance->Get_Scene()->addActor(*m_pActor);
+}
+
+void CRigidBody::Update(CTransform* pTransform)
+{
+	if (m_bTrigger)
+	{
+		Set_PxWorldMatrix(pTransform->Get_WorldFloat4x4());
+	}
+	else if (m_bKinematic && Is_Activated())
+	{
+		m_pActor->setKinematicTarget(physx::PxTransform{CUtils::To_Float4x4(pTransform->Get_WorldFloat4x4())});
+	}
+}
+
+void CRigidBody::Update(_fmatrix matrix)
+{
+	if (m_bTrigger)
+	{
+		Set_PxWorldMatrix(matrix);
+	}
+	else if (m_bKinematic && Is_Activated())
+	{
+		m_pActor->setKinematicTarget(physx::PxTransform{CUtils::To_Float4x4(matrix)});
+	}
+}
+
+void CRigidBody::Update_PhysX(CTransform* pTransform)
+{
+	if (Is_Activated() == false) return;
+
+	if (false == m_bKinematic && false == m_bTrigger)
+	{
+		pTransform->Set_WorldMatrix(Get_PxWorldMatrix());
+	}
+}
+
+void CRigidBody::Render_IMGUI()
+{
+	__super::Render_IMGUI();
+
+	if (ImGui::Button("ReCreateActor(for change shape or scale)"))
+	{
+		Create_Actor();
+		if (!Is_Activated())
+			m_pGameInstance->Get_Scene()->addActor(*m_pActor);
+	}
+	ImGui::Checkbox("bTrigger",		&m_bTrigger);
+	ImGui::Checkbox("bKinematic",	&m_bKinematic);
+	ImGui::InputFloat("Density",	&m_fDensity);
+
+	ImGui::Indent(20.f);
+	if (ImGui::CollapsingHeader("Origin Trasnform"))
+	{
+	}
+	ImGui::Unindent(20.f);
+}
+
 void CRigidBody::Create_Actor()
 {
 	Release_Actor();
 
 	auto pPhysics = m_pGameInstance->Get_Physics();
 	auto pxMat = CUtils::To_Float4x4(_float4x4_sm::Identity);
+	if (m_pObject != nullptr)
+		pxMat = CUtils::To_Float4x4(m_pObject->Get_TransformCom()->Get_WorldMatrix());
 	auto pMtrl = m_pGameInstance->Get_Material();
 	m_pActor = pPhysics->createRigidDynamic(physx::PxTransform{pxMat});
 
@@ -120,12 +189,42 @@ void CRigidBody::Release_Actor()
 	}
 }
 
+/// <summary> physX의 RigidBody를 on/off해주는 함수 </summary>
+void CRigidBody::Activate(_bool _bActive)
+{
+	if (_bActive)
+	{
+		if (m_pActor->getScene() == nullptr)
+			m_pGameInstance->AddActor(*m_pActor);
+	}
+	else
+	{
+		if (m_pActor->getScene())
+			m_pGameInstance->RemoveActor(*m_pActor);
+	}
+}
+
 physx::PxTransform CRigidBody::Get_PxTransform()
 {
 	return physx::PxShapeExt::getGlobalPose(*m_pShape, *m_pActor);
 }
 
-_bool CRigidBody::IsOnPhysX()
+// 현 actor의 physX에서의 행렬을 지정해준다.
+void CRigidBody::Set_PxWorldMatrix(const _float4x4_sm& _worldMatrix)
+{
+	m_pActor->setGlobalPose(physx::PxTransform{CUtils::To_Float4x4(_worldMatrix)});
+}
+
+// physX에서의 행렬을 DX에서의 행렬로 변환하여 가져온다.
+_float4x4 CRigidBody::Get_PxWorldMatrix()
+{
+	physx::PxMat44 pos(physx::PxShapeExt::getGlobalPose(*m_pShape, *m_pActor));
+	return CUtils::To_Float4x4(pos);
+}
+
+/// <summary> Actor가 지정되어있으며, 해당 Actor가 존재할 Scene이 있는 경우 True를 반환
+///	즉, physX의 영향을 받는 actor로 지정되어있는 경우 true를 반환 </summary>
+_bool CRigidBody::Is_Activated()
 {
 	return m_pActor != nullptr && m_pActor->getScene() != nullptr;
 }
@@ -137,7 +236,6 @@ CRigidBody * CRigidBody::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pC
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
 		MSG_BOX(TEXT("Failed To Created : CRigidBody"));
-
 		Safe_Release(pInstance);
 	}
 
@@ -151,7 +249,6 @@ CComponent * CRigidBody::Clone(void * pArg)
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
 		MSG_BOX(TEXT("Failed To Cloned : CRigidBody"));
-
 		Safe_Release(pInstance);
 	}
 

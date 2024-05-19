@@ -18,6 +18,14 @@ string CUtils::WstrToStr(const wstring& value)
 	return stemp;
 }
 
+void CUtils::WCharToChar(const wchar_t* szWchar, char* szChar)
+{
+	_int len;
+	_int slength = lstrlen(szWchar) + 1;
+	len = ::WideCharToMultiByte(CP_ACP, 0, szWchar, slength, 0, 0, 0, 0);
+	::WideCharToMultiByte(CP_ACP, 0, szWchar, slength, szChar, len, 0, 0);
+}
+
 _int CUtils::Make_RandomInt(_int min, _int max)
 {
 	std::random_device rd;
@@ -134,3 +142,4 @@ _float4x4_sm CUtils::To_Float4x4(const physx::PxMat44& mat)
 	memcpy(&out.m[3], &mat.column3, sizeof(_float4));
 	return out;
 }
+

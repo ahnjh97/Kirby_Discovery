@@ -30,12 +30,14 @@ HRESULT CTestModel::Initialize(void* pArg)
     if (FAILED(__super::Initialize(&GameObjectDesc)))
         return E_FAIL;
 
+    CGameInstance::Get_Instance()->Test();
+
     if (FAILED(Add_Components()))
         return E_FAIL;
 
     m_pModelCom->Set_Animation(1, true);
 
-    _vector vPos = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+    _vector vPos = XMVectorSet(0.f, 20.f, 0.f, 1.f);
     m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 
 
@@ -67,7 +69,6 @@ HRESULT CTestModel::Initialize(void* pArg)
     m_pLight = CGameInstance::Get_Instance()->Get_LightLastAddress();
     Safe_AddRef(m_pLight);
 
-    CGameInstance::Get_Instance()->Test();
 
     return S_OK;
 
@@ -140,8 +141,8 @@ void CTestModel::Late_Tick(_float fTimeDelta)
         m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
     }
 
-    CGameInstance::Get_Instance()->Update(m_pTransformCom->Get_WorldMatrix());
-
+    m_pRigidBodyCom->Update(m_pTransformCom);
+    m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
 }
 
 HRESULT CTestModel::Render()
@@ -177,6 +178,20 @@ HRESULT CTestModel::Render_LightDepth()
     return S_OK;
 }
 
+void CTestModel::Render_IMGUI()
+{
+    __super::Render_IMGUI();
+
+    if (ImGui::TreeNode("Guizmo"))
+    {
+        _float4x4 matWorld = m_pTransformCom->Get_WorldFloat4x4();
+        m_pGameInstance->EditTransform(matWorld);
+        m_pTransformCom->Set_WorldMatrix(matWorld);
+        ImGui::Separator(); ImGui::NewLine();
+        ImGui::TreePop();
+    }
+}
+
 HRESULT CTestModel::Add_Components()
 {
     /* For.Com_Shader */
@@ -189,18 +204,18 @@ HRESULT CTestModel::Add_Components()
         TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
         return E_FAIL;
 
-    ///* For.Com_RigidBody */
-    //if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_RigidBody"),
-    //    TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom)))
-    //    return E_FAIL;
-    
-    //CRigidBody::RIGIDBODY_DESC desc{};
-    //desc.eType = CRigidBody::TYPE_SPHERE;
-    //Add_RigidBody(TEXT("Com_RigidBody"), &desc);
+    /* For.Com_RigidBody */
+    if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_RigidBody"),
+        TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom)))
+        return E_FAIL;
+
+    m_pRigidBodyCom->Set_PhysXObject(this);
+    m_pRigidBodyCom->Activate(true);
 
     return S_OK;
 }
 
+// not yet [240520]
 void CTestModel::Add_RigidBody(const wstring& KeyName, void* pArg)
 {
     HRESULT hr;
@@ -265,6 +280,7 @@ void CTestModel::Free()
     
     Safe_Release(m_pLight);
 
+    // not yet [240520]
     //for (auto& iter : m_mapRigidBodies)
     //    Safe_Release(iter.second);
 }

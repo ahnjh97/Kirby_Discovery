@@ -25,7 +25,7 @@ public:
 	virtual void Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 	virtual HRESULT Render_LightDepth() override;
-
+	virtual void Render_IMGUI() override;
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();

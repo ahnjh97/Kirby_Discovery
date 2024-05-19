@@ -557,14 +557,24 @@ PxMaterial* CGameInstance::Get_Material()
 	return m_pPhysx->Get_Material();
 }
 
+void CGameInstance::AddActor(physx::PxActor& pActor)
+{
+	m_pPhysx->AddActor(pActor);
+}
+
+void CGameInstance::RemoveActor(physx::PxActor& pActor)
+{
+	m_pPhysx->RemoveActor(pActor);
+}
+
 void CGameInstance::Test()
 {
 	m_pPhysx->Test();
 }
 
-void CGameInstance::Update(_fmatrix matrix)
+_float4x4_sm CGameInstance::Update(_fmatrix matrix)
 {
-	m_pPhysx->Update(matrix);
+	return m_pPhysx->Update(matrix);
 }
 
 #ifdef _DEBUG

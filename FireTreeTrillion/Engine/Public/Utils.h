@@ -10,6 +10,7 @@ public:
 
 	static wstring  StrToWstr(const string& value);
 	static string   WstrToStr(const wstring& value);
+	static void		WCharToChar(const wchar_t* szWchar, char* szChar);
 
 	static _int		Make_RandomInt(_int min, _int max);
 	static _float	Make_RandomFloat(_float min, _float max);
@@ -35,6 +36,7 @@ public:
 	static physx::PxMat44  To_Float4x4(const _float4x4_sm& mat);
 	static _float4x4_sm    To_Float4x4(const physx::PxMat44& mat);
 
+		
 };
 
 END

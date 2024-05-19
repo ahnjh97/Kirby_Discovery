@@ -111,8 +111,11 @@ public: /* For.PhysX */
 	PxScene*	Get_Scene();
 	PxPhysics*	Get_Physics();
 	PxMaterial* Get_Material();
+	void		AddActor(physx::PxActor& pActor);
+	void		RemoveActor(physx::PxActor& pActor);
+
 	void Test();
-	void Update(_fmatrix matrix);
+	_float4x4_sm Update(_fmatrix matrix);
 
 #ifdef _DEBUG
 	HRESULT Ready_RTVDebug(const wstring& strRenderTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY);
