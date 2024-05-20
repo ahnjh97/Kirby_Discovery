@@ -16,6 +16,8 @@ protected:
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
+	virtual void	Start_Tick() {};
+	virtual void	Render_IMGUI() {};
 
 public:
 	virtual HRESULT Render() {return S_OK;}

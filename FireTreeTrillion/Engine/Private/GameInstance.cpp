@@ -542,6 +542,41 @@ _vector CGameInstance::Compute_WorldPos(const _float2 & vViewportPos, const wstr
 	return m_pExtractor->Compute_WorldPos(vViewportPos, strZRenderTargetTag, iOffset);	
 }
 
+PxPhysics* CGameInstance::Get_Physics()
+{
+	return m_pPhysx->Get_Physics();
+}
+
+PxScene* CGameInstance::Get_Scene()
+{
+	return m_pPhysx->Get_Scene();
+}
+
+PxMaterial* CGameInstance::Get_Material()
+{
+	return m_pPhysx->Get_Material();
+}
+
+void CGameInstance::AddActor(physx::PxActor& pActor)
+{
+	m_pPhysx->AddActor(pActor);
+}
+
+void CGameInstance::RemoveActor(physx::PxActor& pActor)
+{
+	m_pPhysx->RemoveActor(pActor);
+}
+
+void CGameInstance::Test()
+{
+	m_pPhysx->Test();
+}
+
+_float4x4 CGameInstance::Update(_fmatrix matrix)
+{
+	return m_pPhysx->Update(matrix);
+}
+
 #ifdef _DEBUG
 HRESULT CGameInstance::Ready_RTVDebug(const wstring & strRenderTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY)
 {

@@ -10,6 +10,7 @@
 #include <d3dcompiler.h>
 #include <DirectXCollision.h>
 
+
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
@@ -48,6 +49,10 @@ namespace Engine
 #include "DirectXTK/SpriteBatch.h"
 #include "DirectXTK/SpriteFont.h"
 
+// SimpleMath
+#include <DirectXTK/SimpleMath.h>
+
+
 // RapidJSON
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
@@ -62,6 +67,7 @@ namespace Engine
 // Assimp 
 #define AI_TEXTURE_TYPE_MAX 21
 using namespace DirectX;
+using namespace SimpleMath;
 using namespace physx;
 
 #include <algorithm>

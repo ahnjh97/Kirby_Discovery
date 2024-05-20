@@ -18,6 +18,14 @@ string CUtils::WstrToStr(const wstring& value)
 	return stemp;
 }
 
+void CUtils::WCharToChar(const wchar_t* szWchar, char* szChar)
+{
+	_int len;
+	_int slength = lstrlen(szWchar) + 1;
+	len = ::WideCharToMultiByte(CP_ACP, 0, szWchar, slength, 0, 0, 0, 0);
+	::WideCharToMultiByte(CP_ACP, 0, szWchar, slength, szChar, len, 0, 0);
+}
+
 _int CUtils::Make_RandomInt(_int min, _int max)
 {
 	std::random_device rd;
@@ -114,3 +122,24 @@ void CUtils::Turn_OtherMatrix(_Inout_ _float4x4& matrix, _fvector vAxis, _float 
 			XMVector4Transform(Get_State_Vector_Matrix(matrix, (STATE)i), RotationMatrix));
 	}
 }
+
+physx::PxMat44 CUtils::To_Float4x4(const _float4x4& mat)
+{
+	physx::PxMat44 out;
+	memcpy(&out.column0, &mat.m[0], sizeof(_float4));
+	memcpy(&out.column1, &mat.m[1], sizeof(_float4));
+	memcpy(&out.column2, &mat.m[2], sizeof(_float4));
+	memcpy(&out.column3, &mat.m[3], sizeof(_float4));
+	return out;
+}
+
+_float4x4 CUtils::To_Float4x4(const physx::PxMat44& mat)
+{
+	_float4x4 out;
+	memcpy(&out.m[0], &mat.column0, sizeof(_float4));
+	memcpy(&out.m[1], &mat.column1, sizeof(_float4));
+	memcpy(&out.m[2], &mat.column2, sizeof(_float4));
+	memcpy(&out.m[3], &mat.column3, sizeof(_float4));
+	return out;
+}
+

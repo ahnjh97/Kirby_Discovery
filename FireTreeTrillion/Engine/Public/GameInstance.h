@@ -107,6 +107,15 @@ public: /* For.Frustum */
 public: /* For.Extractor */
 	_vector Compute_WorldPos(const _float2& vViewportPos, const wstring& strZRenderTargetTag, _uint iOffset = 0);
 
+public: /* For.PhysX */
+	PxScene*	Get_Scene();
+	PxPhysics*	Get_Physics();
+	PxMaterial* Get_Material();
+	void		AddActor(physx::PxActor& pActor);
+	void		RemoveActor(physx::PxActor& pActor);
+
+	void Test();
+	_float4x4 Update(_fmatrix matrix);
 
 #ifdef _DEBUG
 	HRESULT Ready_RTVDebug(const wstring& strRenderTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY);

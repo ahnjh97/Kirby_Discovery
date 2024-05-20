@@ -184,16 +184,6 @@ void CObject_Manager::IMGUI_Tick()
 	}
 
 	ImGui::End();
-
-	ImGui::Begin("Manage IMGUI Window");
-	static char buffer[64] = ""; ImGui::InputText("Window Name", buffer, 64);
-	if (ImGui::Button("Add"))
-	{
-
-	}
-	ImGui::NewLine(); ImGui::Separator();
-	
-	ImGui::End();
 }
 
 CGameObject * CObject_Manager::Find_Prototype(const wstring & strPrototypeTag)
