@@ -390,7 +390,8 @@ void CTestModel::Free()
     Safe_Release(m_pRigidBodyCom);
     
     Safe_Release(m_pLight);
-
+    Safe_Release(m_pFSM);
+    
     // not yet [240520]
     //for (auto& iter : m_mapRigidBodies)
     //    Safe_Release(iter.second);
