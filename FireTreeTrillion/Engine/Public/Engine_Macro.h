@@ -32,7 +32,9 @@
 #define EASE_INOUT(t) (_float)(-(cos(3.14159f * t) - 1) / 2)
 #define EASE_INOUT_FAST(t) (_float)((t < 0.5) ? (4 * t * t * t) : 1 - pow(-2 * t + 2, 3) / 2)
 
-
+//각도 변환 매크로
+#define ToRadian(degree)			(XMConvertToRadians(degree))
+#define ToDegree(radian)			(XMConvertToDegrees(radian))
 
 
 #define BEGIN(NAMESPACE)	namespace NAMESPACE {

@@ -46,6 +46,16 @@ namespace Engine
 
 	}FX_KEYFRAME;
 
+	typedef struct
+	{
+
+	}FX_DATA;
+
+	typedef struct
+	{
+
+	}COMPFX_DATA;
+
 	typedef struct ENGINE_DLL
 	{
 		XMFLOAT3		vPosition;		
@@ -106,10 +116,6 @@ namespace Engine
 		static const unsigned int	iNumElements = { 6 };
 		static const D3D11_INPUT_ELEMENT_DESC	Elements[6];
 	}VTXINSTANCE_POINT;
-
-
-
-	
 
 
 	typedef struct ENGINE_DLL

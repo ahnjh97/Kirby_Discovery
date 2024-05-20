@@ -354,7 +354,9 @@
     <ClCompile Include="..\Private\RigidBody.cpp">
       <Filter>01.Utility\02.Components\PhysX\RigidBody</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\Effect.cpp" />
+    <ClCompile Include="..\private\Effect.cpp">
+      <Filter>01.Utility\01.GameObjects\Effect</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Base.h">
@@ -564,7 +566,9 @@
     <ClInclude Include="..\Public\RigidBody.h">
       <Filter>01.Utility\02.Components\PhysX\RigidBody</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Effect.h" />
+    <ClInclude Include="..\public\Effect.h">
+      <Filter>01.Utility\01.GameObjects\Effect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_Deferred.hlsl">
