@@ -64,6 +64,12 @@
     <Filter Include="02.GameObjects\UI\[Sample] TestUI">
       <UniqueIdentifier>{04f2b613-8fae-4a92-b5ab-330fe23d2a87}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\UI\Editor">
+      <UniqueIdentifier>{197bd320-0690-4bf3-9f5f-40f57c555e4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\UI Tool">
+      <UniqueIdentifier>{ef096024-030a-43d7-967c-23388e481d5d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -132,6 +138,12 @@
     <ClInclude Include="..\Public\TestUI.h">
       <Filter>02.GameObjects\UI\[Sample] TestUI</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Level_UITool.h">
+      <Filter>01.Levels\UI Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UI_Editor.h">
+      <Filter>02.GameObjects\UI\Editor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -187,6 +199,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\TestUI.cpp">
       <Filter>02.GameObjects\UI\[Sample] TestUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Level_UITool.cpp">
+      <Filter>01.Levels\UI Tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UI_Editor.cpp">
+      <Filter>02.GameObjects\UI\Editor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

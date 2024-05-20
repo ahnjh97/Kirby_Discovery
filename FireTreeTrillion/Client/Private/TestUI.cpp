@@ -25,8 +25,7 @@ HRESULT CTestUI::Initialize(void* pArg)
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;
-	
-	
+
 	m_size2D		= _float2(100.f, 100.f);
 	m_position2D	= _float2(100.f, 100.f);
 	m_WindowSize2D	= _float2(g_iWinSizeX, g_iWinSizeY);
@@ -38,6 +37,7 @@ HRESULT CTestUI::Initialize(void* pArg)
 			0.f,
 			1.f));
 
+	
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(m_WindowSize2D.x, m_WindowSize2D.y, 0.f, 1.f));
 
@@ -51,8 +51,8 @@ _int CTestUI::Tick(_float fTimeDelta)
 
 void CTestUI::Late_Tick(_float fTimeDelta)
 {
-	
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_UI, this);
+	
 }
 
 HRESULT CTestUI::Render()
@@ -95,6 +95,18 @@ void CTestUI::Render_IMGUI()
 	//static _float  Z_radian = 0.f;
 	//ImGui::DragFloat("Z_radian", &Z_radian, 0.f, 360.f);
 	//m_pTransformCom->Rotate(XMVectorSet(0.f, 0.f, 1.f, 0.f), XMConvertToRadians(Z_radian));
+
+	if (ImGui::CollapsingHeader(u8"Mouse 마우스", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		ImGuiIO& io = ImGui::GetIO();
+
+		ImGui::Text(u8"Mouse");
+		if (ImGui::IsMousePosValid())
+			ImGui::Text("X : %.2f \t Y : %.2f", io.MousePos.x, io.MousePos.y);
+
+		else
+			ImGui::Text("Mouse InValid");
+	}
 }
 
 HRESULT CTestUI::Add_Components()
@@ -107,10 +119,12 @@ HRESULT CTestUI::Add_Components()
 	CHECK_FAILED(hr);
 
 	/* For.Com_Texture */
+
+	// 05.20) 테스트
 	hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Logo"),
+	//hr = __super::Add_Component(LEVEL_TOOL_UI, TEXT("Prototype_Component_Texture_Logo"),
 		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom);
 	CHECK_FAILED(hr);
-
 
 	/* For.Com_VIBuffer */
 	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),
@@ -152,7 +166,6 @@ CTestUI* CTestUI::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 	return pInstance;
 }
-
 
 CGameObject* CTestUI::Clone(void* pArg)
 {

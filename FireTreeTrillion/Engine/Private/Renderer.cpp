@@ -4,8 +4,8 @@
 
 _uint		g_iSizeX = 8192;
 _uint		g_iSizeY = 4608;
-_uint		g_iOriginSizeX = 1280;
-_uint		g_iOriginSizeY = 720;
+_uint		g_iOriginSizeX = 1600; //1280;
+_uint		g_iOriginSizeY = 900; //720;
 
 CRenderer::CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
