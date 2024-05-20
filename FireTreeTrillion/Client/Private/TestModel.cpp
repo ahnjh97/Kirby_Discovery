@@ -35,7 +35,7 @@ HRESULT CTestModel::Initialize(void* pArg)
     if (FAILED(Add_Components()))
         return E_FAIL;
 
-    m_pModelCom->Set_Animation(1, true);
+    m_pModelCom->Set_Animation(0, true);
     _vector vPos = XMVectorSet(0.f, 20.f, 0.f, 1.f);
     m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 
