@@ -192,6 +192,8 @@ call UpdateLib.bat</Command>
     <ClCompile Include="..\private\Extractor.cpp" />
     <ClCompile Include="..\private\Font_Manager.cpp" />
     <ClCompile Include="..\private\Frustum.cpp" />
+    <ClCompile Include="..\Private\FSM.cpp" />
+    <ClCompile Include="..\Private\FSM_State.cpp" />
     <ClCompile Include="..\Private\GameInstance.cpp" />
     <ClCompile Include="..\Private\GameObject.cpp" />
     <ClCompile Include="..\Private\Graphic_Device.cpp" />
@@ -275,6 +277,8 @@ call UpdateLib.bat</Command>
     <ClInclude Include="..\public\Extractor.h" />
     <ClInclude Include="..\public\Font_Manager.h" />
     <ClInclude Include="..\public\Frustum.h" />
+    <ClInclude Include="..\Public\FSM.h" />
+    <ClInclude Include="..\Public\FSM_State.h" />
     <ClInclude Include="..\Public\GameInstance.h" />
     <ClInclude Include="..\Public\GameObject.h" />
     <ClInclude Include="..\Public\Graphic_Device.h" />

@@ -64,6 +64,12 @@
     <Filter Include="02.GameObjects\UI\[Sample] TestUI">
       <UniqueIdentifier>{04f2b613-8fae-4a92-b5ab-330fe23d2a87}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\_TestModel">
+      <UniqueIdentifier>{7ee38517-aa59-4304-8efe-ae661ce6f1ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\_TestModel\State">
+      <UniqueIdentifier>{22c89544-a87d-4d03-9f7e-c1ad5d5b621f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -120,9 +126,6 @@
     <ClInclude Include="..\public\Camera_Main.h">
       <Filter>02.GameObjects\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\TestModel.h">
-      <Filter>02.GameObjects\Player</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\TestTerrain.h">
       <Filter>02.GameObjects\Terrain</Filter>
     </ClInclude>
@@ -131,6 +134,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\TestUI.h">
       <Filter>02.GameObjects\UI\[Sample] TestUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TestModel.h">
+      <Filter>02.GameObjects\_TestModel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TestModel_State.h">
+      <Filter>02.GameObjects\_TestModel\State</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -176,9 +185,6 @@
     <ClCompile Include="..\private\Camera_Main.cpp">
       <Filter>02.GameObjects\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\TestModel.cpp">
-      <Filter>02.GameObjects\Player</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\TestTerrain.cpp">
       <Filter>02.GameObjects\Terrain</Filter>
     </ClCompile>
@@ -187,6 +193,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\TestUI.cpp">
       <Filter>02.GameObjects\UI\[Sample] TestUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TestModel.cpp">
+      <Filter>02.GameObjects\_TestModel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TestModel_State.cpp">
+      <Filter>02.GameObjects\_TestModel\State</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
