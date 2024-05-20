@@ -17,14 +17,22 @@ public:
 	HRESULT Initialize(const vector<class CBone*>& Bones, ifstream& fileStream);
 	void Invalidate_TransformationMatrix(const vector<class CBone*>& Bones, _float fTrackPosition, _uint* pCurrentKeyFrameIndex);
 
+	_bool Compare_Name(const _char* pBoneName) {
+		return !strcmp(m_szName, pBoneName);
+	}
+
+	void Ratio_TransformationMatrix(const vector<class CBone*>& Bones, _float fTrackPosition, _uint* pCurrentKeyFrameIndex);
+
+
 private:
 	_char				m_szName[MAX_PATH] = { "" };
 	_int				m_iBoneIndex = { -1 };
 	_uint				m_iNumKeyFrames = { 0 };
 	vector<KEYFRAME>	m_KeyFrames;
 
-	
-	
+	_float3	m_vScale;
+	_float4	m_vRotation;
+	_float3	m_vTranslation;
 
 public:
 	static CChannel* Create(const vector<class CBone*>& Bones, ifstream& fileStream);

@@ -6,6 +6,7 @@
 BEGIN(Engine)
 class CModel;
 class CShader;
+class CRigidBody;
 END
 
 BEGIN(Client)
@@ -24,15 +25,22 @@ public:
 	virtual void Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 	virtual HRESULT Render_LightDepth() override;
+	virtual void Render_IMGUI() override;
+
+private:
+	HRESULT Add_Components();
+	HRESULT Bind_ShaderResources();
+	void	Add_RigidBody(const wstring& KeyName, void* pArg);
 
 private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
-
 	class CLight* m_pLight = { nullptr };
 
-	HRESULT Add_Components();
-	HRESULT Bind_ShaderResources();
+	CRigidBody*		m_pRigidBodyCom = { nullptr };
+	//map<string, CRigidBody*> m_mapRigidBodies;
+
+	_int m_iTestAnim = { 0 };
 
 public:
 	static CTestModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -18,6 +18,22 @@ private:
 public:
 	_bool IsFinished() const {	return m_IsFinished; }
 
+	void Reset_Finished(_bool isFinished = false) {
+		m_IsFinished = isFinished;
+	}
+
+	void Reset_TrackPosition() {
+		m_fTrackPosition = 0.f;
+		for (_uint i = 0; i < m_iNumChannels; ++i)
+		{
+			m_CurrentKeyFrameIndices[i] = 0;
+		}
+	}
+
+	void Reset_Ratio() { m_bRatio = true; }
+
+
+
 public:
 	HRESULT Initialize(const vector<class CBone*>& Bones, ifstream& fileStream);
 	void Invalidate_TransformationMatrix(_float fTimeDelta, const vector<class CBone*>& Bones, _bool isLoop);
@@ -37,6 +53,8 @@ private:
 	vector<_uint>						m_CurrentKeyFrameIndices;
 
 	_bool								m_IsFinished = { false };	
+	_float								m_fRatioTime = { 0.f };
+	_bool								m_bRatio = { false };
 
 public:
 	static CAnimation* Create(const vector<class CBone*>& Bones, ifstream& fileStream);

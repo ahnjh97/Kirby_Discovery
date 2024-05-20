@@ -160,6 +160,15 @@
     <Filter Include="02. PhysX">
       <UniqueIdentifier>{d6077c32-15aa-4495-afe9-721e481bbcbb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. PhysX\_Manager">
+      <UniqueIdentifier>{f88af5e5-4183-40e4-9180-afb42c69dfc5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\02.Components\PhysX">
+      <UniqueIdentifier>{997f9fe1-6d7b-441e-bd17-e750b39cefb3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\02.Components\PhysX\RigidBody">
+      <UniqueIdentifier>{d9d489a6-1706-4bac-b2d2-f0c060f539a7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Base.cpp">
@@ -337,7 +346,10 @@
       <Filter>90.Utils</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\PhysX.cpp">
-      <Filter>02. PhysX</Filter>
+      <Filter>02. PhysX\_Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RigidBody.cpp">
+      <Filter>01.Utility\02.Components\PhysX\RigidBody</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -543,7 +555,10 @@
       <Filter>90.Utils</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\PhysX.h">
-      <Filter>02. PhysX</Filter>
+      <Filter>02. PhysX\_Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\RigidBody.h">
+      <Filter>01.Utility\02.Components\PhysX\RigidBody</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -3,6 +3,8 @@
 #include "Light.h"
 //#include "Utils.h"
 
+#include "RigidBody.h"
+
 CTestModel::CTestModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject{ pDevice, pContext }
 {
@@ -28,12 +30,13 @@ HRESULT CTestModel::Initialize(void* pArg)
     if (FAILED(__super::Initialize(&GameObjectDesc)))
         return E_FAIL;
 
+    CGameInstance::Get_Instance()->Test();
+
     if (FAILED(Add_Components()))
         return E_FAIL;
 
     m_pModelCom->Set_Animation(1, true);
-
-    _vector vPos = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+    _vector vPos = XMVectorSet(0.f, 20.f, 0.f, 1.f);
     m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 
 
@@ -50,6 +53,9 @@ HRESULT CTestModel::Initialize(void* pArg)
     if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
         return E_FAIL;
 
+    m_iTestAnim = 0;
+    m_pModelCom->Set_Animation(m_iTestAnim, true);
+
 
 
     // 예시코드 2 : 따라다니게 하기 예시 코드 + 점 광원 예시 코드
@@ -65,8 +71,6 @@ HRESULT CTestModel::Initialize(void* pArg)
     m_pLight = CGameInstance::Get_Instance()->Get_LightLastAddress();
     Safe_AddRef(m_pLight);
 
-    //if (FAILED(m_pModelCom->CreateDynamicActor(m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION))))
-    //    return E_FAIL;
 
     return S_OK;
 
@@ -125,6 +129,30 @@ _int CTestModel::Tick(_float fTimeDelta)
         m_pGameInstance->Setting_RadialBlur(vPos, 5.f, 10.f);
     }
 
+
+
+    if (m_pGameInstance->Get_DIKeyState(DIK_P, KEY_DOWN))
+    {
+        m_iTestAnim++;
+        if (m_iTestAnim > 2)
+            m_iTestAnim = 2;
+
+        m_pModelCom->Set_Animation(m_iTestAnim, true);
+    }
+    else if (m_pGameInstance->Get_DIKeyState(DIK_O, KEY_DOWN))
+    {
+        m_iTestAnim--;
+        if (m_iTestAnim < 0)
+            m_iTestAnim = 0;
+
+        m_pModelCom->Set_Animation(m_iTestAnim, true);
+    }
+    else if (m_pGameInstance->Get_DIKeyState(DIK_I, KEY_DOWN))
+    {
+        m_pModelCom->Set_Animation(m_iTestAnim, true, true);
+    }
+
+
     return OBJ_NOEVENT;
 }
 
@@ -139,7 +167,15 @@ void CTestModel::Late_Tick(_float fTimeDelta)
         m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
     }
 
+    if (m_pGameInstance->Get_DIKeyState(DIK_L, KEY_DOWN))
+    {
+        _float4 vForce = m_pTransformCom->Get_State_Float4(CTransform::STATE_UP);
+        _float3 force = _float3{ vForce.x * 10000.f, vForce.y * 10000.f, vForce.z * 10000.f };
+        m_pRigidBodyCom->Add_Force(force);
+    }
 
+    m_pRigidBodyCom->Update(m_pTransformCom);
+    m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
 }
 
 HRESULT CTestModel::Render()
@@ -175,6 +211,20 @@ HRESULT CTestModel::Render_LightDepth()
     return S_OK;
 }
 
+void CTestModel::Render_IMGUI()
+{
+    __super::Render_IMGUI();
+
+    if (ImGui::TreeNode("Guizmo"))
+    {
+        _float4x4 matWorld = m_pTransformCom->Get_WorldFloat4x4();
+        m_pGameInstance->EditTransform(matWorld);
+        m_pTransformCom->Set_WorldMatrix(matWorld);
+        ImGui::Separator(); ImGui::NewLine();
+        ImGui::TreePop();
+    }
+}
+
 HRESULT CTestModel::Add_Components()
 {
     /* For.Com_Shader */
@@ -183,12 +233,32 @@ HRESULT CTestModel::Add_Components()
         return E_FAIL;
 
     /* For.Com_Model */
-    if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Fiona"),
+    if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Dee"),
         TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
         return E_FAIL;
 
-    return S_OK;
+    /* For.Com_RigidBody */
+    if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_RigidBody"),
+        TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom)))
+        return E_FAIL;
 
+    m_pRigidBodyCom->Set_PhysXObject(this);
+    m_pRigidBodyCom->Activate(true);
+
+    return S_OK;
+}
+
+// not yet [240520]
+void CTestModel::Add_RigidBody(const wstring& KeyName, void* pArg)
+{
+    HRESULT hr;
+
+    CRigidBody* pRigidBody = nullptr;
+    hr = Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_RigidBody"), KeyName,
+                       (CComponent**)&pRigidBody, pArg);
+    CHECK_FAILED(hr);
+
+    //m_mapRigidBodies.emplace(KeyName, pRigidBody);
 }
 
 HRESULT CTestModel::Bind_ShaderResources()
@@ -214,7 +284,6 @@ CTestModel* CTestModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pCont
     if (FAILED(pInstance->Initialize_Prototype()))
     {
         MSG_BOX(TEXT("Failed To Created : CTestModel"));
-
         Safe_Release(pInstance);
     }
 
@@ -228,7 +297,6 @@ CGameObject* CTestModel::Clone(void* pArg)
     if (FAILED(pInstance->Initialize(pArg)))
     {
         MSG_BOX(TEXT("Failed To Created : CTestModel"));
-
         Safe_Release(pInstance);
     }
 
@@ -238,9 +306,14 @@ CGameObject* CTestModel::Clone(void* pArg)
 void CTestModel::Free()
 {
     __super::Free();
+
     Safe_Release(m_pShaderCom);
     Safe_Release(m_pModelCom);
-
+    Safe_Release(m_pRigidBodyCom);
+    
     Safe_Release(m_pLight);
 
+    // not yet [240520]
+    //for (auto& iter : m_mapRigidBodies)
+    //    Safe_Release(iter.second);
 }
