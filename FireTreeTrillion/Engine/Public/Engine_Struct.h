@@ -38,6 +38,14 @@ namespace Engine
 		float		fTime;
 	}KEYFRAME;
 
+	typedef struct
+	{
+		_float fRatio;
+		_float3 vValue = {};
+		EASING eEasing = { EASE_LINEAR };
+
+	}FX_KEYFRAME;
+
 	typedef struct ENGINE_DLL
 	{
 		XMFLOAT3		vPosition;		
