@@ -9,6 +9,7 @@
 #include "BackGround.h"
 #include "TestModel.h"
 #include "TestTerrain.h"
+#include "TestUI.h"
 
 #include "RigidBody.h"
 
@@ -89,6 +90,7 @@ HRESULT CLoader::Loading_ObjectAll()
 {
 	m_strLoadingText = TEXT("객체의 원형를(을) 로딩 중 입니다.");
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BackGround"),  CBackGround);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_Test"), CTestUI);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestMap"), CTestTerrain);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
@@ -136,7 +138,8 @@ HRESULT CLoader::Loading_For_GamePlay()
 	HRESULT hr;
 	LEVEL eLevel = LEVEL_GAMEPLAY;
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
-
+	if (FAILED(Add_Texture(eLevel, "Logo", "Logo/Logo.png")))
+		return E_FAIL;
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
 	// 모아놓은 Model 한번에 생성.
