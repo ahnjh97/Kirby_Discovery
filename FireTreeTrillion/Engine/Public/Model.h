@@ -22,7 +22,21 @@ public:
 	_bool IsFinished() { return m_Animations[m_iCurrentAnimIndex]->IsFinished(); }
 
 public:
-	void Set_Animation(_uint iAnimIndex, _bool isLoop) { m_iCurrentAnimIndex = iAnimIndex;	m_isLoop = isLoop; }
+	void Set_Animation(_uint iAnimIndex, _bool isLoop, _bool bInterpolation = false) {
+		m_iCurrentAnimIndex = iAnimIndex;	
+		m_isLoop = isLoop;
+
+		m_Animations[m_iCurrentAnimIndex]->Reset_TrackPosition();
+		m_Animations[m_iCurrentAnimIndex]->Reset_Finished();
+
+		if (bInterpolation)
+		{
+			// 바뀔 애니메이션을 대상으로 선형보간 ON
+			m_Animations[m_iCurrentAnimIndex]->Reset_Ratio();
+		}
+	}
+
+
 
 public:
 	virtual HRESULT Initialize_Prototype(_fmatrix TransformMatrix, MODEL tModel);

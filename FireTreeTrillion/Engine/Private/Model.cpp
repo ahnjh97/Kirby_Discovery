@@ -81,7 +81,7 @@ HRESULT CModel::Initialize_Prototype(_fmatrix TransformMatrix, MODEL tModel)
 	if (FAILED(Ready_Meshes()))
 		return E_FAIL;
 
-	if (FAILED(Ready_Materials(m_tModel.strModelName.c_str())))
+ 	if (FAILED(Ready_Materials(m_tModel.strModelName.c_str())))
 		return E_FAIL;
 
 	if (m_tModel.eType == TYPE_ANIM)

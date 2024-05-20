@@ -25,6 +25,9 @@ public:
 	
 	_bool Compare_Name(const _char* pBoneName) { return !strcmp(m_szName, pBoneName); }
 
+	// 보간을 위한 행위
+	_float4x4 Get_TransformationMatrix() { return m_TransformationMatrix; }
+
 	void Read_BoneData(ifstream& fileStream);
 
 private:
