@@ -1,3 +1,4 @@
+#include "Model.h"
 #include "Channel.h"
 #include "Texture.h"
 #include "Shader.h"
@@ -97,11 +98,27 @@ HRESULT CModel::Initialize_Prototype(_fmatrix TransformMatrix, MODEL tModel)
 
 HRESULT CModel::Initialize(void * pArg)
 {
-
 	/* 읽은 정보를 바탕으로해서 내가 사용하기 좋게 정리한다.  */
 	
 
 	return S_OK;
+}
+
+void CModel::Render_IMGUI()
+{
+	__super::Render_IMGUI();
+
+	// Animation의 end까지
+	//ImGui::DragInt("AnimIDX", (_int*)m_iCurrentAnimIndex);
+	//ImGui::DragInt("AnimIDX", (_int*)m_iCurrentAnimIndex, 0.2f, 1, 100);
+
+	_float fTickPerSecond = m_Animations[m_iCurrentAnimIndex]->Get_TickPerSecond();
+	ImGui::DragFloat("TickPerSecond : ", &fTickPerSecond);
+	m_Animations[m_iCurrentAnimIndex]->Set_TickPerSecond(fTickPerSecond);
+
+	_float fTrackPosition = m_Animations[m_iCurrentAnimIndex]->Get_TrackPosition();
+	ImGui::DragFloat("Track_Position : ", &fTrackPosition);
+	m_Animations[m_iCurrentAnimIndex]->Set_TrackPosition(fTrackPosition);
 }
 
 HRESULT CModel::Bind_BoneMatrices(CShader * pShader, const _char * pConstantName, _uint iMeshIndex)

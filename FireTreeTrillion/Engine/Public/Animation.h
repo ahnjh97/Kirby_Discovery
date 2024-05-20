@@ -32,7 +32,12 @@ public:
 
 	void Reset_Ratio() { m_bRatio = true; }
 
+public:
+	_float	Get_TickPerSecond() const { return m_fTickPerSecond; }
+	void	Set_TickPerSecond(_float _fTickPerSecond) { m_fTickPerSecond = _fTickPerSecond; }
 
+	_float	Get_TrackPosition() const { return m_fTrackPosition; }
+	void	Set_TrackPosition(_float _fTrackPosition) { m_fTrackPosition = _fTrackPosition; }
 
 public:
 	HRESULT Initialize(const vector<class CBone*>& Bones, ifstream& fileStream);
