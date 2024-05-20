@@ -64,3 +64,7 @@ FireTreeTrillion/Client/Default/x64/
 FireTreeTrillion/Client/Bin/Client.pdb
 FireTreeTrillion/Client/Bin/Engine.dll
 FireTreeTrillion/Engine/Bin/Shader_Deferred.cso
+Assimp/Client_Assimp/Bin/assimp-vc143-mtd.dll
+Assimp/Client_Assimp/Bin/Engine.dll
+Assimp/Engine/Bin/Engine.dll
+FireTreeTrillion/Client/Bin/fmod.dll
