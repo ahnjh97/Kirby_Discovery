@@ -89,6 +89,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BackGround"),  CBackGround);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestMap"), CTestTerrain);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
 
 	///* For.Prototype_GameObject_Player */
 	//if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Player"),
@@ -136,14 +137,15 @@ HRESULT CLoader::Loading_For_GamePlay()
 
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
+	// 모아놓은 Model 한번에 생성.
 	hr = Add_Models(eLevel);
 	CHECK_FAILED(hr);
 
 	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
+	// 모아놓은 Shaders 한번에 생성
 	hr = Add_Shaders(eLevel);
 	CHECK_FAILED(hr);
 
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 
 	m_IsFinished = true;
@@ -153,6 +155,7 @@ HRESULT CLoader::Loading_For_GamePlay()
 
 HRESULT CLoader::Add_Models(LEVEL eLevel)
 {
+	// SetUp_ModelScaleRotation 함수에서 모아놓은 Model들을 타입에 따라서 Component 생성한다.
 	for (auto& ModelInfo : m_vecModelInfo)
 	{
 		_matrix      TransformMatrix = XMMatrixIdentity();
@@ -169,15 +172,19 @@ HRESULT CLoader::Add_Models(LEVEL eLevel)
 	return S_OK;
 }
 
-void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel) // Scale, Degree, RootIndex
+// 여기다가 모든 Model을 셋업한다.
+void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 {
+	// MODEL 구조체 생성자 순서		: 이름 (파일이름) / ANIMTYPE / Scale / Degree (Y) / Root
+	// MODEL 구조체 생성자 기본 값  : ""			  / TYPE_END /  1.f  /    0.f     / 4
 	if (eLevel == LEVEL_LOGO)
 	{
 
 	}
 	else if (eLevel == LEVEL_GAMEPLAY)
 	{
-		m_vecModelInfo.emplace_back(MODEL{ "Fiona", TYPE_ANIM});
+		m_vecModelInfo.emplace_back(MODEL{ "Fiona", TYPE_ANIM });
+		m_vecModelInfo.emplace_back(MODEL{ "Dee", TYPE_ANIM, 0.01f });
 		m_vecModelInfo.emplace_back(MODEL{ "TestMap", TYPE_NONANIM });
 	}
 

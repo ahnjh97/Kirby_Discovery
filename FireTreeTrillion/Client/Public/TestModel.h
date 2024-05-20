@@ -29,6 +29,8 @@ private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
 
+	_int m_iTestAnim = { 0 };
+
 	class CLight* m_pLight = { nullptr };
 
 	HRESULT Add_Components();

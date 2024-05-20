@@ -31,8 +31,6 @@ HRESULT CTestModel::Initialize(void* pArg)
     if (FAILED(Add_Components()))
         return E_FAIL;
 
-    m_pModelCom->Set_Animation(1, true);
-
     _vector vPos = XMVectorSet(0.f, 0.f, 0.f, 1.f);
     m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 
@@ -49,6 +47,9 @@ HRESULT CTestModel::Initialize(void* pArg)
 
     if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
         return E_FAIL;
+
+    m_iTestAnim = 0;
+    m_pModelCom->Set_Animation(m_iTestAnim, true);
 
 
 
@@ -122,6 +123,30 @@ _int CTestModel::Tick(_float fTimeDelta)
         m_pGameInstance->Setting_RadialBlur(vPos, 5.f, 10.f);
     }
 
+
+
+    if (m_pGameInstance->Get_DIKeyState(DIK_P, KEY_DOWN))
+    {
+        m_iTestAnim++;
+        if (m_iTestAnim > 2)
+            m_iTestAnim = 2;
+
+        m_pModelCom->Set_Animation(m_iTestAnim, true);
+    }
+    else if (m_pGameInstance->Get_DIKeyState(DIK_O, KEY_DOWN))
+    {
+        m_iTestAnim--;
+        if (m_iTestAnim < 0)
+            m_iTestAnim = 0;
+
+        m_pModelCom->Set_Animation(m_iTestAnim, true);
+    }
+    else if (m_pGameInstance->Get_DIKeyState(DIK_I, KEY_DOWN))
+    {
+        m_pModelCom->Set_Animation(m_iTestAnim, true, true);
+    }
+
+
     return OBJ_NOEVENT;
 }
 
@@ -180,7 +205,7 @@ HRESULT CTestModel::Add_Components()
         return E_FAIL;
 
     /* For.Com_Model */
-    if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Fiona"),
+    if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Dee"),
         TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
         return E_FAIL;
 
