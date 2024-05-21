@@ -20,7 +20,7 @@ HRESULT CRigidBody::Initialize_Prototype()
 
 HRESULT CRigidBody::Initialize(void * pArg)
 {
-	Create_Actor();
+	//Create_Actor();
 	return S_OK;
 }
 
@@ -212,6 +212,63 @@ void CRigidBody::Add_Force(_float3 vForce)
 		physx::PxVec3 PxForce = physx::PxVec3(vForce.x, vForce.y, vForce.z);
 		m_pActor->addForce(PxForce, physx::PxForceMode::eFORCE);
 	}
+}
+
+void CRigidBody::PlayerController(_float3 vPos)
+{
+	PxCapsuleControllerDesc capsuleDesc;
+	capsuleDesc.position = PxExtendedVec3(vPos.x, vPos.y, vPos.z);
+	capsuleDesc.radius = 0.5f; // 작은 반지름
+	capsuleDesc.height = 0.5f; // 작은 높이
+	capsuleDesc.stepOffset = 0.5f;
+	capsuleDesc.volumeGrowth = 1.9f;
+	capsuleDesc.slopeLimit = cosf(PxPi / 12); // 15 degrees
+	capsuleDesc.upDirection = PxVec3(0, 1, 0);
+	capsuleDesc.contactOffset = 0.001f;
+
+	PxMaterial* material = m_pGameInstance->Get_Physics()->createMaterial(0.5f, 0.5f, 0.5f);
+	capsuleDesc.material = material;
+
+	// 캡슐 컨트롤러 생성
+	m_pCapsuleController = m_pGameInstance->Get_ControllerManager()->createController(capsuleDesc);
+	if (nullptr == m_pCapsuleController)
+		MSG_BOX(TEXT("Faield to Controller"));
+}
+
+void CRigidBody::Go_Straight(CTransform* pTransform, _float fSpeed, _float fTimeDelta)
+{
+	PxVec3 movement(0.f);
+
+	movement.z += fSpeed * fTimeDelta;
+                
+	PxControllerFilters filter;
+	PxControllerCollisionFlags collisionFlags = m_pCapsuleController->move(movement, 0.001f, fTimeDelta, filter);
+
+	PxExtendedVec3 pxPos = m_pCapsuleController->getPosition();
+	PxVec3 pos(pxPos.x, pxPos.y, pxPos.z);
+
+	XMVECTOR xmPos = XMVectorSet(pos.x, pos.y, pos.z, 0.f);
+
+	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
+}
+
+void CRigidBody::test(CTransform* pTransform, _float fTimeDelta)
+{
+	m_fFallVelocity -= m_fFallAcceleration * fTimeDelta * 50.f;
+
+	if (m_fFallVelocity < -1000.f)
+		m_fFallVelocity = -10.f;
+
+	m_pCapsuleController->move(PxVec3(0.f, 1.f, 0.f) * fTimeDelta * m_fFallVelocity, 0, fTimeDelta, PxControllerFilters());
+
+	Go_Straight(pTransform, 5.f, fTimeDelta);
+
+	PxControllerState m_pPxState;
+
+	m_pCapsuleController->getState(m_pPxState);
+
+	if (m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_DOWN || m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_UP)
+		m_fFallVelocity = 0.f;
 }
 
 physx::PxTransform CRigidBody::Get_PxTransform()

@@ -30,15 +30,19 @@ HRESULT CTestModel::Initialize(void* pArg)
     if (FAILED(__super::Initialize(&GameObjectDesc)))
         return E_FAIL;
 
-    CGameInstance::Get_Instance()->Test();
+    //CGameInstance::Get_Instance()->Test();
 
     if (FAILED(Add_Components()))
         return E_FAIL;
 
-    m_pModelCom->Set_Animation(0, true);
-    _vector vPos = XMVectorSet(0.f, 20.f, 0.f, 1.f);
-    m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 
+    m_fSpeed = 5.f;
+
+    m_pModelCom->Set_Animation(0, true);
+    //_vector vPos = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+    //m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+
+    m_pRigidBodyCom->PlayerController(_float3(0.f, 1.5f, 0.f));
 
 
     // 예시코드 1 : 태양광
@@ -92,17 +96,22 @@ _int CTestModel::Tick(_float fTimeDelta)
     // 예시코드 6 : DInput + KeyPress 예시 코드
     if (m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_PRESS))
     {
-        _float4x4 Worldmatrix = m_pTransformCom->Get_WorldFloat4x4();
-        _vector vLook = CUtils::Get_State_Vector_Matrix(Worldmatrix, CUtils::STATE_LOOK);
-        _vector vPos = CUtils::Get_State_Vector_Matrix(Worldmatrix, CUtils::STATE_POSITION);
-        _float fSpeed = 3.f;
-
-        vPos += vLook * fTimeDelta * fSpeed;
-
-        CUtils::Set_State_Matrix(Worldmatrix, CUtils::STATE_POSITION, vPos);
-
-        m_pTransformCom->Set_WorldMatrix(Worldmatrix);
+        m_pRigidBodyCom->test(m_pTransformCom, fTimeDelta);
     }
+
+    //if (m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_PRESS))
+    //{
+    //    _float4x4 Worldmatrix = m_pTransformCom->Get_WorldFloat4x4();
+    //    _vector vLook = CUtils::Get_State_Vector_Matrix(Worldmatrix, CUtils::STATE_LOOK);
+    //    _vector vPos = CUtils::Get_State_Vector_Matrix(Worldmatrix, CUtils::STATE_POSITION);
+    //    _float fSpeed = 3.f;
+
+    //    vPos += vLook * fTimeDelta * fSpeed;
+
+    //    CUtils::Set_State_Matrix(Worldmatrix, CUtils::STATE_POSITION, vPos);
+
+    //    m_pTransformCom->Set_WorldMatrix(Worldmatrix);
+    //}
 
     // 예시코드 7 : 랜덤 벡터 뽑기
     // 예시코드 8 : DInput + KeyDown 예시코드
@@ -242,8 +251,8 @@ HRESULT CTestModel::Add_Components()
         TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom)))
         return E_FAIL;
 
-    m_pRigidBodyCom->Set_PhysXObject(this);
-    m_pRigidBodyCom->Activate(true);
+    //m_pRigidBodyCom->Set_PhysXObject(this);
+    //m_pRigidBodyCom->Activate(true);
 
     return S_OK;
 }

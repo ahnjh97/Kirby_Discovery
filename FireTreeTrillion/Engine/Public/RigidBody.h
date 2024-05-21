@@ -35,6 +35,12 @@ public:
 	// 날리기
 	void			Add_Force(_float3 vForce);
 
+
+	// physx transform
+	void			PlayerController(_float3 vPos);
+	void			Go_Straight(CTransform* pTransform, _float fSpeed, _float fTimeDelta);
+	void			test(CTransform* pTransform, _float fTimeDelta);
+
 public:
 	physx::PxTransform	Get_PxTransform();
 
@@ -44,9 +50,10 @@ public:
 	_bool				Is_Activated();
 
 protected:
-	class CGameObject*		m_pObject		= nullptr;
-	physx::PxRigidDynamic*	m_pActor		= nullptr;
-	physx::PxShape*			m_pShape		= nullptr;
+	class CGameObject*			m_pObject		= nullptr;
+	physx::PxRigidDynamic*		m_pActor		= nullptr;
+	physx::PxShape*				m_pShape		= nullptr;
+	physx::PxController*		m_pCapsuleController = nullptr;
 
 	// ========== IMGUI에서 제어할 수 있도록 붙이기 ==========
 	// 물리엔진 on/off
@@ -59,8 +66,13 @@ protected:
 	_float					m_fDensity		= 10.f;
 
 	// 현 RigidBody의 형태
-	SHAPE					m_eShapeType	= TYPE_SPHERE;
+	SHAPE					m_eShapeType	= TYPE_CAPSULE;
 	_float4x4				m_OriginTransformMatrix;
+
+
+	//
+	_float m_fFallVelocity = { 0.f };
+	_float m_fFallAcceleration = { 0.f };
 
 public:
 	static CRigidBody*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

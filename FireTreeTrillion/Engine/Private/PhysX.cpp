@@ -15,8 +15,8 @@ HRESULT CPhysX::Initialize()
     m_pPvd->connect(*m_pPvdTransport, physx::PxPvdInstrumentationFlag::eALL);
 
     //mPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *mFoundation, PxTolerancesScale(),true, mPvd);
-    mToleranceScale.length = 1;        // typical length of an object
-    mToleranceScale.speed = 0.1f;         // typical speed of an object, gravity * 1s is a reasonable choice
+    mToleranceScale.length = 100;        // typical length of an object
+    mToleranceScale.speed = 981;         // typical speed of an object, gravity * 1s is a reasonable choice
 
     m_pPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *m_pFoundation, mToleranceScale, true, m_pPvd);
 
@@ -36,7 +36,8 @@ HRESULT CPhysX::Initialize()
     }
 
     // create simulation
-    //m_pMaterial = m_pPhysics->createMaterial(0.5f, 0.5f, 0.6f);
+    m_pMaterial = m_pPhysics->createMaterial(0.5f, 0.5f, 0.6f);
+    m_pControllerManager = PxCreateControllerManager(*m_pScene);
     //physx::PxRigidStatic* groundPlane = PxCreatePlane(*m_pPhysics, physx::PxPlane(0, 1, 0, 0), *m_pMaterial);
     //m_pScene->addActor(*groundPlane);
 
@@ -63,9 +64,9 @@ HRESULT CPhysX::Initialize()
     return S_OK;
 }
 
-void CPhysX::Tick()
+void CPhysX::Tick(_float fTimeDelta)
 {
-    m_pScene->simulate(1.0f / 60.0f);
+    m_pScene->simulate(fTimeDelta * 0.1f);
     m_pScene->fetchResults(true);
 }
 

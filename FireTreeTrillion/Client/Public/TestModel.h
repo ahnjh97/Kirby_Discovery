@@ -40,7 +40,10 @@ private:
 	CRigidBody*		m_pRigidBodyCom = { nullptr };
 	//map<string, CRigidBody*> m_mapRigidBodies;
 
-	_int m_iTestAnim = { 0 };
+	_int		m_iTestAnim = { 0 };
+
+	_float		m_fSpeed = { 0.f };
+	_vector		m_vPos = {};
 
 public:
 	static CTestModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

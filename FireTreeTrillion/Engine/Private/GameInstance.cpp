@@ -112,7 +112,7 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 	m_pInput_Device->Tick();
 
 	m_pObject_Manager->Tick(fTimeDelta);	
-	m_pPhysx->Tick();
+	m_pPhysx->Tick(fTimeDelta);
 
 	m_pPipeLine->Tick();
 
@@ -555,6 +555,11 @@ PxScene* CGameInstance::Get_Scene()
 PxMaterial* CGameInstance::Get_Material()
 {
 	return m_pPhysx->Get_Material();
+}
+
+PxControllerManager* CGameInstance::Get_ControllerManager()
+{
+	return m_pPhysx->Get_ControllerManager();
 }
 
 void CGameInstance::AddActor(physx::PxActor& pActor)
