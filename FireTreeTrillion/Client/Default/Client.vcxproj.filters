@@ -70,6 +70,9 @@
     <Filter Include="02.GameObjects\_TestModel\State">
       <UniqueIdentifier>{22c89544-a87d-4d03-9f7e-c1ad5d5b621f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Levels\Tool_Anim">
+      <UniqueIdentifier>{10037f7f-a7d9-40d2-aa5b-1f1b3d772ba1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -141,6 +144,9 @@
     <ClInclude Include="..\Public\TestModel_State.h">
       <Filter>02.GameObjects\_TestModel\State</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Level_Tool_Anim.h">
+      <Filter>01.Levels\Tool_Anim</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -199,6 +205,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\TestModel_State.cpp">
       <Filter>02.GameObjects\_TestModel\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Tool_Anim.cpp">
+      <Filter>01.Levels\Tool_Anim</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

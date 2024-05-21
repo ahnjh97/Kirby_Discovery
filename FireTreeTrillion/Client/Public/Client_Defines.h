@@ -11,6 +11,7 @@ namespace Client
 
                 //============= TOOL
                  LEVEL_TOOL_UI,
+                 LEVEL_TOOL_ANIM,
 
                  LEVEL_END };
 
