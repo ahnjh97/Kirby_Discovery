@@ -19,6 +19,7 @@ public:
 public:
 	virtual HRESULT Initialize_Prototype(TYPE eModelType, string strDirectory, const vector<CBone*>& Bones, _fmatrix TransformMatrix);
 	virtual HRESULT Initialize(void* pArg) override;
+	virtual void	Render_IMGUI();
 
 public:
 	HRESULT Stock_Matrices(const vector<CBone*>& Bones, _float4x4* pMeshBoneMatrices);

@@ -59,12 +59,12 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 	if (nullptr == m_pRenderer)
 		return E_FAIL;
 
-	m_pLevel_Manager = CLevel_Manager::Create();
-	if (nullptr == m_pLevel_Manager)
-		return E_FAIL;
-
 	m_pPhysx = CPhysX::Create();
 	if (nullptr == m_pPhysx)
+		return E_FAIL;
+
+	m_pLevel_Manager = CLevel_Manager::Create();
+	if (nullptr == m_pLevel_Manager)
 		return E_FAIL;
 
 	/* 인풋 디바이스를 초기화한다 .*/

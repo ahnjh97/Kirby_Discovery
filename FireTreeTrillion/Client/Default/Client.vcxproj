@@ -175,7 +175,10 @@
     <ClInclude Include="..\public\Camera_Free.h" />
     <ClInclude Include="..\public\Camera_Main.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
-    <ClInclude Include="..\Public\Kirby.h" />
+    <ClInclude Include="..\Public\Kirby.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\Public\KirbyDefault_State.h" />
     <ClInclude Include="..\Public\Level_GamePlay.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
     <ClInclude Include="..\Public\Level_Logo.h" />
@@ -208,7 +211,10 @@
     </ClCompile>
     <ClCompile Include="..\private\Camera_Free.cpp" />
     <ClCompile Include="..\private\Camera_Main.cpp" />
-    <ClCompile Include="..\Private\Kirby.cpp" />
+    <ClCompile Include="..\Private\Kirby.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Private\KirbyDefault_State.cpp" />
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
     <ClCompile Include="..\Private\Level_Logo.cpp" />

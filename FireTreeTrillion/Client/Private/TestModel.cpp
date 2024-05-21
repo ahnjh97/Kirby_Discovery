@@ -135,19 +135,19 @@ _int CTestModel::Tick(_float fTimeDelta)
 
     if (m_pGameInstance->Get_DIKeyState(DIK_P, KEY_DOWN))
     {
-       /* m_iTestAnim++;
-        if (m_iTestAnim > 5)
-            m_iTestAnim = 5;
+        m_iTestAnim++;
+        if (m_iTestAnim > 290)
+            m_iTestAnim = 290;
 
-        m_pModelCom->Set_Animation(m_iTestAnim, true);*/
+        m_pModelCom->Set_Animation(m_iTestAnim, true, true);
     }
     else if (m_pGameInstance->Get_DIKeyState(DIK_O, KEY_DOWN))
     {
-      /*  m_iTestAnim--;
+        m_iTestAnim--;
         if (m_iTestAnim < 0)
             m_iTestAnim = 0;
 
-        m_pModelCom->Set_Animation(m_iTestAnim, true);*/
+        m_pModelCom->Set_Animation(m_iTestAnim, true, true);
 
     }
     else if (m_pGameInstance->Get_DIKeyState(DIK_I, KEY_DOWN))
@@ -245,7 +245,7 @@ HRESULT CTestModel::Add_Components()
     CHECK_FAILED(hr);
 
     /* For.Com_Model */
-    if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Kirby"),
+    if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_KirbyVacuum"),
         TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
         return E_FAIL;
 
