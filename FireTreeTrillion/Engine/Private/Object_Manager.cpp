@@ -151,6 +151,9 @@ void CObject_Manager::IMGUI_Tick()
 	if (m_iCurrentLevel <= 2) return;
 
 	ImGui::Begin("MainImGuiEditor");
+	ImGui::Text("FPS : "); ImGui::SameLine();
+	ImGui::Text("%.2f", ImGui::GetIO().Framerate);
+	ImGui::Separator();  ImGui::NewLine();
 
 	for (auto& map : m_pLayers[m_iCurrentLevel])
 	{

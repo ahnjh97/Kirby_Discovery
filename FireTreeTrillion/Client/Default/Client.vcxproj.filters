@@ -72,7 +72,10 @@
     </Filter>
     <Filter Include="01.Levels\Tool_Anim">
       <UniqueIdentifier>{10037f7f-a7d9-40d2-aa5b-1f1b3d772ba1}</UniqueIdentifier>
-    </Filter>
+	</Filter>
+	<Filter Include="02.GameObjects\Player\Kirby">
+      <UniqueIdentifier>{f4444bba-a36c-4a3e-9327-ac76df48dd6f}</UniqueIdentifier>
+	</Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -129,9 +132,6 @@
     <ClInclude Include="..\public\Camera_Main.h">
       <Filter>02.GameObjects\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\TestTerrain.h">
-      <Filter>02.GameObjects\Terrain</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\ToolHelper.h">
       <Filter>90.Utils\[Sample] ToolHelper</Filter>
     </ClInclude>
@@ -146,6 +146,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\Level_Tool_Anim.h">
       <Filter>01.Levels\Tool_Anim</Filter>
+	</ClInclude>
+	<ClInclude Include="..\Public\Kirby.h">
+      <Filter>02.GameObjects\Player\Kirby</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TestTerrain.h">
+      <Filter>02.GameObjects\_TestModel</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -191,9 +197,6 @@
     <ClCompile Include="..\private\Camera_Main.cpp">
       <Filter>02.GameObjects\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\TestTerrain.cpp">
-      <Filter>02.GameObjects\Terrain</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\ToolHelper.cpp">
       <Filter>90.Utils\[Sample] ToolHelper</Filter>
     </ClCompile>
@@ -208,6 +211,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Level_Tool_Anim.cpp">
       <Filter>01.Levels\Tool_Anim</Filter>
+	</ClCompile>
+	<ClCompile Include="..\Private\Kirby.cpp">
+      <Filter>02.GameObjects\Player\Kirby</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TestTerrain.cpp">
+      <Filter>02.GameObjects\_TestModel</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

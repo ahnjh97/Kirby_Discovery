@@ -15,7 +15,7 @@ public:
 	/// <param name="_fAnimSpeed"> 해당 상태일 때의 애니메이션 속도 </param>
 	/// <param name="_bLoop"> 루프 유무 </param>
 	/// <param name="_bInterpolation"> 보간 유무 </param>
-	virtual void OnStateEnter(class CModel* _pModel, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
+	virtual void OnStateEnter(class CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
 
 	/// <summary> 상태 진입되어 있는 상태에서 매 tick마다 호출 </summary>
 	/// <param name="pGameObject"> 상태 제어할 객체(this로 넘겨받는다.) </param>
@@ -26,7 +26,6 @@ public:
 
 protected:
 	class CGameInstance* m_pGameInstance = { nullptr };
-	_uint				 m_uState = INT_MAX;
 	   
 public:
 	virtual void Free() override;

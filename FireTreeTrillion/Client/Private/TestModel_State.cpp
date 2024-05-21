@@ -13,11 +13,12 @@ constexpr _float DefaultSpeed = 0.5f;
 //*******************************************************
 CTestModel_Attack_State::CTestModel_Attack_State()
 {
-	m_uState = CTestModel::ATTACK;
 }
 
-void CTestModel_Attack_State::OnStateEnter(CModel* _pModel, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CTestModel_Attack_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
 {
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+
 }
 
 void CTestModel_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -48,11 +49,13 @@ void CTestModel_Attack_State::Free()
 //*********************************
 CTestModel_Idle_State::CTestModel_Idle_State()
 {
-	m_uState = CTestModel::IDLE;
 }
 
-void CTestModel_Idle_State::OnStateEnter(CModel* _pModel, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CTestModel_Idle_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
 {
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+
+
 }
 
 void CTestModel_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -83,11 +86,12 @@ void CTestModel_Idle_State::Free()
 //*******************************************************
 CTestModel_Run_State::CTestModel_Run_State()
 {
-	m_uState = CTestModel::RUN;
 }
 
-void CTestModel_Run_State::OnStateEnter(CModel* _pModel, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CTestModel_Run_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
 {
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+
 }
 
 void CTestModel_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
