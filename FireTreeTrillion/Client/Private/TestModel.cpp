@@ -4,6 +4,8 @@
 //#include "Utils.h"
 
 #include "RigidBody.h"
+#include "FSM.h"
+#include "TestModel_State.h"
 
 CTestModel::CTestModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject{ pDevice, pContext }
@@ -152,6 +154,9 @@ _int CTestModel::Tick(_float fTimeDelta)
         m_pModelCom->Set_Animation(m_iTestAnim, true, true);
     }
 
+    // FSM 제어
+    Update_FSMState(fTimeDelta);
+    m_pFSM->Update(this, fTimeDelta, m_eCurrentState);
 
     return OBJ_NOEVENT;
 }
@@ -223,27 +228,34 @@ void CTestModel::Render_IMGUI()
         ImGui::Separator(); ImGui::NewLine();
         ImGui::TreePop();
     }
+
+    ImGui::Text("FSM : %d", m_eCurrentState);
+    ImGui::Separator(); ImGui::NewLine();
 }
 
 HRESULT CTestModel::Add_Components()
 {
+    HRESULT hr;
     /* For.Com_Shader */
-    if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxAnimModel"),
-        TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
-        return E_FAIL;
+    hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxAnimModel"),
+        TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
+    CHECK_FAILED(hr);
 
     /* For.Com_Model */
-    if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Dee"),
-        TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
-        return E_FAIL;
+    hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Dee"),
+        TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+    CHECK_FAILED(hr);
 
     /* For.Com_RigidBody */
-    if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_RigidBody"),
-        TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom)))
-        return E_FAIL;
+    hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_RigidBody"),
+        TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom);
+    CHECK_FAILED(hr);
 
     m_pRigidBodyCom->Set_PhysXObject(this);
     m_pRigidBodyCom->Activate(true);
+
+    /* FSM */
+    SetUp_FSM();
 
     return S_OK;
 }
@@ -259,6 +271,72 @@ void CTestModel::Add_RigidBody(const wstring& KeyName, void* pArg)
     CHECK_FAILED(hr);
 
     //m_mapRigidBodies.emplace(KeyName, pRigidBody);
+}
+
+void CTestModel::SetUp_FSM()
+{
+    // FSM 상태 초기화
+    m_pFSM = CFSM::Create();
+    m_pFSM->Add_State(ATTACK,   CTestModel_Attack_State::Create());
+    m_pFSM->Add_State(IDLE,     CTestModel_Idle_State::Create());
+    m_pFSM->Add_State(RUN,      CTestModel_Run_State::Create());
+
+    // 상태 Initialize
+    CFSM::FSM_INFO		FSM_Desc = {};
+    FSM_Desc.iState = m_eCurrentState = IDLE;
+    FSM_Desc.pModel = m_pModelCom;
+    m_pFSM->Initialize(&FSM_Desc);
+}
+
+void CTestModel::Update_FSMState(_float fTimeDelta)
+{
+	switch (m_eCurrentState)
+	{
+	case ATTACK:
+	{
+		/* ATTACK → IDLE */
+		//if (m_pBody_Player->IsOverTrackPercent(defaultAnimRatio))
+        //   Change_State(IDLE, 1.f, true, true);
+
+        /* ATTACK → RUN */
+	}
+	break;
+
+	case IDLE:
+	{
+		/* IDLE → ATTACK */
+		if (m_pGameInstance->Get_DIKeyState(DIK_Z, KEY_DOWN))
+			Change_State(ATTACK, 1.f, false, true);
+
+
+		/* IDLE → RUN */
+		//if (m_pGameInstance->Get_DIKeyState(DIK_W, KEY_PRESS) ||
+		//	m_pGameInstance->Get_DIKeyState(DIK_A, KEY_PRESS) ||
+		//	m_pGameInstance->Get_DIKeyState(DIK_S, KEY_PRESS) ||
+		//	m_pGameInstance->Get_DIKeyState(DIK_D, KEY_PRESS))
+		//	Change_State(RUN, 2.f, true, true);
+	}
+	break;
+
+	case RUN:
+	{
+		/* RUN → ATTACK */
+
+		/* RUN → IDLE */
+		//if (false == m_pGameInstance->Get_DIKeyState(DIK_W, KEY_PRESS) &&
+		//	false == m_pGameInstance->Get_DIKeyState(DIK_A, KEY_PRESS) &&
+		//	false == m_pGameInstance->Get_DIKeyState(DIK_S, KEY_PRESS) &&
+		//	false == m_pGameInstance->Get_DIKeyState(DIK_D, KEY_PRESS))
+		//		Change_State(IDLE, 1.f, true, true);
+	}
+	break;
+	}
+}
+
+void CTestModel::Change_State(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+{
+    m_eCurrentState = eState;
+    m_pFSM->ChangeState((_uint)eState, _fAnimSpeed, _bLoop, _bInterpolation);
 }
 
 HRESULT CTestModel::Bind_ShaderResources()
@@ -312,7 +390,8 @@ void CTestModel::Free()
     Safe_Release(m_pRigidBodyCom);
     
     Safe_Release(m_pLight);
-
+    Safe_Release(m_pFSM);
+    
     // not yet [240520]
     //for (auto& iter : m_mapRigidBodies)
     //    Safe_Release(iter.second);

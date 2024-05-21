@@ -193,6 +193,8 @@ call UpdateLib.bat</Command>
     <ClCompile Include="..\private\Extractor.cpp" />
     <ClCompile Include="..\private\Font_Manager.cpp" />
     <ClCompile Include="..\private\Frustum.cpp" />
+    <ClCompile Include="..\Private\FSM.cpp" />
+    <ClCompile Include="..\Private\FSM_State.cpp" />
     <ClCompile Include="..\Private\GameInstance.cpp" />
     <ClCompile Include="..\Private\GameObject.cpp" />
     <ClCompile Include="..\Private\Graphic_Device.cpp" />
@@ -226,6 +228,7 @@ call UpdateLib.bat</Command>
     <ClCompile Include="..\Private\Timer.cpp" />
     <ClCompile Include="..\Private\Timer_Manager.cpp" />
     <ClCompile Include="..\private\Transform.cpp" />
+    <ClCompile Include="..\Private\UIObject.cpp" />
     <ClCompile Include="..\Private\Utils.cpp" />
     <ClCompile Include="..\private\VIBuffer_Instance.cpp" />
     <ClCompile Include="..\private\VIBuffer.cpp" />
@@ -276,6 +279,8 @@ call UpdateLib.bat</Command>
     <ClInclude Include="..\public\Extractor.h" />
     <ClInclude Include="..\public\Font_Manager.h" />
     <ClInclude Include="..\public\Frustum.h" />
+    <ClInclude Include="..\Public\FSM.h" />
+    <ClInclude Include="..\Public\FSM_State.h" />
     <ClInclude Include="..\Public\GameInstance.h" />
     <ClInclude Include="..\Public\GameObject.h" />
     <ClInclude Include="..\Public\Graphic_Device.h" />
@@ -327,6 +332,7 @@ call UpdateLib.bat</Command>
     <ClInclude Include="..\Public\Timer.h" />
     <ClInclude Include="..\Public\Timer_Manager.h" />
     <ClInclude Include="..\public\Transform.h" />
+    <ClInclude Include="..\Public\UIObject.h" />
     <ClInclude Include="..\Public\Utils.h" />
     <ClInclude Include="..\public\VIBuffer_Instance.h" />
     <ClInclude Include="..\public\VIBuffer.h" />
