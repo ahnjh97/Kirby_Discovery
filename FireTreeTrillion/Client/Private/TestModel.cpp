@@ -92,19 +92,19 @@ _int CTestModel::Tick(_float fTimeDelta)
 
     // 예시코드 5 : 계산기 예시 코드 (월드 매트리스로 예시든거임 이건 정신나간 코드이므로 참고해주셈)
     // 예시코드 6 : DInput + KeyPress 예시 코드
-    if (m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_PRESS))
-    {
-        _float4x4 Worldmatrix = m_pTransformCom->Get_WorldFloat4x4();
-        _vector vLook = CUtils::Get_State_Vector_Matrix(Worldmatrix, CUtils::STATE_LOOK);
-        _vector vPos = CUtils::Get_State_Vector_Matrix(Worldmatrix, CUtils::STATE_POSITION);
-        _float fSpeed = 3.f;
+    //if (m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_PRESS))
+    //{
+    //    _float4x4 Worldmatrix = m_pTransformCom->Get_WorldFloat4x4();
+    //    _vector vLook = CUtils::Get_State_Vector_Matrix(Worldmatrix, CUtils::STATE_LOOK);
+    //    _vector vPos = CUtils::Get_State_Vector_Matrix(Worldmatrix, CUtils::STATE_POSITION);
+    //    _float fSpeed = 3.f;
 
-        vPos += vLook * fTimeDelta * fSpeed;
+    //    vPos += vLook * fTimeDelta * fSpeed;
 
-        CUtils::Set_State_Matrix(Worldmatrix, CUtils::STATE_POSITION, vPos);
+    //    CUtils::Set_State_Matrix(Worldmatrix, CUtils::STATE_POSITION, vPos);
 
-        m_pTransformCom->Set_WorldMatrix(Worldmatrix);
-    }
+    //    m_pTransformCom->Set_WorldMatrix(Worldmatrix);
+    //}
 
     // 예시코드 7 : 랜덤 벡터 뽑기
     // 예시코드 8 : DInput + KeyDown 예시코드
@@ -135,23 +135,24 @@ _int CTestModel::Tick(_float fTimeDelta)
 
     if (m_pGameInstance->Get_DIKeyState(DIK_P, KEY_DOWN))
     {
-        m_iTestAnim++;
+       /* m_iTestAnim++;
         if (m_iTestAnim > 5)
             m_iTestAnim = 5;
 
-        m_pModelCom->Set_Animation(m_iTestAnim, true);
+        m_pModelCom->Set_Animation(m_iTestAnim, true);*/
     }
     else if (m_pGameInstance->Get_DIKeyState(DIK_O, KEY_DOWN))
     {
-        m_iTestAnim--;
+      /*  m_iTestAnim--;
         if (m_iTestAnim < 0)
             m_iTestAnim = 0;
 
-        m_pModelCom->Set_Animation(m_iTestAnim, true);
+        m_pModelCom->Set_Animation(m_iTestAnim, true);*/
+
     }
     else if (m_pGameInstance->Get_DIKeyState(DIK_I, KEY_DOWN))
     {
-        m_pModelCom->Set_Animation(m_iTestAnim, true, true);
+        //m_pModelCom->Set_Animation(m_iTestAnim, true, true);
     }
 
     // FSM 제어
