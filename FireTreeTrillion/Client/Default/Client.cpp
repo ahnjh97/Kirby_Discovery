@@ -200,7 +200,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             break;
 
             /* LEVEL Ãß°¡ */
-            
+            case ID_32773: // LEVEL_GAMEPLAY
+            {
+                HRESULT hr;
+                hr = pMainApp->Open_Level(LEVEL_TOOL_FX);
+                CHECK_FAILED(hr);
+            }
+            break;
             default:
                 return DefWindowProc(hWnd, message, wParam, lParam);
             }

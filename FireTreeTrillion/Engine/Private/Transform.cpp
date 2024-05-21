@@ -91,6 +91,24 @@ void CTransform::Go_Right(_float fTimeDelta)
 	Set_State(STATE_POSITION, vPosition);
 }
 
+void CTransform::Go_Up(_float fTimeDelta)
+{
+	_vector		vPosition = Get_State_Vector(STATE_POSITION);
+	m_WorldMatrix.Up().Normalize();
+	vPosition += XMVector3Normalize(m_WorldMatrix.Up()) * m_fSpeedPerSec * fTimeDelta;
+
+	Set_State(STATE_POSITION, vPosition);
+}
+
+void CTransform::Go_Down(_float fTimeDelta)
+{
+	_vector		vPosition = Get_State_Vector(STATE_POSITION);
+
+	vPosition += XMVector3Normalize(m_WorldMatrix.Down()) * m_fSpeedPerSec * fTimeDelta;
+
+	Set_State(STATE_POSITION, vPosition);
+}
+
 void CTransform::Look_At(_fvector vAt)
 {
 	_vector		vLook = vAt - Get_State_Vector(STATE_POSITION);
@@ -163,6 +181,17 @@ void CTransform::Rotation(_fvector vAxis, _float fRadian)
 		Set_State(STATE(i),
 			XMVector4Transform(vState[(STATE)i], RotationMatrix));
 	}
+}
+
+void CTransform::Orbit(_fvector vTarget, _fvector vAxis, _float fTimeDelta)
+{
+	_vector vDir = Get_State_Vector(STATE_POSITION) - vTarget;
+	Set_State(STATE_POSITION, vTarget);
+
+	_matrix	RotationMatrix = XMMatrixRotationAxis(vAxis, ToRadian(90.f) * fTimeDelta);
+	Turn(vAxis, fTimeDelta);
+	vDir = XMVector4Transform(vDir, RotationMatrix);
+	Set_State(STATE_POSITION, vTarget + vDir);
 }
 
 CTransform * CTransform::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

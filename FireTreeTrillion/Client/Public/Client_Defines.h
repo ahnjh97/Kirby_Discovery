@@ -11,7 +11,8 @@ namespace Client
 
                 //============= TOOL
                  LEVEL_TOOL_UI,
-
+                 LEVEL_TOOL_FX,
+                
                  LEVEL_END };
 
 	const unsigned int	g_iWinSizeX = 1280;

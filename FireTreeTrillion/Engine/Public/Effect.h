@@ -66,7 +66,7 @@ public:
 
 
 	virtual void Reset_Duration() { m_fDuration.first = 0.f; }
-	virtual void Fill_SaveData(_Out_ FX_DATA* pEffectData);
+	virtual void Fill_SaveData(_Out_ SINGLE_FX_DATA* pEffectData);
 
 
 	//키프레임 추가(단일 이펙트 용)
@@ -115,7 +115,8 @@ protected:
 	//이펙트의 지속 시간.(first: 현재 duration, second: 목표 duration)
 	pair<_float, _float>	m_fDuration = { 0.f, 1.f };
 
-	//수명 지속 시간. duration이 사라져야 이펙트 사라짐. 
+	//수명 지속 시간. duration이 사라져야 이펙트 사라짐
+	//루프하는 경우 life time 처음부터 다시 시작한다. 
 	pair<_float, _float>	m_fLifeTime = { 0.f, 1.f };
 
 

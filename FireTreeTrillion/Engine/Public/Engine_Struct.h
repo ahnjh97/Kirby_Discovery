@@ -49,12 +49,12 @@ namespace Engine
 	typedef struct
 	{
 
-	}FX_DATA;
+	}SINGLE_FX_DATA;
 
 	typedef struct
 	{
 
-	}COMPFX_DATA;
+	}MULTI_FX_DATA;
 
 	typedef struct ENGINE_DLL
 	{

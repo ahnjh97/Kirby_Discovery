@@ -183,6 +183,22 @@ HRESULT CGameInstance::Clear(_uint iClearLevelIndex)
 	return S_OK;
 }
 
+_bool CGameInstance::Get_KeyState(_ubyte byKeyID, KEYSTATE eState)
+{
+	if (nullptr == m_pInput_Device)
+		return 0;
+
+	return m_pInput_Device->Get_DIKeyState(byKeyID, eState);
+}
+
+_bool CGameInstance::Get_KeyState(MOUSEKEYSTATE eMouse, KEYSTATE eState)
+{
+	if (nullptr == m_pInput_Device)
+		return 0;
+
+	return m_pInput_Device->Get_DIMouseState(eMouse, eState);
+}
+
 _bool CGameInstance::Get_DIKeyState(_ubyte byKeyID, KEYSTATE eState)
 {
 	if (nullptr == m_pInput_Device)

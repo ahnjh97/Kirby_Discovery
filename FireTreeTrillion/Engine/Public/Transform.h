@@ -94,11 +94,14 @@ public:
 	void Go_Backward(_float fTimeDelta);
 	void Go_Left(_float fTimeDelta);
 	void Go_Right(_float fTimeDelta);
+	void Go_Up(_float fTimeDelta);
+	void Go_Down(_float fTimeDelta);
 	void Look_At(_fvector vPosition);
 	void Look_At_ForLandObject(_fvector vPosition);
 	void Move_toTarget(_fvector vTargetPos, _float fTimeDelta, _float fMinDistance = 0.f);	
 	void Turn(_fvector vAxis, _float fTimeDelta);
 	void Rotation(_fvector vAxis, _float fRadian);
+	void Orbit(_fvector vTarget, _fvector vAxis, _float fTimeDelta);
 
 	
 private:

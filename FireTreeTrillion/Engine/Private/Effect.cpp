@@ -59,7 +59,7 @@ HRESULT CEffect::Initialize(void* pArg)
     return S_OK;
 }
 
-void CEffect::Fill_SaveData(_Out_ FX_DATA* pEffectData)
+void CEffect::Fill_SaveData(_Out_ SINGLE_FX_DATA* pEffectData)
 {
 }
 

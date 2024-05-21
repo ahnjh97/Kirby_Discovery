@@ -28,6 +28,10 @@ public:
 
 
 public: /* For.Input_Device */
+	//키 확인 함수 오버로딩
+	_bool	Get_KeyState(_ubyte byKeyID, KEYSTATE eState);
+	_bool	Get_KeyState(MOUSEKEYSTATE eMouse, KEYSTATE eState);
+
 	_bool	Get_DIKeyState(_ubyte byKeyID, KEYSTATE eState);
 	_byte	Get_DIMouseState(MOUSEKEYSTATE eMouse);
 	_bool	Get_DIMouseState(MOUSEKEYSTATE eMouse, KEYSTATE eState);

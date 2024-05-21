@@ -13,13 +13,17 @@
 
 #include "RigidBody.h"
 
+
+//이펙트 툴
+#include "FXToolDirector.h"
+
 //#include "Body_Player.h"
 //#include "Weapon.h"
 //#include "Player.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: m_pDevice { pDevice }
-	, m_pContext { pContext}
+	: m_pDevice{ pDevice }
+	, m_pContext{ pContext }
 	, m_pGameInstance{ CGameInstance::Get_Instance() }
 {
 	Safe_AddRef(m_pGameInstance);
@@ -32,7 +36,7 @@ _uint APIENTRY LoadingMain(void* pArg)
 	CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
 	/* 로더에게 지정된 레벨을 준비해라*/
-	CLoader*		pLoader = (CLoader*)pArg;
+	CLoader* pLoader = (CLoader*)pArg;
 
 	if (FAILED(pLoader->Start()))
 		return 1;
@@ -75,8 +79,13 @@ HRESULT CLoader::Start()
 	case LEVEL_GAMEPLAY:
 		hr = Loading_For_GamePlay();
 		break;
-	}
 
+	case LEVEL_TOOL_FX:
+	{
+		hr = Loading_For_Tool_FX();
+		break;
+	}
+	}
 	if (FAILED(hr))
 		return E_FAIL;
 
@@ -89,11 +98,12 @@ HRESULT CLoader::Start()
 HRESULT CLoader::Loading_ObjectAll()
 {
 	m_strLoadingText = TEXT("객체의 원형를(을) 로딩 중 입니다.");
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BackGround"),  CBackGround);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BackGround"), CBackGround);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_Test"), CTestUI);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestMap"), CTestTerrain);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FXToolDirector"), CFXToolDirector);
 
 	///* For.Prototype_GameObject_Player */
 	//if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Player"),
@@ -123,9 +133,9 @@ HRESULT CLoader::Loading_For_Logo()
 		return E_FAIL;
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
-	
+
 	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
-	
+
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 
 	m_IsFinished = true;
@@ -150,6 +160,36 @@ HRESULT CLoader::Loading_For_GamePlay()
 	// 리지드바디
 	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_RigidBody"), CRigidBody::Create(m_pDevice, m_pContext));
 	CHECK_FAILED(hr);
+
+	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
+	// 모아놓은 Shaders 한번에 생성
+	hr = Add_Shaders(eLevel);
+	CHECK_FAILED(hr);
+
+	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
+
+	m_IsFinished = true;
+
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_For_Tool_FX()
+{
+	HRESULT hr;
+	LEVEL eLevel = LEVEL_TOOL_FX;
+	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
+	//if (FAILED(Add_Texture(eLevel, "Logo", "Logo/Logo.png")))
+	//	return E_FAIL;
+
+	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
+	// 모아놓은 Model 한번에 생성.
+	//hr = Add_Models(eLevel);
+	//CHECK_FAILED(hr);
+
+	m_strLoadingText = TEXT("물리 컴포넌트(을) 로딩 중 입니다.");
+	// 리지드바디
+	//hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_RigidBody"), CRigidBody::Create(m_pDevice, m_pContext));
+	//CHECK_FAILED(hr);
 
 	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
 	// 모아놓은 Shaders 한번에 생성
@@ -250,9 +290,9 @@ HRESULT CLoader::Add_Texture(LEVEL eLevel, string strPrototypeName, string strFo
 	return S_OK;
 }
 
-CLoader * CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID)
+CLoader* CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID)
 {
-	CLoader*		pInstance = new CLoader(pDevice, pContext);
+	CLoader* pInstance = new CLoader(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize(eNextLevelID)))
 	{
