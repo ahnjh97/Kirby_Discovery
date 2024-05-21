@@ -23,8 +23,6 @@ HRESULT CImGUI_Manager::Initialize(HWND hWnd, ID3D11Device* pGraphic_Device, ID3
 	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
 	io.ConfigViewportsNoTaskBarIcon = true;
 
-	io.Fonts->AddFontFromFileTTF("..\\Bin\\Resources\\Fonts\\Pretendard.ttf", 16.f, NULL, io.Fonts->GetGlyphRangesKorean());
-	io.Fonts->Build();
 
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();

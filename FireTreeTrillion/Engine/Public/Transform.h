@@ -42,6 +42,23 @@ public:
 
 	void Set_Scaled(_float fScaleX, _float fScaleY, _float fScaleZ);
 
+	_float4 Get_State(STATE _eState)
+	{
+		switch (_eState)
+		{
+		case STATE_RIGHT:
+			return Dir(m_WorldMatrix.Right());
+		case STATE_UP:
+			return Dir(m_WorldMatrix.Up());
+		case STATE_LOOK:
+			return Dir(m_WorldMatrix.Forward());
+		case STATE_POSITION:
+			return Pos(m_WorldMatrix.Translation());
+		default:
+			return Pos(m_WorldMatrix.Translation());
+		}
+	}
+
 	_vector Get_State_Vector(STATE eState) {
 		return XMLoadFloat4x4(&m_WorldMatrix).r[eState];
 	}
@@ -62,9 +79,12 @@ public:
 	_float4x4 Get_WorldFloat4x4() const {
 		return m_WorldMatrix;
 	}
-	_matrix Get_WorldMatrix() const {
-		return XMLoadFloat4x4(&m_WorldMatrix);
-	}
+	//_matrix Get_WorldMatrix() const {
+	//	return XMLoadFloat4x4(&m_WorldMatrix);
+	//}
+
+	_float4x4 Get_WorldMatrix() const { return m_WorldMatrix; }
+	_float4x4 Get_WorldMatrix_Inv() const { return m_WorldMatrix.Invert(); }
 
 	_float4x4 Get_WorldFloat4x4_Inverse() const {
 		_float4x4	WorldMatrixInverse;

@@ -5,6 +5,9 @@ BEGIN(Engine)
 
 class ENGINE_DLL CEffect : public CGameObject
 {
+#ifdef _DEBUG
+	friend class CFXToolDirector;
+#endif
 public:
 	typedef struct : public GAMEOBJECT_DESC
 	{

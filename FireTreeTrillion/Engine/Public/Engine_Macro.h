@@ -36,6 +36,10 @@
 #define ToRadian(degree)			(XMConvertToRadians(degree))
 #define ToDegree(radian)			(XMConvertToDegrees(radian))
 
+#define Dir(vec3)					_float4{(vec3).x,( vec3).y, (vec3).z, 0.f}
+#define Pos(vec3)					_float4{(vec3).x, (vec3).y, (vec3).z, 1.f}
+
+
 
 #define BEGIN(NAMESPACE)	namespace NAMESPACE {
 #define END					}

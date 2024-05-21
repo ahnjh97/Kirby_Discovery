@@ -75,12 +75,18 @@ public: /* For.Timer_Manager */
 
 public: /* For.PipeLine */
 	void Set_Transform(CPipeLine::TRANSFORMSTATE eState, _fmatrix TransformMatrix);
+
+	_float4x4 Get_Transform(CPipeLine::TRANSFORMSTATE _eState) const;
+	_float4x4 Get_Transform_Inv(CPipeLine::TRANSFORMSTATE _eState) const;
+
+	_float4 Get_CamPosition() const;
+
+
 	_matrix Get_Transform_Matrix(CPipeLine::TRANSFORMSTATE eState) const;
 	_float4x4 Get_Transform_Float4x4(CPipeLine::TRANSFORMSTATE eState) const;
 	_matrix Get_Transform_Matrix_Inverse(CPipeLine::TRANSFORMSTATE eState) const;
 	_float4x4 Get_Transform_Float4x4_Inverse(CPipeLine::TRANSFORMSTATE eState) const;
-	_vector Get_CamPosition_Vector() const;
-	_float4 Get_CamPosition_Float4() const;
+	//_vector Get_CamPosition_Vector() const;
 
 public: /* For.Light_Manager */
 	const LIGHT_DESC* Get_LightDesc(_uint iIndex);
