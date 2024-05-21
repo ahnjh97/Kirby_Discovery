@@ -12,6 +12,7 @@
 #include "TestUI.h"
 
 #include "RigidBody.h"
+#include "CharacterController.h"
 
 //#include "Body_Player.h"
 //#include "Weapon.h"
@@ -147,8 +148,11 @@ HRESULT CLoader::Loading_For_GamePlay()
 	CHECK_FAILED(hr);
 
 	m_strLoadingText = TEXT("물리 컴포넌트(을) 로딩 중 입니다.");
-	// 리지드바디
+	/* 리지드바디 */
 	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_RigidBody"), CRigidBody::Create(m_pDevice, m_pContext));
+	CHECK_FAILED(hr);
+	/* 캐릭터 컨트롤러 */
+	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_CharacterController"), CCharacterController::Create(m_pDevice, m_pContext));
 	CHECK_FAILED(hr);
 
 	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");

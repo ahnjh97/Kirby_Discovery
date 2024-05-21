@@ -26,9 +26,13 @@ public:
 	_float4			Get_Position();
 	_float4			Get_FootPosition();
 
+	// 이동에 대한 함수
+	void Test(class CTransform* pTransform, _float fSpeed, _float fTimeDelta);
+	void Move(class CTransform* pTransform, _float fTimeDelta);
+
 	// 이동용, 기본 중력없기 때문에 이 함수로 중력 만들어 줄 것
-	physx::PxControllerCollisionFlags Move(_float4 vVelocity, _float fTimeDelta, _float minDist = 0.001f);
-	physx::PxControllerCollisionFlags MoveDisp(_float4 vPosDelta, _float fTimeDelta, _float minDist = 0.001f);
+	physx::PxControllerCollisionFlags Move(_float3 vVelocity, _float fTimeDelta, _float minDist = 0.001f);
+	physx::PxControllerCollisionFlags MoveDisp(_float3 vPosDelta, _float fTimeDelta, _float minDist = 0.001f);
 
 	_bool	Is_Activated();
 	void	Activate(_bool bActive);
@@ -51,6 +55,8 @@ protected:
 	physx::PxFilterData				m_tFilterDesc;
 
 	_float							m_fSlopeLimitDegree = 45.f;
+	_float							m_fFallVelocity = { 0.f };
+	_float							m_fFallAcceleration = { 0.f };
 
 public:
 	static	CCharacterController*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

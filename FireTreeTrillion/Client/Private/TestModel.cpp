@@ -4,6 +4,7 @@
 //#include "Utils.h"
 
 #include "RigidBody.h"
+#include "CharacterController.h"
 
 CTestModel::CTestModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject{ pDevice, pContext }
@@ -23,7 +24,6 @@ HRESULT CTestModel::Initialize_Prototype()
 HRESULT CTestModel::Initialize(void* pArg)
 {
     GAMEOBJECT_DESC		GameObjectDesc{};
-
     GameObjectDesc.fSpeedPerSec = 7.f;
     GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
@@ -42,7 +42,7 @@ HRESULT CTestModel::Initialize(void* pArg)
     //_vector vPos = XMVectorSet(0.f, 0.f, 0.f, 1.f);
     //m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 
-    m_pRigidBodyCom->PlayerController(_float3(0.f, 1.5f, 0.f));
+    //m_pRigidBodyCom->PlayerController(_float3(0.f, 1.5f, 0.f));
 
 
 
@@ -83,7 +83,9 @@ _int CTestModel::Tick(_float fTimeDelta)
     // 예시코드 6 : DInput + KeyPress 예시 코드
     if (m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_PRESS))
     {
-        m_pRigidBodyCom->test(m_pTransformCom, fTimeDelta);
+        //m_pRigidBodyCom->test(m_pTransformCom, fTimeDelta);
+        //m_pControllerCom->Move(_float3(0.f, 1.f, 0.f), fTimeDelta, 0);
+        m_pControllerCom->Move(m_pTransformCom, fTimeDelta);
     }
 
     //if (m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_PRESS))
@@ -170,8 +172,8 @@ void CTestModel::Late_Tick(_float fTimeDelta)
         m_pRigidBodyCom->Add_Force(force);
     }
 
-    m_pRigidBodyCom->Update(m_pTransformCom);
-    m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
+    //m_pRigidBodyCom->Update(m_pTransformCom);
+    //m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
 }
 
 HRESULT CTestModel::Render()
@@ -238,6 +240,12 @@ HRESULT CTestModel::Add_Components()
         TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom)))
         return E_FAIL;
 
+    /* For.Com_RigidBody */
+    if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_CharacterController"),
+        TEXT("Com_Controller"), (CComponent**)&m_pControllerCom)))
+        return E_FAIL;
+
+    
     //m_pRigidBodyCom->Set_PhysXObject(this);
     //m_pRigidBodyCom->Activate(true);
 
@@ -306,6 +314,7 @@ void CTestModel::Free()
     Safe_Release(m_pShaderCom);
     Safe_Release(m_pModelCom);
     Safe_Release(m_pRigidBodyCom);
+    Safe_Release(m_pControllerCom);
     
     Safe_Release(m_pLight);
 

@@ -7,6 +7,7 @@ BEGIN(Engine)
 class CModel;
 class CShader;
 class CRigidBody;
+class CCharacterController;
 END
 
 BEGIN(Client)
@@ -39,6 +40,7 @@ private:
 
 	CRigidBody*		m_pRigidBodyCom = { nullptr };
 	//map<string, CRigidBody*> m_mapRigidBodies;
+	CCharacterController* m_pControllerCom = { nullptr };
 
 	_int		m_iTestAnim = { 0 };
 	_float		m_fSpeed = { 0.f };

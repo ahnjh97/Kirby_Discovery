@@ -83,16 +83,50 @@ _float4 CCharacterController::Get_FootPosition()
 	return _float4{(_float)vPos.x, (_float)vPos.y, (_float)vPos.z, 1.f};
 }
 
-PxControllerCollisionFlags CCharacterController::Move(_float4 vVelocity, _float fTimeDelta, _float minDist)
+void CCharacterController::Test(CTransform* pTransform, _float fSpeed, _float fTimeDelta)
 {
-	// Disp == direction * speed * delta(delta 시간 동안의 이동량)
-	vVelocity *= fTimeDelta;
+	PxVec3 movement(0.f);
+	movement.z += fSpeed * fTimeDelta;
 
-	const physx::PxVec3 vDisp{vVelocity.x, vVelocity.y, vVelocity.z};
-	return m_pController->move(vDisp, minDist, fTimeDelta, m_ControllerFilters);
+	PxControllerFilters filter;
+	PxControllerCollisionFlags collisionFlags = m_pController->move(movement, 0.001f, fTimeDelta, filter);
+
+	PxExtendedVec3 pxPos = m_pController->getPosition();
+	PxVec3 pos(pxPos.x, pxPos.y, pxPos.z);
+
+	XMVECTOR xmPos = XMVectorSet(pos.x, pos.y, pos.z, 0.f);
+
+	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
 }
 
-PxControllerCollisionFlags CCharacterController::MoveDisp(_float4 vPosDelta, _float fTimeDelta, _float minDist)
+void CCharacterController::Move(CTransform* pTransform, _float fTimeDelta)
+{
+	m_fFallVelocity -= m_fFallAcceleration * fTimeDelta * 50.f;
+
+	if (m_fFallVelocity < -1000.f)
+		m_fFallVelocity = -10.f;
+	
+	m_pController->move(PxVec3(0.f, 1.f, 0.f) * fTimeDelta * m_fFallVelocity, 0, fTimeDelta, PxControllerFilters());
+
+	Test(pTransform, 5.f, fTimeDelta);
+
+	PxControllerState m_pPxState;
+	m_pController->getState(m_pPxState);
+
+	if (m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_DOWN || m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_UP)
+		m_fFallVelocity = 0.f;
+}
+
+//PxControllerCollisionFlags CCharacterController::Move(_float3 vVelocity, _float fTimeDelta, _float minDist)
+//{
+//	// Disp == direction * speed * delta(delta 시간 동안의 이동량)
+//	vVelocity *= fTimeDelta;
+//
+//	const physx::PxVec3 vDisp{vVelocity.x, vVelocity.y, vVelocity.z};
+//	return m_pController->move(vDisp, minDist, fTimeDelta, m_ControllerFilters);
+//}
+
+PxControllerCollisionFlags CCharacterController::MoveDisp(_float3 vPosDelta, _float fTimeDelta, _float minDist)
 {
 	const physx::PxVec3 vDisp{vPosDelta.x, vPosDelta.y, vPosDelta.z};
 	return m_pController->move(vDisp, minDist, fTimeDelta, m_ControllerFilters);
@@ -179,6 +213,8 @@ void CCharacterController::Free()
 	__super::Free();
 
 	Release_Controller();
+
+	Safe_Release(m_pObject);
 }
 
 CCharacterController* CCharacterController::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

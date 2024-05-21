@@ -208,6 +208,8 @@ void CRigidBody::Activate(_bool _bActive)
 
 void CRigidBody::Add_Force(_float3 vForce)
 {
+	if (m_pActor == nullptr) return;
+
 	// Trigger는 어떻게 사용할 지 추후 의논 예정
 	if (false == (m_bKinematic))
 	{
@@ -234,13 +236,12 @@ void CRigidBody::PlayerController(_float3 vPos)
 	// 캡슐 컨트롤러 생성
 	m_pCapsuleController = m_pGameInstance->Get_ControllerManager()->createController(capsuleDesc);
 	if (nullptr == m_pCapsuleController)
-		MSG_BOX(TEXT("Faield to Controller"));
+		MSG_BOX(TEXT("Failed to Controller"));
 }
 
 void CRigidBody::Go_Straight(CTransform* pTransform, _float fSpeed, _float fTimeDelta)
 {
 	PxVec3 movement(0.f);
-
 	movement.z += fSpeed * fTimeDelta;
                 
 	PxControllerFilters filter;
