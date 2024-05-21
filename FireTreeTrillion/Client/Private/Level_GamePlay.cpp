@@ -103,8 +103,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const wstring & strLayerTag)
 
 HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& strLayerTag)
 {
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_UI_Test"))))
-		return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_UI_Test"))))
+	//	return E_FAIL;
 
 	return S_OK;
 }

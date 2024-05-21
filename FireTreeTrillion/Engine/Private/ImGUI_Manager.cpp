@@ -23,7 +23,11 @@ HRESULT CImGUI_Manager::Initialize(HWND hWnd, ID3D11Device* pGraphic_Device, ID3
 	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
 	io.ConfigViewportsNoTaskBarIcon = true;
 
+	// 05.21) 한글 폰트 적용
+	io.Fonts->AddFontFromFileTTF("C://Windows/Fonts/malgun.ttf", 15.f, NULL, io.Fonts->GetGlyphRangesKorean());
+
 	// Setup Dear ImGui style
+#pragma region IMGUI_STYLE
 	ImGui::StyleColorsDark();
 	//ImGui::StyleColorsLight();
 
@@ -33,6 +37,61 @@ HRESULT CImGUI_Manager::Initialize(HWND hWnd, ID3D11Device* pGraphic_Device, ID3
 		style.WindowRounding = 0.0f;
 		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 	}
+
+	ImVec4 vPinkDark = { 0.5f, 0.18f, 0.37f, 1.0f };
+	ImVec4 vPink = { 0.75f, 0.18f, 0.37f, 1.0f };
+	ImVec4 vPinkLight = { 1.0f, 0.18f, 0.37f, 1.0f };
+
+	//테두리
+	style.Colors[ImGuiCol_Border] = vPink;
+
+	//프레임
+	style.Colors[ImGuiCol_FrameBg] = vPink;
+	style.Colors[ImGuiCol_FrameBgHovered] = vPinkLight;
+	style.Colors[ImGuiCol_FrameBgActive] = vPink;
+
+	//타이틀
+	style.Colors[ImGuiCol_TitleBg] = vPink;
+	style.Colors[ImGuiCol_TitleBgActive] = vPinkLight;
+	style.Colors[ImGuiCol_TitleBgCollapsed] = vPink;
+
+	//메뉴 바
+	style.Colors[ImGuiCol_MenuBarBg] = vPinkDark;
+	style.Colors[ImGuiCol_ScrollbarBg] = vPink;
+
+	//버튼
+	style.Colors[ImGuiCol_Button] = vPink;
+	style.Colors[ImGuiCol_ButtonHovered] = vPinkLight;
+	style.Colors[ImGuiCol_ButtonActive] = vPink;
+
+	//헤더
+	style.Colors[ImGuiCol_Header] = vPink;
+	style.Colors[ImGuiCol_HeaderHovered] = vPinkLight;
+	style.Colors[ImGuiCol_HeaderActive] = vPink;
+
+	//분리선
+	style.Colors[ImGuiCol_Separator] = vPink;
+	style.Colors[ImGuiCol_SeparatorHovered] = vPinkLight;
+	style.Colors[ImGuiCol_SeparatorActive] = vPink;
+
+	//리사이즈 그립
+	style.Colors[ImGuiCol_ResizeGrip] = vPink;
+	style.Colors[ImGuiCol_ResizeGripHovered] = vPinkLight;
+	style.Colors[ImGuiCol_ResizeGripActive] = vPink;
+
+	// 탭
+	style.Colors[ImGuiCol_Tab] = vPink;
+	style.Colors[ImGuiCol_TabHovered] = vPinkLight;
+	style.Colors[ImGuiCol_TabActive] = vPink;
+
+	style.Colors[ImGuiCol_TabUnfocused] = vPink;
+	style.Colors[ImGuiCol_TabUnfocusedActive] = vPink;
+
+	// 도킹 프리뷰
+	style.Colors[ImGuiCol_DockingPreview] = vPink;
+	style.Colors[ImGuiCol_DockingEmptyBg] = vPink;
+
+#pragma endregion
 
 	// Setup Platform/Renderer backends
 	ImGui_ImplWin32_Init(hWnd);

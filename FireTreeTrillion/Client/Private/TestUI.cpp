@@ -95,18 +95,6 @@ void CTestUI::Render_IMGUI()
 	//static _float  Z_radian = 0.f;
 	//ImGui::DragFloat("Z_radian", &Z_radian, 0.f, 360.f);
 	//m_pTransformCom->Rotate(XMVectorSet(0.f, 0.f, 1.f, 0.f), XMConvertToRadians(Z_radian));
-
-	if (ImGui::CollapsingHeader(u8"Mouse ¸¶¿ì½º", ImGuiTreeNodeFlags_DefaultOpen))
-	{
-		ImGuiIO& io = ImGui::GetIO();
-
-		ImGui::Text(u8"Mouse");
-		if (ImGui::IsMousePosValid())
-			ImGui::Text("X : %.2f \t Y : %.2f", io.MousePos.x, io.MousePos.y);
-
-		else
-			ImGui::Text("Mouse InValid");
-	}
 }
 
 HRESULT CTestUI::Add_Components()

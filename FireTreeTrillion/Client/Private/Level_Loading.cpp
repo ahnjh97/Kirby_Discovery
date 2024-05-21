@@ -6,7 +6,7 @@
 
 #include "Level_Logo.h"
 #include "Level_GamePlay.h"
-#include "Level_UIEditor.h"
+#include "Level_UITool.h"
 
 CLevel_Loading::CLevel_Loading(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }

@@ -29,7 +29,8 @@ public:
 	virtual void Free() override;
 
 private:
-	_float m_fAccDelta = { 0.0 };
+	_uint			m_iFPS = { 0 };
+	_float			m_fAccDelta = { 0.0 };
 };
 
 END

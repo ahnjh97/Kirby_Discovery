@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "UI_Editor.h"
 
+#include "ImGuizmo.h"
+
 CUI_Editor::CUI_Editor(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CUIObject{ pDevice, pContext }
 {
@@ -24,36 +26,12 @@ HRESULT CUI_Editor::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-
 	return S_OK;
 }
 
 _int CUI_Editor::Tick(_float fTimeDelta)
 {
-	//IMGUI 프레임 생성
-	ImGui::NewFrame();
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 7.5f);
-
-	ImGui::SetNextWindowSize(ImVec2(250, 200));
-	if (ImGui::Begin(u8"Editor 에디터", NULL, /*ImGuiWindowFlags_NoCollapse | */ ImGuiWindowFlags_NoResize)) //창 제목
-	{
-		if (ImGui::CollapsingHeader(u8"Mouse 마우스", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			ImGuiIO& io = ImGui::GetIO();
-
-			ImGui::SeparatorText(u8"Mouse");
-			if (ImGui::IsMousePosValid())
-				ImGui::Text("X : %.2f \t Y : %.2f", io.MousePos.x, io.MousePos.y);
-
-			else
-				ImGui::Text("Mouse InValid");
-		}
-	}
-	ImGui::End(); //창 종료
-
-
-	ImGui::PopStyleVar();
-	ImGui::EndFrame(); //현재 프레임 종료
+	__super::Tick(fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
@@ -65,16 +43,13 @@ void CUI_Editor::Late_Tick(_float fTimeDelta)
 
 HRESULT CUI_Editor::Render()
 {
-	//설정 값으로 렌더
-	ImGui::Render();
-	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
 #pragma region BIND SHADER & VIBUFFER
 
+	/*
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
 	if (FAILED(m_pShaderCom->Begin(0)))
 		return E_FAIL;
 
@@ -83,6 +58,7 @@ HRESULT CUI_Editor::Render()
 
 	if (FAILED(m_pVIBufferCom->Render()))
 		return E_FAIL;
+	*/
 
 #pragma endregion 
 
@@ -91,6 +67,194 @@ HRESULT CUI_Editor::Render()
 
 void CUI_Editor::Render_IMGUI()
 {
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 7.5f);
+	//ImGui::SetNextWindowPos(ImVec2(0, 100.f));
+	//ImGui::SetNextWindowSize(ImVec2(250, 200));
+	if (ImGui::Begin(u8"UI Editor 에디터", 0, ImGuiWindowFlags_MenuBar)) //ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize ) //창 제목
+	{
+		// 테스트용
+		/*
+		if (ImGui::CollapsingHeader(u8"Mouse 마우스", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGuiIO& io = ImGui::GetIO();
+
+			ImGui::SeparatorText(u8"Mouse");
+			if (ImGui::IsMousePosValid())
+				ImGui::Text("X : %.2f \t Y : %.2f", io.MousePos.x, io.MousePos.y);
+
+			else
+				ImGui::Text("Mouse InValid");
+		}
+		*/
+
+		if (ImGui::BeginMenuBar())
+		{
+			if (ImGui::BeginMenu(u8"File 파일"))
+			{
+				if (ImGui::MenuItem(u8"Load 로드"))
+				{
+
+				}
+
+				if (ImGui::MenuItem(u8"Save 저장"))
+				{
+
+				}
+
+				ImGui::EndMenu();
+			}
+
+			ImGui::EndMenuBar();
+		}
+
+		if (ImGui::BeginTabBar(u8"Test TabBar 1", NULL))
+		{
+			if (ImGui::BeginTabItem(u8"Test Tab Item 1", NULL))
+			{
+				ImGui::EndTabItem();
+			}
+
+			ImGui::EndTabBar();
+		}
+
+		ImGui::End(); //창 종료
+	}
+
+	if (ImGui::Begin(u8"Test Tab 테스트 탭", NULL))
+	{
+		if (ImGui::BeginTabBar(u8"Test TabBar 1", NULL)) //탭 바
+		{
+			if (ImGui::BeginTabItem(u8"Test Tab Item 1", NULL))
+			{
+				ImGui::SeparatorText(u8"Test SeparatorText");
+				
+				const char* DragTag = { "Translate 위치" };
+				_float fTextWidth = ImGui::CalcTextSize(DragTag).x;
+
+
+				ImGui::Text(u8"Scale 크기");
+				ImGui::SameLine(fTextWidth + 20);
+				ImGui::DragFloat2("##Scale", (_float*)&m_size2D);
+
+
+				ImGui::Text(u8"Rotate 회전");
+				ImGui::SameLine(fTextWidth + 20);
+				ImGui::DragFloat2("##Rotate", (_float*)&m_Ratio2D);
+
+				ImGui::Text(u8"Translate 위치");
+				ImGui::SameLine(fTextWidth + 20);
+				ImGui::DragFloat2("##Translate", (_float*)&m_position2D);
+
+				ImGui::EndTabItem();
+			}
+
+			if (ImGui::BeginTabItem(u8"Test Tab Item 2", NULL))
+			{
+				ImGui::SeparatorText(u8"Test SeparatorText");
+				ImGui::Text(u8"Test Text");
+
+
+				ImGui::EndTabItem();
+			}
+
+			ImGui::EndTabBar();
+		}
+
+		ImGui::End(); //창 종료
+	}
+
+	if (ImGui::Begin(u8"Viewport", NULL))
+	{
+		ImGuizmo::BeginFrame(); //기즈모 생성
+		_float4x4 WorldMatrix = m_pTransformCom->Get_WorldFloat4x4();
+		if (nullptr == m_pTransformCom)
+			return;
+
+		static ImGuizmo::OPERATION eCurGizmoOper(ImGuizmo::TRANSLATE);
+		static ImGuizmo::MODE eCurGizmoMode(ImGuizmo::WORLD);
+
+		//크기 회전 이동 변경 키
+		if (m_pGameInstance->Get_DIKeyState(DIK_LCONTROL, KEY_PRESS))
+		{
+			if (m_pGameInstance->Get_DIKeyState(DIK_Y, KEY_DOWN))
+				eCurGizmoOper = ImGuizmo::SCALE;
+
+			else if (m_pGameInstance->Get_DIKeyState(DIK_R, KEY_DOWN))
+				eCurGizmoOper = ImGuizmo::ROTATE;
+
+			else if (m_pGameInstance->Get_DIKeyState(DIK_T, KEY_DOWN))
+				eCurGizmoOper = ImGuizmo::TRANSLATE;
+		}
+
+		if (!ImGuizmo::IsUsing())
+			ImGui::Text(u8"Gizmo InValid");
+
+		else
+		{
+			switch (eCurGizmoOper)
+			{
+			case ImGuizmo::SCALE:
+				ImGui::Text(u8"Scale Edit");
+				break;
+
+			case ImGuizmo::ROTATE:
+				ImGui::Text(u8"Rotate Edit");
+				break;
+
+			case ImGuizmo::TRANSLATE:
+				ImGui::Text(u8"Translate Edit");
+				break;
+			}
+		}
+
+
+		//_float Translation[3], Rotation[3], Scale[3];
+		////행렬 분해 후 재구성
+		//ImGuizmo::DecomposeMatrixToComponents(WorldMatrix.m[0], Translation, Rotation, Scale);
+		//ImGui::Text(u8"Scale 크기");
+		//ImGui::InputFloat3("Ctrl Y", Scale);
+
+		//ImGui::Text(u8"Rotation 회전");
+		//ImGui::InputFloat3("Ctrl R", Rotation);
+
+		//ImGui::Text(u8"Translate 이동");
+		//ImGui::InputFloat3("Ctrl T", Translation);
+		//ImGuizmo::RecomposeMatrixFromComponents(Translation, Rotation, Scale, WorldMatrix.m[0]);
+		// 
+		//기즈모 영역 세팅
+		ImGuiIO& io = ImGui::GetIO();
+		ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
+
+		//뷰, 투영 행렬 정보 로드
+		_float4x4 ViewMatrix, ProjMatrix;
+		ViewMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW);
+		ProjMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
+
+		//오브젝트 변환
+		ImGuizmo::Manipulate(ViewMatrix.m[0], ProjMatrix.m[0], eCurGizmoOper, eCurGizmoMode,
+			WorldMatrix.m[0], NULL, NULL /*useSnap ? &snap[0] : NULL*/);
+
+		//월드행렬 세팅
+		m_pTransformCom->Set_WorldMatrix(WorldMatrix);
+
+		//텍스처 선택 시 기즈모 활성화
+		//_bool IsUsingGizmo = { FALSE };
+		//if (TRUE == IsUsingGizmo)
+		//{
+		//ImGuizmo::DrawGrid(); // 그리드
+		//}
+
+		ImGui::End();
+	}
+
+	if (ImGui::Begin(u8"Texture Preview 텍스처 미리보기", NULL))
+	{
+		//ImGui::ImageButton();
+
+		ImGui::End();
+	}
+
+	ImGui::PopStyleVar();
 }
 
 HRESULT CUI_Editor::Add_Components()
@@ -148,7 +312,7 @@ void CUI_Editor::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_pShaderCom);
-	Safe_Release(m_pTextureCom);
-	Safe_Release(m_pVIBufferCom);
+	//Safe_Release(m_pShaderCom);
+	//Safe_Release(m_pTextureCom);
+	//Safe_Release(m_pVIBufferCom);
 }

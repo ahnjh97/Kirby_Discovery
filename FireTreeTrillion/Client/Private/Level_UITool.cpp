@@ -31,17 +31,16 @@ HRESULT CLevel_UITool::Render()
 	if (FAILED(__super::Render()))
 		return E_FAIL;
 
-	_uint iFPS = { 0 };
-	++iFPS;
+	++m_iFPS;
 
 	_tchar szFPS[MAX_PATH] = TEXT("");
-	wsprintf(szFPS, TEXT("Level UI Tool, %d FPS"), iFPS);
+	wsprintf(szFPS, TEXT("Level UI Tool, %d FPS"), m_iFPS);
 
 	if (m_fAccDelta >= 1.f)
 	{
  		SetWindowText(g_hWnd, szFPS);
 		m_fAccDelta = 0.f;
-		iFPS = 0.f;
+		m_iFPS = 0;
 	}
 
 	return S_OK;
@@ -55,7 +54,8 @@ HRESULT CLevel_UITool::Ready_Layer_BackGround(const wstring& strLayerTag)
 HRESULT CLevel_UITool::Ready_Layer_UI(const wstring& strLayerTag)
 {
 	// 05.20) IMGUI UI Editor Ãß°¡
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_UI, strLayerTag, TEXT("Prototype_GameObject_UI_Editor"))))
+	//    /*      GameObj_IMGUI_UI_Editor    */
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_UI, strLayerTag, TEXT("Prototype_GameObject_IMGUI_UI_Editor"))))
 		return E_FAIL;
 
 	return S_OK;

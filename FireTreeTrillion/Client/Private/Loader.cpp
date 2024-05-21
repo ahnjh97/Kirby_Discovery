@@ -103,7 +103,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
 
 	// 05.20) 원본 추가
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_Editor"), CUI_Editor);
+	//    /*      GameObj_IMGUI_UI_Editor    */
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("IMGUI_UI_Editor"), CUI_Editor);
 
 	///* For.Prototype_GameObject_Player */
 	//if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Player"),
