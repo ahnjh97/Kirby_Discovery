@@ -169,8 +169,14 @@
     <Filter Include="01.Utility\02.Components\PhysX\RigidBody">
       <UniqueIdentifier>{d9d489a6-1706-4bac-b2d2-f0c060f539a7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Utility\01.GameObjects\UI">
+    <Filter Include="01.Utility\02.Components\PhysX\CharacterController">
+      <UniqueIdentifier>{2f4e478f-fcaf-4750-924b-9dd992e91f29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\01.GameObjects\UIObject">
       <UniqueIdentifier>{dce35891-6f80-4098-9884-4f3d2a82009a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\01.GameObjects\CharacterObject">
+      <UniqueIdentifier>{a091b18d-883d-4cc0-97ba-e07d34fdf205}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -355,7 +361,13 @@
       <Filter>01.Utility\02.Components\PhysX\RigidBody</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\UIObject.cpp">
-      <Filter>01.Utility\01.GameObjects\UI</Filter>
+      <Filter>01.Utility\01.GameObjects\UIObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CharacterController.cpp">
+      <Filter>01.Utility\02.Components\PhysX\CharacterController</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Character.cpp">
+      <Filter>01.Utility\01.GameObjects\CharacterObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -567,7 +579,13 @@
       <Filter>01.Utility\02.Components\PhysX\RigidBody</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\UIObject.h">
-      <Filter>01.Utility\01.GameObjects\UI</Filter>
+      <Filter>01.Utility\01.GameObjects\UIObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CharacterController.h">
+      <Filter>01.Utility\02.Components\PhysX\CharacterController</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Character.h">
+      <Filter>01.Utility\01.GameObjects\CharacterObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -50,9 +50,9 @@ public:
 	_bool				Is_Activated();
 
 protected:
-	class CGameObject*			m_pObject		= nullptr;
-	physx::PxRigidDynamic*		m_pActor		= nullptr;
-	physx::PxShape*				m_pShape		= nullptr;
+	class CGameObject*			m_pObject			 = nullptr;
+	physx::PxRigidDynamic*		m_pActor			 = nullptr;
+	physx::PxShape*				m_pShape			 = nullptr;
 	physx::PxController*		m_pCapsuleController = nullptr;
 
 	// ========== IMGUI에서 제어할 수 있도록 붙이기 ==========

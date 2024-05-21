@@ -1,4 +1,5 @@
 #include "RigidBody.h"
+
 #include "GameInstance.h"
 #include "GameObject.h"
 #include "Transform.h"
@@ -72,7 +73,8 @@ void CRigidBody::Render_IMGUI()
 {
 	__super::Render_IMGUI();
 
-	if (ImGui::Button("ReCreateActor(for change shape or scale)"))
+	//ReCreateActor(for change shape or scale)
+	if (ImGui::Button("Update Changes"))
 	{
 		Create_Actor();
 		if (!Is_Activated())
@@ -154,7 +156,7 @@ void CRigidBody::SetUp_Actor()
 		m_pShape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, false);
 	}
 
-	m_pShape->setSimulationFilterData(physx::PxFilterData{ static_cast<physx::PxU32>(0/*eColliderType*/), 0, 0, 0 });
+	m_pShape->setSimulationFilterData(physx::PxFilterData{ static_cast<physx::PxU32>(0/*ColliderType*/), 0, 0, 0 });
 	m_pShape->setQueryFilterData(physx::PxFilterData{static_cast<physx::PxU32>(1), 0, 0, 0});
 
 	_matrix RemoveScaleOriginMatrix = m_OriginTransformMatrix;

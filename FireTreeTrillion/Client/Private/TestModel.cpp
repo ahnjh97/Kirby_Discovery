@@ -45,24 +45,13 @@ HRESULT CTestModel::Initialize(void* pArg)
     m_pRigidBodyCom->PlayerController(_float3(0.f, 1.5f, 0.f));
 
 
-    // 예시코드 1 : 태양광
-    LIGHT_DESC			LightDesc{};
-    LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
-    LightDesc.vDirection = _float4(0.f, -1.f, 0.f, 0.f);
-
-    LightDesc.vDiffuse = _float4(0.25f, 0.36f, 0.6f, 1.f);
-    LightDesc.vAmbient = _float4(0.6f, 0.6f, 0.6f, 1.f);
-    LightDesc.vSpecular = _float4(0.2f, 0.2f, 0.2f, 1.f);
-
-    if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
-        return E_FAIL;
 
     m_iTestAnim = 0;
     m_pModelCom->Set_Animation(m_iTestAnim, true);
 
 
-
     // 예시코드 2 : 따라다니게 하기 예시 코드 + 점 광원 예시 코드
+    LIGHT_DESC			LightDesc{};
     LightDesc.eType = LIGHT_DESC::TYPE_POINT;
     LightDesc.vPosition = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
     LightDesc.fRange = 5.f;
@@ -75,9 +64,7 @@ HRESULT CTestModel::Initialize(void* pArg)
     m_pLight = CGameInstance::Get_Instance()->Get_LightLastAddress();
     Safe_AddRef(m_pLight);
 
-
     return S_OK;
-
 }
 
 _int CTestModel::Tick(_float fTimeDelta)
