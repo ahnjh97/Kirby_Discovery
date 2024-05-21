@@ -34,13 +34,13 @@ _bool CFSM::ChangeState(_uint iState, _float _fAnimSpeed, _bool _bLoop, _bool _b
 	auto pNextState = Find_State(iState);
 	CHECK_NULLPTR(pNextState);
 
-	if (m_pCurrent_State == pNextState)
-		return false;
+	//if (m_pCurrent_State == pNextState)
+	//	return false;
 
 	// ============ 상태가 변경되었다면 ============
 	// 이전 상태 Terminate
 	m_pCurrent_State->OnStateExit();
-	pNextState->OnStateEnter(m_pModel, _fAnimSpeed, _bLoop, _bInterpolation);
+	pNextState->OnStateEnter(m_pModel, iState, _fAnimSpeed, _bLoop, _bInterpolation);
 
 	m_pCurrent_State = pNextState;
 	m_iPreState = iState;

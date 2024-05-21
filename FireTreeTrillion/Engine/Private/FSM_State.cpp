@@ -8,9 +8,9 @@ CFSM_State::CFSM_State()
 
 }
 
-void CFSM_State::OnStateEnter(class CModel* _pModel, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CFSM_State::OnStateEnter(class CModel* _pModel, _uint iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
 {
-	_pModel->Set_Animation(m_uState, _bLoop, _bInterpolation);
+	_pModel->Set_Animation(iAnimIndex, _bLoop, _bInterpolation);
 }
 
 void CFSM_State::Free()
