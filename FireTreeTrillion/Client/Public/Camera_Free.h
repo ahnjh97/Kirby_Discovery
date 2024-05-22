@@ -45,7 +45,7 @@ private:
 
 	CTransform*		m_pTarget = { nullptr };
 	_bool			m_bTrackTarget = { false };
-
+	_float			m_fTrackDistance = { 8.f };
 	void			Track_Target(_float fTimeDelta);
 
 	//Vector3			m_vOrbitPos = { 0.f, 0.f, 0.f };

@@ -122,7 +122,7 @@ void CCamera_Free::Track_Target(_float fTimeDelta)
 	_float4 vTargetPos = m_pTarget->Get_State(CTransform::STATE_POSITION);
 	_float4 vBackDir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 	vBackDir.Normalize();
-	vBackDir *= 8.f;
+	vBackDir *= m_fTrackDistance;
 
 	_float4 vCurPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
@@ -165,6 +165,10 @@ void CCamera_Free::Control(_float fTimeDelta)
 		if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMMS_WHEEL))
 		{
 			m_pTransformCom->Go_Straight(fTimeDelta * MouseMove * m_fMouseSensor * .5f);
+
+
+			if (m_pTarget != nullptr && m_bTrackTarget)
+				m_fTrackDistance -= MouseMove*.01f ;
 		}
 
 		//¿œ¥‹ æ»æ∏
