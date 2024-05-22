@@ -73,6 +73,18 @@
     <Filter Include="02.GameObjects\Player\Kirby">
       <UniqueIdentifier>{f4444bba-a36c-4a3e-9327-ac76df48dd6f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\MapObject">
+      <UniqueIdentifier>{622ad96e-ae2a-4d0b-9db5-02f0e2a963da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.LevelObject">
+      <UniqueIdentifier>{e237edad-805f-41cf-9f2b-dd1d6905fb4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.LevelObject\LEVEL_TOOL_MAP">
+      <UniqueIdentifier>{00d342cd-c9ef-457f-b16f-658f1dc8ee54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.LevelObject\LEVEL_TOOL_MAP\Trigger">
+      <UniqueIdentifier>{09de3c6b-ff8f-4410-adc7-500c0e1de82d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -147,6 +159,9 @@
     <ClInclude Include="..\Public\TestTerrain.h">
       <Filter>02.GameObjects\_TestModel</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Trigger.h">
+      <Filter>03.LevelObject\LEVEL_TOOL_MAP\Trigger</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -208,6 +223,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\TestTerrain.cpp">
       <Filter>02.GameObjects\_TestModel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Trigger.cpp">
+      <Filter>03.LevelObject\LEVEL_TOOL_MAP\Trigger</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
