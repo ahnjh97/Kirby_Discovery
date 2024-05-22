@@ -8,6 +8,7 @@ class CModel;
 class CShader;
 class CTexture;
 class CFSM;
+class CCharacterController;
 END
 
 BEGIN(Client)
@@ -60,6 +61,10 @@ private:
 	void			Setting_KirbyBalance();
 	void			Key_Input(_float fTimeDelta);
 
+public:
+	void			SetOn_Slope(_float fTimeDelta);
+	void			Lerp_UpVector(_fvector _vOriginUp, _fvector _vTargetUp, _float _maxAngle, _float fTimeDelta);
+
 private:
 	HRESULT			Add_Components();
 	HRESULT			Bind_ShaderResources();
@@ -69,8 +74,10 @@ private:
 	// FSM
 	void			SetUp_FSM();
 	void			Change_State(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
+	
 	// Player FSM 및 Jump 관련 변수들
 	CFSM*			m_pFSM = { nullptr };
+
 	// 애니메이션 상태 제어를 한다.
 	//STATE			m_eCurrentState = { STATE_END };
 
@@ -81,17 +88,22 @@ private:
 
 private:
 	// 몸에 따라 모델이 달라진다.
-	CModel*			m_pModelCom[BODY_END] = {nullptr};
+	CModel*					m_pModelCom[BODY_END] = {nullptr};
 	// 눈 텍스쳐
-	CTexture*		m_pEyeTexture[EYE_END] = { nullptr };
+	CTexture*				m_pEyeTexture[EYE_END] = { nullptr };
 	// 입 텍스쳐
-	CTexture*		m_pMouthTexture[MOUTH_END] = { nullptr };
-	CShader*		m_pShaderCom = { nullptr };
-	class CCamera_Free* m_pCamera = { nullptr };
+	CTexture*				m_pMouthTexture[MOUTH_END] = { nullptr };
+	CShader*				m_pShaderCom = { nullptr };
+	class CCamera_Free*		m_pCamera = { nullptr };
+	CCharacterController*	m_pControllerCom = { nullptr };
+
 	KIRBY_INFODESC  m_tKirbyInfo;
 
+	_int			m_iTestAnim = { 0 };
+	_bool			m_isJump = { false };
+	_float			m_fJumpVelocity = { 0.f };
+	_float			m_fOffsetTurn = { 7.f };
 
-	_int			m_itestAnim = { 0 };
 
 public:
 	static CKirby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

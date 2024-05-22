@@ -73,6 +73,12 @@ _int CKirby::Tick(_float fTimeDelta)
 	// 키 입력에 대한 상태처리
 	Key_Input(fTimeDelta);
 
+	// 점프용 velocity(속도)
+	m_fJumpVelocity -= GRAVITY * fTimeDelta;
+	if (true == m_isJump)
+		m_isJump = m_pControllerCom->Jump(m_pTransformCom, m_fJumpVelocity, fTimeDelta);
+	else
+		m_pControllerCom->FreeFall(m_pTransformCom, fTimeDelta);
 
 
 	// FSM 제어
@@ -86,7 +92,9 @@ void CKirby::Late_Tick(_float fTimeDelta)
 {
 	m_pModelCom[m_eBodyState]->Play_Animation(fTimeDelta);
 
-//	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
+	SetOn_Slope(fTimeDelta);
+
+	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
@@ -219,17 +227,17 @@ void CKirby::Key_Input(_float fTimeDelta)
 	//Test
 	if (m_pGameInstance->Get_DIKeyState(DIK_P, KEY_DOWN))
 	{
-		m_itestAnim++;
-		m_pModelCom[m_eBodyState]->Set_Animation(m_itestAnim, true, true);
+		m_iTestAnim++;
+		m_pModelCom[m_eBodyState]->Set_Animation(m_iTestAnim, true, true);
 		m_pModelCom[m_eBodyState]->Set_TickPerSecond(60.f);
 
 	}
 	else if (m_pGameInstance->Get_DIKeyState(DIK_O, KEY_DOWN))
 	{
-		m_itestAnim--;
-		if (m_itestAnim < 0)
-			m_itestAnim = 0;
-		m_pModelCom[m_eBodyState]->Set_Animation(m_itestAnim, true, true);
+		m_iTestAnim--;
+		if (m_iTestAnim < 0)
+			m_iTestAnim = 0;
+		m_pModelCom[m_eBodyState]->Set_Animation(m_iTestAnim, true, true);
 		m_pModelCom[m_eBodyState]->Set_TickPerSecond(60.f);
 
 	}
@@ -237,26 +245,58 @@ void CKirby::Key_Input(_float fTimeDelta)
 	if (m_pGameInstance->Get_DIKeyState(DIK_0, KEY_DOWN))
 	{
 		m_eBodyState = BODY_DEFAULT;
-		m_pModelCom[m_eBodyState]->Set_Animation(m_itestAnim, true, true);
+		m_pModelCom[m_eBodyState]->Set_Animation(m_iTestAnim, true, true);
 		m_pModelCom[m_eBodyState]->Set_TickPerSecond(60.f);
 
 	}
 	else if (m_pGameInstance->Get_DIKeyState(DIK_9, KEY_DOWN))
 	{
 		m_eBodyState = BODY_BALLOON;
-		m_pModelCom[m_eBodyState]->Set_Animation(m_itestAnim, true, true);
+		m_pModelCom[m_eBodyState]->Set_Animation(m_iTestAnim, true, true);
 		m_pModelCom[m_eBodyState]->Set_TickPerSecond(60.f);
 
 	}
 	else if (m_pGameInstance->Get_DIKeyState(DIK_8, KEY_DOWN))
 	{
 		m_eBodyState = BODY_VACUUM;
-		m_pModelCom[m_eBodyState]->Set_Animation(m_itestAnim, true, true);
+		m_pModelCom[m_eBodyState]->Set_Animation(m_iTestAnim, true, true);
 		m_pModelCom[m_eBodyState]->Set_TickPerSecond(60.f);
 	}
 
-
+	// JUMP TEST
+	if (m_pGameInstance->Get_DIKeyState(DIK_SPACE, KEY_DOWN))
+	{
+		m_isJump = true;
+		m_fJumpVelocity = 5.f;
+	}
 }
+
+
+// ==================================== 커비 전용 ===================================
+void CKirby::SetOn_Slope(_float fTimeDelta)
+{
+	// 지면의 up벡터
+	PxVec3 slope = m_pControllerCom->Compute_Slope(m_pTransformCom);
+	_vector vTerrainNormal = CUtils::To_Vector(slope);
+
+	Lerp_UpVector(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), vTerrainNormal, 10.f, fTimeDelta);
+}
+
+/// <summary> 객체와 지면의 up벡터를 비교하여 객체의 각도를 보간한다. </summary>
+/// <param name="_vOriginUp"> 객체의 up 벡터 </param>
+/// <param name="_vTargetUp"> 지면의 노말 벡터 </param>
+/// <param name="_maxAngle"> 해당 각도보다 크면 각도 보간이 된다. </param>
+void CKirby::Lerp_UpVector(_fvector _vOriginUp, _fvector _vTargetUp, _float _maxAngle, _float fTimeDelta)
+{
+	_float fAngle = ::XMVectorGetX(::XMVector3AngleBetweenVectors(_vTargetUp, _vOriginUp));
+
+	if (fAngle >= XMConvertToRadians(_maxAngle))
+	{
+		_vector vRight = XMVector3Cross(XMVector3Normalize(_vOriginUp), XMVector3Normalize(_vTargetUp));
+		m_pTransformCom->Turn(vRight, fTimeDelta * fAngle * m_fOffsetTurn);
+	}
+}
+// ==========================================================================
 
 HRESULT CKirby::Add_Components()
 {
@@ -266,62 +306,69 @@ HRESULT CKirby::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
+	#pragma region Kirby Model
+		// 커비의 기본 상태 모델
+		hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_KirbyDefault"),
+			TEXT("Com_Model_Default"), (CComponent**)&m_pModelCom[BODY_DEFAULT]);
+		CHECK_FAILED(hr);
 
-	// For Kirby Model
+		// 커비의 빨아들이는 상태 모델
+		hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_KirbyVacuum"),
+			TEXT("Com_Model_Vacuum"), (CComponent**)&m_pModelCom[BODY_VACUUM]);
+		CHECK_FAILED(hr);
 
-	// 커비의 기본 상태 모델
-	hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_KirbyDefault"),
-		TEXT("Com_Model_Default"), (CComponent**)&m_pModelCom[BODY_DEFAULT]);
-	CHECK_FAILED(hr);
+		// 커비의 풍선 모드 상태 모델
+		hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_KirbyBalloon"),
+			TEXT("Com_Model_Balloon"), (CComponent**)&m_pModelCom[BODY_BALLOON]);
+		CHECK_FAILED(hr);
+	#pragma endregion
 
-	// 커비의 빨아들이는 상태 모델
-	hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_KirbyVacuum"),
-		TEXT("Com_Model_Vacuum"), (CComponent**)&m_pModelCom[BODY_VACUUM]);
-	CHECK_FAILED(hr);
+	#pragma region Kirby Eye
+		hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_idle"),
+			TEXT("Com_Texture_Eye_Idle"), (CComponent**)&m_pEyeTexture[EYE_IDLE]);
+		CHECK_FAILED(hr);
+		hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_doubt"),
+			TEXT("Com_Texture_Eye_Doubt"), (CComponent**)&m_pEyeTexture[EYE_SADNESS]);
+		CHECK_FAILED(hr);
+		hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_close"),
+			TEXT("Com_Texture_Eye_Close"), (CComponent**)&m_pEyeTexture[EYE_CLOSE]);
+		CHECK_FAILED(hr);
+		hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_blink"),
+			TEXT("Com_Texture_Eye_Blink"), (CComponent**)&m_pEyeTexture[EYE_BLINK]);
+		CHECK_FAILED(hr);
+		hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_anger"),
+			TEXT("Com_Texture_Eye_Anger"), (CComponent**)&m_pEyeTexture[EYE_ANGER]);
+		CHECK_FAILED(hr);
+		hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_pupil"),
+			TEXT("Com_Texture_Eye_Pupil"), (CComponent**)&m_pEyeTexture[EYE_PUPIL]);
+		CHECK_FAILED(hr);
+	#pragma endregion
 
-	// 커비의 풍선 모드 상태 모델
-	hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_KirbyBalloon"),
-		TEXT("Com_Model_Balloon"), (CComponent**)&m_pModelCom[BODY_BALLOON]);
-	CHECK_FAILED(hr);
+	#pragma region Kirby Mouth
+		hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_mouth_base"),
+			TEXT("Com_Texture_Mouth_Idle"), (CComponent**)&m_pMouthTexture[MONTH_IDLE]);
+		CHECK_FAILED(hr);
+		hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_mouth_anger"),
+			TEXT("Com_Texture_Mouth_Anger"), (CComponent**)&m_pMouthTexture[MOUTH_ANGER]);
+		CHECK_FAILED(hr);
+		hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_mouth_happy"),
+			TEXT("Com_Texture_Mouth_Happy"), (CComponent**)&m_pMouthTexture[MOUTH_HAPPY]);
+		CHECK_FAILED(hr);
+		hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_mouth_smile"),
+			TEXT("Com_Texture_Mouth_Smile"), (CComponent**)&m_pMouthTexture[MOUTH_SMILE]);
+		CHECK_FAILED(hr);
+		hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_mouth_surprise"),
+			TEXT("Com_Texture_Mouth_Surprise"), (CComponent**)&m_pMouthTexture[MOUTH_SURPRISE]);
+		CHECK_FAILED(hr);
+	#pragma endregion
 
-
-	// For Kirby Eye
-	hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_idle"),
-		TEXT("Com_Texture_Eye_Idle"), (CComponent**)&m_pEyeTexture[EYE_IDLE]);
-	CHECK_FAILED(hr);
-	hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_doubt"),
-		TEXT("Com_Texture_Eye_Doubt"), (CComponent**)&m_pEyeTexture[EYE_SADNESS]);
-	CHECK_FAILED(hr);
-	hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_close"),
-		TEXT("Com_Texture_Eye_Close"), (CComponent**)&m_pEyeTexture[EYE_CLOSE]);
-	CHECK_FAILED(hr);
-	hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_blink"),
-		TEXT("Com_Texture_Eye_Blink"), (CComponent**)&m_pEyeTexture[EYE_BLINK]);
-	CHECK_FAILED(hr);
-	hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_anger"),
-		TEXT("Com_Texture_Eye_Anger"), (CComponent**)&m_pEyeTexture[EYE_ANGER]);
-	CHECK_FAILED(hr);
-	hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_pupil"),
-		TEXT("Com_Texture_Eye_Pupil"), (CComponent**)&m_pEyeTexture[EYE_PUPIL]);
-	CHECK_FAILED(hr);
-
-
-	//For Kirby Mouth
-	hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_mouth_base"),
-		TEXT("Com_Texture_Mouth_Idle"), (CComponent**)&m_pMouthTexture[MONTH_IDLE]);
-	CHECK_FAILED(hr);
-	hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_mouth_anger"),
-		TEXT("Com_Texture_Mouth_Anger"), (CComponent**)&m_pMouthTexture[MOUTH_ANGER]);
-	CHECK_FAILED(hr);
-	hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_mouth_happy"),
-		TEXT("Com_Texture_Mouth_Happy"), (CComponent**)&m_pMouthTexture[MOUTH_HAPPY]);
-	CHECK_FAILED(hr);
-	hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_mouth_smile"),
-		TEXT("Com_Texture_Mouth_Smile"), (CComponent**)&m_pMouthTexture[MOUTH_SMILE]);
-	CHECK_FAILED(hr);
-	hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_mouth_surprise"),
-		TEXT("Com_Texture_Mouth_Surprise"), (CComponent**)&m_pMouthTexture[MOUTH_SURPRISE]);
-	CHECK_FAILED(hr);
+	/* For.Com_CharacterController */
+	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+	CCharacterController::CONTROLLER_DESC desc{};
+	desc.vInitialPos = vPos;
+	hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_CharacterController"),
+		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
+	m_pControllerCom->Set_PhysXObject(this);
 
 	/* FSM */
 	SetUp_FSM();
@@ -462,6 +509,8 @@ void CKirby::Free()
 		Safe_Release(pEyeTexture);
 	for (auto& pMouthTexture : m_pMouthTexture)
 		Safe_Release(pMouthTexture);
+
+	Safe_Release(m_pControllerCom);
 	Safe_Release(m_pCamera);
 	Safe_Release(m_pFSM);
 }

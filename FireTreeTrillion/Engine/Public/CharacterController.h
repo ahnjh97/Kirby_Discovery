@@ -37,6 +37,7 @@ public:
 public:
 	// 이동에 대한 함수
 	void			Move(class CTransform* pTransform, _float fSpeed, _float fTimeDelta);	// look방향으로 움직임
+	void			Move_Dir(class CTransform* pTransform, _fvector fDelta, _float fTimeDelta);
 	_bool			Jump(CTransform* pTransform, _float fFallVelocity, _float fTimeDelta);	// 점프
 	void			FreeFall(CTransform* pTransform, _float fTimeDelta);					// 자유 낙하
 	PxVec3			Compute_Slope(CTransform* pTransform);									// 경사면의 노말벡터 계산

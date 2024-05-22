@@ -72,7 +72,7 @@ void CKirbyDefault_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
 	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
-
+	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 
 	Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
 
@@ -88,8 +88,9 @@ void CKirbyDefault_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 	//Kirbydesc->m_vMoveDir = XMVector3Normalize(Kirbydesc->m_vMoveDir);
 	_vector vMoveDelta = Kirbydesc->m_vMoveDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
-	pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vMoveDelta);
+	//pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vMoveDelta);
 	pTransformCom->Turn(Kirbydesc->m_vMoveDir, 1.f, Kirbydesc->m_fZAngle);
+	pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
 }
 
 void CKirbyDefault_Idle_State::OnStateExit()
@@ -130,6 +131,8 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
 	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+
 
 	Kirbydesc->m_fMoveSpeed += fTimeDelta * 100.f;
 
@@ -141,7 +144,9 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	// 타겟기준
 	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 	_vector vMoveDelta = Kirbydesc->m_vTargetDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
-	pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vMoveDelta);
+	//pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vMoveDelta);
+	pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+
 
 	// 각도 (얼마나 벌어졌느냐)
 	_vector vLook = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);

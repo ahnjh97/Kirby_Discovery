@@ -108,6 +108,22 @@ void CCharacterController::Move(CTransform* pTransform, _float fSpeed, _float fT
 	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
 }
 
+void CCharacterController::Move_Dir(CTransform* pTransform, _fvector fDelta, _float fTimeDelta)
+{
+	PxVec3 movement(0.f);
+	movement += CUtils::To_PxVec3(fDelta);
+
+	PxControllerFilters filter;
+	PxControllerCollisionFlags collisionFlags = m_pController->move(movement, 0.001f, fTimeDelta, filter);
+
+	PxExtendedVec3 pxPos = m_pController->getPosition();
+	PxVec3 pos(pxPos.x, pxPos.y, pxPos.z);
+
+	_vector xmPos = XMVectorSet(pos.x, pos.y - m_fOffset, pos.z, 0.f);
+
+	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
+}
+
 
 /// <summary> Â«Çª </summary>
 /// <param name="pTransform"> °´Ã¼ÀÇ Transform </param>
