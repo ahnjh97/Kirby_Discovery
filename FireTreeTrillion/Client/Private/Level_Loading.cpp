@@ -35,34 +35,30 @@ void CLevel_Loading::Tick(_float fTimeDelta)
 
 	if (true == m_pLoader->IsFinished())
 	{
-		//if (GetKeyState(VK_SPACE) & 0x8000)
-		if (m_pGameInstance->Get_DIKeyState(DIK_SPACE, KEY_DOWN))
+		CLevel* pLevel = { nullptr };
+		m_pGameInstance->Set_CurrentLevelID((_uint)m_eNextLevelID);
+
+		switch (m_eNextLevelID)
 		{
-			CLevel*		pLevel = { nullptr };
-			m_pGameInstance->Set_CurrentLevelID((_uint)m_eNextLevelID);
+		case LEVEL_LOGO:
+			pLevel = CLevel_Logo::Create(m_pDevice, m_pContext);
+			break;
+		case LEVEL_GAMEPLAY:
+			pLevel = CLevel_GamePlay::Create(m_pDevice, m_pContext);
+			break;
+		case LEVEL_TOOL_FX:
+			pLevel = CLevel_Tool_FX::Create(m_pDevice, m_pContext);
+			break;
+		case LEVEL_TOOL_UI:
+			pLevel = CLevel_UITool::Create(m_pDevice, m_pContext);
+			break;
+		}
 
-			switch (m_eNextLevelID)
-			{
-			case LEVEL_LOGO:
-				pLevel = CLevel_Logo::Create(m_pDevice, m_pContext);
-				break;
-			case LEVEL_GAMEPLAY:
-				pLevel = CLevel_GamePlay::Create(m_pDevice, m_pContext);
-				break;
-			case LEVEL_TOOL_FX:
-				pLevel = CLevel_Tool_FX::Create(m_pDevice, m_pContext);
-				break;
-			case LEVEL_TOOL_UI:
-				pLevel = CLevel_UITool::Create(m_pDevice, m_pContext);
-				break;
-			}
+		if (nullptr == pLevel)
+			return;
 
-			if (nullptr == pLevel)
-				return;
-
-			if (FAILED(m_pGameInstance->Open_Level(m_eNextLevelID, pLevel)))
-				return;			
-		}		
+		if (FAILED(m_pGameInstance->Open_Level(m_eNextLevelID, pLevel)))
+			return;
 	}
 }
 
