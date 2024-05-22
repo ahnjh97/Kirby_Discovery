@@ -171,6 +171,8 @@
     <ClInclude Include="..\public\MultiEffect.h">
       <Filter>02.GameObjects\Effect\Multi</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby.h" />
+    <ClInclude Include="..\Public\TestModel_State.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -245,6 +247,8 @@
     <ClCompile Include="..\private\MultiEffect.cpp">
       <Filter>02.GameObjects\Effect\Multi</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Kirby.cpp" />
+    <ClCompile Include="..\Private\TestModel_State.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

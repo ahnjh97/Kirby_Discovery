@@ -205,10 +205,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             break;
 
             /* LEVEL Ãß°¡ */
-            case ID_32773: // LEVEL_GAMEPLAY
+            case ID_32773: // LEVEL_TOOL_FX
             {
                 HRESULT hr;
                 hr = pMainApp->Open_Level(LEVEL_TOOL_FX);
+                CHECK_FAILED(hr);
+            }
+            break;
+            case ID_32774: // LEVEL_TOOL_UI
+            {
+                HRESULT hr;
+                hr = pMainApp->Open_Level(LEVEL_TOOL_UI);
                 CHECK_FAILED(hr);
             }
             break;

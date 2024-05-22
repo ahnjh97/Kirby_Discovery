@@ -52,7 +52,6 @@ void CLevel_Loading::Tick(_float fTimeDelta)
 			case LEVEL_TOOL_FX:
 				pLevel = CLevel_Tool_FX::Create(m_pDevice, m_pContext);
 				break;
-
 			case LEVEL_TOOL_UI:
 				pLevel = CLevel_UITool::Create(m_pDevice, m_pContext);
 				break;

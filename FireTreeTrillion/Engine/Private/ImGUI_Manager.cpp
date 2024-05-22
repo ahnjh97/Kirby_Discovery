@@ -38,8 +38,8 @@ HRESULT CImGUI_Manager::Initialize(HWND hWnd, ID3D11Device* pGraphic_Device, ID3
 		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 	}
 
-	ImVec4 vPinkDark = { 0.5f, 0.18f, 0.37f, 1.0f };
-	ImVec4 vPink = { 0.75f, 0.18f, 0.37f, 1.0f };
+	ImVec4 vPinkDark = { 0.6f, 0.18f, 0.37f, 1.0f };
+	ImVec4 vPink = { 0.8f, 0.18f, 0.37f, 1.0f };
 	ImVec4 vPinkLight = { 1.0f, 0.18f, 0.37f, 1.0f };
 
 	//Å×µÎ¸®

@@ -188,6 +188,7 @@ HRESULT CLoader::Loading_For_Tool_FX()
 {
 	HRESULT hr;
 	LEVEL eLevel = LEVEL_TOOL_FX;
+
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
 	//if (FAILED(Add_Texture(eLevel, "Logo", "Logo/Logo.png")))
 	//	return E_FAIL;

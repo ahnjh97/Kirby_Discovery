@@ -88,7 +88,7 @@ protected:
 	_float			m_fStartDelay = { 0.f };
 
 	//필요한 버퍼, 텍스쳐, 마스크 텍스쳐 이름
-	wstring			m_strFXName = { TEXT("NONE") };
+	string			m_strFXName = { "NONE" };
 	wstring			m_strBufferTag = { TEXT("NONE") };
 	wstring			m_strTexTag = { TEXT("NONE") };
 	wstring			m_strMaskTexTag = { TEXT("NONE") };
@@ -97,9 +97,13 @@ protected:
 	_bool			m_bRender = { false };
 
 	//패스, 텍스쳐, 마스크 텍스쳐 인덱스
-	_uint			m_iPassIdx = { 0 };
-	_uint			m_iTexIdx = { 0 };
-	_uint			m_iMaskTexIdx = { 0 };
+	_int			m_iPassIdx = { 0 };
+
+	_int			m_iTexIdx = { 0 };
+	_int			m_iMaxTexIdx = { 1 };
+
+	_int			m_iMaskTexIdx = { 0 };
+	_int			m_iMaxMaskTexIdx = { 1 };
 
 	//재생 시 속성
 	_bool			m_bIsLoop = { false };

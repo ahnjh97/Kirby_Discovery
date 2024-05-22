@@ -26,8 +26,8 @@ public:
 
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
-	virtual _int Tick(_float fTimeDelta) override;
-	virtual void Late_Tick(_float fTimeDelta) override;
+	virtual _int Tick(_float _fTimeDelta) override;
+	virtual void Late_Tick(_float _fTimeDelta) override;
 	virtual HRESULT Render() override;
 	virtual void	Render_IMGUI() override;
 
@@ -112,8 +112,8 @@ private:
 
 	void Render_FXHierarchy();
 
-	void Render_FXProperty(_float _fTimeDelta);
-	void Render_FXPlayBar(_float _fTimeDelta);
+	void Render_FXProperty(_float __fTimeDelta);
+	void Render_FXPlayBar(_float __fTimeDelta);
 
 	void Render_MultiFXHierarchy();
 

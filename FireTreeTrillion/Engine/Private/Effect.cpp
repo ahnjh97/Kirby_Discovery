@@ -35,7 +35,7 @@ HRESULT CEffect::Initialize(void* pArg)
     m_bIsBloom = effectDesc.bIsBloom;
 
     //desc 읽어 기본 초기화
-    m_strFXName = CUtils::StrToWstr(effectDesc.strFXName);
+    m_strFXName = effectDesc.strFXName;
     m_strBufferTag = CUtils::StrToWstr(effectDesc.strBufferTag);
     m_strTexTag = CUtils::StrToWstr(effectDesc.strBufferTag);
     m_strMaskTexTag = CUtils::StrToWstr(effectDesc.strBufferTag);
