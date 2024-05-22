@@ -188,7 +188,7 @@ void CTestModel::Late_Tick(_float fTimeDelta)
 {
     m_pModelCom->Play_Animation(fTimeDelta);
 
-    SetOn_Slope();
+    SetOn_Slope(fTimeDelta);
 
     //PxVec3 slope = m_pRigidBodyCom->Compute_Slope();
 
@@ -257,12 +257,23 @@ void CTestModel::Render_IMGUI()
     }
 }
 
-void CTestModel::SetOn_Slope()
+void CTestModel::SetOn_Slope(_float fTimeDelta)
 {
     PxVec3 slope = m_pRigidBodyCom->Compute_Slope(m_pTransformCom);
     _vector vUp = CUtils::To_Vector(slope);
 
-    m_pTransformCom->Look_Up(vUp);
+    LerpUpVector(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), vUp, 10.f, fTimeDelta);
+}
+
+void CTestModel::LerpUpVector(_fvector _vOriginUp, _fvector _vTargetUp, _float _maxAngle, _float fTimeDelta)
+{
+    _float fAngle = ::XMVectorGetX(::XMVector3AngleBetweenVectors(_vTargetUp, _vOriginUp));
+
+    if (fAngle >= XMConvertToRadians(_maxAngle))
+    {
+        _vector vRight = XMVector3Cross(XMVector3Normalize(_vOriginUp), XMVector3Normalize(_vTargetUp));
+        m_pTransformCom->Turn(vRight, fTimeDelta * fAngle * 7.f);
+    }
 }
 
 HRESULT CTestModel::Add_Components()

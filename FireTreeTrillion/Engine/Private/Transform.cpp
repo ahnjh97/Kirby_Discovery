@@ -165,20 +165,6 @@ void CTransform::Rotation(_fvector vAxis, _float fRadian)
 	}
 }
 
-void CTransform::Look_Up(_fvector _vUp)
-{
-	_vector vUp = _vUp;
-	_vector vRight = XMVector3Cross(vUp, Get_State_Vector(STATE_LOOK));
-	_vector vLook = XMVector3Cross(vRight, vUp);
-
-	_float3		vScaled = Get_Scaled();
-
-	Set_State(STATE_RIGHT, XMVector3Normalize(vRight) * vScaled.x);
-	Set_State(STATE_UP, XMVector3Normalize(vUp) * vScaled.y);
-	Set_State(STATE_LOOK, XMVector3Normalize(vLook) * vScaled.z);
-
-}
-
 CTransform * CTransform::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
 	CTransform*		pInstance = new CTransform(pDevice, pContext);

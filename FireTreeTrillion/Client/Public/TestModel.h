@@ -32,7 +32,8 @@ public:
 	virtual HRESULT Render_LightDepth() override;
 	virtual void Render_IMGUI() override;
 
-	void SetOn_Slope();
+	void SetOn_Slope(_float fTimeDelta);
+	void LerpUpVector(_fvector _vOriginUp, _fvector _vTargetUp, _float _maxAngle, _float fTimeDelta);
 
 private:
 	HRESULT Add_Components();
