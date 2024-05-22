@@ -34,9 +34,8 @@ public:
 	virtual void	Render_IMGUI()				 override;
 
 public:
-	//void SetOn_Slope();
 	void SetOn_Slope(_float fTimeDelta);
-	void LerpUpVector(_fvector _vOriginUp, _fvector _vTargetUp, _float _maxAngle, _float fTimeDelta);
+	void Lerp_UpVector(_fvector _vOriginUp, _fvector _vTargetUp, _float _maxAngle, _float fTimeDelta);
 
 private:
 	HRESULT Add_Components();
@@ -54,9 +53,9 @@ private:
 
 	_int		m_iTestAnim = { 0 };
 	_bool		m_isJump = { false };
+	_float		m_fJumpVelocity = { 0.f };
+	_float		m_fOffsetTurn = { 7.f };
 
-	_float		m_fSpeed = { 0.f };
-	_float		m_fFallVelocity = { 0.f };
 	_vector		m_vPos = {};
 
 public:

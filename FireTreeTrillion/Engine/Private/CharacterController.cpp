@@ -87,6 +87,10 @@ _float4 CCharacterController::Get_FootPosition()
 	return _float4{(_float)vPos.x, (_float)vPos.y, (_float)vPos.z, 1.f};
 }
 
+
+/// <summary> 객체의 Look방향으로 '이동'하는 함수 </summary>
+/// <param name="pTransform"> 객체의 Transform </param>
+/// <param name="fSpeed"> 이동 속도 </param>
 void CCharacterController::Move(CTransform* pTransform, _float fSpeed, _float fTimeDelta)
 {
 	PxVec3 movement(0.f);
@@ -99,52 +103,55 @@ void CCharacterController::Move(CTransform* pTransform, _float fSpeed, _float fT
 	PxExtendedVec3 pxPos = m_pController->getPosition();
 	PxVec3 pos(pxPos.x, pxPos.y, pxPos.z);
 
-	_vector xmPos = XMVectorSet(pos.x, pos.y - 0.5f, pos.z, 0.f);
+	_vector xmPos = XMVectorSet(pos.x, pos.y - m_fOffset, pos.z, 0.f);
 
 	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
 }
 
+
+/// <summary> 짬푸 </summary>
+/// <param name="pTransform"> 객체의 Transform </param>
+/// <param name="fFallVelocity"> 떨어지는 속도 </param>
+/// <returns> 점프 상태 유무값 </returns>
 _bool CCharacterController::Jump(CTransform* pTransform, _float fFallVelocity, _float fTimeDelta)
 {
-	//fFallVelocity -= 9.81f * fTimeDelta;
-
-	if (m_fFallVelocity < -1000.f)
-		m_fFallVelocity = -10.f;
-
+	// 이동
 	PxVec3 moveVector = PxVec3(0.f, fFallVelocity, 0.f) * fTimeDelta;
 	PxControllerCollisionFlags collisionFlags = m_pController->move(moveVector, 0.001f, fTimeDelta, PxControllerFilters());
-	//Go_Straight(pTransform, 5.f, fTimeDelta);
 
+	// 객체의 충돌 상태 받아오기
 	PxControllerState m_pPxState;
-
 	m_pController->getState(m_pPxState);
 
+	// 지면 판정, 천장 판정 처리
 	if (m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_DOWN || m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_UP)
 	{
 		fFallVelocity = 0.f;
 		return false;
 	}
 
+	// 객체의 위치 받아오기
 	PxExtendedVec3 pxPos = m_pController->getPosition();
 	PxVec3 pos(pxPos.x, pxPos.y, pxPos.z);
 
-	_vector xmPos = XMVectorSet(pos.x, pos.y - 0.5f, pos.z, 0.f);
+	// 객체 FOOT POSITION 조정 using OFFSET
+	_vector xmPos = XMVectorSet(pos.x, pos.y - m_fOffset, pos.z, 0.f);
 
+	// 객체 위치 지정
 	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
 
 	return true;
 }
 
+
+/// <summary> 자 유 낙 하 </summary>
 void CCharacterController::FreeFall(CTransform* pTransform, _float fTimeDelta)
 {
-	m_fFallVelocity -= 9.81f * fTimeDelta;
-
-	if (m_fFallVelocity < -1000.f)
-		m_fFallVelocity = -10.f;
+	// 자유낙하용 velocity
+	m_fFallVelocity -= GRAVITY * fTimeDelta;
 
 	PxVec3 moveVector = PxVec3(0.f, m_fFallVelocity, 0.f) * fTimeDelta;
 	PxControllerCollisionFlags collisionFlags = m_pController->move(moveVector, 0.001f, fTimeDelta, PxControllerFilters());
-	//Go_Straight(pTransform, 5.f, fTimeDelta);
 
 	PxControllerState m_pPxState;
 	m_pController->getState(m_pPxState);
@@ -160,9 +167,14 @@ void CCharacterController::FreeFall(CTransform* pTransform, _float fTimeDelta)
 	_vector xmPos = XMVectorSet(pos.x, pos.y - 0.5f, pos.z, 0.f);
 
 	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
-
 }
 
+
+/// <summary>
+/// 해당 character가 서있는 지면의 노말벡터의 평균값을 구하여 뱉는다.
+/// </summary>
+/// <param name="pTransform"> 해당 character의 트랜스폼 </param>
+/// <returns> 지면의 노말벡터 </returns>
 PxVec3 CCharacterController::Compute_Slope(CTransform* pTransform)
 {
 	PxExtendedVec3 position = m_pController->getPosition();
@@ -176,67 +188,33 @@ PxVec3 CCharacterController::Compute_Slope(CTransform* pTransform)
 	PxVec3 right = CUtils::To_PxVec3(vRight * 0.5f);
 	PxVec3 look = CUtils::To_PxVec3(vLook * 0.5f);
 
-	// 오른쪽, 왼쪽 레이캐스트
-	PxVec3 rayOriginRight = rayOrigin + right;
-	PxVec3 rayOriginLeft = rayOrigin - right;
-
-	// 앞, 뒤 레이캐스트
-	PxVec3 rayOriginFront = rayOrigin + look;
-	PxVec3 rayOriginBack = rayOrigin - look;
+	// 객체 중심 위치에서 동서남북방향으로 살짝 움직인 position을 지정
+	PxVec3 rayOriginRight = rayOrigin + right;	// 오른쪽, 왼쪽 레이캐스트
+	PxVec3 rayOriginLeft  = rayOrigin - right;
+	PxVec3 rayOriginFront = rayOrigin + look;	// 앞, 뒤 레이캐스트
+	PxVec3 rayOriginBack  = rayOrigin - look;
 
 	PxVec3 rayDirection = PxVec3(0.f, -1.f, 0.f);
-	_float maxDistance = 1.f;
-
+	_float fMaxDistance = 1.f;
+	
 	PxVec3	normal = { 0.f, 0.f, 0.f };
-
-	normal += TerrainRayCast_Collision(rayOriginRight, rayDirection, maxDistance);
-
-	normal += TerrainRayCast_Collision(rayOriginLeft, rayDirection, maxDistance);
-
-	normal += TerrainRayCast_Collision(rayOriginFront, rayDirection, maxDistance);
-
-	normal += TerrainRayCast_Collision(rayOriginBack, rayDirection, maxDistance);
-
+	normal += TerrainRayCast_Collision(rayOriginRight, rayDirection, fMaxDistance);
+	normal += TerrainRayCast_Collision(rayOriginLeft,  rayDirection, fMaxDistance);
+	normal += TerrainRayCast_Collision(rayOriginFront, rayDirection, fMaxDistance);
+	normal += TerrainRayCast_Collision(rayOriginBack,  rayDirection, fMaxDistance);
+	
 	normal.normalize();
 	return normal;
-
-	//_bool isRayCastLeft = m_pGameInstance->Get_Scene()->raycast(rayOriginLeft, rayDirection, maxDistance, hitBuffer, PxHitFlag::eNORMAL, filterData);
-	//// 충돌이 발생한 경우 법선 벡터 반환
-	//if (isRayCastLeft && hitBuffer.hasBlock)
-	//{
-	//	hit = hitBuffer.block;
-
-	//	normal += hit.normal;
-	//}
-
-	//_bool isRayCastFront = m_pGameInstance->Get_Scene()->raycast(rayOriginFront, rayDirection, maxDistance, hitBuffer, PxHitFlag::eNORMAL, filterData);
-	//// 충돌이 발생한 경우 법선 벡터 반환
-	//if (isRayCastLeft && hitBuffer.hasBlock)
-	//{
-	//	hit = hitBuffer.block;
-
-	//	normal += hit.normal;
-	//}
-
-	//_bool isRayCastBack = m_pGameInstance->Get_Scene()->raycast(rayOriginBack, rayDirection, maxDistance, hitBuffer, PxHitFlag::eNORMAL, filterData);
-	//// 충돌이 발생한 경우 법선 벡터 반환
-	//if (isRayCastLeft && hitBuffer.hasBlock)
-	//{
-	//	hit = hitBuffer.block;
-
-	//	normal += hit.normal;
-	//}
-
-
-	//if (false == isRayCastRight && false == isRayCastLeft)
-	//	return PxVec3(0.0f, 1.0f, 0.0f);
-	//else
-	//{
-	//	normal.normalize();
-	//	return normal;
-	//}
 }
 
+/// <summary>
+/// 1. 'Character의 특정 위치'에서 지면으로부터 rayCast를 실행한다.
+/// 2. rayCast로 'Terrain의 노말벡터'를 뽑는다.
+/// </summary>
+/// <param name="_rayOrigin"> Character의 특정 위치 </param>
+/// <param name="_rayDirection"> raycast 방향벡터 </param>
+/// <param name="_fMaxDistance"> raycast가 실행되는 최대 길이 </param>
+/// <returns> Terrain의 노말벡터 </returns>
 PxVec3 CCharacterController::TerrainRayCast_Collision(PxVec3 _rayOrigin, PxVec3 _rayDirection, _float _fMaxDistance)
 {
 	PxRaycastHit hit;
@@ -248,7 +226,6 @@ PxVec3 CCharacterController::TerrainRayCast_Collision(PxVec3 _rayOrigin, PxVec3 
 	if (isRayCast && hitBuffer.hasBlock)
 	{
 		hit = hitBuffer.block;
-
 		return hit.normal;
 	}
 	else
