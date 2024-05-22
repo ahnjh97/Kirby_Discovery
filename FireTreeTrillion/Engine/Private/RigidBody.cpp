@@ -130,7 +130,6 @@ void CRigidBody::Create_Actor()
 	physx::PxRigidBodyExt::updateMassAndInertia(*m_pActor, m_fDensity);
 }
 
-
 void CRigidBody::SetUp_Actor()
 {
 	if (m_bTrigger)
@@ -242,7 +241,6 @@ void CRigidBody::PlayerController(_float3 vPos)
 void CRigidBody::Go_Straight(CTransform* pTransform, _float fSpeed, _float fTimeDelta)
 {
 	PxVec3 movement(0.f);
-	//movement.z += fSpeed * fTimeDelta;
 	_vector vLook = pTransform->Get_State_Vector(CTransform::STATE_LOOK);
 	movement += CUtils::To_PxVec3(XMVector3Normalize(vLook)) * fSpeed * fTimeDelta;
                 
@@ -257,6 +255,7 @@ void CRigidBody::Go_Straight(CTransform* pTransform, _float fSpeed, _float fTime
 	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
 }
 
+//[JS]
 _bool CRigidBody::Jump(CTransform* pTransform, _float fFallVelocity, _float fTimeDelta)
 {
 	//fFallVelocity -= 9.81f * fTimeDelta;
@@ -280,7 +279,6 @@ _bool CRigidBody::Jump(CTransform* pTransform, _float fFallVelocity, _float fTim
 
 	PxExtendedVec3 pxPos = m_pCapsuleController->getPosition();
 	PxVec3 pos(pxPos.x, pxPos.y, pxPos.z);
-
 	_vector xmPos = XMVectorSet(pos.x, pos.y - 0.5f, pos.z, 0.f);
 
 	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));

@@ -16,14 +16,18 @@ CCharacterController::CCharacterController(const CCharacterController& rhs)
 
 HRESULT CCharacterController::Initialize(void* pArg)
 {
+	CONTROLLER_DESC* pDes = (CONTROLLER_DESC*)pArg;
+	_float4 vInitialPos = pDes->vInitialPos;
+	
 	__super::Initialize(pArg);
 
 	PxMaterial* material = m_pGameInstance->Get_Physics()->createMaterial(0.5f, 0.5f, 0.5f);
 	m_tControllerDesc.material = material;
 	m_tControllerDesc.upDirection = { 0.f, 1.f, 0.f };
 	m_tControllerDesc.density = 100.f;
-
+	m_tControllerDesc.position = PxExtendedVec3(vInitialPos.x, vInitialPos.y, vInitialPos.z);
 	m_ControllerFilters.mFilterData = &m_tFilterDesc;
+
 	if (pArg == nullptr)
 		Set_DefaultValue();
 
@@ -52,7 +56,7 @@ void CCharacterController::Render_IMGUI()
 	ImGui::InputFloat("stepOffset", &m_tControllerDesc.stepOffset);
 	ImGui::InputFloat("maxJumpHeight", &m_tControllerDesc.maxJumpHeight);
 
-	//ReCreateController (for change shape or scale)
+	//ReCreate this Controller (for change shape or scale)
 	if (ImGui::Button("Update Changes"))
 	{
 		Create_Controller();
@@ -83,10 +87,11 @@ _float4 CCharacterController::Get_FootPosition()
 	return _float4{(_float)vPos.x, (_float)vPos.y, (_float)vPos.z, 1.f};
 }
 
-void CCharacterController::Test(CTransform* pTransform, _float fSpeed, _float fTimeDelta)
+void CCharacterController::Move(CTransform* pTransform, _float fSpeed, _float fTimeDelta)
 {
 	PxVec3 movement(0.f);
-	movement.z += fSpeed * fTimeDelta;
+	_vector vLook = pTransform->Get_State_Vector(CTransform::STATE_LOOK);
+	movement += CUtils::To_PxVec3(XMVector3Normalize(vLook)) * fSpeed * fTimeDelta;
 
 	PxControllerFilters filter;
 	PxControllerCollisionFlags collisionFlags = m_pController->move(movement, 0.001f, fTimeDelta, filter);
@@ -94,29 +99,163 @@ void CCharacterController::Test(CTransform* pTransform, _float fSpeed, _float fT
 	PxExtendedVec3 pxPos = m_pController->getPosition();
 	PxVec3 pos(pxPos.x, pxPos.y, pxPos.z);
 
-	XMVECTOR xmPos = XMVectorSet(pos.x, pos.y, pos.z, 0.f);
+	_vector xmPos = XMVectorSet(pos.x, pos.y - 0.5f, pos.z, 0.f);
 
 	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
 }
 
-void CCharacterController::Move(CTransform* pTransform, _float fTimeDelta)
+_bool CCharacterController::Jump(CTransform* pTransform, _float fFallVelocity, _float fTimeDelta)
 {
-	m_fFallVelocity -= m_fFallAcceleration * fTimeDelta * 50.f;
+	//fFallVelocity -= 9.81f * fTimeDelta;
 
 	if (m_fFallVelocity < -1000.f)
 		m_fFallVelocity = -10.f;
-	
-	m_pController->move(PxVec3(0.f, 1.f, 0.f) * fTimeDelta * m_fFallVelocity, 0, fTimeDelta, PxControllerFilters());
 
-	Test(pTransform, 5.f, fTimeDelta);
+	PxVec3 moveVector = PxVec3(0.f, fFallVelocity, 0.f) * fTimeDelta;
+	PxControllerCollisionFlags collisionFlags = m_pController->move(moveVector, 0.001f, fTimeDelta, PxControllerFilters());
+	//Go_Straight(pTransform, 5.f, fTimeDelta);
+
+	PxControllerState m_pPxState;
+
+	m_pController->getState(m_pPxState);
+
+	if (m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_DOWN || m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_UP)
+	{
+		fFallVelocity = 0.f;
+		return false;
+	}
+
+	PxExtendedVec3 pxPos = m_pController->getPosition();
+	PxVec3 pos(pxPos.x, pxPos.y, pxPos.z);
+
+	_vector xmPos = XMVectorSet(pos.x, pos.y - 0.5f, pos.z, 0.f);
+
+	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
+
+	return true;
+}
+
+void CCharacterController::FreeFall(CTransform* pTransform, _float fTimeDelta)
+{
+	m_fFallVelocity -= 9.81f * fTimeDelta;
+
+	if (m_fFallVelocity < -1000.f)
+		m_fFallVelocity = -10.f;
+
+	PxVec3 moveVector = PxVec3(0.f, m_fFallVelocity, 0.f) * fTimeDelta;
+	PxControllerCollisionFlags collisionFlags = m_pController->move(moveVector, 0.001f, fTimeDelta, PxControllerFilters());
+	//Go_Straight(pTransform, 5.f, fTimeDelta);
 
 	PxControllerState m_pPxState;
 	m_pController->getState(m_pPxState);
 
 	if (m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_DOWN || m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_UP)
+	{
 		m_fFallVelocity = 0.f;
+	}
+
+	PxExtendedVec3 pxPos = m_pController->getPosition();
+	PxVec3 pos(pxPos.x, pxPos.y, pxPos.z);
+
+	_vector xmPos = XMVectorSet(pos.x, pos.y - 0.5f, pos.z, 0.f);
+
+	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
+
 }
 
+PxVec3 CCharacterController::Compute_Slope(CTransform* pTransform)
+{
+	PxExtendedVec3 position = m_pController->getPosition();
+	PxVec3 rayOrigin = PxVec3(position.x, position.y, position.z);
+
+	_vector vRight = pTransform->Get_State_Vector(CTransform::STATE_RIGHT);
+	vRight = XMVector3Normalize(vRight);
+	_vector vLook = pTransform->Get_State_Vector(CTransform::STATE_LOOK);
+	vLook = XMVector3Normalize(vLook);
+
+	PxVec3 right = CUtils::To_PxVec3(vRight * 0.5f);
+	PxVec3 look = CUtils::To_PxVec3(vLook * 0.5f);
+
+	// 오른쪽, 왼쪽 레이캐스트
+	PxVec3 rayOriginRight = rayOrigin + right;
+	PxVec3 rayOriginLeft = rayOrigin - right;
+
+	// 앞, 뒤 레이캐스트
+	PxVec3 rayOriginFront = rayOrigin + look;
+	PxVec3 rayOriginBack = rayOrigin - look;
+
+	PxVec3 rayDirection = PxVec3(0.f, -1.f, 0.f);
+	_float maxDistance = 1.f;
+
+	PxVec3	normal = { 0.f, 0.f, 0.f };
+
+	normal += TerrainRayCast_Collision(rayOriginRight, rayDirection, maxDistance);
+
+	normal += TerrainRayCast_Collision(rayOriginLeft, rayDirection, maxDistance);
+
+	normal += TerrainRayCast_Collision(rayOriginFront, rayDirection, maxDistance);
+
+	normal += TerrainRayCast_Collision(rayOriginBack, rayDirection, maxDistance);
+
+	normal.normalize();
+	return normal;
+
+	//_bool isRayCastLeft = m_pGameInstance->Get_Scene()->raycast(rayOriginLeft, rayDirection, maxDistance, hitBuffer, PxHitFlag::eNORMAL, filterData);
+	//// 충돌이 발생한 경우 법선 벡터 반환
+	//if (isRayCastLeft && hitBuffer.hasBlock)
+	//{
+	//	hit = hitBuffer.block;
+
+	//	normal += hit.normal;
+	//}
+
+	//_bool isRayCastFront = m_pGameInstance->Get_Scene()->raycast(rayOriginFront, rayDirection, maxDistance, hitBuffer, PxHitFlag::eNORMAL, filterData);
+	//// 충돌이 발생한 경우 법선 벡터 반환
+	//if (isRayCastLeft && hitBuffer.hasBlock)
+	//{
+	//	hit = hitBuffer.block;
+
+	//	normal += hit.normal;
+	//}
+
+	//_bool isRayCastBack = m_pGameInstance->Get_Scene()->raycast(rayOriginBack, rayDirection, maxDistance, hitBuffer, PxHitFlag::eNORMAL, filterData);
+	//// 충돌이 발생한 경우 법선 벡터 반환
+	//if (isRayCastLeft && hitBuffer.hasBlock)
+	//{
+	//	hit = hitBuffer.block;
+
+	//	normal += hit.normal;
+	//}
+
+
+	//if (false == isRayCastRight && false == isRayCastLeft)
+	//	return PxVec3(0.0f, 1.0f, 0.0f);
+	//else
+	//{
+	//	normal.normalize();
+	//	return normal;
+	//}
+}
+
+PxVec3 CCharacterController::TerrainRayCast_Collision(PxVec3 _rayOrigin, PxVec3 _rayDirection, _float _fMaxDistance)
+{
+	PxRaycastHit hit;
+	PxRaycastBuffer hitBuffer;
+	PxQueryFilterData filterData(PxQueryFlag::eSTATIC);
+
+	_bool isRayCast = m_pGameInstance->Get_Scene()->raycast(_rayOrigin, _rayDirection, _fMaxDistance, hitBuffer, PxHitFlag::eNORMAL, filterData);
+	// 충돌이 발생한 경우 법선 벡터 반환
+	if (isRayCast && hitBuffer.hasBlock)
+	{
+		hit = hitBuffer.block;
+
+		return hit.normal;
+	}
+	else
+		return PxVec3(0.0f, 1.0f, 0.0f);
+}
+
+// NOT YET
 //PxControllerCollisionFlags CCharacterController::Move(_float3 vVelocity, _float fTimeDelta, _float minDist)
 //{
 //	// Disp == direction * speed * delta(delta 시간 동안의 이동량)
@@ -125,12 +264,13 @@ void CCharacterController::Move(CTransform* pTransform, _float fTimeDelta)
 //	const physx::PxVec3 vDisp{vVelocity.x, vVelocity.y, vVelocity.z};
 //	return m_pController->move(vDisp, minDist, fTimeDelta, m_ControllerFilters);
 //}
-
-PxControllerCollisionFlags CCharacterController::MoveDisp(_float3 vPosDelta, _float fTimeDelta, _float minDist)
-{
-	const physx::PxVec3 vDisp{vPosDelta.x, vPosDelta.y, vPosDelta.z};
-	return m_pController->move(vDisp, minDist, fTimeDelta, m_ControllerFilters);
-}
+ 
+// NOT YET
+//PxControllerCollisionFlags CCharacterController::MoveDisp(_float3 vPosDelta, _float fTimeDelta, _float minDist)
+//{
+//	const physx::PxVec3 vDisp{vPosDelta.x, vPosDelta.y, vPosDelta.z};
+//	return m_pController->move(vDisp, minDist, fTimeDelta, m_ControllerFilters);
+//}
 
 _bool CCharacterController::Is_Activated()
 {
@@ -172,15 +312,28 @@ void CCharacterController::Create_Controller()
 {
 	Release_Controller();
 
-	m_pController = m_pGameInstance->Get_ControllerManager()->createController(m_tControllerDesc);
+	PxCapsuleControllerDesc capsuleDesc;
+	capsuleDesc.position = PxExtendedVec3(0.f, 10.f, 0.f);
+	capsuleDesc.radius = 0.5f; // 반지름
+	capsuleDesc.height = 0.1f; // 높이
+	capsuleDesc.stepOffset = 0.f;
+	capsuleDesc.volumeGrowth = 1.0f;
+	capsuleDesc.slopeLimit = cosf(XMConvertToRadians(15.f)); // 15 degrees
+	capsuleDesc.upDirection = PxVec3(0, 1, 0);
+	capsuleDesc.contactOffset = 0.001f;
+	PxMaterial* material = m_pGameInstance->Get_Material();
+	material = m_pGameInstance->Get_Physics()->createMaterial(0.5f, 0.5f, 0.5f);
+	capsuleDesc.material = material;
 
-	PxShape* shape;
-	m_pController->getActor()->getShapes(&shape, 1);
-	shape->setSimulationFilterData(physx::PxFilterData{ static_cast<physx::PxU32>(0/*ColliderType*/), 0, 0, 0 });
-	shape->setQueryFilterData(physx::PxFilterData{static_cast<physx::PxU32>(1), 0, 0, 0});
-	m_pController->getActor()->userData = this;
+	m_pController = m_pGameInstance->Get_ControllerManager()->createController(capsuleDesc);
 
-	m_pGameInstance->RemoveActor(*m_pController->getActor());
+	//PxShape* shape;
+	//m_pController->getActor()->getShapes(&shape, 1);
+	//shape->setSimulationFilterData(physx::PxFilterData{ static_cast<physx::PxU32>(0/*ColliderType*/), 0, 0, 0 });
+	//shape->setQueryFilterData(physx::PxFilterData{static_cast<physx::PxU32>(1), 0, 0, 0});
+	//m_pController->getActor()->userData = this;
+
+	//m_pGameInstance->RemoveActor(*m_pController->getActor());
 
 	if (m_pObject != nullptr)
 		Set_FootPosition(m_pObject->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION));
@@ -188,7 +341,9 @@ void CCharacterController::Create_Controller()
 
 void CCharacterController::Release_Controller()
 {
-	if (m_pController)
+	//if (nullptr == m_pGameInstance->Get_Scene()) return;
+
+	if (nullptr != m_pController)
 	{
 		if (m_pController->getActor()->getScene())
 			m_pGameInstance->RemoveActor(*m_pController->getActor());
@@ -198,10 +353,18 @@ void CCharacterController::Release_Controller()
 
 void CCharacterController::Set_DefaultValue()
 {
-	m_tControllerDesc.radius = 0.5f;
-	m_tControllerDesc.height = 1.f;
+	m_tControllerDesc.stepOffset = 0.f;
+	m_tControllerDesc.volumeGrowth = 1.0f;
+	m_tControllerDesc.upDirection = PxVec3(0, 1, 0);
+	PxMaterial* material = m_pGameInstance->Get_Material();
+	material = m_pGameInstance->Get_Physics()->createMaterial(0.5f, 0.5f, 0.5f);
+	m_tControllerDesc.material = material;
+
+
+
+	m_tControllerDesc.radius = 0.5f; // 반지름
+	m_tControllerDesc.height = 1.f;	 // 높이
 	m_tControllerDesc.contactOffset = 0.1f;
-	m_tControllerDesc.density = 100.f;
 	m_fSlopeLimitDegree = 45.f;     
 	m_tControllerDesc.slopeLimit = cosf(XMConvertToRadians(m_fSlopeLimitDegree));
 	m_tControllerDesc.stepOffset = 0.1f;
@@ -213,8 +376,6 @@ void CCharacterController::Free()
 	__super::Free();
 
 	Release_Controller();
-
-	Safe_Release(m_pObject);
 }
 
 CCharacterController* CCharacterController::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

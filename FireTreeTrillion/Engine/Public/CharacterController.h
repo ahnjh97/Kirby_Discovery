@@ -5,19 +5,19 @@ BEGIN(Engine)
 
 class ENGINE_DLL CCharacterController : public CComponent
 {
+public:
+	struct CONTROLLER_DESC
+	{
+		_float4 vInitialPos;
+	};
+
 protected:
 	CCharacterController(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CCharacterController(const CCharacterController& rhs);
 	virtual ~CCharacterController() = default;
 
 public:
-	virtual HRESULT Initialize(void* pArg)	override;
-	virtual void	Start_Tick()			override;
-	virtual void	Render_IMGUI()			override;
-
-public:
 	void			Set_PhysXObject(class CGameObject* _pObj) { m_pObject = _pObj; }
-
 	// 갑자기 위치값이 변화되는 경우 사용하시오.(ex. 텔레포트 등)
 	void			Set_Position(const _float4& vPos);
 	// 발 위치값 지정
@@ -26,19 +26,28 @@ public:
 	_float4			Get_Position();
 	_float4			Get_FootPosition();
 
+	void			Get_ShapeInfo(physx::PxCapsuleGeometry& CapsuleGeo, physx::PxTransform& pxTransform);
+	_float			Get_Radius() const { return m_tControllerDesc.radius; }
+
+public:
+	virtual HRESULT Initialize(void* pArg)	override;
+	virtual void	Start_Tick()			override;
+	virtual void	Render_IMGUI()			override;
+
+public:
 	// 이동에 대한 함수
-	void Test(class CTransform* pTransform, _float fSpeed, _float fTimeDelta);
-	void Move(class CTransform* pTransform, _float fTimeDelta);
+	void			Move(class CTransform* pTransform, _float fSpeed, _float fTimeDelta);	// look방향으로 움직임
+	_bool			Jump(CTransform* pTransform, _float fFallVelocity, _float fTimeDelta);	// 점프
+	void			FreeFall(CTransform* pTransform, _float fTimeDelta);					// 자유 낙하
+	PxVec3			Compute_Slope(CTransform* pTransform);									// 경사면의 노말벡터 계산
+	PxVec3			TerrainRayCast_Collision(PxVec3 _rayOrigin, PxVec3 _rayDirection, _float _fMaxDistance);
 
 	// 이동용, 기본 중력없기 때문에 이 함수로 중력 만들어 줄 것
-	physx::PxControllerCollisionFlags Move(_float3 vVelocity, _float fTimeDelta, _float minDist = 0.001f);
-	physx::PxControllerCollisionFlags MoveDisp(_float3 vPosDelta, _float fTimeDelta, _float minDist = 0.001f);
+	/*physx::PxControllerCollisionFlags Move(_float3 vVelocity, _float fTimeDelta, _float minDist = 0.001f);
+	physx::PxControllerCollisionFlags MoveDisp(_float3 vPosDelta, _float fTimeDelta, _float minDist = 0.001f);*/
 
 	_bool	Is_Activated();
 	void	Activate(_bool bActive);
-
-	void	Get_ShapeInfo(physx::PxCapsuleGeometry& CapsuleGeo, physx::PxTransform& pxTransform);
-	_float	Get_Radius() const { return m_tControllerDesc.radius; }
 
 protected:
 	void	Create_Controller();

@@ -81,6 +81,7 @@ public:
 
 	void Set_WorldMatrix(_float4x4 worldMatrix) { m_WorldMatrix = worldMatrix; }
 
+	_float Get_SpeedPerSec() const { return m_fSpeedPerSec; }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;

@@ -3,9 +3,6 @@
 #include "Light.h"
 //#include "Utils.h"
 
-#include "RigidBody.h"
-#include "CharacterController.h"
-
 CTestModel::CTestModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject{ pDevice, pContext }
 {
@@ -26,24 +23,17 @@ HRESULT CTestModel::Initialize(void* pArg)
     GAMEOBJECT_DESC		GameObjectDesc{};
     GameObjectDesc.fSpeedPerSec = 7.f;
     GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
-
     if (FAILED(__super::Initialize(&GameObjectDesc)))
         return E_FAIL;
 
     //CGameInstance::Get_Instance()->Test();
-
+    // position 세팅은 항상 Add_Components() 앞에 둘것
+    _vector vPos = XMVectorSet(0.f, 500.f, 0.f, 1.f);
+    m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
     if (FAILED(Add_Components()))
         return E_FAIL;
 
-
     m_fSpeed = 5.f;
-
-    m_pModelCom->Set_Animation(0, true);
-    _vector vPos = XMVectorSet(0.f, 0.f, 0.f, 1.f);
-    m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
-
-    //m_pRigidBodyCom->PlayerController(vPos);
-
 
     m_iTestAnim = 0;
     m_pModelCom->Set_Animation(m_iTestAnim, true);
@@ -77,18 +67,31 @@ _int CTestModel::Tick(_float fTimeDelta)
     if (m_pLight != nullptr)
         m_pLight->Update_LightPos(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
 
+    // [JS] : CharacterController로 넘기고 Character에서 정리하기
     m_fFallVelocity -= 9.81f * fTimeDelta;
     if (true == m_isJump)
-        m_isJump = m_pRigidBodyCom->Jump(m_pTransformCom, m_fFallVelocity, fTimeDelta);
+    {
+        // [JS] : 위 준수, 아래 지영
+        //m_isJump = m_pRigidBodyCom->Jump(m_pTransformCom, m_fFallVelocity, fTimeDelta);
+        m_isJump = m_pControllerCom->Jump(m_pTransformCom, m_fFallVelocity, fTimeDelta);
+    }
     else
-        m_pRigidBodyCom->FreeFall(m_pTransformCom, fTimeDelta);
+    {
+        // [JS] : 위 준수, 아래 지영
+        //m_pRigidBodyCom->FreeFall(m_pTransformCom, fTimeDelta);
+        m_pControllerCom->FreeFall(m_pTransformCom, fTimeDelta);
+    }
+
     // 예시코드 5 : 계산기 예시 코드 (월드 매트리스로 예시든거임 이건 정신나간 코드이므로 참고해주셈)
     // 예시코드 6 : DInput + KeyPress 예시 코드 
     if (m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_PRESS))
     {
-        // [PHYSX 수정중] 위에꺼 내가 만들던거, 아래거 JS거
-        //m_pControllerCom->Move(m_pTransformCom, fTimeDelta);
-        m_pRigidBodyCom->Go_Straight(m_pTransformCom, 5.f, fTimeDelta);
+        _float fSpeed = m_pTransformCom->Get_SpeedPerSec();
+        // for test
+        fSpeed = 5.f;
+        // [JS] : 위 준수, 아래 지영
+        //m_pRigidBodyCom->Go_Straight(m_pTransformCom, fSpeed, fTimeDelta);
+        m_pControllerCom->Move(m_pTransformCom, fSpeed, fTimeDelta);
     }
 
     if (m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_PRESS))
@@ -106,11 +109,12 @@ _int CTestModel::Tick(_float fTimeDelta)
         m_isJump = true;
         m_fFallVelocity = 5.f;
     }
+
     //if (m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_PRESS))
     //{
     //    _float4x4 Worldmatrix = m_pTransformCom->Get_WorldFloat4x4();
     //    _vector vLook = CUtils::Get_State_Vector_Matrix(Worldmatrix, CUtils::STATE_LOOK);
-    //    _vector vPos = CUtils::Get_State_Vector_Matrix(Worldmatrix, CUtils::STATE_POSITION);
+    //    _vector vPos  = CUtils::Get_State_Vector_Matrix(Worldmatrix, CUtils::STATE_POSITION);
     //    _float fSpeed = 3.f;
 
     //    vPos += vLook * fTimeDelta * fSpeed;
@@ -168,7 +172,6 @@ _int CTestModel::Tick(_float fTimeDelta)
         m_pModelCom->Set_Animation(m_iTestAnim, true, true);
     }
 
-
     return OBJ_NOEVENT;
 }
 
@@ -177,8 +180,6 @@ void CTestModel::Late_Tick(_float fTimeDelta)
     m_pModelCom->Play_Animation(fTimeDelta);
 
     SetOn_Slope();
-
-    //PxVec3 slope = m_pRigidBodyCom->Compute_Slope();
 
     if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
     {
@@ -194,7 +195,10 @@ void CTestModel::Late_Tick(_float fTimeDelta)
         m_pRigidBodyCom->Add_Force(force);
     }
 
+    //// =============== RigidBody를 사용한 예시 소스 ===============
+    //// physX에 내 Transform 던지기 
     //m_pRigidBodyCom->Update(m_pTransformCom);
+    //// physX에서 변경된 Transform 가져오기
     //m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
 }
 
@@ -245,11 +249,11 @@ void CTestModel::Render_IMGUI()
     }
 }
 
+//[JS] : 이걸 CharacterContoller에 만들어두기
 void CTestModel::SetOn_Slope()
 {
-    PxVec3 slope = m_pRigidBodyCom->Compute_Slope(m_pTransformCom);
+    PxVec3 slope = m_pControllerCom->Compute_Slope(m_pTransformCom);
     _vector vUp = CUtils::To_Vector(slope);
-
     m_pTransformCom->Look_Up(vUp);
 }
 
@@ -270,19 +274,22 @@ HRESULT CTestModel::Add_Components()
         TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom)))
         return E_FAIL;
 
+    _float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+    CCharacterController::CONTROLLER_DESC desc{};
+    desc.vInitialPos = vPos;
     /* For.Com_RigidBody */
     if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_CharacterController"),
-        TEXT("Com_Controller"), (CComponent**)&m_pControllerCom)))
+        TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc)))
         return E_FAIL;
+    m_pControllerCom->Set_PhysXObject(this);
 
-    
     //m_pRigidBodyCom->Set_PhysXObject(this);
     //m_pRigidBodyCom->Activate(true);
 
     return S_OK;
 }
 
-// not yet [240520]
+// not yet [JYWI]
 void CTestModel::Add_RigidBody(const wstring& KeyName, void* pArg)
 {
     HRESULT hr;
@@ -292,6 +299,7 @@ void CTestModel::Add_RigidBody(const wstring& KeyName, void* pArg)
                        (CComponent**)&pRigidBody, pArg);
     CHECK_FAILED(hr);
 
+    // not yet
     //m_mapRigidBodies.emplace(KeyName, pRigidBody);
 }
 
@@ -305,6 +313,7 @@ HRESULT CTestModel::Bind_ShaderResources()
 
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
         return E_FAIL;
+
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
         return E_FAIL;
 
