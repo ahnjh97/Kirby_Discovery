@@ -9,6 +9,8 @@
 #include "VIBuffer_Terrain.h"
 #include "VIBuffer_Instance_Rect.h"
 #include "VIBuffer_Instance_Point.h"
+#include "RigidBody.h"
+#include "CharacterController.h"
 
 #include "Component.h"
 

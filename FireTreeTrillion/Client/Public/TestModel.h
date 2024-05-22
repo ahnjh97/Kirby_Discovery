@@ -8,6 +8,7 @@ class CModel;
 class CShader;
 class CRigidBody;
 class CFSM;
+class CCharacterController;
 END
 
 BEGIN(Client)
@@ -35,6 +36,13 @@ public:
 	virtual HRESULT Render() override;
 	virtual HRESULT Render_LightDepth() override;
 	virtual void	Render_IMGUI() override;
+	void IsJump(_bool _isJump) {
+		m_isJump = _isJump;
+	}
+
+public:
+	void SetOn_Slope(_float fTimeDelta);
+	void Lerp_UpVector(_fvector _vOriginUp, _fvector _vTargetUp, _float _maxAngle, _float fTimeDelta);
 
 private:
 	HRESULT			Add_Components();
@@ -53,15 +61,21 @@ private:
 
 	CRigidBody*		m_pRigidBodyCom = { nullptr };
 	//map<string, CRigidBody*> m_mapRigidBodies;
+	CCharacterController* m_pControllerCom = { nullptr };
 
 	// Player FSM 및 Jump 관련 변수들
 	CFSM*			m_pFSM = { nullptr };
 	STATE			m_eCurrentState = { STATE_END };
 
 	_int			m_iTestAnim = { 0 };
+	_bool			m_isJump = { false };
+	_float			m_fJumpVelocity = { 0.f };
+	_float			m_fOffsetTurn = { 7.f };
+
+	_vector			m_vPos = {};
 
 public:
-	static CTestModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CTestModel*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 

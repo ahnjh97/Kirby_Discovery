@@ -143,3 +143,17 @@ _float4x4 CUtils::To_Float4x4(const physx::PxMat44& mat)
 	return out;
 }
 
+PxVec3 CUtils::To_PxVec3(const _fvector& vector) 
+{
+	_float3 temp;
+	XMStoreFloat3(&temp, vector);
+
+	// PxVec3로 변환하여 반환
+	return PxVec3(temp.x, temp.y, temp.z);
+}
+
+_vector CUtils::To_Vector(const PxVec3 pxVec3)
+{
+	return XMVectorSet(pxVec3.x, pxVec3.y, pxVec3.z, 0.0f);
+}
+
