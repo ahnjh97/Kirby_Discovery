@@ -29,6 +29,8 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
+	m_pGameInstance->Add_Camera(this);
+
 	return S_OK;
 }
 
@@ -74,7 +76,7 @@ _int CCamera_Free::Tick(_float fTimeDelta)
 
 	//m_fFovy = XMConvertToRadians(120.f);
 
-	__super::Bind_PipeLines();
+	//__super::Bind_PipeLines();
 
 
 	return OBJ_NOEVENT;

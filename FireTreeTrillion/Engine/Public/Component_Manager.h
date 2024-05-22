@@ -16,11 +16,15 @@ BEGIN(Engine)
 
 class CComponent_Manager final : public CBase
 {
+
 private:
 	CComponent_Manager();
 	virtual ~CComponent_Manager() = default;
 
 public:
+	typedef map<const wstring, class CComponent*>	PROTOTYPES;
+	PROTOTYPES* Get_ComMap(_uint iLevelIdx);
+
 	HRESULT Initialize(_uint iNumLevels);
 	HRESULT Add_Prototype(_uint iLevelIndex, const wstring& strPrototypeTag, class CComponent* pPrototype);
 	class CComponent* Clone_Component(_uint iLevelIndex, const wstring& strPrototypeTag, void* pArg);
@@ -28,7 +32,6 @@ public:
 
 private:
 	map<const wstring, class CComponent*>*			m_pPrototypes = { nullptr };
-	typedef map<const wstring, class CComponent*>	PROTOTYPES;
 	_uint											m_iNumLevels = { 0 };
 
 private:
