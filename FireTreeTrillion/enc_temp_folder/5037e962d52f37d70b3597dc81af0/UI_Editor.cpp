@@ -131,7 +131,7 @@ void CUI_Editor::Render_IMGUI()
 			{
 				ImGui::SeparatorText(u8"Transform 오브젝트 변환");
 				
-				ImGui::Text(u8"Ctrl S : 크기 / Ctrl R : 회전 / Ctrl T : 위치");
+				ImGui::Text(u8"Ctrl S : 크기 | Ctrl R : 회전 | Ctrl T : 위치");
 				Edit_Transform();
 
 				//텍스처 선택 시 기즈모 활성화

@@ -129,15 +129,15 @@ void CUI_Editor::Render_IMGUI()
 		{
 			if (ImGui::BeginTabItem(u8"Test Tab Item 1"))
 			{
-				ImGui::SeparatorText(u8"Transform 오브젝트 변환");
+				ImGui::SeparatorText(u8"Test SeparatorText");
 				
-				ImGui::Text(u8"Ctrl S : 크기 / Ctrl R : 회전 / Ctrl T : 위치");
 				Edit_Transform();
 
 				//텍스처 선택 시 기즈모 활성화
 				//_bool IsUsingGizmo = { FALSE };
 				//if (TRUE == IsUsingGizmo)
 				//{
+				//ImGuizmo::DrawGrid(); // 그리드
 				//}
 
 				ImGui::EndTabItem();
@@ -212,7 +212,7 @@ _bool CUI_Editor::Edit_Transform()
 	//크기 회전 이동 변경 키
 	if (m_pGameInstance->Get_DIKeyState(DIK_LCONTROL, KEY_PRESS))
 	{
-		if (m_pGameInstance->Get_DIKeyState(DIK_S, KEY_DOWN))
+		if (m_pGameInstance->Get_DIKeyState(DIK_Y, KEY_DOWN))
 			eCurGizmoOper = ImGuizmo::SCALE;
 
 		else if (m_pGameInstance->Get_DIKeyState(DIK_R, KEY_DOWN))

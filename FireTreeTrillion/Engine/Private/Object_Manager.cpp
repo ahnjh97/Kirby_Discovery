@@ -160,6 +160,7 @@ void CObject_Manager::IMGUI_Tick()
 		auto ObjList = map.second->Get_GameObjectList();
 
 		string LayerName = CUtils::WstrToStr(map.first);
+
 		if (ImGui::TreeNode(LayerName.c_str()))
 		{
 			int index = 0;

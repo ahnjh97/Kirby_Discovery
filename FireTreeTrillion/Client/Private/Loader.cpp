@@ -10,8 +10,12 @@
 #include "TestModel.h"
 #include "TestTerrain.h"
 
+#pragma region TOO_UI
+
 #include "TestUI.h"
 #include "UI_Editor.h"
+
+#pragma endregion
 
 #include "RigidBody.h"
 
@@ -84,7 +88,7 @@ HRESULT CLoader::Start()
 
 	// 05.20) UI Tool 레벨 추가
 	case LEVEL_TOOL_UI:
-		hr = Loading_For_UITool();
+		hr = Loading_For_Tool_UI();
 		break;
 
 	case LEVEL_TOOL_FX:
@@ -113,7 +117,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FXToolDirector"), CFXToolDirector);
 
 	// 05.20) 원본 추가
-	//    /*      GameObj_IMGUI_UI_Editor    */
+	 /*      GameObject_IMGUI_UI_Editor    */
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("IMGUI_UI_Editor"), CUI_Editor);
 
 	///* For.Prototype_GameObject_Player */
@@ -215,7 +219,7 @@ HRESULT CLoader::Loading_For_Tool_FX()
 	return S_OK;
 }
 
-HRESULT CLoader::Loading_For_UITool()
+HRESULT CLoader::Loading_For_Tool_UI()
 {
 	LEVEL eLevel = LEVEL_TOOL_UI;
 	HRESULT hr;
