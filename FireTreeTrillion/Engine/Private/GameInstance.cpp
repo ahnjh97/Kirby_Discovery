@@ -702,6 +702,12 @@ void CGameInstance::EditTransform(_float4x4& _matrix)
 	m_pIMGUI_Manager->EditTransform(_matrix);
 }
 
+void CGameInstance::RenderGrid()
+{
+	CHECK_NULLPTR(m_pIMGUI_Manager);
+	m_pIMGUI_Manager->RenderGrid();
+}
+
 PxRigidDynamic* CGameInstance::CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)
 {
 	if (nullptr == m_pPhysx)

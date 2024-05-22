@@ -232,6 +232,7 @@ void CTestModel::Render_IMGUI()
         ImGui::TreePop();
     }
 
+    //m_pGameInstance->RenderGrid();
     ImGui::Text("FSM : %d", m_eCurrentState);
     ImGui::Separator(); ImGui::NewLine();
 }

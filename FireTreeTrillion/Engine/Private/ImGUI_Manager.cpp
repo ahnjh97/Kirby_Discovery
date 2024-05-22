@@ -115,6 +115,21 @@ void CImGUI_Manager::SetDockSpace()
 	ImGui::End();
 }
 
+void CImGUI_Manager::RenderGrid()
+{
+	const float identityMatrix[16] =
+	{	1.f, 0.f, 0.f, 0.f,
+		0.f, 1.f, 0.f, 0.f,
+		0.f, 0.f, 1.f, 0.f,
+		0.f, 0.f, 0.f, 1.f };
+
+	_float4x4 ViewMatrix, ProjMatrix;
+	ViewMatrix = CGameInstance::Get_Instance()->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW);
+	ProjMatrix = CGameInstance::Get_Instance()->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
+
+	ImGuizmo::DrawGrid(ViewMatrix.m[0], ProjMatrix.m[0], identityMatrix, 100.f);
+}
+
 void CImGUI_Manager::EditTransform(_float4x4& matrix)
 {
 #ifndef _DEBUG
