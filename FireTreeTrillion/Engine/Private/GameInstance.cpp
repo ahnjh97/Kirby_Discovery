@@ -366,6 +366,11 @@ CComponent * CGameInstance::Clone_Component(_uint iLevelIndex, const wstring & s
 	return m_pComponent_Manager->Clone_Component(iLevelIndex, strPrototypeTag, pArg);
 }
 
+CComponent_Manager::PROTOTYPES* CGameInstance::Get_ComMap(_uint iLevelIdx)
+{
+	return m_pComponent_Manager->Get_ComMap(iLevelIdx);
+}
+
 HRESULT CGameInstance::Add_Timer(const wstring & strTimerTag)
 {
 	if (nullptr == m_pTimer_Manager)
@@ -452,6 +457,16 @@ _float4 CGameInstance::Get_CamPosition() const
 		return _float4();
 
 	return m_pPipeLine->Get_CamPosition();
+}
+
+HRESULT CGameInstance::Add_Camera(CCamera* pCamera)
+{
+	return m_pPipeLine->Add_Camera(pCamera);
+}
+
+HRESULT CGameInstance::Switch_CurCamera(_int iIdx)
+{
+	return m_pPipeLine->Switch_CurCamera(iIdx);
 }
 
 const LIGHT_DESC * CGameInstance::Get_LightDesc(_uint iIndex)

@@ -19,6 +19,8 @@
 
 //이펙트 툴
 #include "FXToolDirector.h"
+#include "SingleEffect.h"
+#include "MultiEffect.h"
 
 //#include "Body_Player.h"
 //#include "Weapon.h"
@@ -112,7 +114,11 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestMap"), CTestTerrain);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
+
+	//이펙트 툴 용
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FXToolDirector"), CFXToolDirector);
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("CSingleEffect"), CSingleEffect);
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("CMultiEffect"), CMultiEffect);
 
 	// 05.20) 원본 추가
 	//    /*      GameObj_IMGUI_UI_Editor    */
@@ -195,7 +201,6 @@ HRESULT CLoader::Loading_For_Tool_FX()
 	// 모아놓은 Model 한번에 생성.
 	//hr = Add_Models(eLevel);
 	//CHECK_FAILED(hr);
-
 	m_strLoadingText = TEXT("물리 컴포넌트(을) 로딩 중 입니다.");
 	// 리지드바디
 	//hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_RigidBody"), CRigidBody::Create(m_pDevice, m_pContext));

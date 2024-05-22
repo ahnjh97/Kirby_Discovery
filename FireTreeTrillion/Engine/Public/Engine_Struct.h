@@ -40,7 +40,7 @@ namespace Engine
 
 	typedef struct
 	{
-		_float fRatio;
+		_float fTimeRatio;
 		_float3 vValue = {};
 		EASING eEasing = { EASE_LINEAR };
 
