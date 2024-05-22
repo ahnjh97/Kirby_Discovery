@@ -45,6 +45,7 @@ private:
 	HRESULT Add_Shaders(LEVEL eLevel);
 
 	HRESULT Add_Texture(LEVEL eLevel, string strPrototypeName, string strFolderAndFileName, _uint iNumTextures = 1);
+	HRESULT Add_KirbyFaceTexture(LEVEL eLevel);
 
 private:
 	ID3D11Device*				m_pDevice = { nullptr };

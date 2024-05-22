@@ -59,12 +59,12 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 	if (nullptr == m_pRenderer)
 		return E_FAIL;
 
-	m_pLevel_Manager = CLevel_Manager::Create();
-	if (nullptr == m_pLevel_Manager)
-		return E_FAIL;
-
 	m_pPhysx = CPhysX::Create();
 	if (nullptr == m_pPhysx)
+		return E_FAIL;
+
+	m_pLevel_Manager = CLevel_Manager::Create();
+	if (nullptr == m_pLevel_Manager)
 		return E_FAIL;
 
 	/* 인풋 디바이스를 초기화한다 .*/
@@ -229,6 +229,22 @@ _long CGameInstance::Get_DIMouseMove(MOUSEMOVESTATE eMouseState)
 		return 0;
 
 	return m_pInput_Device->Get_DIMouseMove(eMouseState);
+}
+
+void CGameInstance::Set_WindowActive(_bool _bWindowActive)
+{
+	if (nullptr == m_pInput_Device)
+		return;
+
+	m_pInput_Device->Set_WindowActive(_bWindowActive);
+}
+
+_bool CGameInstance::Get_WindowActive()
+{
+	if (nullptr == m_pInput_Device)
+		return true;
+
+	return m_pInput_Device->Get_WindowActive();
 }
 
 HRESULT CGameInstance::Add_RenderGroup(CRenderer::RENDERGROUP eRenderGroup, CGameObject * pRenderObject)

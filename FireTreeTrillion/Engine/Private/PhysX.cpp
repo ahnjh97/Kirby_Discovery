@@ -259,24 +259,31 @@ void CPhysX::Free()
     m_pControllerManager->release();
 
     // 2. Scene 해제
-    m_pScene->release();
+    if (m_pScene != nullptr)
+        m_pScene->release();
 
     // 3. Material 해제
-    m_pMaterial->release();
+    if (m_pMaterial != nullptr)
+        m_pMaterial->release();
 
     // 4. Dispatcher 해제
-    m_pDispatcher->release();
+    if (m_pDispatcher != nullptr)
+        m_pDispatcher->release();
 
     // 5. Pvd Transport 해제
-    m_pPvdTransport->release();
+    if (m_pPvdTransport != nullptr)
+        m_pPvdTransport->release();
 
     // 6. Physics 해제
-    m_pPhysics->release();
+    if (m_pPhysics != nullptr)
+        m_pPhysics->release();
 
     // 7. Pvd 해제 (선택적, Pvd 사용 시)
-    m_pPvd->release();
+    if (m_pPvd != nullptr)
+        m_pPvd->release();
 
     // 8. Foundation 해제
-    m_pFoundation->release();
+    if (m_pFoundation != nullptr)
+        m_pFoundation->release();
 }
 

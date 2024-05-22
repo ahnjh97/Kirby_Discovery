@@ -23,6 +23,7 @@
 //#include "Body_Player.h"
 //#include "Weapon.h"
 //#include "Player.h"
+#include "Kirby.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
@@ -117,20 +118,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	//    /*      GameObj_IMGUI_UI_Editor    */
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("IMGUI_UI_Editor"), CUI_Editor);
 
-	///* For.Prototype_GameObject_Player */
-	//if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Player"),
-	//	CPlayer::Create(m_pDevice, m_pContext))))
-	//	return E_FAIL;
-
-	///* For.Prototype_GameObject_Part_Body_Player */
-	//if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Part_Body_Player"),
-	//	CBody_Player::Create(m_pDevice, m_pContext))))
-	//	return E_FAIL;
-
-	///* For.Prototype_GameObject_Part_Weapon */
-	//if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Part_Weapon"),
-	//	CWeapon::Create(m_pDevice, m_pContext))))
-	//	return E_FAIL;
+	// For Kirby
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kirby"), CKirby);
 
 	return S_OK;
 }
@@ -160,8 +149,13 @@ HRESULT CLoader::Loading_For_GamePlay()
 	HRESULT hr;
 	LEVEL eLevel = LEVEL_GAMEPLAY;
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
+
 	if (FAILED(Add_Texture(eLevel, "Logo", "Logo/Logo.png")))
 		return E_FAIL;
+
+	// 커비 얼굴 텍스쳐 로드
+	Add_KirbyFaceTexture(eLevel);
+
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
 	// 모아놓은 Model 한번에 생성.
@@ -244,6 +238,11 @@ HRESULT CLoader::Add_Models(LEVEL eLevel)
 	// SetUp_ModelScaleRotation 함수에서 모아놓은 Model들을 타입에 따라서 Component 생성한다.
 	for (auto& ModelInfo : m_vecModelInfo)
 	{
+
+		if (ModelInfo.strModelName == "KirbyDefault")
+		{
+			_int i = 0;
+		}
 		_matrix      TransformMatrix = XMMatrixIdentity();
 		TransformMatrix = XMMatrixScaling(ModelInfo.fScale, ModelInfo.fScale, ModelInfo.fScale) * XMMatrixRotationY(XMConvertToRadians(ModelInfo.fDegree));
 
@@ -275,6 +274,12 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		m_vecModelInfo.emplace_back(MODEL{ "TestMap", TYPE_NONANIM });
 		m_vecModelInfo.emplace_back(MODEL{ "TestMap2", TYPE_NONANIM, 0.01f });
+
+		// For Kirby Body
+		m_vecModelInfo.emplace_back(MODEL{ "KirbyBalloon", TYPE_ANIM, 1.f, 180.f });
+		m_vecModelInfo.emplace_back(MODEL{ "KirbyDefault", TYPE_ANIM, 1.f, 180.f });
+		m_vecModelInfo.emplace_back(MODEL{ "KirbyVacuum", TYPE_ANIM, 1.f, 180.f });
+
 	}
 
 }
@@ -326,7 +331,39 @@ HRESULT CLoader::Add_Texture(LEVEL eLevel, string strPrototypeName, string strFo
 	return S_OK;
 }
 
-CLoader* CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID)
+
+HRESULT CLoader::Add_KirbyFaceTexture(LEVEL eLevel)
+{
+	if (FAILED(Add_Texture(eLevel, "anger", "KirbyFace/anger.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "blink", "KirbyFace/blink.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "close", "KirbyFace/close.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "doubt", "KirbyFace/doubt.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "idle", "KirbyFace/idle.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "pupil", "KirbyFace/pupil.png")))
+		return E_FAIL;
+
+
+	if (FAILED(Add_Texture(eLevel, "mouth_anger", "KirbyFace/mouth_anger.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "mouth_base", "KirbyFace/mouth_base.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "mouth_happy", "KirbyFace/mouth_happy.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "mouth_smile", "KirbyFace/mouth_smile.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "mouth_surprise", "KirbyFace/mouth_surprise.png")))
+		return E_FAIL;
+
+
+	return S_OK;
+}
+
+CLoader * CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID)
 {
 	CLoader* pInstance = new CLoader(pDevice, pContext);
 

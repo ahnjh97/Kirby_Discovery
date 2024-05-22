@@ -85,6 +85,18 @@
     <Filter Include="02.GameObjects\Effect\Multi">
       <UniqueIdentifier>{f34649b7-f041-4be5-b519-7d313325d15a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Player\Kirby\KirbyState">
+      <UniqueIdentifier>{e4b17393-309d-451f-a0c5-1f5044788807}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Player\Kirby\KirbyState\KirbyDefault_State">
+      <UniqueIdentifier>{e782a48f-9b14-4b6a-a1bc-76238299b3cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Player\Kirby\KirbyState\KirbyBalloon_State">
+      <UniqueIdentifier>{65b0a61b-acc6-4a59-8ca3-795c3ba3c952}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Player\Kirby\KirbyState\KirbyVacuum_State">
+      <UniqueIdentifier>{aeecbffe-f2e3-457e-a48d-56ebd8fb1ab5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -173,6 +185,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Kirby.h" />
     <ClInclude Include="..\Public\TestModel_State.h" />
+    <ClInclude Include="..\Public\KirbyDefault_State.h">
+      <Filter>02.GameObjects\Player\Kirby\KirbyState\KirbyDefault_State</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -249,6 +264,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby.cpp" />
     <ClCompile Include="..\Private\TestModel_State.cpp" />
+    <ClCompile Include="..\Private\KirbyDefault_State.cpp">
+      <Filter>02.GameObjects\Player\Kirby\KirbyState\KirbyDefault_State</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

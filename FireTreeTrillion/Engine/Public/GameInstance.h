@@ -36,6 +36,8 @@ public: /* For.Input_Device */
 	_byte	Get_DIMouseState(MOUSEKEYSTATE eMouse);
 	_bool	Get_DIMouseState(MOUSEKEYSTATE eMouse, KEYSTATE eState);
 	_long	Get_DIMouseMove(MOUSEMOVESTATE eMouse);
+	void	Set_WindowActive(_bool _bWindowActive);
+	_bool	Get_WindowActive();
 
 public: /* For.Renderer */
 	HRESULT Add_RenderGroup(CRenderer::RENDERGROUP eRenderGroup, class CGameObject* pRenderObject);

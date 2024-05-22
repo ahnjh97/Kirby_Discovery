@@ -96,6 +96,7 @@ public:
 	void Look_At_ForLandObject(_fvector vPosition);
 	void Move_toTarget(_fvector vTargetPos, _float fTimeDelta, _float fMinDistance = 0.f);	
 	void Turn(_fvector vAxis, _float fTimeDelta);
+	void Turn(_fvector vAxis, _float fTimeDelta, _float fAngle);
 	void Rotation(_fvector vAxis, _float fRadian);
 	void Orbit(_fvector vTarget, _fvector vAxis, _float fTimeDelta);
 

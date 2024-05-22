@@ -37,6 +37,10 @@ HRESULT CTestModel::Initialize(void* pArg)
     if (FAILED(Add_Components()))
         return E_FAIL;
 
+    m_pModelCom->Set_Animation(0, 60.f, true);
+    _vector vPos = XMVectorSet(0.f, 20.f, 0.f, 1.f);
+    m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+
     // 예시코드 1 : 태양광
     LIGHT_DESC			LightDesc{};
     LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
@@ -48,8 +52,6 @@ HRESULT CTestModel::Initialize(void* pArg)
     if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
         return E_FAIL;
 
-    m_iTestAnim = 0;
-    m_pModelCom->Set_Animation(m_iTestAnim, true);
 
     // 예시코드 2 : 따라다니게 하기 예시 코드 + 점 광원 예시 코드
    /* LightDesc.eType = LIGHT_DESC::TYPE_POINT;
@@ -168,19 +170,19 @@ _int CTestModel::Tick(_float fTimeDelta)
 
     if (m_pGameInstance->Get_DIKeyState(DIK_P, KEY_DOWN))
     {
-       /* m_iTestAnim++;
-        if (m_iTestAnim > 5)
-            m_iTestAnim = 5;
+        m_iTestAnim++;
+        if (m_iTestAnim > 290)
+            m_iTestAnim = 290;
 
-        m_pModelCom->Set_Animation(m_iTestAnim, true);*/
+        m_pModelCom->Set_Animation(m_iTestAnim, 60.f, true, true);
     }
     else if (m_pGameInstance->Get_DIKeyState(DIK_O, KEY_DOWN))
     {
-      /*  m_iTestAnim--;
+        m_iTestAnim--;
         if (m_iTestAnim < 0)
             m_iTestAnim = 0;
 
-        m_pModelCom->Set_Animation(m_iTestAnim, true);*/
+        m_pModelCom->Set_Animation(m_iTestAnim, 60.f, true, true);
 
     }
     else if (m_pGameInstance->Get_DIKeyState(DIK_I, KEY_DOWN))
@@ -190,7 +192,7 @@ _int CTestModel::Tick(_float fTimeDelta)
 
     // FSM 제어
     Update_FSMState(fTimeDelta);
-    m_pFSM->Update(this, fTimeDelta, m_eCurrentState);
+    m_pFSM->Update(this, fTimeDelta);
 
     return OBJ_NOEVENT;
 }
@@ -311,10 +313,10 @@ HRESULT CTestModel::Add_Components()
     CHECK_FAILED(hr);
 
     /* For.Com_Model */
-    hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Kirby"),
+    hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_KirbyVacuum"),
         TEXT("Com_Model"), (CComponent**)&m_pModelCom);
     CHECK_FAILED(hr);
-
+    
     /* For.Com_RigidBody */
     hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_RigidBody"),
         TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom);

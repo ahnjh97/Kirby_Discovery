@@ -32,6 +32,10 @@ public:
 
 	void Reset_Ratio() { m_bRatio = true; }
 
+	const _char* Get_AnimationName() const {
+		return m_szName;
+	}
+
 public:
 	_float	Get_TickPerSecond() const { return m_fTickPerSecond; }
 	void	Set_TickPerSecond(_float _fTickPerSecond) { m_fTickPerSecond = _fTickPerSecond; }
