@@ -66,7 +66,7 @@ HRESULT CPhysX::Initialize()
 
 void CPhysX::Tick(_float fTimeDelta)
 {
-    m_pScene->simulate(fTimeDelta * 0.1f);
+    m_pScene->simulate(fTimeDelta);
     m_pScene->fetchResults(true);
 }
 
@@ -255,6 +255,8 @@ void CPhysX::Free()
 
     if(nullptr != m_pShape)
         m_pShape->release();
+
+    m_pControllerManager->release();
 
     // 2. Scene ÇØÁ¦
     m_pScene->release();

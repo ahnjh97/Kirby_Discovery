@@ -19,6 +19,11 @@ private:
 	virtual ~CTestModel() = default;
 
 public:
+	void IsJump(_bool _isJump) {
+		m_isJump = _isJump;
+	}
+
+public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual _int Tick(_float fTimeDelta) override;
@@ -26,6 +31,8 @@ public:
 	virtual HRESULT Render() override;
 	virtual HRESULT Render_LightDepth() override;
 	virtual void Render_IMGUI() override;
+
+	void SetOn_Slope();
 
 private:
 	HRESULT Add_Components();
@@ -41,8 +48,10 @@ private:
 	//map<string, CRigidBody*> m_mapRigidBodies;
 
 	_int		m_iTestAnim = { 0 };
+	_bool		m_isJump = { false };
 
 	_float		m_fSpeed = { 0.f };
+	_float		m_fFallVelocity = { 0.f };
 	_vector		m_vPos = {};
 
 public:

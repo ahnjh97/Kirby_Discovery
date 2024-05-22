@@ -39,10 +39,10 @@ HRESULT CTestModel::Initialize(void* pArg)
     m_fSpeed = 5.f;
 
     m_pModelCom->Set_Animation(0, true);
-    //_vector vPos = XMVectorSet(0.f, 0.f, 0.f, 1.f);
-    //m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+    _vector vPos = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+    m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 
-    m_pRigidBodyCom->PlayerController(_float3(0.f, 1.5f, 0.f));
+    m_pRigidBodyCom->PlayerController(vPos);
 
 
     // 예시코드 1 : 태양광
@@ -91,14 +91,33 @@ _int CTestModel::Tick(_float fTimeDelta)
     if (m_pLight != nullptr)
         m_pLight->Update_LightPos(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
 
-
+    m_fFallVelocity -= 9.81f * fTimeDelta;
+    if (true == m_isJump)
+        m_isJump = m_pRigidBodyCom->Jump(m_pTransformCom, m_fFallVelocity, fTimeDelta);
+    else
+        m_pRigidBodyCom->FreeFall(m_pTransformCom, fTimeDelta);
     // 예시코드 5 : 계산기 예시 코드 (월드 매트리스로 예시든거임 이건 정신나간 코드이므로 참고해주셈)
-    // 예시코드 6 : DInput + KeyPress 예시 코드
+    // 예시코드 6 : DInput + KeyPress 예시 코드 
     if (m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_PRESS))
     {
-        m_pRigidBodyCom->test(m_pTransformCom, fTimeDelta);
+        m_pRigidBodyCom->Go_Straight(m_pTransformCom, 5.f, fTimeDelta);
     }
 
+    if (m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_PRESS))
+    {
+        m_pTransformCom->Turn(XMVectorSet(0.f, -1.f, 0.f, 0.f), fTimeDelta);
+    }
+
+    if (m_pGameInstance->Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
+    {
+        m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta);
+    }
+
+    if (m_pGameInstance->Get_DIKeyState(DIK_SPACE, KEY_DOWN))
+    {
+        m_isJump = true;
+        m_fFallVelocity = 5.f;
+    }
     //if (m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_PRESS))
     //{
     //    _float4x4 Worldmatrix = m_pTransformCom->Get_WorldFloat4x4();
@@ -169,6 +188,10 @@ void CTestModel::Late_Tick(_float fTimeDelta)
 {
     m_pModelCom->Play_Animation(fTimeDelta);
 
+    SetOn_Slope();
+
+    //PxVec3 slope = m_pRigidBodyCom->Compute_Slope();
+
     if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
     {
         m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
@@ -183,8 +206,8 @@ void CTestModel::Late_Tick(_float fTimeDelta)
         m_pRigidBodyCom->Add_Force(force);
     }
 
-    m_pRigidBodyCom->Update(m_pTransformCom);
-    m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
+    //m_pRigidBodyCom->Update(m_pTransformCom);
+    //m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
 }
 
 HRESULT CTestModel::Render()
@@ -232,6 +255,14 @@ void CTestModel::Render_IMGUI()
         ImGui::Separator(); ImGui::NewLine();
         ImGui::TreePop();
     }
+}
+
+void CTestModel::SetOn_Slope()
+{
+    PxVec3 slope = m_pRigidBodyCom->Compute_Slope(m_pTransformCom);
+    _vector vUp = CUtils::To_Vector(slope);
+
+    m_pTransformCom->Look_Up(vUp);
 }
 
 HRESULT CTestModel::Add_Components()
