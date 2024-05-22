@@ -96,9 +96,11 @@ public:
 	void Look_At_ForLandObject(_fvector vPosition);
 	void Move_toTarget(_fvector vTargetPos, _float fTimeDelta, _float fMinDistance = 0.f);	
 	void Turn(_fvector vAxis, _float fTimeDelta);
+	void Turn(_fvector vAxis, _float fTimeDelta, _float fAngle);
 	void Rotation(_fvector vAxis, _float fRadian);
 	void Orbit(_fvector vTarget, _fvector vAxis, _float fTimeDelta);
 
+	_float Get_SpeedPerSec() const { return m_fSpeedPerSec; }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -107,8 +109,6 @@ public:
 public:
 	HRESULT Bind_ShaderResource(class CShader* pShader, const _char* pConstantName);
 
-
-	
 private:
 	_float4x4				m_WorldMatrix;
 	_float					m_fSpeedPerSec = { 0.0f };

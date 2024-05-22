@@ -29,6 +29,8 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
+	m_pGameInstance->Add_Camera(this);
+
 	return S_OK;
 }
 
@@ -74,7 +76,7 @@ _int CCamera_Free::Tick(_float fTimeDelta)
 
 	//m_fFovy = XMConvertToRadians(120.f);
 
-	__super::Bind_PipeLines();
+	//__super::Bind_PipeLines();
 
 
 	return OBJ_NOEVENT;
@@ -95,6 +97,10 @@ void CCamera_Free::Render_IMGUI()
 	_float4 fPosition = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 
 	ImGui::SliderFloat("CameraFree Speed", &fSpeed, 0.f, 50.f);
+
+	ImGui::Checkbox(u8"타겟 따라가기", &m_bTrackTarget);
+
+
 	//m_pTransformCom->Set_Speed(fSpeed);
 	/*
 	ImGui::SliderFloat("CameraFree Smooth Speed", &m_fSmoothSpeed, 0.f, 0.3f);
@@ -108,13 +114,39 @@ void CCamera_Free::Render_IMGUI()
 	ImGui::DragFloat3("CameraFree Offset", &m_vOffset.x);*/
 }
 
+void CCamera_Free::Track_Target(_float fTimeDelta)
+{
+	if (nullptr == m_pTarget)
+		return;
+
+	_float4 vTargetPos = m_pTarget->Get_State(CTransform::STATE_POSITION);
+	_float4 vBackDir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+	vBackDir.Normalize();
+	vBackDir *= m_fTrackDistance;
+
+	_float4 vCurPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+
+	_float4 vDestDir = (vTargetPos + vBackDir) - vCurPos;
+
+
+	if (.1f <= vDestDir.Length())
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, Pos(vCurPos + (vDestDir * .1f)));
+}
+
 void CCamera_Free::Orbit_Target(_float fTimeDelta)
 {
 }
 
 void CCamera_Free::Control(_float fTimeDelta)
 {
-	
+
+	if (m_pGameInstance->Get_KeyState(DIK_TAB, KEY_DOWN))
+		m_bTrackTarget = !m_bTrackTarget;
+
+	if (m_bTrackTarget)
+		Track_Target(fTimeDelta);
+
+
 	if (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
 	{
 		_long	MouseMove = { 0 };
@@ -133,6 +165,10 @@ void CCamera_Free::Control(_float fTimeDelta)
 		if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMMS_WHEEL))
 		{
 			m_pTransformCom->Go_Straight(fTimeDelta * MouseMove * m_fMouseSensor * .5f);
+
+
+			if (m_pTarget != nullptr && m_bTrackTarget)
+				m_fTrackDistance -= MouseMove*.01f ;
 		}
 
 		//일단 안씀
@@ -150,6 +186,9 @@ void CCamera_Free::Control(_float fTimeDelta)
 			// 05.22) LEVEL_TOOL_UI에는 카메라 회전 기능 제외
 			if (*m_pCurrentLevelID == 4) //LEVEL_TOOL_UI
 				return;
+
+			if (*m_pCurrentLevelID == LEVEL_TOOL_FX)
+				vTargetPos = Vector3::Zero;
 
 			if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMMS_X))
 			{
@@ -202,6 +241,7 @@ CGameObject* CCamera_Free::Clone(void* pArg)
 
 void CCamera_Free::Free()
 {
-	__super::Free();
+	Safe_Release(m_pTarget);
 
+	__super::Free();
 }

@@ -26,6 +26,13 @@ HRESULT CImGUI_Manager::Initialize(HWND hWnd, ID3D11Device* pGraphic_Device, ID3
 	// 05.21) 한글 폰트 적용
 	io.Fonts->AddFontFromFileTTF("C://Windows/Fonts/malgun.ttf", 15.f, NULL, io.Fonts->GetGlyphRangesKorean());
 
+//다른 폰트를 넣으려는 사투
+	//ifstream file("C://Windows/Fonts/Pretendard.ttf");
+	//if (!file.good())
+	//{
+	//	io.Fonts->AddFontFromFileTTF("C://Windows/Fonts/malgun.ttf", 16.f, NULL, io.Fonts->GetGlyphRangesKorean());
+	//}
+
 	// Setup Dear ImGui style
 #pragma region IMGUI_STYLE
 	ImGui::StyleColorsDark();

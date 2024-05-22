@@ -6,6 +6,9 @@
 // For Key_Manager
 #define VK_MAX	0xff
 
+#define GRAVITY 9.81f
+
+
 // assert로 확인하고자하는 코드 체크
 // ※ DEBUG용으로 RELEASE모드에서 동작하는 소스엔 사용하지 마십시오.
 #define CHECK_FAILED(p)					assert(SUCCEEDED(p))

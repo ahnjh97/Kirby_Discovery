@@ -27,7 +27,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_ LPWSTR    lpCmdLine,
                      _In_ int       nCmdShow)
 {
-#ifdef _DEBUG
+#ifdef _
+
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
@@ -183,6 +184,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     switch (message)
     {
+    case WM_ACTIVATE:
+        if (LOWORD(wParam) == WA_INACTIVE)
+            CGameInstance::Get_Instance()->Set_WindowActive(false);
+        else
+            CGameInstance::Get_Instance()->Set_WindowActive(true);
+        break;
+
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);
@@ -225,11 +233,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
         break;
     case WM_KEYDOWN:
-        switch (wParam)
+        if (CGameInstance::Get_Instance()->Get_WindowActive())
         {
-        case VK_ESCAPE:
-            DestroyWindow(g_hWnd);
-            break;
+            switch (wParam)
+            {
+            case VK_ESCAPE:
+                DestroyWindow(g_hWnd);
+                break;
+            }
         }
         break;
     case WM_PAINT:

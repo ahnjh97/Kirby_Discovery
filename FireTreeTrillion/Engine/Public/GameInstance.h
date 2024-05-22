@@ -36,6 +36,8 @@ public: /* For.Input_Device */
 	_byte	Get_DIMouseState(MOUSEKEYSTATE eMouse);
 	_bool	Get_DIMouseState(MOUSEKEYSTATE eMouse, KEYSTATE eState);
 	_long	Get_DIMouseMove(MOUSEMOVESTATE eMouse);
+	void	Set_WindowActive(_bool _bWindowActive);
+	_bool	Get_WindowActive();
 
 public: /* For.Renderer */
 	HRESULT Add_RenderGroup(CRenderer::RENDERGROUP eRenderGroup, class CGameObject* pRenderObject);
@@ -67,7 +69,7 @@ public: /* For.Object_Manager */
 public: /* For.Component_Manager */
 	HRESULT			  Add_Prototype(_uint iLevelIndex, const wstring& strPrototypeTag, class CComponent* pPrototype);
 	class CComponent* Clone_Component(_uint iLevelIndex, const wstring& strPrototypeTag, void* pArg = nullptr);
-
+	CComponent_Manager::PROTOTYPES* Get_ComMap(_uint iLevelIdx);
 
 public: /* For.Timer_Manager */
 	HRESULT Add_Timer(const wstring& strTimerTag);
@@ -81,6 +83,8 @@ public: /* For.PipeLine */
 
 	_float4 Get_CamPosition() const;
 
+	HRESULT Add_Camera(class CCamera* pCamera);
+	HRESULT Switch_CurCamera(_int iIdx);
 
 	_matrix Get_Transform_Matrix(CPipeLine::TRANSFORMSTATE eState) const;
 	_float4x4 Get_Transform_Float4x4(CPipeLine::TRANSFORMSTATE eState) const;
@@ -118,9 +122,10 @@ public: /* For.Extractor */
 	_vector Compute_WorldPos(const _float2& vViewportPos, const wstring& strZRenderTargetTag, _uint iOffset = 0);
 
 public: /* For.PhysX */
-	PxScene*	Get_Scene();
-	PxPhysics*	Get_Physics();
-	PxMaterial* Get_Material();
+	PxScene*				Get_Scene();
+	PxPhysics*				Get_Physics();
+	PxMaterial*				Get_Material();
+	PxControllerManager*	Get_ControllerManager();
 	void		AddActor(physx::PxActor& pActor);
 	void		RemoveActor(physx::PxActor& pActor);
 

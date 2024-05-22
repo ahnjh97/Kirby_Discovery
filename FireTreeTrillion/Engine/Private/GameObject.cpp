@@ -111,6 +111,26 @@ HRESULT CGameObject::Add_Component(_uint iLevelIndex, const wstring & strPrototy
 	return S_OK;
 }
 
+/// <summary> LEVEL_STATIC이 아닌 경우, GameObject 내부에서 LEVEL을 처리한다. </summary>
+HRESULT CGameObject::Add_Component(const wstring& strPrototypeTag, const wstring& strComponentTag, CComponent** ppOut, void* pArg)
+{
+	CComponent* pComponent = m_pGameInstance->Clone_Component(*m_pCurrentLevelID, strPrototypeTag, pArg);
+	if (nullptr == pComponent)
+		return E_FAIL;
+
+	auto	iter = m_Components.find(strComponentTag);
+	if (iter != m_Components.end())
+		return E_FAIL;
+
+	m_Components.emplace(strComponentTag, pComponent);
+
+	*ppOut = pComponent;
+
+	Safe_AddRef(pComponent);
+
+	return S_OK;
+}
+
 // fViewZ와 ViewPos를 업데이트 한다.
 HRESULT CGameObject::Compute_ViewZ()
 {

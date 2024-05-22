@@ -11,6 +11,8 @@ using namespace ImGui;
 
 class CFXToolDirector final :  public CGameObject
 {
+	enum SELECTED {SELECTED_SINGLE_FX, SELECTED_PARTICLE_FX, SELECTED_MULTI_FX, SELECTED_END};
+
 private:
 	CFXToolDirector(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CFXToolDirector(const CFXToolDirector& rhs);
@@ -35,37 +37,42 @@ private:
 
 	//이펙트 추가 시 버퍼
 	_int m_iAddingFXBufferIdx = { 0 };
-	vector<char*> m_FXBufferList =
-	{
-	"Rect"
-	};
+	vector<char*> m_FXBufferList;
 
 	//이펙트 추가 시 텍스쳐
 	_int m_iAddingFXTexIdx = { 0 };
-	vector <char*> m_FXTexList =
-	{
-	};
+	vector <char*> m_FXTexList;
 
 	//이펙트 추가 시 마스크 텍스쳐
 	_int m_iAddingFXMaskTexIdx = { 0 };
-	vector <char*> m_FXMaskTexList =
-	{
-	};
+	vector <char*> m_FXMaskTexList;
 
+	_int m_iAddingInstanceNum = { 10 };
 
-/*단일 이펙트*/
+/*이펙트*/
 
-	//존재하는 단일 이펙트 모음
-	vector<CEffect*> m_SingleFXs;
-	_int m_iSelectedSingleFXIdx = { -1 };
+	//존재하는 이펙트 모음
+	vector<CEffect*> m_FXs;
+	_int m_iSelectedFXIdx = { -1 };
+
+/*복합 이펙트*/
+
+	//존재하는 복합 이펙트 모음
+	vector<CEffect*> m_MultiFXs;
+	_int m_iSelectedMultiFXIdx = { -1 };
+
+	SELECTED m_eSelected = { SELECTED_END };
 
 	string m_curFXName = { "NONE" };
 	_bool m_bLooping = { false };
 
 	//수명
-	_float m_fDuration[2] = { 0.f, 1.f };
+	//_float m_fDuration = { 1.f };
 	_float m_fLifeTime[2] = { 0.f, 1.f };
 
+
+	//파티클용 세팅 변수
+	_float m_fRange[3] = { 1.f, 1.f, 1.f };
 
 	// 이펙트 키프레임 편집(단일)
 
@@ -93,12 +100,7 @@ private:
 	};
 
 
-/*복합 이펙트*/
 
-	//존재하는 복합 이펙트 모음
-	vector<CEffect*> m_MultiFXs;
-	_int m_iSelectedMultiFXIdx = { -1 };
-	//_int m_iEffectIdxInComposition = { -1 };
 
 /*플레이 바 변수*/
 
@@ -112,13 +114,22 @@ private:
 
 	void Render_FXHierarchy();
 
-	void Render_FXProperty(_float __fTimeDelta);
-	void Render_FXPlayBar(_float __fTimeDelta);
+	void Render_FXProperty(_float _fTimeDelta);
 
+	void Render_FXPlayBar(_float _fTimeDelta);
+	void MakeBar_SingleFXProperty(_float _fTimeDelta);
+	void MakeBar_ParticleFXProperty(_float _fTimeDelta);
+	void MakeBar_MultiFXProperty(_float _fTimeDelta);
+	
 	void Render_MultiFXHierarchy();
 
+	//이펙트용 컴포넌트 준비 작업
+	HRESULT	Ready_FXPrototypeVector();
+	//컴포넌트 맵에서 검색 문자열과 동일한 친구들을 찾아 벡터에 저장한다.
+	void Ready_Ingredient(wstring wstrSearchTag, vector<char*>* vecCombo, CComponent_Manager::PROTOTYPES* comMap);
 
 	HRESULT Add_Components();
+
 
 	inline void SetupImGuiStyle(bool bStyleDark_, float alpha_)
 	{

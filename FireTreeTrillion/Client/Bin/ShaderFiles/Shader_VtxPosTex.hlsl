@@ -3,7 +3,8 @@
 /* 전역변수 : 쉐이더 외부에 있는 데이터를 쉐이더 안으로 받아온다. */
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
-texture2D	g_Texture;
+texture2D	g_DiffuseTexture;
+texture2D	g_MaskTexture;
 texture2D	g_DepthTexture;
 
 struct VS_IN
@@ -75,7 +76,7 @@ PS_OUT PS_MAIN(PS_IN In)
 {
 	PS_OUT			Out = (PS_OUT)0;
 
-	Out.vColor = g_Texture.Sample(LinearSampler, In.vTexcoord);
+	Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
 	
 	return Out;
 }
@@ -92,7 +93,7 @@ PS_OUT PS_MAIN_ALPHABLEND(PS_IN_ALPHABLEND In)
 {
 	PS_OUT			Out = (PS_OUT)0;
 
-	Out.vColor = g_Texture.Sample(LinearSampler, In.vTexcoord);
+	Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
 
 	float2		vTexcoord = (float2)0.f;
 
