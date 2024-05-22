@@ -137,14 +137,18 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		if (angleInDegrees > 5.f)
 			Kirbydesc->m_fZAngle += fTimeDelta * 40.f;
 		else
-			Kirbydesc->m_fZAngle -= Kirbydesc->m_fZAngle / 4.f;
+		{
+			Kirbydesc->m_fZAngle -= Kirbydesc->m_fZAngle / 5.f;
+		}
 	}
 	else
 	{
 		if (angleInDegrees > 5.f)
 			Kirbydesc->m_fZAngle -= fTimeDelta * 40.f;
 		else
-			Kirbydesc->m_fZAngle -= Kirbydesc->m_fZAngle / 4.f;
+		{
+			Kirbydesc->m_fZAngle -= Kirbydesc->m_fZAngle / 5.f;
+		}
 	}
 
 	if (Kirbydesc->m_fZAngle > 20.f)

@@ -162,6 +162,11 @@ HRESULT CLoader::Add_Models(LEVEL eLevel)
 	// SetUp_ModelScaleRotation 함수에서 모아놓은 Model들을 타입에 따라서 Component 생성한다.
 	for (auto& ModelInfo : m_vecModelInfo)
 	{
+
+		if (ModelInfo.strModelName == "KirbyDefault")
+		{
+			_int i = 0;
+		}
 		_matrix      TransformMatrix = XMMatrixIdentity();
 		TransformMatrix = XMMatrixScaling(ModelInfo.fScale, ModelInfo.fScale, ModelInfo.fScale) * XMMatrixRotationY(XMConvertToRadians(ModelInfo.fDegree));
 

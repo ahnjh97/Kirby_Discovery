@@ -89,6 +89,9 @@ private:
 	class CCamera_Free* m_pCamera = { nullptr };
 	KIRBY_INFODESC  m_tKirbyInfo;
 
+
+	_int			m_itestAnim = { 0 };
+
 public:
 	static CKirby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

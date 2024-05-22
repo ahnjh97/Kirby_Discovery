@@ -36,7 +36,9 @@ public:
 		}
 	}
 
-
+	const _char* Get_AnimationName() const {
+		return m_Animations[m_iCurrentAnimIndex]->Get_AnimationName();
+	}
 
 public:
 	virtual HRESULT Initialize_Prototype(_fmatrix TransformMatrix, MODEL tModel);

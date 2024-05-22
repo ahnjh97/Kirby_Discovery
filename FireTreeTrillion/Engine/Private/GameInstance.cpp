@@ -215,6 +215,22 @@ _long CGameInstance::Get_DIMouseMove(MOUSEMOVESTATE eMouseState)
 	return m_pInput_Device->Get_DIMouseMove(eMouseState);
 }
 
+void CGameInstance::Set_WindowActive(_bool _bWindowActive)
+{
+	if (nullptr == m_pInput_Device)
+		return;
+
+	m_pInput_Device->Set_WindowActive(_bWindowActive);
+}
+
+_bool CGameInstance::Get_WindowActive()
+{
+	if (nullptr == m_pInput_Device)
+		return true;
+
+	return m_pInput_Device->Get_WindowActive();
+}
+
 HRESULT CGameInstance::Add_RenderGroup(CRenderer::RENDERGROUP eRenderGroup, CGameObject * pRenderObject)
 {
 	if (nullptr == m_pRenderer)
