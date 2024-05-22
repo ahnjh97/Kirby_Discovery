@@ -37,12 +37,6 @@
     <Filter Include="02.GameObjects\Player">
       <UniqueIdentifier>{c8892da5-ac0a-4aa1-83ab-12a0fd1f52c6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Player\Body">
-      <UniqueIdentifier>{40fb19c9-0a14-4c9d-9fe2-39d35c97f865}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Player\Weapon">
-      <UniqueIdentifier>{b3b00c76-db29-40f1-91c2-575d98ee7852}</UniqueIdentifier>
-    </Filter>
     <Filter Include="90.Utils">
       <UniqueIdentifier>{b950e84f-4eac-4d0f-a16d-60f2661e798e}</UniqueIdentifier>
     </Filter>
@@ -85,9 +79,6 @@
     <Filter Include="02.GameObjects\Effect\Multi">
       <UniqueIdentifier>{f34649b7-f041-4be5-b519-7d313325d15a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Player\Kirby\KirbyState">
-      <UniqueIdentifier>{e4b17393-309d-451f-a0c5-1f5044788807}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Player\Kirby\KirbyState\KirbyDefault_State">
       <UniqueIdentifier>{e782a48f-9b14-4b6a-a1bc-76238299b3cd}</UniqueIdentifier>
     </Filter>
@@ -96,6 +87,15 @@
     </Filter>
     <Filter Include="02.GameObjects\Player\Kirby\KirbyState\KirbyVacuum_State">
       <UniqueIdentifier>{aeecbffe-f2e3-457e-a48d-56ebd8fb1ab5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Player\Kirby">
+      <UniqueIdentifier>{1c7e445f-7283-4aff-8547-b78b403e00f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Player\Kirby\Kirby_States">
+      <UniqueIdentifier>{49e0d676-aa28-40ae-909d-e3f578136d4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Player\TestModel">
+      <UniqueIdentifier>{34c2185a-9a6a-46ea-bdbe-7aec4726a1fc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -138,23 +138,11 @@
     <ClInclude Include="..\Public\Client_Defines.h">
       <Filter>99.Defines</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Player.h">
-      <Filter>02.GameObjects\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Body_Player.h">
-      <Filter>02.GameObjects\Player\Body</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Weapon.h">
-      <Filter>02.GameObjects\Player\Weapon</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\tinyxml2.h">
       <Filter>90.Utils\XML</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Camera_Main.h">
       <Filter>02.GameObjects\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\TestModel.h">
-      <Filter>02.GameObjects\Player</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\TestTerrain.h">
       <Filter>02.GameObjects\Terrain</Filter>
@@ -183,10 +171,17 @@
     <ClInclude Include="..\public\MultiEffect.h">
       <Filter>02.GameObjects\Effect\Multi</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Kirby.h" />
-    <ClInclude Include="..\Public\TestModel_State.h" />
     <ClInclude Include="..\Public\KirbyDefault_State.h">
-      <Filter>02.GameObjects\Player\Kirby\KirbyState\KirbyDefault_State</Filter>
+      <Filter>02.GameObjects\Player\Kirby\Kirby_States</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby.h">
+      <Filter>02.GameObjects\Player\Kirby</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TestModel_State.h">
+      <Filter>02.GameObjects\Player\TestModel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TestModel.h">
+      <Filter>02.GameObjects\Player\TestModel</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -217,23 +212,11 @@
     <ClCompile Include="..\private\Camera_Free.cpp">
       <Filter>02.GameObjects\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\Player.cpp">
-      <Filter>02.GameObjects\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Body_Player.cpp">
-      <Filter>02.GameObjects\Player\Body</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Weapon.cpp">
-      <Filter>02.GameObjects\Player\Weapon</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\tinyxml2.cpp">
       <Filter>90.Utils\XML</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Camera_Main.cpp">
       <Filter>02.GameObjects\Camera</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\TestModel.cpp">
-      <Filter>02.GameObjects\Player</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\TestTerrain.cpp">
       <Filter>02.GameObjects\Terrain</Filter>
@@ -262,10 +245,17 @@
     <ClCompile Include="..\private\MultiEffect.cpp">
       <Filter>02.GameObjects\Effect\Multi</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Kirby.cpp" />
-    <ClCompile Include="..\Private\TestModel_State.cpp" />
     <ClCompile Include="..\Private\KirbyDefault_State.cpp">
-      <Filter>02.GameObjects\Player\Kirby\KirbyState\KirbyDefault_State</Filter>
+      <Filter>02.GameObjects\Player\Kirby\Kirby_States</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby.cpp">
+      <Filter>02.GameObjects\Player\Kirby</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TestModel_State.cpp">
+      <Filter>02.GameObjects\Player\TestModel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TestModel.cpp">
+      <Filter>02.GameObjects\Player\TestModel</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

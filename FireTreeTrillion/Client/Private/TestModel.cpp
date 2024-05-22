@@ -32,14 +32,12 @@ HRESULT CTestModel::Initialize(void* pArg)
 
     //CGameInstance::Get_Instance()->Test();
     // position 세팅은 항상 Add_Components() 앞에 둘것
-    _vector vPos = XMVectorSet(0.f, 500.f, 0.f, 1.f);
+    _vector vPos = XMVectorSet(0.f, 20.f, 0.f, 1.f);
     m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
     if (FAILED(Add_Components()))
         return E_FAIL;
 
     m_pModelCom->Set_Animation(0, 60.f, true);
-    _vector vPos = XMVectorSet(0.f, 20.f, 0.f, 1.f);
-    m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 
     // 예시코드 1 : 태양광
     LIGHT_DESC			LightDesc{};
