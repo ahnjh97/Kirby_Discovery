@@ -222,15 +222,15 @@ void CRigidBody::PlayerController(_float3 vPos)
 {
 	PxCapsuleControllerDesc capsuleDesc;
 	capsuleDesc.position = PxExtendedVec3(vPos.x, vPos.y, vPos.z);
-	capsuleDesc.radius = 0.5f; // 작은 반지름
-	capsuleDesc.height = 0.5f; // 작은 높이
-	capsuleDesc.stepOffset = 0.5f;
-	capsuleDesc.volumeGrowth = 1.9f;
-	capsuleDesc.slopeLimit = cosf(PxPi / 12); // 15 degrees
+	capsuleDesc.radius = 0.5f; // 반지름
+	capsuleDesc.height = 0.1f; // 높이
+	capsuleDesc.stepOffset = 0.f;
+	capsuleDesc.volumeGrowth = 1.0f;
+	capsuleDesc.slopeLimit = cosf(XMConvertToRadians(15.f)); // 15 degrees
 	capsuleDesc.upDirection = PxVec3(0, 1, 0);
 	capsuleDesc.contactOffset = 0.001f;
-
-	PxMaterial* material = m_pGameInstance->Get_Physics()->createMaterial(0.5f, 0.5f, 0.5f);
+	PxMaterial* material = m_pGameInstance->Get_Material();
+	material = m_pGameInstance->Get_Physics()->createMaterial(0.5f, 0.5f, 0.5f);
 	capsuleDesc.material = material;
 
 	// 캡슐 컨트롤러 생성
@@ -238,11 +238,13 @@ void CRigidBody::PlayerController(_float3 vPos)
 	if (nullptr == m_pCapsuleController)
 		MSG_BOX(TEXT("Failed to Controller"));
 }
-
+   
 void CRigidBody::Go_Straight(CTransform* pTransform, _float fSpeed, _float fTimeDelta)
 {
 	PxVec3 movement(0.f);
-	movement.z += fSpeed * fTimeDelta;
+	//movement.z += fSpeed * fTimeDelta;
+	_vector vLook = pTransform->Get_State_Vector(CTransform::STATE_LOOK);
+	movement += CUtils::To_PxVec3(XMVector3Normalize(vLook)) * fSpeed * fTimeDelta;
                 
 	PxControllerFilters filter;
 	PxControllerCollisionFlags collisionFlags = m_pCapsuleController->move(movement, 0.001f, fTimeDelta, filter);
@@ -250,28 +252,161 @@ void CRigidBody::Go_Straight(CTransform* pTransform, _float fSpeed, _float fTime
 	PxExtendedVec3 pxPos = m_pCapsuleController->getPosition();
 	PxVec3 pos(pxPos.x, pxPos.y, pxPos.z);
 
-	XMVECTOR xmPos = XMVectorSet(pos.x, pos.y, pos.z, 0.f);
+	_vector xmPos = XMVectorSet(pos.x, pos.y - 0.5f, pos.z, 0.f);
 
 	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
 }
 
-void CRigidBody::test(CTransform* pTransform, _float fTimeDelta)
+_bool CRigidBody::Jump(CTransform* pTransform, _float fFallVelocity, _float fTimeDelta)
 {
-	m_fFallVelocity -= m_fFallAcceleration * fTimeDelta * 50.f;
+	//fFallVelocity -= 9.81f * fTimeDelta;
 
 	if (m_fFallVelocity < -1000.f)
 		m_fFallVelocity = -10.f;
 
-	m_pCapsuleController->move(PxVec3(0.f, 1.f, 0.f) * fTimeDelta * m_fFallVelocity, 0, fTimeDelta, PxControllerFilters());
-
-	Go_Straight(pTransform, 5.f, fTimeDelta);
+	PxVec3 moveVector = PxVec3(0.f, fFallVelocity, 0.f) * fTimeDelta;
+	PxControllerCollisionFlags collisionFlags = m_pCapsuleController->move(moveVector, 0.001f, fTimeDelta, PxControllerFilters());
+	//Go_Straight(pTransform, 5.f, fTimeDelta);
 
 	PxControllerState m_pPxState;
 
 	m_pCapsuleController->getState(m_pPxState);
 
 	if (m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_DOWN || m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_UP)
+	{
+		fFallVelocity = 0.f;
+		return false;
+	}
+
+	PxExtendedVec3 pxPos = m_pCapsuleController->getPosition();
+	PxVec3 pos(pxPos.x, pxPos.y, pxPos.z);
+
+	_vector xmPos = XMVectorSet(pos.x, pos.y - 0.5f, pos.z, 0.f);
+
+	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
+
+	return true;
+}
+
+void CRigidBody::FreeFall(CTransform* pTransform, _float fTimeDelta)
+{
+	m_fFallVelocity -= 9.81f * fTimeDelta;
+
+	if (m_fFallVelocity < -1000.f)
+		m_fFallVelocity = -10.f;
+
+	PxVec3 moveVector = PxVec3(0.f, m_fFallVelocity, 0.f) * fTimeDelta;
+	PxControllerCollisionFlags collisionFlags = m_pCapsuleController->move(moveVector, 0.001f, fTimeDelta, PxControllerFilters());
+	//Go_Straight(pTransform, 5.f, fTimeDelta);
+
+	PxControllerState m_pPxState;
+
+	m_pCapsuleController->getState(m_pPxState);
+
+	if (m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_DOWN || m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_UP)
+	{
 		m_fFallVelocity = 0.f;
+	}
+
+	PxExtendedVec3 pxPos = m_pCapsuleController->getPosition();
+	PxVec3 pos(pxPos.x, pxPos.y, pxPos.z);
+
+	_vector xmPos = XMVectorSet(pos.x, pos.y - 0.5f, pos.z, 0.f);
+
+	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
+}
+
+PxVec3 CRigidBody::Compute_Slope(CTransform* pTransform)
+{
+	PxExtendedVec3 position = m_pCapsuleController->getPosition();
+	PxVec3 rayOrigin = PxVec3(position.x, position.y, position.z);
+
+	_vector vRight = pTransform->Get_State_Vector(CTransform::STATE_RIGHT);
+	vRight = XMVector3Normalize(vRight);
+	_vector vLook = pTransform->Get_State_Vector(CTransform::STATE_LOOK);
+	vLook = XMVector3Normalize(vLook);
+
+	PxVec3 right = CUtils::To_PxVec3(vRight * 0.5f);
+	PxVec3 look = CUtils::To_PxVec3(vLook * 0.5f);
+
+	// 오른쪽, 왼쪽 레이캐스트
+	PxVec3 rayOriginRight = rayOrigin + right;
+	PxVec3 rayOriginLeft = rayOrigin - right;
+
+	// 앞, 뒤 레이캐스트
+	PxVec3 rayOriginFront = rayOrigin + look;
+	PxVec3 rayOriginBack = rayOrigin - look;
+
+	PxVec3 rayDirection = PxVec3(0.f, -1.f, 0.f);
+	_float maxDistance = 1.f;
+
+	PxVec3	normal = { 0.f, 0.f, 0.f };
+
+	normal += TerrainRayCast_Collision(rayOriginRight, rayDirection, maxDistance);
+
+	normal += TerrainRayCast_Collision(rayOriginLeft, rayDirection, maxDistance);
+
+	normal += TerrainRayCast_Collision(rayOriginFront, rayDirection, maxDistance);
+
+	normal += TerrainRayCast_Collision(rayOriginBack, rayDirection, maxDistance);
+	 
+	normal.normalize();
+	return normal;
+
+	//_bool isRayCastLeft = m_pGameInstance->Get_Scene()->raycast(rayOriginLeft, rayDirection, maxDistance, hitBuffer, PxHitFlag::eNORMAL, filterData);
+	//// 충돌이 발생한 경우 법선 벡터 반환
+	//if (isRayCastLeft && hitBuffer.hasBlock)
+	//{
+	//	hit = hitBuffer.block;
+
+	//	normal += hit.normal;
+	//}
+
+	//_bool isRayCastFront = m_pGameInstance->Get_Scene()->raycast(rayOriginFront, rayDirection, maxDistance, hitBuffer, PxHitFlag::eNORMAL, filterData);
+	//// 충돌이 발생한 경우 법선 벡터 반환
+	//if (isRayCastLeft && hitBuffer.hasBlock)
+	//{
+	//	hit = hitBuffer.block;
+
+	//	normal += hit.normal;
+	//}
+
+	//_bool isRayCastBack = m_pGameInstance->Get_Scene()->raycast(rayOriginBack, rayDirection, maxDistance, hitBuffer, PxHitFlag::eNORMAL, filterData);
+	//// 충돌이 발생한 경우 법선 벡터 반환
+	//if (isRayCastLeft && hitBuffer.hasBlock)
+	//{
+	//	hit = hitBuffer.block;
+
+	//	normal += hit.normal;
+	//}
+
+
+	//if (false == isRayCastRight && false == isRayCastLeft)
+	//	return PxVec3(0.0f, 1.0f, 0.0f);
+	//else
+	//{
+	//	normal.normalize();
+	//	return normal;
+	//}
+}
+
+PxVec3 CRigidBody::TerrainRayCast_Collision(PxVec3 _rayOrigin, PxVec3 _rayDirection, _float _fMaxDistance)
+{
+	PxRaycastHit hit;
+	PxRaycastBuffer hitBuffer;
+
+	PxQueryFilterData filterData(PxQueryFlag::eSTATIC);
+
+	_bool isRayCast = m_pGameInstance->Get_Scene()->raycast(_rayOrigin, _rayDirection, _fMaxDistance, hitBuffer, PxHitFlag::eNORMAL, filterData);
+	// 충돌이 발생한 경우 법선 벡터 반환
+	if (isRayCast && hitBuffer.hasBlock)
+	{
+		hit = hitBuffer.block;
+
+		return hit.normal;
+	}
+	else
+		return PxVec3(0.0f, 1.0f, 0.0f);
 }
 
 physx::PxTransform CRigidBody::Get_PxTransform()
@@ -330,5 +465,9 @@ void CRigidBody::Free()
 	__super::Free();
 
 	Release_Actor();
+
+	if(nullptr != m_pCapsuleController)
+		m_pCapsuleController->release();
 }
 
+ 
