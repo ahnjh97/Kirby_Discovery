@@ -46,7 +46,6 @@ HRESULT CUI_Editor::Render()
 
 #pragma region BIND SHADER & VIBUFFER
 
-	/*
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
@@ -58,7 +57,6 @@ HRESULT CUI_Editor::Render()
 
 	if (FAILED(m_pVIBufferCom->Render()))
 		return E_FAIL;
-	*/
 
 #pragma endregion 
 
@@ -68,10 +66,31 @@ HRESULT CUI_Editor::Render()
 void CUI_Editor::Render_IMGUI()
 {
 	//ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 7.5f);
-	m_pGameInstance->RenderGrid();
+	// m_pGameInstance->RenderGrid();
 
-	//ImGui::SetNextWindowPos(ImVec2(0, 100.f));
-	//ImGui::SetNextWindowSize(ImVec2(250, 200));
+#pragma region IMGUI GIZMO CUSTOM
+
+	// IMGUI Gizmo Grid 커스텀 (X/Y 2D 좌표계용)
+	static const float gridX[16] =
+	{	1.f, 0.f,  0.f, 0.f, 
+		0.f, 0.f, -1.f, 0.f, 
+		0.f, 1.f, 0.f, 0.f, 
+		0.f, 0.f, 0.f, 1.f };
+
+	_float4x4 ViewMatrix, ProjMatrix;
+	ViewMatrix = CGameInstance::Get_Instance()->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW);
+	ProjMatrix = CGameInstance::Get_Instance()->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
+
+	ImGuizmo::DrawGrid(ViewMatrix.m[0], ProjMatrix.m[0], gridX, 100.f);
+
+#pragma endregion
+
+	
+	//_uint iSizeX, iSizeY = {};
+	//iSizeX = 1900 - g_iWinSizeX;
+	//iSizeY = g_iWinSizeY - 10;
+	//ImGui::SetNextWindowPos(ImVec2(10.f, 10.f));
+	//ImGui::SetNextWindowSize(ImVec2(iSizeX, iSizeY));
 	if (ImGui::Begin(u8"UI Editor 에디터", 0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoCollapse)) 
 		//ImGuiWindowFlags_NoResize
 	{
@@ -123,31 +142,28 @@ void CUI_Editor::Render_IMGUI()
 		ImGui::End(); //창 종료
 	}
 
-	if (ImGui::Begin(u8"Test Tab 테스트 탭", 0, ImGuiWindowFlags_NoCollapse))
+	if (ImGui::Begin(u8"Properties", 0, ImGuiWindowFlags_NoCollapse))
 	{
 		if (ImGui::BeginTabBar(u8"Test TabBar 1")) //탭 바
 		{
-			if (ImGui::BeginTabItem(u8"Test Tab Item 1"))
+			if (ImGui::BeginTabItem(u8"Transform 변환"))
 			{
-				ImGui::SeparatorText(u8"Transform 오브젝트 변환");
-				
-				ImGui::Text(u8"Ctrl S : 크기 / Ctrl R : 회전 / Ctrl T : 위치");
-				Edit_Transform();
-
 				//텍스처 선택 시 기즈모 활성화
 				//_bool IsUsingGizmo = { FALSE };
 				//if (TRUE == IsUsingGizmo)
 				//{
 				//}
 
+				Edit_Transform();
+				Edit_RGBAColor();
+
 				ImGui::EndTabItem();
 			}
 
-			if (ImGui::BeginTabItem(u8"Test Tab Item 2"))
+			if (ImGui::BeginTabItem(u8"Animation 애니메이션"))
 			{
-				ImGui::SeparatorText(u8"Test SeparatorText");
+				ImGui::SeparatorText(u8"애니메이션 제어");
 				ImGui::Text(u8"Test Text");
-
 
 				ImGui::EndTabItem();
 			}
@@ -158,12 +174,44 @@ void CUI_Editor::Render_IMGUI()
 		ImGui::End(); //창 종료
 	}
 
-	//if (ImGui::Begin(u8"Viewport"))
-	//{
-	//	ImGui::End();
-	//}
+	if (ImGui::Begin(u8"ViewPort", 0, ImGuiWindowFlags_NoCollapse))
+	{
+		// 샘플 코드
+		static ImVector<ImVec2> points;
+		static ImVec2 scrolling(0.0f, 0.0f);
+		static bool opt_enable_grid = true;
+		static bool opt_enable_context_menu = true;
+		static bool adding_line = false;
 
-	if (ImGui::Begin(u8"Texture Preview 텍스처 미리보기", 0, ImGuiWindowFlags_NoCollapse))
+		// Using InvisibleButton() as a convenience 1) it will advance the layout cursor and 2) allows us to use IsItemHovered()/IsItemActive()
+		ImVec2 canvas_p0 = ImGui::GetCursorScreenPos();      // ImDrawList API uses screen coordinates!
+		ImVec2 canvas_sz = ImGui::GetContentRegionAvail();   // Resize canvas to what's available
+		if (canvas_sz.x < 50.0f) canvas_sz.x = 50.0f;
+		if (canvas_sz.y < 50.0f) canvas_sz.y = 50.0f;
+		ImVec2 canvas_p1 = ImVec2(canvas_p0.x + canvas_sz.x, canvas_p0.y + canvas_sz.y);
+
+		// Draw border and background color
+		ImGuiIO& io = ImGui::GetIO();
+		ImDrawList* draw_list = ImGui::GetWindowDrawList();
+		draw_list->AddRectFilled(canvas_p0, canvas_p1, IM_COL32(50, 50, 50, 255));
+		draw_list->AddRect(canvas_p0, canvas_p1, IM_COL32(255, 255, 255, 255));
+
+		// Draw grid + all lines in the canvas
+		draw_list->PushClipRect(canvas_p0, canvas_p1, true);
+		if (opt_enable_grid)
+		{
+			const float GRID_STEP = 64.0f;
+			for (float x = fmodf(scrolling.x, GRID_STEP); x < canvas_sz.x; x += GRID_STEP)
+				draw_list->AddLine(ImVec2(canvas_p0.x + x, canvas_p0.y), ImVec2(canvas_p0.x + x, canvas_p1.y), IM_COL32(200, 200, 200, 40));
+			for (float y = fmodf(scrolling.y, GRID_STEP); y < canvas_sz.y; y += GRID_STEP)
+				draw_list->AddLine(ImVec2(canvas_p0.x, canvas_p0.y + y), ImVec2(canvas_p1.x, canvas_p0.y + y), IM_COL32(200, 200, 200, 40));
+		}
+		draw_list->PopClipRect();
+
+		ImGui::End();
+	}
+
+	if (ImGui::Begin(u8"Preview 미리보기", 0, ImGuiWindowFlags_NoCollapse))
 	{
 		ImGui::End();
 	}
@@ -173,6 +221,24 @@ void CUI_Editor::Render_IMGUI()
 
 HRESULT CUI_Editor::Add_Components()
 {
+	HRESULT hr;
+
+	/* For.Com_Shader */
+	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex"),
+		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
+	CHECK_FAILED(hr);
+
+	/* For.Com_Texture */
+	hr = __super::Add_Component(LEVEL_TOOL_UI, TEXT("Prototype_Component_Texture_Logo"),
+		//hr = __super::Add_Component(LEVEL_TOOL_UI, TEXT("Prototype_Component_Texture_Logo"),
+		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom);
+	CHECK_FAILED(hr);
+
+	/* For.Com_VIBuffer */
+	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),
+		TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom);
+	CHECK_FAILED(hr);
+
 	return S_OK;
 }
 
@@ -198,6 +264,8 @@ HRESULT CUI_Editor::Bind_ShaderResources()
 
 _bool CUI_Editor::Edit_Transform()
 {
+	ImGui::SeparatorText(u8"Transform Edit 상태 편집");
+
 	const char* DragTag = { "Translate 위치" };
 	_float fTextWidth = ImGui::CalcTextSize(DragTag).x;
 
@@ -209,19 +277,8 @@ _bool CUI_Editor::Edit_Transform()
 	static ImGuizmo::OPERATION eCurGizmoOper(ImGuizmo::TRANSLATE);
 	static ImGuizmo::MODE eCurGizmoMode(ImGuizmo::WORLD);
 
-	//크기 회전 이동 변경 키
-	if (m_pGameInstance->Get_DIKeyState(DIK_LCONTROL, KEY_PRESS))
-	{
-		if (m_pGameInstance->Get_DIKeyState(DIK_S, KEY_DOWN))
-			eCurGizmoOper = ImGuizmo::SCALE;
-
-		else if (m_pGameInstance->Get_DIKeyState(DIK_R, KEY_DOWN))
-			eCurGizmoOper = ImGuizmo::ROTATE;
-
-		else if (m_pGameInstance->Get_DIKeyState(DIK_T, KEY_DOWN))
-			eCurGizmoOper = ImGuizmo::TRANSLATE;
-	}
-
+	
+	// 기즈모 사용여부 텍스트
 	if (!ImGuizmo::IsUsing())
 		ImGui::Text(u8"Gizmo InValid");
 
@@ -243,22 +300,38 @@ _bool CUI_Editor::Edit_Transform()
 		}
 	}
 
-	//행렬 분해 후 재구성
+	// 기즈모 키 입력 시 기능 스왑
+	ImGui::Text(u8"Ctrl S : 크기 / Ctrl R : 회전 / Ctrl T : 위치");
+
+	// 크기 회전 이동 변경 키
+	if (m_pGameInstance->Get_DIKeyState(DIK_LCONTROL, KEY_PRESS))
+	{
+		if (m_pGameInstance->Get_DIKeyState(DIK_S, KEY_DOWN))
+			eCurGizmoOper = ImGuizmo::SCALE;
+
+		else if (m_pGameInstance->Get_DIKeyState(DIK_R, KEY_DOWN))
+			eCurGizmoOper = ImGuizmo::ROTATE;
+
+		else if (m_pGameInstance->Get_DIKeyState(DIK_T, KEY_DOWN))
+			eCurGizmoOper = ImGuizmo::TRANSLATE;
+	}
+	
 	_float Translate[3], Rotate[3], Scale[3];
 
 	ImGuizmo::DecomposeMatrixToComponents(WorldMatrix.m[0], Translate, Rotate, Scale);
 	ImGui::Text(u8"Scale 크기");
 	ImGui::SameLine(fTextWidth + 20);
-	ImGui::DragFloat3("##Scale", (_float*)&Scale);
+	ImGui::DragFloat3("##Scale", (_float*)&Scale, 0.1f, 0.f, 10.f, "%.2f");
 
 
 	ImGui::Text(u8"Rotate 회전");
 	ImGui::SameLine(fTextWidth + 20);
-	ImGui::DragFloat3("##Rotate", (_float*)&Rotate);
+	ImGui::DragFloat3("##Rotate", (_float*)&Rotate, 0, 0, 0, "%.2f");
 
 	ImGui::Text(u8"Translate 위치");
 	ImGui::SameLine(fTextWidth + 20);
-	ImGui::DragFloat3("##Translate", (_float*)&Translate);
+
+	ImGui::DragFloat3("##Translate", (_float*)&Translate, 0.1f / g_iWinSizeX, 0.f, g_iWinSizeX, "%.2f");
 	ImGuizmo::RecomposeMatrixFromComponents(Translate, Rotate, Scale, WorldMatrix.m[0]);
 
 	//기즈모 영역 세팅
@@ -273,13 +346,49 @@ _bool CUI_Editor::Edit_Transform()
 	static _bool useSnap(false);
 	_float3 snap = _float3();
 
-
 	//오브젝트 변환
 	ImGuizmo::Manipulate(ViewMatrix.m[0], ProjMatrix.m[0], eCurGizmoOper, eCurGizmoMode,
 		WorldMatrix.m[0], useSnap ? &snap.x : NULL);
 
 	//월드행렬 세팅
 	m_pTransformCom->Set_WorldMatrix(WorldMatrix);
+
+	return TRUE;
+}
+
+_bool CUI_Editor::Edit_RGBAColor()
+{
+	ImGui::SeparatorText(u8"Color Edit 색상 편집");
+
+	static ImVec4 color = ImVec4(
+		127.0f / 255.0f, 
+		127.0f / 255.0f, 
+		127.0f / 255.0f, 
+		127.0f / 255.0f);
+
+	// Generate a default palette. The palette will persist and can be edited.
+	static _bool saved_palette_init = true;
+	static ImVec4 saved_palette[32] = {};
+	if (saved_palette_init)
+	{
+		for (int n = 0; n < IM_ARRAYSIZE(saved_palette); n++)
+		{
+			ImGui::ColorConvertHSVtoRGB(n / 31.0f, 0.8f, 0.8f,
+				saved_palette[n].x, saved_palette[n].y, saved_palette[n].z);
+			saved_palette[n].w = 1.0f; // Alpha
+		}
+		saved_palette_init = FALSE;
+	}
+	ImGuiColorEditFlags ColorEdit_Flags = ImGuiColorEditFlags_NoSmallPreview;
+	ImGuiColorEditFlags ColorButton_Flags = ImGuiColorEditFlags_NoBorder | ImGuiColorEditFlags_AlphaPreviewHalf | ImGuiColorEditFlags_NoTooltip;
+
+	ImGui::ColorButton("MyColor##3c", *(ImVec4*)&color, ColorButton_Flags, ImVec2(50, 50));
+	ImGui::SameLine();
+
+	ImGui::PushItemWidth(225.f);
+	ImGui::ColorEdit4("##ColorEdit", (_float*)&color, ColorEdit_Flags);
+	ImGui::PopItemWidth();
+
 
 	return TRUE;
 }

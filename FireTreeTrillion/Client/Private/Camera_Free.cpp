@@ -114,7 +114,7 @@ void CCamera_Free::Orbit_Target(_float fTimeDelta)
 
 void CCamera_Free::Control(_float fTimeDelta)
 {
-
+	
 	if (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
 	{
 		_long	MouseMove = { 0 };
@@ -142,9 +142,14 @@ void CCamera_Free::Control(_float fTimeDelta)
 		//}
 
 		//우측 마우스 누른 채로 공전
+
 		if (m_pGameInstance->Get_KeyState(DIMKS_RBUTTON, KEY_PRESS))
 		{
 			Vector3 vTargetPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Float4(CTransform::STATE_LOOK) * 10.f;
+			
+			// 05.22) LEVEL_TOOL_UI에는 카메라 회전 기능 제외
+			if (*m_pCurrentLevelID == 4) //LEVEL_TOOL_UI
+				return;
 
 			if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMMS_X))
 			{

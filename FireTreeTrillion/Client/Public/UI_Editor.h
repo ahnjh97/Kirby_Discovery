@@ -30,6 +30,8 @@ private:
 	HRESULT			Bind_ShaderResources();
 	_bool			Edit_Transform();
 
+	_bool			Edit_RGBAColor();
+
 private:
 	CShader*			m_pShaderCom = { nullptr };
 	CVIBuffer_Rect*		m_pVIBufferCom = { nullptr };

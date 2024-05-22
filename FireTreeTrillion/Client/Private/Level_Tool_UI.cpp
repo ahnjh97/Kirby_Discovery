@@ -57,11 +57,11 @@ HRESULT CLevel_Tool_UI::Ready_Layer_Camera(const wstring& strLayerTag)
 	CameraDesc.fFovy = XMConvertToRadians(60.0f);
 	CameraDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	CameraDesc.fNear = 0.1f;
-	CameraDesc.fFar = 1000.0f;
-	CameraDesc.vEye = _float4(0.f, 25.f, 0.f, 1.f);
-	CameraDesc.vAt = _float4(0.f, 0.f, 0.1f, 1.f);
+	CameraDesc.fFar = 500.0f;
+	CameraDesc.vEye = _float4(0.f, 0.f, -10.f, 1.f);
+	CameraDesc.vAt = _float4(0.f, 0.f, 1.f, 1.f);
 	CameraDesc.fSpeedPerSec = 10.f;
-	CameraDesc.fRotationPerSec = XMConvertToRadians(270.0f);
+	CameraDesc.fRotationPerSec = XMConvertToRadians(0.0f);
 
 	// 05.20) IMGUI UI Editor Ãß°¡
 	/*      GameObject_Camera_Free    */
