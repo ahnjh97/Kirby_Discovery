@@ -107,12 +107,12 @@ HRESULT CTrigger::Add_Components()
 	HRESULT hr;
 
 	/* For.Com_Shader */
-	hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxModel"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Shader_VtxModel"),
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
 	/* For.Com_Model */
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_ColliderCubeMesh"),
+	if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Model_ColliderCubeMesh"),
 		TEXT("Com_Model"),  (CComponent**)&m_pModelCom)))
 		return E_FAIL;
 	
