@@ -26,6 +26,20 @@ HRESULT CUI_Editor::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
+	m_size2D = _float2(100.f, 100.f);
+	//m_position2D = _float2(100.f, 100.f);
+	m_WindowSize2D = _float2(g_iWinSizeX, g_iWinSizeY);
+
+	m_pTransformCom->Set_Scaled(m_size2D.x, m_size2D.y, 1.f);
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
+		XMVectorSet(
+			 m_position2D.x - g_iWinSizeX * 0.5f + 800.f,
+			-m_position2D.y + g_iWinSizeY * 0.5f - 450.f,
+			0.f, 1.f));
+
+	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
+	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(m_WindowSize2D.x, m_WindowSize2D.y, 0.f, 1.f));
+
 	return S_OK;
 }
 
@@ -85,10 +99,7 @@ void CUI_Editor::Render_IMGUI()
 
 #pragma endregion
 
-	
-	//_uint iSizeX, iSizeY = {};
-	//iSizeX = 1900 - g_iWinSizeX;
-	//iSizeY = g_iWinSizeY - 10;
+	// 도킹 모드는 크기/위치 고정 시 도킹 불가
 	//ImGui::SetNextWindowPos(ImVec2(10.f, 10.f));
 	//ImGui::SetNextWindowSize(ImVec2(iSizeX, iSizeY));
 	if (ImGui::Begin(u8"UI Editor 에디터", 0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoCollapse)) 
@@ -131,6 +142,23 @@ void CUI_Editor::Render_IMGUI()
 
 		if (ImGui::BeginTabBar(u8"Test TabBar 1"))
 		{
+			if (ImGui::TreeNode(u8"Test TreeNode"))
+			{
+				for (int i = 0; i < 3; i++)
+				{
+					if (i == 0)
+						ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+
+					ImGui::PushID(i);
+					if (ImGui::TreeNode("", "Child %d", i))
+					{
+						ImGui::TreePop();
+					}
+					ImGui::PopID();
+				}
+				ImGui::TreePop();
+			}
+
 			if (ImGui::BeginTabItem(u8"Test Tab Item 1"))
 			{
 				ImGui::EndTabItem();
@@ -142,7 +170,7 @@ void CUI_Editor::Render_IMGUI()
 		ImGui::End(); //창 종료
 	}
 
-	if (ImGui::Begin(u8"Properties", 0, ImGuiWindowFlags_NoCollapse))
+	if (ImGui::Begin(u8"Properties 속성", 0, ImGuiWindowFlags_NoCollapse))
 	{
 		if (ImGui::BeginTabBar(u8"Test TabBar 1")) //탭 바
 		{
@@ -216,6 +244,7 @@ void CUI_Editor::Render_IMGUI()
 		ImGui::End();
 	}
 
+
 	//ImGui::PopStyleVar();
 }
 
@@ -265,6 +294,8 @@ HRESULT CUI_Editor::Bind_ShaderResources()
 _bool CUI_Editor::Edit_Transform()
 {
 	ImGui::SeparatorText(u8"Transform Edit 상태 편집");
+
+#pragma region IMGUI_GIZMO
 
 	const char* DragTag = { "Translate 위치" };
 	_float fTextWidth = ImGui::CalcTextSize(DragTag).x;
@@ -317,21 +348,20 @@ _bool CUI_Editor::Edit_Transform()
 	}
 	
 	_float Translate[3], Rotate[3], Scale[3];
-
+	
 	ImGuizmo::DecomposeMatrixToComponents(WorldMatrix.m[0], Translate, Rotate, Scale);
 	ImGui::Text(u8"Scale 크기");
 	ImGui::SameLine(fTextWidth + 20);
-	ImGui::DragFloat3("##Scale", (_float*)&Scale, 0.1f, 0.f, 10.f, "%.2f");
-
-
-	ImGui::Text(u8"Rotate 회전");
-	ImGui::SameLine(fTextWidth + 20);
-	ImGui::DragFloat3("##Rotate", (_float*)&Rotate, 0, 0, 0, "%.2f");
+	ImGui::DragFloat3("##Scale", Scale, 0.1f, 0.f, 10.f, "%.1f");
 
 	ImGui::Text(u8"Translate 위치");
 	ImGui::SameLine(fTextWidth + 20);
+	ImGui::DragFloat3("##Translate", (_float*)&Translate, 1.f, 0.f, g_iWinSizeX, "%.1f");
 
-	ImGui::DragFloat3("##Translate", (_float*)&Translate, 0.1f / g_iWinSizeX, 0.f, g_iWinSizeX, "%.2f");
+	ImGui::Text(u8"Rotate 회전");
+	ImGui::SameLine(fTextWidth + 20);
+	ImGui::DragFloat("##Rotate", (_float*)&Rotate[2], 0, (_int)0, (_int)360, u8"Degree 각도 : %.1f");
+
 	ImGuizmo::RecomposeMatrixFromComponents(Translate, Rotate, Scale, WorldMatrix.m[0]);
 
 	//기즈모 영역 세팅
@@ -353,6 +383,17 @@ _bool CUI_Editor::Edit_Transform()
 	//월드행렬 세팅
 	m_pTransformCom->Set_WorldMatrix(WorldMatrix);
 
+#pragma endregion
+
+	//m_pTransformCom->Set_Scaled(Scale[0], Scale[1], 1.f);
+	//m_pTransformCom->Set_State(CTransform::STATE_POSITION,
+	//	XMVectorSet(
+	//		 m_position2D.x - g_iWinSizeX * 0.5f + Translate[0],
+	//		-m_position2D.y + g_iWinSizeY * 0.5f - Translate[1],
+	//		0.f, 1.f));
+	//m_pTransformCom->Rotation(XMVectorSet(0.f, 0.f, 1.f, 1.f), XMConvertToRadians(Rotate[2]));
+
+
 	return TRUE;
 }
 
@@ -361,7 +402,7 @@ _bool CUI_Editor::Edit_RGBAColor()
 	ImGui::SeparatorText(u8"Color Edit 색상 편집");
 
 	static ImVec4 color = ImVec4(
-		127.0f / 255.0f, 
+		(127.0f / 255.0f) / 1.f, 
 		127.0f / 255.0f, 
 		127.0f / 255.0f, 
 		127.0f / 255.0f);
@@ -379,8 +420,8 @@ _bool CUI_Editor::Edit_RGBAColor()
 		}
 		saved_palette_init = FALSE;
 	}
+	ImGuiColorEditFlags ColorButton_Flags = ImGuiColorEditFlags_NoBorder | ImGuiColorEditFlags_AlphaPreviewHalf | ImGuiColorEditFlags_NoTooltip ;
 	ImGuiColorEditFlags ColorEdit_Flags = ImGuiColorEditFlags_NoSmallPreview;
-	ImGuiColorEditFlags ColorButton_Flags = ImGuiColorEditFlags_NoBorder | ImGuiColorEditFlags_AlphaPreviewHalf | ImGuiColorEditFlags_NoTooltip;
 
 	ImGui::ColorButton("MyColor##3c", *(ImVec4*)&color, ColorButton_Flags, ImVec2(50, 50));
 	ImGui::SameLine();
