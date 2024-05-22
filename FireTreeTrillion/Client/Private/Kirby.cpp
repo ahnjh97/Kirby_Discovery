@@ -42,7 +42,7 @@ HRESULT CKirby::Initialize(void* pArg)
 	m_eMouthState = MONTH_IDLE;
 	m_eEyeState = EYE_IDLE;
 
-	m_eCurrentState = STATE_IDLE;
+	//m_eCurrentState = STATE_IDLE;
 
 	// 카메라 기준으로 움직이기에 미리 받아둔다.
 	if (m_pCamera == nullptr)
@@ -58,7 +58,8 @@ HRESULT CKirby::Initialize(void* pArg)
 
 	m_pTransformCom->Look_At_ForLandObject(vPos + m_tKirbyInfo.m_vMoveDir);
 
-	m_pModelCom[m_eBodyState]->Set_Animation(m_eCurrentState, true, true);
+	m_pModelCom[m_eBodyState]->Set_Animation(STATE_IDLE, 60.f, true, true);
+
 	return S_OK;
 }
 
@@ -76,7 +77,7 @@ _int CKirby::Tick(_float fTimeDelta)
 
 	// FSM 제어
 	if (m_pFSM != nullptr)
-		m_pFSM->Update(this, fTimeDelta, m_eCurrentState);
+		m_pFSM->Update(this, fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
@@ -144,9 +145,14 @@ void CKirby::Render_IMGUI()
 		ImGui::TreePop();
 	}
 
-	ImGui::Text("FSM : %d", m_eCurrentState);
+	ImGui::Text("FSM : %d", m_pFSM->Get_State());
 	ImGui::Separator(); ImGui::NewLine();
 
+}
+
+_uint CKirby::Get_State()
+{
+	return m_pFSM->Get_State();
 }
 
 void CKirby::Setting_KirbyBalance()
@@ -168,42 +174,42 @@ void CKirby::Setting_KirbyBalance()
 void CKirby::Key_Input(_float fTimeDelta)
 {
 	//test
-	//if (m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_PRESS))
-	//{
-	//	if (m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_PRESS))
-	//		m_tKirbyInfo.m_vTargetDir = Make_TargetDir(DIR_LF);
-	//	else if (m_pGameInstance->Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
-	//		m_tKirbyInfo.m_vTargetDir = Make_TargetDir(DIR_RF);
-	//	else
-	//		m_tKirbyInfo.m_vTargetDir = Make_TargetDir(DIR_FRONT);
+	if (m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_PRESS))
+	{
+		if (m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_PRESS))
+			m_tKirbyInfo.m_vTargetDir = Make_TargetDir(DIR_LF);
+		else if (m_pGameInstance->Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
+			m_tKirbyInfo.m_vTargetDir = Make_TargetDir(DIR_RF);
+		else
+			m_tKirbyInfo.m_vTargetDir = Make_TargetDir(DIR_FRONT);
 
-	//	m_pFSM->ChangeState(STATE_RUN, 30.f, true, true);
-	//}
-	//else if (m_pGameInstance->Get_DIKeyState(DIK_DOWN, KEY_PRESS))
-	//{
-	//	if (m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_PRESS))
-	//		m_tKirbyInfo.m_vTargetDir = Make_TargetDir(DIR_LB);
-	//	else if (m_pGameInstance->Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
-	//		m_tKirbyInfo.m_vTargetDir = Make_TargetDir(DIR_RB);
-	//	else
-	//		m_tKirbyInfo.m_vTargetDir = Make_TargetDir(DIR_BACK);
+		m_pFSM->ChangeState(STATE_RUN, 60.f, true, true);
+	}
+	else if (m_pGameInstance->Get_DIKeyState(DIK_DOWN, KEY_PRESS))
+	{
+		if (m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_PRESS))
+			m_tKirbyInfo.m_vTargetDir = Make_TargetDir(DIR_LB);
+		else if (m_pGameInstance->Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
+			m_tKirbyInfo.m_vTargetDir = Make_TargetDir(DIR_RB);
+		else
+			m_tKirbyInfo.m_vTargetDir = Make_TargetDir(DIR_BACK);
 
-	//	m_pFSM->ChangeState(STATE_RUN, 30.f, true, true);
-	//}
-	//else if (m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_PRESS))
-	//{
-	//	m_tKirbyInfo.m_vTargetDir = Make_TargetDir(DIR_LEFT);
-	//	m_pFSM->ChangeState(STATE_RUN, 30.f, true, true);
-	//}
-	//else if (m_pGameInstance->Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
-	//{
-	//	m_tKirbyInfo.m_vTargetDir = Make_TargetDir(DIR_RIGHT);
-	//	m_pFSM->ChangeState(STATE_RUN, 30.f, true, true);
-	//}
-	//else
-	//{
-	//	m_pFSM->ChangeState(STATE_IDLE, 30.f, true, true);
-	//}
+		m_pFSM->ChangeState(STATE_RUN, 60.f, true, true);
+	}
+	else if (m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_PRESS))
+	{
+		m_tKirbyInfo.m_vTargetDir = Make_TargetDir(DIR_LEFT);
+		m_pFSM->ChangeState(STATE_RUN, 60.f, true, true);
+	}
+	else if (m_pGameInstance->Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
+	{
+		m_tKirbyInfo.m_vTargetDir = Make_TargetDir(DIR_RIGHT);
+		m_pFSM->ChangeState(STATE_RUN, 60.f, true, true);
+	}
+	else
+	{
+		m_pFSM->ChangeState(STATE_IDLE, 60.f, true, true);
+	}
 
 
 
@@ -212,6 +218,7 @@ void CKirby::Key_Input(_float fTimeDelta)
 	{
 		m_itestAnim++;
 		m_pModelCom[m_eBodyState]->Set_Animation(m_itestAnim, true, true);
+		m_pModelCom[m_eBodyState]->Set_TickPerSecond(60.f);
 
 	}
 	else if (m_pGameInstance->Get_DIKeyState(DIK_O, KEY_DOWN))
@@ -220,22 +227,30 @@ void CKirby::Key_Input(_float fTimeDelta)
 		if (m_itestAnim < 0)
 			m_itestAnim = 0;
 		m_pModelCom[m_eBodyState]->Set_Animation(m_itestAnim, true, true);
+		m_pModelCom[m_eBodyState]->Set_TickPerSecond(60.f);
+
 	}
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_0, KEY_DOWN))
 	{
 		m_eBodyState = BODY_DEFAULT;
 		m_pModelCom[m_eBodyState]->Set_Animation(m_itestAnim, true, true);
+		m_pModelCom[m_eBodyState]->Set_TickPerSecond(60.f);
+
 	}
 	else if (m_pGameInstance->Get_DIKeyState(DIK_9, KEY_DOWN))
 	{
 		m_eBodyState = BODY_BALLOON;
 		m_pModelCom[m_eBodyState]->Set_Animation(m_itestAnim, true, true);
+		m_pModelCom[m_eBodyState]->Set_TickPerSecond(60.f);
+
 	}
 	else if (m_pGameInstance->Get_DIKeyState(DIK_8, KEY_DOWN))
 	{
 		m_eBodyState = BODY_VACUUM;
 		m_pModelCom[m_eBodyState]->Set_Animation(m_itestAnim, true, true);
+		m_pModelCom[m_eBodyState]->Set_TickPerSecond(60.f);
+
 	}
 
 
@@ -394,7 +409,7 @@ void CKirby::SetUp_FSM()
 
 	// 상태 Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};
-	FSM_Desc.iState = m_eCurrentState = STATE_IDLE;
+	FSM_Desc.iState = STATE_IDLE;
 	FSM_Desc.pModel = m_pModelCom[BODY_DEFAULT];
 	m_pFSM->Initialize(&FSM_Desc);
 
@@ -405,7 +420,6 @@ void CKirby::SetUp_FSM()
 
 void CKirby::Change_State(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
 {
-	m_eCurrentState = eState;
 	m_pFSM->ChangeState((_uint)eState, _fAnimSpeed, _bLoop, _bInterpolation);
 }
 

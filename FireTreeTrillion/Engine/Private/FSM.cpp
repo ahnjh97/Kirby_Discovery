@@ -13,7 +13,7 @@ HRESULT CFSM::Initialize(void* pArg)
 	return S_OK;
 }
 
-void CFSM::Update(class CGameObject* pGameObject, _float fTimeDelta, _uint eState)
+void CFSM::Update(class CGameObject* pGameObject, _float fTimeDelta)
 {
 	if (m_pCurrent_State == nullptr)
 		return;

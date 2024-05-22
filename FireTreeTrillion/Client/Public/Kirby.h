@@ -29,7 +29,7 @@ public:
 
 
 	enum STATE {
-		STATE_IDLE, STATE_RUN = 172, STATE_END
+		STATE_IDLE = 256, STATE_RUN = 172, STATE_END
     };
 
 	enum EYESTATE { EYE_IDLE, EYE_ANGER, EYE_CLOSE, EYE_SADNESS, EYE_PUPIL, EYE_BLINK, EYE_END };
@@ -54,6 +54,7 @@ public:
 	void			Set_KirbyInfo(KIRBY_INFODESC _tInfo) {
 		m_tKirbyInfo = _tInfo;
 	}
+	_uint			Get_State();
 
 private:
 	void			Setting_KirbyBalance();
@@ -71,7 +72,7 @@ private:
 	// Player FSM 및 Jump 관련 변수들
 	CFSM*			m_pFSM = { nullptr };
 	// 애니메이션 상태 제어를 한다.
-	STATE			m_eCurrentState = { STATE_END };
+	//STATE			m_eCurrentState = { STATE_END };
 
 	// 눈, 입, 몸체의 상태를 담당한다.
 	EYESTATE		m_eEyeState = { EYE_END };

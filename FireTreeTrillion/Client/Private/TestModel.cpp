@@ -37,7 +37,7 @@ HRESULT CTestModel::Initialize(void* pArg)
     if (FAILED(Add_Components()))
         return E_FAIL;
 
-    m_pModelCom->Set_Animation(0, true);
+    m_pModelCom->Set_Animation(0, 60.f, true);
     _vector vPos = XMVectorSet(0.f, 20.f, 0.f, 1.f);
     m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 
@@ -56,7 +56,7 @@ HRESULT CTestModel::Initialize(void* pArg)
         return E_FAIL;
 
     m_iTestAnim = 0;
-    m_pModelCom->Set_Animation(m_iTestAnim, true);
+    m_pModelCom->Set_Animation(m_iTestAnim, 60.f, true);
 
 
 
@@ -139,7 +139,7 @@ _int CTestModel::Tick(_float fTimeDelta)
         if (m_iTestAnim > 290)
             m_iTestAnim = 290;
 
-        m_pModelCom->Set_Animation(m_iTestAnim, true, true);
+        m_pModelCom->Set_Animation(m_iTestAnim, 60.f, true, true);
     }
     else if (m_pGameInstance->Get_DIKeyState(DIK_O, KEY_DOWN))
     {
@@ -147,7 +147,7 @@ _int CTestModel::Tick(_float fTimeDelta)
         if (m_iTestAnim < 0)
             m_iTestAnim = 0;
 
-        m_pModelCom->Set_Animation(m_iTestAnim, true, true);
+        m_pModelCom->Set_Animation(m_iTestAnim, 60.f, true, true);
 
     }
     else if (m_pGameInstance->Get_DIKeyState(DIK_I, KEY_DOWN))
@@ -157,7 +157,7 @@ _int CTestModel::Tick(_float fTimeDelta)
 
     // FSM Á¦¾î
     Update_FSMState(fTimeDelta);
-    m_pFSM->Update(this, fTimeDelta, m_eCurrentState);
+    m_pFSM->Update(this, fTimeDelta);
 
     return OBJ_NOEVENT;
 }

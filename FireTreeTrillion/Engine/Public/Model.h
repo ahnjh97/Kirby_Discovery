@@ -22,12 +22,18 @@ public:
 	_bool IsFinished() { return m_Animations[m_iCurrentAnimIndex]->IsFinished(); }
 
 public:
-	void Set_Animation(_uint iAnimIndex, _bool isLoop, _bool bInterpolation = false) {
+	void Set_TickPerSecond(_float _fTickPerSecond) {
+		m_Animations[m_iCurrentAnimIndex]->Set_TickPerSecond(_fTickPerSecond);
+	}
+
+
+	void Set_Animation(_uint iAnimIndex, _float fTickPerSecond, _bool isLoop, _bool bInterpolation = false) {
 		m_iCurrentAnimIndex = iAnimIndex;	
 		m_isLoop = isLoop;
 
 		m_Animations[m_iCurrentAnimIndex]->Reset_TrackPosition();
 		m_Animations[m_iCurrentAnimIndex]->Reset_Finished();
+		m_Animations[m_iCurrentAnimIndex]->Set_TickPerSecond(fTickPerSecond);
 
 		if (bInterpolation)
 		{

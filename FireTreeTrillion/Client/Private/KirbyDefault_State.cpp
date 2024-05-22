@@ -4,7 +4,54 @@
 #include "Kirby.h"
 #include "Utils.h"
 
-//#include <cmath>
+
+void Turn_Interpolate(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTransformCom, _float fTimeDelta)
+{
+	///////// 보간 속도 조정임
+	_float fInterpolate = fTimeDelta * 12.f;
+	_vector vTargetDir = Kirbydesc->m_vTargetDir;
+	_vector vMoveDir = Kirbydesc->m_vMoveDir;
+	_vector vTargetDirXZ = XMVectorSet(XMVectorGetX(vTargetDir), 0.0f, XMVectorGetZ(vTargetDir), 0.0f);
+	_vector vMoveDirXZ = XMVectorSet(XMVectorGetX(vMoveDir), 0.0f, XMVectorGetZ(vMoveDir), 0.0f);
+
+	vTargetDirXZ = XMVector3Normalize(vTargetDirXZ);
+	vMoveDirXZ = XMVector3Normalize(vMoveDirXZ);
+	_float fcosTheta = XMVectorGetX(XMVector4Dot(vTargetDirXZ, vMoveDirXZ));
+	if (fcosTheta < -0.9995f || fcosTheta > 0.9995f)
+	{
+		// 180도로 NaN 방지 랜덤으로 -1, 1도 틀어줌
+		_float4x4 rotationMatrix;
+		XMStoreFloat4x4(&rotationMatrix, XMMatrixIdentity());
+		CUtils::Turn_OtherMatrix(rotationMatrix, XMVectorSet(0.f, 1.f, 0.f, 0.f), 1.f, CUtils::Make_RandomInt(0, 1) == 1 ? 1.f : -1.f);
+		Kirbydesc->m_vMoveDir = XMVector3Transform(Kirbydesc->m_vMoveDir, XMLoadFloat4x4(&rotationMatrix));
+		Kirbydesc->m_vMoveDir = XMVectorSetW(Kirbydesc->m_vMoveDir, 0.0f);
+	}
+	else
+	{
+		_float ftheta = acos(fcosTheta);
+		_float fAngleDegrees = XMConvertToDegrees(ftheta);
+
+		if (fAngleDegrees < 5.0f)
+		{
+			Kirbydesc->m_vMoveDir = Kirbydesc->m_vTargetDir;
+		}
+		else
+		{
+			_float fsinTheta = sqrt(1.0f - fcosTheta * fcosTheta);
+			_float fAlpha = sin((1 - fInterpolate) * ftheta) / fsinTheta;
+			_float fBeta = sin(fInterpolate * ftheta) / fsinTheta;
+			_float4 vResult = vMoveDirXZ * fAlpha + vTargetDirXZ * fBeta;
+			Kirbydesc->m_vMoveDir = XMVector4Normalize(vResult);
+		}
+	}
+
+	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	Kirbydesc->m_vMoveDir = XMVector3Normalize(Kirbydesc->m_vMoveDir);
+	///////////
+
+}
+
+
 
 #pragma region IDLE STATE
 
@@ -25,6 +72,9 @@ void CKirbyDefault_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 
+
+	Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
+
 	// 0.1초간 풀 감속 (최대 속도 8이라 가정)
 	if (Kirbydesc->m_fMoveSpeed > 0.f)
 		Kirbydesc->m_fMoveSpeed -= 80.f * fTimeDelta;
@@ -38,7 +88,6 @@ void CKirbyDefault_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 	Kirbydesc->m_vMoveDir = XMVector3Normalize(Kirbydesc->m_vMoveDir);
 	_vector vMoveDelta = Kirbydesc->m_vMoveDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
 	pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vMoveDelta);
-	//_vector vLook = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
 	pTransformCom->Turn(Kirbydesc->m_vMoveDir, 1.f, Kirbydesc->m_fZAngle);
 }
 
@@ -86,38 +135,11 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	if (Kirbydesc->m_fMoveSpeed > 8.f)
 		Kirbydesc->m_fMoveSpeed = 8.f;
 
-	// 보간 속도 조정임
-	_float fInterpolate = fTimeDelta * 12.f;
-	_vector vTargetDir = Kirbydesc->m_vTargetDir;
-	_vector vMoveDir = Kirbydesc->m_vMoveDir;
-	_vector vTargetDirXZ = XMVectorSet(XMVectorGetX(vTargetDir), 0.0f, XMVectorGetZ(vTargetDir), 0.0f);
-	_vector vMoveDirXZ = XMVectorSet(XMVectorGetX(vMoveDir), 0.0f, XMVectorGetZ(vMoveDir), 0.0f);
+	Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
 
-	vTargetDirXZ = XMVector3Normalize(vTargetDirXZ);
-	vMoveDirXZ = XMVector3Normalize(vMoveDirXZ);
-	_float fcosTheta = XMVectorGetX(XMVector4Dot(vTargetDirXZ, vMoveDirXZ));
-	if (fcosTheta < -0.9995f || fcosTheta > 0.9995f)
-	{
-		// 180도로 NaN 방지 랜덤으로 -1, 1도 틀어줌
-		_float4x4 rotationMatrix;
-		XMStoreFloat4x4(&rotationMatrix, XMMatrixIdentity());
-		CUtils::Turn_OtherMatrix(rotationMatrix, XMVectorSet(0.f, 1.f, 0.f, 0.f), 1.f, CUtils::Make_RandomInt(0, 1) == 1 ? 1.f : -1.f);
-		Kirbydesc->m_vMoveDir = XMVector3Transform(Kirbydesc->m_vMoveDir, XMLoadFloat4x4(&rotationMatrix));
-		Kirbydesc->m_vMoveDir = XMVectorSetW(Kirbydesc->m_vMoveDir, 0.0f);
-	}
-	else
-	{
-		_float ftheta = acos(fcosTheta);
-		_float fsinTheta = sqrt(1.0f - fcosTheta * fcosTheta);
-		_float fAlpha = sin((1 - fInterpolate) * ftheta) / fsinTheta;
-		_float fBeta = sin(fInterpolate * ftheta) / fsinTheta;
-		_float4 vResult = vMoveDirXZ * fAlpha + vTargetDirXZ * fBeta;
-		Kirbydesc->m_vMoveDir = XMVector4Normalize(vResult);
-	}
-
-	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);	
-	Kirbydesc->m_vMoveDir = XMVector3Normalize(Kirbydesc->m_vMoveDir);
-	_vector vMoveDelta = Kirbydesc->m_vMoveDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
+	// 타겟기준
+	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	_vector vMoveDelta = Kirbydesc->m_vTargetDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
 	pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vMoveDelta);
 
 	// 각도 (얼마나 벌어졌느냐)
