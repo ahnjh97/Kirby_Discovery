@@ -64,14 +64,11 @@
     <Filter Include="02.GameObjects\UI\[Sample] TestUI">
       <UniqueIdentifier>{04f2b613-8fae-4a92-b5ab-330fe23d2a87}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\_TestModel">
-      <UniqueIdentifier>{7ee38517-aa59-4304-8efe-ae661ce6f1ef}</UniqueIdentifier>
+    <Filter Include="02.GameObjects\UI\Editor">
+      <UniqueIdentifier>{197bd320-0690-4bf3-9f5f-40f57c555e4d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\_TestModel\State">
-      <UniqueIdentifier>{22c89544-a87d-4d03-9f7e-c1ad5d5b621f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Player\Kirby">
-      <UniqueIdentifier>{f4444bba-a36c-4a3e-9327-ac76df48dd6f}</UniqueIdentifier>
+    <Filter Include="01.Levels\UI Tool">
+      <UniqueIdentifier>{ef096024-030a-43d7-967c-23388e481d5d}</UniqueIdentifier>
     </Filter>
     <Filter Include="01.Levels\Tool_FX">
       <UniqueIdentifier>{2fc1b856-3420-4c6b-b1c3-8a2ae73c0d25}</UniqueIdentifier>
@@ -144,23 +141,23 @@
     <ClInclude Include="..\public\Camera_Main.h">
       <Filter>02.GameObjects\Camera</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\TestModel.h">
+      <Filter>02.GameObjects\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TestTerrain.h">
+      <Filter>02.GameObjects\Terrain</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\ToolHelper.h">
       <Filter>90.Utils\[Sample] ToolHelper</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\TestUI.h">
       <Filter>02.GameObjects\UI\[Sample] TestUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\TestModel.h">
-      <Filter>02.GameObjects\_TestModel</Filter>
+    <ClInclude Include="..\public\Level_UITool.h">
+      <Filter>01.Levels\UI Tool</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\TestModel_State.h">
-      <Filter>02.GameObjects\_TestModel\State</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Kirby.h">
-      <Filter>02.GameObjects\Player\Kirby</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\TestTerrain.h">
-      <Filter>02.GameObjects\_TestModel</Filter>
+    <ClInclude Include="..\Public\UI_Editor.h">
+      <Filter>02.GameObjects\UI\Editor</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Level_Tool_FX.h">
       <Filter>01.Levels\Tool_FX</Filter>
@@ -218,23 +215,23 @@
     <ClCompile Include="..\private\Camera_Main.cpp">
       <Filter>02.GameObjects\Camera</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\TestModel.cpp">
+      <Filter>02.GameObjects\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TestTerrain.cpp">
+      <Filter>02.GameObjects\Terrain</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\ToolHelper.cpp">
       <Filter>90.Utils\[Sample] ToolHelper</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\TestUI.cpp">
       <Filter>02.GameObjects\UI\[Sample] TestUI</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\TestModel.cpp">
-      <Filter>02.GameObjects\_TestModel</Filter>
+    <ClCompile Include="..\private\Level_UITool.cpp">
+      <Filter>01.Levels\UI Tool</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\TestModel_State.cpp">
-      <Filter>02.GameObjects\_TestModel\State</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Kirby.cpp">
-      <Filter>02.GameObjects\Player\Kirby</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\TestTerrain.cpp">
-      <Filter>02.GameObjects\_TestModel</Filter>
+    <ClCompile Include="..\Private\UI_Editor.cpp">
+      <Filter>02.GameObjects\UI\Editor</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Level_Tool_FX.cpp">
       <Filter>01.Levels\Tool_FX</Filter>

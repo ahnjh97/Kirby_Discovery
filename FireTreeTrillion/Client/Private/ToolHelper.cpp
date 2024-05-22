@@ -145,7 +145,6 @@ void CToolHelper::Render_IMGUI()
 	ImGui::NewLine();
 }
 
-
 CToolHelper* CToolHelper::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CToolHelper* pInstance = new CToolHelper(pDevice, pContext);

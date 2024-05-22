@@ -4,8 +4,8 @@
 
 _uint		g_iSizeX = 8192;
 _uint		g_iSizeY = 4608;
-_uint		g_iOriginSizeX = 1280;
-_uint		g_iOriginSizeY = 720;
+_uint		g_iOriginSizeX = 1600; //1280;
+_uint		g_iOriginSizeY = 900; //720;
 
 CRenderer::CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
@@ -176,43 +176,63 @@ HRESULT CRenderer::Initialize()
 #ifdef _DEBUG
 
 	// GameObject
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Diffuse"), 25.f, 695.f, 50.f, 50.f)))
+	//if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Diffuse"), 25.f, 695.f, 50.f, 50.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Diffuse"), 50.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Normal"), 75.f, 695.f, 50.f, 50.f)))
+
+	//if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Normal"), 75.f, 695.f, 50.f, 50.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Normal"), 150.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Depth"), 125.0f, 695.f, 50.f, 50.f)))
+
+	//if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Depth"), 125.0f, 695.f, 50.f, 50.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Depth"), 250.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_FieldDepth"), 175.f, 695.f, 50.f, 50.f)))
+
+	//if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_FieldDepth"), 175.f, 695.f, 50.f, 50.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_FieldDepth"), 350.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Stencil"), 225.f, 695.f, 50.f, 50.f)))
+
+	//if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Stencil"), 225.f, 695.f, 50.f, 50.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Stencil"), 450.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_RimLight"), 275.f, 695.f, 50.f, 50.f)))
+
+	//if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_RimLight"), 275.f, 695.f, 50.f, 50.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_RimLight"), 550.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
 		return E_FAIL;
 
 	// LightAcc
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Shade"), 325.f, 695.f, 50.f, 50.f)))
+	//if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Shade"), 325.f, 695.f, 50.f, 50.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Shade"), 700.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Specular"), 375.f, 695.f, 50.f, 50.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Specular"), 800.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
 		return E_FAIL;
 
 	// ShadowObject
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_LightDepth"), 425.f, 695.f, 50.f, 50.f)))
+	//if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_LightDepth"), 425.f, 695.f, 50.f, 50.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_LightDepth"), 50.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
 		return E_FAIL;
 
 	// Bloom (Blur)
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Blur_X"), 475.f, 695.f, 50.f, 50.f)))
+	//if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Blur_X"), 475.f, 695.f, 50.f, 50.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Blur_X"), 200.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Blur_Y"), 525.f, 695.f, 50.f, 50.f)))
+
+	//if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Blur_Y"), 525.f, 695.f, 50.f, 50.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Blur_Y"), 300.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Effect"), 575.f, 695.f, 50.f, 50.f)))
+
+	//if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Effect"), 575.f, 695.f, 50.f, 50.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Effect"), 400.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
 		return E_FAIL;
 
 	// Sky
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Sky"), 625.f, 695.f, 50.f, 50.f)))
+	//if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Sky"), 625.f, 695.f, 50.f, 50.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Sky"), 550.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
 		return E_FAIL;
 
 	// RadialBlur
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_RadialBlur"), 675.f, 695.f, 50.f, 50.f)))
+	//if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_RadialBlur"), 675.f, 695.f, 50.f, 50.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_RadialBlur"), 700.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
 		return E_FAIL;
 #endif
 
@@ -400,8 +420,10 @@ HRESULT CRenderer::Render_Shadow()
 	ZeroMemory(&ViewPortDesc, sizeof(D3D11_VIEWPORT));
 	ViewPortDesc.TopLeftX = 0;
 	ViewPortDesc.TopLeftY = 0;
-	ViewPortDesc.Width = (_float)1280.0f;
-	ViewPortDesc.Height = (_float)720.0f;
+	ViewPortDesc.Width = (_float)g_iOriginSizeX;
+	ViewPortDesc.Height = (_float)g_iOriginSizeY;
+	//ViewPortDesc.Width = (_float)1280.0f;
+	//ViewPortDesc.Height = (_float)720.0f;
 	ViewPortDesc.MinDepth = 0.f;
 	ViewPortDesc.MaxDepth = 1.f;
 

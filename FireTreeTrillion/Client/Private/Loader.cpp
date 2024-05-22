@@ -9,7 +9,9 @@
 #include "BackGround.h"
 #include "TestModel.h"
 #include "TestTerrain.h"
+
 #include "TestUI.h"
+#include "UI_Editor.h"
 
 #include "RigidBody.h"
 
@@ -80,6 +82,11 @@ HRESULT CLoader::Start()
 		hr = Loading_For_GamePlay();
 		break;
 
+	// 05.20) UI Tool 레벨 추가
+	case LEVEL_TOOL_UI:
+		hr = Loading_For_UITool();
+		break;
+
 	case LEVEL_TOOL_FX:
 	{
 		hr = Loading_For_Tool_FX();
@@ -104,6 +111,10 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestMap"), CTestTerrain);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FXToolDirector"), CFXToolDirector);
+
+	// 05.20) 원본 추가
+	//    /*      GameObj_IMGUI_UI_Editor    */
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("IMGUI_UI_Editor"), CUI_Editor);
 
 	///* For.Prototype_GameObject_Player */
 	//if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Player"),
@@ -200,6 +211,26 @@ HRESULT CLoader::Loading_For_Tool_FX()
 
 	m_IsFinished = true;
 
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_For_UITool()
+{
+	LEVEL eLevel = LEVEL_TOOL_UI;
+	HRESULT hr;
+
+#pragma region TEXTURE
+
+	if (FAILED(Add_Texture(eLevel, "Logo", "Logo/Logo.png")))
+		return E_FAIL;
+
+	m_strLoadingText = TEXT("Loading For Texture : Complete!");
+
+#pragma endregion
+
+	m_strLoadingText = TEXT("Loading For UITool : Complete!");
+
+	m_IsFinished = TRUE;
 	return S_OK;
 }
 

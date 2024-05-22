@@ -6,6 +6,7 @@
 
 #include "Level_Logo.h"
 #include "Level_GamePlay.h"
+#include "Level_UITool.h"
 #include "Level_Tool_FX.h"
 
 CLevel_Loading::CLevel_Loading(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -28,15 +29,14 @@ HRESULT CLevel_Loading::Initialize(LEVEL eNextLevelID)
 	return S_OK;
 }
 
-
-
 void CLevel_Loading::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
 	if (true == m_pLoader->IsFinished())
 	{
-		if (GetKeyState(VK_SPACE) & 0x8000)
+		//if (GetKeyState(VK_SPACE) & 0x8000)
+		if (m_pGameInstance->Get_DIKeyState(DIK_SPACE, KEY_DOWN))
 		{
 			CLevel*		pLevel = { nullptr };
 			m_pGameInstance->Set_CurrentLevelID((_uint)m_eNextLevelID);
@@ -51,6 +51,10 @@ void CLevel_Loading::Tick(_float fTimeDelta)
 				break;
 			case LEVEL_TOOL_FX:
 				pLevel = CLevel_Tool_FX::Create(m_pDevice, m_pContext);
+				break;
+
+			case LEVEL_TOOL_UI:
+				pLevel = CLevel_UITool::Create(m_pDevice, m_pContext);
 				break;
 			}
 
