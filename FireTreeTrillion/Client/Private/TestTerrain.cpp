@@ -72,6 +72,11 @@ HRESULT CTestTerrain::Render()
     return S_OK;
 }
 
+void CTestTerrain::Render_IMGUI()
+{
+    __super::Render_IMGUI();
+}
+
 HRESULT CTestTerrain::Add_Components()
 {
     if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Shader_VtxModel"),

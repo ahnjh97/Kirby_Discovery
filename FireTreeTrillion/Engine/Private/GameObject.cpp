@@ -81,6 +81,9 @@ HRESULT CGameObject::Render()
 
 void CGameObject::Render_IMGUI()
 {
+	string strTag = CUtils::WstrToStr(m_wstrPrototypeTag);
+	string strWindowName = "Component Window : " + strTag;
+	ImGui::Begin(strWindowName.c_str());
 	for (auto& com : m_Components)
 	{
 		char szName[256];
@@ -89,6 +92,7 @@ void CGameObject::Render_IMGUI()
 		if (ImGui::CollapsingHeader(szName))
 			com.second->Render_IMGUI();
 	}
+	ImGui::End();
 }
 
 
