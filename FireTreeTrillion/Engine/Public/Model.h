@@ -40,7 +40,8 @@ public:
 
 public:
 	virtual HRESULT Initialize_Prototype(_fmatrix TransformMatrix, MODEL tModel);
-	virtual HRESULT Initialize(void* pArg) override;
+	virtual HRESULT Initialize(void* pArg)  override;
+	virtual void	Render_IMGUI()			override;
 
 public:
 	HRESULT Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex);
@@ -85,7 +86,7 @@ private:
 
 public:
 	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _fmatrix TransformMatrix
-						,MODEL tModel);
+						, MODEL tModel);
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Free() override;
 };

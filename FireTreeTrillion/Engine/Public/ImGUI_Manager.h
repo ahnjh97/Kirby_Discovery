@@ -19,6 +19,7 @@ public:
 
 public:
 	void SetDockSpace();
+	void RenderGrid();
 	void EditTransform(_float4x4& matrix);
 
 private:
