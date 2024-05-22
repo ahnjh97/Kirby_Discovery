@@ -319,9 +319,6 @@ HRESULT CTestModel::Add_Components()
     hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_RigidBody"),
         TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom);
     CHECK_FAILED(hr);
-    if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_RigidBody"),
-        TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom)))
-        return E_FAIL;
     //m_pRigidBodyCom->Set_PhysXObject(this);
     //m_pRigidBodyCom->Activate(true);
 
@@ -329,9 +326,8 @@ HRESULT CTestModel::Add_Components()
     _float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
     CCharacterController::CONTROLLER_DESC desc{};
     desc.vInitialPos = vPos;
-    if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_CharacterController"),
-        TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc)))
-        return E_FAIL;
+    hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_CharacterController"),
+        TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
     m_pControllerCom->Set_PhysXObject(this);
 
     /* FSM */
