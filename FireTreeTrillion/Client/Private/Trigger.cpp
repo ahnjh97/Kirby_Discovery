@@ -37,7 +37,8 @@ HRESULT CTrigger::Initialize(void * pArg)
 _int CTrigger::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
-
+	
+	return OBJ_NOEVENT;
 }
 
 void CTrigger::Late_Tick(_float fTimeDelta)
@@ -105,15 +106,15 @@ HRESULT CTrigger::Add_Components()
 {
 	HRESULT hr;
 
-	///* For.Com_Shader */
-	//hr = __super::Add_Component(TEXT("Prototype_Component_Shader_VtxModel"),
-	//	TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
-	//CHECK_FAILED(hr);
+	/* For.Com_Shader */
+	hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxModel"),
+		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
+	CHECK_FAILED(hr);
 
-	///* For.Com_Model */
-	//if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Model_ColliderCubeMesh"),
-	//	TEXT("Com_Model"),  (CComponent**)&m_pModelCom)))
-	//	return E_FAIL;
+	/* For.Com_Model */
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_ColliderCubeMesh"),
+		TEXT("Com_Model"),  (CComponent**)&m_pModelCom)))
+		return E_FAIL;
 	
 	return S_OK;
 }
