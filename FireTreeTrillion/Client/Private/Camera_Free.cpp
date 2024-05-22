@@ -97,6 +97,10 @@ void CCamera_Free::Render_IMGUI()
 	_float4 fPosition = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 
 	ImGui::SliderFloat("CameraFree Speed", &fSpeed, 0.f, 50.f);
+
+	ImGui::Checkbox(u8"타겟 따라가기", &m_bTrackTarget);
+
+
 	//m_pTransformCom->Set_Speed(fSpeed);
 	/*
 	ImGui::SliderFloat("CameraFree Smooth Speed", &m_fSmoothSpeed, 0.f, 0.3f);
@@ -110,12 +114,38 @@ void CCamera_Free::Render_IMGUI()
 	ImGui::DragFloat3("CameraFree Offset", &m_vOffset.x);*/
 }
 
+void CCamera_Free::Track_Target(_float fTimeDelta)
+{
+	if (nullptr == m_pTarget)
+		return;
+
+	_float4 vTargetPos = m_pTarget->Get_State(CTransform::STATE_POSITION);
+	_float4 vBackDir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+	vBackDir.Normalize();
+	vBackDir *= 8.f;
+
+	_float4 vCurPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+
+	_float4 vDestDir = (vTargetPos + vBackDir) - vCurPos;
+
+
+	if (.1f <= vDestDir.Length())
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, Pos(vCurPos + (vDestDir * .1f)));
+}
+
 void CCamera_Free::Orbit_Target(_float fTimeDelta)
 {
 }
 
 void CCamera_Free::Control(_float fTimeDelta)
 {
+
+	if (m_pGameInstance->Get_KeyState(DIK_TAB, KEY_DOWN))
+		m_bTrackTarget = !m_bTrackTarget;
+
+	if (m_bTrackTarget)
+		Track_Target(fTimeDelta);
+
 
 	if (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
 	{
@@ -147,6 +177,9 @@ void CCamera_Free::Control(_float fTimeDelta)
 		if (m_pGameInstance->Get_KeyState(DIMKS_RBUTTON, KEY_PRESS))
 		{
 			Vector3 vTargetPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Float4(CTransform::STATE_LOOK) * 10.f;
+
+			if (*m_pCurrentLevelID == LEVEL_TOOL_FX)
+				vTargetPos = Vector3::Zero;
 
 			if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMMS_X))
 			{
@@ -199,6 +232,7 @@ CGameObject* CCamera_Free::Clone(void* pArg)
 
 void CCamera_Free::Free()
 {
-	__super::Free();
+	Safe_Release(m_pTarget);
 
+	__super::Free();
 }

@@ -117,7 +117,7 @@ HRESULT CLoader::Loading_ObjectAll()
 
 	//ÀÌÆåÆ® Åø ¿ë
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FXToolDirector"), CFXToolDirector);
-	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("CSingleEffect"), CSingleEffect);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CSingleEffect"), CSingleEffect);
 	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("CMultiEffect"), CMultiEffect);
 
 	// 05.20) ¿øº» Ãß°¡
@@ -291,6 +291,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 HRESULT CLoader::Add_Shaders(LEVEL eLevel)
 {
+
+	HRESULT hr;
 	/* For.Prototype_Component_Shader_VtxNorTex */
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxNorTex"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxNorTex.hlsl"), VTXNORTEX::Elements, VTXNORTEX::iNumElements))))
@@ -320,6 +322,19 @@ HRESULT CLoader::Add_Shaders(LEVEL eLevel)
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxInstance_Point"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxInstance_Point.hlsl"), VTXINSTANCE_POINT::Elements, VTXINSTANCE_POINT::iNumElements))))
 		return E_FAIL;
+
+
+	//ÀÌÆåÆ®¿ë ½¦ÀÌ´õ
+
+	/* For.Prototype_Component_Shader_FXPosTex */
+	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_FXPosTex"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements));
+	CHECK_FAILED(hr);
+
+	/* For.Prototype_Component_Shader_FXModel */
+	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_FXModel"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements));
+	CHECK_FAILED(hr);
 
 	return S_OK;
 }

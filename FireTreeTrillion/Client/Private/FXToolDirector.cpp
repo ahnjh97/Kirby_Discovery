@@ -89,13 +89,19 @@ void CFXToolDirector::Late_Tick(_float _fTimeDelta)
 	m_pGameInstance->RenderGrid();
 
 	Render_FXHierarchy();
-	//Render_FXProperty(_fTimeDelta);
+	Render_FXProperty(_fTimeDelta);
 	//Render_FXPlayBar(_fTimeDelta);
-	////m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_UI, this);
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_UI, this);
 }
 
 HRESULT CFXToolDirector::Render()
 {
+
+	if (m_eSelected == SELECTED_SINGLE_FX || m_eSelected == SELECTED_PARTICLE_FX)
+		m_FXs[m_iSelectedFXIdx]->Render();
+	else if (m_eSelected == SELECTED_MULTI_FX)
+		m_MultiFXs[m_iSelectedMultiFXIdx]->Render();
+
 	return S_OK;
 }
 
@@ -123,21 +129,48 @@ void CFXToolDirector::Render_FXHierarchy()
 		CSingleEffect::FX_DESC singleFXDesc{};
 		string strComponentTag = "Prototype_Component_";
 
+		string strBaseName{"Default FX"};
 		switch (m_iAddingFXBufferIdx)
 		{
 		case 1:
 			break;
 		default:
-			singleFXDesc.strFXName = "Rect FX ";
+			strBaseName = "Rect FX ";
 			//singleFXDesc.strBufferTag = "Rect";
 			break;
 		}
+
+		//default 이펙트 이름 뒤에 알파벳을 붙인다.
+		char szSuffix = 'A';
+		while (true)
+		{
+			_bool bDoesExistSameName{ false };
+			singleFXDesc.strFXName = strBaseName + szSuffix;
+
+			//중복 이름 있으면 안됨
+			for (const auto& fx : m_FXs)
+			{
+				if (fx->m_strFXName == singleFXDesc.strFXName)
+				{
+					bDoesExistSameName = true;
+					break;
+				}
+			}
+
+			//중복 이름이 없거나, 알파벳이 초과하면 반복 끝
+			if (!bDoesExistSameName || 'Z' <= szSuffix)
+				break;
+
+			++szSuffix;
+		}
+
 
 		singleFXDesc.strBufferTag = strComponentTag + m_FXBufferList[m_iAddingFXBufferIdx];
 		singleFXDesc.strTexTag = strComponentTag + m_FXTexList[m_iAddingFXTexIdx];
 		singleFXDesc.strMaskTexTag = strComponentTag + m_FXMaskTexList[m_iAddingFXMaskTexIdx];
 
-		//CSingleEffect* pSingleFX = static_cast<CSingleEffect*>(m_pGameInstance->Clone_GameObject(TEXT("")))
+		CSingleEffect* pSingleFX = static_cast<CSingleEffect*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_CSingleEffect"), &singleFXDesc));
+		m_FXs.emplace_back(pSingleFX);
 	}
 
 
@@ -155,13 +188,24 @@ void CFXToolDirector::Render_FXHierarchy()
 	
 	Begin(u8"편집하기");
 
+	BeginChild(u8"목록");
 	for (_int i = 0; i < m_FXs.size(); ++i)
 	{
+		//if (m_iSelectedFXIdx == i)
+		//	PushStyleColor(ImGuiCol_Text, COLOR_ORANGE);
+		//else
+		//	PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 1.f));
+		
+
 		if (Selectable(m_FXs[i]->m_strFXName.c_str(), m_iSelectedFXIdx == i))
 		{
-
+			m_iSelectedFXIdx = i;
+			m_eSelected = SELECTED_SINGLE_FX;
 		}
+
+		//PopStyleColor();
 	}
+	EndChild();
 
 	End();
 	
@@ -182,14 +226,14 @@ void CFXToolDirector::Render_FXProperty(_float _fTimeDelta)
 		return;
 
 	//이펙트 기본 변수 세팅
-	Begin("FX Property", nullptr, ImGuiWindowFlags_NoCollapse);
+	Begin(u8"속성 편집", nullptr, ImGuiWindowFlags_NoCollapse);
 
 
 	CEffect* pCurFX = m_FXs[m_iSelectedFXIdx];
 	_bool bIsParticle = _bool{ dynamic_cast<CSingleEffect*>(pCurFX) == nullptr };
 
 	char tempBuf[256];
-	strncpy_s(tempBuf, m_curFXName.c_str(), sizeof(tempBuf));
+	strncpy_s(tempBuf, pCurFX->m_strFXName.c_str(), sizeof(tempBuf));
 	tempBuf[sizeof(tempBuf) - 1] = 0;
 
 	//이름
@@ -203,53 +247,53 @@ void CFXToolDirector::Render_FXProperty(_float _fTimeDelta)
 	}
 
 	//루프, 빌보드
-	Checkbox("Loop", &pCurFX->m_bIsLoop);
-	Checkbox(u8"Billboard", &pCurFX->m_bIsBillboard);
-	if (Checkbox(u8"Bloom", &pCurFX->m_bIsBloom))
+	Checkbox(u8"루프", &pCurFX->m_bIsLoop);
+	Checkbox(u8"빌보딩", &pCurFX->m_bIsBillboard);
+	if (Checkbox(u8"블룸", &pCurFX->m_bIsBloom))
 	{
 		pCurFX->m_bIsBloom ?
-			pCurFX->m_bIsNonLight = false :
-			pCurFX->m_bIsNonLight = true;
+			pCurFX->m_bIsColorRender = false :
+			pCurFX->m_bIsColorRender = true;
 	}
 
 	if(!bIsParticle)
-		Checkbox(u8"Orthographic", &pCurFX->m_bIsOrthographic);
+		Checkbox(u8"직교", &pCurFX->m_bIsOrthographic);
 
 
 	//전체 시간
-	if (DragFloat(u8"Duration", &pCurFX->m_fDuration.second, .1f, 0.f, 30.f, "%.2f"))
+	if (DragFloat(u8"재생 시간", &pCurFX->m_fDuration.second, .1f, 0.f, 30.f, "%.2f"))
 	{
 		m_fTotalPlayDuration = pCurFX->m_fDuration.second;
 	}
 
 	//이펙트의 재생 수명
-	if (DragFloat2(u8"Lifetime", m_fLifeTime, .1f, 0.f, pCurFX->m_fDuration.second, "%.2f"))
+	if (DragFloat2(u8"수명", m_fLifeTime, .1f, 0.f, pCurFX->m_fDuration.second, "%.2f"))
 	{
 		memcpy(&pCurFX->m_fLifeTime, m_fLifeTime, sizeof(_float2));
 		//pCurFX->m_fLifeTime = m_fLifeTime;
 	}
 
-	DragInt(u8"Render Pass", &pCurFX->m_iPassIdx, 1.f, 0, 10);
-	DragInt(u8"Texture Index", &pCurFX->m_iTexIdx, 1.f, 0, pCurFX->m_iMaxTexIdx);
-	DragInt(u8"Mask Texture Index", &pCurFX->m_iMaskTexIdx, 1.f, 0, pCurFX->m_iMaxMaskTexIdx);
+	InputInt(u8"렌더 패스", &pCurFX->m_iPassIdx, 0, 10);
+	InputInt(u8"디퓨즈 인덱스", &pCurFX->m_iTexIdx, 0, pCurFX->m_iMaxTexIdx);
+	InputInt(u8"마스크 인덱스", &pCurFX->m_iMaskTexIdx, 0, pCurFX->m_iMaxMaskTexIdx);
 
 	
-	if (DragFloat3(u8"Init Pos", m_vEditPos, .01f, -50.f, 50.f, "%.2f"))
+	if (DragFloat3(u8"시작 위치", m_vEditPos, .01f, -50.f, 50.f, "%.2f"))
 	{
 		memcpy(&pCurFX->m_vInitPos, m_vEditPos, sizeof(_float3));
 	}
-	if (DragFloat3(u8"Init Rot", m_vEditRot, .1f, -180.f, 180.f, "%.2f"))
+	if (DragFloat3(u8"시작 회전", m_vEditRot, .1f, -180.f, 180.f, "%.2f"))
 	{
 		memcpy(&pCurFX->m_vInitRot, m_vEditRot, sizeof(_float3));
 	}
-	if (DragFloat3(u8"Init Scale", m_vEditScale, .05f, .01f, 100.f, "%.2f"))
+	if (DragFloat3(u8"시작 크기", m_vEditScale, .05f, .01f, 100.f, "%.2f"))
 	{
 		memcpy(&pCurFX->m_vInitScale, m_vEditScale, sizeof(_float3));
 	}
 
 	if (bIsParticle)
 	{
-		DragFloat3(u8"Range", m_fRange, .01f, -100.f, 100.f, "%.2f");
+		DragFloat3(u8"범위", m_fRange, .01f, -100.f, 100.f, "%.2f");
 	}
 
 
@@ -496,5 +540,15 @@ CGameObject* CFXToolDirector::Clone(void* pArg)
 
 void CFXToolDirector::Free()
 {
+	for (auto& pFX : m_FXs)
+		Safe_Release(pFX);
+
+	m_FXs.clear();
+
+	for (auto& pFX : m_MultiFXs)
+		Safe_Release(pFX);
+
+	m_MultiFXs.clear();
+
 	__super::Free();
 }

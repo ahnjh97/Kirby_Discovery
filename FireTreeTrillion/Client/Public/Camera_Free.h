@@ -19,6 +19,20 @@ private:
 	virtual ~CCamera_Free() = default;
 
 public:
+	//트래킹할 타겟을 세팅한다.
+	void Set_Target(CTransform* pTarget)
+	{
+		if (nullptr == pTarget)
+			return;
+
+		if (nullptr != m_pTarget)
+			Safe_Release(m_pTarget);
+
+		m_pTarget = pTarget;
+		Safe_AddRef(pTarget);
+	}
+	void Track_Target(_bool _bTrackTarget) { m_bTrackTarget = _bTrackTarget; }
+
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual _int Tick(_float fTimeDelta) override;
@@ -28,6 +42,12 @@ public:
 
 private:
 	_float			m_fMouseSensor = { 0.0f };
+
+	CTransform*		m_pTarget = { nullptr };
+	_bool			m_bTrackTarget = { false };
+
+	void			Track_Target(_float fTimeDelta);
+
 	//Vector3			m_vOrbitPos = { 0.f, 0.f, 0.f };
 private:
 	void Orbit_Target(_float fTimeDelta);

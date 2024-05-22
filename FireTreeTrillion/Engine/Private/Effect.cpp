@@ -31,7 +31,7 @@ HRESULT CEffect::Initialize(void* pArg)
     m_bIsLoop = effectDesc.bIsLoop;
     m_bIsBillboard = effectDesc.bIsBillboard;
     m_bIsOrthographic = effectDesc.bIsOrthographic;
-    m_bIsNonLight = effectDesc.bIsNonLight;
+    m_bIsColorRender = effectDesc.bIsNonLight;
     m_bIsBloom = effectDesc.bIsBloom;
 
     //desc 읽어 기본 초기화
@@ -84,4 +84,5 @@ void CEffect::Calculate_CurValue(_float fTimeDelta, _bool bIsInEditor)
 
 void CEffect::Free()
 {
+    __super::Free();
 }

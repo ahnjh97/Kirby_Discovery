@@ -50,6 +50,9 @@ HRESULT CKirby::Initialize(void* pArg)
 		Safe_AddRef(m_pCamera);
 	}
 
+	m_pCamera->Set_Target(m_pTransformCom);
+
+
 	_float4 m_pCameraLook = m_pCamera->Get_TransformCom()->Get_State_Vector(CTransform::STATE_LOOK);
 	m_pCameraLook.y = 0.f;
 	m_pCameraLook = XMVector4Normalize(m_pCameraLook);

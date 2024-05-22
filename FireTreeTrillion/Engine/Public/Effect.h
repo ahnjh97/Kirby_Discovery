@@ -9,6 +9,8 @@ class ENGINE_DLL CEffect : public CGameObject
 	friend class CFXToolDirector;
 #endif
 public:
+	enum TEX {TEX_DIFFUSE, TEX_MASK, TEX_END};
+
 	typedef struct : public GAMEOBJECT_DESC
 	{
 		//이펙트 재생을 시작하는 딜레이
@@ -59,17 +61,17 @@ protected:
 	virtual ~CEffect() = default;
 
 public:
-	_float Get_TotalDuration(_float fDuration)
+	_float Get_BiggerDuration(_float fDuration)
 	{
 		m_fDuration.second = (m_fDuration.second < fDuration) ? fDuration : m_fDuration.second;
 		return m_fDuration.second;
 	}
 
-	virtual _int Get_Size() { return 1; }
+	virtual _int	Get_Size() { return 1; }
+	string			Get_Name() { return m_strFXName; }
 
-
-	virtual void Reset_Duration() { m_fDuration.first = 0.f; }
-	virtual void Fill_SaveData(_Out_ SINGLE_FX_DATA* pEffectData);
+	virtual void	Reset_Duration() { m_fDuration.first = 0.f; }
+	virtual void	Fill_SaveData(_Out_ SINGLE_FX_DATA* pFXData);
 
 
 	//키프레임 추가(단일 이펙트 용)
@@ -109,7 +111,7 @@ protected:
 	_bool			m_bIsLoop = { false };
 	_bool			m_bIsBillboard = { false };
 	_bool			m_bIsOrthographic = { false };
-	_bool			m_bIsNonLight = { true };
+	_bool			m_bIsColorRender = { true };
 	_bool			m_bIsBloom = { false };
 
 	//기본 시작 크자이
