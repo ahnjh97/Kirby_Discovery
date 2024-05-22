@@ -302,62 +302,62 @@ HRESULT CKirby::Add_Components()
 {
 	HRESULT hr;
 	/* For.Com_Shader */
-	hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxAnimModel"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Shader_VtxAnimModel"),
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
 	#pragma region Kirby Model
 		// 커비의 기본 상태 모델
-		hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_KirbyDefault"),
+		hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyDefault"),
 			TEXT("Com_Model_Default"), (CComponent**)&m_pModelCom[BODY_DEFAULT]);
 		CHECK_FAILED(hr);
 
 		// 커비의 빨아들이는 상태 모델
-		hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_KirbyVacuum"),
+		hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyVacuum"),
 			TEXT("Com_Model_Vacuum"), (CComponent**)&m_pModelCom[BODY_VACUUM]);
 		CHECK_FAILED(hr);
 
 		// 커비의 풍선 모드 상태 모델
-		hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_KirbyBalloon"),
+		hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyBalloon"),
 			TEXT("Com_Model_Balloon"), (CComponent**)&m_pModelCom[BODY_BALLOON]);
 		CHECK_FAILED(hr);
 	#pragma endregion
 
 	#pragma region Kirby Eye
-		hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_idle"),
+		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_idle"),
 			TEXT("Com_Texture_Eye_Idle"), (CComponent**)&m_pEyeTexture[EYE_IDLE]);
 		CHECK_FAILED(hr);
-		hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_doubt"),
+		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_doubt"),
 			TEXT("Com_Texture_Eye_Doubt"), (CComponent**)&m_pEyeTexture[EYE_SADNESS]);
 		CHECK_FAILED(hr);
-		hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_close"),
+		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_close"),
 			TEXT("Com_Texture_Eye_Close"), (CComponent**)&m_pEyeTexture[EYE_CLOSE]);
 		CHECK_FAILED(hr);
-		hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_blink"),
+		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_blink"),
 			TEXT("Com_Texture_Eye_Blink"), (CComponent**)&m_pEyeTexture[EYE_BLINK]);
 		CHECK_FAILED(hr);
-		hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_anger"),
+		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_anger"),
 			TEXT("Com_Texture_Eye_Anger"), (CComponent**)&m_pEyeTexture[EYE_ANGER]);
 		CHECK_FAILED(hr);
-		hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_pupil"),
+		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_pupil"),
 			TEXT("Com_Texture_Eye_Pupil"), (CComponent**)&m_pEyeTexture[EYE_PUPIL]);
 		CHECK_FAILED(hr);
 	#pragma endregion
 
 	#pragma region Kirby Mouth
-		hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_mouth_base"),
+		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_base"),
 			TEXT("Com_Texture_Mouth_Idle"), (CComponent**)&m_pMouthTexture[MONTH_IDLE]);
 		CHECK_FAILED(hr);
-		hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_mouth_anger"),
+		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_anger"),
 			TEXT("Com_Texture_Mouth_Anger"), (CComponent**)&m_pMouthTexture[MOUTH_ANGER]);
 		CHECK_FAILED(hr);
-		hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_mouth_happy"),
+		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_happy"),
 			TEXT("Com_Texture_Mouth_Happy"), (CComponent**)&m_pMouthTexture[MOUTH_HAPPY]);
 		CHECK_FAILED(hr);
-		hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_mouth_smile"),
+		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_smile"),
 			TEXT("Com_Texture_Mouth_Smile"), (CComponent**)&m_pMouthTexture[MOUTH_SMILE]);
 		CHECK_FAILED(hr);
-		hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_mouth_surprise"),
+		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_surprise"),
 			TEXT("Com_Texture_Mouth_Surprise"), (CComponent**)&m_pMouthTexture[MOUTH_SURPRISE]);
 		CHECK_FAILED(hr);
 	#pragma endregion
@@ -366,7 +366,7 @@ HRESULT CKirby::Add_Components()
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
-	hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_CharacterController"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	m_pControllerCom->Set_PhysXObject(this);
 

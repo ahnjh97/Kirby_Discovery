@@ -74,12 +74,12 @@ HRESULT CTestTerrain::Render()
 
 HRESULT CTestTerrain::Add_Components()
 {
-    if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxModel"),
+    if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Shader_VtxModel"),
         TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
         return E_FAIL;
 
     /* For.Com_Model */
-    if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_TestMap"),
+    if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Model_TestMap"),
         TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
         return E_FAIL;
 

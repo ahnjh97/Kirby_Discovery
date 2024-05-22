@@ -306,17 +306,17 @@ HRESULT CTestModel::Add_Components()
 {
     HRESULT hr;
     /* For.Com_Shader */
-    hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxAnimModel"),
+    hr = __super::Add_Component(TEXT("Prototype_Component_Shader_VtxAnimModel"),
         TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
     CHECK_FAILED(hr);
 
     /* For.Com_Model */
-    hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_KirbyVacuum"),
+    hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyVacuum"),
         TEXT("Com_Model"), (CComponent**)&m_pModelCom);
     CHECK_FAILED(hr);
     
     /* For.Com_RigidBody */
-    hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_RigidBody"),
+    hr = __super::Add_Component(TEXT("Prototype_Component_RigidBody"),
         TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom);
     CHECK_FAILED(hr);
     //m_pRigidBodyCom->Set_PhysXObject(this);
@@ -326,7 +326,7 @@ HRESULT CTestModel::Add_Components()
     _float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
     CCharacterController::CONTROLLER_DESC desc{};
     desc.vInitialPos = vPos;
-    hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_CharacterController"),
+    hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
         TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
     m_pControllerCom->Set_PhysXObject(this);
 
@@ -342,7 +342,7 @@ void CTestModel::Add_RigidBody(const wstring& KeyName, void* pArg)
     HRESULT hr;
 
     CRigidBody* pRigidBody = nullptr;
-    hr = Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_RigidBody"), KeyName,
+    hr = Add_Component(TEXT("Prototype_Component_RigidBody"), KeyName,
                        (CComponent**)&pRigidBody, pArg);
     CHECK_FAILED(hr);
 

@@ -109,7 +109,7 @@ HRESULT CTestUI::Add_Components()
 	/* For.Com_Texture */
 
 	// 05.20) Å×½ºÆ®
-	hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Logo"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Logo"),
 	//hr = __super::Add_Component(LEVEL_TOOL_UI, TEXT("Prototype_Component_Texture_Logo"),
 		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom);
 	CHECK_FAILED(hr);
