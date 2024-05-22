@@ -7,6 +7,8 @@
 
 void Turn_Interpolate(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTransformCom, _float fTimeDelta)
 {
+	if (Kirbydesc->m_vMoveDir == Kirbydesc->m_vTargetDir)
+		return;
 	///////// 보간 속도 조정임
 	_float fInterpolate = fTimeDelta * 12.f;
 	_vector vTargetDir = Kirbydesc->m_vTargetDir;
@@ -31,7 +33,7 @@ void Turn_Interpolate(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTransformC
 		_float ftheta = acos(fcosTheta);
 		_float fAngleDegrees = XMConvertToDegrees(ftheta);
 
-		if (fAngleDegrees < 5.0f)
+		if (fAngleDegrees < 10.0f)
 		{
 			Kirbydesc->m_vMoveDir = Kirbydesc->m_vTargetDir;
 		}
@@ -42,11 +44,10 @@ void Turn_Interpolate(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTransformC
 			_float fBeta = sin(fInterpolate * ftheta) / fsinTheta;
 			_float4 vResult = vMoveDirXZ * fAlpha + vTargetDirXZ * fBeta;
 			Kirbydesc->m_vMoveDir = XMVector4Normalize(vResult);
+			Kirbydesc->m_vMoveDir = XMVector3Normalize(Kirbydesc->m_vMoveDir);
+
 		}
 	}
-
-	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-	Kirbydesc->m_vMoveDir = XMVector3Normalize(Kirbydesc->m_vMoveDir);
 	///////////
 
 }
@@ -85,7 +86,7 @@ void CKirbyDefault_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 	Kirbydesc->m_fZAngle -= Kirbydesc->m_fZAngle / 4.f;
 
 	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-	Kirbydesc->m_vMoveDir = XMVector3Normalize(Kirbydesc->m_vMoveDir);
+	//Kirbydesc->m_vMoveDir = XMVector3Normalize(Kirbydesc->m_vMoveDir);
 	_vector vMoveDelta = Kirbydesc->m_vMoveDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
 	pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vMoveDelta);
 	pTransformCom->Turn(Kirbydesc->m_vMoveDir, 1.f, Kirbydesc->m_fZAngle);
