@@ -55,6 +55,7 @@ HRESULT CKirby::Initialize(void* pArg)
 	m_pCameraLook.y = 0.f;
 	m_pCameraLook = XMVector4Normalize(m_pCameraLook);
 	m_tKirbyInfo.m_vMoveDir = -1.f * m_pCameraLook;
+	m_tKirbyInfo.m_vTargetDir = m_tKirbyInfo.m_vMoveDir;
 
 	m_pTransformCom->Look_At_ForLandObject(vPos + m_tKirbyInfo.m_vMoveDir);
 
@@ -147,6 +148,9 @@ void CKirby::Render_IMGUI()
 
 	ImGui::Text("FSM : %d", m_pFSM->Get_State());
 	ImGui::Separator(); ImGui::NewLine();
+
+	ImGui::Text("MoveDir X : %.2f \tMoveDir Y : %.2f \tMoveDir Z : %.2f ", m_tKirbyInfo.m_vMoveDir.x, m_tKirbyInfo.m_vMoveDir.y, m_tKirbyInfo.m_vMoveDir.z); ImGui::NewLine();
+	ImGui::Text("TargetDir X : %.2f \tTargetDir Y : %.2f \tTargetDir Z : %.2f ", m_tKirbyInfo.m_vTargetDir.x, m_tKirbyInfo.m_vTargetDir.y, m_tKirbyInfo.m_vTargetDir.z);
 
 }
 
@@ -250,7 +254,6 @@ void CKirby::Key_Input(_float fTimeDelta)
 		m_eBodyState = BODY_VACUUM;
 		m_pModelCom[m_eBodyState]->Set_Animation(m_itestAnim, true, true);
 		m_pModelCom[m_eBodyState]->Set_TickPerSecond(60.f);
-
 	}
 
 
