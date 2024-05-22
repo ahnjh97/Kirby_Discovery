@@ -79,15 +79,6 @@
     <Filter Include="02.GameObjects\Effect\Multi">
       <UniqueIdentifier>{f34649b7-f041-4be5-b519-7d313325d15a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Player\Kirby\KirbyState\KirbyDefault_State">
-      <UniqueIdentifier>{e782a48f-9b14-4b6a-a1bc-76238299b3cd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Player\Kirby\KirbyState\KirbyBalloon_State">
-      <UniqueIdentifier>{65b0a61b-acc6-4a59-8ca3-795c3ba3c952}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Player\Kirby\KirbyState\KirbyVacuum_State">
-      <UniqueIdentifier>{aeecbffe-f2e3-457e-a48d-56ebd8fb1ab5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Player\Kirby">
       <UniqueIdentifier>{1c7e445f-7283-4aff-8547-b78b403e00f6}</UniqueIdentifier>
     </Filter>
@@ -96,6 +87,9 @@
     </Filter>
     <Filter Include="02.GameObjects\Player\TestModel">
       <UniqueIdentifier>{34c2185a-9a6a-46ea-bdbe-7aec4726a1fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Player\TestModel\TestModel_State">
+      <UniqueIdentifier>{80e9891c-5385-4bfd-8019-e0c0d6d2071d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -177,11 +171,11 @@
     <ClInclude Include="..\Public\Kirby.h">
       <Filter>02.GameObjects\Player\Kirby</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\TestModel_State.h">
-      <Filter>02.GameObjects\Player\TestModel</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\TestModel.h">
       <Filter>02.GameObjects\Player\TestModel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TestModel_State.h">
+      <Filter>02.GameObjects\Player\TestModel\TestModel_State</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -251,11 +245,11 @@
     <ClCompile Include="..\Private\Kirby.cpp">
       <Filter>02.GameObjects\Player\Kirby</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\TestModel_State.cpp">
-      <Filter>02.GameObjects\Player\TestModel</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\TestModel.cpp">
       <Filter>02.GameObjects\Player\TestModel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TestModel_State.cpp">
+      <Filter>02.GameObjects\Player\TestModel\TestModel_State</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
