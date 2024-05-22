@@ -38,6 +38,24 @@ namespace Engine
 		float		fTime;
 	}KEYFRAME;
 
+	typedef struct
+	{
+		_float fTimeRatio;
+		_float3 vValue = {};
+		EASING eEasing = { EASE_LINEAR };
+
+	}FX_KEYFRAME;
+
+	typedef struct
+	{
+
+	}SINGLE_FX_DATA;
+
+	typedef struct
+	{
+
+	}MULTI_FX_DATA;
+
 	typedef struct ENGINE_DLL
 	{
 		XMFLOAT3		vPosition;		
@@ -98,10 +116,6 @@ namespace Engine
 		static const unsigned int	iNumElements = { 6 };
 		static const D3D11_INPUT_ELEMENT_DESC	Elements[6];
 	}VTXINSTANCE_POINT;
-
-
-
-	
 
 
 	typedef struct ENGINE_DLL

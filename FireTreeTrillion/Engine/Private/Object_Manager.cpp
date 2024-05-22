@@ -187,6 +187,7 @@ void CObject_Manager::IMGUI_Tick()
 	}
 
 	ImGui::End();
+
 }
 
 CGameObject * CObject_Manager::Find_Prototype(const wstring & strPrototypeTag)

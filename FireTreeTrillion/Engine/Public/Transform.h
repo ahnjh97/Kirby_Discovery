@@ -22,65 +22,85 @@ public:
 	virtual ~CTransform() = default;
 
 public:
-	//void Set_State(STATE eState, _fvector vState) {
-	//	_matrix		WorldMatrix;
-	//	WorldMatrix = XMLoadFloat4x4(&m_WorldMatrix);
-	//	WorldMatrix.r[eState] = vState;
-	//	XMStoreFloat4x4(&m_WorldMatrix, WorldMatrix);
-	//}
 
-	void Set_State(STATE eState, _fvector vState) {
+	_float4		Get_State(STATE _eState)
+	{
+		switch (_eState)
+		{
+		case STATE_RIGHT:
+			return Dir(m_WorldMatrix.Right());
+		case STATE_UP:
+			return Dir(m_WorldMatrix.Up());
+		case STATE_LOOK:
+			return Dir(m_WorldMatrix.Forward());
+		case STATE_POSITION:
+			return Pos(m_WorldMatrix.Translation());
+		default:
+			return Pos(m_WorldMatrix.Translation());
+		}
+	}
+	void		Set_State(STATE eState, _fvector vState)
+	{
 		_float4		vTemp;
 		XMStoreFloat4(&vTemp, vState);
 		memcpy(&m_WorldMatrix.m[eState], &vTemp, sizeof(_float4));
 	}
-
-	void Set_State(STATE eState, const _float4& vState)
+	void		Set_State(STATE eState, const _float4& vState)
 	{
 		memcpy(&m_WorldMatrix.m[eState], &vState, sizeof(_float4));
 	}
 
-	void Set_Scaled(_float fScaleX, _float fScaleY, _float fScaleZ);
 
-	_vector Get_State_Vector(STATE eState) {
-		return XMLoadFloat4x4(&m_WorldMatrix).r[eState];
-	}
-
-	_float4 Get_State_Float4(STATE eState) {
-		_float4		vTemp;
-		XMStoreFloat4(&vTemp, XMLoadFloat4x4(&m_WorldMatrix).r[eState]);
-		return vTemp;
-	}
-
-	_float3 Get_Scaled() const {
+	_float3		Get_Scaled() const
+	{
 		_matrix		WorldMatrix = XMLoadFloat4x4(&m_WorldMatrix);
 		return _float3(XMVectorGetX(XMVector3Length(WorldMatrix.r[STATE_RIGHT])), 
 			XMVectorGetX(XMVector3Length(WorldMatrix.r[STATE_UP])), 
 			XMVectorGetX(XMVector3Length(WorldMatrix.r[STATE_LOOK])));
 	}
+	void		Set_Scaled(_float fScaleX, _float fScaleY, _float fScaleZ);
 
-	_float4x4 Get_WorldFloat4x4() const {
-		return m_WorldMatrix;
-	}
-	_matrix Get_WorldMatrix() const {
-		return XMLoadFloat4x4(&m_WorldMatrix);
-	}
 
+	_float4x4	Get_WorldMatrix() const { return m_WorldMatrix; }
+	_float4x4	Get_WorldMatrix_Inv() const { return m_WorldMatrix.Invert(); }
+	void		Set_WorldMatrix(_float4x4 worldMatrix) { m_WorldMatrix = worldMatrix; }
+
+	const _float4x4* Get_WorldFloat4x4_Ptr() const {return &m_WorldMatrix;}
+
+
+	//±¸¹öÀü
+	_vector Get_State_Vector(STATE eState) {return XMLoadFloat4x4(&m_WorldMatrix).r[eState];}
+	_float4 Get_State_Float4(STATE eState)
+	{
+		_float4		vTemp;
+		XMStoreFloat4(&vTemp, XMLoadFloat4x4(&m_WorldMatrix).r[eState]);
+		return vTemp;
+	}
+	_float4x4 Get_WorldFloat4x4() const {return m_WorldMatrix;}
 	_float4x4 Get_WorldFloat4x4_Inverse() const {
 		_float4x4	WorldMatrixInverse;
 		XMStoreFloat4x4(&WorldMatrixInverse, XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix)));
 		return WorldMatrixInverse;
 	}
+	_matrix Get_WorldMatrix_Inverse() const {return XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix));}
 
-	const _float4x4* Get_WorldFloat4x4_Ptr() const {
-		return &m_WorldMatrix;
-	}
-	_matrix Get_WorldMatrix_Inverse() const {
-		return XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix));
-	}
 
-	void Set_WorldMatrix(_float4x4 worldMatrix) { m_WorldMatrix = worldMatrix; }
+public:
+	void Go_Straight(_float fTimeDelta);
+	void Go_Backward(_float fTimeDelta);
+	void Go_Left(_float fTimeDelta);
+	void Go_Right(_float fTimeDelta);
+	void Go_Up(_float fTimeDelta);
+	void Go_Down(_float fTimeDelta);
+	void Look_At(_fvector vPosition);
+	void Look_At_ForLandObject(_fvector vPosition);
+	void Move_toTarget(_fvector vTargetPos, _float fTimeDelta, _float fMinDistance = 0.f);	
+	void Turn(_fvector vAxis, _float fTimeDelta);
+	void Turn(_fvector vAxis, _float fTimeDelta, _float fAngle);
+	void Rotation(_fvector vAxis, _float fRadian);
+	void Orbit(_fvector vTarget, _fvector vAxis, _float fTimeDelta);
 
+	_float Get_SpeedPerSec() const { return m_fSpeedPerSec; }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -89,18 +109,6 @@ public:
 public:
 	HRESULT Bind_ShaderResource(class CShader* pShader, const _char* pConstantName);
 
-public:
-	void Go_Straight(_float fTimeDelta);
-	void Go_Backward(_float fTimeDelta);
-	void Go_Left(_float fTimeDelta);
-	void Go_Right(_float fTimeDelta);
-	void Look_At(_fvector vPosition);
-	void Look_At_ForLandObject(_fvector vPosition);
-	void Move_toTarget(_fvector vTargetPos, _float fTimeDelta, _float fMinDistance = 0.f);	
-	void Turn(_fvector vAxis, _float fTimeDelta);
-	void Rotation(_fvector vAxis, _float fRadian);
-
-	
 private:
 	_float4x4				m_WorldMatrix;
 	_float					m_fSpeedPerSec = { 0.0f };

@@ -48,7 +48,9 @@ HRESULT Engine::CInput_Device::Initialize(HINSTANCE hInst, HWND hWnd)
 
 void Engine::CInput_Device::Tick(void)
 {
-	
+	if (m_IsWindowActive == false)
+		return;
+
 	/* 키보드와 마우스가 어떤 입력상태를 가지고 있는지를 저장한ㄷ.ㅏ */
 	m_pKeyBoard->GetDeviceState(256, m_byKeyState);
 	m_pMouse->GetDeviceState(sizeof(m_tMouseState), &m_tMouseState);

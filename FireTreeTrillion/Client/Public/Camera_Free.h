@@ -28,6 +28,10 @@ public:
 
 private:
 	_float			m_fMouseSensor = { 0.0f };
+	//Vector3			m_vOrbitPos = { 0.f, 0.f, 0.f };
+private:
+	void Orbit_Target(_float fTimeDelta);
+	void Control(_float fTimeDelta);
 
 public:
 	static CCamera_Free* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

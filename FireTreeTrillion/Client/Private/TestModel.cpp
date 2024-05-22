@@ -25,23 +25,19 @@ HRESULT CTestModel::Initialize_Prototype()
 HRESULT CTestModel::Initialize(void* pArg)
 {
     GAMEOBJECT_DESC		GameObjectDesc{};
-
     GameObjectDesc.fSpeedPerSec = 7.f;
     GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
-
     if (FAILED(__super::Initialize(&GameObjectDesc)))
         return E_FAIL;
 
-    CGameInstance::Get_Instance()->Test();
-
+    //CGameInstance::Get_Instance()->Test();
+    // position 세팅은 항상 Add_Components() 앞에 둘것
+    _vector vPos = XMVectorSet(0.f, 20.f, 0.f, 1.f);
+    m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
     if (FAILED(Add_Components()))
         return E_FAIL;
 
-    m_pModelCom->Set_Animation(0, true);
-    _vector vPos = XMVectorSet(0.f, 20.f, 0.f, 1.f);
-    m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
-
-
+    m_pModelCom->Set_Animation(0, 60.f, true);
 
     // 예시코드 1 : 태양광
     LIGHT_DESC			LightDesc{};
@@ -51,13 +47,8 @@ HRESULT CTestModel::Initialize(void* pArg)
     LightDesc.vDiffuse = _float4(0.8f, 0.8f, 0.8f, 1.f);
     LightDesc.vAmbient = _float4(0.6f, 0.6f, 0.6f, 1.f);
     LightDesc.vSpecular = _float4(0.2f, 0.2f, 0.2f, 1.f);
-
     if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
         return E_FAIL;
-
-    m_iTestAnim = 0;
-    m_pModelCom->Set_Animation(m_iTestAnim, true);
-
 
 
     // 예시코드 2 : 따라다니게 하기 예시 코드 + 점 광원 예시 코드
@@ -73,9 +64,7 @@ HRESULT CTestModel::Initialize(void* pArg)
     m_pLight = CGameInstance::Get_Instance()->Get_LightLastAddress();
     Safe_AddRef(m_pLight);*/
 
-
     return S_OK;
-
 }
 
 _int CTestModel::Tick(_float fTimeDelta)
@@ -89,6 +78,12 @@ _int CTestModel::Tick(_float fTimeDelta)
     if (m_pLight != nullptr)
         m_pLight->Update_LightPos(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
 
+    // 점프용 velocity(속도)
+    m_fJumpVelocity -= GRAVITY * fTimeDelta;
+    if (true == m_isJump)
+        m_isJump = m_pControllerCom->Jump(m_pTransformCom, m_fJumpVelocity, fTimeDelta);
+    else
+        m_pControllerCom->FreeFall(m_pTransformCom, fTimeDelta);
 
     // 예시코드 5 : 계산기 예시 코드 (월드 매트리스로 예시든거임 이건 정신나간 코드이므로 참고해주셈)
     // 예시코드 6 : DInput + KeyPress 예시 코드
@@ -97,6 +92,45 @@ _int CTestModel::Tick(_float fTimeDelta)
     //    _float4x4 Worldmatrix = m_pTransformCom->Get_WorldFloat4x4();
     //    _vector vLook = CUtils::Get_State_Vector_Matrix(Worldmatrix, CUtils::STATE_LOOK);
     //    _vector vPos = CUtils::Get_State_Vector_Matrix(Worldmatrix, CUtils::STATE_POSITION);
+    //    _float fSpeed = 3.f;
+
+    //    vPos += vLook * fTimeDelta * fSpeed;
+
+    //    CUtils::Set_State_Matrix(Worldmatrix, CUtils::STATE_POSITION, vPos);
+
+    //    m_pTransformCom->Set_WorldMatrix(Worldmatrix);
+    //}
+    
+    // 예시코드 6 : DInput + KeyPress 예시 코드 
+    if (m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_PRESS))
+    {
+        _float fSpeed = m_pTransformCom->Get_SpeedPerSec();
+        // for test
+        //fSpeed = 5.f;
+        m_pControllerCom->Move(m_pTransformCom, fSpeed, fTimeDelta);
+    }
+
+    if (m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_PRESS))
+    {
+        m_pTransformCom->Turn(XMVectorSet(0.f, -1.f, 0.f, 0.f), fTimeDelta);
+    }
+
+    if (m_pGameInstance->Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
+    {
+        m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta);
+    }
+
+    if (m_pGameInstance->Get_DIKeyState(DIK_SPACE, KEY_DOWN))
+    {
+        m_isJump = true;
+        m_fJumpVelocity = 5.f;
+    }
+
+    //if (m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_PRESS))
+    //{
+    //    _float4x4 Worldmatrix = m_pTransformCom->Get_WorldFloat4x4();
+    //    _vector vLook = CUtils::Get_State_Vector_Matrix(Worldmatrix, CUtils::STATE_LOOK);
+    //    _vector vPos  = CUtils::Get_State_Vector_Matrix(Worldmatrix, CUtils::STATE_POSITION);
     //    _float fSpeed = 3.f;
 
     //    vPos += vLook * fTimeDelta * fSpeed;
@@ -132,22 +166,21 @@ _int CTestModel::Tick(_float fTimeDelta)
     }
 
 
-
     if (m_pGameInstance->Get_DIKeyState(DIK_P, KEY_DOWN))
     {
-       /* m_iTestAnim++;
-        if (m_iTestAnim > 5)
-            m_iTestAnim = 5;
+        m_iTestAnim++;
+        if (m_iTestAnim > 290)
+            m_iTestAnim = 290;
 
-        m_pModelCom->Set_Animation(m_iTestAnim, true);*/
+        m_pModelCom->Set_Animation(m_iTestAnim, 60.f, true, true);
     }
     else if (m_pGameInstance->Get_DIKeyState(DIK_O, KEY_DOWN))
     {
-      /*  m_iTestAnim--;
+        m_iTestAnim--;
         if (m_iTestAnim < 0)
             m_iTestAnim = 0;
 
-        m_pModelCom->Set_Animation(m_iTestAnim, true);*/
+        m_pModelCom->Set_Animation(m_iTestAnim, 60.f, true, true);
 
     }
     else if (m_pGameInstance->Get_DIKeyState(DIK_I, KEY_DOWN))
@@ -157,7 +190,7 @@ _int CTestModel::Tick(_float fTimeDelta)
 
     // FSM 제어
     Update_FSMState(fTimeDelta);
-    m_pFSM->Update(this, fTimeDelta, m_eCurrentState);
+    m_pFSM->Update(this, fTimeDelta);
 
     return OBJ_NOEVENT;
 }
@@ -165,6 +198,8 @@ _int CTestModel::Tick(_float fTimeDelta)
 void CTestModel::Late_Tick(_float fTimeDelta)
 {
     m_pModelCom->Play_Animation(fTimeDelta);
+
+    SetOn_Slope(fTimeDelta);
 
     if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
     {
@@ -182,8 +217,11 @@ void CTestModel::Late_Tick(_float fTimeDelta)
         m_pRigidBodyCom->Add_Force(force);
     }
 
-    m_pRigidBodyCom->Update(m_pTransformCom);
-    m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
+    //// =============== RigidBody를 사용한 예시 소스 ===============
+    //// physX에 내 Transform 던지기 
+    //m_pRigidBodyCom->Update(m_pTransformCom);
+    //// physX에서 변경된 Transform 가져오기
+    //m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
 }
 
 HRESULT CTestModel::Render()
@@ -237,26 +275,60 @@ void CTestModel::Render_IMGUI()
     ImGui::Separator(); ImGui::NewLine();
 }
 
+
+// ==================================== 커비 전용 ===================================
+void CTestModel::SetOn_Slope(_float fTimeDelta)
+{
+    // 지면의 up벡터
+    PxVec3 slope = m_pControllerCom->Compute_Slope(m_pTransformCom);
+    _vector vTerrainNormal = CUtils::To_Vector(slope);
+
+    Lerp_UpVector(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), vTerrainNormal, 10.f, fTimeDelta);
+}
+
+/// <summary> 객체와 지면의 up벡터를 비교하여 객체의 각도를 보간한다. </summary>
+/// <param name="_vOriginUp"> 객체의 up 벡터 </param>
+/// <param name="_vTargetUp"> 지면의 노말 벡터 </param>
+/// <param name="_maxAngle"> 해당 각도보다 크면 각도 보간이 된다. </param>
+void CTestModel::Lerp_UpVector(_fvector _vOriginUp, _fvector _vTargetUp, _float _maxAngle, _float fTimeDelta)
+{
+    _float fAngle = ::XMVectorGetX(::XMVector3AngleBetweenVectors(_vTargetUp, _vOriginUp));
+
+    if (fAngle >= XMConvertToRadians(_maxAngle))
+    {
+        _vector vRight = XMVector3Cross(XMVector3Normalize(_vOriginUp), XMVector3Normalize(_vTargetUp));
+        m_pTransformCom->Turn(vRight, fTimeDelta * fAngle * m_fOffsetTurn);
+    }
+}
+// ==========================================================================
+
 HRESULT CTestModel::Add_Components()
 {
     HRESULT hr;
     /* For.Com_Shader */
-    hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxAnimModel"),
+    hr = __super::Add_Component(TEXT("Prototype_Component_Shader_VtxAnimModel"),
         TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
     CHECK_FAILED(hr);
 
     /* For.Com_Model */
-    if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Kirby"),
-        TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
-        return E_FAIL;
-
+    hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyVacuum"),
+        TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+    CHECK_FAILED(hr);
+    
     /* For.Com_RigidBody */
-    hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_RigidBody"),
+    hr = __super::Add_Component(TEXT("Prototype_Component_RigidBody"),
         TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom);
     CHECK_FAILED(hr);
+    //m_pRigidBodyCom->Set_PhysXObject(this);
+    //m_pRigidBodyCom->Activate(true);
 
-    m_pRigidBodyCom->Set_PhysXObject(this);
-    m_pRigidBodyCom->Activate(true);
+    /* For.Com_CharacterController */
+    _float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+    CCharacterController::CONTROLLER_DESC desc{};
+    desc.vInitialPos = vPos;
+    hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
+        TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
+    m_pControllerCom->Set_PhysXObject(this);
 
     /* FSM */
     SetUp_FSM();
@@ -264,16 +336,17 @@ HRESULT CTestModel::Add_Components()
     return S_OK;
 }
 
-// not yet [240520]
+// not yet [JYWI]
 void CTestModel::Add_RigidBody(const wstring& KeyName, void* pArg)
 {
     HRESULT hr;
 
     CRigidBody* pRigidBody = nullptr;
-    hr = Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_RigidBody"), KeyName,
+    hr = Add_Component(TEXT("Prototype_Component_RigidBody"), KeyName,
                        (CComponent**)&pRigidBody, pArg);
     CHECK_FAILED(hr);
 
+    // not yet
     //m_mapRigidBodies.emplace(KeyName, pRigidBody);
 }
 
@@ -353,6 +426,7 @@ HRESULT CTestModel::Bind_ShaderResources()
 
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
         return E_FAIL;
+
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
         return E_FAIL;
 
@@ -392,6 +466,7 @@ void CTestModel::Free()
     Safe_Release(m_pShaderCom);
     Safe_Release(m_pModelCom);
     Safe_Release(m_pRigidBodyCom);
+    Safe_Release(m_pControllerCom);
     
     Safe_Release(m_pLight);
     Safe_Release(m_pFSM);

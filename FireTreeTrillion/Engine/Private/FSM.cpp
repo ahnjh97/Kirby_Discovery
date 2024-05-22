@@ -13,7 +13,7 @@ HRESULT CFSM::Initialize(void* pArg)
 	return S_OK;
 }
 
-void CFSM::Update(class CGameObject* pGameObject, _float fTimeDelta, _uint eState)
+void CFSM::Update(class CGameObject* pGameObject, _float fTimeDelta)
 {
 	if (m_pCurrent_State == nullptr)
 		return;
@@ -34,8 +34,8 @@ _bool CFSM::ChangeState(_uint iState, _float _fAnimSpeed, _bool _bLoop, _bool _b
 	auto pNextState = Find_State(iState);
 	CHECK_NULLPTR(pNextState);
 
-	//if (m_pCurrent_State == pNextState)
-	//	return false;
+	if (m_pCurrent_State == pNextState)
+		return false;
 
 	// ============ 상태가 변경되었다면 ============
 	// 이전 상태 Terminate

@@ -27,7 +27,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_ LPWSTR    lpCmdLine,
                      _In_ int       nCmdShow)
 {
-#ifdef _DEBUG
+#ifdef _
+
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
@@ -118,6 +119,9 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_CLIENT));
     wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
     wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
+
+    // 05.20) 클라이언트 윈도우에 메뉴 바 삭제 가능 (주석 처리)
+    // wcex.lpszMenuName = NULL;
     wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_CLIENT);
     wcex.lpszClassName  = szWindowClass;
     wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
@@ -141,8 +145,10 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    RECT		rcWindow = { 0, 0, g_iWinSizeX, g_iWinSizeY };
    AdjustWindowRect(&rcWindow, WS_OVERLAPPEDWINDOW, TRUE);
-
-   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+   
+   // 05.20) 윈도우창 최대화 off
+   //HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
       CW_USEDEFAULT, 0, rcWindow.right - rcWindow.left, rcWindow.bottom- rcWindow.top, nullptr, nullptr, hInstance, nullptr);
 
    if (!hWnd)
@@ -178,6 +184,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     switch (message)
     {
+    case WM_ACTIVATE:
+        if (LOWORD(wParam) == WA_INACTIVE)
+            CGameInstance::Get_Instance()->Set_WindowActive(false);
+        else
+            CGameInstance::Get_Instance()->Set_WindowActive(true);
+        break;
+
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);
@@ -200,18 +213,34 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             break;
 
             /* LEVEL 추가 */
-            
+            case ID_32773: // LEVEL_TOOL_FX
+            {
+                HRESULT hr;
+                hr = pMainApp->Open_Level(LEVEL_TOOL_FX);
+                CHECK_FAILED(hr);
+            }
+            break;
+            case ID_32774: // LEVEL_TOOL_UI
+            {
+                HRESULT hr;
+                hr = pMainApp->Open_Level(LEVEL_TOOL_UI);
+                CHECK_FAILED(hr);
+            }
+            break;
             default:
                 return DefWindowProc(hWnd, message, wParam, lParam);
             }
         }
         break;
     case WM_KEYDOWN:
-        switch (wParam)
+        if (CGameInstance::Get_Instance()->Get_WindowActive())
         {
-        case VK_ESCAPE:
-            DestroyWindow(g_hWnd);
-            break;
+            switch (wParam)
+            {
+            case VK_ESCAPE:
+                DestroyWindow(g_hWnd);
+                break;
+            }
         }
         break;
     case WM_PAINT:

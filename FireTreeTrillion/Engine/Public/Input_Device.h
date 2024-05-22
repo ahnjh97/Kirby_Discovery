@@ -27,6 +27,9 @@ public:
 	{	
 		return *(((_long*)&m_tMouseState) + eMouseState);	
 	}
+
+	void	Set_WindowActive(_bool _bIsWindowActive) { m_IsWindowActive = _bIsWindowActive; }
+	_bool	Get_WindowActive() { return m_IsWindowActive; }
 	
 public:
 	HRESULT Initialize(HINSTANCE hInst, HWND hWnd);
@@ -46,6 +49,9 @@ private:
 
 	DIMOUSESTATE			m_tMouseState;
 	KEYSTATE				m_eMouseStates[DIMKS_END];
+
+	// 클라창이 활성화가 되지 않았을 경우 아무것도 작동되지 않게 하는 변수이다.
+	_bool					m_IsWindowActive = { true };
 
 public:
 	static CInput_Device* Create(HINSTANCE hInst, HWND hWnd);

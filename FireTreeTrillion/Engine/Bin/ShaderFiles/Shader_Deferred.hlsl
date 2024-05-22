@@ -6,8 +6,8 @@ matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 matrix g_LightViewMatrix, g_LightProjMatrix;
 matrix g_ViewMatrixInv, g_ProjMatrixInv;
 
-float g_fTexW = 1280.0f;
-float g_fTexH = 720.0f;
+float g_fTexW = 1600.0f;
+float g_fTexH = 900.0f;
 
 static const float fWeight[13] =
 {
