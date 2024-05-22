@@ -100,8 +100,6 @@ public:
 	void Move_toTarget(_fvector vTargetPos, _float fTimeDelta, _float fMinDistance = 0.f);	
 	void Turn(_fvector vAxis, _float fTimeDelta);
 	void Rotation(_fvector vAxis, _float fRadian);
-
-	void Look_Up(_fvector _vUp); // Up을 기준으로 라업룩 다시 계산
 	
 private:
 	_float4x4				m_WorldMatrix;
