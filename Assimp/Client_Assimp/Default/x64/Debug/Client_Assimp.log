@@ -1,0 +1,16 @@
+﻿  LINK : ..\Bin\Client_Assimp.exe을(를) 찾을 수 없거나 마지막 증분 링크에 의해 빌드되지 않았습니다. 전체 링크를 수행하고 있습니다.
+BackGround.obj : warning LNK4099: '' PDB를 'BackGround.obj' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+Camera_Free.obj : warning LNK4099: '' PDB를 'Camera_Free.obj' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+Level_GamePlay.obj : warning LNK4099: '' PDB를 'Level_GamePlay.obj' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+Level_Loading.obj : warning LNK4099: '' PDB를 'Level_Loading.obj' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+Level_Logo.obj : warning LNK4099: '' PDB를 'Level_Logo.obj' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+Level_MapTool.obj : warning LNK4099: '' PDB를 'Level_MapTool.obj' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+Loader.obj : warning LNK4099: '' PDB를 'Loader.obj' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+MainApp.obj : warning LNK4099: '' PDB를 'MainApp.obj' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+Monster.obj : warning LNK4099: '' PDB를 'Monster.obj' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+Terrain.obj : warning LNK4099: '' PDB를 'Terrain.obj' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+Client_Assimp.obj : warning LNK4099: '' PDB를 'Client_Assimp.obj' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+stdafx.obj : warning LNK4099: '' PDB를 'stdafx.obj' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+  Client_Assimp.vcxproj -> C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\Client_Assimp\Bin\Client_Assimp.exe
+  'pwsh.exe'은(는) 내부 또는 외부 명령, 실행할 수 있는 프로그램, 또는
+  배치 파일이 아닙니다.

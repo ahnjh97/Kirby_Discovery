@@ -28,6 +28,9 @@
     <Filter Include="02.GameObjects">
       <UniqueIdentifier>{c4cae272-dd94-43ce-85e6-ecc0b24de4d0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\BackGround">
+      <UniqueIdentifier>{ef3d146c-47a4-4cea-8ab8-0d3efb6a9884}</UniqueIdentifier>
+    </Filter>
     <Filter Include="97.ShaderFiles">
       <UniqueIdentifier>{6c97f181-1c24-4522-bedb-7c3ed51e738e}</UniqueIdentifier>
     </Filter>
@@ -52,44 +55,8 @@
     <Filter Include="02.GameObjects\Terrain">
       <UniqueIdentifier>{790e4632-66f1-4e07-b217-df971b3f85d4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="90.Utils\[Sample] ToolHelper">
-      <UniqueIdentifier>{00fc3552-6b11-480d-a4c6-8313d824b770}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\UI">
-      <UniqueIdentifier>{5686561c-9ae3-4451-b1a7-680ef919cde4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\UI\BackGround">
-      <UniqueIdentifier>{ef3d146c-47a4-4cea-8ab8-0d3efb6a9884}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\UI\[Sample] TestUI">
-      <UniqueIdentifier>{04f2b613-8fae-4a92-b5ab-330fe23d2a87}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\UI\Editor">
-      <UniqueIdentifier>{197bd320-0690-4bf3-9f5f-40f57c555e4d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\UI\FXToolDirector">
-      <UniqueIdentifier>{dbb187c2-6962-4466-b912-a53c4e5d474a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Effect">
-      <UniqueIdentifier>{8da63451-b1d5-46f5-a7cd-b8c224b47c48}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Effect\Single">
-      <UniqueIdentifier>{2a5018c2-8450-43e3-826e-458141237e7c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Effect\Multi">
-      <UniqueIdentifier>{f34649b7-f041-4be5-b519-7d313325d15a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Levels\Tool_UI">
-      <UniqueIdentifier>{ef096024-030a-43d7-967c-23388e481d5d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Levels\Tool">
-      <UniqueIdentifier>{2fc1b856-3420-4c6b-b1c3-8a2ae73c0d25}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Levels\Tool\FX">
-      <UniqueIdentifier>{c638ed01-7d46-4dd2-914f-ebbb16bb731b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Levels\Tool\UI">
-      <UniqueIdentifier>{41f938d7-08df-4edb-8b73-7f075bf755d5}</UniqueIdentifier>
+    <Filter Include="02.GameObjects\Map">
+      <UniqueIdentifier>{242e8596-4ad9-4270-bf01-9dcc6f356075}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -124,7 +91,7 @@
       <Filter>01.Levels\Loading\Loader</Filter>
     </ClInclude>
     <ClInclude Include="..\public\BackGround.h">
-      <Filter>02.GameObjects\UI\BackGround</Filter>
+      <Filter>02.GameObjects\BackGround</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Camera_Free.h">
       <Filter>02.GameObjects\Camera</Filter>
@@ -153,31 +120,8 @@
     <ClInclude Include="..\Public\TestTerrain.h">
       <Filter>02.GameObjects\Terrain</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\ToolHelper.h">
-      <Filter>90.Utils\[Sample] ToolHelper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\TestUI.h">
-      <Filter>02.GameObjects\UI\[Sample] TestUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\UI_Editor.h">
-      <Filter>02.GameObjects\UI\Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\FXToolDirector.h">
-      <Filter>02.GameObjects\UI\FXToolDirector</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\SingleEffect.h">
-      <Filter>02.GameObjects\Effect\Single</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\MultiEffect.h">
-      <Filter>02.GameObjects\Effect\Multi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Kirby.h" />
-    <ClInclude Include="..\Public\TestModel_State.h" />
-    <ClInclude Include="..\public\Level_Tool_FX.h">
-      <Filter>01.Levels\Tool\FX</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\Level_Tool_UI.h">
-      <Filter>01.Levels\Tool\UI</Filter>
+    <ClInclude Include="..\Public\Map_Stage1.h">
+      <Filter>02.GameObjects\Map</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -203,7 +147,7 @@
       <Filter>01.Levels\Loading\Loader</Filter>
     </ClCompile>
     <ClCompile Include="..\private\BackGround.cpp">
-      <Filter>02.GameObjects\UI\BackGround</Filter>
+      <Filter>02.GameObjects\BackGround</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Camera_Free.cpp">
       <Filter>02.GameObjects\Camera</Filter>
@@ -229,31 +173,8 @@
     <ClCompile Include="..\Private\TestTerrain.cpp">
       <Filter>02.GameObjects\Terrain</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\ToolHelper.cpp">
-      <Filter>90.Utils\[Sample] ToolHelper</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\TestUI.cpp">
-      <Filter>02.GameObjects\UI\[Sample] TestUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\UI_Editor.cpp">
-      <Filter>02.GameObjects\UI\Editor</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\FXToolDirector.cpp">
-      <Filter>02.GameObjects\UI\FXToolDirector</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\SingleEffect.cpp">
-      <Filter>02.GameObjects\Effect\Single</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\MultiEffect.cpp">
-      <Filter>02.GameObjects\Effect\Multi</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Kirby.cpp" />
-    <ClCompile Include="..\Private\TestModel_State.cpp" />
-    <ClCompile Include="..\private\Level_Tool_FX.cpp">
-      <Filter>01.Levels\Tool\FX</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Level_Tool_UI.cpp">
-      <Filter>01.Levels\Tool\UI</Filter>
+    <ClCompile Include="..\Private\Map_Stage1.cpp">
+      <Filter>02.GameObjects\Map</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

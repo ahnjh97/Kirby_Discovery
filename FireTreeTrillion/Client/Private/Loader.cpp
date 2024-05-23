@@ -289,8 +289,13 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back(MODEL{ "KirbyDefault", TYPE_ANIM, 1.f, 180.f });
 		m_vecModelInfo.emplace_back(MODEL{ "KirbyVacuum", TYPE_ANIM, 1.f, 180.f });
 
+		m_vecModelInfo.emplace_back(MODEL{ "GsBenchAL", TYPE_NONANIM });
+		m_vecModelInfo.emplace_back(MODEL{ "Level0Stage1Step01", TYPE_NONANIM });
+		m_vecModelInfo.emplace_back(MODEL{ "Level1Stage1Step01", TYPE_NONANIM });
+		m_vecModelInfo.emplace_back(MODEL{ "GsBenchAL", TYPE_NONANIM });
+		m_vecModelInfo.emplace_back(MODEL{ "Level0Stage1Step01", TYPE_NONANIM });
+		m_vecModelInfo.emplace_back(MODEL{ "Level1Stage1Step01", TYPE_NONANIM });
 	}
-
 }
 
 HRESULT CLoader::Add_Shaders(LEVEL eLevel)
