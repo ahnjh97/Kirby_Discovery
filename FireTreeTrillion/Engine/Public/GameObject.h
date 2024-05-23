@@ -9,6 +9,13 @@ class ENGINE_DLL CGameObject abstract : public CBase
 public:
 	typedef struct : public CTransform::TRANSFORM_DESC
 	{		
+		_float4x4 matWorld = {
+			1.0f, 0.0f, 0.0f, 0.0f,
+			0.0f, 1.0f, 0.0f, 0.0f,
+			0.0f, 0.0f, 1.0f, 0.0f,
+			0.0f, 0.0f, 0.0f, 1.0f
+		};
+		wstring wstrModelTag;
 	}GAMEOBJECT_DESC;
 
 protected:

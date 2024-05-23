@@ -19,7 +19,9 @@ HRESULT CMap_Stage1::Initialize_Prototype()
 
 HRESULT CMap_Stage1::Initialize(void* pArg)
 {
-    GAMEOBJECT_DESC		GameObjectDesc{};
+    MAP_DESC		GameObjectDesc{};
+    if (nullptr != pArg)
+        GameObjectDesc = *(MAP_DESC*)pArg;
 
     GameObjectDesc.fSpeedPerSec = 10.f;
     GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
@@ -27,11 +29,19 @@ HRESULT CMap_Stage1::Initialize(void* pArg)
     if (FAILED(__super::Initialize(&GameObjectDesc)))
         return E_FAIL;
 
-    if (FAILED(Add_Components()))
+    wstring wstrModelTag = GameObjectDesc.wstrModelTag;
+
+    if (FAILED(Add_Components(wstrModelTag)))
         return E_FAIL;
 
-    _vector vPos = XMVectorSet(0.f, 10.f, 0.f, 1.f);
-    m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+    if (wstrModelTag.substr(wstrModelTag.length() - 5) != TEXT("Blend")) {  
+        if (FAILED(Add_BlendMap(wstrModelTag))) // BlendMap이 아닌 경우 PartObject 추가
+            return E_FAIL;
+    }
+    else    // BlendMap이 맞는 경우
+        m_eRenderGroup = CRenderer::RENDER_BLEND;
+
+    m_vecPassIndices = GameObjectDesc.iPassIndices;  // 조건문으로 어떤모델인지에 따라서 그냥 이 클래스에서 직접 지정할지 Loader에서 넘겨줘서 지정할지 고민..
 
     if (FAILED(m_pModelCom->CreateStaticActor(m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION))))
         return E_FAIL;
@@ -41,13 +51,18 @@ HRESULT CMap_Stage1::Initialize(void* pArg)
 
 _int CMap_Stage1::Tick(_float fTimeDelta)
 {
+    if (nullptr != m_pBlendMap)
+        m_pBlendMap->Tick(fTimeDelta);
 
     return OBJ_NOEVENT;
 }
 
 void CMap_Stage1::Late_Tick(_float fTimeDelta)
 {
-    m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+    if (nullptr != m_pBlendMap)
+        m_pBlendMap->Late_Tick(fTimeDelta);
+
+    m_pGameInstance->Add_RenderGroup(m_eRenderGroup, this);
 }
 
 HRESULT CMap_Stage1::Render()
@@ -58,7 +73,6 @@ HRESULT CMap_Stage1::Render()
     // Component인 m_pModelCom에서 나의 Mesh의 개수를 파악한다.
     _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 
-    // 파악된 나의 Mesh 개수에 따라 여러번 그려서(왼팔, 오른팔, 무기) 하나의 객체를 만든다.
     for (size_t i = 0; i < iNumMeshes; i++)
     {
         if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
@@ -73,14 +87,15 @@ HRESULT CMap_Stage1::Render()
     return S_OK;
 }
 
-HRESULT CMap_Stage1::Add_Components()
+HRESULT CMap_Stage1::Add_Components(const wstring& _wstrModelTag)
 {
-    if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxModel"),
+    /* For.Com_Shader */
+    if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Shader_VtxModel"),
         TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
         return E_FAIL;
 
     /* For.Com_Model */
-    if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Level1Stage1Step01"),
+    if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Model_") + _wstrModelTag,
         TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
         return E_FAIL;
 
@@ -103,12 +118,19 @@ HRESULT CMap_Stage1::Bind_ShaderResources()
     return S_OK;
 }
 
-HRESULT CMap_Stage1::Add_PartObjects()
+HRESULT CMap_Stage1::Add_BlendMap(const wstring& _wstrModelTag)
 {
-    CPartObject::PARTOBJECT_DESC tPartObjectDesc{};
-    tPartObjectDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+    MAP_DESC tMapDesc{};
+    tMapDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
+    tMapDesc.wstrModelTag = _wstrModelTag + L"Blend"; // 맵 이름 규칙
 
+    vector<_uint> vecPassIndices;
+    vecPassIndices.resize(m_pModelCom->Get_NumMeshes()); // 수정 필요
+    tMapDesc.iPassIndices = vecPassIndices; 
 
+    m_pBlendMap = m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Map_Stage1"), &tMapDesc);
+    if (nullptr == m_pBlendMap)
+        return E_FAIL;
 
     return S_OK;
 }
@@ -143,6 +165,8 @@ CGameObject* CMap_Stage1::Clone(void* pArg)
 void CMap_Stage1::Free()
 {
     __super::Free();
+    Safe_Release(m_pBlendMap);
+
     Safe_Release(m_pShaderCom);
     Safe_Release(m_pModelCom);
 }
