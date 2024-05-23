@@ -1,3 +1,4 @@
+#include "Model.h"
 #include "Channel.h"
 #include "Texture.h"
 #include "Shader.h"
@@ -81,7 +82,7 @@ HRESULT CModel::Initialize_Prototype(_fmatrix TransformMatrix, MODEL tModel)
 	if (FAILED(Ready_Meshes()))
 		return E_FAIL;
 
-	if (FAILED(Ready_Materials(m_tModel.strModelName.c_str())))
+ 	if (FAILED(Ready_Materials(m_tModel.strModelName.c_str())))
 		return E_FAIL;
 
 	if (m_tModel.eType == TYPE_ANIM)
@@ -97,11 +98,33 @@ HRESULT CModel::Initialize_Prototype(_fmatrix TransformMatrix, MODEL tModel)
 
 HRESULT CModel::Initialize(void * pArg)
 {
-
 	/* 읽은 정보를 바탕으로해서 내가 사용하기 좋게 정리한다.  */
 	
 
 	return S_OK;
+}
+
+void CModel::Render_IMGUI()
+{
+	__super::Render_IMGUI();
+	
+
+	if (m_Animations.size() >= m_iCurrentAnimIndex)
+		return;
+
+	// Animation의 end까지
+	ImGui::Text("AnimationIndex: %d", m_iCurrentAnimIndex);
+
+	const _char* animationName = m_Animations[m_iCurrentAnimIndex]->Get_AnimationName();
+	ImGui::Text("Animation Name: %s", animationName);
+
+	_float fTickPerSecond = m_Animations[m_iCurrentAnimIndex]->Get_TickPerSecond();
+	ImGui::DragFloat("TickPerSecond : ", &fTickPerSecond);
+	m_Animations[m_iCurrentAnimIndex]->Set_TickPerSecond(fTickPerSecond);
+
+	_float fTrackPosition = m_Animations[m_iCurrentAnimIndex]->Get_TrackPosition();
+	ImGui::DragFloat("Track_Position : ", &fTrackPosition);
+	m_Animations[m_iCurrentAnimIndex]->Set_TrackPosition(fTrackPosition);
 }
 
 HRESULT CModel::Bind_BoneMatrices(CShader * pShader, const _char * pConstantName, _uint iMeshIndex)

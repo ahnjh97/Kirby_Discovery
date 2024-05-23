@@ -31,8 +31,9 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMLoadFloat4(&pCamDesc->vEye));
 		m_pTransformCom->Look_At(XMLoadFloat4(&pCamDesc->vAt));
 
-		if (FAILED(__super::Initialize(pArg)))
-			return E_FAIL;
+		HRESULT hr = __super::Initialize(pArg);
+		CHECK_FAILED_MSG(hr, "Failed To Initialize : CCamera_Main");
+
 	}
 
 

@@ -10,6 +10,7 @@ public:
 
 	static wstring  StrToWstr(const string& value);
 	static string   WstrToStr(const wstring& value);
+	static void		WCharToChar(const wchar_t* szWchar, char* szChar);
 
 	static _int		Make_RandomInt(_int min, _int max);
 	static _float	Make_RandomFloat(_float min, _float max);
@@ -24,14 +25,20 @@ public:
 
 
 	// Matrix 계산기
-	static void Set_State_Matrix(_Inout_ _float4x4& matrix, STATE eState, _fvector vState);
-	static void Set_State_Matrix(_Inout_ _float4x4& matrix, STATE eState, const _float4& vState);
-	static void Set_Scaled_Matrix(_Inout_ _float4x4& matrix, _float fScaleX, _float fScaleY, _float fScaleZ);
-	static _vector Get_State_Vector_Matrix(_Inout_ _float4x4& matrix, STATE eState);
-	static _float3 Get_Scaled_Matrix(_Inout_ _float4x4& matrix);
-	static void Turn_OtherMatrix(_Inout_ _float4x4& matrix, _fvector vAxis, _float fTimeDelta, _float fAngle);
+	static void		Set_State_Matrix(_Inout_ _float4x4& matrix, STATE eState, _fvector vState);
+	static void		Set_State_Matrix(_Inout_ _float4x4& matrix, STATE eState, const _float4& vState);
+	static void		Set_Scaled_Matrix(_Inout_ _float4x4& matrix, _float fScaleX, _float fScaleY, _float fScaleZ);
+	static _vector	Get_State_Vector_Matrix(_Inout_ _float4x4& matrix, STATE eState);
+	static _float3	Get_Scaled_Matrix(_Inout_ _float4x4& matrix);
+	static void		Turn_OtherMatrix(_Inout_ _float4x4& matrix, _fvector vAxis, _float fTimeDelta, _float fAngle);
 
+	// physX 관련 함수
+	static physx::PxMat44	To_Float4x4(const _float4x4& mat);
+	static _float4x4		To_Float4x4(const physx::PxMat44& mat);
+	static PxVec3			To_PxVec3(const _fvector& vector);
+	static _vector			To_Vector(const PxVec3 pxVec3);
 
+		
 };
 
 END

@@ -10,13 +10,30 @@
 #include "TestModel.h"
 #include "TestTerrain.h"
 
+#pragma region TOO_UI
+
+#include "TestUI.h"
+#include "UI_Editor.h"
+
+#pragma endregion
+
+#include "RigidBody.h"
+#include "CharacterController.h"
+
+
+//이펙트 툴
+#include "FXToolDirector.h"
+#include "SingleEffect.h"
+#include "MultiEffect.h"
+
 //#include "Body_Player.h"
 //#include "Weapon.h"
 //#include "Player.h"
+#include "Kirby.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: m_pDevice { pDevice }
-	, m_pContext { pContext}
+	: m_pDevice{ pDevice }
+	, m_pContext{ pContext }
 	, m_pGameInstance{ CGameInstance::Get_Instance() }
 {
 	Safe_AddRef(m_pGameInstance);
@@ -29,7 +46,7 @@ _uint APIENTRY LoadingMain(void* pArg)
 	CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
 	/* 로더에게 지정된 레벨을 준비해라*/
-	CLoader*		pLoader = (CLoader*)pArg;
+	CLoader* pLoader = (CLoader*)pArg;
 
 	if (FAILED(pLoader->Start()))
 		return 1;
@@ -72,8 +89,18 @@ HRESULT CLoader::Start()
 	case LEVEL_GAMEPLAY:
 		hr = Loading_For_GamePlay();
 		break;
-	}
 
+	// 05.20) UI Tool 레벨 추가
+	case LEVEL_TOOL_UI:
+		hr = Loading_For_Tool_UI();
+		break;
+
+	case LEVEL_TOOL_FX:
+	{
+		hr = Loading_For_Tool_FX();
+		break;
+	}
+	}
 	if (FAILED(hr))
 		return E_FAIL;
 
@@ -86,24 +113,23 @@ HRESULT CLoader::Start()
 HRESULT CLoader::Loading_ObjectAll()
 {
 	m_strLoadingText = TEXT("객체의 원형를(을) 로딩 중 입니다.");
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BackGround"),  CBackGround);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BackGround"), CBackGround);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_Test"), CTestUI);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestMap"), CTestTerrain);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
 
-	///* For.Prototype_GameObject_Player */
-	//if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Player"),
-	//	CPlayer::Create(m_pDevice, m_pContext))))
-	//	return E_FAIL;
+	//이펙트 툴 용
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FXToolDirector"), CFXToolDirector);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CSingleEffect"), CSingleEffect);
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("CMultiEffect"), CMultiEffect);
 
-	///* For.Prototype_GameObject_Part_Body_Player */
-	//if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Part_Body_Player"),
-	//	CBody_Player::Create(m_pDevice, m_pContext))))
-	//	return E_FAIL;
+	// 05.20) 원본 추가
+	 /*      GameObject_IMGUI_UI_Editor    */
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("IMGUI_UI_Editor"), CUI_Editor);
 
-	///* For.Prototype_GameObject_Part_Weapon */
-	//if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Part_Weapon"),
-	//	CWeapon::Create(m_pDevice, m_pContext))))
-	//	return E_FAIL;
+	// For Kirby
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kirby"), CKirby);
 
 	return S_OK;
 }
@@ -118,9 +144,9 @@ HRESULT CLoader::Loading_For_Logo()
 		return E_FAIL;
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
-	
+
 	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
-	
+
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 
 	m_IsFinished = true;
@@ -134,16 +160,31 @@ HRESULT CLoader::Loading_For_GamePlay()
 	LEVEL eLevel = LEVEL_GAMEPLAY;
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
 
+	if (FAILED(Add_Texture(eLevel, "Logo", "Logo/Logo.png")))
+		return E_FAIL;
+
+	// 커비 얼굴 텍스쳐 로드
+	Add_KirbyFaceTexture(eLevel);
+
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
+	// 모아놓은 Model 한번에 생성.
 	hr = Add_Models(eLevel);
 	CHECK_FAILED(hr);
 
+	m_strLoadingText = TEXT("물리 컴포넌트(을) 로딩 중 입니다.");
+	/* 리지드바디 */
+	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_RigidBody"), CRigidBody::Create(m_pDevice, m_pContext));
+	CHECK_FAILED(hr);
+	/* 캐릭터 컨트롤러 */
+	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_CharacterController"), CCharacterController::Create(m_pDevice, m_pContext));
+	CHECK_FAILED(hr);
+
 	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
+	// 모아놓은 Shaders 한번에 생성
 	hr = Add_Shaders(eLevel);
 	CHECK_FAILED(hr);
 
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 
 	m_IsFinished = true;
@@ -151,10 +192,66 @@ HRESULT CLoader::Loading_For_GamePlay()
 	return S_OK;
 }
 
+HRESULT CLoader::Loading_For_Tool_FX()
+{
+	HRESULT hr;
+	LEVEL eLevel = LEVEL_TOOL_FX;
+
+	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
+	//if (FAILED(Add_Texture(eLevel, "Logo", "Logo/Logo.png")))
+	//	return E_FAIL;
+
+	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
+	// 모아놓은 Model 한번에 생성.
+	//hr = Add_Models(eLevel);
+	//CHECK_FAILED(hr);
+	m_strLoadingText = TEXT("물리 컴포넌트(을) 로딩 중 입니다.");
+	// 리지드바디
+	//hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_RigidBody"), CRigidBody::Create(m_pDevice, m_pContext));
+	//CHECK_FAILED(hr);
+
+	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
+	// 모아놓은 Shaders 한번에 생성
+	hr = Add_Shaders(eLevel);
+	CHECK_FAILED(hr);
+
+	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
+
+	m_IsFinished = true;
+
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_For_Tool_UI()
+{
+	LEVEL eLevel = LEVEL_TOOL_UI;
+	HRESULT hr;
+
+#pragma region TEXTURE
+
+	if (FAILED(Add_Texture(eLevel, "Logo", "Logo/Logo.png")))
+		return E_FAIL;
+
+	m_strLoadingText = TEXT("Loading For Texture : Complete!");
+
+#pragma endregion
+
+	m_strLoadingText = TEXT("Loading For UITool : Complete!");
+
+	m_IsFinished = TRUE;
+	return S_OK;
+}
+
 HRESULT CLoader::Add_Models(LEVEL eLevel)
 {
+	// SetUp_ModelScaleRotation 함수에서 모아놓은 Model들을 타입에 따라서 Component 생성한다.
 	for (auto& ModelInfo : m_vecModelInfo)
 	{
+
+		if (ModelInfo.strModelName == "KirbyDefault")
+		{
+			_int i = 0;
+		}
 		_matrix      TransformMatrix = XMMatrixIdentity();
 		TransformMatrix = XMMatrixScaling(ModelInfo.fScale, ModelInfo.fScale, ModelInfo.fScale) * XMMatrixRotationY(XMConvertToRadians(ModelInfo.fDegree));
 
@@ -169,23 +266,37 @@ HRESULT CLoader::Add_Models(LEVEL eLevel)
 	return S_OK;
 }
 
-void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel) // Scale, Degree, RootIndex
+// 여기다가 모든 Model을 셋업한다.
+void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 {
+	// MODEL 구조체 생성자 순서		: 이름 (파일이름) / ANIMTYPE / Scale / Degree (Y) / Root
+	// MODEL 구조체 생성자 기본 값  : ""			  / TYPE_END /  1.f  /    0.f     / 4
 	if (eLevel == LEVEL_LOGO)
 	{
 
 	}
 	else if (eLevel == LEVEL_GAMEPLAY)
 	{
-		m_vecModelInfo.emplace_back(MODEL{ "Fiona", TYPE_ANIM});
+		m_vecModelInfo.emplace_back(MODEL{ "Fiona", TYPE_ANIM });
+		m_vecModelInfo.emplace_back(MODEL{ "Dee", TYPE_ANIM, 0.01f });
+		m_vecModelInfo.emplace_back(MODEL{ "Kirby", TYPE_ANIM });
+
 		m_vecModelInfo.emplace_back(MODEL{ "TestMap", TYPE_NONANIM });
 		m_vecModelInfo.emplace_back(MODEL{ "TestMap2", TYPE_NONANIM, 0.01f });
+
+		// For Kirby Body
+		m_vecModelInfo.emplace_back(MODEL{ "KirbyBalloon", TYPE_ANIM, 1.f, 180.f });
+		m_vecModelInfo.emplace_back(MODEL{ "KirbyDefault", TYPE_ANIM, 1.f, 180.f });
+		m_vecModelInfo.emplace_back(MODEL{ "KirbyVacuum", TYPE_ANIM, 1.f, 180.f });
+
 	}
 
 }
 
 HRESULT CLoader::Add_Shaders(LEVEL eLevel)
 {
+
+	HRESULT hr;
 	/* For.Prototype_Component_Shader_VtxNorTex */
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxNorTex"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxNorTex.hlsl"), VTXNORTEX::Elements, VTXNORTEX::iNumElements))))
@@ -216,6 +327,19 @@ HRESULT CLoader::Add_Shaders(LEVEL eLevel)
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxInstance_Point.hlsl"), VTXINSTANCE_POINT::Elements, VTXINSTANCE_POINT::iNumElements))))
 		return E_FAIL;
 
+
+	//이펙트용 쉐이더
+
+	/* For.Prototype_Component_Shader_FXPosTex */
+	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_FXPosTex"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements));
+	CHECK_FAILED(hr);
+
+	/* For.Prototype_Component_Shader_FXModel */
+	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_FXModel"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements));
+	CHECK_FAILED(hr);
+
 	return S_OK;
 }
 
@@ -231,9 +355,41 @@ HRESULT CLoader::Add_Texture(LEVEL eLevel, string strPrototypeName, string strFo
 	return S_OK;
 }
 
+
+HRESULT CLoader::Add_KirbyFaceTexture(LEVEL eLevel)
+{
+	if (FAILED(Add_Texture(eLevel, "anger", "KirbyFace/anger.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "blink", "KirbyFace/blink.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "close", "KirbyFace/close.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "doubt", "KirbyFace/doubt.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "idle", "KirbyFace/idle.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "pupil", "KirbyFace/pupil.png")))
+		return E_FAIL;
+
+
+	if (FAILED(Add_Texture(eLevel, "mouth_anger", "KirbyFace/mouth_anger.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "mouth_base", "KirbyFace/mouth_base.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "mouth_happy", "KirbyFace/mouth_happy.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "mouth_smile", "KirbyFace/mouth_smile.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "mouth_surprise", "KirbyFace/mouth_surprise.png")))
+		return E_FAIL;
+
+
+	return S_OK;
+}
+
 CLoader * CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID)
 {
-	CLoader*		pInstance = new CLoader(pDevice, pContext);
+	CLoader* pInstance = new CLoader(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize(eNextLevelID)))
 	{

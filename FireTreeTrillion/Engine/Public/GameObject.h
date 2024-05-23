@@ -18,6 +18,7 @@ protected:
 
 public:
 	class CComponent* Get_Component(const wstring& strComTag);
+	CTransform* Get_TransformCom() const { return m_pTransformCom; }
 	_float Get_ViewZ() const { return m_fViewZ; }
 	void Set_Dead() { m_bDead = true; }
 	_bool Get_Dead() { return m_bDead; }
@@ -33,7 +34,7 @@ public:
 	virtual void Late_Tick(_float fTimeDelta);
 	virtual HRESULT Render();
 	virtual HRESULT Render_LightDepth() { return S_OK; }
-	virtual void	Render_IMGUI() {}
+	virtual void	Render_IMGUI();
 
 protected:
 	ID3D11Device*						m_pDevice = { nullptr };
@@ -52,6 +53,7 @@ protected:
 
 protected:
 	HRESULT Add_Component(_uint iLevelIndex, const wstring& strPrototypeTag, const wstring& strComponentTag, class CComponent** ppOut, void* pArg = nullptr);
+	HRESULT Add_Component(const wstring& strPrototypeTag, const wstring& strComponentTag, class CComponent** ppOut, void* pArg = nullptr);
 	HRESULT Compute_ViewZ();
 
 	_float	m_fViewZ = { 0.f };

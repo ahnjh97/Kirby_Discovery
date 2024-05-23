@@ -13,7 +13,8 @@ class ENGINE_DLL CFSM final : public CBase
 public:
 	struct FSM_INFO
 	{
-		_uint		iState;
+		_uint				iState;
+		class CModel*		pModel;
 	};
 
 private:
@@ -21,18 +22,25 @@ private:
 	virtual ~CFSM() = default;
 
 public:
-	HRESULT			Initialize(void* pArg);
+	HRESULT				Initialize(void* pArg);
 	
-	void			Update(_float fTimeDelta, _uint eState);
-	_bool			ChangeState(_uint iState);
-	void			Add_State(_uint iState, CFSM_State* pInitState);
-	CFSM_State*		Find_State(_uint iState);
+	void				Update(class CGameObject* pGameObject, _float fTimeDelta);
+	_bool				ChangeState(_uint iState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
+	void				Add_State(_uint iState, CFSM_State* pInitState);
+	CFSM_State*			Find_State(_uint iState);
+
+	_uint				Get_State() { return m_iState; }
 
 private:
-	CFSM_State*		m_pCurrent_State = {nullptr};
-	_uint			m_iState = { UINT_MAX };
-	_uint			m_iPreState = 0; // Debug
-	//MAP_FSM_STATE	m_mapFSM_State;
+	CFSM_State*			m_pCurrent_State = { nullptr };
+	_uint				m_iState = { UINT_MAX };
+
+	// FSM에서 들고 있을 Model
+	class CModel*		m_pModel = { nullptr };
+
+	// for Debug
+	_uint				m_iPreState = 0; 
+	
 	unordered_map<_uint, CFSM_State*>	m_mapFSM_State;
 
 public:

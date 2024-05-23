@@ -19,6 +19,8 @@ CAnimation::CAnimation(const CAnimation & rhs)
 {
 	for (auto& pChannel : m_Channels)
 		Safe_AddRef(pChannel);
+
+	strcpy_s(m_szName, rhs.m_szName);
 }
 
 HRESULT CAnimation::Initialize(const vector<class CBone*>& Bones, ifstream& fileStream)
@@ -40,6 +42,30 @@ HRESULT CAnimation::Initialize(const vector<class CBone*>& Bones, ifstream& file
 
 void CAnimation::Invalidate_TransformationMatrix(_float fTimeDelta, const vector<CBone*>& Bones, _bool isLoop)
 {
+	// 선형보간 부분
+	if (m_bRatio)
+	{
+		// 재생바를 계속 증가시킨다.
+		m_fRatioTime += fTimeDelta;
+
+		for (_uint i = 0; i < m_iNumChannels; ++i)
+		{
+			//Channel의 뼈 
+			m_Channels[i]->Ratio_TransformationMatrix(Bones, m_fTrackPosition, &m_CurrentKeyFrameIndices[i]);
+		}
+
+		m_fTrackPosition += fTimeDelta;
+
+		if (m_fRatioTime > 0.1f)
+		{
+			Reset_TrackPosition();
+			m_fRatioTime = 0.f;
+			m_bRatio = false;
+		}
+		return;
+	}
+
+
 	m_IsFinished = false;
 
 	m_fTrackPosition += m_fTickPerSecond * fTimeDelta;

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Client_Defines.h"
-#include "GameObject.h"
+#include "UIObject.h"
 
 BEGIN(Engine)
 class CShader;
@@ -11,7 +11,7 @@ END
 
 BEGIN(Client)
 
-class CBackGround final : public CGameObject
+class CBackGround final : public CUIObject
 {
 private:
 	CBackGround(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -19,11 +19,12 @@ private:
 	virtual ~CBackGround() = default;
 
 public:
-	virtual HRESULT Initialize_Prototype() override;
-	virtual HRESULT Initialize(void* pArg) override;
-	virtual _int Tick(_float fTimeDelta) override;
-	virtual void Late_Tick(_float fTimeDelta) override;
-	virtual HRESULT Render() override;
+	virtual HRESULT Initialize_Prototype()		 override;
+	virtual HRESULT Initialize(void* pArg)		 override;
+	virtual _int	Tick(_float fTimeDelta)		 override;
+	virtual void	Late_Tick(_float fTimeDelta) override;
+	virtual HRESULT Render()					 override;
+	virtual void	Render_IMGUI()				 override;
 
 private:
 	CShader*				m_pShaderCom = { nullptr };
@@ -32,7 +33,7 @@ private:
 
 private:
 	_float					m_fX, m_fY, m_fSizeX, m_fSizeY;
-	_float4x4				m_WorldMatrix, m_ViewMatrix, m_ProjMatrix;
+	_float4x4				m_WorldMatrix;
 
 private:
 	HRESULT Add_Components();

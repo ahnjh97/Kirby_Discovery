@@ -5,10 +5,18 @@
 
 namespace Client
 {
-	enum LEVEL { LEVEL_STATIC, LEVEL_LOADING, LEVEL_LOGO, LEVEL_GAMEPLAY, LEVEL_END };
+	enum LEVEL { LEVEL_STATIC, LEVEL_LOADING, 
+                 LEVEL_LOGO, 
+                 LEVEL_GAMEPLAY, 
 
-	const unsigned int	g_iWinSizeX = 1280;
-	const unsigned int	g_iWinSizeY = 720;
+                //============= TOOL
+                 LEVEL_TOOL_UI,
+                 LEVEL_TOOL_FX,
+                
+                 LEVEL_END };
+
+    const unsigned int	g_iWinSizeX = 1600; //1280;
+    const unsigned int	g_iWinSizeY = 900; //720;
 }
 
 

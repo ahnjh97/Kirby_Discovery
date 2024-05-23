@@ -17,6 +17,7 @@ CGameObject::CGameObject(const CGameObject & rhs)
 	: m_pDevice(rhs.m_pDevice)
 	, m_pContext(rhs.m_pContext)
 	, m_pGameInstance(rhs.m_pGameInstance)
+	, m_wstrPrototypeTag(rhs.m_wstrPrototypeTag)
 {
 	Safe_AddRef(m_pGameInstance);
 	Safe_AddRef(m_pDevice);
@@ -79,6 +80,23 @@ HRESULT CGameObject::Render()
 	return S_OK;
 }
 
+void CGameObject::Render_IMGUI()
+{
+	string strTag = CUtils::WstrToStr(m_wstrPrototypeTag);
+	string strWindowName = "Component Window : " + strTag;
+
+	ImGui::BeginChild(strWindowName.c_str());
+	for (auto& com : m_Components)
+	{
+		char szName[256];
+		CUtils::WCharToChar(com.first.c_str(), szName);
+
+		if (ImGui::CollapsingHeader(szName))
+			com.second->Render_IMGUI();
+	}
+	ImGui::EndChild();
+}
+
 
 HRESULT CGameObject::Add_Component(_uint iLevelIndex, const wstring & strPrototypeTag, const wstring & strComponentTag, CComponent** ppOut, void * pArg)
 {
@@ -92,6 +110,26 @@ HRESULT CGameObject::Add_Component(_uint iLevelIndex, const wstring & strPrototy
 
 	m_Components.emplace(strComponentTag, pComponent);
 	
+	*ppOut = pComponent;
+
+	Safe_AddRef(pComponent);
+
+	return S_OK;
+}
+
+/// <summary> LEVEL_STATIC이 아닌 경우, GameObject 내부에서 LEVEL을 처리한다. </summary>
+HRESULT CGameObject::Add_Component(const wstring& strPrototypeTag, const wstring& strComponentTag, CComponent** ppOut, void* pArg)
+{
+	CComponent* pComponent = m_pGameInstance->Clone_Component(*m_pCurrentLevelID, strPrototypeTag, pArg);
+	if (nullptr == pComponent)
+		return E_FAIL;
+
+	auto	iter = m_Components.find(strComponentTag);
+	if (iter != m_Components.end())
+		return E_FAIL;
+
+	m_Components.emplace(strComponentTag, pComponent);
+
 	*ppOut = pComponent;
 
 	Safe_AddRef(pComponent);

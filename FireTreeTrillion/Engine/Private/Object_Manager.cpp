@@ -151,12 +151,16 @@ void CObject_Manager::IMGUI_Tick()
 	if (m_iCurrentLevel <= 2) return;
 
 	ImGui::Begin("MainImGuiEditor");
+	ImGui::Text("FPS : "); ImGui::SameLine();
+	ImGui::Text("%.2f", ImGui::GetIO().Framerate);
+	ImGui::Separator();  ImGui::NewLine();
 
 	for (auto& map : m_pLayers[m_iCurrentLevel])
 	{
 		auto ObjList = map.second->Get_GameObjectList();
 
 		string LayerName = CUtils::WstrToStr(map.first);
+
 		if (ImGui::TreeNode(LayerName.c_str()))
 		{
 			int index = 0;
@@ -185,15 +189,6 @@ void CObject_Manager::IMGUI_Tick()
 
 	ImGui::End();
 
-	ImGui::Begin("Manage IMGUI Window");
-	static char buffer[64] = ""; ImGui::InputText("Window Name", buffer, 64);
-	if (ImGui::Button("Add"))
-	{
-
-	}
-	ImGui::NewLine(); ImGui::Separator();
-	
-	ImGui::End();
 }
 
 CGameObject * CObject_Manager::Find_Prototype(const wstring & strPrototypeTag)

@@ -3,6 +3,8 @@
 
 BEGIN(Engine)
 
+
+
 class CImGUI_Manager final : public CBase
 {
 private:
@@ -19,6 +21,7 @@ public:
 
 public:
 	void SetDockSpace();
+	void RenderGrid();
 	void EditTransform(_float4x4& matrix);
 
 private:

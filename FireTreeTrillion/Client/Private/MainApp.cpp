@@ -55,7 +55,7 @@ HRESULT CMainApp::Render(_float fTimeDelta)
 	if (nullptr == m_pGameInstance)
 		return E_FAIL;
 	
-	m_pGameInstance->Begin_Draw(_float4(0.f, 0.f, 1.f, 1.f));
+	m_pGameInstance->Begin_Draw(_float4(0.5f, 0.f, 1.f, 1.f));
 
 	m_pGameInstance->Draw(fTimeDelta);
 
@@ -94,6 +94,17 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
 		return E_FAIL;
+
+
+	//ÀÌÆåÆ® µð¹ö±ë¿ë ÀÌÆåÆ® ÅØ½ºÃÄ(FX Texture)
+	wstring wstrPrototypeTag = L"Prototype_Component_FXTexture_";
+
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"Logo",
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Logo/Logo.png")))))
+		return E_FAIL;
+
+	//if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CTexture::Create(m_pDevice, m_pContext, wstrFullPath, iNumTextures))))
+	//	return E_FAIL;
 
 	return	S_OK;
 }

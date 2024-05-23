@@ -32,6 +32,9 @@ public:
 	virtual _int Tick(_float fTimeDelta) override;
 	virtual void Late_Tick(_float fTimeDelta) override;
 
+	HRESULT Bind_PipeLines();
+
+
 protected:
 	_float			m_fFovy = { 0.0f };
 	_float			m_fAspect = { 0.0f };
@@ -42,7 +45,6 @@ protected:
 	_float4x4		m_ProjMatrix;
 
 protected:
-	HRESULT Bind_PipeLines();
 
 
 

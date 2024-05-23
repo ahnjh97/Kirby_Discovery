@@ -244,7 +244,7 @@ void CQuadTree::Culling(CGameInstance* pGameInstance, const _float3* pVerticesPo
 
 _bool CQuadTree::isDraw(CGameInstance * pGameInstance, const _float3 * pVerticesPos)
 {
-	_vector		vCamPos = pGameInstance->Get_CamPosition_Vector();
+	_vector		vCamPos = pGameInstance->Get_CamPosition();
 
 	_float		fCenterDistance = XMVectorGetX(XMVector3Length(XMLoadFloat3(&pVerticesPos[m_iCenter]) - vCamPos));
 

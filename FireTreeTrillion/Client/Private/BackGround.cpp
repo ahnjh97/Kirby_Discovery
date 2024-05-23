@@ -2,12 +2,12 @@
 #include "..\Public\BackGround.h"
 
 CBackGround::CBackGround(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
-	: CGameObject{ pDevice, pContext }
+	: CUIObject{ pDevice, pContext }
 {
 }
 
 CBackGround::CBackGround(const CBackGround & rhs)
-	: CGameObject{ rhs }
+	: CUIObject{ rhs }
 {
 
 }
@@ -32,6 +32,8 @@ HRESULT CBackGround::Initialize(void * pArg)
 
 	m_fSizeX = g_iWinSizeX;
 	m_fSizeY = g_iWinSizeY;
+	m_WindowSize2D.x = g_iWinSizeX;
+	m_WindowSize2D.y = g_iWinSizeY;
 	m_fX = g_iWinSizeX * 0.5f;
 	m_fY = g_iWinSizeY * 0.5f;
 
@@ -52,13 +54,16 @@ HRESULT CBackGround::Initialize(void * pArg)
 
 _int CBackGround::Tick(_float fTimeDelta)
 {
-
+	_float4 pos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	return OBJ_NOEVENT;
 }
 
 void CBackGround::Late_Tick(_float fTimeDelta)
 {
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this);
+
+	// UI들은 이제 RENDER_UI로 지정해서 사용해주시면됩니다~
+	//m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_UI, this);
 }
 
 HRESULT CBackGround::Render()
@@ -79,6 +84,30 @@ HRESULT CBackGround::Render()
 	return S_OK;
 }
 
+void CBackGround::Render_IMGUI()
+{
+	char name[12], name2[12];
+	// 위치
+	sprintf_s(name, "pos");
+	ImGui::DragFloat2(name, (_float*)&m_position2D);
+	// 사이즈
+	sprintf_s(name2, "size");
+	ImGui::DragFloat2(name2, (_float*)&m_size2D);
+
+	m_pTransformCom->Set_Scaled(m_size2D.x, m_size2D.y, 1.f);
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
+								XMVectorSet(m_position2D.x - m_WindowSize2D.x * 0.5f,
+											- m_position2D.y + m_WindowSize2D.y * 0.5f,
+											0.f,
+											1.f));
+
+	// 회전
+	static _float  Z_radian = 0.f;
+	ImGui::DragFloat("Z_radian", &Z_radian, 0.f, 360.f);
+	//m_pTransformCom->Rotation(XMVectorSet(0.f, 0.f, 1.f, 0.f), XMConvertToRadians(Z_radian));
+
+}
+
 HRESULT CBackGround::Add_Components()
 {
 	/* For.Com_Shader */
@@ -87,7 +116,7 @@ HRESULT CBackGround::Add_Components()
 		return E_FAIL;
 
 	/* For.Com_Texture */
-	if (FAILED(__super::Add_Component(LEVEL_LOGO, TEXT("Prototype_Component_Texture_Logo"),
+	if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Texture_Logo"),
 		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
 		return E_FAIL;
 
@@ -113,7 +142,7 @@ HRESULT CBackGround::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
-	m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0);
+	m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
 
 	return S_OK;
 }

@@ -22,11 +22,34 @@ public:
 	_bool IsFinished() { return m_Animations[m_iCurrentAnimIndex]->IsFinished(); }
 
 public:
-	void Set_Animation(_uint iAnimIndex, _bool isLoop) { m_iCurrentAnimIndex = iAnimIndex;	m_isLoop = isLoop; }
+	void Set_TickPerSecond(_float _fTickPerSecond) {
+		m_Animations[m_iCurrentAnimIndex]->Set_TickPerSecond(_fTickPerSecond);
+	}
+
+
+	void Set_Animation(_uint iAnimIndex, _float fTickPerSecond, _bool isLoop, _bool bInterpolation = false) {
+		m_iCurrentAnimIndex = iAnimIndex;	
+		m_isLoop = isLoop;
+
+		m_Animations[m_iCurrentAnimIndex]->Reset_TrackPosition();
+		m_Animations[m_iCurrentAnimIndex]->Reset_Finished();
+		m_Animations[m_iCurrentAnimIndex]->Set_TickPerSecond(fTickPerSecond);
+
+		if (bInterpolation)
+		{
+			// 바뀔 애니메이션을 대상으로 선형보간 ON
+			m_Animations[m_iCurrentAnimIndex]->Reset_Ratio();
+		}
+	}
+
+	const _char* Get_AnimationName() const {
+		return m_Animations[m_iCurrentAnimIndex]->Get_AnimationName();
+	}
 
 public:
 	virtual HRESULT Initialize_Prototype(_fmatrix TransformMatrix, MODEL tModel);
-	virtual HRESULT Initialize(void* pArg) override;
+	virtual HRESULT Initialize(void* pArg)  override;
+	virtual void	Render_IMGUI()			override;
 
 public:
 	HRESULT Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex);
@@ -71,7 +94,7 @@ private:
 
 public:
 	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _fmatrix TransformMatrix
-						,MODEL tModel);
+						, MODEL tModel);
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Free() override;
 };

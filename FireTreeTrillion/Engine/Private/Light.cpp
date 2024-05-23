@@ -105,7 +105,7 @@ _bool CLight::Compute_RenderCull()
 
 
 	_vector vLightPos = XMLoadFloat4(&m_LightDesc.vPosition);
-	_vector vCamPos = CGameInstance::Get_Instance()->Get_CamPosition_Vector();
+	_vector vCamPos = CGameInstance::Get_Instance()->Get_CamPosition();
 
 	if (m_LightDesc.fRange > XMVectorGetX(XMVector3Length(vLightPos - vCamPos)))
 		return true;
