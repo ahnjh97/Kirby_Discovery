@@ -97,7 +97,6 @@
     <Filter Include="01.Levels\Tool\UI">
       <UniqueIdentifier>{41f938d7-08df-4edb-8b73-7f075bf755d5}</UniqueIdentifier>
     </Filter>
->>>>>>> main
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

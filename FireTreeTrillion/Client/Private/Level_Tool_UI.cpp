@@ -65,7 +65,7 @@ HRESULT CLevel_Tool_UI::Ready_Layer_Camera(const wstring& strLayerTag)
 
 	// 05.20) IMGUI UI Editor Ãß°¡
 	/*      GameObject_Camera_Free    */
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_UI, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
 		return E_FAIL;
 
 	return S_OK;

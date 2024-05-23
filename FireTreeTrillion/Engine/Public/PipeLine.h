@@ -47,7 +47,7 @@ public:
 public:
 	HRESULT Add_Camera(class CCamera* pCamera);
 	HRESULT Switch_CurCamera(_int iIdx);
-
+	void Clear_Camera();
 
 	HRESULT Initialize();
 	void Bind_Pipeline();

@@ -77,9 +77,8 @@ HRESULT CLevel_Tool_Anim::Ready_Layer_Camera(const wstring & strLayerTag)
 
 HRESULT CLevel_Tool_Anim::Ready_Layer_Player(const wstring & strLayerTag)
 {
-
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_ANIM, strLayerTag, TEXT("Prototype_GameObject_TestModel"))))
-		return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_ANIM, strLayerTag, TEXT("Prototype_GameObject_TestModel"))))
+	//	return E_FAIL;
 
 	return S_OK;
 }
@@ -91,16 +90,16 @@ HRESULT CLevel_Tool_Anim::Ready_Layer_Monster(const wstring & strLayerTag)
 
 HRESULT CLevel_Tool_Anim::Ready_Layer_BackGround(const wstring & strLayerTag)
 {
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_ANIM, strLayerTag, TEXT("Prototype_GameObject_TestMap"))))
-		return E_FAIL;
+	/*if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_ANIM, strLayerTag, TEXT("Prototype_GameObject_TestMap"))))
+		return E_FAIL;*/
 
 	return S_OK;
 }
 
 HRESULT CLevel_Tool_Anim::Ready_Layer_UI(const wstring& strLayerTag)
 {
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_ANIM, strLayerTag, TEXT("Prototype_GameObject_UI_Test"))))
-		return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_ANIM, strLayerTag, TEXT("Prototype_GameObject_UI_Test"))))
+	//	return E_FAIL;
 
 	return S_OK;
 }
@@ -112,7 +111,6 @@ CLevel_Tool_Anim * CLevel_Tool_Anim::Create(ID3D11Device* pDevice, ID3D11DeviceC
 	if (FAILED(pInstance->Initialize()))
 	{
 		MSG_BOX(TEXT("Failed To Created : CLevel_Tool_Anim"));
-
 		Safe_Release(pInstance);
 	}
 
@@ -122,4 +120,5 @@ CLevel_Tool_Anim * CLevel_Tool_Anim::Create(ID3D11Device* pDevice, ID3D11DeviceC
 void CLevel_Tool_Anim::Free()
 {
 	__super::Free();
+
 }

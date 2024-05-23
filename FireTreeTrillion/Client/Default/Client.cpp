@@ -204,27 +204,40 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 DestroyWindow(hWnd);
                 break;
 
-            case ID_32772 : // LEVEL_GAMEPLAY
+            /* ============= LEVEL 이동 ============= */
+            case GAMEPLAY: // LEVEL_GAMEPLAY
             {
                 HRESULT hr;
                 hr = pMainApp->Open_Level(LEVEL_GAMEPLAY);
                 CHECK_FAILED(hr);
             }
             break;
-
-            /* LEVEL 추가 */
-            case ID_32773: // LEVEL_TOOL_FX
+            case TOOL_FX:
             {
                 HRESULT hr;
                 hr = pMainApp->Open_Level(LEVEL_TOOL_FX);
                 CHECK_FAILED(hr);
             }
             break;
-            case ID_32774: // LEVEL_TOOL_UI
+            case TOOL_UI: // LEVEL_TOOL_UI
             {
                 HRESULT hr;
                 hr = pMainApp->Open_Level(LEVEL_TOOL_UI);
                 CHECK_FAILED(hr);
+            }
+            break;
+            case TOOL_ANIM: // LEVEL_TOOL_ANIM
+            {
+                HRESULT hr;
+                hr = pMainApp->Open_Level(LEVEL_TOOL_ANIM);
+                CHECK_FAILED(hr);
+            }
+            break;
+            case TOOL_MAP:
+            {
+                //HRESULT hr;
+                //hr = pMainApp->Open_Level(LEVEL_TOOL_MAP);
+                //CHECK_FAILED(hr);
             }
             break;
             default:

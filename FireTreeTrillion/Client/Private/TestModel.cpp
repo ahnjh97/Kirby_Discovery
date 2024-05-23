@@ -259,8 +259,6 @@ HRESULT CTestModel::Render_LightDepth()
 
 void CTestModel::Render_IMGUI()
 {
-    __super::Render_IMGUI();
-
     if (ImGui::TreeNode("Guizmo"))
     {
         _float4x4 matWorld = m_pTransformCom->Get_WorldFloat4x4();
@@ -273,6 +271,8 @@ void CTestModel::Render_IMGUI()
     //m_pGameInstance->RenderGrid();
     ImGui::Text("FSM : %d", m_eCurrentState);
     ImGui::Separator(); ImGui::NewLine();
+
+    __super::Render_IMGUI();
 }
 
 
