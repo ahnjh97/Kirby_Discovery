@@ -24,10 +24,12 @@ private:
 public:
 	HRESULT				Initialize(void* pArg);
 	
-	void				Update(class CGameObject* pGameObject, _float fTimeDelta, _uint eState);
+	void				Update(class CGameObject* pGameObject, _float fTimeDelta);
 	_bool				ChangeState(_uint iState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
 	void				Add_State(_uint iState, CFSM_State* pInitState);
 	CFSM_State*			Find_State(_uint iState);
+
+	_uint				Get_State() { return m_iState; }
 
 private:
 	CFSM_State*			m_pCurrent_State = { nullptr };

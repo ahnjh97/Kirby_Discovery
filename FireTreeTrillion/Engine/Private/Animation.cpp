@@ -19,6 +19,8 @@ CAnimation::CAnimation(const CAnimation & rhs)
 {
 	for (auto& pChannel : m_Channels)
 		Safe_AddRef(pChannel);
+
+	strcpy_s(m_szName, rhs.m_szName);
 }
 
 HRESULT CAnimation::Initialize(const vector<class CBone*>& Bones, ifstream& fileStream)

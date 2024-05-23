@@ -11,7 +11,7 @@ private:
 
 public:
     HRESULT Initialize();
-    void Tick();
+    void Tick(_float fTimeDelta);
     
     // test 
     void Test();
@@ -27,7 +27,7 @@ public:
     // not yet
     //PxMaterial*                         FindMaterial(const string& strMtrlTag);
     PxScene*                            Get_Scene() { return m_pScene; }
-    PxControllerManager*                GetControllerManager() { return m_pControllerManager; }
+    PxControllerManager*                Get_ControllerManager() { return m_pControllerManager; }
     //PxCooking*                        GetCooking() { return m_pCooking; }
 
     //physx::PxMat44                    To_Float4x4(const _float4x4& mat);

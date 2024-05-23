@@ -8,10 +8,6 @@
                                           /\___/                                                                       /\___/
                                           \/__/                                                                        \/__/ 
 
-<<<<<<<< HEAD:KirbyDiscovery_Emulator&Viewer_Guide_v1.1.txt
-========
-
->>>>>>>> main:FireTreeTrillion/KirbyDiscovery_Emulator&Viewer_Guide_v1.0.txt
  ____                        __                                   _            _     
 /\  _`\              __     /\ \                                /' \         /' \    
 \ \ \L\_\   __  __  /\_\    \_\ \      __              __  __  /\_, \       /\_, \   
@@ -128,6 +124,31 @@ https://github.com/KillzXGaming/Switch-Toolbox
 ..\snd
 
 
+✨컷씬 영상
+..\mov
+
+
+✨폰트 
+..\font\ScalableFontBin
+
+
+✨2D UI (Layout) :: 확장자명 .bflyt
+..\lyt
+- Body.arc.cmp / Parts.arc.cmp
+- 더블클릭 시 Layout Editor 오픈
+- UI에 대한 애니메이션 및 위치/크기 정보 확인 가능
+- Texture List에서 우클릭 시 export 가능
+
+기본 UI(Common) ..\lyt\Cmn
+
+
+
+
+✨3D UI
+..\gfx\Step\UiModel
+
+
+
 ✨✨✨DAE > FBX 변환✨✨✨
 [AutoDesk FBX Converter]
 https://aps.autodesk.com/developer/overview/fbx-converter-archives
@@ -142,10 +163,6 @@ https://aps.autodesk.com/developer/overview/fbx-converter-archives
 정상적으로 변환했을 경우 블렌더에서 애니메이션 이식 시 문제없이 재생
 
 
-<<<<<<<< HEAD:KirbyDiscovery_Emulator&Viewer_Guide_v1.1.txt
-========
-
->>>>>>>> main:FireTreeTrillion/KirbyDiscovery_Emulator&Viewer_Guide_v1.0.txt
 
 ✨✨✨블렌더 플러그인(애드온)✨✨✨
 [io_anim_seanim]

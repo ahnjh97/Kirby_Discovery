@@ -1,13 +1,13 @@
 #include "stdafx.h"
 #include "..\Public\Camera_Free.h"
 
-CCamera_Free::CCamera_Free(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CCamera_Free::CCamera_Free(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CCamera{ pDevice, pContext }
 {
 
 }
 
-CCamera_Free::CCamera_Free(const CCamera_Free & rhs)
+CCamera_Free::CCamera_Free(const CCamera_Free& rhs)
 	: CCamera{ rhs }
 {
 
@@ -18,22 +18,29 @@ HRESULT CCamera_Free::Initialize_Prototype()
 	return S_OK;
 }
 
-HRESULT CCamera_Free::Initialize(void * pArg)
+HRESULT CCamera_Free::Initialize(void* pArg)
 {
 	if (nullptr == pArg)
 		return E_FAIL;
-	
-	CAMERA_FREE_DESC*	pCameraFree = (CAMERA_FREE_DESC*)pArg;
+
+	CAMERA_FREE_DESC* pCameraFree = (CAMERA_FREE_DESC*)pArg;
 	m_fMouseSensor = pCameraFree->fMouseSensor;
 
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
+
+	m_pGameInstance->Add_Camera(this);
 
 	return S_OK;
 }
 
 _int CCamera_Free::Tick(_float fTimeDelta)
 {
+
+	Control(fTimeDelta);
+	Orbit_Target(fTimeDelta);
+
+	/*
 	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_PRESS))
 	{
 		m_pTransformCom->Go_Left(fTimeDelta);
@@ -63,12 +70,13 @@ _int CCamera_Free::Tick(_float fTimeDelta)
 			m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), fTimeDelta * MouseMove * m_fMouseSensor);
 		}
 	}
+	*/
 
 	//m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(0.f, 0.f, 0.f, 1.f));
 
 	//m_fFovy = XMConvertToRadians(120.f);
 
-	__super::Bind_PipeLines();
+	//__super::Bind_PipeLines();
 
 
 	return OBJ_NOEVENT;
@@ -89,6 +97,10 @@ void CCamera_Free::Render_IMGUI()
 	_float4 fPosition = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 
 	ImGui::SliderFloat("CameraFree Speed", &fSpeed, 0.f, 50.f);
+
+	ImGui::Checkbox(u8"타겟 따라가기", &m_bTrackTarget);
+
+
 	//m_pTransformCom->Set_Speed(fSpeed);
 	/*
 	ImGui::SliderFloat("CameraFree Smooth Speed", &m_fSmoothSpeed, 0.f, 0.3f);
@@ -102,9 +114,105 @@ void CCamera_Free::Render_IMGUI()
 	ImGui::DragFloat3("CameraFree Offset", &m_vOffset.x);*/
 }
 
-CCamera_Free * CCamera_Free::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+void CCamera_Free::Track_Target(_float fTimeDelta)
 {
-	CCamera_Free*		pInstance = new CCamera_Free(pDevice, pContext);
+	if (nullptr == m_pTarget)
+		return;
+
+	_float4 vTargetPos = m_pTarget->Get_State(CTransform::STATE_POSITION);
+	_float4 vBackDir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+	vBackDir.Normalize();
+	vBackDir *= m_fTrackDistance;
+
+	_float4 vCurPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+
+	_float4 vDestDir = (vTargetPos + vBackDir) - vCurPos;
+
+
+	if (.1f <= vDestDir.Length())
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, Pos(vCurPos + (vDestDir * .1f)));
+}
+
+void CCamera_Free::Orbit_Target(_float fTimeDelta)
+{
+}
+
+void CCamera_Free::Control(_float fTimeDelta)
+{
+
+	if (m_pGameInstance->Get_KeyState(DIK_TAB, KEY_DOWN))
+		m_bTrackTarget = !m_bTrackTarget;
+
+	if (m_bTrackTarget)
+		Track_Target(fTimeDelta);
+
+
+	if (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
+	{
+		_long	MouseMove = { 0 };
+
+		//휠 누른 채로 상하좌우 이동
+		if (m_pGameInstance->Get_KeyState(DIMKS_WHEEL, KEY_PRESS))
+		{
+			if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMMS_X))
+				m_pTransformCom->Go_Right(fTimeDelta * -MouseMove * m_fMouseSensor);
+
+			if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMMS_Y))
+				m_pTransformCom->Go_Up(fTimeDelta * MouseMove * m_fMouseSensor);
+		}
+
+		//전후진
+		if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMMS_WHEEL))
+		{
+			m_pTransformCom->Go_Straight(fTimeDelta * MouseMove * m_fMouseSensor * .5f);
+
+
+			if (m_pTarget != nullptr && m_bTrackTarget)
+				m_fTrackDistance -= MouseMove*.01f ;
+		}
+
+		//일단 안씀
+		//if (m_pGameInstance->Get_KeyState(DIMKS_RBUTTON, KEY_DOWN))
+		//{
+		//	m_vOrbitPos = 
+		//}
+
+		//우측 마우스 누른 채로 공전
+
+		if (m_pGameInstance->Get_KeyState(DIMKS_RBUTTON, KEY_PRESS))
+		{
+			Vector3 vTargetPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Float4(CTransform::STATE_LOOK) * 10.f;
+			
+			// 05.22) LEVEL_TOOL_UI에는 카메라 회전 기능 제외
+			if (*m_pCurrentLevelID == 4) //LEVEL_TOOL_UI
+				return;
+
+			if (*m_pCurrentLevelID == LEVEL_TOOL_FX)
+				vTargetPos = Vector3::Zero;
+
+			if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMMS_X))
+			{
+				m_pTransformCom->Orbit(vTargetPos, XMVectorSet(0.f, 1.f, 0.f, 1.f), fTimeDelta * MouseMove * m_fMouseSensor);
+			}
+			if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMMS_Y))
+			{
+				m_pTransformCom->Orbit(vTargetPos, m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), fTimeDelta * MouseMove * m_fMouseSensor);
+			}
+		}
+	}
+
+
+	//if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_PRESS))
+	//{
+	//	m_pTransformCom->Go_Left(fTimeDelta);
+
+	//}
+
+}
+
+CCamera_Free* CCamera_Free::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+{
+	CCamera_Free* pInstance = new CCamera_Free(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
@@ -117,9 +225,9 @@ CCamera_Free * CCamera_Free::Create(ID3D11Device * pDevice, ID3D11DeviceContext 
 
 }
 
-CGameObject * CCamera_Free::Clone(void * pArg)
+CGameObject* CCamera_Free::Clone(void* pArg)
 {
-	CCamera_Free*		pInstance = new CCamera_Free(*this);
+	CCamera_Free* pInstance = new CCamera_Free(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
@@ -133,6 +241,7 @@ CGameObject * CCamera_Free::Clone(void * pArg)
 
 void CCamera_Free::Free()
 {
-	__super::Free();
+	Safe_Release(m_pTarget);
 
+	__super::Free();
 }

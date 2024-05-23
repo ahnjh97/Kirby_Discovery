@@ -6,6 +6,9 @@
 // For Key_Manager
 #define VK_MAX	0xff
 
+#define GRAVITY 9.81f
+
+
 // assert로 확인하고자하는 코드 체크
 // ※ DEBUG용으로 RELEASE모드에서 동작하는 소스엔 사용하지 마십시오.
 #define CHECK_FAILED(p)					assert(SUCCEEDED(p))
@@ -32,6 +35,12 @@
 #define EASE_INOUT(t) (_float)(-(cos(3.14159f * t) - 1) / 2)
 #define EASE_INOUT_FAST(t) (_float)((t < 0.5) ? (4 * t * t * t) : 1 - pow(-2 * t + 2, 3) / 2)
 
+//각도 변환 매크로
+#define ToRadian(degree)			(XMConvertToRadians(degree))
+#define ToDegree(radian)			(XMConvertToDegrees(radian))
+
+#define Dir(vec3)					_float4{(vec3).x,( vec3).y, (vec3).z, 0.f}
+#define Pos(vec3)					_float4{(vec3).x, (vec3).y, (vec3).z, 1.f}
 
 
 

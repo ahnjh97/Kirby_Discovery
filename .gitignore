@@ -54,7 +54,6 @@ Engine/Bin/Shader_Deferred.cso
 
 Client/Default/x64/
 Engine/Default/x64/
-Client/Default/imgui.ini
 Client/Default/Client.aps
 
 EngineSDK/
@@ -65,7 +64,6 @@ FireTreeTrillion/Client/Bin/Client.pdb
 FireTreeTrillion/Client/Bin/Engine.dll
 FireTreeTrillion/Engine/Bin/Shader_Deferred.cso
 
-FireTreeTrillion/Client/Default/imgui.ini
 Assimp/Client_Assimp/Bin/Client_Assimp.pdb
 Assimp/Client_Assimp/Bin/Shader_VtxAnimModel.cso
 Assimp/Client_Assimp/Bin/Shader_VtxModel.cso
@@ -105,9 +103,7 @@ Assimp/Engine/Default/x64/Debug/Engine.tlog/link.command.1.tlog
 Assimp/Engine/Default/x64/Debug/Engine.tlog/link.read.1.tlog
 Assimp/Engine/Default/x64/Debug/Engine.tlog/link.write.1.tlog
 Assimp/Engine/Default/x64/Debug/Engine.tlog/link.write.2u.tlog
-
 Assimp/Client_Assimp/Bin/Engine.dll
 Assimp/Engine/Bin/Engine.dll
-
-
 FireTreeTrillion/Client/Bin/fmod.dll
+FireTreeTrillion/Client/Default/imgui.ini

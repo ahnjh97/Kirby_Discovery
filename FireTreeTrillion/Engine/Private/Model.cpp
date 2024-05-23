@@ -107,10 +107,16 @@ HRESULT CModel::Initialize(void * pArg)
 void CModel::Render_IMGUI()
 {
 	__super::Render_IMGUI();
+	
+
+	if (m_Animations.size() >= m_iCurrentAnimIndex)
+		return;
 
 	// AnimationÀÇ end±îÁö
-	//ImGui::DragInt("AnimIDX", (_int*)m_iCurrentAnimIndex);
-	//ImGui::DragInt("AnimIDX", (_int*)m_iCurrentAnimIndex, 0.2f, 1, 100);
+	ImGui::Text("AnimationIndex: %d", m_iCurrentAnimIndex);
+
+	const _char* animationName = m_Animations[m_iCurrentAnimIndex]->Get_AnimationName();
+	ImGui::Text("Animation Name: %s", animationName);
 
 	_float fTickPerSecond = m_Animations[m_iCurrentAnimIndex]->Get_TickPerSecond();
 	ImGui::DragFloat("TickPerSecond : ", &fTickPerSecond);

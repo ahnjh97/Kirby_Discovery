@@ -59,12 +59,12 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 	if (nullptr == m_pRenderer)
 		return E_FAIL;
 
-	m_pLevel_Manager = CLevel_Manager::Create();
-	if (nullptr == m_pLevel_Manager)
-		return E_FAIL;
-
 	m_pPhysx = CPhysX::Create();
 	if (nullptr == m_pPhysx)
+		return E_FAIL;
+
+	m_pLevel_Manager = CLevel_Manager::Create();
+	if (nullptr == m_pLevel_Manager)
 		return E_FAIL;
 
 	/* 인풋 디바이스를 초기화한다 .*/
@@ -112,7 +112,7 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 	m_pInput_Device->Tick();
 
 	m_pObject_Manager->Tick(fTimeDelta);	
-	m_pPhysx->Tick();
+	m_pPhysx->Tick(fTimeDelta);
 
 	m_pPipeLine->Tick();
 
@@ -183,6 +183,22 @@ HRESULT CGameInstance::Clear(_uint iClearLevelIndex)
 	return S_OK;
 }
 
+_bool CGameInstance::Get_KeyState(_ubyte byKeyID, KEYSTATE eState)
+{
+	if (nullptr == m_pInput_Device)
+		return 0;
+
+	return m_pInput_Device->Get_DIKeyState(byKeyID, eState);
+}
+
+_bool CGameInstance::Get_KeyState(MOUSEKEYSTATE eMouse, KEYSTATE eState)
+{
+	if (nullptr == m_pInput_Device)
+		return 0;
+
+	return m_pInput_Device->Get_DIMouseState(eMouse, eState);
+}
+
 _bool CGameInstance::Get_DIKeyState(_ubyte byKeyID, KEYSTATE eState)
 {
 	if (nullptr == m_pInput_Device)
@@ -213,6 +229,22 @@ _long CGameInstance::Get_DIMouseMove(MOUSEMOVESTATE eMouseState)
 		return 0;
 
 	return m_pInput_Device->Get_DIMouseMove(eMouseState);
+}
+
+void CGameInstance::Set_WindowActive(_bool _bWindowActive)
+{
+	if (nullptr == m_pInput_Device)
+		return;
+
+	m_pInput_Device->Set_WindowActive(_bWindowActive);
+}
+
+_bool CGameInstance::Get_WindowActive()
+{
+	if (nullptr == m_pInput_Device)
+		return true;
+
+	return m_pInput_Device->Get_WindowActive();
 }
 
 HRESULT CGameInstance::Add_RenderGroup(CRenderer::RENDERGROUP eRenderGroup, CGameObject * pRenderObject)
@@ -334,6 +366,11 @@ CComponent * CGameInstance::Clone_Component(_uint iLevelIndex, const wstring & s
 	return m_pComponent_Manager->Clone_Component(iLevelIndex, strPrototypeTag, pArg);
 }
 
+CComponent_Manager::PROTOTYPES* CGameInstance::Get_ComMap(_uint iLevelIdx)
+{
+	return m_pComponent_Manager->Get_ComMap(iLevelIdx);
+}
+
 HRESULT CGameInstance::Add_Timer(const wstring & strTimerTag)
 {
 	if (nullptr == m_pTimer_Manager)
@@ -356,6 +393,22 @@ void CGameInstance::Set_Transform(CPipeLine::TRANSFORMSTATE eState, _fmatrix Tra
 		return;
 
 	m_pPipeLine->Set_Transform(eState, TransformMatrix);
+}
+
+_float4x4 CGameInstance::Get_Transform(CPipeLine::TRANSFORMSTATE _eState) const
+{
+	if (nullptr == m_pPipeLine)
+		return _float4x4::Identity;
+
+	return m_pPipeLine->Get_Transform(_eState);
+}
+
+_float4x4 CGameInstance::Get_Transform_Inv(CPipeLine::TRANSFORMSTATE _eState) const
+{
+	if (nullptr == m_pPipeLine)
+		return _float4x4::Identity;
+
+	return m_pPipeLine->Get_Transform_Inv(_eState);
 }
 
 _matrix CGameInstance::Get_Transform_Matrix(CPipeLine::TRANSFORMSTATE eState) const
@@ -390,20 +443,30 @@ _float4x4 CGameInstance::Get_Transform_Float4x4_Inverse(CPipeLine::TRANSFORMSTAT
 	return m_pPipeLine->Get_Transform_Float4x4_Inverse(eState);
 }
 
-_vector CGameInstance::Get_CamPosition_Vector() const
-{
-	if (nullptr == m_pPipeLine)
-		return XMVectorZero();
+//_vector CGameInstance::Get_CamPosition_Vector() const
+//{
+//	if (nullptr == m_pPipeLine)
+//		return XMVectorZero();
+//
+//	return m_pPipeLine->Get_CamPosition_Vector();
+//}
 
-	return m_pPipeLine->Get_CamPosition_Vector();
-}
-
-_float4 CGameInstance::Get_CamPosition_Float4() const
+_float4 CGameInstance::Get_CamPosition() const
 {
 	if (nullptr == m_pPipeLine)
 		return _float4();
 
-	return m_pPipeLine->Get_CamPosition_Float4();
+	return m_pPipeLine->Get_CamPosition();
+}
+
+HRESULT CGameInstance::Add_Camera(CCamera* pCamera)
+{
+	return m_pPipeLine->Add_Camera(pCamera);
+}
+
+HRESULT CGameInstance::Switch_CurCamera(_int iIdx)
+{
+	return m_pPipeLine->Switch_CurCamera(iIdx);
 }
 
 const LIGHT_DESC * CGameInstance::Get_LightDesc(_uint iIndex)
@@ -555,6 +618,11 @@ PxScene* CGameInstance::Get_Scene()
 PxMaterial* CGameInstance::Get_Material()
 {
 	return m_pPhysx->Get_Material();
+}
+
+PxControllerManager* CGameInstance::Get_ControllerManager()
+{
+	return m_pPhysx->Get_ControllerManager();
 }
 
 void CGameInstance::AddActor(physx::PxActor& pActor)

@@ -1,9 +1,10 @@
-#include "..\Public\Component_Manager.h"
+#include "Component_Manager.h"
 #include "Component.h"
 
 CComponent_Manager::CComponent_Manager()
 {
 }
+
 
 HRESULT CComponent_Manager::Initialize(_uint iNumLevels)
 {
@@ -44,6 +45,14 @@ void CComponent_Manager::Clear(_uint iLevelIndex)
 		Safe_Release(Pair.second);
 	}
 	m_pPrototypes[iLevelIndex].clear();
+}
+
+CComponent_Manager::PROTOTYPES* CComponent_Manager::Get_ComMap(_uint iLevelIdx)
+{
+	if (iLevelIdx >= m_iNumLevels)
+		return nullptr;
+
+	return &m_pPrototypes[iLevelIdx]; 
 }
 
 CComponent * CComponent_Manager::Find_Prototype(_uint iLevelIndex, const wstring & strPrototypeTag)
