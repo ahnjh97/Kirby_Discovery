@@ -59,6 +59,7 @@ public:
 			XMVectorGetX(XMVector3Length(WorldMatrix.r[STATE_LOOK])));
 	}
 	void		Set_Scaled(_float fScaleX, _float fScaleY, _float fScaleZ);
+	void		Set_Scaled(_float3 vScale);
 
 
 	_float4x4	Get_WorldMatrix() const { return m_WorldMatrix; }

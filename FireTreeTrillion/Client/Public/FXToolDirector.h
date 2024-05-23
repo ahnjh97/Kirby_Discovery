@@ -63,8 +63,14 @@ private:
 
 	SELECTED m_eSelected = { SELECTED_END };
 
+
+	//이펙트 편집 (기본)
 	string m_curFXName = { "NONE" };
 	_bool m_bLooping = { false };
+
+	_int m_iCurFXPassIdx = { 0 };
+	_int m_iCurFXTexIdx = { 0 };
+	_int m_iCurFXMaskTexIdx = { 0 };
 
 	//수명
 	//_float m_fDuration = { 1.f };
@@ -96,9 +102,8 @@ private:
 	vector<char*> m_Easing =
 	{
 		"EASE_LINEAR", "EASE_IN", "EASE_IN_FAST",
-		"EASE_OUT", "EASE_OUT_FAST", "EASE_INOUT_CUBIC", "EASE_INOUT_SINE"
+		"EASE_OUT", "EASE_OUT_FAST", "EASE_INOUT", "EASE_INOUT_FAST"
 	};
-
 
 
 
@@ -111,15 +116,19 @@ private:
 	_float m_fTotalPlayDuration = { 1.f };
 	_float m_fCurPlayDuration = { 0.f };
 
-
+	//추가하는 키프레임
+	_float	m_vKFPopupValue[3] = { 0.f, 0.f, 0.f };
+	_int	m_eKFPopupEasing = { -1 };
+	//_bool	m_bMakeKFPopupToFront = { false };
+	_bool m_bOpenKeyframeEditor = { false };
 	void Render_FXHierarchy();
 
-	void Render_FXProperty(_float _fTimeDelta);
+	void Render_FXProperty();
 
 	void Render_FXPlayBar(_float _fTimeDelta);
-	void MakeBar_SingleFXProperty(_float _fTimeDelta);
-	void MakeBar_ParticleFXProperty(_float _fTimeDelta);
-	void MakeBar_MultiFXProperty(_float _fTimeDelta);
+	void MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidth);
+	void MakeBar_ParticleFXProperty(_float _fTimeDelta, _float _fWidth);
+	void MakeBar_MultiFXProperty(_float _fTimeDelta, _float _fWidth);
 	
 	void Render_MultiFXHierarchy();
 

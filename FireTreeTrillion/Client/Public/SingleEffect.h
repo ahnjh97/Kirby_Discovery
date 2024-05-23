@@ -31,6 +31,8 @@ public:
 	virtual HRESULT Render() override;
 
 private:
+
+
 	CVIBuffer_Rect*		m_pVIBufferCom = { nullptr };
 	CModel*				m_pModelCom = { nullptr };
 	CTexture*			m_pTextureCom[TEX_END] = { nullptr };

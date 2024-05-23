@@ -51,7 +51,7 @@ public:
 		_int iMaskTexIdx = { 0 };
 
 
-		map<_uint, vector<FX_KEYFRAME>> Keyframes;
+		map<KF_PROPERTY, vector<FX_KEYFRAME>> Keyframes;
 
 	}FX_DESC;
 
@@ -75,8 +75,8 @@ public:
 
 
 	//키프레임 추가(단일 이펙트 용)
-	void			Add_Keyframe(FX_KEYFRAME& newKeyframe);
-
+	void			Add_Keyframe(FX_KEYFRAME& newKeyframe, KF_PROPERTY eProperty);
+	void			Delete_Keyframe(KF_PROPERTY eProperty, _uint iKeyframeIdx);
 	//이펙트 추가(묶음 이펙트 용)
 	virtual void	Add_Effect(CEffect& pEffect) {}
 
@@ -99,7 +99,10 @@ protected:
 	_bool			m_bRender = { false };
 
 	//패스, 텍스쳐, 마스크 텍스쳐 인덱스
+	//최대 인덱스를 한번 제한해 주는데, 이후 고치기
+
 	_int			m_iPassIdx = { 0 };
+	_int			m_iMaxPassIdx = { 0 };
 
 	_int			m_iTexIdx = { 0 };
 	_int			m_iMaxTexIdx = { 1 };
@@ -127,8 +130,11 @@ protected:
 	//수명 지속 시간. duration이 사라져야 이펙트 사라짐
 	//루프하는 경우 life time 처음부터 다시 시작한다. 
 	pair<_float, _float>	m_fLifeTime = { 0.f, 1.f };
+	_float					m_fLifeRatio = { 0.f };
 
-
+	//보간 키프레임
+	map<KF_PROPERTY, vector<FX_KEYFRAME>>	m_Keyframes;
+	_uint* m_iCurKeyframeIdxs = { nullptr };
 	//float3 키프레임
 	
 	//크자이
@@ -152,7 +158,11 @@ protected:
 protected:
 	_bool			Update_Duration(_float fTimeDelta);
 	_bool			Update_LifeTime(_float fTimeDelta);
-	void			Calculate_CurValue(_float fTimeDelta, _bool bIsInEditor = false);
+
+	_bool			Calculate_Duration(_float _fTimeDelta);
+	_bool			Calculate_Lifetime(_float _fTimeDelta);
+	_float3			Calculate_CurValue_Lerp(_float fTimeDelta, KF_PROPERTY eProperty, _bool bIsInEditor = false);
+	_float3			Calculate_CurValue_Slerp(_float fTimeDelta,  KF_PROPERTY eProperty, _bool bIsInEditor = false);
 
 public:
 	virtual void Free() override;

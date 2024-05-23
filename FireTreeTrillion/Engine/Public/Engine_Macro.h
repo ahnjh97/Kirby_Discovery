@@ -42,7 +42,8 @@
 #define Dir(vec3)					_float4{(vec3).x,( vec3).y, (vec3).z, 0.f}
 #define Pos(vec3)					_float4{(vec3).x, (vec3).y, (vec3).z, 1.f}
 
-
+//어떤 범위 안의 값을 다른 범위로 매핑한다.
+#define MAPVALUE(x,  min1,  max1,  min2,  max2) (min2 + (x - min1) * (max2 - min2) / (max1 - min1))
 
 #define BEGIN(NAMESPACE)	namespace NAMESPACE {
 #define END					}

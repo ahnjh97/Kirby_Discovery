@@ -22,6 +22,11 @@ void CTransform::Set_Scaled(_float fScaleX, _float fScaleY, _float fScaleZ)
 		
 }
 
+void CTransform::Set_Scaled(_float3 vScale)
+{
+	Set_Scaled(vScale.x, vScale.y, vScale.z);
+}
+
 HRESULT CTransform::Initialize_Prototype()
 {
 	XMStoreFloat4x4(&m_WorldMatrix, XMMatrixIdentity());

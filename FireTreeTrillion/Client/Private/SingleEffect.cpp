@@ -42,12 +42,37 @@ HRESULT CSingleEffect::Initialize(void* pArg)
 	return S_OK;
 }
 
-_int CSingleEffect::Tick(_float fTimeDelta)
+_int CSingleEffect::Tick(_float _fTimeDelta)
 {
+
+	if (Calculate_Duration(_fTimeDelta))
+	{
+		//툴에서는 다시 시작하기
+		if (*m_pCurrentLevelID == LEVEL_TOOL_FX)
+		{
+			m_fDuration.first = 0.f;
+		}
+		else
+			m_bDead = true;
+	}
+
+	if (Calculate_Lifetime(_fTimeDelta))
+	{
+
+	}
+
+
+	m_vCurPos = Calculate_CurValue_Lerp(_fTimeDelta, KF_POS);
+	m_vCurScale = Calculate_CurValue_Lerp(_fTimeDelta, KF_SCALE);
+
+
+	m_pTransformCom->Set_Scaled(m_vCurScale);
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, Pos(m_vInitPos) + Dir(m_vCurPos));
+
 	return OBJ_NOEVENT;
 }
 
-void CSingleEffect::Late_Tick(_float fTimeDelta)
+void CSingleEffect::Late_Tick(_float _fTimeDelta)
 {
 	if (m_bIsColorRender)
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
@@ -205,5 +230,13 @@ CGameObject* CSingleEffect::Clone(void* pArg)
 
 void CSingleEffect::Free()
 {
+	Safe_Release(m_pVIBufferCom);
+	Safe_Release(m_pModelCom);
+
+	for (auto& texture : m_pTextureCom)
+		Safe_Release(texture);
+
+	Safe_Release(m_pShaderCom);
+
 	__super::Free();
 }
