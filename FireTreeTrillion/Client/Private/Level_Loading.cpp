@@ -8,6 +8,8 @@
 #include "Level_GamePlay.h"
 #include "Level_Tool_UI.h"
 #include "Level_Tool_FX.h"
+#include "Level_Tool_Anim.h"
+
 
 CLevel_Loading::CLevel_Loading(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -37,6 +39,7 @@ void CLevel_Loading::Tick(_float fTimeDelta)
 	{
 		CLevel* pLevel = { nullptr };
 		m_pGameInstance->Set_CurrentLevelID((_uint)m_eNextLevelID);
+		m_pGameInstance->Clear_Light();
 
 		switch (m_eNextLevelID)
 		{
@@ -51,6 +54,9 @@ void CLevel_Loading::Tick(_float fTimeDelta)
 			break;
 		case LEVEL_TOOL_UI:
 			pLevel = CLevel_Tool_UI::Create(m_pDevice, m_pContext);
+			break;
+		case LEVEL_TOOL_ANIM:
+			pLevel = CLevel_Tool_Anim::Create(m_pDevice, m_pContext);
 			break;
 		}
 

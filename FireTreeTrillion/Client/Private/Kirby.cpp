@@ -46,7 +46,7 @@ HRESULT CKirby::Initialize(void* pArg)
 	// 카메라 기준으로 움직이기에 미리 받아둔다.
 	if (m_pCamera == nullptr)
 	{
-		m_pCamera = static_cast<CCamera_Free*>(m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Camera"), 0));
+		m_pCamera = static_cast<CCamera_Free*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Camera"), 0));
 		Safe_AddRef(m_pCamera);
 	}
 

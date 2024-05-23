@@ -25,6 +25,16 @@ HRESULT CPipeLine::Switch_CurCamera(_int iIdx)
 	return S_OK;
 }
 
+void CPipeLine::Clear_Camera()
+{
+	if (!m_pCameras.empty())
+	{
+		for (auto& pCam : m_pCameras)
+			Safe_Release(pCam);
+	}
+	m_pCameras.clear();
+}
+
 void CPipeLine::Bind_Pipeline()
 {
 	if (m_pCameras.empty())
