@@ -77,7 +77,7 @@ HRESULT CMap_Stage1::Render()
     {
         if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
             return E_FAIL;
-        if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_HEIGHT)))
+        if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
             return E_FAIL;
         if (FAILED(m_pShaderCom->Begin(0)))
             return E_FAIL;
