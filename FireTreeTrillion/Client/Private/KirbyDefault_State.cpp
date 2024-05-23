@@ -85,6 +85,7 @@ void CKirbyDefault_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 	// Z 회전 복구 (최대 회전 각도 10도)
 	Kirbydesc->m_fZAngle -= Kirbydesc->m_fZAngle / 4.f;
 
+
 	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 	//Kirbydesc->m_vMoveDir = XMVector3Normalize(Kirbydesc->m_vMoveDir);
 	_vector vMoveDelta = Kirbydesc->m_vMoveDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;

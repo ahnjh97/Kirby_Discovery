@@ -103,8 +103,6 @@ void CKirby::Late_Tick(_float fTimeDelta)
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 	}
 
-	// 리지드바디
-
 }
 
 HRESULT CKirby::Render()
@@ -296,7 +294,8 @@ void CKirby::Lerp_UpVector(_fvector _vOriginUp, _fvector _vTargetUp, _float _max
 	if (fAngle >= XMConvertToRadians(_maxAngle))
 	{
 		_vector vRight = XMVector3Cross(XMVector3Normalize(_vOriginUp), XMVector3Normalize(_vTargetUp));
-		m_pTransformCom->Turn(vRight, fTimeDelta * fAngle * m_fOffsetTurn);
+		// 수정할 것
+		m_pTransformCom->Turn(vRight, fAngle / 20.f);
 	}
 }
 // ==========================================================================
