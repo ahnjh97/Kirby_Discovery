@@ -17,6 +17,7 @@ CGameObject::CGameObject(const CGameObject & rhs)
 	: m_pDevice(rhs.m_pDevice)
 	, m_pContext(rhs.m_pContext)
 	, m_pGameInstance(rhs.m_pGameInstance)
+	, m_wstrPrototypeTag(rhs.m_wstrPrototypeTag)
 {
 	Safe_AddRef(m_pGameInstance);
 	Safe_AddRef(m_pDevice);
@@ -81,6 +82,10 @@ HRESULT CGameObject::Render()
 
 void CGameObject::Render_IMGUI()
 {
+	string strTag = CUtils::WstrToStr(m_wstrPrototypeTag);
+	string strWindowName = "Component Window : " + strTag;
+
+	ImGui::BeginChild(strWindowName.c_str());
 	for (auto& com : m_Components)
 	{
 		char szName[256];
@@ -89,6 +94,7 @@ void CGameObject::Render_IMGUI()
 		if (ImGui::CollapsingHeader(szName))
 			com.second->Render_IMGUI();
 	}
+	ImGui::EndChild();
 }
 
 
