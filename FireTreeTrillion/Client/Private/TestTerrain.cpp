@@ -84,7 +84,7 @@ HRESULT CTestTerrain::Add_Components()
         return E_FAIL;
 
     /* For.Com_Model */
-    if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Level1Stage1Step01"),
+    if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_TestMap"),
         TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
         return E_FAIL;
 
