@@ -48,7 +48,7 @@ CBone * CModel::Get_BonePtr(const _char * pBoneName) const
 	return *iter;
 }
 
-HRESULT CModel::Initialize_Prototype(_fmatrix TransformMatrix, MODEL tModel)
+HRESULT CModel::Initialize_Prototype(MODEL tModel)
 {
 	m_tModel = tModel;
 
@@ -67,6 +67,9 @@ HRESULT CModel::Initialize_Prototype(_fmatrix TransformMatrix, MODEL tModel)
 		MSG_BOX(tempstr.c_str());
 		return E_FAIL;
 	}
+
+	_float4x4 TransformMatrix = XMMatrixIdentity();
+	TransformMatrix = XMMatrixScaling(tModel.fScale, tModel.fScale, tModel.fScale) * XMMatrixRotationY(XMConvertToRadians(tModel.fDegree));
 
 	::XMStoreFloat4x4(&m_TransformMatrix, TransformMatrix);
 
@@ -274,11 +277,11 @@ HRESULT CModel::Ready_Animations()
 	return S_OK;
 }
 
-CModel * CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _fmatrix TransformMatrix, MODEL tModel)
+CModel * CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODEL tModel)
 {
 	CModel* pInstance = new CModel(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype(TransformMatrix, tModel)))
+	if (FAILED(pInstance->Initialize_Prototype(tModel)))
 	{
 		MSG_BOX(TEXT("Failed To Create : CModel"));
 

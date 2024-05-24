@@ -235,9 +235,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             break;
             case TOOL_MAP:
             {
-                //HRESULT hr;
-                //hr = pMainApp->Open_Level(LEVEL_TOOL_MAP);
-                //CHECK_FAILED(hr);
+                HRESULT hr;
+                hr = pMainApp->Open_Level(LEVEL_TOOL_MAP);
+                CHECK_FAILED(hr);
             }
             break;
             default:
@@ -251,7 +251,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             switch (wParam)
             {
             case VK_ESCAPE:
-                DestroyWindow(g_hWnd);
+                if(*CGameInstance::Get_Instance()->Get_CurrentLevelID() != LEVEL_TOOL_MAP )
+                    DestroyWindow(g_hWnd);
                 break;
             }
         }

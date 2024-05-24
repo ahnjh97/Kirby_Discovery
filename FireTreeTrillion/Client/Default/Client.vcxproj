@@ -105,6 +105,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>../Public/;../../EngineSDK/Inc/;../../EngineSDK/Inc/ImGui/;../Bin/core/inc/;../Default/;../../EngineSDK/Inc/physx/</AdditionalIncludeDirectories>
       <AdditionalOptions>/MP /Zm200 %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -172,6 +173,7 @@
     <ClInclude Include="..\public\Camera_Main.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\FXToolDirector.h" />
+    <ClInclude Include="..\Public\Grid.h" />
     <ClInclude Include="..\Public\Kirby.h" />
     <ClInclude Include="..\Public\KirbyDefault_State.h" />
     <ClInclude Include="..\Public\Level_GamePlay.h" />
@@ -179,10 +181,11 @@
     <ClInclude Include="..\Public\Level_Logo.h" />
     <ClInclude Include="..\Public\Level_Tool_Anim.h" />
     <ClInclude Include="..\Public\Level_Tool_FX.h" />
+    <ClInclude Include="..\Public\Level_Tool_Map.h" />
     <ClInclude Include="..\Public\Level_Tool_UI.h" />
     <ClInclude Include="..\Public\Loader.h" />
     <ClInclude Include="..\public\MainApp.h" />
-    <ClInclude Include="..\Public\Map_Stage1.h" />
+    <ClInclude Include="..\Public\BasicMap.h" />
     <ClInclude Include="..\Public\MultiEffect.h" />
     <ClInclude Include="..\Public\SingleEffect.h" />
     <ClInclude Include="..\Public\TestModel.h" />
@@ -190,6 +193,7 @@
     <ClInclude Include="..\Public\TestTerrain.h" />
     <ClInclude Include="..\Public\TestUI.h" />
     <ClInclude Include="..\Public\tinyxml2.h" />
+    <ClInclude Include="..\Public\ToolHelper.h" />
     <ClInclude Include="..\Public\UI_Editor.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="Resource.h" />
@@ -201,6 +205,7 @@
     <ClCompile Include="..\private\Camera_Free.cpp" />
     <ClCompile Include="..\private\Camera_Main.cpp" />
     <ClCompile Include="..\Private\FXToolDirector.cpp" />
+    <ClCompile Include="..\Private\Grid.cpp" />
     <ClCompile Include="..\Private\Kirby.cpp" />
     <ClCompile Include="..\Private\KirbyDefault_State.cpp" />
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />
@@ -208,10 +213,11 @@
     <ClCompile Include="..\Private\Level_Logo.cpp" />
     <ClCompile Include="..\Private\Level_Tool_Anim.cpp" />
     <ClCompile Include="..\Private\Level_Tool_FX.cpp" />
+    <ClCompile Include="..\Private\Level_Tool_Map.cpp" />
     <ClCompile Include="..\Private\Level_Tool_UI.cpp" />
     <ClCompile Include="..\Private\Loader.cpp" />
     <ClCompile Include="..\private\MainApp.cpp" />
-    <ClCompile Include="..\Private\Map_Stage1.cpp" />
+    <ClCompile Include="..\Private\BasicMap.cpp" />
     <ClCompile Include="..\Private\MultiEffect.cpp" />
     <ClCompile Include="..\Private\SingleEffect.cpp" />
     <ClCompile Include="..\Private\TestModel.cpp" />
@@ -219,6 +225,7 @@
     <ClCompile Include="..\Private\TestTerrain.cpp" />
     <ClCompile Include="..\Private\TestUI.cpp" />
     <ClCompile Include="..\Private\tinyxml2.cpp" />
+    <ClCompile Include="..\Private\ToolHelper.cpp" />
     <ClCompile Include="..\Private\UI_Editor.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="stdafx.cpp">
