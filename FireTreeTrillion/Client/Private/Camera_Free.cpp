@@ -149,7 +149,7 @@ void CCamera_Free::Control(_float fTimeDelta)
 		Track_Target(fTimeDelta);
 
 
-	if (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
+	if (*m_pCurrentLevelID == LEVEL_TOOL_MAP || m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS) )
 	{
 		_long	MouseMove = { 0 };
 
