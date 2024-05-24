@@ -42,10 +42,10 @@ HRESULT CGameObject::Initialize_Prototype()
 /* 실제 게임내엣 사용되는 객체가 호출하는 함수다. */
 HRESULT CGameObject::Initialize(void* pArg)
 {
+	GAMEOBJECT_DESC* pGameObjectDesc = nullptr;
+
 	if(nullptr != pArg)
-	{
-		GAMEOBJECT_DESC*		pGameObjectDesc = (GAMEOBJECT_DESC*)pArg;		
-	}
+		pGameObjectDesc = (GAMEOBJECT_DESC*)pArg;		
 
 	m_pTransformCom = CTransform::Create(m_pDevice, m_pContext);
 	if (nullptr == m_pTransformCom)
@@ -57,6 +57,9 @@ HRESULT CGameObject::Initialize(void* pArg)
 	m_Components.emplace(g_strTransformTag, m_pTransformCom);
 
 	Safe_AddRef(m_pTransformCom);
+
+	if (nullptr != pArg)
+		m_pTransformCom->Set_WorldMatrix(pGameObjectDesc->matWorld);
 
 	m_pCurrentLevelID = m_pGameInstance->Get_CurrentLevelID();
 	

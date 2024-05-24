@@ -93,7 +93,7 @@ PS_OUT PS_MAIN(PS_IN In)
 	if (0.3f >= vMtrlDiffuse.a)
 		discard;
 
-	vector vNormalDesc = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
+    vector vNormalDesc = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
 
 	float3 vNormal = vNormalDesc.xyz * 2.f - 1.f;
 
@@ -146,7 +146,7 @@ technique11 DefaultTechnique
 	{
 		SetRasterizerState(RS_Default);
 		SetDepthStencilState(DSS_Default, 0);
-		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;

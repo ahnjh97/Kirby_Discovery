@@ -229,7 +229,9 @@ enum TEXTURETYPE
      *  but is excluded from any further post-processing.
     */
     TextureType_UNKNOWN = 18,
-
+    TextureType_SHEEN = 19,
+    TextureType_CLEARCOAT = 20,
+    TextureType_TRANSMISSION = 21,
 
 #ifndef SWIG
     TextureType_Force32Bit = INT_MAX

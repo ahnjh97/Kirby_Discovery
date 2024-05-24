@@ -1,0 +1,257 @@
+﻿FXC : warning X4717: Effects deprecated for D3DCompiler_47
+  
+  compilation object save succeeded; see C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\Client_Assimp\Bin\Shader_VtxAnimModel.cso
+FXC : warning X4717: Effects deprecated for D3DCompiler_47
+  
+  compilation object save succeeded; see C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\Client_Assimp\Bin\Shader_VtxModel.cso
+FXC : warning X4717: Effects deprecated for D3DCompiler_47
+  
+  compilation object save succeeded; see C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\Client_Assimp\Bin\Shader_VtxNorTex.cso
+FXC : warning X4717: Effects deprecated for D3DCompiler_47
+  
+  compilation object save succeeded; see C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\Client_Assimp\Bin\Shader_VtxPosTex.cso
+  stdafx.cpp
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\Client_Assimp\Default\stdafx.cpp(1,1): warning C4819: 현재 코드 페이지(949)에서 표시할 수 없는 문자가 파일에 들어 있습니다. 데이터가 손실되지 않게 하려면 해당 파일을 유니코드 형식으로 저장하십시오.
+  BackGround.cpp
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(26,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/private/BackGround.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(35,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/private/BackGround.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(45,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/private/BackGround.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(57,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/private/BackGround.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Transform.h(11,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/private/BackGround.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\GameObject.h(10,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/private/BackGround.cpp'을(를) 컴파일하는 중)
+  
+  Camera_Free.cpp
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(26,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/private/Camera_Free.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(35,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/private/Camera_Free.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(45,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/private/Camera_Free.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(57,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/private/Camera_Free.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Transform.h(11,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/private/Camera_Free.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\GameObject.h(10,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/private/Camera_Free.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Camera.h(14,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/private/Camera_Free.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\Client_Assimp\Public\Camera_Free.h(11,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/private/Camera_Free.cpp'을(를) 컴파일하는 중)
+  
+  Level_GamePlay.cpp
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(26,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Level_GamePlay.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(35,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Level_GamePlay.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(45,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Level_GamePlay.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(57,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Level_GamePlay.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Transform.h(11,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Level_GamePlay.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\GameObject.h(10,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Level_GamePlay.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Camera.h(14,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Level_GamePlay.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\Client_Assimp\Public\Camera_Free.h(11,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Level_GamePlay.cpp'을(를) 컴파일하는 중)
+  
+  Level_Loading.cpp
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(26,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Level_Loading.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(35,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Level_Loading.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(45,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Level_Loading.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(57,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Level_Loading.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Transform.h(11,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Level_Loading.cpp'을(를) 컴파일하는 중)
+  
+  Level_Logo.cpp
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(26,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Level_Logo.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(35,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Level_Logo.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(45,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Level_Logo.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(57,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Level_Logo.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Transform.h(11,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Level_Logo.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\GameObject.h(10,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Level_Logo.cpp'을(를) 컴파일하는 중)
+  
+  Level_MapTool.cpp
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(26,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Level_MapTool.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(35,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Level_MapTool.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(45,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Level_MapTool.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(57,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Level_MapTool.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Transform.h(11,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Level_MapTool.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\GameObject.h(10,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Level_MapTool.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Camera.h(14,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Level_MapTool.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\Client_Assimp\Public\Camera_Free.h(11,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Level_MapTool.cpp'을(를) 컴파일하는 중)
+  
+  Loader.cpp
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(26,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Loader.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(35,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Loader.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(45,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Loader.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(57,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Loader.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Transform.h(11,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Loader.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\GameObject.h(10,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Loader.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Camera.h(14,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Loader.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\Client_Assimp\Public\Camera_Free.h(11,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Loader.cpp'을(를) 컴파일하는 중)
+  
+  MainApp.cpp
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(26,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/private/MainApp.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(35,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/private/MainApp.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(45,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/private/MainApp.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(57,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/private/MainApp.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Transform.h(11,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/private/MainApp.cpp'을(를) 컴파일하는 중)
+  
+  Monster.cpp
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(26,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Monster.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(35,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Monster.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(45,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Monster.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(57,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Monster.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Transform.h(11,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Monster.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\GameObject.h(10,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Monster.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\Client_Assimp\Private\Monster.cpp(34,94): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/Private/Monster.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\Client_Assimp\Private\Monster.cpp(34,76): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/Private/Monster.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\Client_Assimp\Private\Monster.cpp(58,63): warning C4267: '인수': 'size_t'에서 'Engine::_uint'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/Private/Monster.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\Client_Assimp\Private\Monster.cpp(62,8): warning C4267: '인수': 'size_t'에서 'Engine::_uint'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/Private/Monster.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\Client_Assimp\Private\Monster.cpp(70,23): warning C4267: '인수': 'size_t'에서 'Engine::_uint'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/Private/Monster.cpp'을(를) 컴파일하는 중)
+  
+  Terrain.cpp
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(26,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Terrain.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(35,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Terrain.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(45,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Terrain.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(57,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Terrain.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Transform.h(11,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Terrain.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\GameObject.h(10,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Private/Terrain.cpp'을(를) 컴파일하는 중)
+  
+  Client_Assimp.cpp
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(26,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Client_Assimp.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(35,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Client_Assimp.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(45,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Client_Assimp.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Engine_Struct.h(57,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Client_Assimp.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\EngineSDK\Inc\Transform.h(11,2): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  (소스 파일 '/Client_Assimp.cpp'을(를) 컴파일하는 중)
+  
+  코드를 생성하고 있습니다...
+  Client_Assimp.vcxproj -> C:\Users\Chelsea0427\Desktop\Kirby_Discovery\Assimp\Client_Assimp\Bin\Client_Assimp.exe
+  'pwsh.exe'은(는) 내부 또는 외부 명령, 실행할 수 있는 프로그램, 또는
+  배치 파일이 아닙니다.
