@@ -96,6 +96,7 @@ void CKirby::Late_Tick(_float fTimeDelta)
 	m_pModelCom[m_eBodyState]->Play_Animation(fTimeDelta);
 
 	SetOn_Slope(fTimeDelta);
+	_float fHeight = m_pControllerCom->Compute_Height();
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
