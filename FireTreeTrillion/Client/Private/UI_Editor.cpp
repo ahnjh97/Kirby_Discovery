@@ -273,7 +273,7 @@ HRESULT CUI_Editor::Add_Components()
 
 HRESULT CUI_Editor::Bind_ShaderResources()
 {
-	HRESULT hr;
+	HRESULT hr = S_OK;
 
 	CHECK_NULLPTR(m_pShaderCom);
 

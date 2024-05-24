@@ -97,9 +97,9 @@
     <Filter Include="02.GameObjects\TestModel\State">
       <UniqueIdentifier>{24c8db5b-dafc-44bf-806a-7f7b3d6aeed8}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="ReadMe.txt" />
+    <Filter Include="01.Levels\Tool\MAP">
+      <UniqueIdentifier>{5aa8e924-15f0-4280-b87a-55b09f572afb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -147,9 +147,6 @@
     <ClInclude Include="..\Public\TestTerrain.h">
       <Filter>02.GameObjects\Terrain</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Map_Stage1.h">
-      <Filter>02.GameObjects\Map</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Level_Tool_UI.h">
       <Filter>01.Levels\Tool\UI</Filter>
     </ClInclude>
@@ -177,9 +174,6 @@
     <ClInclude Include="..\Public\Level_Tool_Anim.h">
       <Filter>01.Levels\Tool\ANIM</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\KirbyDefault_State.h">
-      <Filter>02.GameObjects\Player\State</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\TestModel.h">
       <Filter>02.GameObjects\TestModel</Filter>
     </ClInclude>
@@ -187,8 +181,27 @@
       <Filter>02.GameObjects\TestModel\State</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\KirbyDefault_State.h" />
-    <ClInclude Include="..\Public\Trigger.h" />
-    <ClInclude Include="Kirby_Enums.h" />
+    <ClInclude Include="..\Public\ToolHelper.h">
+      <Filter>90.Utils\[Sample] ToolHelper</Filter>
+    </ClInclude>
+    <ClInclude Include="Kirby_Enums.h">
+      <Filter>99.Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KirbyDefault_State.h">
+      <Filter>02.GameObjects\Player\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BasicMap.h">
+      <Filter>02.GameObjects\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_Tool_Map.h">
+      <Filter>01.Levels\Tool\MAP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Grid.h">
+      <Filter>02.GameObjects\Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MapToolHelper.h">
+      <Filter>02.GameObjects\Map</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -227,9 +240,6 @@
     <ClCompile Include="..\Private\TestTerrain.cpp">
       <Filter>02.GameObjects\Terrain</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Map_Stage1.cpp">
-      <Filter>02.GameObjects\Map</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\FXToolDirector.cpp">
       <Filter>02.GameObjects\UI\FXToolDirector</Filter>
     </ClCompile>
@@ -257,9 +267,6 @@
     <ClCompile Include="..\Private\Level_Tool_Anim.cpp">
       <Filter>01.Levels\Tool\ANIM</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\KirbyDefault_State.cpp">
-      <Filter>02.GameObjects\Player\State</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\TestModel.cpp">
       <Filter>02.GameObjects\TestModel</Filter>
     </ClCompile>
@@ -267,7 +274,24 @@
       <Filter>02.GameObjects\TestModel\State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\KirbyDefault_State.cpp" />
-    <ClCompile Include="..\Private\Trigger.cpp" />
+    <ClCompile Include="..\Private\ToolHelper.cpp">
+      <Filter>90.Utils\[Sample] ToolHelper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KirbyDefault_State.cpp">
+      <Filter>02.GameObjects\Player\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BasicMap.cpp">
+      <Filter>02.GameObjects\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Tool_Map.cpp">
+      <Filter>01.Levels\Tool\MAP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Grid.cpp">
+      <Filter>02.GameObjects\Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MapToolHelper.cpp">
+      <Filter>02.GameObjects\Map</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -304,5 +328,13 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_Point.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_Map.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt">
+      <Filter>98.Default</Filter>
+    </Text>
   </ItemGroup>
 </Project>

@@ -14,6 +14,7 @@ public:
 		RENDER_PRIORITY,
 		RENDER_SHADOW,
 		RENDER_NONBLEND,
+		RENDER_NONLIGHT,
 		RENDER_BLOOM,
 		RENDER_BLEND,
 		RENDER_UI,
@@ -75,6 +76,7 @@ private:
 	HRESULT Render_Priority();
 	HRESULT Render_Shadow();
 	HRESULT Render_NonBlend();
+	HRESULT Render_NonLight();
 	HRESULT Render_Bloom();
 	HRESULT Render_BloomResult();
 
