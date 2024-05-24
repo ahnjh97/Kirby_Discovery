@@ -4,11 +4,12 @@
 #include "Kirby.h"
 #include "Utils.h"
 
-
+// 방향키를 누르면 그쪽으로 2차원 원형 보간이 된다
 void Turn_Interpolate(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTransformCom, _float fTimeDelta)
 {
 	if (Kirbydesc->m_vMoveDir == Kirbydesc->m_vTargetDir)
 		return;
+
 	///////// 보간 속도 조정임
 	_float fInterpolate = fTimeDelta * 12.f;
 	_vector vTargetDir = Kirbydesc->m_vTargetDir;
@@ -19,6 +20,12 @@ void Turn_Interpolate(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTransformC
 	vTargetDirXZ = XMVector3Normalize(vTargetDirXZ);
 	vMoveDirXZ = XMVector3Normalize(vMoveDirXZ);
 	_float fcosTheta = XMVectorGetX(XMVector4Dot(vTargetDirXZ, vMoveDirXZ));
+
+	if (fcosTheta < -0.99f || fcosTheta > 0.99f)
+	{
+		Kirbydesc->m_fMoveSpeed *= 0.8f;
+	}
+
 	if (fcosTheta < -0.9995f || fcosTheta > 0.9995f)
 	{
 		// 180도로 NaN 방지 랜덤으로 -1, 1도 틀어줌
@@ -52,6 +59,36 @@ void Turn_Interpolate(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTransformC
 
 }
 
+// 가속을 주면서 앞으로 나가는 로직이다.
+void Moving_Logic(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTransformCom, CCharacterController* pController, _float fTimeDelta)
+{
+	Kirbydesc->m_fMoveSpeed += fTimeDelta * 70.f;
+	if (Kirbydesc->m_fMoveSpeed > 10.f)
+		Kirbydesc->m_fMoveSpeed = 10.f;
+
+	// 타겟기준
+	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	_vector vMoveDelta = Kirbydesc->m_vTargetDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
+	pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+}
+
+// 감속을 주면서, Z회전도 죽이면서 속도 원상복구를 하려고 한다.
+void Deceleration(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTransformCom, CCharacterController* pController, _float fTimeDelta)
+{
+	// 0.1초간 풀 감속 (최대 속도 8이라 가정)
+	if (Kirbydesc->m_fMoveSpeed > 0.f)
+		Kirbydesc->m_fMoveSpeed -= 120.f * fTimeDelta;
+	if (Kirbydesc->m_fMoveSpeed < 0.f)
+		Kirbydesc->m_fMoveSpeed = 0.f;
+
+	// Z 회전 복구 (최대 회전 각도 10도)
+	Kirbydesc->m_fZAngle -= Kirbydesc->m_fZAngle / 4.f;
+
+	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	_vector vMoveDelta = Kirbydesc->m_vMoveDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
+	pTransformCom->Turn(Kirbydesc->m_vMoveDir, 1.f, Kirbydesc->m_fZAngle);
+	pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+}
 
 
 #pragma region IDLE STATE
@@ -63,8 +100,6 @@ CKirbyDefault_Idle_State::CKirbyDefault_Idle_State()
 void CKirbyDefault_Idle_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
-
-
 }
 
 void CKirbyDefault_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -75,29 +110,14 @@ void CKirbyDefault_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 
 	Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
+	Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
 
-	// 0.1초간 풀 감속 (최대 속도 8이라 가정)
-	if (Kirbydesc->m_fMoveSpeed > 0.f)
-		Kirbydesc->m_fMoveSpeed -= 80.f * fTimeDelta;
-	if (Kirbydesc->m_fMoveSpeed < 0.f)
-		Kirbydesc->m_fMoveSpeed = 0.f;
-
-	// Z 회전 복구 (최대 회전 각도 10도)
-	Kirbydesc->m_fZAngle -= Kirbydesc->m_fZAngle / 4.f;
-
-
-	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-	//Kirbydesc->m_vMoveDir = XMVector3Normalize(Kirbydesc->m_vMoveDir);
-	_vector vMoveDelta = Kirbydesc->m_vMoveDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
-	//pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vMoveDelta);
-	pTransformCom->Turn(Kirbydesc->m_vMoveDir, 1.f, Kirbydesc->m_fZAngle);
-	pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+	if (pKirby->Get_State() == CKirby::STATE_IDLESTREACH)
+		Kirbydesc->m_eEyeState = CKirby::EYE_CLOSE;
 }
 
 void CKirbyDefault_Idle_State::OnStateExit()
 {
-
-
 }
 
 CKirbyDefault_Idle_State* CKirbyDefault_Idle_State::Create()
@@ -112,9 +132,6 @@ void CKirbyDefault_Idle_State::Free()
 }
 
 #pragma endregion
-
-
-
 
 #pragma region RUN STATE
 
@@ -134,20 +151,8 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
 	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 
-
-	Kirbydesc->m_fMoveSpeed += fTimeDelta * 100.f;
-
-	if (Kirbydesc->m_fMoveSpeed > 8.f)
-		Kirbydesc->m_fMoveSpeed = 8.f;
-
+	Moving_Logic(Kirbydesc, pTransformCom, pController, fTimeDelta);
 	Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
-
-	// 타겟기준
-	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-	_vector vMoveDelta = Kirbydesc->m_vTargetDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
-	//pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vMoveDelta);
-	pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
-
 
 	// 각도 (얼마나 벌어졌느냐)
 	_vector vLook = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
@@ -199,6 +204,84 @@ CKirbyDefault_Run_State* CKirbyDefault_Run_State::Create()
 }
 
 void CKirbyDefault_Run_State::Free()
+{
+	__super::Free();
+}
+
+#pragma endregion
+
+#pragma region JUMP STATE
+
+CKirbyDefault_Jump_State::CKirbyDefault_Jump_State()
+{
+}
+
+void CKirbyDefault_Jump_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+}
+
+void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+
+	// 방향은 항상 보간한다.
+	Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
+
+	// 컨트롤러 손 대고 있을 떄
+	if (Kirbydesc->m_isController == true)
+	{
+		Moving_Logic(Kirbydesc, pTransformCom, pController, fTimeDelta);
+	}
+	// 컨트롤러 손 안 대고 있을 때
+	else if (Kirbydesc->m_isController == false)
+	{
+		Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
+	}
+
+
+
+	if (pKirby->Get_State() == CKirby::STATE_JUMPL || pKirby->Get_State() == CKirby::STATE_JUMPR ||
+		pKirby->Get_State() == CKirby::STATE_JUMPEND || pKirby->Get_State() == CKirby::STATE_JUMPFALL)
+	{
+		Kirbydesc->m_fJumpVelocity -= GRAVITY * fTimeDelta * 6.f;
+		Kirbydesc->m_isJump = pController->Jump(pTransformCom, Kirbydesc->m_fJumpVelocity, fTimeDelta);
+
+		// 착지를 했다면,
+		if (Kirbydesc->m_isJump == false)
+		{
+			// 착지상태를 ON 한다. 그리고 아마 여기 들어올 일은 없을 것이다.
+			Kirbydesc->m_isLanding = true;
+
+			// 표정 디테일
+			if (CUtils::Make_RandomInt(0, 1) == 1)
+			{
+				Kirbydesc->m_eEyeState = CKirby::EYE_CLOSE;
+			}
+		}
+	}
+	else if (pKirby->Get_State() == CKirby::STATE_FALL ||
+		pKirby->Get_State() == CKirby::STATE_LANDINGEND || pKirby->Get_State() == CKirby::STATE_LANDINGSMALL)
+	{
+		Kirbydesc->m_fJumpVelocity -= GRAVITY * fTimeDelta * 6.f;
+		pController->FreeFall(pTransformCom, fTimeDelta);
+	}
+}
+
+void CKirbyDefault_Jump_State::OnStateExit()
+{
+}
+
+CKirbyDefault_Jump_State* CKirbyDefault_Jump_State::Create()
+{
+	CKirbyDefault_Jump_State* pInstance = new CKirbyDefault_Jump_State();
+	return pInstance;
+}
+
+void CKirbyDefault_Jump_State::Free()
 {
 	__super::Free();
 }

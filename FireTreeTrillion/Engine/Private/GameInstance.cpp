@@ -281,6 +281,14 @@ HRESULT CGameInstance::Render_LightDepth_For_GameObject(CShader* pShader, CTrans
 	return S_OK;
 }
 
+void CGameInstance::Update_LightShadow(_fvector vLightPos, _fvector vFocusPos)
+{
+	if (nullptr == m_pRenderer)
+		return;
+
+	m_pRenderer->Update_LightShadow(vLightPos, vFocusPos);
+}
+
 HRESULT CGameInstance::Add_DebugComponents(CComponent * pRenderComponent)
 {
 

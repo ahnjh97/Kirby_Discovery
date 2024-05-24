@@ -42,8 +42,8 @@ _bool CFSM::ChangeState(_uint iState, _float _fAnimSpeed, _bool _bLoop, _bool _b
 	m_pCurrent_State->OnStateExit();
 	pNextState->OnStateEnter(m_pModel, iState, _fAnimSpeed, _bLoop, _bInterpolation);
 
+	m_iState = iState;
 	m_pCurrent_State = pNextState;
-	m_iPreState = iState;
 	return true;
 }
 

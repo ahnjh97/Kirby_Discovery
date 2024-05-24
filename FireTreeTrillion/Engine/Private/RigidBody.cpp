@@ -248,7 +248,7 @@ void CRigidBody::Go_Straight(CTransform* pTransform, _float fSpeed, _float fTime
 	PxControllerCollisionFlags collisionFlags = m_pCapsuleController->move(movement, 0.001f, fTimeDelta, filter);
 
 	PxExtendedVec3 pxPos = m_pCapsuleController->getPosition();
-	PxVec3 pos(pxPos.x, pxPos.y, pxPos.z);
+	PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
 
 	_vector xmPos = XMVectorSet(pos.x, pos.y - 0.5f, pos.z, 0.f);
 
@@ -278,7 +278,7 @@ _bool CRigidBody::Jump(CTransform* pTransform, _float fFallVelocity, _float fTim
 	}
 
 	PxExtendedVec3 pxPos = m_pCapsuleController->getPosition();
-	PxVec3 pos(pxPos.x, pxPos.y, pxPos.z);
+	PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
 	_vector xmPos = XMVectorSet(pos.x, pos.y - 0.5f, pos.z, 0.f);
 
 	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
@@ -307,7 +307,7 @@ void CRigidBody::FreeFall(CTransform* pTransform, _float fTimeDelta)
 	}
 
 	PxExtendedVec3 pxPos = m_pCapsuleController->getPosition();
-	PxVec3 pos(pxPos.x, pxPos.y, pxPos.z);
+	PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
 
 	_vector xmPos = XMVectorSet(pos.x, pos.y - 0.5f, pos.z, 0.f);
 
@@ -317,7 +317,7 @@ void CRigidBody::FreeFall(CTransform* pTransform, _float fTimeDelta)
 PxVec3 CRigidBody::Compute_Slope(CTransform* pTransform)
 {
 	PxExtendedVec3 position = m_pCapsuleController->getPosition();
-	PxVec3 rayOrigin = PxVec3(position.x, position.y, position.z);
+	PxVec3 rayOrigin = PxVec3((_float)position.x, (_float)position.y, (_float)position.z);
 
 	_vector vRight = pTransform->Get_State_Vector(CTransform::STATE_RIGHT);
 	vRight = XMVector3Normalize(vRight);

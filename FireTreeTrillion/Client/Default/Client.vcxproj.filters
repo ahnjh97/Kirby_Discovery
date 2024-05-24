@@ -132,15 +132,6 @@
     <ClInclude Include="..\Public\Client_Defines.h">
       <Filter>99.Defines</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Player.h">
-      <Filter>02.GameObjects\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Body_Player.h">
-      <Filter>02.GameObjects\Player\Body</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Weapon.h">
-      <Filter>02.GameObjects\Player\Weapon</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\tinyxml2.h">
       <Filter>90.Utils\XML</Filter>
     </ClInclude>
@@ -179,6 +170,9 @@
     <ClInclude Include="..\public\Level_Tool_UI.h">
       <Filter>01.Levels\Tool\UI</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\KirbyDefault_State.h" />
+    <ClInclude Include="..\Public\Trigger.h" />
+    <ClInclude Include="Kirby_Enums.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -207,15 +201,6 @@
     </ClCompile>
     <ClCompile Include="..\private\Camera_Free.cpp">
       <Filter>02.GameObjects\Camera</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Player.cpp">
-      <Filter>02.GameObjects\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Body_Player.cpp">
-      <Filter>02.GameObjects\Player\Body</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Weapon.cpp">
-      <Filter>02.GameObjects\Player\Weapon</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\tinyxml2.cpp">
       <Filter>90.Utils\XML</Filter>
@@ -255,6 +240,8 @@
     <ClCompile Include="..\private\Level_Tool_UI.cpp">
       <Filter>01.Levels\Tool\UI</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\KirbyDefault_State.cpp" />
+    <ClCompile Include="..\Private\Trigger.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

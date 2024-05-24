@@ -19,10 +19,14 @@ HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer)
 
 	if (LIGHT_DESC::TYPE_DIRECTIONAL == m_LightDesc.eType)
 	{
-		iPassIndex = 1;
+		if (FAILED(pShader->Bind_RawValue("g_vLightPos", &m_LightDesc.vPosition, sizeof(_float4))))
+			return E_FAIL;
 
 		if (FAILED(pShader->Bind_RawValue("g_vLightDir", &m_LightDesc.vDirection, sizeof(_float4))))
 			return E_FAIL;
+
+		iPassIndex = 1;
+
 	}
 
 	else if (LIGHT_DESC::TYPE_POINT == m_LightDesc.eType)

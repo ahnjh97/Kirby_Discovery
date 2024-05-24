@@ -88,7 +88,7 @@ void CGameObject::Render_IMGUI()
 	ImGui::BeginChild(strWindowName.c_str());
 	for (auto& com : m_Components)
 	{
-		char szName[256];
+		_char szName[256];
 		CUtils::WCharToChar(com.first.c_str(), szName);
 
 		if (ImGui::CollapsingHeader(szName))
