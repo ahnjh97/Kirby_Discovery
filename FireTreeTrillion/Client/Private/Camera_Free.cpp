@@ -120,6 +120,8 @@ void CCamera_Free::Track_Target(_float fTimeDelta)
 		return;
 
 	_float4 vTargetPos = m_pTarget->Get_State(CTransform::STATE_POSITION);
+	//vTargetPos.y = m_pTransformCom->Get_State(CTransform::STATE_POSITION).y;
+
 	_float4 vBackDir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 	vBackDir.Normalize();
 	vBackDir *= m_fTrackDistance;
@@ -127,7 +129,7 @@ void CCamera_Free::Track_Target(_float fTimeDelta)
 	_float4 vCurPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
 	_float4 vDestDir = (vTargetPos + vBackDir) - vCurPos;
-
+	vDestDir.y = 0.f;
 
 	if (.1f <= vDestDir.Length())
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, Pos(vCurPos + (vDestDir * .06f)));
@@ -147,7 +149,7 @@ void CCamera_Free::Control(_float fTimeDelta)
 		Track_Target(fTimeDelta);
 
 
-	if (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
+	if (*m_pCurrentLevelID == LEVEL_TOOL_MAP || m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS) )
 	{
 		_long	MouseMove = { 0 };
 

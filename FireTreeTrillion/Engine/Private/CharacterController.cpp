@@ -259,6 +259,29 @@ _float CCharacterController::Compute_Height()
 	return fHeight;
 }
 
+PxVec3 CCharacterController::Compute_TerrainPosition()
+{
+	PxExtendedVec3 position = m_pController->getPosition();
+	PxVec3 rayOrigin = PxVec3((_float)position.x, (_float)position.y, (_float)position.z);
+
+	PxVec3 rayDirection = PxVec3(0.f, -1.f, 0.f);
+	_float fMaxDistance = 10.f;
+
+	PxRaycastHit hit;
+	PxRaycastBuffer hitBuffer;
+	PxQueryFilterData filterData(PxQueryFlag::eSTATIC);
+
+	_bool isRayCast = m_pGameInstance->Get_Scene()->raycast(rayOrigin, rayDirection, fMaxDistance, hitBuffer, PxHitFlag::eNORMAL, filterData);
+	// 충돌이 발생한 경우 법선 벡터 반환
+	if (isRayCast && hitBuffer.hasBlock)
+	{
+		hit = hitBuffer.block;
+		return hit.position;
+	}
+	else
+		return PxVec3(0.0f, 0.0f, 0.0f);
+}
+
 /// <summary>
 /// 1. 'Character의 특정 위치'에서 지면으로부터 rayCast를 실행한다.
 /// 2. rayCast로 'Terrain의 노말벡터'를 뽑는다.
@@ -342,7 +365,7 @@ void CCharacterController::Create_Controller()
 	Release_Controller();
 
 	PxCapsuleControllerDesc capsuleDesc;
-	capsuleDesc.position = PxExtendedVec3(0.f, 100.f, 0.f);
+	capsuleDesc.position = PxExtendedVec3(0.f, 20.f, 0.f);
 	capsuleDesc.radius = 0.5f; // 반지름
 	capsuleDesc.height = 0.1f; // 높이
 	capsuleDesc.stepOffset = 0.f;
