@@ -72,10 +72,10 @@
     </Filter>
     <Filter Include="01.Levels\Tool_Anim">
       <UniqueIdentifier>{10037f7f-a7d9-40d2-aa5b-1f1b3d772ba1}</UniqueIdentifier>
-	</Filter>
-	<Filter Include="02.GameObjects\Player\Kirby">
+    </Filter>
+    <Filter Include="02.GameObjects\Player\Kirby">
       <UniqueIdentifier>{f4444bba-a36c-4a3e-9327-ac76df48dd6f}</UniqueIdentifier>
-	</Filter>
+    </Filter>
     <Filter Include="02.GameObjects\Effect">
       <UniqueIdentifier>{8da63451-b1d5-46f5-a7cd-b8c224b47c48}</UniqueIdentifier>
     </Filter>
@@ -96,6 +96,9 @@
     </Filter>
     <Filter Include="01.Levels\Tool\UI">
       <UniqueIdentifier>{41f938d7-08df-4edb-8b73-7f075bf755d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Kirby">
+      <UniqueIdentifier>{204faa24-9b78-41e2-89a5-f75c6615e6e1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -138,15 +141,6 @@
     <ClInclude Include="..\Public\Client_Defines.h">
       <Filter>99.Defines</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Player.h">
-      <Filter>02.GameObjects\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Body_Player.h">
-      <Filter>02.GameObjects\Player\Body</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Weapon.h">
-      <Filter>02.GameObjects\Player\Weapon</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\tinyxml2.h">
       <Filter>90.Utils\XML</Filter>
     </ClInclude>
@@ -173,11 +167,8 @@
     </ClInclude>
     <ClInclude Include="..\Public\Level_Tool_Anim.h">
       <Filter>01.Levels\Tool_Anim</Filter>
-	</ClInclude>
-	<ClInclude Include="..\Public\Kirby.h">
-      <Filter>02.GameObjects\Player\Kirby</Filter>
-	</ClInclude>
-	<ClInclude Include="..\public\SingleEffect.h">
+    </ClInclude>
+    <ClInclude Include="..\public\SingleEffect.h">
       <Filter>02.GameObjects\Effect\Single</Filter>
     </ClInclude>
     <ClInclude Include="..\public\MultiEffect.h">
@@ -190,6 +181,11 @@
     </ClInclude>
     <ClInclude Include="..\public\Level_Tool_UI.h">
       <Filter>01.Levels\Tool\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KirbyDefault_State.h" />
+    <ClInclude Include="..\Public\Trigger.h" />
+    <ClInclude Include="..\Public\Kirby.h">
+      <Filter>02.GameObjects\Kirby</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -220,15 +216,6 @@
     <ClCompile Include="..\private\Camera_Free.cpp">
       <Filter>02.GameObjects\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\Player.cpp">
-      <Filter>02.GameObjects\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Body_Player.cpp">
-      <Filter>02.GameObjects\Player\Body</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Weapon.cpp">
-      <Filter>02.GameObjects\Player\Weapon</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\tinyxml2.cpp">
       <Filter>90.Utils\XML</Filter>
     </ClCompile>
@@ -255,11 +242,8 @@
     </ClCompile>
     <ClCompile Include="..\Private\Level_Tool_Anim.cpp">
       <Filter>01.Levels\Tool_Anim</Filter>
-	</ClCompile>
-	<ClCompile Include="..\Private\Kirby.cpp">
-      <Filter>02.GameObjects\Player\Kirby</Filter>
-	</ClCompile>
-	<ClCompile Include="..\private\SingleEffect.cpp">
+    </ClCompile>
+    <ClCompile Include="..\private\SingleEffect.cpp">
       <Filter>02.GameObjects\Effect\Single</Filter>
     </ClCompile>
     <ClCompile Include="..\private\MultiEffect.cpp">
@@ -272,6 +256,11 @@
     </ClCompile>
     <ClCompile Include="..\private\Level_Tool_UI.cpp">
       <Filter>01.Levels\Tool\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KirbyDefault_State.cpp" />
+    <ClCompile Include="..\Private\Trigger.cpp" />
+    <ClCompile Include="..\Private\Kirby.cpp">
+      <Filter>02.GameObjects\Kirby</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
