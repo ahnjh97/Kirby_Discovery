@@ -101,8 +101,7 @@ void CCharacterController::Move(CTransform* pTransform, _float fSpeed, _float fT
 	PxControllerCollisionFlags collisionFlags = m_pController->move(movement, 0.001f, fTimeDelta, filter);
 
 	PxExtendedVec3 pxPos = m_pController->getPosition();
-	PxVec3 pos(pxPos.x, pxPos.y, pxPos.z);
-
+	PxVec3 pos ((_float)pxPos.x,(_float)pxPos.y,(_float)pxPos.z);
 	_vector xmPos = XMVectorSet(pos.x, pos.y - m_fOffset, pos.z, 0.f);
 
 	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
@@ -117,7 +116,7 @@ void CCharacterController::Move_Dir(CTransform* pTransform, _fvector fDelta, _fl
 	PxControllerCollisionFlags collisionFlags = m_pController->move(movement, 0.001f, fTimeDelta, filter);
 
 	PxExtendedVec3 pxPos = m_pController->getPosition();
-	PxVec3 pos(pxPos.x, pxPos.y, pxPos.z);
+	PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
 
 	_vector xmPos = XMVectorSet(pos.x, pos.y - m_fOffset, pos.z, 0.f);
 
@@ -148,7 +147,7 @@ _bool CCharacterController::Jump(CTransform* pTransform, _float fFallVelocity, _
 
 	// 객체의 위치 받아오기
 	PxExtendedVec3 pxPos = m_pController->getPosition();
-	PxVec3 pos(pxPos.x, pxPos.y, pxPos.z);
+	PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
 
 	// 객체 FOOT POSITION 조정 using OFFSET
 	_vector xmPos = XMVectorSet(pos.x, pos.y - m_fOffset, pos.z, 0.f);
@@ -178,7 +177,7 @@ void CCharacterController::FreeFall(CTransform* pTransform, _float fTimeDelta)
 	}
 
 	PxExtendedVec3 pxPos = m_pController->getPosition();
-	PxVec3 pos(pxPos.x, pxPos.y, pxPos.z);
+	PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
 
 	_vector xmPos = XMVectorSet(pos.x, pos.y - 0.5f, pos.z, 0.f);
 
@@ -194,7 +193,7 @@ void CCharacterController::FreeFall(CTransform* pTransform, _float fTimeDelta)
 PxVec3 CCharacterController::Compute_Slope(CTransform* pTransform)
 {
 	PxExtendedVec3 position = m_pController->getPosition();
-	PxVec3 rayOrigin = PxVec3(position.x, position.y, position.z);
+	PxVec3 rayOrigin = PxVec3((_float)position.x, (_float)position.y, (_float)position.z);
 
 	_vector vRight = pTransform->Get_State_Vector(CTransform::STATE_RIGHT);
 	vRight = XMVector3Normalize(vRight);

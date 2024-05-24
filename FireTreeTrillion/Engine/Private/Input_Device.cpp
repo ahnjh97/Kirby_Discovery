@@ -51,6 +51,10 @@ void Engine::CInput_Device::Tick(void)
 	if (m_IsWindowActive == false)
 		return;
 
+	// 이전 상태 저장
+	memcpy(m_byPrevKeyState, m_byKeyState, sizeof(m_byKeyState));
+	memcpy(&m_tPrevMouseState, &m_tMouseState, sizeof(m_tMouseState));
+
 	/* 키보드와 마우스가 어떤 입력상태를 가지고 있는지를 저장한ㄷ.ㅏ */
 	m_pKeyBoard->GetDeviceState(256, m_byKeyState);
 	m_pMouse->GetDeviceState(sizeof(m_tMouseState), &m_tMouseState);
@@ -58,27 +62,43 @@ void Engine::CInput_Device::Tick(void)
 
 _bool CInput_Device::Get_DIKeyState(_ubyte byKeyID, KEYSTATE eState)
 {
-	if (m_byKeyState[byKeyID] & 0x80)
+	//if (m_byKeyState[byKeyID] & 0x80)
+	//{
+	//	if (m_eKeyState[byKeyID] == KEY_FREE)
+	//		m_eKeyState[byKeyID] = KEY_DOWN;
+	//	else
+	//		m_eKeyState[byKeyID] = KEY_PRESS;
+	//}
+	//else
+	//{
+	//	if (m_eKeyState[byKeyID] == KEY_DOWN || m_eKeyState[byKeyID] == KEY_PRESS)
+	//		m_eKeyState[byKeyID] = KEY_UP;
+	//	else
+	//		m_eKeyState[byKeyID] = KEY_FREE;
+	//}
+
+	//return (m_eKeyState[byKeyID] == eState);
+
+	if (eState == KEY_PRESS)
 	{
-		if (m_eKeyState[byKeyID] == KEY_FREE)
-			m_eKeyState[byKeyID] = KEY_DOWN;
-		else
-			m_eKeyState[byKeyID] = KEY_PRESS;
+		return m_byKeyState[byKeyID] & 0x80;
 	}
-	else
+	else if (eState == KEY_UP)
 	{
-		if (m_eKeyState[byKeyID] == KEY_DOWN || m_eKeyState[byKeyID] == KEY_PRESS)
-			m_eKeyState[byKeyID] = KEY_UP;
-		else
-			m_eKeyState[byKeyID] = KEY_FREE;
+		return !(m_byKeyState[byKeyID] & 0x80) && (m_byPrevKeyState[byKeyID] & 0x80);
+	}
+	else if (eState == KEY_DOWN)
+	{
+		return (m_byKeyState[byKeyID] & 0x80) && !(m_byPrevKeyState[byKeyID] & 0x80);
 	}
 
-	return (m_eKeyState[byKeyID] == eState);
+
+	return m_byKeyState[byKeyID] & 0x80;
 }
 
 _bool CInput_Device::Get_DIMouseState(MOUSEKEYSTATE eMouse, KEYSTATE eState)
 {
-	if (m_tMouseState.rgbButtons[eMouse] > 0)
+	/*if (m_tMouseState.rgbButtons[eMouse] > 0)
 	{
 		if (m_eMouseStates[eMouse] == KEY_FREE)
 			m_eMouseStates[eMouse] = KEY_DOWN;
@@ -93,7 +113,21 @@ _bool CInput_Device::Get_DIMouseState(MOUSEKEYSTATE eMouse, KEYSTATE eState)
 			m_eMouseStates[eMouse] = KEY_FREE;
 	}
 
-	return (m_eMouseStates[eMouse] == eState);
+	return (m_eMouseStates[eMouse] == eState);*/
+	if (eState == KEY_PRESS)
+	{
+		return m_tMouseState.rgbButtons[eMouse] & 0x80;
+	}
+	else if (eState == KEY_UP)
+	{
+		return !(m_tMouseState.rgbButtons[eMouse] & 0x80) && (m_tPrevMouseState.rgbButtons[eMouse] & 0x80);
+	}
+	else if (eState == KEY_DOWN)
+	{
+		return (m_tMouseState.rgbButtons[eMouse] & 0x80) && !(m_tPrevMouseState.rgbButtons[eMouse] & 0x80);
+	}
+
+	return m_tMouseState.rgbButtons[eMouse] & 0x80;
 }
 
 CInput_Device * CInput_Device::Create(HINSTANCE hInst, HWND hWnd)

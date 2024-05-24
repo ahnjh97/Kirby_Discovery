@@ -34,6 +34,11 @@ public:
 
 	HRESULT Render_LightDepth_For_GameObject(class CShader* pShader, class CTransform* pTransform, class CModel* pModel);
 
+	void Update_LightShadow(_fvector vLightPos, _fvector vFocusPos) {
+		m_vShadowEyePos = vLightPos;
+		m_vShadowFocusPos = vFocusPos;
+	}
+
 
 #ifdef _DEBUG
 public:

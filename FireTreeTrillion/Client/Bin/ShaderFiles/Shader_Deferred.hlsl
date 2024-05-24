@@ -125,8 +125,8 @@ struct PS_IN
 struct PS_OUT
 {
     float4 vColor : SV_TARGET0;
-    float4 vSSAO : SV_TARGET1;
-    float4 vSSAO_SUB : SV_TARGET2;
+    //float4 vSSAO : SV_TARGET1;
+    //float4 vSSAO_SUB : SV_TARGET2;
 };
 
 PS_OUT PS_MAIN(PS_IN In)
@@ -291,7 +291,7 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
     if (0.0f == vDiffuse.a)
     {
         Out.vColor += vSky * (1.f - vEffect.a);
-        Out.vSSAO_SUB = float4(1.f, 0.f, 0.f, 1.f);
+        //Out.vSSAO_SUB = float4(1.f, 0.f, 0.f, 1.f);
     }
     
     Out.vColor += vBlur + vEffect;

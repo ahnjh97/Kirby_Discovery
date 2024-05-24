@@ -186,6 +186,9 @@
     <ClInclude Include="..\Public\TestModel_State.h">
       <Filter>02.GameObjects\TestModel\State</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\KirbyDefault_State.h" />
+    <ClInclude Include="..\Public\Trigger.h" />
+    <ClInclude Include="Kirby_Enums.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -263,6 +266,8 @@
     <ClCompile Include="..\Private\TestModel_State.cpp">
       <Filter>02.GameObjects\TestModel\State</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\KirbyDefault_State.cpp" />
+    <ClCompile Include="..\Private\Trigger.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

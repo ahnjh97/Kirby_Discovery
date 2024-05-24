@@ -37,9 +37,6 @@ private:
 
 	// FSM에서 들고 있을 Model
 	class CModel*		m_pModel = { nullptr };
-
-	// for Debug
-	_uint				m_iPreState = 0; 
 	
 	unordered_map<_uint, CFSM_State*>	m_mapFSM_State;
 
