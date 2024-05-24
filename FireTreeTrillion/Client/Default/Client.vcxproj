@@ -183,6 +183,7 @@
     <ClInclude Include="..\Public\Loader.h" />
     <ClInclude Include="..\public\MainApp.h" />
     <ClInclude Include="..\public\MultiEffect.h" />
+    <ClInclude Include="..\public\Particle.h" />
     <ClInclude Include="..\public\SingleEffect.h" />
     <ClInclude Include="..\Public\TestModel.h" />
     <ClInclude Include="..\Public\TestModel_State.h" />
@@ -213,6 +214,7 @@
     <ClCompile Include="..\Private\Loader.cpp" />
     <ClCompile Include="..\private\MainApp.cpp" />
     <ClCompile Include="..\private\MultiEffect.cpp" />
+    <ClCompile Include="..\private\Particle.cpp" />
     <ClCompile Include="..\private\SingleEffect.cpp" />
     <ClCompile Include="..\Private\TestModel.cpp" />
     <ClCompile Include="..\Private\TestModel_State.cpp" />

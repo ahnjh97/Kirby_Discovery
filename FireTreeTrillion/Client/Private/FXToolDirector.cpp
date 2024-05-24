@@ -109,9 +109,10 @@ void CFXToolDirector::Late_Tick(_float _fTimeDelta)
 
 HRESULT CFXToolDirector::Render()
 {
-
+	//복합 이펙트 아니면 FX에 있는 이펙트 렌더
 	if (m_eSelected == SELECTED_SINGLE_FX || m_eSelected == SELECTED_PARTICLE_FX)
 		m_FXs[m_iSelectedFXIdx]->Render();
+	//아니면 복합 이펙트 렌더
 	else if (m_eSelected == SELECTED_MULTI_FX)
 		m_MultiFXs[m_iSelectedMultiFXIdx]->Render();
 
@@ -137,8 +138,8 @@ void CFXToolDirector::Render_FXHierarchy()
 
 	if (Button(u8"이펙트 생성"))
 	{
-		//m_FXs.emplace_back();
 
+		//이름 정해주기
 		CSingleEffect::FX_DESC singleFXDesc{};
 		string strComponentTag = "Prototype_Component_";
 
@@ -153,7 +154,7 @@ void CFXToolDirector::Render_FXHierarchy()
 			break;
 		}
 
-		//default 이펙트 이름 뒤에 알파벳을 붙인다.
+		//default 이펙트 이름 뒤에 중복 존재 시 알파벳을 붙인다.
 		char szSuffix = 'A';
 		while (true)
 		{
@@ -178,6 +179,7 @@ void CFXToolDirector::Render_FXHierarchy()
 		}
 
 
+		//버퍼, 텍스쳐, 마스크 텍스쳐 컴포넌트 이름 떤져준다.
 		singleFXDesc.strBufferTag = strComponentTag + m_FXBufferList[m_iAddingFXBufferIdx];
 		singleFXDesc.strTexTag = strComponentTag + m_FXTexList[m_iAddingFXTexIdx];
 		singleFXDesc.strMaskTexTag = strComponentTag + m_FXMaskTexList[m_iAddingFXMaskTexIdx];

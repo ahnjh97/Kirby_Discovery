@@ -26,6 +26,7 @@ protected:
 
 public:
 	virtual HRESULT Initialize_Prototype(const CVIBuffer_Instance::INSTANCE_DESC& InstanceDesc);
+	virtual HRESULT Initialize_Prototype(_uint _iNumInstance);
 	virtual HRESULT Initialize(void* pArg);
 	virtual HRESULT Bind_Buffers();
 	virtual HRESULT Render();

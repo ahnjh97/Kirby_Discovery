@@ -101,7 +101,7 @@ namespace Engine
 		XMFLOAT4		vUp;
 		XMFLOAT4		vLook;
 		XMFLOAT4		vPosition;		
-		bool			isLived;
+		bool			bAlive;
 
 	}VTXMATRIX;
 

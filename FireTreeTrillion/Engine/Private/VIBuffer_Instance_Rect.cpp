@@ -141,7 +141,7 @@ HRESULT CVIBuffer_Instance_Rect::Initialize_Prototype(const CVIBuffer_Instance::
 		XMStoreFloat4(&m_pInstanceVertices[i].vLook, XMVectorSet(0.f, 0.f, 1.f, 0.f) * ScaleZ(m_RandomNumber));
 		m_pInstanceVertices[i].vPosition = Compute_RandPosition();
 
-		m_pInstanceVertices[i].isLived = true;
+		m_pInstanceVertices[i].bAlive = true;
 
 
 		/* 0.f 현재 라이프타임 */

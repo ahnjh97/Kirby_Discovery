@@ -14,12 +14,14 @@ private:
 
 public:
 	virtual HRESULT Initialize_Prototype(const CVIBuffer_Instance::INSTANCE_DESC& InstanceDesc);
+	virtual HRESULT Initialize_Prototype(_uint iNumInstance);
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual _float4 Compute_RandPosition() override;
 
 
 public:
 	static CVIBuffer_Instance_Point* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const CVIBuffer_Instance::INSTANCE_DESC& InstanceDesc);
+	static CVIBuffer_Instance_Point* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _uint iNumInstance);
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Free() override;
 };

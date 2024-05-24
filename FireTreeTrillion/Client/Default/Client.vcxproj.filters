@@ -100,6 +100,9 @@
     <Filter Include="02.GameObjects\Kirby">
       <UniqueIdentifier>{204faa24-9b78-41e2-89a5-f75c6615e6e1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Effect\Particle">
+      <UniqueIdentifier>{f072a52c-c670-48a5-b959-b302eb3c6ddf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -187,6 +190,9 @@
     <ClInclude Include="..\Public\Kirby.h">
       <Filter>02.GameObjects\Kirby</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Particle.h">
+      <Filter>02.GameObjects\Effect\Particle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -261,6 +267,9 @@
     <ClCompile Include="..\Private\Trigger.cpp" />
     <ClCompile Include="..\Private\Kirby.cpp">
       <Filter>02.GameObjects\Kirby</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Particle.cpp">
+      <Filter>02.GameObjects\Effect\Particle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

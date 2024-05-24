@@ -33,6 +33,12 @@ HRESULT CVIBuffer_Instance::Initialize_Prototype(const CVIBuffer_Instance::INSTA
 	return S_OK;
 }
 
+HRESULT CVIBuffer_Instance::Initialize_Prototype(_uint _iNumInstance)
+{
+	m_iNumInstance = _iNumInstance;
+	return S_OK;
+}
+
 HRESULT CVIBuffer_Instance::Initialize(void * pArg)
 {
 
@@ -131,7 +137,7 @@ void CVIBuffer_Instance::Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceI
 	{
 
 		if(false == m_InstanceDesc.isLoop)
-			pVertices[iInstanceIndex].isLived = false;
+			pVertices[iInstanceIndex].bAlive = false;
 
 		else
 		{
