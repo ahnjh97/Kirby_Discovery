@@ -417,7 +417,7 @@ _matrix CGameInstance::Get_Transform_Matrix(CPipeLine::TRANSFORMSTATE eState) co
 	if (nullptr == m_pPipeLine)
 		return XMMatrixIdentity();
 
-	return m_pPipeLine->Get_Transform_Matrix(eState);
+	return m_pPipeLine->Get_Transform(eState);
 }
 
 _float4x4 CGameInstance::Get_Transform_Float4x4(CPipeLine::TRANSFORMSTATE eState) const
@@ -425,7 +425,7 @@ _float4x4 CGameInstance::Get_Transform_Float4x4(CPipeLine::TRANSFORMSTATE eState
 	if (nullptr == m_pPipeLine)
 		return _float4x4();
 
-	return m_pPipeLine->Get_Transform_Float4x4(eState);
+	return m_pPipeLine->Get_Transform(eState);
 }
 
 _matrix CGameInstance::Get_Transform_Matrix_Inverse(CPipeLine::TRANSFORMSTATE eState) const

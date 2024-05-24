@@ -269,6 +269,7 @@ void CFXToolDirector::Render_FXHierarchy()
 	//이펙트 초기 값과 키프레임 값을 편집한다.
 	Begin(u8"편집하기");
 
+	SeparatorText(u8"목록");
 	BeginChild(u8"목록", ImVec2(0, 200), true);
 	for (_int i = 0; i < m_FXs.size(); ++i)
 	{
@@ -395,28 +396,14 @@ void CFXToolDirector::Render_FXProperty()
 		pCurFX->m_iMaskTexIdx = m_iCurFXMaskTexIdx;
 	}
 
-	
-	//if (DragFloat3(u8"시작 위치", m_vEditPos, .01f, -50.f, 50.f, "%.2f"))
-	//{
-	//	memcpy(&pCurFX->m_vInitPos, m_vEditPos, sizeof(_float3));
-	//}
-	//if (DragFloat3(u8"시작 회전", m_vEditRot, .1f, -180.f, 180.f, "%.2f"))
-	//{
-	//	memcpy(&pCurFX->m_vInitRot, m_vEditRot, sizeof(_float3));
-	//}
-	//if (DragFloat3(u8"시작 크기", m_vEditScale, .05f, .01f, 100.f, "%.2f"))
-	//{
-	//	memcpy(&pCurFX->m_vInitScale, m_vEditScale, sizeof(_float3));
-	//}
-
 	if (bIsParticle)
 	{
 		DragFloat3(u8"범위", m_fRange, .01f, -100.f, 100.f, "%.2f");
 	}
 
-
 }
 
+//이펙트의 플레이 바를 띄운다.
 void CFXToolDirector::Render_FXPlayBar(_float _fTimeDelta)
 {
 	/*
@@ -427,10 +414,10 @@ void CFXToolDirector::Render_FXPlayBar(_float _fTimeDelta)
 		(io.DisplaySize.y - windowSize.y) - windowSize.y);
 	SetNextWindowPos(windowPos);
 	*/
+
+	//아무것도 선택되지 않았다면 return
 	if (m_eSelected == SELECTED_END)
 		return;
-
-
 
 
  	Begin(u8"Bar", nullptr, ImGuiWindowFlags_NoTitleBar);
