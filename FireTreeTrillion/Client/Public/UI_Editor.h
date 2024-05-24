@@ -29,8 +29,8 @@ private:
 	HRESULT			Add_Components();
 	HRESULT			Bind_ShaderResources();
 	_bool			Edit_Transform();
-
 	_bool			Edit_RGBAColor();
+	_bool			Set_OrthoProj();
 
 private:
 	CShader*			m_pShaderCom = { nullptr };

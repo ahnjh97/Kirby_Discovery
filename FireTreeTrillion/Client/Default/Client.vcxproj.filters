@@ -187,8 +187,10 @@
       <Filter>02.GameObjects\TestModel\State</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\KirbyDefault_State.h" />
-    <ClInclude Include="..\Public\Trigger.h" />
     <ClInclude Include="Kirby_Enums.h" />
+    <ClInclude Include="..\Public\ToolHelper.h">
+      <Filter>90.Utils\[Sample] ToolHelper</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -267,7 +269,9 @@
       <Filter>02.GameObjects\TestModel\State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\KirbyDefault_State.cpp" />
-    <ClCompile Include="..\Private\Trigger.cpp" />
+    <ClCompile Include="..\Private\ToolHelper.cpp">
+      <Filter>90.Utils\[Sample] ToolHelper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
