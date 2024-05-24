@@ -164,8 +164,30 @@ void CCamera_Free::Control(_float fTimeDelta)
 		//전후진
 		if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMMS_WHEEL))
 		{
-			m_pTransformCom->Go_Straight(fTimeDelta * MouseMove * m_fMouseSensor * .5f);
+			// 05.24) LEVEL_TOOL_UI에는 카메라 줌인/아웃 시 객체도 적용
+			if (*m_pCurrentLevelID == LEVEL_TOOL_UI)
+			{
+				_float4x4 WorldMatrix, ViewMatrix, ProjMatrix;
+				ViewMatrix = m_pTransformCom->Get_WorldMatrix_Inverse();
+				m_pGameInstance->Set_Transform(CPipeLine::D3DTS_VIEW, ViewMatrix);
 
+				//XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f);
+
+				_float2 ViewVoulume;
+				ViewVoulume.x -= g_iWinSizeX * 0.001f;
+				ViewVoulume.y -= g_iWinSizeY * 0.001f;
+
+				ProjMatrix = XMMatrixOrthographicLH(ViewVoulume.x, ViewVoulume.y, 0.0f, 300.f);
+				m_pGameInstance->Set_Transform(CPipeLine::D3DTS_PROJ, ProjMatrix);
+
+				const CTransform* pUIEditorTrans = dynamic_cast<const CTransform*>(m_pGameInstance->
+					Get_Component(LEVEL_TOOL_UI, TEXT("Layer_UI"), g_strTransformTag));
+				WorldMatrix = pUIEditorTrans->Get_WorldMatrix();
+				
+				//m_pTransformCom->Set_WorldMatrix(WorldMatrix);
+			}
+
+			m_pTransformCom->Go_Straight(fTimeDelta * MouseMove * m_fMouseSensor * .5f);
 
 			if (m_pTarget != nullptr && m_bTrackTarget)
 				m_fTrackDistance -= MouseMove*.01f ;
@@ -184,7 +206,7 @@ void CCamera_Free::Control(_float fTimeDelta)
 			Vector3 vTargetPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Float4(CTransform::STATE_LOOK) * 10.f;
 			
 			// 05.22) LEVEL_TOOL_UI에는 카메라 회전 기능 제외
-			if (*m_pCurrentLevelID == 4) //LEVEL_TOOL_UI
+			if (*m_pCurrentLevelID == LEVEL_TOOL_UI)
 				return;
 
 			if (*m_pCurrentLevelID == LEVEL_TOOL_FX)

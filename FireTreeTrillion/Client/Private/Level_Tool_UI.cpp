@@ -58,7 +58,7 @@ HRESULT CLevel_Tool_UI::Ready_Layer_Camera(const wstring& strLayerTag)
 	CameraDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	CameraDesc.fNear = 0.1f;
 	CameraDesc.fFar = 500.0f;
-	CameraDesc.vEye = _float4(0.f, 0.f, -200.f, 1.f);
+	CameraDesc.vEye = _float4(0.f, 0.f, g_iWinSizeX * -0.1f, 1.f);
 	CameraDesc.vAt = _float4(0.f, 0.f, 1.f, 1.f);
 	CameraDesc.fSpeedPerSec = 10.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(0.0f);

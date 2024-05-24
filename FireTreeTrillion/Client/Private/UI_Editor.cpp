@@ -26,19 +26,18 @@ HRESULT CUI_Editor::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	m_size2D = _float2(100.f, 100.f);
-	//m_position2D = _float2(100.f, 100.f);
-	m_WindowSize2D = _float2(g_iWinSizeX, g_iWinSizeY);
+	UIOBJ_DESC LOGO_DESC{};
+	LOGO_DESC.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f };
+	LOGO_DESC.vSize = { 100.f, 100.f };
+	LOGO_DESC.vPos = { LOGO_DESC.vCenter.x - 200.f, LOGO_DESC.vCenter.y - 200.f };
 
-	m_pTransformCom->Set_Scaled(m_size2D.x, m_size2D.y, 1.f);
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
-		XMVectorSet(
-			 m_position2D.x - g_iWinSizeX * 0.5f + 800.f,
-			-m_position2D.y + g_iWinSizeY * 0.5f - 450.f,
-			0.f, 1.f));
+	m_pTransformCom->Set_Scaled(LOGO_DESC.vSize.x, LOGO_DESC.vSize.y, 1.f);
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(
+					LOGO_DESC.vCenter.x - LOGO_DESC.vPos.x,
+					-LOGO_DESC.vCenter.y + LOGO_DESC.vPos.y, 0.f, 1.f));
 
-	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
-	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(m_WindowSize2D.x, m_WindowSize2D.y, 0.f, 1.f));
+	//XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
+	//XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 
 	return S_OK;
 }
@@ -84,21 +83,20 @@ void CUI_Editor::Render_IMGUI()
 
 #pragma region IMGUI GIZMO CUSTOM
 
-	// IMGUI Gizmo Grid 커스텀 (X/Y 2D 좌표계용)
-	static const float gridX[16] =
-	{	1.f, 0.f,  0.f, 0.f, 
-		0.f, 0.f, -1.f, 0.f, 
-		0.f, 1.f, 0.f, 0.f, 
+// IMGUI Gizmo Grid 커스텀 (X/Y 2D 좌표계용)
+	static const float MatGridX[16] =
+	{ 1.f, 0.f,  0.f, 0.f,
+		0.f, 0.f, -1.f, 0.f,
+		0.f, 1.f, 0.f, 0.f,
 		0.f, 0.f, 0.f, 1.f };
 
 	_float4x4 ViewMatrix, ProjMatrix;
 	ViewMatrix = CGameInstance::Get_Instance()->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW);
 	ProjMatrix = CGameInstance::Get_Instance()->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
 
-	ImGuizmo::DrawGrid(ViewMatrix.m[0], ProjMatrix.m[0], gridX, 100.f);
+	ImGuizmo::DrawGrid(ViewMatrix.m[0], ProjMatrix.m[0], MatGridX, 100.f);
 
 #pragma endregion
-
 	// 도킹 모드는 크기/위치 고정 시 도킹 불가
 	//ImGui::SetNextWindowPos(ImVec2(10.f, 10.f));
 	//ImGui::SetNextWindowSize(ImVec2(iSizeX, iSizeY));
@@ -244,7 +242,6 @@ void CUI_Editor::Render_IMGUI()
 		ImGui::End();
 	}
 
-
 	//ImGui::PopStyleVar();
 }
 
@@ -280,10 +277,15 @@ HRESULT CUI_Editor::Bind_ShaderResources()
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+	// 05.24) 줌인/아웃용 매트릭스 보정
+	_matrix WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+	_float4x4 ViewMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW);
+	_float4x4 ProjMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
 		return E_FAIL;
 
 	m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
@@ -350,9 +352,10 @@ _bool CUI_Editor::Edit_Transform()
 	_float Translate[3], Rotate[3], Scale[3];
 	
 	ImGuizmo::DecomposeMatrixToComponents(WorldMatrix.m[0], Translate, Rotate, Scale);
+
 	ImGui::Text(u8"Scale 크기");
 	ImGui::SameLine(fTextWidth + 20);
-	ImGui::DragFloat3("##Scale", Scale, 0.1f, 0.f, 10.f, "%.1f");
+	ImGui::DragFloat3("##Scale", (_float*)Scale, 1.f, 0.f, g_iWinSizeX, "%.1f");
 
 	ImGui::Text(u8"Translate 위치");
 	ImGui::SameLine(fTextWidth + 20);
@@ -360,39 +363,40 @@ _bool CUI_Editor::Edit_Transform()
 
 	ImGui::Text(u8"Rotate 회전");
 	ImGui::SameLine(fTextWidth + 20);
-	ImGui::DragFloat("##Rotate", (_float*)&Rotate[2], 0, (_int)0, (_int)360, u8"Degree 각도 : %.1f");
+	ImGui::DragFloat("##Rotate", (_float*)&Rotate[2], 1.f, (_int)-360, (_int)360, u8"Degree 각도 : %.0f");
 
 	ImGuizmo::RecomposeMatrixFromComponents(Translate, Rotate, Scale, WorldMatrix.m[0]);
 
 	//기즈모 영역 세팅
 	ImGuiIO& io = ImGui::GetIO();
-	ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
+	ImGuizmo::SetRect(0.f, 0.f, io.DisplaySize.x, io.DisplaySize.y);
 
 	//뷰, 투영 행렬 정보 로드
 	_float4x4 ViewMatrix, ProjMatrix;
 	ViewMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW);
 	ProjMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
 
-	static _bool useSnap(false);
-	_float3 snap = _float3();
+	//static _bool useSnap(false);
+	_float fGizmoSpeed[3] = { 
+		0.1f,		//Translate
+		1.f,		//Rotate
+		0.01f };		//Scale
 
 	//오브젝트 변환
-	ImGuizmo::Manipulate(ViewMatrix.m[0], ProjMatrix.m[0], eCurGizmoOper, eCurGizmoMode,
-		WorldMatrix.m[0], useSnap ? &snap.x : NULL);
+	ImGuizmo::Manipulate(ViewMatrix.m[0], ProjMatrix.m[0], eCurGizmoOper, eCurGizmoMode, WorldMatrix.m[0], NULL, fGizmoSpeed);
+	/*useSnap ? &snap.x : NULL*/
 
 	//월드행렬 세팅
 	m_pTransformCom->Set_WorldMatrix(WorldMatrix);
 
+	m_UIObjDesc.vSize = (_float2)Scale;
+	m_UIObjDesc.vPos = (_float2)Translate;
+	
+
 #pragma endregion
 
-	//m_pTransformCom->Set_Scaled(Scale[0], Scale[1], 1.f);
-	//m_pTransformCom->Set_State(CTransform::STATE_POSITION,
-	//	XMVectorSet(
-	//		 m_position2D.x - g_iWinSizeX * 0.5f + Translate[0],
-	//		-m_position2D.y + g_iWinSizeY * 0.5f - Translate[1],
-	//		0.f, 1.f));
-	//m_pTransformCom->Rotation(XMVectorSet(0.f, 0.f, 1.f, 1.f), XMConvertToRadians(Rotate[2]));
-
+	m_pTransformCom->Set_Scaled(m_UIObjDesc.vSize.x, m_UIObjDesc.vSize.y, 1.f);
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(m_UIObjDesc.vPos.x, m_UIObjDesc.vPos.y, 0.f, 1.f));
 
 	return TRUE;
 }
@@ -464,7 +468,7 @@ void CUI_Editor::Free()
 {
 	__super::Free();
 
-	//Safe_Release(m_pShaderCom);
-	//Safe_Release(m_pTextureCom);
-	//Safe_Release(m_pVIBufferCom);
+	Safe_Release(m_pShaderCom);
+	Safe_Release(m_pTextureCom);
+	Safe_Release(m_pVIBufferCom);
 }
