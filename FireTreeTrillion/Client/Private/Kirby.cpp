@@ -147,6 +147,9 @@ void CKirby::Render_IMGUI()
 		ImGui::TreePop();
 	}
 
+	ImGui::Text("RePress : %d", m_bRePressBlock);
+	ImGui::Text("Land : %d", INFO(m_isLanding));
+
 	ImGui::Text("JUMP : %d", INFO(m_isJump));
 	ImGui::Text("Velocity : %.2f", INFO(m_fJumpVelocity));
 	ImGui::Text("Input C? : %d", m_pGameInstance->Get_DIKeyState(DIK_C, KEY_PRESS));
@@ -313,6 +316,7 @@ void CKirby::JoyStick_Input(_float fTimeDelta)
 
 void CKirby::ZXCV_Input(_float fTimeDelta)
 {
+
 	// 점프 중이 아닐 때
 	if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN) && INFO(m_isJump) != true)
 	{
@@ -329,9 +333,18 @@ void CKirby::ZXCV_Input(_float fTimeDelta)
 		m_fHoldAirTime = 0.f;
 		// 점프키를 누르는 시간
 		m_fJumpHoldTime = 0.f;
+
+		// 초기화
+		m_bRePressBlock = false;
 	}
 
-	if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_PRESS) && m_fJumpHoldTime < 0.3f)
+	if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_UP))
+	{
+		// 때는 순간 트루가 되고, 점프 가능 시점에 다시 누를 때 까지 C에대한 누적 등 반응하지 않는다.
+		m_bRePressBlock = true;
+	}
+
+	if (m_bRePressBlock == false && m_pGameInstance->Get_DIKeyState(DIK_C, KEY_PRESS) && m_fJumpHoldTime < 0.3f)
 	{
 		m_fJumpHoldTime += fTimeDelta;
 	}

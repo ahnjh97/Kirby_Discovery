@@ -95,6 +95,7 @@ private:
 	_float			m_fChangeVelocityZeroTime = { 0.f };
 	_float			m_fHoldAirTime = { 0.f };
 	_float			m_fChangeRunTime = { 0.f };
+	_bool			m_bRePressBlock = { false };
 
 
 private:
