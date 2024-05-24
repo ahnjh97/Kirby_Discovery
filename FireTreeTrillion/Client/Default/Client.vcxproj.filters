@@ -37,12 +37,6 @@
     <Filter Include="02.GameObjects\Player">
       <UniqueIdentifier>{c8892da5-ac0a-4aa1-83ab-12a0fd1f52c6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Player\Body">
-      <UniqueIdentifier>{40fb19c9-0a14-4c9d-9fe2-39d35c97f865}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Player\Weapon">
-      <UniqueIdentifier>{b3b00c76-db29-40f1-91c2-575d98ee7852}</UniqueIdentifier>
-    </Filter>
     <Filter Include="90.Utils">
       <UniqueIdentifier>{b950e84f-4eac-4d0f-a16d-60f2661e798e}</UniqueIdentifier>
     </Filter>
@@ -70,12 +64,6 @@
     <Filter Include="02.GameObjects\UI\FXToolDirector">
       <UniqueIdentifier>{dbb187c2-6962-4466-b912-a53c4e5d474a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Levels\Tool_Anim">
-      <UniqueIdentifier>{10037f7f-a7d9-40d2-aa5b-1f1b3d772ba1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Player\Kirby">
-      <UniqueIdentifier>{f4444bba-a36c-4a3e-9327-ac76df48dd6f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Effect">
       <UniqueIdentifier>{8da63451-b1d5-46f5-a7cd-b8c224b47c48}</UniqueIdentifier>
     </Filter>
@@ -84,9 +72,6 @@
     </Filter>
     <Filter Include="02.GameObjects\Effect\Multi">
       <UniqueIdentifier>{f34649b7-f041-4be5-b519-7d313325d15a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Levels\Tool_UI">
-      <UniqueIdentifier>{ef096024-030a-43d7-967c-23388e481d5d}</UniqueIdentifier>
     </Filter>
     <Filter Include="01.Levels\Tool">
       <UniqueIdentifier>{2fc1b856-3420-4c6b-b1c3-8a2ae73c0d25}</UniqueIdentifier>
@@ -97,8 +82,20 @@
     <Filter Include="01.Levels\Tool\UI">
       <UniqueIdentifier>{41f938d7-08df-4edb-8b73-7f075bf755d5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Kirby">
-      <UniqueIdentifier>{204faa24-9b78-41e2-89a5-f75c6615e6e1}</UniqueIdentifier>
+    <Filter Include="02.GameObjects\Map">
+      <UniqueIdentifier>{310eaee8-bc9b-4061-8a3b-1befbaed5f82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\Tool\ANIM">
+      <UniqueIdentifier>{33844d5a-d935-47f9-a410-59245e635f38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Player\State">
+      <UniqueIdentifier>{79362919-e7bb-428f-ab22-a4eec033163c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\TestModel">
+      <UniqueIdentifier>{d64477a2-9b4a-44f4-9553-f9c18cf7c023}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\TestModel\State">
+      <UniqueIdentifier>{24c8db5b-dafc-44bf-806a-7f7b3d6aeed8}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Effect\Particle">
       <UniqueIdentifier>{f072a52c-c670-48a5-b959-b302eb3c6ddf}</UniqueIdentifier>
@@ -156,37 +153,48 @@
     <ClInclude Include="..\Public\TestTerrain.h">
       <Filter>02.GameObjects\Terrain</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\ToolHelper.h">
-      <Filter>90.Utils\[Sample] ToolHelper</Filter>
+    <ClInclude Include="..\Public\Map_Stage1.h">
+      <Filter>02.GameObjects\Map</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\TestUI.h">
-      <Filter>02.GameObjects\UI\[Sample] TestUI</Filter>
+    <ClInclude Include="..\Public\Level_Tool_UI.h">
+      <Filter>01.Levels\Tool\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_Tool_FX.h">
+      <Filter>01.Levels\Tool\FX</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\UI_Editor.h">
       <Filter>02.GameObjects\UI\Editor</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\FXToolDirector.h">
+    <ClInclude Include="..\Public\TestUI.h">
+      <Filter>02.GameObjects\UI\[Sample] TestUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\FXToolDirector.h">
       <Filter>02.GameObjects\UI\FXToolDirector</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Level_Tool_Anim.h">
-      <Filter>01.Levels\Tool_Anim</Filter>
+    <ClInclude Include="..\Public\Kirby.h">
+      <Filter>02.GameObjects\Player</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\SingleEffect.h">
+    <ClInclude Include="..\Public\SingleEffect.h">
       <Filter>02.GameObjects\Effect\Single</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\MultiEffect.h">
+    <ClInclude Include="..\Public\MultiEffect.h">
       <Filter>02.GameObjects\Effect\Multi</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Kirby.h" />
-    <ClInclude Include="..\Public\TestModel_State.h" />
-    <ClInclude Include="..\public\Level_Tool_FX.h">
-      <Filter>01.Levels\Tool\FX</Filter>
+    <ClInclude Include="..\Public\Level_Tool_Anim.h">
+      <Filter>01.Levels\Tool\ANIM</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Level_Tool_UI.h">
-      <Filter>01.Levels\Tool\UI</Filter>
+    <ClInclude Include="..\Public\KirbyDefault_State.h">
+      <Filter>02.GameObjects\Player\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TestModel.h">
+      <Filter>02.GameObjects\TestModel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TestModel_State.h">
+      <Filter>02.GameObjects\TestModel\State</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\KirbyDefault_State.h" />
     <ClInclude Include="..\Public\Trigger.h" />
+    <ClInclude Include="Kirby_Enums.h" />
     <ClInclude Include="..\Public\Kirby.h">
       <Filter>02.GameObjects\Kirby</Filter>
     </ClInclude>
@@ -234,34 +242,44 @@
     <ClCompile Include="..\Private\TestTerrain.cpp">
       <Filter>02.GameObjects\Terrain</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\ToolHelper.cpp">
-      <Filter>90.Utils\[Sample] ToolHelper</Filter>
+    <ClCompile Include="..\Private\Map_Stage1.cpp">
+      <Filter>02.GameObjects\Map</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\TestUI.cpp">
-      <Filter>02.GameObjects\UI\[Sample] TestUI</Filter>
+    <ClCompile Include="..\Private\FXToolDirector.cpp">
+      <Filter>02.GameObjects\UI\FXToolDirector</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Tool_FX.cpp">
+      <Filter>01.Levels\Tool\FX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Tool_UI.cpp">
+      <Filter>01.Levels\Tool\UI</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\UI_Editor.cpp">
       <Filter>02.GameObjects\UI\Editor</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\FXToolDirector.cpp">
-      <Filter>02.GameObjects\UI\FXToolDirector</Filter>
+    <ClCompile Include="..\Private\TestUI.cpp">
+      <Filter>02.GameObjects\UI\[Sample] TestUI</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Level_Tool_Anim.cpp">
-      <Filter>01.Levels\Tool_Anim</Filter>
+    <ClCompile Include="..\Private\Kirby.cpp">
+      <Filter>02.GameObjects\Player</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\SingleEffect.cpp">
-      <Filter>02.GameObjects\Effect\Single</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\MultiEffect.cpp">
+    <ClCompile Include="..\Private\MultiEffect.cpp">
       <Filter>02.GameObjects\Effect\Multi</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Kirby.cpp" />
-    <ClCompile Include="..\Private\TestModel_State.cpp" />
-    <ClCompile Include="..\private\Level_Tool_FX.cpp">
-      <Filter>01.Levels\Tool\FX</Filter>
+    <ClCompile Include="..\Private\SingleEffect.cpp">
+      <Filter>02.GameObjects\Effect\Single</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\Level_Tool_UI.cpp">
-      <Filter>01.Levels\Tool\UI</Filter>
+    <ClCompile Include="..\Private\Level_Tool_Anim.cpp">
+      <Filter>01.Levels\Tool\ANIM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KirbyDefault_State.cpp">
+      <Filter>02.GameObjects\Player\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TestModel.cpp">
+      <Filter>02.GameObjects\TestModel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TestModel_State.cpp">
+      <Filter>02.GameObjects\TestModel\State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\KirbyDefault_State.cpp" />
     <ClCompile Include="..\Private\Trigger.cpp" />

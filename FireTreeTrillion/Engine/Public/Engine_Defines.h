@@ -5,6 +5,7 @@
 //#pragma warning (disable : 4819)
 //#pragma warning (disable : 4101)
 
+
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include <d3dcompiler.h>
@@ -229,7 +230,9 @@ enum TEXTURETYPE
      *  but is excluded from any further post-processing.
     */
     TextureType_UNKNOWN = 18,
-
+    TextureType_SHEEN = 19,
+    TextureType_CLEARCOAT = 20,
+    TextureType_TRANSMISSION = 21,
 
 #ifndef SWIG
     TextureType_Force32Bit = INT_MAX

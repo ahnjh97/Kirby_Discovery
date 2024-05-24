@@ -109,7 +109,7 @@ void CModel::Render_IMGUI()
 	__super::Render_IMGUI();
 	
 
-	if (m_Animations.size() >= m_iCurrentAnimIndex)
+	if (m_Animations.empty())
 		return;
 
 	// AnimationÀÇ end±îÁö
