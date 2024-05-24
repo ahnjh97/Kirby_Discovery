@@ -24,6 +24,29 @@ namespace Engine
 
 	}LIGHT_DESC;
 	
+	typedef struct
+	{
+
+		//시작 범위(랜덤X)
+		_float3		vCenter;
+		_float3		vRange;
+
+		//기준점(랜덤X)
+		_float3		vPivot;
+
+		//수명
+		_float2		vLifetime;
+		_float		fStartDelay;
+
+		//크
+		_float3		vScale;
+		
+		
+		_bool		bIsLooping;
+		_float2		vSpeed;
+		//_uint		iNumInstance;
+
+	}INSTANCE_DESC;
 
 	typedef struct 
 	{

@@ -13,13 +13,13 @@ private:
 	virtual ~CVIBuffer_Instance_Rect() = default;
 
 public:
-	virtual HRESULT Initialize_Prototype(const CVIBuffer_Instance::INSTANCE_DESC& InstanceDesc);
+	//virtual HRESULT Initialize_Prototype(const INSTANCE_DESC& InstanceDesc);
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual _float4 Compute_RandPosition() override;
 
 
 public:
-	static CVIBuffer_Instance_Rect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const CVIBuffer_Instance::INSTANCE_DESC& InstanceDesc);
+	//static CVIBuffer_Instance_Rect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const INSTANCE_DESC& InstanceDesc);
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Free() override;
 };

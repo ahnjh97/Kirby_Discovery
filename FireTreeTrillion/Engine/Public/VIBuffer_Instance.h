@@ -7,29 +7,12 @@ BEGIN(Engine)
 class ENGINE_DLL CVIBuffer_Instance abstract : public CVIBuffer
 {
 public:
-	typedef struct
-	{
-		_float3		vPivot;
-		_float3		vCenter;
-		_float3		vRange;
-		_float3		vMinScale, vMaxScale;
-		_float2		vLifeTime;
-		_bool		isLoop;
-		_float2		vSpeed;		
-		_uint		iNumInstance;
-	}INSTANCE_DESC;
+
 
 protected:
 	CVIBuffer_Instance(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CVIBuffer_Instance(const CVIBuffer_Instance& rhs);
 	virtual ~CVIBuffer_Instance() = default;
-
-public:
-	virtual HRESULT Initialize_Prototype(const CVIBuffer_Instance::INSTANCE_DESC& InstanceDesc);
-	virtual HRESULT Initialize_Prototype(_uint _iNumInstance);
-	virtual HRESULT Initialize(void* pArg);
-	virtual HRESULT Bind_Buffers();
-	virtual HRESULT Render();
 
 public:
 	virtual _float4 Compute_RandPosition() = 0;
@@ -38,6 +21,16 @@ public:
 
 	void Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceIndex, _float fTimeDelta);
 
+	void Update_InstanceInfo(const INSTANCE_DESC& InstanceDesc);
+
+public:
+	virtual HRESULT Initialize_Prototype(const INSTANCE_DESC& InstanceDesc);
+	virtual HRESULT Initialize_Prototype(_uint _iNumInstance);
+	virtual HRESULT Initialize(void* pArg);
+	virtual HRESULT Bind_Buffers();
+	virtual HRESULT Render();
+
+	
 
 protected:
 	ID3D11Buffer*			m_pVBInstance = { nullptr };

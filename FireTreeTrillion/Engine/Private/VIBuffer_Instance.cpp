@@ -24,7 +24,7 @@ CVIBuffer_Instance::CVIBuffer_Instance(const CVIBuffer_Instance & rhs)
 	Safe_AddRef(m_pVBInstance);
 }
 
-HRESULT CVIBuffer_Instance::Initialize_Prototype(const CVIBuffer_Instance::INSTANCE_DESC& InstanceDesc)
+HRESULT CVIBuffer_Instance::Initialize_Prototype(const INSTANCE_DESC& InstanceDesc)
 {
 	m_RandomNumber = mt19937_64(m_RandomDevice());
 
@@ -136,7 +136,7 @@ void CVIBuffer_Instance::Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceI
 	if (m_pLifeTimes[iInstanceIndex].x > m_pLifeTimes[iInstanceIndex].y)
 	{
 
-		if(false == m_InstanceDesc.isLoop)
+		if(false == m_InstanceDesc.bIsLooping)
 			pVertices[iInstanceIndex].bAlive = false;
 
 		else
@@ -146,6 +146,11 @@ void CVIBuffer_Instance::Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceI
 		}
 	}
 
+}
+
+void CVIBuffer_Instance::Update_InstanceInfo(const INSTANCE_DESC& _InstanceDesc)
+{
+	m_InstanceDesc = _InstanceDesc;
 }
 
 
