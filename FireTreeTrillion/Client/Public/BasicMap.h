@@ -26,7 +26,7 @@ public:
 private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
-	CGameObject* m_pBlendMap = { nullptr }; // 
+	CGameObject* m_pBlendMap = { nullptr }; 
 
 	vector<_uint> m_vecPassIndices;
 	vector<_float> m_vecSamplingFactors;

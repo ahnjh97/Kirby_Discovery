@@ -25,6 +25,11 @@ HRESULT CLevel_Tool_Map::Initialize()
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_MapToolHelper"), TEXT("Prototype_GameObject_MapToolHelper"))))
 		return E_FAIL;
 
+	CGameObject::GAMEOBJECT_DESC tDesc{};
+	tDesc.wstrModelName = TEXT("Level1Stage1Step01");
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Map"), TEXT("Prototype_GameObject_BasicMap"), &tDesc)))
+		return E_FAIL;
+
 	return S_OK;
 }
 

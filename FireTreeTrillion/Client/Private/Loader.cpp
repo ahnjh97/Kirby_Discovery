@@ -520,7 +520,7 @@ HRESULT CLoader::Add_AllModelTxts(LEVEL eLevel, TYPE eType)
 
 	FindClose(hFind);
 
-	return S_OK;
+ 	return S_OK;
 }
 
 void CLoader::TraverseModelTxts(const wstring& rootFolderPath, list<wstring>& fileList)

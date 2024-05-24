@@ -28,7 +28,7 @@ HRESULT CBasicMap::Initialize(void* pArg)
     if (FAILED(__super::Initialize(&GameObjectDesc)))
         return E_FAIL;
 
-    wstring wstrModelTag = GameObjectDesc.wstrModelTag;
+    wstring wstrModelTag = GameObjectDesc.wstrModelName;
 
     if (FAILED(Add_Components(wstrModelTag)))
         return E_FAIL;
@@ -77,8 +77,11 @@ HRESULT CBasicMap::Render()
             return E_FAIL;
         if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
             return E_FAIL;
-        if (FAILED(m_pShaderCom->Begin(0)))
+        if (FAILED(m_pShaderCom->Begin(m_vecPassIndices[i])))
             return E_FAIL;
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_fSamplingFactor", &m_vecSamplingFactors[i], sizeof(_float))))
+            return E_FAIL;
+
         m_pModelCom->Render(i);
     }
 
@@ -88,7 +91,7 @@ HRESULT CBasicMap::Render()
 HRESULT CBasicMap::Add_Components(const wstring& _wstrModelTag)
 {
     /* For.Com_Shader */
-    if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Shader_VtxModel"),
+    if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Shader_VtxModel_Map"),
         TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
         return E_FAIL;
 
@@ -120,11 +123,11 @@ HRESULT CBasicMap::Add_BlendMap(const wstring& _wstrModelTag)
 {
     GAMEOBJECT_DESC tMapDesc{};
     tMapDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
-    tMapDesc.wstrModelTag = _wstrModelTag + TEXT("_Blend"); 
+    tMapDesc.wstrModelName = _wstrModelTag + TEXT("_Blend"); 
 
-    m_pBlendMap = m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_BasicMap"), &tMapDesc);
+    /*m_pBlendMap = m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_BasicMap"), &tMapDesc);
     if (nullptr == m_pBlendMap)
-        return E_FAIL;
+        return E_FAIL;*/
 
     return S_OK;
 }
@@ -136,7 +139,7 @@ void CBasicMap::SetUpShaderInfo(const wstring& _wstrModelTag)
     fstream fileStream(strFilePath, ios::in | ios::binary);
     if (fileStream.is_open() == false)
     {
-        wstring wstrError = TEXT("Failed to Open: ") + _wstrModelTag + L".txt";
+        wstring wstrError = TEXT("Failed to Open: ") + _wstrModelTag + L"_ShaderInfo.txt";
         MSG_BOX(wstrError.c_str());
         m_vecPassIndices.resize(m_pModelCom->Get_NumMeshes());
         m_vecSamplingFactors.resize(m_pModelCom->Get_NumMeshes());

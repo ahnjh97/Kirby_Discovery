@@ -32,6 +32,12 @@ HRESULT CGrid::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
+	_float fScale = m_pVIBufferCom->Get_Scale();
+	_uint iNumX = m_pVIBufferCom->Get_NumVerticesX();
+	_uint iNumZ = m_pVIBufferCom->Get_NumVerticesZ();
+
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(-fScale * iNumX * 0.5f, 0, -fScale * iNumZ * 0.5f, 1));
+
 	return S_OK;
 }
 
