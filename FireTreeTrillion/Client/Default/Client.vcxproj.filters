@@ -70,6 +70,12 @@
     <Filter Include="02.GameObjects\UI\FXToolDirector">
       <UniqueIdentifier>{dbb187c2-6962-4466-b912-a53c4e5d474a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Levels\Tool_Anim">
+      <UniqueIdentifier>{10037f7f-a7d9-40d2-aa5b-1f1b3d772ba1}</UniqueIdentifier>
+	</Filter>
+	<Filter Include="02.GameObjects\Player\Kirby">
+      <UniqueIdentifier>{f4444bba-a36c-4a3e-9327-ac76df48dd6f}</UniqueIdentifier>
+	</Filter>
     <Filter Include="02.GameObjects\Effect">
       <UniqueIdentifier>{8da63451-b1d5-46f5-a7cd-b8c224b47c48}</UniqueIdentifier>
     </Filter>
@@ -165,7 +171,13 @@
     <ClInclude Include="..\public\FXToolDirector.h">
       <Filter>02.GameObjects\UI\FXToolDirector</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\SingleEffect.h">
+    <ClInclude Include="..\Public\Level_Tool_Anim.h">
+      <Filter>01.Levels\Tool_Anim</Filter>
+	</ClInclude>
+	<ClInclude Include="..\Public\Kirby.h">
+      <Filter>02.GameObjects\Player\Kirby</Filter>
+	</ClInclude>
+	<ClInclude Include="..\public\SingleEffect.h">
       <Filter>02.GameObjects\Effect\Single</Filter>
     </ClInclude>
     <ClInclude Include="..\public\MultiEffect.h">
@@ -241,7 +253,13 @@
     <ClCompile Include="..\private\FXToolDirector.cpp">
       <Filter>02.GameObjects\UI\FXToolDirector</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\SingleEffect.cpp">
+    <ClCompile Include="..\Private\Level_Tool_Anim.cpp">
+      <Filter>01.Levels\Tool_Anim</Filter>
+	</ClCompile>
+	<ClCompile Include="..\Private\Kirby.cpp">
+      <Filter>02.GameObjects\Player\Kirby</Filter>
+	</ClCompile>
+	<ClCompile Include="..\private\SingleEffect.cpp">
       <Filter>02.GameObjects\Effect\Single</Filter>
     </ClCompile>
     <ClCompile Include="..\private\MultiEffect.cpp">

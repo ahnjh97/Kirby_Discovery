@@ -36,6 +36,8 @@ private:
 	HRESULT Loading_For_GamePlay();
 	HRESULT Loading_For_Tool_UI();
 	HRESULT Loading_For_Tool_FX();
+	HRESULT Loading_For_Tool_Anim();
+	//HRESULT Loading_For_Tool_Map();
 
 	// 240518
 	HRESULT Add_Models(LEVEL eLevel);

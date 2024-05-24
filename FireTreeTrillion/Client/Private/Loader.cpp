@@ -100,6 +100,19 @@ HRESULT CLoader::Start()
 		hr = Loading_For_Tool_FX();
 		break;
 	}
+
+	case LEVEL_TOOL_ANIM:
+	{
+		hr = Loading_For_Tool_Anim();
+		break;
+	}
+
+	case LEVEL_TOOL_MAP:
+	{
+		//hr = Loading_For_Tool_FX();
+		break;
+	}
+
 	}
 	if (FAILED(hr))
 		return E_FAIL;
@@ -196,6 +209,36 @@ HRESULT CLoader::Loading_For_Tool_FX()
 {
 	HRESULT hr;
 	LEVEL eLevel = LEVEL_TOOL_FX;
+
+	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
+	//if (FAILED(Add_Texture(eLevel, "Logo", "Logo/Logo.png")))
+	//	return E_FAIL;
+
+	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
+	// 모아놓은 Model 한번에 생성.
+	//hr = Add_Models(eLevel);
+	//CHECK_FAILED(hr);
+	m_strLoadingText = TEXT("물리 컴포넌트(을) 로딩 중 입니다.");
+	// 리지드바디
+	//hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_RigidBody"), CRigidBody::Create(m_pDevice, m_pContext));
+	//CHECK_FAILED(hr);
+
+	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
+	// 모아놓은 Shaders 한번에 생성
+	hr = Add_Shaders(eLevel);
+	CHECK_FAILED(hr);
+
+	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
+
+	m_IsFinished = true;
+
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_For_Tool_Anim()
+{
+	HRESULT hr;
+	LEVEL eLevel = LEVEL_TOOL_ANIM;
 
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
 	//if (FAILED(Add_Texture(eLevel, "Logo", "Logo/Logo.png")))
