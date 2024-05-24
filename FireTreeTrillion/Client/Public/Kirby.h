@@ -2,6 +2,7 @@
 
 #include "Client_Defines.h"
 #include "GameObject.h"
+#define	INFO(state) m_tKirbyInfo.state
 
 BEGIN(Engine)
 class CModel;
@@ -17,6 +18,10 @@ class CKirby :
     public CGameObject
 {
 public:
+
+// Enum을 모아놓은 헤더파일이다.
+#include "Kirby_Enums.h"
+
 	// 다양한 STATE 에서 관리하여야 하는 구조체
 	typedef struct INFODESC
 	{
@@ -24,18 +29,21 @@ public:
 		_float			m_fZAngle = { 0.f };
 		_float4			m_vMoveDir = { 0.f, 0.f, 0.f, 0.f };
 		_float4			m_vTargetDir = { 0.f, 0.f, 0.f, 0.f };
+		// 눈, 입, 몸체의 상태를 담당한다.
+		EYESTATE		m_eEyeState = { EYE_END };
+		MOUTHSTATE		m_eMouthState = { MOUTH_END };
+		BODYSTATE		m_eBodyState = { BODY_END };
+
+		// 중력 및 점프
+		_float m_fJumpVelocity = { 0.f };
+		_bool	m_isJump = { false };
+		_bool	m_isLanding = { false };
+		_float m_fGravityOffset = { 6.f };
+
+		// 방향 키 컨트롤러를 만지고 있는가?
+		_bool	m_isController = { false };
 	}KIRBY_INFODESC;
 
-	enum DIR { DIR_LEFT, DIR_RIGHT, DIR_FRONT, DIR_BACK, DIR_LF, DIR_RF, DIR_LB, DIR_RB, DIR_END };
-
-
-	enum STATE {
-		STATE_IDLE = 256, STATE_RUN = 172, STATE_END
-    };
-
-	enum EYESTATE { EYE_IDLE, EYE_ANGER, EYE_CLOSE, EYE_SADNESS, EYE_PUPIL, EYE_BLINK, EYE_END };
-	enum MOUTHSTATE { MONTH_IDLE, MOUTH_ANGER, MOUTH_HAPPY, MOUTH_SMILE, MOUTH_SURPRISE, MOUTH_END };
-	enum BODYSTATE { BODY_DEFAULT, BODY_VACUUM, BODY_BALLOON, BODY_END };
 
 private:
 	CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -57,13 +65,40 @@ public:
 	}
 	_uint			Get_State();
 
+
+	// 기타 세부적인 제어
 private:
+	// 커비의 움직임을 담은 구조체
+	KIRBY_INFODESC  m_tKirbyInfo;
+	DIR				m_eKirbyDir = { DIR_END };
+
+	void			SetOn_Slope(_float fTimeDelta);
+	void			Lerp_UpVector(_fvector _vTargetUp, _float _maxAngle, _float fTimeDelta);
 	void			Setting_KirbyBalance();
 	void			Key_Input(_float fTimeDelta);
+	void			JoyStick_Input(_float fTimeDelta);
+	// 일반 움직임을 할 수 있는 상황이여야 하니, 전부 false 여야 true를 반환하여야 한다.
+	_bool			Can_JoyStickUsing() { 
+		return !m_tKirbyInfo.m_isJump && !m_tKirbyInfo.m_isLanding;
+	}
+	void			ZXCV_Input(_float fTimeDelta);
+	void			Kirby_SystemTick(_float fTimeDelta);
 
-public:
-	void			SetOn_Slope(_float fTimeDelta);
-	void			Lerp_UpVector(_fvector _vOriginUp, _fvector _vTargetUp, _float _maxAngle, _float fTimeDelta);
+	void			Idle_Animation(_float fTimeDelta);
+	_float			m_fIdleStreachTime = { 0.f };
+	_bool			m_bKirbyIdleChangeTrigger = { true };
+	_uint			m_iIdleChoose = { 0 };
+
+	// JUMP를 위해 L와 R가 번갈아서 진행된다.
+	void			Kirby_Jump(_float fTimeDelta);
+	STATE			m_eJumpState = { STATE_END };
+	_float			m_fJumpHoldTime = { 0.f };
+	_float			m_fChangeVelocityZeroTime = { 0.f };
+	_float			m_fHoldAirTime = { 0.f };
+	_float			m_fChangeRunTime = { 0.f };
+	_float			m_fOffset = { 0.f };			// 점프 오프셋 -> 준수
+	_bool			m_bRePressBlock = { false };
+
 
 private:
 	HRESULT			Add_Components();
@@ -74,35 +109,22 @@ private:
 	// FSM
 	void			SetUp_FSM();
 	void			Change_State(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
-	
 	// Player FSM 및 Jump 관련 변수들
 	CFSM*			m_pFSM = { nullptr };
 
-	// 애니메이션 상태 제어를 한다.
-	//STATE			m_eCurrentState = { STATE_END };
-
-	// 눈, 입, 몸체의 상태를 담당한다.
-	EYESTATE		m_eEyeState = { EYE_END };
-	MOUTHSTATE		m_eMouthState = { MOUTH_END };
-	BODYSTATE		m_eBodyState = { BODY_END };
-
 private:
-	// 몸에 따라 모델이 달라진다.
 	CModel*					m_pModelCom[BODY_END] = {nullptr};
-	// 눈 텍스쳐
 	CTexture*				m_pEyeTexture[EYE_END] = { nullptr };
-	// 입 텍스쳐
 	CTexture*				m_pMouthTexture[MOUTH_END] = { nullptr };
 	CShader*				m_pShaderCom = { nullptr };
 	class CCamera_Free*		m_pCamera = { nullptr };
 	CCharacterController*	m_pControllerCom = { nullptr };
 
-	KIRBY_INFODESC  m_tKirbyInfo;
-
 	_int			m_iTestAnim = { 0 };
-	_bool			m_isJump = { false };
-	_float			m_fJumpVelocity = { 0.f };
+
+	// For_PhysX
 	_float			m_fOffsetTurn = { 7.f };
+	_float4			m_vOriginUp = { 0.f, 1.f, 0.f, 0.f };
 
 
 public:

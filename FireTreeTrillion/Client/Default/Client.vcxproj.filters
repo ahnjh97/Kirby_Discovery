@@ -97,12 +97,6 @@
     <Filter Include="02.GameObjects\TestModel\State">
       <UniqueIdentifier>{24c8db5b-dafc-44bf-806a-7f7b3d6aeed8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Levels\Tool\MAP">
-      <UniqueIdentifier>{5d5617dd-297d-424c-94db-e1ac8ab28a74}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="90.Utils\ToolHelper_Map">
-      <UniqueIdentifier>{9719686a-6fbe-4a2c-b3ff-5706967dc4b6}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -153,7 +147,7 @@
     <ClInclude Include="..\Public\TestTerrain.h">
       <Filter>02.GameObjects\Terrain</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\BasicMap.h">
+    <ClInclude Include="..\Public\Map_Stage1.h">
       <Filter>02.GameObjects\Map</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Tool_UI.h">
@@ -192,15 +186,9 @@
     <ClInclude Include="..\Public\TestModel_State.h">
       <Filter>02.GameObjects\TestModel\State</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Level_Tool_Map.h">
-      <Filter>01.Levels\Tool\MAP</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Grid.h">
-      <Filter>02.GameObjects\Terrain</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\ToolHelper.h">
-      <Filter>90.Utils\[Sample] ToolHelper</Filter>
-    </ClInclude>
+    <ClInclude Include="..\Public\KirbyDefault_State.h" />
+    <ClInclude Include="..\Public\Trigger.h" />
+    <ClInclude Include="Kirby_Enums.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -239,7 +227,7 @@
     <ClCompile Include="..\Private\TestTerrain.cpp">
       <Filter>02.GameObjects\Terrain</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\BasicMap.cpp">
+    <ClCompile Include="..\Private\Map_Stage1.cpp">
       <Filter>02.GameObjects\Map</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\FXToolDirector.cpp">
@@ -278,15 +266,8 @@
     <ClCompile Include="..\Private\TestModel_State.cpp">
       <Filter>02.GameObjects\TestModel\State</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Level_Tool_Map.cpp">
-      <Filter>01.Levels\Tool\MAP</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Grid.cpp">
-      <Filter>02.GameObjects\Terrain</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\ToolHelper.cpp">
-      <Filter>90.Utils\[Sample] ToolHelper</Filter>
-    </ClCompile>
+    <ClCompile Include="..\Private\KirbyDefault_State.cpp" />
+    <ClCompile Include="..\Private\Trigger.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

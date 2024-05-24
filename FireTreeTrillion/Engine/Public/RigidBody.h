@@ -40,7 +40,6 @@ public:
 	void			PlayerController(_float3 vPos);
 	void			Go_Straight(CTransform* pTransform, _float fSpeed, _float fTimeDelta);	// look방향으로 움직임
 	_bool			Jump(CTransform* pTransform, _float fFallVelocity, _float fTimeDelta);	// 점프
-	void			FreeFall(CTransform* pTransform, _float fTimeDelta);					// 자유 낙하
 	PxVec3			Compute_Slope(CTransform* pTransform);									// 경사면의 노말벡터 계산
 	PxVec3			TerrainRayCast_Collision(PxVec3 _rayOrigin, PxVec3 _rayDirection, _float _fMaxDistance);
 

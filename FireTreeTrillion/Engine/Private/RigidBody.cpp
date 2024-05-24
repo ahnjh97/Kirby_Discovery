@@ -248,7 +248,7 @@ void CRigidBody::Go_Straight(CTransform* pTransform, _float fSpeed, _float fTime
 	PxControllerCollisionFlags collisionFlags = m_pCapsuleController->move(movement, 0.001f, fTimeDelta, filter);
 
 	PxExtendedVec3 pxPos = m_pCapsuleController->getPosition();
-	PxVec3 pos(pxPos.x, pxPos.y, pxPos.z);
+	PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
 
 	_vector xmPos = XMVectorSet(pos.x, pos.y - 0.5f, pos.z, 0.f);
 
@@ -278,7 +278,7 @@ _bool CRigidBody::Jump(CTransform* pTransform, _float fFallVelocity, _float fTim
 	}
 
 	PxExtendedVec3 pxPos = m_pCapsuleController->getPosition();
-	PxVec3 pos(pxPos.x, pxPos.y, pxPos.z);
+	PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
 	_vector xmPos = XMVectorSet(pos.x, pos.y - 0.5f, pos.z, 0.f);
 
 	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
@@ -286,38 +286,10 @@ _bool CRigidBody::Jump(CTransform* pTransform, _float fFallVelocity, _float fTim
 	return true;
 }
 
-void CRigidBody::FreeFall(CTransform* pTransform, _float fTimeDelta)
-{
-	m_fFallVelocity -= 9.81f * fTimeDelta;
-
-	if (m_fFallVelocity < -1000.f)
-		m_fFallVelocity = -10.f;
-
-	PxVec3 moveVector = PxVec3(0.f, m_fFallVelocity, 0.f) * fTimeDelta;
-	PxControllerCollisionFlags collisionFlags = m_pCapsuleController->move(moveVector, 0.001f, fTimeDelta, PxControllerFilters());
-	//Go_Straight(pTransform, 5.f, fTimeDelta);
-
-	PxControllerState m_pPxState;
-
-	m_pCapsuleController->getState(m_pPxState);
-
-	if (m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_DOWN || m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_UP)
-	{
-		m_fFallVelocity = 0.f;
-	}
-
-	PxExtendedVec3 pxPos = m_pCapsuleController->getPosition();
-	PxVec3 pos(pxPos.x, pxPos.y, pxPos.z);
-
-	_vector xmPos = XMVectorSet(pos.x, pos.y - 0.5f, pos.z, 0.f);
-
-	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
-}
-
 PxVec3 CRigidBody::Compute_Slope(CTransform* pTransform)
 {
 	PxExtendedVec3 position = m_pCapsuleController->getPosition();
-	PxVec3 rayOrigin = PxVec3(position.x, position.y, position.z);
+	PxVec3 rayOrigin = PxVec3((_float)position.x, (_float)position.y, (_float)position.z);
 
 	_vector vRight = pTransform->Get_State_Vector(CTransform::STATE_RIGHT);
 	vRight = XMVector3Normalize(vRight);

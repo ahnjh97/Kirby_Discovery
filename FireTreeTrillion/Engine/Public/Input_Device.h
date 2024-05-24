@@ -47,6 +47,10 @@ private:
 	_byte					m_byKeyState[256];			// 키보드에 있는 모든 키값을 저장하기 위한 변수
 	KEYSTATE				m_eKeyState[256];			// 해당 키의 상태 값 저장
 
+	// 이전 키와 마우스의 상태를 추적하기 위한 변수이다.
+	_byte                   m_byPrevKeyState[256];
+	DIMOUSESTATE            m_tPrevMouseState;
+
 	DIMOUSESTATE			m_tMouseState;
 	KEYSTATE				m_eMouseStates[DIMKS_END];
 

@@ -26,6 +26,10 @@ public:
 	_float4			Get_Position();
 	_float4			Get_FootPosition();
 
+	//PxControllerCollisionFlag getCollisionFlags()
+	//{
+	//	return collisionFlags;
+	//}
 	void			Get_ShapeInfo(physx::PxCapsuleGeometry& CapsuleGeo, physx::PxTransform& pxTransform);
 	_float			Get_Radius() const { return m_tControllerDesc.radius; }
 
@@ -39,8 +43,10 @@ public:
 	void			Move(class CTransform* pTransform, _float fSpeed, _float fTimeDelta);	// look방향으로 움직임
 	void			Move_Dir(class CTransform* pTransform, _fvector fDelta, _float fTimeDelta);
 	_bool			Jump(CTransform* pTransform, _float fFallVelocity, _float fTimeDelta);	// 점프
-	void			FreeFall(CTransform* pTransform, _float fTimeDelta);					// 자유 낙하
+	void			FreeFall(CTransform* pTransform, _float fTimeDelta, _float fOffset = 1.f);					// 자유 낙하
 	PxVec3			Compute_Slope(CTransform* pTransform);									// 경사면의 노말벡터 계산
+	_float			Compute_Height();														// 경사면의 노말벡터 계산
+	PxVec3			Compute_TerrainPosition();
 	PxVec3			TerrainRayCast_Collision(PxVec3 _rayOrigin, PxVec3 _rayDirection, _float _fMaxDistance);
 
 	// 이동용, 기본 중력없기 때문에 이 함수로 중력 만들어 줄 것
@@ -49,6 +55,16 @@ public:
 
 	_bool	Is_Activated();
 	void	Activate(_bool bActive);
+
+	_bool	Is_Terrain() {
+		PxControllerState m_pPxState;
+		m_pController->getState(m_pPxState);
+
+		if (m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_DOWN)
+			return true;
+		else
+			return false;
+	}
 
 protected:
 	void	Create_Controller();
