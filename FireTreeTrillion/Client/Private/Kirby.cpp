@@ -92,6 +92,12 @@ void CKirby::Late_Tick(_float fTimeDelta)
 {
 	m_pModelCom[INFO(m_eBodyState)]->Play_Animation(fTimeDelta);
 
+	_vector vPos = XMVectorSetW(CUtils::To_Vector(m_pControllerCom->Compute_TerrainPosition()), 1.f);
+	if (true == m_pControllerCom->Is_Terrain())
+	{
+		int a = 10;
+	}
+
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
