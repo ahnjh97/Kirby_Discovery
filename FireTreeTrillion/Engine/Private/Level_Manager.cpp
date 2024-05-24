@@ -22,7 +22,6 @@ HRESULT CLevel_Manager::Open_Level(_uint iNewLevelID, CLevel * pNewLevel)
 
 		/* 기존 레벨용 자원을 파괴한다 .*/
 		pGameInstance->Clear(m_iCurrentLevelID);
-
 		Safe_Release(pGameInstance);
 	}	
 

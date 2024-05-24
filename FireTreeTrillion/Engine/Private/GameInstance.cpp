@@ -168,7 +168,8 @@ HRESULT CGameInstance::Draw(_float fTimeDelta)
 HRESULT CGameInstance::Clear(_uint iClearLevelIndex)
 {
 	if (nullptr == m_pObject_Manager ||
-		nullptr == m_pComponent_Manager)
+		nullptr == m_pComponent_Manager ||
+		nullptr == m_pPipeLine)
 		return E_FAIL;
 
 	/* 지정된 레벨용 자원(텍스쳐, 사운드, 객체등등) 을 삭제한다. */
@@ -178,7 +179,7 @@ HRESULT CGameInstance::Clear(_uint iClearLevelIndex)
 
 	/* 컴포넌트 원형 */
 	m_pComponent_Manager->Clear(iClearLevelIndex);
-
+	
 
 	return S_OK;
 }
@@ -467,6 +468,11 @@ HRESULT CGameInstance::Add_Camera(CCamera* pCamera)
 HRESULT CGameInstance::Switch_CurCamera(_int iIdx)
 {
 	return m_pPipeLine->Switch_CurCamera(iIdx);
+}
+
+void CGameInstance::Clear_Camera()
+{
+	return m_pPipeLine->Clear_Camera();
 }
 
 const LIGHT_DESC * CGameInstance::Get_LightDesc(_uint iIndex)

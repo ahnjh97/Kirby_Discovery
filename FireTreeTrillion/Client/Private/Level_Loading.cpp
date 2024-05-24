@@ -37,6 +37,7 @@ void CLevel_Loading::Tick(_float fTimeDelta)
 	{
 		CLevel* pLevel = { nullptr };
 		m_pGameInstance->Set_CurrentLevelID((_uint)m_eNextLevelID);
+		m_pGameInstance->Clear_Camera();
 
 		switch (m_eNextLevelID)
 		{

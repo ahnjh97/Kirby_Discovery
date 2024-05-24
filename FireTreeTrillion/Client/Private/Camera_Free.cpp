@@ -130,7 +130,7 @@ void CCamera_Free::Track_Target(_float fTimeDelta)
 
 
 	if (.1f <= vDestDir.Length())
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, Pos(vCurPos + (vDestDir * .1f)));
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, Pos(vCurPos + (vDestDir * .06f)));
 }
 
 void CCamera_Free::Orbit_Target(_float fTimeDelta)

@@ -15,6 +15,18 @@ HRESULT CPipeLine::Add_Camera(CCamera* pCamera)
 	return S_OK;
 }
 
+void CPipeLine::Clear_Camera()
+{
+	if (!m_pCameras.empty())
+	{
+		for (auto& pCam : m_pCameras)
+			Safe_Release(pCam);
+	}
+
+	m_pCameras.clear();
+	m_iCurCameraIdx = 0;
+}
+
 HRESULT CPipeLine::Switch_CurCamera(_int iIdx)
 {
 	if (m_pCameras.size() <= iIdx)
@@ -63,9 +75,9 @@ void CPipeLine::Tick()
 	Bind_Pipeline();
 }
 
-CPipeLine * CPipeLine::Create()
+CPipeLine* CPipeLine::Create()
 {
-	CPipeLine*		pInstance = new CPipeLine();
+	CPipeLine* pInstance = new CPipeLine();
 
 	if (FAILED(pInstance->Initialize()))
 	{
