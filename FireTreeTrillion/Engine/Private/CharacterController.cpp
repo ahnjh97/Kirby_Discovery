@@ -47,6 +47,8 @@ void CCharacterController::Render_IMGUI()
 {
 	__super::Render_IMGUI();
 
+	ImGui::Text("FallVelocity : %.2f", (_float)m_fFallVelocity);
+
 	ImGui::InputFloat("Radius", &m_tControllerDesc.radius);
 	ImGui::InputFloat("height", &m_tControllerDesc.height);
 	ImGui::InputFloat("contactOffset", &m_tControllerDesc.contactOffset);
@@ -55,6 +57,7 @@ void CCharacterController::Render_IMGUI()
 	m_tControllerDesc.slopeLimit = cosf(XMConvertToRadians(m_fSlopeLimitDegree));
 	ImGui::InputFloat("stepOffset", &m_tControllerDesc.stepOffset);
 	ImGui::InputFloat("maxJumpHeight", &m_tControllerDesc.maxJumpHeight);
+
 
 	//ReCreate this Controller (for change shape or scale)
 	if (ImGui::Button("Update Changes"))
@@ -160,12 +163,13 @@ _bool CCharacterController::Jump(CTransform* pTransform, _float fFallVelocity, _
 
 
 /// <summary> 자 유 낙 하 </summary>
-void CCharacterController::FreeFall(CTransform* pTransform, _float fTimeDelta)
+void CCharacterController::FreeFall(CTransform* pTransform, _float fTimeDelta, _float fOffset)
 {
 	// 자유낙하용 velocity
-	m_fFallVelocity -= GRAVITY * fTimeDelta;
+	m_fFallVelocity -= GRAVITY * fTimeDelta * fOffset;
 
 	PxVec3 moveVector = PxVec3(0.f, m_fFallVelocity, 0.f) * fTimeDelta;
+
 	PxControllerCollisionFlags collisionFlags = m_pController->move(moveVector, 0.001f, fTimeDelta, PxControllerFilters());
 
 	PxControllerState m_pPxState;
@@ -174,12 +178,13 @@ void CCharacterController::FreeFall(CTransform* pTransform, _float fTimeDelta)
 	if (m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_DOWN || m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_UP)
 	{
 		m_fFallVelocity = 0.f;
+		return;
 	}
 
 	PxExtendedVec3 pxPos = m_pController->getPosition();
 	PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
 
-	_vector xmPos = XMVectorSet(pos.x, pos.y - 0.5f, pos.z, 0.f);
+	_vector xmPos = XMVectorSet(pos.x, pos.y - m_fOffset, pos.z, 0.f);
 
 	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
 }
@@ -230,7 +235,7 @@ PxVec3 CCharacterController::Compute_Slope(CTransform* pTransform)
 _float CCharacterController::Compute_Height()
 {
 	PxExtendedVec3 position = m_pController->getPosition();
-	PxVec3 rayOrigin = PxVec3(position.x, position.y, position.z);
+	PxVec3 rayOrigin = PxVec3((_float)position.x, (_float)position.y, (_float)position.z);
 
 	PxVec3 rayDirection = PxVec3(0.f, -1.f, 0.f);
 	_float fMaxDistance = 10.f;
@@ -249,7 +254,7 @@ _float CCharacterController::Compute_Height()
 		fHeight = rayOrigin.y - hit.position.y;
 	}
 	else
-		return 0.f;
+		return 10.f;
 
 	return fHeight;
 }
@@ -337,7 +342,7 @@ void CCharacterController::Create_Controller()
 	Release_Controller();
 
 	PxCapsuleControllerDesc capsuleDesc;
-	capsuleDesc.position = PxExtendedVec3(0.f, 10.f, 0.f);
+	capsuleDesc.position = PxExtendedVec3(0.f, 100.f, 0.f);
 	capsuleDesc.radius = 0.5f; // 반지름
 	capsuleDesc.height = 0.1f; // 높이
 	capsuleDesc.stepOffset = 0.f;

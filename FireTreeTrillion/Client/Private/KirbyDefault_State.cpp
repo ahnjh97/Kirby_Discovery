@@ -243,11 +243,10 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 	}
 
 
-
 	if (pKirby->Get_State() == CKirby::STATE_JUMPL || pKirby->Get_State() == CKirby::STATE_JUMPR ||
 		pKirby->Get_State() == CKirby::STATE_JUMPEND || pKirby->Get_State() == CKirby::STATE_JUMPFALL)
 	{
-		Kirbydesc->m_fJumpVelocity -= GRAVITY * fTimeDelta * 6.f;
+		Kirbydesc->m_fJumpVelocity -= GRAVITY * fTimeDelta * Kirbydesc->m_fGravityOffset;
 		Kirbydesc->m_isJump = pController->Jump(pTransformCom, Kirbydesc->m_fJumpVelocity, fTimeDelta);
 
 		// 착지를 했다면,
@@ -266,8 +265,8 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 	else if (pKirby->Get_State() == CKirby::STATE_FALL ||
 		pKirby->Get_State() == CKirby::STATE_LANDINGEND || pKirby->Get_State() == CKirby::STATE_LANDINGSMALL)
 	{
-		Kirbydesc->m_fJumpVelocity -= GRAVITY * fTimeDelta * 6.f;
-		pController->FreeFall(pTransformCom, fTimeDelta);
+		//Kirbydesc->m_fJumpVelocity -= GRAVITY * fTimeDelta * 6.f;
+		//pController->FreeFall(pTransformCom, fTimeDelta);
 	}
 }
 

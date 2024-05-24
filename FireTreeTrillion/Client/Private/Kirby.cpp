@@ -34,8 +34,9 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 
-	_float4 vPos = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+	_float4 vPos = XMVectorSet(0.f, 100.f, 0.f, 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+	
 
 	INFO(m_eBodyState) = BODY_DEFAULT;
 	INFO(m_eMouthState) = MONTH_IDLE;
@@ -387,7 +388,6 @@ void CKirby::ZXCV_Input(_float fTimeDelta)
 	}
 }
 
-
 void CKirby::SetOn_Slope(_float fTimeDelta)
 {
 	// 지면의 up벡터
@@ -464,7 +464,8 @@ void CKirby::Kirby_Jump(_float fTimeDelta)
 	// 이럴때 떨어지는 애니메이션이 재생되어야 할 것이다.
 	else
 	{
-		m_pControllerCom->FreeFall(m_pTransformCom, fTimeDelta);
+
+		m_pControllerCom->FreeFall(m_pTransformCom, fTimeDelta, INFO(m_fGravityOffset));
 	}
 
 }

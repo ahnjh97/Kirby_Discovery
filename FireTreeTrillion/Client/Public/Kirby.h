@@ -38,6 +38,7 @@ public:
 		_float m_fJumpVelocity = { 0.f };
 		_bool	m_isJump = { false };
 		_bool	m_isLanding = { false };
+		_float m_fGravityOffset = { 6.f };
 
 		// 방향 키 컨트롤러를 만지고 있는가?
 		_bool	m_isController = { false };
@@ -95,6 +96,7 @@ private:
 	_float			m_fChangeVelocityZeroTime = { 0.f };
 	_float			m_fHoldAirTime = { 0.f };
 	_float			m_fChangeRunTime = { 0.f };
+	_float			m_fOffset = { 0.f };			// 점프 오프셋 -> 준수
 	_bool			m_bRePressBlock = { false };
 
 
