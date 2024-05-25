@@ -76,6 +76,9 @@
     <Filter Include="02.GameObjects\Effect\Multi">
       <UniqueIdentifier>{f34649b7-f041-4be5-b519-7d313325d15a}</UniqueIdentifier>
     </Filter>
+	<Filter Include="02.GameObjects\Effect\Particle">
+	    <UniqueIdentifier>{f072a52c-c670-48a5-b959-b302eb3c6ddf}</UniqueIdentifier>
+	</Filter>
     <Filter Include="01.Levels\Tool">
       <UniqueIdentifier>{2fc1b856-3420-4c6b-b1c3-8a2ae73c0d25}</UniqueIdentifier>
     </Filter>
@@ -100,9 +103,7 @@
     <Filter Include="02.GameObjects\TestModel\State">
       <UniqueIdentifier>{24c8db5b-dafc-44bf-806a-7f7b3d6aeed8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Effect\Particle">
-      <UniqueIdentifier>{f072a52c-c670-48a5-b959-b302eb3c6ddf}</UniqueIdentifier>
-    </Filter>
+
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -186,41 +187,21 @@
     <ClInclude Include="..\Public\Level_Tool_Anim.h">
       <Filter>01.Levels\Tool\ANIM</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\KirbyDefault_State.h">
-      <Filter>02.GameObjects\Player\State</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\TestModel.h">
-      <Filter>02.GameObjects\TestModel</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\TestModel_State.h">
       <Filter>02.GameObjects\TestModel\State</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\KirbyDefault_State.h" />
-    <ClInclude Include="Kirby_Enums.h" />
     <ClInclude Include="..\Public\ToolHelper.h">
       <Filter>90.Utils\[Sample] ToolHelper</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\KirbyDefault_State.h" />
-    <ClInclude Include="..\Public\Trigger.h" />
-    <ClInclude Include="..\Public\Level_Tool_Anim.h">
-      <Filter>01.Levels\Tool\Animation</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\KirbyDefault_State.h">
       <Filter>02.GameObjects\Player\State</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Kirby.h">
-      <Filter>02.GameObjects\Player</Filter>
     </ClInclude>
     <ClInclude Include="Kirby_Enums.h">
       <Filter>02.GameObjects\Player</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\ToolHelper.h">
-      <Filter>90.Utils</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Trigger.h">
       <Filter>90.Utils</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Kirby.h" />
     <ClInclude Include="..\Public\Particle.h">
       <Filter>02.GameObjects\Effect\Particle</Filter>
     </ClInclude>
@@ -283,9 +264,6 @@
     <ClCompile Include="..\Private\TestUI.cpp">
       <Filter>02.GameObjects\UI\[Sample] TestUI</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Kirby.cpp">
-      <Filter>02.GameObjects\Player\Kirby</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\MultiEffect.cpp">
       <Filter>02.GameObjects\Effect\Multi</Filter>
     </ClCompile>
@@ -295,21 +273,12 @@
     <ClCompile Include="..\Private\Level_Tool_Anim.cpp">
       <Filter>01.Levels\Tool\ANIM</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\KirbyDefault_State.cpp">
-      <Filter>02.GameObjects\Player\State</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\TestModel.cpp">
-      <Filter>02.GameObjects\TestModel</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\TestModel_State.cpp">
       <Filter>02.GameObjects\TestModel\State</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\KirbyDefault_State.cpp" />
     <ClCompile Include="..\Private\ToolHelper.cpp">
       <Filter>90.Utils\[Sample] ToolHelper</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\KirbyDefault_State.cpp" />
-    <ClCompile Include="..\Private\Trigger.cpp" />
     <ClCompile Include="..\Private\Level_Tool_Anim.cpp">
       <Filter>01.Levels\Tool\Animation</Filter>
     </ClCompile>
@@ -319,13 +288,9 @@
     <ClCompile Include="..\Private\Kirby.cpp">
       <Filter>02.GameObjects\Player</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\ToolHelper.cpp">
-      <Filter>90.Utils</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Trigger.cpp">
       <Filter>90.Utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Kirby.cpp" />
     <ClCompile Include="..\Private\Particle.cpp">
       <Filter>02.GameObjects\Effect\Particle</Filter>
     </ClCompile>
