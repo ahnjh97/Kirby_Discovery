@@ -12,6 +12,7 @@
 
 //맵툴
 #include "MapToolHelper.h"
+#include "MapToolObject.h"
 #include "BasicMap.h"
 #include "Grid.h"
 
@@ -141,6 +142,12 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FXToolDirector"), CFXToolDirector);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CSingleEffect"), CSingleEffect);
 	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("CMultiEffect"), CMultiEffect);
+
+	// MapTool GameObject Prototypes
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Grid"), CGrid);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BasicMap"), CBasicMap);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolHelper"), CMapToolHelper);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolObject"), CMapToolObject);
 
 	// 05.20) 원본 추가
 	 /*      GameObject_IMGUI_UI_Editor    */
@@ -289,11 +296,6 @@ HRESULT CLoader::Loading_For_Tool_Map()
 	m_strLoadingText = TEXT("모델(을) 로딩 중 입니다.");
 	if(FAILED(Add_AllModelTxts(eLevel, TYPE_NONANIM)))
 		return E_FAIL;
-
-	m_strLoadingText = TEXT("객체의 원형를(을) 로딩 중 입니다.");
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Grid"), CGrid);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BasicMap"), CBasicMap);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolHelper"), CMapToolHelper);
 	
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 

@@ -82,7 +82,8 @@ HRESULT CBasicMap::Render()
         if (FAILED(m_pShaderCom->Bind_RawValue("g_fSamplingFactor", &m_vecSamplingFactors[i], sizeof(_float))))
             return E_FAIL;
 
-        m_pModelCom->Render(i);
+        if(FAILED(m_pModelCom->Render(i)))
+            return E_FAIL;
     }
 
     return S_OK;
@@ -175,7 +176,7 @@ CBasicMap* CBasicMap::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContex
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX(TEXT("Failed To Created : CBasicMap"));
+        MSG_BOX(TEXT("Failed To Create : CBasicMap"));
 
         Safe_Release(pInstance);
     }
@@ -189,7 +190,7 @@ CGameObject* CBasicMap::Clone(void* pArg)
 
     if (FAILED(pInstance->Initialize(pArg)))
     {
-        MSG_BOX(TEXT("Failed To Created : CBasicMap"));
+        MSG_BOX(TEXT("Failed To Clone : CBasicMap"));
         Safe_Release(pInstance);
     }
 

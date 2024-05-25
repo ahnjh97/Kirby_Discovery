@@ -164,7 +164,7 @@ void CCamera_Free::Control(_float fTimeDelta)
 		}
 
 		//ÀüÈÄÁø
-		if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMMS_WHEEL))
+		if ((MouseMove = m_pGameInstance->Get_DIMouseMove(DIMMS_WHEEL)) && m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
 		{
 			m_pTransformCom->Go_Straight(fTimeDelta * MouseMove * m_fMouseSensor * .5f);
 

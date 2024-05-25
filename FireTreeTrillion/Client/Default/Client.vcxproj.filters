@@ -100,6 +100,12 @@
     <Filter Include="01.Levels\Tool\MAP">
       <UniqueIdentifier>{5aa8e924-15f0-4280-b87a-55b09f572afb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\MapToolHelper">
+      <UniqueIdentifier>{c90caebe-5408-4ed1-a218-a7692bde4a30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\MapToolObject">
+      <UniqueIdentifier>{24408cf3-2b56-4349-a3e0-8757f06c5ba0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -200,7 +206,10 @@
       <Filter>02.GameObjects\Terrain</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\MapToolHelper.h">
-      <Filter>02.GameObjects\Map</Filter>
+      <Filter>02.GameObjects\Map\MapToolHelper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MapToolObject.h">
+      <Filter>02.GameObjects\Map\MapToolObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -290,7 +299,10 @@
       <Filter>02.GameObjects\Terrain</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\MapToolHelper.cpp">
-      <Filter>02.GameObjects\Map</Filter>
+      <Filter>02.GameObjects\Map\MapToolHelper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MapToolObject.cpp">
+      <Filter>02.GameObjects\Map\MapToolObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -116,7 +116,7 @@ CGameObject* CGrid::Clone(void* pArg)
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Create : CGrid"));
+		MSG_BOX(TEXT("Failed To Clone : CGrid"));
 
 		Safe_Release(pInstance);
 	}

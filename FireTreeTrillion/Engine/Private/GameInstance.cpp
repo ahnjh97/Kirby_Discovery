@@ -351,6 +351,14 @@ void CGameInstance::Set_CurrentLevel(_int CurrentLevel)
 	m_pObject_Manager->Set_CurrentLevel(CurrentLevel);
 }
 
+void CGameInstance::Clear_Layer(_uint iLevelIndex, const wstring& wstrLayerTag)
+{
+	if (nullptr == m_pObject_Manager)
+		return;
+
+	return m_pObject_Manager->Clear_Layer(iLevelIndex, wstrLayerTag);
+}
+
 CGameObject* CGameInstance::Get_GameObject(_uint iLevelIndex, const wstring& strLayerTag, _uint iIndex)
 {
 	CHECK_NULLPTR(m_pObject_Manager);

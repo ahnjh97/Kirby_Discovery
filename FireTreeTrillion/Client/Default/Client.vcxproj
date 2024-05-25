@@ -187,6 +187,7 @@
     <ClInclude Include="..\Public\Loader.h" />
     <ClInclude Include="..\public\MainApp.h" />
     <ClInclude Include="..\Public\MapToolHelper.h" />
+    <ClInclude Include="..\Public\MapToolObject.h" />
     <ClInclude Include="..\Public\MultiEffect.h" />
     <ClInclude Include="..\Public\SingleEffect.h" />
     <ClInclude Include="..\Public\TestModel.h" />
@@ -221,6 +222,7 @@
     <ClCompile Include="..\Private\Loader.cpp" />
     <ClCompile Include="..\private\MainApp.cpp" />
     <ClCompile Include="..\Private\MapToolHelper.cpp" />
+    <ClCompile Include="..\Private\MapToolObject.cpp" />
     <ClCompile Include="..\Private\MultiEffect.cpp" />
     <ClCompile Include="..\Private\SingleEffect.cpp" />
     <ClCompile Include="..\Private\TestModel.cpp" />
