@@ -11,6 +11,10 @@ BEGIN(Client)
 
 class CMapToolObject : public CGameObject
 {
+public:
+	_int Get_CamIndex() { return m_iCamIndex; }
+	void Set_CamIndex(_int iCamIndex) { m_iCamIndex = iCamIndex; }
+
 private:
 	CMapToolObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CMapToolObject(const CMapToolObject& rhs);
@@ -22,6 +26,9 @@ public:
 	virtual _int Tick(_float fTimeDelta) override;
 	virtual void Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
+
+private:
+	_int m_iCamIndex = {};
 
 private:
 	CModel* m_pModelCom = { nullptr };

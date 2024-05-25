@@ -25,6 +25,7 @@ private:
 	// ImGui
 	void	Menu_Level();
 	void	Menu_NonAnimModels();
+	void	Menu_SetUpCamIndex();
 	void	Edit_Object();
 
 	// On Key/Mouse Input 

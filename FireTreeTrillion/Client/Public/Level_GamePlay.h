@@ -27,6 +27,7 @@ private:
 	HRESULT Ready_Layer_Player(const wstring& strLayerTag);
 	HRESULT Ready_Layer_Monster(const wstring& strLayerTag);
 	HRESULT Ready_Layer_UI(const wstring& strLayerTag);
+	HRESULT Ready_ParsedObjects();
 	
 
 public:

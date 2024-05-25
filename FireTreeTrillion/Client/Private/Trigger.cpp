@@ -112,7 +112,7 @@ HRESULT CTrigger::Add_Components()
 	CHECK_FAILED(hr);
 
 	/* For.Com_Model */
-	if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Model_ColliderCubeMesh"),
+	if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Model_Trigger"),
 		TEXT("Com_Model"),  (CComponent**)&m_pModelCom)))
 		return E_FAIL;
 	

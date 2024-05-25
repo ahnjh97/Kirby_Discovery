@@ -144,7 +144,7 @@ void CBasicMap::SetUpShaderInfo(const wstring& _wstrModelTag)
     if (fileStream.is_open() == false)
     {
         wstring wstrError = TEXT("Failed to Open: ") + _wstrModelTag + L"_ShaderInfo.txt";
-        MSG_BOX(wstrError.c_str());
+        //MSG_BOX(wstrError.c_str());
         m_vecPassIndices.resize(m_pModelCom->Get_NumMeshes());
         m_vecSamplingFactors.resize(m_pModelCom->Get_NumMeshes());
         fill(m_vecSamplingFactors.begin(), m_vecSamplingFactors.end(), 1.f);

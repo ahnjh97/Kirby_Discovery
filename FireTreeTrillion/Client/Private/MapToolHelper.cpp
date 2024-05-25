@@ -1,13 +1,18 @@
 #include "stdafx.h"
 #include "MapToolHelper.h"
-#include "Utils.h"
-#include <iostream>
+#include "MapToolObject.h"
 #include <filesystem>
+#include <iostream>
+#include "Utils.h"
 
 using namespace filesystem;
 static _int iNonAnimIdx = -1;
 static _int iAnimIdx = -1;
 static _int iLevelIndex = 0;
+
+static const _char* camIndices[] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
+									"11", "12", "13", "14", "15", "16", "17", "18", "19", "20" };
+static _int iCamIndex = -1;
 
 CMapToolHelper::CMapToolHelper(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -46,8 +51,11 @@ _int CMapToolHelper::Tick(_float fTimeDelta)
 
 void CMapToolHelper::Late_Tick(_float fTimeDelta)
 {
+	ImGui::Begin("MapTool");
 	Menu_Level();
 	Menu_NonAnimModels();
+	Menu_SetUpCamIndex();
+	ImGui::End();
 
 	if(m_pGameInstance->Get_KeyState(DIMKS_RBUTTON, KEY_DOWN))
 		OnRightClick();
@@ -133,6 +141,29 @@ void CMapToolHelper::Menu_NonAnimModels()
 	Safe_Delete_Array(items2);
 }
 
+void CMapToolHelper::Menu_SetUpCamIndex()
+{
+	if (nullptr == m_pPickedObject)
+		return;
+
+	CModel* pModel = dynamic_cast<CModel*>(m_pPickedObject->Get_Component(TEXT("Com_Model")));
+	if (nullptr == pModel)
+		return;
+
+	string strModelName = pModel->Get_ModelInfo().strModelName;
+	if (strModelName == "Camera" || strModelName == "Trigger")
+	{
+		CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(m_pPickedObject);
+		iCamIndex = pMapToolObject->Get_CamIndex();
+		ImGui::Begin("CamIndexSettings");
+		if (ImGui::Combo("##Index", &iCamIndex, camIndices, IM_ARRAYSIZE(camIndices))) {
+			pMapToolObject->Set_CamIndex(iCamIndex);
+		}
+
+		ImGui::End();
+	}
+}
+
 void CMapToolHelper::Edit_Object()
 {
 	if (nullptr != m_pPickedObject)
@@ -192,6 +223,8 @@ void CMapToolHelper::OnRightClick()
 		wstring wstrPrototypeTag = TEXT("Prototype_GameObject_MapToolObject");
 		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), wstrPrototypeTag, &tempDesc)))
 			return;
+
+		iAnimIdx = iNonAnimIdx = -1;
 	}
 }
 
@@ -256,6 +289,12 @@ void CMapToolHelper::Save_Level()
 		outputFile.write(reinterpret_cast<const char*>(&iStrLength), sizeof(iStrLength));
 		outputFile.write(strModelName.c_str(), iStrLength);
 		outputFile.write(reinterpret_cast<const char*>(&matWorld), sizeof(_float4x4));
+
+		if ("Camera" == strModelName || "Trigger" == strModelName) {
+			CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(object);
+			_int iCamIndex = pMapToolObject->Get_CamIndex();
+			outputFile.write(reinterpret_cast<const char*>(&iCamIndex), sizeof(iCamIndex));
+		}
 	}
 
 	outputFile.close();
@@ -318,6 +357,9 @@ void CMapToolHelper::Load_Level()
 
 	string strModelName;
 	_float4x4 matWorld{};
+	_int iCamIndex{};
+	//map<_int, _float4x4> camMatrices;
+
 	while (!fileStream.eof()) 
 	{
 		_uint iStrLength;
@@ -325,6 +367,11 @@ void CMapToolHelper::Load_Level()
 		strModelName.resize(iStrLength);
 		fileStream.read(&strModelName[0], iStrLength);
 		fileStream.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
+
+		if ("Camera" == strModelName || "Trigger" == strModelName) {
+			fileStream.read(reinterpret_cast<char*>(&iCamIndex), sizeof(iCamIndex));
+			//camMatrices.emplace(iCamIndex, matWorld);
+		}
 
 		if (fileStream.eof())
 			break;
