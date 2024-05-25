@@ -50,6 +50,9 @@ HRESULT CBasicMap::Initialize(void* pArg)
 
 _int CBasicMap::Tick(_float fTimeDelta)
 {
+    if (true == m_bDead)
+        return OBJ_DEAD;
+
     if (nullptr != m_pBlendMap)
         m_pBlendMap->Tick(fTimeDelta);
 

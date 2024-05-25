@@ -37,6 +37,9 @@ HRESULT CMapToolObject::Initialize(void* pArg)
 
 _int CMapToolObject::Tick(_float fTimeDelta)
 {
+	if (true == m_bDead)
+		return OBJ_DEAD;
+
 	return OBJ_NOEVENT;
 }
 

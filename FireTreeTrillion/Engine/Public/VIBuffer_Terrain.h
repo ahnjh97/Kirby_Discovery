@@ -23,7 +23,7 @@ public:
 
 public:
 	void Culling(_fmatrix WorldMatrixInv);
-
+	_float3 Get_PickPos(const class CTransform* pTransform) const;
 private:
 	_uint				m_iNumVerticesX = { 0 };
 	_uint				m_iNumVerticesZ = { 0 };

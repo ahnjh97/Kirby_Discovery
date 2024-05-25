@@ -27,6 +27,8 @@ public:
 	HRESULT CreateDynamicActor(_float4 vPos);
 	HRESULT CreateStaticActor(_float4 vPos);
 
+	_float4 Get_PickPos(const class CTransform* pTransform) const;
+
 private:
 	_char					m_szName[MAX_PATH] = { "" };
 

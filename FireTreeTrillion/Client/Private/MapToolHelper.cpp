@@ -38,6 +38,9 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 _int CMapToolHelper::Tick(_float fTimeDelta)
 {
+	if (true == m_bDead)
+		return OBJ_DEAD;
+
 	return OBJ_NOEVENT;
 }
 
@@ -45,13 +48,20 @@ void CMapToolHelper::Late_Tick(_float fTimeDelta)
 {
 	Menu_Level();
 	Menu_NonAnimModels();
-	Edit_Object();
+
+	if(m_pGameInstance->Get_KeyState(DIMKS_RBUTTON, KEY_DOWN))
+		OnRightClick();
+
+	if (!ImGui::IsAnyItemHovered() && m_pGameInstance->Get_KeyState(DIMKS_LBUTTON, KEY_DOWN) && !m_pGameInstance->Get_DIKeyState(DIK_LSHIFT, KEY_PRESS))
+		OnLeftClick();
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_ESCAPE, KEY_DOWN))
 		On_DIK_Escape();
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_DELETE, KEY_DOWN))
 		On_DIK_Delete();
+
+	Edit_Object();
 }
 
 HRESULT CMapToolHelper::Render()
@@ -130,10 +140,58 @@ void CMapToolHelper::Edit_Object()
 		CTransform* pTransform = dynamic_cast<CTransform*>(m_pPickedObject->Get_Component(g_strTransformTag));
 		if (pTransform != nullptr)
 		{
+			ImGui::Begin("Guizmo");
+			Safe_AddRef(pTransform);
 			_float4x4 tempMatrix = pTransform->Get_WorldFloat4x4();
 			m_pGameInstance->EditTransform(tempMatrix); // 선택한 모델의 월드행렬을 수정 
 			pTransform->Set_WorldMatrix(tempMatrix);
+			Safe_Release(pTransform);
+			ImGui::End();
 		}
+	}
+}
+
+void CMapToolHelper::OnLeftClick()
+{
+	CGameObject* pPickedObject = Select_ModelByPicking();
+	if (nullptr == pPickedObject)
+		return;
+
+	if (pPickedObject == m_pPickedObject)
+		return;
+
+	m_pPickedObject = pPickedObject;
+}
+
+void CMapToolHelper::OnRightClick()
+{
+	if (iAnimIdx == -1 && iNonAnimIdx == -1)
+		return;
+
+	CGameObject* pGrid = m_pGameInstance->Get_GameObject(LEVEL_TOOL_MAP, TEXT("Layer_Grid"), 0);
+	if (nullptr == pGrid)
+		return;
+
+	CVIBuffer_Terrain* pGridBuffer = dynamic_cast<CVIBuffer_Terrain*>(pGrid->Get_Component(TEXT("Com_VIBuffer")));
+	if (nullptr == pGridBuffer)
+		return;
+
+	const CTransform* pTransform = dynamic_cast<const CTransform*>(pGrid->Get_Component(g_strTransformTag));
+	if (nullptr == pTransform)
+		return;
+
+	m_vPickPos = pGridBuffer->Get_PickPos(pTransform);
+
+	if (!::XMVector3Equal(::XMLoadFloat3(&m_vPickPos), ::XMVectorSet(0.f, 0.f, 0.f, 0.f)))
+	{
+		_float4 vTemp(m_vPickPos.x, m_vPickPos.y, m_vPickPos.z, 1.0f); // 위치
+		CGameObject::GAMEOBJECT_DESC tempDesc = {};
+		memcpy(&tempDesc.matWorld.m[CTransform::STATE_POSITION], &vTemp, sizeof(_float4));
+		tempDesc.wstrModelName = CUtils::StrToWstr(m_vecNonAnimTxts[iNonAnimIdx]);
+
+		wstring wstrPrototypeTag = TEXT("Prototype_GameObject_MapToolObject");
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), wstrPrototypeTag, &tempDesc)))
+			return;
 	}
 }
 
@@ -285,6 +343,53 @@ void CMapToolHelper::Load_Level()
 	fileStream.close();
 }
 
+CGameObject* CMapToolHelper::Select_ModelByPicking(const wstring& wstrLayerTag)
+{
+	vector<CGameObject*> vecPickedObjects;
+	vector<_float4> vecPickPos;
+
+	list<CGameObject*>* pObjectList = m_pGameInstance->Get_List(LEVEL_TOOL_MAP, wstrLayerTag);
+	if (nullptr == pObjectList)
+		return nullptr;
+
+	if (pObjectList->empty())
+		return nullptr;
+
+	for (auto& object : *pObjectList)
+	{
+		if (nullptr == object)
+			continue;
+
+		CModel* pModel = dynamic_cast<CModel*>(object->Get_Component(TEXT("Com_Model")));
+		if (nullptr == pModel)
+			continue;
+
+		CTransform* pTransform = dynamic_cast<CTransform*>(object->Get_Component(g_strTransformTag));
+		if (nullptr == pTransform)
+			continue;
+
+		_float4 vPickPos = pModel->Check_Meshes(pTransform);
+		if (vPickPos.w != 0) // 피킹 성공
+		{
+			vecPickedObjects.push_back(object);
+			vecPickPos.push_back(vPickPos);
+		}
+	}
+
+	if (vecPickedObjects.empty())
+		return nullptr;
+
+	_float fShortest = { FLT_MAX };
+	CGameObject* pResult = { nullptr };
+	for (int i = 0; i < vecPickPos.size(); i++)
+	{
+		if (vecPickPos[i].w <= fShortest)
+			pResult = vecPickedObjects[i];
+	}
+
+	return pResult;
+}
+
 CMapToolHelper* CMapToolHelper::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CMapToolHelper* pInstance = new CMapToolHelper(pDevice, pContext);
@@ -312,5 +417,7 @@ CGameObject* CMapToolHelper::Clone(void* pArg)
 void CMapToolHelper::Free()
 {
 	__super::Free();
+
+	Safe_Release(m_pPickedObject);
 }
 

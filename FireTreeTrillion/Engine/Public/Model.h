@@ -22,10 +22,7 @@ public:
 	_bool IsFinished() { return m_Animations[m_iCurrentAnimIndex]->IsFinished(); }
 
 public:
-	void Set_TickPerSecond(_float _fTickPerSecond) {
-		m_Animations[m_iCurrentAnimIndex]->Set_TickPerSecond(_fTickPerSecond);
-	}
-
+	void Set_TickPerSecond(_float _fTickPerSecond) { m_Animations[m_iCurrentAnimIndex]->Set_TickPerSecond(_fTickPerSecond); }
 
 	void Set_Animation(_uint iAnimIndex, _float fTickPerSecond, _bool isLoop, _bool bInterpolation = false) {
 		m_iCurrentAnimIndex = iAnimIndex;	
@@ -42,9 +39,7 @@ public:
 		}
 	}
 
-	const _char* Get_AnimationName() const {
-		return m_Animations[m_iCurrentAnimIndex]->Get_AnimationName();
-	}
+	const _char* Get_AnimationName() const { return m_Animations[m_iCurrentAnimIndex]->Get_AnimationName(); }
 
 public:
 	virtual HRESULT Initialize_Prototype(MODEL tModel);
@@ -60,6 +55,8 @@ public:
 
 	HRESULT CreateDynamicActor(_float4 vPos);
 	HRESULT CreateStaticActor(_float4 vPos);
+
+	_float4 Check_Meshes(const class CTransform* pTransform) const;
 
 private:
 	_uint						m_iNumMeshes = { 0 };

@@ -28,12 +28,17 @@ private:
 	void	Edit_Object();
 
 	// On Key/Mouse Input 
+	void	OnLeftClick();
+	void	OnRightClick();
 	void	On_DIK_Escape();
 	void	On_DIK_Delete();
 
 	// File I/O
 	void	Save_Level();
 	void	Load_Level();
+
+	// Picking
+	CGameObject* Select_ModelByPicking(const wstring& wstrLayerTag = TEXT("Layer_Parse"));
 
 private:
 	vector<string>	vecLevelName = { "Level_Static", "Level_Loading", "Level_Logo", 
@@ -44,6 +49,7 @@ private:
 	vector<string> m_vecNonAnimTxts;
 	string m_strCurModel;
 	CGameObject* m_pPickedObject = { nullptr };
+	_float3 m_vPickPos = {};
 
 public:
 	static	CMapToolHelper* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

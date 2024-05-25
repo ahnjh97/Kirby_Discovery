@@ -166,6 +166,9 @@ public: /* For.PhysX */
 	PxRigidDynamic* CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial = nullptr);
 	PxRigidStatic* CreateStaticActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial = nullptr);
 
+	public: /* For. Picking */
+		void Transform_PickingToLocalSpace(const class CTransform* pTransform, _Out_ _float3* pRayDir, _Out_ _float3* pRayPos);
+
 private:
 	class CGraphic_Device*			m_pGraphic_Device = { nullptr };
 	class CInput_Device*			m_pInput_Device = { nullptr };
@@ -183,6 +186,7 @@ private:
 	class CSound_Manager*			m_pSound_Manager = { nullptr };
 	class CImGUI_Manager*			m_pIMGUI_Manager = { nullptr };
 	class CPhysX*					m_pPhysx = { nullptr };
+	class CPicking*					m_pPicking = { nullptr };
 
 	_uint	m_iCurrentLevelID = { 0 };
 
