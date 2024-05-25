@@ -64,6 +64,9 @@
     <Filter Include="02.GameObjects\UI\FXToolDirector">
       <UniqueIdentifier>{dbb187c2-6962-4466-b912-a53c4e5d474a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Player\Kirby">
+      <UniqueIdentifier>{f4444bba-a36c-4a3e-9327-ac76df48dd6f}</UniqueIdentifier>
+    </Filter>
     <Filter Include="02.GameObjects\Effect">
       <UniqueIdentifier>{8da63451-b1d5-46f5-a7cd-b8c224b47c48}</UniqueIdentifier>
     </Filter>
@@ -171,7 +174,10 @@
     <ClInclude Include="..\Public\FXToolDirector.h">
       <Filter>02.GameObjects\UI\FXToolDirector</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\SingleEffect.h">
+    <ClInclude Include="..\Public\Kirby.h">
+      <Filter>02.GameObjects\Player\Kirby</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\SingleEffect.h">
       <Filter>02.GameObjects\Effect\Single</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\MultiEffect.h">
@@ -180,6 +186,9 @@
     <ClInclude Include="..\Public\Level_Tool_Anim.h">
       <Filter>01.Levels\Tool\ANIM</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\KirbyDefault_State.h">
+      <Filter>02.GameObjects\Player\State</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\TestModel.h">
       <Filter>02.GameObjects\TestModel</Filter>
     </ClInclude>
@@ -187,6 +196,15 @@
       <Filter>02.GameObjects\TestModel\State</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\KirbyDefault_State.h" />
+    <ClInclude Include="Kirby_Enums.h" />
+    <ClInclude Include="..\Public\ToolHelper.h">
+      <Filter>90.Utils\[Sample] ToolHelper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KirbyDefault_State.h" />
+    <ClInclude Include="..\Public\Trigger.h" />
+    <ClInclude Include="..\Public\Level_Tool_Anim.h">
+      <Filter>01.Levels\Tool\Animation</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\KirbyDefault_State.h">
       <Filter>02.GameObjects\Player\State</Filter>
     </ClInclude>
@@ -265,6 +283,9 @@
     <ClCompile Include="..\Private\TestUI.cpp">
       <Filter>02.GameObjects\UI\[Sample] TestUI</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Kirby.cpp">
+      <Filter>02.GameObjects\Player\Kirby</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\MultiEffect.cpp">
       <Filter>02.GameObjects\Effect\Multi</Filter>
     </ClCompile>
@@ -274,6 +295,9 @@
     <ClCompile Include="..\Private\Level_Tool_Anim.cpp">
       <Filter>01.Levels\Tool\ANIM</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\KirbyDefault_State.cpp">
+      <Filter>02.GameObjects\Player\State</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\TestModel.cpp">
       <Filter>02.GameObjects\TestModel</Filter>
     </ClCompile>
@@ -281,6 +305,14 @@
       <Filter>02.GameObjects\TestModel\State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\KirbyDefault_State.cpp" />
+    <ClCompile Include="..\Private\ToolHelper.cpp">
+      <Filter>90.Utils\[Sample] ToolHelper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KirbyDefault_State.cpp" />
+    <ClCompile Include="..\Private\Trigger.cpp" />
+    <ClCompile Include="..\Private\Level_Tool_Anim.cpp">
+      <Filter>01.Levels\Tool\Animation</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\KirbyDefault_State.cpp">
       <Filter>02.GameObjects\Player\State</Filter>
     </ClCompile>

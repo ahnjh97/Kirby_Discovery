@@ -105,6 +105,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>../Public/;../../EngineSDK/Inc/;../../EngineSDK/Inc/ImGui/;../Bin/core/inc/;../Default/;../../EngineSDK/Inc/physx/</AdditionalIncludeDirectories>
       <AdditionalOptions>/MP /Zm200 %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -168,10 +169,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\BackGround.h" />
+    <ClInclude Include="..\Public\BasicMap.h" />
     <ClInclude Include="..\public\Camera_Free.h" />
     <ClInclude Include="..\public\Camera_Main.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\FXToolDirector.h" />
+    <ClInclude Include="..\Public\Grid.h" />
     <ClInclude Include="..\Public\Kirby.h" />
     <ClInclude Include="..\Public\KirbyDefault_State.h" />
     <ClInclude Include="..\Public\Level_GamePlay.h" />
@@ -179,10 +182,11 @@
     <ClInclude Include="..\Public\Level_Logo.h" />
     <ClInclude Include="..\Public\Level_Tool_Anim.h" />
     <ClInclude Include="..\Public\Level_Tool_FX.h" />
+    <ClInclude Include="..\Public\Level_Tool_Map.h" />
     <ClInclude Include="..\Public\Level_Tool_UI.h" />
     <ClInclude Include="..\Public\Loader.h" />
     <ClInclude Include="..\public\MainApp.h" />
-    <ClInclude Include="..\Public\Map_Stage1.h" />
+    <ClInclude Include="..\Public\MapToolHelper.h" />
     <ClInclude Include="..\Public\MultiEffect.h" />
     <ClInclude Include="..\Public\Particle.h" />
     <ClInclude Include="..\Public\SingleEffect.h" />
@@ -202,9 +206,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\BackGround.cpp" />
+    <ClCompile Include="..\Private\BasicMap.cpp" />
     <ClCompile Include="..\private\Camera_Free.cpp" />
     <ClCompile Include="..\private\Camera_Main.cpp" />
     <ClCompile Include="..\Private\FXToolDirector.cpp" />
+    <ClCompile Include="..\Private\Grid.cpp" />
     <ClCompile Include="..\Private\Kirby.cpp" />
     <ClCompile Include="..\Private\KirbyDefault_State.cpp" />
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />
@@ -212,10 +218,11 @@
     <ClCompile Include="..\Private\Level_Logo.cpp" />
     <ClCompile Include="..\Private\Level_Tool_Anim.cpp" />
     <ClCompile Include="..\Private\Level_Tool_FX.cpp" />
+    <ClCompile Include="..\Private\Level_Tool_Map.cpp" />
     <ClCompile Include="..\Private\Level_Tool_UI.cpp" />
     <ClCompile Include="..\Private\Loader.cpp" />
     <ClCompile Include="..\private\MainApp.cpp" />
-    <ClCompile Include="..\Private\Map_Stage1.cpp" />
+    <ClCompile Include="..\Private\MapToolHelper.cpp" />
     <ClCompile Include="..\Private\MultiEffect.cpp" />
     <ClCompile Include="..\Private\Particle.cpp" />
     <ClCompile Include="..\Private\SingleEffect.cpp" />
@@ -248,6 +255,7 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_Point.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_Rect.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_Map.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl" />
   </ItemGroup>

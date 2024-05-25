@@ -67,14 +67,14 @@ HRESULT CImGUI_Manager::Initialize(HWND hWnd, ID3D11Device* pGraphic_Device, ID3
 	style.Colors[ImGuiCol_ScrollbarBg] = vPink;
 
 	//버튼
-	style.Colors[ImGuiCol_Button] = vPink;
+	style.Colors[ImGuiCol_Button] = vPinkDark;
 	style.Colors[ImGuiCol_ButtonHovered] = vPinkLight;
-	style.Colors[ImGuiCol_ButtonActive] = vPink;
+	style.Colors[ImGuiCol_ButtonActive] = vPinkLight;
 
 	//헤더
-	style.Colors[ImGuiCol_Header] = vPink;
+	style.Colors[ImGuiCol_Header] = vPinkDark;
 	style.Colors[ImGuiCol_HeaderHovered] = vPinkLight;
-	style.Colors[ImGuiCol_HeaderActive] = vPink;
+	style.Colors[ImGuiCol_HeaderActive] = vPinkLight;
 
 	//분리선
 	style.Colors[ImGuiCol_Separator] = vPink;

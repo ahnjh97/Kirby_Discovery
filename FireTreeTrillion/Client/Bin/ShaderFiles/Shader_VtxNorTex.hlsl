@@ -7,7 +7,7 @@ texture2D	g_DiffuseTexture[2];
 texture2D	g_MaskTexture;
 texture2D	g_BrushTexture;
 
-vector		g_vBrushPos = vector(00.f, 0.0f, 20.f, 1.f);
+vector		g_vBrushPos = vector(0.f, 0.0f, 20.f, 1.f);
 float		g_fBrushRange = 10.f;
 
 struct VS_IN
@@ -65,41 +65,54 @@ struct PS_OUT
 	float4		vDiffuse : SV_TARGET0;
 	float4		vNormal : SV_TARGET1;
 	float4		vDepth : SV_TARGET2;
-	float4		vFieldDepth : SV_TARGET3;	
+	float4		vFieldDepth : SV_TARGET4;	
 };
 
 PS_OUT PS_MAIN(PS_IN In)
 {
 	PS_OUT			Out = (PS_OUT)0;
 
-	vector		vSourDiffuse = g_DiffuseTexture[0].Sample(LinearSampler, In.vTexcoord * 30.f);	
-	vector		vDestDiffuse = g_DiffuseTexture[1].Sample(LinearSampler, In.vTexcoord * 30.f);
-	vector		vBrush = vector(0.f, 0.f, 0.f, 0.f);
+    vector vSourDiffuse = g_DiffuseTexture[0].Sample(LinearSampler, In.vTexcoord * 30.f);
+    vector vDestDiffuse = g_DiffuseTexture[1].Sample(LinearSampler, In.vTexcoord * 30.f);
+    vector vBrush = vector(0.f, 0.f, 0.f, 0.f);
 	
 
-	if (g_vBrushPos.x - g_fBrushRange * 0.5f < In.vWorldPos.x && In.vWorldPos.x <= g_vBrushPos.x + g_fBrushRange * 0.5f && 
+    if (g_vBrushPos.x - g_fBrushRange * 0.5f < In.vWorldPos.x && In.vWorldPos.x <= g_vBrushPos.x + g_fBrushRange * 0.5f &&
 		g_vBrushPos.z - g_fBrushRange * 0.5f < In.vWorldPos.z && In.vWorldPos.z <= g_vBrushPos.z + g_fBrushRange * 0.5f)
-	{
-		float2		vBrushUV;
+    {
+        float2 vBrushUV;
 
-		vBrushUV.x = (In.vWorldPos.x - (g_vBrushPos.x - g_fBrushRange * 0.5f)) / g_fBrushRange;
-		vBrushUV.y = ((g_vBrushPos.z + g_fBrushRange * 0.5f) - In.vWorldPos.z) / g_fBrushRange;
+        vBrushUV.x = (In.vWorldPos.x - (g_vBrushPos.x - g_fBrushRange * 0.5f)) / g_fBrushRange;
+        vBrushUV.y = ((g_vBrushPos.z + g_fBrushRange * 0.5f) - In.vWorldPos.z) / g_fBrushRange;
 
-		vBrush = g_BrushTexture.Sample(LinearSampler, vBrushUV);
-	}
+        vBrush = g_BrushTexture.Sample(LinearSampler, vBrushUV);
+    }
 
-	vector		vMask = g_MaskTexture.Sample(PointSampler, In.vTexcoord);
+    vector vMask = g_MaskTexture.Sample(PointSampler, In.vTexcoord);
 
-	vector		vDiffuse = vDestDiffuse * vMask + vSourDiffuse * (1.f - vMask) + vBrush;
+    vector vDiffuse = vDestDiffuse * vMask + vSourDiffuse * (1.f - vMask) + vBrush;
 
-	Out.vDiffuse = vector(vDiffuse.xyz, 1.f);
-	// Out.vDiffuse = vector(0.f, 0.f, 0.f, 1.f);
-		/* -1.f ~ 1.f = 0.0f ~ 1.f */
+    Out.vDiffuse = vector(vDiffuse.xyz, 1.f);
+  //  Out.vDiffuse = vector(0.f, 0.f, 0.f, 1.f);
+		///* -1.f ~ 1.f = 0.0f ~ 1.f */
+	
 	Out.vNormal = vector((In.vNormal * 0.5f + 0.5f).xyz, 0.f);
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
 	Out.vFieldDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 1.0F);	
 	
 	return Out;
+}
+
+PS_OUT PS_GRID(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    Out.vDiffuse = vector(1.f, 1.f, 1.f, 1.f);
+    Out.vNormal = vector((In.vNormal * 0.5f + 0.5f).xyz, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vFieldDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 1.0F);
+	
+    return Out;
 }
 
 technique11 DefaultTechnique
@@ -116,4 +129,17 @@ technique11 DefaultTechnique
 		DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
 		PixelShader = compile ps_5_0 PS_MAIN();
 	}
+
+    pass WireFrame
+    {
+        SetRasterizerState(RS_Wireframe);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_GRID();
+    }
 }

@@ -6,10 +6,10 @@ BEGIN(Engine)
 class ENGINE_DLL CUIObject abstract : public CGameObject
 {
 public:
-	struct UIOBJ_DESC : public CGameObject::GAMEOBJECT_DESC
+	typedef struct : public CGameObject::GAMEOBJECT_DESC
 	{
-
-	};
+		_float2 vSize, vCenter, vPos = {};
+	}UIOBJ_DESC;
 
 protected:
 	CUIObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -31,10 +31,15 @@ public:
 	void			Set_IsRender(_bool _isRender) { m_bIsRender = _isRender; }
 
 protected:
+	
+
 	// 2D UI 처리용
 	_float2			m_size2D, m_position2D, m_WindowSize2D;
 	_float2			m_Ratio2D;
 	_float4x4		m_ViewMatrix, m_ProjMatrix;
+
+	UIOBJ_DESC		m_UIObjDesc{};
+	_float2			m_vSize, m_vCenter, m_vPos = {};
 
 	// 상황에 따른 Render 처리해주는 bool값
 	_bool			m_bIsRender = false;
