@@ -2,7 +2,8 @@
 
 /* 전역변수 : 쉐이더 외부에 있는 데이터를 쉐이더 안으로 받아온다. */
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
-texture2D	g_Texture;
+texture2D	g_DiffuseTexture;
+texture2D	g_MaskTexture;
 
 vector	g_vCamPosition;
 
@@ -107,13 +108,13 @@ PS_OUT PS_MAIN(PS_IN In)
 {
 	PS_OUT			Out = (PS_OUT)0;
 
-	Out.vColor = g_Texture.Sample(LinearSampler, In.vTexcoord);
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
 
 	if (Out.vColor.a <= 0.3f || 
 		false == In.isLived)
 		discard;
 
-	Out.vColor = vector(1.f, 0.f, 0.f, 1.f);
+	//Out.vColor = vector(1.f, 0.f, 0.f, 1.f);
 	
 	return Out;
 }

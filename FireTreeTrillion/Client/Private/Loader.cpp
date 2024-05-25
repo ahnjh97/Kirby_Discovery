@@ -24,6 +24,7 @@
 //이펙트 툴
 #include "FXToolDirector.h"
 #include "SingleEffect.h"
+#include "Particle.h"
 #include "MultiEffect.h"
 
 //#include "Body_Player.h"
@@ -134,7 +135,8 @@ HRESULT CLoader::Loading_ObjectAll()
 
 	//이펙트 툴 용
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FXToolDirector"), CFXToolDirector);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CSingleEffect"), CSingleEffect);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SingleEffect"), CSingleEffect);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Particle"), CParticle);
 	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("CMultiEffect"), CMultiEffect);
 
 	// 05.20) 원본 추가

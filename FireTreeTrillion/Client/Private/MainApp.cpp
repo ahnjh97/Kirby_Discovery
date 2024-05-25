@@ -90,9 +90,20 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 		CVIBuffer_Rect::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+	/* For.Prototype_Component_VIBuffer_Instance_Point */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Instance_Point"),
+		CVIBuffer_Instance_Point::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 	/* For.Prototype_Component_Shader_VtxPosTex */
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
+		return E_FAIL;
+
+	//point instance ½¦ÀÌ´õ
+	/* For.Prototype_Component_Shader_VtxInstance_Point */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxInstance_Point"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxInstance_Point.hlsl"), VTXINSTANCE_POINT::Elements, VTXINSTANCE_POINT::iNumElements))))
 		return E_FAIL;
 
 

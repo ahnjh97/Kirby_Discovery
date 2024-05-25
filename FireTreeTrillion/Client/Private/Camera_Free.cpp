@@ -94,7 +94,14 @@ HRESULT CCamera_Free::Render()
 void CCamera_Free::Render_IMGUI()
 {
 	static _float fSpeed = 10.f;
-	_float4 fPosition = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+	_float4 vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+
+
+	ImGui::Text("X: %.2f", vPosition.x);
+	ImGui::SameLine();
+	ImGui::Text("Y: %.2f", vPosition.y);
+	ImGui::SameLine();
+	ImGui::Text("Z: %.2f", vPosition.z);
 
 	ImGui::SliderFloat("CameraFree Speed", &fSpeed, 0.f, 50.f);
 

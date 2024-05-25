@@ -51,6 +51,8 @@ protected:
 	_float*						m_pSpeeds = { nullptr };
 	
 
+	void	Update_Buffer(_uint _iNumInstance);
+
 
 public:
 	virtual CComponent* Clone(void* pArg) = 0;

@@ -42,6 +42,103 @@ HRESULT CVIBuffer_Instance::Initialize_Prototype(_uint _iNumInstance)
 HRESULT CVIBuffer_Instance::Initialize(void * pArg)
 {
 
+	m_iInstanceStride = sizeof(VTXMATRIX);
+	m_iIndexCountPerInstance = 1;
+
+	m_iNumVertices = 1;
+	m_iVertexStride = sizeof(VTXPOS);
+
+	m_iNumIndices = m_iIndexCountPerInstance * m_iNumInstance;
+	m_iIndexStride = sizeof(_ushort);
+	m_iNumVertexBuffers = 2;
+	m_eIndexFormat = DXGI_FORMAT_R16_UINT;
+	m_ePrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_POINTLIST;
+
+#pragma region VERTEX_BUFFER
+	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
+
+	/* 정점 버퍼의 byte크기 */
+	m_BufferDesc.ByteWidth = m_iVertexStride * m_iNumVertices;
+	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	m_BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	m_BufferDesc.CPUAccessFlags = 0;
+	m_BufferDesc.MiscFlags = 0;
+	m_BufferDesc.StructureByteStride = m_iVertexStride;
+
+	VTXPOS* pVertices = new VTXPOS[m_iNumVertices];
+	ZeroMemory(pVertices, sizeof(VTXPOS) * m_iNumVertices);
+
+	pVertices[0].vPosition = _float3(0.f, 0.f, 0.f);
+
+	ZeroMemory(&m_InitialData, sizeof m_InitialData);
+	m_InitialData.pSysMem = pVertices;
+
+	if (FAILED(__super::Create_Buffer(&m_pVB)))
+		return E_FAIL;
+
+	Safe_Delete_Array(pVertices);
+#pragma endregion
+
+
+#pragma region INDEX_BUFFER
+
+	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
+
+	/* 인덱스 버퍼의 byte크기 */
+	m_BufferDesc.ByteWidth = m_iIndexStride * m_iNumIndices;
+	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	m_BufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	m_BufferDesc.CPUAccessFlags = 0;
+	m_BufferDesc.MiscFlags = 0;
+	m_BufferDesc.StructureByteStride = 0;
+
+
+
+	_ushort* pIndices = new _ushort[m_iNumIndices];
+	ZeroMemory(pIndices, sizeof(_ushort) * m_iNumIndices);
+
+	ZeroMemory(&m_InitialData, sizeof m_InitialData);
+	m_InitialData.pSysMem = pIndices;
+
+	if (FAILED(__super::Create_Buffer(&m_pIB)))
+		return E_FAIL;
+
+	Safe_Delete_Array(pIndices);
+
+#pragma endregion
+
+
+#pragma region INSTANCE_BUFFER
+
+	ZeroMemory(&m_InstanceBufferDesc, sizeof m_InstanceBufferDesc);
+
+	/* 인덱스 버퍼의 byte크기 */
+	m_InstanceBufferDesc.ByteWidth = m_iInstanceStride * m_iNumInstance;
+	m_InstanceBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	m_InstanceBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	m_InstanceBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	m_InstanceBufferDesc.MiscFlags = 0;
+	m_InstanceBufferDesc.StructureByteStride = m_iInstanceStride;
+
+	m_pInstanceVertices = new VTXMATRIX[m_iNumInstance];
+	ZeroMemory(m_pInstanceVertices, sizeof(VTXMATRIX) * m_iNumInstance);
+
+	for (size_t i = 0; i < m_iNumInstance; i++)
+	{
+		m_pInstanceVertices[i].vRight = _float4{ 1.f, 0.f, 0.f, 0.f };
+		m_pInstanceVertices[i].vUp = _float4{ 0.f, 1.f, 0.f, 0.f };
+		m_pInstanceVertices[i].vLook = _float4{ 0.f, 0.f, 1.f, 0.f };
+		m_pInstanceVertices[i].vPosition = _float4{ 0.f, 0.f, 0.f, 1.f };
+
+		m_pInstanceVertices[i].bAlive = true;
+	}
+
+	ZeroMemory(&m_InstanceSubResourceData, sizeof m_InstanceSubResourceData);
+	m_InstanceSubResourceData.pSysMem = m_pInstanceVertices;
+
+#pragma endregion
+
+
 	if (FAILED(m_pDevice->CreateBuffer(&m_InstanceBufferDesc, &m_InstanceSubResourceData, &m_pVBInstance)))
 		return E_FAIL;
 
@@ -151,9 +248,17 @@ void CVIBuffer_Instance::Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceI
 void CVIBuffer_Instance::Update_InstanceInfo(const INSTANCE_DESC& _InstanceDesc)
 {
 	m_InstanceDesc = _InstanceDesc;
+
+	//준 desc 대로 값 모두 채워줘야해~~
+
+
 }
 
 
+
+void CVIBuffer_Instance::Update_Buffer(_uint _iNumInstance)
+{
+}
 
 void CVIBuffer_Instance::Free()
 {

@@ -3,6 +3,7 @@
 #include "GameInstance.h"
 
 #include "SingleEffect.h"
+#include "Particle.h"
 #include "MultiEffect.h"
 #include "Camera_Free.h"
 
@@ -252,7 +253,7 @@ void CFXToolDirector::Render_FXHierarchy()
 		newProperty.push_back(newEndKeyframe);
 		singleFXDesc.Keyframes.emplace(KF_MASK, newProperty);
 
-		CSingleEffect* pSingleFX = static_cast<CSingleEffect*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_CSingleEffect"), &singleFXDesc));
+		CSingleEffect* pSingleFX = static_cast<CSingleEffect*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_SingleEffect"), &singleFXDesc));
 		m_FXs.emplace_back(pSingleFX);
 	}
 
@@ -264,6 +265,54 @@ void CFXToolDirector::Render_FXHierarchy()
 	if (Button(u8"파티클 생성"))
 	{
 		m_bOpenKeyframeEditor = false;
+
+		//이름 정해주기
+		CParticle::PARTICLE_DESC ParticleDesc{};
+		string strComponentTag = "Prototype_Component_";
+
+		string strBaseName{ "Default FX" };
+		switch (m_iAddingFXBufferIdx)
+		{
+		case 1:
+			break;
+		default:
+			strBaseName = "Particle ";
+			//singleFXDesc.strBufferTag = "Rect";
+			break;
+		}
+
+		//default 이펙트 이름 뒤에 중복 존재 시 알파벳을 붙인다.
+		char szSuffix = 'A';
+		while (true)
+		{
+			_bool bDoesExistSameName{ false };
+			ParticleDesc.strFXName = strBaseName + szSuffix;
+
+			//중복 이름 있으면 안됨
+			for (const auto& fx : m_FXs)
+			{
+				if (fx->m_strFXName == ParticleDesc.strFXName)
+				{
+					bDoesExistSameName = true;
+					break;
+				}
+			}
+
+			//중복 이름이 없거나, 알파벳이 초과하면 반복 끝
+			if (!bDoesExistSameName || 'Z' <= szSuffix)
+				break;
+
+			++szSuffix;
+		}
+
+
+		//버퍼, 텍스쳐, 마스크 텍스쳐 컴포넌트 이름 떤져준다.
+		ParticleDesc.strBufferTag = strComponentTag + "VIBuffer_Instance_Point";
+		ParticleDesc.strTexTag = strComponentTag + m_FXTexList[m_iAddingFXTexIdx];
+		ParticleDesc.strMaskTexTag = strComponentTag + m_FXMaskTexList[m_iAddingFXMaskTexIdx];
+		ParticleDesc.iNumInstance = m_iAddingInstanceNum;
+		CParticle* pParticle = static_cast<CParticle*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle"), &ParticleDesc));
+		m_FXs.emplace_back(pParticle);
 	}
 
 	End();
@@ -349,6 +398,7 @@ void CFXToolDirector::Render_FXProperty()
 	if(!bIsParticle)
 		Checkbox(u8"직교", &pCurFX->m_bIsOrthographic);
 
+	Separator();
 
 	//전체 시간
 	if (DragFloat(u8"재생 시간", &pCurFX->m_fDuration.second, .1f, 0.f, 30.f, "%.2f"))
@@ -832,7 +882,7 @@ HRESULT CFXToolDirector::Ready_FXPrototypeVector()
 	Ready_Ingredient(TEXT("FXTexture"), &m_FXTexList, pStaticProtoMap);
 	Ready_Ingredient(TEXT("FXTexture"), &m_FXMaskTexList, pStaticProtoMap);
 
-	Ready_Ingredient(TEXT("VIBuffer"), &m_FXBufferList, pStaticProtoMap);
+	Ready_Ingredient(TEXT("VIBuffer_Rect"), &m_FXBufferList, pStaticProtoMap);
 
 	return S_OK;
 }

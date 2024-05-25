@@ -184,6 +184,7 @@
     <ClInclude Include="..\public\MainApp.h" />
     <ClInclude Include="..\Public\Map_Stage1.h" />
     <ClInclude Include="..\Public\MultiEffect.h" />
+    <ClInclude Include="..\Public\Particle.h" />
     <ClInclude Include="..\Public\SingleEffect.h" />
     <ClInclude Include="..\Public\TestModel.h" />
     <ClInclude Include="..\Public\TestModel_State.h" />
@@ -216,6 +217,7 @@
     <ClCompile Include="..\private\MainApp.cpp" />
     <ClCompile Include="..\Private\Map_Stage1.cpp" />
     <ClCompile Include="..\Private\MultiEffect.cpp" />
+    <ClCompile Include="..\Private\Particle.cpp" />
     <ClCompile Include="..\Private\SingleEffect.cpp" />
     <ClCompile Include="..\Private\TestModel.cpp" />
     <ClCompile Include="..\Private\TestModel_State.cpp" />

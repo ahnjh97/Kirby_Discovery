@@ -187,9 +187,6 @@
       <Filter>02.GameObjects\TestModel\State</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\KirbyDefault_State.h" />
-    <ClInclude Include="..\Public\Kirby.h">
-      <Filter>02.GameObjects\Kirby</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\KirbyDefault_State.h">
       <Filter>02.GameObjects\Player\State</Filter>
     </ClInclude>
@@ -204,6 +201,10 @@
     </ClInclude>
     <ClInclude Include="..\Public\Trigger.h">
       <Filter>90.Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby.h" />
+    <ClInclude Include="..\Public\Particle.h">
+      <Filter>02.GameObjects\Effect\Particle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -280,9 +281,6 @@
       <Filter>02.GameObjects\TestModel\State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\KirbyDefault_State.cpp" />
-    <ClCompile Include="..\Private\Kirby.cpp">
-      <Filter>02.GameObjects\Kirby</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\KirbyDefault_State.cpp">
       <Filter>02.GameObjects\Player\State</Filter>
     </ClCompile>
@@ -294,6 +292,10 @@
     </ClCompile>
     <ClCompile Include="..\Private\Trigger.cpp">
       <Filter>90.Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby.cpp" />
+    <ClCompile Include="..\Private\Particle.cpp">
+      <Filter>02.GameObjects\Effect\Particle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
