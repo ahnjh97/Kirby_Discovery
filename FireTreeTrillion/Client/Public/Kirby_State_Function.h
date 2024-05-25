@@ -202,3 +202,45 @@ static void Jump_Turn_Interpolate(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform*
 
 }
 
+// 빨아들일 때의 움직임 로직
+static void Inhale_Moving_Logic(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTransformCom, CCharacterController* pController, _float fTimeDelta)
+{
+	Kirbydesc->m_fMoveSpeed += fTimeDelta * 10.f;
+	if (Kirbydesc->m_fMoveSpeed > 3.f)
+		Kirbydesc->m_fMoveSpeed = 3.f;
+
+	// 타겟기준
+	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	_vector vMoveDelta = Kirbydesc->m_vTargetDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
+	pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+}
+
+static void Fly_Moving_Logic(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTransformCom, CCharacterController* pController, _float fTimeDelta)
+{
+	Kirbydesc->m_fMoveSpeed += fTimeDelta * 10.f;
+	if (Kirbydesc->m_fMoveSpeed > 5.f)
+		Kirbydesc->m_fMoveSpeed = 5.f;
+
+	// 타겟기준
+	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	_vector vMoveDelta = Kirbydesc->m_vTargetDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
+	pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+}
+
+static void Fly_Deceleration(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTransformCom, CCharacterController* pController, _float fTimeDelta)
+{
+	// 0.1초간 풀 감속 (최대 속도 8이라 가정)
+	if (Kirbydesc->m_fMoveSpeed > 0.f)
+		Kirbydesc->m_fMoveSpeed -= 5.f * fTimeDelta;
+	if (Kirbydesc->m_fMoveSpeed < 0.f)
+		Kirbydesc->m_fMoveSpeed = 0.f;
+
+	// Z 회전 복구 (최대 회전 각도 10도)
+	Kirbydesc->m_fZAngle -= Kirbydesc->m_fZAngle / 4.f;
+
+	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	_vector vMoveDelta = Kirbydesc->m_vMoveDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
+	pTransformCom->Turn(Kirbydesc->m_vMoveDir, 1.f, Kirbydesc->m_fZAngle);
+	pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+}
+

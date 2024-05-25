@@ -40,8 +40,14 @@ public:
 		_bool	m_isLanding = { false };
 		_float m_fGravityOffset = { 6.f };
 
+		// 흡수중인 모션
+		_bool	m_isVacuum = { false };
+
 		// 방향 키 컨트롤러를 만지고 있는가?
 		_bool	m_isController = { false };
+
+		// Fly
+		_bool			m_isFly = { false };
 	}KIRBY_INFODESC;
 
 
@@ -80,13 +86,11 @@ private:
 	// 일반 움직임을 할 수 있는 상황이여야 하니, 전부 false 여야 true를 반환하여야 한다. 또한 아이들로 가는거도 막아줌!
 	_bool			Can_JoyStickUsing() { 
 		return !m_tKirbyInfo.m_isJump && !m_tKirbyInfo.m_isLanding && !m_bFreeFall && !m_bIsEatingAnim
-			&& !m_IsSpit;
+			&& !m_IsSpit && !m_tKirbyInfo.m_isVacuum && !m_tKirbyInfo.m_isFly;
 	}
 	_bool			Can_ZXCVUsing() {
 		return !m_IsSpit;
 	}
-	// 바닥에 닿았을 때, 상시 초기화해주어야 하는 것들.
-	void			Terrain_ResetLogic();
 
 	void			ZXCV_Input(_float fTimeDelta);
 	void			Z_Input(_float fTimeDelta);
@@ -110,6 +114,11 @@ private:
 	_float			m_fChangeRunTime = { 0.f };
 	_bool			m_bRePressBlock = { false };
 	_bool			m_bFreeFall = { false };
+	// Fly
+	// 키를 꾹 눌렀을 때, 공중으로 뜨는 딜레이가 있어야 한다.
+	_float			m_fFlyKeyPressDelay = { 0.f };
+	_float			m_fFlyTime = { 0.f };
+
 
 	void			Kirby_Eat(_float fTimeDelta);
 	// 먹는 순간적인 애니메이션이 연출되는 부울 값
@@ -119,7 +128,19 @@ private:
 	_bool			m_IsSpit = { false };
 	// 만약, 공중에서 뱉었을 경우 Jump Anim 으로 가는 것을 막아야 하기 때문에 필요한 부울 값이다.
 	_bool			m_bJumpSpiting = { false };
+	// 뱉고 나서의 흡수 딜레이이다.
 
+	void			Kirby_Vacuum(_float fTimeDelta);
+	// 뱉은 직후 바로 빨아들이면 안 되니까,
+	_float			m_fVacuumDelay = { 0.f };
+	_float			m_fVacuumTime = { 0.f };
+	enum VacuumControl { VACUUM_VACUUMSTART, VACUUM_VACUUM, VACUUM_SUPERVACUUMSTART, VACUUM_SUPERVACUUM, VACUUM_VACUUMEND, VACUUM_END};
+	_uint			m_VacuumControl = { 0 };
+	// 만약, 공중에서 흡수할 경우 Jump Anim으로 가는 것을 막아야 하기 때문에 필요한 부울 값이다.
+	_bool			m_bJumpVacuum = { false };
+	_bool			m_bLandingVacuum = { false };
+	_float			m_fminVacuumTime = { 0.f };
+	_bool			m_bminVacuum = { false };
 
 private:
 	HRESULT			Add_Components();

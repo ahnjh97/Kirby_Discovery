@@ -42,7 +42,7 @@ HRESULT CKirby::Initialize(void* pArg)
 	
 
 	INFO(m_eBodyState) = BODY_DEFAULT;
-	INFO(m_eMouthState) = MONTH_IDLE;
+	INFO(m_eMouthState) = MOUTH_IDLE;
 	INFO(m_eEyeState) = EYE_IDLE;
 	m_eJumpState = STATE_JUMPL;
 
@@ -82,8 +82,9 @@ _int CKirby::Tick(_float fTimeDelta)
 	Key_Input(fTimeDelta);
 	// 점프
 	Kirby_Jump(fTimeDelta);
-	// 커비의 먹는 로직들
+	// 커비의 통통한 로직들
 	Kirby_Eat(fTimeDelta);
+
 
 	// 유틸업데이트가 들어가있다.
 	//****** FSM Update, Shadow ChaseUpdate, IdleResetUpdate ******//
@@ -95,7 +96,10 @@ _int CKirby::Tick(_float fTimeDelta)
 
 void CKirby::Late_Tick(_float fTimeDelta)
 {
-	m_pModelCom[INFO(m_eBodyState)]->Play_Animation(fTimeDelta);
+	//m_pModelCom[INFO(m_eBodyState)]->Play_Animation(fTimeDelta);
+	m_pModelCom[BODY_DEFAULT]->Play_Animation(fTimeDelta);
+	m_pModelCom[BODY_BALLOON]->Play_Animation(fTimeDelta);
+	m_pModelCom[BODY_VACUUM]->Play_Animation(fTimeDelta);
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
@@ -155,16 +159,14 @@ void CKirby::Render_IMGUI()
 	ImGui::Text("JumpSpiting : %d", m_bJumpSpiting);
 	ImGui::Text("m_IsSpit : %d", m_IsSpit);
 	ImGui::Text("m_IsEat : %d", m_IsEat);
-
+	ImGui::Text("m_Vacuum : %d", INFO(m_isVacuum));
+	ImGui::Text("FLY : %d", INFO(m_isFly));
 	ImGui::Text("Land : %d", INFO(m_isLanding));
 	ImGui::Text("JUMP : %d", INFO(m_isJump));
-	ImGui::Text("Velocity : %.2f", INFO(m_fJumpVelocity));
 	ImGui::Text("Input C? : %d", m_pGameInstance->Get_DIKeyState(DIK_C, KEY_PRESS));
 	ImGui::Text("FSM : %d", m_pFSM->Get_State());
 	ImGui::Separator(); ImGui::NewLine();
 
-//	ImGui::Text("MoveDir X : %.2f \tMoveDir Y : %.2f \tMoveDir Z : %.2f ", INFO(m_vMoveDir).x, INFO(m_vMoveDir).y, INFO(m_vMoveDir).z); ImGui::NewLine();
-//	ImGui::Text("TargetDir X : %.2f \tTargetDir Y : %.2f \tTargetDir Z : %.2f ", INFO(m_vTargetDir).x, INFO(m_vTargetDir).y, INFO(m_vTargetDir).z);
 	__super::Render_IMGUI();
 }
 
@@ -345,12 +347,6 @@ void CKirby::JoyStick_Input(_float fTimeDelta)
 	}
 }
 
-void CKirby::Terrain_ResetLogic()
-{
-	//m_bJumpSpiting = false;
-
-}
-
 void CKirby::ZXCV_Input(_float fTimeDelta)
 {
 	// ZXCV 를 누를 자격이 없다면 리턴한다.
@@ -359,7 +355,10 @@ void CKirby::ZXCV_Input(_float fTimeDelta)
 
 	Z_Input(fTimeDelta);
 	X_Input(fTimeDelta);
-	C_Input(fTimeDelta);
+
+	if (!INFO(m_isVacuum))
+		C_Input(fTimeDelta);
+
 	V_Input(fTimeDelta);
 
 }
@@ -370,11 +369,17 @@ void CKirby::Z_Input(_float fTimeDelta)
 
 void CKirby::X_Input(_float fTimeDelta)
 {
+	// 공격 이후에 바로 빨아들이면 안 되니까, 딜레이를 준다.
+	m_fVacuumDelay += fTimeDelta;
+
+
 	// 먹은 상태에서 X 키를 눌러 발사하는 로직이다. 발싸!!!
 	if (m_IsEat == true && m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
 	{
 		Change_State(STATE_SPIT, 100.f, false, false, BODY_VACUUM);
 		m_IsSpit = true;
+
+		m_fVacuumDelay = 0.f;
 
 		// 랜딩모션일 경우, 바로 캔슬되고 뱉는다.
 		m_tKirbyInfo.m_isLanding = false;
@@ -385,59 +390,97 @@ void CKirby::X_Input(_float fTimeDelta)
 			m_bJumpSpiting = true;
 	}
 
+
+	// 커비의 흡수 로직들
+	Kirby_Vacuum(fTimeDelta);
+
+
 }
 
 void CKirby::C_Input(_float fTimeDelta)
 {
-	// 점프 중이 아닐 때
-	if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN) && INFO(m_isJump) != true)
+	// 점프 중일 때, C를 눌렀을 경우 나는 상태가 되어버린다.
+	// Fly 상태는 Jump 중이면서 Fly 상태일 것이다.
+	if (INFO(m_isJump) == true && INFO(m_isFly) == false)
 	{
-		// 점프의 랜덤 애니메이션 재생
-		m_eJumpState == STATE_JUMPL ? m_eJumpState = STATE_JUMPR : m_eJumpState = STATE_JUMPL;
-
-		// 점프의 초기 파워
-		INFO(m_fJumpVelocity) = 22.f;
-		// 점프의 부울 값
-		INFO(m_isJump) = true;
-		// 최소 단위로 점프를 눌렀을 때, 공중으로 뜨는 최소 시간 0.15초
-		m_fChangeVelocityZeroTime = 0.f;
-		// 공중에서 체공하는 시간 0.15초
-		m_fHoldAirTime = 0.f;
-		// 점프키를 누르는 시간
-		m_fJumpHoldTime = 0.f;
-
-		// 초기화
-		m_bRePressBlock = false;
-	}
-
-	if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_UP))
-	{
-		// 때는 순간 트루가 되고, 점프 가능 시점에 다시 누를 때 까지 C에대한 누적 등 반응하지 않는다.
-		m_bRePressBlock = true;
-	}
-
-	if (m_bRePressBlock == false && m_pGameInstance->Get_DIKeyState(DIK_C, KEY_PRESS) && m_fJumpHoldTime < 0.3f)
-	{
-		m_fJumpHoldTime += fTimeDelta;
-	}
-	else
-	{
-		// 최소 점프 제한 키 유지 시간
-		_float fJumpHoldTime = 0.1f;
-		// 공중 체공 시간
-		_float fHoldAirTime = 0.22f;
-		// 최소단위 공중 올라가는 시간
-		_float fChangeVelocityZeroTime = 0.09f;
-
-		// 0.1초 이하로 눌렀을 때
-		if (m_fJumpHoldTime < fJumpHoldTime)
+		if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
 		{
-			// 최소 공중 체공시간 0.15초
-			m_fChangeVelocityZeroTime += fTimeDelta;
+			// 날기의 초기 파워
+			INFO(m_fJumpVelocity) = 4.f;
+			INFO(m_isFly) = true;
+			INFO(m_isJump) = false;
+			Change_State(STATE_FLIGHTSTART, 60.f, false, false, BODY_BALLOON);
 
-			// 공중 체공시간으로 하자. 최소 시간이 지났고, 공중 체공 사이 시간동안!
-			if (m_fChangeVelocityZeroTime > fChangeVelocityZeroTime)
+			// 날기 시작하고 다른건 필요없기에. 바로 리턴한다. 추후 문제있으면 고칠 것
+			return;
+		}
+	}
+
+	// 나는 중이 아닐때 발동하는 C 제어
+	if (INFO(m_isFly) != true)
+	{
+		// 점프 중이 아닐 때
+		if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN)
+			&& INFO(m_isJump) != true)
+		{
+			// 점프의 랜덤 애니메이션 재생
+			m_eJumpState == STATE_JUMPL ? m_eJumpState = STATE_JUMPR : m_eJumpState = STATE_JUMPL;
+
+			// 점프의 초기 파워
+			INFO(m_fJumpVelocity) = 22.f;
+			// 점프의 부울 값
+			INFO(m_isJump) = true;
+			// 최소 단위로 점프를 눌렀을 때, 공중으로 뜨는 최소 시간 0.15초
+			m_fChangeVelocityZeroTime = 0.f;
+			// 공중에서 체공하는 시간 0.15초
+			m_fHoldAirTime = 0.f;
+			// 점프키를 누르는 시간
+			m_fJumpHoldTime = 0.f;
+
+			// 초기화
+			m_bRePressBlock = false;
+		}
+
+		if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_UP))
+		{
+			// 때는 순간 트루가 되고, 점프 가능 시점에 다시 누를 때 까지 C에대한 누적 등 반응하지 않는다.
+			m_bRePressBlock = true;
+		}
+
+		if (m_bRePressBlock == false && m_pGameInstance->Get_DIKeyState(DIK_C, KEY_PRESS) && m_fJumpHoldTime < 0.3f)
+		{
+			m_fJumpHoldTime += fTimeDelta;
+		}
+		else
+		{
+			// 최소 점프 제한 키 유지 시간
+			_float fJumpHoldTime = 0.1f;
+			// 공중 체공 시간
+			_float fHoldAirTime = 0.22f;
+			// 최소단위 공중 올라가는 시간
+			_float fChangeVelocityZeroTime = 0.09f;
+
+			// 0.1초 이하로 눌렀을 때
+			if (m_fJumpHoldTime < fJumpHoldTime)
 			{
+				// 최소 공중 체공시간 0.15초
+				m_fChangeVelocityZeroTime += fTimeDelta;
+
+				// 공중 체공시간으로 하자. 최소 시간이 지났고, 공중 체공 사이 시간동안!
+				if (m_fChangeVelocityZeroTime > fChangeVelocityZeroTime)
+				{
+					m_fHoldAirTime += fTimeDelta;
+					if (m_fHoldAirTime < fHoldAirTime)
+					{
+						_float fStopVelocityPower = GRAVITY * fTimeDelta * 6.f;
+						INFO(m_fJumpVelocity) = fStopVelocityPower + (fabs(m_fHoldAirTime - fHoldAirTime * 0.5f) * (-1.f / (fHoldAirTime * 0.5f)));
+					}
+				}
+			}
+			// 0.1초 이상 눌렀을 때.
+			else
+			{
+				// 공중 체공 시간으로 하자. 공중 체공 사이 시간동안!
 				m_fHoldAirTime += fTimeDelta;
 				if (m_fHoldAirTime < fHoldAirTime)
 				{
@@ -446,15 +489,75 @@ void CKirby::C_Input(_float fTimeDelta)
 				}
 			}
 		}
-		// 0.1초 이상 눌렀을 때.
-		else
+	}
+	// 나는 중일 때 발동하는 C !!!!!!!!
+	else if (INFO(m_isFly) == true)
+	{
+		// 꾹 눌렀을 때 0.3초마다 Flight한다
+		m_fFlyKeyPressDelay += fTimeDelta;
+		// 총 비행 량
+		m_fFlyTime += fTimeDelta;
+		_float fFlyTime = 5.5f;
+
+		if (m_pFSM->Get_State() == STATE_EAT && m_pModelCom[INFO(m_eBodyState)]->IsFinished())
 		{
-			// 공중 체공 시간으로 하자. 공중 체공 사이 시간동안!
-			m_fHoldAirTime += fTimeDelta;
-			if (m_fHoldAirTime < fHoldAirTime)
+			// IDLE로 바꿔놔야 어색하지 않다.
+			m_pModelCom[BODY_DEFAULT]->Set_Animation(STATE_IDLE, 60.f, true, false);
+
+			Change_State(STATE_FLIGHTLANDING, 40.f, false, false, BODY_VACUUM);
+		}
+		else if (m_pFSM->Get_State() == STATE_FLIGHTLANDING && m_pModelCom[INFO(m_eBodyState)]->IsFinished())
+		{
+			// 비로소, 날기가 종료된다.
+			INFO(m_isFly) = false;
+			m_fFlyTime = 0.f;
+		}
+
+		// 바닥에 닿으면 EAT -> FLIGHTLANDING 애니메이션 순으로 진행되도록 한다.
+		if (m_pControllerCom->Is_Terrain())
+			Change_State(STATE_EAT, 150.f, false, true, BODY_BALLOON);
+
+
+		// 바닥에 안착했을 땐 다시 올라가면 절대 안된다.
+		if (m_pFSM->Get_State() != STATE_FLIGHTLANDING)
+		{
+
+			if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
 			{
-				_float fStopVelocityPower = GRAVITY * fTimeDelta * 6.f;
-				INFO(m_fJumpVelocity) = fStopVelocityPower + (fabs(m_fHoldAirTime - fHoldAirTime * 0.5f) * (-1.f / (fHoldAirTime * 0.5f)));
+				// 날면서 뽀잉
+				if (m_fFlyTime < fFlyTime)
+				{
+					INFO(m_fJumpVelocity) = 4.f;
+					Change_State(STATE_FLIGHT, 60.f, false, false, BODY_BALLOON);
+				}
+				else
+					Change_State(STATE_FLIGHTLIMIT, 60.f, false, false, BODY_BALLOON);
+			}
+			else if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_PRESS) && m_fFlyKeyPressDelay > 0.3f)
+			{
+				// 날면서 뽀잉
+				if (m_fFlyTime < fFlyTime)
+				{
+					INFO(m_fJumpVelocity) = 4.f;
+					Change_State(STATE_FLIGHT, 60.f, false, false, BODY_BALLOON);
+				}
+				else
+					Change_State(STATE_FLIGHTLIMIT, 60.f, false, false, BODY_BALLOON);
+			}
+
+
+			// FLIGHT, FLIGHTSTART 일 경우 모델의 ANIM 이 끝나면 다시 FLIGHTFALL 상태로 돌아간다.
+			if ((m_pFSM->Get_State() == STATE_FLIGHT ||
+				m_pFSM->Get_State() == STATE_FLIGHTSTART || 
+				m_pFSM->Get_State() == STATE_FLIGHTLIMIT
+				) == true
+				&& m_pModelCom[INFO(m_eBodyState)]->IsFinished())
+			{
+				// 나는 도중엔 항상 이 친구로 돌아가도록 한다.
+				if (m_fFlyTime < fFlyTime)
+					Change_State(STATE_FLIGHTFALL, 60.f, true, true, BODY_BALLOON);
+				else
+					Change_State(STATE_FLIGHTLIMITFALL, 60.f, true, true, BODY_BALLOON);
 			}
 		}
 	}
@@ -502,9 +605,9 @@ void CKirby::Lerp_UpVector(_fvector _vTargetUp, _float _maxAngle, _float fTimeDe
 void CKirby::Kirby_Jump(_float fTimeDelta)
 {
 	// 점프 중일 때를 담당한다.
-	if (true == INFO(m_isJump))
+	if (true == INFO(m_isJump) && INFO(m_isFly) == false)
 	{
-		if (m_bJumpSpiting)
+		if (m_bJumpSpiting || m_bJumpVacuum)
 			return;
 
 		if (m_fJumpHoldTime > 0.3f)
@@ -568,12 +671,16 @@ void CKirby::Kirby_Jump(_float fTimeDelta)
 			m_fChangeRunTime = 0.f;
 		}
 	}
+	// 날고 있을 때
+	else if (INFO(m_isFly) == true)
+	{
+
+
+	}
 	// 자유 낙하 ( 점프 중도 아니고, 착지 중도 아니다. ) 
 	// 이럴때 떨어지는 애니메이션이 재생되어야 할 것이다.
 	else
 	{
-		//Terrain_ResetLogic();
-
 		// 자유낙하가 아니면서, 1보다 높은 지형에 올라갔을 때 발동된다. Fall 발동
 		if (m_pControllerCom->Compute_Height() > 2.f && m_bFreeFall == false)
 			m_bFreeFall = true;
@@ -633,6 +740,159 @@ void CKirby::Kirby_Eat(_float fTimeDelta)
 
 }
 
+void CKirby::Kirby_Vacuum(_float fTimeDelta)
+{
+	// 0.2초 보다 작게 눌렀을 경우 0.3초간은 무조건 흡수한다.
+	const _float fminVacuumTime = 0.3f;
+	if (m_bminVacuum == false && m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS))
+	{
+		m_fminVacuumTime += fTimeDelta;
+		if (m_fminVacuumTime < fminVacuumTime)
+		{
+			m_bminVacuum = true;
+		}
+	}
+	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_UP))
+	{
+		m_fminVacuumTime = 0.f;
+	}
+
+	// 0.4초 후, 최소 흡수 시간을 관여하는 부울 값이 false가 된다. 만약 키까지 때고 있었으면 완전히 흡수를 그만둔다.
+	if (m_fVacuumTime > fminVacuumTime)
+		m_bminVacuum = false;
+	
+
+	// 흡수 시작!!!!!!!!!!! (흡수 중이 아닐떄만 발동)
+	if (m_fVacuumDelay > 0.5f && (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) || m_bminVacuum == true))
+	{
+		// 흡수가 끝나고 아이들로 무조건 가기 때문에, 튀는것을 막기 위한 행위이다.
+		m_pModelCom[BODY_DEFAULT]->Set_Animation(STATE_IDLE, 60.f, true, false);
+
+
+		if (m_tKirbyInfo.m_isJump == true)
+			m_bJumpVacuum = true;
+
+		INFO(m_isVacuum) = true;
+
+		// 착지중일때 강제로 흡수하게 만든다.
+		INFO(m_isLanding) = false;
+
+		m_fVacuumTime += fTimeDelta;
+
+		if (m_VacuumControl == VACUUM_VACUUMSTART)
+		{
+			Change_State(STATE_INHALESTART, 60.f, false, false, BODY_VACUUM);
+
+			if (m_pModelCom[INFO(m_eBodyState)]->IsFinished())
+			{
+				m_VacuumControl = VACUUM_VACUUM;
+			}
+		}
+		else if (m_VacuumControl == VACUUM_VACUUM)
+		{
+			// 공중에서 흡수를 발동하였을 경우, 땅에 닿는 순간 JumpVacuum 은 쓸모없어지고 땅에 닿는 순간 m_bLandingVacuum이 활성화된다.
+			if (m_bJumpVacuum == true)
+			{
+				Change_State(STATE_INHALEFALL, 50.f, true, true, BODY_VACUUM);
+
+				if (m_pControllerCom->Is_Terrain())
+				{
+					m_bLandingVacuum = true;
+					m_bJumpVacuum = false;
+				}
+			}
+			// 땅에 닿았을 때, 잠깐 발동하는 Landing Anim함수이다.
+			else if (m_bLandingVacuum == true)
+			{
+				Change_State(STATE_INHALELANDING, 50.f, false, true, BODY_VACUUM);
+
+				if (m_pModelCom[INFO(m_eBodyState)]->IsFinished())
+				{
+					m_bLandingVacuum = false;
+				}
+			}
+			// 조작중일땐, 걸어가자.
+			else if (INFO(m_isController) == true)
+				Change_State(STATE_INHALEWALK, 50.f, true, true, BODY_VACUUM);
+			else
+				Change_State(STATE_INHALE, 50.f, true, true, BODY_VACUUM);
+
+			// 만약, 1.2초 이상 흡수를 시도한다면, SUPERVACUUM으로 바뀐다.
+			if (m_fVacuumTime > 1.2f)
+			{
+				if (INFO(m_isController) == true)
+					m_VacuumControl = VACUUM_SUPERVACUUM;
+				else
+					m_VacuumControl = VACUUM_SUPERVACUUMSTART;
+			}
+		}
+		else if (m_VacuumControl == VACUUM_SUPERVACUUMSTART)
+		{
+			INFO(m_eEyeState) = EYE_IDLE;
+
+			// 우와아아아 하는거
+			if (INFO(m_isController) == false)
+			{
+				Change_State(STATE_SUPERINHALESTART, 60.f, false, true, BODY_VACUUM);
+			}
+
+			// 조작하거나 하면 바로 SUPERVACUUM으로 넘어감.
+			if (INFO(m_isController) == true || m_pModelCom[INFO(m_eBodyState)]->IsFinished())
+			{
+				m_VacuumControl = VACUUM_SUPERVACUUM;
+			}
+		}
+		else if (m_VacuumControl == VACUUM_SUPERVACUUM)
+		{
+			INFO(m_eEyeState) = EYE_CLOSE;
+
+			// 조작중이면
+			if (INFO(m_isController) == true)
+			{
+				Change_State(STATE_SUPERINHALEWALK, 50.f, true, true, BODY_VACUUM);
+			}
+			else
+			{
+				Change_State(STATE_SUPERINHALE, 50.f, true, true, BODY_VACUUM);
+			}
+
+			if (m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_UP) ||
+				m_pGameInstance->Get_DIKeyState(DIK_DOWN, KEY_UP) || 
+				m_pGameInstance->Get_DIKeyState(DIK_RIGHT, KEY_UP) || 
+				m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_UP))
+			{
+				m_VacuumControl = VACUUM_SUPERVACUUMSTART;
+			}
+		}
+	}
+	// 흡수 종료 (Vacuum 중이였다!)
+	else if (INFO(m_isVacuum) == true)
+	{
+		Change_State(STATE_INHALEEND, 100.f, false, false, BODY_VACUUM);
+
+		if (m_pModelCom[INFO(m_eBodyState)]->IsFinished())
+		{
+			m_VacuumControl = VACUUM_VACUUMSTART;
+			m_fVacuumTime = 0.f;
+			m_fVacuumDelay = 0.f;
+			// isVacuum이 꺼짐으로서, 비로소 IDLE 상태로 복귀한다. (or) Eat일수도 있다.
+			INFO(m_isVacuum) = false;
+
+			//IDLE로 가면서 방향 보간되는거도 막기
+			INFO(m_vTargetDir) = INFO(m_vMoveDir);
+
+			// 최소로 흡수해주는 부울 값
+			m_bminVacuum = false;
+
+			if (m_bJumpVacuum == true)
+			{
+				m_bJumpVacuum = false;
+			}
+
+		}
+	}
+}
+
 HRESULT CKirby::Add_Components()
 {
 	HRESULT hr;
@@ -681,7 +941,7 @@ HRESULT CKirby::Add_Components()
 
 	#pragma region Kirby Mouth
 		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_base"),
-			TEXT("Com_Texture_Mouth_Idle"), (CComponent**)&m_pMouthTexture[MONTH_IDLE]);
+			TEXT("Com_Texture_Mouth_Idle"), (CComponent**)&m_pMouthTexture[MOUTH_IDLE]);
 		CHECK_FAILED(hr);
 		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_anger"),
 			TEXT("Com_Texture_Mouth_Anger"), (CComponent**)&m_pMouthTexture[MOUTH_ANGER]);
@@ -834,9 +1094,26 @@ void CKirby::SetUp_FSM()
 	m_pFSM->Add_State(STATE_EATJUMP, CKirbyBalloon_Jump_State::Create());
 	m_pFSM->Add_State(STATE_EATLANDING, CKirbyBalloon_Jump_State::Create());
 
+	m_pFSM->Add_State(STATE_FLIGHTSTART, CKirbyBalloon_Fly_State::Create());
+	m_pFSM->Add_State(STATE_FLIGHTFALL, CKirbyBalloon_Fly_State::Create());
+	m_pFSM->Add_State(STATE_FLIGHT, CKirbyBalloon_Fly_State::Create());
+	m_pFSM->Add_State(STATE_FLIGHTLANDING, CKirbyBalloon_Fly_State::Create());
+	m_pFSM->Add_State(STATE_FLIGHTLIMIT, CKirbyBalloon_Fly_State::Create());
+	m_pFSM->Add_State(STATE_FLIGHTLIMITFALL, CKirbyBalloon_Fly_State::Create());
+
 	// Vacuum
 	m_pFSM->Add_State(STATE_SPIT, CKirbyVacuum_Spit_State::Create());
 
+	m_pFSM->Add_State(STATE_INHALESTART, CKirbyVacuum_Vacuum_State::Create());
+	m_pFSM->Add_State(STATE_INHALEEND, CKirbyVacuum_Vacuum_State::Create());
+	m_pFSM->Add_State(STATE_INHALEFALL, CKirbyVacuum_Vacuum_State::Create());
+	m_pFSM->Add_State(STATE_INHALE, CKirbyVacuum_Vacuum_State::Create());
+	m_pFSM->Add_State(STATE_INHALELANDING, CKirbyVacuum_Vacuum_State::Create());
+	m_pFSM->Add_State(STATE_SUPERINHALE, CKirbyVacuum_Vacuum_State::Create());
+	m_pFSM->Add_State(STATE_SUPERINHALESTART, CKirbyVacuum_Vacuum_State::Create());
+
+	m_pFSM->Add_State(STATE_INHALEWALK, CKirbyVacuum_VacuumWalk_State::Create());
+	m_pFSM->Add_State(STATE_SUPERINHALEWALK, CKirbyVacuum_VacuumWalk_State::Create());
 
 
 	// 상태 Initialize

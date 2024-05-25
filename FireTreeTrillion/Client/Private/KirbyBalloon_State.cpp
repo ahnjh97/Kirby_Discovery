@@ -184,10 +184,86 @@ void CKirbyBalloon_Fly_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _
 
 void CKirbyBalloon_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
+	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+
+	Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
+
+	if (Kirbydesc->m_isController == true)
+	{
+		Fly_Moving_Logic(Kirbydesc, pTransformCom, pController, fTimeDelta);
+	}
+	else
+	{
+		Fly_Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
+	}
+
+	Kirbydesc->m_eMouthState = CKirby::MOUTH_ANGER;
+
+	if (pKirby->Get_State() == CKirby::STATE_FLIGHTSTART)
+	{
+		Kirbydesc->m_eEyeState = CKirby::EYE_IDLE;
+
+		Kirbydesc->m_fJumpVelocity -= GRAVITY * fTimeDelta;
+		if (Kirbydesc->m_fJumpVelocity < -2.f)
+			Kirbydesc->m_fJumpVelocity = -2.f;
+		pController->Jump(pTransformCom, Kirbydesc->m_fJumpVelocity, fTimeDelta);
+	}
+	else if (pKirby->Get_State() == CKirby::STATE_FLIGHTFALL)
+	{
+		Kirbydesc->m_eEyeState = CKirby::EYE_IDLE;
+
+		Kirbydesc->m_fJumpVelocity -= GRAVITY * fTimeDelta;
+		if (Kirbydesc->m_fJumpVelocity < -2.f)
+			Kirbydesc->m_fJumpVelocity = -2.f;
+
+		pController->Jump(pTransformCom, Kirbydesc->m_fJumpVelocity, fTimeDelta);
+	}
+	else if (pKirby->Get_State() == CKirby::STATE_FLIGHT)
+	{
+		Kirbydesc->m_eEyeState = CKirby::EYE_IDLE;
+
+		Kirbydesc->m_fJumpVelocity -= GRAVITY * fTimeDelta;
+		if (Kirbydesc->m_fJumpVelocity < -2.f)
+			Kirbydesc->m_fJumpVelocity = -2.f;
+
+		pController->Jump(pTransformCom, Kirbydesc->m_fJumpVelocity, fTimeDelta);
+	}
+	else if (pKirby->Get_State() == CKirby::STATE_FLIGHTLIMIT)
+	{
+		Kirbydesc->m_eEyeState = CKirby::EYE_CLOSE;
+
+		Kirbydesc->m_fJumpVelocity -= GRAVITY * fTimeDelta;
+		if (Kirbydesc->m_fJumpVelocity < -2.f)
+			Kirbydesc->m_fJumpVelocity = -2.f;
+
+		pController->Jump(pTransformCom, Kirbydesc->m_fJumpVelocity, fTimeDelta);
+	}
+	else if (pKirby->Get_State() == CKirby::STATE_FLIGHTLIMITFALL)
+	{
+		Kirbydesc->m_eEyeState = CKirby::EYE_IDLE;
+
+		Kirbydesc->m_fJumpVelocity -= GRAVITY * fTimeDelta;
+		if (Kirbydesc->m_fJumpVelocity < -2.f)
+			Kirbydesc->m_fJumpVelocity = -2.f;
+
+		pController->Jump(pTransformCom, Kirbydesc->m_fJumpVelocity, fTimeDelta);
+	}
+	else if (pKirby->Get_State() == CKirby::STATE_FLIGHTLANDING)
+	{
+
+	}
 }
 
 void CKirbyBalloon_Fly_State::OnStateExit()
 {
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+
+	Kirbydesc->m_eEyeState = CKirby::EYE_IDLE;
+	Kirbydesc->m_eMouthState = CKirby::MOUTH_IDLE;
 }
 
 CKirbyBalloon_Fly_State* CKirbyBalloon_Fly_State::Create()
