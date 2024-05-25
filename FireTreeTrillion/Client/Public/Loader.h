@@ -37,7 +37,7 @@ private:
 	HRESULT Loading_For_Tool_UI();
 	HRESULT Loading_For_Tool_FX();
 	HRESULT Loading_For_Tool_Anim();
-	//HRESULT Loading_For_Tool_Map();
+	HRESULT Loading_For_Tool_Map();
 
 	// 240518
 	HRESULT Add_Models(LEVEL eLevel);
@@ -48,6 +48,9 @@ private:
 
 	HRESULT Add_Texture(LEVEL eLevel, string strPrototypeName, string strFolderAndFileName, _uint iNumTextures = 1);
 	HRESULT Add_KirbyFaceTexture(LEVEL eLevel);
+
+	HRESULT Add_AllModelTxts(LEVEL eLevel, TYPE eType);
+	void TraverseModelTxts(const wstring& rootFolderPath, list<wstring>& fileList);
 
 private:
 	ID3D11Device*				m_pDevice = { nullptr };

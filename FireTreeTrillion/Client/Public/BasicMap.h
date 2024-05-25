@@ -9,18 +9,12 @@ END
 
 BEGIN(Client)
 
-class CMap_Stage1 final : public CGameObject
+class CBasicMap final : public CGameObject
 {
-public:
-	typedef struct : public GAMEOBJECT_DESC
-	{
-		vector<_uint> iPassIndices; // 메쉬마다의 쉐이더 Pass 인덱스 지정을 위한 vector (필요없을수도 있음)
-	}MAP_DESC;
-
 private:
-	CMap_Stage1(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CMap_Stage1(const CMap_Stage1& rhs);
-	virtual ~CMap_Stage1() = default;
+	CBasicMap(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CBasicMap(const CBasicMap& rhs);
+	virtual ~CBasicMap() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -32,9 +26,10 @@ public:
 private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
-	CGameObject* m_pBlendMap = { nullptr }; // AlphaBlend로 그려야 하는 맵 메쉬들을 모아놓은 PartObject
+	CGameObject* m_pBlendMap = { nullptr }; 
 
 	vector<_uint> m_vecPassIndices;
+	vector<_float> m_vecSamplingFactors;
 	CRenderer::RENDERGROUP m_eRenderGroup = { CRenderer::RENDER_NONBLEND };
 
 private:
@@ -42,8 +37,10 @@ private:
 	HRESULT Bind_ShaderResources();
 	HRESULT Add_BlendMap(const wstring& _wstrModelTag);
 
+	void SetUpShaderInfo(const wstring& _wstrModelTag);
+		
 public:
-	static CMap_Stage1* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CBasicMap* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 
