@@ -47,6 +47,7 @@ public:
 	PxVec3			Compute_Slope(CTransform* pTransform);									// 경사면의 노말벡터 계산
 	_float			Compute_Height();														// 경사면의 노말벡터 계산
 	PxVec3			Compute_TerrainPosition();
+	_vector			Compute_TerrainPosition_Vector();
 	PxVec3			TerrainRayCast_Collision(PxVec3 _rayOrigin, PxVec3 _rayDirection, _float _fMaxDistance);
 
 	// 이동용, 기본 중력없기 때문에 이 함수로 중력 만들어 줄 것
@@ -84,7 +85,7 @@ protected:
 	_float							m_fFallVelocity = { 0.f };
 	_float							m_fFallAcceleration = { 0.f };
 
-	_float							m_fOffset = { 0.5f };
+	_float							m_fOffset = { 0.f };
 
 public:
 	static	CCharacterController*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

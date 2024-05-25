@@ -77,11 +77,23 @@ private:
 	void			Setting_KirbyBalance();
 	void			Key_Input(_float fTimeDelta);
 	void			JoyStick_Input(_float fTimeDelta);
-	// 일반 움직임을 할 수 있는 상황이여야 하니, 전부 false 여야 true를 반환하여야 한다.
+	// 일반 움직임을 할 수 있는 상황이여야 하니, 전부 false 여야 true를 반환하여야 한다. 또한 아이들로 가는거도 막아줌!
 	_bool			Can_JoyStickUsing() { 
-		return !m_tKirbyInfo.m_isJump && !m_tKirbyInfo.m_isLanding;
+		return !m_tKirbyInfo.m_isJump && !m_tKirbyInfo.m_isLanding && !m_bFreeFall && !m_bIsEatingAnim
+			&& !m_IsSpit;
 	}
+	_bool			Can_ZXCVUsing() {
+		return !m_IsSpit;
+	}
+	// 바닥에 닿았을 때, 상시 초기화해주어야 하는 것들.
+	void			Terrain_ResetLogic();
+
 	void			ZXCV_Input(_float fTimeDelta);
+	void			Z_Input(_float fTimeDelta);
+	void			X_Input(_float fTimeDelta);
+	void			C_Input(_float fTimeDelta);
+	void			V_Input(_float fTimeDelta);
+
 	void			Kirby_SystemTick(_float fTimeDelta);
 
 	void			Idle_Animation(_float fTimeDelta);
@@ -96,8 +108,17 @@ private:
 	_float			m_fChangeVelocityZeroTime = { 0.f };
 	_float			m_fHoldAirTime = { 0.f };
 	_float			m_fChangeRunTime = { 0.f };
-	_float			m_fOffset = { 0.f };			// 점프 오프셋 -> 준수
 	_bool			m_bRePressBlock = { false };
+	_bool			m_bFreeFall = { false };
+
+	void			Kirby_Eat(_float fTimeDelta);
+	// 먹는 순간적인 애니메이션이 연출되는 부울 값
+	_bool			m_bIsEatingAnim = { false };
+	_bool			m_IsEat = { false };
+	// 뱉는 순간이다.
+	_bool			m_IsSpit = { false };
+	// 만약, 공중에서 뱉었을 경우 Jump Anim 으로 가는 것을 막아야 하기 때문에 필요한 부울 값이다.
+	_bool			m_bJumpSpiting = { false };
 
 
 private:
@@ -108,8 +129,9 @@ private:
 
 	// FSM
 	void			SetUp_FSM();
-	void			Change_State(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
-	// Player FSM 및 Jump 관련 변수들
+	void			Change_State(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, BODYSTATE eBody);
+
+
 	CFSM*			m_pFSM = { nullptr };
 
 private:

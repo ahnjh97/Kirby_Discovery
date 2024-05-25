@@ -282,6 +282,11 @@ PxVec3 CCharacterController::Compute_TerrainPosition()
 		return PxVec3(0.0f, 0.0f, 0.0f);
 }
 
+_vector CCharacterController::Compute_TerrainPosition_Vector()
+{
+	return XMVectorSetW(CUtils::To_Vector(Compute_TerrainPosition()), 1.f);
+}
+
 /// <summary>
 /// 1. 'Character의 특정 위치'에서 지면으로부터 rayCast를 실행한다.
 /// 2. rayCast로 'Terrain의 노말벡터'를 뽑는다.
@@ -366,7 +371,7 @@ void CCharacterController::Create_Controller()
 
 	PxCapsuleControllerDesc capsuleDesc;
 	capsuleDesc.position = PxExtendedVec3(0.f, 20.f, 0.f);
-	capsuleDesc.radius = 0.5f; // 반지름
+	capsuleDesc.radius = 0.05f; // 반지름
 	capsuleDesc.height = 0.1f; // 높이
 	capsuleDesc.stepOffset = 0.f;
 	capsuleDesc.volumeGrowth = 1.0f;

@@ -4,6 +4,9 @@
 #include "Camera_Free.h"
 
 #include "KirbyDefault_State.h"
+#include "KirbyBalloon_State.h"
+#include "KirbyVacuum_State.h"
+
 
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -77,13 +80,15 @@ _int CKirby::Tick(_float fTimeDelta)
 	SetOn_Slope(fTimeDelta);
 	// 키 입력에 대한 상태처리
 	Key_Input(fTimeDelta);
-
 	// 점프
 	Kirby_Jump(fTimeDelta);
+	// 커비의 먹는 로직들
+	Kirby_Eat(fTimeDelta);
 
 	// 유틸업데이트가 들어가있다.
 	//****** FSM Update, Shadow ChaseUpdate, IdleResetUpdate ******//
 	Kirby_SystemTick(fTimeDelta);
+
 
 	return OBJ_NOEVENT;
 }
@@ -91,12 +96,6 @@ _int CKirby::Tick(_float fTimeDelta)
 void CKirby::Late_Tick(_float fTimeDelta)
 {
 	m_pModelCom[INFO(m_eBodyState)]->Play_Animation(fTimeDelta);
-
-	_vector vPos = XMVectorSetW(CUtils::To_Vector(m_pControllerCom->Compute_TerrainPosition()), 1.f);
-	if (true == m_pControllerCom->Is_Terrain())
-	{
-		int a = 10;
-	}
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
@@ -153,9 +152,11 @@ void CKirby::Render_IMGUI()
 		ImGui::TreePop();
 	}
 
-	ImGui::Text("RePress : %d", m_bRePressBlock);
-	ImGui::Text("Land : %d", INFO(m_isLanding));
+	ImGui::Text("JumpSpiting : %d", m_bJumpSpiting);
+	ImGui::Text("m_IsSpit : %d", m_IsSpit);
+	ImGui::Text("m_IsEat : %d", m_IsEat);
 
+	ImGui::Text("Land : %d", INFO(m_isLanding));
 	ImGui::Text("JUMP : %d", INFO(m_isJump));
 	ImGui::Text("Velocity : %.2f", INFO(m_fJumpVelocity));
 	ImGui::Text("Input C? : %d", m_pGameInstance->Get_DIKeyState(DIK_C, KEY_PRESS));
@@ -210,12 +211,11 @@ void CKirby::Setting_KirbyBalance()
 
 void CKirby::Key_Input(_float fTimeDelta)
 {
-
 	JoyStick_Input(fTimeDelta);
 	ZXCV_Input(fTimeDelta);
 
-
 #pragma region 커비 연구소 (애니메이션 제어)
+
 	//Test
 	if (m_pGameInstance->Get_DIKeyState(DIK_P, KEY_DOWN))
 	{
@@ -272,7 +272,12 @@ void CKirby::JoyStick_Input(_float fTimeDelta)
 			INFO(m_vTargetDir) = Make_TargetDir(DIR_FRONT);
 
 		if (Can_JoyStickUsing())
-			m_pFSM->ChangeState(STATE_RUN, 100.f, true, true);
+		{
+			if (m_IsEat)
+				Change_State(STATE_EATRUN, 100.f, true, true, BODY_BALLOON);
+			else
+				Change_State(STATE_RUN, 100.f, true, true, BODY_DEFAULT);
+		}
 
 	}
 	else if (m_pGameInstance->Get_DIKeyState(DIK_DOWN, KEY_PRESS))
@@ -287,15 +292,26 @@ void CKirby::JoyStick_Input(_float fTimeDelta)
 			INFO(m_vTargetDir) = Make_TargetDir(DIR_BACK);
 
 		if (Can_JoyStickUsing())
-			m_pFSM->ChangeState(STATE_RUN, 100.f, true, true);
+		{
+			if (m_IsEat)
+				Change_State(STATE_EATRUN, 100.f, true, true, BODY_BALLOON);
+			else
+				Change_State(STATE_RUN, 100.f, true, true, BODY_DEFAULT);
+		}
 	}
 	else if (m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_PRESS))
 	{
 		INFO(m_isController) = true;
 
 		INFO(m_vTargetDir) = Make_TargetDir(DIR_LEFT);
+
 		if (Can_JoyStickUsing())
-			m_pFSM->ChangeState(STATE_RUN, 100.f, true, true);
+		{
+			if (m_IsEat)
+				Change_State(STATE_EATRUN, 100.f, true, true, BODY_BALLOON);
+			else
+				Change_State(STATE_RUN, 100.f, true, true, BODY_DEFAULT);
+		}
 
 	}
 	else if (m_pGameInstance->Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
@@ -303,26 +319,76 @@ void CKirby::JoyStick_Input(_float fTimeDelta)
 		INFO(m_isController) = true;
 
 		INFO(m_vTargetDir) = Make_TargetDir(DIR_RIGHT);
-		if (Can_JoyStickUsing())
-			m_pFSM->ChangeState(STATE_RUN, 100.f, true, true);
 
+		if (Can_JoyStickUsing())
+		{
+			if (m_IsEat)
+				Change_State(STATE_EATRUN, 100.f, true, true, BODY_BALLOON);
+			else
+				Change_State(STATE_RUN, 100.f, true, true, BODY_DEFAULT);
+		}
 	}
 	else
 	{
 		INFO(m_isController) = false;
 
+		// 평범한 상태라면
 		if (Can_JoyStickUsing())
 		{
+			// 먹고 있는 상태의 아이들
+			if (m_IsEat)
+				Change_State(STATE_EATWAIT, 100.f, true, true, BODY_BALLOON);
 			// Idle상태에서 대기하는 귀여운 상황들을 연출한다.
-			Idle_Animation(fTimeDelta);
+			else
+				Idle_Animation(fTimeDelta);
 		}
-
 	}
+}
+
+void CKirby::Terrain_ResetLogic()
+{
+	//m_bJumpSpiting = false;
+
 }
 
 void CKirby::ZXCV_Input(_float fTimeDelta)
 {
+	// ZXCV 를 누를 자격이 없다면 리턴한다.
+	if (Can_ZXCVUsing() == false)
+		return;
 
+	Z_Input(fTimeDelta);
+	X_Input(fTimeDelta);
+	C_Input(fTimeDelta);
+	V_Input(fTimeDelta);
+
+}
+
+void CKirby::Z_Input(_float fTimeDelta)
+{
+}
+
+void CKirby::X_Input(_float fTimeDelta)
+{
+	// 먹은 상태에서 X 키를 눌러 발사하는 로직이다. 발싸!!!
+	if (m_IsEat == true && m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
+	{
+		Change_State(STATE_SPIT, 100.f, false, false, BODY_VACUUM);
+		m_IsSpit = true;
+
+		// 랜딩모션일 경우, 바로 캔슬되고 뱉는다.
+		m_tKirbyInfo.m_isLanding = false;
+		m_IsEat = false;
+
+		// 만약, 점프 중에 발사를 했다면, 점프 애니메이션을 통제하여야 한다.
+		if (m_tKirbyInfo.m_isJump == true)
+			m_bJumpSpiting = true;
+	}
+
+}
+
+void CKirby::C_Input(_float fTimeDelta)
+{
 	// 점프 중이 아닐 때
 	if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN) && INFO(m_isJump) != true)
 	{
@@ -392,6 +458,12 @@ void CKirby::ZXCV_Input(_float fTimeDelta)
 			}
 		}
 	}
+
+}
+
+void CKirby::V_Input(_float fTimeDelta)
+{
+
 }
 
 void CKirby::SetOn_Slope(_float fTimeDelta)
@@ -399,7 +471,7 @@ void CKirby::SetOn_Slope(_float fTimeDelta)
 	// 지면의 up벡터
 	PxVec3 slope = m_pControllerCom->Compute_Slope(m_pTransformCom);
 	_vector vTerrainNormal = CUtils::To_Vector(slope);
-	Lerp_UpVector(vTerrainNormal, 10.f, fTimeDelta);
+	Lerp_UpVector(vTerrainNormal, 20.f, fTimeDelta);
 }
 
 void CKirby::Lerp_UpVector(_fvector _vTargetUp, _float _maxAngle, _float fTimeDelta)
@@ -429,27 +501,57 @@ void CKirby::Lerp_UpVector(_fvector _vTargetUp, _float _maxAngle, _float fTimeDe
 
 void CKirby::Kirby_Jump(_float fTimeDelta)
 {
-	// 점프 중일 때
+	// 점프 중일 때를 담당한다.
 	if (true == INFO(m_isJump))
 	{
+		if (m_bJumpSpiting)
+			return;
+
 		if (m_fJumpHoldTime > 0.3f)
 		{
-			m_pFSM->ChangeState(STATE_JUMPEND, 60.f, false, true);
+			// 만약 먹은 상태였다면
+			if(m_IsEat == true)
+				Change_State(STATE_EATJUMP, 50.f, false, true, BODY_BALLOON);
+			else
+				Change_State(STATE_JUMPEND, 60.f, false, true, BODY_DEFAULT);
 		}
 		else
-			m_pFSM->ChangeState(m_eJumpState, 50.f, false, true);
+		{
+			// 만약 먹은 상태였다면
+			if (m_IsEat == true)
+				Change_State(STATE_EATJUMP, 50.f, false, true, BODY_BALLOON);
+			else
+				Change_State(m_eJumpState, 50.f, false, true, BODY_DEFAULT);
+		}
 	}
-	// 착지했다면,
+	// 착지했을 때를 담당한다.
 	else if (true == INFO(m_isLanding))
 	{
 		// 최소 애니메이션이 재생되는 시간이다. ( 방향키를 누르면 0.2초 후 바로 Run 상태가 됨 )
 		_float fChangeRunTime = 0.08f;
+		switch (INFO(m_eBodyState))
+		{
+		case BODY_DEFAULT:
+			fChangeRunTime = 0.08f;
+			break;
+		case BODY_BALLOON:
+			fChangeRunTime = 0.15f;
+			break;
+		}
+
 		m_fChangeRunTime += fTimeDelta;
 
-		if (m_fJumpHoldTime > 0.2f)
-			m_pFSM->ChangeState(STATE_LANDINGEND, 30.f, false, false);
+		// 만약 먹은 상태였다면
+		if (m_IsEat == true)
+			Change_State(STATE_EATLANDING, 50.f, false, false, BODY_BALLOON);
+		// Default 상태였다면
 		else
-			m_pFSM->ChangeState(STATE_LANDINGSMALL, 50.f, false, false);
+		{
+			if (m_fJumpHoldTime > 0.2f)
+				Change_State(STATE_LANDINGEND, 30.f, false, false, BODY_DEFAULT);
+			else
+				Change_State(STATE_LANDINGSMALL, 50.f, false, false, BODY_DEFAULT);
+		}
 
 		// 바로 방향키를 갈겼다면
 		if (m_fChangeRunTime > fChangeRunTime && INFO(m_isController))
@@ -470,8 +572,63 @@ void CKirby::Kirby_Jump(_float fTimeDelta)
 	// 이럴때 떨어지는 애니메이션이 재생되어야 할 것이다.
 	else
 	{
+		//Terrain_ResetLogic();
 
-		m_pControllerCom->FreeFall(m_pTransformCom, fTimeDelta, INFO(m_fGravityOffset));
+		// 자유낙하가 아니면서, 1보다 높은 지형에 올라갔을 때 발동된다. Fall 발동
+		if (m_pControllerCom->Compute_Height() > 2.f && m_bFreeFall == false)
+			m_bFreeFall = true;
+		
+		// 자유낙하일 경우 FALL 애니메이션이 발동되고, 터레인 지형에 닿았을 때 비로소 탈출한다.
+		if (m_bFreeFall == true)
+		{
+			// 먹은 상태였다면, FALL 애니메이션은 없다.
+			if (m_IsEat == true)
+				Change_State(STATE_EATJUMP, 50.f, false, true, BODY_BALLOON);
+			else
+				Change_State(STATE_FALL, 50.f, false, true, BODY_DEFAULT);
+
+			if (true == m_pControllerCom->Is_Terrain())
+			{
+				m_bFreeFall = false;
+				INFO(m_isLanding) = true;
+			}
+		}
+		// 자유낙하 이후 바닥에 닿았으면 Anim Idle로 자유낙하 (지형을 타기) 한다.
+		else if (m_bFreeFall == false)
+			m_pControllerCom->FreeFall(m_pTransformCom, fTimeDelta, INFO(m_fGravityOffset));
+	}
+
+}
+
+void CKirby::Kirby_Eat(_float fTimeDelta)
+{
+	// 테스트 (먹었을 때 0.1초정도간 발생하는 애니메이션 로직, 추후 수정)
+	if (m_pGameInstance->Get_DIKeyState(DIK_I, KEY_DOWN))
+	{
+		//INFO(m_eBodyState) == BODY_DEFAULT ? INFO(m_eBodyState) = BODY_BALLOON : INFO(m_eBodyState) = BODY_DEFAULT;
+		Change_State(STATE_EAT, 100.f, false, false, BODY_BALLOON);
+		m_bIsEatingAnim = true;
+	}
+
+	// 먹고 나서 BALLOON 상태로 유지되게 하는 로직이다. 
+	if (m_bIsEatingAnim == true && m_pModelCom[INFO(m_eBodyState)]->IsFinished())
+	{
+		m_bIsEatingAnim = false;
+		// 이제부터 먹은 상태이다.
+		m_IsEat = true;
+	}
+
+	// 뱉고 나서 다시 날씬해진다. Default로 돌아가야 해.
+	if (m_IsSpit == true && m_pModelCom[INFO(m_eBodyState)]->IsFinished())
+	{
+		m_IsSpit = false;
+
+		// 공중에서 만약, 뱉었다면..
+		if (m_bJumpSpiting == true)
+		{
+			Change_State(STATE_FALL, 100.f, false, false, BODY_DEFAULT);
+			m_bJumpSpiting = false;
+		}
 	}
 
 }
@@ -585,7 +742,7 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 	}
 	// Default 상태의 눈 부위 // Vacuum 상태의 눈 부위 // Balloon 상태의 눈 부위
 	else if ((_eBodyState == BODY_DEFAULT && _iMeshIndex == 3) ||
-		(_eBodyState == BODY_VACUUM && _iMeshIndex == 0) ||
+		(_eBodyState == BODY_VACUUM && _iMeshIndex == 2) ||
 		(_eBodyState == BODY_BALLOON && _iMeshIndex == 3))
 	{
 		m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
@@ -607,9 +764,8 @@ void CKirby::Idle_Animation(_float fTimeDelta)
 	// 5초 마다, 아이들 상태에서 어떤 행동을 한다.
 	if (m_fIdleStreachTime > 5.f)
 	{
-		m_iIdleChoose == 0 ?
-			m_pFSM->ChangeState(STATE_IDLESTREACH, 60.f, false, true) :
-			m_pFSM->ChangeState(STATE_IDLELOOKAROUND, 60.f, false, true);
+		m_iIdleChoose == 0 ? Change_State(STATE_IDLESTREACH, 60.f, false, true, BODY_DEFAULT) 
+			: Change_State(STATE_IDLELOOKAROUND, 60.f, false, true, BODY_DEFAULT);
 
 		if (m_pModelCom[INFO(m_eBodyState)]->IsFinished())
 		{
@@ -619,7 +775,7 @@ void CKirby::Idle_Animation(_float fTimeDelta)
 	}
 	else
 	{
-		m_pFSM->ChangeState(STATE_IDLE, 60.f, true, true);
+		Change_State(STATE_IDLE, 60.f, true, true, BODY_DEFAULT);
 		INFO(m_eEyeState) = EYE_IDLE;
 	}
 
@@ -654,9 +810,9 @@ _float4 CKirby::Make_TargetDir(DIR _eDir)
 
 void CKirby::SetUp_FSM()
 {
-
-	// FSM 상태 초기화
 	m_pFSM = CFSM::Create();
+
+	// Default
 	m_pFSM->Add_State(STATE_IDLE, CKirbyDefault_Idle_State::Create());
 	m_pFSM->Add_State(STATE_IDLESTREACH, CKirbyDefault_Idle_State::Create());
 	m_pFSM->Add_State(STATE_IDLELOOKAROUND, CKirbyDefault_Idle_State::Create());
@@ -666,25 +822,44 @@ void CKirby::SetUp_FSM()
 	m_pFSM->Add_State(STATE_JUMPL, CKirbyDefault_Jump_State::Create());
 	m_pFSM->Add_State(STATE_JUMPR, CKirbyDefault_Jump_State::Create());
 	m_pFSM->Add_State(STATE_JUMPEND, CKirbyDefault_Jump_State::Create());
-	m_pFSM->Add_State(STATE_JUMPFALL, CKirbyDefault_Jump_State::Create());//
-	m_pFSM->Add_State(STATE_LANDINGEND, CKirbyDefault_Jump_State::Create());//
-	m_pFSM->Add_State(STATE_LANDINGSMALL, CKirbyDefault_Jump_State::Create());//
+	m_pFSM->Add_State(STATE_JUMPFALL, CKirbyDefault_Jump_State::Create());
+	m_pFSM->Add_State(STATE_LANDINGEND, CKirbyDefault_Jump_State::Create());
+	m_pFSM->Add_State(STATE_LANDINGSMALL, CKirbyDefault_Jump_State::Create());
+	m_pFSM->Add_State(STATE_FALL, CKirbyDefault_Jump_State::Create());
 
-	m_pFSM->Add_State(STATE_FALL, CKirbyDefault_Jump_State::Create());//
+	// Balloon
+	m_pFSM->Add_State(STATE_EAT, CKirbyBalloon_Idle_State::Create());
+	m_pFSM->Add_State(STATE_EATWAIT, CKirbyBalloon_Idle_State::Create());
+	m_pFSM->Add_State(STATE_EATRUN, CKirbyBalloon_Run_State::Create());
+	m_pFSM->Add_State(STATE_EATJUMP, CKirbyBalloon_Jump_State::Create());
+	m_pFSM->Add_State(STATE_EATLANDING, CKirbyBalloon_Jump_State::Create());
+
+	// Vacuum
+	m_pFSM->Add_State(STATE_SPIT, CKirbyVacuum_Spit_State::Create());
+
+
 
 	// 상태 Initialize
-	CFSM::FSM_INFO		FSM_Desc = {};
-	FSM_Desc.iState = STATE_IDLE;
-	FSM_Desc.pModel = m_pModelCom[BODY_DEFAULT];
-	m_pFSM->Initialize(&FSM_Desc);
+	CFSM::FSM_INFO		FSM_Default_Desc = {};
+	FSM_Default_Desc.iState = STATE_IDLE;
+	FSM_Default_Desc.pModel = m_pModelCom[BODY_DEFAULT];
+	m_pFSM->Initialize(&FSM_Default_Desc);
 
-	// 셋업
+	CFSM::FSM_INFO		FSM_Balloon_Desc = {};
+	FSM_Balloon_Desc.iState = STATE_IDLE;
+	FSM_Balloon_Desc.pModel = m_pModelCom[BODY_BALLOON];
+	m_pFSM->Initialize(&FSM_Balloon_Desc);
 
+	CFSM::FSM_INFO		FSM_Vacuum_Desc = {};
+	FSM_Vacuum_Desc.iState = STATE_IDLE;
+	FSM_Vacuum_Desc.pModel = m_pModelCom[BODY_VACUUM];
+	m_pFSM->Initialize(&FSM_Vacuum_Desc);
 }
 
-void CKirby::Change_State(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CKirby::Change_State(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, BODYSTATE eBody)
 {
-	m_pFSM->ChangeState((_uint)eState, _fAnimSpeed, _bLoop, _bInterpolation);
+	INFO(m_eBodyState) = eBody;
+	m_pFSM->ChangeState((_uint)eState, _fAnimSpeed, _bLoop, _bInterpolation, INFO(m_eBodyState));
 }
 
 void CKirby::Kirby_SystemTick(_float fTimeDelta)

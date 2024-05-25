@@ -1,20 +1,22 @@
 #include "stdafx.h"
-#include "KirbyDefault_State.h"
+#include "KirbyBalloon_State.h"
 #include "Kirby_State_Function.h"
 
-#pragma region IDLE STATE
+#pragma region BALLOON IDLE STATE
 
-CKirbyDefault_Idle_State::CKirbyDefault_Idle_State()
+CKirbyBalloon_Idle_State::CKirbyBalloon_Idle_State()
 {
 }
 
-void CKirbyDefault_Idle_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CKirbyBalloon_Idle_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
 }
 
-void CKirbyDefault_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+void CKirbyBalloon_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
+	// 이건 알아서 모델이 바뀔 것이기 때문에, 딱히 조이스틱의 통제가 필요없다.
+
 	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
 	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
@@ -23,39 +25,41 @@ void CKirbyDefault_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 	Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
 	Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
 
-	if (pKirby->Get_State() == CKirby::STATE_IDLESTREACH)
-		Kirbydesc->m_eEyeState = CKirby::EYE_CLOSE;
 }
 
-void CKirbyDefault_Idle_State::OnStateExit()
+void CKirbyBalloon_Idle_State::OnStateExit()
 {
 }
 
-CKirbyDefault_Idle_State* CKirbyDefault_Idle_State::Create()
+CKirbyBalloon_Idle_State* CKirbyBalloon_Idle_State::Create()
 {
-	CKirbyDefault_Idle_State* pInstance = new CKirbyDefault_Idle_State();
+	CKirbyBalloon_Idle_State* pInstance = new CKirbyBalloon_Idle_State();
 	return pInstance;
 }
 
-void CKirbyDefault_Idle_State::Free()
+void CKirbyBalloon_Idle_State::Free()
 {
 	__super::Free();
 }
 
 #pragma endregion
 
+
+
+
+
 #pragma region RUN STATE
 
-CKirbyDefault_Run_State::CKirbyDefault_Run_State()
+CKirbyBalloon_Run_State::CKirbyBalloon_Run_State()
 {
 }
 
-void CKirbyDefault_Run_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CKirbyBalloon_Run_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
 }
 
-void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+void CKirbyBalloon_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
@@ -65,37 +69,42 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	Moving_Logic(Kirbydesc, pTransformCom, pController, fTimeDelta);
 	Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
 	Turn_Z_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
-}
-void CKirbyDefault_Run_State::OnStateExit()
-{
 
 }
 
-CKirbyDefault_Run_State* CKirbyDefault_Run_State::Create()
+void CKirbyBalloon_Run_State::OnStateExit()
 {
-	CKirbyDefault_Run_State* pInstance = new CKirbyDefault_Run_State();
+}
+
+CKirbyBalloon_Run_State* CKirbyBalloon_Run_State::Create()
+{
+	CKirbyBalloon_Run_State* pInstance = new CKirbyBalloon_Run_State();
 	return pInstance;
 }
 
-void CKirbyDefault_Run_State::Free()
+void CKirbyBalloon_Run_State::Free()
 {
 	__super::Free();
 }
 
 #pragma endregion
 
+
+
+
 #pragma region JUMP STATE
 
-CKirbyDefault_Jump_State::CKirbyDefault_Jump_State()
+CKirbyBalloon_Jump_State::CKirbyBalloon_Jump_State()
 {
+
 }
 
-void CKirbyDefault_Jump_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CKirbyBalloon_Jump_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
 }
 
-void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+void CKirbyBalloon_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
 	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
@@ -103,7 +112,7 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 
 	// 방향은 항상 보간한다.
-	if (pKirby->Get_State() == CKirby::STATE_LANDINGSMALL || pKirby->Get_State() == CKirby::STATE_LANDINGEND)
+	if (pKirby->Get_State() == CKirby::STATE_EATLANDING)
 		Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
 	else
 		Jump_Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
@@ -116,15 +125,14 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 	// 컨트롤러 손 안 대고 있을 때
 	else if (Kirbydesc->m_isController == false)
 	{
-		if (pKirby->Get_State() == CKirby::STATE_LANDINGSMALL || pKirby->Get_State() == CKirby::STATE_LANDINGEND)
+		if (pKirby->Get_State() == CKirby::STATE_EATLANDING)
 			Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
 		else
 			Jump_Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
 	}
 
 
-	if (pKirby->Get_State() == CKirby::STATE_JUMPL || pKirby->Get_State() == CKirby::STATE_JUMPR ||
-		pKirby->Get_State() == CKirby::STATE_JUMPEND || pKirby->Get_State() == CKirby::STATE_JUMPFALL)
+	if (pKirby->Get_State() == CKirby::STATE_EATJUMP)
 	{
 		Kirbydesc->m_fJumpVelocity -= GRAVITY * fTimeDelta * Kirbydesc->m_fGravityOffset;
 		Kirbydesc->m_isJump = pController->Jump(pTransformCom, Kirbydesc->m_fJumpVelocity, fTimeDelta);
@@ -142,23 +150,53 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 			}
 		}
 	}
-	else if (pKirby->Get_State() == CKirby::STATE_FALL)
-	{
-		pController->FreeFall(pTransformCom, fTimeDelta, Kirbydesc->m_fGravityOffset);
-	}
 }
 
-void CKirbyDefault_Jump_State::OnStateExit()
+void CKirbyBalloon_Jump_State::OnStateExit()
 {
 }
 
-CKirbyDefault_Jump_State* CKirbyDefault_Jump_State::Create()
+CKirbyBalloon_Jump_State* CKirbyBalloon_Jump_State::Create()
 {
-	CKirbyDefault_Jump_State* pInstance = new CKirbyDefault_Jump_State();
+	CKirbyBalloon_Jump_State* pInstance = new CKirbyBalloon_Jump_State();
 	return pInstance;
 }
 
-void CKirbyDefault_Jump_State::Free()
+void CKirbyBalloon_Jump_State::Free()
+{
+	__super::Free();
+}
+
+#pragma endregion
+
+
+
+#pragma region FLY STATE
+
+CKirbyBalloon_Fly_State::CKirbyBalloon_Fly_State()
+{
+}
+
+void CKirbyBalloon_Fly_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+}
+
+void CKirbyBalloon_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+}
+
+void CKirbyBalloon_Fly_State::OnStateExit()
+{
+}
+
+CKirbyBalloon_Fly_State* CKirbyBalloon_Fly_State::Create()
+{
+	CKirbyBalloon_Fly_State* pInstance = new CKirbyBalloon_Fly_State();
+	return pInstance;
+}
+
+void CKirbyBalloon_Fly_State::Free()
 {
 	__super::Free();
 }
