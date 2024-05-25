@@ -1,4 +1,5 @@
 #include "..\Public\VIBuffer_Instance.h"
+#include "GameInstance.h"
 
 CVIBuffer_Instance::CVIBuffer_Instance(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CVIBuffer{pDevice, pContext }
@@ -15,11 +16,25 @@ CVIBuffer_Instance::CVIBuffer_Instance(const CVIBuffer_Instance & rhs)
 	, m_pInstanceVertices{ rhs.m_pInstanceVertices }
 	, m_InstanceBufferDesc{ rhs.m_InstanceBufferDesc }
 	, m_InstanceSubResourceData { rhs.m_InstanceSubResourceData }	
-	, m_pSpeeds{ rhs.m_pSpeeds }
 	, m_InstanceDesc { rhs.m_InstanceDesc }
 {
 	m_pLifeTimes = new _float2[m_iNumInstance];
 	memcpy(m_pLifeTimes, rhs.m_pLifeTimes, sizeof(_float2) * m_iNumInstance);
+
+	m_pStartDelays = new _float[m_iNumInstance];
+	memcpy(m_pStartDelays, rhs.m_pStartDelays, sizeof(_float) * m_iNumInstance);
+
+	m_pDirections = new _float3[m_iNumInstance];
+	memcpy(m_pDirections, rhs.m_pDirections, sizeof(_float3) * m_iNumInstance);
+
+	m_pSpeeds = new _float[m_iNumInstance];
+	memcpy(m_pSpeeds, rhs.m_pSpeeds, sizeof(_float) * m_iNumInstance);
+
+	m_pColors = new _float3[m_iNumInstance];
+	memcpy(m_pColors, rhs.m_pColors, sizeof(_float3) * m_iNumInstance);
+
+	m_pAlphas = new _float[m_iNumInstance];
+	memcpy(m_pAlphas, rhs.m_pAlphas, sizeof(_float) * m_iNumInstance);
 
 	Safe_AddRef(m_pVBInstance);
 }
@@ -238,27 +253,89 @@ void CVIBuffer_Instance::Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceI
 
 		else
 		{
-			m_pLifeTimes[iInstanceIndex].x = 0.f;
-			pVertices[iInstanceIndex].vPosition = Compute_RandPosition();
+			Change_InstanceInfo(pVertices, iInstanceIndex);
 		}
 	}
 
 }
 
-void CVIBuffer_Instance::Update_InstanceInfo(const INSTANCE_DESC& _InstanceDesc)
+void CVIBuffer_Instance::Update_InstanceDesc(const INSTANCE_DESC& _InstanceDesc)
 {
 	m_InstanceDesc = _InstanceDesc;
 
-	//준 desc 대로 값 모두 채워줘야해~~
 
+	D3D11_MAPPED_SUBRESOURCE		SubResource{};
+	m_pContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
+
+	VTXMATRIX* pVertices = ((VTXMATRIX*)SubResource.pData);
+
+	for (size_t i = 0; i < m_iNumInstance; i++)
+	{
+		Change_InstanceInfo(pVertices, i);
+	}
+
+	m_pContext->Unmap(m_pVBInstance, 0);
+
+
+
+	//_float3 vScaleRandomOffset = m_InstanceDesc.vScaleRandomOffset;
+	//
+
+	////준 desc 대로 값 모두 채워줘야해~~
+	//for (_uint i = 0; i < m_iNumInstance; ++i)
+	//{
+	//	m_pInstanceVertices[i].vRight = Vector4::UnitX * (m_InstanceDesc.vScale.x + CUtils::Make_RandomFloat(-vScaleRandomOffset.x, vScaleRandomOffset.x));
+	//	m_pInstanceVertices[i].vUp = Vector4::UnitY * (m_InstanceDesc.vScale.y + CUtils::Make_RandomFloat(-vScaleRandomOffset.y, vScaleRandomOffset.y));
+	//	m_pInstanceVertices[i].vLook = Vector4::UnitZ * (m_InstanceDesc.vScale.y + CUtils::Make_RandomFloat(-vScaleRandomOffset.z, vScaleRandomOffset.z));
+	//}
 
 }
 
-
-
-void CVIBuffer_Instance::Update_Buffer(_uint _iNumInstance)
+void CVIBuffer_Instance::Change_InstanceInfo(VTXMATRIX* pVertices, _uint iInstanceIndex)
 {
+	m_pLifeTimes[iInstanceIndex].x = 0.f;
+
+	m_pLifeTimes[iInstanceIndex].y = Compute_RandLifetime();
+	m_pStartDelays[iInstanceIndex] = Compute_RandStartDelay();
+
+
+	_float4x4 instanceMat = _float4x4::Identity;
+
+	_float3 vScale = Compute_RandScale();
+	instanceMat.Right() *= vScale.x;
+	instanceMat.Up() *= vScale.y;
+	instanceMat.Forward() *= vScale.z;
+
+	_float3 vRot = Compute_RandRotation();
+	vRot = { vRot.x, vRot.y, vRot.z };
+	//vRot = 
+	Quaternion vResultQuat = Quaternion::CreateFromYawPitchRoll(vRot);
+	instanceMat.Transform(instanceMat, vResultQuat, instanceMat);
+
+
+	_float3 vPosition = Compute_RandPosition();
+	instanceMat.Translation(vPosition);
+
+	pVertices[iInstanceIndex].vRight = Dir(instanceMat.Right());
+	pVertices[iInstanceIndex].vUp = Dir(instanceMat.Up());
+	pVertices[iInstanceIndex].vLook = Dir(instanceMat.Forward());
+	pVertices[iInstanceIndex].vPosition = Pos(instanceMat.Translation());
+
+
+	_float4 vDirection = Compute_RandDirection();
+	m_pDirections[iInstanceIndex] = _float3{ vDirection.x, vDirection.y, vDirection.z };
+	m_pSpeeds[iInstanceIndex] = vDirection.w;
+
+
+	_float4 vColor = Compute_RandColor();
+	m_pColors[iInstanceIndex] = _float3{ vColor.x, vColor.y, vColor.z };
+	m_pAlphas[iInstanceIndex] = vColor.w;
+
 }
+
+//void CVIBuffer_Instance::Update_Buffer(_uint _iNumInstance)
+//{
+//}
 
 void CVIBuffer_Instance::Free()
 {

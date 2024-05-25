@@ -52,6 +52,14 @@ namespace Engine
 		_float		fSpeed;
 		_float		fSpeedRandomOffset;
 
+
+		_float3		vColor;
+		_float3		vColorRandomOffset;
+
+		_float		fAlpha;
+		_float		fAlphaRandomOffset;
+
+
 		//기준점(랜덤X)
 		_float3		vPivot;
 
@@ -60,7 +68,7 @@ namespace Engine
 		_bool		bIsNonLight;
 		_bool		bIsBloom;
 
-		vector<INSTANCE_PROPERTY> bMoveCommands;
+		vector<_bool> bMoveCommands;
 
 	}INSTANCE_DESC;
 

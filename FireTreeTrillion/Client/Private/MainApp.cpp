@@ -85,6 +85,10 @@ HRESULT CMainApp::Open_Level(LEVEL eLevelID)
 
 HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 {
+
+	HRESULT hr;
+
+
 	/* For.Prototype_Component_VIBuffer_Rect */
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),
 		CVIBuffer_Rect::Create(m_pDevice, m_pContext))))
@@ -110,17 +114,39 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 	//ÀÌÆåÆ® µð¹ö±ë¿ë ÀÌÆåÆ® ÅØ½ºÃÄ(FX Texture)
 	wstring wstrPrototypeTag = L"Prototype_Component_FXTexture_";
 
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"Logo",
+	hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"Logo",
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Logo/Logo.png")));
+	CHECK_FAILED(hr);
+
+	hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"Test",
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effects/test.png")));
+	CHECK_FAILED(hr);
+
+	hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"SimpleStar",
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effects/simpleStar.png")));
+	CHECK_FAILED(hr);
+
+	hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"SimpleSolid",
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Simple/simpleSolid_%d.png"), 2));
+	CHECK_FAILED(hr);
+
+	/*if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"Logo",
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Logo/Logo.png")))))
 		return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"Test2",
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Logo/Logo.png")))))
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"Test",
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effects/test.png")))))
 		return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"Test3",
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Logo/Logo.png")))))
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"SimpleStar",
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effects/simpleStar.png")))))
 		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"SimpleSolid",
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effects/simpleSolid_%d.png"), 2))))
+		return E_FAIL;*/
+
+
 	//if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CTexture::Create(m_pDevice, m_pContext, wstrFullPath, iNumTextures))))
 	//	return E_FAIL;
 

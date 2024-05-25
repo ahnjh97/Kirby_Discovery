@@ -85,6 +85,11 @@ _int CFXToolDirector::Tick(_float _fTimeDelta)
 			m_FXs[m_iSelectedFXIdx]->Tick(_fTimeDelta);
 			m_fCurPlayDuration = m_FXs[m_iSelectedFXIdx]->m_fDuration.first;
 		}
+		else if (m_eSelected == SELECTED_PARTICLE_FX)
+		{
+			m_FXs[m_iSelectedFXIdx]->Tick(_fTimeDelta);
+			m_fCurPlayDuration = m_FXs[m_iSelectedFXIdx]->m_fDuration.first;
+		}
 		else if (m_eSelected == SELECTED_MULTI_FX)
 		{
 			m_MultiFXs[m_iSelectedFXIdx]->Tick(_fTimeDelta);
@@ -483,6 +488,8 @@ void CFXToolDirector::Render_FXProperty()
 	if (bIsParticle)
 	{
 		DragFloat3(u8"범위", m_fRange, .01f, -100.f, 100.f, "%.2f");
+		DragFloat3(u8"범위", m_fRange, .01f, -100.f, 100.f, "%.2f");
+
 	}
 
 }
@@ -791,6 +798,8 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 
 			//띄울 키프레임의 값을 매칭해 준다.
 			_float3 vValue = m_FXs[m_iSelectedFXIdx]->m_Keyframes[eSelectedProperty][iSelectedKFIdx].vValue;
+
+
 			memcpy(m_vKFPopupValue, &vValue, sizeof(_float3));
 			m_eKFPopupEasing = m_FXs[m_iSelectedFXIdx]->m_Keyframes[eSelectedProperty][iSelectedKFIdx].eEasing;
 

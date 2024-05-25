@@ -1,5 +1,5 @@
-
 #include "VIBuffer_Instance_Point.h"
+#include "GameInstance.h"
 
 CVIBuffer_Instance_Point::CVIBuffer_Instance_Point(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CVIBuffer_Instance{ pDevice, pContext }
@@ -10,6 +10,8 @@ CVIBuffer_Instance_Point::CVIBuffer_Instance_Point(const CVIBuffer_Instance_Poin
 	: CVIBuffer_Instance{ rhs }
 {
 }
+
+
 
 //
 //HRESULT CVIBuffer_Instance_Point::Initialize_Prototype(const INSTANCE_DESC& InstanceDesc)
@@ -170,14 +172,61 @@ HRESULT CVIBuffer_Instance_Point::Initialize(void * pArg)
 	return S_OK;
 }
 
+
+_float CVIBuffer_Instance_Point::Compute_RandLifetime()
+{
+	return m_InstanceDesc.fLifetime + CUtils::Make_RandomFloat(-m_InstanceDesc.fLifetimeRandomOffset, m_InstanceDesc.fLifetimeRandomOffset);
+}
+
+_float CVIBuffer_Instance_Point::Compute_RandStartDelay()
+{
+	return m_InstanceDesc.fStartDelay + CUtils::Make_RandomFloat(-m_InstanceDesc.fStarDelayRandomOffset, m_InstanceDesc.fStarDelayRandomOffset);
+}
+
+_float3 CVIBuffer_Instance_Point::Compute_RandScale()
+{
+	return { m_InstanceDesc.vScale.x + CUtils::Make_RandomFloat(-m_InstanceDesc.vScaleRandomOffset.x, m_InstanceDesc.vScaleRandomOffset.x),
+			m_InstanceDesc.vScale.y + CUtils::Make_RandomFloat(-m_InstanceDesc.vScaleRandomOffset.y, m_InstanceDesc.vScaleRandomOffset.y),
+			m_InstanceDesc.vScale.z + CUtils::Make_RandomFloat(-m_InstanceDesc.vScaleRandomOffset.z, m_InstanceDesc.vScaleRandomOffset.z)};
+}
+
+_float3 CVIBuffer_Instance_Point::Compute_RandRotation()
+{
+	return { m_InstanceDesc.vRotation.x + CUtils::Make_RandomFloat(-m_InstanceDesc.vRotationRandomOffset.x, m_InstanceDesc.vRotationRandomOffset.x),
+		m_InstanceDesc.vRotation.y + CUtils::Make_RandomFloat(-m_InstanceDesc.vRotationRandomOffset.y, m_InstanceDesc.vRotationRandomOffset.y),
+		m_InstanceDesc.vRotation.z + CUtils::Make_RandomFloat(-m_InstanceDesc.vRotationRandomOffset.z, m_InstanceDesc.vRotationRandomOffset.z) };
+}
+
+
 _float4 CVIBuffer_Instance_Point::Compute_RandPosition()
 {
-	uniform_real_distribution<float>	RangePosX(m_InstanceDesc.vCenter.x - m_InstanceDesc.vRange.x * 0.5f, m_InstanceDesc.vCenter.x + m_InstanceDesc.vRange.x * 0.5f);
-	uniform_real_distribution<float>	RangePosY(m_InstanceDesc.vCenter.y - m_InstanceDesc.vRange.y * 0.5f, m_InstanceDesc.vCenter.y + m_InstanceDesc.vRange.y * 0.5f);
-	uniform_real_distribution<float>	RangePosZ(m_InstanceDesc.vCenter.z - m_InstanceDesc.vRange.z * 0.5f, m_InstanceDesc.vCenter.z + m_InstanceDesc.vRange.z * 0.5f);
+	return {	m_InstanceDesc.vCenter.x + CUtils::Make_RandomFloat(-m_InstanceDesc.vRange.x, m_InstanceDesc.vRange.x),
+				m_InstanceDesc.vCenter.y + CUtils::Make_RandomFloat(-m_InstanceDesc.vRange.y, m_InstanceDesc.vRange.y),
+				m_InstanceDesc.vCenter.z + CUtils::Make_RandomFloat(-m_InstanceDesc.vRange.z, m_InstanceDesc.vRange.z), 1.f };
 
 
-	return _float4(RangePosX(m_RandomNumber), RangePosY(m_RandomNumber), RangePosZ(m_RandomNumber), 1.f);
+	//uniform_real_distribution<float>	RangePosX(m_InstanceDesc.vCenter.x - m_InstanceDesc.vRange.x * 0.5f, m_InstanceDesc.vCenter.x + m_InstanceDesc.vRange.x * 0.5f);
+	//uniform_real_distribution<float>	RangePosY(m_InstanceDesc.vCenter.y - m_InstanceDesc.vRange.y * 0.5f, m_InstanceDesc.vCenter.y + m_InstanceDesc.vRange.y * 0.5f);
+	//uniform_real_distribution<float>	RangePosZ(m_InstanceDesc.vCenter.z - m_InstanceDesc.vRange.z * 0.5f, m_InstanceDesc.vCenter.z + m_InstanceDesc.vRange.z * 0.5f);
+
+
+	//return _float4(RangePosX(m_RandomNumber), RangePosY(m_RandomNumber), RangePosZ(m_RandomNumber), 1.f);
+}
+
+_float4 CVIBuffer_Instance_Point::Compute_RandDirection()
+{
+	return {	m_InstanceDesc.vDir.x + CUtils::Make_RandomFloat(-m_InstanceDesc.vDirRandomOffset.x, m_InstanceDesc.vDirRandomOffset.x),
+				m_InstanceDesc.vDir.y + CUtils::Make_RandomFloat(-m_InstanceDesc.vDirRandomOffset.y, m_InstanceDesc.vDirRandomOffset.y),
+				m_InstanceDesc.vDir.z + CUtils::Make_RandomFloat(-m_InstanceDesc.vDirRandomOffset.z, m_InstanceDesc.vDirRandomOffset.z),
+				m_InstanceDesc.fSpeed + CUtils::Make_RandomFloat(-m_InstanceDesc.fSpeedRandomOffset,m_InstanceDesc.fSpeedRandomOffset)};
+}
+
+_float4 CVIBuffer_Instance_Point::Compute_RandColor()
+{
+	return {	m_InstanceDesc.vColor.x + CUtils::Make_RandomFloat(-m_InstanceDesc.vColorRandomOffset.x, m_InstanceDesc.vColorRandomOffset.x),
+				m_InstanceDesc.vColor.y + CUtils::Make_RandomFloat(-m_InstanceDesc.vColorRandomOffset.y, m_InstanceDesc.vColorRandomOffset.y),
+				m_InstanceDesc.vColor.z + CUtils::Make_RandomFloat(-m_InstanceDesc.vColorRandomOffset.z, m_InstanceDesc.vColorRandomOffset.z),
+				m_InstanceDesc.fAlpha + CUtils::Make_RandomFloat(-m_InstanceDesc.fAlphaRandomOffset, m_InstanceDesc.fAlphaRandomOffset) };
 }
 
 

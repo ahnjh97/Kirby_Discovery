@@ -10,6 +10,22 @@ CVIBuffer_Instance_Rect::CVIBuffer_Instance_Rect(const CVIBuffer_Instance_Rect &
 	: CVIBuffer_Instance{ rhs }
 {
 }
+_float CVIBuffer_Instance_Rect::Compute_RandLifetime()
+{
+	return _float();
+}
+_float CVIBuffer_Instance_Rect::Compute_RandStartDelay()
+{
+	return _float();
+}
+_float3 CVIBuffer_Instance_Rect::Compute_RandScale()
+{
+	return _float3();
+}
+_float3 CVIBuffer_Instance_Rect::Compute_RandRotation()
+{
+	return _float3();
+}
 //
 //HRESULT CVIBuffer_Instance_Rect::Initialize_Prototype(const INSTANCE_DESC& InstanceDesc)
 //{
@@ -178,6 +194,16 @@ _float4 CVIBuffer_Instance_Rect::Compute_RandPosition()
 
 
 	return _float4(RangePosX(m_RandomNumber), RangePosY(m_RandomNumber), RangePosZ(m_RandomNumber), 1.f);
+}
+
+_float4 CVIBuffer_Instance_Rect::Compute_RandDirection()
+{
+	return _float4();
+}
+
+_float4 CVIBuffer_Instance_Rect::Compute_RandColor()
+{
+	return _float4();
 }
 
 

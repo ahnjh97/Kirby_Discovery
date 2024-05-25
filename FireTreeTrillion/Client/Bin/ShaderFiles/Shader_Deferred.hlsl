@@ -275,7 +275,7 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
     vTexcoord.x = (vPosition.x / vPosition.w) * 0.5f + 0.5f;
     vTexcoord.y = (vPosition.y / vPosition.w) * -0.5f + 0.5f;
 
-    vector vLightDepthDesc = g_LightDepthTexture.Sample(LinearSampler, vTexcoord);
+    vector vLightDepthDesc = g_LightDepthTexture.Sample(ClampSampler, vTexcoord);
 
 	/* vPosition.w : 현재 내가 그릴려고 했던 픽셀의 광원기준의 깊이. */
 	/* vLightDepthDesc.x * 2000.f : 현재 픽셀을 광원기준으로  그릴려고 했던 위치에 이미 그려져있떤 광원 기준의 깊이.  */

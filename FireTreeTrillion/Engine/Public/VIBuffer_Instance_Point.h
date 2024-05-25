@@ -19,11 +19,24 @@ private:
 	virtual ~CVIBuffer_Instance_Point() = default;
 
 public:
+	virtual _float Compute_RandLifetime() override;
+	virtual _float Compute_RandStartDelay() override;
+
+	virtual _float3 Compute_RandScale() override;
+	virtual _float3 Compute_RandRotation() override;
+	virtual _float4 Compute_RandPosition() override;
+
+	virtual _float4 Compute_RandDirection() override;
+	virtual _float4 Compute_RandColor() override;
+
+
+
+
 	//virtual HRESULT Initialize_Prototype(const INSTANCE_DESC& InstanceDesc);
 	virtual HRESULT Initialize_Prototype(_uint iNumInstance);
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg) override;
-	virtual _float4 Compute_RandPosition() override;
+
 
 
 public:

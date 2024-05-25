@@ -41,13 +41,22 @@ HRESULT CParticle::Initialize(void* pArg)
 	hr = Add_Components(FXDesc);
 	CHECK_FAILED(hr);
 
+	//기본 상태 세팅
+	INSTANCE_DESC instanceDesc{};
+	instanceDesc.bMoveCommands.resize(INSTANCE_END);
+	instanceDesc.bMoveCommands[INSTANCE_DROP] = false;
+	instanceDesc.bMoveCommands[INSTANCE_SPREAD] = true;
+	instanceDesc.vPivot = { 0.f, -1.f, 0.f };
+
+	Update_InstanceInfo(instanceDesc);
+
 	return S_OK;
 }
 
 void CParticle::Update_InstanceInfo(INSTANCE_DESC& _instanceDesc)
 {
 	m_InstanceDesc = _instanceDesc;
-	m_pVIBufferCom->Update_InstanceInfo(_instanceDesc);
+	m_pVIBufferCom->Update_InstanceDesc(_instanceDesc);
 }
 
 _int CParticle::Tick(_float _fTimeDelta)
@@ -66,10 +75,14 @@ _int CParticle::Tick(_float _fTimeDelta)
 			m_bDead = true;
 	}
 
-	if (Calculate_Lifetime(_fTimeDelta))
-	{
+	if (m_fDuration.second <= m_fDuration.first)
+		return OBJ_NOEVENT;
 
-	}
+	if (m_InstanceDesc.bMoveCommands[INSTANCE_DROP])
+		m_pVIBufferCom->Drop(_fTimeDelta);
+
+	if (m_InstanceDesc.bMoveCommands[INSTANCE_SPREAD])
+		m_pVIBufferCom->Spread(_fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
@@ -118,6 +131,9 @@ HRESULT CParticle::Add_Components(PARTICLE_DESC& _FXDesc)
 	{
 		CVIBuffer_Instance_Point::INSTANCE_POINT_DESC InstanceDesc{};
 		InstanceDesc.iNumInstance = _FXDesc.iNumInstance;
+		//InstanceDesc.
+
+
 		hr = __super::Add_Component(LEVEL_STATIC, CUtils::StrToWstr(_FXDesc.strBufferTag), 
 			TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom, &InstanceDesc);
 		CHECK_FAILED(hr);
