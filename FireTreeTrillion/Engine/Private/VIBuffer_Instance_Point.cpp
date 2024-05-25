@@ -10,6 +10,7 @@ CVIBuffer_Instance_Point::CVIBuffer_Instance_Point(const CVIBuffer_Instance_Poin
 	: CVIBuffer_Instance{ rhs }
 {
 }
+
 //
 //HRESULT CVIBuffer_Instance_Point::Initialize_Prototype(const INSTANCE_DESC& InstanceDesc)
 //{

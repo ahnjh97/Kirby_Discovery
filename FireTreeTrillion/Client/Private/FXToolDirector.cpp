@@ -144,7 +144,7 @@ void CFXToolDirector::Render_FXHierarchy()
 		CSingleEffect::FX_DESC singleFXDesc{};
 		string strComponentTag = "Prototype_Component_";
 
-		string strBaseName{"Default FX"};
+		string strBaseName{ "Default FX" };
 		switch (m_iAddingFXBufferIdx)
 		{
 		case 1:
@@ -187,7 +187,7 @@ void CFXToolDirector::Render_FXHierarchy()
 
 		//기본 세팅된 키프레임들.
 		vector<FX_KEYFRAME> newProperty;
-		FX_KEYFRAME newStartKeyframe{0.f, Vector3::Zero, EASE_OUT };
+		FX_KEYFRAME newStartKeyframe{ 0.f, Vector3::Zero, EASE_OUT };
 		FX_KEYFRAME newEndKeyframe{ 1.f, {2.f, 0.f, 0.f}, EASE_OUT };
 
 		//위치
@@ -208,7 +208,7 @@ void CFXToolDirector::Render_FXHierarchy()
 		newProperty.clear();
 		newStartKeyframe.vValue = Vector3::One;
 		newStartKeyframe.eEasing = EASE_IN;
-		newEndKeyframe.vValue = {.01f, .01f, .01f};
+		newEndKeyframe.vValue = { .01f, .01f, .01f };
 		newProperty.push_back(newStartKeyframe);
 		newProperty.push_back(newEndKeyframe);
 		singleFXDesc.Keyframes.emplace(KF_SCALE, newProperty);
@@ -340,13 +340,45 @@ void CFXToolDirector::Render_FXHierarchy()
 			m_fTotalPlayDuration = m_FXs[i]->m_fDuration.second;
 			memcpy(m_fLifeTime, &m_FXs[i]->m_fLifeTime, sizeof(_float2));
 		}
+
+		if (m_iSelectedFXIdx == i && IsItemHovered() && IsMouseReleased(1))
+			OpenPopup("Hi");
+
+
+		//if (bOpenSelectableMenu)
+		if (BeginPopup("Hi"))
+		{
+			//Begin(u8"제발", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse);
+
+			if (MenuItem("Action 1"))
+			{
+				// Action 1에 대한 처리 코드
+			}
+			if (MenuItem("Action 2"))
+			{
+				// Action 2에 대한 처리 코드
+			}
+			if (MenuItem("Action 3"))
+			{
+				// Action 3에 대한 처리 코드
+			}
+
+			EndPopup();
+			//End();
+		}
+		//bOpenSelectableMenu = true;
+
 	}
+
 	EndChild();
+
+
+
 
 	Render_FXProperty();
 
 	End();
-	
+
 
 	//Begin("Add to MultiFX?", nullptr, ImGuiWindowFlags_NoCollapse);
 	//if (Button(u8"Yes Yes Yes")/* && m_iSelectedCompositionEffectIdx != -1 && m_iSelectedEffectIdx != -1*/)
@@ -395,7 +427,7 @@ void CFXToolDirector::Render_FXProperty()
 			pCurFX->m_bIsColorRender = true;
 	}
 	SameLine();
-	if(!bIsParticle)
+	if (!bIsParticle)
 		Checkbox(u8"직교", &pCurFX->m_bIsOrthographic);
 
 	Separator();
@@ -413,12 +445,12 @@ void CFXToolDirector::Render_FXProperty()
 		//pCurFX->m_fLifeTime = m_fLifeTime;
 	}
 
-	if (InputInt(u8"렌더 패스",  &m_iCurFXPassIdx, 1, pCurFX->m_iMaxPassIdx))
+	if (InputInt(u8"렌더 패스", &m_iCurFXPassIdx, 1, pCurFX->m_iMaxPassIdx))
 	{
 		if (m_iCurFXPassIdx < 0)
 			m_iCurFXPassIdx = 0;
 
-		if(pCurFX->m_iMaxPassIdx < m_iCurFXPassIdx)
+		if (pCurFX->m_iMaxPassIdx < m_iCurFXPassIdx)
 			m_iCurFXPassIdx = pCurFX->m_iMaxPassIdx;
 
 		pCurFX->m_iPassIdx = m_iCurFXPassIdx;
@@ -472,7 +504,7 @@ void CFXToolDirector::Render_FXPlayBar(_float _fTimeDelta)
 		return;
 
 
- 	Begin(u8"Bar", nullptr, ImGuiWindowFlags_NoTitleBar);
+	Begin(u8"Bar", nullptr, ImGuiWindowFlags_NoTitleBar);
 
 	CEffect* pCurFX{ nullptr };
 	if (m_eSelected == SELECTED_SINGLE_FX || m_eSelected == SELECTED_PARTICLE_FX)
@@ -497,7 +529,7 @@ void CFXToolDirector::Render_FXPlayBar(_float _fTimeDelta)
 
 	if (SmallButton(u8"위치 추가") && ( 0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
 	{
-		m_bOpenKeyframeEditor = false;
+		//m_bOpenKeyframeEditor = false;
 		FX_KEYFRAME newKeyframe{};
 		newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
 		newKeyframe.eEasing = EASE_OUT;
@@ -513,7 +545,7 @@ void CFXToolDirector::Render_FXPlayBar(_float _fTimeDelta)
 
 	if (SmallButton(u8"회전 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
 	{
-		m_bOpenKeyframeEditor = false;
+		//m_bOpenKeyframeEditor = false;
 		FX_KEYFRAME newKeyframe{};
 		newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
 		newKeyframe.eEasing = EASE_OUT;
@@ -528,7 +560,7 @@ void CFXToolDirector::Render_FXPlayBar(_float _fTimeDelta)
 	SameLine();
 	if (SmallButton(u8"크기 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
 	{
-		m_bOpenKeyframeEditor = false;
+		//m_bOpenKeyframeEditor = false;
 		FX_KEYFRAME newKeyframe{};
 		newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
 		newKeyframe.eEasing = EASE_OUT;
@@ -547,6 +579,8 @@ void CFXToolDirector::Render_FXPlayBar(_float _fTimeDelta)
 	//재생
 	if (ArrowButton(u8"Play", ImGuiDir_Right) || m_pGameInstance->Get_KeyState(DIK_SPACE, KEY_DOWN))
 	{
+		m_bOpenKeyframeEditor = false;
+
 		m_bPlayingBar = !m_bPlayingBar;
 		//if(m_iSelectedMultiFXIdx != -1)
 
@@ -622,12 +656,12 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 	}
 
 	//키프레임 편집 창을 띄워주는 static 변수들
-	static _bool		bMakeKFPopupToFront = { false };
+	//static _bool		bMakeKFPopupToFront = { false };
 	static KF_PROPERTY	eSelectedProperty = { KF_END };
 	static _int			iSelectedKFIdx = { -1 };
 
 	//키프레임 팝업 사이즈
-	ImVec2 vPopupSize = { 220.f, 140.f };
+	ImVec2 vPopupSize = { 160.f, 140.f };
 
 	//서로 서로 띄워준다.
 	Dummy(ImVec2(0, 15));
@@ -637,7 +671,7 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 
 	_int iTempKFIdx{ 0 };
 	ImDrawList* pDrawList = GetWindowDrawList();
-	
+
 	pDrawList->AddLine(vPos, ImVec2(vPos.x + _fWidth, vPos.y), IM_COL32(255, 0, 100, 255), 1.f);
 
 	//각 키프레임 플레이 바의 위치의 상대 위치로 매칭하기.
@@ -658,7 +692,6 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 		if (fDistance <= 8.0f && IsMouseClicked(0))
 		{
 			m_bOpenKeyframeEditor = true;
-			bMakeKFPopupToFront = true;
 			eSelectedProperty = KF_POS;
 			iSelectedKFIdx = iTempKFIdx;
 
@@ -669,7 +702,9 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 			_float3 vValue = m_FXs[m_iSelectedFXIdx]->m_Keyframes[eSelectedProperty][iSelectedKFIdx].vValue;
 			memcpy(m_vKFPopupValue, &vValue, sizeof(_float3));
 			m_eKFPopupEasing = m_FXs[m_iSelectedFXIdx]->m_Keyframes[eSelectedProperty][iSelectedKFIdx].eEasing;
-			//m_vKFPopupValue
+
+			OpenPopup(u8"키프레임");
+
 		}
 
 		++iTempKFIdx;
@@ -703,7 +738,8 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 		if (distance <= 8.0f && IsMouseClicked(0))
 		{
 			m_bOpenKeyframeEditor = true;
-			bMakeKFPopupToFront = true;
+
+			//bMakeKFPopupToFront = true;
 			eSelectedProperty = KF_ROT;
 			iSelectedKFIdx = iTempKFIdx;
 
@@ -715,6 +751,8 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 			_float3 vValue = m_FXs[m_iSelectedFXIdx]->m_Keyframes[eSelectedProperty][iSelectedKFIdx].vValue;
 			memcpy(m_vKFPopupValue, &vValue, sizeof(_float3));
 			m_eKFPopupEasing = m_FXs[m_iSelectedFXIdx]->m_Keyframes[eSelectedProperty][iSelectedKFIdx].eEasing;
+
+			OpenPopup(u8"키프레임");
 		}
 
 		++iTempKFIdx;
@@ -743,7 +781,7 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 		if (distance <= 8.0f && IsMouseClicked(0))
 		{
 			m_bOpenKeyframeEditor = true;
-			bMakeKFPopupToFront = true;
+			//bMakeKFPopupToFront = true;
 			eSelectedProperty = KF_SCALE;
 			iSelectedKFIdx = iTempKFIdx;
 
@@ -755,6 +793,8 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 			_float3 vValue = m_FXs[m_iSelectedFXIdx]->m_Keyframes[eSelectedProperty][iSelectedKFIdx].vValue;
 			memcpy(m_vKFPopupValue, &vValue, sizeof(_float3));
 			m_eKFPopupEasing = m_FXs[m_iSelectedFXIdx]->m_Keyframes[eSelectedProperty][iSelectedKFIdx].eEasing;
+
+			OpenPopup(u8"키프레임");
 		}
 
 		++iTempKFIdx;
@@ -762,18 +802,11 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 	Spacing();
 
 
- 	if (m_bOpenKeyframeEditor)
+
+
+	if (BeginPopup(u8"키프레임"))
 	{
-		if (eSelectedProperty == KF_POS)
-			Begin(u8"위치", nullptr, ImGuiWindowFlags_NoCollapse);
-		else if (eSelectedProperty == KF_ROT)
-			Begin(u8"회전", nullptr, ImGuiWindowFlags_NoCollapse);
-		else if (eSelectedProperty == KF_SCALE)
-			Begin(u8"크기", nullptr, ImGuiWindowFlags_NoCollapse);
 
-
-		//SetWindowFocus(u8"키프레임 편집");
-		
 		if (DragFloat(u8"시간", &m_FXs[m_iSelectedFXIdx]->m_Keyframes[eSelectedProperty][iSelectedKFIdx].fTimeRatio, .01f, .01f, .99f, "%.2f"))
 		{
 
@@ -791,20 +824,29 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 
 		if (DragFloat3("Value", m_vKFPopupValue, .01f, vValueRange.x, vValueRange.y, "%.2f"))
 		{
-			m_FXs[m_iSelectedFXIdx]->m_Keyframes[eSelectedProperty][iSelectedKFIdx].vValue = _float3{ m_vKFPopupValue[0], m_vKFPopupValue[1], m_vKFPopupValue[2]};
+			m_FXs[m_iSelectedFXIdx]->m_Keyframes[eSelectedProperty][iSelectedKFIdx].vValue = _float3{ m_vKFPopupValue[0], m_vKFPopupValue[1], m_vKFPopupValue[2] };
 
 		}
 		if (Combo(u8"Easing", &m_eKFPopupEasing, m_Easing.data(), (_int)m_Easing.size()))
 		{
 			m_FXs[m_iSelectedFXIdx]->m_Keyframes[eSelectedProperty][iSelectedKFIdx].eEasing = (EASING)m_eKFPopupEasing;
 		}
-		
+
 		if (Button(u8"키프레임 삭제"))
 		{
 			m_bOpenKeyframeEditor = false;
+			CloseCurrentPopup();
 			m_FXs[m_iSelectedFXIdx]->Delete_Keyframe(eSelectedProperty, iSelectedKFIdx);
 		}
-		End();
+
+		SameLine();
+		if (Button(u8"닫기"))
+		{
+			m_bOpenKeyframeEditor = false;
+			CloseCurrentPopup();
+		}
+
+		EndPopup();
 	}
 
 	//drawline

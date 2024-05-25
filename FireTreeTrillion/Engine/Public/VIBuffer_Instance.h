@@ -47,8 +47,15 @@ protected:
 protected:
 	random_device				m_RandomDevice;
 	mt19937_64					m_RandomNumber;
+
+
 	_float2*					m_pLifeTimes = { nullptr };
+	_float*						m_pStartDelays = { nullptr };
+	_float3*					m_pDirections = { nullptr };
 	_float*						m_pSpeeds = { nullptr };
+	_float3*					m_pColors = { nullptr };
+	_float*						m_pAlphas = { nullptr };
+
 	
 
 	void	Update_Buffer(_uint _iNumInstance);

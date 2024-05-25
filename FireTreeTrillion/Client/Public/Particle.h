@@ -10,6 +10,13 @@ public:
 	typedef struct : public FX_DESC
 	{
 		_uint iNumInstance = { 0 };
+		_float fLifeTime = { 1.f };
+		_float fLifetimeRandomOffset = { 0.f };
+
+		_float fStartDelay = { 0.f };
+		_float fStarDelayRandomOffset = { 0.f };
+
+
 	}PARTICLE_DESC;
 
 private:

@@ -233,7 +233,7 @@ void CVIBuffer_Instance::Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceI
 	if (m_pLifeTimes[iInstanceIndex].x > m_pLifeTimes[iInstanceIndex].y)
 	{
 
-		if(false == m_InstanceDesc.bIsLooping)
+		if(false == m_InstanceDesc.bIsLoop)
 			pVertices[iInstanceIndex].bAlive = false;
 
 		else

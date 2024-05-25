@@ -27,24 +27,40 @@ namespace Engine
 	typedef struct
 	{
 
+		//수명
+		_float		fLifetime;
+		_float		fLifetimeRandomOffset;
+
+		_float		fStartDelay;
+		_float		fStarDelayRandomOffset;
+
 		//시작 범위(랜덤X)
 		_float3		vCenter;
 		_float3		vRange;
 
+		//회전
+		_float3		vRotation;
+		_float3		vRotationRandomOffset;
+
+		//크기
+		_float3		vScale;
+		_float3		vScaleRandomOffset;
+		
+		_float3		vDir;
+		_float3		vDirRandomOffset;
+
+		_float		fSpeed;
+		_float		fSpeedRandomOffset;
+
 		//기준점(랜덤X)
 		_float3		vPivot;
 
-		//수명
-		_float2		vLifetime;
-		_float		fStartDelay;
+		_bool		bIsLoop;
+		_bool		bIsBillboard;
+		_bool		bIsNonLight;
+		_bool		bIsBloom;
 
-		//크
-		_float3		vScale;
-		
-		
-		_bool		bIsLooping;
-		_float2		vSpeed;
-		//_uint		iNumInstance;
+		vector<INSTANCE_PROPERTY> bMoveCommands;
 
 	}INSTANCE_DESC;
 

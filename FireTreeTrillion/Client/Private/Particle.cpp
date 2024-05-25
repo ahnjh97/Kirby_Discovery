@@ -13,6 +13,7 @@ CParticle::CParticle(const CParticle& rhs)
 {
 }
 
+
 HRESULT CParticle::Initialize_Prototype()
 {
 	return S_OK;
