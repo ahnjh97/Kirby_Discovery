@@ -59,7 +59,8 @@ HRESULT CTrigger::Render()
 		if (FAILED(m_pShaderCom->Begin(1)))
 			return E_FAIL;
 
-		m_pModelCom->Render(i);
+		if(*m_pGameInstance->Get_CurrentLevelID() == LEVEL_TOOL_MAP)
+			m_pModelCom->Render(i);
 	}
 
 	return S_OK;

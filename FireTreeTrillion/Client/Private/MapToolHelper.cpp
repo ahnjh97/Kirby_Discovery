@@ -358,7 +358,7 @@ void CMapToolHelper::Load_Level()
 	string strModelName;
 	_float4x4 matWorld{};
 	_int iCamIndex{};
-	//map<_int, _float4x4> camMatrices;
+	//map<_int, _float4x4> camMatrices; // -> 인게임 Level에서만 수행
 
 	while (!fileStream.eof()) 
 	{
@@ -370,7 +370,7 @@ void CMapToolHelper::Load_Level()
 
 		if ("Camera" == strModelName || "Trigger" == strModelName) {
 			fileStream.read(reinterpret_cast<char*>(&iCamIndex), sizeof(iCamIndex));
-			//camMatrices.emplace(iCamIndex, matWorld);
+			//camMatrices.emplace(iCamIndex, matWorld); // -> 인게임 Level에서만 수행
 		}
 
 		if (fileStream.eof())
