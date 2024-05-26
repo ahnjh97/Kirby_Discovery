@@ -12,6 +12,7 @@
 
 //맵툴
 #include "MapToolHelper.h"
+#include "MapToolObject.h"
 #include "BasicMap.h"
 #include "Grid.h"
 
@@ -36,6 +37,7 @@
 //#include "Weapon.h"
 //#include "Player.h"
 #include "Kirby.h"
+#include "Awoofy.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
@@ -142,7 +144,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_Test"), CTestUI);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestMap"), CTestTerrain);
-	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
 
 	//이펙트 툴 용
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FXToolDirector"), CFXToolDirector);
@@ -150,12 +152,21 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MultiEffect"), CMultiEffect);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Particle"), CParticle);
 
+	// MapTool GameObject Prototypes
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Grid"), CGrid);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BasicMap"), CBasicMap);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolHelper"), CMapToolHelper);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolObject"), CMapToolObject);
+
 	// 05.20) 원본 추가
 	 /*      GameObject_IMGUI_UI_Editor    */
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("IMGUI_UI_Editor"), CUI_Editor);
 
 	// For Kirby
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kirby"), CKirby);
+
+	// For Awoofy To Monster
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Awoofy"), CAwoofy);
 
 	return S_OK;
 }
@@ -341,11 +352,6 @@ HRESULT CLoader::Loading_For_Tool_Map()
 	m_strLoadingText = TEXT("모델(을) 로딩 중 입니다.");
 	if(FAILED(Add_AllModelTxts(eLevel, TYPE_NONANIM)))
 		return E_FAIL;
-
-	m_strLoadingText = TEXT("객체의 원형를(을) 로딩 중 입니다.");
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Grid"), CGrid);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BasicMap"), CBasicMap);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolHelper"), CMapToolHelper);
 	
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 
@@ -432,14 +438,17 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back(MODEL{ "GsBenchAL", TYPE_NONANIM });
 		m_vecModelInfo.emplace_back(MODEL{ "Level0Stage1Step01", TYPE_NONANIM });
 		m_vecModelInfo.emplace_back(MODEL{ "Level1Stage1Step01", TYPE_NONANIM });
+
+		// For Awoofy
+		m_vecModelInfo.emplace_back(MODEL{ "Awoofy", TYPE_ANIM });
 	}
-	else if (eLevel == LEVEL_TOOL_MAP)
-	{
-		m_vecModelInfo.emplace_back(MODEL{ "TestMap", TYPE_NONANIM });
+	else if (eLevel == LEVEL_TOOL_MAP) 
+	{		
+		// 맵툴에서는 크기나 회전 상태 바꾸고 싶은 모델만 여기에 등록. 안바꾸고싶으면 NonAnim, 크기1, 회전 0도로 자동 추가됨
+		m_vecModelInfo.emplace_back(MODEL{ "Book", TYPE_NONANIM, 0.01f});
 		m_vecModelInfo.emplace_back(MODEL{ "TestMap2", TYPE_NONANIM, 0.01f });
-		m_vecModelInfo.emplace_back(MODEL{ "GsBenchAL", TYPE_NONANIM });
-		m_vecModelInfo.emplace_back(MODEL{ "Level0Stage1Step01", TYPE_NONANIM });
-		m_vecModelInfo.emplace_back(MODEL{ "Level1Stage1Step01", TYPE_NONANIM });
+		m_vecModelInfo.emplace_back(MODEL{ "Trigger", TYPE_NONANIM, 0.01f });
+		m_vecModelInfo.emplace_back(MODEL{ "Camera", TYPE_NONANIM, 0.2f , 270.f});
 	}
 }
 
@@ -562,19 +571,21 @@ HRESULT CLoader::Add_AllModelTxts(LEVEL eLevel, TYPE eType)
 	{
 		wstring wstrModelName = listIter.substr(0, listIter.length() - 4);
 		string strModelName = CUtils::WstrToStr(wstrModelName);
-
+		
+		_bool bFound = { false };
+		MODEL tModelInfo = MODEL{ strModelName ,  TYPE_NONANIM };
 		for (auto& modelInfo : m_vecModelInfo)
 		{
 			if (modelInfo.strModelName == strModelName)
 			{
-				wstring wstrPrototypeTag = TEXT("Prototype_Component_Model_") + CUtils::StrToWstr(modelInfo.strModelName);
-
-				hr = m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag,
-					CModel::Create(m_pDevice, m_pContext, modelInfo));
-				CHECK_FAILED(hr);
+				tModelInfo = modelInfo;
 				break;
 			}
 		}
+
+		wstring wstrPrototypeTag = TEXT("Prototype_Component_Model_") + CUtils::StrToWstr(tModelInfo.strModelName);
+		hr = m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CModel::Create(m_pDevice, m_pContext, tModelInfo));
+		CHECK_FAILED(hr);
 
 		if (FAILED(hr))
 			return E_FAIL;

@@ -28,8 +28,8 @@ HRESULT CCharacterController::Initialize(void* pArg)
 	m_tControllerDesc.position = PxExtendedVec3(vInitialPos.x, vInitialPos.y, vInitialPos.z);
 	m_ControllerFilters.mFilterData = &m_tFilterDesc;
 
-	if (pArg == nullptr)
-		Set_DefaultValue();
+
+	Set_DefaultValue();
 
 	Create_Controller();
 
@@ -215,7 +215,7 @@ PxVec3 CCharacterController::Compute_Slope(CTransform* pTransform)
 	PxVec3 rayOriginBack  = rayOrigin - look;
 
 	PxVec3 rayDirection = PxVec3(0.f, -1.f, 0.f);
-	_float fMaxDistance = 1.f;
+	_float fMaxDistance = 3.f;
 	
 	PxVec3	normal(0.f);
 	normal += TerrainRayCast_Collision(rayOriginRight, rayDirection, fMaxDistance);
@@ -224,6 +224,7 @@ PxVec3 CCharacterController::Compute_Slope(CTransform* pTransform)
 	normal += TerrainRayCast_Collision(rayOriginBack,  rayDirection, fMaxDistance);
 	
 	normal.normalize();
+
 	return normal;
 }
 
@@ -280,6 +281,11 @@ PxVec3 CCharacterController::Compute_TerrainPosition()
 	}
 	else
 		return PxVec3(0.0f, 0.0f, 0.0f);
+}
+
+_vector CCharacterController::Compute_TerrainPosition_Vector()
+{
+	return XMVectorSetW(CUtils::To_Vector(Compute_TerrainPosition()), 1.f);
 }
 
 /// <summary>
@@ -366,7 +372,7 @@ void CCharacterController::Create_Controller()
 
 	PxCapsuleControllerDesc capsuleDesc;
 	capsuleDesc.position = PxExtendedVec3(0.f, 20.f, 0.f);
-	capsuleDesc.radius = 0.5f; // 반지름
+	capsuleDesc.radius = 0.05f; // 반지름
 	capsuleDesc.height = 0.1f; // 높이
 	capsuleDesc.stepOffset = 0.f;
 	capsuleDesc.volumeGrowth = 1.0f;
@@ -377,7 +383,7 @@ void CCharacterController::Create_Controller()
 	material = m_pGameInstance->Get_Physics()->createMaterial(0.5f, 0.5f, 0.5f);
 	capsuleDesc.material = material;
 
-	m_pController = m_pGameInstance->Get_ControllerManager()->createController(capsuleDesc);
+	m_pController = m_pGameInstance->Get_ControllerManager()->createController(m_tControllerDesc);
 
 	//PxShape* shape;
 	//m_pController->getActor()->getShapes(&shape, 1);

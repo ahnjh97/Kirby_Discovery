@@ -18,11 +18,20 @@ public:
 	virtual void OnStateEnter(class CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation) override;
 	// 상태 진입되어 있는 상태에서 매 tick마다 호출
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
+
+	void Key_Z(class CGameObject* pGameObject, _float fTimeDelta);
+	void Key_X(class CGameObject* pGameObject, _float fTimeDelta);
+	void Key_C(class CGameObject* pGameObject, _float fTimeDelta);
+	void Key_V(class CGameObject* pGameObject, _float fTimeDelta);
+
 	virtual void OnStateExit()														override;
 
 public:
 	static	CKirbyDefault_Idle_State*	Create();
 	virtual void						Free() override;
+
+	_float m_fIdleStreachTime = { 0.f };
+	_uint m_iIdleChoose = { 0 };
 
 };
 
@@ -74,6 +83,8 @@ public:
 	static	CKirbyDefault_Jump_State* Create();
 	virtual void					  Free() override;
 
+	_float	m_fChangeRunTime = { 0.f };
+	_float	m_fFallTime = { 0.f };
 };
 
 

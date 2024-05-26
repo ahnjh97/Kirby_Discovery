@@ -88,7 +88,7 @@ HRESULT CMesh::Initialize(void * pArg)
 
 void CMesh::Render_IMGUI()
 {
-	ImGui::InputInt("material", (_int*)m_iMaterialIndex);
+	ImGui::InputInt("material",  (_int*)m_iMaterialIndex);
 }
 
 HRESULT CMesh::Stock_Matrices(const vector<CBone*>& Bones, _float4x4 * pMeshBoneMatrices)
@@ -117,6 +117,52 @@ HRESULT CMesh::CreateStaticActor(_float4 vPos)
 		return E_FAIL;
 
 	return S_OK;
+}
+
+_float4 CMesh::Get_PickPos(const CTransform* pTransform) const
+{
+	vector<_float4> vecPickPos;
+
+	_float3 vRayDir, vRayPos;
+	m_pGameInstance->Transform_PickingToLocalSpace(pTransform, &vRayDir, &vRayPos);
+	_vector vPickPos;
+	_float fDis;
+
+	_uint		iNumIndices = { 0 };
+	for (size_t i = 0; i < m_iFaces; i++)
+	{
+		_vector v0 = ::XMLoadFloat3(&m_pVerticesPos[m_pIndices[iNumIndices++]]);
+		_vector v1 = ::XMLoadFloat3(&m_pVerticesPos[m_pIndices[iNumIndices++]]);
+		_vector v2 = ::XMLoadFloat3(&m_pVerticesPos[m_pIndices[iNumIndices++]]);
+
+		_vector vecRayDir = ::XMVector3Normalize(::XMLoadFloat3(&vRayDir));
+		_vector vecRayPos = ::XMLoadFloat3(&vRayPos);
+		if (::TriangleTests::Intersects(vecRayPos, vecRayDir, v0, v1, v2, fDis))
+		{
+			vPickPos = vecRayPos + vecRayDir * fDis;
+
+			_matrix WorldMatrix = XMLoadFloat4x4(&pTransform->Get_WorldMatrix());
+			vPickPos = XMVector3TransformCoord(vPickPos, WorldMatrix);
+			_float4 tempPos;
+			::XMStoreFloat4(&tempPos, vPickPos);
+			tempPos.w = fDis;
+			if (tempPos.w != 0)
+				vecPickPos.push_back(tempPos);
+		}
+	}
+
+	if (vecPickPos.empty())
+		return _float4();
+
+	_float fShortest = { FLT_MAX };
+	_float4 fResult = {};
+	for (auto& iter : vecPickPos) // 카메라와 가장 거리가 가까운놈 계산 
+	{
+		if (iter.w <= fShortest)
+			fResult = iter;
+	}
+
+	return fResult;
 }
 
 HRESULT CMesh::Ready_Vertices_For_NonAnimModel(_fmatrix TransformMatrix)

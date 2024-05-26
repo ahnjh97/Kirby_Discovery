@@ -13,6 +13,7 @@
 #include "Extractor.h"
 #include "Renderer.h"
 #include "Frustum.h"
+#include "Picking.h"
 
 #include "ImGUI_Manager.h"
 #include "PhysX.h"
@@ -99,6 +100,10 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 	m_pIMGUI_Manager = CImGUI_Manager::Create(EngineDesc.hWnd, *ppDevice, *ppContext);
 	CHECK_NULLPTR(m_pIMGUI_Manager);
 
+	m_pPicking = CPicking::Create(*ppDevice, *ppContext, EngineDesc.hWnd, EngineDesc.iWinSizeX, EngineDesc.iWinSizeY);
+	if (nullptr == m_pComponent_Manager)
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -113,7 +118,7 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 
 	m_pObject_Manager->Tick(fTimeDelta);	
 	m_pPhysx->Tick(fTimeDelta);
-
+	m_pPicking->Update();
 	m_pPipeLine->Tick();
 
 	m_pFrustum->Tick();
@@ -351,6 +356,14 @@ void CGameInstance::Set_CurrentLevel(_int CurrentLevel)
 	m_pObject_Manager->Set_CurrentLevel(CurrentLevel);
 }
 
+void CGameInstance::Clear_Layer(_uint iLevelIndex, const wstring& wstrLayerTag)
+{
+	if (nullptr == m_pObject_Manager)
+		return;
+
+	return m_pObject_Manager->Clear_Layer(iLevelIndex, wstrLayerTag);
+}
+
 CGameObject* CGameInstance::Get_GameObject(_uint iLevelIndex, const wstring& strLayerTag, _uint iIndex)
 {
 	CHECK_NULLPTR(m_pObject_Manager);
@@ -481,6 +494,11 @@ HRESULT CGameInstance::Switch_CurCamera(_int iIdx)
 void CGameInstance::Clear_Camera()
 {
 	return m_pPipeLine->Clear_Camera();
+}
+
+CCamera* CGameInstance::Get_CurCameraPtr()
+{
+	return m_pPipeLine->Get_CurCameraPtr();
 }
 
 const LIGHT_DESC * CGameInstance::Get_LightDesc(_uint iIndex)
@@ -774,6 +792,14 @@ PxRigidStatic* CGameInstance::CreateStaticActor(_float4 vPos, _float3* pVertices
 	return m_pPhysx->CreateStaticActor(vPos, pVerticesPos, iNumVertices, pIndices, iNumIndices, pMaterial);
 }
 
+void CGameInstance::Transform_PickingToLocalSpace(const CTransform* pTransform, _float3* pRayDir, _float3* pRayPos)
+{
+	if (nullptr == m_pPicking)
+		return;
+
+	m_pPicking->Transform_PickingToLocalSpace(pTransform, pRayDir, pRayPos);
+}
+
 void CGameInstance::Release_Engine()
 {
 	CGameInstance::Get_Instance()->Free();
@@ -793,6 +819,7 @@ void CGameInstance::Free()
 	Safe_Release(m_pRenderer);	
 	Safe_Release(m_pObject_Manager);
 	Safe_Release(m_pComponent_Manager);
+	Safe_Release(m_pPicking);
 	Safe_Release(m_pLevel_Manager);
 	Safe_Release(m_pInput_Device);
 	Safe_Release(m_pSound_Manager);

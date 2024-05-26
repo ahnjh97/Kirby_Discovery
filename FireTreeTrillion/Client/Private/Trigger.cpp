@@ -29,8 +29,6 @@ HRESULT CTrigger::Initialize(void * pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;	
 	
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(0.f, -10.f, 0.f, 1.f));
-
 	return S_OK;
 }
 
@@ -59,7 +57,8 @@ HRESULT CTrigger::Render()
 		if (FAILED(m_pShaderCom->Begin(1)))
 			return E_FAIL;
 
-		m_pModelCom->Render(i);
+		if(*m_pGameInstance->Get_CurrentLevelID() == LEVEL_TOOL_MAP)
+			m_pModelCom->Render(i);
 	}
 
 	return S_OK;
@@ -112,7 +111,7 @@ HRESULT CTrigger::Add_Components()
 	CHECK_FAILED(hr);
 
 	/* For.Com_Model */
-	if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Model_ColliderCubeMesh"),
+	if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Model_Trigger"),
 		TEXT("Com_Model"),  (CComponent**)&m_pModelCom)))
 		return E_FAIL;
 	

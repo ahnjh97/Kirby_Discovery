@@ -50,6 +50,9 @@ HRESULT CBasicMap::Initialize(void* pArg)
 
 _int CBasicMap::Tick(_float fTimeDelta)
 {
+    if (true == m_bDead)
+        return OBJ_DEAD;
+
     if (nullptr != m_pBlendMap)
         m_pBlendMap->Tick(fTimeDelta);
 
@@ -82,7 +85,8 @@ HRESULT CBasicMap::Render()
         if (FAILED(m_pShaderCom->Bind_RawValue("g_fSamplingFactor", &m_vecSamplingFactors[i], sizeof(_float))))
             return E_FAIL;
 
-        m_pModelCom->Render(i);
+        if(FAILED(m_pModelCom->Render(i)))
+            return E_FAIL;
     }
 
     return S_OK;
@@ -140,7 +144,7 @@ void CBasicMap::SetUpShaderInfo(const wstring& _wstrModelTag)
     if (fileStream.is_open() == false)
     {
         wstring wstrError = TEXT("Failed to Open: ") + _wstrModelTag + L"_ShaderInfo.txt";
-        MSG_BOX(wstrError.c_str());
+        //MSG_BOX(wstrError.c_str());
         m_vecPassIndices.resize(m_pModelCom->Get_NumMeshes());
         m_vecSamplingFactors.resize(m_pModelCom->Get_NumMeshes());
         fill(m_vecSamplingFactors.begin(), m_vecSamplingFactors.end(), 1.f);
@@ -175,7 +179,7 @@ CBasicMap* CBasicMap::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContex
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX(TEXT("Failed To Created : CBasicMap"));
+        MSG_BOX(TEXT("Failed To Create : CBasicMap"));
 
         Safe_Release(pInstance);
     }
@@ -189,7 +193,7 @@ CGameObject* CBasicMap::Clone(void* pArg)
 
     if (FAILED(pInstance->Initialize(pArg)))
     {
-        MSG_BOX(TEXT("Failed To Created : CBasicMap"));
+        MSG_BOX(TEXT("Failed To Clone : CBasicMap"));
         Safe_Release(pInstance);
     }
 
