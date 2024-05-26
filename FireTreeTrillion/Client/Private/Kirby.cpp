@@ -153,6 +153,7 @@ void CKirby::Render_IMGUI()
 	}
 	ImGui::Text("Origin X : %.2f, Origin Y : %.2f, Origin Z : %.2f,", m_vOriginUp.x, m_vOriginUp.y, m_vOriginUp.z);
 	ImGui::Text("Terrain X : %.2f, Terrain Y : %.2f, Terrain Z : %.2f,", m_vTest.x, m_vTest.y, m_vTest.z);
+	ImGui::Text("ReserveJump : %d", INFO(m_bReserveJumpKey));
 	ImGui::Text("Height : %.2f", m_pControllerCom->Compute_Height());
 	ImGui::Text("Input C? : %d", m_pGameInstance->Get_DIKeyState(DIK_C, KEY_PRESS));
 	ImGui::Text("FSM : %d", m_pFSM->Get_State());

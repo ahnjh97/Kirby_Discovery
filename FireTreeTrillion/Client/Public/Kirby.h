@@ -41,14 +41,22 @@ public:
 		_float			m_fJumpHoldTime = { 0.f };
 		_float			m_fChangeVelocityZeroTime = { 0.f };
 		_float			m_fHoldAirTime = { 0.f };
+
 		// 점프 중 재입력 방지
 		_bool			m_bRePressBlock = { false };
+
+		// 점프 예약 입력
+		_bool			m_bReserveJumpKey = { false };
+
 		// 먹은 상태에서의 FALL 애님은 없기 때문에 같은 애니메이션으로 구분하기 위헤 부울값 선언
 		_bool			m_isEatFall = { false };
+
 		// Vacuum
 		_float			m_fVacuumTime = { 0.f };
+
 		// 방향 키 컨트롤러를 만지고 있는가?
 		_bool			m_isController = { false };
+
 		// Fly
 		_float			m_fFlyTime = { 0.f };
 

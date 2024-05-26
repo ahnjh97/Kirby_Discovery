@@ -230,7 +230,13 @@ void CKirbyBalloon_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 		pKirby->Change_State(CKirby::STATE_SPIT, 70.f, false, false, CKirby::BODY_VACUUM);
 	}
 
-
+	if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN) && (pKirby->Get_State() == CKirby::STATE_EATJUMP))
+	{
+		if (pController->Compute_Height() < 3.f)
+		{
+			DESC(m_bReserveJumpKey) = true;
+		}
+	}
 
 	// 떨어지는 것 (EAT상태는 점프와 FALL을 공유한다.)
 	if (DESC(m_isEatFall) == true && pKirby->Get_State() == CKirby::STATE_EATJUMP)
@@ -314,6 +320,26 @@ void CKirbyBalloon_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 	// 뽀잉
 	else if (pKirby->Get_State() == CKirby::STATE_EATLANDING)
 	{
+		if (DESC(m_bReserveJumpKey) == true)
+		{
+			// 점프의 초기 파워
+			DESC(m_fJumpVelocity) = 22.f;
+			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			pKirby->Change_State(CKirby::STATE_EATJUMP, 50.f, false, true, CKirby::BODY_BALLOON);
+
+			DESC(m_fChangeVelocityZeroTime) = 0.f;
+			// 공중에서 체공하는 시간 0.15초
+			DESC(m_fHoldAirTime) = 0.f;
+			// 점프키를 누르는 시간
+			DESC(m_fJumpHoldTime) = 0.f;
+			// 재입력 블락기능 초기화
+			DESC(m_bRePressBlock) = false;
+			// 예약 초기화
+			DESC(m_bReserveJumpKey) = false;
+			return;
+		}
+
+
 		// 최소 애니메이션이 재생되는 시간이다. ( 방향키를 누르면 0.2초 후 바로 Run 상태가 됨 )
 		_float fChangeRunTime = 0.15f;
 
