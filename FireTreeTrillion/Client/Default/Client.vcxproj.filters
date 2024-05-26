@@ -133,6 +133,9 @@
     <Filter Include="02.GameObjects\Player\State\KirbyVacuum_State">
       <UniqueIdentifier>{ab3b3a78-a477-4ab7-95f4-76e0aecc47b1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Effect\Particle">
+      <UniqueIdentifier>{4be92289-d2a7-44f3-bc64-a36e82d6590f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -261,6 +264,9 @@
     <ClInclude Include="..\Public\KirbyVacuum_State.h">
       <Filter>02.GameObjects\Player\State\KirbyVacuum_State</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Particle.h">
+      <Filter>02.GameObjects\Effect\Particle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -370,6 +376,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Level_Tool_Anim.cpp">
       <Filter>01.Levels\Tool\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Particle.cpp">
+      <Filter>02.GameObjects\Effect\Particle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
