@@ -32,6 +32,7 @@ HRESULT CAwoofy::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_pModelCom->Set_Animation(AWOOFY_WAIT, 60.f, true, true);
+	m_eCollisionGroup = MONSTER;
 
 	return S_OK;
 }
@@ -146,7 +147,8 @@ HRESULT CAwoofy::Add_Components()
 	desc.vInitialPos = vPos;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
-	m_pControllerCom->Set_PhysXObject(this);
+	m_pControllerCom->Set_Object(this);
+	//m_pControllerCom->Set_PhysXObject(this);
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 

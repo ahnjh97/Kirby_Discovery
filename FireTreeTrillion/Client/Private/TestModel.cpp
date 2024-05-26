@@ -326,12 +326,12 @@ HRESULT CTestModel::Add_Components()
     m_pRigidBodyCom->Activate(true);
 
     /* For.Com_CharacterController */
-    _float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
-    CCharacterController::CONTROLLER_DESC desc{};
-    desc.vInitialPos = vPos;
-    hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
-        TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
-    m_pControllerCom->Set_PhysXObject(this);
+    //_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+    //CCharacterController::CONTROLLER_DESC desc{};
+    //desc.vInitialPos = vPos;
+    //hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
+    //    TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
+    //m_pControllerCom->Set_PhysXObject(this);
 
     /* FSM */
     SetUp_FSM();

@@ -27,8 +27,8 @@ HRESULT CCharacterController::Initialize(void* pArg)
 	m_tControllerDesc.upDirection = { 0.f, 1.f, 0.f };
 	m_tControllerDesc.density = 100.f;
 	m_tControllerDesc.position = PxExtendedVec3(vInitialPos.x, vInitialPos.y, vInitialPos.z);
+	m_tControllerDesc.userData = this;//m_pObject;
 	m_ControllerFilters.mFilterData = &m_tFilterDesc;
-
 
 	Set_DefaultValue();
 
@@ -67,6 +67,11 @@ void CCharacterController::Render_IMGUI()
 		if (!Is_Activated())
 			m_pGameInstance->AddActor(*m_pController->getActor());
 	}
+}
+
+void CCharacterController::Set_PhysXObject(CGameObject* _pObj)
+{
+	m_pObject = _pObj;
 }
 
 void CCharacterController::Set_Position(const _float4& vPos)
@@ -365,22 +370,8 @@ void CCharacterController::Create_Controller()
 {
 	Release_Controller();
 
-
-	PxCapsuleControllerDesc capsuleDesc;
-	capsuleDesc.position = PxExtendedVec3(0.f, 20.f, 0.f);
-	capsuleDesc.radius = 0.5f;	// 반지름
-	capsuleDesc.height = 0.1f;	// 높이
-	capsuleDesc.stepOffset = 0.f;
-	capsuleDesc.volumeGrowth = 1.0f;
-	capsuleDesc.slopeLimit = cosf(XMConvertToRadians(15.f)); // 15 degrees
-	capsuleDesc.upDirection = PxVec3(0, 1, 0);
-	capsuleDesc.contactOffset = 0.001f;
-	PxMaterial* material = m_pGameInstance->Get_Material();
-	material = m_pGameInstance->Get_Physics()->createMaterial(0.5f, 0.5f, 0.5f);
-	capsuleDesc.material = material;
 	m_pControllerCallBack = new CControllerBehaviorCallback();
-	capsuleDesc.behaviorCallback = m_pControllerCallBack;
-
+	m_tControllerDesc.behaviorCallback = m_pControllerCallBack;
 	m_pController = m_pGameInstance->Get_ControllerManager()->createController(m_tControllerDesc);
 
 	//PxShape* shape;

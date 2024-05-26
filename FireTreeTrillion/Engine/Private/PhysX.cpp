@@ -338,9 +338,15 @@ PxControllerBehaviorFlags CControllerBehaviorCallback::getBehaviorFlags(const Px
 {
     // 특정 조건에 따라 행동을 정의
     //if (actor.is<PxRigidStatic>())
-    if (actor.is<PxController>())
+    CComponent* pComponent = static_cast<CComponent*>(actor.userData);
+    CGameObject* pObj = pComponent->Get_Object();
+    if (pObj != nullptr)
     {
-        MSG_BOX(TEXT("충 돌"));
+        MSG_BOX(TEXT("뚜뚱 어떠한 것과 충 돌"));
+    }
+    if (actor.is<PxRigidStatic>())// PxController
+    {
+        //MSG_BOX(TEXT("장애물 충 돌"));
         return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
     }
     return PxControllerBehaviorFlag::eCCT_SLIDE;
@@ -349,14 +355,16 @@ PxControllerBehaviorFlags CControllerBehaviorCallback::getBehaviorFlags(const Px
 PxControllerBehaviorFlags CControllerBehaviorCallback::getBehaviorFlags(const PxController& controller)
 {
     // controller의 속성에 따라 행동을 커스터마이징
-    // 예를 들어, 충돌 시 미끄러지도록 설정
-    return PxControllerBehaviorFlag::eCCT_SLIDE;
-}
+    // 예를 들어, 충돌 시 미끄러지도록 설정                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
+    CComponent* pComponent = static_cast<CComponent*>(controller.getUserData());
+    CGameObject* pObj = pComponent->Get_Object();
+    if (pObj != nullptr)
+    {
+        COLLISION_TYPE eCollisionType = pObj->Get_CollisionGroup();
+        if(eCollisionType == MONSTER || eCollisionType == PLAYER)
+            MSG_BOX(TEXT("컨트롤러 충 돌"));
+    }
 
-PxControllerBehaviorFlags CControllerBehaviorCallback::getBehaviorFlags(const PxObstacle& obstacle)
-{
-    // obstacle의 속성에 따라 행동을 커스터마이징
-    // 예를 들어, 충돌 시 미끄러지도록 설정
     return PxControllerBehaviorFlag::eCCT_SLIDE;
 }
 

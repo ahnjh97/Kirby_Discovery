@@ -17,7 +17,7 @@ protected:
 	virtual ~CCharacterController() = default;
 
 public:
-	void			Set_PhysXObject(class CGameObject* _pObj) { m_pObject = _pObj; }
+	void			Set_PhysXObject(class CGameObject* _pObj); //{ m_pObject = _pObj; }
 	// 갑자기 위치값이 변화되는 경우 사용하시오.(ex. 텔레포트 등)
 	void			Set_Position(const _float4& vPos);
 	// 발 위치값 지정

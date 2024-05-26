@@ -83,7 +83,6 @@ _int CKirby::Tick(_float fTimeDelta)
 	// 유틸업데이트가 들어가있다.
 	//****** FSM Update, Shadow ChaseUpdate, IdleResetUpdate ******//
 	Kirby_SystemTick(fTimeDelta);
-
 	return OBJ_NOEVENT;
 }
 
@@ -102,7 +101,6 @@ void CKirby::Late_Tick(_float fTimeDelta)
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 	}
-
 }
 
 HRESULT CKirby::Render()

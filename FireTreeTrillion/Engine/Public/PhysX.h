@@ -89,14 +89,6 @@ public:
     // 컨트롤러가 다른 컨트롤러와 충돌했을 때 호출되는 함수
     virtual PxControllerBehaviorFlags getBehaviorFlags(const PxController& controller) override;
 
-
-    // 컨트롤러가 정적 장애물과 충돌했을 때 호출되는 함수
-    virtual PxControllerBehaviorFlags getBehaviorFlags(const PxObstacle& obstacle) override;
-    {
-        // obstacle의 속성에 따라 행동을 커스터마이징
-        // 예를 들어, 충돌 시 미끄러지도록 설정
-        return PxControllerBehaviorFlag::eCCT_SLIDE;
-    }
-
 };
+
 END
