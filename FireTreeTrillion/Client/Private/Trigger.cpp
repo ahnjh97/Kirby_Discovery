@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "Trigger.h"
-
 #include "GameInstance.h"
-#include "Level_Loading.h"
 
 CTrigger::CTrigger(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CGameObject{ pDevice, pContext }
@@ -11,7 +9,6 @@ CTrigger::CTrigger(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 
 CTrigger::CTrigger(const CTrigger & rhs)
 	: CGameObject( rhs )
-	, m_eChangeLevel(rhs.m_eChangeLevel)
 {
 }
 
@@ -66,14 +63,13 @@ HRESULT CTrigger::Render()
 
 void CTrigger::Render_IMGUI()
 {
-	// Guizmo
-	_float4x4 matWorld = m_pTransformCom->Get_WorldFloat4x4();
-	m_pGameInstance->EditTransform(matWorld);
-	m_pTransformCom->Set_WorldMatrix(matWorld);
-	
-	ImGui::Separator(); ImGui::NewLine();
+	//// Guizmo
+	//_float4x4 matWorld = m_pTransformCom->Get_WorldFloat4x4();
+	//m_pGameInstance->EditTransform(matWorld);
+	//m_pTransformCom->Set_WorldMatrix(matWorld);
+	//
+	//ImGui::Separator(); ImGui::NewLine();
 }
-
 
 /// <summary> 
 /// 셰이더 파일에 행렬(전역변수)들을 넘기는 작업을 진행한다.
@@ -93,11 +89,6 @@ HRESULT CTrigger::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
-	HRESULT hr;
-	_uint iColliderState = 2;
-	hr = m_pShaderCom->Bind_RawValue("g_iColliderState", &iColliderState, sizeof(iColliderState));
-	CHECK_FAILED(hr);
-
 	return S_OK;
 }
 
@@ -115,6 +106,11 @@ HRESULT CTrigger::Add_Components()
 		TEXT("Com_Model"),  (CComponent**)&m_pModelCom)))
 		return E_FAIL;
 	
+	/* For.Com_RigidBody */
+	if(FAILED(__super::Add_Component(TEXT("Prototype_Component_RigidBody"),
+		TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom)))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -124,7 +120,7 @@ CTrigger * CTrigger::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pConte
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CTrigger"));
+		MSG_BOX(TEXT("Failed To Create : CTrigger"));
 		Safe_Release(pInstance);
 	}
 
@@ -137,7 +133,7 @@ CGameObject * CTrigger::Clone(void * pArg)
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Cloned : CTrigger"));
+		MSG_BOX(TEXT("Failed To Clone : CTrigger"));
 		Safe_Release(pInstance);
 	}
 

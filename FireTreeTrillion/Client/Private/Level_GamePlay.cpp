@@ -161,7 +161,7 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 
 		if (strModelName == "NonAnim_Kirby")
 		{
-			tempDesc.wstrModelName.erase(0, 8);
+			tempDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby"), &tempDesc)))
 				return E_FAIL;
 		}
@@ -177,7 +177,7 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 	if (nullptr == pCamera)
 		return E_FAIL;
 
-	if (!camMatrices.empty()) {
+	if (!camMatrices.empty()) { // 카메라 행렬 세팅
 		for (auto& pair : camMatrices)
 			pCamera->EmplaceBackCamMatrix(pair.second);
 

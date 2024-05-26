@@ -25,7 +25,7 @@ public:
 	virtual void	Render_IMGUI()										override;
 
 public:
-	void			Set_CallBackFunction(const std::function<void()>& _Callback) { m_CallBack = _Callback; }
+	void			Set_CallBackFunction(const function<void()>& _Callback) { m_CallBack = _Callback; }
 
 private:
 	HRESULT			Add_Components();
@@ -34,10 +34,10 @@ private:
 private:
 	CModel*			m_pModelCom = { nullptr };
 	CShader*		m_pShaderCom = { nullptr };	
+	CRigidBody*		m_pRigidBodyCom = { nullptr };
 
 private:
-	LEVEL					m_eChangeLevel = { LEVEL_END };
-	std::function<void()>	m_CallBack = nullptr;
+	function<void()>	m_CallBack = nullptr;
 
 public:
 	static CTrigger*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
