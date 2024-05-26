@@ -73,18 +73,19 @@ protected:
 	void	Set_DefaultValue();
 
 protected:
-	class CGameObject*				m_pObject = nullptr;
+	class CGameObject*					m_pObject = nullptr;
 
-	physx::PxController*			m_pController = nullptr;
-	physx::PxCapsuleControllerDesc	m_tControllerDesc;
-	physx::PxControllerFilters		m_ControllerFilters;
-	physx::PxFilterData				m_tFilterDesc;
+	physx::PxController*				m_pController = nullptr;
+	physx::PxCapsuleControllerDesc		m_tControllerDesc;
+	physx::PxControllerFilters			m_ControllerFilters;
+	physx::PxFilterData					m_tFilterDesc;
+	class CControllerBehaviorCallback*	m_pControllerCallBack = nullptr;
 
-	_float							m_fSlopeLimitDegree = 45.f;
-	_float							m_fFallVelocity = { 0.f };
-	_float							m_fFallAcceleration = { 0.f };
+	_float								m_fSlopeLimitDegree = 45.f;
+	_float								m_fFallVelocity = { 0.f };
+	_float								m_fFallAcceleration = { 0.f };
 
-	_float							m_fOffset = { 0.5f };
+	_float								m_fOffset = { 0.5f };
 
 public:
 	static	CCharacterController*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

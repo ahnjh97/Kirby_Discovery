@@ -2,6 +2,7 @@
 
 #include "GameObject.h"
 #include "GameInstance.h"
+#include "PhysX.h"
 
 CCharacterController::CCharacterController(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CComponent(pDevice, pContext)
@@ -364,10 +365,11 @@ void CCharacterController::Create_Controller()
 {
 	Release_Controller();
 
+
 	PxCapsuleControllerDesc capsuleDesc;
 	capsuleDesc.position = PxExtendedVec3(0.f, 20.f, 0.f);
-	capsuleDesc.radius = 0.5f; // 반지름
-	capsuleDesc.height = 0.1f; // 높이
+	capsuleDesc.radius = 0.5f;	// 반지름
+	capsuleDesc.height = 0.1f;	// 높이
 	capsuleDesc.stepOffset = 0.f;
 	capsuleDesc.volumeGrowth = 1.0f;
 	capsuleDesc.slopeLimit = cosf(XMConvertToRadians(15.f)); // 15 degrees
@@ -376,6 +378,8 @@ void CCharacterController::Create_Controller()
 	PxMaterial* material = m_pGameInstance->Get_Material();
 	material = m_pGameInstance->Get_Physics()->createMaterial(0.5f, 0.5f, 0.5f);
 	capsuleDesc.material = material;
+	m_pControllerCallBack = new CControllerBehaviorCallback();
+	capsuleDesc.behaviorCallback = m_pControllerCallBack;
 
 	m_pController = m_pGameInstance->Get_ControllerManager()->createController(m_tControllerDesc);
 
@@ -383,7 +387,6 @@ void CCharacterController::Create_Controller()
 	//m_pController->getActor()->getShapes(&shape, 1);
 	//shape->setSimulationFilterData(physx::PxFilterData{ static_cast<physx::PxU32>(0/*ColliderType*/), 0, 0, 0 });
 	//shape->setQueryFilterData(physx::PxFilterData{static_cast<physx::PxU32>(1), 0, 0, 0});
-	//m_pController->getActor()->userData = this;
 
 	//m_pGameInstance->RemoveActor(*m_pController->getActor());
 
@@ -397,6 +400,8 @@ void CCharacterController::Release_Controller()
 
 	if (nullptr != m_pController)
 	{
+		Safe_Delete(m_pControllerCallBack);
+
 		if (m_pController->getActor()->getScene())
 			m_pGameInstance->RemoveActor(*m_pController->getActor());
 		m_pController->release();
@@ -412,8 +417,6 @@ void CCharacterController::Set_DefaultValue()
 	material = m_pGameInstance->Get_Physics()->createMaterial(0.5f, 0.5f, 0.5f);
 	m_tControllerDesc.material = material;
 
-
-
 	m_tControllerDesc.radius = 0.5f; // 반지름
 	m_tControllerDesc.height = 1.f;	 // 높이
 	m_tControllerDesc.contactOffset = 0.1f;
@@ -423,12 +426,6 @@ void CCharacterController::Set_DefaultValue()
 	m_tControllerDesc.maxJumpHeight = 3.f;
 }
 
-void CCharacterController::Free()
-{
-	__super::Free();
-
-	Release_Controller();
-}
 
 CCharacterController* CCharacterController::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
@@ -453,5 +450,12 @@ CComponent* CCharacterController::Clone(void* pArg)
 	}
 
 	return pInstance;
+}
+
+void CCharacterController::Free()
+{
+	__super::Free();
+
+	Release_Controller();
 }
 

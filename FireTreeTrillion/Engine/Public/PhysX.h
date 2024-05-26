@@ -24,15 +24,14 @@ public:
     PxPhysics*                          Get_Physics() { return m_pPhysics; }
     PxMaterial*                         Get_Material() { return m_pMaterial; }
 
-    // not yet
+    // NOT YET
     //PxMaterial*                         FindMaterial(const string& strMtrlTag);
     PxScene*                            Get_Scene() { return m_pScene; }
     PxControllerManager*                Get_ControllerManager() { return m_pControllerManager; }
     //PxCooking*                        GetCooking() { return m_pCooking; }
 
-    //physx::PxMat44                    To_Float4x4(const _float4x4& mat);
-    //_float4x4                         To_Float4x4(const physx::PxMat44& mat);
-    class CComponent*                   Get_Component(physx::PxActor* pActor);
+    // NOT YET
+    //class CComponent*                   Get_Component(physx::PxActor* pActor);
 
 public:
     PxRigidDynamic* CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
@@ -68,4 +67,36 @@ public:
 
 };
 
+
+// PxSimulationEventCallback : RigidBody의 충돌처리에 대한 콜백 결과를 받아오는 클래스
+class ENGINE_DLL CSimulationEventCallback : public physx::PxSimulationEventCallback
+{
+public:
+    virtual void onContact(const physx::PxContactPairHeader& pairHeader, const physx::PxContactPair* pairs, physx::PxU32 nbPairs) override;
+    // 트리거 이벤트 처리
+    virtual void onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 count) override;
+};
+
+
+// PxControllerBehaviorCallback : Controller의 충돌처리에 대한 콜백 결과를 받아오는 클래스
+// 해당 클래스를 상속받아 이벤트 결과를 활용한다.
+class ENGINE_DLL CControllerBehaviorCallback : public PxControllerBehaviorCallback
+{
+public:
+    // 컨트롤러가 다른 객체와 충돌했을 때 호출되는 함수
+    virtual PxControllerBehaviorFlags getBehaviorFlags(const PxShape& shape, const PxActor& actor) override;
+
+    // 컨트롤러가 다른 컨트롤러와 충돌했을 때 호출되는 함수
+    virtual PxControllerBehaviorFlags getBehaviorFlags(const PxController& controller) override;
+
+
+    // 컨트롤러가 정적 장애물과 충돌했을 때 호출되는 함수
+    virtual PxControllerBehaviorFlags getBehaviorFlags(const PxObstacle& obstacle) override;
+    {
+        // obstacle의 속성에 따라 행동을 커스터마이징
+        // 예를 들어, 충돌 시 미끄러지도록 설정
+        return PxControllerBehaviorFlag::eCCT_SLIDE;
+    }
+
+};
 END

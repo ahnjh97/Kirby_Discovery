@@ -26,6 +26,7 @@ HRESULT CRigidBody::Initialize(void * pArg)
 	m_eShapeType			= pDesc->eShapeType;
 	m_OriginTransformMatrix = pDesc->matWorld;
 	m_vMaterial				= pDesc->vMaterial;
+	m_pActorObject			= pDesc->pObj;
 
 	Create_Actor();
 	return S_OK;
@@ -115,6 +116,7 @@ void CRigidBody::Create_Actor()
 	PxMat44 pxMat = CUtils::To_Float4x4(OriginMatrix);
 	PxTransform transform = CUtils::mat44ToTransform(pxMat);
 	m_pActor = pPhysics->createRigidDynamic(transform);
+	m_pActor->userData = m_pActorObject;
 
 	//SetUp_Actor();
 
@@ -135,7 +137,6 @@ void CRigidBody::SetUp_Actor()
 		m_pActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, true);
 	}
 
-	m_pActor->userData = this;
 
 	if (m_bTrigger)
 	{

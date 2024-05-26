@@ -35,6 +35,8 @@ HRESULT CTestModel::Initialize(void* pArg)
     // position 세팅은 항상 Add_Components() 앞에 둘것
     _vector vPos = XMVectorSet(0.f, 11.f, -180.f, 1.f);
     m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+    m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(-16.f));
+
     if (FAILED(Add_Components()))
         return E_FAIL;
 
@@ -219,6 +221,8 @@ void CTestModel::Late_Tick(_float fTimeDelta)
     }
 
     m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
+    m_pGameInstance->RenderGrid();
+
 }
 
 HRESULT CTestModel::Render()
@@ -227,7 +231,6 @@ HRESULT CTestModel::Render()
         return E_FAIL;
 
     _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
-
     for (size_t i = 0; i < iNumMeshes; i++)
     {
         if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
@@ -265,7 +268,6 @@ void CTestModel::Render_IMGUI()
         ImGui::TreePop();
     }
 
-    //m_pGameInstance->RenderGrid();
     ImGui::Text("FSM : %d", m_eCurrentState);
     ImGui::Separator(); ImGui::NewLine();
 
@@ -315,7 +317,7 @@ HRESULT CTestModel::Add_Components()
     /* For.Com_RigidBody */
     CRigidBody::RIGIDBODY_DESC rigidDesc {};
     rigidDesc.bTrigger = false;
-    rigidDesc.eShapeType = RIGID_SPHERE;
+    rigidDesc.eShapeType = RIGID_BOX;
     rigidDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
     hr = __super::Add_Component(TEXT("Prototype_Component_RigidBody"),
         TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &rigidDesc);

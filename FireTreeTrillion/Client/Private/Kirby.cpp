@@ -60,6 +60,8 @@ HRESULT CKirby::Initialize(void* pArg)
 
 	m_pModelCom[INFO(m_eBodyState)]->Set_Animation(STATE_IDLE, 60.f, true, true);
 
+	m_eCollisionGroup = PLAYER;
+	
 	return S_OK;
 }
 

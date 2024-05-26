@@ -182,6 +182,9 @@ void CImGUI_Manager::SetDockSpace()
 
 void CImGUI_Manager::RenderGrid()
 {
+	ImGuiIO& io = ImGui::GetIO();
+	ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
+
 	const float identityMatrix[16] =
 	{	1.f, 0.f, 0.f, 0.f,
 		0.f, 1.f, 0.f, 0.f,
