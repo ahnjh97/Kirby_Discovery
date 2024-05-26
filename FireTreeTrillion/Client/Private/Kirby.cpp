@@ -7,6 +7,8 @@
 #include "KirbyBalloon_State.h"
 #include "KirbyVacuum_State.h"
 
+#include "Utils.h"
+
 
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -51,14 +53,11 @@ HRESULT CKirby::Initialize(void* pArg)
 
 	m_pCamera->Set_Target(m_pTransformCom);
 
-
 	_float4 m_pCameraLook = m_pCamera->Get_TransformCom()->Get_State_Vector(CTransform::STATE_LOOK);
 	m_pCameraLook.y = 0.f;
 	m_pCameraLook = XMVector4Normalize(m_pCameraLook);
 	INFO(m_vMoveDir) = -1.f * m_pCameraLook;
 	INFO(m_vTargetDir) = INFO(m_vMoveDir);
-
-	//m_pTransformCom->Look_At_ForLandObject(vPos + INFO(m_vMoveDir));
 
 	m_pModelCom[INFO(m_eBodyState)]->Set_Animation(STATE_IDLE, 60.f, true, true);
 
@@ -72,6 +71,7 @@ _int CKirby::Tick(_float fTimeDelta)
 
 	// 커비의 기본적인 축 보정, 밸런스 보정을 담당한다.
 	Setting_KirbyBalance();
+
 	// 지면충돌과 경사 보정
 	SetOn_Slope(fTimeDelta);
 
@@ -95,6 +95,7 @@ void CKirby::Late_Tick(_float fTimeDelta)
 	m_pModelCom[BODY_DEFAULT]->Play_Animation(fTimeDelta);
 	m_pModelCom[BODY_BALLOON]->Play_Animation(fTimeDelta);
 	m_pModelCom[BODY_VACUUM]->Play_Animation(fTimeDelta);
+
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
@@ -150,9 +151,9 @@ void CKirby::Render_IMGUI()
 		ImGui::Separator(); ImGui::NewLine();
 		ImGui::TreePop();
 	}
-
-	ImGui::Text("RePressBlock : %d", INFO(m_bRePressBlock));
-	ImGui::Text("Terrain : %d", m_pControllerCom->Is_Terrain());
+	ImGui::Text("Origin X : %.2f, Origin Y : %.2f, Origin Z : %.2f,", m_vOriginUp.x, m_vOriginUp.y, m_vOriginUp.z);
+	ImGui::Text("Terrain X : %.2f, Terrain Y : %.2f, Terrain Z : %.2f,", m_vTest.x, m_vTest.y, m_vTest.z);
+	ImGui::Text("Height : %.2f", m_pControllerCom->Compute_Height());
 	ImGui::Text("Input C? : %d", m_pGameInstance->Get_DIKeyState(DIK_C, KEY_PRESS));
 	ImGui::Text("FSM : %d", m_pFSM->Get_State());
 	ImGui::Separator(); ImGui::NewLine();
@@ -252,6 +253,7 @@ void CKirby::SetOn_Slope(_float fTimeDelta)
 	// 지면의 up벡터
 	PxVec3 slope = m_pControllerCom->Compute_Slope(m_pTransformCom);
 	_vector vTerrainNormal = CUtils::To_Vector(slope);
+	m_vTest = vTerrainNormal;
 	Lerp_UpVector(vTerrainNormal, 20.f, fTimeDelta);
 }
 
@@ -496,6 +498,14 @@ void CKirby::DefaultIdle()
 		return;
 
 	m_pModelCom[BODY_DEFAULT]->Set_Animation(STATE_IDLE, 60.f, true, false);
+}
+
+_float4 CKirby::Compute_TerrainPosition()
+{
+	if (m_pControllerCom == nullptr)
+		return _float4();
+
+	return m_pControllerCom->Compute_TerrainPosition_Vector();
 }
 
 void CKirby::Kirby_SystemTick(_float fTimeDelta)

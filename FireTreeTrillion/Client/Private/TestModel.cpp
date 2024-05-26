@@ -41,15 +41,15 @@ HRESULT CTestModel::Initialize(void* pArg)
     m_pModelCom->Set_Animation(0, 60.f, true);
 
     // 예시코드 1 : 태양광
-    LIGHT_DESC			LightDesc{};
-    LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
-    LightDesc.vDirection = _float4(0.f, -1.f, 0.f, 0.f);
+    //LIGHT_DESC			LightDesc{};
+    //LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
+    //LightDesc.vDirection = _float4(0.f, -1.f, 0.f, 0.f);
 
-    LightDesc.vDiffuse = _float4(0.8f, 0.8f, 0.8f, 1.f);
-    LightDesc.vAmbient = _float4(0.6f, 0.6f, 0.6f, 1.f);
-    LightDesc.vSpecular = _float4(0.2f, 0.2f, 0.2f, 1.f);
-    if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
-        return E_FAIL;
+    //LightDesc.vDiffuse = _float4(0.8f, 0.8f, 0.8f, 1.f);
+    //LightDesc.vAmbient = _float4(0.6f, 0.6f, 0.6f, 1.f);
+    //LightDesc.vSpecular = _float4(0.2f, 0.2f, 0.2f, 1.f);
+    //if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
+    //    return E_FAIL;
 
 
     // 예시코드 2 : 따라다니게 하기 예시 코드 + 점 광원 예시 코드

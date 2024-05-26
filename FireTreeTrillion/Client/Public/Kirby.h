@@ -29,33 +29,26 @@ public:
 		_float			m_fZAngle = { 0.f };
 		_float4			m_vMoveDir = { 0.f, 0.f, 0.f, 0.f };
 		_float4			m_vTargetDir = { 0.f, 0.f, 0.f, 0.f };
-
 		// 눈, 입, 몸체의 상태를 담당한다.
 		EYESTATE		m_eEyeState = { EYE_END };
 		MOUTHSTATE		m_eMouthState = { MOUTH_END };
 		BODYSTATE		m_eBodyState = { BODY_END };
 		DIR				m_eKirbyDir = { DIR_END };
 		STATE			m_eJumpState = { STATE_JUMPR };
-
 		// 중력 및 점프
 		_float			m_fJumpVelocity = { 0.f };
 		_float			m_fGravityOffset = { 6.f };
 		_float			m_fJumpHoldTime = { 0.f };
 		_float			m_fChangeVelocityZeroTime = { 0.f };
 		_float			m_fHoldAirTime = { 0.f };
-
 		// 점프 중 재입력 방지
 		_bool			m_bRePressBlock = { false };
-
 		// 먹은 상태에서의 FALL 애님은 없기 때문에 같은 애니메이션으로 구분하기 위헤 부울값 선언
 		_bool			m_isEatFall = { false };
-
 		// Vacuum
 		_float			m_fVacuumTime = { 0.f };
-
 		// 방향 키 컨트롤러를 만지고 있는가?
 		_bool			m_isController = { false };
-
 		// Fly
 		_float			m_fFlyTime = { 0.f };
 
@@ -86,6 +79,8 @@ public:
 	void			Set_Animation(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
 	_bool			isAnimFinish();
 	void			DefaultIdle();
+
+	_float4			Compute_TerrainPosition();
 
 	// 기타 세부적인 제어
 private:
@@ -119,6 +114,7 @@ private:
 	// For_PhysX
 	_float			m_fOffsetTurn = { 7.f };
 	_float4			m_vOriginUp = { 0.f, 1.f, 0.f, 0.f };
+	_float4			m_vTest = { 0.f, 0.f, 0.f, 0.f };
 
 
 public:

@@ -85,7 +85,7 @@ protected:
 	_float							m_fFallVelocity = { 0.f };
 	_float							m_fFallAcceleration = { 0.f };
 
-	_float							m_fOffset = { 0.f };
+	_float							m_fOffset = { 1.f };
 
 public:
 	static	CCharacterController*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
