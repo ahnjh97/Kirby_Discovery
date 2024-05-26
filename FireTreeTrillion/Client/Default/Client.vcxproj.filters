@@ -88,9 +88,6 @@
     <Filter Include="02.GameObjects\Map">
       <UniqueIdentifier>{310eaee8-bc9b-4061-8a3b-1befbaed5f82}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Levels\Tool\ANIM">
-      <UniqueIdentifier>{33844d5a-d935-47f9-a410-59245e635f38}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Player\State">
       <UniqueIdentifier>{79362919-e7bb-428f-ab22-a4eec033163c}</UniqueIdentifier>
     </Filter>
@@ -114,6 +111,9 @@
     </Filter>
     <Filter Include="02.GameObjects\Map\BasicMap">
       <UniqueIdentifier>{046c4db6-6d91-4eef-8c46-3e1b7fdc2bcc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\Tool\Map">
+      <UniqueIdentifier>{d2b0c25b-ae5a-4a5a-ab39-0b70b268bcd1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -165,9 +165,6 @@
     <ClInclude Include="..\Public\TestTerrain.h">
       <Filter>02.GameObjects\Terrain</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Map_Stage1.h">
-      <Filter>02.GameObjects\Map</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Level_Tool_UI.h">
       <Filter>01.Levels\Tool\UI</Filter>
     </ClInclude>
@@ -192,9 +189,6 @@
     <ClInclude Include="..\Public\MultiEffect.h">
       <Filter>02.GameObjects\Effect\Multi</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Level_Tool_Anim.h">
-      <Filter>01.Levels\Tool\ANIM</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\KirbyDefault_State.h">
       <Filter>02.GameObjects\Player\State</Filter>
     </ClInclude>
@@ -213,9 +207,6 @@
     <ClInclude Include="..\Public\KirbyDefault_State.h">
       <Filter>02.GameObjects\Player\State</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Level_Tool_Map.h">
-      <Filter>01.Levels\Tool\MAP</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Grid.h">
       <Filter>02.GameObjects\Terrain</Filter>
     </ClInclude>
@@ -230,9 +221,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\Trigger.h">
       <Filter>02.GameObjects\Map\Trigger</Filter>
-	</ClInclude>	
+    </ClInclude>
     <ClInclude Include="..\Public\Level_Tool_Anim.h">
       <Filter>01.Levels\Tool\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_Tool_Map.h">
+      <Filter>01.Levels\Tool\Map</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -272,9 +266,6 @@
     <ClCompile Include="..\Private\TestTerrain.cpp">
       <Filter>02.GameObjects\Terrain</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Map_Stage1.cpp">
-      <Filter>02.GameObjects\Map</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\FXToolDirector.cpp">
       <Filter>02.GameObjects\UI\FXToolDirector</Filter>
     </ClCompile>
@@ -299,9 +290,6 @@
     <ClCompile Include="..\Private\SingleEffect.cpp">
       <Filter>02.GameObjects\Effect\Single</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Level_Tool_Anim.cpp">
-      <Filter>01.Levels\Tool\ANIM</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\KirbyDefault_State.cpp">
       <Filter>02.GameObjects\Player\State</Filter>
     </ClCompile>
@@ -317,9 +305,6 @@
     <ClCompile Include="..\Private\KirbyDefault_State.cpp">
       <Filter>02.GameObjects\Player\State</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Level_Tool_Map.cpp">
-      <Filter>01.Levels\Tool\MAP</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Grid.cpp">
       <Filter>02.GameObjects\Terrain</Filter>
     </ClCompile>
@@ -334,9 +319,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Trigger.cpp">
       <Filter>02.GameObjects\Map\Trigger</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="..\Private\Level_Tool_Anim.cpp">
       <Filter>01.Levels\Tool\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Tool_Map.cpp">
+      <Filter>01.Levels\Tool\Map</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -374,5 +362,6 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_Point.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_Map.hlsl" />
   </ItemGroup>
 </Project>
