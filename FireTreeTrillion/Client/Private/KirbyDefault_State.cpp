@@ -16,19 +16,121 @@ void CKirbyDefault_Idle_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, 
 void CKirbyDefault_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
 	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
-	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
-	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
 	Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
 	Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
 
-	if (pKirby->Get_State() == CKirby::STATE_IDLESTREACH)
-		Kirbydesc->m_eEyeState = CKirby::EYE_CLOSE;
+	// 자유낙하
+	pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
+	// 낙하 높이
+	if (pController->Compute_Height() > 2.f)
+	{
+		DESC(m_eEyeState) = CKirby::EYE_IDLE;
+		pKirby->Change_State(CKirby::STATE_FALL, 50.f, false, true, CKirby::BODY_DEFAULT);
+	}
+
+	// Idle일 때, 방향키를 눌렀을 때 RUN 으로 간다.
+	if (JoyStick_controller(Kirbydesc, pCamera))
+	{
+		DESC(m_eEyeState) = CKirby::EYE_IDLE;
+		pKirby->Change_State(CKirby::STATE_RUN, 100.f, true, true, CKirby::BODY_DEFAULT);
+	}
+
+	Key_Z(pGameObject, fTimeDelta);
+	Key_X(pGameObject, fTimeDelta);
+	Key_C(pGameObject, fTimeDelta);
+	Key_V(pGameObject, fTimeDelta);
+
+	// IDLE상태에서 통제될 것들.
+	if (pKirby->Get_State() == CKirby::STATE_IDLE)
+	{
+		m_fIdleStreachTime += fTimeDelta;
+		// 멍 때리면 다른 Idle 모션을 연출한다.
+		if (m_fIdleStreachTime > 5.f)
+		{
+			m_iIdleChoose == 0 ?
+				pKirby->Change_State(CKirby::STATE_IDLESTREACH, 60.f, false, true, CKirby::BODY_DEFAULT) :
+				pKirby->Change_State(CKirby::STATE_IDLELOOKAROUND, 60.f, false, true, CKirby::BODY_DEFAULT);
+
+			m_iIdleChoose == 0 ?
+				m_iIdleChoose++ : m_iIdleChoose--;
+		}
+	}
+	else if (pKirby->Get_State() == CKirby::STATE_IDLESTREACH || pKirby->Get_State() == CKirby::STATE_IDLELOOKAROUND)
+	{
+		if (pKirby->Get_State() == CKirby::STATE_IDLESTREACH)
+			DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+
+		if (pKirby->isAnimFinish())
+		{
+			pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+		}
+	}
+}
+
+void CKirbyDefault_Idle_State::Key_Z(CGameObject* pGameObject, _float fTimeDelta)
+{
+}
+
+void CKirbyDefault_Idle_State::Key_X(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
+	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
+
+	// Idle일 때, X를 누르면 흡수를 시작한다.
+	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
+	{
+		DESC(m_fVacuumTime) = 0.f;
+		DESC(m_eEyeState) = CKirby::EYE_IDLE;
+		pKirby->Change_State(CKirby::STATE_INHALESTART, 60.f, false, false, CKirby::BODY_VACUUM);
+	}
+}
+
+void CKirbyDefault_Idle_State::Key_C(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
+	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
+
+	// Idle일 때, C를 누르면 점프를 한다.
+	if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
+	{
+		// 점프의 초기 파워
+		DESC(m_fJumpVelocity) = 22.f;
+		DESC(m_eEyeState) = CKirby::EYE_IDLE;
+
+		DESC(m_eJumpState) == DESC(m_eJumpState) ? CKirby::STATE_JUMPR : DESC(m_eJumpState) = CKirby::STATE_JUMPL;
+		pKirby->Change_State(DESC(m_eJumpState), 50.f, false, true, CKirby::BODY_DEFAULT);
+
+		DESC(m_fChangeVelocityZeroTime) = 0.f;
+		// 공중에서 체공하는 시간 0.15초
+		DESC(m_fHoldAirTime) = 0.f;
+		// 점프키를 누르는 시간
+		DESC(m_fJumpHoldTime) = 0.f;
+
+		// 재입력 블락기능 초기화
+		DESC(m_bRePressBlock) = false;
+	}
+
+}
+
+void CKirbyDefault_Idle_State::Key_V(CGameObject* pGameObject, _float fTimeDelta)
+{
 }
 
 void CKirbyDefault_Idle_State::OnStateExit()
 {
+	m_fIdleStreachTime = 0.f;
 }
 
 CKirbyDefault_Idle_State* CKirbyDefault_Idle_State::Create()
@@ -61,10 +163,48 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
 	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
 	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
+
+	// Idle일 때, C를 누르면 점프를 한다.
+	if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
+	{
+		// 점프의 초기 파워
+		DESC(m_fJumpVelocity) = 22.f;
+
+		DESC(m_eJumpState) == DESC(m_eJumpState) ? CKirby::STATE_JUMPR : DESC(m_eJumpState) = CKirby::STATE_JUMPL;
+		pKirby->Change_State(DESC(m_eJumpState), 50.f, false, true, CKirby::BODY_DEFAULT);
+
+		DESC(m_fChangeVelocityZeroTime) = 0.f;
+		// 공중에서 체공하는 시간 0.15초
+		DESC(m_fHoldAirTime) = 0.f;
+		// 점프키를 누르는 시간
+		DESC(m_fJumpHoldTime) = 0.f;
+		// 재입력 블락기능 초기화
+		DESC(m_bRePressBlock) = false;
+	}
+
+	// X를 누르면 흡수를 시작한다.
+	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
+	{
+		DESC(m_fVacuumTime) = 0.f;
+		DESC(m_eEyeState) = CKirby::EYE_IDLE;
+		pKirby->Change_State(CKirby::STATE_INHALEWALK, 50.f, true, true, CKirby::BODY_VACUUM);
+	}
+
+
+	if (false == JoyStick_controller(Kirbydesc, pCamera))
+		pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+
+
+	if (pController->Compute_Height() > 2.f)
+	{
+		pKirby->Change_State(CKirby::STATE_FALL, 50.f, false, true, CKirby::BODY_DEFAULT);
+	}
 
 	Moving_Logic(Kirbydesc, pTransformCom, pController, fTimeDelta);
 	Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
 	Turn_Z_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
+	pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
 }
 void CKirbyDefault_Run_State::OnStateExit()
 {
@@ -101,20 +241,26 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
 	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
-	// 방향은 항상 보간한다.
+	if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_UP))
+	{
+		// 때는 순간 트루가 되고, 점프 가능 시점에 다시 누를 때 까지 C에대한 누적 등 반응하지 않는다.
+		DESC(m_bRePressBlock) = true;
+	}
+
+
 	if (pKirby->Get_State() == CKirby::STATE_LANDINGSMALL || pKirby->Get_State() == CKirby::STATE_LANDINGEND)
 		Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
 	else
 		Jump_Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
 
-	// 컨트롤러 손 대고 있을 떄
-	if (Kirbydesc->m_isController == true)
+
+	if (JoyStick_controller(Kirbydesc, pCamera))
 	{
 		Moving_Logic(Kirbydesc, pTransformCom, pController, fTimeDelta);
 	}
-	// 컨트롤러 손 안 대고 있을 때
-	else if (Kirbydesc->m_isController == false)
+	else
 	{
 		if (pKirby->Get_State() == CKirby::STATE_LANDINGSMALL || pKirby->Get_State() == CKirby::STATE_LANDINGEND)
 			Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
@@ -123,33 +269,171 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 	}
 
 
-	if (pKirby->Get_State() == CKirby::STATE_JUMPL || pKirby->Get_State() == CKirby::STATE_JUMPR ||
-		pKirby->Get_State() == CKirby::STATE_JUMPEND || pKirby->Get_State() == CKirby::STATE_JUMPFALL)
+	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
 	{
-		Kirbydesc->m_fJumpVelocity -= GRAVITY * fTimeDelta * Kirbydesc->m_fGravityOffset;
-		Kirbydesc->m_isJump = pController->Jump(pTransformCom, Kirbydesc->m_fJumpVelocity, fTimeDelta);
+		DESC(m_fVacuumTime) = 0.f;
+		DESC(m_eEyeState) = CKirby::EYE_IDLE;
+		pKirby->Change_State(CKirby::STATE_INHALEFALL, 50.f, true, true, CKirby::BODY_VACUUM);
+	}
 
-		// 착지를 했다면,
-		if (Kirbydesc->m_isJump == false)
+	if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
+	{
+		DESC(m_fFlyTime) = 0.f;
+		DESC(m_fJumpVelocity) = 4.f;
+		pKirby->Change_State(CKirby::STATE_FLIGHTSTART, 60.f, false, false, CKirby::BODY_BALLOON);
+	}
+
+
+	// 떨어지는 것
+	if (pKirby->Get_State() == CKirby::STATE_FALL)
+	{
+		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
+		m_fFallTime += fTimeDelta;
+
+		if (pController->Is_Terrain())
 		{
-			// 착지상태를 ON 한다. 그리고 아마 여기 들어올 일은 없을 것이다.
-			Kirbydesc->m_isLanding = true;
-
-			// 표정 디테일
-			if (CUtils::Make_RandomInt(0, 1) == 1)
+			if (m_fFallTime > 1.f)
 			{
-				Kirbydesc->m_eEyeState = CKirby::EYE_CLOSE;
+				pKirby->Change_State(CKirby::STATE_LANDINGEND, 30.f, false, false, CKirby::BODY_DEFAULT);
+				if (CUtils::Make_RandomInt(0, 1) > 0)
+					DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+				m_fFallTime = 0.f;
+			}
+			else
+			{
+				pKirby->Change_State(CKirby::STATE_LANDINGSMALL, 50.f, false, false, CKirby::BODY_DEFAULT);
+				if (CUtils::Make_RandomInt(0, 1) > 0)
+					DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+
+				m_fFallTime = 0.f;
 			}
 		}
 	}
-	else if (pKirby->Get_State() == CKirby::STATE_FALL)
+	// 점프
+	else if (pKirby->Get_State() == CKirby::STATE_JUMPL || pKirby->Get_State() == CKirby::STATE_JUMPR
+		|| pKirby->Get_State() == CKirby::STATE_JUMPEND)
 	{
-		pController->FreeFall(pTransformCom, fTimeDelta, Kirbydesc->m_fGravityOffset);
+		// 0.3초 동안만 누적이 된다.
+		if (DESC(m_bRePressBlock) == false && m_pGameInstance->Get_DIKeyState(DIK_C, KEY_PRESS) && DESC(m_fJumpHoldTime) < 0.3f)
+		{
+			DESC(m_fJumpHoldTime) += fTimeDelta;
+			DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
+			pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
+		}
+		else
+		{
+			// 최소 점프 제한 키 유지 시간
+			_float fJumpHoldTime = 0.1f;
+			// 공중 체공 시간
+			_float fHoldAirTime = 0.22f;
+			// 최소단위 공중 올라가는 시간
+			_float fChangeVelocityZeroTime = 0.09f;
+
+			// 최소 점프시간 이하로 눌렀을 때
+			if (DESC(m_fJumpHoldTime) < fJumpHoldTime)
+			{
+				DESC(m_fChangeVelocityZeroTime) += fTimeDelta;
+
+				// 만약, 최소 점프 제한키 이하로 눌렀을 때, 최소 단위 공중 올라가는 시간이 지났다면
+				if (DESC(m_fChangeVelocityZeroTime) > fChangeVelocityZeroTime)
+				{
+					// 공중 체공시간동안 중력값은 보정된다.
+					DESC(m_fHoldAirTime) += fTimeDelta;
+					if (DESC(m_fHoldAirTime) < fHoldAirTime)
+					{
+						// 중력값 보정식
+						_float fStopVelocityPower = GRAVITY * fTimeDelta * 6.f;
+						DESC(m_fJumpVelocity) = fStopVelocityPower + (fabs(DESC(m_fHoldAirTime) - fHoldAirTime * 0.5f) * (-1.f / (fHoldAirTime * 0.5f)));
+					}
+				}
+			}
+			// 만약, 0.1초 이상 눌렀을 경우
+			else
+			{
+				// 바로 공중 체공시간이 가산되어 중력값이 보정된다.
+				DESC(m_fHoldAirTime) += fTimeDelta;
+				if (DESC(m_fHoldAirTime) < fHoldAirTime)
+				{
+					_float fStopVelocityPower = GRAVITY * fTimeDelta * 6.f;
+					DESC(m_fJumpVelocity) = fStopVelocityPower + (fabs(DESC(m_fHoldAirTime) - fHoldAirTime * 0.5f) * (-1.f / (fHoldAirTime * 0.5f)));
+				}
+
+			}
+
+			DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
+			pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
+		}
+
+		// 0.3초 이상 눌렀을 경우 JUMPEND (공중에서 한 바퀴 돌기) 행위를 한다.
+		if (DESC(m_fJumpHoldTime) > 0.3f)
+		{
+			pKirby->Change_State(CKirby::STATE_JUMPEND, 60.f, false, true, CKirby::BODY_DEFAULT);
+		}
+		
+		// 만약, 땅에 안전하게 착지했을 경우, 홀딩 시간에 따라 뽀잉 애니메이션이 분기된다.
+		if (pController->Is_Terrain())
+		{
+			if (DESC(m_fJumpHoldTime) > 0.2f)
+			{
+				pKirby->Change_State(CKirby::STATE_LANDINGEND, 30.f, false, false, CKirby::BODY_DEFAULT);
+				if (CUtils::Make_RandomInt(0, 1) > 0)
+					DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+			}
+			else
+			{
+				pKirby->Change_State(CKirby::STATE_LANDINGSMALL, 50.f, false, false, CKirby::BODY_DEFAULT);
+				if (CUtils::Make_RandomInt(0, 1) > 0)
+					DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+			}
+		}
+
+
+	}
+	// 뽀잉
+	else if (pKirby->Get_State() == CKirby::STATE_LANDINGEND || pKirby->Get_State() == CKirby::STATE_LANDINGSMALL)
+	{
+		// 최소 애니메이션이 재생되는 시간이다. ( 방향키를 누르면 0.2초 후 바로 Run 상태가 됨 )
+		_float fChangeRunTime = 0.08f;
+
+		m_fChangeRunTime += fTimeDelta;
+
+		// Idle일 때, C를 누르면 점프를 한다.
+		if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
+		{
+			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			// 점프의 초기 파워
+			DESC(m_fJumpVelocity) = 22.f;
+
+			DESC(m_eJumpState) == DESC(m_eJumpState) ? CKirby::STATE_JUMPR : DESC(m_eJumpState) = CKirby::STATE_JUMPL;
+			pKirby->Change_State(DESC(m_eJumpState), 50.f, false, true, CKirby::BODY_DEFAULT);
+
+			DESC(m_fChangeVelocityZeroTime) = 0.f;
+			// 공중에서 체공하는 시간 0.15초
+			DESC(m_fHoldAirTime) = 0.f;
+			// 점프키를 누르는 시간
+			DESC(m_fJumpHoldTime) = 0.f;
+			// 재입력 블락기능 초기화
+			DESC(m_bRePressBlock) = false;
+		}
+
+		// 바로 방향키를 갈겼다면
+		if (m_fChangeRunTime > fChangeRunTime && JoyStick_controller(Kirbydesc, pCamera))
+		{
+			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			pKirby->Change_State(CKirby::STATE_RUN, 100.f, true, true, CKirby::BODY_DEFAULT);
+		}
+		// 자연스럽게 끝났다면
+		else if (pKirby->isAnimFinish())
+		{
+			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+		}
 	}
 }
 
 void CKirbyDefault_Jump_State::OnStateExit()
 {
+	m_fChangeRunTime = 0.f;
 }
 
 CKirbyDefault_Jump_State* CKirbyDefault_Jump_State::Create()

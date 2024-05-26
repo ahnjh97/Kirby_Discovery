@@ -1,6 +1,8 @@
 #pragma once
 #include "Kirby.h"
 #include "Utils.h"
+#define DESC(state) Kirbydesc->state
+#define GAMEINSTANCE CGameInstance::Get_Instance()->
 
 // 방향키를 누르면 그쪽으로 2차원 원형 보간이 된다
 static void Turn_Interpolate(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTransformCom, _float fTimeDelta)
@@ -215,6 +217,7 @@ static void Inhale_Moving_Logic(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* p
 	pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
 }
 
+// 날때의 로직
 static void Fly_Moving_Logic(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTransformCom, CCharacterController* pController, _float fTimeDelta)
 {
 	Kirbydesc->m_fMoveSpeed += fTimeDelta * 10.f;
@@ -227,6 +230,7 @@ static void Fly_Moving_Logic(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTra
 	pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
 }
 
+// 날때 감속
 static void Fly_Deceleration(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTransformCom, CCharacterController* pController, _float fTimeDelta)
 {
 	// 0.1초간 풀 감속 (최대 속도 8이라 가정)
@@ -244,3 +248,70 @@ static void Fly_Deceleration(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTra
 	pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
 }
 
+// 카메라 기준 방향을 만들어준다. (JoyStick_controler에서 사용)
+static _float4 Make_TargetDir(CKirby::DIR _eDir, CGameObject* pCamera)
+{
+
+	CTransform* pCameraTransform = pCamera->Get_TransformCom();
+	_float4 vCamRight = pCameraTransform->Get_State_Vector(CTransform::STATE_RIGHT);
+	_float4 vCamLook = XMVector3Cross(vCamRight, XMVectorSet(0.f, 1.f, 0.f, 1.f));
+
+	if (_eDir == CKirby::DIR_RIGHT)
+		return vCamRight;
+	else if (_eDir == CKirby::DIR_LEFT)
+		return -1.f * vCamRight;
+	else if (_eDir == CKirby::DIR_FRONT)
+		return vCamLook;
+	else if (_eDir == CKirby::DIR_BACK)
+		return -1.f * vCamLook;
+
+	else if (_eDir == CKirby::DIR_LB)
+		return XMVector4Normalize((-1.f * vCamRight) + (-1.f * vCamLook));
+	else if (_eDir == CKirby::DIR_RB)
+		return XMVector4Normalize(vCamRight + (-1.f * vCamLook));
+	else if (_eDir == CKirby::DIR_LF)
+		return XMVector4Normalize((-1.f * vCamRight) + (vCamLook));
+	else if (_eDir == CKirby::DIR_RF)
+		return XMVector4Normalize(vCamRight + vCamLook);
+
+	return _float4(0.f, 0.f, 0.f, 0.f);
+}
+
+// 조이스틱을 제어하고 있으면 true, 제어하고 있지 않으면 false
+static _bool JoyStick_controller(CKirby::KIRBY_INFODESC* Kirbydesc, CGameObject* pCamera)
+{
+	if (GAMEINSTANCE Get_DIKeyState(DIK_UP, KEY_PRESS))
+	{
+		if (GAMEINSTANCE Get_DIKeyState(DIK_LEFT, KEY_PRESS))
+			DESC(m_vTargetDir) = Make_TargetDir(CKirby::DIR_LF, pCamera);
+		else if (GAMEINSTANCE Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
+			DESC(m_vTargetDir) = Make_TargetDir(CKirby::DIR_RF, pCamera);
+		else
+			DESC(m_vTargetDir) = Make_TargetDir(CKirby::DIR_FRONT, pCamera);
+
+		return true;
+	}
+	else if (GAMEINSTANCE Get_DIKeyState(DIK_DOWN, KEY_PRESS))
+	{
+		if (GAMEINSTANCE Get_DIKeyState(DIK_LEFT, KEY_PRESS))
+			DESC(m_vTargetDir) = Make_TargetDir(CKirby::DIR_LB, pCamera);
+		else if (GAMEINSTANCE Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
+			DESC(m_vTargetDir) = Make_TargetDir(CKirby::DIR_RB, pCamera);
+		else
+			DESC(m_vTargetDir) = Make_TargetDir(CKirby::DIR_BACK, pCamera);
+
+		return true;
+	}
+	else if (GAMEINSTANCE Get_DIKeyState(DIK_LEFT, KEY_PRESS))
+	{
+		DESC(m_vTargetDir) = Make_TargetDir(CKirby::DIR_LEFT, pCamera);
+		return true;
+	}
+	else if (GAMEINSTANCE Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
+	{
+		DESC(m_vTargetDir) = Make_TargetDir(CKirby::DIR_RIGHT, pCamera);
+		return true;
+	}
+
+	return false;
+}

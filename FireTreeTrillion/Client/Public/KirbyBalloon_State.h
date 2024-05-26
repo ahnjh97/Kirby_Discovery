@@ -67,6 +67,8 @@ public:
 	static	CKirbyBalloon_Jump_State* Create();
 	virtual void						Free() override;
 
+	_float	m_fChangeRunTime = { 0.f };
+
 };
 
 
