@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "..\Public\Level_GamePlay.h"
-
+#include "Level_GamePlay.h"
 #include "Camera_Free.h"
+#include "Trigger.h"
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -150,7 +150,8 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 
 		if ("Camera" == strModelName || "Trigger" == strModelName) {
 			fileStream.read(reinterpret_cast<char*>(&iCamIndex), sizeof(iCamIndex));
-			camMatrices.emplace(iCamIndex, matWorld);
+			if("Camera" == strModelName)
+				camMatrices.emplace(iCamIndex, matWorld);
 		}
 		if (fileStream.eof())
 			break;
@@ -172,7 +173,11 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 		}
 		else if (strModelName == "Trigger")
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Trigger"), TEXT("Prototype_GameObject_Trigger"), &tempDesc)))
+			CTrigger::TRIGGER_DESC tTriggerDesc{};
+			tTriggerDesc.matWorld = matWorld;
+			tTriggerDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			tTriggerDesc.iCamIndex = iCamIndex;
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Trigger"), TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc)))
 				return E_FAIL;
 		}
 	}

@@ -1,5 +1,6 @@
 #include "stdafx.h"
-#include "..\Public\Camera_Free.h"
+#include "Camera_Free.h"
+#include <functional>
 
 CCamera_Free::CCamera_Free(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CCamera{ pDevice, pContext }
@@ -30,6 +31,8 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_pGameInstance->Add_Camera(this);
+	function<void(_int)> func = bind(&CCamera_Free::Set_MatrixIndex, this, placeholders::_1);
+	m_pGameInstance->SetUp_CamSetIndexFunc(func);
 
 	return S_OK;
 }

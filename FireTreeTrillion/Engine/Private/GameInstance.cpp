@@ -793,10 +793,16 @@ void CGameInstance::Register_Player(PxActor* pPlayerActor)
 		m_pPhysx->Register_Player(pPlayerActor);
 }
 
-void CGameInstance::Register_Trigger(PxActor* pTriggerActor)
+void CGameInstance::Register_Trigger(PxActor* pTriggerActor, _int iCamIndex)
 {
 	if (nullptr != m_pPhysx)
-		m_pPhysx->Register_Trigger(pTriggerActor);
+		m_pPhysx->Register_Trigger(pTriggerActor,iCamIndex);
+}
+
+void CGameInstance::SetUp_CamSetIndexFunc(function<void(_int)> func)
+{
+	if (nullptr != m_pPhysx)
+		m_pPhysx->SetUp_CamSetIndexFunc(func);
 }
 
 void CGameInstance::Transform_PickingToLocalSpace(const CTransform* pTransform, _float3* pRayDir, _float3* pRayPos)

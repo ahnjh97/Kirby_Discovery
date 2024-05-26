@@ -1,5 +1,6 @@
 #pragma once
 #include "Base.h"
+#include "GameObject.h"
 
 BEGIN(Engine)
 
@@ -23,7 +24,8 @@ public:
 
     //EventCallBack ÇÔ¼öµé
     void Register_Player(PxActor* pPlayerActor);
-    void Register_Trigger(PxActor* pTriggerActor);
+    void Register_Trigger(PxActor* pTriggerActor, _int iCamIndex);
+    void SetUp_CamSetIndexFunc(function<void(_int)> func);
 
     PxPhysics*                          Get_Physics() { return m_pPhysics; }
     PxMaterial*                         Get_Material() { return m_pMaterial; }
@@ -65,6 +67,8 @@ private:
     physx::PxRigidDynamic*              m_pRigidDynamic = nullptr;
 
     map<string, physx::PxMaterial*>     m_mapMaterials;
+
+    CGameObject*                        m_pCamera = { nullptr };
 
 public:
     static CPhysX*  Create();

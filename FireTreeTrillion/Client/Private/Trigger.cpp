@@ -19,6 +19,12 @@ HRESULT CTrigger::Initialize_Prototype()
 
 HRESULT CTrigger::Initialize(void * pArg)
 {
+	TRIGGER_DESC tTriggerDesc{};
+	if (nullptr != pArg) {
+		tTriggerDesc = *(TRIGGER_DESC*)pArg;
+		m_iCamIndex = tTriggerDesc.iCamIndex;
+	}
+
 	HRESULT hr;
 	hr = __super::Initialize(pArg);
 	CHECK_FAILED(hr);
@@ -111,6 +117,8 @@ HRESULT CTrigger::Add_Components()
 	if(FAILED(__super::Add_Component(TEXT("Prototype_Component_RigidBody"),
 		TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &tRigidDesc)))
 		return E_FAIL;
+
+	m_pRigidBodyCom->SetUp_CamIndex(m_iCamIndex);
 	m_pRigidBodyCom->Activate(true);
 
 	return S_OK;

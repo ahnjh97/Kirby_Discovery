@@ -101,16 +101,25 @@ void CPhysX::Register_Player(PxActor* pPlayerActor)
     pEventCallBack->Register_Player(pPlayerActor);
 }
 
-void CPhysX::Register_Trigger(PxActor* pTriggerActor)
+void CPhysX::Register_Trigger(PxActor* pTriggerActor,  _int iCamIndex)
 {
     if (nullptr == m_pScene)
         return;
     CEventCallBack* pEventCallBack = dynamic_cast<CEventCallBack*>(m_pScene->getSimulationEventCallback());
     if (nullptr == pEventCallBack)
         return;
-    pEventCallBack->Register_Trigger(pTriggerActor);
+    pEventCallBack->Register_Trigger(pTriggerActor, iCamIndex);
 }
 
+void CPhysX::SetUp_CamSetIndexFunc(function<void(_int)> func)
+{
+    if (nullptr == m_pScene)
+        return;
+    CEventCallBack* pEventCallBack = dynamic_cast<CEventCallBack*>(m_pScene->getSimulationEventCallback());
+    if (nullptr == pEventCallBack)
+        return;
+    pEventCallBack->SetUp_CamSetIndexFunc(func);
+}
 
 //
 //// DX의 행렬(_float4x4)을 PhysX의 행렬으로 변경한다.

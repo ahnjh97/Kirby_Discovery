@@ -1,4 +1,5 @@
 #include "EventCallBack.h"
+#include "GameInstance.h"
 
 void CEventCallBack::onTrigger(PxTriggerPair* pairs, PxU32 count)
 {
@@ -7,7 +8,7 @@ void CEventCallBack::onTrigger(PxTriggerPair* pairs, PxU32 count)
         if (nullptr != m_pPlayerActor)
         {
             if (pairs[i].otherActor ==  m_pPlayerActor && IsActorInTriggerList(pairs[i].triggerActor)) {
-                MSG_BOX(TEXT("trigger"));
+                //MSG_BOX(TEXT("trigger"));
             }
         }
     }
@@ -18,8 +19,9 @@ _bool CEventCallBack::IsActorInTriggerList(PxActor* pRigidActor)
     if (m_Triggers.empty())
         return false;
 
-    for (auto trigger : m_Triggers) {
-        if (trigger == pRigidActor) {
+    for (auto pair : m_Triggers) {
+        if (pair.first == pRigidActor) {
+            m_pCamSetIndexFunc(pair.second);
             return true;
         }
     }

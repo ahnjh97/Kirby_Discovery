@@ -12,6 +12,11 @@ BEGIN(Client)
 class CMapToolObject : public CGameObject
 {
 public:
+	struct MAPTOOLOBJECT_DESC : public GAMEOBJECT_DESC
+	{
+		_int iCamIndex = -1;
+	};
+public:
 	_int Get_CamIndex() { return m_iCamIndex; }
 	void Set_CamIndex(_int iCamIndex) { m_iCamIndex = iCamIndex; }
 

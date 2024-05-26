@@ -19,9 +19,9 @@ HRESULT CMapToolObject::Initialize_Prototype()
 
 HRESULT CMapToolObject::Initialize(void* pArg)
 {
-	GAMEOBJECT_DESC GameObjectDesc = {}; 
+	MAPTOOLOBJECT_DESC GameObjectDesc = {};
 	if (pArg)
-		GameObjectDesc = *(GAMEOBJECT_DESC*)pArg;
+		GameObjectDesc = *(MAPTOOLOBJECT_DESC*)pArg;
 
 	GameObjectDesc.fSpeedPerSec = 10.f;
 	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
@@ -31,6 +31,8 @@ HRESULT CMapToolObject::Initialize(void* pArg)
 
 	if (FAILED(Add_Components(GameObjectDesc.wstrModelName)))
 		return E_FAIL;
+
+	m_iCamIndex = GameObjectDesc.iCamIndex;
 
 	return S_OK;
 }

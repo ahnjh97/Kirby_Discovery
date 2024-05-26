@@ -11,6 +11,12 @@ BEGIN(Client)
 
 class CTrigger final : public CGameObject
 {
+public:
+	struct TRIGGER_DESC : GAMEOBJECT_DESC
+	{
+		_int iCamIndex = -1;
+	};
+
 private:
 	CTrigger(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CTrigger(const CTrigger& rhs);
@@ -38,6 +44,7 @@ private:
 
 private:
 	function<void()>	m_CallBack = nullptr;
+	_int			m_iCamIndex = { -1 };
 
 public:
 	static CTrigger*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -376,9 +376,11 @@ void CMapToolHelper::Load_Level()
 		if (fileStream.eof())
 			break;
 
-		GAMEOBJECT_DESC tDesc{};
+		CMapToolObject::MAPTOOLOBJECT_DESC tDesc{};
 		tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
 		tDesc.matWorld = matWorld;
+		if ("Camera" == strModelName || "Trigger" == strModelName)
+			tDesc.iCamIndex = iCamIndex;
 
 		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_MapToolObject"), &tDesc))) 
 		{

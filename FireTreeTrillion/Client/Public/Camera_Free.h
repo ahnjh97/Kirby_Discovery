@@ -34,7 +34,7 @@ public:
 	void Track_Target(_bool _bTrackTarget) { m_bTrackTarget = _bTrackTarget; }
 
 	void Set_MatrixIndex(_int iMatrixIndex){ 
-		if ((iMatrixIndex != m_iMatrixIndex) && (nullptr != m_pTransformCom) && (!m_vecCamMatrices.empty()))
+		if ((iMatrixIndex != m_iMatrixIndex) && (nullptr != m_pTransformCom) && (!m_vecCamMatrices.empty()) && iMatrixIndex >= 0)
 		{
 			if(iMatrixIndex < m_vecCamMatrices.size())
 				m_pTransformCom->Set_WorldMatrix(m_vecCamMatrices[iMatrixIndex]);

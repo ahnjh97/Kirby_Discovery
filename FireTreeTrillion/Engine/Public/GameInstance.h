@@ -166,7 +166,8 @@ public: /* For.PhysX */
 	PxRigidDynamic* CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial = nullptr);
 	PxRigidStatic* CreateStaticActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial = nullptr);
 	void Register_Player(PxActor* pPlayerActor);
-	void Register_Trigger(PxActor* pTriggerActor);
+	void Register_Trigger(PxActor* pTriggerActor, _int iCamIndex);
+	void SetUp_CamSetIndexFunc(function<void(_int)> func);
 
 public: /* For. Picking */
 	void Transform_PickingToLocalSpace(const class CTransform* pTransform, _Out_ _float3* pRayDir, _Out_ _float3* pRayPos);

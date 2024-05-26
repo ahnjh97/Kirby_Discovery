@@ -199,9 +199,9 @@ void CRigidBody::Activate(_bool _bActive)
 		if (m_bTrigger)
 		{
 			if (nullptr != m_pActor)
-				m_pGameInstance->Register_Trigger(m_pActor);
+				m_pGameInstance->Register_Trigger(m_pActor, m_iCamIndex);
 			else
-				m_pGameInstance->Register_Trigger(m_pStaticActor);
+				m_pGameInstance->Register_Trigger(m_pStaticActor, m_iCamIndex);
 		}
 	}
 	else
