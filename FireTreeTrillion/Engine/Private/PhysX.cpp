@@ -1,5 +1,6 @@
 #include "PhysX.h"
 #include "Utils.h"
+#include "EventCallBack.h"
 
 CPhysX::CPhysX()
 {
@@ -19,14 +20,16 @@ HRESULT CPhysX::Initialize()
     mToleranceScale.speed = 0.1f;         // typical speed of an object, gravity * 1s is a reasonable choice
 
     m_pPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *m_pFoundation, mToleranceScale, true, m_pPvd);
-
+    CEventCallBack* pEventCallBack = new CEventCallBack();
     PxSceneDesc sceneDesc(m_pPhysics->getTolerancesScale());
     sceneDesc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
     m_pDispatcher = physx::PxDefaultCpuDispatcherCreate(2);
     sceneDesc.cpuDispatcher = m_pDispatcher;
+    sceneDesc.simulationEventCallback = pEventCallBack;
     sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
-    m_pScene = m_pPhysics->createScene(sceneDesc);
 
+    m_pScene = m_pPhysics->createScene(sceneDesc);
+    
     m_pPvdSceneClient = m_pScene->getScenePvdClient();
     if (m_pPvdSceneClient)
     {
@@ -38,28 +41,6 @@ HRESULT CPhysX::Initialize()
     // create simulation
     m_pMaterial = m_pPhysics->createMaterial(0.5f, 0.5f, 0.6f);
     m_pControllerManager = PxCreateControllerManager(*m_pScene);
-    //physx::PxRigidStatic* groundPlane = PxCreatePlane(*m_pPhysics, physx::PxPlane(0, 1, 0, 0), *m_pMaterial);
-    //m_pScene->addActor(*groundPlane);
-
-    //float halfExtent = .5f;
-    //m_pShape = m_pPhysics->createShape(physx::PxBoxGeometry(halfExtent, halfExtent, halfExtent), *m_pMaterial);
-    //physx::PxU32 size = 30;
-    //physx::PxTransform t(physx::PxVec3(0));
-    //for (physx::PxU32 i = 0; i < size; i++) {
-    //    for (physx::PxU32 j = 0; j < size - i; j++) {
-    //        physx::PxTransform localTm(physx::PxVec3(physx::PxReal(j * 2) - physx::PxReal(size - i), physx::PxReal(i * 2 + 1), 0) * halfExtent);
-    //        physx::PxRigidDynamic* body = m_pPhysics->createRigidDynamic(t.transform(localTm));
-    //        body->attachShape(*m_pShape);
-    //        physx::PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
-    //        m_pScene->addActor(*body);
-    //    }
-    //        physx::PxRigidDynamic* body = mPhysics->createRigidDynamic(t.transform(localTm));
-    //        body->attachShape(*shape);
-    //        physx::PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
-    //        mScene->addActor(*body);
-    //    }
-    //}
-
 
     return S_OK;
 }
@@ -108,6 +89,26 @@ void CPhysX::AddActor(physx::PxActor& pActor)
 void CPhysX::RemoveActor(physx::PxActor& pActor)
 {
     m_pScene->removeActor(pActor);
+}
+
+void CPhysX::Register_Player(PxActor* pPlayerActor)
+{
+    if (nullptr == m_pScene)
+        return;
+    CEventCallBack* pEventCallBack = dynamic_cast<CEventCallBack*>(m_pScene->getSimulationEventCallback());
+    if (nullptr == pEventCallBack)
+        return;
+    pEventCallBack->Register_Player(pPlayerActor);
+}
+
+void CPhysX::Register_Trigger(PxActor* pTriggerActor)
+{
+    if (nullptr == m_pScene)
+        return;
+    CEventCallBack* pEventCallBack = dynamic_cast<CEventCallBack*>(m_pScene->getSimulationEventCallback());
+    if (nullptr == pEventCallBack)
+        return;
+    pEventCallBack->Register_Trigger(pTriggerActor);
 }
 
 

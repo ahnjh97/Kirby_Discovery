@@ -105,11 +105,13 @@ HRESULT CTrigger::Add_Components()
 	if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Model_Trigger"),
 		TEXT("Com_Model"),  (CComponent**)&m_pModelCom)))
 		return E_FAIL;
-	
+
+	CRigidBody::RIGIDBODY_DESC tRigidDesc(RIGID_BOX, m_pTransformCom->Get_WorldMatrix(), true, false);
 	/* For.Com_RigidBody */
 	if(FAILED(__super::Add_Component(TEXT("Prototype_Component_RigidBody"),
-		TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom)))
+		TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &tRigidDesc)))
 		return E_FAIL;
+	m_pRigidBodyCom->Activate(true);
 
 	return S_OK;
 }
@@ -146,5 +148,6 @@ void CTrigger::Free()
 
 	Safe_Release(m_pShaderCom);	
 	Safe_Release(m_pModelCom);
+	Safe_Release(m_pRigidBodyCom);
 }
 

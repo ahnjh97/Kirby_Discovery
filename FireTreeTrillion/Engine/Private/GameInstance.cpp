@@ -787,6 +787,18 @@ PxRigidStatic* CGameInstance::CreateStaticActor(_float4 vPos, _float3* pVertices
 	return m_pPhysx->CreateStaticActor(vPos, pVerticesPos, iNumVertices, pIndices, iNumIndices, pMaterial);
 }
 
+void CGameInstance::Register_Player(PxActor* pPlayerActor)
+{
+	if (nullptr != m_pPhysx)
+		m_pPhysx->Register_Player(pPlayerActor);
+}
+
+void CGameInstance::Register_Trigger(PxActor* pTriggerActor)
+{
+	if (nullptr != m_pPhysx)
+		m_pPhysx->Register_Trigger(pTriggerActor);
+}
+
 void CGameInstance::Transform_PickingToLocalSpace(const CTransform* pTransform, _float3* pRayDir, _float3* pRayPos)
 {
 	if (nullptr == m_pPicking)

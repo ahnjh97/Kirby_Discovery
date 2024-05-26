@@ -396,6 +396,9 @@
     <ClCompile Include="..\Private\Picking.cpp">
       <Filter>01.Utility\11.Picking</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\EventCallBack.cpp">
+      <Filter>02. PhysX</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Base.h">
@@ -625,6 +628,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Picking.h">
       <Filter>01.Utility\11.Picking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EventCallBack.h">
+      <Filter>02. PhysX</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

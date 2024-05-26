@@ -170,6 +170,11 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_BasicMap"), &tempDesc)))
 				return E_FAIL;
 		}
+		else if (strModelName == "Trigger")
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Trigger"), TEXT("Prototype_GameObject_Trigger"), &tempDesc)))
+				return E_FAIL;
+		}
 	}
 	fileStream.close();
 

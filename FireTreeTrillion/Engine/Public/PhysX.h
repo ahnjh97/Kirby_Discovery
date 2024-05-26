@@ -21,6 +21,10 @@ public:
     void AddActor(physx::PxActor& pActor);
     void RemoveActor(physx::PxActor& pActor);
 
+    //EventCallBack ÇÔ¼öµé
+    void Register_Player(PxActor* pPlayerActor);
+    void Register_Trigger(PxActor* pTriggerActor);
+
     PxPhysics*                          Get_Physics() { return m_pPhysics; }
     PxMaterial*                         Get_Material() { return m_pMaterial; }
 

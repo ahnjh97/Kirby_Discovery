@@ -14,6 +14,7 @@
 #include "MapToolHelper.h"
 #include "MapToolObject.h"
 #include "BasicMap.h"
+#include "Trigger.h"
 #include "Grid.h"
 
 #pragma region TOO_UI
@@ -148,6 +149,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BasicMap"), CBasicMap);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolHelper"), CMapToolHelper);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolObject"), CMapToolObject);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Trigger"), CTrigger);
 
 	// 05.20) 원본 추가
 	 /*      GameObject_IMGUI_UI_Editor    */
@@ -372,6 +374,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("GsBenchAL", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("Level0Stage1Step01", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("Level1Stage1Step01", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f);
 	}
 	else if (eLevel == LEVEL_TOOL_MAP) 
 	{		
