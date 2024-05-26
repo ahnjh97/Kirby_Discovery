@@ -139,14 +139,15 @@ HRESULT CSingleEffect::Add_Components(FX_DESC& FXDesc)
 	{
 		hr = __super::Add_Component(LEVEL_STATIC, CUtils::StrToWstr(FXDesc.strBufferTag),
 			TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom);
-
 		CHECK_FAILED(hr);
 
 
 		hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex"),
 			TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
-
 		CHECK_FAILED(hr);
+
+		//현재 VtxPosTex Shader Pass 3개
+		m_iMaxPassIdx = 2;
 	}
 	else
 	{
@@ -158,8 +159,10 @@ HRESULT CSingleEffect::Add_Components(FX_DESC& FXDesc)
 
 		hr = __super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Shader_VtxModel"),
 			TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
-
 		CHECK_FAILED(hr);
+
+		//현재 VtxModel Shader Pass 4개
+		m_iMaxPassIdx = 3;
 	}
 
 	return S_OK;

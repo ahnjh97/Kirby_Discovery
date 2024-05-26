@@ -120,7 +120,7 @@ HRESULT CParticle::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Begin(0)))
+	if (FAILED(m_pShaderCom->Begin(m_iPassIdx)))
 		return E_FAIL;
 
 	if (FAILED(m_pVIBufferCom->Bind_Buffers()))
@@ -160,6 +160,9 @@ HRESULT CParticle::Add_Components(PARTICLE_DESC& _FXDesc)
 		hr = __super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Shader_VtxInstance_Point"),
 			TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 		CHECK_FAILED(hr);
+
+		//ÇöÀç VtxInstance Shader Pass 3°³
+		m_iMaxPassIdx = 1;
 	}
 	else
 	{

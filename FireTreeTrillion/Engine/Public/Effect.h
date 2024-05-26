@@ -51,6 +51,7 @@ public:
 		_int iTexIdx = { 0 };
 		_int iMaskTexIdx = { 0 };
 
+		//_int iMaskTexIdx = { 0 };
 
 		map<KF_PROPERTY, vector<FX_KEYFRAME>> Keyframes;
 
@@ -117,6 +118,8 @@ protected:
 	_bool			m_bIsOrthographic = { false };
 	_bool			m_bIsColorRender = { true };
 	_bool			m_bIsBloom = { false };
+
+	_float			m_fRimLightThreshold = { 0.f };
 
 	//기본 시작 크자이
 	_float3 m_vInitPos = { 0.f, 0.f, 0.f };

@@ -122,7 +122,7 @@ void CFXToolDirector::Late_Tick(_float _fTimeDelta)
 
 void CFXToolDirector::Render_AxisLines()
 {
-	ImDrawList* drawList = GetBackgroundDrawList();
+	ImDrawList* drawList = GetForegroundDrawList();
 
 	_float4x4 ViewMatrix, ProjMatrix;
 	ViewMatrix = m_pGameInstance->Get_Transform(CPipeLine::D3DTS_VIEW);
@@ -155,10 +155,10 @@ void CFXToolDirector::Render_AxisLines()
 	ImVec2 screenZAxisEnd = TransformToScreen(zAxisEnd);
 
 	// Draw lines
-	drawList->AddLine(screenXAxisStart, screenOrigin, IM_COL32(255, 255, 255, 255), 1.0f); // Red line for X axis
-	drawList->AddLine(screenOrigin, screenXAxisEnd, IM_COL32(255, 255, 255, 255), 1.0f); // Red line for X axis
-	drawList->AddLine(screenZAxisStart, screenOrigin, IM_COL32(50,50, 255, 255), 1.0f); // Blue line for Z axis
-	drawList->AddLine(screenOrigin, screenZAxisEnd, IM_COL32(50, 50, 255, 255), 1.0f); // Blue line for Z axis
+	drawList->AddLine(screenXAxisStart, screenOrigin, IM_COL32(255, 50, 255, 255), 1.f); // Red line for X axis
+	drawList->AddLine(screenOrigin, screenXAxisEnd, IM_COL32(255, 50, 255, 255), 1.f); // Red line for X axis
+	drawList->AddLine(screenZAxisStart, screenOrigin, IM_COL32(50,50, 255, 255), 1.f); // Blue line for Z axis
+	drawList->AddLine(screenOrigin, screenZAxisEnd, IM_COL32(50, 50, 255, 255), 1.f); // Blue line for Z axis
 }
 
 HRESULT CFXToolDirector::Render()
@@ -169,8 +169,6 @@ HRESULT CFXToolDirector::Render()
 	//¾Æ´Ï¸é º¹ÇÕ ÀÌÆåÆ® ·»´õ
 	else if (m_eSelected == SELECTED_MULTI_FX)
 		m_MultiFXs[m_iSelectedMultiFXIdx]->Render();
-
-
 
 	return S_OK;
 }

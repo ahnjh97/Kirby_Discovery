@@ -7,6 +7,11 @@ texture2D	g_MaskTexture;
 
 vector	g_vCamPosition;
 
+//컬러, 마스크 임계 등
+vector g_vRColor = { 1.f, 1.f, 1.f, 1.f };
+vector g_vGColor = { 1.f, 1.f, 1.f, 1.f };
+vector g_vBColor = { 1.f, 1.f, 1.f, 1.f };
+
 struct VS_IN
 {
 	float3				vPosition : POSITION;
@@ -119,6 +124,23 @@ PS_OUT PS_MAIN(PS_IN In)
 	return Out;
 }
 
+PS_OUT PS_MAIN_WHITE_FX(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    float vBrightness = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord).r;
+	
+	
+    Out.vColor = g_vRColor * vBrightness;
+	
+    Out.vColor.a = vBrightness; // 어두울수록 투명
+    
+    if (Out.vColor.a < .05f)
+        discard;
+	
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
 	pass Default
@@ -133,4 +155,18 @@ technique11 DefaultTechnique
 		DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
 		PixelShader = compile ps_5_0 PS_MAIN();
 	}
+
+	// 하얀 부분만 그리는 패스. 알파 테스팅 ( 1 )
+    pass WhiteFX
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = compile gs_5_0 GS_MAIN();
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_WHITE_FX();
+    }
 }
