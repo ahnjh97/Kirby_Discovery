@@ -36,6 +36,7 @@
 //#include "Weapon.h"
 //#include "Player.h"
 #include "Kirby.h"
+#include "Awoofy.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
@@ -155,6 +156,9 @@ HRESULT CLoader::Loading_ObjectAll()
 
 	// For Kirby
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kirby"), CKirby);
+
+	// For Awoofy To Monster
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Awoofy"), CAwoofy);
 
 	return S_OK;
 }
@@ -372,6 +376,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back(MODEL{ "GsBenchAL", TYPE_NONANIM });
 		m_vecModelInfo.emplace_back(MODEL{ "Level0Stage1Step01", TYPE_NONANIM });
 		m_vecModelInfo.emplace_back(MODEL{ "Level1Stage1Step01", TYPE_NONANIM });
+
+		// For Awoofy
+		m_vecModelInfo.emplace_back(MODEL{ "Awoofy", TYPE_ANIM });
 	}
 	else if (eLevel == LEVEL_TOOL_MAP) 
 	{		
