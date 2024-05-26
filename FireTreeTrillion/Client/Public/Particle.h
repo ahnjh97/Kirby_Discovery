@@ -25,7 +25,7 @@ private:
 	virtual ~CParticle() = default;
 
 public:
-	void Update_InstanceInfo(INSTANCE_DESC& _InstanceDesc);
+	void Update_InstanceInfo(INSTANCE_DESC _InstanceDesc);
 
 	HRESULT Initialize_Prototype();
 	HRESULT Initialize_Prototype(PARTICLE_DESC FXDesc);

@@ -8,6 +8,7 @@ class ENGINE_DLL CEffect : public CGameObject
 #ifdef _DEBUG
 	friend class CFXToolDirector;
 #endif
+
 public:
 	enum TEX {TEX_DIFFUSE, TEX_MASK, TEX_END};
 
@@ -78,7 +79,7 @@ public:
 	void			Add_Keyframe(FX_KEYFRAME& newKeyframe, KF_PROPERTY eProperty);
 	void			Delete_Keyframe(KF_PROPERTY eProperty, _uint iKeyframeIdx);
 	//¿Ã∆Â∆Æ √ﬂ∞°(π≠¿Ω ¿Ã∆Â∆Æ øÎ)
-	virtual void	Add_Effect(CEffect& pEffect) {}
+	virtual void	Add_Effect(CEffect* pEffect) {}
 
 	virtual HRESULT Initialize(void* pArg) override;
 
@@ -162,7 +163,7 @@ protected:
 	_bool			Calculate_Duration(_float _fTimeDelta);
 	_bool			Calculate_Lifetime(_float _fTimeDelta);
 	_float3			Calculate_CurValue_Lerp(_float fTimeDelta, KF_PROPERTY eProperty, _bool bIsInEditor = false);
-	_float3			Calculate_CurValue_Slerp(_float fTimeDelta,  KF_PROPERTY eProperty, _bool bIsInEditor = false);
+	_float4			Calculate_CurValue_Slerp(_float fTimeDelta,  KF_PROPERTY eProperty, _bool bIsInEditor = false);
 
 public:
 	virtual void Free() override;

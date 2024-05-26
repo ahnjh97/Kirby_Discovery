@@ -9,34 +9,16 @@ CVIBuffer_Instance::CVIBuffer_Instance(ID3D11Device * pDevice, ID3D11DeviceConte
 
 CVIBuffer_Instance::CVIBuffer_Instance(const CVIBuffer_Instance & rhs)
 	: CVIBuffer{ rhs }
-	, m_pVBInstance{ rhs.m_pVBInstance }
-	, m_iInstanceStride{ rhs.m_iInstanceStride }
+	/*, m_pVBInstance{ rhs.m_pVBInstance }*/
+	/*, m_iInstanceStride{ rhs.m_iInstanceStride }*/
 	, m_iNumInstance{ rhs.m_iNumInstance }
-	, m_iIndexCountPerInstance{rhs.m_iIndexCountPerInstance }
+	/*, m_iIndexCountPerInstance{rhs.m_iIndexCountPerInstance }
 	, m_pInstanceVertices{ rhs.m_pInstanceVertices }
 	, m_InstanceBufferDesc{ rhs.m_InstanceBufferDesc }
 	, m_InstanceSubResourceData { rhs.m_InstanceSubResourceData }	
-	, m_InstanceDesc { rhs.m_InstanceDesc }
+	, m_InstanceDesc { rhs.m_InstanceDesc }*/
 {
-	m_pLifeTimes = new _float2[m_iNumInstance];
-	memcpy(m_pLifeTimes, rhs.m_pLifeTimes, sizeof(_float2) * m_iNumInstance);
-
-	m_pStartDelays = new _float[m_iNumInstance];
-	memcpy(m_pStartDelays, rhs.m_pStartDelays, sizeof(_float) * m_iNumInstance);
-
-	m_pDirections = new _float3[m_iNumInstance];
-	memcpy(m_pDirections, rhs.m_pDirections, sizeof(_float3) * m_iNumInstance);
-
-	m_pSpeeds = new _float[m_iNumInstance];
-	memcpy(m_pSpeeds, rhs.m_pSpeeds, sizeof(_float) * m_iNumInstance);
-
-	m_pColors = new _float3[m_iNumInstance];
-	memcpy(m_pColors, rhs.m_pColors, sizeof(_float3) * m_iNumInstance);
-
-	m_pAlphas = new _float[m_iNumInstance];
-	memcpy(m_pAlphas, rhs.m_pAlphas, sizeof(_float) * m_iNumInstance);
-
-	Safe_AddRef(m_pVBInstance);
+	
 }
 
 HRESULT CVIBuffer_Instance::Initialize_Prototype(const INSTANCE_DESC& InstanceDesc)
@@ -83,7 +65,7 @@ HRESULT CVIBuffer_Instance::Initialize(void * pArg)
 	VTXPOS* pVertices = new VTXPOS[m_iNumVertices];
 	ZeroMemory(pVertices, sizeof(VTXPOS) * m_iNumVertices);
 
-	pVertices[0].vPosition = _float3(0.f, 0.f, 0.f);
+	//pVertices[0].vPosition = _float3(0.f, 0.f, 0.f);
 
 	ZeroMemory(&m_InitialData, sizeof m_InitialData);
 	m_InitialData.pSysMem = pVertices;
@@ -144,7 +126,6 @@ HRESULT CVIBuffer_Instance::Initialize(void * pArg)
 		m_pInstanceVertices[i].vUp = _float4{ 0.f, 1.f, 0.f, 0.f };
 		m_pInstanceVertices[i].vLook = _float4{ 0.f, 0.f, 1.f, 0.f };
 		m_pInstanceVertices[i].vPosition = _float4{ 0.f, 0.f, 0.f, 1.f };
-
 		m_pInstanceVertices[i].bAlive = true;
 	}
 
@@ -156,6 +137,26 @@ HRESULT CVIBuffer_Instance::Initialize(void * pArg)
 
 	if (FAILED(m_pDevice->CreateBuffer(&m_InstanceBufferDesc, &m_InstanceSubResourceData, &m_pVBInstance)))
 		return E_FAIL;
+
+
+	m_pLifeTimes = new _float2[m_iNumInstance];
+	ZeroMemory(m_pLifeTimes, sizeof(_float2) * m_iNumInstance);
+
+	//memcpy(m_pLifeTimes, rhs.m_pLifeTimes, sizeof(_float2) * m_iNumInstance);
+	m_pStartDelays = new _float[m_iNumInstance];
+	ZeroMemory(m_pStartDelays, sizeof(_float) * m_iNumInstance);
+
+	m_pDirections = new _float3[m_iNumInstance];
+	ZeroMemory(m_pDirections, sizeof(_float3) * m_iNumInstance);
+
+	m_pSpeeds = new _float[m_iNumInstance];
+	ZeroMemory(m_pSpeeds, sizeof(_float) * m_iNumInstance);
+
+	m_pColors = new _float3[m_iNumInstance];
+	ZeroMemory(m_pColors, sizeof(_float3) * m_iNumInstance);
+
+	m_pAlphas = new _float[m_iNumInstance];
+	ZeroMemory(m_pAlphas, sizeof(_float) * m_iNumInstance);
 
 	return S_OK;
 }
@@ -210,9 +211,15 @@ void CVIBuffer_Instance::Drop(_float fTimeDelta)
 
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
+
+		if (0.f < m_pStartDelays[i])
+		{
+			continue;
+		}
+
 		pVertices[i].vPosition.y -= m_pSpeeds[i] * fTimeDelta;
 
-		Compute_LifeTime(pVertices, i, fTimeDelta);
+		//Compute_LifeTime(pVertices, i, fTimeDelta);
 	}
 
 	m_pContext->Unmap(m_pVBInstance, 0);
@@ -230,11 +237,75 @@ void CVIBuffer_Instance::Spread(_float fTimeDelta)
 
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
+
+		if (0.f < m_pStartDelays[i])
+		{
+			continue;
+		}
+
 		_vector		vDir = XMVectorSetW(XMLoadFloat4(&pVertices[i].vPosition) - XMLoadFloat3(&m_InstanceDesc.vPivot), 0.f);
 		
 		XMStoreFloat4(&pVertices[i].vPosition,
 			XMLoadFloat4(&pVertices[i].vPosition) + XMVector3Normalize(vDir) * m_pSpeeds[i] * fTimeDelta);
 
+		//Compute_LifeTime(pVertices, i, fTimeDelta);
+	}
+
+	m_pContext->Unmap(m_pVBInstance, 0);
+}
+
+//Disappear 느낌으로 스케일도 줄여보기
+void CVIBuffer_Instance::Decelerate(_float fTimeDelta)
+{
+
+	D3D11_MAPPED_SUBRESOURCE		SubResource{};
+	m_pContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
+	VTXMATRIX* pVertices = ((VTXMATRIX*)SubResource.pData);
+
+
+	for (size_t i = 0; i < m_iNumInstance; i++)
+	{
+		if (m_pLifeTimes[i].x / m_pLifeTimes[i].y < .8f)
+			continue;
+
+		_float fTimeRatio = ((m_pLifeTimes[i].x / m_pLifeTimes[i].y) - .8f) / .2f;
+		m_pSpeeds[i] *= fTimeRatio;
+
+
+		_float4x4 InstanceMat = { _float4x4::Identity};
+
+
+		InstanceMat.Right(*(_float3*)&pVertices[i].vRight);
+		InstanceMat.Up(*(_float3*)&pVertices[i].vUp);
+		InstanceMat.Forward(*(_float3*)&pVertices[i].vLook);
+		InstanceMat.Translation(*(_float3*)& pVertices[i].vPosition);
+
+		_float3 vScale = CUtils::Get_Scaled_Matrix(InstanceMat);
+
+		vScale *= fTimeRatio;
+
+		CUtils::Set_Scaled_Matrix(InstanceMat, vScale.x, vScale.y, vScale.z);
+
+		pVertices[i].vRight = Dir(InstanceMat.Right());
+		pVertices[i].vUp = Dir(InstanceMat.Up());
+		pVertices[i].vLook = Dir(InstanceMat.Forward());
+		pVertices[i].vPosition = Pos(InstanceMat.Translation());
+
+	}
+
+	m_pContext->Unmap(m_pVBInstance, 0);
+}
+
+void CVIBuffer_Instance::Compute_AllLifeTime(_float fTimeDelta)
+{
+	D3D11_MAPPED_SUBRESOURCE		SubResource{};
+
+	m_pContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
+
+	VTXMATRIX* pVertices = ((VTXMATRIX*)SubResource.pData);
+
+	for (size_t i = 0; i < m_iNumInstance; i++)
+	{
 		Compute_LifeTime(pVertices, i, fTimeDelta);
 	}
 
@@ -243,12 +314,25 @@ void CVIBuffer_Instance::Spread(_float fTimeDelta)
 
 void CVIBuffer_Instance::Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceIndex, _float fTimeDelta)
 {
+	if (0.f < m_pStartDelays[iInstanceIndex])
+	{
+		m_pStartDelays[iInstanceIndex] -= fTimeDelta;
+		pVertices[iInstanceIndex].bAlive = false;
+
+		if (m_pStartDelays[iInstanceIndex] <= 0.f)
+		{
+			pVertices[iInstanceIndex].bAlive = true;
+			m_pStartDelays[iInstanceIndex] = 0.f;
+		}
+		return;
+	}
+
 	m_pLifeTimes[iInstanceIndex].x += fTimeDelta;
 
 	if (m_pLifeTimes[iInstanceIndex].x > m_pLifeTimes[iInstanceIndex].y)
 	{
 
-		if(false == m_InstanceDesc.bIsLoop)
+		if(!m_InstanceDesc.bIsLoop)
 			pVertices[iInstanceIndex].bAlive = false;
 
 		else
@@ -289,6 +373,22 @@ void CVIBuffer_Instance::Update_InstanceDesc(const INSTANCE_DESC& _InstanceDesc)
 	//	m_pInstanceVertices[i].vLook = Vector4::UnitZ * (m_InstanceDesc.vScale.y + CUtils::Make_RandomFloat(-vScaleRandomOffset.z, vScaleRandomOffset.z));
 	//}
 
+}
+
+void CVIBuffer_Instance::Revive()
+{
+	D3D11_MAPPED_SUBRESOURCE		SubResource{};
+	m_pContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
+
+	VTXMATRIX* pVertices = ((VTXMATRIX*)SubResource.pData);
+
+	for (size_t i = 0; i < m_iNumInstance; i++)
+	{
+		//pVertices[i].bAlive = true;
+		Change_InstanceInfo(pVertices, i);
+	}
+
+	m_pContext->Unmap(m_pVBInstance, 0);
 }
 
 void CVIBuffer_Instance::Change_InstanceInfo(VTXMATRIX* pVertices, _uint iInstanceIndex)

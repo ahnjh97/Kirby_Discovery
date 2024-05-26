@@ -177,6 +177,17 @@ void CTransform::Turn(_fvector vAxis, _float fTimeDelta, _float fAngle)
 	}
 }
 
+void CTransform::Turn_Absolute(_float4 _vQuat)
+{
+	//Quaternion vCurQuat = _vQuat;
+	_float4x4 RotMat = _float4x4::CreateFromQuaternion(_vQuat);
+	_float3	vScale = Get_Scaled();
+	_float3 vPos = Get_State(STATE_POSITION);
+
+	//_float4x4 ResultWorld = 
+	m_WorldMatrix = _float4x4::CreateScale(vScale) * RotMat * _float4x4::CreateTranslation(vPos);
+}
+
 void CTransform::Rotation(_fvector vAxis, _float fRadian)
 {
 	_float3		vScaled = Get_Scaled();

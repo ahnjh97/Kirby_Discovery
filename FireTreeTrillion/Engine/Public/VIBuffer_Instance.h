@@ -30,11 +30,16 @@ public:
 
 	virtual void Drop(_float fTimeDelta);
 	virtual void Spread(_float fTimeDelta);
+	virtual void Decelerate(_float fTimeDelta);
+
+	void Compute_AllLifeTime( _float fTimeDelta);
+
 
 	void Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceIndex, _float fTimeDelta);
 
 	void Change_InstanceInfo(VTXMATRIX* pVertices, _uint iInstanceIndex);
 	void Update_InstanceDesc(const INSTANCE_DESC& InstanceDesc);
+	void Revive();
 
 public:
 	virtual HRESULT Initialize_Prototype(const INSTANCE_DESC& InstanceDesc);

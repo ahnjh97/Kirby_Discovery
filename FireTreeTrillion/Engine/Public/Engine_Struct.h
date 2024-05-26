@@ -28,7 +28,7 @@ namespace Engine
 	{
 
 		//수명
-		_float		fLifetime;
+		_float		fLifetime = { 1.f };
 		_float		fLifetimeRandomOffset;
 
 		_float		fStartDelay;
@@ -43,20 +43,20 @@ namespace Engine
 		_float3		vRotationRandomOffset;
 
 		//크기
-		_float3		vScale;
+		_float3		vScale = {1.f, 1.f, 1.f};
 		_float3		vScaleRandomOffset;
 		
-		_float3		vDir;
+		_float3		vDir = {1.f, 1.f, 1.f};
 		_float3		vDirRandomOffset;
 
-		_float		fSpeed;
+		_float		fSpeed = {1.f};
 		_float		fSpeedRandomOffset;
 
 
-		_float3		vColor;
+		_float3		vColor = {1.f, 1.f, 1.f};
 		_float3		vColorRandomOffset;
 
-		_float		fAlpha;
+		_float		fAlpha = {1.f};
 		_float		fAlphaRandomOffset;
 
 

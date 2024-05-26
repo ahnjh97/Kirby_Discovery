@@ -28,7 +28,7 @@ private:
 
 private:	
 	HRESULT Ready_Fonts();
-	HRESULT Ready_Prototype_Component_For_Static();
+	//HRESULT Ready_Prototype_Component_For_Static();
 
 	//Parsing TEST
 	void		CreateXML();

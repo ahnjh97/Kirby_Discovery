@@ -157,14 +157,14 @@ HRESULT CVIBuffer_Instance_Point::Initialize_Prototype()
 HRESULT CVIBuffer_Instance_Point::Initialize(void * pArg)
 {
 
-	INSTANCE_POINT_DESC* instanceDesc{nullptr};
+	INSTANCE_POINT_DESC instanceDesc = {};
 	if (nullptr != pArg)
-		instanceDesc = (INSTANCE_POINT_DESC*)pArg;
+		instanceDesc = *(INSTANCE_POINT_DESC*)pArg;
 	else
 		return E_FAIL;
 
 
-	m_iNumInstance = instanceDesc->iNumInstance;
+	m_iNumInstance = instanceDesc.iNumInstance;
 
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;

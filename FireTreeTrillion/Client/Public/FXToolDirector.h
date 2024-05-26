@@ -133,6 +133,7 @@ private:
 	void MakeBar_MultiFXProperty(_float _fTimeDelta, _float _fWidth);
 	
 	void Render_MultiFXHierarchy();
+	void Render_AxisLines();
 
 	//이펙트용 컴포넌트 준비 작업
 	HRESULT	Ready_FXPrototypeVector();

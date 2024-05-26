@@ -44,6 +44,9 @@ HRESULT CSingleEffect::Initialize(void* pArg)
 
 _int CSingleEffect::Tick(_float _fTimeDelta)
 {
+	if (m_bDead)
+		return OBJ_DEAD;
+
 
 	if (Calculate_Duration(_fTimeDelta))
 	{
@@ -63,10 +66,15 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 
 
 	m_vCurPos = Calculate_CurValue_Lerp(_fTimeDelta, KF_POS);
+
+	Quaternion vCurQuat = Calculate_CurValue_Slerp(_fTimeDelta, KF_ROT);
+	_float3 vRadianEuler = vCurQuat.ToEuler();
+	m_vCurRot = { ToDegree(vRadianEuler.x), ToDegree(vRadianEuler.y), ToDegree(vRadianEuler.z) };
 	m_vCurScale = Calculate_CurValue_Lerp(_fTimeDelta, KF_SCALE);
 
 
 	m_pTransformCom->Set_Scaled(m_vCurScale);
+	m_pTransformCom->Turn_Absolute(vCurQuat);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, Pos(m_vInitPos) + Dir(m_vCurPos));
 
 	return OBJ_NOEVENT;
@@ -135,25 +143,24 @@ HRESULT CSingleEffect::Add_Components(FX_DESC& FXDesc)
 		CHECK_FAILED(hr);
 
 
-		hr = __super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Shader_FXPosTex"),
+		hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex"),
 			TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 
 		CHECK_FAILED(hr);
 	}
 	else
 	{
-		hr = __super::Add_Component(*m_pCurrentLevelID, CUtils::StrToWstr(FXDesc.strBufferTag),
+		hr = __super::Add_Component(LEVEL_STATIC, CUtils::StrToWstr(FXDesc.strBufferTag),
 			TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 
 		CHECK_FAILED(hr);
 
 
-		hr = __super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Shader_FXModel"),
+		hr = __super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Shader_VtxModel"),
 			TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 
 		CHECK_FAILED(hr);
 	}
-
 
 	return S_OK;
 }
