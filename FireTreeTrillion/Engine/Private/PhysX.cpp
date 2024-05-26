@@ -15,8 +15,8 @@ HRESULT CPhysX::Initialize()
     m_pPvd->connect(*m_pPvdTransport, physx::PxPvdInstrumentationFlag::eALL);
 
     //mPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *mFoundation, PxTolerancesScale(),true, mPvd);
-    mToleranceScale.length = 100;        // typical length of an object
-    mToleranceScale.speed = 981;         // typical speed of an object, gravity * 1s is a reasonable choice
+    mToleranceScale.length = 1;        // typical length of an object
+    mToleranceScale.speed = 0.1f;         // typical speed of an object, gravity * 1s is a reasonable choice
 
     m_pPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *m_pFoundation, mToleranceScale, true, m_pPvd);
 
@@ -30,9 +30,9 @@ HRESULT CPhysX::Initialize()
     m_pPvdSceneClient = m_pScene->getScenePvdClient();
     if (m_pPvdSceneClient)
     {
-        m_pPvdSceneClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONSTRAINTS, true);
-        m_pPvdSceneClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONTACTS, true);
-        m_pPvdSceneClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES, true);
+        m_pPvdSceneClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONSTRAINTS,   true);
+        m_pPvdSceneClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONTACTS,      true);
+        m_pPvdSceneClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES,  true);
     }
 
     // create simulation
@@ -84,6 +84,7 @@ void CPhysX::Test()
 
     physx::PxTransform localTm(physx::PxVec3(0, 0, 0) * halfExtent);
     m_pRigidDynamic = m_pPhysics->createRigidDynamic(t.transform(localTm));
+    //m_pRigidDynamic->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, false);
     m_pRigidDynamic->attachShape(*m_pShape);
     physx::PxRigidBodyExt::updateMassAndInertia(*m_pRigidDynamic, 10.0f);
     m_pScene->addActor(*m_pRigidDynamic);
@@ -222,7 +223,11 @@ PxRigidStatic* CPhysX::CreateStaticActor(_float4 vPos, _float3* pVerticesPos, _u
 
     PxShape* pShape = { nullptr };
     if (nullptr == pMaterial)
-        pShape = m_pPhysics->createShape(triGeom, *m_pMaterial);
+    {
+        PxMaterial* pMtrl = m_pPhysics->createMaterial(0.5f, 0.5f, 0.6f);
+        pShape = m_pPhysics->createShape(triGeom, *pMtrl);
+
+    }
     else
         pShape = m_pPhysics->createShape(triGeom, *pMaterial);
 

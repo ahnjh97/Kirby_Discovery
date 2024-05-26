@@ -157,3 +157,15 @@ _vector CUtils::To_Vector(const PxVec3 pxVec3)
 	return XMVectorSet(pxVec3.x, pxVec3.y, pxVec3.z, 0.0f);
 }
 
+PxTransform CUtils::mat44ToTransform(const PxMat44& mat)
+{
+	// 위치 벡터 추출
+	PxVec3 position = mat.getPosition();
+
+	// 상단 좌측 3x3 부분 행렬로부터 회전 쿼터니언 추출
+	PxMat33 rotationMat33(mat.column0.getXYZ(), mat.column1.getXYZ(), mat.column2.getXYZ());
+	PxQuat rotation = PxQuat(rotationMat33);
+
+	return PxTransform(position, rotation);
+}
+

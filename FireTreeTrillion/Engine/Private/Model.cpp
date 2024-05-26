@@ -48,7 +48,7 @@ CBone * CModel::Get_BonePtr(const _char * pBoneName) const
 	return *iter;
 }
 
-HRESULT CModel::Initialize_Prototype(_fmatrix TransformMatrix, MODEL tModel)
+HRESULT CModel::Initialize_Prototype(MODEL tModel)
 {
 	m_tModel = tModel;
 
@@ -67,6 +67,9 @@ HRESULT CModel::Initialize_Prototype(_fmatrix TransformMatrix, MODEL tModel)
 		MSG_BOX(tempstr.c_str());
 		return E_FAIL;
 	}
+
+	_float4x4 TransformMatrix = XMMatrixIdentity();
+	TransformMatrix = XMMatrixScaling(tModel.fScale, tModel.fScale, tModel.fScale) * XMMatrixRotationY(XMConvertToRadians(tModel.fDegree));
 
 	::XMStoreFloat4x4(&m_TransformMatrix, TransformMatrix);
 
@@ -190,6 +193,29 @@ HRESULT CModel::CreateStaticActor(_float4 vPos)
 	return S_OK;
 }
 
+_float4 CModel::Check_Meshes(const CTransform* pTransform) const
+{
+	vector<_float4> vecPickPos;
+	for (auto iter : m_Meshes)
+	{
+		_float4 vTemp = iter->Get_PickPos(pTransform);
+		if (vTemp.w != 0)
+			vecPickPos.push_back(vTemp);
+	}
+
+	if (vecPickPos.empty())
+		return _float4();
+
+	_float fShortest = { FLT_MAX };
+	_float4 fResult = {};
+	for (auto& iter : vecPickPos)
+	{
+		if (iter.w <= fShortest)
+			fResult = iter;
+	}
+	return fResult;
+}
+
 HRESULT CModel::Ready_Meshes()
 {
 	m_InputFile.read(reinterpret_cast<char*>(&m_iNumMeshes), sizeof(m_iNumMeshes));
@@ -274,11 +300,11 @@ HRESULT CModel::Ready_Animations()
 	return S_OK;
 }
 
-CModel * CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _fmatrix TransformMatrix, MODEL tModel)
+CModel * CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODEL tModel)
 {
 	CModel* pInstance = new CModel(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype(TransformMatrix, tModel)))
+	if (FAILED(pInstance->Initialize_Prototype(tModel)))
 	{
 		MSG_BOX(TEXT("Failed To Create : CModel"));
 

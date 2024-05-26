@@ -33,6 +33,18 @@ public:
 	}
 	void Track_Target(_bool _bTrackTarget) { m_bTrackTarget = _bTrackTarget; }
 
+	void Set_MatrixIndex(_int iMatrixIndex){ 
+		if ((iMatrixIndex != m_iMatrixIndex) && (nullptr != m_pTransformCom) && (!m_vecCamMatrices.empty()))
+		{
+			if(iMatrixIndex < m_vecCamMatrices.size())
+				m_pTransformCom->Set_WorldMatrix(m_vecCamMatrices[iMatrixIndex]);
+		}
+		
+		m_iMatrixIndex = iMatrixIndex;
+	}
+
+	void EmplaceBackCamMatrix(_float4x4 matWorld) { m_vecCamMatrices.emplace_back(matWorld); }
+
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual _int Tick(_float fTimeDelta) override;
@@ -47,6 +59,9 @@ private:
 	_bool			m_bTrackTarget = { false };
 	_float			m_fTrackDistance = { 8.f };
 	void			Track_Target(_float fTimeDelta);
+
+	vector<_float4x4>	m_vecCamMatrices;
+	_int			m_iMatrixIndex = { -1 };
 
 	//Vector3			m_vOrbitPos = { 0.f, 0.f, 0.f };
 private:

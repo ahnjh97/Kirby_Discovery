@@ -28,8 +28,8 @@ HRESULT CCharacterController::Initialize(void* pArg)
 	m_tControllerDesc.position = PxExtendedVec3(vInitialPos.x, vInitialPos.y, vInitialPos.z);
 	m_ControllerFilters.mFilterData = &m_tFilterDesc;
 
-	if (pArg == nullptr)
-		Set_DefaultValue();
+
+	Set_DefaultValue();
 
 	Create_Controller();
 
@@ -377,7 +377,7 @@ void CCharacterController::Create_Controller()
 	material = m_pGameInstance->Get_Physics()->createMaterial(0.5f, 0.5f, 0.5f);
 	capsuleDesc.material = material;
 
-	m_pController = m_pGameInstance->Get_ControllerManager()->createController(capsuleDesc);
+	m_pController = m_pGameInstance->Get_ControllerManager()->createController(m_tControllerDesc);
 
 	//PxShape* shape;
 	//m_pController->getActor()->getShapes(&shape, 1);

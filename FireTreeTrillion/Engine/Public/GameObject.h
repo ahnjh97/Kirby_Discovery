@@ -15,7 +15,7 @@ public:
 			0.0f, 0.0f, 1.0f, 0.0f,
 			0.0f, 0.0f, 0.0f, 1.0f
 		};
-		wstring wstrModelTag;
+		wstring wstrModelName;
 	}GAMEOBJECT_DESC;
 
 protected:

@@ -134,6 +134,22 @@ void CObject_Manager::Clear(_uint iLevelIndex)
 	m_pLayers[iLevelIndex].clear();
 }
 
+void CObject_Manager::Clear_Layer(_uint iLevelIndex, const wstring& strLayerTag)
+{
+	CLayer* pLayer = Find_Layer(iLevelIndex, strLayerTag);
+	if (pLayer == nullptr)
+		return;
+	list<CGameObject*> objList = pLayer->Get_GameObjectList();
+	if (objList.empty())
+		return;
+	for (auto& obj : objList)
+	{
+		if (obj == nullptr)
+			continue;
+		obj->Set_Dead();
+	}
+}
+
 list<CGameObject*>*CObject_Manager::Get_List(_uint iLevelIndex, const wstring & strLayerTag)
 {
 	CLayer* pLayer = Find_Layer(iLevelIndex, strLayerTag);

@@ -23,6 +23,8 @@ HRESULT CKirby::Initialize_Prototype()
 HRESULT CKirby::Initialize(void* pArg)
 {
 	GAMEOBJECT_DESC		GameObjectDesc{};
+	if (nullptr != pArg)
+		GameObjectDesc = *(GAMEOBJECT_DESC*)pArg;
 
 	GameObjectDesc.fSpeedPerSec = 7.f;
 	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
@@ -32,11 +34,6 @@ HRESULT CKirby::Initialize(void* pArg)
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;
-
-
-	_float4 vPos = XMVectorSet(0.f, 100.f, 0.f, 1.f);
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
-	
 
 	INFO(m_eBodyState) = BODY_DEFAULT;
 	INFO(m_eMouthState) = MONTH_IDLE;
@@ -59,7 +56,7 @@ HRESULT CKirby::Initialize(void* pArg)
 	INFO(m_vMoveDir) = -1.f * m_pCameraLook;
 	INFO(m_vTargetDir) = INFO(m_vMoveDir);
 
-	m_pTransformCom->Look_At_ForLandObject(vPos + INFO(m_vMoveDir));
+	//m_pTransformCom->Look_At_ForLandObject(vPos + INFO(m_vMoveDir));
 
 	m_pModelCom[INFO(m_eBodyState)]->Set_Animation(STATE_IDLE, 60.f, true, true);
 

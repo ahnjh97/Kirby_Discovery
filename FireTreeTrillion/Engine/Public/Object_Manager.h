@@ -29,6 +29,8 @@ public:
 	void					Tick(_float fTimeDelta);
 	void					Late_Tick(_float fTimeDelta);
 	void					Clear(_uint iLevelIndex);
+	void					Clear_Layer(_uint iLevelIndex, const wstring& strLayerTag);
+
 
 	// IMGUI에 출력할 친구들
 	//HRESULT					Add_Clone(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strPrototypeTag, void* pArg);

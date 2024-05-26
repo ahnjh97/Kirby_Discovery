@@ -278,7 +278,8 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 		return E_FAIL;
 
 	/////////////////////// 블룸 및 Sky와의 결합과 레디얼 블러까지 완료되었다.
-
+	if (FAILED(Render_NonLight()))
+		return E_FAIL;
 	if (FAILED(Render_Blend()))
 		return E_FAIL;
 
@@ -451,6 +452,20 @@ HRESULT CRenderer::Render_NonBlend()
 
 	if (FAILED(m_pGameInstance->End_MRT()))
 		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CRenderer::Render_NonLight()
+{
+	for (auto& pRenderObject : m_RenderObjects[RENDER_NONLIGHT])
+	{
+		if (nullptr != pRenderObject)
+			pRenderObject->Render();
+		Safe_Release(pRenderObject);
+	}
+
+	m_RenderObjects[RENDER_NONLIGHT].clear();
 
 	return S_OK;
 }

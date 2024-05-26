@@ -10,6 +10,12 @@
 #include "TestModel.h"
 #include "TestTerrain.h"
 
+//맵툴
+#include "MapToolHelper.h"
+#include "MapToolObject.h"
+#include "BasicMap.h"
+#include "Grid.h"
+
 #pragma region TOO_UI
 
 #include "TestUI.h"
@@ -110,7 +116,7 @@ HRESULT CLoader::Start()
 
 	case LEVEL_TOOL_MAP:
 	{
-		//hr = Loading_For_Tool_FX();
+		hr = Loading_For_Tool_Map();
 		break;
 	}
 
@@ -137,6 +143,12 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FXToolDirector"), CFXToolDirector);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CSingleEffect"), CSingleEffect);
 	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("CMultiEffect"), CMultiEffect);
+
+	// MapTool GameObject Prototypes
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Grid"), CGrid);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BasicMap"), CBasicMap);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolHelper"), CMapToolHelper);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolObject"), CMapToolObject);
 
 	// 05.20) 원본 추가
 	 /*      GameObject_IMGUI_UI_Editor    */
@@ -173,7 +185,7 @@ HRESULT CLoader::Loading_For_Logo()
 
 HRESULT CLoader::Loading_For_GamePlay()
 {
-	HRESULT hr;
+	HRESULT hr = S_OK;
 	LEVEL eLevel = LEVEL_GAMEPLAY;
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
 
@@ -211,7 +223,7 @@ HRESULT CLoader::Loading_For_GamePlay()
 
 HRESULT CLoader::Loading_For_Tool_FX()
 {
-	HRESULT hr;
+	HRESULT hr = S_OK;
 	LEVEL eLevel = LEVEL_TOOL_FX;
 
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
@@ -241,7 +253,7 @@ HRESULT CLoader::Loading_For_Tool_FX()
 
 HRESULT CLoader::Loading_For_Tool_Anim()
 {
-	HRESULT hr;
+	HRESULT hr = S_OK;
 	LEVEL eLevel = LEVEL_TOOL_ANIM;
 
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
@@ -269,10 +281,37 @@ HRESULT CLoader::Loading_For_Tool_Anim()
 	return S_OK;
 }
 
+HRESULT CLoader::Loading_For_Tool_Map()
+{
+	HRESULT hr = S_OK;
+	LEVEL eLevel = LEVEL_TOOL_MAP;
+
+	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
+
+	m_strLoadingText = TEXT("VI버퍼(을) 로딩 중 입니다.");
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Grid"),
+		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, 200, 200))))
+		return E_FAIL;
+
+	m_strLoadingText = TEXT("쉐이더(을) 로딩 중 입니다.");
+	hr = Add_Shaders(eLevel);
+	CHECK_FAILED(hr);
+
+	m_strLoadingText = TEXT("모델(을) 로딩 중 입니다.");
+	if(FAILED(Add_AllModelTxts(eLevel, TYPE_NONANIM)))
+		return E_FAIL;
+	
+	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
+
+	m_IsFinished = true;
+
+	return S_OK;
+}
+
 HRESULT CLoader::Loading_For_Tool_UI()
 {
 	LEVEL eLevel = LEVEL_TOOL_UI;
-	HRESULT hr;
+	HRESULT hr = S_OK;
 
 #pragma region TEXTURE
 
@@ -299,14 +338,12 @@ HRESULT CLoader::Add_Models(LEVEL eLevel)
 		{
 			_int i = 0;
 		}
-		_matrix      TransformMatrix = XMMatrixIdentity();
-		TransformMatrix = XMMatrixScaling(ModelInfo.fScale, ModelInfo.fScale, ModelInfo.fScale) * XMMatrixRotationY(XMConvertToRadians(ModelInfo.fDegree));
 
 		wstring wstrModelName = CUtils::StrToWstr(ModelInfo.strModelName);
 		wstring wstrPrototypeTag = L"Prototype_Component_Model_" + wstrModelName;
 
 		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag,
-			CModel::Create(m_pDevice, m_pContext, TransformMatrix, ModelInfo))))
+			CModel::Create(m_pDevice, m_pContext, ModelInfo))))
 			return E_FAIL;
 	}
 
@@ -343,12 +380,19 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		// For Awoofy
 		m_vecModelInfo.emplace_back(MODEL{ "Awoofy", TYPE_ANIM });
 	}
+	else if (eLevel == LEVEL_TOOL_MAP) 
+	{		
+		// 맵툴에서는 크기나 회전 상태 바꾸고 싶은 모델만 여기에 등록. 안바꾸고싶으면 NonAnim, 크기1, 회전 0도로 자동 추가됨
+		m_vecModelInfo.emplace_back(MODEL{ "Book", TYPE_NONANIM, 0.01f});
+		m_vecModelInfo.emplace_back(MODEL{ "TestMap2", TYPE_NONANIM, 0.01f });
+		m_vecModelInfo.emplace_back(MODEL{ "Trigger", TYPE_NONANIM, 0.01f });
+		m_vecModelInfo.emplace_back(MODEL{ "Camera", TYPE_NONANIM, 0.2f , 270.f});
+	}
 }
 
 HRESULT CLoader::Add_Shaders(LEVEL eLevel)
 {
-
-	HRESULT hr;
+	HRESULT hr = S_OK;
 	/* For.Prototype_Component_Shader_VtxNorTex */
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxNorTex"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxNorTex.hlsl"), VTXNORTEX::Elements, VTXNORTEX::iNumElements))))
@@ -379,6 +423,10 @@ HRESULT CLoader::Add_Shaders(LEVEL eLevel)
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxInstance_Point.hlsl"), VTXINSTANCE_POINT::Elements, VTXINSTANCE_POINT::iNumElements))))
 		return E_FAIL;
 
+	/* For.Prototype_Component_Shader_VtxModel_Map */
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxModel_Map"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_Map.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
+		return E_FAIL;
 
 	//이펙트용 쉐이더
 
@@ -397,16 +445,14 @@ HRESULT CLoader::Add_Shaders(LEVEL eLevel)
 
 HRESULT CLoader::Add_Texture(LEVEL eLevel, string strPrototypeName, string strFolderAndFileName, _uint iNumTextures)
 {
-	wstring_convert<codecvt_utf8<wchar_t>> converter;
-	wstring wstrPrototypeTag = L"Prototype_Component_Texture_" + converter.from_bytes(strPrototypeName);
-	wstring wstrFullPath = L"../Bin/Resources/Textures/" + converter.from_bytes(strFolderAndFileName);
+	wstring wstrPrototypeTag = L"Prototype_Component_Texture_" + CUtils::StrToWstr(strPrototypeName); 
+	wstring wstrFullPath = L"../Bin/Resources/Textures/" + CUtils::StrToWstr(strFolderAndFileName);
 
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CTexture::Create(m_pDevice, m_pContext, wstrFullPath, iNumTextures))))
 		return E_FAIL;
 
 	return S_OK;
 }
-
 
 HRESULT CLoader::Add_KirbyFaceTexture(LEVEL eLevel)
 {
@@ -435,8 +481,83 @@ HRESULT CLoader::Add_KirbyFaceTexture(LEVEL eLevel)
 	if (FAILED(Add_Texture(eLevel, "mouth_surprise", "KirbyFace/mouth_surprise.png")))
 		return E_FAIL;
 
-
 	return S_OK;
+}
+
+HRESULT CLoader::Add_AllModelTxts(LEVEL eLevel, TYPE eType)
+{
+	HRESULT hr = S_OK;
+
+	wstring wstrRootFolderPath = TEXT("../../../model_txt/");
+	if (TYPE_ANIM == eType)
+		wstrRootFolderPath += TEXT("Anim/");
+	else if (TYPE_NONANIM == eType)
+		wstrRootFolderPath += TEXT("NonAnim/");
+
+	WIN32_FIND_DATA findFileData;
+	HANDLE hFind = FindFirstFile((wstrRootFolderPath + L"\\*").c_str(), &findFileData);
+
+	if (hFind == INVALID_HANDLE_VALUE) {
+		MSG_BOX(TEXT("폴더를 찾을수없습니다"));
+		return E_FAIL;
+	}
+
+	list<wstring> txtList;
+	TraverseModelTxts(wstrRootFolderPath, txtList);
+
+	for (auto listIter : txtList)
+	{
+		wstring wstrModelName = listIter.substr(0, listIter.length() - 4);
+		string strModelName = CUtils::WstrToStr(wstrModelName);
+		
+		_bool bFound = { false };
+		MODEL tModelInfo = MODEL{ strModelName ,  TYPE_NONANIM };
+		for (auto& modelInfo : m_vecModelInfo)
+		{
+			if (modelInfo.strModelName == strModelName)
+			{
+				tModelInfo = modelInfo;
+				break;
+			}
+		}
+
+		wstring wstrPrototypeTag = TEXT("Prototype_Component_Model_") + CUtils::StrToWstr(tModelInfo.strModelName);
+		hr = m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CModel::Create(m_pDevice, m_pContext, tModelInfo));
+		CHECK_FAILED(hr);
+
+		if (FAILED(hr))
+			return E_FAIL;
+	}
+
+	FindClose(hFind);
+
+ 	return S_OK;
+}
+
+void CLoader::TraverseModelTxts(const wstring& rootFolderPath, list<wstring>& fileList)
+{
+	WIN32_FIND_DATA findFileData;
+	HANDLE hFind = FindFirstFile((rootFolderPath + L"\\*").c_str(), &findFileData);
+
+	if (hFind == INVALID_HANDLE_VALUE) {
+		MSG_BOX(TEXT("폴더를 찾을수없습니다"));
+		return;
+	}
+
+	do {
+		if (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+			if (wcscmp(findFileData.cFileName, L".") != 0 && wcscmp(findFileData.cFileName, L"..") != 0) {
+				// 재귀적으로 하위 폴더도 순회
+				TraverseModelTxts(rootFolderPath + L"\\" + findFileData.cFileName, fileList);
+			}
+		}
+		else {
+			// 파일이면 리스트에 추가
+			fileList.push_back(wstring(findFileData.cFileName));
+		}
+	} while (FindNextFile(hFind, &findFileData) != 0);
+
+	FindClose(hFind);
 }
 
 CLoader * CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID)

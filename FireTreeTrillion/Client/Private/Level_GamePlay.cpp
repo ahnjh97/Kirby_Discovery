@@ -33,6 +33,9 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
 		return E_FAIL;
 	
+	if (FAILED(Ready_ParsedObjects()))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -89,8 +92,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
 
 HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_TestMap"))))
-		return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_TestMap"))))
+	//	return E_FAIL;
 
 	return S_OK;
 }
@@ -101,8 +104,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const wstring & strLayerTag)
 		return E_FAIL;
 
 	// Kirby
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Kirby"))))
-		return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Kirby"))))
+	//	return E_FAIL;
 
 	return S_OK;
 }
@@ -121,6 +124,70 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& strLayerTag)
 	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_UI_Test"))))
 	//	return E_FAIL;
 
+	return S_OK;
+}
+
+HRESULT CLevel_GamePlay::Ready_ParsedObjects()
+{
+	LEVEL eLevel = LEVEL_GAMEPLAY;
+
+	string strFileName = "../../../objects_txt/GamePlay.txt";
+	fstream fileStream(strFileName, ios::in | ios::binary);
+	if (fileStream.is_open() == false)
+	{
+		MSG_BOX(TEXT("Failed to open : GamePlay.txt"));
+		return E_FAIL;
+	}
+
+	string strModelName;
+	_float4x4 matWorld{};
+	_int iCamIndex{};
+	map<_int, _float4x4> camMatrices;
+
+	while (!fileStream.eof())
+	{
+		_uint iStrLength;
+		fileStream.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
+		strModelName.resize(iStrLength);
+		fileStream.read(&strModelName[0], iStrLength);
+		fileStream.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
+
+		if ("Camera" == strModelName || "Trigger" == strModelName) {
+			fileStream.read(reinterpret_cast<char*>(&iCamIndex), sizeof(iCamIndex));
+			camMatrices.emplace(iCamIndex, matWorld);
+		}
+		if (fileStream.eof())
+			break;
+
+		CGameObject::GAMEOBJECT_DESC tempDesc = {};
+		tempDesc.matWorld = matWorld;
+		tempDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+
+		if (strModelName == "NonAnim_Kirby")
+		{
+			tempDesc.wstrModelName.erase(0, 8);
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby"), &tempDesc)))
+				return E_FAIL;
+		}
+		else if (strModelName == "Level1Stage1Step01" || strModelName == "Level1Stage1Step01_Blend")
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_BasicMap"), &tempDesc)))
+				return E_FAIL;
+		}
+	}
+	fileStream.close();
+
+	CCamera_Free* pCamera = dynamic_cast<CCamera_Free*> (m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Camera"), 0));
+	if (nullptr == pCamera)
+		return E_FAIL;
+
+	if (!camMatrices.empty()) {
+		for (auto& pair : camMatrices)
+			pCamera->EmplaceBackCamMatrix(pair.second);
+
+		pCamera->Set_MatrixIndex(0);
+	}
+	
 	return S_OK;
 }
 
