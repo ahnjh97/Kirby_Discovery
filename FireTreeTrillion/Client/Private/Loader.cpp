@@ -136,7 +136,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_Test"), CTestUI);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestMap"), CTestTerrain);
-	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
 
 	//이펙트 툴 용
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FXToolDirector"), CFXToolDirector);
