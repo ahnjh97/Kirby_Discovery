@@ -168,7 +168,6 @@ void CCamera_Free::Control(_float fTimeDelta)
 		{
 			m_pTransformCom->Go_Straight(fTimeDelta * MouseMove * m_fMouseSensor * .5f);
 
-
 			if (m_pTarget != nullptr && m_bTrackTarget)
 				m_fTrackDistance -= MouseMove*.01f ;
 		}
@@ -186,7 +185,7 @@ void CCamera_Free::Control(_float fTimeDelta)
 			Vector3 vTargetPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Float4(CTransform::STATE_LOOK) * 10.f;
 			
 			// 05.22) LEVEL_TOOL_UI에는 카메라 회전 기능 제외
-			if (*m_pCurrentLevelID == 4) //LEVEL_TOOL_UI
+			if (*m_pCurrentLevelID == LEVEL_TOOL_UI)
 				return;
 
 			if (*m_pCurrentLevelID == LEVEL_TOOL_FX)

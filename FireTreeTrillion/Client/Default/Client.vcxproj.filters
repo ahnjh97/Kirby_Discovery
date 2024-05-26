@@ -64,6 +64,9 @@
     <Filter Include="02.GameObjects\UI\FXToolDirector">
       <UniqueIdentifier>{dbb187c2-6962-4466-b912-a53c4e5d474a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Player\Kirby">
+      <UniqueIdentifier>{f4444bba-a36c-4a3e-9327-ac76df48dd6f}</UniqueIdentifier>
+    </Filter>
     <Filter Include="02.GameObjects\Effect">
       <UniqueIdentifier>{8da63451-b1d5-46f5-a7cd-b8c224b47c48}</UniqueIdentifier>
     </Filter>
@@ -97,8 +100,8 @@
     <Filter Include="02.GameObjects\TestModel\State">
       <UniqueIdentifier>{24c8db5b-dafc-44bf-806a-7f7b3d6aeed8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Levels\Tool\MAP">
-      <UniqueIdentifier>{5aa8e924-15f0-4280-b87a-55b09f572afb}</UniqueIdentifier>
+    <Filter Include="01.Levels\Tool\Animation">
+      <UniqueIdentifier>{a8ee8959-bf9d-4e0f-8c0f-ec7ddd715597}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Map\MapToolHelper">
       <UniqueIdentifier>{c90caebe-5408-4ed1-a218-a7692bde4a30}</UniqueIdentifier>
@@ -112,6 +115,9 @@
     <Filter Include="02.GameObjects\Map\BasicMap">
       <UniqueIdentifier>{046c4db6-6d91-4eef-8c46-3e1b7fdc2bcc}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -159,6 +165,9 @@
     <ClInclude Include="..\Public\TestTerrain.h">
       <Filter>02.GameObjects\Terrain</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Map_Stage1.h">
+      <Filter>02.GameObjects\Map</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Level_Tool_UI.h">
       <Filter>01.Levels\Tool\UI</Filter>
     </ClInclude>
@@ -175,9 +184,9 @@
       <Filter>02.GameObjects\UI\FXToolDirector</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby.h">
-      <Filter>02.GameObjects\Player</Filter>
+      <Filter>02.GameObjects\Player\Kirby</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\SingleEffect.h">
+    <ClInclude Include="..\public\SingleEffect.h">
       <Filter>02.GameObjects\Effect\Single</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\MultiEffect.h">
@@ -186,13 +195,15 @@
     <ClInclude Include="..\Public\Level_Tool_Anim.h">
       <Filter>01.Levels\Tool\ANIM</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\KirbyDefault_State.h">
+      <Filter>02.GameObjects\Player\State</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\TestModel.h">
       <Filter>02.GameObjects\TestModel</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\TestModel_State.h">
       <Filter>02.GameObjects\TestModel\State</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\KirbyDefault_State.h" />
     <ClInclude Include="..\Public\ToolHelper.h">
       <Filter>90.Utils\[Sample] ToolHelper</Filter>
     </ClInclude>
@@ -219,6 +230,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Trigger.h">
       <Filter>02.GameObjects\Map\Trigger</Filter>
+	</ClInclude>	
+    <ClInclude Include="..\Public\Level_Tool_Anim.h">
+      <Filter>01.Levels\Tool\Animation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -258,6 +272,9 @@
     <ClCompile Include="..\Private\TestTerrain.cpp">
       <Filter>02.GameObjects\Terrain</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Map_Stage1.cpp">
+      <Filter>02.GameObjects\Map</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\FXToolDirector.cpp">
       <Filter>02.GameObjects\UI\FXToolDirector</Filter>
     </ClCompile>
@@ -274,7 +291,7 @@
       <Filter>02.GameObjects\UI\[Sample] TestUI</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby.cpp">
-      <Filter>02.GameObjects\Player</Filter>
+      <Filter>02.GameObjects\Player\Kirby</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\MultiEffect.cpp">
       <Filter>02.GameObjects\Effect\Multi</Filter>
@@ -285,13 +302,15 @@
     <ClCompile Include="..\Private\Level_Tool_Anim.cpp">
       <Filter>01.Levels\Tool\ANIM</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\KirbyDefault_State.cpp">
+      <Filter>02.GameObjects\Player\State</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\TestModel.cpp">
       <Filter>02.GameObjects\TestModel</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\TestModel_State.cpp">
       <Filter>02.GameObjects\TestModel\State</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\KirbyDefault_State.cpp" />
     <ClCompile Include="..\Private\ToolHelper.cpp">
       <Filter>90.Utils\[Sample] ToolHelper</Filter>
     </ClCompile>
@@ -315,6 +334,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Trigger.cpp">
       <Filter>02.GameObjects\Map\Trigger</Filter>
+	</ClCompile>
+    <ClCompile Include="..\Private\Level_Tool_Anim.cpp">
+      <Filter>01.Levels\Tool\Animation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -352,13 +374,5 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_Point.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_Map.hlsl">
-      <Filter>97.ShaderFiles</Filter>
-    </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="ReadMe.txt">
-      <Filter>98.Default</Filter>
-    </Text>
   </ItemGroup>
 </Project>
