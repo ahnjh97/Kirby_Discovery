@@ -1,5 +1,7 @@
 #include "stdafx.h"
+#include "FSM.h"
 #include "Awoofy.h"
+#include "Awoofy_State.h"
 
 CAwoofy::CAwoofy(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -29,15 +31,24 @@ HRESULT CAwoofy::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
+	m_pModelCom->Set_Animation(AWOOFY_WAIT, 60.f, true, true);
+
 	return S_OK;
 }
 
 _int CAwoofy::Tick(_float fTimeDelta)
 {
-	if (true == m_isDead)
+	if (true == m_bDead)
 		return OBJ_DEAD;
 
-	m_pControllerCom->FreeFall(m_pTransformCom, fTimeDelta);
+	//m_pControllerCom->FreeFall(m_pTransformCom, fTimeDelta);
+
+	//if (m_pGameInstance->Get_DIKeyState(DIK_W, KEY_PRESS))
+	//	m_pControllerCom->Move(m_pTransformCom, 5.f, fTimeDelta);
+
+   // FSM 제어
+	if (m_pFSM != nullptr)
+		m_pFSM->Update(this, fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
@@ -111,6 +122,11 @@ void CAwoofy::Render_IMGUI()
 	__super::Render_IMGUI();
 }
 
+void CAwoofy::Change_State(AWOOFY_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+{
+	m_pFSM->ChangeState((_uint)eState, _fAnimSpeed, _bLoop, _bInterpolation);
+}
+
 HRESULT CAwoofy::Add_Components()
 {
 	HRESULT hr;
@@ -125,7 +141,7 @@ HRESULT CAwoofy::Add_Components()
 	CHECK_FAILED(hr);
 
 	/* For.Com_CharacterController */
-	_float4 vPos = XMVectorSet(1.f, 5.f, 0.f, 1.f);
+	_float4 vPos = XMVectorSet(1.f, 6.f, -180.f, 1.f);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
@@ -133,6 +149,8 @@ HRESULT CAwoofy::Add_Components()
 	m_pControllerCom->Set_PhysXObject(this);
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+
+	SetUp_FSM();
 
 	return S_OK;
 }
@@ -151,6 +169,21 @@ HRESULT CAwoofy::Bind_ShaderResources()
 		return E_FAIL;
 
 	return S_OK;
+}
+
+void CAwoofy::SetUp_FSM()
+{
+	// FSM 상태 초기화
+	m_pFSM = CFSM::Create();
+	m_pFSM->Add_State(AWOOFY_WAIT, CAwoofy_Idle_State::Create());
+	m_pFSM->Add_State(AWOOFY_RUN, CAwoofy_Run_State::Create());
+
+
+	// 상태 Initialize
+	CFSM::FSM_INFO		FSM_Desc = {};
+	FSM_Desc.iState = AWOOFY_WAIT;
+	FSM_Desc.pModel = m_pModelCom;
+	m_pFSM->Initialize(&FSM_Desc);
 }
 
 CAwoofy* CAwoofy::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -183,4 +216,6 @@ CGameObject* CAwoofy::Clone(void* pArg)
 void CAwoofy::Free()
 {
 	__super::Free();
+
+	Safe_Release(m_pFSM);
 }

@@ -121,6 +121,9 @@
     <Filter Include="01.Levels\Tool\Map">
       <UniqueIdentifier>{d2b0c25b-ae5a-4a5a-ab39-0b70b268bcd1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Monster\Awoofy\State">
+      <UniqueIdentifier>{db5e1ca0-0d6e-44e4-8381-86b1e15b1abc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -195,7 +198,6 @@
     <ClInclude Include="..\Public\MultiEffect.h">
       <Filter>02.GameObjects\Effect\Multi</Filter>
     </ClInclude>
-
     <ClInclude Include="..\Public\TestModel.h">
       <Filter>02.GameObjects\TestModel</Filter>
     </ClInclude>
@@ -207,7 +209,7 @@
     </ClInclude>
     <ClInclude Include="..\Public\Awoofy.h">
       <Filter>02.GameObjects\Monster\Awoofy</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\Public\ToolHelper.h">
       <Filter>90.Utils\[Sample] ToolHelper</Filter>
     </ClInclude>
@@ -237,6 +239,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Level_Tool_Anim.h">
       <Filter>01.Levels\Tool\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Awoofy_State.h">
+      <Filter>02.GameObjects\Monster\Awoofy\State</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -338,6 +343,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Level_Tool_Anim.cpp">
       <Filter>01.Levels\Tool\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Awoofy_State.cpp">
+      <Filter>02.GameObjects\Monster\Awoofy\State</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -169,6 +169,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Awoofy.h" />
+    <ClInclude Include="..\Public\Awoofy_State.h" />
     <ClInclude Include="..\public\BackGround.h" />
     <ClInclude Include="..\Public\BasicMap.h" />
     <ClInclude Include="..\public\Camera_Free.h" />
@@ -187,7 +188,6 @@
     <ClInclude Include="..\Public\Level_Tool_UI.h" />
     <ClInclude Include="..\Public\Loader.h" />
     <ClInclude Include="..\public\MainApp.h" />
-    <ClInclude Include="..\Public\Map_Stage1.h" />
     <ClInclude Include="..\Public\Monster.h" />
     <ClInclude Include="..\Public\MapToolHelper.h" />
     <ClInclude Include="..\Public\MapToolObject.h" />
@@ -209,6 +209,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Awoofy.cpp" />
+    <ClCompile Include="..\Private\Awoofy_State.cpp" />
     <ClCompile Include="..\private\BackGround.cpp" />
     <ClCompile Include="..\Private\BasicMap.cpp" />
     <ClCompile Include="..\private\Camera_Free.cpp" />
@@ -226,7 +227,6 @@
     <ClCompile Include="..\Private\Level_Tool_UI.cpp" />
     <ClCompile Include="..\Private\Loader.cpp" />
     <ClCompile Include="..\private\MainApp.cpp" />
-    <ClCompile Include="..\Private\Map_Stage1.cpp" />
     <ClCompile Include="..\Private\Monster.cpp" />
     <ClCompile Include="..\Private\MapToolHelper.cpp" />
     <ClCompile Include="..\Private\MapToolObject.cpp" />
