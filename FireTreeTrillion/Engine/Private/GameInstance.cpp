@@ -496,6 +496,11 @@ void CGameInstance::Clear_Camera()
 	return m_pPipeLine->Clear_Camera();
 }
 
+CCamera* CGameInstance::Get_CurCameraPtr()
+{
+	return m_pPipeLine->Get_CurCameraPtr();
+}
+
 const LIGHT_DESC * CGameInstance::Get_LightDesc(_uint iIndex)
 {
 	if (m_pLight_Manager == nullptr)

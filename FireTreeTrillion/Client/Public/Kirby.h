@@ -29,19 +29,36 @@ public:
 		_float			m_fZAngle = { 0.f };
 		_float4			m_vMoveDir = { 0.f, 0.f, 0.f, 0.f };
 		_float4			m_vTargetDir = { 0.f, 0.f, 0.f, 0.f };
+
 		// 눈, 입, 몸체의 상태를 담당한다.
 		EYESTATE		m_eEyeState = { EYE_END };
 		MOUTHSTATE		m_eMouthState = { MOUTH_END };
 		BODYSTATE		m_eBodyState = { BODY_END };
+		DIR				m_eKirbyDir = { DIR_END };
+		STATE			m_eJumpState = { STATE_JUMPR };
 
 		// 중력 및 점프
-		_float m_fJumpVelocity = { 0.f };
-		_bool	m_isJump = { false };
-		_bool	m_isLanding = { false };
-		_float m_fGravityOffset = { 6.f };
+		_float			m_fJumpVelocity = { 0.f };
+		_float			m_fGravityOffset = { 6.f };
+		_float			m_fJumpHoldTime = { 0.f };
+		_float			m_fChangeVelocityZeroTime = { 0.f };
+		_float			m_fHoldAirTime = { 0.f };
+
+		// 점프 중 재입력 방지
+		_bool			m_bRePressBlock = { false };
+
+		// 먹은 상태에서의 FALL 애님은 없기 때문에 같은 애니메이션으로 구분하기 위헤 부울값 선언
+		_bool			m_isEatFall = { false };
+
+		// Vacuum
+		_float			m_fVacuumTime = { 0.f };
 
 		// 방향 키 컨트롤러를 만지고 있는가?
-		_bool	m_isController = { false };
+		_bool			m_isController = { false };
+
+		// Fly
+		_float			m_fFlyTime = { 0.f };
+
 	}KIRBY_INFODESC;
 
 
@@ -63,53 +80,30 @@ public:
 	void			Set_KirbyInfo(KIRBY_INFODESC _tInfo) {
 		m_tKirbyInfo = _tInfo;
 	}
-	_uint			Get_State();
 
+	_uint			Get_State();
+	void			Change_State(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, BODYSTATE eBody);
+	void			Set_Animation(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
+	_bool			isAnimFinish();
+	void			DefaultIdle();
 
 	// 기타 세부적인 제어
 private:
 	// 커비의 움직임을 담은 구조체
 	KIRBY_INFODESC  m_tKirbyInfo;
-	DIR				m_eKirbyDir = { DIR_END };
 
 	void			SetOn_Slope(_float fTimeDelta);
 	void			Lerp_UpVector(_fvector _vTargetUp, _float _maxAngle, _float fTimeDelta);
 	void			Setting_KirbyBalance();
 	void			Key_Input(_float fTimeDelta);
-	void			JoyStick_Input(_float fTimeDelta);
-	// 일반 움직임을 할 수 있는 상황이여야 하니, 전부 false 여야 true를 반환하여야 한다.
-	_bool			Can_JoyStickUsing() { 
-		return !m_tKirbyInfo.m_isJump && !m_tKirbyInfo.m_isLanding;
-	}
-	void			ZXCV_Input(_float fTimeDelta);
 	void			Kirby_SystemTick(_float fTimeDelta);
-
-	void			Idle_Animation(_float fTimeDelta);
-	_float			m_fIdleStreachTime = { 0.f };
-	_bool			m_bKirbyIdleChangeTrigger = { true };
-	_uint			m_iIdleChoose = { 0 };
-
-	// JUMP를 위해 L와 R가 번갈아서 진행된다.
-	void			Kirby_Jump(_float fTimeDelta);
-	STATE			m_eJumpState = { STATE_END };
-	_float			m_fJumpHoldTime = { 0.f };
-	_float			m_fChangeVelocityZeroTime = { 0.f };
-	_float			m_fHoldAirTime = { 0.f };
-	_float			m_fChangeRunTime = { 0.f };
-	_float			m_fOffset = { 0.f };			// 점프 오프셋 -> 준수
-	_bool			m_bRePressBlock = { false };
-
 
 private:
 	HRESULT			Add_Components();
 	HRESULT			Bind_ShaderResources();
 	_bool			Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex);
-	_float4			Make_TargetDir(DIR _eDir);
-
 	// FSM
 	void			SetUp_FSM();
-	void			Change_State(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
-	// Player FSM 및 Jump 관련 변수들
 	CFSM*			m_pFSM = { nullptr };
 
 private:

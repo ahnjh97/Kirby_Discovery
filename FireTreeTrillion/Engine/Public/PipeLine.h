@@ -49,6 +49,11 @@ public:
 	void	Clear_Camera();
 	HRESULT Switch_CurCamera(_int iIdx);
 
+	CCamera* Get_CurCameraPtr()
+	{
+		return m_pCameras[m_iCurCameraIdx];
+	}
+
 	HRESULT Initialize();
 	void Bind_Pipeline();
 	void Tick();

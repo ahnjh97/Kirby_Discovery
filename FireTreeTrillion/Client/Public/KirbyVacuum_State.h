@@ -5,46 +5,31 @@
 
 BEGIN(Client)
 
-// 커비의 IDLE 상태를 통제한다.
-
-class CKirbyDefault_Idle_State final : public CFSM_State
+class CKirbyVacuum_Spit_State final : public CFSM_State
 {
 private:
-	CKirbyDefault_Idle_State();
-	virtual ~CKirbyDefault_Idle_State() = default;
+	CKirbyVacuum_Spit_State();
+	virtual ~CKirbyVacuum_Spit_State() = default;
 
 public:
 	// 상태 진입했을 때 처음만 호출
 	virtual void OnStateEnter(class CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation) override;
 	// 상태 진입되어 있는 상태에서 매 tick마다 호출
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
-
-	void Key_Z(class CGameObject* pGameObject, _float fTimeDelta);
-	void Key_X(class CGameObject* pGameObject, _float fTimeDelta);
-	void Key_C(class CGameObject* pGameObject, _float fTimeDelta);
-	void Key_V(class CGameObject* pGameObject, _float fTimeDelta);
-
 	virtual void OnStateExit()														override;
 
 public:
-	static	CKirbyDefault_Idle_State*	Create();
+	static	CKirbyVacuum_Spit_State* Create();
 	virtual void						Free() override;
-
-	_float m_fIdleStreachTime = { 0.f };
-	_uint m_iIdleChoose = { 0 };
-
 };
 
 
 
-
-// 커비의 RUN 상태를 통제한다.
-
-class CKirbyDefault_Run_State final : public CFSM_State
+class CKirbyVacuum_Vacuum_State final : public CFSM_State
 {
 private:
-	CKirbyDefault_Run_State();
-	virtual ~CKirbyDefault_Run_State() = default;
+	CKirbyVacuum_Vacuum_State();
+	virtual ~CKirbyVacuum_Vacuum_State() = default;
 
 public:
 	// 상태 진입했을 때 처음만 호출
@@ -54,23 +39,17 @@ public:
 	virtual void OnStateExit()														override;
 
 public:
-	static	CKirbyDefault_Run_State* Create();
-	virtual void					 Free() override;
-
-
+	static	CKirbyVacuum_Vacuum_State* Create();
+	virtual void						Free() override;
 };
 
 
 
-
-
-// 커비의 점프 상태를 통제한다.
-
-class CKirbyDefault_Jump_State final : public CFSM_State
+class CKirbyVacuum_VacuumWalk_State final : public CFSM_State
 {
 private:
-	CKirbyDefault_Jump_State();
-	virtual ~CKirbyDefault_Jump_State() = default;
+	CKirbyVacuum_VacuumWalk_State();
+	virtual ~CKirbyVacuum_VacuumWalk_State() = default;
 
 public:
 	// 상태 진입했을 때 처음만 호출
@@ -80,13 +59,8 @@ public:
 	virtual void OnStateExit()														override;
 
 public:
-	static	CKirbyDefault_Jump_State* Create();
-	virtual void					  Free() override;
-
-	_float	m_fChangeRunTime = { 0.f };
-	_float	m_fFallTime = { 0.f };
+	static	CKirbyVacuum_VacuumWalk_State* Create();
+	virtual void						Free() override;
 };
-
-
 
 END

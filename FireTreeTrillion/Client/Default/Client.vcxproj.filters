@@ -123,6 +123,15 @@
     </Filter>
     <Filter Include="02.GameObjects\Monster\Awoofy\State">
       <UniqueIdentifier>{db5e1ca0-0d6e-44e4-8381-86b1e15b1abc}</UniqueIdentifier>
+	</Filter>
+	<Filter Include="02.GameObjects\Player\State\KirbyDefault_State">
+      <UniqueIdentifier>{15a1c888-1e49-4718-9a75-c7b945792614}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Player\State\KirbyBalloon_State">
+      <UniqueIdentifier>{77bae8eb-2969-4e98-bd3d-2e45600592c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Player\State\KirbyVacuum_State">
+      <UniqueIdentifier>{ab3b3a78-a477-4ab7-95f4-76e0aecc47b1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -213,12 +222,6 @@
     <ClInclude Include="..\Public\ToolHelper.h">
       <Filter>90.Utils\[Sample] ToolHelper</Filter>
     </ClInclude>
-    <ClInclude Include="Kirby_Enums.h">
-      <Filter>99.Defines</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\KirbyDefault_State.h">
-      <Filter>02.GameObjects\Player\State</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Grid.h">
       <Filter>02.GameObjects\Terrain</Filter>
     </ClInclude>
@@ -242,6 +245,21 @@
     </ClInclude>
     <ClInclude Include="..\Public\Awoofy_State.h">
       <Filter>02.GameObjects\Monster\Awoofy\State</Filter>
+	</ClInclude>
+    <ClInclude Include="..\Public\KirbyDefault_State.h">
+      <Filter>02.GameObjects\Player\State\KirbyDefault_State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KirbyBalloon_State.h">
+      <Filter>02.GameObjects\Player\State\KirbyBalloon_State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_State_Function.h">
+      <Filter>02.GameObjects\Player\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Enums.h">
+      <Filter>02.GameObjects\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KirbyVacuum_State.h">
+      <Filter>02.GameObjects\Player\State\KirbyVacuum_State</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -305,8 +323,8 @@
     <ClCompile Include="..\Private\SingleEffect.cpp">
       <Filter>02.GameObjects\Effect\Single</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\KirbyDefault_State.cpp">
-      <Filter>02.GameObjects\Player\State</Filter>
+    <ClCompile Include="..\Private\Level_Tool_Anim.cpp">
+      <Filter>01.Levels\Tool\ANIM</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\TestModel.cpp">
       <Filter>02.GameObjects\TestModel</Filter>
@@ -341,11 +359,17 @@
     <ClCompile Include="..\Private\Level_Tool_Map.cpp">
       <Filter>01.Levels\Tool\Map</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Level_Tool_Anim.cpp">
-      <Filter>01.Levels\Tool\Animation</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Awoofy_State.cpp">
       <Filter>02.GameObjects\Monster\Awoofy\State</Filter>
+	</ClCompile>
+	<ClCompile Include="..\Private\KirbyDefault_State.cpp">
+      <Filter>02.GameObjects\Player\State\KirbyDefault_State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KirbyBalloon_State.cpp">
+      <Filter>02.GameObjects\Player\State\KirbyBalloon_State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KirbyVacuum_State.cpp">
+      <Filter>02.GameObjects\Player\State\KirbyVacuum_State</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
