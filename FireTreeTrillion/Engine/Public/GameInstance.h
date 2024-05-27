@@ -66,6 +66,7 @@ public: /* For.Object_Manager */
 	class CGameObject*	Get_GameObject(_uint iLevelIndex, const wstring& strLayerTag, _uint iIndex);
 	class CGameObject*	Get_GameObject_ByTag(_uint iLevelIndex, const wstring& strLayerTag, wstring _tag);
 	void				Set_CurrentLevel(_int CurrentLevel);
+	void	Clear_Layer(_uint iLevelIndex, const wstring& wstrLayerTag);
 
 public: /* For.Component_Manager */
 	HRESULT			  Add_Prototype(_uint iLevelIndex, const wstring& strPrototypeTag, class CComponent* pPrototype);
@@ -87,7 +88,7 @@ public: /* For.PipeLine */
 	HRESULT Add_Camera(class CCamera* pCamera);
 	HRESULT Switch_CurCamera(_int iIdx);
 	void Clear_Camera();
-
+	CCamera* Get_CurCameraPtr();
 	_matrix Get_Transform_Matrix(CPipeLine::TRANSFORMSTATE eState) const;
 	_float4x4 Get_Transform_Float4x4(CPipeLine::TRANSFORMSTATE eState) const;
 	_matrix Get_Transform_Matrix_Inverse(CPipeLine::TRANSFORMSTATE eState) const;
@@ -165,6 +166,9 @@ public: /* For.PhysX */
 	PxRigidDynamic* CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial = nullptr);
 	PxRigidStatic* CreateStaticActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial = nullptr);
 
+	public: /* For. Picking */
+		void Transform_PickingToLocalSpace(const class CTransform* pTransform, _Out_ _float3* pRayDir, _Out_ _float3* pRayPos);
+
 private:
 	class CGraphic_Device*			m_pGraphic_Device = { nullptr };
 	class CInput_Device*			m_pInput_Device = { nullptr };
@@ -182,6 +186,7 @@ private:
 	class CSound_Manager*			m_pSound_Manager = { nullptr };
 	class CImGUI_Manager*			m_pIMGUI_Manager = { nullptr };
 	class CPhysX*					m_pPhysx = { nullptr };
+	class CPicking*					m_pPicking = { nullptr };
 
 	_uint	m_iCurrentLevelID = { 0 };
 

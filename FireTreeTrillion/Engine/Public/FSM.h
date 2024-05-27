@@ -25,7 +25,7 @@ public:
 	HRESULT				Initialize(void* pArg);
 	
 	void				Update(class CGameObject* pGameObject, _float fTimeDelta);
-	_bool				ChangeState(_uint iState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
+	_bool				ChangeState(_uint iState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _uIndex = 0);
 	void				Add_State(_uint iState, CFSM_State* pInitState);
 	CFSM_State*			Find_State(_uint iState);
 
@@ -35,8 +35,7 @@ private:
 	CFSM_State*			m_pCurrent_State = { nullptr };
 	_uint				m_iState = { UINT_MAX };
 
-	// FSM에서 들고 있을 Model
-	class CModel*		m_pModel = { nullptr };
+	vector<class CModel*> m_pModels;
 	
 	unordered_map<_uint, CFSM_State*>	m_mapFSM_State;
 

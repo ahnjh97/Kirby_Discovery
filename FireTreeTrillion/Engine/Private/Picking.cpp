@@ -1,0 +1,79 @@
+#include "Picking.h"
+#include "Transform.h"
+#include "GameInstance.h"
+
+CPicking::CPicking(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+	: m_pDevice(pDevice),
+	m_pContext(pContext),
+	m_pGameInstance(CGameInstance::Get_Instance())
+{
+	Safe_AddRef(m_pGameInstance);
+	Safe_AddRef(m_pDevice);
+	Safe_AddRef(m_pContext);
+}
+
+HRESULT CPicking::Initialize(HWND hWnd, _uint iWinSizeX, _uint iWinSizeY)
+{
+	m_hWnd = hWnd;
+
+	m_iWinSizeX = iWinSizeX;
+	m_iWinSizeY = iWinSizeY;
+
+	return S_OK;
+}
+
+void CPicking::Update()
+{
+	POINT			ptMouse;
+	GetCursorPos(&ptMouse);
+
+	/* 뷰포트 상의 마우스 위치를 구하자. */
+	ScreenToClient(m_hWnd, &ptMouse);
+
+
+	/* 0, 0 -> -1, 1 */
+	/* wincx * 0.5f, wincy * 0.5f -> 0, 0 */
+	/* wincx, wincy -> 1, -1 */
+
+	/* 투영스페이스 상의 마우스 위치를 구하자. */
+	_vector		vMousePos = XMVectorSet(ptMouse.x / (m_iWinSizeX * 0.5f) - 1.f, ptMouse.y / -(m_iWinSizeY * 0.5f) + 1.f, 0.f, 1.f);
+
+	_matrix	ProjMatrixInv = m_pGameInstance->Get_Transform_Matrix_Inverse(CPipeLine::D3DTS_PROJ);
+
+	/* 뷰스페이스 상의 마우스 위치를 구했다. */
+	vMousePos = XMVector3TransformCoord(vMousePos, ProjMatrixInv);
+
+	_matrix	ViewMatrixInv = m_pGameInstance->Get_Transform_Matrix_Inverse(CPipeLine::D3DTS_VIEW);
+
+	/* 월드스페이스 상의 마우스 위치를 구했다. */
+	XMStoreFloat3(&m_vRayDir, XMVector3TransformNormal(vMousePos, ViewMatrixInv));
+	XMStoreFloat3(&m_vRayPos, XMVector3TransformCoord(XMVectorSet(0.f, 0.f, 0.f, 1.f), ViewMatrixInv));
+}
+
+void CPicking::Transform_PickingToLocalSpace(const CTransform* pTransform, _Out_ _float3* pRayDir, _Out_ _float3* pRayPos)
+{
+	_matrix	WorldMatrixInv = pTransform->Get_WorldMatrix_Inverse();
+	XMStoreFloat3(pRayDir, XMVector3TransformNormal(XMLoadFloat3(&m_vRayDir), WorldMatrixInv));
+	XMStoreFloat3(pRayPos, XMVector3TransformCoord(XMLoadFloat3(&m_vRayPos), WorldMatrixInv));
+}
+
+CPicking* CPicking::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, HWND hWnd, _uint iWinSizeX, _uint iWinSizeY)
+{
+	CPicking* pInstance = new CPicking(pDevice, pContext);
+
+	if (FAILED(pInstance->Initialize(hWnd, iWinSizeX, iWinSizeY)))
+	{
+		MSG_BOX(TEXT("Failed To Create : CPicking"));
+
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
+void CPicking::Free()
+{
+	Safe_Release(m_pGameInstance);
+	Safe_Release(m_pDevice);
+	Safe_Release(m_pContext);
+}

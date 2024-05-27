@@ -6,7 +6,15 @@ BEGIN(Engine)
 class ENGINE_DLL CRigidBody : public CComponent
 {
 public:
-	enum SHAPE { TYPE_BOX, TYPE_SPHERE, TYPE_CAPSULE, TYPE_END };
+	struct RIGIDBODY_DESC
+	{
+		RIGID_SHAPE	eShapeType;
+		_float4x4	matWorld;
+		_bool		bTrigger;
+		_float		fOffsetSize;
+		_float3		vMaterial = {0.5f, 0.5f, 0.5f};
+	
+	};
 
 private:
 	CRigidBody(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -16,7 +24,6 @@ private:
 public:
 	virtual HRESULT Initialize_Prototype()  override;
 	virtual HRESULT Initialize(void* pArg)  override;
-	virtual void	Start_Tick()			override;
 	virtual void	Render_IMGUI()			override;
 
 	void			Update(class CTransform* pTransform);
@@ -35,14 +42,6 @@ public:
 	// 날리기
 	void			Add_Force(_float3 vForce);
 
-
-	// physx transform
-	void			PlayerController(_float3 vPos);
-	void			Go_Straight(CTransform* pTransform, _float fSpeed, _float fTimeDelta);	// look방향으로 움직임
-	_bool			Jump(CTransform* pTransform, _float fFallVelocity, _float fTimeDelta);	// 점프
-	PxVec3			Compute_Slope(CTransform* pTransform);									// 경사면의 노말벡터 계산
-	PxVec3			TerrainRayCast_Collision(PxVec3 _rayOrigin, PxVec3 _rayDirection, _float _fMaxDistance);
-
 public:
 	physx::PxTransform	Get_PxTransform();
 
@@ -57,24 +56,16 @@ protected:
 	physx::PxShape*				m_pShape			 = nullptr;
 	physx::PxController*		m_pCapsuleController = nullptr;
 
-	// ========== IMGUI에서 제어할 수 있도록 붙이기 ==========
-	// 물리엔진 on/off
-	// - 움직임을 제어하는 객체인가? true == isKinectic
-	// - 내가 직접 움직임을 제어할 것은 아니지만 물리 영향을 받았으면 좋겠어. false == isKinectic
-	_bool					m_bKinematic	= false;
-	// 이 RigidBody를 들고 있는 객체가 trigger인가
-	_bool					m_bTrigger		= false;
+	_bool						m_bTrigger = false;
+
 	// 물체의 질량
-	_float					m_fDensity		= 10.f;
+	_float						m_fDensity		= 10.f;
 
 	// 현 RigidBody의 형태
-	SHAPE					m_eShapeType	= TYPE_CAPSULE;
-	_float4x4				m_OriginTransformMatrix;
-
-
-	//
-	_float m_fFallVelocity = { 0.f };
-	_float m_fFallAcceleration = { 0.f };
+	RIGID_SHAPE					m_eShapeType	= RIGID_CAPSULE;
+	_float4x4					m_OriginTransformMatrix = _float4x4::Identity;
+	_float3						m_vMaterial = { 0.5f, 0.5f, 0.6f };
+	_float						m_fOffsetSize = 1.f;
 
 public:
 	static CRigidBody*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

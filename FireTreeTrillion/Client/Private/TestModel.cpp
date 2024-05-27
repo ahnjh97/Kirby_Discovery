@@ -31,8 +31,9 @@ HRESULT CTestModel::Initialize(void* pArg)
         return E_FAIL;
 
     //CGameInstance::Get_Instance()->Test();
+    
     // position 세팅은 항상 Add_Components() 앞에 둘것
-    _vector vPos = XMVectorSet(0.f, 20.f, 0.f, 1.f);
+    _vector vPos = XMVectorSet(0.f, 11.f, -180.f, 1.f);
     m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
     if (FAILED(Add_Components()))
         return E_FAIL;
@@ -40,15 +41,15 @@ HRESULT CTestModel::Initialize(void* pArg)
     m_pModelCom->Set_Animation(0, 60.f, true);
 
     // 예시코드 1 : 태양광
-    LIGHT_DESC			LightDesc{};
-    LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
-    LightDesc.vDirection = _float4(0.f, -1.f, 0.f, 0.f);
+    //LIGHT_DESC			LightDesc{};
+    //LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
+    //LightDesc.vDirection = _float4(0.f, -1.f, 0.f, 0.f);
 
-    LightDesc.vDiffuse = _float4(0.8f, 0.8f, 0.8f, 1.f);
-    LightDesc.vAmbient = _float4(0.6f, 0.6f, 0.6f, 1.f);
-    LightDesc.vSpecular = _float4(0.2f, 0.2f, 0.2f, 1.f);
-    if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
-        return E_FAIL;
+    //LightDesc.vDiffuse = _float4(0.8f, 0.8f, 0.8f, 1.f);
+    //LightDesc.vAmbient = _float4(0.6f, 0.6f, 0.6f, 1.f);
+    //LightDesc.vSpecular = _float4(0.2f, 0.2f, 0.2f, 1.f);
+    //if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
+    //    return E_FAIL;
 
 
     // 예시코드 2 : 따라다니게 하기 예시 코드 + 점 광원 예시 코드
@@ -217,11 +218,7 @@ void CTestModel::Late_Tick(_float fTimeDelta)
         m_pRigidBodyCom->Add_Force(force);
     }
 
-    //// =============== RigidBody를 사용한 예시 소스 ===============
-    //// physX에 내 Transform 던지기 
-    //m_pRigidBodyCom->Update(m_pTransformCom);
-    //// physX에서 변경된 Transform 가져오기
-    //m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
+    m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
 }
 
 HRESULT CTestModel::Render()
@@ -316,11 +313,15 @@ HRESULT CTestModel::Add_Components()
     CHECK_FAILED(hr);
     
     /* For.Com_RigidBody */
+    CRigidBody::RIGIDBODY_DESC rigidDesc {};
+    rigidDesc.bTrigger = false;
+    rigidDesc.eShapeType = RIGID_SPHERE;
+    rigidDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
     hr = __super::Add_Component(TEXT("Prototype_Component_RigidBody"),
-        TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom);
+        TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &rigidDesc);
     CHECK_FAILED(hr);
-    //m_pRigidBodyCom->Set_PhysXObject(this);
-    //m_pRigidBodyCom->Activate(true);
+    m_pRigidBodyCom->Set_PhysXObject(this);
+    m_pRigidBodyCom->Activate(true);
 
     /* For.Com_CharacterController */
     _float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);

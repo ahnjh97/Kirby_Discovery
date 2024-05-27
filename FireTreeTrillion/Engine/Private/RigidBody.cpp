@@ -21,49 +21,31 @@ HRESULT CRigidBody::Initialize_Prototype()
 
 HRESULT CRigidBody::Initialize(void * pArg)
 {
-	//Create_Actor();
-	return S_OK;
-}
+	RIGIDBODY_DESC* pDesc = (RIGIDBODY_DESC*)pArg;
+	m_bTrigger				= pDesc->bTrigger;
+	m_eShapeType			= pDesc->eShapeType;
+	m_OriginTransformMatrix = pDesc->matWorld;
+	m_vMaterial				= pDesc->vMaterial;
 
-// start_tick은 한번만 실행
-// rigidBody를 추가하는 순간 physX에서 작동하는 Actor가 추가된다.
-void CRigidBody::Start_Tick()
-{
-	//__super::Start_Tick();
-	CHECK_NULLPTR(m_pObject);
-	m_pActor->setGlobalPose(physx::PxTransform{CUtils::To_Float4x4(m_pObject->Get_TransformCom()->Get_WorldMatrix())});
-	m_pGameInstance->Get_Scene()->addActor(*m_pActor);
+	Create_Actor();
+	return S_OK;
 }
 
 void CRigidBody::Update(CTransform* pTransform)
 {
-	if (m_bTrigger)
-	{
-		Set_PxWorldMatrix(pTransform->Get_WorldFloat4x4());
-	}
-	else if (m_bKinematic && Is_Activated())
-	{
-		m_pActor->setKinematicTarget(physx::PxTransform{CUtils::To_Float4x4(pTransform->Get_WorldFloat4x4())});
-	}
+	Set_PxWorldMatrix(pTransform->Get_WorldFloat4x4());
 }
 
 void CRigidBody::Update(_fmatrix matrix)
 {
-	if (m_bTrigger)
-	{
-		Set_PxWorldMatrix(matrix);
-	}
-	else if (m_bKinematic && Is_Activated())
-	{
-		m_pActor->setKinematicTarget(physx::PxTransform{CUtils::To_Float4x4(matrix)});
-	}
+	Set_PxWorldMatrix(matrix);
 }
 
 void CRigidBody::Update_PhysX(CTransform* pTransform)
 {
 	if (Is_Activated() == false) return;
 
-	if (false == m_bKinematic && false == m_bTrigger)
+	if (false == m_bTrigger)
 	{
 		pTransform->Set_WorldMatrix(Get_PxWorldMatrix());
 	}
@@ -81,7 +63,6 @@ void CRigidBody::Render_IMGUI()
 			m_pGameInstance->Get_Scene()->addActor(*m_pActor);
 	}
 	ImGui::Checkbox("bTrigger",		&m_bTrigger);
-	ImGui::Checkbox("bKinematic",	&m_bKinematic);
 	ImGui::InputFloat("Density",	&m_fDensity);
 
 	ImGui::Indent(20.f);
@@ -96,50 +77,64 @@ void CRigidBody::Create_Actor()
 	Release_Actor();
 
 	auto pPhysics = m_pGameInstance->Get_Physics();
-	auto pxMat = CUtils::To_Float4x4(_float4x4::Identity);
-	if (m_pObject != nullptr)
-		pxMat = CUtils::To_Float4x4(m_pObject->Get_TransformCom()->Get_WorldMatrix());
-	auto pMtrl = m_pGameInstance->Get_Material();
-	m_pActor = pPhysics->createRigidDynamic(physx::PxTransform{pxMat});
-
+	
+	// scale 긁어오기
 	_matrix OriginMatrix = m_OriginTransformMatrix;
-	_float3 vScale = _float3(XMVectorGetX(XMVector3Length(OriginMatrix.r[0])),
-							 XMVectorGetX(XMVector3Length(OriginMatrix.r[1])),
-							 XMVectorGetX(XMVector3Length(OriginMatrix.r[2])));
+	_float3 vScale = _float3();
+	if (m_fOffsetSize == _float())
+	{
+		vScale = _float3(m_fOffsetSize, m_fOffsetSize, m_fOffsetSize);
+	}
+	else
+	{
+		vScale = _float3(XMVectorGetX(XMVector3Length(OriginMatrix.r[0])),
+						 XMVectorGetX(XMVector3Length(OriginMatrix.r[1])),
+						 XMVectorGetX(XMVector3Length(OriginMatrix.r[2])));
+	}
+	
+	PxMaterial* pMtrl = m_pGameInstance->Get_Physics()->createMaterial(m_vMaterial.x, m_vMaterial.y, m_vMaterial.z);
 
 	switch (m_eShapeType)
 	{
-	case TYPE_BOX:
+	case RIGID_BOX:
 		m_pShape = pPhysics->createShape(physx::PxBoxGeometry(0.5f * vScale.x, 0.5f * vScale.y, 0.5f * vScale.z), *pMtrl);
 		break;
-	case TYPE_SPHERE:
+	case RIGID_SPHERE:
 		m_pShape = pPhysics->createShape(physx::PxSphereGeometry(0.5f * vScale.x), *pMtrl);
 		break;
-	case TYPE_CAPSULE:
+	case RIGID_CAPSULE:
 		m_pShape = pPhysics->createShape(physx::PxCapsuleGeometry(0.5f * vScale.x, 1.f * vScale.y), *pMtrl);
 		break;
-	case TYPE_END:
+	case RIGID_END:
 		[[fallthrough]];
 	default:
 		NODEFAULT;
 	}
 
-	SetUp_Actor();
+	// Transform 설정 (위치와 회전)
+	PxMat44 pxMat = CUtils::To_Float4x4(OriginMatrix);
+	PxTransform transform = CUtils::mat44ToTransform(pxMat);
+	m_pActor = pPhysics->createRigidDynamic(transform);
+
+	//SetUp_Actor();
 
 	m_pActor->attachShape(*m_pShape);
 	physx::PxRigidBodyExt::updateMassAndInertia(*m_pActor, m_fDensity);
 }
 
+
+//정현아 여길 봐줘
+/// <summary>
+/// RigidBody를 어떻게 사용할 것인지 세팅 플래그 변경하는 함수
+/// +) Create_Actor의 하단에 호출중
+/// </summary>
 void CRigidBody::SetUp_Actor()
 {
 	if (m_bTrigger)
 	{
 		m_pActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, true);
 	}
-	else
-	{
-		m_pActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, m_bKinematic);
-	}
+
 	m_pActor->userData = this;
 
 	if (m_bTrigger)
@@ -155,7 +150,7 @@ void CRigidBody::SetUp_Actor()
 		m_pShape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, false);
 	}
 
-	m_pShape->setSimulationFilterData(physx::PxFilterData{ static_cast<physx::PxU32>(0/*ColliderType*/), 0, 0, 0 });
+	m_pShape->setSimulationFilterData(physx::PxFilterData{ static_cast<physx::PxU32>(0/*eColliderType*/), 0, 0, 0 });
 	m_pShape->setQueryFilterData(physx::PxFilterData{static_cast<physx::PxU32>(1), 0, 0, 0});
 
 	_matrix RemoveScaleOriginMatrix = m_OriginTransformMatrix;
@@ -195,8 +190,8 @@ void CRigidBody::Activate(_bool _bActive)
 {
 	if (_bActive)
 	{
-		if (m_pActor->getScene() == nullptr)
-			m_pGameInstance->AddActor(*m_pActor);
+		//if (m_pActor->getScene() == nullptr)
+		m_pGameInstance->AddActor(*m_pActor);
 	}
 	else
 	{
@@ -210,173 +205,8 @@ void CRigidBody::Add_Force(_float3 vForce)
 	if (m_pActor == nullptr) return;
 
 	// Trigger는 어떻게 사용할 지 추후 의논 예정
-	if (false == (m_bKinematic))
-	{
-		physx::PxVec3 PxForce = physx::PxVec3(vForce.x, vForce.y, vForce.z);
-		m_pActor->addForce(PxForce, physx::PxForceMode::eFORCE);
-	}
-}
-
-void CRigidBody::PlayerController(_float3 vPos)
-{
-	PxCapsuleControllerDesc capsuleDesc;
-	capsuleDesc.position = PxExtendedVec3(vPos.x, vPos.y, vPos.z);
-	capsuleDesc.radius = 0.5f; // 반지름
-	capsuleDesc.height = 0.1f; // 높이
-	capsuleDesc.stepOffset = 0.f;
-	capsuleDesc.volumeGrowth = 1.0f;
-	capsuleDesc.slopeLimit = cosf(XMConvertToRadians(15.f)); // 15 degrees
-	capsuleDesc.upDirection = PxVec3(0, 1, 0);
-	capsuleDesc.contactOffset = 0.001f;
-	PxMaterial* material = m_pGameInstance->Get_Material();
-	material = m_pGameInstance->Get_Physics()->createMaterial(0.5f, 0.5f, 0.5f);
-	capsuleDesc.material = material;
-
-	// 캡슐 컨트롤러 생성
-	m_pCapsuleController = m_pGameInstance->Get_ControllerManager()->createController(capsuleDesc);
-	if (nullptr == m_pCapsuleController)
-		MSG_BOX(TEXT("Failed to Controller"));
-}
-   
-void CRigidBody::Go_Straight(CTransform* pTransform, _float fSpeed, _float fTimeDelta)
-{
-	PxVec3 movement(0.f);
-	_vector vLook = pTransform->Get_State_Vector(CTransform::STATE_LOOK);
-	movement += CUtils::To_PxVec3(XMVector3Normalize(vLook)) * fSpeed * fTimeDelta;
-                
-	PxControllerFilters filter;
-	PxControllerCollisionFlags collisionFlags = m_pCapsuleController->move(movement, 0.001f, fTimeDelta, filter);
-
-	PxExtendedVec3 pxPos = m_pCapsuleController->getPosition();
-	PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
-
-	_vector xmPos = XMVectorSet(pos.x, pos.y - 0.5f, pos.z, 0.f);
-
-	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
-}
-
-//[JS]
-_bool CRigidBody::Jump(CTransform* pTransform, _float fFallVelocity, _float fTimeDelta)
-{
-	//fFallVelocity -= 9.81f * fTimeDelta;
-
-	if (m_fFallVelocity < -1000.f)
-		m_fFallVelocity = -10.f;
-
-	PxVec3 moveVector = PxVec3(0.f, fFallVelocity, 0.f) * fTimeDelta;
-	PxControllerCollisionFlags collisionFlags = m_pCapsuleController->move(moveVector, 0.001f, fTimeDelta, PxControllerFilters());
-	//Go_Straight(pTransform, 5.f, fTimeDelta);
-
-	PxControllerState m_pPxState;
-
-	m_pCapsuleController->getState(m_pPxState);
-
-	if (m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_DOWN || m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_UP)
-	{
-		fFallVelocity = 0.f;
-		return false;
-	}
-
-	PxExtendedVec3 pxPos = m_pCapsuleController->getPosition();
-	PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
-	_vector xmPos = XMVectorSet(pos.x, pos.y - 0.5f, pos.z, 0.f);
-
-	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
-
-	return true;
-}
-
-PxVec3 CRigidBody::Compute_Slope(CTransform* pTransform)
-{
-	PxExtendedVec3 position = m_pCapsuleController->getPosition();
-	PxVec3 rayOrigin = PxVec3((_float)position.x, (_float)position.y, (_float)position.z);
-
-	_vector vRight = pTransform->Get_State_Vector(CTransform::STATE_RIGHT);
-	vRight = XMVector3Normalize(vRight);
-	_vector vLook = pTransform->Get_State_Vector(CTransform::STATE_LOOK);
-	vLook = XMVector3Normalize(vLook);
-
-	PxVec3 right = CUtils::To_PxVec3(vRight * 0.5f);
-	PxVec3 look = CUtils::To_PxVec3(vLook * 0.5f);
-
-	// 오른쪽, 왼쪽 레이캐스트
-	PxVec3 rayOriginRight = rayOrigin + right;
-	PxVec3 rayOriginLeft = rayOrigin - right;
-
-	// 앞, 뒤 레이캐스트
-	PxVec3 rayOriginFront = rayOrigin + look;
-	PxVec3 rayOriginBack = rayOrigin - look;
-
-	PxVec3 rayDirection = PxVec3(0.f, -1.f, 0.f);
-	_float maxDistance = 1.f;
-
-	PxVec3	normal = { 0.f, 0.f, 0.f };
-
-	normal += TerrainRayCast_Collision(rayOriginRight, rayDirection, maxDistance);
-
-	normal += TerrainRayCast_Collision(rayOriginLeft, rayDirection, maxDistance);
-
-	normal += TerrainRayCast_Collision(rayOriginFront, rayDirection, maxDistance);
-
-	normal += TerrainRayCast_Collision(rayOriginBack, rayDirection, maxDistance);
-	 
-	normal.normalize();
-	return normal;
-
-	//_bool isRayCastLeft = m_pGameInstance->Get_Scene()->raycast(rayOriginLeft, rayDirection, maxDistance, hitBuffer, PxHitFlag::eNORMAL, filterData);
-	//// 충돌이 발생한 경우 법선 벡터 반환
-	//if (isRayCastLeft && hitBuffer.hasBlock)
-	//{
-	//	hit = hitBuffer.block;
-
-	//	normal += hit.normal;
-	//}
-
-	//_bool isRayCastFront = m_pGameInstance->Get_Scene()->raycast(rayOriginFront, rayDirection, maxDistance, hitBuffer, PxHitFlag::eNORMAL, filterData);
-	//// 충돌이 발생한 경우 법선 벡터 반환
-	//if (isRayCastLeft && hitBuffer.hasBlock)
-	//{
-	//	hit = hitBuffer.block;
-
-	//	normal += hit.normal;
-	//}
-
-	//_bool isRayCastBack = m_pGameInstance->Get_Scene()->raycast(rayOriginBack, rayDirection, maxDistance, hitBuffer, PxHitFlag::eNORMAL, filterData);
-	//// 충돌이 발생한 경우 법선 벡터 반환
-	//if (isRayCastLeft && hitBuffer.hasBlock)
-	//{
-	//	hit = hitBuffer.block;
-
-	//	normal += hit.normal;
-	//}
-
-
-	//if (false == isRayCastRight && false == isRayCastLeft)
-	//	return PxVec3(0.0f, 1.0f, 0.0f);
-	//else
-	//{
-	//	normal.normalize();
-	//	return normal;
-	//}
-}
-
-PxVec3 CRigidBody::TerrainRayCast_Collision(PxVec3 _rayOrigin, PxVec3 _rayDirection, _float _fMaxDistance)
-{
-	PxRaycastHit hit;
-	PxRaycastBuffer hitBuffer;
-
-	PxQueryFilterData filterData(PxQueryFlag::eSTATIC);
-
-	_bool isRayCast = m_pGameInstance->Get_Scene()->raycast(_rayOrigin, _rayDirection, _fMaxDistance, hitBuffer, PxHitFlag::eNORMAL, filterData);
-	// 충돌이 발생한 경우 법선 벡터 반환
-	if (isRayCast && hitBuffer.hasBlock)
-	{
-		hit = hitBuffer.block;
-
-		return hit.normal;
-	}
-	else
-		return PxVec3(0.0f, 1.0f, 0.0f);
+	physx::PxVec3 PxForce = physx::PxVec3(vForce.x, vForce.y, vForce.z);
+	m_pActor->addForce(PxForce, physx::PxForceMode::eFORCE);
 }
 
 physx::PxTransform CRigidBody::Get_PxTransform()
@@ -435,9 +265,6 @@ void CRigidBody::Free()
 	__super::Free();
 
 	Release_Actor();
-
-	if(nullptr != m_pCapsuleController)
-		m_pCapsuleController->release();
 }
 
  

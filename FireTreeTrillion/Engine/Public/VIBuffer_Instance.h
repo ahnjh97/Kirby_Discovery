@@ -7,17 +7,7 @@ BEGIN(Engine)
 class ENGINE_DLL CVIBuffer_Instance abstract : public CVIBuffer
 {
 public:
-	typedef struct
-	{
-		_float3		vPivot;
-		_float3		vCenter;
-		_float3		vRange;
-		_float3		vMinScale, vMaxScale;
-		_float2		vLifeTime;
-		_bool		isLoop;
-		_float2		vSpeed;		
-		_uint		iNumInstance;
-	}INSTANCE_DESC;
+
 
 protected:
 	CVIBuffer_Instance(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -25,18 +15,40 @@ protected:
 	virtual ~CVIBuffer_Instance() = default;
 
 public:
-	virtual HRESULT Initialize_Prototype(const CVIBuffer_Instance::INSTANCE_DESC& InstanceDesc);
+	virtual _float	Compute_RandLifetime() = 0;
+	virtual _float	Compute_RandStartDelay() = 0;
+
+	virtual _float3 Compute_RandScale() = 0;
+	virtual _float3 Compute_RandRotation() = 0;
+	virtual _float4 Compute_RandPosition() = 0;
+
+	//Dir(float3) + Speed(float1) 계산
+	virtual _float4 Compute_RandDirection() = 0;
+	//Color + Alpha 계산
+	virtual _float4 Compute_RandColor() = 0;
+
+
+	virtual void Drop(_float fTimeDelta);
+	virtual void Spread(_float fTimeDelta);
+	virtual void Decelerate(_float fTimeDelta);
+
+	void Compute_AllLifeTime( _float fTimeDelta);
+
+
+	void Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceIndex, _float fTimeDelta);
+
+	void Change_InstanceInfo(VTXMATRIX* pVertices, _uint iInstanceIndex);
+	void Update_InstanceDesc(const INSTANCE_DESC& InstanceDesc);
+	void Revive();
+
+public:
+	virtual HRESULT Initialize_Prototype(const INSTANCE_DESC& InstanceDesc);
+	virtual HRESULT Initialize_Prototype(_uint _iNumInstance);
 	virtual HRESULT Initialize(void* pArg);
 	virtual HRESULT Bind_Buffers();
 	virtual HRESULT Render();
 
-public:
-	virtual _float4 Compute_RandPosition() = 0;
-	virtual void Drop(_float fTimeDelta);
-	virtual void Spread(_float fTimeDelta);
-
-	void Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceIndex, _float fTimeDelta);
-
+	
 
 protected:
 	ID3D11Buffer*			m_pVBInstance = { nullptr };
@@ -53,9 +65,18 @@ protected:
 protected:
 	random_device				m_RandomDevice;
 	mt19937_64					m_RandomNumber;
+
+
 	_float2*					m_pLifeTimes = { nullptr };
+	_float*						m_pStartDelays = { nullptr };
+	_float3*					m_pDirections = { nullptr };
 	_float*						m_pSpeeds = { nullptr };
+	_float3*					m_pColors = { nullptr };
+	_float*						m_pAlphas = { nullptr };
+
 	
+
+	//void	Update_Buffer(_uint _iNumInstance);
 
 
 public:
