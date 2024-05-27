@@ -23,8 +23,7 @@ HRESULT CUIObject::Initialize_Prototype()
 
 HRESULT CUIObject::Initialize(void* pArg)
 {
-	HRESULT hr;
-	hr = __super::Initialize(pArg);
+	HRESULT hr = __super::Initialize(pArg);
 	CHECK_FAILED(hr);
 
 	return S_OK;

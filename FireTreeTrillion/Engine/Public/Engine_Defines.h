@@ -36,6 +36,9 @@ namespace Engine
 #include "imgui.h"
 #include "imgui_impl_dx11.h"
 #include "imgui_impl_win32.h"
+#include "ImGuiFileDialog.h"
+#include "ImGuiFileDialogConfig.h"
+
 
 // SHADER - EFFECT
 #include "Effects11/d3dx11effect.h"

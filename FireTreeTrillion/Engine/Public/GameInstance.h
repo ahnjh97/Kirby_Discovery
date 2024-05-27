@@ -161,6 +161,7 @@ public: /* For.ImGui_Manager */
 	void		ImGui_Render();
 	void		EditTransform(/*const CCamera& camera,*/ _float4x4& _matrix);
 	void		RenderGrid();
+	void		Set_FileDialog();
 
 public: /* For.PhysX */
 	PxRigidDynamic* CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial = nullptr);

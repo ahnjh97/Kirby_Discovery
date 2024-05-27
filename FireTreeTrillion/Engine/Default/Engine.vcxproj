@@ -105,7 +105,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;ENGINE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../Public/;../Public/ImGui/;../Bin/core/inc/;../Public/physx/;../Public/physx/cooking/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Public/;../Public/ImGui/;../Bin/core/inc/;../Public/physx/;../Public/physx/cooking/;../Public/ImGui/ImGulFileDialog/dirent/;../Public/ImGui/ImGulFileDialog/</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/MP /Zm200 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -154,7 +154,7 @@ call UpdateLib.bat</Command>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;ENGINE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../Public/;../Public/ImGui/;../Bin/core/inc/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Public/;../Public/ImGui/;../Bin/core/inc/;../Public/ImGui/ImGulFileDialog/dirent/;../Public/ImGui/ImGulFileDialog/</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/MP /Zm200 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>

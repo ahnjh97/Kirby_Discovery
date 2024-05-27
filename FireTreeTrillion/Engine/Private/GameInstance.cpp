@@ -776,6 +776,12 @@ void CGameInstance::RenderGrid()
 	m_pIMGUI_Manager->RenderGrid();
 }
 
+void CGameInstance::Set_FileDialog()
+{
+	CHECK_NULLPTR(m_pIMGUI_Manager);
+	m_pIMGUI_Manager->Set_FileDialog();
+}
+
 PxRigidDynamic* CGameInstance::CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)
 {
 	if (nullptr == m_pPhysx)
