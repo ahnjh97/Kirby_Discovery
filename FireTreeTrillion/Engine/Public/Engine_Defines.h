@@ -23,8 +23,21 @@ namespace Engine
 	enum TYPE { TYPE_NONANIM, TYPE_ANIM, TYPE_END };
 	enum EASING { EASE_LINEAR, EASE_IN, EASE_IN_FAST, EASE_OUT, EASE_OUT_FAST, EASE_INOUT, EASE_INOUT_FAST, EASE_END };
     enum KF_PROPERTY {KF_POS, KF_ROT, KF_SCALE, KF_RCOLOR, KF_GCOLOR, KF_BCOLOR, KF_ALPHA, KF_MASK, KF_END};
+
+    // PhysX
     enum RIGID_SHAPE { RIGID_BOX, RIGID_SPHERE, RIGID_CAPSULE, RIGID_END };
 
+    // COLLISION enum을 enum class로 만들 것인지 고민중
+    //enum class COLLISION { COLLISION_PLAYER, };
+    enum COLLISION_TYPE {
+        PLAYER = 0,
+        MONSTER,
+        FRIEND,
+        TRIGGER,
+        COLLI_END
+    };
+
+    enum INSTANCE_PROPERTY {INSTANCE_DROP, INSTANCE_SPREAD, INSTANCE_DECELERATE, INSTANCE_END};
 }
 
 // Set_Dead() 매크로
@@ -35,6 +48,9 @@ namespace Engine
 #include "imgui.h"
 #include "imgui_impl_dx11.h"
 #include "imgui_impl_win32.h"
+#include "ImGuiFileDialog.h"
+#include "ImGuiFileDialogConfig.h"
+
 
 // SHADER - EFFECT
 #include "Effects11/d3dx11effect.h"

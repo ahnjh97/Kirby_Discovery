@@ -28,21 +28,20 @@ public:
 private:
 	HRESULT			Add_Components();
 	HRESULT			Bind_ShaderResources();
+
+	// IMGUI SET
 	_bool			Edit_Transform();
 	_bool			Edit_RGBAColor();
 	_bool			Set_OrthoProj();
 
-private:
-	CShader*			m_pShaderCom = { nullptr };
-	CVIBuffer_Rect*		m_pVIBufferCom = { nullptr };
-	CTexture*			m_pTextureCom = { nullptr };
+	_bool			Set_GizmoSync();
+	_bool			Set_GizmoGrid();
+	_bool			Set_DockSpace();
+	_bool			Set_FileDialog(); //IMGUI_MANAGER 클래스 내 함수와 동일한 기능. 추후 이동 필요
 
-private:
-	_float				m_fX, m_fY, m_fSizeX, m_fSizeY;
-	_float4x4			m_WorldMatrix, m_ViewMatrix, m_ProjMatrix;
-
-	_float				m_fRatio = 0.f;
-
+	_bool			Save_FileData();
+	_bool			Load_FileData();
+	
 
 public:
 	static CUI_Editor*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

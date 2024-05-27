@@ -6,6 +6,10 @@ BEGIN(Client)
 
 class CMultiEffect final :  public CEffect
 {
+#ifdef _DEBUG
+	friend class CFXToolDirector;
+#endif
+
 public:
 	typedef struct : public FX_DESC
 	{
@@ -27,8 +31,10 @@ public:
 		m_fDuration.second = pEffect->Get_BiggerDuration(m_fDuration.second);
 	}
 	virtual _int Get_Size() { return m_FXs.size(); }
-	virtual void Reset_Duration()
+	virtual void Reset_Duration() override
 	{
+		m_fDuration.first = 0.f;
+
 		for (auto& fx : m_FXs)
 			fx->Reset_Duration();
 	}

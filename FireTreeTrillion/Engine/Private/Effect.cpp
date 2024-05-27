@@ -217,10 +217,10 @@ _float3 CEffect::Calculate_CurValue_Lerp(_float fTimeDelta, KF_PROPERTY ePropert
     return vResultValue;
 }
 
-_float3 CEffect::Calculate_CurValue_Slerp(_float fTimeDelta, KF_PROPERTY eProperty, _bool bIsInEditor)
+_float4 CEffect::Calculate_CurValue_Slerp(_float fTimeDelta, KF_PROPERTY eProperty, _bool bIsInEditor)
 {
     vector<FX_KEYFRAME>& curKeyframes = m_Keyframes[eProperty];
-    _float3 vResultValue = curKeyframes[0].vValue;
+    _float4 vResultValue = curKeyframes[0].vValue;
 
     //지금 키프레임이 마지막 키프레임?
     if (curKeyframes.size() - 1 <= m_iCurKeyframeIdxs[eProperty])
@@ -232,7 +232,7 @@ _float3 CEffect::Calculate_CurValue_Slerp(_float fTimeDelta, KF_PROPERTY eProper
         //루프하지 않는다면, 마지막 키프레임 값으로 제한한다.
         else
         {
-            vResultValue = curKeyframes[m_iCurKeyframeIdxs[eProperty]].vValue;
+            vResultValue = Quaternion::CreateFromYawPitchRoll(curKeyframes[m_iCurKeyframeIdxs[eProperty]].vValue);
             return vResultValue;
         }
     }
@@ -254,6 +254,71 @@ _float3 CEffect::Calculate_CurValue_Slerp(_float fTimeDelta, KF_PROPERTY eProper
     //마지막 키프레임이면 하지마!!
     if (curKeyframes.size() - 1 <= m_iCurKeyframeIdxs[eProperty])
         return vResultValue;
+
+
+
+    //진~짜 보간합니다 레츠고
+    _float fCurKFRatio = curKeyframes[m_iCurKeyframeIdxs[eProperty]].fTimeRatio;
+    _float fNextKFRatio = curKeyframes[m_iCurKeyframeIdxs[eProperty] + 1].fTimeRatio;
+
+    _float fInterpolateRatio = (m_fLifeRatio - fCurKFRatio) / (fNextKFRatio - fCurKFRatio); //비율을 구한다.
+
+    switch (curKeyframes[m_iCurKeyframeIdxs[eProperty]].eEasing)
+    {
+    case EASE_IN:
+        fInterpolateRatio = EASE_IN(fInterpolateRatio);
+        break;
+    case EASE_IN_FAST:
+        fInterpolateRatio = EASE_IN_FAST(fInterpolateRatio);
+        break;
+    case EASE_OUT:
+        fInterpolateRatio = EASE_OUT(fInterpolateRatio);
+        break;
+    case EASE_OUT_FAST:
+        fInterpolateRatio = EASE_OUT_FAST(fInterpolateRatio);
+        break;
+    case EASE_INOUT:
+        fInterpolateRatio = EASE_INOUT(fInterpolateRatio);
+        break;
+    case EASE_INOUT_FAST:
+        fInterpolateRatio = EASE_INOUT_FAST(fInterpolateRatio);
+        break;
+    default: //그냥 Linear도 여기 포함
+        break;
+    }
+
+    //_float4 vFirstQuat = XMQuaternionRotationRollPitchYawFromVector(m_pGameInstance->MakeRollPitchYaw(m_KeyFrames[m_iCurKFIdx].vRotation));
+    //_float4 vFirstQuat =   curKeyframes[m_iCurKeyframeIdxs[eProperty]].vValue.r;
+    //_float4 vSecondQuat = XMQuaternionRotationRollPitchYawFromVector(m_pGameInstance->MakeRollPitchYaw(m_KeyFrames[m_iCurKFIdx + 1].vRotation));
+    //_float4 vResultQuat = XMQuaternionSlerp(vFirstQuat, vSecondQuat, fInterpolateRatio);
+    //_float3 vFirstDegree, vSecondDegree;
+
+    _float3 vFirstRadian{ curKeyframes[m_iCurKeyframeIdxs[eProperty]].vValue };
+    vFirstRadian = { ToRadian(vFirstRadian.x), ToRadian(vFirstRadian.y) , ToRadian(vFirstRadian.z) };
+    _float3 vSecondRadian{ curKeyframes[m_iCurKeyframeIdxs[eProperty] + 1].vValue };
+    vSecondRadian = { ToRadian(vSecondRadian.x), ToRadian(vSecondRadian.y) , ToRadian(vSecondRadian.z) };
+
+    Quaternion vFirstQuat, vSecondQuat, vResultQuat;
+    vFirstQuat = Quaternion::CreateFromYawPitchRoll(vFirstRadian);
+    vSecondQuat = Quaternion::CreateFromYawPitchRoll(vSecondRadian);
+
+    vResultValue = Quaternion::Slerp(vFirstQuat, vSecondQuat, fInterpolateRatio);
+
+    //return 
+
+    ////회전
+    //_vector vInitialRot = XMQuaternionRotationRollPitchYawFromVector(m_pGameInstance->MakeRollPitchYaw(m_vInitialRot));
+    //_vector vResultRotQuat = XMQuaternionMultiply(vCurRotation, vInitialRot);
+
+    ////_vector vResultRollPitchYaw = m_pGameInstance->QuaternionToEulerAngles(vResultRotQuat);
+    ////XMQuaternionMultiply(vInitialRot, vCurRotation);
+    //VecToF3(m_vCurRotation, m_pGameInstance->QuaternionToEulerAngles(vResultRotQuat));
+    //VecToF4(m_vCurRotQuat, vResultRotQuat);
+
+
+
+
+    //vResultValue = _float3::Lerp(curKeyframes[m_iCurKeyframeIdxs[eProperty]].vValue, curKeyframes[m_iCurKeyframeIdxs[eProperty] + 1].vValue, fInterpolateRatio);
 
 
     return vResultValue;

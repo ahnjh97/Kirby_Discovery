@@ -8,6 +8,7 @@ class ENGINE_DLL CEffect : public CGameObject
 #ifdef _DEBUG
 	friend class CFXToolDirector;
 #endif
+
 public:
 	enum TEX {TEX_DIFFUSE, TEX_MASK, TEX_END};
 
@@ -50,6 +51,7 @@ public:
 		_int iTexIdx = { 0 };
 		_int iMaskTexIdx = { 0 };
 
+		//_int iMaskTexIdx = { 0 };
 
 		map<KF_PROPERTY, vector<FX_KEYFRAME>> Keyframes;
 
@@ -78,7 +80,7 @@ public:
 	void			Add_Keyframe(FX_KEYFRAME& newKeyframe, KF_PROPERTY eProperty);
 	void			Delete_Keyframe(KF_PROPERTY eProperty, _uint iKeyframeIdx);
 	//이펙트 추가(묶음 이펙트 용)
-	virtual void	Add_Effect(CEffect& pEffect) {}
+	virtual void	Add_Effect(CEffect* pEffect) {}
 
 	virtual HRESULT Initialize(void* pArg) override;
 
@@ -116,6 +118,8 @@ protected:
 	_bool			m_bIsOrthographic = { false };
 	_bool			m_bIsColorRender = { true };
 	_bool			m_bIsBloom = { false };
+
+	_float			m_fRimLightThreshold = { 0.f };
 
 	//기본 시작 크자이
 	_float3 m_vInitPos = { 0.f, 0.f, 0.f };
@@ -162,7 +166,7 @@ protected:
 	_bool			Calculate_Duration(_float _fTimeDelta);
 	_bool			Calculate_Lifetime(_float _fTimeDelta);
 	_float3			Calculate_CurValue_Lerp(_float fTimeDelta, KF_PROPERTY eProperty, _bool bIsInEditor = false);
-	_float3			Calculate_CurValue_Slerp(_float fTimeDelta,  KF_PROPERTY eProperty, _bool bIsInEditor = false);
+	_float4			Calculate_CurValue_Slerp(_float fTimeDelta,  KF_PROPERTY eProperty, _bool bIsInEditor = false);
 
 public:
 	virtual void Free() override;

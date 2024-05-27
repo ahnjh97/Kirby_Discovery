@@ -25,9 +25,9 @@ public:
 public:
 	void Set_TickPerSecond(_float _fTickPerSecond) { m_Animations[m_iCurrentAnimIndex]->Set_TickPerSecond(_fTickPerSecond); }
 
-	void Set_Animation(_uint iAnimIndex, _float fTickPerSecond, _bool isLoop, _bool bInterpolation = false) {
+	void Set_Animation(_uint iAnimIndex, _float fTickPerSecond, _bool bIsLooping, _bool bInterpolation = false) {
 		m_iCurrentAnimIndex = iAnimIndex;	
-		m_isLoop = isLoop;
+		m_isLoop = bIsLooping;
 
 		m_Animations[m_iCurrentAnimIndex]->Reset_TrackPosition();
 		m_Animations[m_iCurrentAnimIndex]->Reset_Finished();

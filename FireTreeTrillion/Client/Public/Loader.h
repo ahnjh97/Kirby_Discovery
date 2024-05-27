@@ -31,6 +31,7 @@ public:
 
 private:
 	HRESULT Loading_ObjectAll();
+	HRESULT Loading_StaticComponentAll();
 
 	HRESULT Loading_For_Logo();
 	HRESULT Loading_For_GamePlay();

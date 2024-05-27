@@ -1,12 +1,13 @@
 #include "stdafx.h"
-#include "..\Public\Loader.h"
+
+//#include "..\Public\Loader.h"
+#include "Loader.h"
 #include <process.h>
 #include <codecvt>
 #include <locale>
 
 #include "GameInstance.h"
 #include "Camera_Free.h"
-#include "BackGround.h"
 #include "TestModel.h"
 #include "TestTerrain.h"
 
@@ -16,10 +17,16 @@
 #include "BasicMap.h"
 #include "Grid.h"
 
-#pragma region TOO_UI
+#pragma region TOOL_UI
 
 #include "TestUI.h"
+#include "BackGround.h"
 #include "UI_Editor.h"
+
+	#pragma region UI_HUD
+	#include "HUD.h"
+	#include "HUD_Kirby.h"
+	#pragma endregion
 
 #pragma endregion
 
@@ -30,6 +37,7 @@
 //이펙트 툴
 #include "FXToolDirector.h"
 #include "SingleEffect.h"
+#include "Particle.h"
 #include "MultiEffect.h"
 
 //#include "Body_Player.h"
@@ -88,7 +96,13 @@ HRESULT CLoader::Start()
 	{
 	case LEVEL_LOGO:
 	{
+
 		hr = Loading_ObjectAll();
+		CHECK_FAILED(hr);
+
+		SetUp_ModelScaleRotation(LEVEL_STATIC);
+		hr = Loading_StaticComponentAll();
+
 		CHECK_FAILED(hr);
 		hr = Loading_For_Logo();
 		break;
@@ -141,8 +155,9 @@ HRESULT CLoader::Loading_ObjectAll()
 
 	//이펙트 툴 용
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FXToolDirector"), CFXToolDirector);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CSingleEffect"), CSingleEffect);
-	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("CMultiEffect"), CMultiEffect);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SingleEffect"), CSingleEffect);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MultiEffect"), CMultiEffect);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Particle"), CParticle);
 
 	// MapTool GameObject Prototypes
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Grid"), CGrid);
@@ -150,15 +165,63 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolHelper"), CMapToolHelper);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolObject"), CMapToolObject);
 
-	// 05.20) 원본 추가
-	 /*      GameObject_IMGUI_UI_Editor    */
+#pragma region TOOL_UI
+
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("IMGUI_UI_Editor"), CUI_Editor);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_Kirby"), CHUD_Kirby);
+
+#pragma endregion
 
 	// For Kirby
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kirby"), CKirby);
 
 	// For Awoofy To Monster
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Awoofy"), CAwoofy);
+
+	return S_OK;
+}
+//static 컴포넌트들을 로드한다.
+HRESULT CLoader::Loading_StaticComponentAll()
+{
+	HRESULT hr;
+	LEVEL eLevel = LEVEL_STATIC;
+	
+
+	// Static Model 한번에 생성.
+	hr = Add_Models(eLevel);
+	CHECK_FAILED(hr);
+
+	//이펙트 텍스쳐
+	hr = Add_Texture(eLevel, "FX_Test", "Effects/test.png");
+	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "FX_Logo", "Logo/Logo.png");
+	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "FX_SimpleSolid", "Simple/simpleSolid_%d.png", 2);
+	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "FX_SimpleStar", "Effects/SimpleStar.png");
+	CHECK_FAILED(hr);
+
+	wstring wstrPrototypeTag = L"Prototype_Component_Shader_";
+	hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + TEXT("VtxPosTex"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements));
+	CHECK_FAILED(hr);
+
+	hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + TEXT("VtxInstance_Point"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxInstance_Point.hlsl"), VTXINSTANCE_POINT::Elements, VTXINSTANCE_POINT::iNumElements));
+	CHECK_FAILED(hr);
+	
+
+	wstrPrototypeTag = L"Prototype_Component_VIBuffer_";
+
+	hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + TEXT("Rect"),
+		CVIBuffer_Rect::Create(m_pDevice, m_pContext));
+	CHECK_FAILED(hr);
+
+	hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + TEXT("Instance_Point"),
+		CVIBuffer_Instance_Point::Create(m_pDevice, m_pContext));
+	CHECK_FAILED(hr);
+
 
 	return S_OK;
 }
@@ -315,8 +378,8 @@ HRESULT CLoader::Loading_For_Tool_UI()
 
 #pragma region TEXTURE
 
-	if (FAILED(Add_Texture(eLevel, "Logo", "Logo/Logo.png")))
-		return E_FAIL;
+	hr = Add_Texture(eLevel, "KirbyBarHard", "UI/HUD/Hero/BarHard/HeroPanelBarHard_%d.png", 3);
+	CHECK_FAILED(hr);
 
 	m_strLoadingText = TEXT("Loading For Texture : Complete!");
 
@@ -355,7 +418,17 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 {
 	// MODEL 구조체 생성자 순서		: 이름 (파일이름) / ANIMTYPE / Scale / Degree (Y) / Root
 	// MODEL 구조체 생성자 기본 값  : ""			  / TYPE_END /  1.f  /    0.f     / 4
-	if (eLevel == LEVEL_LOGO)
+	if (eLevel == LEVEL_STATIC)
+	{
+		m_vecModelInfo.emplace_back(MODEL{ "SmokeCenter", TYPE_NONANIM });
+		m_vecModelInfo.emplace_back(MODEL{ "SmokeFadeLarge", TYPE_NONANIM });
+		m_vecModelInfo.emplace_back(MODEL{ "SmokeOriginal", TYPE_NONANIM });
+		m_vecModelInfo.emplace_back(MODEL{ "SmokeSplit", TYPE_NONANIM });
+		m_vecModelInfo.emplace_back(MODEL{ "SmokeTail", TYPE_NONANIM });
+		m_vecModelInfo.emplace_back(MODEL{ "Tornado", TYPE_NONANIM });
+
+	}
+	else if (eLevel == LEVEL_LOGO)
 	{
 
 	}

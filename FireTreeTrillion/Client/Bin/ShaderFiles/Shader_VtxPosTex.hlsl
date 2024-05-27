@@ -7,6 +7,11 @@ texture2D	g_DiffuseTexture;
 texture2D	g_MaskTexture;
 texture2D	g_DepthTexture;
 
+//컬러, 마스크 임계 등
+vector g_vRColor = { 1.f, 1.f, 1.f, 1.f };
+vector g_vGColor = { 1.f, 1.f, 1.f, 1.f };
+vector g_vBColor = { 1.f, 1.f, 1.f, 1.f };
+
 struct VS_IN
 {
 	float3		vPosition : POSITION;
@@ -76,7 +81,10 @@ PS_OUT PS_MAIN(PS_IN In)
 {
 	PS_OUT			Out = (PS_OUT)0;
 
-	Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+	
+	if(Out.vColor.a < .05f)
+        discard;
 	
 	return Out;
 }
@@ -95,27 +103,46 @@ PS_OUT PS_MAIN_ALPHABLEND(PS_IN_ALPHABLEND In)
 
 	Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
 
-	float2		vTexcoord = (float2)0.f;
+	//float2		vTexcoord = (float2)0.f;
 
-	vTexcoord.x = (In.vProjPos.x / In.vProjPos.w) * 0.5f + 0.5f;
-	vTexcoord.y = (In.vProjPos.y / In.vProjPos.w) * -0.5f + 0.5f;
+	//vTexcoord.x = (In.vProjPos.x / In.vProjPos.w) * 0.5f + 0.5f;
+	//vTexcoord.y = (In.vProjPos.y / In.vProjPos.w) * -0.5f + 0.5f;
 
-	float4		vDepthDesc = g_DepthTexture.Sample(PointSampler, vTexcoord);
-	float		fOldViewZ = vDepthDesc.y * 1000.f;
+	//float4		vDepthDesc = g_DepthTexture.Sample(PointSampler, vTexcoord);
+	//float		fOldViewZ = vDepthDesc.y * 1000.f;
 
-	Out.vColor.a = Out.vColor.a  * saturate(fOldViewZ - In.vProjPos.w);
+	//Out.vColor.a = Out.vColor.a  * saturate(fOldViewZ - In.vProjPos.w);
 
 	return Out;
 }
 
+PS_OUT PS_MAIN_WHITE_FX(PS_IN_ALPHABLEND In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    float vBrightness = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord).r;
+	
+	
+    Out.vColor = g_vRColor * vBrightness;
+	
+    Out.vColor.a = vBrightness; // 어두울수록 투명
+    
+    
+    if (Out.vColor.a < .05f)
+        discard;
+	
+    return Out;
+}
 
 technique11 DefaultTechnique
 {
+
+	// 기본 패스. 알파 테스팅 ( 0 )
 	pass Default
 	{
 		SetRasterizerState(RS_Default);
 		SetDepthStencilState(DSS_Default, 0);
-		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
@@ -124,6 +151,7 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 PS_MAIN();
 	}
 
+	// 기본 알파 블렌딩 패스 ( 1 )
 	pass Blend
 	{
 		SetRasterizerState(RS_Default);
@@ -136,4 +164,18 @@ technique11 DefaultTechnique
 		DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_ALPHABLEND();
 	}
+
+	// 하얀 부분만 그리는 패스. 알파 테스팅 ( 2 )
+    pass WhiteFX
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN_ALPHABLEND();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_WHITE_FX();
+    }
 }

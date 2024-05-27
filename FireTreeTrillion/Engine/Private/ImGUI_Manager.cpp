@@ -5,6 +5,9 @@
 #include "ImGuizmo.h"
 #include "PipeLine.h"
 
+#include "ImGuiFileDialog.h"
+#include "ImGuiFileDialogConfig.h"
+
 
 HRESULT CImGUI_Manager::Initialize(HWND hWnd, ID3D11Device* pGraphic_Device, ID3D11DeviceContext* pContext)
 {
@@ -48,6 +51,7 @@ HRESULT CImGUI_Manager::Initialize(HWND hWnd, ID3D11Device* pGraphic_Device, ID3
 	ImVec4 vPinkDark = { 0.6f, 0.18f, 0.37f, 1.0f };
 	ImVec4 vPink = { 0.8f, 0.18f, 0.37f, 1.0f };
 	ImVec4 vPinkLight = { 1.0f, 0.18f, 0.37f, 1.0f };
+	ImVec4 vBlack = { 0.1f, 0.1f, 0.1f, 1.0f };
 
 	//테두리
 	style.Colors[ImGuiCol_Border] = vPink;
@@ -96,7 +100,7 @@ HRESULT CImGUI_Manager::Initialize(HWND hWnd, ID3D11Device* pGraphic_Device, ID3
 
 	// 도킹 프리뷰
 	style.Colors[ImGuiCol_DockingPreview] = vPink;
-	style.Colors[ImGuiCol_DockingEmptyBg] = vPink;
+	style.Colors[ImGuiCol_DockingEmptyBg] = vBlack;
 
 #pragma endregion
 
@@ -110,7 +114,6 @@ HRESULT CImGUI_Manager::Initialize(HWND hWnd, ID3D11Device* pGraphic_Device, ID3
 
 void CImGUI_Manager::Tick(_float fTimeDelta)
 {
-	
 }
 
 void CImGUI_Manager::Late_Tick(_float fDeltaTime)
@@ -182,6 +185,9 @@ void CImGUI_Manager::SetDockSpace()
 
 void CImGUI_Manager::RenderGrid()
 {
+	ImGuiIO& io = ImGui::GetIO();
+	ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
+
 	const float identityMatrix[16] =
 	{	1.f, 0.f, 0.f, 0.f,
 		0.f, 1.f, 0.f, 0.f,
@@ -189,10 +195,12 @@ void CImGUI_Manager::RenderGrid()
 		0.f, 0.f, 0.f, 1.f };
 
 	_float4x4 ViewMatrix, ProjMatrix;
-	ViewMatrix = CGameInstance::Get_Instance()->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW);
-	ProjMatrix = CGameInstance::Get_Instance()->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
+	ViewMatrix = CGameInstance::Get_Instance()->Get_Transform(CPipeLine::D3DTS_VIEW);
+	ProjMatrix = CGameInstance::Get_Instance()->Get_Transform(CPipeLine::D3DTS_PROJ);
 
-	ImGuizmo::DrawGrid(ViewMatrix.m[0], ProjMatrix.m[0], identityMatrix, 100.f);
+	_float fGridSize = (*CGameInstance::Get_Instance()->Get_CurrentLevelID() == 5) ?
+		5.f : 100.f;
+	ImGuizmo::DrawGrid(ViewMatrix.m[0], ProjMatrix.m[0], identityMatrix, fGridSize);
 }
 
 void CImGUI_Manager::EditTransform(_float4x4& matrix)
@@ -255,6 +263,71 @@ void CImGUI_Manager::EditTransform(_float4x4& matrix)
 	ViewMatrix = CGameInstance::Get_Instance()->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW);
 	ProjMatrix = CGameInstance::Get_Instance()->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
 	ImGuizmo::Manipulate(ViewMatrix.m[0], ProjMatrix.m[0], mCurrentGizmoOperation, mCurrentGizmoMode, matrix.m[0], NULL, useSnap ? &snap.x : NULL);
+}
+
+void CImGUI_Manager::Set_FileDialog()
+{
+	//static _bool IsOpenDialog = FALSE;
+	static _bool IsFileSave, IsFileLoad = FALSE;
+
+	if (IsFileSave && !IsFileLoad)
+	{
+		// 다이얼로그 오픈
+		IGFD::FileDialogConfig SaveFileConfig;
+		SaveFileConfig.path = "../Bin/Resources/";
+
+		ImGuiFileDialog::Instance()->OpenDialog("SaveFile_Dialog", u8"저장할 파일을 선택하세요", ".UIDAT", SaveFileConfig);		// 디스플레이
+		
+		ImGui::SetNextWindowSize(ImVec2(800.f, 300.f));
+		if (ImGuiFileDialog::Instance()->Display("SaveFile_Dialog"))
+		{
+			if (ImGuiFileDialog::Instance()->IsOk())
+			{
+				string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+				string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+				//string filter = ImGuiFileDialog::Instance()->GetCurrentFilter();
+				//string userDatas;
+				//if (ImGuiFileDialog::Instance()->GetUserDatas())
+				//	userDatas = std::string((const char*)ImGuiFileDialog::Instance()->GetUserDatas());
+				//auto selection = ImGuiFileDialog::Instance()->GetSelection(); // multiselection			
+			}
+
+			// 디스플레이 닫기
+			ImGuiFileDialog::Instance()->Close();
+			IsFileSave = FALSE;
+		}
+	}
+
+	if (IsFileLoad && !IsFileSave)
+	{
+		// 다이얼로그 오픈
+		IGFD::FileDialogConfig LoadFileConfig;
+		LoadFileConfig.path = "../Bin/Resources/";
+
+		ImGuiFileDialog::Instance()->OpenDialog("LoadFile_Dialog", u8"로드할 파일을 선택하세요", ".UIDAT", LoadFileConfig);		// 디스플레이
+
+		ImGui::SetNextWindowSize(ImVec2(800.f, 300.f));
+		if (ImGuiFileDialog::Instance()->Display("LoadFile_Dialog"))
+		{
+			if (ImGuiFileDialog::Instance()->IsOk())
+			{
+				string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+				string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+			}
+
+			// 디스플레이 닫기
+			ImGuiFileDialog::Instance()->Close();
+			IsFileLoad = FALSE;
+		}
+	}
+
+	if (ImGui::BeginMenu(u8"File 파일"))
+	{
+		ImGui::MenuItem(u8"Save 저장", NULL, &IsFileSave);
+		ImGui::MenuItem(u8"Load 로드", NULL, &IsFileLoad);
+
+		ImGui::EndMenu();
+	}
 }
 
 CImGUI_Manager* CImGUI_Manager::Create(HWND hWnd, ID3D11Device* pGraphic_Device, ID3D11DeviceContext* pContext)

@@ -177,8 +177,17 @@
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\FXToolDirector.h" />
     <ClInclude Include="..\Public\Grid.h" />
+    <ClInclude Include="..\Public\HUD.h" />
+    <ClInclude Include="..\Public\HUD_Kirby.h" />
     <ClInclude Include="..\Public\Kirby.h" />
+    <ClInclude Include="..\Public\KirbyBalloon_State.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\Public\KirbyDamage_State.h" />
     <ClInclude Include="..\Public\KirbyDefault_State.h" />
+    <ClInclude Include="..\Public\KirbyVacuum_State.h" />
+    <ClInclude Include="..\Public\Kirby_Enums.h" />
+    <ClInclude Include="..\Public\Kirby_State_Function.h" />
     <ClInclude Include="..\Public\Level_GamePlay.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
     <ClInclude Include="..\Public\Level_Logo.h" />
@@ -192,17 +201,17 @@
     <ClInclude Include="..\Public\MapToolHelper.h" />
     <ClInclude Include="..\Public\MapToolObject.h" />
     <ClInclude Include="..\Public\MultiEffect.h" />
+    <ClInclude Include="..\Public\Particle.h" />
     <ClInclude Include="..\Public\SingleEffect.h" />
     <ClInclude Include="..\Public\TestModel.h" />
     <ClInclude Include="..\Public\TestModel_State.h" />
     <ClInclude Include="..\Public\TestTerrain.h" />
-    <ClInclude Include="..\Public\TestUI.h" />
     <ClInclude Include="..\Public\tinyxml2.h" />
     <ClInclude Include="..\Public\ToolHelper.h" />
+    <ClInclude Include="..\Public\TestUI.h" />
     <ClInclude Include="..\Public\Trigger.h" />
     <ClInclude Include="..\Public\UI_Editor.h" />
     <ClInclude Include="Client.h" />
-    <ClInclude Include="Kirby_Enums.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -216,8 +225,15 @@
     <ClCompile Include="..\private\Camera_Main.cpp" />
     <ClCompile Include="..\Private\FXToolDirector.cpp" />
     <ClCompile Include="..\Private\Grid.cpp" />
+    <ClCompile Include="..\Private\HUD.cpp" />
+    <ClCompile Include="..\Private\HUD_Kirby.cpp" />
     <ClCompile Include="..\Private\Kirby.cpp" />
+    <ClCompile Include="..\Private\KirbyBalloon_State.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Private\KirbyDamage_State.cpp" />
     <ClCompile Include="..\Private\KirbyDefault_State.cpp" />
+    <ClCompile Include="..\Private\KirbyVacuum_State.cpp" />
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
     <ClCompile Include="..\Private\Level_Logo.cpp" />
@@ -231,13 +247,14 @@
     <ClCompile Include="..\Private\MapToolHelper.cpp" />
     <ClCompile Include="..\Private\MapToolObject.cpp" />
     <ClCompile Include="..\Private\MultiEffect.cpp" />
+    <ClCompile Include="..\Private\Particle.cpp" />
     <ClCompile Include="..\Private\SingleEffect.cpp" />
     <ClCompile Include="..\Private\TestModel.cpp" />
     <ClCompile Include="..\Private\TestModel_State.cpp" />
     <ClCompile Include="..\Private\TestTerrain.cpp" />
-    <ClCompile Include="..\Private\TestUI.cpp" />
     <ClCompile Include="..\Private\tinyxml2.cpp" />
     <ClCompile Include="..\Private\ToolHelper.cpp" />
+    <ClCompile Include="..\Private\TestUI.cpp" />
     <ClCompile Include="..\Private\Trigger.cpp" />
     <ClCompile Include="..\Private\UI_Editor.cpp" />
     <ClCompile Include="Client.cpp" />

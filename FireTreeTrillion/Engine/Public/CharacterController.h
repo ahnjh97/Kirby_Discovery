@@ -9,6 +9,7 @@ public:
 	struct CONTROLLER_DESC
 	{
 		_float4 vInitialPos;
+		_uint	uCollisionType;
 	};
 
 protected:
@@ -17,7 +18,7 @@ protected:
 	virtual ~CCharacterController() = default;
 
 public:
-	void			Set_PhysXObject(class CGameObject* _pObj) { m_pObject = _pObj; }
+	//void			Set_CollisionType(COLLISION_TYPE _CollisionType){ m_eCollisionType = _CollisionType; }
 	// 갑자기 위치값이 변화되는 경우 사용하시오.(ex. 텔레포트 등)
 	void			Set_Position(const _float4& vPos);
 	// 발 위치값 지정
@@ -47,6 +48,7 @@ public:
 	PxVec3			Compute_Slope(CTransform* pTransform);												// 경사면의 노말벡터 계산
 	_float			Compute_Height();																	// 경사면의 노말벡터 계산
 	PxVec3			Compute_TerrainPosition();
+	_vector			Compute_TerrainPosition_Vector();
 	PxVec3			TerrainRayCast_Collision(PxVec3 _rayOrigin, PxVec3 _rayDirection, _float _fMaxDistance);
 
 	// 이동용, 기본 중력없기 때문에 이 함수로 중력 만들어 줄 것
@@ -63,7 +65,7 @@ public:
 		if (m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_DOWN)
 			return true;
 		else
-			return false;
+			return false;                                                                                                                                            
 	}
 
 protected:
@@ -73,18 +75,21 @@ protected:
 	void	Set_DefaultValue();
 
 protected:
-	class CGameObject*				m_pObject = nullptr;
+	class CGameObject*					m_pObject = nullptr;
+	COLLISION_TYPE						m_eCollisionType = COLLISION_TYPE::COLLI_END;
 
-	physx::PxController*			m_pController = nullptr;
-	physx::PxCapsuleControllerDesc	m_tControllerDesc;
-	physx::PxControllerFilters		m_ControllerFilters;
-	physx::PxFilterData				m_tFilterDesc;
+	physx::PxController*				m_pController = nullptr;
+	physx::PxCapsuleControllerDesc		m_tControllerDesc;
+	physx::PxControllerFilters			m_ControllerFilters;
+	physx::PxFilterData					m_tFilterDesc;
+	class CControllerBehaviorCallback*	m_pControllerCallBack = nullptr;
+	class CUserControllerHitReport*		m_pControllerHitReport = nullptr;
 
-	_float							m_fSlopeLimitDegree = 45.f;
-	_float							m_fFallVelocity = { 0.f };
-	_float							m_fFallAcceleration = { 0.f };
+	_float								m_fSlopeLimitDegree = 45.f;
+	_float								m_fFallVelocity = { 0.f };
+	_float								m_fFallAcceleration = { 0.f };
 
-	_float							m_fOffset = { 0.5f };
+	_float								m_fOffset = { 1.f };
 
 public:
 	static	CCharacterController*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

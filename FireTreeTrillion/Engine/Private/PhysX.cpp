@@ -1,5 +1,6 @@
 #include "PhysX.h"
 #include "Utils.h"
+#include "GameObject.h"
 
 CPhysX::CPhysX()
 {
@@ -38,6 +39,7 @@ HRESULT CPhysX::Initialize()
     // create simulation
     m_pMaterial = m_pPhysics->createMaterial(0.5f, 0.5f, 0.6f);
     m_pControllerManager = PxCreateControllerManager(*m_pScene);
+
     //physx::PxRigidStatic* groundPlane = PxCreatePlane(*m_pPhysics, physx::PxPlane(0, 1, 0, 0), *m_pMaterial);
     //m_pScene->addActor(*groundPlane);
 
@@ -84,7 +86,6 @@ void CPhysX::Test()
 
     physx::PxTransform localTm(physx::PxVec3(0, 0, 0) * halfExtent);
     m_pRigidDynamic = m_pPhysics->createRigidDynamic(t.transform(localTm));
-    //m_pRigidDynamic->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, false);
     m_pRigidDynamic->attachShape(*m_pShape);
     physx::PxRigidBodyExt::updateMassAndInertia(*m_pRigidDynamic, 10.0f);
     m_pScene->addActor(*m_pRigidDynamic);
@@ -111,30 +112,6 @@ void CPhysX::RemoveActor(physx::PxActor& pActor)
 }
 
 
-//
-//// DX의 행렬(_float4x4)을 PhysX의 행렬으로 변경한다.
-//physx::PxMat44 CPhysX::To_Float4x4(const _float4x4& mat)
-//{
-//    physx::PxMat44 out;
-//    memcpy(&out.column0, &mat.m[0], sizeof(_float4));
-//    memcpy(&out.column1, &mat.m[1], sizeof(_float4));
-//    memcpy(&out.column2, &mat.m[2], sizeof(_float4));
-//    memcpy(&out.column3, &mat.m[3], sizeof(_float4));
-//    return out;
-//}
-//
-//// PhysX의 행렬(_float4x4)을 DX의 행렬로 변경한다.
-//_float4x4 CPhysX::To_Float4x4(const physx::PxMat44& mat)
-//{
-//    _float4x4 out;
-//    memcpy(&out.m[0], &mat.column0, sizeof(_float4));
-//    memcpy(&out.m[1], &mat.column1, sizeof(_float4));
-//    memcpy(&out.m[2], &mat.column2, sizeof(_float4));
-//    memcpy(&out.m[3], &mat.column3, sizeof(_float4));
-//    return out;
-//}
-
-
 //physx::PxMaterial* CPhysX::FindMaterial(const string& strMtrlTag)
 //{
 //    //auto itr = m_pMaterials.find(strMtrlTag);
@@ -142,13 +119,13 @@ void CPhysX::RemoveActor(physx::PxActor& pActor)
 //    //return itr->second;
 //}
 
-// PhysX에서 사용되는 Actor의 data를 가져온다.
-CComponent* CPhysX::Get_Component(physx::PxActor* pActor)
-{
-    if (pActor == nullptr || pActor->userData == nullptr)
-        return nullptr;
-    return static_cast<CComponent*>(pActor->userData);
-}
+// Actor에 넣어둔 data를 가져온다. >> Not Yet >> 이 부분은 사용하려는 것의 정보를 가져오게 설정 바꿀것.
+//CComponent* CPhysX::Get_Component(physx::PxActor* pActor)
+//{
+//    if (pActor == nullptr || pActor->userData == nullptr)
+//        return nullptr;
+//    return static_cast<CComponent*>(pActor->userData);
+//}
 
 PxRigidDynamic* CPhysX::CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)
 {
@@ -290,5 +267,205 @@ void CPhysX::Free()
     // 8. Foundation 해제
     if (m_pFoundation != nullptr)
         m_pFoundation->release();
+}
+
+// =========================================== 충돌 이벤트들을 던져주는 클래스 ===========================================
+
+//eNOTIFY_TOUCH_FOUND    : 두 물체가 서로 접촉을 시작했을 때 이벤트를 발생시킵니다. (동적 객체와 정적 객체 모두에 적용 가능)
+//eNOTIFY_TOUCH_LOST     : 두 물체가 서로의 접촉을 끝냈을 때 이벤트를 발생시킵니다. (동적 객체와 정적 객체 모두에 적용 가능)
+//eNOTIFY_TOUCH_PERSISTS : 두 물체가 접촉을 유지하는 동안 이벤트를 지속적으로 발생시킵니다. (동적 객체와 정적 객체 모두에 적용 가능)
+//eNOTIFY_TOUCH_FORCE_THRESHOLD : 접촉하는 물체의 힘이 일정 임계값 이상일 때 이벤트를 발생시킵니다. (동적 객체와 정적 객체 모두에 적용 가능)
+
+// 충돌처리함수
+void CSimulationEventCallback::onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs)
+{
+	CComponent* pComponentDst = static_cast<CComponent*>(pairHeader.actors[0]->userData);
+	CComponent* pComponentSrc = static_cast<CComponent*>(pairHeader.actors[1]->userData);
+	if (pComponentDst != nullptr && pComponentSrc != nullptr)
+	{
+		CGameObject* pActorObjectDst = pComponentDst->Get_Object();
+		COLLISION_TYPE objectTypeDst = pActorObjectDst->Get_CollisionGroup();
+
+        CGameObject* pActorObjectSrc = pComponentSrc->Get_Object();
+        COLLISION_TYPE objectTypeSrc = pActorObjectSrc->Get_CollisionGroup();
+
+		for (PxU32 i = 0; i < nbPairs; i++)
+		{
+			const PxContactPair& cp = pairs[i];
+			if (cp.events & PxPairFlag::eNOTIFY_TOUCH_FOUND)
+			{
+				// 충돌이 발생했을 때의 처리
+				/*printf("Collision detected between %s and %s\n",
+					pairHeader.actors[0]->getName(),
+					pairHeader.actors[1]->getName());*/
+
+				switch (objectTypeDst)
+				{
+				case PLAYER:
+                {
+                    //MSG_BOX(TEXT("충돌 주체가 PLAYER"));
+					//handlePlayerCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[0]), static_cast<PxRigidDynamic*>(pairHeader.actors[1]));
+                }
+					break;
+				case MONSTER:
+                    //MSG_BOX(TEXT("충돌 주체가 MONSTER"));
+					//handleEnemyCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[0]), static_cast<PxRigidDynamic*>(pairHeader.actors[1]));
+					break;
+				case FRIEND:
+                    //MSG_BOX(TEXT("충돌 주체가 FRIEND"));
+					//handleObstacleCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[0]), static_cast<PxRigidDynamic*>(pairHeader.actors[1]));
+					break;
+				}
+
+				switch (objectTypeSrc)
+				{
+				case PLAYER:
+                    //MSG_BOX(TEXT("충돌 대상자가 PLAYER"));
+					//handlePlayerCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[1]), static_cast<PxRigidDynamic*>(pairHeader.actors[0]));
+					break;
+				case MONSTER:
+                    //MSG_BOX(TEXT("충돌 대상자가 MONSTER"));
+					//handleEnemyCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[1]), static_cast<PxRigidDynamic*>(pairHeader.actors[0]));
+					break;
+				case FRIEND:
+					//handleObstacleCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[1]), static_cast<PxRigidDynamic*>(pairHeader.actors[0]));
+					break;
+				}
+			}
+		}
+	}
+
+}
+
+void CSimulationEventCallback::onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 count)
+{
+}
+
+// ====================================================================================================================
+
+// RIGIDBODY끼리의 충돌을 여기서 상세히 기록할 것 
+PxControllerBehaviorFlags CControllerBehaviorCallback::getBehaviorFlags(const PxShape& shape, const PxActor& actor)
+{
+    // 특정 조건에 따라 행동을 정의
+    //if (actor.is<PxRigidStatic>())
+    CComponent* pComponent = static_cast<CComponent*>(actor.userData);
+    if (pComponent != nullptr)
+    {
+        CGameObject* pObj = pComponent->Get_Object();
+        //MSG_BOX(TEXT("뚜뚱 어떠한 것과 충 돌"));
+    }
+    if (actor.is<PxRigidStatic>())  // PxController
+    {
+        //MSG_BOX(TEXT("floor collision"));
+        return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
+    }
+    return PxControllerBehaviorFlag::eCCT_SLIDE;
+}
+
+// 컨트롤러에 대한 충돌을 나눠야하는데 
+PxControllerBehaviorFlags CControllerBehaviorCallback::getBehaviorFlags(const PxController& controller)
+{
+    // controller의 속성에 따라 행동을 커스터마이징
+    // 예를 들어, 충돌 시 미끄러지도록 설정                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
+    CComponent* pComponent = static_cast<CComponent*>(controller.getUserData());
+    if (pComponent != nullptr)
+    {
+        CGameObject* pObj = pComponent->Get_Object();
+        COLLISION_TYPE eCollisionType = pObj->Get_CollisionGroup();
+
+        //if (eCollisionType == MONSTER)
+            //MSG_BOX(TEXT("받아온 컨트롤러(Monster)와 충 돌"));
+        //if(eCollisionType == PLAYER)
+            //MSG_BOX(TEXT("받아온 컨트롤러(Player)와 충 돌"));
+    }
+
+    return PxControllerBehaviorFlag::eCCT_SLIDE;
+}
+
+PxControllerBehaviorFlags CControllerBehaviorCallback::getBehaviorFlags(const PxObstacle&)
+{
+    return PxControllerBehaviorFlag::eCCT_SLIDE;
+}
+
+
+void CUserControllerHitReport::onShapeHit(const physx::PxControllerShapeHit& hit)
+{
+    // 충돌 정보 처리
+    //physx::PxController* pController = hit.controller;
+    physx::PxShape* shape = hit.shape;
+    physx::PxActor* actor = shape->getActor();
+    if (!actor) return;
+
+    // actor가 RIGID 인 경우
+    if (actor->getType() == PxActorType::eRIGID_STATIC) return;
+    
+    CComponent* pComponent = static_cast<CComponent*>(actor->userData);
+    if (actor)
+    {
+        CComponent* pComponent = static_cast<CComponent*>(actor->userData);
+        if (pComponent != nullptr)
+        {
+            CGameObject* pObj = pComponent->Get_Object();
+            COLLISION_TYPE eCollisionType = pObj->Get_CollisionGroup();
+
+            //if (eCollisionType == MONSTER)
+            //    MSG_BOX(TEXT("충돌한 나는 MONSTER입니다."));
+            //if (eCollisionType == PLAYER)
+            //    MSG_BOX(TEXT("충돌한 나는 PLAYER입니다."));
+        }
+
+    }
+}
+
+void CUserControllerHitReport::onControllerHit(const PxControllersHit& hit)
+{
+	PxController* MeController = hit.controller;
+	PxController* otherController = hit.other;
+
+    // wi
+	CComponent* pComponentDst = static_cast<CComponent*>(MeController->getUserData());
+	CComponent* pComponentSrc = static_cast<CComponent*>(otherController->getUserData());
+
+	if (pComponentDst != nullptr && pComponentSrc != nullptr)
+	{
+		CGameObject* pActorObjectDst = pComponentDst->Get_Object();
+		COLLISION_TYPE objectTypeDst = pActorObjectDst->Get_CollisionGroup();
+
+		CGameObject* pActorObjectSrc = pComponentSrc->Get_Object();
+		COLLISION_TYPE objectTypeSrc = pActorObjectSrc->Get_CollisionGroup();
+
+
+		switch (objectTypeDst)
+		{
+		case PLAYER:
+            pActorObjectDst->Collision_Attack();
+			//MSG_BOX(TEXT("충돌 주체가 PLAYER"));
+			//handlePlayerCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[0]), static_cast<PxRigidDynamic*>(pairHeader.actors[1]));
+			break;
+		case MONSTER:
+			//MSG_BOX(TEXT("충돌 주체가 MONSTER"));
+			//handleEnemyCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[0]), static_cast<PxRigidDynamic*>(pairHeader.actors[1]));
+			break;
+		case FRIEND:
+			//MSG_BOX(TEXT("충돌 주체가 FRIEND"));
+			//handleObstacleCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[0]), static_cast<PxRigidDynamic*>(pairHeader.actors[1]));
+			break;
+		}
+
+		switch (objectTypeSrc)
+		{
+		case PLAYER:
+			//MSG_BOX(TEXT("충돌 대상자가 PLAYER"));
+			//handlePlayerCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[1]), static_cast<PxRigidDynamic*>(pairHeader.actors[0]));
+			break;
+		case MONSTER:
+			//MSG_BOX(TEXT("충돌 대상자가 MONSTER"));
+			//handleEnemyCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[1]), static_cast<PxRigidDynamic*>(pairHeader.actors[0]));
+			break;
+		case FRIEND:
+			//handleObstacleCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[1]), static_cast<PxRigidDynamic*>(pairHeader.actors[0]));
+			break;
+		}
+	}
 }
 

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "..\Public\Camera_Free.h"
+#include "Kirby.h"
 
 CCamera_Free::CCamera_Free(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CCamera{ pDevice, pContext }
@@ -94,7 +95,14 @@ HRESULT CCamera_Free::Render()
 void CCamera_Free::Render_IMGUI()
 {
 	static _float fSpeed = 10.f;
-	_float4 fPosition = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+	_float4 vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+
+
+	ImGui::Text("X: %.2f", vPosition.x);
+	ImGui::SameLine();
+	ImGui::Text("Y: %.2f", vPosition.y);
+	ImGui::SameLine();
+	ImGui::Text("Z: %.2f", vPosition.z);
 
 	ImGui::SliderFloat("CameraFree Speed", &fSpeed, 0.f, 50.f);
 
@@ -121,6 +129,11 @@ void CCamera_Free::Track_Target(_float fTimeDelta)
 
 	_float4 vTargetPos = m_pTarget->Get_State(CTransform::STATE_POSITION);
 	//vTargetPos.y = m_pTransformCom->Get_State(CTransform::STATE_POSITION).y;
+	if (*m_pCurrentLevelID == LEVEL_GAMEPLAY)
+	{
+		_float4 vTerrainPos = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0))->Compute_TerrainPosition();
+		vTargetPos.y = vTerrainPos.y;
+	}
 
 	_float4 vBackDir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 	vBackDir.Normalize();
@@ -129,7 +142,6 @@ void CCamera_Free::Track_Target(_float fTimeDelta)
 	_float4 vCurPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
 	_float4 vDestDir = (vTargetPos + vBackDir) - vCurPos;
-	vDestDir.y = 0.f;
 
 	if (.1f <= vDestDir.Length())
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, Pos(vCurPos + (vDestDir * .06f)));
@@ -149,7 +161,7 @@ void CCamera_Free::Control(_float fTimeDelta)
 		Track_Target(fTimeDelta);
 
 
-	if (*m_pCurrentLevelID == LEVEL_TOOL_MAP || m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS) )
+	if (*m_pCurrentLevelID == LEVEL_TOOL_MAP || m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
 	{
 		_long	MouseMove = { 0 };
 
@@ -169,7 +181,7 @@ void CCamera_Free::Control(_float fTimeDelta)
 			m_pTransformCom->Go_Straight(fTimeDelta * MouseMove * m_fMouseSensor * .5f);
 
 			if (m_pTarget != nullptr && m_bTrackTarget)
-				m_fTrackDistance -= MouseMove*.01f ;
+				m_fTrackDistance -= MouseMove * .01f;
 		}
 
 		//일단 안씀
@@ -182,14 +194,17 @@ void CCamera_Free::Control(_float fTimeDelta)
 
 		if (m_pGameInstance->Get_KeyState(DIMKS_RBUTTON, KEY_PRESS))
 		{
-			Vector3 vTargetPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Float4(CTransform::STATE_LOOK) * 10.f;
-			
+			_float3 vTargetPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Float4(CTransform::STATE_LOOK) * 10.f;
+
+
+
+
 			// 05.22) LEVEL_TOOL_UI에는 카메라 회전 기능 제외
-			if (*m_pCurrentLevelID == LEVEL_TOOL_UI)
-				return;
+			//if (*m_pCurrentLevelID == LEVEL_TOOL_UI)
+			//	return;
 
 			if (*m_pCurrentLevelID == LEVEL_TOOL_FX)
-				vTargetPos = Vector3::Zero;
+				vTargetPos = _float3::Zero;
 
 			if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMMS_X))
 			{

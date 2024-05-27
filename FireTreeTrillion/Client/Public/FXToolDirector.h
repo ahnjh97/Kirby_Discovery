@@ -79,6 +79,8 @@ private:
 
 	//파티클용 세팅 변수
 	_float m_fRange[3] = { 1.f, 1.f, 1.f };
+	_float m_fPivot[3] = { 1.f, 1.f, 1.f };
+
 
 	// 이펙트 키프레임 편집(단일)
 
@@ -131,6 +133,7 @@ private:
 	void MakeBar_MultiFXProperty(_float _fTimeDelta, _float _fWidth);
 	
 	void Render_MultiFXHierarchy();
+	void Render_AxisLines();
 
 	//이펙트용 컴포넌트 준비 작업
 	HRESULT	Ready_FXPrototypeVector();

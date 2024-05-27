@@ -10,8 +10,8 @@ namespace Client
                  LEVEL_GAMEPLAY, 
 
                 //============= TOOL
-                 LEVEL_TOOL_UI,
                  LEVEL_TOOL_FX,
+                 LEVEL_TOOL_UI,
                  LEVEL_TOOL_ANIM,
                  LEVEL_TOOL_MAP,
 
