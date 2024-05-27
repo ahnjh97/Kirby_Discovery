@@ -45,6 +45,8 @@ public:
 	virtual HRESULT Render_LightDepth() { return S_OK; }
 	virtual void	Render_IMGUI();
 
+	virtual void	Collision_Attack();
+
 protected:
 	ID3D11Device*						m_pDevice = { nullptr };
 	ID3D11DeviceContext*				m_pContext = { nullptr };

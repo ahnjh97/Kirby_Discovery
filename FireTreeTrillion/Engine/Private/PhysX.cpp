@@ -302,15 +302,17 @@ void CSimulationEventCallback::onContact(const PxContactPairHeader& pairHeader, 
 				switch (objectTypeDst)
 				{
 				case PLAYER:
-                    MSG_BOX(TEXT("충돌 주체가 PLAYER"));
+                {
+                    //MSG_BOX(TEXT("충돌 주체가 PLAYER"));
 					//handlePlayerCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[0]), static_cast<PxRigidDynamic*>(pairHeader.actors[1]));
+                }
 					break;
 				case MONSTER:
-                    MSG_BOX(TEXT("충돌 주체가 MONSTER"));
+                    //MSG_BOX(TEXT("충돌 주체가 MONSTER"));
 					//handleEnemyCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[0]), static_cast<PxRigidDynamic*>(pairHeader.actors[1]));
 					break;
 				case FRIEND:
-                    MSG_BOX(TEXT("충돌 주체가 FRIEND"));
+                    //MSG_BOX(TEXT("충돌 주체가 FRIEND"));
 					//handleObstacleCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[0]), static_cast<PxRigidDynamic*>(pairHeader.actors[1]));
 					break;
 				}
@@ -318,11 +320,11 @@ void CSimulationEventCallback::onContact(const PxContactPairHeader& pairHeader, 
 				switch (objectTypeSrc)
 				{
 				case PLAYER:
-                    MSG_BOX(TEXT("충돌 대상자가 PLAYER"));
+                    //MSG_BOX(TEXT("충돌 대상자가 PLAYER"));
 					//handlePlayerCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[1]), static_cast<PxRigidDynamic*>(pairHeader.actors[0]));
 					break;
 				case MONSTER:
-                    MSG_BOX(TEXT("충돌 대상자가 MONSTER"));
+                    //MSG_BOX(TEXT("충돌 대상자가 MONSTER"));
 					//handleEnemyCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[1]), static_cast<PxRigidDynamic*>(pairHeader.actors[0]));
 					break;
 				case FRIEND:
@@ -371,10 +373,10 @@ PxControllerBehaviorFlags CControllerBehaviorCallback::getBehaviorFlags(const Px
         CGameObject* pObj = pComponent->Get_Object();
         COLLISION_TYPE eCollisionType = pObj->Get_CollisionGroup();
 
-        if (eCollisionType == MONSTER)
-            MSG_BOX(TEXT("받아온 컨트롤러(Monster)와 충 돌"));
-        if(eCollisionType == PLAYER)
-            MSG_BOX(TEXT("받아온 컨트롤러(Player)와 충 돌"));
+        //if (eCollisionType == MONSTER)
+            //MSG_BOX(TEXT("받아온 컨트롤러(Monster)와 충 돌"));
+        //if(eCollisionType == PLAYER)
+            //MSG_BOX(TEXT("받아온 컨트롤러(Player)와 충 돌"));
     }
 
     return PxControllerBehaviorFlag::eCCT_SLIDE;
@@ -436,15 +438,16 @@ void CUserControllerHitReport::onControllerHit(const PxControllersHit& hit)
 		switch (objectTypeDst)
 		{
 		case PLAYER:
-			MSG_BOX(TEXT("충돌 주체가 PLAYER"));
+            pActorObjectDst->Collision_Attack();
+			//MSG_BOX(TEXT("충돌 주체가 PLAYER"));
 			//handlePlayerCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[0]), static_cast<PxRigidDynamic*>(pairHeader.actors[1]));
 			break;
 		case MONSTER:
-			MSG_BOX(TEXT("충돌 주체가 MONSTER"));
+			//MSG_BOX(TEXT("충돌 주체가 MONSTER"));
 			//handleEnemyCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[0]), static_cast<PxRigidDynamic*>(pairHeader.actors[1]));
 			break;
 		case FRIEND:
-			MSG_BOX(TEXT("충돌 주체가 FRIEND"));
+			//MSG_BOX(TEXT("충돌 주체가 FRIEND"));
 			//handleObstacleCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[0]), static_cast<PxRigidDynamic*>(pairHeader.actors[1]));
 			break;
 		}
@@ -452,11 +455,11 @@ void CUserControllerHitReport::onControllerHit(const PxControllersHit& hit)
 		switch (objectTypeSrc)
 		{
 		case PLAYER:
-			MSG_BOX(TEXT("충돌 대상자가 PLAYER"));
+			//MSG_BOX(TEXT("충돌 대상자가 PLAYER"));
 			//handlePlayerCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[1]), static_cast<PxRigidDynamic*>(pairHeader.actors[0]));
 			break;
 		case MONSTER:
-			MSG_BOX(TEXT("충돌 대상자가 MONSTER"));
+			//MSG_BOX(TEXT("충돌 대상자가 MONSTER"));
 			//handleEnemyCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[1]), static_cast<PxRigidDynamic*>(pairHeader.actors[0]));
 			break;
 		case FRIEND:
