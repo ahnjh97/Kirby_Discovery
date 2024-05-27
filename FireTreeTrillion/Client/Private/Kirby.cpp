@@ -106,7 +106,6 @@ _int CKirby::Tick(_float fTimeDelta)
 		{
 			Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
 		}
-
 	}
 
 	// 유틸업데이트가 들어가있다.
@@ -185,6 +184,28 @@ void CKirby::Render_IMGUI()
 	ImGui::Separator(); ImGui::NewLine();
 
 	__super::Render_IMGUI();
+}
+
+void CKirby::Collision_Attack()
+{
+	INFO(m_fJumpVelocity) = 11.f;
+
+	// 먹은 상태인 경우
+	if (INFO(m_isEat) == true)
+	{
+		Change_State(STATE_EATDAMAGE, 60.f, false, false, BODY_BALLOON);
+	}
+	// 나는 상태일 경우 . . .
+	else if (true == (Get_State() == STATE_FLIGHTSTART || Get_State() == STATE_FLIGHTFALL || Get_State() == STATE_FLIGHT ||
+		Get_State() == STATE_FLIGHTLANDING || Get_State() == STATE_FLIGHTLIMIT || Get_State() == STATE_FLIGHTLIMITFALL))
+	{
+		Change_State(STATE_FILGHTDAMAGE, 60.f, false, false, BODY_BALLOON);
+	}
+	// 평범한 상태에서...
+	else
+	{
+		Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
+	}
 }
 
 _uint CKirby::Get_State()

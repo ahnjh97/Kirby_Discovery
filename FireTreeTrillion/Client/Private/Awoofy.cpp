@@ -32,7 +32,7 @@ HRESULT CAwoofy::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	m_pModelCom->Set_Animation(AWOOFY_WAIT, 60.f, true, true);
+	m_pModelCom->Set_Animation(AWOOFY_GROOMING, 45.f, true, true);
 
 	return S_OK;
 }
@@ -41,11 +41,6 @@ _int CAwoofy::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
 		return OBJ_DEAD;
-
-	//m_pControllerCom->FreeFall(m_pTransformCom, fTimeDelta);
-
-	//if (m_pGameInstance->Get_DIKeyState(DIK_W, KEY_PRESS))
-	//	m_pControllerCom->Move(m_pTransformCom, 5.f, fTimeDelta);
 
    // FSM 제어
 	if (m_pFSM != nullptr)
@@ -57,6 +52,12 @@ _int CAwoofy::Tick(_float fTimeDelta)
 void CAwoofy::Late_Tick(_float fTimeDelta)
 {
 	m_pModelCom->Play_Animation(fTimeDelta);
+
+	// 지면충돌과 경사 보정
+	//// 지면의 up벡터
+	//PxVec3 slope = m_pControllerCom->Compute_Slope(m_pTransformCom);
+	//_vector vTerrainNormal = CUtils::To_Vector(slope);
+	//Lerp_UpVector(vTerrainNormal, 10.f, fTimeDelta);
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
@@ -123,9 +124,41 @@ void CAwoofy::Render_IMGUI()
 	__super::Render_IMGUI();
 }
 
+void CAwoofy::Collision_Attack()
+{
+	Change_State(CAwoofy::AWOOFY_DAMAGE, 40.f, false, true);
+}
+
 void CAwoofy::Change_State(AWOOFY_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
 {
 	m_pFSM->ChangeState((_uint)eState, _fAnimSpeed, _bLoop, _bInterpolation);
+}
+
+_bool CAwoofy::IsAnimFinished()
+{
+	return m_pModelCom->IsFinished();
+}
+
+_bool CAwoofy::IsAnimFinished(_uint iCurrentAnimIndex)
+{
+	return m_pModelCom->IsFinished(iCurrentAnimIndex);
+}
+
+void CAwoofy::Compute_Angle(_vector vOrginLook, _vector vTargetLook)
+{
+	//// 정규화 및 회전 축 계산
+	//vOrginLook.m128_f32[1] = 0.f;
+	//vTargetLook.m128_f32[1] = 0.f;
+	XMVECTOR vOriginLookNormalized = XMVector3Normalize(vOrginLook);
+	XMVECTOR vTargetLookNormalized = XMVector3Normalize(vTargetLook);
+
+	//// 회전 각도 계산
+	//m_fAngle = acos(XMVectorGetX(XMVector3Dot(vOriginLookNormalized, vTargetLookNormalized)));
+
+	m_fAngle = acos(XMVectorGetX(XMVector3Dot(vOriginLookNormalized, vTargetLookNormalized)));
+	_float fY = ::XMVectorGetY(::XMVector3Cross(vOriginLookNormalized, vTargetLookNormalized));
+	if (fY < 0)
+		m_fAngle = -m_fAngle;
 }
 
 HRESULT CAwoofy::Add_Components()
@@ -142,7 +175,7 @@ HRESULT CAwoofy::Add_Components()
 	CHECK_FAILED(hr);
 
 	/* For.Com_CharacterController */
-	_float4 vPos = XMVectorSet(1.f, 6.f, -180.f, 1.f);
+	_float4 vPos = XMVectorSet(10.f, 10.f, -175.f, 1.f);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
 	desc.uCollisionType = m_eCollisionGroup;
@@ -179,8 +212,15 @@ void CAwoofy::SetUp_FSM()
 	// FSM 상태 초기화
 	m_pFSM = CFSM::Create();
 	m_pFSM->Add_State(AWOOFY_WAIT, CAwoofy_Idle_State::Create());
-	m_pFSM->Add_State(AWOOFY_RUN, CAwoofy_Run_State::Create());
+	m_pFSM->Add_State(AWOOFY_GROOMING, CAwoofy_Idle_State::Create());
+	m_pFSM->Add_State(AWOOFY_LOOKAROUND, CAwoofy_Idle_State::Create());
 
+	m_pFSM->Add_State(AWOOFY_RUN, CAwoofy_Run_State::Create());
+	m_pFSM->Add_State(AWOOFY_FIND, CAwoofy_Find_State::Create());
+	m_pFSM->Add_State(AWOOFY_BRAKE, CAwoofy_Brake_State::Create());
+	m_pFSM->Add_State(AWOOFY_LOOKAROUNDAFTERBRAKE, CAwoofy_LookAroundAfterBrake_State::Create());
+
+	m_pFSM->Add_State(AWOOFY_DAMAGE, CAwoofy_Damage_State::Create());
 
 	// 상태 Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};

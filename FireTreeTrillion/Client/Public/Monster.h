@@ -40,6 +40,15 @@ protected:
 	//class CLight*			m_pLight = { nullptr };
 	CCharacterController*	m_pControllerCom = { nullptr };
 
+protected:
+	// For_PhysX
+	_float			m_fOffsetTurn = { 7.f };
+	_float4			m_vOriginUp = { 0.f, 1.f, 0.f, 0.f };
+
+protected:
+	void			SetOn_Slope(_float fTimeDelta);
+	void			Lerp_UpVector(_fvector _vTargetUp, _float _maxAngle, _float fTimeDelta);
+
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;
 	virtual void Free() override;

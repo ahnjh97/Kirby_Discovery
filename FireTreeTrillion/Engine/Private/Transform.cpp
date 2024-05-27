@@ -142,6 +142,44 @@ void CTransform::Look_At_ForLandObject(_fvector vAt)
 	Set_State(STATE_LOOK, XMVector3Normalize(vLook) * vScaled.z);
 }
 
+void CTransform::Look_At_Rotate(_vector vAt, _float fTimeDelta)
+{
+	_vector vLook = Get_State_Vector(CTransform::STATE_LOOK);
+	vLook.m128_f32[1] = 0.f;
+	_vector vTargetLook = vAt - Get_State_Vector(CTransform::STATE_POSITION);
+	vTargetLook.m128_f32[1] = 0.f;
+
+	_vector vLerpLook = XMVectorLerp(vLook, vTargetLook, m_fRotationPerSec * fTimeDelta);
+
+	_vector vLerpRight = XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 0.f), vLerpLook);
+	_vector vLerpUp = XMVector3Cross(vLerpLook, vLerpRight);
+
+	_float3 vScaled = Get_Scaled();
+
+	Set_State(CTransform::STATE_RIGHT, XMVector3Normalize(vLerpRight) * vScaled.x);
+	Set_State(CTransform::STATE_UP, XMVector3Normalize(vLerpUp) * vScaled.y);
+	Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLerpLook) * vScaled.z);
+}
+
+void CTransform::Look_At_Angle(_fvector vAt, _fvector vAxis, _float fRadian)
+{
+	if (XMVector3Equal(vAxis, XMVectorZero()))
+		return;
+
+	_vector vLook = vAt;
+	_matrix matRotate = XMMatrixRotationAxis(vAxis, fRadian);
+	vLook = XMVector3TransformNormal(vLook, matRotate);
+
+	_vector	vRight = XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 0.f), vLook);
+	_vector	vUp = XMVector3Cross(vLook, vRight);
+
+	_float3	vScaled = Get_Scaled();
+
+	Set_State(CTransform::STATE_RIGHT, XMVector3Normalize(vRight) * vScaled.x);
+	Set_State(CTransform::STATE_UP, XMVector3Normalize(vUp) * vScaled.y);
+	Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLook) * vScaled.z);
+}
+
 void CTransform::Move_toTarget(_fvector vTargetPos, _float fTimeDelta, _float fMinDistance)
 {
 	_vector		vPosition = Get_State_Vector(STATE_POSITION);

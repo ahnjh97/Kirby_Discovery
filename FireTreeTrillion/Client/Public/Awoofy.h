@@ -24,6 +24,19 @@ private:
 	virtual ~CAwoofy() = default;
 
 public:
+	_vector Get_Origin() {
+		return m_vOrginLook;
+	}
+
+	_vector Get_Target() {
+		return m_vTargetLook;
+	}
+
+	_float Get_Angle() {
+		return m_fAngle;
+	}
+
+public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual _int	Tick(_float fTimeDelta) override;
@@ -31,12 +44,22 @@ public:
 	virtual HRESULT Render() override;
 	virtual HRESULT Render_LightDepth() override;
 	virtual void	Render_IMGUI() override;
+	virtual void	Collision_Attack() override;
 
+public:
 	void Change_State(AWOOFY_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
-
+	_bool IsAnimFinished();
+	_bool IsAnimFinished(_uint iCurrentAnimIndex);
+	void Compute_Angle(_vector vOrginLook, _vector vTargetLook);
+	
 private:
 	CFSM*			m_pFSM = { nullptr };
 	AWOOFY_ANIM	m_eCurrentState = { AWOOFY_END };
+
+	_vector m_vOrginLook = {};
+	_vector m_vTargetLook = {};
+
+	_float	m_fAngle = { 0.f };
 
 private:
 	HRESULT Add_Components();
