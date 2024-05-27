@@ -50,6 +50,9 @@ public:
 
 private:
 	_float	m_fTimeDelta = { 0.f };
+	_float	m_fAngle = { 0.f };
+
+	_vector m_vAxisY = {};
 
 public:
 	static	CAwoofy_Run_State* Create();
@@ -106,13 +109,13 @@ public:
 };
 
 //*********************************
-//			LOOKAROUND STATE
+//			LOOKAROUNDAFTERBRAKE STATE
 //*********************************
-class CAwoofy_LookAround_State final : public CFSM_State
+class CAwoofy_LookAroundAfterBrake_State final : public CFSM_State
 {
 private:
-	CAwoofy_LookAround_State();
-	virtual ~CAwoofy_LookAround_State() = default;
+	CAwoofy_LookAroundAfterBrake_State();
+	virtual ~CAwoofy_LookAroundAfterBrake_State() = default;
 
 public:
 	// 상태 진입했을 때 처음만 호출
@@ -122,7 +125,28 @@ public:
 	virtual void OnStateExit()														override;
 
 public:
-	static	CAwoofy_LookAround_State* Create();
+	static	CAwoofy_LookAroundAfterBrake_State* Create();
+	virtual void Free() override;
+};
+
+//*********************************
+//			DAMAGE STATE
+//*********************************
+class CAwoofy_Damage_State final : public CFSM_State
+{
+private:
+	CAwoofy_Damage_State();
+	virtual ~CAwoofy_Damage_State() = default;
+
+public:
+	// 상태 진입했을 때 처음만 호출
+	virtual void OnStateEnter(class CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation) override;
+	// 상태 진입되어 있는 상태에서 매 tick마다 호출
+	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
+	virtual void OnStateExit()														override;
+
+public:
+	static	CAwoofy_Damage_State* Create();
 	virtual void Free() override;
 };
 

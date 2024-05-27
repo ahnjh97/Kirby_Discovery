@@ -29,15 +29,26 @@ void CAwoofy_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 	_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 
+	// 플레이어와 몬스터의 거리 계산
 	_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(vPos, vKirbyPos)));
 
+	// 일정 거리 안으로 플레이어가 들어오면 상태 전환
 	if(6.f > fDistance)
-	{
-		_vector vOrginLook = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
-		_vector vTargetLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-
 		pAwoofy->Change_State(CAwoofy::AWOOFY_FIND, 40.f, false, true);
+
+	// 여러 상태의 IDLE로 전환
+	if (true == pAwoofy->IsAnimFinished())
+	{
+		if(rand() % 5 == 0)
+			pAwoofy->Change_State(CAwoofy::AWOOFY_GROOMING, 45.f, false, true);
+		else if(rand() % 5 == 1)
+			pAwoofy->Change_State(CAwoofy::AWOOFY_LOOKAROUND, 40.f, false, true);
+		else
+			pAwoofy->Change_State(CAwoofy::AWOOFY_WAIT, 40.f, false, true);
 	}
+
+	if (m_pGameInstance->Get_DIKeyState(DIK_SPACE, KEY_DOWN))
+		pAwoofy->Change_State(CAwoofy::AWOOFY_DAMAGE, 40.f, false, true);
 
 	pController->FreeFall(pTransformCom, fTimeDelta, 0.5f);
 }
@@ -84,23 +95,46 @@ void CAwoofy_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 
 	m_fTimeDelta += fTimeDelta;
 
-	if(2.f > m_fTimeDelta)
-		pController->Move_Dir(pTransformCom, pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 0.1f , fTimeDelta);
+	// n초 동안 돌진
+	if(3.f > m_fTimeDelta)
+	{
+		// 플레이어와 몬스터사이의 각도 계산
+		_vector vLook = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+		vLook.m128_f32[1] = 0.f;
+		_vector vTargetLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+		vTargetLook.m128_f32[1] = 0.f;
+		_float fAngle = acos(XMVectorGetX(XMVector3Dot(XMVector3Normalize(vLook), XMVector3Normalize(vTargetLook))));
+
+		// n초 동안 일정 각도 이하만큼만 플레이어를 향해 회전
+		if (1.f > m_fTimeDelta)
+		{
+			if (6.f > XMConvertToDegrees(fAngle))
+			{
+				m_vAxisY = XMVector3Cross(XMVector3Normalize(vLook), XMVector3Normalize(vTargetLook));
+
+				m_fAngle = fAngle;
+
+				pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 2.f);
+				pController->Move_Dir(pTransformCom, pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 0.1f, fTimeDelta);
+			}
+			else
+			{
+				pTransformCom->Look_At_Angle(vLook, m_vAxisY, m_fAngle * 0.1f);
+				pController->Move_Dir(pTransformCom, pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 0.1f, fTimeDelta);
+			}
+		}
+		// 일정 시간이 지나면 고정된 각도로 회전
+		else
+		{
+			pTransformCom->Look_At_Angle(vLook, m_vAxisY, m_fAngle * 0.1f);
+			pController->Move_Dir(pTransformCom, pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 0.1f, fTimeDelta);
+		}
+	}
 	else
 	{
 		m_fTimeDelta = 0.f;
 		pAwoofy->Change_State(CAwoofy::AWOOFY_BRAKE, 40.f, false, true);
 	}
-	//if (m_pGameInstance->Get_KeyState(DIK_W, KEY_PRESS))
-	//	pController->Move_Dir(pTransformCom, XMVector4Normalize(pTransformCom->Get_State(CTransform::STATE_LOOK)) * 0.1f, fTimeDelta);
-	//else
-	//	pAwofy->Change_State(CAwoofy::AWOOFY_GROOMING, 40.f, true, true);
-
-	//if (m_pGameInstance->Get_KeyState(DIK_D, KEY_PRESS))
-	//	pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta);
-
-	//if (m_pGameInstance->Get_KeyState(DIK_A, KEY_PRESS))
-	//	pTransformCom->Turn(XMVectorSet(0.f, -1.f, 0.f, 0.f), fTimeDelta);
 
 	pController->FreeFall(pTransformCom, fTimeDelta, 0.5f);
 }
@@ -141,14 +175,18 @@ void CAwoofy_Find_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	CAwoofy* pAwoofy = static_cast<CAwoofy*>(pGameObject);
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+	pController->FreeFall(pTransformCom, fTimeDelta, 0.5f);
 
 	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
 	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
 
+	// 플레이어를 향해 바라본다
 	pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 2.f);
 
 	if (true == pAwoofy->IsAnimFinished())
 		pAwoofy->Change_State(CAwoofy::AWOOFY_RUN, 40.f, true, true);
+
+	pController->FreeFall(pTransformCom, fTimeDelta, 0.5f);
 }
 
 void CAwoofy_Find_State::OnStateExit()
@@ -169,20 +207,20 @@ void CAwoofy_Find_State::Free()
 #pragma endregion
 
 
-#pragma region FIND STATE
+#pragma region LOOKAROUNDAFTERBRAKE STATE
 //*******************************************************
-//						 FIND STATE
+//						 LOOKAROUNDAFTERBRAKE STATE
 //*******************************************************
-CAwoofy_LookAround_State::CAwoofy_LookAround_State()
+CAwoofy_LookAroundAfterBrake_State::CAwoofy_LookAroundAfterBrake_State()
 {
 }
 
-void CAwoofy_LookAround_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CAwoofy_LookAroundAfterBrake_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
 }
 
-void CAwoofy_LookAround_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+void CAwoofy_LookAroundAfterBrake_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
 	CAwoofy* pAwoofy = static_cast<CAwoofy*>(pGameObject);
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
@@ -190,27 +228,32 @@ void CAwoofy_LookAround_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 
 	pController->FreeFall(pTransformCom, fTimeDelta, 0.5f);
 
-	if(true == pAwoofy->IsAnimFinished())
-		pAwoofy->Change_State(CAwoofy::AWOOFY_GROOMING, 45.f, false, true);
+	if (true == pAwoofy->IsAnimFinished())
+		pAwoofy->Change_State(CAwoofy::AWOOFY_WAIT, 40.f, false, true);
 }
 
-void CAwoofy_LookAround_State::OnStateExit()
+void CAwoofy_LookAroundAfterBrake_State::OnStateExit()
 {
 }
 
-CAwoofy_LookAround_State* CAwoofy_LookAround_State::Create()
+CAwoofy_LookAroundAfterBrake_State* CAwoofy_LookAroundAfterBrake_State::Create()
 {
-	CAwoofy_LookAround_State* pInstance = new CAwoofy_LookAround_State();
+	CAwoofy_LookAroundAfterBrake_State* pInstance = new CAwoofy_LookAroundAfterBrake_State();
 	return pInstance;
 }
 
-void CAwoofy_LookAround_State::Free()
+void CAwoofy_LookAroundAfterBrake_State::Free()
 {
 	__super::Free();
 }
 
 #pragma endregion
 
+
+#pragma region LOOKAROUNDAFTERBRAKE STATE
+//*******************************************************
+//						 BRAKE STATE
+//*******************************************************
 CAwoofy_Brake_State::CAwoofy_Brake_State()
 {
 }
@@ -226,6 +269,7 @@ void CAwoofy_Brake_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 
+	// 브레이크 : 제곱 감속
 	_float fDeceleration = m_fSpeed * m_fSpeed;
 
 	if (0.f < m_fSpeed)
@@ -236,9 +280,9 @@ void CAwoofy_Brake_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 	pController->FreeFall(pTransformCom, fTimeDelta, 0.5f);
 
 	if (true == pAwoofy->IsAnimFinished())
-		pAwoofy->Change_State(CAwoofy::AWOOFY_LOOKAROUND, 45.f, false, true);
+		pAwoofy->Change_State(CAwoofy::AWOOFY_LOOKAROUNDAFTERBRAKE, 45.f, false, true);
 	else
-		pController->Move_Dir(pTransformCom, pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 0.1f * fDeceleration, fTimeDelta);
+		pController->Move_Dir(pTransformCom, (pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 0.1f) * fDeceleration, fTimeDelta);
 }
 
 void CAwoofy_Brake_State::OnStateExit()
@@ -255,3 +299,55 @@ void CAwoofy_Brake_State::Free()
 {
 	__super::Free();
 }
+
+#pragma endregion
+
+
+#pragma region DAMAGE STATE
+//*******************************************************
+//						 DAMAGE STATE
+//*******************************************************
+CAwoofy_Damage_State::CAwoofy_Damage_State()
+{
+}
+
+void CAwoofy_Damage_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+}
+
+void CAwoofy_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CAwoofy* pAwoofy = static_cast<CAwoofy*>(pGameObject);
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
+
+	// 넉백
+	_vector vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+	pController->Move_Dir(pTransformCom, vLook * 0.1f, fTimeDelta);
+	//pController->Move_Dir(pTransformCom, vLook * 0.1f, fTimeDelta);
+	//_vector vKnockBack = vLook * 0.1f + XMLoadFloat4(&vMonPos);
+
+	if(true == pAwoofy->IsAnimFinished())
+		pAwoofy->Change_State(CAwoofy::AWOOFY_WAIT, 40.f, false, true);
+}
+
+void CAwoofy_Damage_State::OnStateExit()
+{
+}
+
+CAwoofy_Damage_State* CAwoofy_Damage_State::Create()
+{
+	CAwoofy_Damage_State* pInstance = new CAwoofy_Damage_State();
+	return pInstance;
+}
+
+void CAwoofy_Damage_State::Free()
+{
+	__super::Free();
+}
+
+#pragma endregion

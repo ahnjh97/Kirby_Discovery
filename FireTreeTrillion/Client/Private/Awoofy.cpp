@@ -52,6 +52,12 @@ void CAwoofy::Late_Tick(_float fTimeDelta)
 {
 	m_pModelCom->Play_Animation(fTimeDelta);
 
+	// 지면충돌과 경사 보정
+	// 지면의 up벡터
+	PxVec3 slope = m_pControllerCom->Compute_Slope(m_pTransformCom);
+	_vector vTerrainNormal = CUtils::To_Vector(slope);
+	Lerp_UpVector(vTerrainNormal, 10.f, fTimeDelta);
+
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
@@ -197,18 +203,20 @@ void CAwoofy::SetUp_FSM()
 {
 	// FSM 상태 초기화
 	m_pFSM = CFSM::Create();
+	m_pFSM->Add_State(AWOOFY_WAIT, CAwoofy_Idle_State::Create());
 	m_pFSM->Add_State(AWOOFY_GROOMING, CAwoofy_Idle_State::Create());
 	m_pFSM->Add_State(AWOOFY_LOOKAROUND, CAwoofy_Idle_State::Create());
-	m_pFSM->Add_State(AWOOFY_WAIT, CAwoofy_Idle_State::Create());
 
 	m_pFSM->Add_State(AWOOFY_RUN, CAwoofy_Run_State::Create());
 	m_pFSM->Add_State(AWOOFY_FIND, CAwoofy_Find_State::Create());
 	m_pFSM->Add_State(AWOOFY_BRAKE, CAwoofy_Brake_State::Create());
-	m_pFSM->Add_State(AWOOFY_LOOKAROUND, CAwoofy_LookAround_State::Create());
+	m_pFSM->Add_State(AWOOFY_LOOKAROUNDAFTERBRAKE, CAwoofy_LookAroundAfterBrake_State::Create());
+
+	m_pFSM->Add_State(AWOOFY_DAMAGE, CAwoofy_Damage_State::Create());
 
 	// 상태 Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};
-	FSM_Desc.iState = AWOOFY_GROOMING;
+	FSM_Desc.iState = AWOOFY_WAIT;
 	FSM_Desc.pModel = m_pModelCom;
 	m_pFSM->Initialize(&FSM_Desc);
 }
