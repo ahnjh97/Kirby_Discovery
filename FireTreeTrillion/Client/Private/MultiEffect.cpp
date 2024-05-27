@@ -165,7 +165,7 @@ void CMultiEffect::Late_Tick(_float fTimeDelta)
 		return;
 
 	if (m_bIsColorRender)
-		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this);
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 
 	if (m_bIsBloom)
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);

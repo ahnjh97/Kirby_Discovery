@@ -39,7 +39,7 @@ HRESULT CSingleEffect::Initialize(void* pArg)
 			FXDesc.vInitRot = (*(FX_DESC*)pArg).vInitRot;
 			FXDesc.vInitScale = (*(FX_DESC*)pArg).vInitScale;
 			FXDesc.bIsColorRender = (*(FX_DESC*)pArg).bIsColorRender;
-
+			m_iPassIdx = 1;
 		}
 	}
 	else if (pArg != nullptr)
