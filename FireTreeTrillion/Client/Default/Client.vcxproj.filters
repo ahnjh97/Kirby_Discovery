@@ -136,6 +136,15 @@
     <Filter Include="02.GameObjects\Effect\Particle">
       <UniqueIdentifier>{4be92289-d2a7-44f3-bc64-a36e82d6590f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Player\State\KirbyDamage_State">
+      <UniqueIdentifier>{140cffa0-c6d9-49fb-b92e-065818d0e44c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\HUD">
+      <UniqueIdentifier>{3d7f8468-85e7-4210-bad9-dd5e62bf6d75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\HUD\Kirby">
+      <UniqueIdentifier>{4bba1354-4120-4080-bcfb-aeff11736c4b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -267,6 +276,15 @@
     <ClInclude Include="..\Public\Particle.h">
       <Filter>02.GameObjects\Effect\Particle</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\KirbyDamage_State.h">
+      <Filter>02.GameObjects\Player\State\KirbyDamage_State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\HUD.h">
+      <Filter>02.GameObjects\UI\HUD</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\HUD_Kirby.h">
+      <Filter>02.GameObjects\UI\HUD\Kirby</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -379,6 +397,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\Particle.cpp">
       <Filter>02.GameObjects\Effect\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KirbyDamage_State.cpp">
+      <Filter>02.GameObjects\Player\State\KirbyDamage_State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HUD.cpp">
+      <Filter>02.GameObjects\UI\HUD</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HUD_Kirby.cpp">
+      <Filter>02.GameObjects\UI\HUD\Kirby</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

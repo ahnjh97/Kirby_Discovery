@@ -29,6 +29,8 @@ public:
 		_float			m_fZAngle = { 0.f };
 		_float4			m_vMoveDir = { 0.f, 0.f, 0.f, 0.f };
 		_float4			m_vTargetDir = { 0.f, 0.f, 0.f, 0.f };
+		_float4			m_vDodgeDir = { 0.f, 0.f, 0.f, 0.f };
+
 		// 눈, 입, 몸체의 상태를 담당한다.
 		EYESTATE		m_eEyeState = { EYE_END };
 		MOUTHSTATE		m_eMouthState = { MOUTH_END };
@@ -50,6 +52,8 @@ public:
 
 		// 먹은 상태에서의 FALL 애님은 없기 때문에 같은 애니메이션으로 구분하기 위헤 부울값 선언
 		_bool			m_isEatFall = { false };
+		// 현재 먹은 상황임을 표현한다.
+		_bool			m_isEat = { false };
 
 		// Vacuum
 		_float			m_fVacuumTime = { 0.f };

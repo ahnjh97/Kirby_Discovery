@@ -177,10 +177,13 @@
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\FXToolDirector.h" />
     <ClInclude Include="..\Public\Grid.h" />
+    <ClInclude Include="..\Public\HUD.h" />
+    <ClInclude Include="..\Public\HUD_Kirby.h" />
     <ClInclude Include="..\Public\Kirby.h" />
     <ClInclude Include="..\Public\KirbyBalloon_State.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\Public\KirbyDamage_State.h" />
     <ClInclude Include="..\Public\KirbyDefault_State.h" />
     <ClInclude Include="..\Public\KirbyVacuum_State.h" />
     <ClInclude Include="..\Public\Kirby_Enums.h" />
@@ -222,10 +225,13 @@
     <ClCompile Include="..\private\Camera_Main.cpp" />
     <ClCompile Include="..\Private\FXToolDirector.cpp" />
     <ClCompile Include="..\Private\Grid.cpp" />
+    <ClCompile Include="..\Private\HUD.cpp" />
+    <ClCompile Include="..\Private\HUD_Kirby.cpp" />
     <ClCompile Include="..\Private\Kirby.cpp" />
     <ClCompile Include="..\Private\KirbyBalloon_State.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\Private\KirbyDamage_State.cpp" />
     <ClCompile Include="..\Private\KirbyDefault_State.cpp" />
     <ClCompile Include="..\Private\KirbyVacuum_State.cpp" />
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />

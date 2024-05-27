@@ -37,7 +37,7 @@ void CKirbyDefault_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 	if (JoyStick_controller(Kirbydesc, pCamera))
 	{
 		DESC(m_eEyeState) = CKirby::EYE_IDLE;
-		pKirby->Change_State(CKirby::STATE_RUN, 100.f, true, true, CKirby::BODY_DEFAULT);
+		pKirby->Change_State(CKirby::STATE_RUNSTART, 120.f, true, true, CKirby::BODY_DEFAULT);
 	}
 
 	Key_Z(pGameObject, fTimeDelta);
@@ -75,6 +75,12 @@ void CKirbyDefault_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 
 void CKirbyDefault_Idle_State::Key_Z(CGameObject* pGameObject, _float fTimeDelta)
 {
+	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
+
+	if (m_pGameInstance->Get_DIKeyState(DIK_Z, KEY_PRESS))
+	{
+		pKirby->Change_State(CKirby::STATE_GUARD, 60.f, true, true, CKirby::BODY_DEFAULT);
+	}
 }
 
 void CKirbyDefault_Idle_State::Key_X(CGameObject* pGameObject, _float fTimeDelta)
@@ -191,14 +197,29 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		pKirby->Change_State(CKirby::STATE_INHALEWALK, 50.f, true, true, CKirby::BODY_VACUUM);
 	}
 
+	if (m_pGameInstance->Get_DIKeyState(DIK_Z, KEY_DOWN))
+	{
+		pKirby->Change_State(CKirby::STATE_GUARD, 60.f, true, true, CKirby::BODY_DEFAULT);
+	}
 
 	if (false == JoyStick_controller(Kirbydesc, pCamera))
 		pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
 
+	// 큰 회전이였을 경우
+	if (Is_BigTurn(Kirbydesc) == true)
+		pKirby->Change_State(CKirby::STATE_RUNSTART, 120.f, true, true, CKirby::BODY_DEFAULT);
 
 	if (pController->Compute_Height() > 2.f)
 	{
 		pKirby->Change_State(CKirby::STATE_FALL, 50.f, false, true, CKirby::BODY_DEFAULT);
+	}
+
+	if (pKirby->Get_State() == CKirby::STATE_RUNSTART)
+	{
+		m_fRunStartTime += fTimeDelta;
+
+		if (m_fRunStartTime > 0.8f)
+			pKirby->Change_State(CKirby::STATE_RUN, 100.f, true, false, CKirby::BODY_DEFAULT);
 	}
 
 	Moving_Logic(Kirbydesc, pTransformCom, pController, fTimeDelta);
@@ -208,7 +229,7 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 }
 void CKirbyDefault_Run_State::OnStateExit()
 {
-
+	m_fRunStartTime = 0.f;
 }
 
 CKirbyDefault_Run_State* CKirbyDefault_Run_State::Create()
@@ -450,11 +471,16 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 			DESC(m_bRePressBlock) = false;
 		}
 
+		if (m_pGameInstance->Get_DIKeyState(DIK_Z, KEY_PRESS))
+		{
+			pKirby->Change_State(CKirby::STATE_GUARD, 60.f, true, true, CKirby::BODY_DEFAULT);
+		}
+
 		// 바로 방향키를 갈겼다면
 		if (m_fChangeRunTime > fChangeRunTime && JoyStick_controller(Kirbydesc, pCamera))
 		{
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
-			pKirby->Change_State(CKirby::STATE_RUN, 100.f, true, true, CKirby::BODY_DEFAULT);
+			pKirby->Change_State(CKirby::STATE_RUNSTART, 120.f, true, true, CKirby::BODY_DEFAULT);
 		}
 		// 자연스럽게 끝났다면
 		else if (pKirby->isAnimFinish())
@@ -477,6 +503,226 @@ CKirbyDefault_Jump_State* CKirbyDefault_Jump_State::Create()
 }
 
 void CKirbyDefault_Jump_State::Free()
+{
+	__super::Free();
+}
+
+#pragma endregion
+
+#pragma region GUARD STATE
+
+CKirbyDefault_Guard_State::CKirbyDefault_Guard_State()
+{
+}
+
+void CKirbyDefault_Guard_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+}
+
+void CKirbyDefault_Guard_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
+	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
+
+	DESC(m_eEyeState) = CKirby::EYE_ANGER;
+
+	if (pKirby->Get_State() == CKirby::STATE_GUARD)
+	{
+
+		Guard_Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
+		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
+
+		if (m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_DOWN) ||
+			m_pGameInstance->Get_DIKeyState(DIK_DOWN, KEY_DOWN) ||
+			m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_DOWN) || 
+			m_pGameInstance->Get_DIKeyState(DIK_RIGHT, KEY_DOWN))
+		{
+			pKirby->Change_State(CKirby::STATE_DODGESTART, 50.f, false, false, CKirby::BODY_DEFAULT);
+		}
+		
+
+		// Z키를 안누르고 있다면
+		if (m_pGameInstance->Get_DIKeyState(DIK_Z, KEY_PRESS) == false)
+		{
+			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+		}
+	}
+	// 닷지 시작
+	else if (pKirby->Get_State() == CKirby::STATE_DODGESTART)
+	{
+		Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
+		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
+
+		if (GAMEINSTANCE Get_DIKeyState(DIK_UP, KEY_PRESS))
+		{
+			if (GAMEINSTANCE Get_DIKeyState(DIK_LEFT, KEY_PRESS))
+				DESC(m_vDodgeDir) = Make_TargetDir(CKirby::DIR_LF, pCamera);
+			else if (GAMEINSTANCE Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
+				DESC(m_vDodgeDir) = Make_TargetDir(CKirby::DIR_RF, pCamera);
+			else
+				DESC(m_vDodgeDir) = Make_TargetDir(CKirby::DIR_FRONT, pCamera);
+		}
+		else if (GAMEINSTANCE Get_DIKeyState(DIK_DOWN, KEY_PRESS))
+		{
+			if (GAMEINSTANCE Get_DIKeyState(DIK_LEFT, KEY_PRESS))
+				DESC(m_vDodgeDir) = Make_TargetDir(CKirby::DIR_LB, pCamera);
+			else if (GAMEINSTANCE Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
+				DESC(m_vDodgeDir) = Make_TargetDir(CKirby::DIR_RB, pCamera);
+			else
+				DESC(m_vDodgeDir) = Make_TargetDir(CKirby::DIR_BACK, pCamera);
+		}
+		else if (GAMEINSTANCE Get_DIKeyState(DIK_LEFT, KEY_PRESS))
+		{
+			DESC(m_vDodgeDir) = Make_TargetDir(CKirby::DIR_LEFT, pCamera);
+		}
+		else if (GAMEINSTANCE Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
+		{
+			DESC(m_vDodgeDir) = Make_TargetDir(CKirby::DIR_RIGHT, pCamera);
+		}
+
+		// 끝나면 바로 본격적인 닷지 스타트 ( 여기서 애니메이션을 분기한다.)
+		if (pKirby->isAnimFinish() == true)
+		{
+			CKirby::DIR eDir = Kirby_Standard_Angle(Kirbydesc);
+			DESC(m_fJumpVelocity) = 12.f;
+
+			if (eDir == CKirby::DIR_FRONT)
+				pKirby->Change_State(CKirby::STATE_DODGEFRONT1, 50.f, false, false, CKirby::BODY_DEFAULT);
+			else if (eDir == CKirby::DIR_BACK)
+				pKirby->Change_State(CKirby::STATE_DODGEBACK1, 50.f, false, false, CKirby::BODY_DEFAULT);
+			else if (eDir == CKirby::DIR_LEFT)
+				pKirby->Change_State(CKirby::STATE_DODGELEFT1, 50.f, false, false, CKirby::BODY_DEFAULT);
+			else if (eDir == CKirby::DIR_RIGHT)
+				pKirby->Change_State(CKirby::STATE_DODGERIGHT1, 50.f, false, false, CKirby::BODY_DEFAULT);
+		}
+	}
+	// BACK
+	else if (pKirby->Get_State() == CKirby::STATE_DODGEBACK1)
+	{
+		Dodge_Moving_Logic(Kirbydesc, pTransformCom, pController, fTimeDelta);
+		DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
+		pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
+
+		if (pController->Is_Terrain() == true)
+		{
+			DESC(m_fJumpVelocity) = 9.f;
+			pKirby->Change_State(CKirby::STATE_DODGEBACK2, 60.f, false, false, CKirby::BODY_DEFAULT);
+		}
+	}
+	else if (pKirby->Get_State() == CKirby::STATE_DODGEBACK2)
+	{
+		Dodge_Moving_Logic(Kirbydesc, pTransformCom, pController, fTimeDelta);
+		DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
+		pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
+
+		if (pController->Is_Terrain() == true)
+		{
+			pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			DESC(m_fMoveSpeed) = 0.f;
+		}
+	}
+
+	// FRONT
+	else if (pKirby->Get_State() == CKirby::STATE_DODGEFRONT1)
+	{
+		Dodge_Moving_Logic(Kirbydesc, pTransformCom, pController, fTimeDelta);
+		DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
+		pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
+
+		if (pController->Is_Terrain() == true)
+		{
+			DESC(m_fJumpVelocity) = 9.f;
+			pKirby->Change_State(CKirby::STATE_DODGEFRONT2, 60.f, false, false, CKirby::BODY_DEFAULT);
+		}
+	}
+	else if (pKirby->Get_State() == CKirby::STATE_DODGEFRONT2)
+	{
+		Dodge_Moving_Logic(Kirbydesc, pTransformCom, pController, fTimeDelta);
+		DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
+		pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
+
+		if (pController->Is_Terrain() == true)
+		{
+			pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			DESC(m_fMoveSpeed) = 0.f;
+
+		}
+	}
+
+	// LEFT
+	else if (pKirby->Get_State() == CKirby::STATE_DODGELEFT1)
+	{
+		Dodge_Moving_Logic(Kirbydesc, pTransformCom, pController, fTimeDelta);
+		DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
+		pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
+
+		if (pController->Is_Terrain() == true)
+		{
+			DESC(m_fJumpVelocity) = 9.f;
+			pKirby->Change_State(CKirby::STATE_DODGELEFT2, 60.f, false, false, CKirby::BODY_DEFAULT);
+		}
+	}
+	else if (pKirby->Get_State() == CKirby::STATE_DODGELEFT2)
+	{
+		Dodge_Moving_Logic(Kirbydesc, pTransformCom, pController, fTimeDelta);
+		DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
+		pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
+
+		if (pController->Is_Terrain() == true)
+		{
+			pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			DESC(m_fMoveSpeed) = 0.f;
+		}
+	}
+
+	// RIGHT
+	else if (pKirby->Get_State() == CKirby::STATE_DODGERIGHT1)
+	{
+		Dodge_Moving_Logic(Kirbydesc, pTransformCom, pController, fTimeDelta);
+		DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
+		pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
+
+		if (pController->Is_Terrain() == true)
+		{
+			DESC(m_fJumpVelocity) = 9.f;
+			pKirby->Change_State(CKirby::STATE_DODGERIGHT2, 60.f, false, false, CKirby::BODY_DEFAULT);
+		}
+	}
+	else if (pKirby->Get_State() == CKirby::STATE_DODGERIGHT2)
+	{
+		Dodge_Moving_Logic(Kirbydesc, pTransformCom, pController, fTimeDelta);
+		DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
+		pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
+
+		if (pController->Is_Terrain() == true)
+		{
+			pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			DESC(m_fMoveSpeed) = 0.f;
+		}
+	}
+
+}
+
+void CKirbyDefault_Guard_State::OnStateExit()
+{
+}
+
+CKirbyDefault_Guard_State* CKirbyDefault_Guard_State::Create()
+{
+	CKirbyDefault_Guard_State* pInstance = new CKirbyDefault_Guard_State();
+	return pInstance;
+}
+
+void CKirbyDefault_Guard_State::Free()
 {
 	__super::Free();
 }

@@ -6,6 +6,7 @@
 #include "KirbyDefault_State.h"
 #include "KirbyBalloon_State.h"
 #include "KirbyVacuum_State.h"
+#include "KirbyDamage_State.h"
 
 #include "Utils.h"
 
@@ -37,6 +38,7 @@ HRESULT CKirby::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
+	m_eCollisionGroup = PLAYER;
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
@@ -61,6 +63,7 @@ HRESULT CKirby::Initialize(void* pArg)
 
 	m_pModelCom[INFO(m_eBodyState)]->Set_Animation(STATE_IDLE, 60.f, true, true);
 
+	
 	return S_OK;
 }
 
@@ -79,13 +82,36 @@ _int CKirby::Tick(_float fTimeDelta)
 	Key_Input(fTimeDelta);
 	if (m_pGameInstance->Get_DIKeyState(DIK_I, KEY_DOWN))
 	{
+		INFO(m_isEat) = true;
 		Change_State(STATE_EAT, 100.f, false, false, BODY_BALLOON);
+	}
+
+	if (m_pGameInstance->Get_DIKeyState(DIK_U, KEY_DOWN))
+	{
+		INFO(m_fJumpVelocity) = 11.f;
+
+		// 먹은 상태인 경우
+		if (INFO(m_isEat) == true)
+		{
+			Change_State(STATE_EATDAMAGE, 60.f, false, false, BODY_BALLOON);
+		}
+		// 나는 상태일 경우 . . .
+		else if (true == (Get_State() == STATE_FLIGHTSTART || Get_State() == STATE_FLIGHTFALL || Get_State() == STATE_FLIGHT ||
+			Get_State() == STATE_FLIGHTLANDING || Get_State() == STATE_FLIGHTLIMIT || Get_State() == STATE_FLIGHTLIMITFALL))
+		{
+			Change_State(STATE_FILGHTDAMAGE, 60.f, false, false, BODY_BALLOON);
+		}
+		// 평범한 상태에서...
+		else
+		{
+			Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
+		}
+
 	}
 
 	// 유틸업데이트가 들어가있다.
 	//****** FSM Update, Shadow ChaseUpdate ******//
 	Kirby_SystemTick(fTimeDelta);
-
 
 	return OBJ_NOEVENT;
 }
@@ -102,7 +128,6 @@ void CKirby::Late_Tick(_float fTimeDelta)
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 	}
-
 }
 
 HRESULT CKirby::Render()
@@ -183,7 +208,7 @@ void CKirby::Setting_KirbyBalance()
 	m_pTransformCom->Set_State(CTransform::STATE_RIGHT, XMVector3Normalize(vEditRight));
 	m_pTransformCom->Set_State(CTransform::STATE_UP, XMVectorSet(0.f, 1.f, 0.f, 0.f));
 
-	// 카메라 기준 실시간 방향 제어
+	// 카메라 기준 실시간 방향 탐색
 	CTransform* pCameraTransform = m_pCamera->Get_TransformCom();
 	_float4 vCamRight = pCameraTransform->Get_State_Vector(CTransform::STATE_RIGHT);
 	_float4 vCamLook = XMVector3Cross(vCamRight, XMVectorSet(0.f, 1.f, 0.f, 1.f));
@@ -351,9 +376,11 @@ HRESULT CKirby::Add_Components()
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
+	desc.uCollisionType = m_eCollisionGroup;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
-	m_pControllerCom->Set_PhysXObject(this);
+	m_pControllerCom->Set_Object(this);
+	//m_pControllerCom->Set_CollisionType(m_eCollisionGroup);
 
 	/* FSM */
 	SetUp_FSM();
@@ -410,27 +437,45 @@ void CKirby::SetUp_FSM()
 {
 	m_pFSM = CFSM::Create();
 
+	// Damege or Death
+	m_pFSM->Add_State(STATE_DAMAGE, CKirbyDamage_State::Create());
+	m_pFSM->Add_State(STATE_EATDAMAGE, CKirbyDamage_State::Create());
+	m_pFSM->Add_State(STATE_FILGHTDAMAGE, CKirbyDamage_State::Create());
+
 	// Default
-	m_pFSM->Add_State(STATE_IDLE, CKirbyDefault_Idle_State::Create());//
-	m_pFSM->Add_State(STATE_IDLESTREACH, CKirbyDefault_Idle_State::Create());//
-	m_pFSM->Add_State(STATE_IDLELOOKAROUND, CKirbyDefault_Idle_State::Create());//
+	m_pFSM->Add_State(STATE_IDLE, CKirbyDefault_Idle_State::Create());
+	m_pFSM->Add_State(STATE_IDLESTREACH, CKirbyDefault_Idle_State::Create());
+	m_pFSM->Add_State(STATE_IDLELOOKAROUND, CKirbyDefault_Idle_State::Create());
 
-	m_pFSM->Add_State(STATE_RUN, CKirbyDefault_Run_State::Create());//
+	m_pFSM->Add_State(STATE_RUN, CKirbyDefault_Run_State::Create());
+	m_pFSM->Add_State(STATE_RUNSTART, CKirbyDefault_Run_State::Create());
 
-	m_pFSM->Add_State(STATE_JUMPL, CKirbyDefault_Jump_State::Create());//
-	m_pFSM->Add_State(STATE_JUMPR, CKirbyDefault_Jump_State::Create());//
-	m_pFSM->Add_State(STATE_JUMPEND, CKirbyDefault_Jump_State::Create());//
-	m_pFSM->Add_State(STATE_JUMPFALL, CKirbyDefault_Jump_State::Create());//
-	m_pFSM->Add_State(STATE_LANDINGEND, CKirbyDefault_Jump_State::Create());//
-	m_pFSM->Add_State(STATE_LANDINGSMALL, CKirbyDefault_Jump_State::Create());//
-	m_pFSM->Add_State(STATE_FALL, CKirbyDefault_Jump_State::Create());//
+	m_pFSM->Add_State(STATE_JUMPL, CKirbyDefault_Jump_State::Create());
+	m_pFSM->Add_State(STATE_JUMPR, CKirbyDefault_Jump_State::Create());
+	m_pFSM->Add_State(STATE_JUMPEND, CKirbyDefault_Jump_State::Create());
+	m_pFSM->Add_State(STATE_JUMPFALL, CKirbyDefault_Jump_State::Create());
+	m_pFSM->Add_State(STATE_LANDINGEND, CKirbyDefault_Jump_State::Create());
+	m_pFSM->Add_State(STATE_LANDINGSMALL, CKirbyDefault_Jump_State::Create());
+	m_pFSM->Add_State(STATE_FALL, CKirbyDefault_Jump_State::Create());
+
+	// 가드 및 덤블링
+	m_pFSM->Add_State(STATE_DODGEBACK1, CKirbyDefault_Guard_State::Create());
+	m_pFSM->Add_State(STATE_DODGEBACK2, CKirbyDefault_Guard_State::Create());
+	m_pFSM->Add_State(STATE_DODGEFRONT1, CKirbyDefault_Guard_State::Create());
+	m_pFSM->Add_State(STATE_DODGEFRONT2, CKirbyDefault_Guard_State::Create());
+	m_pFSM->Add_State(STATE_DODGELEFT1, CKirbyDefault_Guard_State::Create());
+	m_pFSM->Add_State(STATE_DODGELEFT2, CKirbyDefault_Guard_State::Create());
+	m_pFSM->Add_State(STATE_DODGERIGHT1, CKirbyDefault_Guard_State::Create());
+	m_pFSM->Add_State(STATE_DODGERIGHT2, CKirbyDefault_Guard_State::Create());
+	m_pFSM->Add_State(STATE_DODGESTART, CKirbyDefault_Guard_State::Create());
+	m_pFSM->Add_State(STATE_GUARD, CKirbyDefault_Guard_State::Create());
 
 	// Balloon
-	m_pFSM->Add_State(STATE_EAT, CKirbyBalloon_Idle_State::Create());//
-	m_pFSM->Add_State(STATE_EATWAIT, CKirbyBalloon_Idle_State::Create());//
-	m_pFSM->Add_State(STATE_EATRUN, CKirbyBalloon_Run_State::Create());//
-	m_pFSM->Add_State(STATE_EATJUMP, CKirbyBalloon_Jump_State::Create());//
-	m_pFSM->Add_State(STATE_EATLANDING, CKirbyBalloon_Jump_State::Create());//
+	m_pFSM->Add_State(STATE_EAT, CKirbyBalloon_Idle_State::Create());
+	m_pFSM->Add_State(STATE_EATWAIT, CKirbyBalloon_Idle_State::Create());
+	m_pFSM->Add_State(STATE_EATRUN, CKirbyBalloon_Run_State::Create());
+	m_pFSM->Add_State(STATE_EATJUMP, CKirbyBalloon_Jump_State::Create());
+	m_pFSM->Add_State(STATE_EATLANDING, CKirbyBalloon_Jump_State::Create());
 
 	m_pFSM->Add_State(STATE_FLIGHTSTART, CKirbyBalloon_Fly_State::Create());
 	m_pFSM->Add_State(STATE_FLIGHTFALL, CKirbyBalloon_Fly_State::Create());

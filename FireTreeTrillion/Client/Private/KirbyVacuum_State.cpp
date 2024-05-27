@@ -27,6 +27,9 @@ void CKirbyVacuum_Spit_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	// ¹ñ´Â´Ù.
 	if (pKirby->isAnimFinish())
 	{
+		// ÀÌÁ¦ ¸ÔÀº »óÅÂ°¡ ¾Æ´Ï¿©.
+		DESC(m_isEat) = false;
+
 		// ¾Ö´Ô ³¡³µ´Âµ¥ ¶¥À» ¹â¾ÒÀ» °æ¿ì
 		if (pController->Is_Terrain() == true)
 		{
@@ -87,7 +90,7 @@ void CKirbyVacuum_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float f
 	{
 		if (JoyStick_controller(Kirbydesc, pCamera) == true)
 		{
-			Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
+			Inhale_Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
 			Inhale_Moving_Logic(Kirbydesc, pTransformCom, pController, fTimeDelta);
 		}
 		else
@@ -141,7 +144,7 @@ void CKirbyVacuum_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float f
 		// Á¶ÀÌ½ºÆ½ ¸¸Á³À»¶© ¹Ù·Î ½´ÆÛ·Î ³Ñ¾î°¨.
 		if (JoyStick_controller(Kirbydesc, pCamera) == true)
 		{
-			Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
+			Jump_Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
 			pKirby->Change_State(CKirby::STATE_SUPERINHALEWALK, 50.f, true, true, CKirby::BODY_VACUUM);
 		}
 
@@ -197,7 +200,7 @@ void CKirbyVacuum_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float f
 	{
 		if (JoyStick_controller(Kirbydesc, pCamera) == true)
 		{
-			Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
+			Inhale_Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
 			Moving_Logic(Kirbydesc, pTransformCom, pController, fTimeDelta);
 		}
 		else
@@ -283,7 +286,7 @@ void CKirbyVacuum_VacuumWalk_State::OnStateUpdate(CGameObject* pGameObject, _flo
 	if (pKirby->Get_State() == CKirby::STATE_INHALEWALK)
 	{
 		DESC(m_fVacuumTime) += fTimeDelta;
-		Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
+		Inhale_Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
 		Inhale_Moving_Logic(Kirbydesc, pTransformCom, pController, fTimeDelta);
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == false && DESC(m_fVacuumTime) > 0.2f)
@@ -309,7 +312,7 @@ void CKirbyVacuum_VacuumWalk_State::OnStateUpdate(CGameObject* pGameObject, _flo
 	{
 		DESC(m_eEyeState) = CKirby::EYE_CLOSE;
 
-		Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
+		Inhale_Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
 		Inhale_Moving_Logic(Kirbydesc, pTransformCom, pController, fTimeDelta);
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == false)

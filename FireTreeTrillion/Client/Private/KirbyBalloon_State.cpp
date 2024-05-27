@@ -451,7 +451,7 @@ void CKirbyBalloon_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		// 추가로 누르면 더 올라감!
 		if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
 		{
-			if (pController->Compute_Height() > 5.f)
+			if (pController->Compute_Height() > 5.f && pController->Compute_Height() < 19.f)
 				DESC(m_fJumpVelocity) = 0.f;
 			else
 				DESC(m_fJumpVelocity) = 4.f;
@@ -485,7 +485,7 @@ void CKirbyBalloon_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
 		{
-			if (pController->Compute_Height() > 5.f)
+			if (pController->Compute_Height() > 5.f && pController->Compute_Height() < 19.f)
 				DESC(m_fJumpVelocity) = 0.f;
 			else
 				DESC(m_fJumpVelocity) = 4.f;
@@ -510,7 +510,7 @@ void CKirbyBalloon_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_PRESS))
 		{
 			// 날면서 뽀잉
-			if (pController->Compute_Height() > 5.f)
+			if (pController->Compute_Height() > 5.f && pController->Compute_Height() < 19.f)
 				DESC(m_fJumpVelocity) = 0.f;
 			else
 				DESC(m_fJumpVelocity) = 4.f;

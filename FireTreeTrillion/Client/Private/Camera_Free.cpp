@@ -192,8 +192,8 @@ void CCamera_Free::Control(_float fTimeDelta)
 
 
 			// 05.22) LEVEL_TOOL_UI에는 카메라 회전 기능 제외
-			if (*m_pCurrentLevelID == LEVEL_TOOL_UI)
-				return;
+			//if (*m_pCurrentLevelID == LEVEL_TOOL_UI)
+			//	return;
 
 			if (*m_pCurrentLevelID == LEVEL_TOOL_FX)
 				vTargetPos = _float3::Zero;
