@@ -147,7 +147,6 @@ HRESULT CImGUI_Manager::RenderUpdate()
 	return S_OK;
 }
 
-
 void CImGUI_Manager::SetDockSpace()
 {
 	ImGuiWindowFlags         WindowFlag = ImGuiWindowFlags_NoDocking;

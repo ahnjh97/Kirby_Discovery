@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "HUD.h"
-#include "HUD_Status.h"
+#include "HUD_Kirby.h"
 
 CHUD::CHUD(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CUIObject{ pDevice, pContext }

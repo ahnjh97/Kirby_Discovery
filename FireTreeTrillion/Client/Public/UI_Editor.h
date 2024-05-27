@@ -40,7 +40,7 @@ private:
 	_bool			Set_FileDialog(); //IMGUI_MANAGER 클래스 내 함수와 동일한 기능. 추후 이동 필요
 
 	_bool			Save_FileData();
-	_bool			Load_FileData();
+	_bool			Load_FileData(const string& _FilePath);
 	
 
 public:

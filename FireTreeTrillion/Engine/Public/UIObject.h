@@ -39,8 +39,9 @@ public:
 	virtual void	Render_IMGUI()								override;
 
 public:
-	_float2			Get_pos2D() const { return m_position2D; }
+	UIOBJ_DESC		Get_UIObj_Desc() const { return m_UIObjDesc; }
 
+	_float2			Get_pos2D() const { return m_position2D; }
 	constexpr _bool	Get_IsRender() const noexcept { return m_bIsRender; }
 	void			Set_IsRender(_bool _isRender) { m_bIsRender = _isRender; }
 

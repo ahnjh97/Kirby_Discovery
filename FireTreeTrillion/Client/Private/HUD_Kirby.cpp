@@ -63,7 +63,7 @@ HRESULT CHUD_Kirby::Render()
 	HRESULT hr;
 	for (size_t i = 0; i < 21; i++)
 	{
-		hr = Bind_ShaderResources(m_pShaderCom, PS_ALPHABLEND, m_pTransformCom, m_pTextureCom, i);
+		hr = Bind_ShaderResources(m_pShaderCom, PS_ALPHABLEND, m_pTransformCom, m_pTextureCom, 7);
 		CHECK_FAILED(hr);
 
 		m_pTransformCom->Set_Scaled(m_UIObjDesc.vSize.x, m_UIObjDesc.vSize.y, 1.f);
@@ -87,7 +87,8 @@ HRESULT CHUD_Kirby::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
-	hr = __super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_KirbyBarHard"),
+	//hr = __super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_KirbyBarHard"),
+	hr = __super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_GameComplete"),
 		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom);
 	CHECK_FAILED(hr);
 

@@ -28,6 +28,19 @@ HRESULT CUI_Editor::Initialize(void* _pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
+#pragma region HUD_Kirby
+
+	UIOBJ_DESC HUD_KirbyDESC{};
+	HUD_KirbyDESC.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f };
+	HUD_KirbyDESC.vSize = { 100.f, 100.f };
+	HUD_KirbyDESC.vPos = { HUD_KirbyDESC.vCenter.x/* - 200.f*/, HUD_KirbyDESC.vCenter.y/* - 200.f */ };
+
+	CUIObject* pUIObject = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_HUD_Kirby"), &HUD_KirbyDESC));
+	CHECK_NULLPTR(pUIObject);
+	m_vecUIObj.push_back(pUIObject);
+
+#pragma endregion
+
 	return S_OK;
 }
 
@@ -73,7 +86,6 @@ void CUI_Editor::Render_IMGUI()
 			{
 				ImGui::SeparatorText(u8"HUD");
 				
-
 				ImGui::EndTabItem();
 			}
 
@@ -130,9 +142,8 @@ _bool CUI_Editor::Edit_Transform()
 	ImGuiIO& io = ImGui::GetIO();
 	ImGuizmo::SetRect(0.f, 0.f, io.DisplaySize.x, io.DisplaySize.y);
 
-
-	_bool IsUsingGizmo = FALSE;
-	if (IsUsingGizmo)
+	//_bool IsUsingGizmo = FALSE;
+	//if (IsUsingGizmo)
 		Set_GizmoSync(); //기즈모와 위젯, 오브젝트 동기화 작업
 
 	//m_UIObjDesc.vSize *= (_float2)Scale;
@@ -342,6 +353,17 @@ _bool CUI_Editor::Set_DockSpace()
 		{
 			// 파일 다이얼로그
 			m_pGameInstance->Set_FileDialog();
+			
+			if (ImGui::Button(u8"Save 저장"))
+			{
+				if (Save_FileData())
+					MSG_BOX(TEXT("Save Complete!"));
+			}
+			if (ImGui::Button(u8"Load 로드"))
+			{
+				if (Load_FileData("../Bin/Resources/Data/UI/Test.UIDAT"))
+					MSG_BOX(TEXT("Load Complete!"));
+			}
 
 			ImGui::EndMainMenuBar();
 		}
@@ -361,7 +383,7 @@ _bool CUI_Editor::Set_FileDialog()
 _bool CUI_Editor::Save_FileData()
 {
 	string FileName = "../Bin/Resources/Data/UI/Test.UIDAT";
-	std::ofstream File(FileName, std::ios::binary);
+	std::ofstream File(FileName, ios::out | std::ios::binary);
 
 	if (!File.is_open()) 
 	{
@@ -369,32 +391,98 @@ _bool CUI_Editor::Save_FileData()
 		return FALSE;
 	}
 
-	// PrototypeTag, size2D, position2D
 	size_t size = m_vecUIObj.size();
 	File.write(reinterpret_cast<const char*>(&size), sizeof(size));
 
 	for (auto iter : m_vecUIObj)
 	{
-		wstring PrototypeTag = iter->Get_PrototypeTag();
-		_float2 size2D = _float2();//iter->Get_size2D();
-		_float2 position2D = _float2();//iter->Get_pos2D();
+		wstring ProtoTag = iter->Get_PrototypeTag();
+		UIOBJ_DESC ProtoUI_Desc = iter->Get_UIObj_Desc();
+		//_float2 size2D = _float2();//iter->Get_size2D();
+		//_float2 position2D = _float2();//iter->Get_pos2D();
 
-		string strPrototypeTag = CUtils::WstrToStr(PrototypeTag);
-		size_t PrototypeTagLen = strPrototypeTag.length() + 1;
-		File.write(reinterpret_cast<const char*>(&PrototypeTagLen), sizeof(PrototypeTagLen));
-		File.write(strPrototypeTag.c_str(), sizeof(char) * PrototypeTagLen);
+		string strProtoTag = CUtils::WstrToStr(ProtoTag);
+		_uint ProtoTagLen = strProtoTag.length();
 
-		File.write(reinterpret_cast<const char*>(&size2D), sizeof(size2D));
-		File.write(reinterpret_cast<const char*>(&position2D), sizeof(position2D));
+		File.write(reinterpret_cast<const char*>(&ProtoTagLen), sizeof(ProtoTagLen));
+		File.write(strProtoTag.c_str(), /*sizeof(char) **/ ProtoTagLen);
+
+		File.write(reinterpret_cast<const char*>(&ProtoUI_Desc), sizeof(ProtoUI_Desc));
+		//File.write(reinterpret_cast<const char*>(&position2D), sizeof(position2D));
 	}
+
+	//쓰기
+	//string strModelName = pModel->Get_ModelInfo().strModelName;
+	//_float4x4 matWorld = pTransform->Get_WorldMatrix();
+	//_uint iStrLength = strModelName.length();
+
+	//outputFile.write(reinterpret_cast<const char*>(&iStrLength), sizeof(iStrLength));
+	//outputFile.write(strModelName.c_str(), iStrLength);
+	//outputFile.write(reinterpret_cast<const char*>(&matWorld), sizeof(_float4x4));
 
 	File.close();
 
 	return TRUE;
 }
 
-_bool CUI_Editor::Load_FileData()
+_bool CUI_Editor::Load_FileData(const string& _FilePath)
 {
+	std::ifstream File(_FilePath, ios::in | std::ios::binary);
+
+	if (!File.is_open()) 
+	{
+		MSG_BOX(TEXT("Load Failed : UI"));
+		return FALSE;
+	}
+
+	size_t size = 0;
+	File.read(reinterpret_cast<char*>(&size), sizeof(size));
+	m_vecUIObj.reserve(size);
+	string ProtoTag;
+
+	for (size_t i = 0; i < size; ++i)
+	{
+		//char ProtoTag[256];
+		//size_t ProtoTagLen;
+		_uint ProtoTagLen;
+		File.read(reinterpret_cast<char*>(&ProtoTagLen), sizeof(ProtoTagLen));
+		ProtoTag.resize(ProtoTagLen);
+
+		File.read(&ProtoTag[0], /*sizeof(char) **/ ProtoTagLen);
+
+		UIOBJ_DESC ProtoUI_Desc;
+		File.read(reinterpret_cast<char*>(&ProtoUI_Desc), sizeof(ProtoUI_Desc));
+
+		//UIOBJ_DESC	LoadUI_Desc{};
+		//LoadUI_Desc.vCenter = ProtoUI_Desc.vCenter;
+		//LoadUI_Desc.vSize = ProtoUI_Desc.vSize;
+		//LoadUI_Desc.vPos = ProtoUI_Desc.vPos;
+		//LoadUI_Desc.fFrame = ProtoUI_Desc.fFrame;
+
+		CGameObject* pObj = m_pGameInstance->Clone_GameObject(CUtils::StrToWstr(ProtoTag), &ProtoUI_Desc);
+		CUIObject* pUIObject = dynamic_cast<CUIObject*>(pObj);
+
+		// push_back 끝나면 크래시 현상 발생
+		m_vecUIObj.push_back(pUIObject);
+	}
+
+	File.close();
+
+	//읽기
+	//string strModelName;
+	//_float4x4 matWorld{};
+	//_int iCamIndex{};
+
+	//while (!fileStream.eof())
+	//{
+	//	_uint iStrLength;
+	//	fileStream.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
+	//	strModelName.resize(iStrLength);
+	//	fileStream.read(&strModelName[0], iStrLength);
+	//	fileStream.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4))
+	//}
+
+
 	return TRUE;
 }
 
