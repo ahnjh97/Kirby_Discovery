@@ -1216,6 +1216,25 @@ The Custom Icon Font (in CustomFont.cpp and CustomFont.h) was made with ImGuiFon
 
 #pragma endregion
 
+#ifdef ENGINE_EXPORTS
+
+#ifndef IMGUI_API
+#define IMGUI_API _declspec(dllexport) 
+#endif
+
+#else
+
+#ifndef IMGUI_API
+#define IMGUI_API _declspec(dllimport) 
+#endif
+
+#endif
+
+#ifndef IMGUI_IMPL_API
+#define IMGUI_IMPL_API              IMGUI_API
+#endif
+
+
 #pragma region IGFD VERSION
 
 // compatible with 1.90.4 WIP

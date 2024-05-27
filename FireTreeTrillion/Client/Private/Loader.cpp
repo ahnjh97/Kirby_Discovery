@@ -1,12 +1,13 @@
 #include "stdafx.h"
-#include "..\Public\Loader.h"
+
+//#include "..\Public\Loader.h"
+#include "Loader.h"
 #include <process.h>
 #include <codecvt>
 #include <locale>
 
 #include "GameInstance.h"
 #include "Camera_Free.h"
-#include "BackGround.h"
 #include "TestModel.h"
 #include "TestTerrain.h"
 
@@ -16,10 +17,16 @@
 #include "BasicMap.h"
 #include "Grid.h"
 
-#pragma region TOO_UI
+#pragma region TOOL_UI
 
 #include "TestUI.h"
+#include "BackGround.h"
 #include "UI_Editor.h"
+
+	#pragma region UI_HUD
+	#include "HUD.h"
+	#include "HUD_Status.h"
+	#pragma endregion
 
 #pragma endregion
 
@@ -158,9 +165,13 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolHelper"), CMapToolHelper);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolObject"), CMapToolObject);
 
-	// 05.20) 원본 추가
-	 /*      GameObject_IMGUI_UI_Editor    */
+#pragma region TOOL_UI
+
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("IMGUI_UI_Editor"), CUI_Editor);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_Kirby"), CHUD_Kirby);
+
+#pragma endregion
 
 	// For Kirby
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kirby"), CKirby);
@@ -367,8 +378,8 @@ HRESULT CLoader::Loading_For_Tool_UI()
 
 #pragma region TEXTURE
 
-	if (FAILED(Add_Texture(eLevel, "Logo", "Logo/Logo.png")))
-		return E_FAIL;
+	hr = Add_Texture(eLevel, "KirbyBarHard", "UI/HUD/Hero/BarHard/HeroPanelBarHard_%d.png", 3);
+	CHECK_FAILED(hr);
 
 	m_strLoadingText = TEXT("Loading For Texture : Complete!");
 

@@ -96,7 +96,7 @@ CGameObject * CObject_Manager::Clone_GameObject(const wstring & strPrototypeTag,
 	CGameObject*	pGameObject = pPrototype->Clone(pArg);
 	CHECK_NULLPTR(pGameObject);
 
-	return pGameObject;
+	return pGameObject; 
 }
 
 void CObject_Manager::Tick(_float fTimeDelta)

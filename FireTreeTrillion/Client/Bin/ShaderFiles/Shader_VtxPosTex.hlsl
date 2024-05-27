@@ -81,7 +81,7 @@ PS_OUT PS_MAIN(PS_IN In)
 {
 	PS_OUT			Out = (PS_OUT)0;
 
-	Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
 	
 	if(Out.vColor.a < .05f)
         discard;
@@ -142,7 +142,7 @@ technique11 DefaultTechnique
 	{
 		SetRasterizerState(RS_Default);
 		SetDepthStencilState(DSS_Default, 0);
-		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;

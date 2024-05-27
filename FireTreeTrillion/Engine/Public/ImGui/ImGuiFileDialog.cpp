@@ -77,7 +77,8 @@ SOFTWARE.
 #ifdef USE_STD_FILESYSTEM
 #include <windows.h>
 #else
-#include "dirent/dirent.h"  // directly open the dirent file attached to this lib
+//#include "dirent/dirent.h"  // directly open the dirent file attached to this lib
+#include "dirent.h"  // 05.27) 경로 변경
 #endif                      // USE_STD_FILESYSTEM
 #define PATH_SEP '\\'
 #ifndef PATH_MAX
