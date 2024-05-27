@@ -14,6 +14,10 @@ protected:
 	virtual ~CComponent() = default;
 
 public:
+	class CGameObject* Get_Object() const { return m_pGameObject; }
+	void Set_Object(class CGameObject* _pGameObject) { m_pGameObject = _pGameObject; }
+
+public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
 	virtual void	Start_Tick() {};
@@ -23,11 +27,12 @@ public:
 	virtual HRESULT Render() {return S_OK;}
 
 protected:
-	ID3D11Device*						m_pDevice = { nullptr };
-	ID3D11DeviceContext*				m_pContext = { nullptr };
-	class CGameInstance*				m_pGameInstance = { nullptr };
+	ID3D11Device*			m_pDevice = { nullptr };
+	ID3D11DeviceContext*	m_pContext = { nullptr };
+	class CGameInstance*	m_pGameInstance = { nullptr };
+	class CGameObject*		m_pGameObject = { nullptr };
 
-	_bool						m_isCloned = { false };
+	_bool					m_isCloned = { false };
 
 public:
 	virtual CComponent* Clone(void* pArg) = 0;

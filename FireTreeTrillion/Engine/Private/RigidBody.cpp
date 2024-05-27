@@ -26,6 +26,7 @@ HRESULT CRigidBody::Initialize(void * pArg)
 	m_eShapeType			= pDesc->eShapeType;
 	m_OriginTransformMatrix = pDesc->matWorld;
 	m_vMaterial				= pDesc->vMaterial;
+	m_pActorObject			= pDesc->pObj;
 
 	Create_Actor();
 	return S_OK;
@@ -55,7 +56,7 @@ void CRigidBody::Render_IMGUI()
 {
 	__super::Render_IMGUI();
 
-	//ReCreateActor(for change shape or scale)
+	// ReCreateActor(for change shape or scale)
 	if (ImGui::Button("Update Changes"))
 	{
 		Create_Actor();
@@ -115,6 +116,7 @@ void CRigidBody::Create_Actor()
 	PxMat44 pxMat = CUtils::To_Float4x4(OriginMatrix);
 	PxTransform transform = CUtils::mat44ToTransform(pxMat);
 	m_pActor = pPhysics->createRigidDynamic(transform);
+	m_pActor->userData = this;
 
 	//SetUp_Actor();
 
@@ -135,7 +137,6 @@ void CRigidBody::SetUp_Actor()
 		m_pActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, true);
 	}
 
-	m_pActor->userData = this;
 
 	if (m_bTrigger)
 	{

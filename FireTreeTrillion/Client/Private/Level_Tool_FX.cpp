@@ -45,14 +45,21 @@ HRESULT CLevel_Tool_FX::Ready_Layer_Camera(const wstring& strLayerTag)
 {
 	CCamera_Free::CAMERA_FREE_DESC		CameraDesc{};
 	CameraDesc.fMouseSensor = 0.1f;
-	CameraDesc.fFovy = XMConvertToRadians(60.0f);
+	//CameraDesc.fFovy = XMConvertToRadians(60.0f);
+	CameraDesc.fFovy = XMConvertToRadians(5.0f);
+
 	CameraDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	CameraDesc.fNear = 0.1f;
 	CameraDesc.fFar = 1000.0f;
-	CameraDesc.vEye = _float4(0.f, 2.f, -1.f, 1.f);
-	CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
+
+	//CameraDesc.vEye = _float4(0.f, 2.f, -1.f, 1.f);
+	CameraDesc.vEye = _float4(0.f, 0.f, g_iWinSizeX * -0.1f, 1.f);
+
+	//CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
+	CameraDesc.vAt = _float4(0.f, 0.f, 1.f, 1.f);
 	CameraDesc.fSpeedPerSec = 10.f;
-	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
+	//CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
+	CameraDesc.fRotationPerSec = XMConvertToRadians(0.0f);
 
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_FX, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
 		return E_FAIL;

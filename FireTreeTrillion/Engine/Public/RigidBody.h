@@ -8,12 +8,12 @@ class ENGINE_DLL CRigidBody : public CComponent
 public:
 	struct RIGIDBODY_DESC
 	{
-		RIGID_SHAPE	eShapeType;
-		_float4x4	matWorld;
-		_bool		bTrigger;
-		_float		fOffsetSize;
-		_float3		vMaterial = {0.5f, 0.5f, 0.5f};
-	
+		RIGID_SHAPE			eShapeType;
+		_float4x4			matWorld;
+		_bool				bTrigger;
+		_float				fOffsetSize;
+		_float3				vMaterial = {0.5f, 0.5f, 0.5f};
+		class CGameObject*	pObj = nullptr;
 	};
 
 private:
@@ -31,7 +31,7 @@ public:
 	void			Update_PhysX(CTransform* pTransform);
 
 public:
-	void			Set_PhysXObject(class CGameObject* _pObj) { m_pObject = _pObj; }
+	void			Set_PhysXObject(class CGameObject* _pObj) { m_pActorObject = _pObj; }
 	
 	void			Create_Actor();
 	void			SetUp_Actor();
@@ -51,7 +51,7 @@ public:
 	_bool				Is_Activated();
 
 protected:
-	class CGameObject*			m_pObject			 = nullptr;
+	class CGameObject*			m_pActorObject		 = nullptr;
 	physx::PxRigidDynamic*		m_pActor			 = nullptr;
 	physx::PxShape*				m_pShape			 = nullptr;
 	physx::PxController*		m_pCapsuleController = nullptr;
