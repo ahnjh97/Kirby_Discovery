@@ -19,7 +19,7 @@ HRESULT CCharacterController::Initialize(void* pArg)
 {
 	CONTROLLER_DESC* pDes = (CONTROLLER_DESC*)pArg;
 	_float4 vInitialPos = pDes->vInitialPos;
-	
+	m_eCollisionType = (COLLISION_TYPE)pDes->uCollisionType;
 	__super::Initialize(pArg);
 
 	PxMaterial* material = m_pGameInstance->Get_Physics()->createMaterial(0.5f, 0.5f, 0.5f);
@@ -69,11 +69,6 @@ void CCharacterController::Render_IMGUI()
 	}
 }
 
-void CCharacterController::Set_PhysXObject(CGameObject* _pObj)
-{
-	m_pObject = _pObj;
-}
-
 void CCharacterController::Set_Position(const _float4& vPos)
 {
 	m_pController->setPosition({(_double)vPos.x, (_double)vPos.y, (_double)vPos.z});
@@ -95,7 +90,6 @@ _float4 CCharacterController::Get_FootPosition()
 	const auto vPos = m_pController->getFootPosition();
 	return _float4{(_float)vPos.x, (_float)vPos.y, (_float)vPos.z, 1.f};
 }
-
 
 /// <summary> 객체의 Look방향으로 '이동'하는 함수 </summary>
 /// <param name="pTransform"> 객체의 Transform </param>
@@ -132,7 +126,6 @@ void CCharacterController::Move_Dir(CTransform* pTransform, _fvector fDelta, _fl
 	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
 }
 
-
 /// <summary> 짬푸 </summary>
 /// <param name="pTransform"> 객체의 Transform </param>
 /// <param name="fFallVelocity"> 떨어지는 속도 </param>
@@ -167,7 +160,6 @@ _bool CCharacterController::Jump(CTransform* pTransform, _float fFallVelocity, _
 	return true;
 }
 
-
 /// <summary> 자 유 낙 하 </summary>
 void CCharacterController::FreeFall(CTransform* pTransform, _float fTimeDelta, _float fOffset)
 {
@@ -194,7 +186,6 @@ void CCharacterController::FreeFall(CTransform* pTransform, _float fTimeDelta, _
 
 	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
 }
-
 
 /// <summary>
 /// 해당 character가 서있는 지면의 노말벡터의 평균값을 구하여 뱉는다.
@@ -372,11 +363,14 @@ void CCharacterController::Create_Controller()
 
 	m_pControllerCallBack = new CControllerBehaviorCallback();
 	m_tControllerDesc.behaviorCallback = m_pControllerCallBack;
+	m_pControllerHitReport = new CUserControllerHitReport();
+	m_tControllerDesc.reportCallback = m_pControllerHitReport;
+
 	m_pController = m_pGameInstance->Get_ControllerManager()->createController(m_tControllerDesc);
 
-	//PxShape* shape;
-	//m_pController->getActor()->getShapes(&shape, 1);
-	//shape->setSimulationFilterData(physx::PxFilterData{ static_cast<physx::PxU32>(0/*ColliderType*/), 0, 0, 0 });
+	PxShape* shape;
+	m_pController->getActor()->getShapes(&shape, 1);
+	shape->setSimulationFilterData(physx::PxFilterData{ static_cast<physx::PxU32>(COLLISION_TYPE(m_eCollisionType)), 0, 0, 0 });
 	//shape->setQueryFilterData(physx::PxFilterData{static_cast<physx::PxU32>(1), 0, 0, 0});
 
 	//m_pGameInstance->RemoveActor(*m_pController->getActor());
@@ -392,6 +386,7 @@ void CCharacterController::Release_Controller()
 	if (nullptr != m_pController)
 	{
 		Safe_Delete(m_pControllerCallBack);
+		Safe_Delete(m_pControllerHitReport);
 
 		if (m_pController->getActor()->getScene())
 			m_pGameInstance->RemoveActor(*m_pController->getActor());
@@ -416,7 +411,6 @@ void CCharacterController::Set_DefaultValue()
 	m_tControllerDesc.stepOffset = 0.1f;
 	m_tControllerDesc.maxJumpHeight = 3.f;
 }
-
 
 CCharacterController* CCharacterController::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

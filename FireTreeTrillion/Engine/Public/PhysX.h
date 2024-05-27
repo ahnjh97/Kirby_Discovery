@@ -78,7 +78,7 @@ public:
 };
 
 
-// PxControllerBehaviorCallback : Controller의 충돌처리에 대한 콜백 결과를 받아오는 클래스
+// PxControllerBehaviorCallback : Controller 끼리의 충돌처리에 대한 콜백 결과를 받아오는 클래스
 // 해당 클래스를 상속받아 이벤트 결과를 활용한다.
 class ENGINE_DLL CControllerBehaviorCallback : public PxControllerBehaviorCallback
 {
@@ -89,6 +89,26 @@ public:
     // 컨트롤러가 다른 컨트롤러와 충돌했을 때 호출되는 함수
     virtual PxControllerBehaviorFlags getBehaviorFlags(const PxController& controller) override;
 
+    // 사용하지 않지만 순수가상함수로 상속받아야하는 함수. 절대 지우지 말 것!
+    virtual PxControllerBehaviorFlags getBehaviorFlags(const PxObstacle&) override;
+    
 };
+
+// PxUserControllerHitReport : Controller의 모든 충돌 정보를 가지고옴.
+class CUserControllerHitReport : public physx::PxUserControllerHitReport 
+{
+public:
+    // 캐릭터 컨트롤러의 충돌 이벤트 처리
+    virtual void onShapeHit(const physx::PxControllerShapeHit& hit) override;
+    
+    virtual void onControllerHit(const PxControllersHit& hit) override;
+
+    // NOT YET
+    //virtual void onControllerShapeHit(const PxControllerShapeHit& hit) override {}
+    
+    // for 순수가상함수
+    virtual void onObstacleHit(const PxControllerObstacleHit& hit) override {}
+};
+
 
 END

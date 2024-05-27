@@ -9,6 +9,7 @@ public:
 	struct CONTROLLER_DESC
 	{
 		_float4 vInitialPos;
+		_uint	uCollisionType;
 	};
 
 protected:
@@ -17,7 +18,7 @@ protected:
 	virtual ~CCharacterController() = default;
 
 public:
-	void			Set_PhysXObject(class CGameObject* _pObj); //{ m_pObject = _pObj; }
+	//void			Set_CollisionType(COLLISION_TYPE _CollisionType){ m_eCollisionType = _CollisionType; }
 	// 갑자기 위치값이 변화되는 경우 사용하시오.(ex. 텔레포트 등)
 	void			Set_Position(const _float4& vPos);
 	// 발 위치값 지정
@@ -63,7 +64,7 @@ public:
 		if (m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_DOWN)
 			return true;
 		else
-			return false;
+			return false;                                                                                                                                            
 	}
 
 protected:
@@ -74,12 +75,14 @@ protected:
 
 protected:
 	class CGameObject*					m_pObject = nullptr;
+	COLLISION_TYPE						m_eCollisionType = COLLISION_TYPE::COLLI_END;
 
 	physx::PxController*				m_pController = nullptr;
 	physx::PxCapsuleControllerDesc		m_tControllerDesc;
 	physx::PxControllerFilters			m_ControllerFilters;
 	physx::PxFilterData					m_tFilterDesc;
 	class CControllerBehaviorCallback*	m_pControllerCallBack = nullptr;
+	class CUserControllerHitReport*		m_pControllerHitReport = nullptr;
 
 	_float								m_fSlopeLimitDegree = 45.f;
 	_float								m_fFallVelocity = { 0.f };

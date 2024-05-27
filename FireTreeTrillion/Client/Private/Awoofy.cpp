@@ -28,11 +28,11 @@ HRESULT CAwoofy::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
+	m_eCollisionGroup = MONSTER;
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
 	m_pModelCom->Set_Animation(AWOOFY_WAIT, 60.f, true, true);
-	m_eCollisionGroup = MONSTER;
 
 	return S_OK;
 }
@@ -145,10 +145,11 @@ HRESULT CAwoofy::Add_Components()
 	_float4 vPos = XMVectorSet(1.f, 6.f, -180.f, 1.f);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
+	desc.uCollisionType = m_eCollisionGroup;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	m_pControllerCom->Set_Object(this);
-	//m_pControllerCom->Set_PhysXObject(this);
+	//m_pControllerCom->Set_CollisionType(m_eCollisionGroup);
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 

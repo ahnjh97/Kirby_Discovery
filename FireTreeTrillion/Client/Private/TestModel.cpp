@@ -33,7 +33,7 @@ HRESULT CTestModel::Initialize(void* pArg)
     //CGameInstance::Get_Instance()->Test();
     
     // position 세팅은 항상 Add_Components() 앞에 둘것
-    _vector vPos = XMVectorSet(0.f, 11.f, -180.f, 1.f);
+    _vector vPos = XMVectorSet(0.f, 15.f, -180.f, 1.f);
     m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
     m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(-16.f));
 
@@ -67,6 +67,8 @@ HRESULT CTestModel::Initialize(void* pArg)
     m_pLight = CGameInstance::Get_Instance()->Get_LightLastAddress();
     Safe_AddRef(m_pLight);*/
 
+    m_eCollisionGroup = FRIEND;
+
     return S_OK;
 }
 
@@ -82,11 +84,11 @@ _int CTestModel::Tick(_float fTimeDelta)
         m_pLight->Update_LightPos(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
 
     // 점프용 velocity(속도)
-    m_fJumpVelocity -= GRAVITY * fTimeDelta;
-    if (true == m_isJump)
-        m_isJump = m_pControllerCom->Jump(m_pTransformCom, m_fJumpVelocity, fTimeDelta);
-    else
-        m_pControllerCom->FreeFall(m_pTransformCom, fTimeDelta);
+    //m_fJumpVelocity -= GRAVITY * fTimeDelta;
+    //if (true == m_isJump)
+    //    m_isJump = m_pControllerCom->Jump(m_pTransformCom, m_fJumpVelocity, fTimeDelta);
+    //else
+    //    m_pControllerCom->FreeFall(m_pTransformCom, fTimeDelta);
 
     // 예시코드 5 : 계산기 예시 코드 (월드 매트리스로 예시든거임 이건 정신나간 코드이므로 참고해주셈)
     // 예시코드 6 : DInput + KeyPress 예시 코드
@@ -110,7 +112,7 @@ _int CTestModel::Tick(_float fTimeDelta)
         _float fSpeed = m_pTransformCom->Get_SpeedPerSec();
         // for test
         //fSpeed = 5.f;
-        m_pControllerCom->Move(m_pTransformCom, fSpeed, fTimeDelta);
+        //m_pControllerCom->Move(m_pTransformCom, fSpeed, fTimeDelta);
     }
 
     if (m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_PRESS))
@@ -202,7 +204,7 @@ void CTestModel::Late_Tick(_float fTimeDelta)
 {
     m_pModelCom->Play_Animation(fTimeDelta);
 
-    SetOn_Slope(fTimeDelta);
+    //SetOn_Slope(fTimeDelta);
 
     if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
     {
@@ -322,7 +324,8 @@ HRESULT CTestModel::Add_Components()
     hr = __super::Add_Component(TEXT("Prototype_Component_RigidBody"),
         TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &rigidDesc);
     CHECK_FAILED(hr);
-    m_pRigidBodyCom->Set_PhysXObject(this);
+    m_pRigidBodyCom->Set_Object(this);
+    //m_pRigidBodyCom->Set_PhysXObject(this);
     m_pRigidBodyCom->Activate(true);
 
     /* For.Com_CharacterController */

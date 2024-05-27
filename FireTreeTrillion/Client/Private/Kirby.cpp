@@ -32,6 +32,7 @@ HRESULT CKirby::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
+	m_eCollisionGroup = PLAYER;
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
@@ -60,7 +61,6 @@ HRESULT CKirby::Initialize(void* pArg)
 
 	m_pModelCom[INFO(m_eBodyState)]->Set_Animation(STATE_IDLE, 60.f, true, true);
 
-	m_eCollisionGroup = PLAYER;
 	
 	return S_OK;
 }
@@ -541,9 +541,11 @@ HRESULT CKirby::Add_Components()
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
+	desc.uCollisionType = m_eCollisionGroup;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
-	m_pControllerCom->Set_PhysXObject(this);
+	m_pControllerCom->Set_Object(this);
+	//m_pControllerCom->Set_CollisionType(m_eCollisionGroup);
 
 	/* FSM */
 	SetUp_FSM();

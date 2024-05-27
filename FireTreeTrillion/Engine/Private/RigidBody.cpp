@@ -56,7 +56,7 @@ void CRigidBody::Render_IMGUI()
 {
 	__super::Render_IMGUI();
 
-	//ReCreateActor(for change shape or scale)
+	// ReCreateActor(for change shape or scale)
 	if (ImGui::Button("Update Changes"))
 	{
 		Create_Actor();
@@ -116,7 +116,7 @@ void CRigidBody::Create_Actor()
 	PxMat44 pxMat = CUtils::To_Float4x4(OriginMatrix);
 	PxTransform transform = CUtils::mat44ToTransform(pxMat);
 	m_pActor = pPhysics->createRigidDynamic(transform);
-	m_pActor->userData = m_pActorObject;
+	m_pActor->userData = this;
 
 	//SetUp_Actor();
 
