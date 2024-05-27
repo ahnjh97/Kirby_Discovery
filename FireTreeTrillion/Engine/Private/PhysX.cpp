@@ -354,7 +354,7 @@ PxControllerBehaviorFlags CControllerBehaviorCallback::getBehaviorFlags(const Px
     }
     if (actor.is<PxRigidStatic>())  // PxController
     {
-        MSG_BOX(TEXT("floor collision"));
+        //MSG_BOX(TEXT("floor collision"));
         return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
     }
     return PxControllerBehaviorFlag::eCCT_SLIDE;
