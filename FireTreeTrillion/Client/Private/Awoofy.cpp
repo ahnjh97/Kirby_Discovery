@@ -31,7 +31,7 @@ HRESULT CAwoofy::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	m_pModelCom->Set_Animation(AWOOFY_WAIT, 60.f, true, true);
+	m_pModelCom->Set_Animation(AWOOFY_GROOMING, 45.f, true, true);
 
 	return S_OK;
 }
@@ -40,11 +40,6 @@ _int CAwoofy::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
 		return OBJ_DEAD;
-
-	//m_pControllerCom->FreeFall(m_pTransformCom, fTimeDelta);
-
-	//if (m_pGameInstance->Get_DIKeyState(DIK_W, KEY_PRESS))
-	//	m_pControllerCom->Move(m_pTransformCom, 5.f, fTimeDelta);
 
    // FSM 제어
 	if (m_pFSM != nullptr)
@@ -127,6 +122,33 @@ void CAwoofy::Change_State(AWOOFY_ANIM eState, _float _fAnimSpeed, _bool _bLoop,
 	m_pFSM->ChangeState((_uint)eState, _fAnimSpeed, _bLoop, _bInterpolation);
 }
 
+_bool CAwoofy::IsAnimFinished()
+{
+	return m_pModelCom->IsFinished();
+}
+
+_bool CAwoofy::IsAnimFinished(_uint iCurrentAnimIndex)
+{
+	return m_pModelCom->IsFinished(iCurrentAnimIndex);
+}
+
+void CAwoofy::Compute_Angle(_vector vOrginLook, _vector vTargetLook)
+{
+	//// 정규화 및 회전 축 계산
+	//vOrginLook.m128_f32[1] = 0.f;
+	//vTargetLook.m128_f32[1] = 0.f;
+	XMVECTOR vOriginLookNormalized = XMVector3Normalize(vOrginLook);
+	XMVECTOR vTargetLookNormalized = XMVector3Normalize(vTargetLook);
+
+	//// 회전 각도 계산
+	//m_fAngle = acos(XMVectorGetX(XMVector3Dot(vOriginLookNormalized, vTargetLookNormalized)));
+
+	m_fAngle = acos(XMVectorGetX(XMVector3Dot(vOriginLookNormalized, vTargetLookNormalized)));
+	_float fY = ::XMVectorGetY(::XMVector3Cross(vOriginLookNormalized, vTargetLookNormalized));
+	if (fY < 0)
+		m_fAngle = -m_fAngle;
+}
+
 HRESULT CAwoofy::Add_Components()
 {
 	HRESULT hr;
@@ -141,7 +163,7 @@ HRESULT CAwoofy::Add_Components()
 	CHECK_FAILED(hr);
 
 	/* For.Com_CharacterController */
-	_float4 vPos = XMVectorSet(1.f, 6.f, -180.f, 1.f);
+	_float4 vPos = XMVectorSet(10.f, 10.f, -175.f, 1.f);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
@@ -175,13 +197,18 @@ void CAwoofy::SetUp_FSM()
 {
 	// FSM 상태 초기화
 	m_pFSM = CFSM::Create();
+	m_pFSM->Add_State(AWOOFY_GROOMING, CAwoofy_Idle_State::Create());
+	m_pFSM->Add_State(AWOOFY_LOOKAROUND, CAwoofy_Idle_State::Create());
 	m_pFSM->Add_State(AWOOFY_WAIT, CAwoofy_Idle_State::Create());
-	m_pFSM->Add_State(AWOOFY_RUN, CAwoofy_Run_State::Create());
 
+	m_pFSM->Add_State(AWOOFY_RUN, CAwoofy_Run_State::Create());
+	m_pFSM->Add_State(AWOOFY_FIND, CAwoofy_Find_State::Create());
+	m_pFSM->Add_State(AWOOFY_BRAKE, CAwoofy_Brake_State::Create());
+	m_pFSM->Add_State(AWOOFY_LOOKAROUND, CAwoofy_LookAround_State::Create());
 
 	// 상태 Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};
-	FSM_Desc.iState = AWOOFY_WAIT;
+	FSM_Desc.iState = AWOOFY_GROOMING;
 	FSM_Desc.pModel = m_pModelCom;
 	m_pFSM->Initialize(&FSM_Desc);
 }

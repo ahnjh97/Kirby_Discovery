@@ -378,7 +378,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back(MODEL{ "Level1Stage1Step01", TYPE_NONANIM });
 
 		// For Awoofy
-		m_vecModelInfo.emplace_back(MODEL{ "Awoofy", TYPE_ANIM });
+		m_vecModelInfo.emplace_back(MODEL{ "Awoofy", TYPE_ANIM, 1.f, 180.f });
 	}
 	else if (eLevel == LEVEL_TOOL_MAP) 
 	{		
