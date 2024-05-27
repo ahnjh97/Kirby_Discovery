@@ -37,6 +37,7 @@ namespace Engine
         COLLI_END
     };
 
+    enum INSTANCE_PROPERTY {INSTANCE_DROP, INSTANCE_SPREAD, INSTANCE_DECELERATE, INSTANCE_END};
 }
 
 // Set_Dead() ∏≈≈©∑Œ

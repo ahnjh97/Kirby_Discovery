@@ -32,8 +32,9 @@ HRESULT CMainApp::Initialize()
 	if (FAILED(Ready_Fonts()))
 		return E_FAIL;
 
-	if (FAILED(Ready_Prototype_Component_For_Static()))
-		return E_FAIL;
+	//loader의 Loading_StaticComponentAll() 로 옮김
+	//if (FAILED(Ready_Prototype_Component_For_Static()))
+	//	return E_FAIL;
 
 	if (FAILED(Open_Level(LEVEL_LOGO)))
 		return E_FAIL;
@@ -45,9 +46,36 @@ HRESULT CMainApp::Initialize()
 
 void CMainApp::Tick(_float fTimeDelta)
 {
-
 	m_pGameInstance->Tick_Engine(fTimeDelta);
 
+	if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_LALT, KEY_PRESS))
+	{
+		if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_1, KEY_DOWN))
+		{
+			if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_GAMEPLAY))))
+				return;
+		}
+		if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_2, KEY_DOWN))
+		{
+			if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_TOOL_FX))))
+				return;
+		}
+		if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_3, KEY_DOWN))
+		{
+			if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_TOOL_UI))))
+				return;
+		}
+		if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_4, KEY_DOWN))
+		{
+			if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_TOOL_ANIM))))
+				return;
+		}
+		if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_5, KEY_DOWN))
+		{
+			if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_TOOL_MAP))))
+				return;
+		}
+	}
 }
 
 HRESULT CMainApp::Render(_float fTimeDelta)
@@ -67,8 +95,8 @@ HRESULT CMainApp::Render(_float fTimeDelta)
 HRESULT CMainApp::Ready_Fonts()
 {
 	// MakeSpriteFont "넥슨lv1고딕 Bold" /FontSize:30 /FastPack /CharacterRegion:0x0020-0x00FF /CharacterRegion:0x3131-0x3163 /CharacterRegion:0xAC00-0xD800 /DefaultCharacter:0xAC00 142.spritefont
-	//if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_Default"), TEXT("../Bin/Resources/Fonts/141ex.spriteFont"))))
-	//	return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_Default"), TEXT("../Bin/Resources/Fonts/HUD_Sub_EN10.spriteFont"))))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -83,38 +111,69 @@ HRESULT CMainApp::Open_Level(LEVEL eLevelID)
 	return	S_OK;
 }
 
-HRESULT CMainApp::Ready_Prototype_Component_For_Static()
-{
-	/* For.Prototype_Component_VIBuffer_Rect */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),
-		CVIBuffer_Rect::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
 
-	/* For.Prototype_Component_Shader_VtxPosTex */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
-		return E_FAIL;
+//HRESULT CMainApp::Ready_Prototype_Component_For_Static()
+//{
+//
+//	//HRESULT hr;
+//
+//
+//	///* For.Prototype_Component_VIBuffer_Rect */
+//	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),
+//	//	CVIBuffer_Rect::Create(m_pDevice, m_pContext))))
+//	//	return E_FAIL;
+//
+//	///* For.Prototype_Component_VIBuffer_Instance_Point */
+//	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Instance_Point"),
+//	//	CVIBuffer_Instance_Point::Create(m_pDevice, m_pContext))))
+//	//	return E_FAIL;
+//
+//	///* For.Prototype_Component_Shader_VtxPosTex */
+//	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex"),
+//	//	CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
+//	//	return E_FAIL;
+//
+//	////point instance 쉐이더
+//	///* For.Prototype_Component_Shader_VtxInstance_Point */
+//	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxInstance_Point"),
+//	//	CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxInstance_Point.hlsl"), VTXINSTANCE_POINT::Elements, VTXINSTANCE_POINT::iNumElements))))
+//	//	return E_FAIL;
+//
+//	//wstring wstrPrototypeTag = L"Prototype_Component_FXModel_";
+//
+//	//hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"Logo",
+//	//	CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Logo/Logo.png")));
+//	//CHECK_FAILED(hr);
+//
+//
+//	//이펙트 디버깅용 이펙트 텍스쳐(FX Texture)
+//	//wstrPrototypeTag = L"Prototype_Component_FXTexture_";
+//
+//	//hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"Logo",
+//	//	CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Logo/Logo.png")));
+//	//CHECK_FAILED(hr);
+//
+//	//hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"Test",
+//	//	CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effects/test.png")));
+//	//CHECK_FAILED(hr);
+//
+//	//hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"SimpleStar",
+//	//	CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effects/simpleStar.png")));
+//	//CHECK_FAILED(hr);
+//
+//	//hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"SimpleSolid",
+//	//	CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Simple/simpleSolid_%d.png"), 2));
+//	//CHECK_FAILED(hr);
+//
+//
+//
+//	//if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CTexture::Create(m_pDevice, m_pContext, wstrFullPath, iNumTextures))))
+//	//	return E_FAIL;
+//
+//	return	S_OK;
+//}
 
 
-	//이펙트 디버깅용 이펙트 텍스쳐(FX Texture)
-	wstring wstrPrototypeTag = L"Prototype_Component_FXTexture_";
-
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"Logo",
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Logo/Logo.png")))))
-		return E_FAIL;
-
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"Test2",
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Logo/Logo.png")))))
-		return E_FAIL;
-
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"Test3",
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Logo/Logo.png")))))
-		return E_FAIL;
-	//if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CTexture::Create(m_pDevice, m_pContext, wstrFullPath, iNumTextures))))
-	//	return E_FAIL;
-
-	return	S_OK;
-}
 
 /// <summary>
 /// 1. 내가 저장하고자 하는 원소들의 개수(iCnt)를 저장한다.

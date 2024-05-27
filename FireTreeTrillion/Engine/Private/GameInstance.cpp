@@ -438,7 +438,7 @@ _matrix CGameInstance::Get_Transform_Matrix(CPipeLine::TRANSFORMSTATE eState) co
 	if (nullptr == m_pPipeLine)
 		return XMMatrixIdentity();
 
-	return m_pPipeLine->Get_Transform_Matrix(eState);
+	return m_pPipeLine->Get_Transform(eState);
 }
 
 _float4x4 CGameInstance::Get_Transform_Float4x4(CPipeLine::TRANSFORMSTATE eState) const
@@ -446,7 +446,7 @@ _float4x4 CGameInstance::Get_Transform_Float4x4(CPipeLine::TRANSFORMSTATE eState
 	if (nullptr == m_pPipeLine)
 		return _float4x4();
 
-	return m_pPipeLine->Get_Transform_Float4x4(eState);
+	return m_pPipeLine->Get_Transform(eState);
 }
 
 _matrix CGameInstance::Get_Transform_Matrix_Inverse(CPipeLine::TRANSFORMSTATE eState) const
@@ -494,6 +494,11 @@ HRESULT CGameInstance::Switch_CurCamera(_int iIdx)
 void CGameInstance::Clear_Camera()
 {
 	return m_pPipeLine->Clear_Camera();
+}
+
+CCamera* CGameInstance::Get_CurCameraPtr()
+{
+	return m_pPipeLine->Get_CurCameraPtr();
 }
 
 const LIGHT_DESC * CGameInstance::Get_LightDesc(_uint iIndex)

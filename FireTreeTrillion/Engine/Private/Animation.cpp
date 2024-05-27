@@ -40,7 +40,7 @@ HRESULT CAnimation::Initialize(const vector<class CBone*>& Bones, ifstream& file
 	return S_OK;
 }
 
-void CAnimation::Invalidate_TransformationMatrix(_float fTimeDelta, const vector<CBone*>& Bones, _bool isLoop)
+void CAnimation::Invalidate_TransformationMatrix(_float fTimeDelta, const vector<CBone*>& Bones, _bool bIsLooping)
 {
 	// 선형보간 부분
 	if (m_bRatio)
@@ -72,7 +72,7 @@ void CAnimation::Invalidate_TransformationMatrix(_float fTimeDelta, const vector
 
 	if (m_fDuration <= m_fTrackPosition)
 	{
-		if (false == isLoop)
+		if (false == bIsLooping)
 		{
 			m_IsFinished = true;			
 			return;

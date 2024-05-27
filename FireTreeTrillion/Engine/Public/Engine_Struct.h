@@ -24,6 +24,53 @@ namespace Engine
 
 	}LIGHT_DESC;
 	
+	typedef struct
+	{
+
+		//수명
+		_float		fLifetime = { 1.f };
+		_float		fLifetimeRandomOffset;
+
+		_float		fStartDelay;
+		_float		fStarDelayRandomOffset;
+
+		//시작 범위(랜덤X)
+		_float3		vCenter;
+		_float3		vRange;
+
+		//회전
+		_float3		vRotation;
+		_float3		vRotationRandomOffset;
+
+		//크기
+		_float3		vScale = {1.f, 1.f, 1.f};
+		_float3		vScaleRandomOffset;
+		
+		_float3		vDir = {1.f, 1.f, 1.f};
+		_float3		vDirRandomOffset;
+
+		_float		fSpeed = {1.f};
+		_float		fSpeedRandomOffset;
+
+
+		_float3		vColor = {1.f, 1.f, 1.f};
+		_float3		vColorRandomOffset;
+
+		_float		fAlpha = {1.f};
+		_float		fAlphaRandomOffset;
+
+
+		//기준점(랜덤X)
+		_float3		vPivot;
+
+		_bool		bIsLoop;
+		_bool		bIsBillboard;
+		_bool		bIsNonLight;
+		_bool		bIsBloom;
+
+		vector<_bool> bMoveCommands;
+
+	}INSTANCE_DESC;
 
 	typedef struct 
 	{
@@ -101,7 +148,7 @@ namespace Engine
 		XMFLOAT4		vUp;
 		XMFLOAT4		vLook;
 		XMFLOAT4		vPosition;		
-		bool			isLived;
+		bool			bAlive;
 
 	}VTXMATRIX;
 

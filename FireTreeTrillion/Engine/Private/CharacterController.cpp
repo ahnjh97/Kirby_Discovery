@@ -212,7 +212,7 @@ PxVec3 CCharacterController::Compute_Slope(CTransform* pTransform)
 	PxVec3 rayOriginBack  = rayOrigin - look;
 
 	PxVec3 rayDirection = PxVec3(0.f, -1.f, 0.f);
-	_float fMaxDistance = 1.f;
+	_float fMaxDistance = 3.f;
 	
 	PxVec3	normal(0.f);
 	normal += TerrainRayCast_Collision(rayOriginRight, rayDirection, fMaxDistance);
@@ -221,6 +221,7 @@ PxVec3 CCharacterController::Compute_Slope(CTransform* pTransform)
 	normal += TerrainRayCast_Collision(rayOriginBack,  rayDirection, fMaxDistance);
 	
 	normal.normalize();
+
 	return normal;
 }
 
@@ -251,7 +252,7 @@ _float CCharacterController::Compute_Height()
 		fHeight = rayOrigin.y - hit.position.y;
 	}
 	else
-		return 10.f;
+		return 20.f;
 
 	return fHeight;
 }
@@ -277,6 +278,11 @@ PxVec3 CCharacterController::Compute_TerrainPosition()
 	}
 	else
 		return PxVec3(0.0f, 0.0f, 0.0f);
+}
+
+_vector CCharacterController::Compute_TerrainPosition_Vector()
+{
+	return XMVectorSetW(CUtils::To_Vector(Compute_TerrainPosition()), 1.f);
 }
 
 /// <summary>
