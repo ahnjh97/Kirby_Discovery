@@ -236,7 +236,7 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 		}
 
 
-		wstring wstrProtoName = { TEXT("Prototype_Gameobject_") + CUtils::StrToWstr(strname) };
+		wstring wstrProtoName = { TEXT("Prototype_GameObject_") + CUtils::StrToWstr(strname) };
 
 		if (FAILED(m_pGameInstance->Add_Prototype(wstrProtoName, CSingleEffect::Create(m_pDevice, m_pContext, FXDesc))))
 			return E_FAIL;
@@ -273,7 +273,7 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 			FXDesc.FXs.push_back(FXPair.second);
 
 
-		wstring wstrProtoName = { TEXT("Prototype_Gameobject_") + CUtils::StrToWstr(strname) };
+		wstring wstrProtoName = { TEXT("Prototype_GameObject_") + CUtils::StrToWstr(strname) };
 
 		if (FAILED(m_pGameInstance->Add_Prototype(wstrProtoName, CMultiEffect::Create(m_pDevice, m_pContext, FXDesc))))
 			return E_FAIL;

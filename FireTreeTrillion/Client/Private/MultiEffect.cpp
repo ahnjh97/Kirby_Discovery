@@ -78,29 +78,22 @@ HRESULT CMultiEffect::Initialize(void* pArg)
 	//클라에서는 정보를 받아 prototype name으로 clone
 	if (m_FXDesc.strFXName != "NONE")
 	{
-
-		if (!FXDesc.FXs.empty())
+		//정보 들어왔을 때 크자이를 같이 전달해 준다.
+		if (!m_FXDesc.FXs.empty())
 		{
-			CComponent_Manager::PROTOTYPES* pStaticProtoMap{ nullptr };
+			//CComponent_Manager::PROTOTYPES* pStaticProtoMap{ nullptr };
+			//pStaticProtoMap = m_pGameInstance->Get_ComMap(LEVEL_STATIC);
+			//if (nullptr == pStaticProtoMap)
+			//	return E_FAIL;
 
-			pStaticProtoMap = m_pGameInstance->Get_ComMap(LEVEL_STATIC);
-			if (nullptr == pStaticProtoMap)
-				return E_FAIL;
-
-			for (auto& FXName : FXDesc.FXs)
+			for (auto& FXName : m_FXDesc.FXs)
 			{
 				FX_DESC SingleFXDesc{};
 				SingleFXDesc.vInitPos = FXDesc.vInitPos;
 				SingleFXDesc.vInitRot = FXDesc.vInitRot;
 				SingleFXDesc.vInitScale = FXDesc.vInitScale;
-
-				//SingleFXDesc.bIsLoop = FXDesc.bIsLoop;
-				//SingleFXDesc.bIsBillboard = FXDesc.bIsBillboard;
-				//SingleFXDesc.bIsOrthographic = FXDesc.bIsOrthographic;
-				//SingleFXDesc.bIsColorRender = FXDesc.bIsColorRender;
-				//SingleFXDesc.bIsBloom = FXDesc.bIsBloom;
-
-
+				m_bIsColorRender = true;
+				SingleFXDesc.bIsColorRender = true;
 				wstring wstrProtoName = L"Prototype_GameObject_" + CUtils::StrToWstr(FXName);
 
 				CSingleEffect* pFX = static_cast<CSingleEffect*>(m_pGameInstance->Clone_GameObject(wstrProtoName, &SingleFXDesc));
@@ -146,7 +139,7 @@ _int CMultiEffect::Tick(_float fTimeDelta)
 	}
 
 	m_fDuration.first += fTimeDelta;
-	if (m_fDuration.second < m_fDuration.first && (*m_pCurrentLevelID) != LEVEL_TOOL_FX)
+	if (m_fDuration.second <= m_fDuration.first && (*m_pCurrentLevelID) != LEVEL_TOOL_FX)
 	{
 		m_bDead = true;
 	}
@@ -168,6 +161,8 @@ void CMultiEffect::Late_Tick(_float fTimeDelta)
 	if (0.f < m_fStartDelay)
 		return;
 
+	if (m_bDead)
+		return;
 
 	if (m_bIsColorRender)
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this);

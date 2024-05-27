@@ -32,6 +32,15 @@ HRESULT CSingleEffect::Initialize(void* pArg)
 	if (m_FXDesc.strFXName != "NONE")
 	{
 		FXDesc = m_FXDesc;
+
+		if (pArg != nullptr)
+		{
+			FXDesc.vInitPos = (*(FX_DESC*)pArg).vInitPos;
+			FXDesc.vInitRot = (*(FX_DESC*)pArg).vInitRot;
+			FXDesc.vInitScale = (*(FX_DESC*)pArg).vInitScale;
+			FXDesc.bIsColorRender = (*(FX_DESC*)pArg).bIsColorRender;
+
+		}
 	}
 	else if (pArg != nullptr)
 	{
@@ -79,6 +88,10 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 	m_vCurRot = { ToDegree(vRadianEuler.x), ToDegree(vRadianEuler.y), ToDegree(vRadianEuler.z) };
 	m_vCurScale = Calculate_CurValue_Lerp(_fTimeDelta, KF_SCALE);
 
+
+
+
+
 	m_vCurRColor = Calculate_CurValue_Lerp(_fTimeDelta, KF_RCOLOR);
 	m_vCurGColor = Calculate_CurValue_Lerp(_fTimeDelta, KF_GCOLOR);
 	m_vCurBColor = Calculate_CurValue_Lerp(_fTimeDelta, KF_BCOLOR);
@@ -88,15 +101,26 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 	_float3 vUVOffset = Calculate_CurValue_Lerp(_fTimeDelta, KF_UVOFFSET);
 	m_vCurUVOffset = { vUVOffset.x, vUVOffset.y };
 
-	m_pTransformCom->Set_Scaled(m_vInitScale * m_vCurScale);
+	//초기 회전 세팅
+	_float3 vInitRadianRot = { ToRadian(m_vInitRot.x), ToRadian(m_vInitRot.y) , ToRadian(m_vInitRot.z) };
 
-	_float3 vRadianRot = { ToRadian(m_vInitRot.x), ToRadian(m_vInitRot.y) , ToRadian(m_vInitRot.z) };
-	Quaternion vInitQuat = Quaternion::CreateFromYawPitchRoll(vRadianRot);
+
+	_float4x4 RotMat = _float4x4::CreateFromYawPitchRoll(vInitRadianRot);
+	_float3 vDir = _float3::TransformNormal(m_vCurPos, RotMat);
+
+
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, Pos(m_vInitPos) + Dir(vDir));
+
+	Quaternion vInitQuat = Quaternion::CreateFromYawPitchRoll(vInitRadianRot);
 
 	Quaternion vResultQuat = vCurQuat * vInitQuat;
 	m_pTransformCom->Turn_Absolute(vResultQuat);
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, Pos(m_vInitPos) + Dir(m_vCurPos));
+
+	m_pTransformCom->Set_Scaled(m_vInitScale * m_vCurScale);
+	//m_pTransformCom->Set_Scaled({ 1.f, 1.f, 1.f });
+
+
 
 	return OBJ_NOEVENT;
 }
