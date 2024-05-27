@@ -110,7 +110,10 @@ void CAwoofy_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 		{
 			if (6.f > XMConvertToDegrees(fAngle))
 			{
-				m_vAxisY = XMVector3Cross(XMVector3Normalize(vLook), XMVector3Normalize(vTargetLook));
+				if (XMVector3Equal(XMVector3Cross(XMVector3Normalize(vLook), XMVector3Normalize(vTargetLook)), XMVectorZero()))
+					m_vAxisY = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+				else
+					m_vAxisY = XMVector3Cross(XMVector3Normalize(vLook), XMVector3Normalize(vTargetLook));
 
 				m_fAngle = fAngle;
 
