@@ -45,6 +45,8 @@ HRESULT CBasicMap::Initialize(void* pArg)
     if (FAILED(m_pModelCom->CreateStaticActor(m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION))))
         return E_FAIL;
 
+    m_fTime = 100.f;
+    m_fNonMatchTime = 100.f;
     return S_OK;
 }
 
@@ -52,6 +54,8 @@ _int CBasicMap::Tick(_float fTimeDelta)
 {
     if (true == m_bDead)
         return OBJ_DEAD;
+
+    m_fTime += fTimeDelta;
 
     if (nullptr != m_pBlendMap)
         m_pBlendMap->Tick(fTimeDelta);
@@ -84,7 +88,15 @@ HRESULT CBasicMap::Render()
             return E_FAIL;
         if (FAILED(m_pShaderCom->Bind_RawValue("g_fSamplingFactor", &m_vecSamplingFactors[i], sizeof(_float))))
             return E_FAIL;
-
+        if (i == m_iMeshIndex) {
+            if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fTime, sizeof(_float))))
+                return E_FAIL;
+        }
+        else {
+            if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fNonMatchTime, sizeof(_float))))
+                return E_FAIL;
+        }
+        
         if(FAILED(m_pModelCom->Render(i)))
             return E_FAIL;
     }

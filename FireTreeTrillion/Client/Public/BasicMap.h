@@ -11,6 +11,11 @@ BEGIN(Client)
 
 class CBasicMap final : public CGameObject
 {
+public:
+	void Set_PassIndex(_uint iIndex, _uint iPassIndex) { m_vecPassIndices[iIndex] = iPassIndex; }
+	void Set_SamplingFactor(_uint iIndex, _float fSamplingFactor) { m_vecSamplingFactors[iIndex] = fSamplingFactor; }
+	void Reset_Time(_uint iIndex) { m_iMeshIndex = iIndex; m_fTime = 0;  }
+
 private:
 	CBasicMap(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CBasicMap(const CBasicMap& rhs);
@@ -31,6 +36,9 @@ private:
 	vector<_uint> m_vecPassIndices;
 	vector<_float> m_vecSamplingFactors;
 	CRenderer::RENDERGROUP m_eRenderGroup = { CRenderer::RENDER_NONBLEND };
+	_float m_fTime = { };
+	_uint m_iMeshIndex = {};
+	_float m_fNonMatchTime = {};
 
 private:
 	HRESULT Add_Components(const wstring& _wstrModelTag);

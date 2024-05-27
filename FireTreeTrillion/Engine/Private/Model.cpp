@@ -48,6 +48,12 @@ CBone * CModel::Get_BonePtr(const _char * pBoneName) const
 	return *iter;
 }
 
+string CModel::Get_MeshName(_uint iMeshIndex)
+{
+	string str = m_Meshes[iMeshIndex]->Get_Name();
+	return str;
+}
+
 HRESULT CModel::Initialize_Prototype(MODEL tModel)
 {
 	m_tModel = tModel;
@@ -193,25 +199,30 @@ HRESULT CModel::CreateStaticActor(_float4 vPos)
 	return S_OK;
 }
 
-_float4 CModel::Check_Meshes(const CTransform* pTransform) const
+_float4 CModel::Check_Meshes(const class CTransform* pTransform, _Out_ _int& iMeshIndex) const
 {
-	vector<_float4> vecPickPos;
-	for (auto iter : m_Meshes)
+	if (m_Meshes.empty())
+		return _float4();
+
+	vector<pair<_float4, _int>> vecPickPosAndMeshIdx;
+	for (_int i = 0; i < static_cast<_int>(m_iNumMeshes); i++)
 	{
-		_float4 vTemp = iter->Get_PickPos(pTransform);
+		_float4 vTemp = m_Meshes[i]->Get_PickPos(pTransform);
 		if (vTemp.w != 0)
-			vecPickPos.push_back(vTemp);
+			vecPickPosAndMeshIdx.emplace_back(pair<_float4, _int>(vTemp, i));
 	}
 
-	if (vecPickPos.empty())
+	if (vecPickPosAndMeshIdx.empty())
 		return _float4();
 
 	_float fShortest = { FLT_MAX };
 	_float4 fResult = {};
-	for (auto& iter : vecPickPos)
+	for (auto& iter : vecPickPosAndMeshIdx)
 	{
-		if (iter.w <= fShortest)
-			fResult = iter;
+		if (iter.first.w <= fShortest) {
+			fResult = iter.first;
+			iMeshIndex = iter.second;
+		}
 	}
 	return fResult;
 }
@@ -320,7 +331,7 @@ CComponent * CModel::Clone(void * pArg)
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Cloned : CModel"));
+		MSG_BOX(TEXT("Failed To Clone : CModel"));
 
 		Safe_Release(pInstance);
 	}

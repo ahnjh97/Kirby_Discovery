@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "MapToolHelper.h"
 #include "MapToolObject.h"
+#include "BasicMap.h"
 #include <filesystem>
 #include <iostream>
 #include "Utils.h"
@@ -13,6 +14,14 @@ static _int iLevelIndex = 0;
 static const _char* camIndices[] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
 									"11", "12", "13", "14", "15", "16", "17", "18", "19", "20" };
 static _int iCamIndex = -1;
+static _int iMapMeshIndex = -1;
+static _int iSelectedMeshIndex = -1; 
+
+static const _char* ShaderPasses[] = { "Blend X, NormalO", "Blend X, Normal X", "LightDepth", "Blend O, Normal O", "Blend O, Normal X"};
+static vector<vector<_int>> vecPassIndices;
+static vector<vector<_float>> vecSamplingFactors;
+static _int iCurMapIndex = 0;
+static _int iPickedMeshIndex = 0;
 
 CMapToolHelper::CMapToolHelper(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -35,6 +44,13 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	hr = __super::Initialize(pArg);
 	CHECK_FAILED(hr);
 
+	m_vecLevelName = { "Level_Static", "Level_Loading", "Level_Logo", // 두번째 줄에 실제 인게임 레벨 추가
+			"GamePlay",
+			"Level_Tool_UI", "Level_Tool_FX", "Level_Tool_Anim", "Level_Tool_Map", "Level_End" };
+	m_vecMapModelNames = { "Level0Stage1Step01", "Level1Stage1Step01"};
+	vecPassIndices.resize(m_vecMapModelNames.size());
+	vecSamplingFactors.resize(m_vecMapModelNames.size());
+
 	SetUpTxtVectors(TYPE_ANIM);
 	SetUpTxtVectors(TYPE_NONANIM);
 
@@ -55,6 +71,7 @@ void CMapToolHelper::Late_Tick(_float fTimeDelta)
 	Menu_Level();
 	Menu_NonAnimModels();
 	Menu_SetUpCamIndex();
+	Menu_MapShaderInfo();
 	ImGui::End();
 
 	if(m_pGameInstance->Get_KeyState(DIMKS_RBUTTON, KEY_DOWN))
@@ -111,34 +128,30 @@ void CMapToolHelper::Menu_Level()
 	ImGui::SeparatorText("Level");
 	for (_int i = LEVEL_GAMEPLAY; i < LEVEL_GAMEPLAY + 1; i++)
 	{
-		if (ImGui::RadioButton(vecLevelName[i].c_str(), iLevelIndex == i - LEVEL_GAMEPLAY))
+		if (ImGui::RadioButton(m_vecLevelName[i].c_str(), iLevelIndex == i - LEVEL_GAMEPLAY))
 			iLevelIndex = i - LEVEL_GAMEPLAY; // 선택 시 실행할 로직 추가
 	}
 	if (ImGui::Button("Save", ImVec2(100, 40)))
 		Save_Level();
 	ImGui::SameLine();
 	if (ImGui::Button("Load", ImVec2(100, 40)))
-	{
 		Load_Level();
-		return;
-	}
 }
 
 void CMapToolHelper::Menu_NonAnimModels()
 {
 	ImGui::SeparatorText("NonAnim");
 	ImGui::SetNextItemWidth(200.0f);
-	const _char** items2 = new const char* [m_vecNonAnimTxts.size()];
-	for (size_t i = 0; i < m_vecNonAnimTxts.size(); ++i)
-		items2[i] = m_vecNonAnimTxts[i].c_str();
 
-	if (ImGui::ListBox("##NonAnim", &iNonAnimIdx, items2, static_cast<int>(m_vecNonAnimTxts.size()), 9))
+	vector<const _char*> vecNonAnimModelNames(m_vecNonAnimTxts.size());
+	for (_int i = 0; i < m_vecNonAnimTxts.size(); ++i)
+		vecNonAnimModelNames[i] = m_vecNonAnimTxts[i].c_str();
+
+	if (ImGui::ListBox("##NonAnim", &iNonAnimIdx, vecNonAnimModelNames.data(), m_vecNonAnimTxts.size(), 9))
 	{
 		m_strCurModel = m_vecNonAnimTxts[iNonAnimIdx];
 		iAnimIdx = -1;
 	}
-
-	Safe_Delete_Array(items2);
 }
 
 void CMapToolHelper::Menu_SetUpCamIndex()
@@ -162,6 +175,96 @@ void CMapToolHelper::Menu_SetUpCamIndex()
 
 		ImGui::End();
 	}
+}
+
+void CMapToolHelper::Menu_MapShaderInfo()
+{
+	if (nullptr == m_pPickedObject)
+		return;
+
+	CModel* pModel = dynamic_cast<CModel*>(m_pPickedObject->Get_Component(TEXT("Com_Model")));
+	if (nullptr == pModel)
+		return;
+
+	string strModelName = pModel->Get_ModelInfo().strModelName;
+	_bool bFound = { false };
+	_int iMapIndex = { -1 };
+	for (auto& mapName : m_vecMapModelNames)
+	{
+		iMapIndex++;
+		if (strModelName == mapName) {
+			bFound = true;
+			iCurMapIndex = iMapIndex;
+			break;
+		}
+	}
+
+	if (false == bFound)
+		return;
+
+	_uint iNumMesh = pModel->Get_NumMeshes();
+
+	if (vecPassIndices[iCurMapIndex].empty())
+		vecPassIndices[iCurMapIndex].resize(iNumMesh);
+	if (vecSamplingFactors[iCurMapIndex].empty()) {
+		vecSamplingFactors[iCurMapIndex].resize(iNumMesh);
+		fill(vecSamplingFactors[iCurMapIndex].begin(), vecSamplingFactors[iCurMapIndex].end(), 1.f);
+	}
+
+	vector<string> vecMeshNames(iNumMesh);
+	for (_uint i = 0; i < iNumMesh; ++i)
+		vecMeshNames[i] = pModel->Get_MeshName(i);
+
+	vector<const _char*> vecMapMeshNames(iNumMesh);
+	for (_uint i = 0; i < iNumMesh; ++i)
+		vecMapMeshNames[i] = vecMeshNames[i].c_str();
+
+	CBasicMap* pBasicMap = dynamic_cast<CBasicMap*>(m_pPickedObject);
+	string strMapInfo = strModelName + "_ShaderInfo";
+	ImGui::Begin(strMapInfo.c_str());
+
+	ImVec2 vWindowSize = ImGui::GetWindowSize();
+	_float fButtonWidth = 100.0f;
+	_float fButtonPosX = (vWindowSize.x - fButtonWidth) * 0.5f;
+	ImGui::SetCursorPosX(fButtonPosX - fButtonWidth * 0.6f);
+	if (ImGui::Button("Save", ImVec2(100, 40)))
+		Save_MapShaderInfo();
+	ImGui::SameLine();
+	ImGui::SetCursorPosX(fButtonPosX + fButtonWidth * 0.6f);
+	if (ImGui::Button("Load", ImVec2(100, 40)))
+		Load_MapShaderInfo();
+
+	for (_uint j = 0; j < iNumMesh; j++)
+	{
+		ImGui::PushID(j);
+		if (ImGui::Selectable(vecMapMeshNames[j], iSelectedMeshIndex == j, ImGuiSelectableFlags_AllowDoubleClick, ImVec2(320,0)))
+		{
+			iSelectedMeshIndex = j;
+			pBasicMap->Reset_Time(j);
+		}
+		ImGui::SameLine();
+		
+		
+		ImGui::SetNextItemWidth(150);
+		if (ImGui::Combo("##PassIndex", &vecPassIndices[iCurMapIndex][j], ShaderPasses, IM_ARRAYSIZE(ShaderPasses)))
+		{
+			_uint iMeshIndex = j + 1;
+			if (iMeshIndex == iNumMesh)
+				iMeshIndex = 0;
+
+			pBasicMap->Set_PassIndex(iMeshIndex, static_cast<_uint>(vecPassIndices[iCurMapIndex][j]));
+		}
+
+		ImGui::SameLine();
+
+		ImGui::SetNextItemWidth(100);
+		if (ImGui::InputFloat("##SamplingFactor", &vecSamplingFactors[iCurMapIndex][j], 0.1f, 1.0f, "%.3f")) 
+		{
+			pBasicMap->Set_SamplingFactor(j, vecSamplingFactors[iCurMapIndex][j]);
+		}
+		ImGui::PopID();
+	}
+	ImGui::End();
 }
 
 void CMapToolHelper::Edit_Object()
@@ -188,10 +291,29 @@ void CMapToolHelper::OnLeftClick()
 	if (nullptr == pPickedObject)
 		return;
 
-	if (pPickedObject == m_pPickedObject)
-		return;
-
 	m_pPickedObject = pPickedObject;
+
+	CModel* pModel = dynamic_cast<CModel*>(m_pPickedObject->Get_Component(TEXT("Com_Model")));
+	string strModelName = pModel->Get_ModelInfo().strModelName;
+	_uint iNumMeshes = pModel->Get_NumMeshes();
+	_bool bIsMap = { false };
+	for (auto& mapModelName : m_vecMapModelNames)
+	{
+		if (strModelName == mapModelName) {
+			bIsMap = true;
+			break;
+		}
+	}
+
+	if (true == bIsMap)
+	{
+		CBasicMap* pBasicMap = dynamic_cast<CBasicMap*>(m_pPickedObject);
+		pBasicMap->Reset_Time(iPickedMeshIndex - 1);
+		if (iPickedMeshIndex != 0)
+			iSelectedMeshIndex = iPickedMeshIndex - 1;
+		else
+			iSelectedMeshIndex = iNumMeshes - 1;
+	}
 }
 
 void CMapToolHelper::OnRightClick()
@@ -247,7 +369,7 @@ void CMapToolHelper::Save_Level()
 	if (iLevelIndex < 0)
 		return;
 
-	string strLevel = vecLevelName[iLevelIndex + LEVEL_GAMEPLAY];
+	string strLevel = m_vecLevelName[iLevelIndex + LEVEL_GAMEPLAY];
 	string tempFileName = "temp_" + strLevel + ".txt";
 	
 	ofstream outputFile(tempFileName, ios::out | ios::binary);
@@ -344,7 +466,7 @@ void CMapToolHelper::Load_Level()
 	On_DIK_Delete();
 	m_pGameInstance->Clear_Layer(LEVEL_TOOL_MAP, TEXT("Layer_Parse"));
 
-	string strLevel = vecLevelName[iLevelIndex + LEVEL_GAMEPLAY];
+	string strLevel = m_vecLevelName[iLevelIndex + LEVEL_GAMEPLAY];
 	string strFileName = "../../../objects_txt/" + strLevel + ".txt";
 
 	fstream fileStream(strFileName, ios::in | ios::binary);
@@ -382,13 +504,124 @@ void CMapToolHelper::Load_Level()
 		if ("Camera" == strModelName || "Trigger" == strModelName)
 			tDesc.iCamIndex = iCamIndex;
 
-		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_MapToolObject"), &tDesc))) 
+		_bool bIsMap = { false };
+		for (auto& mapModelName : m_vecMapModelNames) {
+			if (strModelName == mapModelName) {
+				bIsMap = true;
+				break;
+			}
+		}
+
+		wstring wstrGameObjectTag;
+		if (true == bIsMap)
+			wstrGameObjectTag = TEXT("BasicMap");
+		else
+			wstrGameObjectTag = TEXT("MapToolObject");
+		
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
 		{
-			MSG_BOX(TEXT("Failed to Clone MapToolObject"));
+			wstring wstrErrorMsg = TEXT("Failed to Clone MapToolObject") + wstrGameObjectTag;
+			MSG_BOX(wstrErrorMsg.c_str());
 			fileStream.close();
 			return;
 		}
 	}
+
+	fileStream.close();
+}
+
+void CMapToolHelper::Save_MapShaderInfo()
+{
+	string tempFileName = "temp_" + m_vecMapModelNames[iCurMapIndex] + "_ShaderInfo.txt";
+
+	ofstream outputFile(tempFileName, ios::out | ios::binary);
+	if (!outputFile.is_open()) // 임시파일 열렸는지 확인
+	{
+		wstring wstrErrorMsg = TEXT("Failed to Open: ") + CUtils::StrToWstr(tempFileName);
+		MSG_BOX(wstrErrorMsg.c_str());
+		return;
+	}
+
+	if (vecPassIndices[iCurMapIndex].empty() || vecSamplingFactors[iCurMapIndex].empty())
+		return;
+
+	for (_int i = 0; i < vecPassIndices[iCurMapIndex].size(); i++)
+	{
+		outputFile.write(reinterpret_cast<const char*>(&vecPassIndices[iCurMapIndex][i]), sizeof(vecPassIndices[iCurMapIndex][i]));
+		outputFile.write(reinterpret_cast<const char*>(&vecSamplingFactors[iCurMapIndex][i]), sizeof(vecSamplingFactors[iCurMapIndex][i]));
+	}
+	outputFile.close();
+
+	if (!outputFile)
+	{
+		wstring wstrError = TEXT("Failed to write data to ") + CUtils::StrToWstr(tempFileName);
+		MSG_BOX(wstrError.c_str());
+		remove(tempFileName.c_str()); // 임시파일 삭제
+		return;
+	}
+
+	// 현재시간 받아오기
+	auto now = chrono::system_clock::now();
+	time_t currentTime = chrono::system_clock::to_time_t(now);
+
+	struct tm timeinfo;
+	localtime_s(&timeinfo, &currentTime);
+
+	// 현재 시간을 문자열로 변환
+	char buffer[80];
+	strftime(buffer, sizeof(buffer), "%H%M%S", &timeinfo);
+
+	string fileName_Time = "../../../objects_txt/" + string(buffer) + "_" + m_vecMapModelNames[iCurMapIndex] + "_ShaderInfo.txt";
+	string fileName = "../../../objects_txt/" + m_vecMapModelNames[iCurMapIndex] + "_ShaderInfo.txt";
+	if (rename(fileName.c_str(), fileName_Time.c_str()) != 0)
+	{
+		MSG_BOX(TEXT("Failed to rename original file."));
+		return;
+	}
+
+	if (rename(tempFileName.c_str(), fileName.c_str()) != 0) // 임시파일 이름을 level 이름으로 변경
+	{
+		wstring wstrError2 = TEXT("Failed to rename ") + CUtils::StrToWstr(tempFileName);
+		MSG_BOX(wstrError2.c_str());
+		remove(tempFileName.c_str()); // 임시파일 삭제
+		return;
+	}
+
+	wstring wstrSaveMsg = CUtils::StrToWstr(string(m_vecMapModelNames[iCurMapIndex] + "_ShaderInfo")) + TEXT(" Saved.");
+	MSG_BOX(wstrSaveMsg.c_str());
+}
+
+void CMapToolHelper::Load_MapShaderInfo()
+{
+	if (vecPassIndices.empty() || vecSamplingFactors.empty())
+		return;
+
+	string strFileName = "../../../objects_txt/" + m_vecMapModelNames[iCurMapIndex] + "_ShaderInfo.txt";
+
+	fstream fileStream(strFileName, ios::in | ios::binary);
+	if (fileStream.is_open() == false)
+	{
+		wstring wstrError = TEXT("Failed to open : ") + CUtils::StrToWstr(m_vecMapModelNames[iCurMapIndex]) + TEXT("_ShaderInfo.txt");
+		MSG_BOX(wstrError.c_str());
+		return;
+	}
+
+	_int iPassIndex{};
+	_float fSamplingFactor{};
+	_int iCount{};
+	while (!fileStream.eof())
+	{
+		fileStream.read(reinterpret_cast<char*>(&iPassIndex), sizeof(iPassIndex));
+		fileStream.read(reinterpret_cast<char*>(&fSamplingFactor), sizeof(fSamplingFactor));
+
+		if (fileStream.eof())
+			break;
+
+		vecPassIndices[iCurMapIndex][iCount] = iPassIndex;
+		vecSamplingFactors[iCurMapIndex][iCount] = fSamplingFactor;
+		iCount++;
+	}
+
 	fileStream.close();
 }
 
@@ -396,6 +629,7 @@ CGameObject* CMapToolHelper::Select_ModelByPicking(const wstring& wstrLayerTag)
 {
 	vector<CGameObject*> vecPickedObjects;
 	vector<_float4> vecPickPos;
+	vector<_int> vecMeshIndex;
 
 	list<CGameObject*>* pObjectList = m_pGameInstance->Get_List(LEVEL_TOOL_MAP, wstrLayerTag);
 	if (nullptr == pObjectList)
@@ -417,11 +651,13 @@ CGameObject* CMapToolHelper::Select_ModelByPicking(const wstring& wstrLayerTag)
 		if (nullptr == pTransform)
 			continue;
 
-		_float4 vPickPos = pModel->Check_Meshes(pTransform);
+		_int iMeshIndex{};
+		_float4 vPickPos = pModel->Check_Meshes(pTransform, iMeshIndex);
 		if (vPickPos.w != 0) // 피킹 성공
 		{
-			vecPickedObjects.push_back(object);
-			vecPickPos.push_back(vPickPos);
+			vecPickedObjects.emplace_back(object);
+			vecPickPos.emplace_back(vPickPos);
+			vecMeshIndex.emplace_back(iMeshIndex);
 		}
 	}
 
@@ -432,8 +668,10 @@ CGameObject* CMapToolHelper::Select_ModelByPicking(const wstring& wstrLayerTag)
 	CGameObject* pResult = { nullptr };
 	for (int i = 0; i < vecPickPos.size(); i++)
 	{
-		if (vecPickPos[i].w <= fShortest)
+		if (vecPickPos[i].w <= fShortest) {
 			pResult = vecPickedObjects[i];
+			iPickedMeshIndex = vecMeshIndex[i];
+		}
 	}
 
 	return pResult;
