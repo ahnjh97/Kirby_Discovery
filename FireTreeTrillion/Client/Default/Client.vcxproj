@@ -177,6 +177,8 @@
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\FXToolDirector.h" />
     <ClInclude Include="..\Public\Grid.h" />
+    <ClInclude Include="..\Public\HUD.h" />
+    <ClInclude Include="..\Public\HUD_Kirby.h" />
     <ClInclude Include="..\Public\Kirby.h" />
     <ClInclude Include="..\Public\KirbyBalloon_State.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -222,6 +224,8 @@
     <ClCompile Include="..\private\Camera_Main.cpp" />
     <ClCompile Include="..\Private\FXToolDirector.cpp" />
     <ClCompile Include="..\Private\Grid.cpp" />
+    <ClCompile Include="..\Private\HUD.cpp" />
+    <ClCompile Include="..\Private\HUD_Kirby.cpp" />
     <ClCompile Include="..\Private\Kirby.cpp" />
     <ClCompile Include="..\Private\KirbyBalloon_State.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>

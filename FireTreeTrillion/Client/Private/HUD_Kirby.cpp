@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "HUD_Status.h"
+#include "HUD_Kirby.h"
 
 CHUD_Kirby::CHUD_Kirby(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext)
 	: CUIObject{ _pDevice, _pContext }

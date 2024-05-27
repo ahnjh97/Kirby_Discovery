@@ -25,7 +25,7 @@
 
 	#pragma region UI_HUD
 	#include "HUD.h"
-	#include "HUD_Status.h"
+	#include "HUD_Kirby.h"
 	#pragma endregion
 
 #pragma endregion
