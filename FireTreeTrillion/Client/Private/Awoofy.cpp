@@ -124,6 +124,11 @@ void CAwoofy::Render_IMGUI()
 	__super::Render_IMGUI();
 }
 
+void CAwoofy::Collision_Attack()
+{
+	Change_State(CAwoofy::AWOOFY_DAMAGE, 40.f, false, true);
+}
+
 void CAwoofy::Change_State(AWOOFY_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
 {
 	m_pFSM->ChangeState((_uint)eState, _fAnimSpeed, _bLoop, _bInterpolation);

@@ -443,6 +443,7 @@ void CUserControllerHitReport::onControllerHit(const PxControllersHit& hit)
 			//handlePlayerCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[0]), static_cast<PxRigidDynamic*>(pairHeader.actors[1]));
 			break;
 		case MONSTER:
+            pActorObjectDst->Collision_Attack();
 			//MSG_BOX(TEXT("충돌 주체가 MONSTER"));
 			//handleEnemyCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[0]), static_cast<PxRigidDynamic*>(pairHeader.actors[1]));
 			break;
@@ -455,10 +456,12 @@ void CUserControllerHitReport::onControllerHit(const PxControllersHit& hit)
 		switch (objectTypeSrc)
 		{
 		case PLAYER:
+            pActorObjectSrc->Collision_Attack();
 			//MSG_BOX(TEXT("충돌 대상자가 PLAYER"));
 			//handlePlayerCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[1]), static_cast<PxRigidDynamic*>(pairHeader.actors[0]));
 			break;
 		case MONSTER:
+            pActorObjectSrc->Collision_Attack();
 			//MSG_BOX(TEXT("충돌 대상자가 MONSTER"));
 			//handleEnemyCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[1]), static_cast<PxRigidDynamic*>(pairHeader.actors[0]));
 			break;
