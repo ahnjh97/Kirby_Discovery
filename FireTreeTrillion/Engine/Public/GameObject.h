@@ -30,6 +30,8 @@ public:
 	void Set_Dead() { m_bDead = true; }
 	_bool Get_Dead() { return m_bDead; }
 
+	COLLISION_TYPE	Get_CollisionGroup() const { return m_eCollisionGroup; }
+
 	// prototypeTag
 	const wstring&		Get_PrototypeTag() { return m_wstrPrototypeTag; }
 	void				Set_PrototypeTag(wstring _wstrProtoTag) { m_wstrPrototypeTag = _wstrProtoTag; }
@@ -54,6 +56,7 @@ protected:
 	_uint*								m_pCurrentLevelID = { nullptr };
 	// prototypeName을 들고 있는다.
 	wstring								m_wstrPrototypeTag = wstring();
+	COLLISION_TYPE						m_eCollisionGroup = COLLISION_TYPE::COLLI_END;
 
 protected:
 	map<const wstring, class CComponent*>		m_Components;
