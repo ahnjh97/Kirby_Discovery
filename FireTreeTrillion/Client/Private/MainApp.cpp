@@ -46,9 +46,36 @@ HRESULT CMainApp::Initialize()
 
 void CMainApp::Tick(_float fTimeDelta)
 {
-
 	m_pGameInstance->Tick_Engine(fTimeDelta);
 
+	if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_LALT, KEY_PRESS))
+	{
+		if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_1, KEY_DOWN))
+		{
+			if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_GAMEPLAY))))
+				return;
+		}
+		if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_2, KEY_DOWN))
+		{
+			if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_TOOL_FX))))
+				return;
+		}
+		if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_3, KEY_DOWN))
+		{
+			if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_TOOL_UI))))
+				return;
+		}
+		if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_4, KEY_DOWN))
+		{
+			if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_TOOL_ANIM))))
+				return;
+		}
+		if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_5, KEY_DOWN))
+		{
+			if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_TOOL_MAP))))
+				return;
+		}
+	}
 }
 
 HRESULT CMainApp::Render(_float fTimeDelta)
