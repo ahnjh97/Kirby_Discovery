@@ -4,12 +4,12 @@
 
 
 CParticle::CParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	:CEffect{pDevice, pContext}
+	:CEffect{ pDevice, pContext }
 {
 }
 
 CParticle::CParticle(const CParticle& rhs)
-	:CEffect{rhs}
+	:CEffect{ rhs }
 {
 }
 
@@ -45,10 +45,10 @@ HRESULT CParticle::Initialize(void* pArg)
 	//기본 상태 세팅
 	INSTANCE_DESC instanceDesc{};
 
-	instanceDesc.bMoveCommands.resize(INSTANCE_END);
-	instanceDesc.bMoveCommands[INSTANCE_DROP] = true;
-	instanceDesc.bMoveCommands[INSTANCE_SPREAD] = true;
-	instanceDesc.bMoveCommands[INSTANCE_DECELERATE] = true;
+	instanceDesc.vecMoveCommands.resize(INSTANCE_END);
+	instanceDesc.vecMoveCommands[INSTANCE_DROP] = true;
+	instanceDesc.vecMoveCommands[INSTANCE_SPREAD] = true;
+	instanceDesc.vecMoveCommands[INSTANCE_DECELERATE] = true;
 
 	instanceDesc.vPivot = { 0.f, -1.f, 0.f };
 	instanceDesc.vRange = { 2.f, 2.f, 2.f };
@@ -72,6 +72,52 @@ void CParticle::Update_InstanceInfo(INSTANCE_DESC _instanceDesc)
 	m_pVIBufferCom->Update_InstanceDesc(m_InstanceDesc);
 }
 
+void CParticle::Fill_SaveData(PARTICLE_DATA* pFXData)
+{
+	pFXData->iNameStrLen = (_uint)m_strFXName.size();
+	pFXData->strName = m_strFXName;
+
+	pFXData->iBufferStrLen = (_uint)m_strBufferTag.size();
+	pFXData->strBufferName = CUtils::WstrToStr(m_strBufferTag);
+
+	pFXData->iTexStrLen = (_uint)m_strTexTag.size();
+	pFXData->strTexName = CUtils::WstrToStr(m_strTexTag);
+
+	pFXData->iMaskTexStrLen = (_uint)m_strMaskTexTag.size();
+	pFXData->strMaskTexName = CUtils::WstrToStr(m_strMaskTexTag);
+
+	pFXData->iNumInstance = m_FXDesc.iNumInstance;
+
+	pFXData->fDuration = m_fDuration.second;
+	pFXData->fLifetime = m_InstanceDesc.fLifetime;
+	pFXData->fLifetimeRandomOffset = m_InstanceDesc.fLifetimeRandomOffset;
+	pFXData->fStartDelay = m_InstanceDesc.fStartDelay;
+	pFXData->fStarDelayRandomOffset = m_InstanceDesc.fStarDelayRandomOffset;
+	pFXData->vCenter = m_InstanceDesc.vCenter;
+	pFXData->vRange = m_InstanceDesc.vRange;
+	pFXData->vRotation = m_InstanceDesc.vRotation;
+	pFXData->vRotationRandomOffset = m_InstanceDesc.vRotationRandomOffset;
+	pFXData->vScale = m_InstanceDesc.vScale;
+	pFXData->vScaleRandomOffset = m_InstanceDesc.vScaleRandomOffset;
+	pFXData->vDir = m_InstanceDesc.vDir;
+	pFXData->vDirRandomOffset = m_InstanceDesc.vDirRandomOffset;
+	pFXData->fSpeed = m_InstanceDesc.fSpeed;
+	pFXData->fSpeedRandomOffset = m_InstanceDesc.fSpeedRandomOffset;
+	pFXData->vColor = m_InstanceDesc.vColor;
+	pFXData->vColorRandomOffset = m_InstanceDesc.vColorRandomOffset;
+	pFXData->fAlpha = m_InstanceDesc.fAlpha;
+	pFXData->fAlphaRandomOffset = m_InstanceDesc.fAlphaRandomOffset;
+
+	pFXData->vPivot = m_InstanceDesc.vPivot;
+	pFXData->bIsLoop = m_InstanceDesc.bIsLoop;
+	pFXData->bIsBillboard = m_InstanceDesc.bIsBillboard;
+	pFXData->bIsColorRender = m_InstanceDesc.bIsColorRender;
+	pFXData->bIsBloom = m_InstanceDesc.bIsBloom;
+	pFXData->iMoveCommandsNum = m_InstanceDesc.vecMoveCommands.size();
+	pFXData->vecMoveCommands = m_InstanceDesc.vecMoveCommands;
+
+}
+
 _int CParticle::Tick(_float _fTimeDelta)
 {
 	if (m_bDead)
@@ -92,13 +138,13 @@ _int CParticle::Tick(_float _fTimeDelta)
 	if (m_fDuration.second <= m_fDuration.first)
 		return OBJ_NOEVENT;
 
-	//if (m_InstanceDesc.bMoveCommands[INSTANCE_DROP])
+	//if (m_InstanceDesc.vecMoveCommands[INSTANCE_DROP])
 	//	m_pVIBufferCom->Drop(_fTimeDelta);
 
-	if (m_InstanceDesc.bMoveCommands[INSTANCE_SPREAD])
+	if (m_InstanceDesc.vecMoveCommands[INSTANCE_SPREAD])
 		m_pVIBufferCom->Spread(_fTimeDelta);
 
-	if (m_InstanceDesc.bMoveCommands[INSTANCE_DECELERATE])
+	if (m_InstanceDesc.vecMoveCommands[INSTANCE_DECELERATE])
 		m_pVIBufferCom->Decelerate(_fTimeDelta);
 
 	m_pVIBufferCom->Compute_AllLifeTime(_fTimeDelta);
@@ -152,7 +198,7 @@ HRESULT CParticle::Add_Components(PARTICLE_DESC& _FXDesc)
 		InstanceDesc.iNumInstance = _FXDesc.iNumInstance;
 
 
-		hr = __super::Add_Component(LEVEL_STATIC, CUtils::StrToWstr(_FXDesc.strBufferTag), 
+		hr = __super::Add_Component(LEVEL_STATIC, CUtils::StrToWstr(_FXDesc.strBufferTag),
 			TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom, &InstanceDesc);
 		CHECK_FAILED(hr);
 
@@ -204,7 +250,7 @@ HRESULT CParticle::Bind_ShaderResources(_int iTexIdx, _int iMaskTexIdx)
 
 	hr = m_pTextureCom[TEX_DIFFUSE]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", m_iTexIdx);
 	CHECK_FAILED(hr);
-	
+
 	hr = m_pTextureCom[TEX_MASK]->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", m_iMaskTexIdx);
 	CHECK_FAILED(hr);
 

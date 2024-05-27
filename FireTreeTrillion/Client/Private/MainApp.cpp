@@ -6,6 +6,10 @@
 
 #include "tinyxml2.h"
 #include "Utils.h"
+#include "SingleEffect.h"
+#include "Particle.h"
+#include "MultiEffect.h"
+
 
 CMainApp::CMainApp()
 	: m_pGameInstance(CGameInstance::Get_Instance())
@@ -33,8 +37,8 @@ HRESULT CMainApp::Initialize()
 		return E_FAIL;
 
 	//loader¿« Loading_StaticComponentAll() ∑Œ ø≈±Ë
-	//if (FAILED(Ready_Prototype_Component_For_Static()))
-	//	return E_FAIL;
+	if (FAILED(Ready_Prototype_Component_For_Static()))
+		return E_FAIL;
 
 	if (FAILED(Open_Level(LEVEL_LOGO)))
 		return E_FAIL;
@@ -112,66 +116,106 @@ HRESULT CMainApp::Open_Level(LEVEL eLevelID)
 }
 
 
-//HRESULT CMainApp::Ready_Prototype_Component_For_Static()
-//{
-//
-//	//HRESULT hr;
-//
-//
-//	///* For.Prototype_Component_VIBuffer_Rect */
-//	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),
-//	//	CVIBuffer_Rect::Create(m_pDevice, m_pContext))))
-//	//	return E_FAIL;
-//
-//	///* For.Prototype_Component_VIBuffer_Instance_Point */
-//	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Instance_Point"),
-//	//	CVIBuffer_Instance_Point::Create(m_pDevice, m_pContext))))
-//	//	return E_FAIL;
-//
-//	///* For.Prototype_Component_Shader_VtxPosTex */
-//	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex"),
-//	//	CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
-//	//	return E_FAIL;
-//
-//	////point instance Ω¶¿Ã¥ı
-//	///* For.Prototype_Component_Shader_VtxInstance_Point */
-//	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxInstance_Point"),
-//	//	CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxInstance_Point.hlsl"), VTXINSTANCE_POINT::Elements, VTXINSTANCE_POINT::iNumElements))))
-//	//	return E_FAIL;
-//
-//	//wstring wstrPrototypeTag = L"Prototype_Component_FXModel_";
-//
-//	//hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"Logo",
-//	//	CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Logo/Logo.png")));
-//	//CHECK_FAILED(hr);
-//
-//
-//	//¿Ã∆Â∆Æ µπˆ±ÎøÎ ¿Ã∆Â∆Æ ≈ÿΩ∫√ƒ(FX Texture)
-//	//wstrPrototypeTag = L"Prototype_Component_FXTexture_";
-//
-//	//hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"Logo",
-//	//	CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Logo/Logo.png")));
-//	//CHECK_FAILED(hr);
-//
-//	//hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"Test",
-//	//	CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effects/test.png")));
-//	//CHECK_FAILED(hr);
-//
-//	//hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"SimpleStar",
-//	//	CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effects/simpleStar.png")));
-//	//CHECK_FAILED(hr);
-//
-//	//hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"SimpleSolid",
-//	//	CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Simple/simpleSolid_%d.png"), 2));
-//	//CHECK_FAILED(hr);
-//
-//
-//
-//	//if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CTexture::Create(m_pDevice, m_pContext, wstrFullPath, iNumTextures))))
-//	//	return E_FAIL;
-//
-//	return	S_OK;
-//}
+HRESULT CMainApp::Ready_Prototype_Component_For_Static()
+{
+
+	path FXPath("../Bin/Resources/Effects/Single/");
+	if (!exists(FXPath) || !is_directory(FXPath))
+	{
+		ALARM_FAIL(TEXT("∏¡«ﬂæÓ ∞Ê∑Œ æ¯¥Ÿ"));
+		return E_FAIL;
+	}
+
+	//¥‹¿œ ¿Ã∆Â∆Æ
+	for (auto& entry : directory_iterator(FXPath))
+	{
+		auto& filePath = entry.path();
+		string strname = filePath.stem().string();
+
+		if (filePath.extension() != ".bin")
+			continue;
+
+		SINGLE_FX_DATA FXData = {};
+
+		CUtils::Load_Effect(filePath, &FXData);
+
+		CSingleEffect::FX_DESC FXDesc{};
+
+		FXDesc.strFXName = FXData.strName;
+		FXDesc.strBufferTag = FXData.strBufferName;
+		FXDesc.strTexTag = FXData.strTexName;
+		FXDesc.strMaskTexTag = FXData.strMaskTexName;
+
+		FXDesc.fDuration = FXData.fDuration;
+		FXDesc.fLifetime = FXData.fLifetime;
+
+		FXDesc.iPassIdx = FXData.iPassIdx;
+		FXDesc.iTexIdx = FXData.iTexIdx;
+		FXDesc.iMaskTexIdx = FXData.iMaskTexIdx;
+
+		FXDesc.bIsLoop = FXData.bIsLoop;
+		FXDesc.bIsBillboard = FXData.bIsBillboard;
+		FXDesc.bIsOrthographic = FXData.bIsOrthographic;
+		FXDesc.bIsColorRender = FXData.bIsColorRender;
+		FXDesc.bIsBloom = FXData.bIsBloom;
+
+		FXDesc.fRimLightThreshold = FXData.fRimLightThreshold;
+
+
+		for (_uint i = 0; i < FXData.iPropertyMapNum; ++i)
+		{
+			FXDesc.Keyframes.emplace(FXData.vecKeyframeInfo[i].first, FXData.vecKeyframes[i]);
+		}
+
+
+		wstring wstrProtoName = { TEXT("Prototype_Gameobject_") + CUtils::StrToWstr(strname) };
+
+		if (FAILED(m_pGameInstance->Add_Prototype(wstrProtoName, CSingleEffect::Create(m_pDevice, m_pContext, FXDesc))))
+			return E_FAIL;
+
+		
+		//Make_Effect(FXData);
+	}
+
+
+
+	FXPath = "../Bin/Resources/Effects/Multi/";
+	if (!exists(FXPath) || !is_directory(FXPath))
+	{
+		ALARM_FAIL(TEXT("∏¡«ﬂæÓ ∞Ê∑Œ æ¯¥Ÿ"));
+		return E_FAIL;
+	}
+
+	//∫π«’ ¿Ã∆Â∆Æ
+	for (auto& entry : directory_iterator(FXPath))
+	{
+		auto& filePath = entry.path();
+		string strname = filePath.stem().string();
+
+		if (filePath.extension() != ".bin")
+			continue;
+
+		MULTI_FX_DATA FXData = {};
+		CUtils::Load_Effect(filePath, &FXData);
+		
+		CMultiEffect::MULTI_FX_DESC FXDesc = {};
+
+		FXDesc.strFXName = FXData.strName;
+		for (auto& FXPair : FXData.FXs)
+			FXDesc.FXs.push_back(FXPair.second);
+
+
+		wstring wstrProtoName = { TEXT("Prototype_Gameobject_") + CUtils::StrToWstr(strname) };
+
+		if (FAILED(m_pGameInstance->Add_Prototype(wstrProtoName, CMultiEffect::Create(m_pDevice, m_pContext, FXDesc))))
+			return E_FAIL;
+
+	}
+
+
+
+	return	S_OK;
+}
 
 
 

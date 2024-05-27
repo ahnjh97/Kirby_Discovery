@@ -39,7 +39,15 @@ public:
 	static _vector			To_Vector(const PxVec3 pxVec3);
 	static PxTransform		mat44ToTransform(const PxMat44& mat);
 		
-		
+	//이펙트 관련 함수
+	static HRESULT Load_Effect(path _FilePath, _Out_ SINGLE_FX_DATA* _pData);
+	static HRESULT Load_Effect(path _FilePath, _Out_ PARTICLE_DATA* _pData);
+	static HRESULT Load_Effect(path _FilePath, _Out_ MULTI_FX_DATA* _pData);
+
+	//이펙트 생성
+	static void Make_Effect(SINGLE_FX_DATA& _FXData);
+	static void Make_Effect(MULTI_FX_DATA& _FXData);
+	static void Make_Effect(PARTICLE_DATA& _FXData);
 };
 
 END

@@ -11,6 +11,10 @@ using namespace ImGui;
 
 class CFXToolDirector final :  public CGameObject
 {
+#ifdef _DEBUG
+	friend class CMultiEffect;
+#endif
+
 	enum SELECTED {SELECTED_SINGLE_FX, SELECTED_PARTICLE_FX, SELECTED_MULTI_FX, SELECTED_END};
 
 private:
@@ -20,11 +24,22 @@ private:
 
 public:
 	//이펙트 생성
-	void Make_Effect(SINGLE_FX_DATA& EffectData);
-	void Make_Effect(MULTI_FX_DATA& EffectData);
+	void Make_Effect(SINGLE_FX_DATA& _FXData);
+	void Make_Effect(MULTI_FX_DATA& _FXData);
+	void Make_Effect(PARTICLE_DATA& _FXData);
 
 	//이펙트 찾기
 	CEffect* Find_Effect(string strEffectName);
+	
+	HRESULT Save_AllEffect();
+	HRESULT Save_Effect(CEffect* pEffect, const wstring& strFileName);
+	HRESULT Save_Particle(CEffect* pEffect, const wstring& strFileName);
+	HRESULT Save_MultiEffect(CEffect* pEffect, const wstring& strFileName);
+
+	HRESULT Load_AllEffect();
+	HRESULT Load_Effect(path FilePath, _Out_ SINGLE_FX_DATA* pData);
+	HRESULT Load_Effect(path FilePath, _Out_ PARTICLE_DATA* pData);
+	HRESULT Load_Effect(path FilePath, _Out_ MULTI_FX_DATA* pData);
 
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
@@ -74,7 +89,7 @@ private:
 
 	//수명
 	//_float m_fDuration = { 1.f };
-	_float m_fLifeTime[2] = { 0.f, 1.f };
+	_float m_fLifetime[2] = { 0.f, 1.f };
 
 
 	//파티클용 세팅 변수
@@ -123,6 +138,10 @@ private:
 	_int	m_eKFPopupEasing = { -1 };
 	//_bool	m_bMakeKFPopupToFront = { false };
 	_bool m_bOpenKeyframeEditor = { false };
+
+	KF_PROPERTY m_eSelectedProperty = { KF_END };
+	_int		m_iSelectedKFIdx = { -1 };
+
 	void Render_FXHierarchy();
 
 	void Render_FXProperty();
@@ -132,6 +151,9 @@ private:
 	void MakeBar_ParticleFXProperty(_float _fTimeDelta, _float _fWidth);
 	void MakeBar_MultiFXProperty(_float _fTimeDelta, _float _fWidth);
 	
+	void Make_KeyframeList(_float _fWidth, _float _fInitialYPos, CEffect* _pCurFX, KF_PROPERTY _eRenderProperty);
+
+
 	void Render_MultiFXHierarchy();
 	void Render_AxisLines();
 

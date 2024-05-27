@@ -10,11 +10,11 @@ public:
 	typedef struct : public FX_DESC
 	{
 		_uint iNumInstance = { 0 };
-		_float fLifeTime = { 1.f };
-		_float fLifetimeRandomOffset = { 0.f };
+		//_float fLifeTime = { 1.f };
+		//_float fLifetimeRandomOffset = { 0.f };
 
-		_float fStartDelay = { 0.f };
-		_float fStarDelayRandomOffset = { 0.f };
+		//_float fStartDelay = { 0.f };
+		//_float fStarDelayRandomOffset = { 0.f };
 
 
 	}PARTICLE_DESC;
@@ -26,7 +26,7 @@ private:
 
 public:
 	void Update_InstanceInfo(INSTANCE_DESC _InstanceDesc);
-
+	virtual void	Fill_SaveData(_Out_ PARTICLE_DATA* pFXData) override;
 	HRESULT Initialize_Prototype();
 	HRESULT Initialize_Prototype(PARTICLE_DESC FXDesc);
 	virtual HRESULT Initialize(void* pArg) override;

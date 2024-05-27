@@ -19,6 +19,9 @@ HRESULT CSingleEffect::Initialize_Prototype()
 
 HRESULT CSingleEffect::Initialize_Prototype(FX_DESC FXDesc)
 {
+	m_strFXName = FXDesc.strFXName;
+	m_FXDesc = FXDesc;
+
 	return S_OK;
 }
 
@@ -26,7 +29,11 @@ HRESULT CSingleEffect::Initialize(void* pArg)
 {
 	FX_DESC FXDesc{};
 
-	if (pArg != nullptr)
+	if (m_FXDesc.strFXName != "NONE")
+	{
+		FXDesc = m_FXDesc;
+	}
+	else if (pArg != nullptr)
 	{
 		FXDesc = *(FX_DESC*)pArg;
 	}
@@ -72,9 +79,23 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 	m_vCurRot = { ToDegree(vRadianEuler.x), ToDegree(vRadianEuler.y), ToDegree(vRadianEuler.z) };
 	m_vCurScale = Calculate_CurValue_Lerp(_fTimeDelta, KF_SCALE);
 
+	m_vCurRColor = Calculate_CurValue_Lerp(_fTimeDelta, KF_RCOLOR);
+	m_vCurGColor = Calculate_CurValue_Lerp(_fTimeDelta, KF_GCOLOR);
+	m_vCurBColor = Calculate_CurValue_Lerp(_fTimeDelta, KF_BCOLOR);
+	m_fCurAlpha = Calculate_CurValue_Lerp(_fTimeDelta, KF_ALPHA).x;
+	m_fCurMaskThreshold = Calculate_CurValue_Lerp(_fTimeDelta, KF_MASK).x;
 
-	m_pTransformCom->Set_Scaled(m_vCurScale);
-	m_pTransformCom->Turn_Absolute(vCurQuat);
+	_float3 vUVOffset = Calculate_CurValue_Lerp(_fTimeDelta, KF_UVOFFSET);
+	m_vCurUVOffset = { vUVOffset.x, vUVOffset.y };
+
+	m_pTransformCom->Set_Scaled(m_vInitScale * m_vCurScale);
+
+	_float3 vRadianRot = { ToRadian(m_vInitRot.x), ToRadian(m_vInitRot.y) , ToRadian(m_vInitRot.z) };
+	Quaternion vInitQuat = Quaternion::CreateFromYawPitchRoll(vRadianRot);
+
+	Quaternion vResultQuat = vCurQuat * vInitQuat;
+	m_pTransformCom->Turn_Absolute(vResultQuat);
+
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, Pos(m_vInitPos) + Dir(m_vCurPos));
 
 	return OBJ_NOEVENT;

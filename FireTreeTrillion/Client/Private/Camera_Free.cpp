@@ -184,19 +184,11 @@ void CCamera_Free::Control(_float fTimeDelta)
 				m_fTrackDistance -= MouseMove * .01f;
 		}
 
-		//일단 안씀
-		//if (m_pGameInstance->Get_KeyState(DIMKS_RBUTTON, KEY_DOWN))
-		//{
-		//	m_vOrbitPos = 
-		//}
-
 		//우측 마우스 누른 채로 공전
 
 		if (m_pGameInstance->Get_KeyState(DIMKS_RBUTTON, KEY_PRESS))
 		{
 			_float3 vTargetPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Float4(CTransform::STATE_LOOK) * 10.f;
-
-
 
 
 			// 05.22) LEVEL_TOOL_UI에는 카메라 회전 기능 제외
