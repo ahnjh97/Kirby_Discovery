@@ -255,7 +255,7 @@ _float CCharacterController::Compute_Height()
 		fHeight = rayOrigin.y - hit.position.y;
 	}
 	else
-		return 10.f;
+		return 20.f;
 
 	return fHeight;
 }

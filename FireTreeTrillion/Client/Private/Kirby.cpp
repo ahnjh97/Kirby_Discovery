@@ -183,7 +183,7 @@ void CKirby::Setting_KirbyBalance()
 	m_pTransformCom->Set_State(CTransform::STATE_RIGHT, XMVector3Normalize(vEditRight));
 	m_pTransformCom->Set_State(CTransform::STATE_UP, XMVectorSet(0.f, 1.f, 0.f, 0.f));
 
-	// 카메라 기준 실시간 방향 제어
+	// 카메라 기준 실시간 방향 탐색
 	CTransform* pCameraTransform = m_pCamera->Get_TransformCom();
 	_float4 vCamRight = pCameraTransform->Get_State_Vector(CTransform::STATE_RIGHT);
 	_float4 vCamLook = XMVector3Cross(vCamRight, XMVectorSet(0.f, 1.f, 0.f, 1.f));
@@ -416,6 +416,7 @@ void CKirby::SetUp_FSM()
 	m_pFSM->Add_State(STATE_IDLELOOKAROUND, CKirbyDefault_Idle_State::Create());//
 
 	m_pFSM->Add_State(STATE_RUN, CKirbyDefault_Run_State::Create());//
+	m_pFSM->Add_State(STATE_RUNSTART, CKirbyDefault_Run_State::Create());//
 
 	m_pFSM->Add_State(STATE_JUMPL, CKirbyDefault_Jump_State::Create());//
 	m_pFSM->Add_State(STATE_JUMPR, CKirbyDefault_Jump_State::Create());//
@@ -424,6 +425,22 @@ void CKirby::SetUp_FSM()
 	m_pFSM->Add_State(STATE_LANDINGEND, CKirbyDefault_Jump_State::Create());//
 	m_pFSM->Add_State(STATE_LANDINGSMALL, CKirbyDefault_Jump_State::Create());//
 	m_pFSM->Add_State(STATE_FALL, CKirbyDefault_Jump_State::Create());//
+
+	// 가드 및 덤블링 (Default)
+	//m_pFSM->Add_State(STATE_DODGEBACK, CKirbyDefault_Guard_State::Create());
+	m_pFSM->Add_State(STATE_DODGEBACK1, CKirbyDefault_Guard_State::Create());
+	m_pFSM->Add_State(STATE_DODGEBACK2, CKirbyDefault_Guard_State::Create());
+	//m_pFSM->Add_State(STATE_DODGEFRONT, CKirbyDefault_Guard_State::Create());
+	m_pFSM->Add_State(STATE_DODGEFRONT1, CKirbyDefault_Guard_State::Create());
+	m_pFSM->Add_State(STATE_DODGEFRONT2, CKirbyDefault_Guard_State::Create());
+	//m_pFSM->Add_State(STATE_DODGELEFT, CKirbyDefault_Guard_State::Create());
+	m_pFSM->Add_State(STATE_DODGELEFT1, CKirbyDefault_Guard_State::Create());
+	m_pFSM->Add_State(STATE_DODGELEFT2, CKirbyDefault_Guard_State::Create());
+	//m_pFSM->Add_State(STATE_DODGERIGHT, CKirbyDefault_Guard_State::Create());
+	m_pFSM->Add_State(STATE_DODGERIGHT1, CKirbyDefault_Guard_State::Create());
+	m_pFSM->Add_State(STATE_DODGERIGHT2, CKirbyDefault_Guard_State::Create());
+	m_pFSM->Add_State(STATE_DODGESTART, CKirbyDefault_Guard_State::Create());
+	m_pFSM->Add_State(STATE_GUARD, CKirbyDefault_Guard_State::Create());
 
 	// Balloon
 	m_pFSM->Add_State(STATE_EAT, CKirbyBalloon_Idle_State::Create());//
