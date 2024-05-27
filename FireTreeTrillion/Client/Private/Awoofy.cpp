@@ -53,10 +53,10 @@ void CAwoofy::Late_Tick(_float fTimeDelta)
 	m_pModelCom->Play_Animation(fTimeDelta);
 
 	// 지면충돌과 경사 보정
-	// 지면의 up벡터
-	PxVec3 slope = m_pControllerCom->Compute_Slope(m_pTransformCom);
-	_vector vTerrainNormal = CUtils::To_Vector(slope);
-	Lerp_UpVector(vTerrainNormal, 10.f, fTimeDelta);
+	//// 지면의 up벡터
+	//PxVec3 slope = m_pControllerCom->Compute_Slope(m_pTransformCom);
+	//_vector vTerrainNormal = CUtils::To_Vector(slope);
+	//Lerp_UpVector(vTerrainNormal, 10.f, fTimeDelta);
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{

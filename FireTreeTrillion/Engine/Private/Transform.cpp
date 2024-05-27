@@ -163,6 +163,9 @@ void CTransform::Look_At_Rotate(_vector vAt, _float fTimeDelta)
 
 void CTransform::Look_At_Angle(_fvector vAt, _fvector vAxis, _float fRadian)
 {
+	if (XMVector3Equal(vAxis, XMVectorZero()))
+		return;
+
 	_vector vLook = vAt;
 	_matrix matRotate = XMMatrixRotationAxis(vAxis, fRadian);
 	vLook = XMVector3TransformNormal(vLook, matRotate);
