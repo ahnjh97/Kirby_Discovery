@@ -27,6 +27,9 @@ void CKirbyVacuum_Spit_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	// ¹ñ´Â´Ù.
 	if (pKirby->isAnimFinish())
 	{
+		// ÀÌÁ¦ ¸ÔÀº »óÅÂ°¡ ¾Æ´Ï¿©.
+		DESC(m_isEat) = false;
+
 		// ¾Ö´Ô ³¡³µ´Âµ¥ ¶¥À» ¹â¾ÒÀ» °æ¿ì
 		if (pController->Is_Terrain() == true)
 		{

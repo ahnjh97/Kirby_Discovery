@@ -108,7 +108,6 @@ static void Moving_Logic(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTransfo
 		Kirbydesc->m_fMoveSpeed = 10.f;
 
 	// Å¸°Ù±âÁØ
-	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 	_vector vMoveDelta = Kirbydesc->m_vTargetDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
 	pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
 }

@@ -6,6 +6,7 @@
 #include "KirbyDefault_State.h"
 #include "KirbyBalloon_State.h"
 #include "KirbyVacuum_State.h"
+#include "KirbyDamage_State.h"
 
 #include "Utils.h"
 
@@ -79,7 +80,31 @@ _int CKirby::Tick(_float fTimeDelta)
 	Key_Input(fTimeDelta);
 	if (m_pGameInstance->Get_DIKeyState(DIK_I, KEY_DOWN))
 	{
+		INFO(m_isEat) = true;
 		Change_State(STATE_EAT, 100.f, false, false, BODY_BALLOON);
+	}
+
+	if (m_pGameInstance->Get_DIKeyState(DIK_U, KEY_DOWN))
+	{
+		INFO(m_fJumpVelocity) = 11.f;
+
+		// 먹은 상태인 경우
+		if (INFO(m_isEat) == true)
+		{
+			Change_State(STATE_EATDAMAGE, 60.f, false, false, BODY_BALLOON);
+		}
+		// 나는 상태일 경우 . . .
+		else if (true == (Get_State() == STATE_FLIGHTSTART || Get_State() == STATE_FLIGHTFALL || Get_State() == STATE_FLIGHT ||
+			Get_State() == STATE_FLIGHTLANDING || Get_State() == STATE_FLIGHTLIMIT || Get_State() == STATE_FLIGHTLIMITFALL))
+		{
+			Change_State(STATE_FILGHTDAMAGE, 60.f, false, false, BODY_BALLOON);
+		}
+		// 평범한 상태에서...
+		else
+		{
+			Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
+		}
+
 	}
 
 	// 유틸업데이트가 들어가있다.
@@ -410,44 +435,45 @@ void CKirby::SetUp_FSM()
 {
 	m_pFSM = CFSM::Create();
 
+	// Damege or Death
+	m_pFSM->Add_State(STATE_DAMAGE, CKirbyDamage_State::Create());
+	m_pFSM->Add_State(STATE_EATDAMAGE, CKirbyDamage_State::Create());
+	m_pFSM->Add_State(STATE_FILGHTDAMAGE, CKirbyDamage_State::Create());
+
 	// Default
-	m_pFSM->Add_State(STATE_IDLE, CKirbyDefault_Idle_State::Create());//
-	m_pFSM->Add_State(STATE_IDLESTREACH, CKirbyDefault_Idle_State::Create());//
-	m_pFSM->Add_State(STATE_IDLELOOKAROUND, CKirbyDefault_Idle_State::Create());//
+	m_pFSM->Add_State(STATE_IDLE, CKirbyDefault_Idle_State::Create());
+	m_pFSM->Add_State(STATE_IDLESTREACH, CKirbyDefault_Idle_State::Create());
+	m_pFSM->Add_State(STATE_IDLELOOKAROUND, CKirbyDefault_Idle_State::Create());
 
-	m_pFSM->Add_State(STATE_RUN, CKirbyDefault_Run_State::Create());//
-	m_pFSM->Add_State(STATE_RUNSTART, CKirbyDefault_Run_State::Create());//
+	m_pFSM->Add_State(STATE_RUN, CKirbyDefault_Run_State::Create());
+	m_pFSM->Add_State(STATE_RUNSTART, CKirbyDefault_Run_State::Create());
 
-	m_pFSM->Add_State(STATE_JUMPL, CKirbyDefault_Jump_State::Create());//
-	m_pFSM->Add_State(STATE_JUMPR, CKirbyDefault_Jump_State::Create());//
-	m_pFSM->Add_State(STATE_JUMPEND, CKirbyDefault_Jump_State::Create());//
-	m_pFSM->Add_State(STATE_JUMPFALL, CKirbyDefault_Jump_State::Create());//
-	m_pFSM->Add_State(STATE_LANDINGEND, CKirbyDefault_Jump_State::Create());//
-	m_pFSM->Add_State(STATE_LANDINGSMALL, CKirbyDefault_Jump_State::Create());//
-	m_pFSM->Add_State(STATE_FALL, CKirbyDefault_Jump_State::Create());//
+	m_pFSM->Add_State(STATE_JUMPL, CKirbyDefault_Jump_State::Create());
+	m_pFSM->Add_State(STATE_JUMPR, CKirbyDefault_Jump_State::Create());
+	m_pFSM->Add_State(STATE_JUMPEND, CKirbyDefault_Jump_State::Create());
+	m_pFSM->Add_State(STATE_JUMPFALL, CKirbyDefault_Jump_State::Create());
+	m_pFSM->Add_State(STATE_LANDINGEND, CKirbyDefault_Jump_State::Create());
+	m_pFSM->Add_State(STATE_LANDINGSMALL, CKirbyDefault_Jump_State::Create());
+	m_pFSM->Add_State(STATE_FALL, CKirbyDefault_Jump_State::Create());
 
-	// 가드 및 덤블링 (Default)
-	//m_pFSM->Add_State(STATE_DODGEBACK, CKirbyDefault_Guard_State::Create());
+	// 가드 및 덤블링
 	m_pFSM->Add_State(STATE_DODGEBACK1, CKirbyDefault_Guard_State::Create());
 	m_pFSM->Add_State(STATE_DODGEBACK2, CKirbyDefault_Guard_State::Create());
-	//m_pFSM->Add_State(STATE_DODGEFRONT, CKirbyDefault_Guard_State::Create());
 	m_pFSM->Add_State(STATE_DODGEFRONT1, CKirbyDefault_Guard_State::Create());
 	m_pFSM->Add_State(STATE_DODGEFRONT2, CKirbyDefault_Guard_State::Create());
-	//m_pFSM->Add_State(STATE_DODGELEFT, CKirbyDefault_Guard_State::Create());
 	m_pFSM->Add_State(STATE_DODGELEFT1, CKirbyDefault_Guard_State::Create());
 	m_pFSM->Add_State(STATE_DODGELEFT2, CKirbyDefault_Guard_State::Create());
-	//m_pFSM->Add_State(STATE_DODGERIGHT, CKirbyDefault_Guard_State::Create());
 	m_pFSM->Add_State(STATE_DODGERIGHT1, CKirbyDefault_Guard_State::Create());
 	m_pFSM->Add_State(STATE_DODGERIGHT2, CKirbyDefault_Guard_State::Create());
 	m_pFSM->Add_State(STATE_DODGESTART, CKirbyDefault_Guard_State::Create());
 	m_pFSM->Add_State(STATE_GUARD, CKirbyDefault_Guard_State::Create());
 
 	// Balloon
-	m_pFSM->Add_State(STATE_EAT, CKirbyBalloon_Idle_State::Create());//
-	m_pFSM->Add_State(STATE_EATWAIT, CKirbyBalloon_Idle_State::Create());//
-	m_pFSM->Add_State(STATE_EATRUN, CKirbyBalloon_Run_State::Create());//
-	m_pFSM->Add_State(STATE_EATJUMP, CKirbyBalloon_Jump_State::Create());//
-	m_pFSM->Add_State(STATE_EATLANDING, CKirbyBalloon_Jump_State::Create());//
+	m_pFSM->Add_State(STATE_EAT, CKirbyBalloon_Idle_State::Create());
+	m_pFSM->Add_State(STATE_EATWAIT, CKirbyBalloon_Idle_State::Create());
+	m_pFSM->Add_State(STATE_EATRUN, CKirbyBalloon_Run_State::Create());
+	m_pFSM->Add_State(STATE_EATJUMP, CKirbyBalloon_Jump_State::Create());
+	m_pFSM->Add_State(STATE_EATLANDING, CKirbyBalloon_Jump_State::Create());
 
 	m_pFSM->Add_State(STATE_FLIGHTSTART, CKirbyBalloon_Fly_State::Create());
 	m_pFSM->Add_State(STATE_FLIGHTFALL, CKirbyBalloon_Fly_State::Create());

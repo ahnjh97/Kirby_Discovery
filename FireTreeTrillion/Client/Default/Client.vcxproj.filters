@@ -136,6 +136,9 @@
     <Filter Include="02.GameObjects\Effect\Particle">
       <UniqueIdentifier>{4be92289-d2a7-44f3-bc64-a36e82d6590f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Player\State\KirbyDamage_State">
+      <UniqueIdentifier>{140cffa0-c6d9-49fb-b92e-065818d0e44c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -267,6 +270,9 @@
     <ClInclude Include="..\Public\Particle.h">
       <Filter>02.GameObjects\Effect\Particle</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\KirbyDamage_State.h">
+      <Filter>02.GameObjects\Player\State\KirbyDamage_State</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -379,6 +385,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Particle.cpp">
       <Filter>02.GameObjects\Effect\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KirbyDamage_State.cpp">
+      <Filter>02.GameObjects\Player\State\KirbyDamage_State</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
