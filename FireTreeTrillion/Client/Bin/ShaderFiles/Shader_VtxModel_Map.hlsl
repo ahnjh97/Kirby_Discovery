@@ -98,7 +98,9 @@ PS_OUT PS_MAIN(PS_IN In)
 
     vector vNormalDesc = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
 
-	float3 vNormal = vNormalDesc.xyz * 2.f - 1.f;
+    float3 vNormal;
+    vNormal.xy = vNormalDesc.wy * 2.f - 1.f;
+    vNormal.z = sqrt(1 - saturate(dot(vNormal.xy, vNormal.xy)));
 
 	float3x3 WorldMatrix = float3x3(In.vTangent, In.vBinormal, In.vNormal);
 
@@ -113,7 +115,10 @@ PS_OUT PS_MAIN(PS_IN In)
     else if (g_fTime < 1.f)
         Out.vDiffuse.rgb += vDamageColor * smoothstep(0.0f, 1.0f, (1 - g_fTime));
     
-	return Out;
+    if (Out.vDiffuse.a != 0 && Out.vDiffuse.r < 0.06f)
+        discard;
+    
+    return Out;
 }
 
 PS_OUT NO_NORMALMAP_PS_MAIN(PS_IN In)
@@ -121,7 +126,7 @@ PS_OUT NO_NORMALMAP_PS_MAIN(PS_IN In)
     PS_OUT Out = (PS_OUT) 0;
 
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
-    if (0.3f >= vMtrlDiffuse.a)
+    if (0.0f >= vMtrlDiffuse.a)
         discard;
 
     Out.vDiffuse = vMtrlDiffuse;

@@ -237,28 +237,24 @@ void CMapToolHelper::Menu_MapShaderInfo()
 	for (_uint j = 0; j < iNumMesh; j++)
 	{
 		ImGui::PushID(j);
+		ImGui::Text("%d", j);
+		ImGui::SameLine(25); // 다음 메뉴 위치를 25에서부터 시작하도록 지정
 		if (ImGui::Selectable(vecMapMeshNames[j], iSelectedMeshIndex == j, ImGuiSelectableFlags_AllowDoubleClick, ImVec2(320,0)))
 		{
 			iSelectedMeshIndex = j;
 			pBasicMap->Reset_Time(j);
 		}
 		ImGui::SameLine();
-		
-		
+		//------------------------------
 		ImGui::SetNextItemWidth(150);
 		if (ImGui::Combo("##PassIndex", &vecPassIndices[iCurMapIndex][j], ShaderPasses, IM_ARRAYSIZE(ShaderPasses)))
 		{
-			_uint iMeshIndex = j + 1;
-			if (iMeshIndex == iNumMesh)
-				iMeshIndex = 0;
-
-			pBasicMap->Set_PassIndex(iMeshIndex, static_cast<_uint>(vecPassIndices[iCurMapIndex][j]));
+			pBasicMap->Set_PassIndex(j, vecPassIndices[iCurMapIndex][j]);
 		}
-
 		ImGui::SameLine();
-
+		//------------------------------
 		ImGui::SetNextItemWidth(100);
-		if (ImGui::InputFloat("##SamplingFactor", &vecSamplingFactors[iCurMapIndex][j], 0.1f, 1.0f, "%.3f")) 
+		if (ImGui::InputFloat("##SamplingFactor", &vecSamplingFactors[iCurMapIndex][j], 0.01f, 1.0f, "%.3f")) 
 		{
 			pBasicMap->Set_SamplingFactor(j, vecSamplingFactors[iCurMapIndex][j]);
 		}
@@ -308,11 +304,8 @@ void CMapToolHelper::OnLeftClick()
 	if (true == bIsMap)
 	{
 		CBasicMap* pBasicMap = dynamic_cast<CBasicMap*>(m_pPickedObject);
-		pBasicMap->Reset_Time(iPickedMeshIndex - 1);
-		if (iPickedMeshIndex != 0)
-			iSelectedMeshIndex = iPickedMeshIndex - 1;
-		else
-			iSelectedMeshIndex = iNumMeshes - 1;
+		pBasicMap->Reset_Time(iPickedMeshIndex);
+		iSelectedMeshIndex = iPickedMeshIndex;
 	}
 }
 
@@ -606,6 +599,8 @@ void CMapToolHelper::Load_MapShaderInfo()
 		return;
 	}
 
+	CBasicMap* pBasicMap = dynamic_cast<CBasicMap*>(m_pPickedObject);
+
 	_int iPassIndex{};
 	_float fSamplingFactor{};
 	_int iCount{};
@@ -619,6 +614,8 @@ void CMapToolHelper::Load_MapShaderInfo()
 
 		vecPassIndices[iCurMapIndex][iCount] = iPassIndex;
 		vecSamplingFactors[iCurMapIndex][iCount] = fSamplingFactor;
+		pBasicMap->Set_PassIndex(iCount, iPassIndex);
+		pBasicMap->Set_SamplingFactor(iCount, fSamplingFactor);
 		iCount++;
 	}
 

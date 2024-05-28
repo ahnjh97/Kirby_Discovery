@@ -47,6 +47,7 @@ HRESULT CBasicMap::Initialize(void* pArg)
 
     m_fTime = 100.f;
     m_fNonMatchTime = 100.f;
+
     return S_OK;
 }
 
@@ -84,8 +85,6 @@ HRESULT CBasicMap::Render()
             return E_FAIL;
         if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
             return E_FAIL;
-        if (FAILED(m_pShaderCom->Begin(m_vecPassIndices[i])))
-            return E_FAIL;
         if (FAILED(m_pShaderCom->Bind_RawValue("g_fSamplingFactor", &m_vecSamplingFactors[i], sizeof(_float))))
             return E_FAIL;
         if (i == m_iMeshIndex) {
@@ -96,9 +95,13 @@ HRESULT CBasicMap::Render()
             if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fNonMatchTime, sizeof(_float))))
                 return E_FAIL;
         }
-        
-        if(FAILED(m_pModelCom->Render(i)))
+
+        if (FAILED(m_pShaderCom->Begin(m_vecPassIndices[i])))
             return E_FAIL;
+                
+        if (FAILED(m_pModelCom->Render(i)))
+            return E_FAIL;
+        
     }
 
     return S_OK;
@@ -141,15 +144,24 @@ HRESULT CBasicMap::Add_BlendMap(const wstring& _wstrModelTag)
     tMapDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
     tMapDesc.wstrModelName = _wstrModelTag + TEXT("_Blend"); 
 
-    /*m_pBlendMap = m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_BasicMap"), &tMapDesc);
+    m_pBlendMap = m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_BasicMap"), &tMapDesc);
     if (nullptr == m_pBlendMap)
-        return E_FAIL;*/
+        return E_FAIL;
 
     return S_OK;
 }
 
 void CBasicMap::SetUpShaderInfo(const wstring& _wstrModelTag)
 {
+    m_vecPassIndices.resize(m_pModelCom->Get_NumMeshes());
+    m_vecSamplingFactors.resize(m_pModelCom->Get_NumMeshes());
+    fill(m_vecSamplingFactors.begin(), m_vecSamplingFactors.end(), 1.f);
+
+    if (m_eRenderGroup == CRenderer::RENDER_BLEND) {
+        fill(m_vecPassIndices.begin(), m_vecPassIndices.end(), 4);
+        return;
+    }
+
     string strFilePath = "../../../objects_txt/" + CUtils::WstrToStr(_wstrModelTag) + "_ShaderInfo.txt";
 
     fstream fileStream(strFilePath, ios::in | ios::binary);
@@ -157,15 +169,7 @@ void CBasicMap::SetUpShaderInfo(const wstring& _wstrModelTag)
     {
         wstring wstrError = TEXT("Failed to Open: ") + _wstrModelTag + L"_ShaderInfo.txt";
         //MSG_BOX(wstrError.c_str());
-        m_vecPassIndices.resize(m_pModelCom->Get_NumMeshes());
-        m_vecSamplingFactors.resize(m_pModelCom->Get_NumMeshes());
-        fill(m_vecSamplingFactors.begin(), m_vecSamplingFactors.end(), 1.f);
         return;
-    }
-    else
-    {
-        m_vecPassIndices.reserve(m_pModelCom->Get_NumMeshes());
-        m_vecSamplingFactors.reserve(m_pModelCom->Get_NumMeshes());
     }
 
     _uint iPassIndex{};
