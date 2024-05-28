@@ -367,7 +367,7 @@ void CTestModel::SetUp_FSM()
     // ป๓ลย Initialize
     CFSM::FSM_INFO		FSM_Desc = {};
     FSM_Desc.iState = m_eCurrentState = IDLE;
-    FSM_Desc.pModel = m_pModelCom;
+    FSM_Desc.pModel = &m_pModelCom;
     m_pFSM->Initialize(&FSM_Desc);
 }
 

@@ -520,21 +520,27 @@ void CKirby::SetUp_FSM()
 	m_pFSM->Add_State(STATE_SUPERINHALEWALK, CKirbyVacuum_VacuumWalk_State::Create());
 
 
-	// 상태 Initialize
-	CFSM::FSM_INFO		FSM_Default_Desc = {};
-	FSM_Default_Desc.iState = STATE_IDLE;
-	FSM_Default_Desc.pModel = m_pModelCom[BODY_DEFAULT];
-	m_pFSM->Initialize(&FSM_Default_Desc);
+	CFSM::FSM_INFO		FSM_Info_Desc = {};
+	FSM_Info_Desc.iState = STATE_IDLE;
+	FSM_Info_Desc.uNumModel = BODY_END;
+	FSM_Info_Desc.pModel = &m_pModelCom[BODY_DEFAULT];
+	m_pFSM->Initialize(&FSM_Info_Desc);
 
-	CFSM::FSM_INFO		FSM_Balloon_Desc = {};
-	FSM_Balloon_Desc.iState = STATE_IDLE;
-	FSM_Balloon_Desc.pModel = m_pModelCom[BODY_BALLOON];
-	m_pFSM->Initialize(&FSM_Balloon_Desc);
+	//// 상태 Initialize
+	//CFSM::FSM_INFO		FSM_Default_Desc = {};
+	//FSM_Default_Desc.iState = STATE_IDLE;
+	//FSM_Default_Desc.pModel = (_ubyte*)m_pModelCom[BODY_DEFAULT];
+	//m_pFSM->Initialize(&FSM_Default_Desc);
 
-	CFSM::FSM_INFO		FSM_Vacuum_Desc = {};
-	FSM_Vacuum_Desc.iState = STATE_IDLE;
-	FSM_Vacuum_Desc.pModel = m_pModelCom[BODY_VACUUM];
-	m_pFSM->Initialize(&FSM_Vacuum_Desc);
+	//CFSM::FSM_INFO		FSM_Balloon_Desc = {};
+	//FSM_Balloon_Desc.iState = STATE_IDLE;
+	//FSM_Balloon_Desc.pModel = (_ubyte*)m_pModelCom[BODY_BALLOON];
+	//m_pFSM->Initialize(&FSM_Balloon_Desc);
+
+	//CFSM::FSM_INFO		FSM_Vacuum_Desc = {};
+	//FSM_Vacuum_Desc.iState = STATE_IDLE;
+	//FSM_Vacuum_Desc.pModel = (_ubyte*)m_pModelCom[BODY_VACUUM];
+	//m_pFSM->Initialize(&FSM_Vacuum_Desc);
 }
 
 void CKirby::Change_State(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, BODYSTATE eBody)
