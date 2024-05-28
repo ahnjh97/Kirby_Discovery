@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Client_Defines.h"
-#include "Character.h"
+#include "GameObject.h"
 
 BEGIN(Engine)
 class CModel;
@@ -12,18 +12,12 @@ END
 
 BEGIN(Client)
 
-class CMonster abstract : public CCharacter
+class CCharacter abstract : public CGameObject
 {
-public:
-	struct MONSTER_DESC : public CGameObject
-	{
-
-	};
-
 protected:
-	CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CMonster(const CMonster& rhs);
-	virtual ~CMonster() = default;
+	CCharacter(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CCharacter(const CCharacter& rhs);
+	virtual ~CCharacter() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype()			override;
@@ -35,8 +29,18 @@ public:
 	virtual void	Render_IMGUI()					override;
 
 protected:
-	// JSPark : 우선 몬스터들은 modelCom을 하나만 가지고 있다는 전제하에
-	CModel*					m_pModelCom	 = { nullptr };
+	CCharacterController*	m_pControllerCom	= { nullptr };
+	CShader*				m_pShaderCom = { nullptr };
+	CFSM*					m_pFSM = { nullptr };
+
+protected:
+	// For_PhysX
+	_float			m_fOffsetTurn = { 7.f };
+	_float4			m_vOriginUp = { 0.f, 1.f, 0.f, 0.f };
+		
+protected:
+	void			SetOn_Slope(_float fTimeDelta);
+	void			Lerp_UpVector(_fvector _vTargetUp, _float _maxAngle, _float fTimeDelta);
 
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;

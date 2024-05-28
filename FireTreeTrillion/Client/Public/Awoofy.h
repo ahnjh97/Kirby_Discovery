@@ -10,7 +10,7 @@ class CShader;
 END
 
 BEGIN(Client)
-
+ 
 class CAwoofy final : public CMonster
 {
 public:
@@ -53,7 +53,7 @@ public:
 	void Compute_Angle(_vector vOrginLook, _vector vTargetLook);
 	
 private:
-	CFSM*			m_pFSM = { nullptr };
+	//CFSM*			m_pFSM = { nullptr };
 	AWOOFY_ANIM	m_eCurrentState = { AWOOFY_END };
 
 	_vector m_vOrginLook = {};

@@ -42,9 +42,11 @@ _int CAwoofy::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return OBJ_DEAD;
 
-   // FSM 제어
-	if (m_pFSM != nullptr)
-		m_pFSM->Update(this, fTimeDelta);
+	__super::Tick(fTimeDelta);
+
+    // FSM 제어
+	//if (m_pFSM != nullptr)
+	//	m_pFSM->Update(this, fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
@@ -181,8 +183,8 @@ HRESULT CAwoofy::Add_Components()
 	desc.uCollisionType = m_eCollisionGroup;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
+	CHECK_FAILED(hr);
 	m_pControllerCom->Set_Object(this);
-	//m_pControllerCom->Set_CollisionType(m_eCollisionGroup);
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 
@@ -201,6 +203,7 @@ HRESULT CAwoofy::Bind_ShaderResources()
 
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
+
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
@@ -236,7 +239,6 @@ CAwoofy* CAwoofy::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
 		MSG_BOX(TEXT("Failed To Created : CAwoofy"));
-
 		Safe_Release(pInstance);
 	}
 
@@ -260,5 +262,6 @@ void CAwoofy::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_pFSM);
+	//Safe_Release(m_pFSM);
 }
+

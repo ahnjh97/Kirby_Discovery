@@ -34,17 +34,11 @@
     <Filter Include="02.GameObjects\Camera">
       <UniqueIdentifier>{75e45318-a739-4941-9854-12d78de671fe}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Player">
-      <UniqueIdentifier>{c8892da5-ac0a-4aa1-83ab-12a0fd1f52c6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="90.Utils">
       <UniqueIdentifier>{b950e84f-4eac-4d0f-a16d-60f2661e798e}</UniqueIdentifier>
     </Filter>
     <Filter Include="90.Utils\XML">
       <UniqueIdentifier>{952aa0f7-ec8e-42be-b8ec-701d80f0ec38}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Terrain">
-      <UniqueIdentifier>{790e4632-66f1-4e07-b217-df971b3f85d4}</UniqueIdentifier>
     </Filter>
     <Filter Include="90.Utils\[Sample] ToolHelper">
       <UniqueIdentifier>{00fc3552-6b11-480d-a4c6-8313d824b770}</UniqueIdentifier>
@@ -63,9 +57,6 @@
     </Filter>
     <Filter Include="02.GameObjects\UI\FXToolDirector">
       <UniqueIdentifier>{dbb187c2-6962-4466-b912-a53c4e5d474a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Player\Kirby">
-      <UniqueIdentifier>{f4444bba-a36c-4a3e-9327-ac76df48dd6f}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Effect">
       <UniqueIdentifier>{8da63451-b1d5-46f5-a7cd-b8c224b47c48}</UniqueIdentifier>
@@ -88,21 +79,6 @@
     <Filter Include="02.GameObjects\Map">
       <UniqueIdentifier>{310eaee8-bc9b-4061-8a3b-1befbaed5f82}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Player\State">
-      <UniqueIdentifier>{79362919-e7bb-428f-ab22-a4eec033163c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\TestModel">
-      <UniqueIdentifier>{d64477a2-9b4a-44f4-9553-f9c18cf7c023}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\TestModel\State">
-      <UniqueIdentifier>{24c8db5b-dafc-44bf-806a-7f7b3d6aeed8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Monster">
-      <UniqueIdentifier>{9552f36f-64c4-4740-9177-ffb1919d1926}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Monster\Awoofy">
-      <UniqueIdentifier>{47b01008-973d-4733-a913-b503347d723c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Levels\Tool\Animation">
       <UniqueIdentifier>{a8ee8959-bf9d-4e0f-8c0f-ec7ddd715597}</UniqueIdentifier>
     </Filter>
@@ -121,29 +97,56 @@
     <Filter Include="01.Levels\Tool\Map">
       <UniqueIdentifier>{d2b0c25b-ae5a-4a5a-ab39-0b70b268bcd1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Monster\Awoofy\State">
-      <UniqueIdentifier>{db5e1ca0-0d6e-44e4-8381-86b1e15b1abc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Player\State\KirbyDefault_State">
-      <UniqueIdentifier>{15a1c888-1e49-4718-9a75-c7b945792614}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Player\State\KirbyBalloon_State">
-      <UniqueIdentifier>{77bae8eb-2969-4e98-bd3d-2e45600592c2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Player\State\KirbyVacuum_State">
-      <UniqueIdentifier>{ab3b3a78-a477-4ab7-95f4-76e0aecc47b1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Effect\Particle">
       <UniqueIdentifier>{4be92289-d2a7-44f3-bc64-a36e82d6590f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Player\State\KirbyDamage_State">
-      <UniqueIdentifier>{140cffa0-c6d9-49fb-b92e-065818d0e44c}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\UI\HUD">
       <UniqueIdentifier>{3d7f8468-85e7-4210-bad9-dd5e62bf6d75}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\UI\HUD\Kirby">
       <UniqueIdentifier>{4bba1354-4120-4080-bcfb-aeff11736c4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Character">
+      <UniqueIdentifier>{38847d14-fb30-4372-be60-a9f410277476}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Character\Player">
+      <UniqueIdentifier>{c8892da5-ac0a-4aa1-83ab-12a0fd1f52c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Character\Player\Kirby">
+      <UniqueIdentifier>{f4444bba-a36c-4a3e-9327-ac76df48dd6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Character\Player\State">
+      <UniqueIdentifier>{79362919-e7bb-428f-ab22-a4eec033163c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Character\Player\State\KirbyDefault_State">
+      <UniqueIdentifier>{15a1c888-1e49-4718-9a75-c7b945792614}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Character\Player\State\KirbyBalloon_State">
+      <UniqueIdentifier>{77bae8eb-2969-4e98-bd3d-2e45600592c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Character\Player\State\KirbyVacuum_State">
+      <UniqueIdentifier>{ab3b3a78-a477-4ab7-95f4-76e0aecc47b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Character\Player\State\KirbyDamage_State">
+      <UniqueIdentifier>{140cffa0-c6d9-49fb-b92e-065818d0e44c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Character\Monster">
+      <UniqueIdentifier>{9552f36f-64c4-4740-9177-ffb1919d1926}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Character\Monster\Awoofy">
+      <UniqueIdentifier>{47b01008-973d-4733-a913-b503347d723c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Character\Monster\Awoofy\State">
+      <UniqueIdentifier>{db5e1ca0-0d6e-44e4-8381-86b1e15b1abc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Character\TestModel">
+      <UniqueIdentifier>{d64477a2-9b4a-44f4-9553-f9c18cf7c023}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Character\TestModel\State">
+      <UniqueIdentifier>{24c8db5b-dafc-44bf-806a-7f7b3d6aeed8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Terrain">
+      <UniqueIdentifier>{790e4632-66f1-4e07-b217-df971b3f85d4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -193,7 +196,7 @@
       <Filter>02.GameObjects\Camera</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\TestTerrain.h">
-      <Filter>02.GameObjects\Terrain</Filter>
+      <Filter>02.GameObjects\Map\Terrain</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Tool_UI.h">
       <Filter>01.Levels\Tool\UI</Filter>
@@ -211,7 +214,7 @@
       <Filter>02.GameObjects\UI\FXToolDirector</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby.h">
-      <Filter>02.GameObjects\Player\Kirby</Filter>
+      <Filter>02.GameObjects\Character\Player\Kirby</Filter>
     </ClInclude>
     <ClInclude Include="..\public\SingleEffect.h">
       <Filter>02.GameObjects\Effect\Single</Filter>
@@ -220,22 +223,22 @@
       <Filter>02.GameObjects\Effect\Multi</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\TestModel.h">
-      <Filter>02.GameObjects\TestModel</Filter>
+      <Filter>02.GameObjects\Character\TestModel</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\TestModel_State.h">
-      <Filter>02.GameObjects\TestModel\State</Filter>
+      <Filter>02.GameObjects\Character\TestModel\State</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Monster.h">
-      <Filter>02.GameObjects\Monster</Filter>
+      <Filter>02.GameObjects\Character\Monster</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Awoofy.h">
-      <Filter>02.GameObjects\Monster\Awoofy</Filter>
+      <Filter>02.GameObjects\Character\Monster\Awoofy</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\ToolHelper.h">
       <Filter>90.Utils\[Sample] ToolHelper</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Grid.h">
-      <Filter>02.GameObjects\Terrain</Filter>
+      <Filter>02.GameObjects\Map\Terrain</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\MapToolHelper.h">
       <Filter>02.GameObjects\Map\MapToolHelper</Filter>
@@ -256,34 +259,37 @@
       <Filter>01.Levels\Tool\Animation</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Awoofy_State.h">
-      <Filter>02.GameObjects\Monster\Awoofy\State</Filter>
+      <Filter>02.GameObjects\Character\Monster\Awoofy\State</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\KirbyDefault_State.h">
-      <Filter>02.GameObjects\Player\State\KirbyDefault_State</Filter>
+      <Filter>02.GameObjects\Character\Player\State\KirbyDefault_State</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\KirbyBalloon_State.h">
-      <Filter>02.GameObjects\Player\State\KirbyBalloon_State</Filter>
+      <Filter>02.GameObjects\Character\Player\State\KirbyBalloon_State</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_State_Function.h">
-      <Filter>02.GameObjects\Player\State</Filter>
+      <Filter>02.GameObjects\Character\Player\State</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Enums.h">
-      <Filter>02.GameObjects\Player</Filter>
+      <Filter>02.GameObjects\Character\Player</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\KirbyVacuum_State.h">
-      <Filter>02.GameObjects\Player\State\KirbyVacuum_State</Filter>
+      <Filter>02.GameObjects\Character\Player\State\KirbyVacuum_State</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Particle.h">
       <Filter>02.GameObjects\Effect\Particle</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\KirbyDamage_State.h">
-      <Filter>02.GameObjects\Player\State\KirbyDamage_State</Filter>
+      <Filter>02.GameObjects\Character\Player\State\KirbyDamage_State</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\HUD.h">
       <Filter>02.GameObjects\UI\HUD</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\HUD_Kirby.h">
       <Filter>02.GameObjects\UI\HUD\Kirby</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Character.h">
+      <Filter>02.GameObjects\Character</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -321,7 +327,7 @@
       <Filter>02.GameObjects\Camera</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\TestTerrain.cpp">
-      <Filter>02.GameObjects\Terrain</Filter>
+      <Filter>02.GameObjects\Map\Terrain</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\FXToolDirector.cpp">
       <Filter>02.GameObjects\UI\FXToolDirector</Filter>
@@ -339,7 +345,7 @@
       <Filter>02.GameObjects\UI\[Sample] TestUI</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby.cpp">
-      <Filter>02.GameObjects\Player\Kirby</Filter>
+      <Filter>02.GameObjects\Character\Player\Kirby</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\MultiEffect.cpp">
       <Filter>02.GameObjects\Effect\Multi</Filter>
@@ -348,22 +354,22 @@
       <Filter>02.GameObjects\Effect\Single</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\TestModel.cpp">
-      <Filter>02.GameObjects\TestModel</Filter>
+      <Filter>02.GameObjects\Character\TestModel</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\TestModel_State.cpp">
-      <Filter>02.GameObjects\TestModel\State</Filter>
+      <Filter>02.GameObjects\Character\TestModel\State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Monster.cpp">
-      <Filter>02.GameObjects\Monster</Filter>
+      <Filter>02.GameObjects\Character\Monster</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Awoofy.cpp">
-      <Filter>02.GameObjects\Monster\Awoofy</Filter>
+      <Filter>02.GameObjects\Character\Monster\Awoofy</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\ToolHelper.cpp">
       <Filter>90.Utils\[Sample] ToolHelper</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Grid.cpp">
-      <Filter>02.GameObjects\Terrain</Filter>
+      <Filter>02.GameObjects\Map\Terrain</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\MapToolHelper.cpp">
       <Filter>02.GameObjects\Map\MapToolHelper</Filter>
@@ -381,16 +387,16 @@
       <Filter>01.Levels\Tool\Map</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Awoofy_State.cpp">
-      <Filter>02.GameObjects\Monster\Awoofy\State</Filter>
+      <Filter>02.GameObjects\Character\Monster\Awoofy\State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\KirbyDefault_State.cpp">
-      <Filter>02.GameObjects\Player\State\KirbyDefault_State</Filter>
+      <Filter>02.GameObjects\Character\Player\State\KirbyDefault_State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\KirbyBalloon_State.cpp">
-      <Filter>02.GameObjects\Player\State\KirbyBalloon_State</Filter>
+      <Filter>02.GameObjects\Character\Player\State\KirbyBalloon_State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\KirbyVacuum_State.cpp">
-      <Filter>02.GameObjects\Player\State\KirbyVacuum_State</Filter>
+      <Filter>02.GameObjects\Character\Player\State\KirbyVacuum_State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Tool_Anim.cpp">
       <Filter>01.Levels\Tool\Animation</Filter>
@@ -399,13 +405,16 @@
       <Filter>02.GameObjects\Effect\Particle</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\KirbyDamage_State.cpp">
-      <Filter>02.GameObjects\Player\State\KirbyDamage_State</Filter>
+      <Filter>02.GameObjects\Character\Player\State\KirbyDamage_State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\HUD.cpp">
       <Filter>02.GameObjects\UI\HUD</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\HUD_Kirby.cpp">
       <Filter>02.GameObjects\UI\HUD\Kirby</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Character.cpp">
+      <Filter>02.GameObjects\Character</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
