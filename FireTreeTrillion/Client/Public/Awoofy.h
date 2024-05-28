@@ -44,7 +44,7 @@ public:
 	virtual HRESULT Render() override;
 	virtual HRESULT Render_LightDepth() override;
 	virtual void	Render_IMGUI() override;
-	virtual void	Collision_Attack() override;
+	virtual void	Collision_Attack(CGameObject* pOtherObj) override;
 
 public:
 	void Change_State(AWOOFY_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);

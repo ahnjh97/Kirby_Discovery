@@ -19,19 +19,11 @@ HRESULT CCharacterController::Initialize(void* pArg)
 {
 	CONTROLLER_DESC* pDes = (CONTROLLER_DESC*)pArg;
 	_float4 vInitialPos = pDes->vInitialPos;
+	m_tControllerDesc.position = PxExtendedVec3(vInitialPos.x, vInitialPos.y, vInitialPos.z);
 	m_eCollisionType = (COLLISION_TYPE)pDes->uCollisionType;
 	__super::Initialize(pArg);
 
-	PxMaterial* material = m_pGameInstance->Get_Physics()->createMaterial(0.5f, 0.5f, 0.5f);
-	m_tControllerDesc.material = material;
-	m_tControllerDesc.upDirection = { 0.f, 1.f, 0.f };
-	m_tControllerDesc.density = 100.f;
-	m_tControllerDesc.position = PxExtendedVec3(vInitialPos.x, vInitialPos.y, vInitialPos.z);
-	m_tControllerDesc.userData = this;//m_pObject;
-	m_ControllerFilters.mFilterData = &m_tFilterDesc;
-
 	Set_DefaultValue();
-
 	Create_Controller();
 
 	return S_OK;
@@ -44,29 +36,34 @@ void CCharacterController::Start_Tick()
 		Set_FootPosition(m_pObject->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION));
 }
 
+/// <summary> 속성값을 변화시키고 다시 컨트롤러를 생성한다. </summary>
 void CCharacterController::Render_IMGUI()
 {
 	__super::Render_IMGUI();
 
-	ImGui::Text("FallVelocity : %.2f", (_float)m_fFallVelocity);
+	ImGui::Text("FallVelocity : %.2f", (_float)m_fFallVelocity); ImGui::NewLine();
 
-	ImGui::InputFloat("Radius", &m_tControllerDesc.radius);
-	ImGui::InputFloat("height", &m_tControllerDesc.height);
-	ImGui::InputFloat("contactOffset", &m_tControllerDesc.contactOffset);
-	ImGui::InputFloat("density", &m_tControllerDesc.density);
-	ImGui::InputFloat("slopeLimit", &m_fSlopeLimitDegree);
-	m_tControllerDesc.slopeLimit = cosf(XMConvertToRadians(m_fSlopeLimitDegree));
-	ImGui::InputFloat("stepOffset", &m_tControllerDesc.stepOffset);
-	ImGui::InputFloat("maxJumpHeight", &m_tControllerDesc.maxJumpHeight);
-
-
-	//ReCreate this Controller (for change shape or scale)
 	if (ImGui::Button("Update Changes"))
 	{
 		Create_Controller();
 		if (!Is_Activated())
 			m_pGameInstance->AddActor(*m_pController->getActor());
 	}
+
+	// 캡슐(컨트롤러)의 질량
+	ImGui::InputFloat("density", &m_tControllerDesc.density);
+	// 캐릭터가 올라갈 수 있는 최대 계단 높이
+	ImGui::InputFloat("stepOffset", &m_tControllerDesc.stepOffset);
+	// Material
+	ImGui::InputFloat3("Material", (_float*)&m_vMaterialOptions);
+	// 캡슐의 반지름
+	ImGui::InputFloat("Radius", &m_tControllerDesc.radius);
+	// 캡슐의 높이
+	ImGui::InputFloat("height", &m_tControllerDesc.height);
+	// 경사도
+	ImGui::InputFloat("slopeLimit", &m_fSlopeLimitDegree);
+	m_tControllerDesc.slopeLimit = cosf(XMConvertToRadians(m_fSlopeLimitDegree));
+
 }
 
 void CCharacterController::Set_Position(const _float4& vPos)
@@ -371,14 +368,14 @@ void CCharacterController::Create_Controller()
 	m_tControllerDesc.behaviorCallback = m_pControllerCallBack;
 	m_pControllerHitReport = new CUserControllerHitReport();
 	m_tControllerDesc.reportCallback = m_pControllerHitReport;
-
+	m_ControllerMaterial = m_pGameInstance->Get_Physics()->createMaterial(m_vMaterialOptions.x, m_vMaterialOptions.y, m_vMaterialOptions.z);
+	m_tControllerDesc.material = m_ControllerMaterial;
 	m_pController = m_pGameInstance->Get_ControllerManager()->createController(m_tControllerDesc);
 
 	PxShape* shape;
 	m_pController->getActor()->getShapes(&shape, 1);
-	shape->setSimulationFilterData(physx::PxFilterData{ static_cast<physx::PxU32>(COLLISION_TYPE(m_eCollisionType)), 0, 0, 0 });
+	shape->setSimulationFilterData(physx::PxFilterData{ static_cast<physx::PxU32>(m_eCollisionType), 0, 0, 0 });
 	//shape->setQueryFilterData(physx::PxFilterData{static_cast<physx::PxU32>(1), 0, 0, 0});
-
 	//m_pGameInstance->RemoveActor(*m_pController->getActor());
 
 	if (m_pObject != nullptr)
@@ -387,7 +384,7 @@ void CCharacterController::Create_Controller()
 
 void CCharacterController::Release_Controller()
 {
-	//if (nullptr == m_pGameInstance->Get_Scene()) return;
+	if (nullptr == m_pGameInstance->Get_Scene()) return;
 
 	if (nullptr != m_pController)
 	{
@@ -396,26 +393,48 @@ void CCharacterController::Release_Controller()
 
 		if (m_pController->getActor()->getScene())
 			m_pGameInstance->RemoveActor(*m_pController->getActor());
+		
 		m_pController->release();
+		m_ControllerMaterial->release();
 	}
 }
 
+/// <summary> 캐릭터 컨트롤러를 생성하기 위해 필요한 구조체를 세팅한다. </summary>
 void CCharacterController::Set_DefaultValue()
 {
-	m_tControllerDesc.stepOffset = 0.f;
+	#pragma region 변하지 않을 값들 (건드릴 경우 피쌤과 논의 요망)
+	// 컨트롤러 볼륨 크기 
 	m_tControllerDesc.volumeGrowth = 1.0f;
+	// 컨트롤러의 UP-VECTOR
 	m_tControllerDesc.upDirection = PxVec3(0, 1, 0);
-	PxMaterial* material = m_pGameInstance->Get_Material();
-	material = m_pGameInstance->Get_Physics()->createMaterial(0.5f, 0.5f, 0.5f);
-	m_tControllerDesc.material = material;
+	// 충돌판정 거리
+	m_tControllerDesc.contactOffset = 0.01f;
+	// 사용자 정의 데이터
+	m_tControllerDesc.userData = this;
+	// ControllerFilters
+	m_ControllerFilters.mFilterData = &m_tFilterDesc;
+	#pragma endregion
 
-	m_tControllerDesc.radius = 0.5f; // 반지름
-	m_tControllerDesc.height = 1.f;	 // 높이
-	m_tControllerDesc.contactOffset = 0.1f;
+	// 컨트롤러의 질량(밀도)
+	m_tControllerDesc.density = 100.f;
+
+	// 캐릭터가 올라갈 수 있는 최대 계단의 높이
+	m_tControllerDesc.stepOffset = 0.f;
+
+	// 캐릭터와 환경 간의 물리적 상호작용을 위해 사용되는 물질
+	//PxMaterial* material = m_pGameInstance->Get_Material();
+	m_ControllerMaterial = m_pGameInstance->Get_Physics()->createMaterial(0.5f, 0.5f, 0.5f);
+	m_tControllerDesc.material = m_ControllerMaterial;
+
+	// 캐릭터컨트롤러(캡슐)의 가로 반지름
+	m_tControllerDesc.radius = 0.5f;
+
+	// 캐릭터컨트롤러(캡슐)의 높이
+	m_tControllerDesc.height = 1.f;
+	
+	// 캐릭터가 오를 수 있는 최대 경사도
 	m_fSlopeLimitDegree = 45.f;     
 	m_tControllerDesc.slopeLimit = cosf(XMConvertToRadians(m_fSlopeLimitDegree));
-	m_tControllerDesc.stepOffset = 0.1f;
-	m_tControllerDesc.maxJumpHeight = 3.f;
 }
 
 CCharacterController* CCharacterController::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

@@ -134,6 +134,7 @@ public: /* For.PhysX */
 
 	void		Test();
 	_float4x4	Update(_fmatrix matrix);
+	_uint		Get_CollisionContent(COLLISION_TYPE eMeType, COLLISION_TYPE eOtherType);
 
 #ifdef _DEBUG
 	HRESULT Ready_RTVDebug(const wstring& strRenderTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY);
@@ -189,7 +190,7 @@ private:
 	class CPhysX*					m_pPhysx = { nullptr };
 	class CPicking*					m_pPicking = { nullptr };
 
-	_uint	m_iCurrentLevelID = { 0 };
+	_uint	m_iCurrentLevelID		= { 0 };
 
 public:		
 	static void Release_Engine();

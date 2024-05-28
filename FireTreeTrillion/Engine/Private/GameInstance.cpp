@@ -104,8 +104,11 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 	if (nullptr == m_pComponent_Manager)
 		return E_FAIL;
 
+
+
 	return S_OK;
 }
+
 
 void CGameInstance::Tick_Engine(_float fTimeDelta)
 {
@@ -675,6 +678,11 @@ void CGameInstance::Test()
 _float4x4 CGameInstance::Update(_fmatrix matrix)
 {
 	return m_pPhysx->Update(matrix);
+}
+
+_uint CGameInstance::Get_CollisionContent(COLLISION_TYPE eMeType, COLLISION_TYPE eOtherType)
+{
+	return m_pPhysx->Get_CollisionContent(eMeType, eOtherType);
 }
 
 #ifdef _DEBUG

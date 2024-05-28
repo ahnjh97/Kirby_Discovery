@@ -104,7 +104,7 @@ void CCamera_Free::Render_IMGUI()
 	ImGui::SameLine();
 	ImGui::Text("Z: %.2f", vPosition.z);
 
-	ImGui::SliderFloat("CameraFree Speed", &fSpeed, 0.f, 50.f);
+	ImGui::SliderFloat("CameraFree Speed", &fSpeed, 0.f, 200.f);
 
 	ImGui::Checkbox(u8"타겟 따라가기", &m_bTrackTarget);
 

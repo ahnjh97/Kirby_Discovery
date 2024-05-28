@@ -5,12 +5,10 @@
 //#pragma warning (disable : 4819)
 //#pragma warning (disable : 4101)
 
-
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include <d3dcompiler.h>
 #include <DirectXCollision.h>
-
 
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
@@ -24,18 +22,26 @@ namespace Engine
 	enum EASING { EASE_LINEAR, EASE_IN, EASE_IN_FAST, EASE_OUT, EASE_OUT_FAST, EASE_INOUT, EASE_INOUT_FAST, EASE_END };
     enum KF_PROPERTY {KF_POS, KF_ROT, KF_SCALE, KF_RCOLOR, KF_GCOLOR, KF_BCOLOR, KF_ALPHA, KF_MASK, KF_UVOFFSET, KF_END};
     enum RIGID_SHAPE { RIGID_BOX, RIGID_SPHERE, RIGID_CAPSULE, RIGID_END };
+    enum INSTANCE_PROPERTY {INSTANCE_DROP, INSTANCE_SPREAD, INSTANCE_DECELERATE, INSTANCE_END};
 
-    // COLLISION enum을 enum class로 만들 것인지 고민중
-    //enum class COLLISION { COLLISION_PLAYER, };
-    enum COLLISION_TYPE {
-        PLAYER = 0,
+    enum COLLISION_TYPE
+    { 
+        PLAYER = 0, PLAYER_EFFECT,
         MONSTER,
-        FRIEND,
+        INTERACT,
+        ITEM,
         TRIGGER,
-        COLLI_END
+        COLLISION_END
     };
 
-    enum INSTANCE_PROPERTY {INSTANCE_DROP, INSTANCE_SPREAD, INSTANCE_DECELERATE, INSTANCE_END};
+    enum COLLISION_CONTENT
+    {
+        CONTENT_ATTACK,		// 공격 - 피격 처리
+        CONTENT_INTERACT,	// 상호작용하는 객체끼리의 충돌
+        CONTENT_ACQUIRE,	// 만나면 ObjDest가 삭제되는 충돌액션
+        CONTENT_NONEVENT,	// 공통적인 충돌처리가 없는 경우
+        CONTENT_END
+    };
 }
 
 // Set_Dead() 매크로
@@ -48,7 +54,6 @@ namespace Engine
 #include "imgui_impl_win32.h"
 #include "ImGuiFileDialog.h"
 #include "ImGuiFileDialogConfig.h"
-
 
 // SHADER - EFFECT
 #include "Effects11/d3dx11effect.h"
@@ -69,7 +74,6 @@ namespace Engine
 
 // SimpleMath
 #include <DirectXTK/SimpleMath.h>
-
 
 // RapidJSON
 #include "rapidjson/document.h"

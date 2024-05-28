@@ -15,6 +15,8 @@ CAwoofy::CAwoofy(const CAwoofy& rhs)
 
 HRESULT CAwoofy::Initialize_Prototype()
 {
+	m_eCollisionGroup = MONSTER;
+
 	return S_OK;
 }
 
@@ -28,7 +30,6 @@ HRESULT CAwoofy::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
-	m_eCollisionGroup = MONSTER;
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
@@ -126,7 +127,7 @@ void CAwoofy::Render_IMGUI()
 	__super::Render_IMGUI();
 }
 
-void CAwoofy::Collision_Attack()
+void CAwoofy::Collision_Attack(CGameObject* pOtherObj)
 {
 	Change_State(CAwoofy::AWOOFY_DAMAGE, 40.f, false, true);
 }
@@ -155,8 +156,6 @@ void CAwoofy::Compute_Angle(_vector vOrginLook, _vector vTargetLook)
 	XMVECTOR vTargetLookNormalized = XMVector3Normalize(vTargetLook);
 
 	//// 회전 각도 계산
-	//m_fAngle = acos(XMVectorGetX(XMVector3Dot(vOriginLookNormalized, vTargetLookNormalized)));
-
 	m_fAngle = acos(XMVectorGetX(XMVector3Dot(vOriginLookNormalized, vTargetLookNormalized)));
 	_float fY = ::XMVectorGetY(::XMVector3Cross(vOriginLookNormalized, vTargetLookNormalized));
 	if (fY < 0)

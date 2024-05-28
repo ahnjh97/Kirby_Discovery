@@ -23,6 +23,8 @@ CKirby::CKirby(const CKirby& rhs)
 
 HRESULT CKirby::Initialize_Prototype()
 {
+	m_eCollisionGroup = PLAYER;
+
 	return S_OK;
 }
 
@@ -38,7 +40,6 @@ HRESULT CKirby::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
-	m_eCollisionGroup = PLAYER;
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
@@ -86,27 +87,26 @@ _int CKirby::Tick(_float fTimeDelta)
 		Change_State(STATE_EAT, 100.f, false, false, BODY_BALLOON);
 	}
 
-	if (m_pGameInstance->Get_DIKeyState(DIK_U, KEY_DOWN))
-	{
-		INFO(m_fJumpVelocity) = 11.f;
-
-		// 먹은 상태인 경우
-		if (INFO(m_isEat) == true)
-		{
-			Change_State(STATE_EATDAMAGE, 60.f, false, false, BODY_BALLOON);
-		}
-		// 나는 상태일 경우 . . .
-		else if (true == (Get_State() == STATE_FLIGHTSTART || Get_State() == STATE_FLIGHTFALL || Get_State() == STATE_FLIGHT ||
-			Get_State() == STATE_FLIGHTLANDING || Get_State() == STATE_FLIGHTLIMIT || Get_State() == STATE_FLIGHTLIMITFALL))
-		{
-			Change_State(STATE_FILGHTDAMAGE, 60.f, false, false, BODY_BALLOON);
-		}
-		// 평범한 상태에서...
-		else
-		{
-			Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
-		}
-	}
+	//if (m_pGameInstance->Get_DIKeyState(DIK_U, KEY_DOWN))
+	//{
+	//	INFO(m_fJumpVelocity) = 11.f;
+	//	// 먹은 상태인 경우
+	//	if (INFO(m_isEat) == true)
+	//	{
+	//		Change_State(STATE_EATDAMAGE, 60.f, false, false, BODY_BALLOON);
+	//	}
+	//	// 나는 상태일 경우 . . .
+	//	else if (true == (Get_State() == STATE_FLIGHTSTART || Get_State() == STATE_FLIGHTFALL || Get_State() == STATE_FLIGHT ||
+	//		Get_State() == STATE_FLIGHTLANDING || Get_State() == STATE_FLIGHTLIMIT || Get_State() == STATE_FLIGHTLIMITFALL))
+	//	{
+	//		Change_State(STATE_FILGHTDAMAGE, 60.f, false, false, BODY_BALLOON);
+	//	}
+	//	// 평범한 상태에서...
+	//	else
+	//	{
+	//		Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
+	//	}
+	//}
 
 	// 유틸업데이트가 들어가있다.
 	//****** FSM Update, Shadow ChaseUpdate ******//
@@ -186,7 +186,7 @@ void CKirby::Render_IMGUI()
 	__super::Render_IMGUI();
 }
 
-void CKirby::Collision_Attack()
+void CKirby::Collision_Attack(CGameObject* pOtherObj)
 {
 	INFO(m_fJumpVelocity) = 11.f;
 

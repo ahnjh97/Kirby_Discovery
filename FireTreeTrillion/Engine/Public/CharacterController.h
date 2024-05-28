@@ -76,15 +76,19 @@ protected:
 
 protected:
 	class CGameObject*					m_pObject = nullptr;
-	COLLISION_TYPE						m_eCollisionType = COLLISION_TYPE::COLLI_END;
+	COLLISION_TYPE						m_eCollisionType = COLLISION_END;
 
 	physx::PxController*				m_pController = nullptr;
+	physx::PxMaterial*					m_ControllerMaterial = nullptr;
+	_float3								m_vMaterialOptions = _float3(0.5f, 0.5f, 0.5f);
+
 	physx::PxCapsuleControllerDesc		m_tControllerDesc;
 	physx::PxControllerFilters			m_ControllerFilters;
 	physx::PxFilterData					m_tFilterDesc;
+	
 	class CControllerBehaviorCallback*	m_pControllerCallBack = nullptr;
 	class CUserControllerHitReport*		m_pControllerHitReport = nullptr;
-
+	
 	_float								m_fSlopeLimitDegree = 45.f;
 	_float								m_fFallVelocity = { 0.f };
 	_float								m_fFallAcceleration = { 0.f };

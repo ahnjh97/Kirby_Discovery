@@ -80,7 +80,7 @@ public:
 	virtual HRESULT Render() override;
 	virtual HRESULT Render_LightDepth() override;
 	virtual void	Render_IMGUI() override;
-	virtual void	Collision_Attack() override;
+	virtual void	Collision_Attack(CGameObject* pOtherObj) override;
 
 	KIRBY_INFODESC* Get_KirbyInfo() { return &m_tKirbyInfo; }
 	void			Set_KirbyInfo(KIRBY_INFODESC _tInfo) {
