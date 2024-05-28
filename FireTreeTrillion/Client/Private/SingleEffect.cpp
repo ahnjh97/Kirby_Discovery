@@ -19,6 +19,9 @@ HRESULT CSingleEffect::Initialize_Prototype()
 
 HRESULT CSingleEffect::Initialize_Prototype(FX_DESC FXDesc)
 {
+	m_strFXName = FXDesc.strFXName;
+	m_FXDesc = FXDesc;
+
 	return S_OK;
 }
 
@@ -26,7 +29,20 @@ HRESULT CSingleEffect::Initialize(void* pArg)
 {
 	FX_DESC FXDesc{};
 
-	if (pArg != nullptr)
+	if (m_FXDesc.strFXName != "NONE")
+	{
+		FXDesc = m_FXDesc;
+
+		if (pArg != nullptr)
+		{
+			FXDesc.vInitPos = (*(FX_DESC*)pArg).vInitPos;
+			FXDesc.vInitRot = (*(FX_DESC*)pArg).vInitRot;
+			FXDesc.vInitScale = (*(FX_DESC*)pArg).vInitScale;
+			FXDesc.bIsColorRender = (*(FX_DESC*)pArg).bIsColorRender;
+			m_iPassIdx = 1;
+		}
+	}
+	else if (pArg != nullptr)
 	{
 		FXDesc = *(FX_DESC*)pArg;
 	}
@@ -73,9 +89,38 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 	m_vCurScale = Calculate_CurValue_Lerp(_fTimeDelta, KF_SCALE);
 
 
-	m_pTransformCom->Set_Scaled(m_vCurScale);
-	m_pTransformCom->Turn_Absolute(vCurQuat);
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, Pos(m_vInitPos) + Dir(m_vCurPos));
+
+
+
+	m_vCurRColor = Calculate_CurValue_Lerp(_fTimeDelta, KF_RCOLOR);
+	m_vCurGColor = Calculate_CurValue_Lerp(_fTimeDelta, KF_GCOLOR);
+	m_vCurBColor = Calculate_CurValue_Lerp(_fTimeDelta, KF_BCOLOR);
+	m_fCurAlpha = Calculate_CurValue_Lerp(_fTimeDelta, KF_ALPHA).x;
+	m_fCurMaskThreshold = Calculate_CurValue_Lerp(_fTimeDelta, KF_MASK).x;
+
+	_float3 vUVOffset = Calculate_CurValue_Lerp(_fTimeDelta, KF_UVOFFSET);
+	m_vCurUVOffset = { vUVOffset.x, vUVOffset.y };
+
+	//초기 회전 세팅
+	_float3 vInitRadianRot = { ToRadian(m_vInitRot.x), ToRadian(m_vInitRot.y) , ToRadian(m_vInitRot.z) };
+
+
+	_float4x4 RotMat = _float4x4::CreateFromYawPitchRoll(vInitRadianRot);
+	_float3 vDir = _float3::TransformNormal(m_vCurPos, RotMat);
+
+
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, Pos(m_vInitPos) + Dir(vDir));
+
+	Quaternion vInitQuat = Quaternion::CreateFromYawPitchRoll(vInitRadianRot);
+
+	Quaternion vResultQuat = vCurQuat * vInitQuat;
+	m_pTransformCom->Turn_Absolute(vResultQuat);
+
+
+	m_pTransformCom->Set_Scaled(m_vInitScale * m_vCurScale);
+	//m_pTransformCom->Set_Scaled({ 1.f, 1.f, 1.f });
+
+
 
 	return OBJ_NOEVENT;
 }

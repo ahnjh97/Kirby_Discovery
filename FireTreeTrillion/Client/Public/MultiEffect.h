@@ -38,6 +38,7 @@ public:
 		for (auto& fx : m_FXs)
 			fx->Reset_Duration();
 	}
+	virtual void Fill_SaveData(_Out_ MULTI_FX_DATA* pFXData) override;
 
 	HRESULT Initialize_Prototype();
 	HRESULT Initialize_Prototype(MULTI_FX_DESC FXDesc);

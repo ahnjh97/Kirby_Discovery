@@ -65,10 +65,10 @@ namespace Engine
 
 		_bool		bIsLoop;
 		_bool		bIsBillboard;
-		_bool		bIsNonLight;
+		_bool		bIsColorRender;
 		_bool		bIsBloom;
 
-		vector<_bool> bMoveCommands;
+		vector<_bool> vecMoveCommands;
 
 	}INSTANCE_DESC;
 
@@ -95,11 +95,110 @@ namespace Engine
 
 	typedef struct
 	{
+		_uint	iNameStrLen;
+		string	strName;
+
+		_uint	iBufferStrLen;
+		string	strBufferName;
+
+		_uint	iTexStrLen;
+		string	strTexName;
+
+		_uint	iMaskTexStrLen;
+		string	strMaskTexName;
+
+		_float					fDuration = { 0.f };
+		pair<_float, _float>	fLifetime = { 0.f, 1.f };
+
+		_int	iPassIdx = { 0 };
+		_int	iTexIdx = { 0 };
+		_int	iMaskTexIdx = { 0 };
+
+		_bool	bIsLoop = { false };
+		_bool	bIsBillboard = { false };
+		_bool	bIsOrthographic = { false };
+		_bool	bIsColorRender = { false };
+		_bool	bIsBloom = { false };
+
+		_float	fRimLightThreshold = { 0.f };
+
+		_uint iPropertyMapNum;
+		vector<pair<KF_PROPERTY, _uint>> vecKeyframeInfo;
+		vector<vector<FX_KEYFRAME>> vecKeyframes;
+
 
 	}SINGLE_FX_DATA;
 
 	typedef struct
 	{
+		_uint		iNameStrLen;
+		string		strName;
+
+		_uint		iBufferStrLen;
+		string		strBufferName;
+
+		_uint		iTexStrLen;
+		string		strTexName;
+
+		_uint		iMaskTexStrLen;
+		string		strMaskTexName;
+
+		_uint		iNumInstance = { 0 };
+
+		_float		fDuration = { 1.f };
+
+		_float		fLifetime = { 1.f };
+		_float		fLifetimeRandomOffset;
+
+		_float		fStartDelay;
+		_float		fStarDelayRandomOffset;
+
+		//시작 범위(랜덤X)
+		_float3		vCenter;
+		_float3		vRange;
+
+		//회전
+		_float3		vRotation;
+		_float3		vRotationRandomOffset;
+
+		//크기
+		_float3		vScale = { 1.f, 1.f, 1.f };
+		_float3		vScaleRandomOffset;
+
+		_float3		vDir = { 1.f, 1.f, 1.f };
+		_float3		vDirRandomOffset;
+
+		_float		fSpeed = { 1.f };
+		_float		fSpeedRandomOffset;
+
+
+		_float3		vColor = { 1.f, 1.f, 1.f };
+		_float3		vColorRandomOffset;
+
+		_float		fAlpha = { 1.f };
+		_float		fAlphaRandomOffset;
+
+
+		//기준점(랜덤X)
+		_float3		vPivot;
+
+		_bool		bIsLoop;
+		_bool		bIsBillboard;
+		_bool		bIsColorRender;
+		_bool		bIsBloom;
+
+		_uint			iMoveCommandsNum;
+		vector<_bool>	vecMoveCommands;
+
+	}PARTICLE_DATA;
+
+	typedef struct
+	{
+		_uint	iNameStrLen;
+		string	strName;
+
+		_uint iFXsNum;
+		vector<pair<_uint, string>> FXs;
 
 	}MULTI_FX_DATA;
 

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "KirbyDefault_State.h"
 #include "Kirby_State_Function.h"
+#include "MultiEffect.h"
 
 #pragma region IDLE STATE
 
@@ -171,6 +172,41 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
+
+#pragma region 가라 이펙트 세팅
+	static _float fBbongTime{ 0.f };
+	fBbongTime += fTimeDelta;
+	if (.2f < fBbongTime)
+	{
+		CMultiEffect::MULTI_FX_DESC FXDesc{};
+		_float4 vMyPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+		//vMyPos += pTransformCom->Get_State(CTransform::STATE_LOOK) * .4f;
+		FXDesc.vInitPos = { vMyPos.x, vMyPos.y + .3f, vMyPos.z };
+		FXDesc.vInitScale = { 1.3f, 1.3f, 1.3f };
+
+		_float3 vDir = -pTransformCom->Get_State(CTransform::STATE_LOOK);
+		vDir.Normalize();
+		_float3 vLook = { 0.f, 0.f, 1.f };
+
+		_float fAngleLook = atan2f(vLook.z, vLook.x);
+		_float fAngleDiff = fAngleLook - atan2f(vDir.z, vDir.x);
+		fAngleDiff = ToDegree(fAngleDiff);
+
+		_float3 vAngle = { 0.f, fAngleDiff, 0.f };
+		FXDesc.vInitRot = vAngle;
+
+
+		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
+			return;
+
+		fBbongTime = 0.f;
+
+	}
+
+#pragma endregion
+
+
+
 	// Idle일 때, C를 누르면 점프를 한다.
 	if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
 	{
@@ -297,7 +333,7 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 		pKirby->Change_State(CKirby::STATE_INHALEFALL, 50.f, true, true, CKirby::BODY_VACUUM);
 	}
 
-	if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN) && 
+	if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN) &&
 		(pKirby->Get_State() == CKirby::STATE_LANDINGSMALL || pKirby->Get_State() == CKirby::STATE_LANDINGEND) == false)
 	{
 		if (pController->Compute_Height() < 3.f &&
@@ -402,7 +438,7 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 		{
 			pKirby->Change_State(CKirby::STATE_JUMPEND, 60.f, false, true, CKirby::BODY_DEFAULT);
 		}
-		
+
 		// 만약, 땅에 안전하게 착지했을 경우, 홀딩 시간에 따라 뽀잉 애니메이션이 분기된다.
 		if (pController->Is_Terrain())
 		{
@@ -411,6 +447,56 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 				pKirby->Change_State(CKirby::STATE_LANDINGEND, 30.f, false, false, CKirby::BODY_DEFAULT);
 				if (CUtils::Make_RandomInt(0, 1) > 0)
 					DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+
+
+#pragma region 가라 이펙트 세팅
+				CMultiEffect::MULTI_FX_DESC FXDesc{};
+				_float4 vMyPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+				//vMyPos += pTransformCom->Get_State(CTransform::STATE_LOOK) * 1.2f;
+				FXDesc.vInitPos = { vMyPos.x, vMyPos.y + .4f, vMyPos.z };
+				FXDesc.vInitScale = { 1.3f, 1.3f, 1.3f };
+
+				//_float3 vDir = -pTransformCom->Get_State(CTransform::STATE_LOOK);
+				//vDir.Normalize();
+				//_float3 vLook = { 0.f, 0.f, 1.f };
+
+				//_float fAngleLook = atan2f(vLook.z, vLook.x);
+				//_float fAngleDiff = fAngleLook - atan2f(vDir.z, vDir.x);
+				//fAngleDiff = ToDegree(fAngleDiff);
+
+				//_float3 vAngle = { 0.f, fAngleDiff, 0.f };
+
+				FXDesc.vInitRot = {0.f, CUtils::Make_RandomFloat(0.f, 360.f), 0.f};
+
+				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
+					return;
+
+				FXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 360.f), 0.f };
+
+				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
+					return;
+
+				FXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 360.f), 0.f };
+
+				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
+					return;
+
+				FXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 360.f), 0.f };
+
+				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
+					return;
+
+				FXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 360.f), 0.f };
+
+				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
+					return;
+
+				FXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 360.f), 0.f };
+
+				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
+					return;
+#pragma endregion
+
 			}
 			else
 			{
@@ -538,12 +624,12 @@ void CKirbyDefault_Guard_State::OnStateUpdate(CGameObject* pGameObject, _float f
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_DOWN) ||
 			m_pGameInstance->Get_DIKeyState(DIK_DOWN, KEY_DOWN) ||
-			m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_DOWN) || 
+			m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_DOWN) ||
 			m_pGameInstance->Get_DIKeyState(DIK_RIGHT, KEY_DOWN))
 		{
 			pKirby->Change_State(CKirby::STATE_DODGESTART, 50.f, false, false, CKirby::BODY_DEFAULT);
 		}
-		
+
 
 		// Z키를 안누르고 있다면
 		if (m_pGameInstance->Get_DIKeyState(DIK_Z, KEY_PRESS) == false)
