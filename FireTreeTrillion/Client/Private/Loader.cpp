@@ -15,6 +15,7 @@
 #include "MapToolHelper.h"
 #include "MapToolObject.h"
 #include "BasicMap.h"
+#include "Trigger.h"
 #include "Grid.h"
 
 #pragma region TOOL_UI
@@ -164,6 +165,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BasicMap"), CBasicMap);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolHelper"), CMapToolHelper);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolObject"), CMapToolObject);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Trigger"), CTrigger);
 
 #pragma region TOOL_UI
 
@@ -434,21 +436,23 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	}
 	else if (eLevel == LEVEL_GAMEPLAY)
 	{
-		m_vecModelInfo.emplace_back(MODEL{ "Fiona", TYPE_ANIM });
-		m_vecModelInfo.emplace_back(MODEL{ "Dee", TYPE_ANIM, 0.01f });
-		m_vecModelInfo.emplace_back(MODEL{ "Kirby", TYPE_ANIM });
+		m_vecModelInfo.emplace_back("Fiona", TYPE_ANIM );
+		m_vecModelInfo.emplace_back("Dee", TYPE_ANIM, 0.01f);
+		m_vecModelInfo.emplace_back("Kirby", TYPE_ANIM);
 
-		m_vecModelInfo.emplace_back(MODEL{ "TestMap", TYPE_NONANIM });
-		m_vecModelInfo.emplace_back(MODEL{ "TestMap2", TYPE_NONANIM, 0.01f });
+		m_vecModelInfo.emplace_back("TestMap", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("TestMap2", TYPE_NONANIM, 0.01f);
 
 		// For Kirby Body
-		m_vecModelInfo.emplace_back(MODEL{ "KirbyBalloon", TYPE_ANIM, 1.f, 180.f });
-		m_vecModelInfo.emplace_back(MODEL{ "KirbyDefault", TYPE_ANIM, 1.f, 180.f });
-		m_vecModelInfo.emplace_back(MODEL{ "KirbyVacuum", TYPE_ANIM, 1.f, 180.f });
+		m_vecModelInfo.emplace_back("KirbyBalloon", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbyDefault", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbyVacuum", TYPE_ANIM, 1.f, 180.f);
 
-		m_vecModelInfo.emplace_back(MODEL{ "GsBenchAL", TYPE_NONANIM });
-		m_vecModelInfo.emplace_back(MODEL{ "Level0Stage1Step01", TYPE_NONANIM });
-		m_vecModelInfo.emplace_back(MODEL{ "Level1Stage1Step01", TYPE_NONANIM });
+		m_vecModelInfo.emplace_back("GsBenchAL", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("Level0Stage1Step01", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("Level1Stage1Step01", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("Level1Stage1Step01_Blend", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f);
 
 		// For Awoofy
 		m_vecModelInfo.emplace_back(MODEL{ "Awoofy", TYPE_ANIM, 1.f, 180.f });
@@ -456,10 +460,10 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	else if (eLevel == LEVEL_TOOL_MAP) 
 	{		
 		// 맵툴에서는 크기나 회전 상태 바꾸고 싶은 모델만 여기에 등록. 안바꾸고싶으면 NonAnim, 크기1, 회전 0도로 자동 추가됨
-		m_vecModelInfo.emplace_back(MODEL{ "Book", TYPE_NONANIM, 0.01f});
-		m_vecModelInfo.emplace_back(MODEL{ "TestMap2", TYPE_NONANIM, 0.01f });
-		m_vecModelInfo.emplace_back(MODEL{ "Trigger", TYPE_NONANIM, 0.01f });
-		m_vecModelInfo.emplace_back(MODEL{ "Camera", TYPE_NONANIM, 0.2f , 270.f});
+		m_vecModelInfo.emplace_back("Book", TYPE_NONANIM, 0.01f);
+		m_vecModelInfo.emplace_back("TestMap2", TYPE_NONANIM, 0.01f);
+		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f);
+		m_vecModelInfo.emplace_back("Camera", TYPE_NONANIM, 0.2f , 270.f);
 	}
 }
 
@@ -639,7 +643,7 @@ CLoader * CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, 
 
 	if (FAILED(pInstance->Initialize(eNextLevelID)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CLoader"));
+		MSG_BOX(TEXT("Failed To Create : CLoader"));
 
 		Safe_Release(pInstance);
 	}

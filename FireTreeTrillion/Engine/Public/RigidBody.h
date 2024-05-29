@@ -6,14 +6,25 @@ BEGIN(Engine)
 class ENGINE_DLL CRigidBody : public CComponent
 {
 public:
+	PxActor* Get_Actor() { if (m_bDynamic) return m_pActor; else return m_pStaticActor; };
+
+public:
 	struct RIGIDBODY_DESC
 	{
-		RIGID_SHAPE			eShapeType;
-		_float4x4			matWorld;
-		_bool				bTrigger;
-		_float				fOffsetSize;
-		_float3				vMaterial = {0.5f, 0.5f, 0.5f};
-		class CGameObject*	pObj = nullptr;
+		RIGID_SHAPE	eShapeType;
+		_float4x4	matWorld;
+		_bool		bTrigger;
+		_bool		bDynamic;
+		_float		fOffsetSize;
+		_float3		vMaterial = {0.5f, 0.5f, 0.5f};
+		RIGIDBODY_DESC
+		(RIGID_SHAPE _eShapeType = { RIGID_END },
+			_float4x4 _matWorld = {},
+			_bool _bTrigger = { false },
+			_bool _bDynamic = { true },
+			_float _fOffsetSize = {},
+			_float3 _vMaterial = { 0.5f, 0.5f, 0.5f }
+		) : eShapeType(_eShapeType), matWorld(_matWorld), bTrigger(_bTrigger), bDynamic(_bDynamic), fOffsetSize(_fOffsetSize), vMaterial(_vMaterial) {}
 	};
 
 private:
@@ -38,12 +49,14 @@ public:
 	void			Release_Actor();
 
 	void			Activate(_bool _bActive);
+	void			SetUp_TriggerType(_int iTriggerType) { m_iTriggerType = iTriggerType; }
+	void			SetUp_TriggerIndex(_int iTriggerIndex) { m_iTriggerIndex = iTriggerIndex; }
 
 	// 날리기
 	void			Add_Force(_float3 vForce);
 
 public:
-	physx::PxTransform	Get_PxTransform();
+	PxTransform	Get_PxTransform();
 
 	void				Set_PxWorldMatrix(const _float4x4& worldMatrix);
 	_float4x4			Get_PxWorldMatrix();
@@ -51,21 +64,28 @@ public:
 	_bool				Is_Activated();
 
 protected:
-	class CGameObject*			m_pActorObject		 = nullptr;
-	physx::PxRigidDynamic*		m_pActor			 = nullptr;
-	physx::PxShape*				m_pShape			 = nullptr;
-	physx::PxController*		m_pCapsuleController = nullptr;
+	PxRigidDynamic*		m_pActor				= { nullptr };
+	PxRigidStatic*		m_pStaticActor			= { nullptr };
 
-	_bool						m_bTrigger = false;
+	PxShape*			m_pShape				= { nullptr };
+	PxController*		m_pCapsuleController	= { nullptr };
+	class CGameObject*			m_pActorObject		 = nullptr;
+
+
+	_bool				m_bTrigger				= { false };
 
 	// 물체의 질량
-	_float						m_fDensity		= 10.f;
+	_float				m_fDensity				= { 10.f };
 
 	// 현 RigidBody의 형태
-	RIGID_SHAPE					m_eShapeType	= RIGID_CAPSULE;
-	_float4x4					m_OriginTransformMatrix = _float4x4::Identity;
-	_float3						m_vMaterial = { 0.5f, 0.5f, 0.6f };
-	_float						m_fOffsetSize = 1.f;
+	RIGID_SHAPE			m_eShapeType = { RIGID_CAPSULE };
+	_float4x4			m_OriginTransformMatrix = { _float4x4::Identity };
+	_float3				m_vMaterial = { 0.5f, 0.5f, 0.6f };
+	_float				m_fOffsetSize = { 1.f };
+	_bool				m_bDynamic = { true };
+
+	_int				m_iTriggerType = { -1 };
+	_int				m_iTriggerIndex = { -1 };
 
 public:
 	static CRigidBody*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "..\Public\Level_GamePlay.h"
-
+#include "Level_GamePlay.h"
 #include "Camera_Free.h"
+#include "Trigger.h"
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -142,7 +142,8 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 
 	string strModelName;
 	_float4x4 matWorld{};
-	_int iCamIndex{};
+	_int iTriggerType{};
+	_int iTriggerIndex{};
 	map<_int, _float4x4> camMatrices;
 
 	while (!fileStream.eof())
@@ -154,8 +155,11 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 		fileStream.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
 
 		if ("Camera" == strModelName || "Trigger" == strModelName) {
-			fileStream.read(reinterpret_cast<char*>(&iCamIndex), sizeof(iCamIndex));
-			camMatrices.emplace(iCamIndex, matWorld);
+			if("Trigger" == strModelName)
+				fileStream.read(reinterpret_cast<char*>(&iTriggerType), sizeof(iTriggerType));
+			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
+			if("Camera" == strModelName)
+				camMatrices.emplace(iTriggerIndex, matWorld);
 		}
 		if (fileStream.eof())
 			break;
@@ -166,13 +170,23 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 
 		if (strModelName == "NonAnim_Kirby")
 		{
-			tempDesc.wstrModelName.erase(0, 8);
+			tempDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby"), &tempDesc)))
 				return E_FAIL;
 		}
 		else if (strModelName == "Level1Stage1Step01" || strModelName == "Level1Stage1Step01_Blend")
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_BasicMap"), &tempDesc)))
+				return E_FAIL;
+		}
+		else if (strModelName == "Trigger")
+		{
+			CTrigger::TRIGGER_DESC tTriggerDesc{};
+			tTriggerDesc.matWorld = matWorld;
+			tTriggerDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			tTriggerDesc.iTriggerType = iTriggerType;
+			tTriggerDesc.iTriggerIndex = iTriggerIndex;
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Trigger"), TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc)))
 				return E_FAIL;
 		}
 	}
@@ -182,7 +196,7 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 	if (nullptr == pCamera)
 		return E_FAIL;
 
-	if (!camMatrices.empty()) {
+	if (!camMatrices.empty()) { // 카메라 행렬 세팅
 		for (auto& pair : camMatrices)
 			pCamera->EmplaceBackCamMatrix(pair.second);
 

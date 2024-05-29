@@ -637,7 +637,7 @@ _vector CGameInstance::Compute_WorldPos(const _float2 & vViewportPos, const wstr
 	if (m_pExtractor == nullptr)
 		return XMVectorZero();
 
-	return m_pExtractor->Compute_WorldPos(vViewportPos, strZRenderTargetTag, iOffset);	
+	return m_pExtractor->Compute_WorldPos(vViewportPos, strZRenderTargetTag, iOffset);
 }
 
 PxPhysics* CGameInstance::Get_Physics()
@@ -806,12 +806,38 @@ PxRigidStatic* CGameInstance::CreateStaticActor(_float4 vPos, _float3* pVertices
 	return m_pPhysx->CreateStaticActor(vPos, pVerticesPos, iNumVertices, pIndices, iNumIndices, pMaterial);
 }
 
+void CGameInstance::Register_Player(PxActor* pPlayerActor)
+{
+	if (nullptr != m_pPhysx)
+		m_pPhysx->Register_Player(pPlayerActor);
+}
+
+void CGameInstance::Register_Trigger(PxActor* pTriggerActor, _int iTriggerType, _int iTriggerIndex)
+{
+	if (nullptr != m_pPhysx)
+		m_pPhysx->Register_Trigger(pTriggerActor, iTriggerType, iTriggerIndex);
+}
+
+void CGameInstance::SetUp_TriggerFunc(_int iTriggerType, function<void(_int)> func)
+{
+	if (nullptr != m_pPhysx)
+		m_pPhysx->SetUp_TriggerFunc(iTriggerType, func);
+}
+
 void CGameInstance::Transform_PickingToLocalSpace(const CTransform* pTransform, _float3* pRayDir, _float3* pRayPos)
 {
 	if (nullptr == m_pPicking)
 		return;
 
 	m_pPicking->Transform_PickingToLocalSpace(pTransform, pRayDir, pRayPos);
+}
+
+_float2 CGameInstance::Get_MouseViewPortPos()
+{
+	if (nullptr == m_pPicking)
+		return _float2();
+
+	return m_pPicking->Get_MouseViewPortPos();
 }
 
 void CGameInstance::Release_Engine()

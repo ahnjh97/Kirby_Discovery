@@ -44,22 +44,10 @@ HRESULT CExtractor::Initialize()
 	return S_OK;
 }
 
-_vector CExtractor::Compute_WorldPos(const _float2 & vViewportPos, const wstring & strZRenderTargetTag, _uint iOffset)
+_vector CExtractor::Compute_WorldPos(const _float2& vViewportPos, const wstring& strZRenderTargetTag, _uint iOffset)
 {
 	if (FAILED(m_pGameInstance->Copy_Resource(strZRenderTargetTag, &m_pTextureHub)))
 		return XMVectorZero();
-
-
-	//for (size_t i = 0; i < Height; i++)
-	//{
-	//	for (size_t j = 0; j < Width; j++)
-	//	{
-	//		_uint iIndex = i * Width + j;
-
-	//	}
-
-	//}
-	
 
 	D3D11_MAPPED_SUBRESOURCE		SubResource{};
 
@@ -73,6 +61,9 @@ _vector CExtractor::Compute_WorldPos(const _float2 & vViewportPos, const wstring
 
 
 	m_pContext->Unmap(m_pTextureHub, 0);
+
+	if (0 == fZ)
+		return XMVectorZero();
 
 	_float3		vProjPos;
 
