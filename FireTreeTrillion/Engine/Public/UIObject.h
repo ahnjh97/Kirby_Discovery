@@ -2,9 +2,9 @@
 #include "GameObject.h"
 #include "VIBuffer_Rect.h"
 
-BEGIN(Client)
-class CHUD;
-END
+//BEGIN(Client)
+//class CHUD;
+//END
 
 BEGIN(Engine)
 
@@ -21,8 +21,9 @@ protected:
 public:
 	typedef struct : public CGameObject::GAMEOBJECT_DESC
 	{
-		_float2 vSize, vCenter, vPos = { 0.f, 0.f };
-		_float fFrame = { 0.f };
+		wstring		strUITag = { TEXT("") };
+		_float2		vSize, vCenter, vPos = { 0.f, 0.f };
+		_float		fFrame = { 0.f };
 	}UIOBJ_DESC;
 
 protected:
@@ -64,6 +65,8 @@ protected:
 	CVIBuffer_Rect*		m_pVIBufferCom = { nullptr };
 	CTexture*			m_pTextureCom = { nullptr };
 
+public:
+	string				m_strUITag = { "Test" };
 
 public:
 	virtual CGameObject* Clone(_uint iLevelIndex, void* pArg) { return nullptr; }

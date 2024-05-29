@@ -16,30 +16,27 @@ HRESULT CHUD_Kirby::Initialize_Prototype()
     return S_OK;
 }
 
-HRESULT CHUD_Kirby::Initialize(void* pArg)
+HRESULT CHUD_Kirby::Initialize(void* _pArg)
 {
-	HRESULT hr = __super::Initialize(pArg);
+	HRESULT hr = __super::Initialize(_pArg);
 	CHECK_FAILED(hr);
+
+	UIOBJ_DESC* HUD_KirbyDESC = nullptr;
+	if (nullptr != _pArg)
+		HUD_KirbyDESC = (UIOBJ_DESC*)_pArg;
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-#pragma region HUD_StatusHP
-
-	UIOBJ_DESC LOGO_DESC{};
-	LOGO_DESC.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f };
-	LOGO_DESC.vSize = { 100.f, 100.f };
-	LOGO_DESC.vPos = { LOGO_DESC.vCenter.x/* - 200.f*/, LOGO_DESC.vCenter.y/* - 200.f */};
-
-	m_pTransformCom->Set_Scaled(LOGO_DESC.vSize.x, LOGO_DESC.vSize.y, 1.f);
+	m_pTransformCom->Set_Scaled(HUD_KirbyDESC->vSize.x, HUD_KirbyDESC->vSize.y, 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(
-					LOGO_DESC.vCenter.x - LOGO_DESC.vPos.x,
-					-LOGO_DESC.vCenter.y + LOGO_DESC.vPos.y, 0.f, 1.f));
+						HUD_KirbyDESC->vCenter.x - HUD_KirbyDESC->vPos.x,
+						-HUD_KirbyDESC->vCenter.y + HUD_KirbyDESC->vPos.y, 0.f, 1.f));
 
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
-
-	m_UIObjDesc = LOGO_DESC;
+	
+	m_UIObjDesc = *HUD_KirbyDESC;
 
 #pragma endregion
 
@@ -60,18 +57,8 @@ void CHUD_Kirby::Late_Tick(_float fTimeDelta)
 
 HRESULT CHUD_Kirby::Render()
 {
-	HRESULT hr;
-	for (size_t i = 0; i < 21; i++)
-	{
-		hr = Bind_ShaderResources(m_pShaderCom, PS_ALPHABLEND, m_pTransformCom, m_pTextureCom, 7);
-		CHECK_FAILED(hr);
-
-		m_pTransformCom->Set_Scaled(m_UIObjDesc.vSize.x, m_UIObjDesc.vSize.y, 1.f);
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(
-			m_UIObjDesc.vCenter.x - m_UIObjDesc.vPos.x,
-			-m_UIObjDesc.vCenter.y + m_UIObjDesc.vPos.y, 0.f, 1.f));
-
-	}
+	if (FAILED(Bind_ShaderResources(m_pShaderCom, PS_ALPHABLEND, m_pTransformCom, m_pTextureCom, 7)))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -82,19 +69,17 @@ void CHUD_Kirby::Render_IMGUI()
 
 HRESULT CHUD_Kirby::Add_Components()
 {
-	HRESULT hr;
-	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex"),
-		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
-	CHECK_FAILED(hr);
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex"),
+		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
+		return E_FAIL;
 
-	//hr = __super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_KirbyBarHard"),
-	hr = __super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_GameComplete"),
-		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom);
-	CHECK_FAILED(hr);
+	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_GameComplete"),
+		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
+		return E_FAIL;
 
-	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),
-		TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom);
-	CHECK_FAILED(hr);
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),
+		TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom)))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -103,32 +88,30 @@ HRESULT CHUD_Kirby::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex
 {
 	CHECK_NULLPTR(_pShaderCom);
 
-	HRESULT hr;
-	hr = _pTransCom->Bind_ShaderResource(_pShaderCom, "g_WorldMatrix");
-	CHECK_FAILED(hr);
+	if (FAILED(_pTransCom->Bind_ShaderResource(_pShaderCom, "g_WorldMatrix")))
+		return E_FAIL;
 
 	//// 05.24) 카메라 줌인/아웃용 Matrix 처리
 	//_matrix WorldMatrix = m_pTransformCom->Get_WorldMatrix();
-
 	//_float4x4 ViewMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW);
 	//_float4x4 ProjMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
 
 	//셰이더 파일의 매트릭스 정보를 가져와 바인딩
-	hr = _pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix);
-	CHECK_FAILED(hr);
+	if (FAILED(_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+		return E_FAIL;
 
-	hr = _pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix);
-	CHECK_FAILED(hr);
+	if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+		return E_FAIL;
 
 	//셰이더 파일의 텍스처 정보를 가져와 바인딩
 	_pTextureCom->Bind_ShaderResource(_pShaderCom, "g_DiffuseTexture", _iTexIndex);
 
 	//Begin() > Apply() 함수 호출 전 셰이더 전역 데이터를 저장해야함
-	hr = _pShaderCom->Begin(_iPassIndex);
-	CHECK_FAILED(hr);
+	if (FAILED(_pShaderCom->Begin(_iPassIndex)))
+		return E_FAIL;
 
-	hr = Bind_VIBuffer(m_pVIBufferCom);
-	CHECK_FAILED(hr);
+	if (FAILED(Bind_VIBuffer(m_pVIBufferCom)))
+		return E_FAIL;
 
 	return S_OK;
 }
