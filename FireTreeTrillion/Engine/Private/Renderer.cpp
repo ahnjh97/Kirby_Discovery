@@ -57,6 +57,9 @@ HRESULT CRenderer::Initialize()
 	/* For.Target_Stencil */
 	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Stencil"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 1.f))))
 		return E_FAIL;
+	/* For.Target_MotionBlur */
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_MotionBlur"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 1.f))))
+		return E_FAIL;
 
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Diffuse"))))
 		return E_FAIL;
@@ -70,6 +73,9 @@ HRESULT CRenderer::Initialize()
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Stencil"))))
 		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_MotionBlur"))))
+		return E_FAIL;
+
 #pragma endregion
 
 #pragma region MRT_LightAcc
@@ -312,6 +318,28 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 	if (FAILED(Render_SuperUI()))
 		return E_FAIL;
 
+
+
+	/// test
+	if (m_pGameInstance->Get_DIKeyState(DIK_R, KEY_DOWN))
+		m_bRimTest = !m_bRimTest;
+	
+	if (m_bRimTest == true)
+	{
+		m_fRimWidth += (0.2f - m_fRimWidth) * (fTimeDelta * 5.f);
+		if ((0.2f - m_fRimWidth) < 0.001f)
+		{
+			m_fRimWidth = 0.2f;
+		}
+	}
+	else
+	{
+		m_fRimWidth -= m_fRimWidth * (fTimeDelta * 5.f);
+		if (m_fRimWidth < 0.01f)
+		{
+			m_fRimWidth = 0.f;
+		}
+	}
 
 #ifdef _DEBUG
 	if (FAILED(Render_Debug()))
@@ -648,6 +676,13 @@ HRESULT CRenderer::Render_Result()
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_NonLight"), "g_NonLightTexture")))
 		return E_FAIL;
 
+	// 림 라이트 + 카메라 포지션
+	if (FAILED(m_pShader->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_RimLight"), "g_RimLightTexture")))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fRimWidth", &m_fRimWidth, sizeof(_float))))
+		return E_FAIL;
 
 	// 섞을 스카이 박스
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Sky"), "g_SkyTexture")))

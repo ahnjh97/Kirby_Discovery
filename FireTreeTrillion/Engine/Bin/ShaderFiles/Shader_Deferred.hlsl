@@ -28,8 +28,8 @@ texture2D g_SpecularTexture;
 texture2D g_LightDepthTexture;
 
 texture2D g_FieldDepthTexture;
-
 texture2D g_StencilTexture;
+texture2D g_RimLightTexture;
 
 texture2D g_EffectTexture;
 texture2D g_BlurTexture;
@@ -55,6 +55,8 @@ float4 g_vLightSpecular;
 
 float4 g_vMtrlAmbient = float4(1.f, 1.f, 1.f, 1.f);
 float4 g_vMtrlSpecular = float4(1.f, 1.f, 1.f, 1.f);
+
+float g_fRimWidth;
 
 float4 g_vCamPosition;
 
@@ -307,6 +309,18 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
     {
         Out.vColor *= 0.2f;
     }
+    
+
+    //////// 림 라이트
+    vector vRimLightDesc = g_RimLightTexture.Sample(ClampSampler, In.vTexcoord);
+    float4 vLook = g_vCamPosition - vWorldPos;
+    vector vNormalDesc = g_NormalTexture.Sample(PointSampler, In.vTexcoord);
+    float4 vNormal = float4(vNormalDesc.xyz * 2.f - 1.f, 0.f);
+    
+    if (g_fRimWidth > 0.01f && vRimLightDesc.b == 1.f)
+        Out.vColor += (1.f - (clamp(pow(dot(normalize(vLook), normalize(vNormal)), g_fRimWidth), 0.f, 1.f)));
+    /////////
+    
         
     vector vNonLight = g_NonLightTexture.Sample(LinearSampler, In.vTexcoord);
     vector vBlend = g_BlendTexture.Sample(LinearSampler, In.vTexcoord);
@@ -353,8 +367,19 @@ PS_OUT PS_MAIN_BLUR_Y(PS_IN In)
 PS_OUT PS_MAIN_RADIAL_BLUR(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
+        
+    //vector vBlurBeforeTexture = g_RadialBlur.Sample(ClampSampler, In);
+    //vector vDepthDesc = g_DepthTexture.Sample(PointSampler, In.vTexcoord);
     
-    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    //for (int iYD = -6; iYD < 7; ++iYD)
+    //{
+    //    for (int iXD = -6; iXD < 7; ++iXD)
+    //    {
+            
+    //    }
+
+    //}
+    
     
     // 0~1 텍스트 쿠드 좌표로 환산하여 넣어준다.
     float2 fCenter = g_fRadialblurCenter;

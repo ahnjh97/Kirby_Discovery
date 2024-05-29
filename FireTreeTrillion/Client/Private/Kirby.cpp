@@ -87,27 +87,6 @@ _int CKirby::Tick(_float fTimeDelta)
 		Change_State(STATE_EAT, 100.f, false, false, BODY_BALLOON);
 	}
 
-	//if (m_pGameInstance->Get_DIKeyState(DIK_U, KEY_DOWN))
-	//{
-	//	INFO(m_fJumpVelocity) = 11.f;
-	//	// 먹은 상태인 경우
-	//	if (INFO(m_isEat) == true)
-	//	{
-	//		Change_State(STATE_EATDAMAGE, 60.f, false, false, BODY_BALLOON);
-	//	}
-	//	// 나는 상태일 경우 . . .
-	//	else if (true == (Get_State() == STATE_FLIGHTSTART || Get_State() == STATE_FLIGHTFALL || Get_State() == STATE_FLIGHT ||
-	//		Get_State() == STATE_FLIGHTLANDING || Get_State() == STATE_FLIGHTLIMIT || Get_State() == STATE_FLIGHTLIMITFALL))
-	//	{
-	//		Change_State(STATE_FILGHTDAMAGE, 60.f, false, false, BODY_BALLOON);
-	//	}
-	//	// 평범한 상태에서...
-	//	else
-	//	{
-	//		Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
-	//	}
-	//}
-
 	// 유틸업데이트가 들어가있다.
 	//****** FSM Update, Shadow ChaseUpdate ******//
 	Kirby_SystemTick(fTimeDelta);
@@ -146,6 +125,13 @@ HRESULT CKirby::Render()
 
 		if (FAILED(m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
+
+		_bool bStencil = true;
+		_bool bRimLight = true;
+		_bool bMotionBlur = true;
+		m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
 
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
 		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_X)))
@@ -429,6 +415,13 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
 		m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
 		m_pMouthTexture[INFO(m_eMouthState)]->Bind_ShaderResource(m_pShaderCom, "g_KirbyMouthTexture", 0);
+		_bool bStencil = true;
+		_bool bRimLight = true;
+		_bool bMotionBlur = true;
+		m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
+
 		m_pShaderCom->Begin(ANIMMODEL_KIRBYMOUTH);
 		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
 		return true;
@@ -441,16 +434,32 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
 		m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
 		m_pEyeTexture[INFO(m_eEyeState)]->Bind_ShaderResource(m_pShaderCom, "g_KirbyEyeTexture", 0);
+		_bool bStencil = true;
+		_bool bRimLight = true;
+		_bool bMotionBlur = true;
+		m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
 		m_pShaderCom->Begin(ANIMMODEL_KIRBYEYE);
 		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
 		return true;
 	}
 
-	//// 0 , 1 , 2(눈) , 3(구강)
-	//if (_eBodyState == BODY_VACUUM && _iMeshIndex != 3)
-	//{
-	//	return true;
-	//}
+	// Vacuum 상태의 구강 부위
+	if (_eBodyState == BODY_VACUUM && _iMeshIndex == 3)
+	{
+		m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
+		m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
+		_bool bStencil = true;
+		_bool bRimLight = false;
+		_bool bMotionBlur = true;
+		m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
+		m_pShaderCom->Begin(ANIMMODEL_NORMAL_X);
+		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
+		return true;
+	}
 
 	return false;
 }

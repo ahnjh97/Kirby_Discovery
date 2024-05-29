@@ -95,6 +95,9 @@ private:
 	_float m_fRadialBlurRadius = { 0.f };
 	_float m_fRadialRadiusSubtraction = { 0.f };
 
+	_float m_fRimWidth = { 0.f };
+	_bool  m_bRimTest = { false };
+
 #ifdef _DEBUG
 private:
 	HRESULT Render_Debug();
