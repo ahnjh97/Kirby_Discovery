@@ -1,5 +1,8 @@
 #include "stdafx.h"
 #include "BasicMap.h"
+#include <filesystem>
+
+using namespace filesystem;
 
 CBasicMap::CBasicMap(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
     : CGameObject{ pDevice, pContext }
@@ -34,8 +37,10 @@ HRESULT CBasicMap::Initialize(void* pArg)
         return E_FAIL;
 
     if (wstrModelTag.substr(wstrModelTag.length() - 5) != TEXT("Blend")) {
-        if (FAILED(Add_BlendMap(wstrModelTag))) 
-            return E_FAIL;
+        if (true == CheckIfBlendMapExists(GameObjectDesc.wstrModelName)) {
+            if (FAILED(Add_BlendMap(wstrModelTag)))
+                return E_FAIL;
+        }
     }
     else    
         m_eRenderGroup = CRenderer::RENDER_BLEND;
@@ -174,6 +179,7 @@ void CBasicMap::SetUpShaderInfo(const wstring& _wstrModelTag)
 
     _uint iPassIndex{};
     _float fSamplingFactor{};
+    _int iCount{};
     while (!fileStream.eof()) 
     {
         fileStream.read(reinterpret_cast<char*>(&iPassIndex), sizeof(iPassIndex));
@@ -182,11 +188,33 @@ void CBasicMap::SetUpShaderInfo(const wstring& _wstrModelTag)
         if (fileStream.eof())
             break;
         
-        m_vecPassIndices.emplace_back(iPassIndex);
-        m_vecSamplingFactors.emplace_back(fSamplingFactor);
+        m_vecPassIndices[iCount] = iPassIndex;
+        m_vecSamplingFactors[iCount] = fSamplingFactor;
+        iCount++;
     }
 
     fileStream.close();
+}
+
+_bool CBasicMap::CheckIfBlendMapExists(const wstring& _wstrModelTag)
+{
+    string strPath = "../../../model_txt/NonAnim/";
+    string strBlendMapName = CUtils::WstrToStr(_wstrModelTag) + "_Blend";
+
+    directory_iterator end_iter;  // 디렉토리 순회의 끝을 나타내는 iterator
+    directory_iterator dir_iter(strPath);  // 지정된 경로의 시작 iterator
+
+    while (dir_iter != end_iter) {
+        if (is_regular_file(*dir_iter)) {
+            string strFilePath = dir_iter->path().filename().string();
+
+            if (strBlendMapName == strFilePath.substr(0, strFilePath.length() - 4))
+                return true;
+        }
+        ++dir_iter;
+    }
+
+    return _bool();
 }
 
 CBasicMap* CBasicMap::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

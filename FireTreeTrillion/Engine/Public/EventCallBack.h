@@ -12,8 +12,8 @@ class CEventCallBack : public PxSimulationEventCallback
 {
 public:
     void Register_Player(PxActor* pPlayerActor) { m_pPlayerActor = pPlayerActor; }
-    void Register_Trigger(PxActor* pTriggerActor, _int iCamIndex) { m_Triggers.emplace_back(pTriggerActor, iCamIndex); }
-    void SetUp_CamSetIndexFunc(function<void(_int)> func) { m_pCamSetIndexFunc = func; }
+    void Register_Trigger(PxActor* pTriggerActor, _int iType, _int iIndex) { m_Triggers.emplace_back(pTriggerActor, iType, iIndex); }
+    void SetUp_TriggerFunc(_int iType, function<void(_int)> func) { m_TriggerFunctions.emplace(iType, func); }
 
 public:
     virtual void onTrigger(PxTriggerPair* pairs, PxU32 count) override;
@@ -32,8 +32,8 @@ private:
 
 private:
     PxActor* m_pPlayerActor = { nullptr };
-    list<pair<PxActor*, _int>> m_Triggers; // 
-    function<void(_int)> m_pCamSetIndexFunc;
+    list<tuple<PxActor*, _int, _int>> m_Triggers; // 
+    map<_int, function<void(_int)>> m_TriggerFunctions;
 };
 
 END

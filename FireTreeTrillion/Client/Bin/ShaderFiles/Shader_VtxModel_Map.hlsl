@@ -109,7 +109,8 @@ PS_OUT PS_MAIN(PS_IN In)
 	Out.vDiffuse = vMtrlDiffuse;
 	Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
-	//Out.vFieldDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 0.0f);
+    Out.vFieldDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 0.0f);
+    
     if (g_fTime < 0.5f)
         Out.vDiffuse.rgb += vDamageColor * smoothstep(0.0f, 1.0f, g_fTime);
     else if (g_fTime < 1.f)
@@ -132,7 +133,8 @@ PS_OUT NO_NORMALMAP_PS_MAIN(PS_IN In)
     Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
-    //Out.vStencil = vector(1.f, 0.f, 0.f, 1.f);
+    Out.vFieldDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 0.0f);
+    
     if (g_fTime < 0.5f)
         Out.vDiffuse.rgb += vDamageColor * smoothstep(0.0f, 1.0f, g_fTime);
     else if (g_fTime < 1.f)
@@ -182,7 +184,7 @@ technique11 DefaultTechnique
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_LIGHTDEPTH();
     }
-	// 노말이 있는 일반 논 애님 모델 ( 3 )
+	// 노말이 있는 일반 블렌딩 객체 ( 3 )
     pass AlphaBlend
     {
         SetRasterizerState(RS_Default);
@@ -195,7 +197,7 @@ technique11 DefaultTechnique
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN();
     }
-	// 노말이 없는 일반 논 애님 모델 ( 4 )
+	// 노말이 없는 일반 블렌딩 객체 ( 4 )
     pass NonNormal_AlphaBlend
     {
         SetRasterizerState(RS_Default);

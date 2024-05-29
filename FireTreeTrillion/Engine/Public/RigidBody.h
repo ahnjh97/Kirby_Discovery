@@ -49,7 +49,8 @@ public:
 	void			Release_Actor();
 
 	void			Activate(_bool _bActive);
-	void			SetUp_CamIndex(_int iCamIndex) { m_iCamIndex = iCamIndex; }
+	void			SetUp_TriggerType(_int iTriggerType) { m_iTriggerType = iTriggerType; }
+	void			SetUp_TriggerIndex(_int iTriggerIndex) { m_iTriggerIndex = iTriggerIndex; }
 
 	// ³¯¸®±â
 	void			Add_Force(_float3 vForce);
@@ -81,7 +82,9 @@ protected:
 	_float3				m_vMaterial = { 0.5f, 0.5f, 0.6f };
 	_float				m_fOffsetSize = { 1.f };
 	_bool				m_bDynamic = { true };
-	_int				m_iCamIndex = { -1 };
+
+	_int				m_iTriggerType = { -1 };
+	_int				m_iTriggerIndex = { -1 };
 
 public:
 	static CRigidBody*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

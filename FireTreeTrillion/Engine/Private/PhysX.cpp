@@ -101,24 +101,24 @@ void CPhysX::Register_Player(PxActor* pPlayerActor)
     pEventCallBack->Register_Player(pPlayerActor);
 }
 
-void CPhysX::Register_Trigger(PxActor* pTriggerActor,  _int iCamIndex)
+void CPhysX::Register_Trigger(PxActor* pTriggerActor, _int iTriggerType, _int iTriggerIndex)
 {
     if (nullptr == m_pScene)
         return;
     CEventCallBack* pEventCallBack = dynamic_cast<CEventCallBack*>(m_pScene->getSimulationEventCallback());
     if (nullptr == pEventCallBack)
         return;
-    pEventCallBack->Register_Trigger(pTriggerActor, iCamIndex);
+    pEventCallBack->Register_Trigger(pTriggerActor, iTriggerType, iTriggerIndex);
 }
 
-void CPhysX::SetUp_CamSetIndexFunc(function<void(_int)> func)
+void CPhysX::SetUp_TriggerFunc(_int iTriggerType, function<void(_int)> func)
 {
     if (nullptr == m_pScene)
         return;
     CEventCallBack* pEventCallBack = dynamic_cast<CEventCallBack*>(m_pScene->getSimulationEventCallback());
     if (nullptr == pEventCallBack)
         return;
-    pEventCallBack->SetUp_CamSetIndexFunc(func);
+    pEventCallBack->SetUp_TriggerFunc(iTriggerType, func);
 }
 
 //

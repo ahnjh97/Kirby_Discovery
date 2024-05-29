@@ -3,7 +3,6 @@
 #include "MapToolObject.h"
 #include "BasicMap.h"
 #include <filesystem>
-#include <iostream>
 #include "Utils.h"
 
 using namespace filesystem;
@@ -11,16 +10,18 @@ static _int iNonAnimIdx = -1;
 static _int iAnimIdx = -1;
 static _int iLevelIndex = 0;
 
-static const _char* camIndices[] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
+static const _char* triggerTypes[] = {"Camera", "Shader"};
+static _int iTriggerType = -1;
+static const _char* triggerIndices[] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
 									"11", "12", "13", "14", "15", "16", "17", "18", "19", "20" };
-static _int iCamIndex = -1;
+static _int iTriggerIdx = -1;
 static _int iMapMeshIndex = -1;
 static _int iSelectedMeshIndex = -1; 
 
 static const _char* ShaderPasses[] = { "Blend X, NormalO", "Blend X, Normal X", "LightDepth", "Blend O, Normal O", "Blend O, Normal X"};
 static vector<vector<_int>> vecPassIndices;
 static vector<vector<_float>> vecSamplingFactors;
-static _int iCurMapIndex = 0;
+static _int iMapIndex = 0;
 static _int iPickedMeshIndex = 0;
 
 CMapToolHelper::CMapToolHelper(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -70,7 +71,7 @@ void CMapToolHelper::Late_Tick(_float fTimeDelta)
 	ImGui::Begin("MapTool");
 	Menu_Level();
 	Menu_NonAnimModels();
-	Menu_SetUpCamIndex();
+	Menu_TriggerIndex();
 	Menu_MapShaderInfo();
 	ImGui::End();
 
@@ -154,7 +155,7 @@ void CMapToolHelper::Menu_NonAnimModels()
 	}
 }
 
-void CMapToolHelper::Menu_SetUpCamIndex()
+void CMapToolHelper::Menu_TriggerIndex()
 {
 	if (nullptr == m_pPickedObject)
 		return;
@@ -167,10 +168,33 @@ void CMapToolHelper::Menu_SetUpCamIndex()
 	if (strModelName == "Camera" || strModelName == "Trigger")
 	{
 		CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(m_pPickedObject);
-		iCamIndex = pMapToolObject->Get_CamIndex();
-		ImGui::Begin("CamIndexSettings");
-		if (ImGui::Combo("##Index", &iCamIndex, camIndices, IM_ARRAYSIZE(camIndices))) {
-			pMapToolObject->Set_CamIndex(iCamIndex);
+		iTriggerType = pMapToolObject->Get_TriggerType();
+		iTriggerIdx = pMapToolObject->Get_TriggerIndex();
+
+		ImGui::Begin(strModelName.c_str());
+		if (strModelName == "Trigger") {
+			ImGui::SetCursorPosX(37);
+			ImGui::Text("TYPE");
+			ImGui::SameLine();
+			ImGui::SetCursorPosX(120);
+		}
+		else
+			ImGui::SetCursorPosX(33);
+		ImGui::Text("INDEX");
+
+
+		if (strModelName == "Trigger")
+		{
+			ImGui::SetNextItemWidth(80);
+			if (ImGui::Combo("##Type", &iTriggerType, triggerTypes, IM_ARRAYSIZE(triggerTypes)))
+				pMapToolObject->Set_TriggerType(iTriggerType);
+			ImGui::SameLine();
+		}
+		
+		//-------------------------------------------
+		ImGui::SetNextItemWidth(80);
+		if (ImGui::Combo("##Index", &iTriggerIdx, triggerIndices, IM_ARRAYSIZE(triggerIndices))) {
+			pMapToolObject->Set_TriggerIndex(iTriggerIdx);
 		}
 
 		ImGui::End();
@@ -187,28 +211,18 @@ void CMapToolHelper::Menu_MapShaderInfo()
 		return;
 
 	string strModelName = pModel->Get_ModelInfo().strModelName;
-	_bool bFound = { false };
-	_int iMapIndex = { -1 };
-	for (auto& mapName : m_vecMapModelNames)
-	{
-		iMapIndex++;
-		if (strModelName == mapName) {
-			bFound = true;
-			iCurMapIndex = iMapIndex;
-			break;
-		}
-	}
+	_int iIndex = Compute_MapIndex(strModelName);
 
-	if (false == bFound)
+	if (-1 == iIndex)
 		return;
 
 	_uint iNumMesh = pModel->Get_NumMeshes();
 
-	if (vecPassIndices[iCurMapIndex].empty())
-		vecPassIndices[iCurMapIndex].resize(iNumMesh);
-	if (vecSamplingFactors[iCurMapIndex].empty()) {
-		vecSamplingFactors[iCurMapIndex].resize(iNumMesh);
-		fill(vecSamplingFactors[iCurMapIndex].begin(), vecSamplingFactors[iCurMapIndex].end(), 1.f);
+	if (vecPassIndices[iMapIndex].empty())
+		vecPassIndices[iMapIndex].resize(iNumMesh);
+	if (vecSamplingFactors[iMapIndex].empty()) {
+		vecSamplingFactors[iMapIndex].resize(iNumMesh);
+		fill(vecSamplingFactors[iMapIndex].begin(), vecSamplingFactors[iMapIndex].end(), 1.f);
 	}
 
 	vector<string> vecMeshNames(iNumMesh);
@@ -223,15 +237,20 @@ void CMapToolHelper::Menu_MapShaderInfo()
 	string strMapInfo = strModelName + "_ShaderInfo";
 	ImGui::Begin(strMapInfo.c_str());
 
+	_float fButtonWidth = 80;
+	if (ImGui::Button("Reset", ImVec2(fButtonWidth, 30)))
+		Reset_MapShaderInfo();
+	ImGui::SameLine();
+
 	ImVec2 vWindowSize = ImGui::GetWindowSize();
-	_float fButtonWidth = 100.0f;
 	_float fButtonPosX = (vWindowSize.x - fButtonWidth) * 0.5f;
 	ImGui::SetCursorPosX(fButtonPosX - fButtonWidth * 0.6f);
-	if (ImGui::Button("Save", ImVec2(100, 40)))
+	if (ImGui::Button("Save", ImVec2(fButtonWidth, 30)))
 		Save_MapShaderInfo();
 	ImGui::SameLine();
+	
 	ImGui::SetCursorPosX(fButtonPosX + fButtonWidth * 0.6f);
-	if (ImGui::Button("Load", ImVec2(100, 40)))
+	if (ImGui::Button("Load", ImVec2(fButtonWidth, 30)))
 		Load_MapShaderInfo();
 
 	for (_uint j = 0; j < iNumMesh; j++)
@@ -247,16 +266,16 @@ void CMapToolHelper::Menu_MapShaderInfo()
 		ImGui::SameLine();
 		//------------------------------
 		ImGui::SetNextItemWidth(150);
-		if (ImGui::Combo("##PassIndex", &vecPassIndices[iCurMapIndex][j], ShaderPasses, IM_ARRAYSIZE(ShaderPasses)))
+		if (ImGui::Combo("##PassIndex", &vecPassIndices[iMapIndex][j], ShaderPasses, IM_ARRAYSIZE(ShaderPasses)))
 		{
-			pBasicMap->Set_PassIndex(j, vecPassIndices[iCurMapIndex][j]);
+			pBasicMap->Set_PassIndex(j, vecPassIndices[iMapIndex][j]);
 		}
 		ImGui::SameLine();
 		//------------------------------
 		ImGui::SetNextItemWidth(100);
-		if (ImGui::InputFloat("##SamplingFactor", &vecSamplingFactors[iCurMapIndex][j], 0.01f, 1.0f, "%.3f")) 
+		if (ImGui::InputFloat("##SamplingFactor", &vecSamplingFactors[iMapIndex][j], 0.01f, 1.0f, "%.3f")) 
 		{
-			pBasicMap->Set_SamplingFactor(j, vecSamplingFactors[iCurMapIndex][j]);
+			pBasicMap->Set_SamplingFactor(j, vecSamplingFactors[iMapIndex][j]);
 		}
 		ImGui::PopID();
 	}
@@ -292,20 +311,23 @@ void CMapToolHelper::OnLeftClick()
 	CModel* pModel = dynamic_cast<CModel*>(m_pPickedObject->Get_Component(TEXT("Com_Model")));
 	string strModelName = pModel->Get_ModelInfo().strModelName;
 	_uint iNumMeshes = pModel->Get_NumMeshes();
-	_bool bIsMap = { false };
-	for (auto& mapModelName : m_vecMapModelNames)
-	{
-		if (strModelName == mapModelName) {
-			bIsMap = true;
-			break;
-		}
-	}
 
-	if (true == bIsMap)
+	_int iIndex = Compute_MapIndex(strModelName);
+
+	if (-1 == iIndex) // 피킹한 객체가 맵이 아님
+		return;
+
+	CBasicMap* pBasicMap = dynamic_cast<CBasicMap*>(m_pPickedObject);
+	pBasicMap->Reset_Time(iPickedMeshIndex);
+	iSelectedMeshIndex = iPickedMeshIndex;
+	iMapIndex = iIndex;
+
+	if (vecPassIndices[iIndex].empty() || vecSamplingFactors[iIndex].empty())
 	{
-		CBasicMap* pBasicMap = dynamic_cast<CBasicMap*>(m_pPickedObject);
-		pBasicMap->Reset_Time(iPickedMeshIndex);
-		iSelectedMeshIndex = iPickedMeshIndex;
+		vecPassIndices[iIndex].resize(iNumMeshes);
+		vecSamplingFactors[iIndex].resize(iNumMeshes);
+
+		Load_MapShaderInfo();
 	}
 }
 
@@ -314,20 +336,28 @@ void CMapToolHelper::OnRightClick()
 	if (iAnimIdx == -1 && iNonAnimIdx == -1)
 		return;
 
-	CGameObject* pGrid = m_pGameInstance->Get_GameObject(LEVEL_TOOL_MAP, TEXT("Layer_Grid"), 0);
-	if (nullptr == pGrid)
-		return;
+	_float2 vMouseViewPortPos = m_pGameInstance->Get_MouseViewPortPos();
+	_vector vWorldPos = m_pGameInstance->Compute_WorldPos(vMouseViewPortPos, TEXT("Target_FieldDepth"));
 
-	CVIBuffer_Terrain* pGridBuffer = dynamic_cast<CVIBuffer_Terrain*>(pGrid->Get_Component(TEXT("Com_VIBuffer")));
-	if (nullptr == pGridBuffer)
-		return;
+	if (false == XMVector4Equal(vWorldPos, XMVectorZero())) 
+		m_vPickPos = vWorldPos;
+	else
+	{
+		CGameObject* pGrid = m_pGameInstance->Get_GameObject(LEVEL_TOOL_MAP, TEXT("Layer_Grid"), 0);
+		if (nullptr == pGrid)
+			return;
 
-	const CTransform* pTransform = dynamic_cast<const CTransform*>(pGrid->Get_Component(g_strTransformTag));
-	if (nullptr == pTransform)
-		return;
+		CVIBuffer_Terrain* pGridBuffer = dynamic_cast<CVIBuffer_Terrain*>(pGrid->Get_Component(TEXT("Com_VIBuffer")));
+		if (nullptr == pGridBuffer)
+			return;
 
-	m_vPickPos = pGridBuffer->Get_PickPos(pTransform);
+		const CTransform* pTransform = dynamic_cast<const CTransform*>(pGrid->Get_Component(g_strTransformTag));
+		if (nullptr == pTransform)
+			return;
 
+		m_vPickPos = pGridBuffer->Get_PickPos(pTransform);
+	}
+		
 	if (!::XMVector3Equal(::XMLoadFloat3(&m_vPickPos), ::XMVectorSet(0.f, 0.f, 0.f, 0.f)))
 	{
 		_float4 vTemp(m_vPickPos.x, m_vPickPos.y, m_vPickPos.z, 1.0f); // 위치
@@ -335,11 +365,28 @@ void CMapToolHelper::OnRightClick()
 		memcpy(&tempDesc.matWorld.m[CTransform::STATE_POSITION], &vTemp, sizeof(_float4));
 		tempDesc.wstrModelName = CUtils::StrToWstr(m_vecNonAnimTxts[iNonAnimIdx]);
 
-		wstring wstrPrototypeTag = TEXT("Prototype_GameObject_MapToolObject");
+		wstring wstrPrototypeTag = TEXT("Prototype_GameObject_");
+		
+		_bool bIsMap = { false };
+		for (auto& mapName : m_vecMapModelNames) {
+			if (mapName == m_vecNonAnimTxts[iNonAnimIdx]) {
+				bIsMap = true;
+				break;
+			}
+		}
+			
+		if (true == bIsMap)
+			wstrPrototypeTag += TEXT("BasicMap");
+		else
+			wstrPrototypeTag += TEXT("MapToolObject");
+
 		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), wstrPrototypeTag, &tempDesc)))
 			return;
 
 		iAnimIdx = iNonAnimIdx = -1;
+
+		list<CGameObject*>* pObjList = m_pGameInstance->Get_List(LEVEL_TOOL_MAP, TEXT("Layer_Parse"));
+		m_pPickedObject = pObjList->back();
 	}
 }
 
@@ -407,8 +454,14 @@ void CMapToolHelper::Save_Level()
 
 		if ("Camera" == strModelName || "Trigger" == strModelName) {
 			CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(object);
-			_int iCamIndex = pMapToolObject->Get_CamIndex();
-			outputFile.write(reinterpret_cast<const char*>(&iCamIndex), sizeof(iCamIndex));
+
+			if ("Trigger" == strModelName)
+			{
+				_int triggerType = pMapToolObject->Get_TriggerType();
+				outputFile.write(reinterpret_cast<const char*>(&triggerType), sizeof(triggerType));
+			}
+			_int iTriggerIndex = pMapToolObject->Get_TriggerIndex();
+			outputFile.write(reinterpret_cast<const char*>(&iTriggerIndex), sizeof(iTriggerIndex));
 		}
 	}
 
@@ -472,8 +525,8 @@ void CMapToolHelper::Load_Level()
 
 	string strModelName;
 	_float4x4 matWorld{};
-	_int iCamIndex{};
-	//map<_int, _float4x4> camMatrices; // -> 인게임 Level에서만 수행
+	_int triggerType{};
+	_int iTriggerIndex{};
 
 	while (!fileStream.eof()) 
 	{
@@ -484,8 +537,10 @@ void CMapToolHelper::Load_Level()
 		fileStream.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
 
 		if ("Camera" == strModelName || "Trigger" == strModelName) {
-			fileStream.read(reinterpret_cast<char*>(&iCamIndex), sizeof(iCamIndex));
-			//camMatrices.emplace(iCamIndex, matWorld); // -> 인게임 Level에서만 수행
+			if ("Trigger" == strModelName)
+				fileStream.read(reinterpret_cast<char*>(&triggerType), sizeof(triggerType));
+
+			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
 		}
 
 		if (fileStream.eof())
@@ -495,7 +550,12 @@ void CMapToolHelper::Load_Level()
 		tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
 		tDesc.matWorld = matWorld;
 		if ("Camera" == strModelName || "Trigger" == strModelName)
-			tDesc.iCamIndex = iCamIndex;
+		{
+			if("Trigger" == strModelName)
+				tDesc.iTriggerType = triggerType;
+			tDesc.iTriggerIndex = iTriggerIndex;
+		}
+			
 
 		_bool bIsMap = { false };
 		for (auto& mapModelName : m_vecMapModelNames) {
@@ -525,7 +585,7 @@ void CMapToolHelper::Load_Level()
 
 void CMapToolHelper::Save_MapShaderInfo()
 {
-	string tempFileName = "temp_" + m_vecMapModelNames[iCurMapIndex] + "_ShaderInfo.txt";
+	string tempFileName = "temp_" + m_vecMapModelNames[iMapIndex] + "_ShaderInfo.txt";
 
 	ofstream outputFile(tempFileName, ios::out | ios::binary);
 	if (!outputFile.is_open()) // 임시파일 열렸는지 확인
@@ -535,13 +595,13 @@ void CMapToolHelper::Save_MapShaderInfo()
 		return;
 	}
 
-	if (vecPassIndices[iCurMapIndex].empty() || vecSamplingFactors[iCurMapIndex].empty())
+	if (vecPassIndices[iMapIndex].empty() || vecSamplingFactors[iMapIndex].empty())
 		return;
 
-	for (_int i = 0; i < vecPassIndices[iCurMapIndex].size(); i++)
+	for (_int i = 0; i < vecPassIndices[iMapIndex].size(); i++)
 	{
-		outputFile.write(reinterpret_cast<const char*>(&vecPassIndices[iCurMapIndex][i]), sizeof(vecPassIndices[iCurMapIndex][i]));
-		outputFile.write(reinterpret_cast<const char*>(&vecSamplingFactors[iCurMapIndex][i]), sizeof(vecSamplingFactors[iCurMapIndex][i]));
+		outputFile.write(reinterpret_cast<const char*>(&vecPassIndices[iMapIndex][i]), sizeof(vecPassIndices[iMapIndex][i]));
+		outputFile.write(reinterpret_cast<const char*>(&vecSamplingFactors[iMapIndex][i]), sizeof(vecSamplingFactors[iMapIndex][i]));
 	}
 	outputFile.close();
 
@@ -564,8 +624,8 @@ void CMapToolHelper::Save_MapShaderInfo()
 	char buffer[80];
 	strftime(buffer, sizeof(buffer), "%H%M%S", &timeinfo);
 
-	string fileName_Time = "../../../objects_txt/" + string(buffer) + "_" + m_vecMapModelNames[iCurMapIndex] + "_ShaderInfo.txt";
-	string fileName = "../../../objects_txt/" + m_vecMapModelNames[iCurMapIndex] + "_ShaderInfo.txt";
+	string fileName_Time = "../../../objects_txt/" + string(buffer) + "_" + m_vecMapModelNames[iMapIndex] + "_ShaderInfo.txt";
+	string fileName = "../../../objects_txt/" + m_vecMapModelNames[iMapIndex] + "_ShaderInfo.txt";
 	if (rename(fileName.c_str(), fileName_Time.c_str()) != 0)
 	{
 		MSG_BOX(TEXT("Failed to rename original file."));
@@ -580,7 +640,7 @@ void CMapToolHelper::Save_MapShaderInfo()
 		return;
 	}
 
-	wstring wstrSaveMsg = CUtils::StrToWstr(string(m_vecMapModelNames[iCurMapIndex] + "_ShaderInfo")) + TEXT(" Saved.");
+	wstring wstrSaveMsg = CUtils::StrToWstr(string(m_vecMapModelNames[iMapIndex] + "_ShaderInfo")) + TEXT(" Saved.");
 	MSG_BOX(wstrSaveMsg.c_str());
 }
 
@@ -589,12 +649,12 @@ void CMapToolHelper::Load_MapShaderInfo()
 	if (vecPassIndices.empty() || vecSamplingFactors.empty())
 		return;
 
-	string strFileName = "../../../objects_txt/" + m_vecMapModelNames[iCurMapIndex] + "_ShaderInfo.txt";
+	string strFileName = "../../../objects_txt/" + m_vecMapModelNames[iMapIndex] + "_ShaderInfo.txt";
 
 	fstream fileStream(strFileName, ios::in | ios::binary);
 	if (fileStream.is_open() == false)
 	{
-		wstring wstrError = TEXT("Failed to open : ") + CUtils::StrToWstr(m_vecMapModelNames[iCurMapIndex]) + TEXT("_ShaderInfo.txt");
+		wstring wstrError = TEXT("Failed to open : ") + CUtils::StrToWstr(m_vecMapModelNames[iMapIndex]) + TEXT("_ShaderInfo.txt");
 		MSG_BOX(wstrError.c_str());
 		return;
 	}
@@ -612,8 +672,8 @@ void CMapToolHelper::Load_MapShaderInfo()
 		if (fileStream.eof())
 			break;
 
-		vecPassIndices[iCurMapIndex][iCount] = iPassIndex;
-		vecSamplingFactors[iCurMapIndex][iCount] = fSamplingFactor;
+		vecPassIndices[iMapIndex][iCount] = iPassIndex;
+		vecSamplingFactors[iMapIndex][iCount] = fSamplingFactor;
 		pBasicMap->Set_PassIndex(iCount, iPassIndex);
 		pBasicMap->Set_SamplingFactor(iCount, fSamplingFactor);
 		iCount++;
@@ -665,13 +725,40 @@ CGameObject* CMapToolHelper::Select_ModelByPicking(const wstring& wstrLayerTag)
 	CGameObject* pResult = { nullptr };
 	for (int i = 0; i < vecPickPos.size(); i++)
 	{
-		if (vecPickPos[i].w <= fShortest) {
+		if (vecPickPos[i].w < fShortest) {
+			fShortest = vecPickPos[i].w;
 			pResult = vecPickedObjects[i];
 			iPickedMeshIndex = vecMeshIndex[i];
 		}
 	}
 
 	return pResult;
+}
+
+_int CMapToolHelper::Compute_MapIndex(const string& _strModelName)
+{
+	for (_int i = 0; i < m_vecMapModelNames.size(); i++)
+	{
+		if (_strModelName == m_vecMapModelNames[i])
+			return i;
+	}
+
+	return -1;
+}
+
+void CMapToolHelper::Reset_MapShaderInfo()
+{
+	if (nullptr == m_pPickedObject)
+		return;
+
+	CModel* pModel = dynamic_cast<CModel*>(m_pPickedObject->Get_Component(TEXT("Com_Model")));
+	if (nullptr == pModel)
+		return;
+
+	_int iNumMesh = pModel->Get_NumMeshes();
+	vecPassIndices[iMapIndex].resize(iNumMesh);
+	vecSamplingFactors[iMapIndex].resize(iNumMesh);
+	fill(vecSamplingFactors[iMapIndex].begin(), vecSamplingFactors[iMapIndex].end(), 1.f);
 }
 
 CMapToolHelper* CMapToolHelper::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

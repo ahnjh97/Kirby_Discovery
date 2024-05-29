@@ -219,7 +219,8 @@ _float4 CModel::Check_Meshes(const class CTransform* pTransform, _Out_ _int& iMe
 	_float4 fResult = {};
 	for (auto& iter : vecPickPosAndMeshIdx)
 	{
-		if (iter.first.w <= fShortest) {
+		if (iter.first.w < fShortest) {
+			fShortest = iter.first.w;
 			fResult = iter.first;
 			iMeshIndex = iter.second;
 		}

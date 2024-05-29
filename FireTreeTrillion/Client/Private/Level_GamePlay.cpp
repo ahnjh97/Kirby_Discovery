@@ -100,8 +100,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const wstring& strLayerTag)
 
 HRESULT CLevel_GamePlay::Ready_Layer_Player(const wstring & strLayerTag)
 {
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_TestModel"))))
-		return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_TestModel"))))
+	//	return E_FAIL;
 
 	// Kirby
 	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Kirby"))))
@@ -137,7 +137,8 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 
 	string strModelName;
 	_float4x4 matWorld{};
-	_int iCamIndex{};
+	_int iTriggerType{};
+	_int iTriggerIndex{};
 	map<_int, _float4x4> camMatrices;
 
 	while (!fileStream.eof())
@@ -149,9 +150,11 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 		fileStream.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
 
 		if ("Camera" == strModelName || "Trigger" == strModelName) {
-			fileStream.read(reinterpret_cast<char*>(&iCamIndex), sizeof(iCamIndex));
+			if("Trigger" == strModelName)
+				fileStream.read(reinterpret_cast<char*>(&iTriggerType), sizeof(iTriggerType));
+			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
 			if("Camera" == strModelName)
-				camMatrices.emplace(iCamIndex, matWorld);
+				camMatrices.emplace(iTriggerIndex, matWorld);
 		}
 		if (fileStream.eof())
 			break;
@@ -176,7 +179,8 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 			CTrigger::TRIGGER_DESC tTriggerDesc{};
 			tTriggerDesc.matWorld = matWorld;
 			tTriggerDesc.wstrModelName = CUtils::StrToWstr(strModelName);
-			tTriggerDesc.iCamIndex = iCamIndex;
+			tTriggerDesc.iTriggerType = iTriggerType;
+			tTriggerDesc.iTriggerIndex = iTriggerIndex;
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Trigger"), TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc)))
 				return E_FAIL;
 		}

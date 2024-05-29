@@ -46,6 +46,8 @@ private:
 	HRESULT Add_BlendMap(const wstring& _wstrModelTag);
 
 	void SetUpShaderInfo(const wstring& _wstrModelTag);
+
+	_bool CheckIfBlendMapExists(const wstring& _wstrModelTag);
 		
 public:
 	static CBasicMap* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

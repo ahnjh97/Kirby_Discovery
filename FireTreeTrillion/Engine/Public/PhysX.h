@@ -24,8 +24,8 @@ public:
 
     //EventCallBack ÇÔ¼öµé
     void Register_Player(PxActor* pPlayerActor);
-    void Register_Trigger(PxActor* pTriggerActor, _int iCamIndex);
-    void SetUp_CamSetIndexFunc(function<void(_int)> func);
+    void Register_Trigger(PxActor* pTriggerActor, _int iTriggerType, _int iTriggerIndex);
+    void SetUp_TriggerFunc(_int iTriggerType, function<void(_int)> func);
 
     PxPhysics*                          Get_Physics() { return m_pPhysics; }
     PxMaterial*                         Get_Material() { return m_pMaterial; }

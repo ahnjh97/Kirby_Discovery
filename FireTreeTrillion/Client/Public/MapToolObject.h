@@ -14,11 +14,15 @@ class CMapToolObject : public CGameObject
 public:
 	struct MAPTOOLOBJECT_DESC : public GAMEOBJECT_DESC
 	{
-		_int iCamIndex = -1;
+		_int iTriggerType = -1;
+		_int iTriggerIndex = -1;
 	};
 public:
-	_int Get_CamIndex() { return m_iCamIndex; }
-	void Set_CamIndex(_int iCamIndex) { m_iCamIndex = iCamIndex; }
+	_int Get_TriggerType() { return m_iTriggerType; }
+	_int Get_TriggerIndex() { return m_iTriggerIndex; }
+
+	void Set_TriggerType(_int iTriggerType) { m_iTriggerType = iTriggerType; }
+	void Set_TriggerIndex(_int iTriggerIndex) { m_iTriggerIndex = iTriggerIndex; }
 
 private:
 	CMapToolObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -33,7 +37,8 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	_int m_iCamIndex = {};
+	_int m_iTriggerType = { -1 };
+	_int m_iTriggerIndex = {};
 
 private:
 	CModel* m_pModelCom = { nullptr };

@@ -19,10 +19,17 @@ _bool CEventCallBack::IsActorInTriggerList(PxActor* pRigidActor)
     if (m_Triggers.empty())
         return false;
 
-    for (auto pair : m_Triggers) {
-        if (pair.first == pRigidActor) {
-            m_pCamSetIndexFunc(pair.second);
-            return true;
+    for (auto& tuple : m_Triggers) {
+        if (get<0>(tuple) == pRigidActor) {
+            auto iter = m_TriggerFunctions.find(get<1>(tuple));
+
+            wstring wstrDebug = TEXT("TYPE: ") + to_wstring(get<1>(tuple)) + TEXT(", INDEX: ") + to_wstring(get<2>(tuple));
+            //MSG_BOX(wstrDebug.c_str());
+
+            if (iter != m_TriggerFunctions.end()) {
+                iter->second(get<2>(tuple));
+                return true;
+            }
         }
     }
 

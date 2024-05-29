@@ -11,10 +11,12 @@ BEGIN(Client)
 
 class CTrigger final : public CGameObject
 {
+	enum TRIGGER { TRIGGER_CAM, TRIGGER_SHADER, TRIGGER_END };
 public:
 	struct TRIGGER_DESC : GAMEOBJECT_DESC
 	{
-		_int iCamIndex = -1;
+		_uint iTriggerType;
+		_int iTriggerIndex = -1;
 	};
 
 private:
@@ -30,9 +32,6 @@ public:
 	virtual HRESULT Render()											override;
 	virtual void	Render_IMGUI()										override;
 
-public:
-	void			Set_CallBackFunction(const function<void()>& _Callback) { m_CallBack = _Callback; }
-
 private:
 	HRESULT			Add_Components();
 	HRESULT			Bind_ShaderResources();
@@ -43,8 +42,9 @@ private:
 	CRigidBody*		m_pRigidBodyCom = { nullptr };
 
 private:
-	function<void()>	m_CallBack = nullptr;
-	_int			m_iCamIndex = { -1 };
+	TRIGGER			m_eTriggerType = { TRIGGER_END };
+	_int			m_iTriggerIndex = { -1 };
+
 
 public:
 	static CTrigger*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

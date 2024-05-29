@@ -32,7 +32,7 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 
 	m_pGameInstance->Add_Camera(this);
 	function<void(_int)> func = bind(&CCamera_Free::Set_MatrixIndex, this, placeholders::_1);
-	m_pGameInstance->SetUp_CamSetIndexFunc(func);
+	m_pGameInstance->SetUp_TriggerFunc(TRIGGER_CAMERA, func);
 
 	return S_OK;
 }

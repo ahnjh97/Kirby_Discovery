@@ -25,7 +25,7 @@ private:
 	// ImGui
 	void	Menu_Level();
 	void	Menu_NonAnimModels();
-	void	Menu_SetUpCamIndex();
+	void	Menu_TriggerIndex();
 	void	Menu_MapShaderInfo();
 	void	Edit_Object();
 
@@ -40,9 +40,12 @@ private:
 	void	Load_Level();
 	void	Save_MapShaderInfo();
 	void	Load_MapShaderInfo();
+	void	Reset_MapShaderInfo();
 
 	// Picking
 	CGameObject* Select_ModelByPicking(const wstring& wstrLayerTag = TEXT("Layer_Parse"));
+
+	_int Compute_MapIndex(const string& strModelName);
 
 private:
 	vector<string>	m_vecLevelName; 

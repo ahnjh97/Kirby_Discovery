@@ -4,6 +4,7 @@
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 texture2D	g_DiffuseTexture;
 texture2D	g_NormalTexture;
+uint        g_iTriggerType;
 
 struct VS_IN
 {
@@ -123,7 +124,6 @@ PS_OUT NO_NORMALMAP_PS_MAIN(PS_IN In)
     return Out;
 }
 
-
 PS_OUT SKY_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
@@ -138,6 +138,21 @@ PS_OUT SKY_MAIN(PS_IN In)
     return Out;
 }
 
+PS_OUT TRIGGER(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    if (g_iTriggerType == 0)
+        Out.vDiffuse = vector(1, 0.75f, 0.8f, 1);
+    else if (g_iTriggerType == 1)
+        Out.vDiffuse = vector(0, 0, 1, 1);
+    else
+        Out.vDiffuse = vector(1, 1, 1, 1);
+    
+    Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    
+    return Out;
+}
 
 technique11 DefaultTechnique
 {
@@ -193,5 +208,17 @@ technique11 DefaultTechnique
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 SKY_MAIN();
     }
+    // Æ®¸®°Å ( 4 )
+    pass Trigger
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 TRIGGER();
+    }
 }
