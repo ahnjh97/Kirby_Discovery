@@ -38,9 +38,9 @@ private:
 	_bool			Set_GizmoGrid();
 	_bool			Set_DockSpace();
 
-public:
-	_bool			Save_FileData();
-	_bool			Load_FileData(const string& _FilePath);
+	_bool			Create_UIObject();
+	_bool			Save_FileData(string _strFilePath);
+	_bool			Load_FileData(const string& _strFilePath);
 	
 
 public:

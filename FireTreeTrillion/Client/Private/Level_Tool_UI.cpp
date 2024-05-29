@@ -87,11 +87,12 @@ HRESULT CLevel_Tool_UI::Ready_Layer_UI(const wstring& strLayerTag)
 {
 	// 05.25) HUD Ãß°¡
 	CUIObject::UIOBJ_DESC HUD_KirbyDESC{};
-	HUD_KirbyDESC.strUITag = { TEXT("HUD_Kirby") };
+	HUD_KirbyDESC.wstrUITag = { TEXT("HUD_Kirby") };
 	HUD_KirbyDESC.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f };
-	HUD_KirbyDESC.vSize = { 100.f, 100.f };
+	HUD_KirbyDESC.vSize = { 10.f, 10.f };
 	HUD_KirbyDESC.vPos = {	HUD_KirbyDESC.vCenter.x/* - 200.f*/, 
 							HUD_KirbyDESC.vCenter.y/* - 200.f */ };
+	HUD_KirbyDESC.fRaito = { 0.f };
 
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_UI, strLayerTag, TEXT("Prototype_GameObject_HUD_Kirby"), &HUD_KirbyDESC)))
 		return E_FAIL;

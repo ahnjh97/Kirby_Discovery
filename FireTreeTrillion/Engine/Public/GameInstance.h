@@ -68,6 +68,8 @@ public: /* For.Object_Manager */
 	class CGameObject*	Get_GameObject_ByTag(_uint iLevelIndex, const wstring& strLayerTag, wstring _tag);
 	void				Set_CurrentLevel(_int CurrentLevel);
 	void	Clear_Layer(_uint iLevelIndex, const wstring& wstrLayerTag);
+	_uint				Get_GameObject_Num(_uint _iLevelIndex, const wstring& _strLayerTag);
+
 
 public: /* For.Component_Manager */
 	HRESULT			  Add_Prototype(_uint iLevelIndex, const wstring& strPrototypeTag, class CComponent* pPrototype);

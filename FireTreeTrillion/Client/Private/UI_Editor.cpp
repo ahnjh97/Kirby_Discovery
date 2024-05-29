@@ -29,9 +29,23 @@ HRESULT CUI_Editor::Initialize(void* _pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	CUIObject* pUIObj = dynamic_cast<CUIObject*>(m_pGameInstance->Get_GameObject(LEVEL_TOOL_UI, TEXT("Layer_UI"), 0));
-	CHECK_NULLPTR(pUIObj);
-	m_vecUIObj.push_back(pUIObj);
+#pragma region GET_GAMEOBJ
+
+	//CUIObject* pUIObj = dynamic_cast<CUIObject*>(m_pGameInstance->Get_GameObject(LEVEL_TOOL_UI, TEXT("Layer_UI"), 0));
+	//CHECK_NULLPTR(pUIObj);
+	//m_vecUIObj.push_back(pUIObj);
+
+#pragma endregion
+
+#pragma region LOAD_FILEDATA
+
+	//string strFilePath = "../Bin/Resources/Data/UI/";
+	//if (Load_FileData(strFilePath + "Test_Origin.txt"))
+	//	MSG_BOX(TEXT("Successed to Load : FileData"));
+	//else
+	//	MSG_BOX(TEXT("Failed to Load : FileData"));
+
+#pragma endregion
 
 	return S_OK;
 }
@@ -76,22 +90,29 @@ void CUI_Editor::Render_IMGUI()
 	{
 		if (ImGui::BeginTabBar(u8"##Directory"))
 		{
-			if (ImGui::BeginTabItem(u8"ㅁㄴㅇㄹ"))
+			if (ImGui::BeginTabItem(u8"HUD"))
 			{
-				ImGui::SeparatorText(u8"UI List");
+				ImGui::SeparatorText(u8"UI List 목록");
 
 				if (ImGui::BeginListBox(u8"##UI List", ImVec2(285, 200)))
 				{
 					_int iSelect = -1;
 					for (size_t i = 0; i < m_vecUIObj.size(); ++i)
 					{
-						if (ImGui::Selectable(m_vecUIObj[i]->m_strUITag.c_str(), iSelect == i))
+ 						string strUITag = CUtils::WstrToStr(m_vecUIObj[i]->Get_UIObj_Desc().wstrUITag);
+						
+						if (strUITag.empty()) //wstrUITag 값에 대한 예외처리
+							strUITag = "##";
+
+						if (ImGui::Selectable(strUITag.c_str(), iSelect == i))
 						{
 							iSelect = i;
 						}
 
-						if (iSelect)
+						if (iSelect == i) //목록 선택할 경우, 활성화
+						{
 							ImGui::SetItemDefaultFocus();
+						}
 					}
 
 					ImGui::EndListBox();
@@ -232,19 +253,14 @@ _bool CUI_Editor::Set_GizmoSync()
 	ImGuizmo::BeginFrame(); //기즈모 생성
 	ImGuizmo::SetOrthographic(TRUE); //기즈모 직교기준
 
-	//_float4x4 WorldMatrix = m_pTransformCom->Get_WorldFloat4x4();
-	//if (nullptr == m_pTransformCom)
-	//	return FALSE;
-
-	CTransform* UITrans = (CTransform*)(m_pGameInstance->
-		Get_Component(LEVEL_TOOL_UI, TEXT("Layer_UI"), g_strTransformTag, 0));
-
+	//오브젝트의 트랜스폼/매트릭스 정보 저장
+	CTransform* UITrans = (CTransform*)(m_pGameInstance->Get_Component(LEVEL_TOOL_UI, TEXT("Layer_UI"), g_strTransformTag, 0));
 	_float4x4 UIWorldMat = UITrans->Get_WorldFloat4x4();
 
 	if (nullptr == UITrans)
 		return FALSE;
 
-	static ImGuizmo::OPERATION eCurGizmoOper(ImGuizmo::TRANSLATE/*TRANSLATE_X | ImGuizmo::TRANSLATE_Y*/);
+	static ImGuizmo::OPERATION eCurGizmoOper(ImGuizmo::TRANSLATE);
 	static ImGuizmo::MODE eCurGizmoMode(ImGuizmo::WORLD);
 
 	// 기즈모 사용여부 텍스트
@@ -276,7 +292,7 @@ _bool CUI_Editor::Set_GizmoSync()
 	if (m_pGameInstance->Get_DIKeyState(DIK_LCONTROL, KEY_PRESS))
 	{
 		if (m_pGameInstance->Get_DIKeyState(DIK_S, KEY_DOWN))
-			eCurGizmoOper = ImGuizmo::SCALE/*ImGuizmo::SCALE_X | ImGuizmo::SCALE_Y*/;
+			eCurGizmoOper = ImGuizmo::SCALE;
 
 		else if (m_pGameInstance->Get_DIKeyState(DIK_R, KEY_DOWN))
 			eCurGizmoOper = ImGuizmo::ROTATE;
@@ -321,6 +337,17 @@ _bool CUI_Editor::Set_GizmoSync()
 	//월드행렬 세팅
 	UITrans->Set_WorldMatrix(UIWorldMat);
 
+	//UIObj 순회하며 변경 값 적용
+	for (auto& iter : m_vecUIObj)
+	{
+		m_UIObjDesc.wstrUITag = iter->Get_UIObj_Desc().wstrUITag;
+		m_UIObjDesc.vPos = (_float2)Translate;
+		m_UIObjDesc.fRaito = Rotate[2];
+		m_UIObjDesc.vSize = (_float2)Scale;
+
+		iter->Set_UIObj_Desc(m_UIObjDesc);
+	}
+
 	return TRUE;
 }
 
@@ -337,7 +364,7 @@ _bool CUI_Editor::Set_GizmoGrid()
 	ViewMatrix = CGameInstance::Get_Instance()->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW);
 	ProjMatrix = CGameInstance::Get_Instance()->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
 
-	ImGuizmo::DrawGrid(ViewMatrix.m[0], ProjMatrix.m[0], MatGridX, 1000.f);
+	ImGuizmo::DrawGrid(ViewMatrix.m[0], ProjMatrix.m[0], MatGridX, 10000.f);
 
 	return TRUE;
 }
@@ -366,9 +393,18 @@ _bool CUI_Editor::Set_DockSpace()
 
 			if (ImGui::BeginMenu(u8"File 파일"))
 			{
+				if (ImGui::MenuItem(u8"Create 생성"))
+				{
+					if (Create_UIObject())
+						MSG_BOX(TEXT("Successed to Create : UI Object"));
+
+					else
+						MSG_BOX(TEXT("Failed to Create : UI Object"));
+				}
+
 				if (ImGui::MenuItem(u8"Save 저장"))
 				{
-					if (Save_FileData()) //==TRUE
+					if (Save_FileData("../Bin/Resources/Data/UI/")) //==TRUE
 						MSG_BOX(TEXT("Successed to Save : FileData"));
 
 					else
@@ -377,7 +413,9 @@ _bool CUI_Editor::Set_DockSpace()
 
 				if (ImGui::MenuItem(u8"Load 로드")) //==TRUE
 				{
-					if (Load_FileData("../Bin/Resources/Data/UI/Test_Origin.txt"))
+					string strFilePath = "../Bin/Resources/Data/UI/";
+
+					if (Load_FileData(strFilePath + "Test_Origin.txt"))
 						MSG_BOX(TEXT("Successed to Load : FileData"));
 
 					else
@@ -407,11 +445,23 @@ _bool CUI_Editor::Set_DockSpace()
 	return TRUE;
 }
 
-_bool CUI_Editor::Save_FileData()
+_bool CUI_Editor::Create_UIObject()
 {
-	string strFilePath = "../Bin/Resources/Data/UI/";
-	string strOriginName = strFilePath + "Test_Origin.txt";
-	string strTempName = strFilePath + "Test_Temp.txt"; //임시
+	CUIObject* pUIObj = dynamic_cast<CUIObject*>(m_pGameInstance->Get_GameObject(LEVEL_TOOL_UI, TEXT("Layer_UI"), 0));
+	if (nullptr == pUIObj)
+	{ 
+		CHECK_NULLPTR(pUIObj);
+		return FALSE;
+	}
+	m_vecUIObj.push_back(pUIObj);
+
+	return TRUE;
+}
+
+_bool CUI_Editor::Save_FileData(string _strFilePath)
+{
+	string strOriginName = _strFilePath + "Test_Origin.txt";
+	string strTempName = _strFilePath + "Test_Temp.txt"; //임시
 
 	std::ofstream OutputFile(strTempName, ios::out | std::ios::binary);
 
@@ -422,24 +472,63 @@ _bool CUI_Editor::Save_FileData()
 	}
 
 	size_t size = m_vecUIObj.size();
+	if (m_vecUIObj.empty())
+	{
+		OutputFile.close();
+		return FALSE;
+	}
+
 	OutputFile.write(reinterpret_cast<const char*>(&size), sizeof(size));
 
-	for (auto& iter : m_vecUIObj)
+	//for (auto& iter : m_vecUIObj)
+	for (size_t i = 0; i < m_vecUIObj.size(); ++i)
 	{
-		wstring wstProtoTag = iter->Get_PrototypeTag();
-		UIOBJ_DESC ProtoUI_Desc = iter->Get_UIObj_Desc();
-
+		//wstring wstProtoTag = iter->Get_PrototypeTag();
+		wstring wstProtoTag = m_vecUIObj[i]->Get_PrototypeTag();
 		string strProtoTag = CUtils::WstrToStr(wstProtoTag);
 		_uint iProtoTagLen = strProtoTag.length();
 
 		OutputFile.write(reinterpret_cast<const char*>(&iProtoTagLen), sizeof(iProtoTagLen));
-		OutputFile.write(strProtoTag.c_str(), /*sizeof(char) * sizeof*/iProtoTagLen);
+		OutputFile.write(strProtoTag.c_str(), iProtoTagLen);
 
-		OutputFile.write(reinterpret_cast<const char*>(&ProtoUI_Desc.strUITag), sizeof(ProtoUI_Desc.strUITag));
-		OutputFile.write(reinterpret_cast<const char*>(&ProtoUI_Desc.vCenter), sizeof(ProtoUI_Desc.vCenter));
-		OutputFile.write(reinterpret_cast<const char*>(&ProtoUI_Desc.vSize), sizeof(ProtoUI_Desc.vSize));
-		OutputFile.write(reinterpret_cast<const char*>(&ProtoUI_Desc.vPos), sizeof(ProtoUI_Desc.vPos));
-		OutputFile.write(reinterpret_cast<const char*>(&ProtoUI_Desc.fFrame), sizeof(ProtoUI_Desc.fFrame));
+		//m_UIObjDesc = iter->Get_UIObj_Desc();
+		m_UIObjDesc = m_vecUIObj[i]->Get_UIObj_Desc();
+		wstring wstrUITag = m_UIObjDesc.wstrUITag;
+		wstring wstrNum = to_wstring(i);
+
+		size_t wstrPos = wstrUITag.find(L"-"); //문자열 위치
+		//저장할 때 wstrUITag에 대한 예외처리
+		//if (wstrUITag == m_UIObjDesc.wstrUITag)
+		//{
+		//}
+		if (wstrPos != wstring::npos) //문자열 위치에 언더바가 존재할 경우
+		{
+			wstrUITag = wstrUITag.substr(0, wstrPos); //언더바 이전 문자열만 남김
+			++i;
+			wstrNum = to_wstring(i);
+			wstrUITag += TEXT("-") + wstrNum;
+
+		}
+		wstrUITag += TEXT("-") + wstrNum;
+
+		string strUITag = CUtils::WstrToStr(wstrUITag);
+		_uint iUITagLen = strUITag.length();
+
+		//OutputFile.write(reinterpret_cast<const char*>(&m_UIObjDesc.wstrUITag), sizeof(m_UIObjDesc.wstrUITag));
+		OutputFile.write(reinterpret_cast<const char*>(&iUITagLen), sizeof(iUITagLen));
+		OutputFile.write(strUITag.c_str(), iUITagLen);
+
+		OutputFile.write(reinterpret_cast<const char*>(&m_UIObjDesc.vCenter), sizeof(m_UIObjDesc.vCenter));
+		OutputFile.write(reinterpret_cast<const char*>(&m_UIObjDesc.vSize), sizeof(m_UIObjDesc.vSize));
+		OutputFile.write(reinterpret_cast<const char*>(&m_UIObjDesc.vPos), sizeof(m_UIObjDesc.vPos));
+		OutputFile.write(reinterpret_cast<const char*>(&m_UIObjDesc.fRaito), sizeof(m_UIObjDesc.fRaito));
+
+		//CUIObject* pUIObject = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(CUtils::StrToWstr(strProtoTag), &m_UIObjDesc));
+		//m_vecUIObj.push_back(pUIObject);
+		m_UIObjDesc.wstrUITag = CUtils::StrToWstr(strUITag);
+
+		CUIObject* pUIObject = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(CUtils::StrToWstr(strProtoTag), &m_UIObjDesc));
+		m_vecUIObj.push_back(pUIObject);
 	}
 
 	OutputFile.close();
@@ -483,18 +572,19 @@ _bool CUI_Editor::Load_FileData(const string& _strFilePath)
 		_uint iProtoTagLen;
 		InputFile.read(reinterpret_cast<char*>(&iProtoTagLen), sizeof(iProtoTagLen));
 		strProtoTag.resize(iProtoTagLen);
-		InputFile.read(&strProtoTag[0], /*sizeof(char) * */iProtoTagLen);
+		InputFile.read(&strProtoTag[0], iProtoTagLen);
 
-		//File.read(reinterpret_cast<char*>(&ProtoUI_Desc), sizeof(ProtoUI_Desc));
-		CUIObject::UIOBJ_DESC ProtoUI_Desc;
-		InputFile.read(reinterpret_cast<char*>(&ProtoUI_Desc.strUITag), sizeof(ProtoUI_Desc.strUITag));
-		InputFile.read(reinterpret_cast<char*>(&ProtoUI_Desc.vCenter), sizeof(ProtoUI_Desc.vCenter));
-		InputFile.read(reinterpret_cast<char*>(&ProtoUI_Desc.vSize), sizeof(ProtoUI_Desc.vSize));
-		InputFile.read(reinterpret_cast<char*>(&ProtoUI_Desc.vPos), sizeof(ProtoUI_Desc.vPos));
-		InputFile.read(reinterpret_cast<char*>(&ProtoUI_Desc.fFrame), sizeof(ProtoUI_Desc.fFrame));
-
-		CUIObject* pUIObject = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(CUtils::StrToWstr(strProtoTag), &ProtoUI_Desc));	
-		m_vecUIObj.push_back(pUIObject);
+		string strUITag;
+		_uint iUITagLen; 
+		InputFile.read(reinterpret_cast<char*>(&iUITagLen), sizeof(iUITagLen));
+		strUITag.resize(iUITagLen);
+		InputFile.read(&strUITag[0], iUITagLen);
+		
+		//InputFile.read(reinterpret_cast<char*>(&m_UIObjDesc.wstrUITag), sizeof(m_UIObjDesc.wstrUITag));
+		InputFile.read(reinterpret_cast<char*>(&m_UIObjDesc.vCenter), sizeof(m_UIObjDesc.vCenter));
+		InputFile.read(reinterpret_cast<char*>(&m_UIObjDesc.vSize), sizeof(m_UIObjDesc.vSize));
+		InputFile.read(reinterpret_cast<char*>(&m_UIObjDesc.vPos), sizeof(m_UIObjDesc.vPos));
+		InputFile.read(reinterpret_cast<char*>(&m_UIObjDesc.fRaito), sizeof(m_UIObjDesc.fRaito));
 
 		//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_UI, TEXT("Layer_UI"), CUtils::StrToWstr(strProtoTag), &ProtoUI_Desc)))
 		//{

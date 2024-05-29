@@ -87,70 +87,70 @@ HRESULT CMainApp::Render(_float fTimeDelta)
 
 	m_pGameInstance->Draw(fTimeDelta);
 
-//#ifdef _DEBUG
-//
-//	// RTV_FONT 추가
-//#pragma region GAME_OBJ
-//
-//	_float fRTVFont = { 100.f };
-//	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Diffuse"), 
-//		_float2(5.f, g_iWinSizeY - 90.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
-//
-//	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Normal"), 
-//		_float2(fRTVFont + 5.f, g_iWinSizeY - 90.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
-//
-//	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Depth"), 
-//		_float2(fRTVFont + 105.f, g_iWinSizeY - 90.f), XMVectorSet(0.f, 0.f, 0.f, 1.f), 0.f);
-//
-//	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Field Depth"), 
-//		_float2(fRTVFont + 205.f, g_iWinSizeY - 90.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
-//
-//	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Stencil"), 
-//		_float2(fRTVFont + 305.f, g_iWinSizeY - 90.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
-//
-//	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("RimLight"), 
-//		_float2(fRTVFont + 405.f, g_iWinSizeY - 90.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
-//
-//#pragma endregion
-//
-//#pragma region LIGHTACC
-//
-//	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Shade"), 
-//		_float2(fRTVFont + 555.f, g_iWinSizeY - 90.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
-//
-//	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Specular"), 
-//		_float2(fRTVFont + 655.f, g_iWinSizeY - 90.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
-//
-//#pragma endregion
-//
-//	//SHADOW_OBJ
-//	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("LightDepth"), 
-//		_float2(5.f, g_iWinSizeY - 190.f), XMVectorSet(0.f, 0.f, 0.f, 1.f), 0.f);
-//
-//#pragma region BLOOM_BLUR
-//
-//	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Blur_X"), 
-//		_float2(fRTVFont + 55.f, g_iWinSizeY - 190.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
-//
-//	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Blur_Y"), 
-//		_float2(fRTVFont + 155.f, g_iWinSizeY - 190.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
-//
-//	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Effect"), 
-//		_float2(fRTVFont + 255.f, g_iWinSizeY - 190.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
-//
-//#pragma endregion
-//
-//	//SKY
-//	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Sky"), 
-//		_float2(fRTVFont + 405.f, g_iWinSizeY - 190.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
-//
-//	//Radial Blur
-//	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("RadialBlur"), 
-//		_float2(fRTVFont + 555.f, g_iWinSizeY - 190.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
-//
-//
-//
-//#endif // _DEBUG
+#ifdef _DEBUG
+
+	// RTV_FONT 추가
+#pragma region GAME_OBJ
+
+	_float fRTVFont = { 100.f };
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Diffuse"), 
+		_float2(5.f, g_iWinSizeY - 90.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Normal"), 
+		_float2(fRTVFont + 5.f, g_iWinSizeY - 90.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Depth"), 
+		_float2(fRTVFont + 105.f, g_iWinSizeY - 90.f), XMVectorSet(0.f, 0.f, 0.f, 1.f), 0.f);
+
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Field Depth"), 
+		_float2(fRTVFont + 205.f, g_iWinSizeY - 90.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Stencil"), 
+		_float2(fRTVFont + 305.f, g_iWinSizeY - 90.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("RimLight"), 
+		_float2(fRTVFont + 405.f, g_iWinSizeY - 90.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+
+#pragma endregion
+
+#pragma region LIGHTACC
+
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Shade"), 
+		_float2(fRTVFont + 555.f, g_iWinSizeY - 90.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Specular"), 
+		_float2(fRTVFont + 655.f, g_iWinSizeY - 90.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+
+#pragma endregion
+
+	//SHADOW_OBJ
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("LightDepth"), 
+		_float2(5.f, g_iWinSizeY - 190.f), XMVectorSet(0.f, 0.f, 0.f, 1.f), 0.f);
+
+#pragma region BLOOM_BLUR
+
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Blur_X"), 
+		_float2(fRTVFont + 55.f, g_iWinSizeY - 190.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Blur_Y"), 
+		_float2(fRTVFont + 155.f, g_iWinSizeY - 190.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Effect"), 
+		_float2(fRTVFont + 255.f, g_iWinSizeY - 190.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+
+#pragma endregion
+
+	//SKY
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Sky"), 
+		_float2(fRTVFont + 405.f, g_iWinSizeY - 190.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+
+	//Radial Blur
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("RadialBlur"), 
+		_float2(fRTVFont + 555.f, g_iWinSizeY - 190.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+
+
+
+#endif // _DEBUG
 
 
 	m_pGameInstance->End_Draw();
@@ -178,7 +178,6 @@ HRESULT CMainApp::Open_Level(LEVEL eLevelID)
 
 	return	S_OK;
 }
-
 
 //HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 //{
@@ -240,8 +239,6 @@ HRESULT CMainApp::Open_Level(LEVEL eLevelID)
 //
 //	return	S_OK;
 //}
-
-
 
 /// <summary>
 /// 1. 내가 저장하고자 하는 원소들의 개수(iCnt)를 저장한다.
@@ -330,11 +327,6 @@ void CMainApp::Read_XML()
 		//m_vecItemInfo.push_back(itemInfo);
 	}
 }
-
-
-
-
-
 
 /// <summary>
 /// 1. 

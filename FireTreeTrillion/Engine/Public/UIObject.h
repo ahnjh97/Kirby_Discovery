@@ -21,9 +21,9 @@ protected:
 public:
 	typedef struct : public CGameObject::GAMEOBJECT_DESC
 	{
-		wstring		strUITag = { TEXT("") };
+		wstring		wstrUITag = { TEXT("") };
 		_float2		vSize, vCenter, vPos = { 0.f, 0.f };
-		_float		fFrame = { 0.f };
+		_float		fRaito = { 0.f };
 	}UIOBJ_DESC;
 
 protected:
@@ -41,6 +41,7 @@ public:
 
 public:
 	UIOBJ_DESC		Get_UIObj_Desc() const { return m_UIObjDesc; }
+	void			Set_UIObj_Desc(UIOBJ_DESC _UIDesc) { m_UIObjDesc = _UIDesc; }
 
 	_float2			Get_pos2D() const { return m_position2D; }
 	constexpr _bool	Get_IsRender() const noexcept { return m_bIsRender; }
@@ -48,6 +49,7 @@ public:
 
 protected:
 	vector<CUIObject*>	m_vecUIObj;
+	UIOBJ_DESC			m_UIObjDesc{};
 
 	// 2D UI 처리용
 	_float2				m_size2D, m_position2D, m_WindowSize2D;
@@ -57,16 +59,9 @@ protected:
 	// 상황에 따른 Render 처리해주는 bool값
 	_bool				m_bIsRender = false;
 
-	UIOBJ_DESC			m_UIObjDesc{};
-	_float2				m_vSize, m_vCenter, m_vPos = { 0.f, 0.f };
-	_float				m_fFrame = { 0.f };
-
 	CShader*			m_pShaderCom = { nullptr };
 	CVIBuffer_Rect*		m_pVIBufferCom = { nullptr };
 	CTexture*			m_pTextureCom = { nullptr };
-
-public:
-	string				m_strUITag = { "Test" };
 
 public:
 	virtual CGameObject* Clone(_uint iLevelIndex, void* pArg) { return nullptr; }

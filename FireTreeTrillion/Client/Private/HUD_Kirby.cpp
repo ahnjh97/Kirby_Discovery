@@ -21,7 +21,7 @@ HRESULT CHUD_Kirby::Initialize(void* _pArg)
 	HRESULT hr = __super::Initialize(_pArg);
 	CHECK_FAILED(hr);
 
-	UIOBJ_DESC* HUD_KirbyDESC = nullptr;
+	UIOBJ_DESC* HUD_KirbyDESC = { nullptr };
 	if (nullptr != _pArg)
 		HUD_KirbyDESC = (UIOBJ_DESC*)_pArg;
 
@@ -32,10 +32,12 @@ HRESULT CHUD_Kirby::Initialize(void* _pArg)
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(
 						HUD_KirbyDESC->vCenter.x - HUD_KirbyDESC->vPos.x,
 						-HUD_KirbyDESC->vCenter.y + HUD_KirbyDESC->vPos.y, 0.f, 1.f));
+	m_pTransformCom->Rotation(XMVectorSet(0.f, 0.f, 1.f, 1.f), XMConvertToRadians(HUD_KirbyDESC->fRaito));
 
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 	
+	//m_UIObjDesc.wstrUITag = HUD_KirbyDESC->wstrUITag;
 	m_UIObjDesc = *HUD_KirbyDESC;
 
 #pragma endregion
