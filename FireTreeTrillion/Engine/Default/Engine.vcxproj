@@ -259,7 +259,6 @@ call UpdateLib.bat</Command>
     <ClCompile Include="..\Public\ImGui\imgui_impl_win32.cpp" />
     <ClCompile Include="..\Public\ImGui\imgui_tables.cpp" />
     <ClCompile Include="..\Public\ImGui\imgui_widgets.cpp" />
-    <ClCompile Include="..\Public\ImGui\ImSequencer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Animation.h">
@@ -308,7 +307,6 @@ call UpdateLib.bat</Command>
     <ClInclude Include="..\Public\ImGui\imgui_impl_dx11.h" />
     <ClInclude Include="..\Public\ImGui\imgui_impl_win32.h" />
     <ClInclude Include="..\Public\ImGui\imgui_internal.h" />
-    <ClInclude Include="..\Public\ImGui\ImSequencer.h" />
     <ClInclude Include="..\Public\ImGui\imstb_rectpack.h" />
     <ClInclude Include="..\Public\ImGui\imstb_textedit.h" />
     <ClInclude Include="..\Public\ImGui\imstb_truetype.h" />

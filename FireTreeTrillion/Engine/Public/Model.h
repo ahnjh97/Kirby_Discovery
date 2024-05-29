@@ -41,7 +41,8 @@ public:
 	}
 
 	const _char* Get_AnimationName() const { return m_Animations[m_iCurrentAnimIndex]->Get_AnimationName(); }
-
+	_uint Get_AnimCnt() const { return m_Animations.size(); }
+	vector<class CAnimation*>* const Get_Animations() { return &m_Animations; }
 public:
 	virtual HRESULT Initialize_Prototype(MODEL tModel);
 	virtual HRESULT Initialize(void* pArg)  override;

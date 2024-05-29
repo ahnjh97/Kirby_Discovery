@@ -8,6 +8,8 @@ END
 BEGIN(Engine)
 class CImGUI_Manager final : public CBase
 {
+public:
+	enum STYLE { PINK, PURPLE, DARK, STYLE_END };
 private:
 	CImGUI_Manager() = default;
 	virtual ~CImGUI_Manager() = default;
@@ -27,6 +29,9 @@ public:
 
 	// FileDialog
 	void Set_FileDialog();
+
+	// for Style
+	void Set_IMGUIStyle(_uint uStyle);
 
 private:
 	ID3D11Device*		 m_pDevice = { nullptr };

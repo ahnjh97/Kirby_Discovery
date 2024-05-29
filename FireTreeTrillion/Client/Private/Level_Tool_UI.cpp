@@ -18,6 +18,8 @@ HRESULT CLevel_Tool_UI::Initialize()
 	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
 		return E_FAIL;
 
+	m_pGameInstance->Set_IMGUIStyle(0);
+
 	return S_OK;
 }
 

@@ -135,6 +135,7 @@ public: /* For.PhysX */
 	void		Test();
 	_float4x4	Update(_fmatrix matrix);
 	_uint		Get_CollisionContent(COLLISION_TYPE eMeType, COLLISION_TYPE eOtherType);
+	void		Ready_TestGround();
 
 #ifdef _DEBUG
 	HRESULT Ready_RTVDebug(const wstring& strRenderTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY);
@@ -163,6 +164,7 @@ public: /* For.ImGui_Manager */
 	void		EditTransform(/*const CCamera& camera,*/ _float4x4& _matrix);
 	void		RenderGrid();
 	void		Set_FileDialog();
+	void		Set_IMGUIStyle(_uint uStyle);
 
 public: /* For.PhysX */
 	PxRigidDynamic* CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial = nullptr);

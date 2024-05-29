@@ -1,15 +1,9 @@
 #include "stdafx.h"
-
-//#include "..\Public\Loader.h"
 #include "Loader.h"
 #include <process.h>
 #include <codecvt>
 #include <locale>
-
 #include "GameInstance.h"
-#include "Camera_Free.h"
-#include "TestModel.h"
-#include "TestTerrain.h"
 
 //맵툴
 #include "MapToolHelper.h"
@@ -30,21 +24,24 @@
 
 #pragma endregion
 
-#include "RigidBody.h"
-#include "CharacterController.h"
-
-
 //이펙트 툴
 #include "FXToolDirector.h"
 #include "SingleEffect.h"
 #include "Particle.h"
 #include "MultiEffect.h"
 
-//#include "Body_Player.h"
-//#include "Weapon.h"
-//#include "Player.h"
+//애님 툴
+#include "AnimToolHelper.h"
+
+//클라이언트
+#include "Camera_Free.h"
+#include "TestModel.h"
+#include "TestTerrain.h"
 #include "Kirby.h"
 #include "Awoofy.h"
+#include "RigidBody.h"
+#include "CharacterController.h"
+
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
@@ -147,37 +144,45 @@ HRESULT CLoader::Start()
 HRESULT CLoader::Loading_ObjectAll()
 {
 	m_strLoadingText = TEXT("객체의 원형를(을) 로딩 중 입니다.");
+
+	// 이펙트 툴 용
+	#pragma region TOOL_EFFECT
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FXToolDirector"), CFXToolDirector);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SingleEffect"), CSingleEffect);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MultiEffect"), CMultiEffect);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Particle"), CParticle);
+	#pragma endregion
+	
+	// MapTool GameObject Prototypes
+	#pragma region TOOL_MAP
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Grid"), CGrid);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BasicMap"), CBasicMap);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolHelper"), CMapToolHelper);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolObject"), CMapToolObject);
+	#pragma endregion
+
+	#pragma region TOOL_UI
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("IMGUI_UI_Editor"), CUI_Editor);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_Kirby"), CHUD_Kirby);
+	#pragma endregion
+
+	#pragma region TOOL_ANIMATION
+	// AnimationTool GameObject Prototypes
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("AnimToolHelper"), CAnimToolHelper);
+	#pragma endregion
+
+	#pragma region FOR CLIENT
+	// For Kirby
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kirby"), CKirby);
+	// For Awoofy To Monster
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Awoofy"), CAwoofy);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BackGround"), CBackGround);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_Test"), CTestUI);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestMap"), CTestTerrain);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
-
-	//이펙트 툴 용
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FXToolDirector"), CFXToolDirector);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SingleEffect"), CSingleEffect);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MultiEffect"), CMultiEffect);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Particle"), CParticle);
-
-	// MapTool GameObject Prototypes
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Grid"), CGrid);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BasicMap"), CBasicMap);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolHelper"), CMapToolHelper);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolObject"), CMapToolObject);
-
-#pragma region TOOL_UI
-
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("IMGUI_UI_Editor"), CUI_Editor);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_Kirby"), CHUD_Kirby);
-
-#pragma endregion
-
-	// For Kirby
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kirby"), CKirby);
-
-	// For Awoofy To Monster
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Awoofy"), CAwoofy);
+	#pragma endregion
 
 	return S_OK;
 }
@@ -186,7 +191,6 @@ HRESULT CLoader::Loading_StaticComponentAll()
 {
 	HRESULT hr;
 	LEVEL eLevel = LEVEL_STATIC;
-	
 
 	// Static Model 한번에 생성.
 	hr = Add_Models(eLevel);
@@ -250,35 +254,41 @@ HRESULT CLoader::Loading_For_GamePlay()
 {
 	HRESULT hr = S_OK;
 	LEVEL eLevel = LEVEL_GAMEPLAY;
-	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
 
+	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
+	#pragma region 텍스쳐
 	if (FAILED(Add_Texture(eLevel, "Logo", "Logo/Logo.png")))
 		return E_FAIL;
 
 	// 커비 얼굴 텍스쳐 로드
 	Add_KirbyFaceTexture(eLevel);
-
+	#pragma endregion
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
+	#pragma region 모델
 	// 모아놓은 Model 한번에 생성.
 	hr = Add_Models(eLevel);
 	CHECK_FAILED(hr);
-
+	#pragma endregion
+	
 	m_strLoadingText = TEXT("물리 컴포넌트(을) 로딩 중 입니다.");
+	#pragma region 물리 컴포넌트
 	/* 리지드바디 */
 	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_RigidBody"), CRigidBody::Create(m_pDevice, m_pContext));
 	CHECK_FAILED(hr);
 	/* 캐릭터 컨트롤러 */
 	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_CharacterController"), CCharacterController::Create(m_pDevice, m_pContext));
 	CHECK_FAILED(hr);
-
+	#pragma endregion
+	
 	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
+	#pragma region 셰이더
 	// 모아놓은 Shaders 한번에 생성
 	hr = Add_Shaders(eLevel);
 	CHECK_FAILED(hr);
+	#pragma endregion
 
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
-
 	m_IsFinished = true;
 
 	return S_OK;
@@ -290,25 +300,32 @@ HRESULT CLoader::Loading_For_Tool_FX()
 	LEVEL eLevel = LEVEL_TOOL_FX;
 
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
+	#pragma region 텍스쳐
 	//if (FAILED(Add_Texture(eLevel, "Logo", "Logo/Logo.png")))
 	//	return E_FAIL;
+	#pragma endregion
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
+	#pragma region 모델
 	// 모아놓은 Model 한번에 생성.
 	//hr = Add_Models(eLevel);
 	//CHECK_FAILED(hr);
+	#pragma endregion
+
 	m_strLoadingText = TEXT("물리 컴포넌트(을) 로딩 중 입니다.");
-	// 리지드바디
+	#pragma region 물리 컴포넌트
 	//hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_RigidBody"), CRigidBody::Create(m_pDevice, m_pContext));
 	//CHECK_FAILED(hr);
+	#pragma endregion
 
 	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
+	#pragma region 셰이더
 	// 모아놓은 Shaders 한번에 생성
 	hr = Add_Shaders(eLevel);
 	CHECK_FAILED(hr);
+	#pragma endregion
 
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
-
 	m_IsFinished = true;
 
 	return S_OK;
@@ -320,25 +337,42 @@ HRESULT CLoader::Loading_For_Tool_Anim()
 	LEVEL eLevel = LEVEL_TOOL_ANIM;
 
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
+	#pragma region 텍스쳐
 	//if (FAILED(Add_Texture(eLevel, "Logo", "Logo/Logo.png")))
 	//	return E_FAIL;
+	Add_KirbyFaceTexture(eLevel);
+	#pragma endregion
+
+	m_strLoadingText = TEXT("VI버퍼(을) 로딩 중 입니다.");
+	#pragma region VI버퍼
+	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Grid"),
+		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, 5, 5));
+	CHECK_FAILED(hr);
+	#pragma endregion
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
-	// 모아놓은 Model 한번에 생성.
-	//hr = Add_Models(eLevel);
-	//CHECK_FAILED(hr);
+	#pragma region 모델
+	hr = Add_Models(eLevel);
+	CHECK_FAILED(hr);
+	#pragma endregion
+
 	m_strLoadingText = TEXT("물리 컴포넌트(을) 로딩 중 입니다.");
-	// 리지드바디
-	//hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_RigidBody"), CRigidBody::Create(m_pDevice, m_pContext));
-	//CHECK_FAILED(hr);
+	#pragma region 물리 컴포넌트
+	/* 리지드바디 */
+	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_RigidBody"), CRigidBody::Create(m_pDevice, m_pContext));
+	CHECK_FAILED(hr);
+	/* 캐릭터 컨트롤러 */
+	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_CharacterController"), CCharacterController::Create(m_pDevice, m_pContext));
+	CHECK_FAILED(hr);
+	#pragma endregion
 
 	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
-	// 모아놓은 Shaders 한번에 생성
+	#pragma region 셰이더
 	hr = Add_Shaders(eLevel);
 	CHECK_FAILED(hr);
+	#pragma endregion
 
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
-
 	m_IsFinished = true;
 
 	return S_OK;
@@ -461,6 +495,16 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back(MODEL{ "Trigger", TYPE_NONANIM, 0.01f });
 		m_vecModelInfo.emplace_back(MODEL{ "Camera", TYPE_NONANIM, 0.2f , 270.f});
 	}
+	else if (eLevel == LEVEL_TOOL_ANIM)
+	{
+		m_vecModelInfo.emplace_back(MODEL{ "Kirby", TYPE_ANIM });
+
+		// For Kirby Body
+		m_vecModelInfo.emplace_back(MODEL{ "KirbyBalloon", TYPE_ANIM, 1.f, 180.f });
+		m_vecModelInfo.emplace_back(MODEL{ "KirbyDefault", TYPE_ANIM, 1.f, 180.f });
+		m_vecModelInfo.emplace_back(MODEL{ "KirbyVacuum", TYPE_ANIM, 1.f, 180.f });
+	}
+
 }
 
 HRESULT CLoader::Add_Shaders(LEVEL eLevel)

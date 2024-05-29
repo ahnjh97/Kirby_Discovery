@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Level_Tool_Anim.h"
 
+#include "PhysX.h"
 #include "Camera_Free.h"
 
 CLevel_Tool_Anim::CLevel_Tool_Anim(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -19,18 +20,16 @@ HRESULT CLevel_Tool_Anim::Initialize()
 	if(FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
 		return E_FAIL;
 
-	if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))
+	if (FAILED(Ready_Layer_Ground(TEXT("Layer_Ground"))))
 		return E_FAIL;
 
-	//if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
+	//if (FAILED(Ready_Layer_Character(TEXT("Layer_Character"))))
 	//	return E_FAIL;
 
-	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
+	if (FAILED(Ready_Layer_IMGUI(TEXT("Layer_IMGUI"))))
 		return E_FAIL;
 
-	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
-		return E_FAIL;
-	
+	m_pGameInstance->Set_IMGUIStyle(1);
 
 	return S_OK;
 }
@@ -53,6 +52,18 @@ HRESULT CLevel_Tool_Anim::Render()
 
 HRESULT CLevel_Tool_Anim::Ready_Lights()
 {
+	//// 예시코드 1 : 태양광
+	LIGHT_DESC			LightDesc{};
+	LightDesc.eType		 = LIGHT_DESC::TYPE_DIRECTIONAL;
+	LightDesc.vDirection = _float4(0.f, -1.f, 0.f, 0.f);
+
+	LightDesc.vDiffuse	 = _float4(0.8f, 0.8f, 0.8f, 1.f);
+	LightDesc.vAmbient	 = _float4(0.6f, 0.6f, 0.6f, 1.f);
+	LightDesc.vSpecular  = _float4(0.2f, 0.2f, 0.2f, 1.f);
+
+	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -75,31 +86,28 @@ HRESULT CLevel_Tool_Anim::Ready_Layer_Camera(const wstring & strLayerTag)
 	return S_OK;
 }
 
-HRESULT CLevel_Tool_Anim::Ready_Layer_Player(const wstring & strLayerTag)
+HRESULT CLevel_Tool_Anim::Ready_Layer_Ground(const wstring& strLayerTag)
 {
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_ANIM, strLayerTag, TEXT("Prototype_GameObject_TestModel"))))
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_ANIM, strLayerTag, TEXT("Prototype_GameObject_Grid"))))
+		return E_FAIL;
+
+	m_pGameInstance->Ready_TestGround();
+
+	return S_OK;
+}
+
+HRESULT CLevel_Tool_Anim::Ready_Layer_Character(const wstring & strLayerTag)
+{
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_ANIM, strLayerTag, TEXT("Prototype_GameObject_Kirby"))))
 	//	return E_FAIL;
 
 	return S_OK;
 }
 
-HRESULT CLevel_Tool_Anim::Ready_Layer_Monster(const wstring & strLayerTag)
+HRESULT CLevel_Tool_Anim::Ready_Layer_IMGUI(const wstring& strLayerTag)
 {
-	return S_OK;
-}
-
-HRESULT CLevel_Tool_Anim::Ready_Layer_BackGround(const wstring & strLayerTag)
-{
-	/*if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_ANIM, strLayerTag, TEXT("Prototype_GameObject_TestMap"))))
-		return E_FAIL;*/
-
-	return S_OK;
-}
-
-HRESULT CLevel_Tool_Anim::Ready_Layer_UI(const wstring& strLayerTag)
-{
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_ANIM, strLayerTag, TEXT("Prototype_GameObject_UI_Test"))))
-	//	return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_ANIM, strLayerTag, TEXT("Prototype_GameObject_AnimToolHelper"))))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -122,3 +130,4 @@ void CLevel_Tool_Anim::Free()
 	__super::Free();
 
 }
+

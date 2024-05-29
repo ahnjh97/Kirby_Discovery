@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "..\Public\Level_GamePlay.h"
 
+#include "Kirby.h"
 #include "Camera_Free.h"
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -50,7 +51,11 @@ HRESULT CLevel_GamePlay::Render()
 	if (FAILED(__super::Render()))
 		return E_FAIL;
 
-	SetWindowText(g_hWnd, TEXT("게임플레이레벨입니다."));
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject_ByTag(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby")));
+	_float4 vPos = pKirby->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION);
+	wstring wstrMsg = TEXT("게임플레이레벨입니다. 커비 위치 : ")
+		+ to_wstring(vPos.x) + TEXT(", ") + to_wstring(vPos.y) + TEXT(", ") + to_wstring(vPos.z);
+	SetWindowText(g_hWnd, wstrMsg.c_str());
 
 	return S_OK;
 }
