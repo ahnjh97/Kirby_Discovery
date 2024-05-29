@@ -383,7 +383,8 @@ PS_OUT PS_MAIN_COLORCORRECT(PS_IN In)
     
     vector vDiffuse = g_FinalTexture.Sample(LinearSampler, In.vTexcoord);
     Out.vColor = vDiffuse;
-    //Out.vColor.r = 0.f;
+    Out.vColor.r *= .9f;
+    Out.vColor.g *= .9f;
     
     return Out;
 }

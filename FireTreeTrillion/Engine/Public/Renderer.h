@@ -84,10 +84,6 @@ private:
 
 	HRESULT Render_Result();
 	HRESULT Render_Blur_Result(_float fTimeDelta);
-	HRESULT Render_NonLight();
-	HRESULT Render_Bloom();
-	HRESULT Render_BloomResult();
-	HRESULT Render_Blend();
 
 	HRESULT Render_FinalResult();
 

@@ -708,7 +708,33 @@ HRESULT CRenderer::Render_Blur_Result(_float fTimeDelta)
 	if (FAILED(m_pShader->Bind_RawValue("g_fRadialblurCenter", &m_vScreenPos, sizeof(_float2))))
 		return E_FAIL;
 
+
 	m_pShader->Begin(DEFERRED_BLUR_R);
+
+	m_pVIBuffer->Bind_Buffers();
+
+	m_pVIBuffer->Render();
+
+	if (FAILED(m_pGameInstance->End_MRT()))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CRenderer::Render_FinalResult()
+{
+	if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+		return E_FAIL;
+
+	// 최종 작업물 던지기
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Final"), "g_FinalTexture")))
+		return E_FAIL;
+
+	m_pShader->Begin(DEFERRED_COLORCORRECT);
 
 	m_pVIBuffer->Bind_Buffers();
 
@@ -716,6 +742,8 @@ HRESULT CRenderer::Render_Blur_Result(_float fTimeDelta)
 
 	//if (FAILED(m_pGameInstance->End_MRT()))
 	//	return E_FAIL;
+
+
 	return S_OK;
 }
 
