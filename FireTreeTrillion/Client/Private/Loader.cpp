@@ -45,6 +45,7 @@
 //#include "Player.h"
 #include "Kirby.h"
 #include "Awoofy.h"
+#include "Moon.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
@@ -176,6 +177,9 @@ HRESULT CLoader::Loading_ObjectAll()
 	// For Kirby
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kirby"), CKirby);
 
+	// For Test
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Moon"), CMoon);
+
 	// For Awoofy To Monster
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Awoofy"), CAwoofy);
 
@@ -254,6 +258,9 @@ HRESULT CLoader::Loading_For_GamePlay()
 
 	if (FAILED(Add_Texture(eLevel, "Logo", "Logo/Logo.png")))
 		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Moon", "Moon.png")))
+		return E_FAIL;
+
 
 	// 커비 얼굴 텍스쳐 로드
 	Add_KirbyFaceTexture(eLevel);

@@ -36,6 +36,9 @@ texture2D g_BlurTexture;
 
 texture2D g_SkyTexture;
 
+texture2D g_BlendTexture;
+texture2D g_NonLightTexture;
+
 texture2D g_RadialBlur;
 float g_fRadialblurRaduis;
 float2 g_fRadialblurCenter;
@@ -58,15 +61,24 @@ float4 Blur_X(float2 vTexCoord)
     float4 vOut = (float4) 0;
 
     float2 vUV = (float2) 0;
+    
+    
+    if (1.f == g_BlendTexture.Sample(ClampSampler, vTexCoord).g)
+        return vOut;  
+    
+    int iTotal = 0;
 
     for (int i = -6; i < 7; ++i)
     {
-        vUV = vTexCoord + float2(1.f / g_fTexW * i, 0);
+        vUV = vTexCoord + float2(1.f / g_fTexW * i, 0);        
+        if (1.f == g_BlendTexture.Sample(ClampSampler, vUV).g )
+            continue;
+
         vOut += fWeight[6 + i] * g_EffectTexture.Sample(ClampSampler, vUV);
+        iTotal++;
     }
 
-    vOut /= fTotal;
-
+    vOut /= iTotal;
     return vOut;
 }
 
@@ -75,15 +87,23 @@ float4 Blur_Y(float2 vTexCoord)
     float4 vOut = (float4) 0;
 
     float2 vUV = (float2) 0;
+    
+    if (1.f == g_BlendTexture.Sample(ClampSampler, vTexCoord).g)
+        return vOut;
 
+    int iTotal = 0;
+    
     for (int i = -6; i < 7; ++i)
     {
         vUV = vTexCoord + float2(0, 1.f / (g_fTexH / 2.f) * i);
+        if (1.f == g_BlendTexture.Sample(ClampSampler, vUV).g)
+            continue;
+
         vOut += fWeight[6 + i] * g_EffectTexture.Sample(ClampSampler, vUV);
+        iTotal++;
     }
 
-    vOut /= fTotal;
-
+    vOut /= iTotal;
     return vOut;
 }
 
@@ -284,17 +304,26 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
         Out.vColor *= 0.2f;
     }
         
+    vector vNonLight = g_NonLightTexture.Sample(LinearSampler, In.vTexcoord);
+    vector vBlend = g_BlendTexture.Sample(LinearSampler, In.vTexcoord);
     vector vBlur = g_BlurTexture.Sample(LinearSampler, In.vTexcoord);
     vector vEffect = g_EffectTexture.Sample(LinearSampler, In.vTexcoord);
     vector vSky = g_SkyTexture.Sample(LinearSampler, In.vTexcoord);
     
+    // 스카이박스와 이펙트의 결합 ( 블룸 및 블랜드 )
     if (0.0f == vDiffuse.a)
-    {
         Out.vColor += vSky * (1.f - vEffect.a);
-        //Out.vSSAO_SUB = float4(1.f, 0.f, 0.f, 1.f);
-    }
     
-    Out.vColor += vBlur + vEffect;
+    // 빛 연산이 되지 않고, Alpha값이 1인 객체들을 그대로 그린다.
+    if (0.0f < vNonLight.a )
+        Out.vColor = vNonLight;
+        
+    // Blend 라는 뜻
+    if (vBlend.g == 1.f)
+        Out.vColor *= (1.f - vEffect.a);
+
+    // 기존 디퓨즈와 가산되어 그려진다.
+    Out.vColor += vEffect + vBlur;
     
     return Out;
 }

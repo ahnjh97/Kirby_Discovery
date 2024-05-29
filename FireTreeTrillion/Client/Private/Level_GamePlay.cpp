@@ -36,6 +36,11 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_ParsedObjects()))
 		return E_FAIL;
 
+	// TEST (블러와 블랜드의 관계)
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Moon"), TEXT("Prototype_GameObject_Moon"))))
+		return E_FAIL;
+
+
 	return S_OK;
 }
 

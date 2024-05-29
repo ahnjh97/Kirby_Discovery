@@ -25,7 +25,7 @@ HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer)
 		if (FAILED(pShader->Bind_RawValue("g_vLightDir", &m_LightDesc.vDirection, sizeof(_float4))))
 			return E_FAIL;
 
-		iPassIndex = 1;
+		iPassIndex = DEFERRED_DIRECTLIGHT;
 
 	}
 
@@ -37,7 +37,7 @@ HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer)
 		if (FAILED(pShader->Bind_RawValue("g_fLightRange", &m_LightDesc.fRange, sizeof(_float))))
 			return E_FAIL;
 
-		iPassIndex = 2;
+		iPassIndex = DEFERRED_POINTLIGHT;
 	}
 	else if (LIGHT_DESC::TYPE_FLASH == m_LightDesc.eType)
 	{
@@ -57,7 +57,7 @@ HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer)
 		if (FAILED(pShader->Bind_RawValue("g_fLightRange", &m_LightDesc.fRange, sizeof(_float))))
 			return E_FAIL;
 
-		iPassIndex = 2;
+		iPassIndex = DEFERRED_POINTLIGHT;
 	}
 	else if (LIGHT_DESC::TYPE_SUPERFLASH == m_LightDesc.eType)
 	{
@@ -79,7 +79,7 @@ HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer)
 		if (FAILED(pShader->Bind_RawValue("g_fLightRange", &m_LightDesc.fRange, sizeof(_float))))
 			return E_FAIL;
 
-		iPassIndex = 2;
+		iPassIndex = DEFERRED_POINTLIGHT;
 	}
 
 
