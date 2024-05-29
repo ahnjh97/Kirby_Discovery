@@ -72,6 +72,12 @@ struct PS_OUT
     float4 vStencil : SV_TARGET5;
 };
 
+struct PS_OUT_EFFECT
+{
+    float4 vColor : SV_TARGET0;
+    float4 vNonBlur : SV_TARGET1;
+};
+
 struct PS_OUT_LIGHTDEPTH
 {
     float4 vLightDepth : SV_TARGET0;
@@ -96,13 +102,12 @@ PS_OUT PS_MAIN(PS_IN In)
 	if (0.3f >= vMtrlDiffuse.a)
 		discard;
 
-    vector vNormalDesc = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
+    vector vNormalTex = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
 
-    float3 vNormal;
-    vNormal.xy = vNormalDesc.wy * 2.f - 1.f;
-    vNormal.z = sqrt(1 - saturate(dot(vNormal.xy, vNormal.xy)));
-
-	float3x3 WorldMatrix = float3x3(In.vTangent, In.vBinormal, In.vNormal);
+    float3 vNormal = float3(vNormalTex.r, vNormalTex.g, vNormalTex.b);
+    vNormal.xy = vNormalTex.wy * 2.f - 1.f;
+    vNormal.z = 1 - vNormal.z;
+    float3x3 WorldMatrix = float3x3(In.vTangent, In.vBinormal, In.vNormal);
 
 	float3 vWorldNormal = mul(vNormal, WorldMatrix);	
 
@@ -140,6 +145,20 @@ PS_OUT NO_NORMALMAP_PS_MAIN(PS_IN In)
     else if (g_fTime < 1.f)
         Out.vDiffuse.rgb += vDamageColor * smoothstep(0.0f, 1.0f, (1 - g_fTime));
     
+    return Out;
+}
+
+PS_OUT_EFFECT NONBLUR(PS_IN In)
+{
+    PS_OUT_EFFECT Out = (PS_OUT_EFFECT) 0;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    if (0.0f >= vMtrlDiffuse.a)
+        discard;
+
+    
+    Out.vColor = vMtrlDiffuse;
+    Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
     return Out;
 }
 
@@ -208,6 +227,6 @@ technique11 DefaultTechnique
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 NO_NORMALMAP_PS_MAIN();
+        PixelShader = compile ps_5_0 NONBLUR();
     }
 }
