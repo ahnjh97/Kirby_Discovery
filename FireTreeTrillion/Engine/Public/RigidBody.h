@@ -17,14 +17,16 @@ public:
 		_bool		bDynamic;
 		_float		fOffsetSize;
 		_float3		vMaterial = {0.5f, 0.5f, 0.5f};
+		CGameObject* pObj = { nullptr };
 		RIGIDBODY_DESC
 		(RIGID_SHAPE _eShapeType = { RIGID_END },
 			_float4x4 _matWorld = {},
 			_bool _bTrigger = { false },
 			_bool _bDynamic = { true },
 			_float _fOffsetSize = {},
-			_float3 _vMaterial = { 0.5f, 0.5f, 0.5f }
-		) : eShapeType(_eShapeType), matWorld(_matWorld), bTrigger(_bTrigger), bDynamic(_bDynamic), fOffsetSize(_fOffsetSize), vMaterial(_vMaterial) {}
+			_float3 _vMaterial = { 0.5f, 0.5f, 0.5f },
+			CGameObject* _pObj = {}
+		) : eShapeType(_eShapeType), matWorld(_matWorld), bTrigger(_bTrigger), bDynamic(_bDynamic), fOffsetSize(_fOffsetSize), vMaterial(_vMaterial), pObj(_pObj) {}
 	};
 
 private:
@@ -69,7 +71,7 @@ protected:
 
 	PxShape*			m_pShape				= { nullptr };
 	PxController*		m_pCapsuleController	= { nullptr };
-	class CGameObject*			m_pActorObject		 = nullptr;
+	class CGameObject*	m_pActorObject		 = nullptr;
 
 
 	_bool				m_bTrigger				= { false };
