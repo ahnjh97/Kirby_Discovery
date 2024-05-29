@@ -25,7 +25,8 @@ private:
 	// ImGui
 	void	Menu_Level();
 	void	Menu_NonAnimModels();
-	void	Menu_SetUpCamIndex();
+	void	Menu_TriggerIndex();
+	void	Menu_MapShaderInfo();
 	void	Edit_Object();
 
 	// On Key/Mouse Input 
@@ -37,14 +38,18 @@ private:
 	// File I/O
 	void	Save_Level();
 	void	Load_Level();
+	void	Save_MapShaderInfo();
+	void	Load_MapShaderInfo();
+	void	Reset_MapShaderInfo();
 
 	// Picking
 	CGameObject* Select_ModelByPicking(const wstring& wstrLayerTag = TEXT("Layer_Parse"));
 
+	_int Compute_MapIndex(const string& strModelName);
+
 private:
-	vector<string>	vecLevelName = { "Level_Static", "Level_Loading", "Level_Logo", 
-		"GamePlay",
-	 "Level_Tool_UI", "Level_Tool_FX", "Level_Tool_Anim", "Level_Tool_Map", "Level_End" }; // 두번째 줄에 실제 인게임 레벨 추가
+	vector<string>	m_vecLevelName; 
+	vector<string>	m_vecMapModelNames;
 
 	vector<string> m_vecAnimTxts;
 	vector<string> m_vecNonAnimTxts;

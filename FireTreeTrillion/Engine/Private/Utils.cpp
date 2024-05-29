@@ -166,6 +166,23 @@ PxTransform CUtils::mat44ToTransform(const PxMat44& mat)
 	PxMat33 rotationMat33(mat.column0.getXYZ(), mat.column1.getXYZ(), mat.column2.getXYZ());
 	PxQuat rotation = PxQuat(rotationMat33);
 
+	// NaN 및 Inf 값 처리: NaN 또는 Inf가 있는 경우, 해당 성분을 0으로 설정
+	if (!std::isfinite(rotation.x) || std::isnan(rotation.x)) rotation.x = 0.0f;
+	if (!std::isfinite(rotation.y) || std::isnan(rotation.y)) rotation.y = 0.0f;
+	if (!std::isfinite(rotation.z) || std::isnan(rotation.z)) rotation.z = 0.0f;
+	if (!std::isfinite(rotation.w) || std::isnan(rotation.w)) rotation.w = 1.0f; // w 성분은 회전을 표현하므로 1로 설정
+
+	// 정규화: 크기가 0인 경우 기본값 (단위 쿼터니언)으로 설정
+	float norm = rotation.magnitude();
+	if (norm > 1e-6) {
+		rotation.x /= norm;
+		rotation.y /= norm;
+		rotation.z /= norm;
+		rotation.w /= norm;
+	}
+	else {
+		rotation = PxQuat(PxIdentity);
+	}
 	return PxTransform(position, rotation);
 }
 
