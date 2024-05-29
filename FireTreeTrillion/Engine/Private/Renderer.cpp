@@ -122,6 +122,17 @@ HRESULT CRenderer::Initialize()
 #pragma endregion
 
 
+#pragma region MRT_ColorCorrrection
+
+	/* For.Target_RadialBlur */
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Final"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_ColorCorrrection"), TEXT("Target_Final"))))
+		return E_FAIL;
+
+#pragma endregion
+
+
 	m_pVIBuffer = CVIBuffer_Rect::Create(m_pDevice, m_pContext);
 	if (nullptr == m_pVIBuffer)
 		return E_FAIL;
@@ -234,6 +245,12 @@ HRESULT CRenderer::Initialize()
 	//if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_RadialBlur"), 675.f, 695.f, 50.f, 50.f)))
 	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_RadialBlur"), 700.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
 		return E_FAIL;
+
+
+	// Final
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Final"), 800.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
+		return E_FAIL;
+
 #endif
 
 
@@ -280,7 +297,12 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 	/////////////////////// 블룸 및 Sky와의 결합과 레디얼 블러까지 완료되었다.
 	if (FAILED(Render_NonLight()))
 		return E_FAIL;
+
 	if (FAILED(Render_Blend()))
+		return E_FAIL;
+
+	/////////////////////// UI를 제외하고 그려진 상황에서, 화면 색 보정 처리한다.
+	if (FAILED(Render_FinalResult()))
 		return E_FAIL;
 
 	if (FAILED(Render_UI()))
@@ -458,6 +480,10 @@ HRESULT CRenderer::Render_NonBlend()
 
 HRESULT CRenderer::Render_NonLight()
 {
+
+	//if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_ColorCorrrection"))))
+	//	return E_FAIL;
+
 	for (auto& pRenderObject : m_RenderObjects[RENDER_NONLIGHT])
 	{
 		if (nullptr != pRenderObject)
@@ -467,6 +493,8 @@ HRESULT CRenderer::Render_NonLight()
 
 	m_RenderObjects[RENDER_NONLIGHT].clear();
 
+	//if (FAILED(m_pGameInstance->End_MRT()))
+	//	return E_FAIL;
 	return S_OK;
 }
 
@@ -539,6 +567,17 @@ HRESULT CRenderer::Render_BloomResult()
 
 HRESULT CRenderer::Render_Blend()
 {	
+
+	//if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
+	//	return E_FAIL;
+	//if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+	//	return E_FAIL;
+	//if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+	//	return E_FAIL;
+
+	//if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_ColorCorrrection"))))
+	//	return E_FAIL;
+
 	m_RenderObjects[RENDER_BLEND].sort([](CGameObject* pSour, CGameObject* pDest)->_bool
 		{
 			return ((CGameObject*)pSour)->Get_ViewZ() > ((CGameObject*)pDest)->Get_ViewZ();
@@ -551,6 +590,35 @@ HRESULT CRenderer::Render_Blend()
 		Safe_Release(pRenderObject);
 	}
 	m_RenderObjects[RENDER_BLEND].clear();
+
+
+	if (FAILED(m_pGameInstance->End_MRT()))
+		return E_FAIL;
+
+
+	return S_OK;
+}
+
+HRESULT CRenderer::Render_FinalResult()
+{
+	if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Final"), "g_FinalTexture")))
+		return E_FAIL;
+
+	if (FAILED(m_pShader->Begin(7)))
+		return E_FAIL;
+
+	if (FAILED(m_pVIBuffer->Bind_Buffers()))
+		return E_FAIL;
+
+	if (FAILED(m_pVIBuffer->Render()))
+		return  E_FAIL;
 
 	return S_OK;
 }
@@ -686,7 +754,10 @@ HRESULT CRenderer::Render_Result()
 }
 
 HRESULT CRenderer::Render_Blur_Result(_float fTimeDelta)
-{
+{  
+	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_ColorCorrrection"))))
+		return E_FAIL;
+
 	if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
 		return E_FAIL;
 	if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
@@ -715,6 +786,9 @@ HRESULT CRenderer::Render_Blur_Result(_float fTimeDelta)
 	m_pVIBuffer->Bind_Buffers();
 
 	m_pVIBuffer->Render();
+
+	//if (FAILED(m_pGameInstance->End_MRT()))
+	//	return E_FAIL;
 	return S_OK;
 }
 

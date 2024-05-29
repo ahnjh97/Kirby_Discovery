@@ -27,6 +27,9 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 	CAMERA_FREE_DESC* pCameraFree = (CAMERA_FREE_DESC*)pArg;
 	m_fMouseSensor = pCameraFree->fMouseSensor;
 
+	//pCameraFree->fRotationPerSec = ToRadian(45.f);
+
+
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
@@ -95,14 +98,21 @@ HRESULT CCamera_Free::Render()
 void CCamera_Free::Render_IMGUI()
 {
 	static _float fSpeed = 10.f;
+
+	_float4x4 WorldMat = m_pTransformCom->Get_WorldMatrix();
 	_float4 vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
 
-	ImGui::Text("X: %.2f", vPosition.x);
-	ImGui::SameLine();
-	ImGui::Text("Y: %.2f", vPosition.y);
-	ImGui::SameLine();
-	ImGui::Text("Z: %.2f", vPosition.z);
+	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._11, WorldMat._12, WorldMat._13, WorldMat._14 );
+	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._21, WorldMat._22, WorldMat._23, WorldMat._24);
+	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._31, WorldMat._32, WorldMat._33, WorldMat._34);
+	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._41, WorldMat._42, WorldMat._43, WorldMat._44);
+
+	//ImGui::Text("X: %.2f", vPosition.x);
+	//ImGui::SameLine();
+	//ImGui::Text("Y: %.2f", vPosition.y);
+	//ImGui::SameLine();
+	//ImGui::Text("Z: %.2f", vPosition.z);
 
 	ImGui::SliderFloat("CameraFree Speed", &fSpeed, 0.f, 200.f);
 
@@ -161,7 +171,7 @@ void CCamera_Free::Control(_float fTimeDelta)
 		Track_Target(fTimeDelta);
 
 
-	if (*m_pCurrentLevelID == LEVEL_TOOL_MAP || m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
+	if (/**m_pCurrentLevelID == LEVEL_TOOL_MAP ||*/ m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
 	{
 		_long	MouseMove = { 0 };
 

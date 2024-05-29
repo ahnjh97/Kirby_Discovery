@@ -79,8 +79,10 @@ private:
 	HRESULT Render_NonLight();
 	HRESULT Render_Bloom();
 	HRESULT Render_BloomResult();
-
 	HRESULT Render_Blend();
+
+	HRESULT Render_FinalResult();
+
 	HRESULT Render_UI();
 	HRESULT Render_SuperUI();
 

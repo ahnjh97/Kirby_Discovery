@@ -36,6 +36,8 @@ texture2D g_BlurTexture;
 
 texture2D g_SkyTexture;
 
+texture2D g_FinalTexture;
+
 texture2D g_RadialBlur;
 float g_fRadialblurRaduis;
 float2 g_fRadialblurCenter;
@@ -86,6 +88,8 @@ float4 Blur_Y(float2 vTexCoord)
 
     return vOut;
 }
+
+
 
 struct VS_IN
 {
@@ -232,7 +236,7 @@ PS_OUT_LIGHT PS_MAIN_POINT(PS_IN In)
     return Out;
 }
 
-/* 최종적ㅇ으로 480000 수행되는 쉐이더. */
+/* 최종적으로 480000 수행되는 쉐이더. */
 PS_OUT PS_MAIN_FINAL(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
@@ -344,7 +348,16 @@ PS_OUT PS_MAIN_RADIAL_BLUR(PS_IN In)
   
 }
 
-
+PS_OUT PS_MAIN_COLORCORRECT(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    vector vDiffuse = g_FinalTexture.Sample(LinearSampler, In.vTexcoord);
+    Out.vColor = vDiffuse;
+    //Out.vColor.r = 0.f;
+    
+    return Out;
+}
 
 
 technique11 DefaultTechnique
@@ -436,5 +449,15 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_RADIAL_BLUR();
     }
 
+    // 색 후처리 ( 7 )
+    pass ColorCorrection 
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_Default, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xffffffff);
 
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_COLORCORRECT();
+    }
 }
