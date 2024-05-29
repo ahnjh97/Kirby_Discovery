@@ -157,6 +157,17 @@ void CAnimToolHelper::Ready_AnimObjects(const wstring& strLayerTag)
 void CAnimToolHelper::Render_ObjectList()
 {
 	ImGui::Begin("OBJECT LIST");
+
+	// ListBox 사이즈 조정
+	float windowHeight = ImGui::GetWindowHeight();
+	float listBoxHeight = windowHeight - 100;
+	ImGui::SetNextWindowSizeConstraints(ImVec2(-1, listBoxHeight), ImVec2(-1, listBoxHeight));
+
+	static ImGuiTextFilter filter;
+	ImGui::Text("Search Object");
+	filter.Draw();
+
+
 	static int item_current_idx = -1;
 	if (ImGui::BeginListBox(" ", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing())))
 	{
@@ -167,9 +178,12 @@ void CAnimToolHelper::Render_ObjectList()
 			_char szName[256];
 			CUtils::WCharToChar(wstrTag.c_str(), szName);
 			if (szName == nullptr) continue;
-
-			if (ImGui::Selectable(szName, is_selected))
-				item_current_idx = n;
+			if (filter.PassFilter(szName))
+				if (ImGui::Selectable(szName, is_selected))
+					item_current_idx = n;
+			
+			/*if (ImGui::Selectable(szName, is_selected))
+				item_current_idx = n;*/
 
 			if (is_selected)
 			{
@@ -185,17 +199,14 @@ void CAnimToolHelper::Render_ObjectList()
 void CAnimToolHelper::Render_AnimationList(const wstring& wstrObjectTag)
 {
 	ImGui::Begin("ANIMATION LIST");
-	//static ImGuiTextFilter filter;
-	//ImGui::Text("Filter usage:\n"
-	//	"  \"\"         display all lines\n"
-	//	"  \"xxx\"      display lines containing \"xxx\"\n"
-	//	"  \"xxx,yyy\"  display lines containing \"xxx\" or \"yyy\"\n"
-	//	"  \"-xxx\"     hide lines containing \"xxx\"");
-	//filter.Draw();
-	//const char* lines[] = { "aaa1.c", "bbb1.c", "ccc1.c", "aaa2.cpp", "bbb2.cpp", "ccc2.cpp", "abc.h", "hello, world" };
-	//for (int i = 0; i < IM_ARRAYSIZE(lines); i++)
-	//	if (filter.PassFilter(lines[i]))
-	//		ImGui::BulletText("%s", lines[i]);
+	
+	float windowHeight = ImGui::GetWindowHeight();
+	float listBoxHeight = windowHeight - 100;
+	ImGui::SetNextWindowSizeConstraints(ImVec2(-1, windowHeight), ImVec2(-1, windowHeight));
+
+	static ImGuiTextFilter filter;
+	ImGui::Text("Search Animation");
+	filter.Draw();
 
 	for (auto& obj : m_vecAnimObjects)
 	{
@@ -212,24 +223,27 @@ void CAnimToolHelper::Render_AnimationList(const wstring& wstrObjectTag)
 					MODEL tModelInfo = pModel[w]->Get_ModelInfo();
 					if (ImGui::BeginTabItem(tModelInfo.strModelName.c_str())) // 모델이름으로 Tab Name 형성
 					{
-						ImGui::BeginChild("anim list");
+						float childwindowHeight = ImGui::GetWindowHeight();
+						float childlistBoxHeight = windowHeight - 110;
+						ImGui::SetNextWindowSizeConstraints(ImVec2(-1, childlistBoxHeight), ImVec2(-1, childlistBoxHeight));
+
+						static int item_current_idx = -1;
+						if (ImGui::BeginListBox(" ", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing())))
 						{
-							static int item_current_idx = -1;
-							if (ImGui::BeginListBox("animations", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing())))
-							{
 								// 해당 모델이 가지고 있는 애니메이션 개수
 								_uint uAnimCnt = pModel[w]->Get_AnimCnt();
 								vector<CAnimation*>* pVecAnims = pModel[w]->Get_Animations();
 								for (int n = 0; n < uAnimCnt; n++)
 								{
 									const bool is_selected = (item_current_idx == n);
-									
+
 									const char* animName = (*pVecAnims)[n]->Get_AnimationName();
 									if (animName == nullptr) continue;
 
-									if (ImGui::Selectable(animName, is_selected))
-										item_current_idx = n;
-									
+									if (filter.PassFilter(animName))
+										if (ImGui::Selectable(animName, is_selected))
+											item_current_idx = n;
+
 									if (is_selected)
 									{
 										ImGui::SetItemDefaultFocus();
@@ -237,10 +251,7 @@ void CAnimToolHelper::Render_AnimationList(const wstring& wstrObjectTag)
 									}
 								}
 								ImGui::EndListBox();
-							}
-							ImGui::EndChild();
 						}
-
 						ImGui::EndTabItem();
 					}
 					ImGui::EndTabBar();
@@ -256,7 +267,6 @@ void CAnimToolHelper::Render_FrameLine(_uint uModelNum, const string& strAnimati
 	static AnimSequence mySequence;
 	mySequence.m_iFrameMin = 0;
 	mySequence.m_iFrameMax = 300;
-	static _int currentFrame = 0;
 
 	// 벡터에 SEQUENCE ITEM 여러개 넣기
 	if (mySequence.m_vecSequenceItems.empty()) {
@@ -272,8 +282,13 @@ void CAnimToolHelper::Render_FrameLine(_uint uModelNum, const string& strAnimati
 	static int firstFrame = 0;
 	static bool expanded = true;
 	ImGui::PushItemWidth(100);
-	ImGui::Text("Current Frame"); ImGui::SameLine();
-	ImGui::InputInt(" ", &currentFrame); ImGui::SameLine();
+	static _int currentFrame = 0;
+	//ImGui::Text("Current Frame"); ImGui::SameLine();
+	ImGui::InputInt("Current Frame", &currentFrame); ImGui::SameLine();
+
+	static _float animationSpeed = 0;
+	//ImGui::Text("Animation Speed"); ImGui::SameLine();
+	ImGui::InputFloat("Animation Speed", &animationSpeed); ImGui::SameLine();
 	if (ImGui::Button("ANIMATION DATA SAVE"))
 	{
 		// 현 애니메이션관련 데이터 저장
