@@ -76,6 +76,14 @@ private:
 	HRESULT Render_Priority();
 	HRESULT Render_Shadow();
 	HRESULT Render_NonBlend();
+
+	HRESULT Render_Lights();
+
+	HRESULT Render_Effect();
+	HRESULT Render_EffectResult();
+
+	HRESULT Render_Result();
+	HRESULT Render_Blur_Result(_float fTimeDelta);
 	HRESULT Render_NonLight();
 	HRESULT Render_Bloom();
 	HRESULT Render_BloomResult();
@@ -87,9 +95,6 @@ private:
 	HRESULT Render_SuperUI();
 
 private:
-	HRESULT Render_Lights();
-	HRESULT Render_Result();
-	HRESULT Render_Blur_Result(_float fTimeDelta);
 	_float2 m_vScreenPos = { 0.f, 0.f };
 	_float m_fRadialBlurRadius = { 0.f };
 	_float m_fRadialRadiusSubtraction = { 0.f };

@@ -165,7 +165,7 @@ name_replacements = { # 머티리얼 이름과 동일한 텍스쳐가 없을경�
     "GsDefaultCeilingC": "GsDefaultSideRockC",
     "GsDefaultMocoCoverC": "GsDefaultMocoC",
     "GsDefaultSideC" : "GsDefaultSideRockC",
-    "GsDefaultTopC" : "GsLandAsphaltC",
+    "GsDefaultTopC" : "GsLandSoilC",
     "GsDefaultWallCoverC": "GsDefaultPartsC",
     "GsDefaultTopC_0000_0000_0000" : "GsLandTop"
 }

@@ -10,6 +10,9 @@ private:
 	virtual ~CPicking() = default;
 
 public:
+	_float2 Get_MouseViewPortPos() { return m_vMousViewPortPos; }
+
+public:
 	HRESULT Initialize(HWND hWnd, _uint iWinSizeX, _uint iWinSizeY);
 	void Update();
 	void Transform_PickingToLocalSpace(const class CTransform* pTransform, _Out_ _float3* pRayDir, _Out_ _float3* pRayPos);
@@ -19,10 +22,11 @@ private:
 	ID3D11DeviceContext* m_pContext = { nullptr };
 	class CGameInstance* m_pGameInstance = { nullptr };
 
-	HWND					m_hWnd;
-	_uint					m_iWinSizeX, m_iWinSizeY;
+	HWND		m_hWnd;
+	_uint		m_iWinSizeX, m_iWinSizeY;
 
-	_float3					m_vRayDir, m_vRayPos;
+	_float3		m_vRayDir, m_vRayPos;
+	_float2		m_vMousViewPortPos;
 
 public:
 	static CPicking* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, HWND hWnd, _uint iWinSizeX, _uint iWinSizeY);

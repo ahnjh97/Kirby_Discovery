@@ -291,6 +291,9 @@
     <ClInclude Include="..\Public\Character.h">
       <Filter>02.GameObjects\Character</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Moon.h">
+      <Filter>02.GameObjects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -415,6 +418,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Character.cpp">
       <Filter>02.GameObjects\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Moon.cpp">
+      <Filter>02.GameObjects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

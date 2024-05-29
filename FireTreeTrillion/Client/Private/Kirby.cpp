@@ -148,7 +148,7 @@ HRESULT CKirby::Render()
 			return E_FAIL;
 
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom->Begin(1)))
+		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_X)))
 			return E_FAIL;
 
 		m_pModelCom[INFO(m_eBodyState)]->Render(i);
@@ -257,8 +257,7 @@ void CKirby::Key_Input(_float fTimeDelta)
 	if (m_pGameInstance->Get_DIKeyState(DIK_P, KEY_DOWN))
 	{
 		m_iTestAnim++;
-		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, true, true);
-		m_pModelCom[INFO(m_eBodyState)]->Set_TickPerSecond(60.f);
+		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
 
 	}
 	else if (m_pGameInstance->Get_DIKeyState(DIK_O, KEY_DOWN))
@@ -266,30 +265,26 @@ void CKirby::Key_Input(_float fTimeDelta)
 		m_iTestAnim--;
 		if (m_iTestAnim < 0)
 			m_iTestAnim = 0;
-		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, true, true);
-		m_pModelCom[INFO(m_eBodyState)]->Set_TickPerSecond(60.f);
+		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
 
 	}
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_0, KEY_DOWN))
 	{
 		INFO(m_eBodyState) = BODY_DEFAULT;
-		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, true, true);
-		m_pModelCom[INFO(m_eBodyState)]->Set_TickPerSecond(60.f);
+		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
 
 	}
 	else if (m_pGameInstance->Get_DIKeyState(DIK_9, KEY_DOWN))
 	{
 		INFO(m_eBodyState) = BODY_BALLOON;
-		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, true, true);
-		m_pModelCom[INFO(m_eBodyState)]->Set_TickPerSecond(60.f);
+		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
 
 	}
 	else if (m_pGameInstance->Get_DIKeyState(DIK_8, KEY_DOWN))
 	{
 		INFO(m_eBodyState) = BODY_VACUUM;
-		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, true, true);
-		m_pModelCom[INFO(m_eBodyState)]->Set_TickPerSecond(60.f);
+		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
 	}
 #pragma endregion
 
@@ -434,7 +429,7 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
 		m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
 		m_pMouthTexture[INFO(m_eMouthState)]->Bind_ShaderResource(m_pShaderCom, "g_KirbyMouthTexture", 0);
-		m_pShaderCom->Begin(3);
+		m_pShaderCom->Begin(ANIMMODEL_KIRBYMOUTH);
 		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
 		return true;
 	}
@@ -446,10 +441,16 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
 		m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
 		m_pEyeTexture[INFO(m_eEyeState)]->Bind_ShaderResource(m_pShaderCom, "g_KirbyEyeTexture", 0);
-		m_pShaderCom->Begin(4);
+		m_pShaderCom->Begin(ANIMMODEL_KIRBYEYE);
 		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
 		return true;
 	}
+
+	//// 0 , 1 , 2(눈) , 3(구강)
+	//if (_eBodyState == BODY_VACUUM && _iMeshIndex != 3)
+	//{
+	//	return true;
+	//}
 
 	return false;
 }

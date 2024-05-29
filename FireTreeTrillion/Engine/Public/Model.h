@@ -20,7 +20,8 @@ public:
 	MODEL Get_ModelInfo() { return m_tModel; }
 
 	_bool IsFinished() { return m_Animations[m_iCurrentAnimIndex]->IsFinished(); }
-	_bool IsFinished(_uint ICurrentAnimIndex) { return m_Animations[ICurrentAnimIndex]->IsFinished(); }
+	_bool IsFinished(_uint iCurrentAnimIndex) { return m_Animations[iCurrentAnimIndex]->IsFinished(); }
+	string Get_MeshName(_uint iMeshIndex);
 
 public:
 	void Set_TickPerSecond(_float _fTickPerSecond) { m_Animations[m_iCurrentAnimIndex]->Set_TickPerSecond(_fTickPerSecond); }
@@ -57,7 +58,7 @@ public:
 	HRESULT CreateDynamicActor(_float4 vPos);
 	HRESULT CreateStaticActor(_float4 vPos);
 
-	_float4 Check_Meshes(const class CTransform* pTransform) const;
+	_float4 Check_Meshes(const class CTransform* pTransform, _Out_ _int& iMeshIndex) const;
 
 private:
 	_uint						m_iNumMeshes = { 0 };

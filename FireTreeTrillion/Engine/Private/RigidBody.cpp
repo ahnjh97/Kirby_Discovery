@@ -26,6 +26,8 @@ HRESULT CRigidBody::Initialize(void * pArg)
 	m_eShapeType			= pDesc->eShapeType;
 	m_OriginTransformMatrix = pDesc->matWorld;
 	m_vMaterial				= pDesc->vMaterial;
+	m_fOffsetSize			= pDesc->fOffsetSize;
+	m_bDynamic				= pDesc->bDynamic;
 	m_pActorObject			= pDesc->pObj;
 
 	Create_Actor();
@@ -82,7 +84,7 @@ void CRigidBody::Create_Actor()
 	// scale 긁어오기
 	_matrix OriginMatrix = m_OriginTransformMatrix;
 	_float3 vScale = _float3();
-	if (m_fOffsetSize == _float())
+	if (m_fOffsetSize != _float())
 	{
 		vScale = _float3(m_fOffsetSize, m_fOffsetSize, m_fOffsetSize);
 	}
@@ -98,7 +100,7 @@ void CRigidBody::Create_Actor()
 	switch (m_eShapeType)
 	{
 	case RIGID_BOX:
-		m_pShape = pPhysics->createShape(physx::PxBoxGeometry(0.5f * vScale.x, 0.5f * vScale.y, 0.5f * vScale.z), *pMtrl);
+		m_pShape = pPhysics->createShape(physx::PxBoxGeometry(vScale.x, vScale.y, vScale.z), *pMtrl);
 		break;
 	case RIGID_SPHERE:
 		m_pShape = pPhysics->createShape(physx::PxSphereGeometry(0.5f * vScale.x), *pMtrl);
@@ -115,13 +117,20 @@ void CRigidBody::Create_Actor()
 	// Transform 설정 (위치와 회전)
 	PxMat44 pxMat = CUtils::To_Float4x4(OriginMatrix);
 	PxTransform transform = CUtils::mat44ToTransform(pxMat);
-	m_pActor = pPhysics->createRigidDynamic(transform);
-	m_pActor->userData = this;
+	if (m_bDynamic)
+	{
+		m_pActor = pPhysics->createRigidDynamic(transform);
+		SetUp_Actor();
 
-	//SetUp_Actor();
-
-	m_pActor->attachShape(*m_pShape);
-	physx::PxRigidBodyExt::updateMassAndInertia(*m_pActor, m_fDensity);
+		m_pActor->attachShape(*m_pShape);
+		physx::PxRigidBodyExt::updateMassAndInertia(*m_pActor, m_fDensity);
+	}
+	else 
+	{
+		m_pStaticActor = pPhysics->createRigidStatic(transform);
+		SetUp_Actor();
+		m_pStaticActor->attachShape(*m_pShape);
+	}
 }
 
 
@@ -134,9 +143,12 @@ void CRigidBody::SetUp_Actor()
 {
 	if (m_bTrigger)
 	{
-		m_pActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, true);
+		if(true == m_bDynamic)
+			m_pActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, true);
 	}
 
+	if(nullptr != m_pActor)
+		m_pActor->userData = this;
 
 	if (m_bTrigger)
 	{
@@ -150,17 +162,6 @@ void CRigidBody::SetUp_Actor()
 		m_pShape->setFlag(physx::PxShapeFlag::eSCENE_QUERY_SHAPE, true);
 		m_pShape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, false);
 	}
-
-	m_pShape->setSimulationFilterData(physx::PxFilterData{ static_cast<physx::PxU32>(0/*eColliderType*/), 0, 0, 0 });
-	m_pShape->setQueryFilterData(physx::PxFilterData{static_cast<physx::PxU32>(1), 0, 0, 0});
-
-	_matrix RemoveScaleOriginMatrix = m_OriginTransformMatrix;
-	RemoveScaleOriginMatrix.r[0] = XMVector3Normalize(RemoveScaleOriginMatrix.r[0]);
-	RemoveScaleOriginMatrix.r[1] = XMVector3Normalize(RemoveScaleOriginMatrix.r[1]);
-	RemoveScaleOriginMatrix.r[2] = XMVector3Normalize(RemoveScaleOriginMatrix.r[2]);
-
-	physx::PxTransform relativePose(CUtils::To_Float4x4(RemoveScaleOriginMatrix));
-	m_pShape->setLocalPose(relativePose);
 }
 
 void CRigidBody::Release_Actor()
@@ -191,8 +192,18 @@ void CRigidBody::Activate(_bool _bActive)
 {
 	if (_bActive)
 	{
-		//if (m_pActor->getScene() == nullptr)
-		m_pGameInstance->AddActor(*m_pActor);
+		if(m_bDynamic)
+			m_pGameInstance->AddActor(*m_pActor);
+		else
+			m_pGameInstance->AddActor(*m_pStaticActor);
+
+		if (m_bTrigger)
+		{
+			if (nullptr != m_pActor)
+				m_pGameInstance->Register_Trigger(m_pActor, m_iTriggerType,  m_iTriggerIndex);
+			else
+				m_pGameInstance->Register_Trigger(m_pStaticActor, m_iTriggerType, m_iTriggerIndex);
+		}
 	}
 	else
 	{
@@ -219,6 +230,7 @@ physx::PxTransform CRigidBody::Get_PxTransform()
 void CRigidBody::Set_PxWorldMatrix(const _float4x4& _worldMatrix)
 {
 	m_pActor->setGlobalPose(physx::PxTransform{CUtils::To_Float4x4(_worldMatrix)});
+	
 }
 
 // physX에서의 행렬을 DX에서의 행렬로 변환하여 가져온다.
@@ -241,7 +253,7 @@ CRigidBody * CRigidBody::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pC
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CRigidBody"));
+		MSG_BOX(TEXT("Failed To Create : CRigidBody"));
 		Safe_Release(pInstance);
 	}
 
@@ -254,7 +266,7 @@ CComponent * CRigidBody::Clone(void * pArg)
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Cloned : CRigidBody"));
+		MSG_BOX(TEXT("Failed To Clone : CRigidBody"));
 		Safe_Release(pInstance);
 	}
 

@@ -30,7 +30,7 @@ void CPicking::Update()
 	/* 뷰포트 상의 마우스 위치를 구하자. */
 	ScreenToClient(m_hWnd, &ptMouse);
 
-
+	m_vMousViewPortPos = _float2(_float(ptMouse.x), _float(ptMouse.y));
 	/* 0, 0 -> -1, 1 */
 	/* wincx * 0.5f, wincy * 0.5f -> 0, 0 */
 	/* wincx, wincy -> 1, -1 */
