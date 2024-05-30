@@ -148,6 +148,12 @@
     <Filter Include="02.GameObjects\Map\Terrain">
       <UniqueIdentifier>{790e4632-66f1-4e07-b217-df971b3f85d4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Character\Monster\Rabbit">
+      <UniqueIdentifier>{5f67491a-2cff-4f07-b9b2-4e5139f23539}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Character\Monster\Rabbit\State">
+      <UniqueIdentifier>{5da02606-450b-4582-a1be-2d28da2c1590}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -294,6 +300,12 @@
     <ClInclude Include="..\Public\Moon.h">
       <Filter>02.GameObjects</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Rabbit_State.h">
+      <Filter>02.GameObjects\Character\Monster\Rabbit\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Rabbit.h">
+      <Filter>02.GameObjects\Character\Monster\Rabbit</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -421,6 +433,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Moon.cpp">
       <Filter>02.GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Rabbit_State.cpp">
+      <Filter>02.GameObjects\Character\Monster\Rabbit\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Rabbit.cpp">
+      <Filter>02.GameObjects\Character\Monster\Rabbit</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

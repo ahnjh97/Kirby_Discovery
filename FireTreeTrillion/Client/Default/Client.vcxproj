@@ -204,6 +204,8 @@
     <ClInclude Include="..\Public\Moon.h" />
     <ClInclude Include="..\Public\MultiEffect.h" />
     <ClInclude Include="..\Public\Particle.h" />
+    <ClInclude Include="..\Public\Rabbit.h" />
+    <ClInclude Include="..\Public\Rabbit_State.h" />
     <ClInclude Include="..\Public\SingleEffect.h" />
     <ClInclude Include="..\Public\TestModel.h" />
     <ClInclude Include="..\Public\TestModel_State.h" />
@@ -252,6 +254,8 @@
     <ClCompile Include="..\Private\Moon.cpp" />
     <ClCompile Include="..\Private\MultiEffect.cpp" />
     <ClCompile Include="..\Private\Particle.cpp" />
+    <ClCompile Include="..\Private\Rabbit.cpp" />
+    <ClCompile Include="..\Private\Rabbit_State.cpp" />
     <ClCompile Include="..\Private\SingleEffect.cpp" />
     <ClCompile Include="..\Private\TestModel.cpp" />
     <ClCompile Include="..\Private\TestModel_State.cpp" />

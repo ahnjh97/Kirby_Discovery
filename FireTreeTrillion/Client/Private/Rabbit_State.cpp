@@ -1,0 +1,359 @@
+#include "stdafx.h"
+#include "Rabbit_State.h"
+#include "Rabbit.h"
+#include "Kirby.h"
+
+#pragma region IDLE STATE
+//*********************************
+//			 IDLE STATE
+//*********************************
+CRabbit_Idle_State::CRabbit_Idle_State()
+{
+}
+
+void CRabbit_Idle_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+}
+
+void CRabbit_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CRabbit* pRabbit = static_cast<CRabbit*>(pGameObject);
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
+
+	// 몬스터, 플레이어 위치
+	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	vPos.m128_f32[1] = 0.f;
+	_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	vKirbyPos.m128_f32[1] = 0.f;
+
+	// 자유 낙하
+	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
+
+	// 플레이어와 몬스터의 거리 계산
+	_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(vPos, vKirbyPos)));
+
+	_vector vLook = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+	vLook.m128_f32[1] = 0.f;
+
+	// 몬스터와 플레이어 사이의 각도 계산
+	_float fAngle = XMVectorGetX(XMVector3AngleBetweenVectors(XMVector3Normalize(vLook), XMVector3Normalize(XMVectorSubtract(vKirbyPos, vPos))));
+
+	// 몬스터가 타겟을 찾았을 때
+	if(true == pRabbit->Get_Find())
+	{
+		// 타겟이 일정 범위 안에 있으면 계속 쫒아감
+		if(15.f > fDistance)
+		{
+			// 플레이어를 향해 회전
+			pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 2.f);
+
+			if (true == pRabbit->IsAnimFinished())
+			{
+				pRabbit->Set_TimeDelta(0.f);
+
+				// 일정 거리를 넘어가면 최소 사정거리 점프
+				if(7.f < fDistance)
+				{
+					//_vector vEndPos = XMVector3Normalize(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
+					pRabbit->Compute_Parabola(pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + (XMVector3Normalize(XMVectorSubtract(vKirbyPos, vPos)) * 7.f));
+				}
+				// 플레이어를 향해 점프
+				else
+					pRabbit->Compute_Parabola(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
+
+				pRabbit->Change_State(CRabbit::RABBIT_JUMPSTART, 100.f, false, false);
+			}
+		}
+	}
+	// 일정 거리 안으로 플레이어가 들어오면 상태 전환
+	if (10.f > fDistance)
+	{
+		if (false == pRabbit->Get_Find())
+		{
+			if (135.f > XMConvertToDegrees(fAngle))
+			{
+				pRabbit->Set_Find(true);
+				pRabbit->Change_State(CRabbit::RABBIT_FIND, 40.f, false, true);
+			}
+		}
+	}
+	// 타겟이 일정 범위를 넘어갔을 때 타겟을 못찾음
+	else if (15.f < fDistance)
+	{
+		pRabbit->Set_Find(false);
+
+		// 여러 상태의 IDLE로 전환
+		if (true == pRabbit->IsAnimFinished())
+		{
+			if (rand() % 3 == 1 || rand() % 3 == 2)
+				pRabbit->Change_State(CRabbit::RABBIT_WAIT, 40.f, false, true);
+			else
+				pRabbit->Change_State(CRabbit::RABBIT_LOOKAROUND, 40.f, false, true);
+		}
+	}
+	else
+	{
+		// 여러 상태의 IDLE로 전환
+		if (true == pRabbit->IsAnimFinished())
+		{
+			if (rand() % 3 == 1 || rand() % 3 == 2)
+				pRabbit->Change_State(CRabbit::RABBIT_WAIT, 40.f, false, true);
+			else
+				pRabbit->Change_State(CRabbit::RABBIT_LOOKAROUND, 40.f, false, true);
+		}
+	}
+}
+
+void CRabbit_Idle_State::OnStateExit()  
+{
+}
+
+CRabbit_Idle_State* CRabbit_Idle_State::Create()
+{
+	CRabbit_Idle_State* pInstance = new CRabbit_Idle_State();
+	return pInstance;
+}
+
+void CRabbit_Idle_State::Free()
+{
+	__super::Free();
+}
+
+#pragma endregion
+
+
+#pragma region FIND STATE
+//*********************************
+//			 FIND STATE
+//*********************************
+CRabbit_Find_State::CRabbit_Find_State()
+{
+}
+
+void CRabbit_Find_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+}
+
+void CRabbit_Find_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CRabbit* pRabbit = static_cast<CRabbit*>(pGameObject);
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
+
+	// 자유 낙하
+	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
+
+	// 플레이어를 향해 바라본다
+	pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 2.f);
+
+	if (true == pRabbit->IsAnimFinished())
+	{
+		pRabbit->Set_TimeDelta(0.f);
+		pRabbit->Compute_Parabola(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
+		pRabbit->Change_State(CRabbit::RABBIT_JUMPSTART, 100.f, false, false);
+	}
+}
+
+void CRabbit_Find_State::OnStateExit()
+{
+}
+
+CRabbit_Find_State* CRabbit_Find_State::Create()
+{
+	CRabbit_Find_State* pInstance = new CRabbit_Find_State();
+	return pInstance;
+}
+
+void CRabbit_Find_State::Free()
+{
+	__super::Free();
+}
+
+#pragma endregion
+
+#pragma region JUMP STATE
+//*********************************
+//			 JUMP STATE
+//*********************************
+CRabbit_Jump_State::CRabbit_Jump_State()
+{
+}
+
+void CRabbit_Jump_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+
+	m_fJumpVelocity = 15.f;
+}
+
+void CRabbit_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CRabbit* pRabbit = static_cast<CRabbit*>(pGameObject);
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
+
+	pTransformCom->Look_At_Axis(pTransformCom->Get_State_Vector(CTransform::STATE_LOOK));
+
+	if (true == pRabbit->IsAnimFinished())
+	{
+		switch (pRabbit->Get_State())
+		{
+		case CRabbit::RABBIT_JUMPSTART:
+			pRabbit->Change_State(CRabbit::RABBIT_JUMP, 85.f, false, true);
+			break;
+		case CRabbit::RABBIT_JUMP:
+			pRabbit->Change_State(CRabbit::RABBIT_JUMPEND, 45.f, false, true);
+			break;
+		case CRabbit::RABBIT_JUMPEND:
+			pRabbit->Change_State(CRabbit::RABBIT_JUMPFALL, 45.f, false, true);
+			break;
+		default:
+			pRabbit->Change_State(CRabbit::RABBIT_WAIT, 45.f, false, true);
+			break;
+		}
+	}
+
+	_float fJumpTimeDelta = pRabbit->Get_TimeDelta();
+	fJumpTimeDelta += fTimeDelta;
+	// 매 Tick 점프 중인 위치 벡터 받아오기
+	_vector vGoPos = pRabbit->JumpAttak(fJumpTimeDelta);
+
+	_bool bJump = { false };
+
+	// 점프 위치 벡터를 physx에 던지기
+	bJump = pController->Jump_Parabola(pTransformCom, vGoPos, fTimeDelta);
+
+	pRabbit->Set_TimeDelta(fJumpTimeDelta);
+
+	pRabbit->Get_State();
+
+	if(CRabbit::RABBIT_JUMPFALL == pRabbit->Get_State())
+	{
+		if (!bJump)
+			pRabbit->Change_State(CRabbit::RABBIT_JUMPLANDING, 45.f, false, true);
+	}
+}
+
+void CRabbit_Jump_State::OnStateExit()
+{
+}
+
+CRabbit_Jump_State* CRabbit_Jump_State::Create()
+{
+	CRabbit_Jump_State* pInstance = new CRabbit_Jump_State();
+	return pInstance;
+}
+
+void CRabbit_Jump_State::Free()
+{
+	__super::Free();
+}
+
+#pragma endregion
+
+
+#pragma region JUMPLANDING STATE
+//*********************************
+//			 JUMPLANDING STATE
+//*********************************
+CRabbit_JumpLanding_State::CRabbit_JumpLanding_State()
+{
+}
+
+void CRabbit_JumpLanding_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+}
+
+void CRabbit_JumpLanding_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CRabbit* pRabbit = static_cast<CRabbit*>(pGameObject);
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+
+	if (pRabbit->IsAnimFinished())
+		pRabbit->Change_State(CRabbit::RABBIT_WAIT, 100.f, false, true);
+}
+
+void CRabbit_JumpLanding_State::OnStateExit()
+{
+}
+
+CRabbit_JumpLanding_State* CRabbit_JumpLanding_State::Create()
+{
+	CRabbit_JumpLanding_State* pInstance = new CRabbit_JumpLanding_State();
+	return pInstance;
+}
+
+void CRabbit_JumpLanding_State::Free()
+{
+	__super::Free();
+}
+
+#pragma endregion
+
+
+#pragma region DAMAGE STATE
+//*********************************
+//			 DAMAGE STATE
+//*********************************
+CRabbit_Damage_State::CRabbit_Damage_State()
+{
+}
+
+void CRabbit_Damage_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
+
+	m_vKirbyLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+
+	m_fJumpVelocity = 6.f;
+}
+
+void CRabbit_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CRabbit* pRabbit = static_cast<CRabbit*>(pGameObject);
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+
+	pTransformCom->Look_At_Axis(-m_vKirbyLook);
+	pController->Move_Dir(pTransformCom, m_vKirbyLook * 0.15f, fTimeDelta);
+
+	m_fJumpVelocity -= GRAVITY * fTimeDelta * 2.5f;
+	pController->Jump(pTransformCom, m_fJumpVelocity, fTimeDelta);
+
+	if (true == pRabbit->IsAnimFinished() || pController->Is_Terrain())
+		pRabbit->Change_State(CRabbit::RABBIT_WAIT, 45.f, false, true);
+}
+
+void CRabbit_Damage_State::OnStateExit()
+{
+}
+
+CRabbit_Damage_State* CRabbit_Damage_State::Create()
+{
+	CRabbit_Damage_State* pInstance = new CRabbit_Damage_State();
+	return pInstance;
+}
+
+void CRabbit_Damage_State::Free()
+{
+	__super::Free();
+}
+
+#pragma endregion
