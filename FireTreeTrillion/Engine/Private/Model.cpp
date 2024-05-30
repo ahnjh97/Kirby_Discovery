@@ -160,6 +160,8 @@ HRESULT CModel::Bind_ShaderResource(CShader * pShader, const _char * pConstantNa
 
 HRESULT CModel::Play_Animation(_float fTimeDelta)
 {
+	if (m_bStop) return S_OK;
+
 	/* 현재 애니메이션에 맞는 뼈의 상태(m_TransformationMatrix)를 갱신해준다. */
 	m_Animations[m_iCurrentAnimIndex]->Invalidate_TransformationMatrix(fTimeDelta, m_Bones, m_isLoop);
 

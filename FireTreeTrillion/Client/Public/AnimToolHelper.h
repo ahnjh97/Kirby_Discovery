@@ -17,7 +17,7 @@ public:
 	virtual _int	Tick(_float fTimeDelta)				override;
 	virtual void	Late_Tick(_float fTimeDelta)		override;
 	virtual HRESULT Render()							override;
-	virtual void	Render_IMGUI()						override;
+	//virtual void	Render_IMGUI()						override;
 
 private:
 	void			Ready_AnimObjects(const wstring& strLayerTag);
@@ -33,6 +33,7 @@ private:
 
 private:
 	vector<CGameObject*>	m_vecAnimObjects;
+	CGameObject*			m_pGameObj = nullptr;
 
 public:
 	static	CAnimToolHelper* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

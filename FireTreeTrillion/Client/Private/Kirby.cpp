@@ -251,7 +251,7 @@ void CKirby::Setting_KirbyBalance()
 
 void CKirby::Key_Input(_float fTimeDelta)
 {
-#pragma region 目厚 楷备家 (局聪皋捞记 力绢)
+	#pragma region 目厚 楷备家 (局聪皋捞记 力绢)
 
 	//Test
 	if (m_pGameInstance->Get_DIKeyState(DIK_P, KEY_DOWN))
@@ -292,7 +292,6 @@ void CKirby::Key_Input(_float fTimeDelta)
 		m_pModelCom[INFO(m_eBodyState)]->Set_TickPerSecond(60.f);
 	}
 #pragma endregion
-
 }
 
 void CKirby::SetOn_Slope(_float fTimeDelta)
@@ -559,6 +558,11 @@ void CKirby::Set_Animation(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool
 		return;
 
 	m_pModelCom[INFO(m_eBodyState)]->Set_Animation(eState, _fAnimSpeed, _bLoop, _bInterpolation);
+}
+
+void CKirby::Set_Animation(_int _iAnimIndex)
+{
+	m_pModelCom[INFO(m_eBodyState)]->Set_Animation(_iAnimIndex);
 }
 
 _bool CKirby::isAnimFinish()

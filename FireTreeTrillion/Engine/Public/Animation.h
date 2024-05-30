@@ -31,6 +31,7 @@ public:
 	}
 
 	void Reset_Ratio() { m_bRatio = true; }
+	void Remove_Ratio() { m_bRatio = false; }
 
 
 public:
@@ -45,7 +46,7 @@ public:
 
 public:
 	HRESULT Initialize(const vector<class CBone*>& Bones, ifstream& fileStream);
-	void Invalidate_TransformationMatrix(_float fTimeDelta, const vector<class CBone*>& Bones, _bool bIsLooping);
+	void	Invalidate_TransformationMatrix(_float fTimeDelta, const vector<class CBone*>& Bones, _bool bIsLooping);
 
 public:
 	void Read_AnimationData(ifstream& fileStream);
