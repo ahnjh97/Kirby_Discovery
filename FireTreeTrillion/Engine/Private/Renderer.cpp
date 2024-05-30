@@ -58,7 +58,7 @@ HRESULT CRenderer::Initialize()
 	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Stencil"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 1.f))))
 		return E_FAIL;
 	/* For.Target_MotionBlur */
-	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_MotionBlur"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 1.f))))
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_MotionBlur"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
 		return E_FAIL;
 
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Diffuse"))))
@@ -138,9 +138,26 @@ HRESULT CRenderer::Initialize()
 		return E_FAIL;
 #pragma endregion
 
-#pragma region MRT_ColorCorrrection
-
+#pragma region MRT_DOFBlur
 	/* For.Target_RadialBlur */
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_DOFBlur"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_DOFBlur"), TEXT("Target_DOFBlur"))))
+		return E_FAIL;
+#pragma endregion
+
+
+#pragma region MRT_MotionBlur
+	/* For.Target_RadialBlur */
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_DiffuseMotionBlur"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_MotionBlur"), TEXT("Target_DiffuseMotionBlur"))))
+		return E_FAIL;
+#pragma endregion
+
+
+#pragma region MRT_ColorCorrrection
+	/* For.Target_ColorCorrrection (Final) */
 	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Final"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_ColorCorrrection"), TEXT("Target_Final"))))
@@ -217,6 +234,10 @@ HRESULT CRenderer::Initialize()
 	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_RimLight"), 550.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_MotionBlur"), 1200.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
+		return E_FAIL;
+
+
 
 	// LightAcc
 	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Shade"), 700.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
@@ -251,10 +272,18 @@ HRESULT CRenderer::Initialize()
 	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Sky"), 550.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
 		return E_FAIL;
 
-
 	// RadialBlur
 	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_RadialBlur"), 700.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
 		return E_FAIL;
+
+	// DOFBlur
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_DOFBlur"), 1000.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
+		return E_FAIL;
+
+	// MotionBlur
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_DiffuseMotionBlur"), 1100.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
+		return E_FAIL;
+
 
 #endif
 
@@ -304,9 +333,15 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 
 	if (FAILED(Render_Result()))
 		return E_FAIL;
-	if (FAILED(Render_Blur_Result(fTimeDelta)))
+	// Radial블러 적용
+	if (FAILED(Render_Radial_Result(fTimeDelta)))
 		return E_FAIL;
-
+	// DOF블러 적용
+	if (FAILED(Render_DOF_Result()))
+		return E_FAIL;
+	// Motion블러 적용
+	if (FAILED(Render_MotionBlur()))
+		return E_FAIL;
 	//**** 후처리 완료 ****//
 
 	/////////////////////// UI를 제외하고 그려진 상황에서, 화면 색 보정 처리한다.
@@ -315,6 +350,7 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 
 	if (FAILED(Render_UI()))
 		return E_FAIL;
+
 	if (FAILED(Render_SuperUI()))
 		return E_FAIL;
 
@@ -366,6 +402,16 @@ void CRenderer::Setting_RadialBlur(_float fRadial, _float fSubtraction)
 	m_vScreenPos = _float2(0.5f, 0.5f);
 	m_fRadialBlurRadius = fRadial;
 	m_fRadialRadiusSubtraction = fSubtraction;
+}
+
+void CRenderer::Update_DofFocus(_fvector vWorldPos)
+{
+	_matrix ViewProjectionMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW) * m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
+	_vector vScreenPos = XMVector3TransformCoord(vWorldPos, ViewProjectionMatrix);
+	_float fScreenX = (XMVectorGetX(vScreenPos) + 1.f) * 0.5f;
+	_float fScreenY = (XMVectorGetY(vScreenPos) + 1.f) * 0.5f;
+
+	m_vDofFocus = _float2(fScreenX, 1.f - fScreenY);
 }
 
 HRESULT CRenderer::Render_LightDepth_For_GameObject(CShader* pShader, CTransform* pTransform, CModel* pModel)
@@ -716,9 +762,10 @@ HRESULT CRenderer::Render_Result()
 	return S_OK;
 }
 
-HRESULT CRenderer::Render_Blur_Result(_float fTimeDelta)
+HRESULT CRenderer::Render_Radial_Result(_float fTimeDelta)
 {  
-	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_ColorCorrrection"))))
+	// DOF에 담는다.
+	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_DOFBlur"))))
 		return E_FAIL;
 
 	if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
@@ -728,7 +775,7 @@ HRESULT CRenderer::Render_Blur_Result(_float fTimeDelta)
 	if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
-	// 최종 작업물 던지기
+	// 레디얼 블러를 적용시킬 텍스쳐를 던진다.
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_RadialBlur"), "g_RadialBlur")))
 		return E_FAIL;
 
@@ -743,8 +790,74 @@ HRESULT CRenderer::Render_Blur_Result(_float fTimeDelta)
 	if (FAILED(m_pShader->Bind_RawValue("g_fRadialblurCenter", &m_vScreenPos, sizeof(_float2))))
 		return E_FAIL;
 
-
+	// 레디얼 블러를 적용시킨다.
 	m_pShader->Begin(DEFERRED_BLUR_R);
+
+	m_pVIBuffer->Bind_Buffers();
+
+	m_pVIBuffer->Render();
+
+	if (FAILED(m_pGameInstance->End_MRT()))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CRenderer::Render_DOF_Result()
+{
+	// 모션블러에 담는다.
+	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_MotionBlur"))))
+		return E_FAIL;
+
+	if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+		return E_FAIL;
+
+	// DOF를 적용시킬 텍스쳐를 던진다.
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_DOFBlur"), "g_DOFBlur")))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_vDOFFocus", &m_vDofFocus, sizeof(_float2))))
+		return E_FAIL;
+
+
+	// DOF 를 적용시킨다.
+	m_pShader->Begin(8);
+
+	m_pVIBuffer->Bind_Buffers();
+
+	m_pVIBuffer->Render();
+
+	if (FAILED(m_pGameInstance->End_MRT()))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CRenderer::Render_MotionBlur()
+{
+	// 최종 컬러 보정할 최종 MRT에 담는다.
+	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_ColorCorrrection"))))
+		return E_FAIL;
+
+	if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+		return E_FAIL;
+
+	// 모션 블러를 적용시킬 원본 텍스쳐를 던진다.
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_DiffuseMotionBlur"), "g_DiffuseMotionBlur")))
+		return E_FAIL;
+	// 모션 블러의 정보(방향 벨로시티)를 가진것을 던진다.
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_MotionBlur"), "g_MotionBlur")))
+		return E_FAIL;
+
+	// 모션 블러를 적용시킨다.
+	m_pShader->Begin(9);
 
 	m_pVIBuffer->Bind_Buffers();
 
@@ -774,9 +887,6 @@ HRESULT CRenderer::Render_FinalResult()
 	m_pVIBuffer->Bind_Buffers();
 
 	m_pVIBuffer->Render();
-
-	//if (FAILED(m_pGameInstance->End_MRT()))
-	//	return E_FAIL;
 
 
 	return S_OK;
@@ -848,6 +958,11 @@ HRESULT CRenderer::Render_Debug()
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Draw_RTVDebug(TEXT("MRT_NonLight"), m_pShader, m_pVIBuffer)))
 		return E_FAIL;
+	if (FAILED(m_pGameInstance->Draw_RTVDebug(TEXT("MRT_DOFBlur"), m_pShader, m_pVIBuffer)))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Draw_RTVDebug(TEXT("MRT_MotionBlur"), m_pShader, m_pVIBuffer)))
+		return E_FAIL;
+
 
 	return S_OK;	
 }

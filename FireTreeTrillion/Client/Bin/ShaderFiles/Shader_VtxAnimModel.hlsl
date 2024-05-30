@@ -13,6 +13,8 @@ texture2D g_KirbyEyeTexture;
 
 bool g_bStencil;
 bool g_bRimLight;
+bool g_bMotionBlur;
+float4 g_vMotionVelocity;
 
 
 struct VS_IN
@@ -132,6 +134,9 @@ PS_OUT PS_MAIN(PS_IN In)
     if (g_bRimLight == true)
         Out.vRimLight = vector(0.f, 0.f, 1.f, 1.f);
 
+    if (g_bMotionBlur == true)
+        Out.vMotionBlur = g_vMotionVelocity;
+
     
 	
     return Out;
@@ -155,6 +160,9 @@ PS_OUT NO_NORMALMAP_PS_MAIN(PS_IN In)
     if (g_bRimLight == true)
         Out.vRimLight = vector(0.f, 0.f, 1.f, 1.f);
 
+    if (g_bMotionBlur == true)
+        Out.vMotionBlur = g_vMotionVelocity;
+
     
     return Out;
 }
@@ -176,6 +184,9 @@ PS_OUT FOR_KIRBYMOUTH_PS_MAIN(PS_IN In)
     
     if (g_bRimLight == true)
         Out.vRimLight = vector(0.f, 0.f, 1.f, 1.f);
+
+    if (g_bMotionBlur == true)
+        Out.vMotionBlur = g_vMotionVelocity;
 
     
     return Out;
@@ -199,6 +210,9 @@ PS_OUT FOR_KIRBYEYE_PS_MAIN(PS_IN In)
     
     if (g_bRimLight == true)
         Out.vRimLight = vector(0.f, 0.f, 1.f, 1.f);
+
+    if (g_bMotionBlur == true)
+        Out.vMotionBlur = g_vMotionVelocity;
     
     return Out;
 

@@ -45,6 +45,7 @@ public: /* For.Renderer */
 	void Setting_RadialBlur(_float fRadial, _float fSubtraction = 70.f);
 	HRESULT Render_LightDepth_For_GameObject(class CShader* pShader, class CTransform* pTransform, class CModel* pModel);
 	void Update_LightShadow(_fvector vLightPos, _fvector vFocusPos);
+	void Update_DofFocus(_fvector vWorldPos);
 
 
 #ifdef _DEBUG
@@ -88,7 +89,7 @@ public: /* For.PipeLine */
 	HRESULT Add_Camera(class CCamera* pCamera);
 	HRESULT Switch_CurCamera(_int iIdx);
 	void Clear_Camera();
-	CCamera* Get_CurCameraPtr();
+	class CCamera* Get_CurCameraPtr();
 	_matrix Get_Transform_Matrix(CPipeLine::TRANSFORMSTATE eState) const;
 	_float4x4 Get_Transform_Float4x4(CPipeLine::TRANSFORMSTATE eState) const;
 	_matrix Get_Transform_Matrix_Inverse(CPipeLine::TRANSFORMSTATE eState) const;

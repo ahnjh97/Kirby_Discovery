@@ -9,6 +9,8 @@ matrix g_ViewMatrixInv, g_ProjMatrixInv;
 float g_fTexW = 1600.0f;
 float g_fTexH = 900.0f;
 
+float g_fFar = 1000.f;
+
 static const float fWeight[13] =
 {
     0.0561, 0.1353, 0.278, 0.4868, 0.7261, 0.9231, 1,
@@ -44,6 +46,11 @@ texture2D g_FinalTexture;
 texture2D g_RadialBlur;
 float g_fRadialblurRaduis;
 float2 g_fRadialblurCenter;
+
+texture2D g_DOFBlur;
+float2 g_vDOFFocus;
+texture2D g_DiffuseMotionBlur;
+texture2D g_MotionBlur;
 
 float4 g_vLightDir;
 float4 g_vLightPos;
@@ -181,7 +188,7 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
     float4 vNormal = float4(vNormalDesc.xyz * 2.f - 1.f, 0.f);
 
     vector vDepthDesc = g_DepthTexture.Sample(PointSampler, In.vTexcoord);
-    float fViewZ = vDepthDesc.y * 1000.0f;
+    float fViewZ = vDepthDesc.y * g_fFar;
 	
     Out.vShade = g_vLightDiffuse * saturate(max(dot(normalize(g_vLightDir) * -1.f, vNormal), 0.f) + g_vLightAmbient * g_vMtrlAmbient);
 
@@ -220,7 +227,7 @@ PS_OUT_LIGHT PS_MAIN_POINT(PS_IN In)
     float4 vNormal = float4(vNormalDesc.xyz * 2.f - 1.f, 0.f);
 
     vector vDepthDesc = g_DepthTexture.Sample(PointSampler, In.vTexcoord);
-    float fViewZ = vDepthDesc.y * 1000.0f;
+    float fViewZ = vDepthDesc.y * g_fFar;
 
     float4 vWorldPos;
 
@@ -273,7 +280,7 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
 	/* ProjPos.w == View.Z */
     vector vDepthDesc = g_DepthTexture.Sample(PointSampler, In.vTexcoord);
     
-    float fViewZ = vDepthDesc.y * 1000.0f;
+    float fViewZ = vDepthDesc.y * g_fFar;
 
     float4 vWorldPos;
 
@@ -366,20 +373,7 @@ PS_OUT PS_MAIN_BLUR_Y(PS_IN In)
 
 PS_OUT PS_MAIN_RADIAL_BLUR(PS_IN In)
 {
-    PS_OUT Out = (PS_OUT) 0;
-        
-    //vector vBlurBeforeTexture = g_RadialBlur.Sample(ClampSampler, In);
-    //vector vDepthDesc = g_DepthTexture.Sample(PointSampler, In.vTexcoord);
-    
-    //for (int iYD = -6; iYD < 7; ++iYD)
-    //{
-    //    for (int iXD = -6; iXD < 7; ++iXD)
-    //    {
-            
-    //    }
-
-    //}
-    
+    PS_OUT Out = (PS_OUT) 0;    
     
     // 0~1 텍스트 쿠드 좌표로 환산하여 넣어준다.
     float2 fCenter = g_fRadialblurCenter;
@@ -408,11 +402,86 @@ PS_OUT PS_MAIN_COLORCORRECT(PS_IN In)
     
     vector vDiffuse = g_FinalTexture.Sample(LinearSampler, In.vTexcoord);
     Out.vColor = vDiffuse;
-    Out.vColor.r *= .9f;
-    Out.vColor.g *= .9f;
     
     return Out;
 }
+
+
+PS_OUT PS_MAIN_DOFBlur(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+        
+    // 초점 대상의 Depth값
+    vector vDepthFocus = g_DepthTexture.Sample(PointSampler, g_vDOFFocus);
+    float fViewZ = vDepthFocus.y * g_fFar;
+    
+    // 현재 픽셀의 Depth값
+    vector vMyDepth = g_DepthTexture.Sample(PointSampler, In.vTexcoord);
+    float fMyViewZ = vMyDepth.y * g_fFar;
+
+    float2 vUV = (float2) 0;
+    float fDOFTotal = 0.f;
+    
+     // 초점 깊이와 현재 깊이의 차이
+    float fDepthDifference = abs(fViewZ - fMyViewZ);
+    
+    // DOFWeight 계산 (스케일링 및 클램핑)
+    float fDOFWeight = clamp(fDepthDifference / g_fFar * 4.f, 0.0f, 1.0f);
+    
+    
+    //float fDepthDifference = 0.f;
+    //float fDOFWeight = 0.f;
+    //// 만약, 현재 나의 픽셀이 뒤에 있을 경우.
+    //if (fViewZ - fMyViewZ > 0)
+    //{
+    //    fDepthDifference = fViewZ - fMyViewZ;
+    //    fDOFWeight = clamp(fDepthDifference / g_fFar * 4.f, 0.0f, 1.0f);
+    //}
+    //// 만약, 현재 나의 픽셀이 앞에 있을 경우
+    //else
+    //{
+    //    fDepthDifference = fMyViewZ - fViewZ;
+    //    fDOFWeight = clamp(fDepthDifference / g_fFar * 50.f, 0.0f, 1.0f);
+    //}
+
+    for (int i = -6; i < 7; ++i)
+    {
+        for (int j = -6; j < 7; ++j)
+        {
+            float2 Offset = float2(j, i);
+            float2 TexOffset = Offset * float2(1.0f / g_fTexW, 1.0f / g_fTexH) * fDOFWeight;
+            vUV = In.vTexcoord + TexOffset;
+            
+            float fSampleWeight = fWeight[6 + j] * fWeight[6 + i];
+            Out.vColor += fSampleWeight * g_DOFBlur.Sample(ClampSampler, vUV);
+            fDOFTotal += fSampleWeight;
+        }
+    }
+    
+    Out.vColor /= fDOFTotal;
+    return Out;
+}
+
+
+PS_OUT PS_MAIN_MotionBlur(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    //vector Diffusedesc = g_DiffuseMotionBlur.Sample(LinearSampler, In.vTexcoord);
+    float4 vMotionBlurSample = g_MotionBlur.Sample(LinearSampler, In.vTexcoord);
+    float2 vMyBlurDir = vMotionBlurSample.xy;
+    float fMotionblurRaduis = 250.f;
+    float2 vUV = (float2) 0;
+
+    for (int i = -6; i < 7; ++i)
+    {
+        vUV = In.vTexcoord + (vMyBlurDir * i * float2(1.f / g_fTexW * fMotionblurRaduis, 1.f / g_fTexH * fMotionblurRaduis));
+        Out.vColor += fWeight[6 + i] * (g_DiffuseMotionBlur.Sample(ClampSampler, vUV));
+    }
+    Out.vColor /= fTotal;
+
+    return Out;
+ }
 
 
 technique11 DefaultTechnique
@@ -515,4 +584,29 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN_COLORCORRECT();
     }
+
+    // DOF 블러 ( 8 )
+    pass DOF_Blur
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_Default, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_DOFBlur();
+    }
+
+    // 모션 블러 ( 9 )
+    pass Motion_Blur
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_Default, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_MotionBlur();
+    }
+
 }

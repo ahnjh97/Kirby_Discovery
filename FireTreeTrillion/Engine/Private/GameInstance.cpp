@@ -298,6 +298,15 @@ void CGameInstance::Update_LightShadow(_fvector vLightPos, _fvector vFocusPos)
 	m_pRenderer->Update_LightShadow(vLightPos, vFocusPos);
 }
 
+void CGameInstance::Update_DofFocus(_fvector vWorldPos)
+{
+	if (nullptr == m_pRenderer)
+		return;
+
+	m_pRenderer->Update_DofFocus(vWorldPos);
+
+}
+
 HRESULT CGameInstance::Add_DebugComponents(CComponent * pRenderComponent)
 {
 

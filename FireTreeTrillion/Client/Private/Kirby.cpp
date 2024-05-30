@@ -81,6 +81,8 @@ _int CKirby::Tick(_float fTimeDelta)
 
 	// 테스트 (먹었을 때 0.1초정도간 발생하는 애니메이션 로직, 추후 수정)
 	Key_Input(fTimeDelta);
+
+
 	if (m_pGameInstance->Get_DIKeyState(DIK_I, KEY_DOWN))
 	{
 		INFO(m_isEat) = true;
@@ -132,6 +134,8 @@ HRESULT CKirby::Render()
 		m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
+			return E_FAIL;
 
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
 		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_X)))
@@ -162,7 +166,6 @@ void CKirby::Render_IMGUI()
 		ImGui::TreePop();
 	}
 	ImGui::Text("Origin X : %.2f, Origin Y : %.2f, Origin Z : %.2f,", m_vOriginUp.x, m_vOriginUp.y, m_vOriginUp.z);
-	ImGui::Text("Terrain X : %.2f, Terrain Y : %.2f, Terrain Z : %.2f,", m_vTest.x, m_vTest.y, m_vTest.z);
 	ImGui::Text("ReserveJump : %d", INFO(m_bReserveJumpKey));
 	ImGui::Text("Height : %.2f", m_pControllerCom->Compute_Height());
 	ImGui::Text("Input C? : %d", m_pGameInstance->Get_DIKeyState(DIK_C, KEY_PRESS));
@@ -281,7 +284,6 @@ void CKirby::SetOn_Slope(_float fTimeDelta)
 	// 지면의 up벡터
 	PxVec3 slope = m_pControllerCom->Compute_Slope(m_pTransformCom);
 	_vector vTerrainNormal = CUtils::To_Vector(slope);
-	m_vTest = vTerrainNormal;
 	Lerp_UpVector(vTerrainNormal, 20.f, fTimeDelta);
 }
 
@@ -603,6 +605,29 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 	// FSM 제어
 	if (m_pFSM != nullptr)
 		m_pFSM->Update(this, fTimeDelta);
+
+	// Dof 초점을 커비에게 맞춘다.
+	_vector vDOFPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	vDOFPos.m128_f32[1] += 0.5f;
+	m_pGameInstance->Update_DofFocus(vDOFPos);
+
+	// 모션 블러 계산
+	Compute_MotionBlur();
+}
+
+void CKirby::Compute_MotionBlur()
+{
+	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	_matrix ViewProjectionMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW) * m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
+	_vector vScreenPos = XMVector3TransformCoord(vPos, ViewProjectionMatrix);
+	_float fScreenX = (XMVectorGetX(vScreenPos) + 1.f) * 0.5f;
+	_float fScreenY = (XMVectorGetY(vScreenPos) + 1.f) * 0.5f;
+
+	_float2 vCurScreenPos = _float2(fScreenX, 1.f - fScreenY);
+
+	m_vMotionVelocity.x = (m_vPreScreenPos - vCurScreenPos).x;
+	m_vMotionVelocity.y = (m_vPreScreenPos - vCurScreenPos).y;
+	m_vPreScreenPos = vCurScreenPos;
 }
 
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
