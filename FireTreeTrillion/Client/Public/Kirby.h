@@ -103,6 +103,7 @@ private:
 	void			Key_Input(_float fTimeDelta);
 	void			Kirby_SystemTick(_float fTimeDelta);
 
+	// 모션블러 재료
 	void			Compute_MotionBlur();
 	_float2			m_vPreScreenPos = { 0.f, 0.f };
 	_float4			m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
