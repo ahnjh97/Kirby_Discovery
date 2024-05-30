@@ -332,10 +332,11 @@ void CAnimToolHelper::Render_FrameLine(CAnimation** ppAnimation, const string& s
 		if (ImGui::BeginPopupModal("Notify", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 		{
 			ImGui::Text("Register Event Name");
-			ImGui::Separator();
+			char buf1[32] = "";  ImGui::InputText("event", buf1, 32);
 
 			if (ImGui::Button("OK", ImVec2(120, 0))) 
 			{
+				// QZR : buf1를 바깥에 넘기자.
 				selectedEntry = -1; ImGui::CloseCurrentPopup();
 			}
 			ImGui::SetItemDefaultFocus(); ImGui::SameLine();
