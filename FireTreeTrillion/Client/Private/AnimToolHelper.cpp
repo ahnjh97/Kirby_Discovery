@@ -4,6 +4,10 @@
 #include "ImSequencer.h"
 #include "Utils.h"
 
+
+static string strProtoTag = "";
+static _int		iModelNum = 0;
+
 static const char* SequencerItemTypeNames[] = { "Effect Event", "Collision Event", "Sound Event" };
 struct AnimSequence : public ImSequencer::SequenceInterface
 {
@@ -34,19 +38,6 @@ struct AnimSequence : public ImSequencer::SequenceInterface
 	virtual const char* GetItemTypeName(_int typeIndex) const override
 	{
 		return SequencerItemTypeNames[typeIndex];
-		//switch (typeIndex)
-		//{
-		//case 1:
-		//	return "Effect Event";
-		//break;
-		//case 2:
-		//	return "Collision Event";
-		//break;
-		//case 3:
-		//	return "Sound Event";
-		//break;
-		//}
-		//return "-"; 
 	}
 
 	virtual const char* GetItemLabel(int index) const
@@ -163,10 +154,10 @@ void CAnimToolHelper::Render_ObjectList()
 	float listBoxHeight = windowHeight - 100;
 	ImGui::SetNextWindowSizeConstraints(ImVec2(-1, listBoxHeight), ImVec2(-1, listBoxHeight));
 
+	// 검색 기능 추가
 	static ImGuiTextFilter filter;
 	ImGui::Text("Search Object");
 	filter.Draw();
-
 
 	static int item_current_idx = -1;
 	if (ImGui::BeginListBox(" ", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing())))
@@ -182,9 +173,6 @@ void CAnimToolHelper::Render_ObjectList()
 				if (ImGui::Selectable(szName, is_selected))
 					item_current_idx = n;
 			
-			/*if (ImGui::Selectable(szName, is_selected))
-				item_current_idx = n;*/
-
 			if (is_selected)
 			{
 				ImGui::SetItemDefaultFocus();
@@ -247,7 +235,7 @@ void CAnimToolHelper::Render_AnimationList(const wstring& wstrObjectTag)
 									if (is_selected)
 									{
 										ImGui::SetItemDefaultFocus();
-										Render_FrameLine(0, "anim"/*클릭한 애니메이션 이름*/);
+										Render_FrameLine(&(*pVecAnims)[n], animName);
 									}
 								}
 								ImGui::EndListBox();
@@ -262,56 +250,66 @@ void CAnimToolHelper::Render_AnimationList(const wstring& wstrObjectTag)
 	}
 }
 
-void CAnimToolHelper::Render_FrameLine(_uint uModelNum, const string& strAnimationTag)
+void CAnimToolHelper::Render_FrameLine(CAnimation** ppAnimation, const string& strAnimationTag)
 {
 	static AnimSequence mySequence;
 	mySequence.m_iFrameMin = 0;
-	mySequence.m_iFrameMax = 300;
+	mySequence.m_iFrameMax = (_int)(*ppAnimation)->Get_Duration();
 
 	// 벡터에 SEQUENCE ITEM 여러개 넣기
-	if (mySequence.m_vecSequenceItems.empty()) {
-		mySequence.m_vecSequenceItems.push_back(AnimSequence::AnimSequenceItem{ 0, 10, 20, true });
-		mySequence.m_vecSequenceItems.push_back(AnimSequence::AnimSequenceItem{ 1, 10, 20, true });
-		mySequence.m_vecSequenceItems.push_back(AnimSequence::AnimSequenceItem{ 2, 20, 25, false });
-		//mySequence.m_vecSequenceItems.push_back(AnimSequence::AnimSequenceItem{ 1, 61, 90, false });
-		//mySequence.m_vecSequenceItems.push_back(AnimSequence::AnimSequenceItem{ 2, 90, 99, false });
+	if (mySequence.m_vecSequenceItems.empty())
+	{
+		mySequence.m_vecSequenceItems.push_back(AnimSequence::AnimSequenceItem{ 0, 11, 12, false });
+		mySequence.m_vecSequenceItems.push_back(AnimSequence::AnimSequenceItem{ 1, 10, 11, false });
+		mySequence.m_vecSequenceItems.push_back(AnimSequence::AnimSequenceItem{ 2, 11, 12, false });
 	}
+
+	 // 고정할 위치와 크기
+	ImVec2 windowPos = ImVec2(368, 583); // 창의 위치
+	ImVec2 windowSize = ImVec2(1221, 299); // 창의 크기
+
+	// 창의 위치와 크기를 설정
+	ImGui::SetNextWindowPos(windowPos,	 ImGuiCond_Always);
+	ImGui::SetNextWindowSize(windowSize, ImGuiCond_Always);
+
+	// 애니메이션 관련 창 생성
 	ImGui::Begin(strAnimationTag.c_str());
 
 	static int selectedEntry = -1;
 	static int firstFrame = 0;
 	static bool expanded = true;
+
+	// 아이템 간격
 	ImGui::PushItemWidth(100);
+	
+	// 현재 프레임 띄우기
 	static _int currentFrame = 0;
-	//ImGui::Text("Current Frame"); ImGui::SameLine();
 	ImGui::InputInt("Current Frame", &currentFrame); ImGui::SameLine();
 
+	// 애니메이션 스피드
 	static _float animationSpeed = 0;
-	//ImGui::Text("Animation Speed"); ImGui::SameLine();
 	ImGui::InputFloat("Animation Speed", &animationSpeed); ImGui::SameLine();
-	if (ImGui::Button("ANIMATION DATA SAVE"))
+
+	// 현 애니메이션 데이터 저장
+	if (ImGui::Button("ANIMATION DATA SAVE")) 
 	{
-		// 현 애니메이션관련 데이터 저장
+		Save();
 	}
-	//if (ImGui::Button("LOAD"))
-	//{
-		// 애니메이션 데이터 불러오기 // 필요하려나? 아직은 필요성 못느껴서 안만듦.
-	//}
 
 	ImGui::Text("Frame Min: %d", mySequence.m_iFrameMin); ImGui::SameLine();
 	ImGui::Text("Frame Max: %d", mySequence.m_iFrameMax);
 	ImGui::PopItemWidth();
 
+	// 프레임단위 띄우기
 	ImSequencer::Sequencer(&mySequence, &currentFrame, &expanded, &selectedEntry, &firstFrame,
 		ImSequencer::SEQUENCER_EDIT_STARTEND | ImSequencer::SEQUENCER_ADD | ImSequencer::SEQUENCER_DEL | /*ImSequencer::SEQUENCER_COPYPASTE | */ImSequencer::SEQUENCER_CHANGE_FRAME);
 
 	ImGui::End();
 }
 
-void CAnimToolHelper::Render_EventList()
-{
-
-}
+//void CAnimToolHelper::Render_EventList()
+//{
+//}
 
 void CAnimToolHelper::Save()
 {

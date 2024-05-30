@@ -25,8 +25,8 @@ private:
 	// RENDER
 	void			Render_ObjectList();
 	void			Render_AnimationList(const wstring& wstrObjectTag);
-	void			Render_FrameLine(_uint uModelNum, const string& strAnimationTag);
-	void			Render_EventList();
+	void			Render_FrameLine(class CAnimation** pModel, const string& strAnimationTag);
+	//void			Render_EventList();
 
 	void			Save();
 	void			Load(const string& FileName);
