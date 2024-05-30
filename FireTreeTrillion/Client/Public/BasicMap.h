@@ -5,6 +5,7 @@
 BEGIN(Engine)
 class CShader;
 class CModel;
+class CTexture;
 END
 
 BEGIN(Client)
@@ -31,6 +32,7 @@ public:
 private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
+	CTexture* m_pTextureCom = { nullptr };
 	CGameObject* m_pBlendMap = { nullptr }; 
 
 	vector<_uint> m_vecPassIndices;

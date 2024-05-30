@@ -201,7 +201,7 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 	}
 	fileStream.close();
 
-	CCamera_Free* pCamera = dynamic_cast<CCamera_Free*> (m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Camera"), 0));
+	CCamera_Free* pCamera = dynamic_cast<CCamera_Free*> (m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Camera")));
 	if (nullptr == pCamera)
 		return E_FAIL;
 
@@ -231,4 +231,5 @@ CLevel_GamePlay * CLevel_GamePlay::Create(ID3D11Device* pDevice, ID3D11DeviceCon
 void CLevel_GamePlay::Free()
 {
 	__super::Free();
+	m_pGameInstance->Clear_EventCallBack();
 }

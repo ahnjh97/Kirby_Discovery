@@ -27,6 +27,9 @@ public:
     virtual void onSleep(PxActor** actors, PxU32 count) override { }
     virtual void onAdvance(const PxRigidBody* const* bodyBuffer, const PxTransform* poseBuffer, const PxU32 count) override {}
 
+public:
+    void Clear_EventCallBack();
+
 private:
     _bool IsActorInTriggerList(PxActor* pRigidActor);
 

@@ -14,6 +14,12 @@ void CEventCallBack::onTrigger(PxTriggerPair* pairs, PxU32 count)
     }
 }
 
+void CEventCallBack::Clear_EventCallBack()
+{
+    m_Triggers.clear();
+    m_TriggerFunctions.clear();
+}
+
 _bool CEventCallBack::IsActorInTriggerList(PxActor* pRigidActor)
 {
     if (m_Triggers.empty())

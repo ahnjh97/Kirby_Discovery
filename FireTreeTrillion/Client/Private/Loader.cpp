@@ -265,7 +265,8 @@ HRESULT CLoader::Loading_For_GamePlay()
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Moon", "Moon.png")))
 		return E_FAIL;
-
+	if(FAILED(Add_Texture(eLevel, "GsLandTopNoize_Fur", "Map/GsLandTopNoize_Fur.dds")))
+		return E_FAIL;
 
 	// 커비 얼굴 텍스쳐 로드
 	Add_KirbyFaceTexture(eLevel);
@@ -362,6 +363,8 @@ HRESULT CLoader::Loading_For_Tool_Map()
 	LEVEL eLevel = LEVEL_TOOL_MAP;
 
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
+	if (FAILED(Add_Texture(eLevel, "GsLandTopNoize_Fur", "Map/GsLandTopNoize_Fur.dds")))
+		return E_FAIL;
 
 	m_strLoadingText = TEXT("VI버퍼(을) 로딩 중 입니다.");
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Grid"),

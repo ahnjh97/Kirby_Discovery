@@ -66,6 +66,7 @@ public: /* For.Object_Manager */
 	list<CGameObject*>* Get_List(_uint iLevelIndex, const wstring& strLayerTag);
 
 	class CGameObject*	Get_GameObject(_uint iLevelIndex, const wstring& strLayerTag, _uint iIndex);
+	class CGameObject*	Get_GameObject(_uint iLevelIndex, const wstring& wstrLayerTag);
 	class CGameObject*	Get_GameObject_ByTag(_uint iLevelIndex, const wstring& strLayerTag, wstring _tag);
 	void				Set_CurrentLevel(_int CurrentLevel);
 	void	Clear_Layer(_uint iLevelIndex, const wstring& wstrLayerTag);
@@ -174,6 +175,7 @@ public: /* For.PhysX */
 	void Register_Player(PxActor* pPlayerActor);
 	void Register_Trigger(PxActor* pTriggerActor, _int iTriggerType, _int iTriggerIndex);
 	void SetUp_TriggerFunc(_int iTriggerType, function<void(_int)> func);
+	void Clear_EventCallBack();
 
 public: /* For. Picking */
 	void Transform_PickingToLocalSpace(const class CTransform* pTransform, _Out_ _float3* pRayDir, _Out_ _float3* pRayPos);

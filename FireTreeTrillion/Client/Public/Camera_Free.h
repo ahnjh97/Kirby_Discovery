@@ -33,24 +33,17 @@ public:
 	}
 	void Track_Target(_bool _bTrackTarget) { m_bTrackTarget = _bTrackTarget; }
 
-	void Set_MatrixIndex(_int iMatrixIndex){ 
-		if ((iMatrixIndex != m_iMatrixIndex) && (nullptr != m_pTransformCom) && (!m_vecCamMatrices.empty()) && iMatrixIndex >= 0)
-		{
-			if(iMatrixIndex < m_vecCamMatrices.size())
-				m_pTransformCom->Set_WorldMatrix(m_vecCamMatrices[iMatrixIndex]);
-		}
-		
-		m_iMatrixIndex = iMatrixIndex;
-	}
-
-	void EmplaceBackCamMatrix(_float4x4 matWorld) { m_vecCamMatrices.emplace_back(matWorld); }
-
+private:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual _int Tick(_float fTimeDelta) override;
 	virtual void Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 	virtual void Render_IMGUI() override;
+
+public:
+	void Set_MatrixIndex(_int iMatrixIndex);
+	void EmplaceBackCamMatrix(_float4x4 matWorld) { m_vecCamMatrices.emplace_back(matWorld); }
 
 private:
 	_float			m_fMouseSensor = { 0.0f };
