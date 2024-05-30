@@ -94,6 +94,7 @@ public:
 	void Go_Up(_float fTimeDelta);
 	void Go_Down(_float fTimeDelta);
 	void Look_At(_fvector vPosition);
+	void Look_At_Axis(_fvector vAxis);
 	void Look_At_ForLandObject(_fvector vPosition);
 	void Look_At_Rotate(_vector vAt, _float fTimeDelta);
 	void Look_At_Angle(_fvector vAt, _fvector vAxis, _float fRadian);

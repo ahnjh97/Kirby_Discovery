@@ -20,7 +20,7 @@ public:
 	MODEL Get_ModelInfo() { return m_tModel; }
 
 	_bool IsFinished() { return m_Animations[m_iCurrentAnimIndex]->IsFinished(); }
-	_bool IsFinished(_uint ICurrentAnimIndex) { return m_Animations[ICurrentAnimIndex]->IsFinished(); }
+	_bool IsFinished(_uint iCurrentAnimIndex) { return m_Animations[iCurrentAnimIndex]->IsFinished(); }
 
 public:
 	void Set_TickPerSecond(_float _fTickPerSecond) { m_Animations[m_iCurrentAnimIndex]->Set_TickPerSecond(_fTickPerSecond); }

@@ -9,13 +9,6 @@ BEGIN(Client)
 //*********************************
 class CAwoofy_Idle_State final : public CFSM_State
 {
-//public:
-//	enum AWOOFY_STATE {
-//		AWOOFY_BRAKE, AWOOFY_DAMAGE, AWOOFY_FALL, AWOOFY_FIND, AWOOFY_FINDSUB, AWOOFY_FINDWAIT, AWOOFY_GROOMING,
-//		AWOOFY_HOWLING, AWOOFY_JUMP, AWOOFY_JUMPEND, AWOOFY_LANDING, AWOOFY_LOOKAROUND, AWOOFY_LOOKAROUNDAFTERBRAKE, AWOOFY_RUN,
-//		AWOOFY_SLEEP, AWOOFY_SLEEPFALL, AWOOFY_WAIT, AWOOFY_WAKEUP, AWOOFY_WALK, AWOOFY_END
-//	};
-
 private:
 	CAwoofy_Idle_State();
 	virtual ~CAwoofy_Idle_State() = default;
@@ -144,6 +137,10 @@ public:
 	// 상태 진입되어 있는 상태에서 매 tick마다 호출
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
 	virtual void OnStateExit()														override;
+
+private:
+	_float m_fJumpVelocity = { 0.f };
+	_vector m_vKirbyLook = {};
 
 public:
 	static	CAwoofy_Damage_State* Create();

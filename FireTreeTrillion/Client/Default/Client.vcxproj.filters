@@ -145,6 +145,12 @@
     <Filter Include="02.GameObjects\UI\HUD\Kirby">
       <UniqueIdentifier>{4bba1354-4120-4080-bcfb-aeff11736c4b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Monster\Rabbit">
+      <UniqueIdentifier>{a71956b6-b59a-4830-b586-f42af4cf8801}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Monster\Rabbit\State">
+      <UniqueIdentifier>{d36be9aa-e10b-41d2-ae5d-d739cb709913}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -285,6 +291,12 @@
     <ClInclude Include="..\Public\HUD_Kirby.h">
       <Filter>02.GameObjects\UI\HUD\Kirby</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Rabbit.h">
+      <Filter>02.GameObjects\Monster\Rabbit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Rabbit_State.h">
+      <Filter>02.GameObjects\Monster\Rabbit\State</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -406,6 +418,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\HUD_Kirby.cpp">
       <Filter>02.GameObjects\UI\HUD\Kirby</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Rabbit.cpp">
+      <Filter>02.GameObjects\Monster\Rabbit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Rabbit_State.cpp">
+      <Filter>02.GameObjects\Monster\Rabbit\State</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
