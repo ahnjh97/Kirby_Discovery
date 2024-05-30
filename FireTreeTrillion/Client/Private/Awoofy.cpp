@@ -181,7 +181,7 @@ HRESULT CAwoofy::Add_Components()
 	CHECK_FAILED(hr);
 
 	/* For.Com_CharacterController */
-	_float4 vPos = XMVectorSet(10.f, 10.f, -180.f, 1.f);
+	_float4 vPos = XMVectorSet(10.f, 20.f, -170.f, 1.f);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
 	desc.uCollisionType = m_eCollisionGroup;

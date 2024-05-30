@@ -148,11 +148,23 @@
     <Filter Include="02.GameObjects\Map\Terrain">
       <UniqueIdentifier>{790e4632-66f1-4e07-b217-df971b3f85d4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Character\WaddleDee">
+      <UniqueIdentifier>{975b42f5-4d3e-4ce1-acee-ceac9f5b976a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\SkySphere">
+      <UniqueIdentifier>{24afa923-789a-4526-9b9d-3523c19603e1}</UniqueIdentifier>
+	</Filter>
     <Filter Include="02.GameObjects\Character\Monster\Rabbit">
       <UniqueIdentifier>{5f67491a-2cff-4f07-b9b2-4e5139f23539}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Character\Monster\Rabbit\State">
       <UniqueIdentifier>{5da02606-450b-4582-a1be-2d28da2c1590}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Character\Monster\Buffahorn">
+      <UniqueIdentifier>{119c683d-2914-4419-b633-2ec30fcda00c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Character\Monster\Buffahorn\State">
+      <UniqueIdentifier>{36a9b0b1-2680-464e-9a8d-a7d446bbe9e2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -300,11 +312,23 @@
     <ClInclude Include="..\Public\Moon.h">
       <Filter>02.GameObjects</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\SkySphere.h">
+      <Filter>02.GameObjects\Map\SkySphere</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\WaddleDee.h">
+      <Filter>02.GameObjects\Character\WaddleDee</Filter>
+	</ClInclude>
     <ClInclude Include="..\Public\Rabbit_State.h">
       <Filter>02.GameObjects\Character\Monster\Rabbit\State</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Rabbit.h">
       <Filter>02.GameObjects\Character\Monster\Rabbit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Buffahorn.h">
+      <Filter>02.GameObjects\Character\Monster\Buffahorn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Buffahorn_State.h">
+      <Filter>02.GameObjects\Character\Monster\Buffahorn\State</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -434,11 +458,23 @@
     <ClCompile Include="..\Private\Moon.cpp">
       <Filter>02.GameObjects</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\SkySphere.cpp">
+      <Filter>02.GameObjects\Map\SkySphere</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\WaddleDee.cpp">
+      <Filter>02.GameObjects\Character\WaddleDee</Filter>
+	</ClCompile>
     <ClCompile Include="..\Private\Rabbit_State.cpp">
       <Filter>02.GameObjects\Character\Monster\Rabbit\State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Rabbit.cpp">
       <Filter>02.GameObjects\Character\Monster\Rabbit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Buffahorn.cpp">
+      <Filter>02.GameObjects\Character\Monster\Buffahorn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Buffahorn_State.cpp">
+      <Filter>02.GameObjects\Character\Monster\Buffahorn\State</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
