@@ -30,7 +30,7 @@ HRESULT CHUD_Kirby::Initialize(void* _pArg)
 
 	m_pTransformCom->Set_Scaled(HUD_KirbyDESC->vSize.x, HUD_KirbyDESC->vSize.y, 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(
-						HUD_KirbyDESC->vCenter.x - HUD_KirbyDESC->vPos.x,
+						HUD_KirbyDESC->vPos.x - HUD_KirbyDESC->vCenter.x,
 						-HUD_KirbyDESC->vCenter.y + HUD_KirbyDESC->vPos.y, 0.f, 1.f));
 	m_pTransformCom->Rotation(XMVectorSet(0.f, 0.f, 1.f, 1.f), XMConvertToRadians(HUD_KirbyDESC->fRaito));
 
@@ -60,7 +60,7 @@ void CHUD_Kirby::Late_Tick(_float fTimeDelta)
 HRESULT CHUD_Kirby::Render()
 {
 	// PS_ALPHABLEND > PS_DEFAULT·Î º¯°æ
-	if (FAILED(Bind_ShaderResources(m_pShaderCom, PS_DEFAULT, m_pTransformCom, m_pTextureCom, 7)))
+	if (FAILED(Bind_ShaderResources(m_pShaderCom, PS_DEFAULT, m_pTransformCom, m_pTextureCom, m_iTexIndex)))
 		return E_FAIL;
 
 	return S_OK;
@@ -68,6 +68,7 @@ HRESULT CHUD_Kirby::Render()
 
 void CHUD_Kirby::Render_IMGUI()
 {
+
 }
 
 HRESULT CHUD_Kirby::Add_Components()
@@ -76,7 +77,8 @@ HRESULT CHUD_Kirby::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_GameComplete"),
+	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_KirbyBarHard"),
+	//if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_GameComplete"),
 		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
 		return E_FAIL;
 

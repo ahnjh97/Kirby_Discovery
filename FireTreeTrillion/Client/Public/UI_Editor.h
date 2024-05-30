@@ -30,6 +30,10 @@ private:
 	HRESULT			Bind_ShaderResources();
 
 	// IMGUI SET
+	_bool			Window_Directories();
+	_bool			Window_Properties();
+	_bool			Window_Textures();
+
 	_bool			Edit_Transform();
 	_bool			Edit_RGBAColor();
 	_bool			Set_OrthoProj();

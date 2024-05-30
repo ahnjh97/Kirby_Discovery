@@ -24,6 +24,7 @@ public:
 		wstring		wstrUITag = { TEXT("") };
 		_float2		vSize, vCenter, vPos = { 0.f, 0.f };
 		_float		fRaito = { 0.f };
+		_int		iTexIndex = { 0 };
 	}UIOBJ_DESC;
 
 protected:
@@ -50,6 +51,7 @@ public:
 protected:
 	vector<CUIObject*>	m_vecUIObj;
 	UIOBJ_DESC			m_UIObjDesc{};
+	_int				m_iTexIndex = { 0 };
 
 	// 2D UI Ã³¸®¿ë
 	_float2				m_size2D, m_position2D, m_WindowSize2D;

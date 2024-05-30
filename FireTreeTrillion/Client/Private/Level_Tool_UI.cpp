@@ -60,7 +60,7 @@ HRESULT CLevel_Tool_UI::Ready_Layer_Camera(const wstring& strLayerTag)
 	CameraDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	CameraDesc.fNear = 0.1f;
 	CameraDesc.fFar = 10000.0f;
-	CameraDesc.vEye = _float4(0.f, 0.f, g_iWinSizeX * -0.1f, 1.f);
+	CameraDesc.vEye = _float4(0.f, 0.f, -250.f/*g_iWinSizeX * -0.1f*/, 1.f);
 
 	CameraDesc.vAt = _float4(0.f, 0.f, 1.f, 1.f);
 	CameraDesc.fSpeedPerSec = 10.f;
@@ -93,6 +93,7 @@ HRESULT CLevel_Tool_UI::Ready_Layer_UI(const wstring& strLayerTag)
 	HUD_KirbyDESC.vPos = {	HUD_KirbyDESC.vCenter.x/* - 200.f*/, 
 							HUD_KirbyDESC.vCenter.y/* - 200.f */ };
 	HUD_KirbyDESC.fRaito = { 0.f };
+	HUD_KirbyDESC.iTexIndex = { 0 };
 
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_UI, strLayerTag, TEXT("Prototype_GameObject_HUD_Kirby"), &HUD_KirbyDESC)))
 		return E_FAIL;

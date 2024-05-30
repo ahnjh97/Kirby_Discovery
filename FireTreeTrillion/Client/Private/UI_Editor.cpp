@@ -40,8 +40,8 @@ HRESULT CUI_Editor::Initialize(void* _pArg)
 #pragma region LOAD_FILEDATA
 
 	//에디터 첫 실행 시, 파일데이터 읽고 로드
-	string strFilePath = "../Bin/Resources/Data/UI/";
-	Load_FileData(strFilePath + "Test_Origin.txt");
+	//string strFilePath = "../Bin/Resources/Data/UI/";
+	//Load_FileData(strFilePath + "Test_Origin.txt");
 
 #pragma endregion
 
@@ -59,6 +59,20 @@ _int CUI_Editor::Tick(_float _fTimeDelta)
 			pUIObj->Tick(_fTimeDelta);
 	}
 
+#pragma region KEY_INPUT
+
+	string strFilePath = "../Bin/Resources/Data/UI/";
+	if (m_pGameInstance->Get_DIKeyState(DIK_LCONTROL, KEY_PRESS))
+	{
+		if (m_pGameInstance->Get_DIKeyState(DIK_S, KEY_DOWN))
+			Save_FileData(strFilePath); //==TRUE
+
+		if (m_pGameInstance->Get_DIKeyState(DIK_D, KEY_DOWN))
+			Load_FileData(strFilePath + "Test_Origin.txt");
+	}
+
+#pragma endregion
+
 	return OBJ_NOEVENT;
 }
 
@@ -70,23 +84,41 @@ void CUI_Editor::Late_Tick(_float _fTimeDelta)
 			pUIObj->Late_Tick(_fTimeDelta);
 	}
 
+	Set_GizmoGrid(); //IMGUI GIZMO GRID CUSTOM
+
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_UI, this);
 }
 
 HRESULT CUI_Editor::Render()
 {
+	Set_DockSpace(); //IMGUI DOCKSPACE
+	Window_Directories(); //디렉토리 윈도우
+	Window_Properties(); //오브젝트 속성 윈도우
+	Window_Textures(); //텍스처 윈도우
+
 	return S_OK;
 }
 
 void CUI_Editor::Render_IMGUI()
 {
-	Set_GizmoGrid(); //IMGUI GIZMO GRID CUSTOM
-	Set_DockSpace(); //IMGUI DOCKSPACE
+}
 
+HRESULT CUI_Editor::Add_Components()
+{
+	return S_OK;
+}
+
+HRESULT CUI_Editor::Bind_ShaderResources()
+{
+	return S_OK;
+}
+
+_bool CUI_Editor::Window_Directories()
+{
 	ImGuiWindowFlags Dirwindow_Flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize;
-	if (ImGui::Begin(u8"Directory 경로 ", 0, Dirwindow_Flags))
+	if (ImGui::Begin(u8"Directories", 0, Dirwindow_Flags))
 	{
-		if (ImGui::BeginTabBar(u8"##Directory"))
+		if (ImGui::BeginTabBar(u8"##Directories"))
 		{
 			if (ImGui::BeginTabItem(u8"HUD"))
 			{
@@ -97,19 +129,24 @@ void CUI_Editor::Render_IMGUI()
 					_int iSelect = -1;
 					for (size_t i = 0; i < m_vecUIObj.size(); ++i)
 					{
- 						string strUITag = CUtils::WstrToStr(m_vecUIObj[i]->Get_UIObj_Desc().wstrUITag);
-						
+						string strUITag = CUtils::WstrToStr(m_vecUIObj[i]->Get_UIObj_Desc().wstrUITag);
+
 						if (strUITag.empty()) //wstrUITag 값에 대한 예외처리
 							strUITag = "##";
 
 						if (ImGui::Selectable(strUITag.c_str(), iSelect == i))
-						{
 							iSelect = i;
-						}
 
 						if (iSelect == i) //목록 선택할 경우, 활성화
 						{
 							ImGui::SetItemDefaultFocus();
+
+							//벡터에서 일치하는 태그를 찾아 검색 후 정보를 가져옴
+							for (auto& iter : m_vecUIObj)
+							{
+								wstring wstrUITag = iter->Get_UIObj_Desc().wstrUITag;
+								//if (strUITag == wstrUITag)
+							}
 						}
 					}
 
@@ -125,6 +162,11 @@ void CUI_Editor::Render_IMGUI()
 		ImGui::End();
 	}
 
+	return FALSE;
+}
+
+_bool CUI_Editor::Window_Properties()
+{
 	if (ImGui::Begin(u8"Properties 속성", 0, ImGuiWindowFlags_NoCollapse))
 	{
 		if (ImGui::BeginTabBar(u8"Test TabBar 1")) //탭 바
@@ -150,16 +192,50 @@ void CUI_Editor::Render_IMGUI()
 
 		ImGui::End(); //창 종료
 	}
+
+	return TRUE;
 }
 
-HRESULT CUI_Editor::Add_Components()
+_bool CUI_Editor::Window_Textures()
 {
-	return S_OK;
-}
+	ImGuiWindowFlags TexWindow_Flags = {}; /* ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize;*/
+	if (ImGui::Begin(u8"Texture 텍스처", 0, TexWindow_Flags))
+	{
+		ImGui::SeparatorText(u8"Texture List 목록");
 
-HRESULT CUI_Editor::Bind_ShaderResources()
-{
-	return S_OK;
+		if (ImGui::BeginListBox(u8"##Texture List", ImVec2(285, 200)))
+		{
+			_int iSelect = -1;
+			m_pGameInstance->Get_GameObject(LEVEL_TOOL_UI, )
+
+			CTexture* pUITexCom = (CTexture*)(m_pGameInstance->Get_Component(LEVEL_TOOL_UI, TEXT("Layer_UI"), g_strTransformTag, 0));
+			_uint iNumTex = pUITexCom->Get_NumTexture();
+			
+			for (size_t i = 0; i < iNumTex; ++i)
+			{
+				_int iTexIndex = m_vecUIObj[i]->Get_UIObj_Desc().iTexIndex;
+				string strTexTag = CUtils::WstrToStr(m_vecUIObj[i]->Get_UIObj_Desc().wstrUITag);
+				strTexTag += "_" + to_string(iTexIndex);
+
+				if (ImGui::Selectable(strTexTag.c_str(), iSelect == i))
+					iSelect = i;
+
+				if (iSelect == i) //목록 선택할 경우, 활성화
+				{
+					ImGui::SetItemDefaultFocus();
+
+					for (auto& iter : m_vecUIObj)
+					{
+					}
+				}
+			}
+
+			ImGui::EndListBox();
+		}
+	}
+	ImGui::End();
+
+	return TRUE;
 }
 
 _bool CUI_Editor::Edit_Transform()
@@ -284,12 +360,12 @@ _bool CUI_Editor::Set_GizmoSync()
 	}
 
 	// 기즈모 키 입력 시 기능 스왑
-	ImGui::Text(u8"Ctrl S : 크기 / Ctrl R : 회전 / Ctrl T : 위치");
+	ImGui::Text(u8"Ctrl E : 크기 / Ctrl R : 회전 / Ctrl T : 위치");
 
 	// 크기 회전 이동 변경 키
 	if (m_pGameInstance->Get_DIKeyState(DIK_LCONTROL, KEY_PRESS))
 	{
-		if (m_pGameInstance->Get_DIKeyState(DIK_S, KEY_DOWN))
+		if (m_pGameInstance->Get_DIKeyState(DIK_E, KEY_DOWN))
 			eCurGizmoOper = ImGuizmo::SCALE;
 
 		else if (m_pGameInstance->Get_DIKeyState(DIK_R, KEY_DOWN))
@@ -392,33 +468,14 @@ _bool CUI_Editor::Set_DockSpace()
 			if (ImGui::BeginMenu(u8"File 파일"))
 			{
 				if (ImGui::MenuItem(u8"Create 생성"))
-				{
-					if (Create_UIObject())
-						MSG_BOX(TEXT("Successed to Create : UI Object"));
+					Create_UIObject();
 
-					else
-						MSG_BOX(TEXT("Failed to Create : UI Object"));
-				}
-
+				string strFilePath = "../Bin/Resources/Data/UI/";
 				if (ImGui::MenuItem(u8"Save 저장"))
-				{
-					if (Save_FileData("../Bin/Resources/Data/UI/")) //==TRUE
-						MSG_BOX(TEXT("Successed to Save : FileData"));
-
-					else
-						MSG_BOX(TEXT("Failed to Save : FileData"));
-				}
+					Save_FileData(strFilePath); //==TRUE
 
 				if (ImGui::MenuItem(u8"Load 로드")) //==TRUE
-				{
-					string strFilePath = "../Bin/Resources/Data/UI/";
-
-					if (Load_FileData(strFilePath + "Test_Origin.txt"))
-						MSG_BOX(TEXT("Successed to Load : FileData"));
-
-					else
-						MSG_BOX(TEXT("Failed to Load : FileData"));
-				}
+					Load_FileData(strFilePath + "Test_Origin.txt");
 
 				ImGui::EndMenu();
 			}
@@ -448,31 +505,36 @@ _bool CUI_Editor::Create_UIObject()
 	CUIObject* pUIObj = dynamic_cast<CUIObject*>(m_pGameInstance->Get_GameObject(LEVEL_TOOL_UI, TEXT("Layer_UI"), 0));
 	if (nullptr == pUIObj)
 	{ 
+		MSG_BOX(TEXT("Failed to Create : UI Object"));
 		CHECK_NULLPTR(pUIObj);
 		return FALSE;
 	}
 	m_vecUIObj.push_back(pUIObj);
 
+	MSG_BOX(TEXT("Successed to Create : UI Object"));
 	return TRUE;
 }
 
 _bool CUI_Editor::Save_FileData(string _strFilePath)
 {
 	string strOriginName = _strFilePath + "Test_Origin.txt";
-	string strTempName = _strFilePath + "Test_Temp.txt"; //임시
+	string strTempName = _strFilePath + "Test_Temp.txt"; //임시 파일
 
 	std::ofstream OutputFile(strTempName, ios::out | std::ios::binary);
 
 	if (!OutputFile.is_open()) //==FALSE
 	{
 		MSG_BOX(TEXT("Failed to Open : FileData"));
+		//OutputFile.close();
 		return FALSE;
 	}
 
+	//벡터가 비었을 경우 
 	size_t size = m_vecUIObj.size();
 	if (m_vecUIObj.empty())
 	{
 		OutputFile.close();
+		MSG_BOX(TEXT("Failed to Save : Need to Create Object"));
 		return FALSE;
 	}
 
@@ -520,6 +582,7 @@ _bool CUI_Editor::Save_FileData(string _strFilePath)
 		OutputFile.write(reinterpret_cast<const char*>(&m_UIObjDesc.vSize), sizeof(m_UIObjDesc.vSize));
 		OutputFile.write(reinterpret_cast<const char*>(&m_UIObjDesc.vPos), sizeof(m_UIObjDesc.vPos));
 		OutputFile.write(reinterpret_cast<const char*>(&m_UIObjDesc.fRaito), sizeof(m_UIObjDesc.fRaito));
+		OutputFile.write(reinterpret_cast<const char*>(&m_UIObjDesc.iTexIndex), sizeof(m_UIObjDesc.iTexIndex));
 
 		//CUIObject* pUIObject = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(CUtils::StrToWstr(strProtoTag), &m_UIObjDesc));
 		//m_vecUIObj.push_back(pUIObject);
@@ -530,11 +593,11 @@ _bool CUI_Editor::Save_FileData(string _strFilePath)
 	if (!OutputFile)
 	{
 		MSG_BOX(TEXT("Failed to Write : FileData"));
-		remove(strTempName.c_str()); 	//기존파일 삭제
+		remove(strTempName.c_str()); 	//기존 파일 삭제
 		return FALSE;
 	}
 
-	remove(strOriginName.c_str()); 	//기존파일 삭제
+	remove(strOriginName.c_str()); 	//기존 파일 삭제
 
 	if (rename(strTempName.c_str(), strOriginName.c_str()) != 0) //임시 파일 > 최종 파일
 	{
@@ -543,6 +606,7 @@ _bool CUI_Editor::Save_FileData(string _strFilePath)
 		return FALSE;
 	}
 
+	MSG_BOX(TEXT("Successed to Save : FileData"));
 	return TRUE;
 }
 
@@ -552,7 +616,7 @@ _bool CUI_Editor::Load_FileData(const string& _strFilePath)
 
 	if (!InputFile.is_open()) //==FALSE 
 	{
-		MSG_BOX(TEXT("Load Failed : UI"));
+		MSG_BOX(TEXT("Failed to Open : FileData"));
 		return FALSE;
 	}
 
@@ -582,16 +646,18 @@ _bool CUI_Editor::Load_FileData(const string& _strFilePath)
 		InputFile.read(reinterpret_cast<char*>(&m_UIObjDesc.vSize), sizeof(m_UIObjDesc.vSize));
 		InputFile.read(reinterpret_cast<char*>(&m_UIObjDesc.vPos), sizeof(m_UIObjDesc.vPos));
 		InputFile.read(reinterpret_cast<char*>(&m_UIObjDesc.fRaito), sizeof(m_UIObjDesc.fRaito));
+		InputFile.read(reinterpret_cast<char*>(&m_UIObjDesc.iTexIndex), sizeof(m_UIObjDesc.iTexIndex));
 
 		//list box용 태그 연동
 		m_UIObjDesc.wstrUITag = CUtils::StrToWstr(strUITag);
 
-		CUIObject* pUIObject = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(CUtils::StrToWstr(strProtoTag), &m_UIObjDesc));
+ 		CUIObject* pUIObject = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(CUtils::StrToWstr(strProtoTag), &m_UIObjDesc));
 		m_vecUIObj.push_back(pUIObject);
 	}
 
 	InputFile.close();
 
+	MSG_BOX(TEXT("Successed to Load : FileData"));
 	return TRUE;
 }
 
