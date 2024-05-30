@@ -11,7 +11,8 @@ BEGIN(Client)
 
 class CTrigger final : public CGameObject
 {
-	enum TRIGGER { TRIGGER_CAM, TRIGGER_SHADER, TRIGGER_END };
+	enum TRIGGER { TRIGGER_CAM, TRIGGER_SHADER, TRIGGER_STAR, TRIGGER_END };
+
 public:
 	struct TRIGGER_DESC : GAMEOBJECT_DESC
 	{

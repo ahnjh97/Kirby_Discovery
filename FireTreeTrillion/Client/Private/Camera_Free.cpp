@@ -34,8 +34,11 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_pGameInstance->Add_Camera(this);
-	function<void(_int)> func = bind(&CCamera_Free::Set_MatrixIndex, this, placeholders::_1);
-	m_pGameInstance->SetUp_TriggerFunc(TRIGGER_CAMERA, func);
+
+	if (*m_pGameInstance->Get_CurrentLevelID() == LEVEL_GAMEPLAY) {
+		function<void(_int)> func = bind(&CCamera_Free::Set_MatrixIndex, this, placeholders::_1);
+		m_pGameInstance->SetUp_TriggerFunc(TRIGGER_CAMERA, func);
+	}
 
 	return S_OK;
 }
@@ -132,6 +135,25 @@ void CCamera_Free::Render_IMGUI()
 
 	ImGui::Separator();
 	ImGui::DragFloat3("CameraFree Offset", &m_vOffset.x);*/
+}
+ 
+void CCamera_Free::Set_MatrixIndex(_int iMatrixIndex)
+{
+	if (nullptr == m_pTransformCom || m_vecCamMatrices.empty())
+		return;
+
+	if (iMatrixIndex < 0 || iMatrixIndex == m_iMatrixIndex)
+		return;
+
+	if (iMatrixIndex < m_vecCamMatrices.size()) {
+		m_pTransformCom->Set_WorldMatrix(m_vecCamMatrices[iMatrixIndex]);
+		m_iMatrixIndex = iMatrixIndex;
+	}	
+}
+
+void CCamera_Free::EmplaceBackCamMatrix(const _float4x4& matWorld)
+{
+	m_vecCamMatrices.emplace_back(matWorld);
 }
 
 void CCamera_Free::Track_Target(_float fTimeDelta)
@@ -236,7 +258,7 @@ CCamera_Free* CCamera_Free::Create(ID3D11Device* pDevice, ID3D11DeviceContext* p
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CCamera_Free"));
+		MSG_BOX(TEXT("Failed To Create : CCamera_Free"));
 
 		Safe_Release(pInstance);
 	}
@@ -251,7 +273,7 @@ CGameObject* CCamera_Free::Clone(void* pArg)
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CCamera_Free"));
+		MSG_BOX(TEXT("Failed To Clone : CCamera_Free"));
 
 		Safe_Release(pInstance);
 	}
@@ -264,4 +286,6 @@ void CCamera_Free::Free()
 	Safe_Release(m_pTarget);
 
 	__super::Free();
+
+	m_vecCamMatrices.clear();
 }

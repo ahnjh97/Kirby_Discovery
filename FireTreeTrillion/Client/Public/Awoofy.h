@@ -2,7 +2,6 @@
 
 #include "Client_Defines.h"
 #include "Monster.h"
-#include <Kirby.h>
 
 BEGIN(Engine)
 class CModel;
@@ -49,6 +48,11 @@ private:
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
+
+	void			Compute_MotionBlur();
+	_float2			m_vPreScreenPos = { 0.f, 0.f };
+	_float4			m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
+
 
 	// FSM
 	void SetUp_FSM();

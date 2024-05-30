@@ -47,14 +47,9 @@ _int CAwoofy::Tick(_float fTimeDelta)
 
 	Compute_ViewZ();
 
-    // FSM 제어
-	//if (m_pFSM != nullptr)
-	//	m_pFSM->Update(this, fTimeDelta);
+	__super::SetOn_Slope(fTimeDelta);
 
-	// 지면의 up벡터
-	//PxVec3 slope = m_pControllerCom->Compute_Slope(m_pTransformCom);
-	//_vector vTerrainNormal = CUtils::To_Vector(slope);
-	//Lerp_UpVector(vTerrainNormal, 10.f, fTimeDelta);
+	Compute_MotionBlur();
 
    // FSM 제어
 	if (m_pFSM != nullptr)
@@ -181,7 +176,7 @@ HRESULT CAwoofy::Add_Components()
 	CHECK_FAILED(hr);
 
 	/* For.Com_CharacterController */
-	_float4 vPos = XMVectorSet(10.f, 10.f, -180.f, 1.f);
+	_float4 vPos = XMVectorSet(10.f, 20.f, -170.f, 1.f);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
 	desc.uCollisionType = m_eCollisionGroup;
@@ -213,12 +208,33 @@ HRESULT CAwoofy::Bind_ShaderResources()
 
 	_bool bStencil = true;
 	_bool bRimLight = true;
+	_bool bMotionBlur = true;
+
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool))))
 		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
+		return E_FAIL;
 
 	return S_OK;
+}
+
+void CAwoofy::Compute_MotionBlur()
+{
+	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	_matrix ViewProjectionMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW) * m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
+	_vector vScreenPos = XMVector3TransformCoord(vPos, ViewProjectionMatrix);
+	_float fScreenX = (XMVectorGetX(vScreenPos) + 1.f) * 0.5f;
+	_float fScreenY = (XMVectorGetY(vScreenPos) + 1.f) * 0.5f;
+
+	_float2 vCurScreenPos = _float2(fScreenX, 1.f - fScreenY);
+
+	m_vMotionVelocity.x = (m_vPreScreenPos - vCurScreenPos).x;
+	m_vMotionVelocity.y = (m_vPreScreenPos - vCurScreenPos).y;
+	m_vPreScreenPos = vCurScreenPos;
 }
 
 void CAwoofy::SetUp_FSM()

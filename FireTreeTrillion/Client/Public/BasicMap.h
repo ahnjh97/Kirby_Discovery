@@ -5,6 +5,7 @@
 BEGIN(Engine)
 class CShader;
 class CModel;
+class CTexture;
 END
 
 BEGIN(Client)
@@ -27,10 +28,13 @@ public:
 	virtual _int Tick(_float fTimeDelta) override;
 	virtual void Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
+	virtual void	Render_IMGUI() override;
+
 
 private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
+	CTexture* m_pTextureCom = { nullptr };
 	CGameObject* m_pBlendMap = { nullptr }; 
 
 	vector<_uint> m_vecPassIndices;

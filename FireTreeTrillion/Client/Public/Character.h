@@ -28,6 +28,24 @@ public:
 	virtual HRESULT Render_LightDepth()				override;
 	virtual void	Render_IMGUI()					override;
 
+	void	Plus_Hp(_float fHp) {
+		m_fHp += fHp;
+		if (m_fMaxHp < m_fHp)
+			m_fHp = m_fMaxHp;
+		else if (m_fHp < 0.f)
+			m_fHp = 0.f;
+	}
+	void	Minus_Hp(_float fHp) {
+		m_fHp -= fHp;
+		if (m_fMaxHp < m_fHp)
+			m_fHp = m_fMaxHp;
+		else if (m_fHp < 0.f)
+			m_fHp = 0.f;
+	}
+	_float	Get_Hp() { return m_fHp; }
+	_float	Get_MaxHp() { return m_fMaxHp; }
+	_float	Get_Attack() { return m_fAttack; }
+
 protected:
 	CCharacterController*	m_pControllerCom	= { nullptr };
 	CShader*				m_pShaderCom = { nullptr };
@@ -37,6 +55,11 @@ protected:
 	// For_PhysX
 	_float			m_fOffsetTurn = { 7.f };
 	_float4			m_vOriginUp = { 0.f, 1.f, 0.f, 0.f };
+
+	_float			m_fHp = { 0.f };
+	_float			m_fMaxHp = { 0.f };
+	_float			m_fAttack = { 0.f };
+
 		
 protected:
 	void			SetOn_Slope(_float fTimeDelta);

@@ -201,6 +201,30 @@ namespace Engine
 		vector<pair<_uint, string>> FXs;
 
 	}MULTI_FX_DATA;
+	
+	typedef struct
+	{
+		_float fExposure = { -1.f };
+		_float fHue = { -1.f };
+		_float fSaturation = { -1.f };
+		_float fBrightness = { -1.f };
+		_float fGamma = { -1.f };
+		_float fVibrance = { -1.f };
+		_float fContrast = { -1.f };
+
+		_float vWhiteBalance[3] = { -1.f,  -1.f,  -1.f };
+		_float vColorBalance[3] = { -1.f,  -1.f,  -1.f };
+
+		_float vShadowColor[3] = { -1.f,  -1.f,  -1.f };
+		_float fShadowIntensity = { -1.f };
+		_float vMidtoneColor[3] = { -1.f,  -1.f,  -1.f };
+		_float fMidtoneIntensity = { -1.f };
+		_float vHighlightColor[3] = { -1.f,  -1.f,  -1.f };
+		_float fHighlightIntensity = { -1.f };
+		_float fShadowThreshold = { -1.f };
+		_float fHighlightThreshold = { -1.f };
+
+	}COLOR_DATA;
 
 	typedef struct ENGINE_DLL
 	{
