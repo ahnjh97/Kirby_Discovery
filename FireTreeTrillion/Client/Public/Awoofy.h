@@ -38,10 +38,13 @@ public:
 	void Change_State(AWOOFY_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
 	_bool IsAnimFinished();
 	_bool IsAnimFinished(_uint iCurrentAnimIndex);
-	
+	void Compute_Angle(_vector vOrginLook, _vector vTargetLook);
+
 private:
 	//CFSM*			m_pFSM = { nullptr };
 	AWOOFY_ANIM	m_eCurrentState = { AWOOFY_END };
+
+	_float m_fAngle = { 0.f };
 
 private:
 	HRESULT Add_Components();

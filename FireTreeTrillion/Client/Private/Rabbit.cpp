@@ -144,7 +144,7 @@ void CRabbit::Render_IMGUI()
 	__super::Render_IMGUI();
 }
 
-void CRabbit::Collision_Attack()
+void CRabbit::Collision_Attack(CGameObject* pOtherObj)
 {
 	Change_State(CRabbit::RABBIT_DAMAGE, 50.f, false, true);
 }
@@ -274,7 +274,7 @@ void CRabbit::SetUp_FSM()
 	//ป๓ลย Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};
 	FSM_Desc.iState = RABBIT_WAIT;
-	FSM_Desc.pModel = m_pModelCom;
+	FSM_Desc.pModel = &m_pModelCom;
 	m_pFSM->Initialize(&FSM_Desc);
 }
 
