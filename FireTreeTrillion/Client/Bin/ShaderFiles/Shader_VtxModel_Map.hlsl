@@ -104,14 +104,14 @@ PS_OUT PS_MAIN(PS_IN In)
 		discard;
 
     vector vNormalTex = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
-    vNormalTex.y = 1- vNormalTex.y;
+    //vNormalTex.y = 1- vNormalTex.y;
     //float3 vNormal = float3(vNormalTex.r, vNormalTex.g, vNormalTex.b);
-    float3 vNormal = 0;
+    //float3 vNormal = 0;
 
-    vNormal.xy = vNormalTex.wy * 2.f - 1.f;
-    vNormal.z = sqrt(1 - saturate(dot(vNormalTex.xy, vNormalTex.xy)));
-    //vNormal.z = sqrt(1 - vNormalTex.x * vNormalTex.x - vNormalTex.y * vNormalTex.y);
-    
+    //vNormal.xy = vNormalTex.wy * 2.f - 1.f;
+    //vNormal.z = sqrt(1 - saturate(dot(vNormalTex.xy, vNormalTex.xy)));
+
+    float3 vNormal = vNormalTex.xyz * 2.f - 1.f;
     float3x3 WorldMatrix = float3x3(In.vTangent, In.vBinormal, In.vNormal);
 
 	float3 vWorldNormal = mul(vNormal, WorldMatrix);	
