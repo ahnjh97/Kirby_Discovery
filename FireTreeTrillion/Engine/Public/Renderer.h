@@ -24,6 +24,8 @@ public:
 private:
 	CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual ~CRenderer() = default;
+
+
 public:
 	HRESULT Initialize();
 	HRESULT Add_RenderGroup(RENDERGROUP eRenderGroup, class CGameObject* pRenderObject);
@@ -31,6 +33,7 @@ public:
 
 
 	void Set_ColorSet(COLOR_DATA destColorData);
+	void Set_ColorSet(_int iSetIdx);
 	void Save_ColorSet(string strTag, COLOR_DATA destColorData);
 	COLOR_DATA& Find_ColorSet(string strTag);
 

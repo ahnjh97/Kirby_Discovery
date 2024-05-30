@@ -75,6 +75,15 @@ HRESULT CRenderer::Initialize()
 		});
 
 
+
+	//function<void(_int)> func = bind(&CCamera_Free::Set_MatrixIndex, this, placeholders::_1);
+	//auto ColorFunc = bind((CRenderer::Set_ColorSet), this, placeholders::_1);
+
+	//function<void(_int)> ColorFunc = bind(&CRenderer::Set_ColorSet, this, placeholders::_1);
+
+	//m_pGameInstance->SetUp_TriggerFunc(1, ColorFunc);
+
+
 #pragma region MRT_Sky
 	// 스카이와 블룸이 공존할 수 있게 랜더타겟으로 별도로 스카이박스를 처리한다.
 	/* For.Target_Sky */
@@ -442,6 +451,24 @@ void CRenderer::Set_ColorSet(COLOR_DATA destColorData)
 	m_DestColorData = {};
 
 	m_DestColorData = destColorData;
+}
+
+void CRenderer::Set_ColorSet(_int iSetIdx)
+{
+	switch (iSetIdx)
+	{
+	case 0:
+		m_DestColorData = Find_ColorSet("Default");
+		break;
+	case 1:
+		m_DestColorData = Find_ColorSet("Forest");
+		break;
+	case 2:
+		m_DestColorData = Find_ColorSet("Night");
+		break;
+	default:
+		break;
+	}
 }
 
 void CRenderer::Save_ColorSet(string strTag, COLOR_DATA destColorData)
