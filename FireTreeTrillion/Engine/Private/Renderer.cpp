@@ -837,12 +837,9 @@ HRESULT CRenderer::Render_Result()
 }
 
 HRESULT CRenderer::Render_Radial_Result(_float fTimeDelta)
-{  
+{
 	// DOF에 담는다.
 	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_DOFBlur"))))
-HRESULT CRenderer::Render_Blur_Result(_float fTimeDelta)
-{
-	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_ColorCorrrection"))))
 		return E_FAIL;
 
 	if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
