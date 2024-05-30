@@ -148,6 +148,9 @@
     <Filter Include="02.GameObjects\Map\Terrain">
       <UniqueIdentifier>{790e4632-66f1-4e07-b217-df971b3f85d4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\SkySphere">
+      <UniqueIdentifier>{24afa923-789a-4526-9b9d-3523c19603e1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -294,6 +297,7 @@
     <ClInclude Include="..\Public\Moon.h">
       <Filter>02.GameObjects</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\SkySphere.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -422,6 +426,7 @@
     <ClCompile Include="..\Private\Moon.cpp">
       <Filter>02.GameObjects</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\SkySphere.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

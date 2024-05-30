@@ -233,7 +233,7 @@ technique11 DefaultTechnique
 	// 스카이박스 ( 3 )
     pass SKY
     {
-        SetRasterizerState(RS_Sky);
+        SetRasterizerState(RS_NonCull);
         SetDepthStencilState(DSS_Sky, 0);
         SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 

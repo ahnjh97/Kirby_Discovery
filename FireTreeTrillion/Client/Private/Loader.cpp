@@ -18,6 +18,10 @@
 #include "Trigger.h"
 #include "Grid.h"
 
+
+//스카이 스피어
+#include "SkySphere.h"
+
 #pragma region TOOL_UI
 
 #include "TestUI.h"
@@ -160,6 +164,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SingleEffect"), CSingleEffect);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MultiEffect"), CMultiEffect);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Particle"), CParticle);
+
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SkySphere"), CSkySphere);
 
 	// MapTool GameObject Prototypes
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Grid"), CGrid);
@@ -429,6 +435,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	// MODEL 구조체 생성자 기본 값  : ""			  / TYPE_END /  1.f  /    0.f     / 4
 	if (eLevel == LEVEL_STATIC)
 	{
+		//sky sphere
+		m_vecModelInfo.emplace_back(MODEL{ "SkySphere_Stage1_Day", TYPE_NONANIM });
+
 		m_vecModelInfo.emplace_back(MODEL{ "SmokeCenter", TYPE_NONANIM });
 		m_vecModelInfo.emplace_back(MODEL{ "SmokeFadeLarge", TYPE_NONANIM });
 		m_vecModelInfo.emplace_back(MODEL{ "SmokeOriginal", TYPE_NONANIM });

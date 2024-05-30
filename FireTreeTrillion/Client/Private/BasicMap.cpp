@@ -82,10 +82,19 @@ HRESULT CBasicMap::Render()
     if (FAILED(Bind_ShaderResources()))
         return E_FAIL;
 
+    static _int iPassMeshIdx = 0;
+    //14, 15°¡ ÀÜµð
+    ImGui::InputInt("pass mesh", &iPassMeshIdx);
+
+    if (m_pGameInstance->Get_KeyState(DIK_0, KEY_DOWN))
+        ++iPassMeshIdx;
+
     _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 
     for (size_t i = 0; i < iNumMeshes; i++)
     {
+        if (i == iPassMeshIdx)
+            continue;
         if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
             return E_FAIL;
         if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))

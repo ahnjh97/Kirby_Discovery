@@ -96,18 +96,32 @@ PS_OUT PS_MAIN(PS_IN In)
 	if (0.3f >= vMtrlDiffuse.a)
 		discard;
 
+ //   vector vNormalDesc = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
+
+ //   float3 vNormal;
+ //   vNormal.xy = vNormalDesc.wy * 2.f - 1.f;
+ //   vNormal.z = sqrt(1 - saturate(dot(vNormal.xy, vNormal.xy)));
+
+	//float3x3 WorldMatrix = float3x3(In.vTangent, In.vBinormal, In.vNormal);
+
+	//float3 vWorldNormal = mul(vNormal, WorldMatrix);	
+
+    
     vector vNormalDesc = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
 
-    float3 vNormal;
-    vNormal.xy = vNormalDesc.wy * 2.f - 1.f;
-    vNormal.z = sqrt(1 - saturate(dot(vNormal.xy, vNormal.xy)));
+    float3 vNormal = vNormalDesc.xyz * 2.f - 1.f;
 
-	float3x3 WorldMatrix = float3x3(In.vTangent, In.vBinormal, In.vNormal);
+    float3x3 WorldMatrix = float3x3(In.vTangent, In.vBinormal, In.vNormal);
 
-	float3 vWorldNormal = mul(vNormal, WorldMatrix);	
+    float3 vWorldNormal = mul(vNormal, WorldMatrix);
 
+    Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
+    
+    
+    
 	Out.vDiffuse = vMtrlDiffuse;
-	Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
+	//Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
+    //Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
     Out.vFieldDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 0.0f);
     
@@ -210,4 +224,5 @@ technique11 DefaultTechnique
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 NO_NORMALMAP_PS_MAIN();
     }
+
 }
