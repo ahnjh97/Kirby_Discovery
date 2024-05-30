@@ -37,10 +37,10 @@ private:
 	_bool			Set_GizmoSync();
 	_bool			Set_GizmoGrid();
 	_bool			Set_DockSpace();
-	_bool			Set_FileDialog(); //IMGUI_MANAGER 클래스 내 함수와 동일한 기능. 추후 이동 필요
 
-	_bool			Save_FileData();
-	_bool			Load_FileData();
+	_bool			Create_UIObject();
+	_bool			Save_FileData(string _strFilePath);
+	_bool			Load_FileData(const string& _strFilePath);
 	
 
 public:

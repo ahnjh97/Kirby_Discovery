@@ -884,7 +884,7 @@ void CFXToolDirector::Render_FXHierarchy()
 			break;
 		}
 
-		//default 이펙트 이름 뒤에 중복 존재 시 알파벳을 붙인다.
+		//default 이펙트 이름 뒤에 중복 존재 시 알파벳을 붙인다. 
 		char szSuffix = 'A';
 		while (true)
 		{

@@ -106,6 +106,10 @@ private:
 	void			Key_Input(_float fTimeDelta);
 	void			Kirby_SystemTick(_float fTimeDelta);
 
+	void			Compute_MotionBlur();
+	_float2			m_vPreScreenPos = { 0.f, 0.f };
+	_float4			m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
+
 private:
 	HRESULT			Add_Components();
 	HRESULT			Bind_ShaderResources();
@@ -127,7 +131,6 @@ private:
 	// For_PhysX
 	_float			m_fOffsetTurn = { 7.f };
 	_float4			m_vOriginUp = { 0.f, 1.f, 0.f, 0.f };
-	_float4			m_vTest = { 0.f, 0.f, 0.f, 0.f };
 
 
 public:

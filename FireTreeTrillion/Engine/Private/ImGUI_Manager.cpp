@@ -8,7 +8,6 @@
 #include "ImGuiFileDialog.h"
 #include "ImGuiFileDialogConfig.h"
 
-
 HRESULT CImGUI_Manager::Initialize(HWND hWnd, ID3D11Device* pGraphic_Device, ID3D11DeviceContext* pContext)
 {
 	m_pDevice = pGraphic_Device;
@@ -147,7 +146,6 @@ HRESULT CImGUI_Manager::RenderUpdate()
 	return S_OK;
 }
 
-
 void CImGUI_Manager::SetDockSpace()
 {
 	ImGuiWindowFlags         WindowFlag = ImGuiWindowFlags_NoDocking;
@@ -266,9 +264,8 @@ void CImGUI_Manager::EditTransform(_float4x4& matrix)
 	ImGuizmo::Manipulate(ViewMatrix.m[0], ProjMatrix.m[0], mCurrentGizmoOperation, mCurrentGizmoMode, matrix.m[0], NULL, useSnap ? &snap.x : NULL);
 }
 
-void CImGUI_Manager::Set_FileDialog()
+CImGUI_Manager::FILE_MODE CImGUI_Manager::Set_FileDialog()
 {
-	//static _bool IsOpenDialog = FALSE;
 	static _bool IsFileSave, IsFileLoad = FALSE;
 
 	if (IsFileSave && !IsFileLoad)
@@ -277,7 +274,7 @@ void CImGUI_Manager::Set_FileDialog()
 		IGFD::FileDialogConfig SaveFileConfig;
 		SaveFileConfig.path = "../Bin/Resources/";
 
-		ImGuiFileDialog::Instance()->OpenDialog("SaveFile_Dialog", u8"저장할 파일을 선택하세요", ".UIDAT", SaveFileConfig);		// 디스플레이
+		ImGuiFileDialog::Instance()->OpenDialog("SaveFile_Dialog", u8"저장할 파일을 선택하세요", ".txt", SaveFileConfig);		// 디스플레이
 		
 		ImGui::SetNextWindowSize(ImVec2(800.f, 300.f));
 		if (ImGuiFileDialog::Instance()->Display("SaveFile_Dialog"))
@@ -290,7 +287,7 @@ void CImGUI_Manager::Set_FileDialog()
 				//string userDatas;
 				//if (ImGuiFileDialog::Instance()->GetUserDatas())
 				//	userDatas = std::string((const char*)ImGuiFileDialog::Instance()->GetUserDatas());
-				//auto selection = ImGuiFileDialog::Instance()->GetSelection(); // multiselection			
+				//auto selection = ImGuiFileDialog::Instance()->GetSelection(); // multiselection	
 			}
 
 			// 디스플레이 닫기
@@ -305,7 +302,7 @@ void CImGUI_Manager::Set_FileDialog()
 		IGFD::FileDialogConfig LoadFileConfig;
 		LoadFileConfig.path = "../Bin/Resources/";
 
-		ImGuiFileDialog::Instance()->OpenDialog("LoadFile_Dialog", u8"로드할 파일을 선택하세요", ".UIDAT", LoadFileConfig);		// 디스플레이
+		ImGuiFileDialog::Instance()->OpenDialog("LoadFile_Dialog", u8"로드할 파일을 선택하세요", ".txt", LoadFileConfig);		// 디스플레이
 
 		ImGui::SetNextWindowSize(ImVec2(800.f, 300.f));
 		if (ImGuiFileDialog::Instance()->Display("LoadFile_Dialog"))
@@ -322,13 +319,20 @@ void CImGUI_Manager::Set_FileDialog()
 		}
 	}
 
+	FILE_MODE eFileMode = FILE_MODE::FILE_NONE;
+
 	if (ImGui::BeginMenu(u8"File 파일"))
 	{
-		ImGui::MenuItem(u8"Save 저장", NULL, &IsFileSave);
-		ImGui::MenuItem(u8"Load 로드", NULL, &IsFileLoad);
+		if (ImGui::MenuItem(u8"Save 저장", NULL, &IsFileSave))
+			eFileMode = FILE_MODE::FILE_SAVE;
+
+		if (ImGui::MenuItem(u8"Load 로드", NULL, &IsFileLoad))
+			eFileMode = FILE_MODE::FILE_LOAD;
 
 		ImGui::EndMenu();
 	}
+
+	return eFileMode;
 }
 
 CImGUI_Manager* CImGUI_Manager::Create(HWND hWnd, ID3D11Device* pGraphic_Device, ID3D11DeviceContext* pContext)

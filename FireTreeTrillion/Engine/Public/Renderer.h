@@ -38,6 +38,8 @@ public:
 	void Setting_RadialBlur(_fvector vWorldPos, _float fRadial, _float fSubtraction);
 	void Setting_RadialBlur(_float fRadial, _float fSubtraction);
 
+	void Update_DofFocus(_fvector vWorldPos);
+
 	HRESULT Render_LightDepth_For_GameObject(class CShader* pShader, class CTransform* pTransform, class CModel* pModel);
 
 	void Update_LightShadow(_fvector vLightPos, _fvector vFocusPos) {
@@ -88,7 +90,9 @@ private:
 	HRESULT Render_EffectResult();
 
 	HRESULT Render_Result();
-	HRESULT Render_Blur_Result(_float fTimeDelta);
+	HRESULT Render_Radial_Result(_float fTimeDelta);
+	HRESULT Render_DOF_Result();
+	HRESULT Render_MotionBlur();
 
 	HRESULT Render_FinalResult();
 
@@ -104,6 +108,11 @@ private:
 	_float m_fRadialBlurRadius = { 0.f };
 	_float m_fRadialRadiusSubtraction = { 0.f };
 
+
+	_float m_fRimWidth = { 0.f };
+	_bool  m_bRimTest = { false };
+
+	_float2 m_vDofFocus = { 0.f, 0.f };
 
 	//색감 보정 변수
 	_bool m_bApplyCorrection = { true };

@@ -153,6 +153,11 @@
     </Filter>
     <Filter Include="02.GameObjects\Map\SkySphere">
       <UniqueIdentifier>{24afa923-789a-4526-9b9d-3523c19603e1}</UniqueIdentifier>
+    <Filter Include="02.GameObjects\Character\Monster\Rabbit">
+      <UniqueIdentifier>{5f67491a-2cff-4f07-b9b2-4e5139f23539}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Character\Monster\Rabbit\State">
+      <UniqueIdentifier>{5da02606-450b-4582-a1be-2d28da2c1590}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -305,6 +310,11 @@
     </ClInclude>
     <ClInclude Include="..\public\WaddleDee.h">
       <Filter>02.GameObjects\Character\WaddleDee</Filter>
+    <ClInclude Include="..\Public\Rabbit_State.h">
+      <Filter>02.GameObjects\Character\Monster\Rabbit\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Rabbit.h">
+      <Filter>02.GameObjects\Character\Monster\Rabbit</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -439,6 +449,11 @@
     </ClCompile>
     <ClCompile Include="..\private\WaddleDee.cpp">
       <Filter>02.GameObjects\Character\WaddleDee</Filter>
+    <ClCompile Include="..\Private\Rabbit_State.cpp">
+      <Filter>02.GameObjects\Character\Monster\Rabbit\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Rabbit.cpp">
+      <Filter>02.GameObjects\Character\Monster\Rabbit</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
