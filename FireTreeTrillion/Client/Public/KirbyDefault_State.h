@@ -23,6 +23,7 @@ public:
 	void Key_X(class CGameObject* pGameObject, _float fTimeDelta);
 	void Key_C(class CGameObject* pGameObject, _float fTimeDelta);
 	void Key_V(class CGameObject* pGameObject, _float fTimeDelta);
+	void Key_Happy(class CGameObject* pGameObject, _float fTimeDelta);
 
 	virtual void OnStateExit()														override;
 
@@ -109,6 +110,56 @@ public:
 
 public:
 	static	CKirbyDefault_Guard_State* Create();
+	virtual void						Free() override;
+};
+
+
+
+// 커비의 슬라이딩 상태를 통제한다.
+
+class CKirbyDefault_Slide_State final : public CFSM_State
+{
+private:
+	CKirbyDefault_Slide_State();
+	virtual ~CKirbyDefault_Slide_State() = default;
+
+public:
+	// 상태 진입했을 때 처음만 호출
+	virtual void OnStateEnter(class CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation) override;
+	// 상태 진입되어 있는 상태에서 매 tick마다 호출
+	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
+
+	virtual void OnStateExit()														override;
+
+public:
+	static	CKirbyDefault_Slide_State* Create();
+	virtual void						Free() override;
+};
+
+
+
+
+
+// 커비의 감정표현 상태를 통제한다.
+
+class CKirbyDefault_Happy_State final : public CFSM_State
+{
+private:
+	CKirbyDefault_Happy_State();
+	virtual ~CKirbyDefault_Happy_State() = default;
+
+public:
+	// 상태 진입했을 때 처음만 호출
+	virtual void OnStateEnter(class CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation) override;
+	// 상태 진입되어 있는 상태에서 매 tick마다 호출
+	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
+
+	virtual void OnStateExit()														override;
+
+	_float	m_fHappyTime = { 0.f };
+
+public:
+	static	CKirbyDefault_Happy_State* Create();
 	virtual void						Free() override;
 };
 
