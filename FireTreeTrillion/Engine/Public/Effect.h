@@ -1,6 +1,5 @@
 #pragma once
 #include "GameObject.h"
-
 BEGIN(Engine)
 
 class ENGINE_DLL CEffect : public CGameObject
@@ -14,29 +13,6 @@ public:
 
 	typedef struct : public GAMEOBJECT_DESC
 	{
-		//이펙트 재생을 시작하는 딜레이
-		_float fStartDelay = { 0.f };
-		
-		//루프하는가?
-		_bool bIsLoop = { false };
-		//빌보딩하는가?
-		_bool bIsBillboard = { false };
-		//직교하는가?
-		_bool bIsOrthographic = { false };
-		_bool bIsNonLight = { false };
-		_bool bIsBloom = { false };
-
-		//이펙트의 기본 시작 크자이
-		_float3 vInitPos = { 0.f, 0.f, 0.f };
-		_float3 vInitRot = { 0.f, 0.f, 0.f };
-		_float3 vInitScale = { 1.f, 1.f, 1.f };
-
-		//텍스쳐가 흑백 or RGB로 이루어져 있는 경우, 설정할 색상 값
-		
-		//흑백일 경우 흰색, RGB일 경우 R 색상에 해당
-		_float3 vRColor = { 0.f, 0.f, 0.f };
-		_float3 vGColor = { 0.f, 0.f, 0.f };
-		_float3 vBColor = { 0.f, 0.f, 0.f };
 
 		//이펙트 이름
 		string strFXName = { "NONE" };
@@ -46,14 +22,42 @@ public:
 		string strTexTag = { "NONE" };
 		string strMaskTexTag = { "NONE" };
 
+		_float					fDuration = { 0.f };
+		pair<_float, _float>	fLifetime = { 0.f, 1.f };
+
 		//쉐이더 패스 인덱스, 텍스쳐 인덱스, 마스크 텍스쳐 인덱스
 		_int iPassIdx = { 0 };
 		_int iTexIdx = { 0 };
 		_int iMaskTexIdx = { 0 };
 
-		//_int iMaskTexIdx = { 0 };
+		//루프하는가?
+		_bool bIsLoop = { false };
+		//빌보딩하는가?
+		_bool bIsBillboard = { false };
+		//직교하는가?
+		_bool bIsOrthographic = { false };
+		_bool bIsColorRender = { false };
+		_bool bIsBloom = { false };
+
+		_float fRimLightThreshold = { 0.f };
+
+		//이펙트 재생을 시작하는 딜레이
+		_float fStartDelay = { 0.f };
+\
+		//이펙트의 기본 시작 크자이
+		_float3 vInitPos = { 0.f, 0.f, 0.f };
+		_float3 vInitRot = { 0.f, 0.f, 0.f };
+		_float3 vInitScale = { 1.f, 1.f, 1.f };
 
 		map<KF_PROPERTY, vector<FX_KEYFRAME>> Keyframes;
+
+
+		//텍스쳐가 흑백 or RGB로 이루어져 있는 경우, 설정할 색상 값
+		
+		//흑백일 경우 흰색, RGB일 경우 R 색상에 해당
+		//_float3 vRColor = { 0.f, 0.f, 0.f };
+		//_float3 vGColor = { 0.f, 0.f, 0.f };
+		//_float3 vBColor = { 0.f, 0.f, 0.f };
 
 	}FX_DESC;
 
@@ -74,6 +78,8 @@ public:
 
 	virtual void	Reset_Duration() { m_fDuration.first = 0.f; }
 	virtual void	Fill_SaveData(_Out_ SINGLE_FX_DATA* pFXData);
+	virtual void	Fill_SaveData(_Out_ PARTICLE_DATA* pFXData) {}
+	virtual void	Fill_SaveData(_Out_ MULTI_FX_DATA* pFXData) {}
 
 
 	//키프레임 추가(단일 이펙트 용)
@@ -133,7 +139,7 @@ protected:
 
 	//수명 지속 시간. duration이 사라져야 이펙트 사라짐
 	//루프하는 경우 life time 처음부터 다시 시작한다. 
-	pair<_float, _float>	m_fLifeTime = { 0.f, 1.f };
+	pair<_float, _float>	m_fLifetime = { 0.f, 1.f };
 	_float					m_fLifeRatio = { 0.f };
 
 	//보간 키프레임
@@ -157,8 +163,8 @@ protected:
 	_float			m_fCurAlpha = { 1.f };
 	//마스크 임계
 	_float			m_fCurMaskThreshold = { 0.f };
-
-
+	//uv 오프셋
+	_float2			m_vCurUVOffset = { 0.f, 0.f };
 protected:
 	_bool			Update_Duration(_float fTimeDelta);
 	_bool			Update_LifeTime(_float fTimeDelta);

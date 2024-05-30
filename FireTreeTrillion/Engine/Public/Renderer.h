@@ -76,21 +76,40 @@ private:
 	HRESULT Render_Priority();
 	HRESULT Render_Shadow();
 	HRESULT Render_NonBlend();
-	HRESULT Render_NonLight();
-	HRESULT Render_Bloom();
-	HRESULT Render_BloomResult();
 
-	HRESULT Render_Blend();
+	HRESULT Render_Lights();
+
+	HRESULT Render_Effect();
+	HRESULT Render_EffectResult();
+
+	HRESULT Render_Result();
+	HRESULT Render_Blur_Result(_float fTimeDelta);
+
+	HRESULT Render_FinalResult();
+
 	HRESULT Render_UI();
 	HRESULT Render_SuperUI();
 
+	void Render_IMGUI();
 private:
-	HRESULT Render_Lights();
-	HRESULT Render_Result();
-	HRESULT Render_Blur_Result(_float fTimeDelta);
 	_float2 m_vScreenPos = { 0.f, 0.f };
 	_float m_fRadialBlurRadius = { 0.f };
 	_float m_fRadialRadiusSubtraction = { 0.f };
+
+
+	//색감 보정 변수
+	_float m_fExposure = { 1.03f };
+	_float m_fHue = { 1.f };
+	_float m_fSaturation = { 1.08f };
+	_float m_fBrightness = { 1.34f };
+	_float m_fGamma = { 1.05f };
+	_float m_fVibrance = { .99f };
+	_float m_fContrast = { .98f };
+
+	_float m_vWhiteBalance[3] = {.65f, .6f, .6f};
+	_float m_vColorBalance[3] = {1.04f, .94f, .98f};
+
+	_bool m_bApplyCorrection = { true };
 
 #ifdef _DEBUG
 private:

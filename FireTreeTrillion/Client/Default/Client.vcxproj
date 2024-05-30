@@ -174,6 +174,7 @@
     <ClInclude Include="..\Public\BasicMap.h" />
     <ClInclude Include="..\public\Camera_Free.h" />
     <ClInclude Include="..\public\Camera_Main.h" />
+    <ClInclude Include="..\Public\Character.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\FXToolDirector.h" />
     <ClInclude Include="..\Public\Grid.h" />
@@ -183,6 +184,7 @@
     <ClInclude Include="..\Public\KirbyBalloon_State.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\Public\KirbyDamage_State.h" />
     <ClInclude Include="..\Public\KirbyDefault_State.h" />
     <ClInclude Include="..\Public\KirbyVacuum_State.h" />
     <ClInclude Include="..\Public\Kirby_Enums.h" />
@@ -199,6 +201,7 @@
     <ClInclude Include="..\Public\Monster.h" />
     <ClInclude Include="..\Public\MapToolHelper.h" />
     <ClInclude Include="..\Public\MapToolObject.h" />
+    <ClInclude Include="..\Public\Moon.h" />
     <ClInclude Include="..\Public\MultiEffect.h" />
     <ClInclude Include="..\Public\Particle.h" />
     <ClInclude Include="..\Public\SingleEffect.h" />
@@ -222,6 +225,7 @@
     <ClCompile Include="..\Private\BasicMap.cpp" />
     <ClCompile Include="..\private\Camera_Free.cpp" />
     <ClCompile Include="..\private\Camera_Main.cpp" />
+    <ClCompile Include="..\Private\Character.cpp" />
     <ClCompile Include="..\Private\FXToolDirector.cpp" />
     <ClCompile Include="..\Private\Grid.cpp" />
     <ClCompile Include="..\Private\HUD.cpp" />
@@ -230,6 +234,7 @@
     <ClCompile Include="..\Private\KirbyBalloon_State.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\Private\KirbyDamage_State.cpp" />
     <ClCompile Include="..\Private\KirbyDefault_State.cpp" />
     <ClCompile Include="..\Private\KirbyVacuum_State.cpp" />
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />
@@ -244,6 +249,7 @@
     <ClCompile Include="..\Private\Monster.cpp" />
     <ClCompile Include="..\Private\MapToolHelper.cpp" />
     <ClCompile Include="..\Private\MapToolObject.cpp" />
+    <ClCompile Include="..\Private\Moon.cpp" />
     <ClCompile Include="..\Private\MultiEffect.cpp" />
     <ClCompile Include="..\Private\Particle.cpp" />
     <ClCompile Include="..\Private\SingleEffect.cpp" />

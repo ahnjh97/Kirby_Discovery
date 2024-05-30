@@ -166,6 +166,216 @@ PxTransform CUtils::mat44ToTransform(const PxMat44& mat)
 	PxMat33 rotationMat33(mat.column0.getXYZ(), mat.column1.getXYZ(), mat.column2.getXYZ());
 	PxQuat rotation = PxQuat(rotationMat33);
 
+	// NaN 및 Inf 값 처리: NaN 또는 Inf가 있는 경우, 해당 성분을 0으로 설정
+	if (!std::isfinite(rotation.x) || std::isnan(rotation.x)) rotation.x = 0.0f;
+	if (!std::isfinite(rotation.y) || std::isnan(rotation.y)) rotation.y = 0.0f;
+	if (!std::isfinite(rotation.z) || std::isnan(rotation.z)) rotation.z = 0.0f;
+	if (!std::isfinite(rotation.w) || std::isnan(rotation.w)) rotation.w = 1.0f; // w 성분은 회전을 표현하므로 1로 설정
+
+	// 정규화: 크기가 0인 경우 기본값 (단위 쿼터니언)으로 설정
+	float norm = rotation.magnitude();
+	if (norm > 1e-6) {
+		rotation.x /= norm;
+		rotation.y /= norm;
+		rotation.z /= norm;
+		rotation.w /= norm;
+	}
+	else {
+		rotation = PxQuat(PxIdentity);
+	}
 	return PxTransform(position, rotation);
+}
+
+HRESULT CUtils::Load_Effect(path _FilePath, SINGLE_FX_DATA* _pData)
+{
+	ifstream InputFile(_FilePath, ios::binary | ios::in);
+
+	if (!InputFile.is_open())
+		ALARM_FAIL(TEXT("망했어"));
+
+
+	//이펙트 이름
+	InputFile.read(reinterpret_cast<char*>(&_pData->iNameStrLen), sizeof(_uint));
+	_pData->strName.resize(_pData->iNameStrLen);
+	InputFile.read(&_pData->strName[0], _pData->iNameStrLen);
+
+
+	//버퍼 이름
+	InputFile.read(reinterpret_cast<char*>(&_pData->iBufferStrLen), sizeof(_uint));
+	_pData->strBufferName.resize(_pData->iBufferStrLen);
+	InputFile.read(&_pData->strBufferName[0], _pData->iBufferStrLen);
+
+
+	//텍스쳐 이름
+	InputFile.read(reinterpret_cast<char*>(&_pData->iTexStrLen), sizeof(_uint));
+	_pData->strTexName.resize(_pData->iTexStrLen);
+	InputFile.read(&_pData->strTexName[0], _pData->iTexStrLen);
+
+
+	//마스크 텍스쳐 이름
+	InputFile.read(reinterpret_cast<char*>(&_pData->iMaskTexStrLen), sizeof(_uint));
+	_pData->strMaskTexName.resize(_pData->iMaskTexStrLen);
+	InputFile.read(&_pData->strMaskTexName[0], _pData->iMaskTexStrLen);
+
+	InputFile.read(reinterpret_cast<char*>(&_pData->fDuration), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&_pData->fLifetime.first), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&_pData->fLifetime.second), sizeof(_float));
+
+
+	InputFile.read(reinterpret_cast<char*>(&_pData->iPassIdx), sizeof(_int));
+	InputFile.read(reinterpret_cast<char*>(&_pData->iTexIdx), sizeof(_int));
+	InputFile.read(reinterpret_cast<char*>(&_pData->iMaskTexIdx), sizeof(_int));
+
+
+	InputFile.read(reinterpret_cast<char*>(&_pData->bIsLoop), sizeof(_bool));
+	InputFile.read(reinterpret_cast<char*>(&_pData->bIsBillboard), sizeof(_bool));
+	InputFile.read(reinterpret_cast<char*>(&_pData->bIsOrthographic), sizeof(_bool));
+	InputFile.read(reinterpret_cast<char*>(&_pData->bIsColorRender), sizeof(_bool));
+	InputFile.read(reinterpret_cast<char*>(&_pData->bIsBloom), sizeof(_bool));
+
+	InputFile.read(reinterpret_cast<char*>(&_pData->fRimLightThreshold), sizeof(_float));
+
+
+	InputFile.read(reinterpret_cast<char*>(&_pData->iPropertyMapNum), sizeof(_uint));
+
+	_pData->vecKeyframeInfo.resize(_pData->iPropertyMapNum);
+	_pData->vecKeyframes.resize(_pData->iPropertyMapNum);
+
+	for (_uint i = 0; i < _pData->iPropertyMapNum; ++i)
+	{
+		InputFile.read(reinterpret_cast<char*>(&_pData->vecKeyframeInfo[i].first), sizeof(KF_PROPERTY));
+		InputFile.read(reinterpret_cast<char*>(&_pData->vecKeyframeInfo[i].second), sizeof(_uint));
+
+		_pData->vecKeyframes[i].resize(_pData->vecKeyframeInfo[i].second);
+
+		for (auto& KF : _pData->vecKeyframes[i])
+		{
+			InputFile.read(reinterpret_cast<char*>(&KF.fTimeRatio), sizeof(_float));
+			InputFile.read(reinterpret_cast<char*>(&KF.vValue), sizeof(_float3));
+			InputFile.read(reinterpret_cast<char*>(&KF.eEasing), sizeof(EASING));
+		}
+	}
+
+	return S_OK;
+}
+
+HRESULT CUtils::Load_Effect(path _FilePath, PARTICLE_DATA* _pData)
+{
+	ifstream InputFile(_FilePath, ios::binary | ios::in);
+
+	if (!InputFile.is_open())
+		ALARM_FAIL(TEXT("망했어"));
+
+
+	//이펙트 이름
+	InputFile.read(reinterpret_cast<char*>(&_pData->iNameStrLen), sizeof(_uint));
+	_pData->strName.resize(_pData->iNameStrLen);
+	InputFile.read(&_pData->strName[0], _pData->iNameStrLen);
+
+
+	//버퍼 이름
+	InputFile.read(reinterpret_cast<char*>(&_pData->iBufferStrLen), sizeof(_uint));
+	_pData->strBufferName.resize(_pData->iBufferStrLen);
+	InputFile.read(&_pData->strBufferName[0], _pData->iBufferStrLen);
+
+
+	//텍스쳐 이름
+	InputFile.read(reinterpret_cast<char*>(&_pData->iTexStrLen), sizeof(_uint));
+	_pData->strTexName.resize(_pData->iTexStrLen);
+	InputFile.read(&_pData->strTexName[0], _pData->iTexStrLen);
+
+
+	//마스크 텍스쳐 이름
+	InputFile.read(reinterpret_cast<char*>(&_pData->iMaskTexStrLen), sizeof(_uint));
+	_pData->strMaskTexName.resize(_pData->iMaskTexStrLen);
+	InputFile.read(&_pData->strMaskTexName[0], _pData->iMaskTexStrLen);
+
+
+	InputFile.read(reinterpret_cast<char*>(&_pData->fDuration), sizeof(_float));
+
+	InputFile.read(reinterpret_cast<char*>(&_pData->fLifetime), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&_pData->fLifetimeRandomOffset), sizeof(_float));
+
+	InputFile.read(reinterpret_cast<char*>(&_pData->fStartDelay), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&_pData->fStarDelayRandomOffset), sizeof(_float));
+
+	InputFile.read(reinterpret_cast<char*>(&_pData->vCenter), sizeof(_float3));
+	InputFile.read(reinterpret_cast<char*>(&_pData->vRange), sizeof(_float3));
+
+	InputFile.read(reinterpret_cast<char*>(&_pData->vRotation), sizeof(_float3));
+	InputFile.read(reinterpret_cast<char*>(&_pData->vRotationRandomOffset), sizeof(_float3));
+
+	InputFile.read(reinterpret_cast<char*>(&_pData->vScale), sizeof(_float3));
+	InputFile.read(reinterpret_cast<char*>(&_pData->vScaleRandomOffset), sizeof(_float3));
+
+	InputFile.read(reinterpret_cast<char*>(&_pData->vDir), sizeof(_float3));
+	InputFile.read(reinterpret_cast<char*>(&_pData->vDirRandomOffset), sizeof(_float3));
+
+	InputFile.read(reinterpret_cast<char*>(&_pData->fSpeed), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&_pData->fSpeedRandomOffset), sizeof(_float));
+
+	InputFile.read(reinterpret_cast<char*>(&_pData->fAlpha), sizeof(_float3));
+	InputFile.read(reinterpret_cast<char*>(&_pData->fAlphaRandomOffset), sizeof(_float3));
+
+
+	InputFile.read(reinterpret_cast<char*>(&_pData->vPivot), sizeof(_float3));
+
+
+	InputFile.read(reinterpret_cast<char*>(&_pData->bIsLoop), sizeof(_bool));
+	InputFile.read(reinterpret_cast<char*>(&_pData->bIsBillboard), sizeof(_bool));
+	InputFile.read(reinterpret_cast<char*>(&_pData->bIsColorRender), sizeof(_bool));
+	InputFile.read(reinterpret_cast<char*>(&_pData->bIsBloom), sizeof(_bool));
+
+
+	InputFile.read(reinterpret_cast<char*>(&_pData->iMoveCommandsNum), sizeof(_uint));
+
+	_pData->vecMoveCommands.resize(_pData->iMoveCommandsNum);
+
+	for (auto& KF : _pData->vecMoveCommands)
+	{
+		InputFile.read(reinterpret_cast<char*>(&KF), sizeof(_bool));
+	}
+
+	return S_OK;
+}
+
+HRESULT CUtils::Load_Effect(path _FilePath, MULTI_FX_DATA* _pData)
+{
+	ifstream InputFile(_FilePath, ios::binary | ios::in);
+
+	if (!InputFile.is_open())
+		ALARM_FAIL(TEXT("망했어"));
+
+
+	//이펙트 이름
+	InputFile.read(reinterpret_cast<char*>(&_pData->iNameStrLen), sizeof(_uint));
+	_pData->strName.resize(_pData->iNameStrLen);
+	InputFile.read(&_pData->strName[0], _pData->iNameStrLen);
+
+
+	InputFile.read(reinterpret_cast<char*>(&_pData->iFXsNum), sizeof(_uint));
+	_pData->FXs.resize(_pData->iFXsNum);
+
+	for (auto& FX : _pData->FXs)
+	{
+		InputFile.read(reinterpret_cast<char*>(&FX.first), sizeof(_uint));
+		FX.second.resize(FX.first);
+		InputFile.read(&FX.second[0], FX.first);
+	}
+
+	return S_OK;
+}
+
+
+void CUtils::Make_Effect(SINGLE_FX_DATA& _FXData)
+{
+}
+
+void CUtils::Make_Effect(MULTI_FX_DATA& _FXData)
+{
+}
+
+void CUtils::Make_Effect(PARTICLE_DATA& _FXData)
+{
 }
 

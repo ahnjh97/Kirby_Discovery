@@ -157,12 +157,6 @@
     <Filter Include="01.Utility\10.Sound">
       <UniqueIdentifier>{e3b3ea35-4a7d-4218-9501-4ec07b162d11}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. PhysX">
-      <UniqueIdentifier>{d6077c32-15aa-4495-afe9-721e481bbcbb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02. PhysX\_Manager">
-      <UniqueIdentifier>{f88af5e5-4183-40e4-9180-afb42c69dfc5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Utility\02.Components\PhysX">
       <UniqueIdentifier>{997f9fe1-6d7b-441e-bd17-e750b39cefb3}</UniqueIdentifier>
     </Filter>
@@ -192,6 +186,12 @@
     </Filter>
     <Filter Include="01.Utility\11.Picking">
       <UniqueIdentifier>{c488df90-9908-489e-a087-3329ef1da7cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.PhysX">
+      <UniqueIdentifier>{d6077c32-15aa-4495-afe9-721e481bbcbb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.PhysX\_Manager">
+      <UniqueIdentifier>{f88af5e5-4183-40e4-9180-afb42c69dfc5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -370,7 +370,7 @@
       <Filter>90.Utils</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\PhysX.cpp">
-      <Filter>02. PhysX\_Manager</Filter>
+      <Filter>02.PhysX\_Manager</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\RigidBody.cpp">
       <Filter>01.Utility\02.Components\PhysX\RigidBody</Filter>
@@ -395,6 +395,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Picking.cpp">
       <Filter>01.Utility\11.Picking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EventCallBack.cpp">
+      <Filter>02. PhysX</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -600,7 +603,7 @@
       <Filter>90.Utils</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\PhysX.h">
-      <Filter>02. PhysX\_Manager</Filter>
+      <Filter>02.PhysX\_Manager</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\RigidBody.h">
       <Filter>01.Utility\02.Components\PhysX\RigidBody</Filter>
@@ -625,6 +628,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Picking.h">
       <Filter>01.Utility\11.Picking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EventCallBack.h">
+      <Filter>02. PhysX</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

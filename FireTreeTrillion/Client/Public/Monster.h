@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Client_Defines.h"
-#include "GameObject.h"
+#include "Character.h"
 
 BEGIN(Engine)
 class CModel;
@@ -12,13 +12,13 @@ END
 
 BEGIN(Client)
 
-class CMonster abstract : public CGameObject
+class CMonster abstract : public CCharacter
 {
 public:
-	typedef struct tagMonster_Desc : public CGameObject 
+	struct MONSTER_DESC : public CGameObject
 	{
 
-	}MONSTER_DESC;
+	};
 
 protected:
 	CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -26,19 +26,17 @@ protected:
 	virtual ~CMonster() = default;
 
 public:
-	virtual HRESULT Initialize_Prototype() override;
-	virtual HRESULT Initialize(void* pArg) override;
-	virtual _int	Tick(_float fTimeDelta) override;
-	virtual void	Late_Tick(_float fTimeDelta) override;
-	virtual HRESULT Render() override;
-	virtual HRESULT Render_LightDepth() override;
-	virtual void	Render_IMGUI() override;
+	virtual HRESULT Initialize_Prototype()			override;
+	virtual HRESULT Initialize(void* pArg)			override;
+	virtual _int	Tick(_float fTimeDelta)			override;
+	virtual void	Late_Tick(_float fTimeDelta)	override;
+	virtual HRESULT Render()						override;
+	virtual HRESULT Render_LightDepth()				override;
+	virtual void	Render_IMGUI()					override;
 
 protected:
-	CModel*					m_pModelCom = { nullptr };
-	CShader*				m_pShaderCom = { nullptr };
-	//class CLight*			m_pLight = { nullptr };
-	CCharacterController*	m_pControllerCom = { nullptr };
+	// JSPark : 우선 몬스터들은 modelCom을 하나만 가지고 있다는 전제하에
+	CModel*					m_pModelCom	 = { nullptr };
 
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;

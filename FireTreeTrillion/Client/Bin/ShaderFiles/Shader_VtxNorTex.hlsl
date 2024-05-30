@@ -98,7 +98,7 @@ PS_OUT PS_MAIN(PS_IN In)
 	
 	Out.vNormal = vector((In.vNormal * 0.5f + 0.5f).xyz, 0.f);
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
-	Out.vFieldDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 1.0F);	
+	Out.vFieldDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 1.0f);	
 	
 	return Out;
 }
@@ -110,7 +110,7 @@ PS_OUT PS_GRID(PS_IN In)
     Out.vDiffuse = vector(1.f, 1.f, 1.f, 1.f);
     Out.vNormal = vector((In.vNormal * 0.5f + 0.5f).xyz, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
-    Out.vFieldDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 1.0F);
+    Out.vFieldDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 1.0f);
 	
     return Out;
 }

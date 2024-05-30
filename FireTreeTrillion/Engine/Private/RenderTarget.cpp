@@ -90,7 +90,7 @@ HRESULT CRenderTarget::Render_Debug(CShader * pShader, CVIBuffer_Rect * pVIBuffe
 	if (FAILED(pShader->Bind_Texture("g_Texture", m_pSRV)))
 		return E_FAIL;	
 
-	if (FAILED(pShader->Begin(0)))
+	if (FAILED(pShader->Begin(DEFERRED_DEBUG)))
 		return E_FAIL;
 
 	if (FAILED(pVIBuffer->Render()))

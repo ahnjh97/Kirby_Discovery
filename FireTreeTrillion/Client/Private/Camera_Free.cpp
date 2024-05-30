@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "..\Public\Camera_Free.h"
+#include "Camera_Free.h"
 #include "Kirby.h"
 
 CCamera_Free::CCamera_Free(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -27,10 +27,15 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 	CAMERA_FREE_DESC* pCameraFree = (CAMERA_FREE_DESC*)pArg;
 	m_fMouseSensor = pCameraFree->fMouseSensor;
 
+	//pCameraFree->fRotationPerSec = ToRadian(45.f);
+
+
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
 	m_pGameInstance->Add_Camera(this);
+	function<void(_int)> func = bind(&CCamera_Free::Set_MatrixIndex, this, placeholders::_1);
+	m_pGameInstance->SetUp_TriggerFunc(TRIGGER_CAMERA, func);
 
 	return S_OK;
 }
@@ -95,16 +100,23 @@ HRESULT CCamera_Free::Render()
 void CCamera_Free::Render_IMGUI()
 {
 	static _float fSpeed = 10.f;
+
+	_float4x4 WorldMat = m_pTransformCom->Get_WorldMatrix();
 	_float4 vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
 
-	ImGui::Text("X: %.2f", vPosition.x);
-	ImGui::SameLine();
-	ImGui::Text("Y: %.2f", vPosition.y);
-	ImGui::SameLine();
-	ImGui::Text("Z: %.2f", vPosition.z);
+	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._11, WorldMat._12, WorldMat._13, WorldMat._14 );
+	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._21, WorldMat._22, WorldMat._23, WorldMat._24);
+	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._31, WorldMat._32, WorldMat._33, WorldMat._34);
+	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._41, WorldMat._42, WorldMat._43, WorldMat._44);
 
-	ImGui::SliderFloat("CameraFree Speed", &fSpeed, 0.f, 50.f);
+	//ImGui::Text("X: %.2f", vPosition.x);
+	//ImGui::SameLine();
+	//ImGui::Text("Y: %.2f", vPosition.y);
+	//ImGui::SameLine();
+	//ImGui::Text("Z: %.2f", vPosition.z);
+
+	ImGui::SliderFloat("CameraFree Speed", &fSpeed, 0.f, 200.f);
 
 	ImGui::Checkbox(u8"타겟 따라가기", &m_bTrackTarget);
 
@@ -161,7 +173,7 @@ void CCamera_Free::Control(_float fTimeDelta)
 		Track_Target(fTimeDelta);
 
 
-	if (*m_pCurrentLevelID == LEVEL_TOOL_MAP || m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
+	if (/**m_pCurrentLevelID == LEVEL_TOOL_MAP ||*/ m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
 	{
 		_long	MouseMove = { 0 };
 
@@ -184,19 +196,11 @@ void CCamera_Free::Control(_float fTimeDelta)
 				m_fTrackDistance -= MouseMove * .01f;
 		}
 
-		//일단 안씀
-		//if (m_pGameInstance->Get_KeyState(DIMKS_RBUTTON, KEY_DOWN))
-		//{
-		//	m_vOrbitPos = 
-		//}
-
 		//우측 마우스 누른 채로 공전
 
 		if (m_pGameInstance->Get_KeyState(DIMKS_RBUTTON, KEY_PRESS))
 		{
 			_float3 vTargetPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Float4(CTransform::STATE_LOOK) * 10.f;
-
-
 
 
 			// 05.22) LEVEL_TOOL_UI에는 카메라 회전 기능 제외

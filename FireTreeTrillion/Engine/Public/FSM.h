@@ -14,7 +14,8 @@ public:
 	struct FSM_INFO
 	{
 		_uint				iState;
-		class CModel*		pModel;
+		_uint				uNumModel = 1;
+		class CModel**		pModel;
 	};
 
 private:
@@ -34,8 +35,9 @@ public:
 private:
 	CFSM_State*			m_pCurrent_State = { nullptr };
 	_uint				m_iState = { UINT_MAX };
+	_uint				m_uNumModel = UINT_MAX;
 
-	vector<class CModel*> m_pModels;
+	vector<class CModel*> m_vecModels;
 	
 	unordered_map<_uint, CFSM_State*>	m_mapFSM_State;
 

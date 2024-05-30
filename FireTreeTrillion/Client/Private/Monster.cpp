@@ -2,12 +2,12 @@
 #include "Monster.h"
 
 CMonster::CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CGameObject{ pDevice , pContext }
+	: CCharacter{ pDevice , pContext }
 {
 }
 
 CMonster::CMonster(const CMonster& rhs)
-	: CGameObject{ rhs }
+	: CCharacter{ rhs }
 {
 }
 
@@ -18,23 +18,30 @@ HRESULT CMonster::Initialize_Prototype()
 
 HRESULT CMonster::Initialize(void* pArg)
 {
-	if (FAILED(__super::Initialize(pArg)))
-		return E_FAIL;
+	HRESULT hr;
+	hr = __super::Initialize(pArg);
+	CHECK_FAILED(hr);
 
 	return S_OK;
 }
 
 _int CMonster::Tick(_float fTimeDelta)
 {
+	__super::Tick(fTimeDelta);
+
 	return OBJ_NOEVENT;
 }
 
 void CMonster::Late_Tick(_float fTimeDelta)
 {
+	__super::Late_Tick(fTimeDelta);
+
 }
 
 HRESULT CMonster::Render()
 {
+	__super::Render();
+
 	return S_OK;
 }
 
@@ -45,13 +52,13 @@ HRESULT CMonster::Render_LightDepth()
 
 void CMonster::Render_IMGUI()
 {
+	__super::Render_IMGUI();
+
 }
 
 void CMonster::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModelCom);
-	Safe_Release(m_pControllerCom);
 }

@@ -196,7 +196,8 @@ void CImGUI_Manager::RenderGrid()
 	ViewMatrix = CGameInstance::Get_Instance()->Get_Transform(CPipeLine::D3DTS_VIEW);
 	ProjMatrix = CGameInstance::Get_Instance()->Get_Transform(CPipeLine::D3DTS_PROJ);
 
-	_float fGridSize = (*CGameInstance::Get_Instance()->Get_CurrentLevelID() == 5) ?
+	//FX tool에서는 그리드 사이즈 작게
+	_float fGridSize = (*CGameInstance::Get_Instance()->Get_CurrentLevelID() == 4) ?
 		5.f : 100.f;
 	ImGuizmo::DrawGrid(ViewMatrix.m[0], ProjMatrix.m[0], identityMatrix, fGridSize);
 }

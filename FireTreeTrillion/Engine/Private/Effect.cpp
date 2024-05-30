@@ -31,14 +31,14 @@ HRESULT CEffect::Initialize(void* pArg)
     m_bIsLoop = effectDesc.bIsLoop;
     m_bIsBillboard = effectDesc.bIsBillboard;
     m_bIsOrthographic = effectDesc.bIsOrthographic;
-    m_bIsColorRender = effectDesc.bIsNonLight;
+    m_bIsColorRender = effectDesc.bIsColorRender;
     m_bIsBloom = effectDesc.bIsBloom;
 
     //desc 읽어 기본 초기화
     m_strFXName = effectDesc.strFXName;
     m_strBufferTag = CUtils::StrToWstr(effectDesc.strBufferTag);
-    m_strTexTag = CUtils::StrToWstr(effectDesc.strBufferTag);
-    m_strMaskTexTag = CUtils::StrToWstr(effectDesc.strBufferTag);
+    m_strTexTag = CUtils::StrToWstr(effectDesc.strTexTag);
+    m_strMaskTexTag = CUtils::StrToWstr(effectDesc.strMaskTexTag);
 
 
     m_vInitPos = effectDesc.vInitPos;
@@ -62,17 +62,51 @@ HRESULT CEffect::Initialize(void* pArg)
     //iSize = m_iCurKeyframeIdxs[3];
     //ZeroMemory(m_iCurKeyframeIdxs, )
     //_int iSize = m;
-    m_vCurRColor = effectDesc.vRColor;
-    m_vCurGColor = effectDesc.vGColor;
-    m_vCurBColor = effectDesc.vBColor;
+    //m_vCurRColor = effectDesc.vRColor;
+    //m_vCurGColor = effectDesc.vGColor;
+    //m_vCurBColor = effectDesc.vBColor;
 
     //m_keyfra = effectDesc.Keyframes;
 
     return S_OK;
 }
 
-void CEffect::Fill_SaveData(_Out_ SINGLE_FX_DATA* pEffectData)
+void CEffect::Fill_SaveData(_Out_ SINGLE_FX_DATA* pFXData)
 {
+    pFXData->iNameStrLen = (_uint)m_strFXName.size();
+    pFXData->strName = m_strFXName;
+
+    pFXData->iBufferStrLen = (_uint)m_strBufferTag.size();
+    pFXData->strBufferName = CUtils::WstrToStr(m_strBufferTag);
+
+    pFXData->iTexStrLen = (_uint)m_strTexTag.size();
+    pFXData->strTexName = CUtils::WstrToStr(m_strTexTag);
+
+    pFXData->iMaskTexStrLen = (_uint)m_strMaskTexTag.size();
+    pFXData->strMaskTexName = CUtils::WstrToStr(m_strMaskTexTag);
+
+    pFXData->fDuration = m_fDuration.second;
+    pFXData->fLifetime = m_fLifetime;
+
+    pFXData->iPassIdx = m_iPassIdx;
+    pFXData->iTexIdx = m_iTexIdx;
+    pFXData->iMaskTexIdx = m_iMaskTexIdx;
+
+    pFXData->bIsLoop = m_bIsLoop;
+    pFXData->bIsBillboard = m_bIsBillboard;
+    pFXData->bIsOrthographic = m_bIsOrthographic;
+    pFXData->bIsColorRender = m_bIsColorRender;
+    pFXData->bIsBloom = m_bIsBloom;
+
+    pFXData->fRimLightThreshold = m_fRimLightThreshold;
+
+    pFXData->iPropertyMapNum = m_Keyframes.size();
+
+    for (auto& keyframePair : m_Keyframes)
+    {
+        pFXData->vecKeyframeInfo.push_back({ keyframePair.first , keyframePair.second.size()});
+        pFXData->vecKeyframes.push_back(keyframePair.second);
+    }
 }
 
 void CEffect::Add_Keyframe(FX_KEYFRAME& newKeyframe, KF_PROPERTY eProperty)
@@ -117,18 +151,18 @@ _bool CEffect::Calculate_Duration(_float _fTimeDelta)
 
 _bool CEffect::Calculate_Lifetime(_float _fTimeDelta)
 {
-    if ( m_fDuration.first < m_fLifeTime.first)
+    if ( m_fDuration.first < m_fLifetime.first)
         return false;
 
-    //m_fLifeTime.first += _fTimeDelta;
+    //m_fLifetime.first += _fTimeDelta;
     
-    if (m_fLifeTime.second <= m_fDuration.first)
+    if (m_fLifetime.second <= m_fDuration.first)
     {
         if (m_bIsLoop)
         {
-            _float fLength = m_fLifeTime.second - m_fLifeTime.first;
-            m_fLifeTime.first += fLength;
-            m_fLifeTime.second += fLength;
+            _float fLength = m_fLifetime.second - m_fLifetime.first;
+            m_fLifetime.first += fLength;
+            m_fLifetime.second += fLength;
         }
         else
         {
@@ -137,7 +171,7 @@ _bool CEffect::Calculate_Lifetime(_float _fTimeDelta)
         }
     }
 
-    m_fLifeRatio = (m_fDuration.first - m_fLifeTime.first) / (m_fLifeTime.second - m_fLifeTime.first);
+    m_fLifeRatio = (m_fDuration.first - m_fLifetime.first) / (m_fLifetime.second - m_fLifetime.first);
 
     return false;
 }

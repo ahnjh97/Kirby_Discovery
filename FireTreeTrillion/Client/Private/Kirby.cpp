@@ -6,6 +6,7 @@
 #include "KirbyDefault_State.h"
 #include "KirbyBalloon_State.h"
 #include "KirbyVacuum_State.h"
+#include "KirbyDamage_State.h"
 
 #include "Utils.h"
 
@@ -22,6 +23,8 @@ CKirby::CKirby(const CKirby& rhs)
 
 HRESULT CKirby::Initialize_Prototype()
 {
+	m_eCollisionGroup = PLAYER;
+
 	return S_OK;
 }
 
@@ -37,7 +40,6 @@ HRESULT CKirby::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
-	m_eCollisionGroup = PLAYER;
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
@@ -81,8 +83,30 @@ _int CKirby::Tick(_float fTimeDelta)
 	Key_Input(fTimeDelta);
 	if (m_pGameInstance->Get_DIKeyState(DIK_I, KEY_DOWN))
 	{
+		INFO(m_isEat) = true;
 		Change_State(STATE_EAT, 100.f, false, false, BODY_BALLOON);
 	}
+
+	//if (m_pGameInstance->Get_DIKeyState(DIK_U, KEY_DOWN))
+	//{
+	//	INFO(m_fJumpVelocity) = 11.f;
+	//	// 먹은 상태인 경우
+	//	if (INFO(m_isEat) == true)
+	//	{
+	//		Change_State(STATE_EATDAMAGE, 60.f, false, false, BODY_BALLOON);
+	//	}
+	//	// 나는 상태일 경우 . . .
+	//	else if (true == (Get_State() == STATE_FLIGHTSTART || Get_State() == STATE_FLIGHTFALL || Get_State() == STATE_FLIGHT ||
+	//		Get_State() == STATE_FLIGHTLANDING || Get_State() == STATE_FLIGHTLIMIT || Get_State() == STATE_FLIGHTLIMITFALL))
+	//	{
+	//		Change_State(STATE_FILGHTDAMAGE, 60.f, false, false, BODY_BALLOON);
+	//	}
+	//	// 평범한 상태에서...
+	//	else
+	//	{
+	//		Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
+	//	}
+	//}
 
 	// 유틸업데이트가 들어가있다.
 	//****** FSM Update, Shadow ChaseUpdate ******//
@@ -124,7 +148,7 @@ HRESULT CKirby::Render()
 			return E_FAIL;
 
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom->Begin(1)))
+		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_X)))
 			return E_FAIL;
 
 		m_pModelCom[INFO(m_eBodyState)]->Render(i);
@@ -160,6 +184,28 @@ void CKirby::Render_IMGUI()
 	ImGui::Separator(); ImGui::NewLine();
 
 	__super::Render_IMGUI();
+}
+
+void CKirby::Collision_Attack(CGameObject* pOtherObj)
+{
+	INFO(m_fJumpVelocity) = 11.f;
+
+	// 먹은 상태인 경우
+	if (INFO(m_isEat) == true)
+	{
+		Change_State(STATE_EATDAMAGE, 60.f, false, false, BODY_BALLOON);
+	}
+	// 나는 상태일 경우 . . .
+	else if (true == (Get_State() == STATE_FLIGHTSTART || Get_State() == STATE_FLIGHTFALL || Get_State() == STATE_FLIGHT ||
+		Get_State() == STATE_FLIGHTLANDING || Get_State() == STATE_FLIGHTLIMIT || Get_State() == STATE_FLIGHTLIMITFALL))
+	{
+		Change_State(STATE_FILGHTDAMAGE, 60.f, false, false, BODY_BALLOON);
+	}
+	// 평범한 상태에서...
+	else
+	{
+		Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
+	}
 }
 
 _uint CKirby::Get_State()
@@ -211,8 +257,7 @@ void CKirby::Key_Input(_float fTimeDelta)
 	if (m_pGameInstance->Get_DIKeyState(DIK_P, KEY_DOWN))
 	{
 		m_iTestAnim++;
-		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, true, true);
-		m_pModelCom[INFO(m_eBodyState)]->Set_TickPerSecond(60.f);
+		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
 
 	}
 	else if (m_pGameInstance->Get_DIKeyState(DIK_O, KEY_DOWN))
@@ -220,30 +265,26 @@ void CKirby::Key_Input(_float fTimeDelta)
 		m_iTestAnim--;
 		if (m_iTestAnim < 0)
 			m_iTestAnim = 0;
-		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, true, true);
-		m_pModelCom[INFO(m_eBodyState)]->Set_TickPerSecond(60.f);
+		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
 
 	}
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_0, KEY_DOWN))
 	{
 		INFO(m_eBodyState) = BODY_DEFAULT;
-		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, true, true);
-		m_pModelCom[INFO(m_eBodyState)]->Set_TickPerSecond(60.f);
+		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
 
 	}
 	else if (m_pGameInstance->Get_DIKeyState(DIK_9, KEY_DOWN))
 	{
 		INFO(m_eBodyState) = BODY_BALLOON;
-		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, true, true);
-		m_pModelCom[INFO(m_eBodyState)]->Set_TickPerSecond(60.f);
+		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
 
 	}
 	else if (m_pGameInstance->Get_DIKeyState(DIK_8, KEY_DOWN))
 	{
 		INFO(m_eBodyState) = BODY_VACUUM;
-		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, true, true);
-		m_pModelCom[INFO(m_eBodyState)]->Set_TickPerSecond(60.f);
+		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
 	}
 #pragma endregion
 
@@ -388,7 +429,7 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
 		m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
 		m_pMouthTexture[INFO(m_eMouthState)]->Bind_ShaderResource(m_pShaderCom, "g_KirbyMouthTexture", 0);
-		m_pShaderCom->Begin(3);
+		m_pShaderCom->Begin(ANIMMODEL_KIRBYMOUTH);
 		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
 		return true;
 	}
@@ -400,10 +441,16 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
 		m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
 		m_pEyeTexture[INFO(m_eEyeState)]->Bind_ShaderResource(m_pShaderCom, "g_KirbyEyeTexture", 0);
-		m_pShaderCom->Begin(4);
+		m_pShaderCom->Begin(ANIMMODEL_KIRBYEYE);
 		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
 		return true;
 	}
+
+	//// 0 , 1 , 2(눈) , 3(구강)
+	//if (_eBodyState == BODY_VACUUM && _iMeshIndex != 3)
+	//{
+	//	return true;
+	//}
 
 	return false;
 }
@@ -412,44 +459,45 @@ void CKirby::SetUp_FSM()
 {
 	m_pFSM = CFSM::Create();
 
+	// Damege or Death
+	m_pFSM->Add_State(STATE_DAMAGE, CKirbyDamage_State::Create());
+	m_pFSM->Add_State(STATE_EATDAMAGE, CKirbyDamage_State::Create());
+	m_pFSM->Add_State(STATE_FILGHTDAMAGE, CKirbyDamage_State::Create());
+
 	// Default
-	m_pFSM->Add_State(STATE_IDLE, CKirbyDefault_Idle_State::Create());//
-	m_pFSM->Add_State(STATE_IDLESTREACH, CKirbyDefault_Idle_State::Create());//
-	m_pFSM->Add_State(STATE_IDLELOOKAROUND, CKirbyDefault_Idle_State::Create());//
+	m_pFSM->Add_State(STATE_IDLE, CKirbyDefault_Idle_State::Create());
+	m_pFSM->Add_State(STATE_IDLESTREACH, CKirbyDefault_Idle_State::Create());
+	m_pFSM->Add_State(STATE_IDLELOOKAROUND, CKirbyDefault_Idle_State::Create());
 
-	m_pFSM->Add_State(STATE_RUN, CKirbyDefault_Run_State::Create());//
-	m_pFSM->Add_State(STATE_RUNSTART, CKirbyDefault_Run_State::Create());//
+	m_pFSM->Add_State(STATE_RUN, CKirbyDefault_Run_State::Create());
+	m_pFSM->Add_State(STATE_RUNSTART, CKirbyDefault_Run_State::Create());
 
-	m_pFSM->Add_State(STATE_JUMPL, CKirbyDefault_Jump_State::Create());//
-	m_pFSM->Add_State(STATE_JUMPR, CKirbyDefault_Jump_State::Create());//
-	m_pFSM->Add_State(STATE_JUMPEND, CKirbyDefault_Jump_State::Create());//
-	m_pFSM->Add_State(STATE_JUMPFALL, CKirbyDefault_Jump_State::Create());//
-	m_pFSM->Add_State(STATE_LANDINGEND, CKirbyDefault_Jump_State::Create());//
-	m_pFSM->Add_State(STATE_LANDINGSMALL, CKirbyDefault_Jump_State::Create());//
-	m_pFSM->Add_State(STATE_FALL, CKirbyDefault_Jump_State::Create());//
+	m_pFSM->Add_State(STATE_JUMPL, CKirbyDefault_Jump_State::Create());
+	m_pFSM->Add_State(STATE_JUMPR, CKirbyDefault_Jump_State::Create());
+	m_pFSM->Add_State(STATE_JUMPEND, CKirbyDefault_Jump_State::Create());
+	m_pFSM->Add_State(STATE_JUMPFALL, CKirbyDefault_Jump_State::Create());
+	m_pFSM->Add_State(STATE_LANDINGEND, CKirbyDefault_Jump_State::Create());
+	m_pFSM->Add_State(STATE_LANDINGSMALL, CKirbyDefault_Jump_State::Create());
+	m_pFSM->Add_State(STATE_FALL, CKirbyDefault_Jump_State::Create());
 
-	// 가드 및 덤블링 (Default)
-	//m_pFSM->Add_State(STATE_DODGEBACK, CKirbyDefault_Guard_State::Create());
+	// 가드 및 덤블링
 	m_pFSM->Add_State(STATE_DODGEBACK1, CKirbyDefault_Guard_State::Create());
 	m_pFSM->Add_State(STATE_DODGEBACK2, CKirbyDefault_Guard_State::Create());
-	//m_pFSM->Add_State(STATE_DODGEFRONT, CKirbyDefault_Guard_State::Create());
 	m_pFSM->Add_State(STATE_DODGEFRONT1, CKirbyDefault_Guard_State::Create());
 	m_pFSM->Add_State(STATE_DODGEFRONT2, CKirbyDefault_Guard_State::Create());
-	//m_pFSM->Add_State(STATE_DODGELEFT, CKirbyDefault_Guard_State::Create());
 	m_pFSM->Add_State(STATE_DODGELEFT1, CKirbyDefault_Guard_State::Create());
 	m_pFSM->Add_State(STATE_DODGELEFT2, CKirbyDefault_Guard_State::Create());
-	//m_pFSM->Add_State(STATE_DODGERIGHT, CKirbyDefault_Guard_State::Create());
 	m_pFSM->Add_State(STATE_DODGERIGHT1, CKirbyDefault_Guard_State::Create());
 	m_pFSM->Add_State(STATE_DODGERIGHT2, CKirbyDefault_Guard_State::Create());
 	m_pFSM->Add_State(STATE_DODGESTART, CKirbyDefault_Guard_State::Create());
 	m_pFSM->Add_State(STATE_GUARD, CKirbyDefault_Guard_State::Create());
 
 	// Balloon
-	m_pFSM->Add_State(STATE_EAT, CKirbyBalloon_Idle_State::Create());//
-	m_pFSM->Add_State(STATE_EATWAIT, CKirbyBalloon_Idle_State::Create());//
-	m_pFSM->Add_State(STATE_EATRUN, CKirbyBalloon_Run_State::Create());//
-	m_pFSM->Add_State(STATE_EATJUMP, CKirbyBalloon_Jump_State::Create());//
-	m_pFSM->Add_State(STATE_EATLANDING, CKirbyBalloon_Jump_State::Create());//
+	m_pFSM->Add_State(STATE_EAT, CKirbyBalloon_Idle_State::Create());
+	m_pFSM->Add_State(STATE_EATWAIT, CKirbyBalloon_Idle_State::Create());
+	m_pFSM->Add_State(STATE_EATRUN, CKirbyBalloon_Run_State::Create());
+	m_pFSM->Add_State(STATE_EATJUMP, CKirbyBalloon_Jump_State::Create());
+	m_pFSM->Add_State(STATE_EATLANDING, CKirbyBalloon_Jump_State::Create());
 
 	m_pFSM->Add_State(STATE_FLIGHTSTART, CKirbyBalloon_Fly_State::Create());
 	m_pFSM->Add_State(STATE_FLIGHTFALL, CKirbyBalloon_Fly_State::Create());
@@ -473,21 +521,27 @@ void CKirby::SetUp_FSM()
 	m_pFSM->Add_State(STATE_SUPERINHALEWALK, CKirbyVacuum_VacuumWalk_State::Create());
 
 
-	// 상태 Initialize
-	CFSM::FSM_INFO		FSM_Default_Desc = {};
-	FSM_Default_Desc.iState = STATE_IDLE;
-	FSM_Default_Desc.pModel = m_pModelCom[BODY_DEFAULT];
-	m_pFSM->Initialize(&FSM_Default_Desc);
+	CFSM::FSM_INFO		FSM_Info_Desc = {};
+	FSM_Info_Desc.iState = STATE_IDLE;
+	FSM_Info_Desc.uNumModel = BODY_END;
+	FSM_Info_Desc.pModel = &m_pModelCom[BODY_DEFAULT];
+	m_pFSM->Initialize(&FSM_Info_Desc);
 
-	CFSM::FSM_INFO		FSM_Balloon_Desc = {};
-	FSM_Balloon_Desc.iState = STATE_IDLE;
-	FSM_Balloon_Desc.pModel = m_pModelCom[BODY_BALLOON];
-	m_pFSM->Initialize(&FSM_Balloon_Desc);
+	//// 상태 Initialize
+	//CFSM::FSM_INFO		FSM_Default_Desc = {};
+	//FSM_Default_Desc.iState = STATE_IDLE;
+	//FSM_Default_Desc.pModel = (_ubyte*)m_pModelCom[BODY_DEFAULT];
+	//m_pFSM->Initialize(&FSM_Default_Desc);
 
-	CFSM::FSM_INFO		FSM_Vacuum_Desc = {};
-	FSM_Vacuum_Desc.iState = STATE_IDLE;
-	FSM_Vacuum_Desc.pModel = m_pModelCom[BODY_VACUUM];
-	m_pFSM->Initialize(&FSM_Vacuum_Desc);
+	//CFSM::FSM_INFO		FSM_Balloon_Desc = {};
+	//FSM_Balloon_Desc.iState = STATE_IDLE;
+	//FSM_Balloon_Desc.pModel = (_ubyte*)m_pModelCom[BODY_BALLOON];
+	//m_pFSM->Initialize(&FSM_Balloon_Desc);
+
+	//CFSM::FSM_INFO		FSM_Vacuum_Desc = {};
+	//FSM_Vacuum_Desc.iState = STATE_IDLE;
+	//FSM_Vacuum_Desc.pModel = (_ubyte*)m_pModelCom[BODY_VACUUM];
+	//m_pFSM->Initialize(&FSM_Vacuum_Desc);
 }
 
 void CKirby::Change_State(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, BODYSTATE eBody)

@@ -41,12 +41,12 @@ public:
 
 public:
 	// 이동에 대한 함수
-	void			Move(class CTransform* pTransform, _float fSpeed, _float fTimeDelta);	// look방향으로 움직임
-	void			Move_Dir(class CTransform* pTransform, _fvector fDelta, _float fTimeDelta);
-	_bool			Jump(CTransform* pTransform, _float fFallVelocity, _float fTimeDelta);	// 점프
-	void			FreeFall(CTransform* pTransform, _float fTimeDelta, _float fOffset = 1.f);					// 자유 낙하
-	PxVec3			Compute_Slope(CTransform* pTransform);									// 경사면의 노말벡터 계산
-	_float			Compute_Height();														// 경사면의 노말벡터 계산
+	void			Move(class CTransform* pTransform, _float fSpeed, _float fTimeDelta);				// look방향으로 움직임
+	void			Move_Dir(class CTransform* pTransform, _fvector fDelta, _float fTimeDelta);			// 방향 벡터로 움직임
+	_bool			Jump(CTransform* pTransform, _float fFallVelocity, _float fTimeDelta);				// 점프
+	void			FreeFall(CTransform* pTransform, _float fTimeDelta, _float fOffset = 1.f);			// 자유 낙하
+	PxVec3			Compute_Slope(CTransform* pTransform);												// 경사면의 노말벡터 계산
+	_float			Compute_Height();																	// 경사면의 노말벡터 계산
 	PxVec3			Compute_TerrainPosition();
 	_vector			Compute_TerrainPosition_Vector();
 	PxVec3			TerrainRayCast_Collision(PxVec3 _rayOrigin, PxVec3 _rayDirection, _float _fMaxDistance);
@@ -76,15 +76,19 @@ protected:
 
 protected:
 	class CGameObject*					m_pObject = nullptr;
-	COLLISION_TYPE						m_eCollisionType = COLLISION_TYPE::COLLI_END;
+	COLLISION_TYPE						m_eCollisionType = COLLISION_END;
 
 	physx::PxController*				m_pController = nullptr;
+	physx::PxMaterial*					m_ControllerMaterial = nullptr;
+	_float3								m_vMaterialOptions = _float3(0.5f, 0.5f, 0.5f);
+
 	physx::PxCapsuleControllerDesc		m_tControllerDesc;
 	physx::PxControllerFilters			m_ControllerFilters;
 	physx::PxFilterData					m_tFilterDesc;
+	
 	class CControllerBehaviorCallback*	m_pControllerCallBack = nullptr;
 	class CUserControllerHitReport*		m_pControllerHitReport = nullptr;
-
+	
 	_float								m_fSlopeLimitDegree = 45.f;
 	_float								m_fFallVelocity = { 0.f };
 	_float								m_fFallAcceleration = { 0.f };

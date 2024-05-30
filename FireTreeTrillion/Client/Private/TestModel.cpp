@@ -19,6 +19,8 @@ CTestModel::CTestModel(const CTestModel& rhs)
 
 HRESULT CTestModel::Initialize_Prototype()
 {
+    m_eCollisionGroup = COLLISION_TYPE::INTERACT;
+
     return S_OK;
 }
 
@@ -67,7 +69,6 @@ HRESULT CTestModel::Initialize(void* pArg)
     m_pLight = CGameInstance::Get_Instance()->Get_LightLastAddress();
     Safe_AddRef(m_pLight);*/
 
-    m_eCollisionGroup = FRIEND;
 
     return S_OK;
 }
@@ -367,7 +368,7 @@ void CTestModel::SetUp_FSM()
     // ป๓ลย Initialize
     CFSM::FSM_INFO		FSM_Desc = {};
     FSM_Desc.iState = m_eCurrentState = IDLE;
-    FSM_Desc.pModel = m_pModelCom;
+    FSM_Desc.pModel = &m_pModelCom;
     m_pFSM->Initialize(&FSM_Desc);
 }
 

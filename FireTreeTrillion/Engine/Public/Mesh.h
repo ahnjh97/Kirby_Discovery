@@ -15,6 +15,7 @@ private:
 
 public:
 	_uint Get_MaterialIndex() const { return m_iMaterialIndex; }
+	string Get_Name() { return string(m_szName); }
 
 public:
 	virtual HRESULT Initialize_Prototype(TYPE eModelType, string strDirectory, const vector<CBone*>& Bones, _fmatrix TransformMatrix);

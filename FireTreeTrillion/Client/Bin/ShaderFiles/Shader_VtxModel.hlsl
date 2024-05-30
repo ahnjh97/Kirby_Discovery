@@ -5,6 +5,7 @@ matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 texture2D	g_DiffuseTexture;
 texture2D   g_MaskTexture;
 texture2D	g_NormalTexture;
+uint        g_iTriggerType;
 
 struct VS_IN
 {
@@ -71,6 +72,12 @@ struct PS_OUT
     float4 vStencil : SV_TARGET5;
 };
 
+struct PS_OUT_EFFECT
+{
+    float4 vColor : SV_TARGET0;
+    float4 vNonBlur : SV_TARGET1;
+};
+
 struct PS_OUT_LIGHTDEPTH
 {
     float4 vLightDepth : SV_TARGET0;
@@ -84,7 +91,6 @@ PS_OUT_LIGHTDEPTH PS_MAIN_LIGHTDEPTH(PS_IN In)
 
     return Out;
 }
-
 
 PS_OUT PS_MAIN(PS_IN In)
 {
@@ -124,7 +130,6 @@ PS_OUT NO_NORMALMAP_PS_MAIN(PS_IN In)
     return Out;
 }
 
-
 PS_OUT SKY_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
@@ -133,12 +138,56 @@ PS_OUT SKY_MAIN(PS_IN In)
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
         
 	// 구현부
-	
     Out.vDiffuse = vMtrlDiffuse;
     
     return Out;
 }
 
+PS_OUT_EFFECT PS_MAIN_BLUR(PS_IN In)
+{
+    PS_OUT_EFFECT Out = (PS_OUT_EFFECT) 0;
+
+    
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord);
+    if (0.3f >= vMtrlDiffuse.a)
+        discard;
+
+    
+    Out.vColor = vMtrlDiffuse;
+    
+    return Out;
+}
+
+PS_OUT_EFFECT PS_MAIN_NONBLUR(PS_IN In)
+{
+    PS_OUT_EFFECT Out = (PS_OUT_EFFECT) 0;
+
+    
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord);
+    if (0.3f >= vMtrlDiffuse.a)
+        discard;
+
+    
+    Out.vColor = vMtrlDiffuse;
+    Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
+    return Out;
+}
+
+PS_OUT TRIGGER(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    if (g_iTriggerType == 0)
+        Out.vDiffuse = vector(1, 0.75f, 0.8f, 1);
+    else if (g_iTriggerType == 1)
+        Out.vDiffuse = vector(0, 0, 1, 1);
+    else
+        Out.vDiffuse = vector(1, 1, 1, 1);
+    
+    Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    
+    return Out;
+}
 
 technique11 DefaultTechnique
 {
@@ -195,4 +244,40 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 SKY_MAIN();
     }
 
+    // 블룸 처리 할 모델 ( 4 )
+    pass Blur_Default
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_BLUR();
+    }
+    // 블랜드 할 모델 ( 5 )
+    pass NonBlur_Default
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_NONBLUR();
+    }
+    // 트리거 ( 6 )
+    pass Trigger
+    {
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 TRIGGER();
+    }
 }

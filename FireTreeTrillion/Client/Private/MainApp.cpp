@@ -6,6 +6,10 @@
 
 #include "tinyxml2.h"
 #include "Utils.h"
+#include "SingleEffect.h"
+#include "Particle.h"
+#include "MultiEffect.h"
+
 
 CMainApp::CMainApp()
 	: m_pGameInstance(CGameInstance::Get_Instance())
@@ -33,8 +37,8 @@ HRESULT CMainApp::Initialize()
 		return E_FAIL;
 
 	//loader의 Loading_StaticComponentAll() 로 옮김
-	//if (FAILED(Ready_Prototype_Component_For_Static()))
-	//	return E_FAIL;
+	if (FAILED(Ready_Prototype_Component_For_Static()))
+		return E_FAIL;
 
 	if (FAILED(Open_Level(LEVEL_LOGO)))
 		return E_FAIL;
@@ -239,6 +243,107 @@ HRESULT CMainApp::Open_Level(LEVEL eLevelID)
 //
 //	return	S_OK;
 //}
+
+HRESULT CMainApp::Ready_Prototype_Component_For_Static()
+{
+
+	path FXPath("../Bin/Resources/Effects/Single/");
+	if (!exists(FXPath) || !is_directory(FXPath))
+	{
+		ALARM_FAIL(TEXT("망했어 경로 없다"));
+		return E_FAIL;
+	}
+
+	//단일 이펙트
+	for (auto& entry : directory_iterator(FXPath))
+	{
+		auto& filePath = entry.path();
+		string strname = filePath.stem().string();
+
+		if (filePath.extension() != ".bin")
+			continue;
+
+		SINGLE_FX_DATA FXData = {};
+
+		CUtils::Load_Effect(filePath, &FXData);
+
+		CSingleEffect::FX_DESC FXDesc{};
+
+		FXDesc.strFXName = FXData.strName;
+		FXDesc.strBufferTag = FXData.strBufferName;
+		FXDesc.strTexTag = FXData.strTexName;
+		FXDesc.strMaskTexTag = FXData.strMaskTexName;
+
+		FXDesc.fDuration = FXData.fDuration;
+		FXDesc.fLifetime = FXData.fLifetime;
+
+		FXDesc.iPassIdx = FXData.iPassIdx;
+		FXDesc.iTexIdx = FXData.iTexIdx;
+		FXDesc.iMaskTexIdx = FXData.iMaskTexIdx;
+
+		FXDesc.bIsLoop = FXData.bIsLoop;
+		FXDesc.bIsBillboard = FXData.bIsBillboard;
+		FXDesc.bIsOrthographic = FXData.bIsOrthographic;
+		FXDesc.bIsColorRender = FXData.bIsColorRender;
+		FXDesc.bIsBloom = FXData.bIsBloom;
+
+		FXDesc.fRimLightThreshold = FXData.fRimLightThreshold;
+
+
+		for (_uint i = 0; i < FXData.iPropertyMapNum; ++i)
+		{
+			FXDesc.Keyframes.emplace(FXData.vecKeyframeInfo[i].first, FXData.vecKeyframes[i]);
+		}
+
+
+		wstring wstrProtoName = { TEXT("Prototype_GameObject_") + CUtils::StrToWstr(strname) };
+
+		if (FAILED(m_pGameInstance->Add_Prototype(wstrProtoName, CSingleEffect::Create(m_pDevice, m_pContext, FXDesc))))
+			return E_FAIL;
+
+		
+		//Make_Effect(FXData);
+	}
+
+
+
+	FXPath = "../Bin/Resources/Effects/Multi/";
+	if (!exists(FXPath) || !is_directory(FXPath))
+	{
+		ALARM_FAIL(TEXT("망했어 경로 없다"));
+		return E_FAIL;
+	}
+
+	//복합 이펙트
+	for (auto& entry : directory_iterator(FXPath))
+	{
+		auto& filePath = entry.path();
+		string strname = filePath.stem().string();
+
+		if (filePath.extension() != ".bin")
+			continue;
+
+		MULTI_FX_DATA FXData = {};
+		CUtils::Load_Effect(filePath, &FXData);
+		
+		CMultiEffect::MULTI_FX_DESC FXDesc = {};
+
+		FXDesc.strFXName = FXData.strName;
+		for (auto& FXPair : FXData.FXs)
+			FXDesc.FXs.push_back(FXPair.second);
+
+
+		wstring wstrProtoName = { TEXT("Prototype_GameObject_") + CUtils::StrToWstr(strname) };
+
+		if (FAILED(m_pGameInstance->Add_Prototype(wstrProtoName, CMultiEffect::Create(m_pDevice, m_pContext, FXDesc))))
+			return E_FAIL;
+
+	}
+
+
+
+	return	S_OK;
+}
 
 /// <summary>
 /// 1. 내가 저장하고자 하는 원소들의 개수(iCnt)를 저장한다.
