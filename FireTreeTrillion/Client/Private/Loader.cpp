@@ -436,12 +436,12 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	// MODEL 구조체 생성자 기본 값  : ""			  / TYPE_END /  1.f  /    0.f     / 4
 	if (eLevel == LEVEL_STATIC)
 	{
-		m_vecModelInfo.emplace_back(MODEL{ "SmokeCenter", TYPE_NONANIM });
-		m_vecModelInfo.emplace_back(MODEL{ "SmokeFadeLarge", TYPE_NONANIM });
-		m_vecModelInfo.emplace_back(MODEL{ "SmokeOriginal", TYPE_NONANIM });
-		m_vecModelInfo.emplace_back(MODEL{ "SmokeSplit", TYPE_NONANIM });
-		m_vecModelInfo.emplace_back(MODEL{ "SmokeTail", TYPE_NONANIM });
-		m_vecModelInfo.emplace_back(MODEL{ "Tornado", TYPE_NONANIM });
+		m_vecModelInfo.emplace_back("SmokeCenter", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("SmokeFadeLarge", TYPE_NONANIM );
+		m_vecModelInfo.emplace_back("SmokeOriginal", TYPE_NONANIM );
+		m_vecModelInfo.emplace_back("SmokeSplit", TYPE_NONANIM );
+		m_vecModelInfo.emplace_back("SmokeTail", TYPE_NONANIM );
+		m_vecModelInfo.emplace_back("Tornado", TYPE_NONANIM );
 
 	}
 	else if (eLevel == LEVEL_LOGO)
@@ -469,10 +469,10 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f);
 
 		// For Awoofy
-		m_vecModelInfo.emplace_back(MODEL{ "Awoofy", TYPE_ANIM, 1.f, 180.f });
+		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.f, 180.f);
 
 		// For Rabbit
-		m_vecModelInfo.emplace_back(MODEL{ "Rabbit", TYPE_ANIM, 1.f, 180.f });
+		m_vecModelInfo.emplace_back("Rabbit", TYPE_ANIM, 1.f, 180.f );
 	}
 	else if (eLevel == LEVEL_TOOL_MAP) 
 	{		
