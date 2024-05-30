@@ -380,6 +380,8 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 #ifdef _DEBUG
 	if (FAILED(Render_Debug()))
 		return E_FAIL;
+
+	Render_IMGUI();
 #endif
 
 	return S_OK;
@@ -878,6 +880,35 @@ HRESULT CRenderer::Render_FinalResult()
 	if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
+	if (FAILED(m_pShader->Bind_RawValue("g_bApplyCorrection", &m_bApplyCorrection, sizeof(_bool))))
+		return E_FAIL;
+
+
+	if (FAILED(m_pShader->Bind_RawValue("g_fExposure", &m_fExposure, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fHue", &m_fHue, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fSaturation", &m_fSaturation, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fGamma", &m_fGamma, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fVibrance", &m_fVibrance, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fVibrance", &m_fVibrance, sizeof(_float))))
+		return E_FAIL;
+
+	if (FAILED(m_pShader->Bind_RawValue("g_fContrast", &m_fContrast, sizeof(_float))))
+		return E_FAIL;
+
+	if(FAILED(m_pShader->Bind_RawValue("g_vColorBalance", m_vColorBalance, sizeof(_float3))))
+		return E_FAIL;
+	if(FAILED(m_pShader->Bind_RawValue("g_vWhiteBalance", m_vWhiteBalance, sizeof(_float3))))
+		return E_FAIL;
+
+
+
 	// 최종 작업물 던지기
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Final"), "g_FinalTexture")))
 		return E_FAIL;
@@ -916,6 +947,28 @@ HRESULT CRenderer::Render_SuperUI()
 	m_RenderObjects[RENDER_SUPERUI].clear();
 
 	return S_OK;
+}
+
+void CRenderer::Render_IMGUI()
+{
+	ImGui::Begin(u8"컬러 코렉션");
+
+	ImGui::Checkbox(u8"적용", &m_bApplyCorrection);
+
+
+	ImGui::DragFloat(u8"노출", &m_fExposure, .01f, 0.f, 3.f, "%.2f");
+	ImGui::DragFloat(u8"색조", &m_fHue, .01f, 0.f, 1.5f, "%.2f");
+	ImGui::DragFloat(u8"채도", &m_fSaturation, .01f, 0.f, 2.f, "%.2f");
+	ImGui::DragFloat(u8"명도", &m_fBrightness, .01f, 0.f, 3.f, "%.2f");
+	ImGui::DragFloat(u8"감마", &m_fGamma, .01f, 0.f, 3.f, "%.2f");
+	ImGui::DragFloat(u8"활기", &m_fVibrance, .01f, 0.f, 3.f, "%.2f");
+	ImGui::DragFloat(u8"대비", &m_fContrast, .01f, 0.f, 3.f, "%.2f");
+
+	ImGui::DragFloat3(u8"화이트 밸런스", m_vWhiteBalance, .01f, 0.f, 3.f, "%.2f");
+	ImGui::DragFloat3(u8"색상 균형", m_vColorBalance, .01f, 0.f, 3.f, "%.2f");
+
+	ImGui::End();
+
 }
 
 

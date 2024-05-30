@@ -11,6 +11,20 @@ float g_fTexH = 900.0f;
 
 float g_fFar = 1000.f;
 
+//색 보정 글로별 번수
+bool g_bApplyCorrection = true;
+
+float g_fExposure = 1.4f;
+float g_fHue = 1.f;
+float g_fSaturation = 1.f;
+float g_fBrightness = 1.f;
+float g_fGamma = .5f;
+float g_fVibrance = .5f;
+
+float3 g_vColorBalance = { 1.f, 1.f, 1.f };
+float3 g_vWhiteBalance = { .5f, .5f, .5f };
+float g_fContrast = .5f;
+
 static const float fWeight[13] =
 {
     0.0561, 0.1353, 0.278, 0.4868, 0.7261, 0.9231, 1,
@@ -75,14 +89,14 @@ float4 Blur_X(float2 vTexCoord)
     
     
     if (1.f == g_BlendTexture.Sample(ClampSampler, vTexCoord).g)
-        return vOut;  
+        return vOut;
     
     int iTotal = 0;
 
     for (int i = -6; i < 7; ++i)
     {
-        vUV = vTexCoord + float2(1.f / g_fTexW * i, 0);        
-        if (1.f == g_BlendTexture.Sample(ClampSampler, vUV).g )
+        vUV = vTexCoord + float2(1.f / g_fTexW * i, 0);
+        if (1.f == g_BlendTexture.Sample(ClampSampler, vUV).g)
             continue;
 
         vOut += fWeight[6 + i] * g_EffectTexture.Sample(ClampSampler, vUV);
@@ -118,8 +132,64 @@ float4 Blur_Y(float2 vTexCoord)
     return vOut;
 }
 
+float3 ToneMapping(float3 vHDRColor, float fExposure)
+{
+    vHDRColor *= fExposure;
+    
+    return vHDRColor / (vHDRColor + float3(1.f, 1.f, 1.f));
+}
 
+float3 RGB2HSV(float3 c)
+{
+    float4 K = float4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+    float4 p = lerp(float4(c.bg, K.wz), float4(c.gb, K.xy), step(c.b, c.g));
+    float4 q = lerp(float4(p.xyw, c.r), float4(c.r, p.yzx), step(p.x, c.r));
 
+    float d = q.x - min(q.w, q.y);
+    float e = 1.0e-10;
+    return float3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+}
+
+float3 HSV2RGB(float3 c)
+{
+    float4 K = float4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    float3 p = abs(frac(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * lerp(K.xxx, saturate(p - K.xxx), c.y);
+}
+
+float3 ColorGrading(float3 vColor, float fHue, float fSaturation, float fBrightness)
+{
+    float3 vHSV = RGB2HSV(vColor);
+    vHSV.x += fHue;
+    vHSV.y *= fSaturation;
+    vHSV.z *= fBrightness;
+    return HSV2RGB(vHSV);
+}
+float3 GammaCorrection(float3 vColor, float fGamma)
+{
+    return pow(vColor, 1.0 / fGamma);
+}
+
+float3 AdjustVibrance(float3 vColor, float fVibrance)
+{
+    float luminance = dot(vColor, float3(0.299, 0.587, 0.114));
+    float3 grey = float3(luminance, luminance, luminance);
+    return lerp(grey, vColor, fVibrance);
+}
+
+float3 AdjustContrast(float3 vColor, float fContrast)
+{
+    float3 vMidpoint = float3(0.5, 0.5, 0.5);
+    return (vColor - vMidpoint) * fContrast + vMidpoint;
+}
+float3 AdjustColorBalance(float3 vColor, float3 vBalance)
+{
+    return vColor * vBalance;
+}
+float3 AdjustWhiteBalance(float3 color, float3 vWhitePoint)
+{
+    return color / vWhitePoint;
+}
 struct VS_IN
 {
     float3 vPosition : POSITION;
@@ -340,7 +410,7 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
         Out.vColor += vSky * (1.f - vEffect.a);
     
     // 빛 연산이 되지 않고, Alpha값이 1인 객체들을 그대로 그린다.
-    if (0.0f < vNonLight.a )
+    if (0.0f < vNonLight.a)
         Out.vColor = vNonLight;
         
     // Blend 라는 뜻
@@ -400,10 +470,33 @@ PS_OUT PS_MAIN_COLORCORRECT(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
     
-    vector vDiffuse = g_FinalTexture.Sample(LinearSampler, In.vTexcoord);
-    Out.vColor = vDiffuse;
+    vector vColor = g_FinalTexture.Sample(LinearSampler, In.vTexcoord);
     
-    return Out;
+    if (g_bApplyCorrection)
+    {
+        //톤매핑
+        vColor.rgb = ToneMapping(vColor.rgb, g_fExposure);
+        
+        vColor.rgb = AdjustWhiteBalance(vColor.rgb, g_vWhiteBalance);
+    
+        vColor.rgb = AdjustContrast(vColor.rgb, g_fContrast);
+        
+        //Color Balance
+        vColor.rgb = AdjustColorBalance(vColor.rgb, g_vColorBalance);
+        
+        //HSV
+        vColor.rgb = ColorGrading(vColor.rgb, g_fHue, g_fSaturation, g_fBrightness);
+        
+        //활기
+        vColor.rgb = AdjustVibrance(vColor.rgb, g_fVibrance);
+    
+        //감마
+        vColor.rgb = GammaCorrection(vColor.rgb, g_fGamma);
+        
+    }
+    
+    Out.vColor = vColor;
+
 }
 
 
@@ -428,22 +521,6 @@ PS_OUT PS_MAIN_DOFBlur(PS_IN In)
     // DOFWeight 계산 (스케일링 및 클램핑)
     float fDOFWeight = clamp(fDepthDifference / g_fFar * 4.f, 0.0f, 1.0f);
     
-    
-    //float fDepthDifference = 0.f;
-    //float fDOFWeight = 0.f;
-    //// 만약, 현재 나의 픽셀이 뒤에 있을 경우.
-    //if (fViewZ - fMyViewZ > 0)
-    //{
-    //    fDepthDifference = fViewZ - fMyViewZ;
-    //    fDOFWeight = clamp(fDepthDifference / g_fFar * 4.f, 0.0f, 1.0f);
-    //}
-    //// 만약, 현재 나의 픽셀이 앞에 있을 경우
-    //else
-    //{
-    //    fDepthDifference = fMyViewZ - fViewZ;
-    //    fDOFWeight = clamp(fDepthDifference / g_fFar * 50.f, 0.0f, 1.0f);
-    //}
-
     for (int i = -6; i < 7; ++i)
     {
         for (int j = -6; j < 7; ++j)
@@ -467,7 +544,6 @@ PS_OUT PS_MAIN_MotionBlur(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
     
-    //vector Diffusedesc = g_DiffuseMotionBlur.Sample(LinearSampler, In.vTexcoord);
     float4 vMotionBlurSample = g_MotionBlur.Sample(LinearSampler, In.vTexcoord);
     float2 vMyBlurDir = vMotionBlurSample.xy;
     float fMotionblurRaduis = 250.f;
@@ -574,7 +650,7 @@ technique11 DefaultTechnique
     }
 
     // 색 후처리 ( 7 )
-    pass ColorCorrection 
+    pass ColorCorrection
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_NO_TEST_WRITE, 0);

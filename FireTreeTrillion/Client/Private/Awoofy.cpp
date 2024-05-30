@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "FSM.h"
 #include "Awoofy.h"
+#include "FSM.h"
 #include "Awoofy_State.h"
 
 CAwoofy::CAwoofy(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -33,7 +33,7 @@ HRESULT CAwoofy::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	m_pModelCom->Set_Animation(AWOOFY_GROOMING, 45.f, true, true);
+	m_pModelCom->Set_Animation(AWOOFY_GROOMING, 45.f, false, true);
 
 	return S_OK;
 }
@@ -51,18 +51,21 @@ _int CAwoofy::Tick(_float fTimeDelta)
 	//if (m_pFSM != nullptr)
 	//	m_pFSM->Update(this, fTimeDelta);
 
+	// 지면의 up벡터
+	//PxVec3 slope = m_pControllerCom->Compute_Slope(m_pTransformCom);
+	//_vector vTerrainNormal = CUtils::To_Vector(slope);
+	//Lerp_UpVector(vTerrainNormal, 10.f, fTimeDelta);
+
+   // FSM 제어
+	if (m_pFSM != nullptr)
+		m_pFSM->Update(this, fTimeDelta);
+
 	return OBJ_NOEVENT;
 }
 
 void CAwoofy::Late_Tick(_float fTimeDelta)
 {
 	m_pModelCom->Play_Animation(fTimeDelta);
-
-	// 지면충돌과 경사 보정
-	//// 지면의 up벡터
-	//PxVec3 slope = m_pControllerCom->Compute_Slope(m_pTransformCom);
-	//_vector vTerrainNormal = CUtils::To_Vector(slope);
-	//Lerp_UpVector(vTerrainNormal, 10.f, fTimeDelta);
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
@@ -131,7 +134,7 @@ void CAwoofy::Render_IMGUI()
 
 void CAwoofy::Collision_Attack(CGameObject* pOtherObj)
 {
-	Change_State(CAwoofy::AWOOFY_DAMAGE, 40.f, false, true);
+	Change_State(CAwoofy::AWOOFY_DAMAGE, 50.f, false, true);
 }
 
 void CAwoofy::Change_State(AWOOFY_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
@@ -178,7 +181,7 @@ HRESULT CAwoofy::Add_Components()
 	CHECK_FAILED(hr);
 
 	/* For.Com_CharacterController */
-	_float4 vPos = XMVectorSet(10.f, 10.f, -175.f, 1.f);
+	_float4 vPos = XMVectorSet(10.f, 10.f, -180.f, 1.f);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
 	desc.uCollisionType = m_eCollisionGroup;
@@ -246,7 +249,8 @@ CAwoofy* CAwoofy::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CAwoofy"));
+		MSG_BOX(TEXT("Failed To Create : CAwoofy"));
+
 		Safe_Release(pInstance);
 	}
 
@@ -259,7 +263,7 @@ CGameObject* CAwoofy::Clone(void* pArg)
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Cloned : CAwoofy"));
+		MSG_BOX(TEXT("Failed To Clone : CAwoofy"));
 		Safe_Release(pInstance);
 	}
 

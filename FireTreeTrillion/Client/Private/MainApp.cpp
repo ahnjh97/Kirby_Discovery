@@ -91,70 +91,70 @@ HRESULT CMainApp::Render(_float fTimeDelta)
 
 	m_pGameInstance->Draw(fTimeDelta);
 
-//#ifdef _DEBUG
-//
-//	// RTV_FONT 추가
-//#pragma region GAME_OBJ
-//
-//	_float fRTVFont = { 100.f };
-//	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Diffuse"), 
-//		_float2(5.f, g_iWinSizeY - 90.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
-//
-//	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Normal"), 
-//		_float2(fRTVFont + 5.f, g_iWinSizeY - 90.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
-//
-//	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Depth"), 
-//		_float2(fRTVFont + 105.f, g_iWinSizeY - 90.f), XMVectorSet(0.f, 0.f, 0.f, 1.f), 0.f);
-//
-//	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Field Depth"), 
-//		_float2(fRTVFont + 205.f, g_iWinSizeY - 90.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
-//
-//	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Stencil"), 
-//		_float2(fRTVFont + 305.f, g_iWinSizeY - 90.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
-//
-//	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("RimLight"), 
-//		_float2(fRTVFont + 405.f, g_iWinSizeY - 90.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
-//
-//#pragma endregion
-//
-//#pragma region LIGHTACC
-//
-//	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Shade"), 
-//		_float2(fRTVFont + 555.f, g_iWinSizeY - 90.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
-//
-//	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Specular"), 
-//		_float2(fRTVFont + 655.f, g_iWinSizeY - 90.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
-//
-//#pragma endregion
-//
-//	//SHADOW_OBJ
-//	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("LightDepth"), 
-//		_float2(5.f, g_iWinSizeY - 190.f), XMVectorSet(0.f, 0.f, 0.f, 1.f), 0.f);
-//
-//#pragma region BLOOM_BLUR
-//
-//	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Blur_X"), 
-//		_float2(fRTVFont + 55.f, g_iWinSizeY - 190.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
-//
-//	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Blur_Y"), 
-//		_float2(fRTVFont + 155.f, g_iWinSizeY - 190.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
-//
-//	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Effect"), 
-//		_float2(fRTVFont + 255.f, g_iWinSizeY - 190.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
-//
-//#pragma endregion
-//
-//	//SKY
-//	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Sky"), 
-//		_float2(fRTVFont + 405.f, g_iWinSizeY - 190.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
-//
-//	//Radial Blur
-//	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("RadialBlur"), 
-//		_float2(fRTVFont + 555.f, g_iWinSizeY - 190.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
-//
-//
-//
-//#endif // _DEBUG
+#ifdef _DEBUG
+
+	// RTV_FONT 추가
+#pragma region GAME_OBJ
+
+	_float fRTVFont = { 100.f };
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Diffuse"), 
+		_float2(5.f, g_iWinSizeY - 90.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Normal"), 
+		_float2(fRTVFont + 5.f, g_iWinSizeY - 90.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Depth"), 
+		_float2(fRTVFont + 105.f, g_iWinSizeY - 90.f), XMVectorSet(0.f, 0.f, 0.f, 1.f), 0.f);
+
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Field Depth"), 
+		_float2(fRTVFont + 205.f, g_iWinSizeY - 90.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Stencil"), 
+		_float2(fRTVFont + 305.f, g_iWinSizeY - 90.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("RimLight"), 
+		_float2(fRTVFont + 405.f, g_iWinSizeY - 90.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+
+#pragma endregion
+
+#pragma region LIGHTACC
+
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Shade"), 
+		_float2(fRTVFont + 555.f, g_iWinSizeY - 90.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Specular"), 
+		_float2(fRTVFont + 655.f, g_iWinSizeY - 90.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+
+#pragma endregion
+
+	//SHADOW_OBJ
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("LightDepth"), 
+		_float2(5.f, g_iWinSizeY - 190.f), XMVectorSet(0.f, 0.f, 0.f, 1.f), 0.f);
+
+#pragma region BLOOM_BLUR
+
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Blur_X"), 
+		_float2(fRTVFont + 55.f, g_iWinSizeY - 190.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Blur_Y"), 
+		_float2(fRTVFont + 155.f, g_iWinSizeY - 190.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Effect"), 
+		_float2(fRTVFont + 255.f, g_iWinSizeY - 190.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+
+#pragma endregion
+
+	//SKY
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Sky"), 
+		_float2(fRTVFont + 405.f, g_iWinSizeY - 190.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+
+	//Radial Blur
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("RadialBlur"), 
+		_float2(fRTVFont + 555.f, g_iWinSizeY - 190.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+
+
+
+#endif // _DEBUG
 
 
 	m_pGameInstance->End_Draw();
@@ -183,6 +183,66 @@ HRESULT CMainApp::Open_Level(LEVEL eLevelID)
 	return	S_OK;
 }
 
+//HRESULT CMainApp::Ready_Prototype_Component_For_Static()
+//{
+//
+//	//HRESULT hr;
+//
+//
+//	///* For.Prototype_Component_VIBuffer_Rect */
+//	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),
+//	//	CVIBuffer_Rect::Create(m_pDevice, m_pContext))))
+//	//	return E_FAIL;
+//
+//	///* For.Prototype_Component_VIBuffer_Instance_Point */
+//	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Instance_Point"),
+//	//	CVIBuffer_Instance_Point::Create(m_pDevice, m_pContext))))
+//	//	return E_FAIL;
+//
+//	///* For.Prototype_Component_Shader_VtxPosTex */
+//	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex"),
+//	//	CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
+//	//	return E_FAIL;
+//
+//	////point instance 쉐이더
+//	///* For.Prototype_Component_Shader_VtxInstance_Point */
+//	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxInstance_Point"),
+//	//	CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxInstance_Point.hlsl"), VTXINSTANCE_POINT::Elements, VTXINSTANCE_POINT::iNumElements))))
+//	//	return E_FAIL;
+//
+//	//wstring wstrPrototypeTag = L"Prototype_Component_FXModel_";
+//
+//	//hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"Logo",
+//	//	CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Logo/Logo.png")));
+//	//CHECK_FAILED(hr);
+//
+//
+//	//이펙트 디버깅용 이펙트 텍스쳐(FX Texture)
+//	//wstrPrototypeTag = L"Prototype_Component_FXTexture_";
+//
+//	//hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"Logo",
+//	//	CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Logo/Logo.png")));
+//	//CHECK_FAILED(hr);
+//
+//	//hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"Test",
+//	//	CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effects/test.png")));
+//	//CHECK_FAILED(hr);
+//
+//	//hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"SimpleStar",
+//	//	CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effects/simpleStar.png")));
+//	//CHECK_FAILED(hr);
+//
+//	//hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"SimpleSolid",
+//	//	CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Simple/simpleSolid_%d.png"), 2));
+//	//CHECK_FAILED(hr);
+//
+//
+//
+//	//if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CTexture::Create(m_pDevice, m_pContext, wstrFullPath, iNumTextures))))
+//	//	return E_FAIL;
+//
+//	return	S_OK;
+//}
 
 HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 {
@@ -285,8 +345,6 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 	return	S_OK;
 }
 
-
-
 /// <summary>
 /// 1. 내가 저장하고자 하는 원소들의 개수(iCnt)를 저장한다.
 /// 2. 저장하고자하는 Element들(현 예시 4개)을 원하는 경로(strPath)에 저장하는 함수
@@ -374,11 +432,6 @@ void CMainApp::Read_XML()
 		//m_vecItemInfo.push_back(itemInfo);
 	}
 }
-
-
-
-
-
 
 /// <summary>
 /// 1. 

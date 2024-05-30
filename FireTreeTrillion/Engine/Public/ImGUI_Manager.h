@@ -1,13 +1,12 @@
 #pragma once
 #include "Base.h"
 
-BEGIN(Client)
-class CUI_Editor;
-END
-
 BEGIN(Engine)
 class CImGUI_Manager final : public CBase
 {
+public:
+	enum FILE_MODE { FILE_SAVE, FILE_LOAD, FILE_NONE };
+
 private:
 	CImGUI_Manager() = default;
 	virtual ~CImGUI_Manager() = default;
@@ -24,14 +23,11 @@ public:
 	void SetDockSpace();
 	void RenderGrid();
 	void EditTransform(_float4x4& matrix);
-
-	// FileDialog
-	void Set_FileDialog();
+	CImGUI_Manager::FILE_MODE Set_FileDialog();
 
 private:
-	ID3D11Device*		 m_pDevice = { nullptr };
-	ID3D11DeviceContext* m_pContext = { nullptr };
-	class CUI_Editor*	 m_pUIEditor = { nullptr };
+	ID3D11Device*			m_pDevice = { nullptr };
+	ID3D11DeviceContext*	m_pContext = { nullptr };
 
 public:
 	static CImGUI_Manager* Create(HWND hWnd, ID3D11Device* pGraphic_Device, ID3D11DeviceContext* pContext);

@@ -47,6 +47,7 @@
 #include "Kirby.h"
 #include "Awoofy.h"
 #include "Moon.h"
+#include "Rabbit.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
@@ -183,7 +184,9 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Moon"), CMoon);
 
 	// For Awoofy To Monster
+	// For Monster
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Awoofy"), CAwoofy);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Rabbit"), CRabbit);
 
 	return S_OK;
 }
@@ -387,7 +390,8 @@ HRESULT CLoader::Loading_For_Tool_UI()
 
 #pragma region TEXTURE
 
-	hr = Add_Texture(eLevel, "KirbyBarHard", "UI/HUD/Hero/BarHard/HeroPanelBarHard_%d.png", 3);
+	//hr = Add_Texture(eLevel, "KirbyBarHard", "UI/HUD/Hero/BarHard/HeroPanelBarHard_%d.png", 3);
+	hr = Add_Texture(eLevel, "GameComplete", "UI/GAMECOMPLETE/GameComplete_%d.png", 21);
 	CHECK_FAILED(hr);
 
 	m_strLoadingText = TEXT("Loading For Texture : Complete!");
@@ -463,6 +467,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// For Awoofy
 		m_vecModelInfo.emplace_back(MODEL{ "Awoofy", TYPE_ANIM, 1.f, 180.f });
+
+		// For Rabbit
+		m_vecModelInfo.emplace_back(MODEL{ "Rabbit", TYPE_ANIM, 1.f, 180.f });
 	}
 	else if (eLevel == LEVEL_TOOL_MAP) 
 	{		

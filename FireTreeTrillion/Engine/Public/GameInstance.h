@@ -5,6 +5,7 @@
 #include "Component_Manager.h"
 #include "PipeLine.h"
 #include "Utils.h"
+#include "ImGUI_Manager.h"
 
 BEGIN(Engine)
 
@@ -68,6 +69,8 @@ public: /* For.Object_Manager */
 	class CGameObject*	Get_GameObject_ByTag(_uint iLevelIndex, const wstring& strLayerTag, wstring _tag);
 	void				Set_CurrentLevel(_int CurrentLevel);
 	void	Clear_Layer(_uint iLevelIndex, const wstring& wstrLayerTag);
+	_uint				Get_GameObject_Num(_uint _iLevelIndex, const wstring& _strLayerTag);
+
 
 public: /* For.Component_Manager */
 	HRESULT			  Add_Prototype(_uint iLevelIndex, const wstring& strPrototypeTag, class CComponent* pPrototype);
@@ -163,7 +166,7 @@ public: /* For.ImGui_Manager */
 	void		ImGui_Render();
 	void		EditTransform(/*const CCamera& camera,*/ _float4x4& _matrix);
 	void		RenderGrid();
-	void		Set_FileDialog();
+	CImGUI_Manager::FILE_MODE	Set_FileDialog();
 
 public: /* For.PhysX */
 	PxRigidDynamic* CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial = nullptr);

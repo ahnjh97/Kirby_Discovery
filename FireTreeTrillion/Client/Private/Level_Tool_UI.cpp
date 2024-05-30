@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "UIObject.h"
 #include "Level_Tool_UI.h"
 #include "Camera_Free.h"
 
@@ -16,6 +17,9 @@ HRESULT CLevel_Tool_UI::Initialize()
 		return E_FAIL;
 
 	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
+		return E_FAIL;
+
+	if (FAILED(Ready_Layer_IMGUI(TEXT("Layer_IMGUI"))))
 		return E_FAIL;
 
 	return S_OK;
@@ -55,7 +59,7 @@ HRESULT CLevel_Tool_UI::Ready_Layer_Camera(const wstring& strLayerTag)
 
 	CameraDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	CameraDesc.fNear = 0.1f;
-	CameraDesc.fFar = 2000.0f;
+	CameraDesc.fFar = 10000.0f;
 	CameraDesc.vEye = _float4(0.f, 0.f, g_iWinSizeX * -0.1f, 1.f);
 
 	CameraDesc.vAt = _float4(0.f, 0.f, 1.f, 1.f);
@@ -70,19 +74,27 @@ HRESULT CLevel_Tool_UI::Ready_Layer_Camera(const wstring& strLayerTag)
 	return S_OK;
 }
 
-HRESULT CLevel_Tool_UI::Ready_Layer_BackGround(const wstring& strLayerTag)
-{
+HRESULT CLevel_Tool_UI::Ready_Layer_IMGUI(const wstring& strLayerTag)
+{	
+	// 05.20) IMGUI UI Editor 추가
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_UI, strLayerTag, TEXT("Prototype_GameObject_IMGUI_UI_Editor"))))
+		return E_FAIL;
+
 	return S_OK;
 }
 
 HRESULT CLevel_Tool_UI::Ready_Layer_UI(const wstring& strLayerTag)
 {
-	// 05.20) IMGUI UI Editor 추가
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_UI, strLayerTag, TEXT("Prototype_GameObject_IMGUI_UI_Editor"))))
-		return E_FAIL;
-
 	// 05.25) HUD 추가
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_UI, strLayerTag, TEXT("Prototype_GameObject_HUD"))))
+	CUIObject::UIOBJ_DESC HUD_KirbyDESC{};
+	HUD_KirbyDESC.wstrUITag = { TEXT("HUD_Kirby") };
+	HUD_KirbyDESC.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f };
+	HUD_KirbyDESC.vSize = { 100.f, 100.f };
+	HUD_KirbyDESC.vPos = {	HUD_KirbyDESC.vCenter.x/* - 200.f*/, 
+							HUD_KirbyDESC.vCenter.y/* - 200.f */ };
+	HUD_KirbyDESC.fRaito = { 0.f };
+
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_UI, strLayerTag, TEXT("Prototype_GameObject_HUD_Kirby"), &HUD_KirbyDESC)))
 		return E_FAIL;
 
 	return S_OK;
