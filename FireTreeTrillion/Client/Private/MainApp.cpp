@@ -152,6 +152,19 @@ HRESULT CMainApp::Render(_float fTimeDelta)
 	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("RadialBlur"), 
 		_float2(fRTVFont + 555.f, g_iWinSizeY - 190.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
 
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Blend"),
+		_float2(fRTVFont + 655.f, g_iWinSizeY - 190.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("NonLight"),
+		_float2(fRTVFont + 755.f, g_iWinSizeY - 190.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("DOFBlur"),
+		_float2(fRTVFont + 855.f, g_iWinSizeY - 190.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("D-MotionBlur"),
+		_float2(fRTVFont + 955.f, g_iWinSizeY - 190.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("MotionBlur"),
+		_float2(fRTVFont + 1055.f, g_iWinSizeY - 190.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("M.R.A"),
+		_float2(fRTVFont + 1155.f, g_iWinSizeY - 190.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+
 
 
 #endif // _DEBUG

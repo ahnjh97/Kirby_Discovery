@@ -5,6 +5,7 @@ matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 texture2D	g_DiffuseTexture;
 texture2D   g_MaskTexture;
 texture2D	g_NormalTexture;
+texture2D   g_MRATexture;
 uint        g_iTriggerType;
 
 
@@ -77,6 +78,8 @@ struct PS_OUT
     float4 vFieldDepth : SV_TARGET4;
     float4 vStencil : SV_TARGET5;
     float4 vMotionBlur : SV_TARGET6;
+    float4 vMRA : SV_TARGET7;
+
 };
 
 struct PS_OUT_EFFECT
@@ -118,6 +121,7 @@ PS_OUT PS_MAIN(PS_IN In)
 	Out.vDiffuse = vMtrlDiffuse;
 	Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
     
     if (g_bStencil == true)
         Out.vStencil = vector(1.f, 0.f, 0.0f, 1.f);
@@ -142,7 +146,8 @@ PS_OUT NO_NORMALMAP_PS_MAIN(PS_IN In)
     Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
-    
+    Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
+
     if (g_bStencil == true)
         Out.vStencil = vector(1.f, 0.f, 0.0f, 1.f);
     

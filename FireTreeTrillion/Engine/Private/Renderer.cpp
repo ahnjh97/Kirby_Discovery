@@ -60,6 +60,10 @@ HRESULT CRenderer::Initialize()
 	/* For.Target_MotionBlur */
 	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_MotionBlur"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
 		return E_FAIL;
+	/* For.Target_MRA */
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_MRA"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+		return E_FAIL;
+
 
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Diffuse"))))
 		return E_FAIL;
@@ -74,6 +78,8 @@ HRESULT CRenderer::Initialize()
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Stencil"))))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_MotionBlur"))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_MRA"))))
 		return E_FAIL;
 
 #pragma endregion
@@ -237,6 +243,8 @@ HRESULT CRenderer::Initialize()
 	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_MotionBlur"), 1200.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_MRA"), 1300.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
+		return E_FAIL;
 
 
 	// LightAcc
