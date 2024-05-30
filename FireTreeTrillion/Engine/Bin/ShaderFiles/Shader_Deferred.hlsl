@@ -9,6 +9,8 @@ matrix g_ViewMatrixInv, g_ProjMatrixInv;
 float g_fTexW = 1600.0f;
 float g_fTexH = 900.0f;
 
+float g_fFar = 1000.f;
+
 //색 보정 글로별 번수
 bool g_bApplyCorrection = true;
 
@@ -22,6 +24,16 @@ float g_fVibrance = .5f;
 float3 g_vColorBalance = { 1.f, 1.f, 1.f };
 float3 g_vWhiteBalance = { .5f, .5f, .5f };
 float g_fContrast = .5f;
+
+//toner
+float3 g_vShadowColor = { 1.f, 1.f, 1.f};
+float g_fShadowIntensity = { 0.f };
+float3 g_vMidtoneColor = { 1.f, 1.f, 1.f };
+float g_fMidtoneIntensity = { 0.f };
+float3 g_vHighlightColor = { 1.f, 1.f, 1.f };
+float g_fHighlightIntensity = { 0.f };
+float g_fShadowThreshold = { .25f};
+float g_fHighlightThreshold = { .75f};
 
 static const float fWeight[13] =
 {
@@ -42,8 +54,8 @@ texture2D g_SpecularTexture;
 texture2D g_LightDepthTexture;
 
 texture2D g_FieldDepthTexture;
-
 texture2D g_StencilTexture;
+texture2D g_RimLightTexture;
 
 texture2D g_EffectTexture;
 texture2D g_BlurTexture;
@@ -59,6 +71,11 @@ texture2D g_RadialBlur;
 float g_fRadialblurRaduis;
 float2 g_fRadialblurCenter;
 
+texture2D g_DOFBlur;
+float2 g_vDOFFocus;
+texture2D g_DiffuseMotionBlur;
+texture2D g_MotionBlur;
+
 float4 g_vLightDir;
 float4 g_vLightPos;
 float g_fLightRange;
@@ -69,6 +86,8 @@ float4 g_vLightSpecular;
 
 float4 g_vMtrlAmbient = float4(1.f, 1.f, 1.f, 1.f);
 float4 g_vMtrlSpecular = float4(1.f, 1.f, 1.f, 1.f);
+
+float g_fRimWidth;
 
 float4 g_vCamPosition;
 
@@ -177,10 +196,53 @@ float3 AdjustColorBalance(float3 vColor, float3 vBalance)
 {
     return vColor * vBalance;
 }
-float3 AdjustWhiteBalance(float3 color, float3 vWhitePoint)
+float3 AdjustWhiteBalance(float3 vColor, float3 vWhitePoint)
 {
-    return color / vWhitePoint;
+    return vColor / vWhitePoint;
 }
+float3 AdjustShadow(float3 vColor, float3 vShadowColor, float fShadowIntensity, float fLuminance)
+{
+    
+    float intensity = fShadowIntensity * smoothstep(g_fShadowThreshold - 0.1, g_fShadowThreshold, fLuminance);
+    return lerp(vColor, vShadowColor, intensity);
+    
+    
+    //if (g_fShadowThreshold < fLuminance )
+    //    fShadowIntensity *= pow( 1 - ((fLuminance - g_fShadowThreshold) * 10) , 1);
+
+    //return lerp(vColor, vShadowColor, fShadowIntensity );
+}
+
+float3 AdjustMidtone(float3 vColor, float3 vMidtoneColor, float fMidtoneIntensity, float fLuminance)
+{
+    
+    float lowerThreshold = g_fShadowThreshold;
+    float upperThreshold = g_fHighlightThreshold;
+    float intensity = fMidtoneIntensity * smoothstep(lowerThreshold, upperThreshold, fLuminance);
+    return lerp(vColor, vMidtoneColor, intensity);
+    
+    
+    //if ( fLuminance < g_fShadowThreshold)
+    //    fMidtoneIntensity *= pow((g_fShadowThreshold - fLuminance) * 10, 1);
+    //if (g_fHighlightThreshold < fLuminance)
+    //    fMidtoneIntensity *= pow(1 - (fLuminance - g_fHighlightThreshold) *10, 1);
+    
+    //return lerp(vColor, vMidtoneColor, fMidtoneIntensity);
+}
+
+float3 AdjustHighlight(float3 vColor, float3 vHighlightColor, float fHighlightIntensity, float fLuminance)
+{
+    
+    float intensity = fHighlightIntensity * smoothstep(g_fHighlightThreshold, g_fHighlightThreshold + 0.1, fLuminance);
+    return lerp(vColor, vHighlightColor, intensity);
+    
+    
+    //if (fLuminance < g_fHighlightThreshold)
+    //    fHighlightIntensity *= pow(( g_fHighlightThreshold - fLuminance) * 10 , 1);
+    
+    //return lerp(vColor, vHighlightColor, fHighlightIntensity);
+}
+
 struct VS_IN
 {
     float3 vPosition : POSITION;
@@ -249,7 +311,7 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
     float4 vNormal = float4(vNormalDesc.xyz * 2.f - 1.f, 0.f);
 
     vector vDepthDesc = g_DepthTexture.Sample(PointSampler, In.vTexcoord);
-    float fViewZ = vDepthDesc.y * 1000.0f;
+    float fViewZ = vDepthDesc.y * g_fFar;
 	
     Out.vShade = g_vLightDiffuse * saturate(max(dot(normalize(g_vLightDir) * -1.f, vNormal), 0.f) + g_vLightAmbient * g_vMtrlAmbient);
 
@@ -288,7 +350,7 @@ PS_OUT_LIGHT PS_MAIN_POINT(PS_IN In)
     float4 vNormal = float4(vNormalDesc.xyz * 2.f - 1.f, 0.f);
 
     vector vDepthDesc = g_DepthTexture.Sample(PointSampler, In.vTexcoord);
-    float fViewZ = vDepthDesc.y * 1000.0f;
+    float fViewZ = vDepthDesc.y * g_fFar;
 
     float4 vWorldPos;
 
@@ -341,7 +403,7 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
 	/* ProjPos.w == View.Z */
     vector vDepthDesc = g_DepthTexture.Sample(PointSampler, In.vTexcoord);
     
-    float fViewZ = vDepthDesc.y * 1000.0f;
+    float fViewZ = vDepthDesc.y * g_fFar;
 
     float4 vWorldPos;
 
@@ -375,8 +437,20 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
 	/* vLightDepthDesc.x * 2000.f : 현재 픽셀을 광원기준으로  그릴려고 했던 위치에 이미 그려져있떤 광원 기준의 깊이.  */
     if (vPosition.w > (vLightDepthDesc.x * 2000.f) && g_StencilTexture.Sample(LinearSampler, In.vTexcoord).x == 0.f)
     {
-        Out.vColor *= 0.2f;
+        Out.vColor *= 0.6f;
     }
+    
+
+    //////// 림 라이트
+    vector vRimLightDesc = g_RimLightTexture.Sample(ClampSampler, In.vTexcoord);
+    float4 vLook = g_vCamPosition - vWorldPos;
+    vector vNormalDesc = g_NormalTexture.Sample(PointSampler, In.vTexcoord);
+    float4 vNormal = float4(vNormalDesc.xyz * 2.f - 1.f, 0.f);
+    
+    if (g_fRimWidth > 0.01f && vRimLightDesc.b == 1.f)
+        Out.vColor += (1.f - (clamp(pow(dot(normalize(vLook), normalize(vNormal)), g_fRimWidth), 0.f, 1.f)));
+    /////////
+    
         
     vector vNonLight = g_NonLightTexture.Sample(LinearSampler, In.vTexcoord);
     vector vBlend = g_BlendTexture.Sample(LinearSampler, In.vTexcoord);
@@ -422,9 +496,7 @@ PS_OUT PS_MAIN_BLUR_Y(PS_IN In)
 
 PS_OUT PS_MAIN_RADIAL_BLUR(PS_IN In)
 {
-    PS_OUT Out = (PS_OUT) 0;
-    
-    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    PS_OUT Out = (PS_OUT) 0;    
     
     // 0~1 텍스트 쿠드 좌표로 환산하여 넣어준다.
     float2 fCenter = g_fRadialblurCenter;
@@ -453,15 +525,45 @@ PS_OUT PS_MAIN_COLORCORRECT(PS_IN In)
     
     vector vColor = g_FinalTexture.Sample(LinearSampler, In.vTexcoord);
     
-    
     if (g_bApplyCorrection)
     {
         //톤매핑
         vColor.rgb = ToneMapping(vColor.rgb, g_fExposure);
         
+        float fLuminance = dot(vColor.rgb, float3(0.299, 0.587, 0.114));
+        
+        float3 vTonerColor = 0.f;
+        //vTonerColor.rgb = vColor.rgb;
+        
+        int iTotalNum = 0;
+        if (fLuminance < g_fShadowThreshold + .1f)
+        {
+            vTonerColor += AdjustShadow(vColor.rgb, g_vShadowColor, g_fShadowIntensity, fLuminance) - vColor.rgb;
+            ++iTotalNum;
+            //vColor.rgb = AdjustShadow(vColor.rgb, g_vShadowColor, g_fShadowIntensity, fLuminance);
+        }
+        if (g_fShadowThreshold - .1f < fLuminance && fLuminance < g_fHighlightThreshold + .1f)
+        {
+            vTonerColor += AdjustMidtone(vColor.rgb, g_vMidtoneColor, g_fMidtoneIntensity, fLuminance) - vColor.rgb;
+            ++iTotalNum;
+            //vColor.rgb = AdjustMidtone(vColor.rgb, g_vMidtoneColor, g_fMidtoneIntensity, fLuminance);
+        }
+        if (g_fHighlightThreshold - .1f < fLuminance)
+        {
+            vTonerColor += AdjustHighlight(vColor.rgb, g_vHighlightColor, g_fHighlightIntensity, fLuminance) - vColor.rgb;
+            ++iTotalNum;
+            //vColor.rgb = AdjustHighlight(vColor.rgb, g_vHighlightColor, g_fHighlightIntensity, fLuminance);
+        }
+        
+        if(0 < iTotalNum)
+            vColor.rgb += (vTonerColor / iTotalNum);
+        
+        
         vColor.rgb = AdjustWhiteBalance(vColor.rgb, g_vWhiteBalance);
-    
+        
+        
         vColor.rgb = AdjustContrast(vColor.rgb, g_fContrast);
+        
         
         //Color Balance
         vColor.rgb = AdjustColorBalance(vColor.rgb, g_vColorBalance);
@@ -478,11 +580,68 @@ PS_OUT PS_MAIN_COLORCORRECT(PS_IN In)
     }
     
     Out.vColor = vColor;
-    //Out.vColor.r *= .9f;
-    //Out.vColor.g *= .9f;
-    
     return Out;
 }
+
+
+PS_OUT PS_MAIN_DOFBlur(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+        
+    // 초점 대상의 Depth값
+    vector vDepthFocus = g_DepthTexture.Sample(PointSampler, g_vDOFFocus);
+    float fViewZ = vDepthFocus.y * g_fFar;
+    
+    // 현재 픽셀의 Depth값
+    vector vMyDepth = g_DepthTexture.Sample(PointSampler, In.vTexcoord);
+    float fMyViewZ = vMyDepth.y * g_fFar;
+
+    float2 vUV = (float2) 0;
+    float fDOFTotal = 0.f;
+    
+     // 초점 깊이와 현재 깊이의 차이
+    float fDepthDifference = abs(fViewZ - fMyViewZ);
+    
+    // DOFWeight 계산 (스케일링 및 클램핑)
+    float fDOFWeight = clamp(fDepthDifference / g_fFar * 4.f, 0.0f, 1.0f);
+    
+    for (int i = -6; i < 7; ++i)
+    {
+        for (int j = -6; j < 7; ++j)
+        {
+            float2 Offset = float2(j, i);
+            float2 TexOffset = Offset * float2(1.0f / g_fTexW, 1.0f / g_fTexH) * fDOFWeight;
+            vUV = In.vTexcoord + TexOffset;
+            
+            float fSampleWeight = fWeight[6 + j] * fWeight[6 + i];
+            Out.vColor += fSampleWeight * g_DOFBlur.Sample(ClampSampler, vUV);
+            fDOFTotal += fSampleWeight;
+        }
+    }
+    
+    Out.vColor /= fDOFTotal;
+    return Out;
+}
+
+
+PS_OUT PS_MAIN_MotionBlur(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    float4 vMotionBlurSample = g_MotionBlur.Sample(LinearSampler, In.vTexcoord);
+    float2 vMyBlurDir = vMotionBlurSample.xy;
+    float fMotionblurRaduis = 250.f;
+    float2 vUV = (float2) 0;
+
+    for (int i = -6; i < 7; ++i)
+    {
+        vUV = In.vTexcoord + (vMyBlurDir * i * float2(1.f / g_fTexW * fMotionblurRaduis, 1.f / g_fTexH * fMotionblurRaduis));
+        Out.vColor += fWeight[6 + i] * (g_DiffuseMotionBlur.Sample(ClampSampler, vUV));
+    }
+    Out.vColor /= fTotal;
+
+    return Out;
+ }
 
 
 technique11 DefaultTechnique
@@ -585,4 +744,29 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN_COLORCORRECT();
     }
+
+    // DOF 블러 ( 8 )
+    pass DOF_Blur
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_Default, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_DOFBlur();
+    }
+
+    // 모션 블러 ( 9 )
+    pass Motion_Blur
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_Default, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_MotionBlur();
+    }
+
 }

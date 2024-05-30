@@ -10,7 +10,7 @@ _uint		g_iOriginSizeY = 900; //720;
 CRenderer::CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
 	, m_pContext{ pContext }
-	, m_pGameInstance {CGameInstance::Get_Instance()}
+	, m_pGameInstance{ CGameInstance::Get_Instance() }
 {
 	Safe_AddRef(m_pGameInstance);
 	Safe_AddRef(m_pDevice);
@@ -28,6 +28,61 @@ HRESULT CRenderer::Initialize()
 	m_fShadowFar = { 2000.f };
 
 	m_pContext->RSGetViewports(&iNumViewports, &ViewportDesc);
+
+	Save_ColorSet("Default",
+		COLOR_DATA{
+		m_fExposure, m_fHue, m_fSaturation,	m_fBrightness, m_fGamma, m_fVibrance, m_fContrast,
+		{m_vWhiteBalance[0], m_vWhiteBalance[1], m_vWhiteBalance[2]},
+		{m_vColorBalance[0], m_vColorBalance[1], m_vColorBalance[2]},
+		{m_vShadowColor[0], m_vShadowColor[1], m_vShadowColor[2]},
+		m_fShadowIntensity,
+		{m_vMidtoneColor[0], m_vMidtoneColor[1], m_vMidtoneColor[2]},
+		m_fMidtoneIntensity,
+		{m_vHighlightColor[0], m_vHighlightColor[1], m_vHighlightColor[2]},
+		m_fHighlightIntensity,
+		m_fShadowThreshold,
+		m_fHighlightThreshold
+		});
+
+	Save_ColorSet("Tutorial",
+		COLOR_DATA{
+		.39f, 1.f, .80f,	1.74f, .99f, .90f, 1.05f,
+		{.94f, .6f, .6f},
+		{1.05f, 1.01f, 1.22f},
+		{73.f / 255.f, 15.f / 255.f, 89.f / 255.f},
+		.29f,
+		{61.f / 255.f, 186.f / 255.f, 173.f / 255.f},
+		.48f,
+		{1.f, 216.f / 255.f, 65.f / 255.f},
+		.34f,
+		.33f,
+		.60f
+		});
+
+	Save_ColorSet("Night",
+		COLOR_DATA{
+		0.75f,
+		1.f, 1.14f,
+		1.01f,
+		0.63f,
+		0.62f,
+		1.03f,
+		0.8f,
+		0.6f,
+		0.6f,
+		1.6f, 0.72f, 1.82f, 0.376471f, 0.0352941f, 0.372549f,
+		0.07f, 0.579137f, 0.633162f, 0.769912f, 0.51f, 0.973451f, 0.771999f, 0.323048f, 0.72f, 0.08f, 0.63f
+		});
+
+
+
+	//function<void(_int)> func = bind(&CCamera_Free::Set_MatrixIndex, this, placeholders::_1);
+	//auto ColorFunc = bind((CRenderer::Set_ColorSet), this, placeholders::_1);
+
+	//function<void(_int)> ColorFunc = bind(&CRenderer::Set_ColorSet, this, placeholders::_1);
+
+	//m_pGameInstance->SetUp_TriggerFunc(1, ColorFunc);
+
 
 #pragma region MRT_Sky
 	// 스카이와 블룸이 공존할 수 있게 랜더타겟으로 별도로 스카이박스를 처리한다.
@@ -57,6 +112,9 @@ HRESULT CRenderer::Initialize()
 	/* For.Target_Stencil */
 	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Stencil"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 1.f))))
 		return E_FAIL;
+	/* For.Target_MotionBlur */
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_MotionBlur"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+		return E_FAIL;
 
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Diffuse"))))
 		return E_FAIL;
@@ -70,6 +128,9 @@ HRESULT CRenderer::Initialize()
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Stencil"))))
 		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_MotionBlur"))))
+		return E_FAIL;
+
 #pragma endregion
 
 #pragma region MRT_LightAcc
@@ -132,9 +193,26 @@ HRESULT CRenderer::Initialize()
 		return E_FAIL;
 #pragma endregion
 
-#pragma region MRT_ColorCorrrection
-
+#pragma region MRT_DOFBlur
 	/* For.Target_RadialBlur */
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_DOFBlur"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_DOFBlur"), TEXT("Target_DOFBlur"))))
+		return E_FAIL;
+#pragma endregion
+
+
+#pragma region MRT_MotionBlur
+	/* For.Target_RadialBlur */
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_DiffuseMotionBlur"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_MotionBlur"), TEXT("Target_DiffuseMotionBlur"))))
+		return E_FAIL;
+#pragma endregion
+
+
+#pragma region MRT_ColorCorrrection
+	/* For.Target_ColorCorrrection (Final) */
 	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Final"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_ColorCorrrection"), TEXT("Target_Final"))))
@@ -161,7 +239,7 @@ HRESULT CRenderer::Initialize()
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(ViewportDesc.Width, ViewportDesc.Height, 0.f, 1.f));
 
-	ID3D11Texture2D*		pDepthStencilTexture = nullptr;
+	ID3D11Texture2D* pDepthStencilTexture = nullptr;
 
 	D3D11_TEXTURE2D_DESC	TextureDesc;
 	ZeroMemory(&TextureDesc, sizeof(D3D11_TEXTURE2D_DESC));
@@ -211,6 +289,10 @@ HRESULT CRenderer::Initialize()
 	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_RimLight"), 550.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_MotionBlur"), 1200.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
+		return E_FAIL;
+
+
 
 	// LightAcc
 	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Shade"), 700.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
@@ -245,10 +327,18 @@ HRESULT CRenderer::Initialize()
 	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Sky"), 550.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
 		return E_FAIL;
 
-
 	// RadialBlur
 	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_RadialBlur"), 700.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
 		return E_FAIL;
+
+	// DOFBlur
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_DOFBlur"), 1000.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
+		return E_FAIL;
+
+	// MotionBlur
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_DiffuseMotionBlur"), 1100.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
+		return E_FAIL;
+
 
 #endif
 
@@ -256,7 +346,7 @@ HRESULT CRenderer::Initialize()
 	return S_OK;
 }
 
-HRESULT CRenderer::Add_RenderGroup(RENDERGROUP eRenderGroup, CGameObject * pRenderObject)
+HRESULT CRenderer::Add_RenderGroup(RENDERGROUP eRenderGroup, CGameObject* pRenderObject)
 {
 	if (eRenderGroup >= RENDER_END)
 		return E_FAIL;
@@ -298,20 +388,52 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 
 	if (FAILED(Render_Result()))
 		return E_FAIL;
-	if (FAILED(Render_Blur_Result(fTimeDelta)))
+	// Radial블러 적용
+	if (FAILED(Render_Radial_Result(fTimeDelta)))
 		return E_FAIL;
-
+	// DOF블러 적용
+	if (FAILED(Render_DOF_Result()))
+		return E_FAIL;
+	// Motion블러 적용
+	if (FAILED(Render_MotionBlur()))
+		return E_FAIL;
 	//**** 후처리 완료 ****//
 
 	/////////////////////// UI를 제외하고 그려진 상황에서, 화면 색 보정 처리한다.
+
+	Interpolate_ColorData(fTimeDelta);
+
 	if (FAILED(Render_FinalResult()))
 		return E_FAIL;
 
 	if (FAILED(Render_UI()))
 		return E_FAIL;
+
 	if (FAILED(Render_SuperUI()))
 		return E_FAIL;
 
+
+
+	/// test
+	if (m_pGameInstance->Get_DIKeyState(DIK_R, KEY_DOWN))
+		m_bRimTest = !m_bRimTest;
+	
+	if (m_bRimTest == true)
+	{
+		m_fRimWidth += (0.2f - m_fRimWidth) * (fTimeDelta * 5.f);
+		if ((0.2f - m_fRimWidth) < 0.001f)
+		{
+			m_fRimWidth = 0.2f;
+		}
+	}
+	else
+	{
+		m_fRimWidth -= m_fRimWidth * (fTimeDelta * 5.f);
+		if (m_fRimWidth < 0.01f)
+		{
+			m_fRimWidth = 0.f;
+		}
+	}
 
 #ifdef _DEBUG
 	if (FAILED(Render_Debug()))
@@ -321,6 +443,47 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 #endif
 
 	return S_OK;
+}
+
+void CRenderer::Set_ColorSet(COLOR_DATA destColorData)
+{
+	//일단 -1로 초기화
+	m_DestColorData = {};
+
+	m_DestColorData = destColorData;
+}
+
+void CRenderer::Set_ColorSet(_int iSetIdx)
+{
+	switch (iSetIdx)
+	{
+	case 0:
+		m_DestColorData = Find_ColorSet("Default");
+		break;
+	case 1:
+		m_DestColorData = Find_ColorSet("Forest");
+		break;
+	case 2:
+		m_DestColorData = Find_ColorSet("Night");
+		break;
+	default:
+		break;
+	}
+}
+
+void CRenderer::Save_ColorSet(string strTag, COLOR_DATA destColorData)
+{
+	m_ColorSets.emplace(strTag, destColorData);
+}
+
+COLOR_DATA& CRenderer::Find_ColorSet(string strTag)
+{
+	auto iter = m_ColorSets.find(strTag);
+
+	if (iter == m_ColorSets.end())
+		return COLOR_DATA{};
+
+	return (iter->second);
 }
 
 void CRenderer::Setting_RadialBlur(_fvector vWorldPos, _float fRadial, _float fSubtraction)
@@ -340,6 +503,16 @@ void CRenderer::Setting_RadialBlur(_float fRadial, _float fSubtraction)
 	m_vScreenPos = _float2(0.5f, 0.5f);
 	m_fRadialBlurRadius = fRadial;
 	m_fRadialRadiusSubtraction = fSubtraction;
+}
+
+void CRenderer::Update_DofFocus(_fvector vWorldPos)
+{
+	_matrix ViewProjectionMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW) * m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
+	_vector vScreenPos = XMVector3TransformCoord(vWorldPos, ViewProjectionMatrix);
+	_float fScreenX = (XMVectorGetX(vScreenPos) + 1.f) * 0.5f;
+	_float fScreenY = (XMVectorGetY(vScreenPos) + 1.f) * 0.5f;
+
+	m_vDofFocus = _float2(fScreenX, 1.f - fScreenY);
 }
 
 HRESULT CRenderer::Render_LightDepth_For_GameObject(CShader* pShader, CTransform* pTransform, CModel* pModel)
@@ -385,7 +558,7 @@ HRESULT CRenderer::Render_LightDepth_For_GameObject(CShader* pShader, CTransform
 
 #ifdef _DEBUG
 
-HRESULT CRenderer::Add_DebugComponents(CComponent * pRenderComponent)
+HRESULT CRenderer::Add_DebugComponents(CComponent* pRenderComponent)
 {
 	m_DebugComponents.emplace_back(pRenderComponent);
 
@@ -403,7 +576,7 @@ HRESULT CRenderer::Render_Priority()
 
 	for (auto& pRenderObject : m_RenderObjects[RENDER_PRIORITY])
 	{
-		if(nullptr != pRenderObject)
+		if (nullptr != pRenderObject)
 			pRenderObject->Render();
 		Safe_Release(pRenderObject);
 	}
@@ -431,7 +604,7 @@ HRESULT CRenderer::Render_Shadow()
 
 	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_ShadowObject"), m_pLightDepthDSV)))
 		return E_FAIL;
-	
+
 	for (auto& pRenderObject : m_RenderObjects[RENDER_SHADOW])
 	{
 		if (nullptr != pRenderObject)
@@ -541,9 +714,9 @@ HRESULT CRenderer::Render_Effect()
 	RenderObjects.insert(RenderObjects.end(), m_RenderObjects[RENDER_BLOOM].begin(), m_RenderObjects[RENDER_BLOOM].end());
 	RenderObjects.insert(RenderObjects.end(), m_RenderObjects[RENDER_BLEND].begin(), m_RenderObjects[RENDER_BLEND].end());
 	RenderObjects.sort([](CGameObject* pSour, CGameObject* pDest)->_bool
-	{
+		{
 			return ((CGameObject*)pSour)->Get_ViewZ() > ((CGameObject*)pDest)->Get_ViewZ();
-	});
+		});
 
 
 	for (auto& pRenderObject : RenderObjects)
@@ -650,6 +823,13 @@ HRESULT CRenderer::Render_Result()
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_NonLight"), "g_NonLightTexture")))
 		return E_FAIL;
 
+	// 림 라이트 + 카메라 포지션
+	if (FAILED(m_pShader->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_RimLight"), "g_RimLightTexture")))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fRimWidth", &m_fRimWidth, sizeof(_float))))
+		return E_FAIL;
 
 	// 섞을 스카이 박스
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Sky"), "g_SkyTexture")))
@@ -683,9 +863,10 @@ HRESULT CRenderer::Render_Result()
 	return S_OK;
 }
 
-HRESULT CRenderer::Render_Blur_Result(_float fTimeDelta)
-{  
-	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_ColorCorrrection"))))
+HRESULT CRenderer::Render_Radial_Result(_float fTimeDelta)
+{
+	// DOF에 담는다.
+	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_DOFBlur"))))
 		return E_FAIL;
 
 	if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
@@ -695,7 +876,7 @@ HRESULT CRenderer::Render_Blur_Result(_float fTimeDelta)
 	if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
-	// 최종 작업물 던지기
+	// 레디얼 블러를 적용시킬 텍스쳐를 던진다.
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_RadialBlur"), "g_RadialBlur")))
 		return E_FAIL;
 
@@ -710,8 +891,74 @@ HRESULT CRenderer::Render_Blur_Result(_float fTimeDelta)
 	if (FAILED(m_pShader->Bind_RawValue("g_fRadialblurCenter", &m_vScreenPos, sizeof(_float2))))
 		return E_FAIL;
 
-
+	// 레디얼 블러를 적용시킨다.
 	m_pShader->Begin(DEFERRED_BLUR_R);
+
+	m_pVIBuffer->Bind_Buffers();
+
+	m_pVIBuffer->Render();
+
+	if (FAILED(m_pGameInstance->End_MRT()))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CRenderer::Render_DOF_Result()
+{
+	// 모션블러에 담는다.
+	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_MotionBlur"))))
+		return E_FAIL;
+
+	if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+		return E_FAIL;
+
+	// DOF를 적용시킬 텍스쳐를 던진다.
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_DOFBlur"), "g_DOFBlur")))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_vDOFFocus", &m_vDofFocus, sizeof(_float2))))
+		return E_FAIL;
+
+
+	// DOF 를 적용시킨다.
+	m_pShader->Begin(8);
+
+	m_pVIBuffer->Bind_Buffers();
+
+	m_pVIBuffer->Render();
+
+	if (FAILED(m_pGameInstance->End_MRT()))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CRenderer::Render_MotionBlur()
+{
+	// 최종 컬러 보정할 최종 MRT에 담는다.
+	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_ColorCorrrection"))))
+		return E_FAIL;
+
+	if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+		return E_FAIL;
+
+	// 모션 블러를 적용시킬 원본 텍스쳐를 던진다.
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_DiffuseMotionBlur"), "g_DiffuseMotionBlur")))
+		return E_FAIL;
+	// 모션 블러의 정보(방향 벨로시티)를 가진것을 던진다.
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_MotionBlur"), "g_MotionBlur")))
+		return E_FAIL;
+
+	// 모션 블러를 적용시킨다.
+	m_pShader->Begin(9);
 
 	m_pVIBuffer->Bind_Buffers();
 
@@ -732,6 +979,10 @@ HRESULT CRenderer::Render_FinalResult()
 	if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
+
+#pragma region 색감 보정 변수 바인딩
+
+
 	if (FAILED(m_pShader->Bind_RawValue("g_bApplyCorrection", &m_bApplyCorrection, sizeof(_bool))))
 		return E_FAIL;
 
@@ -748,18 +999,35 @@ HRESULT CRenderer::Render_FinalResult()
 		return E_FAIL;
 	if (FAILED(m_pShader->Bind_RawValue("g_fVibrance", &m_fVibrance, sizeof(_float))))
 		return E_FAIL;
-	if (FAILED(m_pShader->Bind_RawValue("g_fVibrance", &m_fVibrance, sizeof(_float))))
-		return E_FAIL;
 
 	if (FAILED(m_pShader->Bind_RawValue("g_fContrast", &m_fContrast, sizeof(_float))))
 		return E_FAIL;
 
-	if(FAILED(m_pShader->Bind_RawValue("g_vColorBalance", m_vColorBalance, sizeof(_float3))))
+	if (FAILED(m_pShader->Bind_RawValue("g_vColorBalance", m_vColorBalance, sizeof(_float3))))
 		return E_FAIL;
-	if(FAILED(m_pShader->Bind_RawValue("g_vWhiteBalance", m_vWhiteBalance, sizeof(_float3))))
+	if (FAILED(m_pShader->Bind_RawValue("g_vWhiteBalance", m_vWhiteBalance, sizeof(_float3))))
 		return E_FAIL;
 
 
+
+	if (FAILED(m_pShader->Bind_RawValue("g_fShadowThreshold", &m_fShadowThreshold, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fHighlightThreshold", &m_fHighlightThreshold, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_vShadowColor", &m_vShadowColor, sizeof(_float3))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fShadowIntensity", &m_fShadowIntensity, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_vMidtoneColor", &m_vMidtoneColor, sizeof(_float3))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fMidtoneIntensity", &m_fMidtoneIntensity, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_vHighlightColor", &m_vHighlightColor, sizeof(_float3))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fHighlightIntensity", &m_fHighlightIntensity, sizeof(_float))))
+		return E_FAIL;
+
+#pragma endregion
 
 	// 최종 작업물 던지기
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Final"), "g_FinalTexture")))
@@ -770,9 +1038,6 @@ HRESULT CRenderer::Render_FinalResult()
 	m_pVIBuffer->Bind_Buffers();
 
 	m_pVIBuffer->Render();
-
-	//if (FAILED(m_pGameInstance->End_MRT()))
-	//	return E_FAIL;
 
 
 	return S_OK;
@@ -806,13 +1071,21 @@ HRESULT CRenderer::Render_SuperUI()
 
 void CRenderer::Render_IMGUI()
 {
+
+	if (m_pGameInstance->Get_KeyState(DIK_1, KEY_DOWN))
+		Set_ColorSet(Find_ColorSet("Default"));
+	if (m_pGameInstance->Get_KeyState(DIK_2, KEY_DOWN))
+		Set_ColorSet(Find_ColorSet("Tutorial"));
+	if (m_pGameInstance->Get_KeyState(DIK_3, KEY_DOWN))
+		Set_ColorSet(Find_ColorSet("Night"));
+
 	ImGui::Begin(u8"컬러 코렉션");
 
 	ImGui::Checkbox(u8"적용", &m_bApplyCorrection);
 
 
 	ImGui::DragFloat(u8"노출", &m_fExposure, .01f, 0.f, 3.f, "%.2f");
-	ImGui::DragFloat(u8"색조", &m_fHue, .01f, 0.f, 1.5f, "%.2f");
+	//ImGui::DragFloat(u8"색조", &m_fHue, .01f, 0.f, 1.5f, "%.2f");
 	ImGui::DragFloat(u8"채도", &m_fSaturation, .01f, 0.f, 2.f, "%.2f");
 	ImGui::DragFloat(u8"명도", &m_fBrightness, .01f, 0.f, 3.f, "%.2f");
 	ImGui::DragFloat(u8"감마", &m_fGamma, .01f, 0.f, 3.f, "%.2f");
@@ -822,8 +1095,125 @@ void CRenderer::Render_IMGUI()
 	ImGui::DragFloat3(u8"화이트 밸런스", m_vWhiteBalance, .01f, 0.f, 3.f, "%.2f");
 	ImGui::DragFloat3(u8"색상 균형", m_vColorBalance, .01f, 0.f, 3.f, "%.2f");
 
+	ImGui::ColorEdit3(u8"그림자 색상", m_vShadowColor);
+	ImGui::DragFloat(u8"그림자 세기", &m_fShadowIntensity, .01f, 0.f, 1.f, "%.2f");
+
+	ImGui::ColorEdit3(u8"중간 색상", m_vMidtoneColor);
+	ImGui::DragFloat(u8"중간 세기", &m_fMidtoneIntensity, .01f, 0.f, 1.f, "%.2f");
+
+	ImGui::ColorEdit3(u8"하이라이트 색상", m_vHighlightColor);
+	ImGui::DragFloat(u8"하이라이트 세기", &m_fHighlightIntensity, .01f, 0.f, 1.f, "%.2f");
+
+	ImGui::DragFloat(u8"그림자 임계", &m_fShadowThreshold, .01f, 0.f, 1.f, "%.2f");
+	ImGui::DragFloat(u8"하이라이트 임계", &m_fHighlightThreshold, .01f, 0.f, 1.f, "%.2f");
+
+
+	ostringstream oss;
+	oss << m_fExposure << ", "
+		<< m_fHue << ", "
+		<< m_fSaturation << ", "
+		<< m_fBrightness << ", "
+		<< m_fGamma << ", "
+		<< m_fVibrance << ", "
+		<< m_fContrast << ", "
+		<< m_vWhiteBalance[0] << ", " << m_vWhiteBalance[1] << ", " << m_vWhiteBalance[2] << ", "
+		<< m_vColorBalance[0] << ", " << m_vColorBalance[1] << ", " << m_vColorBalance[2] << ", "
+		<< m_vShadowColor[0] << ", " << m_vShadowColor[1] << ", " << m_vShadowColor[2] << ", "
+		<< m_fShadowIntensity << ", "
+		<< m_vMidtoneColor[0] << ", " << m_vMidtoneColor[1] << ", " << m_vMidtoneColor[2] << ", "
+		<< m_fMidtoneIntensity << ", "
+		<< m_vHighlightColor[0] << ", " << m_vHighlightColor[1] << ", " << m_vHighlightColor[2] << ", "
+		<< m_fHighlightIntensity << ", "
+		<< m_fShadowThreshold << ", "
+		<< m_fHighlightThreshold;
+
+	std::string colorDataStr = oss.str();
+
+	// ImGui 텍스트 박스에 표시
+	ImGui::InputTextMultiline("Color Data", &colorDataStr[0], colorDataStr.size() + 1, ImVec2(-FLT_MIN, ImGui::GetTextLineHeight() * 16), ImGuiInputTextFlags_ReadOnly);
+
+
 	ImGui::End();
 
+}
+
+void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
+{
+	_float fInterpolateSpeed = 3.f * _fTimeDelta;
+
+	if (m_DestColorData.fExposure != -1.f)
+		m_fExposure += (m_DestColorData.fExposure - m_fExposure) * fInterpolateSpeed;
+
+	if (m_DestColorData.fHue != -1.f)
+		m_fHue += (m_DestColorData.fHue - m_fHue) * fInterpolateSpeed;
+
+	if (m_DestColorData.fSaturation != -1.f)
+		m_fSaturation += (m_DestColorData.fSaturation - m_fSaturation) * fInterpolateSpeed;
+
+	if (m_DestColorData.fBrightness != -1.f)
+		m_fBrightness += (m_DestColorData.fBrightness - m_fBrightness) * fInterpolateSpeed;
+
+	if (m_DestColorData.fGamma != -1.f)
+		m_fGamma += (m_DestColorData.fGamma - m_fGamma) * fInterpolateSpeed;
+
+	if (m_DestColorData.fVibrance != -1.f)
+		m_fVibrance += (m_DestColorData.fVibrance - m_fVibrance) * fInterpolateSpeed;
+
+	if (m_DestColorData.fContrast != -1.f)
+		m_fContrast += (m_DestColorData.fContrast - m_fContrast) * fInterpolateSpeed;
+
+	if (m_DestColorData.fShadowIntensity != -1.f)
+		m_fShadowIntensity += (m_DestColorData.fShadowIntensity - m_fShadowIntensity) * fInterpolateSpeed;
+
+	if (m_DestColorData.fMidtoneIntensity != -1.f)
+		m_fMidtoneIntensity += (m_DestColorData.fMidtoneIntensity - m_fMidtoneIntensity) * fInterpolateSpeed;
+
+	if (m_DestColorData.fHighlightIntensity != -1.f)
+		m_fHighlightIntensity += (m_DestColorData.fHighlightIntensity - m_fHighlightIntensity) * fInterpolateSpeed;
+
+	if (m_DestColorData.fShadowThreshold != -1.f)
+		m_fShadowThreshold += (m_DestColorData.fShadowThreshold - m_fShadowThreshold) * fInterpolateSpeed;
+
+	if (m_DestColorData.fHighlightThreshold != -1.f)
+		m_fHighlightThreshold += (m_DestColorData.fHighlightThreshold - m_fHighlightThreshold) * fInterpolateSpeed;
+
+
+
+
+	if (m_DestColorData.vWhiteBalance[0] != -1.f)
+	{
+		m_vWhiteBalance[0] += (m_DestColorData.vWhiteBalance[0] - m_vWhiteBalance[0]) * fInterpolateSpeed;
+		m_vWhiteBalance[1] += (m_DestColorData.vWhiteBalance[1] - m_vWhiteBalance[1]) * fInterpolateSpeed;
+		m_vWhiteBalance[2] += (m_DestColorData.vWhiteBalance[2] - m_vWhiteBalance[2]) * fInterpolateSpeed;
+	}
+
+	if (m_DestColorData.vColorBalance[0] != -1.f)
+	{
+		m_vColorBalance[0] += (m_DestColorData.vColorBalance[0] - m_vColorBalance[0]) * fInterpolateSpeed;
+		m_vColorBalance[1] += (m_DestColorData.vColorBalance[1] - m_vColorBalance[1]) * fInterpolateSpeed;
+		m_vColorBalance[2] += (m_DestColorData.vColorBalance[2] - m_vColorBalance[2]) * fInterpolateSpeed;
+	}
+
+	if (m_DestColorData.vShadowColor[0] != -1.f)
+	{
+		m_vShadowColor[0] += (m_DestColorData.vShadowColor[0] - m_vShadowColor[0]) * fInterpolateSpeed;
+		m_vShadowColor[1] += (m_DestColorData.vShadowColor[1] - m_vShadowColor[1]) * fInterpolateSpeed;
+		m_vShadowColor[2] += (m_DestColorData.vShadowColor[2] - m_vShadowColor[2]) * fInterpolateSpeed;
+	}
+
+	if (m_DestColorData.vMidtoneColor[0] != -1.f)
+	{
+		m_vMidtoneColor[0] += (m_DestColorData.vMidtoneColor[0] - m_vMidtoneColor[0]) * fInterpolateSpeed;
+		m_vMidtoneColor[1] += (m_DestColorData.vMidtoneColor[1] - m_vMidtoneColor[1]) * fInterpolateSpeed;
+		m_vMidtoneColor[2] += (m_DestColorData.vMidtoneColor[2] - m_vMidtoneColor[2]) * fInterpolateSpeed;
+	}
+
+	if (m_DestColorData.vHighlightColor[0] != -1.f)
+	{
+		m_vHighlightColor[0] += (m_DestColorData.vHighlightColor[0] - m_vHighlightColor[0]) * fInterpolateSpeed;
+		m_vHighlightColor[1] += (m_DestColorData.vHighlightColor[1] - m_vHighlightColor[1]) * fInterpolateSpeed;
+		m_vHighlightColor[2] += (m_DestColorData.vHighlightColor[2] - m_vHighlightColor[2]) * fInterpolateSpeed;
+	}
 }
 
 
@@ -836,7 +1226,7 @@ HRESULT CRenderer::Render_Debug()
 		if (nullptr != pDebugCom)
 			pDebugCom->Render();
 
-		Safe_Release(pDebugCom);		
+		Safe_Release(pDebugCom);
 	}
 	m_DebugComponents.clear();
 
@@ -866,15 +1256,19 @@ HRESULT CRenderer::Render_Debug()
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Draw_RTVDebug(TEXT("MRT_NonLight"), m_pShader, m_pVIBuffer)))
 		return E_FAIL;
+	if (FAILED(m_pGameInstance->Draw_RTVDebug(TEXT("MRT_DOFBlur"), m_pShader, m_pVIBuffer)))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Draw_RTVDebug(TEXT("MRT_MotionBlur"), m_pShader, m_pVIBuffer)))
+		return E_FAIL;
 
-	return S_OK;	
+	return S_OK;
 }
 
 #endif
 
-CRenderer * CRenderer::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CRenderer* CRenderer::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	CRenderer*		pInstance = new CRenderer(pDevice, pContext);
+	CRenderer* pInstance = new CRenderer(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize()))
 	{
@@ -894,9 +1288,9 @@ void CRenderer::Free()
 
 	for (auto& RenderList : m_RenderObjects)
 	{
-		for (auto& pRenderObject : RenderList)		
+		for (auto& pRenderObject : RenderList)
 			Safe_Release(pRenderObject);
-		RenderList.clear();		
+		RenderList.clear();
 	}
 
 

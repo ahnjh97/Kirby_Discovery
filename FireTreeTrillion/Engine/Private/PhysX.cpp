@@ -162,6 +162,16 @@ void CPhysX::SetUp_TriggerFunc(_int iTriggerType, function<void(_int)> func)
     pEventCallBack->SetUp_TriggerFunc(iTriggerType, func);
 }
 
+void CPhysX::Clear_EventCallBack()
+{
+    if (nullptr == m_pScene)
+        return;
+    CEventCallBack* pEventCallBack = dynamic_cast<CEventCallBack*>(m_pScene->getSimulationEventCallback());
+    if (nullptr == pEventCallBack)
+        return;
+    pEventCallBack->Clear_EventCallBack();
+}
+
 //physx::PxMaterial* CPhysX::FindMaterial(const string& strMtrlTag)
 //{
 //    //auto itr = m_pMaterials.find(strMtrlTag);

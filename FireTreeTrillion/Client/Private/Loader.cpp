@@ -18,6 +18,10 @@
 #include "Trigger.h"
 #include "Grid.h"
 
+
+//스카이 스피어
+#include "SkySphere.h"
+
 #pragma region TOOL_UI
 
 #include "TestUI.h"
@@ -164,6 +168,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MultiEffect"), CMultiEffect);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Particle"), CParticle);
 
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SkySphere"), CSkySphere);
+
 	// MapTool GameObject Prototypes
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Grid"), CGrid);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BasicMap"), CBasicMap);
@@ -267,7 +273,8 @@ HRESULT CLoader::Loading_For_GamePlay()
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Moon", "Moon.png")))
 		return E_FAIL;
-
+	if(FAILED(Add_Texture(eLevel, "GsLandTopNoize_Fur", "Map/GsLandTopNoize_Fur.dds")))
+		return E_FAIL;
 
 	// 커비 얼굴 텍스쳐 로드
 	Add_KirbyFaceTexture(eLevel);
@@ -364,6 +371,8 @@ HRESULT CLoader::Loading_For_Tool_Map()
 	LEVEL eLevel = LEVEL_TOOL_MAP;
 
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
+	if (FAILED(Add_Texture(eLevel, "GsLandTopNoize_Fur", "Map/GsLandTopNoize_Fur.dds")))
+		return E_FAIL;
 
 	m_strLoadingText = TEXT("VI버퍼(을) 로딩 중 입니다.");
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Grid"),
@@ -435,12 +444,15 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	// MODEL 구조체 생성자 기본 값  : ""			  / TYPE_END /  1.f  /    0.f     / 4
 	if (eLevel == LEVEL_STATIC)
 	{
-		m_vecModelInfo.emplace_back("SmokeCenter", TYPE_NONANIM);
-		m_vecModelInfo.emplace_back("SmokeFadeLarge", TYPE_NONANIM);
-		m_vecModelInfo.emplace_back("SmokeOriginal", TYPE_NONANIM);
-		m_vecModelInfo.emplace_back("SmokeSplit", TYPE_NONANIM);
+		//sky sphere
+		m_vecModelInfo.emplace_back("SkySphere_Stage1_Day", TYPE_NONANIM );
+
+		m_vecModelInfo.emplace_back("SmokeCenter", TYPE_NONANIM );
+		m_vecModelInfo.emplace_back("SmokeFadeLarge", TYPE_NONANIM );
+		m_vecModelInfo.emplace_back("SmokeOriginal", TYPE_NONANIM );
+		m_vecModelInfo.emplace_back("SmokeSplit", TYPE_NONANIM );
 		m_vecModelInfo.emplace_back("SmokeTail", TYPE_NONANIM);
-		m_vecModelInfo.emplace_back("Tornado", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("Tornado", TYPE_NONANIM );
 
 	}
 	else if (eLevel == LEVEL_LOGO)

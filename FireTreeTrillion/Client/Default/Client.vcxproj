@@ -209,6 +209,7 @@
     <ClInclude Include="..\Public\Rabbit.h" />
     <ClInclude Include="..\Public\Rabbit_State.h" />
     <ClInclude Include="..\Public\SingleEffect.h" />
+    <ClInclude Include="..\public\SkySphere.h" />
     <ClInclude Include="..\Public\TestModel.h" />
     <ClInclude Include="..\Public\TestModel_State.h" />
     <ClInclude Include="..\Public\TestTerrain.h" />
@@ -217,6 +218,7 @@
     <ClInclude Include="..\Public\TestUI.h" />
     <ClInclude Include="..\Public\Trigger.h" />
     <ClInclude Include="..\Public\UI_Editor.h" />
+    <ClInclude Include="..\public\WaddleDee.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -261,6 +263,7 @@
     <ClCompile Include="..\Private\Rabbit.cpp" />
     <ClCompile Include="..\Private\Rabbit_State.cpp" />
     <ClCompile Include="..\Private\SingleEffect.cpp" />
+    <ClCompile Include="..\private\SkySphere.cpp" />
     <ClCompile Include="..\Private\TestModel.cpp" />
     <ClCompile Include="..\Private\TestModel_State.cpp" />
     <ClCompile Include="..\Private\TestTerrain.cpp" />
@@ -269,6 +272,7 @@
     <ClCompile Include="..\Private\TestUI.cpp" />
     <ClCompile Include="..\Private\Trigger.cpp" />
     <ClCompile Include="..\Private\UI_Editor.cpp" />
+    <ClCompile Include="..\private\WaddleDee.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

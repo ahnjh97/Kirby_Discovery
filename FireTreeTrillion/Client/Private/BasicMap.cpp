@@ -82,6 +82,7 @@ HRESULT CBasicMap::Render()
     if (FAILED(Bind_ShaderResources()))
         return E_FAIL;
 
+
     _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 
     for (size_t i = 0; i < iNumMeshes; i++)
@@ -142,6 +143,11 @@ HRESULT CBasicMap::Add_Components(const wstring& _wstrModelTag)
         TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
         return E_FAIL;
 
+    /* For. Com_Texture */
+    if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Texture_GsLandTopNoize_Fur"),
+        TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -152,10 +158,11 @@ HRESULT CBasicMap::Bind_ShaderResources()
 
     if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
         return E_FAIL;
-
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
+        return E_FAIL;
+    if (FAILED(m_pTextureCom->Bind_ShaderResources(m_pShaderCom, "g_NoiseTexture")))
         return E_FAIL;
 
     return S_OK;
@@ -266,6 +273,7 @@ void CBasicMap::Free()
 {
     __super::Free();
     Safe_Release(m_pBlendMap);
+    Safe_Release(m_pTextureCom);
 
     Safe_Release(m_pShaderCom);
     Safe_Release(m_pModelCom);

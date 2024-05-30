@@ -60,10 +60,10 @@ _int CBackGround::Tick(_float fTimeDelta)
 
 void CBackGround::Late_Tick(_float fTimeDelta)
 {
-	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this);
+	//m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this);
 
 	// UI들은 이제 RENDER_UI로 지정해서 사용해주시면됩니다~
-	//m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_UI, this);
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_UI, this);
 }
 
 HRESULT CBackGround::Render()

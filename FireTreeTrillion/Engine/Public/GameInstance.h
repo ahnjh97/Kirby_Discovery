@@ -46,6 +46,7 @@ public: /* For.Renderer */
 	void Setting_RadialBlur(_float fRadial, _float fSubtraction = 70.f);
 	HRESULT Render_LightDepth_For_GameObject(class CShader* pShader, class CTransform* pTransform, class CModel* pModel);
 	void Update_LightShadow(_fvector vLightPos, _fvector vFocusPos);
+	void Update_DofFocus(_fvector vWorldPos);
 
 
 #ifdef _DEBUG
@@ -65,6 +66,7 @@ public: /* For.Object_Manager */
 	list<CGameObject*>* Get_List(_uint iLevelIndex, const wstring& strLayerTag);
 
 	class CGameObject*	Get_GameObject(_uint iLevelIndex, const wstring& strLayerTag, _uint iIndex);
+	class CGameObject*	Get_GameObject(_uint iLevelIndex, const wstring& wstrLayerTag);
 	class CGameObject*	Get_GameObject_ByTag(_uint iLevelIndex, const wstring& strLayerTag, wstring _tag);
 	void				Set_CurrentLevel(_int CurrentLevel);
 	void	Clear_Layer(_uint iLevelIndex, const wstring& wstrLayerTag);
@@ -91,7 +93,7 @@ public: /* For.PipeLine */
 	HRESULT Add_Camera(class CCamera* pCamera);
 	HRESULT Switch_CurCamera(_int iIdx);
 	void Clear_Camera();
-	CCamera* Get_CurCameraPtr();
+	class CCamera* Get_CurCameraPtr();
 	_matrix Get_Transform_Matrix(CPipeLine::TRANSFORMSTATE eState) const;
 	_float4x4 Get_Transform_Float4x4(CPipeLine::TRANSFORMSTATE eState) const;
 	_matrix Get_Transform_Matrix_Inverse(CPipeLine::TRANSFORMSTATE eState) const;
@@ -173,6 +175,7 @@ public: /* For.PhysX */
 	void Register_Player(PxActor* pPlayerActor);
 	void Register_Trigger(PxActor* pTriggerActor, _int iTriggerType, _int iTriggerIndex);
 	void SetUp_TriggerFunc(_int iTriggerType, function<void(_int)> func);
+	void Clear_EventCallBack();
 
 public: /* For. Picking */
 	void Transform_PickingToLocalSpace(const class CTransform* pTransform, _Out_ _float3* pRayDir, _Out_ _float3* pRayPos);

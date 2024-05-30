@@ -7,6 +7,12 @@ texture2D   g_MaskTexture;
 texture2D	g_NormalTexture;
 uint        g_iTriggerType;
 
+
+bool g_bStencil;
+bool g_bRimLight;
+bool g_bMotionBlur;
+float4 g_vMotionVelocity;
+
 struct VS_IN
 {
 	float3		vPosition : POSITION;
@@ -70,6 +76,7 @@ struct PS_OUT
     float4 vRimLight : SV_TARGET3;
     float4 vFieldDepth : SV_TARGET4;
     float4 vStencil : SV_TARGET5;
+    float4 vMotionBlur : SV_TARGET6;
 };
 
 struct PS_OUT_EFFECT
@@ -111,7 +118,16 @@ PS_OUT PS_MAIN(PS_IN In)
 	Out.vDiffuse = vMtrlDiffuse;
 	Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
-	//Out.vFieldDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 0.0f);
+    
+    if (g_bStencil == true)
+        Out.vStencil = vector(1.f, 0.f, 0.0f, 1.f);
+    
+    if (g_bRimLight == true)
+        Out.vRimLight = vector(0.f, 0.f, 1.f, 1.f);
+
+    if (g_bMotionBlur == true)
+        Out.vMotionBlur = g_vMotionVelocity;
+    
 	return Out;
 }
 
@@ -126,7 +142,16 @@ PS_OUT NO_NORMALMAP_PS_MAIN(PS_IN In)
     Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
-    //Out.vStencil = vector(1.f, 0.f, 0.f, 1.f);
+    
+    if (g_bStencil == true)
+        Out.vStencil = vector(1.f, 0.f, 0.0f, 1.f);
+    
+    if (g_bRimLight == true)
+        Out.vRimLight = vector(0.f, 0.f, 1.f, 1.f);
+
+    if (g_bMotionBlur == true)
+        Out.vMotionBlur = g_vMotionVelocity;
+    
     return Out;
 }
 
@@ -233,7 +258,7 @@ technique11 DefaultTechnique
 	// 스카이박스 ( 3 )
     pass SKY
     {
-        SetRasterizerState(RS_Sky);
+        SetRasterizerState(RS_NonCull);
         SetDepthStencilState(DSS_Sky, 0);
         SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 

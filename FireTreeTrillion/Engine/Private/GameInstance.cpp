@@ -298,6 +298,15 @@ void CGameInstance::Update_LightShadow(_fvector vLightPos, _fvector vFocusPos)
 	m_pRenderer->Update_LightShadow(vLightPos, vFocusPos);
 }
 
+void CGameInstance::Update_DofFocus(_fvector vWorldPos)
+{
+	if (nullptr == m_pRenderer)
+		return;
+
+	m_pRenderer->Update_DofFocus(vWorldPos);
+
+}
+
 HRESULT CGameInstance::Add_DebugComponents(CComponent * pRenderComponent)
 {
 
@@ -364,7 +373,7 @@ void CGameInstance::Clear_Layer(_uint iLevelIndex, const wstring& wstrLayerTag)
 	if (nullptr == m_pObject_Manager)
 		return;
 
-	return m_pObject_Manager->Clear_Layer(iLevelIndex, wstrLayerTag);
+	m_pObject_Manager->Clear_Layer(iLevelIndex, wstrLayerTag);
 }
 
 _uint CGameInstance::Get_GameObject_Num(_uint _iLevelIndex, const wstring& _strLayerTag)
@@ -377,6 +386,12 @@ CGameObject* CGameInstance::Get_GameObject(_uint iLevelIndex, const wstring& str
 {
 	CHECK_NULLPTR(m_pObject_Manager);
 	return m_pObject_Manager->Get_GameObject(iLevelIndex, strLayerTag, iIndex);
+}
+
+CGameObject* CGameInstance::Get_GameObject(_uint iLevelIndex, const wstring& wstrLayerTag)
+{
+	CHECK_NULLPTR(m_pObject_Manager);
+	return m_pObject_Manager->Get_GameObject(iLevelIndex, wstrLayerTag);
 }
 
 CGameObject* CGameInstance::Get_GameObject_ByTag(_uint iLevelIndex, const wstring& strLayerTag, wstring _tag)
@@ -828,6 +843,12 @@ void CGameInstance::SetUp_TriggerFunc(_int iTriggerType, function<void(_int)> fu
 {
 	if (nullptr != m_pPhysx)
 		m_pPhysx->SetUp_TriggerFunc(iTriggerType, func);
+}
+
+void CGameInstance::Clear_EventCallBack()
+{
+	if (nullptr != m_pPhysx)
+		m_pPhysx->Clear_EventCallBack();
 }
 
 void CGameInstance::Transform_PickingToLocalSpace(const CTransform* pTransform, _float3* pRayDir, _float3* pRayPos)
