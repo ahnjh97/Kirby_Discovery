@@ -43,7 +43,7 @@ private:
 
 public:
 	void Set_MatrixIndex(_int iMatrixIndex);
-	void EmplaceBackCamMatrix(_float4x4 matWorld) { m_vecCamMatrices.emplace_back(matWorld); }
+	void EmplaceBackCamMatrix(const _float4x4& matWorld);
 
 private:
 	_float			m_fMouseSensor = { 0.0f };
