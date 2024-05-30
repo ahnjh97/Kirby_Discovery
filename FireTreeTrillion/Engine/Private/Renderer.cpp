@@ -342,7 +342,8 @@ HRESULT CRenderer::Initialize()
 
 #endif
 
-
+	function<void(_int)> TriggerFunc = bind(&CRenderer::Set_ColorSet_ByIndex, this, placeholders::_1);
+	m_pGameInstance->SetUp_TriggerFunc(1, TriggerFunc);
 	return S_OK;
 }
 
@@ -453,7 +454,7 @@ void CRenderer::Set_ColorSet(COLOR_DATA destColorData)
 	m_DestColorData = destColorData;
 }
 
-void CRenderer::Set_ColorSet(_int iSetIdx)
+void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 {
 	switch (iSetIdx)
 	{

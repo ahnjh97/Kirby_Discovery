@@ -44,6 +44,10 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 	if (nullptr == m_pLight_Manager)
 		return E_FAIL;
 
+	m_pPhysx = CPhysX::Create();
+	if (nullptr == m_pPhysx)
+		return E_FAIL;
+
 	/*m_pFont_Manager = CFont_Manager::Create(*ppGraphic_Device);
 	if (nullptr == m_pFont_Manager)
 		return E_FAIL;
@@ -58,10 +62,6 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 
 	m_pRenderer = CRenderer::Create(*ppDevice, *ppContext);
 	if (nullptr == m_pRenderer)
-		return E_FAIL;
-
-	m_pPhysx = CPhysX::Create();
-	if (nullptr == m_pPhysx)
 		return E_FAIL;
 
 	m_pLevel_Manager = CLevel_Manager::Create();

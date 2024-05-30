@@ -142,18 +142,26 @@ void CCamera_Free::Set_MatrixIndex(_int iMatrixIndex)
 	if (nullptr == m_pTransformCom || m_vecCamMatrices.empty())
 		return;
 
-	if (iMatrixIndex < 0 || iMatrixIndex == m_iMatrixIndex)
+	if (iMatrixIndex < 0 || iMatrixIndex == m_iMatrixIndex || iMatrixIndex > m_vecCamMatrices.size())
 		return;
 
-	if (iMatrixIndex < m_vecCamMatrices.size()) {
-		m_pTransformCom->Set_WorldMatrix(m_vecCamMatrices[iMatrixIndex]);
-		m_iMatrixIndex = iMatrixIndex;
-	}	
+	m_pTransformCom->Set_WorldMatrix(m_vecCamMatrices[iMatrixIndex]);
+	m_iMatrixIndex = iMatrixIndex;
 }
 
 void CCamera_Free::EmplaceBackCamMatrix(const _float4x4& matWorld)
 {
 	m_vecCamMatrices.emplace_back(matWorld);
+}
+
+void CCamera_Free::Lerp_ToNextCamMatrix(_int iMatrixIndex)
+{
+	if (nullptr == m_pTransformCom || m_vecCamMatrices.empty())
+		return;
+
+	if (iMatrixIndex < 0 || iMatrixIndex == m_iMatrixIndex || iMatrixIndex > m_vecCamMatrices.size())
+		return;
+
 }
 
 void CCamera_Free::Track_Target(_float fTimeDelta)

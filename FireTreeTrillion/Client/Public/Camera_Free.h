@@ -44,6 +44,7 @@ private:
 public:
 	void Set_MatrixIndex(_int iMatrixIndex);
 	void EmplaceBackCamMatrix(const _float4x4& matWorld);
+	void Lerp_ToNextCamMatrix(_int iMatrixIndex);
 
 private:
 	_float			m_fMouseSensor = { 0.0f };
