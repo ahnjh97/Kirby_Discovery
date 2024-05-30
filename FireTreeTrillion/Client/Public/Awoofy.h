@@ -2,7 +2,6 @@
 
 #include "Client_Defines.h"
 #include "Monster.h"
-#include <Kirby.h>
 
 BEGIN(Engine)
 class CModel;

@@ -172,6 +172,8 @@
     <ClInclude Include="..\Public\Awoofy_State.h" />
     <ClInclude Include="..\public\BackGround.h" />
     <ClInclude Include="..\Public\BasicMap.h" />
+    <ClInclude Include="..\Public\Buffahorn.h" />
+    <ClInclude Include="..\Public\Buffahorn_State.h" />
     <ClInclude Include="..\public\Camera_Free.h" />
     <ClInclude Include="..\public\Camera_Main.h" />
     <ClInclude Include="..\Public\Character.h" />
@@ -225,6 +227,8 @@
     <ClCompile Include="..\Private\Awoofy_State.cpp" />
     <ClCompile Include="..\private\BackGround.cpp" />
     <ClCompile Include="..\Private\BasicMap.cpp" />
+    <ClCompile Include="..\Private\Buffahorn.cpp" />
+    <ClCompile Include="..\Private\Buffahorn_State.cpp" />
     <ClCompile Include="..\private\Camera_Free.cpp" />
     <ClCompile Include="..\private\Camera_Main.cpp" />
     <ClCompile Include="..\Private\Character.cpp" />

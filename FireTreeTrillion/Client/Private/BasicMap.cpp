@@ -112,6 +112,24 @@ HRESULT CBasicMap::Render()
     return S_OK;
 }
 
+void CBasicMap::Render_IMGUI()
+{
+    HRESULT hr;
+    static _bool bRabbit = false;
+    static _bool bCow = false;
+    if (ImGui::Checkbox("rabbit", &bRabbit))
+    {
+        hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, L"Layer_Monster", TEXT("Prototype_GameObject_Rabbit"));
+        CHECK_FAILED(hr);
+    }
+    if (ImGui::Checkbox("cow", &bCow))
+    {
+        hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, L"Layer_Monster", TEXT("Prototype_GameObject_Buffahorn"));
+        CHECK_FAILED(hr);
+    }
+
+}
+
 HRESULT CBasicMap::Add_Components(const wstring& _wstrModelTag)
 {
     /* For.Com_Shader */
