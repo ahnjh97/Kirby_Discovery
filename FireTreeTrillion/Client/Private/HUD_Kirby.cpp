@@ -59,7 +59,8 @@ void CHUD_Kirby::Late_Tick(_float fTimeDelta)
 
 HRESULT CHUD_Kirby::Render()
 {
-	if (FAILED(Bind_ShaderResources(m_pShaderCom, PS_ALPHABLEND, m_pTransformCom, m_pTextureCom, 7)))
+	// PS_ALPHABLEND > PS_DEFAULT·Î º¯°æ
+	if (FAILED(Bind_ShaderResources(m_pShaderCom, PS_DEFAULT, m_pTransformCom, m_pTextureCom, 7)))
 		return E_FAIL;
 
 	return S_OK;

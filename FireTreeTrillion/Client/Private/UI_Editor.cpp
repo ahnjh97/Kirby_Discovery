@@ -39,11 +39,9 @@ HRESULT CUI_Editor::Initialize(void* _pArg)
 
 #pragma region LOAD_FILEDATA
 
-	//string strFilePath = "../Bin/Resources/Data/UI/";
-	//if (Load_FileData(strFilePath + "Test_Origin.txt"))
-	//	MSG_BOX(TEXT("Successed to Load : FileData"));
-	//else
-	//	MSG_BOX(TEXT("Failed to Load : FileData"));
+	//에디터 첫 실행 시, 파일데이터 읽고 로드
+	string strFilePath = "../Bin/Resources/Data/UI/";
+	Load_FileData(strFilePath + "Test_Origin.txt");
 
 #pragma endregion
 
@@ -494,22 +492,22 @@ _bool CUI_Editor::Save_FileData(string _strFilePath)
 		//m_UIObjDesc = iter->Get_UIObj_Desc();
 		m_UIObjDesc = m_vecUIObj[i]->Get_UIObj_Desc();
 		wstring wstrUITag = m_UIObjDesc.wstrUITag;
-		wstring wstrNum = to_wstring(i);
+		//wstring wstrNum = to_wstring(i);
 
-		size_t wstrPos = wstrUITag.find(L"-"); //문자열 위치
+		//size_t wstrPos = wstrUITag.find(L"-"); //문자열 위치
 		//저장할 때 wstrUITag에 대한 예외처리
 		//if (wstrUITag == m_UIObjDesc.wstrUITag)
 		//{
 		//}
-		if (wstrPos != wstring::npos) //문자열 위치에 언더바가 존재할 경우
-		{
-			wstrUITag = wstrUITag.substr(0, wstrPos); //언더바 이전 문자열만 남김
-			++i;
-			wstrNum = to_wstring(i);
-			wstrUITag += TEXT("-") + wstrNum;
+		//if (wstrPos != wstring::npos) //문자열 위치에 언더바가 존재할 경우
+		//{
+		//	wstrUITag = wstrUITag.substr(0, wstrPos); //언더바 이전 문자열만 남김
+		//	++i;
+		//	wstrNum = to_wstring(i);
+		//	wstrUITag += TEXT("-") + wstrNum;
 
-		}
-		wstrUITag += TEXT("-") + wstrNum;
+		//}
+		//wstrUITag += TEXT("-") + wstrNum;
 
 		string strUITag = CUtils::WstrToStr(wstrUITag);
 		_uint iUITagLen = strUITag.length();
@@ -525,10 +523,6 @@ _bool CUI_Editor::Save_FileData(string _strFilePath)
 
 		//CUIObject* pUIObject = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(CUtils::StrToWstr(strProtoTag), &m_UIObjDesc));
 		//m_vecUIObj.push_back(pUIObject);
-		m_UIObjDesc.wstrUITag = CUtils::StrToWstr(strUITag);
-
-		CUIObject* pUIObject = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(CUtils::StrToWstr(strProtoTag), &m_UIObjDesc));
-		m_vecUIObj.push_back(pUIObject);
 	}
 
 	OutputFile.close();
@@ -568,11 +562,14 @@ _bool CUI_Editor::Load_FileData(const string& _strFilePath)
 
 	for (size_t i = 0; i < size; ++i)
 	{
-		string strProtoTag;
-		_uint iProtoTagLen;
+		string strProtoTag = {};
+		_uint iProtoTagLen = {};
 		InputFile.read(reinterpret_cast<char*>(&iProtoTagLen), sizeof(iProtoTagLen));
 		strProtoTag.resize(iProtoTagLen);
 		InputFile.read(&strProtoTag[0], iProtoTagLen);
+
+		if (0 == strProtoTag.size())
+			return FALSE;
 
 		string strUITag;
 		_uint iUITagLen; 
@@ -586,12 +583,11 @@ _bool CUI_Editor::Load_FileData(const string& _strFilePath)
 		InputFile.read(reinterpret_cast<char*>(&m_UIObjDesc.vPos), sizeof(m_UIObjDesc.vPos));
 		InputFile.read(reinterpret_cast<char*>(&m_UIObjDesc.fRaito), sizeof(m_UIObjDesc.fRaito));
 
-		//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_UI, TEXT("Layer_UI"), CUtils::StrToWstr(strProtoTag), &ProtoUI_Desc)))
-		//{
-		//	MSG_BOX(TEXT("Failed to Clone : UIObject"));
-		//	InputFile.close();
-		//	return FALSE;
-		//}
+		//list box용 태그 연동
+		m_UIObjDesc.wstrUITag = CUtils::StrToWstr(strUITag);
+
+		CUIObject* pUIObject = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(CUtils::StrToWstr(strProtoTag), &m_UIObjDesc));
+		m_vecUIObj.push_back(pUIObject);
 	}
 
 	InputFile.close();
@@ -637,3 +633,4 @@ void CUI_Editor::Free()
 
 	__super::Free();
 }
+;

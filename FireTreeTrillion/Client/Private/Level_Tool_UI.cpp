@@ -89,7 +89,7 @@ HRESULT CLevel_Tool_UI::Ready_Layer_UI(const wstring& strLayerTag)
 	CUIObject::UIOBJ_DESC HUD_KirbyDESC{};
 	HUD_KirbyDESC.wstrUITag = { TEXT("HUD_Kirby") };
 	HUD_KirbyDESC.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f };
-	HUD_KirbyDESC.vSize = { 10.f, 10.f };
+	HUD_KirbyDESC.vSize = { 100.f, 100.f };
 	HUD_KirbyDESC.vPos = {	HUD_KirbyDESC.vCenter.x/* - 200.f*/, 
 							HUD_KirbyDESC.vCenter.y/* - 200.f */ };
 	HUD_KirbyDESC.fRaito = { 0.f };
