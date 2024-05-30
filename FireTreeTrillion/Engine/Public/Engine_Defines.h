@@ -114,6 +114,7 @@ using namespace physx;
 #include <iostream>
 #include <fstream>
 #include <filesystem>
+#include <sstream>
 //#include <tchar.h>
 //#include <memory.h>
 #include <utility>

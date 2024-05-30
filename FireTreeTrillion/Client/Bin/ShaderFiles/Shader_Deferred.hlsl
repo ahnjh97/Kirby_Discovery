@@ -25,6 +25,16 @@ float3 g_vColorBalance = { 1.f, 1.f, 1.f };
 float3 g_vWhiteBalance = { .5f, .5f, .5f };
 float g_fContrast = .5f;
 
+//toner
+float3 g_vShadowColor = { 1.f, 1.f, 1.f};
+float g_fShadowIntensity = { 0.f };
+float3 g_vMidtoneColor = { 1.f, 1.f, 1.f };
+float g_fMidtoneIntensity = { 0.f };
+float3 g_vHighlightColor = { 1.f, 1.f, 1.f };
+float g_fHighlightIntensity = { 0.f };
+float g_fShadowThreshold = { .25f};
+float g_fHighlightThreshold = { .75f};
+
 static const float fWeight[13] =
 {
     0.0561, 0.1353, 0.278, 0.4868, 0.7261, 0.9231, 1,
@@ -186,10 +196,53 @@ float3 AdjustColorBalance(float3 vColor, float3 vBalance)
 {
     return vColor * vBalance;
 }
-float3 AdjustWhiteBalance(float3 color, float3 vWhitePoint)
+float3 AdjustWhiteBalance(float3 vColor, float3 vWhitePoint)
 {
-    return color / vWhitePoint;
+    return vColor / vWhitePoint;
 }
+float3 AdjustShadow(float3 vColor, float3 vShadowColor, float fShadowIntensity, float fLuminance)
+{
+    
+    float intensity = fShadowIntensity * smoothstep(g_fShadowThreshold - 0.1, g_fShadowThreshold, fLuminance);
+    return lerp(vColor, vShadowColor, intensity);
+    
+    
+    //if (g_fShadowThreshold < fLuminance )
+    //    fShadowIntensity *= pow( 1 - ((fLuminance - g_fShadowThreshold) * 10) , 1);
+
+    //return lerp(vColor, vShadowColor, fShadowIntensity );
+}
+
+float3 AdjustMidtone(float3 vColor, float3 vMidtoneColor, float fMidtoneIntensity, float fLuminance)
+{
+    
+    float lowerThreshold = g_fShadowThreshold;
+    float upperThreshold = g_fHighlightThreshold;
+    float intensity = fMidtoneIntensity * smoothstep(lowerThreshold, upperThreshold, fLuminance);
+    return lerp(vColor, vMidtoneColor, intensity);
+    
+    
+    //if ( fLuminance < g_fShadowThreshold)
+    //    fMidtoneIntensity *= pow((g_fShadowThreshold - fLuminance) * 10, 1);
+    //if (g_fHighlightThreshold < fLuminance)
+    //    fMidtoneIntensity *= pow(1 - (fLuminance - g_fHighlightThreshold) *10, 1);
+    
+    //return lerp(vColor, vMidtoneColor, fMidtoneIntensity);
+}
+
+float3 AdjustHighlight(float3 vColor, float3 vHighlightColor, float fHighlightIntensity, float fLuminance)
+{
+    
+    float intensity = fHighlightIntensity * smoothstep(g_fHighlightThreshold, g_fHighlightThreshold + 0.1, fLuminance);
+    return lerp(vColor, vHighlightColor, intensity);
+    
+    
+    //if (fLuminance < g_fHighlightThreshold)
+    //    fHighlightIntensity *= pow(( g_fHighlightThreshold - fLuminance) * 10 , 1);
+    
+    //return lerp(vColor, vHighlightColor, fHighlightIntensity);
+}
+
 struct VS_IN
 {
     float3 vPosition : POSITION;
@@ -384,7 +437,7 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
 	/* vLightDepthDesc.x * 2000.f : 현재 픽셀을 광원기준으로  그릴려고 했던 위치에 이미 그려져있떤 광원 기준의 깊이.  */
     if (vPosition.w > (vLightDepthDesc.x * 2000.f) && g_StencilTexture.Sample(LinearSampler, In.vTexcoord).x == 0.f)
     {
-        Out.vColor *= 0.2f;
+        Out.vColor *= 0.6f;
     }
     
 
@@ -477,9 +530,40 @@ PS_OUT PS_MAIN_COLORCORRECT(PS_IN In)
         //톤매핑
         vColor.rgb = ToneMapping(vColor.rgb, g_fExposure);
         
+        float fLuminance = dot(vColor.rgb, float3(0.299, 0.587, 0.114));
+        
+        float3 vTonerColor = 0.f;
+        //vTonerColor.rgb = vColor.rgb;
+        
+        int iTotalNum = 0;
+        if (fLuminance < g_fShadowThreshold + .1f)
+        {
+            vTonerColor += AdjustShadow(vColor.rgb, g_vShadowColor, g_fShadowIntensity, fLuminance) - vColor.rgb;
+            ++iTotalNum;
+            //vColor.rgb = AdjustShadow(vColor.rgb, g_vShadowColor, g_fShadowIntensity, fLuminance);
+        }
+        if (g_fShadowThreshold - .1f < fLuminance && fLuminance < g_fHighlightThreshold + .1f)
+        {
+            vTonerColor += AdjustMidtone(vColor.rgb, g_vMidtoneColor, g_fMidtoneIntensity, fLuminance) - vColor.rgb;
+            ++iTotalNum;
+            //vColor.rgb = AdjustMidtone(vColor.rgb, g_vMidtoneColor, g_fMidtoneIntensity, fLuminance);
+        }
+        if (g_fHighlightThreshold - .1f < fLuminance)
+        {
+            vTonerColor += AdjustHighlight(vColor.rgb, g_vHighlightColor, g_fHighlightIntensity, fLuminance) - vColor.rgb;
+            ++iTotalNum;
+            //vColor.rgb = AdjustHighlight(vColor.rgb, g_vHighlightColor, g_fHighlightIntensity, fLuminance);
+        }
+        
+        if(0 < iTotalNum)
+            vColor.rgb += (vTonerColor / iTotalNum);
+        
+        
         vColor.rgb = AdjustWhiteBalance(vColor.rgb, g_vWhiteBalance);
-    
+        
+        
         vColor.rgb = AdjustContrast(vColor.rgb, g_fContrast);
+        
         
         //Color Balance
         vColor.rgb = AdjustColorBalance(vColor.rgb, g_vColorBalance);
