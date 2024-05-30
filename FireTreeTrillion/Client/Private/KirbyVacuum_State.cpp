@@ -208,6 +208,7 @@ void CKirbyVacuum_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float f
 
 		// ¹Ù´Ú¿¡ ´ê¾Ò´Ù¸é
 		pController->FreeFall(pTransformCom, fTimeDelta, Kirbydesc->m_fGravityOffset);
+
 		if (pController->Is_Terrain())
 		{
 			pKirby->Change_State(CKirby::STATE_INHALELANDING, 50.f, false, true, CKirby::BODY_VACUUM);
@@ -223,13 +224,28 @@ void CKirbyVacuum_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float f
 	}
 	else if (pKirby->Get_State() == CKirby::STATE_INHALELANDING)
 	{
-		Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
+		if (JoyStick_controller(Kirbydesc, pCamera) == true)
+		{
+			Inhale_Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
+			Inhale_Moving_Logic(Kirbydesc, pTransformCom, pController, fTimeDelta);
+		}
+		else
+			Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
+
+		pController->FreeFall(pTransformCom, fTimeDelta, Kirbydesc->m_fGravityOffset);
 
 		//»ÇÀ× ³¡³ª¸é
 		if (pKirby->isAnimFinish())
 		{
 			if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS))
-				pKirby->Change_State(CKirby::STATE_INHALE, 50.f, true, true, CKirby::BODY_VACUUM);
+			{
+				if (DESC(m_fVacuumTime) > 1.2f)
+				{
+					pKirby->Change_State(CKirby::STATE_SUPERINHALESTART, 60.f, false, true, CKirby::BODY_VACUUM);
+				}
+				else
+					pKirby->Change_State(CKirby::STATE_INHALE, 50.f, true, true, CKirby::BODY_VACUUM);
+			}
 			else
 			{
 				DESC(m_fVacuumTime) = 0.f;
@@ -237,8 +253,6 @@ void CKirbyVacuum_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float f
 				pKirby->Change_State(CKirby::STATE_INHALEEND, 100.f, false, false, CKirby::BODY_VACUUM);
 			}
 		}
-
-		pController->FreeFall(pTransformCom, fTimeDelta, Kirbydesc->m_fGravityOffset);
 	}
 }
 
@@ -281,6 +295,13 @@ void CKirbyVacuum_VacuumWalk_State::OnStateUpdate(CGameObject* pGameObject, _flo
 	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 	pKirby->DefaultIdle();
+
+
+
+	if (pController->Compute_Height() > 2.f)
+	{
+		pKirby->Change_State(CKirby::STATE_INHALEFALL, 50.f, true, true, CKirby::BODY_VACUUM);
+	}
 
 	// »¡¾ÆµéÀÌ¸é¼­ °È±â
 	if (pKirby->Get_State() == CKirby::STATE_INHALEWALK)

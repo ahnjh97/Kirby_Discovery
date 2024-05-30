@@ -124,8 +124,6 @@ HRESULT CTestUI::Add_Components()
 
 HRESULT CTestUI::Bind_ShaderResources()
 {
-	HRESULT hr;
-
 	CHECK_NULLPTR(m_pShaderCom);
 
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))

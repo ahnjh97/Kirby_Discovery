@@ -5,6 +5,7 @@
 #include "Component_Manager.h"
 #include "PipeLine.h"
 #include "Utils.h"
+#include "ImGUI_Manager.h"
 
 BEGIN(Engine)
 
@@ -45,6 +46,7 @@ public: /* For.Renderer */
 	void Setting_RadialBlur(_float fRadial, _float fSubtraction = 70.f);
 	HRESULT Render_LightDepth_For_GameObject(class CShader* pShader, class CTransform* pTransform, class CModel* pModel);
 	void Update_LightShadow(_fvector vLightPos, _fvector vFocusPos);
+	void Update_DofFocus(_fvector vWorldPos);
 
 
 #ifdef _DEBUG
@@ -67,6 +69,8 @@ public: /* For.Object_Manager */
 	class CGameObject*	Get_GameObject_ByTag(_uint iLevelIndex, const wstring& strLayerTag, wstring _tag);
 	void				Set_CurrentLevel(_int CurrentLevel);
 	void	Clear_Layer(_uint iLevelIndex, const wstring& wstrLayerTag);
+	_uint				Get_GameObject_Num(_uint _iLevelIndex, const wstring& _strLayerTag);
+
 
 public: /* For.Component_Manager */
 	HRESULT			  Add_Prototype(_uint iLevelIndex, const wstring& strPrototypeTag, class CComponent* pPrototype);
@@ -88,7 +92,7 @@ public: /* For.PipeLine */
 	HRESULT Add_Camera(class CCamera* pCamera);
 	HRESULT Switch_CurCamera(_int iIdx);
 	void Clear_Camera();
-	CCamera* Get_CurCameraPtr();
+	class CCamera* Get_CurCameraPtr();
 	_matrix Get_Transform_Matrix(CPipeLine::TRANSFORMSTATE eState) const;
 	_float4x4 Get_Transform_Float4x4(CPipeLine::TRANSFORMSTATE eState) const;
 	_matrix Get_Transform_Matrix_Inverse(CPipeLine::TRANSFORMSTATE eState) const;
@@ -162,7 +166,7 @@ public: /* For.ImGui_Manager */
 	void		ImGui_Render();
 	void		EditTransform(/*const CCamera& camera,*/ _float4x4& _matrix);
 	void		RenderGrid();
-	void		Set_FileDialog();
+	CImGUI_Manager::FILE_MODE	Set_FileDialog();
 
 public: /* For.PhysX */
 	PxRigidDynamic* CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial = nullptr);

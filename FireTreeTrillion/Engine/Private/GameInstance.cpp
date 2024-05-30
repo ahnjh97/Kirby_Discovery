@@ -298,6 +298,15 @@ void CGameInstance::Update_LightShadow(_fvector vLightPos, _fvector vFocusPos)
 	m_pRenderer->Update_LightShadow(vLightPos, vFocusPos);
 }
 
+void CGameInstance::Update_DofFocus(_fvector vWorldPos)
+{
+	if (nullptr == m_pRenderer)
+		return;
+
+	m_pRenderer->Update_DofFocus(vWorldPos);
+
+}
+
 HRESULT CGameInstance::Add_DebugComponents(CComponent * pRenderComponent)
 {
 
@@ -365,6 +374,12 @@ void CGameInstance::Clear_Layer(_uint iLevelIndex, const wstring& wstrLayerTag)
 		return;
 
 	return m_pObject_Manager->Clear_Layer(iLevelIndex, wstrLayerTag);
+}
+
+_uint CGameInstance::Get_GameObject_Num(_uint _iLevelIndex, const wstring& _strLayerTag)
+{
+	CHECK_NULLPTR(m_pObject_Manager);
+	return m_pObject_Manager->Get_GameObject_Num(_iLevelIndex, _strLayerTag);
 }
 
 CGameObject* CGameInstance::Get_GameObject(_uint iLevelIndex, const wstring& strLayerTag, _uint iIndex)
@@ -784,10 +799,10 @@ void CGameInstance::RenderGrid()
 	m_pIMGUI_Manager->RenderGrid();
 }
 
-void CGameInstance::Set_FileDialog()
+CImGUI_Manager::FILE_MODE CGameInstance::Set_FileDialog()
 {
 	CHECK_NULLPTR(m_pIMGUI_Manager);
-	m_pIMGUI_Manager->Set_FileDialog();
+	return m_pIMGUI_Manager->Set_FileDialog();
 }
 
 PxRigidDynamic* CGameInstance::CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)

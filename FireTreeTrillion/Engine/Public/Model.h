@@ -21,6 +21,7 @@ public:
 
 	_bool IsFinished() { return m_Animations[m_iCurrentAnimIndex]->IsFinished(); }
 	_bool IsFinished(_uint iCurrentAnimIndex) { return m_Animations[iCurrentAnimIndex]->IsFinished(); }
+
 	string Get_MeshName(_uint iMeshIndex);
 
 public:
