@@ -148,7 +148,10 @@
     <Filter Include="02.GameObjects\Map\Terrain">
       <UniqueIdentifier>{790e4632-66f1-4e07-b217-df971b3f85d4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\SkySphere">
+    <Filter Include="02.GameObjects\Character\WaddleDee">
+      <UniqueIdentifier>{975b42f5-4d3e-4ce1-acee-ceac9f5b976a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\SkySphere">
       <UniqueIdentifier>{24afa923-789a-4526-9b9d-3523c19603e1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -297,7 +300,12 @@
     <ClInclude Include="..\Public\Moon.h">
       <Filter>02.GameObjects</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\SkySphere.h" />
+    <ClInclude Include="..\public\SkySphere.h">
+      <Filter>02.GameObjects\Map\SkySphere</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\WaddleDee.h">
+      <Filter>02.GameObjects\Character\WaddleDee</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -426,7 +434,12 @@
     <ClCompile Include="..\Private\Moon.cpp">
       <Filter>02.GameObjects</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\SkySphere.cpp" />
+    <ClCompile Include="..\private\SkySphere.cpp">
+      <Filter>02.GameObjects\Map\SkySphere</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\WaddleDee.cpp">
+      <Filter>02.GameObjects\Character\WaddleDee</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

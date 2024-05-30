@@ -214,6 +214,7 @@
     <ClInclude Include="..\Public\TestUI.h" />
     <ClInclude Include="..\Public\Trigger.h" />
     <ClInclude Include="..\Public\UI_Editor.h" />
+    <ClInclude Include="..\public\WaddleDee.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -263,6 +264,7 @@
     <ClCompile Include="..\Private\TestUI.cpp" />
     <ClCompile Include="..\Private\Trigger.cpp" />
     <ClCompile Include="..\Private\UI_Editor.cpp" />
+    <ClCompile Include="..\private\WaddleDee.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
