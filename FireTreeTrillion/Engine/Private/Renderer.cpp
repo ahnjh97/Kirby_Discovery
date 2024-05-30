@@ -396,23 +396,27 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 
 	if (FAILED(Render_Result()))
 		return E_FAIL;
-	// Radial블러 적용
-	if (FAILED(Render_Radial_Result(fTimeDelta)))
-		return E_FAIL;
-	// DOF블러 적용
-	if (FAILED(Render_DOF_Result()))
-		return E_FAIL;
-	// Motion블러 적용
-	if (FAILED(Render_MotionBlur()))
-		return E_FAIL;
-	//**** 후처리 완료 ****//
 
-	/////////////////////// UI를 제외하고 그려진 상황에서, 화면 색 보정 처리한다.
+	if (m_bLowPass == false)
+	{
+		// Radial블러 적용
+		if (FAILED(Render_Radial_Result(fTimeDelta)))
+			return E_FAIL;
+		// DOF블러 적용
+		if (FAILED(Render_DOF_Result()))
+			return E_FAIL;
+		// Motion블러 적용
+		if (FAILED(Render_MotionBlur()))
+			return E_FAIL;
+		//**** 후처리 완료 ****//
 
-	Interpolate_ColorData(fTimeDelta);
+		/////////////////////// UI를 제외하고 그려진 상황에서, 화면 색 보정 처리한다.
 
-	if (FAILED(Render_FinalResult()))
-		return E_FAIL;
+		Interpolate_ColorData(fTimeDelta);
+
+		if (FAILED(Render_FinalResult()))
+			return E_FAIL;
+	}
 
 	if (FAILED(Render_UI()))
 		return E_FAIL;
@@ -422,7 +426,7 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 
 
 
-	/// test
+	/// 림 라이트
 	if (m_pGameInstance->Get_DIKeyState(DIK_R, KEY_DOWN))
 		m_bRimTest = !m_bRimTest;
 	
@@ -442,6 +446,10 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 			m_fRimWidth = 0.f;
 		}
 	}
+
+	// 고사양, 저사양 모드
+	if (m_pGameInstance->Get_DIKeyState(DIK_E, KEY_DOWN))
+		m_bLowPass = !m_bLowPass;
 
 #ifdef _DEBUG
 	if (FAILED(Render_Debug()))
@@ -795,9 +803,12 @@ HRESULT CRenderer::Render_EffectResult()
 
 HRESULT CRenderer::Render_Result()
 {
-	// 최종적으로 레디얼 블러 및 다른 블러를 먹일 생각이다.
-	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_RadialBlur"))))
-		return E_FAIL;
+	if (m_bLowPass == false)
+	{
+		// 최종적으로 레디얼 블러 및 다른 블러를 먹일 생각이다.
+		if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_RadialBlur"))))
+			return E_FAIL;
+	}
 
 	if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
 		return E_FAIL;
@@ -865,8 +876,11 @@ HRESULT CRenderer::Render_Result()
 	if (FAILED(m_pVIBuffer->Render()))
 		return  E_FAIL;
 
-	if (FAILED(m_pGameInstance->End_MRT()))
-		return E_FAIL;
+	if (m_bLowPass == false)
+	{
+		if (FAILED(m_pGameInstance->End_MRT()))
+			return E_FAIL;
+	}
 
 	return S_OK;
 }
