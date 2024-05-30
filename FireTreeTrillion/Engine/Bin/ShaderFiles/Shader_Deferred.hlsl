@@ -496,7 +496,7 @@ PS_OUT PS_MAIN_COLORCORRECT(PS_IN In)
     }
     
     Out.vColor = vColor;
-
+    return Out;
 }
 
 

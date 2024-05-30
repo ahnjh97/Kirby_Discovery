@@ -9,8 +9,8 @@ matrix g_ViewMatrixInv, g_ProjMatrixInv;
 float g_fTexW = 1600.0f;
 float g_fTexH = 900.0f;
 
-
 float g_fFar = 1000.f;
+
 //색 보정 글로별 번수
 bool g_bApplyCorrection = true;
 
@@ -472,7 +472,6 @@ PS_OUT PS_MAIN_COLORCORRECT(PS_IN In)
     
     vector vColor = g_FinalTexture.Sample(LinearSampler, In.vTexcoord);
     
-    
     if (g_bApplyCorrection)
     {
         //톤매핑
@@ -497,7 +496,7 @@ PS_OUT PS_MAIN_COLORCORRECT(PS_IN In)
     }
     
     Out.vColor = vColor;
-
+    return Out;
 }
 
 
@@ -522,22 +521,6 @@ PS_OUT PS_MAIN_DOFBlur(PS_IN In)
     // DOFWeight 계산 (스케일링 및 클램핑)
     float fDOFWeight = clamp(fDepthDifference / g_fFar * 4.f, 0.0f, 1.0f);
     
-    
-    //float fDepthDifference = 0.f;
-    //float fDOFWeight = 0.f;
-    //// 만약, 현재 나의 픽셀이 뒤에 있을 경우.
-    //if (fViewZ - fMyViewZ > 0)
-    //{
-    //    fDepthDifference = fViewZ - fMyViewZ;
-    //    fDOFWeight = clamp(fDepthDifference / g_fFar * 4.f, 0.0f, 1.0f);
-    //}
-    //// 만약, 현재 나의 픽셀이 앞에 있을 경우
-    //else
-    //{
-    //    fDepthDifference = fMyViewZ - fViewZ;
-    //    fDOFWeight = clamp(fDepthDifference / g_fFar * 50.f, 0.0f, 1.0f);
-    //}
-
     for (int i = -6; i < 7; ++i)
     {
         for (int j = -6; j < 7; ++j)
@@ -561,7 +544,6 @@ PS_OUT PS_MAIN_MotionBlur(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
     
-    //vector Diffusedesc = g_DiffuseMotionBlur.Sample(LinearSampler, In.vTexcoord);
     float4 vMotionBlurSample = g_MotionBlur.Sample(LinearSampler, In.vTexcoord);
     float2 vMyBlurDir = vMotionBlurSample.xy;
     float fMotionblurRaduis = 250.f;
