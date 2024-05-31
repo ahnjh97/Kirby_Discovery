@@ -8,9 +8,13 @@ texture2D	g_MaskTexture;
 vector	g_vCamPosition;
 
 //컬러, 마스크 임계 등
-vector g_vRColor = { 1.f, 1.f, 1.f, 1.f };
-vector g_vGColor = { 1.f, 1.f, 1.f, 1.f };
-vector g_vBColor = { 1.f, 1.f, 1.f, 1.f };
+float3 g_vRColor = { 1.f, 1.f, 1.f };
+float3 g_vGColor = { 1.f, 1.f, 1.f };
+float3 g_vBColor = { 1.f, 1.f, 1.f };
+
+float g_fAlpha;
+//float g_fMaskThreshold;
+
 
 struct VS_IN
 {
@@ -131,12 +135,13 @@ PS_OUT PS_MAIN_WHITE_FX(PS_IN In)
     float vBrightness = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord).r;
 	
 	
-    Out.vColor = g_vRColor * vBrightness;
+    Out.vColor.rgb = g_vRColor * vBrightness;
 	
     Out.vColor.a = vBrightness; // 어두울수록 투명
     
-    if (Out.vColor.a < .05f)
+    if (Out.vColor.a < .1f || false == In.isLived)
         discard;
+	
 	
     return Out;
 }

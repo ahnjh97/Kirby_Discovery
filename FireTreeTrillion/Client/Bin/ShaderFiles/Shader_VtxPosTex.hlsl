@@ -13,6 +13,7 @@ vector g_vGColor = { 1.f, 1.f, 1.f, 1.f };
 vector g_vBColor = { 1.f, 1.f, 1.f, 1.f };
 
 float g_fAlpha;
+float g_fMaskThreshold;
 
 struct VS_IN
 {
@@ -143,6 +144,9 @@ PS_OUT PS_MAIN_WHITE_FX(PS_IN_ALPHABLEND In)
 
     float vBrightness = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord).r;
 	
+    float vMaskValue = g_MaskTexture.Sample(PointSampler, In.vTexcoord).r;
+    if (vMaskValue - .01f < g_fMaskThreshold)
+        discard;
 	
     Out.vColor = g_vRColor * vBrightness;
 	

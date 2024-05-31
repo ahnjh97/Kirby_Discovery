@@ -51,13 +51,7 @@ public:
 
 		map<KF_PROPERTY, vector<FX_KEYFRAME>> Keyframes;
 
-
-		//텍스쳐가 흑백 or RGB로 이루어져 있는 경우, 설정할 색상 값
-		
-		//흑백일 경우 흰색, RGB일 경우 R 색상에 해당
-		//_float3 vRColor = { 0.f, 0.f, 0.f };
-		//_float3 vGColor = { 0.f, 0.f, 0.f };
-		//_float3 vBColor = { 0.f, 0.f, 0.f };
+		_uint eRenderGroup = { 0 };
 
 	}FX_DESC;
 
@@ -124,6 +118,9 @@ protected:
 	_bool			m_bIsOrthographic = { false };
 	_bool			m_bIsColorRender = { true };
 	_bool			m_bIsBloom = { false };
+
+	_uint			m_eRenderGroup = { 0 };
+
 
 	_float			m_fRimLightThreshold = { 0.f };
 

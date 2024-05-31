@@ -61,14 +61,17 @@ HRESULT CParticle::Initialize(void* pArg)
 	instanceDesc.fLifetime = { 1.4f };
 	instanceDesc.fLifetimeRandomOffset = { .3f };
 	instanceDesc.bIsLoop = true;
-	Update_InstanceInfo(instanceDesc);
+	Update_InstanceInfo(&instanceDesc);
 
 	return S_OK;
 }
 
-void CParticle::Update_InstanceInfo(INSTANCE_DESC _instanceDesc)
+void CParticle::Update_InstanceInfo(INSTANCE_DESC* _instanceDesc)
 {
-	m_InstanceDesc = _instanceDesc;
+	//이건 파티클에 저장하는 거. 값 있을 때만.
+	if(nullptr != _instanceDesc)
+		m_InstanceDesc = *_instanceDesc;
+
 	m_pVIBufferCom->Update_InstanceDesc(m_InstanceDesc);
 }
 
@@ -123,6 +126,10 @@ _int CParticle::Tick(_float _fTimeDelta)
 	if (m_bDead)
 		return OBJ_DEAD;
 
+
+
+	m_pVIBufferCom->Compute_AllLifeTime(_fTimeDelta);
+
 	if (Calculate_Duration(_fTimeDelta))
 	{
 		//툴에서는 다시 시작하기
@@ -135,11 +142,14 @@ _int CParticle::Tick(_float _fTimeDelta)
 			m_bDead = true;
 	}
 
+
 	if (m_fDuration.second <= m_fDuration.first)
 		return OBJ_NOEVENT;
 
-	//if (m_InstanceDesc.vecMoveCommands[INSTANCE_DROP])
-	//	m_pVIBufferCom->Drop(_fTimeDelta);
+
+
+	if (m_InstanceDesc.vecMoveCommands[INSTANCE_DROP])
+		m_pVIBufferCom->Drop(_fTimeDelta);
 
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_SPREAD])
 		m_pVIBufferCom->Spread(_fTimeDelta);
@@ -147,7 +157,6 @@ _int CParticle::Tick(_float _fTimeDelta)
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_DECELERATE])
 		m_pVIBufferCom->Decelerate(_fTimeDelta);
 
-	m_pVIBufferCom->Compute_AllLifeTime(_fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
@@ -248,11 +257,20 @@ HRESULT CParticle::Bind_ShaderResources(_int iTexIdx, _int iMaskTexIdx)
 	hr = m_pShaderCom->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition(), sizeof(_float4));
 	CHECK_FAILED(hr);
 
+	hr = m_pShaderCom->Bind_RawValue("g_vRColor", &m_InstanceDesc.vColor, sizeof(_float3));
+	CHECK_FAILED(hr);
+
+	hr = m_pShaderCom->Bind_RawValue("g_fAlpha", &m_InstanceDesc.fAlpha, sizeof(_float));
+	CHECK_FAILED(hr);
+
 	hr = m_pTextureCom[TEX_DIFFUSE]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", m_iTexIdx);
 	CHECK_FAILED(hr);
 
 	hr = m_pTextureCom[TEX_MASK]->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", m_iMaskTexIdx);
 	CHECK_FAILED(hr);
+
+
+
 
 	return S_OK;
 }

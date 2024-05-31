@@ -1243,6 +1243,9 @@ void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 
 HRESULT CRenderer::Render_Debug()
 {
+	if (*m_pGameInstance->Get_CurrentLevelID() == 4)
+		return S_OK;
+
 	for (auto& pDebugCom : m_DebugComponents)
 	{
 		if (nullptr != pDebugCom)

@@ -93,6 +93,9 @@ HRESULT CMainApp::Render(_float fTimeDelta)
 
 #ifdef _DEBUG
 
+
+	if (*m_pGameInstance->Get_CurrentLevelID() != LEVEL_TOOL_FX)
+	{
 	// RTV_FONT Ãß°¡
 #pragma region GAME_OBJ
 
@@ -168,6 +171,8 @@ HRESULT CMainApp::Render(_float fTimeDelta)
 
 
 #endif // _DEBUG
+	}
+
 
 
 	m_pGameInstance->End_Draw();

@@ -127,8 +127,8 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 
 void CSingleEffect::Late_Tick(_float _fTimeDelta)
 {
-	if (m_bIsColorRender)
-		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+	if ((CRenderer::RENDERGROUP)m_eRenderGroup != CRenderer::RENDER_END)
+		m_pGameInstance->Add_RenderGroup((CRenderer::RENDERGROUP)m_eRenderGroup, this);
 
 	if (m_bIsBloom)
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
