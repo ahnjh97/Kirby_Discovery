@@ -5,18 +5,18 @@
 #include "Model.h"
 #include "ImSequencer.h"
 #include "Utils.h"
+#include "tinyxml2.h"
 
 
 static string	g_strProtoObjTag = "";
 //static string	g_strModelTag = "";
-static _int		g_iActiveModelNum = -1;
+//static _int	g_iActiveModelNum = -1;
 
 static const char* SequencerItemTypeNames[] = { "notify"/*, "Collision Event", "Sound Event" */};
 struct AnimSequence : public ImSequencer::SequenceInterface
 {
 	struct AnimSequenceItem
 	{
-		_int	iEventType;
 		string	strEventName;
 		_int	iStartFrame;
 		_int	iEndFrame;
@@ -65,7 +65,7 @@ struct AnimSequence : public ImSequencer::SequenceInterface
 
 	virtual void Add(int type, const char* strName) override
 	{
-		m_vecSequenceItems.push_back(AnimSequenceItem{ type, strName, 0, 1});
+		m_vecSequenceItems.push_back(AnimSequenceItem{strName, 0, 1});
 	}
 
 	virtual void Del(int index) override
@@ -185,7 +185,6 @@ void CAnimToolHelper::Render_ObjectList()
 					m_strModelName = m_vecAnimModels[n];
 					wstring wstrPrototypeTag = TEXT("Prototype_Component_Model_") + CUtils::StrToWstr(m_strModelName);
 					m_pAnimToolObj->Change_ModelCom(wstrPrototypeTag);
-					//isChanged = true;
 				}
 			}
 			
@@ -267,6 +266,7 @@ void CAnimToolHelper::Render_AnimationList()
 				{
 					const _bool is_selected = (item_current_idx == n);
 					const _char* animName = (*pVecAnims)[n]->Get_AnimationName();
+					m_strAnimationName = animName;
 					if (animName == nullptr) continue;
 
 					if (filter.PassFilter(animName))
@@ -310,11 +310,15 @@ void CAnimToolHelper::Render_FrameLine(CAnimation** ppAnimation, const string& s
 	if (mySequence.m_vecSequenceItems.empty())
 	{
 		// QZR : 추후 animation정보를 가져오는 Load()를 여기서 처리
-		// 
+		Load();
 		// Load해서 가져온 data들 중 Sequence에 띄워야하는
 		// (1) 프레임 처음/끝, (2) 이벤트 종류, (3) 이벤트 이름을 가져와서 아래에 push_back한다.
-		mySequence.m_vecSequenceItems.push_back(AnimSequence::AnimSequenceItem{ 0, "Test0", 2, 3 });
-		mySequence.m_vecSequenceItems.push_back(AnimSequence::AnimSequenceItem{ 1, "Test1", 3, 4 });
+
+		for (auto item : m_vecSequence)
+		{
+			mySequence.m_vecSequenceItems.push_back(AnimSequence::AnimSequenceItem{item.strEventName, item.iStartFrame, item.iEndFrame });
+		}
+		//mySequence.m_vecSequenceItems.push_back(AnimSequence::AnimSequenceItem{"Test1", 3, 4 });
 	}
 
 	 // 고정할 위치와 크기
@@ -345,19 +349,31 @@ void CAnimToolHelper::Render_FrameLine(CAnimation** ppAnimation, const string& s
 	ImGui::Checkbox("   ", &bIsLoop);
 	if (!bIsLoop)
 		(*ppAnimation)->Set_TrackPosition((_float)currentFrame);
+	else
+		currentFrame = (*ppAnimation)->Get_TrackPosition();
 	ImGui::SameLine();
 	
 	// 애니메이션 스피드
-	static _float animationSpeed = (*ppAnimation)->Get_TickPerSecond();
+	m_fAnimationSpeed = (*ppAnimation)->Get_TickPerSecond();
 	if (previousAnimation != (*ppAnimation)->Get_AnimationName())
-		animationSpeed = (*ppAnimation)->Get_TickPerSecond();
+		m_fAnimationSpeed = (*ppAnimation)->Get_TickPerSecond();
 	ImGui::Text("Animation Speed"); ImGui::SameLine();
-	ImGui::InputFloat("    ", &animationSpeed); ImGui::SameLine();
-	(*ppAnimation)->Set_TickPerSecond(animationSpeed);
+	ImGui::InputFloat("    ", &m_fAnimationSpeed); ImGui::SameLine();
+	(*ppAnimation)->Set_TickPerSecond(m_fAnimationSpeed);
+
 
 	// 현 애니메이션 데이터 저장
 	if (ImGui::Button("ANIMATION DATA SAVE")) 
 	{
+		for (auto& item : mySequence.m_vecSequenceItems)
+		{
+			SEQUENCE_ITEM desc;
+			desc.strEventName = item.strEventName;
+			desc.iStartFrame = item.iStartFrame;
+			desc.iEndFrame = item.iEndFrame;
+			m_vecSequence.push_back(desc);
+		}
+
 		Save();
 	}
 
@@ -396,7 +412,7 @@ void CAnimToolHelper::Render_FrameLine(CAnimation** ppAnimation, const string& s
 				
 				if (!bCheckSame)
 				{
-					mySequence.m_vecSequenceItems.push_back(AnimSequence::AnimSequenceItem{ 0, charEventName, 0, 1 });
+					mySequence.m_vecSequenceItems.push_back(AnimSequence::AnimSequenceItem{ charEventName, 0, 1 });
 					memset(charEventName, 0, sizeof(charEventName));
 					selectedEntry = -1;
 					ImGui::CloseCurrentPopup();
@@ -417,71 +433,81 @@ void CAnimToolHelper::Render_FrameLine(CAnimation** ppAnimation, const string& s
 
 void CAnimToolHelper::Save()
 {
-	//string FileName = "../Bin/Resources/Data/UIData/UI_240418.ui";
-	//std::ofstream File(FileName, std::ios::binary);
+	tinyxml2::XMLDocument	m_xmlDocument;
+	tinyxml2::XMLNode* m_pNode;
 
-	//if (!File.is_open()) {
-	//	MSG_BOX(TEXT("UIHelper Save Failed"));
-	//	return;
-	//}
+	m_pNode = m_xmlDocument.NewElement("Root");
+	m_xmlDocument.InsertFirstChild(m_pNode);
 
-	//// PrototypeTag, size2D, position2D
-	//size_t size = m_vecUIObjects.size();
-	//File.write(reinterpret_cast<const char*>(&size), sizeof(size));
+	tinyxml2::XMLElement* m_pElement = m_xmlDocument.NewElement("Version");
+	m_pElement->SetText(240405);
+	m_pNode->InsertEndChild(m_pElement);
 
-	//for (auto iter : m_vecUIObjects)
-	//{
-	//	wstring PrototypeTag = iter->Get_PrototypeTag();
-	//	_float2 size2D = _float2();//iter->Get_size2D();
-	//	_float2 position2D = _float2();//iter->Get_pos2D();
+	m_pElement = m_xmlDocument.NewElement("ModelName"); // 모델
+	m_pElement->SetText(m_strModelName.c_str());
+	m_pNode->InsertEndChild(m_pElement);
 
-	//	string strPrototypeTag = CUtils::WstrToStr(PrototypeTag);
-	//	size_t PrototypeTagLen = strPrototypeTag.length() + 1;
-	//	File.write(reinterpret_cast<const char*>(&PrototypeTagLen), sizeof(PrototypeTagLen));
-	//	File.write(strPrototypeTag.c_str(), sizeof(char) * PrototypeTagLen);
+	m_pElement = m_xmlDocument.NewElement("Animation"); // 애니메이션
+	m_pElement->SetText(m_strAnimationName.c_str());
+	m_pNode->InsertEndChild(m_pElement);
 
-	//	File.write(reinterpret_cast<const char*>(&size2D), sizeof(size2D));
-	//	File.write(reinterpret_cast<const char*>(&position2D), sizeof(position2D));
-	//}
+	m_pElement = m_xmlDocument.NewElement("Count");
+	_uint iCnt = m_vecSequence.size();
+	m_pElement->SetText(iCnt);
+	m_pNode->InsertEndChild(m_pElement);
 
-	//File.close();
+	for (_uint i = 0; i < iCnt; ++i)
+	{
+		string strData = "Data" + to_string(i);
+		m_pElement = m_xmlDocument.NewElement(strData.c_str());
+
+		string strTemp = m_vecSequence[i].strEventName;
+		m_pElement->SetAttribute("EventName", strTemp.c_str());
+
+		string strStartFrame = to_string(m_vecSequence[i].iStartFrame);
+		m_pElement->SetAttribute("StartFrame", strStartFrame.c_str());
+
+		string strEndFrame = to_string(m_vecSequence[i].iEndFrame);
+		m_pElement->SetAttribute("EndFrame", strEndFrame.c_str());
+
+		//_int iEndFrame = m_vecSequence[i].iEndFrame;
+		//m_pElement->SetText(iEndFrame);
+
+		m_pNode->InsertEndChild(m_pElement);
+	}
+	tinyxml2::XMLError error = m_xmlDocument.SaveFile("../Bin/Resources/Data/AnimationData.xml");
 }
+
 
 void CAnimToolHelper::Load(const string& FileName)
 {
-	//std::ifstream File(FileName, std::ios::binary);
+	tinyxml2::XMLDocument	m_xmlDocument;
+	tinyxml2::XMLNode* m_pNode;
+	tinyxml2::XMLElement* m_pElement;
 
-	//if (!File.is_open()) {
-	//	MSG_BOX(TEXT("UIHelper Load Failed"));
-	//	return;
-	//}
+	tinyxml2::XMLError error = m_xmlDocument.LoadFile("../Bin/Resources/Data/AnimationData.xml");
+	m_pNode = m_xmlDocument.FirstChild();
 
-	//// PrototypeTag, Worldmatrix
-	//size_t size = 0;
-	//File.read(reinterpret_cast<char*>(&size), sizeof(size));
-	//m_vecUIObjects.reserve(size);
+	_int	iRead, iCnt, iEA;
 
-	//for (size_t i = 0; i < size; ++i)
-	//{
-	//	// PrototypeTag, size2D, position2D
-	//	char PrototypeTag[256];
-	//	size_t PrototypeTagLen;
-	//	File.read(reinterpret_cast<char*>(&PrototypeTagLen), sizeof(PrototypeTagLen));
-	//	File.read(PrototypeTag, sizeof(char) * PrototypeTagLen);
+	m_pElement = m_pNode->FirstChildElement("Version");
+	m_pElement->QueryIntText(&iRead);
+	m_pElement = m_pNode->FirstChildElement("Count");
+	m_pElement->QueryIntText(&iCnt);
 
-	//	_float2 size2D, pos2D;
-	//	File.read(reinterpret_cast<char*>(&size2D), sizeof(size2D));
-	//	File.read(reinterpret_cast<char*>(&pos2D), sizeof(pos2D));
+	for (_uint i = 0; i < iCnt; ++i)
+	{
+		string strData = "Data" + to_string(i);
+		m_pElement = m_pNode->FirstChildElement(strData.c_str());
 
-	//	CUIObject::UIOBJ_DESC	UIObjDesc{};
-	//	/*UIObjDesc.Size2D		= size2D;
-	//	UIObjDesc.Position2D	= pos2D;
-	//	UIObjDesc.WindowSize2D	= _float2(g_iWinSizeX, g_iWinSizeY);*/
-	//	CUIObject* pUIObject = static_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(CUtils::StrToWstr(PrototypeTag), &UIObjDesc));
-	//	m_vecUIObjects.push_back(pUIObject);
-	//}
+		SEQUENCE_ITEM Info{};
+		Info.strEventName = m_pElement->Attribute("EventName");
+		Info.iStartFrame = stoi(m_pElement->Attribute("StartFrame"));
+		Info.iEndFrame = stoi(m_pElement->Attribute("EndFrame"));
+		m_pElement->QueryIntText(&iEA);
 
-	//File.close();
+		m_vecSequence.push_back(Info);
+	}
 }
 
 CAnimToolHelper* CAnimToolHelper::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
