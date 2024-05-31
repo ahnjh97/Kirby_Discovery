@@ -51,10 +51,6 @@ _int CAwoofy::Tick(_float fTimeDelta)
 
 	Compute_MotionBlur();
 
-   // FSM Á¦¾î
-	if (m_pFSM != nullptr)
-		m_pFSM->Update(this, fTimeDelta);
-
 	return OBJ_NOEVENT;
 }
 
