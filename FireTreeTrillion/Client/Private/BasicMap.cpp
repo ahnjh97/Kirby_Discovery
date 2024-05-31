@@ -91,6 +91,9 @@ HRESULT CBasicMap::Render()
             return E_FAIL;
         if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
             return E_FAIL;
+        if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
+            return E_FAIL;
+
         if (FAILED(m_pShaderCom->Bind_RawValue("g_fSamplingFactor", &m_vecSamplingFactors[i], sizeof(_float))))
             return E_FAIL;
         if (i == m_iMeshIndex) {
@@ -111,6 +114,24 @@ HRESULT CBasicMap::Render()
     }
 
     return S_OK;
+}
+
+void CBasicMap::Render_IMGUI()
+{
+    HRESULT hr;
+    static _bool bRabbit = false;
+    static _bool bCow = false;
+    if (ImGui::Checkbox("rabbit", &bRabbit))
+    {
+        hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, L"Layer_Monster", TEXT("Prototype_GameObject_Rabbit"));
+        CHECK_FAILED(hr);
+    }
+    if (ImGui::Checkbox("cow", &bCow))
+    {
+        hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, L"Layer_Monster", TEXT("Prototype_GameObject_Buffahorn"));
+        CHECK_FAILED(hr);
+    }
+
 }
 
 HRESULT CBasicMap::Add_Components(const wstring& _wstrModelTag)

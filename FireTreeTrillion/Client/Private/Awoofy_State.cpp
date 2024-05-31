@@ -49,8 +49,8 @@ void CAwoofy_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 			pAwoofy->Change_State(CAwoofy::AWOOFY_WAIT, 40.f, false, true);
 	}
 
-	if (m_pGameInstance->Get_DIKeyState(DIK_SPACE, KEY_DOWN))
-		pAwoofy->Change_State(CAwoofy::AWOOFY_DAMAGE, 40.f, false, true);
+	//if (m_pGameInstance->Get_DIKeyState(DIK_SPACE, KEY_DOWN))
+	//	pAwoofy->Change_State(CAwoofy::AWOOFY_DAMAGE, 40.f, false, true);
 }
 
 void CAwoofy_Idle_State::OnStateExit()

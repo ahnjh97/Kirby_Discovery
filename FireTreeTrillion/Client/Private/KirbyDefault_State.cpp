@@ -45,6 +45,7 @@ void CKirbyDefault_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 	Key_X(pGameObject, fTimeDelta);
 	Key_C(pGameObject, fTimeDelta);
 	Key_V(pGameObject, fTimeDelta);
+	Key_Happy(pGameObject, fTimeDelta);
 
 	// IDLE상태에서 통제될 것들.
 	if (pKirby->Get_State() == CKirby::STATE_IDLE)
@@ -133,6 +134,32 @@ void CKirbyDefault_Idle_State::Key_C(CGameObject* pGameObject, _float fTimeDelta
 
 void CKirbyDefault_Idle_State::Key_V(CGameObject* pGameObject, _float fTimeDelta)
 {
+}
+
+void CKirbyDefault_Idle_State::Key_Happy(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+
+	if (m_pGameInstance->Get_DIKeyState(DIK_LCONTROL, KEY_PRESS))
+	{
+		if (m_pGameInstance->Get_DIKeyState(DIK_1, KEY_DOWN))
+		{
+			DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+			DESC(m_eMouthState) = CKirby::MOUTH_SMILE;
+			pKirby->Change_State(CKirby::STATE_EMOTEWAVEHAND, 60.f, false, true, CKirby::BODY_DEFAULT);
+		}
+		else if (m_pGameInstance->Get_DIKeyState(DIK_2, KEY_DOWN))
+		{
+			pKirby->Change_State(CKirby::STATE_WAITYAY, 60.f, false, true, CKirby::BODY_DEFAULT);
+
+		}
+		else if (m_pGameInstance->Get_DIKeyState(DIK_3, KEY_DOWN))
+		{
+			pKirby->Change_State(CKirby::STATE_WAITSIT, 60.f, false, true, CKirby::BODY_DEFAULT);
+
+		}
+	}
 }
 
 void CKirbyDefault_Idle_State::OnStateExit()
@@ -630,6 +657,17 @@ void CKirbyDefault_Guard_State::OnStateUpdate(CGameObject* pGameObject, _float f
 			pKirby->Change_State(CKirby::STATE_DODGESTART, 50.f, false, false, CKirby::BODY_DEFAULT);
 		}
 
+		if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
+		{
+			if (JoyStick_controller(Kirbydesc, pCamera))
+				pKirby->Change_State(CKirby::STATE_DODGESTART, 50.f, false, false, CKirby::BODY_DEFAULT);
+			else
+			{
+				_vector vLook = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+				DESC(m_vDodgeDir) = vLook;
+				pKirby->Change_State(CKirby::STATE_SLIDESTART, 60.f, false, false, CKirby::BODY_DEFAULT);
+			}
+		}
 
 		// Z키를 안누르고 있다면
 		if (m_pGameInstance->Get_DIKeyState(DIK_Z, KEY_PRESS) == false)
@@ -671,6 +709,11 @@ void CKirbyDefault_Guard_State::OnStateUpdate(CGameObject* pGameObject, _float f
 			DESC(m_vDodgeDir) = Make_TargetDir(CKirby::DIR_RIGHT, pCamera);
 		}
 
+		if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_PRESS))
+		{
+			DESC(m_vMoveDir) = DESC(m_vDodgeDir);
+			pKirby->Change_State(CKirby::STATE_SLIDESTART, 60.f, false, false, CKirby::BODY_DEFAULT);
+		}
 		// 끝나면 바로 본격적인 닷지 스타트 ( 여기서 애니메이션을 분기한다.)
 		if (pKirby->isAnimFinish() == true)
 		{
@@ -809,6 +852,179 @@ CKirbyDefault_Guard_State* CKirbyDefault_Guard_State::Create()
 }
 
 void CKirbyDefault_Guard_State::Free()
+{
+	__super::Free();
+}
+
+#pragma endregion
+
+#pragma region GUARD STATE
+
+CKirbyDefault_Slide_State::CKirbyDefault_Slide_State()
+{
+}
+
+void CKirbyDefault_Slide_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+}
+
+void CKirbyDefault_Slide_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
+	pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
+
+	if (pKirby->Get_State() == CKirby::STATE_SLIDESTART)
+	{
+		if (pKirby->isAnimFinish())
+		{
+			pKirby->Change_State(CKirby::STATE_SLIDE, 60.f, true, false, CKirby::BODY_DEFAULT);
+			DESC(m_fMoveSpeed) = 25.f;
+		}
+	}
+	else if (pKirby->Get_State() == CKirby::STATE_SLIDE)
+	{
+		_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+		_vector vMoveDelta = DESC(m_vDodgeDir) * fTimeDelta * DESC(m_fMoveSpeed);
+		pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+		DESC(m_fMoveSpeed) -= fTimeDelta * 40.f;
+
+		if (DESC(m_fMoveSpeed) < 0.f)
+		{
+			pKirby->Change_State(CKirby::STATE_SLIDEEND, 120.f, false, false, CKirby::BODY_DEFAULT);
+		}
+
+	}
+	else if (pKirby->Get_State() == CKirby::STATE_SLIDEEND)
+	{
+		if (pKirby->isAnimFinish())
+		{
+			if (m_pGameInstance->Get_DIKeyState(DIK_Z, KEY_PRESS))
+			{
+				pKirby->Change_State(CKirby::STATE_GUARD, 60.f, true, true, CKirby::BODY_DEFAULT);
+			}
+			else
+			{
+				DESC(m_eEyeState) = CKirby::EYE_IDLE;
+				pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, false, CKirby::BODY_DEFAULT);
+			}
+		}
+	}
+}
+
+void CKirbyDefault_Slide_State::OnStateExit()
+{
+}
+
+CKirbyDefault_Slide_State* CKirbyDefault_Slide_State::Create()
+{
+	CKirbyDefault_Slide_State* pInstance = new CKirbyDefault_Slide_State();
+	return pInstance;
+}
+
+void CKirbyDefault_Slide_State::Free()
+{
+	__super::Free();
+}
+
+#pragma endregion
+
+#pragma region HAPPY STATE
+
+CKirbyDefault_Happy_State::CKirbyDefault_Happy_State()
+{
+
+}
+
+void CKirbyDefault_Happy_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+}
+
+void CKirbyDefault_Happy_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
+
+	m_fHappyTime += fTimeDelta;
+
+	if (pKirby->Get_State() == CKirby::STATE_WAITYAY)
+	{
+		if (m_fHappyTime > 0.3f && m_fHappyTime < 0.45f)
+		{
+			DESC(m_eEyeState) = CKirby::EYE_BLINK;
+		}
+		else if (m_fHappyTime > 0.45f && m_fHappyTime < 1.f)
+		{
+			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			DESC(m_eMouthState) = CKirby::MOUTH_SMILE;
+		}
+		else if (m_fHappyTime > 1.f)
+		{
+			DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+			DESC(m_eMouthState) = CKirby::MOUTH_HAPPY;
+		}
+
+
+	}
+	else if (pKirby->Get_State() == CKirby::STATE_WAITSIT)
+	{
+		if (m_fHappyTime > 0.3f)
+		{
+			DESC(m_eMouthState) = CKirby::MOUTH_SMILE;
+		}
+
+	}
+	else if (pKirby->Get_State() == CKirby::STATE_EMOTEWAVEHAND)
+	{
+		if (m_fHappyTime > 0.35f && m_fHappyTime < 1.35f)
+		{
+			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			DESC(m_eMouthState) = CKirby::MOUTH_HAPPY;
+		}
+		else if (m_fHappyTime > 1.35f)
+		{
+			DESC(m_eEyeState) = CKirby::EYE_BLINK;
+			DESC(m_eMouthState) = CKirby::MOUTH_SMILE;
+		}
+	}
+
+
+
+	if (JoyStick_controller(Kirbydesc, pCamera))
+	{
+		DESC(m_eEyeState) = CKirby::EYE_IDLE;
+		DESC(m_eMouthState) = CKirby::MOUTH_IDLE;
+		pKirby->Change_State(CKirby::STATE_RUNSTART, 120.f, true, true, CKirby::BODY_DEFAULT);
+	}
+	if (pKirby->isAnimFinish())
+	{
+		DESC(m_eEyeState) = CKirby::EYE_IDLE;
+		DESC(m_eMouthState) = CKirby::MOUTH_IDLE;
+		pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+	}
+
+}
+
+void CKirbyDefault_Happy_State::OnStateExit()
+{
+	m_fHappyTime = 0.f;
+}
+
+CKirbyDefault_Happy_State* CKirbyDefault_Happy_State::Create()
+{
+	CKirbyDefault_Happy_State* pInstance = new CKirbyDefault_Happy_State();
+	return pInstance;
+}
+
+void CKirbyDefault_Happy_State::Free()
 {
 	__super::Free();
 }

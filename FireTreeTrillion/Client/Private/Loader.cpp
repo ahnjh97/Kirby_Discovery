@@ -50,8 +50,10 @@
 //#include "Player.h"
 #include "Kirby.h"
 #include "Awoofy.h"
-#include "Moon.h"
 #include "Rabbit.h"
+#include "Buffahorn.h"
+
+#include "Moon.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
@@ -189,10 +191,10 @@ HRESULT CLoader::Loading_ObjectAll()
 	// For Test
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Moon"), CMoon);
 
-	// For Awoofy To Monster
 	// For Monster
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Awoofy"), CAwoofy);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Rabbit"), CRabbit);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Buffahorn"), CBuffahorn);
 
 	return S_OK;
 }
@@ -477,11 +479,10 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Level1Stage1Step01_Blend", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f);
 
-		// For Awoofy
+		// For Monster
 		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.f, 180.f);
-
-		// For Rabbit
-		m_vecModelInfo.emplace_back("Rabbit", TYPE_ANIM, 1.f, 180.f );
+		m_vecModelInfo.emplace_back("Rabbit", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("Buffahorn", TYPE_ANIM, 1.f, 180.f);
 	}
 	else if (eLevel == LEVEL_TOOL_MAP) 
 	{		

@@ -160,7 +160,7 @@ _bool CCharacterController::Jump(CTransform* pTransform, _float fFallVelocity, _
 _bool CCharacterController::Jump_Parabola(CTransform* pTransform, _vector vGoPos, _float fTimeDelta)
 {
 	PxExtendedVec3 pxCurrentPos = m_pController->getPosition();
-	PxVec3 moveVector(pxCurrentPos.x, pxCurrentPos.y, pxCurrentPos.z);
+	PxVec3 moveVector((_float)pxCurrentPos.x, (_float)pxCurrentPos.y, (_float)pxCurrentPos.z);
 	//// ÀÌµ¿
 	//PxControllerCollisionFlags collisionFlags = m_pController->move(moveVector, 0.001f, fTimeDelta, PxControllerFilters());
 
@@ -210,16 +210,17 @@ void CCharacterController::FreeFall(CTransform* pTransform, _float fTimeDelta, _
 	PxControllerState m_pPxState;
 	m_pController->getState(m_pPxState);
 
-	if (m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_DOWN || m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_UP)
-	{
-		m_fFallVelocity = 0.f;
-		return;
-	}
-
 	PxExtendedVec3 pxPos = m_pController->getPosition();
 	PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
 
 	_vector xmPos = XMVectorSet(pos.x, pos.y - m_fOffset, pos.z, 0.f);
+
+	if (m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_DOWN || m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_UP)
+	{
+		m_fFallVelocity = 0.f;
+		pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
+		return;
+	}
 
 	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
 }

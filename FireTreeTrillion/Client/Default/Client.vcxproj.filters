@@ -160,6 +160,12 @@
     <Filter Include="02.GameObjects\Character\Monster\Rabbit\State">
       <UniqueIdentifier>{5da02606-450b-4582-a1be-2d28da2c1590}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Character\Monster\Buffahorn">
+      <UniqueIdentifier>{119c683d-2914-4419-b633-2ec30fcda00c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Character\Monster\Buffahorn\State">
+      <UniqueIdentifier>{36a9b0b1-2680-464e-9a8d-a7d446bbe9e2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -318,6 +324,12 @@
     <ClInclude Include="..\Public\Rabbit.h">
       <Filter>02.GameObjects\Character\Monster\Rabbit</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Buffahorn.h">
+      <Filter>02.GameObjects\Character\Monster\Buffahorn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Buffahorn_State.h">
+      <Filter>02.GameObjects\Character\Monster\Buffahorn\State</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -457,6 +469,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Rabbit.cpp">
       <Filter>02.GameObjects\Character\Monster\Rabbit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Buffahorn.cpp">
+      <Filter>02.GameObjects\Character\Monster\Buffahorn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Buffahorn_State.cpp">
+      <Filter>02.GameObjects\Character\Monster\Buffahorn\State</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

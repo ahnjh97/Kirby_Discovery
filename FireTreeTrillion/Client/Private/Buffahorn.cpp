@@ -1,26 +1,26 @@
 #include "stdafx.h"
-#include "Awoofy.h"
+#include "Buffahorn.h"
 #include "FSM.h"
-#include "Awoofy_State.h"
+#include "Buffahorn_State.h"
 
-CAwoofy::CAwoofy(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CBuffahorn::CBuffahorn(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
 {
 }
 
-CAwoofy::CAwoofy(const CAwoofy& rhs)
+CBuffahorn::CBuffahorn(const CBuffahorn& rhs)
 	: CMonster{ rhs }
 {
 }
 
-HRESULT CAwoofy::Initialize_Prototype()
+HRESULT CBuffahorn::Initialize_Prototype()
 {
 	m_eCollisionGroup = MONSTER;
 
 	return S_OK;
 }
 
-HRESULT CAwoofy::Initialize(void* pArg)
+HRESULT CBuffahorn::Initialize(void* pArg)
 {
 	GAMEOBJECT_DESC		GameObjectDesc{};
 
@@ -33,32 +33,51 @@ HRESULT CAwoofy::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	m_pModelCom->Set_Animation(AWOOFY_GROOMING, 45.f, false, true);
+	m_pModelCom->Set_Animation(BUFFAHORN_CHARGEWAIT, 50.f, true, true);
 
 	return S_OK;
 }
 
-_int CAwoofy::Tick(_float fTimeDelta)
+_int CBuffahorn::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
 		return OBJ_DEAD;
 
-	__super::Tick(fTimeDelta);
+	// 지면의 up벡터
+	//PxVec3 slope = m_pControllerCom->Compute_Slope(m_pTransformCom);
+	//_vector vTerrainNormal = CUtils::To_Vector(slope);
+	//Lerp_UpVector(vTerrainNormal, 10.f, fTimeDelta);
 
-	Compute_ViewZ();
+	if (m_pGameInstance->Get_DIKeyState(DIK_W, KEY_PRESS))
+	{
+		m_pTransformCom->Go_Straight(fTimeDelta);
+		//m_pControllerCom->Move_Dir(m_pTransformCom, m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), fTimeDelta);
+	}
 
+	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_PRESS))
+	{
+		m_pTransformCom->Turn(XMVectorSet(0.f, -1.f, 0.f, 0.f), fTimeDelta);
+	}
+
+	if (m_pGameInstance->Get_DIKeyState(DIK_D, KEY_PRESS))
+	{
+		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta);
+	}
+
+	// 지면충돌과 경사 보정
 	__super::SetOn_Slope(fTimeDelta);
 
 	Compute_MotionBlur();
 
-   // FSM 제어
+	m_pControllerCom->FreeFall(m_pTransformCom, fTimeDelta, 6.f);
+	// FSM 제어
 	if (m_pFSM != nullptr)
 		m_pFSM->Update(this, fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
 
-void CAwoofy::Late_Tick(_float fTimeDelta)
+void CBuffahorn::Late_Tick(_float fTimeDelta)
 {
 	m_pModelCom->Play_Animation(fTimeDelta);
 
@@ -69,7 +88,7 @@ void CAwoofy::Late_Tick(_float fTimeDelta)
 	}
 }
 
-HRESULT CAwoofy::Render()
+HRESULT CBuffahorn::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
@@ -85,7 +104,7 @@ HRESULT CAwoofy::Render()
 			return E_FAIL;
 
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom->Begin(MODEL_NORMAL_X)))
+		if (FAILED(m_pShaderCom->Begin(1)))
 			return E_FAIL;
 
 		m_pModelCom->Render(i);
@@ -94,7 +113,7 @@ HRESULT CAwoofy::Render()
 	return S_OK;
 }
 
-HRESULT CAwoofy::Render_LightDepth()
+HRESULT CBuffahorn::Render_LightDepth()
 {
 	if (FAILED(m_pGameInstance->Render_LightDepth_For_GameObject(m_pShaderCom, m_pTransformCom, m_pModelCom)))
 		return E_FAIL;
@@ -102,7 +121,7 @@ HRESULT CAwoofy::Render_LightDepth()
 	return S_OK;
 }
 
-void CAwoofy::Render_IMGUI()
+void CBuffahorn::Render_IMGUI()
 {
 	if (ImGui::TreeNode("Guizmo"))
 	{
@@ -127,102 +146,26 @@ void CAwoofy::Render_IMGUI()
 	__super::Render_IMGUI();
 }
 
-void CAwoofy::Collision_Attack(CGameObject* pOtherObj)
+void CBuffahorn::Collision_Attack(CGameObject* pOtherObj)
 {
-	Change_State(CAwoofy::AWOOFY_DAMAGE, 50.f, false, true);
 }
 
-void CAwoofy::Change_State(AWOOFY_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CBuffahorn::Change_State(BUFFAHORN_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
 {
 	m_pFSM->ChangeState((_uint)eState, _fAnimSpeed, _bLoop, _bInterpolation);
 }
 
-_bool CAwoofy::IsAnimFinished()
+_bool CBuffahorn::IsAnimFinished()
 {
 	return m_pModelCom->IsFinished();
 }
 
-_bool CAwoofy::IsAnimFinished(_uint iCurrentAnimIndex)
+_uint CBuffahorn::Get_State()
 {
-	return m_pModelCom->IsFinished(iCurrentAnimIndex);
+	return m_pFSM->Get_State();
 }
 
-void CAwoofy::Compute_Angle(_vector vOrginLook, _vector vTargetLook)
-{
-	//// 정규화 및 회전 축 계산
-	//vOrginLook.m128_f32[1] = 0.f;
-	//vTargetLook.m128_f32[1] = 0.f;
-	XMVECTOR vOriginLookNormalized = XMVector3Normalize(vOrginLook);
-	XMVECTOR vTargetLookNormalized = XMVector3Normalize(vTargetLook);
-
-	//// 회전 각도 계산
-	m_fAngle = acos(XMVectorGetX(XMVector3Dot(vOriginLookNormalized, vTargetLookNormalized)));
-	_float fY = ::XMVectorGetY(::XMVector3Cross(vOriginLookNormalized, vTargetLookNormalized));
-	if (fY < 0)
-		m_fAngle = -m_fAngle;
-}
-
-HRESULT CAwoofy::Add_Components()
-{
-	HRESULT hr;
-	/* For.Com_Shader */
-	hr = __super::Add_Component(TEXT("Prototype_Component_Shader_VtxAnimModel"),
-		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
-	CHECK_FAILED(hr);
-
-	/* For.Com_Model */
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Awoofy"),
-		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
-	CHECK_FAILED(hr);
-
-	/* For.Com_CharacterController */
-	_float4 vPos = XMVectorSet(10.f, 20.f, -170.f, 1.f);
-	CCharacterController::CONTROLLER_DESC desc{};
-	desc.vInitialPos = vPos;
-	desc.uCollisionType = m_eCollisionGroup;
-	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
-		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
-	CHECK_FAILED(hr);
-	m_pControllerCom->Set_Object(this);
-
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
-
-	SetUp_FSM();
-
-	return S_OK;
-}
-
-HRESULT CAwoofy::Bind_ShaderResources()
-{
-	if (nullptr == m_pShaderCom)
-		return E_FAIL;
-
-	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
-		return E_FAIL;
-
-	_bool bStencil = true;
-	_bool bRimLight = true;
-	_bool bMotionBlur = true;
-
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
-		return E_FAIL;
-
-	return S_OK;
-}
-
-void CAwoofy::Compute_MotionBlur()
+void CBuffahorn::Compute_MotionBlur()
 {
 	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 	_matrix ViewProjectionMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW) * m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
@@ -235,37 +178,94 @@ void CAwoofy::Compute_MotionBlur()
 	m_vMotionVelocity.x = (m_vPreScreenPos - vCurScreenPos).x;
 	m_vMotionVelocity.y = (m_vPreScreenPos - vCurScreenPos).y;
 	m_vPreScreenPos = vCurScreenPos;
+
 }
 
-void CAwoofy::SetUp_FSM()
+HRESULT CBuffahorn::Add_Components()
+{
+	HRESULT hr;
+	/* For.Com_Shader */
+	hr = __super::Add_Component(TEXT("Prototype_Component_Shader_VtxAnimModel"),
+		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
+	CHECK_FAILED(hr);
+
+	/* For.Com_Model */
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Buffahorn"),
+		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+	CHECK_FAILED(hr);
+
+	/* For.Com_CharacterController */
+	_float4 vPos = XMVectorSet(10.f, 20.f, -160.f, 1.f);
+	CCharacterController::CONTROLLER_DESC desc{};
+	desc.vInitialPos = vPos;
+	desc.uCollisionType = m_eCollisionGroup;
+	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
+		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
+	m_pControllerCom->Set_Object(this);
+	//m_pControllerCom->Set_CollisionType(m_eCollisionGroup);
+
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+
+	SetUp_FSM();
+
+	return S_OK;
+}
+
+HRESULT CBuffahorn::Bind_ShaderResources()
+{
+	if (nullptr == m_pShaderCom)
+		return E_FAIL;
+
+	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
+		return E_FAIL;
+
+	_bool bStencil = true;
+	_bool bRimLight = true;
+	_bool bMotionBlur = true;
+	m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
+	m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+	m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+void CBuffahorn::SetUp_FSM()
 {
 	// FSM 상태 초기화
 	m_pFSM = CFSM::Create();
-	m_pFSM->Add_State(AWOOFY_WAIT, CAwoofy_Idle_State::Create());
-	m_pFSM->Add_State(AWOOFY_GROOMING, CAwoofy_Idle_State::Create());
-	m_pFSM->Add_State(AWOOFY_LOOKAROUND, CAwoofy_Idle_State::Create());
+	m_pFSM->Add_State(BUFFAHORN_CHARGEWAIT, CBuffahorn_Idle_State::Create());
 
-	m_pFSM->Add_State(AWOOFY_RUN, CAwoofy_Run_State::Create());
-	m_pFSM->Add_State(AWOOFY_FIND, CAwoofy_Find_State::Create());
-	m_pFSM->Add_State(AWOOFY_BRAKE, CAwoofy_Brake_State::Create());
-	m_pFSM->Add_State(AWOOFY_LOOKAROUNDAFTERBRAKE, CAwoofy_LookAroundAfterBrake_State::Create());
+	m_pFSM->Add_State(BUFFAHORN_FIND, CBuffahorn_Find_State::Create());
 
-	m_pFSM->Add_State(AWOOFY_DAMAGE, CAwoofy_Damage_State::Create());
+	m_pFSM->Add_State(BUFFAHORN_WAIT, CBuffahorn_Wait_State::Create());
 
-	// 상태 Initialize
+	m_pFSM->Add_State(BUFFAHORN_RUNSTART, CBuffahorn_Run_State::Create());
+	m_pFSM->Add_State(BUFFAHORN_RUN, CBuffahorn_Run_State::Create());
+
+	m_pFSM->Add_State(BUFFAHORN_BRAKE, CBuffahorn_Brake_State::Create());
+	m_pFSM->Add_State(BUFFAHORN_BRAKEEND, CBuffahorn_Brake_State::Create());
+
+	//상태 Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};
-	FSM_Desc.iState = AWOOFY_WAIT;
+	FSM_Desc.iState = BUFFAHORN_CHARGEWAIT;
 	FSM_Desc.pModel = &m_pModelCom;
 	m_pFSM->Initialize(&FSM_Desc);
 }
 
-CAwoofy* CAwoofy::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CBuffahorn* CBuffahorn::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	CAwoofy* pInstance = new CAwoofy(pDevice, pContext);
+	CBuffahorn* pInstance = new CBuffahorn(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Create : CAwoofy"));
+		MSG_BOX(TEXT("Failed To Create : CBuffahorn"));
 
 		Safe_Release(pInstance);
 	}
@@ -273,23 +273,20 @@ CAwoofy* CAwoofy::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	return pInstance;
 }
 
-CGameObject* CAwoofy::Clone(void* pArg)
+CGameObject* CBuffahorn::Clone(void* pArg)
 {
-	CAwoofy* pInstance = new CAwoofy(*this);
+	CBuffahorn* pInstance = new CBuffahorn(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Clone : CAwoofy"));
+		MSG_BOX(TEXT("Failed To Clone : CBuffahorn"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CAwoofy::Free()
+void CBuffahorn::Free()
 {
 	__super::Free();
-
-	//Safe_Release(m_pFSM);
 }
-

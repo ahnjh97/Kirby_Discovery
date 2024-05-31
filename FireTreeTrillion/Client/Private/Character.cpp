@@ -65,7 +65,7 @@ void CCharacter::SetOn_Slope(_float fTimeDelta)
 	// Áö¸éÀÇ upº¤ÅÍ
 	PxVec3 slope = m_pControllerCom->Compute_Slope(m_pTransformCom);
 	_vector vTerrainNormal = CUtils::To_Vector(slope);
-	Lerp_UpVector(vTerrainNormal, 10.f, fTimeDelta);
+	Lerp_UpVector(vTerrainNormal, 20.f, fTimeDelta);
 }
 
 void CCharacter::Lerp_UpVector(_fvector _vTargetUp, _float _maxAngle, _float fTimeDelta)

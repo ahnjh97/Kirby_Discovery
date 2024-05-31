@@ -2,7 +2,6 @@
 
 #include "Client_Defines.h"
 #include "Monster.h"
-#include <Kirby.h>
 
 BEGIN(Engine)
 class CModel;
@@ -53,15 +52,18 @@ public:
 public:
 	void Change_State(RABBIT_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
 	_bool IsAnimFinished();
-	_bool IsAnimFinished(_uint iCurrentAnimIndex);
 	_uint Get_State();
 
 	void Compute_Parabola(_vector vEndPos);
 	_vector JumpAttak(_float fTimeDelta);
 
 private:
-	CFSM* m_pFSM = { nullptr };
 	RABBIT_ANIM	m_eCurrentState = { RABBIT_END };
+
+	void			Compute_MotionBlur();
+	_float2			m_vPreScreenPos = { 0.f, 0.f };
+	_float4			m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
+
 
 private:
 	_float	m_fTimeDelta = { 0.f };
