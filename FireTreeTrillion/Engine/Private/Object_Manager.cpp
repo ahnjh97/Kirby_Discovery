@@ -27,6 +27,15 @@ CGameObject* CObject_Manager::Get_GameObject(_uint iLevelIndex, const wstring& s
 	return pLayer->Get_GameObject(iIndex);
 }
 
+CGameObject* CObject_Manager::Get_GameObject(_uint iLevelIndex, const wstring& wstrLayerTag)
+{
+	CLayer* pLayer = Find_Layer(iLevelIndex, wstrLayerTag);
+	if (nullptr == pLayer)
+		return nullptr;
+
+	return pLayer->Get_GameObject();
+}
+
 CGameObject* CObject_Manager::Get_GameObject_ByTag(_uint iLevelIndex, const wstring& strLayerTag, wstring _tag)
 {
 	CLayer* pLayer = Find_Layer(iLevelIndex, strLayerTag);
@@ -34,6 +43,16 @@ CGameObject* CObject_Manager::Get_GameObject_ByTag(_uint iLevelIndex, const wstr
 		return nullptr;
 
 	return pLayer->Get_GameObject_ByTag(_tag);
+}
+
+_uint CObject_Manager::Get_GameObject_Num(_uint _iLevelIndex, const wstring& _strLayerTag)
+{
+	//레이어 검색 후 오브젝트 개수 리턴
+	CLayer* pLayer = Find_Layer(_iLevelIndex, _strLayerTag);
+	if (nullptr == pLayer)
+		return 0;
+
+	return pLayer->Get_GameObject_Num();
 }
 
 HRESULT CObject_Manager::Initialize(_uint iNumLevels)

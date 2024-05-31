@@ -44,6 +44,7 @@ public:
 	virtual HRESULT		Render();
 	virtual HRESULT		Render_LightDepth() { return S_OK; }
 	virtual void		Render_IMGUI();
+	virtual HRESULT		Render_DeferredInfo() { return S_OK; }
 	
 	// 충돌처리 함수
 	virtual void		Collision_Attack(CGameObject* pGameObject);

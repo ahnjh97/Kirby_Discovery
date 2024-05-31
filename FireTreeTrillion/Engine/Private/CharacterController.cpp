@@ -25,7 +25,7 @@ HRESULT CCharacterController::Initialize(void* pArg)
 
 	Set_DefaultValue();
 	Create_Controller();
-
+	m_pGameInstance->Register_Player(m_pController->getActor());
 	return S_OK;
 }
 
@@ -157,6 +157,46 @@ _bool CCharacterController::Jump(CTransform* pTransform, _float fFallVelocity, _
 	return true;
 }
 
+_bool CCharacterController::Jump_Parabola(CTransform* pTransform, _vector vGoPos, _float fTimeDelta)
+{
+	PxExtendedVec3 pxCurrentPos = m_pController->getPosition();
+	PxVec3 moveVector((_float)pxCurrentPos.x, (_float)pxCurrentPos.y, (_float)pxCurrentPos.z);
+	//// 이동
+	//PxControllerCollisionFlags collisionFlags = m_pController->move(moveVector, 0.001f, fTimeDelta, PxControllerFilters());
+
+	PxVec3 displacement = CUtils::To_PxVec3(vGoPos) - moveVector;
+
+	if (vGoPos.m128_f32[1] > 0.0f)
+	{
+		PxControllerFilters filters;
+		m_pController->move(displacement, 0.0f, fTimeDelta, filters);
+
+		// 객체의 충돌 상태 받아오기
+		PxControllerState m_pPxState;
+		m_pController->getState(m_pPxState);
+
+		// 지면 판정, 천장 판정 처리
+		if (m_pPxState.collisionFlags & PxControllerCollisionFlag::eCOLLISION_DOWN || m_pPxState.collisionFlags & PxControllerCollisionFlag::eCOLLISION_UP)
+			return false;
+
+		pxCurrentPos = m_pController->getPosition();
+		PxVec3 pos((_float)pxCurrentPos.x, (_float)pxCurrentPos.y, (_float)pxCurrentPos.z);
+
+		_vector xmPos = XMVectorSet(pos.x, pos.y - 0.5f, pos.z, 0.f);
+
+		pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
+	}
+	// 객체의 위치 받아오기
+	//PxExtendedVec3 pxCurPos = m_pController->getPosition();
+	//PxVec3 pos((_float)pxCurrentPos.x, (_float)pxCurrentPos.y, (_float)pxCurrentPos.z);
+
+	//_vector xmPos = XMVectorSet(pos.x, pos.y - 0.5f, pos.z, 0.f);
+
+	//pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
+
+	return true;
+}
+
 /// <summary> 자 유 낙 하 </summary>
 void CCharacterController::FreeFall(CTransform* pTransform, _float fTimeDelta, _float fOffset)
 {
@@ -170,16 +210,17 @@ void CCharacterController::FreeFall(CTransform* pTransform, _float fTimeDelta, _
 	PxControllerState m_pPxState;
 	m_pController->getState(m_pPxState);
 
-	if (m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_DOWN || m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_UP)
-	{
-		m_fFallVelocity = 0.f;
-		return;
-	}
-
 	PxExtendedVec3 pxPos = m_pController->getPosition();
 	PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
 
 	_vector xmPos = XMVectorSet(pos.x, pos.y - m_fOffset, pos.z, 0.f);
+
+	if (m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_DOWN || m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_UP)
+	{
+		m_fFallVelocity = 0.f;
+		pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
+		return;
+	}
 
 	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
 }

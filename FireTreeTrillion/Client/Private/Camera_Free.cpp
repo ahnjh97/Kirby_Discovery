@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "..\Public\Camera_Free.h"
+#include "Camera_Free.h"
 #include "Kirby.h"
 
 CCamera_Free::CCamera_Free(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -27,10 +27,18 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 	CAMERA_FREE_DESC* pCameraFree = (CAMERA_FREE_DESC*)pArg;
 	m_fMouseSensor = pCameraFree->fMouseSensor;
 
+	//pCameraFree->fRotationPerSec = ToRadian(45.f);
+
+
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
 	m_pGameInstance->Add_Camera(this);
+
+	if (*m_pGameInstance->Get_CurrentLevelID() == LEVEL_GAMEPLAY) {
+		function<void(_int)> func = bind(&CCamera_Free::Set_MatrixIndex, this, placeholders::_1);
+		m_pGameInstance->SetUp_TriggerFunc(TRIGGER_CAMERA, func);
+	}
 
 	return S_OK;
 }
@@ -95,14 +103,21 @@ HRESULT CCamera_Free::Render()
 void CCamera_Free::Render_IMGUI()
 {
 	static _float fSpeed = 10.f;
+
+	_float4x4 WorldMat = m_pTransformCom->Get_WorldMatrix();
 	_float4 vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
 
-	ImGui::Text("X: %.2f", vPosition.x);
-	ImGui::SameLine();
-	ImGui::Text("Y: %.2f", vPosition.y);
-	ImGui::SameLine();
-	ImGui::Text("Z: %.2f", vPosition.z);
+	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._11, WorldMat._12, WorldMat._13, WorldMat._14 );
+	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._21, WorldMat._22, WorldMat._23, WorldMat._24);
+	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._31, WorldMat._32, WorldMat._33, WorldMat._34);
+	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._41, WorldMat._42, WorldMat._43, WorldMat._44);
+
+	//ImGui::Text("X: %.2f", vPosition.x);
+	//ImGui::SameLine();
+	//ImGui::Text("Y: %.2f", vPosition.y);
+	//ImGui::SameLine();
+	//ImGui::Text("Z: %.2f", vPosition.z);
 
 	ImGui::SliderFloat("CameraFree Speed", &fSpeed, 0.f, 200.f);
 
@@ -120,6 +135,25 @@ void CCamera_Free::Render_IMGUI()
 
 	ImGui::Separator();
 	ImGui::DragFloat3("CameraFree Offset", &m_vOffset.x);*/
+}
+ 
+void CCamera_Free::Set_MatrixIndex(_int iMatrixIndex)
+{
+	if (nullptr == m_pTransformCom || m_vecCamMatrices.empty())
+		return;
+
+	if (iMatrixIndex < 0 || iMatrixIndex == m_iMatrixIndex)
+		return;
+
+	if (iMatrixIndex < m_vecCamMatrices.size()) {
+		m_pTransformCom->Set_WorldMatrix(m_vecCamMatrices[iMatrixIndex]);
+		m_iMatrixIndex = iMatrixIndex;
+	}	
+}
+
+void CCamera_Free::EmplaceBackCamMatrix(const _float4x4& matWorld)
+{
+	m_vecCamMatrices.emplace_back(matWorld);
 }
 
 void CCamera_Free::Track_Target(_float fTimeDelta)
@@ -161,7 +195,7 @@ void CCamera_Free::Control(_float fTimeDelta)
 		Track_Target(fTimeDelta);
 
 
-	if (*m_pCurrentLevelID == LEVEL_TOOL_MAP || m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
+	if (/**m_pCurrentLevelID == LEVEL_TOOL_MAP ||*/ m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
 	{
 		_long	MouseMove = { 0 };
 
@@ -224,7 +258,7 @@ CCamera_Free* CCamera_Free::Create(ID3D11Device* pDevice, ID3D11DeviceContext* p
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CCamera_Free"));
+		MSG_BOX(TEXT("Failed To Create : CCamera_Free"));
 
 		Safe_Release(pInstance);
 	}
@@ -239,7 +273,7 @@ CGameObject* CCamera_Free::Clone(void* pArg)
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CCamera_Free"));
+		MSG_BOX(TEXT("Failed To Clone : CCamera_Free"));
 
 		Safe_Release(pInstance);
 	}
@@ -252,4 +286,6 @@ void CCamera_Free::Free()
 	Safe_Release(m_pTarget);
 
 	__super::Free();
+
+	m_vecCamMatrices.clear();
 }

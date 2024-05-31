@@ -1,3 +1,6 @@
+float g_fTexW = 1600.0f;
+float g_fTexH = 900.0f;
+float g_fFar = 1000.f;
 
 
 sampler ClampSampler = sampler_state

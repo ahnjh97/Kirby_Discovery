@@ -12,6 +12,8 @@ vector g_vRColor = { 1.f, 1.f, 1.f, 1.f };
 vector g_vGColor = { 1.f, 1.f, 1.f, 1.f };
 vector g_vBColor = { 1.f, 1.f, 1.f, 1.f };
 
+float g_fAlpha;
+
 struct VS_IN
 {
 	float3		vPosition : POSITION;
@@ -74,7 +76,8 @@ struct PS_IN
 
 struct PS_OUT
 {
-	float4		vColor : SV_TARGET0;
+    float4 vColor : SV_TARGET0;
+    float4 vNonBlur : SV_TARGET1;
 };
 
 PS_OUT PS_MAIN(PS_IN In)
@@ -83,6 +86,7 @@ PS_OUT PS_MAIN(PS_IN In)
 
     Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
 	
+	//알파 테스트
 	if(Out.vColor.a < .05f)
         discard;
 	
@@ -112,8 +116,25 @@ PS_OUT PS_MAIN_ALPHABLEND(PS_IN_ALPHABLEND In)
 	//float		fOldViewZ = vDepthDesc.y * 1000.f;
 
 	//Out.vColor.a = Out.vColor.a  * saturate(fOldViewZ - In.vProjPos.w);
-
+	
+	
+    Out.vColor *= g_fAlpha;
+	
+    Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
+	
 	return Out;
+}
+
+PS_OUT PS_MAIN_BLOOM(PS_IN_ALPHABLEND In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+	
+	if(0.f == Out.vColor.a)
+        discard;
+		
+    return Out;
 }
 
 PS_OUT PS_MAIN_WHITE_FX(PS_IN_ALPHABLEND In)
@@ -177,5 +198,19 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_WHITE_FX();
+    }
+
+	// For Bloom ( 3 )
+    pass Bloom
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN_ALPHABLEND();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_BLOOM();
     }
 }

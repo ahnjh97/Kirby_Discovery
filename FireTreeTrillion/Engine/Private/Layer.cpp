@@ -37,11 +37,27 @@ HRESULT CLayer::Add_GameObject(CGameObject * pGameObject)
 CGameObject* CLayer::Get_GameObject(_uint iIndex)
 {
 	auto	iter = m_GameObjects.begin();
-	std::advance(iter, iIndex);
+	advance(iter, iIndex);
 	/*for (size_t i = 0; i < iIndex; i++)
 		++iter;*/
 
 	return *iter;
+}
+
+CGameObject* CLayer::Get_GameObject()
+{
+	for (auto& obj : m_GameObjects)
+	{
+		if (nullptr == obj)
+			continue;;
+
+		if (true == obj->Get_Dead())
+			continue;
+
+		return obj;
+	}
+
+	return nullptr;
 }
 
 CGameObject* CLayer::Get_GameObject_ByTag(wstring _tag)

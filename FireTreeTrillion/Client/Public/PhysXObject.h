@@ -1,0 +1,53 @@
+#pragma once
+#include "Client_Defines.h"
+#include "GameObject.h"
+
+BEGIN(Client)
+
+/// <summary> 
+/// ABILITY 속성값을 부여하기 위한 상위 클래스입니다.
+/// 1. physX 영향을 받는 대부분의 객체에 해당됩니다.
+/// 2. 해당 클래스를 상속받지 않는 클래스는 다음과 같습니다.
+///		- Effect, Camera, UI_Object
+/// </summary>
+class CPhysXObject abstract : public CGameObject
+{
+protected:
+	CPhysXObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CPhysXObject(const CPhysXObject& rhs);
+	virtual ~CPhysXObject() = default;
+
+public:
+	virtual HRESULT Initialize_Prototype()			override;
+	virtual HRESULT Initialize(void* pArg)			override;
+	virtual _int	Tick(_float fTimeDelta)			override;
+	virtual void	Late_Tick(_float fTimeDelta)	override;
+	virtual HRESULT Render()						override;
+	virtual HRESULT Render_LightDepth()				override;
+	virtual void	Render_IMGUI()					override;
+
+	ABILITYTYPE	Get_AbilityType() { return m_eAbilityType; }
+	void Set_AbilityType(ABILITYTYPE eAbilityType) { m_eAbilityType = eAbilityType; }
+
+	_float Get_ResistTime() { return m_fResistTime; }
+
+	_bool	Get_Vacuuming() { return m_bVacuuming; }
+	void	Set_Vacuuming(_bool bVacuuming) { m_bVacuuming = bVacuuming; }
+
+public:
+	virtual CGameObject* Clone(void* pArg) = 0;
+	virtual void Free() override;
+
+protected:
+	// 현재 이 객체의 타입
+	ABILITYTYPE m_eAbilityType = { ABILITY_END };
+
+	// 커비가 빨아들일때, 버티는 시간을 지정한다.
+	_float		m_fResistTime;
+
+	// 흡수할때, 이 값을 true가 된다. (충돌에 영향을 안 받게 됨)
+	_bool		m_bVacuuming = { false };
+
+};
+
+END

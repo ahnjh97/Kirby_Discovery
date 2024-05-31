@@ -114,6 +114,7 @@ using namespace physx;
 #include <iostream>
 #include <fstream>
 #include <filesystem>
+#include <sstream>
 //#include <tchar.h>
 //#include <memory.h>
 #include <utility>
@@ -262,6 +263,10 @@ enum TEXTURETYPE
 #ifndef SWIG
     TextureType_Force32Bit = INT_MAX
 #endif
+};
+
+enum PASS_DEFERRED {
+    DEFERRED_DEBUG, DEFERRED_DIRECTLIGHT, DEFERRED_POINTLIGHT, DEFERRED_FINAL, DEFERRED_BLUR_X, DEFERRED_BLUR_Y, DEFERRED_BLUR_R, DEFERRED_COLORCORRECT, DEFERRED_END
 };
 
 #define TEXTURE_TYPE_MAX  TextureType_UNKNOWN

@@ -22,12 +22,14 @@ void CAwoofy_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 
-
 	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
 	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
 
 	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 	_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+
+	// 자유 낙하
+	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
 
 	// 플레이어와 몬스터의 거리 계산
 	_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(vPos, vKirbyPos)));
@@ -47,10 +49,8 @@ void CAwoofy_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 			pAwoofy->Change_State(CAwoofy::AWOOFY_WAIT, 40.f, false, true);
 	}
 
-	if (m_pGameInstance->Get_DIKeyState(DIK_SPACE, KEY_DOWN))
-		pAwoofy->Change_State(CAwoofy::AWOOFY_DAMAGE, 40.f, false, true);
-
-	pController->FreeFall(pTransformCom, fTimeDelta, 0.5f);
+	//if (m_pGameInstance->Get_DIKeyState(DIK_SPACE, KEY_DOWN))
+	//	pAwoofy->Change_State(CAwoofy::AWOOFY_DAMAGE, 40.f, false, true);
 }
 
 void CAwoofy_Idle_State::OnStateExit()
@@ -150,6 +150,9 @@ void CAwoofy_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
 	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
 
+	// 자유 낙하
+	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
+
 	m_fTimeDelta += fTimeDelta;
 
 	// n초 동안 돌진
@@ -199,8 +202,6 @@ void CAwoofy_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 		m_fTimeDelta = 0.f;
 		pAwoofy->Change_State(CAwoofy::AWOOFY_BRAKE, 40.f, false, true);
 	}
-
-	pController->FreeFall(pTransformCom, fTimeDelta, 0.5f);
 }
 
 void CAwoofy_Run_State::OnStateExit()
@@ -239,18 +240,19 @@ void CAwoofy_Find_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	CAwoofy* pAwoofy = static_cast<CAwoofy*>(pGameObject);
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
-	pController->FreeFall(pTransformCom, fTimeDelta, 0.5f);
+	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
 
 	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
 	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
+
+	// 자유 낙하
+	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
 
 	// 플레이어를 향해 바라본다
 	pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 2.f);
 
 	if (true == pAwoofy->IsAnimFinished())
 		pAwoofy->Change_State(CAwoofy::AWOOFY_RUN, 40.f, true, true);
-
-	pController->FreeFall(pTransformCom, fTimeDelta, 0.5f);
 }
 
 void CAwoofy_Find_State::OnStateExit()
@@ -290,7 +292,8 @@ void CAwoofy_LookAroundAfterBrake_State::OnStateUpdate(CGameObject* pGameObject,
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 
-	pController->FreeFall(pTransformCom, fTimeDelta, 0.5f);
+	// 자유 낙하
+	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
 
 	if (true == pAwoofy->IsAnimFinished())
 		pAwoofy->Change_State(CAwoofy::AWOOFY_WAIT, 40.f, false, true);
@@ -341,7 +344,7 @@ void CAwoofy_Brake_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 	else
 		m_fSpeed = 1.f;
 
-	pController->FreeFall(pTransformCom, fTimeDelta, 0.5f);
+	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
 
 	if (true == pAwoofy->IsAnimFinished())
 		pAwoofy->Change_State(CAwoofy::AWOOFY_LOOKAROUNDAFTERBRAKE, 45.f, false, true);
@@ -378,6 +381,13 @@ CAwoofy_Damage_State::CAwoofy_Damage_State()
 void CAwoofy_Damage_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
+
+	m_vKirbyLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+
+	m_fJumpVelocity = 5.f;
 }
 
 void CAwoofy_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -386,16 +396,13 @@ void CAwoofy_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 
-	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
-	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
+	pTransformCom->Look_At_Axis(-m_vKirbyLook);
+	pController->Move_Dir(pTransformCom, m_vKirbyLook * 0.15f, fTimeDelta);
 
-	// 넉백
-	_vector vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
-	pController->Move_Dir(pTransformCom, vLook * 0.1f, fTimeDelta);
-	//pController->Move_Dir(pTransformCom, vLook * 0.1f, fTimeDelta);
-	//_vector vKnockBack = vLook * 0.1f + XMLoadFloat4(&vMonPos);
+	m_fJumpVelocity -= GRAVITY * fTimeDelta * 2.5f;
+	pController->Jump(pTransformCom, m_fJumpVelocity, fTimeDelta);
 
-	if(true == pAwoofy->IsAnimFinished())
+	if(true == pAwoofy->IsAnimFinished() || pController->Is_Terrain())
 		pAwoofy->Change_State(CAwoofy::AWOOFY_WAIT, 40.f, false, true);
 }
 

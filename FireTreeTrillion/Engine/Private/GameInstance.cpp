@@ -117,20 +117,27 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 		nullptr == m_pPipeLine)
 		return;
 
+	_float ffTimeDelta = fTimeDelta;
+	if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_W, KEY_PRESS))
+	{
+		ffTimeDelta = fTimeDelta * 0.5f;
+	}
+
+
 	m_pInput_Device->Tick();
 
-	m_pObject_Manager->Tick(fTimeDelta);	
-	m_pPhysx->Tick(fTimeDelta);
+	m_pObject_Manager->Tick(ffTimeDelta);
+	m_pPhysx->Tick(ffTimeDelta);
 	m_pPicking->Update();
 	m_pPipeLine->Tick();
 
 	m_pFrustum->Tick();
-	m_pIMGUI_Manager->Late_Tick(fTimeDelta);
+	m_pIMGUI_Manager->Late_Tick(ffTimeDelta);
 
-	m_pObject_Manager->Late_Tick(fTimeDelta);
+	m_pObject_Manager->Late_Tick(ffTimeDelta);
 	
 	/* 반복적인 갱신이 필요한 객체들의 Tick함수를 호출한다. */
-	m_pLevel_Manager->Tick(fTimeDelta);
+	m_pLevel_Manager->Tick(ffTimeDelta);
 
 }
 
@@ -298,6 +305,17 @@ void CGameInstance::Update_LightShadow(_fvector vLightPos, _fvector vFocusPos)
 	m_pRenderer->Update_LightShadow(vLightPos, vFocusPos);
 }
 
+void CGameInstance::Update_DofFocus(_fvector vWorldPos)
+{
+	if (nullptr == m_pRenderer)
+		return;
+
+	m_pRenderer->Update_DofFocus(vWorldPos);
+
+}
+
+#ifdef _DEBUG
+
 HRESULT CGameInstance::Add_DebugComponents(CComponent * pRenderComponent)
 {
 
@@ -306,6 +324,8 @@ HRESULT CGameInstance::Add_DebugComponents(CComponent * pRenderComponent)
 
 	return m_pRenderer->Add_DebugComponents(pRenderComponent);
 }
+
+#endif
 
 HRESULT CGameInstance::Open_Level(_uint iNewLevelID, CLevel * pNewLevel)
 {
@@ -364,13 +384,25 @@ void CGameInstance::Clear_Layer(_uint iLevelIndex, const wstring& wstrLayerTag)
 	if (nullptr == m_pObject_Manager)
 		return;
 
-	return m_pObject_Manager->Clear_Layer(iLevelIndex, wstrLayerTag);
+	m_pObject_Manager->Clear_Layer(iLevelIndex, wstrLayerTag);
+}
+
+_uint CGameInstance::Get_GameObject_Num(_uint _iLevelIndex, const wstring& _strLayerTag)
+{
+	CHECK_NULLPTR(m_pObject_Manager);
+	return m_pObject_Manager->Get_GameObject_Num(_iLevelIndex, _strLayerTag);
 }
 
 CGameObject* CGameInstance::Get_GameObject(_uint iLevelIndex, const wstring& strLayerTag, _uint iIndex)
 {
 	CHECK_NULLPTR(m_pObject_Manager);
 	return m_pObject_Manager->Get_GameObject(iLevelIndex, strLayerTag, iIndex);
+}
+
+CGameObject* CGameInstance::Get_GameObject(_uint iLevelIndex, const wstring& wstrLayerTag)
+{
+	CHECK_NULLPTR(m_pObject_Manager);
+	return m_pObject_Manager->Get_GameObject(iLevelIndex, wstrLayerTag);
 }
 
 CGameObject* CGameInstance::Get_GameObject_ByTag(_uint iLevelIndex, const wstring& strLayerTag, wstring _tag)
@@ -637,7 +669,7 @@ _vector CGameInstance::Compute_WorldPos(const _float2 & vViewportPos, const wstr
 	if (m_pExtractor == nullptr)
 		return XMVectorZero();
 
-	return m_pExtractor->Compute_WorldPos(vViewportPos, strZRenderTargetTag, iOffset);	
+	return m_pExtractor->Compute_WorldPos(vViewportPos, strZRenderTargetTag, iOffset);
 }
 
 PxPhysics* CGameInstance::Get_Physics()
@@ -789,10 +821,10 @@ void CGameInstance::RenderGrid()
 	m_pIMGUI_Manager->RenderGrid();
 }
 
-void CGameInstance::Set_FileDialog()
+CImGUI_Manager::FILE_MODE CGameInstance::Set_FileDialog()
 {
 	CHECK_NULLPTR(m_pIMGUI_Manager);
-	m_pIMGUI_Manager->Set_FileDialog();
+	return m_pIMGUI_Manager->Set_FileDialog();
 }
 
 void CGameInstance::Set_IMGUIStyle(_uint uStyle)
@@ -817,12 +849,44 @@ PxRigidStatic* CGameInstance::CreateStaticActor(_float4 vPos, _float3* pVertices
 	return m_pPhysx->CreateStaticActor(vPos, pVerticesPos, iNumVertices, pIndices, iNumIndices, pMaterial);
 }
 
+void CGameInstance::Register_Player(PxActor* pPlayerActor)
+{
+	if (nullptr != m_pPhysx)
+		m_pPhysx->Register_Player(pPlayerActor);
+}
+
+void CGameInstance::Register_Trigger(PxActor* pTriggerActor, _int iTriggerType, _int iTriggerIndex)
+{
+	if (nullptr != m_pPhysx)
+		m_pPhysx->Register_Trigger(pTriggerActor, iTriggerType, iTriggerIndex);
+}
+
+void CGameInstance::SetUp_TriggerFunc(_int iTriggerType, function<void(_int)> func)
+{
+	if (nullptr != m_pPhysx)
+		m_pPhysx->SetUp_TriggerFunc(iTriggerType, func);
+}
+
+void CGameInstance::Clear_EventCallBack()
+{
+	if (nullptr != m_pPhysx)
+		m_pPhysx->Clear_EventCallBack();
+}
+
 void CGameInstance::Transform_PickingToLocalSpace(const CTransform* pTransform, _float3* pRayDir, _float3* pRayPos)
 {
 	if (nullptr == m_pPicking)
 		return;
 
 	m_pPicking->Transform_PickingToLocalSpace(pTransform, pRayDir, pRayPos);
+}
+
+_float2 CGameInstance::Get_MouseViewPortPos()
+{
+	if (nullptr == m_pPicking)
+		return _float2();
+
+	return m_pPicking->Get_MouseViewPortPos();
 }
 
 void CGameInstance::Release_Engine()

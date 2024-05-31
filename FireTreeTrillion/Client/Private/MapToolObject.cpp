@@ -19,9 +19,9 @@ HRESULT CMapToolObject::Initialize_Prototype()
 
 HRESULT CMapToolObject::Initialize(void* pArg)
 {
-	GAMEOBJECT_DESC GameObjectDesc = {}; 
+	MAPTOOLOBJECT_DESC GameObjectDesc = {};
 	if (pArg)
-		GameObjectDesc = *(GAMEOBJECT_DESC*)pArg;
+		GameObjectDesc = *(MAPTOOLOBJECT_DESC*)pArg;
 
 	GameObjectDesc.fSpeedPerSec = 10.f;
 	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
@@ -31,6 +31,9 @@ HRESULT CMapToolObject::Initialize(void* pArg)
 
 	if (FAILED(Add_Components(GameObjectDesc.wstrModelName)))
 		return E_FAIL;
+	
+	m_iTriggerIndex = GameObjectDesc.iTriggerIndex;
+	m_iTriggerType = GameObjectDesc.iTriggerType;
 
 	return S_OK;
 }
@@ -62,7 +65,10 @@ HRESULT CMapToolObject::Render()
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
 			return E_FAIL;
 			/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom->Begin(0)))
+		_uint iPassIndex{};
+		if (m_pModelCom->Get_ModelInfo().strModelName == "Trigger")
+			iPassIndex = MODEL_TRIGGER;
+		if (FAILED(m_pShaderCom->Begin(iPassIndex)))
 			return E_FAIL;
 
 		if (FAILED(m_pModelCom->Render(i)))
@@ -94,12 +100,14 @@ HRESULT CMapToolObject::Bind_ShaderResources()
 
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
-
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
-
+	if (m_pModelCom->Get_ModelInfo().strModelName == "Trigger") {
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_iTriggerType", &m_iTriggerType, sizeof(_uint))))
+			return E_FAIL;
+	}
 	return S_OK;
 }
 

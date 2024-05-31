@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "FSM.h"
 #include "Awoofy.h"
+#include "FSM.h"
 #include "Awoofy_State.h"
 
 CAwoofy::CAwoofy(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -33,7 +33,14 @@ HRESULT CAwoofy::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	m_pModelCom->Set_Animation(AWOOFY_GROOMING, 45.f, true, true);
+	m_pModelCom->Set_Animation(AWOOFY_GROOMING, 45.f, false, true);
+
+
+	m_fMaxHp = 10.f;
+	m_fHp = 10.f;
+	m_fAttack = 8.f;
+	m_fResistTime = 0.3f;
+	m_eAbilityType = ABILITY_DEFAULT;
 
 	return S_OK;
 }
@@ -45,22 +52,12 @@ _int CAwoofy::Tick(_float fTimeDelta)
 
 	__super::Tick(fTimeDelta);
 
-    // FSM 제어
-	//if (m_pFSM != nullptr)
-	//	m_pFSM->Update(this, fTimeDelta);
-
 	return OBJ_NOEVENT;
 }
 
 void CAwoofy::Late_Tick(_float fTimeDelta)
 {
 	m_pModelCom->Play_Animation(fTimeDelta);
-
-	// 지면충돌과 경사 보정
-	//// 지면의 up벡터
-	//PxVec3 slope = m_pControllerCom->Compute_Slope(m_pTransformCom);
-	//_vector vTerrainNormal = CUtils::To_Vector(slope);
-	//Lerp_UpVector(vTerrainNormal, 10.f, fTimeDelta);
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
@@ -85,7 +82,7 @@ HRESULT CAwoofy::Render()
 			return E_FAIL;
 
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom->Begin(1)))
+		if (FAILED(m_pShaderCom->Begin(MODEL_NORMAL_X)))
 			return E_FAIL;
 
 		m_pModelCom->Render(i);
@@ -129,7 +126,7 @@ void CAwoofy::Render_IMGUI()
 
 void CAwoofy::Collision_Attack(CGameObject* pOtherObj)
 {
-	Change_State(CAwoofy::AWOOFY_DAMAGE, 40.f, false, true);
+	Change_State(CAwoofy::AWOOFY_DAMAGE, 50.f, false, true);
 }
 
 void CAwoofy::Change_State(AWOOFY_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
@@ -176,7 +173,7 @@ HRESULT CAwoofy::Add_Components()
 	CHECK_FAILED(hr);
 
 	/* For.Com_CharacterController */
-	_float4 vPos = XMVectorSet(10.f, 10.f, -175.f, 1.f);
+	_float4 vPos = XMVectorSet(10.f, 20.f, -170.f, 1.f);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
 	desc.uCollisionType = m_eCollisionGroup;
@@ -204,6 +201,19 @@ HRESULT CAwoofy::Bind_ShaderResources()
 		return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
+		return E_FAIL;
+
+	_bool bStencil = true;
+	_bool bRimLight = true;
+	_bool bMotionBlur = true;
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
 		return E_FAIL;
 
 	return S_OK;
@@ -237,7 +247,8 @@ CAwoofy* CAwoofy::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CAwoofy"));
+		MSG_BOX(TEXT("Failed To Create : CAwoofy"));
+
 		Safe_Release(pInstance);
 	}
 
@@ -250,7 +261,7 @@ CGameObject* CAwoofy::Clone(void* pArg)
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Cloned : CAwoofy"));
+		MSG_BOX(TEXT("Failed To Clone : CAwoofy"));
 		Safe_Release(pInstance);
 	}
 
@@ -260,7 +271,5 @@ CGameObject* CAwoofy::Clone(void* pArg)
 void CAwoofy::Free()
 {
 	__super::Free();
-
-	//Safe_Release(m_pFSM);
 }
 

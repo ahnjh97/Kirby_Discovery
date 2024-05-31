@@ -9,7 +9,12 @@
 #include "MapToolHelper.h"
 #include "MapToolObject.h"
 #include "BasicMap.h"
+#include "Trigger.h"
 #include "Grid.h"
+
+
+//스카이 스피어
+#include "SkySphere.h"
 
 #pragma region TOOL_UI
 
@@ -42,7 +47,10 @@
 #include "Awoofy.h"
 #include "RigidBody.h"
 #include "CharacterController.h"
+#include "Rabbit.h"
+#include "Buffahorn.h"
 
+#include "Moon.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
@@ -175,19 +183,44 @@ HRESULT CLoader::Loading_ObjectAll()
 	#pragma endregion
 
 	#pragma region FOR CLIENT
-	// For Kirby
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kirby"), CKirby);
-	// For Awoofy To Monster
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Awoofy"), CAwoofy);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Rabbit"), CRabbit);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Buffahorn"), CBuffahorn);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BackGround"), CBackGround);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_Test"), CTestUI);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestMap"), CTestTerrain);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Moon"), CMoon);
 	#pragma endregion
+
+	//이펙트 툴 용
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FXToolDirector"), CFXToolDirector);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SingleEffect"), CSingleEffect);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MultiEffect"), CMultiEffect);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Particle"), CParticle);
+
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SkySphere"), CSkySphere);
+
+	// MapTool GameObject Prototypes
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Grid"), CGrid);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BasicMap"), CBasicMap);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolHelper"), CMapToolHelper);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolObject"), CMapToolObject);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Trigger"), CTrigger);
+
+#pragma region TOOL_UI
+
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("IMGUI_UI_Editor"), CUI_Editor);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_Kirby"), CHUD_Kirby);
+
+#pragma endregion
 
 	return S_OK;
 }
+
 //static 컴포넌트들을 로드한다.
 HRESULT CLoader::Loading_StaticComponentAll()
 {
@@ -260,6 +293,10 @@ HRESULT CLoader::Loading_For_GamePlay()
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
 	#pragma region 텍스쳐
 	if (FAILED(Add_Texture(eLevel, "Logo", "Logo/Logo.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Moon", "Moon.png")))
+		return E_FAIL;
+	if(FAILED(Add_Texture(eLevel, "GsLandTopNoize_Fur", "Map/GsLandTopNoize_Fur.dds")))
 		return E_FAIL;
 
 	// 커비 얼굴 텍스쳐 로드
@@ -386,6 +423,8 @@ HRESULT CLoader::Loading_For_Tool_Map()
 	LEVEL eLevel = LEVEL_TOOL_MAP;
 
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
+	if (FAILED(Add_Texture(eLevel, "GsLandTopNoize_Fur", "Map/GsLandTopNoize_Fur.dds")))
+		return E_FAIL;
 
 	m_strLoadingText = TEXT("VI버퍼(을) 로딩 중 입니다.");
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Grid"),
@@ -414,7 +453,8 @@ HRESULT CLoader::Loading_For_Tool_UI()
 
 #pragma region TEXTURE
 
-	hr = Add_Texture(eLevel, "KirbyBarHard", "UI/HUD/Hero/BarHard/HeroPanelBarHard_%d.png", 3);
+	//hr = Add_Texture(eLevel, "KirbyBarHard", "UI/HUD/Hero/BarHard/HeroPanelBarHard_%d.png", 3);
+	hr = Add_Texture(eLevel, "GameComplete", "UI/GAMECOMPLETE/GameComplete_%d.png", 21);
 	CHECK_FAILED(hr);
 
 	m_strLoadingText = TEXT("Loading For Texture : Complete!");
@@ -456,12 +496,15 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	// MODEL 구조체 생성자 기본 값  : ""			  / TYPE_END /  1.f  /    0.f     / 4
 	if (eLevel == LEVEL_STATIC)
 	{
-		m_vecModelInfo.emplace_back(MODEL{ "SmokeCenter", TYPE_NONANIM });
-		m_vecModelInfo.emplace_back(MODEL{ "SmokeFadeLarge", TYPE_NONANIM });
-		m_vecModelInfo.emplace_back(MODEL{ "SmokeOriginal", TYPE_NONANIM });
-		m_vecModelInfo.emplace_back(MODEL{ "SmokeSplit", TYPE_NONANIM });
-		m_vecModelInfo.emplace_back(MODEL{ "SmokeTail", TYPE_NONANIM });
-		m_vecModelInfo.emplace_back(MODEL{ "Tornado", TYPE_NONANIM });
+		//sky sphere
+		m_vecModelInfo.emplace_back("SkySphere_Stage1_Day", TYPE_NONANIM );
+
+		m_vecModelInfo.emplace_back("SmokeCenter", TYPE_NONANIM );
+		m_vecModelInfo.emplace_back("SmokeFadeLarge", TYPE_NONANIM );
+		m_vecModelInfo.emplace_back("SmokeOriginal", TYPE_NONANIM );
+		m_vecModelInfo.emplace_back("SmokeSplit", TYPE_NONANIM );
+		m_vecModelInfo.emplace_back("SmokeTail", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("Tornado", TYPE_NONANIM );
 
 	}
 	else if (eLevel == LEVEL_LOGO)
@@ -470,32 +513,36 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	}
 	else if (eLevel == LEVEL_GAMEPLAY)
 	{
-		m_vecModelInfo.emplace_back(MODEL{ "Fiona", TYPE_ANIM });
-		m_vecModelInfo.emplace_back(MODEL{ "Dee", TYPE_ANIM, 0.01f });
-		m_vecModelInfo.emplace_back(MODEL{ "Kirby", TYPE_ANIM });
+		m_vecModelInfo.emplace_back("Fiona", TYPE_ANIM );
+		m_vecModelInfo.emplace_back("Dee", TYPE_ANIM, 0.01f);
+		m_vecModelInfo.emplace_back("Kirby", TYPE_ANIM);
 
-		m_vecModelInfo.emplace_back(MODEL{ "TestMap", TYPE_NONANIM });
-		m_vecModelInfo.emplace_back(MODEL{ "TestMap2", TYPE_NONANIM, 0.01f });
+		m_vecModelInfo.emplace_back("TestMap", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("TestMap2", TYPE_NONANIM, 0.01f);
 
 		// For Kirby Body
-		m_vecModelInfo.emplace_back(MODEL{ "KirbyBalloon", TYPE_ANIM, 1.f, 180.f });
-		m_vecModelInfo.emplace_back(MODEL{ "KirbyDefault", TYPE_ANIM, 1.f, 180.f });
-		m_vecModelInfo.emplace_back(MODEL{ "KirbyVacuum", TYPE_ANIM, 1.f, 180.f });
+		m_vecModelInfo.emplace_back("KirbyBalloon", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbyDefault", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbyVacuum", TYPE_ANIM, 1.f, 180.f);
 
-		m_vecModelInfo.emplace_back(MODEL{ "GsBenchAL", TYPE_NONANIM });
-		m_vecModelInfo.emplace_back(MODEL{ "Level0Stage1Step01", TYPE_NONANIM });
-		m_vecModelInfo.emplace_back(MODEL{ "Level1Stage1Step01", TYPE_NONANIM });
+		m_vecModelInfo.emplace_back("GsBenchAL", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("Level0Stage1Step01", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("Level1Stage1Step01", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("Level1Stage1Step01_Blend", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f);
 
-		// For Awoofy
-		m_vecModelInfo.emplace_back(MODEL{ "Awoofy", TYPE_ANIM, 1.f, 180.f });
+		// For Monster
+		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("Rabbit", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("Buffahorn", TYPE_ANIM, 1.f, 180.f);
 	}
 	else if (eLevel == LEVEL_TOOL_MAP) 
 	{		
 		// 맵툴에서는 크기나 회전 상태 바꾸고 싶은 모델만 여기에 등록. 안바꾸고싶으면 NonAnim, 크기1, 회전 0도로 자동 추가됨
-		m_vecModelInfo.emplace_back(MODEL{ "Book", TYPE_NONANIM, 0.01f});
-		m_vecModelInfo.emplace_back(MODEL{ "TestMap2", TYPE_NONANIM, 0.01f });
-		m_vecModelInfo.emplace_back(MODEL{ "Trigger", TYPE_NONANIM, 0.01f });
-		m_vecModelInfo.emplace_back(MODEL{ "Camera", TYPE_NONANIM, 0.2f , 270.f});
+		m_vecModelInfo.emplace_back("Book", TYPE_NONANIM, 0.01f);
+		m_vecModelInfo.emplace_back("TestMap2", TYPE_NONANIM, 0.01f);
+		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f);
+		m_vecModelInfo.emplace_back("Camera", TYPE_NONANIM, 0.2f , 270.f);
 	}
 	else if (eLevel == LEVEL_TOOL_ANIM)
 	{
@@ -686,7 +733,7 @@ CLoader * CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, 
 
 	if (FAILED(pInstance->Initialize(eNextLevelID)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CLoader"));
+		MSG_BOX(TEXT("Failed To Create : CLoader"));
 
 		Safe_Release(pInstance);
 	}

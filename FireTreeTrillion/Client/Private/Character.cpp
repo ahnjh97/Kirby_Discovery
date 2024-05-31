@@ -3,12 +3,12 @@
 #include "FSM.h"
 
 CCharacter::CCharacter(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CGameObject{ pDevice , pContext }
+	: CPhysXObject{ pDevice , pContext }
 {
 }
 
 CCharacter::CCharacter(const CCharacter& rhs)
-	: CGameObject{ rhs }
+	: CPhysXObject{ rhs }
 {
 }
 
@@ -30,9 +30,8 @@ _int CCharacter::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
-    // FSM 제어
-    if (m_pFSM != nullptr)
-   		m_pFSM->Update(this, fTimeDelta);
+	// FSM Update , SetOn_Slope, MotionBlur // 
+	Character_SystemTick(fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
@@ -51,6 +50,8 @@ HRESULT CCharacter::Render()
 
 HRESULT CCharacter::Render_LightDepth()
 {
+	__super::Render();
+
 	return S_OK;
 }
 
@@ -65,7 +66,7 @@ void CCharacter::SetOn_Slope(_float fTimeDelta)
 	// 지면의 up벡터
 	PxVec3 slope = m_pControllerCom->Compute_Slope(m_pTransformCom);
 	_vector vTerrainNormal = CUtils::To_Vector(slope);
-	Lerp_UpVector(vTerrainNormal, 10.f, fTimeDelta);
+	Lerp_UpVector(vTerrainNormal, 20.f, fTimeDelta);
 }
 
 void CCharacter::Lerp_UpVector(_fvector _vTargetUp, _float _maxAngle, _float fTimeDelta)
@@ -91,6 +92,34 @@ void CCharacter::Lerp_UpVector(_fvector _vTargetUp, _float _maxAngle, _float fTi
 	m_pTransformCom->Set_State(CTransform::STATE_RIGHT, vNewRight);
 	m_pTransformCom->Set_State(CTransform::STATE_UP, m_vOriginUp);
 	m_pTransformCom->Set_State(CTransform::STATE_LOOK, vNewLook);
+}
+
+void CCharacter::Compute_MotionBlur()
+{
+	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	_matrix ViewProjectionMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW) * m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
+	_vector vScreenPos = XMVector3TransformCoord(vPos, ViewProjectionMatrix);
+	_float fScreenX = (XMVectorGetX(vScreenPos) + 1.f) * 0.5f;
+	_float fScreenY = (XMVectorGetY(vScreenPos) + 1.f) * 0.5f;
+
+	_float2 vCurScreenPos = _float2(fScreenX, 1.f - fScreenY);
+
+	m_vMotionVelocity.x = (m_vPreScreenPos - vCurScreenPos).x;
+	m_vMotionVelocity.y = (m_vPreScreenPos - vCurScreenPos).y;
+	m_vPreScreenPos = vCurScreenPos;
+}
+
+void CCharacter::Character_SystemTick(_float fTimeDelta)
+{
+	// 모션블러 계산
+	Compute_MotionBlur();
+
+	// FSM 제어
+	if (m_pFSM != nullptr)
+		m_pFSM->Update(this, fTimeDelta);
+
+	// 터레인 경사면 보간 제어
+	SetOn_Slope(fTimeDelta);
 }
 
 void CCharacter::Free()

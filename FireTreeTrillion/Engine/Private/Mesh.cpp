@@ -156,10 +156,13 @@ _float4 CMesh::Get_PickPos(const CTransform* pTransform) const
 
 	_float fShortest = { FLT_MAX };
 	_float4 fResult = {};
-	for (auto& iter : vecPickPos) // 카메라와 가장 거리가 가까운놈 계산 
+	for (auto& iter : vecPickPos) // 카메라와 가장 거리가 가까운 위치 계산 
 	{
-		if (iter.w <= fShortest)
+		if (iter.w < fShortest) {
+			fShortest = iter.w;
 			fResult = iter;
+		}
+			
 	}
 
 	return fResult;

@@ -2,7 +2,9 @@
 #include "..\Public\Level_GamePlay.h"
 
 #include "Kirby.h"
+#include "Level_GamePlay.h"
 #include "Camera_Free.h"
+#include "Trigger.h"
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -36,6 +38,11 @@ HRESULT CLevel_GamePlay::Initialize()
 	
 	if (FAILED(Ready_ParsedObjects()))
 		return E_FAIL;
+
+	// TEST (블러와 블랜드의 관계)
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Moon"), TEXT("Prototype_GameObject_Moon"))))
+		return E_FAIL;
+
 
 	return S_OK;
 }
@@ -98,8 +105,12 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
 
 HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_TestMap"))))
-		return E_FAIL;
+
+	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_SkySphere"));
+	CHECK_FAILED(hr);
+
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_TestMap"))))
+	//	return E_FAIL;
 
 	return S_OK;
 }
@@ -121,6 +132,14 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const wstring & strLayerTag)
 	// Awoofy
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Awoofy"))))
 		return E_FAIL;
+
+	//// Rabbit
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Rabbit"))))
+	//	return E_FAIL;
+
+	// Buffahorn
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Buffahorn"))))
+	//	return E_FAIL;
 
 	return S_OK;
 }
@@ -147,7 +166,8 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 
 	string strModelName;
 	_float4x4 matWorld{};
-	_int iCamIndex{};
+	_int iTriggerType{};
+	_int iTriggerIndex{};
 	map<_int, _float4x4> camMatrices;
 
 	while (!fileStream.eof())
@@ -159,8 +179,11 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 		fileStream.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
 
 		if ("Camera" == strModelName || "Trigger" == strModelName) {
-			fileStream.read(reinterpret_cast<char*>(&iCamIndex), sizeof(iCamIndex));
-			camMatrices.emplace(iCamIndex, matWorld);
+			if("Trigger" == strModelName)
+				fileStream.read(reinterpret_cast<char*>(&iTriggerType), sizeof(iTriggerType));
+			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
+			if("Camera" == strModelName)
+				camMatrices.emplace(iTriggerIndex, matWorld);
 		}
 		if (fileStream.eof())
 			break;
@@ -171,7 +194,7 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 
 		if (strModelName == "NonAnim_Kirby")
 		{
-			tempDesc.wstrModelName.erase(0, 8);
+			tempDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby"), &tempDesc)))
 				return E_FAIL;
 		}
@@ -180,14 +203,24 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_BasicMap"), &tempDesc)))
 				return E_FAIL;
 		}
+		else if (strModelName == "Trigger")
+		{
+			CTrigger::TRIGGER_DESC tTriggerDesc{};
+			tTriggerDesc.matWorld = matWorld;
+			tTriggerDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			tTriggerDesc.iTriggerType = iTriggerType;
+			tTriggerDesc.iTriggerIndex = iTriggerIndex;
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Trigger"), TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc)))
+				return E_FAIL;
+		}
 	}
 	fileStream.close();
 
-	CCamera_Free* pCamera = dynamic_cast<CCamera_Free*> (m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Camera"), 0));
+	CCamera_Free* pCamera = dynamic_cast<CCamera_Free*> (m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Camera")));
 	if (nullptr == pCamera)
 		return E_FAIL;
 
-	if (!camMatrices.empty()) {
+	if (!camMatrices.empty()) { // 카메라 행렬 세팅
 		for (auto& pair : camMatrices)
 			pCamera->EmplaceBackCamMatrix(pair.second);
 
@@ -203,7 +236,7 @@ CLevel_GamePlay * CLevel_GamePlay::Create(ID3D11Device* pDevice, ID3D11DeviceCon
 
 	if (FAILED(pInstance->Initialize()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CLevel_GamePlay"));
+		MSG_BOX(TEXT("Failed To Create : CLevel_GamePlay"));
 		Safe_Release(pInstance);
 	}
 
@@ -213,4 +246,5 @@ CLevel_GamePlay * CLevel_GamePlay::Create(ID3D11Device* pDevice, ID3D11DeviceCon
 void CLevel_GamePlay::Free()
 {
 	__super::Free();
+	m_pGameInstance->Clear_EventCallBack();
 }

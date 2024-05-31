@@ -1,5 +1,6 @@
 #pragma once
 #include "Base.h"
+#include "GameObject.h"
 
 BEGIN(Engine)
 
@@ -24,6 +25,12 @@ public:
     // Actor 관리
     void AddActor(physx::PxActor& pActor);
     void RemoveActor(physx::PxActor& pActor);
+
+    //EventCallBack 함수들
+    void Register_Player(PxActor* pPlayerActor);
+    void Register_Trigger(PxActor* pTriggerActor, _int iTriggerType, _int iTriggerIndex);
+    void SetUp_TriggerFunc(_int iTriggerType, function<void(_int)> func);
+    void Clear_EventCallBack();
 
     PxPhysics*                          Get_Physics() { return m_pPhysics; }
     PxMaterial*                         Get_Material() { return m_pMaterial; }

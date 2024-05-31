@@ -1,5 +1,6 @@
 #include "PhysX.h"
 #include "Utils.h"
+#include "EventCallBack.h"
 #include "GameObject.h"
 #include "GameInstance.h"
 
@@ -21,16 +22,17 @@ HRESULT CPhysX::Initialize()
     mToleranceScale.speed = 0.1f;      // typical speed of an object, gravity * 1s is a reasonable choice
 
     m_pPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *m_pFoundation, mToleranceScale, true, m_pPvd);
-
+    CEventCallBack* pEventCallBack = new CEventCallBack();
     PxSceneDesc sceneDesc(m_pPhysics->getTolerancesScale());
     sceneDesc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
     m_pDispatcher = physx::PxDefaultCpuDispatcherCreate(2);
     sceneDesc.cpuDispatcher = m_pDispatcher;
+    sceneDesc.simulationEventCallback = pEventCallBack;
     sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
     sceneDesc.broadPhaseType = PxBroadPhaseType::eSAP; // ¶Ç´Â eMBP
 
     m_pScene = m_pPhysics->createScene(sceneDesc);
-
+    
     m_pPvdSceneClient = m_pScene->getScenePvdClient();
     if (m_pPvdSceneClient)
     {
@@ -137,6 +139,45 @@ void CPhysX::RemoveActor(physx::PxActor& pActor)
     m_pScene->removeActor(pActor);
 }
 
+void CPhysX::Register_Player(PxActor* pPlayerActor)
+{
+    if (nullptr == m_pScene)
+        return;
+    CEventCallBack* pEventCallBack = dynamic_cast<CEventCallBack*>(m_pScene->getSimulationEventCallback());
+    if (nullptr == pEventCallBack)
+        return;
+    pEventCallBack->Register_Player(pPlayerActor);
+}
+
+void CPhysX::Register_Trigger(PxActor* pTriggerActor, _int iTriggerType, _int iTriggerIndex)
+{
+    if (nullptr == m_pScene)
+        return;
+    CEventCallBack* pEventCallBack = dynamic_cast<CEventCallBack*>(m_pScene->getSimulationEventCallback());
+    if (nullptr == pEventCallBack)
+        return;
+    pEventCallBack->Register_Trigger(pTriggerActor, iTriggerType, iTriggerIndex);
+}
+
+void CPhysX::SetUp_TriggerFunc(_int iTriggerType, function<void(_int)> func)
+{
+    if (nullptr == m_pScene)
+        return;
+    CEventCallBack* pEventCallBack = dynamic_cast<CEventCallBack*>(m_pScene->getSimulationEventCallback());
+    if (nullptr == pEventCallBack)
+        return;
+    pEventCallBack->SetUp_TriggerFunc(iTriggerType, func);
+}
+
+void CPhysX::Clear_EventCallBack()
+{
+    if (nullptr == m_pScene)
+        return;
+    CEventCallBack* pEventCallBack = dynamic_cast<CEventCallBack*>(m_pScene->getSimulationEventCallback());
+    if (nullptr == pEventCallBack)
+        return;
+    pEventCallBack->Clear_EventCallBack();
+}
 
 //physx::PxMaterial* CPhysX::FindMaterial(const string& strMtrlTag)
 //{
