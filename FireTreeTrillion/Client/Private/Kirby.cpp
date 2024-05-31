@@ -275,7 +275,7 @@ void CKirby::Setting_KirbyBalance()
 
 void CKirby::Key_Input(_float fTimeDelta)
 {
-#pragma region 目厚 楷备家 (局聪皋捞记 力绢)
+	#pragma region 目厚 楷备家 (局聪皋捞记 力绢)
 
 	//Test
 	if (m_pGameInstance->Get_DIKeyState(DIK_P, KEY_DOWN))
@@ -311,7 +311,6 @@ void CKirby::Key_Input(_float fTimeDelta)
 		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
 	}
 #pragma endregion
-
 }
 
 HRESULT CKirby::Add_Components()
@@ -337,6 +336,8 @@ HRESULT CKirby::Add_Components()
 		hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyBalloon"),
 			TEXT("Com_Model_Balloon"), (CComponent**)&m_pModelCom[BODY_BALLOON]);
 		CHECK_FAILED(hr);
+
+
 	#pragma endregion
 
 	#pragma region Kirby Eye
@@ -564,6 +565,11 @@ void CKirby::Set_Animation(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool
 		return;
 
 	m_pModelCom[INFO(m_eBodyState)]->Set_Animation(eState, _fAnimSpeed, _bLoop, _bInterpolation);
+}
+
+void CKirby::Set_Animation(_int _iAnimIndex)
+{
+	m_pModelCom[INFO(m_eBodyState)]->Set_Animation(_iAnimIndex);
 }
 
 _bool CKirby::isAnimFinish()

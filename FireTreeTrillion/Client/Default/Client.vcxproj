@@ -168,6 +168,8 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Public\AnimToolHelper.h" />
+    <ClInclude Include="..\Public\AnimToolObject.h" />
     <ClInclude Include="..\Public\Awoofy.h" />
     <ClInclude Include="..\Public\Awoofy_State.h" />
     <ClInclude Include="..\public\BackGround.h" />
@@ -182,6 +184,7 @@
     <ClInclude Include="..\Public\Grid.h" />
     <ClInclude Include="..\Public\HUD.h" />
     <ClInclude Include="..\Public\HUD_Kirby.h" />
+    <ClInclude Include="..\Public\ImSequencer.h" />
     <ClInclude Include="..\Public\Kirby.h" />
     <ClInclude Include="..\Public\KirbyBalloon_State.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -227,6 +230,8 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Private\AnimToolHelper.cpp" />
+    <ClCompile Include="..\Private\AnimToolObject.cpp" />
     <ClCompile Include="..\Private\Awoofy.cpp" />
     <ClCompile Include="..\Private\Awoofy_State.cpp" />
     <ClCompile Include="..\private\BackGround.cpp" />
@@ -276,6 +281,7 @@
     <ClCompile Include="..\Private\TestUI.cpp" />
     <ClCompile Include="..\Private\Trigger.cpp" />
     <ClCompile Include="..\Private\UI_Editor.cpp" />
+    <ClCompile Include="..\Public\ImSequencer.cpp" />
     <ClCompile Include="..\private\WaddleDee.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="stdafx.cpp">

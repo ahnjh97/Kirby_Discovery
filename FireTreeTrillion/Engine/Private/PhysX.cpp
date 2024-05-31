@@ -93,6 +93,13 @@ void CPhysX::Tick(_float fTimeDelta)
     m_pScene->fetchResults(true);
 }
 
+/// physX에 영향을 받는 테스트용 Ground를 만들어줍니다.
+void CPhysX::Ready_TestGround()
+{
+    physx::PxRigidStatic* groundPlane = PxCreatePlane(*m_pPhysics, physx::PxPlane(0, 1, 0, 0), *m_pMaterial);
+    m_pScene->addActor(*groundPlane);
+}
+
 void CPhysX::Test()
 {
     // create simulation

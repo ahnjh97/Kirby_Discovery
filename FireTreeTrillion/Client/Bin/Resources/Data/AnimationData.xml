@@ -1,0 +1,10 @@
+<Root>
+    <Version>240405</Version>
+    <ModelName>KirbyDefault</ModelName>
+    <Animation>BackJump</Animation>
+    <Count>4</Count>
+    <Data0 EventName="Test_0" StartFrame="2" EndFrame="3"/>
+    <Data1 EventName="Test_1" StartFrame="1" EndFrame="2"/>
+    <Data2 EventName="Test_0" StartFrame="2" EndFrame="3"/>
+    <Data3 EventName="Test_1" StartFrame="1" EndFrame="2"/>
+</Root>
