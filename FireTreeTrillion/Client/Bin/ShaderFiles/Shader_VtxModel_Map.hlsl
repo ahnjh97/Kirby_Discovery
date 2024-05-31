@@ -4,6 +4,7 @@
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 texture2D	g_DiffuseTexture;
 texture2D	g_NormalTexture;
+texture2D   g_MRATexture;
 texture2D   g_NoiseTexture;
 float       g_fSamplingFactor;
 float       g_fTime;
@@ -71,6 +72,8 @@ struct PS_OUT
     float4 vRimLight : SV_TARGET3;
     float4 vFieldDepth : SV_TARGET4;
     float4 vStencil : SV_TARGET5;
+    float4 vMotionBlur : SV_TARGET6;
+    float4 vMRA : SV_TARGET7;
 };
 
 struct PS_OUT_EFFECT
@@ -120,6 +123,7 @@ PS_OUT PS_MAIN(PS_IN In)
 	Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
     Out.vFieldDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 0.0f);
+    Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
     
     if (g_fTime < 0.5f)
         Out.vDiffuse.rgb += vDamageColor * smoothstep(0.0f, 1.0f, g_fTime);
@@ -144,7 +148,8 @@ PS_OUT NO_NORMALMAP_PS_MAIN(PS_IN In)
     Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
     Out.vFieldDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 0.0f);
-    
+    Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
+
     if (g_fTime < 0.5f)
         Out.vDiffuse.rgb += vDamageColor * smoothstep(0.0f, 1.0f, g_fTime);
     else if (g_fTime < 1.f)

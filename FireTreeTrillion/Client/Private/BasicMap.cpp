@@ -91,6 +91,9 @@ HRESULT CBasicMap::Render()
             return E_FAIL;
         if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
             return E_FAIL;
+        if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
+            return E_FAIL;
+
         if (FAILED(m_pShaderCom->Bind_RawValue("g_fSamplingFactor", &m_vecSamplingFactors[i], sizeof(_float))))
             return E_FAIL;
         if (i == m_iMeshIndex) {

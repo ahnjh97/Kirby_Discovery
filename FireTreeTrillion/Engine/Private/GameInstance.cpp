@@ -117,20 +117,27 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 		nullptr == m_pPipeLine)
 		return;
 
+	_float ffTimeDelta = fTimeDelta;
+	if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_W, KEY_PRESS))
+	{
+		ffTimeDelta = fTimeDelta * 0.5f;
+	}
+
+
 	m_pInput_Device->Tick();
 
-	m_pObject_Manager->Tick(fTimeDelta);	
-	m_pPhysx->Tick(fTimeDelta);
+	m_pObject_Manager->Tick(ffTimeDelta);
+	m_pPhysx->Tick(ffTimeDelta);
 	m_pPicking->Update();
 	m_pPipeLine->Tick();
 
 	m_pFrustum->Tick();
-	m_pIMGUI_Manager->Late_Tick(fTimeDelta);
+	m_pIMGUI_Manager->Late_Tick(ffTimeDelta);
 
-	m_pObject_Manager->Late_Tick(fTimeDelta);
+	m_pObject_Manager->Late_Tick(ffTimeDelta);
 	
 	/* 반복적인 갱신이 필요한 객체들의 Tick함수를 호출한다. */
-	m_pLevel_Manager->Tick(fTimeDelta);
+	m_pLevel_Manager->Tick(ffTimeDelta);
 
 }
 
@@ -307,6 +314,8 @@ void CGameInstance::Update_DofFocus(_fvector vWorldPos)
 
 }
 
+#ifdef _DEBUG
+
 HRESULT CGameInstance::Add_DebugComponents(CComponent * pRenderComponent)
 {
 
@@ -315,6 +324,8 @@ HRESULT CGameInstance::Add_DebugComponents(CComponent * pRenderComponent)
 
 	return m_pRenderer->Add_DebugComponents(pRenderComponent);
 }
+
+#endif
 
 HRESULT CGameInstance::Open_Level(_uint iNewLevelID, CLevel * pNewLevel)
 {

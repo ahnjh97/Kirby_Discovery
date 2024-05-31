@@ -160,7 +160,7 @@ _bool CCharacterController::Jump(CTransform* pTransform, _float fFallVelocity, _
 _bool CCharacterController::Jump_Parabola(CTransform* pTransform, _vector vGoPos, _float fTimeDelta)
 {
 	PxExtendedVec3 pxCurrentPos = m_pController->getPosition();
-	PxVec3 moveVector(pxCurrentPos.x, pxCurrentPos.y, pxCurrentPos.z);
+	PxVec3 moveVector((_float)pxCurrentPos.x, (_float)pxCurrentPos.y, (_float)pxCurrentPos.z);
 	//// ÀÌµ¿
 	//PxControllerCollisionFlags collisionFlags = m_pController->move(moveVector, 0.001f, fTimeDelta, PxControllerFilters());
 

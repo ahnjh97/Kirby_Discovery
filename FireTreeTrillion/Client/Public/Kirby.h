@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Client_Defines.h"
-#include "GameObject.h"
+#include "Character.h"
 #define	INFO(state) m_tKirbyInfo.state
 
 BEGIN(Engine)
@@ -15,7 +15,7 @@ END
 BEGIN(Client)
 
 class CKirby :
-    public CGameObject
+    public CCharacter
 {
 public:
 
@@ -99,13 +99,11 @@ public:
 private:
 	// 커비의 움직임을 담은 구조체
 	KIRBY_INFODESC  m_tKirbyInfo;
-
-	void			SetOn_Slope(_float fTimeDelta);
-	void			Lerp_UpVector(_fvector _vTargetUp, _float _maxAngle, _float fTimeDelta);
 	void			Setting_KirbyBalance();
 	void			Key_Input(_float fTimeDelta);
 	void			Kirby_SystemTick(_float fTimeDelta);
 
+	// 모션블러 재료
 	void			Compute_MotionBlur();
 	_float2			m_vPreScreenPos = { 0.f, 0.f };
 	_float4			m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
@@ -116,21 +114,14 @@ private:
 	_bool			Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex);
 	// FSM
 	void			SetUp_FSM();
-	CFSM*			m_pFSM = { nullptr };
 
 private:
 	CModel*					m_pModelCom[BODY_END] = {nullptr};
 	CTexture*				m_pEyeTexture[EYE_END] = { nullptr };
 	CTexture*				m_pMouthTexture[MOUTH_END] = { nullptr };
-	CShader*				m_pShaderCom = { nullptr };
 	class CCamera_Free*		m_pCamera = { nullptr };
-	CCharacterController*	m_pControllerCom = { nullptr };
 
-	_int			m_iTestAnim = { 0 };
-
-	// For_PhysX
-	_float			m_fOffsetTurn = { 7.f };
-	_float4			m_vOriginUp = { 0.f, 1.f, 0.f, 0.f };
+	_int					m_iTestAnim = { 0 };
 
 
 public:

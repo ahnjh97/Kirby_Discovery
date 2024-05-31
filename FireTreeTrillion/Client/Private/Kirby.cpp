@@ -12,12 +12,12 @@
 
 
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CGameObject{ pDevice, pContext }
+	: CCharacter{ pDevice, pContext }
 {
 }
 
 CKirby::CKirby(const CKirby& rhs)
-	: CGameObject{ rhs }
+	: CCharacter{ rhs }
 {
 }
 
@@ -62,9 +62,13 @@ HRESULT CKirby::Initialize(void* pArg)
 	INFO(m_vMoveDir) = -1.f * m_pCameraLook;
 	INFO(m_vTargetDir) = INFO(m_vMoveDir);
 
+	//Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
 	m_pModelCom[INFO(m_eBodyState)]->Set_Animation(STATE_IDLE, 60.f, true, true);
 
-	
+	m_fMaxHp = 100.f;
+	m_fHp = 100.f;
+	m_fAttack = 5.f;
+
 	return S_OK;
 }
 
@@ -77,7 +81,7 @@ _int CKirby::Tick(_float fTimeDelta)
 	Setting_KirbyBalance();
 
 	// 지면충돌과 경사 보정
-	SetOn_Slope(fTimeDelta);
+	__super::SetOn_Slope(fTimeDelta);
 
 	// 테스트 (먹었을 때 0.1초정도간 발생하는 애니메이션 로직, 추후 수정)
 	Key_Input(fTimeDelta);
@@ -279,39 +283,6 @@ void CKirby::Key_Input(_float fTimeDelta)
 
 }
 
-void CKirby::SetOn_Slope(_float fTimeDelta)
-{
-	// 지면의 up벡터
-	PxVec3 slope = m_pControllerCom->Compute_Slope(m_pTransformCom);
-	_vector vTerrainNormal = CUtils::To_Vector(slope);
-	Lerp_UpVector(vTerrainNormal, 20.f, fTimeDelta);
-}
-
-void CKirby::Lerp_UpVector(_fvector _vTargetUp, _float _maxAngle, _float fTimeDelta)
-{
-	_float fAngle = ::XMVectorGetX(::XMVector3AngleBetweenVectors(_vTargetUp, m_vOriginUp));
-
-	// 구면 선형 보간 : m_vOriginUp을 vTargetUp 방향으로 보간
-	_float fInterpolateAngle = fTimeDelta * XMConvertToRadians(_maxAngle) * m_fOffsetTurn;
-
-	if (fAngle > fInterpolateAngle) { fAngle = fInterpolateAngle / fAngle; }
-	else fAngle = 1.0f;
-
-	m_vOriginUp = XMQuaternionSlerp(m_vOriginUp, _vTargetUp, fAngle);
-	m_vOriginUp = XMVector3Normalize(m_vOriginUp);
-
-	_vector vLook = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
-	_vector vNewRight = XMVector3Cross(m_vOriginUp, vLook);
-	vNewRight = XMVector3Normalize(vNewRight);
-	_vector vNewLook = XMVector3Cross(vNewRight, m_vOriginUp);
-	vNewLook = XMVector3Normalize(vNewLook);
-
-	// OriginUp을 기준으로 다시 재 설정
-	m_pTransformCom->Set_State(CTransform::STATE_RIGHT, vNewRight);
-	m_pTransformCom->Set_State(CTransform::STATE_UP, m_vOriginUp);
-	m_pTransformCom->Set_State(CTransform::STATE_LOOK, vNewLook);
-}
-
 HRESULT CKirby::Add_Components()
 {
 	HRESULT hr;
@@ -491,6 +462,17 @@ void CKirby::SetUp_FSM()
 	m_pFSM->Add_State(STATE_LANDINGSMALL, CKirbyDefault_Jump_State::Create());
 	m_pFSM->Add_State(STATE_FALL, CKirbyDefault_Jump_State::Create());
 
+	// Slide
+	m_pFSM->Add_State(STATE_SLIDESTART, CKirbyDefault_Slide_State::Create());
+	m_pFSM->Add_State(STATE_SLIDE, CKirbyDefault_Slide_State::Create());
+	m_pFSM->Add_State(STATE_SLIDEEND, CKirbyDefault_Slide_State::Create());
+
+	// Happy
+	m_pFSM->Add_State(STATE_WAITYAY, CKirbyDefault_Happy_State::Create());
+	m_pFSM->Add_State(STATE_WAITSIT, CKirbyDefault_Happy_State::Create());
+	m_pFSM->Add_State(STATE_EMOTEWAVEHAND, CKirbyDefault_Happy_State::Create());
+
+
 	// 가드 및 덤블링
 	m_pFSM->Add_State(STATE_DODGEBACK1, CKirbyDefault_Guard_State::Create());
 	m_pFSM->Add_State(STATE_DODGEBACK2, CKirbyDefault_Guard_State::Create());
@@ -537,22 +519,6 @@ void CKirby::SetUp_FSM()
 	FSM_Info_Desc.uNumModel = BODY_END;
 	FSM_Info_Desc.pModel = &m_pModelCom[BODY_DEFAULT];
 	m_pFSM->Initialize(&FSM_Info_Desc);
-
-	//// 상태 Initialize
-	//CFSM::FSM_INFO		FSM_Default_Desc = {};
-	//FSM_Default_Desc.iState = STATE_IDLE;
-	//FSM_Default_Desc.pModel = (_ubyte*)m_pModelCom[BODY_DEFAULT];
-	//m_pFSM->Initialize(&FSM_Default_Desc);
-
-	//CFSM::FSM_INFO		FSM_Balloon_Desc = {};
-	//FSM_Balloon_Desc.iState = STATE_IDLE;
-	//FSM_Balloon_Desc.pModel = (_ubyte*)m_pModelCom[BODY_BALLOON];
-	//m_pFSM->Initialize(&FSM_Balloon_Desc);
-
-	//CFSM::FSM_INFO		FSM_Vacuum_Desc = {};
-	//FSM_Vacuum_Desc.iState = STATE_IDLE;
-	//FSM_Vacuum_Desc.pModel = (_ubyte*)m_pModelCom[BODY_VACUUM];
-	//m_pFSM->Initialize(&FSM_Vacuum_Desc);
 }
 
 void CKirby::Change_State(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, BODYSTATE eBody)
@@ -660,16 +626,12 @@ void CKirby::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_pShaderCom);
 	for (auto& pModelCom : m_pModelCom)
 		Safe_Release(pModelCom);
 	for (auto& pEyeTexture : m_pEyeTexture)
 		Safe_Release(pEyeTexture);
 	for (auto& pMouthTexture : m_pMouthTexture)
 		Safe_Release(pMouthTexture);
-
-	Safe_Release(m_pControllerCom);
 	Safe_Release(m_pCamera);
-	Safe_Release(m_pFSM);
 
 }

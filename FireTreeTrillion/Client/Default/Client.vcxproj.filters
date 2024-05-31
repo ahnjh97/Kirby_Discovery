@@ -106,65 +106,71 @@
     <Filter Include="02.GameObjects\UI\HUD\Kirby">
       <UniqueIdentifier>{4bba1354-4120-4080-bcfb-aeff11736c4b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Character">
-      <UniqueIdentifier>{38847d14-fb30-4372-be60-a9f410277476}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Character\Player">
-      <UniqueIdentifier>{c8892da5-ac0a-4aa1-83ab-12a0fd1f52c6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Character\Player\Kirby">
-      <UniqueIdentifier>{f4444bba-a36c-4a3e-9327-ac76df48dd6f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Character\Player\State">
-      <UniqueIdentifier>{79362919-e7bb-428f-ab22-a4eec033163c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Character\Player\State\KirbyDefault_State">
-      <UniqueIdentifier>{15a1c888-1e49-4718-9a75-c7b945792614}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Character\Player\State\KirbyBalloon_State">
-      <UniqueIdentifier>{77bae8eb-2969-4e98-bd3d-2e45600592c2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Character\Player\State\KirbyVacuum_State">
-      <UniqueIdentifier>{ab3b3a78-a477-4ab7-95f4-76e0aecc47b1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Character\Player\State\KirbyDamage_State">
-      <UniqueIdentifier>{140cffa0-c6d9-49fb-b92e-065818d0e44c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Character\Monster">
-      <UniqueIdentifier>{9552f36f-64c4-4740-9177-ffb1919d1926}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Character\Monster\Awoofy">
-      <UniqueIdentifier>{47b01008-973d-4733-a913-b503347d723c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Character\Monster\Awoofy\State">
-      <UniqueIdentifier>{db5e1ca0-0d6e-44e4-8381-86b1e15b1abc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Character\TestModel">
-      <UniqueIdentifier>{d64477a2-9b4a-44f4-9553-f9c18cf7c023}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Character\TestModel\State">
-      <UniqueIdentifier>{24c8db5b-dafc-44bf-806a-7f7b3d6aeed8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Map\Terrain">
       <UniqueIdentifier>{790e4632-66f1-4e07-b217-df971b3f85d4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Character\WaddleDee">
-      <UniqueIdentifier>{975b42f5-4d3e-4ce1-acee-ceac9f5b976a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Map\SkySphere">
       <UniqueIdentifier>{24afa923-789a-4526-9b9d-3523c19603e1}</UniqueIdentifier>
-	</Filter>
-    <Filter Include="02.GameObjects\Character\Monster\Rabbit">
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject">
+      <UniqueIdentifier>{20b7e933-4554-475a-a562-bcab1aff8667}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character">
+      <UniqueIdentifier>{38847d14-fb30-4372-be60-a9f410277476}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player">
+      <UniqueIdentifier>{c8892da5-ac0a-4aa1-83ab-12a0fd1f52c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\Kirby">
+      <UniqueIdentifier>{f4444bba-a36c-4a3e-9327-ac76df48dd6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\State">
+      <UniqueIdentifier>{79362919-e7bb-428f-ab22-a4eec033163c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyDefault_State">
+      <UniqueIdentifier>{15a1c888-1e49-4718-9a75-c7b945792614}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyBalloon_State">
+      <UniqueIdentifier>{77bae8eb-2969-4e98-bd3d-2e45600592c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyVacuum_State">
+      <UniqueIdentifier>{ab3b3a78-a477-4ab7-95f4-76e0aecc47b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyDamage_State">
+      <UniqueIdentifier>{140cffa0-c6d9-49fb-b92e-065818d0e44c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster">
+      <UniqueIdentifier>{9552f36f-64c4-4740-9177-ffb1919d1926}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Awoofy">
+      <UniqueIdentifier>{47b01008-973d-4733-a913-b503347d723c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Awoofy\State">
+      <UniqueIdentifier>{db5e1ca0-0d6e-44e4-8381-86b1e15b1abc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Rabbit">
       <UniqueIdentifier>{5f67491a-2cff-4f07-b9b2-4e5139f23539}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Character\Monster\Rabbit\State">
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Rabbit\State">
       <UniqueIdentifier>{5da02606-450b-4582-a1be-2d28da2c1590}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Character\Monster\Buffahorn">
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Buffahorn">
       <UniqueIdentifier>{119c683d-2914-4419-b633-2ec30fcda00c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Character\Monster\Buffahorn\State">
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Buffahorn\State">
       <UniqueIdentifier>{36a9b0b1-2680-464e-9a8d-a7d446bbe9e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\TestModel">
+      <UniqueIdentifier>{d64477a2-9b4a-44f4-9553-f9c18cf7c023}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\TestModel\State">
+      <UniqueIdentifier>{24c8db5b-dafc-44bf-806a-7f7b3d6aeed8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\WaddleDee">
+      <UniqueIdentifier>{975b42f5-4d3e-4ce1-acee-ceac9f5b976a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\RigidObject">
+      <UniqueIdentifier>{ec828ee3-b588-495f-82c4-e369a19f7ef0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -232,7 +238,7 @@
       <Filter>02.GameObjects\UI\FXToolDirector</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby.h">
-      <Filter>02.GameObjects\Character\Player\Kirby</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby</Filter>
     </ClInclude>
     <ClInclude Include="..\public\SingleEffect.h">
       <Filter>02.GameObjects\Effect\Single</Filter>
@@ -241,16 +247,16 @@
       <Filter>02.GameObjects\Effect\Multi</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\TestModel.h">
-      <Filter>02.GameObjects\Character\TestModel</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\TestModel</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\TestModel_State.h">
-      <Filter>02.GameObjects\Character\TestModel\State</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\TestModel\State</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Monster.h">
-      <Filter>02.GameObjects\Character\Monster</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Monster</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Awoofy.h">
-      <Filter>02.GameObjects\Character\Monster\Awoofy</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Awoofy</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\ToolHelper.h">
       <Filter>90.Utils\[Sample] ToolHelper</Filter>
@@ -277,28 +283,28 @@
       <Filter>01.Levels\Tool\Animation</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Awoofy_State.h">
-      <Filter>02.GameObjects\Character\Monster\Awoofy\State</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Awoofy\State</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\KirbyDefault_State.h">
-      <Filter>02.GameObjects\Character\Player\State\KirbyDefault_State</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyDefault_State</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\KirbyBalloon_State.h">
-      <Filter>02.GameObjects\Character\Player\State\KirbyBalloon_State</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyBalloon_State</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_State_Function.h">
-      <Filter>02.GameObjects\Character\Player\State</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Enums.h">
-      <Filter>02.GameObjects\Character\Player</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Player</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\KirbyVacuum_State.h">
-      <Filter>02.GameObjects\Character\Player\State\KirbyVacuum_State</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyVacuum_State</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Particle.h">
       <Filter>02.GameObjects\Effect\Particle</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\KirbyDamage_State.h">
-      <Filter>02.GameObjects\Character\Player\State\KirbyDamage_State</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyDamage_State</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\HUD.h">
       <Filter>02.GameObjects\UI\HUD</Filter>
@@ -307,7 +313,7 @@
       <Filter>02.GameObjects\UI\HUD\Kirby</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Character.h">
-      <Filter>02.GameObjects\Character</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Moon.h">
       <Filter>02.GameObjects</Filter>
@@ -316,19 +322,25 @@
       <Filter>02.GameObjects\Map\SkySphere</Filter>
     </ClInclude>
     <ClInclude Include="..\public\WaddleDee.h">
-      <Filter>02.GameObjects\Character\WaddleDee</Filter>
-	</ClInclude>
+      <Filter>02.GameObjects\PhysXObject\Character\WaddleDee</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Rabbit_State.h">
-      <Filter>02.GameObjects\Character\Monster\Rabbit\State</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Rabbit\State</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Rabbit.h">
-      <Filter>02.GameObjects\Character\Monster\Rabbit</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Rabbit</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Buffahorn.h">
-      <Filter>02.GameObjects\Character\Monster\Buffahorn</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Buffahorn</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Buffahorn_State.h">
-      <Filter>02.GameObjects\Character\Monster\Buffahorn\State</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Buffahorn\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PhysXObject.h">
+      <Filter>02.GameObjects\PhysXObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\RigidObject.h">
+      <Filter>02.GameObjects\PhysXObject\RigidObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -384,7 +396,7 @@
       <Filter>02.GameObjects\UI\[Sample] TestUI</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby.cpp">
-      <Filter>02.GameObjects\Character\Player\Kirby</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\MultiEffect.cpp">
       <Filter>02.GameObjects\Effect\Multi</Filter>
@@ -393,16 +405,16 @@
       <Filter>02.GameObjects\Effect\Single</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\TestModel.cpp">
-      <Filter>02.GameObjects\Character\TestModel</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\TestModel</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\TestModel_State.cpp">
-      <Filter>02.GameObjects\Character\TestModel\State</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\TestModel\State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Monster.cpp">
-      <Filter>02.GameObjects\Character\Monster</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Monster</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Awoofy.cpp">
-      <Filter>02.GameObjects\Character\Monster\Awoofy</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Awoofy</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\ToolHelper.cpp">
       <Filter>90.Utils\[Sample] ToolHelper</Filter>
@@ -426,16 +438,16 @@
       <Filter>01.Levels\Tool\Map</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Awoofy_State.cpp">
-      <Filter>02.GameObjects\Character\Monster\Awoofy\State</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Awoofy\State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\KirbyDefault_State.cpp">
-      <Filter>02.GameObjects\Character\Player\State\KirbyDefault_State</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyDefault_State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\KirbyBalloon_State.cpp">
-      <Filter>02.GameObjects\Character\Player\State\KirbyBalloon_State</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyBalloon_State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\KirbyVacuum_State.cpp">
-      <Filter>02.GameObjects\Character\Player\State\KirbyVacuum_State</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyVacuum_State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Tool_Anim.cpp">
       <Filter>01.Levels\Tool\Animation</Filter>
@@ -444,7 +456,7 @@
       <Filter>02.GameObjects\Effect\Particle</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\KirbyDamage_State.cpp">
-      <Filter>02.GameObjects\Character\Player\State\KirbyDamage_State</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyDamage_State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\HUD.cpp">
       <Filter>02.GameObjects\UI\HUD</Filter>
@@ -453,7 +465,7 @@
       <Filter>02.GameObjects\UI\HUD\Kirby</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Character.cpp">
-      <Filter>02.GameObjects\Character</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Moon.cpp">
       <Filter>02.GameObjects</Filter>
@@ -462,19 +474,25 @@
       <Filter>02.GameObjects\Map\SkySphere</Filter>
     </ClCompile>
     <ClCompile Include="..\private\WaddleDee.cpp">
-      <Filter>02.GameObjects\Character\WaddleDee</Filter>
-	</ClCompile>
+      <Filter>02.GameObjects\PhysXObject\Character\WaddleDee</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Rabbit_State.cpp">
-      <Filter>02.GameObjects\Character\Monster\Rabbit\State</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Rabbit\State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Rabbit.cpp">
-      <Filter>02.GameObjects\Character\Monster\Rabbit</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Rabbit</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Buffahorn.cpp">
-      <Filter>02.GameObjects\Character\Monster\Buffahorn</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Buffahorn</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Buffahorn_State.cpp">
-      <Filter>02.GameObjects\Character\Monster\Buffahorn\State</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Buffahorn\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PhysXObject.cpp">
+      <Filter>02.GameObjects\PhysXObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RigidObject.cpp">
+      <Filter>02.GameObjects\PhysXObject\RigidObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
