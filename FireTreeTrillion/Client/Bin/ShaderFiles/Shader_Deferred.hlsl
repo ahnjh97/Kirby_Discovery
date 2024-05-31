@@ -625,7 +625,7 @@ PS_OUT PS_MAIN_MotionBlur(PS_IN In)
     
     float4 vMotionBlurSample = g_MotionBlur.Sample(LinearSampler, In.vTexcoord);
     float2 vMyBlurDir = vMotionBlurSample.xy;
-    float fMotionblurRaduis = 300.f;
+    float fMotionblurRaduis = 500.f;
     float2 vUV = (float2) 0;
 
     for (int i = -6; i < 7; ++i)

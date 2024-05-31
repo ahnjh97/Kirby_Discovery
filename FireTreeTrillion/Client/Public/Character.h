@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Client_Defines.h"
-#include "GameObject.h"
+#include "PhysXObject.h"
 
 BEGIN(Engine)
 class CModel;
@@ -12,7 +12,7 @@ END
 
 BEGIN(Client)
 
-class CCharacter abstract : public CGameObject
+class CCharacter abstract : public CPhysXObject
 {
 protected:
 	CCharacter(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

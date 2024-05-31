@@ -62,7 +62,8 @@ HRESULT CKirby::Initialize(void* pArg)
 	INFO(m_vMoveDir) = -1.f * m_pCameraLook;
 	INFO(m_vTargetDir) = INFO(m_vMoveDir);
 
-	Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+	//Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+	m_pModelCom[INFO(m_eBodyState)]->Set_Animation(STATE_IDLE, 60.f, true, true);
 
 	m_fMaxHp = 100.f;
 	m_fHp = 100.f;
@@ -460,6 +461,17 @@ void CKirby::SetUp_FSM()
 	m_pFSM->Add_State(STATE_LANDINGEND, CKirbyDefault_Jump_State::Create());
 	m_pFSM->Add_State(STATE_LANDINGSMALL, CKirbyDefault_Jump_State::Create());
 	m_pFSM->Add_State(STATE_FALL, CKirbyDefault_Jump_State::Create());
+
+	// Slide
+	m_pFSM->Add_State(STATE_SLIDESTART, CKirbyDefault_Slide_State::Create());
+	m_pFSM->Add_State(STATE_SLIDE, CKirbyDefault_Slide_State::Create());
+	m_pFSM->Add_State(STATE_SLIDEEND, CKirbyDefault_Slide_State::Create());
+
+	// Happy
+	m_pFSM->Add_State(STATE_WAITYAY, CKirbyDefault_Happy_State::Create());
+	m_pFSM->Add_State(STATE_WAITSIT, CKirbyDefault_Happy_State::Create());
+	m_pFSM->Add_State(STATE_EMOTEWAVEHAND, CKirbyDefault_Happy_State::Create());
+
 
 	// 가드 및 덤블링
 	m_pFSM->Add_State(STATE_DODGEBACK1, CKirbyDefault_Guard_State::Create());

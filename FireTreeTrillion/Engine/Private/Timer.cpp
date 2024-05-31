@@ -1,5 +1,5 @@
 
-#include "../Public/Timer.h"
+#include "Timer.h"
 
 CTimer::CTimer()
 	: m_fTimeDelta(0.f)
