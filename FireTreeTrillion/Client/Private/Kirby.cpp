@@ -68,6 +68,7 @@ HRESULT CKirby::Initialize(void* pArg)
 	m_fMaxHp = 100.f;
 	m_fHp = 100.f;
 	m_fAttack = 5.f;
+	m_eAbilityType = ABILITY_DEFAULT;
 
 	return S_OK;
 }

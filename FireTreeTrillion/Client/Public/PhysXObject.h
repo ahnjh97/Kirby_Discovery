@@ -29,7 +29,7 @@ public:
 	ABILITYTYPE	Get_AbilityType() { return m_eAbilityType; }
 	void Set_AbilityType(ABILITYTYPE eAbilityType) { m_eAbilityType = eAbilityType; }
 
-	const _float Get_ResistTime() { return m_fResistTime; }
+	_float Get_ResistTime() { return m_fResistTime; }
 
 	_bool	Get_Vacuuming() { return m_bVacuuming; }
 	void	Set_Vacuuming(_bool bVacuuming) { m_bVacuuming = bVacuuming; }
@@ -38,11 +38,13 @@ public:
 	virtual CGameObject* Clone(void* pArg) = 0;
 	virtual void Free() override;
 
-private:
+protected:
 	// 현재 이 객체의 타입
 	ABILITYTYPE m_eAbilityType = { ABILITY_END };
+
 	// 커비가 빨아들일때, 버티는 시간을 지정한다.
-	const _float		m_fResistTime = { 0.f };
+	_float		m_fResistTime;
+
 	// 흡수할때, 이 값을 true가 된다. (충돌에 영향을 안 받게 됨)
 	_bool		m_bVacuuming = { false };
 

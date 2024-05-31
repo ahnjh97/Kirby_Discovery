@@ -35,6 +35,13 @@ HRESULT CAwoofy::Initialize(void* pArg)
 
 	m_pModelCom->Set_Animation(AWOOFY_GROOMING, 45.f, false, true);
 
+
+	m_fMaxHp = 10.f;
+	m_fHp = 10.f;
+	m_fAttack = 8.f;
+	m_fResistTime = 0.3f;
+	m_eAbilityType = ABILITY_DEFAULT;
+
 	return S_OK;
 }
 
