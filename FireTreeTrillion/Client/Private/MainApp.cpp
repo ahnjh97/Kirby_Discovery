@@ -117,7 +117,7 @@ HRESULT CMainApp::Render(_float fTimeDelta)
 
 #pragma endregion
 
-#pragma region LIGHTACC
+#pragma region LIGHT_ACC
 
 	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Shade"), 
 		_float2(fRTVFont + 555.f, g_iWinSizeY - 90.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
@@ -168,7 +168,6 @@ HRESULT CMainApp::Render(_float fTimeDelta)
 
 
 #endif // _DEBUG
-
 
 	m_pGameInstance->End_Draw();
 

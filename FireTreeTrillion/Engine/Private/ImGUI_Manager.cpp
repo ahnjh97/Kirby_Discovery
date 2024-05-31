@@ -56,7 +56,7 @@ HRESULT CImGUI_Manager::Initialize(HWND hWnd, ID3D11Device* pGraphic_Device, ID3
 	style.Colors[ImGuiCol_Border] = vPink;
 
 	//프레임
-	style.Colors[ImGuiCol_FrameBg] = vPink;
+	style.Colors[ImGuiCol_FrameBg] = vPinkDark;
 	style.Colors[ImGuiCol_FrameBgHovered] = vPinkLight;
 	style.Colors[ImGuiCol_FrameBgActive] = vPink;
 
@@ -77,7 +77,7 @@ HRESULT CImGUI_Manager::Initialize(HWND hWnd, ID3D11Device* pGraphic_Device, ID3
 	//헤더
 	style.Colors[ImGuiCol_Header] = vPinkDark;
 	style.Colors[ImGuiCol_HeaderHovered] = vPinkLight;
-	style.Colors[ImGuiCol_HeaderActive] = vPinkLight;
+	style.Colors[ImGuiCol_HeaderActive] = vPink;
 
 	//분리선
 	style.Colors[ImGuiCol_Separator] = vPink;
@@ -109,7 +109,6 @@ HRESULT CImGUI_Manager::Initialize(HWND hWnd, ID3D11Device* pGraphic_Device, ID3
 
 	return S_OK;
 }
-
 
 void CImGUI_Manager::Tick(_float fTimeDelta)
 {

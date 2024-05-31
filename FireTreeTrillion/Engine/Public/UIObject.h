@@ -22,8 +22,8 @@ public:
 	typedef struct : public CGameObject::GAMEOBJECT_DESC
 	{
 		wstring		wstrUITag = { TEXT("") };
-		_float2		vSize, vCenter, vPos = { 0.f, 0.f };
-		_float		fRaito = { 0.f };
+		_float3		vSize, vCenter, vPos = { 0.f, 0.f, 0.f };
+		_float		fDegree = { 0.f };
 		_int		iTexIndex = { 0 };
 	}UIOBJ_DESC;
 
@@ -44,6 +44,9 @@ public:
 	UIOBJ_DESC		Get_UIObj_Desc() const { return m_UIObjDesc; }
 	void			Set_UIObj_Desc(UIOBJ_DESC _UIDesc) { m_UIObjDesc = _UIDesc; }
 
+	_uint			Get_TexIndex() { return m_iTexIndex; }
+	void			Set_TexIndex(_uint _iTexIndex) { m_iTexIndex = _iTexIndex; }
+
 	_float2			Get_pos2D() const { return m_position2D; }
 	constexpr _bool	Get_IsRender() const noexcept { return m_bIsRender; }
 	void			Set_IsRender(_bool _isRender) { m_bIsRender = _isRender; }
@@ -51,7 +54,7 @@ public:
 protected:
 	vector<CUIObject*>	m_vecUIObj;
 	UIOBJ_DESC			m_UIObjDesc{};
-	_int				m_iTexIndex = { 0 };
+	_uint				m_iTexIndex = { 0 };
 
 	// 2D UI Ã³¸®¿ë
 	_float2				m_size2D, m_position2D, m_WindowSize2D;

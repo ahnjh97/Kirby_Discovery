@@ -31,13 +31,13 @@ HRESULT CHUD_Kirby::Initialize(void* _pArg)
 	m_pTransformCom->Set_Scaled(HUD_KirbyDESC->vSize.x, HUD_KirbyDESC->vSize.y, 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(
 						HUD_KirbyDESC->vPos.x - HUD_KirbyDESC->vCenter.x,
-						-HUD_KirbyDESC->vCenter.y + HUD_KirbyDESC->vPos.y, 0.f, 1.f));
-	m_pTransformCom->Rotation(XMVectorSet(0.f, 0.f, 1.f, 1.f), XMConvertToRadians(HUD_KirbyDESC->fRaito));
+						-HUD_KirbyDESC->vPos.y + HUD_KirbyDESC->vCenter.y, 0.f, 1.f));
+	m_pTransformCom->Rotation(XMVectorSet(0.f, 0.f, 1.f, 1.f), XMConvertToRadians(HUD_KirbyDESC->fDegree));
 
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 	
-	//m_UIObjDesc.wstrUITag = HUD_KirbyDESC->wstrUITag;
+	m_iTexIndex = HUD_KirbyDESC->iTexIndex;
 	m_UIObjDesc = *HUD_KirbyDESC;
 
 #pragma endregion
@@ -77,8 +77,8 @@ HRESULT CHUD_Kirby::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_KirbyBarHard"),
-	//if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_GameComplete"),
+	//if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_KirbyBarHard"),
+	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_GameComplete"),
 		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
 		return E_FAIL;
 

@@ -43,6 +43,7 @@ private:
 	_bool			Set_DockSpace();
 
 	_bool			Create_UIObject();
+	_bool			Delete_UIObject();
 	_bool			Save_FileData(string _strFilePath);
 	_bool			Load_FileData(const string& _strFilePath);
 	

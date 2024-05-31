@@ -450,6 +450,10 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 	// 고사양, 저사양 모드
 	if (m_pGameInstance->Get_DIKeyState(DIK_E, KEY_DOWN))
 		m_bLowPass = !m_bLowPass;
+	
+	//레벨 별 사양 처리
+	//int iCurrLevel = m_pGameInstance->Get_CurrentLevelID();
+	//if (3 == iCurrLevel) //LEVEL_GAMEPLAY
 
 #ifdef _DEBUG
 	if (FAILED(Render_Debug()))

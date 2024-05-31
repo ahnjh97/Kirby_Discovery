@@ -76,7 +76,7 @@ private:
 	_float								m_fShadowFar = { 0.f };
 
 	// 저 사양 모드
-	_bool								m_bLowPass = { false };
+	_bool								m_bLowPass = { TRUE };
 
 
 
