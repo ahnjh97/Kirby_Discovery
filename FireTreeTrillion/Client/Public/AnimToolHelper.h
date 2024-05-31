@@ -12,24 +12,23 @@ private:
 	virtual ~CAnimToolHelper() = default;
 
 public:
-	virtual HRESULT Initialize_Prototype()				override;
-	virtual HRESULT Initialize(void* pArg = nullptr)	override;
-	virtual _int	Tick(_float fTimeDelta)				override;
-	virtual void	Late_Tick(_float fTimeDelta)		override;
-	virtual HRESULT Render()							override;
-	//virtual void	Render_IMGUI()						override;
+	virtual HRESULT			Initialize_Prototype()				override;
+	virtual HRESULT			Initialize(void* pArg = nullptr)	override;
+	virtual _int			Tick(_float fTimeDelta)				override;
+	virtual void			Late_Tick(_float fTimeDelta)		override;
+	virtual HRESULT			Render()							override;
+	//virtual void			Render_IMGUI()						override;
 
 private:
-	void			Ready_AnimObjects(const wstring& strLayerTag);
+	void					Ready_AnimObjects(const wstring& strLayerTag);
 
 	// RENDER
-	void			Render_ObjectList();
-	void			Render_AnimationList(const wstring& wstrObjectTag);
-	void			Render_FrameLine(class CAnimation** pModel, const string& strAnimationTag);
-	//void			Render_EventList();
+	void					Render_ObjectList();
+	void					Render_AnimationList(const wstring& wstrObjectTag);
+	void					Render_FrameLine(class CAnimation** pModel, const string& strAnimationTag);
 
-	void			Save();
-	void			Load(const string& FileName);
+	void					Save();
+	void					Load(const string& FileName);
 
 private:
 	vector<CGameObject*>	m_vecAnimObjects;

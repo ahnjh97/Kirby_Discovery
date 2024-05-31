@@ -53,10 +53,10 @@ namespace ImSequencer
       virtual void EndEdit() {}
       virtual int GetItemTypeCount() const { return 0; }
       virtual const char* GetItemTypeName(int /*typeIndex*/) const { return ""; }
-      virtual const char* GetItemLabel(int /*index*/) const { return ""; }
+      virtual const char* GetItemLabel(int /*index*/, const char* /*event name*/) const { return ""; }
       virtual const char* GetCollapseFmt() const { return "%d Frames / %d entries"; }
 
-      virtual void Get(int index, int** start, int** end, int* type, unsigned int* color) = 0;
+      virtual void Get(int index, int** start, int** end, char** eventName, unsigned int* color) = 0;
       virtual void Add(int /*type*/, const char* strName) {}
       virtual void Del(int /*index*/) {}
       virtual void Duplicate(int /*index*/) {}

@@ -40,14 +40,14 @@ struct AnimSequence : public ImSequencer::SequenceInterface
 		return SequencerItemTypeNames[typeIndex];
 	}
 
-	virtual const char* GetItemLabel(int index) const
+	virtual const char* GetItemLabel(int _index, const char* _eventName) const
 	{
 		static char tmps[512];
-		snprintf(tmps, 512, "[%d] %s", index/*m_vecSequenceItems.size()*/, SequencerItemTypeNames[m_vecSequenceItems[0].iEventType]);
+		snprintf(tmps, 512, "[%d] %s", _index/*m_vecSequenceItems.size()*/, _eventName/*SequencerItemTypeNames[m_vecSequenceItems[0].iEventType]*/);
 		return tmps;
 	}
 
-	virtual void Get(int index, int** start, int** end, int* type, unsigned int* color) override
+	virtual void Get(int index, int** start, int** end, char** eventName, unsigned int* color) override
 	{
 		AnimSequenceItem& sequenceItem = m_vecSequenceItems[index];
 		if (color)
@@ -56,8 +56,8 @@ struct AnimSequence : public ImSequencer::SequenceInterface
 			*start = &sequenceItem.iStartFrame;
 		if (end)
 			*end = &sequenceItem.iEndFrame;
-		if (type)
-			*type = sequenceItem.iEventType;
+		if (eventName)
+			*eventName = const_cast<char*>(sequenceItem.strEventName.c_str());
 	}
 
 	virtual void Add(int type, const char* strName) override
@@ -270,8 +270,8 @@ void CAnimToolHelper::Render_FrameLine(CAnimation** ppAnimation, const string& s
 		// QZR : 추후 animation정보를 가져오는 Load()를 여기서 처리
 		// Load해서 가져온 data들 중 Sequence에 띄워야하는
 		// (1) 프레임 처음/끝, (2) 이벤트 종류, (3) 이벤트 이름을 가져와서 아래에 push_back한다.
-		mySequence.m_vecSequenceItems.push_back(AnimSequence::AnimSequenceItem{ 0, "Notify_00", 2, 3 });
-		mySequence.m_vecSequenceItems.push_back(AnimSequence::AnimSequenceItem{ 1, "Notify_01", 3, 4 });
+		mySequence.m_vecSequenceItems.push_back(AnimSequence::AnimSequenceItem{ 0, "Test0", 2, 3 });
+		mySequence.m_vecSequenceItems.push_back(AnimSequence::AnimSequenceItem{ 1, "Test1", 3, 4 });
 	}
 
 	 // 고정할 위치와 크기
@@ -322,7 +322,6 @@ void CAnimToolHelper::Render_FrameLine(CAnimation** ppAnimation, const string& s
 	
 	if (selectedEntry != -1)
 	{
-		const AnimSequence::AnimSequenceItem& item = mySequence.m_vecSequenceItems[selectedEntry];
 		ImGui::OpenPopup("Notify");
 
 		ImVec2 center = ImGui::GetMainViewport()->GetCenter();
@@ -331,22 +330,37 @@ void CAnimToolHelper::Render_FrameLine(CAnimation** ppAnimation, const string& s
 		if (ImGui::BeginPopupModal("Notify", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 		{
 			ImGui::Text("Register Event Name");
-			char buf1[32] = "";  ImGui::InputText(" ", buf1, 32);
 
+			static char charEventName[128] = ""; 
+			ImGui::InputText(" ", charEventName, sizeof(charEventName));
 			if (ImGui::Button("OK", ImVec2(120, 0)) || m_pGameInstance->Get_DIKeyState(DIK_RETURN, KEY_DOWN)) 
 			{
-				mySequence.Add(2, buf1);
-				//mySequence.m_vecSequenceItems.push_back(AnimSequence::AnimSequenceItem{ 0, buf1, 0, 1 });
-				selectedEntry = -1; ImGui::CloseCurrentPopup();
+				_bool bCheckSame = false;
+				for (auto& p : mySequence.m_vecSequenceItems)
+				{
+					if (p.strEventName == charEventName)
+					{
+						bCheckSame = true;
+						break;
+					}
+				}
+				
+				if (!bCheckSame)
+				{
+					mySequence.m_vecSequenceItems.push_back(AnimSequence::AnimSequenceItem{ 0, charEventName, 0, 1 });
+					memset(charEventName, 0, sizeof(charEventName));
+					selectedEntry = -1;
+					ImGui::CloseCurrentPopup();
+				}
 			}
 			ImGui::SetItemDefaultFocus(); ImGui::SameLine();
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) 
-			{ 
-				selectedEntry = -1; ImGui::CloseCurrentPopup(); 
+			if (ImGui::Button("Cancel", ImVec2(120, 0)))
+			{
+				selectedEntry = -1;
+				ImGui::CloseCurrentPopup(); 
 			}
 			ImGui::EndPopup();
 		}
-
 	}
 	ImGui::End();
 }
@@ -354,6 +368,7 @@ void CAnimToolHelper::Render_FrameLine(CAnimation** ppAnimation, const string& s
 //void CAnimToolHelper::Render_EventList()
 //{
 //}
+
 
 void CAnimToolHelper::Save()
 {
