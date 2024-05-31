@@ -57,7 +57,7 @@ namespace ImSequencer
       virtual const char* GetCollapseFmt() const { return "%d Frames / %d entries"; }
 
       virtual void Get(int index, int** start, int** end, int* type, unsigned int* color) = 0;
-      virtual void Add(int /*type*/) {}
+      virtual void Add(int /*type*/, const char* strName) {}
       virtual void Del(int /*index*/) {}
       virtual void Duplicate(int /*index*/) {}
 

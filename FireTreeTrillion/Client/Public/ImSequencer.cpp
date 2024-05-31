@@ -201,7 +201,7 @@ namespace ImSequencer
                for (int i = 0; i < sequence->GetItemTypeCount(); i++)
                   if (ImGui::Selectable(sequence->GetItemTypeName(i)))
                   {
-                     sequence->Add(i);
+                     //sequence->Add(i);
                      *selectedEntry = sequence->GetItemCount() - 1;
                   }
 
