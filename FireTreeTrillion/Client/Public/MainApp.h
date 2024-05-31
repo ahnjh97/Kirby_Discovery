@@ -30,6 +30,10 @@ private:
 	HRESULT Ready_Fonts();
 	HRESULT Ready_Prototype_Component_For_Static();
 
+#ifdef _DEBUG
+	_bool	Render_RTVFonts();
+#endif // _DEBUG
+
 	//Parsing TEST
 	void		CreateXML();
 	void		Read_XML();
@@ -44,6 +48,9 @@ private:
 public:	
 	static CMainApp* Create();
 	virtual void Free() override;
+
+private:
+	_bool m_IsRenderRTV = { TRUE };
 };
 
 END

@@ -77,6 +77,7 @@ private:
 
 	// Àú »ç¾ç ¸ðµå
 	_bool								m_bLowPass = { TRUE };
+	_bool								m_IsRenderRTV = { TRUE }; //·»´õ Å¸°Ù ºä ON/OFF
 
 
 

@@ -456,8 +456,16 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 	//if (3 == iCurrLevel) //LEVEL_GAMEPLAY
 
 #ifdef _DEBUG
-	if (FAILED(Render_Debug()))
-		return E_FAIL;
+
+	//·»´õ Å¸°Ù ºä ON/OFF
+	if (m_pGameInstance->Get_DIKeyState(DIK_F1, KEY_DOWN))
+		m_IsRenderRTV = !m_IsRenderRTV;
+
+	if (m_IsRenderRTV)
+	{
+		if (FAILED(Render_Debug()))
+			return E_FAIL;
+	}
 
 	Render_IMGUI();
 #endif
