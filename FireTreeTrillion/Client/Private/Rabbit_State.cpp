@@ -283,6 +283,9 @@ void CRabbit_JumpLanding_State::OnStateUpdate(CGameObject* pGameObject, _float f
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 
+	// ÀÚÀ¯ ³«ÇÏ
+	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
+
 	if (pRabbit->IsAnimFinished())
 		pRabbit->Change_State(CRabbit::RABBIT_WAIT, 100.f, false, true);
 }

@@ -187,7 +187,7 @@ _bool CCharacterController::Jump_Parabola(CTransform* pTransform, _vector vGoPos
 		pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
 	}
 	// 객체의 위치 받아오기
-	//PxExtendedVec3 pxCurPos = m_pController->getPosition();
+	//PxExtendedVec3 pxCurPos = m_pController->getPosition();     
 	//PxVec3 pos((_float)pxCurrentPos.x, (_float)pxCurrentPos.y, (_float)pxCurrentPos.z);
 
 	//_vector xmPos = XMVectorSet(pos.x, pos.y - 0.5f, pos.z, 0.f);

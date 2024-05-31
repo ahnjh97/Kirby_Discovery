@@ -67,7 +67,7 @@ _int CRabbit::Tick(_float fTimeDelta)
 	//	m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta);
 	//}
 
-   // FSM 제어
+	// FSM 제어
 	if (m_pFSM != nullptr)
 		m_pFSM->Update(this, fTimeDelta);
 
