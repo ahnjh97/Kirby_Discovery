@@ -212,23 +212,38 @@ HRESULT CKirby::Render_DeferredInfo()
 
 void CKirby::Collision_Attack(CGameObject* pOtherObj)
 {
-	INFO(m_fJumpVelocity) = 11.f;
+	CCharacter* pMonster = static_cast<CCharacter*>(pOtherObj);
 
-	// 먹은 상태인 경우
-	if (INFO(m_isEat) == true)
+	// 흡수될 운명인 몬스터
+	if (pMonster->Get_Vacuuming())
 	{
-		Change_State(STATE_EATDAMAGE, 60.f, false, false, BODY_BALLOON);
+		if (pMonster->Get_AbilityType() == ABILITY_DEFAULT)
+		{
+			INFO(m_isEat) = true;
+			Change_State(STATE_EAT, 100.f, false, false, BODY_BALLOON);
+		}
 	}
-	// 나는 상태일 경우 . . .
-	else if (true == (Get_State() == STATE_FLIGHTSTART || Get_State() == STATE_FLIGHTFALL || Get_State() == STATE_FLIGHT ||
-		Get_State() == STATE_FLIGHTLANDING || Get_State() == STATE_FLIGHTLIMIT || Get_State() == STATE_FLIGHTLIMITFALL))
-	{
-		Change_State(STATE_FILGHTDAMAGE, 60.f, false, false, BODY_BALLOON);
-	}
-	// 평범한 상태에서...
+	// 일반 타격
 	else
 	{
-		Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
+		INFO(m_fJumpVelocity) = 11.f;
+
+		// 먹은 상태인 경우
+		if (INFO(m_isEat) == true)
+		{
+			Change_State(STATE_EATDAMAGE, 60.f, false, false, BODY_BALLOON);
+		}
+		// 나는 상태일 경우 . . .
+		else if (true == (Get_State() == STATE_FLIGHTSTART || Get_State() == STATE_FLIGHTFALL || Get_State() == STATE_FLIGHT ||
+			Get_State() == STATE_FLIGHTLANDING || Get_State() == STATE_FLIGHTLIMIT || Get_State() == STATE_FLIGHTLIMITFALL))
+		{
+			Change_State(STATE_FILGHTDAMAGE, 60.f, false, false, BODY_BALLOON);
+		}
+		// 평범한 상태에서...
+		else
+		{
+			Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
+		}
 	}
 }
 

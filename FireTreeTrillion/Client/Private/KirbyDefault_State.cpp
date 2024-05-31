@@ -883,7 +883,7 @@ void CKirbyDefault_Slide_State::OnStateUpdate(CGameObject* pGameObject, _float f
 		if (pKirby->isAnimFinish())
 		{
 			pKirby->Change_State(CKirby::STATE_SLIDE, 60.f, true, false, CKirby::BODY_DEFAULT);
-			DESC(m_fMoveSpeed) = 25.f;
+			DESC(m_fMoveSpeed) = 18.f;
 		}
 	}
 	else if (pKirby->Get_State() == CKirby::STATE_SLIDE)
@@ -891,7 +891,7 @@ void CKirbyDefault_Slide_State::OnStateUpdate(CGameObject* pGameObject, _float f
 		_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 		_vector vMoveDelta = DESC(m_vDodgeDir) * fTimeDelta * DESC(m_fMoveSpeed);
 		pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
-		DESC(m_fMoveSpeed) -= fTimeDelta * 40.f;
+		DESC(m_fMoveSpeed) -= fTimeDelta * 30.f;
 
 		if (DESC(m_fMoveSpeed) < 0.f)
 		{
