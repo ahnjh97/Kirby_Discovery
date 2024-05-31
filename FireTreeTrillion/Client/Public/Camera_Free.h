@@ -43,8 +43,14 @@ private:
 
 public:
 	void Set_MatrixIndex(_int iMatrixIndex);
-	void EmplaceBackCamMatrix(const _float4x4& matWorld);
-	void Lerp_ToNextCamMatrix(_int iMatrixIndex);
+	void EmplaceBackCamMatrix(const _float4x4& matWorld) { m_vecCamMatrices.emplace_back(matWorld); }
+
+	void EmplaceBackDirRadius(_int iCamType, _fvector vDir, _float fRadius);
+	void LerpByDirRadius(_int iTriggerIndex);
+
+	void EmplaceBackTriggerInfo(const _float4x4& matWorld, _float fScale) { 
+		m_vecTriggerInfo.emplace_back(matWorld, fScale); }
+	_float Compute_TriggerPosRatio(_int iTriggerIndex);
 
 private:
 	_float			m_fMouseSensor = { 0.0f };
@@ -55,7 +61,11 @@ private:
 	void			Track_Target(_float fTimeDelta);
 
 	vector<_float4x4>	m_vecCamMatrices;
-	_int			m_iMatrixIndex = { -1 };
+	_int				m_iMatrixIndex = { -1 };
+
+	vector<pair<_vector, _float>>	m_vecFrontDirRadius;
+	vector<pair<_vector, _float>>	m_vecRearDirRadius;
+	vector<pair<_float4x4, _float>>	m_vecTriggerInfo; // Trigger InverseMatrix and Scale
 
 	//Vector3			m_vOrbitPos = { 0.f, 0.f, 0.f };
 private:

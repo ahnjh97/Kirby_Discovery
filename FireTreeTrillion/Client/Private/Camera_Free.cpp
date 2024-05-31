@@ -36,7 +36,7 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 	m_pGameInstance->Add_Camera(this);
 
 	if (*m_pGameInstance->Get_CurrentLevelID() == LEVEL_GAMEPLAY) {
-		function<void(_int)> func = bind(&CCamera_Free::Set_MatrixIndex, this, placeholders::_1);
+		function<void(_int)> func = bind(&CCamera_Free::LerpByDirRadius, this, placeholders::_1);
 		m_pGameInstance->SetUp_TriggerFunc(TRIGGER_CAMERA, func);
 	}
 
@@ -149,19 +149,43 @@ void CCamera_Free::Set_MatrixIndex(_int iMatrixIndex)
 	m_iMatrixIndex = iMatrixIndex;
 }
 
-void CCamera_Free::EmplaceBackCamMatrix(const _float4x4& matWorld)
+void CCamera_Free::EmplaceBackDirRadius(_int iCamType, _fvector vDir, _float fRadius)
 {
-	m_vecCamMatrices.emplace_back(matWorld);
+	if (CAM_FRONT == iCamType)
+		m_vecFrontDirRadius.emplace_back(vDir, fRadius);
+	else if(CAM_REAR == iCamType)
+		m_vecRearDirRadius.emplace_back(vDir, fRadius);
 }
 
-void CCamera_Free::Lerp_ToNextCamMatrix(_int iMatrixIndex)
+void CCamera_Free::LerpByDirRadius(_int iTriggerIndex)
 {
-	if (nullptr == m_pTransformCom || m_vecCamMatrices.empty())
+	if (nullptr == m_pTransformCom || m_vecFrontDirRadius.empty() || m_vecRearDirRadius.empty())
 		return;
 
-	if (iMatrixIndex < 0 || iMatrixIndex == m_iMatrixIndex || iMatrixIndex > m_vecCamMatrices.size())
+	if (iTriggerIndex < 0 || iTriggerIndex > m_vecFrontDirRadius.size())
 		return;
 
+	_float fRatio = Compute_TriggerPosRatio(iTriggerIndex);
+	if (0 <= fRatio && 1 > fRatio)
+	{
+		_int a = 0;
+	}
+}
+		
+
+_float CCamera_Free::Compute_TriggerPosRatio(_int iTriggerIndex)
+{
+	if (m_vecTriggerInfo.empty())
+		return _float();
+
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0));
+	CTransform* pKirbyTransform = dynamic_cast<CTransform*>(pKirby->Get_Component(g_strTransformTag));
+	_float fZ = XMVectorGetZ(XMVector4Transform(pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION)
+		, m_vecTriggerInfo[iTriggerIndex].first));
+
+	// rear : 0, middle : 0.5, front: 1
+	_float fRatio = 0.5f * fZ + 0.5f;
+	return fRatio;
 }
 
 void CCamera_Free::Track_Target(_float fTimeDelta)
@@ -295,5 +319,4 @@ void CCamera_Free::Free()
 
 	__super::Free();
 
-	m_vecCamMatrices.clear();
 }

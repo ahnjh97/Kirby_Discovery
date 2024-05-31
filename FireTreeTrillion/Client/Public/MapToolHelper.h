@@ -25,7 +25,8 @@ private:
 	// ImGui
 	void	Menu_Level();
 	void	Menu_NonAnimModels();
-	void	Menu_TriggerIndex();
+	void	Menu_TriggerInfo();
+	void	Menu_CamLerpInfo(class CMapToolObject* _pMapToolObject);
 	void	Menu_MapShaderInfo();
 	void	Edit_Object();
 

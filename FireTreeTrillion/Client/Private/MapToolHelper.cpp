@@ -15,6 +15,7 @@ static _int iTriggerType = -1;
 static const _char* triggerIndices[] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
 									"11", "12", "13", "14", "15", "16", "17", "18", "19", "20" };
 static _int iTriggerIdx = -1;
+
 static _int iMapMeshIndex = -1;
 static _int iSelectedMeshIndex = -1; 
 
@@ -23,6 +24,11 @@ static vector<vector<_int>> vecPassIndices;
 static vector<vector<_float>> vecSamplingFactors;
 static _int iMapIndex = 0;
 static _int iPickedMeshIndex = 0;
+
+static _float fRadius = 0;
+
+static const _char* camTypes[] = { "Front", "Rear"};
+static _int iCamType = -1;
 
 CMapToolHelper::CMapToolHelper(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -71,7 +77,7 @@ void CMapToolHelper::Late_Tick(_float fTimeDelta)
 	ImGui::Begin("MapTool");
 	Menu_Level();
 	Menu_NonAnimModels();
-	Menu_TriggerIndex();
+	Menu_TriggerInfo();
 	Menu_MapShaderInfo();
 	ImGui::End();
 
@@ -155,7 +161,7 @@ void CMapToolHelper::Menu_NonAnimModels()
 	}
 }
 
-void CMapToolHelper::Menu_TriggerIndex()
+void CMapToolHelper::Menu_TriggerInfo()
 {
 	if (nullptr == m_pPickedObject)
 		return;
@@ -165,14 +171,14 @@ void CMapToolHelper::Menu_TriggerIndex()
 		return;
 
 	string strModelName = pModel->Get_ModelInfo().strModelName;
-	if (strModelName == "Camera" || strModelName == "Trigger")
+	if (strModelName == "Camera" || strModelName == "Trigger" || strModelName == "Dummy")
 	{
 		CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(m_pPickedObject);
 		iTriggerType = pMapToolObject->Get_TriggerType();
 		iTriggerIdx = pMapToolObject->Get_TriggerIndex();
 
 		ImGui::Begin(strModelName.c_str());
-		if (strModelName == "Trigger") {
+		if (strModelName == "Trigger" || strModelName == "Dummy") {
 			ImGui::SetCursorPosX(37);
 			ImGui::Text("TYPE");
 			ImGui::SameLine();
@@ -190,6 +196,13 @@ void CMapToolHelper::Menu_TriggerIndex()
 				pMapToolObject->Set_TriggerType(iTriggerType);
 			ImGui::SameLine();
 		}
+		else if (strModelName == "Dummy")
+		{
+			ImGui::SetNextItemWidth(80);
+			if (ImGui::Combo("##Type", &iCamType, camTypes, IM_ARRAYSIZE(camTypes)))
+				pMapToolObject->Set_CamType(iCamType);
+			ImGui::SameLine();
+		}
 		
 		//-------------------------------------------
 		ImGui::SetNextItemWidth(80);
@@ -197,8 +210,24 @@ void CMapToolHelper::Menu_TriggerIndex()
 			pMapToolObject->Set_TriggerIndex(iTriggerIdx);
 		}
 
+		if (strModelName == "Dummy")
+			Menu_CamLerpInfo(pMapToolObject);
+
 		ImGui::End();
 	}
+}
+
+void CMapToolHelper::Menu_CamLerpInfo(CMapToolObject* _pMapToolObject)
+{
+	iCamType = _pMapToolObject->Get_CamType();
+	fRadius = _pMapToolObject->Get_Radius();
+
+	ImGui::Text("RADIUS");
+	ImGui::SameLine();
+	ImGui::SetCursorPosX(60);
+	ImGui::SetNextItemWidth(90);
+	if (ImGui::InputFloat("##Radius", &fRadius, 1.f, 1.f, "%.3f"))
+		_pMapToolObject->Set_Radius(fRadius);
 }
 
 void CMapToolHelper::Menu_MapShaderInfo()
@@ -361,27 +390,26 @@ void CMapToolHelper::OnRightClick()
 	if (!::XMVector3Equal(::XMLoadFloat3(&m_vPickPos), ::XMVectorSet(0.f, 0.f, 0.f, 0.f)))
 	{
 		_float4 vTemp(m_vPickPos.x, m_vPickPos.y, m_vPickPos.z, 1.0f); // À§Ä¡
-		CGameObject::GAMEOBJECT_DESC tempDesc = {};
-		memcpy(&tempDesc.matWorld.m[CTransform::STATE_POSITION], &vTemp, sizeof(_float4));
-		tempDesc.wstrModelName = CUtils::StrToWstr(m_vecNonAnimTxts[iNonAnimIdx]);
+		CMapToolObject::MAPTOOLOBJECT_DESC tMapToolDesc = {};
+		memcpy(&tMapToolDesc.matWorld.m[CTransform::STATE_POSITION], &vTemp, sizeof(_float4));
+		tMapToolDesc.wstrModelName = CUtils::StrToWstr(m_vecNonAnimTxts[iNonAnimIdx]);
 
-		wstring wstrPrototypeTag = TEXT("Prototype_GameObject_");
-		
-		_bool bIsMap = { false };
-		for (auto& mapName : m_vecMapModelNames) {
-			if (mapName == m_vecNonAnimTxts[iNonAnimIdx]) {
-				bIsMap = true;
-				break;
-			}
+		if (Compute_MapIndex(m_vecNonAnimTxts[iNonAnimIdx]) == -1) // ¸ÊÀÌ ¾Æ´Ò¶§
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), 
+				TEXT("Prototype_GameObject_MapToolObject"), &tMapToolDesc)))
+				return;
 		}
-			
-		if (true == bIsMap)
-			wstrPrototypeTag += TEXT("BasicMap");
 		else
-			wstrPrototypeTag += TEXT("MapToolObject");
+		{
+			CGameObject::GAMEOBJECT_DESC tempDesc = {};
+			tempDesc.matWorld = tMapToolDesc.matWorld;
+			tempDesc.wstrModelName = tMapToolDesc.wstrModelName;
 
-		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), wstrPrototypeTag, &tempDesc)))
-			return;
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), 
+				TEXT("Prototype_GameObject_BasicMap"), &tempDesc)))
+				return;
+		}
 
 		iAnimIdx = iNonAnimIdx = -1;
 
@@ -463,6 +491,20 @@ void CMapToolHelper::Save_Level()
 			_int iTriggerIndex = pMapToolObject->Get_TriggerIndex();
 			outputFile.write(reinterpret_cast<const char*>(&iTriggerIndex), sizeof(iTriggerIndex));
 		}
+		else if ("Dummy" == strModelName)
+		{
+			CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(object);
+			_int iTriggerIndex = pMapToolObject->Get_TriggerIndex();
+			_int iCamType = pMapToolObject->Get_CamType();
+			_float3 vDir = pMapToolObject->Get_OrbitingCamPos();
+			_float fRadius = pMapToolObject->Get_Radius();
+
+
+			outputFile.write(reinterpret_cast<const char*>(&iTriggerIndex), sizeof(iTriggerIndex));
+			outputFile.write(reinterpret_cast<const char*>(&iCamType), sizeof(iCamType));
+			outputFile.write(reinterpret_cast<const char*>(&vDir), sizeof(vDir));
+			outputFile.write(reinterpret_cast<const char*>(&fRadius), sizeof(fRadius));
+		}
 	}
 
 	outputFile.close();
@@ -527,6 +569,9 @@ void CMapToolHelper::Load_Level()
 	_float4x4 matWorld{};
 	_int triggerType{};
 	_int iTriggerIndex{};
+	_int iCamType{};
+	_float fRadius{};
+	_float3 vOrbitingCameraPos{};
 
 	while (!fileStream.eof()) 
 	{
@@ -542,6 +587,13 @@ void CMapToolHelper::Load_Level()
 
 			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
 		}
+		else if ("Dummy" == strModelName)
+		{
+			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
+			fileStream.read(reinterpret_cast<char*>(&iCamType), sizeof(iCamType));
+			fileStream.read(reinterpret_cast<char*>(&vOrbitingCameraPos), sizeof(vOrbitingCameraPos));
+			fileStream.read(reinterpret_cast<char*>(&fRadius), sizeof(fRadius));
+		}
 
 		if (fileStream.eof())
 			break;
@@ -555,18 +607,16 @@ void CMapToolHelper::Load_Level()
 				tDesc.iTriggerType = triggerType;
 			tDesc.iTriggerIndex = iTriggerIndex;
 		}
-			
-
-		_bool bIsMap = { false };
-		for (auto& mapModelName : m_vecMapModelNames) {
-			if (strModelName == mapModelName) {
-				bIsMap = true;
-				break;
-			}
+		else if ("Dummy" == strModelName)
+		{
+			tDesc.iTriggerIndex = iTriggerIndex;
+			tDesc.iCamType = iCamType;
+			tDesc.vOrbitingCameraPos = vOrbitingCameraPos;
+			tDesc.fRadius = fRadius;
 		}
-
+		
 		wstring wstrGameObjectTag;
-		if (true == bIsMap)
+		if (Compute_MapIndex(strModelName) != -1) // ¸ÊÀÎ °æ¿ì
 			wstrGameObjectTag = TEXT("BasicMap");
 		else
 			wstrGameObjectTag = TEXT("MapToolObject");
