@@ -168,7 +168,7 @@ public: /* For.ImGui_Manager */
 	void		ImGui_Render();
 	void		EditTransform(/*const CCamera& camera,*/ _float4x4& _matrix);
 	void		RenderGrid();
-	void		Set_FileDialog();
+	//void		Set_FileDialog();
 	void		Set_IMGUIStyle(_uint uStyle);
 	CImGUI_Manager::FILE_MODE	Set_FileDialog();
 

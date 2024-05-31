@@ -160,6 +160,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SingleEffect"), CSingleEffect);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MultiEffect"), CMultiEffect);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Particle"), CParticle);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SkySphere"), CSkySphere);
 	#pragma endregion
 	
 	// MapTool GameObject Prototypes
@@ -168,6 +169,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BasicMap"), CBasicMap);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolHelper"), CMapToolHelper);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolObject"), CMapToolObject);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Trigger"), CTrigger);
 	#pragma endregion
 
 	#pragma region TOOL_UI
@@ -194,29 +196,6 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Moon"), CMoon);
 	#pragma endregion
-
-	//ÀÌÆåÆ® Åø ¿ë
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FXToolDirector"), CFXToolDirector);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SingleEffect"), CSingleEffect);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MultiEffect"), CMultiEffect);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Particle"), CParticle);
-
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SkySphere"), CSkySphere);
-
-	// MapTool GameObject Prototypes
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Grid"), CGrid);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BasicMap"), CBasicMap);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolHelper"), CMapToolHelper);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolObject"), CMapToolObject);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Trigger"), CTrigger);
-
-#pragma region TOOL_UI
-
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("IMGUI_UI_Editor"), CUI_Editor);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_Kirby"), CHUD_Kirby);
-
-#pragma endregion
 
 	return S_OK;
 }
