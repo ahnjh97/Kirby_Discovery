@@ -107,6 +107,7 @@ void CKirby::Late_Tick(_float fTimeDelta)
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_DEFERREDINFO, this);
 	}
 }
 
@@ -173,6 +174,39 @@ void CKirby::Render_IMGUI()
 	ImGui::Separator(); ImGui::NewLine();
 
 	__super::Render_IMGUI();
+}
+
+HRESULT CKirby::Render_DeferredInfo()
+{
+
+	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
+		return E_FAIL;
+
+	_uint iNumMeshes = m_pModelCom[INFO(m_eBodyState)]->Get_NumMeshes();
+
+	for (size_t i = 0; i < iNumMeshes; i++)
+	{
+
+		if (FAILED(m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
+			return E_FAIL;
+
+		if (FAILED(m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+			return E_FAIL;
+
+		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
+		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_DEFERREDINFO)))
+			return E_FAIL;
+
+		if (FAILED(m_pModelCom[INFO(m_eBodyState)]->Render(i)))
+			return E_FAIL;
+	}
+
+	return S_OK;
+
 }
 
 void CKirby::Collision_Attack(CGameObject* pOtherObj)
