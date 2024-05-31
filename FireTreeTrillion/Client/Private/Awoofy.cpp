@@ -45,12 +45,6 @@ _int CAwoofy::Tick(_float fTimeDelta)
 
 	__super::Tick(fTimeDelta);
 
-	Compute_ViewZ();
-
-	__super::SetOn_Slope(fTimeDelta);
-
-	Compute_MotionBlur();
-
 	return OBJ_NOEVENT;
 }
 
@@ -218,21 +212,6 @@ HRESULT CAwoofy::Bind_ShaderResources()
 	return S_OK;
 }
 
-void CAwoofy::Compute_MotionBlur()
-{
-	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-	_matrix ViewProjectionMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW) * m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
-	_vector vScreenPos = XMVector3TransformCoord(vPos, ViewProjectionMatrix);
-	_float fScreenX = (XMVectorGetX(vScreenPos) + 1.f) * 0.5f;
-	_float fScreenY = (XMVectorGetY(vScreenPos) + 1.f) * 0.5f;
-
-	_float2 vCurScreenPos = _float2(fScreenX, 1.f - fScreenY);
-
-	m_vMotionVelocity.x = (m_vPreScreenPos - vCurScreenPos).x;
-	m_vMotionVelocity.y = (m_vPreScreenPos - vCurScreenPos).y;
-	m_vPreScreenPos = vCurScreenPos;
-}
-
 void CAwoofy::SetUp_FSM()
 {
 	// FSM 상태 초기화
@@ -285,7 +264,5 @@ CGameObject* CAwoofy::Clone(void* pArg)
 void CAwoofy::Free()
 {
 	__super::Free();
-
-	//Safe_Release(m_pFSM);
 }
 

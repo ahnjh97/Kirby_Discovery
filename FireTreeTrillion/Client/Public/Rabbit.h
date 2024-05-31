@@ -60,10 +60,6 @@ public:
 private:
 	RABBIT_ANIM	m_eCurrentState = { RABBIT_END };
 
-	void			Compute_MotionBlur();
-	_float2			m_vPreScreenPos = { 0.f, 0.f };
-	_float4			m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
-
 
 private:
 	_float	m_fTimeDelta = { 0.f };

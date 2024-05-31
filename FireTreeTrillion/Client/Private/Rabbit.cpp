@@ -67,14 +67,8 @@ _int CRabbit::Tick(_float fTimeDelta)
 	//	m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta);
 	//}
 
-	// 지면충돌과 경사 보정
-	__super::SetOn_Slope(fTimeDelta);
 
-	Compute_MotionBlur();
-
-   // FSM 제어
-	if (m_pFSM != nullptr)
-		m_pFSM->Update(this, fTimeDelta);
+	__super::Tick(fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
@@ -199,21 +193,6 @@ _vector CRabbit::JumpAttak(_float fTimeDelta)
 	m_vGoPos.z = m_vStartPos.z + m_fAxisZ * fTimeDelta;
 	 
 	return m_vGoPos;
-}
-
-void CRabbit::Compute_MotionBlur()
-{
-	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-	_matrix ViewProjectionMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW) * m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
-	_vector vScreenPos = XMVector3TransformCoord(vPos, ViewProjectionMatrix);
-	_float fScreenX = (XMVectorGetX(vScreenPos) + 1.f) * 0.5f;
-	_float fScreenY = (XMVectorGetY(vScreenPos) + 1.f) * 0.5f;
-
-	_float2 vCurScreenPos = _float2(fScreenX, 1.f - fScreenY);
-
-	m_vMotionVelocity.x = (m_vPreScreenPos - vCurScreenPos).x;
-	m_vMotionVelocity.y = (m_vPreScreenPos - vCurScreenPos).y;
-	m_vPreScreenPos = vCurScreenPos;
 }
 
 HRESULT CRabbit::Add_Components()
