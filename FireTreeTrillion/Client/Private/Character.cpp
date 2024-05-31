@@ -3,12 +3,12 @@
 #include "FSM.h"
 
 CCharacter::CCharacter(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CGameObject{ pDevice , pContext }
+	: CPhysXObject{ pDevice , pContext }
 {
 }
 
 CCharacter::CCharacter(const CCharacter& rhs)
-	: CGameObject{ rhs }
+	: CPhysXObject{ rhs }
 {
 }
 
@@ -51,6 +51,8 @@ HRESULT CCharacter::Render()
 
 HRESULT CCharacter::Render_LightDepth()
 {
+	__super::Render();
+
 	return S_OK;
 }
 

@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Client_Defines.h"
 #include "PhysXObject.h"
 
@@ -7,17 +6,17 @@ BEGIN(Engine)
 class CModel;
 class CShader;
 class CFSM;
-class CCharacterController;
+//class CCharacterController;
 END
 
 BEGIN(Client)
 
-class CCharacter abstract : public CPhysXObject
+class CRigidObject abstract : public CPhysXObject
 {
 protected:
-	CCharacter(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CCharacter(const CCharacter& rhs);
-	virtual ~CCharacter() = default;
+	CRigidObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CRigidObject(const CRigidObject& rhs);
+	virtual ~CRigidObject() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype()			override;
@@ -29,18 +28,18 @@ public:
 	virtual void	Render_IMGUI()					override;
 
 protected:
-	CCharacterController*	m_pControllerCom	= { nullptr };
+	//CCharacterController*	m_pControllerCom	= { nullptr };
 	CShader*				m_pShaderCom = { nullptr };
-	CFSM*					m_pFSM = { nullptr };
-
-protected:
-	// For_PhysX
-	_float			m_fOffsetTurn = { 7.f };
-	_float4			m_vOriginUp = { 0.f, 1.f, 0.f, 0.f };
-		
-protected:
-	void			SetOn_Slope(_float fTimeDelta);
-	void			Lerp_UpVector(_fvector _vTargetUp, _float _maxAngle, _float fTimeDelta);
+//	CFSM*					m_pFSM = { nullptr };
+//
+//protected:
+//	// For_PhysX
+//	_float			m_fOffsetTurn = { 7.f };
+//	_float4			m_vOriginUp = { 0.f, 1.f, 0.f, 0.f };
+//		
+//protected:
+//	void			SetOn_Slope(_float fTimeDelta);
+//	void			Lerp_UpVector(_fvector _vTargetUp, _float _maxAngle, _float fTimeDelta);
 
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;
