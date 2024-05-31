@@ -2,6 +2,10 @@
 #include "Client_Defines.h"
 #include "GameObject.h"
 
+BEGIN(Engine)
+class CModel;
+END
+
 BEGIN(Client)
 
 class CAnimToolHelper final : public CGameObject
@@ -20,19 +24,21 @@ public:
 	//virtual void			Render_IMGUI()						override;
 
 private:
-	void					Ready_AnimObjects(const wstring& strLayerTag);
+	void					Ready_AnimModels();
 
 	// RENDER
 	void					Render_ObjectList();
-	void					Render_AnimationList(const wstring& wstrObjectTag);
+	void					Render_AnimationList();
 	void					Render_FrameLine(class CAnimation** pModel, const string& strAnimationTag);
 
 	void					Save();
 	void					Load(const string& FileName);
 
 private:
-	vector<CGameObject*>	m_vecAnimObjects;
-	CGameObject*			m_pGameObj = nullptr;
+	vector<string>			m_vecAnimModels;
+	class CAnimToolObject*	m_pAnimToolObj = nullptr;
+	CModel*					m_pModel = nullptr;
+	string					m_strModelName = string();
 
 public:
 	static	CAnimToolHelper* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

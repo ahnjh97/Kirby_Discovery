@@ -169,6 +169,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\AnimToolHelper.h" />
+    <ClInclude Include="..\Public\AnimToolObject.h" />
     <ClInclude Include="..\Public\Awoofy.h" />
     <ClInclude Include="..\Public\Awoofy_State.h" />
     <ClInclude Include="..\public\BackGround.h" />
@@ -221,6 +222,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\AnimToolHelper.cpp" />
+    <ClCompile Include="..\Private\AnimToolObject.cpp" />
     <ClCompile Include="..\Private\Awoofy.cpp" />
     <ClCompile Include="..\Private\Awoofy_State.cpp" />
     <ClCompile Include="..\private\BackGround.cpp" />

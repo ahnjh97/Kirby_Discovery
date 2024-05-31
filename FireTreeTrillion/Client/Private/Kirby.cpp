@@ -352,9 +352,7 @@ HRESULT CKirby::Add_Components()
 			TEXT("Com_Model_Balloon"), (CComponent**)&m_pModelCom[BODY_BALLOON]);
 		CHECK_FAILED(hr);
 
-		// for animTool
-		m_ppModelForAnimTool = &m_pModelCom[BODY_DEFAULT];
-		m_uModelCnt = BODY_END;
+
 	#pragma endregion
 
 	#pragma region Kirby Eye

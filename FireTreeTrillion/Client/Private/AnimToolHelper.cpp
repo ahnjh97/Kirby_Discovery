@@ -1,11 +1,14 @@
 #include "stdafx.h"
 #include "AnimToolHelper.h"
 
+#include "AnimToolObject.h"
+#include "Model.h"
 #include "ImSequencer.h"
 #include "Utils.h"
 
 
 static string	g_strProtoObjTag = "";
+//static string	g_strModelTag = "";
 static _int		g_iActiveModelNum = -1;
 
 static const char* SequencerItemTypeNames[] = { "notify"/*, "Collision Event", "Sound Event" */};
@@ -79,6 +82,7 @@ struct AnimSequence : public ImSequencer::SequenceInterface
 };
 
 
+//========================================== AnimToolHelper ==========================================
 CAnimToolHelper::CAnimToolHelper(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
 {
@@ -100,7 +104,12 @@ HRESULT CAnimToolHelper::Initialize(void* pArg)
 	hr = __super::Initialize(pArg);
 	CHECK_FAILED(hr);
 
-	Ready_AnimObjects(L"Layer_AnimObjects");
+	// 테스트 객체 생성
+	m_pAnimToolObj = static_cast<CAnimToolObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_AnimToolObject")));
+	CHECK_NULLPTR(m_pAnimToolObj);
+
+	// 테스트 애님 모델들 가져오기
+	Ready_AnimModels();
 
 	//Load("../Bin/Resources/Data/UIData/UI_240418.ui");
 
@@ -109,36 +118,38 @@ HRESULT CAnimToolHelper::Initialize(void* pArg)
 
 _int CAnimToolHelper::Tick(_float fTimeDelta)
 {
-	for (auto& obj : m_vecAnimObjects)
-		obj->Tick(fTimeDelta);
+	m_pAnimToolObj->Tick(fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
 
 void CAnimToolHelper::Late_Tick(_float fTimeDelta)
 {
-	for (auto& obj : m_vecAnimObjects)
-		obj->Late_Tick(fTimeDelta);
+	m_pAnimToolObj->Late_Tick(fTimeDelta);
 
 	Render_ObjectList();
 }
 
 HRESULT CAnimToolHelper::Render()
 {
-	for (auto& obj : m_vecAnimObjects)
-		obj->Render();
-
 	return S_OK;
 }
 
-void CAnimToolHelper::Ready_AnimObjects(const wstring& strLayerTag)
+void CAnimToolHelper::Ready_AnimModels()
 {
-	CGameObject* pGameObj = nullptr;
+	string strPath = "../../../model_txt/Anim/";
+	directory_iterator end_iter;  // 디렉토리 순회의 끝을 나타내는 iterator
+	directory_iterator dir_iter(strPath);  // 지정된 경로의 시작 iterator
 
-	// 추후 anim 전용 객체로 변경 예정 [JYWI. 240530]
-	pGameObj = m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Kirby"));
-	CHECK_NULLPTR(pGameObj);
-	m_vecAnimObjects.push_back(pGameObj);
+	while (dir_iter != end_iter) 
+	{
+		if (is_regular_file(*dir_iter)) 
+		{
+			string strFilePath = dir_iter->path().filename().string();
+			m_vecAnimModels.emplace_back(strFilePath.substr(0, strFilePath.length() - 4));
+		}
+		++dir_iter;
+	}
 }
 
 void CAnimToolHelper::Render_ObjectList()
@@ -158,23 +169,31 @@ void CAnimToolHelper::Render_ObjectList()
 	static int item_current_idx = -1;
 	if (ImGui::BeginListBox(" ", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing())))
 	{
-		for (int n = 0; n < m_vecAnimObjects.size(); n++)
+		for (int n = 0; n < m_vecAnimModels.size(); n++)
 		{
+			//static _bool isChanged = false;
 			const bool is_selected = (item_current_idx == n);
-			wstring wstrTag = m_vecAnimObjects[n]->Get_PrototypeTag();
-			g_strProtoObjTag = CUtils::WstrToStr(wstrTag);
-			_char szName[256];
-			CUtils::WCharToChar(wstrTag.c_str(), szName);
-			if (szName == nullptr) continue;
-			if (filter.PassFilter(szName))
-				if (ImGui::Selectable(szName, is_selected))
+			string strModelName = m_vecAnimModels[n];//m_vecAnimModels[n]->Get_ModelInfo().strModelName;
+			if (strModelName.empty()) continue;
+
+			if (filter.PassFilter(strModelName.c_str()))
+			{
+				if (ImGui::Selectable(strModelName.c_str(), is_selected))
+				{
 					item_current_idx = n;
+					
+					m_strModelName = m_vecAnimModels[n];
+					wstring wstrPrototypeTag = TEXT("Prototype_Component_Model_") + CUtils::StrToWstr(m_strModelName);
+					m_pAnimToolObj->Change_ModelCom(wstrPrototypeTag);
+					//isChanged = true;
+				}
+			}
 			
 			if (is_selected)
 			{
-				m_pGameObj = m_vecAnimObjects[n];
 				ImGui::SetItemDefaultFocus();
-				Render_AnimationList(wstrTag);
+				
+				Render_AnimationList();
 			}
 		}
 		ImGui::EndListBox();
@@ -182,83 +201,106 @@ void CAnimToolHelper::Render_ObjectList()
 	ImGui::End();
 }
 
-void CAnimToolHelper::Render_AnimationList(const wstring& wstrObjectTag)
+void CAnimToolHelper::Render_AnimationList()
 {
 	ImGui::Begin("ANIMATION LIST");
-	
+
 	float windowHeight = ImGui::GetWindowHeight();
 	float listBoxHeight = windowHeight - 100;
 	ImGui::SetNextWindowSizeConstraints(ImVec2(-1, windowHeight), ImVec2(-1, windowHeight));
+
 
 	static ImGuiTextFilter filter;
 	ImGui::Text("Search Animation");
 	filter.Draw();
 
-	for (auto& obj : m_vecAnimObjects)
+	m_pModel = static_cast<CModel*>(m_pAnimToolObj->Get_Component(TEXT("Com_Model")));
+	/*if (obj->Get_PrototypeTag() == wstrObjectTag)
+	{*/
+	//CModel** pModel = obj->Get_ModelAddress();
+	//_uint uModelCnt = obj->Get_ModelCnt();
+
+	ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
+	//for (size_t w = 0; w < uModelCnt; ++w) // 모델 개수 만큼 Tab을 형성한다.
+	//{
+		// 현재 활성화된 탭 인덱스
+	if (ImGui::BeginTabBar("MyTabBar", tab_bar_flags))
 	{
-		if (obj->Get_PrototypeTag() == wstrObjectTag)
+		//MODEL tModelInfo = pModel[w]->Get_ModelInfo();
+		if (ImGui::BeginTabItem(m_strModelName.c_str())) // 모델이름으로 Tab Name 형성
 		{
-			CModel** pModel = obj->Get_ModelAddress();
-			_uint uModelCnt = obj->Get_ModelCnt();
+			//g_iActiveModelNum = w;
+			_float childwindowHeight = ImGui::GetWindowHeight();
+			_float childlistBoxHeight = windowHeight - 110;
+			ImGui::SetNextWindowSizeConstraints(ImVec2(-1, childlistBoxHeight), ImVec2(-1, childlistBoxHeight));
 
-			ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
-			for (size_t w = 0; w < uModelCnt; ++w) // 모델 개수 만큼 Tab을 형성한다.
+			static _int item_current_idx = -1;
+			static _int item_previous_idx = -1;
+
+			if (ImGui::BeginListBox(" ", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing())))
 			{
-				// 현재 활성화된 탭 인덱스
-				if (ImGui::BeginTabBar("MyTabBar", tab_bar_flags))
+				// 해당 모델이 가지고 있는 애니메이션 개수
+				_uint uAnimCnt = m_pModel->Get_AnimCnt();
+				vector<CAnimation*>* pVecAnims = m_pModel->Get_Animations();
+
+				if (m_pGameInstance->Get_KeyState(DIK_UP, KEY_DOWN))
 				{
-					MODEL tModelInfo = pModel[w]->Get_ModelInfo();
-					if (ImGui::BeginTabItem(tModelInfo.strModelName.c_str())) // 모델이름으로 Tab Name 형성
-					{
-						g_iActiveModelNum = w;
-						_float childwindowHeight = ImGui::GetWindowHeight();
-						_float childlistBoxHeight = windowHeight - 110;
-						ImGui::SetNextWindowSizeConstraints(ImVec2(-1, childlistBoxHeight), ImVec2(-1, childlistBoxHeight));
-
-						static _int item_current_idx = -1;
-						if (ImGui::BeginListBox(" ", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing())))
-						{
-							// 해당 모델이 가지고 있는 애니메이션 개수
-							_uint uAnimCnt = pModel[w]->Get_AnimCnt();
-							vector<CAnimation*>* pVecAnims = pModel[w]->Get_Animations();
-							for (_int n = 0; n < uAnimCnt; n++)
-							{
-								const _bool is_selected = (item_current_idx == n);
-								const _char* animName = (*pVecAnims)[n]->Get_AnimationName();
-								if (animName == nullptr) continue;
-
-								if (filter.PassFilter(animName))
-								{
-									if (ImGui::Selectable(animName, is_selected))
-									{
-										item_current_idx = n;
-										pModel[w]->Set_Animation(n);
-									}
-								}
-
-								if (is_selected)
-								{
-									// 해당 애니메이션 ListBox 포커싱
-									ImGui::SetItemDefaultFocus();
-									// 애니메이션 창 띄우기
-									Render_FrameLine(&(*pVecAnims)[n], animName);
-								}
-							}
-							ImGui::EndListBox();
-						}
-						ImGui::EndTabItem();
-					}
-					ImGui::EndTabBar();
+					item_current_idx--;
+					if (item_current_idx < 0)
+						item_current_idx = uAnimCnt - 1;
 				}
+				if (m_pGameInstance->Get_KeyState(DIK_DOWN, KEY_DOWN))
+				{
+					item_current_idx++;
+					if (item_current_idx >= uAnimCnt)
+						item_current_idx = 0;
+				}
+
+				// 인덱스가 변경되었을 때 애니메이션 설정 호출
+				if (item_previous_idx != item_current_idx)
+				{
+					m_pModel->Set_Animation(item_current_idx);
+					item_previous_idx = item_current_idx;
+				}
+
+				for (_int n = 0; n < uAnimCnt; n++)
+				{
+					const _bool is_selected = (item_current_idx == n);
+					const _char* animName = (*pVecAnims)[n]->Get_AnimationName();
+					if (animName == nullptr) continue;
+
+					if (filter.PassFilter(animName))
+					{
+						if (ImGui::Selectable(animName, is_selected))
+						{
+							item_current_idx = n;
+							m_pModel->Set_Animation(n);
+						}
+
+						if (is_selected)
+						{
+							// 해당 애니메이션 ListBox 포커싱
+							ImGui::SetItemDefaultFocus();
+							ImGui::SetScrollHereY();
+							// 애니메이션 창 띄우기
+							Render_FrameLine(&(*pVecAnims)[n], animName);
+						}
+					}
+				}
+				ImGui::EndListBox();
 			}
+			ImGui::EndTabItem();
 		}
-		ImGui::End();
+		ImGui::EndTabBar();
 	}
+	ImGui::End();
 }
 
 // 가져온 애니메이션의 정보를 가져오는 함수
 void CAnimToolHelper::Render_FrameLine(CAnimation** ppAnimation, const string& strAnimationTag)
 {
+	static string previousAnimation = (*ppAnimation)->Get_AnimationName();
+
 	// Sequence에서 해당 animation frame data긁어와서 처리
 	static AnimSequence mySequence;
 	mySequence.m_iFrameMin = 0;
@@ -268,6 +310,7 @@ void CAnimToolHelper::Render_FrameLine(CAnimation** ppAnimation, const string& s
 	if (mySequence.m_vecSequenceItems.empty())
 	{
 		// QZR : 추후 animation정보를 가져오는 Load()를 여기서 처리
+		// 
 		// Load해서 가져온 data들 중 Sequence에 띄워야하는
 		// (1) 프레임 처음/끝, (2) 이벤트 종류, (3) 이벤트 이름을 가져와서 아래에 push_back한다.
 		mySequence.m_vecSequenceItems.push_back(AnimSequence::AnimSequenceItem{ 0, "Test0", 2, 3 });
@@ -294,17 +337,23 @@ void CAnimToolHelper::Render_FrameLine(CAnimation** ppAnimation, const string& s
 	
 	// 현재 프레임 띄우기
 	static _int currentFrame = 0;
-	ImGui::InputInt("Current Frame", &currentFrame); ImGui::SameLine();
+	ImGui::Text("Current Frame"); ImGui::SameLine();
+	ImGui::InputInt("  ", &currentFrame); ImGui::SameLine();
 	
 	static _bool bIsLoop = true;
-	ImGui::Checkbox("LOOP", &bIsLoop);
+	ImGui::Text("LOOP"); ImGui::SameLine();
+	ImGui::Checkbox("   ", &bIsLoop);
 	if (!bIsLoop)
 		(*ppAnimation)->Set_TrackPosition((_float)currentFrame);
 	ImGui::SameLine();
 	
 	// 애니메이션 스피드
-	static _float animationSpeed = 0;
-	ImGui::InputFloat("Animation Speed", &animationSpeed); ImGui::SameLine();
+	static _float animationSpeed = (*ppAnimation)->Get_TickPerSecond();
+	if (previousAnimation != (*ppAnimation)->Get_AnimationName())
+		animationSpeed = (*ppAnimation)->Get_TickPerSecond();
+	ImGui::Text("Animation Speed"); ImGui::SameLine();
+	ImGui::InputFloat("    ", &animationSpeed); ImGui::SameLine();
+	(*ppAnimation)->Set_TickPerSecond(animationSpeed);
 
 	// 현 애니메이션 데이터 저장
 	if (ImGui::Button("ANIMATION DATA SAVE")) 
@@ -364,10 +413,6 @@ void CAnimToolHelper::Render_FrameLine(CAnimation** ppAnimation, const string& s
 	}
 	ImGui::End();
 }
-
-//void CAnimToolHelper::Render_EventList()
-//{
-//}
 
 
 void CAnimToolHelper::Save()
@@ -467,8 +512,8 @@ void CAnimToolHelper::Free()
 {
 	__super::Free();
 
-	for (auto& p : m_vecAnimObjects)
-		Safe_Release(p);
-	m_vecAnimObjects.clear();
+	Safe_Release(m_pAnimToolObj);
+	Safe_Release(m_pModel);
+	m_vecAnimModels.clear();
 }
 

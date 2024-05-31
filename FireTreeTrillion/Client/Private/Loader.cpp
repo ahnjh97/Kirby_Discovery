@@ -32,6 +32,7 @@
 
 //애님 툴
 #include "AnimToolHelper.h"
+#include "AnimToolObject.h"
 
 //클라이언트
 #include "Camera_Free.h"
@@ -170,6 +171,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	#pragma region TOOL_ANIMATION
 	// AnimationTool GameObject Prototypes
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("AnimToolHelper"), CAnimToolHelper);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("AnimToolObject"), CAnimToolObject);
 	#pragma endregion
 
 	#pragma region FOR CLIENT
@@ -352,8 +354,8 @@ HRESULT CLoader::Loading_For_Tool_Anim()
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
 	#pragma region 모델
-	hr = Add_Models(eLevel);
-	CHECK_FAILED(hr);
+	if (FAILED(Add_AllModelTxts(eLevel, TYPE_ANIM)))
+		return E_FAIL;
 	#pragma endregion
 
 	m_strLoadingText = TEXT("물리 컴포넌트(을) 로딩 중 입니다.");
@@ -628,7 +630,7 @@ HRESULT CLoader::Add_AllModelTxts(LEVEL eLevel, TYPE eType)
 		string strModelName = CUtils::WstrToStr(wstrModelName);
 		
 		_bool bFound = { false };
-		MODEL tModelInfo = MODEL{ strModelName ,  TYPE_NONANIM };
+		MODEL tModelInfo = MODEL{ strModelName ,  eType };
 		for (auto& modelInfo : m_vecModelInfo)
 		{
 			if (modelInfo.strModelName == strModelName)
@@ -661,7 +663,8 @@ void CLoader::TraverseModelTxts(const wstring& rootFolderPath, list<wstring>& fi
 		return;
 	}
 
-	do {
+	do 
+	{
 		if (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
 			if (wcscmp(findFileData.cFileName, L".") != 0 && wcscmp(findFileData.cFileName, L"..") != 0) {
 				// 재귀적으로 하위 폴더도 순회

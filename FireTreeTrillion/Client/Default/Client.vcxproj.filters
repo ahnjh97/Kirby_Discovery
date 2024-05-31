@@ -157,6 +157,9 @@
     <Filter Include="02.GameObjects\Anim\Sequencer">
       <UniqueIdentifier>{0353110f-7e27-416f-ba6f-01daa2bb4ed3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Anim\AnimToolObject">
+      <UniqueIdentifier>{0cedacd1-c3fc-452f-958a-85d2d94171e4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -306,6 +309,9 @@
     <ClInclude Include="..\Public\ImSequencer.h">
       <Filter>02.GameObjects\Anim\Sequencer</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\AnimToolObject.h">
+      <Filter>02.GameObjects\Anim\AnimToolObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -436,6 +442,9 @@
     </ClCompile>
     <ClCompile Include="..\Public\ImSequencer.cpp">
       <Filter>02.GameObjects\Anim\Sequencer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\AnimToolObject.cpp">
+      <Filter>02.GameObjects\Anim\AnimToolObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

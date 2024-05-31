@@ -51,6 +51,7 @@ public:
 protected:
 	HRESULT				Add_Component(_uint iLevelIndex, const wstring& strPrototypeTag, const wstring& strComponentTag, class CComponent** ppOut, void* pArg = nullptr);
 	HRESULT				Add_Component(const wstring& strPrototypeTag, const wstring& strComponentTag, class CComponent** ppOut, void* pArg = nullptr);
+	void				Delete_Component(const wstring& strPrototypeTag, const wstring& strComponentTag, class CComponent** ppOut);
 	HRESULT				Compute_ViewZ();
 
 protected:
