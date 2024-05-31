@@ -24,14 +24,12 @@
 
 #pragma region TOOL_UI
 
-#include "TestUI.h"
+#include "Editor_UI.h"
 #include "BackGround.h"
-#include "UI_Editor.h"
-
-	#pragma region UI_HUD
-	#include "HUD.h"
-	#include "HUD_Kirby.h"
-	#pragma endregion
+//#include "TestUI.h"
+#include "Single_UI.h"
+#include "Multi_UI.h"
+#include "HUD.h"
 
 #pragma endregion
 
@@ -157,7 +155,6 @@ HRESULT CLoader::Loading_ObjectAll()
 {
 	m_strLoadingText = TEXT("객체의 원형를(을) 로딩 중 입니다.");
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BackGround"), CBackGround);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_Test"), CTestUI);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestMap"), CTestTerrain);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
@@ -179,9 +176,10 @@ HRESULT CLoader::Loading_ObjectAll()
 
 #pragma region TOOL_UI
 
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("IMGUI_UI_Editor"), CUI_Editor);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_Kirby"), CHUD_Kirby);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Editor_UI"), CEditor_UI);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Single_UI"), CSingle_UI);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Multi_UI"), CMulti_UI);
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
 
 #pragma endregion
 

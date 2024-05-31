@@ -10,12 +10,12 @@ END
 
 BEGIN(Client)
 
-class CUI_Editor : public CUIObject
+class CEditor_UI : public CUIObject
 {
 private:
-	CUI_Editor(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CUI_Editor(const CUI_Editor& rhs);
-	virtual ~CUI_Editor() = default;
+	CEditor_UI(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CEditor_UI(const CEditor_UI& rhs);
+	virtual ~CEditor_UI() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype()						override;
@@ -26,10 +26,6 @@ public:
 	virtual void	Render_IMGUI()								override;
 
 private:
-	HRESULT			Add_Components();
-	HRESULT			Bind_ShaderResources();
-
-	// IMGUI SET
 	_bool			Window_Directories();
 	_bool			Window_Properties();
 	_bool			Window_Textures();
@@ -49,10 +45,9 @@ private:
 	
 
 public:
-	static CUI_Editor*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CEditor_UI*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject*	Clone(void* pArg) override;
 	virtual void			Free() override;
-
 };
 
 

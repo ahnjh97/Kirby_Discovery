@@ -180,8 +180,8 @@
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\FXToolDirector.h" />
     <ClInclude Include="..\Public\Grid.h" />
-    <ClInclude Include="..\Public\HUD.h" />
-    <ClInclude Include="..\Public\HUD_Kirby.h" />
+    <ClInclude Include="..\Public\Multi_UI.h" />
+    <ClInclude Include="..\Public\Single_UI.h" />
     <ClInclude Include="..\Public\Kirby.h" />
     <ClInclude Include="..\Public\KirbyBalloon_State.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -217,9 +217,8 @@
     <ClInclude Include="..\Public\TestTerrain.h" />
     <ClInclude Include="..\Public\tinyxml2.h" />
     <ClInclude Include="..\Public\ToolHelper.h" />
-    <ClInclude Include="..\Public\TestUI.h" />
     <ClInclude Include="..\Public\Trigger.h" />
-    <ClInclude Include="..\Public\UI_Editor.h" />
+    <ClInclude Include="..\Public\Editor_UI.h" />
     <ClInclude Include="..\public\WaddleDee.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="Resource.h" />
@@ -238,8 +237,8 @@
     <ClCompile Include="..\Private\Character.cpp" />
     <ClCompile Include="..\Private\FXToolDirector.cpp" />
     <ClCompile Include="..\Private\Grid.cpp" />
-    <ClCompile Include="..\Private\HUD.cpp" />
-    <ClCompile Include="..\Private\HUD_Kirby.cpp" />
+    <ClCompile Include="..\Private\Multi_UI.cpp" />
+    <ClCompile Include="..\Private\Single_UI.cpp" />
     <ClCompile Include="..\Private\Kirby.cpp" />
     <ClCompile Include="..\Private\KirbyBalloon_State.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -273,9 +272,8 @@
     <ClCompile Include="..\Private\TestTerrain.cpp" />
     <ClCompile Include="..\Private\tinyxml2.cpp" />
     <ClCompile Include="..\Private\ToolHelper.cpp" />
-    <ClCompile Include="..\Private\TestUI.cpp" />
     <ClCompile Include="..\Private\Trigger.cpp" />
-    <ClCompile Include="..\Private\UI_Editor.cpp" />
+    <ClCompile Include="..\Private\Editor_UI.cpp" />
     <ClCompile Include="..\private\WaddleDee.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="stdafx.cpp">

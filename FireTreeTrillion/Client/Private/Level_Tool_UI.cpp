@@ -66,8 +66,6 @@ HRESULT CLevel_Tool_UI::Ready_Layer_Camera(const wstring& strLayerTag)
 	CameraDesc.fSpeedPerSec = 10.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(0.0f);
 
-	// 05.20) IMGUI UI Editor 추가
-	/*      GameObject_Camera_Free    */
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_UI, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
 		return E_FAIL;
 
@@ -76,8 +74,7 @@ HRESULT CLevel_Tool_UI::Ready_Layer_Camera(const wstring& strLayerTag)
 
 HRESULT CLevel_Tool_UI::Ready_Layer_IMGUI(const wstring& strLayerTag)
 {	
-	// 05.20) IMGUI UI Editor 추가
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_UI, strLayerTag, TEXT("Prototype_GameObject_IMGUI_UI_Editor"))))
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_UI, strLayerTag, TEXT("Prototype_GameObject_Editor_UI"))))
 		return E_FAIL;
 
 	return S_OK;
@@ -85,17 +82,21 @@ HRESULT CLevel_Tool_UI::Ready_Layer_IMGUI(const wstring& strLayerTag)
 
 HRESULT CLevel_Tool_UI::Ready_Layer_UI(const wstring& strLayerTag)
 {
-	// 05.25) HUD 추가
-	CUIObject::UIOBJ_DESC HUD_KirbyDESC{};
-	HUD_KirbyDESC.wstrUITag = { TEXT("HUD_Kirby") };
-	HUD_KirbyDESC.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f };
-	HUD_KirbyDESC.vSize = { 100.f, 100.f };
-	HUD_KirbyDESC.vPos = {	HUD_KirbyDESC.vCenter.x/* - 200.f*/, 
-							HUD_KirbyDESC.vCenter.y/* - 200.f */ };
-	HUD_KirbyDESC.fDegree = { 0.f };
-	HUD_KirbyDESC.iTexIndex = { 0 };
+	CUIObject::UIOBJ_DESC SingleUI_Desc{};
+	SingleUI_Desc.wstrUITag = { TEXT("Single_UI") };
+	SingleUI_Desc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f };
+	SingleUI_Desc.vSize = { 100.f, 100.f };
+	SingleUI_Desc.vPos = { SingleUI_Desc.vCenter.x/* - 200.f*/,
+							SingleUI_Desc.vCenter.y/* - 200.f */ };
+	SingleUI_Desc.fDegree = { 0.f };
+	SingleUI_Desc.iTexIndex = { 0 };
 
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_UI, strLayerTag, TEXT("Prototype_GameObject_HUD_Kirby"), &HUD_KirbyDESC)))
+	//단일 
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_UI, strLayerTag, TEXT("Prototype_GameObject_Single_UI"), &SingleUI_Desc)))
+		return E_FAIL;
+
+	//다중 (상속)
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_UI, strLayerTag, TEXT("Prototype_GameObject_Multi_UI"))))
 		return E_FAIL;
 
 	return S_OK;
