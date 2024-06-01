@@ -187,6 +187,15 @@ public: /* For. Picking */
 	void Transform_PickingToLocalSpace(const class CTransform* pTransform, _Out_ _float3* pRayDir, _Out_ _float3* pRayPos);
 	_float2 Get_MouseViewPortPos();
 
+public: /* For. TimeController */
+	_float	Get_FirstTimer();
+	_float	Get_SecondTimer();
+	void	Set_FirstTimerRatio(_float fRatio);
+	void	Set_SecondTimerRatio(_float fRatio);
+	void	Restore_FirstTimer();
+	void	Restore_SecondTimer();
+
+
 private:
 	class CGraphic_Device*			m_pGraphic_Device = { nullptr };
 	class CInput_Device*			m_pInput_Device = { nullptr };
@@ -207,6 +216,7 @@ private:
 #endif
 	class CPhysX*					m_pPhysx = { nullptr };
 	class CPicking*					m_pPicking = { nullptr };
+	class CTimeController*			m_pTimeController = { nullptr };
 
 	_uint	m_iCurrentLevelID		= { 0 };
 

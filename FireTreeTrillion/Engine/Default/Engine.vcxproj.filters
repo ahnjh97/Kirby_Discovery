@@ -190,6 +190,9 @@
     <Filter Include="02.PhysX\_Manager">
       <UniqueIdentifier>{f88af5e5-4183-40e4-9180-afb42c69dfc5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\12.TimeController">
+      <UniqueIdentifier>{bcf5e0f1-895c-4733-bd87-8aca7e79dfb9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Base.cpp">
@@ -392,6 +395,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Model.cpp">
       <Filter>01.Utility\02.Components\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TimeController.cpp">
+      <Filter>01.Utility\12.TimeController</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -622,6 +628,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Model.h">
       <Filter>01.Utility\02.Components\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TimeController.h">
+      <Filter>01.Utility\12.TimeController</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
