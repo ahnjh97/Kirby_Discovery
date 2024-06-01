@@ -213,7 +213,7 @@ HRESULT CParticle::Add_Components(PARTICLE_DESC& _FXDesc)
 			TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 		CHECK_FAILED(hr);
 
-		//현재 VtxInstance Shader Pass 3개
+		//현재 VtxInstance Shader Pass 2까지
 		m_iMaxPassIdx = 1;
 	}
 	else

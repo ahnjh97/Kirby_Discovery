@@ -142,7 +142,6 @@ HRESULT CVIBuffer_Instance::Initialize(void * pArg)
 	m_pLifeTimes = new _float2[m_iNumInstance];
 	ZeroMemory(m_pLifeTimes, sizeof(_float2) * m_iNumInstance);
 
-	//memcpy(m_pLifeTimes, rhs.m_pLifeTimes, sizeof(_float2) * m_iNumInstance);
 	m_pStartDelays = new _float[m_iNumInstance];
 	ZeroMemory(m_pStartDelays, sizeof(_float) * m_iNumInstance);
 
@@ -305,7 +304,7 @@ void CVIBuffer_Instance::Decelerate(_float fTimeDelta)
 		
 	}
 
-	m_pContext->Unmap(m_pVBInstance, 0);
+	m_pContext->Unmap(m_pVBInstance, 0); 
 }
 
 void CVIBuffer_Instance::Compute_AllLifeTime(_float fTimeDelta)

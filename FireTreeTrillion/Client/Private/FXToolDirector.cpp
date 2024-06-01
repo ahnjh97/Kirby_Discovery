@@ -602,6 +602,8 @@ HRESULT CFXToolDirector::Initialize(void* pArg)
 	hr = Ready_FXPrototypeVector();
 	CHECK_FAILED_MSG(hr, "Failed To Add Components : CFXToolDirector");
 
+
+	m_pGameInstance->Set_IMGUIStyle(CImGUI_Manager::HYO);
 	//SetupImGuiStyle(true, .8f);
 
 	return S_OK;
@@ -645,24 +647,30 @@ _int CFXToolDirector::Tick(_float _fTimeDelta)
 
 void CFXToolDirector::Late_Tick(_float _fTimeDelta)
 {
-	//Matrix viewMat = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW);
-	//Matrix projMat = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
-	//Matrix identityMat = XMMatrixIdentity();
 
+	//0, 0 중심선을 긋는다.
 	Render_AxisLines();
+
+	//그리드를 그린다.
 	m_pGameInstance->RenderGrid();
 
+	//단일 이펙트 생성, 목록 확인
 	Render_FXHierarchy();
+
+	//복합 이펙트 생성, 목록 확인
 	Render_MultiFXHierarchy();
+
+	//이펙트들의 변수 설정
 	Render_FXProperty();
 
+	//이펙트의 재생 바 설정
 	Render_FXPlayBar(_fTimeDelta);
 
-
-	//복합 이펙트 아니면 FX에 있는 이펙트 렌더
+	//복합 이펙트 아니면 FX에 있는 이펙트 업데이트
 	if (m_eSelected == SELECTED_SINGLE_FX || m_eSelected == SELECTED_PARTICLE_FX)
 		m_FXs[m_iSelectedFXIdx]->Late_Tick(_fTimeDelta);
-	//아니면 복합 이펙트 렌더
+
+	//아니면 복합 이펙트 업데이트
 	else if (m_eSelected == SELECTED_MULTI_FX)
 		m_MultiFXs[m_iSelectedMultiFXIdx]->Late_Tick(_fTimeDelta);
 
@@ -713,8 +721,6 @@ void CFXToolDirector::Render_AxisLines()
 
 HRESULT CFXToolDirector::Render()
 {
-
-
 	return S_OK;
 }
 
@@ -723,21 +729,26 @@ void CFXToolDirector::Render_IMGUI()
 	__super::Render_IMGUI();
 }
 
+//단일 이펙트들의 생성 세팅, 계층을 보여준다.
 void CFXToolDirector::Render_FXHierarchy()
 {
 	Begin(u8"만들기");
 
+	//색 텍스쳐
 	Combo(u8"디퓨즈 텍스쳐", &m_iAddingFXTexIdx, m_FXTexList.data(), (_int)m_FXTexList.size());
+
+	//마스크 텍스쳐
 	Combo(u8"마스크 텍스쳐", &m_iAddingFXMaskTexIdx, m_FXMaskTexList.data(), (_int)m_FXMaskTexList.size());
 
 	Separator();
 	Columns(2);
 
+	//버퍼
 	Combo(u8"버퍼", &m_iAddingFXBufferIdx, m_FXBufferList.data(), (_int)m_FXBufferList.size());
 
+	//single effect를 생성한다.
 	if (Button(u8"이펙트 생성"))
 	{
-
 		//이름 정해주기
 		CSingleEffect::FX_DESC singleFXDesc{};
 		string strComponentTag = "Prototype_Component_";
@@ -925,14 +936,12 @@ void CFXToolDirector::Render_FXHierarchy()
 	//이펙트 초기 값과 키프레임 값을 편집한다.
 	Begin(u8"편집하기");
 
-	SeparatorText(u8"목록");
+	SeparatorText(u8"단일 이펙트 목록");
 	BeginChild(u8"목록", ImVec2(0, 200), true);
 	for (_int i = 0; i < m_FXs.size(); ++i)
 	{
-
 		if (Selectable(m_FXs[i]->m_strFXName.c_str(), m_iSelectedFXIdx == i))
 		{
-			//			m_bOpenKeyframeEditor = false;
 			m_iSelectedFXIdx = i;
 
 			m_eSelected = _bool{ dynamic_cast<CSingleEffect*>(m_FXs[i]) != nullptr } ? SELECTED_SINGLE_FX : SELECTED_PARTICLE_FX;
@@ -973,6 +982,29 @@ void CFXToolDirector::Render_FXHierarchy()
 		//bOpenSelectableMenu = true;
 
 	}
+
+	/*
+	if (ImGui::BeginPopup("another popup"))
+	{
+		for (int i = 0; i < IM_ARRAYSIZE(names); i++)
+			ImGui::MenuItem(names[i], "", &toggles[i]);
+		if (ImGui::BeginMenu("Sub-menu"))
+		{
+			ImGui::MenuItem("Click me");
+			if (ImGui::Button("Stacked Popup"))
+				ImGui::OpenPopup("another popup");
+			if (ImGui::BeginPopup("another popup"))
+			{
+				ImGui::Text("I am the last one here.");
+				ImGui::EndPopup();
+			}
+			ImGui::EndMenu();
+		}
+		ImGui::EndPopup();
+	}
+	*/
+
+	//우측 키를 누르면 나오는 메뉴들
 	if (BeginPopup("FXMenu"))
 	{
 		//Begin(u8"제발", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse);
@@ -1032,17 +1064,21 @@ void CFXToolDirector::Render_FXHierarchy()
 				m_iSelectedFXIdx = -1;
 			}
 		}
+
 		if (MenuItem(u8"복사"))
 		{
-
+			for (int i = 0; i < 5; i++)
+			{
+				string name = (i + 1) + "복사";
+				MenuItem(name.c_str());
+			}
 		}
 
 		EndPopup();
-		//End();
 	}
+
+
 	EndChild();
-
-
 	End();
 
 }
@@ -1062,7 +1098,7 @@ void CFXToolDirector::Render_FXProperty()
 	if (m_eSelected == SELECTED_MULTI_FX && m_iSelectedMultiFXIdx == -1)
 		return;
 
-
+	
 	//이펙트 기본 변수 세팅
 	Begin(u8"속성 편집");
 
@@ -1088,13 +1124,8 @@ void CFXToolDirector::Render_FXProperty()
 		pCurFX->m_strFXName = m_curFXName;
 	}
 
-	//멀티 이펙트가 가지고 있는 변수
-	if (m_eSelected == SELECTED_MULTI_FX)
-	{
-
-	}
-	//나머지 이펙트가 가지고 있는 변수
-	else
+	//단일 이펙트가 가지고 있는 변수
+	if (m_eSelected != SELECTED_MULTI_FX)
 	{
 		//루프, 빌보드
 		Checkbox(u8"루프", &pCurFX->m_bIsLoop);
@@ -1117,7 +1148,7 @@ void CFXToolDirector::Render_FXProperty()
 		}
 
 		//렌더 그룹 설정
-		static _int iSelected = 0;
+		static _int iSelected = 1;
 		if (RadioButton(u8"No Render", iSelected == 0))
 		{
 			iSelected = 0;
@@ -1149,13 +1180,14 @@ void CFXToolDirector::Render_FXProperty()
 	Separator();
 
 	//전체 시간
-	if (DragFloat(u8"재생 시간", &pCurFX->m_fDuration.second, .1f, 0.f, 30.f, "%.2f"))
+	if (DragFloat(u8"재생 시간", &pCurFX->m_fDuration.second, .1f, 0.f, 300.f, "%.2f"))
 	{
 		m_fTotalPlayDuration = pCurFX->m_fDuration.second;
 	}
 
 
-	//복합 이펙트는 재생 시간만 보인다.
+
+	//복합 이펙트는 재생 시간까지만 보인다.
 	if (m_eSelected == SELECTED_MULTI_FX)
 	{
 		End();
@@ -1205,6 +1237,7 @@ void CFXToolDirector::Render_FXProperty()
 		pCurFX->m_iMaskTexIdx = m_iCurFXMaskTexIdx;
 	}
 
+	//단일 이펙트는 여기까지만 보인다.
 	if (!bIsParticle)
 	{
 		End();
@@ -1247,10 +1280,13 @@ void CFXToolDirector::Render_FXProperty()
 	//if (DragFloat(u8"시작 딜레이", &pCurParticle->m_InstanceDesc.fStartDelay, .01f, 0.f, 100.f, "%.2f"))
 	//	bEdited = true;
 
-	if (DragFloat(u8"시작 딜레이", &pCurParticle->m_InstanceDesc.fStartDelay, .01f, 0.f, 100.f, "%.2f"))
+	if (DragFloat(u8"시작 딜레이", &pCurParticle->m_InstanceDesc.fStartDelay, .1f, 0.f, 100.f, "%.2f"))
 		bEdited = true;
-	if (DragFloat(u8"시작 딜레이 랜덤", &pCurParticle->m_InstanceDesc.fStarDelayRandomOffset, .01f, -100.f, 100.f, "%.2f"))
+	if (DragFloat(u8"시작 딜레이 랜덤", &pCurParticle->m_InstanceDesc.fStarDelayRandomOffset, .1f, 0.f, 100.f, "%.1f"))
 		bEdited = true;
+
+
+
 	if (DragFloat3(u8"중점", m_vCenter, .01f, -100.f, 100.f, "%.2f"))
 	{
 		pCurParticle->m_InstanceDesc.vCenter = { m_vCenter[0], m_vCenter[1], m_vCenter[2] };
@@ -1411,7 +1447,7 @@ void CFXToolDirector::Render_FXPlayBar(_float _fTimeDelta)
 			pCurFX->Add_Keyframe(newKeyframe, KF_SCALE);
 		}
 
-		Text(u8"R");
+		Text(u8"Color");
 		SameLine();
 		Text("\t%.2f %.2f %.2f\t", pCurFX->m_vCurRColor.x, pCurFX->m_vCurRColor.y, pCurFX->m_vCurRColor.z);
 		SameLine();
@@ -1425,7 +1461,7 @@ void CFXToolDirector::Render_FXPlayBar(_float _fTimeDelta)
 
 			pCurFX->Add_Keyframe(newKeyframe, KF_RCOLOR);
 		}
-
+/*
 		Text(u8"G");
 		SameLine();
 		Text("\t%.2f %.2f %.2f\t", pCurFX->m_vCurGColor.x, pCurFX->m_vCurGColor.y, pCurFX->m_vCurGColor.z);
@@ -1455,7 +1491,7 @@ void CFXToolDirector::Render_FXPlayBar(_float _fTimeDelta)
 
 			pCurFX->Add_Keyframe(newKeyframe, KF_BCOLOR);
 		}
-
+		*/
 		Text(u8"알파");
 		SameLine();
 		Text("\t%.2f\t\t\t", pCurFX->m_fCurAlpha);
@@ -1594,10 +1630,6 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 		m_FXs[m_iSelectedFXIdx]->m_fDuration.first = m_fCurPlayDuration;
 	}
 
-	//키프레임 편집 창을 띄워주는 static 변수들
-	//static KF_PROPERTY	m_eSelectedProperty = { KF_END };
-	//static _int			m_iSelectedKFIdx = { -1 };
-
 	//키프레임 팝업 사이즈
 	ImVec2 vPopupSize = { 160.f, 140.f };
 
@@ -1607,147 +1639,28 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 	ImVec2 vPos = GetCursorScreenPos();
 	_float fInitialYPos = vPos.y - 250.f;
 
-	//_int iTempKFIdx{ 0 };
-	//ImDrawList* pDrawList = GetWindowDrawList();
-
-	//pDrawList->AddLine(vPos, ImVec2(vPos.x + _fWidth, vPos.y), IM_COL32(255, 0, 100, 255), 1.f);
-
 	//각 키프레임 플레이 바의 위치의 상대 위치로 매칭하기.
 
 	//위치
 	Make_KeyframeList(_fWidth, fInitialYPos, pCurFX, KF_POS);
 
-	/*
-	for (auto& keyframe : pCurFX->m_Keyframes[KF_POS])
-	{
-		_float fRatio = (pCurFX->m_fLifetime.first + (keyframe.fTimeRatio * (pCurFX->m_fLifetime.second - pCurFX->m_fLifetime.first)));
-		_float fPosX = fRatio * _fWidth / pCurFX->m_fDuration.second;
-		ImVec2 vCurPos = vPos + ImVec2{ fPosX, 2.f };
-
-		GetWindowDrawList()->AddCircleFilled(vCurPos, 6.0f, IM_COL32(255, 255, 100, 255));
-
-		ImVec2 mousePos = GetIO().MousePos;
-		float fDistance = (_float)sqrt(pow(mousePos.x - vCurPos.x, 2) + pow(mousePos.y - vCurPos.y, 2));
-
-		//키프레임 범위 안에서 마우스 클릭 발생 시 키프레임 위치에 ui 띄움
-		if (fDistance <= 8.0f && IsMouseClicked(0))
-		{
-			m_eSelectedProperty = KF_POS;
-			m_iSelectedKFIdx = iTempKFIdx;
-
-			//위치, 스케일 키프레임 옆에 맞춘다
-			SetNextWindowSize(vPopupSize);
-			SetNextWindowPos(ImVec2(vCurPos.x, fInitialYPos));
-
-			_float3 vValue = m_FXs[m_iSelectedFXIdx]->m_Keyframes[m_eSelectedProperty][m_iSelectedKFIdx].vValue;
-			memcpy(m_vKFPopupValue, &vValue, sizeof(_float3));
-			m_eKFPopupEasing = m_FXs[m_iSelectedFXIdx]->m_Keyframes[m_eSelectedProperty][m_iSelectedKFIdx].eEasing;
-
-			OpenPopup(u8"키프레임");
-
-		}
-
-		++iTempKFIdx;
-	}
-
-	*/
-
 	//회전
 	Dummy(ImVec2(0, 15));
 	Make_KeyframeList(_fWidth, fInitialYPos, pCurFX, KF_ROT);
-
-	/*
-	iTempKFIdx = 0;
-	vPos = GetCursorScreenPos();
-	pDrawList->AddLine(vPos, ImVec2(vPos.x + _fWidth, vPos.y), IM_COL32(255, 0, 100, 255), 1.f);
-
-	for (auto& keyframe : pCurFX->m_Keyframes[KF_ROT])
-	{
-		//재생 위치로 cur pos 맞추기
-		_float fRatio = (pCurFX->m_fLifetime.first + (keyframe.fTimeRatio * (pCurFX->m_fLifetime.second - pCurFX->m_fLifetime.first)));
-		_float fPosX = fRatio * _fWidth / pCurFX->m_fDuration.second;
-		ImVec2 vCurPos = vPos + ImVec2{ fPosX, 2.f };
-
-		GetWindowDrawList()->AddCircleFilled(vCurPos, 6.0f, IM_COL32(255, 255, 100, 255));
-
-		ImVec2 mousePos = GetIO().MousePos;
-		float distance = (_float)sqrt(pow(mousePos.x - vCurPos.x, 2) + pow(mousePos.y - vCurPos.y, 2));
-
-		//키프레임 범위 안에서 마우스 클릭 발생 시 키프레임 위치에 ui 띄움
-		if (distance <= 8.0f && IsMouseClicked(0))
-		{
-			////m_bOpenKeyframeEditor = true;
-			m_eSelectedProperty = KF_ROT;
-			m_iSelectedKFIdx = iTempKFIdx;
-
-			//위치, 스케일 키프레임 옆에 맞춘다
-			SetNextWindowSize(vPopupSize);
-			SetNextWindowPos(ImVec2(vCurPos.x, fInitialYPos));
-
-			_float3 vValue = m_FXs[m_iSelectedFXIdx]->m_Keyframes[m_eSelectedProperty][m_iSelectedKFIdx].vValue;
-			memcpy(m_vKFPopupValue, &vValue, sizeof(_float3));
-			m_eKFPopupEasing = m_FXs[m_iSelectedFXIdx]->m_Keyframes[m_eSelectedProperty][m_iSelectedKFIdx].eEasing;
-
-			OpenPopup(u8"키프레임");
-		}
-
-		++iTempKFIdx;
-	}
-	*/
 
 	//크기
 	Dummy(ImVec2(0, 15));
 	Make_KeyframeList(_fWidth, fInitialYPos, pCurFX, KF_SCALE);
 
-	/*
-	iTempKFIdx = 0;
-	vPos = GetCursorScreenPos();
-
-	pDrawList->AddLine(vPos, ImVec2(vPos.x + _fWidth, vPos.y), IM_COL32(255, 0, 100, 255), 1.f);
-	for (auto& keyframe : pCurFX->m_Keyframes[KF_SCALE])
-	{
-		_float fRatio = (pCurFX->m_fLifetime.first + (keyframe.fTimeRatio * (pCurFX->m_fLifetime.second - pCurFX->m_fLifetime.first)));
-		_float fPosX = fRatio * _fWidth / pCurFX->m_fDuration.second;
-		ImVec2 vCurPos = vPos + ImVec2{ fPosX, 2.f };
-
-		GetWindowDrawList()->AddCircleFilled(vCurPos, 6.0f, IM_COL32(255, 255, 100, 255));
-
-		ImVec2 mousePos = GetIO().MousePos;
-		float distance = (_float)sqrt(pow(mousePos.x - vCurPos.x, 2) + pow(mousePos.y - vCurPos.y, 2));
-
-		//키프레임 범위 안에서 마우스 클릭 발생 시 키프레임 위치에 ui 띄움
-		if (distance <= 8.0f && IsMouseClicked(0))
-		{
-			m_eSelectedProperty = KF_SCALE;
-			m_iSelectedKFIdx = iTempKFIdx;
-
-			//위치, 스케일 키프레임 옆에 맞춘다
-			SetNextWindowSize(vPopupSize);
-			SetNextWindowPos(ImVec2(vCurPos.x, fInitialYPos));
-
-			//띄울 키프레임의 값을 매칭해 준다.
-			_float3 vValue = m_FXs[m_iSelectedFXIdx]->m_Keyframes[m_eSelectedProperty][m_iSelectedKFIdx].vValue;
-
-
-			memcpy(m_vKFPopupValue, &vValue, sizeof(_float3));
-			m_eKFPopupEasing = m_FXs[m_iSelectedFXIdx]->m_Keyframes[m_eSelectedProperty][m_iSelectedKFIdx].eEasing;
-
-			OpenPopup(u8"키프레임");
-		}
-
-		++iTempKFIdx;
-	}
-
-	*/
 
 	Dummy(ImVec2(0, 15));
 	Make_KeyframeList(_fWidth, fInitialYPos, pCurFX, KF_RCOLOR);
 
-	Dummy(ImVec2(0, 15));
-	Make_KeyframeList(_fWidth, fInitialYPos, pCurFX, KF_GCOLOR);
+	//Dummy(ImVec2(0, 15));
+	//Make_KeyframeList(_fWidth, fInitialYPos, pCurFX, KF_GCOLOR);
 
-	Dummy(ImVec2(0, 15));
-	Make_KeyframeList(_fWidth, fInitialYPos, pCurFX, KF_BCOLOR);
+	//Dummy(ImVec2(0, 15));
+	//Make_KeyframeList(_fWidth, fInitialYPos, pCurFX, KF_BCOLOR);
 
 	Dummy(ImVec2(0, 15));
 	Make_KeyframeList(_fWidth, fInitialYPos, pCurFX, KF_ALPHA);
@@ -1894,6 +1807,14 @@ void CFXToolDirector::MakeBar_ParticleFXProperty(_float _fTimeDelta, _float _fWi
 		return;
 
 
+	CEffect* pCurFX = m_FXs[m_iSelectedFXIdx];
+	CHECK_NULLPTR(pCurFX);
+
+
+	if (SliderFloat("##", &m_fCurPlayDuration, 0.f, m_fTotalPlayDuration, "%.2f"))
+	{
+		m_FXs[m_iSelectedFXIdx]->m_fDuration.first = m_fCurPlayDuration;
+	}
 }
 
 void CFXToolDirector::MakeBar_MultiFXProperty(_float _fTimeDelta, _float _fWidth)
@@ -1915,7 +1836,7 @@ void CFXToolDirector::Render_MultiFXHierarchy()
 {
 	Begin(u8"복합 이펙트", nullptr, ImGuiWindowFlags_NoCollapse);
 
-	SeparatorText(u8"목록");
+	SeparatorText(u8"복합 이펙트 목록");
 	BeginChild(u8"목록", ImVec2(0, 200), true);
 
 	for (_int i = 0; i < m_MultiFXs.size(); ++i)

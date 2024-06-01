@@ -144,6 +144,9 @@ PS_OUT PS_MAIN_WHITE_FX(PS_IN_ALPHABLEND In)
 
     float vBrightness = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord).r;
 	
+    if (vBrightness < .05f)
+        discard;
+	
     float vMaskValue = g_MaskTexture.Sample(PointSampler, In.vTexcoord).r;
     if (vMaskValue - .01f < g_fMaskThreshold)
         discard;
@@ -153,8 +156,29 @@ PS_OUT PS_MAIN_WHITE_FX(PS_IN_ALPHABLEND In)
     Out.vColor.a = vBrightness; // 어두울수록 투명
     
     
-    if (Out.vColor.a < .05f)
+
+	
+    return Out;
+}
+
+PS_OUT PS_MAIN_DEFAULT_FX(PS_IN_ALPHABLEND In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+	
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+	
+	
+    Out.vColor *= g_fAlpha;
+	
+    Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
+	
+
+    float vMaskValue = g_MaskTexture.Sample(ClampSampler, In.vTexcoord).r;
+    if (vMaskValue < g_fMaskThreshold)
         discard;
+	
+
 	
     return Out;
 }
@@ -216,5 +240,19 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_BLOOM();
+    }
+
+	// 기본 이펙트 패스 ( 4 )
+    pass DefaultFX
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN_ALPHABLEND();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_DEFAULT_FX();
     }
 }

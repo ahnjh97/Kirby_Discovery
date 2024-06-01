@@ -41,17 +41,23 @@ public:
 
 		_float fRimLightThreshold = { 0.f };
 
+
+		map<KF_PROPERTY, vector<FX_KEYFRAME>> Keyframes;
+		_uint eRenderGroup = { 0 };
+
+
+		//clone 시 전달되는 변수들
+		//위치를 맞춰주는 소켓. clone할 때만 전달할 것!!
+
+		CGameObject* pSocket = { nullptr };
+
 		//이펙트 재생을 시작하는 딜레이
 		_float fStartDelay = { 0.f };
-\
+
 		//이펙트의 기본 시작 크자이
 		_float3 vInitPos = { 0.f, 0.f, 0.f };
 		_float3 vInitRot = { 0.f, 0.f, 0.f };
 		_float3 vInitScale = { 1.f, 1.f, 1.f };
-
-		map<KF_PROPERTY, vector<FX_KEYFRAME>> Keyframes;
-
-		_uint eRenderGroup = { 0 };
 
 	}FX_DESC;
 

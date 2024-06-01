@@ -124,9 +124,12 @@ private:
 	_float m_fEditMaskThreshold = { 1.f };
 
 
+	//**** 값을 복사하기 위해 저장하는 임시 변수들 ****//
 	
 	//임시로 복사 정보를 저장한다.
 	SINGLE_FX_DATA m_TempCopySingleFXData = {};
+	MULTI_FX_DATA m_TempCopyMultiFXData = {};
+	PARTICLE_DATA m_TempCopyInstanceData = {};
 
 
 	//현재 키프레임의 easing 플래그

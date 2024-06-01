@@ -64,6 +64,7 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 		return OBJ_DEAD;
 
 
+	//true 반환하면 duration 끝난 것.
 	if (Calculate_Duration(_fTimeDelta))
 	{
 		//툴에서는 다시 시작하기
@@ -75,6 +76,7 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 			m_bDead = true;
 	}
 
+	//true 반환하면 lifetime 끝난 것.
 	if (Calculate_Lifetime(_fTimeDelta))
 	{
 
@@ -175,6 +177,8 @@ HRESULT CSingleEffect::Add_Components(FX_DESC& FXDesc)
 		TEXT("Com_DiffuseTexture"), (CComponent**)&m_pTextureCom[TEX_DIFFUSE]);
 	CHECK_FAILED(hr);
 
+	m_iMaxTexIdx = m_pTextureCom[TEX_DIFFUSE]->Get_TextureNum();
+
 	hr = __super::Add_Component(LEVEL_STATIC, CUtils::StrToWstr(FXDesc.strMaskTexTag),
 		TEXT("Com_MaskTexture"), (CComponent**)&m_pTextureCom[TEX_MASK]);
 	CHECK_FAILED(hr);
@@ -191,7 +195,7 @@ HRESULT CSingleEffect::Add_Components(FX_DESC& FXDesc)
 			TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 		CHECK_FAILED(hr);
 
-		//현재 VtxPosTex Shader Pass 3개
+		//현재 VtxPosTex Shader Pass 2까지
 		m_iMaxPassIdx = 2;
 	}
 	else
@@ -206,7 +210,7 @@ HRESULT CSingleEffect::Add_Components(FX_DESC& FXDesc)
 			TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 		CHECK_FAILED(hr);
 
-		//현재 VtxModel Shader Pass 4개
+		//현재 VtxModel Shader Pass 3까지
 		m_iMaxPassIdx = 3;
 	}
 
