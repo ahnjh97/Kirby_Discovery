@@ -191,7 +191,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\Public\HUD.h" />
-    <ClInclude Include="..\Public\HUD_Kirby.h" />
     <ClInclude Include="..\Public\ImSequencer.h" />
     <ClInclude Include="..\Public\Multi_UI.h" />
     <ClInclude Include="..\Public\Single_UI.h" />
@@ -267,7 +266,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\Private\HUD.cpp" />
-    <ClCompile Include="..\Private\HUD_Kirby.cpp" />
+    <ClCompile Include="..\Private\ImSequencer.cpp" />
     <ClCompile Include="..\Private\Multi_UI.cpp" />
     <ClCompile Include="..\Private\Single_UI.cpp" />
     <ClCompile Include="..\Private\Kirby.cpp" />
@@ -313,7 +312,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\private\WaddleDee.cpp" />
-    <ClCompile Include="..\Public\ImSequencer.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

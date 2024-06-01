@@ -67,13 +67,6 @@ HRESULT CSingle_UI::Render()
 	return S_OK;
 }
 
-#ifdef _DEBUG
-void CHUD_Kirby::Render_IMGUI()
-{
-
-}
-#endif
-
 HRESULT CSingle_UI::Add_Components()
 {
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex"),

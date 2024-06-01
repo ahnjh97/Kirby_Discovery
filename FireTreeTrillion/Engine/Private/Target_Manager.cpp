@@ -112,7 +112,7 @@ HRESULT CTarget_Manager::Copy_Resource(const wstring & strRenderTargetTag, ID3D1
 	return pRenderTarget->Copy_Resource(ppTextureHub);
 }
 
-#ifdef _MY_DEBUG
+#ifdef _DEBUG
 
 HRESULT CTarget_Manager::Ready_Debug(const wstring & strRenderTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY)
 {

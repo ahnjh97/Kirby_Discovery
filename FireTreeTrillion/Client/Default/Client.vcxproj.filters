@@ -150,7 +150,7 @@
     </Filter>
     <Filter Include="02.GameObjects\Map\MapToolObject\OrbitingCamera">
       <UniqueIdentifier>{0c5b85a4-5089-4e20-81fa-96d48f004385}</UniqueIdentifier>
-	</Filter>
+    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\TestModel">
       <UniqueIdentifier>{d64477a2-9b4a-44f4-9553-f9c18cf7c023}</UniqueIdentifier>
     </Filter>
@@ -354,9 +354,6 @@
     <ClInclude Include="..\Public\Multi_UI.h">
       <Filter>02.GameObjects\UI\Editor\Multi</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\ImSequencer.h">
-      <Filter>02.GameObjects</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\AnimToolHelper.h">
       <Filter>02.GameObjects\Anim</Filter>
     </ClInclude>
@@ -374,6 +371,10 @@
     </ClInclude>
     <ClInclude Include="..\Public\BladeKnightSword.h">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\HUD.h" />
+    <ClInclude Include="..\Public\ImSequencer.h">
+      <Filter>02.GameObjects\Anim</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -533,9 +534,6 @@
     <ClCompile Include="..\Private\Multi_UI.cpp">
       <Filter>02.GameObjects\UI\Editor\Multi</Filter>
     </ClCompile>
-    <ClCompile Include="..\Public\ImSequencer.cpp">
-      <Filter>02.GameObjects</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\AnimToolHelper.cpp">
       <Filter>02.GameObjects\Anim</Filter>
     </ClCompile>
@@ -544,6 +542,10 @@
     </ClCompile>
     <ClCompile Include="..\Private\OrbitingCamera.cpp">
       <Filter>02.GameObjects\Map\MapToolObject\OrbitingCamera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HUD.cpp" />
+    <ClCompile Include="..\Private\ImSequencer.cpp">
+      <Filter>02.GameObjects\Anim</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

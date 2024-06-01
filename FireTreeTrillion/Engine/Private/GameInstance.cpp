@@ -324,7 +324,7 @@ void CGameInstance::Update_DofFocus(_fvector vWorldPos)
 
 }
 
-#ifdef _MY_DEBUG
+#ifdef _DEBUG
 
 HRESULT CGameInstance::Add_DebugComponents(CComponent * pRenderComponent)
 {

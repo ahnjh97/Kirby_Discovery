@@ -52,7 +52,7 @@ public:
 	}
 
 
-#ifdef _MY_DEBUG
+#ifdef _DEBUG
 public:
 	HRESULT Add_DebugComponents(class CComponent* pRenderObject);
 #endif
@@ -82,7 +82,7 @@ private:
 
 
 
-#ifdef _MY_DEBUG
+#ifdef _DEBUG
 private:
 	list<class CComponent*>				m_DebugComponents;
 #endif
@@ -150,7 +150,7 @@ private:
 	COLOR_DATA m_DestColorData{};
 	map<string, COLOR_DATA> m_ColorSets;
 
-#ifdef _MY_DEBUG
+#ifdef _DEBUG
 private:
 	HRESULT Render_Debug();
 #endif

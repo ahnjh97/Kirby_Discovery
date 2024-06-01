@@ -24,13 +24,9 @@
 #include "BackGround.h"
 
 #ifdef _DEBUG
-#include "UI_Editor.h"
+#include "Editor_UI.h"
 #endif
 
-	#pragma region UI_HUD
-	#include "HUD.h"
-	#include "HUD_Kirby.h"
-	#pragma endregion
 //#include "TestUI.h"
 #include "Single_UI.h"
 #include "Multi_UI.h"
@@ -174,7 +170,6 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Grid"), CGrid);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolHelper"), CMapToolHelper);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolObject"), CMapToolObject);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("IMGUI_UI_Editor"), CUI_Editor);
 #endif
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SingleEffect"), CSingleEffect);
@@ -184,7 +179,6 @@ HRESULT CLoader::Loading_ObjectAll()
 	#pragma endregion
 	
 	// MapTool GameObject Prototypes
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Grid"), CGrid);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BasicMap"), CBasicMap);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Trigger"), CTrigger);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("OrbitingCamera"), COrbitingCamera);
@@ -204,7 +198,6 @@ HRESULT CLoader::Loading_ObjectAll()
 	#pragma endregion
 #pragma region TOOL_UI
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_Kirby"), CHUD_Kirby);
 
 #pragma endregion
 

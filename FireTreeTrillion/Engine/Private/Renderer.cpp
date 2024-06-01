@@ -282,7 +282,7 @@ HRESULT CRenderer::Initialize()
 	Safe_Release(pDepthStencilTexture);
 
 
-#ifdef _MY_DEBUG
+#ifdef _DEBUG
 
 	// GameObject
 	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Diffuse"), 50.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
@@ -606,7 +606,7 @@ HRESULT CRenderer::Render_LightDepth_For_GameObject(CShader* pShader, CTransform
 }
 
 
-#ifdef _MY_DEBUG
+#ifdef _DEBUG
 
 HRESULT CRenderer::Add_DebugComponents(CComponent* pRenderComponent)
 {
@@ -1299,7 +1299,7 @@ void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 }
 
 
-#ifdef _MY_DEBUG
+#ifdef _DEBUG
 
 HRESULT CRenderer::Render_Debug()
 {

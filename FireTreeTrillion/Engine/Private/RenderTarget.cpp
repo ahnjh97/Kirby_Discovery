@@ -63,7 +63,7 @@ HRESULT CRenderTarget::Copy_Resource(ID3D11Texture2D ** ppTextureHub)
 	return S_OK;
 }
 
-#ifdef _MY_DEBUG
+#ifdef _DEBUG
 
 HRESULT CRenderTarget::Ready_Debug(_float fX, _float fY, _float fSizeX, _float fSizeY)
 {

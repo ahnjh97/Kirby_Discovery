@@ -1,35 +1,26 @@
 #include "stdafx.h"
 #include "..\Public\BackGround.h"
-
-CBackGround::CBackGround(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CBackGround::CBackGround(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CUIObject{ pDevice, pContext }
 {
 }
-
-CBackGround::CBackGround(const CBackGround & rhs)
+CBackGround::CBackGround(const CBackGround& rhs)
 	: CUIObject{ rhs }
 {
-
 }
-
 HRESULT CBackGround::Initialize_Prototype()
 {
 	return S_OK;
 }
-
-HRESULT CBackGround::Initialize(void * pArg)
+HRESULT CBackGround::Initialize(void* pArg)
 {
 	GAMEOBJECT_DESC		GameObjectDesc{};
-
 	GameObjectDesc.fSpeedPerSec = 10.f;
 	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
-
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
-
 	if (FAILED(Add_Components()))
 		return E_FAIL;
-
 	UIOBJ_DESC BG_DESC = {};
 	BG_DESC.wstrUITag = { TEXT("BG_Logo") };
 	BG_DESC.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f };
@@ -40,10 +31,10 @@ HRESULT CBackGround::Initialize(void * pArg)
 
 	m_pTransformCom->Set_Scaled(BG_DESC.vSize.x, BG_DESC.vSize.y, 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(
-					BG_DESC.vPos.x - BG_DESC.vCenter.x,
-					-BG_DESC.vPos.y + BG_DESC.vCenter.y, 0.f, 1.f));
-
+		BG_DESC.vPos.x - BG_DESC.vCenter.x,
+		-BG_DESC.vPos.y + BG_DESC.vCenter.y, 0.f, 1.f));
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
+
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 
 	return S_OK;
@@ -67,51 +58,25 @@ HRESULT CBackGround::Render()
 	return S_OK;
 }
 
-#ifdef _DEBUG
 void CBackGround::Render_IMGUI()
-{
-	char name[12], name2[12];
-	// 위치
-	sprintf_s(name, "pos");
-	ImGui::DragFloat2(name, (_float*)&m_position2D);
-	// 사이즈
-	sprintf_s(name2, "size");
-	ImGui::DragFloat2(name2, (_float*)&m_size2D);
-
-	m_pTransformCom->Set_Scaled(m_size2D.x, m_size2D.y, 1.f);
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
-								XMVectorSet(m_position2D.x - m_WindowSize2D.x * 0.5f,
-											- m_position2D.y + m_WindowSize2D.y * 0.5f,
-											0.f,
-											1.f));
-
-	// 회전
-	static _float  Z_radian = 0.f;
-	ImGui::DragFloat("Z_radian", &Z_radian, 0.f, 360.f);
-	//m_pTransformCom->Rotation(XMVectorSet(0.f, 0.f, 1.f, 0.f), XMConvertToRadians(Z_radian));
-}
-#endif
+{}
 
 HRESULT CBackGround::Add_Components()
 {
 	/* For.Com_Shader */
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex"), 
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex"),
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
-
 	/* For.Com_Texture */
 	if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Texture_Logo"),
 		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
 		return E_FAIL;
-
 	/* For.Com_VIBuffer */
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),
 		TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom)))
 		return E_FAIL;
-
 	return S_OK;
 }
-
 HRESULT CBackGround::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTransform* _pTransCom, CTexture* _pTextureCom, _uint _iTexIndex)
 {
 	CHECK_NULLPTR(_pShaderCom);
@@ -121,18 +86,14 @@ HRESULT CBackGround::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassInde
 
 	if (FAILED(_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
 		return E_FAIL;
-
 	if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
-
 	_pTextureCom->Bind_ShaderResource(_pShaderCom, "g_DiffuseTexture", _iPassIndex);
 
 	if (FAILED(_pShaderCom->Begin(0)))
 		return E_FAIL;
-
 	if (FAILED(Bind_VIBuffer(m_pVIBufferCom)))
 		return E_FAIL;
-
 	return S_OK;
 }
 
@@ -146,40 +107,29 @@ HRESULT CBackGround::Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom)
 
 	return S_OK;
 }
-
-CBackGround * CBackGround::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CBackGround* CBackGround::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	CBackGround*		pInstance = new CBackGround(pDevice, pContext);
-
+	CBackGround* pInstance = new CBackGround(pDevice, pContext);
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
 		MSG_BOX(TEXT("Failed To Created : CBackGround"));
-
 		Safe_Release(pInstance);
 	}
-
 	return pInstance;
-
 }
-
-CGameObject * CBackGround::Clone(void * pArg)
+CGameObject* CBackGround::Clone(void* pArg)
 {
-	CBackGround*		pInstance = new CBackGround(*this);
-
+	CBackGround* pInstance = new CBackGround(*this);
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
 		MSG_BOX(TEXT("Failed To Created : CBackGround"));
-
 		Safe_Release(pInstance);
 	}
-
 	return pInstance;
 }
-
 void CBackGround::Free()
 {
 	__super::Free();
-
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pTextureCom);
 	Safe_Release(m_pVIBufferCom);

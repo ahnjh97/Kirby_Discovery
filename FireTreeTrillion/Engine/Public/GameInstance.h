@@ -49,7 +49,7 @@ public: /* For.Renderer */
 	void Update_DofFocus(_fvector vWorldPos);
 
 
-#ifdef _MY_DEBUG
+#ifdef _DEBUG
 public:
 	HRESULT Add_DebugComponents(class CComponent* pRenderComponent);
 #endif
@@ -142,7 +142,7 @@ public: /* For.PhysX */
 	_uint		Get_CollisionContent(COLLISION_TYPE eMeType, COLLISION_TYPE eOtherType);
 	void		Ready_TestGround();
 
-#ifdef _MY_DEBUG
+#ifdef _DEBUG
 	HRESULT Ready_RTVDebug(const wstring& strRenderTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY);
 	HRESULT Draw_RTVDebug(const wstring& strMRTTag, class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
 #endif

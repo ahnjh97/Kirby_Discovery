@@ -23,7 +23,7 @@ public:
 	virtual void				Late_Tick(_float fTimeDelta)				override;
 	virtual HRESULT				Render()									override;
 #ifdef _DEBUG
-	virtual void				Render_IMGUI()								override;
+	//virtual void				Render_IMGUI()								override;
 #endif
 
 private:
