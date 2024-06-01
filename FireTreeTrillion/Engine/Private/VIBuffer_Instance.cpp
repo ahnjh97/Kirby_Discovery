@@ -329,13 +329,12 @@ void CVIBuffer_Instance::Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceI
 	if (0.f < m_pStartDelays[iInstanceIndex])
 	{
 		m_pStartDelays[iInstanceIndex] -= fTimeDelta;
-		pVertices[iInstanceIndex].bAlive = false;
+		//pVertices[iInstanceIndex].bAlive = false;
 
 		if (m_pStartDelays[iInstanceIndex] <= 0.f)
 		{
 			pVertices[iInstanceIndex].bAlive = true;
 			m_pStartDelays[iInstanceIndex] = 0.f;
-
 		}
 		return;
 	}
@@ -344,10 +343,10 @@ void CVIBuffer_Instance::Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceI
 
 	if (m_pLifeTimes[iInstanceIndex].x > m_pLifeTimes[iInstanceIndex].y)
 	{
-
+		//루프가 아니였다면 죽어!!
 		if(!m_InstanceDesc.bIsLoop)
 			pVertices[iInstanceIndex].bAlive = false;
-
+		//아니라면 다시 초기화~
 		else
 		{
 			Change_InstanceInfo(pVertices, iInstanceIndex);
@@ -406,6 +405,7 @@ void CVIBuffer_Instance::Revive()
 
 void CVIBuffer_Instance::Change_InstanceInfo(VTXMATRIX* pVertices, _uint iInstanceIndex)
 {
+
 	m_pLifeTimes[iInstanceIndex].x = 0.f;
 
 	m_pLifeTimes[iInstanceIndex].y = Compute_RandLifetime();
@@ -433,7 +433,7 @@ void CVIBuffer_Instance::Change_InstanceInfo(VTXMATRIX* pVertices, _uint iInstan
 	pVertices[iInstanceIndex].vUp = Dir(instanceMat.Up());
 	pVertices[iInstanceIndex].vLook = Dir(instanceMat.Forward());
 	pVertices[iInstanceIndex].vPosition = Pos(instanceMat.Translation());
-
+	pVertices[iInstanceIndex].bAlive = false;
 
 	_float4 vDirection = Compute_RandDirection();
 	m_pDirections[iInstanceIndex] = _float3{ vDirection.x, vDirection.y, vDirection.z };

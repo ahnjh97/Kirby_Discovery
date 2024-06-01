@@ -101,8 +101,7 @@ HRESULT CMainApp::Render(_float fTimeDelta)
 		Render_RTVFonts();
 
 #endif // _DEBUG
-	}
-
+	
 
 	m_pGameInstance->End_Draw();
 

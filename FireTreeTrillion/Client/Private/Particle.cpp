@@ -52,8 +52,8 @@ HRESULT CParticle::Initialize(void* pArg)
 
 	instanceDesc.vPivot = { 0.f, -1.f, 0.f };
 	instanceDesc.vRange = { 2.f, 2.f, 2.f };
-	instanceDesc.fSpeed = { 10.f };
-	instanceDesc.fSpeedRandomOffset = { 2.f };
+	instanceDesc.fSpeed = { 3.f };
+	instanceDesc.fSpeedRandomOffset = { 1.f };
 
 	instanceDesc.fStartDelay = { .1f };
 	instanceDesc.fStarDelayRandomOffset = { .2f };
@@ -126,10 +126,6 @@ _int CParticle::Tick(_float _fTimeDelta)
 	if (m_bDead)
 		return OBJ_DEAD;
 
-
-
-	m_pVIBufferCom->Compute_AllLifeTime(_fTimeDelta);
-
 	if (Calculate_Duration(_fTimeDelta))
 	{
 		//툴에서는 다시 시작하기
@@ -142,6 +138,7 @@ _int CParticle::Tick(_float _fTimeDelta)
 			m_bDead = true;
 	}
 
+	m_pVIBufferCom->Compute_AllLifeTime(_fTimeDelta);
 
 	if (m_fDuration.second <= m_fDuration.first)
 		return OBJ_NOEVENT;
