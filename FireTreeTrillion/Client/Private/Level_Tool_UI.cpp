@@ -21,14 +21,14 @@ HRESULT CLevel_Tool_UI::Initialize()
 		return E_FAIL;
 
 #ifdef _DEBUG
-	m_pGameInstance->Set_IMGUIStyle(0);
+	m_pGameInstance->Set_IMGUIStyle(CImGUI_Manager::STYLE::PURPLE);
 #endif // DEBUG
 
 	if (FAILED(Ready_Layer_IMGUI(TEXT("Layer_IMGUI"))))
 		return E_FAIL;
 
 	//IMGUI_STYLE ¼¼ÆÃ
-	m_pGameInstance->Set_IMGUIStyle(CImGUI_Manager::STYLE::PURPLE);
+
 
 	return S_OK;
 }
