@@ -45,8 +45,10 @@ private:
 
 	// Picking
 	CGameObject* Select_ModelByPicking(const wstring& wstrLayerTag = TEXT("Layer_Parse"));
-
 	_int Compute_MapIndex(const string& strModelName);
+
+	// Options
+	void HideTriggers(_bool bHideTriggers);
 
 private:
 	vector<string>	m_vecLevelName; 

@@ -20,7 +20,6 @@ public:
 		_int iTriggerIndex = { -1 };
 		_float fRadius = { 0.f };
 		_int iCamType = { -1 };
-		_float3 vOrbitingCameraPos = {};
 	};
 
 public:
@@ -28,12 +27,13 @@ public:
 	_int Get_TriggerIndex() { return m_iTriggerIndex; }
 	_float Get_Radius() { return m_fRadius; }
 	_int Get_CamType() { return m_iCamType; }
-	_float3 Get_OrbitingCamPos();
 
 	void Set_TriggerType(_int iTriggerType) { m_iTriggerType = iTriggerType; }
 	void Set_TriggerIndex(_int iTriggerIndex) { m_iTriggerIndex = iTriggerIndex; }
 	void Set_CamType(_int iCamType) { m_iCamType = iCamType; }
 	void Set_Radius(_float fRadius) { m_fRadius = fRadius; }
+
+	virtual void Set_Hide(_bool bHide) { m_bHide = bHide; if (nullptr != m_pOrbitingCamera) m_pOrbitingCamera->Set_Hide(bHide); }
 
 private:
 	CMapToolObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -26,7 +26,8 @@ public:
     //EventCallBack ÇÔ¼öµé
     void Register_Player(PxActor* pPlayerActor);
     void Register_Trigger(PxActor* pTriggerActor, _int iTriggerType, _int iTriggerIndex);
-    void SetUp_TriggerFunc(_int iTriggerType, function<void(_int)> func);
+    void Emplace_TriggerFunc(_int iTriggerType, function<void(_int)> func);
+    void Emplace_ExitFunc(_int iTriggerType, function<void(void)> exitFunc);
     void Clear_EventCallBack();
 
     PxPhysics*                          Get_Physics() { return m_pPhysics; }

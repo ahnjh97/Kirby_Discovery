@@ -26,6 +26,9 @@ public:
 	_bool				Get_Dead() { return m_bDead; }
 	void				Set_Dead() { m_bDead = true; }
 
+	_bool				Get_Hide() { return m_bHide; }
+	virtual void		Set_Hide(_bool bHide) { m_bHide = bHide; }
+
 	COLLISION_TYPE		Get_CollisionGroup() const { return m_eCollisionGroup; }
 
 	// prototypeTag
@@ -69,6 +72,8 @@ protected:
 	
 	_float									m_fViewZ = { 0.f };
 	_float3									m_vViewPos = _float3{ 0.f, 0.f, 0.f };
+
+	_bool									m_bHide = { false };
 
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;

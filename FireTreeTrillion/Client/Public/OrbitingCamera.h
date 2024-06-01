@@ -14,7 +14,6 @@ class COrbitingCamera : public CPartObject
 public:
 	void Set_Radius(_float fRadius) { m_fRadius = fRadius; }
 	
-	_float3 Get_OrbitingCameraPos();
 	void Set_OrbitingCameraPos(_fvector vPos) { if (nullptr != m_pTransformCom) 
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos); };
 

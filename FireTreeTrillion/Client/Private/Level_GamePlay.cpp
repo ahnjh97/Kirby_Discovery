@@ -162,7 +162,6 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 	_int iTriggerType{};
 	_int iTriggerIndex{};
 	_int iCamType{};
-	_float3 vOrbitingCameraPos{};
 	_float fRadius{};
 	_float4x4 matInverse{};
 	map<_int, _float4x4> camMatrices;
@@ -195,10 +194,9 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 		{
 			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
 			fileStream.read(reinterpret_cast<char*>(&iCamType), sizeof(iCamType));
-			fileStream.read(reinterpret_cast<char*>(&vOrbitingCameraPos), sizeof(vOrbitingCameraPos));
 			fileStream.read(reinterpret_cast<char*>(&fRadius), sizeof(fRadius));
 
-			_vector vDir = XMVector3Normalize(XMVectorSet(matWorld._41, matWorld._42, matWorld._43, 0));
+			_vector vDir = XMVector3Normalize(XMVectorSet(matWorld._31, matWorld._32, matWorld._33, 0));
 
 			if(CAM_FRONT == iCamType)
 				frontDirRadii.emplace(iTriggerIndex, pair<_vector, _float>(vDir, fRadius));

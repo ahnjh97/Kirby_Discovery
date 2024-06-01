@@ -30,6 +30,8 @@ static _float fRadius = 0;
 static const _char* camTypes[] = { "Front", "Rear"};
 static _int iCamType = -1;
 
+static _bool bHideTriggers = { false };
+
 CMapToolHelper::CMapToolHelper(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
 {
@@ -143,6 +145,12 @@ void CMapToolHelper::Menu_Level()
 	ImGui::SameLine();
 	if (ImGui::Button("Load", ImVec2(100, 40)))
 		Load_Level();
+
+	ImGui::SeparatorText("Options");
+	if (ImGui::RadioButton("Hide Triggers", bHideTriggers)) {
+		bHideTriggers = !bHideTriggers;
+		HideTriggers(bHideTriggers);
+	}
 }
 
 void CMapToolHelper::Menu_NonAnimModels()
@@ -496,13 +504,10 @@ void CMapToolHelper::Save_Level()
 			CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(object);
 			_int iTriggerIndex = pMapToolObject->Get_TriggerIndex();
 			_int iCamType = pMapToolObject->Get_CamType();
-			_float3 vDir = pMapToolObject->Get_OrbitingCamPos();
 			_float fRadius = pMapToolObject->Get_Radius();
-
 
 			outputFile.write(reinterpret_cast<const char*>(&iTriggerIndex), sizeof(iTriggerIndex));
 			outputFile.write(reinterpret_cast<const char*>(&iCamType), sizeof(iCamType));
-			outputFile.write(reinterpret_cast<const char*>(&vDir), sizeof(vDir));
 			outputFile.write(reinterpret_cast<const char*>(&fRadius), sizeof(fRadius));
 		}
 	}
@@ -571,7 +576,6 @@ void CMapToolHelper::Load_Level()
 	_int iTriggerIndex{};
 	_int iCamType{};
 	_float fRadius{};
-	_float3 vOrbitingCameraPos{};
 
 	while (!fileStream.eof()) 
 	{
@@ -591,7 +595,6 @@ void CMapToolHelper::Load_Level()
 		{
 			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
 			fileStream.read(reinterpret_cast<char*>(&iCamType), sizeof(iCamType));
-			fileStream.read(reinterpret_cast<char*>(&vOrbitingCameraPos), sizeof(vOrbitingCameraPos));
 			fileStream.read(reinterpret_cast<char*>(&fRadius), sizeof(fRadius));
 		}
 
@@ -611,7 +614,6 @@ void CMapToolHelper::Load_Level()
 		{
 			tDesc.iTriggerIndex = iTriggerIndex;
 			tDesc.iCamType = iCamType;
-			tDesc.vOrbitingCameraPos = vOrbitingCameraPos;
 			tDesc.fRadius = fRadius;
 		}
 		
@@ -750,6 +752,9 @@ CGameObject* CMapToolHelper::Select_ModelByPicking(const wstring& wstrLayerTag)
 		if (nullptr == object)
 			continue;
 
+		if (true == object->Get_Hide())
+			continue;
+
 		CModel* pModel = dynamic_cast<CModel*>(object->Get_Component(TEXT("Com_Model")));
 		if (nullptr == pModel)
 			continue;
@@ -794,6 +799,30 @@ _int CMapToolHelper::Compute_MapIndex(const string& _strModelName)
 	}
 
 	return -1;
+}
+
+void CMapToolHelper::HideTriggers(_bool bHideTriggers)
+{
+	list<CGameObject*>* pObjectList = m_pGameInstance->Get_List(LEVEL_TOOL_MAP, TEXT("Layer_Parse"));
+	if (pObjectList == nullptr)
+		return;
+
+	if (pObjectList->empty())
+		return;
+
+	for (auto& obj : *pObjectList)
+	{
+		if (nullptr == obj)
+			continue;
+
+		CModel* pModel = dynamic_cast<CModel*>(obj->Get_Component(TEXT("Com_Model")));
+		if (nullptr == pModel)
+			continue;
+
+		string strModelName = pModel->Get_ModelInfo().strModelName;
+		if ("Trigger" == strModelName || "Dummy" == strModelName)
+			obj->Set_Hide(bHideTriggers);
+	}
 }
 
 void CMapToolHelper::Reset_MapShaderInfo()

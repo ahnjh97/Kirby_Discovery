@@ -1,16 +1,6 @@
 #include "stdafx.h"
 #include "OrbitingCamera.h"
 
-_float3 COrbitingCamera::Get_OrbitingCameraPos()
-{
-	if(nullptr == m_pTransformCom)
-		return _float3();
-
-	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
-
-	return _float3(vPos.x, vPos.y, vPos.z);
-}
-
 COrbitingCamera::COrbitingCamera(ID3D11Device* pDevice, ID3D11DeviceContext* pContext) :
 	CPartObject{ pDevice, pContext }
 {
@@ -54,7 +44,8 @@ _int COrbitingCamera::Tick(_float fTimeDelta)
 void COrbitingCamera::Late_Tick(_float fTimeDelta)
 {
 	XMStoreFloat4x4(&m_WorldMatrix, m_pTransformCom->Get_WorldMatrix() * XMLoadFloat4x4(m_pParentMatrix));
-	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+	if(false == m_bHide)
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
 
 HRESULT COrbitingCamera::Render()

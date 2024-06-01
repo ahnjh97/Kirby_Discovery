@@ -850,10 +850,16 @@ void CGameInstance::Register_Trigger(PxActor* pTriggerActor, _int iTriggerType, 
 		m_pPhysx->Register_Trigger(pTriggerActor, iTriggerType, iTriggerIndex);
 }
 
-void CGameInstance::SetUp_TriggerFunc(_int iTriggerType, function<void(_int)> func)
+void CGameInstance::Emplace_TriggerFunc(_int iTriggerType, function<void(_int)> func)
 {
 	if (nullptr != m_pPhysx)
-		m_pPhysx->SetUp_TriggerFunc(iTriggerType, func);
+		m_pPhysx->Emplace_TriggerFunc(iTriggerType, func);
+}
+
+void CGameInstance::Emplace_ExitFunc(_int iTriggerType, function<void(void)> exitFunc)
+{
+	if (nullptr != m_pPhysx)
+		m_pPhysx->Emplace_ExitFunc(iTriggerType, exitFunc);
 }
 
 void CGameInstance::Clear_EventCallBack()

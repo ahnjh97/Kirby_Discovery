@@ -46,11 +46,17 @@ public:
 	void EmplaceBackCamMatrix(const _float4x4& matWorld) { m_vecCamMatrices.emplace_back(matWorld); }
 
 	void EmplaceBackDirRadius(_int iCamType, _fvector vDir, _float fRadius);
-	void LerpByDirRadius(_int iTriggerIndex);
+	void LerpByTriggerInfo(_int iTriggerIndex);
 
 	void EmplaceBackTriggerInfo(const _float4x4& matWorld, _float fScale) { 
 		m_vecTriggerInfo.emplace_back(matWorld, fScale); }
 	_float Compute_TriggerPosRatio(_int iTriggerIndex);
+
+	void StartLerpByTriggerInfo(_int iTriggerIndex) { m_bLerpByTriggerInfo = true; m_iMatrixIndex = iTriggerIndex; }
+	void EndLerpByTriggerInfo() { m_bLerpByTriggerInfo = false; };
+
+	_vector SlerpDirVec(_fvector vStart, _fvector vEnd, _float fRatio);
+	_float LerpRadius(_float fStart, _float fEnd, _float fRatio);
 
 private:
 	_float			m_fMouseSensor = { 0.0f };
@@ -66,7 +72,13 @@ private:
 	vector<pair<_vector, _float>>	m_vecFrontDirRadius;
 	vector<pair<_vector, _float>>	m_vecRearDirRadius;
 	vector<pair<_float4x4, _float>>	m_vecTriggerInfo; // Trigger InverseMatrix and Scale
+	
+	_float m_fTriggerRatio = {};
+	_bool m_bLerpByTriggerInfo = { false };
+	_bool m_bPreLerpByTriggerInfo = { false };
 
+	_vector m_vSlerpedDir = {};
+	_float m_fLerpedRadius = {};
 	//Vector3			m_vOrbitPos = { 0.f, 0.f, 0.f };
 private:
 	void Orbit_Target(_float fTimeDelta);

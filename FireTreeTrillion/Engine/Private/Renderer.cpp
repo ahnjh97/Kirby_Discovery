@@ -81,7 +81,7 @@ HRESULT CRenderer::Initialize()
 
 	//function<void(_int)> ColorFunc = bind(&CRenderer::Set_ColorSet, this, placeholders::_1);
 
-	//m_pGameInstance->SetUp_TriggerFunc(1, ColorFunc);
+	//m_pGameInstance->Emplace_TriggerFunc(1, ColorFunc);
 
 
 #pragma region MRT_Sky
@@ -351,7 +351,7 @@ HRESULT CRenderer::Initialize()
 #endif
 
 	function<void(_int)> TriggerFunc = bind(&CRenderer::Set_ColorSet_ByIndex, this, placeholders::_1);
-	m_pGameInstance->SetUp_TriggerFunc(1, TriggerFunc);
+	m_pGameInstance->Emplace_TriggerFunc(1, TriggerFunc);
 	return S_OK;
 }
 

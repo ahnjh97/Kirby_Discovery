@@ -1,14 +1,6 @@
 #include "stdafx.h"
 #include "MapToolObject.h"
 
-_float3 CMapToolObject::Get_OrbitingCamPos()
-{
-	if (nullptr == m_pOrbitingCamera)
-		return _float3();
-
-	return m_pOrbitingCamera->Get_OrbitingCameraPos();
-}
-
 CMapToolObject::CMapToolObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
 {
@@ -50,7 +42,7 @@ HRESULT CMapToolObject::Initialize(void* pArg)
 		if (FAILED(Add_PartObject()))
 			return E_FAIL;
 
-		m_pOrbitingCamera->Set_OrbitingCameraPos(XMLoadFloat3(&GameObjectDesc.vOrbitingCameraPos));
+		m_pOrbitingCamera->Set_OrbitingCameraPos(XMVectorSet(0, 0, -m_fRadius, 0));
 	}
 
 	return S_OK;
@@ -74,7 +66,8 @@ void CMapToolObject::Late_Tick(_float fTimeDelta)
 	if (nullptr != m_pOrbitingCamera)
 		m_pOrbitingCamera->Late_Tick(fTimeDelta);
 
-	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+	if(false == m_bHide)
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
 
 HRESULT CMapToolObject::Render()
