@@ -22,8 +22,9 @@ public:
 	virtual _int				Tick(_float fTimeDelta)						override;
 	virtual void				Late_Tick(_float fTimeDelta)				override;
 	virtual HRESULT				Render()									override;
+#ifdef _DEBUG
 	virtual void				Render_IMGUI()								override;
-
+#endif
 private:
 	HRESULT						Add_Components();
 	HRESULT						Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTransform* _pTransCom, CTexture* _pTextureCom, _uint _iTexIndex);

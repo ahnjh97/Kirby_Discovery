@@ -163,45 +163,34 @@ HRESULT CLoader::Loading_ObjectAll()
 {
 	m_strLoadingText = TEXT("객체의 원형를(을) 로딩 중 입니다.");
 
-
-	//이펙트 툴 용
 #ifdef _DEBUG
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FXToolDirector"), CFXToolDirector);
+
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Grid"), CGrid);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolHelper"), CMapToolHelper);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolObject"), CMapToolObject);
+
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Editor_UI"), CEditor_UI);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("AnimToolHelper"), CAnimToolHelper);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("AnimToolObject"), CAnimToolObject);
 #endif
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SingleEffect"), CSingleEffect);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MultiEffect"), CMultiEffect);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Particle"), CParticle);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SkySphere"), CSkySphere);
-	#pragma endregion
 	
 	// MapTool GameObject Prototypes
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BasicMap"), CBasicMap);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Trigger"), CTrigger);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("OrbitingCamera"), COrbitingCamera);
-	#pragma endregion
 
-	#pragma region TOOL_UI
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Editor_UI"), CEditor_UI);
+	// UI
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Single_UI"), CSingle_UI);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Multi_UI"), CMulti_UI);
-	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
-	#pragma endregion
-
-	#pragma region TOOL_ANIMATION
-	// AnimationTool GameObject Prototypes
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("AnimToolHelper"), CAnimToolHelper);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("AnimToolObject"), CAnimToolObject);
-	#pragma endregion
-#pragma region TOOL_UI
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
-
-#pragma endregion
-
-	#pragma region FOR CLIENT
+	
+#pragma region FOR CLIENT
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kirby"), CKirby);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Awoofy"), CAwoofy);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Rabbit"), CRabbit);
@@ -214,7 +203,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestMap"), CTestTerrain);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Moon"), CMoon);
-	#pragma endregion
+#pragma endregion
 
 	return S_OK;
 }

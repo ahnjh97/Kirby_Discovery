@@ -295,6 +295,7 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 	return	S_OK;
 }
 
+#ifdef _DEBUG
 _bool CMainApp::Render_RTVFonts()
 {
 	// RTV_FONT 추가
@@ -371,7 +372,7 @@ _bool CMainApp::Render_RTVFonts()
 
 	return TRUE;
 }
-
+#endif // _DEBUG
 /// <summary>
 /// 1. 내가 저장하고자 하는 원소들의 개수(iCnt)를 저장한다.
 /// 2. 저장하고자하는 Element들(현 예시 4개)을 원하는 경로(strPath)에 저장하는 함수

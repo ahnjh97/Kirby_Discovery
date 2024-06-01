@@ -169,8 +169,12 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Public\AnimToolHelper.h" />
-    <ClInclude Include="..\Public\AnimToolObject.h" />
+    <ClInclude Include="..\Public\AnimToolHelper.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\Public\AnimToolObject.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="..\Public\Awoofy.h" />
     <ClInclude Include="..\Public\Awoofy_State.h" />
     <ClInclude Include="..\public\BackGround.h" />
@@ -191,7 +195,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\Public\HUD.h" />
-    <ClInclude Include="..\Public\ImSequencer.h" />
+    <ClInclude Include="..\Public\ImSequencer.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="..\Public\Multi_UI.h" />
     <ClInclude Include="..\Public\Single_UI.h" />
     <ClInclude Include="..\Public\Kirby.h" />
@@ -245,8 +251,12 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Private\AnimToolHelper.cpp" />
-    <ClCompile Include="..\Private\AnimToolObject.cpp" />
+    <ClCompile Include="..\Private\AnimToolHelper.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Private\AnimToolObject.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\Private\Awoofy.cpp" />
     <ClCompile Include="..\Private\Awoofy_State.cpp" />
     <ClCompile Include="..\private\BackGround.cpp" />
@@ -266,7 +276,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\Private\HUD.cpp" />
-    <ClCompile Include="..\Private\ImSequencer.cpp" />
+    <ClCompile Include="..\Private\ImSequencer.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\Private\Multi_UI.cpp" />
     <ClCompile Include="..\Private\Single_UI.cpp" />
     <ClCompile Include="..\Private\Kirby.cpp" />

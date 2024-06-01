@@ -72,9 +72,11 @@ HRESULT CMulti_UI::Render()
 	return S_OK;
 }
 
+#ifdef _DEBUG
 void CMulti_UI::Render_IMGUI()
 {
 }
+#endif // DEBUG
 
 HRESULT CMulti_UI::Add_Components()
 {

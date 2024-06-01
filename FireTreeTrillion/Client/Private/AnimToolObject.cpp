@@ -101,6 +101,7 @@ HRESULT CAnimToolObject::Render_LightDepth()
 	return S_OK;
 }
 
+#ifdef _DEBUG
 void CAnimToolObject::Render_IMGUI()
 {
 	if (ImGui::TreeNode("Guizmo"))
@@ -115,6 +116,7 @@ void CAnimToolObject::Render_IMGUI()
 
 	__super::Render_IMGUI();
 }
+#endif
 
 HRESULT CAnimToolObject::Add_Components()
 {

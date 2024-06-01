@@ -29,7 +29,9 @@ HRESULT CLevel_Tool_Anim::Initialize()
 	if (FAILED(Ready_Layer_IMGUI(TEXT("Layer_IMGUI"))))
 		return E_FAIL;
 
+#ifdef _DEBUG
 	m_pGameInstance->Set_IMGUIStyle(1);
+#endif // DEBUG
 
 	return S_OK;
 }
