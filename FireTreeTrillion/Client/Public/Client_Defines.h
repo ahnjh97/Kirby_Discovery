@@ -6,7 +6,7 @@
 namespace Client
 {
 	enum LEVEL { LEVEL_STATIC, LEVEL_LOADING, 
-                 LEVEL_LOGO, 
+                 LEVEL_LOGO = 2, 
                  LEVEL_GAMEPLAY, 
 
                 //============= TOOL
@@ -21,8 +21,11 @@ namespace Client
 
     const unsigned int	g_iWinSizeX = 1600; //1280;
     const unsigned int	g_iWinSizeY = 900; //720;
-}
 
+    const wstring g_strLayerMonster = TEXT("Layer_Monster");
+    const wstring g_strLayerItem = TEXT("Layer_Item");
+    const wstring g_strLayerMapObject = TEXT("Layer_MapObject");
+}
 
 extern HWND g_hWnd;
 extern HINSTANCE g_hInst;
@@ -47,7 +50,8 @@ enum PASS_MODEL {
 };
 
 enum PASS_ANIMMODEL {
-    ANIMMODEL_NORMAL_O, ANIMMODEL_NORMAL_X, ANIMMODEL_SHADOW, ANIMMODEL_KIRBYMOUTH, ANIMMODEL_KIRBYEYE, ANIMMODEL_BLOOM, ANIMMODEL_BLEND, ANIMMODEL_END
+    ANIMMODEL_NORMAL_O, ANIMMODEL_NORMAL_X, ANIMMODEL_SHADOW, ANIMMODEL_KIRBYMOUTH, ANIMMODEL_KIRBYEYE, ANIMMODEL_BLOOM, ANIMMODEL_BLEND, ANIMMODEL_DEFERREDINFO,
+    ANIMMODEL_END
 };
 
 enum PASS_INSTANCEPOINT {
@@ -56,4 +60,8 @@ enum PASS_INSTANCEPOINT {
 
 enum ABILITYTYPE {
     ABILITY_DEFAULT, ABILITY_SWORD, ABILITY_CUTTER, ABILITY_BOMB, ABILITY_END
+};
+
+enum VACUUMSIZE {
+    SIZE_SMALL, SIZE_BIG, SIZE_END
 };

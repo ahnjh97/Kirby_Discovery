@@ -139,7 +139,6 @@ public:
 	virtual void OnStateExit()														override;
 
 private:
-	_float m_fJumpVelocity = { 0.f };
 	_vector m_vKirbyLook = {};
 
 public:

@@ -15,6 +15,9 @@ public:
     HRESULT Ready_CollisionContents();
     void    Tick(_float fTimeDelta);
     
+    // For Animation
+    void    Ready_TestGround();
+
     // test 
     void Test();
     _float4x4 Update(_fmatrix matrix);

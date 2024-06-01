@@ -31,21 +31,22 @@ public:
 	}
 
 	void Reset_Ratio() { m_bRatio = true; }
+	void Remove_Ratio() { m_bRatio = false; }
 
-	const _char* Get_AnimationName() const {
-		return m_szName;
-	}
 
 public:
-	_float	Get_TickPerSecond() const { return m_fTickPerSecond; }
-	void	Set_TickPerSecond(_float _fTickPerSecond) { m_fTickPerSecond = _fTickPerSecond; }
+	_float		 Get_TickPerSecond() const { return m_fTickPerSecond; }
+	void		 Set_TickPerSecond(_float _fTickPerSecond) { m_fTickPerSecond = _fTickPerSecond; }
+				 
+	_float		 Get_TrackPosition() const { return m_fTrackPosition; }
+	void		 Set_TrackPosition(_float _fTrackPosition) { m_fTrackPosition = _fTrackPosition; }
 
-	_float	Get_TrackPosition() const { return m_fTrackPosition; }
-	void	Set_TrackPosition(_float _fTrackPosition) { m_fTrackPosition = _fTrackPosition; }
+	const _char* Get_AnimationName() const { return m_szName; }
+	_float		 Get_Duration() const { return m_fDuration; }
 
 public:
 	HRESULT Initialize(const vector<class CBone*>& Bones, ifstream& fileStream);
-	void Invalidate_TransformationMatrix(_float fTimeDelta, const vector<class CBone*>& Bones, _bool bIsLooping);
+	void	Invalidate_TransformationMatrix(_float fTimeDelta, const vector<class CBone*>& Bones, _bool bIsLooping);
 
 public:
 	void Read_AnimationData(ifstream& fileStream);
@@ -67,7 +68,7 @@ private:
 
 public:
 	static CAnimation* Create(const vector<class CBone*>& Bones, ifstream& fileStream);
-	CAnimation* Clone();
+	CAnimation*		Clone();
 	virtual void Free() override;
 };
 
