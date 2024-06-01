@@ -151,11 +151,6 @@ HRESULT CLoader::Start()
 HRESULT CLoader::Loading_ObjectAll()
 {
 	m_strLoadingText = TEXT("객체의 원형를(을) 로딩 중 입니다.");
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BackGround"), CBackGround);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestMap"), CTestTerrain);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
-
 	// 이펙트 툴 용
 	#pragma region TOOL_EFFECT
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FXToolDirector"), CFXToolDirector);
@@ -193,7 +188,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Rabbit"), CRabbit);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Buffahorn"), CBuffahorn);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BackGround"), CBackGround);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_Test"), CTestUI);
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_Test"), CTestUI);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestMap"), CTestTerrain);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);

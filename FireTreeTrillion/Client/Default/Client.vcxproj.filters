@@ -169,6 +169,12 @@
     <Filter Include="02.GameObjects\UI\Editor\Multi">
       <UniqueIdentifier>{0739de1b-2da7-47f4-8811-597bd872e366}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\NewFilter1">
+      <UniqueIdentifier>{41cd0184-8bb7-4d3f-8101-754198ebcb36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Anim">
+      <UniqueIdentifier>{51ec9ec2-a618-48a0-816b-2a9fc108e89c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -336,6 +342,15 @@
     <ClInclude Include="..\Public\Multi_UI.h">
       <Filter>02.GameObjects\UI\Editor\Multi</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\ImSequencer.h">
+      <Filter>02.GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\AnimToolHelper.h">
+      <Filter>02.GameObjects\Anim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\AnimToolObject.h">
+      <Filter>02.GameObjects\Anim</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -484,6 +499,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\Multi_UI.cpp">
       <Filter>02.GameObjects\UI\Editor\Multi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Public\ImSequencer.cpp">
+      <Filter>02.GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\AnimToolHelper.cpp">
+      <Filter>02.GameObjects\Anim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\AnimToolObject.cpp">
+      <Filter>02.GameObjects\Anim</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
