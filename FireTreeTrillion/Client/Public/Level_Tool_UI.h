@@ -28,10 +28,6 @@ private:
 public:
 	static CLevel_Tool_UI* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual void Free() override;
-
-private:
-	_uint			m_iFPS = { 0 };
-	_float			m_fAccDelta = { 0.0 };
 };
 
 END
