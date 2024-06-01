@@ -61,7 +61,6 @@ public:
 		_float3			m_vObjectScale = { 0.f, 0.f, 0.f };
 		_float			m_fObjectDistance = { 0.f };
 
-
 		// 방향 키 컨트롤러를 만지고 있는가?
 		_bool			m_isController = { false };
 
@@ -110,6 +109,7 @@ private:
 	void			Key_Input(_float fTimeDelta);
 	void			Kirby_SystemTick(_float fTimeDelta);
 
+	_float3			Make_RepulsiveDir(CPhysXObject* pObject);
 
 private:
 	HRESULT			Add_Components();

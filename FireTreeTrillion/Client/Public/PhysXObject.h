@@ -28,10 +28,20 @@ public:
 
 	ABILITYTYPE	Get_AbilityType() { return m_eAbilityType; }
 	void Set_AbilityType(ABILITYTYPE eAbilityType) { m_eAbilityType = eAbilityType; }
+
 	VACUUMSIZE Get_VacuumSize() { return m_eVacuumSize; }
 
 	_bool	Get_Vacuuming() { return m_bVacuuming; }
 	void	Set_Vacuuming(_bool bVacuuming) { m_bVacuuming = bVacuuming; }
+
+	// 넉백력을 정의해준다.
+	void	Set_DamageMoving(_float3 vDamgeDir, _float DamageJumpPower) {
+		m_vDamegeDir = vDamgeDir;
+		m_fDamageJumpPower = DamageJumpPower;
+	}
+	_float3 Get_DamegeDir() { return m_vDamegeDir; }
+	_float	Get_DamageJumpPower() { return m_fDamageJumpPower; }
+	void	Set_DamageJumpPower(_float fDamageJumpPower) { m_fDamageJumpPower = fDamageJumpPower; }
 
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;
@@ -43,6 +53,12 @@ protected:
 
 	// 작은놈인지, 큰놈인지를 이것으로 분류한다.
 	VACUUMSIZE m_eVacuumSize = { SIZE_END };
+
+	// 충돌 시, 날아갈 방향을 정의한다. (세기도 조절 가능하다)
+	_float3	m_vDamegeDir = { 0.f, 0.f, 0.f };
+
+	// 충돌 시, 공중으로 뜨는 힘을 정의한다.
+	_float	m_fDamageJumpPower = { 0.f };
 
 	// 흡수할때, 이 값을 true가 된다. (충돌에 영향을 안 받게 됨)
 	_bool		m_bVacuuming = { false };

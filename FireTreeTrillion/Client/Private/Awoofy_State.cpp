@@ -387,7 +387,6 @@ void CAwoofy_Damage_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _flo
 
 	m_vKirbyLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
 
-	m_fJumpVelocity = 5.f;
 }
 
 void CAwoofy_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -396,13 +395,22 @@ void CAwoofy_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 
+	// 일반 충돌 상태 (Get_Vacuuming()이 true라면 빨아들이는 상태이다.
 	if (pAwoofy->Get_Vacuuming() == false)
 	{
+		// 일단 그 방향으로 바라보게만 한다.
 		pTransformCom->Look_At_Axis(-m_vKirbyLook);
-		pController->Move_Dir(pTransformCom, m_vKirbyLook * 0.15f, fTimeDelta);
 
-		m_fJumpVelocity -= GRAVITY * fTimeDelta * 2.5f;
-		pController->Jump(pTransformCom, m_fJumpVelocity, fTimeDelta);
+		// 이제 날아가는 것을 구현해보자.
+		_float3 vDamegeDir = pAwoofy->Get_DamegeDir();
+		pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 10.f, fTimeDelta);
+
+		// 점프되는 체공시간을 구현해보자.
+		_float fDamageJumpPower = pAwoofy->Get_DamageJumpPower();
+		pController->Jump(pTransformCom, fDamageJumpPower, fTimeDelta);
+		fDamageJumpPower -= GRAVITY * fTimeDelta * 3.f;
+		pAwoofy->Set_DamageJumpPower(fDamageJumpPower);
+
 
 		if (true == pAwoofy->IsAnimFinished() || pController->Is_Terrain())
 			pAwoofy->Change_State(CAwoofy::AWOOFY_WAIT, 40.f, false, true);

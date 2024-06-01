@@ -215,12 +215,12 @@ HRESULT CKirby::Render_DeferredInfo()
 
 void CKirby::Collision_Attack(CGameObject* pOtherObj)
 {
-	CCharacter* pMonster = static_cast<CCharacter*>(pOtherObj);
+	CPhysXObject* pObject = static_cast<CPhysXObject*>(pOtherObj);
 
 	// 흡수될 운명인 몬스터
-	if (pMonster->Get_Vacuuming())
+	if (pObject->Get_Vacuuming())
 	{
-		if (pMonster->Get_AbilityType() == ABILITY_DEFAULT)
+		if (pObject->Get_AbilityType() == ABILITY_DEFAULT)
 		{
 			INFO(m_isEat) = true;
 			INFO(m_eEyeState) = EYE_IDLE;
@@ -238,13 +238,15 @@ void CKirby::Collision_Attack(CGameObject* pOtherObj)
 	// 슬라이드중
 	else if (Get_State() == STATE_SLIDE)
 	{
-
+		pObject->Set_DamageMoving(Make_RepulsiveDir(pObject), 10.f);
+		INFO(m_fJumpVelocity) = 11.f;
+		//INFO(m_fMoveSpeed) = 0.f;
+		Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
 	}
 	// 일반 박치기
 	else
 	{
-		// 데미지 다는 공식
-
+		pObject->Set_DamageMoving(Make_RepulsiveDir(pObject), 5.f);
 
 		INFO(m_fJumpVelocity) = 11.f;
 
@@ -265,6 +267,16 @@ void CKirby::Collision_Attack(CGameObject* pOtherObj)
 			Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
 		}
 	}
+}
+
+_float3 CKirby::Make_RepulsiveDir(CPhysXObject* pObject)
+{
+	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	_vector vObjectPos = pObject->Get_TransformCom()->Get_State_Vector(CTransform::STATE_POSITION);
+
+	m_vDamegeDir = XMVector3Normalize(vPos - vObjectPos);
+
+	return XMVector3Normalize(vObjectPos - vPos);
 }
 
 _uint CKirby::Get_State()
