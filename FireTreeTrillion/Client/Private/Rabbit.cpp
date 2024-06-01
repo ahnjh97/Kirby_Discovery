@@ -38,6 +38,12 @@ HRESULT CRabbit::Initialize(void* pArg)
 	//CTransform* pKirby = dynamic_cast<CTransform*>(m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player"), 0));
 	//Compute_Parabola(pKirby);
 
+	m_fMaxHp = 10.f;
+	m_fHp = 10.f;
+	m_fAttack = 10.f;
+	m_eVacuumSize = SIZE_SMALL;
+	m_eAbilityType = ABILITY_DEFAULT;
+
 	return S_OK;
 }
 
@@ -67,6 +73,9 @@ _int CRabbit::Tick(_float fTimeDelta)
 	//	m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta);
 	//}
 
+		// »¡¸± ¶§
+	if (m_bVacuuming == true)
+		Change_State(CRabbit::RABBIT_DAMAGE, 120.f, true, false);
 
 	__super::Tick(fTimeDelta);
 

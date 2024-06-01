@@ -2,15 +2,12 @@
 #include "GameObject.h"
 #include "VIBuffer_Rect.h"
 
-//BEGIN(Client)
-//class CHUD;
-//END
-
 BEGIN(Engine)
 
 class ENGINE_DLL CUIObject abstract : public CGameObject
 {
 protected:
+	enum UI_TYPE { TYPE_SINGLE, TYPE_MULTI, TYPE_NONE };
 	enum SHADER_PS
 	{
 		PS_DEFAULT, PS_ALPHABLEND,
@@ -21,10 +18,26 @@ protected:
 public:
 	typedef struct : public CGameObject::GAMEOBJECT_DESC
 	{
+		UI_TYPE		eUIType = { TYPE_NONE };
 		wstring		wstrUITag = { TEXT("") };
-		_float2		vSize, vCenter, vPos = { 0.f, 0.f };
-		_float		fRaito = { 0.f };
+		_float3		vSize, vCenter, vPos = { 0.f, 0.f, 0.f };
+		_float		fDegree = { 0.f };
+		_int		iTexIndex = { 0 };
 	}UIOBJ_DESC;
+
+#pragma region Getter/Setter
+
+public:
+	UIOBJ_DESC		Get_UIObj_Desc() const { return m_UIObjDesc; }
+	void			Set_UIObj_Desc(UIOBJ_DESC _UIDesc) { m_UIObjDesc = _UIDesc; }
+
+	_uint			Get_TexIndex() { return m_iTexIndex; }
+	void			Set_TexIndex(_uint _iTexIndex) { m_iTexIndex = _iTexIndex; }
+
+	constexpr _bool	Get_IsRender() const noexcept { return m_bIsRender; }
+	void			Set_IsRender(_bool _isRender) { m_bIsRender = _isRender; }
+
+#pragma endregion
 
 protected:
 	CUIObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -39,29 +52,21 @@ public:
 	virtual HRESULT Render()									override;
 	virtual void	Render_IMGUI()								override;
 
-public:
-	UIOBJ_DESC		Get_UIObj_Desc() const { return m_UIObjDesc; }
-	void			Set_UIObj_Desc(UIOBJ_DESC _UIDesc) { m_UIObjDesc = _UIDesc; }
-
-	_float2			Get_pos2D() const { return m_position2D; }
-	constexpr _bool	Get_IsRender() const noexcept { return m_bIsRender; }
-	void			Set_IsRender(_bool _isRender) { m_bIsRender = _isRender; }
-
 protected:
-	vector<CUIObject*>	m_vecUIObj;
-	UIOBJ_DESC			m_UIObjDesc{};
-
-	// 2D UI 처리용
-	_float2				m_size2D, m_position2D, m_WindowSize2D;
-	_float2				m_Ratio2D;
-	_float4x4			m_ViewMatrix, m_ProjMatrix;
-
-	// 상황에 따른 Render 처리해주는 bool값
-	_bool				m_bIsRender = false;
-
 	CShader*			m_pShaderCom = { nullptr };
 	CVIBuffer_Rect*		m_pVIBufferCom = { nullptr };
 	CTexture*			m_pTextureCom = { nullptr };
+
+	UIOBJ_DESC			m_UIObjDesc{};
+	UI_TYPE				m_eUIType = { TYPE_NONE };
+	
+	_uint				m_iTexIndex = { 0 };
+	_float4x4			m_ViewMatrix, m_ProjMatrix;
+
+	_bool				m_bIsRender = false;
+
+	vector<CUIObject*>	m_UIs;
+	vector<CUIObject*>	m_MultiUIs;
 
 public:
 	virtual CGameObject* Clone(_uint iLevelIndex, void* pArg) { return nullptr; }

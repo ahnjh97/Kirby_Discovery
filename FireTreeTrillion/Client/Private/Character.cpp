@@ -106,6 +106,8 @@ void CCharacter::Compute_MotionBlur()
 
 	m_vMotionVelocity.x = (m_vPreScreenPos - vCurScreenPos).x;
 	m_vMotionVelocity.y = (m_vPreScreenPos - vCurScreenPos).y;
+	m_vMotionVelocity.z = m_bVacuuming == true ? 1.f : 0.f;
+
 	m_vPreScreenPos = vCurScreenPos;
 }
 

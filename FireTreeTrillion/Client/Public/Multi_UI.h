@@ -1,6 +1,6 @@
 #pragma once
 #include "Client_Defines.h"
-#include "HUD.h"
+#include "UIObject.h"
 
 BEGIN(Engine)
 class CShader;
@@ -9,13 +9,12 @@ class CVIBuffer_Rect;
 END
 
 BEGIN(Client)
-
-class CHUD_Kirby : public CUIObject
+class CMulti_UI : public CUIObject //¥Ÿ¡ﬂ UI
 {
 private:
-	CHUD_Kirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CHUD_Kirby(const CHUD_Kirby& rhs);
-	virtual ~CHUD_Kirby() = default;
+	CMulti_UI(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CMulti_UI(const CMulti_UI& rhs);
+	virtual ~CMulti_UI() = default;
 
 public:
 	virtual HRESULT				Initialize_Prototype()						override;
@@ -27,12 +26,11 @@ public:
 
 private:
 	HRESULT						Add_Components();
-	//HRESULT					Bind_ShaderResources();
 	HRESULT						Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTransform* _pTransCom, CTexture* _pTextureCom, _uint _iTexIndex);
 	HRESULT						Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom);
 
 public:
-	static CHUD_Kirby*			Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CMulti_UI*			Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject*		Clone(void* pArg) override;
 	virtual void				Free() override;
 };

@@ -49,14 +49,8 @@
     <Filter Include="02.GameObjects\UI\BackGround">
       <UniqueIdentifier>{ef3d146c-47a4-4cea-8ab8-0d3efb6a9884}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\UI\[Sample] TestUI">
-      <UniqueIdentifier>{04f2b613-8fae-4a92-b5ab-330fe23d2a87}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\UI\Editor">
       <UniqueIdentifier>{197bd320-0690-4bf3-9f5f-40f57c555e4d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\UI\FXToolDirector">
-      <UniqueIdentifier>{dbb187c2-6962-4466-b912-a53c4e5d474a}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Effect">
       <UniqueIdentifier>{8da63451-b1d5-46f5-a7cd-b8c224b47c48}</UniqueIdentifier>
@@ -99,12 +93,6 @@
     </Filter>
     <Filter Include="02.GameObjects\Effect\Particle">
       <UniqueIdentifier>{4be92289-d2a7-44f3-bc64-a36e82d6590f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\UI\HUD">
-      <UniqueIdentifier>{3d7f8468-85e7-4210-bad9-dd5e62bf6d75}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\UI\HUD\Kirby">
-      <UniqueIdentifier>{4bba1354-4120-4080-bcfb-aeff11736c4b}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Map\Terrain">
       <UniqueIdentifier>{790e4632-66f1-4e07-b217-df971b3f85d4}</UniqueIdentifier>
@@ -172,6 +160,21 @@
     <Filter Include="02.GameObjects\PhysXObject\RigidObject">
       <UniqueIdentifier>{ec828ee3-b588-495f-82c4-e369a19f7ef0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Effect\FXToolDirector">
+      <UniqueIdentifier>{dbb187c2-6962-4466-b912-a53c4e5d474a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\Editor\Single">
+      <UniqueIdentifier>{ac3d583d-1d14-49c7-8cb8-b77af55d1bd6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\Editor\Multi">
+      <UniqueIdentifier>{0739de1b-2da7-47f4-8811-597bd872e366}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\NewFilter1">
+      <UniqueIdentifier>{41cd0184-8bb7-4d3f-8101-754198ebcb36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Anim">
+      <UniqueIdentifier>{51ec9ec2-a618-48a0-816b-2a9fc108e89c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -228,14 +231,11 @@
     <ClInclude Include="..\Public\Level_Tool_FX.h">
       <Filter>01.Levels\Tool\FX</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\UI_Editor.h">
+    <ClInclude Include="..\Public\Editor_UI.h">
       <Filter>02.GameObjects\UI\Editor</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\TestUI.h">
-      <Filter>02.GameObjects\UI\[Sample] TestUI</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\FXToolDirector.h">
-      <Filter>02.GameObjects\UI\FXToolDirector</Filter>
+      <Filter>02.GameObjects\Effect\FXToolDirector</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby.h">
       <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby</Filter>
@@ -306,12 +306,6 @@
     <ClInclude Include="..\Public\KirbyDamage_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyDamage_State</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\HUD.h">
-      <Filter>02.GameObjects\UI\HUD</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\HUD_Kirby.h">
-      <Filter>02.GameObjects\UI\HUD\Kirby</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Character.h">
       <Filter>02.GameObjects\PhysXObject\Character</Filter>
     </ClInclude>
@@ -341,6 +335,21 @@
     </ClInclude>
     <ClInclude Include="..\Public\RigidObject.h">
       <Filter>02.GameObjects\PhysXObject\RigidObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Single_UI.h">
+      <Filter>02.GameObjects\UI\Editor\Single</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Multi_UI.h">
+      <Filter>02.GameObjects\UI\Editor\Multi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ImSequencer.h">
+      <Filter>02.GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\AnimToolHelper.h">
+      <Filter>02.GameObjects\Anim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\AnimToolObject.h">
+      <Filter>02.GameObjects\Anim</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -381,7 +390,7 @@
       <Filter>02.GameObjects\Map\Terrain</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\FXToolDirector.cpp">
-      <Filter>02.GameObjects\UI\FXToolDirector</Filter>
+      <Filter>02.GameObjects\Effect\FXToolDirector</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Tool_FX.cpp">
       <Filter>01.Levels\Tool\FX</Filter>
@@ -389,11 +398,8 @@
     <ClCompile Include="..\Private\Level_Tool_UI.cpp">
       <Filter>01.Levels\Tool\UI</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\UI_Editor.cpp">
+    <ClCompile Include="..\Private\Editor_UI.cpp">
       <Filter>02.GameObjects\UI\Editor</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\TestUI.cpp">
-      <Filter>02.GameObjects\UI\[Sample] TestUI</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby</Filter>
@@ -458,12 +464,6 @@
     <ClCompile Include="..\Private\KirbyDamage_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyDamage_State</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\HUD.cpp">
-      <Filter>02.GameObjects\UI\HUD</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\HUD_Kirby.cpp">
-      <Filter>02.GameObjects\UI\HUD\Kirby</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Character.cpp">
       <Filter>02.GameObjects\PhysXObject\Character</Filter>
     </ClCompile>
@@ -493,6 +493,21 @@
     </ClCompile>
     <ClCompile Include="..\Private\RigidObject.cpp">
       <Filter>02.GameObjects\PhysXObject\RigidObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Single_UI.cpp">
+      <Filter>02.GameObjects\UI\Editor\Single</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Multi_UI.cpp">
+      <Filter>02.GameObjects\UI\Editor\Multi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Public\ImSequencer.cpp">
+      <Filter>02.GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\AnimToolHelper.cpp">
+      <Filter>02.GameObjects\Anim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\AnimToolObject.cpp">
+      <Filter>02.GameObjects\Anim</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -19,7 +19,9 @@ void CKirbyDamage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 
 	// 임시
-	_float4 vDamageDir = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * -1.f;
+	//_float4 vDamageDir = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * -1.f;
+	_float3 vDamageDir = pKirby->Get_DamegeDir();
+
 	// 타겟기준
 	_vector vMoveDelta = vDamageDir * fTimeDelta * 12.f;
 	pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);

@@ -35,6 +35,13 @@ HRESULT CAwoofy::Initialize(void* pArg)
 
 	m_pModelCom->Set_Animation(AWOOFY_GROOMING, 45.f, false, true);
 
+
+	m_fMaxHp = 10.f;
+	m_fHp = 10.f;
+	m_fAttack = 8.f;
+	m_eVacuumSize = SIZE_SMALL;
+	m_eAbilityType = ABILITY_DEFAULT;
+
 	return S_OK;
 }
 
@@ -44,6 +51,10 @@ _int CAwoofy::Tick(_float fTimeDelta)
 		return OBJ_DEAD;
 
 	__super::Tick(fTimeDelta);
+
+	// »¡¸± ¶§
+	if (m_bVacuuming == true)
+		Change_State(CAwoofy::AWOOFY_DAMAGE, 120.f, true, false);
 
 	return OBJ_NOEVENT;
 }

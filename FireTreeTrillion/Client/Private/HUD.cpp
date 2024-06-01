@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "HUD.h"
-#include "HUD_Kirby.h"
 
 CHUD::CHUD(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CUIObject{ pDevice, pContext }
@@ -22,6 +21,19 @@ HRESULT CHUD::Initialize(void* pArg)
 	HRESULT hr = __super::Initialize(pArg);
 	CHECK_FAILED(hr);
 
+	//CUIObject::UIOBJ_DESC HUD_KirbyDESC{};
+	//HUD_KirbyDESC.wstrUITag = { TEXT("HUD_Kirby") };
+	//HUD_KirbyDESC.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f };
+	//HUD_KirbyDESC.vSize = { 100.f, 100.f };
+	//HUD_KirbyDESC.vPos = { HUD_KirbyDESC.vCenter.x/* - 200.f*/,
+	//						HUD_KirbyDESC.vCenter.y/* - 200.f */ };
+	//HUD_KirbyDESC.fDegree = { 0.f };
+	//HUD_KirbyDESC.iTexIndex = { 0 };
+
+	//CUIObject* pUIObj = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_HUD_Kirby"), &HUD_KirbyDESC));
+	//CHECK_NULLPTR(pUIObj);
+	//m_vecSingleUI.push_back(pUIObj);
+
 	return S_OK;
 }
 
@@ -32,6 +44,9 @@ _int CHUD::Tick(_float _fTimeDelta)
 
 void CHUD::Late_Tick(_float _fTimeDelta)
 {
+	//for (auto& pUIObj : m_vecSingleUI)
+	//	pUIObj->Late_Tick(_fTimeDelta);
+
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_UI, this);
 }
 
@@ -44,28 +59,13 @@ void CHUD::Render_IMGUI()
 {
 }
 
-HRESULT CHUD::Add_Components()
-{	
-	return S_OK;
-}
-
-HRESULT CHUD::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTransform* _pTransCom, CTexture* _pTextureCom, _uint _iTexIndex)
-{
-	return S_OK;
-}
-
-HRESULT CHUD::Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom)
-{
-	return S_OK;
-}
-
 CHUD* CHUD::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CHUD* pInstance = new CHUD(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CHUD"));
+		MSG_BOX(TEXT("Failed To Create : CHUD"));
 		Safe_Release(pInstance);
 	}
 

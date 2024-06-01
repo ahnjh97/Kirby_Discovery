@@ -25,12 +25,6 @@ HRESULT CLevel_Logo::Initialize()
 void CLevel_Logo::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
-
-	//if (m_pGameInstance->Get_DIKeyState(DIK_RETURN, KEY_DOWN))
-	//{
-	//	if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_GAMEPLAY))))
-	//		return ;
-	//}
 }
 
 HRESULT CLevel_Logo::Render()
@@ -39,8 +33,6 @@ HRESULT CLevel_Logo::Render()
 		return E_FAIL;
 
 	SetWindowText(g_hWnd, TEXT("로고레벨입니다."));
-	
-
 
 	return S_OK;
 }

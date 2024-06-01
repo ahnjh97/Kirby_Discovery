@@ -68,6 +68,7 @@ HRESULT CKirby::Initialize(void* pArg)
 	m_fMaxHp = 100.f;
 	m_fHp = 100.f;
 	m_fAttack = 5.f;
+	m_eAbilityType = ABILITY_DEFAULT;
 
 	return S_OK;
 }
@@ -107,6 +108,7 @@ void CKirby::Late_Tick(_float fTimeDelta)
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_DEFERREDINFO, this);
 	}
 }
 
@@ -165,6 +167,9 @@ void CKirby::Render_IMGUI()
 		ImGui::Separator(); ImGui::NewLine();
 		ImGui::TreePop();
 	}
+
+	ImGui::Text("Vacuuming : %d", m_bVacuuming);
+	ImGui::Text("ObjectAddress : %d", INFO(m_pObject));
 	ImGui::Text("Origin X : %.2f, Origin Y : %.2f, Origin Z : %.2f,", m_vOriginUp.x, m_vOriginUp.y, m_vOriginUp.z);
 	ImGui::Text("ReserveJump : %d", INFO(m_bReserveJumpKey));
 	ImGui::Text("Height : %.2f", m_pControllerCom->Compute_Height());
@@ -175,26 +180,103 @@ void CKirby::Render_IMGUI()
 	__super::Render_IMGUI();
 }
 
+HRESULT CKirby::Render_DeferredInfo()
+{
+
+	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
+		return E_FAIL;
+
+	_uint iNumMeshes = m_pModelCom[INFO(m_eBodyState)]->Get_NumMeshes();
+
+	for (size_t i = 0; i < iNumMeshes; i++)
+	{
+
+		if (FAILED(m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
+			return E_FAIL;
+
+		if (FAILED(m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+			return E_FAIL;
+
+		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
+		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_DEFERREDINFO)))
+			return E_FAIL;
+
+		if (FAILED(m_pModelCom[INFO(m_eBodyState)]->Render(i)))
+			return E_FAIL;
+	}
+
+	return S_OK;
+
+}
+
 void CKirby::Collision_Attack(CGameObject* pOtherObj)
 {
-	INFO(m_fJumpVelocity) = 11.f;
+	CPhysXObject* pObject = static_cast<CPhysXObject*>(pOtherObj);
 
-	// 먹은 상태인 경우
-	if (INFO(m_isEat) == true)
+	// 흡수될 운명인 몬스터
+	if (pObject->Get_Vacuuming())
 	{
-		Change_State(STATE_EATDAMAGE, 60.f, false, false, BODY_BALLOON);
+		if (pObject->Get_AbilityType() == ABILITY_DEFAULT)
+		{
+			INFO(m_isEat) = true;
+			INFO(m_eEyeState) = EYE_IDLE;
+			INFO(m_eMouthState) = MOUTH_ANGER;
+			m_bVacuuming = false;
+			Change_State(STATE_EAT, 100.f, false, false, BODY_BALLOON);
+			m_eAbilityType = ABILITY_DEFAULT;
+		}
+
+		INFO(m_pObject)->Set_Dead();
+		Safe_Release(INFO(m_pObject));
+		INFO(m_pObject) = nullptr;
+
 	}
-	// 나는 상태일 경우 . . .
-	else if (true == (Get_State() == STATE_FLIGHTSTART || Get_State() == STATE_FLIGHTFALL || Get_State() == STATE_FLIGHT ||
-		Get_State() == STATE_FLIGHTLANDING || Get_State() == STATE_FLIGHTLIMIT || Get_State() == STATE_FLIGHTLIMITFALL))
+	// 슬라이드중
+	else if (Get_State() == STATE_SLIDE)
 	{
-		Change_State(STATE_FILGHTDAMAGE, 60.f, false, false, BODY_BALLOON);
-	}
-	// 평범한 상태에서...
-	else
-	{
+		pObject->Set_DamageMoving(Make_RepulsiveDir(pObject), 10.f);
+		INFO(m_fJumpVelocity) = 11.f;
+		//INFO(m_fMoveSpeed) = 0.f;
 		Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
 	}
+	// 일반 박치기
+	else
+	{
+		pObject->Set_DamageMoving(Make_RepulsiveDir(pObject), 5.f);
+
+		INFO(m_fJumpVelocity) = 11.f;
+
+		// 먹은 상태인 경우
+		if (INFO(m_isEat) == true)
+		{
+			Change_State(STATE_EATDAMAGE, 60.f, false, false, BODY_BALLOON);
+		}
+		// 나는 상태일 경우 . . .
+		else if (true == (Get_State() == STATE_FLIGHTSTART || Get_State() == STATE_FLIGHTFALL || Get_State() == STATE_FLIGHT ||
+			Get_State() == STATE_FLIGHTLANDING || Get_State() == STATE_FLIGHTLIMIT || Get_State() == STATE_FLIGHTLIMITFALL))
+		{
+			Change_State(STATE_FILGHTDAMAGE, 60.f, false, false, BODY_BALLOON);
+		}
+		// 평범한 상태에서...
+		else
+		{
+			Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
+		}
+	}
+}
+
+_float3 CKirby::Make_RepulsiveDir(CPhysXObject* pObject)
+{
+	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	_vector vObjectPos = pObject->Get_TransformCom()->Get_State_Vector(CTransform::STATE_POSITION);
+
+	m_vDamegeDir = XMVector3Normalize(vPos - vObjectPos);
+
+	return XMVector3Normalize(vObjectPos - vPos);
 }
 
 _uint CKirby::Get_State()
@@ -240,7 +322,7 @@ void CKirby::Setting_KirbyBalance()
 
 void CKirby::Key_Input(_float fTimeDelta)
 {
-#pragma region 커비 연구소 (애니메이션 제어)
+	#pragma region 커비 연구소 (애니메이션 제어)
 
 	//Test
 	if (m_pGameInstance->Get_DIKeyState(DIK_P, KEY_DOWN))
@@ -276,7 +358,6 @@ void CKirby::Key_Input(_float fTimeDelta)
 		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
 	}
 #pragma endregion
-
 }
 
 HRESULT CKirby::Add_Components()
@@ -302,6 +383,8 @@ HRESULT CKirby::Add_Components()
 		hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyBalloon"),
 			TEXT("Com_Model_Balloon"), (CComponent**)&m_pModelCom[BODY_BALLOON]);
 		CHECK_FAILED(hr);
+
+
 	#pragma endregion
 
 	#pragma region Kirby Eye
@@ -509,6 +592,11 @@ void CKirby::SetUp_FSM()
 	m_pFSM->Add_State(STATE_INHALEWALK, CKirbyVacuum_VacuumWalk_State::Create());
 	m_pFSM->Add_State(STATE_SUPERINHALEWALK, CKirbyVacuum_VacuumWalk_State::Create());
 
+	// Vacuuming
+	m_pFSM->Add_State(STATE_VACUUM, CKirbyVacuum_Vacuuming_State::Create());
+	m_pFSM->Add_State(STATE_VACUUMHUSTLELV2, CKirbyVacuum_Vacuuming_State::Create());
+
+
 
 	CFSM::FSM_INFO		FSM_Info_Desc = {};
 	FSM_Info_Desc.iState = STATE_IDLE;
@@ -529,6 +617,11 @@ void CKirby::Set_Animation(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool
 		return;
 
 	m_pModelCom[INFO(m_eBodyState)]->Set_Animation(eState, _fAnimSpeed, _bLoop, _bInterpolation);
+}
+
+void CKirby::Set_Animation(_int _iAnimIndex)
+{
+	m_pModelCom[INFO(m_eBodyState)]->Set_Animation(_iAnimIndex);
 }
 
 _bool CKirby::isAnimFinish()

@@ -50,4 +50,9 @@ public:
 	static void Make_Effect(PARTICLE_DATA& _FXData);
 };
 
+template <typename T, std::size_t N>
+constexpr std::size_t getArraySize(T(&)[N]) noexcept
+{
+	return N;
+}
 END
