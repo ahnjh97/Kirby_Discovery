@@ -190,6 +190,9 @@
     <Filter Include="02.PhysX\_Manager">
       <UniqueIdentifier>{f88af5e5-4183-40e4-9180-afb42c69dfc5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\02.Components\Model\OcTree">
+      <UniqueIdentifier>{11710d6a-3e27-44aa-b551-74fa08ad3193}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Base.cpp">
@@ -392,6 +395,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Model.cpp">
       <Filter>01.Utility\02.Components\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\OcTree.cpp">
+      <Filter>01.Utility\02.Components\Model\OcTree</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -622,6 +628,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Model.h">
       <Filter>01.Utility\02.Components\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\OcTree.h">
+      <Filter>01.Utility\02.Components\Model\OcTree</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

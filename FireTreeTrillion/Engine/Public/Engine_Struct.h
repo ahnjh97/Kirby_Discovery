@@ -331,4 +331,11 @@ namespace Engine
 			_uint _iRootNode = { 4 }
 		) : strModelName(_strModelName), eType(_eType), fScale(_fScale), fDegree(_fDegree), iRootNode(_iRootNode) {}
 	};
+
+	struct FACE
+	{
+		_float3 vA = {};
+		_float3 vB = {};
+		_float3 vC = {};
+	};
 }

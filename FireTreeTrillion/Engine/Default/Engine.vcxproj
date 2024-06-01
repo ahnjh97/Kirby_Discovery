@@ -223,6 +223,7 @@ call UpdateLib.bat</Command>
     </ClCompile>
     <ClCompile Include="..\Private\Model.cpp" />
     <ClCompile Include="..\Private\Object_Manager.cpp" />
+    <ClCompile Include="..\Private\OcTree.cpp" />
     <ClCompile Include="..\private\PartObject.cpp" />
     <ClCompile Include="..\Private\PhysX.cpp" />
     <ClCompile Include="..\Private\Picking.cpp" />
@@ -386,6 +387,7 @@ call UpdateLib.bat</Command>
     </ClInclude>
     <ClInclude Include="..\Public\Model.h" />
     <ClInclude Include="..\Public\Object_Manager.h" />
+    <ClInclude Include="..\Public\OcTree.h" />
     <ClInclude Include="..\public\PartObject.h" />
     <ClInclude Include="..\Public\PhysX.h" />
     <ClInclude Include="..\Public\Picking.h" />
