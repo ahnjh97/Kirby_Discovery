@@ -57,6 +57,8 @@ _int CRabbit::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return OBJ_DEAD;
 
+	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+
 	// Áö¸éÀÇ upº¤ÅÍ
 	//PxVec3 slope = m_pControllerCom->Compute_Slope(m_pTransformCom);
 	//_vector vTerrainNormal = CUtils::To_Vector(slope);
@@ -82,14 +84,16 @@ _int CRabbit::Tick(_float fTimeDelta)
 	if (m_bVacuuming == true)
 		Change_State(CRabbit::RABBIT_DAMAGE, 120.f, true, false);
 
-	__super::Tick(fTimeDelta);
+	__super::Tick(m_fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
 
 void CRabbit::Late_Tick(_float fTimeDelta)
 {
-	m_pModelCom->Play_Animation(fTimeDelta);
+	_float fSecondTime = m_pGameInstance->Get_SecondTimer();
+
+	m_pModelCom->Play_Animation(fSecondTime);
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
@@ -204,9 +208,9 @@ void CRabbit::Compute_Parabola(_vector vEndPos)
 
 _vector CRabbit::JumpAttak(_float fTimeDelta)
 {
-	m_vGoPos.x = m_vStartPos.x + m_fAxisX * fTimeDelta;
-	m_vGoPos.y = m_vStartPos.y + (m_fAxisY * fTimeDelta) - (0.5f * m_fGravity * fTimeDelta * fTimeDelta);
-	m_vGoPos.z = m_vStartPos.z + m_fAxisZ * fTimeDelta;
+	m_vGoPos.x = m_vStartPos.x + m_fAxisX * m_fTimeDelta;
+	m_vGoPos.y = m_vStartPos.y + (m_fAxisY * m_fTimeDelta) - (0.5f * m_fGravity * m_fTimeDelta * m_fTimeDelta);
+	m_vGoPos.z = m_vStartPos.z + m_fAxisZ * m_fTimeDelta;
 	 
 	return m_vGoPos;
 }

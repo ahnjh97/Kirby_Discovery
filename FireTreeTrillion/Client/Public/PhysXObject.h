@@ -62,6 +62,9 @@ protected:
 
 	// 충돌 시, 공중으로 뜨는 힘을 정의한다.
 	_float	m_fDamageJumpPower = { 0.f };
+	
+	// 모든 객체들이 가지는 시간값
+	_float	m_fTimeDelta = { 0.f };
 
 	// 흡수할때, 이 값을 true가 된다. (충돌에 영향을 안 받게 됨)
 	_bool		m_bVacuuming = { false };

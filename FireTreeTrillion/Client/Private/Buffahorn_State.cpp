@@ -201,7 +201,7 @@ void CBuffahorn_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 	_float fHeight = pController->Compute_Height(pTransformCom->Get_State_Vector(CTransform::STATE_LOOK));
 
-	if(2.f > fHeight)
+	if(2.f < fHeight)
 		pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_RETURNJUMPSTART, 50.f, false, true);
 }
 
@@ -294,7 +294,7 @@ void CBuffahorn_Jump_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _fl
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
 
-	m_fJumpVelocity = 5.f;
+	m_fJumpVelocity = 10.f;
 }
 
 void CBuffahorn_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -320,8 +320,11 @@ void CBuffahorn_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	m_fJumpVelocity -= GRAVITY * fTimeDelta * 6.f;
 	pController->Jump(pTransformCom, m_fJumpVelocity, fTimeDelta);
 
-	if ((true == pBuffahorn->IsAnimFinished() || pController->Is_Terrain()) && CBuffahorn::BUFFAHORN_RETURNJUMPEND == pBuffahorn->Get_State())
-		pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_RUN, 45.f, true, true);
+	if(CBuffahorn::BUFFAHORN_RETURNJUMPEND == pBuffahorn->Get_State())
+	{
+		if ((true == pBuffahorn->IsAnimFinished() || pController->Is_Terrain()))
+			pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_RUN, 45.f, true, true);
+	}
 }
 
 void CBuffahorn_Jump_State::OnStateExit()

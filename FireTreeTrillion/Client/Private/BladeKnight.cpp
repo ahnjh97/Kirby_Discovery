@@ -52,11 +52,13 @@ _int CBladeKnight::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return OBJ_DEAD;
 
-	__super::Tick(fTimeDelta);
+	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+
+	__super::Tick(m_fTimeDelta);
 
 	Compute_ViewZ();
 
-	__super::SetOn_Slope(fTimeDelta);
+	__super::SetOn_Slope(m_fTimeDelta);
 
 	Compute_MotionBlur();
 
@@ -65,17 +67,17 @@ _int CBladeKnight::Tick(_float fTimeDelta)
 	   //	m_pFSM->Update(this, fTimeDelta);
 
 	for (auto& Pair : m_PartObjects)
-		Pair.second->Tick(fTimeDelta);
+		Pair.second->Tick(m_fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
 
 void CBladeKnight::Late_Tick(_float fTimeDelta)
 {
-	m_pModelCom->Play_Animation(fTimeDelta);
+	m_pModelCom->Play_Animation(m_fTimeDelta);
 
 	for (auto& Pair : m_PartObjects)
-		Pair.second->Late_Tick(fTimeDelta);
+		Pair.second->Late_Tick(m_fTimeDelta);
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
