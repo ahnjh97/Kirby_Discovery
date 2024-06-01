@@ -82,18 +82,19 @@ HRESULT CLevel_Tool_UI::Ready_Layer_IMGUI(const wstring& strLayerTag)
 
 HRESULT CLevel_Tool_UI::Ready_Layer_UI(const wstring& strLayerTag)
 {
-	CUIObject::UIOBJ_DESC SingleUI_Desc{};
-	SingleUI_Desc.wstrUITag = { TEXT("Single_UI") };
-	SingleUI_Desc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f };
-	SingleUI_Desc.vSize = { 100.f, 100.f };
-	SingleUI_Desc.vPos = { SingleUI_Desc.vCenter.x/* - 200.f*/,
-							SingleUI_Desc.vCenter.y/* - 200.f */ };
-	SingleUI_Desc.fDegree = { 0.f };
-	SingleUI_Desc.iTexIndex = { 0 };
+	//CUIObject::UIOBJ_DESC SingleUI_Desc{};
+	//SingleUI_Desc.wstrUITag = { TEXT("Single_UI") };
+	//SingleUI_Desc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f };
+	//SingleUI_Desc.vSize = { 100.f, 100.f };
+	//SingleUI_Desc.vPos = { SingleUI_Desc.vCenter.x/* - 200.f*/,
+	//						SingleUI_Desc.vCenter.y/* - 200.f */ };
+	//SingleUI_Desc.fDegree = { 0.f };
+	//SingleUI_Desc.iTexIndex = { 0 };
 
-	//단일 
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_UI, strLayerTag, TEXT("Prototype_GameObject_Single_UI"), &SingleUI_Desc)))
-		return E_FAIL;
+	////단일 
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_UI, strLayerTag, TEXT("Prototype_GameObject_Single_UI"), &SingleUI_Desc)))
+	//	return E_FAIL;
+
 
 	//다중 (상속)
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_UI, strLayerTag, TEXT("Prototype_GameObject_Multi_UI"))))

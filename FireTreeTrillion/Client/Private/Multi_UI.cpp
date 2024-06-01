@@ -22,6 +22,7 @@ HRESULT CMulti_UI::Initialize(void* _pArg)
 	CHECK_FAILED(hr);
 
 	UIOBJ_DESC MultiUI_Desc{};
+	MultiUI_Desc.eUIType = { TYPE_MULTI };
 	MultiUI_Desc.wstrUITag = { TEXT("Multi_UI") };
 	MultiUI_Desc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f };
 	MultiUI_Desc.vSize = { 100.f, 100.f };
