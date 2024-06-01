@@ -342,7 +342,7 @@ void CRabbit_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	if (pRabbit->Get_Vacuuming() == false)
 	{
 		pTransformCom->Look_At_Axis(-m_vKirbyLook);
-		pController->Move_Dir(pTransformCom, m_vKirbyLook * 0.15f, fTimeDelta);
+		pController->Move_Dir(pTransformCom, m_vKirbyLook * fTimeDelta * 11.f, fTimeDelta);
 
 		m_fJumpVelocity -= GRAVITY * fTimeDelta * 2.5f;
 		pController->Jump(pTransformCom, m_fJumpVelocity, fTimeDelta);

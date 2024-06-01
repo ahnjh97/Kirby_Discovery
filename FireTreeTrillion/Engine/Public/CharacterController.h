@@ -49,7 +49,7 @@ public:
 	_bool			Jump_Parabola(CTransform* pTransform, _vector vGoPos, _float fTimeDelta);			// 목표 지점으로 점프
 	void			FreeFall(CTransform* pTransform, _float fTimeDelta, _float fOffset = 1.f);			// 자유 낙하
 	PxVec3			Compute_Slope(CTransform* pTransform);												// 경사면의 노말벡터 계산
-	_float			Compute_Height();																	// 경사면의 노말벡터 계산
+	_float			Compute_Height(_fvector vAxis = XMVectorSet(0.f, 0.f, 0.f, 0.f));																	// 경사면의 노말벡터 계산
 	PxVec3			Compute_TerrainPosition();
 	_vector			Compute_TerrainPosition_Vector();
 	PxVec3			TerrainRayCast_Collision(PxVec3 _rayOrigin, PxVec3 _rayDirection, _float _fMaxDistance);

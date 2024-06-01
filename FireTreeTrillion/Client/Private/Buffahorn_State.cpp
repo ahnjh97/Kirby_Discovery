@@ -193,12 +193,16 @@ void CBuffahorn_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	{
 		m_fTimeDelta += fTimeDelta;
 
-		if(2.f > m_fTimeDelta)
-			pController->Move_Dir(pTransformCom, pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 0.2f, fTimeDelta);
+		if (2.f > m_fTimeDelta)
+			pController->Move_Dir(pTransformCom, pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * fTimeDelta * 10.f, fTimeDelta);
 		else
 			pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_BRAKE, 50.f, false, true);
 	}
 
+	_float fHeight = pController->Compute_Height(pTransformCom->Get_State_Vector(CTransform::STATE_LOOK));
+
+	if(2.f > fHeight)
+		pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_RETURNJUMPSTART, 50.f, false, true);
 }
 
 void CBuffahorn_Run_State::OnStateExit()
@@ -251,7 +255,7 @@ void CBuffahorn_Brake_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 	if (true == pBuffahorn->IsAnimFinished())
 		pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_BRAKEEND, 45.f, false, true);
 	else
-		pController->Move_Dir(pTransformCom, (pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 0.1f) * fDeceleration, fTimeDelta);
+		pController->Move_Dir(pTransformCom, (pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * fTimeDelta * 10.f) * fDeceleration, fTimeDelta);
 
 	if (CBuffahorn::BUFFAHORN_BRAKEEND == pBuffahorn->Get_State())
 	{
@@ -271,6 +275,66 @@ CBuffahorn_Brake_State* CBuffahorn_Brake_State::Create()
 }
 
 void CBuffahorn_Brake_State::Free()
+{
+	__super::Free();
+}
+
+#pragma endregion
+
+
+#pragma region JUMP STATE
+//*********************************
+//			 JUMP STATE
+//*********************************
+CBuffahorn_Jump_State::CBuffahorn_Jump_State()
+{
+}
+
+void CBuffahorn_Jump_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+
+	m_fJumpVelocity = 5.f;
+}
+
+void CBuffahorn_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CBuffahorn* pBuffahorn = static_cast<CBuffahorn*>(pGameObject);
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+
+	if (true == pBuffahorn->IsAnimFinished())
+	{
+		switch (pBuffahorn->Get_State())
+		{
+		case CBuffahorn::BUFFAHORN_RETURNJUMPSTART:
+			pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_RETURNJUMP, 45.f, false, true);
+			break;
+		case CBuffahorn::BUFFAHORN_RETURNJUMP:
+			pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_RETURNJUMPEND, 45.f, false, true);
+			break;
+		}
+	}
+	pController->Move_Dir(pTransformCom, pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * fTimeDelta * 10.f, fTimeDelta);
+
+	m_fJumpVelocity -= GRAVITY * fTimeDelta * 6.f;
+	pController->Jump(pTransformCom, m_fJumpVelocity, fTimeDelta);
+
+	if ((true == pBuffahorn->IsAnimFinished() || pController->Is_Terrain()) && CBuffahorn::BUFFAHORN_RETURNJUMPEND == pBuffahorn->Get_State())
+		pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_RUN, 45.f, true, true);
+}
+
+void CBuffahorn_Jump_State::OnStateExit()
+{
+}
+
+CBuffahorn_Jump_State* CBuffahorn_Jump_State::Create()
+{
+	CBuffahorn_Jump_State* pInstance = new CBuffahorn_Jump_State();
+	return pInstance;
+}
+
+void CBuffahorn_Jump_State::Free()
 {
 	__super::Free();
 }

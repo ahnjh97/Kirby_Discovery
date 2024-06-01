@@ -246,6 +246,10 @@ void CBuffahorn::SetUp_FSM()
 	m_pFSM->Add_State(BUFFAHORN_BRAKE, CBuffahorn_Brake_State::Create());
 	m_pFSM->Add_State(BUFFAHORN_BRAKEEND, CBuffahorn_Brake_State::Create());
 
+	m_pFSM->Add_State(BUFFAHORN_RETURNJUMPSTART, CBuffahorn_Jump_State::Create());
+	m_pFSM->Add_State(BUFFAHORN_RETURNJUMP, CBuffahorn_Jump_State::Create());
+	m_pFSM->Add_State(BUFFAHORN_RETURNJUMPEND, CBuffahorn_Jump_State::Create());
+
 	//ป๓ลย Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};
 	FSM_Desc.iState = BUFFAHORN_CHARGEWAIT;

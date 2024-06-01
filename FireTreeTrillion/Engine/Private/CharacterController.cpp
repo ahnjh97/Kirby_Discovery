@@ -270,10 +270,10 @@ PxVec3 CCharacterController::Compute_Slope(CTransform* pTransform)
 /// </summary>
 /// <param name="pTransform"></param>
 /// <returns></returns>
-_float CCharacterController::Compute_Height()
+_float CCharacterController::Compute_Height(_fvector vAxis)
 {
 	PxExtendedVec3 position = m_pController->getPosition();
-	PxVec3 rayOrigin = PxVec3((_float)position.x, (_float)position.y, (_float)position.z);
+	PxVec3 rayOrigin = PxVec3((_float)position.x, (_float)position.y, (_float)position.z) + CUtils::To_PxVec3(XMVector3Normalize(vAxis));
 
 	PxVec3 rayDirection = PxVec3(0.f, -1.f, 0.f);
 	_float fMaxDistance = 10.f;
