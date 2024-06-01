@@ -22,7 +22,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-//
+#include "stdafx.h"
 #include "ImSequencer.h"
 #include "imgui.h"
 #include "imgui_internal.h"
@@ -201,8 +201,8 @@ namespace ImSequencer
                for (int i = 0; i < sequence->GetItemTypeCount(); i++)
                   if (ImGui::Selectable(sequence->GetItemTypeName(i)))
                   {
-                     sequence->Add(i);
-                     *selectedEntry = sequence->GetItemCount() - 1;
+                     //sequence->Add(i, );
+                     *selectedEntry = sequence->GetItemCount()/* - 1*/;
                   }
 
                ImGui::EndPopup();
@@ -274,9 +274,10 @@ namespace ImSequencer
          for (int i = 0; i < sequenceCount; i++)
          {
             int type;
-            sequence->Get(i, NULL, NULL, &type, NULL);
+            char* strName = nullptr;
+            sequence->Get(i, NULL, NULL, &strName, NULL);
             ImVec2 tpos(contentMin.x + 3, contentMin.y + i * ItemHeight + 2 + customHeight);
-            draw_list->AddText(tpos, 0xFFFFFFFF, sequence->GetItemLabel(i));
+            draw_list->AddText(tpos, 0xFFFFFFFF, sequence->GetItemLabel(i, strName));
 
             if (sequenceOptions & SEQUENCER_DEL)
             {
@@ -338,7 +339,8 @@ namespace ImSequencer
          {
             int* start, * end;
             unsigned int color;
-            sequence->Get(i, &start, &end, NULL, &color);
+            char* strName = nullptr;
+            sequence->Get(i, &start, &end, &strName, &color);
             size_t localCustomHeight = sequence->GetCustomHeight(i);
 
             ImVec2 pos = ImVec2(contentMin.x + legendWidth - firstFrameUsed * framePixelWidth, contentMin.y + ItemHeight * i + 1 + customHeight);
@@ -427,7 +429,8 @@ namespace ImSequencer
             if (std::abs(diffFrame) > 0)
             {
                int* start, * end;
-               sequence->Get(movingEntry, &start, &end, NULL, NULL);
+               char* strName = nullptr;
+               sequence->Get(movingEntry, &start, &end, &strName, NULL);
                if (selectedEntry)
                   *selectedEntry = movingEntry;
                int& l = *start;

@@ -5,6 +5,7 @@ BEGIN(Engine)
 class CImGUI_Manager final : public CBase
 {
 public:
+	enum STYLE { PINK, PURPLE, DARK, STYLE_END };
 	enum FILE_MODE { FILE_SAVE, FILE_LOAD, FILE_NONE };
 
 private:
@@ -24,6 +25,9 @@ public:
 	void RenderGrid();
 	void EditTransform(_float4x4& matrix);
 	CImGUI_Manager::FILE_MODE Set_FileDialog();
+
+	// for Style
+	void Set_IMGUIStyle(_uint uStyle);
 
 private:
 	ID3D11Device*			m_pDevice = { nullptr };

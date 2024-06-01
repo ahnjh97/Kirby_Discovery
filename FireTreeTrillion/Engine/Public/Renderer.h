@@ -17,6 +17,7 @@ public:
 		RENDER_NONLIGHT,
 		RENDER_BLOOM,
 		RENDER_BLEND,
+		RENDER_DEFERREDINFO,
 		RENDER_UI,
 		RENDER_SUPERUI,
 		RENDER_END
@@ -94,6 +95,8 @@ private:
 
 	HRESULT Render_Effect();
 	HRESULT Render_EffectResult();
+
+	HRESULT Render_DeferredInfo();
 
 	HRESULT Render_Result();
 	HRESULT Render_Radial_Result(_float fTimeDelta);

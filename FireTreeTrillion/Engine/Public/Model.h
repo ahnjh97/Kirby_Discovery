@@ -26,7 +26,15 @@ public:
 
 public:
 	void Set_TickPerSecond(_float _fTickPerSecond) { m_Animations[m_iCurrentAnimIndex]->Set_TickPerSecond(_fTickPerSecond); }
-
+	
+	void Set_Animation(_int iAnimIndex)
+	{
+		m_isLoop = true;
+		m_iCurrentAnimIndex = iAnimIndex;
+		m_Animations[m_iCurrentAnimIndex]->Reset_TrackPosition();
+		m_Animations[m_iCurrentAnimIndex]->Reset_Finished();
+		m_Animations[m_iCurrentAnimIndex]->Remove_Ratio();
+	}
 	void Set_Animation(_uint iAnimIndex, _float fTickPerSecond, _bool bIsLooping, _bool bInterpolation = false) {
 		m_iCurrentAnimIndex = iAnimIndex;	
 		m_isLoop = bIsLooping;
@@ -43,7 +51,8 @@ public:
 	}
 
 	const _char* Get_AnimationName() const { return m_Animations[m_iCurrentAnimIndex]->Get_AnimationName(); }
-
+	_uint Get_AnimCnt() const { return m_Animations.size(); }
+	vector<class CAnimation*>* const Get_Animations() { return &m_Animations; }
 public:
 	virtual HRESULT Initialize_Prototype(MODEL tModel);
 	virtual HRESULT Initialize(void* pArg)  override;
@@ -54,6 +63,8 @@ public:
 	HRESULT Bind_ShaderResource(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, _uint iTextureType);
 	
 	HRESULT Play_Animation(_float fTimeDelta);
+	void	Stop_Animation() { m_bStop = true; }
+	void	Replay_Animation() { m_bStop = false; }
 	HRESULT Render(_uint iMeshIndex);
 
 	HRESULT CreateDynamicActor(_float4 vPos);
@@ -72,9 +83,11 @@ private:
 
 	vector<class CBone*>		m_Bones;
 
+	// 애니메이션
 	_uint						m_iNumAnimations = { 0 };
 	_uint						m_iCurrentAnimIndex = { 0 };
 	_bool						m_isLoop = { false };
+	_bool						m_bStop = false;
 	vector<class CAnimation*>	m_Animations;
 
 	_float4x4					m_MeshBoneMatrices[512];

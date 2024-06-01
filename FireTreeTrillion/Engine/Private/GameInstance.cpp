@@ -717,6 +717,11 @@ _uint CGameInstance::Get_CollisionContent(COLLISION_TYPE eMeType, COLLISION_TYPE
 	return m_pPhysx->Get_CollisionContent(eMeType, eOtherType);
 }
 
+void CGameInstance::Ready_TestGround()
+{
+	m_pPhysx->Ready_TestGround();
+}
+
 #ifdef _DEBUG
 HRESULT CGameInstance::Ready_RTVDebug(const wstring & strRenderTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY)
 {
@@ -820,6 +825,12 @@ CImGUI_Manager::FILE_MODE CGameInstance::Set_FileDialog()
 {
 	CHECK_NULLPTR(m_pIMGUI_Manager);
 	return m_pIMGUI_Manager->Set_FileDialog();
+}
+
+void CGameInstance::Set_IMGUIStyle(_uint uStyle)
+{
+	CHECK_NULLPTR(m_pIMGUI_Manager);
+	m_pIMGUI_Manager->Set_IMGUIStyle(uStyle);
 }
 
 PxRigidDynamic* CGameInstance::CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)

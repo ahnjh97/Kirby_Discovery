@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Client_Defines.h"
-#include "GameObject.h"
+#include "PhysXObject.h"
 
 BEGIN(Engine)
 class CModel;
@@ -12,7 +12,7 @@ END
 
 BEGIN(Client)
 
-class CCharacter abstract : public CGameObject
+class CCharacter abstract : public CPhysXObject
 {
 protected:
 	CCharacter(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -64,6 +64,12 @@ protected:
 protected:
 	void			SetOn_Slope(_float fTimeDelta);
 	void			Lerp_UpVector(_fvector _vTargetUp, _float _maxAngle, _float fTimeDelta);
+	void			Compute_MotionBlur();
+	_float2			m_vPreScreenPos = { 0.f, 0.f };
+	_float4			m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
+
+	// 05.31) 현재 지면 경사보간, 모션블러계산, FSM Update가 포함되어있다.
+	void			Character_SystemTick(_float fTimeDelta);
 
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;

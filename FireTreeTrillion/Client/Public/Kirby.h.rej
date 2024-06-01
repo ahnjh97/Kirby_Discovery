@@ -1,0 +1,9 @@
+diff a/FireTreeTrillion/Client/Public/Kirby.h b/FireTreeTrillion/Client/Public/Kirby.h	(rejected hunks)
+@@ -95,6 +95,7 @@
+ 
+ 	_float4			Compute_TerrainPosition();
+ 
++
+ 	// ��Ÿ �������� ����
+ private:
+ 	// Ŀ���� �������� ���� ����ü
