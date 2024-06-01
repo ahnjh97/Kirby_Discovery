@@ -80,6 +80,24 @@ _vector CUtils::Make_RandomAngle_Vector(_float fDirAngle, _fvector vDir, _float 
 	return XMVector3Transform(vNormalDir, XMLoadFloat4x4(&rotationMatrix)) * Make_RandomFloat(fminlength, fmaxlength);
 }
 
+Quaternion CUtils::Make_Quat_FromMatrix(const _float4x4& _mat)
+{
+	Matrix curMat = _mat;
+	_float3 vScale, vPos;
+	Quaternion vRot;
+	curMat.Decompose(vScale, vRot, vScale);
+	return vRot;
+}
+
+Quaternion CUtils::Make_Quat_FromDir(const _float4& _dir)
+{
+	_float3 vStartDir{ 0.f, 0.f, 1.f };
+	_float3 vDestDir = _dir;
+	
+
+	return Quaternion::FromToRotation(vStartDir, vDestDir);
+}
+
 void CUtils::Set_State_Matrix(_Inout_ _float4x4& matrix, STATE eState, _fvector vState)
 {
 	_float4		vTemp;

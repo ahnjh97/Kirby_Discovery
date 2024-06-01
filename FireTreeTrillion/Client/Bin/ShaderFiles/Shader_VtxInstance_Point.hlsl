@@ -134,7 +134,7 @@ PS_OUT PS_MAIN_WHITE_FX(PS_IN In)
 
     float vBrightness = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord).r;
 	
-    if (vBrightness || false == In.bAlive)
+    if (vBrightness < .01f || false == In.bAlive)
         discard;
 	
     Out.vColor.rgb = g_vRColor * vBrightness;
