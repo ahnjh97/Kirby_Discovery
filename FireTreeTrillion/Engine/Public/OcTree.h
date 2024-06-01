@@ -18,7 +18,7 @@ public:
 		_float3 vxYZ, _float3 vxyZ, _float3 vxyz, _float3 vxYz, const vector<FACE>& _vecFaces);
 	HRESULT SetUp_Neighbors();
 	void Culling(class CGameInstance* pGameInstance, const _float3* pVerticesPos, _uint* pIndices, _uint* pNumIndices);
-	_bool IsOctantInFrustum(class CGameInstance* pGameInstance, const _float3* pVerticesPos);
+	_bool IsDrawable(class CGameInstance* pGameInstance, const _float3* pVerticesPos);
 
 private:
 	_float3				m_vCenter = {};
