@@ -4,6 +4,9 @@
 
 BEGIN(Client)
 
+/// <summary>
+/// 샘플 소스 입니다.
+/// </summary>
 class CToolHelper final : public CGameObject
 {
 private:

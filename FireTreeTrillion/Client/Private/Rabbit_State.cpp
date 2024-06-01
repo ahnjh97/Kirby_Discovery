@@ -339,14 +339,17 @@ void CRabbit_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 
-	pTransformCom->Look_At_Axis(-m_vKirbyLook);
-	pController->Move_Dir(pTransformCom, m_vKirbyLook * 0.15f, fTimeDelta);
+	if (pRabbit->Get_Vacuuming() == false)
+	{
+		pTransformCom->Look_At_Axis(-m_vKirbyLook);
+		pController->Move_Dir(pTransformCom, m_vKirbyLook * 0.15f, fTimeDelta);
 
-	m_fJumpVelocity -= GRAVITY * fTimeDelta * 2.5f;
-	pController->Jump(pTransformCom, m_fJumpVelocity, fTimeDelta);
+		m_fJumpVelocity -= GRAVITY * fTimeDelta * 2.5f;
+		pController->Jump(pTransformCom, m_fJumpVelocity, fTimeDelta);
 
-	if (true == pRabbit->IsAnimFinished() || pController->Is_Terrain())
-		pRabbit->Change_State(CRabbit::RABBIT_WAIT, 45.f, false, true);
+		if (true == pRabbit->IsAnimFinished() || pController->Is_Terrain())
+			pRabbit->Change_State(CRabbit::RABBIT_WAIT, 45.f, false, true);
+	}
 }
 
 void CRabbit_Damage_State::OnStateExit()

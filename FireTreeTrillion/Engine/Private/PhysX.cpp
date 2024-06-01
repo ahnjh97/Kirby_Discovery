@@ -93,6 +93,13 @@ void CPhysX::Tick(_float fTimeDelta)
     m_pScene->fetchResults(true);
 }
 
+/// physX에 영향을 받는 테스트용 Ground를 만들어줍니다.
+void CPhysX::Ready_TestGround()
+{
+    physx::PxRigidStatic* groundPlane = PxCreatePlane(*m_pPhysics, physx::PxPlane(0, 1, 0, 0), *m_pMaterial);
+    m_pScene->addActor(*groundPlane);
+}
+
 void CPhysX::Test()
 {
     // create simulation
@@ -152,14 +159,24 @@ void CPhysX::Register_Trigger(PxActor* pTriggerActor, _int iTriggerType, _int iT
     pEventCallBack->Register_Trigger(pTriggerActor, iTriggerType, iTriggerIndex);
 }
 
-void CPhysX::SetUp_TriggerFunc(_int iTriggerType, function<void(_int)> func)
+void CPhysX::Emplace_TriggerFunc(_int iTriggerType, function<void(_int)> func)
 {
     if (nullptr == m_pScene)
         return;
     CEventCallBack* pEventCallBack = dynamic_cast<CEventCallBack*>(m_pScene->getSimulationEventCallback());
     if (nullptr == pEventCallBack)
         return;
-    pEventCallBack->SetUp_TriggerFunc(iTriggerType, func);
+    pEventCallBack->Emplace_TriggerFunc(iTriggerType, func);
+}
+
+void CPhysX::Emplace_ExitFunc(_int iTriggerType, function<void(void)> exitFunc)
+{
+    if (nullptr == m_pScene)
+        return;
+    CEventCallBack* pEventCallBack = dynamic_cast<CEventCallBack*>(m_pScene->getSimulationEventCallback());
+    if (nullptr == pEventCallBack)
+        return;
+    pEventCallBack->Emplace_ExitFunc(iTriggerType, exitFunc);
 }
 
 void CPhysX::Clear_EventCallBack()

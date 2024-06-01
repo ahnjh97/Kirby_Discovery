@@ -81,7 +81,7 @@ HRESULT CRenderer::Initialize()
 
 	//function<void(_int)> ColorFunc = bind(&CRenderer::Set_ColorSet, this, placeholders::_1);
 
-	//m_pGameInstance->SetUp_TriggerFunc(1, ColorFunc);
+	//m_pGameInstance->Emplace_TriggerFunc(1, ColorFunc);
 
 
 #pragma region MRT_Sky
@@ -162,6 +162,16 @@ HRESULT CRenderer::Initialize()
 		return E_FAIL;
 #pragma endregion
 
+#pragma region MRT_DefferredInfo
+	/* For.Target_LightDepth */
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_DeferredInfo"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_DeferredInfo"), TEXT("Target_DeferredInfo"))))
+		return E_FAIL;
+#pragma endregion
+
+
 #pragma region MRT_NonLight
 	/* For.Target_RadialBlur */
 	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_NonLight"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
@@ -207,7 +217,6 @@ HRESULT CRenderer::Initialize()
 		return E_FAIL;
 #pragma endregion
 
-
 #pragma region MRT_MotionBlur
 	/* For.Target_RadialBlur */
 	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_DiffuseMotionBlur"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
@@ -215,7 +224,6 @@ HRESULT CRenderer::Initialize()
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_MotionBlur"), TEXT("Target_DiffuseMotionBlur"))))
 		return E_FAIL;
 #pragma endregion
-
 
 #pragma region MRT_ColorCorrrection
 	/* For.Target_ColorCorrrection (Final) */
@@ -347,10 +355,14 @@ HRESULT CRenderer::Initialize()
 	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_DiffuseMotionBlur"), 1100.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
 		return E_FAIL;
 
+	// DEFERRED INFO
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_DeferredInfo"), 900.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
+		return E_FAIL;
 
 #endif
 
-
+	function<void(_int)> TriggerFunc = bind(&CRenderer::Set_ColorSet_ByIndex, this, placeholders::_1);
+	m_pGameInstance->Emplace_TriggerFunc(1, TriggerFunc);
 	return S_OK;
 }
 
@@ -380,6 +392,11 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 	if (FAILED(Render_NonBlend()))
 		return E_FAIL;
 
+	// 디퍼드에 필요한 값을 따로 저장한다.
+	if (FAILED(Render_DeferredInfo()))
+		return E_FAIL;
+
+
 	// 빛 연산을 시작한다.
 	if (FAILED(Render_Lights()))
 		return E_FAIL;
@@ -391,6 +408,8 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 	// 이펙트 끼리 연산을 한다.
 	if (FAILED(Render_EffectResult()))
 		return E_FAIL;
+
+
 
 	//**** 모든 그리기가 완료되었다. ****//
 
@@ -450,10 +469,25 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 	// 고사양, 저사양 모드
 	if (m_pGameInstance->Get_DIKeyState(DIK_E, KEY_DOWN))
 		m_bLowPass = !m_bLowPass;
+	
+	//레벨 별 사양 처리
+	//int iCurrLevel = m_pGameInstance->Get_CurrentLevelID();
+	//if (3 == iCurrLevel) //LEVEL_GAMEPLAY
 
-#ifdef _MY_DEBUG
-	if (FAILED(Render_Debug()))
-		return E_FAIL;
+#ifdef _DEBUG
+
+	//렌더 타겟 뷰 ON/OFF
+	if (m_pGameInstance->Get_DIKeyState(DIK_F1, KEY_DOWN))
+		m_IsRenderRTV = !m_IsRenderRTV;
+
+	if (m_IsRenderRTV)
+	{
+		if (FAILED(Render_Debug()))
+			return E_FAIL;
+	}
+
+
+
 
 	Render_IMGUI();
 #endif
@@ -469,7 +503,7 @@ void CRenderer::Set_ColorSet(COLOR_DATA destColorData)
 	m_DestColorData = destColorData;
 }
 
-void CRenderer::Set_ColorSet(_int iSetIdx)
+void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 {
 	switch (iSetIdx)
 	{
@@ -801,6 +835,25 @@ HRESULT CRenderer::Render_EffectResult()
 	return S_OK;
 }
 
+HRESULT CRenderer::Render_DeferredInfo()
+{
+	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_DeferredInfo"))))
+		return E_FAIL;
+
+	for (auto& pRenderObject : m_RenderObjects[RENDER_DEFERREDINFO])
+	{
+		if (nullptr != pRenderObject)
+			pRenderObject->Render_DeferredInfo();
+		Safe_Release(pRenderObject);
+	}
+	m_RenderObjects[RENDER_DEFERREDINFO].clear();
+
+	if (FAILED(m_pGameInstance->End_MRT()))
+		return E_FAIL;
+
+	return S_OK;
+}
+
 HRESULT CRenderer::Render_Result()
 {
 	if (m_bLowPass == false)
@@ -854,6 +907,9 @@ HRESULT CRenderer::Render_Result()
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Sky"), "g_SkyTexture")))
 		return E_FAIL;
 
+	// 각종 디퍼드 자원
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_DeferredInfo"), "g_DeferredInfoTexture")))
+		return E_FAIL;
 
 
 	_float4x4		ViewMatrix, ProjMatrix;
@@ -1285,6 +1341,8 @@ HRESULT CRenderer::Render_Debug()
 	if (FAILED(m_pGameInstance->Draw_RTVDebug(TEXT("MRT_DOFBlur"), m_pShader, m_pVIBuffer)))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Draw_RTVDebug(TEXT("MRT_MotionBlur"), m_pShader, m_pVIBuffer)))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Draw_RTVDebug(TEXT("MRT_DeferredInfo"), m_pShader, m_pVIBuffer)))
 		return E_FAIL;
 
 	return S_OK;

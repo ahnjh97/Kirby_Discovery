@@ -1,17 +1,12 @@
 #include "stdafx.h"
-
-//#include "..\Public\Loader.h"
 #include "Loader.h"
 #include <process.h>
 #include <codecvt>
 #include <locale>
-
 #include "GameInstance.h"
-#include "Camera_Free.h"
-#include "TestModel.h"
-#include "TestTerrain.h"
 
 //맵툴
+#include "OrbitingCamera.h"
 #include "MapToolHelper.h"
 #include "MapToolObject.h"
 #include "BasicMap.h"
@@ -25,7 +20,7 @@
 
 #pragma region TOOL_UI
 
-#include "TestUI.h"
+#include "Editor_UI.h"
 #include "BackGround.h"
 
 #ifdef _DEBUG
@@ -36,12 +31,12 @@
 	#include "HUD.h"
 	#include "HUD_Kirby.h"
 	#pragma endregion
+//#include "TestUI.h"
+#include "Single_UI.h"
+#include "Multi_UI.h"
+#include "HUD.h"
 
 #pragma endregion
-
-#include "RigidBody.h"
-#include "CharacterController.h"
-
 
 //이펙트 툴
 #ifdef _DEBUG
@@ -51,11 +46,18 @@
 #include "Particle.h"
 #include "MultiEffect.h"
 
-//#include "Body_Player.h"
-//#include "Weapon.h"
-//#include "Player.h"
+//애님 툴
+#include "AnimToolHelper.h"
+#include "AnimToolObject.h"
+
+//클라이언트
+#include "Camera_Free.h"
+#include "TestModel.h"
+#include "TestTerrain.h"
 #include "Kirby.h"
 #include "Awoofy.h"
+#include "RigidBody.h"
+#include "CharacterController.h"
 #include "Rabbit.h"
 #include "Buffahorn.h"
 #include "BladeKnight.h"
@@ -164,11 +166,7 @@ HRESULT CLoader::Start()
 HRESULT CLoader::Loading_ObjectAll()
 {
 	m_strLoadingText = TEXT("객체의 원형를(을) 로딩 중 입니다.");
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BackGround"), CBackGround);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_Test"), CTestUI);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestMap"), CTestTerrain);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
+
 
 	//이펙트 툴 용
 #ifdef _DEBUG
@@ -182,41 +180,57 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SingleEffect"), CSingleEffect);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MultiEffect"), CMultiEffect);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Particle"), CParticle);
-
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SkySphere"), CSkySphere);
-
+	#pragma endregion
+	
 	// MapTool GameObject Prototypes
-
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Grid"), CGrid);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BasicMap"), CBasicMap);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Trigger"), CTrigger);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("OrbitingCamera"), COrbitingCamera);
+	#pragma endregion
 
+	#pragma region TOOL_UI
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Editor_UI"), CEditor_UI);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Single_UI"), CSingle_UI);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Multi_UI"), CMulti_UI);
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
+	#pragma endregion
+
+	#pragma region TOOL_ANIMATION
+	// AnimationTool GameObject Prototypes
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("AnimToolHelper"), CAnimToolHelper);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("AnimToolObject"), CAnimToolObject);
+	#pragma endregion
 #pragma region TOOL_UI
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_Kirby"), CHUD_Kirby);
 
 #pragma endregion
 
-	// For Kirby
+	#pragma region FOR CLIENT
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kirby"), CKirby);
-
-	// For Test
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Moon"), CMoon);
-
-	// For Monster
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Awoofy"), CAwoofy);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Rabbit"), CRabbit);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Buffahorn"), CBuffahorn);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BladeKnight"), CBladeKnight);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BladeKnightSword"), CBladeKnightSword);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BackGround"), CBackGround);
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_Test"), CTestUI);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestMap"), CTestTerrain);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Moon"), CMoon);
+	#pragma endregion
 
 	return S_OK;
 }
+
 //static 컴포넌트들을 로드한다.
 HRESULT CLoader::Loading_StaticComponentAll()
 {
 	HRESULT hr;
 	LEVEL eLevel = LEVEL_STATIC;
-	
 
 	// Static Model 한번에 생성.
 	hr = Add_Models(eLevel);
@@ -280,8 +294,9 @@ HRESULT CLoader::Loading_For_GamePlay()
 {
 	HRESULT hr = S_OK;
 	LEVEL eLevel = LEVEL_GAMEPLAY;
-	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
 
+	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
+	#pragma region 텍스쳐
 	if (FAILED(Add_Texture(eLevel, "Logo", "Logo/Logo.png")))
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Moon", "Moon.png")))
@@ -291,28 +306,33 @@ HRESULT CLoader::Loading_For_GamePlay()
 
 	// 커비 얼굴 텍스쳐 로드
 	Add_KirbyFaceTexture(eLevel);
-
+	#pragma endregion
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
+	#pragma region 모델
 	// 모아놓은 Model 한번에 생성.
 	hr = Add_Models(eLevel);
 	CHECK_FAILED(hr);
-
+	#pragma endregion
+	
 	m_strLoadingText = TEXT("물리 컴포넌트(을) 로딩 중 입니다.");
+	#pragma region 물리 컴포넌트
 	/* 리지드바디 */
 	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_RigidBody"), CRigidBody::Create(m_pDevice, m_pContext));
 	CHECK_FAILED(hr);
 	/* 캐릭터 컨트롤러 */
 	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_CharacterController"), CCharacterController::Create(m_pDevice, m_pContext));
 	CHECK_FAILED(hr);
-
+	#pragma endregion
+	
 	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
+	#pragma region 셰이더
 	// 모아놓은 Shaders 한번에 생성
 	hr = Add_Shaders(eLevel);
 	CHECK_FAILED(hr);
+	#pragma endregion
 
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
-
 	m_IsFinished = true;
 
 	return S_OK;
@@ -324,25 +344,32 @@ HRESULT CLoader::Loading_For_Tool_FX()
 	LEVEL eLevel = LEVEL_TOOL_FX;
 
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
+	#pragma region 텍스쳐
 	//if (FAILED(Add_Texture(eLevel, "Logo", "Logo/Logo.png")))
 	//	return E_FAIL;
+	#pragma endregion
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
+	#pragma region 모델
 	// 모아놓은 Model 한번에 생성.
 	//hr = Add_Models(eLevel);
 	//CHECK_FAILED(hr);
+	#pragma endregion
+
 	m_strLoadingText = TEXT("물리 컴포넌트(을) 로딩 중 입니다.");
-	// 리지드바디
+	#pragma region 물리 컴포넌트
 	//hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_RigidBody"), CRigidBody::Create(m_pDevice, m_pContext));
 	//CHECK_FAILED(hr);
+	#pragma endregion
 
 	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
+	#pragma region 셰이더
 	// 모아놓은 Shaders 한번에 생성
 	hr = Add_Shaders(eLevel);
 	CHECK_FAILED(hr);
+	#pragma endregion
 
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
-
 	m_IsFinished = true;
 
 	return S_OK;
@@ -354,25 +381,42 @@ HRESULT CLoader::Loading_For_Tool_Anim()
 	LEVEL eLevel = LEVEL_TOOL_ANIM;
 
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
+	#pragma region 텍스쳐
 	//if (FAILED(Add_Texture(eLevel, "Logo", "Logo/Logo.png")))
 	//	return E_FAIL;
+	Add_KirbyFaceTexture(eLevel);
+	#pragma endregion
+
+	m_strLoadingText = TEXT("VI버퍼(을) 로딩 중 입니다.");
+	#pragma region VI버퍼
+	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Grid"),
+		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, 5, 5));
+	CHECK_FAILED(hr);
+	#pragma endregion
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
-	// 모아놓은 Model 한번에 생성.
-	//hr = Add_Models(eLevel);
-	//CHECK_FAILED(hr);
+	#pragma region 모델
+	if (FAILED(Add_AllModelTxts(eLevel, TYPE_ANIM)))
+		return E_FAIL;
+	#pragma endregion
+
 	m_strLoadingText = TEXT("물리 컴포넌트(을) 로딩 중 입니다.");
-	// 리지드바디
-	//hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_RigidBody"), CRigidBody::Create(m_pDevice, m_pContext));
-	//CHECK_FAILED(hr);
+	#pragma region 물리 컴포넌트
+	/* 리지드바디 */
+	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_RigidBody"), CRigidBody::Create(m_pDevice, m_pContext));
+	CHECK_FAILED(hr);
+	/* 캐릭터 컨트롤러 */
+	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_CharacterController"), CCharacterController::Create(m_pDevice, m_pContext));
+	CHECK_FAILED(hr);
+	#pragma endregion
 
 	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
-	// 모아놓은 Shaders 한번에 생성
+	#pragma region 셰이더
 	hr = Add_Shaders(eLevel);
 	CHECK_FAILED(hr);
+	#pragma endregion
 
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
-
 	m_IsFinished = true;
 
 	return S_OK;
@@ -506,7 +550,18 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("TestMap2", TYPE_NONANIM, 0.01f);
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f);
 		m_vecModelInfo.emplace_back("Camera", TYPE_NONANIM, 0.2f , 270.f);
+		m_vecModelInfo.emplace_back("Dummy", TYPE_NONANIM, 0.01f);
 	}
+	else if (eLevel == LEVEL_TOOL_ANIM)
+	{
+		m_vecModelInfo.emplace_back(MODEL{ "Kirby", TYPE_ANIM });
+
+		// For Kirby Body
+		m_vecModelInfo.emplace_back(MODEL{ "KirbyBalloon", TYPE_ANIM, 1.f, 180.f });
+		m_vecModelInfo.emplace_back(MODEL{ "KirbyDefault", TYPE_ANIM, 1.f, 180.f });
+		m_vecModelInfo.emplace_back(MODEL{ "KirbyVacuum", TYPE_ANIM, 1.f, 180.f });
+	}
+
 }
 
 HRESULT CLoader::Add_Shaders(LEVEL eLevel)
@@ -630,7 +685,7 @@ HRESULT CLoader::Add_AllModelTxts(LEVEL eLevel, TYPE eType)
 		string strModelName = CUtils::WstrToStr(wstrModelName);
 		
 		_bool bFound = { false };
-		MODEL tModelInfo = MODEL{ strModelName ,  TYPE_NONANIM };
+		MODEL tModelInfo = MODEL{ strModelName ,  eType };
 		for (auto& modelInfo : m_vecModelInfo)
 		{
 			if (modelInfo.strModelName == strModelName)
@@ -663,7 +718,8 @@ void CLoader::TraverseModelTxts(const wstring& rootFolderPath, list<wstring>& fi
 		return;
 	}
 
-	do {
+	do 
+	{
 		if (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
 			if (wcscmp(findFileData.cFileName, L".") != 0 && wcscmp(findFileData.cFileName, L"..") != 0) {
 				// 재귀적으로 하위 폴더도 순회

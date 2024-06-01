@@ -17,6 +17,7 @@ public:
 		RENDER_NONLIGHT,
 		RENDER_BLOOM,
 		RENDER_BLEND,
+		RENDER_DEFERREDINFO,
 		RENDER_UI,
 		RENDER_SUPERUI,
 		RENDER_END
@@ -33,7 +34,7 @@ public:
 
 
 	void Set_ColorSet(COLOR_DATA destColorData);
-	void Set_ColorSet(_int iSetIdx);
+	void Set_ColorSet_ByIndex(_int iSetIdx);
 	void Save_ColorSet(string strTag, COLOR_DATA destColorData);
 	COLOR_DATA& Find_ColorSet(string strTag);
 
@@ -76,7 +77,8 @@ private:
 	_float								m_fShadowFar = { 0.f };
 
 	// Àú »ç¾ç ¸ðµå
-	_bool								m_bLowPass = { true };
+	_bool								m_bLowPass = { TRUE };
+	_bool								m_IsRenderRTV = { TRUE }; //·»´õ Å¸°Ù ºä ON/OFF
 
 
 
@@ -94,6 +96,8 @@ private:
 
 	HRESULT Render_Effect();
 	HRESULT Render_EffectResult();
+
+	HRESULT Render_DeferredInfo();
 
 	HRESULT Render_Result();
 	HRESULT Render_Radial_Result(_float fTimeDelta);

@@ -443,3 +443,93 @@ static _bool Is_BigTurn(CKirby::KIRBY_INFODESC* Kirbydesc)
 
 	return false;
 }
+
+static _bool Vacuum_Object(CKirby* pKirby, _float fTimeDelta)
+{
+	CTransform* pTransformCom = pKirby->Get_TransformCom();
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+	_float fDistance = 9.f;
+	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+
+	// 1차로 우선순위인 몬스터들 순회를 돈다.
+	if (nullptr != GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), g_strLayerMonster))
+	{
+
+		for (auto& pObject : *GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), g_strLayerMonster))
+		{
+			CTransform* pObjectTransform = pObject->Get_TransformCom();
+			_vector vObjectPos = pObjectTransform->Get_State_Vector(CTransform::STATE_POSITION);
+			_vector vObjectDir = vObjectPos - vPos;
+			_float fObjectDistance = XMVectorGetX(XMVector3Length(vObjectDir));
+
+			// 만약, 목표 오브젝트가 거리보다 멀었을 경우
+			if (fObjectDistance > fDistance)
+				continue;
+			// 만약, 목표 오브젝트가 거리보다 가까웠을 경우
+			else
+			{
+				_vector vLook = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+				// 내적 ( 30도 )
+				_float fDot = XMVectorGetX(XMVector3Dot(XMVector3Normalize(vObjectDir), vLook));
+				// 각도 계산 (도 단위)
+				_float fDegrees = XMConvertToDegrees(acosf(fDot));
+
+				// 각도가 30도 이상이면 스킵한다.
+				if (fDegrees > 60.f)
+					continue;
+
+				// 사이즈가 작을 경우
+				if (static_cast<CPhysXObject*>(pObject)->Get_VacuumSize() == SIZE_SMALL)
+				{
+					// 작은 흡입일때 진정코 흡수를 시작한다.
+					if (pKirby->Get_State() == CKirby::STATE_INHALE ||
+						pKirby->Get_State() == CKirby::STATE_INHALEFALL ||
+						pKirby->Get_State() == CKirby::STATE_INHALELANDING ||
+						pKirby->Get_State() == CKirby::STATE_INHALEWALK ||
+						pKirby->Get_State() == CKirby::STATE_SUPERINHALEWALK ||
+						pKirby->Get_State() == CKirby::STATE_SUPERINHALE ||
+						pKirby->Get_State() == CKirby::STATE_SUPERINHALESTART)
+					{
+						fDistance = fObjectDistance;
+						DESC(m_pObject) = static_cast<CPhysXObject*>(pObject);
+						DESC(m_vObjectScale) = pObjectTransform->Get_Scaled();
+						DESC(m_fObjectDistance) = fObjectDistance;
+					}
+				}
+				// 사이즈가 클 경우
+				else if (static_cast<CPhysXObject*>(pObject)->Get_VacuumSize() == SIZE_BIG)
+				{
+					// 작은 흡입일때 진정코 흡수를 시작한다.
+					if (pKirby->Get_State() == CKirby::STATE_SUPERINHALEWALK ||
+						pKirby->Get_State() == CKirby::STATE_SUPERINHALE ||
+						pKirby->Get_State() == CKirby::STATE_SUPERINHALESTART)
+					{
+						fDistance = fObjectDistance;
+						DESC(m_pObject) = static_cast<CPhysXObject*>(pObject);
+						DESC(m_vObjectScale) = pObjectTransform->Get_Scaled();
+						DESC(m_fObjectDistance) = fObjectDistance;
+					}
+				}
+			}
+		}
+	}
+
+	if (DESC(m_pObject) != nullptr)
+	{
+		// 참조하면서 애니메이션으로 끌고간다.
+		Safe_AddRef(DESC(m_pObject));
+		// 커비가 동일한 애니메이션으로 몬스터를 포착해서 꽤 긴 시간동안 서로 짝짝꿍하겠다는 것이다.
+		pKirby->Set_Vacuuming(true);
+		DESC(m_pObject)->Set_Vacuuming(true);
+
+		if (DESC(m_pObject)->Get_VacuumSize() == SIZE_SMALL)
+			pKirby->Change_State(CKirby::STATE_VACUUM, 50.f, true, true, CKirby::BODY_VACUUM);
+
+		else if (DESC(m_pObject)->Get_VacuumSize() == SIZE_BIG)
+			pKirby->Change_State(CKirby::STATE_VACUUMHUSTLELV2, 50.f, true, true, CKirby::BODY_VACUUM);
+
+		return true;
+	}
+
+	return false;
+}

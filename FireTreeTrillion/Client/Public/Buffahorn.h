@@ -46,10 +46,6 @@ private:
 	//CFSM*			m_pFSM = { nullptr };
 	BUFFAHORN_ANIM	m_eCurrentState = { BUFFAHORN_END };
 
-	void			Compute_MotionBlur();
-	_float2			m_vPreScreenPos = { 0.f, 0.f };
-	_float4			m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
-
 
 private:
 	HRESULT Add_Components();

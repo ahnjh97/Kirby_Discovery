@@ -47,6 +47,10 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 	if (nullptr == m_pLight_Manager)
 		return E_FAIL;
 
+	m_pPhysx = CPhysX::Create();
+	if (nullptr == m_pPhysx)
+		return E_FAIL;
+
 	/*m_pFont_Manager = CFont_Manager::Create(*ppGraphic_Device);
 	if (nullptr == m_pFont_Manager)
 		return E_FAIL;
@@ -61,10 +65,6 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 
 	m_pRenderer = CRenderer::Create(*ppDevice, *ppContext);
 	if (nullptr == m_pRenderer)
-		return E_FAIL;
-
-	m_pPhysx = CPhysX::Create();
-	if (nullptr == m_pPhysx)
 		return E_FAIL;
 
 	m_pLevel_Manager = CLevel_Manager::Create();
@@ -727,7 +727,12 @@ _uint CGameInstance::Get_CollisionContent(COLLISION_TYPE eMeType, COLLISION_TYPE
 	return m_pPhysx->Get_CollisionContent(eMeType, eOtherType);
 }
 
-#ifdef _MY_DEBUG
+void CGameInstance::Ready_TestGround()
+{
+	m_pPhysx->Ready_TestGround();
+}
+
+#ifdef _DEBUG
 HRESULT CGameInstance::Ready_RTVDebug(const wstring & strRenderTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY)
 {
 	if (m_pTarget_Manager == nullptr)
@@ -834,6 +839,12 @@ CImGUI_Manager::FILE_MODE CGameInstance::Set_FileDialog()
 }
 #endif
 
+void CGameInstance::Set_IMGUIStyle(_uint uStyle)
+{
+	CHECK_NULLPTR(m_pIMGUI_Manager);
+	m_pIMGUI_Manager->Set_IMGUIStyle(uStyle);
+}
+
 PxRigidDynamic* CGameInstance::CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)
 {
 	if (nullptr == m_pPhysx)
@@ -862,10 +873,16 @@ void CGameInstance::Register_Trigger(PxActor* pTriggerActor, _int iTriggerType, 
 		m_pPhysx->Register_Trigger(pTriggerActor, iTriggerType, iTriggerIndex);
 }
 
-void CGameInstance::SetUp_TriggerFunc(_int iTriggerType, function<void(_int)> func)
+void CGameInstance::Emplace_TriggerFunc(_int iTriggerType, function<void(_int)> func)
 {
 	if (nullptr != m_pPhysx)
-		m_pPhysx->SetUp_TriggerFunc(iTriggerType, func);
+		m_pPhysx->Emplace_TriggerFunc(iTriggerType, func);
+}
+
+void CGameInstance::Emplace_ExitFunc(_int iTriggerType, function<void(void)> exitFunc)
+{
+	if (nullptr != m_pPhysx)
+		m_pPhysx->Emplace_ExitFunc(iTriggerType, exitFunc);
 }
 
 void CGameInstance::Clear_EventCallBack()

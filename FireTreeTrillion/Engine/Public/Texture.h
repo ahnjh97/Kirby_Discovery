@@ -11,6 +11,13 @@ private:
 	CTexture(const CTexture& rhs);
 	virtual ~CTexture() = default;
 
+#pragma region Getter & Setter
+
+public:
+	_uint Get_NumTexture() { return m_iNumTextures; }
+
+#pragma endregion
+
 public:
 	virtual HRESULT Initialize_Prototype(const wstring& strTextureFilePath, _uint iNumTexture);
 	virtual HRESULT Initialize(void* pArg) override;

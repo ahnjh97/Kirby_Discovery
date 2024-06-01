@@ -142,9 +142,6 @@
     <Filter Include="90.Utils\IMGUI\Guizmo">
       <UniqueIdentifier>{0314758f-d952-4c6a-8f5c-649ee12d5abe}</UniqueIdentifier>
     </Filter>
-    <Filter Include="90.Utils\IMGUI\Sequencer">
-      <UniqueIdentifier>{701b6a64-e54a-4475-ad57-97e681826709}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Utility\02.Components\_Manager">
       <UniqueIdentifier>{9a25d0bd-b87d-44f6-bfce-fb32c1047b59}</UniqueIdentifier>
     </Filter>
@@ -347,9 +344,6 @@
     </ClCompile>
     <ClCompile Include="..\Public\ImGui\imgui_widgets.cpp">
       <Filter>90.Utils\IMGUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Public\ImGui\ImSequencer.cpp">
-      <Filter>90.Utils\IMGUI\Sequencer</Filter>
     </ClCompile>
     <ClCompile Include="..\Public\ImGui\ImGuizmo.cpp">
       <Filter>90.Utils\IMGUI\Guizmo</Filter>
@@ -577,9 +571,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\ImGui\ImZoomSlider.h">
       <Filter>90.Utils\IMGUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\ImGui\ImSequencer.h">
-      <Filter>90.Utils\IMGUI\Sequencer</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\ImGui\ImGuizmo.h">
       <Filter>90.Utils\IMGUI\Guizmo</Filter>

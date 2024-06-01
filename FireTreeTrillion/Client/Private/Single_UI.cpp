@@ -1,66 +1,67 @@
 #include "stdafx.h"
-#include "HUD_Kirby.h"
+#include "Single_UI.h"
 
-CHUD_Kirby::CHUD_Kirby(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext)
+CSingle_UI::CSingle_UI(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext)
 	: CUIObject{ _pDevice, _pContext }
 {
 }
 
-CHUD_Kirby::CHUD_Kirby(const CHUD_Kirby& _rhs)
+CSingle_UI::CSingle_UI(const CSingle_UI& _rhs)
     : CUIObject {_rhs}
 {
 }
 
-HRESULT CHUD_Kirby::Initialize_Prototype()
+HRESULT CSingle_UI::Initialize_Prototype()
 {
     return S_OK;
 }
 
-HRESULT CHUD_Kirby::Initialize(void* _pArg)
+HRESULT CSingle_UI::Initialize(void* _pArg)
 {
 	HRESULT hr = __super::Initialize(_pArg);
 	CHECK_FAILED(hr);
 
-	UIOBJ_DESC* HUD_KirbyDESC = { nullptr };
+	UIOBJ_DESC* SingleUI_Desc{};
 	if (nullptr != _pArg)
-		HUD_KirbyDESC = (UIOBJ_DESC*)_pArg;
+		SingleUI_Desc = (UIOBJ_DESC*)_pArg;
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	m_pTransformCom->Set_Scaled(HUD_KirbyDESC->vSize.x, HUD_KirbyDESC->vSize.y, 1.f);
+	m_pTransformCom->Set_Scaled(SingleUI_Desc->vSize.x, SingleUI_Desc->vSize.y, 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(
-						HUD_KirbyDESC->vCenter.x - HUD_KirbyDESC->vPos.x,
-						-HUD_KirbyDESC->vCenter.y + HUD_KirbyDESC->vPos.y, 0.f, 1.f));
-	m_pTransformCom->Rotation(XMVectorSet(0.f, 0.f, 1.f, 1.f), XMConvertToRadians(HUD_KirbyDESC->fRaito));
+								SingleUI_Desc->vPos.x - SingleUI_Desc->vCenter.x,
+								-SingleUI_Desc->vCenter.y + SingleUI_Desc->vPos.y, 0.f, 1.f));
+	m_pTransformCom->Rotation(XMVectorSet(0.f, 0.f, 1.f, 1.f), XMConvertToRadians(SingleUI_Desc->fDegree));
 
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 	
-	//m_UIObjDesc.wstrUITag = HUD_KirbyDESC->wstrUITag;
-	m_UIObjDesc = *HUD_KirbyDESC;
+	m_iTexIndex = SingleUI_Desc->iTexIndex;
+	m_UIObjDesc = *SingleUI_Desc;
+	m_eUIType = TYPE_SINGLE;
 
 #pragma endregion
 
 	return S_OK;
 }
 
-_int CHUD_Kirby::Tick(_float fTimeDelta)
+_int CSingle_UI::Tick(_float fTimeDelta)
 {	
 	__super::Tick(fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
 
-void CHUD_Kirby::Late_Tick(_float fTimeDelta)
+void CSingle_UI::Late_Tick(_float fTimeDelta)
 {
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_UI, this);
 }
 
-HRESULT CHUD_Kirby::Render()
+HRESULT CSingle_UI::Render()
 {
 	// PS_ALPHABLEND > PS_DEFAULT·Î º¯°æ
-	if (FAILED(Bind_ShaderResources(m_pShaderCom, PS_DEFAULT, m_pTransformCom, m_pTextureCom, 7)))
+	if (FAILED(Bind_ShaderResources(m_pShaderCom, PS_DEFAULT, m_pTransformCom, m_pTextureCom, m_iTexIndex)))
 		return E_FAIL;
 
 	return S_OK;
@@ -69,15 +70,17 @@ HRESULT CHUD_Kirby::Render()
 #ifdef _DEBUG
 void CHUD_Kirby::Render_IMGUI()
 {
+
 }
 #endif
 
-HRESULT CHUD_Kirby::Add_Components()
+HRESULT CSingle_UI::Add_Components()
 {
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex"),
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
+	//if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_KirbyBarHard"),
 	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_GameComplete"),
 		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
 		return E_FAIL;
@@ -89,7 +92,7 @@ HRESULT CHUD_Kirby::Add_Components()
 	return S_OK;
 }
 
-HRESULT CHUD_Kirby::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTransform* _pTransCom, CTexture* _pTextureCom, _uint _iTexIndex)
+HRESULT CSingle_UI::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTransform* _pTransCom, CTexture* _pTextureCom, _uint _iTexIndex)
 {
 	CHECK_NULLPTR(_pShaderCom);
 
@@ -121,7 +124,7 @@ HRESULT CHUD_Kirby::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex
 	return S_OK;
 }
 
-HRESULT CHUD_Kirby::Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom)
+HRESULT CSingle_UI::Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom)
 {
 	if (FAILED(_pVIBufferCom->Bind_Buffers()))
 		return E_FAIL;
@@ -132,33 +135,33 @@ HRESULT CHUD_Kirby::Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom)
 	return S_OK;
 }
 
-CHUD_Kirby* CHUD_Kirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CSingle_UI* CSingle_UI::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	CHUD_Kirby* pInstance = new CHUD_Kirby(pDevice, pContext);
+	CSingle_UI* pInstance = new CSingle_UI(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CHUD_Kirby"));
+		MSG_BOX(TEXT("Failed To Created : CSingle_UI"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CGameObject* CHUD_Kirby::Clone(void* pArg)
+CGameObject* CSingle_UI::Clone(void* pArg)
 {
-	CHUD_Kirby* pInstance = new CHUD_Kirby(*this);
+	CSingle_UI* pInstance = new CSingle_UI(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Clone : CHUD_Kirby"));
+		MSG_BOX(TEXT("Failed To Clone : CSingle_UI"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CHUD_Kirby::Free()
+void CSingle_UI::Free()
 {
 	__super::Free();
 

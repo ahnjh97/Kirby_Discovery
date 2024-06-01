@@ -36,8 +36,11 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 	m_pGameInstance->Add_Camera(this);
 
 	if (*m_pGameInstance->Get_CurrentLevelID() == LEVEL_GAMEPLAY) {
-		function<void(_int)> func = bind(&CCamera_Free::Set_MatrixIndex, this, placeholders::_1);
-		m_pGameInstance->SetUp_TriggerFunc(TRIGGER_CAMERA, func);
+		function<void(_int)> func = bind(&CCamera_Free::StartLerpByTriggerInfo, this, placeholders::_1);
+		m_pGameInstance->Emplace_TriggerFunc(TRIGGER_CAMERA, func);
+
+		function<void(void)> exitFunc = bind(&CCamera_Free::EndLerpByTriggerInfo, this);
+		m_pGameInstance->Emplace_ExitFunc(TRIGGER_CAMERA, exitFunc);
 	}
 
 	return S_OK;
@@ -45,9 +48,10 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 
 _int CCamera_Free::Tick(_float fTimeDelta)
 {
-
 	Control(fTimeDelta);
 	Orbit_Target(fTimeDelta);
+	if (true == m_bLerpByTriggerInfo)
+		LerpByTriggerInfo(m_iMatrixIndex);
 
 	/*
 	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_PRESS))
@@ -124,7 +128,9 @@ void CCamera_Free::Render_IMGUI()
 
 	ImGui::Checkbox(u8"타겟 따라가기", &m_bTrackTarget);
 
-
+	ImGui::Text("TriggerRatio: %.2f", m_fTriggerRatio);
+	ImGui::Text("SlerpedDir: %.2f, %.2f, %.2f", XMVectorGetX(m_vSlerpedDir), XMVectorGetY(m_vSlerpedDir), XMVectorGetZ(m_vSlerpedDir));
+	ImGui::Text("LerpedRadius: %.2f", m_fLerpedRadius);
 	//m_pTransformCom->Set_Speed(fSpeed);
 	/*
 	ImGui::SliderFloat("CameraFree Smooth Speed", &m_fSmoothSpeed, 0.f, 0.3f);
@@ -144,18 +150,76 @@ void CCamera_Free::Set_MatrixIndex(_int iMatrixIndex)
 	if (nullptr == m_pTransformCom || m_vecCamMatrices.empty())
 		return;
 
-	if (iMatrixIndex < 0 || iMatrixIndex == m_iMatrixIndex)
+	if (iMatrixIndex < 0 || iMatrixIndex == m_iMatrixIndex || iMatrixIndex >= m_vecCamMatrices.size())
 		return;
 
-	if (iMatrixIndex < m_vecCamMatrices.size()) {
-		m_pTransformCom->Set_WorldMatrix(m_vecCamMatrices[iMatrixIndex]);
-		m_iMatrixIndex = iMatrixIndex;
-	}	
+	m_pTransformCom->Set_WorldMatrix(m_vecCamMatrices[iMatrixIndex]);
+	m_iMatrixIndex = iMatrixIndex;
 }
 
-void CCamera_Free::EmplaceBackCamMatrix(const _float4x4& matWorld)
+void CCamera_Free::EmplaceBackDirRadius(_int iCamType, _fvector vDir, _float fRadius)
 {
-	m_vecCamMatrices.emplace_back(matWorld);
+	if (CAM_FRONT == iCamType)
+		m_vecFrontDirRadius.emplace_back(vDir, fRadius);
+	else if(CAM_REAR == iCamType)
+		m_vecRearDirRadius.emplace_back(vDir, fRadius);
+}
+
+void CCamera_Free::LerpByTriggerInfo(_int iTriggerIndex)
+{
+	if (nullptr == m_pTransformCom || m_vecFrontDirRadius.empty() || m_vecRearDirRadius.empty())
+		return;
+
+	if (m_iMatrixIndex < 0 || m_iMatrixIndex >= m_vecFrontDirRadius.size())
+		return;
+
+	m_fTriggerRatio = Compute_TriggerPosRatio(m_iMatrixIndex);
+	if (0 > m_fTriggerRatio || 1 < m_fTriggerRatio)
+		return;
+
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0));
+	if (nullptr == pKirby)
+		return;
+	CTransform* pKirbyTransform = static_cast<CTransform*>(pKirby->Get_Component(g_strTransformTag));
+	if (nullptr == pKirbyTransform)
+		return;
+	_vector pKirbyPos = pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION);
+
+	m_vSlerpedDir = SlerpDirVec(m_vecRearDirRadius[m_iMatrixIndex].first, m_vecFrontDirRadius[m_iMatrixIndex].first, m_fTriggerRatio);
+	m_fLerpedRadius = LerpRadius(m_vecRearDirRadius[m_iMatrixIndex].second, m_vecFrontDirRadius[m_iMatrixIndex].second, m_fTriggerRatio); 
+
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, pKirbyPos - m_vSlerpedDir * m_fLerpedRadius);
+	m_pTransformCom->Look_At(pKirbyPos);
+}
+		
+_float CCamera_Free::Compute_TriggerPosRatio(_int iTriggerIndex)
+{
+	if (m_vecTriggerInfo.empty())
+		return _float();
+
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0));
+	CTransform* pKirbyTransform = static_cast<CTransform*>(pKirby->Get_Component(g_strTransformTag));
+	_float fZ = XMVectorGetZ(XMVector4Transform(pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION)
+		, m_vecTriggerInfo[iTriggerIndex].first));
+
+	// rear : 0, middle : 0.5, front: 1
+	_float fRatio = 0.5f * fZ + 0.5f;
+	return fRatio;
+}
+
+_vector CCamera_Free::SlerpDirVec(_fvector vStart, _fvector vEnd, _float fRatio)
+{
+	_float fDot = ::XMVectorGetX(::XMVector3Dot(vStart, vEnd));
+	fDot = clamp(fDot, -1.f, 1.f);
+	_float fTheta = acosf(fDot) * fRatio;
+	_vector vRelative = ::XMVector3Normalize(vEnd - vStart * fRatio);
+
+	return XMVector3Normalize(vStart * cosf(fTheta) + vRelative * sinf(fTheta));
+}
+
+_float CCamera_Free::LerpRadius(_float fStart, _float fEnd, _float fRatio)
+{
+	return fStart + fRatio * (fEnd - fStart);
 }
 
 void CCamera_Free::Track_Target(_float fTimeDelta)
@@ -289,5 +353,4 @@ void CCamera_Free::Free()
 
 	__super::Free();
 
-	m_vecCamMatrices.clear();
 }

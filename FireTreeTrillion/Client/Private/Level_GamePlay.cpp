@@ -1,4 +1,7 @@
 #include "stdafx.h"
+#include "..\Public\Level_GamePlay.h"
+
+#include "Kirby.h"
 #include "Level_GamePlay.h"
 #include "Camera_Free.h"
 #include "Trigger.h"
@@ -55,7 +58,11 @@ HRESULT CLevel_GamePlay::Render()
 	if (FAILED(__super::Render()))
 		return E_FAIL;
 
-	SetWindowText(g_hWnd, TEXT("게임플레이레벨입니다."));
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject_ByTag(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby")));
+	_float4 vPos = pKirby->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION);
+	wstring wstrMsg = TEXT("게임플레이레벨입니다. 커비 위치 : ")
+		+ to_wstring(vPos.x) + TEXT(", ") + to_wstring(vPos.y) + TEXT(", ") + to_wstring(vPos.z);
+	SetWindowText(g_hWnd, wstrMsg.c_str());
 
 	return S_OK;
 }
@@ -161,7 +168,13 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 	_float4x4 matWorld{};
 	_int iTriggerType{};
 	_int iTriggerIndex{};
+	_int iCamType{};
+	_float fRadius{};
+	_float4x4 matInverse{};
 	map<_int, _float4x4> camMatrices;
+	map<_int, pair<_vector, _float>> frontDirRadii;
+	map<_int, pair<_vector, _float>> rearDirRadii;
+	map<_int, pair<_float4x4, _float>> triggerInfos;
 
 	while (!fileStream.eof())
 	{
@@ -171,13 +184,33 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 		fileStream.read(&strModelName[0], iStrLength);
 		fileStream.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
 
-		if ("Camera" == strModelName || "Trigger" == strModelName) {
-			if("Trigger" == strModelName)
-				fileStream.read(reinterpret_cast<char*>(&iTriggerType), sizeof(iTriggerType));
+		if ("Camera" == strModelName) 
+		{
 			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
-			if("Camera" == strModelName)
-				camMatrices.emplace(iTriggerIndex, matWorld);
+			camMatrices.emplace(iTriggerIndex, matWorld);
 		}
+		else if ("Trigger" == strModelName)
+		{
+			fileStream.read(reinterpret_cast<char*>(&iTriggerType), sizeof(iTriggerType));
+			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
+			_vector vDeterminant{};
+			matInverse = XMMatrixInverse(&vDeterminant, matWorld);
+			triggerInfos.emplace(iTriggerIndex, pair<_float4x4, _float>(matInverse, matWorld._33));
+		}
+		else if ("Dummy" == strModelName)
+		{
+			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
+			fileStream.read(reinterpret_cast<char*>(&iCamType), sizeof(iCamType));
+			fileStream.read(reinterpret_cast<char*>(&fRadius), sizeof(fRadius));
+
+			_vector vDir = XMVector3Normalize(XMVectorSet(matWorld._31, matWorld._32, matWorld._33, 0));
+
+			if(CAM_FRONT == iCamType)
+				frontDirRadii.emplace(iTriggerIndex, pair<_vector, _float>(vDir, fRadius));
+			else if(CAM_REAR == iCamType)
+				rearDirRadii.emplace(iTriggerIndex, pair<_vector, _float>(vDir, fRadius));
+		}
+
 		if (fileStream.eof())
 			break;
 
@@ -185,7 +218,7 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 		tempDesc.matWorld = matWorld;
 		tempDesc.wstrModelName = CUtils::StrToWstr(strModelName);
 
-		if (strModelName == "NonAnim_Kirby")
+		if ("NonAnim_Kirby" == strModelName)
 		{
 			tempDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby"), &tempDesc)))
@@ -220,7 +253,7 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_BasicMap"), &tempDesc)))
 				return E_FAIL;
 		}
-		else if (strModelName == "Trigger")
+		else if ("Trigger" == strModelName)
 		{
 			CTrigger::TRIGGER_DESC tTriggerDesc{};
 			tTriggerDesc.matWorld = matWorld;
@@ -244,6 +277,24 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 		pCamera->Set_MatrixIndex(0);
 	}
 	
+	if (!frontDirRadii.empty())
+	{
+		for (auto& pair : frontDirRadii)
+			pCamera->EmplaceBackDirRadius(CAM_FRONT, pair.second.first, pair.second.second);
+	}
+
+	if (!rearDirRadii.empty())
+	{
+		for (auto& pair : rearDirRadii)
+			pCamera->EmplaceBackDirRadius(CAM_REAR, pair.second.first, pair.second.second);
+	}
+
+	if (!triggerInfos.empty())
+	{
+		for (auto& pair : triggerInfos)
+			pCamera->EmplaceBackTriggerInfo(pair.second.first, pair.second.second);
+	}
+
 	return S_OK;
 }
 

@@ -71,6 +71,8 @@ float2 g_vDOFFocus;
 texture2D g_DiffuseMotionBlur;
 texture2D g_MotionBlur;
 
+texture2D g_DeferredInfoTexture;
+
 float4 g_vLightDir;
 float4 g_vLightPos;
 float g_fLightRange;
@@ -467,6 +469,29 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
 
     // 기존 디퓨즈와 가산되어 그려진다.
     Out.vColor += vEffect + vBlur;
+        
+    if (g_DeferredInfoTexture.Sample(LinearSampler, In.vTexcoord).g == 1.f && g_StencilTexture.Sample(LinearSampler, In.vTexcoord).r != 1.f)
+    {
+        int ShadowTotal = 0;
+        float2 vUV = (float2) 0;
+
+        for (int i = -6; i < 7; ++i)
+        {
+            for (int j = -6; j < 7; ++j)
+            {
+                float2 Offset = float2(j, i);
+                float2 TexOffset = Offset * float2(1.0f / g_fTexW * 0.8f, 1.0f / g_fTexH * 0.8f);
+                vUV = In.vTexcoord + TexOffset;
+                
+                if (g_DeferredInfoTexture.Sample(LinearSampler, vUV).g != 1.f)
+                    ShadowTotal++;
+            }
+        }      
+        
+        // 0 ~ 196번 최대   0번일수록 0.6   196번 일수록 1이여야 한다.
+        Out.vColor *= saturate(0.6f + (0.4f / 90.f * ShadowTotal));
+    }
+     
     
     return Out;
 }
@@ -624,8 +649,21 @@ PS_OUT PS_MAIN_MotionBlur(PS_IN In)
     PS_OUT Out = (PS_OUT) 0;
     
     float4 vMotionBlurSample = g_MotionBlur.Sample(LinearSampler, In.vTexcoord);
+    
+    if (length(vMotionBlurSample) < 0.01f)
+    {
+        Out.vColor = g_DiffuseMotionBlur.Sample(ClampSampler, In.vTexcoord);
+        return Out;
+    }
+    
     float2 vMyBlurDir = vMotionBlurSample.xy;
+    
+    
     float fMotionblurRaduis = 500.f;
+    
+    if (vMotionBlurSample.z == 1.f)
+        fMotionblurRaduis = 1000.f;
+    
     float2 vUV = (float2) 0;
 
     for (int i = -6; i < 7; ++i)

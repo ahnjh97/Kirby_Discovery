@@ -169,6 +169,8 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Public\AnimToolHelper.h" />
+    <ClInclude Include="..\Public\AnimToolObject.h" />
     <ClInclude Include="..\Public\Awoofy.h" />
     <ClInclude Include="..\Public\Awoofy_State.h" />
     <ClInclude Include="..\public\BackGround.h" />
@@ -190,6 +192,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\HUD.h" />
     <ClInclude Include="..\Public\HUD_Kirby.h" />
+    <ClInclude Include="..\Public\ImSequencer.h" />
+    <ClInclude Include="..\Public\Multi_UI.h" />
+    <ClInclude Include="..\Public\Single_UI.h" />
     <ClInclude Include="..\Public\Kirby.h" />
     <ClInclude Include="..\Public\KirbyBalloon_State.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -217,6 +222,7 @@
     </ClInclude>
     <ClInclude Include="..\Public\Moon.h" />
     <ClInclude Include="..\Public\MultiEffect.h" />
+    <ClInclude Include="..\Public\OrbitingCamera.h" />
     <ClInclude Include="..\Public\Particle.h" />
     <ClInclude Include="..\Public\PhysXObject.h" />
     <ClInclude Include="..\Public\Rabbit.h" />
@@ -229,9 +235,8 @@
     <ClInclude Include="..\Public\TestTerrain.h" />
     <ClInclude Include="..\Public\tinyxml2.h" />
     <ClInclude Include="..\Public\ToolHelper.h" />
-    <ClInclude Include="..\Public\TestUI.h" />
     <ClInclude Include="..\Public\Trigger.h" />
-    <ClInclude Include="..\Public\UI_Editor.h">
+    <ClInclude Include="..\Public\Editor_UI.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\public\WaddleDee.h" />
@@ -241,6 +246,8 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Private\AnimToolHelper.cpp" />
+    <ClCompile Include="..\Private\AnimToolObject.cpp" />
     <ClCompile Include="..\Private\Awoofy.cpp" />
     <ClCompile Include="..\Private\Awoofy_State.cpp" />
     <ClCompile Include="..\private\BackGround.cpp" />
@@ -261,6 +268,8 @@
     </ClCompile>
     <ClCompile Include="..\Private\HUD.cpp" />
     <ClCompile Include="..\Private\HUD_Kirby.cpp" />
+    <ClCompile Include="..\Private\Multi_UI.cpp" />
+    <ClCompile Include="..\Private\Single_UI.cpp" />
     <ClCompile Include="..\Private\Kirby.cpp" />
     <ClCompile Include="..\Private\KirbyBalloon_State.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -286,6 +295,7 @@
     </ClCompile>
     <ClCompile Include="..\Private\Moon.cpp" />
     <ClCompile Include="..\Private\MultiEffect.cpp" />
+    <ClCompile Include="..\Private\OrbitingCamera.cpp" />
     <ClCompile Include="..\Private\Particle.cpp" />
     <ClCompile Include="..\Private\PhysXObject.cpp" />
     <ClCompile Include="..\Private\Rabbit.cpp" />
@@ -298,12 +308,12 @@
     <ClCompile Include="..\Private\TestTerrain.cpp" />
     <ClCompile Include="..\Private\tinyxml2.cpp" />
     <ClCompile Include="..\Private\ToolHelper.cpp" />
-    <ClCompile Include="..\Private\TestUI.cpp" />
     <ClCompile Include="..\Private\Trigger.cpp" />
-    <ClCompile Include="..\Private\UI_Editor.cpp">
+    <ClCompile Include="..\Private\Editor_UI.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\private\WaddleDee.cpp" />
+    <ClCompile Include="..\Public\ImSequencer.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

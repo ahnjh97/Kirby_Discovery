@@ -29,11 +29,21 @@ HRESULT CMapToolObject::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
+	m_iTriggerIndex = GameObjectDesc.iTriggerIndex;
+	m_iTriggerType = GameObjectDesc.iTriggerType;
+	m_iCamType = GameObjectDesc.iCamType;
+	m_fRadius = GameObjectDesc.fRadius;
+
 	if (FAILED(Add_Components(GameObjectDesc.wstrModelName)))
 		return E_FAIL;
 	
-	m_iTriggerIndex = GameObjectDesc.iTriggerIndex;
-	m_iTriggerType = GameObjectDesc.iTriggerType;
+	if (GameObjectDesc.wstrModelName == TEXT("Dummy"))
+	{
+		if (FAILED(Add_PartObject()))
+			return E_FAIL;
+
+		m_pOrbitingCamera->Set_OrbitingCameraPos(XMVectorSet(0, 0, -m_fRadius, 0));
+	}
 
 	return S_OK;
 }
@@ -43,12 +53,21 @@ _int CMapToolObject::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return OBJ_DEAD;
 
+	if (nullptr != m_pOrbitingCamera) {
+		m_pOrbitingCamera->Set_Radius(m_fRadius);
+		m_pOrbitingCamera->Tick(fTimeDelta);
+	}
+		
 	return OBJ_NOEVENT;
 }
 
 void CMapToolObject::Late_Tick(_float fTimeDelta)
 {
-	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+	if (nullptr != m_pOrbitingCamera)
+		m_pOrbitingCamera->Late_Tick(fTimeDelta);
+
+	if(false == m_bHide)
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
 
 HRESULT CMapToolObject::Render()
@@ -108,6 +127,24 @@ HRESULT CMapToolObject::Bind_ShaderResources()
 		if (FAILED(m_pShaderCom->Bind_RawValue("g_iTriggerType", &m_iTriggerType, sizeof(_uint))))
 			return E_FAIL;
 	}
+
+	return S_OK;
+}
+
+HRESULT CMapToolObject::Add_PartObject()
+{
+	CPartObject* pOrbitingCamera = { nullptr };
+	CPartObject::PARTOBJECT_DESC tPartObjectDesc{};
+
+	tPartObjectDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	tPartObjectDesc.wstrModelName = TEXT("Camera");
+	tPartObjectDesc.matWorld._11 = 0.5f;
+	tPartObjectDesc.matWorld._22 = 0.5f;
+	tPartObjectDesc.matWorld._33 = 0.5f;
+	tPartObjectDesc.matWorld._43 = -2;
+	
+	m_pOrbitingCamera = dynamic_cast<COrbitingCamera*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_OrbitingCamera"), &tPartObjectDesc));
+
 	return S_OK;
 }
 
@@ -143,6 +180,7 @@ void CMapToolObject::Free()
 {
 	__super::Free();
 
+	Safe_Release(m_pOrbitingCamera);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModelCom);
 }

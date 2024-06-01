@@ -147,6 +147,18 @@ HRESULT CGameObject::Add_Component(const wstring& strPrototypeTag, const wstring
 	return S_OK;
 }
 
+void CGameObject::Delete_Component(const wstring& strPrototypeTag, const wstring& strComponentTag, CComponent** ppOut)
+{
+	auto	iter = m_Components.find(strComponentTag);
+	if (iter == m_Components.end())
+		ALARM_FAIL("없는 컴포넌트를 찾으려고 했습니다.");
+	else
+	{
+		Safe_Release(iter->second);
+		m_Components.erase(iter);
+	}
+}
+
 // fViewZ와 ViewPos를 업데이트 한다.
 HRESULT CGameObject::Compute_ViewZ()
 {

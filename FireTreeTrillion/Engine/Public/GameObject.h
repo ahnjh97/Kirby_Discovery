@@ -26,12 +26,19 @@ public:
 	_bool				Get_Dead() { return m_bDead; }
 	void				Set_Dead() { m_bDead = true; }
 
+	_bool				Get_Hide() { return m_bHide; }
+	virtual void		Set_Hide(_bool bHide) { m_bHide = bHide; }
+
 	COLLISION_TYPE		Get_CollisionGroup() const { return m_eCollisionGroup; }
 
 	// prototypeTag
 	const wstring&		Get_PrototypeTag() const { return m_wstrPrototypeTag; }
 	void				Set_PrototypeTag(wstring _wstrProtoTag) { m_wstrPrototypeTag = _wstrProtoTag; }
 
+	//FOR ANIM TOOL
+	class CModel**		Get_ModelAddress()   { return m_ppModelForAnimTool; }
+	_uint				Get_ModelCnt() const { return m_uModelCnt; }
+	
 public:
 	virtual HRESULT		Initialize_Prototype();
 	virtual HRESULT		Initialize(void* pArg);
@@ -43,6 +50,7 @@ public:
 #ifdef _DEBUG
 	virtual void		Render_IMGUI();
 #endif
+	virtual HRESULT		Render_DeferredInfo() { return S_OK; }
 	
 	// 충돌처리 함수
 	virtual void		Collision_Attack(CGameObject* pGameObject);
@@ -50,6 +58,7 @@ public:
 protected:
 	HRESULT				Add_Component(_uint iLevelIndex, const wstring& strPrototypeTag, const wstring& strComponentTag, class CComponent** ppOut, void* pArg = nullptr);
 	HRESULT				Add_Component(const wstring& strPrototypeTag, const wstring& strComponentTag, class CComponent** ppOut, void* pArg = nullptr);
+	void				Delete_Component(const wstring& strPrototypeTag, const wstring& strComponentTag, class CComponent** ppOut);
 	HRESULT				Compute_ViewZ();
 
 protected:
@@ -72,6 +81,12 @@ protected:
 	
 	_float									m_fViewZ = { 0.f };
 	_float3									m_vViewPos = _float3{ 0.f, 0.f, 0.f };
+
+	// 애니메이션 툴을 위한 것입니다. 아무도 건드리지 마십시오. 정기적으로 검사하무니다. (JYWI)
+	class CModel**							m_ppModelForAnimTool = nullptr;
+	_uint									m_uModelCnt = 1;
+
+	_bool									m_bHide = { false };
 
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;

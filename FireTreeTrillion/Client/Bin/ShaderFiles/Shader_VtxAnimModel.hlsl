@@ -83,8 +83,8 @@ struct PS_IN
 	float4		vWorldPos : TEXCOORD1;
 	float4		vProjPos : TEXCOORD2;
     
-    float3 vTangent : TANGENT;
-    float3 vBinormal : BINORMAL;
+    float3      vTangent : TANGENT;
+    float3      vBinormal : BINORMAL;
 };
 
 struct PS_OUT
@@ -228,6 +228,19 @@ PS_OUT_LIGHTDEPTH PS_MAIN_LIGHTDEPTH(PS_IN In)
 	return Out;	
 }
 
+PS_OUT_LIGHTDEPTH PS_MAIN_DEFERREDINFO(PS_IN In)
+{
+    PS_OUT_LIGHTDEPTH Out = (PS_OUT_LIGHTDEPTH) 0;
+    
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord);
+    if (vMtrlDiffuse.a == 0.f)
+        discard;
+
+    Out.vLightDepth = float4(0.f, 1.f, 0.f, 1.f);
+    return Out;
+}
+
+
 PS_OUT_EFFECT PS_MAIN_BLUR(PS_IN In)
 {
     PS_OUT_EFFECT Out = (PS_OUT_EFFECT) 0;
@@ -352,6 +365,19 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_NONBLUR();
     }
 
+    // 디퍼드 인포 7
+    pass DeferredInfo_Depth
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_DEFERREDINFO();
+    }
 
 
 }

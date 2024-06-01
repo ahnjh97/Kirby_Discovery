@@ -57,6 +57,9 @@ public:
 
 		// Vacuum
 		_float			m_fVacuumTime = { 0.f };
+		CPhysXObject*	m_pObject = { nullptr };
+		_float3			m_vObjectScale = { 0.f, 0.f, 0.f };
+		_float			m_fObjectDistance = { 0.f };
 
 		// 방향 키 컨트롤러를 만지고 있는가?
 		_bool			m_isController = { false };
@@ -82,6 +85,7 @@ public:
 #ifdef _DEBUG
 	virtual void	Render_IMGUI() override;
 #endif
+	virtual HRESULT	Render_DeferredInfo() override;
 	virtual void	Collision_Attack(CGameObject* pOtherObj) override;
 
 	KIRBY_INFODESC* Get_KirbyInfo() { return &m_tKirbyInfo; }
@@ -92,6 +96,8 @@ public:
 	_uint			Get_State();
 	void			Change_State(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, BODYSTATE eBody);
 	void			Set_Animation(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
+	void			Set_Animation(_int iAnimIndex);
+
 	_bool			isAnimFinish();
 	void			DefaultIdle();
 
@@ -105,10 +111,7 @@ private:
 	void			Key_Input(_float fTimeDelta);
 	void			Kirby_SystemTick(_float fTimeDelta);
 
-	// 모션블러 재료
-	void			Compute_MotionBlur();
-	_float2			m_vPreScreenPos = { 0.f, 0.f };
-	_float4			m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
+	_float3			Make_RepulsiveDir(CPhysXObject* pObject);
 
 private:
 	HRESULT			Add_Components();
