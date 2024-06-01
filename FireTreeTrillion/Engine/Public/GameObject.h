@@ -46,7 +46,10 @@ public:
 	virtual void		Late_Tick(_float fTimeDelta);
 	virtual HRESULT		Render();
 	virtual HRESULT		Render_LightDepth() { return S_OK; }
+
+#ifdef _DEBUG
 	virtual void		Render_IMGUI();
+#endif
 	virtual HRESULT		Render_DeferredInfo() { return S_OK; }
 	
 	// 충돌처리 함수

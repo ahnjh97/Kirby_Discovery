@@ -486,6 +486,9 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 			return E_FAIL;
 	}
 
+
+
+
 	Render_IMGUI();
 #endif
 
@@ -1144,6 +1147,8 @@ HRESULT CRenderer::Render_SuperUI()
 	return S_OK;
 }
 
+#ifdef _DEBUG
+
 void CRenderer::Render_IMGUI()
 {
 
@@ -1211,6 +1216,8 @@ void CRenderer::Render_IMGUI()
 	ImGui::End();
 
 }
+
+#endif
 
 void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 {

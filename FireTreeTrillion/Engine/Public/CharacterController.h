@@ -37,7 +37,9 @@ public:
 public:
 	virtual HRESULT Initialize(void* pArg)	override;
 	virtual void	Start_Tick()			override;
+#ifdef _DEBUG
 	virtual void	Render_IMGUI()			override;
+#endif
 
 public:
 	// 이동에 대한 함수

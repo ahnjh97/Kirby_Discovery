@@ -116,6 +116,7 @@ HRESULT CBasicMap::Render()
     return S_OK;
 }
 
+#ifdef _DEBUG
 void CBasicMap::Render_IMGUI()
 {
     HRESULT hr;
@@ -133,6 +134,7 @@ void CBasicMap::Render_IMGUI()
     }
 
 }
+#endif
 
 HRESULT CBasicMap::Add_Components(const wstring& _wstrModelTag)
 {

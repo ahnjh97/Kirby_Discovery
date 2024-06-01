@@ -50,11 +50,13 @@ HRESULT CMonster::Render_LightDepth()
 	return S_OK;
 }
 
+#ifdef _DEBUG
 void CMonster::Render_IMGUI()
 {
 	__super::Render_IMGUI();
 
 }
+#endif
 
 void CMonster::Free()
 {

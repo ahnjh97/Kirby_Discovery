@@ -72,10 +72,12 @@ HRESULT CTestTerrain::Render()
     return S_OK;
 }
 
+#ifdef _DEBUG
 void CTestTerrain::Render_IMGUI()
 {
     __super::Render_IMGUI();
 }
+#endif
 
 HRESULT CTestTerrain::Add_Components()
 {

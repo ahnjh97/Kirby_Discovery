@@ -66,7 +66,7 @@ void CRabbit_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 				else
 					pRabbit->Compute_Parabola(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
 
-				pRabbit->Change_State(CRabbit::RABBIT_JUMPSTART, 100.f, false, false);
+				pRabbit->Change_State(CRabbit::RABBIT_JUMPSTART, 100.f, false, true);
 			}
 		}
 	}
@@ -159,7 +159,7 @@ void CRabbit_Find_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	{
 		pRabbit->Set_TimeDelta(0.f);
 		pRabbit->Compute_Parabola(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
-		pRabbit->Change_State(CRabbit::RABBIT_JUMPSTART, 100.f, false, false);
+		pRabbit->Change_State(CRabbit::RABBIT_JUMPSTART, 100.f, false, true);
 	}
 }
 
@@ -242,7 +242,12 @@ void CRabbit_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	if(CRabbit::RABBIT_JUMPFALL == pRabbit->Get_State())
 	{
 		if (!bJump)
+		{
+			// 切政 開馬
+			pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
+
 			pRabbit->Change_State(CRabbit::RABBIT_JUMPLANDING, 45.f, false, true);
+		}
 	}
 }
 
@@ -282,6 +287,9 @@ void CRabbit_JumpLanding_State::OnStateUpdate(CGameObject* pGameObject, _float f
 	CRabbit* pRabbit = static_cast<CRabbit*>(pGameObject);
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+
+	// 切政 開馬
+	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
 
 	if (pRabbit->IsAnimFinished())
 		pRabbit->Change_State(CRabbit::RABBIT_WAIT, 100.f, false, true);

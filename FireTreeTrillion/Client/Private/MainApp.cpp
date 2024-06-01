@@ -97,6 +97,10 @@ HRESULT CMainApp::Render(_float fTimeDelta)
 	if (m_pGameInstance->Get_DIKeyState(DIK_F1, KEY_DOWN))
 		m_IsRenderRTV = !m_IsRenderRTV;
 
+
+	// RTV_FONT Ãß°¡
+#pragma region GAME_OBJ
+
 	if (m_IsRenderRTV)
 		Render_RTVFonts();
 

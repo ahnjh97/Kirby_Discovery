@@ -54,6 +54,8 @@ void CRigidBody::Update_PhysX(CTransform* pTransform)
 	}
 }
 
+#ifdef _DEBUG
+
 void CRigidBody::Render_IMGUI()
 {
 	__super::Render_IMGUI();
@@ -74,6 +76,8 @@ void CRigidBody::Render_IMGUI()
 	}
 	ImGui::Unindent(20.f);
 }
+
+#endif
 
 void CRigidBody::Create_Actor()
 {

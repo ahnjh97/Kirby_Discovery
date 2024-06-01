@@ -67,11 +67,6 @@ HRESULT CSingle_UI::Render()
 	return S_OK;
 }
 
-void CSingle_UI::Render_IMGUI()
-{
-
-}
-
 HRESULT CSingle_UI::Add_Components()
 {
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex"),

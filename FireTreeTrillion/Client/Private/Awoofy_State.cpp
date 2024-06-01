@@ -86,63 +86,6 @@ void CAwoofy_Run_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float 
 
 void CAwoofy_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
-#pragma region dd
-	//CAwoofy* pAwoofy = static_cast<CAwoofy*>(pGameObject);
-	//CTransform* pTransformCom = pGameObject->Get_TransformCom();
-	//CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
-
-	//CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
-	//CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
-
-	//m_fTimeDelta += fTimeDelta;
-
-	//// n초 동안 돌진
-	//if(3.f > m_fTimeDelta)
-	//{
-	//	// 플레이어와 몬스터사이의 각도 계산
-	//	_vector vLook = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
-	//	vLook.m128_f32[1] = 0.f;
-	//	_vector vTargetLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-	//	vTargetLook.m128_f32[1] = 0.f;
-
-	//	_float fAngle = acos(XMVectorGetX(XMVector3Dot(XMVector3Normalize(vLook), XMVector3Normalize(vTargetLook))));
-
-	//	// n초 동안 일정 각도 이하만큼만 플레이어를 향해 회전
-	//	if (1.f > m_fTimeDelta)
-	//	{
-	//		_float fcosTheta = XMVectorGetX(XMVector4Dot(vLook, vTargetLook));
-
-	//		if (6.f > XMConvertToDegrees(fAngle))
-	//		{
-
-	//			m_vAxisY = XMVector3Cross(XMVector3Normalize(vLook), XMVector3Normalize(vTargetLook));
-
-	//			m_fAngle = fAngle;
-
-	//			pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 2.f);
-	//			pController->Move_Dir(pTransformCom, pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 0.1f, fTimeDelta);
-	//		}
-	//		else
-	//		{
-	//			pTransformCom->Look_At_Angle(vLook, m_vAxisY, m_fAngle * 0.1f);
-	//			pController->Move_Dir(pTransformCom, pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 0.1f, fTimeDelta);
-	//		}
-	//	}
-	//	// 일정 시간이 지나면 고정된 각도로 회전
-	//	else
-	//	{
-	//		pTransformCom->Look_At_Angle(vLook, m_vAxisY, m_fAngle * 0.1f);
-	//		pController->Move_Dir(pTransformCom, pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 0.1f, fTimeDelta);
-	//	}
-	//}
-	//else
-	//{
-	//	m_fTimeDelta = 0.f;
-	//	pAwoofy->Change_State(CAwoofy::AWOOFY_BRAKE, 40.f, false, true);
-	//}
-
-	//pController->FreeFall(pTransformCom, fTimeDelta, 0.5f);
-#pragma endregion
 	CAwoofy* pAwoofy = static_cast<CAwoofy*>(pGameObject);
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));

@@ -53,8 +53,10 @@ private:
 	class CGameObject*		Find_Prototype(const wstring& strPrototypeTag);
 	class CLayer*			Find_Layer(_uint iLevelIndex, const wstring& strLayerTag);
 
+#ifdef _DEBUG
 	// IMGUI TICK นื RENDER
 	void					IMGUI_Tick();
+#endif
 
 public:
 	static CObject_Manager* Create(_uint iNumLevels);

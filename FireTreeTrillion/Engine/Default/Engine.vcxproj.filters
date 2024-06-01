@@ -261,9 +261,6 @@
     <ClCompile Include="..\Private\Input_Device.cpp">
       <Filter>00.Device\Input</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\Model.cpp">
-      <Filter>01.Utility\02.Components\Model</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\Mesh.cpp">
       <Filter>01.Utility\02.Components\Model\Mesh</Filter>
     </ClCompile>
@@ -393,6 +390,9 @@
     <ClCompile Include="..\Private\EventCallBack.cpp">
       <Filter>02.PhysX</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Model.cpp">
+      <Filter>01.Utility\02.Components\Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Base.h">
@@ -472,9 +472,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\Input_Device.h">
       <Filter>00.Device\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\Model.h">
-      <Filter>01.Utility\02.Components\Model</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Mesh.h">
       <Filter>01.Utility\02.Components\Model\Mesh</Filter>
@@ -622,6 +619,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\EventCallBack.h">
       <Filter>02.PhysX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Model.h">
+      <Filter>01.Utility\02.Components\Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -108,9 +108,9 @@ private:
 
 	HRESULT Render_UI();
 	HRESULT Render_SuperUI();
-
+#ifdef _DEBUG
 	void Render_IMGUI();
-
+#endif
 	void Interpolate_ColorData(_float _fTimeDelta);
 
 private:

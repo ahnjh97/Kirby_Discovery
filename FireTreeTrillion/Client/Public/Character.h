@@ -26,7 +26,9 @@ public:
 	virtual void	Late_Tick(_float fTimeDelta)	override;
 	virtual HRESULT Render()						override;
 	virtual HRESULT Render_LightDepth()				override;
+#ifdef _DEBUG
 	virtual void	Render_IMGUI()					override;
+#endif
 
 	void	Plus_Hp(_float fHp) {
 		m_fHp += fHp;

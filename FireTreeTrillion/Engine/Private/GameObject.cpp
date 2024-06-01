@@ -84,6 +84,7 @@ HRESULT CGameObject::Render()
 	return S_OK;
 }
 
+#ifdef _DEBUG
 void CGameObject::Render_IMGUI()
 {
 	string strTag = CUtils::WstrToStr(m_wstrPrototypeTag);
@@ -100,6 +101,7 @@ void CGameObject::Render_IMGUI()
 	}
 	ImGui::EndChild();
 }
+#endif
 
 void CGameObject::Collision_Attack(CGameObject* pGameObject)
 {

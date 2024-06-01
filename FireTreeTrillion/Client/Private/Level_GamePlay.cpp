@@ -50,7 +50,7 @@ HRESULT CLevel_GamePlay::Initialize()
 void CLevel_GamePlay::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
-
+	m_fAccDelta += fTimeDelta;
 }
 
 HRESULT CLevel_GamePlay::Render()
@@ -58,11 +58,25 @@ HRESULT CLevel_GamePlay::Render()
 	if (FAILED(__super::Render()))
 		return E_FAIL;
 
-	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject_ByTag(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby")));
-	_float4 vPos = pKirby->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION);
-	wstring wstrMsg = TEXT("게임플레이레벨입니다. 커비 위치 : ")
-		+ to_wstring(vPos.x) + TEXT(", ") + to_wstring(vPos.y) + TEXT(", ") + to_wstring(vPos.z);
-	SetWindowText(g_hWnd, wstrMsg.c_str());
+	//CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject_ByTag(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby")));
+	//_float4 vPos = pKirby->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION);
+	//wstring wstrMsg = TEXT("게임플레이레벨입니다. 커비 위치 : ")
+	//	+ to_wstring(vPos.x) + TEXT(", ") + to_wstring(vPos.y) + TEXT(", ") + to_wstring(vPos.z);
+	//SetWindowText(g_hWnd, wstrMsg.c_str());
+
+	//윈도우 바 FPS 체크
+	++m_iFPS;
+
+	_tchar szFPS[MAX_PATH] = TEXT("");
+	wsprintf(szFPS, TEXT("Level GamePlay, %d FPS"), m_iFPS);
+
+	if (m_fAccDelta >= 1.f)
+	{
+		SetWindowText(g_hWnd, szFPS);
+		m_fAccDelta = 0.f;
+		m_iFPS = 0;
+	}
+
 
 	return S_OK;
 }
@@ -129,9 +143,9 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const wstring & strLayerTag)
 
 HRESULT CLevel_GamePlay::Ready_Layer_Monster(const wstring & strLayerTag)
 {
-	// Awoofy
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Awoofy"))))
-		return E_FAIL;
+	//// Awoofy
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Awoofy"))))
+	//	return E_FAIL;
 
 	//// Rabbit
 	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Rabbit"))))
@@ -224,7 +238,31 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby"), &tempDesc)))
 				return E_FAIL;
 		}
-		else if ("Level1Stage1Step01"  == strModelName || "Level1Stage1Step01_Blend" == strModelName)
+		else if (strModelName == "NonAnim_Awoofy")
+		{
+			tempDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Awoofy"), &tempDesc)))
+				return E_FAIL;
+		}
+		else if (strModelName == "NonAnim_Rabbit")
+		{
+			tempDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Rabbit"), &tempDesc)))
+				return E_FAIL;
+		}
+		else if (strModelName == "NonAnim_Buffahorn")
+		{
+			tempDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Buffahorn"), &tempDesc)))
+				return E_FAIL;
+		}
+		else if (strModelName == "NonAnim_BladeKnight")
+		{
+			tempDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BladeKnight"), &tempDesc)))
+				return E_FAIL;
+		}
+		else if (strModelName == "Level1Stage1Step01" || strModelName == "Level1Stage1Step01_Blend")
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_BasicMap"), &tempDesc)))
 				return E_FAIL;

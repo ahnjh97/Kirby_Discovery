@@ -82,7 +82,9 @@ public:
 	virtual void	Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 	virtual HRESULT Render_LightDepth() override;
+#ifdef _DEBUG
 	virtual void	Render_IMGUI() override;
+#endif
 	virtual HRESULT	Render_DeferredInfo() override;
 	virtual void	Collision_Attack(CGameObject* pOtherObj) override;
 

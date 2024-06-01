@@ -7,11 +7,13 @@ class CEffect;
 END
 
 BEGIN(Client)
+#ifdef _DEBUG
 using namespace ImGui;
+#endif
 
 class CFXToolDirector final :  public CGameObject
 {
-#ifdef _DEBUG
+#ifdef _MY_DEBUG
 	friend class CMultiEffect;
 #endif
 
@@ -46,7 +48,9 @@ public:
 	virtual _int Tick(_float _fTimeDelta) override;
 	virtual void Late_Tick(_float _fTimeDelta) override;
 	virtual HRESULT Render() override;
+#ifdef _DEBUG
 	virtual void	Render_IMGUI() override;
+#endif
 
 private:
 
@@ -183,6 +187,7 @@ private:
 	HRESULT Add_Components();
 
 
+#ifdef _DEBUG
 	inline void SetupImGuiStyle(bool bStyleDark_, float alpha_)
 	{
 		ImGuiStyle& style = ImGui::GetStyle();
@@ -270,6 +275,8 @@ private:
 			}
 		}
 	}
+
+#endif
 
 public:
 	static CFXToolDirector* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

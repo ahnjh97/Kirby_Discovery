@@ -37,7 +37,9 @@ private:
 public:
 	virtual HRESULT Initialize_Prototype()  override;
 	virtual HRESULT Initialize(void* pArg)  override;
+#ifdef _DEBUG
 	virtual void	Render_IMGUI()			override;
+#endif
 
 	void			Update(class CTransform* pTransform);
 	void			Update(_fmatrix matrix);

@@ -17,10 +17,16 @@
 //스카이 스피어
 #include "SkySphere.h"
 
+
 #pragma region TOOL_UI
 
 #include "Editor_UI.h"
 #include "BackGround.h"
+
+#ifdef _DEBUG
+#include "Editor_UI.h"
+#endif
+
 //#include "TestUI.h"
 #include "Single_UI.h"
 #include "Multi_UI.h"
@@ -29,7 +35,9 @@
 #pragma endregion
 
 //이펙트 툴
+#ifdef _DEBUG
 #include "FXToolDirector.h"
+#endif
 #include "SingleEffect.h"
 #include "Particle.h"
 #include "MultiEffect.h"
@@ -48,6 +56,8 @@
 #include "CharacterController.h"
 #include "Rabbit.h"
 #include "Buffahorn.h"
+#include "BladeKnight.h"
+#include "BladeKnightSword.h"
 
 #include "Moon.h"
 
@@ -152,9 +162,16 @@ HRESULT CLoader::Start()
 HRESULT CLoader::Loading_ObjectAll()
 {
 	m_strLoadingText = TEXT("객체의 원형를(을) 로딩 중 입니다.");
-	// 이펙트 툴 용
-	#pragma region TOOL_EFFECT
+
+
+	//이펙트 툴 용
+#ifdef _DEBUG
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FXToolDirector"), CFXToolDirector);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Grid"), CGrid);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolHelper"), CMapToolHelper);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolObject"), CMapToolObject);
+#endif
+
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SingleEffect"), CSingleEffect);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MultiEffect"), CMultiEffect);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Particle"), CParticle);
@@ -162,11 +179,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	#pragma endregion
 	
 	// MapTool GameObject Prototypes
-	#pragma region TOOL_MAP
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Grid"), CGrid);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BasicMap"), CBasicMap);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolHelper"), CMapToolHelper);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolObject"), CMapToolObject);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Trigger"), CTrigger);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("OrbitingCamera"), COrbitingCamera);
 	#pragma endregion
@@ -183,12 +196,18 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("AnimToolHelper"), CAnimToolHelper);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("AnimToolObject"), CAnimToolObject);
 	#pragma endregion
+#pragma region TOOL_UI
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
+
+#pragma endregion
 
 	#pragma region FOR CLIENT
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kirby"), CKirby);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Awoofy"), CAwoofy);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Rabbit"), CRabbit);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Buffahorn"), CBuffahorn);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BladeKnight"), CBladeKnight);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BladeKnightSword"), CBladeKnightSword);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BackGround"), CBackGround);
 	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_Test"), CTestUI);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
@@ -514,6 +533,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("Rabbit", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("Buffahorn", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("BladeKnight", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("BladeKnightSword", TYPE_NONANIM, 1.f);
 	}
 	else if (eLevel == LEVEL_TOOL_MAP) 
 	{		

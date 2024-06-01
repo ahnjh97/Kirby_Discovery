@@ -1,11 +1,14 @@
 #include "stdafx.h"
 #include "Editor_UI.h"
 #include "ImGUI_Manager.h"
+
+#ifdef _DEBUG
 #include "ImGuizmo.h"
 #include "Single_UI.h"
 #include "Multi_UI.h"
 //#include "ImGuiFileDialog.h"
 //#include "ImGuiFileDialogConfig.h" //현재 사용 안함
+#endif
 
 
 CEditor_UI::CEditor_UI(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext)
@@ -169,7 +172,6 @@ _bool CEditor_UI::Set_DockSpace()
 			}*/
 
 #pragma endregion
-
 			ImGui::EndMainMenuBar();
 		}
 

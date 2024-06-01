@@ -55,11 +55,13 @@ HRESULT CCharacter::Render_LightDepth()
 	return S_OK;
 }
 
+#ifdef _DEBUG
 void CCharacter::Render_IMGUI()
 {
 	__super::Render_IMGUI();
 
 }
+#endif
 
 void CCharacter::SetOn_Slope(_float fTimeDelta)
 {

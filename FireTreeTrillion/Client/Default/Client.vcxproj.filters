@@ -150,7 +150,7 @@
     </Filter>
     <Filter Include="02.GameObjects\Map\MapToolObject\OrbitingCamera">
       <UniqueIdentifier>{0c5b85a4-5089-4e20-81fa-96d48f004385}</UniqueIdentifier>
-	</Filter>
+    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\TestModel">
       <UniqueIdentifier>{d64477a2-9b4a-44f4-9553-f9c18cf7c023}</UniqueIdentifier>
     </Filter>
@@ -177,6 +177,15 @@
     </Filter>
     <Filter Include="02.GameObjects\Anim">
       <UniqueIdentifier>{51ec9ec2-a618-48a0-816b-2a9fc108e89c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BladeKnight">
+      <UniqueIdentifier>{4d206836-01dd-4e4b-ac5d-3ea486017876}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BladeKnight\State">
+      <UniqueIdentifier>{c3509440-bbe1-439c-b743-a205693e77b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword">
+      <UniqueIdentifier>{c3a1e0ee-a23e-4cfa-80f9-70d6a55eb2b8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -345,9 +354,6 @@
     <ClInclude Include="..\Public\Multi_UI.h">
       <Filter>02.GameObjects\UI\Editor\Multi</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\ImSequencer.h">
-      <Filter>02.GameObjects</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\AnimToolHelper.h">
       <Filter>02.GameObjects\Anim</Filter>
     </ClInclude>
@@ -356,6 +362,19 @@
     </ClInclude>
     <ClInclude Include="..\Public\OrbitingCamera.h">
       <Filter>02.GameObjects\Map\MapToolObject\OrbitingCamera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BladeKnight.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BladeKnight_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BladeKnightSword.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\HUD.h" />
+    <ClInclude Include="..\Public\ImSequencer.h">
+      <Filter>02.GameObjects\Anim</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -500,14 +519,20 @@
     <ClCompile Include="..\Private\RigidObject.cpp">
       <Filter>02.GameObjects\PhysXObject\RigidObject</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\BladeKnight.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BladeKnight_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BladeKnightSword.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Single_UI.cpp">
       <Filter>02.GameObjects\UI\Editor\Single</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Multi_UI.cpp">
       <Filter>02.GameObjects\UI\Editor\Multi</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Public\ImSequencer.cpp">
-      <Filter>02.GameObjects</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\AnimToolHelper.cpp">
       <Filter>02.GameObjects\Anim</Filter>
@@ -517,6 +542,10 @@
     </ClCompile>
     <ClCompile Include="..\Private\OrbitingCamera.cpp">
       <Filter>02.GameObjects\Map\MapToolObject\OrbitingCamera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HUD.cpp" />
+    <ClCompile Include="..\Private\ImSequencer.cpp">
+      <Filter>02.GameObjects\Anim</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

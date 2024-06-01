@@ -24,7 +24,10 @@ public:
 	virtual void	Late_Tick(_float fTimeDelta)	override;
 	virtual HRESULT Render()						override;
 	virtual HRESULT Render_LightDepth()				override;
+
+#ifdef _DEBUG
 	virtual void	Render_IMGUI()					override;
+#endif
 
 	ABILITYTYPE	Get_AbilityType() { return m_eAbilityType; }
 	void Set_AbilityType(ABILITYTYPE eAbilityType) { m_eAbilityType = eAbilityType; }

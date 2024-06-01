@@ -22,12 +22,17 @@ HRESULT CBuffahorn::Initialize_Prototype()
 
 HRESULT CBuffahorn::Initialize(void* pArg)
 {
-	GAMEOBJECT_DESC		GameObjectDesc{};
+	GAMEOBJECT_DESC* pGameObjectDesc = nullptr;
 
-	GameObjectDesc.fSpeedPerSec = 7.f;
-	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
+	if (nullptr != pArg)
+	{
+		pGameObjectDesc = (GAMEOBJECT_DESC*)pArg;
 
-	if (FAILED(__super::Initialize(&GameObjectDesc)))
+		pGameObjectDesc->fSpeedPerSec = 7.f;
+		pGameObjectDesc->fRotationPerSec = XMConvertToRadians(90.0f);
+	}
+
+	if (FAILED(__super::Initialize(pGameObjectDesc)))
 		return E_FAIL;
 
 	if (FAILED(Add_Components()))
@@ -122,6 +127,7 @@ HRESULT CBuffahorn::Render_LightDepth()
 	return S_OK;
 }
 
+#ifdef _DEBUG
 void CBuffahorn::Render_IMGUI()
 {
 	if (ImGui::TreeNode("Guizmo"))
@@ -146,6 +152,7 @@ void CBuffahorn::Render_IMGUI()
 	//	ImGui::Text("TargetDir X : %.2f \tTargetDir Y : %.2f \tTargetDir Z : %.2f ", INFO(m_vTargetDir).x, INFO(m_vTargetDir).y, INFO(m_vTargetDir).z);
 	__super::Render_IMGUI();
 }
+#endif
 
 void CBuffahorn::Collision_Attack(CGameObject* pOtherObj)
 {
@@ -182,7 +189,7 @@ HRESULT CBuffahorn::Add_Components()
 	CHECK_FAILED(hr);
 
 	/* For.Com_CharacterController */
-	_float4 vPos = XMVectorSet(10.f, 20.f, -160.f, 1.f);
+	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
 	desc.uCollisionType = m_eCollisionGroup;

@@ -34,6 +34,18 @@ public:
 	void Remove_Ratio() { m_bRatio = false; }
 
 
+	_float Get_Duration() {
+		return m_fDuration;
+	}
+
+	_float Get_TrackPosition() {
+		return m_fTrackPosition;
+	}
+
+	_float Get_AnimRatio() {
+		return m_fTrackPosition / m_fDuration;
+	}
+
 public:
 	_float		 Get_TickPerSecond() const { return m_fTickPerSecond; }
 	void		 Set_TickPerSecond(_float _fTickPerSecond) { m_fTickPerSecond = _fTickPerSecond; }
