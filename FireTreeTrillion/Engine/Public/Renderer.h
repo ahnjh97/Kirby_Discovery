@@ -34,7 +34,7 @@ public:
 
 
 	void Set_ColorSet(COLOR_DATA destColorData);
-	void Set_ColorSet(_int iSetIdx);
+	void Set_ColorSet_ByIndex(_int iSetIdx);
 	void Save_ColorSet(string strTag, COLOR_DATA destColorData);
 	COLOR_DATA& Find_ColorSet(string strTag);
 

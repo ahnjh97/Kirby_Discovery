@@ -6,6 +6,7 @@
 #include "GameInstance.h"
 
 //¸ÊÅø
+#include "OrbitingCamera.h"
 #include "MapToolHelper.h"
 #include "MapToolObject.h"
 #include "BasicMap.h"
@@ -167,6 +168,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolHelper"), CMapToolHelper);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolObject"), CMapToolObject);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Trigger"), CTrigger);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("OrbitingCamera"), COrbitingCamera);
 	#pragma endregion
 
 	#pragma region TOOL_UI
@@ -520,6 +522,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("TestMap2", TYPE_NONANIM, 0.01f);
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f);
 		m_vecModelInfo.emplace_back("Camera", TYPE_NONANIM, 0.2f , 270.f);
+		m_vecModelInfo.emplace_back("Dummy", TYPE_NONANIM, 0.01f);
 	}
 	else if (eLevel == LEVEL_TOOL_ANIM)
 	{

@@ -29,7 +29,8 @@ public:
     //EventCallBack 함수들
     void Register_Player(PxActor* pPlayerActor);
     void Register_Trigger(PxActor* pTriggerActor, _int iTriggerType, _int iTriggerIndex);
-    void SetUp_TriggerFunc(_int iTriggerType, function<void(_int)> func);
+    void Emplace_TriggerFunc(_int iTriggerType, function<void(_int)> func);
+    void Emplace_ExitFunc(_int iTriggerType, function<void(void)> exitFunc);
     void Clear_EventCallBack();
 
     PxPhysics*                          Get_Physics() { return m_pPhysics; }
@@ -71,9 +72,9 @@ private:
     PxPvdSceneClient*                   m_pPvdSceneClient = nullptr;
 
     //PxCooking*                        m_pCooking = nullptr;
-    physx::PxRigidDynamic*              m_pRigidDynamic = nullptr;
+    PxRigidDynamic*              m_pRigidDynamic = nullptr;
 
-    map<string, physx::PxMaterial*>     m_mapMaterials;
+    map<string, PxMaterial*>     m_mapMaterials;
 
 private:
     // 충돌처리할 그룹들의 결과컨텐츠를 2차원 배열로 저장합니다.

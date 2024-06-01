@@ -148,6 +148,9 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Buffahorn\State">
       <UniqueIdentifier>{36a9b0b1-2680-464e-9a8d-a7d446bbe9e2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\MapToolObject\OrbitingCamera">
+      <UniqueIdentifier>{0c5b85a4-5089-4e20-81fa-96d48f004385}</UniqueIdentifier>
+	</Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\TestModel">
       <UniqueIdentifier>{d64477a2-9b4a-44f4-9553-f9c18cf7c023}</UniqueIdentifier>
     </Filter>
@@ -351,6 +354,9 @@
     <ClInclude Include="..\Public\AnimToolObject.h">
       <Filter>02.GameObjects\Anim</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\OrbitingCamera.h">
+      <Filter>02.GameObjects\Map\MapToolObject\OrbitingCamera</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -508,6 +514,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\AnimToolObject.cpp">
       <Filter>02.GameObjects\Anim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\OrbitingCamera.cpp">
+      <Filter>02.GameObjects\Map\MapToolObject\OrbitingCamera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

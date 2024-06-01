@@ -208,6 +208,7 @@
     <ClInclude Include="..\Public\MapToolObject.h" />
     <ClInclude Include="..\Public\Moon.h" />
     <ClInclude Include="..\Public\MultiEffect.h" />
+    <ClInclude Include="..\Public\OrbitingCamera.h" />
     <ClInclude Include="..\Public\Particle.h" />
     <ClInclude Include="..\Public\PhysXObject.h" />
     <ClInclude Include="..\Public\Rabbit.h" />
@@ -265,6 +266,7 @@
     <ClCompile Include="..\Private\MapToolObject.cpp" />
     <ClCompile Include="..\Private\Moon.cpp" />
     <ClCompile Include="..\Private\MultiEffect.cpp" />
+    <ClCompile Include="..\Private\OrbitingCamera.cpp" />
     <ClCompile Include="..\Private\Particle.cpp" />
     <ClCompile Include="..\Private\PhysXObject.cpp" />
     <ClCompile Include="..\Private\Rabbit.cpp" />
