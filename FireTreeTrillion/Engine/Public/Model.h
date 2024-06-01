@@ -55,8 +55,9 @@ public:
 public:
 	virtual HRESULT Initialize_Prototype(MODEL tModel);
 	virtual HRESULT Initialize(void* pArg)  override;
+#ifdef _DEBUG
 	virtual void	Render_IMGUI()			override;
-
+#endif
 public:
 	HRESULT Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex);
 	HRESULT Bind_ShaderResource(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, _uint iTextureType);

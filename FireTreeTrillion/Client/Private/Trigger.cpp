@@ -68,6 +68,7 @@ HRESULT CTrigger::Render()
 	return S_OK;
 }
 
+#ifdef _DEBUG
 void CTrigger::Render_IMGUI()
 {
 	//// Guizmo
@@ -77,6 +78,7 @@ void CTrigger::Render_IMGUI()
 	//
 	//ImGui::Separator(); ImGui::NewLine();
 }
+#endif
 
 HRESULT CTrigger::Bind_ShaderResources()
 {

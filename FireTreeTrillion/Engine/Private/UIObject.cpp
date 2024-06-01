@@ -46,10 +46,12 @@ HRESULT CUIObject::Render()
 	return S_OK;
 }
 
+#ifdef _DEBUG
 void CUIObject::Render_IMGUI()
 {
 	__super::Render_IMGUI();
 }
+#endif
 
 void CUIObject::Free()
 {

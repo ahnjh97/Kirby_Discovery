@@ -1,5 +1,7 @@
 #include "stdafx.h"
+#ifdef _DEBUG
 #include "FXToolDirector.h"
+#endif
 #include "GameInstance.h"
 
 #include "SingleEffect.h"

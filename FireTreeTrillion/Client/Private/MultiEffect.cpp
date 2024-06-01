@@ -1,7 +1,10 @@
 #include "stdafx.h"
 #include "MultiEffect.h"
 #include "SingleEffect.h"
+#ifdef _DEBUG
 #include "FXToolDirector.h"
+#endif
+
 CMultiEffect::CMultiEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     :CEffect{ pDevice, pContext }
 {
@@ -55,6 +58,7 @@ HRESULT CMultiEffect::Initialize(void* pArg)
 	CHECK_FAILED(hr);
 
 
+#ifdef _DEBUG
 	//툴 레벨에서는 tool editor에게 이펙트 포인터를 받아 단순하게 추가해요~
 	if (*m_pCurrentLevelID == LEVEL_TOOL_FX)
 	{
@@ -72,6 +76,7 @@ HRESULT CMultiEffect::Initialize(void* pArg)
 		}
 		return S_OK;
 	}
+#endif
 
 
 

@@ -107,6 +107,7 @@ HRESULT CAwoofy::Render_LightDepth()
 	return S_OK;
 }
 
+#ifdef _DEBUG
 void CAwoofy::Render_IMGUI()
 {
 	if (ImGui::TreeNode("Guizmo"))
@@ -131,6 +132,7 @@ void CAwoofy::Render_IMGUI()
 	//	ImGui::Text("TargetDir X : %.2f \tTargetDir Y : %.2f \tTargetDir Z : %.2f ", INFO(m_vTargetDir).x, INFO(m_vTargetDir).y, INFO(m_vTargetDir).z);
 	__super::Render_IMGUI();
 }
+#endif
 
 void CAwoofy::Collision_Attack(CGameObject* pOtherObj)
 {

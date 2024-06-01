@@ -22,11 +22,15 @@
 //스카이 스피어
 #include "SkySphere.h"
 
+
 #pragma region TOOL_UI
 
 #include "TestUI.h"
 #include "BackGround.h"
+
+#ifdef _DEBUG
 #include "UI_Editor.h"
+#endif
 
 	#pragma region UI_HUD
 	#include "HUD.h"
@@ -40,7 +44,9 @@
 
 
 //이펙트 툴
+#ifdef _DEBUG
 #include "FXToolDirector.h"
+#endif
 #include "SingleEffect.h"
 #include "Particle.h"
 #include "MultiEffect.h"
@@ -165,7 +171,14 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
 
 	//이펙트 툴 용
+#ifdef _DEBUG
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FXToolDirector"), CFXToolDirector);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Grid"), CGrid);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolHelper"), CMapToolHelper);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolObject"), CMapToolObject);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("IMGUI_UI_Editor"), CUI_Editor);
+#endif
+
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SingleEffect"), CSingleEffect);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MultiEffect"), CMultiEffect);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Particle"), CParticle);
@@ -173,15 +186,11 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SkySphere"), CSkySphere);
 
 	// MapTool GameObject Prototypes
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Grid"), CGrid);
+
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BasicMap"), CBasicMap);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolHelper"), CMapToolHelper);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MapToolObject"), CMapToolObject);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Trigger"), CTrigger);
 
 #pragma region TOOL_UI
-
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("IMGUI_UI_Editor"), CUI_Editor);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_Kirby"), CHUD_Kirby);
 

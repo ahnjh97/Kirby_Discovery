@@ -2,9 +2,11 @@
 #include "UI_Editor.h"
 #include "ImGUI_Manager.h"
 
+#ifdef _DEBUG
 #include "ImGuizmo.h"
 #include "ImGuiFileDialog.h"
 #include "ImGuiFileDialogConfig.h"
+#endif
 
 CUI_Editor::CUI_Editor(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext)
 	: CUIObject{ _pDevice, _pContext }

@@ -40,9 +40,11 @@ HRESULT CHUD::Render()
 	return S_OK;
 }
 
+#ifdef _DEBUG
 void CHUD::Render_IMGUI()
 {
 }
+#endif
 
 HRESULT CHUD::Add_Components()
 {	

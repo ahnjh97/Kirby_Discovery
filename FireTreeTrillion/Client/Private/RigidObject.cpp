@@ -51,10 +51,12 @@ HRESULT CRigidObject::Render_LightDepth()
 	return S_OK;
 }
 
+#ifdef _DEBUG
 void CRigidObject::Render_IMGUI()
 {
 	__super::Render_IMGUI();
 }
+#endif
 
 void CRigidObject::Free()
 {

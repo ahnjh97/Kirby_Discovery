@@ -224,8 +224,9 @@ void CTestModel::Late_Tick(_float fTimeDelta)
     }
 
     m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
+#ifdef _DEBUG
     m_pGameInstance->RenderGrid();
-
+#endif
 }
 
 HRESULT CTestModel::Render()
@@ -260,6 +261,7 @@ HRESULT CTestModel::Render_LightDepth()
     return S_OK;
 }
 
+#ifdef _DEBUG
 void CTestModel::Render_IMGUI()
 {
     if (ImGui::TreeNode("Guizmo"))
@@ -276,7 +278,7 @@ void CTestModel::Render_IMGUI()
 
     __super::Render_IMGUI();
 }
-
+#endif
 
 // ==================================== 커비 전용 ===================================
 void CTestModel::SetOn_Slope(_float fTimeDelta)

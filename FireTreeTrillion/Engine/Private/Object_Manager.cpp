@@ -141,7 +141,9 @@ void CObject_Manager::Late_Tick(_float fTimeDelta)
 		}
 	}
 
+#ifdef _DEBUG
 	IMGUI_Tick();
+#endif
 }
 
 void CObject_Manager::Clear(_uint iLevelIndex)
@@ -179,6 +181,7 @@ list<CGameObject*>*CObject_Manager::Get_List(_uint iLevelIndex, const wstring & 
 	return pLayer->Get_list();
 }
 
+#ifdef _DEBUG
 /// <summary> 객체를 Clone할 당시에 자동으로 추가되어 관리되는 IMGUI 함수 </summary>
 void CObject_Manager::IMGUI_Tick()
 {
@@ -225,6 +228,7 @@ void CObject_Manager::IMGUI_Tick()
 	ImGui::End();
 
 }
+#endif
 
 CGameObject * CObject_Manager::Find_Prototype(const wstring & strPrototypeTag)
 {

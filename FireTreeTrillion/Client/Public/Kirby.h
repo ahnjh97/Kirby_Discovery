@@ -79,7 +79,9 @@ public:
 	virtual void	Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 	virtual HRESULT Render_LightDepth() override;
+#ifdef _DEBUG
 	virtual void	Render_IMGUI() override;
+#endif
 	virtual void	Collision_Attack(CGameObject* pOtherObj) override;
 
 	KIRBY_INFODESC* Get_KirbyInfo() { return &m_tKirbyInfo; }

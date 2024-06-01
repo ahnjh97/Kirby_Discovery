@@ -159,6 +159,7 @@ HRESULT CKirby::Render_LightDepth()
 	return S_OK;
 }
 
+#ifdef _DEBUG
 void CKirby::Render_IMGUI()
 {
 	if (ImGui::TreeNode("Guizmo"))
@@ -178,6 +179,7 @@ void CKirby::Render_IMGUI()
 
 	__super::Render_IMGUI();
 }
+#endif
 
 void CKirby::Collision_Attack(CGameObject* pOtherObj)
 {

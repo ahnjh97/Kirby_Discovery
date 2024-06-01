@@ -24,7 +24,10 @@ public:
 	virtual void	Late_Tick(_float fTimeDelta)	override;
 	virtual HRESULT Render()						override;
 	virtual HRESULT Render_LightDepth()				override;
+
+#ifdef _DEBUG
 	virtual void	Render_IMGUI()					override;
+#endif
 
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;

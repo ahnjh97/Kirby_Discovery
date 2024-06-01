@@ -21,7 +21,9 @@ public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
 	virtual void	Start_Tick() {};
+#ifdef _DEBUG
 	virtual void	Render_IMGUI() {};
+#endif
 
 public:
 	virtual HRESULT Render() {return S_OK;}

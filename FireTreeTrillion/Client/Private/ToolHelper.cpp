@@ -127,6 +127,7 @@ void CToolHelper::Load(const string& FileName)
 	File.close();
 }
 
+#ifdef _DEBUG
 void CToolHelper::Render_IMGUI()
 {
 	if (ImGui::Button("Save"))
@@ -144,6 +145,7 @@ void CToolHelper::Render_IMGUI()
 	ImGui::Separator();
 	ImGui::NewLine();
 }
+#endif
 
 CToolHelper* CToolHelper::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

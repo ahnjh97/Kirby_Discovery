@@ -52,11 +52,13 @@ HRESULT CPhysXObject::Render_LightDepth()
 	return S_OK;
 }
 
+#ifdef _DEBUG
 void CPhysXObject::Render_IMGUI()
 {
 	__super::Render_IMGUI();
 
 }
+#endif
 
 void CPhysXObject::Free()
 {

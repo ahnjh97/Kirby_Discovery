@@ -76,6 +76,7 @@ HRESULT CTestUI::Render()
 	return S_OK;
 }
 
+#ifdef _DEBUG
 void CTestUI::Render_IMGUI()
 {
 	char name[12], name2[12];
@@ -96,6 +97,7 @@ void CTestUI::Render_IMGUI()
 	//ImGui::DragFloat("Z_radian", &Z_radian, 0.f, 360.f);
 	//m_pTransformCom->Rotate(XMVectorSet(0.f, 0.f, 1.f, 0.f), XMConvertToRadians(Z_radian));
 }
+#endif
 
 HRESULT CTestUI::Add_Components()
 {

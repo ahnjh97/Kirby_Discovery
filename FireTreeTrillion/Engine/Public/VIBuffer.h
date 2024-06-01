@@ -17,7 +17,11 @@ public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
 	virtual HRESULT Render();
+
+#ifdef _DEBUG
 	virtual void	Render_IMGUI() {};
+#endif
+
 
 public:
 	virtual HRESULT Bind_Buffers();

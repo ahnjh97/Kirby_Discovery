@@ -100,6 +100,7 @@ HRESULT CCamera_Free::Render()
 	return S_OK;
 }
 
+#ifdef _DEBUG
 void CCamera_Free::Render_IMGUI()
 {
 	static _float fSpeed = 10.f;
@@ -136,6 +137,7 @@ void CCamera_Free::Render_IMGUI()
 	ImGui::Separator();
 	ImGui::DragFloat3("CameraFree Offset", &m_vOffset.x);*/
 }
+#endif
  
 void CCamera_Free::Set_MatrixIndex(_int iMatrixIndex)
 {

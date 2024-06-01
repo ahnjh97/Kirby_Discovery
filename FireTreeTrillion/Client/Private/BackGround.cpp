@@ -84,6 +84,7 @@ HRESULT CBackGround::Render()
 	return S_OK;
 }
 
+#ifdef _DEBUG
 void CBackGround::Render_IMGUI()
 {
 	char name[12], name2[12];
@@ -105,8 +106,8 @@ void CBackGround::Render_IMGUI()
 	static _float  Z_radian = 0.f;
 	ImGui::DragFloat("Z_radian", &Z_radian, 0.f, 360.f);
 	//m_pTransformCom->Rotation(XMVectorSet(0.f, 0.f, 1.f, 0.f), XMConvertToRadians(Z_radian));
-
 }
+#endif
 
 HRESULT CBackGround::Add_Components()
 {

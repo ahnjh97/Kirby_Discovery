@@ -32,7 +32,9 @@ public:
 	virtual void	Late_Tick(_float fTimeDelta)	override;
 	virtual HRESULT Render()						override;
 	virtual HRESULT Render_LightDepth()				override;
+#ifdef _DEBUG
 	virtual void	Render_IMGUI()					override;
+#endif
 
 protected:
 	// JSPark : 우선 몬스터들은 modelCom을 하나만 가지고 있다는 전제하에

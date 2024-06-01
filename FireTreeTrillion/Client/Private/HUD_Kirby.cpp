@@ -66,9 +66,11 @@ HRESULT CHUD_Kirby::Render()
 	return S_OK;
 }
 
+#ifdef _DEBUG
 void CHUD_Kirby::Render_IMGUI()
 {
 }
+#endif
 
 HRESULT CHUD_Kirby::Add_Components()
 {

@@ -86,10 +86,12 @@ HRESULT CMesh::Initialize(void * pArg)
 	return S_OK;
 }
 
+#ifdef _DEBUG
 void CMesh::Render_IMGUI()
 {
 	ImGui::InputInt("material",  (_int*)m_iMaterialIndex);
 }
+#endif
 
 HRESULT CMesh::Stock_Matrices(const vector<CBone*>& Bones, _float4x4 * pMeshBoneMatrices)
 {
