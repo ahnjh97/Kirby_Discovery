@@ -57,6 +57,10 @@ public:
 
 		// Vacuum
 		_float			m_fVacuumTime = { 0.f };
+		CPhysXObject*	m_pObject = { nullptr };
+		_float3			m_vObjectScale = { 0.f, 0.f, 0.f };
+		_float			m_fObjectDistance = { 0.f };
+
 
 		// 방향 키 컨트롤러를 만지고 있는가?
 		_bool			m_isController = { false };

@@ -29,6 +29,8 @@ void CKirbyVacuum_Spit_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	{
 		// 이제 먹은 상태가 아니여.
 		DESC(m_isEat) = false;
+		DESC(m_eEyeState) = CKirby::EYE_IDLE;
+		DESC(m_eMouthState) = CKirby::MOUTH_IDLE;
 
 		// 애님 끝났는데 땅을 밟았을 경우
 		if (pController->Is_Terrain() == true)
@@ -82,8 +84,20 @@ void CKirbyVacuum_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float f
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
-
 	pKirby->DefaultIdle();
+
+
+	if (pKirby->Get_State() == CKirby::STATE_INHALE ||
+			pKirby->Get_State() == CKirby::STATE_SUPERINHALESTART ||
+			pKirby->Get_State() == CKirby::STATE_SUPERINHALE ||
+			pKirby->Get_State() == CKirby::STATE_INHALEFALL ||
+			pKirby->Get_State() == CKirby::STATE_INHALELANDING)
+	{
+		// 흡수에 성공했을땐 return 으로 바로 빠져나간다.
+		if (Vacuum_Object(pKirby, fTimeDelta) == true)
+			return;
+	}
+
 
 	// Vacuum 시작. 이 애니메이션이 무조건 발생한다.
 	if (pKirby->Get_State() == CKirby::STATE_INHALESTART)
@@ -110,7 +124,6 @@ void CKirbyVacuum_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float f
 	{
 		Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
 		DESC(m_fVacuumTime) += fTimeDelta;
-
 		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS))
 		{
 			if (DESC(m_fVacuumTime) > 1.2f)
@@ -127,13 +140,10 @@ void CKirbyVacuum_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float f
 			pKirby->Change_State(CKirby::STATE_INHALEEND, 100.f, false, false, CKirby::BODY_VACUUM);
 		}
 
-
-
 		if (JoyStick_controller(Kirbydesc, pCamera) == true)
 		{
 			pKirby->Change_State(CKirby::STATE_INHALEWALK, 50.f, true, true, CKirby::BODY_VACUUM);
 		}
-
 		pController->FreeFall(pTransformCom, fTimeDelta, Kirbydesc->m_fGravityOffset);
 	}
 	else if (pKirby->Get_State() == CKirby::STATE_SUPERINHALESTART)
@@ -155,14 +165,12 @@ void CKirbyVacuum_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float f
 			pKirby->Change_State(CKirby::STATE_SUPERINHALE, 50.f, true, true, CKirby::BODY_VACUUM);
 		}
 
-
 		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == false)
 		{
 			DESC(m_fVacuumTime) = 0.f;
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			pKirby->Change_State(CKirby::STATE_INHALEEND, 100.f, false, false, CKirby::BODY_VACUUM);
 		}
-
 		pController->FreeFall(pTransformCom, fTimeDelta, Kirbydesc->m_fGravityOffset);
 	}
 	else if (pKirby->Get_State() == CKirby::STATE_SUPERINHALE)
@@ -195,6 +203,8 @@ void CKirbyVacuum_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float f
 		}
 
 		pController->FreeFall(pTransformCom, fTimeDelta, Kirbydesc->m_fGravityOffset);
+
+
 	}
 	else if (pKirby->Get_State() == CKirby::STATE_INHALEFALL)
 	{
@@ -297,6 +307,10 @@ void CKirbyVacuum_VacuumWalk_State::OnStateUpdate(CGameObject* pGameObject, _flo
 	pKirby->DefaultIdle();
 
 
+	// 흡수에 성공했을땐 return 으로 바로 빠져나간다.
+	if (Vacuum_Object(pKirby, fTimeDelta) == true)
+		return;
+
 
 	if (pController->Compute_Height() > 2.f)
 	{
@@ -362,6 +376,68 @@ CKirbyVacuum_VacuumWalk_State* CKirbyVacuum_VacuumWalk_State::Create()
 }
 
 void CKirbyVacuum_VacuumWalk_State::Free()
+{
+	__super::Free();
+}
+
+#pragma endregion
+
+
+
+
+
+
+#pragma region Vacuuming STATE
+
+CKirbyVacuum_Vacuuming_State::CKirbyVacuum_Vacuuming_State()
+{
+
+}
+
+void CKirbyVacuum_Vacuuming_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+}
+
+void CKirbyVacuum_Vacuuming_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
+
+	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+
+	DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+	CTransform* pObjectTransform = DESC(m_pObject)->Get_TransformCom();
+	_vector vObjectPos = pObjectTransform->Get_State_Vector(CTransform::STATE_POSITION);
+	_float vCurDistance = XMVectorGetX(XMVector3Length(vPos - vObjectPos));
+	_vector vObjectDir = XMVector3Normalize(vPos - vObjectPos);
+	CCharacterController* pObjectController = static_cast<CCharacterController*>(DESC(m_pObject)->Get_Component(TEXT("Com_Controller")));
+
+	pObjectController->Move_Dir(pObjectTransform, vObjectDir * fVacuumObjectSpeed * fTimeDelta, fTimeDelta);
+
+	_float fScaleinverse = 1.f - ((DESC(m_fObjectDistance) - vCurDistance) / DESC(m_fObjectDistance) * 0.3f);
+
+	_float3 vObjectScale = pObjectTransform->Get_Scaled();
+	pObjectTransform->Set_Scaled(DESC(m_vObjectScale).x * fScaleinverse, DESC(m_vObjectScale).y * fScaleinverse, DESC(m_vObjectScale).z * fScaleinverse);
+
+	fVacuumObjectSpeed += fTimeDelta * 150.f;
+}
+
+void CKirbyVacuum_Vacuuming_State::OnStateExit()
+{
+	fVacuumObjectSpeed = 2.f;
+}
+
+CKirbyVacuum_Vacuuming_State* CKirbyVacuum_Vacuuming_State::Create()
+{
+	CKirbyVacuum_Vacuuming_State* pInstance = new CKirbyVacuum_Vacuuming_State();
+	return pInstance;
+}
+
+void CKirbyVacuum_Vacuuming_State::Free()
 {
 	__super::Free();
 }

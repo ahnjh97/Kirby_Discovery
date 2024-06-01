@@ -167,6 +167,9 @@ void CKirby::Render_IMGUI()
 		ImGui::Separator(); ImGui::NewLine();
 		ImGui::TreePop();
 	}
+
+	ImGui::Text("Vacuuming : %d", m_bVacuuming);
+	ImGui::Text("ObjectAddress : %d", INFO(m_pObject));
 	ImGui::Text("Origin X : %.2f, Origin Y : %.2f, Origin Z : %.2f,", m_vOriginUp.x, m_vOriginUp.y, m_vOriginUp.z);
 	ImGui::Text("ReserveJump : %d", INFO(m_bReserveJumpKey));
 	ImGui::Text("Height : %.2f", m_pControllerCom->Compute_Height());
@@ -220,12 +223,29 @@ void CKirby::Collision_Attack(CGameObject* pOtherObj)
 		if (pMonster->Get_AbilityType() == ABILITY_DEFAULT)
 		{
 			INFO(m_isEat) = true;
+			INFO(m_eEyeState) = EYE_IDLE;
+			INFO(m_eMouthState) = MOUTH_ANGER;
+			m_bVacuuming = false;
 			Change_State(STATE_EAT, 100.f, false, false, BODY_BALLOON);
+			m_eAbilityType = ABILITY_DEFAULT;
 		}
+
+		INFO(m_pObject)->Set_Dead();
+		Safe_Release(INFO(m_pObject));
+		INFO(m_pObject) = nullptr;
+
 	}
-	// 일반 타격
+	// 슬라이드중
+	else if (Get_State() == STATE_SLIDE)
+	{
+
+	}
+	// 일반 박치기
 	else
 	{
+		// 데미지 다는 공식
+
+
 		INFO(m_fJumpVelocity) = 11.f;
 
 		// 먹은 상태인 경우
@@ -558,6 +578,11 @@ void CKirby::SetUp_FSM()
 
 	m_pFSM->Add_State(STATE_INHALEWALK, CKirbyVacuum_VacuumWalk_State::Create());
 	m_pFSM->Add_State(STATE_SUPERINHALEWALK, CKirbyVacuum_VacuumWalk_State::Create());
+
+	// Vacuuming
+	m_pFSM->Add_State(STATE_VACUUM, CKirbyVacuum_Vacuuming_State::Create());
+	m_pFSM->Add_State(STATE_VACUUMHUSTLELV2, CKirbyVacuum_Vacuuming_State::Create());
+
 
 
 	CFSM::FSM_INFO		FSM_Info_Desc = {};

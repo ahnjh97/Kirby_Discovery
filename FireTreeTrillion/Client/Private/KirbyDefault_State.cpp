@@ -858,7 +858,7 @@ void CKirbyDefault_Guard_State::Free()
 
 #pragma endregion
 
-#pragma region GUARD STATE
+#pragma region SILDE STATE
 
 CKirbyDefault_Slide_State::CKirbyDefault_Slide_State()
 {
@@ -896,6 +896,7 @@ void CKirbyDefault_Slide_State::OnStateUpdate(CGameObject* pGameObject, _float f
 		if (DESC(m_fMoveSpeed) < 0.f)
 		{
 			pKirby->Change_State(CKirby::STATE_SLIDEEND, 120.f, false, false, CKirby::BODY_DEFAULT);
+			DESC(m_fMoveSpeed) = 0.f;
 		}
 
 	}
