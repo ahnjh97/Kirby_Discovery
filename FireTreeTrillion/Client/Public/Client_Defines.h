@@ -21,8 +21,11 @@ namespace Client
 
     const unsigned int	g_iWinSizeX = 1600; //1280;
     const unsigned int	g_iWinSizeY = 900; //720;
-}
 
+    const wstring g_strLayerMonster = TEXT("Layer_Monster");
+    const wstring g_strLayerItem = TEXT("Layer_Item");
+    const wstring g_strLayerMapObject = TEXT("Layer_MapObject");
+}
 
 extern HWND g_hWnd;
 extern HINSTANCE g_hInst;
@@ -57,4 +60,8 @@ enum PASS_INSTANCEPOINT {
 
 enum ABILITYTYPE {
     ABILITY_DEFAULT, ABILITY_SWORD, ABILITY_CUTTER, ABILITY_BOMB, ABILITY_END
+};
+
+enum VACUUMSIZE {
+    SIZE_SMALL, SIZE_BIG, SIZE_END
 };

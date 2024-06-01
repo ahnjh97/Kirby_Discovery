@@ -656,8 +656,14 @@ PS_OUT PS_MAIN_MotionBlur(PS_IN In)
         return Out;
     }
     
-        float2 vMyBlurDir = vMotionBlurSample.xy;
+    float2 vMyBlurDir = vMotionBlurSample.xy;
+    
+    
     float fMotionblurRaduis = 500.f;
+    
+    if (vMotionBlurSample.z == 1.f)
+        fMotionblurRaduis = 1000.f;
+    
     float2 vUV = (float2) 0;
 
     for (int i = -6; i < 7; ++i)

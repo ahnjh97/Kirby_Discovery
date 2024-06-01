@@ -167,6 +167,9 @@ void CKirby::Render_IMGUI()
 		ImGui::Separator(); ImGui::NewLine();
 		ImGui::TreePop();
 	}
+
+	ImGui::Text("Vacuuming : %d", m_bVacuuming);
+	ImGui::Text("ObjectAddress : %d", INFO(m_pObject));
 	ImGui::Text("Origin X : %.2f, Origin Y : %.2f, Origin Z : %.2f,", m_vOriginUp.x, m_vOriginUp.y, m_vOriginUp.z);
 	ImGui::Text("ReserveJump : %d", INFO(m_bReserveJumpKey));
 	ImGui::Text("Height : %.2f", m_pControllerCom->Compute_Height());
@@ -212,23 +215,55 @@ HRESULT CKirby::Render_DeferredInfo()
 
 void CKirby::Collision_Attack(CGameObject* pOtherObj)
 {
-	INFO(m_fJumpVelocity) = 11.f;
+	CCharacter* pMonster = static_cast<CCharacter*>(pOtherObj);
 
-	// 먹은 상태인 경우
-	if (INFO(m_isEat) == true)
+	// 흡수될 운명인 몬스터
+	if (pMonster->Get_Vacuuming())
 	{
-		Change_State(STATE_EATDAMAGE, 60.f, false, false, BODY_BALLOON);
+		if (pMonster->Get_AbilityType() == ABILITY_DEFAULT)
+		{
+			INFO(m_isEat) = true;
+			INFO(m_eEyeState) = EYE_IDLE;
+			INFO(m_eMouthState) = MOUTH_ANGER;
+			m_bVacuuming = false;
+			Change_State(STATE_EAT, 100.f, false, false, BODY_BALLOON);
+			m_eAbilityType = ABILITY_DEFAULT;
+		}
+
+		INFO(m_pObject)->Set_Dead();
+		Safe_Release(INFO(m_pObject));
+		INFO(m_pObject) = nullptr;
+
 	}
-	// 나는 상태일 경우 . . .
-	else if (true == (Get_State() == STATE_FLIGHTSTART || Get_State() == STATE_FLIGHTFALL || Get_State() == STATE_FLIGHT ||
-		Get_State() == STATE_FLIGHTLANDING || Get_State() == STATE_FLIGHTLIMIT || Get_State() == STATE_FLIGHTLIMITFALL))
+	// 슬라이드중
+	else if (Get_State() == STATE_SLIDE)
 	{
-		Change_State(STATE_FILGHTDAMAGE, 60.f, false, false, BODY_BALLOON);
+
 	}
-	// 평범한 상태에서...
+	// 일반 박치기
 	else
 	{
-		Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
+		// 데미지 다는 공식
+
+
+		INFO(m_fJumpVelocity) = 11.f;
+
+		// 먹은 상태인 경우
+		if (INFO(m_isEat) == true)
+		{
+			Change_State(STATE_EATDAMAGE, 60.f, false, false, BODY_BALLOON);
+		}
+		// 나는 상태일 경우 . . .
+		else if (true == (Get_State() == STATE_FLIGHTSTART || Get_State() == STATE_FLIGHTFALL || Get_State() == STATE_FLIGHT ||
+			Get_State() == STATE_FLIGHTLANDING || Get_State() == STATE_FLIGHTLIMIT || Get_State() == STATE_FLIGHTLIMITFALL))
+		{
+			Change_State(STATE_FILGHTDAMAGE, 60.f, false, false, BODY_BALLOON);
+		}
+		// 평범한 상태에서...
+		else
+		{
+			Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
+		}
 	}
 }
 
@@ -544,6 +579,11 @@ void CKirby::SetUp_FSM()
 
 	m_pFSM->Add_State(STATE_INHALEWALK, CKirbyVacuum_VacuumWalk_State::Create());
 	m_pFSM->Add_State(STATE_SUPERINHALEWALK, CKirbyVacuum_VacuumWalk_State::Create());
+
+	// Vacuuming
+	m_pFSM->Add_State(STATE_VACUUM, CKirbyVacuum_Vacuuming_State::Create());
+	m_pFSM->Add_State(STATE_VACUUMHUSTLELV2, CKirbyVacuum_Vacuuming_State::Create());
+
 
 
 	CFSM::FSM_INFO		FSM_Info_Desc = {};

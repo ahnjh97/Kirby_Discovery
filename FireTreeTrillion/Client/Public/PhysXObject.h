@@ -28,8 +28,7 @@ public:
 
 	ABILITYTYPE	Get_AbilityType() { return m_eAbilityType; }
 	void Set_AbilityType(ABILITYTYPE eAbilityType) { m_eAbilityType = eAbilityType; }
-
-	_float Get_ResistTime() { return m_fResistTime; }
+	VACUUMSIZE Get_VacuumSize() { return m_eVacuumSize; }
 
 	_bool	Get_Vacuuming() { return m_bVacuuming; }
 	void	Set_Vacuuming(_bool bVacuuming) { m_bVacuuming = bVacuuming; }
@@ -42,8 +41,8 @@ protected:
 	// 현재 이 객체의 타입
 	ABILITYTYPE m_eAbilityType = { ABILITY_END };
 
-	// 커비가 빨아들일때, 버티는 시간을 지정한다.
-	_float		m_fResistTime;
+	// 작은놈인지, 큰놈인지를 이것으로 분류한다.
+	VACUUMSIZE m_eVacuumSize = { SIZE_END };
 
 	// 흡수할때, 이 값을 true가 된다. (충돌에 영향을 안 받게 됨)
 	_bool		m_bVacuuming = { false };

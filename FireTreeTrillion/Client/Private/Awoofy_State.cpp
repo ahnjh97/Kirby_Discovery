@@ -396,14 +396,17 @@ void CAwoofy_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 
-	pTransformCom->Look_At_Axis(-m_vKirbyLook);
-	pController->Move_Dir(pTransformCom, m_vKirbyLook * 0.15f, fTimeDelta);
+	if (pAwoofy->Get_Vacuuming() == false)
+	{
+		pTransformCom->Look_At_Axis(-m_vKirbyLook);
+		pController->Move_Dir(pTransformCom, m_vKirbyLook * 0.15f, fTimeDelta);
 
-	m_fJumpVelocity -= GRAVITY * fTimeDelta * 2.5f;
-	pController->Jump(pTransformCom, m_fJumpVelocity, fTimeDelta);
+		m_fJumpVelocity -= GRAVITY * fTimeDelta * 2.5f;
+		pController->Jump(pTransformCom, m_fJumpVelocity, fTimeDelta);
 
-	if(true == pAwoofy->IsAnimFinished() || pController->Is_Terrain())
-		pAwoofy->Change_State(CAwoofy::AWOOFY_WAIT, 40.f, false, true);
+		if (true == pAwoofy->IsAnimFinished() || pController->Is_Terrain())
+			pAwoofy->Change_State(CAwoofy::AWOOFY_WAIT, 40.f, false, true);
+	}
 }
 
 void CAwoofy_Damage_State::OnStateExit()
