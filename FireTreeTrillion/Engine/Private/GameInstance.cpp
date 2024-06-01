@@ -44,6 +44,10 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 	if (nullptr == m_pLight_Manager)
 		return E_FAIL;
 
+	m_pPhysx = CPhysX::Create();
+	if (nullptr == m_pPhysx)
+		return E_FAIL;
+
 	/*m_pFont_Manager = CFont_Manager::Create(*ppGraphic_Device);
 	if (nullptr == m_pFont_Manager)
 		return E_FAIL;
@@ -58,10 +62,6 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 
 	m_pRenderer = CRenderer::Create(*ppDevice, *ppContext);
 	if (nullptr == m_pRenderer)
-		return E_FAIL;
-
-	m_pPhysx = CPhysX::Create();
-	if (nullptr == m_pPhysx)
 		return E_FAIL;
 
 	m_pLevel_Manager = CLevel_Manager::Create();
@@ -861,10 +861,16 @@ void CGameInstance::Register_Trigger(PxActor* pTriggerActor, _int iTriggerType, 
 		m_pPhysx->Register_Trigger(pTriggerActor, iTriggerType, iTriggerIndex);
 }
 
-void CGameInstance::SetUp_TriggerFunc(_int iTriggerType, function<void(_int)> func)
+void CGameInstance::Emplace_TriggerFunc(_int iTriggerType, function<void(_int)> func)
 {
 	if (nullptr != m_pPhysx)
-		m_pPhysx->SetUp_TriggerFunc(iTriggerType, func);
+		m_pPhysx->Emplace_TriggerFunc(iTriggerType, func);
+}
+
+void CGameInstance::Emplace_ExitFunc(_int iTriggerType, function<void(void)> exitFunc)
+{
+	if (nullptr != m_pPhysx)
+		m_pPhysx->Emplace_ExitFunc(iTriggerType, exitFunc);
 }
 
 void CGameInstance::Clear_EventCallBack()

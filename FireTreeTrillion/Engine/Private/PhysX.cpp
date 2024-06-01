@@ -159,14 +159,24 @@ void CPhysX::Register_Trigger(PxActor* pTriggerActor, _int iTriggerType, _int iT
     pEventCallBack->Register_Trigger(pTriggerActor, iTriggerType, iTriggerIndex);
 }
 
-void CPhysX::SetUp_TriggerFunc(_int iTriggerType, function<void(_int)> func)
+void CPhysX::Emplace_TriggerFunc(_int iTriggerType, function<void(_int)> func)
 {
     if (nullptr == m_pScene)
         return;
     CEventCallBack* pEventCallBack = dynamic_cast<CEventCallBack*>(m_pScene->getSimulationEventCallback());
     if (nullptr == pEventCallBack)
         return;
-    pEventCallBack->SetUp_TriggerFunc(iTriggerType, func);
+    pEventCallBack->Emplace_TriggerFunc(iTriggerType, func);
+}
+
+void CPhysX::Emplace_ExitFunc(_int iTriggerType, function<void(void)> exitFunc)
+{
+    if (nullptr == m_pScene)
+        return;
+    CEventCallBack* pEventCallBack = dynamic_cast<CEventCallBack*>(m_pScene->getSimulationEventCallback());
+    if (nullptr == pEventCallBack)
+        return;
+    pEventCallBack->Emplace_ExitFunc(iTriggerType, exitFunc);
 }
 
 void CPhysX::Clear_EventCallBack()

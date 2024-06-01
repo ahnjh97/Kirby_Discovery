@@ -18,7 +18,8 @@ namespace Client
                  LEVEL_END };
 
     enum TRIGGER_TYPE { TRIGGER_CAMERA, TRIGGER_SHADER, TRIGGER_END };
-
+    enum CAMERA_TYPE { CAM_FRONT, CAM_REAR, CAM_END };
+    
     const unsigned int	g_iWinSizeX = 1600; //1280;
     const unsigned int	g_iWinSizeY = 900; //720;
 

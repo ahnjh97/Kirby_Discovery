@@ -1,10 +1,12 @@
 #pragma once
 #include "Client_Defines.h"
 #include "GameObject.h"
+#include "OrbitingCamera.h"
 
 BEGIN(Engine)
 class CModel;
 class CShader;
+class CPartObject;
 END
 
 BEGIN(Client)
@@ -14,15 +16,24 @@ class CMapToolObject : public CGameObject
 public:
 	struct MAPTOOLOBJECT_DESC : public GAMEOBJECT_DESC
 	{
-		_int iTriggerType = -1;
-		_int iTriggerIndex = -1;
+		_int iTriggerType = { -1 };
+		_int iTriggerIndex = { -1 };
+		_float fRadius = { 0.f };
+		_int iCamType = { -1 };
 	};
+
 public:
 	_int Get_TriggerType() { return m_iTriggerType; }
 	_int Get_TriggerIndex() { return m_iTriggerIndex; }
+	_float Get_Radius() { return m_fRadius; }
+	_int Get_CamType() { return m_iCamType; }
 
 	void Set_TriggerType(_int iTriggerType) { m_iTriggerType = iTriggerType; }
 	void Set_TriggerIndex(_int iTriggerIndex) { m_iTriggerIndex = iTriggerIndex; }
+	void Set_CamType(_int iCamType) { m_iCamType = iCamType; }
+	void Set_Radius(_float fRadius) { m_fRadius = fRadius; }
+
+	virtual void Set_Hide(_bool bHide) { m_bHide = bHide; if (nullptr != m_pOrbitingCamera) m_pOrbitingCamera->Set_Hide(bHide); }
 
 private:
 	CMapToolObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -38,15 +49,19 @@ public:
 
 private:
 	_int m_iTriggerType = { -1 };
-	_int m_iTriggerIndex = {};
+	_int m_iTriggerIndex = { -1 };
+	_float m_fRadius = { 0.f };
+	_int m_iCamType = { -1 };
 
 private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
+	COrbitingCamera* m_pOrbitingCamera = { nullptr };
 
 private:
 	HRESULT Add_Components(const wstring& _wstrModelTag);
 	HRESULT Bind_ShaderResources();
+	HRESULT Add_PartObject();
 
 public:
 	static CMapToolObject* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

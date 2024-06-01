@@ -26,6 +26,9 @@ public:
 	_bool				Get_Dead() { return m_bDead; }
 	void				Set_Dead() { m_bDead = true; }
 
+	_bool				Get_Hide() { return m_bHide; }
+	virtual void		Set_Hide(_bool bHide) { m_bHide = bHide; }
+
 	COLLISION_TYPE		Get_CollisionGroup() const { return m_eCollisionGroup; }
 
 	// prototypeTag
@@ -79,6 +82,8 @@ protected:
 	// 애니메이션 툴을 위한 것입니다. 아무도 건드리지 마십시오. 정기적으로 검사하무니다. (JYWI)
 	class CModel**							m_ppModelForAnimTool = nullptr;
 	_uint									m_uModelCnt = 1;
+
+	_bool									m_bHide = { false };
 
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;
