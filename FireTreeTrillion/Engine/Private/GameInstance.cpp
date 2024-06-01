@@ -837,13 +837,13 @@ CImGUI_Manager::FILE_MODE CGameInstance::Set_FileDialog()
 	CHECK_NULLPTR(m_pIMGUI_Manager);
 	return m_pIMGUI_Manager->Set_FileDialog();
 }
-#endif
 
 void CGameInstance::Set_IMGUIStyle(_uint uStyle)
 {
 	CHECK_NULLPTR(m_pIMGUI_Manager);
 	m_pIMGUI_Manager->Set_IMGUIStyle(uStyle);
 }
+#endif
 
 PxRigidDynamic* CGameInstance::CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)
 {

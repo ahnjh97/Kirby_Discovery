@@ -58,8 +58,10 @@ HRESULT CBackGround::Render()
 	return S_OK;
 }
 
+#ifdef _DEBUG
 void CBackGround::Render_IMGUI()
 {}
+#endif // DEBUG
 
 HRESULT CBackGround::Add_Components()
 {

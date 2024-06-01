@@ -176,32 +176,24 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("MultiEffect"), CMultiEffect);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Particle"), CParticle);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SkySphere"), CSkySphere);
-	#pragma endregion
 	
 	// MapTool GameObject Prototypes
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BasicMap"), CBasicMap);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Trigger"), CTrigger);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("OrbitingCamera"), COrbitingCamera);
-	#pragma endregion
 
-	#pragma region TOOL_UI
+#ifdef _DEBUG
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Editor_UI"), CEditor_UI);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Single_UI"), CSingle_UI);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Multi_UI"), CMulti_UI);
-	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
-	#pragma endregion
-
-	#pragma region TOOL_ANIMATION
-	// AnimationTool GameObject Prototypes
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("AnimToolHelper"), CAnimToolHelper);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("AnimToolObject"), CAnimToolObject);
-	#pragma endregion
-#pragma region TOOL_UI
+#endif // _DEBUG
+
+
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Single_UI"), CSingle_UI);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Multi_UI"), CMulti_UI);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
-
-#pragma endregion
-
-	#pragma region FOR CLIENT
+	
+#pragma region FOR CLIENT
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kirby"), CKirby);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Awoofy"), CAwoofy);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Rabbit"), CRabbit);
@@ -214,7 +206,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestMap"), CTestTerrain);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Moon"), CMoon);
-	#pragma endregion
+#pragma endregion
 
 	return S_OK;
 }
