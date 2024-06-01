@@ -25,6 +25,7 @@ HRESULT CLevel_Logo::Initialize()
 void CLevel_Logo::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
+	m_fAccDelta += fTimeDelta;
 }
 
 HRESULT CLevel_Logo::Render()
@@ -32,7 +33,20 @@ HRESULT CLevel_Logo::Render()
 	if (FAILED(__super::Render()))
 		return E_FAIL;
 
-	SetWindowText(g_hWnd, TEXT("로고레벨입니다."));
+	//SetWindowText(g_hWnd, TEXT("로고레벨입니다."));
+	//윈도우 바 FPS 체크
+	++m_iFPS;
+
+	_tchar szFPS[MAX_PATH] = TEXT("");
+	wsprintf(szFPS, TEXT("Level GamePlay, %d FPS"), m_iFPS);
+
+	if (m_fAccDelta >= 1.f)
+	{
+		SetWindowText(g_hWnd, szFPS);
+		m_fAccDelta = 0.f;
+		m_iFPS = 0;
+	}
+
 
 	return S_OK;
 }

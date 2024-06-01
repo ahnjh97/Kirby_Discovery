@@ -172,7 +172,6 @@ _bool CEditor_UI::Set_DockSpace()
 			}*/
 
 #pragma endregion
-
 			ImGui::EndMainMenuBar();
 		}
 

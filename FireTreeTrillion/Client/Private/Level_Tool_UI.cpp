@@ -2,6 +2,7 @@
 #include "UIObject.h"
 #include "Level_Tool_UI.h"
 #include "Camera_Free.h"
+#include "Level.h"
 
 CLevel_Tool_UI::CLevel_Tool_UI(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -26,6 +27,9 @@ HRESULT CLevel_Tool_UI::Initialize()
 	if (FAILED(Ready_Layer_IMGUI(TEXT("Layer_IMGUI"))))
 		return E_FAIL;
 
+	//IMGUI_STYLE 세팅
+	m_pGameInstance->Set_IMGUIStyle(CImGUI_Manager::STYLE::PURPLE);
+
 	return S_OK;
 }
 
@@ -40,6 +44,7 @@ HRESULT CLevel_Tool_UI::Render()
 	if (FAILED(__super::Render()))
 		return E_FAIL;
 
+	//윈도우 바 FPS 체크
 	++m_iFPS;
 
 	_tchar szFPS[MAX_PATH] = TEXT("");
