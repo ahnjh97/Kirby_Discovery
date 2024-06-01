@@ -48,12 +48,15 @@ namespace Engine
 #define OBJ_NOEVENT 0
 #define OBJ_DEAD 1
 
+#ifdef _DEBUG
 // IMGUI
 #include "imgui.h"
 #include "imgui_impl_dx11.h"
 #include "imgui_impl_win32.h"
 #include "ImGuiFileDialog.h"
 #include "ImGuiFileDialogConfig.h"
+#endif
+
 
 // SHADER - EFFECT
 #include "Effects11/d3dx11effect.h"
@@ -280,7 +283,7 @@ enum PASS_DEFERRED {
 
 using namespace Engine;
 
-#ifdef _DEBUG
+#ifdef _MY_DEBUG
 
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>

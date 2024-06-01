@@ -91,7 +91,7 @@ HRESULT CMainApp::Render(_float fTimeDelta)
 
 	m_pGameInstance->Draw(fTimeDelta);
 
-#ifdef _DEBUG
+#ifdef _MY_DEBUG
 
 	// RTV_FONT Ãß°¡
 #pragma region GAME_OBJ

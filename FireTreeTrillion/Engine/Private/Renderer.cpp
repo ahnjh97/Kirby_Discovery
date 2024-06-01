@@ -274,7 +274,7 @@ HRESULT CRenderer::Initialize()
 	Safe_Release(pDepthStencilTexture);
 
 
-#ifdef _DEBUG
+#ifdef _MY_DEBUG
 
 	// GameObject
 	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Diffuse"), 50.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
@@ -451,7 +451,7 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 	if (m_pGameInstance->Get_DIKeyState(DIK_E, KEY_DOWN))
 		m_bLowPass = !m_bLowPass;
 
-#ifdef _DEBUG
+#ifdef _MY_DEBUG
 	if (FAILED(Render_Debug()))
 		return E_FAIL;
 
@@ -572,7 +572,7 @@ HRESULT CRenderer::Render_LightDepth_For_GameObject(CShader* pShader, CTransform
 }
 
 
-#ifdef _DEBUG
+#ifdef _MY_DEBUG
 
 HRESULT CRenderer::Add_DebugComponents(CComponent* pRenderComponent)
 {
@@ -1091,6 +1091,8 @@ HRESULT CRenderer::Render_SuperUI()
 	return S_OK;
 }
 
+#ifdef _DEBUG
+
 void CRenderer::Render_IMGUI()
 {
 
@@ -1158,6 +1160,8 @@ void CRenderer::Render_IMGUI()
 	ImGui::End();
 
 }
+
+#endif
 
 void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 {
@@ -1239,7 +1243,7 @@ void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 }
 
 
-#ifdef _DEBUG
+#ifdef _MY_DEBUG
 
 HRESULT CRenderer::Render_Debug()
 {

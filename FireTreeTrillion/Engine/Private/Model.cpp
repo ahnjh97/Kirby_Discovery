@@ -1,8 +1,7 @@
 #include "Model.h"
-#include "Channel.h"
+//#include "Channel.h"
 #include "Texture.h"
 #include "Shader.h"
-#include "Model.h"
 #include "Bone.h"
 #include "Mesh.h"
 #include "Utils.h"
@@ -113,6 +112,7 @@ HRESULT CModel::Initialize(void * pArg)
 	return S_OK;
 }
 
+#ifdef _DEBUG
 void CModel::Render_IMGUI()
 {
 	__super::Render_IMGUI();
@@ -135,6 +135,7 @@ void CModel::Render_IMGUI()
 	ImGui::DragFloat("Track_Position : ", &fTrackPosition);
 	m_Animations[m_iCurrentAnimIndex]->Set_TrackPosition(fTrackPosition);
 }
+#endif
 
 HRESULT CModel::Bind_BoneMatrices(CShader * pShader, const _char * pConstantName, _uint iMeshIndex)
 {

@@ -204,7 +204,7 @@ void CImGUI_Manager::RenderGrid()
 
 void CImGUI_Manager::EditTransform(_float4x4& matrix)
 {
-#ifndef _DEBUG
+#ifndef _MY_DEBUG
 	return;
 #endif
 

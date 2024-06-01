@@ -191,12 +191,12 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby"), &tempDesc)))
 				return E_FAIL;
 		}
-		//else if (strModelName == "NonAnim_Awoofy")
-		//{
-		//	tempDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기
-		//	if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Awoofy"), &tempDesc)))
-		//		return E_FAIL;
-		//}
+		else if (strModelName == "NonAnim_Awoofy")
+		{
+			tempDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Awoofy"), &tempDesc)))
+				return E_FAIL;
+		}
 		else if (strModelName == "NonAnim_Rabbit")
 		{
 			tempDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기

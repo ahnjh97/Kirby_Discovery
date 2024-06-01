@@ -49,7 +49,7 @@ public: /* For.Renderer */
 	void Update_DofFocus(_fvector vWorldPos);
 
 
-#ifdef _DEBUG
+#ifdef _MY_DEBUG
 public:
 	HRESULT Add_DebugComponents(class CComponent* pRenderComponent);
 #endif
@@ -141,7 +141,7 @@ public: /* For.PhysX */
 	_float4x4	Update(_fmatrix matrix);
 	_uint		Get_CollisionContent(COLLISION_TYPE eMeType, COLLISION_TYPE eOtherType);
 
-#ifdef _DEBUG
+#ifdef _MY_DEBUG
 	HRESULT Ready_RTVDebug(const wstring& strRenderTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY);
 	HRESULT Draw_RTVDebug(const wstring& strMRTTag, class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
 #endif
@@ -163,11 +163,13 @@ public: // Sound Manager
 	_int  VolumeRestore(CHANNELID eID);
 	void PlaySound_Free(TCHAR* pSoundKey, _float _vol);
 
+#ifdef _DEBUG
 public: /* For.ImGui_Manager */
 	void		ImGui_Render();
 	void		EditTransform(/*const CCamera& camera,*/ _float4x4& _matrix);
 	void		RenderGrid();
 	CImGUI_Manager::FILE_MODE	Set_FileDialog();
+#endif
 
 public: /* For.PhysX */
 	PxRigidDynamic* CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial = nullptr);
@@ -196,7 +198,9 @@ private:
 	class CFrustum*					m_pFrustum = { nullptr };
 	class CExtractor*				m_pExtractor = { nullptr };
 	class CSound_Manager*			m_pSound_Manager = { nullptr };
+#ifdef _DEBUG
 	class CImGUI_Manager*			m_pIMGUI_Manager = { nullptr };
+#endif
 	class CPhysX*					m_pPhysx = { nullptr };
 	class CPicking*					m_pPicking = { nullptr };
 

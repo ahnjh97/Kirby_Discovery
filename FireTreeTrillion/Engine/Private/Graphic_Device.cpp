@@ -11,7 +11,7 @@ HRESULT CGraphic_Device::Ready_Graphic_Device(const ENGINE_DESC& EngineDesc, _In
 {
 	_uint		iFlag = 0;
 
-#ifdef _DEBUG
+#ifdef _MY_DEBUG
 	iFlag = D3D11_CREATE_DEVICE_DEBUG;
 #endif
 	D3D_FEATURE_LEVEL			FeatureLV;

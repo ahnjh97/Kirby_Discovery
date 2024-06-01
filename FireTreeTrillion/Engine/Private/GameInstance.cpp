@@ -15,7 +15,10 @@
 #include "Frustum.h"
 #include "Picking.h"
 
+#ifdef _DEBUG
 #include "ImGUI_Manager.h"
+#endif
+
 #include "PhysX.h"
 
 IMPLEMENT_SINGLETON(CGameInstance)
@@ -96,9 +99,11 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 	if (nullptr == m_pExtractor)
 		return E_FAIL;
 	
+#ifdef _DEBUG
 	/* IMGUI 매니저의 공간 예약을 한다. */
 	m_pIMGUI_Manager = CImGUI_Manager::Create(EngineDesc.hWnd, *ppDevice, *ppContext);
 	CHECK_NULLPTR(m_pIMGUI_Manager);
+#endif
 
 	m_pPicking = CPicking::Create(*ppDevice, *ppContext, EngineDesc.hWnd, EngineDesc.iWinSizeX, EngineDesc.iWinSizeY);
 	if (nullptr == m_pComponent_Manager)
@@ -132,7 +137,10 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 	m_pPipeLine->Tick();
 
 	m_pFrustum->Tick();
+
+#ifdef _DEBUG
 	m_pIMGUI_Manager->Late_Tick(ffTimeDelta);
+#endif
 
 	m_pObject_Manager->Late_Tick(ffTimeDelta);
 	
@@ -174,8 +182,10 @@ HRESULT CGameInstance::Draw(_float fTimeDelta)
 
 	m_pLevel_Manager->Render();	
 
+#ifdef _DEBUG
 	m_pIMGUI_Manager->Render();
 	m_pIMGUI_Manager->RenderUpdate();
+#endif
 
 	return S_OK;
 }
@@ -314,7 +324,7 @@ void CGameInstance::Update_DofFocus(_fvector vWorldPos)
 
 }
 
-#ifdef _DEBUG
+#ifdef _MY_DEBUG
 
 HRESULT CGameInstance::Add_DebugComponents(CComponent * pRenderComponent)
 {
@@ -717,7 +727,7 @@ _uint CGameInstance::Get_CollisionContent(COLLISION_TYPE eMeType, COLLISION_TYPE
 	return m_pPhysx->Get_CollisionContent(eMeType, eOtherType);
 }
 
-#ifdef _DEBUG
+#ifdef _MY_DEBUG
 HRESULT CGameInstance::Ready_RTVDebug(const wstring & strRenderTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY)
 {
 	if (m_pTarget_Manager == nullptr)
@@ -797,6 +807,7 @@ void CGameInstance::PlaySound_Free(TCHAR* pSoundKey, _float _vol)
 	m_pSound_Manager->PlaySound_Free(pSoundKey, _vol);
 }
 
+#ifdef _DEBUG
 void CGameInstance::ImGui_Render()
 {
 	CHECK_NULLPTR(m_pIMGUI_Manager);
@@ -821,6 +832,7 @@ CImGUI_Manager::FILE_MODE CGameInstance::Set_FileDialog()
 	CHECK_NULLPTR(m_pIMGUI_Manager);
 	return m_pIMGUI_Manager->Set_FileDialog();
 }
+#endif
 
 PxRigidDynamic* CGameInstance::CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)
 {
@@ -889,7 +901,9 @@ void CGameInstance::Free()
 	Safe_Release(m_pFrustum);
 	Safe_Release(m_pExtractor);
 	Safe_Release(m_pTarget_Manager);
+#ifdef _DEBUG
 	Safe_Release(m_pIMGUI_Manager);
+#endif
 	Safe_Release(m_pFont_Manager);
 	Safe_Release(m_pLight_Manager);
 	Safe_Release(m_pPipeLine);

@@ -51,7 +51,7 @@ public:
 	}
 
 
-#ifdef _DEBUG
+#ifdef _MY_DEBUG
 public:
 	HRESULT Add_DebugComponents(class CComponent* pRenderObject);
 #endif
@@ -80,7 +80,7 @@ private:
 
 
 
-#ifdef _DEBUG
+#ifdef _MY_DEBUG
 private:
 	list<class CComponent*>				m_DebugComponents;
 #endif
@@ -104,9 +104,9 @@ private:
 
 	HRESULT Render_UI();
 	HRESULT Render_SuperUI();
-
+#ifdef _DEBUG
 	void Render_IMGUI();
-
+#endif
 	void Interpolate_ColorData(_float _fTimeDelta);
 
 private:
@@ -146,7 +146,7 @@ private:
 	COLOR_DATA m_DestColorData{};
 	map<string, COLOR_DATA> m_ColorSets;
 
-#ifdef _DEBUG
+#ifdef _MY_DEBUG
 private:
 	HRESULT Render_Debug();
 #endif
