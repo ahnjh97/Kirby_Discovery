@@ -52,6 +52,8 @@
 #include "Awoofy.h"
 #include "Rabbit.h"
 #include "Buffahorn.h"
+#include "BladeKnight.h"
+#include "BladeKnightSword.h"
 
 #include "Moon.h"
 
@@ -195,6 +197,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Awoofy"), CAwoofy);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Rabbit"), CRabbit);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Buffahorn"), CBuffahorn);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BladeKnight"), CBladeKnight);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BladeKnightSword"), CBladeKnightSword);
 
 	return S_OK;
 }
@@ -483,6 +487,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("Rabbit", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("Buffahorn", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("BladeKnight", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("BladeKnightSword", TYPE_NONANIM, 1.f);
 	}
 	else if (eLevel == LEVEL_TOOL_MAP) 
 	{		

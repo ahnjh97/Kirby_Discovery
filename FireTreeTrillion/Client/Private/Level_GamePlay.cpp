@@ -126,9 +126,9 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const wstring & strLayerTag)
 	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Awoofy"))))
 	//	return E_FAIL;
 
-	// Rabbit
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Rabbit"))))
-		return E_FAIL;
+	//// Rabbit
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Rabbit"))))
+	//	return E_FAIL;
 
 	// Buffahorn
 	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Buffahorn"))))
@@ -189,6 +189,30 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 		{
 			tempDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby"), &tempDesc)))
+				return E_FAIL;
+		}
+		//else if (strModelName == "NonAnim_Awoofy")
+		//{
+		//	tempDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기
+		//	if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Awoofy"), &tempDesc)))
+		//		return E_FAIL;
+		//}
+		else if (strModelName == "NonAnim_Rabbit")
+		{
+			tempDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Rabbit"), &tempDesc)))
+				return E_FAIL;
+		}
+		else if (strModelName == "NonAnim_Buffahorn")
+		{
+			tempDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Buffahorn"), &tempDesc)))
+				return E_FAIL;
+		}
+		else if (strModelName == "NonAnim_BladeKnight")
+		{
+			tempDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BladeKnight"), &tempDesc)))
 				return E_FAIL;
 		}
 		else if (strModelName == "Level1Stage1Step01" || strModelName == "Level1Stage1Step01_Blend")

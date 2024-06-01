@@ -24,6 +24,14 @@ public:
 
 	string Get_MeshName(_uint iMeshIndex);
 
+	_float Get_Duration() { return m_Animations[m_iCurrentAnimIndex]->Get_Duration(); }
+
+	_float Get_Trackposition() { return m_Animations[m_iCurrentAnimIndex]->Get_TrackPosition(); }
+
+	_float Get_AnimRatio() {
+		return m_Animations[m_iCurrentAnimIndex]->Get_AnimRatio();
+	}
+
 public:
 	void Set_TickPerSecond(_float _fTickPerSecond) { m_Animations[m_iCurrentAnimIndex]->Set_TickPerSecond(_fTickPerSecond); }
 

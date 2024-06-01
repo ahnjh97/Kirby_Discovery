@@ -172,6 +172,15 @@
     <Filter Include="02.GameObjects\PhysXObject\RigidObject">
       <UniqueIdentifier>{ec828ee3-b588-495f-82c4-e369a19f7ef0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BladeKnight">
+      <UniqueIdentifier>{4d206836-01dd-4e4b-ac5d-3ea486017876}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BladeKnight\State">
+      <UniqueIdentifier>{c3509440-bbe1-439c-b743-a205693e77b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword">
+      <UniqueIdentifier>{c3a1e0ee-a23e-4cfa-80f9-70d6a55eb2b8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -342,6 +351,15 @@
     <ClInclude Include="..\Public\RigidObject.h">
       <Filter>02.GameObjects\PhysXObject\RigidObject</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\BladeKnight.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BladeKnight_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BladeKnightSword.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -493,6 +511,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\RigidObject.cpp">
       <Filter>02.GameObjects\PhysXObject\RigidObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BladeKnight.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BladeKnight_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BladeKnightSword.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

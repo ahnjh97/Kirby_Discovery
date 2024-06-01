@@ -1,26 +1,27 @@
 #include "stdafx.h"
-#include "Awoofy.h"
+#include "BladeKnight.h"
 #include "FSM.h"
-#include "Awoofy_State.h"
+#include "BladeKnight_State.h"
+#include "BladeKnightSword.h"
 
-CAwoofy::CAwoofy(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CBladeKnight::CBladeKnight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
 {
 }
 
-CAwoofy::CAwoofy(const CAwoofy& rhs)
+CBladeKnight::CBladeKnight(const CBladeKnight& rhs)
 	: CMonster{ rhs }
 {
 }
 
-HRESULT CAwoofy::Initialize_Prototype()
+HRESULT CBladeKnight::Initialize_Prototype()
 {
 	m_eCollisionGroup = MONSTER;
 
 	return S_OK;
 }
 
-HRESULT CAwoofy::Initialize(void* pArg)
+HRESULT CBladeKnight::Initialize(void* pArg)
 {
 	GAMEOBJECT_DESC* pGameObjectDesc = nullptr;
 
@@ -38,12 +39,15 @@ HRESULT CAwoofy::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	m_pModelCom->Set_Animation(AWOOFY_GROOMING, 45.f, false, true);
+	if (FAILED(Add_PartObjects()))
+		return E_FAIL;
+
+	m_pModelCom->Set_Animation(BLADEKNIGHT_WAIT, 50.f, true, true);
 
 	return S_OK;
 }
 
-_int CAwoofy::Tick(_float fTimeDelta)
+_int CBladeKnight::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
 		return OBJ_DEAD;
@@ -56,16 +60,22 @@ _int CAwoofy::Tick(_float fTimeDelta)
 
 	Compute_MotionBlur();
 
- //  // FSM 제어
-	//if (m_pFSM != nullptr)
-	//	m_pFSM->Update(this, fTimeDelta);
+	//  // FSM 제어
+	   //if (m_pFSM != nullptr)
+	   //	m_pFSM->Update(this, fTimeDelta);
+
+	for (auto& Pair : m_PartObjects)
+		Pair.second->Tick(fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
 
-void CAwoofy::Late_Tick(_float fTimeDelta)
+void CBladeKnight::Late_Tick(_float fTimeDelta)
 {
 	m_pModelCom->Play_Animation(fTimeDelta);
+
+	for (auto& Pair : m_PartObjects)
+		Pair.second->Late_Tick(fTimeDelta);
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
@@ -74,7 +84,7 @@ void CAwoofy::Late_Tick(_float fTimeDelta)
 	}
 }
 
-HRESULT CAwoofy::Render()
+HRESULT CBladeKnight::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
@@ -99,7 +109,7 @@ HRESULT CAwoofy::Render()
 	return S_OK;
 }
 
-HRESULT CAwoofy::Render_LightDepth()
+HRESULT CBladeKnight::Render_LightDepth()
 {
 	if (FAILED(m_pGameInstance->Render_LightDepth_For_GameObject(m_pShaderCom, m_pTransformCom, m_pModelCom)))
 		return E_FAIL;
@@ -107,7 +117,7 @@ HRESULT CAwoofy::Render_LightDepth()
 	return S_OK;
 }
 
-void CAwoofy::Render_IMGUI()
+void CBladeKnight::Render_IMGUI()
 {
 	if (ImGui::TreeNode("Guizmo"))
 	{
@@ -132,42 +142,42 @@ void CAwoofy::Render_IMGUI()
 	__super::Render_IMGUI();
 }
 
-void CAwoofy::Collision_Attack(CGameObject* pOtherObj)
+void CBladeKnight::Collision_Attack(CGameObject* pOtherObj)
 {
-	Change_State(CAwoofy::AWOOFY_DAMAGE, 50.f, false, true);
+	//Change_State(BLADEKNIGHT_DAMAGE, 50.f, false, true);
 }
 
-void CAwoofy::Change_State(AWOOFY_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CBladeKnight::Change_State(BLADEKNIGHT_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
 {
 	m_pFSM->ChangeState((_uint)eState, _fAnimSpeed, _bLoop, _bInterpolation);
 }
 
-_bool CAwoofy::IsAnimFinished()
+_bool CBladeKnight::IsAnimFinished()
 {
 	return m_pModelCom->IsFinished();
 }
 
-_bool CAwoofy::IsAnimFinished(_uint iCurrentAnimIndex)
+_uint CBladeKnight::Get_State()
 {
-	return m_pModelCom->IsFinished(iCurrentAnimIndex);
+	return m_pFSM->Get_State();
 }
 
-void CAwoofy::Compute_Angle(_vector vOrginLook, _vector vTargetLook)
+void CBladeKnight::Compute_MotionBlur()
 {
-	//// 정규화 및 회전 축 계산
-	//vOrginLook.m128_f32[1] = 0.f;
-	//vTargetLook.m128_f32[1] = 0.f;
-	XMVECTOR vOriginLookNormalized = XMVector3Normalize(vOrginLook);
-	XMVECTOR vTargetLookNormalized = XMVector3Normalize(vTargetLook);
+	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	_matrix ViewProjectionMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW) * m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
+	_vector vScreenPos = XMVector3TransformCoord(vPos, ViewProjectionMatrix);
+	_float fScreenX = (XMVectorGetX(vScreenPos) + 1.f) * 0.5f;
+	_float fScreenY = (XMVectorGetY(vScreenPos) + 1.f) * 0.5f;
 
-	//// 회전 각도 계산
-	m_fAngle = acos(XMVectorGetX(XMVector3Dot(vOriginLookNormalized, vTargetLookNormalized)));
-	_float fY = ::XMVectorGetY(::XMVector3Cross(vOriginLookNormalized, vTargetLookNormalized));
-	if (fY < 0)
-		m_fAngle = -m_fAngle;
+	_float2 vCurScreenPos = _float2(fScreenX, 1.f - fScreenY);
+
+	m_vMotionVelocity.x = (m_vPreScreenPos - vCurScreenPos).x;
+	m_vMotionVelocity.y = (m_vPreScreenPos - vCurScreenPos).y;
+	m_vPreScreenPos = vCurScreenPos;
 }
 
-HRESULT CAwoofy::Add_Components()
+HRESULT CBladeKnight::Add_Components()
 {
 	HRESULT hr;
 	/* For.Com_Shader */
@@ -176,7 +186,7 @@ HRESULT CAwoofy::Add_Components()
 	CHECK_FAILED(hr);
 
 	/* For.Com_Model */
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Awoofy"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_BladeKnight"),
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
@@ -197,7 +207,32 @@ HRESULT CAwoofy::Add_Components()
 	return S_OK;
 }
 
-HRESULT CAwoofy::Bind_ShaderResources()
+HRESULT CBladeKnight::Add_PartObjects()
+{
+	/* For.Part_Weapon */
+	CPartObject* pWeaponObject = { nullptr };
+	CBladeKnightSword::BLADEKNIGHTSWORD_DESC	BladeKnightSwordDesc{};
+
+	CModel* pModel = (CModel*)Get_Component(TEXT("Com_Model"));
+
+	BladeKnightSwordDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	BladeKnightSwordDesc.pSocket = pModel->Get_BonePtr("RHaveL_end");
+
+	pWeaponObject = dynamic_cast<CPartObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_BladeKnightSword"), &BladeKnightSwordDesc));
+	if (nullptr == pWeaponObject)
+		return E_FAIL;
+
+	m_pSword = dynamic_cast<CBladeKnightSword*>(pWeaponObject);
+
+	Safe_AddRef(m_pSword);
+
+	m_PartObjects.emplace(TEXT("Part_Weapon"), pWeaponObject);
+
+
+	return S_OK;
+}
+
+HRESULT CBladeKnight::Bind_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
@@ -227,50 +262,42 @@ HRESULT CAwoofy::Bind_ShaderResources()
 	return S_OK;
 }
 
-void CAwoofy::Compute_MotionBlur()
-{
-	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-	_matrix ViewProjectionMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW) * m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
-	_vector vScreenPos = XMVector3TransformCoord(vPos, ViewProjectionMatrix);
-	_float fScreenX = (XMVectorGetX(vScreenPos) + 1.f) * 0.5f;
-	_float fScreenY = (XMVectorGetY(vScreenPos) + 1.f) * 0.5f;
-
-	_float2 vCurScreenPos = _float2(fScreenX, 1.f - fScreenY);
-
-	m_vMotionVelocity.x = (m_vPreScreenPos - vCurScreenPos).x;
-	m_vMotionVelocity.y = (m_vPreScreenPos - vCurScreenPos).y;
-	m_vPreScreenPos = vCurScreenPos;
-}
-
-void CAwoofy::SetUp_FSM()
+void CBladeKnight::SetUp_FSM()
 {
 	// FSM 상태 초기화
 	m_pFSM = CFSM::Create();
-	m_pFSM->Add_State(AWOOFY_WAIT, CAwoofy_Idle_State::Create());
-	m_pFSM->Add_State(AWOOFY_GROOMING, CAwoofy_Idle_State::Create());
-	m_pFSM->Add_State(AWOOFY_LOOKAROUND, CAwoofy_Idle_State::Create());
+	m_pFSM->Add_State(BLADEKNIGHT_WAIT, CBladeKnight_Idle_State::Create());
 
-	m_pFSM->Add_State(AWOOFY_RUN, CAwoofy_Run_State::Create());
-	m_pFSM->Add_State(AWOOFY_FIND, CAwoofy_Find_State::Create());
-	m_pFSM->Add_State(AWOOFY_BRAKE, CAwoofy_Brake_State::Create());
-	m_pFSM->Add_State(AWOOFY_LOOKAROUNDAFTERBRAKE, CAwoofy_LookAroundAfterBrake_State::Create());
+	m_pFSM->Add_State(BLADEKNIGHT_FIND, CBladeKnight_Find_State::Create());
+	m_pFSM->Add_State(BLADEKNIGHT_FINDWAIT, CBladeKnight_Find_State::Create());
 
-	m_pFSM->Add_State(AWOOFY_DAMAGE, CAwoofy_Damage_State::Create());
+	m_pFSM->Add_State(BLADEKNIGHT_MOVE, CBladeKnight_Move_State::Create());
+
+	m_pFSM->Add_State(BLADEKNIGHT_ATTACKSTART, CBladeKnight_Attack_State::Create());
+	m_pFSM->Add_State(BLADEKNIGHT_ATTACK, CBladeKnight_Attack_State::Create());
+	m_pFSM->Add_State(BLADEKNIGHT_DOUBLEATTACK, CBladeKnight_Attack_State::Create());
+
+	m_pFSM->Add_State(BLADEKNIGHT_RETREAT, CBladeKnight_Retreat_State::Create());
+
+	m_pFSM->Add_State(BLADEKNIGHT_TORNADOATTACKCHARGE, CBladeKnight_TornadoAttack_State::Create());
+	m_pFSM->Add_State(BLADEKNIGHT_TORNADOATTACK, CBladeKnight_TornadoAttack_State::Create());
+
+	//m_pFSM->Add_State(BLADEKNIGHT_DAMAGE, CBladeKnight_Damage_State::Create());
 
 	// 상태 Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};
-	FSM_Desc.iState = AWOOFY_WAIT;
+	FSM_Desc.iState = BLADEKNIGHT_WAIT;
 	FSM_Desc.pModel = &m_pModelCom;
 	m_pFSM->Initialize(&FSM_Desc);
 }
 
-CAwoofy* CAwoofy::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CBladeKnight* CBladeKnight::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	CAwoofy* pInstance = new CAwoofy(pDevice, pContext);
+	CBladeKnight* pInstance = new CBladeKnight(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Create : CAwoofy"));
+		MSG_BOX(TEXT("Failed To Create : CBladeKnight"));
 
 		Safe_Release(pInstance);
 	}
@@ -278,23 +305,26 @@ CAwoofy* CAwoofy::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	return pInstance;
 }
 
-CGameObject* CAwoofy::Clone(void* pArg)
+CGameObject* CBladeKnight::Clone(void* pArg)
 {
-	CAwoofy* pInstance = new CAwoofy(*this);
+	CBladeKnight* pInstance = new CBladeKnight(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Clone : CAwoofy"));
+		MSG_BOX(TEXT("Failed To Clone : CBladeKnight"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CAwoofy::Free()
+void CBladeKnight::Free()
 {
 	__super::Free();
 
-	//Safe_Release(m_pFSM);
-}
+	for (auto& Pair : m_PartObjects)
+		Safe_Release(Pair.second);
 
+	Safe_Release(m_pSword);
+	m_PartObjects.clear();
+}
