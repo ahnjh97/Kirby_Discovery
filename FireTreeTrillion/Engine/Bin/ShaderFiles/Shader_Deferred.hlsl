@@ -84,7 +84,9 @@ float4 g_vLightSpecular;
 float4 g_vMtrlAmbient = float4(1.f, 1.f, 1.f, 1.f);
 float4 g_vMtrlSpecular = float4(1.f, 1.f, 1.f, 1.f);
 
-float g_fRimWidth;
+bool g_bRimTest;
+
+float g_fBlackBackGround;
 
 float4 g_vCamPosition;
 
@@ -438,15 +440,18 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
     }
     
 
+    if (g_bRimTest == true)
+    {
     //////// 림 라이트
-    vector vRimLightDesc = g_RimLightTexture.Sample(ClampSampler, In.vTexcoord);
-    float4 vLook = g_vCamPosition - vWorldPos;
-    vector vNormalDesc = g_NormalTexture.Sample(PointSampler, In.vTexcoord);
-    float4 vNormal = float4(vNormalDesc.xyz * 2.f - 1.f, 0.f);
+        vector vRimLightDesc = g_RimLightTexture.Sample(ClampSampler, In.vTexcoord);
+        float4 vLook = g_vCamPosition - vWorldPos;
+        vector vNormalDesc = g_NormalTexture.Sample(PointSampler, In.vTexcoord);
+        float4 vNormal = float4(vNormalDesc.xyz * 2.f - 1.f, 0.f);
     
-    if (g_fRimWidth > 0.01f && vRimLightDesc.b == 1.f)
-        Out.vColor += (1.f - (clamp(pow(dot(normalize(vLook), normalize(vNormal)), g_fRimWidth), 0.f, 1.f)));
+        if (vRimLightDesc.g > 0.01f && vRimLightDesc.b == 1.f)
+            Out.vColor += (1.f - (clamp(pow(dot(normalize(vLook), normalize(vNormal)), vRimLightDesc.g), 0.f, 1.f)));
     /////////
+    }
     
         
     vector vNonLight = g_NonLightTexture.Sample(LinearSampler, In.vTexcoord);
@@ -491,7 +496,10 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
         // 0 ~ 196번 최대   0번일수록 0.6   196번 일수록 1이여야 한다.
         Out.vColor *= saturate(0.6f + (0.4f / 90.f * ShadowTotal));
     }
-     
+    else if (g_DeferredInfoTexture.Sample(LinearSampler, In.vTexcoord).g != 1.f)
+    {
+        Out.vColor *= g_fBlackBackGround;
+    }
     
     return Out;
 }

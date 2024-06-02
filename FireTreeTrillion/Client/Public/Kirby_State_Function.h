@@ -57,6 +57,9 @@ static void Turn_Interpolate(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTra
 	}
 	///////////
 
+
+
+
 }
 
 // 조이스틱의 방향이 꺾일 때, Dir방향으로 Z 회전하는 기능 (오토바이 무빙)
@@ -411,8 +414,8 @@ static CKirby::DIR Kirby_Standard_Angle(CKirby::KIRBY_INFODESC* Kirbydesc)
 static void Dodge_Moving_Logic(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTransformCom, CCharacterController* pController, _float fTimeDelta)
 {
 	DESC(m_fMoveSpeed) += fTimeDelta * 100.f;
-	if (DESC(m_fMoveSpeed) > 8.f)
-		DESC(m_fMoveSpeed) = 8.f;
+	if (DESC(m_fMoveSpeed) > 10.f)
+		DESC(m_fMoveSpeed) = 10.f;
 
 	// 타겟기준
 	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
@@ -444,6 +447,7 @@ static _bool Is_BigTurn(CKirby::KIRBY_INFODESC* Kirbydesc)
 	return false;
 }
 
+// 주변에서 가장 가까운 Object를 흡수한다. 몬스터 -> 아이템 -> 오브젝트 우선순위
 static _bool Vacuum_Object(CKirby* pKirby, _float fTimeDelta)
 {
 	CTransform* pTransformCom = pKirby->Get_TransformCom();
@@ -524,12 +528,78 @@ static _bool Vacuum_Object(CKirby* pKirby, _float fTimeDelta)
 
 		if (DESC(m_pObject)->Get_VacuumSize() == SIZE_SMALL)
 			pKirby->Change_State(CKirby::STATE_VACUUM, 50.f, true, true, CKirby::BODY_VACUUM);
-
 		else if (DESC(m_pObject)->Get_VacuumSize() == SIZE_BIG)
 			pKirby->Change_State(CKirby::STATE_VACUUMHUSTLELV2, 50.f, true, true, CKirby::BODY_VACUUM);
 
 		return true;
 	}
 
+
+	// 이 이후로는 아이템, 돌멩이 등 진행하여야 한다.
+
+
+
 	return false;
+}
+
+// 커비가 빌보드 한다.
+static void Kirby_Billboard(CTransform* pTransformCom, CGameObject* pCamera)
+{
+	_float3   vScale = pTransformCom->Get_Scaled();
+	_float4x4      CamMatrix;
+	CTransform* pCamTransform = pCamera->Get_TransformCom();
+	CamMatrix = pCamTransform->Get_WorldFloat4x4();
+
+	_vector vLook, vRight, vUp;
+
+	vRight = CUtils::Get_State_Vector_Matrix(CamMatrix, CUtils::STATE_RIGHT);
+	vLook = CUtils::Get_State_Vector_Matrix(CamMatrix, CUtils::STATE_LOOK);
+	vUp = CUtils::Get_State_Vector_Matrix(CamMatrix, CUtils::STATE_UP);
+
+	vRight = XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 1.f), vLook);
+	vLook = XMVector3Cross(vRight, vUp);
+	pTransformCom->Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLook) * vScale.z);
+	pTransformCom->Set_State(CTransform::STATE_UP, XMVector3Normalize(vUp) * vScale.y);
+	pTransformCom->Set_State(CTransform::STATE_RIGHT, XMVector3Normalize(vRight) * vScale.x);
+}
+
+// 커비가 자신의 능력에 따라 상태로 변형된다!! (공용에서 비슷한 애들로 넘어갈 때만)
+static void Kirby_AbilityType_Assist(CKirby* pKirby, CKirby::STATE eState)
+{
+	if (eState == CKirby::STATE_IDLE)
+	{
+		if (pKirby->Get_AbilityType() == ABILITY_SWORD)
+			pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		else
+			pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+	}
+	else if (eState == CKirby::STATE_RUNSTART)
+	{
+		if (pKirby->Get_AbilityType() == ABILITY_SWORD)
+			pKirby->Change_State(CKirby::SWORDSTATE_RUN, 120.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		else
+			pKirby->Change_State(CKirby::STATE_RUNSTART, 120.f, true, true, CKirby::BODY_DEFAULT);
+	}
+	else if (eState == CKirby::STATE_GUARD)
+	{
+		if (pKirby->Get_AbilityType() == ABILITY_SWORD)
+			pKirby->Change_State(CKirby::SWORDSTATE_GUARD, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		else
+			pKirby->Change_State(CKirby::STATE_GUARD, 60.f, true, true, CKirby::BODY_DEFAULT);
+	}
+	else if (eState == CKirby::STATE_SLIDESTART)
+	{
+		if (pKirby->Get_AbilityType() == ABILITY_SWORD)
+			pKirby->Change_State(CKirby::SWORDSTATE_SWORDSLIDESTART, 60.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		else
+			pKirby->Change_State(CKirby::STATE_SLIDESTART, 60.f, false, false, CKirby::BODY_DEFAULT);
+	}
+	else if (eState == CKirby::STATE_FLIGHT)
+	{
+		if (pKirby->Get_AbilityType() == ABILITY_SWORD)
+			pKirby->Change_State(CKirby::SWORDSTATE_HAVESWORDWAITFLIGHT, 60.f, false, false, CKirby::BODY_SWORDBALLOON, CKirby::OFFSET_SWORD);
+		else
+			pKirby->Change_State(CKirby::STATE_FLIGHT, 60.f, false, false, CKirby::BODY_BALLOON);
+	}
+
 }

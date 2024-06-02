@@ -11,6 +11,7 @@ uint        g_iTriggerType;
 
 bool g_bStencil;
 bool g_bRimLight;
+float m_fRimWidth;
 bool g_bMotionBlur;
 float4 g_vMotionVelocity;
 
@@ -127,7 +128,7 @@ PS_OUT PS_MAIN(PS_IN In)
         Out.vStencil = vector(1.f, 0.f, 0.0f, 1.f);
     
     if (g_bRimLight == true)
-        Out.vRimLight = vector(0.f, 0.f, 1.f, 1.f);
+        Out.vRimLight = vector(0.f, m_fRimWidth, 1.f, 1.f);
 
     if (g_bMotionBlur == true)
         Out.vMotionBlur = g_vMotionVelocity;
@@ -152,7 +153,7 @@ PS_OUT NO_NORMALMAP_PS_MAIN(PS_IN In)
         Out.vStencil = vector(1.f, 0.f, 0.0f, 1.f);
     
     if (g_bRimLight == true)
-        Out.vRimLight = vector(0.f, 0.f, 1.f, 1.f);
+        Out.vRimLight = vector(0.f, m_fRimWidth, 1.f, 1.f);
 
     if (g_bMotionBlur == true)
         Out.vMotionBlur = g_vMotionVelocity;

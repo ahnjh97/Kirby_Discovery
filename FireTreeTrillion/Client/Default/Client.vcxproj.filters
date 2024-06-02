@@ -187,6 +187,12 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword">
       <UniqueIdentifier>{c3a1e0ee-a23e-4cfa-80f9-70d6a55eb2b8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyContents_State">
+      <UniqueIdentifier>{327ee443-7a2d-4e39-acdc-88550179e67c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbySword_State">
+      <UniqueIdentifier>{00b58d0d-786b-4ae0-a6e2-a4a5042882aa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -376,6 +382,12 @@
     <ClInclude Include="..\Public\ImSequencer.h">
       <Filter>02.GameObjects\Anim</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\KirbyContents_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyContents_State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KirbySword_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbySword_State</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -546,6 +558,12 @@
     <ClCompile Include="..\Private\HUD.cpp" />
     <ClCompile Include="..\Private\ImSequencer.cpp">
       <Filter>02.GameObjects\Anim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KirbyContents_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyContents_State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KirbySword_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbySword_State</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

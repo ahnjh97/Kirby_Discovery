@@ -8,9 +8,9 @@ CKirbyBalloon_Idle_State::CKirbyBalloon_Idle_State()
 {
 }
 
-void CKirbyBalloon_Idle_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CKirbyBalloon_Idle_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CKirbyBalloon_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -38,7 +38,15 @@ void CKirbyBalloon_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 	{
 		if (pKirby->isAnimFinish())
 		{
-			pKirby->Change_State(CKirby::STATE_EATWAIT, 60.f, true, true, CKirby::BODY_BALLOON);
+			if (DESC(m_eTemporaryEatType) == ABILITY_DEFAULT)
+			{
+				pKirby->Change_State(CKirby::STATE_EATWAIT, 60.f, true, true, CKirby::BODY_BALLOON);
+			}
+			else
+			{
+				DESC(m_isEat) = false;
+				pKirby->Change_State(CKirby::STATE_SWALLOWSTART, 60.f, false, false, CKirby::BODY_BALLOON);
+			}
 		}
 	}
 	// 먹었을 때의 아이들 상태
@@ -105,9 +113,9 @@ CKirbyBalloon_Run_State::CKirbyBalloon_Run_State()
 {
 }
 
-void CKirbyBalloon_Run_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CKirbyBalloon_Run_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CKirbyBalloon_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -186,9 +194,9 @@ CKirbyBalloon_Jump_State::CKirbyBalloon_Jump_State()
 
 }
 
-void CKirbyBalloon_Jump_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CKirbyBalloon_Jump_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CKirbyBalloon_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -403,9 +411,9 @@ CKirbyBalloon_Fly_State::CKirbyBalloon_Fly_State()
 {
 }
 
-void CKirbyBalloon_Fly_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CKirbyBalloon_Fly_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CKirbyBalloon_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -455,7 +463,8 @@ void CKirbyBalloon_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 				DESC(m_fJumpVelocity) = 0.f;
 			else
 				DESC(m_fJumpVelocity) = 4.f;
-			pKirby->Change_State(CKirby::STATE_FLIGHT, 60.f, false, false, CKirby::BODY_BALLOON);
+
+			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_FLIGHT);
 		}
 		// 비행 시작 애니메이션이 끝났을 경우
 		else if (pKirby->isAnimFinish())
@@ -489,7 +498,7 @@ void CKirbyBalloon_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 				DESC(m_fJumpVelocity) = 0.f;
 			else
 				DESC(m_fJumpVelocity) = 4.f;
-			pKirby->Set_Animation(CKirby::STATE_FLIGHT, 60.f, false, false);
+			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_FLIGHT);
 		}
 
 	}
@@ -514,7 +523,7 @@ void CKirbyBalloon_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 				DESC(m_fJumpVelocity) = 0.f;
 			else
 				DESC(m_fJumpVelocity) = 4.f;
-			pKirby->Change_State(CKirby::STATE_FLIGHT, 60.f, false, false, CKirby::BODY_BALLOON);
+			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_FLIGHT);
 		}
 		// 힘들경우 LIMITFALL 로 간다.
 		if (DESC(m_fFlyTime) > fFlyTime)
@@ -618,6 +627,90 @@ CKirbyBalloon_Fly_State* CKirbyBalloon_Fly_State::Create()
 }
 
 void CKirbyBalloon_Fly_State::Free()
+{
+	__super::Free();
+}
+
+#pragma endregion
+
+
+
+
+#pragma region SWALLOW STATE
+
+
+CKirbyBalloon_Swallow_State::CKirbyBalloon_Swallow_State()
+{
+}
+
+void CKirbyBalloon_Swallow_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+}
+
+void CKirbyBalloon_Swallow_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
+
+	CTransform* pCameraTransform = pCamera->Get_TransformCom();
+	_float4 vCamRight = pCameraTransform->Get_State_Vector(CTransform::STATE_RIGHT);
+	_float4 vCamLook = XMVector3Cross(vCamRight, XMVectorSet(0.f, 1.f, 0.f, 1.f));
+	DESC(m_vTargetDir) = vCamLook * -1.f;
+
+	Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
+
+	m_pGameInstance->Set_SecondTimerRatio(0.f);
+	m_pGameInstance->Set_BlackBackGround(true);
+
+
+	if (pKirby->Get_State() == CKirby::STATE_SWALLOWSTART)
+	{
+		DESC(m_eEyeState) = CKirby::EYE_IDLE;
+		DESC(m_eMouthState) = CKirby::MOUTH_ANGER;
+
+		if (pKirby->isAnimFinish())
+		{
+			pKirby->Change_State(CKirby::STATE_SWALLOWEND, 70.f, false, false, CKirby::BODY_BALLOON);
+		}
+
+	}
+	else if (pKirby->Get_State() == CKirby::STATE_SWALLOWEND)
+	{
+
+		DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+		DESC(m_eMouthState) = CKirby::MOUTH_ANGER;
+
+		if (pKirby->isAnimFinish())
+		{
+			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			DESC(m_eMouthState) = CKirby::MOUTH_IDLE;
+
+			// 파츠 실시간 교체는 밖에서 해준다.
+			pKirby->Set_AbilityType(DESC(m_eTemporaryEatType));
+			// 이제 먹었으니까. 입에 머금고 있는 능력을 삭제한다.
+			DESC(m_eTemporaryEatType) = ABILITY_END;
+
+			pKirby->Change_State(CKirby::STATE_GETABILITY, 70.f, false, false, CKirby::BODY_DEFAULT);
+		}
+	}
+
+}
+
+void CKirbyBalloon_Swallow_State::OnStateExit()
+{
+}
+
+CKirbyBalloon_Swallow_State* CKirbyBalloon_Swallow_State::Create()
+{
+	CKirbyBalloon_Swallow_State* pInstance = new CKirbyBalloon_Swallow_State();
+	return pInstance;
+}
+
+void CKirbyBalloon_Swallow_State::Free()
 {
 	__super::Free();
 }

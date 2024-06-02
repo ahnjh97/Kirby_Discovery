@@ -432,6 +432,7 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 		/////////////////////// UI를 제외하고 그려진 상황에서, 화면 색 보정 처리한다.
 
 		Interpolate_ColorData(fTimeDelta);
+		Interpolate_BlackBackground(fTimeDelta);
 
 		if (FAILED(Render_FinalResult()))
 			return E_FAIL;
@@ -449,23 +450,6 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 	if (m_pGameInstance->Get_DIKeyState(DIK_R, KEY_DOWN))
 		m_bRimTest = !m_bRimTest;
 	
-	if (m_bRimTest == true)
-	{
-		m_fRimWidth += (0.2f - m_fRimWidth) * (fTimeDelta * 5.f);
-		if ((0.2f - m_fRimWidth) < 0.001f)
-		{
-			m_fRimWidth = 0.2f;
-		}
-	}
-	else
-	{
-		m_fRimWidth -= m_fRimWidth * (fTimeDelta * 5.f);
-		if (m_fRimWidth < 0.01f)
-		{
-			m_fRimWidth = 0.f;
-		}
-	}
-
 	// 고사양, 저사양 모드
 	if (m_pGameInstance->Get_DIKeyState(DIK_E, KEY_DOWN))
 		m_bLowPass = !m_bLowPass;
@@ -900,7 +884,9 @@ HRESULT CRenderer::Render_Result()
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_RimLight"), "g_RimLightTexture")))
 		return E_FAIL;
-	if (FAILED(m_pShader->Bind_RawValue("g_fRimWidth", &m_fRimWidth, sizeof(_float))))
+	if (FAILED(m_pShader->Bind_RawValue("g_bRimTest", &m_bRimTest, sizeof(_bool))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fBlackBackGround", &m_fBlackBackground, sizeof(_float))))
 		return E_FAIL;
 
 	// 섞을 스카이 박스
@@ -1295,6 +1281,22 @@ void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 		m_vHighlightColor[0] += (m_DestColorData.vHighlightColor[0] - m_vHighlightColor[0]) * fInterpolateSpeed;
 		m_vHighlightColor[1] += (m_DestColorData.vHighlightColor[1] - m_vHighlightColor[1]) * fInterpolateSpeed;
 		m_vHighlightColor[2] += (m_DestColorData.vHighlightColor[2] - m_vHighlightColor[2]) * fInterpolateSpeed;
+	}
+}
+
+void CRenderer::Interpolate_BlackBackground(_float fTimeDelta)
+{
+	if (m_bBlackBackground == false)
+	{
+		m_fBlackBackground += fTimeDelta * 1.2f;
+		if (m_fBlackBackground > 1.f)
+			m_fBlackBackground = 1.f;
+	}
+	else
+	{
+		m_fBlackBackground -= fTimeDelta * 1.2f;
+		if (m_fBlackBackground < 0.5f)
+			m_fBlackBackground = 0.5f;
 	}
 }
 

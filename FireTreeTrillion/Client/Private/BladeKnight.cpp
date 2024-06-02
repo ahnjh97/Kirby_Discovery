@@ -44,6 +44,12 @@ HRESULT CBladeKnight::Initialize(void* pArg)
 
 	m_pModelCom->Set_Animation(BLADEKNIGHT_WAIT, 50.f, true, true);
 
+	m_fMaxHp = 15.f;
+	m_fHp = 15.f;
+	m_fAttack = 10.f;
+	m_eVacuumSize = SIZE_SMALL;
+	m_eAbilityType = ABILITY_SWORD;
+
 	return S_OK;
 }
 
@@ -257,6 +263,8 @@ HRESULT CBladeKnight::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool))))
 		return E_FAIL;

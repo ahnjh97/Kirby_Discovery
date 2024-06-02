@@ -323,6 +323,14 @@ void CGameInstance::Update_DofFocus(_fvector vWorldPos)
 
 }
 
+void CGameInstance::Set_BlackBackGround(_bool bSet)
+{
+	if (nullptr == m_pRenderer)
+		return;
+
+	m_pRenderer->Set_BlackBackGround(bSet);
+}
+
 #ifdef _DEBUG
 
 HRESULT CGameInstance::Add_DebugComponents(CComponent * pRenderComponent)
