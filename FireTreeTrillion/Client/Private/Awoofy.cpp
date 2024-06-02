@@ -48,8 +48,6 @@ HRESULT CAwoofy::Initialize(void* pArg)
 	m_eVacuumSize = SIZE_SMALL;
 	m_eAbilityType = ABILITY_DEFAULT;
 
-	Add_AnimEvent();
-
 	return S_OK;
 }
 

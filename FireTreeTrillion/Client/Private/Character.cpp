@@ -21,6 +21,8 @@ HRESULT CCharacter::Initialize(void* pArg)
 {
 	HRESULT hr;
 	hr = __super::Initialize(pArg);
+	Add_AnimEvent();
+
 	CHECK_FAILED(hr);
 
 	return S_OK;

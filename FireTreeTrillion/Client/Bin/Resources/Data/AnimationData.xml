@@ -1,36 +1,7 @@
 <Root>
     <Version>240602</Version>
     <ModelName>KirbyDefault
-        <Animation>Choose</Animation>
-        <AnimSpeed>17</AnimSpeed>
-        <Count>1</Count>
-        <Data0 EventName="Notify" StartFrame="0" EndFrame="0"/>
-        <Animation>Brake</Animation>
-        <AnimSpeed>30</AnimSpeed>
-        <Count>1</Count>
-        <Data0 EventName="Notify" StartFrame="0" EndFrame="0"/>
-        <Animation>DodgeRight</Animation>
-        <AnimSpeed>30</AnimSpeed>
-        <Count>1</Count>
-        <Data0 EventName="Notify" StartFrame="0" EndFrame="0"/>
-        <Animation>DanceA1</Animation>
-        <AnimSpeed>29</AnimSpeed>
-        <Count>1</Count>
-        <Data0 EventName="Notify" StartFrame="0" EndFrame="0"/>
-        <Animation>BackJump</Animation>
-        <AnimSpeed>30</AnimSpeed>
-        <Count>1</Count>
-        <Data0 EventName="Notify" StartFrame="0" EndFrame="0"/>
-        <Animation>Feed</Animation>
-        <AnimSpeed>17</AnimSpeed>
-        <Count>1</Count>
-        <Data0 EventName="Notify" StartFrame="0" EndFrame="0"/>
-    </ModelName>
-    <ModelName>Awoofy
-        <Animation>Armature|Armature|Run</Animation>
-        <AnimSpeed>30</AnimSpeed>
-        <Count>2</Count>
-        <Data0 EventName="Notify" StartFrame="0" EndFrame="0"/>
-        <Data1 EventName="SpawnParticle" StartFrame="0" EndFrame="1"/>
+        <Animation AnimName="ArenaDeath" Speed="30" Count="1">
+            <EventInfo EventName="Notify" StartFrame="0" EndFrame="1"/></Animation>
     </ModelName>
 </Root>
