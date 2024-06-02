@@ -61,12 +61,14 @@ public:
 	const _char* Get_AnimationName() const { return m_Animations[m_iCurrentAnimIndex]->Get_AnimationName(); }
 	_uint Get_AnimCnt() const { return m_Animations.size(); }
 	vector<class CAnimation*>* const Get_Animations() { return &m_Animations; }
+	
 public:
 	virtual HRESULT Initialize_Prototype(MODEL tModel);
 	virtual HRESULT Initialize(void* pArg)  override;
 #ifdef _DEBUG
 	virtual void	Render_IMGUI()			override;
 #endif
+
 public:
 	HRESULT Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex);
 	HRESULT Bind_ShaderResource(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, _uint iTextureType);
@@ -81,6 +83,10 @@ public:
 
 	_float4 Check_Meshes(const class CTransform* pTransform, _Out_ _int& iMeshIndex) const;
 
+	void Find_MinMax(_float3& vMin, _float3& vMax);
+	void Create_OcTree(_float3 vMin, _float3 vMax);
+	void Culling(_fmatrix matWorldInverse);
+
 private:
 	_uint						m_iNumMeshes = { 0 };
 	vector<class CMesh*>		m_Meshes;
@@ -91,6 +97,10 @@ private:
 	_float4x4					m_TransformMatrix;
 
 	vector<class CBone*>		m_Bones;
+
+	class COcTree*				m_pOctree = { nullptr };
+	_float3						m_vMin = {};
+	_float3						m_vMax = {};
 
 	// 애니메이션
 	_uint						m_iNumAnimations = { 0 };

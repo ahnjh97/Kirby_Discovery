@@ -4,6 +4,7 @@
 #include "Kirby.h"
 #include "Level_GamePlay.h"
 #include "Camera_Free.h"
+#include "BasicMap.h"
 #include "Trigger.h"
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -262,7 +263,22 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BladeKnight"), &tempDesc)))
 				return E_FAIL;
 		}
-		else if (strModelName == "Level1Stage1Step01" || strModelName == "Level1Stage1Step01_Blend")
+		else if (strModelName == "Level1Stage1Step01")
+		{
+			CBasicMap::MAP_DESC tMapDesc{};
+			tMapDesc.matWorld = tempDesc.matWorld;
+			tMapDesc.wstrModelName = tempDesc.wstrModelName;
+			
+			_float3 vMin{}, vMax{};
+			fileStream.read(reinterpret_cast<char*>(&vMin), sizeof(vMin));
+			fileStream.read(reinterpret_cast<char*>(&vMax), sizeof(vMax));
+
+			tMapDesc.vMin = vMin;
+			tMapDesc.vMax = vMax;
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_BasicMap"), &tMapDesc)))
+				return E_FAIL;
+		}
+		else if (strModelName == "Level1Stage1Step01_Blend")
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_BasicMap"), &tempDesc)))
 				return E_FAIL;

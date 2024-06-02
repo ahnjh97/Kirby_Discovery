@@ -334,8 +334,8 @@ namespace Engine
 
 	struct FACE
 	{
-		_float3 vA = {};
-		_float3 vB = {};
-		_float3 vC = {};
+		_uint iA;
+		_uint iB;
+		_uint iC;
 	};
 }

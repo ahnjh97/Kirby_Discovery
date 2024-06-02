@@ -278,6 +278,5 @@ void CQuadTree::Free()
 		if (m_pChildren[i] != nullptr)
 			Safe_Release(m_pChildren[i]);
 	}
-
 }
 

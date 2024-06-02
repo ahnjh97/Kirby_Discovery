@@ -1,4 +1,6 @@
 #include "Model.h"
+#include "GameInstance.h"
+#include "OcTree.h"
 //#include "Channel.h"
 #include "Texture.h"
 #include "Shader.h"
@@ -229,6 +231,56 @@ _float4 CModel::Check_Meshes(const class CTransform* pTransform, _Out_ _int& iMe
 		}
 	}
 	return fResult;
+}
+
+void CModel::Find_MinMax(_float3& vMin, _float3& vMax)
+{
+	for (auto& mesh : m_Meshes)
+		mesh->Find_MinMax(vMin, vMax);
+}
+
+void CModel::Create_OcTree(_float3 vMin, _float3 vMax)
+{
+	if (vMin.x == 0)
+		return;
+	
+	m_vMin = vMin;
+	m_vMax = vMax;
+
+	vector<_float3> vecEdges(COcTree::OC_END);
+
+	vecEdges[COcTree::OC_XYZ] = _float3(m_vMax.x, m_vMax.y, m_vMax.z);
+	vecEdges[COcTree::OC_XyZ] = _float3(m_vMax.x, m_vMin.y, m_vMax.z);
+	vecEdges[COcTree::OC_Xyz] = _float3(m_vMax.x, m_vMin.y, m_vMin.z);
+	vecEdges[COcTree::OC_XYz] = _float3(m_vMax.x, m_vMax.y, m_vMin.z);
+	vecEdges[COcTree::OC_xYZ] = _float3(m_vMin.x, m_vMax.y, m_vMax.z);
+	vecEdges[COcTree::OC_xyZ] = _float3(m_vMin.x, m_vMin.y, m_vMax.z);
+	vecEdges[COcTree::OC_xyz] = _float3(m_vMin.x, m_vMin.y, m_vMin.z);
+	vecEdges[COcTree::OC_xYz] = _float3(m_vMin.x, m_vMax.y, m_vMin.z);
+
+	vector<_float3*> vecMeshVerticesPtrs;
+	vector<_uint> vecMeshNumVertices;
+	vector<_uint*> vecMeshIndicesPtrs;
+	vector<_uint> vecMeshNumIndices;
+
+	
+	//m_pOctree = COcTree::Create()
+}
+
+void CModel::Culling(_fmatrix matWorldInverse)
+{
+	m_pGameInstance->TransformFrustum_LocalSpace(matWorldInverse);
+
+	vector<_float3*> vecMeshVerticesPtrs;
+	vector<_uint> vecMeshNumVertices;
+
+	for (auto& mesh : m_Meshes)
+	{
+		vecMeshVerticesPtrs.emplace_back(mesh->Get_VerticesPtr());
+		vecMeshNumVertices.emplace_back(mesh->Get_NumVertices());
+	}
+
+	return;
 }
 
 HRESULT CModel::Ready_Meshes()

@@ -21,9 +21,9 @@ HRESULT CBasicMap::Initialize_Prototype()
 
 HRESULT CBasicMap::Initialize(void* pArg)
 {
-    GAMEOBJECT_DESC		GameObjectDesc{};
+    MAP_DESC		GameObjectDesc{};
     if (nullptr != pArg)
-        GameObjectDesc = *(GAMEOBJECT_DESC*)pArg;
+        GameObjectDesc = *(MAP_DESC*)pArg;
 
     GameObjectDesc.fSpeedPerSec = 10.f;
     GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
@@ -41,6 +41,8 @@ HRESULT CBasicMap::Initialize(void* pArg)
             if (FAILED(Add_BlendMap(wstrModelTag)))
                 return E_FAIL;
         }
+        
+        m_pModelCom->Create_OcTree(GameObjectDesc.vMin, GameObjectDesc.vMax);
     }
     else    
         m_eRenderGroup = CRenderer::RENDER_BLEND;
@@ -64,8 +66,12 @@ _int CBasicMap::Tick(_float fTimeDelta)
     m_fTime += fTimeDelta;
 
     if (nullptr != m_pBlendMap)
+    {
         m_pBlendMap->Tick(fTimeDelta);
 
+        m_pModelCom->Culling(m_pTransformCom->Get_WorldMatrix_Inverse());
+    }
+       
     return OBJ_NOEVENT;
 }
 

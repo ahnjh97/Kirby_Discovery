@@ -510,6 +510,17 @@ void CMapToolHelper::Save_Level()
 			outputFile.write(reinterpret_cast<const char*>(&iCamType), sizeof(iCamType));
 			outputFile.write(reinterpret_cast<const char*>(&fRadius), sizeof(fRadius));
 		}
+		else if (-1 != Compute_MapIndex(strModelName)) // ∏ ¿Œ ∞ÊøÏ
+		{
+			if (0 != strModelName.compare(strModelName.size() - 5, 5, "Blend")) // Blend∏ ¿Ã æ∆¥— ∞ÊøÏ
+			{
+				_float3 vMin{FLT_MAX, FLT_MAX, FLT_MAX}, vMax{-FLT_MAX, -FLT_MAX , -FLT_MAX };
+				pModel->Find_MinMax(vMin, vMax);
+				
+				outputFile.write(reinterpret_cast<const char*>(&vMin), sizeof(vMin));
+				outputFile.write(reinterpret_cast<const char*>(&vMax), sizeof(vMax));
+			}
+		}
 	}
 
 	outputFile.close();
@@ -596,6 +607,15 @@ void CMapToolHelper::Load_Level()
 			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
 			fileStream.read(reinterpret_cast<char*>(&iCamType), sizeof(iCamType));
 			fileStream.read(reinterpret_cast<char*>(&fRadius), sizeof(fRadius));
+		}
+		else if (-1 != Compute_MapIndex(strModelName)) // ∏ ¿Ã∏È
+		{
+			if (0 != strModelName.compare(strModelName.size() - 5, 5, "Blend")) // Blend∏ ¿Ã æ∆¥— ∞ÊøÏ
+			{
+				_float3 vMin{}, vMax{};
+				fileStream.read(reinterpret_cast<char*>(&vMin), sizeof(vMin));
+				fileStream.read(reinterpret_cast<char*>(&vMax), sizeof(vMax));
+			}
 		}
 
 		if (fileStream.eof())

@@ -16,6 +16,10 @@ private:
 public:
 	_uint Get_MaterialIndex() const { return m_iMaterialIndex; }
 	string Get_Name() { return string(m_szName); }
+	_float3* Get_VerticesPtr() { return m_pVerticesPos; }
+	_uint Get_NumVertices() { return m_iNumVertices; }
+	_uint* Get_IndicesPtr() { return m_pIndices; }
+	_uint Get_NumIndices() { return m_iNumIndices; }
 
 public:
 	virtual HRESULT Initialize_Prototype(TYPE eModelType, string strDirectory, const vector<CBone*>& Bones, _fmatrix TransformMatrix);
@@ -31,6 +35,9 @@ public:
 	HRESULT CreateStaticActor(_float4 vPos);
 
 	_float4 Get_PickPos(const class CTransform* pTransform) const;
+
+	void Find_MinMax(_float3& vMin, _float3& vMax);
+	void Culling(const vector<FACE>& _vecFaces);
 
 private:
 	_char					m_szName[MAX_PATH] = { "" };

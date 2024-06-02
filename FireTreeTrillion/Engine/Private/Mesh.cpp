@@ -170,6 +170,32 @@ _float4 CMesh::Get_PickPos(const CTransform* pTransform) const
 	return fResult;
 }
 
+void CMesh::Find_MinMax(_float3& vMin, _float3& vMax)
+{
+	for (_uint i = 0; i < m_iNumVertices; i++)
+	{
+		if (m_pVerticesPos[i].x < vMin.x)
+			vMin.x = m_pVerticesPos[i].x;
+		else if (m_pVerticesPos[i].x > vMax.x)
+			vMax.x = m_pVerticesPos[i].x;
+
+		if (m_pVerticesPos[i].y < vMin.y)
+			vMin.y = m_pVerticesPos[i].y;
+		else if (m_pVerticesPos[i].y > vMax.y)
+			vMax.y = m_pVerticesPos[i].y;
+
+		if (m_pVerticesPos[i].z < vMin.z)
+			vMin.z = m_pVerticesPos[i].z;
+		else if (m_pVerticesPos[i].z > vMax.z)
+			vMax.z = m_pVerticesPos[i].z;
+	}
+}
+
+void CMesh::Culling(const vector<FACE>& _vecFaces)
+{
+
+}
+
 HRESULT CMesh::Ready_Vertices_For_NonAnimModel(_fmatrix TransformMatrix)
 {
 	m_iVertexStride = sizeof(VTXMESH);

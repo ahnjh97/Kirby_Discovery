@@ -13,6 +13,13 @@ BEGIN(Client)
 class CBasicMap final : public CGameObject
 {
 public:
+	struct MAP_DESC : public GAMEOBJECT_DESC
+	{
+		_float3 vMin{};
+		_float3 vMax{};
+	};
+
+public:
 	void Set_PassIndex(_uint iIndex, _uint iPassIndex) { m_vecPassIndices[iIndex] = iPassIndex; }
 	void Set_SamplingFactor(_uint iIndex, _float fSamplingFactor) { m_vecSamplingFactors[iIndex] = fSamplingFactor; }
 	void Reset_Time(_uint iIndex) { m_iMeshIndex = iIndex; m_fTime = 0;  }
