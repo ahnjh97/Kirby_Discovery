@@ -38,7 +38,7 @@ HRESULT CLevel_Logo::Render()
 	++m_iFPS;
 
 	_tchar szFPS[MAX_PATH] = TEXT("");
-	wsprintf(szFPS, TEXT("Level GamePlay, %d FPS"), m_iFPS);
+	wsprintf(szFPS, TEXT("Level Logo, %d FPS"), m_iFPS);
 
 	if (m_fAccDelta >= 1.f)
 	{
