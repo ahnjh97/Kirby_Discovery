@@ -51,7 +51,9 @@ private:
 	HRESULT Add_KirbyFaceTexture(LEVEL eLevel);
 
 	HRESULT Add_AllModelTxts(LEVEL eLevel, TYPE eType);
-	void TraverseModelTxts(const wstring& rootFolderPath, list<wstring>& fileList);
+	void	TraverseModelTxts(const wstring& rootFolderPath, list<wstring>& fileList);
+	// animation 정보를 로드하여 모델을 추가할때 넘겨주는 데이터에 넣는다.
+	void	Load_AnimInfo();
 
 private:
 	ID3D11Device*				m_pDevice = { nullptr };
@@ -61,10 +63,13 @@ private:
 	LEVEL						m_eNextLevelID = { LEVEL_END };
 	wstring						m_strLoadingText;
 	_bool						m_IsFinished = { false };
+	CGameInstance*				m_pGameInstance = { nullptr };
 
 	vector<MODEL>				m_vecModelInfo;
 
-	CGameInstance*				m_pGameInstance = { nullptr };
+	using AnimToolMap = unordered_map< string, unordered_map< string, ANIM_INFO >>;
+	AnimToolMap					m_mapSequence;
+
 
 public:
 	static CLoader* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID);

@@ -3,8 +3,8 @@
 
 #include "AnimToolObject.h"
 #include "Model.h"
-#include "ImSequencer.h"
 #include "Utils.h"
+#include "ImSequencer.h"
 #include "tinyxml2.h"
 
 
@@ -12,19 +12,19 @@ static string	g_strProtoObjTag = "";
 //static string	g_strModelTag = "";
 //static _int	g_iActiveModelNum = -1;
 
-static const char* SequencerItemTypeNames[] = { "notify"/*, "Collision Event", "Sound Event" */};
+static const char* SequencerItemTypeNames[] = { "notify"/*, "Collision Event", "Sound Event" */ };
 struct AnimSequence : public ImSequencer::SequenceInterface
 {
-	struct AnimSequenceItem
-	{
-		string	strEventName;
-		_int	iStartFrame;
-		_int	iEndFrame;
-	};
+	//struct AnimSequenceItem
+	//{
+	//	string	strEventName;
+	//	_int	iStartFrame;
+	//	_int	iEndFrame;
+	//};
 
 	// 구조체 내 멤버 변수, vector
 	_int m_iFrameMin, m_iFrameMax;
-	std::vector<AnimSequenceItem> m_vecSequenceItems;
+	std::vector<EVENT_INFO> m_vecSequenceItems;
 
 	// 구조체 생성자
 	AnimSequence() {}
@@ -52,7 +52,7 @@ struct AnimSequence : public ImSequencer::SequenceInterface
 
 	virtual void Get(int index, int** start, int** end, char** eventName, unsigned int* color) override
 	{
-		AnimSequenceItem& sequenceItem = m_vecSequenceItems[index];
+		EVENT_INFO& sequenceItem = m_vecSequenceItems[index];
 		if (color)
 			*color = 0xFFAA8080; // same color for everyone, return color based on type
 		if (start)
@@ -65,7 +65,7 @@ struct AnimSequence : public ImSequencer::SequenceInterface
 
 	virtual void Add(int type, const char* strName) override
 	{
-		m_vecSequenceItems.push_back(AnimSequenceItem{strName, 0, 1});
+		m_vecSequenceItems.push_back(EVENT_INFO{ strName, 0, 1 });
 	}
 
 	virtual void Del(int index) override
@@ -80,7 +80,6 @@ struct AnimSequence : public ImSequencer::SequenceInterface
 			m_vecSequenceItems.push_back(m_vecSequenceItems[index]);
 	}
 };
-
 
 //========================================== AnimToolHelper ==========================================
 CAnimToolHelper::CAnimToolHelper(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -111,7 +110,7 @@ HRESULT CAnimToolHelper::Initialize(void* pArg)
 	// 테스트 애님 모델들 가져오기
 	Ready_AnimModels();
 
-	//Load("../Bin/Resources/Data/UIData/UI_240418.ui");
+	Load();
 
 	return S_OK;
 }
@@ -310,15 +309,15 @@ void CAnimToolHelper::Render_FrameLine(CAnimation** ppAnimation, const string& s
 	if (mySequence.m_vecSequenceItems.empty())
 	{
 		// QZR : 추후 animation정보를 가져오는 Load()를 여기서 처리
-		Load();
+		//Load();
 		// Load해서 가져온 data들 중 Sequence에 띄워야하는
 		// (1) 프레임 처음/끝, (2) 이벤트 종류, (3) 이벤트 이름을 가져와서 아래에 push_back한다.
 
-		for (auto item : m_vecSequence)
-		{
-			mySequence.m_vecSequenceItems.push_back(AnimSequence::AnimSequenceItem{item.strEventName, item.iStartFrame, item.iEndFrame });
-		}
-		//mySequence.m_vecSequenceItems.push_back(AnimSequence::AnimSequenceItem{"Test1", 3, 4 });
+		//for (auto item : m_vecSequence)
+		//{
+		//	mySequence.m_vecSequenceItems.push_back(AnimSequence::AnimSequenceItem{item.strEventName, item.iStartFrame, item.iEndFrame });
+		//}
+		mySequence.m_vecSequenceItems.push_back(EVENT_INFO{"Notify", 0,0 });
 	}
 
 	 // 고정할 위치와 크기
@@ -365,15 +364,12 @@ void CAnimToolHelper::Render_FrameLine(CAnimation** ppAnimation, const string& s
 	// 현 애니메이션 데이터 저장
 	if (ImGui::Button("ANIMATION DATA SAVE")) 
 	{
-		for (auto& item : mySequence.m_vecSequenceItems)
-		{
-			SEQUENCE_ITEM desc;
-			desc.strEventName = item.strEventName;
-			desc.iStartFrame = item.iStartFrame;
-			desc.iEndFrame = item.iEndFrame;
-			m_vecSequence.push_back(desc);
-		}
+		auto& ModelIter = m_mapSequence[m_strModelName];
+		auto& AnimIter = ModelIter[m_strAnimationName];
 
+		//Event 정보를 덮어씌운다.
+		AnimIter.fAnimSpeed = m_fAnimationSpeed;
+		AnimIter.vecEventInfo = mySequence.m_vecSequenceItems;
 		Save();
 	}
 
@@ -383,7 +379,7 @@ void CAnimToolHelper::Render_FrameLine(CAnimation** ppAnimation, const string& s
 
 	// 프레임단위 띄우기
 	ImSequencer::Sequencer(&mySequence, &currentFrame, &expanded, &selectedEntry, &firstFrame,
-		ImSequencer::SEQUENCER_EDIT_STARTEND | ImSequencer::SEQUENCER_ADD | ImSequencer::SEQUENCER_DEL | /*ImSequencer::SEQUENCER_COPYPASTE | */ImSequencer::SEQUENCER_CHANGE_FRAME);
+		ImSequencer::SEQUENCER_EDIT_STARTEND | ImSequencer::SEQUENCER_ADD | ImSequencer::SEQUENCER_DEL | ImSequencer::SEQUENCER_CHANGE_FRAME);
 	
 	if (selectedEntry != -1)
 	{
@@ -412,7 +408,7 @@ void CAnimToolHelper::Render_FrameLine(CAnimation** ppAnimation, const string& s
 				
 				if (!bCheckSame)
 				{
-					mySequence.m_vecSequenceItems.push_back(AnimSequence::AnimSequenceItem{ charEventName, 0, 1 });
+					mySequence.m_vecSequenceItems.push_back(EVENT_INFO{ charEventName, 0, 1 });
 					memset(charEventName, 0, sizeof(charEventName));
 					selectedEntry = -1;
 					ImGui::CloseCurrentPopup();
@@ -430,85 +426,426 @@ void CAnimToolHelper::Render_FrameLine(CAnimation** ppAnimation, const string& s
 	ImGui::End();
 }
 
+//void CAnimToolHelper::Save() 
+//{
+//	tinyxml2::XMLDocument m_xmlDocument;
+//	tinyxml2::XMLNode* m_pRootNode = m_xmlDocument.NewElement("Root");
+//	m_xmlDocument.InsertFirstChild(m_pRootNode);
+//
+//	tinyxml2::XMLElement* m_pElement = m_xmlDocument.NewElement("Version");
+//	m_pElement->SetText(240602);
+//	m_pRootNode->InsertEndChild(m_pElement);
+//
+//	for (const auto& [ModelName, AnimMap] : m_mapSequence) 
+//	{
+//		tinyxml2::XMLElement* m_pModelElement = m_xmlDocument.NewElement("ModelName");
+//		m_pModelElement->SetText(ModelName.c_str());
+//		m_pRootNode->InsertEndChild(m_pModelElement);
+//
+//		for (const auto& [AnimName, AnimInfo] : AnimMap) 
+//		{
+//			tinyxml2::XMLElement* m_pAnimElement = m_xmlDocument.NewElement("Animation");
+//			m_pAnimElement->SetText(AnimName.c_str());
+//			m_pModelElement->InsertEndChild(m_pAnimElement);
+//
+//			tinyxml2::XMLElement* m_pAnimSpeedElement = m_xmlDocument.NewElement("AnimSpeed");
+//			m_pAnimSpeedElement->SetText(AnimInfo.fAnimSpeed);
+//			m_pAnimElement->InsertEndChild(m_pAnimSpeedElement);
+//
+//			tinyxml2::XMLElement* m_pCountElement = m_xmlDocument.NewElement("Count");
+//			unsigned int iCnt = AnimInfo.vecEventInfo.size();
+//			m_pCountElement->SetText(iCnt);
+//			m_pAnimElement->InsertEndChild(m_pCountElement);
+//
+//			for (unsigned int i = 0; i < iCnt; ++i) {
+//				string strData = "Data" + to_string(i);
+//				tinyxml2::XMLElement* m_pDataElement = m_xmlDocument.NewElement(strData.c_str());
+//
+//				m_pDataElement->SetAttribute("EventName", AnimInfo.vecEventInfo[i].strEventName.c_str());
+//				m_pDataElement->SetAttribute("StartFrame", AnimInfo.vecEventInfo[i].iStartFrame);
+//				m_pDataElement->SetAttribute("EndFrame", AnimInfo.vecEventInfo[i].iEndFrame);
+//
+//				m_pAnimElement->InsertEndChild(m_pDataElement);
+//			}
+//		}
+//	}
+//
+//	tinyxml2::XMLPrinter printer;
+//	m_xmlDocument.Print(&printer);
+//
+//	std::ofstream outFile("../Bin/Resources/Data/AnimationData.xml");
+//	outFile << printer.CStr();
+//	outFile.close();
+//}
+
+//void CAnimToolHelper::Save()
+//{
+//	tinyxml2::XMLDocument m_xmlDocument;
+//	tinyxml2::XMLNode* m_pRootNode;
+//
+//	// 루트 요소 생성
+//	m_pRootNode = m_xmlDocument.NewElement("Root");
+//	m_xmlDocument.InsertFirstChild(m_pRootNode);
+//
+//	// 버전 요소 생성 및 추가
+//	tinyxml2::XMLElement* m_pElement = m_xmlDocument.NewElement("Version");
+//	m_pElement->SetText(240602);
+//	m_pRootNode->InsertEndChild(m_pElement);
+//
+//	// 맵 시퀀스를 순회
+//	for (const auto& [ModelName, AnimMap] : m_mapSequence)
+//	{
+//		// ModelName 요소 생성 및 추가
+//		tinyxml2::XMLElement* m_pModelElement = m_xmlDocument.NewElement("ModelName");
+//		m_pModelElement->SetText(ModelName.c_str());
+//		m_pRootNode->InsertEndChild(m_pModelElement);
+//
+//		// 현재 모델의 애니메이션 맵을 순회
+//		for (const auto& [AnimName, AnimInfo] : AnimMap)
+//		{
+//			// ModelName 하위에 Animation 요소 생성 및 추가
+//			tinyxml2::XMLElement* m_pAnimElement = m_xmlDocument.NewElement("Animation");
+//			m_pAnimElement->SetText(AnimName.c_str());
+//			m_pModelElement->InsertEndChild(m_pAnimElement);
+//
+//			// ModelName 하위에 AnimSpeed 요소 생성 및 추가
+//			m_pElement = m_xmlDocument.NewElement("AnimSpeed");
+//			m_pElement->SetText(AnimInfo.fAnimSpeed);
+//			m_pModelElement->InsertEndChild(m_pElement);
+//
+//			// ModelName 하위에 Count 요소 생성 및 추가
+//			m_pElement = m_xmlDocument.NewElement("Count");
+//			_uint iCnt = AnimInfo.vecEventInfo.size();
+//			m_pElement->SetText(iCnt);
+//			m_pModelElement->InsertEndChild(m_pElement);
+//
+//			// 현재 애니메이션의 이벤트 정보를 순회
+//			for (_uint i = 0; i < iCnt; ++i)
+//			{
+//				string strData = "Data" + to_string(i);
+//				m_pElement = m_xmlDocument.NewElement(strData.c_str());
+//
+//				// Data 요소에 속성 추가
+//				string strTemp = AnimInfo.vecEventInfo[i].strEventName;
+//				m_pElement->SetAttribute("EventName", strTemp.c_str());
+//
+//				string strStartFrame = to_string(AnimInfo.vecEventInfo[i].iStartFrame);
+//				m_pElement->SetAttribute("StartFrame", strStartFrame.c_str());
+//
+//				string strEndFrame = to_string(AnimInfo.vecEventInfo[i].iEndFrame);
+//				m_pElement->SetAttribute("EndFrame", strEndFrame.c_str());
+//
+//				// Data 요소를 ModelName 하위에 추가
+//				m_pModelElement->InsertEndChild(m_pElement);
+//			}
+//		}
+//	}
+//
+//	// XML 문서를 파일로 저장
+//	tinyxml2::XMLError error = m_xmlDocument.SaveFile("../Bin/Resources/Data/AnimationData.xml");
+//}
+
 
 void CAnimToolHelper::Save()
 {
-	tinyxml2::XMLDocument	m_xmlDocument;
-	tinyxml2::XMLNode* m_pNode;
+	tinyxml2::XMLDocument m_xmlDocument;
+	tinyxml2::XMLNode* m_pRootNode;
 
-	m_pNode = m_xmlDocument.NewElement("Root");
-	m_xmlDocument.InsertFirstChild(m_pNode);
+	// 루트 요소 생성
+	m_pRootNode = m_xmlDocument.NewElement("Root");
+	m_xmlDocument.InsertFirstChild(m_pRootNode);
 
+	// 버전 요소 생성 및 추가
 	tinyxml2::XMLElement* m_pElement = m_xmlDocument.NewElement("Version");
-	m_pElement->SetText(240405);
-	m_pNode->InsertEndChild(m_pElement);
+	m_pElement->SetText(240602);
+	m_pRootNode->InsertEndChild(m_pElement);
 
-	m_pElement = m_xmlDocument.NewElement("ModelName"); // 모델
-	m_pElement->SetText(m_strModelName.c_str());
-	m_pNode->InsertEndChild(m_pElement);
-
-	m_pElement = m_xmlDocument.NewElement("Animation"); // 애니메이션
-	m_pElement->SetText(m_strAnimationName.c_str());
-	m_pNode->InsertEndChild(m_pElement);
-
-	m_pElement = m_xmlDocument.NewElement("Count");
-	_uint iCnt = m_vecSequence.size();
-	m_pElement->SetText(iCnt);
-	m_pNode->InsertEndChild(m_pElement);
-
-	for (_uint i = 0; i < iCnt; ++i)
+	// 맵 시퀀스를 순회
+	for (const auto& [ModelName, AnimMap] : m_mapSequence)
 	{
-		string strData = "Data" + to_string(i);
-		m_pElement = m_xmlDocument.NewElement(strData.c_str());
+		// ModelName 요소 생성 및 추가
+		tinyxml2::XMLElement* m_pModelElement = m_xmlDocument.NewElement("ModelName");
 
-		string strTemp = m_vecSequence[i].strEventName;
-		m_pElement->SetAttribute("EventName", strTemp.c_str());
+		// 개행 문자 추가
+		string strModelName = ModelName + "\n";
+		m_pModelElement->SetText(strModelName.c_str());
+		m_pRootNode->InsertEndChild(m_pModelElement);
 
-		string strStartFrame = to_string(m_vecSequence[i].iStartFrame);
-		m_pElement->SetAttribute("StartFrame", strStartFrame.c_str());
+		// 현재 모델의 애니메이션 맵을 순회
+		for (const auto& [AnimName, AnimInfo] : AnimMap)
+		{
+			// ModelName 하위에 Animation 요소 생성 및 추가
+			tinyxml2::XMLElement* m_pAnimElement = m_xmlDocument.NewElement("Animation");
+			m_pAnimElement->SetText(AnimName.c_str());
+			m_pModelElement->InsertEndChild(m_pAnimElement);
 
-		string strEndFrame = to_string(m_vecSequence[i].iEndFrame);
-		m_pElement->SetAttribute("EndFrame", strEndFrame.c_str());
+			// ModelName 하위에 AnimSpeed 요소 생성 및 추가
+			m_pElement = m_xmlDocument.NewElement("AnimSpeed");
+			m_pElement->SetText(AnimInfo.fAnimSpeed);
+			m_pModelElement->InsertEndChild(m_pElement);
 
-		//_int iEndFrame = m_vecSequence[i].iEndFrame;
-		//m_pElement->SetText(iEndFrame);
+			// ModelName 하위에 Count 요소 생성 및 추가
+			m_pElement = m_xmlDocument.NewElement("Count");
+			_uint iCnt = AnimInfo.vecEventInfo.size();
+			m_pElement->SetText(iCnt);
+			m_pModelElement->InsertEndChild(m_pElement);
 
-		m_pNode->InsertEndChild(m_pElement);
+			// 현재 애니메이션의 이벤트 정보를 순회
+			for (_uint i = 0; i < iCnt; ++i)
+			{
+				string strData = "Data" + to_string(i);
+				m_pElement = m_xmlDocument.NewElement(strData.c_str());
+
+				// Data 요소에 속성 추가
+				string strTemp = AnimInfo.vecEventInfo[i].strEventName;
+				m_pElement->SetAttribute("EventName", strTemp.c_str());
+
+				string strStartFrame = to_string(AnimInfo.vecEventInfo[i].iStartFrame);
+				m_pElement->SetAttribute("StartFrame", strStartFrame.c_str());
+
+				string strEndFrame = to_string(AnimInfo.vecEventInfo[i].iEndFrame);
+				m_pElement->SetAttribute("EndFrame", strEndFrame.c_str());
+
+				// Data 요소를 ModelName 하위에 추가
+				m_pModelElement->InsertEndChild(m_pElement);
+			}
+		}
 	}
+
+	// XML 문서를 파일로 저장
 	tinyxml2::XMLError error = m_xmlDocument.SaveFile("../Bin/Resources/Data/AnimationData.xml");
 }
 
 
-void CAnimToolHelper::Load(const string& FileName)
+//void CAnimToolHelper::Load() 
+//{   
+//	// XML 파일을 읽어올 경로 설정
+//	const char* filePath = "../Bin/Resources/Data/AnimationData.xml";
+//
+//	// XMLDocument 객체 생성
+//	tinyxml2::XMLDocument m_xmlDocument;
+//
+//	// XML 파일 로드
+//	if (m_xmlDocument.LoadFile(filePath) != tinyxml2::XML_SUCCESS) 
+//	{
+//		MSG_BOX(TEXT("Failed to load XML file"));
+//		return;
+//	}
+//
+//	// 루트 요소 가져오기
+//	tinyxml2::XMLElement* pRoot = m_xmlDocument.RootElement();
+//
+//	// ModelName 요소 순회
+//	for (tinyxml2::XMLElement* pModelNameElement = pRoot->FirstChildElement("ModelName");
+//		pModelNameElement != nullptr;
+//		pModelNameElement = pModelNameElement->NextSiblingElement("ModelName")) 
+//	{
+//
+//		// ModelName 가져오기
+//		const char* modelName = pModelNameElement->GetText();
+//		// 문자열 끝 부분의 공백 제거
+//		string modelNameStr(modelName);
+//		modelNameStr.erase(std::find_if(modelNameStr.rbegin(), modelNameStr.rend(), [](unsigned char ch) {
+//			return !std::isspace(ch);
+//			}).base(), modelNameStr.end());
+//		
+//		//if (modelName)
+//		if (!modelNameStr.empty())
+//		{
+//			// Animation 정보를 담을 임시 맵
+//			unordered_map<string, ANIM_INFO> animMap;
+//
+//			// Animation 요소 순회
+//			for (tinyxml2::XMLElement* pAnimationElement = pModelNameElement->FirstChildElement("Animation");
+//				pAnimationElement != nullptr;
+//				pAnimationElement = pAnimationElement->NextSiblingElement("Animation")) {
+//
+//				// Animation 가져오기
+//				const char* animationName = pAnimationElement->GetText();
+//				if (animationName) 
+//				{
+//					// AnimSpeed 가져오기
+//					tinyxml2::XMLElement* pAnimSpeedElement = pAnimationElement->FirstChildElement("AnimSpeed");
+//					float animSpeed = 0.0f;
+//					if (pAnimSpeedElement) 
+//					{
+//						pAnimSpeedElement->QueryFloatText(&animSpeed);
+//					}
+//
+//					// Count 가져오기
+//					tinyxml2::XMLElement* pCountElement = pAnimationElement->FirstChildElement("Count");
+//					int count = 0;
+//					if (pCountElement) 
+//					{
+//						pCountElement->QueryIntText(&count);
+//					}
+//
+//					// Event 정보를 담을 벡터
+//					vector<EVENT_INFO> eventInfoVec;
+//
+//					// Data 요소 순회
+//					for (tinyxml2::XMLElement* pDataElement = pAnimationElement->FirstChildElement();
+//						pDataElement != nullptr;
+//						pDataElement = pDataElement->NextSiblingElement()) 
+//					{
+//
+//						const char* eventName = pDataElement->Attribute("EventName");
+//						int startFrame = 0, endFrame = 0;
+//						pDataElement->QueryIntAttribute("StartFrame", &startFrame);
+//						pDataElement->QueryIntAttribute("EndFrame", &endFrame);
+//
+//						if (eventName) 
+//						{
+//							eventInfoVec.push_back({ eventName, startFrame, endFrame });
+//						}
+//					}
+//
+//					// Animation 정보를 맵에 추가
+//					animMap.emplace(animationName, ANIM_INFO{ animSpeed, eventInfoVec });
+//				}
+//			}
+//
+//			// ModelName과 해당 Animation 정보를 m_mapSequence에 추가
+//			m_mapSequence.emplace(modelNameStr, std::move(animMap));
+//		}
+//	}
+//}
+
+
+void CAnimToolHelper::Load()
 {
-	tinyxml2::XMLDocument	m_xmlDocument;
-	tinyxml2::XMLNode* m_pNode;
-	tinyxml2::XMLElement* m_pElement;
+	// XML 파일을 읽어올 경로 설정
+	const char* filePath = "../Bin/Resources/Data/AnimationData.xml";
 
-	tinyxml2::XMLError error = m_xmlDocument.LoadFile("../Bin/Resources/Data/AnimationData.xml");
-	m_pNode = m_xmlDocument.FirstChild();
+	// XMLDocument 객체 생성
+	tinyxml2::XMLDocument m_xmlDocument;
 
-	_int	iRead, iCnt, iEA;
-
-	m_pElement = m_pNode->FirstChildElement("Version");
-	m_pElement->QueryIntText(&iRead);
-	m_pElement = m_pNode->FirstChildElement("Count");
-	m_pElement->QueryIntText(&iCnt);
-
-	for (_uint i = 0; i < iCnt; ++i)
+	// XML 파일 로드
+	if (m_xmlDocument.LoadFile(filePath) != tinyxml2::XML_SUCCESS)
 	{
-		string strData = "Data" + to_string(i);
-		m_pElement = m_pNode->FirstChildElement(strData.c_str());
+		MSG_BOX(TEXT("Failed to load XML file"));
+		return;
+	}
 
-		SEQUENCE_ITEM Info{};
-		Info.strEventName = m_pElement->Attribute("EventName");
-		Info.iStartFrame = stoi(m_pElement->Attribute("StartFrame"));
-		Info.iEndFrame = stoi(m_pElement->Attribute("EndFrame"));
-		m_pElement->QueryIntText(&iEA);
+	// 루트 요소 가져오기
+	tinyxml2::XMLElement* pRoot = m_xmlDocument.RootElement();
 
-		m_vecSequence.push_back(Info);
+	// ModelName 및 Animation 정보를 읽어옴
+	for (tinyxml2::XMLElement* pModelElement = pRoot->FirstChildElement("ModelName");
+		pModelElement != nullptr;
+		pModelElement = pModelElement->NextSiblingElement("ModelName"))
+	{
+
+		// 문자열 끝 부분의 공백 제거
+		string modelNameStr(pModelElement->GetText());
+		modelNameStr.erase(std::find_if(modelNameStr.rbegin(), modelNameStr.rend(), [](_ubyte ch) {
+			return !std::isspace(ch);
+			}).base(), modelNameStr.end());
+		
+		if (!modelNameStr.empty())
+		{
+			// ModelName에 해당하는 AnimMap을 생성
+			AnimToolMap::mapped_type& animMap = m_mapSequence[string(modelNameStr)];
+
+			// Animation 정보 읽기
+			for (tinyxml2::XMLElement* pAnimElement = pModelElement->FirstChildElement("Animation");
+				pAnimElement != nullptr;
+				pAnimElement = pAnimElement->NextSiblingElement("Animation"))
+			{
+				const char* animName = pAnimElement->GetText();
+				if (animName)
+				{
+					// ANIM_INFO 객체 생성 및 초기화
+					ANIM_INFO animInfo;
+
+					// AnimSpeed 읽기
+					tinyxml2::XMLElement* pAnimSpeedElement = pAnimElement->NextSiblingElement("AnimSpeed");
+					if (pAnimSpeedElement)
+					{
+						_float animSpeed;
+						pAnimSpeedElement->QueryFloatText(&animSpeed);
+						animInfo.fAnimSpeed = animSpeed;
+					}
+
+					// Count 값 읽기
+					tinyxml2::XMLElement* pCountElement = pAnimElement->NextSiblingElement("Count");
+					if (pCountElement)
+					{
+						_uint count;
+						pCountElement->QueryUnsignedText(&count);
+
+						// Event 정보 읽기
+						for (unsigned int i = 0; i < count; ++i)
+						{
+							std::string dataName = "Data" + std::to_string(i);
+							tinyxml2::XMLElement* pDataElement = pCountElement->NextSiblingElement(dataName.c_str());
+							if (pDataElement)
+							{
+								EVENT_INFO eventInfo;
+
+								// EventName, StartFrame, EndFrame 읽기
+								const char* eventName = pDataElement->Attribute("EventName");
+								int startFrame, endFrame;
+								pDataElement->QueryIntAttribute("StartFrame", &startFrame);
+								pDataElement->QueryIntAttribute("EndFrame", &endFrame);
+
+								eventInfo.strEventName = eventName ? eventName : "";
+								eventInfo.iStartFrame = startFrame;
+								eventInfo.iEndFrame = endFrame;
+
+								// ANIM_INFO의 vecEventInfo에 추가
+								animInfo.vecEventInfo.push_back(eventInfo);
+							}
+						}
+					}
+
+					// ANIM_INFO 객체를 AnimMap에 추가
+					animMap[string(animName)] = animInfo;
+				}
+			}
+		}
 	}
 }
+
+
+//void CAnimToolHelper::Load(const string& FileName)
+//{
+//	tinyxml2::XMLDocument	m_xmlDocument;
+//	tinyxml2::XMLNode* m_pNode;
+//	tinyxml2::XMLElement* m_pElement;
+//
+//	tinyxml2::XMLError error = m_xmlDocument.LoadFile("../Bin/Resources/Data/AnimationData.xml");
+//	m_pNode = m_xmlDocument.FirstChild();
+//
+//	_int	iRead, iCnt, iEA;
+//
+//	m_pElement = m_pNode->FirstChildElement("Version");
+//	m_pElement->QueryIntText(&iRead);
+//	m_pElement = m_pNode->FirstChildElement("Count");
+//	m_pElement->QueryIntText(&iCnt);
+//
+//	//모델 이름 읽어오기
+//	string ModelName;
+//
+//	//모델에 있는 애니메이션 배열 들고오기
+//	//애니메이션 이름 읽어오기
+//	string AnimName;
+//
+//	for (_uint i = 0; i < iCnt; ++i)
+//	{
+//		string strData = "Data" + to_string(i);
+//		m_pElement = m_pNode->FirstChildElement(strData.c_str());
+//
+//		EVENT_INFO Info{};
+//		Info.strEventName = m_pElement->Attribute("EventName");
+//		Info.iStartFrame = stoi(m_pElement->Attribute("StartFrame"));
+//		Info.iEndFrame = stoi(m_pElement->Attribute("EndFrame"));
+//		m_pElement->QueryIntText(&iEA);
+//
+//		//m_vecSequence.push_back(Info);
+//	}
+//}
+
 
 CAnimToolHelper* CAnimToolHelper::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

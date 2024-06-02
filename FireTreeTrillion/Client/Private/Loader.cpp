@@ -4,6 +4,7 @@
 #include <codecvt>
 #include <locale>
 #include "GameInstance.h"
+#include "tinyxml2.h"
 
 //맵툴
 #include "OrbitingCamera.h"
@@ -293,6 +294,7 @@ HRESULT CLoader::Loading_For_GamePlay()
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
 	#pragma region 모델
 	// 모아놓은 Model 한번에 생성.
+	Load_AnimInfo();
 	hr = Add_Models(eLevel);
 	CHECK_FAILED(hr);
 	#pragma endregion
@@ -459,15 +461,23 @@ HRESULT CLoader::Add_Models(LEVEL eLevel)
 	// SetUp_ModelScaleRotation 함수에서 모아놓은 Model들을 타입에 따라서 Component 생성한다.
 	for (auto& ModelInfo : m_vecModelInfo)
 	{
-
-		if (ModelInfo.strModelName == "KirbyDefault")
-		{
+		if (ModelInfo.strModelName == "KirbyDefault"){
 			_int i = 0;
+		}
+
+		// QZR
+		// 애님툴에서 조정하여 저장한 값을 불러서
+		// 모델 이름이 같을 경우, model의 정보들을 읽어오기
+		for (auto& pair : m_mapSequence)
+		{
+			if (ModelInfo.strModelName == pair.first)
+			{
+				ModelInfo.umapAnimInfo = pair.second;
+			}
 		}
 
 		wstring wstrModelName = CUtils::StrToWstr(ModelInfo.strModelName);
 		wstring wstrPrototypeTag = L"Prototype_Component_Model_" + wstrModelName;
-
 		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag,
 			CModel::Create(m_pDevice, m_pContext, ModelInfo))))
 			return E_FAIL;
@@ -667,6 +677,8 @@ HRESULT CLoader::Add_AllModelTxts(LEVEL eLevel, TYPE eType)
 		string strModelName = CUtils::WstrToStr(wstrModelName);
 		
 		_bool bFound = { false };
+		
+
 		MODEL tModelInfo = MODEL{ strModelName ,  eType };
 		for (auto& modelInfo : m_vecModelInfo)
 		{
@@ -676,7 +688,10 @@ HRESULT CLoader::Add_AllModelTxts(LEVEL eLevel, TYPE eType)
 				break;
 			}
 		}
-
+		
+		// QZR
+		// 애님툴에서 조정하여 저장한 값을 불러서
+		// 모델 이름이 같을 경우, model의 정보들을 읽어오기
 		wstring wstrPrototypeTag = TEXT("Prototype_Component_Model_") + CUtils::StrToWstr(tModelInfo.strModelName);
 		hr = m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CModel::Create(m_pDevice, m_pContext, tModelInfo));
 		CHECK_FAILED(hr);
@@ -695,20 +710,23 @@ void CLoader::TraverseModelTxts(const wstring& rootFolderPath, list<wstring>& fi
 	WIN32_FIND_DATA findFileData;
 	HANDLE hFind = FindFirstFile((rootFolderPath + L"\\*").c_str(), &findFileData);
 
-	if (hFind == INVALID_HANDLE_VALUE) {
+	if (hFind == INVALID_HANDLE_VALUE) 
+	{
 		MSG_BOX(TEXT("폴더를 찾을수없습니다"));
 		return;
 	}
 
 	do 
 	{
-		if (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+		if (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) 
+		{
 			if (wcscmp(findFileData.cFileName, L".") != 0 && wcscmp(findFileData.cFileName, L"..") != 0) {
 				// 재귀적으로 하위 폴더도 순회
 				TraverseModelTxts(rootFolderPath + L"\\" + findFileData.cFileName, fileList);
 			}
 		}
-		else {
+		else 
+		{
 			// 파일이면 리스트에 추가
 			fileList.push_back(wstring(findFileData.cFileName));
 		}
@@ -716,6 +734,105 @@ void CLoader::TraverseModelTxts(const wstring& rootFolderPath, list<wstring>& fi
 
 	FindClose(hFind);
 }
+
+
+
+void CLoader::Load_AnimInfo()
+{
+	// XML 파일을 읽어올 경로 설정
+	const char* filePath = "../Bin/Resources/Data/AnimationData.xml";
+
+	// XMLDocument 객체 생성
+	tinyxml2::XMLDocument m_xmlDocument;
+
+	// XML 파일 로드
+	if (m_xmlDocument.LoadFile(filePath) != tinyxml2::XML_SUCCESS)
+	{
+		MSG_BOX(TEXT("Failed to load XML file"));
+		return;
+	}
+
+	// 루트 요소 가져오기
+	tinyxml2::XMLElement* pRoot = m_xmlDocument.RootElement();
+
+	// ModelName 및 Animation 정보를 읽어옴
+	for (tinyxml2::XMLElement* pModelElement = pRoot->FirstChildElement("ModelName");
+		pModelElement != nullptr;
+		pModelElement = pModelElement->NextSiblingElement("ModelName"))
+	{
+
+		// 문자열 끝 부분의 공백 제거
+		string modelNameStr(pModelElement->GetText());
+		modelNameStr.erase(std::find_if(modelNameStr.rbegin(), modelNameStr.rend(), [](_ubyte ch) {
+			return !std::isspace(ch);
+			}).base(), modelNameStr.end());
+
+		if (!modelNameStr.empty())
+		{
+			// ModelName에 해당하는 AnimMap을 생성
+			AnimToolMap::mapped_type& animMap = m_mapSequence[string(modelNameStr)];
+
+			// Animation 정보 읽기
+			for (tinyxml2::XMLElement* pAnimElement = pModelElement->FirstChildElement("Animation");
+				pAnimElement != nullptr;
+				pAnimElement = pAnimElement->NextSiblingElement("Animation"))
+			{
+				const char* animName = pAnimElement->GetText();
+				if (animName)
+				{
+					// ANIM_INFO 객체 생성 및 초기화
+					ANIM_INFO animInfo;
+
+					// AnimSpeed 읽기
+					tinyxml2::XMLElement* pAnimSpeedElement = pAnimElement->NextSiblingElement("AnimSpeed");
+					if (pAnimSpeedElement)
+					{
+						_float animSpeed;
+						pAnimSpeedElement->QueryFloatText(&animSpeed);
+						animInfo.fAnimSpeed = animSpeed;
+					}
+
+					// Count 값 읽기
+					tinyxml2::XMLElement* pCountElement = pAnimElement->NextSiblingElement("Count");
+					if (pCountElement)
+					{
+						_uint count;
+						pCountElement->QueryUnsignedText(&count);
+
+						// Event 정보 읽기
+						for (unsigned int i = 0; i < count; ++i)
+						{
+							std::string dataName = "Data" + std::to_string(i);
+							tinyxml2::XMLElement* pDataElement = pCountElement->NextSiblingElement(dataName.c_str());
+							if (pDataElement)
+							{
+								EVENT_INFO eventInfo;
+
+								// EventName, StartFrame, EndFrame 읽기
+								const char* eventName = pDataElement->Attribute("EventName");
+								int startFrame, endFrame;
+								pDataElement->QueryIntAttribute("StartFrame", &startFrame);
+								pDataElement->QueryIntAttribute("EndFrame", &endFrame);
+
+								eventInfo.strEventName = eventName ? eventName : "";
+								eventInfo.iStartFrame = startFrame;
+								eventInfo.iEndFrame = endFrame;
+
+								// ANIM_INFO의 vecEventInfo에 추가
+								animInfo.vecEventInfo.push_back(eventInfo);
+							}
+						}
+					}
+
+					// ANIM_INFO 객체를 AnimMap에 추가
+					animMap[string(animName)] = animInfo;
+				}
+			}
+		}
+	}
+}
+
+
 
 CLoader * CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID)
 {

@@ -170,7 +170,7 @@ HRESULT CModel::Play_Animation(_float fTimeDelta)
 	if (m_bStop) return S_OK;
 
 	/* 현재 애니메이션에 맞는 뼈의 상태(m_TransformationMatrix)를 갱신해준다. */
-	m_Animations[m_iCurrentAnimIndex]->Invalidate_TransformationMatrix(fTimeDelta, m_Bones, m_isLoop);
+	m_Animations[m_iCurrentAnimIndex]->Invalidate_TransformationMatrix(fTimeDelta, m_Bones, m_isLoop, this);
 
 	for (auto& pBone : m_Bones)
 		pBone->Invalidate_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_TransformMatrix));
@@ -229,6 +229,18 @@ _float4 CModel::Check_Meshes(const class CTransform* pTransform, _Out_ _int& iMe
 		}
 	}
 	return fResult;
+}
+
+void CModel::Add_Event(const string& EventName, function<void()>&& Callback)
+{
+	m_AnimEvents.emplace(EventName, move(Callback));
+}
+
+void CModel::CallEvent(const string& EventName)
+{
+	auto EventIter = m_AnimEvents.find(EventName);
+	if (EventIter != m_AnimEvents.end())
+		EventIter->second();
 }
 
 HRESULT CModel::Ready_Meshes()
@@ -300,13 +312,23 @@ HRESULT CModel::Ready_Animations()
 {
 	m_InputFile.read(reinterpret_cast<char*>(&m_iNumAnimations), sizeof(m_iNumAnimations));
 	m_Animations.reserve(m_iNumAnimations);
-
+	
 	for (size_t i = 0; i < m_iNumAnimations; i++)
 	{
 		CAnimation* pAnimation = CAnimation::Create(m_Bones, m_InputFile);
 		if (nullptr == pAnimation)
 			return E_FAIL;
 
+		// 로더에서 읽어온 애님툴에서 수정된 애니메이션 unordered_map을 여기서 사용
+		for (auto& pair : m_tModel.umapAnimInfo)
+		{
+			// 애니메이션 map을 돌면서 현재 접근한 애니메이션과 이름이 같은 지 확인
+			if (pAnimation->Get_AnimationName() == pair.first)
+			{
+				// 같은 경우 해당 애니메이션이 갈취(?)해야하는 정보를 set해준다.
+				pAnimation->Set_AnimEventData(pair.second);
+			}
+		}
 		m_Animations.push_back(pAnimation);
 	}
 

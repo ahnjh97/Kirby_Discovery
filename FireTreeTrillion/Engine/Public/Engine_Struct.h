@@ -315,14 +315,30 @@ namespace Engine
 		static const D3D11_INPUT_ELEMENT_DESC	Elements[6];
 	}VTXANIMMESH;
 
+	struct ENGINE_DLL EVENT_INFO
+	{
+		string	strEventName;
+		_int	iStartFrame;
+		_int	iEndFrame;
+	};
+
+	struct ENGINE_DLL ANIM_INFO
+	{
+		_float				fAnimSpeed;
+		vector<EVENT_INFO>	vecEventInfo;
+	};
+
 	struct ENGINE_DLL MODEL
 	{
 		string strModelName = "";
 		TYPE eType = { TYPE_END };
 
-		_float fScale = { 1.f };
-		_float fDegree = { 0.f };
-		_uint iRootNode = { 4 };
+		_float	fScale = { 1.f };
+		_float	fDegree = { 0.f };
+		_uint	iRootNode = { 4 };
+
+		// 애니메이션 정보 저장
+		unordered_map< string, ANIM_INFO > umapAnimInfo;
 
 		MODEL(string _strModelName = "",
 			TYPE _eType = { TYPE_END },
@@ -331,4 +347,6 @@ namespace Engine
 			_uint _iRootNode = { 4 }
 		) : strModelName(_strModelName), eType(_eType), fScale(_fScale), fDegree(_fDegree), iRootNode(_iRootNode) {}
 	};
+
+
 }

@@ -24,12 +24,13 @@ private:
 	virtual ~CAwoofy() = default;
 
 public:
-	virtual HRESULT Initialize_Prototype() override;
-	virtual HRESULT Initialize(void* pArg) override;
+	virtual HRESULT Initialize_Prototype()	override;
+	virtual HRESULT Initialize(void* pArg)	override;
 	virtual _int	Tick(_float fTimeDelta) override;
 	virtual void	Late_Tick(_float fTimeDelta) override;
-	virtual HRESULT Render() override;
-	virtual HRESULT Render_LightDepth() override;
+	virtual HRESULT Render()				override;
+	virtual HRESULT Render_LightDepth()		override;
+	virtual void	Add_AnimEvent()			override;
 #ifdef _DEBUG
 	virtual void	Render_IMGUI() override;
 #endif
