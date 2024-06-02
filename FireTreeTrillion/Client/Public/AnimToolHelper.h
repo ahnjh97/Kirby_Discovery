@@ -11,12 +11,21 @@ BEGIN(Client)
 class CAnimToolHelper final : public CGameObject
 {
 public:
-	struct SEQUENCE_ITEM
-	{
-		string	strEventName;
-		_int	iStartFrame;
-		_int	iEndFrame;
-	};
+	//struct EVENT_INFO
+	//{
+	//	string	strEventName;
+	//	_int	iStartFrame;
+	//	_int	iEndFrame;
+	//};
+
+	//struct ANIM_INFO
+	//{
+	//	_float				fAnimSpeed;
+	//	vector<EVENT_INFO>	vecEventInfo;
+	//};
+
+	using AnimToolMap = unordered_map< string, unordered_map< string, ANIM_INFO >>;
+
 private:
 	CAnimToolHelper(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CAnimToolHelper(const CAnimToolHelper& rhs);
@@ -39,7 +48,7 @@ private:
 	void					Render_FrameLine(class CAnimation** pModel, const string& strAnimationTag);
 
 	void					Save();
-	void					Load(const string& FileName = "");
+	void					Load(/*const string& FileName = ""*/);
 
 private:
 	vector<string>							m_vecAnimModels;
@@ -49,7 +58,10 @@ private:
 	string									m_strModelName = string();
 	string									m_strAnimationName = string();
 	_float									m_fAnimationSpeed = _float();
-	vector<SEQUENCE_ITEM>					m_vecSequence;
+
+	//vector<SEQUENCE_ITEM>					m_vecSequence;
+	AnimToolMap								m_mapSequence;
+
 public:
 	static	CAnimToolHelper* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject*	 Clone(void* pArg) override;

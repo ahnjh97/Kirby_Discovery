@@ -2,6 +2,7 @@
 #include "Awoofy.h"
 #include "FSM.h"
 #include "Awoofy_State.h"
+#include "MultiEffect.h"
 
 CAwoofy::CAwoofy(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -46,6 +47,8 @@ HRESULT CAwoofy::Initialize(void* pArg)
 	m_fAttack = 8.f;
 	m_eVacuumSize = SIZE_SMALL;
 	m_eAbilityType = ABILITY_DEFAULT;
+
+	Add_AnimEvent();
 
 	return S_OK;
 }
@@ -108,6 +111,54 @@ HRESULT CAwoofy::Render_LightDepth()
 		return E_FAIL;
 
 	return S_OK;
+}
+
+void CAwoofy::Add_AnimEvent()
+{
+	__super::Add_AnimEvent();
+	
+	//1. 한 애니메이션에서 같은 이름의 이벤트 가능
+	//2. 현재 실행되는 애니메이션에 따라 이벤트가 발생하도록 한다.
+	//3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
+	m_pModelCom->Add_Event("SpawnParticle", [this]() {
+		//파티클 생성
+
+		static _float fBbongTime{ 0.f };
+		fBbongTime += GetTickCount64();
+		if (.2f < fBbongTime)
+		{
+			CMultiEffect::MULTI_FX_DESC FXDesc{};
+			_float4 vMyPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+			FXDesc.vInitPos = { vMyPos.x, vMyPos.y + .3f, vMyPos.z };
+			FXDesc.vInitScale = { 1.3f, 1.3f, 1.3f };
+
+			_float3 vDir = -m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+			vDir.Normalize();
+			_float3 vLook = { 0.f, 0.f, 1.f };
+
+			_float fAngleLook = atan2f(vLook.z, vLook.x);
+			_float fAngleDiff = fAngleLook - atan2f(vDir.z, vDir.x);
+			fAngleDiff = ToDegree(fAngleDiff);
+
+			_float3 vAngle = { 0.f, fAngleDiff, 0.f };
+			FXDesc.vInitRot = vAngle;
+
+
+			if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
+				return;
+
+			fBbongTime = 0.f;
+
+		}
+		});
+
+	m_pModelCom->Add_Event("PlayWalkSound", [this]() {
+		//사운드 재생
+		});
+
+	m_pModelCom->Add_Event("ApplyDamage", [this]() {
+		//데미지 처리
+		});
 }
 
 #ifdef _DEBUG

@@ -1,6 +1,4 @@
 #pragma once
-
-
 #include "GameInstance.h"
 
 namespace Client
