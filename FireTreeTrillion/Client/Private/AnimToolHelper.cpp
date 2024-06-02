@@ -137,8 +137,8 @@ HRESULT CAnimToolHelper::Render()
 void CAnimToolHelper::Ready_AnimModels()
 {
 	string strPath = "../../../model_txt/Anim/";
-	directory_iterator end_iter;  // 디렉토리 순회의 끝을 나타내는 iterator
-	directory_iterator dir_iter(strPath);  // 지정된 경로의 시작 iterator
+	directory_iterator end_iter;			// 디렉토리 순회의 끝을 나타내는 iterator
+	directory_iterator dir_iter(strPath);   // 지정된 경로의 시작 iterator
 
 	while (dir_iter != end_iter) 
 	{
@@ -170,9 +170,8 @@ void CAnimToolHelper::Render_ObjectList()
 	{
 		for (int n = 0; n < m_vecAnimModels.size(); n++)
 		{
-			//static _bool isChanged = false;
 			const bool is_selected = (item_current_idx == n);
-			string strModelName = m_vecAnimModels[n];//m_vecAnimModels[n]->Get_ModelInfo().strModelName;
+			string strModelName = m_vecAnimModels[n];
 			if (strModelName.empty()) continue;
 
 			if (filter.PassFilter(strModelName.c_str()))
@@ -317,7 +316,7 @@ void CAnimToolHelper::Render_FrameLine(CAnimation** ppAnimation, const string& s
 		//{
 		//	mySequence.m_vecSequenceItems.push_back(AnimSequence::AnimSequenceItem{item.strEventName, item.iStartFrame, item.iEndFrame });
 		//}
-		mySequence.m_vecSequenceItems.push_back(EVENT_INFO{"Notify", 0,0 });
+		mySequence.m_vecSequenceItems.push_back(EVENT_INFO{"Notify", 0,1 });
 	}
 
 	 // 고정할 위치와 크기
@@ -360,8 +359,21 @@ void CAnimToolHelper::Render_FrameLine(CAnimation** ppAnimation, const string& s
 	ImGui::InputFloat("    ", &m_fAnimationSpeed); ImGui::SameLine();
 	(*ppAnimation)->Set_TickPerSecond(m_fAnimationSpeed);
 
+	// 미리보기
+	if (ImGui::Button("PREVIEW"))
+	{
+		//auto& ModelIter = m_mapSequence[m_strModelName];
+		//auto& AnimIter = ModelIter[m_strAnimationName];
+
+		////Event 정보를 덮어씌운다.
+		//AnimIter.fAnimSpeed = m_fAnimationSpeed;
+		//AnimIter.vecEventInfo = mySequence.m_vecSequenceItems;
+		//Save();
+		//Load();
+	}
 
 	// 현 애니메이션 데이터 저장
+	ImGui::Text("IS IT DONE? >> "); ImGui::SameLine();
 	if (ImGui::Button("ANIMATION DATA SAVE")) 
 	{
 		auto& ModelIter = m_mapSequence[m_strModelName];
@@ -373,13 +385,15 @@ void CAnimToolHelper::Render_FrameLine(CAnimation** ppAnimation, const string& s
 		Save();
 	}
 
+
+
 	ImGui::Text("Frame Min: %d", mySequence.m_iFrameMin); ImGui::SameLine();
 	ImGui::Text("Frame Max: %d", mySequence.m_iFrameMax);
 	ImGui::PopItemWidth();
 
 	// 프레임단위 띄우기
 	ImSequencer::Sequencer(&mySequence, &currentFrame, &expanded, &selectedEntry, &firstFrame,
-		ImSequencer::SEQUENCER_EDIT_STARTEND | ImSequencer::SEQUENCER_ADD | ImSequencer::SEQUENCER_DEL | ImSequencer::SEQUENCER_CHANGE_FRAME);
+		ImSequencer::SEQUENCER_EDIT_STARTEND | ImSequencer::SEQUENCER_CHANGE_FRAME | ImSequencer::SEQUENCER_ADD | ImSequencer::SEQUENCER_DEL);
 	
 	if (selectedEntry != -1)
 	{
@@ -616,7 +630,6 @@ void CAnimToolHelper::Save()
 	tinyxml2::XMLError error = m_xmlDocument.SaveFile("../Bin/Resources/Data/AnimationData.xml");
 }
 
-
 //void CAnimToolHelper::Load() 
 //{   
 //	// XML 파일을 읽어올 경로 설정
@@ -710,7 +723,6 @@ void CAnimToolHelper::Save()
 //		}
 //	}
 //}
-
 
 void CAnimToolHelper::Load()
 {
@@ -807,7 +819,6 @@ void CAnimToolHelper::Load()
 	}
 }
 
-
 //void CAnimToolHelper::Load(const string& FileName)
 //{
 //	tinyxml2::XMLDocument	m_xmlDocument;
@@ -845,7 +856,6 @@ void CAnimToolHelper::Load()
 //		//m_vecSequence.push_back(Info);
 //	}
 //}
-
 
 CAnimToolHelper* CAnimToolHelper::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

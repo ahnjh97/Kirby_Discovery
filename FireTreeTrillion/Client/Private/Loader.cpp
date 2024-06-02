@@ -468,7 +468,6 @@ HRESULT CLoader::Add_Models(LEVEL eLevel)
 			_int i = 0;
 		}
 
-		// QZR
 		// 애님툴에서 조정하여 저장한 값을 불러서
 		// 모델 이름이 같을 경우, model의 정보들을 읽어오기
 		for (auto& pair : m_mapSequence)
@@ -653,6 +652,8 @@ HRESULT CLoader::Add_KirbyFaceTexture(LEVEL eLevel)
 	return S_OK;
 }
 
+
+// TOOL_MAP, TOOL_ANIM에서 사용중인 함수.
 HRESULT CLoader::Add_AllModelTxts(LEVEL eLevel, TYPE eType)
 {
 	HRESULT hr = S_OK;
@@ -681,26 +682,39 @@ HRESULT CLoader::Add_AllModelTxts(LEVEL eLevel, TYPE eType)
 		
 		_bool bFound = { false };
 		
-
+		// 원래 버전
+		//MODEL tModelInfo = MODEL{ strModelName ,  eType };
+		//for (auto& modelInfo : m_vecModelInfo)
+		//{
+		//	if (modelInfo.strModelName == strModelName)
+		//	{
+		//		tModelInfo = modelInfo;
+		//		break;
+		//	}
+		//}
+		
 		MODEL tModelInfo = MODEL{ strModelName ,  eType };
 		for (auto& modelInfo : m_vecModelInfo)
 		{
+			// 애님툴에서 조정하여 저장한 값을 불러서
+			// 모델 이름이 같을 경우, model의 정보들을 읽어오기
+			for (auto& pair : m_mapSequence)
+			{
+				if (modelInfo.strModelName == pair.first)
+				{
+					modelInfo.umapAnimInfo = pair.second;
+				}
+			}
 			if (modelInfo.strModelName == strModelName)
 			{
 				tModelInfo = modelInfo;
 				break;
 			}
 		}
-		
-		// QZR
-		// 애님툴에서 조정하여 저장한 값을 불러서
-		// 모델 이름이 같을 경우, model의 정보들을 읽어오기
+
 		wstring wstrPrototypeTag = TEXT("Prototype_Component_Model_") + CUtils::StrToWstr(tModelInfo.strModelName);
 		hr = m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CModel::Create(m_pDevice, m_pContext, tModelInfo));
 		CHECK_FAILED(hr);
-
-		if (FAILED(hr))
-			return E_FAIL;
 	}
 
 	FindClose(hFind);
