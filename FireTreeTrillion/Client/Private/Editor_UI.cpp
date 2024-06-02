@@ -4,7 +4,7 @@
 
 #ifdef _DEBUG
 #include "ImGuizmo.h"
-#include "Single_UI.h"
+#include "LayerUI.h"
 #include "Multi_UI.h"
 //#include "ImGuiFileDialog.h"
 //#include "ImGuiFileDialogConfig.h" //현재 사용 안함
@@ -72,7 +72,8 @@ _int CEditor_UI::Tick(_float _fTimeDelta)
 			Save_FileData(strFilePath);
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_D, KEY_DOWN))
-			Load_FileData(strFilePath + "Single_UI_Orig.txt");
+			//Load_FileData(strFilePath + strUITag + "_Orig.txt");
+			Load_FileData(strFilePath + "LayerUI_Orig.txt");
 	}
 
 #pragma endregion
@@ -103,7 +104,7 @@ HRESULT CEditor_UI::Render()
 	Window_Directories();
 	Window_Textures();
 	Window_Properties();
-	Window_ShadeColor();
+	Window_Tools();
 
 	return S_OK;
 }
@@ -168,8 +169,8 @@ _bool CEditor_UI::Set_DockSpace()
 					Save_FileData(strFilePath);
 
 				if (ImGui::MenuItem(u8"Load 로드", "Ctrl+D"))
-					//Load_FileData(strFilePath + strUITag.c_str() + "_Orig.txt");
-					Load_FileData(strFilePath + "Single_UI_Orig.txt");
+					//Load_FileData(strFilePath + strUITag + "_Orig.txt");
+					Load_FileData(strFilePath + "LayerUI_Orig.txt");
 
 				ImGui::EndMenu();
 			}
@@ -177,18 +178,20 @@ _bool CEditor_UI::Set_DockSpace()
 #pragma region FILEDIALOG_사용안함
 
 			// 파일 다이얼로그 (ImGUI_Manager::Set_FileDialog() 참고)
-			/*switch (m_pGameInstance->Set_FileDialog())
-			{
-			case CImGUI_Manager::FILE_MODE::FILE_SAVE:
-				Save_FileData();
-				break;
+			//CImGUI_Manager::FILE_MODE eFileMode = m_pGameInstance->Set_FileDialog();
+			//switch (eFileMode)
+			//{
+			//case CImGUI_Manager::FILE_MODE::FILE_SAVE:
+			//	Save_FileData(strFilePath);
+			//	break;
 
-			case CImGUI_Manager::FILE_MODE::FILE_LOAD:
-				Load_FileData("../Bin/Resources/Data/UI/Test.txt");
-				break;
-			}*/
+			//case CImGUI_Manager::FILE_MODE::FILE_LOAD:
+			//	Load_FileData(strFilePath + strUITag + "_Orig.txt");
+			//	break;
+			//}
 
 #pragma endregion
+
 			ImGui::EndMainMenuBar();
 		}
 	}
@@ -200,7 +203,7 @@ _bool CEditor_UI::Set_DockSpace()
 _bool CEditor_UI::Window_Directories()
 {
 	ImGuiWindowFlags Dirwindow_Flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize;
-	if (ImGui::Begin(u8"Directories", 0, Dirwindow_Flags))
+	if (ImGui::Begin(u8"Directories 디렉토리", 0, Dirwindow_Flags))
 	{
 		if (ImGui::BeginTabBar(u8"##Directories"))
 		{
@@ -333,7 +336,7 @@ _bool CEditor_UI::Window_Textures()
 
 						if (ImGui::BeginPopupContextItem()) // 우클릭하면 컨텍스트 메뉴 표시
 						{
-							if (ImGui::MenuItem(u8"변경"))
+							if (ImGui::MenuItem(u8"Modify 변경"))
 							{
 								if (!m_UIs.empty())
 									//m_UIs[iSelectUI]->Set_UIObj_Desc();
@@ -391,15 +394,22 @@ _bool CEditor_UI::Window_Properties()
 	return TRUE;
 }
 
-_bool CEditor_UI::Window_ShadeColor()
+_bool CEditor_UI::Window_Tools()
 {
-	if (ImGui::Begin(u8"Shade 셰이더"))
+	if (ImGui::Begin(u8"Tool 도구"))
 	{
 		if (ImGui::BeginTabBar(u8"##"))
 		{
 			if (ImGui::BeginTabItem(u8"Color 색상 편집"))
 			{
 				Edit_RGBAColor();
+
+				ImGui::EndTabItem();
+			}
+
+			if (ImGui::BeginTabItem(u8"Text 텍스트 편집"))
+			{
+				Edit_Text();
 
 				ImGui::EndTabItem();
 			}
@@ -431,20 +441,22 @@ _bool CEditor_UI::Edit_Transform(CUIObject* _pUIObj)
 	pUIObj_Desc.vPos = (_float3)Translate;
 	pUIObj_Desc.fDegree = (_float)Rotate[2];
 
+	ImGui::PushItemWidth(ImGui::GetColumnOffset());
 	ImGui::Text(u8"Scale 크기");
 	ImGui::SameLine(); HelpMarker(u8"Ctrl+E");
-	ImGui::SameLine(fTextWidth +30);
+	ImGui::SameLine(fTextWidth + 35);
 	ImGui::DragFloat3("##Scale", (_float*)Scale, 1.f, 0.f, g_iWinSizeX, "%.1f");
 
 	ImGui::Text(u8"Translate 위치");
 	ImGui::SameLine(); HelpMarker(u8"Ctrl+T");
-	ImGui::SameLine(fTextWidth + 30);
+	ImGui::SameLine(fTextWidth + 35);
 	ImGui::DragFloat3("##Translate", (_float*)&Translate, 1.f, (_float)-0.1 * g_iWinSizeX, (_float)g_iWinSizeX, "%.1f");
 
 	ImGui::Text(u8"Rotate 회전");
 	ImGui::SameLine(); HelpMarker(u8"Ctrl+R");
-	ImGui::SameLine(fTextWidth + 30);
+	ImGui::SameLine(fTextWidth + 35);
 	ImGui::DragFloat("##Rotate", (_float*)&Rotate[2], 1.f, (_int)-360, (_int)360, u8"Degree 각도 : %.1f");
+	ImGui::PopItemWidth();
 
 	_pUIObj->Set_UIObj_Desc(pUIObj_Desc);
 
@@ -484,20 +496,33 @@ _bool CEditor_UI::Edit_RGBAColor()
 	ImGuiColorEditFlags ColorEditHex_Flags = ImGuiColorEditFlags_NoSmallPreview | ImGuiColorEditFlags_DisplayHex;
 	ImGuiColorEditFlags ColorPicker_Flags = { ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar };
 
-	ImGui::ColorButton("MyColor##3c", *(ImVec4*)&color, ColorButton_Flags, ImVec2(50, 50));
+	//컬러버튼
+	ImGui::ColorButton("MyColor##3c", *(ImVec4*)&color, ColorButton_Flags, ImVec2(50, 45));
 	ImGui::SameLine();
 
-	ImGui::PushItemWidth(225.f);
-	ImGui::ColorEdit4("##ColorEdit_RGBA", (_float*)&color, ColorEditRGBA_Flags);
 	
-	ImGui::PushItemWidth(225.f);
+	ImGui::BeginGroup();
+	ImGui::PushItemWidth(ImGui::GetColumnOffset());
+	ImGui::ColorEdit4("##ColorEdit_RGBA", (_float*)&color, ColorEditRGBA_Flags);
+	//ImGui::PopItemWidth();
+	 
+	//ImGui::PushItemWidth(ImGui::GetColumnOffset());
 	ImGui::ColorEdit4("##ColorEdit_HEX", (_float*)&color, ColorEditHex_Flags);
 	ImGui::PopItemWidth();
-	ImGui::NewLine();
+	ImGui::EndGroup();
 
-	ImGui::PushItemWidth(285.f);
+	//ImGui::NewLine();
+
+	//ImGui::PushItemWidth(ImGui::GetColumnOffset());
 	ImGui::ColorPicker4("##ColorPicker", (_float*)&color, ColorPicker_Flags);
-	ImGui::PopItemWidth();
+	//ImGui::PopItemWidth();
+
+	return TRUE;
+}
+
+_bool CEditor_UI::Edit_Text()
+{
+	ImGui::SeparatorText(u8"Text Edit 텍스트 편집");
 
 	return TRUE;
 }
@@ -604,30 +629,30 @@ _bool CEditor_UI::Create_UIObject(UI_TYPE _eUIType)
 
 	if (CUIObject::TYPE_LAYER == _eUIType) //단일 UI
 	{
-		CUIObject::UIOBJ_DESC SingleUI_Desc{};
-		//SingleUI_Desc.eUIType = { TYPE_LAYER };
-		SingleUI_Desc.wstrUITag = { TEXT("Single_UI") };
-		SingleUI_Desc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f };
-		SingleUI_Desc.vSize = { 100.f, 100.f };
-		SingleUI_Desc.vPos = {	SingleUI_Desc.vCenter.x/* - 200.f*/,
-								SingleUI_Desc.vCenter.y/* - 200.f */ };
-		SingleUI_Desc.fDegree = { 0.f };
-		SingleUI_Desc.iTexIndex = { 0 };
+		CUIObject::UIOBJ_DESC LayerUI_Desc{};
+		//LayerUI_Desc.eUIType = { TYPE_LAYER };
+		LayerUI_Desc.wstrUITag = { TEXT("LayerUI") };
+		LayerUI_Desc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f };
+		LayerUI_Desc.vSize = { 100.f, 100.f };
+		LayerUI_Desc.vPos = { 0.f, 0.f };
+		LayerUI_Desc.fDegree = { 0.f };
+		LayerUI_Desc.iTexIndex = { 0 };
 
-		strProtoTag += CUtils::WstrToStr(SingleUI_Desc.wstrUITag);
+		strProtoTag += CUtils::WstrToStr(LayerUI_Desc.wstrUITag);
 
-		CUIObject* pSingleUI = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(CUtils::StrToWstr(strProtoTag), &SingleUI_Desc));
-		if (nullptr == pSingleUI)
+		CUIObject* pLayerUI = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(CUtils::StrToWstr(strProtoTag), &LayerUI_Desc));
+		if (nullptr == pLayerUI)
 		{
-			MSG_BOX(TEXT("Failed to Create : Single UIObject"));
-			CHECK_NULLPTR(pSingleUI);
+			MSG_BOX(TEXT("Failed to Create : LayerUI"));
+			CHECK_NULLPTR(pLayerUI);
 			return FALSE;
 		}
 
-		m_UIs.push_back(pSingleUI);
+		m_UIs.push_back(pLayerUI);
 		return TRUE;
 	}
 
+	/*
 	if (CUIObject::TYPE_MULTI == _eUIType) //다중 UI
 	{
 		CUIObject::UIOBJ_DESC MultiUI_Desc{};
@@ -646,6 +671,7 @@ _bool CEditor_UI::Create_UIObject(UI_TYPE _eUIType)
 		m_UIs.push_back(pMultiUI);
 		return TRUE;
 	}
+	*/
 }
 
 _bool CEditor_UI::Delete_UIObject()

@@ -166,9 +166,6 @@
     <Filter Include="02.GameObjects\Effect\FXToolDirector">
       <UniqueIdentifier>{dbb187c2-6962-4466-b912-a53c4e5d474a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\UI\Editor\Single">
-      <UniqueIdentifier>{ac3d583d-1d14-49c7-8cb8-b77af55d1bd6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\UI\Editor\Multi">
       <UniqueIdentifier>{0739de1b-2da7-47f4-8811-597bd872e366}</UniqueIdentifier>
     </Filter>
@@ -186,6 +183,9 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword">
       <UniqueIdentifier>{c3a1e0ee-a23e-4cfa-80f9-70d6a55eb2b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\Editor\LayerUI">
+      <UniqueIdentifier>{ac3d583d-1d14-49c7-8cb8-b77af55d1bd6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -348,8 +348,8 @@
     <ClInclude Include="..\Public\RigidObject.h">
       <Filter>02.GameObjects\PhysXObject\RigidObject</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Single_UI.h">
-      <Filter>02.GameObjects\UI\Editor\Single</Filter>
+    <ClInclude Include="..\Public\LayerUI.h">
+      <Filter>02.GameObjects\UI\Editor\LayerUI</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Multi_UI.h">
       <Filter>02.GameObjects\UI\Editor\Multi</Filter>
@@ -528,8 +528,8 @@
     <ClCompile Include="..\Private\BladeKnightSword.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Single_UI.cpp">
-      <Filter>02.GameObjects\UI\Editor\Single</Filter>
+    <ClCompile Include="..\Private\LayerUI.cpp">
+      <Filter>02.GameObjects\UI\Editor\LayerUI</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Multi_UI.cpp">
       <Filter>02.GameObjects\UI\Editor\Multi</Filter>

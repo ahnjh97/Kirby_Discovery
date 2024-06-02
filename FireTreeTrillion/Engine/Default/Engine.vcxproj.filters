@@ -163,9 +163,6 @@
     <Filter Include="01.Utility\01.GameObjects\Effect">
       <UniqueIdentifier>{2026ddf7-bd14-41e0-b167-12803eb4c159}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Utility\01.GameObjects\UI">
-      <UniqueIdentifier>{dce35891-6f80-4098-9884-4f3d2a82009a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Utility\02.Components\FSM">
       <UniqueIdentifier>{bdbde33a-39dd-4f3a-a51a-46ec6b1eaa6a}</UniqueIdentifier>
     </Filter>

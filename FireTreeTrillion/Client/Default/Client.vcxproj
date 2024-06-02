@@ -199,7 +199,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\Public\Multi_UI.h" />
-    <ClInclude Include="..\Public\Single_UI.h" />
+    <ClInclude Include="..\Public\LayerUI.h" />
     <ClInclude Include="..\Public\Kirby.h" />
     <ClInclude Include="..\Public\KirbyBalloon_State.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -280,7 +280,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\Private\Multi_UI.cpp" />
-    <ClCompile Include="..\Private\Single_UI.cpp" />
+    <ClCompile Include="..\Private\LayerUI.cpp" />
     <ClCompile Include="..\Private\Kirby.cpp" />
     <ClCompile Include="..\Private\KirbyBalloon_State.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>

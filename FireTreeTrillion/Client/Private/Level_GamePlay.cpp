@@ -162,7 +162,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const wstring & strLayerTag)
 HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& strLayerTag)
 {
 	string strFilePath = { "../../../UI_txt/" };
-	string strUITag = { "Single_UI_Orig.txt" };
+	string strUITag = { "LayerUI_Orig.txt" };
 
 	std::ifstream InputFile(strFilePath + strUITag, ios::in | std::ios::binary);
 

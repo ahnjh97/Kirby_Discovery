@@ -33,7 +33,7 @@ private:
 	_bool			Window_Directories();
 	_bool			Window_Textures();
 	_bool			Window_Properties();
-	_bool			Window_ShadeColor();
+	_bool			Window_Tools();
 
 	_bool			Set_OrthoProj(); //투영스페이스 직교 
 	_bool			Set_GizmoGrid(); //기즈모 위젯 그리드 세팅
@@ -41,9 +41,12 @@ private:
 
 	_bool			Edit_Transform(CUIObject* _pUIObj); //변환
 	_bool			Edit_RGBAColor(); //색상 편집
+	_bool			Edit_Text(); //텍스트 편집
 
 	_bool			Create_UIObject(UI_TYPE _eUIType);
 	_bool			Delete_UIObject();
+
+public:
 	_bool			Save_FileData(string _strFilePath);
 	_bool			Load_FileData(const string& _strFilePath);	
 

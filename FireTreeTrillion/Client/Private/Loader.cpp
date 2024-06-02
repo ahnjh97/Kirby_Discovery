@@ -28,7 +28,7 @@
 #endif
 
 //#include "TestUI.h"
-#include "Single_UI.h"
+#include "LayerUI.h"
 #include "Multi_UI.h"
 #include "HUD.h"
 
@@ -186,9 +186,9 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("OrbitingCamera"), COrbitingCamera);
 
 	// UI
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Single_UI"), CSingle_UI);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("LayerUI"), CLayerUI);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Multi_UI"), CMulti_UI);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
 	
 #pragma region FOR CLIENT
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kirby"), CKirby);
