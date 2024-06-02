@@ -39,7 +39,7 @@ HRESULT CSingle_UI::Initialize(void* _pArg)
 	
 	m_iTexIndex = SingleUI_Desc->iTexIndex;
 	m_UIObjDesc = *SingleUI_Desc;
-	m_eUIType = TYPE_SINGLE;
+	m_eUIType = TYPE_LAYER;
 
 #pragma endregion
 

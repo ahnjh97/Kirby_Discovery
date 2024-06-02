@@ -69,7 +69,7 @@ protected:
 
 	vector<CUIObject*>	m_UIs;
 	vector<CUIObject*>	m_MultiUIs;
-
+	
 public:
 	virtual CGameObject* Clone(_uint iLevelIndex, void* pArg) { return nullptr; }
 	virtual void		 Free() override;
