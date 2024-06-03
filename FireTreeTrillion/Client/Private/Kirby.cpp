@@ -266,6 +266,7 @@ void CKirby::Collision_Attack(CGameObject* pOtherObj)
 		{
 			Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
 		}
+		Delete_KirbyEffect();
 	}
 }
 
