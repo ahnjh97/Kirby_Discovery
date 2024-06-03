@@ -31,6 +31,9 @@ private:
 	//IMGUI UI/UX
 	_bool			Set_DockSpace();
 	_bool			Window_Directories();
+	_bool			Tab_LayerList();
+	_bool			Tab_GroupList();
+
 	_bool			Window_Textures();
 	_bool			Window_Properties();
 	_bool			Window_Tools();
@@ -45,9 +48,11 @@ private:
 
 	_bool			Create_UIObject(UI_TYPE _eUIType);
 	_bool			Delete_UIObject();
+	_bool			Grouping_UIObject(UI_GROUP _eUIGroup);
 
 public:
-	_bool			Save_FileData(string _strFilePath);
+	_bool			Save_Texture(const string& _strFilePath, ID3D11RenderTargetView* _pRTV);
+	_bool			Save_FileData(const string& _strFilePath);
 	_bool			Load_FileData(const string& _strFilePath);	
 
 public:

@@ -1,4 +1,5 @@
 #include "UIObject.h"
+#include "GameInstance.h"
 
 CUIObject::CUIObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -53,5 +54,17 @@ void CUIObject::Render_IMGUI()
 void CUIObject::Free()
 {
 	__super::Free();
+
+	if (!m_LayerUIs.empty())
+	{
+		for (auto& pUIObj : m_LayerUIs)
+			Safe_Release(pUIObj);
+
+		m_LayerUIs.clear();
+	}
+
+	Safe_Release(m_pShaderCom);
+	Safe_Release(m_pTextureCom);
+	Safe_Release(m_pVIBufferCom);
 }
 

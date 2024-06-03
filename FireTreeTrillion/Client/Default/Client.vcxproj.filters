@@ -166,9 +166,6 @@
     <Filter Include="02.GameObjects\Effect\FXToolDirector">
       <UniqueIdentifier>{dbb187c2-6962-4466-b912-a53c4e5d474a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\UI\Editor\Multi">
-      <UniqueIdentifier>{0739de1b-2da7-47f4-8811-597bd872e366}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\NewFilter1">
       <UniqueIdentifier>{41cd0184-8bb7-4d3f-8101-754198ebcb36}</UniqueIdentifier>
     </Filter>
@@ -351,9 +348,6 @@
     <ClInclude Include="..\Public\LayerUI.h">
       <Filter>02.GameObjects\UI\Editor\LayerUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Multi_UI.h">
-      <Filter>02.GameObjects\UI\Editor\Multi</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\AnimToolHelper.h">
       <Filter>02.GameObjects\Anim</Filter>
     </ClInclude>
@@ -372,7 +366,6 @@
     <ClInclude Include="..\Public\BladeKnightSword.h">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\HUD.h" />
     <ClInclude Include="..\Public\ImSequencer.h">
       <Filter>02.GameObjects\Anim</Filter>
     </ClInclude>
@@ -531,9 +524,6 @@
     <ClCompile Include="..\Private\LayerUI.cpp">
       <Filter>02.GameObjects\UI\Editor\LayerUI</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Multi_UI.cpp">
-      <Filter>02.GameObjects\UI\Editor\Multi</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\AnimToolHelper.cpp">
       <Filter>02.GameObjects\Anim</Filter>
     </ClCompile>
@@ -543,7 +533,6 @@
     <ClCompile Include="..\Private\OrbitingCamera.cpp">
       <Filter>02.GameObjects\Map\MapToolObject\OrbitingCamera</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\HUD.cpp" />
     <ClCompile Include="..\Private\ImSequencer.cpp">
       <Filter>02.GameObjects\Anim</Filter>
     </ClCompile>

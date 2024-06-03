@@ -30,9 +30,6 @@
 
 //#include "TestUI.h"
 #include "LayerUI.h"
-#include "Multi_UI.h"
-#include "HUD.h"
-
 #pragma endregion
 
 //이펙트 툴
@@ -188,7 +185,7 @@ HRESULT CLoader::Loading_ObjectAll()
 
 	// UI
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("LayerUI"), CLayerUI);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Multi_UI"), CMulti_UI);
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("Multi_UI"), CMulti_UI);
 	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
 	
 #pragma region FOR CLIENT
@@ -738,8 +735,6 @@ void CLoader::TraverseModelTxts(const wstring& rootFolderPath, list<wstring>& fi
 	FindClose(hFind);
 }
 
-
-
 void CLoader::Load_AnimInfo()
 {
 	// XML 파일을 읽어올 경로 설정
@@ -834,8 +829,6 @@ void CLoader::Load_AnimInfo()
 		}
 	}
 }
-
-
 
 CLoader * CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID)
 {

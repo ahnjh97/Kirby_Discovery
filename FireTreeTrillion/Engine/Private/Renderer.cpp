@@ -468,11 +468,14 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 
 	// 고사양, 저사양 모드
 	if (m_pGameInstance->Get_DIKeyState(DIK_E, KEY_DOWN))
+	{
+		//레벨 별 사양 처리 (현재 TOOL_UI 레벨에서만 고/저사양 제외)
+		_uint* iCurrLevel = m_pGameInstance->Get_CurrentLevelID();
+		if (5 == *iCurrLevel) //LEVEL_TOOL_UI
+			return S_OK;
+
 		m_bLowPass = !m_bLowPass;
-	
-	//레벨 별 사양 처리
-	//int iCurrLevel = m_pGameInstance->Get_CurrentLevelID();
-	//if (3 == iCurrLevel) //LEVEL_GAMEPLAY
+	}
 
 #ifdef _DEBUG
 
@@ -485,9 +488,6 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 		if (FAILED(Render_Debug()))
 			return E_FAIL;
 	}
-
-
-
 
 	Render_IMGUI();
 #endif
@@ -604,7 +604,6 @@ HRESULT CRenderer::Render_LightDepth_For_GameObject(CShader* pShader, CTransform
 
 	return S_OK;
 }
-
 
 #ifdef _DEBUG
 
@@ -1136,6 +1135,7 @@ HRESULT CRenderer::Render_UI()
 
 HRESULT CRenderer::Render_SuperUI()
 {
+	//SuperUI :: Fadein FadeOut/트랜잭션 효과 등을 표현할 때 최우선 순위로 렌더할 UI 요소
 	for (auto& pRenderObject : m_RenderObjects[RENDER_SUPERUI])
 	{
 		if (nullptr != pRenderObject)

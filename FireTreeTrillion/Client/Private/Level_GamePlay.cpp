@@ -37,8 +37,8 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_ParsedObjects()))
 		return E_FAIL;
 
-	//if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
-	//	return E_FAIL;
+	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
+		return E_FAIL;
 
 	// TEST (블러와 블랜드의 관계)
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Moon"), TEXT("Prototype_GameObject_Moon"))))
@@ -174,7 +174,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& strLayerTag)
 
 	size_t size = 0;
 	InputFile.read(reinterpret_cast<char*>(&size), sizeof(size));
-	//m_UIs.reserve(size);
+	//m_LayerUIs.reserve(size);
 
 	for (size_t i = 0; i < size; ++i)
 	{
