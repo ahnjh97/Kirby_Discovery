@@ -19,6 +19,8 @@ public:
 		RABBIT_JUNMPLANDINGBIG, RABBIT_JUMPLANDINGSMALL, RABBIT_JUMPSMALL, RABBIT_JUMPSTART, RABBIT_JUMPSTARTBIG, RABBIT_JUMPSTARTSMALL, RABBIT_LOOKAROUND, RABBIT_WAIT,
 		RABBIT_END };
 
+	enum RABBITEYE_STATE { RABBITEYE_IDLE, RABBITEYE_HALF, RABBITEYE_SLEEP, RABBITEYE_HAPPY, RABBITEYE_ANGER, RABBITEYE_END };
+
 private:
 	CRabbit(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CRabbit(const CRabbit& rhs);
@@ -54,12 +56,12 @@ public:
 public:
 	void Change_State(RABBIT_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
 	_bool IsAnimFinished();
-	_uint Get_State();
 
 	void Compute_Parabola(_vector vEndPos);
 	_vector JumpAttak(_float fTimeDelta);
 
 private:
+	//CTexture*	m_pEyeTextureCom = { nullptr };
 	RABBIT_ANIM	m_eCurrentState = { RABBIT_END };
 
 

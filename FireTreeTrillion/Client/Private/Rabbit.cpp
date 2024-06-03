@@ -175,11 +175,6 @@ _bool CRabbit::IsAnimFinished()
 	return m_pModelCom->IsFinished();
 }
 
-_uint CRabbit::Get_State()
-{
-	return m_pFSM->Get_State();
-}
-
 void CRabbit::Compute_Parabola(_vector vEndPos)
 {
 	// 포물선 세팅을 위한 변수
@@ -280,13 +275,13 @@ void CRabbit::SetUp_FSM()
 
 	m_pFSM->Add_State(RABBIT_FIND, CRabbit_Find_State::Create());
 
-	m_pFSM->Add_State(RABBIT_DAMAGE, CRabbit_Jump_State::Create());
 	m_pFSM->Add_State(RABBIT_JUMPSTART, CRabbit_Jump_State::Create());
 	m_pFSM->Add_State(RABBIT_JUMP, CRabbit_Jump_State::Create());
 	m_pFSM->Add_State(RABBIT_JUMPFALL, CRabbit_Jump_State::Create());
 	m_pFSM->Add_State(RABBIT_JUMPEND, CRabbit_Jump_State::Create());
 
 	m_pFSM->Add_State(RABBIT_JUMPLANDING, CRabbit_JumpLanding_State::Create());
+
 	//m_pFSM->Add_State(RABBIT_BRAKE, CRabbit_Brake_State::Create());
 	//m_pFSM->Add_State(RABBIT_LOOKAROUNDAFTERBRAKE, CRabbit_LookAroundAfterBrake_State::Create());
 
@@ -329,6 +324,4 @@ CGameObject* CRabbit::Clone(void* pArg)
 void CRabbit::Free()
 {
 	__super::Free();
-
-	Safe_Release(m_pFSM);
 }

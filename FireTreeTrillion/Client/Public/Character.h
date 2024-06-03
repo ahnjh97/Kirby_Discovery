@@ -48,6 +48,8 @@ public:
 	_float	Get_MaxHp() { return m_fMaxHp; }
 	_float	Get_Attack() { return m_fAttack; }
 
+	_uint Get_State();
+
 protected:
 	CCharacterController*	m_pControllerCom	= { nullptr };
 	CShader*				m_pShaderCom = { nullptr };

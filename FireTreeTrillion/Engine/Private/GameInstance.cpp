@@ -964,6 +964,7 @@ void CGameInstance::Release_Engine()
 
 void CGameInstance::Free()
 {
+	Safe_Release(m_pTimeController);
 	Safe_Release(m_pFrustum);
 	Safe_Release(m_pExtractor);
 	Safe_Release(m_pTarget_Manager);

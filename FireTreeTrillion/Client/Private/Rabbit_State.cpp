@@ -63,7 +63,7 @@ void CRabbit_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 					pRabbit->Compute_Parabola(pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + (XMVector3Normalize(XMVectorSubtract(vKirbyPos, vPos)) * 5.f));
 				}
 				// 플레이어를 향해 점프
-				else
+				else if(7.f >= fDistance)
 					pRabbit->Compute_Parabola(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
 
 				pRabbit->Change_State(CRabbit::RABBIT_JUMPSTART, 100.f, false, true);

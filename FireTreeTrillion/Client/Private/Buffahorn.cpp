@@ -176,11 +176,6 @@ _bool CBuffahorn::IsAnimFinished()
 	return m_pModelCom->IsFinished();
 }
 
-_uint CBuffahorn::Get_State()
-{
-	return m_pFSM->Get_State();
-}
-
 HRESULT CBuffahorn::Add_Components()
 {
 	HRESULT hr;

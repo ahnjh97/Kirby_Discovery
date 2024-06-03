@@ -93,7 +93,6 @@ public:
 		m_tKirbyInfo = _tInfo;
 	}
 
-	_uint			Get_State();
 	void			Change_State(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, BODYSTATE eBody);
 	void			Set_Animation(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
 	void			Set_Animation(_int iAnimIndex);

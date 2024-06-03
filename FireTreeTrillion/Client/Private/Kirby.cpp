@@ -279,11 +279,6 @@ _float3 CKirby::Make_RepulsiveDir(CPhysXObject* pObject)
 	return XMVector3Normalize(vObjectPos - vPos);
 }
 
-_uint CKirby::Get_State()
-{
-	return m_pFSM->Get_State();
-}
-
 void CKirby::Setting_KirbyBalance()
 {
 	// 커비는 항상 m_vMoveDir)를 바라본다.

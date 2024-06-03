@@ -161,11 +161,6 @@ _bool CBladeKnight::IsAnimFinished()
 	return m_pModelCom->IsFinished();
 }
 
-_uint CBladeKnight::Get_State()
-{
-	return m_pFSM->Get_State();
-}
-
 void CBladeKnight::Compute_MotionBlur()
 {
 	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);

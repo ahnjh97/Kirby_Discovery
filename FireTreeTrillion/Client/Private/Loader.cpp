@@ -650,6 +650,14 @@ HRESULT CLoader::Add_KirbyFaceTexture(LEVEL eLevel)
 	if (FAILED(Add_Texture(eLevel, "mouth_surprise", "KirbyFace/mouth_surprise.png")))
 		return E_FAIL;
 
+	// Awoofy Eye
+	if (FAILED(Add_Texture(eLevel, "Awoofy_Eye", "AwoofyEye/NormalEnemyEye%d.dds", 5)))
+		return E_FAIL;
+
+	//// Rabbit Eye
+	//if (FAILED(Add_Texture(eLevel, "Rabbit_Eye", "RabbitEye/RabbitEye%d.dds", 5)))
+	//	return E_FAIL;
+
 	return S_OK;
 }
 
