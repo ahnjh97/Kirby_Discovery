@@ -140,7 +140,7 @@ protected:
 	_float3 m_vInitScale = { 1.f, 1.f, 1.f };
 
 	//특정 대상 중심에 붙어있어야 할 경우 계속 따라가며 유지되는 월드 상태
-	const _float4x4* m_pSoketMatrix;
+	const _float4x4* m_pSoketMatrix = {nullptr};
 
 	/*Tick 돌리며 계속 값 바뀌는 부분*/
 
