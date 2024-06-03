@@ -361,4 +361,6 @@ _float4 CEffect::Calculate_CurValue_Slerp(_float fTimeDelta, KF_PROPERTY eProper
 void CEffect::Free()
 {
     __super::Free();
+
+    Safe_Delete_Array(m_iCurKeyframeIdxs);
 }

@@ -27,8 +27,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_ LPWSTR    lpCmdLine,
                      _In_ int       nCmdShow)
 {
-#ifdef _
-
+#ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
@@ -82,7 +81,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		fTimeAcc += pGameInstance->Compute_TimeDelta(TEXT("Timer_Default"));
 
-		if (fTimeAcc > 1.f / 60.0f)
+		if (fTimeAcc > 1.f / 400.f)
 		{
             _float fTickTimeDelta = pGameInstance->Compute_TimeDelta(TEXT("Timer_60"));
 			pMainApp->Tick(fTickTimeDelta);

@@ -337,5 +337,8 @@ namespace Engine
 		_uint iA;
 		_uint iB;
 		_uint iC;
+
+		FACE(_uint _iA, _uint _iB, _uint _iC) : iA(_iA), iB(_iB), iC(_iC) {}
+		FACE() : iA(0), iB(0), iC(0) {}
 	};
 }

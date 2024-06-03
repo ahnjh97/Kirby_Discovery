@@ -246,25 +246,42 @@ void CModel::Create_OcTree(_float3 vMin, _float3 vMax)
 	
 	m_vMin = vMin;
 	m_vMax = vMax;
-
-	vector<_float3> vecEdges(COcTree::OC_END);
-
-	vecEdges[COcTree::OC_XYZ] = _float3(m_vMax.x, m_vMax.y, m_vMax.z);
-	vecEdges[COcTree::OC_XyZ] = _float3(m_vMax.x, m_vMin.y, m_vMax.z);
-	vecEdges[COcTree::OC_Xyz] = _float3(m_vMax.x, m_vMin.y, m_vMin.z);
-	vecEdges[COcTree::OC_XYz] = _float3(m_vMax.x, m_vMax.y, m_vMin.z);
-	vecEdges[COcTree::OC_xYZ] = _float3(m_vMin.x, m_vMax.y, m_vMax.z);
-	vecEdges[COcTree::OC_xyZ] = _float3(m_vMin.x, m_vMin.y, m_vMax.z);
-	vecEdges[COcTree::OC_xyz] = _float3(m_vMin.x, m_vMin.y, m_vMin.z);
-	vecEdges[COcTree::OC_xYz] = _float3(m_vMin.x, m_vMax.y, m_vMin.z);
+	_float3 vCenter = _float3((m_vMin.x + m_vMax.x) * 0.5f, (m_vMin.y + m_vMax.y) * 0.5f, (m_vMin.z + m_vMax.z) * 0.5f);
+	_float3 vHalfExtents = _float3((m_vMax.x - m_vMin.x) * 0.5f, (m_vMax.y - m_vMin.y) * 0.5f, (m_vMax.z - m_vMin.z) * 0.5f);
 
 	vector<_float3*> vecMeshVerticesPtrs;
 	vector<_uint> vecMeshNumVertices;
 	vector<_uint*> vecMeshIndicesPtrs;
 	vector<_uint> vecMeshNumIndices;
 
-	
-	//m_pOctree = COcTree::Create()
+	for (auto& mesh : m_Meshes)
+	{
+		vecMeshVerticesPtrs.emplace_back(mesh->Get_VerticesPtr());
+		vecMeshNumVertices.emplace_back(mesh->Get_NumVertices());
+		vecMeshIndicesPtrs.emplace_back(mesh->Get_IndicesPtr());
+		vecMeshNumIndices.emplace_back(mesh->Get_NumIndices());
+	}
+
+	vector<vector<FACE>> vecMeshFaces(m_iNumMeshes);
+
+	for (_uint iMeshIdx = 0; iMeshIdx < m_iNumMeshes; iMeshIdx++)
+	{
+		_int iCount{};
+		for (_uint i = 0; i < vecMeshNumIndices[iMeshIdx] / 3; i++)
+		{
+			vecMeshFaces[iMeshIdx].emplace_back(vecMeshIndicesPtrs[iMeshIdx][iCount],
+				vecMeshIndicesPtrs[iMeshIdx][iCount + 1], vecMeshIndicesPtrs[iMeshIdx][iCount + 2]);
+			iCount += 3;
+		}
+	}
+
+	string strFilePath = "../../../objects_txt/" + m_tModel.strModelName + "_Octree.txt";
+	ifstream fileInput(strFilePath, ios::in | ios::binary);
+
+	m_pOctree = COcTree::Create(m_iNumMeshes, vCenter, vHalfExtents, vecMeshVerticesPtrs, vecMeshNumVertices
+		, vecMeshFaces, fileInput);
+
+	fileInput.close();
 }
 
 void CModel::Culling(_fmatrix matWorldInverse)
@@ -272,15 +289,100 @@ void CModel::Culling(_fmatrix matWorldInverse)
 	m_pGameInstance->TransformFrustum_LocalSpace(matWorldInverse);
 
 	vector<_float3*> vecMeshVerticesPtrs;
+	vecMeshVerticesPtrs.reserve(m_iNumMeshes);
 	vector<_uint> vecMeshNumVertices;
+	vecMeshNumVertices.reserve(m_iNumMeshes);
 
-	for (auto& mesh : m_Meshes)
+	for(auto& mesh : m_Meshes)
 	{
 		vecMeshVerticesPtrs.emplace_back(mesh->Get_VerticesPtr());
 		vecMeshNumVertices.emplace_back(mesh->Get_NumVertices());
 	}
 
+	vector<vector<FACE>> vecCulledIndices(m_iNumMeshes);
+
+	m_pOctree->Culling(m_pGameInstance, vecMeshVerticesPtrs, vecMeshNumVertices, vecCulledIndices);
+
+	for (_uint j = 0; j < m_iNumMeshes; j++)
+	{
+		D3D11_MAPPED_SUBRESOURCE		SubResource{};
+		ID3D11Buffer* pMeshIB = m_Meshes[j]->Get_IndexBufferPtr();
+
+		m_pContext->Map(pMeshIB, 0, D3D11_MAP_WRITE_DISCARD, 0, &SubResource);
+
+		_uint* pIndices = static_cast<_uint*>(SubResource.pData);
+		if (nullptr == pIndices)
+		{
+			m_pContext->Unmap(pMeshIB, 0);
+			continue;
+		}
+
+		_uint iIndex{};
+		for (auto& face : vecCulledIndices[j])
+		{
+			pIndices[iIndex++] = face.iA;
+			pIndices[iIndex++] = face.iB;
+			pIndices[iIndex++] = face.iC;
+		}
+
+		m_Meshes[j]->Set_NumIndices(iIndex);
+		m_pContext->Unmap(pMeshIB, 0);
+	}
+
 	return;
+}
+
+void CModel::Save_OctreeData()
+{
+	string tempFileName = "temp_" + m_tModel.strModelName + "_Octree.txt";
+	ofstream outputFile(tempFileName, ios::out | ios::binary);
+	if (!outputFile.is_open()) // 임시파일 열렸는지 확인
+	{
+		wstring wstrErrorMsg = TEXT("Failed to Open: ") + CUtils::StrToWstr(tempFileName);
+		MSG_BOX(wstrErrorMsg.c_str());
+		return;
+	}
+
+	m_pOctree->Save_OctreeData(outputFile);
+
+	outputFile.close();
+
+	if (!outputFile)
+	{
+		wstring wstrError = TEXT("Failed to write data to ") + CUtils::StrToWstr(tempFileName);
+		MSG_BOX(wstrError.c_str());
+		remove(tempFileName.c_str()); // 임시파일 삭제
+		return;
+	}
+
+	// 현재시간 받아오기
+	auto now = chrono::system_clock::now();
+	time_t currentTime = chrono::system_clock::to_time_t(now);
+
+	struct tm timeinfo;
+	localtime_s(&timeinfo, &currentTime);
+
+	// 현재 시간을 문자열로 변환
+	char buffer[80];
+	strftime(buffer, sizeof(buffer), "%H%M%S", &timeinfo);
+
+	string fileName_Time = "../../../objects_txt/" + string(buffer) + "_" + m_tModel.strModelName + "_Octree.txt";
+	string fileName = "../../../objects_txt/" + m_tModel.strModelName + "_Octree.txt";
+	if (rename(fileName.c_str(), fileName_Time.c_str()) != 0)
+	{
+		MSG_BOX(TEXT("Failed to rename original file."));
+		return;
+	}
+
+	if (rename(tempFileName.c_str(), fileName.c_str()) != 0) // 임시파일 이름을 level 이름으로 변경
+	{
+		wstring wstrError2 = TEXT("Failed to rename ") + CUtils::StrToWstr(tempFileName);
+		MSG_BOX(wstrError2.c_str());
+		remove(tempFileName.c_str()); // 임시파일 삭제
+		return;
+	}
+
+	MSG_BOX(TEXT("Octree Saved."));
 }
 
 HRESULT CModel::Ready_Meshes()
@@ -398,6 +500,8 @@ CComponent * CModel::Clone(void * pArg)
 void CModel::Free()
 {
 	__super::Free();
+
+	Safe_Release(m_pOctree);
 
 	for (auto& pAnimation : m_Animations)
 		Safe_Release(pAnimation);

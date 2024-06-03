@@ -51,9 +51,9 @@ HRESULT CMesh::Initialize_Prototype(TYPE eModelType, string strDirectory, const 
 
 	/* 인덱스 버퍼의 byte크기 */
 	m_BufferDesc.ByteWidth = m_iIndexStride * m_iNumIndices;
-	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	m_BufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	m_BufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	m_BufferDesc.CPUAccessFlags = 0;
+	m_BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	m_BufferDesc.MiscFlags = 0;
 	m_BufferDesc.StructureByteStride = 0;
 
@@ -189,11 +189,6 @@ void CMesh::Find_MinMax(_float3& vMin, _float3& vMax)
 		else if (m_pVerticesPos[i].z > vMax.z)
 			vMax.z = m_pVerticesPos[i].z;
 	}
-}
-
-void CMesh::Culling(const vector<FACE>& _vecFaces)
-{
-
 }
 
 HRESULT CMesh::Ready_Vertices_For_NonAnimModel(_fmatrix TransformMatrix)

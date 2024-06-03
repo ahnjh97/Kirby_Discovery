@@ -317,10 +317,12 @@ void CPhysX::Free()
 
     m_pControllerManager->release();
 
+    PxSimulationEventCallback* pEventCallback = m_pScene->getSimulationEventCallback();
+    Safe_Delete(pEventCallback);
     // 2. Scene 해제
     if (m_pScene != nullptr)
         m_pScene->release();
-
+   
     // 3. Material 해제
     if (m_pMaterial != nullptr)
         m_pMaterial->release();

@@ -86,6 +86,7 @@ public:
 	void Find_MinMax(_float3& vMin, _float3& vMax);
 	void Create_OcTree(_float3 vMin, _float3 vMax);
 	void Culling(_fmatrix matWorldInverse);
+	void Save_OctreeData();
 
 private:
 	_uint						m_iNumMeshes = { 0 };

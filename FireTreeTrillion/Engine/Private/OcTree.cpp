@@ -5,52 +5,63 @@ COcTree::COcTree()
 {
 }
 
-HRESULT COcTree::Initialize(const vector<_float3> _vecEdges, const vector<_float3*>& _vecMeshVerticesPtrs, const vector<_uint>& _vecMeshNumVertices
-	, const vector<_uint*>& _vecIndicesPtrs, const vector<_uint>& _vecNumIndices)
+HRESULT COcTree::Initialize(_uint iNumMeshes, _float3 vCenter, _float3 vHalfExtents
+	, const vector<_float3*>& _vecMeshVerticesPtrs, const vector<_uint>& _vecMeshNumVertices
+	, const vector<vector<FACE>>& _vecMeshFaces, ifstream& fileInput)
 {
-	if (_vecEdges.empty() || _vecIndicesPtrs.empty() || _vecNumIndices.empty()) {
+	if ( _vecMeshVerticesPtrs.empty()|| _vecMeshNumVertices.empty() || _vecMeshFaces.empty())
+	{
 		MSG_BOX(TEXT("OcTree: vector empty."));
 		return E_FAIL;
 	}
-		
+
+	m_iNumMeshes = iNumMeshes;
+	m_vCenter = vCenter;
+
 	m_vecEdges.resize(OC_END);
-	m_vecEdges = _vecEdges;
-
 	m_vecChildren.resize(OC_END);
-	m_vecMeshFaces.resize(_vecIndicesPtrs.size()); // 메쉬 개수만큼
+	m_vecMeshFaces.resize(iNumMeshes);
+	m_vecChidrenMeshFaces.resize(OC_END); // 메쉬 개수만큼
+	for (auto& vecChildrenFaces : m_vecChidrenMeshFaces)
+		vecChildrenFaces.resize(iNumMeshes);
 
-	_float fX{}, fY{}, fZ{};
-	for (_int i = 0; i < OC_END; i++) {
-		fX += m_vecEdges[i].x;
-		fY += m_vecEdges[i].y;
-		fZ += m_vecEdges[i].z;
-	}
-		
-	m_vCenter = _float3(fX * 0.125f, fY * 0.125f, fZ * 0.125f);
+	SetUp_Edges(vCenter, vHalfExtents);
 
 	_uint iTotal{};
-	for (auto& numIndices : _vecNumIndices)
-		iTotal += numIndices;
+	for (auto& numFaces : _vecMeshFaces)
+		iTotal += numFaces.size();
+
+	if (false == Load_OctreeData(fileInput))
+		IdentifyOctant(_vecMeshVerticesPtrs, _vecMeshNumVertices, _vecMeshFaces);
 
 	// 분열 중지 조건
-	if (iTotal / _vecNumIndices.size() < 30 || XMVectorGetX(XMVector3Length(m_vecEdges[OC_XYZ] - m_vecEdges[OC_xyz])) < 32)
+	if (iTotal / _vecMeshFaces.size() < 30 || XMVectorGetX(XMVector3Length(m_vecEdges[OC_XYZ] - m_vecEdges[OC_xyz])) < 12)
 		return S_OK;
 
-	_uint iRightFront{}, iRightBottom{}, iRightBack{}, iRightTop{}, iRightCenter{};
-	_uint iFrontCenter{}, iBottomCenter{}, iBackCenter{}, iTopCenter{};
-	_uint iFrontBottomCenter{}, iBottomBackCenter{}, iBackTopCenter{}, iTopFrontCenter{};
-	_uint iLeftFront{}, iLeftBottom{}, iLeftBack{}, iLeftTop{}, iLeftCenter{};
+	vector<_float3> vecChildrenCenters(OC_END);
 
-	IdentifyOctant();
+	_float3 vQuarterExtents = _float3(vHalfExtents.x * 0.5f, vHalfExtents.y * 0.5f, vHalfExtents.z * 0.5f);
+	SetUp_ChildrenCenter(vCenter, vQuarterExtents, vecChildrenCenters);
 
-
-
+	for (_int j = 0; j < OC_END; j++) {
+		m_vecChildren[j] = COcTree::Create(iNumMeshes, vecChildrenCenters[j], vQuarterExtents
+			, _vecMeshVerticesPtrs, _vecMeshNumVertices, m_vecChidrenMeshFaces[j], fileInput);
+	}
+		
 	return S_OK;
 }
 
-void COcTree::Culling(CGameInstance* pGameInstance, const vector<_float3*>& _vecMeshVerticesPtrse)
+void COcTree::Culling(class CGameInstance* pGameInstance, const vector<_float3*>& _vecMeshVerticesPtrs
+	, const vector<_uint>& _vecMeshNumVertices, vector<vector<FACE>>& _vecResultFaces)
 {
+	if (nullptr == m_vecChildren[OC_XYZ])
+		return;
 
+	for (_int i = 0; i < OC_END; i++)
+	{
+		//AppendVectors(_vecResultFaces, m_vecMeshFaces);
+		AppendVectors(_vecResultFaces, m_vecChidrenMeshFaces[i]);
+	}	
 }
 
 _bool COcTree::IsDrawable(CGameInstance* pGameInstance, const vector<_float3*>& _vecMeshVerticesPtrs)
@@ -65,29 +76,226 @@ _bool COcTree::IsDrawable(CGameInstance* pGameInstance, const vector<_float3*>& 
 	return false;
 }
 
-void COcTree::IdentifyOctant()
+void COcTree::IdentifyOctant(const vector<_float3*>& _vecMeshVerticesPtrs, const vector<_uint>& _vecMeshNumVertices
+	, const vector<vector<FACE>>& _vecMeshFaces)
 {
-	_vector vPlanes[6] = {}; // Right, Back, Left, Front, Top, Bottom;
-
-	vPlanes[0] = XMPlaneFromPoints(m_vecEdges[OC_XYZ], m_vecEdges[OC_XyZ], m_vecEdges[OC_Xyz]); // Right
-	vPlanes[1] = XMPlaneFromPoints(m_vecEdges[OC_XYz], m_vecEdges[OC_Xyz], m_vecEdges[OC_xyz]); // Back
-	vPlanes[2] = XMPlaneFromPoints(m_vecEdges[OC_xYz], m_vecEdges[OC_xyz], m_vecEdges[OC_xyZ]); // Left
-	vPlanes[3] = XMPlaneFromPoints(m_vecEdges[OC_xYZ], m_vecEdges[OC_XYZ], m_vecEdges[OC_XyZ]); // Front
-	vPlanes[4] = XMPlaneFromPoints(m_vecEdges[OC_xYZ], m_vecEdges[OC_XYZ], m_vecEdges[OC_XYz]); // Top
-	vPlanes[5] = XMPlaneFromPoints(m_vecEdges[OC_xyZ], m_vecEdges[OC_XyZ], m_vecEdges[OC_Xyz]); // Bottom
-
-	for (_int i = 0; i < 6; i++)
+	for (_uint iMeshIdx = 0; iMeshIdx < m_iNumMeshes; iMeshIdx++)
 	{
-		//_float fDis = XMPlaneDotCoord(vPlanes[i], )
+		OCTANT eOctant = { OC_END };
+		_int iCount{};
+
+		for (auto& face : _vecMeshFaces[iMeshIdx])
+		{
+			_float3 vA = _vecMeshVerticesPtrs[iMeshIdx][face.iA];
+			_float3 vB = _vecMeshVerticesPtrs[iMeshIdx][face.iB];
+			_float3 vC = _vecMeshVerticesPtrs[iMeshIdx][face.iC];
+
+			eOctant = FinalOctant(vA, vB, vC);
+
+			if (eOctant == OC_END)
+				m_vecMeshFaces[iMeshIdx].emplace_back(face);
+			else
+				m_vecChidrenMeshFaces[eOctant][iMeshIdx].emplace_back(face);
+		}
 	}
 }
 
-COcTree* COcTree::Create(const vector<_float3> _vecEdges, const vector<_float3*>& _vecMeshVerticesPtrs, const vector<_uint>& _vecMeshNumVertices
-	, const vector<_uint*>& _vecIndicesPtrs, const vector<_uint>& _vecNumIndices)
+COcTree::OCTANT COcTree::CheckOctant(const _float3& vPoint)
+{
+	_int iBinaryNum{};
+	if (vPoint.x > m_vCenter.x)
+		iBinaryNum |= 4;
+	if (vPoint.y > m_vCenter.y)
+		iBinaryNum |= 2;
+	if (vPoint.z > m_vCenter.z)
+		iBinaryNum |= 1;
+
+	switch (iBinaryNum)
+	{
+	case 0:
+		return OC_xyz;
+	case 1:
+		return OC_xyZ;
+	case 2:
+		return OC_xYz;
+	case 3:
+		return OC_xYZ;
+	case 4:
+		return OC_Xyz;
+	case 5:
+		return OC_XyZ;
+	case 6:
+		return OC_XYz;
+	case 7:
+		return OC_XYZ;
+	default:
+		return OC_END;
+	}
+}
+
+COcTree::OCTANT COcTree::FinalOctant(const _float3& _vA, const _float3& _vB, const _float3& _vC)
+{
+	OCTANT eOctantA = CheckOctant(_vA);
+	OCTANT eOctantB = CheckOctant(_vB);
+
+	if (eOctantA != eOctantB)
+		return OC_END;
+
+	OCTANT eOctantC = CheckOctant(_vC);
+
+	if (eOctantA != eOctantC)
+		return OC_END;
+
+	return eOctantA;
+}
+
+void COcTree::Save_OctreeData(ofstream& fileOutput)
+{
+	for (_uint iMeshIdx = 0; iMeshIdx < m_iNumMeshes; iMeshIdx++)
+	{
+		if (m_vecMeshFaces[iMeshIdx].empty())
+		{
+			_uint iZero = 0; 
+			fileOutput.write(reinterpret_cast<const char*>(&iZero), sizeof(iZero));
+			continue;
+		}
+			
+		_uint iNumFaces = m_vecMeshFaces[iMeshIdx].size();
+		fileOutput.write(reinterpret_cast<const char*>(&iNumFaces), sizeof(iNumFaces));
+
+		for (_uint iFaceIdx = 0; iFaceIdx < iNumFaces; iFaceIdx++)
+			fileOutput.write(reinterpret_cast<const char*>(&m_vecMeshFaces[iMeshIdx][iFaceIdx]), sizeof(m_vecMeshFaces[iMeshIdx][iFaceIdx]));			
+	}
+
+	
+	if (nullptr == m_vecChildren[OC_XYZ])
+	{
+		string strDelimiter = "Stop";
+		_uint iSize = strDelimiter.size();
+		fileOutput.write(reinterpret_cast<const char*>(&iSize), sizeof(iSize));
+		fileOutput.write(strDelimiter.c_str(), iSize);
+		return;
+	}
+	else
+	{
+		string strDelimiter = "Read";
+		_uint iSize = strDelimiter.size();
+		fileOutput.write(reinterpret_cast<const char*>(&iSize), sizeof(iSize));
+		fileOutput.write(strDelimiter.c_str(), iSize);
+	}
+		
+	for (_int iOctant = 0; iOctant < OC_END; iOctant++)
+	{
+		for (_uint iMeshIdx = 0; iMeshIdx < m_iNumMeshes; iMeshIdx++)
+		{
+			if (m_vecChidrenMeshFaces[iOctant][iMeshIdx].empty())
+			{
+				_uint iZero = 0;
+				fileOutput.write(reinterpret_cast<const char*>(&iZero), sizeof(iZero));
+				continue;
+			}
+
+			_uint iNumFaces = m_vecChidrenMeshFaces[iOctant][iMeshIdx].size();
+			fileOutput.write(reinterpret_cast<const char*>(&iNumFaces), sizeof(iNumFaces));
+
+			for (auto& childFace : m_vecChidrenMeshFaces[iOctant][iMeshIdx])
+				fileOutput.write(reinterpret_cast<const char*>(&childFace), sizeof(childFace));
+		}
+	}
+
+	if (nullptr == m_vecChildren[OC_XYZ])
+		return;
+
+	for (auto& child : m_vecChildren)
+		child->Save_OctreeData(fileOutput);
+}
+
+_bool COcTree::Load_OctreeData(ifstream& fileInput)
+{
+	if(true == fileInput.fail())
+		return false;
+
+	if (fileInput.eof())
+		return true;
+
+	for (_uint iMeshIdx = 0; iMeshIdx < m_iNumMeshes; iMeshIdx++)
+	{
+		_uint iNumFaces{};
+		fileInput.read(reinterpret_cast<char*>(&iNumFaces), sizeof(iNumFaces));
+
+		FACE tTempFace = {};
+		for (_uint iFaceIdx = 0; iFaceIdx < iNumFaces; iFaceIdx++)
+		{
+			fileInput.read(reinterpret_cast<char*>(&tTempFace), sizeof(tTempFace));
+			m_vecMeshFaces[iMeshIdx].emplace_back(tTempFace);
+		}
+	}
+
+	_uint iSize{};
+	string strDelimiter;
+	fileInput.read(reinterpret_cast<char*>(&iSize), sizeof(iSize));
+	strDelimiter.resize(iSize);
+	fileInput.read(&strDelimiter[0], iSize);
+	if ('S' == strDelimiter.front())
+		return true;
+
+	for (_int iOctant = 0; iOctant < OC_END; iOctant++)
+	{
+		for (_uint iMeshIdx = 0; iMeshIdx < m_iNumMeshes; iMeshIdx++)
+		{
+			_uint iNumFaces{};
+			fileInput.read(reinterpret_cast<char*>(&iNumFaces), sizeof(iNumFaces));
+
+			FACE tTempFace = {};
+			for (_uint iFaceIdx = 0; iFaceIdx < iNumFaces; iFaceIdx++)
+			{
+				fileInput.read(reinterpret_cast<char*>(&tTempFace), sizeof(tTempFace));
+				m_vecChidrenMeshFaces[iOctant][iMeshIdx].emplace_back(tTempFace);
+			}
+		}
+	}
+
+	return true;
+}
+
+void COcTree::SetUp_Edges(_float3 vCenter, _float3 vHalfExtents)
+{
+	m_vecEdges[OC_XYZ] = _float3(vCenter.x + vHalfExtents.x, vCenter.y + vHalfExtents.y, vCenter.z + vHalfExtents.z);
+	m_vecEdges[OC_XyZ] = _float3(vCenter.x + vHalfExtents.x, vCenter.y - vHalfExtents.y, vCenter.z + vHalfExtents.z);
+	m_vecEdges[OC_Xyz] = _float3(vCenter.x + vHalfExtents.x, vCenter.y - vHalfExtents.y, vCenter.z - vHalfExtents.z);
+	m_vecEdges[OC_XYz] = _float3(vCenter.x + vHalfExtents.x, vCenter.y + vHalfExtents.y, vCenter.z - vHalfExtents.z);
+	m_vecEdges[OC_xYZ] = _float3(vCenter.x - vHalfExtents.x, vCenter.y + vHalfExtents.y, vCenter.z + vHalfExtents.z);
+	m_vecEdges[OC_xyZ] = _float3(vCenter.x - vHalfExtents.x, vCenter.y - vHalfExtents.y, vCenter.z + vHalfExtents.z);
+	m_vecEdges[OC_xyz] = _float3(vCenter.x - vHalfExtents.x, vCenter.y - vHalfExtents.y, vCenter.z - vHalfExtents.z);
+	m_vecEdges[OC_xYz] = _float3(vCenter.x - vHalfExtents.x, vCenter.y + vHalfExtents.y, vCenter.z - vHalfExtents.z);
+}
+
+void COcTree::SetUp_ChildrenCenter(_float3 vCenter, _float3 vQuarterExtents, vector<_float3>& _vecChildrenCenters)
+{
+	_vecChildrenCenters[OC_XYZ] = _float3(vCenter.x + vQuarterExtents.x, vCenter.y + vQuarterExtents.y, vCenter.z + vQuarterExtents.z);
+	_vecChildrenCenters[OC_XyZ] = _float3(vCenter.x + vQuarterExtents.x, vCenter.y - vQuarterExtents.y, vCenter.z + vQuarterExtents.z);
+	_vecChildrenCenters[OC_Xyz] = _float3(vCenter.x + vQuarterExtents.x, vCenter.y - vQuarterExtents.y, vCenter.z - vQuarterExtents.z);
+	_vecChildrenCenters[OC_XYz] = _float3(vCenter.x + vQuarterExtents.x, vCenter.y + vQuarterExtents.y, vCenter.z - vQuarterExtents.z);
+	_vecChildrenCenters[OC_xYZ] = _float3(vCenter.x - vQuarterExtents.x, vCenter.y + vQuarterExtents.y, vCenter.z + vQuarterExtents.z);
+	_vecChildrenCenters[OC_xyZ] = _float3(vCenter.x - vQuarterExtents.x, vCenter.y - vQuarterExtents.y, vCenter.z + vQuarterExtents.z);
+	_vecChildrenCenters[OC_xyz] = _float3(vCenter.x - vQuarterExtents.x, vCenter.y - vQuarterExtents.y, vCenter.z - vQuarterExtents.z);
+	_vecChildrenCenters[OC_xYz] = _float3(vCenter.x - vQuarterExtents.x, vCenter.y + vQuarterExtents.y, vCenter.z - vQuarterExtents.z);
+}
+
+void COcTree::AppendVectors(vector<vector<FACE>>& _vecDst, vector<vector<FACE>>& _vecSrc)
+{
+	for (_uint i = 0; i < _vecDst.size(); i++)
+		_vecDst[i].insert(_vecDst[i].end(), _vecSrc[i].begin(), _vecSrc[i].end());
+}
+
+COcTree* COcTree::Create(_uint iNumMeshes, _float3 vCenter, _float3 vHalfExtents
+	, const vector<_float3*>& _vecMeshVerticesPtrs, const vector<_uint>& _vecMeshNumVertices
+	, const vector<vector<FACE>>& _vecMeshFaces, ifstream& fileInput)
 {
 	COcTree* pInstance = new COcTree();
 
-	if (FAILED(pInstance->Initialize(_vecEdges, _vecMeshVerticesPtrs, _vecMeshNumVertices, _vecIndicesPtrs, _vecNumIndices)))
+	if (FAILED(pInstance->Initialize(iNumMeshes, vCenter, vHalfExtents, _vecMeshVerticesPtrs, _vecMeshNumVertices
+		, _vecMeshFaces, fileInput)))
 	{
 		MSG_BOX(TEXT("Failed to Create : COcTree"));
 		Safe_Release(pInstance);

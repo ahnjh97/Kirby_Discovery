@@ -27,6 +27,14 @@ void CEventCallBack::onTrigger(PxTriggerPair* pairs, PxU32 count)
 
 void CEventCallBack::Clear_EventCallBack()
 {
+    if (!m_Triggers.empty())
+    {
+        for (auto& tuple : m_Triggers)
+        {
+            if (nullptr != get<0>(tuple))
+                get<0>(tuple)->release();
+        }
+    }
     m_Triggers.clear();
     m_TriggerFuncs.clear();
     m_ExitFuncs.clear();

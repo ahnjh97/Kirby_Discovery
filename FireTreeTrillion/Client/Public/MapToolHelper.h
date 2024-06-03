@@ -44,6 +44,7 @@ private:
 	void	Save_MapShaderInfo();
 	void	Load_MapShaderInfo();
 	void	Reset_MapShaderInfo();
+	void	Save_Octree();
 
 	// Picking
 	CGameObject* Select_ModelByPicking(const wstring& wstrLayerTag = TEXT("Layer_Parse"));

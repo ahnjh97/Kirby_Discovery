@@ -289,6 +289,11 @@ void CMapToolHelper::Menu_MapShaderInfo()
 	ImGui::SetCursorPosX(fButtonPosX + fButtonWidth * 0.6f);
 	if (ImGui::Button("Load", ImVec2(fButtonWidth, 30)))
 		Load_MapShaderInfo();
+	ImGui::SameLine();
+
+	ImGui::SetCursorPosX(fButtonPosX + fButtonWidth * 3.1f);
+	if (ImGui::Button("SaveOctree", ImVec2(fButtonWidth, 30)))
+		Save_Octree();
 
 	for (_uint j = 0; j < iNumMesh; j++)
 	{
@@ -587,6 +592,7 @@ void CMapToolHelper::Load_Level()
 	_int iTriggerIndex{};
 	_int iCamType{};
 	_float fRadius{};
+	_float3 vMin{}, vMax{};
 
 	while (!fileStream.eof()) 
 	{
@@ -612,7 +618,6 @@ void CMapToolHelper::Load_Level()
 		{
 			if (0 != strModelName.compare(strModelName.size() - 5, 5, "Blend")) // Blend¸ÊÀÌ ¾Æ´Ñ °æ¿ì
 			{
-				_float3 vMin{}, vMax{};
 				fileStream.read(reinterpret_cast<char*>(&vMin), sizeof(vMin));
 				fileStream.read(reinterpret_cast<char*>(&vMax), sizeof(vMax));
 			}
@@ -638,17 +643,35 @@ void CMapToolHelper::Load_Level()
 		}
 		
 		wstring wstrGameObjectTag;
+
+
 		if (Compute_MapIndex(strModelName) != -1) // ¸ÊÀÎ °æ¿ì
-			wstrGameObjectTag = TEXT("BasicMap");
-		else
-			wstrGameObjectTag = TEXT("MapToolObject");
-		
-		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
 		{
-			wstring wstrErrorMsg = TEXT("Failed to Clone MapToolObject") + wstrGameObjectTag;
-			MSG_BOX(wstrErrorMsg.c_str());
-			fileStream.close();
-			return;
+			CBasicMap::MAP_DESC tMapDesc{};
+			tMapDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			tMapDesc.matWorld = matWorld;
+			tMapDesc.vMin = vMin;
+			tMapDesc.vMax = vMax;
+			wstrGameObjectTag = TEXT("BasicMap");
+
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tMapDesc)))
+			{
+				wstring wstrErrorMsg = TEXT("Failed to Clone MapToolObject") + wstrGameObjectTag;
+				MSG_BOX(wstrErrorMsg.c_str());
+				fileStream.close();
+				return;
+			}
+		}	
+		else
+		{
+			wstrGameObjectTag = TEXT("MapToolObject");
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
+			{
+				wstring wstrErrorMsg = TEXT("Failed to Clone MapToolObject") + wstrGameObjectTag;
+				MSG_BOX(wstrErrorMsg.c_str());
+				fileStream.close();
+				return;
+			}
 		}
 	}
 
@@ -858,6 +881,15 @@ void CMapToolHelper::Reset_MapShaderInfo()
 	vecPassIndices[iMapIndex].resize(iNumMesh);
 	vecSamplingFactors[iMapIndex].resize(iNumMesh);
 	fill(vecSamplingFactors[iMapIndex].begin(), vecSamplingFactors[iMapIndex].end(), 1.f);
+}
+
+void CMapToolHelper::Save_Octree()
+{
+	CModel* pModel = dynamic_cast<CModel*>(m_pPickedObject->Get_Component(TEXT("Com_Model")));
+	if (nullptr == pModel)
+		return;
+
+	pModel->Save_OctreeData();
 }
 
 CMapToolHelper* CMapToolHelper::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

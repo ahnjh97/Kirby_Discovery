@@ -820,13 +820,5 @@ CGameObject* CEditor_UI::Clone(void* _pArg)
 
 void CEditor_UI::Free()
 {
-	if (!m_UIs.empty())
-	{
-		for (auto& pUIObj : m_UIs)
-			Safe_Release(pUIObj);
-
-		m_UIs.clear();
-	}
-
 	__super::Free();
 }

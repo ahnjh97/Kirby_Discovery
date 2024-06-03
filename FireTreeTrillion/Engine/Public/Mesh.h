@@ -20,6 +20,9 @@ public:
 	_uint Get_NumVertices() { return m_iNumVertices; }
 	_uint* Get_IndicesPtr() { return m_pIndices; }
 	_uint Get_NumIndices() { return m_iNumIndices; }
+	ID3D11Buffer* Get_IndexBufferPtr() { return m_pIB; }
+	
+	void Set_NumIndices(_uint iNumIndices) { m_iNumIndices = iNumIndices; }
 
 public:
 	virtual HRESULT Initialize_Prototype(TYPE eModelType, string strDirectory, const vector<CBone*>& Bones, _fmatrix TransformMatrix);
@@ -37,7 +40,6 @@ public:
 	_float4 Get_PickPos(const class CTransform* pTransform) const;
 
 	void Find_MinMax(_float3& vMin, _float3& vMax);
-	void Culling(const vector<FACE>& _vecFaces);
 
 private:
 	_char					m_szName[MAX_PATH] = { "" };
