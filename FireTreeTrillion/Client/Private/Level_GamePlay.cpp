@@ -87,7 +87,7 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 	//// 예시코드 1 : 태양광
 	LIGHT_DESC			LightDesc{};
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
-	LightDesc.vDirection = _float4(0.f, -1.f, 0.f, 0.f);
+	LightDesc.vDirection = _float4(0.3f, -1.f, -0.3f, 0.f);
 
 	LightDesc.vDiffuse = _float4(0.8f, 0.8f, 0.8f, 1.f);
 	LightDesc.vAmbient = _float4(0.6f, 0.6f, 0.6f, 1.f);

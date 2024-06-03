@@ -229,6 +229,14 @@ HRESULT CLoader::Loading_StaticComponentAll()
 	hr = Add_Texture(eLevel, "FX_SimpleStar", "Effects/SimpleStar.png");
 	CHECK_FAILED(hr);
 
+	hr = Add_Texture(eLevel, "FX_VacuumTornado", "Effects/wind01.png");
+	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "FX_VacuumWind", "Effects/scroll07.png");
+	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "FX_VacuumDGB", "Effects/twinkle02.png");
+	CHECK_FAILED(hr);
+
+
 	wstring wstrPrototypeTag = L"Prototype_Component_Shader_";
 	hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + TEXT("VtxPosTex"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements));
@@ -297,7 +305,7 @@ HRESULT CLoader::Loading_For_GamePlay()
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
 	#pragma region 모델
 	// 모아놓은 Model 한번에 생성.
-	Load_AnimInfo();
+	Load_AnimToolInfo();
 	hr = Add_Models(eLevel);
 	CHECK_FAILED(hr);
 	#pragma endregion
@@ -383,6 +391,7 @@ HRESULT CLoader::Loading_For_Tool_Anim()
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
 	#pragma region 모델
+	Load_AnimToolInfo();
 	if (FAILED(Add_AllModelTxts(eLevel, TYPE_ANIM)))
 		return E_FAIL;
 	#pragma endregion
@@ -468,7 +477,6 @@ HRESULT CLoader::Add_Models(LEVEL eLevel)
 			_int i = 0;
 		}
 
-		// QZR
 		// 애님툴에서 조정하여 저장한 값을 불러서
 		// 모델 이름이 같을 경우, model의 정보들을 읽어오기
 		for (auto& pair : m_mapSequence)
@@ -506,6 +514,12 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("SmokeTail", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("Tornado", TYPE_NONANIM );
 
+		//커비 회오리
+		m_vecModelInfo.emplace_back("VacuumTornado", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("VacuumWind", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("VacuumDGB", TYPE_NONANIM);
+
+
 	}
 	else if (eLevel == LEVEL_LOGO)
 	{
@@ -538,23 +552,25 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("BladeKnight", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("BladeKnightSword", TYPE_NONANIM, 1.f);
 	}
-	else if (eLevel == LEVEL_TOOL_MAP) 
-	{		
+	else if (eLevel == LEVEL_TOOL_MAP)
+	{
 		// 맵툴에서는 크기나 회전 상태 바꾸고 싶은 모델만 여기에 등록. 안바꾸고싶으면 NonAnim, 크기1, 회전 0도로 자동 추가됨
 		m_vecModelInfo.emplace_back("Book", TYPE_NONANIM, 0.01f);
 		m_vecModelInfo.emplace_back("TestMap2", TYPE_NONANIM, 0.01f);
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f);
-		m_vecModelInfo.emplace_back("Camera", TYPE_NONANIM, 0.2f , 270.f);
+		m_vecModelInfo.emplace_back("Camera", TYPE_NONANIM, 0.2f, 270.f);
 		m_vecModelInfo.emplace_back("Dummy", TYPE_NONANIM, 0.01f);
 	}
 	else if (eLevel == LEVEL_TOOL_ANIM)
 	{
-		m_vecModelInfo.emplace_back(MODEL{ "Kirby", TYPE_ANIM });
-
 		// For Kirby Body
+		m_vecModelInfo.emplace_back(MODEL{ "Kirby", TYPE_ANIM });
 		m_vecModelInfo.emplace_back(MODEL{ "KirbyBalloon", TYPE_ANIM, 1.f, 180.f });
 		m_vecModelInfo.emplace_back(MODEL{ "KirbyDefault", TYPE_ANIM, 1.f, 180.f });
-		m_vecModelInfo.emplace_back(MODEL{ "KirbyVacuum", TYPE_ANIM, 1.f, 180.f });
+		m_vecModelInfo.emplace_back(MODEL{ "KirbyVacuum",  TYPE_ANIM, 1.f, 180.f });
+		
+		// For Awoofy
+		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.f, 180.f);
 	}
 
 }
@@ -661,6 +677,7 @@ HRESULT CLoader::Add_KirbyFaceTexture(LEVEL eLevel)
 	return S_OK;
 }
 
+// TOOL_MAP, TOOL_ANIM에서 사용중인 함수.
 HRESULT CLoader::Add_AllModelTxts(LEVEL eLevel, TYPE eType)
 {
 	HRESULT hr = S_OK;
@@ -689,26 +706,39 @@ HRESULT CLoader::Add_AllModelTxts(LEVEL eLevel, TYPE eType)
 		
 		_bool bFound = { false };
 		
-
+		// 원래 버전
+		//MODEL tModelInfo = MODEL{ strModelName ,  eType };
+		//for (auto& modelInfo : m_vecModelInfo)
+		//{
+		//	if (modelInfo.strModelName == strModelName)
+		//	{
+		//		tModelInfo = modelInfo;
+		//		break;
+		//	}
+		//}
+		
 		MODEL tModelInfo = MODEL{ strModelName ,  eType };
 		for (auto& modelInfo : m_vecModelInfo)
 		{
+			// 애님툴에서 조정하여 저장한 값을 불러서
+			// 모델 이름이 같을 경우, model의 정보들을 읽어오기
+			for (auto& pair : m_mapSequence)
+			{
+				if (modelInfo.strModelName == pair.first)
+				{
+					modelInfo.umapAnimInfo = pair.second;
+				}
+			}
 			if (modelInfo.strModelName == strModelName)
 			{
 				tModelInfo = modelInfo;
 				break;
 			}
 		}
-		
-		// QZR
-		// 애님툴에서 조정하여 저장한 값을 불러서
-		// 모델 이름이 같을 경우, model의 정보들을 읽어오기
+
 		wstring wstrPrototypeTag = TEXT("Prototype_Component_Model_") + CUtils::StrToWstr(tModelInfo.strModelName);
 		hr = m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CModel::Create(m_pDevice, m_pContext, tModelInfo));
 		CHECK_FAILED(hr);
-
-		if (FAILED(hr))
-			return E_FAIL;
 	}
 
 	FindClose(hFind);
@@ -747,8 +777,8 @@ void CLoader::TraverseModelTxts(const wstring& rootFolderPath, list<wstring>& fi
 }
 
 
-
-void CLoader::Load_AnimInfo()
+// AnimTool에서 만들어놓은 파일을 읽어서 가지고있는 함수
+void CLoader::Load_AnimToolInfo()
 {
 	// XML 파일을 읽어올 경로 설정
 	const char* filePath = "../Bin/Resources/Data/AnimationData.xml";

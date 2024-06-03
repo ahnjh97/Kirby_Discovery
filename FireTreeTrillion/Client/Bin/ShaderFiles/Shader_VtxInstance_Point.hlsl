@@ -8,15 +8,19 @@ texture2D	g_MaskTexture;
 vector	g_vCamPosition;
 
 //컬러, 마스크 임계 등
-vector g_vRColor = { 1.f, 1.f, 1.f, 1.f };
-vector g_vGColor = { 1.f, 1.f, 1.f, 1.f };
-vector g_vBColor = { 1.f, 1.f, 1.f, 1.f };
+float3 g_vRColor = { 1.f, 1.f, 1.f };
+float3 g_vGColor = { 1.f, 1.f, 1.f };
+float3 g_vBColor = { 1.f, 1.f, 1.f };
+
+float g_fAlpha;
+//float g_fMaskThreshold;
+
 
 struct VS_IN
 {
 	float3				vPosition : POSITION;
 	row_major float4x4	TransformMatrix : WORLD;
-	bool				isLived : COLOR0;
+	bool				bAlive : COLOR0;
 };
 
 
@@ -24,7 +28,7 @@ struct VS_OUT
 {
 	float4		vPosition : POSITION;
 	float2		vPSize : PSIZE;
-	bool		isLived : COLOR0;
+	bool		bAlive : COLOR0;
 };
 
 /* 정점 쉐이더 */
@@ -36,7 +40,7 @@ VS_OUT VS_MAIN(VS_IN In)
 
 	Out.vPosition = mul(vPosition, g_WorldMatrix);
 	Out.vPSize = float2(In.TransformMatrix._11, In.TransformMatrix._22);
-	Out.isLived = In.isLived;
+	Out.bAlive = In.bAlive;
 
 	return Out;
 }
@@ -45,14 +49,14 @@ struct GS_IN
 {
 	float4		vPosition : POSITION;
 	float2		vPSize : PSIZE;
-	bool		isLived : COLOR0;
+	bool		bAlive : COLOR0;
 };
 
 struct GS_OUT
 {
 	float4		vPosition : SV_POSITION;
 	float2		vTexcoord : TEXCOORD0;
-	bool		isLived : COLOR0;
+	bool		bAlive : COLOR0;
 };
 
 /* 정점을 생성한다. */
@@ -70,22 +74,22 @@ void GS_MAIN(point GS_IN In[1], inout TriangleStream<GS_OUT> Vertices)
 	Out[0].vPosition = vector(In[0].vPosition.xyz + vRight + vUp, 1.f);
 	Out[0].vTexcoord = float2(0.0f, 0.0f);
 	Out[0].vPosition = mul(Out[0].vPosition, matVP);
-	Out[0].isLived = In[0].isLived;
+	Out[0].bAlive = In[0].bAlive;
 
 	Out[1].vPosition = vector(In[0].vPosition.xyz - vRight + vUp, 1.f);
 	Out[1].vTexcoord = float2(1.0f, 0.0f);
 	Out[1].vPosition = mul(Out[1].vPosition, matVP);
-	Out[1].isLived = In[0].isLived;
+	Out[1].bAlive = In[0].bAlive;
 
 	Out[2].vPosition = vector(In[0].vPosition.xyz - vRight - vUp, 1.f);
 	Out[2].vTexcoord = float2(1.0f, 1.0f);
 	Out[2].vPosition = mul(Out[2].vPosition, matVP);
-	Out[2].isLived = In[0].isLived;
+	Out[2].bAlive = In[0].bAlive;
 
 	Out[3].vPosition = vector(In[0].vPosition.xyz + vRight - vUp, 1.f);
 	Out[3].vTexcoord = float2(0.0f, 1.0f);
 	Out[3].vPosition = mul(Out[3].vPosition, matVP);
-	Out[3].isLived = In[0].isLived;
+	Out[3].bAlive = In[0].bAlive;
 
 	Vertices.Append(Out[0]);
 	Vertices.Append(Out[1]);
@@ -101,7 +105,7 @@ struct PS_IN
 {
 	float4		vPosition : SV_POSITION;
 	float2		vTexcoord : TEXCOORD0;
-	bool		isLived : COLOR0;
+	bool		bAlive : COLOR0;
 };
 
 struct PS_OUT
@@ -116,7 +120,7 @@ PS_OUT PS_MAIN(PS_IN In)
     Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
 
 	if (Out.vColor.a <= 0.3f || 
-		false == In.isLived)
+		false == In.bAlive)
 		discard;
 
 	//Out.vColor = vector(1.f, 0.f, 0.f, 1.f);
@@ -130,13 +134,15 @@ PS_OUT PS_MAIN_WHITE_FX(PS_IN In)
 
     float vBrightness = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord).r;
 	
+    if (vBrightness < .01f || false == In.bAlive)
+        discard;
 	
-    Out.vColor = g_vRColor * vBrightness;
+    Out.vColor.rgb = g_vRColor * vBrightness;
 	
     Out.vColor.a = vBrightness; // 어두울수록 투명
     
-    if (Out.vColor.a < .05f)
-        discard;
+
+	
 	
     return Out;
 }

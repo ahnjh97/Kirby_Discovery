@@ -50,7 +50,6 @@ HRESULT CAwoofy::Initialize(void* pArg)
 	m_eEyeState = AWOOFYEYE_IDLE;
 
 	Add_AnimEvent();
-
 	return S_OK;
 }
 
@@ -121,14 +120,13 @@ HRESULT CAwoofy::Render_LightDepth()
 
 void CAwoofy::Add_AnimEvent()
 {
-	__super::Add_AnimEvent();
+	//__super::Add_AnimEvent();
 	
 	//1. 한 애니메이션에서 같은 이름의 이벤트 가능
 	//2. 현재 실행되는 애니메이션에 따라 이벤트가 발생하도록 한다.
 	//3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
-	m_pModelCom->Add_Event("SpawnParticle", [this]() {
+	m_pModelCom->Add_Event("Bboong", [this]() {
 		//파티클 생성
-
 		static _float fBbongTime{ 0.f };
 		fBbongTime += GetTickCount64();
 		if (.2f < fBbongTime)
@@ -149,17 +147,16 @@ void CAwoofy::Add_AnimEvent()
 			_float3 vAngle = { 0.f, fAngleDiff, 0.f };
 			FXDesc.vInitRot = vAngle;
 
-
 			if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
 				return;
 
 			fBbongTime = 0.f;
-
 		}
 		});
 
-	m_pModelCom->Add_Event("PlayWalkSound", [this]() {
-		//사운드 재생
+	m_pModelCom->Add_Event("PlaySound", [this]() {
+		// 사운드 처리
+		m_pGameInstance->PlaySound_Free(L"TakeItem01.wav", 0.5f);
 		});
 
 	m_pModelCom->Add_Event("ApplyDamage", [this]() {
@@ -290,6 +287,10 @@ HRESULT CAwoofy::Add_Components()
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 
+	// FOR ANIMTOOL
+	m_ppModelForAnimTool = &m_pModelCom;
+
+	/* FSM */
 	SetUp_FSM();
 
 	return S_OK;

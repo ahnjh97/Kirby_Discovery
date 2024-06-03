@@ -95,13 +95,18 @@ public:
 	void Go_Down(_float fTimeDelta);
 	void Look_At(_fvector vPosition);
 	void Look_At_Axis(_fvector vAxis);
+	void Look_At_Dir(_float4 vDir);
 	void Look_At_ForLandObject(_fvector vPosition);
 	void Look_At_Rotate(_vector vAt, _float fTimeDelta);
+	void Look_At_Interpolate(_vector vAt, _float fTimeDelta);
 	void Look_At_Angle(_fvector vAt, _fvector vAxis, _float fRadian);
 	void Move_toTarget(_fvector vTargetPos, _float fTimeDelta, _float fMinDistance = 0.f);	
+	void Move(_float4 vDir);
 	void Turn(_fvector vAxis, _float fTimeDelta);
 	void Turn(_fvector vAxis, _float fTimeDelta, _float fAngle);
+	void Turn(Quaternion _vQuat);
 	void Turn_Absolute(_float4 _vQuat);
+
 	void Rotation(_fvector vAxis, _float fRadian);
 	void Orbit(_fvector vTarget, _fvector vAxis, _float fTimeDelta);
 

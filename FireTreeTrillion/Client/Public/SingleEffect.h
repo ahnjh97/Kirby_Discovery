@@ -22,6 +22,14 @@ private:
 	virtual ~CSingleEffect() = default;
 
 public:
+	virtual void	Reset_Duration() override
+	{
+		m_fDuration.first = 0.f;
+
+		m_fLifetime.second -= m_fLifetime.first;
+		m_fLifetime.first -= m_fLifetime.first;
+	}
+
 	HRESULT Initialize_Prototype();
 	HRESULT Initialize_Prototype(FX_DESC FXDesc);
 	virtual HRESULT Initialize(void* pArg) override;

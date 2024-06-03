@@ -1,10 +1,13 @@
 #include "Animation.h"
+
+#include "GameInstance.h"
+
 #include "Channel.h"
 #include "Bone.h"
 #include "Model.h"
+
 CAnimation::CAnimation()
 {
-
 }
 
 CAnimation::CAnimation(const CAnimation & rhs)
@@ -78,16 +81,16 @@ void CAnimation::Invalidate_TransformationMatrix(_float fTimeDelta, const vector
 	_float preTrackPosition = m_fTrackPosition;
 	m_fTrackPosition += m_fTickPerSecond * fTimeDelta;
 
-	if (!m_vecEventInfo.empty())
-		int a = 3;
-
 	// 해당 애니메이션에서, 프레임 사이에 있는 이벤트 이름을 알아온다.
 	// 그 이벤트 이름에 넣어준 함수를 실행
-	for (auto& eventInfo : m_vecEventInfo)
+	if (*CGameInstance::Get_Instance()->Get_CurrentLevelID() != 6)
 	{
-		if ((_int)m_fTrackPosition == eventInfo.iStartFrame)
+		for (auto& eventInfo : m_vecEventInfo)
 		{
-			model->CallEvent(eventInfo.strEventName);
+			if ((_int)m_fTrackPosition == eventInfo.iStartFrame)
+			{
+				model->CallEvent(eventInfo.strEventName);
+			}
 		}
 	}
 

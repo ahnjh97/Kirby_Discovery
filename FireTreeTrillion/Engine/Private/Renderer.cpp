@@ -74,6 +74,13 @@ HRESULT CRenderer::Initialize()
 		0.07f, 0.579137f, 0.633162f, 0.769912f, 0.51f, 0.973451f, 0.771999f, 0.323048f, 0.72f, 0.08f, 0.63f
 		});
 
+	Save_ColorSet("Stage1",
+		COLOR_DATA{
+		1.06f, 1.f, 0.9f, 1.3f, 1.f, 0.99f, 1.06f, 0.71f, 0.6f, 0.6f, 1.39f, 1.06f, 1.24f, 0.199115f, 0.0378847f, 0.114933f, 0.1f, 0.30578f, 0.342999f, 0.606195f, 0.15f, 0.986726f, 0.949634f, 0.462801f, 0.34f, 0.12f, 0.5f
+		});
+
+
+	Set_ColorSet(Find_ColorSet("Stage1"));
 
 
 	//function<void(_int)> func = bind(&CCamera_Free::Set_MatrixIndex, this, placeholders::_1);
@@ -446,8 +453,11 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 
 
 	/// 림 라이트
-	if (m_pGameInstance->Get_DIKeyState(DIK_R, KEY_DOWN))
-		m_bRimTest = !m_bRimTest;
+	if (*m_pGameInstance->Get_CurrentLevelID() != 6)
+	{
+		if (m_pGameInstance->Get_DIKeyState(DIK_R, KEY_DOWN))
+			m_bRimTest = !m_bRimTest;
+	}
 	
 	if (m_bRimTest == true)
 	{
@@ -1158,7 +1168,8 @@ void CRenderer::Render_IMGUI()
 		Set_ColorSet(Find_ColorSet("Tutorial"));
 	if (m_pGameInstance->Get_KeyState(DIK_3, KEY_DOWN))
 		Set_ColorSet(Find_ColorSet("Night"));
-
+	if (m_pGameInstance->Get_KeyState(DIK_4, KEY_DOWN))
+		Set_ColorSet(Find_ColorSet("Stage1"));
 	ImGui::Begin(u8"컬러 코렉션");
 
 	ImGui::Checkbox(u8"적용", &m_bApplyCorrection);
@@ -1224,10 +1235,25 @@ void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 	_float fInterpolateSpeed = 3.f * _fTimeDelta;
 
 	if (m_DestColorData.fExposure != -1.f)
+	{
 		m_fExposure += (m_DestColorData.fExposure - m_fExposure) * fInterpolateSpeed;
 
+		if (abs(m_fExposure - m_DestColorData.fExposure) < 01.f)
+		{
+			m_fExposure = m_DestColorData.fExposure;
+			m_DestColorData.fExposure = -1.f;
+		}
+	}
+
 	if (m_DestColorData.fHue != -1.f)
+	{
 		m_fHue += (m_DestColorData.fHue - m_fHue) * fInterpolateSpeed;
+		if (abs(m_fHue - m_DestColorData.fHue) < 01.f)
+		{
+			m_fHue = m_DestColorData.fHue;
+			m_DestColorData.fHue = -1.f;
+		}
+	}
 
 	if (m_DestColorData.fSaturation != -1.f)
 		m_fSaturation += (m_DestColorData.fSaturation - m_fSaturation) * fInterpolateSpeed;
@@ -1296,6 +1322,40 @@ void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 		m_vHighlightColor[1] += (m_DestColorData.vHighlightColor[1] - m_vHighlightColor[1]) * fInterpolateSpeed;
 		m_vHighlightColor[2] += (m_DestColorData.vHighlightColor[2] - m_vHighlightColor[2]) * fInterpolateSpeed;
 	}
+
+
+	//if (abs(m_fExposure - m_DestColorData.fExposure) < 01.f)
+	//{
+	//	m_fExposure = m_DestColorData.fExposure;
+	//	m_fHue = m_DestColorData.fHue;
+	//	m_fSaturation = m_DestColorData.fSaturation;
+	//	m_fBrightness = m_DestColorData.fBrightness;
+	//	m_fGamma = m_DestColorData.fGamma;
+	//	m_fVibrance = m_DestColorData.fVibrance;
+	//	m_fContrast = m_DestColorData.fContrast;
+	//	m_fShadowIntensity = m_DestColorData.fShadowIntensity;
+	//	m_fMidtoneIntensity = m_DestColorData.fMidtoneIntensity;
+	//	m_fHighlightIntensity = m_DestColorData.fHighlightIntensity;
+	//	m_fShadowThreshold = m_DestColorData.fShadowThreshold;
+	//	m_fHighlightThreshold = m_DestColorData.fHighlightThreshold;
+	//	m_vWhiteBalance[0] = m_DestColorData.vWhiteBalance[0];
+	//	m_vWhiteBalance[1] = m_DestColorData.vWhiteBalance[1];
+	//	m_vWhiteBalance[2] = m_DestColorData.vWhiteBalance[2];
+	//	m_vColorBalance[0] = m_DestColorData.vColorBalance[0];
+	//	m_vColorBalance[1] = m_DestColorData.vColorBalance[1];
+	//	m_vColorBalance[2] = m_DestColorData.vColorBalance[2];
+	//	m_vShadowColor[0] = m_DestColorData.vShadowColor[0];
+	//	m_vShadowColor[1] = m_DestColorData.vShadowColor[1];
+	//	m_vShadowColor[2] = m_DestColorData.vShadowColor[2];
+	//	m_vMidtoneColor[0] = m_DestColorData.vMidtoneColor[0];
+	//	m_vMidtoneColor[1] = m_DestColorData.vMidtoneColor[1];
+	//	m_vMidtoneColor[2] = m_DestColorData.vMidtoneColor[2];
+	//	m_vHighlightColor[0] = m_DestColorData.vHighlightColor[0];
+	//	m_vHighlightColor[1] = m_DestColorData.vHighlightColor[1];
+	//	m_vHighlightColor[2] = m_DestColorData.vHighlightColor[2];
+
+	//	m_DestColorData = COLOR_DATA{};
+	//}
 }
 
 
@@ -1303,6 +1363,9 @@ void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 
 HRESULT CRenderer::Render_Debug()
 {
+	if (*m_pGameInstance->Get_CurrentLevelID() == 4)
+		return S_OK;
+
 	for (auto& pDebugCom : m_DebugComponents)
 	{
 		if (nullptr != pDebugCom)

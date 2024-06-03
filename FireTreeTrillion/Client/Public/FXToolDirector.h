@@ -90,6 +90,7 @@ private:
 	_int m_iCurFXPassIdx = { 0 };
 	_int m_iCurFXTexIdx = { 0 };
 	_int m_iCurFXMaskTexIdx = { 0 };
+	_int m_iCurRenderGroup = { 2 };
 
 	//수명
 	//_float m_fDuration = { 1.f };
@@ -97,8 +98,19 @@ private:
 
 
 	//파티클용 세팅 변수
-	_float m_fRange[3] = { 1.f, 1.f, 1.f };
-	_float m_fPivot[3] = { 1.f, 1.f, 1.f };
+	_float m_vCenter[3] = { 1.f, 1.f, 1.f };
+	_float m_vRange[3] = { 1.f, 1.f, 1.f };
+
+	_float m_vRotation[3] = { 1.f, 1.f, 1.f };
+	_float m_vRotationRandomOffset[3] = { 1.f, 1.f, 1.f };
+	_float m_vScale[3] = { 1.f, 1.f, 1.f };
+	_float m_vScaleRandomOffset[3] = { 1.f, 1.f, 1.f };
+	_float m_vDir[3] = { 1.f, 1.f, 1.f };
+	_float m_vDirRandomOffset[3] = { 1.f, 1.f, 1.f };
+	_float m_vColor[3] = { 1.f, 1.f, 1.f };
+	_float m_vColorRandomOffset[3] = { 1.f, 1.f, 1.f };
+
+	_float m_vPivot[3] = { 1.f, 1.f, 1.f };
 
 
 	// 이펙트 키프레임 편집(단일)
@@ -116,8 +128,15 @@ private:
 	_float m_fEditAlpha = { 1.f };
 	_float m_fEditMaskThreshold = { 1.f };
 
-	//_uint m_eEditEasing = { EASE_LINEAR };
+
+	//**** 값을 복사하기 위해 저장하는 임시 변수들 ****//
 	
+	//임시로 복사 정보를 저장한다.
+	SINGLE_FX_DATA m_TempCopySingleFXData = {};
+	MULTI_FX_DATA m_TempCopyMultiFXData = {};
+	PARTICLE_DATA m_TempCopyInstanceData = {};
+
+
 	//현재 키프레임의 easing 플래그
 	_int m_iCurEasing = { 0 };
 	vector<char*> m_Easing =
