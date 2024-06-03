@@ -65,7 +65,13 @@ private:
 
 	CTransform*		m_pTarget = { nullptr };
 	_bool			m_bTrackTarget = { false };
-	_float			m_fTrackDistance = { 8.f };
+	_float			m_fTrackDistance = { 20.f };
+
+	_float			m_fSlerpRatio = { .2f };
+
+	_float4 m_vDestCamPos = {};
+	_float4 m_vDestCamDir = {};
+
 	void			Track_Target(_float fTimeDelta);
 
 	vector<_float4x4>	m_vecCamMatrices;
@@ -75,15 +81,18 @@ private:
 	vector<pair<_vector, _float>>	m_vecRearDirRadius;
 	vector<pair<_float4x4, _float>>	m_vecTriggerInfo; // Trigger InverseMatrix and Scale
 	
+
 	_float m_fTriggerRatio = {};
 	_bool m_bLerpByTriggerInfo = { false };
 	_bool m_bPreLerpByTriggerInfo = { false };
+
+
 
 	_vector m_vSlerpedDir = {};
 	_float m_fLerpedRadius = {};
 	//Vector3			m_vOrbitPos = { 0.f, 0.f, 0.f };
 private:
-	void Orbit_Target(_float fTimeDelta);
+	//void Orbit_Target(_float fTimeDelta);
 	void Control(_float fTimeDelta);
 
 public:

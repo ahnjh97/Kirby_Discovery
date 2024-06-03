@@ -26,6 +26,15 @@ private:
 	virtual ~CBuffahorn() = default;
 
 public:
+	void Set_JumpTime(_float fTimeDelta) {
+		m_fJumpTime = fTimeDelta;
+	}
+
+	_float Get_JumpTime() {
+		return m_fJumpTime;
+	}
+
+public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual _int	Tick(_float fTimeDelta) override;
@@ -45,6 +54,8 @@ public:
 private:
 	//CFSM*			m_pFSM = { nullptr };
 	BUFFAHORN_ANIM	m_eCurrentState = { BUFFAHORN_END };
+
+	_float			m_fJumpTime = { 0.f };
 
 
 private:

@@ -203,7 +203,7 @@ void CKirbyVacuum_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float f
 		}
 
 		pController->FreeFall(pTransformCom, fTimeDelta, Kirbydesc->m_fGravityOffset);
-
+		pKirby->Delete_KirbyEffect();
 
 	}
 	else if (pKirby->Get_State() == CKirby::STATE_INHALEFALL)

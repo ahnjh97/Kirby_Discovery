@@ -47,6 +47,9 @@ HRESULT CBuffahorn::Initialize(void* pArg)
 	m_eVacuumSize = SIZE_BIG;
 	m_eAbilityType = ABILITY_DEFAULT;
 
+	//for test
+	//31 8 -102
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(31.f, 8.f, -102.f, 1.f));
 	return S_OK;
 }
 
@@ -249,8 +252,7 @@ void CBuffahorn::SetUp_FSM()
 	m_pFSM->Add_State(BUFFAHORN_BRAKE, CBuffahorn_Brake_State::Create());
 	m_pFSM->Add_State(BUFFAHORN_BRAKEEND, CBuffahorn_Brake_State::Create());
 
-	m_pFSM->Add_State(BUFFAHORN_RETURNJUMPSTART, CBuffahorn_Jump_State::Create());
-	m_pFSM->Add_State(BUFFAHORN_RETURNJUMP, CBuffahorn_Jump_State::Create());
+	m_pFSM->Add_State(BUFFAHORN_JUMP, CBuffahorn_Jump_State::Create());
 	m_pFSM->Add_State(BUFFAHORN_RETURNJUMPEND, CBuffahorn_Jump_State::Create());
 
 	//ป๓ลย Initialize

@@ -135,7 +135,7 @@ public:
 	virtual void OnStateExit()														override;
 
 private:
-	_float m_fJumpVelocity = { 0.f };
+	_float	m_fSpeed = { 0.f };
 
 public:
 	static	CBuffahorn_Jump_State* Create();

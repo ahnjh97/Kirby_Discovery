@@ -233,7 +233,7 @@ void CKirby::Collision_Attack(CGameObject* pOtherObj)
 		INFO(m_pObject)->Set_Dead();
 		Safe_Release(INFO(m_pObject));
 		INFO(m_pObject) = nullptr;
-
+		Delete_KirbyEffect();
 	}
 	// 슬라이드중
 	else if (Get_State() == STATE_SLIDE)
@@ -266,6 +266,7 @@ void CKirby::Collision_Attack(CGameObject* pOtherObj)
 		{
 			Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
 		}
+		Delete_KirbyEffect();
 	}
 }
 
