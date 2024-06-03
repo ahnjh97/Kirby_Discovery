@@ -281,6 +281,7 @@ void CRigidBody::Free()
 {
 	__super::Free();
 
+	Safe_Release(m_pActorObject);
 	Release_Actor();
 }
 

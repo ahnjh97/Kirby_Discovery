@@ -56,6 +56,17 @@ HRESULT CEffect::Initialize(void* pArg)
     m_iCurKeyframeIdxs = new _uint[m_Keyframes.size()];
     ZeroMemory(m_iCurKeyframeIdxs, sizeof(_uint) * m_Keyframes.size());
 
+
+    m_fDuration.second = effectDesc.fDuration;
+    m_fLifetime = effectDesc.fLifetime;
+    m_eRenderGroup = effectDesc.eRenderGroup;
+
+    if (effectDesc.pSocketMatrix != nullptr)
+    {
+        m_pSoketMatrix = effectDesc.pSocketMatrix;
+    }
+
+
     //_int iSize = m_iCurKeyframeIdxs[0];
     //iSize = m_iCurKeyframeIdxs[1];
     //iSize = m_iCurKeyframeIdxs[2];
@@ -107,6 +118,9 @@ void CEffect::Fill_SaveData(_Out_ SINGLE_FX_DATA* pFXData)
         pFXData->vecKeyframeInfo.push_back({ keyframePair.first , keyframePair.second.size()});
         pFXData->vecKeyframes.push_back(keyframePair.second);
     }
+
+    pFXData->eRenderGroup = m_eRenderGroup;
+
 }
 
 void CEffect::Add_Keyframe(FX_KEYFRAME& newKeyframe, KF_PROPERTY eProperty)
@@ -361,4 +375,6 @@ _float4 CEffect::Calculate_CurValue_Slerp(_float fTimeDelta, KF_PROPERTY eProper
 void CEffect::Free()
 {
     __super::Free();
+
+    Safe_Delete_Array(m_iCurKeyframeIdxs);
 }

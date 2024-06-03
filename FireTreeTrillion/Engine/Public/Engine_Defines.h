@@ -283,7 +283,7 @@ enum PASS_DEFERRED {
 
 using namespace Engine;
 
-#ifdef _MY_DEBUG
+#ifdef _DEBUG
 
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>

@@ -1,6 +1,4 @@
 #pragma once
-
-
 #include "GameInstance.h"
 
 namespace Client
@@ -12,8 +10,11 @@ namespace Client
                 //============= TOOL
                  LEVEL_TOOL_FX,
                  LEVEL_TOOL_UI,
-                 LEVEL_TOOL_ANIM,
+                 LEVEL_TOOL_ANIM = 6, // ANIM툴은 6으로 고정 ! 부탁드립니댜
                  LEVEL_TOOL_MAP,
+                
+                //============ GAME
+                // 여기에서 이어서 
 
                  LEVEL_END };
 

@@ -127,6 +127,19 @@ void CTransform::Look_At(_fvector vAt)
 	Set_State(STATE_LOOK, XMVector3Normalize(vLook) * vScaled.z);
 }
 
+void CTransform::Look_At_Dir(_float4 vDir)
+{
+	_vector		vLook = Dir(vDir);
+	_vector		vRight = XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 0.f), vLook);
+	_vector		vUp = XMVector3Cross(vLook, vRight);
+
+	_float3		vScaled = Get_Scaled();
+
+	Set_State(STATE_RIGHT, XMVector3Normalize(vRight) * vScaled.x);
+	Set_State(STATE_UP, XMVector3Normalize(vUp) * vScaled.y);
+	Set_State(STATE_LOOK, XMVector3Normalize(vLook) * vScaled.z);
+}
+
 void CTransform::Look_At_Axis(_fvector vAxis)
 {
 	_vector		vLook = vAxis;
@@ -174,6 +187,25 @@ void CTransform::Look_At_Rotate(_vector vAt, _float fTimeDelta)
 	Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLerpLook) * vScaled.z);
 }
 
+void CTransform::Look_At_Interpolate(_vector vAt, _float fTimeDelta)
+{
+	_vector vLook = Get_State_Vector(CTransform::STATE_LOOK);
+	//vLook.m128_f32[1] = 0.f;
+	_vector vTargetLook = vAt - Get_State_Vector(CTransform::STATE_POSITION);
+	//vTargetLook.m128_f32[1] = 0.f;
+
+	_vector vLerpLook = XMVectorLerp(vLook, vTargetLook, m_fRotationPerSec * fTimeDelta);
+
+	_vector vLerpRight = XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 0.f), vLerpLook);
+	_vector vLerpUp = XMVector3Cross(vLerpLook, vLerpRight);
+
+	_float3 vScaled = Get_Scaled();
+
+	Set_State(CTransform::STATE_RIGHT, XMVector3Normalize(vLerpRight) * vScaled.x);
+	Set_State(CTransform::STATE_UP, XMVector3Normalize(vLerpUp) * vScaled.y);
+	Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLerpLook) * vScaled.z);
+}
+
 void CTransform::Look_At_Angle(_fvector vAt, _fvector vAxis, _float fRadian)
 {
 	if (XMVector3Equal(vAxis, XMVectorZero()))
@@ -203,6 +235,11 @@ void CTransform::Move_toTarget(_fvector vTargetPos, _float fTimeDelta, _float fM
 		vPosition += XMVector3Normalize(vLook) * m_fSpeedPerSec * fTimeDelta;
 }
 
+void CTransform::Move(_float4 vDir)
+{
+	Set_State(STATE_POSITION, Get_State(STATE_POSITION) + vDir);
+}
+
 void CTransform::Turn(_fvector vAxis, _float fTimeDelta)
 {
 	_matrix			RotationMatrix  = XMMatrixRotationAxis(vAxis, m_fRotationPerSec * fTimeDelta);
@@ -226,6 +263,12 @@ void CTransform::Turn(_fvector vAxis, _float fTimeDelta, _float fAngle)
 		Set_State(STATE(i),
 			XMVector4Transform(Get_State_Vector((STATE)i), RotationMatrix));
 	}
+}
+
+void CTransform::Turn(Quaternion _vQuat)
+{
+	_float4x4 RotMat = _float4x4::CreateFromQuaternion(_vQuat);
+	m_WorldMatrix *= RotMat;
 }
 
 void CTransform::Turn_Absolute(_float4 _vQuat)

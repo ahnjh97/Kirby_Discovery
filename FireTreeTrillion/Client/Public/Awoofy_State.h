@@ -21,6 +21,9 @@ public:
 	virtual void OnStateExit()														override;
 
 public:
+	_float	m_fTimeDelta = { 0.f };
+
+public:
 	static	CAwoofy_Idle_State* Create();
 	virtual void Free() override;
 };

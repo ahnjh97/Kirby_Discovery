@@ -6,6 +6,7 @@
 BEGIN(Engine)
 class CModel;
 class CShader;
+class CTexture;
 END
 
 BEGIN(Client)
@@ -18,18 +19,30 @@ public:
 		AWOOFY_SLEEP, AWOOFY_SLEEPFALL, AWOOFY_WAIT, AWOOFY_WAKEUP, AWOOFY_WALK, 
 		AWOOFY_END };
 
+	enum AWOOFYEYE_STATE { AWOOFYEYE_IDLE, AWOOFYEYE_HALF, AWOOFYEYE_SLEEP, AWOOFYEYE_HAPPY, AWOOFYEYE_ANGER, AWOOFYEYE_END };
+
 private:
 	CAwoofy(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CAwoofy(const CAwoofy& rhs);
 	virtual ~CAwoofy() = default;
 
 public:
-	virtual HRESULT Initialize_Prototype() override;
-	virtual HRESULT Initialize(void* pArg) override;
+	void Set_AwoofyEye(AWOOFYEYE_STATE _eEye) {
+		m_eEyeState = _eEye;
+	}
+
+	_float Get_AnimRatio() {
+		return m_pModelCom->Get_AnimRatio();
+	}
+
+public:
+	virtual HRESULT Initialize_Prototype()	override;
+	virtual HRESULT Initialize(void* pArg)	override;
 	virtual _int	Tick(_float fTimeDelta) override;
 	virtual void	Late_Tick(_float fTimeDelta) override;
-	virtual HRESULT Render() override;
-	virtual HRESULT Render_LightDepth() override;
+	virtual HRESULT Render()				override;
+	virtual HRESULT Render_LightDepth()		override;
+	virtual void	Add_AnimEvent()			override;
 #ifdef _DEBUG
 	virtual void	Render_IMGUI() override;
 #endif
@@ -42,8 +55,13 @@ public:
 	void Compute_Angle(_vector vOrginLook, _vector vTargetLook);
 
 private:
-	AWOOFY_ANIM	m_eCurrentState = { AWOOFY_END };
+	CTexture*			m_pEyeTextureCom = { nullptr };
+
+	AWOOFY_ANIM			m_eCurrentState = { AWOOFY_END };
+	AWOOFYEYE_STATE	m_eEyeState = { AWOOFYEYE_END };
 	_float m_fAngle = { 0.f };
+
+
 
 private:
 	HRESULT Add_Components();
@@ -51,6 +69,7 @@ private:
 
 	// FSM
 	void SetUp_FSM();
+	_bool Custom_Face(_uint iMeshIndex);
 
 public:
 	static CAwoofy* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

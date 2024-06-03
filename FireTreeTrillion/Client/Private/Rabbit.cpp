@@ -91,9 +91,7 @@ _int CRabbit::Tick(_float fTimeDelta)
 
 void CRabbit::Late_Tick(_float fTimeDelta)
 {
-	_float fSecondTime = m_pGameInstance->Get_SecondTimer();
-
-	m_pModelCom->Play_Animation(fSecondTime);
+	m_pModelCom->Play_Animation(m_fTimeDelta);
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
@@ -177,11 +175,6 @@ _bool CRabbit::IsAnimFinished()
 	return m_pModelCom->IsFinished();
 }
 
-_uint CRabbit::Get_State()
-{
-	return m_pFSM->Get_State();
-}
-
 void CRabbit::Compute_Parabola(_vector vEndPos)
 {
 	// 포물선 세팅을 위한 변수
@@ -208,9 +201,9 @@ void CRabbit::Compute_Parabola(_vector vEndPos)
 
 _vector CRabbit::JumpAttak(_float fTimeDelta)
 {
-	m_vGoPos.x = m_vStartPos.x + m_fAxisX * m_fTimeDelta;
-	m_vGoPos.y = m_vStartPos.y + (m_fAxisY * m_fTimeDelta) - (0.5f * m_fGravity * m_fTimeDelta * m_fTimeDelta);
-	m_vGoPos.z = m_vStartPos.z + m_fAxisZ * m_fTimeDelta;
+	m_vGoPos.x = m_vStartPos.x + m_fAxisX * fTimeDelta;
+	m_vGoPos.y = m_vStartPos.y + (m_fAxisY * fTimeDelta) - (0.5f * m_fGravity * fTimeDelta * fTimeDelta);
+	m_vGoPos.z = m_vStartPos.z + m_fAxisZ * fTimeDelta;
 	 
 	return m_vGoPos;
 }
@@ -284,13 +277,13 @@ void CRabbit::SetUp_FSM()
 
 	m_pFSM->Add_State(RABBIT_FIND, CRabbit_Find_State::Create());
 
-	m_pFSM->Add_State(RABBIT_DAMAGE, CRabbit_Jump_State::Create());
 	m_pFSM->Add_State(RABBIT_JUMPSTART, CRabbit_Jump_State::Create());
 	m_pFSM->Add_State(RABBIT_JUMP, CRabbit_Jump_State::Create());
 	m_pFSM->Add_State(RABBIT_JUMPFALL, CRabbit_Jump_State::Create());
 	m_pFSM->Add_State(RABBIT_JUMPEND, CRabbit_Jump_State::Create());
 
 	m_pFSM->Add_State(RABBIT_JUMPLANDING, CRabbit_JumpLanding_State::Create());
+
 	//m_pFSM->Add_State(RABBIT_BRAKE, CRabbit_Brake_State::Create());
 	//m_pFSM->Add_State(RABBIT_LOOKAROUNDAFTERBRAKE, CRabbit_LookAroundAfterBrake_State::Create());
 
@@ -333,6 +326,4 @@ CGameObject* CRabbit::Clone(void* pArg)
 void CRabbit::Free()
 {
 	__super::Free();
-
-	Safe_Release(m_pFSM);
 }

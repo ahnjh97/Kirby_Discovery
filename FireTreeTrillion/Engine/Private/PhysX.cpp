@@ -22,12 +22,12 @@ HRESULT CPhysX::Initialize()
     mToleranceScale.speed = 0.1f;      // typical speed of an object, gravity * 1s is a reasonable choice
 
     m_pPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *m_pFoundation, mToleranceScale, true, m_pPvd);
-    CEventCallBack* pEventCallBack = new CEventCallBack();
+    m_pEventCallBack = new CEventCallBack();
     PxSceneDesc sceneDesc(m_pPhysics->getTolerancesScale());
     sceneDesc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
     m_pDispatcher = physx::PxDefaultCpuDispatcherCreate(2);
     sceneDesc.cpuDispatcher = m_pDispatcher;
-    sceneDesc.simulationEventCallback = pEventCallBack;
+    sceneDesc.simulationEventCallback = m_pEventCallBack;
     sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
     sceneDesc.broadPhaseType = PxBroadPhaseType::eSAP; // 또는 eMBP
 
@@ -317,9 +317,14 @@ void CPhysX::Free()
 
     m_pControllerManager->release();
 
+    if (m_pRigidDynamic != nullptr)
+        m_pRigidDynamic->release();
+
     // 2. Scene 해제
     if (m_pScene != nullptr)
         m_pScene->release();
+
+    Safe_Delete(m_pEventCallBack);
 
     // 3. Material 해제
     if (m_pMaterial != nullptr)
@@ -344,6 +349,9 @@ void CPhysX::Free()
     // 8. Foundation 해제
     if (m_pFoundation != nullptr)
         m_pFoundation->release();
+
+
+    //PxCooking*                        m_pCooking = nullptr;
 }
 
 

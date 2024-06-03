@@ -46,7 +46,6 @@ public:
 public:
 	void Change_State(BLADEKNIGHT_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
 	_bool IsAnimFinished();
-	_uint Get_State();
 
 private:
 	map<const wstring, CPartObject*>	m_PartObjects;

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Client_Defines.h"
-#include "GameObject.h"
+#include "Character.h"
 #define	INFO(state) m_tKirbyInfo.state
 
 BEGIN(Engine)
@@ -16,7 +16,7 @@ BEGIN(Client)
 
 
 // CAnimToolObject은 TEST용 모델이어서 GameObject 바로 상속받았습니다.
-class CAnimToolObject : public CGameObject
+class CAnimToolObject : public CCharacter
 {
 private:
 	CAnimToolObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

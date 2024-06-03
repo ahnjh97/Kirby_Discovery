@@ -261,6 +261,8 @@ void CKirby::Collision_Attack(CGameObject* pOtherObj)
 			Safe_Release(INFO(m_pObject));
 			INFO(m_pObject) = nullptr;
 		}
+
+		Delete_KirbyEffect();
 	}
 	// 슬라이드중의 충돌
 	else if (Get_State() == STATE_SLIDE)
@@ -293,6 +295,7 @@ void CKirby::Collision_Attack(CGameObject* pOtherObj)
 		{
 			Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
 		}
+		Delete_KirbyEffect();
 	}
 }
 
@@ -304,11 +307,6 @@ _float3 CKirby::Make_RepulsiveDir(CPhysXObject* pObject)
 	m_vDamegeDir = XMVector3Normalize(vPos - vObjectPos);
 
 	return XMVector3Normalize(vObjectPos - vPos);
-}
-
-_uint CKirby::Get_State()
-{
-	return m_pFSM->Get_State();
 }
 
 void CKirby::Setting_KirbyBalance()
@@ -483,6 +481,10 @@ HRESULT CKirby::Add_Components()
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	m_pControllerCom->Set_Object(this);
 	//m_pControllerCom->Set_CollisionType(m_eCollisionGroup);
+
+	// FOR ANIMTOOL
+	m_ppModelForAnimTool = &m_pModelCom[BODY_DEFAULT];
+	m_uModelCnt = BODY_END;
 
 	/* FSM */
 	SetUp_FSM();

@@ -6,6 +6,10 @@ BEGIN(Client)
 
 class CParticle final : public CEffect
 {
+#ifdef _DEBUG
+	friend class CFXToolDirector;
+#endif
+
 public:
 	typedef struct : public FX_DESC
 	{
@@ -25,8 +29,10 @@ private:
 	virtual ~CParticle() = default;
 
 public:
-	void Update_InstanceInfo(INSTANCE_DESC _InstanceDesc);
+	void			Update_InstanceInfo(INSTANCE_DESC* _InstanceDesc = nullptr);
 	virtual void	Fill_SaveData(_Out_ PARTICLE_DATA* pFXData) override;
+
+
 	HRESULT Initialize_Prototype();
 	HRESULT Initialize_Prototype(PARTICLE_DESC FXDesc);
 	virtual HRESULT Initialize(void* pArg) override;

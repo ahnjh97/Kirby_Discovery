@@ -2,6 +2,8 @@
 
 #include "Client_Defines.h"
 #include "Character.h"
+#include "Effect.h"
+
 #define	INFO(state) m_tKirbyInfo.state
 
 BEGIN(Engine)
@@ -119,6 +121,32 @@ public:
 	void			DefaultIdle();
 
 	_float4			Compute_TerrainPosition();
+
+#pragma region 이펙트 리스트 실험
+	//안녕하세요 디버깅 용으로 이펙트 리스트를 추가했습니다
+	void			Add_KirbyEffect(CEffect* pEffect)
+	{
+		m_KirbyFXList.emplace_back(pEffect);
+		Safe_AddRef(pEffect);
+	}
+	void			Delete_KirbyEffect()
+	{
+		if (m_KirbyFXList.empty())
+			return;
+
+		for (auto& FX : m_KirbyFXList)
+		{
+			FX->Set_Dead();
+			Safe_Release(FX);
+		}
+		m_KirbyFXList.clear();
+	}
+
+private:
+	list<CEffect*> m_KirbyFXList;
+
+#pragma endregion
+
 
 	// 기타 세부적인 제어
 private:

@@ -29,9 +29,9 @@ HRESULT CSingle_UI::Initialize(void* _pArg)
 		return E_FAIL;
 
 	m_pTransformCom->Set_Scaled(SingleUI_Desc->vSize.x, SingleUI_Desc->vSize.y, 1.f);
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(
-								SingleUI_Desc->vPos.x - SingleUI_Desc->vCenter.x,
-								-SingleUI_Desc->vCenter.y + SingleUI_Desc->vPos.y, 0.f, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, 
+		XMVectorSet(/*SingleUI_Desc->vCenter.x*/ - SingleUI_Desc->vPos.x,
+					/*-SingleUI_Desc->vCenter.y*/ + SingleUI_Desc->vPos.y, 0.f, 1.f));
 	m_pTransformCom->Rotation(XMVectorSet(0.f, 0.f, 1.f, 1.f), XMConvertToRadians(SingleUI_Desc->fDegree));
 
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
@@ -39,7 +39,7 @@ HRESULT CSingle_UI::Initialize(void* _pArg)
 	
 	m_iTexIndex = SingleUI_Desc->iTexIndex;
 	m_UIObjDesc = *SingleUI_Desc;
-	m_eUIType = TYPE_SINGLE;
+	//m_eUIType = TYPE_LAYER;
 
 #pragma endregion
 

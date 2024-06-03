@@ -2,6 +2,7 @@
 #include "Awoofy.h"
 #include "FSM.h"
 #include "Awoofy_State.h"
+#include "MultiEffect.h"
 
 CAwoofy::CAwoofy(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -46,8 +47,10 @@ HRESULT CAwoofy::Initialize(void* pArg)
 	m_fAttack = 8.f;
 	m_eVacuumSize = SIZE_SMALL;
 	m_eAbilityType = ABILITY_DEFAULT;
+	m_eEyeState = AWOOFYEYE_IDLE;
 
 	m_fRimWidth = 5.f;
+	Add_AnimEvent();
 
 	return S_OK;
 }
@@ -58,6 +61,8 @@ _int CAwoofy::Tick(_float fTimeDelta)
 		return OBJ_DEAD;
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+	if (m_pGameInstance->Get_DIKeyState(DIK_W, KEY_PRESS))
+		m_fTimeDelta = 0.f;
 
 	__super::Tick(m_fTimeDelta);
 
@@ -88,6 +93,9 @@ HRESULT CAwoofy::Render()
 
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
+		if (Custom_Face(i) == true)
+			continue;
+
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
 			return E_FAIL;
 
@@ -110,6 +118,52 @@ HRESULT CAwoofy::Render_LightDepth()
 		return E_FAIL;
 
 	return S_OK;
+}
+
+void CAwoofy::Add_AnimEvent()
+{
+	//__super::Add_AnimEvent();
+	
+	//1. 한 애니메이션에서 같은 이름의 이벤트 가능
+	//2. 현재 실행되는 애니메이션에 따라 이벤트가 발생하도록 한다.
+	//3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
+	m_pModelCom->Add_Event("Bboong", [this]() {
+		//파티클 생성
+		static _float fBbongTime{ 0.f };
+		fBbongTime += GetTickCount64();
+		if (.2f < fBbongTime)
+		{
+			CMultiEffect::MULTI_FX_DESC FXDesc{};
+			_float4 vMyPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+			FXDesc.vInitPos = { vMyPos.x, vMyPos.y + .3f, vMyPos.z };
+			FXDesc.vInitScale = { 1.3f, 1.3f, 1.3f };
+
+			_float3 vDir = -m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+			vDir.Normalize();
+			_float3 vLook = { 0.f, 0.f, 1.f };
+
+			_float fAngleLook = atan2f(vLook.z, vLook.x);
+			_float fAngleDiff = fAngleLook - atan2f(vDir.z, vDir.x);
+			fAngleDiff = ToDegree(fAngleDiff);
+
+			_float3 vAngle = { 0.f, fAngleDiff, 0.f };
+			FXDesc.vInitRot = vAngle;
+
+			if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
+				return;
+
+			fBbongTime = 0.f;
+		}
+		});
+
+	m_pModelCom->Add_Event("PlaySound", [this]() {
+		// 사운드 처리
+		m_pGameInstance->PlaySound_Free(L"TakeItem01.wav", 0.5f);
+		});
+
+	m_pModelCom->Add_Event("ApplyDamage", [this]() {
+		//데미지 처리
+		});
 }
 
 #ifdef _DEBUG
@@ -142,6 +196,7 @@ void CAwoofy::Render_IMGUI()
 void CAwoofy::Collision_Attack(CGameObject* pOtherObj)
 {
 	Change_State(CAwoofy::AWOOFY_DAMAGE, 50.f, false, true);
+	m_eEyeState = AWOOFYEYE_HAPPY;
 }
 
 void CAwoofy::Change_State(AWOOFY_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
@@ -174,6 +229,35 @@ void CAwoofy::Compute_Angle(_vector vOrginLook, _vector vTargetLook)
 		m_fAngle = -m_fAngle;
 }
 
+_bool CAwoofy::Custom_Face(_uint iMeshIndex)
+{
+	if (iMeshIndex == 0)
+	{
+		HRESULT hr;
+
+		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", iMeshIndex, TextureType_DIFFUSE);
+		CHECK_FAILED(hr);
+
+		hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", iMeshIndex);
+		CHECK_FAILED(hr);
+
+		hr = m_pEyeTextureCom->Bind_ShaderResource(m_pShaderCom, "g_KirbyEyeTexture", (_uint)m_eEyeState);
+		CHECK_FAILED(hr);
+
+		_bool bStencil = true;
+		_bool bRimLight = true;
+		_bool bMotionBlur = true;
+		m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
+
+		m_pShaderCom->Begin(ANIMMODEL_KIRBYEYE);
+		m_pModelCom->Render(iMeshIndex);
+		return true;
+	}
+	return false;
+}
+
 HRESULT CAwoofy::Add_Components()
 {
 	HRESULT hr;
@@ -187,6 +271,12 @@ HRESULT CAwoofy::Add_Components()
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
+#pragma region Awoofy Eye
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Awoofy_Eye"),
+		TEXT("Com_Texture"), (CComponent**)&m_pEyeTextureCom);
+	CHECK_FAILED(hr);
+#pragma endregion
+
 	/* For.Com_CharacterController */
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
@@ -199,6 +289,10 @@ HRESULT CAwoofy::Add_Components()
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 
+	// FOR ANIMTOOL
+	m_ppModelForAnimTool = &m_pModelCom;
+
+	/* FSM */
 	SetUp_FSM();
 
 	return S_OK;
@@ -288,5 +382,7 @@ CGameObject* CAwoofy::Clone(void* pArg)
 void CAwoofy::Free()
 {
 	__super::Free();
+
+	Safe_Release(m_pEyeTextureCom);
 }
 

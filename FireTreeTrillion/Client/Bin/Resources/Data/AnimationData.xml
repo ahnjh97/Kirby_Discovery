@@ -1,10 +1,30 @@
 <Root>
-    <Version>240405</Version>
-    <ModelName>KirbyDefault</ModelName>
-    <Animation>BackJump</Animation>
-    <Count>4</Count>
-    <Data0 EventName="Test_0" StartFrame="2" EndFrame="3"/>
-    <Data1 EventName="Test_1" StartFrame="1" EndFrame="2"/>
-    <Data2 EventName="Test_0" StartFrame="2" EndFrame="3"/>
-    <Data3 EventName="Test_1" StartFrame="1" EndFrame="2"/>
+    <Version>240602</Version>
+    <ModelName>Awoofy
+        <Animation>Armature|Armature|Run</Animation>
+        <AnimSpeed>30</AnimSpeed>
+        <Count>3</Count>
+        <Data0 EventName="Notify" StartFrame="0" EndFrame="1"/>
+        <Data1 EventName="Bboong" StartFrame="0" EndFrame="1"/>
+        <Data2 EventName="PlaySound" StartFrame="19" EndFrame="40"/>
+        <Animation>Armature|Armature|Landing</Animation>
+        <AnimSpeed>30</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Armature|Armature|SleepFall</Animation>
+        <AnimSpeed>30</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Armature|Armature|Wakeup</Animation>
+        <AnimSpeed>30</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Armature|Armature|Sleep</Animation>
+        <AnimSpeed>30</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Armature|Armature|LookAroundAfterBrake</Animation>
+        <AnimSpeed>30</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="Notify" StartFrame="0" EndFrame="1"/>
+        <Animation>Armature|Armature|Jump</Animation>
+        <AnimSpeed>30</AnimSpeed>
+        <Count>0</Count>
+    </ModelName>
 </Root>

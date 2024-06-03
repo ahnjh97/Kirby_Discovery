@@ -60,10 +60,10 @@ void CRabbit_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 				if(7.f < fDistance)
 				{
 					//_vector vEndPos = XMVector3Normalize(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
-					pRabbit->Compute_Parabola(pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + (XMVector3Normalize(XMVectorSubtract(vKirbyPos, vPos)) * 7.f));
+					pRabbit->Compute_Parabola(pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + (XMVector3Normalize(XMVectorSubtract(vKirbyPos, vPos)) * 5.f));
 				}
 				// 플레이어를 향해 점프
-				else
+				else if(7.f >= fDistance)
 					pRabbit->Compute_Parabola(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
 
 				pRabbit->Change_State(CRabbit::RABBIT_JUMPSTART, 100.f, false, true);
@@ -191,8 +191,6 @@ CRabbit_Jump_State::CRabbit_Jump_State()
 void CRabbit_Jump_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
-
-	m_fJumpVelocity = 15.f;
 }
 
 void CRabbit_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
