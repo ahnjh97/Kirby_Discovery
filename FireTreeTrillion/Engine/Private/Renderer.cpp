@@ -446,8 +446,11 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 
 
 	/// 림 라이트
-	if (m_pGameInstance->Get_DIKeyState(DIK_R, KEY_DOWN))
-		m_bRimTest = !m_bRimTest;
+	if (*m_pGameInstance->Get_CurrentLevelID() != 6)
+	{
+		if (m_pGameInstance->Get_DIKeyState(DIK_R, KEY_DOWN))
+			m_bRimTest = !m_bRimTest;
+	}
 	
 	if (m_bRimTest == true)
 	{

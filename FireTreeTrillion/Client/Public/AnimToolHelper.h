@@ -41,10 +41,12 @@ public:
 
 private:
 	void					Ready_AnimModels();
+	void					Ready_AnimObjects(const wstring& strLayerTag);
 
 	// RENDER
 	void					Render_ObjectList();
 	void					Render_AnimationList();
+	void					Render_AnimationList(const wstring& wstrObjectTag);
 	void					Render_FrameLine(class CAnimation** pModel, const string& strAnimationTag);
 
 	void					Save();
@@ -58,9 +60,14 @@ private:
 	string									m_strModelName = string();
 	string									m_strAnimationName = string();
 	_float									m_fAnimationSpeed = _float();
+	_bool									m_bOnce = false;
 
 	//vector<SEQUENCE_ITEM>					m_vecSequence;
 	AnimToolMap								m_mapSequence;
+
+	// 객체별 띄우는 로직으로 변경
+	class CCharacter*						m_pCharacter = nullptr;
+	vector<class CCharacter*>				m_vecCharacter;
 
 public:
 	static	CAnimToolHelper* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

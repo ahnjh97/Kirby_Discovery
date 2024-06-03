@@ -436,6 +436,10 @@ HRESULT CKirby::Add_Components()
 	m_pControllerCom->Set_Object(this);
 	//m_pControllerCom->Set_CollisionType(m_eCollisionGroup);
 
+	// FOR ANIMTOOL
+	m_ppModelForAnimTool = &m_pModelCom[BODY_DEFAULT];
+	m_uModelCnt = BODY_END;
+
 	/* FSM */
 	SetUp_FSM();
 

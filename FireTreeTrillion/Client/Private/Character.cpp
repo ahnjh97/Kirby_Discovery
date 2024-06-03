@@ -21,7 +21,7 @@ HRESULT CCharacter::Initialize(void* pArg)
 {
 	HRESULT hr;
 	hr = __super::Initialize(pArg);
-	Add_AnimEvent();
+	//Add_AnimEvent();
 
 	CHECK_FAILED(hr);
 
@@ -120,9 +120,12 @@ void CCharacter::Character_SystemTick(_float fTimeDelta)
 	// 모션블러 계산
 	Compute_MotionBlur();
 
-	// FSM 제어
-	if (m_pFSM != nullptr)
-		m_pFSM->Update(this, fTimeDelta);
+	if (*m_pCurrentLevelID != LEVEL_TOOL_ANIM)
+	{
+		// FSM 제어
+		if (m_pFSM != nullptr)
+			m_pFSM->Update(this, fTimeDelta);
+	}
 
 	// 터레인 경사면 보간 제어
 	SetOn_Slope(fTimeDelta);

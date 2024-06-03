@@ -53,7 +53,7 @@ private:
 	HRESULT Add_AllModelTxts(LEVEL eLevel, TYPE eType);
 	void	TraverseModelTxts(const wstring& rootFolderPath, list<wstring>& fileList);
 	// animation 정보를 로드하여 모델을 추가할때 넘겨주는 데이터에 넣는다.
-	void	Load_AnimInfo();
+	void	Load_AnimToolInfo();
 
 private:
 	ID3D11Device*				m_pDevice = { nullptr };

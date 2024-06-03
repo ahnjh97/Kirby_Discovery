@@ -248,13 +248,14 @@ void CSound_Manager::LoadSoundFile()
 {
 	_tfinddata64_t fd;
 
-	__int64 handle = _tfindfirst64(L"../Bin/Sound/*.*", &fd);
+	__int64 handle = _tfindfirst64(L"../../../Resources/Sounds/*.*", &fd);
+	//__int64 handle = _tfindfirst64(L"../Bin/Sound/*.*", &fd);
 	if (handle == -1 || handle == 0)
 		return;
 
 	int iResult = 0;
 
-	char szCurPath[128] = "../Bin/Sound/";
+	char szCurPath[128] = "../../../Resources/Sounds/";
 	char szFullPath[128] = "";
 	char szFilename[MAX_PATH];
 
