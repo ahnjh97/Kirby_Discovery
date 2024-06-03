@@ -35,7 +35,7 @@ void CFSM::Update(class CGameObject* pGameObject, _float fTimeDelta)
 /// <param name="_bLoop"> 루프 유무 </param>
 /// <param name="_bInterpolation">보간 유무 </param>
 /// <returns = "false"> 바꾸고자 하는 상태가 현 상태일 경우 </returns>
-_bool CFSM::ChangeState(_uint iState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _uIndex)
+_bool CFSM::ChangeState(_uint iState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _uIndex, _uint _uOffSet)
 {
 	auto pNextState = Find_State(iState);
 	CHECK_NULLPTR(pNextState);
@@ -46,7 +46,8 @@ _bool CFSM::ChangeState(_uint iState, _float _fAnimSpeed, _bool _bLoop, _bool _b
 	// ============ 상태가 변경되었다면 ============
 	// 이전 상태 Terminate
 	m_pCurrent_State->OnStateExit();
-	pNextState->OnStateEnter(m_vecModels[_uIndex], iState, _fAnimSpeed, _bLoop, _bInterpolation);
+
+	pNextState->OnStateEnter(m_vecModels[_uIndex], iState, _fAnimSpeed, _bLoop, _bInterpolation, _uOffSet);
 
 	m_iState = iState;
 	m_pCurrent_State = pNextState;

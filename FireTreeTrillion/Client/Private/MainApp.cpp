@@ -105,6 +105,7 @@ HRESULT CMainApp::Render(_float fTimeDelta)
 		Render_RTVFonts();
 
 #endif // _DEBUG
+	
 
 	m_pGameInstance->End_Draw();
 
@@ -237,7 +238,7 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 		FXDesc.bIsBloom = FXData.bIsBloom;
 
 		FXDesc.fRimLightThreshold = FXData.fRimLightThreshold;
-
+		FXDesc.eRenderGroup = FXData.eRenderGroup;
 
 		for (_uint i = 0; i < FXData.iPropertyMapNum; ++i)
 		{

@@ -126,7 +126,7 @@ HRESULT CVIBuffer_Instance::Initialize(void * pArg)
 		m_pInstanceVertices[i].vUp = _float4{ 0.f, 1.f, 0.f, 0.f };
 		m_pInstanceVertices[i].vLook = _float4{ 0.f, 0.f, 1.f, 0.f };
 		m_pInstanceVertices[i].vPosition = _float4{ 0.f, 0.f, 0.f, 1.f };
-		m_pInstanceVertices[i].bAlive = true;
+		m_pInstanceVertices[i].bAlive = false;
 	}
 
 	ZeroMemory(&m_InstanceSubResourceData, sizeof m_InstanceSubResourceData);
@@ -142,7 +142,6 @@ HRESULT CVIBuffer_Instance::Initialize(void * pArg)
 	m_pLifeTimes = new _float2[m_iNumInstance];
 	ZeroMemory(m_pLifeTimes, sizeof(_float2) * m_iNumInstance);
 
-	//memcpy(m_pLifeTimes, rhs.m_pLifeTimes, sizeof(_float2) * m_iNumInstance);
 	m_pStartDelays = new _float[m_iNumInstance];
 	ZeroMemory(m_pStartDelays, sizeof(_float) * m_iNumInstance);
 
@@ -211,8 +210,8 @@ void CVIBuffer_Instance::Drop(_float fTimeDelta)
 
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
-
-		if (0.f < m_pStartDelays[i])
+		
+		if ( !pVertices[i].bAlive || 0.f < m_pStartDelays[i])
 		{
 			continue;
 		}
@@ -238,15 +237,15 @@ void CVIBuffer_Instance::Spread(_float fTimeDelta)
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
 
-		if (0.f < m_pStartDelays[i])
+		if (!pVertices[i].bAlive || 0.f < m_pStartDelays[i])
 		{
 			continue;
 		}
 
-		_vector		vDir = XMVectorSetW(XMLoadFloat4(&pVertices[i].vPosition) - XMLoadFloat3(&m_InstanceDesc.vPivot), 0.f);
+		_float4		vDir = Dir(pVertices[i].vPosition - Pos(m_InstanceDesc.vPivot));
 		
-		XMStoreFloat4(&pVertices[i].vPosition,
-			XMLoadFloat4(&pVertices[i].vPosition) + XMVector3Normalize(vDir) * m_pSpeeds[i] * fTimeDelta);
+		pVertices[i].vPosition += vDir * m_pSpeeds[i] * fTimeDelta;
+
 
 		//Compute_LifeTime(pVertices, i, fTimeDelta);
 	}
@@ -265,13 +264,25 @@ void CVIBuffer_Instance::Decelerate(_float fTimeDelta)
 
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
-		if (m_pLifeTimes[i].x / m_pLifeTimes[i].y < .8f)
+
+		m_pSpeeds[i] -= fTimeDelta;
+		if (m_pSpeeds[i] < 0.f)
+			m_pSpeeds[i] = 0.f;
+
+		/*
+		if (m_pLifeTimes[i].x / m_pLifeTimes[i].y < .7f)
 			continue;
 
-		_float fTimeRatio = ((m_pLifeTimes[i].x / m_pLifeTimes[i].y) - .8f) / .2f;
-		m_pSpeeds[i] *= fTimeRatio;
 
+		//m_pSpeeds[i] -= fTimeRatio;
 
+		m_pSpeeds[i] -= fTimeDelta;
+		if (m_pSpeeds[i] < 0.f)
+			m_pSpeeds[i] = 0.f;
+*/
+
+		_float fTimeRatio = (m_pLifeTimes[i].x / m_pLifeTimes[i].y < .7f) ? 1.f :  ((m_pLifeTimes[i].x / m_pLifeTimes[i].y) - .7f) / .3f;
+		
 		_float4x4 InstanceMat = { _float4x4::Identity};
 
 
@@ -290,10 +301,10 @@ void CVIBuffer_Instance::Decelerate(_float fTimeDelta)
 		pVertices[i].vUp = Dir(InstanceMat.Up());
 		pVertices[i].vLook = Dir(InstanceMat.Forward());
 		pVertices[i].vPosition = Pos(InstanceMat.Translation());
-
+		
 	}
 
-	m_pContext->Unmap(m_pVBInstance, 0);
+	m_pContext->Unmap(m_pVBInstance, 0); 
 }
 
 void CVIBuffer_Instance::Compute_AllLifeTime(_float fTimeDelta)
@@ -317,7 +328,7 @@ void CVIBuffer_Instance::Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceI
 	if (0.f < m_pStartDelays[iInstanceIndex])
 	{
 		m_pStartDelays[iInstanceIndex] -= fTimeDelta;
-		pVertices[iInstanceIndex].bAlive = false;
+		//pVertices[iInstanceIndex].bAlive = false;
 
 		if (m_pStartDelays[iInstanceIndex] <= 0.f)
 		{
@@ -331,10 +342,10 @@ void CVIBuffer_Instance::Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceI
 
 	if (m_pLifeTimes[iInstanceIndex].x > m_pLifeTimes[iInstanceIndex].y)
 	{
-
+		//루프가 아니였다면 죽어!!
 		if(!m_InstanceDesc.bIsLoop)
 			pVertices[iInstanceIndex].bAlive = false;
-
+		//아니라면 다시 초기화~
 		else
 		{
 			Change_InstanceInfo(pVertices, iInstanceIndex);
@@ -384,7 +395,7 @@ void CVIBuffer_Instance::Revive()
 
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
-		//pVertices[i].bAlive = true;
+		pVertices[i].bAlive = false;
 		Change_InstanceInfo(pVertices, i);
 	}
 
@@ -393,6 +404,7 @@ void CVIBuffer_Instance::Revive()
 
 void CVIBuffer_Instance::Change_InstanceInfo(VTXMATRIX* pVertices, _uint iInstanceIndex)
 {
+
 	m_pLifeTimes[iInstanceIndex].x = 0.f;
 
 	m_pLifeTimes[iInstanceIndex].y = Compute_RandLifetime();
@@ -420,7 +432,7 @@ void CVIBuffer_Instance::Change_InstanceInfo(VTXMATRIX* pVertices, _uint iInstan
 	pVertices[iInstanceIndex].vUp = Dir(instanceMat.Up());
 	pVertices[iInstanceIndex].vLook = Dir(instanceMat.Forward());
 	pVertices[iInstanceIndex].vPosition = Pos(instanceMat.Translation());
-
+	pVertices[iInstanceIndex].bAlive = false;
 
 	_float4 vDirection = Compute_RandDirection();
 	m_pDirections[iInstanceIndex] = _float3{ vDirection.x, vDirection.y, vDirection.z };

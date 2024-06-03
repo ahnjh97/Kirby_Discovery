@@ -71,7 +71,7 @@ HRESULT CImGUI_Manager::Render()
 {
 	// Rendering
 	//ImGui::EndFrame();
-	ImGui::ShowDemoWindow(); //IMGUI 데모 윈도우
+	//ImGui::ShowDemoWindow(); //IMGUI 데모 윈도우
 	ImGui::Render();
 
 	return S_OK;
@@ -358,6 +358,74 @@ void CImGUI_Manager::Set_IMGUIStyle(_uint uStyle)
 	}
 	break;
 	case DARK:
+	break;
+	case HYO:
+	{
+		ImGuiStyle& _style = ImGui::GetStyle();
+
+		ImVec4 vPinkDark = { 0.6f, 0.18f, 0.37f, 1.0f };
+		ImVec4 vPink = { 0.8f, 0.18f * 1.3f, 0.37f * 1.2f, 1.0f };
+		ImVec4 vPinkLight = { 1.0f, 0.18f*1.5f, 0.37f*1.5f, 1.0f };
+		ImVec4 vBlack = { 0.1f, 0.1f, 0.1f, 1.0f };
+
+		//테두리
+		_style.Colors[ImGuiCol_Border] = vPink;
+
+		//프레임
+		_style.Colors[ImGuiCol_FrameBg] = vPink;
+		_style.Colors[ImGuiCol_FrameBgHovered] = vPinkLight;
+		_style.Colors[ImGuiCol_FrameBgActive] = vPink;
+
+		//타이틀
+		_style.Colors[ImGuiCol_TitleBg] = vPink;
+		_style.Colors[ImGuiCol_TitleBgActive] = vPinkLight;
+		_style.Colors[ImGuiCol_TitleBgCollapsed] = vPink;
+
+		//메뉴 바
+		_style.Colors[ImGuiCol_MenuBarBg] = vPinkDark;
+		_style.Colors[ImGuiCol_ScrollbarBg] = vPink;
+
+		//버튼
+		_style.Colors[ImGuiCol_Button] = vPinkDark;
+		_style.Colors[ImGuiCol_ButtonHovered] = vPinkLight;
+		_style.Colors[ImGuiCol_ButtonActive] = vPinkLight;
+
+		//헤더
+		_style.Colors[ImGuiCol_Header] = vPinkDark;
+		_style.Colors[ImGuiCol_HeaderHovered] = vPinkLight;
+		_style.Colors[ImGuiCol_HeaderActive] = vPinkLight;
+
+		//분리선
+		_style.Colors[ImGuiCol_Separator] = vPink;
+		_style.Colors[ImGuiCol_SeparatorHovered] = vPinkLight;
+		_style.Colors[ImGuiCol_SeparatorActive] = vPink;
+
+		//리사이즈 그립
+		_style.Colors[ImGuiCol_ResizeGrip] = vPink;
+		_style.Colors[ImGuiCol_ResizeGripHovered] = vPinkLight;
+		_style.Colors[ImGuiCol_ResizeGripActive] = vPink;
+
+		// 탭
+		_style.Colors[ImGuiCol_Tab] = vPink;
+		_style.Colors[ImGuiCol_TabHovered] = vPinkLight;
+		_style.Colors[ImGuiCol_TabActive] = vPink;
+
+		_style.Colors[ImGuiCol_TabUnfocused] = vPink;
+		_style.Colors[ImGuiCol_TabUnfocusedActive] = vPink;
+
+		// 도킹 프리뷰
+		_style.Colors[ImGuiCol_DockingPreview] = vPink;
+		_style.Colors[ImGuiCol_DockingEmptyBg] = vBlack;
+		//ImGui::StyleColorsClassic();
+		_style.WindowRounding = 10.0f;
+		_style.ChildRounding = 5.f;
+		_style.FrameRounding = 5.f;
+		_style.PopupRounding = 5.f;
+		_style.ScrollbarRounding = 12.f;
+		_style.GrabRounding = 2.f;
+		_style.TabRounding = 2.f;
+	}
+	break;
 	default:
 	{
 		ImGui::StyleColorsDark();

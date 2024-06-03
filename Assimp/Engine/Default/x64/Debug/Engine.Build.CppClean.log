@@ -1,60 +1,47 @@
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\vc143.pdb
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\vc143.idb
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\layer.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\input_device.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\graphic_device.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\gameobject.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\gameinstance.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\component_manager.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\component.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\channel.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\camera.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\bone.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\base.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\animation.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\imgui_widgets.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\imgui_tables.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\imgui_impl_win32.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\imgui_impl_dx11.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\imgui_draw.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\imgui_demo.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\imguizmo.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\imgui.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\engine_struct.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\vibuffer_terrain.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\vibuffer_rect.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\vibuffer.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\transform.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\timer_manager.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\timer.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\texture.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\shader.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\renderer.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\pipeline.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\picking.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\object_manager.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\model.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\mesh.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\level_manager.obj
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\level.obj
-c:\users\chelsea0427\desktop\kirby_discovery\assimp\engine\bin\assimp-vc143-mtd.dll
-c:\users\chelsea0427\desktop\kirby_discovery\assimp\engine\bin\poly2tri.dll
-c:\users\chelsea0427\desktop\kirby_discovery\assimp\engine\bin\minizip.dll
-c:\users\chelsea0427\desktop\kirby_discovery\assimp\engine\bin\zlibd1.dll
-c:\users\chelsea0427\desktop\kirby_discovery\assimp\engine\bin\pugixml.dll
-c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\bin\assimp-vc143-mtd.dll
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\bin\engine.lib
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\bin\engine.exp
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\engine.ilk
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\bin\engine.dll
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\bin\engine.pdb
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\engine.tlog\cl.command.1.tlog
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\engine.tlog\cl.items.tlog
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\engine.tlog\cl.read.1.tlog
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\engine.tlog\cl.write.1.tlog
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\engine.tlog\engine.write.1u.tlog
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\engine.tlog\link.command.1.tlog
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\engine.tlog\link.read.1.tlog
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\engine.tlog\link.secondary.1.tlog
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\engine.tlog\link.write.1.tlog
-c:\users\ghkdl\onedrive\바탕 화면\jus\kirby\assimp\engine\default\x64\debug\engine.tlog\link.write.2u.tlog
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\vc143.pdb
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\vc143.idb
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\layer.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\input_device.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\graphic_device.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\gameobject.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\gameinstance.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\component_manager.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\component.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\channel.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\camera.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\bone.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\base.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\animation.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\imgui_widgets.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\imgui_tables.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\imgui_impl_win32.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\imgui_impl_dx11.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\imgui_draw.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\imgui_demo.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\imguizmo.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\imgui.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\engine_struct.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\vibuffer_terrain.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\vibuffer_rect.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\vibuffer.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\transform.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\timer_manager.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\timer.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\texture.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\shader.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\renderer.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\pipeline.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\picking.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\object_manager.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\model.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\mesh.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\level_manager.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\level.obj
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\bin\engine.dll
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\bin\engine.pdb
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\engine.tlog\cl.command.1.tlog
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\engine.tlog\cl.items.tlog
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\engine.tlog\cl.read.1.tlog
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\engine.tlog\cl.write.1.tlog
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\engine.tlog\link.command.1.tlog
+c:\users\toktak\desktop\local\ftt\kirby_discovery\assimp\engine\default\x64\debug\engine.tlog\link.write.1.tlog

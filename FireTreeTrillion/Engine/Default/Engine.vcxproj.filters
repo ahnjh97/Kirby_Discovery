@@ -175,9 +175,6 @@
     <Filter Include="01.Utility\01.GameObjects\UIObject">
       <UniqueIdentifier>{dce35891-6f80-4098-9884-4f3d2a82009a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Utility\01.GameObjects\CharacterObject">
-      <UniqueIdentifier>{a091b18d-883d-4cc0-97ba-e07d34fdf205}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Utility\11.Picking">
       <UniqueIdentifier>{c488df90-9908-489e-a087-3329ef1da7cf}</UniqueIdentifier>
     </Filter>
@@ -374,9 +371,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\CharacterController.cpp">
       <Filter>01.Utility\02.Components\PhysX\CharacterController</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Character.cpp">
-      <Filter>01.Utility\01.GameObjects\CharacterObject</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\FSM_State.cpp">
       <Filter>01.Utility\02.Components\FSM\State</Filter>
@@ -607,9 +601,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\CharacterController.h">
       <Filter>01.Utility\02.Components\PhysX\CharacterController</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Character.h">
-      <Filter>01.Utility\01.GameObjects\CharacterObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\FSM_State.h">
       <Filter>01.Utility\02.Components\FSM\State</Filter>

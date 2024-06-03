@@ -51,6 +51,9 @@ public:
 		m_vShadowFocusPos = vFocusPos;
 	}
 
+	void Set_BlackBackGround(_bool bSet) {
+		m_bBlackBackground = bSet;
+	}
 
 #ifdef _DEBUG
 public:
@@ -112,12 +115,15 @@ private:
 	void Render_IMGUI();
 #endif
 	void Interpolate_ColorData(_float _fTimeDelta);
+	void Interpolate_BlackBackground(_float fTimeDelta);
 
 private:
 	_float2 m_vScreenPos = { 0.f, 0.f };
 	_float m_fRadialBlurRadius = { 0.f };
 	_float m_fRadialRadiusSubtraction = { 0.f };
 
+	_bool  m_bBlackBackground = { false };
+	_float m_fBlackBackground = { 1.f };
 
 	_float m_fRimWidth = { 0.f };
 	_bool  m_bRimTest = { false };

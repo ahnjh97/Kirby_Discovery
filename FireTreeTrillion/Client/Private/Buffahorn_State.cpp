@@ -11,9 +11,9 @@ CBuffahorn_Idle_State::CBuffahorn_Idle_State()
 {
 }
 
-void CBuffahorn_Idle_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CBuffahorn_Idle_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CBuffahorn_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -65,9 +65,9 @@ CBuffahorn_Find_State::CBuffahorn_Find_State()
 {
 }
 
-void CBuffahorn_Find_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CBuffahorn_Find_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CBuffahorn_Find_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -115,9 +115,9 @@ CBuffahorn_Wait_State::CBuffahorn_Wait_State()
 {
 }
 
-void CBuffahorn_Wait_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CBuffahorn_Wait_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CBuffahorn_Wait_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -171,9 +171,9 @@ CBuffahorn_Run_State::CBuffahorn_Run_State()
 {
 }
 
-void CBuffahorn_Run_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CBuffahorn_Run_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 
 	m_fTimeDelta = 0.f;
 }
@@ -202,7 +202,10 @@ void CBuffahorn_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	_float fHeight = pController->Compute_Height(pTransformCom->Get_State_Vector(CTransform::STATE_LOOK));
 
 	if(2.f < fHeight)
-		pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_RETURNJUMPSTART, 50.f, false, true);
+	{
+		pBuffahorn->Set_JumpTime(15.f);
+		pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_JUMP, 80.f, false, true);
+	}
 }
 
 void CBuffahorn_Run_State::OnStateExit()
@@ -231,9 +234,9 @@ CBuffahorn_Brake_State::CBuffahorn_Brake_State()
 {
 }
 
-void CBuffahorn_Brake_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CBuffahorn_Brake_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 
 	m_fSpeed = 1.f;
 }
@@ -260,7 +263,7 @@ void CBuffahorn_Brake_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 	if (CBuffahorn::BUFFAHORN_BRAKEEND == pBuffahorn->Get_State())
 	{
 		if(true == pBuffahorn->IsAnimFinished())
-			pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_CHARGEWAIT, 45.f, true, true);
+			pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_CHARGEWAIT, 50.f, true, true);
 	}
 }
 
@@ -290,11 +293,9 @@ CBuffahorn_Jump_State::CBuffahorn_Jump_State()
 {
 }
 
-void CBuffahorn_Jump_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CBuffahorn_Jump_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
-
-	m_fJumpVelocity = 10.f;
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CBuffahorn_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -303,27 +304,30 @@ void CBuffahorn_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 
-	if (true == pBuffahorn->IsAnimFinished())
-	{
-		switch (pBuffahorn->Get_State())
-		{
-		case CBuffahorn::BUFFAHORN_RETURNJUMPSTART:
-			pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_RETURNJUMP, 45.f, false, true);
-			break;
-		case CBuffahorn::BUFFAHORN_RETURNJUMP:
-			pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_RETURNJUMPEND, 45.f, false, true);
-			break;
-		}
-	}
-	pController->Move_Dir(pTransformCom, pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * fTimeDelta * 10.f, fTimeDelta);
+	//if (true == pBuffahorn->IsAnimFinished())
+	//{
+	//	switch (pBuffahorn->Get_State())
+	//	{
+	//	case CBuffahorn::BUFFAHORN_JUMP:
+	//		pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_RETURNJUMPEND, 50.f, false, true);
+	//		break;
+	//	}
+	//}
 
-	m_fJumpVelocity -= GRAVITY * fTimeDelta * 6.f;
-	pController->Jump(pTransformCom, m_fJumpVelocity, fTimeDelta);
+	pController->Move_Dir(pTransformCom, pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * fTimeDelta * 6.f, fTimeDelta);
 
-	if(CBuffahorn::BUFFAHORN_RETURNJUMPEND == pBuffahorn->Get_State())
+	_float fJumpVelocity = pBuffahorn->Get_JumpTime();
+	fJumpVelocity -= GRAVITY * fTimeDelta * 3.f;
+	pController->Jump(pTransformCom, fJumpVelocity, fTimeDelta);
+	pBuffahorn->Set_JumpTime(fJumpVelocity);
+
+	if (true == pBuffahorn->IsAnimFinished() && true == pController->Is_Terrain())
+		pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_RETURNJUMPEND, 100.f, false, true);
+
+	if (CBuffahorn::BUFFAHORN_RETURNJUMPEND == pBuffahorn->Get_State())
 	{
-		if ((true == pBuffahorn->IsAnimFinished() || pController->Is_Terrain()))
-			pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_RUN, 45.f, true, true);
+		if (true == pBuffahorn->IsAnimFinished())
+			pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_RUN, 50.f, true, true);
 	}
 }
 

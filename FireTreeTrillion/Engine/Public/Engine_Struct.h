@@ -126,6 +126,7 @@ namespace Engine
 		vector<pair<KF_PROPERTY, _uint>> vecKeyframeInfo;
 		vector<vector<FX_KEYFRAME>> vecKeyframes;
 
+		_uint eRenderGroup = { 0 };
 
 	}SINGLE_FX_DATA;
 
@@ -189,6 +190,9 @@ namespace Engine
 
 		_uint			iMoveCommandsNum;
 		vector<_bool>	vecMoveCommands;
+
+		_uint eRenderGroup = { 0 };
+
 
 	}PARTICLE_DATA;
 
@@ -267,10 +271,10 @@ namespace Engine
 
 	typedef struct ENGINE_DLL
 	{
-		XMFLOAT4		vRight;
-		XMFLOAT4		vUp;
-		XMFLOAT4		vLook;
-		XMFLOAT4		vPosition;		
+		_float4		vRight;
+		_float4		vUp;
+		_float4		vLook;
+		_float4		vPosition;		
 		bool			bAlive;
 
 	}VTXMATRIX;
