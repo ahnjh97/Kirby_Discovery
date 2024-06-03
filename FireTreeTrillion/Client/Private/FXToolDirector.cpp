@@ -50,7 +50,7 @@ void CFXToolDirector::Make_Effect(SINGLE_FX_DATA& _FXData)
 	FXDesc.bIsBloom = _FXData.bIsBloom;
 
 	FXDesc.fRimLightThreshold = _FXData.fRimLightThreshold;
-
+	FXDesc.eRenderGroup = _FXData.eRenderGroup;
 
 	for (_uint i = 0; i < _FXData.iPropertyMapNum; ++i)
 	{
@@ -72,6 +72,7 @@ void CFXToolDirector::Make_Effect(PARTICLE_DATA& _FXData)
 	ParticleDesc.strTexTag = _FXData.strTexName;
 	ParticleDesc.strMaskTexTag = _FXData.strMaskTexName;
 	ParticleDesc.iNumInstance = _FXData.iNumInstance;
+	ParticleDesc.eRenderGroup = _FXData.eRenderGroup;
 
 
 	InstanceDesc.fLifetime = _FXData.fLifetime;
@@ -215,6 +216,9 @@ HRESULT CFXToolDirector::Save_Effect(CEffect* pEffect, const wstring& strFileNam
 		}
 	}
 
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.eRenderGroup), sizeof(_uint));
+
+
 	OutputFile.close();
 
 	return S_OK;
@@ -284,6 +288,8 @@ HRESULT CFXToolDirector::Save_Particle(CEffect* pEffect, const wstring& strFileN
 	{
 		OutputFile.write(reinterpret_cast<const char*>(&bCommand), sizeof(_bool));
 	}
+
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.eRenderGroup), sizeof(_uint));
 
 
 	OutputFile.close();
@@ -459,6 +465,9 @@ HRESULT CFXToolDirector::Load_Effect(path _FilePath, SINGLE_FX_DATA* _pData)
 		}
 	}
 
+	InputFile.read(reinterpret_cast<char*>(&_pData->eRenderGroup), sizeof(_uint));
+
+
 	return S_OK;
 }
 
@@ -539,6 +548,7 @@ HRESULT CFXToolDirector::Load_Effect(path _FilePath, PARTICLE_DATA* _pData)
 		InputFile.read(reinterpret_cast<char*>(&KF), sizeof(_bool));
 	}
 	
+	InputFile.read(reinterpret_cast<char*>(&_pData->eRenderGroup), sizeof(_uint));
 
 
 	return S_OK;
@@ -947,13 +957,12 @@ void CFXToolDirector::Render_FXHierarchy()
 			m_iSelectedFXIdx = i;
 
 			m_eSelected = _bool{ dynamic_cast<CSingleEffect*>(m_FXs[i]) != nullptr } ? SELECTED_SINGLE_FX : SELECTED_PARTICLE_FX;
-
 			m_bPlayingBar = false;
 			m_bLooping = m_FXs[i]->m_bIsLoop;
 			m_iCurFXPassIdx = m_FXs[i]->m_iPassIdx;
 			m_iCurFXTexIdx = m_FXs[i]->m_iTexIdx;
 			m_iCurFXMaskTexIdx = m_FXs[i]->m_iMaskTexIdx;
-
+			m_iCurRenderGroup = m_FXs[i]->m_eRenderGroup;
 			m_fTotalPlayDuration = m_FXs[i]->m_fDuration.second;
 			m_fLifetime[0] = m_FXs[i]->m_fLifetime.first;
 			m_fLifetime[1] = m_FXs[i]->m_fLifetime.second;
@@ -1030,7 +1039,7 @@ void CFXToolDirector::Render_FXHierarchy()
 				FxDesc.strFXName = strBaseName + szSuffix;
 
 				//중복 이름 있으면 안됨
-				for (const auto& fx : m_FXs)
+				for (const auto& fx : m_MultiFXs)
 				{
 					if (fx->m_strFXName == FxDesc.strFXName)
 					{
@@ -1150,33 +1159,34 @@ void CFXToolDirector::Render_FXProperty()
 		}
 
 		//렌더 그룹 설정
-		static _int iSelected = 1;
-		if (RadioButton(u8"No Render", iSelected == 0))
+		if (RadioButton(u8"No Render", m_iCurRenderGroup == CRenderer::RENDER_END))
 		{
-			iSelected = 0;
+			m_iCurRenderGroup = CRenderer::RENDER_END;
 			pCurFX->m_eRenderGroup = CRenderer::RENDER_END;
 		}
 		SameLine();
 
-		if (RadioButton(u8"NonBlend", iSelected == 1))
+		if (RadioButton(u8"NonBlend", m_iCurRenderGroup == CRenderer::RENDER_NONBLEND))
 		{
-			iSelected = 1;
+			m_iCurRenderGroup = CRenderer::RENDER_NONBLEND;
 			pCurFX->m_eRenderGroup = CRenderer::RENDER_NONBLEND;
 		}
 		SameLine();
 
-		if (RadioButton(u8"Nonlight", iSelected == 2))
+		if (RadioButton(u8"Nonlight", m_iCurRenderGroup == CRenderer::RENDER_NONLIGHT))
 		{
-			iSelected = 2;
+			m_iCurRenderGroup = CRenderer::RENDER_NONLIGHT;
 			pCurFX->m_eRenderGroup = CRenderer::RENDER_NONLIGHT;
 		}
+
 		SameLine();
 
-		if (RadioButton(u8"Blend", iSelected == 3))
+		if (RadioButton(u8"Blend", m_iCurRenderGroup == CRenderer::RENDER_BLEND))
 		{
-			iSelected = 3;
+			m_iCurRenderGroup = CRenderer::RENDER_BLEND;
 			pCurFX->m_eRenderGroup = CRenderer::RENDER_BLEND;
 		}
+
 	}
 
 	Separator();
@@ -1735,11 +1745,15 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 		if (DragFloat3("Value", m_vKFPopupValue, .01f, vValueRange.x, vValueRange.y, "%.2f"))
 		{
 			m_FXs[m_iSelectedFXIdx]->m_Keyframes[m_eSelectedProperty][m_iSelectedKFIdx].vValue = _float3{ m_vKFPopupValue[0], m_vKFPopupValue[1], m_vKFPopupValue[2] };
+			m_FXs[m_iSelectedFXIdx]->Tick(_fTimeDelta);
+			m_FXs[m_iSelectedFXIdx]->m_fDuration.first = m_fCurPlayDuration;
 
 		}
 		if (Combo(u8"Easing", &m_eKFPopupEasing, m_Easing.data(), (_int)m_Easing.size()))
 		{
 			m_FXs[m_iSelectedFXIdx]->m_Keyframes[m_eSelectedProperty][m_iSelectedKFIdx].eEasing = (EASING)m_eKFPopupEasing;
+			m_FXs[m_iSelectedFXIdx]->Tick(_fTimeDelta);
+			m_FXs[m_iSelectedFXIdx]->m_fDuration.first = m_fCurPlayDuration;
 		}
 
 		if (Button(u8"키프레임 삭제"))
@@ -1815,6 +1829,7 @@ void CFXToolDirector::MakeBar_ParticleFXProperty(_float _fTimeDelta, _float _fWi
 
 	if (SliderFloat("##", &m_fCurPlayDuration, 0.f, m_fTotalPlayDuration, "%.2f"))
 	{
+		m_FXs[m_iSelectedFXIdx]->Tick(_fTimeDelta);
 		m_FXs[m_iSelectedFXIdx]->m_fDuration.first = m_fCurPlayDuration;
 	}
 }
@@ -1830,6 +1845,7 @@ void CFXToolDirector::MakeBar_MultiFXProperty(_float _fTimeDelta, _float _fWidth
 
 	if (SliderFloat("##", &m_fCurPlayDuration, 0.f, m_fTotalPlayDuration, "%.2f"))
 	{
+		m_MultiFXs[m_iSelectedMultiFXIdx]->Tick(_fTimeDelta);
 		m_MultiFXs[m_iSelectedMultiFXIdx]->m_fDuration.first = m_fCurPlayDuration;
 	}
 }
@@ -1906,7 +1922,7 @@ void CFXToolDirector::Render_MultiFXHierarchy()
 					++szSuffix;
 				}
 
-				CMultiEffect* pMultiFX = static_cast<CMultiEffect*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_MultiEffect"), &pMultiFX));
+				CMultiEffect* pMultiFX = static_cast<CMultiEffect*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_MultiEffect"), &FxDesc));
 				m_MultiFXs.emplace_back(pMultiFX);
 
 				//m_MultiFXs.back()->Add_Effect(*m_FXs[m_iSelectedFXIdx]);

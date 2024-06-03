@@ -33,13 +33,15 @@ HRESULT CSingleEffect::Initialize(void* pArg)
 	{
 		FXDesc = m_FXDesc;
 
+		//clone 하면서 새로 들어오는 값!
 		if (pArg != nullptr)
 		{
 			FXDesc.vInitPos = (*(FX_DESC*)pArg).vInitPos;
 			FXDesc.vInitRot = (*(FX_DESC*)pArg).vInitRot;
 			FXDesc.vInitScale = (*(FX_DESC*)pArg).vInitScale;
-			FXDesc.bIsColorRender = (*(FX_DESC*)pArg).bIsColorRender;
-			m_iPassIdx = 1;
+			FXDesc.pSocketMatrix = (*(FX_DESC*)pArg).pSocketMatrix;
+			//FXDesc.bIsColorRender = (*(FX_DESC*)pArg).bIsColorRender;
+			//m_iPassIdx = 1;
 		}
 	}
 	else if (pArg != nullptr)
@@ -52,9 +54,36 @@ HRESULT CSingleEffect::Initialize(void* pArg)
 	hr = __super::Initialize(&FXDesc);
 	CHECK_FAILED(hr);
 
+
 	hr = Add_Components(FXDesc);
 	CHECK_FAILED(hr);
 
+
+	//초기 크자이 세팅
+	m_vCurPos = Calculate_CurValue_Lerp(0.f, KF_POS);
+	Quaternion vCurQuat = Calculate_CurValue_Slerp(0.f, KF_ROT);
+	_float3 vRadianEuler = vCurQuat.ToEuler();
+	m_vCurRot = { ToDegree(vRadianEuler.x), ToDegree(vRadianEuler.y), ToDegree(vRadianEuler.z) };
+	m_vCurScale = Calculate_CurValue_Lerp(0.f, KF_SCALE);
+
+
+	//초기 회전 세팅
+	_float3 vInitRadianRot = { ToRadian(m_vInitRot.x), ToRadian(m_vInitRot.y) , ToRadian(m_vInitRot.z) };
+	_float4x4 RotMat = _float4x4::CreateFromYawPitchRoll(vInitRadianRot);
+	_float3 vDir = _float3::TransformNormal(m_vCurPos, RotMat);
+
+
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, Pos(m_vInitPos) + Dir(vDir));
+	Quaternion vInitQuat = Quaternion::CreateFromYawPitchRoll(vInitRadianRot);
+	Quaternion vResultQuat = vCurQuat * vInitQuat;
+	m_pTransformCom->Turn_Absolute(vResultQuat);
+	m_pTransformCom->Set_Scaled(m_vInitScale * m_vCurScale);
+
+	/*m_pTransformCom->Set_State(CTransform::STATE_POSITION, Pos(m_vInitPos));
+	_float3 vInitRadianRot = { ToRadian(m_vInitRot.x), ToRadian(m_vInitRot.y) , ToRadian(m_vInitRot.z) };
+	Quaternion vInitQuat = Quaternion::CreateFromYawPitchRoll(vInitRadianRot);
+	m_pTransformCom->Turn_Absolute(vInitQuat);
+	m_pTransformCom->Set_Scaled(m_vInitScale);*/
 	return S_OK;
 }
 
@@ -116,12 +145,21 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 	Quaternion vInitQuat = Quaternion::CreateFromYawPitchRoll(vInitRadianRot);
 
 	Quaternion vResultQuat = vCurQuat * vInitQuat;
+
 	m_pTransformCom->Turn_Absolute(vResultQuat);
 
 
 	m_pTransformCom->Set_Scaled(m_vInitScale * m_vCurScale);
-	//m_pTransformCom->Set_Scaled({ 1.f, 1.f, 1.f });
 
+	if (m_pSoketMatrix != nullptr)
+	{
+		_float4x4 socketMatrix = *m_pSoketMatrix;
+		socketMatrix.Right().Normalize();
+		socketMatrix.Up().Normalize();
+		socketMatrix.Forward().Normalize();
+
+		m_pTransformCom->Set_WorldMatrix( m_pTransformCom->Get_WorldMatrix() * socketMatrix);
+	}
 
 
 	return OBJ_NOEVENT;
@@ -195,8 +233,9 @@ HRESULT CSingleEffect::Add_Components(FX_DESC& FXDesc)
 			TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 		CHECK_FAILED(hr);
 
-		//현재 VtxPosTex Shader Pass 2까지
-		m_iMaxPassIdx = 2;
+		//현재 VtxPosTex Shader Pass 4까지
+		m_iMaxPassIdx = 4;
+		//m_iPassIdx = 4;
 	}
 	else
 	{
@@ -210,8 +249,9 @@ HRESULT CSingleEffect::Add_Components(FX_DESC& FXDesc)
 			TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 		CHECK_FAILED(hr);
 
-		//현재 VtxModel Shader Pass 3까지
-		m_iMaxPassIdx = 3;
+		//현재 VtxModel Shader Pass 7까지
+		m_iMaxPassIdx = 7;
+		//m_iPassIdx = 7;
 	}
 
 	return S_OK;
@@ -242,6 +282,20 @@ HRESULT CSingleEffect::Bind_ShaderResources(_int iTexIdx, _int iMaskTexIdx)
 	hr = m_pTextureCom[TEX_MASK]->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", iMaskTexIdx);
 	CHECK_FAILED(hr);
 
+	hr = m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fCurAlpha, sizeof(_float));
+	CHECK_FAILED(hr);
+
+	hr = m_pShaderCom->Bind_RawValue("g_fMaskThreshold", &m_fCurMaskThreshold, sizeof(_float));
+	CHECK_FAILED(hr);
+
+	hr = m_pShaderCom->Bind_RawValue("g_vRColor", &m_vCurRColor, sizeof(_float3));
+	CHECK_FAILED(hr);
+
+	hr = m_pShaderCom->Bind_RawValue("g_vUVOffset", &m_vCurUVOffset, sizeof(_float2));
+	CHECK_FAILED(hr);
+
+	hr = m_pGameInstance->Bind_RTShaderResource(m_pShaderCom, TEXT("Target_Depth"), "g_DepthTexture");
+	CHECK_FAILED(hr);
 
 	return S_OK;
 }

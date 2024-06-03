@@ -29,8 +29,8 @@ HRESULT CLevel_Tool_FX::Initialize()
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
 	LightDesc.vDirection = _float4(0.3f, -1.f, 0.3f, 0.f);
 
-	LightDesc.vDiffuse = _float4(0.8f, 0.8f, 0.8f, 1.f);
-	LightDesc.vAmbient = _float4(0.6f, 0.6f, 0.6f, 1.f);
+	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
+	LightDesc.vAmbient = _float4(.2f, .2f, .2f, 1.f);
 	LightDesc.vSpecular = _float4(0.2f, 0.2f, 0.2f, 1.f);
 
 	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
@@ -85,8 +85,8 @@ HRESULT CLevel_Tool_FX::Ready_Layer_UI(const wstring& strLayerTag)
 HRESULT CLevel_Tool_FX::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
 
-	//HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_TOOL_FX, strLayerTag, TEXT("Prototype_GameObject_SkySphere"));
-	//CHECK_FAILED(hr);
+	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_TOOL_FX, strLayerTag, TEXT("Prototype_GameObject_SkySphere"));
+	CHECK_FAILED(hr);
 
 	return S_OK;
 }

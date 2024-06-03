@@ -119,6 +119,7 @@ void CParticle::Fill_SaveData(PARTICLE_DATA* pFXData)
 	pFXData->iMoveCommandsNum = m_InstanceDesc.vecMoveCommands.size();
 	pFXData->vecMoveCommands = m_InstanceDesc.vecMoveCommands;
 
+	pFXData->eRenderGroup = m_eRenderGroup;
 }
 
 _int CParticle::Tick(_float _fTimeDelta)

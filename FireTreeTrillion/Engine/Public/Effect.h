@@ -1,5 +1,7 @@
 #pragma once
 #include "GameObject.h"
+#include "Renderer.h"
+
 BEGIN(Engine)
 
 class ENGINE_DLL CEffect : public CGameObject
@@ -43,21 +45,23 @@ public:
 
 
 		map<KF_PROPERTY, vector<FX_KEYFRAME>> Keyframes;
-		_uint eRenderGroup = { 0 };
 
 
-		//clone 시 전달되는 변수들
-		//위치를 맞춰주는 소켓. clone할 때만 전달할 것!!
-
-		CGameObject* pSocket = { nullptr };
+		//clone 시 전달되는 변수들. clone할 때만 전달할 것!!
+		
+		//위치를 계속 맞춰주는 소켓. 
+		const _float4x4* pSocketMatrix = { nullptr };
 
 		//이펙트 재생을 시작하는 딜레이
 		_float fStartDelay = { 0.f };
 
-		//이펙트의 기본 시작 크자이
+		//이펙트의 기본 시작 크자이 offset
 		_float3 vInitPos = { 0.f, 0.f, 0.f };
 		_float3 vInitRot = { 0.f, 0.f, 0.f };
 		_float3 vInitScale = { 1.f, 1.f, 1.f };
+
+		_uint eRenderGroup = { 0 };
+
 
 	}FX_DESC;
 
@@ -125,7 +129,7 @@ protected:
 	_bool			m_bIsColorRender = { true };
 	_bool			m_bIsBloom = { false };
 
-	_uint			m_eRenderGroup = { 0 };
+	_uint			m_eRenderGroup = { (_uint)CRenderer::RENDER_NONBLEND };
 
 
 	_float			m_fRimLightThreshold = { 0.f };
@@ -134,6 +138,9 @@ protected:
 	_float3 m_vInitPos = { 0.f, 0.f, 0.f };
 	_float3 m_vInitRot = { 0.f, 0.f, 0.f };
 	_float3 m_vInitScale = { 1.f, 1.f, 1.f };
+
+	//특정 대상 중심에 붙어있어야 할 경우 계속 따라가며 유지되는 월드 상태
+	const _float4x4* m_pSoketMatrix;
 
 	/*Tick 돌리며 계속 값 바뀌는 부분*/
 

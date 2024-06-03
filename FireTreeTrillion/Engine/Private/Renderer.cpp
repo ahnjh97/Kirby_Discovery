@@ -1232,10 +1232,25 @@ void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 	_float fInterpolateSpeed = 3.f * _fTimeDelta;
 
 	if (m_DestColorData.fExposure != -1.f)
+	{
 		m_fExposure += (m_DestColorData.fExposure - m_fExposure) * fInterpolateSpeed;
 
+		if (abs(m_fExposure - m_DestColorData.fExposure) < 01.f)
+		{
+			m_fExposure = m_DestColorData.fExposure;
+			m_DestColorData.fExposure = -1.f;
+		}
+	}
+
 	if (m_DestColorData.fHue != -1.f)
+	{
 		m_fHue += (m_DestColorData.fHue - m_fHue) * fInterpolateSpeed;
+		if (abs(m_fHue - m_DestColorData.fHue) < 01.f)
+		{
+			m_fHue = m_DestColorData.fHue;
+			m_DestColorData.fHue = -1.f;
+		}
+	}
 
 	if (m_DestColorData.fSaturation != -1.f)
 		m_fSaturation += (m_DestColorData.fSaturation - m_fSaturation) * fInterpolateSpeed;
@@ -1306,38 +1321,38 @@ void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 	}
 
 
-	if (abs(m_fExposure - m_DestColorData.fExposure) < 01.f)
-	{
-		m_fExposure = m_DestColorData.fExposure;
-		m_fHue = m_DestColorData.fHue;
-		m_fSaturation = m_DestColorData.fSaturation;
-		m_fBrightness = m_DestColorData.fBrightness;
-		m_fGamma = m_DestColorData.fGamma;
-		m_fVibrance = m_DestColorData.fVibrance;
-		m_fContrast = m_DestColorData.fContrast;
-		m_fShadowIntensity = m_DestColorData.fShadowIntensity;
-		m_fMidtoneIntensity = m_DestColorData.fMidtoneIntensity;
-		m_fHighlightIntensity = m_DestColorData.fHighlightIntensity;
-		m_fShadowThreshold = m_DestColorData.fShadowThreshold;
-		m_fHighlightThreshold = m_DestColorData.fHighlightThreshold;
-		m_vWhiteBalance[0] = m_DestColorData.vWhiteBalance[0];
-		m_vWhiteBalance[1] = m_DestColorData.vWhiteBalance[1];
-		m_vWhiteBalance[2] = m_DestColorData.vWhiteBalance[2];
-		m_vColorBalance[0] = m_DestColorData.vColorBalance[0];
-		m_vColorBalance[1] = m_DestColorData.vColorBalance[1];
-		m_vColorBalance[2] = m_DestColorData.vColorBalance[2];
-		m_vShadowColor[0] = m_DestColorData.vShadowColor[0];
-		m_vShadowColor[1] = m_DestColorData.vShadowColor[1];
-		m_vShadowColor[2] = m_DestColorData.vShadowColor[2];
-		m_vMidtoneColor[0] = m_DestColorData.vMidtoneColor[0];
-		m_vMidtoneColor[1] = m_DestColorData.vMidtoneColor[1];
-		m_vMidtoneColor[2] = m_DestColorData.vMidtoneColor[2];
-		m_vHighlightColor[0] = m_DestColorData.vHighlightColor[0];
-		m_vHighlightColor[1] = m_DestColorData.vHighlightColor[1];
-		m_vHighlightColor[2] = m_DestColorData.vHighlightColor[2];
+	//if (abs(m_fExposure - m_DestColorData.fExposure) < 01.f)
+	//{
+	//	m_fExposure = m_DestColorData.fExposure;
+	//	m_fHue = m_DestColorData.fHue;
+	//	m_fSaturation = m_DestColorData.fSaturation;
+	//	m_fBrightness = m_DestColorData.fBrightness;
+	//	m_fGamma = m_DestColorData.fGamma;
+	//	m_fVibrance = m_DestColorData.fVibrance;
+	//	m_fContrast = m_DestColorData.fContrast;
+	//	m_fShadowIntensity = m_DestColorData.fShadowIntensity;
+	//	m_fMidtoneIntensity = m_DestColorData.fMidtoneIntensity;
+	//	m_fHighlightIntensity = m_DestColorData.fHighlightIntensity;
+	//	m_fShadowThreshold = m_DestColorData.fShadowThreshold;
+	//	m_fHighlightThreshold = m_DestColorData.fHighlightThreshold;
+	//	m_vWhiteBalance[0] = m_DestColorData.vWhiteBalance[0];
+	//	m_vWhiteBalance[1] = m_DestColorData.vWhiteBalance[1];
+	//	m_vWhiteBalance[2] = m_DestColorData.vWhiteBalance[2];
+	//	m_vColorBalance[0] = m_DestColorData.vColorBalance[0];
+	//	m_vColorBalance[1] = m_DestColorData.vColorBalance[1];
+	//	m_vColorBalance[2] = m_DestColorData.vColorBalance[2];
+	//	m_vShadowColor[0] = m_DestColorData.vShadowColor[0];
+	//	m_vShadowColor[1] = m_DestColorData.vShadowColor[1];
+	//	m_vShadowColor[2] = m_DestColorData.vShadowColor[2];
+	//	m_vMidtoneColor[0] = m_DestColorData.vMidtoneColor[0];
+	//	m_vMidtoneColor[1] = m_DestColorData.vMidtoneColor[1];
+	//	m_vMidtoneColor[2] = m_DestColorData.vMidtoneColor[2];
+	//	m_vHighlightColor[0] = m_DestColorData.vHighlightColor[0];
+	//	m_vHighlightColor[1] = m_DestColorData.vHighlightColor[1];
+	//	m_vHighlightColor[2] = m_DestColorData.vHighlightColor[2];
 
-		m_DestColorData = COLOR_DATA{};
-	}
+	//	m_DestColorData = COLOR_DATA{};
+	//}
 }
 
 

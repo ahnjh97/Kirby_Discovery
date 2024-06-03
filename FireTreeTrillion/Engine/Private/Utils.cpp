@@ -274,6 +274,12 @@ HRESULT CUtils::Load_Effect(path _FilePath, SINGLE_FX_DATA* _pData)
 		}
 	}
 
+	InputFile.read(reinterpret_cast<char*>(&_pData->eRenderGroup), sizeof(_uint));
+	if (_pData->eRenderGroup == 5)
+	{
+		_int a = 5;
+	}
+
 	return S_OK;
 }
 
@@ -353,6 +359,8 @@ HRESULT CUtils::Load_Effect(path _FilePath, PARTICLE_DATA* _pData)
 	{
 		InputFile.read(reinterpret_cast<char*>(&KF), sizeof(_bool));
 	}
+
+	InputFile.read(reinterpret_cast<char*>(&_pData->eRenderGroup), sizeof(_uint));
 
 	return S_OK;
 }

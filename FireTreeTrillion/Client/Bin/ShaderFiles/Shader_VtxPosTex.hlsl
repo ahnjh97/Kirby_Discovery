@@ -7,13 +7,15 @@ texture2D	g_DiffuseTexture;
 texture2D	g_MaskTexture;
 texture2D	g_DepthTexture;
 
-//컬러, 마스크 임계 등
-vector g_vRColor = { 1.f, 1.f, 1.f, 1.f };
-vector g_vGColor = { 1.f, 1.f, 1.f, 1.f };
-vector g_vBColor = { 1.f, 1.f, 1.f, 1.f };
+//컬러, 마스크 임계 등 이펙트 관련 변수
+float3 g_vRColor = { 1.f, 1.f, 1.f};
+float3 g_vGColor = { 1.f, 1.f, 1.f};
+float3 g_vBColor = { 1.f, 1.f, 1.f};
 
-float g_fAlpha;
-float g_fMaskThreshold;
+float g_fAlpha = { 1.f };
+float g_fMaskThreshold = { 0.f };
+
+float2 g_vUVOffset = { 0.f, 0.f };
 
 struct VS_IN
 {
@@ -142,21 +144,19 @@ PS_OUT PS_MAIN_WHITE_FX(PS_IN_ALPHABLEND In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
-    float vBrightness = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord).r;
+    float vBrightness = g_DiffuseTexture.Sample(PointSampler, In.vTexcoord + g_vUVOffset).r;
 	
-    if (vBrightness < .05f)
+    if (vBrightness < .1f)
         discard;
 	
     float vMaskValue = g_MaskTexture.Sample(PointSampler, In.vTexcoord).r;
-    if (vMaskValue - .01f < g_fMaskThreshold)
+    if (vMaskValue < g_fMaskThreshold)
         discard;
 	
-    Out.vColor = g_vRColor * vBrightness;
+    Out.vColor.rgb = ( 1.f, 1.f, 1.f );
+    Out.vColor.rgb *= g_vRColor /* * vBrightness*/;
 	
-    Out.vColor.a = vBrightness; // 어두울수록 투명
-    
-    
-
+    Out.vColor.a = vBrightness * g_fAlpha; // 어두울수록 투명
 	
     return Out;
 }
@@ -166,19 +166,15 @@ PS_OUT PS_MAIN_DEFAULT_FX(PS_IN_ALPHABLEND In)
     PS_OUT Out = (PS_OUT) 0;
 
 	
-    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
-	
-	
-    Out.vColor *= g_fAlpha;
-	
-    Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
-	
-
     float vMaskValue = g_MaskTexture.Sample(ClampSampler, In.vTexcoord).r;
     if (vMaskValue < g_fMaskThreshold)
         discard;
 	
-
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord + g_vUVOffset);
+	
+    Out.vColor.a *= g_fAlpha;
+	
+    Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
 	
     return Out;
 }
@@ -242,7 +238,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_BLOOM();
     }
 
-	// 기본 이펙트 패스 ( 4 )
+	// 기본 이펙트 패스. 알파 블렌딩 + 마스크 ( 4 )
     pass DefaultFX
     {
         SetRasterizerState(RS_Default);

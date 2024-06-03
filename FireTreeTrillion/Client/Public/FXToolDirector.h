@@ -90,6 +90,7 @@ private:
 	_int m_iCurFXPassIdx = { 0 };
 	_int m_iCurFXTexIdx = { 0 };
 	_int m_iCurFXMaskTexIdx = { 0 };
+	_int m_iCurRenderGroup = { 2 };
 
 	//¼ö¸í
 	//_float m_fDuration = { 1.f };
