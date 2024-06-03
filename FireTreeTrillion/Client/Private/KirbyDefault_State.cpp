@@ -215,7 +215,7 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	{
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		_float4 vMyPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
-		//vMyPos += pTransformCom->Get_State(CTransform::STATE_LOOK) * .4f;
+		vMyPos += pTransformCom->Get_State(CTransform::STATE_LOOK) * .4f;
 		FXDesc.vInitPos = { vMyPos.x, vMyPos.y + .3f, vMyPos.z };
 		FXDesc.vInitScale = { 1.3f, 1.3f, 1.3f };
 
