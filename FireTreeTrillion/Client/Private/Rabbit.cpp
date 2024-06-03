@@ -57,6 +57,8 @@ _int CRabbit::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return OBJ_DEAD;
 
+	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+
 	// Áö¸éÀÇ upº¤ÅÍ
 	//PxVec3 slope = m_pControllerCom->Compute_Slope(m_pTransformCom);
 	//_vector vTerrainNormal = CUtils::To_Vector(slope);
@@ -82,14 +84,14 @@ _int CRabbit::Tick(_float fTimeDelta)
 	if (m_bVacuuming == true)
 		Change_State(CRabbit::RABBIT_DAMAGE, 120.f, true, false);
 
-	__super::Tick(fTimeDelta);
+	__super::Tick(m_fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
 
 void CRabbit::Late_Tick(_float fTimeDelta)
 {
-	m_pModelCom->Play_Animation(fTimeDelta);
+	m_pModelCom->Play_Animation(m_fTimeDelta);
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{

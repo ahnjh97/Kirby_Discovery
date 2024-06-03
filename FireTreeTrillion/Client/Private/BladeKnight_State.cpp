@@ -100,7 +100,7 @@ void CBladeKnight_Move_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	if (15.f < fDistance)
 		pBladeKnight->Change_State(CBladeKnight::BLADEKNIGHT_WAIT, 55.f, true, true);
 	// 일정 거리 안으로 들어오면 공격
-	else if(4.f > fDistance)
+	else if(6.f > fDistance)
 	{
 		if(rand() % 2 == 0)
 			pBladeKnight->Change_State(CBladeKnight::BLADEKNIGHT_ATTACKSTART, 55.f, false, true);
@@ -171,7 +171,7 @@ void CBladeKnight_Find_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 	if (1.f < m_fTimeDelta)
 	{
-		if (7.f < fDistance)
+		if (4.f < fDistance)
 			pBladeKnight->Change_State(CBladeKnight::BLADEKNIGHT_MOVE, 55.f, true, true);
 	}
 

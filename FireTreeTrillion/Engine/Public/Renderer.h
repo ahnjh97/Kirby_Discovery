@@ -98,7 +98,7 @@ private:
 	HRESULT Render_EffectResult();
 
 	HRESULT Render_DeferredInfo();
-
+	
 	HRESULT Render_Result();
 	HRESULT Render_Radial_Result(_float fTimeDelta);
 	HRESULT Render_DOF_Result();

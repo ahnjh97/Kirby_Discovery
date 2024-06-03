@@ -78,30 +78,28 @@ _int CKirby::Tick(_float fTimeDelta)
 	if (m_bDead == true)
 		return OBJ_DEAD;
 
+	_float fFirstTimeDelta = m_pGameInstance->Get_FirstTimer();
+
 	// 커비의 기본적인 축 보정, 밸런스 보정을 담당한다.
 	Setting_KirbyBalance();
 
-	// 테스트 (먹었을 때 0.1초정도간 발생하는 애니메이션 로직, 추후 수정)
-	Key_Input(fTimeDelta);
-
-	if (m_pGameInstance->Get_DIKeyState(DIK_I, KEY_DOWN))
-	{
-		INFO(m_isEat) = true;
-		Change_State(STATE_EAT, 100.f, false, false, BODY_BALLOON);
-	}
+	// 테스트 전용
+	Key_Input(fFirstTimeDelta);
 
 	// 유틸업데이트가 들어가있다.
-	__super::Tick(fTimeDelta);
-	Kirby_SystemTick(fTimeDelta);
+	__super::Tick(fFirstTimeDelta);
+	Kirby_SystemTick(fFirstTimeDelta);
 
 	return OBJ_NOEVENT;
 }
 
 void CKirby::Late_Tick(_float fTimeDelta)
 {
-	m_pModelCom[BODY_DEFAULT]->Play_Animation(fTimeDelta);
-	m_pModelCom[BODY_BALLOON]->Play_Animation(fTimeDelta);
-	m_pModelCom[BODY_VACUUM]->Play_Animation(fTimeDelta);
+	_float fFirstTimeDelta = m_pGameInstance->Get_FirstTimer();
+
+	m_pModelCom[BODY_DEFAULT]->Play_Animation(fFirstTimeDelta);
+	m_pModelCom[BODY_BALLOON]->Play_Animation(fFirstTimeDelta);
+	m_pModelCom[BODY_VACUUM]->Play_Animation(fFirstTimeDelta);
 
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))

@@ -37,12 +37,12 @@ private:
 
 	_bool			Set_OrthoProj(); //투영스페이스 직교 
 	_bool			Set_GizmoGrid(); //기즈모 위젯 그리드 세팅
-	_bool			Set_GizmoSync(); //기즈모 위젯 동기화 및 세팅
+	_bool			Set_GizmoSync(CUIObject* _pUIObj); //기즈모 위젯 동기화 및 세팅
 
-	_bool			Edit_Transform(); //변환
+	_bool			Edit_Transform(CUIObject* _pUIObj); //변환
 	_bool			Edit_RGBAColor(); //색상 편집
 
-	_bool			Create_UIObject();
+	_bool			Create_UIObject(UI_TYPE _eUIType);
 	_bool			Delete_UIObject();
 	_bool			Save_FileData(string _strFilePath);
 	_bool			Load_FileData(const string& _strFilePath);	

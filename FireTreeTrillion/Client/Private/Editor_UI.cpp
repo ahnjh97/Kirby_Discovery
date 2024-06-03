@@ -55,24 +55,24 @@ _int CEditor_UI::Tick(_float _fTimeDelta)
 
 #pragma region KEY_INPUT
 
+	string strFilePath = { "../../../UI_txt/" };
+	string strUITag = {};
+	for (auto& pUIObj : m_UIs)
+		strUITag = CUtils::WstrToStr(pUIObj->Get_UIObj_Desc().wstrUITag);
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_LCONTROL, KEY_PRESS))
 	{
-		CUIObject* pUIObj = dynamic_cast<CUIObject*>(m_pGameInstance->Get_GameObject(LEVEL_TOOL_UI, TEXT("Layer_UI"), 0));
-		string strFilePath = "../../../UI_txt/"; //"../Bin/Resources/Data/UI/";
-		string strUITag = CUtils::WstrToStr(pUIObj->Get_UIObj_Desc().wstrUITag);
-
 		if (m_pGameInstance->Get_DIKeyState(DIK_N, KEY_DOWN))
-			Create_UIObject();
+			Create_UIObject(TYPE_LAYER);
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_Z, KEY_DOWN))
 			Delete_UIObject();
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_S, KEY_DOWN))
-			Save_FileData(strFilePath); //==TRUE
+			Save_FileData(strFilePath);
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_D, KEY_DOWN))
-			Load_FileData(strFilePath + strUITag.c_str() + "_Orig.txt");
+			Load_FileData(strFilePath + "Single_UI_Orig.txt");
 	}
 
 #pragma endregion
@@ -95,6 +95,9 @@ void CEditor_UI::Late_Tick(_float _fTimeDelta)
 
 HRESULT CEditor_UI::Render()
 {
+	ImGuizmo::BeginFrame(); //기즈모 생성 및 초기화
+	ImGuizmo::SetOrthographic(TRUE); //기즈모 직교기준
+
 	Set_DockSpace(); //IMGUI DOCKSPACE
 
 	Window_Directories();
@@ -107,6 +110,19 @@ HRESULT CEditor_UI::Render()
 
 void CEditor_UI::Render_IMGUI()
 {
+}
+
+static _int iSelectUI, iSelectTex = -1;
+static void HelpMarker(const char* desc)
+{
+	ImGui::TextDisabled("(?)");
+	if (ImGui::BeginItemTooltip())
+	{
+		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+		ImGui::TextUnformatted(desc);
+		ImGui::PopTextWrapPos();
+		ImGui::EndTooltip();
+	}
 }
 
 _bool CEditor_UI::Set_DockSpace()
@@ -134,25 +150,26 @@ _bool CEditor_UI::Set_DockSpace()
 			{
 				if (ImGui::BeginMenu(u8"New/Create 생성", "Ctrl+N"))
 				{
-					if (ImGui::MenuItem(u8"Single"))
-						Create_UIObject();
+					if (ImGui::MenuItem(u8"Layer 레이어"))
+						Create_UIObject(TYPE_LAYER);
 
+					//if (ImGui::MenuItem(u8"Multi 다중"))
+					//	Create_UIObject(TYPE_MULTI);
 					ImGui::EndMenu();
 				}
 
-				if (ImGui::MenuItem(u8"Delete 삭제", "Ctrl+Z"))
-					Delete_UIObject();
-
 				string strFilePath = { "../../../UI_txt/" };
 				string strUITag = {};
-				for (auto& iter : m_UIs)
-					strUITag = CUtils::WstrToStr(iter->Get_UIObj_Desc().wstrUITag);
+
+				for (auto& pUIObj : m_UIs)
+					strUITag = CUtils::WstrToStr(pUIObj->Get_UIObj_Desc().wstrUITag);
 				
 				if (ImGui::MenuItem(u8"Save 저장", "Ctrl+S"))
 					Save_FileData(strFilePath);
 
 				if (ImGui::MenuItem(u8"Load 로드", "Ctrl+D"))
-					Load_FileData(strFilePath + strUITag.c_str() + "_Orig.txt");
+					//Load_FileData(strFilePath + strUITag.c_str() + "_Orig.txt");
+					Load_FileData(strFilePath + "Single_UI_Orig.txt");
 
 				ImGui::EndMenu();
 			}
@@ -174,7 +191,6 @@ _bool CEditor_UI::Set_DockSpace()
 #pragma endregion
 			ImGui::EndMainMenuBar();
 		}
-
 	}
 	ImGui::End(); //창 종료
 
@@ -188,66 +204,45 @@ _bool CEditor_UI::Window_Directories()
 	{
 		if (ImGui::BeginTabBar(u8"##Directories"))
 		{
-			if (ImGui::BeginTabItem(u8"Single 단일"))
+			if (ImGui::BeginTabItem(u8"Layer 레이어"))
 			{
-				ImGui::SeparatorText(u8"SingleUI List 단일UI 목록");
+				ImGui::SeparatorText(u8"Layer List 레이어 목록");
 
-				if (ImGui::BeginListBox(u8"##UI List", ImVec2(285, 200)))
+				if (ImGui::BeginListBox(u8"##UI List", ImVec2(-FLT_MIN, 10 * ImGui::GetTextLineHeightWithSpacing())))
 				{
-					_int iSelect = -1;
-					for (size_t i = 0; i < m_UIs.size(); ++i)
+					//static _int iSelect = -1;
+					for (size_t iUI = 0; iUI < m_UIs.size(); ++iUI)
 					{
-						string strUITag = CUtils::WstrToStr(m_UIs[i]->Get_UIObj_Desc().wstrUITag);
-						strUITag += "_" + to_string(i);
+						string strUITag = CUtils::WstrToStr(m_UIs[iUI]->Get_UIObj_Desc().wstrUITag);
+						strUITag += "_" + to_string(iUI);
 
 						if (strUITag.empty()) //wstrUITag 값에 대한 예외처리
 							strUITag = "##";
 
-						if (ImGui::Selectable(strUITag.c_str(), iSelect == i))
-							iSelect = i;
+						const _bool IsSelected = iSelectUI == iUI;
+						if (ImGui::Selectable(strUITag.c_str(), IsSelected))
+							iSelectUI = iUI;
 
-						if (iSelect == i) //목록 선택할 경우, 활성화
+						if (IsSelected) //목록 선택할 경우, 선택 대상에게 기즈모 동기화
 						{
 							ImGui::SetItemDefaultFocus();
 
+							if (!m_UIs.empty())
+								Set_GizmoSync(m_UIs[iUI]); //기즈모와 위젯, 오브젝트 동기화 작업
+						}
+
+						if (ImGui::BeginPopupContextItem()) // 우클릭하면 컨텍스트 메뉴 표시
+						{
+							if (ImGui::MenuItem(u8"Delete 삭제", "Ctrl+Z"))
+								Delete_UIObject();
+
+							ImGui::EndPopup();
 						}
 					}
 
 					ImGui::EndListBox();
 				}
 
-				ImGui::EndTabItem();
-			}
-			if (ImGui::BeginTabItem(u8"Multi 다중"))
-			{
-				ImGui::SeparatorText(u8"MultiUI List 다중UI 목록");
-
-				if (ImGui::BeginListBox(u8"##UI List", ImVec2(285, 200)))
-				{
-					_int iSelect = -1;
-
-					CUIObject* pUI = dynamic_cast<CMulti_UI*>(m_pGameInstance->Get_GameObject(LEVEL_TOOL_UI, TEXT("Layer_UI")));
-					//pUI.get
-					//vector<CUIObject*> pUIs = 
-
-					for (size_t i = 0; i < m_MultiUIs.size(); ++i)
-					{
-						string strUITag = CUtils::WstrToStr(m_MultiUIs[i]->Get_UIObj_Desc().wstrUITag);
-						strUITag += "_" + to_string(i);
-
-						if (strUITag.empty()) //wstrUITag 값에 대한 예외처리
-							strUITag = "##";
-
-						if (ImGui::Selectable(strUITag.c_str(), iSelect == i))
-							iSelect = i;
-
-						if (iSelect == i) //목록 선택할 경우, 활성화
-						{
-							ImGui::SetItemDefaultFocus();
-						}
-					}
-					ImGui::EndListBox();
-				}
 				ImGui::EndTabItem();
 			}
 			ImGui::EndTabBar();
@@ -261,55 +256,100 @@ _bool CEditor_UI::Window_Directories()
 _bool CEditor_UI::Window_Textures()
 {
 	ImGuiWindowFlags TexWindow_Flags = {}; /* ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize;*/
+	ImGuiComboFlags TexCombo_Flags = {};
+
 	if (ImGui::Begin(u8"Texture 텍스처", 0, TexWindow_Flags))
 	{
 		ImGui::SeparatorText(u8"Texture List 텍스처 목록");
-		if (ImGui::BeginListBox(u8"##Texture List", ImVec2(285, 200)))
+	
+		string strUITag = {};
+
+#pragma region COMBO
+		
+		//if (!m_UIs.empty())
+		//{
+		//	for (size_t iUI = 0; iUI < m_UIs.size(); ++iUI)
+		//	{
+		//		strUITag = CUtils::WstrToStr(m_UIs[iUI]->Get_UIObj_Desc().wstrUITag);
+		//		strUITag += "_" + to_string(iUI);
+		//	}
+		//}
+
+		//ImGui::PushItemWidth(290.f);
+		//if (ImGui::BeginCombo(u8"##", (iSelectUI >= 0 && iSelectUI < m_UIs.size()) ? strUITag.c_str() : u8"Select Object 레이어를 선택해주세요."))
+		//{
+		//	for (size_t iUI = 0 ; iUI < m_UIs.size(); ++iUI)
+		//	{
+		//		string strUITag = CUtils::WstrToStr(m_UIs[iUI]->Get_UIObj_Desc().wstrUITag);
+		//		strUITag += "_" + to_string(iUI);
+
+		//		if (strUITag.empty()) //wstrUITag 값에 대한 예외처리
+		//			strUITag = "##";
+
+		//		const _bool IsSelected = iSelectUI == iUI;
+		//		if (ImGui::Selectable(strUITag.c_str(), IsSelected))
+		//			iSelectUI = iUI;
+		//	
+		//	}
+		//	ImGui::EndCombo();
+		//}
+		//ImGui::PopItemWidth();
+
+#pragma endregion
+
+#pragma region LISTBOX
+
+		//vecUI의 UIObj 순회하며 해당 오브젝트가 가진 텍스처 목록을 출력 
+		if (ImGui::BeginListBox(u8"##Texture List", ImVec2(-FLT_MIN, 10 * ImGui::GetTextLineHeightWithSpacing())))
 		{
-			//CUIObject* pUI = dynamic_cast<CUIObject*>(m_pGameInstance->Get_GameObject(LEVEL_TOOL_UI, TEXT("Layer_UI"), 0));
-			//CTexture* pUITexCom = dynamic_cast<CTexture*>(pUI->Get_Component(TEXT("Com_Texture")));
-			//_uint iNumTex = pUITexCom->Get_NumTexture();
-			//for (size_t i = 0; i < iNumTex; ++i)
-			//{
-			//	_uint iTexIndex = pUI->Get_UIObj_Desc().iTexIndex;
-			//	string strTexTag = CUtils::WstrToStr(pUI->Get_UIObj_Desc().wstrUITag);
-			//	strTexTag += "_" + to_string(i);
-
-			//	if (ImGui::Selectable(strTexTag.c_str(), iSelect == i))
-			//		iSelect = i;
-
-			//	if (iSelect == i) //목록 선택할 경우, 활성화
-			//	{
-			//		ImGui::SetItemDefaultFocus();
-			//		pUI->Set_TexIndex(i);
-			//	}
-			//}
-
-			_int iSelect = -1;
-			for (auto& pUI : m_UIs)
+			if ((iSelectUI >= 0 && iSelectUI < m_UIs.size()))				
 			{
-				CTexture* pUITex = dynamic_cast<CTexture*>(pUI->Get_Component(TEXT("Com_Texture")));
-				_uint iNumTex = pUITex->Get_NumTexture();
-
-				for (size_t i = 0; i < iNumTex; ++i)
+				//해당 오브젝트의 텍스처 정보
+				CTexture* pUITex = dynamic_cast<CTexture*>(m_UIs[iSelectUI]->Get_Component(TEXT("Com_Texture")));
+				_uint iMaxTex = pUITex->Get_NumTexture();
+				if (pUITex)
 				{
-					_uint iTexIndex = pUI->Get_UIObj_Desc().iTexIndex;
-					string strTexTag = CUtils::WstrToStr(pUI->Get_UIObj_Desc().wstrUITag);
-					strTexTag += "_" + to_string(i);
-
-					if (ImGui::Selectable(strTexTag.c_str(), iSelect == i))
-						iSelect = i;
-
-					if (iSelect == i) //목록 선택할 경우, 활성화
+					for (size_t iTex = 0; iTex < iMaxTex; ++iTex)
 					{
-						//ImGui::SetItemDefaultFocus();
-						pUI->Set_TexIndex(i);
+						_uint iTexIndex = m_UIs[iSelectUI]->Get_UIObj_Desc().iTexIndex;
+						string strTexTag = CUtils::WstrToStr(m_UIs[iSelectUI]->Get_UIObj_Desc().wstrUITag);
+						strTexTag += "_" + to_string(iTex);
+
+						if (strTexTag.empty()) //strTexTag 값에 대한 예외처리
+							strTexTag = "##";
+
+						const _bool IsSelected = (iSelectTex == iTex);
+						if (ImGui::Selectable(strTexTag.c_str(), IsSelected))
+							iSelectTex = iTex;
+
+						if (IsSelected)
+						{
+							ImGui::SetItemDefaultFocus();
+
+							//선택 오브젝트의 텍스처를 보여줌
+							//if (!m_UIs.empty())
+							//	iSelectTex = m_UIs[iSelectUI]->Get_TexIndex(); 
+						}
+
+						if (ImGui::BeginPopupContextItem()) // 우클릭하면 컨텍스트 메뉴 표시
+						{
+							if (ImGui::MenuItem(u8"변경"))
+							{
+								if (!m_UIs.empty())
+									//m_UIs[iSelectUI]->Set_UIObj_Desc();
+									m_UIs[iSelectUI]->Set_TexIndex(iSelectTex); //선택 텍스처로 변경
+							}
+
+							ImGui::EndPopup();
+						}
 					}
 				}
 			}
-			
 			ImGui::EndListBox();
 		}
+
+#pragma endregion
+
 	}
 	ImGui::End();
 
@@ -318,27 +358,33 @@ _bool CEditor_UI::Window_Textures()
 
 _bool CEditor_UI::Window_Properties()
 {
-	if (ImGui::Begin(u8"Properties 속성" /*, 0, ImGuiWindowFlags_NoCollapse */ ))
+	if (ImGui::Begin(u8"Properties 속성" /*, 0, ImGuiWindowFlags_NoCollapse */))
 	{
 		if (ImGui::BeginTabBar(u8"##")) //탭 바
 		{
 			if (ImGui::BeginTabItem(u8"Transform 변환"))
 			{
-				Edit_Transform();
-				ImGui::EndTabItem();
-			}
-
-			if (ImGui::BeginTabItem(u8"Animation 애니메이션"))
-			{
-				ImGui::SeparatorText(u8"애니메이션 제어");
-				ImGui::Text(u8"Test Text");
+				ImGui::SeparatorText(u8"Transform Edit 상태 편집");
+				if (!m_UIs.empty())
+				{
+					if ((iSelectUI >= 0 && iSelectUI < m_UIs.size()))
+						Edit_Transform(m_UIs[iSelectUI]);
+				}
 
 				ImGui::EndTabItem();
 			}
-
 			ImGui::EndTabBar();
 		}
 
+		if (ImGui::BeginTabBar(u8"##")) //탭 바
+		{
+			//if (ImGui::BeginTabItem(u8"123"))
+			//{
+
+			//	ImGui::EndTabItem();
+			//}
+			ImGui::EndTabBar();
+		}
 	}
 	ImGui::End(); //창 종료
 
@@ -347,13 +393,14 @@ _bool CEditor_UI::Window_Properties()
 
 _bool CEditor_UI::Window_ShadeColor()
 {
-	if (ImGui::Begin(u8"Test"))
+	if (ImGui::Begin(u8"Shade 셰이더"))
 	{
 		if (ImGui::BeginTabBar(u8"##"))
 		{
 			if (ImGui::BeginTabItem(u8"Color 색상 편집"))
 			{
 				Edit_RGBAColor();
+
 				ImGui::EndTabItem();
 			}
 			ImGui::EndTabBar();
@@ -364,17 +411,47 @@ _bool CEditor_UI::Window_ShadeColor()
 	return TRUE;
 }
 
-_bool CEditor_UI::Edit_Transform()
+_bool CEditor_UI::Edit_Transform(CUIObject* _pUIObj)
 {
-	ImGui::SeparatorText(u8"Transform Edit 상태 편집");
+	const char* DragTag = { "Translate 위치" };
+	_float fTextWidth = ImGui::CalcTextSize(DragTag).x;
+	_float Translate[3], Rotate[3], Scale[3];
 
-	// 기즈모 영역 세팅
-	ImGuiIO& io = ImGui::GetIO();
-	ImGuizmo::SetRect(0.f, 0.f, io.DisplaySize.x, io.DisplaySize.y);
+	CTransform* pUITrans = (CTransform*)_pUIObj->Get_Component(g_strTransformTag);
+	if (nullptr == pUITrans)
+		return FALSE;
 
-	//_bool IsUsingGizmo = FALSE;
-	//if (IsUsingGizmo)
-	Set_GizmoSync(); //기즈모와 위젯, 오브젝트 동기화 작업
+	_float4x4 UIWorldMat = pUITrans->Get_WorldFloat4x4();
+
+	// 기즈모 연동
+	ImGuizmo::DecomposeMatrixToComponents(UIWorldMat.m[0], Translate, Rotate, Scale);
+
+	UIOBJ_DESC pUIObj_Desc = _pUIObj->Get_UIObj_Desc();
+	pUIObj_Desc.vSize = (_float3)Scale;
+	pUIObj_Desc.vPos = (_float3)Translate;
+	pUIObj_Desc.fDegree = (_float)Rotate[2];
+
+	ImGui::Text(u8"Scale 크기");
+	ImGui::SameLine(); HelpMarker(u8"Ctrl+E");
+	ImGui::SameLine(fTextWidth +30);
+	ImGui::DragFloat3("##Scale", (_float*)Scale, 1.f, 0.f, g_iWinSizeX, "%.1f");
+
+	ImGui::Text(u8"Translate 위치");
+	ImGui::SameLine(); HelpMarker(u8"Ctrl+T");
+	ImGui::SameLine(fTextWidth + 30);
+	ImGui::DragFloat3("##Translate", (_float*)&Translate, 1.f, (_float)-0.1 * g_iWinSizeX, (_float)g_iWinSizeX, "%.1f");
+
+	ImGui::Text(u8"Rotate 회전");
+	ImGui::SameLine(); HelpMarker(u8"Ctrl+R");
+	ImGui::SameLine(fTextWidth + 30);
+	ImGui::DragFloat("##Rotate", (_float*)&Rotate[2], 1.f, (_int)-360, (_int)360, u8"Degree 각도 : %.1f");
+
+	_pUIObj->Set_UIObj_Desc(pUIObj_Desc);
+
+	ImGuizmo::RecomposeMatrixFromComponents(Translate, Rotate, Scale, UIWorldMat.m[0]);
+
+	//월드행렬 세팅
+	pUITrans->Set_WorldMatrix(UIWorldMat);
 
 	return TRUE;
 }
@@ -454,50 +531,12 @@ _bool CEditor_UI::Set_OrthoProj()
 	return TRUE;
 }
 
-_bool CEditor_UI::Set_GizmoSync()
+_bool CEditor_UI::Set_GizmoSync(CUIObject* _pUIObj)
 {
-	const char* DragTag = { "Translate 위치" };
-	_float fTextWidth = ImGui::CalcTextSize(DragTag).x;
-
-	ImGuizmo::BeginFrame(); //기즈모 생성
-	ImGuizmo::SetOrthographic(TRUE); //기즈모 직교기준
-
-	//오브젝트의 트랜스폼/매트릭스 정보 저장
-	CTransform* UITrans = (CTransform*)(m_pGameInstance->Get_Component(LEVEL_TOOL_UI, TEXT("Layer_UI"), g_strTransformTag, 0));
-	_float4x4 UIWorldMat = UITrans->Get_WorldFloat4x4();
-
-	if (nullptr == UITrans)
-		return FALSE;
-
 	static ImGuizmo::OPERATION eCurGizmoOper(ImGuizmo::TRANSLATE);
 	static ImGuizmo::MODE eCurGizmoMode(ImGuizmo::WORLD);
 
-	// 기즈모 사용여부 텍스트
-	if (!ImGuizmo::IsUsing())
-		ImGui::Text(u8"Gizmo InValid");
-
-	else
-	{
-		switch (eCurGizmoOper)
-		{
-		case ImGuizmo::TRANSLATE:
-			ImGui::Text(u8"Translate Edit");
-			break;
-
-		case ImGuizmo::SCALE:
-			ImGui::Text(u8"Scale Edit");
-			break;
-
-		case ImGuizmo::ROTATE:
-			ImGui::Text(u8"Rotate Edit");
-			break;
-		}
-	}
-
-	// 기즈모 키 입력 시 기능 스왑
-	ImGui::Text(u8"Ctrl+E : 크기 / Ctrl+R : 회전 / Ctrl+T : 위치");
-
-	// 크기 회전 이동 변경 키
+	//크기,회전,이동 변경 키
 	if (m_pGameInstance->Get_DIKeyState(DIK_LCONTROL, KEY_PRESS))
 	{
 		if (m_pGameInstance->Get_DIKeyState(DIK_E, KEY_DOWN))
@@ -510,23 +549,11 @@ _bool CEditor_UI::Set_GizmoSync()
 			eCurGizmoOper = ImGuizmo::TRANSLATE;
 	}
 
-	// 기즈모 드래그 위젯 연동
-	_float Translate[3], Rotate[3], Scale[3];	
-	ImGuizmo::DecomposeMatrixToComponents(UIWorldMat.m[0], Translate, Rotate, Scale);
-
-	ImGui::Text(u8"Scale 크기");
-	ImGui::SameLine(fTextWidth + 20);
-	ImGui::DragFloat3("##Scale", (_float*)Scale, 0.1f, 0.f, g_iWinSizeX, "%.1f");
-
-	ImGui::Text(u8"Translate 위치");
-	ImGui::SameLine(fTextWidth + 20);
-	ImGui::DragFloat3("##Translate", (_float*)&Translate, 0.1f, 0.f, g_iWinSizeX, "%.1f");
-
-	ImGui::Text(u8"Rotate 회전");
-	ImGui::SameLine(fTextWidth + 20);
-	ImGui::DragFloat("##Rotate", (_float*)&Rotate[2], 0.1f, (_int)-360, (_int)360, u8"Degree 각도 : %.1f");
-
-	ImGuizmo::RecomposeMatrixFromComponents(Translate, Rotate, Scale, UIWorldMat.m[0]);
+	//오브젝트의 트랜스폼/매트릭스 정보 저장
+	CTransform* pUITrans = (CTransform*)_pUIObj->Get_Component(g_strTransformTag);
+	_float4x4 UIWorldMat = pUITrans->Get_WorldFloat4x4();
+	if (nullptr == pUITrans)
+		return FALSE;
 
 	// 뷰, 투영 행렬 정보 로드
 	_float4x4 ViewMatrix, ProjMatrix;
@@ -540,22 +567,11 @@ _bool CEditor_UI::Set_GizmoSync()
 		0.01f };		//Scale
 
 	//기즈모로 변환 값 적용
-	ImGuizmo::Manipulate(ViewMatrix.m[0], ProjMatrix.m[0], eCurGizmoOper, eCurGizmoMode, 
+	ImGuizmo::Manipulate(ViewMatrix.m[0], ProjMatrix.m[0], eCurGizmoOper, eCurGizmoMode,
 		UIWorldMat.m[0], NULL, fGizmoSpeed); /*useSnap ? &snap.x : NULL*/
 
 	//월드행렬 세팅
-	UITrans->Set_WorldMatrix(UIWorldMat);
-
-	//UIObj 순회하며 변경 값 적용
-	for (auto& iter : m_UIs)
-	{
-		m_UIObjDesc.wstrUITag = iter->Get_UIObj_Desc().wstrUITag;
-		m_UIObjDesc.vPos = (_float3)Translate;
-		m_UIObjDesc.fDegree = Rotate[2];
-		m_UIObjDesc.vSize = (_float3)Scale;
-
-		iter->Set_UIObj_Desc(m_UIObjDesc);
-	}
+	pUITrans->Set_WorldMatrix(UIWorldMat);
 
 	return TRUE;
 }
@@ -575,17 +591,21 @@ _bool CEditor_UI::Set_GizmoGrid()
 
 	ImGuizmo::DrawGrid(ViewMatrix.m[0], ProjMatrix.m[0], MatGridX, 10000.f);
 
+	// 기즈모 영역 세팅
+	ImGuiIO& io = ImGui::GetIO();
+	ImGuizmo::SetRect(0.f, 0.f, io.DisplaySize.x, io.DisplaySize.y);
+
 	return TRUE;
 }
 
-_bool CEditor_UI::Create_UIObject()
+_bool CEditor_UI::Create_UIObject(UI_TYPE _eUIType)
 {
 	string strProtoTag = { "Prototype_GameObject_" };
 
-	if (CUIObject::TYPE_SINGLE == m_eUIType) //단일 UI
+	if (CUIObject::TYPE_LAYER == _eUIType) //단일 UI
 	{
 		CUIObject::UIOBJ_DESC SingleUI_Desc{};
-		SingleUI_Desc.eUIType = { TYPE_SINGLE };
+		//SingleUI_Desc.eUIType = { TYPE_LAYER };
 		SingleUI_Desc.wstrUITag = { TEXT("Single_UI") };
 		SingleUI_Desc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f };
 		SingleUI_Desc.vSize = { 100.f, 100.f };
@@ -604,12 +624,11 @@ _bool CEditor_UI::Create_UIObject()
 			return FALSE;
 		}
 
-		MSG_BOX(TEXT("Successed to Create : Single UIObject"));
 		m_UIs.push_back(pSingleUI);
 		return TRUE;
 	}
 
-	if (CUIObject::TYPE_MULTI == m_eUIType) //다중 UI
+	if (CUIObject::TYPE_MULTI == _eUIType) //다중 UI
 	{
 		CUIObject::UIOBJ_DESC MultiUI_Desc{};
 		MultiUI_Desc.wstrUITag = { TEXT("Multi_UI") };
@@ -624,7 +643,6 @@ _bool CEditor_UI::Create_UIObject()
 			return FALSE;
 		}
 
-		MSG_BOX(TEXT("Successed to Create : Multi UIObject"));
 		m_UIs.push_back(pMultiUI);
 		return TRUE;
 	}
@@ -638,54 +656,62 @@ _bool CEditor_UI::Delete_UIObject()
 		return TRUE;
 	}
 
-	m_UIs.pop_back();
-
-	MSG_BOX(TEXT("Successed to Delete : UI Object"));
-	return TRUE;
+	//ListBox에서 선택한 레이어를 삭제
+	if (iSelectUI >= 0 && iSelectUI < m_UIs.size()) 
+	{
+		m_UIs.erase(m_UIs.begin() + iSelectUI);
+		iSelectUI = -1; // 삭제 후 선택한 UI 인덱스 초기화
+		//MSG_BOX(TEXT("Successed to Delete : UI Object"));
+		return TRUE;
+	}
 }
 
 _bool CEditor_UI::Save_FileData(string _strFilePath)
 {
 	string strUITag = {};
-	for (auto& iter : m_UIs)
-		strUITag = CUtils::WstrToStr(iter->Get_UIObj_Desc().wstrUITag);
+	for (auto& iUI : m_UIs)
+		strUITag = CUtils::WstrToStr(iUI->Get_UIObj_Desc().wstrUITag);
+	
+	//벡터가 비었을 경우 
+	if (m_UIs.empty())
+	{
+		//OutputFile.close();
+		MSG_BOX(TEXT("Failed to Save : empty"));
+		return FALSE;
+	}
 
 	string strOriginName = _strFilePath + strUITag + "_Orig.txt";
 	string strTempName = _strFilePath + strUITag + "_Temp.txt"; //임시 파일
 
 	std::ofstream OutputFile(strTempName, ios::out | std::ios::binary);
-
-	if (!OutputFile.is_open()) //==FALSE
+	
+	if (!OutputFile.is_open())
 	{
 		MSG_BOX(TEXT("Failed to Open : FileData"));
 		//OutputFile.close();
 		return FALSE;
 	}
 
-	//벡터가 비었을 경우 
 	size_t size = m_UIs.size();
-	if (m_UIs.empty())
-	{
-		OutputFile.close();
-		MSG_BOX(TEXT("Failed to Save : empty"));
-		return FALSE;
-	}
-
 	OutputFile.write(reinterpret_cast<const char*>(&size), sizeof(size));
 
-	//for (auto& iter : m_UIs)
-	for (size_t i = 0; i < m_UIs.size(); ++i)
+	//for (size_t i = 0; i < m_UIs.size(); ++i)
+	for (auto& pUIObj : m_UIs)
 	{
-		//wstring wstProtoTag = iter->Get_PrototypeTag();
-		wstring wstProtoTag = m_UIs[i]->Get_PrototypeTag();
+		wstring wstProtoTag = pUIObj->Get_PrototypeTag();
 		string strProtoTag = CUtils::WstrToStr(wstProtoTag);
 		_uint iProtoTagLen = strProtoTag.length();
 
 		OutputFile.write(reinterpret_cast<const char*>(&iProtoTagLen), sizeof(iProtoTagLen));
 		OutputFile.write(strProtoTag.c_str(), iProtoTagLen);
 
-		m_UIObjDesc = m_UIs[i]->Get_UIObj_Desc();
-		wstring wstrUITag = m_UIObjDesc.wstrUITag;
+		UIOBJ_DESC UIobj_Desc = pUIObj->Get_UIObj_Desc();
+		wstring wstrUITag = UIobj_Desc.wstrUITag;
+		string strUITag = CUtils::WstrToStr(wstrUITag);
+		_uint iUITagLen = strUITag.length();
+
+		OutputFile.write(reinterpret_cast<const char*>(&iUITagLen), sizeof(iUITagLen));
+		OutputFile.write(strUITag.c_str(), iUITagLen);
 
 		//size_t wstrPos = wstrUITag.find(L"-"); //문자열 위치
 		//저장할 때 wstrUITag에 대한 예외처리
@@ -701,22 +727,14 @@ _bool CEditor_UI::Save_FileData(string _strFilePath)
 		//}
 		//wstrUITag += TEXT("-") + wstrNum;
 
-		string strUITag = CUtils::WstrToStr(wstrUITag);
-		_uint iUITagLen = strUITag.length();
+		OutputFile.write(reinterpret_cast<const char*>(&UIobj_Desc.vCenter), sizeof(UIobj_Desc.vCenter));
+		OutputFile.write(reinterpret_cast<const char*>(&UIobj_Desc.vSize), sizeof(UIobj_Desc.vSize));
+		OutputFile.write(reinterpret_cast<const char*>(&UIobj_Desc.vPos), sizeof(UIobj_Desc.vPos));
+		OutputFile.write(reinterpret_cast<const char*>(&UIobj_Desc.fDegree), sizeof(UIobj_Desc.fDegree));
 
-		//OutputFile.write(reinterpret_cast<const char*>(&m_UIObjDesc.wstrUITag), sizeof(m_UIObjDesc.wstrUITag));
-		OutputFile.write(reinterpret_cast<const char*>(&iUITagLen), sizeof(iUITagLen));
-		OutputFile.write(strUITag.c_str(), iUITagLen);
-
-		OutputFile.write(reinterpret_cast<const char*>(&m_UIObjDesc.vCenter), sizeof(m_UIObjDesc.vCenter));
-		OutputFile.write(reinterpret_cast<const char*>(&m_UIObjDesc.vSize), sizeof(m_UIObjDesc.vSize));
-		OutputFile.write(reinterpret_cast<const char*>(&m_UIObjDesc.vPos), sizeof(m_UIObjDesc.vPos));
-		OutputFile.write(reinterpret_cast<const char*>(&m_UIObjDesc.fDegree), sizeof(m_UIObjDesc.fDegree));
-
-		CUIObject* pUIObj = dynamic_cast<CUIObject*>(m_pGameInstance->Get_GameObject(LEVEL_TOOL_UI, TEXT("Layer_UI"), 0));
-		m_UIObjDesc.iTexIndex = pUIObj->Get_TexIndex();
-
-		OutputFile.write(reinterpret_cast<const char*>(&m_UIObjDesc.iTexIndex), sizeof(m_UIObjDesc.iTexIndex));
+		//텍스처는 별개로 세팅
+		_uint iTexIndex = pUIObj->Get_TexIndex();
+		OutputFile.write(reinterpret_cast<const char*>(&iTexIndex), sizeof(iTexIndex));
 	}
 
 	OutputFile.close();
@@ -766,23 +784,22 @@ _bool CEditor_UI::Load_FileData(const string& _strFilePath)
 		if (0 == strProtoTag.size())
 			return FALSE;
 
-		string strUITag;
-		_uint iUITagLen; 
+		string strUITag = {};
+		_uint iUITagLen = {};
 		InputFile.read(reinterpret_cast<char*>(&iUITagLen), sizeof(iUITagLen));
 		strUITag.resize(iUITagLen);
 		InputFile.read(&strUITag[0], iUITagLen);
 		
-		//InputFile.read(reinterpret_cast<char*>(&m_UIObjDesc.wstrUITag), sizeof(m_UIObjDesc.wstrUITag));
-		InputFile.read(reinterpret_cast<char*>(&m_UIObjDesc.vCenter), sizeof(m_UIObjDesc.vCenter));
-		InputFile.read(reinterpret_cast<char*>(&m_UIObjDesc.vSize), sizeof(m_UIObjDesc.vSize));
-		InputFile.read(reinterpret_cast<char*>(&m_UIObjDesc.vPos), sizeof(m_UIObjDesc.vPos));
-		InputFile.read(reinterpret_cast<char*>(&m_UIObjDesc.fDegree), sizeof(m_UIObjDesc.fDegree));
-		InputFile.read(reinterpret_cast<char*>(&m_UIObjDesc.iTexIndex), sizeof(m_UIObjDesc.iTexIndex));
+		UIOBJ_DESC UIobj_Desc{};
+		UIobj_Desc.wstrUITag = CUtils::StrToWstr(strUITag);
 
-		//list box용 태그 연동
-		m_UIObjDesc.wstrUITag = CUtils::StrToWstr(strUITag);
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vCenter), sizeof(UIobj_Desc.vCenter));
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vSize), sizeof(UIobj_Desc.vSize));
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vPos), sizeof(UIobj_Desc.vPos));
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.fDegree), sizeof(UIobj_Desc.fDegree));
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.iTexIndex), sizeof(UIobj_Desc.iTexIndex));
 
- 		CUIObject* pUIObject = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(CUtils::StrToWstr(strProtoTag), &m_UIObjDesc));
+ 		CUIObject* pUIObject = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(CUtils::StrToWstr(strProtoTag), &UIobj_Desc));
 		m_UIs.push_back(pUIObject);
 	}
 

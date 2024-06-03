@@ -29,14 +29,14 @@ public:
 		m_bFind = bFind;
 	}
 	void Set_TimeDelta(_float fTimeDelta) {
-		m_fTimeDelta = fTimeDelta;
+		m_fTempTime = fTimeDelta;
 	}
 
 	_bool Get_Find() {
 		return m_bFind;
 	}
 	_float Get_TimeDelta() {
-		return m_fTimeDelta;
+		return m_fTempTime;
 	}
 
 public:
@@ -64,7 +64,7 @@ private:
 
 
 private:
-	_float	m_fTimeDelta = { 0.f };
+	_float	m_fTempTime = { 0.f };
 
 	_bool	m_bFind = { false };
 

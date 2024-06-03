@@ -5,6 +5,7 @@
 #include "Level_GamePlay.h"
 #include "Camera_Free.h"
 #include "Trigger.h"
+#include "UIObject.h"
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -32,12 +33,12 @@ HRESULT CLevel_GamePlay::Initialize()
 	/* 구한정보들을 각 랜드오브젝트르 생성할 때 던진다. */
 	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
 		return E_FAIL;
-
-	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
-		return E_FAIL;
 	
 	if (FAILED(Ready_ParsedObjects()))
 		return E_FAIL;
+
+	//if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
+	//	return E_FAIL;
 
 	// TEST (블러와 블랜드의 관계)
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Moon"), TEXT("Prototype_GameObject_Moon"))))
@@ -160,8 +161,50 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const wstring & strLayerTag)
 
 HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& strLayerTag)
 {
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_UI_Test"))))
-	//	return E_FAIL;
+	string strFilePath = { "../../../UI_txt/" };
+	string strUITag = { "Single_UI_Orig.txt" };
+
+	std::ifstream InputFile(strFilePath + strUITag, ios::in | std::ios::binary);
+
+	if (!InputFile.is_open()) //==FALSE 
+	{
+		MSG_BOX(TEXT("Failed to Open : FileData"));
+		return FALSE;
+	}
+
+	size_t size = 0;
+	InputFile.read(reinterpret_cast<char*>(&size), sizeof(size));
+	//m_UIs.reserve(size);
+
+	for (size_t i = 0; i < size; ++i)
+	{
+		string strProtoTag = {};
+		_uint iProtoTagLen = {};
+		InputFile.read(reinterpret_cast<char*>(&iProtoTagLen), sizeof(iProtoTagLen));
+		strProtoTag.resize(iProtoTagLen);
+		InputFile.read(&strProtoTag[0], iProtoTagLen);
+
+		if (0 == strProtoTag.size())
+			return FALSE;
+
+		string strUITag = {};
+		_uint iUITagLen = {};
+		InputFile.read(reinterpret_cast<char*>(&iUITagLen), sizeof(iUITagLen));
+		strUITag.resize(iUITagLen);
+		InputFile.read(&strUITag[0], iUITagLen);
+
+		CUIObject::UIOBJ_DESC UIobj_Desc{};
+		UIobj_Desc.wstrUITag = CUtils::StrToWstr(strUITag);
+
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vCenter), sizeof(UIobj_Desc.vCenter));
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vSize), sizeof(UIobj_Desc.vSize));
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vPos), sizeof(UIobj_Desc.vPos));
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.fDegree), sizeof(UIobj_Desc.fDegree));
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.iTexIndex), sizeof(UIobj_Desc.iTexIndex));
+
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, CUtils::StrToWstr(strProtoTag), &UIobj_Desc)))
+			return E_FAIL;
+	}
 
 	return S_OK;
 }

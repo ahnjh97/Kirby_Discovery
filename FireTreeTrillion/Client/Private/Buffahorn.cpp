@@ -47,6 +47,9 @@ HRESULT CBuffahorn::Initialize(void* pArg)
 	m_eVacuumSize = SIZE_BIG;
 	m_eAbilityType = ABILITY_DEFAULT;
 
+	//for test
+	//31 8 -102
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(31.f, 8.f, -102.f, 1.f));
 	return S_OK;
 }
 
@@ -55,37 +58,40 @@ _int CBuffahorn::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return OBJ_DEAD;
 
+	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+
 	// 지면의 up벡터
 	//PxVec3 slope = m_pControllerCom->Compute_Slope(m_pTransformCom);
 	//_vector vTerrainNormal = CUtils::To_Vector(slope);
 	//Lerp_UpVector(vTerrainNormal, 10.f, fTimeDelta);
 
-	if (m_pGameInstance->Get_DIKeyState(DIK_W, KEY_PRESS))
-	{
-		m_pTransformCom->Go_Straight(fTimeDelta);
-		//m_pControllerCom->Move_Dir(m_pTransformCom, m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), fTimeDelta);
-	}
+	//if (m_pGameInstance->Get_DIKeyState(DIK_W, KEY_PRESS))
+	//{
+	//	m_pTransformCom->Go_Straight(m_fTimeDelta);
+	//	//m_pControllerCom->Move_Dir(m_pTransformCom, m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), fTimeDelta);
+	//}
 
-	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_PRESS))
-	{
-		m_pTransformCom->Turn(XMVectorSet(0.f, -1.f, 0.f, 0.f), fTimeDelta);
-	}
+	//if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_PRESS))
+	//{
+	//	m_pTransformCom->Turn(XMVectorSet(0.f, -1.f, 0.f, 0.f), m_fTimeDelta);
+	//}
 
-	if (m_pGameInstance->Get_DIKeyState(DIK_D, KEY_PRESS))
-	{
-		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta);
-	}
+	//if (m_pGameInstance->Get_DIKeyState(DIK_D, KEY_PRESS))
+	//{
+	//	m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), m_fTimeDelta);
+	//}
 
 
-	m_pControllerCom->FreeFall(m_pTransformCom, fTimeDelta, 6.f);
-	__super::Tick(fTimeDelta);
+	//m_pControllerCom->FreeFall(m_pTransformCom, m_fTimeDelta, 6.f);
+
+	__super::Tick(m_fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
 
 void CBuffahorn::Late_Tick(_float fTimeDelta)
 {
-	m_pModelCom->Play_Animation(fTimeDelta);
+	m_pModelCom->Play_Animation(m_fTimeDelta);
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
@@ -245,6 +251,9 @@ void CBuffahorn::SetUp_FSM()
 
 	m_pFSM->Add_State(BUFFAHORN_BRAKE, CBuffahorn_Brake_State::Create());
 	m_pFSM->Add_State(BUFFAHORN_BRAKEEND, CBuffahorn_Brake_State::Create());
+
+	m_pFSM->Add_State(BUFFAHORN_JUMP, CBuffahorn_Jump_State::Create());
+	m_pFSM->Add_State(BUFFAHORN_RETURNJUMPEND, CBuffahorn_Jump_State::Create());
 
 	//상태 Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};

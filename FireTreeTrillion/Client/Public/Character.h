@@ -29,7 +29,7 @@ public:
 #ifdef _DEBUG
 	virtual void	Render_IMGUI()					override;
 #endif
-
+	virtual void	Add_AnimEvent(){}
 	void	Plus_Hp(_float fHp) {
 		m_fHp += fHp;
 		if (m_fMaxHp < m_fHp)

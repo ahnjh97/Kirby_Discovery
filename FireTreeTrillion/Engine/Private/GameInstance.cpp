@@ -14,6 +14,7 @@
 #include "Renderer.h"
 #include "Frustum.h"
 #include "Picking.h"
+#include "TimeController.h"
 
 #ifdef _DEBUG
 #include "ImGUI_Manager.h"
@@ -109,7 +110,9 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 	if (nullptr == m_pComponent_Manager)
 		return E_FAIL;
 
-
+	m_pTimeController = CTimeController::Create();
+	if (nullptr == m_pTimeController)
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -122,30 +125,26 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 		nullptr == m_pPipeLine)
 		return;
 
-	_float ffTimeDelta = fTimeDelta;
-	if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_W, KEY_PRESS))
-	{
-		ffTimeDelta = fTimeDelta * 0.5f;
-	}
 
 
 	m_pInput_Device->Tick();
+	m_pTimeController->Update_TimeController(fTimeDelta);
 
-	m_pObject_Manager->Tick(ffTimeDelta);
-	m_pPhysx->Tick(ffTimeDelta);
+	m_pObject_Manager->Tick(fTimeDelta);
+	m_pPhysx->Tick(fTimeDelta);
 	m_pPicking->Update();
 	m_pPipeLine->Tick();
 
 	m_pFrustum->Tick();
 
 #ifdef _DEBUG
-	m_pIMGUI_Manager->Late_Tick(ffTimeDelta);
+	m_pIMGUI_Manager->Late_Tick(fTimeDelta);
 #endif
 
-	m_pObject_Manager->Late_Tick(ffTimeDelta);
+	m_pObject_Manager->Late_Tick(fTimeDelta);
 	
 	/* 반복적인 갱신이 필요한 객체들의 Tick함수를 호출한다. */
-	m_pLevel_Manager->Tick(ffTimeDelta);
+	m_pLevel_Manager->Tick(fTimeDelta);
 
 }
 
@@ -906,6 +905,56 @@ _float2 CGameInstance::Get_MouseViewPortPos()
 
 	return m_pPicking->Get_MouseViewPortPos();
 }
+
+_float CGameInstance::Get_FirstTimer()
+{
+	if (nullptr == m_pTimeController)
+		return _float();
+
+	return m_pTimeController->Get_FirstTimer();
+}
+
+_float CGameInstance::Get_SecondTimer()
+{
+	if (nullptr == m_pTimeController)
+		return _float();
+
+	return m_pTimeController->Get_SecondTimer();
+}
+
+void CGameInstance::Set_FirstTimerRatio(_float fRatio)
+{
+	if (nullptr == m_pTimeController)
+		return;
+
+	m_pTimeController->Set_FirstTimerRatio(fRatio);
+}
+
+void CGameInstance::Set_SecondTimerRatio(_float fRatio)
+{
+	if (nullptr == m_pTimeController)
+		return;
+
+	m_pTimeController->Set_SecondTimerRatio(fRatio);
+}
+
+void CGameInstance::Restore_FirstTimer()
+{
+	if (nullptr == m_pTimeController)
+		return;
+
+	m_pTimeController->Restore_FirstTimer();
+}
+
+void CGameInstance::Restore_SecondTimer()
+{
+	if (nullptr == m_pTimeController)
+		return;
+
+	m_pTimeController->Restore_SecondTimer();
+}
+
+
 
 void CGameInstance::Release_Engine()
 {

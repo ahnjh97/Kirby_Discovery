@@ -7,7 +7,7 @@ BEGIN(Engine)
 class ENGINE_DLL CUIObject abstract : public CGameObject
 {
 protected:
-	enum UI_TYPE { TYPE_SINGLE, TYPE_MULTI, TYPE_NONE };
+	enum UI_TYPE { TYPE_LAYER, TYPE_MULTI, TYPE_NONE };
 	enum SHADER_PS
 	{
 		PS_DEFAULT, PS_ALPHABLEND,
@@ -18,9 +18,9 @@ protected:
 public:
 	typedef struct : public CGameObject::GAMEOBJECT_DESC
 	{
-		UI_TYPE		eUIType = { TYPE_NONE };
+		//UI_TYPE		eUIType = { TYPE_NONE };
 		wstring		wstrUITag = { TEXT("") };
-		_float3		vSize, vCenter, vPos = { 0.f, 0.f, 0.f };
+		_float3		vCenter, vSize, vPos = { };
 		_float		fDegree = { 0.f };
 		_int		iTexIndex = { 0 };
 	}UIOBJ_DESC;
@@ -69,7 +69,7 @@ protected:
 
 	vector<CUIObject*>	m_UIs;
 	vector<CUIObject*>	m_MultiUIs;
-
+	
 public:
 	virtual CGameObject* Clone(_uint iLevelIndex, void* pArg) { return nullptr; }
 	virtual void		 Free() override;

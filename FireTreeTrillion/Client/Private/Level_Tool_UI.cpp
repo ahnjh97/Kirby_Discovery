@@ -106,8 +106,8 @@ HRESULT CLevel_Tool_UI::Ready_Layer_UI(const wstring& strLayerTag)
 
 
 	//다중 (상속)
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_UI, strLayerTag, TEXT("Prototype_GameObject_Multi_UI"))))
-		return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_UI, strLayerTag, TEXT("Prototype_GameObject_Multi_UI"))))
+	//	return E_FAIL;
 
 	return S_OK;
 }
