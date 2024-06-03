@@ -647,6 +647,7 @@ void CKirbyDefault_Jump_State::Key_X(CGameObject* pGameObject, _float fTimeDelta
 {
 	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
 	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
