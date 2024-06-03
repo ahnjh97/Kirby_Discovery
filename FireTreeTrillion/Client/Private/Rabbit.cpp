@@ -207,7 +207,7 @@ void CRabbit::Compute_Parabola(_vector vEndPos)
 _vector CRabbit::JumpAttak(_float fTimeDelta)
 {
 	m_vGoPos.x = m_vStartPos.x + m_fAxisX * fTimeDelta;
-	m_vGoPos.y = m_vStartPos.y + (m_fAxisY * fTimeDelta) - (0.5f * m_fGravity * m_fTimeDelta * fTimeDelta);
+	m_vGoPos.y = m_vStartPos.y + (m_fAxisY * fTimeDelta) - (0.5f * m_fGravity * fTimeDelta * fTimeDelta);
 	m_vGoPos.z = m_vStartPos.z + m_fAxisZ * fTimeDelta;
 	 
 	return m_vGoPos;
