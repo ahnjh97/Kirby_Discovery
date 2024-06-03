@@ -26,7 +26,7 @@ void CKirbyBalloon_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 	// ÀÚÀ¯³«ÇÏ
 	pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
 	// ³«ÇÏ ³ôÀÌ
-	if (pController->Compute_Height() > 2.f)
+	if (pController->Compute_Height() > 2.f && DESC(m_eTemporaryEatType) == ABILITY_DEFAULT)
 	{
 		DESC(m_eEyeState) = CKirby::EYE_IDLE;
 		DESC(m_isEatFall) = true;
@@ -183,7 +183,6 @@ void CKirbyBalloon_Run_State::Free()
 }
 
 #pragma endregion
-
 
 
 
@@ -632,7 +631,6 @@ void CKirbyBalloon_Fly_State::Free()
 }
 
 #pragma endregion
-
 
 
 

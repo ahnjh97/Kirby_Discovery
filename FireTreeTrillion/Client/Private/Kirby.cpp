@@ -10,7 +10,11 @@
 #include "KirbyContents_State.h"
 #include "KirbySword_State.h"
 
+#include "KirbyWeapons.h"
+#include "KirbyArmours.h"
+
 #include "Utils.h"
+#include "Bone.h"
 
 
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -45,6 +49,9 @@ HRESULT CKirby::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
+	if (FAILED(Add_PartObjects()))
+		return E_FAIL;
+
 	INFO(m_eBodyState) = BODY_DEFAULT;
 	INFO(m_eMouthState) = MOUTH_IDLE;
 	INFO(m_eEyeState) = EYE_IDLE;
@@ -71,6 +78,7 @@ HRESULT CKirby::Initialize(void* pArg)
 	m_fHp = 100.f;
 	m_fAttack = 5.f;
 	m_eAbilityType = ABILITY_DEFAULT;
+	//m_eAbilityType = ABILITY_SWORD;
 
 	return S_OK;
 }
@@ -82,6 +90,9 @@ _int CKirby::Tick(_float fTimeDelta)
 
 	m_fTimeDelta = m_pGameInstance->Get_FirstTimer();
 
+	// 파트 오브젝트의 뼈 행렬을 업데이트한다.
+	Update_PartObjectMatrix();
+
 	// 커비의 기본적인 축 보정, 밸런스 보정을 담당한다.
 	Setting_KirbyBalance();
 
@@ -91,6 +102,9 @@ _int CKirby::Tick(_float fTimeDelta)
 	// 유틸업데이트가 들어가있다.
 	__super::Tick(m_fTimeDelta);
 	Kirby_SystemTick(m_fTimeDelta);
+
+	m_pWeapons->Tick(m_fTimeDelta);
+	m_pArmours->Tick(m_fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
@@ -103,6 +117,12 @@ void CKirby::Late_Tick(_float fTimeDelta)
 	if (INFO(m_eBodyState) != BODY_DEFAULT)
 		m_pModelCom[BODY_DEFAULT]->Play_Animation(m_fTimeDelta);
 
+	// 임시로 진행한다. 나중에 능력 분기되면 파츠오브젝트 많이 생겨야함.
+	if (m_eAbilityType == ABILITY_SWORD)
+	{
+		m_pWeapons->Late_Tick(m_fTimeDelta);
+		m_pArmours->Late_Tick(m_fTimeDelta);
+	}
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
@@ -171,9 +191,13 @@ void CKirby::Render_IMGUI()
 		ImGui::TreePop();
 	}
 
+
 	ImGui::Text("Vacuuming : %d", m_bVacuuming);
 	ImGui::Text("ObjectAddress : %d", INFO(m_pObject));
-	ImGui::Text("DumpAbilityTime : %.2f", INFO(m_fDumpAbilityTime));
+	ImGui::Text("MoveSpeed : %.2f", INFO(m_fMoveSpeed));
+	ImGui::Text("PREATTACKSTATE : %d", INFO(m_ePreAttackState));
+	ImGui::Text("TemporaryEatType : %d", INFO(m_eTemporaryEatType));
+
 	ImGui::Text("FSM : %d", m_pFSM->Get_State());
 	ImGui::Separator(); ImGui::NewLine();
 
@@ -463,6 +487,32 @@ HRESULT CKirby::Add_Components()
 	/* FSM */
 	SetUp_FSM();
 
+
+
+	return S_OK;
+}
+
+HRESULT CKirby::Add_PartObjects()
+{
+
+	CKirbyWeapons::KIRBYWEAPON_DESC	WeaponDesc{};
+	//CModel* pModel = (CModel*)Get_Component(TEXT("Com_Model_SwordDefault"));
+	WeaponDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	//WeaponDesc.pSocket = pModel->Get_BonePtr("HatL");
+	WeaponDesc.pBoneMatrix = &m_WeaponMatrix;
+	m_pWeapons = static_cast<CKirbyWeapons*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_KirbyWeapons"), &WeaponDesc));
+	if (nullptr == m_pWeapons)
+		return E_FAIL;
+	Safe_AddRef(m_pWeapons);
+
+	CKirbyArmours::KIRBYARMOURS_DESC ArmourDesc{};
+	ArmourDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	ArmourDesc.pBoneMatrix = &m_ArmourMatrix;
+	m_pArmours = static_cast<CKirbyArmours*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_KirbyArmours"), &ArmourDesc));
+	if (nullptr == m_pArmours)
+		return E_FAIL;
+	Safe_AddRef(m_pArmours);
+
 	return S_OK;
 }
 
@@ -645,6 +695,13 @@ void CKirby::SetUp_FSM()
 	m_pFSM->Add_State(SWORDSTATE_SWORDSLIDE, CKirbySword_Guard_State::Create());
 	m_pFSM->Add_State(SWORDSTATE_SWORDSLIDEEND, CKirbySword_Guard_State::Create());
 	m_pFSM->Add_State(SWORDSTATE_HAVESWORDWAITFLIGHT, CKirbySword_Fly_State::Create());
+	// 1타
+	m_pFSM->Add_State(SWORDSTATE_SIDESLASH, CKirbySword_Attack_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SIDESLASHEND, CKirbySword_Attack_State::Create());
+	// 2타
+	m_pFSM->Add_State(SWORDSTATE_MULITSWORDATTACK, CKirbySword_Attack_State::Create());
+	// 3타
+	m_pFSM->Add_State(SWORDSTATE_DECISIVESLASH, CKirbySword_Attack_State::Create());
 
 
 
@@ -654,6 +711,12 @@ void CKirby::SetUp_FSM()
 	FSM_Info_Desc.pModel = &m_pModelCom[BODY_DEFAULT];
 	m_pFSM->Initialize(&FSM_Info_Desc);
 
+}
+
+void CKirby::Update_PartObjectMatrix()
+{
+	m_ArmourMatrix = *(m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("HatL")->Get_CombinedTransformationMatrix());
+	m_WeaponMatrix = *(m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("RHaveL")->Get_CombinedTransformationMatrix());
 }
 
 void CKirby::Change_State(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, BODYSTATE eBody, _uint iOffSet)
@@ -712,6 +775,26 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 	_vector vDOFPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 	vDOFPos.m128_f32[1] += 0.5f;
 	m_pGameInstance->Update_DofFocus(vDOFPos);
+
+	// 능력이 SWORD 일때, 평타 모션의 순서를 리셋시키는 로직이다.
+	if (m_eAbilityType == ABILITY_SWORD)
+	{
+		// 이 모션이 아닐때만 감소한다.
+		if ((Get_State() == SWORDSTATE_SIDESLASH ||
+			Get_State() == SWORDSTATE_SIDESLASHEND ||
+			Get_State() == SWORDSTATE_MULITSWORDATTACK ||
+			Get_State() == SWORDSTATE_DECISIVESLASH) == false)
+		{
+			if (INFO(m_fAttackTime) > 0.f)
+				INFO(m_fAttackTime) -= fTimeDelta;
+
+			if (INFO(m_fAttackTime) < 0.f)
+			{
+				INFO(m_fAttackTime) = 0.f;
+				INFO(m_ePreAttackState) = SWORDSTATE_DECISIVESLASH;
+			}
+		}
+	}
 }
 
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -751,5 +834,8 @@ void CKirby::Free()
 	for (auto& pMouthTexture : m_pMouthTexture)
 		Safe_Release(pMouthTexture);
 	Safe_Release(m_pCamera);
+
+	Safe_Release(m_pWeapons);
+	Safe_Release(m_pArmours);
 
 }

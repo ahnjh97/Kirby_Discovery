@@ -79,6 +79,9 @@ public:
 };
 
 
+
+
+
 // 커비의 평타 공격을 제어한다.
 
 class CKirbySword_Attack_State final : public CFSM_State
@@ -95,6 +98,10 @@ public:
 	virtual void OnStateExit()														override;
 
 public:
+	_bool	m_bPassNextAttackMotion = { false };
+	_float	m_fAttackSpeed = { 0.f };
+	_float	m_fAnimTime = { 0.f };
+	_float	m_fLockTime = { 0.f };
 	static	CKirbySword_Attack_State* Create();
 	virtual void					 Free() override;
 };

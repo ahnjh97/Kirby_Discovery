@@ -8,8 +8,7 @@ BEGIN(Engine)
 class CModel;
 class CShader;
 class CTexture;
-class CFSM;
-class CCharacterController;
+class CPartObject;
 END
 
 BEGIN(Client)
@@ -30,6 +29,10 @@ public:
 		_float4			m_vMoveDir = { 0.f, 0.f, 0.f, 0.f };
 		_float4			m_vTargetDir = { 0.f, 0.f, 0.f, 0.f };
 		_float4			m_vDodgeDir = { 0.f, 0.f, 0.f, 0.f };
+
+		// 다양한 무기 움직임에 사용 될 것이다.
+		_float4			m_vAttackDir = { 0.f, 0.f, 0.f, 0.f };
+		_float			m_fAttackMoveSpeed = { 0.f };
 
 		// 눈, 입, 몸체의 상태를 담당한다.
 		EYESTATE		m_eEyeState = { EYE_END };
@@ -73,6 +76,13 @@ public:
 
 		// 땅에 능력 버리는 시간
 		_float			m_fDumpAbilityTime = { 0.f };
+
+		// Ability Sword
+		// PRESS 시, 차지시간을 정해주는 변수
+		_float			m_fChargeTime = { 0.f };
+		// 어택 시, 다음 어택모션이 정해질 시간변수
+		_float			m_fAttackTime = { 0.f };
+		STATE			m_ePreAttackState = { SWORDSTATE_DECISIVESLASH };
 
 	}KIRBY_INFODESC;
 
@@ -122,6 +132,7 @@ private:
 
 private:
 	HRESULT			Add_Components();
+	HRESULT			Add_PartObjects();
 	HRESULT			Bind_ShaderResources();
 	_bool			Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex);
 	// FSM
@@ -132,6 +143,13 @@ private:
 	CTexture*				m_pEyeTexture[EYE_END] = { nullptr };
 	CTexture*				m_pMouthTexture[MOUTH_END] = { nullptr };
 	class CCamera_Free*		m_pCamera = { nullptr };
+
+private:
+	void			Update_PartObjectMatrix();
+	class CKirbyWeapons* m_pWeapons = { nullptr };
+	class CKirbyArmours* m_pArmours = { nullptr };
+	_float4x4			 m_WeaponMatrix;
+	_float4x4			 m_ArmourMatrix;
 
 	_int					m_iTestAnim = { 0 };
 

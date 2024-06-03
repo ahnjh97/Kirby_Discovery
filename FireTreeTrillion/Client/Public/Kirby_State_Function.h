@@ -391,6 +391,92 @@ static _bool JoyStick_controller(CKirby::KIRBY_INFODESC* Kirbydesc, CGameObject*
 	return false;
 }
 
+// 단순 조이스틱 On? or Off?
+static _bool JoyStick_On()
+{
+	if (GAMEINSTANCE Get_DIKeyState(DIK_UP, KEY_PRESS))
+		return true;
+	else if (GAMEINSTANCE Get_DIKeyState(DIK_DOWN, KEY_PRESS))
+		return true;
+	else if (GAMEINSTANCE Get_DIKeyState(DIK_LEFT, KEY_PRESS))
+		return true;
+	else if (GAMEINSTANCE Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
+		return true;
+
+	return false;
+}
+
+// 순수한 방향을 얻는 함수
+static _float4 JoyStick_controller_OtherDir(CGameObject* pCamera)
+{
+	if (GAMEINSTANCE Get_DIKeyState(DIK_UP, KEY_PRESS))
+	{
+		if (GAMEINSTANCE Get_DIKeyState(DIK_LEFT, KEY_PRESS))
+			return Make_TargetDir(CKirby::DIR_LF, pCamera);
+		else if (GAMEINSTANCE Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
+			return Make_TargetDir(CKirby::DIR_RF, pCamera);
+		else
+			return Make_TargetDir(CKirby::DIR_FRONT, pCamera);
+
+	}
+	else if (GAMEINSTANCE Get_DIKeyState(DIK_DOWN, KEY_PRESS))
+	{
+		if (GAMEINSTANCE Get_DIKeyState(DIK_LEFT, KEY_PRESS))
+			return Make_TargetDir(CKirby::DIR_LB, pCamera);
+		else if (GAMEINSTANCE Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
+			return Make_TargetDir(CKirby::DIR_RB, pCamera);
+		else
+			return Make_TargetDir(CKirby::DIR_BACK, pCamera);
+	}
+	else if (GAMEINSTANCE Get_DIKeyState(DIK_LEFT, KEY_PRESS))
+	{
+		return Make_TargetDir(CKirby::DIR_LEFT, pCamera);
+	}
+	else if (GAMEINSTANCE Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
+	{
+		return Make_TargetDir(CKirby::DIR_RIGHT, pCamera);
+	}
+	return _float4(0.f, 0.f, 0.f, 0.f);
+}
+
+// 조이스틱을 제어하고 있으면 true, 제어하고 있지 않으면 false. 근데 이 친구는 커비가 방향을 돌지 않는다.
+static _bool JoyStick_controller_Attack(CKirby::KIRBY_INFODESC* Kirbydesc, CGameObject* pCamera)
+{
+	if (GAMEINSTANCE Get_DIKeyState(DIK_UP, KEY_PRESS))
+	{
+		if (GAMEINSTANCE Get_DIKeyState(DIK_LEFT, KEY_PRESS))
+			DESC(m_vAttackDir) = Make_TargetDir(CKirby::DIR_LF, pCamera);
+		else if (GAMEINSTANCE Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
+			DESC(m_vAttackDir) = Make_TargetDir(CKirby::DIR_RF, pCamera);
+		else
+			DESC(m_vAttackDir) = Make_TargetDir(CKirby::DIR_FRONT, pCamera);
+
+		return true;
+	}
+	else if (GAMEINSTANCE Get_DIKeyState(DIK_DOWN, KEY_PRESS))
+	{
+		if (GAMEINSTANCE Get_DIKeyState(DIK_LEFT, KEY_PRESS))
+			DESC(m_vAttackDir) = Make_TargetDir(CKirby::DIR_LB, pCamera);
+		else if (GAMEINSTANCE Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
+			DESC(m_vAttackDir) = Make_TargetDir(CKirby::DIR_RB, pCamera);
+		else
+			DESC(m_vAttackDir) = Make_TargetDir(CKirby::DIR_BACK, pCamera);
+
+		return true;
+	}
+	else if (GAMEINSTANCE Get_DIKeyState(DIK_LEFT, KEY_PRESS))
+	{
+		DESC(m_vAttackDir) = Make_TargetDir(CKirby::DIR_LEFT, pCamera);
+		return true;
+	}
+	else if (GAMEINSTANCE Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
+	{
+		DESC(m_vAttackDir) = Make_TargetDir(CKirby::DIR_RIGHT, pCamera);
+		return true;
+	}
+	return false;
+}
+
 // 커비 몸체 기준에서, 내가 누른 방향이 어느 방향인지 배출하는 기능
 static CKirby::DIR Kirby_Standard_Angle(CKirby::KIRBY_INFODESC* Kirbydesc)
 {
@@ -398,6 +484,25 @@ static CKirby::DIR Kirby_Standard_Angle(CKirby::KIRBY_INFODESC* Kirbydesc)
 	_float fCZ = DESC(m_vMoveDir).z;
 	_float fDX = DESC(m_vDodgeDir).x;
 	_float fDZ = DESC(m_vDodgeDir).z;
+
+	_float fAngle = (atan2f(fCX, fCZ) * 180.0f / XM_PI) - (atan2f(fDX, fDZ) * 180.0f / XM_PI);
+	if (fAngle < 0.f) fAngle += 360.0f;
+
+	if (fAngle >= 315.f || fAngle < 45.f) return CKirby::DIR_FRONT;
+	else if (fAngle >= 45.f && fAngle < 135.f) return CKirby::DIR_LEFT;
+	else if (fAngle >= 135.f && fAngle < 225.f) return CKirby::DIR_BACK;
+	else if (fAngle >= 225.f && fAngle < 315.f) return CKirby::DIR_RIGHT;
+
+	return CKirby::DIR_FRONT;
+}
+
+// 커비 몸체 기준에서, 내가 누른 방향이 어느 방향인지 배출하는 기능 (1. 기준축, 2. 비교군)
+static CKirby::DIR Kirby_Standard_Angle(_float4 vAxisDir, _float4 vDiffDir)
+{
+	_float fCX = vAxisDir.x;
+	_float fCZ = vAxisDir.z;
+	_float fDX = vDiffDir.x;
+	_float fDZ = vDiffDir.z;
 
 	_float fAngle = (atan2f(fCX, fCZ) * 180.0f / XM_PI) - (atan2f(fDX, fDZ) * 180.0f / XM_PI);
 	if (fAngle < 0.f) fAngle += 360.0f;

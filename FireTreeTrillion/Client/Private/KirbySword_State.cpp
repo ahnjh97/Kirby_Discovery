@@ -61,9 +61,36 @@ void CKirbySword_Idle_State::Key_Z(CGameObject* pGameObject, _float fTimeDelta)
 
 void CKirbySword_Idle_State::Key_X(CGameObject* pGameObject, _float fTimeDelta)
 {
+	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
+
 	// Idle일 때, X를 누르면 1타 공격을 시작한다.
 	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
 	{
+		DESC(m_eEyeState) = CKirby::EYE_ANGER;
+
+		// 조이스틱을 만지지 않았을 경우 현재 Dir 으로 공격 방향이 정해진다.
+		if (JoyStick_controller_Attack(Kirbydesc, pCamera) == false)
+			DESC(m_vAttackDir) = DESC(m_vMoveDir);
+
+		if (DESC(m_ePreAttackState) == CKirby::SWORDSTATE_DECISIVESLASH)
+		{
+			pKirby->Change_State(CKirby::SWORDSTATE_SIDESLASH, 60.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			DESC(m_ePreAttackState) = CKirby::SWORDSTATE_SIDESLASH;
+		}
+		else if (DESC(m_ePreAttackState) == CKirby::SWORDSTATE_SIDESLASH)
+		{
+			pKirby->Change_State(CKirby::SWORDSTATE_MULITSWORDATTACK, 60.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			DESC(m_ePreAttackState) = CKirby::SWORDSTATE_MULITSWORDATTACK;
+
+		}
+		else if (DESC(m_ePreAttackState) == CKirby::SWORDSTATE_MULITSWORDATTACK)
+		{
+			pKirby->Change_State(CKirby::SWORDSTATE_DECISIVESLASH, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			DESC(m_ePreAttackState) = CKirby::SWORDSTATE_DECISIVESLASH;
+
+		}
 	}
 
 	// Idle일 때, X를 차징하면 기를 모은다.
@@ -105,7 +132,7 @@ void CKirbySword_Idle_State::Key_V(CGameObject* pGameObject, _float fTimeDelta)
 	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
 	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
 
-
+	// 능력을 땅에 버리는 로직이다.
 	if (m_pGameInstance->Get_DIKeyState(DIK_V, KEY_PRESS))
 	{
 		DESC(m_fDumpAbilityTime) += fTimeDelta;
@@ -213,9 +240,32 @@ void CKirbySword_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		DESC(m_bRePressBlock) = false;
 	}
 
-	// X를 누르면 1타 공격한다.
+	// Run일 때, X를 누르면 1타 공격을 시작한다.
 	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
 	{
+		DESC(m_eEyeState) = CKirby::EYE_ANGER;
+
+		// 조이스틱을 만지지 않았을 경우 현재 Dir 으로 공격 방향이 정해진다.
+		if (JoyStick_controller_Attack(Kirbydesc, pCamera) == false)
+			DESC(m_vAttackDir) = DESC(m_vMoveDir);
+
+		if (DESC(m_ePreAttackState) == CKirby::SWORDSTATE_DECISIVESLASH)
+		{
+			pKirby->Change_State(CKirby::SWORDSTATE_SIDESLASH, 60.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			DESC(m_ePreAttackState) = CKirby::SWORDSTATE_SIDESLASH;
+		}
+		else if (DESC(m_ePreAttackState) == CKirby::SWORDSTATE_SIDESLASH)
+		{
+			pKirby->Change_State(CKirby::SWORDSTATE_MULITSWORDATTACK, 60.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			DESC(m_ePreAttackState) = CKirby::SWORDSTATE_MULITSWORDATTACK;
+
+		}
+		else if (DESC(m_ePreAttackState) == CKirby::SWORDSTATE_MULITSWORDATTACK)
+		{
+			pKirby->Change_State(CKirby::SWORDSTATE_DECISIVESLASH, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			DESC(m_ePreAttackState) = CKirby::SWORDSTATE_DECISIVESLASH;
+
+		}
 	}
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_Z, KEY_DOWN))
@@ -403,14 +453,216 @@ CKirbySword_Attack_State::CKirbySword_Attack_State()
 void CKirbySword_Attack_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+
+	m_fAttackSpeed = DESC(m_fMoveSpeed);
+	m_fAnimTime = 0.f;
+	m_fLockTime = 0.f;
 }
 
 void CKirbySword_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
+
+	// 자유낙하 한다.
+	pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
+
+	if (pKirby->Get_State() == CKirby::SWORDSTATE_SIDESLASH)
+	{
+		m_fAnimTime += fTimeDelta;
+		if (JoyStick_On() == true)
+		{
+			// 내가 누른 방향에 따라, 이동개념이 달라진다.
+			JoyStick_controller_Attack(Kirbydesc, pCamera);
+			CKirby::DIR eDir = Kirby_Standard_Angle(DESC(m_vMoveDir), DESC(m_vAttackDir));
+
+			DESC(m_fMoveSpeed) += fTimeDelta * 100.f;
+			if (DESC(m_fMoveSpeed) > 20.f - (m_fAnimTime * 90.f))
+				DESC(m_fMoveSpeed) = 20.f - (m_fAnimTime * 90.f);
+			if (DESC(m_fMoveSpeed) < 0.f)
+				DESC(m_fMoveSpeed) = 0.f;
+
+			if (eDir != CKirby::DIR_BACK)
+			{
+				_vector vMoveDelta = DESC(m_vAttackDir) * fTimeDelta * DESC(m_fMoveSpeed);
+				pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+			}
+		}
+		else
+		{
+			if (DESC(m_fMoveSpeed) > 0.f)
+				DESC(m_fMoveSpeed) -= 120.f * fTimeDelta;
+			if (DESC(m_fMoveSpeed) < 0.f)
+				DESC(m_fMoveSpeed) = 0.f;
+			_vector vMoveDelta = DESC(m_vAttackDir) * fTimeDelta * DESC(m_fMoveSpeed);
+			pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+		}
+
+
+		// 한번이라도 애님도중에 눌렀을 경우, END또는 IDLE로 거치지 않고 바로 다음모션으로 넘어간다.
+		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
+		{
+			m_bPassNextAttackMotion = true;
+		}
+
+		if (pKirby->isAnimFinish())
+		{
+			// 다음 공격으로 넘어간다는 시그널이 있을 경우
+			if (m_bPassNextAttackMotion == true)
+			{
+				pKirby->Change_State(CKirby::SWORDSTATE_MULITSWORDATTACK, 60.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				DESC(m_ePreAttackState) = CKirby::SWORDSTATE_MULITSWORDATTACK;
+			}
+			else
+				pKirby->Change_State(CKirby::SWORDSTATE_SIDESLASHEND, 60.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		}
+	}
+
+
+	else if (pKirby->Get_State() == CKirby::SWORDSTATE_SIDESLASHEND)
+	{
+		// 0.1초간 풀 감속 (최대 속도 8이라 가정)
+		if (DESC(m_fMoveSpeed) > 0.f)
+			DESC(m_fMoveSpeed) -= 120.f * fTimeDelta;
+		if (DESC(m_fMoveSpeed) < 0.f)
+			DESC(m_fMoveSpeed) = 0.f;
+		_vector vMoveDelta = DESC(m_vAttackDir) * fTimeDelta * DESC(m_fMoveSpeed);
+		pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+
+
+
+		// 엔드모션일 때, 뒤늦게 X키를 눌렀을 땐, 바로 다음 모션으로 보간되며 넘어간다.
+		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
+		{
+			pKirby->Change_State(CKirby::SWORDSTATE_MULITSWORDATTACK, 60.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			DESC(m_ePreAttackState) = CKirby::SWORDSTATE_MULITSWORDATTACK;
+		}
+
+		if (pKirby->isAnimFinish())
+		{
+			pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			// 0.7초간 유예시간을 준다.
+			DESC(m_fAttackTime) = 0.5f;
+		}
+	}
+
+
+	else if (pKirby->Get_State() == CKirby::SWORDSTATE_MULITSWORDATTACK)
+	{
+		m_fAnimTime += fTimeDelta;
+
+		if (JoyStick_On() == true)
+		{
+			// 내가 누른 방향에 따라, 이동개념이 달라진다.
+			JoyStick_controller_Attack(Kirbydesc, pCamera);
+			CKirby::DIR eDir = Kirby_Standard_Angle(DESC(m_vMoveDir), DESC(m_vAttackDir));
+
+			DESC(m_fMoveSpeed) += fTimeDelta * 50.f;
+			if (DESC(m_fMoveSpeed) > 6.f - (m_fAnimTime * 8.f))
+				DESC(m_fMoveSpeed) = 6.f - (m_fAnimTime * 8.f);
+			if (DESC(m_fMoveSpeed) < 0.f)
+				DESC(m_fMoveSpeed) = 0.f;
+
+			if (eDir != CKirby::DIR_BACK)
+			{
+				_vector vMoveDelta = DESC(m_vAttackDir) * fTimeDelta * DESC(m_fMoveSpeed);
+				pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+			}
+		}
+		else
+		{
+			if (DESC(m_fMoveSpeed) > 0.f)
+				DESC(m_fMoveSpeed) -= 120.f * fTimeDelta;
+			if (DESC(m_fMoveSpeed) < 0.f)
+				DESC(m_fMoveSpeed) = 0.f;
+			_vector vMoveDelta = DESC(m_vAttackDir) * fTimeDelta * DESC(m_fMoveSpeed);
+			pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+		}
+
+
+
+		// 한번이라도 애님도중에 눌렀을 경우, END또는 IDLE로 거치지 않고 바로 다음모션으로 넘어간다.
+		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
+		{
+			m_bPassNextAttackMotion = true;
+		}
+
+
+		if (pKirby->isAnimFinish())
+		{
+			// 다음 공격으로 넘어간다는 시그널이 있을 경우
+			if (m_bPassNextAttackMotion == true)
+			{
+				pKirby->Change_State(CKirby::SWORDSTATE_DECISIVESLASH, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				DESC(m_ePreAttackState) = CKirby::SWORDSTATE_DECISIVESLASH;
+			}
+			else
+			{
+				pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				DESC(m_eEyeState) = CKirby::EYE_IDLE;
+				// 0.7초간 유예시간을 준다.
+				DESC(m_fAttackTime) = 0.5f;
+			}
+		}
+	}
+
+
+	// 마무리 모션
+	else if (pKirby->Get_State() == CKirby::SWORDSTATE_DECISIVESLASH)
+	{
+		m_fLockTime += fTimeDelta;
+
+		if (m_fLockTime > 0.3f)
+			m_fAnimTime += fTimeDelta;
+
+		if (JoyStick_On() == true)
+		{
+			// 내가 누른 방향에 따라, 이동개념이 달라진다.
+			JoyStick_controller_Attack(Kirbydesc, pCamera);
+			CKirby::DIR eDir = Kirby_Standard_Angle(DESC(m_vMoveDir), DESC(m_vAttackDir));
+
+			DESC(m_fMoveSpeed) += fTimeDelta * 50.f;
+			if (DESC(m_fMoveSpeed) > 20.f - (m_fAnimTime * 200.f))
+				DESC(m_fMoveSpeed) = 20.f - (m_fAnimTime * 200.f);
+			if (DESC(m_fMoveSpeed) < 0.f)
+				DESC(m_fMoveSpeed) = 0.f;
+
+			if (eDir != CKirby::DIR_BACK)
+			{
+				_vector vMoveDelta = DESC(m_vAttackDir) * fTimeDelta * DESC(m_fMoveSpeed);
+				pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+			}
+		}
+		else
+		{
+			if (DESC(m_fMoveSpeed) > 0.f)
+				DESC(m_fMoveSpeed) -= 120.f * fTimeDelta;
+			if (DESC(m_fMoveSpeed) < 0.f)
+				DESC(m_fMoveSpeed) = 0.f;
+			_vector vMoveDelta = DESC(m_vAttackDir) * fTimeDelta * DESC(m_fMoveSpeed);
+			pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+		}
+
+
+
+		if (pKirby->isAnimFinish())
+		{
+			pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+		}
+	}
+
 }
 
 void CKirbySword_Attack_State::OnStateExit()
 {
+	m_bPassNextAttackMotion = false;
 }
 
 CKirbySword_Attack_State* CKirbySword_Attack_State::Create()

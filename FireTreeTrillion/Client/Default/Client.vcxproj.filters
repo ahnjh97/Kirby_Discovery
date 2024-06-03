@@ -193,6 +193,9 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbySword_State">
       <UniqueIdentifier>{00b58d0d-786b-4ae0-a6e2-a4a5042882aa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\Kirby\PartObject">
+      <UniqueIdentifier>{9f9cb972-12d8-4dd6-9d3b-e75811e79a7e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -388,6 +391,12 @@
     <ClInclude Include="..\Public\KirbySword_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbySword_State</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\KirbyArmours.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\PartObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KirbyWeapons.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\PartObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -564,6 +573,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\KirbySword_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbySword_State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KirbyArmours.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\PartObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KirbyWeapons.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\PartObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
