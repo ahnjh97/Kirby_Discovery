@@ -125,19 +125,19 @@ void CAwoofy_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 				m_fAngle = fAngle;
 
 				pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 2.f);
-				pController->Move_Dir(pTransformCom, pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 0.1f, fTimeDelta);
+				pController->Move_Dir(pTransformCom, pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * fTimeDelta * 6.f, fTimeDelta);
 			}
 			else
 			{
-				pTransformCom->Look_At_Angle(vLook, m_vAxisY, m_fAngle * 0.1f);
-				pController->Move_Dir(pTransformCom, pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 0.1f, fTimeDelta);
+				pTransformCom->Look_At_Angle(vLook, m_vAxisY, m_fAngle * fTimeDelta * 6.f);
+				pController->Move_Dir(pTransformCom, pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * fTimeDelta * 6.f, fTimeDelta);
 			}
 		}
 		// 일정 시간이 지나면 고정된 각도로 회전
 		else
 		{
-			pTransformCom->Look_At_Angle(vLook, m_vAxisY, m_fAngle * 0.1f);
-			pController->Move_Dir(pTransformCom, pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 0.1f, fTimeDelta);
+			pTransformCom->Look_At_Angle(vLook, m_vAxisY, m_fAngle * fTimeDelta * 6.f);
+			pController->Move_Dir(pTransformCom, pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * fTimeDelta * 6.f, fTimeDelta);
 		}
 	}
 	else
@@ -292,7 +292,7 @@ void CAwoofy_Brake_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 	if (true == pAwoofy->IsAnimFinished())
 		pAwoofy->Change_State(CAwoofy::AWOOFY_LOOKAROUNDAFTERBRAKE, 45.f, false, true);
 	else
-		pController->Move_Dir(pTransformCom, (pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 0.1f) * fDeceleration, fTimeDelta);
+		pController->Move_Dir(pTransformCom, (pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * fTimeDelta * 6.f) * fDeceleration, fTimeDelta);
 }
 
 void CAwoofy_Brake_State::OnStateExit()
@@ -342,11 +342,11 @@ void CAwoofy_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	if (pAwoofy->Get_Vacuuming() == false)
 	{
 		// 일단 그 방향으로 바라보게만 한다.
-		pTransformCom->Look_At_Axis(-m_vKirbyLook);
+		_float3 vDamegeDir = pAwoofy->Get_DamegeDir();
+		pTransformCom->Look_At_Axis(-vDamegeDir);
 
 		// 이제 날아가는 것을 구현해보자.
-		_float3 vDamegeDir = pAwoofy->Get_DamegeDir();
-		pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 10.f, fTimeDelta);
+		pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 6.f, fTimeDelta);
 
 		// 점프되는 체공시간을 구현해보자.
 		_float fDamageJumpPower = pAwoofy->Get_DamageJumpPower();

@@ -59,6 +59,8 @@ _int CAwoofy::Tick(_float fTimeDelta)
 		return OBJ_DEAD;
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+	if (m_pGameInstance->Get_DIKeyState(DIK_W, KEY_PRESS))
+		m_fTimeDelta = 0.f;
 
 	__super::Tick(m_fTimeDelta);
 

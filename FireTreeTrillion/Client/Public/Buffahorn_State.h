@@ -134,9 +134,6 @@ public:
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
 	virtual void OnStateExit()														override;
 
-private:
-	_float m_fJumpVelocity = { 0.f };
-
 public:
 	static	CBuffahorn_Jump_State* Create();
 	virtual void Free() override;

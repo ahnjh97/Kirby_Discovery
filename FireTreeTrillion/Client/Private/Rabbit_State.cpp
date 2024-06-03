@@ -226,7 +226,7 @@ void CRabbit_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	}
 
 	_float fJumpTimeDelta = pRabbit->Get_TimeDelta();
-	fJumpTimeDelta += fTimeDelta;
+	fJumpTimeDelta += fTimeDelta * 0.5f;
 	// 매 Tick 점프 중인 위치 벡터 받아오기
 	_vector vGoPos = pRabbit->JumpAttak(fJumpTimeDelta);
 
