@@ -166,12 +166,6 @@
     <Filter Include="02.GameObjects\Effect\FXToolDirector">
       <UniqueIdentifier>{dbb187c2-6962-4466-b912-a53c4e5d474a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\UI\Editor\Single">
-      <UniqueIdentifier>{ac3d583d-1d14-49c7-8cb8-b77af55d1bd6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\UI\Editor\Multi">
-      <UniqueIdentifier>{0739de1b-2da7-47f4-8811-597bd872e366}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Anim">
       <UniqueIdentifier>{51ec9ec2-a618-48a0-816b-2a9fc108e89c}</UniqueIdentifier>
     </Filter>
@@ -192,8 +186,8 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Player\Kirby\PartObject">
       <UniqueIdentifier>{9f9cb972-12d8-4dd6-9d3b-e75811e79a7e}</UniqueIdentifier>
-	</Filter>
-	<Filter Include="01.Levels\_LevelChanger">
+    </Filter>
+    <Filter Include="01.Levels\_LevelChanger">
       <UniqueIdentifier>{e6904695-a072-4b0f-b959-c88b8cd03ebc}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Moon">
@@ -201,6 +195,9 @@
     </Filter>
     <Filter Include="02.GameObjects\UI\HUD">
       <UniqueIdentifier>{22a35dfd-b59c-4d3b-9206-374c1ec77e1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\Editor\Layer">
+      <UniqueIdentifier>{a3260a15-cebf-4a5f-b682-fa24015a992a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -360,12 +357,6 @@
     <ClInclude Include="..\Public\RigidObject.h">
       <Filter>02.GameObjects\PhysXObject\RigidObject</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Single_UI.h">
-      <Filter>02.GameObjects\UI\Editor\Single</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Multi_UI.h">
-      <Filter>02.GameObjects\UI\Editor\Multi</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\AnimToolHelper.h">
       <Filter>02.GameObjects\Anim</Filter>
     </ClInclude>
@@ -398,12 +389,15 @@
     </ClInclude>
     <ClInclude Include="..\Public\KirbyWeapons.h">
       <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\PartObject</Filter>
-	</ClInclude>
-	<ClInclude Include="..\Public\Moon.h">
+    </ClInclude>
+    <ClInclude Include="..\Public\Moon.h">
       <Filter>02.GameObjects\Moon</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\HUD.h">
       <Filter>02.GameObjects\UI\HUD</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LayerUI.h">
+      <Filter>02.GameObjects\UI\Editor\Layer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -554,12 +548,6 @@
     <ClCompile Include="..\Private\BladeKnightSword.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Single_UI.cpp">
-      <Filter>02.GameObjects\UI\Editor\Single</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Multi_UI.cpp">
-      <Filter>02.GameObjects\UI\Editor\Multi</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\AnimToolHelper.cpp">
       <Filter>02.GameObjects\Anim</Filter>
     </ClCompile>
@@ -583,12 +571,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\KirbyWeapons.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\PartObject</Filter>
-	</ClCompile>
-	<ClCompile Include="..\Private\Moon.cpp">
+    </ClCompile>
+    <ClCompile Include="..\Private\Moon.cpp">
       <Filter>02.GameObjects\Moon</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\HUD.cpp">
       <Filter>02.GameObjects\UI\HUD</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LayerUI.cpp">
+      <Filter>02.GameObjects\UI\Editor\Layer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

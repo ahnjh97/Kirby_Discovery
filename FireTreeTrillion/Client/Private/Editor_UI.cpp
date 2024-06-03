@@ -74,6 +74,9 @@ _int CEditor_UI::Tick(_float _fTimeDelta)
 		if (m_pGameInstance->Get_DIKeyState(DIK_D, KEY_DOWN))
 			//Load_FileData(strFilePath + strUITag + "_Orig.txt");
 			Load_FileData(strFilePath + "LayerUI_Orig.txt");
+
+		if (m_pGameInstance->Get_DIKeyState(DIK_G, KEY_DOWN))
+			Grouping_UIObject(GROUP_SELECT);
 	}
 
 #pragma endregion
@@ -133,7 +136,7 @@ _bool CEditor_UI::Set_DockSpace()
 	// 도킹 모드는 크기/위치 고정 시 도킹 불가
 	//ImGui::SetNextWindowPos(ImVec2(10.f, 10.f));
 	//ImGui::SetNextWindowSize(ImVec2(iSizeX, iSizeY));
-	ImGuiWindowFlags Window_Flags = /*ImGuiWindowFlags_MenuBar*/ ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking;
+	ImGuiWindowFlags Window_Flags{};/*ImGuiWindowFlags_MenuBar* ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking;*/
 	ImGuiDockNodeFlags Dockspace_Flags = ImGuiDockNodeFlags_None;
 	Dockspace_Flags &= ~ImGuiDockNodeFlags_PassthruCentralNode;
 
@@ -151,9 +154,9 @@ _bool CEditor_UI::Set_DockSpace()
 		{
 			if (ImGui::BeginMenu(u8"File 파일"))
 			{
-				if (ImGui::BeginMenu(u8"New/Create 생성", "Ctrl+N"))
+				if (ImGui::BeginMenu(u8"New/Create 생성"))
 				{
-					if (ImGui::MenuItem(u8"Layer 레이어"))
+					if (ImGui::MenuItem(u8"Layer 레이어", "Ctrl+N"))
 						Create_UIObject(TYPE_LAYER);
 
 					//if (ImGui::MenuItem(u8"Multi 다중"))
@@ -167,9 +170,9 @@ _bool CEditor_UI::Set_DockSpace()
 				for (auto& pUIObj : m_LayerUIs)
 					strUITag = CUtils::WstrToStr(pUIObj->Get_UIObj_Desc().wstrUITag);
 
-				if (ImGui::BeginMenu(u8"Save 생성", "Ctrl+S"))
+				if (ImGui::BeginMenu(u8"Save 저장"))
 				{
-					if (ImGui::MenuItem(u8"Data 데이터"))
+					if (ImGui::MenuItem(u8"Data 데이터", "Ctrl+S"))
 						Save_FileData(strFilePath);
 
 					if (ImGui::MenuItem(u8"Texture 텍스처"))
@@ -212,7 +215,7 @@ _bool CEditor_UI::Set_DockSpace()
 
 _bool CEditor_UI::Window_Directories()
 {
-	ImGuiWindowFlags Dirwindow_Flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize;
+	ImGuiWindowFlags Dirwindow_Flags{}; /*= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize;*/
 	if (ImGui::Begin(u8"Directories 디렉토리", 0, Dirwindow_Flags))
 	{
 		if (ImGui::BeginTabBar(u8"##Directories"))
@@ -283,12 +286,12 @@ _bool CEditor_UI::Tab_LayerList()
 
 				if (ImGui::BeginPopupContextItem()) // 우클릭하면 세부 메뉴 표시
 				{
-					if (ImGui::BeginMenu(u8"Group 그룹", "Ctrl+G"))
+					if (ImGui::BeginMenu(u8"Group 그룹"))
 					{
 						if (ImGui::MenuItem(u8"All 전체"))
 							Grouping_UIObject(GROUP_ALL);
 
-						if (ImGui::MenuItem(u8"Select 선택"))
+						if (ImGui::MenuItem(u8"Select 선택", "Ctrl+G"))
 							Grouping_UIObject(GROUP_SELECT);
 
 						ImGui::EndMenu();
@@ -387,23 +390,23 @@ _bool CEditor_UI::Tab_GroupList()
 						ImGui::SetItemDefaultFocus();
 						if (!m_GroupUIs.empty()) //그룹 상속관계 변환 동기화
 						{
-							for (size_t iGroupIx = 0; iGroupIx < m_GroupUIs.size(); ++iGroupIx)
-							{
-								for (size_t iLayerIx = 0; iLayerIx < m_GroupUIs[iGroupIx].size(); ++iLayerIx)
-								{
-									auto& LayerUI = m_GroupUIs[iGroupIx][iLayerIx];
+							//for (size_t iGroupIx = 0; iGroupIx < m_GroupUIs.size(); ++iGroupIx)
+							//{
+							//	for (size_t iLayerIx = 0; iLayerIx < m_GroupUIs[iGroupIx].size(); ++iLayerIx)
+							//	{
+							//		auto& LayerUI = m_GroupUIs[iGroupIx][iLayerIx];
 
-									//그룹 요소의 디스크립션을 첫번째 요소기준 증감 보정
-									UIOBJ_DESC FstLayerDesc = LayerUI[0].Get_UIObj_Desc(); //그룹의 첫번째 요소
-									UIOBJ_DESC LayerDesc = LayerUI[iLayerIx].Get_UIObj_Desc();
-									LayerDesc.vPos = FstLayerDesc.vPos - LayerDesc.vPos;
+							//		//그룹 요소의 디스크립션을 첫번째 요소기준 증감 보정
+							//		UIOBJ_DESC FstLayerDesc = LayerUI[0].Get_UIObj_Desc(); //그룹의 첫번째 요소
+							//		UIOBJ_DESC LayerDesc = LayerUI[iLayerIx].Get_UIObj_Desc();
+							//		LayerDesc.vPos = FstLayerDesc.vPos - LayerDesc.vPos;
 
-									LayerUI[iLayerIx].Set_UIObj_Desc(LayerDesc);
+							//		LayerUI[iLayerIx].Set_UIObj_Desc(LayerDesc);
 
-									//for (auto& GroupUI : m_GroupUIs[iGroupIx])
-									Set_GizmoSync(LayerUI); //기즈모와 위젯, 오브젝트 동기화 작업
-								}
-							}
+							//		//for (auto& GroupUI : m_GroupUIs[iGroupIx])
+							//		Set_GizmoSync(LayerUI); //기즈모와 위젯, 오브젝트 동기화 작업
+							//	}
+							//}
 						}
 					}
 				}
@@ -651,6 +654,7 @@ _bool CEditor_UI::Edit_RGBAColor()
 	return TRUE;
 }
 
+//추가 필요) 글꼴 편집
 _bool CEditor_UI::Edit_Text()
 {
 	ImGui::SeparatorText(u8"Text Edit 텍스트 편집");
@@ -764,6 +768,7 @@ _bool CEditor_UI::Set_GizmoGrid()
 	return TRUE;
 }
 
+//추가 필요) 레이어그룹(캔버스) 생성
 _bool CEditor_UI::Create_UIObject(UI_TYPE _eUIType)
 {
 	string strProtoTag = { "Prototype_GameObject_" };
@@ -798,6 +803,7 @@ _bool CEditor_UI::Create_UIObject(UI_TYPE _eUIType)
 	}
 }
 
+//추가 필요) 이넘으로 구분하여 벡터 그룹 삭제 
 _bool CEditor_UI::Delete_UIObject()
 {
 	if (m_LayerUIs.empty())
@@ -861,6 +867,7 @@ _bool CEditor_UI::Grouping_UIObject(UI_GROUP _eUIGroup)
 
 }
 
+//진행 중) 텍스처화 :: RTV 기준으로 저장 (저장은 되나, RTV 세팅 필요)
 _bool CEditor_UI::Save_Texture(const string& _strFilePath, ID3D11RenderTargetView* _pRTV)
 {
 	//렌더타겟 설정

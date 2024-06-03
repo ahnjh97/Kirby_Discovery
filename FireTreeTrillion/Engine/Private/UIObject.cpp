@@ -54,13 +54,25 @@ void CUIObject::Render_IMGUI()
 void CUIObject::Free()
 {
 	__super::Free();
+	
+	if (!m_GroupUIs.empty())
+	{
+		for (auto& pGroupUI : m_GroupUIs)
+		{
+			for (auto& pUIObj : pGroupUI)
+				Safe_Release(pUIObj);
+
+			m_GroupUIs.clear();
+		}
+		m_GroupUIs.clear();
+	}
 
 	if (!m_LayerUIs.empty())
 	{
 		for (auto& pUIObj : m_LayerUIs)
 			Safe_Release(pUIObj);
 
-		m_LayerUIs.clear();
+		m_LayerUIs.clear(); 
 	}
 
 	Safe_Release(m_pShaderCom);
