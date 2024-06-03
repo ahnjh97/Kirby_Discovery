@@ -16,6 +16,8 @@ float g_fAlpha = { 1.f };
 float g_fMaskThreshold = { 0.f };
 
 float2 g_vUVOffset = { 0.f, 0.f };
+float2 g_vMaskUVOffset = { 0.f, 0.f };
+float2 g_vMaskUVAngle = { 0.f, 0.f };
 
 struct VS_IN
 {

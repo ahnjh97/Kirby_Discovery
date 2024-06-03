@@ -24,6 +24,8 @@ float g_fAlpha = { 1.f };
 float g_fMaskThreshold = { 0.f };
 
 float2 g_vUVOffset = { 0.f, 0.f };
+float2 g_vMaskUVOffset = { 0.f, 0.f };
+float2 g_vMaskUVAngle = { 0.f, 0.f };
 
 
 struct VS_IN
@@ -265,8 +267,9 @@ PS_OUT PS_MAIN_DEFAULT_FX(PS_IN In)
         discard;
     
     
-    float vMaskValue = g_MaskTexture.Sample(ClampSampler, In.vTexcoord).r;
+    float vMaskValue = g_MaskTexture.Sample(ClampSampler, In.vTexcoord + g_vMaskUVOffset).a;
     if (vMaskValue < g_fMaskThreshold)
+        //if (.5f < g_fMaskThreshold)
         discard;
 
     

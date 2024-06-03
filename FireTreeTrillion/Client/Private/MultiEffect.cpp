@@ -110,6 +110,7 @@ HRESULT CMultiEffect::Initialize(void* pArg)
 
 				m_FXs.push_back(pFX);
 				m_fDuration.second = pFX->Get_BiggerDuration(m_fDuration.second);
+
 				/*for (auto& comPair : *pStaticProtoMap)
 				{
 					if (comPair.first.find(CUtils::StrToWstr(FXName)) != wstring::npos)
@@ -245,13 +246,14 @@ CGameObject* CMultiEffect::Clone(void* pArg)
 		Safe_Release(pInstance);
 	}
 
-	return pInstance;;
+	return pInstance;
 }
 
 void CMultiEffect::Free()
 {
 	for (auto& pEffect : m_FXs)
 		Safe_Release(pEffect);
+
 	m_FXs.clear();
 
 	__super::Free();

@@ -236,6 +236,11 @@ HRESULT CLoader::Loading_StaticComponentAll()
 	hr = Add_Texture(eLevel, "FX_VacuumDGB", "Effects/twinkle02.png");
 	CHECK_FAILED(hr);
 
+	hr = Add_Texture(eLevel, "FX_Wind", "Effects/wind_%d.png", 2);
+	CHECK_FAILED(hr);
+
+	hr = Add_Texture(eLevel, "FX_Shockwave", "Effects/shockwave_%d.png", 1);
+	CHECK_FAILED(hr);
 
 	wstring wstrPrototypeTag = L"Prototype_Component_Shader_";
 	hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + TEXT("VtxPosTex"),
@@ -519,6 +524,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("VacuumWind", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("VacuumDGB", TYPE_NONANIM);
 
+		m_vecModelInfo.emplace_back("SwordTrail", TYPE_NONANIM);
 
 	}
 	else if (eLevel == LEVEL_LOGO)

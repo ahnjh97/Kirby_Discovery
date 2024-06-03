@@ -829,7 +829,7 @@ void CFXToolDirector::Render_FXHierarchy()
 		newProperty.clear();
 		newStartKeyframe.vValue = Vector3::One;
 		newStartKeyframe.eEasing = EASE_IN;
-		newEndKeyframe.vValue = { .01f, .01f, .01f };
+		newEndKeyframe.vValue = Vector3::One;
 		newProperty.push_back(newStartKeyframe);
 		newProperty.push_back(newEndKeyframe);
 		singleFXDesc.Keyframes.emplace(KF_SCALE, newProperty);
@@ -876,10 +876,25 @@ void CFXToolDirector::Render_FXHierarchy()
 
 		newProperty.clear();
 		newStartKeyframe.vValue = Vector3::Zero;
+		newStartKeyframe.eEasing = EASE_LINEAR;
 		newEndKeyframe.vValue = Vector3::Zero;
 		newProperty.push_back(newStartKeyframe);
 		newProperty.push_back(newEndKeyframe);
 		singleFXDesc.Keyframes.emplace(KF_UVOFFSET, newProperty);
+
+		//newProperty.clear();
+		//newStartKeyframe.vValue = Vector3::Zero;
+		//newEndKeyframe.vValue = Vector3::Zero;
+		//newProperty.push_back(newStartKeyframe);
+		//newProperty.push_back(newEndKeyframe);
+		singleFXDesc.Keyframes.emplace(KF_MASKUVOFFSET, newProperty);
+
+		//newProperty.clear();
+		//newStartKeyframe.vValue = Vector3::Zero;
+		//newEndKeyframe.vValue = Vector3::Zero;
+		//newProperty.push_back(newStartKeyframe);
+		//newProperty.push_back(newEndKeyframe);
+		singleFXDesc.Keyframes.emplace(KF_MASKUVANGLE, newProperty);
 
 		CSingleEffect* pSingleFX = static_cast<CSingleEffect*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_SingleEffect"), &singleFXDesc));
 		m_FXs.emplace_back(pSingleFX);
@@ -987,33 +1002,8 @@ void CFXToolDirector::Render_FXHierarchy()
 		if (m_iSelectedFXIdx == i && IsItemHovered() && IsMouseReleased(1))
 			OpenPopup("FXMenu");
 
-
-		//if (bOpenSelectableMenu)
-
-		//bOpenSelectableMenu = true;
-
 	}
 
-	/*
-	if (ImGui::BeginPopup("another popup"))
-	{
-		for (int i = 0; i < IM_ARRAYSIZE(names); i++)
-			ImGui::MenuItem(names[i], "", &toggles[i]);
-		if (ImGui::BeginMenu("Sub-menu"))
-		{
-			ImGui::MenuItem("Click me");
-			if (ImGui::Button("Stacked Popup"))
-				ImGui::OpenPopup("another popup");
-			if (ImGui::BeginPopup("another popup"))
-			{
-				ImGui::Text("I am the last one here.");
-				ImGui::EndPopup();
-			}
-			ImGui::EndMenu();
-		}
-		ImGui::EndPopup();
-	}
-	*/
 
 	//우측 키를 누르면 나오는 메뉴들
 	if (BeginPopup("FXMenu"))
@@ -1256,7 +1246,7 @@ void CFXToolDirector::Render_FXProperty()
 		return;
 	}
 
-	//파티클 편집. 캐스팅한다.
+#pragma region  파티클 편집. 캐스팅한다.
 	CParticle* pCurParticle = static_cast<CParticle*>(pCurFX);
 
 	_bool bEdited{ false };
@@ -1287,10 +1277,6 @@ void CFXToolDirector::Render_FXProperty()
 	}
 
 	Separator();
-	//if (DragFloat(u8"", &pCurParticle->m_InstanceDesc.fStartDelay, .01f, 0.f, 100.f, "%.2f"))
-	//	bEdited = true;
-	//if (DragFloat(u8"시작 딜레이", &pCurParticle->m_InstanceDesc.fStartDelay, .01f, 0.f, 100.f, "%.2f"))
-	//	bEdited = true;
 
 	if (DragFloat(u8"시작 딜레이", &pCurParticle->m_InstanceDesc.fStartDelay, .1f, 0.f, 100.f, "%.2f"))
 		bEdited = true;
@@ -1367,6 +1353,8 @@ void CFXToolDirector::Render_FXProperty()
 		bEdited = true;
 	}
 
+#pragma endregion
+
 	End();
 
 	if (bEdited)
@@ -1374,10 +1362,6 @@ void CFXToolDirector::Render_FXProperty()
 		pCurParticle->Update_InstanceInfo();
 	}
 
-	//if (bIsParticle)
-	//{
-
-	//}
 
 }
 
@@ -1401,7 +1385,7 @@ void CFXToolDirector::Render_FXPlayBar(_float _fTimeDelta)
 	CHECK_NULLPTR(pCurFX);
 
 	Columns(2);
-	SetColumnWidth(0, 220.f);
+	SetColumnWidth(0, 250.f);
 
 	m_eSelected == SELECTED_MULTI_FX ? Text("Cur Duration %.2f", pCurFX->m_fDuration.first) :
 		Text("Cur Lifetime %.2f", pCurFX->m_fLifeRatio);
@@ -1510,7 +1494,6 @@ void CFXToolDirector::Render_FXPlayBar(_float _fTimeDelta)
 		SameLine();
 		if (SmallButton(u8"알파 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
 		{
-			////m_bOpenKeyframeEditor = false;
 			FX_KEYFRAME newKeyframe{};
 			newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
 			newKeyframe.eEasing = EASE_OUT;
@@ -1525,7 +1508,6 @@ void CFXToolDirector::Render_FXPlayBar(_float _fTimeDelta)
 		SameLine();
 		if (SmallButton(u8"임계 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
 		{
-			////m_bOpenKeyframeEditor = false;
 			FX_KEYFRAME newKeyframe{};
 			newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
 			newKeyframe.eEasing = EASE_OUT;
@@ -1534,19 +1516,48 @@ void CFXToolDirector::Render_FXPlayBar(_float _fTimeDelta)
 			pCurFX->Add_Keyframe(newKeyframe, KF_MASK);
 		}
 
-		Text(u8"UV 오프셋");
+		Text(u8"UV 이동 오프셋");
 		SameLine();
 		Text("\t%.2f %.2f\t", pCurFX->m_vCurUVOffset.x, pCurFX->m_vCurUVOffset.y);
 		SameLine();
-		if (SmallButton(u8"UV 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
+		if (SmallButton(u8"UV 이동 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
 		{
-			////m_bOpenKeyframeEditor = false;
 			FX_KEYFRAME newKeyframe{};
 			newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
 			newKeyframe.eEasing = EASE_OUT;
 			newKeyframe.vValue = { pCurFX->m_vCurUVOffset.x, pCurFX->m_vCurUVOffset.y, 0.f };
 
+
 			pCurFX->Add_Keyframe(newKeyframe, KF_UVOFFSET);
+		}
+
+		Text(u8"마스크 UV 이동 오프셋");
+		SameLine();
+		Text("\t%.2f %.2f\t", pCurFX->m_vCurMaskUVOffset.x, pCurFX->m_vCurMaskUVOffset.y);
+		SameLine();
+		if (SmallButton(u8"Mask UV 이동 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
+		{
+
+			FX_KEYFRAME newKeyframe{};
+			newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
+			newKeyframe.eEasing = EASE_OUT;
+			newKeyframe.vValue = { pCurFX->m_vCurMaskUVOffset.x, pCurFX->m_vCurMaskUVOffset.y, 0.f };
+
+			pCurFX->Add_Keyframe(newKeyframe, KF_MASKUVOFFSET);
+		}
+
+		Text(u8"마스크 UV 회전 오프셋");
+		SameLine();
+		Text("\t%.2f\t", pCurFX->m_vCurMaskUVAngle);
+		SameLine();
+		if (SmallButton(u8"Mask UV 회전 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
+		{
+			FX_KEYFRAME newKeyframe{};
+			newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
+			newKeyframe.eEasing = EASE_OUT;
+			newKeyframe.vValue = { pCurFX->m_vCurMaskUVAngle, 0.f, 0.f };
+
+			pCurFX->Add_Keyframe(newKeyframe, KF_MASKUVANGLE);
 		}
 	}
 
@@ -1683,6 +1694,12 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 	Dummy(ImVec2(0, 15));
 	Make_KeyframeList(_fWidth, fInitialYPos, pCurFX, KF_UVOFFSET);
 
+	Dummy(ImVec2(0, 15));
+	Make_KeyframeList(_fWidth, fInitialYPos, pCurFX, KF_MASKUVOFFSET);
+
+	Dummy(ImVec2(0, 15));
+	Make_KeyframeList(_fWidth, fInitialYPos, pCurFX, KF_MASKUVANGLE);
+
 
 	if (BeginPopup(u8"키프레임"))
 	{
@@ -1718,6 +1735,12 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 			break;
 		case KF_UVOFFSET:
 			strTitle = "UV Offset";
+			break;
+		case KF_MASKUVOFFSET:
+			strTitle = "Mask UV Offset";
+			break;
+		case KF_MASKUVANGLE:
+			strTitle = "Mask UV Angle";
 			break;
 		default:
 			break;

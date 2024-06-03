@@ -132,6 +132,11 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 	_float3 vUVOffset = Calculate_CurValue_Lerp(_fTimeDelta, KF_UVOFFSET);
 	m_vCurUVOffset = { vUVOffset.x, vUVOffset.y };
 
+	_float3 vMaskUVOffset = Calculate_CurValue_Lerp(_fTimeDelta, KF_MASKUVOFFSET);
+	m_vCurMaskUVOffset = { vMaskUVOffset.x, vMaskUVOffset.y };
+
+	m_vCurMaskUVAngle = Calculate_CurValue_Lerp(_fTimeDelta, KF_MASKUVANGLE).x;
+
 	//초기 회전 세팅
 	_float3 vInitRadianRot = { ToRadian(m_vInitRot.x), ToRadian(m_vInitRot.y) , ToRadian(m_vInitRot.z) };
 
@@ -292,6 +297,12 @@ HRESULT CSingleEffect::Bind_ShaderResources(_int iTexIdx, _int iMaskTexIdx)
 	CHECK_FAILED(hr);
 
 	hr = m_pShaderCom->Bind_RawValue("g_vUVOffset", &m_vCurUVOffset, sizeof(_float2));
+	CHECK_FAILED(hr);
+
+	hr = m_pShaderCom->Bind_RawValue("g_vMaskUVOffset", &m_vCurMaskUVOffset, sizeof(_float2));
+	CHECK_FAILED(hr);
+
+	hr = m_pShaderCom->Bind_RawValue("g_vMaskUVAngle", &m_vCurMaskUVAngle, sizeof(_float2));
 	CHECK_FAILED(hr);
 
 	hr = m_pGameInstance->Bind_RTShaderResource(m_pShaderCom, TEXT("Target_Depth"), "g_DepthTexture");
