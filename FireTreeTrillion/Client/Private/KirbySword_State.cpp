@@ -89,6 +89,7 @@ void CKirbySword_Idle_State::Key_X(CGameObject* pGameObject, _float fTimeDelta)
 		{
 			pKirby->Change_State(CKirby::SWORDSTATE_DECISIVESLASH, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 			DESC(m_ePreAttackState) = CKirby::SWORDSTATE_DECISIVESLASH;
+			DESC(m_fMoveSpeed) = 0.f;
 
 		}
 	}
@@ -263,6 +264,7 @@ void CKirbySword_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		else if (DESC(m_ePreAttackState) == CKirby::SWORDSTATE_MULITSWORDATTACK)
 		{
 			pKirby->Change_State(CKirby::SWORDSTATE_DECISIVESLASH, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			DESC(m_fMoveSpeed) = 0.f;
 			DESC(m_ePreAttackState) = CKirby::SWORDSTATE_DECISIVESLASH;
 
 		}
@@ -601,6 +603,7 @@ void CKirbySword_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 			{
 				pKirby->Change_State(CKirby::SWORDSTATE_DECISIVESLASH, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 				DESC(m_ePreAttackState) = CKirby::SWORDSTATE_DECISIVESLASH;
+				DESC(m_fMoveSpeed) = 0.f;
 			}
 			else
 			{

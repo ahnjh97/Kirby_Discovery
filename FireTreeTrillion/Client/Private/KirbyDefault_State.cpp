@@ -658,15 +658,16 @@ void CKirbyDefault_Jump_State::Key_X(CGameObject* pGameObject, _float fTimeDelta
 			DESC(m_fVacuumTime) = 0.f;
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			pKirby->Change_State(CKirby::STATE_INHALEFALL, 50.f, true, true, CKirby::BODY_VACUUM);
+
+			CMultiEffect::MULTI_FX_DESC FXDesc{};
+			FXDesc.vInitPos = { 0.f, .65f, .4f };
+			FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+			if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_VacuumC"), &FXDesc)))
+				return;
+			pKirby->Add_KirbyEffect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+
+
 		}
-
-		CMultiEffect::MULTI_FX_DESC FXDesc{};
-		FXDesc.vInitPos = { 0.f, .65f, .4f };
-		FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_VacuumC"), &FXDesc)))
-			return;
-		pKirby->Add_KirbyEffect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
-
 	}
 
 }
