@@ -59,6 +59,9 @@ public:
 	static CEditor_UI*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject*	Clone(void* pArg) override;
 	virtual void			Free() override;
+
+private:
+	wstring					m_wstrInputText = {};
 };
 
 

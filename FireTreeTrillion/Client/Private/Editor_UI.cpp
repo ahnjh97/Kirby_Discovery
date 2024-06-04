@@ -654,20 +654,55 @@ _bool CEditor_UI::Edit_RGBAColor()
 	return TRUE;
 }
 
-//추가 필요) 글꼴 편집
+//진행 중) 글꼴 편집
 _bool CEditor_UI::Edit_Text()
 {
 	ImGui::SeparatorText(u8"Text Edit 텍스트 편집");
+
+	const char* DragTag = { "Translate 위치" };
+	_float fTextWidth = ImGui::CalcTextSize(DragTag).x;
+
 	wstring wstrFontTag, wstrText = {};
-	_float2 fFontPos = {};
-	_float fFontColor[4] = {};
-	_float fDegree = { 0.f };
+	UIOBJ_DESC FontDesc{};
+	FontDesc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f };
+	FontDesc.vSize = { 10.f, 10.f };
+	FontDesc.vPos = { FontDesc.vCenter };
+	FontDesc.fDegree = { 0.f };
+	FontDesc.vColorRGBA = { 1.f, 1.f, 1.f, 1.f };
 
-	//InputBuf[256]
-	//ImGui::InputText(u8"##", InputBuf, IM_ARRAYSIZE(InputBuf));
+	static string strInputText(1024 * 16, '\0');
+	ImGuiInputTextFlags InputText_flags{}; //= ImGuiInputTextFlags_AllowTabInput;
 
-	//m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("Sky"), _float2(fFontPos), 
-	//	XMVectorSet(*fFontColor), fDegree);
+	
+	ImGui::InputTextMultiline(u8"##", &strInputText[0], 
+		strInputText.capacity(), /*IM_ARRAYSIZE(strInputText.c_str()*/
+		ImVec2(-FLT_MIN, 10 * ImGui::GetTextLineHeightWithSpacing())); /*ImGui::GetTextLineHeight() * 10*/
+
+	//UTF-8 인코딩 변환
+	wstrText = CUtils::StrToWstrUTF8(strInputText);
+
+	//스프라이트 폰트 렌더 (폰트 테스트용)
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_KR15"), wstrText, _float2(FontDesc.vPos),
+		FontDesc.vColorRGBA, FontDesc.fDegree);
+
+	//위젯
+	//ImGui::Text(u8"Scale 크기");
+	//ImGui::SameLine(fTextWidth + 35);
+	//ImGui::DragFloat3("##Scale", (_float*)&FontDesc.vSize, 1.f, 0.f, g_iWinSizeX, "%.1f");
+
+	ImGui::PushItemWidth(ImGui::GetColumnOffset());
+	ImGui::Text(u8"Translate 위치");
+	ImGui::SameLine(fTextWidth + 35);
+	ImGui::DragFloat3("##Translate", (_float*)&FontDesc.vPos, 1.f, (_float)-0.1 * g_iWinSizeX, (_float)g_iWinSizeX, "%.1f");
+
+	ImGui::Text(u8"Rotate 회전");
+	ImGui::SameLine(fTextWidth + 35);
+	ImGui::DragFloat("##Rotate", (_float*)&FontDesc.fDegree, 1.f, (_int)-360, (_int)360, u8"Degree 각도 : %.1f");
+
+	ImGui::Text(u8"Color 색상");
+	ImGui::SameLine(fTextWidth + 35);
+	ImGui::DragFloat3("##Color", (_float*)&FontDesc.vColorRGBA, 0.1f, 0, 255, "%.1f");
+	ImGui::PopItemWidth();
 
 	return TRUE;
 }
@@ -822,6 +857,7 @@ _bool CEditor_UI::Delete_UIObject()
 	}
 }
 
+//진행 보류) 그룹 선택 후 기즈모 상속 동기화
 _bool CEditor_UI::Grouping_UIObject(UI_GROUP _eUIGroup)
 {
 	if (m_LayerUIs.empty()) //레이어가 없음

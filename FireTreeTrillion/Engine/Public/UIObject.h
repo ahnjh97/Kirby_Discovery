@@ -21,9 +21,10 @@ public:
 	{
 		//UI_TYPE		eUIType = { TYPE_NONE };
 		wstring		wstrUITag = { TEXT("") };
-		_float3		vCenter, vSize, vPos = { };
+		_float3		vCenter, vSize, vPos = { 0.f, 0.f, 0.f };
 		_float		fDegree = { 0.f };
 		_int		iTexIndex = { 0 };
+		_float4		vColorRGBA = { 0.f, 0.f, 0.f, 0.f };
 	}UIOBJ_DESC;
 
 #pragma region Getter/Setter

@@ -9,6 +9,17 @@ wstring CUtils::StrToWstr(const string& value)
 	return tag;
 }
 
+wstring CUtils::StrToWstrUTF8(const string& value)
+{
+	//UTF8 인코딩 변환하여 RenderFont를 위함
+	int len;
+	int strLength = static_cast<int>(value.length()) + 1;
+	len = MultiByteToWideChar(CP_UTF8, 0, value.c_str(), strLength, 0, 0);
+	std::wstring wstr(len, L'\0');
+	MultiByteToWideChar(CP_UTF8, 0, value.c_str(), strLength, &wstr[0], len);
+	return wstr;
+}
+
 // wstring --> string 변환
 string CUtils::WstrToStr(const wstring& value)
 {
@@ -16,6 +27,17 @@ string CUtils::WstrToStr(const wstring& value)
 	USES_CONVERSION;
 	stemp = std::string(W2A(value.c_str()));
 	return stemp;
+}
+
+string WstrToStrUTF8(const std::wstring& value)
+{
+	//UTF8 인코딩 변환하여 RenderFont를 위함
+	int len;
+	int wstrLength = static_cast<int>(value.length()) + 1;
+	len = WideCharToMultiByte(CP_UTF8, 0, value.c_str(), wstrLength, 0, 0, 0, 0);
+	std::string str(len, '\0');
+	WideCharToMultiByte(CP_UTF8, 0, value.c_str(), wstrLength, &str[0], len, 0, 0);
+	return str;
 }
 
 void CUtils::WCharToChar(const wchar_t* szWchar, char* szChar)

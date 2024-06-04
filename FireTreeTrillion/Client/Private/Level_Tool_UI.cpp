@@ -28,9 +28,6 @@ HRESULT CLevel_Tool_UI::Initialize()
 	if (FAILED(Ready_Layer_IMGUI(TEXT("Layer_IMGUI"))))
 		return E_FAIL;
 
-	//if (FAILED(Ready_RTV(TEXT("Layer_RTV"))))
-	//	return E_FAIL;
-
 	return S_OK;
 }
 
@@ -113,25 +110,11 @@ HRESULT CLevel_Tool_UI::Ready_Layer_UI(const wstring& strLayerTag)
 	return S_OK;
 }
 
+/*
 HRESULT CLevel_Tool_UI::Ready_RTV(const wstring& strLayerTag)
 {
-	_uint				iNumViewports = { 1 };
-	D3D11_VIEWPORT		ViewportDesc{};
-	m_pContext->RSGetViewports(&iNumViewports, &ViewportDesc);
 
-	//·»´õÅ¸°Ù ºä »ý¼º ¹× ÁØºñ
-	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_UI"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, 
-		DXGI_FORMAT_R32G32B32A32_FLOAT,_float4(0.f, 1.f, 0.f, 1.f))))
-	{
-		MSG_BOX(TEXT("Failed to Add : RenderTarget"));
-		return E_FAIL;
-	}
 
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_UI"), 50.f, g_iWinSizeY - 50.f, g_iWinSizeX * 0.75f, g_iWinSizeY * 0.75f)))
-	{
-		MSG_BOX(TEXT("Failed to Ready : RenderTarget"));
-		return E_FAIL;
-	}
 
 	//XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 	//XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizex, g_iWinSizeY, 0.f, 1.f));
@@ -178,6 +161,7 @@ HRESULT CLevel_Tool_UI::Ready_RTV(const wstring& strLayerTag)
 
 	return S_OK;
 }
+*/
 
 CLevel_Tool_UI* CLevel_Tool_UI::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

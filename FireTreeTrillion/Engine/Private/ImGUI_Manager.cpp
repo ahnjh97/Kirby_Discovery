@@ -71,7 +71,7 @@ HRESULT CImGUI_Manager::Render()
 {
 	// Rendering
 	//ImGui::EndFrame();
-	//ImGui::ShowDemoWindow(); //IMGUI 데모 윈도우
+	ImGui::ShowDemoWindow(); //IMGUI 데모 윈도우
 	ImGui::Render();
 
 	return S_OK;

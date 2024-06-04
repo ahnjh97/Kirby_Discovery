@@ -126,6 +126,12 @@ HRESULT CRenderer::Initialize()
 	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_MRA"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
 		return E_FAIL;
 
+	//06.04) UI 렌더타겟 뷰 생성 및 준비
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_UI"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 1.f, 0.f, 1.f))))
+	{
+		MSG_BOX(TEXT("Failed to Add : RenderTarget_UI"));
+		return E_FAIL;
+	}
 
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Diffuse"))))
 		return E_FAIL;
@@ -366,6 +372,14 @@ HRESULT CRenderer::Initialize()
 	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_DeferredInfo"), 900.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
 		return E_FAIL;
 
+	//06.04) UI 렌더타겟 뷰 생성 및 준비
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_UI"), 50.f, ViewportDesc.Height - 50.f, 
+		ViewportDesc.Width * 0.75f, ViewportDesc.Height * 0.75f)))
+	{
+		MSG_BOX(TEXT("Failed to Ready : RenderTarget_UI"));
+		return E_FAIL;
+	}
+
 #endif
 
 	function<void(_int)> TriggerFunc = bind(&CRenderer::Set_ColorSet_ByIndex, this, placeholders::_1);
@@ -451,24 +465,20 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 	if (FAILED(Render_SuperUI()))
 		return E_FAIL;
 
+	//레벨 별 옵션 ON/OFF
+	_uint* iCurrLevel = m_pGameInstance->Get_CurrentLevelID();
+	if (5 != *iCurrLevel) //LEVEL_TOOL_UI 제외
+	{
+		// 고사양, 저사양 모드
+		if (m_pGameInstance->Get_DIKeyState(DIK_E, KEY_DOWN))
+			m_bLowPass = !m_bLowPass;
+	}
 
-
-	/// 림 라이트
+	// 림 라이트
 	if (*m_pGameInstance->Get_CurrentLevelID() != 6)
 	{
 		if (m_pGameInstance->Get_DIKeyState(DIK_R, KEY_DOWN))
 			m_bRimTest = !m_bRimTest;
-	}
-	
-	// 고사양, 저사양 모드
-	if (m_pGameInstance->Get_DIKeyState(DIK_E, KEY_DOWN))
-	{
-		//레벨 별 사양 처리 (현재 TOOL_UI 레벨에서만 고/저사양 제외)
-		_uint* iCurrLevel = m_pGameInstance->Get_CurrentLevelID();
-		if (5 == *iCurrLevel) //LEVEL_TOOL_UI
-			return S_OK;
-
-		m_bLowPass = !m_bLowPass;
 	}
 
 #ifdef _DEBUG

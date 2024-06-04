@@ -120,6 +120,9 @@ HRESULT CMainApp::Ready_Fonts()
 	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUDSub_EN10"), TEXT("../Bin/Resources/Fonts/HUD_Sub_EN10.spritefont"))))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUDSub_KR15"), TEXT("../Bin/Resources/Fonts/HUD_Sub_KR15.SpriteFont"))))
+		return E_FAIL;
+
 	return S_OK;
 }
 
