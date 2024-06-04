@@ -147,10 +147,7 @@ void CImGUI_Manager::RenderGrid()
 
 void CImGUI_Manager::EditTransform(_float4x4& matrix)
 {
-#ifndef _MY_DEBUG
-	return;
-#endif
-
+#ifdef _DEBUG
 	ImGui::Separator();
 	ImGui::NewLine();
 
@@ -205,6 +202,8 @@ void CImGUI_Manager::EditTransform(_float4x4& matrix)
 	ViewMatrix = CGameInstance::Get_Instance()->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW);
 	ProjMatrix = CGameInstance::Get_Instance()->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
 	ImGuizmo::Manipulate(ViewMatrix.m[0], ProjMatrix.m[0], mCurrentGizmoOperation, mCurrentGizmoMode, matrix.m[0], NULL, useSnap ? &snap.x : NULL);
+
+#endif
 }
 
 CImGUI_Manager::FILE_MODE CImGUI_Manager::Set_FileDialog()

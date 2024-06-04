@@ -43,6 +43,7 @@ HRESULT CBasicMap::Initialize(void* pArg)
         }
         
         m_pModelCom->Create_OcTree(GameObjectDesc.vMin, GameObjectDesc.vMax);
+        
     }
     else    
         m_eRenderGroup = CRenderer::RENDER_BLEND;
@@ -65,11 +66,18 @@ _int CBasicMap::Tick(_float fTimeDelta)
 
     m_fTime += fTimeDelta;
 
+    if (m_pGameInstance->Get_KeyState(DIK_Q, KEY_DOWN))
+    {
+        m_bCull = !m_bCull;
+    }
+       
+
     if (nullptr != m_pBlendMap)
     {
         m_pBlendMap->Tick(fTimeDelta);
 
-        m_pModelCom->Culling(m_pTransformCom->Get_WorldMatrix_Inverse());
+        if(m_bCull)
+            m_pModelCom->Culling(m_pTransformCom->Get_WorldMatrix_Inverse());
     }
        
     return OBJ_NOEVENT;
@@ -87,38 +95,56 @@ HRESULT CBasicMap::Render()
 {
     if (FAILED(Bind_ShaderResources()))
         return E_FAIL;
-
-
-    _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
-
-    for (size_t i = 0; i < iNumMeshes; i++)
+    if (LEVEL_GAMEPLAY == *m_pGameInstance->Get_CurrentLevelID())
     {
-        if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
+        if (FAILED(m_pTextureCom->Bind_ShaderResources(m_pShaderCom, "g_DiffuseTexture")))
             return E_FAIL;
-        if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
+        if (FAILED(m_pTextureCom->Bind_ShaderResources(m_pShaderCom, "g_NormalTexture")))
             return E_FAIL;
-        if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
+        if (FAILED(m_pTextureCom->Bind_ShaderResources(m_pShaderCom, "g_MRATexture")))
             return E_FAIL;
-
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_fSamplingFactor", &m_vecSamplingFactors[i], sizeof(_float))))
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_fSamplingFactor", &m_vecSamplingFactors[0], sizeof(_float))))
             return E_FAIL;
-        if (i == m_iMeshIndex) {
-            if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fTime, sizeof(_float))))
-                return E_FAIL;
-        }
-        else {
-            if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fNonMatchTime, sizeof(_float))))
-                return E_FAIL;
-        }
-
-        if (FAILED(m_pShaderCom->Begin(m_vecPassIndices[i])))
-            return E_FAIL;
-                
-        if (FAILED(m_pModelCom->Render(i)))
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fNonMatchTime, sizeof(_float))))
             return E_FAIL;
         
+        if (FAILED(m_pShaderCom->Begin(0)))
+            return E_FAIL;
+        if (FAILED(m_pModelCom->Render()))
+            return E_FAIL;
     }
+    else
+    {
+        _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 
+        for (size_t i = 0; i < iNumMeshes; i++)
+        {
+            if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
+                return E_FAIL;
+            if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
+                return E_FAIL;
+            if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
+                return E_FAIL;
+
+            if (FAILED(m_pShaderCom->Bind_RawValue("g_fSamplingFactor", &m_vecSamplingFactors[i], sizeof(_float))))
+                return E_FAIL;
+            if (i == m_iMeshIndex) {
+                if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fTime, sizeof(_float))))
+                    return E_FAIL;
+            }
+            else {
+                if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fNonMatchTime, sizeof(_float))))
+                    return E_FAIL;
+            }
+
+            if (FAILED(m_pShaderCom->Begin(m_vecPassIndices[i])))
+                return E_FAIL;
+
+            if (FAILED(m_pModelCom->Render(i)))
+                return E_FAIL;
+        }
+    }
+    
     return S_OK;
 }
 
@@ -144,9 +170,13 @@ void CBasicMap::Render_IMGUI()
 
 HRESULT CBasicMap::Add_Components(const wstring& _wstrModelTag)
 {
+    wstring wstrShaderPrototypeTag = TEXT("Prototype_Component_Shader_VtxModel_");
+    if (LEVEL_GAMEPLAY == *m_pGameInstance->Get_CurrentLevelID())
+        wstrShaderPrototypeTag += TEXT("MergedMap");
+    else
+        wstrShaderPrototypeTag += TEXT("Map");
     /* For.Com_Shader */
-    if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Shader_VtxModel_Map"),
-        TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
+    if (FAILED(__super::Add_Component(wstrShaderPrototypeTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
         return E_FAIL;
 
     /* For.Com_Model */

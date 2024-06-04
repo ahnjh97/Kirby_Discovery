@@ -1,5 +1,7 @@
 #include "Model.h"
 #include "GameInstance.h"
+#include "TextureArray.h"
+#include "MergedMesh.h"
 #include "OcTree.h"
 //#include "Channel.h"
 #include "Texture.h"
@@ -22,6 +24,7 @@ CModel::CModel(const CModel & rhs)
 	, m_TransformMatrix { rhs.m_TransformMatrix }	
 	, m_iNumAnimations { rhs.m_iNumAnimations }	
 	, m_tModel{ rhs.m_tModel }
+	, m_pMergedMesh{ rhs.m_pMergedMesh }
 {
 	for (auto& pPrototypeAnimation : rhs.m_Animations)	
 		m_Animations.push_back(pPrototypeAnimation->Clone());
@@ -89,7 +92,7 @@ HRESULT CModel::Initialize_Prototype(MODEL tModel)
 
 	/* 모델을 구성하는 메시들을 생성한다. */
 	/* 모델 = 메시 + 메시 + ... */
-	if (FAILED(Ready_Meshes()))
+	if (FAILED(Ready_Meshes(tModel.bOctree)))
 		return E_FAIL;
 
  	if (FAILED(Ready_Materials(m_tModel.strModelName.c_str())))
@@ -102,6 +105,9 @@ HRESULT CModel::Initialize_Prototype(MODEL tModel)
 	}
 
 	m_InputFile.close();
+
+	if (true == tModel.bOctree)
+		Create_MergedMesh(TransformMatrix);
 
 	return S_OK;
 }
@@ -188,6 +194,17 @@ HRESULT CModel::Render(_uint iMeshIndex)
 	return S_OK;
 }
 
+HRESULT CModel::Render()
+{
+	if (nullptr == m_pMergedMesh)
+		return S_OK;
+
+	m_pMergedMesh->Bind_Buffers();
+	m_pMergedMesh->Render();
+
+	return S_OK;
+}
+
 HRESULT CModel::CreateDynamicActor(_float4 vPos)
 {
 	for (auto& mesh : m_Meshes)
@@ -241,94 +258,65 @@ void CModel::Find_MinMax(_float3& vMin, _float3& vMax)
 
 void CModel::Create_OcTree(_float3 vMin, _float3 vMax)
 {
-	if (vMin.x == 0)
+	if (vMin.x == 0 || false == m_tModel.bOctree || nullptr == m_pMergedMesh)
 		return;
-	
+
 	m_vMin = vMin;
 	m_vMax = vMax;
 	_float3 vCenter = _float3((m_vMin.x + m_vMax.x) * 0.5f, (m_vMin.y + m_vMax.y) * 0.5f, (m_vMin.z + m_vMax.z) * 0.5f);
 	_float3 vHalfExtents = _float3((m_vMax.x - m_vMin.x) * 0.5f, (m_vMax.y - m_vMin.y) * 0.5f, (m_vMax.z - m_vMin.z) * 0.5f);
 
-	vector<_float3*> vecMeshVerticesPtrs;
-	vector<_uint> vecMeshNumVertices;
-	vector<_uint*> vecMeshIndicesPtrs;
-	vector<_uint> vecMeshNumIndices;
+	_float3* pVerticesPtr = m_pMergedMesh->Get_VerticesPtr();
+	_uint iNumVertices = m_pMergedMesh->Get_NumVertices();
+	_uint* pIndicesPtr = m_pMergedMesh->Get_IndicesPtr();
+	_uint iNumIndices = m_pMergedMesh->Get_NumIndices();
 
-	for (auto& mesh : m_Meshes)
+	vector<FACE> vecFaces;
+
+	_int iCount{};
+	for (_uint i = 0; i < iNumIndices / 3; i++)
 	{
-		vecMeshVerticesPtrs.emplace_back(mesh->Get_VerticesPtr());
-		vecMeshNumVertices.emplace_back(mesh->Get_NumVertices());
-		vecMeshIndicesPtrs.emplace_back(mesh->Get_IndicesPtr());
-		vecMeshNumIndices.emplace_back(mesh->Get_NumIndices());
-	}
-
-	vector<vector<FACE>> vecMeshFaces(m_iNumMeshes);
-
-	for (_uint iMeshIdx = 0; iMeshIdx < m_iNumMeshes; iMeshIdx++)
-	{
-		_int iCount{};
-		for (_uint i = 0; i < vecMeshNumIndices[iMeshIdx] / 3; i++)
-		{
-			vecMeshFaces[iMeshIdx].emplace_back(vecMeshIndicesPtrs[iMeshIdx][iCount],
-				vecMeshIndicesPtrs[iMeshIdx][iCount + 1], vecMeshIndicesPtrs[iMeshIdx][iCount + 2]);
-			iCount += 3;
-		}
+		vecFaces.emplace_back(pIndicesPtr[iCount], pIndicesPtr[iCount + 1], pIndicesPtr[iCount + 2]);
+		iCount += 3;
 	}
 
 	string strFilePath = "../../../objects_txt/" + m_tModel.strModelName + "_Octree.txt";
 	ifstream fileInput(strFilePath, ios::in | ios::binary);
 
-	m_pOctree = COcTree::Create(m_iNumMeshes, vCenter, vHalfExtents, vecMeshVerticesPtrs, vecMeshNumVertices
-		, vecMeshFaces, fileInput);
+	m_pOctree = COcTree::Create(vCenter, vHalfExtents, pVerticesPtr, iNumVertices, vecFaces, fileInput);
 
 	fileInput.close();
 }
 
 void CModel::Culling(_fmatrix matWorldInverse)
 {
+	if (false == m_tModel.bOctree || m_pMergedMesh == nullptr)
+		return;
+
 	m_pGameInstance->TransformFrustum_LocalSpace(matWorldInverse);
 
-	vector<_float3*> vecMeshVerticesPtrs;
-	vecMeshVerticesPtrs.reserve(m_iNumMeshes);
-	vector<_uint> vecMeshNumVertices;
-	vecMeshNumVertices.reserve(m_iNumMeshes);
+	_float3* pVerticePoses = m_pMergedMesh->Get_VerticesPtr();
+	_uint iNumvertices = m_pMergedMesh->Get_NumVertices();
+	vector<FACE> vecResultFaces;
 
-	for(auto& mesh : m_Meshes)
+	m_pOctree->Culling(m_pGameInstance, pVerticePoses, iNumvertices, vecResultFaces);
+		
+	D3D11_MAPPED_SUBRESOURCE		SubResource{};
+	ID3D11Buffer* pMeshIB = m_pMergedMesh->Get_IndexBufferPtr();
+
+	m_pContext->Map(pMeshIB, 0, D3D11_MAP_WRITE_DISCARD, 0, &SubResource);
+	_uint* pIndices = static_cast<_uint*>(SubResource.pData);
+	if (nullptr == pIndices)
 	{
-		vecMeshVerticesPtrs.emplace_back(mesh->Get_VerticesPtr());
-		vecMeshNumVertices.emplace_back(mesh->Get_NumVertices());
-	}
-
-	vector<vector<FACE>> vecCulledIndices(m_iNumMeshes);
-
-	m_pOctree->Culling(m_pGameInstance, vecMeshVerticesPtrs, vecMeshNumVertices, vecCulledIndices);
-
-	for (_uint j = 0; j < m_iNumMeshes; j++)
-	{
-		D3D11_MAPPED_SUBRESOURCE		SubResource{};
-		ID3D11Buffer* pMeshIB = m_Meshes[j]->Get_IndexBufferPtr();
-
-		m_pContext->Map(pMeshIB, 0, D3D11_MAP_WRITE_DISCARD, 0, &SubResource);
-
-		_uint* pIndices = static_cast<_uint*>(SubResource.pData);
-		if (nullptr == pIndices)
-		{
-			m_pContext->Unmap(pMeshIB, 0);
-			continue;
-		}
-
-		_uint iIndex{};
-		for (auto& face : vecCulledIndices[j])
-		{
-			pIndices[iIndex++] = face.iA;
-			pIndices[iIndex++] = face.iB;
-			pIndices[iIndex++] = face.iC;
-		}
-
-		m_Meshes[j]->Set_NumIndices(iIndex);
 		m_pContext->Unmap(pMeshIB, 0);
+		return;
 	}
 
+	memcpy(pIndices, vecResultFaces.data(), vecResultFaces.size() * sizeof(FACE));
+
+	m_pMergedMesh->Set_NumIndices(vecResultFaces.size() * 3);
+	m_pContext->Unmap(pMeshIB, 0);
+	
 	return;
 }
 
@@ -385,13 +373,59 @@ void CModel::Save_OctreeData()
 	MSG_BOX(TEXT("Octree Saved."));
 }
 
-HRESULT CModel::Ready_Meshes()
+void CModel::Create_MergedMesh(_fmatrix TransformMatrix)
+{
+	vector<_float3*> vecMeshVerticesPtrs;
+	vector<_uint> vecMeshNumVertices;
+	vector<_float3*> vecMeshNormalsPtrs;
+	vector<_uint*> vecMeshIndicesPtrs;
+	vector<_uint> vecMeshNumIndices;
+	vector<_uint> vecMaterialIndices;
+
+	for (auto& mesh : m_Meshes)
+	{
+		vecMeshVerticesPtrs.emplace_back(mesh->Get_VerticesPtr());
+		vecMeshNumVertices.emplace_back(mesh->Get_NumVertices());
+		vecMeshNormalsPtrs.emplace_back(mesh->Get_NormalsPtr());
+		vecMeshIndicesPtrs.emplace_back(mesh->Get_IndicesPtr());
+		vecMeshNumIndices.emplace_back(mesh->Get_NumIndices());
+		vecMaterialIndices.emplace_back(mesh->Get_MaterialIndex());
+	}
+
+	m_pMergedMesh = CMergedMesh::Create(m_pDevice, m_pContext, vecMeshVerticesPtrs, vecMeshNumVertices,
+		vecMeshNormalsPtrs, vecMeshIndicesPtrs, vecMeshNumIndices, vecMaterialIndices, m_tModel.strModelName, TransformMatrix);
+}
+
+void CModel::Create_TextureArray()
+{
+	ID3D11Resource* pResource = { nullptr };
+	ID3D11ShaderResourceView* pSRV = m_Materials[0].MaterialTextures[TextureType_DIFFUSE]->Get_pSRV_ByIndex(0);
+	ID3D11Texture2D* pSrcTexture = static_cast<ID3D11Texture2D*>(pResource);
+	D3D11_TEXTURE2D_DESC desc;
+	pSrcTexture->GetDesc(&desc);
+	pResource->Release();
+
+	D3D11_TEXTURE2D_DESC arrayDesc = desc;
+	arrayDesc.ArraySize = m_Materials.size();
+	arrayDesc.Usage = D3D11_USAGE_DEFAULT;
+	arrayDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	arrayDesc.CPUAccessFlags = 0;
+	arrayDesc.MiscFlags = 0;
+
+	ID3D11Texture2D* pTextureArray = nullptr;
+	HRESULT hr = m_pDevice->CreateTexture2D(&arrayDesc, nullptr, &pTextureArray);
+	if (FAILED(hr)) {
+		// 오류 처리
+	}
+}
+
+HRESULT CModel::Ready_Meshes(_bool bOctree)
 {
 	m_InputFile.read(reinterpret_cast<char*>(&m_iNumMeshes), sizeof(m_iNumMeshes));
 
 	for (size_t i = 0; i < m_iNumMeshes; i++)
 	{
-		CMesh* pMesh = CMesh::Create(m_pDevice, m_pContext, m_tModel.eType, m_strDirectory, m_InputFile, m_Bones, XMLoadFloat4x4(&m_TransformMatrix));
+		CMesh* pMesh = CMesh::Create(m_pDevice, m_pContext, m_tModel.eType, m_strDirectory, m_InputFile, m_Bones, XMLoadFloat4x4(&m_TransformMatrix), bOctree);
 		if (nullptr == pMesh)
 			return E_FAIL;
 
@@ -503,6 +537,10 @@ void CModel::Free()
 
 	Safe_Release(m_pOctree);
 
+	for (auto& pTexArr : m_vecTextureArrayPtrs)
+		Safe_Release(pTexArr);
+	m_vecTextureArrayPtrs.clear();
+
 	for (auto& pAnimation : m_Animations)
 		Safe_Release(pAnimation);
 	m_Animations.clear();
@@ -517,6 +555,8 @@ void CModel::Free()
 			Safe_Release(Material.MaterialTextures[i]);
 	}
 	m_Materials.clear();
+
+	Safe_Release(m_pMergedMesh);
 
 	for (auto& pMesh : m_Meshes)
 		Safe_Release(pMesh);

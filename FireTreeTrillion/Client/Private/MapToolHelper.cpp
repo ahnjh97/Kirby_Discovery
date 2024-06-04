@@ -332,11 +332,11 @@ void CMapToolHelper::Edit_Object()
 		if (pTransform != nullptr)
 		{
 			ImGui::Begin("Guizmo");
-			Safe_AddRef(pTransform);
+			//Safe_AddRef(pTransform);
 			_float4x4 tempMatrix = pTransform->Get_WorldFloat4x4();
 			m_pGameInstance->EditTransform(tempMatrix); // 선택한 모델의 월드행렬을 수정 
 			pTransform->Set_WorldMatrix(tempMatrix);
-			Safe_Release(pTransform);
+			//Safe_Release(pTransform);
 			ImGui::End();
 		}
 	}

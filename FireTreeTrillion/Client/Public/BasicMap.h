@@ -52,6 +52,7 @@ private:
 	_float m_fTime = { };
 	_uint m_iMeshIndex = {};
 	_float m_fNonMatchTime = {};
+	_bool m_bCull = { false };
 
 private:
 	HRESULT Add_Components(const wstring& _wstrModelTag);

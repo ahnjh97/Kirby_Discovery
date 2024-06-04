@@ -13,7 +13,7 @@ using namespace ImGui;
 
 class CFXToolDirector final :  public CGameObject
 {
-#ifdef _MY_DEBUG
+#ifdef _DEBUG
 	friend class CMultiEffect;
 #endif
 

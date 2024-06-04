@@ -11,7 +11,7 @@
 #include "VIBuffer_Instance_Point.h"
 #include "RigidBody.h"
 #include "CharacterController.h"
-
+#include "TextureArray.h"
 #include "Component.h"
 
 BEGIN(Engine)

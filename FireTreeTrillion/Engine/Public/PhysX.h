@@ -53,28 +53,32 @@ public:
     PxRigidStatic*  CreateStaticActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
 
 private:
-    PxDefaultAllocator                  mDefaultAllocatorCallback;
-    PxDefaultErrorCallback              mDefaultErrorCallback;
-    PxTolerancesScale                   mToleranceScale;
+    PxDefaultAllocator          mDefaultAllocatorCallback;
+    PxDefaultErrorCallback      mDefaultErrorCallback;
+    PxTolerancesScale           mToleranceScale;
 
-    PxControllerManager*                m_pControllerManager = nullptr;
+    PxControllerManager*        m_pControllerManager = { nullptr };
     
-    PxDefaultCpuDispatcher*             m_pDispatcher = nullptr;
-    PxPvdTransport*                     m_pPvdTransport = nullptr;
-    PxFoundation*                       m_pFoundation = nullptr;
-    PxPhysics*                          m_pPhysics = nullptr;
-    PxShape*                            m_pShape = nullptr;
+    PxDefaultCpuDispatcher*     m_pDispatcher       = { nullptr };
+    PxPvdTransport*             m_pPvdTransport     = { nullptr };
+    PxFoundation*               m_pFoundation       = { nullptr };
+    PxPhysics*                  m_pPhysics          = { nullptr };
+    PxShape*                    m_pShape            = { nullptr };
     
-    PxMaterial*                         m_pMaterial = nullptr;
+    PxMaterial*                 m_pMaterial         = { nullptr };
     
-    PxPvd*                              m_pPvd = nullptr;
-    PxScene*                            m_pScene = nullptr;
-    PxPvdSceneClient*                   m_pPvdSceneClient = nullptr;
+    PxPvd*                      m_pPvd              = { nullptr };
+    PxScene*                    m_pScene            = { nullptr };
+    PxPvdSceneClient*           m_pPvdSceneClient   = { nullptr };
 
     //PxCooking*                        m_pCooking = nullptr;
-    PxRigidDynamic*              m_pRigidDynamic = nullptr;
+    PxRigidDynamic*             m_pRigidDynamic     = { nullptr };
 
-    map<string, PxMaterial*>     m_mapMaterials;
+    class CEventCallBack*       m_pEventCallBack    = { nullptr };
+
+    map<string, PxMaterial*>    m_mapMaterials;
+
+
 
 private:
     // 충돌처리할 그룹들의 결과컨텐츠를 2차원 배열로 저장합니다.

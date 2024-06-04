@@ -13,7 +13,8 @@ CMesh::CMesh(const CMesh & rhs)
 
 }
 
-HRESULT CMesh::Initialize_Prototype(TYPE eModelType, string strDirectory, const vector<CBone*>& Bones, _fmatrix TransformMatrix)
+HRESULT CMesh::Initialize_Prototype(TYPE eModelType, string strDirectory, const vector<CBone*>& Bones
+	, _fmatrix TransformMatrix, _bool bOctree)
 {
 	m_strDirectory = strDirectory;
 	if (!m_InputFile.is_open())
@@ -38,7 +39,7 @@ HRESULT CMesh::Initialize_Prototype(TYPE eModelType, string strDirectory, const 
 
 #pragma region VERTEX_BUFFER
 
-	HRESULT hr = TYPE_NONANIM == eModelType ? Ready_Vertices_For_NonAnimModel(TransformMatrix) : Ready_Vertices_For_AnimModel(Bones);
+	HRESULT hr = TYPE_NONANIM == eModelType ? Ready_Vertices_For_NonAnimModel(TransformMatrix, bOctree) : Ready_Vertices_For_AnimModel(Bones);
 	if (FAILED(hr))
 		return E_FAIL;
 
@@ -51,11 +52,12 @@ HRESULT CMesh::Initialize_Prototype(TYPE eModelType, string strDirectory, const 
 
 	/* 인덱스 버퍼의 byte크기 */
 	m_BufferDesc.ByteWidth = m_iIndexStride * m_iNumIndices;
-	m_BufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	m_BufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	m_BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	m_BufferDesc.MiscFlags = 0;
 	m_BufferDesc.StructureByteStride = 0;
+	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	m_BufferDesc.CPUAccessFlags = 0;
+	
 
 	_uint* pIndices = new _uint[m_iNumIndices];
 	m_pIndices = new _uint[m_iNumIndices];
@@ -76,9 +78,9 @@ HRESULT CMesh::Initialize_Prototype(TYPE eModelType, string strDirectory, const 
 
 	Safe_Delete_Array(pIndices);
 
-#pragma endregion
+	#pragma endregion
 
-	return S_OK;
+		return S_OK;
 }
 
 HRESULT CMesh::Initialize(void * pArg)
@@ -164,7 +166,6 @@ _float4 CMesh::Get_PickPos(const CTransform* pTransform) const
 			fShortest = iter.w;
 			fResult = iter;
 		}
-			
 	}
 
 	return fResult;
@@ -191,7 +192,7 @@ void CMesh::Find_MinMax(_float3& vMin, _float3& vMax)
 	}
 }
 
-HRESULT CMesh::Ready_Vertices_For_NonAnimModel(_fmatrix TransformMatrix)
+HRESULT CMesh::Ready_Vertices_For_NonAnimModel(_fmatrix TransformMatrix, _bool bOcTree)
 {
 	m_iVertexStride = sizeof(VTXMESH);
 
@@ -214,6 +215,13 @@ HRESULT CMesh::Ready_Vertices_For_NonAnimModel(_fmatrix TransformMatrix)
 		XMStoreFloat3(&pVertices[i].vPosition, XMVector3TransformCoord(XMLoadFloat3(&pVertices[i].vPosition), TransformMatrix));
 		XMStoreFloat3(&pVertices[i].vNormal, XMVector3TransformNormal(XMLoadFloat3(&pVertices[i].vNormal), TransformMatrix));
 		m_pVerticesPos[i] = pVertices[i].vPosition;
+	}
+
+	if (true == bOcTree)
+	{
+		m_pNormals = new _float3[m_iNumVertices];
+		for (size_t i = 0; i < m_iNumVertices; i++)
+			m_pNormals[i] = pVertices[i].vNormal;
 	}
 
 	ZeroMemory(&m_InitialData, sizeof m_InitialData);
@@ -293,11 +301,12 @@ HRESULT CMesh::Ready_Vertices_For_AnimModel(const vector<CBone*>& Bones)
 	return S_OK;
 }
 
-CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eModelType, string strDirectory, ifstream& fileStream, const vector<CBone*>& Bones, _fmatrix TransformMatrix)
+CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eModelType, string strDirectory
+	, ifstream& fileStream, const vector<CBone*>& Bones, _fmatrix TransformMatrix, _bool bOctree)
 {
 	CMesh* pInstance = new CMesh(pDevice, pContext, fileStream);
 
-	if (FAILED(pInstance->Initialize_Prototype(eModelType, strDirectory, Bones, TransformMatrix)))
+	if (FAILED(pInstance->Initialize_Prototype(eModelType, strDirectory, Bones, TransformMatrix, bOctree)))
 	{
 		MSG_BOX(TEXT("Failed To Create : CMesh"));
 
@@ -318,8 +327,7 @@ void CMesh::Free()
 
 	if (false == m_isCloned)
 	{
-		Safe_Delete_Array(m_pIndices);
-		Safe_Delete_Array(m_pVerticesPos);
+		Safe_Delete_Array(m_pNormals);
 
 		if (nullptr != m_pActor) {
 			PxScene* scene = m_pActor->getScene();

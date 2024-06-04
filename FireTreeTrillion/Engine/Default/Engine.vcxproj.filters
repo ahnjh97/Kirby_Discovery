@@ -193,6 +193,9 @@
     <Filter Include="01.Utility\02.Components\Model\OcTree">
       <UniqueIdentifier>{11710d6a-3e27-44aa-b551-74fa08ad3193}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\02.Components\Model\MergedMesh">
+      <UniqueIdentifier>{be936d1b-112b-4ee8-afd7-2d63485fb3a0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Base.cpp">
@@ -398,6 +401,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\OcTree.cpp">
       <Filter>01.Utility\02.Components\Model\OcTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MergedMesh.cpp">
+      <Filter>01.Utility\02.Components\Model\MergedMesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TextureArray.cpp">
+      <Filter>01.Utility\02.Components\Texture</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -631,6 +640,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\OcTree.h">
       <Filter>01.Utility\02.Components\Model\OcTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MergedMesh.h">
+      <Filter>01.Utility\02.Components\Model\MergedMesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TextureArray.h">
+      <Filter>01.Utility\02.Components\Texture</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

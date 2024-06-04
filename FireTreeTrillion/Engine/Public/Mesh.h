@@ -2,7 +2,6 @@
 /* 디자이너분들이 저장해준 정점과 인덱스의 정보를 바탕으로해서 정점, 인덱스버퍼를 새엏나다.  */
 #include "VIBuffer.h"
 #include "Model.h"
-#include <fstream>
 
 BEGIN(Engine)
 
@@ -16,16 +15,12 @@ private:
 public:
 	_uint Get_MaterialIndex() const { return m_iMaterialIndex; }
 	string Get_Name() { return string(m_szName); }
-	_float3* Get_VerticesPtr() { return m_pVerticesPos; }
-	_uint Get_NumVertices() { return m_iNumVertices; }
-	_uint* Get_IndicesPtr() { return m_pIndices; }
-	_uint Get_NumIndices() { return m_iNumIndices; }
-	ID3D11Buffer* Get_IndexBufferPtr() { return m_pIB; }
-	
-	void Set_NumIndices(_uint iNumIndices) { m_iNumIndices = iNumIndices; }
+	_float3* Get_NormalsPtr() { return m_pNormals; }
+
 
 public:
-	virtual HRESULT Initialize_Prototype(TYPE eModelType, string strDirectory, const vector<CBone*>& Bones, _fmatrix TransformMatrix);
+	virtual HRESULT Initialize_Prototype(TYPE eModelType, string strDirectory, const vector<CBone*>& Bones
+		, _fmatrix TransformMatrix, _bool bOctree);
 	virtual HRESULT Initialize(void* pArg) override;
 #ifdef _DEBUG
 	virtual void	Render_IMGUI();
@@ -58,21 +53,21 @@ private:
 	_uint		m_iFaces = { 0 };
 	string		m_strDirectory;
 	streampos	m_filePointerPos;
-	ifstream& m_InputFile;
-	_float3* m_pVerticesPos = { nullptr }; // 정점 위치 
-	_uint* m_pIndices = { nullptr }; // 인덱스 버퍼 
+	ifstream&	m_InputFile;
+
+	_float3*	m_pNormals = { nullptr };
 
 	class PxTriangleMeshGeometry m_TriangleMeshGeometry;
 	class PxTriangleMesh* m_pTriangleMesh = { nullptr };
 	class PxRigidActor* m_pActor = { nullptr };
 
 private:
-	HRESULT Ready_Vertices_For_NonAnimModel(_fmatrix TransformationMatrix);
+	HRESULT Ready_Vertices_For_NonAnimModel(_fmatrix TransformationMatrix, _bool bOcTree);
 	HRESULT Ready_Vertices_For_AnimModel(const vector<CBone*>& Bones);
 
 public:
 	static CMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eModelType, string strDirectory
-		, ifstream& fileStream, const vector<class CBone*>& Bones, _fmatrix TransformMatrix);
+		, ifstream& fileStream, const vector<class CBone*>& Bones, _fmatrix TransformMatrix, _bool bOctree);
 	virtual CMesh* Clone(void* pArg);
 	virtual void Free() override;
 };

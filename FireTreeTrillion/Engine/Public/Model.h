@@ -2,7 +2,6 @@
 
 #include "Component.h"
 #include "Animation.h"
-#include <fstream>
 
 BEGIN(Engine)
 
@@ -23,14 +22,9 @@ public:
 	_bool IsFinished(_uint iCurrentAnimIndex) { return m_Animations[iCurrentAnimIndex]->IsFinished(); }
 
 	string Get_MeshName(_uint iMeshIndex);
-
 	_float Get_Duration() { return m_Animations[m_iCurrentAnimIndex]->Get_Duration(); }
-
 	_float Get_Trackposition() { return m_Animations[m_iCurrentAnimIndex]->Get_TrackPosition(); }
-
-	_float Get_AnimRatio() {
-		return m_Animations[m_iCurrentAnimIndex]->Get_AnimRatio();
-	}
+	_float Get_AnimRatio() { return m_Animations[m_iCurrentAnimIndex]->Get_AnimRatio(); }
 
 public:
 	void Set_TickPerSecond(_float _fTickPerSecond) { m_Animations[m_iCurrentAnimIndex]->Set_TickPerSecond(_fTickPerSecond); }
@@ -77,6 +71,7 @@ public:
 	void	Stop_Animation() { m_bStop = true; }
 	void	Replay_Animation() { m_bStop = false; }
 	HRESULT Render(_uint iMeshIndex);
+	HRESULT Render();
 
 	HRESULT CreateDynamicActor(_float4 vPos);
 	HRESULT CreateStaticActor(_float4 vPos);
@@ -87,6 +82,9 @@ public:
 	void Create_OcTree(_float3 vMin, _float3 vMax);
 	void Culling(_fmatrix matWorldInverse);
 	void Save_OctreeData();
+
+	void Create_MergedMesh(_fmatrix TransformMatrix);
+	void Create_TextureArray();
 
 private:
 	_uint						m_iNumMeshes = { 0 };
@@ -119,8 +117,12 @@ private:
 	// ¸ðµ¨ Á¤º¸
 	MODEL						m_tModel;
 
+	class CMergedMesh*			m_pMergedMesh = { nullptr };
+	_uint						m_iNumTotalIndices = {};
+	vector<class CTextureArray*>	m_vecTextureArrayPtrs;
+
 private:
-	HRESULT Ready_Meshes();
+	HRESULT Ready_Meshes(_bool bOctree);
 	HRESULT Ready_Materials(const _char* pModelFilePath);
 	HRESULT Ready_Bones();
 	HRESULT Ready_Animations();

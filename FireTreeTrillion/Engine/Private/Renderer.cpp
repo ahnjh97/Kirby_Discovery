@@ -511,10 +511,10 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 		m_DestColorData = Find_ColorSet("Default");
 		break;
 	case 1:
-		m_DestColorData = Find_ColorSet("Forest");
+		m_DestColorData = Find_ColorSet("Night");
 		break;
 	case 2:
-		m_DestColorData = Find_ColorSet("Night");
+		m_DestColorData = Find_ColorSet("Tutorial");
 		break;
 	default:
 		break;

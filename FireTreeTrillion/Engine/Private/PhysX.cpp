@@ -14,21 +14,21 @@ HRESULT CPhysX::Initialize()
     m_pFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, mDefaultAllocatorCallback, mDefaultErrorCallback);
     if (!m_pFoundation) throw("PxCreateFoundation failed!");
     m_pPvd = PxCreatePvd(*m_pFoundation);
-    m_pPvdTransport = physx::PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
-    m_pPvd->connect(*m_pPvdTransport, physx::PxPvdInstrumentationFlag::eALL);
+    m_pPvdTransport = PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
+    m_pPvd->connect(*m_pPvdTransport, PxPvdInstrumentationFlag::eALL);
 
     //mPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *mFoundation, PxTolerancesScale(),true, mPvd);
     mToleranceScale.length = 1;        // typical length of an object
     mToleranceScale.speed = 0.1f;      // typical speed of an object, gravity * 1s is a reasonable choice
 
     m_pPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *m_pFoundation, mToleranceScale, true, m_pPvd);
-    CEventCallBack* pEventCallBack = new CEventCallBack();
+    m_pEventCallBack = new CEventCallBack();
     PxSceneDesc sceneDesc(m_pPhysics->getTolerancesScale());
-    sceneDesc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
-    m_pDispatcher = physx::PxDefaultCpuDispatcherCreate(2);
+    sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
+    m_pDispatcher = PxDefaultCpuDispatcherCreate(2);
     sceneDesc.cpuDispatcher = m_pDispatcher;
-    sceneDesc.simulationEventCallback = pEventCallBack;
-    sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
+    sceneDesc.simulationEventCallback = m_pEventCallBack;
+    sceneDesc.filterShader = PxDefaultSimulationFilterShader;
     sceneDesc.broadPhaseType = PxBroadPhaseType::eSAP; // 또는 eMBP
 
     m_pScene = m_pPhysics->createScene(sceneDesc);
@@ -96,7 +96,7 @@ void CPhysX::Tick(_float fTimeDelta)
 /// physX에 영향을 받는 테스트용 Ground를 만들어줍니다.
 void CPhysX::Ready_TestGround()
 {
-    physx::PxRigidStatic* groundPlane = PxCreatePlane(*m_pPhysics, physx::PxPlane(0, 1, 0, 0), *m_pMaterial);
+    PxRigidStatic* groundPlane = PxCreatePlane(*m_pPhysics, PxPlane(0, 1, 0, 0), *m_pMaterial);
     m_pScene->addActor(*groundPlane);
 }
 
@@ -104,18 +104,18 @@ void CPhysX::Test()
 {
     // create simulation
     m_pMaterial = m_pPhysics->createMaterial(0.5f, 0.5f, 0.6f);
-    physx::PxRigidStatic* groundPlane = PxCreatePlane(*m_pPhysics, physx::PxPlane(0, 1, 0, 0), *m_pMaterial);
+    PxRigidStatic* groundPlane = PxCreatePlane(*m_pPhysics, PxPlane(0, 1, 0, 0), *m_pMaterial);
     m_pScene->addActor(*groundPlane);
 
     float halfExtent = .5f;
-    m_pShape = m_pPhysics->createShape(physx::PxBoxGeometry(halfExtent, halfExtent, halfExtent), *m_pMaterial);
-    physx::PxU32 size = 30;
-    physx::PxTransform t(physx::PxVec3(0));
+    m_pShape = m_pPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *m_pMaterial);
+    PxU32 size = 30;
+    PxTransform t(PxVec3(0));
 
-    physx::PxTransform localTm(physx::PxVec3(0, 0, 0) * halfExtent);
+    PxTransform localTm(PxVec3(0, 0, 0) * halfExtent);
     m_pRigidDynamic = m_pPhysics->createRigidDynamic(t.transform(localTm));
     m_pRigidDynamic->attachShape(*m_pShape);
-    physx::PxRigidBodyExt::updateMassAndInertia(*m_pRigidDynamic, 10.0f);
+    PxRigidBodyExt::updateMassAndInertia(*m_pRigidDynamic, 10.0f);
     m_pScene->addActor(*m_pRigidDynamic);
 }
 
@@ -131,62 +131,58 @@ _float4x4 CPhysX::Update(_fmatrix matrix)
 
 void CPhysX::AddActor(physx::PxActor& pActor)
 {
+    if (nullptr == m_pScene)
+        return;
+
     m_pScene->addActor(pActor);
 }
 
 void CPhysX::RemoveActor(physx::PxActor& pActor)
 {
+    if (nullptr == m_pScene)
+        return;
+
     m_pScene->removeActor(pActor);
 }
 
 void CPhysX::Register_Player(PxActor* pPlayerActor)
 {
-    if (nullptr == m_pScene)
+    if (nullptr == m_pEventCallBack)
         return;
-    CEventCallBack* pEventCallBack = dynamic_cast<CEventCallBack*>(m_pScene->getSimulationEventCallback());
-    if (nullptr == pEventCallBack)
-        return;
-    pEventCallBack->Register_Player(pPlayerActor);
+
+    m_pEventCallBack->Register_Player(pPlayerActor);
 }
 
 void CPhysX::Register_Trigger(PxActor* pTriggerActor, _int iTriggerType, _int iTriggerIndex)
 {
-    if (nullptr == m_pScene)
+    if (nullptr == m_pEventCallBack)
         return;
-    CEventCallBack* pEventCallBack = dynamic_cast<CEventCallBack*>(m_pScene->getSimulationEventCallback());
-    if (nullptr == pEventCallBack)
-        return;
-    pEventCallBack->Register_Trigger(pTriggerActor, iTriggerType, iTriggerIndex);
+
+    m_pEventCallBack->Register_Trigger(pTriggerActor, iTriggerType, iTriggerIndex);
 }
 
 void CPhysX::Emplace_TriggerFunc(_int iTriggerType, function<void(_int)> func)
 {
-    if (nullptr == m_pScene)
+    if (nullptr == m_pEventCallBack)
         return;
-    CEventCallBack* pEventCallBack = dynamic_cast<CEventCallBack*>(m_pScene->getSimulationEventCallback());
-    if (nullptr == pEventCallBack)
-        return;
-    pEventCallBack->Emplace_TriggerFunc(iTriggerType, func);
+
+    m_pEventCallBack->Emplace_TriggerFunc(iTriggerType, func);
 }
 
 void CPhysX::Emplace_ExitFunc(_int iTriggerType, function<void(void)> exitFunc)
 {
-    if (nullptr == m_pScene)
+    if (nullptr == m_pEventCallBack)
         return;
-    CEventCallBack* pEventCallBack = dynamic_cast<CEventCallBack*>(m_pScene->getSimulationEventCallback());
-    if (nullptr == pEventCallBack)
-        return;
-    pEventCallBack->Emplace_ExitFunc(iTriggerType, exitFunc);
+
+    m_pEventCallBack->Emplace_ExitFunc(iTriggerType, exitFunc);
 }
 
 void CPhysX::Clear_EventCallBack()
 {
-    if (nullptr == m_pScene)
+    if (nullptr == m_pEventCallBack)
         return;
-    CEventCallBack* pEventCallBack = dynamic_cast<CEventCallBack*>(m_pScene->getSimulationEventCallback());
-    if (nullptr == pEventCallBack)
-        return;
-    pEventCallBack->Clear_EventCallBack();
+
+    m_pEventCallBack->Clear_EventCallBack();
 }
 
 //physx::PxMaterial* CPhysX::FindMaterial(const string& strMtrlTag)
@@ -299,7 +295,7 @@ CPhysX* CPhysX::Create()
 
     if (FAILED(pInstance->Initialize()))
     {
-        MSG_BOX(TEXT("Failed to Created : CPhysX"));
+        MSG_BOX(TEXT("Failed to Create : CPhysX"));
         Safe_Release(pInstance);
     }
 
@@ -317,8 +313,8 @@ void CPhysX::Free()
 
     m_pControllerManager->release();
 
-    PxSimulationEventCallback* pEventCallback = m_pScene->getSimulationEventCallback();
-    Safe_Delete(pEventCallback);
+    Safe_Delete(m_pEventCallBack);
+
     // 2. Scene 해제
     if (m_pScene != nullptr)
         m_pScene->release();
@@ -366,7 +362,7 @@ void CSimulationEventCallback::onContact(const PxContactPairHeader& pairHeader, 
 	}
 }
 
-void CSimulationEventCallback::onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 count)
+void CSimulationEventCallback::onTrigger(PxTriggerPair* pairs, PxU32 count)
 {
 }
 
@@ -411,7 +407,7 @@ PxControllerBehaviorFlags CControllerBehaviorCallback::getBehaviorFlags(const Px
 }
 
 
-void CUserControllerHitReport::onShapeHit(const physx::PxControllerShapeHit& hit)
+void CUserControllerHitReport::onShapeHit(const PxControllerShapeHit& hit)
 {
 }
 

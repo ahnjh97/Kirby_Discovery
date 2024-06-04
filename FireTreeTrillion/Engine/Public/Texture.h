@@ -12,15 +12,15 @@ private:
 	virtual ~CTexture() = default;
 
 #pragma region Getter & Setter
-
 public:
 	_uint Get_NumTexture() { return m_iNumTextures; }
-
+	ID3D11ShaderResourceView* Get_pSRV_ByIndex(_int iIndex) { return m_Textures[iIndex]; }
 #pragma endregion
 
 public:
 	virtual HRESULT Initialize_Prototype(const wstring& strTextureFilePath, _uint iNumTexture);
 	virtual HRESULT Initialize(void* pArg) override;
+
 public:
 	HRESULT Bind_ShaderResource(class CShader* pShader, const _char* pConstantName, _uint iTextureIndex = 0);
 	HRESULT Bind_ShaderResources(class CShader* pShader, const _char* pConstantName);
