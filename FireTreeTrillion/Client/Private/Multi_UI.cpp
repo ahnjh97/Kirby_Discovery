@@ -33,7 +33,7 @@ HRESULT CMulti_UI::Initialize(void* _pArg)
 
 	CUIObject* pUIObj = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Single_UI"), &MultiUI_Desc));
 	CHECK_NULLPTR(pUIObj);
-	m_MultiUIs.push_back(pUIObj);
+	//m_GroupUIs.push_back(pUIObj);
 
 #pragma endregion
 
@@ -44,29 +44,29 @@ _int CMulti_UI::Tick(_float _fTimeDelta)
 {	
 	__super::Tick(_fTimeDelta);
 
-	if (!m_MultiUIs.empty())
-	{
-		for (auto& pUIObj : m_MultiUIs)
-			pUIObj->Tick(_fTimeDelta);
-	}
+	//if (!m_GroupUIs.empty())
+	//{
+	//	for (auto& pUIObj : m_GroupUIs)
+	//		pUIObj->Tick(_fTimeDelta);
+	//}
 
 	return OBJ_NOEVENT;
 }
 
 void CMulti_UI::Late_Tick(_float _fTimeDelta)
 {
-	if (!m_MultiUIs.empty())
-	{
-		for (auto& pUIObj : m_MultiUIs)
-			pUIObj->Late_Tick(_fTimeDelta);
-	}
+	//if (!m_GroupUIs.empty())
+	//{
+	//	for (auto& pUIObj : m_GroupUIs)
+	//		pUIObj->Late_Tick(_fTimeDelta);
+	//}
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_UI, this);
 }
 
 HRESULT CMulti_UI::Render()
 {
-	//for (auto& pUIObj : m_MultiUIs)
+	//for (auto& pUIObj : m_GroupUIs)
 	//	pUIObj->Render();
 
 	return S_OK;
@@ -123,10 +123,10 @@ void CMulti_UI::Free()
 {
 	__super::Free();
 
-	for (auto& pUIObj : m_MultiUIs)
-		Safe_Release(pUIObj);
+	//for (auto& pUIObj : m_GroupUIs)
+	//	Safe_Release(pUIObj);
 
-	m_MultiUIs.clear();
+	//m_GroupUIs.clear();
 }
 
 

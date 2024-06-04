@@ -14,6 +14,7 @@ texture2D g_KirbyEyeTexture;
 
 bool g_bStencil;
 bool g_bRimLight;
+float m_fRimWidth;
 bool g_bMotionBlur;
 float4 g_vMotionVelocity;
 
@@ -96,6 +97,8 @@ struct PS_OUT
     float4		vFieldDepth : SV_TARGET4;
     float4		vStencil : SV_TARGET5;
     float4      vMotionBlur : SV_TARGET6;
+    float4      vMRA : SV_TARGET7;
+
 };
 
 struct PS_OUT_EFFECT
@@ -128,12 +131,13 @@ PS_OUT PS_MAIN(PS_IN In)
     Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vMRA = vector(0.f, 0.f, 0.f, 0.f);
     
     if (g_bStencil == true)
         Out.vStencil = vector(1.f, 0.f, 0.0f, 1.f);
     
     if (g_bRimLight == true)
-        Out.vRimLight = vector(0.f, 0.f, 1.f, 1.f);
+        Out.vRimLight = vector(0.f, m_fRimWidth, 1.f, 1.f);
 
     if (g_bMotionBlur == true)
         Out.vMotionBlur = g_vMotionVelocity;
@@ -154,12 +158,14 @@ PS_OUT NO_NORMALMAP_PS_MAIN(PS_IN In)
     Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vMRA = vector(0.f, 0.f, 0.f, 0.f);
+
     
     if (g_bStencil == true)
         Out.vStencil = vector(1.f, 0.f, 0.0f, 1.f);
     
     if (g_bRimLight == true)
-        Out.vRimLight = vector(0.f, 0.f, 1.f, 1.f);
+        Out.vRimLight = vector(0.f, m_fRimWidth, 1.f, 1.f);
 
     if (g_bMotionBlur == true)
         Out.vMotionBlur = g_vMotionVelocity;
@@ -179,12 +185,14 @@ PS_OUT FOR_KIRBYMOUTH_PS_MAIN(PS_IN In)
     Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vMRA = vector(0.f, 0.f, 0.f, 0.f);
+
     
     if (g_bStencil == true)
         Out.vStencil = vector(1.f, 0.f, 0.0f, 1.f);
     
     if (g_bRimLight == true)
-        Out.vRimLight = vector(0.f, 0.f, 1.f, 1.f);
+        Out.vRimLight = vector(0.f, m_fRimWidth, 1.f, 1.f);
 
     if (g_bMotionBlur == true)
         Out.vMotionBlur = g_vMotionVelocity;
@@ -205,12 +213,14 @@ PS_OUT FOR_KIRBYEYE_PS_MAIN(PS_IN In)
     Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vMRA = vector(0.f, 0.f, 0.f, 0.f);
+
   
     if (g_bStencil == true)
         Out.vStencil = vector(1.f, 0.f, 0.0f, 1.f);
     
     if (g_bRimLight == true)
-        Out.vRimLight = vector(0.f, 0.f, 1.f, 1.f);
+        Out.vRimLight = vector(0.f, m_fRimWidth, 1.f, 1.f);
 
     if (g_bMotionBlur == true)
         Out.vMotionBlur = g_vMotionVelocity;

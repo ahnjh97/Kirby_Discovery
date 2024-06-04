@@ -72,7 +72,9 @@ private:
     PxPvdSceneClient*                   m_pPvdSceneClient = nullptr;
 
     //PxCooking*                        m_pCooking = nullptr;
-    PxRigidDynamic*              m_pRigidDynamic = nullptr;
+    PxRigidDynamic*                     m_pRigidDynamic = nullptr;
+
+    class CEventCallBack*               m_pEventCallBack = nullptr;
 
     map<string, PxMaterial*>     m_mapMaterials;
 

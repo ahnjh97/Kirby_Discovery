@@ -30,6 +30,7 @@ public:
 	virtual void	Render_IMGUI()					override;
 #endif
 	virtual void	Add_AnimEvent(){}
+
 	void	Plus_Hp(_float fHp) {
 		m_fHp += fHp;
 		if (m_fMaxHp < m_fHp)
@@ -47,6 +48,8 @@ public:
 	_float	Get_Hp() { return m_fHp; }
 	_float	Get_MaxHp() { return m_fMaxHp; }
 	_float	Get_Attack() { return m_fAttack; }
+
+	_uint Get_State();
 
 protected:
 	CCharacterController*	m_pControllerCom	= { nullptr };

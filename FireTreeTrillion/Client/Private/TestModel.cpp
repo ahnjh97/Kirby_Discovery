@@ -223,7 +223,7 @@ void CTestModel::Late_Tick(_float fTimeDelta)
     //    m_pRigidBodyCom->Add_Force(force);
     //}
 
-    m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
+    //m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
 #ifdef _DEBUG
     m_pGameInstance->RenderGrid();
 #endif
