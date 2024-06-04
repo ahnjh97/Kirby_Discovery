@@ -522,7 +522,6 @@ HRESULT CKirby::Add_PartObjects()
 	m_pWeapons = static_cast<CKirbyWeapons*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_KirbyWeapons"), &WeaponDesc));
 	if (nullptr == m_pWeapons)
 		return E_FAIL;
-	Safe_AddRef(m_pWeapons);
 
 	CKirbyArmours::KIRBYARMOURS_DESC ArmourDesc{};
 	ArmourDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
@@ -530,7 +529,6 @@ HRESULT CKirby::Add_PartObjects()
 	m_pArmours = static_cast<CKirbyArmours*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_KirbyArmours"), &ArmourDesc));
 	if (nullptr == m_pArmours)
 		return E_FAIL;
-	Safe_AddRef(m_pArmours);
 
 	return S_OK;
 }
@@ -610,9 +608,7 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
 		return true;
 	}
-
-
-
+	
 	return false;
 }
 
@@ -874,5 +870,7 @@ void CKirby::Free()
 
 	Safe_Release(m_pWeapons);
 	Safe_Release(m_pArmours);
-
+	for (auto& fx : m_KirbyFXList)
+		Safe_Release(fx);
+	
 }

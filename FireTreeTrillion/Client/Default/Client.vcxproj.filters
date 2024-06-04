@@ -396,6 +396,9 @@
     <ClInclude Include="..\Public\HUD.h">
       <Filter>02.GameObjects\UI\HUD</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\LevelChanger.h">
+      <Filter>01.Levels\_LevelChanger</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\LayerUI.h">
       <Filter>02.GameObjects\UI\Editor\Layer</Filter>
     </ClInclude>
@@ -577,6 +580,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\HUD.cpp">
       <Filter>02.GameObjects\UI\HUD</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LevelChanger.cpp">
+      <Filter>01.Levels\_LevelChanger</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LayerUI.cpp">
       <Filter>02.GameObjects\UI\Editor\Layer</Filter>
