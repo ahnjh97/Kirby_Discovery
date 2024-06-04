@@ -7,8 +7,10 @@ BEGIN(Engine)
 class ENGINE_DLL CUIObject abstract : public CGameObject
 {
 protected:
-	enum UI_TYPE { TYPE_LAYER, TYPE_GROUP, TYPE_NONE };
+	enum UI_TYPE { UI_TEXTURE, UI_FONT, UI_NONE };
+	enum LAYER_TYPE { TYPE_LAYER, TYPE_GROUP, TYPE_NONE };
 	enum UI_GROUP { GROUP_ALL, GROUP_SELECT, GROUP_NONE };
+
 	enum SHADER_PS
 	{
 		PS_DEFAULT, PS_ALPHABLEND,
@@ -19,11 +21,14 @@ protected:
 public:
 	typedef struct : public CGameObject::GAMEOBJECT_DESC
 	{
-		//UI_TYPE		eUIType = { TYPE_NONE };
+		UI_TYPE		eUIType = { UI_NONE };
 		wstring		wstrUITag = { TEXT("") };
+
 		_float3		vCenter, vSize, vPos = { 0.f, 0.f, 0.f };
 		_float		fDegree = { 0.f };
 		_int		iTexIndex = { 0 };
+		
+		wstring		wstrText = { TEXT("") };
 		_float4		vColorRGBA = { 0.f, 0.f, 0.f, 0.f };
 	}UIOBJ_DESC;
 
@@ -65,7 +70,7 @@ protected:
 	ID3D11RenderTargetView*		m_pRTV = { nullptr };
 
 	UIOBJ_DESC					m_UIObjDesc{};
-	UI_TYPE						m_eUIType = { TYPE_NONE };
+	UI_TYPE						m_eUIType = { UI_NONE };
 	
 	_uint						m_iTexIndex = { 0 };
 	_float4x4					m_ViewMatrix, m_ProjMatrix;

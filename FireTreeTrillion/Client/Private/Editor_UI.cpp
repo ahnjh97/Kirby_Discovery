@@ -63,7 +63,7 @@ _int CEditor_UI::Tick(_float _fTimeDelta)
 	if (m_pGameInstance->Get_DIKeyState(DIK_LCONTROL, KEY_PRESS))
 	{
 		if (m_pGameInstance->Get_DIKeyState(DIK_N, KEY_DOWN))
-			Create_UIObject(TYPE_LAYER);
+			Create_UIObject(TYPE_LAYER, UI_TEXTURE);
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_Z, KEY_DOWN))
 			Delete_UIObject();
@@ -156,9 +156,16 @@ _bool CEditor_UI::Set_DockSpace()
 			{
 				if (ImGui::BeginMenu(u8"New/Create 생성"))
 				{
-					if (ImGui::MenuItem(u8"Layer 레이어", "Ctrl+N"))
-						Create_UIObject(TYPE_LAYER);
+					if (ImGui::BeginMenu(u8"Layer 레이어", "Ctrl+N"))
+					{
+						if (ImGui::MenuItem(u8"Texture 텍스처"))
+							Create_UIObject(TYPE_LAYER, UI_TEXTURE);
 
+						if (ImGui::MenuItem(u8"Font 폰트"))
+							Create_UIObject(TYPE_LAYER, UI_FONT);
+
+						ImGui::EndMenu();
+					}
 					//if (ImGui::MenuItem(u8"Multi 다중"))
 					//	Create_UIObject(TYPE_MULTI);
 					ImGui::EndMenu();
@@ -438,10 +445,11 @@ _bool CEditor_UI::Window_Textures()
 			{
 				//해당 오브젝트의 텍스처 정보
 				CTexture* pUITex = dynamic_cast<CTexture*>(m_LayerUIs[iSelectUI]->Get_Component(TEXT("Com_Texture")));
+				if (!pUITex)
+					return FALSE;
+
 				_uint iMaxTex = pUITex->Get_NumTexture();
-				if (pUITex)
-				{
-					for (size_t iTex = 0; iTex < iMaxTex; ++iTex)
+				for (size_t iTex = 0; iTex < iMaxTex; ++iTex)
 					{
 						_uint iTexIndex = m_LayerUIs[iSelectUI]->Get_UIObj_Desc().iTexIndex;
 						string strTexTag = CUtils::WstrToStr(m_LayerUIs[iSelectUI]->Get_UIObj_Desc().wstrUITag);
@@ -475,7 +483,6 @@ _bool CEditor_UI::Window_Textures()
 							ImGui::EndPopup();
 						}
 					}
-				}
 			}
 			ImGui::EndListBox();
 		}
@@ -543,7 +550,12 @@ _bool CEditor_UI::Window_Tools()
 
 			if (ImGui::BeginTabItem(u8"Text 텍스트 편집"))
 			{
-				Edit_Text();
+				if (!SelectUIs.empty())
+				{
+					iSelectUI = SelectUIs.front();
+					if ((iSelectUI >= 0 && iSelectUI < m_LayerUIs.size()))
+						Edit_Text(m_LayerUIs[iSelectUI]);
+				}
 
 				ImGui::EndTabItem();
 			}
@@ -560,6 +572,9 @@ _bool CEditor_UI::Edit_Transform(CUIObject* _pUIObj)
 	const char* DragTag = { "Translate 위치" };
 	_float fTextWidth = ImGui::CalcTextSize(DragTag).x;
 	_float Translate[3], Rotate[3], Scale[3];
+
+	if (nullptr == _pUIObj || UI_FONT == _pUIObj->Get_UIObj_Desc().eUIType)
+		return FALSE;
 
 	CTransform* pUITrans = (CTransform*)_pUIObj->Get_Component(g_strTransformTag);
 	if (nullptr == pUITrans)
@@ -654,55 +669,69 @@ _bool CEditor_UI::Edit_RGBAColor()
 	return TRUE;
 }
 
-//진행 중) 글꼴 편집
-_bool CEditor_UI::Edit_Text()
+//1차 완료) 글꼴 편집
+_bool CEditor_UI::Edit_Text(CUIObject* _pUIObj)
 {
 	ImGui::SeparatorText(u8"Text Edit 텍스트 편집");
 
 	const char* DragTag = { "Translate 위치" };
 	_float fTextWidth = ImGui::CalcTextSize(DragTag).x;
+	_float Translate[3], Rotate[3], Scale[3];
+
+	if (nullptr == _pUIObj || UI_TEXTURE == _pUIObj->Get_UIObj_Desc().eUIType)
+		return FALSE;
+
+	CTransform* pFontTrans = (CTransform*)_pUIObj->Get_Component(g_strTransformTag);
+	if (nullptr == pFontTrans)
+		return FALSE;
+
+	_float4x4 FontWorldMat = pFontTrans->Get_WorldFloat4x4();
+	
+	ImGuizmo::DecomposeMatrixToComponents(FontWorldMat.m[0], Translate, Rotate, Scale);
 
 	wstring wstrFontTag, wstrText = {};
-	UIOBJ_DESC FontDesc{};
-	FontDesc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f };
-	FontDesc.vSize = { 10.f, 10.f };
-	FontDesc.vPos = { FontDesc.vCenter };
-	FontDesc.fDegree = { 0.f };
-	FontDesc.vColorRGBA = { 1.f, 1.f, 1.f, 1.f };
+	UIOBJ_DESC FontDesc = _pUIObj->Get_UIObj_Desc();
+	FontDesc.vSize = (_float3)Scale;
+	FontDesc.vPos = (_float3)Translate;
+	FontDesc.fDegree = (_float)Rotate[2];
 
+	//폰트 편집 동기화
 	static string strInputText(1024 * 16, '\0');
 	ImGuiInputTextFlags InputText_flags{}; //= ImGuiInputTextFlags_AllowTabInput;
 
-	
 	ImGui::InputTextMultiline(u8"##", &strInputText[0], 
 		strInputText.capacity(), /*IM_ARRAYSIZE(strInputText.c_str()*/
 		ImVec2(-FLT_MIN, 10 * ImGui::GetTextLineHeightWithSpacing())); /*ImGui::GetTextLineHeight() * 10*/
 
 	//UTF-8 인코딩 변환
 	wstrText = CUtils::StrToWstrUTF8(strInputText);
-
-	//스프라이트 폰트 렌더 (폰트 테스트용)
-	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_KR15"), wstrText, _float2(FontDesc.vPos),
-		FontDesc.vColorRGBA, FontDesc.fDegree);
+	FontDesc.wstrText = wstrText;
 
 	//위젯
-	//ImGui::Text(u8"Scale 크기");
-	//ImGui::SameLine(fTextWidth + 35);
-	//ImGui::DragFloat3("##Scale", (_float*)&FontDesc.vSize, 1.f, 0.f, g_iWinSizeX, "%.1f");
-
 	ImGui::PushItemWidth(ImGui::GetColumnOffset());
+	ImGui::Text(u8"Scale 크기");
+	ImGui::SameLine(fTextWidth + 35);
+	ImGui::DragFloat3("##Scale", (_float*)&Scale, 1.f, 0.f, g_iWinSizeX, "%.1f");
+
 	ImGui::Text(u8"Translate 위치");
 	ImGui::SameLine(fTextWidth + 35);
-	ImGui::DragFloat3("##Translate", (_float*)&FontDesc.vPos, 1.f, (_float)-0.1 * g_iWinSizeX, (_float)g_iWinSizeX, "%.1f");
+	ImGui::DragFloat3("##Translate", (_float*)&Translate, 1.f, (_float)-0.1 * g_iWinSizeX, (_float)g_iWinSizeX, "%.1f");
 
 	ImGui::Text(u8"Rotate 회전");
 	ImGui::SameLine(fTextWidth + 35);
-	ImGui::DragFloat("##Rotate", (_float*)&FontDesc.fDegree, 1.f, (_int)-360, (_int)360, u8"Degree 각도 : %.1f");
+	ImGui::DragFloat("##Rotate", (_float*)&Rotate[2], 0.1f, (_int)-360, (_int)360, u8"Degree 각도 : %.1f");
 
 	ImGui::Text(u8"Color 색상");
 	ImGui::SameLine(fTextWidth + 35);
-	ImGui::DragFloat3("##Color", (_float*)&FontDesc.vColorRGBA, 0.1f, 0, 255, "%.1f");
+	ImGui::DragFloat3("##Color", (_float*)&FontDesc.vColorRGBA, 0.1f, 0, 1, "%.1f");
 	ImGui::PopItemWidth();
+
+	_pUIObj->Set_UIObj_Desc(FontDesc);
+
+	ImGuizmo::RecomposeMatrixFromComponents(Translate, Rotate, Scale, FontWorldMat.m[0]);
+
+	//월드행렬 세팅
+	pFontTrans->Set_WorldMatrix(FontWorldMat);
 
 	return TRUE;
 }
@@ -804,11 +833,11 @@ _bool CEditor_UI::Set_GizmoGrid()
 }
 
 //추가 필요) 레이어그룹(캔버스) 생성
-_bool CEditor_UI::Create_UIObject(UI_TYPE _eUIType)
+_bool CEditor_UI::Create_UIObject(LAYER_TYPE _eLayerType, UI_TYPE _eUIType)
 {
 	string strProtoTag = { "Prototype_GameObject_" };
 
-	if (CUIObject::TYPE_LAYER == _eUIType) //레이어 생성
+	if (CUIObject::TYPE_LAYER == _eLayerType) //레이어 생성
 	{
 		CUIObject::UIOBJ_DESC LayerUI_Desc{};
 		//LayerUI_Desc.eUIType = { TYPE_LAYER };
@@ -817,9 +846,22 @@ _bool CEditor_UI::Create_UIObject(UI_TYPE _eUIType)
 		LayerUI_Desc.vSize = { 100.f, 100.f };
 		LayerUI_Desc.vPos = { 0.f, 0.f };
 		LayerUI_Desc.fDegree = { 0.f };
-		LayerUI_Desc.iTexIndex = { 0 };
+		//LayerUI_Desc.iTexIndex = { 0 };
 
 		strProtoTag += CUtils::WstrToStr(LayerUI_Desc.wstrUITag);
+		
+		if (UI_TEXTURE == _eUIType)
+		{
+			LayerUI_Desc.eUIType = UI_TEXTURE;
+			LayerUI_Desc.iTexIndex = { 0 };
+		}
+
+		if (UI_FONT == _eUIType)
+		{
+			LayerUI_Desc.eUIType = UI_FONT;
+			LayerUI_Desc.wstrText = TEXT("Test");
+			LayerUI_Desc.vColorRGBA = { 1.f, 1.f, 1.f, 1.f };
+		}
 
 		CUIObject* pLayerUI = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(CUtils::StrToWstr(strProtoTag), &LayerUI_Desc));
 		if (nullptr == pLayerUI)
@@ -830,10 +872,11 @@ _bool CEditor_UI::Create_UIObject(UI_TYPE _eUIType)
 		}
 
 		m_LayerUIs.push_back(pLayerUI);
+		MSG_BOX(TEXT("Successed to Create : LayerUI"));
 		return TRUE;
 	}
 
-	if (CUIObject::TYPE_GROUP == _eUIType) //레이어그룹(캔버스) 생성
+	if (CUIObject::TYPE_GROUP == _eLayerType) //레이어그룹(캔버스) 생성
 	{
 	}
 }
@@ -949,8 +992,12 @@ _bool CEditor_UI::Save_Texture(const string& _strFilePath, ID3D11RenderTargetVie
 _bool CEditor_UI::Save_FileData(const string& _strFilePath)
 {
 	string strUITag = {};
+	UI_TYPE eUIType = { UI_NONE };
 	for (auto& iUI : m_LayerUIs)
+	{
 		strUITag = CUtils::WstrToStr(iUI->Get_UIObj_Desc().wstrUITag);
+		eUIType = iUI->Get_UIObj_Desc().eUIType;
+	}
 
 	//벡터가 비었을 경우 
 	if (m_LayerUIs.empty())
@@ -978,18 +1025,21 @@ _bool CEditor_UI::Save_FileData(const string& _strFilePath)
 	//for (size_t i = 0; i < m_LayerUIs.size(); ++i)
 	for (auto& pUIObj : m_LayerUIs)
 	{
+		//ProtoType Tag
 		wstring wstProtoTag = pUIObj->Get_PrototypeTag();
 		string strProtoTag = CUtils::WstrToStr(wstProtoTag);
 		_uint iProtoTagLen = strProtoTag.length();
-
 		OutputFile.write(reinterpret_cast<const char*>(&iProtoTagLen), sizeof(iProtoTagLen));
 		OutputFile.write(strProtoTag.c_str(), iProtoTagLen);
 
+		//eUIType
 		UIOBJ_DESC UIobj_Desc = pUIObj->Get_UIObj_Desc();
+		OutputFile.write(reinterpret_cast<const char*>(&UIobj_Desc.eUIType), sizeof(UIobj_Desc.eUIType));
+
+		//UITag
 		wstring wstrUITag = UIobj_Desc.wstrUITag;
 		string strUITag = CUtils::WstrToStr(wstrUITag);
 		_uint iUITagLen = strUITag.length();
-
 		OutputFile.write(reinterpret_cast<const char*>(&iUITagLen), sizeof(iUITagLen));
 		OutputFile.write(strUITag.c_str(), iUITagLen);
 
@@ -1007,14 +1057,30 @@ _bool CEditor_UI::Save_FileData(const string& _strFilePath)
 		//}
 		//wstrUITag += TEXT("-") + wstrNum;
 
+
 		OutputFile.write(reinterpret_cast<const char*>(&UIobj_Desc.vCenter), sizeof(UIobj_Desc.vCenter));
 		OutputFile.write(reinterpret_cast<const char*>(&UIobj_Desc.vSize), sizeof(UIobj_Desc.vSize));
 		OutputFile.write(reinterpret_cast<const char*>(&UIobj_Desc.vPos), sizeof(UIobj_Desc.vPos));
 		OutputFile.write(reinterpret_cast<const char*>(&UIobj_Desc.fDegree), sizeof(UIobj_Desc.fDegree));
 
-		//텍스처는 별개로 세팅
-		_uint iTexIndex = pUIObj->Get_TexIndex();
-		OutputFile.write(reinterpret_cast<const char*>(&iTexIndex), sizeof(iTexIndex));
+		//if (UI_TEXTURE == eUIType)
+		//{
+			_uint iTexIndex = pUIObj->Get_TexIndex();
+			OutputFile.write(reinterpret_cast<const char*>(&iTexIndex), sizeof(iTexIndex));
+		//}
+
+		//if (UI_FONT == eUIType)
+		//{
+			wstring wstrText = pUIObj->Get_UIObj_Desc().wstrText;
+			string strText = CUtils::WstrToStr(wstrText);
+			_uint iUIextLen = strText.length();
+
+			OutputFile.write(reinterpret_cast<const char*>(&iUIextLen), sizeof(iUIextLen));
+			OutputFile.write(strText.c_str(), iUIextLen);
+			//OutputFile.write(reinterpret_cast<const char*>(&UIobj_Desc.wstrText), sizeof(UIobj_Desc.wstrText));
+
+			OutputFile.write(reinterpret_cast<const char*>(&UIobj_Desc.vColorRGBA), sizeof(UIobj_Desc.vColorRGBA));
+		//}
 	}
 
 	OutputFile.close();
@@ -1064,20 +1130,37 @@ _bool CEditor_UI::Load_FileData(const string& _strFilePath)
 		if (0 == strProtoTag.size())
 			return FALSE;
 
+		UIOBJ_DESC UIobj_Desc{};
 		string strUITag = {};
 		_uint iUITagLen = {};
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.eUIType), sizeof(UIobj_Desc.eUIType));
+
 		InputFile.read(reinterpret_cast<char*>(&iUITagLen), sizeof(iUITagLen));
 		strUITag.resize(iUITagLen);
 		InputFile.read(&strUITag[0], iUITagLen);
 
-		UIOBJ_DESC UIobj_Desc{};
 		UIobj_Desc.wstrUITag = CUtils::StrToWstr(strUITag);
 
 		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vCenter), sizeof(UIobj_Desc.vCenter));
 		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vSize), sizeof(UIobj_Desc.vSize));
 		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vPos), sizeof(UIobj_Desc.vPos));
 		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.fDegree), sizeof(UIobj_Desc.fDegree));
-		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.iTexIndex), sizeof(UIobj_Desc.iTexIndex));
+
+		//if (UI_TEXTURE == UIobj_Desc.eUIType)
+			InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.iTexIndex), sizeof(UIobj_Desc.iTexIndex));
+
+		//if (UI_FONT == UIobj_Desc.eUIType)
+		//{
+			string strText = {};
+			_uint iUIextLen = {};
+			InputFile.read(reinterpret_cast<char*>(&iUIextLen), sizeof(iUIextLen));
+			strText.resize(iUIextLen);
+			InputFile.read(&strText[0], iUIextLen);
+			UIobj_Desc.wstrText = CUtils::StrToWstr(strText);
+
+			InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vColorRGBA), sizeof(UIobj_Desc.vColorRGBA));
+		//}
+
 
 		CUIObject* pUIObject = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(CUtils::StrToWstr(strProtoTag), &UIobj_Desc));
 		m_LayerUIs.push_back(pUIObject);

@@ -23,6 +23,7 @@ public:
 	virtual _int	Tick(_float fTimeDelta)						override;
 	virtual void	Late_Tick(_float fTimeDelta)				override;
 	virtual HRESULT Render()									override;
+
 #ifdef _DEBUG
 	virtual void	Render_IMGUI()								override;
 #endif
@@ -44,9 +45,9 @@ private:
 
 	_bool			Edit_Transform(CUIObject* _pUIObj); //변환
 	_bool			Edit_RGBAColor(); //색상 편집
-	_bool			Edit_Text(); //텍스트 편집
+	_bool			Edit_Text(CUIObject* _pUIObj); //텍스트 편집
 
-	_bool			Create_UIObject(UI_TYPE _eUIType);
+	_bool			Create_UIObject(LAYER_TYPE _eLayerType, UI_TYPE _eUIType);
 	_bool			Delete_UIObject();
 	_bool			Grouping_UIObject(UI_GROUP _eUIGroup);
 

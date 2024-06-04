@@ -187,13 +187,15 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& strLayerTag)
 		if (0 == strProtoTag.size())
 			return FALSE;
 
+		CUIObject::UIOBJ_DESC UIobj_Desc{};
 		string strUITag = {};
 		_uint iUITagLen = {};
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.eUIType), sizeof(UIobj_Desc.eUIType));
+
 		InputFile.read(reinterpret_cast<char*>(&iUITagLen), sizeof(iUITagLen));
 		strUITag.resize(iUITagLen);
 		InputFile.read(&strUITag[0], iUITagLen);
 
-		CUIObject::UIOBJ_DESC UIobj_Desc{};
 		UIobj_Desc.wstrUITag = CUtils::StrToWstr(strUITag);
 
 		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vCenter), sizeof(UIobj_Desc.vCenter));
@@ -201,6 +203,15 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& strLayerTag)
 		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vPos), sizeof(UIobj_Desc.vPos));
 		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.fDegree), sizeof(UIobj_Desc.fDegree));
 		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.iTexIndex), sizeof(UIobj_Desc.iTexIndex));
+
+		string strText = {};
+		_uint iUIextLen = {};
+		InputFile.read(reinterpret_cast<char*>(&iUIextLen), sizeof(iUIextLen));
+		strText.resize(iUIextLen);
+		InputFile.read(&strText[0], iUIextLen);
+		UIobj_Desc.wstrText = CUtils::StrToWstr(strText);
+
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vColorRGBA), sizeof(UIobj_Desc.vColorRGBA));
 
 		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, CUtils::StrToWstr(strProtoTag), &UIobj_Desc)))
 			return E_FAIL;
