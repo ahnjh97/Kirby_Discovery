@@ -85,8 +85,8 @@ HRESULT CLevel_Tool_FX::Ready_Layer_UI(const wstring& strLayerTag)
 HRESULT CLevel_Tool_FX::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
 
-	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_TOOL_FX, strLayerTag, TEXT("Prototype_GameObject_SkySphere"));
-	CHECK_FAILED(hr);
+	//HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_TOOL_FX, strLayerTag, TEXT("Prototype_GameObject_SkySphere"));
+	//CHECK_FAILED(hr);
 
 	return S_OK;
 }
