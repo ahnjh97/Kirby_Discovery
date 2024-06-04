@@ -103,7 +103,7 @@ void CKirbyDefault_Idle_State::Key_X(CGameObject* pGameObject, _float fTimeDelta
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.vInitPos = { 0.f, .6f, .4f };
 		FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_VacuumC"), &FXDesc)))
+		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Vacuum_v1"), &FXDesc)))
 			return;
 		pKirby->Add_KirbyEffect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 
@@ -269,7 +269,7 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.vInitPos = { 0.f, .65f, .4f };
 		FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_VacuumC"), &FXDesc)))
+		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Vacuum_v1"), &FXDesc)))
 			return;
 		pKirby->Add_KirbyEffect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 	}
@@ -662,7 +662,7 @@ void CKirbyDefault_Jump_State::Key_X(CGameObject* pGameObject, _float fTimeDelta
 			CMultiEffect::MULTI_FX_DESC FXDesc{};
 			FXDesc.vInitPos = { 0.f, .65f, .4f };
 			FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-			if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_VacuumC"), &FXDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Vacuum_v1"), &FXDesc)))
 				return;
 			pKirby->Add_KirbyEffect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 

@@ -119,10 +119,6 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 	m_vCurRot = { ToDegree(vRadianEuler.x), ToDegree(vRadianEuler.y), ToDegree(vRadianEuler.z) };
 	m_vCurScale = Calculate_CurValue_Lerp(_fTimeDelta, KF_SCALE);
 
-
-
-
-
 	m_vCurRColor = Calculate_CurValue_Lerp(_fTimeDelta, KF_RCOLOR);
 	m_vCurGColor = Calculate_CurValue_Lerp(_fTimeDelta, KF_GCOLOR);
 	m_vCurBColor = Calculate_CurValue_Lerp(_fTimeDelta, KF_BCOLOR);
@@ -132,10 +128,16 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 	_float3 vUVOffset = Calculate_CurValue_Lerp(_fTimeDelta, KF_UVOFFSET);
 	m_vCurUVOffset = { vUVOffset.x, vUVOffset.y };
 
-	_float3 vMaskUVOffset = Calculate_CurValue_Lerp(_fTimeDelta, KF_MASKUVOFFSET);
-	m_vCurMaskUVOffset = { vMaskUVOffset.x, vMaskUVOffset.y };
 
-	m_vCurMaskUVAngle = Calculate_CurValue_Lerp(_fTimeDelta, KF_MASKUVANGLE).x;
+	//뒤 세 변수는 이후 추가했으므로, vector 크기 기존과 달라 넘어가 버릴 수 있다.
+	if (KF_MASKUVOFFSET < m_Keyframes.size())
+	{
+		_float3 vMaskUVOffset = Calculate_CurValue_Lerp(_fTimeDelta, KF_MASKUVOFFSET);
+		m_vCurMaskUVOffset = { vMaskUVOffset.x, vMaskUVOffset.y };
+	}
+
+	if (KF_MASKUVANGLE < m_Keyframes.size())
+		m_vCurMaskUVAngle = Calculate_CurValue_Lerp(_fTimeDelta, KF_MASKUVANGLE).x;
 
 	//초기 회전 세팅
 	_float3 vInitRadianRot = { ToRadian(m_vInitRot.x), ToRadian(m_vInitRot.y) , ToRadian(m_vInitRot.z) };
@@ -240,7 +242,6 @@ HRESULT CSingleEffect::Add_Components(FX_DESC& FXDesc)
 
 		//현재 VtxPosTex Shader Pass 4까지
 		m_iMaxPassIdx = 4;
-		//m_iPassIdx = 4;
 	}
 	else
 	{
@@ -254,9 +255,8 @@ HRESULT CSingleEffect::Add_Components(FX_DESC& FXDesc)
 			TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 		CHECK_FAILED(hr);
 
-		//현재 VtxModel Shader Pass 7까지
-		m_iMaxPassIdx = 7;
-		//m_iPassIdx = 7;
+		//현재 VtxModel Shader Pass 8까지
+		m_iMaxPassIdx = 8;
 	}
 
 	return S_OK;
@@ -269,6 +269,13 @@ HRESULT CSingleEffect::Bind_ShaderResources(_int iTexIdx, _int iMaskTexIdx)
 
 	HRESULT hr = m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix");
 	CHECK_FAILED(hr);
+
+	_bool bStencil = true;
+	_bool bRimLight = false;
+	_bool bMotionBlur = false;
+	m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
+	m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+	m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
 
 	//직교일 경우, 직교 행렬 바인딩
 	if (!m_bIsOrthographic)

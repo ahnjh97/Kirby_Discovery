@@ -237,49 +237,44 @@ PS_OUT TRIGGER(PS_IN In)
 PS_OUT PS_MAIN_DEFAULT_FX(PS_IN In)
 {
     
-    //PS_OUT Out = (PS_OUT) 0;
-
-    //vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
-    //if (0.3f >= vMtrlDiffuse.a)
-    //    discard;
-
-    //Out.vDiffuse = vMtrlDiffuse;
-    //Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
-    //Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
-    //Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
-
-    //if (g_bStencil == true)
-    //    Out.vStencil = vector(1.f, 0.f, 0.0f, 1.f);
-    
-    //if (g_bRimLight == true)
-    //    Out.vRimLight = vector(0.f, 0.f, 1.f, 1.f);
-
-    //if (g_bMotionBlur == true)
-    //    Out.vMotionBlur = g_vMotionVelocity;
-    
-    //return Out;
-    
-
-    
     PS_OUT Out = (PS_OUT) 0;
 
-    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord + g_vUVOffset);
-    if (vMtrlDiffuse.a < .03f)
+    //마스크 값으로 자르기
+    vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord + g_vMaskUVOffset);
+    if (vMask.a < .01f && vMask.a < g_fMaskThreshold)
+        discard;
+    else if (vMask.r < .1f && vMask.r < g_fMaskThreshold)
+        discard;
+    
+    //diffuse 알파 테스팅
+    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord + g_vUVOffset);
+    if (vDiffuse.a < .01f)
         discard;
     
     
-    float vMaskValue = g_MaskTexture.Sample(ClampSampler, In.vTexcoord + g_vMaskUVOffset).a;
-    if (vMaskValue < g_fMaskThreshold)
-        //if (.5f < g_fMaskThreshold)
+    Out.vDiffuse = vDiffuse;
+	
+    return Out;
+}
+
+PS_OUT_EFFECT PS_MAIN_BLEND_FX(PS_IN In)
+{
+    PS_OUT_EFFECT Out = (PS_OUT_EFFECT) 0;
+
+    vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord + g_vMaskUVOffset);
+    
+    if(vMask.a < .01f && vMask.a < g_fMaskThreshold)
+        discard;
+    else if (vMask.r < .1f && vMask.r < g_fMaskThreshold)
+        discard;
+    
+
+    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord + g_vUVOffset);
+    if (vDiffuse.a < .01f || (vDiffuse.r < 0.1f && vDiffuse.g < 0.1f && vDiffuse.b < 0.1f) )
         discard;
 
-    
-    Out.vDiffuse = vMtrlDiffuse;
-    //Out.vDiffuse.rgb = vMtrlDiffuse;
-    //Out.vDiffuse.a *= g_fAlpha;
-    
-    Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vColor.rgb = vDiffuse.rgb * g_vRColor;
+    Out.vColor.a = vDiffuse.a * g_fAlpha;
 
     
     //소프트 이펙트 보정
@@ -291,54 +286,10 @@ PS_OUT PS_MAIN_DEFAULT_FX(PS_IN In)
     float4 vDepthDesc = g_DepthTexture.Sample(PointSampler, vTexcoord);
     float fOldViewZ = vDepthDesc.y * 1000.f;
 
-    Out.vDiffuse.a = Out.vDiffuse.a * saturate(fOldViewZ - In.vProjPos.w);
+    Out.vColor.a = Out.vColor.a * saturate(fOldViewZ - In.vProjPos.w);
     
+    Out.vNonBlur = vector(0.f, 1.f, 0.f, 0.f);
     
-    
-    //if (g_bStencil == true)
-    //    Out.vStencil = vector(1.f, 0.f, 0.0f, 1.f);
-    
-    //if (g_bRimLight == true)
-    //    Out.vRimLight = vector(0.f, 0.f, 1.f, 1.f);
-
-    //if (g_bMotionBlur == true)
-    //    Out.vMotionBlur = g_vMotionVelocity;
-
-	
-    return Out;
-}
-
-PS_OUT PS_MAIN_WHITE_FX(PS_IN In)
-{
-    PS_OUT Out = (PS_OUT) 0;
-
-	
-    float vMaskValue = g_MaskTexture.Sample(ClampSampler, In.vTexcoord).r;
-    if (vMaskValue < g_fMaskThreshold)
-        discard;
-	
-
-    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord + g_vUVOffset);
-    if (vMtrlDiffuse.a < .05f)
-        discard;
-
-    Out.vDiffuse.rgb = g_vBColor;
-    Out.vDiffuse.a *= g_fAlpha;
-    
-    Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
-
-
-    if (g_bStencil == true)
-        Out.vStencil = vector(1.f, 0.f, 0.0f, 1.f);
-    
-    if (g_bRimLight == true)
-        Out.vRimLight = vector(0.f, 0.f, 1.f, 1.f);
-
-    //if (g_bMotionBlur == true)
-    //    Out.vMotionBlur = g_vMotionVelocity;
-
-	
     return Out;
 }
 
@@ -351,6 +302,7 @@ PS_OUT_LIGHTDEPTH PS_MAIN_DEFERREDINFO(PS_IN In)
         discard;
 
     Out.vLightDepth = float4(0.f, 1.f, 0.f, 1.f);
+    
     return Out;
 }
 
@@ -450,9 +402,9 @@ technique11 DefaultTechnique
 	// 기본 이펙트 패스. 알파 테스팅 + 마스크 ( 7 )
     pass DefaultFX
     {
-        SetRasterizerState(RS_NonCull);
-        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
-        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
@@ -461,18 +413,18 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_DEFAULT_FX();
     }
 
-    //디퓨즈가 흰색인 이펙트 ( 8 )
-    pass WhiteFX
+    //블렌드되는 이펙트. 알파 블렌딩 + 마스크 + 소프트 이펙트 ( 8 )
+    pass BlendFX
     {
         SetRasterizerState(RS_NonCull);
-        SetDepthStencilState(DSS_Default, 0);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 PS_MAIN_WHITE_FX();
+        PixelShader = compile ps_5_0 PS_MAIN_BLEND_FX();
     }
 
     // 디퍼드 인포 ( 9 )

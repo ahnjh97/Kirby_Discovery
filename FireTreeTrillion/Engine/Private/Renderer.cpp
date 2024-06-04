@@ -76,11 +76,18 @@ HRESULT CRenderer::Initialize()
 
 	Save_ColorSet("Stage1",
 		COLOR_DATA{
-		1.06f, 1.f, 0.9f, 1.3f, 1.f, 0.99f, 1.06f, 0.71f, 0.6f, 0.6f, 1.39f, 1.06f, 1.24f, 0.199115f, 0.0378847f, 0.114933f, 0.1f, 0.30578f, 0.342999f, 0.606195f, 0.15f, 0.986726f, 0.949634f, 0.462801f, 0.34f, 0.12f, 0.5f
+		1.06f, 1.f, 0.9f, 1.3f, 1.f, 0.99f, 1.06f, 0.71f,
+		0.6f, 0.6f, 1.39f, 1.06f, 1.24f, 0.199115f, 0.0378847f,
+		0.114933f, 0.1f, 0.30578f, 0.342999f, 0.606195f, 0.15f, 0.986726f,
+		0.949634f, 0.462801f, 0.34f, 0.12f, 0.5f
 		});
 
 
-	Set_ColorSet(Find_ColorSet("Stage1"));
+	Set_ColorSet(Find_ColorSet("Default"));
+
+	//쉐이더 타입 트리거는 idx 1, 접촉하면 해당 함수를 호출!
+	function<void(_int)> TriggerFunc = bind(&CRenderer::Set_ColorSet_ByIndex, this, placeholders::_1);
+	m_pGameInstance->Emplace_TriggerFunc(1, TriggerFunc);
 
 
 	//function<void(_int)> func = bind(&CCamera_Free::Set_MatrixIndex, this, placeholders::_1);
@@ -177,7 +184,6 @@ HRESULT CRenderer::Initialize()
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_DeferredInfo"), TEXT("Target_DeferredInfo"))))
 		return E_FAIL;
 #pragma endregion
-
 
 #pragma region MRT_NonLight
 	/* For.Target_RadialBlur */
@@ -368,8 +374,6 @@ HRESULT CRenderer::Initialize()
 
 #endif
 
-	function<void(_int)> TriggerFunc = bind(&CRenderer::Set_ColorSet_ByIndex, this, placeholders::_1);
-	m_pGameInstance->Emplace_TriggerFunc(1, TriggerFunc);
 	return S_OK;
 }
 
@@ -505,12 +509,16 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 		m_DestColorData = Find_ColorSet("Default");
 		break;
 	case 1:
-		m_DestColorData = Find_ColorSet("Forest");
+		m_DestColorData = Find_ColorSet("Tutorial");
 		break;
 	case 2:
 		m_DestColorData = Find_ColorSet("Night");
 		break;
+	case 3:
+		m_DestColorData = Find_ColorSet("Stage1");
+		break;
 	default:
+		m_DestColorData = Find_ColorSet("Default");
 		break;
 	}
 }
@@ -1148,13 +1156,13 @@ HRESULT CRenderer::Render_SuperUI()
 void CRenderer::Render_IMGUI()
 {
 
-	if (m_pGameInstance->Get_KeyState(DIK_1, KEY_DOWN))
+	if (m_pGameInstance->Get_KeyState(DIK_F5, KEY_DOWN))
 		Set_ColorSet(Find_ColorSet("Default"));
-	if (m_pGameInstance->Get_KeyState(DIK_2, KEY_DOWN))
+	if (m_pGameInstance->Get_KeyState(DIK_F6, KEY_DOWN))
 		Set_ColorSet(Find_ColorSet("Tutorial"));
-	if (m_pGameInstance->Get_KeyState(DIK_3, KEY_DOWN))
+	if (m_pGameInstance->Get_KeyState(DIK_F7, KEY_DOWN))
 		Set_ColorSet(Find_ColorSet("Night"));
-	if (m_pGameInstance->Get_KeyState(DIK_4, KEY_DOWN))
+	if (m_pGameInstance->Get_KeyState(DIK_F8, KEY_DOWN))
 		Set_ColorSet(Find_ColorSet("Stage1"));
 	ImGui::Begin(u8"컬러 코렉션");
 
@@ -1231,15 +1239,15 @@ void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 		}
 	}
 
-	if (m_DestColorData.fHue != -1.f)
-	{
-		m_fHue += (m_DestColorData.fHue - m_fHue) * fInterpolateSpeed;
-		if (abs(m_fHue - m_DestColorData.fHue) < 01.f)
-		{
-			m_fHue = m_DestColorData.fHue;
-			m_DestColorData.fHue = -1.f;
-		}
-	}
+	//if (m_DestColorData.fHue != -1.f)
+	//{
+	//	m_fHue += (m_DestColorData.fHue - m_fHue) * fInterpolateSpeed;
+	//	if (abs(m_fHue - m_DestColorData.fHue) < 01.f)
+	//	{
+	//		m_fHue = m_DestColorData.fHue;
+	//		m_DestColorData.fHue = -1.f;
+	//	}
+	//}
 
 	if (m_DestColorData.fSaturation != -1.f)
 		m_fSaturation += (m_DestColorData.fSaturation - m_fSaturation) * fInterpolateSpeed;
