@@ -420,14 +420,22 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 
 	//**** 모든 그리기가 완료되었다. ****//
 
+	// 레디얼블러가 가동중일때만, 레디얼블러 셰이더가 작동하도록 한다.
+	Interpolate_RadialBlur(fTimeDelta);
+
+
 	if (FAILED(Render_Result()))
 		return E_FAIL;
 
 	if (m_bLowPass == false)
 	{
-		// Radial블러 적용
-		if (FAILED(Render_Radial_Result(fTimeDelta)))
-			return E_FAIL;
+		// 레디얼 블러 값이 있을때만 레디얼블러를 가동한다.
+		if (m_isRadial == true)
+		{
+			// Radial블러 적용
+			if (FAILED(Render_Radial_Result(fTimeDelta)))
+				return E_FAIL;
+		}
 		// DOF블러 적용
 		if (FAILED(Render_DOF_Result()))
 			return E_FAIL;
@@ -851,9 +859,19 @@ HRESULT CRenderer::Render_Result()
 {
 	if (m_bLowPass == false)
 	{
-		// 최종적으로 레디얼 블러 및 다른 블러를 먹일 생각이다.
-		if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_RadialBlur"))))
-			return E_FAIL;
+		// 최적화를 위해 레디얼 블러가 작동중일때만, MRT_RadialBlur가 작동하도록 한다.
+		if (m_isRadial == true)
+		{
+			// 최종적으로 레디얼 블러 및 다른 블러를 먹일 생각이다.
+			if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_RadialBlur"))))
+				return E_FAIL;
+		}
+		else
+		{
+			// DOF에 담는다.
+			if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_DOFBlur"))))
+				return E_FAIL;
+		}
 	}
 
 	if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
@@ -952,12 +970,6 @@ HRESULT CRenderer::Render_Radial_Result(_float fTimeDelta)
 	// 레디얼 블러를 적용시킬 텍스쳐를 던진다.
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_RadialBlur"), "g_RadialBlur")))
 		return E_FAIL;
-
-	if (m_fRadialBlurRadius > 0.f)
-		m_fRadialBlurRadius -= fTimeDelta * m_fRadialRadiusSubtraction;
-
-	if (m_fRadialBlurRadius < 0.f)
-		m_fRadialBlurRadius = 0.f;
 
 	if (FAILED(m_pShader->Bind_RawValue("g_fRadialblurRaduis", &m_fRadialBlurRadius, sizeof(_float))))
 		return E_FAIL;
@@ -1358,6 +1370,23 @@ void CRenderer::Interpolate_BlackBackground(_float fTimeDelta)
 		if (m_fBlackBackground < 0.5f)
 			m_fBlackBackground = 0.5f;
 	}
+}
+
+void CRenderer::Interpolate_RadialBlur(_float fTimeDelta)
+{
+
+	if (m_fRadialBlurRadius > 0.f)
+		m_fRadialBlurRadius -= fTimeDelta * m_fRadialRadiusSubtraction;
+
+	if (m_fRadialBlurRadius < 0.f)
+		m_fRadialBlurRadius = 0.f;
+
+
+	if (m_fRadialBlurRadius == 0.f)
+		m_isRadial = false;
+	else
+		m_isRadial = true;
+
 }
 
 

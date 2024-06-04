@@ -85,6 +85,7 @@ HRESULT CKirby::Initialize(void* pArg)
 
 _int CKirby::Tick(_float fTimeDelta)
 {
+
 	if (m_bDead == true)
 		return OBJ_DEAD;
 
@@ -393,6 +394,21 @@ void CKirby::Key_Input(_float fTimeDelta)
 		INFO(m_eBodyState) = BODY_SWORDBALLOON;
 		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
 	}
+
+
+	// B : Radial Blur Center
+	if (m_pGameInstance->Get_DIKeyState(DIK_B, KEY_DOWN))
+	{
+		m_pGameInstance->Setting_RadialBlur(30.f, 120.f);
+	}
+
+	// N : Radial Blur Center
+	if (m_pGameInstance->Get_DIKeyState(DIK_N, KEY_DOWN))
+	{
+		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+		m_pGameInstance->Setting_RadialBlur(vPos, 30.f, 120.f);
+	}
+
 
 #pragma endregion
 }
