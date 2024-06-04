@@ -85,8 +85,7 @@ HRESULT CLayerUI::Render()
 		//스프라이트 폰트 렌더 (폰트 테스트용)
 		if (FAILED(m_pGameInstance->
 			Render_Font(TEXT("Font_HUDSub_KR15"), m_UIObjDesc.wstrText, 
-				_float2(m_UIObjDesc.vPos + m_UIObjDesc.vCenter),
-						m_UIObjDesc.vColorRGBA, m_UIObjDesc.fDegree)))
+				_float2(m_UIObjDesc.vPos + m_UIObjDesc.vCenter), m_UIObjDesc.vColorRGBA, m_UIObjDesc.fDegree)))
 			return E_FAIL;
 	}
 

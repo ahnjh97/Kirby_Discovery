@@ -48,7 +48,7 @@ private:
 	_bool			Edit_Text(CUIObject* _pUIObj); //텍스트 편집
 
 	_bool			Create_UIObject(LAYER_TYPE _eLayerType, UI_TYPE _eUIType);
-	_bool			Delete_UIObject();
+	_bool			Delete_UIObject(LAYER_TYPE _eLayerType);
 	_bool			Grouping_UIObject(UI_GROUP _eUIGroup);
 
 public:

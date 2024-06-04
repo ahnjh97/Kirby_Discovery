@@ -66,7 +66,7 @@ _int CEditor_UI::Tick(_float _fTimeDelta)
 			Create_UIObject(TYPE_LAYER, UI_TEXTURE);
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_Z, KEY_DOWN))
-			Delete_UIObject();
+			Delete_UIObject(TYPE_LAYER);
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_S, KEY_DOWN))
 			Save_FileData(strFilePath);
@@ -159,7 +159,24 @@ _bool CEditor_UI::Set_DockSpace()
 					if (ImGui::BeginMenu(u8"Layer 레이어", "Ctrl+N"))
 					{
 						if (ImGui::MenuItem(u8"Texture 텍스처"))
-							Create_UIObject(TYPE_LAYER, UI_TEXTURE);
+							if (Create_UIObject(TYPE_LAYER, UI_TEXTURE))
+							{
+								ImGui::OpenPopup("Create");
+
+								ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+								ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+								if (ImGui::BeginPopupModal("Create", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+								{
+									ImGui::Text("Successed to Create : LayerUI");
+									ImGui::Separator();
+
+									//if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+									//ImGui::SetItemDefaultFocus();
+									//ImGui::SameLine();
+									if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+									ImGui::EndPopup();
+								}
+							}
 
 						if (ImGui::MenuItem(u8"Font 폰트"))
 							Create_UIObject(TYPE_LAYER, UI_FONT);
@@ -306,7 +323,7 @@ _bool CEditor_UI::Tab_LayerList()
 
 					if (ImGui::MenuItem(u8"Delete 삭제", "Ctrl+Z"))
 					{
-						Delete_UIObject();
+						Delete_UIObject(TYPE_LAYER);
 					}
 
 					ImGui::EndPopup();
@@ -519,16 +536,6 @@ _bool CEditor_UI::Window_Properties()
 			}
 			ImGui::EndTabBar();
 		}
-
-		if (ImGui::BeginTabBar(u8"##")) //탭 바
-		{
-			//if (ImGui::BeginTabItem(u8"123"))
-			//{
-
-			//	ImGui::EndTabItem();
-			//}
-			ImGui::EndTabBar();
-		}
 	}
 	ImGui::End(); //창 종료
 
@@ -573,7 +580,7 @@ _bool CEditor_UI::Edit_Transform(CUIObject* _pUIObj)
 	_float fTextWidth = ImGui::CalcTextSize(DragTag).x;
 	_float Translate[3], Rotate[3], Scale[3];
 
-	if (nullptr == _pUIObj || UI_FONT == _pUIObj->Get_UIObj_Desc().eUIType)
+	if (nullptr == _pUIObj) //|| UI_FONT == _pUIObj->Get_UIObj_Desc().eUIType)
 		return FALSE;
 
 	CTransform* pUITrans = (CTransform*)_pUIObj->Get_Component(g_strTransformTag);
@@ -669,7 +676,7 @@ _bool CEditor_UI::Edit_RGBAColor()
 	return TRUE;
 }
 
-//1차 완료) 글꼴 편집
+//06.04) 글꼴 편집 기능 구현
 _bool CEditor_UI::Edit_Text(CUIObject* _pUIObj)
 {
 	ImGui::SeparatorText(u8"Text Edit 텍스트 편집");
@@ -678,7 +685,7 @@ _bool CEditor_UI::Edit_Text(CUIObject* _pUIObj)
 	_float fTextWidth = ImGui::CalcTextSize(DragTag).x;
 	_float Translate[3], Rotate[3], Scale[3];
 
-	if (nullptr == _pUIObj || UI_TEXTURE == _pUIObj->Get_UIObj_Desc().eUIType)
+	if (nullptr == _pUIObj) //|| UI_TEXTURE == _pUIObj->Get_UIObj_Desc().eUIType)
 		return FALSE;
 
 	CTransform* pFontTrans = (CTransform*)_pUIObj->Get_Component(g_strTransformTag);
@@ -866,13 +873,13 @@ _bool CEditor_UI::Create_UIObject(LAYER_TYPE _eLayerType, UI_TYPE _eUIType)
 		CUIObject* pLayerUI = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(CUtils::StrToWstr(strProtoTag), &LayerUI_Desc));
 		if (nullptr == pLayerUI)
 		{
+
 			MSG_BOX(TEXT("Failed to Create : LayerUI"));
 			CHECK_NULLPTR(pLayerUI);
 			return FALSE;
 		}
-
 		m_LayerUIs.push_back(pLayerUI);
-		MSG_BOX(TEXT("Successed to Create : LayerUI"));
+		//MSG_BOX(TEXT("Successed to Create : LayerUI"));
 		return TRUE;
 	}
 
@@ -882,7 +889,7 @@ _bool CEditor_UI::Create_UIObject(LAYER_TYPE _eLayerType, UI_TYPE _eUIType)
 }
 
 //추가 필요) 이넘으로 구분하여 벡터 그룹 삭제 
-_bool CEditor_UI::Delete_UIObject()
+_bool CEditor_UI::Delete_UIObject(LAYER_TYPE _eLayerType)
 {
 	if (m_LayerUIs.empty())
 	{
@@ -890,13 +897,21 @@ _bool CEditor_UI::Delete_UIObject()
 		return TRUE;
 	}
 
-	//ListBox에서 선택한 레이어를 삭제
-	if (iSelectUI >= 0 && iSelectUI < m_LayerUIs.size())
+	if (CUIObject::TYPE_LAYER == _eLayerType) //레이어 삭제
 	{
-		m_LayerUIs.erase(m_LayerUIs.begin() + iSelectUI);
-		iSelectUI = -1; // 삭제 후 선택한 UI 인덱스 초기화
-		//MSG_BOX(TEXT("Successed to Delete : UI Object"));
-		return TRUE;
+		//ListBox에서 선택한 레이어를 삭제
+		if (iSelectUI >= 0 && iSelectUI < m_LayerUIs.size())
+		{
+			m_LayerUIs.erase(m_LayerUIs.begin() + iSelectUI);
+			iSelectUI = -1; // 삭제 후 선택한 UI 인덱스 초기화
+			MSG_BOX(TEXT("Successed to Delete : UI Object"));
+			return TRUE;
+		}
+	}
+
+	if (CUIObject::TYPE_GROUP == _eLayerType) //레이어그룹(캔버스) 삭제
+	{
+
 	}
 }
 
