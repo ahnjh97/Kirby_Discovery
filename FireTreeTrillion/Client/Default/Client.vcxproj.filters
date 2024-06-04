@@ -398,8 +398,8 @@
     </ClInclude>
     <ClInclude Include="..\Public\LevelChanger.h">
       <Filter>01.Levels\_LevelChanger</Filter>
-	</ClInclude>
-	<ClInclude Include="..\Public\LayerUI.h">
+    </ClInclude>
+    <ClInclude Include="..\Public\LayerUI.h">
       <Filter>02.GameObjects\UI\Editor\Layer</Filter>
     </ClInclude>
   </ItemGroup>
@@ -583,8 +583,8 @@
     </ClCompile>
     <ClCompile Include="..\Private\LevelChanger.cpp">
       <Filter>01.Levels\_LevelChanger</Filter>
-	</ClCompile>
-	<ClCompile Include="..\Private\LayerUI.cpp">
+    </ClCompile>
+    <ClCompile Include="..\Private\LayerUI.cpp">
       <Filter>02.GameObjects\UI\Editor\Layer</Filter>
     </ClCompile>
   </ItemGroup>
