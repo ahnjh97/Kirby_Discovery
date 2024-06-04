@@ -9,12 +9,12 @@ class CVIBuffer_Rect;
 END
 
 BEGIN(Client)
-class CSingle_UI : public CUIObject //¥‹¿œ UI
+class CLayerUI : public CUIObject
 {
 private:
-	CSingle_UI(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CSingle_UI(const CSingle_UI& rhs);
-	virtual ~CSingle_UI() = default;
+	CLayerUI(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CLayerUI(const CLayerUI& rhs);
+	virtual ~CLayerUI() = default;
 
 public:
 	virtual HRESULT				Initialize_Prototype()						override;
@@ -22,6 +22,7 @@ public:
 	virtual _int				Tick(_float fTimeDelta)						override;
 	virtual void				Late_Tick(_float fTimeDelta)				override;
 	virtual HRESULT				Render()									override;
+
 #ifdef _DEBUG
 	//virtual void				Render_IMGUI()								override;
 #endif
@@ -32,7 +33,7 @@ private:
 	HRESULT						Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom);
 
 public:
-	static CSingle_UI*			Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CLayerUI*			Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject*		Clone(void* pArg) override;
 	virtual void				Free() override;
 };

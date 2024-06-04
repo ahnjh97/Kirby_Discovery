@@ -11,9 +11,9 @@ CAwoofy_Idle_State::CAwoofy_Idle_State()
 {
 }
 
-void CAwoofy_Idle_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CAwoofy_Idle_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CAwoofy_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -43,10 +43,32 @@ void CAwoofy_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	{
 		if(rand() % 5 == 0)
 			pAwoofy->Change_State(CAwoofy::AWOOFY_GROOMING, 45.f, false, true);
-		else if(rand() % 5 == 1)
+		else if (rand() % 5 == 1)
 			pAwoofy->Change_State(CAwoofy::AWOOFY_LOOKAROUND, 40.f, false, true);
 		else
 			pAwoofy->Change_State(CAwoofy::AWOOFY_WAIT, 40.f, false, true);
+	}
+
+	m_fTimeDelta += fTimeDelta;
+
+	if(CAwoofy::AWOOFY_WAIT == pAwoofy->Get_State() || CAwoofy::AWOOFY_LOOKAROUND == pAwoofy->Get_State())
+	{
+		if (2.5f < m_fTimeDelta)
+		{
+			pAwoofy->Set_AwoofyEye(CAwoofy::AWOOFYEYE_SLEEP);
+
+			if (2.65f < m_fTimeDelta)
+				m_fTimeDelta = 0.f;
+		}
+		else
+			pAwoofy->Set_AwoofyEye(CAwoofy::AWOOFYEYE_IDLE);
+	}
+	else if (CAwoofy::AWOOFY_GROOMING == pAwoofy->Get_State())
+	{
+		if (0.5f < pAwoofy->Get_AnimRatio() && 0.75f > pAwoofy->Get_AnimRatio())
+			pAwoofy->Set_AwoofyEye(CAwoofy::AWOOFYEYE_HAPPY);
+		else if(0.75f <= pAwoofy->Get_AnimRatio())
+			pAwoofy->Set_AwoofyEye(CAwoofy::AWOOFYEYE_ANGER);
 	}
 
 	//if (m_pGameInstance->Get_DIKeyState(DIK_SPACE, KEY_DOWN))
@@ -79,9 +101,9 @@ CAwoofy_Run_State::CAwoofy_Run_State()
 {
 }
 
-void CAwoofy_Run_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CAwoofy_Run_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CAwoofy_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -143,6 +165,7 @@ void CAwoofy_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 	else
 	{
 		m_fTimeDelta = 0.f;
+		pAwoofy->Set_AwoofyEye(CAwoofy::AWOOFYEYE_IDLE);
 		pAwoofy->Change_State(CAwoofy::AWOOFY_BRAKE, 40.f, false, true);
 	}
 }
@@ -173,9 +196,9 @@ CAwoofy_Find_State::CAwoofy_Find_State()
 {
 }
 
-void CAwoofy_Find_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CAwoofy_Find_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CAwoofy_Find_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -195,7 +218,11 @@ void CAwoofy_Find_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 2.f);
 
 	if (true == pAwoofy->IsAnimFinished())
+	{
+		// Awoofy ´« »óÅÂ
+		pAwoofy->Set_AwoofyEye(CAwoofy::AWOOFYEYE_ANGER);
 		pAwoofy->Change_State(CAwoofy::AWOOFY_RUN, 40.f, true, true);
+	}
 }
 
 void CAwoofy_Find_State::OnStateExit()
@@ -224,9 +251,9 @@ CAwoofy_LookAroundAfterBrake_State::CAwoofy_LookAroundAfterBrake_State()
 {
 }
 
-void CAwoofy_LookAroundAfterBrake_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CAwoofy_LookAroundAfterBrake_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CAwoofy_LookAroundAfterBrake_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -239,7 +266,11 @@ void CAwoofy_LookAroundAfterBrake_State::OnStateUpdate(CGameObject* pGameObject,
 	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
 
 	if (true == pAwoofy->IsAnimFinished())
+	{
+		// Awoofy ´« »óÅÂ
+		pAwoofy->Set_AwoofyEye(CAwoofy::AWOOFYEYE_IDLE);
 		pAwoofy->Change_State(CAwoofy::AWOOFY_WAIT, 40.f, false, true);
+	}
 }
 
 void CAwoofy_LookAroundAfterBrake_State::OnStateExit()
@@ -268,9 +299,9 @@ CAwoofy_Brake_State::CAwoofy_Brake_State()
 {
 }
 
-void CAwoofy_Brake_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CAwoofy_Brake_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CAwoofy_Brake_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -290,7 +321,11 @@ void CAwoofy_Brake_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
 
 	if (true == pAwoofy->IsAnimFinished())
+	{
+		// Awoofy ´« »óÅÂ
+		pAwoofy->Set_AwoofyEye(CAwoofy::AWOOFYEYE_IDLE);
 		pAwoofy->Change_State(CAwoofy::AWOOFY_LOOKAROUNDAFTERBRAKE, 45.f, false, true);
+	}
 	else
 		pController->Move_Dir(pTransformCom, (pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * fTimeDelta * 6.f) * fDeceleration, fTimeDelta);
 }
@@ -321,9 +356,9 @@ CAwoofy_Damage_State::CAwoofy_Damage_State()
 {
 }
 
-void CAwoofy_Damage_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CAwoofy_Damage_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 
 	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
 	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
@@ -356,7 +391,11 @@ void CAwoofy_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 
 		if (true == pAwoofy->IsAnimFinished() || pController->Is_Terrain())
+		{
+			// Awoofy ´« »óÅÂ
+			pAwoofy->Set_AwoofyEye(CAwoofy::AWOOFYEYE_IDLE);
 			pAwoofy->Change_State(CAwoofy::AWOOFY_WAIT, 40.f, false, true);
+		}
 	}
 }
 

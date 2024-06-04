@@ -65,6 +65,11 @@ void CCharacter::Render_IMGUI()
 }
 #endif
 
+_uint CCharacter::Get_State()
+{
+	return m_pFSM->Get_State();
+}
+
 void CCharacter::SetOn_Slope(_float fTimeDelta)
 {
 	// 지면의 up벡터

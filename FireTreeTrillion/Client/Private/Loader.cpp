@@ -29,10 +29,7 @@
 #endif
 
 //#include "TestUI.h"
-#include "Single_UI.h"
-#include "Multi_UI.h"
-#include "HUD.h"
-
+#include "LayerUI.h"
 #pragma endregion
 
 //¿Ã∆Â∆Æ ≈¯
@@ -52,6 +49,8 @@
 #include "TestModel.h"
 #include "TestTerrain.h"
 #include "Kirby.h"
+#include "KirbyWeapons.h"
+#include "KirbyArmours.h"
 #include "Awoofy.h"
 #include "RigidBody.h"
 #include "CharacterController.h"
@@ -187,12 +186,14 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("OrbitingCamera"), COrbitingCamera);
 
 	// UI
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Single_UI"), CSingle_UI);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Multi_UI"), CMulti_UI);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("LayerUI"), CLayerUI);
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("Multi_UI"), CMulti_UI);
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
 	
 #pragma region FOR CLIENT
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kirby"), CKirby);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KirbyWeapons"), CKirbyWeapons);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KirbyArmours"), CKirbyArmours);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Awoofy"), CAwoofy);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Rabbit"), CRabbit);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Buffahorn"), CBuffahorn);
@@ -538,6 +539,13 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("KirbyBalloon", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("KirbyDefault", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("KirbyVacuum", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbySwordDefault", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbySwordBalloon", TYPE_ANIM, 1.f, 180.f);
+		// For Kirby Weapon
+		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
+		// For Kirby Armour
+		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
+
 
 		m_vecModelInfo.emplace_back("GsBenchAL", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("Level0Stage1Step01", TYPE_NONANIM);
@@ -665,6 +673,14 @@ HRESULT CLoader::Add_KirbyFaceTexture(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "mouth_surprise", "KirbyFace/mouth_surprise.png")))
 		return E_FAIL;
+
+	// Awoofy Eye
+	if (FAILED(Add_Texture(eLevel, "Awoofy_Eye", "AwoofyEye/NormalEnemyEye%d.dds", 5)))
+		return E_FAIL;
+
+	//// Rabbit Eye
+	//if (FAILED(Add_Texture(eLevel, "Rabbit_Eye", "RabbitEye/RabbitEye%d.dds", 5)))
+	//	return E_FAIL;
 
 	return S_OK;
 }
@@ -864,8 +880,6 @@ void CLoader::Load_AnimToolInfo()
 		}
 	}
 }
-
-
 
 CLoader * CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID)
 {

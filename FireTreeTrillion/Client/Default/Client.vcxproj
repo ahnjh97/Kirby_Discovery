@@ -201,6 +201,10 @@
     <ClInclude Include="..\Public\LevelChanger.h" />
     <ClInclude Include="..\Public\Multi_UI.h" />
     <ClInclude Include="..\Public\Single_UI.h" />
+    <ClInclude Include="..\Public\KirbyArmours.h" />
+    <ClInclude Include="..\Public\KirbyContents_State.h" />
+    <ClInclude Include="..\Public\KirbySword_State.h" />
+    <ClInclude Include="..\Public\KirbyWeapons.h" />
     <ClInclude Include="..\Public\Kirby.h" />
     <ClInclude Include="..\Public\KirbyBalloon_State.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -210,6 +214,7 @@
     <ClInclude Include="..\Public\KirbyVacuum_State.h" />
     <ClInclude Include="..\Public\Kirby_Enums.h" />
     <ClInclude Include="..\Public\Kirby_State_Function.h" />
+    <ClInclude Include="..\Public\LayerUI.h" />
     <ClInclude Include="..\Public\Level_GamePlay.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
     <ClInclude Include="..\Public\Level_Logo.h" />
@@ -283,6 +288,10 @@
     <ClCompile Include="..\Private\LevelChanger.cpp" />
     <ClCompile Include="..\Private\Multi_UI.cpp" />
     <ClCompile Include="..\Private\Single_UI.cpp" />
+    <ClCompile Include="..\Private\KirbyArmours.cpp" />
+    <ClCompile Include="..\Private\KirbyContents_State.cpp" />
+    <ClCompile Include="..\Private\KirbySword_State.cpp" />
+    <ClCompile Include="..\Private\KirbyWeapons.cpp" />
     <ClCompile Include="..\Private\Kirby.cpp" />
     <ClCompile Include="..\Private\KirbyBalloon_State.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -290,6 +299,7 @@
     <ClCompile Include="..\Private\KirbyDamage_State.cpp" />
     <ClCompile Include="..\Private\KirbyDefault_State.cpp" />
     <ClCompile Include="..\Private\KirbyVacuum_State.cpp" />
+    <ClCompile Include="..\Private\LayerUI.cpp" />
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
     <ClCompile Include="..\Private\Level_Logo.cpp" />

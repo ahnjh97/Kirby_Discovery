@@ -47,7 +47,7 @@ public: /* For.Renderer */
 	HRESULT Render_LightDepth_For_GameObject(class CShader* pShader, class CTransform* pTransform, class CModel* pModel);
 	void Update_LightShadow(_fvector vLightPos, _fvector vFocusPos);
 	void Update_DofFocus(_fvector vWorldPos);
-
+	void Set_BlackBackGround(_bool bSet);
 
 #ifdef _DEBUG
 public:

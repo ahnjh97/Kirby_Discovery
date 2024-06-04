@@ -7,8 +7,14 @@
 #include "KirbyBalloon_State.h"
 #include "KirbyVacuum_State.h"
 #include "KirbyDamage_State.h"
+#include "KirbyContents_State.h"
+#include "KirbySword_State.h"
+
+#include "KirbyWeapons.h"
+#include "KirbyArmours.h"
 
 #include "Utils.h"
+#include "Bone.h"
 
 
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -43,6 +49,9 @@ HRESULT CKirby::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
+	if (FAILED(Add_PartObjects()))
+		return E_FAIL;
+
 	INFO(m_eBodyState) = BODY_DEFAULT;
 	INFO(m_eMouthState) = MOUTH_IDLE;
 	INFO(m_eEyeState) = EYE_IDLE;
@@ -68,7 +77,8 @@ HRESULT CKirby::Initialize(void* pArg)
 	m_fMaxHp = 100.f;
 	m_fHp = 100.f;
 	m_fAttack = 5.f;
-	m_eAbilityType = ABILITY_DEFAULT;
+	//m_eAbilityType = ABILITY_DEFAULT;
+	m_eAbilityType = ABILITY_SWORD;
 
 	return S_OK;
 }
@@ -78,29 +88,41 @@ _int CKirby::Tick(_float fTimeDelta)
 	if (m_bDead == true)
 		return OBJ_DEAD;
 
-	_float fFirstTimeDelta = m_pGameInstance->Get_FirstTimer();
+	m_fTimeDelta = m_pGameInstance->Get_FirstTimer();
+
+	// 파트 오브젝트의 뼈 행렬을 업데이트한다.
+	Update_PartObjectMatrix();
 
 	// 커비의 기본적인 축 보정, 밸런스 보정을 담당한다.
 	Setting_KirbyBalance();
 
 	// 테스트 전용
-	Key_Input(fFirstTimeDelta);
+	Key_Input(m_fTimeDelta);
 
 	// 유틸업데이트가 들어가있다.
-	__super::Tick(fFirstTimeDelta);
-	Kirby_SystemTick(fFirstTimeDelta);
+	__super::Tick(m_fTimeDelta);
+	Kirby_SystemTick(m_fTimeDelta);
+
+	m_pWeapons->Tick(m_fTimeDelta);
+	m_pArmours->Tick(m_fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
 
 void CKirby::Late_Tick(_float fTimeDelta)
 {
-	_float fFirstTimeDelta = m_pGameInstance->Get_FirstTimer();
 
-	m_pModelCom[BODY_DEFAULT]->Play_Animation(fFirstTimeDelta);
-	m_pModelCom[BODY_BALLOON]->Play_Animation(fFirstTimeDelta);
-	m_pModelCom[BODY_VACUUM]->Play_Animation(fFirstTimeDelta);
+	m_pModelCom[INFO(m_eBodyState)]->Play_Animation(m_fTimeDelta);
 
+	if (INFO(m_eBodyState) != BODY_DEFAULT)
+		m_pModelCom[BODY_DEFAULT]->Play_Animation(m_fTimeDelta);
+
+	// 임시로 진행한다. 나중에 능력 분기되면 파츠오브젝트 많이 생겨야함.
+	if (m_eAbilityType == ABILITY_SWORD)
+	{
+		m_pWeapons->Late_Tick(m_fTimeDelta);
+		m_pArmours->Late_Tick(m_fTimeDelta);
+	}
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
@@ -133,6 +155,8 @@ HRESULT CKirby::Render()
 		_bool bMotionBlur = true;
 		m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+		if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
+			return E_FAIL;
 		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
 		if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
 			return E_FAIL;
@@ -167,12 +191,14 @@ void CKirby::Render_IMGUI()
 		ImGui::TreePop();
 	}
 
+
 	ImGui::Text("Vacuuming : %d", m_bVacuuming);
 	ImGui::Text("ObjectAddress : %d", INFO(m_pObject));
-	ImGui::Text("Origin X : %.2f, Origin Y : %.2f, Origin Z : %.2f,", m_vOriginUp.x, m_vOriginUp.y, m_vOriginUp.z);
-	ImGui::Text("ReserveJump : %d", INFO(m_bReserveJumpKey));
-	ImGui::Text("Height : %.2f", m_pControllerCom->Compute_Height());
-	ImGui::Text("Input C? : %d", m_pGameInstance->Get_DIKeyState(DIK_C, KEY_PRESS));
+	ImGui::Text("ChargeTime : %.2f", INFO(m_fChargeTime));
+	ImGui::Text("MoveSpeed : %.2f", INFO(m_fMoveSpeed));
+	ImGui::Text("PREATTACKSTATE : %d", INFO(m_ePreAttackState));
+	ImGui::Text("TemporaryEatType : %d", INFO(m_eTemporaryEatType));
+
 	ImGui::Text("FSM : %d", m_pFSM->Get_State());
 	ImGui::Separator(); ImGui::NewLine();
 
@@ -220,22 +246,26 @@ void CKirby::Collision_Attack(CGameObject* pOtherObj)
 	// 흡수될 운명인 몬스터
 	if (pObject->Get_Vacuuming())
 	{
-		if (pObject->Get_AbilityType() == ABILITY_DEFAULT)
+		// 일단 EAT으로 넘기는건 같으나, EAT이 끝날 시점에 내가 삼켰던 것이 무엇이였는지 판단 후 애니메이션이 분기된다.
+		INFO(m_isEat) = true;
+		INFO(m_eEyeState) = EYE_IDLE;
+		INFO(m_eMouthState) = MOUTH_ANGER;
+		m_bVacuuming = false;
+		Change_State(STATE_EAT, 100.f, false, false, BODY_BALLOON);
+		// 임시 보관소. 먹은게 끝났을 떄, 비로소 커비의 어빌리티 타입이 바뀐다.
+		INFO(m_eTemporaryEatType) = pObject->Get_AbilityType();
+
+		// 먹은애는 죽여놓는다. *****나중에 수정이 필요할 것이다. 먹은애를 날려야 하기 때문에*****
+		if (INFO(m_pObject) != nullptr)
 		{
-			INFO(m_isEat) = true;
-			INFO(m_eEyeState) = EYE_IDLE;
-			INFO(m_eMouthState) = MOUTH_ANGER;
-			m_bVacuuming = false;
-			Change_State(STATE_EAT, 100.f, false, false, BODY_BALLOON);
-			m_eAbilityType = ABILITY_DEFAULT;
+			INFO(m_pObject)->Set_Dead();
+			Safe_Release(INFO(m_pObject));
+			INFO(m_pObject) = nullptr;
 		}
 
-		INFO(m_pObject)->Set_Dead();
-		Safe_Release(INFO(m_pObject));
-		INFO(m_pObject) = nullptr;
 		Delete_KirbyEffect();
 	}
-	// 슬라이드중
+	// 슬라이드중의 충돌
 	else if (Get_State() == STATE_SLIDE)
 	{
 		pObject->Set_DamageMoving(Make_RepulsiveDir(pObject), 10.f);
@@ -243,7 +273,7 @@ void CKirby::Collision_Attack(CGameObject* pOtherObj)
 		//INFO(m_fMoveSpeed) = 0.f;
 		Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
 	}
-	// 일반 박치기
+	// 서로 박치기 해였을 때 충돌
 	else
 	{
 		pObject->Set_DamageMoving(Make_RepulsiveDir(pObject), 5.f);
@@ -278,11 +308,6 @@ _float3 CKirby::Make_RepulsiveDir(CPhysXObject* pObject)
 	m_vDamegeDir = XMVector3Normalize(vPos - vObjectPos);
 
 	return XMVector3Normalize(vObjectPos - vPos);
-}
-
-_uint CKirby::Get_State()
-{
-	return m_pFSM->Get_State();
 }
 
 void CKirby::Setting_KirbyBalance()
@@ -358,6 +383,17 @@ void CKirby::Key_Input(_float fTimeDelta)
 		INFO(m_eBodyState) = BODY_VACUUM;
 		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
 	}
+	else if (m_pGameInstance->Get_DIKeyState(DIK_7, KEY_DOWN))
+	{
+		INFO(m_eBodyState) = BODY_SWORDDEFAULT;
+		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
+	}
+	else if (m_pGameInstance->Get_DIKeyState(DIK_6, KEY_DOWN))
+	{
+		INFO(m_eBodyState) = BODY_SWORDBALLOON;
+		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
+	}
+
 #pragma endregion
 }
 
@@ -383,6 +419,16 @@ HRESULT CKirby::Add_Components()
 		// 커비의 풍선 모드 상태 모델
 		hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyBalloon"),
 			TEXT("Com_Model_Balloon"), (CComponent**)&m_pModelCom[BODY_BALLOON]);
+		CHECK_FAILED(hr);
+
+		// 커비의 Sword Body 상태 모델
+		hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbySwordDefault"),
+			TEXT("Com_Model_SwordDefault"), (CComponent**)&m_pModelCom[BODY_SWORDDEFAULT]);
+		CHECK_FAILED(hr);
+
+		// 커비의 Sword Balloon 상태 모델
+		hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbySwordBalloon"),
+			TEXT("Com_Model_SwordBalloon"), (CComponent**)&m_pModelCom[BODY_SWORDBALLOON]);
 		CHECK_FAILED(hr);
 
 
@@ -444,6 +490,32 @@ HRESULT CKirby::Add_Components()
 	/* FSM */
 	SetUp_FSM();
 
+
+
+	return S_OK;
+}
+
+HRESULT CKirby::Add_PartObjects()
+{
+
+	CKirbyWeapons::KIRBYWEAPON_DESC	WeaponDesc{};
+	//CModel* pModel = (CModel*)Get_Component(TEXT("Com_Model_SwordDefault"));
+	WeaponDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	//WeaponDesc.pSocket = pModel->Get_BonePtr("HatL");
+	WeaponDesc.pBoneMatrix = &m_WeaponMatrix;
+	m_pWeapons = static_cast<CKirbyWeapons*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_KirbyWeapons"), &WeaponDesc));
+	if (nullptr == m_pWeapons)
+		return E_FAIL;
+	Safe_AddRef(m_pWeapons);
+
+	CKirbyArmours::KIRBYARMOURS_DESC ArmourDesc{};
+	ArmourDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	ArmourDesc.pBoneMatrix = &m_ArmourMatrix;
+	m_pArmours = static_cast<CKirbyArmours*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_KirbyArmours"), &ArmourDesc));
+	if (nullptr == m_pArmours)
+		return E_FAIL;
+	Safe_AddRef(m_pArmours);
+
 	return S_OK;
 }
 
@@ -467,7 +539,9 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 {
 	// Default 상태의 입 부위 // Balloon 상태의 입 부위
 	if ((_eBodyState == BODY_DEFAULT && _iMeshIndex == 0) ||
-		(_eBodyState == BODY_BALLOON && _iMeshIndex == 4))
+		(_eBodyState == BODY_BALLOON && _iMeshIndex == 4) ||
+		(_eBodyState == BODY_SWORDDEFAULT && _iMeshIndex == 0) ||
+		(_eBodyState == BODY_SWORDBALLOON && _iMeshIndex == 4))
 	{
 		m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
 		m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
@@ -477,6 +551,7 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		_bool bMotionBlur = true;
 		m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float));
 		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
 
 		m_pShaderCom->Begin(ANIMMODEL_KIRBYMOUTH);
@@ -486,7 +561,9 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 	// Default 상태의 눈 부위 // Vacuum 상태의 눈 부위 // Balloon 상태의 눈 부위
 	else if ((_eBodyState == BODY_DEFAULT && _iMeshIndex == 3) ||
 		(_eBodyState == BODY_VACUUM && _iMeshIndex == 2) ||
-		(_eBodyState == BODY_BALLOON && _iMeshIndex == 3))
+		(_eBodyState == BODY_BALLOON && _iMeshIndex == 3) ||
+		(_eBodyState == BODY_SWORDDEFAULT && _iMeshIndex == 3) ||
+		(_eBodyState == BODY_SWORDBALLOON && _iMeshIndex == 3))
 	{
 		m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
 		m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
@@ -496,14 +573,14 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		_bool bMotionBlur = true;
 		m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float));
 		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
 		m_pShaderCom->Begin(ANIMMODEL_KIRBYEYE);
 		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
 		return true;
 	}
-
 	// Vacuum 상태의 구강 부위
-	if (_eBodyState == BODY_VACUUM && _iMeshIndex == 3)
+	else if (_eBodyState == BODY_VACUUM && _iMeshIndex == 3)
 	{
 		m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
 		m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
@@ -517,6 +594,8 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
 		return true;
 	}
+
+
 
 	return false;
 }
@@ -583,6 +662,9 @@ void CKirby::SetUp_FSM()
 	m_pFSM->Add_State(STATE_FLIGHTLIMIT, CKirbyBalloon_Fly_State::Create());
 	m_pFSM->Add_State(STATE_FLIGHTLIMITFALL, CKirbyBalloon_Fly_State::Create());
 
+	m_pFSM->Add_State(STATE_SWALLOWSTART, CKirbyBalloon_Swallow_State::Create());
+	m_pFSM->Add_State(STATE_SWALLOWEND, CKirbyBalloon_Swallow_State::Create());
+
 	// Vacuum
 	m_pFSM->Add_State(STATE_SPIT, CKirbyVacuum_Spit_State::Create());//
 
@@ -601,6 +683,47 @@ void CKirby::SetUp_FSM()
 	m_pFSM->Add_State(STATE_VACUUM, CKirbyVacuum_Vacuuming_State::Create());
 	m_pFSM->Add_State(STATE_VACUUMHUSTLELV2, CKirbyVacuum_Vacuuming_State::Create());
 
+	// Get
+	m_pFSM->Add_State(STATE_GETABILITY, CKirbyGet_State::Create());
+	m_pFSM->Add_State(STATE_ITEMGET, CKirbyGet_State::Create());
+	m_pFSM->Add_State(STATE_ITENGETWAIT, CKirbyGet_State::Create());
+	m_pFSM->Add_State(STATE_ABILITYDUMP, CKirbyGet_State::Create());
+
+
+	// For Sword
+	m_pFSM->Add_State(SWORDSTATE_WAIT, CKirbySword_Idle_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_RUN, CKirbySword_Run_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_GUARD, CKirbySword_Guard_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SWORDSLIDESTART, CKirbySword_Guard_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SWORDSLIDE, CKirbySword_Guard_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SWORDSLIDEEND, CKirbySword_Guard_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_HAVESWORDWAITFLIGHT, CKirbySword_Fly_State::Create());
+	// 1타
+	m_pFSM->Add_State(SWORDSTATE_SIDESLASH, CKirbySword_Attack_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SIDESLASHEND, CKirbySword_Attack_State::Create());
+	// 2타
+	m_pFSM->Add_State(SWORDSTATE_MULITSWORDATTACK, CKirbySword_Attack_State::Create());
+	// 3타
+	m_pFSM->Add_State(SWORDSTATE_DECISIVESLASH, CKirbySword_Attack_State::Create());
+	// 충전 모션 및 회전베기
+	m_pFSM->Add_State(SWORDSTATE_SPINSLASHCHARGE, CKirbySword_ChargeSpin_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SUPERSPINSLASHCHARGESTART, CKirbySword_ChargeSpin_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SUPERSPINSLASHCHARGE, CKirbySword_ChargeSpin_State::Create());
+
+	m_pFSM->Add_State(SWORDSTATE_SHUFFIEFRONT, CKirbySword_ChargeSpin_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SHUFFIERIGHT, CKirbySword_ChargeSpin_State::Create());
+
+	m_pFSM->Add_State(SWORDSTATE_GIGANTSPINSLASH, CKirbySword_ChargeSpin_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SUPERSPINSLASHSTART, CKirbySword_ChargeSpin_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SUPERSPINSLASHLOOP, CKirbySword_ChargeSpin_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SPINSLASHEND, CKirbySword_ChargeSpin_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SUPERSPINSLASHEND, CKirbySword_ChargeSpin_State::Create());
+
+	m_pFSM->Add_State(SWORDSTATE_UPWARDSLASH, CKirbySword_JumpAttack_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SWORDDIVE, CKirbySword_JumpAttack_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SWORDSPIN, CKirbySword_JumpAttack_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SWORDSPINSTART, CKirbySword_JumpAttack_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SPINAFTER, CKirbySword_JumpAttack_State::Create());
 
 
 	CFSM::FSM_INFO		FSM_Info_Desc = {};
@@ -608,12 +731,19 @@ void CKirby::SetUp_FSM()
 	FSM_Info_Desc.uNumModel = BODY_END;
 	FSM_Info_Desc.pModel = &m_pModelCom[BODY_DEFAULT];
 	m_pFSM->Initialize(&FSM_Info_Desc);
+
 }
 
-void CKirby::Change_State(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, BODYSTATE eBody)
+void CKirby::Update_PartObjectMatrix()
+{
+	m_ArmourMatrix = *(m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("HatL")->Get_CombinedTransformationMatrix());
+	m_WeaponMatrix = *(m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("RHaveL")->Get_CombinedTransformationMatrix());
+}
+
+void CKirby::Change_State(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, BODYSTATE eBody, _uint iOffSet)
 {
 	INFO(m_eBodyState) = eBody;
-	m_pFSM->ChangeState((_uint)eState, _fAnimSpeed, _bLoop, _bInterpolation, INFO(m_eBodyState));
+	m_pFSM->ChangeState((_uint)eState, _fAnimSpeed, _bLoop, _bInterpolation, INFO(m_eBodyState), iOffSet);
 }
 
 void CKirby::Set_Animation(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
@@ -658,7 +788,7 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 	// 그림자는 무조건 커비를 따라간다.
 	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 	_vector vLightPos = vPos;
-	vLightPos.m128_f32[1] += 30.f;
+	vLightPos.m128_f32[1] += 60.f;
 	vLightPos.m128_f32[2] -= 1.f;
 	m_pGameInstance->Update_LightShadow(vLightPos, vPos);
 
@@ -666,6 +796,26 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 	_vector vDOFPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 	vDOFPos.m128_f32[1] += 0.5f;
 	m_pGameInstance->Update_DofFocus(vDOFPos);
+
+	// 능력이 SWORD 일때, 평타 모션의 순서를 리셋시키는 로직이다.
+	if (m_eAbilityType == ABILITY_SWORD)
+	{
+		// 이 모션이 아닐때만 감소한다.
+		if ((Get_State() == SWORDSTATE_SIDESLASH ||
+			Get_State() == SWORDSTATE_SIDESLASHEND ||
+			Get_State() == SWORDSTATE_MULITSWORDATTACK ||
+			Get_State() == SWORDSTATE_DECISIVESLASH) == false)
+		{
+			if (INFO(m_fAttackTime) > 0.f)
+				INFO(m_fAttackTime) -= fTimeDelta;
+
+			if (INFO(m_fAttackTime) < 0.f)
+			{
+				INFO(m_fAttackTime) = 0.f;
+				INFO(m_ePreAttackState) = SWORDSTATE_DECISIVESLASH;
+			}
+		}
+	}
 }
 
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -705,5 +855,8 @@ void CKirby::Free()
 	for (auto& pMouthTexture : m_pMouthTexture)
 		Safe_Release(pMouthTexture);
 	Safe_Release(m_pCamera);
+
+	Safe_Release(m_pWeapons);
+	Safe_Release(m_pArmours);
 
 }

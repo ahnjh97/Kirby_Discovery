@@ -47,7 +47,11 @@ HRESULT CAwoofy::Initialize(void* pArg)
 	m_fAttack = 8.f;
 	m_eVacuumSize = SIZE_SMALL;
 	m_eAbilityType = ABILITY_DEFAULT;
+	m_eEyeState = AWOOFYEYE_IDLE;
+
+	m_fRimWidth = 5.f;
 	Add_AnimEvent();
+
 	return S_OK;
 }
 
@@ -89,6 +93,9 @@ HRESULT CAwoofy::Render()
 
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
+		if (Custom_Face(i) == true)
+			continue;
+
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
 			return E_FAIL;
 
@@ -189,6 +196,7 @@ void CAwoofy::Render_IMGUI()
 void CAwoofy::Collision_Attack(CGameObject* pOtherObj)
 {
 	Change_State(CAwoofy::AWOOFY_DAMAGE, 50.f, false, true);
+	m_eEyeState = AWOOFYEYE_HAPPY;
 }
 
 void CAwoofy::Change_State(AWOOFY_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
@@ -221,6 +229,35 @@ void CAwoofy::Compute_Angle(_vector vOrginLook, _vector vTargetLook)
 		m_fAngle = -m_fAngle;
 }
 
+_bool CAwoofy::Custom_Face(_uint iMeshIndex)
+{
+	if (iMeshIndex == 0)
+	{
+		HRESULT hr;
+
+		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", iMeshIndex, TextureType_DIFFUSE);
+		CHECK_FAILED(hr);
+
+		hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", iMeshIndex);
+		CHECK_FAILED(hr);
+
+		hr = m_pEyeTextureCom->Bind_ShaderResource(m_pShaderCom, "g_KirbyEyeTexture", (_uint)m_eEyeState);
+		CHECK_FAILED(hr);
+
+		_bool bStencil = true;
+		_bool bRimLight = true;
+		_bool bMotionBlur = true;
+		m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
+
+		m_pShaderCom->Begin(ANIMMODEL_KIRBYEYE);
+		m_pModelCom->Render(iMeshIndex);
+		return true;
+	}
+	return false;
+}
+
 HRESULT CAwoofy::Add_Components()
 {
 	HRESULT hr;
@@ -233,6 +270,12 @@ HRESULT CAwoofy::Add_Components()
 	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Awoofy"),
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
+
+#pragma region Awoofy Eye
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Awoofy_Eye"),
+		TEXT("Com_Texture"), (CComponent**)&m_pEyeTextureCom);
+	CHECK_FAILED(hr);
+#pragma endregion
 
 	/* For.Com_CharacterController */
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
@@ -276,6 +319,8 @@ HRESULT CAwoofy::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool))))
 		return E_FAIL;
@@ -337,5 +382,7 @@ CGameObject* CAwoofy::Clone(void* pArg)
 void CAwoofy::Free()
 {
 	__super::Free();
+
+	Safe_Release(m_pEyeTextureCom);
 }
 

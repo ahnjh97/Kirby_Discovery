@@ -12,6 +12,7 @@ uint        g_iTriggerType;
 
 bool g_bStencil;
 bool g_bRimLight;
+float m_fRimWidth;
 bool g_bMotionBlur;
 float4 g_vMotionVelocity;
 
@@ -139,7 +140,7 @@ PS_OUT PS_MAIN(PS_IN In)
         Out.vStencil = vector(1.f, 0.f, 0.0f, 1.f);
     
     if (g_bRimLight == true)
-        Out.vRimLight = vector(0.f, 0.f, 1.f, 1.f);
+        Out.vRimLight = vector(0.f, m_fRimWidth, 1.f, 1.f);
 
     if (g_bMotionBlur == true)
         Out.vMotionBlur = g_vMotionVelocity;
@@ -164,7 +165,7 @@ PS_OUT NO_NORMALMAP_PS_MAIN(PS_IN In)
         Out.vStencil = vector(1.f, 0.f, 0.0f, 1.f);
     
     if (g_bRimLight == true)
-        Out.vRimLight = vector(0.f, 0.f, 1.f, 1.f);
+        Out.vRimLight = vector(0.f, m_fRimWidth, 1.f, 1.f);
 
     if (g_bMotionBlur == true)
         Out.vMotionBlur = g_vMotionVelocity;
@@ -338,6 +339,19 @@ PS_OUT PS_MAIN_WHITE_FX(PS_IN In)
     return Out;
 }
 
+PS_OUT_LIGHTDEPTH PS_MAIN_DEFERREDINFO(PS_IN In)
+{
+    PS_OUT_LIGHTDEPTH Out = (PS_OUT_LIGHTDEPTH) 0;
+    
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord);
+    if (vMtrlDiffuse.a == 0.f)
+        discard;
+
+    Out.vLightDepth = float4(0.f, 1.f, 0.f, 1.f);
+    return Out;
+}
+
+
 technique11 DefaultTechnique
 {
 	// 노말이 있는 일반 논 애님 모델 ( 0 )
@@ -444,7 +458,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_DEFAULT_FX();
     }
 
-    //디퓨즈가 흰색인 이펙트
+    //디퓨즈가 흰색인 이펙트 ( 8 )
     pass WhiteFX
     {
         SetRasterizerState(RS_NonCull);
@@ -457,4 +471,20 @@ technique11 DefaultTechnique
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_WHITE_FX();
     }
+
+    // 디퍼드 인포 ( 9 )
+    pass DeferredInfo_Depth
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_DEFERREDINFO();
+    }
+
+
 }

@@ -37,6 +37,9 @@ public:
 	_bool	Get_Vacuuming() { return m_bVacuuming; }
 	void	Set_Vacuuming(_bool bVacuuming) { m_bVacuuming = bVacuuming; }
 
+	_bool	Get_FlyAway() { return m_bFlyAway; }
+	void	Set_FlyAway(_bool bFlyAway) { m_bFlyAway = bFlyAway; }
+
 	// 넉백력을 정의해준다.
 	void	Set_DamageMoving(_float3 vDamgeDir, _float DamageJumpPower) {
 		m_vDamegeDir = vDamgeDir;
@@ -66,8 +69,11 @@ protected:
 	// 모든 객체들이 가지는 시간값
 	_float	m_fTimeDelta = { 0.f };
 
-	// 흡수할때, 이 값을 true가 된다. (충돌에 영향을 안 받게 됨)
+	// 흡수할때, 이 값은 true가 된다. (커비와 직접적인 충돌에 영향을 안 받게 됨)
 	_bool		m_bVacuuming = { false };
+
+	// 날아갈때, 이 값은 true가 된다. (커비가 먹고 날려야 하기 때문이다.)
+	_bool		m_bFlyAway = { false };
 
 };
 

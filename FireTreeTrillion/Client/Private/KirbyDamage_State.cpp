@@ -6,9 +6,9 @@ CKirbyDamage_State::CKirbyDamage_State()
 {
 }
 
-void CKirbyDamage_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CKirbyDamage_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CKirbyDamage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -34,7 +34,7 @@ void CKirbyDamage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 
 		if (pController->Is_Terrain() || pKirby->isAnimFinish())
 		{
-			pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_IDLE);
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 		}
 	}
@@ -59,7 +59,7 @@ void CKirbyDamage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 
 		if (pController->Is_Terrain() || pKirby->isAnimFinish())
 		{
-			pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_IDLE);
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 		}
 

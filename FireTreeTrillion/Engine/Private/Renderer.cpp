@@ -439,6 +439,7 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 		/////////////////////// UI를 제외하고 그려진 상황에서, 화면 색 보정 처리한다.
 
 		Interpolate_ColorData(fTimeDelta);
+		Interpolate_BlackBackground(fTimeDelta);
 
 		if (FAILED(Render_FinalResult()))
 			return E_FAIL;
@@ -459,30 +460,16 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 			m_bRimTest = !m_bRimTest;
 	}
 	
-	if (m_bRimTest == true)
-	{
-		m_fRimWidth += (0.2f - m_fRimWidth) * (fTimeDelta * 5.f);
-		if ((0.2f - m_fRimWidth) < 0.001f)
-		{
-			m_fRimWidth = 0.2f;
-		}
-	}
-	else
-	{
-		m_fRimWidth -= m_fRimWidth * (fTimeDelta * 5.f);
-		if (m_fRimWidth < 0.01f)
-		{
-			m_fRimWidth = 0.f;
-		}
-	}
-
 	// 고사양, 저사양 모드
 	if (m_pGameInstance->Get_DIKeyState(DIK_E, KEY_DOWN))
+	{
+		//레벨 별 사양 처리 (현재 TOOL_UI 레벨에서만 고/저사양 제외)
+		_uint* iCurrLevel = m_pGameInstance->Get_CurrentLevelID();
+		if (5 == *iCurrLevel) //LEVEL_TOOL_UI
+			return S_OK;
+
 		m_bLowPass = !m_bLowPass;
-	
-	//레벨 별 사양 처리
-	//int iCurrLevel = m_pGameInstance->Get_CurrentLevelID();
-	//if (3 == iCurrLevel) //LEVEL_GAMEPLAY
+	}
 
 #ifdef _DEBUG
 
@@ -495,9 +482,6 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 		if (FAILED(Render_Debug()))
 			return E_FAIL;
 	}
-
-
-
 
 	Render_IMGUI();
 #endif
@@ -614,7 +598,6 @@ HRESULT CRenderer::Render_LightDepth_For_GameObject(CShader* pShader, CTransform
 
 	return S_OK;
 }
-
 
 #ifdef _DEBUG
 
@@ -910,7 +893,9 @@ HRESULT CRenderer::Render_Result()
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_RimLight"), "g_RimLightTexture")))
 		return E_FAIL;
-	if (FAILED(m_pShader->Bind_RawValue("g_fRimWidth", &m_fRimWidth, sizeof(_float))))
+	if (FAILED(m_pShader->Bind_RawValue("g_bRimTest", &m_bRimTest, sizeof(_bool))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fBlackBackGround", &m_fBlackBackground, sizeof(_float))))
 		return E_FAIL;
 
 	// 섞을 스카이 박스
@@ -1146,6 +1131,7 @@ HRESULT CRenderer::Render_UI()
 
 HRESULT CRenderer::Render_SuperUI()
 {
+	//SuperUI :: Fadein FadeOut/트랜잭션 효과 등을 표현할 때 최우선 순위로 렌더할 UI 요소
 	for (auto& pRenderObject : m_RenderObjects[RENDER_SUPERUI])
 	{
 		if (nullptr != pRenderObject)
@@ -1356,6 +1342,22 @@ void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 
 	//	m_DestColorData = COLOR_DATA{};
 	//}
+}
+
+void CRenderer::Interpolate_BlackBackground(_float fTimeDelta)
+{
+	if (m_bBlackBackground == false)
+	{
+		m_fBlackBackground += fTimeDelta * 1.2f;
+		if (m_fBlackBackground > 1.f)
+			m_fBlackBackground = 1.f;
+	}
+	else
+	{
+		m_fBlackBackground -= fTimeDelta * 1.2f;
+		if (m_fBlackBackground < 0.5f)
+			m_fBlackBackground = 0.5f;
+	}
 }
 
 

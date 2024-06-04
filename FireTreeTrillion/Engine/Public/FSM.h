@@ -26,7 +26,7 @@ public:
 	HRESULT				Initialize(void* pArg);
 	
 	void				Update(class CGameObject* pGameObject, _float fTimeDelta);
-	_bool				ChangeState(_uint iState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _uIndex = 0);
+	_bool				ChangeState(_uint iState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _uIndex = 0, _uint _uOffSet = 0);
 	void				Add_State(_uint iState, CFSM_State* pInitState);
 	CFSM_State*			Find_State(_uint iState);
 
