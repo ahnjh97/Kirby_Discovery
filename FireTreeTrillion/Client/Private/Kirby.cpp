@@ -77,8 +77,8 @@ HRESULT CKirby::Initialize(void* pArg)
 	m_fMaxHp = 100.f;
 	m_fHp = 100.f;
 	m_fAttack = 5.f;
-	m_eAbilityType = ABILITY_DEFAULT;
-	//m_eAbilityType = ABILITY_SWORD;
+	//m_eAbilityType = ABILITY_DEFAULT;
+	m_eAbilityType = ABILITY_SWORD;
 
 	return S_OK;
 }
@@ -194,6 +194,7 @@ void CKirby::Render_IMGUI()
 
 	ImGui::Text("Vacuuming : %d", m_bVacuuming);
 	ImGui::Text("ObjectAddress : %d", INFO(m_pObject));
+	ImGui::Text("ChargeTime : %.2f", INFO(m_fChargeTime));
 	ImGui::Text("MoveSpeed : %.2f", INFO(m_fMoveSpeed));
 	ImGui::Text("PREATTACKSTATE : %d", INFO(m_ePreAttackState));
 	ImGui::Text("TemporaryEatType : %d", INFO(m_eTemporaryEatType));
@@ -704,7 +705,25 @@ void CKirby::SetUp_FSM()
 	m_pFSM->Add_State(SWORDSTATE_MULITSWORDATTACK, CKirbySword_Attack_State::Create());
 	// 3타
 	m_pFSM->Add_State(SWORDSTATE_DECISIVESLASH, CKirbySword_Attack_State::Create());
+	// 충전 모션 및 회전베기
+	m_pFSM->Add_State(SWORDSTATE_SPINSLASHCHARGE, CKirbySword_ChargeSpin_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SUPERSPINSLASHCHARGESTART, CKirbySword_ChargeSpin_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SUPERSPINSLASHCHARGE, CKirbySword_ChargeSpin_State::Create());
 
+	m_pFSM->Add_State(SWORDSTATE_SHUFFIEFRONT, CKirbySword_ChargeSpin_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SHUFFIERIGHT, CKirbySword_ChargeSpin_State::Create());
+
+	m_pFSM->Add_State(SWORDSTATE_GIGANTSPINSLASH, CKirbySword_ChargeSpin_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SUPERSPINSLASHSTART, CKirbySword_ChargeSpin_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SUPERSPINSLASHLOOP, CKirbySword_ChargeSpin_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SPINSLASHEND, CKirbySword_ChargeSpin_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SUPERSPINSLASHEND, CKirbySword_ChargeSpin_State::Create());
+
+	m_pFSM->Add_State(SWORDSTATE_UPWARDSLASH, CKirbySword_JumpAttack_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SWORDDIVE, CKirbySword_JumpAttack_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SWORDSPIN, CKirbySword_JumpAttack_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SWORDSPINSTART, CKirbySword_JumpAttack_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SPINAFTER, CKirbySword_JumpAttack_State::Create());
 
 
 	CFSM::FSM_INFO		FSM_Info_Desc = {};

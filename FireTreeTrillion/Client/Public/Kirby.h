@@ -85,6 +85,8 @@ public:
 		// 어택 시, 다음 어택모션이 정해질 시간변수
 		_float			m_fAttackTime = { 0.f };
 		STATE			m_ePreAttackState = { SWORDSTATE_DECISIVESLASH };
+		_bool			m_bWalkingCharge = { true };
+		_bool			m_bUpWardSlash = { false };
 
 	}KIRBY_INFODESC;
 
