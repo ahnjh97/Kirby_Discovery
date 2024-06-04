@@ -384,6 +384,9 @@
     <ClInclude Include="..\Public\HUD.h">
       <Filter>02.GameObjects\UI\HUD</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\LevelChanger.h">
+      <Filter>01.Levels\_LevelChanger</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -556,6 +559,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\HUD.cpp">
       <Filter>02.GameObjects\UI\HUD</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LevelChanger.cpp">
+      <Filter>01.Levels\_LevelChanger</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

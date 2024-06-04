@@ -3,6 +3,7 @@
 
 #include "GameInstance.h"
 #include "Level_Loading.h"
+#include "LevelChanger.h"
 
 #include "tinyxml2.h"
 #include "Utils.h"
@@ -635,5 +636,6 @@ void CMainApp::Free()
 
 	Safe_Release(m_pGameInstance);
 
+	CLevelChanger::Get_Instance()->Release_LevelChanger();
 	CGameInstance::Release_Engine();
 }
