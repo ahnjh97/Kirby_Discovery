@@ -44,7 +44,14 @@
 #include "AnimToolHelper.h"
 #include "AnimToolObject.h"
 
-//클라이언트
+// 클라이언트
+
+#pragma region 컴포넌트
+#include "RigidBody.h"
+#include "CharacterController.h"
+#pragma endregion
+
+#pragma region 객체
 #include "Camera_Free.h"
 #include "TestModel.h"
 #include "TestTerrain.h"
@@ -52,14 +59,14 @@
 #include "KirbyWeapons.h"
 #include "KirbyArmours.h"
 #include "Awoofy.h"
-#include "RigidBody.h"
-#include "CharacterController.h"
 #include "Rabbit.h"
 #include "Buffahorn.h"
 #include "BladeKnight.h"
 #include "BladeKnightSword.h"
-
 #include "Moon.h"
+#include "WasteCan.h"
+#pragma endregion
+
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
@@ -205,6 +212,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestMap"), CTestTerrain);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Moon"), CMoon);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("WasteCan"), CWasteCan);
 #pragma endregion
 
 	return S_OK;
@@ -565,6 +573,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Buffahorn", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("BladeKnight", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("BladeKnightSword", TYPE_NONANIM, 1.f);
+
+		// For Mab Interactive Object
+		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM, 1.f);
 	}
 	else if (eLevel == LEVEL_TOOL_MAP)
 	{
@@ -789,7 +800,6 @@ void CLoader::TraverseModelTxts(const wstring& rootFolderPath, list<wstring>& fi
 
 	FindClose(hFind);
 }
-
 
 // AnimTool에서 만들어놓은 파일을 읽어서 가지고있는 함수
 void CLoader::Load_AnimToolInfo()

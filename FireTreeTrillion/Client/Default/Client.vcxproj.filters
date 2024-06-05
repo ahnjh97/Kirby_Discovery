@@ -199,6 +199,9 @@
     <Filter Include="02.GameObjects\UI\Editor\Layer">
       <UniqueIdentifier>{a3260a15-cebf-4a5f-b682-fa24015a992a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\RigidObject\WasteCan">
+      <UniqueIdentifier>{f175b95e-a1d4-47cd-9d10-49f323d1f526}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -402,6 +405,9 @@
     <ClInclude Include="..\Public\LayerUI.h">
       <Filter>02.GameObjects\UI\Editor\Layer</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\WasteCan.h">
+      <Filter>02.GameObjects\PhysXObject\RigidObject\WasteCan</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -586,6 +592,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\LayerUI.cpp">
       <Filter>02.GameObjects\UI\Editor\Layer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\WasteCan.cpp">
+      <Filter>02.GameObjects\PhysXObject\RigidObject\WasteCan</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
