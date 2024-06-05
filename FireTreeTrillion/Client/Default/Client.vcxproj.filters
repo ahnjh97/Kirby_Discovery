@@ -193,6 +193,12 @@
     <Filter Include="02.GameObjects\UI\HUD">
       <UniqueIdentifier>{22a35dfd-b59c-4d3b-9206-374c1ec77e1a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Kabu">
+      <UniqueIdentifier>{585adf8d-8437-4502-8737-2b4dc975b783}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Kabu\State">
+      <UniqueIdentifier>{900bcf63-7231-4f8a-961b-9064113c9e34}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -384,6 +390,12 @@
     <ClInclude Include="..\Public\HUD.h">
       <Filter>02.GameObjects\UI\HUD</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kabu.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Kabu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kabu_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Kabu\State</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -556,6 +568,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\HUD.cpp">
       <Filter>02.GameObjects\UI\HUD</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kabu.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Kabu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kabu_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Kabu\State</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

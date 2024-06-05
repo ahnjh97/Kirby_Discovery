@@ -1,72 +1,130 @@
 #include "stdafx.h"
-#include "Buffahorn.h"
+#include "Kabu.h"
 #include "FSM.h"
-#include "Buffahorn_State.h"
+#include "Kabu_State.h"
 
-CBuffahorn::CBuffahorn(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CKabu::CKabu(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
 {
 }
 
-CBuffahorn::CBuffahorn(const CBuffahorn& rhs)
+CKabu::CKabu(const CKabu& rhs)
 	: CMonster{ rhs }
 {
 }
 
-HRESULT CBuffahorn::Initialize_Prototype()
+HRESULT CKabu::Initialize_Prototype()
 {
 	m_eCollisionGroup = MONSTER;
 
 	return S_OK;
 }
 
-HRESULT CBuffahorn::Initialize(void* pArg)
+HRESULT CKabu::Initialize(void* pArg)
 {
-	GAMEOBJECT_DESC* pGameObjectDesc = nullptr;
+	KABU_DESC* pKabuDesc = nullptr;
 
 	if (nullptr != pArg)
 	{
-		pGameObjectDesc = (GAMEOBJECT_DESC*)pArg;
+		pKabuDesc = (KABU_DESC*)pArg;
 
-		pGameObjectDesc->fSpeedPerSec = 7.f;
-		pGameObjectDesc->fRotationPerSec = XMConvertToRadians(90.0f);
+		pKabuDesc->fSpeedPerSec = 7.f;
+		pKabuDesc->fRotationPerSec = XMConvertToRadians(90.0f);
+		m_eMoveState = pKabuDesc->eMoveState;
 	}
 
-	if (FAILED(__super::Initialize(pGameObjectDesc)))
+	if (FAILED(__super::Initialize(pKabuDesc)))
 		return E_FAIL;
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	m_pModelCom->Set_Animation(BUFFAHORN_CHARGEWAIT, 50.f, true, true);
+	m_pModelCom->Set_Animation(KABU_WAIT, 50.f, true, true);
 
 
 	m_fMaxHp = 15.f;
 	m_fHp = 15.f;
 	m_fAttack = 10.f;
-	m_eVacuumSize = SIZE_BIG;
+	m_eVacuumSize = SIZE_SMALL;
 	m_eAbilityType = ABILITY_DEFAULT;
-	m_eEyeState = BUFFAHORNEYE_IDLE;
 
-	//for test
-	//31 8 -102
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(31.f, 8.f, -102.f, 1.f));
+	m_fDistance = 10.f;
+	m_fSpeed = 0.f;
+
+	//m_vRally = m_vecRallyPoint[m_iCnt + 1] - m_vecRallyPoint[m_iCnt];
+
 	return S_OK;
 }
 
-_int CBuffahorn::Tick(_float fTimeDelta)
+_int CKabu::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
 		return OBJ_DEAD;
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
+	m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), m_fTimeDelta * 5.f);
+
+	if(KABUMOVING_CIRCLE == m_eMoveState)
+	{
+		m_fAngle += m_fTimeDelta * 50.f;
+
+		m_vRotatePos.x = m_vOriginPos.x + (m_fDistance * sin(XMConvertToRadians(m_fAngle)));
+		m_vRotatePos.z = m_vOriginPos.z - (m_fDistance * cos(XMConvertToRadians(m_fAngle)));
+
+		m_pControllerCom->Move(m_pTransformCom, m_vRotatePos, m_fTimeDelta);
+	}
+	else if (KABUMOVING_PATROL == m_eMoveState)
+	{
+		m_fMoveTime += m_fTimeDelta;
+
+		if (1.f < m_fMoveTime)
+			m_fSpeed -= m_fTimeDelta * 10.f;
+		else if (1.f >= m_fMoveTime)
+			m_fSpeed += m_fTimeDelta * 10.f;
+
+		if (2.f < m_fMoveTime)
+		{
+			m_fMoveTime = 0.f;
+			m_fSpeed = 0.f;
+
+			if (m_iCnt == 0)
+			{
+				m_bConvert = false;
+				m_vRally = m_vecRallyPoint[m_iCnt + 1] - m_vecRallyPoint[m_iCnt];
+				m_iCnt++;
+			}
+			else if (m_iCnt < m_vecRallyPoint.size() - 1)
+			{
+				if(false == m_bConvert)
+				{
+					m_vRally = m_vecRallyPoint[m_iCnt + 1] - m_vecRallyPoint[m_iCnt];
+					m_iCnt++;
+				}
+				else
+				{
+					m_iCnt--;
+					m_vRally = m_vecRallyPoint[m_iCnt] - m_vecRallyPoint[m_iCnt + 1];
+				}
+			}
+			else
+			{
+				//m_iCnt = 0;
+				m_bConvert = true;
+				m_iCnt--;
+				m_vRally = m_vecRallyPoint[m_iCnt] - m_vecRallyPoint[m_iCnt + 1];
+			}
+		}
+
+		m_pControllerCom->Move_Dir(m_pTransformCom, XMVector3Normalize(m_vRally) * m_fTimeDelta * m_fSpeed, m_fTimeDelta);
+	}
+
 	__super::Tick(m_fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
 
-void CBuffahorn::Late_Tick(_float fTimeDelta)
+void CKabu::Late_Tick(_float fTimeDelta)
 {
 	m_pModelCom->Play_Animation(m_fTimeDelta);
 
@@ -77,7 +135,7 @@ void CBuffahorn::Late_Tick(_float fTimeDelta)
 	}
 }
 
-HRESULT CBuffahorn::Render()
+HRESULT CKabu::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
@@ -86,9 +144,6 @@ HRESULT CBuffahorn::Render()
 
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
-		if (Custom_Face(i) == true)
-			continue;
-
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
 			return E_FAIL;
 
@@ -105,7 +160,7 @@ HRESULT CBuffahorn::Render()
 	return S_OK;
 }
 
-HRESULT CBuffahorn::Render_LightDepth()
+HRESULT CKabu::Render_LightDepth()
 {
 	if (FAILED(m_pGameInstance->Render_LightDepth_For_GameObject(m_pShaderCom, m_pTransformCom, m_pModelCom)))
 		return E_FAIL;
@@ -114,7 +169,7 @@ HRESULT CBuffahorn::Render_LightDepth()
 }
 
 #ifdef _DEBUG
-void CBuffahorn::Render_IMGUI()
+void CKabu::Render_IMGUI()
 {
 	if (ImGui::TreeNode("Guizmo"))
 	{
@@ -140,22 +195,21 @@ void CBuffahorn::Render_IMGUI()
 }
 #endif
 
-void CBuffahorn::Collision_Attack(CGameObject* pOtherObj)
+void CKabu::Collision_Attack(CGameObject* pOtherObj)
 {
-
 }
 
-void CBuffahorn::Change_State(BUFFAHORN_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CKabu::Change_State(KABU_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
 {
 	m_pFSM->ChangeState((_uint)eState, _fAnimSpeed, _bLoop, _bInterpolation);
 }
 
-_bool CBuffahorn::IsAnimFinished()
+_bool CKabu::IsAnimFinished()
 {
 	return m_pModelCom->IsFinished();
 }
 
-HRESULT CBuffahorn::Add_Components()
+HRESULT CKabu::Add_Components()
 {
 	HRESULT hr;
 	/* For.Com_Shader */
@@ -164,13 +218,8 @@ HRESULT CBuffahorn::Add_Components()
 	CHECK_FAILED(hr);
 
 	/* For.Com_Model */
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Buffahorn"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Kabu"),
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
-	CHECK_FAILED(hr);
-
-	/* For.Com_Texture */
-	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Buffahorn_Eye"),
-		TEXT("Com_Texture"), (CComponent**)&m_pEyeTextureCom);
 	CHECK_FAILED(hr);
 
 	/* For.Com_CharacterController */
@@ -184,13 +233,17 @@ HRESULT CBuffahorn::Add_Components()
 	//m_pControllerCom->Set_CollisionType(m_eCollisionGroup);
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
-
-	SetUp_FSM();
+	m_vOriginPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	m_vecRallyPoint.push_back(vPos);
+	m_vecRallyPoint.push_back(XMVectorSet(3.f, 7.f, -176.f, 1.f));
+	//m_vecRallyPoint.push_back(XMVectorSet(2.f, 6.5f, -187.f, 1.f));
+	
+	//SetUp_FSM();
 
 	return S_OK;
 }
 
-HRESULT CBuffahorn::Bind_ShaderResources()
+HRESULT CKabu::Bind_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
@@ -215,7 +268,7 @@ HRESULT CBuffahorn::Bind_ShaderResources()
 	return S_OK;
 }
 
-void CBuffahorn::Compute_MotionBlur()
+void CKabu::Compute_MotionBlur()
 {
 	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 	_matrix ViewProjectionMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW) * m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
@@ -230,70 +283,27 @@ void CBuffahorn::Compute_MotionBlur()
 	m_vPreScreenPos = vCurScreenPos;
 }
 
-void CBuffahorn::SetUp_FSM()
+void CKabu::SetUp_FSM()
 {
 	// FSM 상태 초기화
 	m_pFSM = CFSM::Create();
-	m_pFSM->Add_State(BUFFAHORN_CHARGEWAIT, CBuffahorn_Idle_State::Create());
+	m_pFSM->Add_State(KABU_WAIT, CKabu_Idle_State::Create());
 
-	m_pFSM->Add_State(BUFFAHORN_FIND, CBuffahorn_Find_State::Create());
-
-	m_pFSM->Add_State(BUFFAHORN_WAIT, CBuffahorn_Wait_State::Create());
-
-	m_pFSM->Add_State(BUFFAHORN_RUNSTART, CBuffahorn_Run_State::Create());
-	m_pFSM->Add_State(BUFFAHORN_RUN, CBuffahorn_Run_State::Create());
-
-	m_pFSM->Add_State(BUFFAHORN_BRAKE, CBuffahorn_Brake_State::Create());
-	m_pFSM->Add_State(BUFFAHORN_BRAKEEND, CBuffahorn_Brake_State::Create());
-
-	m_pFSM->Add_State(BUFFAHORN_JUMP, CBuffahorn_Jump_State::Create());
-	m_pFSM->Add_State(BUFFAHORN_RETURNJUMPEND, CBuffahorn_Jump_State::Create());
 
 	//상태 Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};
-	FSM_Desc.iState = BUFFAHORN_CHARGEWAIT;
+	FSM_Desc.iState = KABU_WAIT;
 	FSM_Desc.pModel = &m_pModelCom;
 	m_pFSM->Initialize(&FSM_Desc);
 }
 
-_bool CBuffahorn::Custom_Face(_uint iMeshIndex)
+CKabu* CKabu::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	if (iMeshIndex == 1)
-	{
-		HRESULT hr;
-
-		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", iMeshIndex, TextureType_DIFFUSE);
-		CHECK_FAILED(hr);
-
-		hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", iMeshIndex);
-		CHECK_FAILED(hr);
-
-		hr = m_pEyeTextureCom->Bind_ShaderResource(m_pShaderCom, "g_KirbyEyeTexture", (_uint)m_eEyeState);
-		CHECK_FAILED(hr);
-
-		_bool bStencil = true;
-		_bool bRimLight = true;
-		_bool bMotionBlur = true;
-		m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
-
-		m_pShaderCom->Begin(ANIMMODEL_KIRBYEYE);
-		m_pModelCom->Render(iMeshIndex);
-
-		return true;
-	}
-
-	return false;
-}
-
-CBuffahorn* CBuffahorn::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-{
-	CBuffahorn* pInstance = new CBuffahorn(pDevice, pContext);
+	CKabu* pInstance = new CKabu(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Create : CBuffahorn"));
+		MSG_BOX(TEXT("Failed To Create : CKabu"));
 
 		Safe_Release(pInstance);
 	}
@@ -301,22 +311,20 @@ CBuffahorn* CBuffahorn::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pCont
 	return pInstance;
 }
 
-CGameObject* CBuffahorn::Clone(void* pArg)
+CGameObject* CKabu::Clone(void* pArg)
 {
-	CBuffahorn* pInstance = new CBuffahorn(*this);
+	CKabu* pInstance = new CKabu(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Clone : CBuffahorn"));
+		MSG_BOX(TEXT("Failed To Clone : CKabu"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CBuffahorn::Free()
+void CKabu::Free()
 {
 	__super::Free();
-
-	Safe_Release(m_pEyeTextureCom);
 }

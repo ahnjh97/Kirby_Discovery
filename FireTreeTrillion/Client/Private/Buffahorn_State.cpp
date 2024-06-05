@@ -37,6 +37,11 @@ void CBuffahorn_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	// 일정 거리 안으로 플레이어가 들어오면 상태 전환
 	if (15.f > fDistance)
 		pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_FIND, 50.f, false, true);
+
+	if (0.5f < pBuffahorn->Get_AnimRatio() && 0.55f > pBuffahorn->Get_AnimRatio())
+		pBuffahorn->Set_BuffahornEye(CBuffahorn::BUFFAHORNEYE_SLEEP);
+	else
+		pBuffahorn->Set_BuffahornEye(CBuffahorn::BUFFAHORNEYE_IDLE);
 }
 
 void CBuffahorn_Idle_State::OnStateExit()
@@ -86,7 +91,10 @@ void CBuffahorn_Find_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 1.5f);
 
 	if (true == pBuffahorn->IsAnimFinished())
+	{
+		pBuffahorn->Set_BuffahornEye(CBuffahorn::BUFFAHORNEYE_IDLE);
 		pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_WAIT, 50.f, true, true);
+	}
 }
 
 void CBuffahorn_Find_State::OnStateExit()
@@ -142,9 +150,20 @@ void CBuffahorn_Wait_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 	// 일정 거리 안으로 플레이어가 들어오면 상태 전환
 	if (13.f > fDistance)
+	{
+		pBuffahorn->Set_BuffahornEye(CBuffahorn::BUFFAHORNEYE_IDLE);
 		pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_RUNSTART, 50.f, false, true);
+	}
 	else if(15.f < fDistance)
+	{
+		pBuffahorn->Set_BuffahornEye(CBuffahorn::BUFFAHORNEYE_IDLE);
 		pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_CHARGEWAIT, 50.f, true, true);
+	}
+
+	if (0.5f < pBuffahorn->Get_AnimRatio() && 0.55f > pBuffahorn->Get_AnimRatio())
+		pBuffahorn->Set_BuffahornEye(CBuffahorn::BUFFAHORNEYE_SLEEP);
+	else
+		pBuffahorn->Set_BuffahornEye(CBuffahorn::BUFFAHORNEYE_IDLE);
 }
 
 void CBuffahorn_Wait_State::OnStateExit()
@@ -196,7 +215,10 @@ void CBuffahorn_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		if (2.f > m_fTimeDelta)
 			pController->Move_Dir(pTransformCom, pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * fTimeDelta * 10.f, fTimeDelta);
 		else
+		{
+			pBuffahorn->Set_BuffahornEye(CBuffahorn::BUFFAHORNEYE_IDLE);
 			pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_BRAKE, 50.f, false, true);
+		}
 	}
 
 	_float fHeight = pController->Compute_Height(pTransformCom->Get_State_Vector(CTransform::STATE_LOOK));
@@ -204,6 +226,7 @@ void CBuffahorn_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	if(2.f < fHeight)
 	{
 		pBuffahorn->Set_JumpTime(15.f);
+		pBuffahorn->Set_BuffahornEye(CBuffahorn::BUFFAHORNEYE_IDLE);
 		pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_JUMP, 80.f, false, true);
 	}
 }
@@ -263,7 +286,10 @@ void CBuffahorn_Brake_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 	if (CBuffahorn::BUFFAHORN_BRAKEEND == pBuffahorn->Get_State())
 	{
 		if(true == pBuffahorn->IsAnimFinished())
+		{
+			pBuffahorn->Set_BuffahornEye(CBuffahorn::BUFFAHORNEYE_IDLE);
 			pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_CHARGEWAIT, 50.f, true, true);
+		}
 	}
 }
 
@@ -304,16 +330,6 @@ void CBuffahorn_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 
-	//if (true == pBuffahorn->IsAnimFinished())
-	//{
-	//	switch (pBuffahorn->Get_State())
-	//	{
-	//	case CBuffahorn::BUFFAHORN_JUMP:
-	//		pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_RETURNJUMPEND, 50.f, false, true);
-	//		break;
-	//	}
-	//}
-
 	pController->Move_Dir(pTransformCom, pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * fTimeDelta * 6.f, fTimeDelta);
 
 	_float fJumpVelocity = pBuffahorn->Get_JumpTime();
@@ -322,12 +338,18 @@ void CBuffahorn_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	pBuffahorn->Set_JumpTime(fJumpVelocity);
 
 	if (true == pBuffahorn->IsAnimFinished() && true == pController->Is_Terrain())
+	{
+		pBuffahorn->Set_BuffahornEye(CBuffahorn::BUFFAHORNEYE_IDLE);
 		pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_RETURNJUMPEND, 100.f, false, true);
+	}
 
 	if (CBuffahorn::BUFFAHORN_RETURNJUMPEND == pBuffahorn->Get_State())
 	{
 		if (true == pBuffahorn->IsAnimFinished())
+		{
+			pBuffahorn->Set_BuffahornEye(CBuffahorn::BUFFAHORNEYE_IDLE);
 			pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_RUN, 50.f, true, true);
+		}
 	}
 }
 

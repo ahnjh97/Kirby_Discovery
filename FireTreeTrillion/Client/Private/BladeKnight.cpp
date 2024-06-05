@@ -223,8 +223,6 @@ HRESULT CBladeKnight::Add_PartObjects()
 
 	m_pSword = dynamic_cast<CBladeKnightSword*>(pWeaponObject);
 
-	Safe_AddRef(m_pSword);
-
 	m_PartObjects.emplace(TEXT("Part_Weapon"), pWeaponObject);
 
 
@@ -324,6 +322,5 @@ void CBladeKnight::Free()
 	for (auto& Pair : m_PartObjects)
 		Safe_Release(Pair.second);
 
-	Safe_Release(m_pSword);
 	m_PartObjects.clear();
 }

@@ -53,6 +53,7 @@ void CAwoofy_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 
 	m_fTimeDelta += fTimeDelta;
 
+	// Awoofy의 역동적인 eye state
 	if(CAwoofy::AWOOFY_WAIT == pAwoofy->Get_State() || CAwoofy::AWOOFY_LOOKAROUND == pAwoofy->Get_State())
 	{
 		if (2.5f < m_fTimeDelta)
@@ -67,9 +68,13 @@ void CAwoofy_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	}
 	else if (CAwoofy::AWOOFY_GROOMING == pAwoofy->Get_State())
 	{
-		if (0.5f < pAwoofy->Get_AnimRatio() && 0.75f > pAwoofy->Get_AnimRatio())
+		m_fTimeDelta = 0.f;
+
+		if (0.45f < pAwoofy->Get_AnimRatio() && 0.75f > pAwoofy->Get_AnimRatio())
 			pAwoofy->Set_AwoofyEye(CAwoofy::AWOOFYEYE_HAPPY);
-		else if(0.75f <= pAwoofy->Get_AnimRatio())
+		else if(0.8f > pAwoofy->Get_AnimRatio())
+			pAwoofy->Set_AwoofyEye(CAwoofy::AWOOFYEYE_IDLE);
+		else if(0.8f <= pAwoofy->Get_AnimRatio())
 			pAwoofy->Set_AwoofyEye(CAwoofy::AWOOFYEYE_ANGER);
 	}
 

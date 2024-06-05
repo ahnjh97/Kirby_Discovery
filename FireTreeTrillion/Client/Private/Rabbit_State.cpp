@@ -66,6 +66,7 @@ void CRabbit_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 				else if(7.f >= fDistance)
 					pRabbit->Compute_Parabola(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
 
+				pRabbit->Set_RabbitEye(CRabbit::RABBITEYE_IDLE);
 				pRabbit->Change_State(CRabbit::RABBIT_JUMPSTART, 100.f, false, true);
 			}
 		}
@@ -78,6 +79,7 @@ void CRabbit_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 			if (135.f > XMConvertToDegrees(fAngle))
 			{
 				pRabbit->Set_Find(true);
+				pRabbit->Set_RabbitEye(CRabbit::RABBITEYE_IDLE);
 				pRabbit->Change_State(CRabbit::RABBIT_FIND, 40.f, false, true);
 			}
 		}
@@ -106,6 +108,24 @@ void CRabbit_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 			else
 				pRabbit->Change_State(CRabbit::RABBIT_LOOKAROUND, 40.f, false, true);
 		}
+	}
+
+	// eye state
+	if(CRabbit::RABBIT_WAIT == pRabbit->Get_State())
+	{
+		if (0.45f < pRabbit->Get_AnimRatio() && 0.5f > pRabbit->Get_AnimRatio())
+			pRabbit->Set_RabbitEye(CRabbit::RABBITEYE_HAPPY);
+		else
+			pRabbit->Set_RabbitEye(CRabbit::RABBITEYE_IDLE);
+	}
+	else if (CRabbit::RABBIT_LOOKAROUND == pRabbit->Get_State())
+	{
+		if (0.59f < pRabbit->Get_AnimRatio() && 0.6f > pRabbit->Get_AnimRatio())
+			pRabbit->Set_RabbitEye(CRabbit::RABBITEYE_HAPPY);
+		else if (0.63f < pRabbit->Get_AnimRatio() && 0.64f > pRabbit->Get_AnimRatio())
+			pRabbit->Set_RabbitEye(CRabbit::RABBITEYE_HAPPY);
+		else
+			pRabbit->Set_RabbitEye(CRabbit::RABBITEYE_IDLE);
 	}
 }
 
@@ -159,6 +179,7 @@ void CRabbit_Find_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	{
 		pRabbit->Set_TimeDelta(0.f);
 		pRabbit->Compute_Parabola(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
+		pRabbit->Set_RabbitEye(CRabbit::RABBITEYE_IDLE);
 		pRabbit->Change_State(CRabbit::RABBIT_JUMPSTART, 100.f, false, true);
 	}
 }
@@ -244,6 +265,7 @@ void CRabbit_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 			// 자유 낙하
 			pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
 
+			pRabbit->Set_RabbitEye(CRabbit::RABBITEYE_IDLE);
 			pRabbit->Change_State(CRabbit::RABBIT_JUMPLANDING, 45.f, false, true);
 		}
 	}
@@ -290,7 +312,10 @@ void CRabbit_JumpLanding_State::OnStateUpdate(CGameObject* pGameObject, _float f
 	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
 
 	if (pRabbit->IsAnimFinished())
+	{
+		pRabbit->Set_RabbitEye(CRabbit::RABBITEYE_IDLE);
 		pRabbit->Change_State(CRabbit::RABBIT_WAIT, 100.f, false, true);
+	}
 }
 
 void CRabbit_JumpLanding_State::OnStateExit()
@@ -322,13 +347,6 @@ CRabbit_Damage_State::CRabbit_Damage_State()
 void CRabbit_Damage_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
-
-	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
-	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
-
-	m_vKirbyLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
-
-	m_fJumpVelocity = 6.f;
 }
 
 void CRabbit_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -339,14 +357,25 @@ void CRabbit_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 	if (pRabbit->Get_Vacuuming() == false)
 	{
-		pTransformCom->Look_At_Axis(-m_vKirbyLook);
-		pController->Move_Dir(pTransformCom, m_vKirbyLook * fTimeDelta * 11.f, fTimeDelta);
+		// 일단 그 방향으로 바라보게만 한다.
+		_float3 vDamegeDir = pRabbit->Get_DamegeDir();
+		pTransformCom->Look_At_Axis(-vDamegeDir);
 
-		m_fJumpVelocity -= GRAVITY * fTimeDelta * 2.5f;
-		pController->Jump(pTransformCom, m_fJumpVelocity, fTimeDelta);
+		// 이제 날아가는 것을 구현해보자.
+		pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 6.f, fTimeDelta);
+
+		// 점프되는 체공시간을 구현해보자.
+		_float fDamageJumpPower = pRabbit->Get_DamageJumpPower();
+		pController->Jump(pTransformCom, fDamageJumpPower, fTimeDelta);
+		fDamageJumpPower -= GRAVITY * fTimeDelta * 3.f;
+
+		pRabbit->Set_DamageJumpPower(fDamageJumpPower);
 
 		if (true == pRabbit->IsAnimFinished() || pController->Is_Terrain())
+		{
+			pRabbit->Set_RabbitEye(CRabbit::RABBITEYE_IDLE);
 			pRabbit->Change_State(CRabbit::RABBIT_WAIT, 45.f, false, true);
+		}
 	}
 }
 

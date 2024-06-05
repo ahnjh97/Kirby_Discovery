@@ -52,6 +52,7 @@
 #include "TestModel.h"
 #include "TestTerrain.h"
 #include "Kirby.h"
+// ∏ÛΩ∫≈Õ
 #include "Awoofy.h"
 #include "RigidBody.h"
 #include "CharacterController.h"
@@ -59,6 +60,7 @@
 #include "Buffahorn.h"
 #include "BladeKnight.h"
 #include "BladeKnightSword.h"
+#include "Kabu.h"
 
 #include "Moon.h"
 
@@ -198,6 +200,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Buffahorn"), CBuffahorn);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BladeKnight"), CBladeKnight);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BladeKnightSword"), CBladeKnightSword);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kabu"), CKabu);
+
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BackGround"), CBackGround);
 	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_Test"), CTestUI);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
@@ -551,6 +555,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Buffahorn", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("BladeKnight", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("BladeKnightSword", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("Kabu", TYPE_ANIM, 2.f, 180.f);
 	}
 	else if (eLevel == LEVEL_TOOL_MAP)
 	{
@@ -670,9 +675,13 @@ HRESULT CLoader::Add_KirbyFaceTexture(LEVEL eLevel)
 	if (FAILED(Add_Texture(eLevel, "Awoofy_Eye", "AwoofyEye/NormalEnemyEye%d.dds", 5)))
 		return E_FAIL;
 
-	//// Rabbit Eye
-	//if (FAILED(Add_Texture(eLevel, "Rabbit_Eye", "RabbitEye/RabbitEye%d.dds", 5)))
-	//	return E_FAIL;
+	// Rabbit Eye
+	if (FAILED(Add_Texture(eLevel, "Rabbit_Eye", "RabbitEye/RabbitEnemyEye.0%d.dds", 5)))
+		return E_FAIL;
+
+	// Buffahorn Eye
+	if (FAILED(Add_Texture(eLevel, "Buffahorn_Eye", "BuffahornEye/TackleEnemyEye.0%d.dds", 4)))
+		return E_FAIL;
 
 	return S_OK;
 }

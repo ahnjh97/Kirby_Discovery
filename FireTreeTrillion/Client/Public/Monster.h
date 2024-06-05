@@ -15,7 +15,7 @@ BEGIN(Client)
 class CMonster abstract : public CCharacter
 {
 public:
-	struct MONSTER_DESC : public CGameObject
+	struct MONSTER_DESC : public CGameObject::GAMEOBJECT_DESC
 	{
 
 	};

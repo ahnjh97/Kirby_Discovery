@@ -27,8 +27,8 @@ private:
 	virtual ~CAwoofy() = default;
 
 public:
-	void Set_AwoofyEye(AWOOFYEYE_STATE _eEye) {
-		m_eEyeState = _eEye;
+	void Set_AwoofyEye(AWOOFYEYE_STATE eEyeState) {
+		m_eEyeState = eEyeState;
 	}
 
 	_float Get_AnimRatio() {
@@ -58,10 +58,9 @@ private:
 	CTexture*			m_pEyeTextureCom = { nullptr };
 
 	AWOOFY_ANIM			m_eCurrentState = { AWOOFY_END };
-	AWOOFYEYE_STATE	m_eEyeState = { AWOOFYEYE_END };
-	_float m_fAngle = { 0.f };
+	AWOOFYEYE_STATE		m_eEyeState = { AWOOFYEYE_END };
 
-
+	_float				m_fAngle = { 0.f };
 
 private:
 	HRESULT Add_Components();
