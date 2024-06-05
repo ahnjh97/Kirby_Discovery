@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "..\Public\Level_GamePlay.h"
+#include "LevelChanger.h"
 
 #include "Kirby.h"
 #include "Level_GamePlay.h"
@@ -16,6 +17,8 @@ CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 
 HRESULT CLevel_GamePlay::Initialize()
 {
+	CLevelChanger::Get_Instance()->Load();
+
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
 	
@@ -38,8 +41,8 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_ParsedObjects()))
 		return E_FAIL;
 
-	//if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
-	//	return E_FAIL;
+	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
+		return E_FAIL;
 
 	// TEST (블러와 블랜드의 관계)
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Moon"), TEXT("Prototype_GameObject_Moon"))))
@@ -121,12 +124,11 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
 
 HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
-
 	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_SkySphere"));
 	CHECK_FAILED(hr);
 
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_TestMap"))))
-	//	return E_FAIL;
+	hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_WasteCan"));
+	CHECK_FAILED(hr);
 
 	return S_OK;
 }
@@ -163,7 +165,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const wstring & strLayerTag)
 HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& strLayerTag)
 {
 	string strFilePath = { "../../../UI_txt/" };
-	string strUITag = { "Single_UI_Orig.txt" };
+	string strUITag = { "LayerUI_Orig.txt" };
 
 	std::ifstream InputFile(strFilePath + strUITag, ios::in | std::ios::binary);
 
@@ -175,7 +177,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& strLayerTag)
 
 	size_t size = 0;
 	InputFile.read(reinterpret_cast<char*>(&size), sizeof(size));
-	//m_UIs.reserve(size);
+	//m_LayerUIs.reserve(size);
 
 	for (size_t i = 0; i < size; ++i)
 	{
@@ -383,4 +385,6 @@ void CLevel_GamePlay::Free()
 {
 	__super::Free();
 	m_pGameInstance->Clear_EventCallBack();
+
+	CLevelChanger::Get_Instance()->Save();
 }

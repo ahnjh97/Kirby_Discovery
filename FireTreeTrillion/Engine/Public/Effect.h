@@ -173,8 +173,12 @@ protected:
 	_float			m_fCurAlpha = { 1.f };
 	//마스크 임계
 	_float			m_fCurMaskThreshold = { 0.f };
-	//uv 오프셋
+
+	//uv 오프셋들
 	_float2			m_vCurUVOffset = { 0.f, 0.f };
+	_float2			m_vCurMaskUVOffset = { 0.f, 0.f };
+	_float			m_vCurMaskUVAngle = { 0.f };
+
 protected:
 	_bool			Update_Duration(_float fTimeDelta);
 	_bool			Update_LifeTime(_float fTimeDelta);

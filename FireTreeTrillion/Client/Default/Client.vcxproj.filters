@@ -166,12 +166,6 @@
     <Filter Include="02.GameObjects\Effect\FXToolDirector">
       <UniqueIdentifier>{dbb187c2-6962-4466-b912-a53c4e5d474a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\UI\Editor\Single">
-      <UniqueIdentifier>{ac3d583d-1d14-49c7-8cb8-b77af55d1bd6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\UI\Editor\Multi">
-      <UniqueIdentifier>{0739de1b-2da7-47f4-8811-597bd872e366}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Anim">
       <UniqueIdentifier>{51ec9ec2-a618-48a0-816b-2a9fc108e89c}</UniqueIdentifier>
     </Filter>
@@ -183,6 +177,15 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword">
       <UniqueIdentifier>{c3a1e0ee-a23e-4cfa-80f9-70d6a55eb2b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyContents_State">
+      <UniqueIdentifier>{327ee443-7a2d-4e39-acdc-88550179e67c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbySword_State">
+      <UniqueIdentifier>{00b58d0d-786b-4ae0-a6e2-a4a5042882aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\Kirby\PartObject">
+      <UniqueIdentifier>{9f9cb972-12d8-4dd6-9d3b-e75811e79a7e}</UniqueIdentifier>
     </Filter>
     <Filter Include="01.Levels\_LevelChanger">
       <UniqueIdentifier>{e6904695-a072-4b0f-b959-c88b8cd03ebc}</UniqueIdentifier>
@@ -198,6 +201,12 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Kabu\State">
       <UniqueIdentifier>{900bcf63-7231-4f8a-961b-9064113c9e34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\Editor\Layer">
+      <UniqueIdentifier>{a3260a15-cebf-4a5f-b682-fa24015a992a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\RigidObject\WasteCan">
+      <UniqueIdentifier>{f175b95e-a1d4-47cd-9d10-49f323d1f526}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -357,12 +366,6 @@
     <ClInclude Include="..\Public\RigidObject.h">
       <Filter>02.GameObjects\PhysXObject\RigidObject</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Single_UI.h">
-      <Filter>02.GameObjects\UI\Editor\Single</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Multi_UI.h">
-      <Filter>02.GameObjects\UI\Editor\Multi</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\AnimToolHelper.h">
       <Filter>02.GameObjects\Anim</Filter>
     </ClInclude>
@@ -384,6 +387,18 @@
     <ClInclude Include="..\Public\ImSequencer.h">
       <Filter>02.GameObjects\Anim</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\KirbyContents_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyContents_State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KirbySword_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbySword_State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KirbyArmours.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\PartObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KirbyWeapons.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\PartObject</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Moon.h">
       <Filter>02.GameObjects\Moon</Filter>
     </ClInclude>
@@ -395,6 +410,15 @@
     </ClInclude>
     <ClInclude Include="..\Public\Kabu_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\Kabu\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LevelChanger.h">
+      <Filter>01.Levels\_LevelChanger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LayerUI.h">
+      <Filter>02.GameObjects\UI\Editor\Layer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\WasteCan.h">
+      <Filter>02.GameObjects\PhysXObject\RigidObject\WasteCan</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -545,12 +569,6 @@
     <ClCompile Include="..\Private\BladeKnightSword.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Single_UI.cpp">
-      <Filter>02.GameObjects\UI\Editor\Single</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Multi_UI.cpp">
-      <Filter>02.GameObjects\UI\Editor\Multi</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\AnimToolHelper.cpp">
       <Filter>02.GameObjects\Anim</Filter>
     </ClCompile>
@@ -563,6 +581,18 @@
     <ClCompile Include="..\Private\ImSequencer.cpp">
       <Filter>02.GameObjects\Anim</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\KirbyContents_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyContents_State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KirbySword_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbySword_State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KirbyArmours.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\PartObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KirbyWeapons.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\PartObject</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Moon.cpp">
       <Filter>02.GameObjects\Moon</Filter>
     </ClCompile>
@@ -574,6 +604,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kabu_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\Kabu\State</Filter>
+    </ClCompile>	
+    <ClCompile Include="..\Private\LevelChanger.cpp">
+      <Filter>01.Levels\_LevelChanger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LayerUI.cpp">
+      <Filter>02.GameObjects\UI\Editor\Layer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\WasteCan.cpp">
+      <Filter>02.GameObjects\PhysXObject\RigidObject\WasteCan</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

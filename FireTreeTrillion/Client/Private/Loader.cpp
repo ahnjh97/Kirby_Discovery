@@ -29,10 +29,7 @@
 #endif
 
 //#include "TestUI.h"
-#include "Single_UI.h"
-#include "Multi_UI.h"
-#include "HUD.h"
-
+#include "LayerUI.h"
 #pragma endregion
 
 //이펙트 툴
@@ -47,15 +44,23 @@
 #include "AnimToolHelper.h"
 #include "AnimToolObject.h"
 
-//클라이언트
+// 클라이언트
+
+#pragma region 컴포넌트
+#include "RigidBody.h"
+#include "CharacterController.h"
+#pragma endregion
+
+#pragma region 객체
 #include "Camera_Free.h"
 #include "TestModel.h"
 #include "TestTerrain.h"
 #include "Kirby.h"
+
 // 몬스터
+#include "KirbyWeapons.h"
+#include "KirbyArmours.h"
 #include "Awoofy.h"
-#include "RigidBody.h"
-#include "CharacterController.h"
 #include "Rabbit.h"
 #include "Buffahorn.h"
 #include "BladeKnight.h"
@@ -63,6 +68,9 @@
 #include "Kabu.h"
 
 #include "Moon.h"
+#include "WasteCan.h"
+#pragma endregion
+
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
@@ -189,12 +197,14 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("OrbitingCamera"), COrbitingCamera);
 
 	// UI
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Single_UI"), CSingle_UI);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Multi_UI"), CMulti_UI);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("LayerUI"), CLayerUI);
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("Multi_UI"), CMulti_UI);
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
 	
 #pragma region FOR CLIENT
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kirby"), CKirby);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KirbyWeapons"), CKirbyWeapons);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KirbyArmours"), CKirbyArmours);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Awoofy"), CAwoofy);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Rabbit"), CRabbit);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Buffahorn"), CBuffahorn);
@@ -208,6 +218,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestMap"), CTestTerrain);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Moon"), CMoon);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("WasteCan"), CWasteCan);
 #pragma endregion
 
 	return S_OK;
@@ -240,6 +251,11 @@ HRESULT CLoader::Loading_StaticComponentAll()
 	hr = Add_Texture(eLevel, "FX_VacuumDGB", "Effects/twinkle02.png");
 	CHECK_FAILED(hr);
 
+	hr = Add_Texture(eLevel, "FX_Wind", "Effects/wind_%d.png", 2);
+	CHECK_FAILED(hr);
+
+	hr = Add_Texture(eLevel, "FX_Shockwave", "Effects/shockwave_%d.png", 1);
+	CHECK_FAILED(hr);
 
 	wstring wstrPrototypeTag = L"Prototype_Component_Shader_";
 	hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + TEXT("VtxPosTex"),
@@ -523,6 +539,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("VacuumWind", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("VacuumDGB", TYPE_NONANIM);
 
+		m_vecModelInfo.emplace_back("SwordTrail", TYPE_NONANIM);
 
 	}
 	else if (eLevel == LEVEL_LOGO)
@@ -542,6 +559,13 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("KirbyBalloon", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("KirbyDefault", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("KirbyVacuum", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbySwordDefault", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbySwordBalloon", TYPE_ANIM, 1.f, 180.f);
+		// For Kirby Weapon
+		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
+		// For Kirby Armour
+		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
+
 
 		m_vecModelInfo.emplace_back("GsBenchAL", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("Level0Stage1Step01", TYPE_NONANIM);
@@ -556,6 +580,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("BladeKnight", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("BladeKnightSword", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("Kabu", TYPE_ANIM, 2.f, 180.f);
+
+		// For Mab Interactive Object
+		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM, 1.f);
 	}
 	else if (eLevel == LEVEL_TOOL_MAP)
 	{
@@ -785,7 +812,6 @@ void CLoader::TraverseModelTxts(const wstring& rootFolderPath, list<wstring>& fi
 	FindClose(hFind);
 }
 
-
 // AnimTool에서 만들어놓은 파일을 읽어서 가지고있는 함수
 void CLoader::Load_AnimToolInfo()
 {
@@ -881,8 +907,6 @@ void CLoader::Load_AnimToolInfo()
 		}
 	}
 }
-
-
 
 CLoader * CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID)
 {

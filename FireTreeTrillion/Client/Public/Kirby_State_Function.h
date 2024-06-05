@@ -57,6 +57,9 @@ static void Turn_Interpolate(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTra
 	}
 	///////////
 
+
+
+
 }
 
 // 조이스틱의 방향이 꺾일 때, Dir방향으로 Z 회전하는 기능 (오토바이 무빙)
@@ -388,6 +391,92 @@ static _bool JoyStick_controller(CKirby::KIRBY_INFODESC* Kirbydesc, CGameObject*
 	return false;
 }
 
+// 단순 조이스틱 On? or Off?
+static _bool JoyStick_On()
+{
+	if (GAMEINSTANCE Get_DIKeyState(DIK_UP, KEY_PRESS))
+		return true;
+	else if (GAMEINSTANCE Get_DIKeyState(DIK_DOWN, KEY_PRESS))
+		return true;
+	else if (GAMEINSTANCE Get_DIKeyState(DIK_LEFT, KEY_PRESS))
+		return true;
+	else if (GAMEINSTANCE Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
+		return true;
+
+	return false;
+}
+
+// 순수한 방향을 얻는 함수
+static _float4 JoyStick_controller_OtherDir(CGameObject* pCamera)
+{
+	if (GAMEINSTANCE Get_DIKeyState(DIK_UP, KEY_PRESS))
+	{
+		if (GAMEINSTANCE Get_DIKeyState(DIK_LEFT, KEY_PRESS))
+			return Make_TargetDir(CKirby::DIR_LF, pCamera);
+		else if (GAMEINSTANCE Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
+			return Make_TargetDir(CKirby::DIR_RF, pCamera);
+		else
+			return Make_TargetDir(CKirby::DIR_FRONT, pCamera);
+
+	}
+	else if (GAMEINSTANCE Get_DIKeyState(DIK_DOWN, KEY_PRESS))
+	{
+		if (GAMEINSTANCE Get_DIKeyState(DIK_LEFT, KEY_PRESS))
+			return Make_TargetDir(CKirby::DIR_LB, pCamera);
+		else if (GAMEINSTANCE Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
+			return Make_TargetDir(CKirby::DIR_RB, pCamera);
+		else
+			return Make_TargetDir(CKirby::DIR_BACK, pCamera);
+	}
+	else if (GAMEINSTANCE Get_DIKeyState(DIK_LEFT, KEY_PRESS))
+	{
+		return Make_TargetDir(CKirby::DIR_LEFT, pCamera);
+	}
+	else if (GAMEINSTANCE Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
+	{
+		return Make_TargetDir(CKirby::DIR_RIGHT, pCamera);
+	}
+	return _float4(0.f, 0.f, 0.f, 0.f);
+}
+
+// 조이스틱을 제어하고 있으면 true, 제어하고 있지 않으면 false. 근데 이 친구는 커비가 방향을 돌지 않는다.
+static _bool JoyStick_controller_Attack(CKirby::KIRBY_INFODESC* Kirbydesc, CGameObject* pCamera)
+{
+	if (GAMEINSTANCE Get_DIKeyState(DIK_UP, KEY_PRESS))
+	{
+		if (GAMEINSTANCE Get_DIKeyState(DIK_LEFT, KEY_PRESS))
+			DESC(m_vAttackDir) = Make_TargetDir(CKirby::DIR_LF, pCamera);
+		else if (GAMEINSTANCE Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
+			DESC(m_vAttackDir) = Make_TargetDir(CKirby::DIR_RF, pCamera);
+		else
+			DESC(m_vAttackDir) = Make_TargetDir(CKirby::DIR_FRONT, pCamera);
+
+		return true;
+	}
+	else if (GAMEINSTANCE Get_DIKeyState(DIK_DOWN, KEY_PRESS))
+	{
+		if (GAMEINSTANCE Get_DIKeyState(DIK_LEFT, KEY_PRESS))
+			DESC(m_vAttackDir) = Make_TargetDir(CKirby::DIR_LB, pCamera);
+		else if (GAMEINSTANCE Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
+			DESC(m_vAttackDir) = Make_TargetDir(CKirby::DIR_RB, pCamera);
+		else
+			DESC(m_vAttackDir) = Make_TargetDir(CKirby::DIR_BACK, pCamera);
+
+		return true;
+	}
+	else if (GAMEINSTANCE Get_DIKeyState(DIK_LEFT, KEY_PRESS))
+	{
+		DESC(m_vAttackDir) = Make_TargetDir(CKirby::DIR_LEFT, pCamera);
+		return true;
+	}
+	else if (GAMEINSTANCE Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
+	{
+		DESC(m_vAttackDir) = Make_TargetDir(CKirby::DIR_RIGHT, pCamera);
+		return true;
+	}
+	return false;
+}
+
 // 커비 몸체 기준에서, 내가 누른 방향이 어느 방향인지 배출하는 기능
 static CKirby::DIR Kirby_Standard_Angle(CKirby::KIRBY_INFODESC* Kirbydesc)
 {
@@ -407,12 +496,31 @@ static CKirby::DIR Kirby_Standard_Angle(CKirby::KIRBY_INFODESC* Kirbydesc)
 	return CKirby::DIR_FRONT;
 }
 
+// 커비 몸체 기준에서, 내가 누른 방향이 어느 방향인지 배출하는 기능 (1. 기준축, 2. 비교군)
+static CKirby::DIR Kirby_Standard_Angle(_float4 vAxisDir, _float4 vDiffDir)
+{
+	_float fCX = vAxisDir.x;
+	_float fCZ = vAxisDir.z;
+	_float fDX = vDiffDir.x;
+	_float fDZ = vDiffDir.z;
+
+	_float fAngle = (atan2f(fCX, fCZ) * 180.0f / XM_PI) - (atan2f(fDX, fDZ) * 180.0f / XM_PI);
+	if (fAngle < 0.f) fAngle += 360.0f;
+
+	if (fAngle >= 315.f || fAngle < 45.f) return CKirby::DIR_FRONT;
+	else if (fAngle >= 45.f && fAngle < 135.f) return CKirby::DIR_LEFT;
+	else if (fAngle >= 135.f && fAngle < 225.f) return CKirby::DIR_BACK;
+	else if (fAngle >= 225.f && fAngle < 315.f) return CKirby::DIR_RIGHT;
+
+	return CKirby::DIR_FRONT;
+}
+
 // 덤블링 하면서 그 방향으로 나가게 한다.
 static void Dodge_Moving_Logic(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTransformCom, CCharacterController* pController, _float fTimeDelta)
 {
 	DESC(m_fMoveSpeed) += fTimeDelta * 100.f;
-	if (DESC(m_fMoveSpeed) > 8.f)
-		DESC(m_fMoveSpeed) = 8.f;
+	if (DESC(m_fMoveSpeed) > 10.f)
+		DESC(m_fMoveSpeed) = 10.f;
 
 	// 타겟기준
 	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
@@ -444,6 +552,7 @@ static _bool Is_BigTurn(CKirby::KIRBY_INFODESC* Kirbydesc)
 	return false;
 }
 
+// 주변에서 가장 가까운 Object를 흡수한다. 몬스터 -> 아이템 -> 오브젝트 우선순위
 static _bool Vacuum_Object(CKirby* pKirby, _float fTimeDelta)
 {
 	CTransform* pTransformCom = pKirby->Get_TransformCom();
@@ -524,12 +633,78 @@ static _bool Vacuum_Object(CKirby* pKirby, _float fTimeDelta)
 
 		if (DESC(m_pObject)->Get_VacuumSize() == SIZE_SMALL)
 			pKirby->Change_State(CKirby::STATE_VACUUM, 50.f, true, true, CKirby::BODY_VACUUM);
-
 		else if (DESC(m_pObject)->Get_VacuumSize() == SIZE_BIG)
 			pKirby->Change_State(CKirby::STATE_VACUUMHUSTLELV2, 50.f, true, true, CKirby::BODY_VACUUM);
 
 		return true;
 	}
 
+
+	// 이 이후로는 아이템, 돌멩이 등 진행하여야 한다.
+
+
+
 	return false;
+}
+
+// 커비가 빌보드 한다.
+static void Kirby_Billboard(CTransform* pTransformCom, CGameObject* pCamera)
+{
+	_float3   vScale = pTransformCom->Get_Scaled();
+	_float4x4      CamMatrix;
+	CTransform* pCamTransform = pCamera->Get_TransformCom();
+	CamMatrix = pCamTransform->Get_WorldFloat4x4();
+
+	_vector vLook, vRight, vUp;
+
+	vRight = CUtils::Get_State_Vector_Matrix(CamMatrix, CUtils::STATE_RIGHT);
+	vLook = CUtils::Get_State_Vector_Matrix(CamMatrix, CUtils::STATE_LOOK);
+	vUp = CUtils::Get_State_Vector_Matrix(CamMatrix, CUtils::STATE_UP);
+
+	vRight = XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 1.f), vLook);
+	vLook = XMVector3Cross(vRight, vUp);
+	pTransformCom->Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLook) * vScale.z);
+	pTransformCom->Set_State(CTransform::STATE_UP, XMVector3Normalize(vUp) * vScale.y);
+	pTransformCom->Set_State(CTransform::STATE_RIGHT, XMVector3Normalize(vRight) * vScale.x);
+}
+
+// 커비가 자신의 능력에 따라 상태로 변형된다!! (공용에서 비슷한 애들로 넘어갈 때만)
+static void Kirby_AbilityType_Assist(CKirby* pKirby, CKirby::STATE eState)
+{
+	if (eState == CKirby::STATE_IDLE)
+	{
+		if (pKirby->Get_AbilityType() == ABILITY_SWORD)
+			pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		else
+			pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+	}
+	else if (eState == CKirby::STATE_RUNSTART)
+	{
+		if (pKirby->Get_AbilityType() == ABILITY_SWORD)
+			pKirby->Change_State(CKirby::SWORDSTATE_RUN, 120.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		else
+			pKirby->Change_State(CKirby::STATE_RUNSTART, 120.f, true, true, CKirby::BODY_DEFAULT);
+	}
+	else if (eState == CKirby::STATE_GUARD)
+	{
+		if (pKirby->Get_AbilityType() == ABILITY_SWORD)
+			pKirby->Change_State(CKirby::SWORDSTATE_GUARD, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		else
+			pKirby->Change_State(CKirby::STATE_GUARD, 60.f, true, true, CKirby::BODY_DEFAULT);
+	}
+	else if (eState == CKirby::STATE_SLIDESTART)
+	{
+		if (pKirby->Get_AbilityType() == ABILITY_SWORD)
+			pKirby->Change_State(CKirby::SWORDSTATE_SWORDSLIDESTART, 60.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		else
+			pKirby->Change_State(CKirby::STATE_SLIDESTART, 60.f, false, false, CKirby::BODY_DEFAULT);
+	}
+	else if (eState == CKirby::STATE_FLIGHT)
+	{
+		if (pKirby->Get_AbilityType() == ABILITY_SWORD)
+			pKirby->Change_State(CKirby::SWORDSTATE_HAVESWORDWAITFLIGHT, 60.f, false, false, CKirby::BODY_SWORDBALLOON, CKirby::OFFSET_SWORD);
+		else
+			pKirby->Change_State(CKirby::STATE_FLIGHT, 60.f, false, false, CKirby::BODY_BALLOON);
+	}
+
 }

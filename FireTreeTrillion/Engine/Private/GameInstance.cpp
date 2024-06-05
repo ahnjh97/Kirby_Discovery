@@ -125,8 +125,6 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 		nullptr == m_pPipeLine)
 		return;
 
-
-
 	m_pInput_Device->Tick();
 	m_pTimeController->Update_TimeController(fTimeDelta);
 
@@ -138,7 +136,11 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 	m_pFrustum->Tick();
 
 #ifdef _DEBUG
+
 	m_pIMGUI_Manager->Late_Tick(fTimeDelta);
+
+	m_pLight_Manager->IMGUI_Tick();
+
 #endif
 
 	m_pObject_Manager->Late_Tick(fTimeDelta);
@@ -321,6 +323,14 @@ void CGameInstance::Update_DofFocus(_fvector vWorldPos)
 
 	m_pRenderer->Update_DofFocus(vWorldPos);
 
+}
+
+void CGameInstance::Set_BlackBackGround(_bool bSet)
+{
+	if (nullptr == m_pRenderer)
+		return;
+
+	m_pRenderer->Set_BlackBackGround(bSet);
 }
 
 #ifdef _DEBUG

@@ -88,6 +88,8 @@ protected:
 
 	_bool									m_bHide = { false };
 
+	_float									m_fRimWidth = { 0.2f };
+
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;
 	virtual void Free() override;

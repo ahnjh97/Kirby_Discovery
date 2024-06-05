@@ -7,7 +7,8 @@ BEGIN(Engine)
 class ENGINE_DLL CUIObject abstract : public CGameObject
 {
 protected:
-	enum UI_TYPE { TYPE_LAYER, TYPE_MULTI, TYPE_NONE };
+	enum UI_TYPE { TYPE_LAYER, TYPE_GROUP, TYPE_NONE };
+	enum UI_GROUP { GROUP_ALL, GROUP_SELECT, GROUP_NONE };
 	enum SHADER_PS
 	{
 		PS_DEFAULT, PS_ALPHABLEND,
@@ -50,25 +51,28 @@ public:
 	virtual _int	Tick(_float fTimeDelta)						override;
 	virtual void	Late_Tick(_float fTimeDelta)				override;
 	virtual HRESULT Render()									override;
+
 #ifdef _DEBUG
 	virtual void	Render_IMGUI()								override;
 #endif
 
 protected:
-	CShader*			m_pShaderCom = { nullptr };
-	CVIBuffer_Rect*		m_pVIBufferCom = { nullptr };
-	CTexture*			m_pTextureCom = { nullptr };
+	CShader*					m_pShaderCom = { nullptr };
+	CVIBuffer_Rect*				m_pVIBufferCom = { nullptr };
+	CTexture*					m_pTextureCom = { nullptr };
+	//ID3D11Texture2D* m_;
+	ID3D11RenderTargetView*		m_pRTV = { nullptr };
 
-	UIOBJ_DESC			m_UIObjDesc{};
-	UI_TYPE				m_eUIType = { TYPE_NONE };
+	UIOBJ_DESC					m_UIObjDesc{};
+	UI_TYPE						m_eUIType = { TYPE_NONE };
 	
-	_uint				m_iTexIndex = { 0 };
-	_float4x4			m_ViewMatrix, m_ProjMatrix;
+	_uint						m_iTexIndex = { 0 };
+	_float4x4					m_ViewMatrix, m_ProjMatrix;
 
-	_bool				m_bIsRender = false;
+	_bool						m_bIsRender = false;
 
-	vector<CUIObject*>	m_UIs;
-	vector<CUIObject*>	m_MultiUIs;
+	vector<CUIObject*>			m_LayerUIs;
+	vector <vector<CUIObject*>>	m_GroupUIs;
 	
 public:
 	virtual CGameObject* Clone(_uint iLevelIndex, void* pArg) { return nullptr; }

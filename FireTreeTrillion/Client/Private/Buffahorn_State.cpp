@@ -11,9 +11,9 @@ CBuffahorn_Idle_State::CBuffahorn_Idle_State()
 {
 }
 
-void CBuffahorn_Idle_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CBuffahorn_Idle_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CBuffahorn_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -70,9 +70,9 @@ CBuffahorn_Find_State::CBuffahorn_Find_State()
 {
 }
 
-void CBuffahorn_Find_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CBuffahorn_Find_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CBuffahorn_Find_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -123,9 +123,9 @@ CBuffahorn_Wait_State::CBuffahorn_Wait_State()
 {
 }
 
-void CBuffahorn_Wait_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CBuffahorn_Wait_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CBuffahorn_Wait_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -190,9 +190,9 @@ CBuffahorn_Run_State::CBuffahorn_Run_State()
 {
 }
 
-void CBuffahorn_Run_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CBuffahorn_Run_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 
 	m_fTimeDelta = 0.f;
 }
@@ -257,9 +257,9 @@ CBuffahorn_Brake_State::CBuffahorn_Brake_State()
 {
 }
 
-void CBuffahorn_Brake_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CBuffahorn_Brake_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 
 	m_fSpeed = 1.f;
 }
@@ -319,9 +319,9 @@ CBuffahorn_Jump_State::CBuffahorn_Jump_State()
 {
 }
 
-void CBuffahorn_Jump_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CBuffahorn_Jump_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CBuffahorn_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)

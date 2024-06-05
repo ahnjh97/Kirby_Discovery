@@ -4,6 +4,7 @@
 #include "GameInstance.h"
 #include "ImGuizmo.h"
 #include "PipeLine.h"
+#include "../../Client/Public/Editor_UI.h"
 
 #include "ImGuiFileDialog.h"
 #include "ImGuiFileDialogConfig.h"
@@ -147,9 +148,8 @@ void CImGUI_Manager::RenderGrid()
 
 void CImGUI_Manager::EditTransform(_float4x4& matrix)
 {
-#ifndef _MY_DEBUG
-	return;
-#endif
+
+#ifdef _DEBUG
 
 	ImGui::Separator();
 	ImGui::NewLine();
@@ -205,6 +205,9 @@ void CImGUI_Manager::EditTransform(_float4x4& matrix)
 	ViewMatrix = CGameInstance::Get_Instance()->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW);
 	ProjMatrix = CGameInstance::Get_Instance()->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
 	ImGuizmo::Manipulate(ViewMatrix.m[0], ProjMatrix.m[0], mCurrentGizmoOperation, mCurrentGizmoMode, matrix.m[0], NULL, useSnap ? &snap.x : NULL);
+
+#endif
+
 }
 
 CImGUI_Manager::FILE_MODE CImGUI_Manager::Set_FileDialog()
@@ -215,7 +218,7 @@ CImGUI_Manager::FILE_MODE CImGUI_Manager::Set_FileDialog()
 	{
 		// 다이얼로그 오픈
 		IGFD::FileDialogConfig SaveFileConfig;
-		SaveFileConfig.path = "../Bin/Resources/";
+		SaveFileConfig.path = "../";
 
 		ImGuiFileDialog::Instance()->OpenDialog("SaveFile_Dialog", u8"저장할 파일을 선택하세요", ".txt", SaveFileConfig);		// 디스플레이
 		
@@ -243,7 +246,7 @@ CImGUI_Manager::FILE_MODE CImGUI_Manager::Set_FileDialog()
 	{
 		// 다이얼로그 오픈
 		IGFD::FileDialogConfig LoadFileConfig;
-		LoadFileConfig.path = "../Bin/Resources/";
+		LoadFileConfig.path = "../";
 
 		ImGuiFileDialog::Instance()->OpenDialog("LoadFile_Dialog", u8"로드할 파일을 선택하세요", ".txt", LoadFileConfig);		// 디스플레이
 
@@ -254,6 +257,7 @@ CImGUI_Manager::FILE_MODE CImGUI_Manager::Set_FileDialog()
 			{
 				string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
 				string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+				//_pEditUI->Save_FileData()
 			}
 
 			// 디스플레이 닫기
