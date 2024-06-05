@@ -238,7 +238,7 @@ void CAnimToolHelper::Render_AnimationList()
 			if (ImGui::BeginListBox(" ", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing())))
 			{
 				// 해당 모델이 가지고 있는 애니메이션 개수
-				_uint uAnimCnt = m_pModel->Get_AnimCnt();
+				_int uAnimCnt = (_int)m_pModel->Get_AnimCnt();
 				vector<CAnimation*>* pVecAnims = m_pModel->Get_Animations();
 
 				if (m_pGameInstance->Get_KeyState(DIK_UP, KEY_DOWN))
@@ -335,7 +335,7 @@ void CAnimToolHelper::Render_AnimationList(const wstring& wstrObjectTag)
 							// 해당 모델이 가지고 있는 애니메이션 개수
 							_uint uAnimCnt = pModel[w]->Get_AnimCnt();
 							vector<CAnimation*>* pVecAnims = pModel[w]->Get_Animations();
-							for (_int n = 0; n < uAnimCnt; n++)
+							for (_uint n = 0; n < uAnimCnt; n++)
 							{
 								const _bool is_selected = (item_current_idx == n);
 								const _char* animName = (*pVecAnims)[n]->Get_AnimationName();
@@ -415,7 +415,7 @@ void CAnimToolHelper::Render_FrameLine(CAnimation** ppAnimation, const string& s
 	if (!bIsLoop)
 		(*ppAnimation)->Set_TrackPosition((_float)currentFrame);
 	else
-		currentFrame = (*ppAnimation)->Get_TrackPosition();
+		currentFrame = (_int)(*ppAnimation)->Get_TrackPosition();
 	ImGui::SameLine();
 	
 	// 애니메이션 스피드
