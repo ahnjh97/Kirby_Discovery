@@ -290,34 +290,34 @@ void CModel::Find_MinMax(_float3& vMin, _float3& vMax)
 
 void CModel::Create_OcTree(_float3 vMin, _float3 vMax)
 {
-	if (vMin.x == 0 || false == m_tModel.bOctree || nullptr == m_pMergedMesh)
-		return;
+	//if (vMin.x == 0 || false == m_tModel.bOctree || nullptr == m_pMergedMesh)
+	//	return;
 
-	m_vMin = vMin;
-	m_vMax = vMax;
-	_float3 vCenter = _float3((m_vMin.x + m_vMax.x) * 0.5f, (m_vMin.y + m_vMax.y) * 0.5f, (m_vMin.z + m_vMax.z) * 0.5f);
-	_float3 vHalfExtents = _float3((m_vMax.x - m_vMin.x) * 0.5f, (m_vMax.y - m_vMin.y) * 0.5f, (m_vMax.z - m_vMin.z) * 0.5f);
+	//m_vMin = vMin;
+	//m_vMax = vMax;
+	//_float3 vCenter = _float3((m_vMin.x + m_vMax.x) * 0.5f, (m_vMin.y + m_vMax.y) * 0.5f, (m_vMin.z + m_vMax.z) * 0.5f);
+	//_float3 vHalfExtents = _float3((m_vMax.x - m_vMin.x) * 0.5f, (m_vMax.y - m_vMin.y) * 0.5f, (m_vMax.z - m_vMin.z) * 0.5f);
 
-	_float3* pVerticesPtr = m_pMergedMesh->Get_VerticesPtr();
-	_uint iNumVertices = m_pMergedMesh->Get_NumVertices();
-	_uint* pIndicesPtr = m_pMergedMesh->Get_IndicesPtr();
-	_uint iNumIndices = m_pMergedMesh->Get_NumIndices();
+	//_float3* pVerticesPtr = m_pMergedMesh->Get_VerticesPtr();
+	//_uint iNumVertices = m_pMergedMesh->Get_NumVertices();
+	//_uint* pIndicesPtr = m_pMergedMesh->Get_IndicesPtr();
+	//_uint iNumIndices = m_pMergedMesh->Get_NumIndices();
 
-	vector<FACE> vecFaces;
+	//vector<FACE> vecFaces;
 
-	_int iCount{};
-	for (_uint i = 0; i < iNumIndices / 3; i++)
-	{
-		vecFaces.emplace_back(pIndicesPtr[iCount], pIndicesPtr[iCount + 1], pIndicesPtr[iCount + 2]);
-		iCount += 3;
-	}
+	//_int iCount{};
+	//for (_uint i = 0; i < iNumIndices / 3; i++)
+	//{
+	//	vecFaces.emplace_back(pIndicesPtr[iCount], pIndicesPtr[iCount + 1], pIndicesPtr[iCount + 2]);
+	//	iCount += 3;
+	//}
 
-	string strFilePath = "../../../objects_txt/" + m_tModel.strModelName + "_Octree.txt";
-	ifstream fileInput(strFilePath, ios::in | ios::binary);
+	//string strFilePath = "../../../objects_txt/" + m_tModel.strModelName + "_Octree.txt";
+	//ifstream fileInput(strFilePath, ios::in | ios::binary);
 
-	m_pOctree = COcTree::Create(vCenter, vHalfExtents, pVerticesPtr, iNumVertices, vecFaces, fileInput);
+	//m_pOctree = COcTree::Create(vCenter, vHalfExtents, pVerticesPtr, iNumVertices, vecFaces, fileInput);
 
-	fileInput.close();
+	//fileInput.close();
 }
 
 void CModel::Culling(_fmatrix matWorldInverse)

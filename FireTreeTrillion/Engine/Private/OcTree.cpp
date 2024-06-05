@@ -1,35 +1,40 @@
 #include "GameInstance.h"
 #include "OcTree.h"
+#include "Mesh.h"
 
 COcTree::COcTree()
 {
 }
 
-HRESULT COcTree::Initialize(_float3 vCenter, _float3 vHalfExtents, const _float3* _pVerticesPtrs, const  _uint _iNumVertices
-	, const vector<FACE>& _vecMeshFaces, ifstream& fileInput)
+HRESULT COcTree::Initialize(_float3 vCenter, _float3 vHalfExtents, const vector<_float3*>& _vecVerticesPtrs, const vector<_uint>& _vecNumVertices
+	, const vector<_float3*>& _vecNormals, const vector<_float3*>& _vecIndicesPtrs, const vector<_uint>& _vecNumIndices, ifstream& fileInput
+	, vector<class CMesh*>& _vecMeshes)
 {
+	if (false == _vecMeshes.empty())
+		m_vecMeshes = _vecMeshes;
+
 	m_vCenter = vCenter;
 	m_vecEdges.resize(OC_END);
 	m_vecChildren.resize(OC_END);
-	m_vecChidrenMeshFaces.resize(OC_END);
+	m_vecChildrenFaces.resize(OC_END);
 
 	SetUp_Edges(vCenter, vHalfExtents);
 
-	if(false == Load_OctreeData(fileInput))
-		IdentifyOctant(_pVerticesPtrs, _iNumVertices, _vecMeshFaces);
+	///*if(false == Load_OctreeData(fileInput))
+	//	*/IdentifyOctant(_pVerticesPtrs, _iNumVertices, _vecMeshFaces);
 
-	if (_vecMeshFaces.size() < 30 || XMVectorGetX(XMVector3Length(m_vecEdges[OC_XYZ] - m_vecEdges[OC_xyz])) < 12)
-		return S_OK;
+	//if (_vecMeshFaces.size() < 30 || XMVectorGetX(XMVector3Length(m_vecEdges[OC_XYZ] - m_vecEdges[OC_xyz])) < 12)
+	//	return S_OK;
 
-	vector<_float3> vecChildrenCenters(OC_END);
+	//vector<_float3> vecChildrenCenters(OC_END);
 
-	_float3 vQuarterExtents = _float3(vHalfExtents.x * 0.5f, vHalfExtents.y * 0.5f, vHalfExtents.z * 0.5f);
-	SetUp_ChildrenCenter(vCenter, vQuarterExtents, vecChildrenCenters);
+	//_float3 vQuarterExtents = _float3(vHalfExtents.x * 0.5f, vHalfExtents.y * 0.5f, vHalfExtents.z * 0.5f);
+	//SetUp_ChildrenCenter(vCenter, vQuarterExtents, vecChildrenCenters);
 
-	for (_int j = 0; j < OC_END; j++) {
-		m_vecChildren[j] = COcTree::Create(vecChildrenCenters[j], vQuarterExtents
-			, _pVerticesPtrs, _iNumVertices, m_vecChidrenMeshFaces[j], fileInput);
-	}
+	//for (_int j = 0; j < OC_END; j++) {
+	//	m_vecChildren[j] = COcTree::Create(vecChildrenCenters[j], vQuarterExtents
+	//		, _pVerticesPtrs, _iNumVertices, m_vecChildrenFaces[j], fileInput);
+	//}
 
 	return S_OK;
 }
@@ -38,13 +43,6 @@ void COcTree::Culling(CGameInstance* pGameInstance, const _float3* _pVerticePose
 {
 	if (nullptr == m_vecChildren[OC_XYZ])
 		return;
-
-	_vecResultFaces.insert(_vecResultFaces.end(), m_vecMeshFaces.begin(), m_vecMeshFaces.end());
-
-	for (_int i = 0; i < OC_END; i++)
-	{
-		_vecResultFaces.insert(_vecResultFaces.end(), m_vecChidrenMeshFaces[i].begin(), m_vecChidrenMeshFaces[i].end());
-	}
 }
 
 _bool COcTree::IsDrawable(CGameInstance* pGameInstance, const vector<_float3*>& _vecMeshVerticesPtrs)
@@ -75,7 +73,7 @@ void COcTree::IdentifyOctant(const _float3* _VerticesPtr, const _uint _iNumVerti
 		if (eOctant == OC_END)
 			m_vecMeshFaces.emplace_back(face);
 		else
-			m_vecChidrenMeshFaces[eOctant].emplace_back(face);
+			m_vecChildrenFaces[eOctant].emplace_back(face);
 	}
 }
 
@@ -161,17 +159,17 @@ void COcTree::Save_OctreeData(ofstream& fileOutput)
 
 	for (_int iOctant = 0; iOctant < OC_END; iOctant++)
 	{
-		if (m_vecChidrenMeshFaces[iOctant].empty())
+		if (m_vecChildrenFaces[iOctant].empty())
 		{
 			_uint iZero = 0;
 			fileOutput.write(reinterpret_cast<const char*>(&iZero), sizeof(iZero));
 			continue;
 		}
 
-		_uint iNumFaces = m_vecChidrenMeshFaces[iOctant].size();
+		_uint iNumFaces = m_vecChildrenFaces[iOctant].size();
 		fileOutput.write(reinterpret_cast<const char*>(&iNumFaces), sizeof(iNumFaces));
 
-		for (auto& childFace : m_vecChidrenMeshFaces[iOctant])
+		for (auto& childFace : m_vecChildrenFaces[iOctant])
 			fileOutput.write(reinterpret_cast<const char*>(&childFace), sizeof(childFace));
 		
 	}
@@ -218,7 +216,7 @@ _bool COcTree::Load_OctreeData(ifstream& fileInput)
 		for (_uint iFaceIdx = 0; iFaceIdx < iNumFaces; iFaceIdx++)
 		{
 			fileInput.read(reinterpret_cast<char*>(&tTempFace), sizeof(tTempFace));
-			m_vecChidrenMeshFaces[iOctant].emplace_back(tTempFace);
+			m_vecChildrenFaces[iOctant].emplace_back(tTempFace);
 		}
 	}
 
@@ -249,12 +247,14 @@ void COcTree::SetUp_ChildrenCenter(_float3 vCenter, _float3 vQuarterExtents, vec
 	_vecChildrenCenters[OC_xYz] = _float3(vCenter.x - vQuarterExtents.x, vCenter.y + vQuarterExtents.y, vCenter.z - vQuarterExtents.z);
 }
 
-COcTree* COcTree::Create(_float3 vCenter, _float3 vHalfExtents, const _float3* _pVerticesPtrs, const _uint _iNumVertices
-	, const vector<FACE>& _vecMeshFaces, ifstream& fileInput)
+COcTree* COcTree::Create(_float3 vCenter, _float3 vHalfExtents, const vector<_float3*>& _vecVerticesPtrs, const vector<_uint>& _vecNumVertices
+	, const vector<_float3*>& _vecNormals, const vector<_float3*>& _vecIndicesPtrs, const vector<_uint>& _vecNumIndices, ifstream& fileInput
+	, vector<class CMesh*>& _vecMeshes)
 {
 	COcTree* pInstance = new COcTree();
 
-	if (FAILED(pInstance->Initialize(vCenter, vHalfExtents, _pVerticesPtrs, _iNumVertices, _vecMeshFaces, fileInput)))
+	if (FAILED(pInstance->Initialize(vCenter, vHalfExtents, _vecVerticesPtrs, _vecNumVertices
+		, _vecNormals, _vecIndicesPtrs, _vecNumIndices, fileInput, _vecMeshes)))
 	{
 		MSG_BOX(TEXT("Failed to Create : COcTree"));
 		Safe_Release(pInstance);

@@ -83,6 +83,11 @@ HRESULT CMesh::Initialize_Prototype(TYPE eModelType, string strDirectory, const 
 		return S_OK;
 }
 
+HRESULT CMesh::Initialize_Prototype(const _float3* pVerticePos, _uint iNumVertices, const _float3* pNormals, _uint* pIndices, _uint iNumIndices)
+{
+	return S_OK;
+}
+
 HRESULT CMesh::Initialize(void * pArg)
 {
 	return S_OK;
@@ -307,6 +312,20 @@ CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE 
 	CMesh* pInstance = new CMesh(pDevice, pContext, fileStream);
 
 	if (FAILED(pInstance->Initialize_Prototype(eModelType, strDirectory, Bones, TransformMatrix, bOctree)))
+	{
+		MSG_BOX(TEXT("Failed To Create : CMesh"));
+
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
+CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _float3* pVerticePos, _uint iNumVertices, const _float3* pNormals, _uint* pIndices, _uint iNumIndices)
+{
+	CMesh* pInstance = new CMesh(pDevice, pContext, ifstream());
+
+	if (FAILED(pInstance->Initialize_Prototype(pVerticePos, iNumVertices, pNormals, pIndices, iNumIndices)))
 	{
 		MSG_BOX(TEXT("Failed To Create : CMesh"));
 

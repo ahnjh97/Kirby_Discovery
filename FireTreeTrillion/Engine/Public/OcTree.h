@@ -13,9 +13,9 @@ private:
 	virtual ~COcTree() = default;
 
 public:
-	HRESULT Initialize(_float3 vCenter, _float3 vHalfExtents, const _float3* _pVerticesPtrs, const _uint _iNumVertices
-		, const vector<FACE>& _vecMeshFaces, ifstream& fileInput);
-
+	HRESULT Initialize(_float3 vCenter, _float3 vHalfExtents, const vector<_float3*>& _vecVerticesPtrs, const vector<_uint>& _vecNumVertices
+		, const vector<_float3*>& _vecNormals, const vector<_float3*>& _vecIndicesPtrs, const vector<_uint>& _vecNumIndices, ifstream& fileInput
+		, vector<class CMesh*>& _vecMeshes);
 	void Culling(class CGameInstance* pGameInstance, const _float3* _pVerticePoses, _uint _iNumVertices, vector<FACE>& _vecResultFaces);
 	_bool IsDrawable(class CGameInstance* pGameInstance, const vector<_float3*>& _vecMeshVerticesPtrs);
 
@@ -36,12 +36,18 @@ private:
 	vector<_float3>			m_vecEdges;	// 큐브의 꼭짓점들
 
 	vector<COcTree*>		m_vecChildren;
-	vector<FACE>			m_vecMeshFaces; // 각 메쉬의 인덱스 버퍼를 삼각형 단위(3개씩) 저장
-	vector<vector<FACE>>	m_vecChidrenMeshFaces; 
+	vector<FACE>			m_vecMeshFaces; // 각 메쉬의 인덱스 버퍼를 삼각형 단위(3개씩) 저장	
+	vector<vector<FACE>>	m_vecChildrenFaces;
+
+	vector<class CMesh*>	m_vecMeshes;
+	vector<class CMesh*>	m_vecAmbiguousMeshes;
+	vector<MESH_MATERIAL>	m_vecMaterials;
+	vector<MESH_MATERIAL>	m_vecAmbiguousMaterials;
 
 public:
-	static COcTree* Create(_float3 vCenter, _float3 vHalfExtents, const _float3* _pVerticesPtrs, const _uint _iNumVertices
-		, const vector<FACE>& _vecMeshFaces, ifstream& fileInput);
+	static COcTree* Create(_float3 vCenter, _float3 vHalfExtents, const vector<_float3*>& _vecVerticesPtrs, const vector<_uint>& _vecNumVertices
+		, const vector<_float3*>& _vecNormals, const vector<_float3*>& _vecIndicesPtrs, const vector<_uint>& _vecNumIndices, ifstream& fileInput
+		, vector<class CMesh*>& _vecMeshes);
 	virtual void Free() override;
 };
 

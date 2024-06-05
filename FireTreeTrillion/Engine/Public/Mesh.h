@@ -21,6 +21,8 @@ public:
 public:
 	virtual HRESULT Initialize_Prototype(TYPE eModelType, string strDirectory, const vector<CBone*>& Bones
 		, _fmatrix TransformMatrix, _bool bOctree);
+	virtual HRESULT Initialize_Prototype(const _float3* pVerticePos, _uint iNumVertices, const _float3* pNormals
+		, _uint* pIndices, _uint iNumIndices);
 	virtual HRESULT Initialize(void* pArg) override;
 #ifdef _DEBUG
 	virtual void	Render_IMGUI();
@@ -68,6 +70,8 @@ private:
 public:
 	static CMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eModelType, string strDirectory
 		, ifstream& fileStream, const vector<class CBone*>& Bones, _fmatrix TransformMatrix, _bool bOctree);
+	static CMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _float3* pVerticePos, _uint iNumVertices, const _float3* pNormals
+		, _uint* pIndices, _uint iNumIndices);
 	virtual CMesh* Clone(void* pArg);
 	virtual void Free() override;
 };
