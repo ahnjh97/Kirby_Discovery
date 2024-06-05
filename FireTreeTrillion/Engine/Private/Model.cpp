@@ -25,6 +25,8 @@ CModel::CModel(const CModel & rhs)
 	, m_iNumAnimations { rhs.m_iNumAnimations }	
 	, m_tModel{ rhs.m_tModel }
 	, m_pMergedMesh{ rhs.m_pMergedMesh }
+	, m_vecTextureArraySRVs{ rhs.m_vecTextureArraySRVs }
+	, m_pSamplerState{ rhs.m_pSamplerState }
 {
 	for (auto& pPrototypeAnimation : rhs.m_Animations)	
 		m_Animations.push_back(pPrototypeAnimation->Clone());
@@ -40,6 +42,11 @@ CModel::CModel(const CModel & rhs)
 		for (size_t i = 0; i < AI_TEXTURE_TYPE_MAX; i++)		
 			Safe_AddRef(Material.MaterialTextures[i]);	
 	}
+
+	Safe_AddRef(m_pSamplerState);
+
+	for (auto& texArraySRV : m_vecTextureArraySRVs)
+		Safe_AddRef(texArraySRV);
 }
 
 CBone * CModel::Get_BonePtr(const _char * pBoneName) const
@@ -95,7 +102,7 @@ HRESULT CModel::Initialize_Prototype(MODEL tModel)
 	if (FAILED(Ready_Meshes(tModel.bOctree)))
 		return E_FAIL;
 
- 	if (FAILED(Ready_Materials(m_tModel.strModelName.c_str())))
+ 	if (FAILED(Ready_Materials(m_tModel.strModelName.c_str(), tModel.bOctree)))
 		return E_FAIL;
 
 	if (m_tModel.eType == TYPE_ANIM)
@@ -106,9 +113,34 @@ HRESULT CModel::Initialize_Prototype(MODEL tModel)
 
 	m_InputFile.close();
 
-	if (true == tModel.bOctree)
+	if (true == tModel.bOctree) {
 		Create_MergedMesh(TransformMatrix);
+		CreateSamplerState();
 
+		vector<wstring> vecDiffuse;
+		for (auto& vecPaths : m_vecTexturePaths)
+			vecDiffuse.push_back(vecPaths[TextureType_DIFFUSE]);
+		m_vecTextureArraySRVs.emplace_back(CreateTexture2DArraySRV(vecDiffuse));
+
+		vector<wstring> vecNormal;
+		for (auto& vecPaths : m_vecTexturePaths)
+			vecNormal.push_back(vecPaths[TextureType_NORMALS]);
+		m_vecTextureArraySRVs.emplace_back(CreateTexture2DArraySRV(vecNormal));
+
+		vector<wstring> vecMRA;
+		for (auto& vecPaths : m_vecTexturePaths)
+			vecMRA.push_back(vecPaths[TextureType_METALNESS]);
+		m_vecTextureArraySRVs.emplace_back(CreateTexture2DArraySRV(vecMRA));
+
+		//wstring wstrFullPath = L"../../../Resources/Models/NonAnim/Level1Stage1Step01/GsAllBuildingCeilingConcreteC_MRA._622887136.dds";
+		//vecTexPath.emplace_back(wstrFullPath);
+
+
+
+		
+
+	}
+		
 	return S_OK;
 }
 
@@ -396,26 +428,111 @@ void CModel::Create_MergedMesh(_fmatrix TransformMatrix)
 		vecMeshNormalsPtrs, vecMeshIndicesPtrs, vecMeshNumIndices, vecMaterialIndices, m_tModel.strModelName, TransformMatrix);
 }
 
-void CModel::Create_TextureArray()
+void CModel::Bind_TextureArrays()
 {
-	ID3D11Resource* pResource = { nullptr };
-	ID3D11ShaderResourceView* pSRV = m_Materials[0].MaterialTextures[TextureType_DIFFUSE]->Get_pSRV_ByIndex(0);
-	ID3D11Texture2D* pSrcTexture = static_cast<ID3D11Texture2D*>(pResource);
-	D3D11_TEXTURE2D_DESC desc;
-	pSrcTexture->GetDesc(&desc);
-	pResource->Release();
+	if(nullptr != m_pSamplerState)
+		m_pContext->PSSetSamplers(5, 1, &m_pSamplerState);
+	for (_uint i = 4; i < 4 + m_vecTextureArraySRVs.size(); i++)
+		m_pContext->PSSetShaderResources(i, 1, &m_vecTextureArraySRVs[i-4]);
+}
 
-	D3D11_TEXTURE2D_DESC arrayDesc = desc;
-	arrayDesc.ArraySize = m_Materials.size();
-	arrayDesc.Usage = D3D11_USAGE_DEFAULT;
-	arrayDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-	arrayDesc.CPUAccessFlags = 0;
-	arrayDesc.MiscFlags = 0;
+ID3D11ShaderResourceView* CModel::CreateTexture2DArraySRV(const vector<wstring>& filePaths) {
+	ID3D10Multithread* pMultithread = nullptr;
+	if (FAILED(m_pDevice->QueryInterface(__uuidof(ID3D10Multithread), reinterpret_cast<void**>(&pMultithread)))) {
+		MSG_BOX(TEXT("ID3D10Multithread Failed."));
+		return nullptr;
+	}
+	pMultithread->SetMultithreadProtected(TRUE);
+	pMultithread->Enter();
 
-	ID3D11Texture2D* pTextureArray = nullptr;
-	HRESULT hr = m_pDevice->CreateTexture2D(&arrayDesc, nullptr, &pTextureArray);
+	vector<ID3D11Texture2D*> textures;
+	D3D11_TEXTURE2D_DESC textureDesc = {};
+	bool firstTexture = true;
+
+	for (const auto& filePath : filePaths) {
+		ID3D11ShaderResourceView* pSRV = nullptr;
+		ID3D11Resource* pResource = nullptr;
+		HRESULT hr = DirectX::CreateDDSTextureFromFile(m_pDevice, filePath.c_str(), &pResource, &pSRV);
+		if (FAILED(hr)) {
+			return nullptr;
+		}
+
+		ID3D11Texture2D* texture = nullptr;
+		hr = pResource->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&texture);
+		if (FAILED(hr)) {
+			pSRV->Release();
+			pResource->Release();
+			return nullptr;
+		}
+
+		textures.push_back(texture);
+
+		if (firstTexture) {
+			texture->GetDesc(&textureDesc);
+			firstTexture = false;
+		}
+
+		pSRV->Release();
+		pResource->Release();
+	}
+
+	textureDesc.ArraySize = static_cast<_uint>(textures.size());
+	textureDesc.Usage = D3D11_USAGE_DEFAULT;
+	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	textureDesc.CPUAccessFlags = 0;
+	textureDesc.MiscFlags = 0;
+
+	ID3D11Texture2D* textureArray = nullptr;
+	HRESULT hr = m_pDevice->CreateTexture2D(&textureDesc, nullptr, &textureArray);
 	if (FAILED(hr)) {
-		// 오류 처리
+		for (auto& texture : textures) {
+			texture->Release();
+		}
+		return nullptr;
+	}
+
+	for (_uint i = 0; i < textures.size(); ++i) {
+		for (_uint mipLevel = 0; mipLevel < textureDesc.MipLevels; ++mipLevel) {
+			m_pContext->CopySubresourceRegion(textureArray, D3D11CalcSubresource(mipLevel, i, textureDesc.MipLevels), 0, 0, 0, textures[i], mipLevel, nullptr);
+		}
+		textures[i]->Release();
+	}
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+	srvDesc.Format = textureDesc.Format;
+	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
+	srvDesc.Texture2DArray.MostDetailedMip = 0;
+	srvDesc.Texture2DArray.MipLevels = textureDesc.MipLevels;
+	srvDesc.Texture2DArray.FirstArraySlice = 0;
+	srvDesc.Texture2DArray.ArraySize = textureDesc.ArraySize;
+
+	ID3D11ShaderResourceView* srv = nullptr;
+	hr = m_pDevice->CreateShaderResourceView(textureArray, &srvDesc, &srv);
+	textureArray->Release();
+	pMultithread->Leave();
+	pMultithread->Release();
+	if (FAILED(hr))
+		return nullptr;
+
+	return srv;
+}
+
+void CModel::CreateSamplerState()
+{
+	D3D11_SAMPLER_DESC samplerDesc = {};
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR; // 필터링 모드 설정
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP; // 가로 축 주소 모드 설정
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP; // 세로 축 주소 모드 설정
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP; // 깊이 축 주소 모드 설정
+	samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER; // 비교 함수 설정
+	samplerDesc.MinLOD = -D3D11_FLOAT32_MAX; // 최소 LOD 설정
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX; // 최대 LOD 설정
+
+	HRESULT hr = m_pDevice->CreateSamplerState(&samplerDesc, &m_pSamplerState);
+	if (FAILED(hr)) {
+		TEXT("Failed to Create SamplerState");
+		Safe_Release(m_pSamplerState);
+		return;
 	}
 }
 
@@ -435,32 +552,70 @@ HRESULT CModel::Ready_Meshes(_bool bOctree)
 	return S_OK;
 }
 
-HRESULT CModel::Ready_Materials(const _char * pModelFilePath)
+HRESULT CModel::Ready_Materials(const _char* pModelFilePath, _bool bOctree)
 {
 	m_InputFile.read(reinterpret_cast<char*>(&m_iNumMaterials), sizeof(m_iNumMaterials));
 
-	while (true)
+	if (false == bOctree)
 	{
-		_uint iTemp;
-		_uint jTemp;
-		MESH_MATERIAL MeshMaterial{};
-		_char			szFullPath[MAX_PATH] = { "" };
-		_tchar			szPerfectPath[MAX_PATH] = { L"" };
-		m_InputFile.read(reinterpret_cast<char*>(&iTemp), sizeof(iTemp));
-		if (iTemp == m_iNumMaterials)
-			break;
-		m_InputFile.read(reinterpret_cast<char*>(&jTemp), sizeof(jTemp));
-		m_InputFile.read(reinterpret_cast<char*>(&szFullPath), sizeof(szFullPath));
+		while (true)
+		{
+			_uint iTemp;
+			_uint jTemp;
+			MESH_MATERIAL MeshMaterial{};
+			_char			szFullPath[MAX_PATH] = { "" };
+			_tchar			szPerfectPath[MAX_PATH] = { L"" };
+			m_InputFile.read(reinterpret_cast<char*>(&iTemp), sizeof(iTemp));
+			if (iTemp == m_iNumMaterials)
+				break;
+			m_InputFile.read(reinterpret_cast<char*>(&jTemp), sizeof(jTemp));
+			m_InputFile.read(reinterpret_cast<char*>(&szFullPath), sizeof(szFullPath));
 
-		MultiByteToWideChar(CP_ACP, 0, szFullPath, strlen(szFullPath), szPerfectPath, MAX_PATH);
-		MeshMaterial.MaterialTextures[jTemp] = CTexture::Create(m_pDevice, m_pContext, szPerfectPath);
-		if (nullptr == MeshMaterial.MaterialTextures[jTemp])
-			return E_FAIL;
+			MultiByteToWideChar(CP_ACP, 0, szFullPath, strlen(szFullPath), szPerfectPath, MAX_PATH);
+			MeshMaterial.MaterialTextures[jTemp] = CTexture::Create(m_pDevice, m_pContext, szPerfectPath);
+			if (nullptr == MeshMaterial.MaterialTextures[jTemp])
+				return E_FAIL;
 
-		if (m_Materials.size() <= iTemp) // 새로운 배열 삽입
-			m_Materials.push_back(MeshMaterial);
-		else // 벡터 안에있는 배열의 원소 수정
-			m_Materials[iTemp].MaterialTextures[jTemp] = MeshMaterial.MaterialTextures[jTemp];
+			if (m_Materials.size() <= iTemp) // 새로운 배열 삽입
+				m_Materials.push_back(MeshMaterial);
+			else // 벡터 안에있는 배열의 원소 수정
+				m_Materials[iTemp].MaterialTextures[jTemp] = MeshMaterial.MaterialTextures[jTemp];
+		}
+	}
+	else
+	{
+		while (true)
+		{
+			_uint iTemp;
+			_uint jTemp;
+			MESH_MATERIAL MeshMaterial{};
+			_char			szFullPath[MAX_PATH] = { "" };
+			_tchar			szPerfectPath[MAX_PATH] = { L"" };
+			m_InputFile.read(reinterpret_cast<char*>(&iTemp), sizeof(iTemp));
+			if (iTemp == m_iNumMaterials)
+				break;
+			m_InputFile.read(reinterpret_cast<char*>(&jTemp), sizeof(jTemp));
+			m_InputFile.read(reinterpret_cast<char*>(&szFullPath), sizeof(szFullPath));
+
+			MultiByteToWideChar(CP_ACP, 0, szFullPath, strlen(szFullPath), szPerfectPath, MAX_PATH);
+			MeshMaterial.MaterialTextures[jTemp] = CTexture::Create(m_pDevice, m_pContext, szPerfectPath);
+			if (nullptr == MeshMaterial.MaterialTextures[jTemp])
+				return E_FAIL;
+
+			if (m_Materials.size() <= iTemp) // 새로운 배열 삽입
+				m_Materials.push_back(MeshMaterial);
+			else // 벡터 안에있는 배열의 원소 수정
+				m_Materials[iTemp].MaterialTextures[jTemp] = MeshMaterial.MaterialTextures[jTemp];
+
+			// 텍스처 경로 저장
+			if (m_vecTexturePaths.size() <= iTemp) {
+				m_vecTexturePaths.resize(iTemp + 1); // 벡터 크기 조정
+			}
+			if (m_vecTexturePaths[iTemp].size() <= jTemp) {
+				m_vecTexturePaths[iTemp].resize(jTemp + 1); // 벡터 크기 조정
+			}
+			m_vecTexturePaths[iTemp][jTemp] = wstring(szPerfectPath); // 경로 저장
+		}
 	}
 
 	return S_OK;
@@ -537,10 +692,6 @@ void CModel::Free()
 
 	Safe_Release(m_pOctree);
 
-	for (auto& pTexArr : m_vecTextureArrayPtrs)
-		Safe_Release(pTexArr);
-	m_vecTextureArrayPtrs.clear();
-
 	for (auto& pAnimation : m_Animations)
 		Safe_Release(pAnimation);
 	m_Animations.clear();
@@ -549,6 +700,12 @@ void CModel::Free()
 		Safe_Release(pBone);
 	m_Bones.clear();
 
+	Safe_Release(m_pSamplerState);
+
+	for (auto& pTexArr : m_vecTextureArraySRVs)
+		Safe_Release(pTexArr);
+	m_vecTextureArraySRVs.clear();
+		
 	for (auto& Material : m_Materials)
 	{
 		for (size_t i = 0; i < AI_TEXTURE_TYPE_MAX; i++)

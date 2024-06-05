@@ -53,6 +53,7 @@ private:
 	_uint m_iMeshIndex = {};
 	_float m_fNonMatchTime = {};
 	_bool m_bCull = { false };
+	_bool m_bBlendMap = { false };
 
 private:
 	HRESULT Add_Components(const wstring& _wstrModelTag);

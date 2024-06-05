@@ -118,6 +118,8 @@ using namespace physx;
 #include <fstream>
 #include <filesystem>
 #include <sstream>
+#include <mutex>
+
 //#include <tchar.h>
 //#include <memory.h>
 #include <utility>

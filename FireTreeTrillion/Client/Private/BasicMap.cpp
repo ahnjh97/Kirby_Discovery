@@ -33,21 +33,26 @@ HRESULT CBasicMap::Initialize(void* pArg)
 
     wstring wstrModelTag = GameObjectDesc.wstrModelName;
 
+    if (wstrModelTag.substr(wstrModelTag.length() - 5) == TEXT("Blend"))
+    {
+        m_bBlendMap = true;
+        m_eRenderGroup = CRenderer::RENDER_BLEND;
+    }
+
     if (FAILED(Add_Components(wstrModelTag)))
         return E_FAIL;
 
-    if (wstrModelTag.substr(wstrModelTag.length() - 5) != TEXT("Blend")) {
+    if(false == m_bBlendMap)
+    {
         if (true == CheckIfBlendMapExists(GameObjectDesc.wstrModelName)) {
             if (FAILED(Add_BlendMap(wstrModelTag)))
                 return E_FAIL;
         }
-        
-        m_pModelCom->Create_OcTree(GameObjectDesc.vMin, GameObjectDesc.vMax);
-        
-    }
-    else    
-        m_eRenderGroup = CRenderer::RENDER_BLEND;
 
+        m_pModelCom->Create_OcTree(GameObjectDesc.vMin, GameObjectDesc.vMax);
+        //m_pModelCom->CreateSamplerState();
+    }
+  
     SetUpShaderInfo(wstrModelTag);
 
     if (FAILED(m_pModelCom->CreateStaticActor(m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION))))
@@ -95,8 +100,10 @@ HRESULT CBasicMap::Render()
 {
     if (FAILED(Bind_ShaderResources()))
         return E_FAIL;
-    if (LEVEL_GAMEPLAY == *m_pGameInstance->Get_CurrentLevelID())
+    if (LEVEL_GAMEPLAY == *m_pGameInstance->Get_CurrentLevelID() && false == m_bBlendMap)
     {
+        m_pModelCom->Bind_TextureArrays();
+
         if (FAILED(m_pTextureCom->Bind_ShaderResources(m_pShaderCom, "g_DiffuseTexture")))
             return E_FAIL;
         if (FAILED(m_pTextureCom->Bind_ShaderResources(m_pShaderCom, "g_NormalTexture")))
@@ -171,7 +178,7 @@ void CBasicMap::Render_IMGUI()
 HRESULT CBasicMap::Add_Components(const wstring& _wstrModelTag)
 {
     wstring wstrShaderPrototypeTag = TEXT("Prototype_Component_Shader_VtxModel_");
-    if (LEVEL_GAMEPLAY == *m_pGameInstance->Get_CurrentLevelID())
+    if (LEVEL_GAMEPLAY == *m_pGameInstance->Get_CurrentLevelID() && false == m_bBlendMap)
         wstrShaderPrototypeTag += TEXT("MergedMap");
     else
         wstrShaderPrototypeTag += TEXT("Map");
@@ -228,7 +235,7 @@ void CBasicMap::SetUpShaderInfo(const wstring& _wstrModelTag)
     m_vecSamplingFactors.resize(m_pModelCom->Get_NumMeshes());
     fill(m_vecSamplingFactors.begin(), m_vecSamplingFactors.end(), 1.f);
 
-    if (m_eRenderGroup == CRenderer::RENDER_BLEND) {
+    if (true == m_bBlendMap) {
         fill(m_vecPassIndices.begin(), m_vecPassIndices.end(), 4);
         return;
     }

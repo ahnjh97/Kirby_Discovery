@@ -84,7 +84,9 @@ public:
 	void Save_OctreeData();
 
 	void Create_MergedMesh(_fmatrix TransformMatrix);
-	void Create_TextureArray();
+	void Bind_TextureArrays();
+	ID3D11ShaderResourceView* CreateTexture2DArraySRV(const vector<wstring>& filePaths);
+	void CreateSamplerState();
 
 private:
 	_uint						m_iNumMeshes = { 0 };
@@ -118,12 +120,14 @@ private:
 	MODEL						m_tModel;
 
 	class CMergedMesh*			m_pMergedMesh = { nullptr };
-	_uint						m_iNumTotalIndices = {};
-	vector<class CTextureArray*>	m_vecTextureArrayPtrs;
+	vector<vector<wstring>>		m_vecTexturePaths;
+	vector<ID3D11ShaderResourceView*>	m_vecTextureArraySRVs;
+	ID3D11SamplerState*			m_pSamplerState = { nullptr };
+
 
 private:
 	HRESULT Ready_Meshes(_bool bOctree);
-	HRESULT Ready_Materials(const _char* pModelFilePath);
+	HRESULT Ready_Materials(const _char* pModelFilePath, _bool bOctree);
 	HRESULT Ready_Bones();
 	HRESULT Ready_Animations();
 
