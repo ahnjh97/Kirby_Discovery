@@ -198,6 +198,9 @@
     <ClInclude Include="..\Public\ImSequencer.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\Public\Kabu.h" />
+    <ClInclude Include="..\Public\Kabu_State.h" />
+    <ClInclude Include="..\Public\Multi_UI.h" />
     <ClInclude Include="..\Public\LevelChanger.h" />
     <ClInclude Include="..\Public\KirbyArmours.h" />
     <ClInclude Include="..\Public\KirbyContents_State.h" />
@@ -284,6 +287,9 @@
     <ClCompile Include="..\Private\ImSequencer.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\Private\Kabu.cpp" />
+    <ClCompile Include="..\Private\Kabu_State.cpp" />
+    <ClCompile Include="..\Private\Multi_UI.cpp" />
     <ClCompile Include="..\Private\LevelChanger.cpp" />
     <ClCompile Include="..\Private\KirbyArmours.cpp" />
     <ClCompile Include="..\Private\KirbyContents_State.cpp" />

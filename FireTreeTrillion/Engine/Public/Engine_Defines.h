@@ -300,3 +300,7 @@ using namespace Engine;
 
 #endif // _DEBUG
 
+//#ifdef _DEBUG
+//#define new new(_CLIENT_BLOCK, __FILE__, __LINE__)
+//#define malloc(s) _malloc_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
+//#endif

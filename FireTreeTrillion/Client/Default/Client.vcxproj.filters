@@ -196,6 +196,12 @@
     <Filter Include="02.GameObjects\UI\HUD">
       <UniqueIdentifier>{22a35dfd-b59c-4d3b-9206-374c1ec77e1a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Kabu">
+      <UniqueIdentifier>{585adf8d-8437-4502-8737-2b4dc975b783}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Kabu\State">
+      <UniqueIdentifier>{900bcf63-7231-4f8a-961b-9064113c9e34}</UniqueIdentifier>
+    </Filter>
     <Filter Include="02.GameObjects\UI\Editor\Layer">
       <UniqueIdentifier>{a3260a15-cebf-4a5f-b682-fa24015a992a}</UniqueIdentifier>
     </Filter>
@@ -399,6 +405,12 @@
     <ClInclude Include="..\Public\HUD.h">
       <Filter>02.GameObjects\UI\HUD</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kabu.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Kabu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kabu_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Kabu\State</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\LevelChanger.h">
       <Filter>01.Levels\_LevelChanger</Filter>
     </ClInclude>
@@ -408,6 +420,7 @@
     <ClInclude Include="..\Public\WasteCan.h">
       <Filter>02.GameObjects\PhysXObject\RigidObject\WasteCan</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Multi_UI.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -587,6 +600,12 @@
     <ClCompile Include="..\Private\HUD.cpp">
       <Filter>02.GameObjects\UI\HUD</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Kabu.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Kabu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kabu_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Kabu\State</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\LevelChanger.cpp">
       <Filter>01.Levels\_LevelChanger</Filter>
     </ClCompile>
@@ -596,6 +615,7 @@
     <ClCompile Include="..\Private\WasteCan.cpp">
       <Filter>02.GameObjects\PhysXObject\RigidObject\WasteCan</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Multi_UI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
