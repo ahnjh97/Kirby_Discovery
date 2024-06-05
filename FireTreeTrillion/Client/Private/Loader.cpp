@@ -414,6 +414,9 @@ HRESULT CLoader::Loading_For_Tool_Anim()
 	Load_AnimToolInfo();
 	if (FAILED(Add_AllModelTxts(eLevel, TYPE_ANIM)))
 		return E_FAIL;
+	hr = Add_Models(eLevel);
+	CHECK_FAILED(hr);
+
 	#pragma endregion
 
 	m_strLoadingText = TEXT("물리 컴포넌트(을) 로딩 중 입니다.");
@@ -595,14 +598,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	}
 	else if (eLevel == LEVEL_TOOL_ANIM)
 	{
-		// For Kirby Body
-		m_vecModelInfo.emplace_back(MODEL{ "Kirby", TYPE_ANIM });
-		m_vecModelInfo.emplace_back(MODEL{ "KirbyBalloon", TYPE_ANIM, 1.f, 180.f });
-		m_vecModelInfo.emplace_back(MODEL{ "KirbyDefault", TYPE_ANIM, 1.f, 180.f });
-		m_vecModelInfo.emplace_back(MODEL{ "KirbyVacuum",  TYPE_ANIM, 1.f, 180.f });
-		
-		// For Awoofy
-		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("BladeKnightSword",  TYPE_NONANIM, 1.f);
 	}
 
 }
