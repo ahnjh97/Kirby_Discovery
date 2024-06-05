@@ -112,6 +112,17 @@ HRESULT CMesh::CreateDynamicActor(_float4 vPos)
 	return S_OK;
 }
 
+// 물리 시뮬레이션 결과를 가져오는 함수
+void CMesh::Update_ActorTransform(CTransform* pTransform)
+{
+	// PhysX 변환 행렬을 가져옴
+	PxTransform transform = m_pActor->getGlobalPose();
+	PxMat44 mat(transform);
+	
+	// PhysX 행렬을 DirectX 행렬로 변환
+	pTransform->Set_WorldMatrix(CUtils::To_Float4x4(mat));
+}
+
 HRESULT CMesh::CreateStaticActor(_float4 vPos)
 {
 	m_pActor = m_pGameInstance->CreateStaticActor(vPos, m_pVerticesPos, m_iNumVertices, m_pIndices, m_iNumIndices);

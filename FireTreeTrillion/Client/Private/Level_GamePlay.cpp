@@ -44,6 +44,9 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
 		return E_FAIL;
 
+	if (FAILED(Ready_Layer_MapObject(TEXT("Layer_MapObject"))))
+		return E_FAIL;
+
 	// TEST (블러와 블랜드의 관계)
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Moon"), TEXT("Prototype_GameObject_Moon"))))
 		return E_FAIL;
@@ -125,9 +128,6 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
 HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
 	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_SkySphere"));
-	CHECK_FAILED(hr);
-
-	hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_WasteCan"));
 	CHECK_FAILED(hr);
 
 	return S_OK;
@@ -364,6 +364,15 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 		for (auto& pair : triggerInfos)
 			pCamera->EmplaceBackTriggerInfo(pair.second.first, pair.second.second);
 	}
+
+	return S_OK;
+}
+
+HRESULT CLevel_GamePlay::Ready_Layer_MapObject(const wstring& strLayerTag)
+{
+	HRESULT hr;
+	hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_WasteCan"));
+	CHECK_FAILED(hr);
 
 	return S_OK;
 }

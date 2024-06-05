@@ -194,6 +194,12 @@ HRESULT CModel::CreateDynamicActor(_float4 vPos)
 	return S_OK;
 }
 
+void CModel::Update_ActorTransform(CTransform* pTransform)
+{
+	for (auto& mesh : m_Meshes)
+		mesh->Update_ActorTransform(pTransform);
+}
+
 HRESULT CModel::CreateStaticActor(_float4 vPos)
 {
 	for (auto& mesh : m_Meshes)

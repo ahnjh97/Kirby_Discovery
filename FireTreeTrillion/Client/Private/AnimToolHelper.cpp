@@ -738,6 +738,12 @@ void CAnimToolHelper::Free()
 
 	Safe_Release(m_pAnimToolObj);
 	Safe_Release(m_pModel);
+
 	m_vecAnimModels.clear();
+
+	for (auto& character : m_vecCharacter)
+		Safe_Release(character);
+	m_vecCharacter.clear();
+	m_pCharacter = nullptr;
 }
 

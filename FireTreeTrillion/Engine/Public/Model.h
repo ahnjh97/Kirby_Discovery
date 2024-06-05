@@ -82,6 +82,8 @@ public:
 	HRESULT Render(_uint iMeshIndex);
 
 	HRESULT CreateDynamicActor(_float4 vPos);
+	void	Update_ActorTransform(class CTransform* pTransform);
+
 	HRESULT CreateStaticActor(_float4 vPos);
 
 	_float4 Check_Meshes(const class CTransform* pTransform, _Out_ _int& iMeshIndex) const;
