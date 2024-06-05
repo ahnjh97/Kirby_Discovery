@@ -420,6 +420,7 @@
     <ClInclude Include="..\Public\WasteCan.h">
       <Filter>02.GameObjects\PhysXObject\RigidObject\WasteCan</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Multi_UI.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -604,7 +605,7 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kabu_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\Kabu\State</Filter>
-    </ClCompile>	
+    </ClCompile>
     <ClCompile Include="..\Private\LevelChanger.cpp">
       <Filter>01.Levels\_LevelChanger</Filter>
     </ClCompile>
@@ -614,6 +615,7 @@
     <ClCompile Include="..\Private\WasteCan.cpp">
       <Filter>02.GameObjects\PhysXObject\RigidObject\WasteCan</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Multi_UI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

@@ -6,9 +6,9 @@ CKabu_Idle_State::CKabu_Idle_State()
 {
 }
 
-void CKabu_Idle_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CKabu_Idle_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 }
 
 void CKabu_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)

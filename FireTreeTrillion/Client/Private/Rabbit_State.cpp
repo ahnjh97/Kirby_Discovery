@@ -350,10 +350,6 @@ void CRabbit_Damage_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _flo
 
 	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
 	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
-
-	m_vKirbyLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
-
-	m_fJumpVelocity = 6.f;
 }
 
 void CRabbit_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
