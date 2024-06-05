@@ -283,18 +283,30 @@ enum PASS_DEFERRED {
 
 using namespace Engine;
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
+//
+//#define _CRTDBG_MAP_ALLOC
+//#include <stdlib.h>
+//#include <crtdbg.h>
+//
+//#ifndef DBG_NEW 
+//
+//#define new DBG_NEW 
+//#define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ ) 
+//
+//#endif
+//
+//#endif // _DEBUG
 
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
 
-#ifndef DBG_NEW 
+//#ifdef _DEBUG
+//#define new new ( _NORMAL_BLOCK , __FILE__ , __LINE__ ) 
+//#endif // _DEBUG
 
-#define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ ) 
-#define new DBG_NEW 
-
+#ifdef _DEBUG
+#define new new(_CLIENT_BLOCK, __FILE__, __LINE__)
+#define malloc(s) _malloc_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
-
-#endif // _DEBUG
-

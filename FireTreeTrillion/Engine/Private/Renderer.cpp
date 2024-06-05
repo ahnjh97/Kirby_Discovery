@@ -732,6 +732,9 @@ HRESULT CRenderer::Render_Lights()
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Depth"), "g_DepthTexture")))
 		return E_FAIL;
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_MRA"), "g_MRATexture")))
+		return E_FAIL;
+
 
 	if (FAILED(m_pVIBuffer->Bind_Buffers()))
 		return E_FAIL;

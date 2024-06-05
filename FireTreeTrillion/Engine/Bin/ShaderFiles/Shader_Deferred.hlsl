@@ -30,6 +30,13 @@ float g_fHighlightIntensity = { 0.f };
 float g_fShadowThreshold = { .25f};
 float g_fHighlightThreshold = { .75f};
 
+//PBR
+static const float Epsilon = 0.0001;
+static const uint NumLights = 3;
+static const float3 Fdielectric = 0.04;
+texture2D g_MRATexture;
+
+
 static const float fWeight[13] =
 {
     0.0561, 0.1353, 0.278, 0.4868, 0.7261, 0.9231, 1,
@@ -89,6 +96,52 @@ bool g_bRimTest;
 float g_fBlackBackGround;
 
 float4 g_vCamPosition;
+
+
+//////////////////////////////////// For PBR 
+
+float ndfGGX(float cosLh, float roughness)
+{
+    float alpha = roughness * roughness;
+    float alphaSq = alpha * alpha;
+
+    float denom = (cosLh * cosLh) * (alphaSq - 1.0) + 1.0;
+    return alphaSq / (PI * denom * denom);
+}
+
+
+// Single term for separable Schlick-GGX below.
+float gaSchlickG1(float cosTheta, float k)
+{
+    return cosTheta / (cosTheta * (1.0 - k) + k);
+}
+
+
+// Schlick-GGX approximation of geometric attenuation function using Smith's method.
+float gaSchlickGGX(float cosLi, float cosLo, float roughness)
+{
+    float r = roughness + 1.0;
+    float k = (r * r) / 8.0; // Epic suggests using this roughness remapping for analytic lights.
+    return gaSchlickG1(cosLi, k) * gaSchlickG1(cosLo, k);
+}
+
+
+// Shlick's approximation of the Fresnel factor.
+float3 fresnelSchlick(float3 F0, float cosTheta)
+{
+    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+}
+
+
+// Returns number of mipmap levels for specular IBL environment map.
+uint querySpecularTextureLevels()
+{
+    uint width, height, levels;
+    g_SpecularTexture.GetDimensions(0, width, height, levels);
+    return levels;
+}
+
+//////////////////////////////////////
 
 float4 Blur_X(float2 vTexCoord)
 {
