@@ -51,7 +51,7 @@ texture2D g_NormalTexture;
 texture2D g_DiffuseTexture;
 
 texture2D g_LinearTexture;
-texture2D g_EnvTexture;
+TextureCube g_EnvTexture;
 
 texture2D g_DepthTexture;
 texture2D g_LightDepthTexture;
@@ -362,6 +362,7 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
     vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
     float fMetalness = g_MRATexture.Sample(LinearSampler, In.vTexcoord).x;
     float fRoughness = g_MRATexture.Sample(LinearSampler, In.vTexcoord).y;
+    float fAmbientOcclusion = g_MRATexture.Sample(LinearSampler, In.vTexcoord).z;
     vector vDepthDesc = g_DepthTexture.Sample(LinearSampler, In.vTexcoord);
     float fViewZ = vDepthDesc.y * g_fFar;
     
@@ -383,8 +384,10 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
     // 월드 포지션에서 빛이 반사되어 우리 눈에 들어오는 방향 벡터
     float3 Lo = normalize(g_vCamPosition - vWorldPos);
     
+    vector vNormalDesc = g_NormalTexture.Sample(PointSampler, In.vTexcoord);
     // 월드 상의 노말벡터를 가져온다.
-    float3 N = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
+    float3 N = vNormalDesc.xyz * 2.f - 1.f;
+    
     
     // 표면의 법선벡터와 빛이 반사되어 우리 눈에 들어오는 방향 벡터간의 내적
     float cosLo = max(0.0, dot(N, Lo));
@@ -409,6 +412,7 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
 	// Half-vector between Li and Lo.
     float3 Lh = normalize(Li + Lo);
 
+    
 	// Calculate angles between surface normal and various light vectors.
     float cosLi = max(0.0, dot(N, Li));
     float cosLh = max(0.0, dot(N, Lh));
@@ -438,7 +442,7 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
     
     float3 ambientLighting;
 	{
-        float3 irradiance = 1.f; /*g_EnvTexture.Sample(LinearSampler, In.vTexcoord).rgb;*/
+        float3 irradiance = g_EnvTexture.Sample(LinearSampler, N).rgb;
         
     
         float3 F = fresnelSchlick(F0, cosLo);
@@ -455,19 +459,20 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
 
 		//// Split-sum approximation factors for Cook-Torrance specular BRDF.
   //      float2 specularBRDF = specularBRDF_LUT.Sample(spBRDF_Sampler, float2(cosLo, roughness)).rg;
+        float2 specularBRDF = float2(1.0, 0.0);
 
 		//// Total specular IBL contribution.
   //      float3 specularIBL = (F0 * specularBRDF.x + specularBRDF.y) * specularIrradiance;
         
-        // If there's no specular texture, we set specular contribution to zero or some default value
-        float3 specularIBL = float3(0.0, 0.0, 0.0);
-    
+        float3 specularIBL = (F0 * specularBRDF.x + specularBRDF.y) * irradiance;
+        specularIBL = (F0 * specularBRDF.x + specularBRDF.y) * irradiance;
+        
 		// Total ambient lighting contribution.
-        ambientLighting = diffuseIBL + specularIBL;
+        ambientLighting = diffuseIBL/* + specularIBL*/;
     }
     
             
-    Out.vResultColor = float4(directLighting + ambientLighting, 1.0);
+    Out.vResultColor = float4(directLighting + ambientLighting, 1.0) * fAmbientOcclusion;
     return Out;
 }
 

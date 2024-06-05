@@ -86,7 +86,6 @@ HRESULT CLevel_GamePlay::Render()
 	}
 
 
-	////////
 
 	// 환경맵을 던진다.
 	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture, "g_EnvTexture")))

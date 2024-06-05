@@ -183,7 +183,7 @@ PS_OUT FOR_KIRBY_PS_MAIN(PS_IN In)
     Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
-    Out.vMRA = vector(0.f, 0.5f, 1.f, 1.f);
+    Out.vMRA = vector(0.f, 1.f, 1.f, 1.f);
     
     if (g_bStencil == true)
         Out.vStencil = vector(1.f, 0.f, 0.0f, 1.f);
@@ -207,8 +207,7 @@ PS_OUT FOR_KIRBYMOUTH_PS_MAIN(PS_IN In)
     Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
-    Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
-
+    Out.vMRA = vector(0.f, 1.f, 1.f, 1.f);
     
     if (g_bStencil == true)
         Out.vStencil = vector(1.f, 0.f, 0.0f, 1.f);
@@ -235,7 +234,7 @@ PS_OUT FOR_KIRBYEYE_PS_MAIN(PS_IN In)
     Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
-    Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
+    Out.vMRA = vector(0.f, 1.f, 1.f, 1.f);
 
   
     if (g_bStencil == true)
