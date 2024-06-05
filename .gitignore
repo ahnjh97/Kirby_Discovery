@@ -1,35 +1,3 @@
-# Prerequisites
-*.d
-
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-
-
-# Executables
-*.exe
-*.out
-*.app
-
 
 FireTreeTrillion/Engine/Bin/Engine.exp
 FireTreeTrillion/Engine/Bin/Engine.ilk
@@ -120,5 +88,6 @@ Assimp/Engine/Default/x64/Debug/Engine.ilk
 Assimp/Engine/Default/x64/Debug/Engine.log
 Assimp/Engine/Default/x64/Debug/Engine.tlog/link.read.1.tlog
 FireTreeTrillion/Client/Bin/Shader_VtxModel_Map.cso
-FireTreeTrillion/Client/Bin/ShaderFiles/Shader_Deferred.hlsl
 Assimp/Engine/Default/x64/Debug/Engine.Build.CppClean.log
+*.obj
+*.exe

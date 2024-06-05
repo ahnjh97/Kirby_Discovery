@@ -77,14 +77,15 @@ HRESULT CKirby::Initialize(void* pArg)
 	m_fMaxHp = 100.f;
 	m_fHp = 100.f;
 	m_fAttack = 5.f;
-	m_eAbilityType = ABILITY_DEFAULT;
-	//m_eAbilityType = ABILITY_SWORD;
+	//m_eAbilityType = ABILITY_DEFAULT;
+	m_eAbilityType = ABILITY_SWORD;
 
 	return S_OK;
 }
 
 _int CKirby::Tick(_float fTimeDelta)
 {
+
 	if (m_bDead == true)
 		return OBJ_DEAD;
 
@@ -194,6 +195,7 @@ void CKirby::Render_IMGUI()
 
 	ImGui::Text("Vacuuming : %d", m_bVacuuming);
 	ImGui::Text("ObjectAddress : %d", INFO(m_pObject));
+	ImGui::Text("ChargeTime : %.2f", INFO(m_fChargeTime));
 	ImGui::Text("MoveSpeed : %.2f", INFO(m_fMoveSpeed));
 	ImGui::Text("PREATTACKSTATE : %d", INFO(m_ePreAttackState));
 	ImGui::Text("TemporaryEatType : %d", INFO(m_eTemporaryEatType));
@@ -393,6 +395,21 @@ void CKirby::Key_Input(_float fTimeDelta)
 		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
 	}
 
+
+	// B : Radial Blur Center
+	if (m_pGameInstance->Get_DIKeyState(DIK_B, KEY_DOWN))
+	{
+		m_pGameInstance->Setting_RadialBlur(30.f, 120.f);
+	}
+
+	// N : Radial Blur Center
+	if (m_pGameInstance->Get_DIKeyState(DIK_N, KEY_DOWN))
+	{
+		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+		m_pGameInstance->Setting_RadialBlur(vPos, 30.f, 120.f);
+	}
+
+
 #pragma endregion
 }
 
@@ -505,7 +522,6 @@ HRESULT CKirby::Add_PartObjects()
 	m_pWeapons = static_cast<CKirbyWeapons*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_KirbyWeapons"), &WeaponDesc));
 	if (nullptr == m_pWeapons)
 		return E_FAIL;
-	Safe_AddRef(m_pWeapons);
 
 	CKirbyArmours::KIRBYARMOURS_DESC ArmourDesc{};
 	ArmourDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
@@ -513,7 +529,6 @@ HRESULT CKirby::Add_PartObjects()
 	m_pArmours = static_cast<CKirbyArmours*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_KirbyArmours"), &ArmourDesc));
 	if (nullptr == m_pArmours)
 		return E_FAIL;
-	Safe_AddRef(m_pArmours);
 
 	return S_OK;
 }
@@ -593,9 +608,7 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
 		return true;
 	}
-
-
-
+	
 	return false;
 }
 
@@ -704,7 +717,25 @@ void CKirby::SetUp_FSM()
 	m_pFSM->Add_State(SWORDSTATE_MULITSWORDATTACK, CKirbySword_Attack_State::Create());
 	// 3타
 	m_pFSM->Add_State(SWORDSTATE_DECISIVESLASH, CKirbySword_Attack_State::Create());
+	// 충전 모션 및 회전베기
+	m_pFSM->Add_State(SWORDSTATE_SPINSLASHCHARGE, CKirbySword_ChargeSpin_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SUPERSPINSLASHCHARGESTART, CKirbySword_ChargeSpin_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SUPERSPINSLASHCHARGE, CKirbySword_ChargeSpin_State::Create());
 
+	m_pFSM->Add_State(SWORDSTATE_SHUFFIEFRONT, CKirbySword_ChargeSpin_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SHUFFIERIGHT, CKirbySword_ChargeSpin_State::Create());
+
+	m_pFSM->Add_State(SWORDSTATE_GIGANTSPINSLASH, CKirbySword_ChargeSpin_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SUPERSPINSLASHSTART, CKirbySword_ChargeSpin_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SUPERSPINSLASHLOOP, CKirbySword_ChargeSpin_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SPINSLASHEND, CKirbySword_ChargeSpin_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SUPERSPINSLASHEND, CKirbySword_ChargeSpin_State::Create());
+
+	m_pFSM->Add_State(SWORDSTATE_UPWARDSLASH, CKirbySword_JumpAttack_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SWORDDIVE, CKirbySword_JumpAttack_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SWORDSPIN, CKirbySword_JumpAttack_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SWORDSPINSTART, CKirbySword_JumpAttack_State::Create());
+	m_pFSM->Add_State(SWORDSTATE_SPINAFTER, CKirbySword_JumpAttack_State::Create());
 
 
 	CFSM::FSM_INFO		FSM_Info_Desc = {};
@@ -839,5 +870,7 @@ void CKirby::Free()
 
 	Safe_Release(m_pWeapons);
 	Safe_Release(m_pArmours);
-
+	for (auto& fx : m_KirbyFXList)
+		Safe_Release(fx);
+	
 }

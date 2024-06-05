@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "..\Public\Level_GamePlay.h"
+#include "LevelChanger.h"
 
 #include "Kirby.h"
 #include "Level_GamePlay.h"
@@ -15,6 +16,8 @@ CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 
 HRESULT CLevel_GamePlay::Initialize()
 {
+	CLevelChanger::Get_Instance()->Load();
+
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
 	
@@ -383,4 +386,6 @@ void CLevel_GamePlay::Free()
 {
 	__super::Free();
 	m_pGameInstance->Clear_EventCallBack();
+
+	CLevelChanger::Get_Instance()->Save();
 }

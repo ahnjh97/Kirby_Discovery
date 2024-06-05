@@ -121,11 +121,13 @@ private:
 #endif
 	void Interpolate_ColorData(_float _fTimeDelta);
 	void Interpolate_BlackBackground(_float fTimeDelta);
+	void Interpolate_RadialBlur(_float fTimeDelta);
 
 private:
 	_float2 m_vScreenPos = { 0.f, 0.f };
 	_float m_fRadialBlurRadius = { 0.f };
 	_float m_fRadialRadiusSubtraction = { 0.f };
+	_bool  m_isRadial = { false };
 
 	_bool  m_bBlackBackground = { false };
 	_float m_fBlackBackground = { 1.f };

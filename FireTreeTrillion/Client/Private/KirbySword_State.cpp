@@ -89,16 +89,26 @@ void CKirbySword_Idle_State::Key_X(CGameObject* pGameObject, _float fTimeDelta)
 		{
 			pKirby->Change_State(CKirby::SWORDSTATE_DECISIVESLASH, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 			DESC(m_ePreAttackState) = CKirby::SWORDSTATE_DECISIVESLASH;
+			DESC(m_fMoveSpeed) = 0.f;
 
 		}
 	}
 
-	// Idle일 때, X를 차징하면 기를 모은다.
+	// Idle일 때, X를 차징하면 기를 모은다. 그러나 키를 누르지 않으면 차징 시간이 0이 된다.
 	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS))
 	{
+		DESC(m_fChargeTime) += fTimeDelta;
 
+		if (DESC(m_fChargeTime) > 0.3f)
+		{
+			DESC(m_eEyeState) = CKirby::EYE_ANGER;
+			pKirby->Change_State(CKirby::SWORDSTATE_SPINSLASHCHARGE, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			// 다시 차징시간 0.f 부터 시작한다.
+			DESC(m_fChargeTime) = 0.f;
+		}
 	}
-
+	else
+		DESC(m_fChargeTime) = 0.f;
 }
 
 void CKirbySword_Idle_State::Key_C(CGameObject* pGameObject, _float fTimeDelta)
@@ -263,6 +273,7 @@ void CKirbySword_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		else if (DESC(m_ePreAttackState) == CKirby::SWORDSTATE_MULITSWORDATTACK)
 		{
 			pKirby->Change_State(CKirby::SWORDSTATE_DECISIVESLASH, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			DESC(m_fMoveSpeed) = 0.f;
 			DESC(m_ePreAttackState) = CKirby::SWORDSTATE_DECISIVESLASH;
 
 		}
@@ -347,13 +358,12 @@ void CKirbySword_Guard_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
-	pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
+
 
 	DESC(m_eEyeState) = CKirby::EYE_ANGER;
 
 	if (pKirby->Get_State() == CKirby::SWORDSTATE_GUARD)
 	{
-
 		Guard_Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
 		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
 
@@ -388,6 +398,8 @@ void CKirbySword_Guard_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	// 이 아래는 슬라이딩
 	else if (pKirby->Get_State() == CKirby::SWORDSTATE_SWORDSLIDESTART)
 	{
+		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
+
 		if (pKirby->isAnimFinish())
 		{
 			pKirby->Change_State(CKirby::SWORDSTATE_SWORDSLIDE, 60.f, true, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
@@ -399,6 +411,8 @@ void CKirbySword_Guard_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 		_vector vMoveDelta = DESC(m_vDodgeDir) * fTimeDelta * DESC(m_fMoveSpeed);
 		pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
+
 		DESC(m_fMoveSpeed) -= fTimeDelta * 30.f;
 
 		if (DESC(m_fMoveSpeed) < 0.f)
@@ -407,9 +421,18 @@ void CKirbySword_Guard_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 			DESC(m_fMoveSpeed) = 0.f;
 		}
 
+		// 슬라이드 중에 C를 누르면 공중 공격을 한다.
+		if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
+		{
+			DESC(m_fJumpVelocity) = 22.f;
+			pKirby->Change_State(CKirby::SWORDSTATE_UPWARDSLASH, 60.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		}
+
 	}
 	else if (pKirby->Get_State() == CKirby::SWORDSTATE_SWORDSLIDEEND)
 	{
+		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
+
 		if (pKirby->isAnimFinish())
 		{
 			if (m_pGameInstance->Get_DIKeyState(DIK_Z, KEY_PRESS))
@@ -472,6 +495,16 @@ void CKirbySword_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 	// 자유낙하 한다.
 	pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
 
+
+	// 공격중에도 차징시간이 계산된다. (모션이 끝나면 바로 충전을 시작함)
+	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS))
+	{
+		DESC(m_fChargeTime) += fTimeDelta;
+	}
+	else
+		DESC(m_fChargeTime) = 0.f;
+
+
 	if (pKirby->Get_State() == CKirby::SWORDSTATE_SIDESLASH)
 	{
 		m_fAnimTime += fTimeDelta;
@@ -520,6 +553,15 @@ void CKirbySword_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 			}
 			else
 				pKirby->Change_State(CKirby::SWORDSTATE_SIDESLASHEND, 60.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+
+			if (DESC(m_fChargeTime) > 0.15f)
+			{
+				DESC(m_eEyeState) = CKirby::EYE_ANGER;
+				pKirby->Change_State(CKirby::SWORDSTATE_SPINSLASHCHARGE, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				// 다시 차징시간 0.f 부터 시작한다.
+				DESC(m_fChargeTime) = 0.f;
+			}
+
 		}
 	}
 
@@ -601,6 +643,7 @@ void CKirbySword_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 			{
 				pKirby->Change_State(CKirby::SWORDSTATE_DECISIVESLASH, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 				DESC(m_ePreAttackState) = CKirby::SWORDSTATE_DECISIVESLASH;
+				DESC(m_fMoveSpeed) = 0.f;
 			}
 			else
 			{
@@ -609,6 +652,17 @@ void CKirbySword_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 				// 0.7초간 유예시간을 준다.
 				DESC(m_fAttackTime) = 0.5f;
 			}
+
+
+			if (DESC(m_fChargeTime) > 0.15f)
+			{
+				DESC(m_eEyeState) = CKirby::EYE_ANGER;
+				pKirby->Change_State(CKirby::SWORDSTATE_SPINSLASHCHARGE, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				// 다시 차징시간 0.f 부터 시작한다.
+				DESC(m_fChargeTime) = 0.f;
+
+			}
+
 		}
 	}
 
@@ -649,12 +703,20 @@ void CKirbySword_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 			pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
 		}
 
-
-
 		if (pKirby->isAnimFinish())
 		{
-			pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
-			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			if (DESC(m_fChargeTime) > 0.15f)
+			{
+				DESC(m_eEyeState) = CKirby::EYE_ANGER;
+				pKirby->Change_State(CKirby::SWORDSTATE_SPINSLASHCHARGE, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				// 다시 차징시간 0.f 부터 시작한다.
+				DESC(m_fChargeTime) = 0.f;
+			}
+			else
+			{
+				pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			}
 		}
 	}
 
@@ -693,6 +755,405 @@ void CKirbySword_ChargeSpin_State::OnStateEnter(CModel* _pModel, _uint _iAnimInd
 
 void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
+
+
+	// 기본 차징 모션이다. 
+	if (pKirby->Get_State() == CKirby::SWORDSTATE_SPINSLASHCHARGE)
+	{
+		Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
+		DESC(m_bWalkingCharge) = true;
+
+		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS))
+		{
+			DESC(m_fChargeTime) += fTimeDelta;
+
+			if (JoyStick_On() == true)
+			{
+				// 내가 누른 방향에 따라, 이동개념이 달라진다.
+				JoyStick_controller_Attack(Kirbydesc, pCamera);
+				CKirby::DIR eDir = Kirby_Standard_Angle(DESC(m_vMoveDir), DESC(m_vAttackDir));
+
+				if (eDir == CKirby::DIR_FRONT || eDir == CKirby::DIR_BACK)
+					pKirby->Change_State(CKirby::SWORDSTATE_SHUFFIEFRONT, 120.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				else
+					pKirby->Change_State(CKirby::SWORDSTATE_SHUFFIERIGHT, 120.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			}
+
+			// 1초간 차징시간이 더 추가되었을 때, 슈퍼 차지모드로 변경된다.
+			if (DESC(m_fChargeTime) > 1.f)
+			{
+				pKirby->Change_State(CKirby::SWORDSTATE_SUPERSPINSLASHCHARGESTART, 60.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			}
+		}
+		else
+		{
+			if (DESC(m_ePreAttackState) == CKirby::SWORDSTATE_SIDESLASH && DESC(m_fChargeTime) < 0.2f)
+			{
+				DESC(m_eEyeState) = CKirby::EYE_IDLE;
+				pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				DESC(m_ePreAttackState) = CKirby::SWORDSTATE_DECISIVESLASH;
+			}
+			else
+			{
+				DESC(m_eEyeState) = CKirby::EYE_ANGER;
+				pKirby->Change_State(CKirby::SWORDSTATE_GIGANTSPINSLASH, 60.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			}
+		}
+	}
+
+	// 슈퍼차징 시작애님.
+	else if (pKirby->Get_State() == CKirby::SWORDSTATE_SUPERSPINSLASHCHARGESTART)
+	{
+		DESC(m_bWalkingCharge) = false;
+
+		if (JoyStick_controller_Attack(Kirbydesc, pCamera) == true)
+		{
+			DESC(m_fMoveSpeed) += fTimeDelta * 10.f;
+			if (DESC(m_fMoveSpeed) > 3.f)
+				DESC(m_fMoveSpeed) = 3.f;
+
+			// 타겟기준
+			_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+			_vector vMoveDelta = DESC(m_vAttackDir) * fTimeDelta * DESC(m_fMoveSpeed);
+			pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+		}
+		else
+		{
+			Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
+		}
+
+		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS))
+		{
+			DESC(m_fChargeTime) += fTimeDelta;
+			//if (JoyStick_On() == true)
+			//{
+			//	// 내가 누른 방향에 따라, 이동개념이 달라진다.
+			//	JoyStick_controller_Attack(Kirbydesc, pCamera);
+			//	CKirby::DIR eDir = Kirby_Standard_Angle(DESC(m_vMoveDir), DESC(m_vAttackDir));
+			//	if (eDir == CKirby::DIR_FRONT || eDir == CKirby::DIR_BACK)
+			//		pKirby->Change_State(CKirby::SWORDSTATE_SHUFFIEFRONT, 120.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			//	else
+			//		pKirby->Change_State(CKirby::SWORDSTATE_SHUFFIERIGHT, 120.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			//}
+		}
+		// 이때 X를 떼면 바로 슈퍼스핀.
+		else
+		{
+			DESC(m_eEyeState) = CKirby::EYE_ANGER;
+			pKirby->Change_State(CKirby::SWORDSTATE_SUPERSPINSLASHSTART, 60.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		}
+
+		// 이게 핵심이다.
+		if (pKirby->isAnimFinish())
+		{
+			pKirby->Change_State(CKirby::SWORDSTATE_SUPERSPINSLASHCHARGE, 60.f, true, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		}
+	}
+
+	// 슈퍼차징 중
+	else if (pKirby->Get_State() == CKirby::SWORDSTATE_SUPERSPINSLASHCHARGE)
+	{
+		Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
+
+		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS))
+		{
+			DESC(m_fChargeTime) += fTimeDelta;
+
+			if (JoyStick_On() == true)
+			{
+				// 내가 누른 방향에 따라, 이동개념이 달라진다.
+				JoyStick_controller_Attack(Kirbydesc, pCamera);
+				CKirby::DIR eDir = Kirby_Standard_Angle(DESC(m_vMoveDir), DESC(m_vAttackDir));
+
+				if (eDir == CKirby::DIR_FRONT || eDir == CKirby::DIR_BACK)
+					pKirby->Change_State(CKirby::SWORDSTATE_SHUFFIEFRONT, 120.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				else
+					pKirby->Change_State(CKirby::SWORDSTATE_SHUFFIERIGHT, 120.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			}
+		}
+		// 이때 X를 떼면 바로 슈퍼스핀.
+		else
+		{
+			DESC(m_eEyeState) = CKirby::EYE_ANGER;
+			pKirby->Change_State(CKirby::SWORDSTATE_SUPERSPINSLASHSTART, 60.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		}
+	}
+
+	// 차징 모션중에 앞으로 가는 모션이다.
+	else if (pKirby->Get_State() == CKirby::SWORDSTATE_SHUFFIEFRONT)
+	{
+		DESC(m_fMoveSpeed) += fTimeDelta * 10.f;
+		if (DESC(m_fMoveSpeed) > 3.f)
+			DESC(m_fMoveSpeed) = 3.f;
+
+		// 타겟기준
+		_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+		_vector vMoveDelta = DESC(m_vAttackDir) * fTimeDelta * DESC(m_fMoveSpeed);
+		pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+
+		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS))
+		{
+			DESC(m_fChargeTime) += fTimeDelta;
+
+			if (JoyStick_On() == true)
+			{
+				// 내가 누른 방향에 따라, 이동개념이 달라진다.
+				JoyStick_controller_Attack(Kirbydesc, pCamera);
+				CKirby::DIR eDir = Kirby_Standard_Angle(DESC(m_vMoveDir), DESC(m_vAttackDir));
+
+				if (eDir == CKirby::DIR_LEFT || eDir == CKirby::DIR_RIGHT)
+					pKirby->Change_State(CKirby::SWORDSTATE_SHUFFIERIGHT, 120.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			}
+			else
+			{
+				DESC(m_eEyeState) = CKirby::EYE_ANGER;
+
+				// 차징 시간이 1초가 넘었을 경우엔
+				if (DESC(m_fChargeTime) > 1.f)
+					pKirby->Change_State(CKirby::SWORDSTATE_SUPERSPINSLASHCHARGE, 60.f, true, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				else
+					pKirby->Change_State(CKirby::SWORDSTATE_SPINSLASHCHARGE, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			}
+
+			if (DESC(m_bWalkingCharge) == true && DESC(m_fChargeTime) > 1.f)
+				pKirby->Change_State(CKirby::SWORDSTATE_SUPERSPINSLASHCHARGESTART, 60.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		}
+		else
+		{
+			if (DESC(m_ePreAttackState) == CKirby::SWORDSTATE_SIDESLASH && DESC(m_fChargeTime) < 0.2f)
+			{
+				DESC(m_eEyeState) = CKirby::EYE_IDLE;
+				pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				DESC(m_ePreAttackState) = CKirby::SWORDSTATE_DECISIVESLASH;
+			}
+			else
+			{
+				DESC(m_eEyeState) = CKirby::EYE_ANGER;
+				// 1초간 차징시간이 더 추가되었을 때, 슈퍼 차지모드로 변경된다.
+				if (DESC(m_fChargeTime) > 1.f)
+					pKirby->Change_State(CKirby::SWORDSTATE_SUPERSPINSLASHSTART, 60.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				else
+					pKirby->Change_State(CKirby::SWORDSTATE_GIGANTSPINSLASH, 60.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			}
+		}
+	}
+
+	// 차징 모션중에 옆으로 가는 모션이다.
+	else if (pKirby->Get_State() == CKirby::SWORDSTATE_SHUFFIERIGHT)
+	{
+		DESC(m_fMoveSpeed) += fTimeDelta * 10.f;
+		if (DESC(m_fMoveSpeed) > 3.f)
+			DESC(m_fMoveSpeed) = 3.f;
+
+		// 타겟기준
+		_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+		_vector vMoveDelta = DESC(m_vAttackDir) * fTimeDelta * DESC(m_fMoveSpeed);
+		pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+
+		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS))
+		{
+			DESC(m_fChargeTime) += fTimeDelta;
+
+			if (JoyStick_On() == true)
+			{
+				// 내가 누른 방향에 따라, 이동개념이 달라진다.
+				JoyStick_controller_Attack(Kirbydesc, pCamera);
+				CKirby::DIR eDir = Kirby_Standard_Angle(DESC(m_vMoveDir), DESC(m_vAttackDir));
+
+				if (eDir == CKirby::DIR_FRONT || eDir == CKirby::DIR_BACK)
+					pKirby->Change_State(CKirby::SWORDSTATE_SHUFFIEFRONT, 120.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			}
+			else
+			{
+				DESC(m_eEyeState) = CKirby::EYE_ANGER;
+				// 차징 시간이 1초가 넘었을 경우엔
+				if (DESC(m_fChargeTime) > 1.f)
+					pKirby->Change_State(CKirby::SWORDSTATE_SUPERSPINSLASHCHARGE, 60.f, true, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				else
+					pKirby->Change_State(CKirby::SWORDSTATE_SPINSLASHCHARGE, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			}
+
+			if (DESC(m_bWalkingCharge) == true && DESC(m_fChargeTime) > 1.f)
+				pKirby->Change_State(CKirby::SWORDSTATE_SUPERSPINSLASHCHARGESTART, 60.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+
+		}
+		else
+		{
+			if (DESC(m_ePreAttackState) == CKirby::SWORDSTATE_SIDESLASH && DESC(m_fChargeTime) < 0.2f)
+			{
+				DESC(m_eEyeState) = CKirby::EYE_IDLE;
+				pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				DESC(m_ePreAttackState) = CKirby::SWORDSTATE_DECISIVESLASH;
+			}
+			else
+			{
+				DESC(m_eEyeState) = CKirby::EYE_ANGER;
+				if (DESC(m_fChargeTime) > 1.f)
+					pKirby->Change_State(CKirby::SWORDSTATE_SUPERSPINSLASHSTART, 60.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				else
+					pKirby->Change_State(CKirby::SWORDSTATE_GIGANTSPINSLASH, 60.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			}
+		}
+	}
+
+	// 덜 차징 회전베기이다. 약하게 이동이 가능하다.
+	else if (pKirby->Get_State() == CKirby::SWORDSTATE_GIGANTSPINSLASH)
+	{
+		if (JoyStick_controller_Attack(Kirbydesc, pCamera) == true)
+		{
+			DESC(m_fMoveSpeed) += fTimeDelta * 10.f;
+			if (DESC(m_fMoveSpeed) > 6.f)
+				DESC(m_fMoveSpeed) = 6.f;
+
+			_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+			_vector vMoveDelta = DESC(m_vAttackDir) * fTimeDelta * DESC(m_fMoveSpeed);
+			pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+
+		}
+		else
+		{
+			if (DESC(m_fMoveSpeed) > 0.f)
+				DESC(m_fMoveSpeed) -= 120.f * fTimeDelta;
+			if (DESC(m_fMoveSpeed) < 0.f)
+				DESC(m_fMoveSpeed) = 0.f;
+
+			_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+			_vector vMoveDelta = DESC(m_vAttackDir) * fTimeDelta * DESC(m_fMoveSpeed);
+			pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+		}
+
+
+		if (pKirby->isAnimFinish())
+		{
+			DESC(m_fChargeTime) += 0.f;
+
+			DESC(m_eEyeState) = CKirby::EYE_ANGER;
+			pKirby->Change_State(CKirby::SWORDSTATE_SPINSLASHEND, 100.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		}
+	}
+
+	// 덜 차징 회전베기이다. 종료 모션이므로 빠르게 감속한다.
+	else if (pKirby->Get_State() == CKirby::SWORDSTATE_SPINSLASHEND)
+	{
+		// 0.1초간 풀 감속 (최대 속도 8이라 가정)
+		if (Kirbydesc->m_fMoveSpeed > 0.f)
+			Kirbydesc->m_fMoveSpeed -= 90.f * fTimeDelta;
+		if (Kirbydesc->m_fMoveSpeed < 0.f)
+			Kirbydesc->m_fMoveSpeed = 0.f;
+
+		_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+		_vector vMoveDelta = DESC(m_vAttackDir) * fTimeDelta * Kirbydesc->m_fMoveSpeed;
+		pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+
+		if (pKirby->isAnimFinish())
+		{
+			DESC(m_fChargeTime) = 0.f;
+			DESC(m_ePreAttackState) = CKirby::SWORDSTATE_DECISIVESLASH;
+			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		}
+
+	}
+
+	// 슈퍼 스핀의 시작단계
+	else if (pKirby->Get_State() == CKirby::SWORDSTATE_SUPERSPINSLASHSTART)
+	{
+		if (JoyStick_controller_Attack(Kirbydesc, pCamera) == true)
+		{
+			DESC(m_fMoveSpeed) += fTimeDelta * 30.f;
+			if (DESC(m_fMoveSpeed) > 8.f)
+				DESC(m_fMoveSpeed) = 8.f;
+
+			_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+			_vector vMoveDelta = DESC(m_vAttackDir) * fTimeDelta * DESC(m_fMoveSpeed);
+			pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+
+		}
+		else
+		{
+			if (DESC(m_fMoveSpeed) > 0.f)
+				DESC(m_fMoveSpeed) -= 60.f * fTimeDelta;
+			if (DESC(m_fMoveSpeed) < 0.f)
+				DESC(m_fMoveSpeed) = 0.f;
+
+			_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+			_vector vMoveDelta = DESC(m_vAttackDir) * fTimeDelta * DESC(m_fMoveSpeed);
+			pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+		}
+
+
+
+		if (pKirby->isAnimFinish())
+		{
+			DESC(m_fChargeTime) = 0.f;
+			pKirby->Change_State(CKirby::SWORDSTATE_SUPERSPINSLASHLOOP, 60.f, true, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		}
+	}
+
+	// 슈퍼 스핀의 중간단계
+	else if (pKirby->Get_State() == CKirby::SWORDSTATE_SUPERSPINSLASHLOOP)
+	{
+		DESC(m_fChargeTime) += fTimeDelta;
+
+		if (JoyStick_controller_Attack(Kirbydesc, pCamera) == true)
+		{
+			DESC(m_fMoveSpeed) += fTimeDelta * 30.f;
+			if (DESC(m_fMoveSpeed) > 8.f)
+				DESC(m_fMoveSpeed) = 8.f;
+
+			_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+			_vector vMoveDelta = DESC(m_vAttackDir) * fTimeDelta * DESC(m_fMoveSpeed);
+			pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+
+		}
+		else
+		{
+			if (DESC(m_fMoveSpeed) > 0.f)
+				DESC(m_fMoveSpeed) -= 60.f * fTimeDelta;
+			if (DESC(m_fMoveSpeed) < 0.f)
+				DESC(m_fMoveSpeed) = 0.f;
+
+			_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+			_vector vMoveDelta = DESC(m_vAttackDir) * fTimeDelta * DESC(m_fMoveSpeed);
+			pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+		}
+
+
+
+		if (DESC(m_fChargeTime) > 1.1f)
+		{
+			pKirby->Change_State(CKirby::SWORDSTATE_SUPERSPINSLASHEND, 100.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		}
+	}
+
+	// 슈퍼 스핀의 마지막 단계
+	else if (pKirby->Get_State() == CKirby::SWORDSTATE_SUPERSPINSLASHEND)
+	{
+		// 0.1초간 풀 감속 (최대 속도 8이라 가정)
+		if (Kirbydesc->m_fMoveSpeed > 0.f)
+			Kirbydesc->m_fMoveSpeed -= 90.f * fTimeDelta;
+		if (Kirbydesc->m_fMoveSpeed < 0.f)
+			Kirbydesc->m_fMoveSpeed = 0.f;
+
+		_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+		_vector vMoveDelta = DESC(m_vAttackDir) * fTimeDelta * Kirbydesc->m_fMoveSpeed;
+		pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+
+
+		if (pKirby->isAnimFinish())
+		{
+			DESC(m_fChargeTime) = 0.f;
+			DESC(m_ePreAttackState) = CKirby::SWORDSTATE_DECISIVESLASH;
+			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		}
+	}
+
 }
 
 void CKirbySword_ChargeSpin_State::OnStateExit()
@@ -727,6 +1188,143 @@ void CKirbySword_JumpAttack_State::OnStateEnter(CModel* _pModel, _uint _iAnimInd
 
 void CKirbySword_JumpAttack_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
+	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
+	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
+
+	if (pKirby->Get_State() == CKirby::SWORDSTATE_UPWARDSLASH)
+	{
+		_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+		_vector vMoveDelta = DESC(m_vDodgeDir) * fTimeDelta * DESC(m_fMoveSpeed);
+		pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+
+		DESC(m_fMoveSpeed) -= fTimeDelta * 30.f;
+		if (DESC(m_fMoveSpeed) < 0.f)
+			DESC(m_fMoveSpeed) = 0.f;
+
+		DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
+		pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
+
+		if (/*DESC(m_fJumpVelocity) < -5.f*/pKirby->isAnimFinish())
+		{
+			DESC(m_bUpWardSlash) = true;
+			pKirby->Change_State(CKirby::SWORDSTATE_SPINAFTER, 600.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		}
+	}
+	// 어퍼컷 공격 후 내려찍기
+	else if (pKirby->Get_State() == CKirby::SWORDSTATE_SWORDDIVE)
+	{
+
+
+
+
+
+
+	}
+	// 공중제비 시작
+	else if (pKirby->Get_State() == CKirby::SWORDSTATE_SWORDSPINSTART)
+	{
+		if (JoyStick_controller_Attack(Kirbydesc, pCamera) == true)
+		{
+			Kirbydesc->m_fMoveSpeed += fTimeDelta * 40.f;
+			if (Kirbydesc->m_fMoveSpeed > 10.f)
+				Kirbydesc->m_fMoveSpeed = 10.f;
+
+			_vector vMoveDelta = DESC(m_vAttackDir) * fTimeDelta * Kirbydesc->m_fMoveSpeed;
+			pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+		}
+		else
+		{
+			// 0.1초간 풀 감속 (최대 속도 8이라 가정)
+			if (Kirbydesc->m_fMoveSpeed > 0.f)
+				Kirbydesc->m_fMoveSpeed -= 100.f * fTimeDelta;
+			if (Kirbydesc->m_fMoveSpeed < 0.f)
+				Kirbydesc->m_fMoveSpeed = 0.f;
+
+			_vector vMoveDelta = DESC(m_vAttackDir) * fTimeDelta * Kirbydesc->m_fMoveSpeed;
+			pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+		}
+
+
+		DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
+		pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
+
+		if (pKirby->isAnimFinish())
+		{
+			pKirby->Change_State(CKirby::SWORDSTATE_SWORDSPIN, 60.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		}
+
+
+	}
+	// 공중제비
+	else if (pKirby->Get_State() == CKirby::SWORDSTATE_SWORDSPIN)
+	{
+		if (JoyStick_controller_Attack(Kirbydesc, pCamera) == true)
+		{
+			Kirbydesc->m_fMoveSpeed += fTimeDelta * 40.f;
+			if (Kirbydesc->m_fMoveSpeed > 10.f)
+				Kirbydesc->m_fMoveSpeed = 10.f;
+
+			_vector vMoveDelta = DESC(m_vAttackDir) * fTimeDelta * Kirbydesc->m_fMoveSpeed;
+			pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+		}
+		else
+		{
+			// 0.1초간 풀 감속 (최대 속도 8이라 가정)
+			if (Kirbydesc->m_fMoveSpeed > 0.f)
+				Kirbydesc->m_fMoveSpeed -= 100.f * fTimeDelta;
+			if (Kirbydesc->m_fMoveSpeed < 0.f)
+				Kirbydesc->m_fMoveSpeed = 0.f;
+
+			_vector vMoveDelta = DESC(m_vAttackDir) * fTimeDelta * Kirbydesc->m_fMoveSpeed;
+			pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+		}
+
+		DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
+		pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
+
+		if (pKirby->isAnimFinish())
+		{
+			pKirby->Change_State(CKirby::SWORDSTATE_SPINAFTER, 600.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		}
+	}
+	else if (pKirby->Get_State() == CKirby::SWORDSTATE_SPINAFTER)
+	{
+		Jump_Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
+
+		if (JoyStick_controller(Kirbydesc, pCamera) == true)
+		{
+			Kirbydesc->m_fMoveSpeed += fTimeDelta * 10.f;
+			if (Kirbydesc->m_fMoveSpeed > 10.f)
+				Kirbydesc->m_fMoveSpeed = 10.f;
+
+			_vector vMoveDelta = Kirbydesc->m_vTargetDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
+			pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+		}
+		else
+		{
+			Jump_Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
+		}
+
+		DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
+		pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
+
+
+		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
+		{
+			DESC(m_fJumpVelocity) = 10.f;
+			DESC(m_eEyeState) = CKirby::EYE_ANGER;
+			pKirby->Change_State(CKirby::SWORDSTATE_SWORDSPINSTART, 60.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		}
+
+		if (pController->Is_Terrain())
+		{
+			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		}
+	}
 }
 
 void CKirbySword_JumpAttack_State::OnStateExit()

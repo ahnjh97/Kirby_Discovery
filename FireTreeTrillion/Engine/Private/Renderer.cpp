@@ -76,11 +76,18 @@ HRESULT CRenderer::Initialize()
 
 	Save_ColorSet("Stage1",
 		COLOR_DATA{
-		1.06f, 1.f, 0.9f, 1.3f, 1.f, 0.99f, 1.06f, 0.71f, 0.6f, 0.6f, 1.39f, 1.06f, 1.24f, 0.199115f, 0.0378847f, 0.114933f, 0.1f, 0.30578f, 0.342999f, 0.606195f, 0.15f, 0.986726f, 0.949634f, 0.462801f, 0.34f, 0.12f, 0.5f
+		1.06f, 1.f, 0.9f, 1.3f, 1.f, 0.99f, 1.06f, 0.71f,
+		0.6f, 0.6f, 1.39f, 1.06f, 1.24f, 0.199115f, 0.0378847f,
+		0.114933f, 0.1f, 0.30578f, 0.342999f, 0.606195f, 0.15f, 0.986726f,
+		0.949634f, 0.462801f, 0.34f, 0.12f, 0.5f
 		});
 
 
-	Set_ColorSet(Find_ColorSet("Stage1"));
+	Set_ColorSet(Find_ColorSet("Default"));
+
+	//쉐이더 타입 트리거는 idx 1, 접촉하면 해당 함수를 호출!
+	function<void(_int)> TriggerFunc = bind(&CRenderer::Set_ColorSet_ByIndex, this, placeholders::_1);
+	m_pGameInstance->Emplace_TriggerFunc(1, TriggerFunc);
 
 
 	//function<void(_int)> func = bind(&CCamera_Free::Set_MatrixIndex, this, placeholders::_1);
@@ -423,8 +430,6 @@ HRESULT CRenderer::Initialize()
 	
 #endif
 
-	function<void(_int)> TriggerFunc = bind(&CRenderer::Set_ColorSet_ByIndex, this, placeholders::_1);
-	m_pGameInstance->Emplace_TriggerFunc(1, TriggerFunc);
 	return S_OK;
 }
 
@@ -475,14 +480,22 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 
 	//**** 모든 그리기가 완료되었다. ****//
 
+	// 레디얼블러가 가동중일때만, 레디얼블러 셰이더가 작동하도록 한다.
+	Interpolate_RadialBlur(fTimeDelta);
+
+
 	if (FAILED(Render_Result()))
 		return E_FAIL;
 
 	if (m_bLowPass == false)
 	{
-		// Radial블러 적용
-		if (FAILED(Render_Radial_Result(fTimeDelta)))
-			return E_FAIL;
+		// 레디얼 블러 값이 있을때만 레디얼블러를 가동한다.
+		if (m_isRadial == true)
+		{
+			// Radial블러 적용
+			if (FAILED(Render_Radial_Result(fTimeDelta)))
+				return E_FAIL;
+		}
 		// DOF블러 적용
 		if (FAILED(Render_DOF_Result()))
 			return E_FAIL;
@@ -589,12 +602,16 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 		m_DestColorData = Find_ColorSet("Default");
 		break;
 	case 1:
-		m_DestColorData = Find_ColorSet("Forest");
+		m_DestColorData = Find_ColorSet("Tutorial");
 		break;
 	case 2:
 		m_DestColorData = Find_ColorSet("Night");
 		break;
+	case 3:
+		m_DestColorData = Find_ColorSet("Stage1");
+		break;
 	default:
+		m_DestColorData = Find_ColorSet("Default");
 		break;
 	}
 }
@@ -935,9 +952,19 @@ HRESULT CRenderer::Render_Result()
 {
 	if (m_bLowPass == false)
 	{
-		// 최종적으로 레디얼 블러 및 다른 블러를 먹일 생각이다.
-		if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_RadialBlur"))))
-			return E_FAIL;
+		// 최적화를 위해 레디얼 블러가 작동중일때만, MRT_RadialBlur가 작동하도록 한다.
+		if (m_isRadial == true)
+		{
+			// 최종적으로 레디얼 블러 및 다른 블러를 먹일 생각이다.
+			if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_RadialBlur"))))
+				return E_FAIL;
+		}
+		else
+		{
+			// DOF에 담는다.
+			if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_DOFBlur"))))
+				return E_FAIL;
+		}
 	}
 
 	if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
@@ -1036,12 +1063,6 @@ HRESULT CRenderer::Render_Radial_Result(_float fTimeDelta)
 	// 레디얼 블러를 적용시킬 텍스쳐를 던진다.
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_RadialBlur"), "g_RadialBlur")))
 		return E_FAIL;
-
-	if (m_fRadialBlurRadius > 0.f)
-		m_fRadialBlurRadius -= fTimeDelta * m_fRadialRadiusSubtraction;
-
-	if (m_fRadialBlurRadius < 0.f)
-		m_fRadialBlurRadius = 0.f;
 
 	if (FAILED(m_pShader->Bind_RawValue("g_fRadialblurRaduis", &m_fRadialBlurRadius, sizeof(_float))))
 		return E_FAIL;
@@ -1262,13 +1283,13 @@ HRESULT CRenderer::Render_SuperUI()
 void CRenderer::Render_IMGUI()
 {
 
-	if (m_pGameInstance->Get_KeyState(DIK_1, KEY_DOWN))
+	if (m_pGameInstance->Get_KeyState(DIK_F5, KEY_DOWN))
 		Set_ColorSet(Find_ColorSet("Default"));
-	if (m_pGameInstance->Get_KeyState(DIK_2, KEY_DOWN))
+	if (m_pGameInstance->Get_KeyState(DIK_F6, KEY_DOWN))
 		Set_ColorSet(Find_ColorSet("Tutorial"));
-	if (m_pGameInstance->Get_KeyState(DIK_3, KEY_DOWN))
+	if (m_pGameInstance->Get_KeyState(DIK_F7, KEY_DOWN))
 		Set_ColorSet(Find_ColorSet("Night"));
-	if (m_pGameInstance->Get_KeyState(DIK_4, KEY_DOWN))
+	if (m_pGameInstance->Get_KeyState(DIK_F8, KEY_DOWN))
 		Set_ColorSet(Find_ColorSet("Stage1"));
 	ImGui::Begin(u8"컬러 코렉션");
 
@@ -1345,15 +1366,15 @@ void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 		}
 	}
 
-	if (m_DestColorData.fHue != -1.f)
-	{
-		m_fHue += (m_DestColorData.fHue - m_fHue) * fInterpolateSpeed;
-		if (abs(m_fHue - m_DestColorData.fHue) < 01.f)
-		{
-			m_fHue = m_DestColorData.fHue;
-			m_DestColorData.fHue = -1.f;
-		}
-	}
+	//if (m_DestColorData.fHue != -1.f)
+	//{
+	//	m_fHue += (m_DestColorData.fHue - m_fHue) * fInterpolateSpeed;
+	//	if (abs(m_fHue - m_DestColorData.fHue) < 01.f)
+	//	{
+	//		m_fHue = m_DestColorData.fHue;
+	//		m_DestColorData.fHue = -1.f;
+	//	}
+	//}
 
 	if (m_DestColorData.fSaturation != -1.f)
 		m_fSaturation += (m_DestColorData.fSaturation - m_fSaturation) * fInterpolateSpeed;
@@ -1472,6 +1493,23 @@ void CRenderer::Interpolate_BlackBackground(_float fTimeDelta)
 		if (m_fBlackBackground < 0.5f)
 			m_fBlackBackground = 0.5f;
 	}
+}
+
+void CRenderer::Interpolate_RadialBlur(_float fTimeDelta)
+{
+
+	if (m_fRadialBlurRadius > 0.f)
+		m_fRadialBlurRadius -= fTimeDelta * m_fRadialRadiusSubtraction;
+
+	if (m_fRadialBlurRadius < 0.f)
+		m_fRadialBlurRadius = 0.f;
+
+
+	if (m_fRadialBlurRadius == 0.f)
+		m_isRadial = false;
+	else
+		m_isRadial = true;
+
 }
 
 

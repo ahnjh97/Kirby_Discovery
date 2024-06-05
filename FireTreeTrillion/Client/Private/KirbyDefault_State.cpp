@@ -103,7 +103,7 @@ void CKirbyDefault_Idle_State::Key_X(CGameObject* pGameObject, _float fTimeDelta
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.vInitPos = { 0.f, .6f, .4f };
 		FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_VacuumC"), &FXDesc)))
+		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Vacuum_v1"), &FXDesc)))
 			return;
 		pKirby->Add_KirbyEffect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 
@@ -269,7 +269,7 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.vInitPos = { 0.f, .65f, .4f };
 		FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_VacuumC"), &FXDesc)))
+		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Vacuum_v1"), &FXDesc)))
 			return;
 		pKirby->Add_KirbyEffect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 	}
@@ -635,6 +635,36 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 
 			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_IDLE);
 		}
+
+		// Idle일 때, X를 누르면 1타 공격을 시작한다.
+		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
+		{
+			DESC(m_eEyeState) = CKirby::EYE_ANGER;
+
+			// 조이스틱을 만지지 않았을 경우 현재 Dir 으로 공격 방향이 정해진다.
+			if (JoyStick_controller_Attack(Kirbydesc, pCamera) == false)
+				DESC(m_vAttackDir) = DESC(m_vMoveDir);
+
+			if (DESC(m_ePreAttackState) == CKirby::SWORDSTATE_DECISIVESLASH)
+			{
+				pKirby->Change_State(CKirby::SWORDSTATE_SIDESLASH, 60.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				DESC(m_ePreAttackState) = CKirby::SWORDSTATE_SIDESLASH;
+			}
+			else if (DESC(m_ePreAttackState) == CKirby::SWORDSTATE_SIDESLASH)
+			{
+				pKirby->Change_State(CKirby::SWORDSTATE_MULITSWORDATTACK, 60.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				DESC(m_ePreAttackState) = CKirby::SWORDSTATE_MULITSWORDATTACK;
+
+			}
+			else if (DESC(m_ePreAttackState) == CKirby::SWORDSTATE_MULITSWORDATTACK)
+			{
+				pKirby->Change_State(CKirby::SWORDSTATE_DECISIVESLASH, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				DESC(m_ePreAttackState) = CKirby::SWORDSTATE_DECISIVESLASH;
+				DESC(m_fMoveSpeed) = 0.f;
+
+			}
+		}
+
 	}
 }
 
@@ -658,15 +688,21 @@ void CKirbyDefault_Jump_State::Key_X(CGameObject* pGameObject, _float fTimeDelta
 			DESC(m_fVacuumTime) = 0.f;
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			pKirby->Change_State(CKirby::STATE_INHALEFALL, 50.f, true, true, CKirby::BODY_VACUUM);
+
+			CMultiEffect::MULTI_FX_DESC FXDesc{};
+			FXDesc.vInitPos = { 0.f, .65f, .4f };
+			FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+			if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Vacuum_v1"), &FXDesc)))
+				return;
+			pKirby->Add_KirbyEffect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 		}
-
-		CMultiEffect::MULTI_FX_DESC FXDesc{};
-		FXDesc.vInitPos = { 0.f, .65f, .4f };
-		FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_VacuumC"), &FXDesc)))
-			return;
-		pKirby->Add_KirbyEffect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
-
+		// 칼 상태일땐 공중제비를 돈다.
+		else if (pKirby->Get_AbilityType() == ABILITY_SWORD)
+		{
+			DESC(m_fJumpVelocity) = 10.f;
+			DESC(m_eEyeState) = CKirby::EYE_ANGER;
+			pKirby->Change_State(CKirby::SWORDSTATE_SWORDSPINSTART, 60.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		}
 	}
 
 }
