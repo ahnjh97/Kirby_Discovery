@@ -22,6 +22,8 @@ public:
 		RENDER_SUPERUI,
 		RENDER_END
 	};
+
+	enum TEX{TEX_LUT, TEX_END};
 private:
 	CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual ~CRenderer() = default;
@@ -160,6 +162,8 @@ private:
 
 	COLOR_DATA m_DestColorData{};
 	map<string, COLOR_DATA> m_ColorSets;
+
+	CTexture* m_pTextureComs[TEX_END];
 
 #ifdef _DEBUG
 private:

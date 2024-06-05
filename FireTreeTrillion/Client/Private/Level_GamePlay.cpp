@@ -88,7 +88,11 @@ HRESULT CLevel_GamePlay::Render()
 
 
 	// 환경맵을 던진다.
-	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture, "g_EnvTexture")))
+	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture[0], "g_EnvTexture")))
+		return E_FAIL;
+
+	//LUT 던진다.
+	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture[1], "g_LUTTexture")))
 		return E_FAIL;
 
 	return S_OK;
@@ -372,8 +376,13 @@ HRESULT CLevel_GamePlay::Add_EnvMap()
 	HRESULT hr;
 
 	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Level_0_Env"),
-		TEXT("Com_Texture"), (CComponent**)&m_pEnvTexture);
+		TEXT("Com_Texture"), (CComponent**)&m_pEnvTexture[0]);
 	CHECK_FAILED(hr);
+
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_BRDF_LUT"),
+		TEXT("Com_Texture2"), (CComponent**)&m_pEnvTexture[1]);
+	CHECK_FAILED(hr);
+
 
 	return S_OK;
 }
@@ -396,7 +405,8 @@ void CLevel_GamePlay::Free()
 	__super::Free();
 	m_pGameInstance->Clear_EventCallBack();
 
-	Safe_Release(m_pEnvTexture);
+	for(auto& tex : m_pEnvTexture)
+		Safe_Release(tex);
 
 	CLevelChanger::Get_Instance()->Save();
 }

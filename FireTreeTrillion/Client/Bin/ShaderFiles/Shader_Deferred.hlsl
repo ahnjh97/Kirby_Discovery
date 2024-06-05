@@ -21,14 +21,14 @@ float3 g_vWhiteBalance = { .5f, .5f, .5f };
 float g_fContrast = .5f;
 
 //toner
-float3 g_vShadowColor = { 1.f, 1.f, 1.f};
+float3 g_vShadowColor = { 1.f, 1.f, 1.f };
 float g_fShadowIntensity = { 0.f };
 float3 g_vMidtoneColor = { 1.f, 1.f, 1.f };
 float g_fMidtoneIntensity = { 0.f };
 float3 g_vHighlightColor = { 1.f, 1.f, 1.f };
 float g_fHighlightIntensity = { 0.f };
-float g_fShadowThreshold = { .25f};
-float g_fHighlightThreshold = { .75f};
+float g_fShadowThreshold = { .25f };
+float g_fHighlightThreshold = { .75f };
 
 //PBR
 static const float Epsilon = 0.0001;
@@ -51,7 +51,9 @@ texture2D g_NormalTexture;
 texture2D g_DiffuseTexture;
 
 texture2D g_LinearTexture;
+
 TextureCube g_EnvTexture;
+Texture2D g_LUTTexture;
 
 texture2D g_DepthTexture;
 texture2D g_LightDepthTexture;
@@ -363,6 +365,7 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
     float fMetalness = g_MRATexture.Sample(LinearSampler, In.vTexcoord).x;
     float fRoughness = g_MRATexture.Sample(LinearSampler, In.vTexcoord).y;
     float fAmbientOcclusion = g_MRATexture.Sample(LinearSampler, In.vTexcoord).z;
+    
     vector vDepthDesc = g_DepthTexture.Sample(LinearSampler, In.vTexcoord);
     float fViewZ = vDepthDesc.y * g_fFar;
     
@@ -398,81 +401,90 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
     // Fresnel reflectance at normal incidence (for metals use albedo color).
     float3 F0 = lerp(Fdielectric, vDiffuse.rgb, fMetalness);
     
+    
     // Direct lighting calculation for analytical lights.
     float3 directLighting = 0.0;
+    {
     
-    
-    
-    
-    //////////////////// // Direct lighting calculation for analytical lights.
-    
-    float3 Li = -1.f * g_vLightDir;
-    float3 Lradiance = 1.f;
+        float3 Li = -1.f * g_vLightDir;
+        float3 Lradiance = 1.f;
 
 	// Half-vector between Li and Lo.
-    float3 Lh = normalize(Li + Lo);
+        float3 Lh = normalize(Li + Lo);
 
     
 	// Calculate angles between surface normal and various light vectors.
-    float cosLi = max(0.0, dot(N, Li));
-    float cosLh = max(0.0, dot(N, Lh));
+        float cosLi = max(0.0, dot(N, Li));
+        float cosLh = max(0.0, dot(N, Lh));
 
-	// Calculate Fresnel term for direct lighting. 
-    float3 F = fresnelSchlick(F0, max(0.0, dot(Lh, Lo)));
-    
-	// Calculate normal distribution for specular BRDF.
-    float D = ndfGGX(cosLh, fRoughness);
-    
-	// Calculate geometric attenuation for specular BRDF.
-    float G = gaSchlickGGX(cosLi, cosLo, fRoughness);
+        float3 F = fresnelSchlick(F0, max(0.0, dot(Lh, Lo)));
+        float D = ndfGGX(cosLh, fRoughness);
+        float G = gaSchlickGGX(cosLi, cosLo, fRoughness);
     
     
-    float3 kd = lerp(float3(1, 1, 1) - F, float3(0, 0, 0), fMetalness);
-
-    // 스페큘러가 높을수록 Diffuse를 잃는다.
-    float3 diffuseBRDF = kd * vDiffuse.rgb;
-
-	// Cook-Torrance specular BRDF. (공식임 ㅎㅎ)
-    float3 specularBRDF = (F * D * G) / max(Epsilon, 4.0 * cosLi * cosLo);
-
-	// 최종적인 결과물
-    directLighting += (diffuseBRDF + specularBRDF) * Lradiance * cosLi;
-    
-    //////////////////    // Ambient lighting (IBL).
-    
-    float3 ambientLighting;
-	{
-        float3 irradiance = g_EnvTexture.Sample(LinearSampler, N).rgb;
-        
-    
-        float3 F = fresnelSchlick(F0, cosLo);
-
-		// Get diffuse contribution factor (as with direct lighting).
         float3 kd = lerp(1.0 - F, 0.0, fMetalness);
 
-		// Irradiance map contains exitant radiance assuming Lambertian BRDF, no need to scale by 1/PI here either.
+
+    // 스페큘러가 높을수록 Diffuse를 잃는다.
+        float3 diffuseBRDF = kd * vDiffuse.rgb;
+
+	// Cook-Torrance specular BRDF. (공식임 ㅎㅎ)
+        float3 specularBRDF = (F * D * G) / max(Epsilon, 4.0 * cosLi * cosLo);
+
+	// 최종적인 결과물
+        directLighting += (diffuseBRDF + specularBRDF) * Lradiance * cosLi;
+    }
+    //////////////////    // Ambient lighting (IBL).
+    
+    float3 ambientLighting = 0.0;
+    {
+        float3 irradiance = g_EnvTexture.Sample(LinearSampler, N).rgb * fMetalness;
+        float3 F = fresnelSchlick(F0, cosLo);
+        float3 kd = lerp(1.0 - F, 0.0, fMetalness);
         float3 diffuseIBL = kd * vDiffuse.rgb * irradiance + 0.001;
-
-		//// Sample pre-filtered specular reflection environment at correct mipmap level.
-  //      //uint specularTextureLevels = querySpecularTextureLevels();
-  //      float3 specularIrradiance = specularTexture.SampleLevel(defaultSampler, Lr, roughness * specularTextureLevels).rgb;
-
-		//// Split-sum approximation factors for Cook-Torrance specular BRDF.
-  //      float2 specularBRDF = specularBRDF_LUT.Sample(spBRDF_Sampler, float2(cosLo, roughness)).rg;
-        float2 specularBRDF = float2(1.0, 0.0);
-
-		//// Total specular IBL contribution.
-  //      float3 specularIBL = (F0 * specularBRDF.x + specularBRDF.y) * specularIrradiance;
         
+        float2 specularBRDF = g_LUTTexture.Sample(LinearSampler, float2(cosLo, fRoughness)).rg;
+        
+        //float2 specularBRDF = float2(1.0, 0.0);
+        
+        //float3 specularIBL = (F0 * 1.0 + 0.0) * irradiance; // Adjusted for simplification
         float3 specularIBL = (F0 * specularBRDF.x + specularBRDF.y) * irradiance;
-        specularIBL = (F0 * specularBRDF.x + specularBRDF.y) * irradiance;
+        //specularIBL = (F0 * specularBRDF.x + specularBRDF.y) * irradiance;
         
-		// Total ambient lighting contribution.
-        ambientLighting = diffuseIBL/* + specularIBL*/;
+        
+        ambientLighting = diffuseIBL + specularIBL;
+        ambientLighting *= fAmbientOcclusion;
     }
     
-            
-    Out.vResultColor = float4(directLighting + ambientLighting, 1.0) * fAmbientOcclusion;
+    
+    
+    {
+        // // Calculate ambient lighting from irradiance map.
+    
+        //const float3 reflectionDirection = normalize(mul(reflect(-viewDirection, normal), (float3x3) sceneBuffer.inverseViewMatrix));
+
+        //const float3 f0 = lerp(float3(0.04f, 0.04f, 0.04f), albedo.xyz, metallicFactor);
+    
+        //const float3 kS = fresnelSchlickFunctionRoughness(f0, saturate(dot(viewDirection, normal)), roughnessFactor);
+        //const float3 kD = lerp(float3(1.0f, 1.0f, 1.0f) - kS, float3(0.0f, 0.0f, 0.0f), metallicFactor);
+    
+        //const float nDotV = saturate(dot(viewDirection, normal));
+    
+        //// Batching texture fetches for optimal performance.
+        //const float3 irradiance = irradianceTexture.Sample(linearClampSampler, worldSpaceNormal).rgb;
+        //const float3 specularPreFilter = preFilterTexture.SampleLevel(minMapLinearMipPointClampSampler, reflectionDirection, roughnessFactor * 6.0f).xyz;
+        //const float2 brdfLut = brdfLUTTexture.Sample(pointWrapSampler, float2(nDotV, roughnessFactor)).xy;
+
+        //const float3 diffuseIBL = kD * irradiance * albedo.xyz;
+        //const float3 specularIBL = specularPreFilter * (f0 * brdfLut.x + brdfLut.y);
+
+    }
+    
+    
+    
+    
+    Out.vResultColor = float4( directLighting + ambientLighting, fAmbientOcclusion);
+    
     return Out;
 }
 
@@ -595,7 +607,7 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
                 if (g_DeferredInfoTexture.Sample(LinearSampler, vUV).g != 1.f)
                     ShadowTotal++;
             }
-        }      
+        }
         
         // 0 ~ 196번 최대   0번일수록 0.6   196번 일수록 1이여야 한다.
         Out.vColor *= saturate(0.6f + (0.4f / 90.f * ShadowTotal));
@@ -628,7 +640,7 @@ PS_OUT PS_MAIN_BLUR_Y(PS_IN In)
 
 PS_OUT PS_MAIN_RADIAL_BLUR(PS_IN In)
 {
-    PS_OUT Out = (PS_OUT) 0;    
+    PS_OUT Out = (PS_OUT) 0;
     
     // 0~1 텍스트 쿠드 좌표로 환산하여 넣어준다.
     float2 fCenter = g_fRadialblurCenter;
@@ -687,7 +699,7 @@ PS_OUT PS_MAIN_COLORCORRECT(PS_IN In)
             //vColor.rgb = AdjustHighlight(vColor.rgb, g_vHighlightColor, g_fHighlightIntensity, fLuminance);
         }
         
-        if(0 < iTotalNum)
+        if (0 < iTotalNum)
             vColor.rgb += (vTonerColor / iTotalNum);
         
         
@@ -786,7 +798,7 @@ PS_OUT PS_MAIN_MotionBlur(PS_IN In)
     Out.vColor /= fTotal;
 
     return Out;
- }
+}
 
 
 technique11 DefaultTechnique
