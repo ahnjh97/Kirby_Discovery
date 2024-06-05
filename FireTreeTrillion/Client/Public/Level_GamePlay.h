@@ -6,6 +6,9 @@
 
 /* 1. 레벨에 필요한 객체들을 생성한다. */
 /* 2. 레벨을 반복적으로 갱신하여 화면에 보여준다. */
+BEGIN(Engine)
+class CTexture;
+END
 
 BEGIN(Client)
 
@@ -29,6 +32,8 @@ private:
 	HRESULT Ready_Layer_UI(const wstring& strLayerTag);
 	HRESULT Ready_ParsedObjects();
 	
+	HRESULT Add_EnvMap();
+	CTexture* m_pEnvTexture = { nullptr };
 
 public:
 	static CLevel_GamePlay* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

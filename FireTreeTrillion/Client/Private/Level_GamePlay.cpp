@@ -20,6 +20,10 @@ HRESULT CLevel_GamePlay::Initialize()
 
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
+
+	// 환경맵을 추가한다.
+	if (FAILED(Add_EnvMap()))
+		return E_FAIL;
 	
 	if (FAILED(Ready_Lights()))
 		return E_FAIL;
@@ -81,6 +85,12 @@ HRESULT CLevel_GamePlay::Render()
 		m_iFPS = 0;
 	}
 
+
+	////////
+
+	// 환경맵을 던진다.
+	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture, "g_EnvTexture")))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -358,6 +368,17 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 	return S_OK;
 }
 
+HRESULT CLevel_GamePlay::Add_EnvMap()
+{
+	HRESULT hr;
+
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Level_0_Env"),
+		TEXT("Com_Texture"), (CComponent**)&m_pEnvTexture);
+	CHECK_FAILED(hr);
+
+	return S_OK;
+}
+
 CLevel_GamePlay * CLevel_GamePlay::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CLevel_GamePlay*		pInstance = new CLevel_GamePlay(pDevice, pContext);
@@ -375,6 +396,8 @@ void CLevel_GamePlay::Free()
 {
 	__super::Free();
 	m_pGameInstance->Clear_EventCallBack();
+
+	Safe_Release(m_pEnvTexture);
 
 	CLevelChanger::Get_Instance()->Save();
 }

@@ -32,6 +32,9 @@ public:
 	HRESULT Add_RenderGroup(RENDERGROUP eRenderGroup, class CGameObject* pRenderObject);
 	HRESULT Render(_float fTimeDelta);
 
+	HRESULT Bind_DeferredTexture(CTexture* pTexture, const _char* pConstantName, _uint iIndex);
+	HRESULT Bind_DeferredRawValue(const _char* pConstantName, const void* pData, _uint iLength);
+
 
 	void Set_ColorSet(COLOR_DATA destColorData);
 	void Set_ColorSet_ByIndex(_int iSetIdx);

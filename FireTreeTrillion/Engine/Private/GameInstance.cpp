@@ -331,6 +331,22 @@ void CGameInstance::Set_BlackBackGround(_bool bSet)
 	m_pRenderer->Set_BlackBackGround(bSet);
 }
 
+HRESULT CGameInstance::Bind_DeferredTexture(CTexture* pTexture, const _char* pConstantName, _uint iIndex)
+{
+	if (nullptr == m_pRenderer)
+		return E_FAIL;
+
+	return m_pRenderer->Bind_DeferredTexture(pTexture, pConstantName, iIndex);
+}
+
+HRESULT CGameInstance::Bind_DeferredRawValue(const _char* pConstantName, const void* pData, _uint iLength)
+{
+	if (nullptr == m_pRenderer)
+		return E_FAIL;
+
+	return m_pRenderer->Bind_DeferredRawValue(pConstantName, pData, iLength);
+}
+
 #ifdef _DEBUG
 
 HRESULT CGameInstance::Add_DebugComponents(CComponent * pRenderComponent)

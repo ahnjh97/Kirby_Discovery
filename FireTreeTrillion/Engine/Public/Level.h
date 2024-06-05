@@ -21,6 +21,8 @@ protected:
 	ID3D11DeviceContext*		m_pContext = { nullptr };
 	class CGameInstance*		m_pGameInstance = { nullptr };
 
+	virtual HRESULT Add_Component(const wstring& strPrototypeTag, const wstring& strComponentTag, class CComponent** ppOut);
+
 	_uint						m_iFPS = { 0 };
 	_float						m_fAccDelta = { 0.f };
 

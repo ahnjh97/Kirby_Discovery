@@ -50,9 +50,10 @@ texture2D g_Texture;
 texture2D g_NormalTexture;
 texture2D g_DiffuseTexture;
 
-texture2D g_ShadeTexture;
+texture2D g_LinearTexture;
+texture2D g_EnvTexture;
+
 texture2D g_DepthTexture;
-texture2D g_SpecularTexture;
 texture2D g_LightDepthTexture;
 
 texture2D g_FieldDepthTexture;
@@ -129,17 +130,17 @@ float gaSchlickGGX(float cosLi, float cosLo, float roughness)
 // Shlick's approximation of the Fresnel factor.
 float3 fresnelSchlick(float3 F0, float cosTheta)
 {
-    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+    return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
 
 // Returns number of mipmap levels for specular IBL environment map.
-uint querySpecularTextureLevels()
-{
-    uint width, height, levels;
-    g_SpecularTexture.GetDimensions(0, width, height, levels);
-    return levels;
-}
+//uint querySpecularTextureLevels()
+//{
+//    uint width, height, levels;
+//    g_SpecularTexture.GetDimensions(0, width, height, levels);
+//    return levels;
+//}
 
 //////////////////////////////////////
 
@@ -348,8 +349,7 @@ PS_OUT PS_MAIN(PS_IN In)
 
 struct PS_OUT_LIGHT
 {
-    float4 vShade : SV_TARGET0;
-    float4 vSpecular : SV_TARGET1;
+    float4 vResultColor : SV_TARGET0;
 };
 
 
@@ -359,38 +359,115 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
 {
     PS_OUT_LIGHT Out = (PS_OUT_LIGHT) 0;
 
-    vector vNormalDesc = g_NormalTexture.Sample(PointSampler, In.vTexcoord);
-    float4 vNormal = float4(vNormalDesc.xyz * 2.f - 1.f, 0.f);
-
-    vector vDepthDesc = g_DepthTexture.Sample(PointSampler, In.vTexcoord);
+    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    float fMetalness = g_MRATexture.Sample(LinearSampler, In.vTexcoord).x;
+    float fRoughness = g_MRATexture.Sample(LinearSampler, In.vTexcoord).y;
+    vector vDepthDesc = g_DepthTexture.Sample(LinearSampler, In.vTexcoord);
     float fViewZ = vDepthDesc.y * g_fFar;
-	
-    Out.vShade = g_vLightDiffuse * saturate(max(dot(normalize(g_vLightDir) * -1.f, vNormal), 0.f) + g_vLightAmbient * g_vMtrlAmbient);
-
+    
+    vDiffuse = pow(vDiffuse, 2.2f);
+    
     float4 vWorldPos;
-
-	/* 로컬위치 * 월드행렬 * 뷰행렬 * 투영행렬 / View.z */
+   /* 로컬위치 * 월드행렬 * 뷰행렬 * 투영행렬 / View.z */
     vWorldPos.x = In.vTexcoord.x * 2.f - 1.f;
     vWorldPos.y = In.vTexcoord.y * -2.f + 1.f;
     vWorldPos.z = vDepthDesc.x;
     vWorldPos.w = 1.f;
-
-	/* 로컬위치 * 월드행렬 * 뷰행렬 * 투영행렬 */
+   /* 로컬위치 * 월드행렬 * 뷰행렬 * 투영행렬 */
     vWorldPos *= fViewZ;
-
-	/* 로컬위치 * 월드행렬 * 뷰행렬 */
+   /* 로컬위치 * 월드행렬 * 뷰행렬 */
     vWorldPos = mul(vWorldPos, g_ProjMatrixInv);
-
-	/* 로컬위치 * 월드행렬 */
+   /* 로컬위치 * 월드행렬 */
     vWorldPos = mul(vWorldPos, g_ViewMatrixInv);
+    
+    // 월드 포지션에서 빛이 반사되어 우리 눈에 들어오는 방향 벡터
+    float3 Lo = normalize(g_vCamPosition - vWorldPos);
+    
+    // 월드 상의 노말벡터를 가져온다.
+    float3 N = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
+    
+    // 표면의 법선벡터와 빛이 반사되어 우리 눈에 들어오는 방향 벡터간의 내적
+    float cosLo = max(0.0, dot(N, Lo));
+    
+    // 리플렉트
+    float3 Lr = 2.0 * cosLo * N - Lo;
+    
+    // Fresnel reflectance at normal incidence (for metals use albedo color).
+    float3 F0 = lerp(Fdielectric, vDiffuse.rgb, fMetalness);
+    
+    // Direct lighting calculation for analytical lights.
+    float3 directLighting = 0.0;
+    
+    
+    
+    
+    //////////////////// // Direct lighting calculation for analytical lights.
+    
+    float3 Li = -1.f * g_vLightDir;
+    float3 Lradiance = 1.f;
 
-    float4 vLook = vWorldPos - g_vCamPosition;
-    float4 vReflect = reflect(normalize(g_vLightDir), vNormal);
+	// Half-vector between Li and Lo.
+    float3 Lh = normalize(Li + Lo);
 
-    float fSpecular = pow(max(dot(normalize(vLook) * -1.f, normalize(vReflect)), 0.f), 30.f);
+	// Calculate angles between surface normal and various light vectors.
+    float cosLi = max(0.0, dot(N, Li));
+    float cosLh = max(0.0, dot(N, Lh));
 
-    Out.vSpecular = (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
+	// Calculate Fresnel term for direct lighting. 
+    float3 F = fresnelSchlick(F0, max(0.0, dot(Lh, Lo)));
+    
+	// Calculate normal distribution for specular BRDF.
+    float D = ndfGGX(cosLh, fRoughness);
+    
+	// Calculate geometric attenuation for specular BRDF.
+    float G = gaSchlickGGX(cosLi, cosLo, fRoughness);
+    
+    
+    float3 kd = lerp(float3(1, 1, 1) - F, float3(0, 0, 0), fMetalness);
 
+    // 스페큘러가 높을수록 Diffuse를 잃는다.
+    float3 diffuseBRDF = kd * vDiffuse.rgb;
+
+	// Cook-Torrance specular BRDF. (공식임 ㅎㅎ)
+    float3 specularBRDF = (F * D * G) / max(Epsilon, 4.0 * cosLi * cosLo);
+
+	// 최종적인 결과물
+    directLighting += (diffuseBRDF + specularBRDF) * Lradiance * cosLi;
+    
+    //////////////////    // Ambient lighting (IBL).
+    
+    float3 ambientLighting;
+	{
+        float3 irradiance = 1.f; /*g_EnvTexture.Sample(LinearSampler, In.vTexcoord).rgb;*/
+        
+    
+        float3 F = fresnelSchlick(F0, cosLo);
+
+		// Get diffuse contribution factor (as with direct lighting).
+        float3 kd = lerp(1.0 - F, 0.0, fMetalness);
+
+		// Irradiance map contains exitant radiance assuming Lambertian BRDF, no need to scale by 1/PI here either.
+        float3 diffuseIBL = kd * vDiffuse.rgb * irradiance + 0.001;
+
+		//// Sample pre-filtered specular reflection environment at correct mipmap level.
+  //      //uint specularTextureLevels = querySpecularTextureLevels();
+  //      float3 specularIrradiance = specularTexture.SampleLevel(defaultSampler, Lr, roughness * specularTextureLevels).rgb;
+
+		//// Split-sum approximation factors for Cook-Torrance specular BRDF.
+  //      float2 specularBRDF = specularBRDF_LUT.Sample(spBRDF_Sampler, float2(cosLo, roughness)).rg;
+
+		//// Total specular IBL contribution.
+  //      float3 specularIBL = (F0 * specularBRDF.x + specularBRDF.y) * specularIrradiance;
+        
+        // If there's no specular texture, we set specular contribution to zero or some default value
+        float3 specularIBL = float3(0.0, 0.0, 0.0);
+    
+		// Total ambient lighting contribution.
+        ambientLighting = diffuseIBL + specularIBL;
+    }
+    
+            
+    Out.vResultColor = float4(directLighting + ambientLighting, 1.0);
     return Out;
 }
 
@@ -398,44 +475,12 @@ PS_OUT_LIGHT PS_MAIN_POINT(PS_IN In)
 {
     PS_OUT_LIGHT Out = (PS_OUT_LIGHT) 0;
 
-    vector vNormalDesc = g_NormalTexture.Sample(PointSampler, In.vTexcoord);
-    float4 vNormal = float4(vNormalDesc.xyz * 2.f - 1.f, 0.f);
+    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    float fMetalness = g_MRATexture.Sample(LinearSampler, In.vTexcoord).x;
+    float fRoughness = g_MRATexture.Sample(LinearSampler, In.vTexcoord).y;
 
-    vector vDepthDesc = g_DepthTexture.Sample(PointSampler, In.vTexcoord);
-    float fViewZ = vDepthDesc.y * g_fFar;
-
-    float4 vWorldPos;
-
-	/* 로컬위치 * 월드행렬 * 뷰행렬 * 투영행렬 / View.z */
-    vWorldPos.x = In.vTexcoord.x * 2.f - 1.f;
-    vWorldPos.y = In.vTexcoord.y * -2.f + 1.f;
-    vWorldPos.z = vDepthDesc.x;
-    vWorldPos.w = 1.f;
-
-	/* 로컬위치 * 월드행렬 * 뷰행렬 * 투영행렬 */
-    vWorldPos *= fViewZ;
-
-	/* 로컬위치 * 월드행렬 * 뷰행렬 */
-    vWorldPos = mul(vWorldPos, g_ProjMatrixInv);
-
-	/* 로컬위치 * 월드행렬 */
-    vWorldPos = mul(vWorldPos, g_ViewMatrixInv);
-
-    vector vLightDir = vWorldPos - g_vLightPos;
-    float fDistance = length(vLightDir);
-
-    float fAtt = saturate((g_fLightRange - fDistance) / g_fLightRange);
-
-    Out.vShade = g_vLightDiffuse * saturate(max(dot(normalize(vLightDir) * -1.f, vNormal), 0.f) + g_vLightAmbient * g_vMtrlAmbient);
-    Out.vShade *= fAtt;
-	
-    float4 vLook = vWorldPos - g_vCamPosition;
-    float4 vReflect = reflect(normalize(vLightDir), vNormal);
-
-    float fSpecular = pow(max(dot(normalize(vLook) * -1.f, normalize(vReflect)), 0.f), 30.f);
-
-    Out.vSpecular = (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
-    Out.vSpecular *= fAtt;
+    vDiffuse = pow(vDiffuse, 2.2f);
+       
 
     return Out;
 }
@@ -445,11 +490,10 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
-    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
-    vector vShade = g_ShadeTexture.Sample(LinearSampler, In.vTexcoord);
-    vector vSpecular = g_SpecularTexture.Sample(LinearSampler, In.vTexcoord);
-
-    Out.vColor = vDiffuse * vShade + vSpecular;
+    vector vDiffuse = g_LinearTexture.Sample(LinearSampler, In.vTexcoord);
+    
+    Out.vColor = pow(vDiffuse, 1.0f / 2.2f);
+    
 	/* 현재 픽셀의 월드상의 위치를 구한다. */
 
 	/* ProjPos.w == View.Z */
@@ -528,6 +572,8 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
     // 기존 디퓨즈와 가산되어 그려진다.
     Out.vColor += vEffect + vBlur;
         
+    
+    
     if (g_DeferredInfoTexture.Sample(LinearSampler, In.vTexcoord).g == 1.f && g_StencilTexture.Sample(LinearSampler, In.vTexcoord).r != 1.f)
     {
         int ShadowTotal = 0;

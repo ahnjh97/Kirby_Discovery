@@ -300,6 +300,9 @@ HRESULT CLoader::Loading_For_GamePlay()
 		return E_FAIL;
 	if(FAILED(Add_Texture(eLevel, "GsLandTopNoize_Fur", "Map/GsLandTopNoize_Fur.dds")))
 		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Level_0_Env", "Map/Level_0_Env.dds")))
+		return E_FAIL;
+
 	
 	hr = Add_Texture(eLevel, "GameComplete", "UI/GAMECOMPLETE/GameComplete_%d.png", 21);
 	CHECK_FAILED(hr);

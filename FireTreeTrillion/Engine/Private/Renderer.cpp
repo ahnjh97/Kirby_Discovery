@@ -155,15 +155,10 @@ HRESULT CRenderer::Initialize()
 
 #pragma region MRT_LightAcc
 	/* For.Target_Shade */
-	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Shade"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 1.f))))
-		return E_FAIL;
-	/* For.Target_Specular */
-	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Specular"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 0.f))))
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_ResultColor"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 0.f))))
 		return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Shade"))))
-		return E_FAIL;
-	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Specular"))))
+	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_ResultColor"))))
 		return E_FAIL;
 #pragma endregion
 
@@ -324,9 +319,7 @@ HRESULT CRenderer::Initialize()
 
 
 	// LightAcc
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Shade"), 700.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
-		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Specular"), 800.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_ResultColor"), 700.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
 		return E_FAIL;
 
 
@@ -500,6 +493,23 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 
 	return S_OK;
 }
+
+HRESULT CRenderer::Bind_DeferredTexture(CTexture* pTexture, const _char* pConstantName, _uint iIndex)
+{
+	if (FAILED(pTexture->Bind_ShaderResource(m_pShader, pConstantName, iIndex)))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CRenderer::Bind_DeferredRawValue(const _char* pConstantName, const void* pData, _uint iLength)
+{
+	if (FAILED(m_pShader->Bind_RawValue(pConstantName, pData, iLength)))
+		return E_FAIL;
+
+	return S_OK;
+}
+
 
 void CRenderer::Set_ColorSet(COLOR_DATA destColorData)
 {
@@ -735,7 +745,6 @@ HRESULT CRenderer::Render_Lights()
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_MRA"), "g_MRATexture")))
 		return E_FAIL;
 
-
 	if (FAILED(m_pVIBuffer->Bind_Buffers()))
 		return E_FAIL;
 
@@ -894,13 +903,11 @@ HRESULT CRenderer::Render_Result()
 
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Diffuse"), "g_DiffuseTexture")))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Specular"), "g_SpecularTexture")))
-		return E_FAIL;
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Depth"), "g_DepthTexture")))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_FieldDepth"), "g_FieldDepthTexture")))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Shade"), "g_ShadeTexture")))
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_ResultColor"), "g_LinearTexture")))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_LightDepth"), "g_LightDepthTexture")))
 		return E_FAIL;
@@ -943,7 +950,6 @@ HRESULT CRenderer::Render_Result()
 
 	if (FAILED(m_pShader->Bind_Matrix("g_LightViewMatrix", &ViewMatrix)))
 		return E_FAIL;
-
 	if (FAILED(m_pShader->Bind_Matrix("g_LightProjMatrix", &ProjMatrix)))
 		return E_FAIL;
 

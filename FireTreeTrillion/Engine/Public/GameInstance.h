@@ -48,6 +48,8 @@ public: /* For.Renderer */
 	void Update_LightShadow(_fvector vLightPos, _fvector vFocusPos);
 	void Update_DofFocus(_fvector vWorldPos);
 	void Set_BlackBackGround(_bool bSet);
+	HRESULT Bind_DeferredTexture(CTexture* pTexture, const _char* pConstantName, _uint iIndex = 0);
+	HRESULT Bind_DeferredRawValue(const _char* pConstantName, const void* pData, _uint iLength);
 
 #ifdef _DEBUG
 public:
