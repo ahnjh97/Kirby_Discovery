@@ -126,13 +126,13 @@ HRESULT CLevel_Tool_UI::Ready_RTV(const wstring& strLayerTag)
 		MSG_BOX(TEXT("Failed to Add : RenderTarget"));
 		return E_FAIL;
 	}
-
+#ifdef _DEBUG
 	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_UI"), 50.f, g_iWinSizeY - 50.f, g_iWinSizeX * 0.75f, g_iWinSizeY * 0.75f)))
 	{
 		MSG_BOX(TEXT("Failed to Ready : RenderTarget"));
 		return E_FAIL;
 	}
-
+#endif
 	//XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 	//XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizex, g_iWinSizeY, 0.f, 1.f));
 

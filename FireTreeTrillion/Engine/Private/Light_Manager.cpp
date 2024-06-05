@@ -59,6 +59,7 @@ HRESULT CLight_Manager::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer)
 	return S_OK;
 }
 
+#ifdef _DEBUG
 void CLight_Manager::IMGUI_Tick()
 {
 	if (m_Lights.empty()) return;
@@ -101,6 +102,7 @@ void CLight_Manager::IMGUI_Tick()
 
 	ImGui::End();
 }
+#endif
 
 void CLight_Manager::Clear_Light()
 {
