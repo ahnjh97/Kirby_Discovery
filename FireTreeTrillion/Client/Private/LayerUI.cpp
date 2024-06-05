@@ -81,11 +81,13 @@ HRESULT CLayerUI::Render()
 	{
 		//if (FAILED(Bind_ShaderResources(m_pShaderCom, PS_DEFAULT, m_pTransformCom)))
 		//	return E_FAIL;
+		_float2 vFontPos = { m_UIObjDesc.vPos.x + m_UIObjDesc.vCenter.x, 
+							- m_UIObjDesc.vPos.y + m_UIObjDesc.vCenter.y};
 
 		//스프라이트 폰트 렌더 (폰트 테스트용)
 		if (FAILED(m_pGameInstance->
-			Render_Font(TEXT("Font_HUDSub_KR15"), m_UIObjDesc.wstrText, 
-				_float2(m_UIObjDesc.vPos + m_UIObjDesc.vCenter), m_UIObjDesc.vColorRGBA, m_UIObjDesc.fDegree)))
+			Render_Font(TEXT("Font_HUDSub_KR15"), m_UIObjDesc.wstrText, vFontPos, m_UIObjDesc.vColorRGBA, 
+				XMConvertToRadians(m_UIObjDesc.fDegree))))
 			return E_FAIL;
 	}
 

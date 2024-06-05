@@ -127,26 +127,31 @@ HRESULT CRenderer::Initialize()
 		return E_FAIL;
 
 	//06.04) UI 렌더타겟 뷰 생성 및 준비
-	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_UI"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
-	{
-		MSG_BOX(TEXT("Failed to Add : RenderTarget_UI"));
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_UI"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, 
+		DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 1.f, 0.f, 1.f))))
 		return E_FAIL;
-	}
 
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Diffuse"))))
 		return E_FAIL;
+
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Normal"))))
 		return E_FAIL;
+
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Depth"))))
 		return E_FAIL;
+
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_RimLight"))))
 		return E_FAIL;
+
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_FieldDepth"))))
 		return E_FAIL;
+
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Stencil"))))
 		return E_FAIL;
+
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_MotionBlur"))))
 		return E_FAIL;
+
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_MRA"))))
 		return E_FAIL;
 
@@ -184,7 +189,6 @@ HRESULT CRenderer::Initialize()
 		return E_FAIL;
 #pragma endregion
 
-
 #pragma region MRT_NonLight
 	/* For.Target_RadialBlur */
 	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_NonLight"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
@@ -220,6 +224,7 @@ HRESULT CRenderer::Initialize()
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_RadialBlur"), TEXT("Target_RadialBlur"))))
 		return E_FAIL;
+
 #pragma endregion
 
 #pragma region MRT_DOFBlur
@@ -380,13 +385,42 @@ HRESULT CRenderer::Initialize()
 	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_DeferredInfo"), 900.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
 		return E_FAIL;
 
-	//06.04) UI 렌더타겟 뷰 생성 및 준비
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_UI"), 50.f, 50.f, 100.f, 100.f)))
-	{
-		MSG_BOX(TEXT("Failed to Ready : RenderTarget_UI"));
-		return E_FAIL;
-	}
+#pragma region READY_UI
 
+	//06.04) UI 렌더타겟 뷰 생성 및 준비
+	//렌더할 뷰포트 세팅
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_UI"), 50.f, 50.f, 
+		ViewportDesc.Width * 0.25f, ViewportDesc.Height * 0.25f/*100.f, 100.f*/)))
+		return E_FAIL;
+
+	ID3D11Texture2D* pCopyTex2D = { nullptr };
+	if (FAILED(m_pGameInstance->Copy_Resource(TEXT("Target_UI"), &pCopyTex2D)))
+		return E_FAIL;
+	
+	D3D11_TEXTURE2D_DESC CopyTexDesc{};
+	pCopyTex2D->GetDesc(&CopyTexDesc);
+
+
+	//RTV 직접 접근하면 IMGUI에러로 크래시 발생 (사용안함)
+	//D3D11_RENDER_TARGET_VIEW_DESC CopyRTVDesc = {};
+	//CopyRTVDesc.Format = CopyTexDesc.Format;
+	//CopyRTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+	//CopyRTVDesc.Texture2D.MipSlice = 0;
+	//m_pDevice->CreateRenderTargetView(pCopyTex2D, &CopyRTVDesc, &m_pUIRTV);
+
+	//생성한 RTV 데이터 SRV에 복사
+	D3D11_SHADER_RESOURCE_VIEW_DESC		CopySRVDesc = {};
+	CopySRVDesc.Format = CopyTexDesc.Format;
+	CopySRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	CopySRVDesc.Texture2D.MostDetailedMip = 0;
+	CopySRVDesc.Texture2D.MipLevels = 1;
+	
+	//복사한 데이터를 기반으로 SRV 생성
+	m_pDevice->CreateShaderResourceView(pCopyTex2D, &CopySRVDesc, &m_pUISRV);
+	Safe_Release(pCopyTex2D);
+
+#pragma endregion
+	
 #endif
 
 	function<void(_int)> TriggerFunc = bind(&CRenderer::Set_ColorSet_ByIndex, this, placeholders::_1);
@@ -498,6 +532,39 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 	{
 		if (FAILED(Render_Debug()))
 			return E_FAIL;
+	}
+
+	//레벨 별 옵션 ON/OFF
+	//_uint* iCurrLevel = m_pGameInstance->Get_CurrentLevelID();
+	if (5 == *iCurrLevel) //LEVEL_TOOL_UI 만
+	{
+		ImGuiWindowFlags Dirwindow_Flags{}; /*= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize;*/
+		if (ImGui::Begin(u8"Preview 미리보기", 0, Dirwindow_Flags))
+		{
+			D3D11_VIEWPORT		ViewportDesc{};	
+			_uint				iNumViewports = { 1 };
+			m_pContext->RSGetViewports(&iNumViewports, &ViewportDesc);
+
+			ImVec2 vWinSize = { ViewportDesc.Width * 0.25f, ViewportDesc.Height * 0.25f }; //ImGui::GetWindowSize();
+			//06.05) UI 렌더타겟 뷰 렌더
+				//m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("UI Default"),
+				//	_float2(5.f, 10.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+				//이미 생성한 RTV 데이터 저장 및 DESC에 복사
+
+			XMStoreFloat4x4(&m_WorldMatrix, XMMatrixIdentity());
+
+			m_WorldMatrix._11 = ViewportDesc.Width;
+			m_WorldMatrix._22 = ViewportDesc.Height;
+			m_WorldMatrix._41 = 0.f;
+			m_WorldMatrix._42 = 0.f;
+
+			XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
+			XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(ViewportDesc.Width, ViewportDesc.Height, 0.f, 1.f));
+
+			ImGui::Image((void*)m_pUISRV, vWinSize);
+
+			ImGui::End();
+			}
 	}
 
 	Render_IMGUI();
@@ -1415,6 +1482,7 @@ HRESULT CRenderer::Render_Debug()
 	if (*m_pGameInstance->Get_CurrentLevelID() == 4)
 		return S_OK;
 
+
 	for (auto& pDebugCom : m_DebugComponents)
 	{
 		if (nullptr != pDebugCom)
@@ -1457,12 +1525,8 @@ HRESULT CRenderer::Render_Debug()
 	if (FAILED(m_pGameInstance->Draw_RTVDebug(TEXT("MRT_DeferredInfo"), m_pShader, m_pVIBuffer)))
 		return E_FAIL;
 
-	//06.04) UI 렌더타겟 뷰 생성 및 준비
 	if (FAILED(m_pGameInstance->Draw_RTVDebug(TEXT("MRT_UI"), m_pShader, m_pVIBuffer)))
-	{
-		MSG_BOX(TEXT("Failed to Draw : MRT_UI"));
 		return E_FAIL;
-	}
 
 	return S_OK;
 }

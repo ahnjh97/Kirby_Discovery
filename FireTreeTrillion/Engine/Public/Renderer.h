@@ -72,7 +72,12 @@ private:
 	class CVIBuffer_Rect* m_pVIBuffer = { nullptr };
 	class CShader* m_pShader = { nullptr };
 	_float4x4							m_WorldMatrix{}, m_ViewMatrix{}, m_ProjMatrix{};
-	ID3D11DepthStencilView* m_pLightDepthDSV = { nullptr };
+
+	ID3D11DepthStencilView*				m_pLightDepthDSV = { nullptr };
+
+	ID3D11RenderTargetView*				m_pUIRTV = { nullptr };
+	ID3D11ShaderResourceView*			m_pUISRV = { nullptr };
+
 
 	_float4								m_vShadowEyePos = { 0.f, 0.f, 0.f, 0.f };
 	_float4								m_vShadowFocusPos = { 0.f, 0.f, 0.f, 0.f };

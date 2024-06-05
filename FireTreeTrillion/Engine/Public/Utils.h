@@ -12,6 +12,7 @@ public:
 	static wstring  StrToWstrUTF8(const string& value);
 	static string   WstrToStr(const wstring& value);
 	static string   WstrToStrUTF8(const wstring& value);
+	static string	StrToUTF8(const string& value);
 
 	static void		WCharToChar(const wchar_t* szWchar, char* szChar);
 

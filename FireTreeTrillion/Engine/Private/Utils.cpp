@@ -13,7 +13,7 @@ wstring CUtils::StrToWstrUTF8(const string& value)
 {
 	//UTF8 인코딩 변환하여 RenderFont를 위함
 	int len;
-	int strLength = static_cast<int>(value.length()) + 1;
+	int strLength = static_cast<int>(value.length()); //+ 1;
 	len = MultiByteToWideChar(CP_UTF8, 0, value.c_str(), strLength, 0, 0);
 	std::wstring wstr(len, L'\0');
 	MultiByteToWideChar(CP_UTF8, 0, value.c_str(), strLength, &wstr[0], len);
@@ -29,15 +29,38 @@ string CUtils::WstrToStr(const wstring& value)
 	return stemp;
 }
 
-string WstrToStrUTF8(const std::wstring& value)
+string CUtils::WstrToStrUTF8(const std::wstring& value)
 {
 	//UTF8 인코딩 변환하여 RenderFont를 위함
 	int len;
-	int wstrLength = static_cast<int>(value.length()) + 1;
+	int wstrLength = static_cast<int>(value.length()); //+ 1;
 	len = WideCharToMultiByte(CP_UTF8, 0, value.c_str(), wstrLength, 0, 0, 0, 0);
 	std::string str(len, '\0');
 	WideCharToMultiByte(CP_UTF8, 0, value.c_str(), wstrLength, &str[0], len, 0, 0);
 	return str;
+}
+
+string CUtils::StrToUTF8(const string& value)
+{
+	// ANSI 문자열을 wide 문자열로 변환
+	int wideCharLen = MultiByteToWideChar(CP_ACP, 0, value.c_str(), -1, NULL, 0);
+	if (wideCharLen == 0) {
+		return "";
+	}
+
+	std::wstring wideString(wideCharLen, 0);
+	MultiByteToWideChar(CP_ACP, 0, value.c_str(), -1, &wideString[0], wideCharLen);
+
+	// Wide 문자열을 UTF-8로 변환
+	int utf8Len = WideCharToMultiByte(CP_UTF8, 0, wideString.c_str(), -1, NULL, 0, NULL, NULL);
+	if (utf8Len == 0) {
+		return "";
+	}
+
+	std::string utf8String(utf8Len, 0);
+	WideCharToMultiByte(CP_UTF8, 0, wideString.c_str(), -1, &utf8String[0], utf8Len, NULL, NULL);
+
+	return utf8String;
 }
 
 void CUtils::WCharToChar(const wchar_t* szWchar, char* szChar)

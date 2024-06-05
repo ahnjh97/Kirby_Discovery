@@ -45,7 +45,9 @@ private:
 
 	_bool			Edit_Transform(CUIObject* _pUIObj); //변환
 	_bool			Edit_RGBAColor(); //색상 편집
-	_bool			Edit_Text(CUIObject* _pUIObj); //텍스트 편집
+
+	_bool			Edit_Text(); //텍스트 편집
+	_bool			Set_TextSync(string _strInput);
 
 	_bool			Create_UIObject(LAYER_TYPE _eLayerType, UI_TYPE _eUIType);
 	_bool			Delete_UIObject(LAYER_TYPE _eLayerType);

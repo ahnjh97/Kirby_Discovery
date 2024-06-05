@@ -695,8 +695,8 @@ PS_OUT PS_UI_Default(PS_IN In)
     
     Out.vColor = vColor;
     
-    if (vUIColor.a != 0.f)
-        Out.vColor = vUIColor;
+    //if (vUIColor.a != 0.f)
+    //    Out.vColor = vUIColor;
     
     return Out;
 }

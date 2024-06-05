@@ -5,7 +5,7 @@
 #ifdef _DEBUG
 #include "ImGuizmo.h"
 #include "LayerUI.h"
-#include "Multi_UI.h"
+//#include "Multi_UI.h"
 //#include "ImGuiFileDialog.h"
 //#include "ImGuiFileDialogConfig.h" //현재 사용 안함
 #endif
@@ -520,11 +520,7 @@ _bool CEditor_UI::Window_Properties()
 			if (ImGui::BeginTabItem(u8"Transform 변환"))
 			{
 				ImGui::SeparatorText(u8"Transform Edit 상태 편집");
-				//if (!m_LayerUIs.empty())
-				//{
-				//	if ((iSelectUI >= 0 && iSelectUI < m_LayerUIs.size()))
-				//		Edit_Transform(m_LayerUIs[iSelectUI]);
-				//}
+
 				if (!SelectUIs.empty())
 				{
 					iSelectUI = SelectUIs.front();
@@ -557,12 +553,8 @@ _bool CEditor_UI::Window_Tools()
 
 			if (ImGui::BeginTabItem(u8"Text 텍스트 편집"))
 			{
-				if (!SelectUIs.empty())
-				{
-					iSelectUI = SelectUIs.front();
-					if ((iSelectUI >= 0 && iSelectUI < m_LayerUIs.size()))
-						Edit_Text(m_LayerUIs[iSelectUI]);
-				}
+				ImGui::SeparatorText(u8"Text Edit 텍스트 편집");
+				Edit_Text();
 
 				ImGui::EndTabItem();
 			}
@@ -578,7 +570,7 @@ _bool CEditor_UI::Edit_Transform(CUIObject* _pUIObj)
 {
 	const char* DragTag = { "Translate 위치" };
 	_float fTextWidth = ImGui::CalcTextSize(DragTag).x;
-	_float Translate[3], Rotate[3], Scale[3];
+	_float Translate[3], Rotate[3], Scale[3] = { 0.f, 0.f, 0.f };
 
 	if (nullptr == _pUIObj) //|| UI_FONT == _pUIObj->Get_UIObj_Desc().eUIType)
 		return FALSE;
@@ -611,7 +603,7 @@ _bool CEditor_UI::Edit_Transform(CUIObject* _pUIObj)
 	ImGui::Text(u8"Rotate 회전");
 	ImGui::SameLine(); HelpMarker(u8"Ctrl+R");
 	ImGui::SameLine(fTextWidth + 35);
-	ImGui::DragFloat("##Rotate", (_float*)&Rotate[2], 1.f, (_int)-360, (_int)360, u8"Degree 각도 : %.1f");
+	ImGui::DragFloat("##Rotate", (_float*)&Rotate[2], 0.1f, (_int)-360, (_int)360, u8"Degree 각도 : %.1f");
 	ImGui::PopItemWidth();
 
 	_pUIObj->Set_UIObj_Desc(pUIObj_Desc);
@@ -677,68 +669,52 @@ _bool CEditor_UI::Edit_RGBAColor()
 }
 
 //06.04) 글꼴 편집 기능 구현
-_bool CEditor_UI::Edit_Text(CUIObject* _pUIObj)
-{
-	ImGui::SeparatorText(u8"Text Edit 텍스트 편집");
-
-	const char* DragTag = { "Translate 위치" };
-	_float fTextWidth = ImGui::CalcTextSize(DragTag).x;
-	_float Translate[3], Rotate[3], Scale[3];
-
-	if (nullptr == _pUIObj) //|| UI_TEXTURE == _pUIObj->Get_UIObj_Desc().eUIType)
-		return FALSE;
-
-	CTransform* pFontTrans = (CTransform*)_pUIObj->Get_Component(g_strTransformTag);
-	if (nullptr == pFontTrans)
-		return FALSE;
-
-	_float4x4 FontWorldMat = pFontTrans->Get_WorldFloat4x4();
-	
-	ImGuizmo::DecomposeMatrixToComponents(FontWorldMat.m[0], Translate, Rotate, Scale);
-
-	wstring wstrFontTag, wstrText = {};
-	UIOBJ_DESC FontDesc = _pUIObj->Get_UIObj_Desc();
-	FontDesc.vSize = (_float3)Scale;
-	FontDesc.vPos = (_float3)Translate;
-	FontDesc.fDegree = (_float)Rotate[2];
-
+_bool CEditor_UI::Edit_Text()
+{				
 	//폰트 편집 동기화
-	static string strInputText(1024 * 16, '\0');
-	ImGuiInputTextFlags InputText_flags{}; //= ImGuiInputTextFlags_AllowTabInput;
+	static string strInput(1024 * 16, '\0');
+	static string strTemp(1024 * 16, '\0');
+	//ImGuiInputTextFlags InputText_flags{}; //= ImGuiInputTextFlags_AllowTabInput;
 
-	ImGui::InputTextMultiline(u8"##", &strInputText[0], 
-		strInputText.capacity(), /*IM_ARRAYSIZE(strInputText.c_str()*/
-		ImVec2(-FLT_MIN, 10 * ImGui::GetTextLineHeightWithSpacing())); /*ImGui::GetTextLineHeight() * 10*/
+	ImGui::InputTextMultiline(u8"##", &strInput[0],
+		strInput.capacity(), /*IM_ARRAYSIZE(strInputText.c_str()*/
+		ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing())); /*ImGui::GetTextLineHeight() * 10*/
 
-	//UTF-8 인코딩 변환
-	wstrText = CUtils::StrToWstrUTF8(strInputText);
-	FontDesc.wstrText = wstrText;
+#pragma region FONT_SYNC
 
-	//위젯
-	ImGui::PushItemWidth(ImGui::GetColumnOffset());
-	ImGui::Text(u8"Scale 크기");
-	ImGui::SameLine(fTextWidth + 35);
-	ImGui::DragFloat3("##Scale", (_float*)&Scale, 1.f, 0.f, g_iWinSizeX, "%.1f");
+	wstring wstrText{};
+	UIOBJ_DESC FontDesc{};
 
-	ImGui::Text(u8"Translate 위치");
-	ImGui::SameLine(fTextWidth + 35);
-	ImGui::DragFloat3("##Translate", (_float*)&Translate, 1.f, (_float)-0.1 * g_iWinSizeX, (_float)g_iWinSizeX, "%.1f");
+	if (!SelectUIs.empty())
+	{
+		iSelectUI = SelectUIs.front();
+		if ((iSelectUI >= 0 && iSelectUI < m_LayerUIs.size()))
+		{
+			//UTF-8 인코딩 변환 작업
+			FontDesc = m_LayerUIs[iSelectUI]->Get_UIObj_Desc();
 
-	ImGui::Text(u8"Rotate 회전");
-	ImGui::SameLine(fTextWidth + 35);
-	ImGui::DragFloat("##Rotate", (_float*)&Rotate[2], 0.1f, (_int)-360, (_int)360, u8"Degree 각도 : %.1f");
+			wstrText = CUtils::StrToWstrUTF8(strInput);
+			FontDesc.wstrText = wstrText;
 
-	ImGui::Text(u8"Color 색상");
-	ImGui::SameLine(fTextWidth + 35);
-	ImGui::DragFloat3("##Color", (_float*)&FontDesc.vColorRGBA, 0.1f, 0, 1, "%.1f");
-	ImGui::PopItemWidth();
+			//추후 처리 필요 (UTF8 변환된 것들에 대한 예외처리가 까다로움)
+			//strInput = CUtils::WstrToStr(FontDesc.wstrText);
+			//wstrText = CUtils::StrToWstr(strInput);
+			//FontDesc.wstrText = wstrText;
+			//strInputText = CUtils::StrToUTF8(strInputText); //strANSI > strUTF8 변환 (만약 이미 UTF8이면 변환 안해도됨)
 
-	_pUIObj->Set_UIObj_Desc(FontDesc);
+			m_LayerUIs[iSelectUI]->Set_UIObj_Desc(FontDesc);
+			//strTempText = strInputText;
 
-	ImGuizmo::RecomposeMatrixFromComponents(Translate, Rotate, Scale, FontWorldMat.m[0]);
+			//if (strInputText != strTempText) //이전에 입력한 값이랑 현재 값이랑 다를 경우
+			//{
+			//	FontDesc = m_LayerUIs[iSelectUI]->Get_UIObj_Desc();
+			//	FontDesc.wstrText = wstrText;
+			//	m_LayerUIs[iSelectUI]->Set_UIObj_Desc(FontDesc);
+			//}
+		}		
+	}
 
-	//월드행렬 세팅
-	pFontTrans->Set_WorldMatrix(FontWorldMat);
+#pragma endregion
 
 	return TRUE;
 }
@@ -866,7 +842,7 @@ _bool CEditor_UI::Create_UIObject(LAYER_TYPE _eLayerType, UI_TYPE _eUIType)
 		if (UI_FONT == _eUIType)
 		{
 			LayerUI_Desc.eUIType = UI_FONT;
-			LayerUI_Desc.wstrText = TEXT("Test");
+			LayerUI_Desc.wstrText = TEXT("텍스트를 여기에 입력");
 			LayerUI_Desc.vColorRGBA = { 1.f, 1.f, 1.f, 1.f };
 		}
 
@@ -888,7 +864,7 @@ _bool CEditor_UI::Create_UIObject(LAYER_TYPE _eLayerType, UI_TYPE _eUIType)
 	}
 }
 
-//추가 필요) 이넘으로 구분하여 벡터 그룹 삭제 
+//추가 필요) 레이어그룹 삭제 
 _bool CEditor_UI::Delete_UIObject(LAYER_TYPE _eLayerType)
 {
 	if (m_LayerUIs.empty())
