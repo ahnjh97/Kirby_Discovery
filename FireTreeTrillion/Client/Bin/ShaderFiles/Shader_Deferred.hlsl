@@ -406,7 +406,7 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
     float3 directLighting = 0.0;
     {
     
-        float3 Li = -1.f * g_vLightDir;
+        float3 Li = -1.f * normalize(g_vLightDir);
         float3 Lradiance = 1.f;
 
 	// Half-vector between Li and Lo.
@@ -414,7 +414,7 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
 
     
 	// Calculate angles between surface normal and various light vectors.
-        float cosLi = max(0.0, dot(N, Li));
+        float cosLi = max(0.1, saturate(dot(N, Li) + 0.7f));
         float cosLh = max(0.0, dot(N, Lh));
 
         float3 F = fresnelSchlick(F0, max(0.0, dot(Lh, Lo)));
@@ -432,7 +432,7 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
         float3 specularBRDF = (F * D * G) / max(Epsilon, 4.0 * cosLi * cosLo);
 
 	// 최종적인 결과물
-        directLighting += (diffuseBRDF + specularBRDF) * Lradiance * cosLi;
+        directLighting = (diffuseBRDF + specularBRDF) * Lradiance * cosLi;
     }
     //////////////////    // Ambient lighting (IBL).
     
@@ -453,37 +453,9 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
         
         
         ambientLighting = diffuseIBL + specularIBL;
-        ambientLighting *= fAmbientOcclusion;
     }
     
-    
-    
-    {
-        // // Calculate ambient lighting from irradiance map.
-    
-        //const float3 reflectionDirection = normalize(mul(reflect(-viewDirection, normal), (float3x3) sceneBuffer.inverseViewMatrix));
-
-        //const float3 f0 = lerp(float3(0.04f, 0.04f, 0.04f), albedo.xyz, metallicFactor);
-    
-        //const float3 kS = fresnelSchlickFunctionRoughness(f0, saturate(dot(viewDirection, normal)), roughnessFactor);
-        //const float3 kD = lerp(float3(1.0f, 1.0f, 1.0f) - kS, float3(0.0f, 0.0f, 0.0f), metallicFactor);
-    
-        //const float nDotV = saturate(dot(viewDirection, normal));
-    
-        //// Batching texture fetches for optimal performance.
-        //const float3 irradiance = irradianceTexture.Sample(linearClampSampler, worldSpaceNormal).rgb;
-        //const float3 specularPreFilter = preFilterTexture.SampleLevel(minMapLinearMipPointClampSampler, reflectionDirection, roughnessFactor * 6.0f).xyz;
-        //const float2 brdfLut = brdfLUTTexture.Sample(pointWrapSampler, float2(nDotV, roughnessFactor)).xy;
-
-        //const float3 diffuseIBL = kD * irradiance * albedo.xyz;
-        //const float3 specularIBL = specularPreFilter * (f0 * brdfLut.x + brdfLut.y);
-
-    }
-    
-    
-    
-    
-    Out.vResultColor = float4( directLighting + ambientLighting, fAmbientOcclusion);
+    Out.vResultColor = float4(directLighting + ambientLighting, 1.f) * fAmbientOcclusion;
     
     return Out;
 }
