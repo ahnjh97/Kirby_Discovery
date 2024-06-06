@@ -44,22 +44,33 @@
 #include "AnimToolHelper.h"
 #include "AnimToolObject.h"
 
-//클라이언트
+// 클라이언트
+
+#pragma region 컴포넌트
+#include "RigidBody.h"
+#include "CharacterController.h"
+#pragma endregion
+
+#pragma region 객체
 #include "Camera_Free.h"
 #include "TestModel.h"
 #include "TestTerrain.h"
 #include "Kirby.h"
+
+// 몬스터
 #include "KirbyWeapons.h"
 #include "KirbyArmours.h"
 #include "Awoofy.h"
-#include "RigidBody.h"
-#include "CharacterController.h"
 #include "Rabbit.h"
 #include "Buffahorn.h"
 #include "BladeKnight.h"
 #include "BladeKnightSword.h"
+#include "Kabu.h"
 
 #include "Moon.h"
+#include "WasteCan.h"
+#pragma endregion
+
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
@@ -199,12 +210,15 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Buffahorn"), CBuffahorn);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BladeKnight"), CBladeKnight);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BladeKnightSword"), CBladeKnightSword);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kabu"), CKabu);
+
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BackGround"), CBackGround);
 	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_Test"), CTestUI);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestMap"), CTestTerrain);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Moon"), CMoon);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("WasteCan"), CWasteCan);
 #pragma endregion
 
 	return S_OK;
@@ -400,6 +414,9 @@ HRESULT CLoader::Loading_For_Tool_Anim()
 	Load_AnimToolInfo();
 	if (FAILED(Add_AllModelTxts(eLevel, TYPE_ANIM)))
 		return E_FAIL;
+	hr = Add_Models(eLevel);
+	CHECK_FAILED(hr);
+
 	#pragma endregion
 
 	m_strLoadingText = TEXT("물리 컴포넌트(을) 로딩 중 입니다.");
@@ -565,6 +582,10 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Buffahorn", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("BladeKnight", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("BladeKnightSword", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("Kabu", TYPE_ANIM, 2.f, 180.f);
+
+		// For Mab Interactive Object
+		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM, 1.f);
 	}
 	else if (eLevel == LEVEL_TOOL_MAP)
 	{
@@ -577,14 +598,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	}
 	else if (eLevel == LEVEL_TOOL_ANIM)
 	{
-		// For Kirby Body
-		m_vecModelInfo.emplace_back(MODEL{ "Kirby", TYPE_ANIM });
-		m_vecModelInfo.emplace_back(MODEL{ "KirbyBalloon", TYPE_ANIM, 1.f, 180.f });
-		m_vecModelInfo.emplace_back(MODEL{ "KirbyDefault", TYPE_ANIM, 1.f, 180.f });
-		m_vecModelInfo.emplace_back(MODEL{ "KirbyVacuum",  TYPE_ANIM, 1.f, 180.f });
-		
-		// For Awoofy
-		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("BladeKnightSword",  TYPE_NONANIM, 1.f);
 	}
 
 }
@@ -684,9 +700,13 @@ HRESULT CLoader::Add_KirbyFaceTexture(LEVEL eLevel)
 	if (FAILED(Add_Texture(eLevel, "Awoofy_Eye", "AwoofyEye/NormalEnemyEye%d.dds", 5)))
 		return E_FAIL;
 
-	//// Rabbit Eye
-	//if (FAILED(Add_Texture(eLevel, "Rabbit_Eye", "RabbitEye/RabbitEye%d.dds", 5)))
-	//	return E_FAIL;
+	// Rabbit Eye
+	if (FAILED(Add_Texture(eLevel, "Rabbit_Eye", "RabbitEye/RabbitEnemyEye.0%d.dds", 5)))
+		return E_FAIL;
+
+	// Buffahorn Eye
+	if (FAILED(Add_Texture(eLevel, "Buffahorn_Eye", "BuffahornEye/TackleEnemyEye.0%d.dds", 4)))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -789,7 +809,6 @@ void CLoader::TraverseModelTxts(const wstring& rootFolderPath, list<wstring>& fi
 
 	FindClose(hFind);
 }
-
 
 // AnimTool에서 만들어놓은 파일을 읽어서 가지고있는 함수
 void CLoader::Load_AnimToolInfo()

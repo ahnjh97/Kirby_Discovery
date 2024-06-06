@@ -14,11 +14,12 @@ public:
     HRESULT Initialize();
     HRESULT Ready_CollisionContents();
     void    Tick(_float fTimeDelta);
-    
+
     // For Animation
     void    Ready_TestGround();
 
     // test 
+    void CheckPvdConnection(PxPvd* pvd);
     void Test();
     _float4x4 Update(_fmatrix matrix);
 

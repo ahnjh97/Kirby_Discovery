@@ -48,6 +48,7 @@ HRESULT CRabbit::Initialize(void* pArg)
 	m_fAttack = 10.f;
 	m_eVacuumSize = SIZE_SMALL;
 	m_eAbilityType = ABILITY_DEFAULT;
+	m_eEyeState = RABBITEYE_IDLE;
 
 	return S_OK;
 }
@@ -58,27 +59,6 @@ _int CRabbit::Tick(_float fTimeDelta)
 		return OBJ_DEAD;
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
-
-	// Áö¸éÀÇ upº¤ÅÍ
-	//PxVec3 slope = m_pControllerCom->Compute_Slope(m_pTransformCom);
-	//_vector vTerrainNormal = CUtils::To_Vector(slope);
-	//Lerp_UpVector(vTerrainNormal, 10.f, fTimeDelta);
-
-	//if (m_pGameInstance->Get_DIKeyState(DIK_W, KEY_PRESS))
-	//{
-	//	m_pTransformCom->Go_Straight(fTimeDelta);
-	//	//m_pControllerCom->Move_Dir(m_pTransformCom, m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), fTimeDelta);
-	//}
-
-	//if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_PRESS))
-	//{
-	//	m_pTransformCom->Turn(XMVectorSet(0.f, -1.f, 0.f, 0.f), fTimeDelta);
-	//}
-
-	//if (m_pGameInstance->Get_DIKeyState(DIK_D, KEY_PRESS))
-	//{
-	//	m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta);
-	//}
 
 		// »¡¸± ¶§
 	if (m_bVacuuming == true)
@@ -109,6 +89,9 @@ HRESULT CRabbit::Render()
 
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
+		if (Custom_Face(i) == true)
+			continue;
+
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
 			return E_FAIL;
 
@@ -163,6 +146,7 @@ void CRabbit::Render_IMGUI()
 void CRabbit::Collision_Attack(CGameObject* pOtherObj)
 {
 	Change_State(CRabbit::RABBIT_DAMAGE, 50.f, false, true);
+	m_eEyeState = RABBITEYE_HAPPY;
 }
 
 void CRabbit::Change_State(RABBIT_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
@@ -219,6 +203,11 @@ HRESULT CRabbit::Add_Components()
 	/* For.Com_Model */
 	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Rabbit"),
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+	CHECK_FAILED(hr);
+
+	/* For.Com_Texture */
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Rabbit_Eye"),
+		TEXT("Com_Texture"), (CComponent**)&m_pEyeTextureCom);
 	CHECK_FAILED(hr);
 
 	/* For.Com_CharacterController */
@@ -296,6 +285,37 @@ void CRabbit::SetUp_FSM()
 	m_pFSM->Initialize(&FSM_Desc);
 }
 
+_bool CRabbit::Custom_Face(_uint iMeshIndex)
+{
+	if (iMeshIndex == 1)
+	{
+		HRESULT hr;
+
+		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", iMeshIndex, TextureType_DIFFUSE);
+		CHECK_FAILED(hr);
+
+		hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", iMeshIndex);
+		CHECK_FAILED(hr);
+
+		hr = m_pEyeTextureCom->Bind_ShaderResource(m_pShaderCom, "g_KirbyEyeTexture", (_uint)m_eEyeState);
+		CHECK_FAILED(hr);
+
+		_bool bStencil = true;
+		_bool bRimLight = true;
+		_bool bMotionBlur = true;
+		m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
+
+		m_pShaderCom->Begin(ANIMMODEL_KIRBYEYE);
+		m_pModelCom->Render(iMeshIndex);
+
+		return true;
+	}
+
+	return false;
+}
+
 CRabbit* CRabbit::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CRabbit* pInstance = new CRabbit(pDevice, pContext);
@@ -326,4 +346,6 @@ CGameObject* CRabbit::Clone(void* pArg)
 void CRabbit::Free()
 {
 	__super::Free();
+
+	Safe_Release(m_pEyeTextureCom);
 }

@@ -2,6 +2,8 @@
 #pragma warning (disable : 4251)
 #pragma warning (disable : 5208)
 #pragma warning (disable : 4267)
+#pragma warning (disable : 4099)
+#pragma warning (disable : 26495)
 //#pragma warning (disable : 4819)
 //#pragma warning (disable : 4101)
 
@@ -301,3 +303,7 @@ using namespace Engine;
 
 #endif // _DEBUG
 
+//#ifdef _DEBUG
+//#define new new(_CLIENT_BLOCK, __FILE__, __LINE__)
+//#define malloc(s) _malloc_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
+//#endif

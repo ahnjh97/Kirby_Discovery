@@ -253,8 +253,10 @@ _bool CAwoofy::Custom_Face(_uint iMeshIndex)
 
 		m_pShaderCom->Begin(ANIMMODEL_KIRBYEYE);
 		m_pModelCom->Render(iMeshIndex);
+
 		return true;
 	}
+
 	return false;
 }
 

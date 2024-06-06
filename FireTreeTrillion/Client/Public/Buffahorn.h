@@ -6,6 +6,7 @@
 BEGIN(Engine)
 class CModel;
 class CShader;
+class CTexture;
 END
 
 BEGIN(Client)
@@ -20,16 +21,24 @@ public:
 		BUFFAHORN_END
 	};
 
+	enum BUFFAHORNEYE_STATE { BUFFAHORNEYE_IDLE, BUFFAHORNEYE_HALF, BUFFAHORNEYE_SLEEP, BUFFAHORNEYE_SURPRISE, BUFFAHORNEYE_END };
+
 private:
 	CBuffahorn(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CBuffahorn(const CBuffahorn& rhs);
 	virtual ~CBuffahorn() = default;
 
 public:
+	void Set_BuffahornEye(BUFFAHORNEYE_STATE eEyeState) {
+		m_eEyeState = eEyeState;
+	}
 	void Set_JumpTime(_float fTimeDelta) {
 		m_fJumpTime = fTimeDelta;
 	}
 
+	_float Get_AnimRatio() {
+		return m_pModelCom->Get_AnimRatio();
+	}
 	_float Get_JumpTime() {
 		return m_fJumpTime;
 	}
@@ -51,8 +60,10 @@ public:
 	_bool IsAnimFinished();
 
 private:
-	//CFSM*			m_pFSM = { nullptr };
+	CTexture*		m_pEyeTextureCom = { nullptr };
+
 	BUFFAHORN_ANIM	m_eCurrentState = { BUFFAHORN_END };
+	BUFFAHORNEYE_STATE	m_eEyeState = { BUFFAHORNEYE_END };
 
 	_float			m_fJumpTime = { 0.f };
 
@@ -61,8 +72,11 @@ private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
 
+	void	Compute_MotionBlur();
+
 	// FSM
 	void SetUp_FSM();
+	_bool Custom_Face(_uint iMeshIndex);
 
 public:
 	static CBuffahorn* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

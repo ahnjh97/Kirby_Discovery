@@ -7,6 +7,7 @@
 #include "Camera_Free.h"
 #include "Trigger.h"
 #include "UIObject.h"
+#include "Kabu.h"
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -123,12 +124,11 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
 
 HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
-
 	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_SkySphere"));
 	CHECK_FAILED(hr);
 
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_TestMap"))))
-	//	return E_FAIL;
+	hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_WasteCan"));
+	CHECK_FAILED(hr);
 
 	return S_OK;
 }
@@ -317,6 +317,16 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 		{
 			tempDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BladeKnight"), &tempDesc)))
+				return E_FAIL;
+		}
+		else if (strModelName == "NonAnim_Kabu")
+		{
+			CKabu::KABU_DESC KabuDesc = {};
+			KabuDesc.matWorld = matWorld;
+			KabuDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			KabuDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기
+			KabuDesc.eMoveState = CKabu::KABUMOVING_PATROL;
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Kabu"), &KabuDesc)))
 				return E_FAIL;
 		}
 		else if (strModelName == "Level1Stage1Step01" || strModelName == "Level1Stage1Step01_Blend")
