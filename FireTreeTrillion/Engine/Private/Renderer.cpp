@@ -396,8 +396,8 @@ HRESULT CRenderer::Initialize()
 
 	//06.04) UI ·»´õÅ¸°Ù ºä »ý¼º ¹× ÁØºñ
 	//·»´õÇÒ ºäÆ÷Æ® ¼¼ÆÃ
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_UI"), 50.f, 50.f, 
-		ViewportDesc.Width * 0.25f, ViewportDesc.Height * 0.25f/*100.f, 100.f*/)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_UI"), 50.f, 50.f, 100.f, 100.f)))
+		//ViewportDesc.Width * 0.25f, ViewportDesc.Height * 0.25f
 		return E_FAIL;
 
 	ID3D11Texture2D* pCopyTex2D = { nullptr };
