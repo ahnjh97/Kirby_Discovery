@@ -464,7 +464,7 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 		if (m_pGameInstance->Get_DIKeyState(DIK_R, KEY_DOWN))
 			m_bRimTest = !m_bRimTest;
 	}
-	
+
 	// 고사양, 저사양 모드
 	if (m_pGameInstance->Get_DIKeyState(DIK_E, KEY_DOWN))
 	{
@@ -1260,61 +1260,139 @@ void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 		}
 	}
 
-	//if (m_DestColorData.fHue != -1.f)
-	//{
-	//	m_fHue += (m_DestColorData.fHue - m_fHue) * fInterpolateSpeed;
-	//	if (abs(m_fHue - m_DestColorData.fHue) < 01.f)
-	//	{
-	//		m_fHue = m_DestColorData.fHue;
-	//		m_DestColorData.fHue = -1.f;
-	//	}
-	//}
-
 	if (m_DestColorData.fSaturation != -1.f)
+	{
 		m_fSaturation += (m_DestColorData.fSaturation - m_fSaturation) * fInterpolateSpeed;
+		if (abs(m_fSaturation - m_DestColorData.fSaturation) < 01.f)
+		{
+			m_fSaturation = m_DestColorData.fSaturation;
+			m_DestColorData.fSaturation = -1.f;
+		}
+	}
 
 	if (m_DestColorData.fBrightness != -1.f)
+	{
 		m_fBrightness += (m_DestColorData.fBrightness - m_fBrightness) * fInterpolateSpeed;
+		if (abs(m_fBrightness - m_DestColorData.fBrightness) < 01.f)
+		{
+			m_fBrightness = m_DestColorData.fBrightness;
+			m_DestColorData.fBrightness = -1.f;
+		}
+	}
 
 	if (m_DestColorData.fGamma != -1.f)
+	{
 		m_fGamma += (m_DestColorData.fGamma - m_fGamma) * fInterpolateSpeed;
+		if (abs(m_fGamma - m_DestColorData.fGamma) < 01.f)
+		{
+			m_fGamma = m_DestColorData.fGamma;
+			m_DestColorData.fGamma = -1.f;
+		}
+	}
 
 	if (m_DestColorData.fVibrance != -1.f)
+	{
 		m_fVibrance += (m_DestColorData.fVibrance - m_fVibrance) * fInterpolateSpeed;
+		if (abs(m_fVibrance - m_DestColorData.fVibrance) < 01.f)
+		{
+			m_fVibrance = m_DestColorData.fVibrance;
+			m_DestColorData.fHue = -1.f;
+		}
+	}
 
 	if (m_DestColorData.fContrast != -1.f)
+	{
 		m_fContrast += (m_DestColorData.fContrast - m_fContrast) * fInterpolateSpeed;
+		if (abs(m_fContrast - m_DestColorData.fContrast) < 01.f)
+		{
+			m_fContrast = m_DestColorData.fContrast;
+			m_DestColorData.fContrast = -1.f;
+		}
+	}
 
 	if (m_DestColorData.fShadowIntensity != -1.f)
+	{
 		m_fShadowIntensity += (m_DestColorData.fShadowIntensity - m_fShadowIntensity) * fInterpolateSpeed;
+		if (abs(m_fShadowIntensity - m_DestColorData.fShadowIntensity) < 01.f)
+		{
+			m_fShadowIntensity = m_DestColorData.fShadowIntensity;
+			m_DestColorData.fShadowIntensity = -1.f;
+		}
+	}
 
 	if (m_DestColorData.fMidtoneIntensity != -1.f)
+	{
 		m_fMidtoneIntensity += (m_DestColorData.fMidtoneIntensity - m_fMidtoneIntensity) * fInterpolateSpeed;
+		if (abs(m_fMidtoneIntensity - m_DestColorData.fMidtoneIntensity) < 01.f)
+		{
+			m_fMidtoneIntensity = m_DestColorData.fMidtoneIntensity;
+			m_DestColorData.fMidtoneIntensity = -1.f;
+		}
+	}
 
 	if (m_DestColorData.fHighlightIntensity != -1.f)
+	{
 		m_fHighlightIntensity += (m_DestColorData.fHighlightIntensity - m_fHighlightIntensity) * fInterpolateSpeed;
+		if (abs(m_fHighlightIntensity - m_DestColorData.fHighlightIntensity) < 01.f)
+		{
+			m_fHighlightIntensity = m_DestColorData.fHighlightIntensity;
+			m_DestColorData.fHighlightIntensity = -1.f;
+		}
+	}
 
 	if (m_DestColorData.fShadowThreshold != -1.f)
+	{
 		m_fShadowThreshold += (m_DestColorData.fShadowThreshold - m_fShadowThreshold) * fInterpolateSpeed;
+		if (abs(m_fShadowThreshold - m_DestColorData.fShadowThreshold) < 01.f)
+		{
+			m_fShadowThreshold = m_DestColorData.fShadowThreshold;
+			m_DestColorData.fShadowThreshold = -1.f;
+		}
+	}
 
 	if (m_DestColorData.fHighlightThreshold != -1.f)
+	{
 		m_fHighlightThreshold += (m_DestColorData.fHighlightThreshold - m_fHighlightThreshold) * fInterpolateSpeed;
 
 
+		if (abs(m_fHighlightThreshold - m_DestColorData.fHighlightThreshold) < 01.f)
+		{
+			m_fHighlightThreshold = m_DestColorData.fHighlightThreshold;
+			m_DestColorData.fHighlightThreshold = -1.f;
+		}
+	}
 
 
 	if (m_DestColorData.vWhiteBalance[0] != -1.f)
 	{
+
 		m_vWhiteBalance[0] += (m_DestColorData.vWhiteBalance[0] - m_vWhiteBalance[0]) * fInterpolateSpeed;
 		m_vWhiteBalance[1] += (m_DestColorData.vWhiteBalance[1] - m_vWhiteBalance[1]) * fInterpolateSpeed;
 		m_vWhiteBalance[2] += (m_DestColorData.vWhiteBalance[2] - m_vWhiteBalance[2]) * fInterpolateSpeed;
+
+		if (abs(m_vWhiteBalance[0] - m_DestColorData.vWhiteBalance[0]) < 01.f)
+		{
+			m_vWhiteBalance[0] = m_DestColorData.vWhiteBalance[0];
+			m_DestColorData.vWhiteBalance[0] = -1.f;
+			m_DestColorData.vWhiteBalance[1] = -1.f;
+			m_DestColorData.vWhiteBalance[2] = -1.f;
+		}
 	}
 
 	if (m_DestColorData.vColorBalance[0] != -1.f)
 	{
+
 		m_vColorBalance[0] += (m_DestColorData.vColorBalance[0] - m_vColorBalance[0]) * fInterpolateSpeed;
 		m_vColorBalance[1] += (m_DestColorData.vColorBalance[1] - m_vColorBalance[1]) * fInterpolateSpeed;
 		m_vColorBalance[2] += (m_DestColorData.vColorBalance[2] - m_vColorBalance[2]) * fInterpolateSpeed;
+
+		if (abs(m_vColorBalance[0] - m_DestColorData.vColorBalance[0]) < 01.f)
+		{
+			m_vColorBalance[0] = m_DestColorData.vColorBalance[0];
+			m_DestColorData.vColorBalance[0] = -1.f;
+			m_DestColorData.vColorBalance[1] = -1.f;
+			m_DestColorData.vColorBalance[2] = -1.f;
+		}
 	}
 
 	if (m_DestColorData.vShadowColor[0] != -1.f)
@@ -1322,6 +1400,14 @@ void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 		m_vShadowColor[0] += (m_DestColorData.vShadowColor[0] - m_vShadowColor[0]) * fInterpolateSpeed;
 		m_vShadowColor[1] += (m_DestColorData.vShadowColor[1] - m_vShadowColor[1]) * fInterpolateSpeed;
 		m_vShadowColor[2] += (m_DestColorData.vShadowColor[2] - m_vShadowColor[2]) * fInterpolateSpeed;
+
+		if (abs(m_vShadowColor[0] - m_DestColorData.vShadowColor[0]) < 01.f)
+		{
+			m_vShadowColor[0] = m_DestColorData.vShadowColor[0];
+			m_DestColorData.vShadowColor[0] = -1.f;
+			m_DestColorData.vShadowColor[1] = -1.f;
+			m_DestColorData.vShadowColor[2] = -1.f;
+		}
 	}
 
 	if (m_DestColorData.vMidtoneColor[0] != -1.f)
@@ -1329,6 +1415,14 @@ void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 		m_vMidtoneColor[0] += (m_DestColorData.vMidtoneColor[0] - m_vMidtoneColor[0]) * fInterpolateSpeed;
 		m_vMidtoneColor[1] += (m_DestColorData.vMidtoneColor[1] - m_vMidtoneColor[1]) * fInterpolateSpeed;
 		m_vMidtoneColor[2] += (m_DestColorData.vMidtoneColor[2] - m_vMidtoneColor[2]) * fInterpolateSpeed;
+
+		if (abs(m_vMidtoneColor[0] - m_DestColorData.vMidtoneColor[0]) < 01.f)
+		{
+			m_vMidtoneColor[0] = m_DestColorData.vMidtoneColor[0];
+			m_DestColorData.vMidtoneColor[0] = -1.f;
+			m_DestColorData.vMidtoneColor[1] = -1.f;
+			m_DestColorData.vMidtoneColor[2] = -1.f;
+		}
 	}
 
 	if (m_DestColorData.vHighlightColor[0] != -1.f)
@@ -1336,6 +1430,14 @@ void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 		m_vHighlightColor[0] += (m_DestColorData.vHighlightColor[0] - m_vHighlightColor[0]) * fInterpolateSpeed;
 		m_vHighlightColor[1] += (m_DestColorData.vHighlightColor[1] - m_vHighlightColor[1]) * fInterpolateSpeed;
 		m_vHighlightColor[2] += (m_DestColorData.vHighlightColor[2] - m_vHighlightColor[2]) * fInterpolateSpeed;
+
+		if (abs(m_vHighlightColor[0] - m_DestColorData.vHighlightColor[0]) < 01.f)
+		{
+			m_vHighlightColor[0] = m_DestColorData.vHighlightColor[0];
+			m_DestColorData.vHighlightColor[0] = -1.f;
+			m_DestColorData.vHighlightColor[1] = -1.f;
+			m_DestColorData.vHighlightColor[2] = -1.f;
+		}
 	}
 
 
