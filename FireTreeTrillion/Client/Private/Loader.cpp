@@ -586,10 +586,11 @@ HRESULT CLoader::Add_Shaders(LEVEL eLevel)
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_Map.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
 		return E_FAIL;
 
-	/* For.Prototype_Component_Shader_VtxModel_MergedMap */
-	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxModel_MergedMap"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_MergedMap.hlsl"), VTXMERGEDMESH::Elements, VTXMERGEDMESH::iNumElements))))
+	/* For.Prototype_Component_Shader_VtxModel_Octree */
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxModel_Octree"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_Octree.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
 		return E_FAIL;
+
 	//¿Ã∆Â∆ÆøÎ Ω¶¿Ã¥ı
 
 	/* For.Prototype_Component_Shader_FXPosTex */

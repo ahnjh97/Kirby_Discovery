@@ -15,6 +15,7 @@ private:
 public:
 	_uint Get_NumTexture() { return m_iNumTextures; }
 	ID3D11ShaderResourceView* Get_pSRV_ByIndex(_int iIndex) { return m_Textures[iIndex]; }
+	const wstring Get_TexturePath() { return m_wstrTexturePath; }
 #pragma endregion
 
 public:
@@ -28,6 +29,7 @@ public:
 private:
 	vector<ID3D11ShaderResourceView*>			m_Textures;
 	_uint										m_iNumTextures = { 0 };
+	wstring										m_wstrTexturePath;
 
 public:
 	static CTexture* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const wstring& strTextureFilePath, _uint iNumTexture = 1);

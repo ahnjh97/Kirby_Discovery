@@ -114,7 +114,7 @@ HRESULT CModel::Initialize_Prototype(MODEL tModel)
 	m_InputFile.close();
 
 	if (true == tModel.bOctree) {
-		Create_MergedMesh(TransformMatrix);
+		/*Create_MergedMesh(TransformMatrix);
 		CreateSamplerState();
 
 		vector<wstring> vecDiffuse;
@@ -130,15 +130,10 @@ HRESULT CModel::Initialize_Prototype(MODEL tModel)
 		vector<wstring> vecMRA;
 		for (auto& vecPaths : m_vecTexturePaths)
 			vecMRA.push_back(vecPaths[TextureType_METALNESS]);
-		m_vecTextureArraySRVs.emplace_back(CreateTexture2DArraySRV(vecMRA));
+		m_vecTextureArraySRVs.emplace_back(CreateTexture2DArraySRV(vecMRA));*/
 
 		//wstring wstrFullPath = L"../../../Resources/Models/NonAnim/Level1Stage1Step01/GsAllBuildingCeilingConcreteC_MRA._622887136.dds";
 		//vecTexPath.emplace_back(wstrFullPath);
-
-
-
-		
-
 	}
 		
 	return S_OK;
@@ -288,20 +283,34 @@ void CModel::Find_MinMax(_float3& vMin, _float3& vMax)
 		mesh->Find_MinMax(vMin, vMax);
 }
 
-void CModel::Create_OcTree(_float3 vMin, _float3 vMax)
+COcTree* CModel::Create_OcTree(_float3 vMin, _float3 vMax, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors)
 {
-	//if (vMin.x == 0 || false == m_tModel.bOctree || nullptr == m_pMergedMesh)
-	//	return;
+	if (vMin.x == 0 || false == m_tModel.bOctree)
+		return nullptr;
 
-	//m_vMin = vMin;
-	//m_vMax = vMax;
-	//_float3 vCenter = _float3((m_vMin.x + m_vMax.x) * 0.5f, (m_vMin.y + m_vMax.y) * 0.5f, (m_vMin.z + m_vMax.z) * 0.5f);
-	//_float3 vHalfExtents = _float3((m_vMax.x - m_vMin.x) * 0.5f, (m_vMax.y - m_vMin.y) * 0.5f, (m_vMax.z - m_vMin.z) * 0.5f);
+	m_vMin = vMin;
+	m_vMax = vMax;
+	_float3 vCenter = _float3((m_vMin.x + m_vMax.x) * 0.5f, (m_vMin.y + m_vMax.y) * 0.5f, (m_vMin.z + m_vMax.z) * 0.5f);
+	_float3 vHalfExtents = _float3((m_vMax.x - m_vMin.x) * 0.5f, (m_vMax.y - m_vMin.y) * 0.5f, (m_vMax.z - m_vMin.z) * 0.5f);
 
-	//_float3* pVerticesPtr = m_pMergedMesh->Get_VerticesPtr();
-	//_uint iNumVertices = m_pMergedMesh->Get_NumVertices();
-	//_uint* pIndicesPtr = m_pMergedMesh->Get_IndicesPtr();
-	//_uint iNumIndices = m_pMergedMesh->Get_NumIndices();
+	vector<_float3*> vecVerticesPtrs;
+	vector<_uint> vecNumVertices;
+	vector<_float3*> vecNormalsPtrs;
+	vector<_float2*> vecTexCoordsPtrs;
+	vector<_float3*> vecTangentsPtrs;
+	vector<_uint*> vecIndicesPtrs;
+	vector<_uint> vecNumIndices;
+
+	for (auto& mesh : m_Meshes)
+	{
+		vecVerticesPtrs.push_back(mesh->Get_VerticesPtr());
+		vecNumVertices.push_back(mesh->Get_NumVertices());
+		vecNormalsPtrs.push_back(mesh->Get_NormalsPtr());
+		vecTexCoordsPtrs.push_back(mesh->Get_TexCoordsPtr());
+		vecTangentsPtrs.push_back(mesh->Get_TangentsPtr());
+		vecIndicesPtrs.push_back(mesh->Get_IndicesPtr());
+		vecNumIndices.push_back(mesh->Get_NumIndices());
+	}
 
 	//vector<FACE> vecFaces;
 
@@ -312,17 +321,21 @@ void CModel::Create_OcTree(_float3 vMin, _float3 vMax)
 	//	iCount += 3;
 	//}
 
-	//string strFilePath = "../../../objects_txt/" + m_tModel.strModelName + "_Octree.txt";
-	//ifstream fileInput(strFilePath, ios::in | ios::binary);
+	string strFilePath = "../../../objects_txt/" + m_tModel.strModelName + "_Octree.txt";
+	ifstream fileInput(strFilePath, ios::in | ios::binary);
 
-	//m_pOctree = COcTree::Create(vCenter, vHalfExtents, pVerticesPtr, iNumVertices, vecFaces, fileInput);
+	COcTree* pOctree = COcTree::Create(m_pDevice, m_pContext, vCenter, vHalfExtents, vecVerticesPtrs, vecNumVertices
+		, vecNormalsPtrs, vecTexCoordsPtrs, vecTangentsPtrs,vecIndicesPtrs, vecNumIndices
+		, fileInput, m_Meshes, m_Materials, _vecPassIndices, _vecSamplingFactors);
 
-	//fileInput.close();
+	fileInput.close();
+
+	return pOctree;
 }
 
 void CModel::Culling(_fmatrix matWorldInverse)
 {
-	if (false == m_tModel.bOctree || m_pMergedMesh == nullptr)
+	/*if (false == m_tModel.bOctree || m_pMergedMesh == nullptr)
 		return;
 
 	m_pGameInstance->TransformFrustum_LocalSpace(matWorldInverse);
@@ -349,60 +362,12 @@ void CModel::Culling(_fmatrix matWorldInverse)
 	m_pMergedMesh->Set_NumIndices(vecResultFaces.size() * 3);
 	m_pContext->Unmap(pMeshIB, 0);
 	
-	return;
+	return;*/
 }
 
 void CModel::Save_OctreeData()
 {
-	string tempFileName = "temp_" + m_tModel.strModelName + "_Octree.txt";
-	ofstream outputFile(tempFileName, ios::out | ios::binary);
-	if (!outputFile.is_open()) // 임시파일 열렸는지 확인
-	{
-		wstring wstrErrorMsg = TEXT("Failed to Open: ") + CUtils::StrToWstr(tempFileName);
-		MSG_BOX(wstrErrorMsg.c_str());
-		return;
-	}
-
-	m_pOctree->Save_OctreeData(outputFile);
-
-	outputFile.close();
-
-	if (!outputFile)
-	{
-		wstring wstrError = TEXT("Failed to write data to ") + CUtils::StrToWstr(tempFileName);
-		MSG_BOX(wstrError.c_str());
-		remove(tempFileName.c_str()); // 임시파일 삭제
-		return;
-	}
-
-	// 현재시간 받아오기
-	auto now = chrono::system_clock::now();
-	time_t currentTime = chrono::system_clock::to_time_t(now);
-
-	struct tm timeinfo;
-	localtime_s(&timeinfo, &currentTime);
-
-	// 현재 시간을 문자열로 변환
-	char buffer[80];
-	strftime(buffer, sizeof(buffer), "%H%M%S", &timeinfo);
-
-	string fileName_Time = "../../../objects_txt/" + string(buffer) + "_" + m_tModel.strModelName + "_Octree.txt";
-	string fileName = "../../../objects_txt/" + m_tModel.strModelName + "_Octree.txt";
-	if (rename(fileName.c_str(), fileName_Time.c_str()) != 0)
-	{
-		MSG_BOX(TEXT("Failed to rename original file."));
-		return;
-	}
-
-	if (rename(tempFileName.c_str(), fileName.c_str()) != 0) // 임시파일 이름을 level 이름으로 변경
-	{
-		wstring wstrError2 = TEXT("Failed to rename ") + CUtils::StrToWstr(tempFileName);
-		MSG_BOX(wstrError2.c_str());
-		remove(tempFileName.c_str()); // 임시파일 삭제
-		return;
-	}
-
-	MSG_BOX(TEXT("Octree Saved."));
+	
 }
 
 void CModel::Create_MergedMesh(_fmatrix TransformMatrix)
@@ -689,8 +654,6 @@ CComponent * CModel::Clone(void * pArg)
 void CModel::Free()
 {
 	__super::Free();
-
-	Safe_Release(m_pOctree);
 
 	for (auto& pAnimation : m_Animations)
 		Safe_Release(pAnimation);

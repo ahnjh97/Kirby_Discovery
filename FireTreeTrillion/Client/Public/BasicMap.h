@@ -55,6 +55,9 @@ private:
 	_bool m_bCull = { false };
 	_bool m_bBlendMap = { false };
 
+	class COcTree* m_pOcTree = { nullptr };
+	_uint m_iRenderAll{}, m_iRenderMyMesh{};
+
 private:
 	HRESULT Add_Components(const wstring& _wstrModelTag);
 	HRESULT Bind_ShaderResources();
@@ -63,6 +66,8 @@ private:
 	void SetUpShaderInfo(const wstring& _wstrModelTag);
 
 	_bool CheckIfBlendMapExists(const wstring& _wstrModelTag);
+
+	void Save_OctreeData();
 		
 public:
 	static CBasicMap* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

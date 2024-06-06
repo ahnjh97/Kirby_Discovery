@@ -83,8 +83,74 @@ HRESULT CMesh::Initialize_Prototype(TYPE eModelType, string strDirectory, const 
 		return S_OK;
 }
 
-HRESULT CMesh::Initialize_Prototype(const _float3* pVerticePos, _uint iNumVertices, const _float3* pNormals, _uint* pIndices, _uint iNumIndices)
+HRESULT CMesh::Initialize_Prototype(const _float3* pVerticePos, _uint iNumVertices, const _float3* pNormals
+	, const _float2* pTexCoords, const _float3* pTangents, vector<FACE>& _vecFaces)
 {
+	m_iNumIndices = _vecFaces.size() * 3;
+	m_iIndexStride = sizeof(_uint);
+	m_iNumVertexBuffers = 1;
+	m_eIndexFormat = DXGI_FORMAT_R32_UINT;
+	m_ePrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
+#pragma region VERTEX_BUFFER
+	m_iVertexStride = sizeof(VTXMESH);
+
+	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
+
+	m_BufferDesc.ByteWidth = m_iVertexStride * iNumVertices;
+	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	m_BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	m_BufferDesc.CPUAccessFlags = 0;
+	m_BufferDesc.MiscFlags = 0;
+	m_BufferDesc.StructureByteStride = m_iVertexStride;
+
+	VTXMESH* pVertices = new VTXMESH[iNumVertices];
+	ZeroMemory(pVertices, sizeof(VTXMESH) * iNumVertices);
+
+	for (size_t i = 0; i < iNumVertices; i++)
+	{
+		pVertices[i].vPosition = pVerticePos[i];
+		pVertices[i].vNormal = pNormals[i];
+		pVertices[i].vTexcoord = pTexCoords[i];
+		pVertices[i].vTangent = pTangents[i];
+	}
+
+	ZeroMemory(&m_InitialData, sizeof m_InitialData);
+	m_InitialData.pSysMem = pVertices;
+
+	if (FAILED(__super::Create_Buffer(&m_pVB)))
+		return E_FAIL;
+
+	Safe_Delete_Array(pVertices);
+#pragma endregion
+
+
+#pragma region INDEX_BUFFER
+
+	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
+
+	/* 인덱스 버퍼의 byte크기 */
+	m_BufferDesc.ByteWidth = m_iIndexStride * m_iNumIndices;
+	m_BufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	m_BufferDesc.MiscFlags = 0;
+	m_BufferDesc.StructureByteStride = 0;
+	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	m_BufferDesc.CPUAccessFlags = 0;
+
+	_uint* pIndices = new _uint[m_iNumIndices];
+	ZeroMemory(pIndices, sizeof(_uint) * m_iNumIndices);
+
+	memcpy(pIndices, _vecFaces.data(), m_iNumIndices * sizeof(_uint));
+
+	ZeroMemory(&m_InitialData, sizeof m_InitialData);
+	m_InitialData.pSysMem = pIndices;
+
+	if (FAILED(__super::Create_Buffer(&m_pIB)))
+		return E_FAIL;
+
+	Safe_Delete_Array(pIndices);
+#pragma endregion
+
 	return S_OK;
 }
 
@@ -227,6 +293,14 @@ HRESULT CMesh::Ready_Vertices_For_NonAnimModel(_fmatrix TransformMatrix, _bool b
 		m_pNormals = new _float3[m_iNumVertices];
 		for (size_t i = 0; i < m_iNumVertices; i++)
 			m_pNormals[i] = pVertices[i].vNormal;
+
+		m_pTexCoords = new _float2[m_iNumVertices];
+		for (size_t i = 0; i < m_iNumVertices; i++)
+			m_pTexCoords[i] = pVertices[i].vTexcoord;
+
+		m_pTangents = new _float3[m_iNumVertices];
+		for (size_t i = 0; i < m_iNumVertices; i++)
+			m_pTangents[i] = pVertices[i].vTangent;
 	}
 
 	ZeroMemory(&m_InitialData, sizeof m_InitialData);
@@ -321,11 +395,12 @@ CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE 
 	return pInstance;
 }
 
-CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _float3* pVerticePos, _uint iNumVertices, const _float3* pNormals, _uint* pIndices, _uint iNumIndices)
+CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _float3* pVerticePos, _uint iNumVertices
+	, const _float3* pNormals, const _float2* pTexCoords, const _float3* pTangents, vector<FACE>& _vecFaces)
 {
 	CMesh* pInstance = new CMesh(pDevice, pContext, ifstream());
 
-	if (FAILED(pInstance->Initialize_Prototype(pVerticePos, iNumVertices, pNormals, pIndices, iNumIndices)))
+	if (FAILED(pInstance->Initialize_Prototype(pVerticePos, iNumVertices, pNormals, pTexCoords, pTangents, _vecFaces)))
 	{
 		MSG_BOX(TEXT("Failed To Create : CMesh"));
 
@@ -347,6 +422,8 @@ void CMesh::Free()
 	if (false == m_isCloned)
 	{
 		Safe_Delete_Array(m_pNormals);
+		Safe_Delete_Array(m_pTexCoords);
+		Safe_Delete_Array(m_pTangents);
 
 		if (nullptr != m_pActor) {
 			PxScene* scene = m_pActor->getScene();

@@ -2,17 +2,11 @@
 
 /* 전역변수 : 쉐이더 외부에 있는 데이터를 쉐이더 안으로 받아온다. */
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
-SamplerState LinearSamplerArr : register(s5);
-Texture2DArray g_DiffuseArr : register(t4);
-Texture2DArray g_NormalArr : register(t5);
-Texture2DArray g_MRAArr : register(t6);
-
-texture2D   g_DiffuseTexture;
+texture2D	g_DiffuseTexture;
 texture2D	g_NormalTexture;
 texture2D   g_MRATexture;
 texture2D   g_NoiseTexture;
 float       g_fSamplingFactor;
-float       g_fTime;
 
 struct VS_IN
 {
@@ -20,8 +14,6 @@ struct VS_IN
 	float3		vNormal : NORMAL;
 	float2		vTexcoord : TEXCOORD0;
 	float3		vTangent : TANGENT;
-    float       fSamplingFactor : SAMPLINGFACTOR;
-    uint        iTextureIndex : TEXINDEX;
 };
 
 struct VS_OUT
@@ -34,7 +26,6 @@ struct VS_OUT
 
 	float3		vTangent : TANGENT;
 	float3		vBinormal : BINORMAL;
-    uint        iTextureIndex : TEXINDEX;
 };
 
 /* 정점 쉐이더 */
@@ -51,8 +42,7 @@ VS_OUT VS_MAIN(VS_IN In)
 	Out.vNormal = normalize(mul(float4(In.vNormal, 0.f), g_WorldMatrix)).xyz;
 	Out.vTangent = normalize(mul(float4(In.vTangent, 0.f), g_WorldMatrix)).xyz;
 	Out.vBinormal = normalize(cross(Out.vNormal, Out.vTangent));
-    Out.vTexcoord = In.vTexcoord * In.fSamplingFactor;
-    Out.iTextureIndex = In.iTextureIndex;
+    Out.vTexcoord = In.vTexcoord * g_fSamplingFactor;
 	Out.vWorldPos = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
 	Out.vProjPos = Out.vPosition;
 
@@ -69,7 +59,6 @@ struct PS_IN
 
 	float3		vTangent : TANGENT;
 	float3		vBinormal : BINORMAL;
-    uint        iTextureIndex : TEXINDEX;
 };
 
 struct PS_OUT
@@ -104,12 +93,13 @@ PS_OUT_LIGHTDEPTH PS_MAIN_LIGHTDEPTH(PS_IN In)
     return Out;
 }
 
+float3 vDamageColor = float3(2.f, 0.45f, 0);
+
 PS_OUT PS_MAIN(PS_IN In)
 {
 	PS_OUT			Out = (PS_OUT)0;
 
-    //vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
-    vector vMtrlDiffuse = g_DiffuseArr.Sample(LinearSamplerArr, float3(In.vTexcoord, 0));
+	vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
 	if (0.3f >= vMtrlDiffuse.a)
 		discard;
 
@@ -130,7 +120,6 @@ PS_OUT PS_MAIN(PS_IN In)
 	Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
     Out.vFieldDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 0.0f);
-    //Out.vFieldDepth = g_DiffuseArr.Sample(LinearSampler, float3(In.vTexcoord, 0));
     Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
     
     if (Out.vDiffuse.a != 0 && Out.vDiffuse.r < 0.06f)
@@ -143,8 +132,7 @@ PS_OUT NO_NORMALMAP_PS_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
-    //vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
-    vector vMtrlDiffuse = g_DiffuseArr.Sample(LinearSamplerArr, float3(In.vTexcoord, 0));
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
     if (0.0f >= vMtrlDiffuse.a)
         discard;
 
@@ -152,9 +140,8 @@ PS_OUT NO_NORMALMAP_PS_MAIN(PS_IN In)
     Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
     Out.vFieldDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 0.0f);
-    //Out.vFieldDepth = g_DiffuseArr.Sample(LinearSampler, float3(In.vTexcoord, 0));
     Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
-    
+
     return Out;
 }
 
@@ -166,7 +153,6 @@ PS_OUT_EFFECT NONBLUR(PS_IN In)
     if (0.0f >= vMtrlDiffuse.a)
         discard;
 
-    
     Out.vColor = vMtrlDiffuse;
     Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
     return Out;

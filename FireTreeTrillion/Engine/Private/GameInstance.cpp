@@ -127,8 +127,7 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 	{
 		ffTimeDelta = fTimeDelta * 0.5f;
 	}
-
-
+	
 	m_pInput_Device->Tick();
 
 	m_pObject_Manager->Tick(ffTimeDelta);

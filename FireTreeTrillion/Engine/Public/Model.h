@@ -79,7 +79,7 @@ public:
 	_float4 Check_Meshes(const class CTransform* pTransform, _Out_ _int& iMeshIndex) const;
 
 	void Find_MinMax(_float3& vMin, _float3& vMax);
-	void Create_OcTree(_float3 vMin, _float3 vMax);
+	class COcTree* Create_OcTree(_float3 vMin, _float3 vMax, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors);
 	void Culling(_fmatrix matWorldInverse);
 	void Save_OctreeData();
 
@@ -99,7 +99,6 @@ private:
 
 	vector<class CBone*>		m_Bones;
 
-	class COcTree*				m_pOctree = { nullptr };
 	_float3						m_vMin = {};
 	_float3						m_vMax = {};
 

@@ -84,7 +84,7 @@ HRESULT CQuadTree::SetUp_Neighbors()
 	return S_OK;
 }
 
-void CQuadTree::Culling(CGameInstance* pGameInstance, const _float3* pVerticesPos, _uint* pIndices, _uint* pNumIndices )
+void CQuadTree::Culling(CGameInstance* pGameInstance, const _float3* pVerticesPos, _uint* pIndices, _uint* pNumIndices)
 {
 	/* 더 이상 분열이 되지 않는다면 자식들에 대한 비교를 할 필요가 없다. */
 	if (nullptr == m_pChildren[CORNER_LT] || 

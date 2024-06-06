@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "BasicMap.h"
-#include <filesystem>
-
-using namespace filesystem;
+#include "OcTree.h"
 
 CBasicMap::CBasicMap(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
     : CGameObject{ pDevice, pContext }
@@ -42,6 +40,8 @@ HRESULT CBasicMap::Initialize(void* pArg)
     if (FAILED(Add_Components(wstrModelTag)))
         return E_FAIL;
 
+    SetUpShaderInfo(wstrModelTag);
+
     if(false == m_bBlendMap)
     {
         if (true == CheckIfBlendMapExists(GameObjectDesc.wstrModelName)) {
@@ -49,11 +49,9 @@ HRESULT CBasicMap::Initialize(void* pArg)
                 return E_FAIL;
         }
 
-        m_pModelCom->Create_OcTree(GameObjectDesc.vMin, GameObjectDesc.vMax);
+        m_pOcTree = m_pModelCom->Create_OcTree(GameObjectDesc.vMin, GameObjectDesc.vMax, m_vecPassIndices, m_vecSamplingFactors);
         //m_pModelCom->CreateSamplerState();
     }
-  
-    SetUpShaderInfo(wstrModelTag);
 
     if (FAILED(m_pModelCom->CreateStaticActor(m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION))))
         return E_FAIL;
@@ -102,23 +100,9 @@ HRESULT CBasicMap::Render()
         return E_FAIL;
     if (LEVEL_GAMEPLAY == *m_pGameInstance->Get_CurrentLevelID() && false == m_bBlendMap)
     {
-        m_pModelCom->Bind_TextureArrays();
-
-        if (FAILED(m_pTextureCom->Bind_ShaderResources(m_pShaderCom, "g_DiffuseTexture")))
-            return E_FAIL;
-        if (FAILED(m_pTextureCom->Bind_ShaderResources(m_pShaderCom, "g_NormalTexture")))
-            return E_FAIL;
-        if (FAILED(m_pTextureCom->Bind_ShaderResources(m_pShaderCom, "g_MRATexture")))
-            return E_FAIL;
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_fSamplingFactor", &m_vecSamplingFactors[0], sizeof(_float))))
-            return E_FAIL;
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fNonMatchTime, sizeof(_float))))
-            return E_FAIL;
-        
-        if (FAILED(m_pShaderCom->Begin(0)))
-            return E_FAIL;
-        if (FAILED(m_pModelCom->Render()))
-            return E_FAIL;
+        m_iRenderAll = 0;
+        m_iRenderMyMesh = 0;
+        m_pOcTree->Culling(m_pGameInstance, m_pShaderCom, m_iRenderAll, m_iRenderMyMesh);
     }
     else
     {
@@ -172,6 +156,9 @@ void CBasicMap::Render_IMGUI()
         CHECK_FAILED(hr);
     }
 
+    ImGui::Text("Octrees: %d", m_pGameInstance->Get_NumOctree());
+    ImGui::Text("RenderAll: %d", m_iRenderAll);
+    ImGui::Text("RenderMyMesh: %d", m_iRenderMyMesh);
 }
 #endif
 
@@ -179,7 +166,7 @@ HRESULT CBasicMap::Add_Components(const wstring& _wstrModelTag)
 {
     wstring wstrShaderPrototypeTag = TEXT("Prototype_Component_Shader_VtxModel_");
     if (LEVEL_GAMEPLAY == *m_pGameInstance->Get_CurrentLevelID() && false == m_bBlendMap)
-        wstrShaderPrototypeTag += TEXT("MergedMap");
+        wstrShaderPrototypeTag += TEXT("Octree");
     else
         wstrShaderPrototypeTag += TEXT("Map");
     /* For.Com_Shader */
@@ -290,6 +277,60 @@ _bool CBasicMap::CheckIfBlendMapExists(const wstring& _wstrModelTag)
     return _bool();
 }
 
+void CBasicMap::Save_OctreeData()
+{
+    string strModelName = m_pModelCom->Get_ModelInfo().strModelName;
+    string tempFileName = "temp_" + strModelName + "_Octree.txt";
+    ofstream outputFile(tempFileName, ios::out | ios::binary);
+    if (!outputFile.is_open()) // 임시파일 열렸는지 확인
+    {
+        wstring wstrErrorMsg = TEXT("Failed to Open: ") + CUtils::StrToWstr(tempFileName);
+        MSG_BOX(wstrErrorMsg.c_str());
+        return;
+    }
+
+    m_pOcTree->Save_OctreeData(outputFile);
+
+    outputFile.close();
+
+    if (!outputFile)
+    {
+        wstring wstrError = TEXT("Failed to write data to ") + CUtils::StrToWstr(tempFileName);
+        MSG_BOX(wstrError.c_str());
+        remove(tempFileName.c_str()); // 임시파일 삭제
+        return;
+    }
+
+    // 현재시간 받아오기
+    auto now = chrono::system_clock::now();
+    time_t currentTime = chrono::system_clock::to_time_t(now);
+
+    struct tm timeinfo;
+    localtime_s(&timeinfo, &currentTime);
+
+    // 현재 시간을 문자열로 변환
+    char buffer[80];
+    strftime(buffer, sizeof(buffer), "%H%M%S", &timeinfo);
+
+    string fileName_Time = "../../../objects_txt/" + string(buffer) + "_" + strModelName + "_Octree.txt";
+    string fileName = "../../../objects_txt/" + strModelName + "_Octree.txt";
+    if (rename(fileName.c_str(), fileName_Time.c_str()) != 0)
+    {
+        MSG_BOX(TEXT("Failed to rename original file."));
+        return;
+    }
+
+    if (rename(tempFileName.c_str(), fileName.c_str()) != 0) // 임시파일 이름을 level 이름으로 변경
+    {
+        wstring wstrError2 = TEXT("Failed to rename ") + CUtils::StrToWstr(tempFileName);
+        MSG_BOX(wstrError2.c_str());
+        remove(tempFileName.c_str()); // 임시파일 삭제
+        return;
+    }
+
+    MSG_BOX(TEXT("Octree Saved."));
+}
+
 CBasicMap* CBasicMap::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
     CBasicMap* pInstance = new CBasicMap(pDevice, pContext);
@@ -320,6 +361,8 @@ CGameObject* CBasicMap::Clone(void* pArg)
 void CBasicMap::Free()
 {
     __super::Free();
+
+    Safe_Release(m_pOcTree);
     Safe_Release(m_pBlendMap);
     Safe_Release(m_pTextureCom);
 
