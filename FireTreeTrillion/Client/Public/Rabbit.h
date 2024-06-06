@@ -61,6 +61,9 @@ public:
 	_vector JumpAttak(_float fTimeDelta);
 
 private:
+	_bool bRenderEye = { true };
+	_bool bRenderBody = { true };
+	
 	//CTexture*	m_pEyeTextureCom = { nullptr };
 	RABBIT_ANIM	m_eCurrentState = { RABBIT_END };
 

@@ -112,7 +112,7 @@ HRESULT CBladeKnight::Render()
 			return E_FAIL;
 
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_X)))
+		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
 			return E_FAIL;
 
 		m_pModelCom->Render(i);
@@ -225,7 +225,7 @@ HRESULT CBladeKnight::Add_PartObjects()
 	CModel* pModel = (CModel*)Get_Component(TEXT("Com_Model"));
 
 	BladeKnightSwordDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-	BladeKnightSwordDesc.pSocket = pModel->Get_BonePtr("RHaveL_end");
+	BladeKnightSwordDesc.pSocket = pModel->Get_BonePtr("RHaveL");
 
 	pWeaponObject = dynamic_cast<CPartObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_BladeKnightSword"), &BladeKnightSwordDesc));
 	if (nullptr == pWeaponObject)
