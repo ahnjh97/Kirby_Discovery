@@ -76,14 +76,11 @@ HRESULT CRenderer::Initialize()
 
 	Save_ColorSet("Stage1",
 		COLOR_DATA{
-		1.06f, 1.f, 0.9f, 1.3f, 1.f, 0.99f, 1.06f, 0.71f,
-		0.6f, 0.6f, 1.39f, 1.06f, 1.24f, 0.199115f, 0.0378847f,
-		0.114933f, 0.1f, 0.30578f, 0.342999f, 0.606195f, 0.15f, 0.986726f,
-		0.949634f, 0.462801f, 0.34f, 0.12f, 0.5f
+		0.829539f, 1.f, 1.00999f, 1.44943f, 1.17964f, 1.14037f, 1.11018f, 0.720338f, 0.6f, 0.6f, 1.3f, 1.06f, 1.1f, 0.0649942f, 0.0378847f, 0.199115f, 0.00958735f, 0.466084f, 0.676991f, 0.218674f, 0.0796085f, 0.499961f, 0.912908f, 0.99115f, 0.209722f, 0.209559f, 0.340393f
 		});
 
 
-	Set_ColorSet(Find_ColorSet("Default"));
+	Set_ColorSet(Find_ColorSet("Stage1"));
 
 	//쉐이더 타입 트리거는 idx 1, 접촉하면 해당 함수를 호출!
 	function<void(_int)> TriggerFunc = bind(&CRenderer::Set_ColorSet_ByIndex, this, placeholders::_1);
@@ -1192,33 +1189,74 @@ void CRenderer::Render_IMGUI()
 		Set_ColorSet(Find_ColorSet("Night"));
 	if (m_pGameInstance->Get_KeyState(DIK_F8, KEY_DOWN))
 		Set_ColorSet(Find_ColorSet("Stage1"));
+
+
+
+
 	ImGui::Begin(u8"컬러 코렉션");
 
-	ImGui::Checkbox(u8"적용", &m_bApplyCorrection);
+
+	if (ImGui::Checkbox(u8"적용", &m_bApplyCorrection))
+	{
+		/*
+		if (m_bApplyCorrection)
+		{
+			m_fExposure = m_DestColorData.fExposure;
+			m_fHue = m_DestColorData.fHue;
+			m_fSaturation = m_DestColorData.fSaturation;
+			m_fBrightness = m_DestColorData.fBrightness;
+			m_fGamma = m_DestColorData.fGamma;
+			m_fVibrance = m_DestColorData.fVibrance;
+			m_fContrast = m_DestColorData.fContrast;
+			m_fShadowIntensity = m_DestColorData.fShadowIntensity;
+			m_fMidtoneIntensity = m_DestColorData.fMidtoneIntensity;
+			m_fHighlightIntensity = m_DestColorData.fHighlightIntensity;
+			m_fShadowThreshold = m_DestColorData.fShadowThreshold;
+			m_fHighlightThreshold = m_DestColorData.fHighlightThreshold;
+			m_vWhiteBalance[0] = m_DestColorData.vWhiteBalance[0];
+			m_vWhiteBalance[1] = m_DestColorData.vWhiteBalance[1];
+			m_vWhiteBalance[2] = m_DestColorData.vWhiteBalance[2];
+			m_vColorBalance[0] = m_DestColorData.vColorBalance[0];
+			m_vColorBalance[1] = m_DestColorData.vColorBalance[1];
+			m_vColorBalance[2] = m_DestColorData.vColorBalance[2];
+			m_vShadowColor[0] = m_DestColorData.vShadowColor[0];
+			m_vShadowColor[1] = m_DestColorData.vShadowColor[1];
+			m_vShadowColor[2] = m_DestColorData.vShadowColor[2];
+			m_vMidtoneColor[0] = m_DestColorData.vMidtoneColor[0];
+			m_vMidtoneColor[1] = m_DestColorData.vMidtoneColor[1];
+			m_vMidtoneColor[2] = m_DestColorData.vMidtoneColor[2];
+			m_vHighlightColor[0] = m_DestColorData.vHighlightColor[0];
+			m_vHighlightColor[1] = m_DestColorData.vHighlightColor[1];
+			m_vHighlightColor[2] = m_DestColorData.vHighlightColor[2];
+
+			//m_DestColorData = COLOR_DATA{};
+		}
+			*/
+	}
 
 
-	ImGui::DragFloat(u8"노출", &m_fExposure, .01f, 0.f, 3.f, "%.2f");
-	//ImGui::DragFloat(u8"색조", &m_fHue, .01f, 0.f, 1.5f, "%.2f");
-	ImGui::DragFloat(u8"채도", &m_fSaturation, .01f, 0.f, 2.f, "%.2f");
-	ImGui::DragFloat(u8"명도", &m_fBrightness, .01f, 0.f, 3.f, "%.2f");
-	ImGui::DragFloat(u8"감마", &m_fGamma, .01f, 0.f, 3.f, "%.2f");
-	ImGui::DragFloat(u8"활기", &m_fVibrance, .01f, 0.f, 3.f, "%.2f");
-	ImGui::DragFloat(u8"대비", &m_fContrast, .01f, 0.f, 3.f, "%.2f");
+	ImGui::DragFloat(u8"노출", &m_DestColorData.fExposure, .01f, 0.f, 3.f, "%.2f");
+	//ImGui::DragFloat(u8"색조", &m_DestColorData.fHue, .01f, 0.f, 1.5f, "%.2f");
+	ImGui::DragFloat(u8"채도", &m_DestColorData.fSaturation, .01f, 0.f, 2.f, "%.2f");
+	ImGui::DragFloat(u8"명도", &m_DestColorData.fBrightness, .01f, 0.f, 3.f, "%.2f");
+	ImGui::DragFloat(u8"감마", &m_DestColorData.fGamma, .01f, 0.f, 3.f, "%.2f");
+	ImGui::DragFloat(u8"활기", &m_DestColorData.fVibrance, .01f, 0.f, 3.f, "%.2f");
+	ImGui::DragFloat(u8"대비", &m_DestColorData.fContrast, .01f, 0.f, 3.f, "%.2f");
 
-	ImGui::DragFloat3(u8"화이트 밸런스", m_vWhiteBalance, .01f, 0.f, 3.f, "%.2f");
-	ImGui::DragFloat3(u8"색상 균형", m_vColorBalance, .01f, 0.f, 3.f, "%.2f");
+	ImGui::DragFloat3(u8"화이트 밸런스", m_DestColorData.vWhiteBalance, .01f, 0.f, 3.f, "%.2f");
+	ImGui::DragFloat3(u8"색상 균형", m_DestColorData.vColorBalance, .01f, 0.f, 3.f, "%.2f");
 
-	ImGui::ColorEdit3(u8"그림자 색상", m_vShadowColor);
-	ImGui::DragFloat(u8"그림자 세기", &m_fShadowIntensity, .01f, 0.f, 1.f, "%.2f");
+	ImGui::ColorEdit3(u8"그림자 색상", m_DestColorData.vShadowColor);
+	ImGui::DragFloat(u8"그림자 세기", &m_DestColorData.fShadowIntensity, .01f, 0.f, 1.f, "%.2f");
 
-	ImGui::ColorEdit3(u8"중간 색상", m_vMidtoneColor);
-	ImGui::DragFloat(u8"중간 세기", &m_fMidtoneIntensity, .01f, 0.f, 1.f, "%.2f");
+	ImGui::ColorEdit3(u8"중간 색상", m_DestColorData.vMidtoneColor);
+	ImGui::DragFloat(u8"중간 세기", &m_DestColorData.fMidtoneIntensity, .01f, 0.f, 1.f, "%.2f");
 
-	ImGui::ColorEdit3(u8"하이라이트 색상", m_vHighlightColor);
-	ImGui::DragFloat(u8"하이라이트 세기", &m_fHighlightIntensity, .01f, 0.f, 1.f, "%.2f");
+	ImGui::ColorEdit3(u8"하이라이트 색상", m_DestColorData.vHighlightColor);
+	ImGui::DragFloat(u8"하이라이트 세기", &m_DestColorData.fHighlightIntensity, .01f, 0.f, 1.f, "%.2f");
 
-	ImGui::DragFloat(u8"그림자 임계", &m_fShadowThreshold, .01f, 0.f, 1.f, "%.2f");
-	ImGui::DragFloat(u8"하이라이트 임계", &m_fHighlightThreshold, .01f, 0.f, 1.f, "%.2f");
+	ImGui::DragFloat(u8"그림자 임계", &m_DestColorData.fShadowThreshold, .01f, 0.f, 1.f, "%.2f");
+	ImGui::DragFloat(u8"하이라이트 임계", &m_DestColorData.fHighlightThreshold, .01f, 0.f, 1.f, "%.2f");
 
 
 	ostringstream oss;
@@ -1254,170 +1292,175 @@ void CRenderer::Render_IMGUI()
 
 void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 {
+	if (!m_bApplyCorrection)
+		return;
+
 	_float fInterpolateSpeed = 3.f * _fTimeDelta;
 
-	if (m_DestColorData.fExposure != -1.f)
+	if (.01f < abs(m_fExposure - m_DestColorData.fExposure))
 	{
 		m_fExposure += (m_DestColorData.fExposure - m_fExposure) * fInterpolateSpeed;
 
-		if (abs(m_fExposure - m_DestColorData.fExposure) < 01.f)
+		if (abs(m_fExposure - m_DestColorData.fExposure) < 0.001f)
 		{
 			m_fExposure = m_DestColorData.fExposure;
-			m_DestColorData.fExposure = -1.f;
+			//m_DestColorData.fExposure = -1.f;
 		}
 	}
 
-	if (m_DestColorData.fSaturation != -1.f)
+	if (.01f < abs(m_fSaturation - m_DestColorData.fSaturation))
 	{
 		m_fSaturation += (m_DestColorData.fSaturation - m_fSaturation) * fInterpolateSpeed;
-		if (abs(m_fSaturation - m_DestColorData.fSaturation) < 01.f)
+		if (abs(m_fSaturation - m_DestColorData.fSaturation) < 0.001f)
 		{
 			m_fSaturation = m_DestColorData.fSaturation;
-			m_DestColorData.fSaturation = -1.f;
+			//m_DestColorData.fSaturation = -1.f;
 		}
 	}
 
-	if (m_DestColorData.fBrightness != -1.f)
+	if (.01f < abs(m_fBrightness - m_DestColorData.fBrightness))
 	{
 		m_fBrightness += (m_DestColorData.fBrightness - m_fBrightness) * fInterpolateSpeed;
-		if (abs(m_fBrightness - m_DestColorData.fBrightness) < 01.f)
+		if (abs(m_fBrightness - m_DestColorData.fBrightness) < 0.001f)
 		{
 			m_fBrightness = m_DestColorData.fBrightness;
-			m_DestColorData.fBrightness = -1.f;
+			//m_DestColorData.fBrightness = -1.f;
 		}
 	}
 
-	if (m_DestColorData.fGamma != -1.f)
+	if (.01f < abs(m_fGamma - m_DestColorData.fGamma))
 	{
 		m_fGamma += (m_DestColorData.fGamma - m_fGamma) * fInterpolateSpeed;
-		if (abs(m_fGamma - m_DestColorData.fGamma) < 01.f)
+		if (abs(m_fGamma - m_DestColorData.fGamma) < 0.001f)
 		{
 			m_fGamma = m_DestColorData.fGamma;
-			m_DestColorData.fGamma = -1.f;
+			//m_DestColorData.fGamma = -1.f;
 		}
 	}
 
-	if (m_DestColorData.fVibrance != -1.f)
+	if (.01f < abs(m_fVibrance - m_DestColorData.fVibrance))
 	{
 		m_fVibrance += (m_DestColorData.fVibrance - m_fVibrance) * fInterpolateSpeed;
-		if (abs(m_fVibrance - m_DestColorData.fVibrance) < 01.f)
+		if (abs(m_fVibrance - m_DestColorData.fVibrance) < 0.001f)
 		{
 			m_fVibrance = m_DestColorData.fVibrance;
-			m_DestColorData.fHue = -1.f;
+			//m_DestColorData.fHue = -1.f;
 		}
 	}
 
-	if (m_DestColorData.fContrast != -1.f)
+	if (.01f < abs(m_fContrast - m_DestColorData.fContrast))
 	{
 		m_fContrast += (m_DestColorData.fContrast - m_fContrast) * fInterpolateSpeed;
-		if (abs(m_fContrast - m_DestColorData.fContrast) < 01.f)
+		if (abs(m_fContrast - m_DestColorData.fContrast) < 0.001f)
 		{
 			m_fContrast = m_DestColorData.fContrast;
-			m_DestColorData.fContrast = -1.f;
+			//m_DestColorData.fContrast = -1.f;
 		}
 	}
 
-	if (m_DestColorData.fShadowIntensity != -1.f)
+	if (.01f < abs(m_fShadowIntensity - m_DestColorData.fShadowIntensity))
 	{
 		m_fShadowIntensity += (m_DestColorData.fShadowIntensity - m_fShadowIntensity) * fInterpolateSpeed;
-		if (abs(m_fShadowIntensity - m_DestColorData.fShadowIntensity) < 01.f)
+		if (abs(m_fShadowIntensity - m_DestColorData.fShadowIntensity) < 0.001f)
 		{
 			m_fShadowIntensity = m_DestColorData.fShadowIntensity;
-			m_DestColorData.fShadowIntensity = -1.f;
+			//m_DestColorData.fShadowIntensity = -1.f;
 		}
 	}
 
-	if (m_DestColorData.fMidtoneIntensity != -1.f)
+	if (.01f < abs(m_fMidtoneIntensity - m_DestColorData.fMidtoneIntensity))
 	{
 		m_fMidtoneIntensity += (m_DestColorData.fMidtoneIntensity - m_fMidtoneIntensity) * fInterpolateSpeed;
-		if (abs(m_fMidtoneIntensity - m_DestColorData.fMidtoneIntensity) < 01.f)
+		if (abs(m_fMidtoneIntensity - m_DestColorData.fMidtoneIntensity) < 0.001f)
 		{
 			m_fMidtoneIntensity = m_DestColorData.fMidtoneIntensity;
-			m_DestColorData.fMidtoneIntensity = -1.f;
+			//m_DestColorData.fMidtoneIntensity = -1.f;
 		}
 	}
 
-	if (m_DestColorData.fHighlightIntensity != -1.f)
+	if (.01f < abs(m_fHighlightIntensity - m_DestColorData.fHighlightIntensity))
 	{
 		m_fHighlightIntensity += (m_DestColorData.fHighlightIntensity - m_fHighlightIntensity) * fInterpolateSpeed;
-		if (abs(m_fHighlightIntensity - m_DestColorData.fHighlightIntensity) < 01.f)
+		if (abs(m_fHighlightIntensity - m_DestColorData.fHighlightIntensity) < 0.001f)
 		{
 			m_fHighlightIntensity = m_DestColorData.fHighlightIntensity;
-			m_DestColorData.fHighlightIntensity = -1.f;
+			//m_DestColorData.fHighlightIntensity = -1.f;
 		}
 	}
 
-	if (m_DestColorData.fShadowThreshold != -1.f)
+	if (.01f < abs(m_fShadowThreshold - m_DestColorData.fShadowThreshold))
 	{
 		m_fShadowThreshold += (m_DestColorData.fShadowThreshold - m_fShadowThreshold) * fInterpolateSpeed;
-		if (abs(m_fShadowThreshold - m_DestColorData.fShadowThreshold) < 01.f)
+		if (abs(m_fShadowThreshold - m_DestColorData.fShadowThreshold) < 0.001f)
 		{
 			m_fShadowThreshold = m_DestColorData.fShadowThreshold;
-			m_DestColorData.fShadowThreshold = -1.f;
+			//m_DestColorData.fShadowThreshold = -1.f;
 		}
 	}
 
-	if (m_DestColorData.fHighlightThreshold != -1.f)
+	if (.01f < abs(m_fHighlightThreshold - m_DestColorData.fHighlightThreshold))
 	{
 		m_fHighlightThreshold += (m_DestColorData.fHighlightThreshold - m_fHighlightThreshold) * fInterpolateSpeed;
 
 
-		if (abs(m_fHighlightThreshold - m_DestColorData.fHighlightThreshold) < 01.f)
+		if (abs(m_fHighlightThreshold - m_DestColorData.fHighlightThreshold) < 0.001f)
 		{
 			m_fHighlightThreshold = m_DestColorData.fHighlightThreshold;
-			m_DestColorData.fHighlightThreshold = -1.f;
+			//m_DestColorData.fHighlightThreshold = -1.f;
 		}
 	}
 
 
-	if (m_DestColorData.vWhiteBalance[0] != -1.f)
+	if (.01f < abs(m_vWhiteBalance[0] - m_DestColorData.vWhiteBalance[0]))
 	{
 
 		m_vWhiteBalance[0] += (m_DestColorData.vWhiteBalance[0] - m_vWhiteBalance[0]) * fInterpolateSpeed;
 		m_vWhiteBalance[1] += (m_DestColorData.vWhiteBalance[1] - m_vWhiteBalance[1]) * fInterpolateSpeed;
 		m_vWhiteBalance[2] += (m_DestColorData.vWhiteBalance[2] - m_vWhiteBalance[2]) * fInterpolateSpeed;
 
-		if (abs(m_vWhiteBalance[0] - m_DestColorData.vWhiteBalance[0]) < 01.f)
+		if (abs(m_vWhiteBalance[0] - m_DestColorData.vWhiteBalance[0]) < 0.001f)
 		{
-			m_vWhiteBalance[0] = m_DestColorData.vWhiteBalance[0];
-			m_DestColorData.vWhiteBalance[0] = -1.f;
-			m_DestColorData.vWhiteBalance[1] = -1.f;
-			m_DestColorData.vWhiteBalance[2] = -1.f;
+			//m_vWhiteBalance[0] = m_DestColorData.vWhiteBalance[0];
+			//m_vWhiteBalance[1] = m_DestColorData.vWhiteBalance[1];
+			//m_vWhiteBalance[2] = m_DestColorData.vWhiteBalance[2];
+			memcpy(m_vWhiteBalance, m_DestColorData.vWhiteBalance, sizeof(_float3));
+
+			//m_DestColorData.vWhiteBalance[0] = -1.f;
+			//m_DestColorData.vWhiteBalance[1] = -1.f;
+			//m_DestColorData.vWhiteBalance[2] = -1.f;
 		}
 	}
 
-	if (m_DestColorData.vColorBalance[0] != -1.f)
+	if (.01f < m_DestColorData.vColorBalance[0] != -1.f)
 	{
 
 		m_vColorBalance[0] += (m_DestColorData.vColorBalance[0] - m_vColorBalance[0]) * fInterpolateSpeed;
 		m_vColorBalance[1] += (m_DestColorData.vColorBalance[1] - m_vColorBalance[1]) * fInterpolateSpeed;
 		m_vColorBalance[2] += (m_DestColorData.vColorBalance[2] - m_vColorBalance[2]) * fInterpolateSpeed;
 
-		if (abs(m_vColorBalance[0] - m_DestColorData.vColorBalance[0]) < 01.f)
+		if (abs(m_vColorBalance[0] - m_DestColorData.vColorBalance[0]) < 0.001f)
 		{
-			m_vColorBalance[0] = m_DestColorData.vColorBalance[0];
-			m_DestColorData.vColorBalance[0] = -1.f;
-			m_DestColorData.vColorBalance[1] = -1.f;
-			m_DestColorData.vColorBalance[2] = -1.f;
+			memcpy(m_vColorBalance, m_DestColorData.vColorBalance, sizeof(_float3));
 		}
 	}
 
-	if (m_DestColorData.vShadowColor[0] != -1.f)
+	if (.01f < m_DestColorData.vShadowColor[0] != -1.f)
 	{
 		m_vShadowColor[0] += (m_DestColorData.vShadowColor[0] - m_vShadowColor[0]) * fInterpolateSpeed;
 		m_vShadowColor[1] += (m_DestColorData.vShadowColor[1] - m_vShadowColor[1]) * fInterpolateSpeed;
 		m_vShadowColor[2] += (m_DestColorData.vShadowColor[2] - m_vShadowColor[2]) * fInterpolateSpeed;
 
-		if (abs(m_vShadowColor[0] - m_DestColorData.vShadowColor[0]) < 01.f)
+		if (abs(m_vShadowColor[0] - m_DestColorData.vShadowColor[0]) < 0.001f)
 		{
-			m_vShadowColor[0] = m_DestColorData.vShadowColor[0];
-			m_DestColorData.vShadowColor[0] = -1.f;
-			m_DestColorData.vShadowColor[1] = -1.f;
-			m_DestColorData.vShadowColor[2] = -1.f;
+			memcpy(m_vShadowColor, m_DestColorData.vShadowColor, sizeof(_float3));
+
+			//m_DestColorData.vShadowColor[0] = -1.f;
+			//m_DestColorData.vShadowColor[1] = -1.f;
+			//m_DestColorData.vShadowColor[2] = -1.f;
 		}
 	}
 
-	if (m_DestColorData.vMidtoneColor[0] != -1.f)
+	if (.01f < m_DestColorData.vMidtoneColor[0] != -1.f)
 	{
 		m_vMidtoneColor[0] += (m_DestColorData.vMidtoneColor[0] - m_vMidtoneColor[0]) * fInterpolateSpeed;
 		m_vMidtoneColor[1] += (m_DestColorData.vMidtoneColor[1] - m_vMidtoneColor[1]) * fInterpolateSpeed;
@@ -1425,14 +1468,16 @@ void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 
 		if (abs(m_vMidtoneColor[0] - m_DestColorData.vMidtoneColor[0]) < 01.f)
 		{
-			m_vMidtoneColor[0] = m_DestColorData.vMidtoneColor[0];
-			m_DestColorData.vMidtoneColor[0] = -1.f;
-			m_DestColorData.vMidtoneColor[1] = -1.f;
-			m_DestColorData.vMidtoneColor[2] = -1.f;
+			memcpy(m_vMidtoneColor, m_DestColorData.vMidtoneColor, sizeof(_float3));
+
+			//m_vMidtoneColor[0] = m_DestColorData.vMidtoneColor[0];
+			//m_DestColorData.vMidtoneColor[0] = -1.f;
+			//m_DestColorData.vMidtoneColor[1] = -1.f;
+			//m_DestColorData.vMidtoneColor[2] = -1.f;
 		}
 	}
 
-	if (m_DestColorData.vHighlightColor[0] != -1.f)
+	if (.01f < m_DestColorData.vHighlightColor[0] != -1.f)
 	{
 		m_vHighlightColor[0] += (m_DestColorData.vHighlightColor[0] - m_vHighlightColor[0]) * fInterpolateSpeed;
 		m_vHighlightColor[1] += (m_DestColorData.vHighlightColor[1] - m_vHighlightColor[1]) * fInterpolateSpeed;
@@ -1440,10 +1485,12 @@ void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 
 		if (abs(m_vHighlightColor[0] - m_DestColorData.vHighlightColor[0]) < 01.f)
 		{
-			m_vHighlightColor[0] = m_DestColorData.vHighlightColor[0];
-			m_DestColorData.vHighlightColor[0] = -1.f;
-			m_DestColorData.vHighlightColor[1] = -1.f;
-			m_DestColorData.vHighlightColor[2] = -1.f;
+			memcpy(m_vHighlightColor, m_DestColorData.vHighlightColor, sizeof(_float3));
+
+			//m_vHighlightColor[0] = m_DestColorData.vHighlightColor[0];
+			//m_DestColorData.vHighlightColor[0] = -1.f;
+			//m_DestColorData.vHighlightColor[1] = -1.f;
+			//m_DestColorData.vHighlightColor[2] = -1.f;
 		}
 	}
 

@@ -713,7 +713,7 @@ PS_OUT PS_MAIN_DOFBlur(PS_IN In)
         
     // 초점 대상의 Depth값
     vector vDepthFocus = g_DepthTexture.Sample(PointSampler, g_vDOFFocus);
-    float fViewZ = vDepthFocus.y * g_fFar;
+    float fKirbyViewZ = vDepthFocus.y * g_fFar;
     
     // 현재 픽셀의 Depth값
     vector vMyDepth = g_DepthTexture.Sample(PointSampler, In.vTexcoord);
@@ -723,10 +723,36 @@ PS_OUT PS_MAIN_DOFBlur(PS_IN In)
     float fDOFTotal = 0.f;
     
      // 초점 깊이와 현재 깊이의 차이
-    float fDepthDifference = abs(fViewZ - fMyViewZ);
+    float fDepthDifference = abs(fKirbyViewZ - fMyViewZ);
     
-    // DOFWeight 계산 (스케일링 및 클램핑)
-    float fDOFWeight = clamp(fDepthDifference / g_fFar * 4.f, 0.0f, 1.0f);
+    float fDOFWeight = 0.f;
+    
+    
+        //far에 제일 가까울 때 b + 10
+    // 공기 원근법 적용
+    //float distance = length(g_vCamPosition - vWorldPos.xyz);
+    float airFactor = saturate ( pow(fMyViewZ / 200.0, 3.0) - .4);
+    /*saturate(pow(fMyViewZ / g_fFar, 15.0) * 2.0)*/ // 공기 원근법 계수 계산
+    float3 airColor = float3(-0.05, 0.01, 0.08); // 공기색 (파란색 계열)
+    //float3 finalColor = lerp(airColor, g_DOFBlur.Sample(ClampSampler, In.vTexcoord).xyz, airFactor);
+
+    // Combine direct and ambient lighting
+    //Out.vColor = float4(finalColor, 1.0);
+    
+    
+    //커비보다 내가 가까우면
+    if(fMyViewZ < fKirbyViewZ)
+    {
+        float fDOFFar = fKirbyViewZ;
+        // DOFWeight 계산 (스케일링 및 클램핑)
+        fDOFWeight = saturate( pow(fDepthDifference / fDOFFar, 5.0) * 20.0);
+    }
+    else
+    {
+        float fDOFFar = g_fFar - fKirbyViewZ;
+        fDOFWeight = saturate( pow(fDepthDifference / 100, 15.0) * 2.0);
+    }
+    
     
     for (int i = -6; i < 7; ++i)
     {
@@ -737,15 +763,22 @@ PS_OUT PS_MAIN_DOFBlur(PS_IN In)
             vUV = In.vTexcoord + TexOffset;
             
             float fSampleWeight = fWeight[6 + j] * fWeight[6 + i];
+            
             Out.vColor += fSampleWeight * g_DOFBlur.Sample(ClampSampler, vUV);
+            
+            
             fDOFTotal += fSampleWeight;
         }
     }
     
     Out.vColor /= fDOFTotal;
-    return Out;
-}
+    //Out.vColor += float4(airFactor * airColor, 0.f);
+    
 
+    
+    return Out;
+    
+}
 
 PS_OUT PS_MAIN_MotionBlur(PS_IN In)
 {
