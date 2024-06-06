@@ -304,7 +304,10 @@ _bool CEditor_UI::Tab_LayerList()
 					ImGui::SetItemDefaultFocus();
 
 					if (!m_LayerUIs.empty() && !SelectUIs.empty())
+					{
 						Set_GizmoSync(m_LayerUIs[iUI]); //기즈모와 위젯, 오브젝트 동기화 작업
+						Set_TextSync(strUITag);
+					}
 				}
 #pragma endregion
 
@@ -355,13 +358,14 @@ _bool CEditor_UI::Tab_GroupList()
 				for (auto& GroupUI : m_GroupUIs)
 				{
 					strUITag = CUtils::WstrToStr(GroupUI[iGroupIx]->Get_UIObj_Desc().wstrUITag);
-					strUITag += "_" + to_string(iGroupIx);
+					strUITag += "_Group_" + to_string(iGroupIx);
 				}
 			}
 		}
 
 		ImGui::PushItemWidth(290.f);
-		if (ImGui::BeginCombo(u8"##", (iSelectUI >= 0 && iSelectUI < m_GroupUIs.size()) ? strUITag.c_str() : u8"그룹을 선택해주세요."))
+		if (ImGui::BeginCombo(u8"##", (iSelectUI >= 0 && iSelectUI < m_GroupUIs.size()) 
+			? strUITag.c_str() : u8"그룹을 선택해주세요."))
 		{
 			for (size_t iGroupIx = 0; iGroupIx < m_GroupUIs.size(); ++iGroupIx)
 			{
@@ -390,7 +394,7 @@ _bool CEditor_UI::Tab_GroupList()
 				{
 					auto& GroupUI = m_GroupUIs[iGroupIx][iLayerIx];
 					string strUITag = CUtils::WstrToStr(GroupUI->Get_UIObj_Desc().wstrUITag);
-					strUITag += "_" + to_string(iGroupIx) + "_" + to_string(iLayerIx);
+					strUITag += "_Group_" + to_string(iGroupIx) + "_" + to_string(iLayerIx);
 
 					if (strUITag.empty()) //wstrUITag 값에 대한 예외처리
 						strUITag = "##";
@@ -668,12 +672,12 @@ _bool CEditor_UI::Edit_RGBAColor()
 	return TRUE;
 }
 
-//06.04) 글꼴 편집 기능 구현
+//06.04) 글꼴 편집 기능 구현 
+//추후 작업) 선택 개체에 대한 정보와 위젯에 대한 동기화 작업 필요 (UTF-8 변환 이슈로 보류)
 _bool CEditor_UI::Edit_Text()
 {				
 	//폰트 편집 동기화
 	static string strInput(1024 * 16, '\0');
-	static string strTemp(1024 * 16, '\0');
 	//ImGuiInputTextFlags InputText_flags{}; //= ImGuiInputTextFlags_AllowTabInput;
 
 	ImGui::InputTextMultiline(u8"##", &strInput[0],
@@ -696,7 +700,6 @@ _bool CEditor_UI::Edit_Text()
 			wstrText = CUtils::StrToWstrUTF8(strInput);
 			FontDesc.wstrText = wstrText;
 
-			//추후 처리 필요 (UTF8 변환된 것들에 대한 예외처리가 까다로움)
 			//strInput = CUtils::WstrToStr(FontDesc.wstrText);
 			//wstrText = CUtils::StrToWstr(strInput);
 			//FontDesc.wstrText = wstrText;
@@ -717,6 +720,11 @@ _bool CEditor_UI::Edit_Text()
 #pragma endregion
 
 	return TRUE;
+}
+
+_bool CEditor_UI::Set_TextSync(string _strInput)
+{
+	return _bool();
 }
 
 _bool CEditor_UI::Set_OrthoProj()
