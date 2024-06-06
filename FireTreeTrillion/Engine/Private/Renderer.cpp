@@ -397,16 +397,17 @@ HRESULT CRenderer::Initialize()
 	//06.04) UI 렌더타겟 뷰 생성 및 준비
 	//렌더할 뷰포트 세팅
 	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_UI"), 50.f, 50.f, 100.f, 100.f)))
+		return E_FAIL;
 		//ViewportDesc.Width * 0.25f, ViewportDesc.Height * 0.25f
-		return E_FAIL;
 
-	ID3D11Texture2D* pCopyTex2D = { nullptr };
-	if (FAILED(m_pGameInstance->Copy_Resource(TEXT("Target_UI"), &pCopyTex2D)))
-		return E_FAIL;
-	
-	D3D11_TEXTURE2D_DESC CopyTexDesc{};
-	pCopyTex2D->GetDesc(&CopyTexDesc);
+	//ID3D11Texture2D* pCopyTex2D = { nullptr };
+	//if (FAILED(m_pGameInstance->Copy_Resource(TEXT("Target_UI"), &pCopyTex2D)))
+	//	return E_FAIL;
+	//
+	//D3D11_TEXTURE2D_DESC CopyTexDesc{};
+	//ZeroMemory(&CopyTexDesc, sizeof(D3D11_TEXTURE2D_DESC));
 
+	//pCopyTex2D->GetDesc(&CopyTexDesc);
 
 	//RTV 직접 접근하면 IMGUI에러로 크래시 발생 (사용안함)
 	//D3D11_RENDER_TARGET_VIEW_DESC CopyRTVDesc = {};
@@ -416,15 +417,15 @@ HRESULT CRenderer::Initialize()
 	//m_pDevice->CreateRenderTargetView(pCopyTex2D, &CopyRTVDesc, &m_pUIRTV);
 
 	//생성한 RTV 데이터 SRV에 복사
-	D3D11_SHADER_RESOURCE_VIEW_DESC		CopySRVDesc = {};
-	CopySRVDesc.Format = CopyTexDesc.Format;
-	CopySRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	CopySRVDesc.Texture2D.MostDetailedMip = 0;
-	CopySRVDesc.Texture2D.MipLevels = 1;
+	//D3D11_SHADER_RESOURCE_VIEW_DESC		CopySRVDesc = {};
+	//CopySRVDesc.Format = CopyTexDesc.Format;
+	//CopySRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	//CopySRVDesc.Texture2D.MostDetailedMip = 0;
+	//CopySRVDesc.Texture2D.MipLevels = 1;
 	
 	//복사한 데이터를 기반으로 SRV 생성
-	m_pDevice->CreateShaderResourceView(pCopyTex2D, &CopySRVDesc, &m_pUISRV);
-	Safe_Release(pCopyTex2D);
+	//m_pDevice->CreateShaderResourceView(pCopyTex2D, &CopySRVDesc, &m_pUISRV);
+	//Safe_Release(pCopyTex2D);
 
 #pragma endregion
 	
@@ -577,7 +578,7 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 			ImGui::Image((void*)m_pUISRV, vWinSize);
 
 			ImGui::End();
-			}
+		}
 	}
 
 	Render_IMGUI();
@@ -1598,7 +1599,7 @@ void CRenderer::Free()
 		RenderList.clear();
 	}
 
-
+	Safe_Release(m_pUISRV);
 	Safe_Release(m_pLightDepthDSV);
 	Safe_Release(m_pShader);
 	Safe_Release(m_pVIBuffer);
