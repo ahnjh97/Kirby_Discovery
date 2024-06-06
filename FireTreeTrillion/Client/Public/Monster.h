@@ -35,6 +35,8 @@ public:
 #ifdef _DEBUG
 	virtual void	Render_IMGUI()					override;
 #endif
+	virtual void	Add_AnimEvent()  override {}
+
 
 protected:
 	// JSPark : 우선 몬스터들은 modelCom을 하나만 가지고 있다는 전제하에

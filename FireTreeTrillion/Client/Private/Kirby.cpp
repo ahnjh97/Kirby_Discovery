@@ -131,6 +131,9 @@ void CKirby::Late_Tick(_float fTimeDelta)
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_DEFERREDINFO, this);
 	}
+
+	//if (m_pControllerCom != nullptr)
+		//m_pControllerCom->Overlap_Hitbox();
 }
 
 HRESULT CKirby::Render()
@@ -240,6 +243,21 @@ HRESULT CKirby::Render_DeferredInfo()
 
 }
 
+void CKirby::Add_AnimEvent()
+{
+	__super::Add_AnimEvent();
+
+	// 1. 한 애니메이션에서 같은 이름의 이벤트 가능
+	// 2. 재생 기준은 애님툴에서 지정한 애니메이션인지 + 시작 프레임이 애니메이션 프레임안에 들어가는 지
+	// 3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
+	m_pModelCom[INFO(m_eBodyState)]->Add_Event("ApplyDamage", [this]() {
+
+		//데미지 처리
+
+
+		});
+}
+
 void CKirby::Collision_Attack(CGameObject* pOtherObj)
 {
 	CPhysXObject* pObject = static_cast<CPhysXObject*>(pOtherObj);
@@ -299,6 +317,43 @@ void CKirby::Collision_Attack(CGameObject* pOtherObj)
 		}
 		Delete_KirbyEffect();
 	}
+}
+
+void CKirby::Collision_Overlap()
+{
+	//PerformHitboxOverlapTest();
+}
+
+void CKirby::PerformHitboxOverlapTest() 
+{
+	//// 히트박스 기하학적 모양 정의 (박스 형태)
+	//PxBoxGeometry hitboxGeometry(PxVec3(1.0f, 1.0f, 1.0f)); // 히트박스 크기
+
+	//// 히트박스 위치 설정 (플레이어 앞)
+	//PxTransform hitboxPose(mActor->getGlobalPose().p + PxVec3(2.0f, 0.0f, 0.0f)); // 플레이어 앞 2.0m 위치
+
+	//// Overlap 테스트 실행
+	//PxOverlapBuffer hitBuffer; // 충돌 정보를 저장할 버퍼
+	//bool status = mScene->overlap(hitboxGeometry, hitboxPose, hitBuffer);
+
+	//if (status) 
+	//{
+	//	cout << "Hitbox overlap detected with " << hitBuffer.getNbAnyHits() << " objects." << endl;
+	//	for (PxU32 i = 0; i < hitBuffer.getNbAnyHits(); i++) {
+	//		const PxOverlapHit& hit = hitBuffer.getAnyHit(i);
+	//		PxActor* actor = hit.actor;
+	//		if (actor) 
+	//		{
+	//			const char* name = actor->getName();
+	//			cout << "Hit object: " << (name ? name : "Unnamed Actor") << endl;
+	//			// 몬스터와의 충돌 처리
+	//		}
+	//	}
+	//}
+	//else 
+	//{
+	//	//No hitbox overlap detected.
+	//}
 }
 
 _float3 CKirby::Make_RepulsiveDir(CPhysXObject* pObject)
@@ -874,3 +929,4 @@ void CKirby::Free()
 		Safe_Release(fx);
 	
 }
+

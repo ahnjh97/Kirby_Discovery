@@ -54,9 +54,8 @@ public:
 	_vector			Compute_TerrainPosition_Vector();
 	PxVec3			TerrainRayCast_Collision(PxVec3 _rayOrigin, PxVec3 _rayDirection, _float _fMaxDistance);
 
-	// 이동용, 기본 중력없기 때문에 이 함수로 중력 만들어 줄 것
-	/*physx::PxControllerCollisionFlags Move(_float3 vVelocity, _float fTimeDelta, _float minDist = 0.001f);
-	physx::PxControllerCollisionFlags MoveDisp(_float3 vPosDelta, _float fTimeDelta, _float minDist = 0.001f);*/
+	// 충돌에 대한 함수
+	void			Overlap_Hitbox();
 
 	_bool	Is_Activated();
 	void	Activate(_bool bActive);

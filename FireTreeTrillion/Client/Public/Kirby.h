@@ -106,8 +106,14 @@ public:
 #ifdef _DEBUG
 	virtual void	Render_IMGUI() override;
 #endif
-	virtual HRESULT	Render_DeferredInfo() override;
+	virtual HRESULT	Render_DeferredInfo()					 override;
+
+	virtual void	Add_AnimEvent()							 override;
 	virtual void	Collision_Attack(CGameObject* pOtherObj) override;
+	
+	// for overlap 충돌 처리
+	void			Collision_Overlap();
+	void			PerformHitboxOverlapTest();
 
 	KIRBY_INFODESC* Get_KirbyInfo() { return &m_tKirbyInfo; }
 	void			Set_KirbyInfo(KIRBY_INFODESC _tInfo) {
