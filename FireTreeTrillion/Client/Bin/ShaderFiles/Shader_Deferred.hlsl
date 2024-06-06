@@ -51,6 +51,7 @@ texture2D g_NormalTexture;
 texture2D g_DiffuseTexture;
 
 texture2D g_LinearTexture;
+texture2D g_SpecularTexture;
 
 TextureCube g_EnvTexture;
 Texture2D g_LUTTexture;
@@ -132,17 +133,11 @@ float gaSchlickGGX(float cosLi, float cosLo, float roughness)
 // Shlick's approximation of the Fresnel factor.
 float3 fresnelSchlick(float3 F0, float cosTheta)
 {
+    float factor = pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+    // Increase the impact of the fresnel factor
+    //return F0 + (1.0 - F0) * factor * 1.5; // Adjust the multiplier as needed
     return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
-
-
-// Returns number of mipmap levels for specular IBL environment map.
-//uint querySpecularTextureLevels()
-//{
-//    uint width, height, levels;
-//    g_SpecularTexture.GetDimensions(0, width, height, levels);
-//    return levels;
-//}
 
 //////////////////////////////////////
 
@@ -164,7 +159,7 @@ float4 Blur_X(float2 vTexCoord)
         if (1.f == g_BlendTexture.Sample(ClampSampler, vUV).g)
             continue;
 
-        vOut += fWeight[6 + i] * g_EffectTexture.Sample(ClampSampler, vUV);
+        vOut += fWeight[6 + i] * (g_EffectTexture.Sample(ClampSampler, vUV) + g_SpecularTexture.Sample(ClampSampler, vUV));
         iTotal++;
     }
 
@@ -352,8 +347,8 @@ PS_OUT PS_MAIN(PS_IN In)
 struct PS_OUT_LIGHT
 {
     float4 vResultColor : SV_TARGET0;
+    float4 vSpecular : SV_TARGET1;
 };
-
 
 /* 빛 하나당 480000 수행되는 쉐이더. */
 
@@ -455,8 +450,20 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
         ambientLighting = diffuseIBL + specularIBL;
     }
     
-    Out.vResultColor = float4(directLighting + ambientLighting, 1.f) * fAmbientOcclusion;
+    float4 vLightspecular = 0.0;
+    {
+        float3 vReflect = reflect(normalize(g_vLightDir.xyz), N);
+        float fLightspecular = saturate(pow(max(dot(normalize(vReflect), normalize(Lo)), 0.0), 20.f * ( max(0.5, 1.f - fRoughness * 2.f) )) * saturate(1.f - fRoughness * 1.05f));
+        vLightspecular = fLightspecular;
+
+        vLightspecular += vDiffuse * vLightspecular.a;
+
+    }
     
+    
+    
+    Out.vResultColor = float4(directLighting + ambientLighting, 1.f) * fAmbientOcclusion;
+    Out.vSpecular = vLightspecular;
     return Out;
 }
 
@@ -559,7 +566,7 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
         Out.vColor *= (1.f - vEffect.a);
 
     // 기존 디퓨즈와 가산되어 그려진다.
-    Out.vColor += vEffect + vBlur;
+    Out.vColor += vEffect + (vBlur * 10);
         
     
     

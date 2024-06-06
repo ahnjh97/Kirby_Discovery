@@ -101,7 +101,7 @@ HRESULT CBladeKnightSword::Add_Components()
 	CHECK_FAILED(hr);
 
 	/* For.Com_Model */
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_BladeKnightSword"),
+	hr = __super::Add_Component(TEXT(/*Prototype_Component_Model_BladeKnightSword*/"Prototype_Component_Model_KirbyWeapon_Sword"),
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
