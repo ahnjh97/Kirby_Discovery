@@ -85,16 +85,6 @@ HRESULT CLevel_GamePlay::Render()
 		m_iFPS = 0;
 	}
 
-
-
-	// 환경맵을 던진다.
-	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture[0], "g_EnvTexture")))
-		return E_FAIL;
-
-	//LUT 던진다.
-	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture[1], "g_LUTTexture")))
-		return E_FAIL;
-
 	return S_OK;
 }
 
@@ -376,12 +366,31 @@ HRESULT CLevel_GamePlay::Add_EnvMap()
 	HRESULT hr;
 
 	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Level_0_Env"),
-		TEXT("Com_Texture"), (CComponent**)&m_pEnvTexture[0]);
+		TEXT("Com_Texture1"), (CComponent**)&m_pEnvTexture[TYPE_ENV]);
 	CHECK_FAILED(hr);
 
 	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_BRDF_LUT"),
-		TEXT("Com_Texture2"), (CComponent**)&m_pEnvTexture[1]);
+		TEXT("Com_Texture2"), (CComponent**)&m_pEnvTexture[TYPE_LUT]);
 	CHECK_FAILED(hr);
+
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_RandomNormal"),
+		TEXT("Com_Texture3"), (CComponent**)&m_pEnvTexture[TYPE_NORMAL]);
+	CHECK_FAILED(hr);
+
+
+
+
+	// 환경맵을 던진다.
+	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture[TYPE_ENV], "g_EnvTexture")))
+		return E_FAIL;
+
+	//LUT 던진다.
+	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture[TYPE_LUT], "g_LUTTexture")))
+		return E_FAIL;
+
+	//Normal 던진다.
+	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture[TYPE_NORMAL], "g_RandomNormalTexture")))
+		return E_FAIL;
 
 
 	return S_OK;

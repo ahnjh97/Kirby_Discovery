@@ -156,9 +156,13 @@ HRESULT CRenderer::Initialize()
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Specular"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
 		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_SSAO"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_ResultColor"))))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Specular"))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_SSAO"))))
 		return E_FAIL;
 #pragma endregion
 
@@ -323,7 +327,8 @@ HRESULT CRenderer::Initialize()
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Specular"), 800.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
 		return E_FAIL;
-
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_SSAO"), 1000.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
+		return E_FAIL;
 
 	// ShadowObject
 	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_LightDepth"), 50.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
@@ -926,6 +931,10 @@ HRESULT CRenderer::Render_Result()
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Effect"), "g_EffectTexture")))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_NonLight"), "g_NonLightTexture")))
+		return E_FAIL;
+
+	// SSAO 연산
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_SSAO"), "g_SSAOTexture")))
 		return E_FAIL;
 
 	// 림 라이트 + 카메라 포지션

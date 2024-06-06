@@ -33,7 +33,8 @@ private:
 	HRESULT Ready_ParsedObjects();
 	
 	HRESULT Add_EnvMap();
-	CTexture* m_pEnvTexture[2] = { nullptr };
+	enum TEXTURETYPE { TYPE_ENV, TYPE_LUT, TYPE_NORMAL, TYPE_END };
+	CTexture* m_pEnvTexture[TYPE_END] = { nullptr };
 
 public:
 	static CLevel_GamePlay* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

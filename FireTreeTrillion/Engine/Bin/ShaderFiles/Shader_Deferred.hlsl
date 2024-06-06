@@ -53,6 +53,22 @@ texture2D g_DiffuseTexture;
 texture2D g_LinearTexture;
 texture2D g_SpecularTexture;
 
+//**** 싸오 ****//
+texture2D g_SSAOTexture;
+texture2D g_RandomNormalTexture;
+
+const float2 vCoordDir[4] = { float2(1, 0), float2(-1, 0), float2(0, 1), float2(0, -1) };
+// 원근 허용범위
+float g_scale = 0.5f;
+// 콘모양 제어
+float g_bias = 0.f;
+// 탐색 반경
+float g_sample_radius = 3.f;
+// 음영의 강함
+float g_intensity = 3.f;
+
+////////////////
+
 TextureCube g_EnvTexture;
 Texture2D g_LUTTexture;
 
@@ -140,6 +156,42 @@ float3 fresnelSchlick(float3 F0, float cosTheta)
 }
 
 //////////////////////////////////////
+
+
+/// For SSAO
+
+float2 getRandom(in float2 uv)
+{
+    return normalize(g_RandomNormalTexture.Sample(LinearSampler, float2(g_fTexW, g_fTexH) * uv / float2(900.f, 900.f)).xy * 2.0f - 1.0f);
+}
+
+float doAmbientOcclusion(in float2 tcoord, in float2 uv, in float3 p, in float3 cnorm)
+{
+    float2 vUV = tcoord + uv;
+    
+    vector vSSAO_DepthDesc = g_DepthTexture.Sample(PointSampler, vUV);
+    float fSSAO_ViewZ = vSSAO_DepthDesc.y * g_fFar;
+    float4 vSSAO_WorldPos;
+    /* 로컬위치 * 월드행렬 * 뷰행렬 * 투영행렬 / View.z */
+    vSSAO_WorldPos.x = vUV.x * 2.f - 1.f;
+    vSSAO_WorldPos.y = vUV.y * -2.f + 1.f;
+    vSSAO_WorldPos.z = vSSAO_DepthDesc.x;
+    vSSAO_WorldPos.w = 1.f;
+	/* 로컬위치 * 월드행렬 * 뷰행렬 * 투영행렬 */
+    vSSAO_WorldPos *= fSSAO_ViewZ;
+	/* 로컬위치 * 월드행렬 * 뷰행렬 */
+    vSSAO_WorldPos = mul(vSSAO_WorldPos, g_ProjMatrixInv);
+	/* 로컬위치 * 월드행렬 */
+    vSSAO_WorldPos = mul(vSSAO_WorldPos, g_ViewMatrixInv);
+    
+    float3 diff = vSSAO_WorldPos.xyz - p;
+    const float3 v = normalize(diff);
+    const float d = length(diff) * g_scale;
+    
+    return max(0.0, dot(cnorm, v) - g_bias) * (1.0 / (1.0 + d)) * g_intensity;
+}
+
+
 
 float4 Blur_X(float2 vTexCoord)
 {
@@ -331,8 +383,6 @@ struct PS_IN
 struct PS_OUT
 {
     float4 vColor : SV_TARGET0;
-    //float4 vSSAO : SV_TARGET1;
-    //float4 vSSAO_SUB : SV_TARGET2;
 };
 
 PS_OUT PS_MAIN(PS_IN In)
@@ -348,6 +398,7 @@ struct PS_OUT_LIGHT
 {
     float4 vResultColor : SV_TARGET0;
     float4 vSpecular : SV_TARGET1;
+    float4 vSSAO : SV_TARGET2;
 };
 
 /* 빛 하나당 480000 수행되는 쉐이더. */
@@ -460,10 +511,34 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
 
     }
     
-    
+    float4 vSSAO = 0.0;
+    {
+        Out.vSSAO.rgb = 1.0;
+
+        float2 rand = getRandom(In.vTexcoord);
+        float radius = g_sample_radius / fViewZ;
+        
+        // SSAO Calculation
+        
+        int iterations = 4;
+        for (int i = 0; i < iterations; ++i)
+        {
+            float2 coord1 = reflect(vCoordDir[i], rand) * radius;
+            float2 coord2 = float2(coord1.x * 0.707 - coord1.y * 0.707, coord1.x * 0.707 + coord1.y * 0.707);
+            
+            vSSAO += doAmbientOcclusion(In.vTexcoord, coord1 * 0.25, vWorldPos.xyz, N);
+            vSSAO += doAmbientOcclusion(In.vTexcoord, coord2 * 0.5, vWorldPos.xyz, N);
+            vSSAO += doAmbientOcclusion(In.vTexcoord, coord1 * 0.75, vWorldPos.xyz, N);
+            vSSAO += doAmbientOcclusion(In.vTexcoord, coord2, vWorldPos.xyz, N);
+
+        }
+        
+        vSSAO /= (float) iterations * 4.0; 
+    }
     
     Out.vResultColor = float4(directLighting + ambientLighting, 1.f) * fAmbientOcclusion;
     Out.vSpecular = vLightspecular;
+    Out.vSSAO -= vSSAO;
     return Out;
 }
 
@@ -489,6 +564,7 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
     vector vDiffuse = g_LinearTexture.Sample(LinearSampler, In.vTexcoord);
     
     Out.vColor = pow(vDiffuse, 1.0f / 2.2f);
+   // Out.vColor *= g_SSAOTexture.Sample(LinearSampler, In.vTexcoord);
     
 	/* 현재 픽셀의 월드상의 위치를 구한다. */
 
