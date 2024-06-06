@@ -248,9 +248,9 @@ PxRigidDynamic* CPhysX::CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, 
 
     PxShape* pShape = { nullptr };
     // [½Ãµµ1] 1 1 1 : ?? / Ä¿ºñ°¡ ¸øÂü / ÅÊÅÊº¼Ã³·³ Æ¨°ÜÁü
-    pMaterial = m_pPhysics->createMaterial(.1f, .1f, .5f);
+    //pMaterial = m_pPhysics->createMaterial(.1f, .1f, .5f);
     if (nullptr == pMaterial)
-        pShape = m_pPhysics->createShape(meshGeometry, *pMaterial);//*m_pMaterial);
+        pShape = m_pPhysics->createShape(meshGeometry, *m_pMaterial);
     else
         pShape = m_pPhysics->createShape(meshGeometry, *pMaterial);
 
@@ -259,9 +259,6 @@ PxRigidDynamic* CPhysX::CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, 
         pDynamicActor->release();
         return nullptr;
     }
-
-    // for test
-    pDynamicActor->setLinearVelocity(PxVec3(0.f, 10.f, .0f)); // ÃÊ±â ¼Óµµ ¼³Á¤
 
     pDynamicActor->attachShape(*pShape);
     m_pScene->addActor(*pDynamicActor);
