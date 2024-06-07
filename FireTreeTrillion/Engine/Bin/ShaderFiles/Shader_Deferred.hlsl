@@ -564,7 +564,7 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
     vector vDiffuse = g_LinearTexture.Sample(LinearSampler, In.vTexcoord);
     
     Out.vColor = pow(vDiffuse, 1.0f / 2.2f);
-   // Out.vColor *= g_SSAOTexture.Sample(LinearSampler, In.vTexcoord);
+    Out.vColor *= g_SSAOTexture.Sample(LinearSampler, In.vTexcoord);
     
 	/* 현재 픽셀의 월드상의 위치를 구한다. */
 
@@ -862,11 +862,13 @@ PS_OUT PS_MAIN_MotionBlur(PS_IN In)
     
     float4 vMotionBlurSample = g_MotionBlur.Sample(LinearSampler, In.vTexcoord);
     
-    if (length(vMotionBlurSample) < 0.01f)
+    
+    if (length(vMotionBlurSample) < 0.0001f)
     {
         Out.vColor = g_DiffuseMotionBlur.Sample(ClampSampler, In.vTexcoord);
         return Out;
     }
+    
     
     float2 vMyBlurDir = vMotionBlurSample.xy;
     
