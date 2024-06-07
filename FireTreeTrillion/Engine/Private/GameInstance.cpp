@@ -308,6 +308,14 @@ HRESULT CGameInstance::Render_LightDepth_For_GameObject(CShader* pShader, CTrans
 	return S_OK;
 }
 
+HRESULT CGameInstance::Render_LightDepth_For_PartObject(CShader* pShader, const _float4x4* pMatrix, CModel* pModel)
+{
+	if (nullptr == m_pRenderer)
+		return E_FAIL;
+
+	return m_pRenderer->Render_LightDepth_For_PartObject(pShader, pMatrix, pModel);
+}
+
 void CGameInstance::Update_LightShadow(_fvector vLightPos, _fvector vFocusPos)
 {
 	if (nullptr == m_pRenderer)

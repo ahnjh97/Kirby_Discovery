@@ -95,6 +95,7 @@ float g_fRadialblurRaduis;
 float2 g_fRadialblurCenter;
 
 texture2D g_DOFBlur;
+texture2D g_DOFBlur_Result;
 float2 g_vDOFFocus;
 texture2D g_DiffuseMotionBlur;
 texture2D g_MotionBlur;
@@ -204,7 +205,7 @@ float4 Blur_X(float2 vTexCoord)
     if (1.f == g_BlendTexture.Sample(ClampSampler, vTexCoord).g)
         return vOut;
     
-    int iTotal = 0;
+    float fTotal = 0.0;
 
     for (int i = -6; i < 7; ++i)
     {
@@ -213,10 +214,30 @@ float4 Blur_X(float2 vTexCoord)
             continue;
 
         vOut += fWeight[6 + i] * (g_EffectTexture.Sample(ClampSampler, vUV) + g_SpecularTexture.Sample(ClampSampler, vUV));
-        iTotal++;
+        fTotal += fWeight[6 + i];
     }
 
-    vOut /= iTotal;
+    vOut /= fTotal;
+    return vOut;
+}
+
+float4 FreeBlur_X(float2 vTexCoord, texture2D tTexture, float fRadius)
+{
+    float4 vOut = (float4) 0;
+    float2 vUV = (float2) 0;
+
+    float fTotal = 0.0;
+
+    for (int i = -6; i < 7; ++i)
+    {
+        vUV = vTexCoord + float2(1.f / g_fTexW * i * fRadius, 0);
+
+        vOut += fWeight[6 + i] * (tTexture.Sample(ClampSampler, vUV));
+        fTotal += fWeight[6 + i];
+    }
+
+    vOut /= fTotal;
+
     return vOut;
 }
 
@@ -229,7 +250,7 @@ float4 Blur_Y(float2 vTexCoord)
     if (1.f == g_BlendTexture.Sample(ClampSampler, vTexCoord).g)
         return vOut;
 
-    int iTotal = 0;
+    float fTotal = 0.0;
     
     for (int i = -6; i < 7; ++i)
     {
@@ -238,12 +259,34 @@ float4 Blur_Y(float2 vTexCoord)
             continue;
 
         vOut += fWeight[6 + i] * g_EffectTexture.Sample(ClampSampler, vUV);
-        iTotal++;
+        fTotal += fWeight[6 + i];
+
     }
 
-    vOut /= iTotal;
+    vOut /= fTotal;
     return vOut;
 }
+
+float4 FreeBlur_Y(float2 vTexCoord, texture2D tTexture, float fRadius)
+{
+    float4 vOut = (float4) 0;
+    float2 vUV = (float2) 0;
+
+    float fTotal = 0.0;
+
+    for (int i = -6; i < 7; ++i)
+    {
+        vUV = vTexCoord + float2(0, 1.f / (g_fTexH) * i * fRadius);
+
+        vOut += fWeight[6 + i] * (tTexture.Sample(ClampSampler, vUV));
+        fTotal += fWeight[6 + i];
+    }
+
+    vOut /= fTotal;
+
+    return vOut;
+}
+
 
 float3 ToneMapping(float3 vHDRColor, float fExposure)
 {
@@ -521,7 +564,12 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
         
         // SSAO Calculation
         
+        
         int iterations = 4;
+
+        if (fViewZ > 120.f)
+            iterations = 2;
+        
         for (int i = 0; i < iterations; ++i)
         {
             float2 coord1 = reflect(vCoordDir[i], rand) * radius;
@@ -531,7 +579,6 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
             vSSAO += doAmbientOcclusion(In.vTexcoord, coord2 * 0.5, vWorldPos.xyz, N);
             vSSAO += doAmbientOcclusion(In.vTexcoord, coord1 * 0.75, vWorldPos.xyz, N);
             vSSAO += doAmbientOcclusion(In.vTexcoord, coord2, vWorldPos.xyz, N);
-
         }
         
         vSSAO /= (float) iterations * 4.0; 
@@ -643,7 +690,7 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
         Out.vColor *= (1.f - vEffect.a);
 
     // 기존 디퓨즈와 가산되어 그려진다.
-    Out.vColor += vEffect + (vBlur * 10);
+    Out.vColor += vEffect + (vBlur * 2);
         
     
     
@@ -800,23 +847,9 @@ PS_OUT PS_MAIN_DOFBlur(PS_IN In)
     float fDOFTotal = 0.f;
     
      // 초점 깊이와 현재 깊이의 차이
-    float fDepthDifference = abs(fKirbyViewZ - fMyViewZ);
-    
+    float fDepthDifference = abs(fKirbyViewZ - fMyViewZ);    
     float fDOFWeight = 0.f;
-    
-    
-        //far에 제일 가까울 때 b + 10
-    // 공기 원근법 적용
-    //float distance = length(g_vCamPosition - vWorldPos.xyz);
-    float airFactor = saturate ( pow(fMyViewZ / 200.0, 3.0) - .4);
-    /*saturate(pow(fMyViewZ / g_fFar, 15.0) * 2.0)*/ // 공기 원근법 계수 계산
-    float3 airColor = float3(-0.05, 0.01, 0.08); // 공기색 (파란색 계열)
-    //float3 finalColor = lerp(airColor, g_DOFBlur.Sample(ClampSampler, In.vTexcoord).xyz, airFactor);
-
-    // Combine direct and ambient lighting
-    //Out.vColor = float4(finalColor, 1.0);
-    
-    
+        
     //커비보다 내가 가까우면
     if(fMyViewZ < fKirbyViewZ)
     {
@@ -831,29 +864,56 @@ PS_OUT PS_MAIN_DOFBlur(PS_IN In)
     }
     
     
-    for (int i = -6; i < 7; ++i)
+    Out.vColor = FreeBlur_X(In.vTexcoord, g_DOFBlur, fDOFWeight);
+    
+    
+    // 공기 원근법 적용
+    float airFactor = saturate(pow(fMyViewZ / 200.0, 3.0) - .4);
+    float3 airColor = float3(-0.05, 0.01, 0.08); // 공기색 (파란색 계열)
+    Out.vColor += float4(airFactor * airColor, 0.f);
+
+
+    return Out;
+    
+    
+}
+
+PS_OUT PS_MAIN_DOFBlur_Result(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+        
+    // 초점 대상의 Depth값
+    vector vDepthFocus = g_DepthTexture.Sample(PointSampler, g_vDOFFocus);
+    float fKirbyViewZ = vDepthFocus.y * g_fFar;
+    
+    // 현재 픽셀의 Depth값
+    vector vMyDepth = g_DepthTexture.Sample(PointSampler, In.vTexcoord);
+    float fMyViewZ = vMyDepth.y * g_fFar;
+
+    float2 vUV = (float2) 0;
+    float fDOFTotal = 0.f;
+    
+     // 초점 깊이와 현재 깊이의 차이
+    float fDepthDifference = abs(fKirbyViewZ - fMyViewZ);
+    
+    float fDOFWeight = 0.f;
+        
+    //커비보다 내가 가까우면
+    if (fMyViewZ < fKirbyViewZ)
     {
-        for (int j = -6; j < 7; ++j)
-        {
-            float2 Offset = float2(j, i);
-            float2 TexOffset = Offset * float2(1.0f / g_fTexW, 1.0f / g_fTexH) * fDOFWeight;
-            vUV = In.vTexcoord + TexOffset;
-            
-            float fSampleWeight = fWeight[6 + j] * fWeight[6 + i];
-            
-            Out.vColor += fSampleWeight * g_DOFBlur.Sample(ClampSampler, vUV);
-            
-            
-            fDOFTotal += fSampleWeight;
-        }
+        float fDOFFar = fKirbyViewZ;
+        // DOFWeight 계산 (스케일링 및 클램핑)
+        fDOFWeight = saturate(pow(fDepthDifference / fDOFFar, 5.0) * 20.0);
+    }
+    else
+    {
+        float fDOFFar = g_fFar - fKirbyViewZ;
+        fDOFWeight = saturate(pow(fDepthDifference / 100, 15.0) * 2.0);
     }
     
-    Out.vColor /= fDOFTotal;
-    //Out.vColor += float4(airFactor * airColor, 0.f);
     
-
-    
-    return Out;
+    Out.vColor = FreeBlur_Y(In.vTexcoord, g_DOFBlur_Result, fDOFWeight);
+    return Out;    
     
 }
 
@@ -1042,6 +1102,18 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_UI_Default();
+    }
+
+    // DOF 블러 최종 ( 11 )
+    pass DOF_Blur_Result
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_Default, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_DOFBlur_Result();
     }
 
 }

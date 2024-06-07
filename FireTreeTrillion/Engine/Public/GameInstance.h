@@ -45,6 +45,7 @@ public: /* For.Renderer */
 	void Setting_RadialBlur(_fvector vWorldPos, _float fRadial, _float fSubtraction = 70.f);
 	void Setting_RadialBlur(_float fRadial, _float fSubtraction = 70.f);
 	HRESULT Render_LightDepth_For_GameObject(class CShader* pShader, class CTransform* pTransform, class CModel* pModel);
+	HRESULT Render_LightDepth_For_PartObject(class CShader* pShader, const _float4x4* pMatrix, class CModel* pModel);
 	void Update_LightShadow(_fvector vLightPos, _fvector vFocusPos);
 	void Update_DofFocus(_fvector vWorldPos);
 	void Set_BlackBackGround(_bool bSet);

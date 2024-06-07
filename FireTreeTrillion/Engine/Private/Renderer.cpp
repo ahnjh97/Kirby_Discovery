@@ -234,15 +234,19 @@ HRESULT CRenderer::Initialize()
 #pragma endregion
 
 #pragma region MRT_DOFBlur
-	/* For.Target_RadialBlur */
+	/* For.Target_DOFBlur */
 	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_DOFBlur"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_DOFBlur"), TEXT("Target_DOFBlur"))))
 		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_DOFBlur_Result"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_DOFBlur_Result"), TEXT("Target_DOFBlur_Result"))))
+		return E_FAIL;
 #pragma endregion
 
 #pragma region MRT_MotionBlur
-	/* For.Target_RadialBlur */
+	/* For.Target_MotionBlur */
 	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_DiffuseMotionBlur"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_MotionBlur"), TEXT("Target_DiffuseMotionBlur"))))
@@ -718,6 +722,46 @@ HRESULT CRenderer::Render_LightDepth_For_GameObject(CShader* pShader, CTransform
 	return S_OK;
 }
 
+HRESULT CRenderer::Render_LightDepth_For_PartObject(CShader* pShader, const _float4x4* pMatrix, CModel* pModel)
+{
+	if (nullptr == pShader || nullptr == pModel)
+		return E_FAIL;
+
+	if (FAILED(pShader->Bind_Matrix("g_WorldMatrix", pMatrix)))
+		return E_FAIL;
+
+	_float4x4		ViewMatrix, ProjMatrix;
+	XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMLoadFloat4(&m_vShadowEyePos), XMLoadFloat4(&m_vShadowFocusPos), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
+	XMStoreFloat4x4(&ProjMatrix, XMMatrixPerspectiveFovLH(XMConvertToRadians(m_fShadowAngle), (_float)(g_iOriginSizeX / g_iOriginSizeY), 0.1f, m_fShadowFar));
+
+	if (FAILED(pShader->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
+		return E_FAIL;
+	if (FAILED(pShader->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
+		return E_FAIL;
+
+	_uint iNumMeshes = pModel->Get_NumMeshes();
+
+	for (size_t i = 0; i < iNumMeshes; i++)
+	{
+		if (FAILED(pModel->Bind_ShaderResource(pShader, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
+			return E_FAIL;
+
+		if (pModel->Get_ModelInfo().eType == TYPE_ANIM)
+		{
+			if (FAILED(pModel->Bind_BoneMatrices(pShader, "g_BoneMatrices", i)))
+				return E_FAIL;
+		}
+
+		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
+		if (FAILED(pShader->Begin(2)))
+			return E_FAIL;
+
+		pModel->Render(i);
+	}
+
+	return S_OK;
+}
+
 #ifdef _DEBUG
 
 HRESULT CRenderer::Add_DebugComponents(CComponent* pRenderComponent)
@@ -1108,7 +1152,8 @@ HRESULT CRenderer::Render_Radial_Result(_float fTimeDelta)
 HRESULT CRenderer::Render_DOF_Result()
 {
 	// 모션블러에 담는다.
-	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_MotionBlur"))))
+
+	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_DOFBlur_Result"))))
 		return E_FAIL;
 
 	if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
@@ -1127,6 +1172,29 @@ HRESULT CRenderer::Render_DOF_Result()
 
 	// DOF 를 적용시킨다.
 	m_pShader->Begin(8);
+
+	m_pVIBuffer->Bind_Buffers();
+
+	m_pVIBuffer->Render();
+
+	if (FAILED(m_pGameInstance->End_MRT()))
+		return E_FAIL;
+
+	///////////////////////////////
+
+	// 모션블러에 담는다.
+	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_MotionBlur"))))
+		return E_FAIL;
+
+	// DOF를 적용시킬 텍스쳐를 던진다.
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_DOFBlur_Result"), "g_DOFBlur_Result")))
+		return E_FAIL;
+
+	if (FAILED(m_pShader->Bind_RawValue("g_vDOFFocus", &m_vDofFocus, sizeof(_float2))))
+		return E_FAIL;
+
+	// DOF 를 적용시킨다.
+	m_pShader->Begin(11);
 
 	m_pVIBuffer->Bind_Buffers();
 

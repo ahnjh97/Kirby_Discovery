@@ -82,7 +82,10 @@ HRESULT CKirbyWeapons::Render()
 
 HRESULT CKirbyWeapons::Render_LightDepth()
 {
-    if (FAILED(m_pGameInstance->Render_LightDepth_For_GameObject(m_pShaderCom, m_pTransformCom, m_pModelCom)))
+   /* if (FAILED(m_pGameInstance->Render_LightDepth_For_GameObject(m_pShaderCom, m_pTransformCom, m_pModelCom)))
+        return E_FAIL;*/
+
+    if (FAILED(m_pGameInstance->Render_LightDepth_For_PartObject(m_pShaderCom, &m_WorldMatrix, m_pModelCom)))
         return E_FAIL;
 
     return S_OK;
