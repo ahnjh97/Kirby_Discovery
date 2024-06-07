@@ -870,7 +870,10 @@ PS_OUT PS_MAIN_DOFBlur(PS_IN In)
     // 공기 원근법 적용
     float airFactor = saturate(pow(fMyViewZ / 200.0, 3.0) - .4);
     float3 airColor = float3(-0.05, 0.01, 0.08); // 공기색 (파란색 계열)
-    Out.vColor += float4(airFactor * airColor, 0.f);
+    
+    //백 버퍼가 보이면 색 보정 해주지 마
+    if (g_SkyTexture.Sample(PointSampler, g_vDOFFocus).a != 0.f)
+        Out.vColor += float4(airFactor * airColor, 0.f);
 
 
     return Out;
@@ -961,8 +964,11 @@ PS_OUT PS_UI_Default(PS_IN In)
     
     Out.vColor = vColor;
     
-    //if (vUIColor.a != 0.f)
-    //    Out.vColor = vUIColor;
+    if (vUIColor.a != 0.f)
+    {
+        Out.vColor *= 1 - vUIColor.a;
+        Out.vColor += vUIColor;
+    }
     
     return Out;
 }

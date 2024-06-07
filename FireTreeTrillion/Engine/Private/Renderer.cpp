@@ -130,10 +130,6 @@ HRESULT CRenderer::Initialize()
 	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_MRA"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
 		return E_FAIL;
 
-	//06.04) UI ·»´õÅ¸°Ù ºä »ı¼º ¹× ÁØºñ
-	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_UI"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, 
-		DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 1.f, 0.f, 1.f))))
-		return E_FAIL;
 
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Diffuse"))))
 		return E_FAIL;
@@ -263,6 +259,12 @@ HRESULT CRenderer::Initialize()
 #pragma endregion
 	
 #pragma region MRT_UI
+
+
+	//06.04) UI ·»´õÅ¸°Ù ºä »ı¼º ¹× ÁØºñ
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_UI"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height,
+		DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+		return E_FAIL;
 
 	//06.04) UI ·»´õÅ¸°Ù ºä »ı¼º ¹× ÁØºñ
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_UI"), TEXT("Target_UI"))))
@@ -402,6 +404,8 @@ HRESULT CRenderer::Initialize()
 	//·»´õÇÒ ºäÆ÷Æ® ¼¼ÆÃ
 	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_UI"), 50.f, 50.f, 100.f, 100.f)))
 		return E_FAIL;
+
+
 		//ViewportDesc.Width * 0.25f, ViewportDesc.Height * 0.25f
 
 	//ID3D11Texture2D* pCopyTex2D = { nullptr };
@@ -1241,8 +1245,8 @@ HRESULT CRenderer::Render_MotionBlur()
 
 HRESULT CRenderer::Render_FinalResult()
 {
-	//if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_RadialBlur"))))
-	//	return E_FAIL;
+	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_DeferredInfo"))))
+		return E_FAIL;
 
 	if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
 		return E_FAIL;
@@ -1315,16 +1319,16 @@ HRESULT CRenderer::Render_FinalResult()
 
 	m_pVIBuffer->Render();
 
-	//if (FAILED(m_pGameInstance->End_MRT()))
-	//	return E_FAIL;
+	if (FAILED(m_pGameInstance->End_MRT()))
+		return E_FAIL;
 
 	return S_OK;
 }
 
 HRESULT CRenderer::Render_UI()
 {
-	//if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_UI"))))
-	//	return E_FAIL;
+	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_UI"))))
+		return E_FAIL;
 
 	for (auto& pRenderObject : m_RenderObjects[RENDER_UI])
 	{
@@ -1333,9 +1337,6 @@ HRESULT CRenderer::Render_UI()
 		Safe_Release(pRenderObject);
 	}
 	m_RenderObjects[RENDER_UI].clear();
-
-	//if (FAILED(m_pGameInstance->End_MRT()))
-	//	return E_FAIL;
 
 	return S_OK;
 }
@@ -1351,20 +1352,20 @@ HRESULT CRenderer::Render_SuperUI()
 	}
 	m_RenderObjects[RENDER_SUPERUI].clear();
 
-	//if (FAILED(m_pGameInstance->End_MRT()))
-	//	return E_FAIL;
+	if (FAILED(m_pGameInstance->End_MRT()))
+		return E_FAIL;
 
-	//if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_RadialBlur"), "g_FinalTexture")))
-	//	return E_FAIL;
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_DeferredInfo"), "g_FinalTexture")))
+		return E_FAIL;
 
-	//if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_UI"), "g_UITexture")))
-	//	return E_FAIL;
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_UI"), "g_UITexture")))
+		return E_FAIL;
 
-	//m_pShader->Begin(DEFERRED_UI);
+	m_pShader->Begin(DEFERRED_UI);
 
-	//m_pVIBuffer->Bind_Buffers();
+	m_pVIBuffer->Bind_Buffers();
 
-	//m_pVIBuffer->Render();
+	m_pVIBuffer->Render();
 
 	return S_OK;
 }
