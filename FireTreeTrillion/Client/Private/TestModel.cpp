@@ -35,7 +35,7 @@ HRESULT CTestModel::Initialize(void* pArg)
     //CGameInstance::Get_Instance()->Test();
     
     // position 세팅은 항상 Add_Components() 앞에 둘것
-    _vector vPos = XMVectorSet(0.f, 10.f, -180.f, 1.f);
+    _vector vPos = XMVectorSet(0.f, 9.f, -180.f, 1.f);
     m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
     m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(-16.f));
 
@@ -324,6 +324,7 @@ HRESULT CTestModel::Add_Components()
     /* For.Com_RigidBody */
     CRigidBody::RIGIDBODY_DESC rigidDesc {};
     rigidDesc.bTrigger = false;
+    rigidDesc.bDynamic = true;
     rigidDesc.bKinematic = true;
     rigidDesc.eShapeType = RIGID_CAPSULE;
     rigidDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
