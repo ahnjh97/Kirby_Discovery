@@ -10,6 +10,14 @@ BEGIN(Engine)
 class CRenderer final : public CBase
 {
 public:
+	enum RENDER_MODE {
+		MODE_GAMEPLAY, MODE_TOOL, MODE_END
+	};
+
+	enum OPTION {
+		OPTION_SHADOW, OPTION_SSAO, OPTION_DOF, OPTION_MOTIONBLUR, OPTION_END
+	};
+
 	enum RENDERGROUP {
 		RENDER_PRIORITY,
 		RENDER_SHADOW,
@@ -23,16 +31,42 @@ public:
 		RENDER_END
 	};
 
-	enum TEX{TEX_LUT, TEX_END};
 private:
 	CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual ~CRenderer() = default;
 
-
 public:
 	HRESULT Initialize();
+	void Color_Initialize();
+
 	HRESULT Add_RenderGroup(RENDERGROUP eRenderGroup, class CGameObject* pRenderObject);
 	HRESULT Render(_float fTimeDelta);
+
+	void Set_RenderMode(RENDER_MODE eMode) {
+		m_eRenderMode = eMode;
+		if (eMode == MODE_TOOL)
+		{
+			for (size_t i = OPTION_SHADOW; i < OPTION_END; ++i)
+			{
+				m_bRenderOption[i] = false;
+				Update_Option((OPTION)i, m_bRenderOption[i]);
+
+			}
+		}
+		else
+		{
+			for (size_t i = OPTION_SHADOW; i < OPTION_END; ++i)
+			{
+				m_bRenderOption[i] = true;
+				Update_Option((OPTION)i, m_bRenderOption[i]);
+
+			}
+
+		}
+	}
+
+	void Render_SystemTick(_float fTimeDelta);
+	void Key_Input();
 
 	HRESULT Bind_DeferredTexture(CTexture* pTexture, const _char* pConstantName, _uint iIndex);
 	HRESULT Bind_DeferredRawValue(const _char* pConstantName, const void* pData, _uint iLength);
@@ -46,7 +80,7 @@ public:
 	// 잠깐의 레디얼 블러를 세팅한다.
 	void Setting_RadialBlur(_fvector vWorldPos, _float fRadial, _float fSubtraction);
 	void Setting_RadialBlur(_float fRadial, _float fSubtraction);
-
+	// DOF 초점을 업데이트한다.
 	void Update_DofFocus(_fvector vWorldPos);
 
 	HRESULT Render_LightDepth_For_GameObject(class CShader* pShader, class CTransform* pTransform, class CModel* pModel);
@@ -60,6 +94,9 @@ public:
 	void Set_BlackBackGround(_bool bSet) {
 		m_bBlackBackground = bSet;
 	}
+
+	// 환경설정 업데이트
+	void Update_Option(OPTION Option, _bool bOn);
 
 #ifdef _DEBUG
 public:
@@ -78,23 +115,24 @@ private:
 	class CVIBuffer_Rect* m_pVIBuffer = { nullptr };
 	class CShader* m_pShader = { nullptr };
 	_float4x4							m_WorldMatrix{}, m_ViewMatrix{}, m_ProjMatrix{};
-
-	ID3D11DepthStencilView*				m_pLightDepthDSV = { nullptr };
-
-	ID3D11RenderTargetView*				m_pUIRTV = { nullptr };
-	ID3D11ShaderResourceView*			m_pUISRV = { nullptr };
-
+	ID3D11DepthStencilView* m_pLightDepthDSV = { nullptr };
+	ID3D11RenderTargetView* m_pUIRTV = { nullptr };
+	ID3D11ShaderResourceView* m_pUISRV = { nullptr };
 
 	_float4								m_vShadowEyePos = { 0.f, 0.f, 0.f, 0.f };
 	_float4								m_vShadowFocusPos = { 0.f, 0.f, 0.f, 0.f };
 	_float								m_fShadowAngle = { 0.f };
 	_float								m_fShadowFar = { 0.f };
 
-	// 저 사양 모드
-	_bool								m_bLowPass = { TRUE };
-	_bool								m_IsRenderRTV = { TRUE }; //렌더 타겟 뷰 ON/OFF
+#ifdef _DEBUG
+	// 디버그 랜더타겟뷰 ON / OFF
+	_bool								m_IsRenderRTV = { TRUE };
+#endif
 
-
+	// 현재 게임 모드
+	RENDER_MODE							m_eRenderMode = { MODE_END };
+	_bool								m_bRenderOption[OPTION_END] = { true, true, true, true };
+	_bool								m_bDebugOptionControl = { true };
 
 #ifdef _DEBUG
 private:
@@ -106,14 +144,14 @@ private:
 	HRESULT Render_Shadow();
 	HRESULT Render_NonBlend();
 
-	HRESULT Render_Lights();
+	HRESULT Render_Lights();			HRESULT Render_Light_For_Tool();
 
 	HRESULT Render_Effect();
 	HRESULT Render_EffectResult();
 
 	HRESULT Render_DeferredInfo();
-	
-	HRESULT Render_Result();
+
+	HRESULT Render_Result();			HRESULT Render_Result_For_Tool();
 	HRESULT Render_Radial_Result(_float fTimeDelta);
 	HRESULT Render_DOF_Result();
 	HRESULT Render_MotionBlur();
@@ -121,29 +159,28 @@ private:
 	HRESULT Render_FinalResult();
 
 	HRESULT Render_UI();
-	HRESULT Render_SuperUI();
+
 #ifdef _DEBUG
 	void Render_IMGUI();
 #endif
+
 	void Interpolate_ColorData(_float _fTimeDelta);
 	void Interpolate_BlackBackground(_float fTimeDelta);
 	void Interpolate_RadialBlur(_float fTimeDelta);
 
 private:
+	// For.RadialBlur
 	_float2 m_vScreenPos = { 0.f, 0.f };
 	_float m_fRadialBlurRadius = { 0.f };
 	_float m_fRadialRadiusSubtraction = { 0.f };
 	_bool  m_isRadial = { false };
-
+	// For.BackgroundColor
 	_bool  m_bBlackBackground = { false };
 	_float m_fBlackBackground = { 1.f };
-
-	_float m_fRimWidth = { 0.f };
-	_bool  m_bRimTest = { false };
-
+	// For.DOF
 	_float2 m_vDofFocus = { 0.f, 0.f };
 
-	//색감 보정 변수
+	// For.ColorCorrection
 	_bool m_bApplyCorrection = { true };
 
 	_float m_fExposure = { 1.03f };
@@ -154,8 +191,8 @@ private:
 	_float m_fVibrance = { .96f };
 	_float m_fContrast = { 1.10f };
 
-	_float m_vWhiteBalance[3] = {.64f, .6f, .6f};
-	_float m_vColorBalance[3] = {1.06f, .96f, 1.04f};
+	_float m_vWhiteBalance[3] = { .64f, .6f, .6f };
+	_float m_vColorBalance[3] = { 1.06f, .96f, 1.04f };
 
 	_float m_vShadowColor[3] = { 62.f / 255.f, 2.f / 255.f, 2.f / 255.f };
 	_float m_fShadowIntensity = { 0.12f };
@@ -168,8 +205,6 @@ private:
 
 	COLOR_DATA m_DestColorData{};
 	map<string, COLOR_DATA> m_ColorSets;
-
-	CTexture* m_pTextureComs[TEX_END];
 
 #ifdef _DEBUG
 private:

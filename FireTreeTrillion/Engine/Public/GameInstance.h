@@ -51,6 +51,9 @@ public: /* For.Renderer */
 	void Set_BlackBackGround(_bool bSet);
 	HRESULT Bind_DeferredTexture(CTexture* pTexture, const _char* pConstantName, _uint iIndex = 0);
 	HRESULT Bind_DeferredRawValue(const _char* pConstantName, const void* pData, _uint iLength);
+	void Set_RenderMode(CRenderer::RENDER_MODE eMode);
+	void Update_Option(CRenderer::OPTION Option, _bool bOn);
+
 
 #ifdef _DEBUG
 public:
@@ -106,7 +109,7 @@ public: /* For.PipeLine */
 public: /* For.Light_Manager */
 	const LIGHT_DESC* Get_LightDesc(_uint iIndex);
 	HRESULT Add_Light(const LIGHT_DESC& LightDesc);
-	HRESULT Render_Lights(class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
+	HRESULT Render_Lights(class CShader* pShader, class CVIBuffer_Rect* pVIBuffer, _bool bForTool = false);
 	void Clear_Light();
 	class CLight* Get_LightLastAddress();
 

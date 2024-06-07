@@ -27,6 +27,8 @@ CFXToolDirector::CFXToolDirector(const CFXToolDirector& rhs)
 {
 }
 
+
+//세 이펙트를 만든다.
 void CFXToolDirector::Make_Effect(SINGLE_FX_DATA& _FXData)
 {
 	CSingleEffect::FX_DESC FXDesc{};
@@ -135,7 +137,7 @@ void CFXToolDirector::Make_Effect(MULTI_FX_DATA& _FXData)
 	m_MultiFXs.emplace_back(pMultiFX);
 }
 
-
+//이펙트 찾기
 CEffect* CFXToolDirector::Find_Effect(string strName)
 {
 	for (CEffect* FX : m_FXs)
@@ -153,6 +155,8 @@ CEffect* CFXToolDirector::Find_Effect(string strName)
 	return nullptr;
 }
 
+
+//이펙트 싹 저장
 HRESULT CFXToolDirector::Save_AllEffect()
 {
 	for (auto& FX : m_FXs)
@@ -339,6 +343,7 @@ HRESULT CFXToolDirector::Save_MultiEffect(CEffect* pEffect, const wstring& strFi
 	return S_OK;
 }
 
+//이펙트 싹 로드
 HRESULT CFXToolDirector::Load_AllEffect()
 {
 	path FXPath("../Bin/Resources/Effects/Single/");
@@ -616,29 +621,25 @@ HRESULT CFXToolDirector::Initialize(void* pArg)
 		GameObjectDesc = *(GAMEOBJECT_DESC*)pArg;
 	}
 
-	//if (FAILED(__super::Initialize(&GameObjectDesc)))
-	//	return E_FAIL;
-
 
 	HRESULT hr = __super::Initialize(pArg);
 	CHECK_FAILED_MSG(hr, "Failed To Initialize : CFXToolDirector");
 
-
 	hr = Add_Components();
 	CHECK_FAILED_MSG(hr, "Failed To Add Components : CFXToolDirector");
 
+	//static 프로토타입 중 이펙트 툴에서 사용할 컴포넌트의 이름을 가져온다.
 	hr = Ready_FXPrototypeVector();
 	CHECK_FAILED_MSG(hr, "Failed To Add Components : CFXToolDirector");
 
-
 	m_pGameInstance->Set_IMGUIStyle(CImGUI_Manager::HYO);
-	//SetupImGuiStyle(true, .8f);
 
 	return S_OK;
 }
 
 _int CFXToolDirector::Tick(_float _fTimeDelta)
 {
+	//이펙트 저장 / 불러오기
 	if (m_pGameInstance->Get_KeyState(DIK_LCONTROL, KEY_PRESS))
 	{
 		if (m_pGameInstance->Get_KeyState(DIK_S, KEY_DOWN))
@@ -651,23 +652,16 @@ _int CFXToolDirector::Tick(_float _fTimeDelta)
 		}
 	}
 
+
+	//플레이 바 재생 중일 때 이펙트 틱 돌리기
 	if (m_bPlayingBar)
 	{
 		if (m_eSelected == SELECTED_SINGLE_FX)
-		{
 			m_FXs[m_iSelectedFXIdx]->Tick(_fTimeDelta);
-			//m_fCurPlayDuration = m_FXs[m_iSelectedFXIdx]->m_fDuration.first;
-		}
 		else if (m_eSelected == SELECTED_PARTICLE_FX)
-		{
 			m_FXs[m_iSelectedFXIdx]->Tick(_fTimeDelta);
-			//m_fCurPlayDuration = m_FXs[m_iSelectedFXIdx]->m_fDuration.first;
-		}
 		else if (m_eSelected == SELECTED_MULTI_FX)
-		{
 			m_MultiFXs[m_iSelectedMultiFXIdx]->Tick(_fTimeDelta);
-			//m_fCurPlayDuration += m_MultiFXs[m_iSelectedMultiFXIdx]->m_fDuration.first;
-		}
 	}
 
 	return OBJ_NOEVENT;
@@ -716,7 +710,6 @@ void CFXToolDirector::Render_AxisLines()
 
 	_float4x4 VPMatrix = ViewMatrix * ProjMatrix;
 
-
 	auto TransformToScreen = [&](XMVECTOR worldPos)
 		{
 			XMVECTOR screenPos = XMVector3TransformCoord(worldPos, VPMatrix);
@@ -744,16 +737,13 @@ void CFXToolDirector::Render_AxisLines()
 	// 화살표를 그리는 람다 함수
 	auto AddArrow = [drawList](ImVec2 p1, ImVec2 p2, ImU32 col, float thickness, float arrowSize)
 		{
-			// 선을 그릴 벡터 계산
 			ImVec2 direction = ImVec2(p2.x - p1.x, p2.y - p1.y);
 			float length = sqrtf(direction.x * direction.x + direction.y * direction.y);
 			direction.x /= length;
 			direction.y /= length;
 
-			// 선을 그리기
 			drawList->AddLine(p1, p2, col, thickness);
 
-			// 화살표 머리 부분 계산
 			ImVec2 arrowLeft = ImVec2(
 				p2.x - direction.x * arrowSize - direction.y * arrowSize * 0.5f,
 				p2.y - direction.y * arrowSize + direction.x * arrowSize * 0.5f
@@ -763,25 +753,12 @@ void CFXToolDirector::Render_AxisLines()
 				p2.y - direction.y * arrowSize - direction.x * arrowSize * 0.5f
 			);
 
-			// 화살표 머리 그리기
 			drawList->AddTriangleFilled(p2, arrowLeft, arrowRight, col);
 		};
 
 	// 화살표 그리기
-	//AddArrow(screenXAxisStart, screenOrigin, IM_COL32(255, 50, 255, 255), 1.0f, 6.0f);
 	AddArrow(screenOrigin, screenXAxisEnd, IM_COL32(255, 50, 255, 255), 1.0f, 12.0f);
-	//AddArrow(screenZAxisStart, screenOrigin, IM_COL32(50, 50, 255, 255), 1.0f, 6.0f);
 	AddArrow(screenOrigin, screenZAxisEnd, IM_COL32(50, 50, 255, 255), 1.0f, 12.0f);
-
-
-	// Draw lines
-	//drawList->AddLine(screenXAxisStart, screenOrigin, IM_COL32(255, 50, 255, 255), 1.f);
-
-	//drawList->AddLine(screenOrigin, screenXAxisEnd, IM_COL32(255, 50, 255, 255), 1.f);
-
-	//drawList->AddLine(screenZAxisStart, screenOrigin, IM_COL32(50, 50, 255, 255), 1.f);
-
-	//drawList->AddLine(screenOrigin, screenZAxisEnd, IM_COL32(50, 50, 255, 255), 1.f);
 }
 
 HRESULT CFXToolDirector::Render()
@@ -828,7 +805,6 @@ void CFXToolDirector::Render_FXHierarchy()
 			break;
 		default:
 			strBaseName = "New FX ";
-			//singleFXDesc.strBufferTag = "Rect";
 			break;
 		}
 
@@ -855,7 +831,6 @@ void CFXToolDirector::Render_FXHierarchy()
 
 			++szSuffix;
 		}
-
 
 		//버퍼, 텍스쳐, 마스크 텍스쳐 컴포넌트 이름 떤져준다.
 		singleFXDesc.strBufferTag = strComponentTag + m_FXBufferList[m_iAddingFXBufferIdx];
@@ -953,9 +928,8 @@ void CFXToolDirector::Render_FXHierarchy()
 
 	if (Button(u8"파티클 생성"))
 	{
-		//		m_bOpenKeyframeEditor = false;
 
-				//이름 정해주기
+		//이름 정해주기
 		CParticle::PARTICLE_DESC ParticleDesc{};
 		string strComponentTag = "Prototype_Component_";
 
@@ -966,7 +940,6 @@ void CFXToolDirector::Render_FXHierarchy()
 			break;
 		default:
 			strBaseName = "Particle ";
-			//singleFXDesc.strBufferTag = "Rect";
 			break;
 		}
 
@@ -1013,6 +986,7 @@ void CFXToolDirector::Render_FXHierarchy()
 	BeginChild(u8"목록", ImVec2(0, 200), true);
 	for (_int i = 0; i < m_FXs.size(); ++i)
 	{
+		//목록 중 하나 선택하면 해당 객체의 값을 ui에 매칭
 		if (Selectable(m_FXs[i]->m_strFXName.c_str(), m_iSelectedFXIdx == i))
 		{
 			m_iSelectedFXIdx = i;
@@ -1028,6 +1002,7 @@ void CFXToolDirector::Render_FXHierarchy()
 			m_fLifetime[0] = m_FXs[i]->m_fLifetime.first;
 			m_fLifetime[1] = m_FXs[i]->m_fLifetime.second;
 
+			//파티클이면 추가 변수 매칭
 			if (m_eSelected == SELECTED_PARTICLE_FX)
 			{
 				CParticle* pCurParticle = static_cast<CParticle*>(m_FXs[i]);
@@ -1054,8 +1029,6 @@ void CFXToolDirector::Render_FXHierarchy()
 	//우측 키를 누르면 나오는 메뉴들
 	if (BeginPopup("FXMenu"))
 	{
-		//Begin(u8"제발", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse);
-
 		if (MenuItem(u8"선택된 이펙트 그룹에 추가") && m_iSelectedFXIdx != -1 && m_iSelectedMultiFXIdx != -1)
 		{
 			m_MultiFXs[m_iSelectedMultiFXIdx]->Add_Effect(m_FXs[m_iSelectedFXIdx]);
@@ -1146,6 +1119,7 @@ void CFXToolDirector::Render_FXHierarchy()
 
 			Make_Effect(FXData);
 		}
+
 		if (MenuItem(u8"변수만 복사 생성"))
 		{
 			//일단 단일 이펙트만
@@ -1186,7 +1160,6 @@ void CFXToolDirector::Render_FXHierarchy()
 
 			Make_Effect(FXData);
 		}
-
 
 		EndPopup();
 	}

@@ -35,7 +35,7 @@ HRESULT CLight_Manager::Add_Light(const LIGHT_DESC & LightDesc)
 	return S_OK;
 }
 
-HRESULT CLight_Manager::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer)
+HRESULT CLight_Manager::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer, _bool bForTool)
 {
 	// ºû ¼øÈ¸¸¦ µ·´Ù.
 	for (auto Light = m_Lights.begin(); Light != m_Lights.end();)
@@ -45,7 +45,7 @@ HRESULT CLight_Manager::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer)
 
 		// ºû ÄÃ¸µ
 		if ((*Light)->Compute_RenderCull())
-			(*Light)->Render(pShader, pVIBuffer);
+			(*Light)->Render(pShader, pVIBuffer, bForTool);
 
 		// ºû »çÇü ¼±°í
 		if (LightDead == true)
@@ -58,6 +58,7 @@ HRESULT CLight_Manager::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer)
 	}
 	return S_OK;
 }
+
 
 #ifdef _DEBUG
 void CLight_Manager::IMGUI_Tick()
