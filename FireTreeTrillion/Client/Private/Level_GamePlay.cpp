@@ -167,6 +167,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const wstring & strLayerTag)
 
 HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& strLayerTag)
 {
+	//파일명과 UITag 별도로 지정 필요
 	string strFilePath = { "../../../UI_txt/" };
 	string strUITag = { "LayerUI_Orig.txt" };
 
@@ -175,7 +176,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& strLayerTag)
 	if (!InputFile.is_open()) //==FALSE 
 	{
 		MSG_BOX(TEXT("Failed to Open : FileData"));
-		return FALSE;
+		return E_FAIL;
 	}
 
 	size_t size = 0;
@@ -191,7 +192,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& strLayerTag)
 		InputFile.read(&strProtoTag[0], iProtoTagLen);
 
 		if (0 == strProtoTag.size())
-			return FALSE;
+			return E_FAIL;
 
 		CUIObject::UIOBJ_DESC UIobj_Desc{};
 		string strUITag = {};
@@ -201,7 +202,6 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& strLayerTag)
 		InputFile.read(reinterpret_cast<char*>(&iUITagLen), sizeof(iUITagLen));
 		strUITag.resize(iUITagLen);
 		InputFile.read(&strUITag[0], iUITagLen);
-
 		UIobj_Desc.wstrUITag = CUtils::StrToWstr(strUITag);
 
 		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vCenter), sizeof(UIobj_Desc.vCenter));
@@ -218,6 +218,12 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& strLayerTag)
 		UIobj_Desc.wstrText = CUtils::StrToWstr(strText);
 
 		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vColorRGBA), sizeof(UIobj_Desc.vColorRGBA));
+
+		//if ("HUD_kribyStatus" == strUITag)
+		//{
+		//	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, CUtils::StrToWstr(strProtoTag), &UIobj_Desc)))
+		//		return E_FAIL;
+		//}
 
 		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, CUtils::StrToWstr(strProtoTag), &UIobj_Desc)))
 			return E_FAIL;

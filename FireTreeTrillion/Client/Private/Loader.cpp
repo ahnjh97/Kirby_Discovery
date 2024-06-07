@@ -18,18 +18,13 @@
 //스카이 스피어
 #include "SkySphere.h"
 
-
+//UI 툴
 #pragma region TOOL_UI
-
-#include "Editor_UI.h"
-#include "BackGround.h"
-
 #ifdef _DEBUG
 #include "Editor_UI.h"
 #endif
-
-//#include "TestUI.h"
 #include "LayerUI.h"
+
 #pragma endregion
 
 //이펙트 툴
@@ -69,6 +64,10 @@
 
 #include "Moon.h"
 #include "WasteCan.h"
+
+//UI
+#include "BackGround.h"
+#include "HUD_KirbyStatus.h"
 #pragma endregion
 
 
@@ -196,10 +195,16 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Trigger"), CTrigger);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("OrbitingCamera"), COrbitingCamera);
 
+#pragma region UI
+
 	// UI
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("LayerUI"), CLayerUI);
-	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("Multi_UI"), CMulti_UI);
-	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_KirbyStatus"), CHUD_KirbyStatus);
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_StarPoint"), CHUD_StarPoint);
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_HPBoss"), CHUD_HPBoss);
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_Mission"), CHUD_Mission);
+
+#pragma endregion
 	
 #pragma region FOR CLIENT
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kirby"), CKirby);
@@ -484,8 +489,8 @@ HRESULT CLoader::Loading_For_Tool_UI()
 
 #pragma region TEXTURE
 
-	//hr = Add_Texture(eLevel, "KirbyBarHard", "UI/HUD/Hero/BarHard/HeroPanelBarHard_%d.png", 3);
-	hr = Add_Texture(eLevel, "GameComplete", "UI/GAMECOMPLETE/GameComplete_%d.png", 21);
+	//hr = Add_Texture(eLevel, "GameComplete", "UI/GAMECOMPLETE/GameComplete_%d.png", 21);
+	hr = Add_Texture(eLevel, "HUD_KirbyStatus", "UI/HUD/Kirby/PanelHard/HeroPanelHard_%d.png", 16);
 	CHECK_FAILED(hr);
 
 	m_strLoadingText = TEXT("Loading For Texture : Complete!");

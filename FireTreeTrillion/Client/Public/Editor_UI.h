@@ -38,6 +38,8 @@ private:
 	_bool			Window_Textures();
 	_bool			Window_Properties();
 	_bool			Window_Tools();
+	_bool			Window_Sequencer();
+	void			Window_PopupAlert();
 
 	_bool			Set_OrthoProj(); //투영스페이스 직교 
 	_bool			Set_GizmoGrid(); //기즈모 위젯 그리드 세팅
@@ -47,6 +49,7 @@ private:
 	_bool			Edit_RGBAColor(); //색상 편집
 
 	_bool			Edit_Text(); //텍스트 편집
+	_bool			Edit_LayerUITag(string _strInput);
 	_bool			Set_TextSync(string _strInput);
 
 	void			Create_UIObject(UI_STATE _eUIState, UI_TYPE _eUIType);

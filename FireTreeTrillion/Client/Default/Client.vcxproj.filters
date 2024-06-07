@@ -208,6 +208,9 @@
     <Filter Include="02.GameObjects\PhysXObject\RigidObject\WasteCan">
       <UniqueIdentifier>{f175b95e-a1d4-47cd-9d10-49f323d1f526}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\UI\HUD\Status">
+      <UniqueIdentifier>{40b17e1d-b951-4cde-ac57-e7be68df93a9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -420,7 +423,9 @@
     <ClInclude Include="..\Public\WasteCan.h">
       <Filter>02.GameObjects\PhysXObject\RigidObject\WasteCan</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Multi_UI.h" />
+    <ClInclude Include="..\Public\HUD_KirbyStatus.h">
+      <Filter>02.GameObjects\UI\HUD</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -615,7 +620,9 @@
     <ClCompile Include="..\Private\WasteCan.cpp">
       <Filter>02.GameObjects\PhysXObject\RigidObject\WasteCan</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Multi_UI.cpp" />
+    <ClCompile Include="..\Private\HUD_KirbyStatus.cpp">
+      <Filter>02.GameObjects\UI\HUD</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

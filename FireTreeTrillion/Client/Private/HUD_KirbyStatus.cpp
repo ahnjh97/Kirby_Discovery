@@ -1,22 +1,22 @@
 #include "stdafx.h"
-#include "LayerUI.h"
+#include "HUD_KirbyStatus.h"
 
-CLayerUI::CLayerUI(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext)
+CHUD_KirbyStatus::CHUD_KirbyStatus(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext)
 	: CUIObject{ _pDevice, _pContext }
 {
 }
 
-CLayerUI::CLayerUI(const CLayerUI& _rhs)
+CHUD_KirbyStatus::CHUD_KirbyStatus(const CHUD_KirbyStatus& _rhs)
 	: CUIObject{ _rhs }
 {
 }
 
-HRESULT CLayerUI::Initialize_Prototype()
+HRESULT CHUD_KirbyStatus::Initialize_Prototype()
 {
 	return S_OK;
 }
 
-HRESULT CLayerUI::Initialize(void* _pArg)
+HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 {
 	HRESULT hr = __super::Initialize(_pArg);
 	CHECK_FAILED(hr);
@@ -56,28 +56,31 @@ HRESULT CLayerUI::Initialize(void* _pArg)
 	return S_OK;
 }
 
-_int CLayerUI::Tick(_float fTimeDelta)
+_int CHUD_KirbyStatus::Tick(_float fTimeDelta)
 {	
 	__super::Tick(fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
 
-void CLayerUI::Late_Tick(_float fTimeDelta)
+void CHUD_KirbyStatus::Late_Tick(_float fTimeDelta)
 {
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_UI, this);
 }
 
-HRESULT CLayerUI::Render()
+HRESULT CHUD_KirbyStatus::Render()
 {
 	if (UI_TEXTURE == m_UIObjDesc.eUIType)
 	{
-		if (FAILED(Bind_ShaderResources(m_pShaderCom, PS_ALPHABLEND, m_pTransformCom, m_pTextureCom, m_iTexIndex)))
+		// PS_ALPHABLEND > PS_DEFAULT로 변경
+		if (FAILED(Bind_ShaderResources(m_pShaderCom, PS_DEFAULT, m_pTransformCom, m_pTextureCom, m_iTexIndex)))
 			return E_FAIL;
 	}
 
 	if (UI_FONT == m_UIObjDesc.eUIType)
 	{
+		//if (FAILED(Bind_ShaderResources(m_pShaderCom, PS_DEFAULT, m_pTransformCom)))
+		//	return E_FAIL;
 		_float2 vFontPos = { m_UIObjDesc.vPos.x + m_UIObjDesc.vCenter.x, 
 							- m_UIObjDesc.vPos.y + m_UIObjDesc.vCenter.y};
 
@@ -91,14 +94,14 @@ HRESULT CLayerUI::Render()
 	return S_OK;
 }
 
-HRESULT CLayerUI::Add_Components()
+HRESULT CHUD_KirbyStatus::Add_Components()
 {
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex"),
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_KirbyStatus"),
-	//if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_GameComplete"),
+	//if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_KirbyBarHard"),
+	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_GameComplete"),
 		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
 		return E_FAIL;
 
@@ -109,7 +112,7 @@ HRESULT CLayerUI::Add_Components()
 	return S_OK;
 }
 
-HRESULT CLayerUI::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTransform* _pTransCom, CTexture* _pTextureCom, _uint _iTexIndex)
+HRESULT CHUD_KirbyStatus::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTransform* _pTransCom, CTexture* _pTextureCom, _uint _iTexIndex)
 {
 	CHECK_NULLPTR(_pShaderCom);
 
@@ -131,9 +134,6 @@ HRESULT CLayerUI::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, 
 	//셰이더 파일의 텍스처 정보를 가져와 바인딩
 	_pTextureCom->Bind_ShaderResource(_pShaderCom, "g_DiffuseTexture", _iTexIndex);
 
-	//셰이더의 원시데이터 가져와 저장
-	_pShaderCom->Bind_RawValue("g_vRColor", &m_vColorRGBA, sizeof(_float4));
-
 	//Begin() > Apply() 함수 호출 전 셰이더 전역 데이터를 저장해야함
 	if (FAILED(_pShaderCom->Begin(_iPassIndex)))
 		return E_FAIL;
@@ -144,7 +144,7 @@ HRESULT CLayerUI::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, 
 	return S_OK;
 }
 
-HRESULT CLayerUI::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTransform* _pTransCom)
+HRESULT CHUD_KirbyStatus::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTransform* _pTransCom)
 {
 	CHECK_NULLPTR(_pShaderCom);
 
@@ -168,7 +168,7 @@ HRESULT CLayerUI::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, 
 	return S_OK;
 }
 
-HRESULT CLayerUI::Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom)
+HRESULT CHUD_KirbyStatus::Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom)
 {
 	if (FAILED(_pVIBufferCom->Bind_Buffers()))
 		return E_FAIL;
@@ -179,33 +179,33 @@ HRESULT CLayerUI::Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom)
 	return S_OK;
 }
 
-CLayerUI* CLayerUI::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CHUD_KirbyStatus* CHUD_KirbyStatus::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	CLayerUI* pInstance = new CLayerUI(pDevice, pContext);
+	CHUD_KirbyStatus* pInstance = new CHUD_KirbyStatus(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CLayerUI"));
+		MSG_BOX(TEXT("Failed To Created : CHUD_KirbyStatus"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CGameObject* CLayerUI::Clone(void* pArg)
+CGameObject* CHUD_KirbyStatus::Clone(void* pArg)
 {
-	CLayerUI* pInstance = new CLayerUI(*this);
+	CHUD_KirbyStatus* pInstance = new CHUD_KirbyStatus(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Clone : CLayerUI"));
+		MSG_BOX(TEXT("Failed To Clone : CHUD_KirbyStatus"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CLayerUI::Free()
+void CHUD_KirbyStatus::Free()
 {
 	Safe_Release(m_pTextureCom);
 	Safe_Release(m_pShaderCom);
