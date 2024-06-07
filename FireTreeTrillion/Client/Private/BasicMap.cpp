@@ -70,18 +70,10 @@ _int CBasicMap::Tick(_float fTimeDelta)
     m_fTime += fTimeDelta;
 
     if (m_pGameInstance->Get_KeyState(DIK_Q, KEY_DOWN))
-    {
         m_bCull = !m_bCull;
-    }
        
-
     if (nullptr != m_pBlendMap)
-    {
         m_pBlendMap->Tick(fTimeDelta);
-
-        if(m_bCull)
-            m_pModelCom->Culling(m_pTransformCom->Get_WorldMatrix_Inverse());
-    }
        
     return OBJ_NOEVENT;
 }
@@ -100,6 +92,9 @@ HRESULT CBasicMap::Render()
         return E_FAIL;
     if (LEVEL_GAMEPLAY == *m_pGameInstance->Get_CurrentLevelID() && false == m_bBlendMap)
     {
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fNonMatchTime, sizeof(_float))))
+            return E_FAIL;
+
         m_iRenderAll = 0;
         m_iRenderMyMesh = 0;
         m_pOcTree->Culling(m_pGameInstance, m_pShaderCom, m_iRenderAll, m_iRenderMyMesh);
@@ -135,7 +130,7 @@ HRESULT CBasicMap::Render()
                 return E_FAIL;
         }
     }
-    
+
     return S_OK;
 }
 
@@ -164,13 +159,9 @@ void CBasicMap::Render_IMGUI()
 
 HRESULT CBasicMap::Add_Components(const wstring& _wstrModelTag)
 {
-    wstring wstrShaderPrototypeTag = TEXT("Prototype_Component_Shader_VtxModel_");
-    if (LEVEL_GAMEPLAY == *m_pGameInstance->Get_CurrentLevelID() && false == m_bBlendMap)
-        wstrShaderPrototypeTag += TEXT("Octree");
-    else
-        wstrShaderPrototypeTag += TEXT("Map");
     /* For.Com_Shader */
-    if (FAILED(__super::Add_Component(wstrShaderPrototypeTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
+    if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Shader_VtxModel_Map"),
+        TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
         return E_FAIL;
 
     /* For.Com_Model */
@@ -178,10 +169,15 @@ HRESULT CBasicMap::Add_Components(const wstring& _wstrModelTag)
         TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
         return E_FAIL;
 
-    /* For. Com_Texture */
-    if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Texture_GsLandTopNoize_Fur"),
-        TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
-        return E_FAIL;
+    ///* For. Com_Texture_Noise */
+    //if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Texture_GsLandTopNoize_Fur"),
+    //    TEXT("Com_Texture_Noise"), (CComponent**)&m_pTextureCom[TEX_NOISE])))
+    //    return E_FAIL;
+
+    ///* For. Com_Texture */
+    //if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Texture_GsDefaultSideRockC_Height"),
+    //    TEXT("Com_Texture_Height"), (CComponent**)&m_pTextureCom[TEX_HEIGHT])))
+    //    return E_FAIL;
 
     return S_OK;
 }
@@ -197,8 +193,8 @@ HRESULT CBasicMap::Bind_ShaderResources()
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
         return E_FAIL;
-    if (FAILED(m_pTextureCom->Bind_ShaderResources(m_pShaderCom, "g_NoiseTexture")))
-        return E_FAIL;
+    //if (FAILED(m_pTextureCom[TEX_NOISE]->Bind_ShaderResources(m_pShaderCom, "g_NoiseTexture")))
+    //    return E_FAIL;
 
     return S_OK;
 }
@@ -364,7 +360,8 @@ void CBasicMap::Free()
 
     Safe_Release(m_pOcTree);
     Safe_Release(m_pBlendMap);
-    Safe_Release(m_pTextureCom);
+    for(_uint i = 0; i < TEX_END; i++)
+        Safe_Release(m_pTextureCom[i]);
 
     Safe_Release(m_pShaderCom);
     Safe_Release(m_pModelCom);

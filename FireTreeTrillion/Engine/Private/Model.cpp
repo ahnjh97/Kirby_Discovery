@@ -333,43 +333,6 @@ COcTree* CModel::Create_OcTree(_float3 vMin, _float3 vMax, vector<_uint>& _vecPa
 	return pOctree;
 }
 
-void CModel::Culling(_fmatrix matWorldInverse)
-{
-	/*if (false == m_tModel.bOctree || m_pMergedMesh == nullptr)
-		return;
-
-	m_pGameInstance->TransformFrustum_LocalSpace(matWorldInverse);
-
-	_float3* pVerticePoses = m_pMergedMesh->Get_VerticesPtr();
-	_uint iNumvertices = m_pMergedMesh->Get_NumVertices();
-	vector<FACE> vecResultFaces;
-
-	m_pOctree->Culling(m_pGameInstance, pVerticePoses, iNumvertices, vecResultFaces);
-		
-	D3D11_MAPPED_SUBRESOURCE		SubResource{};
-	ID3D11Buffer* pMeshIB = m_pMergedMesh->Get_IndexBufferPtr();
-
-	m_pContext->Map(pMeshIB, 0, D3D11_MAP_WRITE_DISCARD, 0, &SubResource);
-	_uint* pIndices = static_cast<_uint*>(SubResource.pData);
-	if (nullptr == pIndices)
-	{
-		m_pContext->Unmap(pMeshIB, 0);
-		return;
-	}
-
-	memcpy(pIndices, vecResultFaces.data(), vecResultFaces.size() * sizeof(FACE));
-
-	m_pMergedMesh->Set_NumIndices(vecResultFaces.size() * 3);
-	m_pContext->Unmap(pMeshIB, 0);
-	
-	return;*/
-}
-
-void CModel::Save_OctreeData()
-{
-	
-}
-
 void CModel::Create_MergedMesh(_fmatrix TransformMatrix)
 {
 	vector<_float3*> vecMeshVerticesPtrs;

@@ -49,6 +49,9 @@ HRESULT COcTree::Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext
 		m_vecMaterials[iMeshIdx][TEX_DIFFUSE] = _vecMaterials[iMatIndex].MaterialTextures[TextureType_DIFFUSE];
 		m_vecMaterials[iMeshIdx][TEX_NORMAL] = _vecMaterials[iMatIndex].MaterialTextures[TextureType_NORMALS];
 		m_vecMaterials[iMeshIdx][TEX_MRA] = _vecMaterials[iMatIndex].MaterialTextures[TextureType_METALNESS];
+		Safe_AddRef(_vecMaterials[iMatIndex].MaterialTextures[TextureType_DIFFUSE]);
+		Safe_AddRef(_vecMaterials[iMatIndex].MaterialTextures[TextureType_NORMALS]);
+		Safe_AddRef(_vecMaterials[iMatIndex].MaterialTextures[TextureType_METALNESS]);
 	}
 
 	if (false == Load_OctreeData(fileInput))
@@ -78,6 +81,8 @@ HRESULT COcTree::Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext
 
 		m_vecMyMeshes.push_back(pMyMesh);
 		m_vecMyMaterials.push_back(m_vecMaterials[iMeshIdx]);
+		for (auto& tex : m_vecMaterials[iMeshIdx])
+			Safe_AddRef(tex);
 		m_vecMyPassIndices.push_back(m_vecPassIndices[iMeshIdx]);
 		m_vecMySamplingFactors.push_back(m_vecSamplingFactors[iMeshIdx]);
 	}
@@ -122,7 +127,7 @@ HRESULT COcTree::Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext
 
 		for (_uint iMeshIdx = 0; iMeshIdx < m_iNumMeshes; iMeshIdx++)
 			IdentifyOctant(iMeshIdx, _vecVerticesPtrs[iMeshIdx], _vecNumVertices[iMeshIdx], vecMeshResultFaces[iMeshIdx]);
-
+	}
 		// Create Mesh
 		for (_uint iMeshIdx = 0; iMeshIdx < m_iNumMeshes; iMeshIdx++) {
 			if (_vecMeshFaces[iMeshIdx].empty())
@@ -136,6 +141,8 @@ HRESULT COcTree::Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext
 
 			m_vecMeshes.push_back(pMyMesh);
 			m_vecMaterials.push_back(_vecSortedMaterials[iMeshIdx]);
+			for (auto& tex : _vecSortedMaterials[iMeshIdx])
+				Safe_AddRef(tex);
 			m_vecPassIndices.push_back(_vecPassIndices[iMeshIdx]);
 			m_vecSamplingFactors.push_back(_vecSamplingFactors[iMeshIdx]);
 		}
@@ -153,9 +160,10 @@ HRESULT COcTree::Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext
 
 			m_vecMyMeshes.push_back(pMyMesh);
 			m_vecMyMaterials.push_back(_vecSortedMaterials[iMeshIdx]);
+			for(auto& tex : _vecSortedMaterials[iMeshIdx])
+				Safe_AddRef(tex);
 			m_vecMyPassIndices.push_back(_vecPassIndices[iMeshIdx]);
 			m_vecMySamplingFactors.push_back(_vecSamplingFactors[iMeshIdx]);
-		}
 	}
 
 	_uint iTotal{};
@@ -163,7 +171,7 @@ HRESULT COcTree::Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext
 		iTotal += mesh->Get_NumIndices();
 
 	if (m_vecMeshes.empty() || iTotal / m_vecMeshes.size() < 4096
-		|| abs(XMVectorGetX(XMVector3Length(m_vecEdges[OC_XYZ] - m_vecEdges[OC_xyz]))) < 32)
+		|| abs(XMVectorGetX(XMVector3Length(m_vecEdges[OC_XYZ] - m_vecEdges[OC_xyz]))) < 36)
 		return S_OK;
 
 	// Create Children
@@ -191,9 +199,10 @@ void COcTree::Culling(CGameInstance* pGameInstance, CShader* pShaderCom, _uint& 
 			iInFrustum++;
 	}
 
-	if (iInFrustum == OC_END) {
+	if (iInFrustum >= OC_END) {
 		RenderAll(pShaderCom);
 		iRenderAll++;
+		return;
 	}
 		
 	else if (iInFrustum > 0)
@@ -497,8 +506,8 @@ void COcTree::Free()
 		Safe_Release(mesh);
 	m_vecMeshes.clear();
 
-	for (auto& ambigMesh : m_vecMyMeshes)
-		Safe_Release(ambigMesh);
+	for (auto& myMesh : m_vecMyMeshes)
+		Safe_Release(myMesh);
 	m_vecMyMeshes.clear();
 
 	for (auto& vecTex : m_vecMaterials)
@@ -509,11 +518,11 @@ void COcTree::Free()
 	}
 	m_vecMaterials.clear();
 
-	for (auto& vecAmbigTex : m_vecMyMaterials)
+	for (auto& vecMyTex : m_vecMyMaterials)
 	{
-		for (auto& ambigTex : vecAmbigTex)
-			Safe_Release(ambigTex);
-		vecAmbigTex.clear();
+		for (auto& tex : vecMyTex)
+			Safe_Release(tex);
+		vecMyTex.clear();
 	}
 	m_vecMyMaterials.clear();
 

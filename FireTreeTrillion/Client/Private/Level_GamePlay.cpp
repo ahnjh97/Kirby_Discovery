@@ -6,6 +6,7 @@
 #include "Camera_Free.h"
 #include "BasicMap.h"
 #include "Trigger.h"
+#include "BG.h"
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -291,6 +292,11 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 			tTriggerDesc.iTriggerType = iTriggerType;
 			tTriggerDesc.iTriggerIndex = iTriggerIndex;
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Trigger"), TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc)))
+				return E_FAIL;
+		}
+		else if (strModelName == "BG1")
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_BG"), &tempDesc)))
 				return E_FAIL;
 		}
 	}

@@ -7,6 +7,7 @@ namespace Client
 {
 	enum LEVEL { LEVEL_STATIC, LEVEL_LOADING, 
                  LEVEL_LOGO = 2, 
+                 LEVEL_INTRO,
                  LEVEL_GAMEPLAY, 
 
                 //============= TOOL

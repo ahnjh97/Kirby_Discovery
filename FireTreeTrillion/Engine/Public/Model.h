@@ -80,8 +80,6 @@ public:
 
 	void Find_MinMax(_float3& vMin, _float3& vMax);
 	class COcTree* Create_OcTree(_float3 vMin, _float3 vMax, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors);
-	void Culling(_fmatrix matWorldInverse);
-	void Save_OctreeData();
 
 	void Create_MergedMesh(_fmatrix TransformMatrix);
 	void Bind_TextureArrays();

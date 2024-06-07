@@ -54,7 +54,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	CHECK_FAILED(hr);
 
 	m_vecLevelName = { "Level_Static", "Level_Loading", "Level_Logo", // 두번째 줄에 실제 인게임 레벨 추가
-			"GamePlay",
+			"Intro", "GamePlay",
 			"Level_Tool_UI", "Level_Tool_FX", "Level_Tool_Anim", "Level_Tool_Map", "Level_End" };
 	m_vecMapModelNames = { "Level0Stage1Step01", "Level1Stage1Step01"};
 	vecPassIndices.resize(m_vecMapModelNames.size());
@@ -135,10 +135,26 @@ void CMapToolHelper::SetUpTxtVectors(TYPE _eType)
 void CMapToolHelper::Menu_Level()
 {
 	ImGui::SeparatorText("Level");
-	for (_int i = LEVEL_GAMEPLAY; i < LEVEL_GAMEPLAY + 1; i++)
+	for (_int i = LEVEL_INTRO; i <= LEVEL_GAMEPLAY; i++)
 	{
-		if (ImGui::RadioButton(m_vecLevelName[i].c_str(), iLevelIndex == i - LEVEL_GAMEPLAY))
-			iLevelIndex = i - LEVEL_GAMEPLAY; // 선택 시 실행할 로직 추가
+		if (ImGui::RadioButton(m_vecLevelName[i].c_str(), iLevelIndex == i - LEVEL_INTRO)) {
+			ImGui::OpenPopup("Example Popup");
+			iLevelIndex = i - LEVEL_INTRO; 
+
+			if (ImGui::BeginPopup("Example Popup"))
+			{
+				string strMsg = "Open " + m_vecLevelName[i] + "?";
+				ImGui::Text(strMsg.c_str());
+				if (ImGui::Button("Close"))
+				{
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+		}
+
+		if (i % 2 == 1)
+			ImGui::SameLine();
 	}
 	if (ImGui::Button("Save", ImVec2(100, 40)))
 		Save_Level();
@@ -409,9 +425,17 @@ void CMapToolHelper::OnRightClick()
 
 		if (Compute_MapIndex(m_vecNonAnimTxts[iNonAnimIdx]) == -1) // 맵이 아닐때
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), 
-				TEXT("Prototype_GameObject_MapToolObject"), &tMapToolDesc)))
-				return;
+			if (tMapToolDesc.wstrModelName == TEXT("BG1")) {
+				if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"),
+					TEXT("Prototype_GameObject_BG"), &tMapToolDesc)))
+					return;
+			}
+			else
+			{
+				if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"),
+					TEXT("Prototype_GameObject_MapToolObject"), &tMapToolDesc)))
+					return;
+			}
 		}
 		else
 		{
@@ -450,7 +474,7 @@ void CMapToolHelper::Save_Level()
 	if (iLevelIndex < 0)
 		return;
 
-	string strLevel = m_vecLevelName[iLevelIndex + LEVEL_GAMEPLAY];
+	string strLevel = m_vecLevelName[iLevelIndex + LEVEL_INTRO];
 	string tempFileName = "temp_" + strLevel + ".txt";
 	
 	ofstream outputFile(tempFileName, ios::out | ios::binary);
@@ -575,7 +599,7 @@ void CMapToolHelper::Load_Level()
 	On_DIK_Delete();
 	m_pGameInstance->Clear_Layer(LEVEL_TOOL_MAP, TEXT("Layer_Parse"));
 
-	string strLevel = m_vecLevelName[iLevelIndex + LEVEL_GAMEPLAY];
+	string strLevel = m_vecLevelName[iLevelIndex + LEVEL_INTRO];
 	string strFileName = "../../../objects_txt/" + strLevel + ".txt";
 
 	fstream fileStream(strFileName, ios::in | ios::binary);
@@ -664,10 +688,14 @@ void CMapToolHelper::Load_Level()
 		}	
 		else
 		{
-			wstrGameObjectTag = TEXT("MapToolObject");
+			if ("BG1" == strModelName)
+				wstrGameObjectTag = TEXT("BG");
+			else
+				wstrGameObjectTag = TEXT("MapToolObject");
+			
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
 			{
-				wstring wstrErrorMsg = TEXT("Failed to Clone MapToolObject") + wstrGameObjectTag;
+				wstring wstrErrorMsg = TEXT("Failed to Clone: ") + wstrGameObjectTag;
 				MSG_BOX(wstrErrorMsg.c_str());
 				fileStream.close();
 				return;
@@ -885,11 +913,7 @@ void CMapToolHelper::Reset_MapShaderInfo()
 
 void CMapToolHelper::Save_Octree()
 {
-	CModel* pModel = dynamic_cast<CModel*>(m_pPickedObject->Get_Component(TEXT("Com_Model")));
-	if (nullptr == pModel)
-		return;
 
-	pModel->Save_OctreeData();
 }
 
 CMapToolHelper* CMapToolHelper::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
