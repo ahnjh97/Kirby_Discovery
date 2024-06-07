@@ -15,6 +15,7 @@ public:
 		_float4x4	matWorld;
 		_bool		bTrigger;
 		_bool		bDynamic;
+		_bool		bKinematic;
 		_float		fOffsetSize;
 		_float3		vMaterial = {0.5f, 0.5f, 0.5f};
 		CGameObject* pObj = { nullptr };
@@ -23,10 +24,11 @@ public:
 			_float4x4 _matWorld = {},
 			_bool _bTrigger = { false },
 			_bool _bDynamic = { true },
+			_bool _bKinematic = { false },
 			_float _fOffsetSize = {},
 			_float3 _vMaterial = { 0.5f, 0.5f, 0.5f },
 			CGameObject* _pObj = {}
-		) : eShapeType(_eShapeType), matWorld(_matWorld), bTrigger(_bTrigger), bDynamic(_bDynamic), fOffsetSize(_fOffsetSize), vMaterial(_vMaterial), pObj(_pObj) {}
+		) : eShapeType(_eShapeType), matWorld(_matWorld), bTrigger(_bTrigger), bDynamic(_bDynamic), bKinematic(_bKinematic),fOffsetSize(_fOffsetSize), vMaterial(_vMaterial), pObj(_pObj) {}
 	};
 
 private:
@@ -87,6 +89,7 @@ protected:
 	_float3				m_vMaterial = { 0.5f, 0.5f, 0.6f };
 	_float				m_fOffsetSize = { 1.f };
 	_bool				m_bDynamic = { true };
+	_bool				m_bKinematic = { false };
 
 	_int				m_iTriggerType = { -1 };
 	_int				m_iTriggerIndex = { -1 };

@@ -93,19 +93,19 @@ _int CTestModel::Tick(_float fTimeDelta)
 
     // 예시코드 5 : 계산기 예시 코드 (월드 매트리스로 예시든거임 이건 정신나간 코드이므로 참고해주셈)
     // 예시코드 6 : DInput + KeyPress 예시 코드
-    //if (m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_PRESS))
-    //{
-    //    _float4x4 Worldmatrix = m_pTransformCom->Get_WorldFloat4x4();
-    //    _vector vLook = CUtils::Get_State_Vector_Matrix(Worldmatrix, CUtils::STATE_LOOK);
-    //    _vector vPos = CUtils::Get_State_Vector_Matrix(Worldmatrix, CUtils::STATE_POSITION);
-    //    _float fSpeed = 3.f;
+    if (m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_PRESS) && m_pGameInstance->Get_DIKeyState(DIK_LCONTROL, KEY_PRESS))
+    {
+        _float4x4 Worldmatrix = m_pTransformCom->Get_WorldFloat4x4();
+        _vector vLook = CUtils::Get_State_Vector_Matrix(Worldmatrix, CUtils::STATE_LOOK);
+        _vector vPos = CUtils::Get_State_Vector_Matrix(Worldmatrix, CUtils::STATE_POSITION);
+        _float fSpeed = 3.f;
 
-    //    vPos += vLook * fTimeDelta * fSpeed;
+        vPos += vLook * fTimeDelta * fSpeed;
 
-    //    CUtils::Set_State_Matrix(Worldmatrix, CUtils::STATE_POSITION, vPos);
+        CUtils::Set_State_Matrix(Worldmatrix, CUtils::STATE_POSITION, vPos);
 
-    //    m_pTransformCom->Set_WorldMatrix(Worldmatrix);
-    //}
+        m_pTransformCom->Set_WorldMatrix(Worldmatrix);
+    }
     
     // 예시코드 6 : DInput + KeyPress 예시 코드 
     //if (m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_PRESS))
@@ -116,21 +116,21 @@ _int CTestModel::Tick(_float fTimeDelta)
     //    m_pControllerCom->Move(m_pTransformCom, fSpeed, fTimeDelta);
     //}
 
-    if (m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_PRESS))
-    {
-        m_pTransformCom->Turn(XMVectorSet(0.f, -1.f, 0.f, 0.f), fTimeDelta);
-    }
+    //if (m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_PRESS))
+    //{
+    //    m_pTransformCom->Turn(XMVectorSet(0.f, -1.f, 0.f, 0.f), fTimeDelta);
+    //}
 
-    if (m_pGameInstance->Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
-    {
-        m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta);
-    }
+    //if (m_pGameInstance->Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
+    //{
+    //    m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta);
+    //}
 
-    if (m_pGameInstance->Get_DIKeyState(DIK_SPACE, KEY_DOWN))
-    {
-        m_isJump = true;
-        m_fJumpVelocity = 5.f;
-    }
+    //if (m_pGameInstance->Get_DIKeyState(DIK_SPACE, KEY_DOWN))
+    //{
+    //    m_isJump = true;
+    //    m_fJumpVelocity = 5.f;
+    //}
 
     //if (m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_PRESS))
     //{
@@ -148,14 +148,14 @@ _int CTestModel::Tick(_float fTimeDelta)
 
     // 예시코드 7 : 랜덤 벡터 뽑기
     // 예시코드 8 : DInput + KeyDown 예시코드
-    if (m_pGameInstance->Get_DIKeyState(DIK_E, KEY_DOWN))
-    {
-        // 0.5f 길이의 랜덤한 방향의 벡터 생성
-        _vector vRandomVector = CUtils::Make_Random_Vector(0.5f);
-        _vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+    //if (m_pGameInstance->Get_DIKeyState(DIK_E, KEY_DOWN))
+    //{
+    //    // 0.5f 길이의 랜덤한 방향의 벡터 생성
+    //    _vector vRandomVector = CUtils::Make_Random_Vector(0.5f);
+    //    _vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 
-        m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vRandomVector);
-    }
+    //    m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vRandomVector);
+    //}
 
 
     // 예시코드 9 : Radial Blur Center
@@ -324,7 +324,7 @@ HRESULT CTestModel::Add_Components()
     /* For.Com_RigidBody */
     CRigidBody::RIGIDBODY_DESC rigidDesc {};
     rigidDesc.bTrigger = false;
-    rigidDesc.bDynamic = true;
+    rigidDesc.bKinematic = true;
     rigidDesc.eShapeType = RIGID_CAPSULE;
     rigidDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
     hr = __super::Add_Component(TEXT("Prototype_Component_RigidBody"),

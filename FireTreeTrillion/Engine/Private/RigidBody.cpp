@@ -28,6 +28,7 @@ HRESULT CRigidBody::Initialize(void * pArg)
 	m_vMaterial				= pDesc->vMaterial;
 	m_fOffsetSize			= pDesc->fOffsetSize;
 	m_bDynamic				= pDesc->bDynamic;
+	m_bKinematic			= pDesc->bKinematic;
 	m_pActorObject			= pDesc->pObj;
 
 	Create_Actor();
@@ -36,19 +37,25 @@ HRESULT CRigidBody::Initialize(void * pArg)
 
 void CRigidBody::Update(CTransform* pTransform)
 {
-	Set_PxWorldMatrix(pTransform->Get_WorldFloat4x4());
+	if(!m_bKinematic)
+		Set_PxWorldMatrix(pTransform->Get_WorldFloat4x4());
+	else if (m_bKinematic && Is_Activated())
+		m_pActor->setKinematicTarget(physx::PxTransform{CUtils::To_Float4x4(pTransform->Get_WorldFloat4x4())});
 }
 
 void CRigidBody::Update(_fmatrix matrix)
 {
-	Set_PxWorldMatrix(matrix);
+	if (!m_bKinematic)
+		Set_PxWorldMatrix(matrix);
+	else if (m_bKinematic && Is_Activated())
+		m_pActor->setKinematicTarget(physx::PxTransform{CUtils::To_Float4x4(matrix)});
 }
 
 void CRigidBody::Update_PhysX(CTransform* pTransform)
 {
 	if (Is_Activated() == false) return;
 
-	if (false == m_bTrigger)
+	if (false == m_bKinematic && false == m_bTrigger)
 	{
 		pTransform->Set_WorldMatrix(Get_PxWorldMatrix());
 	}
@@ -68,6 +75,7 @@ void CRigidBody::Render_IMGUI()
 			m_pGameInstance->Get_Scene()->addActor(*m_pActor);
 	}
 	ImGui::Checkbox("bTrigger",		&m_bTrigger);
+	ImGui::Checkbox("bKinematic",	&m_bKinematic);
 	ImGui::InputFloat("Density",	&m_fDensity);
 
 	ImGui::Indent(20.f);
@@ -162,9 +170,10 @@ void CRigidBody::SetUp_Actor()
 		if(true == m_bDynamic)
 			m_pActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, true);
 	}
-
-	if (true == m_bDynamic)
-		m_pActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, true);
+	else
+	{
+		m_pActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, m_bKinematic);
+	}
 
 	if(nullptr != m_pActor)
 		m_pActor->userData = this;
@@ -235,9 +244,11 @@ void CRigidBody::Add_Force(_float3 vForce)
 {
 	if (m_pActor == nullptr) return;
 
-	// Trigger는 어떻게 사용할 지 추후 의논 예정
-	physx::PxVec3 PxForce = physx::PxVec3(vForce.x, vForce.y, vForce.z);
-	m_pActor->addForce(PxForce, physx::PxForceMode::eFORCE);
+	if (false == m_bKinematic && false == m_bTrigger)
+	{
+		physx::PxVec3 PxForce = physx::PxVec3(vForce.x, vForce.y, vForce.z);
+		m_pActor->addForce(PxForce, physx::PxForceMode::eFORCE);
+	}
 }
 
 physx::PxTransform CRigidBody::Get_PxTransform()
