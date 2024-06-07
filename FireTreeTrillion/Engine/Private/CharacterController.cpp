@@ -416,7 +416,6 @@ void CCharacterController::Overlap_Hitbox()
 
 	// PxExtendedVec3에서 PxVec3로 변환
 	PxVec3 controllerVec3Position((_float)controllerPosition.x, (_float)controllerPosition.y, (_float)controllerPosition.z);
-	//PxVec3 controllerVec3Position(controllerPosition.x, controllerPosition.y, controllerPosition.z);
 
 	// 히트박스 위치 설정 (플레이어 앞)
 	PxVec3 hitboxPosition = PxVec3(3.f, 9.f, -171.f); //controllerVec3Position + PxVec3(0.5f, -0.5f, 0.0f);
@@ -503,8 +502,8 @@ void CCharacterController::Create_Controller()
 
 	PxShape* shape;
 	m_pController->getActor()->getShapes(&shape, 1);
-	shape->setSimulationFilterData(physx::PxFilterData{ static_cast<physx::PxU32>(m_eCollisionType), 0, 0, 0 });
-	//shape->setQueryFilterData(physx::PxFilterData{static_cast<physx::PxU32>(1), 0, 0, 0});
+	shape->setSimulationFilterData(physx::PxFilterData{ /*static_cast<physx::PxU32>(m_eCollisionType)*/1, 1, 0, 0 });
+	shape->setQueryFilterData(physx::PxFilterData{/*static_cast<physx::PxU32>(1)*/ 1, 1, 0, 0});//});
 	//m_pGameInstance->RemoveActor(*m_pController->getActor());
 
 	if (m_pObject != nullptr)

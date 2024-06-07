@@ -8,6 +8,7 @@ CPhysX::CPhysX()
 {
 }
 
+
 HRESULT CPhysX::Initialize()
 {
     // init physx
@@ -28,7 +29,7 @@ HRESULT CPhysX::Initialize()
     m_pDispatcher = physx::PxDefaultCpuDispatcherCreate(2);
     sceneDesc.cpuDispatcher = m_pDispatcher;
     sceneDesc.simulationEventCallback = m_pEventCallBack;
-    sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
+    sceneDesc.filterShader = CustomFilterShader; // 필터 셰이더 설정
     sceneDesc.broadPhaseType = PxBroadPhaseType::eSAP; // 또는 eMBP
 
     m_pScene = m_pPhysics->createScene(sceneDesc);
@@ -47,7 +48,6 @@ HRESULT CPhysX::Initialize()
 
     //physx::PxRigidStatic* groundPlane = PxCreatePlane(*m_pPhysics, physx::PxPlane(0, 1, 0, 0), *m_pMaterial);
     //m_pScene->addActor(*groundPlane);
-
     //float halfExtent = .5f;
     //m_pShape = m_pPhysics->createShape(physx::PxBoxGeometry(halfExtent, halfExtent, halfExtent), *m_pMaterial);
     //physx::PxU32 size = 30;
@@ -259,6 +259,8 @@ PxRigidDynamic* CPhysX::CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, 
         pDynamicActor->release();
         return nullptr;
     }
+    pShape->setSimulationFilterData(physx::PxFilterData{ 1, 1, 0, 0 });
+    //pShape->setSimulationFilterData(physx::PxFilterData{ 1, 1, 0, 0 });
 
     pDynamicActor->attachShape(*pShape);
     m_pScene->addActor(*pDynamicActor);
@@ -301,6 +303,8 @@ PxRigidStatic* CPhysX::CreateStaticActor(_float4 vPos, _float3* pVerticesPos, _u
     }
     else
         pShape = m_pPhysics->createShape(triGeom, *pMaterial);
+    //pShape->setSimulationFilterData(physx::PxFilterData{ 1, 1, 0, 0 });
+    //pShape->setSimulationFilterData(physx::PxFilterData{ 1, 1, 0, 0 });
 
     pStaticActor->attachShape(*pShape);
     m_pScene->addActor(*pStaticActor);
@@ -309,6 +313,7 @@ PxRigidStatic* CPhysX::CreateStaticActor(_float4 vPos, _float3* pVerticesPos, _u
 
     return pStaticActor;
 }
+
 
 CPhysX* CPhysX::Create()
 {
@@ -399,7 +404,6 @@ void CSimulationEventCallback::onTrigger(physx::PxTriggerPair* pairs, physx::PxU
 PxControllerBehaviorFlags CControllerBehaviorCallback::getBehaviorFlags(const PxShape& shape, const PxActor& actor)
 {
     // 특정 조건에 따라 행동을 정의
-    //if (actor.is<PxRigidStatic>())
     CComponent* pComponent = static_cast<CComponent*>(actor.userData);
     if (pComponent != nullptr)
     {
@@ -409,7 +413,7 @@ PxControllerBehaviorFlags CControllerBehaviorCallback::getBehaviorFlags(const Px
     if (actor.is<PxRigidStatic>())  // PxController
     {
         //MSG_BOX(TEXT("floor collision"));
-        return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
+        return PxControllerBehaviorFlag::eCCT_SLIDE;
     }
     return PxControllerBehaviorFlag::eCCT_SLIDE;
 }
@@ -491,7 +495,6 @@ void CUserControllerHitReport::CollsionEvent(CGameObject* pObj, CGameObject* pOt
     }
 }
 
-//
 //void CUserControllerHitReport::onControllerHit(const PxControllersHit& hit)
 //{
 //    PxController* MeController = hit.controller;
@@ -544,3 +547,19 @@ void CUserControllerHitReport::CollsionEvent(CGameObject* pObj, CGameObject* pOt
 //        }
 //    }
 //}
+
+
+PxFilterFlags CustomFilterShader(PxFilterObjectAttributes attributes0, PxFilterData filterData0,
+    PxFilterObjectAttributes attributes1, PxFilterData filterData1, PxPairFlags& pairFlags, const void* constantBlock, PxU32 constantBlockSize)
+{
+    // 특정 필터 데이터를 가진 객체 간의 물리적 반응을 무시하고 충돌 판정만 유지
+    if ((filterData0.word0 & filterData1.word1) || (filterData1.word0 & filterData0.word1))
+    {
+        pairFlags = PxPairFlag::eNOTIFY_TOUCH_FOUND;// | PxPairFlag::eNOTIFY_TOUCH_LOST;
+        return PxFilterFlag::eNOTIFY;
+    }
+
+    // 기본 충돌 처리
+    pairFlags = PxPairFlag::eCONTACT_DEFAULT;
+    return PxFilterFlag::eDEFAULT;
+}

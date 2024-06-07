@@ -118,6 +118,19 @@ void CRigidBody::Create_Actor()
 		NODEFAULT;
 	}
 
+	PxFilterData filterData;
+	filterData.word0 = 1;  // 충돌 그룹 설정
+	filterData.word1 = 1;  // 이 값과 충돌할 그룹을 설정
+	//m_pShape->setSimulationFilterData(filterData);
+	m_pShape->setSimulationFilterData(physx::PxFilterData{ 1, 1, 0, 0 });
+
+	// 쿼리 필터 데이터 설정
+	PxFilterData queryFilterData;
+	queryFilterData.word0 = 1;  // 쿼리 그룹 설정
+	queryFilterData.word1 = 1;  // 쿼리 그룹 설정
+	//m_pShape->setQueryFilterData(queryFilterData);
+	m_pShape->setQueryFilterData(physx::PxFilterData{ 1, 1, 0, 0 });
+
 	// Transform 설정 (위치와 회전)
 	PxMat44 pxMat = CUtils::To_Float4x4(OriginMatrix);
 	PxTransform transform = CUtils::mat44ToTransform(pxMat);
@@ -137,7 +150,6 @@ void CRigidBody::Create_Actor()
 	}
 }
 
-
 //정현아 여길 봐줘
 /// <summary>
 /// RigidBody를 어떻게 사용할 것인지 세팅 플래그 변경하는 함수
@@ -150,6 +162,9 @@ void CRigidBody::SetUp_Actor()
 		if(true == m_bDynamic)
 			m_pActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, true);
 	}
+
+	if (true == m_bDynamic)
+		m_pActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, true);
 
 	if(nullptr != m_pActor)
 		m_pActor->userData = this;

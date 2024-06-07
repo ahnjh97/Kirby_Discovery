@@ -53,6 +53,8 @@ public:
     PxRigidDynamic* CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
     PxRigidStatic*  CreateStaticActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
 
+   
+
 private:
     PxDefaultAllocator          mDefaultAllocatorCallback;
     PxDefaultErrorCallback      mDefaultErrorCallback;
@@ -84,6 +86,7 @@ private:
     _uint arrCollisionContents[COLLISION_END][COLLISION_END];
 
 public:
+
     static CPhysX*  Create();
     virtual void    Free() override;
 
@@ -144,3 +147,9 @@ public:
 
 
 END
+
+
+static PxFilterFlags CustomFilterShader(PxFilterObjectAttributes attributes0, PxFilterData filterData0,
+    PxFilterObjectAttributes attributes1, PxFilterData filterData1,
+    PxPairFlags& pairFlags, const void* constantBlock, PxU32 constantBlockSize);
+

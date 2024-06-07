@@ -29,7 +29,7 @@ HRESULT CWasteCan::Initialize(void* pArg)
 	CHECK_FAILED(hr);
 
 	Add_Components();
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(0.f, 15.f, -180.f, 1.f));
+	//m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(rand() % 20, 15.f, -180.f, 1.f));
 
 	hr = m_pModelCom->CreateDynamicActor(m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION));
 	CHECK_FAILED(hr);
@@ -54,6 +54,7 @@ void CWasteCan::Late_Tick(_float fTimeDelta)
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 
 	m_pModelCom->Update_ActorTransform(m_pTransformCom);
+	Overlap_Hitbox();
 }
 
 HRESULT CWasteCan::Render()
@@ -103,6 +104,50 @@ void CWasteCan::Render_IMGUI()
 	__super::Render_IMGUI();
 }
 #endif
+
+void CWasteCan::Overlap_Hitbox()
+{
+	// 히트박스 기하학적 모양 정의 (박스 형태)
+	PxBoxGeometry hitboxGeometry(PxVec3(5.0f, 5.0f, 5.0f)); // 히트박스 크기
+
+	// 컨트롤러의 위치 가져오기
+	_vector pos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	PxVec3 controllerPosition = CUtils::To_PxVec3(pos);
+
+	// 히트박스 위치 설정 (플레이어 앞)
+	PxVec3 hitboxPosition = controllerPosition + PxVec3(0.5f, -0.5f, 0.0f);
+
+	// 회전은 기본값으로 설정 (항등 쿼터니언)
+	PxQuat rotation = PxQuat(PxIdentity);
+
+	// 히트박스의 변환 생성
+	PxTransform hitboxPose(hitboxPosition, rotation);
+
+	// Overlap 테스트 실행
+	PxOverlapBuffer hitBuffer; // 충돌 정보를 저장할 버퍼
+	PxScene* myScene = m_pGameInstance->Get_Scene();//m_pController->getActor()->getScene();
+	_bool status = myScene->overlap(hitboxGeometry, hitboxPose, hitBuffer);
+
+	if (status)
+	{
+		cout << "Hitbox overlap detected with " << hitBuffer.getNbAnyHits() << " objects." << endl;
+		for (PxU32 i = 0; i < hitBuffer.getNbAnyHits(); i++)
+		{
+			const PxOverlapHit& hit = hitBuffer.getAnyHit(i);
+			PxActor* actor = hit.actor;
+			if (actor)
+			{
+				const char* name = actor->getName();
+				cout << "Hit object: " << (name ? name : "Unnamed Actor") << endl;
+				// 몬스터와의 충돌 처리
+			}
+		}
+	}
+	else
+	{
+		//No hitbox overlap detected.
+	}
+}
 
 HRESULT CWasteCan::Add_Components()
 {

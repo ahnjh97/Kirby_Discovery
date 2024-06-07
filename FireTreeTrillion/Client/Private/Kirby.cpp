@@ -134,6 +134,8 @@ void CKirby::Late_Tick(_float fTimeDelta)
 
 	//if (m_pControllerCom != nullptr)
 		//m_pControllerCom->Overlap_Hitbox();
+
+	//m_pRigidBodyCom->Set_PxWorldMatrix(m_pTransformCom->Get_WorldFloat4x4());
 }
 
 HRESULT CKirby::Render()
@@ -554,6 +556,19 @@ HRESULT CKirby::Add_Components()
 	m_pControllerCom->Set_Object(this);
 	//m_pControllerCom->Set_CollisionType(m_eCollisionGroup);
 
+
+	/* For.Com_RigidBody */
+	CRigidBody::RIGIDBODY_DESC rigidDesc {};
+	rigidDesc.bTrigger = false;
+	rigidDesc.bDynamic = true;
+	rigidDesc.eShapeType = RIGID_SPHERE;
+	rigidDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
+	hr = __super::Add_Component(TEXT("Prototype_Component_RigidBody"),
+								TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &rigidDesc);
+	CHECK_FAILED(hr);
+	m_pRigidBodyCom->Set_Object(this);
+	m_pRigidBodyCom->Activate(true);
+
 	// FOR ANIMTOOL
 	m_ppModelForAnimTool = &m_pModelCom[BODY_DEFAULT];
 	m_uModelCnt = BODY_END;
@@ -928,5 +943,6 @@ void CKirby::Free()
 	for (auto& fx : m_KirbyFXList)
 		Safe_Release(fx);
 	
+	Safe_Release(m_pRigidBodyCom);
 }
 

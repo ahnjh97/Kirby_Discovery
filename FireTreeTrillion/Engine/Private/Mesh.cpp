@@ -8,7 +8,10 @@ CMesh::CMesh(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, ifstream& f
 }
 
 CMesh::CMesh(const CMesh & rhs)
-	: CVIBuffer(rhs), m_iFaces{ rhs.m_iFaces }, m_InputFile(ifstream())
+	: CVIBuffer(rhs), 
+	m_iFaces{ rhs.m_iFaces }, 
+	m_InputFile(ifstream()),
+	m_pActor{ rhs.m_pActor }
 {
 
 }

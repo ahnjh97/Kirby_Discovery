@@ -25,6 +25,7 @@ public:
 #ifdef _DEBUG
 	virtual void	Render_IMGUI()					override;
 #endif
+	void Overlap_Hitbox();
 
 private:
 	HRESULT			Add_Components();
