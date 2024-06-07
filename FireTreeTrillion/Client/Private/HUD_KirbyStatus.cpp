@@ -33,16 +33,15 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 
 	m_UIObjDesc = (*LayerUI_Desc);
 	m_UIObjDesc.eUIType = (*LayerUI_Desc).eUIType;
+	m_UIObjDesc.vColorRGB = (*LayerUI_Desc).vColorRGB;
+	m_UIObjDesc.fAlpha = (*LayerUI_Desc).fAlpha;
+
 	if (UI_TEXTURE == m_UIObjDesc.eUIType)
-	{
 		m_iTexIndex = (*LayerUI_Desc).iTexIndex;
-	}
-		
+
 	if (UI_FONT == m_UIObjDesc.eUIType)
-	{
 		m_UIObjDesc.wstrText = (*LayerUI_Desc).wstrText;
-		m_UIObjDesc.vColorRGBA = (*LayerUI_Desc).vColorRGBA;
-	}
+
 
 		m_pTransformCom->Set_Scaled(m_UIObjDesc.vSize.x, m_UIObjDesc.vSize.y, 1.f);
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, 
@@ -86,7 +85,7 @@ HRESULT CHUD_KirbyStatus::Render()
 
 		//스프라이트 폰트 렌더 (폰트 테스트용)
 		if (FAILED(m_pGameInstance->
-			Render_Font(TEXT("Font_HUDSub_KR15"), m_UIObjDesc.wstrText, vFontPos, m_UIObjDesc.vColorRGBA, 
+			Render_Font(TEXT("Font_HUDSub_KR15"), m_UIObjDesc.wstrText, vFontPos, m_UIObjDesc.vColorRGB, 
 				XMConvertToRadians(m_UIObjDesc.fDegree))))
 			return E_FAIL;
 	}
@@ -157,6 +156,10 @@ HRESULT CHUD_KirbyStatus::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPas
 
 	if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
+
+	//셰이더의 원시데이터 가져와 저장
+	_pShaderCom->Bind_RawValue("g_vRColor", &m_UIObjDesc.vColorRGB, sizeof(_float3));
+	_pShaderCom->Bind_RawValue("g_fAlpha", &m_UIObjDesc.fAlpha, sizeof(_float));
 
 	//Begin() > Apply() 함수 호출 전 셰이더 전역 데이터를 저장해야함
 	if (FAILED(_pShaderCom->Begin(_iPassIndex)))

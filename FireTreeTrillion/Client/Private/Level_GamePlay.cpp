@@ -217,7 +217,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& strLayerTag)
 		InputFile.read(&strText[0], iUIextLen);
 		UIobj_Desc.wstrText = CUtils::StrToWstr(strText);
 
-		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vColorRGBA), sizeof(UIobj_Desc.vColorRGBA));
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vColorRGB), sizeof(UIobj_Desc.vColorRGB));
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.fAlpha), sizeof(UIobj_Desc.fAlpha));
 
 		//UITag 레이어명에 따라 객체를 생성
 		if ("LayerUI" != strUITag)

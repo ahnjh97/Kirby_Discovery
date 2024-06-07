@@ -592,7 +592,7 @@ _bool CEditor_UI::Window_Sequencer()
 	return TRUE;
 }
 
-//전반적인 안내팝업 설정
+//완료) 전반적인 안내팝업 설정
 void CEditor_UI::Window_PopupAlert()
 {
 	if (!SelectUIs.empty())
@@ -723,7 +723,7 @@ void CEditor_UI::Window_PopupAlert()
 
 }
 
-//객체에 대한 변환(크기, 회전, 이동) 편집
+//완료) 객체에 대한 변환(크기, 회전, 이동) 편집
 _bool CEditor_UI::Edit_Transform(CUIObject* _pUIObj)
 {
 	const char* DragTag = { "Translate 위치" };
@@ -774,13 +774,14 @@ _bool CEditor_UI::Edit_Transform(CUIObject* _pUIObj)
 	return TRUE;
 }
 
+//완료) 객체의 색상, 알파 값 편집
 _bool CEditor_UI::Edit_RGBAColor()
 {
-	static ImVec4 color = ImVec4(
-		(127.0f / 255.0f) / 1.f,
-		127.0f / 255.0f,
-		127.0f / 255.0f,
-		127.0f / 255.0f);
+	//static ImVec4 color = ImVec4(
+	//	(127.0f / 255.0f) / 1.f,
+	//	127.0f / 255.0f,
+	//	127.0f / 255.0f,
+	//	127.0f / 255.0f);
 
 	// Generate a default palette. The palette will persist and can be edited.
 	static _bool saved_palette_init = true;
@@ -800,31 +801,48 @@ _bool CEditor_UI::Edit_RGBAColor()
 	ImGuiColorEditFlags ColorEditHex_Flags = ImGuiColorEditFlags_NoSmallPreview | ImGuiColorEditFlags_DisplayHex;
 	ImGuiColorEditFlags ColorPicker_Flags = { ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar };
 
-	//컬러버튼
-	ImGui::ColorButton("##ColorButton", *(ImVec4*)&color, ColorButton_Flags, ImVec2(50, 45));
-	ImGui::SameLine();
+	
+	static ImVec4 vColorRGBA{ 0.f, 0.f, 0.f, 1.f };
 
+	ImGui::ColorButton("##ColorButton", *(ImVec4*)&vColorRGBA, ColorButton_Flags, ImVec2(50, 45));
+	ImGui::SameLine();
 
 	ImGui::BeginGroup();
 	ImGui::PushItemWidth(ImGui::GetColumnOffset());
-	ImGui::ColorEdit4("##ColorEdit_RGBA", (_float*)&color, ColorEditRGBA_Flags);
-	//ImGui::PopItemWidth();
+	ImGui::ColorEdit4("##ColorEdit_RGBA", (_float*)&vColorRGBA, ColorEditRGBA_Flags);
+	ImGui::PopItemWidth();
 
-	//ImGui::PushItemWidth(ImGui::GetColumnOffset());
-	ImGui::ColorEdit4("##ColorEdit_HEX", (_float*)&color, ColorEditHex_Flags);
+	ImGui::PushItemWidth(ImGui::GetColumnOffset());
+	ImGui::ColorEdit4("##ColorEdit_HEX", (_float*)&vColorRGBA, ColorEditHex_Flags);
 	ImGui::PopItemWidth();
 	ImGui::EndGroup();
 	//ImGui::NewLine();
 
 	//ImGui::PushItemWidth(ImGui::GetColumnOffset());
-	ImGui::ColorPicker4("##ColorPicker", (_float*)&color, ColorPicker_Flags);
+	ImGui::ColorPicker4("##ColorPicker", (_float*)&vColorRGBA, ColorPicker_Flags);
 	//ImGui::PopItemWidth();
+
+	if (!SelectUIs.empty())
+	{
+		iSelectUI = SelectUIs.front();
+		if ((iSelectUI >= 0 && iSelectUI < m_LayerUIs.size()))
+		{
+			UIOBJ_DESC LayerUIDesc = m_LayerUIs[iSelectUI]->Get_UIObj_Desc();
+			
+			//위젯 동기화
+			LayerUIDesc.vColorRGB.x = vColorRGBA.x;
+			LayerUIDesc.vColorRGB.y = vColorRGBA.y;
+			LayerUIDesc.vColorRGB.z = vColorRGBA.z;
+			LayerUIDesc.fAlpha = vColorRGBA.w;
+				
+			m_LayerUIs[iSelectUI]->Set_UIObj_Desc(LayerUIDesc);
+		}
+	}
 
 	return TRUE;
 }
 
-//06.04) 글꼴 편집 기능 구현 
-//추후 작업) 선택 개체에 대한 정보와 위젯에 대한 동기화 작업 필요 (UTF-8 변환 이슈로 보류)
+//온료) 텍스트 편집
 _bool CEditor_UI::Edit_Text()
 {				
 	//폰트 편집 동기화
@@ -873,6 +891,7 @@ _bool CEditor_UI::Edit_Text()
 	return TRUE;
 }
 
+//완료) 레이어명 편집
 CUIObject::UIOBJ_DESC CEditor_UI::Edit_LayerUITag(string _strInput)
 {
 	static wstring wstrUITag{};
@@ -896,6 +915,7 @@ CUIObject::UIOBJ_DESC CEditor_UI::Edit_LayerUITag(string _strInput)
 	return LayerUIDesc;
 }
 
+//사용안함) 직교투영 세팅
 _bool CEditor_UI::Set_OrthoProj()
 {
 	// 05.24) 직교투영 스페이스 변환
@@ -925,7 +945,7 @@ _bool CEditor_UI::Set_OrthoProj()
 	return TRUE;
 }
 
-//기즈모 동기화
+//완료) 기즈모 동기화
 _bool CEditor_UI::Set_GizmoSync(CUIObject* _pUIObj)
 {
 	static ImGuizmo::OPERATION eCurGizmoOper(ImGuizmo::TRANSLATE);
@@ -971,7 +991,7 @@ _bool CEditor_UI::Set_GizmoSync(CUIObject* _pUIObj)
 	return TRUE;
 }
 
-//그리드 생성 및 세팅
+//완료) 그리드 생성 및 세팅
 _bool CEditor_UI::Set_GizmoGrid()
 {
 	//IMGUI Gizmo Grid 커스텀 (X/Y 2D 좌표계용)
@@ -1008,7 +1028,8 @@ void CEditor_UI::Create_UIObject(UI_STATE _eUIState, UI_TYPE _eUIType)
 		LayerUI_Desc.vSize = { 100.f, 100.f };
 		LayerUI_Desc.vPos = { 0.f, 0.f };
 		LayerUI_Desc.fDegree = { 0.f };
-		//LayerUI_Desc.iTexIndex = { 0 };
+		LayerUI_Desc.vColorRGB = { 1.f, 1.f, 1.f };
+		LayerUI_Desc.fAlpha = { 1.f };
 
 		strProtoTag += CUtils::WstrToStr(LayerUI_Desc.wstrUITag);
 		
@@ -1022,7 +1043,6 @@ void CEditor_UI::Create_UIObject(UI_STATE _eUIState, UI_TYPE _eUIType)
 		{
 			LayerUI_Desc.eUIType = UI_FONT;
 			LayerUI_Desc.wstrText = { TEXT("") };
-			LayerUI_Desc.vColorRGBA = { 1.f, 1.f, 1.f, 1.f };
 		}
 
 		CUIObject* pLayerUI = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(CUtils::StrToWstr(strProtoTag), &LayerUI_Desc));
@@ -1110,8 +1130,8 @@ void CEditor_UI::Group_UIObject(GROUP_TYPE _eUIGroup)
 
 }
 
-//진행 보류) 텍스처화 :: RTV 기준으로 저장 (저장은 되나, RTV 세팅 필요(셰이더 담당자 협업))
-//엔진에서 렌더한 RTV 정보를 받아 저장하는 방식
+//진행 보류) 텍스처화 :: RTV 기준으로 저장 (저장은 되나, RTV 세팅 필요(셰이더 담당자 협업)) 
+// 엔진에서 렌더한 RTV 정보를 받아 저장하는 방식
 void CEditor_UI::Save_Texture(const string& _strFilePath, ID3D11RenderTargetView* _pRTV)
 {
 	string strFilePath = { "../Bin/Resources/Textures/UI/DDS/" };
@@ -1132,7 +1152,7 @@ void CEditor_UI::Save_Texture(const string& _strFilePath, ID3D11RenderTargetView
 	IsSuccessed = TRUE; eOpenPopup = POPUP_SAVE;
 }
 
-//데이터 저장
+//완료) 데이터 저장
 _bool CEditor_UI::Save_FileData(const string& _strFilePath)
 {
 	string strUITag = {};
@@ -1221,7 +1241,8 @@ _bool CEditor_UI::Save_FileData(const string& _strFilePath)
 			OutputFile.write(strText.c_str(), iUIextLen);
 			//OutputFile.write(reinterpret_cast<const char*>(&UIobj_Desc.wstrText), sizeof(UIobj_Desc.wstrText));
 
-			OutputFile.write(reinterpret_cast<const char*>(&UIobj_Desc.vColorRGBA), sizeof(UIobj_Desc.vColorRGBA));
+			OutputFile.write(reinterpret_cast<const char*>(&UIobj_Desc.vColorRGB), sizeof(UIobj_Desc.vColorRGB));
+			OutputFile.write(reinterpret_cast<const char*>(&UIobj_Desc.fAlpha), sizeof(UIobj_Desc.fAlpha));
 		//}
 	}
 
@@ -1248,7 +1269,7 @@ _bool CEditor_UI::Save_FileData(const string& _strFilePath)
 	return TRUE;
 }
 
-//데이터 로드
+//완료) 데이터 로드
 _bool CEditor_UI::Load_FileData(const string& _strFilePath)
 {
 	std::ifstream InputFile(_strFilePath, ios::in | std::ios::binary);
@@ -1303,8 +1324,9 @@ _bool CEditor_UI::Load_FileData(const string& _strFilePath)
 			InputFile.read(&strText[0], iUIextLen);
 			UIobj_Desc.wstrText = CUtils::StrToWstr(strText);
 
-			InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vColorRGBA), sizeof(UIobj_Desc.vColorRGBA));
-		//}
+			InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vColorRGB), sizeof(UIobj_Desc.vColorRGB));
+			InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.fAlpha), sizeof(UIobj_Desc.fAlpha));
+			//}
 
 
 		CUIObject* pUIObject = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(CUtils::StrToWstr(strProtoTag), &UIobj_Desc));

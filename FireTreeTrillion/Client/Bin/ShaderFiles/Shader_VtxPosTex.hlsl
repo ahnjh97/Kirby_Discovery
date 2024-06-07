@@ -122,9 +122,15 @@ PS_OUT PS_MAIN_ALPHABLEND(PS_IN_ALPHABLEND In)
 
 	//Out.vColor.a = Out.vColor.a  * saturate(fOldViewZ - In.vProjPos.w);
 	
-	
+    //vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord + g_vUVOffset);
+    //if (vDiffuse.a < .01f || (vDiffuse.r < 0.1f && vDiffuse.g < 0.1f && vDiffuse.b < 0.1f))
+    //    discard;
+
+    //Out.vColor.rgb = vDiffuse.rgb * g_vRColor;
+    //Out.vColor.a = vDiffuse.a * g_fAlpha;
+    Out.vColor.rgb = g_vRColor;
     Out.vColor *= g_fAlpha;
-	
+
     Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
 	
 	return Out;

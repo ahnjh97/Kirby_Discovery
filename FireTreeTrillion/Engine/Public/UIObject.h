@@ -33,7 +33,8 @@ public:
 		_int		iTexIndex = { 0 };
 		
 		wstring		wstrText = { TEXT("") };
-		_float4		vColorRGBA = { 0.f, 0.f, 0.f, 0.f };
+		_float3		vColorRGB = { 1.f, 1.f, 1.f };
+		_float		fAlpha = { 1.f };
 	}UIOBJ_DESC;
 
 	typedef struct : public CUIObject::UIOBJ_DESC
@@ -102,6 +103,10 @@ protected:
 	_uint						m_iTexIndex = { 0 };
 	_float4x4					m_ViewMatrix, m_ProjMatrix;
 	_float4						m_vColorRGBA = { 0.f, 0.f, 0.f, 1.f };
+
+	//Shader 원시데이터용
+	_float3						m_vColorRGB = { 1.f, 1.f, 1.f };
+	_float						m_fAlpha = { 1.f };
 
 	_bool						m_bIsRender = false;
 
