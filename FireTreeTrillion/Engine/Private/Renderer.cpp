@@ -536,17 +536,6 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 			m_bRimTest = !m_bRimTest;
 	}
 	
-	// 고사양, 저사양 모드
-	if (m_pGameInstance->Get_DIKeyState(DIK_E, KEY_DOWN))
-	{
-		//레벨 별 사양 처리 (현재 TOOL_UI 레벨에서만 고/저사양 제외)
-		_uint* iCurrLevel = m_pGameInstance->Get_CurrentLevelID();
-		if (5 == *iCurrLevel) //LEVEL_TOOL_UI
-			return S_OK;
-
-		m_bLowPass = !m_bLowPass;
-	}
-
 #ifdef _DEBUG
 
 	//렌더 타겟 뷰 ON/OFF
@@ -1567,7 +1556,7 @@ void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 		}
 	}
 
-	if (.01f < m_DestColorData.vColorBalance[0] != -1.f)
+	if (.01f < abs(m_vColorBalance[0] - m_DestColorData.vColorBalance[0]))
 	{
 
 		m_vColorBalance[0] += (m_DestColorData.vColorBalance[0] - m_vColorBalance[0]) * fInterpolateSpeed;
@@ -1580,7 +1569,7 @@ void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 		}
 	}
 
-	if (.01f < m_DestColorData.vShadowColor[0] != -1.f)
+	if (.01f < abs(m_vShadowColor[0] - m_DestColorData.vShadowColor[0]))
 	{
 		m_vShadowColor[0] += (m_DestColorData.vShadowColor[0] - m_vShadowColor[0]) * fInterpolateSpeed;
 		m_vShadowColor[1] += (m_DestColorData.vShadowColor[1] - m_vShadowColor[1]) * fInterpolateSpeed;
@@ -1596,7 +1585,7 @@ void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 		}
 	}
 
-	if (.01f < m_DestColorData.vMidtoneColor[0] != -1.f)
+	if (.01f < abs(m_vMidtoneColor[0] - m_DestColorData.vMidtoneColor[0]))
 	{
 		m_vMidtoneColor[0] += (m_DestColorData.vMidtoneColor[0] - m_vMidtoneColor[0]) * fInterpolateSpeed;
 		m_vMidtoneColor[1] += (m_DestColorData.vMidtoneColor[1] - m_vMidtoneColor[1]) * fInterpolateSpeed;
@@ -1613,7 +1602,7 @@ void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 		}
 	}
 
-	if (.01f < m_DestColorData.vHighlightColor[0] != -1.f)
+	if (.01f < abs(m_vHighlightColor[0] - m_DestColorData.vHighlightColor[0]))
 	{
 		m_vHighlightColor[0] += (m_DestColorData.vHighlightColor[0] - m_vHighlightColor[0]) * fInterpolateSpeed;
 		m_vHighlightColor[1] += (m_DestColorData.vHighlightColor[1] - m_vHighlightColor[1]) * fInterpolateSpeed;

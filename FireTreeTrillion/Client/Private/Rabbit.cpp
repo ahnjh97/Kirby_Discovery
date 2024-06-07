@@ -108,12 +108,11 @@ HRESULT CRabbit::Render()
 			return E_FAIL;
 
 
-		//¸öÅëÀº normal O, ´«±î¸®´Â normal x ÆÐ½º
+		//¸öÅë(1)Àº normal O, ´«±î¸®(0)´Â normal x ÆÐ½º
 		if (i == 1 && bRenderBody)
 		{
 			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
 				return E_FAIL;
-
 			if (FAILED(m_pModelCom->Render(i)))
 				return E_FAIL;
 		}
@@ -121,8 +120,8 @@ HRESULT CRabbit::Render()
 		{
 			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_X)))
 				return E_FAIL;
-		if (FAILED(m_pModelCom->Render(i)))
-			return E_FAIL;
+			if (FAILED(m_pModelCom->Render(i)))
+				return E_FAIL;
 		}
 
 		
@@ -315,7 +314,7 @@ void CRabbit::SetUp_FSM()
 
 _bool CRabbit::Custom_Face(_uint iMeshIndex)
 {
-	if (iMeshIndex == 1)
+	if (iMeshIndex == 0)
 	{
 		HRESULT hr;
 

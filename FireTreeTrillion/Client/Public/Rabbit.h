@@ -71,13 +71,10 @@ private:
 	_bool bRenderEye = { true };
 	_bool bRenderBody = { true };
 	
-	//CTexture*	m_pEyeTextureCom = { nullptr };
-	RABBIT_ANIM	m_eCurrentState = { RABBIT_END };
-
+	RABBIT_ANIM		m_eCurrentState = { RABBIT_END };
 	CTexture*		m_pEyeTextureCom = { nullptr };
 
 private:
-	RABBIT_ANIM		m_eCurrentState = { RABBIT_END };
 	RABBITEYE_STATE	m_eEyeState = { RABBITEYE_END };
 	_float			m_fTempTime = { 0.f };
 
