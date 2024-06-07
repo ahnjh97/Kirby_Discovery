@@ -229,7 +229,7 @@ static POPUP_TYPE eOpenPopup = { POPUP_NONE };
 static POPUP_DETAIL ePopupDetail = { DETAIL_NONE };
 
 static _bool IsSuccessed = { FALSE };
-string strResult, strPoppTag, strMessage, strDetail, strUITag = { " " };
+string strResult, strPopupTag, strMessage, strDetail, strUITag = { " " };
 
 _bool CEditor_UI::Window_Directories()
 {
@@ -324,7 +324,6 @@ _bool CEditor_UI::Tab_LayerList()
 					if (ImGui::MenuItem(u8"Modify 변경")) //레이어Tag 변경
 					{
 						IsSuccessed = TRUE; eOpenPopup = POPUP_MODIFY;
-						//Edit_LayerUITag();
 					}
 
 					ImGui::EndPopup();
@@ -601,33 +600,29 @@ void CEditor_UI::Window_PopupAlert()
 	//{
 	switch (eOpenPopup)
 	{
-	case POPUP_CREATE:	strPoppTag = { "Create" };
+	case POPUP_CREATE:	strPopupTag = { "Create" };
 		switch (ePopupDetail)
-		{
-		default: strDetail = { " " };
-		}
-		ImGui::OpenPopup(strPoppTag.c_str());
+		{	default: strDetail = { " " };	}
+		ImGui::OpenPopup(strPopupTag.c_str());
 		break;
 
-	case POPUP_DELETE:	strPoppTag = { "Delete" };
+	case POPUP_DELETE:	strPopupTag = { "Delete" };
 		switch (ePopupDetail)
-		{
-		default: strDetail = { " " };
-		}
-		ImGui::OpenPopup(strPoppTag.c_str());
+		{	default: strDetail = { " " };	}
+		ImGui::OpenPopup(strPopupTag.c_str());
 		break;
 
-	case POPUP_GROUP:	strPoppTag = { "Group" };
+	case POPUP_GROUP:	strPopupTag = { "Group" };
 		switch (ePopupDetail)
 		{
 		case NEED_CREATE:	strDetail = { u8"Need to Create Layer 생성한 레이어가 없습니다" }; break;
 		case NEED_SELECT:	strDetail = { u8"Need to Select Layer 레이어를 선택해주세요" }; break;
 		default: strDetail = {" "};
 		}
-		ImGui::OpenPopup(strPoppTag.c_str());
+		ImGui::OpenPopup(strPopupTag.c_str());
 		break;
 
-	case POPUP_SAVE:	strPoppTag = { "Save" };
+	case POPUP_SAVE:	strPopupTag = { "Save" };
 		switch (ePopupDetail)
 		{
 		case NEED_CREATE:	strDetail = { u8"Need to Create Layer 생성한 레이어가 없습니다" }; break;
@@ -635,24 +630,22 @@ void CEditor_UI::Window_PopupAlert()
 		case FILE_COPY:		strDetail = { u8"Copy Failed" }; break;
 		default: strDetail = { " " };
 		}
-		ImGui::OpenPopup(strPoppTag.c_str());
+		ImGui::OpenPopup(strPopupTag.c_str());
 		break;
 
-	case POPUP_LOAD:	strPoppTag = { "Load" };
+	case POPUP_LOAD:	strPopupTag = { "Load" };
 		switch (ePopupDetail)
 		{
 		case FILE_OPEN:		strDetail = { u8"Check the File Path & Name 파일 경로와 이름을 확인해주세요" }; break;
 		default: strDetail = { " " };
 		}
-		ImGui::OpenPopup(strPoppTag.c_str());
+		ImGui::OpenPopup(strPopupTag.c_str());
 		break;
 
-	case POPUP_MODIFY:	strPoppTag = { "Modify" };
+	case POPUP_MODIFY:	strPopupTag = { "Modify" };
 		switch (ePopupDetail)
-		{
-		default: strDetail = { " " };
-		}
-		ImGui::OpenPopup(strPoppTag.c_str());
+		{	default: strDetail = { " " };	}
+		ImGui::OpenPopup(strPopupTag.c_str());
 		break;
 	}
 
@@ -662,7 +655,7 @@ void CEditor_UI::Window_PopupAlert()
 	ImGuiWindowFlags Popup_Flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove;
 	ImGui::SetNextWindowPos(ViewCenter, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 	ImGui::SetNextWindowSize(ViewCenter * 0.3f);
-	if (ImGui::BeginPopupModal(strPoppTag.c_str(), NULL, Popup_Flags))
+	if (ImGui::BeginPopupModal(strPopupTag.c_str(), NULL, Popup_Flags))
 	{
 		ImVec2 WindowSize = ImGui::GetWindowSize();
 		ImVec2 MessageSize = ImGui::CalcTextSize(strMessage.c_str());
@@ -672,12 +665,17 @@ void CEditor_UI::Window_PopupAlert()
 
 		ImVec2 DetailSize = ImGui::CalcTextSize(strDetail.c_str());
 		_float DetailPosX = (WindowSize.x - DetailSize.x) * 0.5f;
-		if ("Modify" == strPoppTag)
+		if ("Modify" == strPopupTag)
 		{
 			static string strInput(1024 * 16, '\0');
-			ImGui::InputText(u8"##", &strInput[0], strInput.capacity() + 1);
+			ImVec2 InputSize = { 200.f, 0.f };
+			_float InputPosX = (WindowSize.x - InputSize.x) * 0.5f;
 
-			Edit_LayerUITag(strInput);
+			ImGui::SetNextItemWidth(200.f);
+			ImGui::SetCursorPos(ImVec2(InputPosX, WindowSize.y * 0.5f + 3.5f));
+			ImGui::InputText(u8"##", &strInput[0], strInput.capacity());
+
+			m_UIObjDesc = Edit_LayerUITag(strInput);
 		}
 		else
 		{
@@ -692,12 +690,21 @@ void CEditor_UI::Window_PopupAlert()
 		ImVec2 ButtonSize = ImVec2(120, 0);
 		_float ButtonPosX = (WindowSize.x - ButtonSize.x) * 0.5f;
 		ImGui::SetCursorPos(ImVec2(ButtonPosX, 100.f));
-		if (ImGui::Button("OK", ButtonSize) || m_pGameInstance->Get_DIKeyState(DIK_SPACE, KEY_DOWN)) {	ImGui::CloseCurrentPopup(); }
+		if (ImGui::Button("OK", ButtonSize) || m_pGameInstance->Get_DIKeyState(DIK_RETURN, KEY_DOWN)) 
+		{	
+			if ("Modify" == strPopupTag)
+				m_LayerUIs[iSelectUI]->Set_UIObj_Desc(m_UIObjDesc);
+				
+			ImGui::CloseCurrentPopup(); 
+		}
 		ImGui::SetItemDefaultFocus();
 		ImGui::EndPopup();
 	}
 
-	strMessage = strResult + " to " + strPoppTag + " :" + strUITag;
+	if ("Modify" == strPopupTag)
+		strMessage = { u8"내힘들다" };
+
+	strMessage = strResult + " to " + strPopupTag + " :" + strUITag;
 	eOpenPopup = POPUP_NONE;
 
 #pragma endregion
@@ -856,9 +863,9 @@ _bool CEditor_UI::Edit_Text()
 	return TRUE;
 }
 
-_bool CEditor_UI::Edit_LayerUITag(string _strInput)
+CUIObject::UIOBJ_DESC CEditor_UI::Edit_LayerUITag(string _strInput)
 {
-	wstring wstrText{};
+	static wstring wstrUITag{};
 	UIOBJ_DESC LayerUIDesc{};
 
 	if (!SelectUIs.empty())
@@ -867,13 +874,16 @@ _bool CEditor_UI::Edit_LayerUITag(string _strInput)
 		if ((iSelectUI >= 0 && iSelectUI < m_LayerUIs.size()))
 		{
 			LayerUIDesc = m_LayerUIs[iSelectUI]->Get_UIObj_Desc();
-			LayerUIDesc.wstrUITag = CUtils::StrToWstr(_strInput);
 
-			m_LayerUIs[iSelectUI]->Set_UIObj_Desc(LayerUIDesc);
+			wstrUITag = CUtils::StrToWstrUTF8(_strInput);
+			LayerUIDesc.wstrUITag = wstrUITag;
+
+			return LayerUIDesc;
+			//m_LayerUIs[iSelectUI]->Set_UIObj_Desc(LayerUIDesc);
 		}
 	}
 
-	return TRUE;
+	return LayerUIDesc;
 }
 
 //현재 사용안함. 깡통
@@ -979,7 +989,7 @@ _bool CEditor_UI::Set_GizmoGrid()
 }
 
 //추가 필요) 레이어그룹(캔버스) 생성
-_bool CEditor_UI::Create_UIObject(UI_STATE _eUIState, UI_TYPE _eUIType)
+void CEditor_UI::Create_UIObject(UI_STATE _eUIState, UI_TYPE _eUIType)
 {
 	string strProtoTag = { "Prototype_GameObject_" };
 
@@ -1015,12 +1025,10 @@ _bool CEditor_UI::Create_UIObject(UI_STATE _eUIState, UI_TYPE _eUIType)
 			IsSuccessed = FALSE;
 			eOpenPopup = POPUP_CREATE;
 			CHECK_NULLPTR(pLayerUI);
-			return FALSE;
 		}
 		m_LayerUIs.push_back(pLayerUI);
 
 		IsSuccessed = TRUE; eOpenPopup = POPUP_CREATE;
-		return TRUE;
 	}
 
 	if (UI_GROUP == _eUIState) //레이어그룹(캔버스) 생성
@@ -1029,13 +1037,10 @@ _bool CEditor_UI::Create_UIObject(UI_STATE _eUIState, UI_TYPE _eUIType)
 }
 
 //추가 필요) 레이어그룹 삭제 
-_bool CEditor_UI::Delete_UIObject(UI_STATE _eUIState)
+void CEditor_UI::Delete_UIObject(UI_STATE _eUIState)
 {
 	if (m_LayerUIs.empty())
-	{
 		IsSuccessed = FALSE; eOpenPopup = POPUP_DELETE; ePopupDetail = NEED_CREATE;
-		return FALSE;
-	}
 
 	if (UI_LAYER == _eUIState) //레이어 삭제
 	{
@@ -1044,15 +1049,12 @@ _bool CEditor_UI::Delete_UIObject(UI_STATE _eUIState)
 		{
 			m_LayerUIs.erase(m_LayerUIs.begin() + iSelectUI);
 			iSelectUI = -1; // 삭제 후 선택한 UI 인덱스 초기화
-			//MSG_BOX(TEXT("Successed to Delete : UI Object"));
 			IsSuccessed = TRUE; eOpenPopup = POPUP_DELETE;
-			return TRUE;
 		}
 	}
 
 	if (UI_GROUP == _eUIState) //레이어그룹(캔버스) 삭제
 	{
-		return TRUE;
 	}
 }
 
@@ -1104,7 +1106,7 @@ void CEditor_UI::Group_UIObject(GROUP_TYPE _eUIGroup)
 
 //진행 보류) 텍스처화 :: RTV 기준으로 저장 (저장은 되나, RTV 세팅 필요(셰이더 담당자 협업))
 //엔진에서 렌더한 RTV 정보를 받아 저장하는 방식
-_bool CEditor_UI::Save_Texture(const string& _strFilePath, ID3D11RenderTargetView* _pRTV)
+void CEditor_UI::Save_Texture(const string& _strFilePath, ID3D11RenderTargetView* _pRTV)
 {
 	string strFilePath = { "../Bin/Resources/Textures/UI/DDS/" };
 	string strUITag = {};
@@ -1115,20 +1117,13 @@ _bool CEditor_UI::Save_Texture(const string& _strFilePath, ID3D11RenderTargetVie
 	wstring wstrFilePath = CUtils::StrToWstr(strFilePath);
 
 	if (m_LayerUIs.empty())
-	{
 		IsSuccessed = FALSE; eOpenPopup = POPUP_SAVE; ePopupDetail = NEED_CREATE;
-		return FALSE;
-	}
 
 	//텍스처 저장
 	if (FAILED(DirectX::SaveDDSTextureToFile(m_pContext, m_pTexture2D, wstrFilePath.c_str())))
-	{
 		IsSuccessed = FALSE; eOpenPopup = POPUP_SAVE; ePopupDetail = FILE_OPEN;
-		return E_FAIL;
-	}
 
 	IsSuccessed = TRUE; eOpenPopup = POPUP_SAVE;
-	return TRUE;
 }
 
 _bool CEditor_UI::Save_FileData(const string& _strFilePath)

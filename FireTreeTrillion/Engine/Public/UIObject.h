@@ -59,6 +59,7 @@ public:
 #pragma region Getter/Setter
 
 public:
+
 	UIOBJ_DESC		Get_UIObj_Desc() const { return m_UIObjDesc; }
 	void			Set_UIObj_Desc(UIOBJ_DESC _UIDesc) { m_UIObjDesc = _UIDesc; }
 

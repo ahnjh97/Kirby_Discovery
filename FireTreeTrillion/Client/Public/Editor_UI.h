@@ -49,7 +49,7 @@ private:
 	_bool			Edit_RGBAColor(); //색상 편집
 
 	_bool			Edit_Text(); //텍스트 편집
-	_bool			Edit_LayerUITag(string _strInput);
+	UIOBJ_DESC		Edit_LayerUITag(string _strInput);
 	_bool			Set_TextSync(string _strInput);
 
 	void			Create_UIObject(UI_STATE _eUIState, UI_TYPE _eUIType);
@@ -57,7 +57,7 @@ private:
 	void			Group_UIObject(GROUP_TYPE _eUIGroup);
 
 public:
-	_bool			Save_Texture(const string& _strFilePath, ID3D11RenderTargetView* _pRTV);
+	void			Save_Texture(const string& _strFilePath, ID3D11RenderTargetView* _pRTV);
 	_bool			Save_FileData(const string& _strFilePath);
 	_bool			Load_FileData(const string& _strFilePath);	
 
