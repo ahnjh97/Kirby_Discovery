@@ -91,7 +91,22 @@ void CPhysX::Tick(_float fTimeDelta)
 {
     m_pScene->simulate(fTimeDelta);
     m_pScene->fetchResults(true);
+
+    //CheckPvdConnection(m_pPvd);
 }
+
+void CPhysX::CheckPvdConnection(PxPvd* pvd) 
+{
+    if (pvd->isConnected()) 
+    {
+        MSG_BOX(L"PVD is connected.");
+    }
+    else 
+    {
+        MSG_BOX(L"PVD is NOT connected.");
+    }
+}
+
 
 /// physX에 영향을 받는 테스트용 Ground를 만들어줍니다.
 void CPhysX::Ready_TestGround()

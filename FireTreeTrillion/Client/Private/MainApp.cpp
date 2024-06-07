@@ -121,6 +121,9 @@ HRESULT CMainApp::Ready_Fonts()
 	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUDSub_EN10"), TEXT("../Bin/Resources/Fonts/HUD_Sub_EN10.spritefont"))))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUDSub_KR15"), TEXT("../Bin/Resources/Fonts/HUD_Sub_KR15.SpriteFont"))))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -370,6 +373,10 @@ _bool CMainApp::Render_RTVFonts()
 		_float2(fRTVFont + 1055.f, g_iWinSizeY - 190.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
 	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("M.R.A"),
 		_float2(fRTVFont + 1155.f, g_iWinSizeY - 190.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+
+	//UI
+	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("UI"),
+		_float2(5.f, 10.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
 
 	return TRUE;
 }

@@ -28,9 +28,6 @@ HRESULT CLevel_Tool_UI::Initialize()
 	if (FAILED(Ready_Layer_IMGUI(TEXT("Layer_IMGUI"))))
 		return E_FAIL;
 
-	//if (FAILED(Ready_RTV(TEXT("Layer_RTV"))))
-	//	return E_FAIL;
-
 	return S_OK;
 }
 

@@ -314,13 +314,6 @@ void CBladeKnight_Retreat_State::OnStateUpdate(CGameObject* pGameObject, _float 
 
 	_float fAnimRatio = pBladeKnight->Get_AnimRatio();
 
-	//if ((0.25f < fAnimRatio && 0.35f > fAnimRatio) || 0.6f < fAnimRatio)
-	//	m_fSpeed = 0.f;
-	//else
-	//{
-	//	m_fSpeed = 3.f;
-	//}
-
 	// 백스텝 움직임 제어
 	if (0.25f > fAnimRatio)
 		m_fSpeed -= fTimeDelta * 3.f;

@@ -2,6 +2,8 @@
 #pragma warning (disable : 4251)
 #pragma warning (disable : 5208)
 #pragma warning (disable : 4267)
+#pragma warning (disable : 4099)
+#pragma warning (disable : 26495)
 //#pragma warning (disable : 4819)
 //#pragma warning (disable : 4101)
 
@@ -269,7 +271,10 @@ enum TEXTURETYPE
 };
 
 enum PASS_DEFERRED {
-    DEFERRED_DEBUG, DEFERRED_DIRECTLIGHT, DEFERRED_POINTLIGHT, DEFERRED_FINAL, DEFERRED_BLUR_X, DEFERRED_BLUR_Y, DEFERRED_BLUR_R, DEFERRED_COLORCORRECT, DEFERRED_END
+    DEFERRED_DEBUG, DEFERRED_DIRECTLIGHT, DEFERRED_POINTLIGHT, DEFERRED_FINAL, 
+    DEFERRED_BLUR_X, DEFERRED_BLUR_Y, DEFERRED_BLUR_R, DEFERRED_COLORCORRECT, 
+    DEFERRED_UI = 10,
+    DEFERRED_END
 };
 
 #define TEXTURE_TYPE_MAX  TextureType_UNKNOWN

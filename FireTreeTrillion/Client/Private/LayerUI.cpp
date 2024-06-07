@@ -7,13 +7,13 @@ CLayerUI::CLayerUI(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext)
 }
 
 CLayerUI::CLayerUI(const CLayerUI& _rhs)
-    : CUIObject {_rhs}
+	: CUIObject{ _rhs }
 {
 }
 
 HRESULT CLayerUI::Initialize_Prototype()
 {
-    return S_OK;
+	return S_OK;
 }
 
 HRESULT CLayerUI::Initialize(void* _pArg)
@@ -25,22 +25,33 @@ HRESULT CLayerUI::Initialize(void* _pArg)
 	if (nullptr != _pArg)
 		LayerUI_Desc = (UIOBJ_DESC*)_pArg;
 
+	//if (UI_TEXTURE == (*LayerUI_Desc).eUIType)
+	//{
 	if (FAILED(Add_Components()))
 		return E_FAIL;
+	//}
 
 	m_UIObjDesc = *LayerUI_Desc;
-	m_iTexIndex = LayerUI_Desc->iTexIndex;
+	m_UIObjDesc.eUIType = (*LayerUI_Desc).eUIType;
+	if (UI_TEXTURE == m_UIObjDesc.eUIType)
+	{
+		m_iTexIndex = (*LayerUI_Desc).iTexIndex;
+	}
+		
+	if (UI_FONT == m_UIObjDesc.eUIType)
+	{
+		m_UIObjDesc.wstrText = (*LayerUI_Desc).wstrText;
+		m_UIObjDesc.vColorRGBA = (*LayerUI_Desc).vColorRGBA;
+	}
 
-	m_pTransformCom->Set_Scaled(m_UIObjDesc.vSize.x, m_UIObjDesc.vSize.y, 1.f);
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, 
-		XMVectorSet(	m_UIObjDesc.vPos.x - m_UIObjDesc.vCenter.x + m_UIObjDesc.vCenter.x,
+		m_pTransformCom->Set_Scaled(m_UIObjDesc.vSize.x, m_UIObjDesc.vSize.y, 1.f);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, 
+			XMVectorSet(m_UIObjDesc.vPos.x - m_UIObjDesc.vCenter.x + m_UIObjDesc.vCenter.x,
 						m_UIObjDesc.vPos.y - m_UIObjDesc.vCenter.y + m_UIObjDesc.vCenter.y, 0.f, 1.f));
-	m_pTransformCom->Rotation(XMVectorSet(0.f, 0.f, 1.f, 1.f), XMConvertToRadians(LayerUI_Desc->fDegree));
+		m_pTransformCom->Rotation(XMVectorSet(0.f, 0.f, 1.f, 1.f), XMConvertToRadians(m_UIObjDesc.fDegree));
 
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
-	
-#pragma endregion
 
 	return S_OK;
 }
@@ -59,9 +70,26 @@ void CLayerUI::Late_Tick(_float fTimeDelta)
 
 HRESULT CLayerUI::Render()
 {
-	// PS_ALPHABLEND > PS_DEFAULT로 변경
-	if (FAILED(Bind_ShaderResources(m_pShaderCom, PS_DEFAULT, m_pTransformCom, m_pTextureCom, m_iTexIndex)))
-		return E_FAIL;
+	if (UI_TEXTURE == m_UIObjDesc.eUIType)
+	{
+		// PS_ALPHABLEND > PS_DEFAULT로 변경
+		if (FAILED(Bind_ShaderResources(m_pShaderCom, PS_DEFAULT, m_pTransformCom, m_pTextureCom, m_iTexIndex)))
+			return E_FAIL;
+	}
+
+	if (UI_FONT == m_UIObjDesc.eUIType)
+	{
+		//if (FAILED(Bind_ShaderResources(m_pShaderCom, PS_DEFAULT, m_pTransformCom)))
+		//	return E_FAIL;
+		_float2 vFontPos = { m_UIObjDesc.vPos.x + m_UIObjDesc.vCenter.x, 
+							- m_UIObjDesc.vPos.y + m_UIObjDesc.vCenter.y};
+
+		//스프라이트 폰트 렌더 (폰트 테스트용)
+		if (FAILED(m_pGameInstance->
+			Render_Font(TEXT("Font_HUDSub_KR15"), m_UIObjDesc.wstrText, vFontPos, m_UIObjDesc.vColorRGBA, 
+				XMConvertToRadians(m_UIObjDesc.fDegree))))
+			return E_FAIL;
+	}
 
 	return S_OK;
 }
@@ -116,6 +144,30 @@ HRESULT CLayerUI::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, 
 	return S_OK;
 }
 
+HRESULT CLayerUI::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTransform* _pTransCom)
+{
+	CHECK_NULLPTR(_pShaderCom);
+
+	if (FAILED(_pTransCom->Bind_ShaderResource(_pShaderCom, "g_WorldMatrix")))
+		return E_FAIL;
+
+	//셰이더 파일의 매트릭스 정보를 가져와 바인딩
+	if (FAILED(_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+		return E_FAIL;
+
+	if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+		return E_FAIL;
+
+	//Begin() > Apply() 함수 호출 전 셰이더 전역 데이터를 저장해야함
+	if (FAILED(_pShaderCom->Begin(_iPassIndex)))
+		return E_FAIL;
+
+	if (FAILED(Bind_VIBuffer(m_pVIBufferCom)))
+		return E_FAIL;
+
+	return S_OK;
+}
+
 HRESULT CLayerUI::Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom)
 {
 	if (FAILED(_pVIBufferCom->Bind_Buffers()))
@@ -155,11 +207,11 @@ CGameObject* CLayerUI::Clone(void* pArg)
 
 void CLayerUI::Free()
 {
-	__super::Free();
-
 	Safe_Release(m_pTextureCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pVIBufferCom);
+
+	__super::Free();
 }
 
 

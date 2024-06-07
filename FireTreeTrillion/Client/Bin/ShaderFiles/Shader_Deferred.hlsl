@@ -88,6 +88,7 @@ texture2D g_BlendTexture;
 texture2D g_NonLightTexture;
 
 texture2D g_FinalTexture;
+texture2D g_UITexture;
 
 texture2D g_RadialBlur;
 float g_fRadialblurRaduis;
@@ -890,6 +891,21 @@ PS_OUT PS_MAIN_MotionBlur(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_UI_Default(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    vector vColor = g_FinalTexture.Sample(LinearSampler, In.vTexcoord);
+ 
+    vector vUIColor = g_UITexture.Sample(LinearSampler, In.vTexcoord);
+    
+    Out.vColor = vColor;
+    
+    //if (vUIColor.a != 0.f)
+    //    Out.vColor = vUIColor;
+    
+    return Out;
+}
 
 technique11 DefaultTechnique
 {
@@ -1014,6 +1030,18 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN_MotionBlur();
+    }
+
+    // (10)
+    pass UI_Default
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_Default, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_UI_Default();
     }
 
 }

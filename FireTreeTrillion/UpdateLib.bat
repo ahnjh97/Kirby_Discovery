@@ -7,4 +7,6 @@ xcopy /y/s			.\Engine\Public\*.*						.\EngineSDK\Inc\
 xcopy /y			.\Engine\Bin\*.lib						.\EngineSDK\lib\
 xcopy /y			.\Engine\ThirdPartyLib\*.lib			.\EngineSDK\lib\
 xcopy /y			.\Engine\Bin\*.dll						.\Client\Bin\
+xcopy /y			.\Engine\Bin\PhysxDebug\*.dll			.\Client\Bin\PhysxDebug\
+xcopy /y			.\Engine\Bin\PhysxRelease\*.dll			.\Client\Bin\PhysxRelease\
 xcopy /y			.\Engine\Bin\ShaderFiles\*.*			.\Client\Bin\ShaderFiles\

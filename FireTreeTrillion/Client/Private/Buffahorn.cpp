@@ -46,6 +46,7 @@ HRESULT CBuffahorn::Initialize(void* pArg)
 	m_fAttack = 10.f;
 	m_eVacuumSize = SIZE_BIG;
 	m_eAbilityType = ABILITY_DEFAULT;
+	m_eEyeState = BUFFAHORNEYE_IDLE;
 
 	//for test
 	//31 8 -102
@@ -59,30 +60,6 @@ _int CBuffahorn::Tick(_float fTimeDelta)
 		return OBJ_DEAD;
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
-
-	// 지면의 up벡터
-	//PxVec3 slope = m_pControllerCom->Compute_Slope(m_pTransformCom);
-	//_vector vTerrainNormal = CUtils::To_Vector(slope);
-	//Lerp_UpVector(vTerrainNormal, 10.f, fTimeDelta);
-
-	//if (m_pGameInstance->Get_DIKeyState(DIK_W, KEY_PRESS))
-	//{
-	//	m_pTransformCom->Go_Straight(m_fTimeDelta);
-	//	//m_pControllerCom->Move_Dir(m_pTransformCom, m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), fTimeDelta);
-	//}
-
-	//if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_PRESS))
-	//{
-	//	m_pTransformCom->Turn(XMVectorSet(0.f, -1.f, 0.f, 0.f), m_fTimeDelta);
-	//}
-
-	//if (m_pGameInstance->Get_DIKeyState(DIK_D, KEY_PRESS))
-	//{
-	//	m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), m_fTimeDelta);
-	//}
-
-
-	//m_pControllerCom->FreeFall(m_pTransformCom, m_fTimeDelta, 6.f);
 
 	__super::Tick(m_fTimeDelta);
 
@@ -109,6 +86,9 @@ HRESULT CBuffahorn::Render()
 
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
+		if (Custom_Face(i) == true)
+			continue;
+
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
@@ -167,7 +147,6 @@ void CBuffahorn::Render_IMGUI()
 void CBuffahorn::Collision_Attack(CGameObject* pOtherObj)
 {
 
-
 }
 
 void CBuffahorn::Change_State(BUFFAHORN_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
@@ -191,6 +170,11 @@ HRESULT CBuffahorn::Add_Components()
 	/* For.Com_Model */
 	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Buffahorn"),
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+	CHECK_FAILED(hr);
+
+	/* For.Com_Texture */
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Buffahorn_Eye"),
+		TEXT("Com_Texture"), (CComponent**)&m_pEyeTextureCom);
 	CHECK_FAILED(hr);
 
 	/* For.Com_CharacterController */
@@ -237,6 +221,21 @@ HRESULT CBuffahorn::Bind_ShaderResources()
 	return S_OK;
 }
 
+void CBuffahorn::Compute_MotionBlur()
+{
+	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	_matrix ViewProjectionMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW) * m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
+	_vector vScreenPos = XMVector3TransformCoord(vPos, ViewProjectionMatrix);
+	_float fScreenX = (XMVectorGetX(vScreenPos) + 1.f) * 0.5f;
+	_float fScreenY = (XMVectorGetY(vScreenPos) + 1.f) * 0.5f;
+
+	_float2 vCurScreenPos = _float2(fScreenX, 1.f - fScreenY);
+
+	m_vMotionVelocity.x = (m_vPreScreenPos - vCurScreenPos).x;
+	m_vMotionVelocity.y = (m_vPreScreenPos - vCurScreenPos).y;
+	m_vPreScreenPos = vCurScreenPos;
+}
+
 void CBuffahorn::SetUp_FSM()
 {
 	// FSM 상태 초기화
@@ -261,6 +260,37 @@ void CBuffahorn::SetUp_FSM()
 	FSM_Desc.iState = BUFFAHORN_CHARGEWAIT;
 	FSM_Desc.pModel = &m_pModelCom;
 	m_pFSM->Initialize(&FSM_Desc);
+}
+
+_bool CBuffahorn::Custom_Face(_uint iMeshIndex)
+{
+	if (iMeshIndex == 1)
+	{
+		HRESULT hr;
+
+		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", iMeshIndex, TextureType_DIFFUSE);
+		CHECK_FAILED(hr);
+
+		hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", iMeshIndex);
+		CHECK_FAILED(hr);
+
+		hr = m_pEyeTextureCom->Bind_ShaderResource(m_pShaderCom, "g_KirbyEyeTexture", (_uint)m_eEyeState);
+		CHECK_FAILED(hr);
+
+		_bool bStencil = true;
+		_bool bRimLight = true;
+		_bool bMotionBlur = true;
+		m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
+
+		m_pShaderCom->Begin(ANIMMODEL_KIRBYEYE);
+		m_pModelCom->Render(iMeshIndex);
+
+		return true;
+	}
+
+	return false;
 }
 
 CBuffahorn* CBuffahorn::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -293,4 +323,6 @@ CGameObject* CBuffahorn::Clone(void* pArg)
 void CBuffahorn::Free()
 {
 	__super::Free();
+
+	Safe_Release(m_pEyeTextureCom);
 }

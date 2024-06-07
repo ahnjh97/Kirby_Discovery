@@ -59,6 +59,51 @@ HRESULT CLight_Manager::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer)
 	return S_OK;
 }
 
+#ifdef _DEBUG
+void CLight_Manager::IMGUI_Tick()
+{
+	if (m_Lights.empty()) return;
+
+	ImGui::Begin("LIGHT Editor");
+	_int iIDX = 0;
+	auto it = m_Lights.begin();
+	for (auto& light : m_Lights)
+	{
+		LIGHT_DESC* pLightDesc;
+		pLightDesc = const_cast<LIGHT_DESC*>(light->Get_LightDesc());
+
+		// 태양광은 IMGUI에서 조절하지 않습니다.
+		if (pLightDesc->eType == LIGHT_DESC::TYPE_DIRECTIONAL)
+			continue;
+
+		// light numbering
+		string strLightName = "LIGHT_" + to_string(iIDX);
+		ImGui::SeparatorText(strLightName.c_str());
+
+		// POSITION
+		string strLightPos = "POSITION_" + to_string(iIDX);
+		ImGui::DragFloat3(strLightPos.c_str(), &pLightDesc->vPosition.x, -200.f, 500.f);
+		// RANGE
+		string strLightRange = "RANGE_" + to_string(iIDX);
+		ImGui::SliderFloat(strLightRange.c_str(), &pLightDesc->fRange, 0.f, 200.f);
+		// DIFFUSE
+		string strLightDiffuse = "DIFFUSE_" + to_string(iIDX);
+		ImGui::SliderFloat3(strLightDiffuse.c_str(), &pLightDesc->vDiffuse.x, 0.f, 1.f);
+		// AMBIENT
+		string strLightAmbient = "AMBIENT_" + to_string(iIDX);
+		ImGui::SliderFloat3(strLightAmbient.c_str(), &pLightDesc->vAmbient.x, 0.f, 1.f);
+		// SPECULAR
+		string strLightSpecular = "SPECULAR_" + to_string(iIDX);
+		ImGui::SliderFloat3(strLightSpecular.c_str(), &pLightDesc->vSpecular.x, 0.f, 1.f);
+		ImGui::NewLine(); ImGui::Separator();
+
+		++iIDX;
+	}
+
+	ImGui::End();
+}
+#endif
+
 void CLight_Manager::Clear_Light()
 {
 	// 모든 빛을 죽인다.

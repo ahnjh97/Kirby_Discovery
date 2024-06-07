@@ -7,6 +7,7 @@
 #include "Camera_Free.h"
 #include "Trigger.h"
 #include "UIObject.h"
+#include "Kabu.h"
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -126,12 +127,11 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
 
 HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
-
 	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_SkySphere"));
 	CHECK_FAILED(hr);
 
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_TestMap"))))
-	//	return E_FAIL;
+	hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_WasteCan"));
+	CHECK_FAILED(hr);
 
 	return S_OK;
 }
@@ -193,13 +193,15 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& strLayerTag)
 		if (0 == strProtoTag.size())
 			return FALSE;
 
+		CUIObject::UIOBJ_DESC UIobj_Desc{};
 		string strUITag = {};
 		_uint iUITagLen = {};
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.eUIType), sizeof(UIobj_Desc.eUIType));
+
 		InputFile.read(reinterpret_cast<char*>(&iUITagLen), sizeof(iUITagLen));
 		strUITag.resize(iUITagLen);
 		InputFile.read(&strUITag[0], iUITagLen);
 
-		CUIObject::UIOBJ_DESC UIobj_Desc{};
 		UIobj_Desc.wstrUITag = CUtils::StrToWstr(strUITag);
 
 		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vCenter), sizeof(UIobj_Desc.vCenter));
@@ -207,6 +209,15 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& strLayerTag)
 		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vPos), sizeof(UIobj_Desc.vPos));
 		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.fDegree), sizeof(UIobj_Desc.fDegree));
 		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.iTexIndex), sizeof(UIobj_Desc.iTexIndex));
+
+		string strText = {};
+		_uint iUIextLen = {};
+		InputFile.read(reinterpret_cast<char*>(&iUIextLen), sizeof(iUIextLen));
+		strText.resize(iUIextLen);
+		InputFile.read(&strText[0], iUIextLen);
+		UIobj_Desc.wstrText = CUtils::StrToWstr(strText);
+
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vColorRGBA), sizeof(UIobj_Desc.vColorRGBA));
 
 		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, CUtils::StrToWstr(strProtoTag), &UIobj_Desc)))
 			return E_FAIL;
@@ -309,6 +320,16 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 		{
 			tempDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BladeKnight"), &tempDesc)))
+				return E_FAIL;
+		}
+		else if (strModelName == "NonAnim_Kabu")
+		{
+			CKabu::KABU_DESC KabuDesc = {};
+			KabuDesc.matWorld = matWorld;
+			KabuDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			KabuDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기
+			KabuDesc.eMoveState = CKabu::KABUMOVING_PATROL;
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Kabu"), &KabuDesc)))
 				return E_FAIL;
 		}
 		else if (strModelName == "Level1Stage1Step01" || strModelName == "Level1Stage1Step01_Blend")

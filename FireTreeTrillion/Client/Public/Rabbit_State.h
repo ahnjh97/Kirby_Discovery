@@ -118,10 +118,6 @@ public:
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
 	virtual void OnStateExit()														override;
 
-private:
-	_float m_fJumpVelocity = { 0.f };
-	_vector m_vKirbyLook = {};
-
 public:
 	static	CRabbit_Damage_State* Create();
 	virtual void Free() override;

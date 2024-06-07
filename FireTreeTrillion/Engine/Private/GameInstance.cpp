@@ -125,8 +125,6 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 		nullptr == m_pPipeLine)
 		return;
 
-
-
 	m_pInput_Device->Tick();
 	m_pTimeController->Update_TimeController(fTimeDelta);
 
@@ -138,7 +136,11 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 	m_pFrustum->Tick();
 
 #ifdef _DEBUG
+
 	m_pIMGUI_Manager->Late_Tick(fTimeDelta);
+
+	m_pLight_Manager->IMGUI_Tick();
+
 #endif
 
 	m_pObject_Manager->Late_Tick(fTimeDelta);
@@ -625,6 +627,7 @@ HRESULT CGameInstance::Render_Font(const wstring & strFontTag, const wstring & s
 	return m_pFont_Manager->Render(strFontTag, strText, vPosition, vColor, fRadian);
 }
 
+#pragma region TARGET_MANAGER
 HRESULT CGameInstance::Add_RenderTarget(const wstring & strRenderTargetTag, _uint iSizeX, _uint iSizeY, DXGI_FORMAT ePixelFormat, const _float4 & vClearColor)
 {
 	if (m_pTarget_Manager == nullptr)
@@ -672,6 +675,7 @@ HRESULT CGameInstance::Copy_Resource(const wstring & strRenderTargetTag, ID3D11T
 
 	return m_pTarget_Manager->Copy_Resource(strRenderTargetTag, ppTextureHub);
 }
+#pragma endregion
 
 _bool CGameInstance::isInFrustum_WorldSpace(_fvector vWorldPos, _float fRange)
 {
