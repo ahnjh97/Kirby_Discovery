@@ -134,6 +134,9 @@ HRESULT CLayerUI::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, 
 	//셰이더 파일의 텍스처 정보를 가져와 바인딩
 	_pTextureCom->Bind_ShaderResource(_pShaderCom, "g_DiffuseTexture", _iTexIndex);
 
+	//셰이더의 원시데이터 가져와 저장
+	_pShaderCom->Bind_RawValue("g_vRColor", &m_vColorRGBA, sizeof(_float4));
+
 	//Begin() > Apply() 함수 호출 전 셰이더 전역 데이터를 저장해야함
 	if (FAILED(_pShaderCom->Begin(_iPassIndex)))
 		return E_FAIL;

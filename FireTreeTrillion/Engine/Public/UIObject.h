@@ -8,8 +8,8 @@ class ENGINE_DLL CUIObject abstract : public CGameObject
 {
 protected:
 	enum UI_TYPE { UI_TEXTURE, UI_FONT, UI_NONE };
-	enum LAYER_TYPE { TYPE_LAYER, TYPE_GROUP, TYPE_NONE };
-	enum UI_GROUP { GROUP_ALL, GROUP_SELECT, GROUP_NONE };
+	enum UI_STATE { UI_LAYER, UI_GROUP, UI_END };
+	enum GROUP_TYPE { GROUP_ALL, GROUP_SELECT, GROUP_NONE };
 
 	enum SHADER_PS
 	{
@@ -74,6 +74,7 @@ protected:
 	
 	_uint						m_iTexIndex = { 0 };
 	_float4x4					m_ViewMatrix, m_ProjMatrix;
+	_float4						m_vColorRGBA = { 0.f, 0.f, 0.f, 1.f };
 
 	_bool						m_bIsRender = false;
 

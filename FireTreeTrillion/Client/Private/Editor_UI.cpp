@@ -828,9 +828,9 @@ _bool CEditor_UI::Create_UIObject(LAYER_TYPE _eLayerType, UI_TYPE _eUIType)
 {
 	string strProtoTag = { "Prototype_GameObject_" };
 
-	if (CUIObject::TYPE_LAYER == _eLayerType) //레이어 생성
+	if (UI_LAYER == _eUIState) //레이어 생성
 	{
-		CUIObject::UIOBJ_DESC LayerUI_Desc{};
+		UIOBJ_DESC LayerUI_Desc{};
 		//LayerUI_Desc.eUIType = { TYPE_LAYER };
 		LayerUI_Desc.wstrUITag = { TEXT("LayerUI") };
 		LayerUI_Desc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f };
@@ -867,7 +867,7 @@ _bool CEditor_UI::Create_UIObject(LAYER_TYPE _eLayerType, UI_TYPE _eUIType)
 		return TRUE;
 	}
 
-	if (CUIObject::TYPE_GROUP == _eLayerType) //레이어그룹(캔버스) 생성
+	if (UI_GROUP == _eUIState) //레이어그룹(캔버스) 생성
 	{
 	}
 }
@@ -881,7 +881,7 @@ _bool CEditor_UI::Delete_UIObject(LAYER_TYPE _eLayerType)
 		return TRUE;
 	}
 
-	if (CUIObject::TYPE_LAYER == _eLayerType) //레이어 삭제
+	if (UI_LAYER == _eUIState) //레이어 삭제
 	{
 		//ListBox에서 선택한 레이어를 삭제
 		if (iSelectUI >= 0 && iSelectUI < m_LayerUIs.size())
@@ -893,14 +893,14 @@ _bool CEditor_UI::Delete_UIObject(LAYER_TYPE _eLayerType)
 		}
 	}
 
-	if (CUIObject::TYPE_GROUP == _eLayerType) //레이어그룹(캔버스) 삭제
+	if (UI_GROUP == _eUIState) //레이어그룹(캔버스) 삭제
 	{
 
 	}
 }
 
 //진행 보류) 그룹 선택 후 기즈모 상속 동기화
-_bool CEditor_UI::Grouping_UIObject(UI_GROUP _eUIGroup)
+void CEditor_UI::Group_UIObject(GROUP_TYPE _eUIGroup)
 {
 	if (m_LayerUIs.empty()) //레이어가 없음
 	{
@@ -913,7 +913,7 @@ _bool CEditor_UI::Grouping_UIObject(UI_GROUP _eUIGroup)
 		return FALSE;
 	}
 
-	if (CUIObject::GROUP_ALL == _eUIGroup) //전체 레이어 그룹화
+	if (GROUP_ALL == _eUIGroup) //전체 레이어 그룹화
 	{
 		m_GroupUIs.push_back(m_LayerUIs); 
 
@@ -923,7 +923,7 @@ _bool CEditor_UI::Grouping_UIObject(UI_GROUP _eUIGroup)
 
 	vector<CUIObject*> TpSelectUIs; //임시 벡터
 
-	if (CUIObject::GROUP_SELECT == _eUIGroup) //선택 레이어 그룹화
+	if (GROUP_SELECT == _eUIGroup) //선택 레이어 그룹화
 	{
 		for (auto& SelectIndex : SelectUIs) //선택한 항목의 벡터 인덱스 검색
 		{

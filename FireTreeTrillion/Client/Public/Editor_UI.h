@@ -49,9 +49,9 @@ private:
 	_bool			Edit_Text(); //텍스트 편집
 	_bool			Set_TextSync(string _strInput);
 
-	_bool			Create_UIObject(LAYER_TYPE _eLayerType, UI_TYPE _eUIType);
-	_bool			Delete_UIObject(LAYER_TYPE _eLayerType);
-	_bool			Grouping_UIObject(UI_GROUP _eUIGroup);
+	void			Create_UIObject(UI_STATE _eUIState, UI_TYPE _eUIType);
+	void			Delete_UIObject(UI_STATE _eUIState);
+	void			Group_UIObject(GROUP_TYPE _eUIGroup);
 
 public:
 	_bool			Save_Texture(const string& _strFilePath, ID3D11RenderTargetView* _pRTV);
