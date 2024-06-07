@@ -529,13 +529,13 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 		return E_FAIL;
 
 	//레벨 별 옵션 ON/OFF
-	_uint* iCurrLevel = m_pGameInstance->Get_CurrentLevelID();
-	if (5 != *iCurrLevel) //LEVEL_TOOL_UI 제외
-	{
+	//_uint* iCurrLevel = m_pGameInstance->Get_CurrentLevelID();
+	//if (5 != *iCurrLevel) //LEVEL_TOOL_UI 제외
+	//{
 		// 고사양, 저사양 모드
 		if (m_pGameInstance->Get_DIKeyState(DIK_E, KEY_DOWN))
 			m_bLowPass = !m_bLowPass;
-	}
+	//}
 
 	// 림 라이트
 	if (*m_pGameInstance->Get_CurrentLevelID() != 6)
@@ -558,36 +558,36 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 
 	//레벨 별 옵션 ON/OFF
 	//_uint* iCurrLevel = m_pGameInstance->Get_CurrentLevelID();
-	if (5 == *iCurrLevel) //LEVEL_TOOL_UI 만
-	{
-		ImGuiWindowFlags Dirwindow_Flags{}; /*= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize;*/
-		if (ImGui::Begin(u8"Preview 미리보기", 0, Dirwindow_Flags))
-		{
-			D3D11_VIEWPORT		ViewportDesc{};	
-			_uint				iNumViewports = { 1 };
-			m_pContext->RSGetViewports(&iNumViewports, &ViewportDesc);
+	//if (5 == *iCurrLevel) //LEVEL_TOOL_UI 만
+	//{
+	//	ImGuiWindowFlags Dirwindow_Flags{}; /*= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize;*/
+	//	if (ImGui::Begin(u8"Preview 미리보기", 0, Dirwindow_Flags))
+	//	{
+	//		D3D11_VIEWPORT		ViewportDesc{};
+	//		_uint				iNumViewports = { 1 };
+	//		m_pContext->RSGetViewports(&iNumViewports, &ViewportDesc);
 
-			ImVec2 vWinSize = { ViewportDesc.Width * 0.25f, ViewportDesc.Height * 0.25f }; //ImGui::GetWindowSize();
-			//06.05) UI 렌더타겟 뷰 렌더
-				//m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("UI Default"),
-				//	_float2(5.f, 10.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
-				//이미 생성한 RTV 데이터 저장 및 DESC에 복사
+	//		ImVec2 vWinSize = { ViewportDesc.Width * 0.1f, ViewportDesc.Height * 0.1f }; //ImGui::GetWindowSize();
+	//		//06.05) UI 렌더타겟 뷰 렌더
+	//			//m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("UI Default"),
+	//			//	_float2(5.f, 10.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+	//			//이미 생성한 RTV 데이터 저장 및 DESC에 복사
 
-			XMStoreFloat4x4(&m_WorldMatrix, XMMatrixIdentity());
+	//		XMStoreFloat4x4(&m_WorldMatrix, XMMatrixIdentity());
 
-			m_WorldMatrix._11 = ViewportDesc.Width;
-			m_WorldMatrix._22 = ViewportDesc.Height;
-			m_WorldMatrix._41 = 0.f;
-			m_WorldMatrix._42 = 0.f;
+	//		m_WorldMatrix._11 = ViewportDesc.Width;
+	//		m_WorldMatrix._22 = ViewportDesc.Height;
+	//		m_WorldMatrix._41 = 0.f;
+	//		m_WorldMatrix._42 = 0.f;
 
-			XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
-			XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(ViewportDesc.Width, ViewportDesc.Height, 0.f, 1.f));
+	//		XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
+	//		XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(ViewportDesc.Width, ViewportDesc.Height, 0.f, 1.f));
 
-			ImGui::Image((void*)m_pUISRV, vWinSize);
+	//		ImGui::Image((void*)m_pUISRV, vWinSize);
 
-			ImGui::End();
-		}
-	}
+	//	}
+	//	ImGui::End();
+	//}
 
 	Render_IMGUI();
 #endif

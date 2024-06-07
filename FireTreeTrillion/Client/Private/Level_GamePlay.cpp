@@ -219,14 +219,19 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& strLayerTag)
 
 		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vColorRGBA), sizeof(UIobj_Desc.vColorRGBA));
 
+		//UITag 레이어명에 따라 객체를 생성
+		if ("LayerUI" != strUITag)
+			continue;
 		//if ("HUD_kribyStatus" == strUITag)
 		//{
 		//	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, CUtils::StrToWstr(strProtoTag), &UIobj_Desc)))
 		//		return E_FAIL;
 		//}
-
-		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, CUtils::StrToWstr(strProtoTag), &UIobj_Desc)))
-			return E_FAIL;
+		else
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, CUtils::StrToWstr(strProtoTag), &UIobj_Desc)))
+				return E_FAIL;
+		}
 	}
 
 	return S_OK;

@@ -50,7 +50,6 @@ private:
 
 	_bool			Edit_Text(); //텍스트 편집
 	UIOBJ_DESC		Edit_LayerUITag(string _strInput);
-	_bool			Set_TextSync(string _strInput);
 
 	void			Create_UIObject(UI_STATE _eUIState, UI_TYPE _eUIType);
 	void			Delete_UIObject(UI_STATE _eUIState);

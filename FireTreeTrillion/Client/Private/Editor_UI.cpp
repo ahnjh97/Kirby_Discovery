@@ -229,7 +229,8 @@ static POPUP_TYPE eOpenPopup = { POPUP_NONE };
 static POPUP_DETAIL ePopupDetail = { DETAIL_NONE };
 
 static _bool IsSuccessed = { FALSE };
-string strResult, strPopupTag, strMessage, strDetail, strUITag = { " " };
+string strResult, strPopupTag, strMessage, strDetail = { u8" " };
+string strUITag = { "LayerUI" };
 
 _bool CEditor_UI::Window_Directories()
 {
@@ -300,7 +301,6 @@ _bool CEditor_UI::Tab_LayerList()
 					if (!m_LayerUIs.empty() && !SelectUIs.empty())
 					{
 						Set_GizmoSync(m_LayerUIs[iUI]); //기즈모와 위젯, 오브젝트 동기화 작업
-						Set_TextSync(strUITag);
 					}
 				}
 #pragma endregion
@@ -547,6 +547,7 @@ _bool CEditor_UI::Window_Tools()
 		{
 			if (ImGui::BeginTabItem(u8"Color 색상 편집"))
 			{
+				ImGui::SeparatorText(u8"Color Edit 색상 편집");
 				Edit_RGBAColor();
 
 				ImGui::EndTabItem();
@@ -591,9 +592,18 @@ _bool CEditor_UI::Window_Sequencer()
 	return TRUE;
 }
 
+//전반적인 안내팝업 설정
 void CEditor_UI::Window_PopupAlert()
 {
-	strUITag = { "LayerUI" };
+	if (!SelectUIs.empty())
+	{
+		iSelectUI = SelectUIs.front();
+		if ((iSelectUI >= 0 && iSelectUI < m_LayerUIs.size()))
+		{
+			wstring wstrUITag = m_LayerUIs[iSelectUI]->Get_UIObj_Desc().wstrUITag;
+			strUITag = CUtils::WstrToStr(wstrUITag); //{ " LayerUI" };
+		}
+	}
 
 	if (IsSuccessed) strResult = { "Successed" };
 	else strResult = { "Failed" };
@@ -602,13 +612,13 @@ void CEditor_UI::Window_PopupAlert()
 	{
 	case POPUP_CREATE:	strPopupTag = { "Create" };
 		switch (ePopupDetail)
-		{	default: strDetail = { " " };	}
+		{	default: strDetail = { u8" " };	break;	}
 		ImGui::OpenPopup(strPopupTag.c_str());
 		break;
 
 	case POPUP_DELETE:	strPopupTag = { "Delete" };
 		switch (ePopupDetail)
-		{	default: strDetail = { " " };	}
+		{	default: strDetail = { u8" " };	break;	}
 		ImGui::OpenPopup(strPopupTag.c_str());
 		break;
 
@@ -617,7 +627,7 @@ void CEditor_UI::Window_PopupAlert()
 		{
 		case NEED_CREATE:	strDetail = { u8"Need to Create Layer 생성한 레이어가 없습니다" }; break;
 		case NEED_SELECT:	strDetail = { u8"Need to Select Layer 레이어를 선택해주세요" }; break;
-		default: strDetail = {" "};
+		default: strDetail = { u8" " }; break;
 		}
 		ImGui::OpenPopup(strPopupTag.c_str());
 		break;
@@ -628,7 +638,7 @@ void CEditor_UI::Window_PopupAlert()
 		case NEED_CREATE:	strDetail = { u8"Need to Create Layer 생성한 레이어가 없습니다" }; break;
 		case FILE_OPEN:		strDetail = { u8"Check the File Path & Name 파일 경로와 이름을 확인해주세요" }; break;
 		case FILE_COPY:		strDetail = { u8"Copy Failed" }; break;
-		default: strDetail = { " " };
+		case DETAIL_NONE: default: strDetail = { u8" " }; break;
 		}
 		ImGui::OpenPopup(strPopupTag.c_str());
 		break;
@@ -637,14 +647,14 @@ void CEditor_UI::Window_PopupAlert()
 		switch (ePopupDetail)
 		{
 		case FILE_OPEN:		strDetail = { u8"Check the File Path & Name 파일 경로와 이름을 확인해주세요" }; break;
-		default: strDetail = { " " };
+		case DETAIL_NONE: default: strDetail = { u8" " }; break;
 		}
 		ImGui::OpenPopup(strPopupTag.c_str());
 		break;
 
 	case POPUP_MODIFY:	strPopupTag = { "Modify" };
 		switch (ePopupDetail)
-		{	default: strDetail = { " " };	}
+		{	default: strDetail = { u8" " };	break;	}
 		ImGui::OpenPopup(strPopupTag.c_str());
 		break;
 	}
@@ -701,16 +711,19 @@ void CEditor_UI::Window_PopupAlert()
 		ImGui::EndPopup();
 	}
 
-	if ("Modify" == strPopupTag)
-		strMessage = { u8"내힘들다" };
-
-	strMessage = strResult + " to " + strPopupTag + " :" + strUITag;
-	eOpenPopup = POPUP_NONE;
-
 #pragma endregion
+
+	if ("Modify" == strPopupTag)
+		strMessage = { u8"변경할 레이어 이름을 입력해주세요" };
+
+	else
+		strMessage = strResult + " to " + strPopupTag + " : " + strUITag;
+
+	eOpenPopup = POPUP_NONE;
 
 }
 
+//객체에 대한 변환(크기, 회전, 이동) 편집
 _bool CEditor_UI::Edit_Transform(CUIObject* _pUIObj)
 {
 	const char* DragTag = { "Translate 위치" };
@@ -763,8 +776,6 @@ _bool CEditor_UI::Edit_Transform(CUIObject* _pUIObj)
 
 _bool CEditor_UI::Edit_RGBAColor()
 {
-	ImGui::SeparatorText(u8"Color Edit 색상 편집");
-
 	static ImVec4 color = ImVec4(
 		(127.0f / 255.0f) / 1.f,
 		127.0f / 255.0f,
@@ -790,7 +801,7 @@ _bool CEditor_UI::Edit_RGBAColor()
 	ImGuiColorEditFlags ColorPicker_Flags = { ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar };
 
 	//컬러버튼
-	ImGui::ColorButton("MyColor##3c", *(ImVec4*)&color, ColorButton_Flags, ImVec2(50, 45));
+	ImGui::ColorButton("##ColorButton", *(ImVec4*)&color, ColorButton_Flags, ImVec2(50, 45));
 	ImGui::SameLine();
 
 
@@ -803,7 +814,6 @@ _bool CEditor_UI::Edit_RGBAColor()
 	ImGui::ColorEdit4("##ColorEdit_HEX", (_float*)&color, ColorEditHex_Flags);
 	ImGui::PopItemWidth();
 	ImGui::EndGroup();
-
 	//ImGui::NewLine();
 
 	//ImGui::PushItemWidth(ImGui::GetColumnOffset());
@@ -886,12 +896,6 @@ CUIObject::UIOBJ_DESC CEditor_UI::Edit_LayerUITag(string _strInput)
 	return LayerUIDesc;
 }
 
-//현재 사용안함. 깡통
-_bool CEditor_UI::Set_TextSync(string _strInput)
-{
-	return TRUE;
-}
-
 _bool CEditor_UI::Set_OrthoProj()
 {
 	// 05.24) 직교투영 스페이스 변환
@@ -921,6 +925,7 @@ _bool CEditor_UI::Set_OrthoProj()
 	return TRUE;
 }
 
+//기즈모 동기화
 _bool CEditor_UI::Set_GizmoSync(CUIObject* _pUIObj)
 {
 	static ImGuizmo::OPERATION eCurGizmoOper(ImGuizmo::TRANSLATE);
@@ -966,6 +971,7 @@ _bool CEditor_UI::Set_GizmoSync(CUIObject* _pUIObj)
 	return TRUE;
 }
 
+//그리드 생성 및 세팅
 _bool CEditor_UI::Set_GizmoGrid()
 {
 	//IMGUI Gizmo Grid 커스텀 (X/Y 2D 좌표계용)
@@ -1126,6 +1132,7 @@ void CEditor_UI::Save_Texture(const string& _strFilePath, ID3D11RenderTargetView
 	IsSuccessed = TRUE; eOpenPopup = POPUP_SAVE;
 }
 
+//데이터 저장
 _bool CEditor_UI::Save_FileData(const string& _strFilePath)
 {
 	string strUITag = {};
@@ -1237,10 +1244,11 @@ _bool CEditor_UI::Save_FileData(const string& _strFilePath)
 	}
 
 	//MSG_BOX(TEXT("Successed to Save : FileData"));
-	IsSuccessed = TRUE; eOpenPopup = POPUP_SAVE;
+	IsSuccessed = TRUE; eOpenPopup = POPUP_SAVE; ePopupDetail = DETAIL_NONE;
 	return TRUE;
 }
 
+//데이터 로드
 _bool CEditor_UI::Load_FileData(const string& _strFilePath)
 {
 	std::ifstream InputFile(_strFilePath, ios::in | std::ios::binary);
@@ -1306,7 +1314,7 @@ _bool CEditor_UI::Load_FileData(const string& _strFilePath)
 	InputFile.close();
 
 	//MSG_BOX(TEXT("Successed to Load : FileData"));
-	IsSuccessed = TRUE; eOpenPopup = POPUP_LOAD;
+	IsSuccessed = TRUE; eOpenPopup = POPUP_LOAD; ePopupDetail = DETAIL_NONE;
 	return TRUE;
 }
 

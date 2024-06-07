@@ -328,6 +328,7 @@ HRESULT CLoader::Loading_For_GamePlay()
 
 
 	hr = Add_Texture(eLevel, "GameComplete", "UI/GAMECOMPLETE/GameComplete_%d.png", 21);
+	hr = Add_Texture(eLevel, "HUD_KirbyStatus", "UI/HUD/Kirby/PanelHard/HeroPanelHard_%d.png", 16);
 	CHECK_FAILED(hr);
 
 	// 커비 얼굴 텍스쳐 로드
@@ -489,7 +490,7 @@ HRESULT CLoader::Loading_For_Tool_UI()
 
 #pragma region TEXTURE
 
-	//hr = Add_Texture(eLevel, "GameComplete", "UI/GAMECOMPLETE/GameComplete_%d.png", 21);
+	hr = Add_Texture(eLevel, "GameComplete", "UI/GAMECOMPLETE/GameComplete_%d.png", 21);
 	hr = Add_Texture(eLevel, "HUD_KirbyStatus", "UI/HUD/Kirby/PanelHard/HeroPanelHard_%d.png", 16);
 	CHECK_FAILED(hr);
 
