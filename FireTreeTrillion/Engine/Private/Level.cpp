@@ -26,6 +26,17 @@ HRESULT CLevel::Render()
 	return S_OK;
 }
 
+HRESULT CLevel::Add_Component(const wstring& strPrototypeTag, const wstring& strComponentTag, CComponent** ppOut)
+{
+	CComponent* pComponent = m_pGameInstance->Clone_Component(*m_pGameInstance->Get_CurrentLevelID(), strPrototypeTag);
+	if (nullptr == pComponent)
+		return E_FAIL;
+
+	*ppOut = pComponent;
+
+	return S_OK;
+}
+
 void CLevel::Free()
 {
 	__super::Free();

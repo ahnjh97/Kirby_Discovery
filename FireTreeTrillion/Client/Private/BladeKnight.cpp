@@ -44,6 +44,12 @@ HRESULT CBladeKnight::Initialize(void* pArg)
 
 	m_pModelCom->Set_Animation(BLADEKNIGHT_WAIT, 50.f, true, true);
 
+	m_fMaxHp = 15.f;
+	m_fHp = 15.f;
+	m_fAttack = 10.f;
+	m_eVacuumSize = SIZE_SMALL;
+	m_eAbilityType = ABILITY_SWORD;
+
 	return S_OK;
 }
 
@@ -52,11 +58,13 @@ _int CBladeKnight::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return OBJ_DEAD;
 
-	__super::Tick(fTimeDelta);
+	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+
+	__super::Tick(m_fTimeDelta);
 
 	Compute_ViewZ();
 
-	__super::SetOn_Slope(fTimeDelta);
+	__super::SetOn_Slope(m_fTimeDelta);
 
 	Compute_MotionBlur();
 
@@ -65,17 +73,17 @@ _int CBladeKnight::Tick(_float fTimeDelta)
 	   //	m_pFSM->Update(this, fTimeDelta);
 
 	for (auto& Pair : m_PartObjects)
-		Pair.second->Tick(fTimeDelta);
+		Pair.second->Tick(m_fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
 
 void CBladeKnight::Late_Tick(_float fTimeDelta)
 {
-	m_pModelCom->Play_Animation(fTimeDelta);
+	m_pModelCom->Play_Animation(m_fTimeDelta);
 
 	for (auto& Pair : m_PartObjects)
-		Pair.second->Late_Tick(fTimeDelta);
+		Pair.second->Late_Tick(m_fTimeDelta);
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
@@ -95,12 +103,16 @@ HRESULT CBladeKnight::Render()
 	{
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
 			return E_FAIL;
+		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
+			return E_FAIL;
 
 		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
 
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom->Begin(MODEL_NORMAL_X)))
+		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
 			return E_FAIL;
 
 		m_pModelCom->Render(i);
@@ -159,11 +171,6 @@ _bool CBladeKnight::IsAnimFinished()
 	return m_pModelCom->IsFinished();
 }
 
-_uint CBladeKnight::Get_State()
-{
-	return m_pFSM->Get_State();
-}
-
 void CBladeKnight::Compute_MotionBlur()
 {
 	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
@@ -218,15 +225,13 @@ HRESULT CBladeKnight::Add_PartObjects()
 	CModel* pModel = (CModel*)Get_Component(TEXT("Com_Model"));
 
 	BladeKnightSwordDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-	BladeKnightSwordDesc.pSocket = pModel->Get_BonePtr("RHaveL_end");
+	BladeKnightSwordDesc.pSocket = pModel->Get_BonePtr("RHaveL");
 
 	pWeaponObject = dynamic_cast<CPartObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_BladeKnightSword"), &BladeKnightSwordDesc));
 	if (nullptr == pWeaponObject)
 		return E_FAIL;
 
 	m_pSword = dynamic_cast<CBladeKnightSword*>(pWeaponObject);
-
-	Safe_AddRef(m_pSword);
 
 	m_PartObjects.emplace(TEXT("Part_Weapon"), pWeaponObject);
 
@@ -255,6 +260,8 @@ HRESULT CBladeKnight::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool))))
 		return E_FAIL;
@@ -327,6 +334,5 @@ void CBladeKnight::Free()
 	for (auto& Pair : m_PartObjects)
 		Safe_Release(Pair.second);
 
-	Safe_Release(m_pSword);
 	m_PartObjects.clear();
 }

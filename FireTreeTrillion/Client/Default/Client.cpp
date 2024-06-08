@@ -87,12 +87,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			pMainApp->Tick(fTickTimeDelta);
 			pMainApp->Render(fTickTimeDelta);
 
-			fTimeAcc = 0.f;
+			fTimeAcc = 0.f; 
 		}		
 	}
 
 	Safe_Release(pGameInstance);
-	Safe_Release(pMainApp);   
+	Safe_Release(pMainApp);
 
     return (int) msg.wParam;
 }

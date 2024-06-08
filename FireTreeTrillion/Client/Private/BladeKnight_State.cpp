@@ -12,9 +12,9 @@ CBladeKnight_Idle_State::CBladeKnight_Idle_State()
 {
 }
 
-void CBladeKnight_Idle_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CBladeKnight_Idle_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CBladeKnight_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -68,9 +68,9 @@ CBladeKnight_Move_State::CBladeKnight_Move_State()
 {
 }
 
-void CBladeKnight_Move_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CBladeKnight_Move_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 
 	m_fSpeed = 3.5f;
 }
@@ -100,7 +100,7 @@ void CBladeKnight_Move_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	if (15.f < fDistance)
 		pBladeKnight->Change_State(CBladeKnight::BLADEKNIGHT_WAIT, 55.f, true, true);
 	// 일정 거리 안으로 들어오면 공격
-	else if(4.f > fDistance)
+	else if(6.f > fDistance)
 	{
 		if(rand() % 2 == 0)
 			pBladeKnight->Change_State(CBladeKnight::BLADEKNIGHT_ATTACKSTART, 55.f, false, true);
@@ -138,9 +138,9 @@ CBladeKnight_Find_State::CBladeKnight_Find_State()
 {
 }
 
-void CBladeKnight_Find_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CBladeKnight_Find_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 
 	m_fTimeDelta = 0.f;
 }
@@ -171,7 +171,7 @@ void CBladeKnight_Find_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 	if (1.f < m_fTimeDelta)
 	{
-		if (7.f < fDistance)
+		if (4.f < fDistance)
 			pBladeKnight->Change_State(CBladeKnight::BLADEKNIGHT_MOVE, 55.f, true, true);
 	}
 
@@ -221,9 +221,9 @@ CBladeKnight_Attack_State::CBladeKnight_Attack_State()
 {
 }
 
-void CBladeKnight_Attack_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CBladeKnight_Attack_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 
 	m_fX = 0.f;
 	bStop = false;
@@ -298,9 +298,9 @@ CBladeKnight_Retreat_State::CBladeKnight_Retreat_State()
 {
 }
 
-void CBladeKnight_Retreat_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CBladeKnight_Retreat_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 
 	m_fSpeed = 3.f;
 	m_bRecoverSpeed = false;
@@ -313,13 +313,6 @@ void CBladeKnight_Retreat_State::OnStateUpdate(CGameObject* pGameObject, _float 
 	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 
 	_float fAnimRatio = pBladeKnight->Get_AnimRatio();
-
-	//if ((0.25f < fAnimRatio && 0.35f > fAnimRatio) || 0.6f < fAnimRatio)
-	//	m_fSpeed = 0.f;
-	//else
-	//{
-	//	m_fSpeed = 3.f;
-	//}
 
 	// 백스텝 움직임 제어
 	if (0.25f > fAnimRatio)
@@ -372,9 +365,9 @@ CBladeKnight_TornadoAttack_State::CBladeKnight_TornadoAttack_State()
 {
 }
 
-void CBladeKnight_TornadoAttack_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CBladeKnight_TornadoAttack_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CBladeKnight_TornadoAttack_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)

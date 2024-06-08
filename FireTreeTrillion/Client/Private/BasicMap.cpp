@@ -149,6 +149,7 @@ void CBasicMap::Render_IMGUI()
     if (ImGui::Checkbox("cow", &bCow))
     {
         hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, L"Layer_Monster", TEXT("Prototype_GameObject_Buffahorn"));
+
         CHECK_FAILED(hr);
     }
 

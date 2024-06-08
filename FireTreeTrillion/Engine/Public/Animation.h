@@ -55,12 +55,14 @@ public:
 	const _char* Get_AnimationName() const { return m_szName; }
 	_float		 Get_Duration() const { return m_fDuration; }
 
-public:
-	HRESULT Initialize(const vector<class CBone*>& Bones, ifstream& fileStream);
-	void	Invalidate_TransformationMatrix(_float fTimeDelta, const vector<class CBone*>& Bones, _bool bIsLooping);
+	// 애님툴에서 작업한 데이터 가져오기
+	void		 Set_AnimEventData(ANIM_INFO tAnimInfo);
 
 public:
-	void Read_AnimationData(ifstream& fileStream);
+	HRESULT		Initialize(const vector<class CBone*>& Bones, ifstream& fileStream);
+	void		Invalidate_TransformationMatrix(_float fTimeDelta, const vector<class CBone*>& Bones, _bool bIsLooping, class CModel* model);
+
+	void		Read_AnimationData(ifstream& fileStream);
 
 private:
 	_char								m_szName[MAX_PATH] = { "" };
@@ -77,10 +79,13 @@ private:
 	_float								m_fRatioTime = { 0.f };
 	_bool								m_bRatio = { false };
 
+	vector<EVENT_INFO>					m_vecEventInfo;
+
 public:
-	static CAnimation* Create(const vector<class CBone*>& Bones, ifstream& fileStream);
-	CAnimation*		Clone();
-	virtual void Free() override;
+	static CAnimation*	Create(const vector<class CBone*>& Bones, ifstream& fileStream);
+	CAnimation*			Clone();
+	virtual void		Free() override;
+
 };
 
 END

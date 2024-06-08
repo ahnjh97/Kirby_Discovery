@@ -2,6 +2,8 @@
 #pragma warning (disable : 4251)
 #pragma warning (disable : 5208)
 #pragma warning (disable : 4267)
+#pragma warning (disable : 4099)
+#pragma warning (disable : 26495)
 //#pragma warning (disable : 4819)
 //#pragma warning (disable : 4101)
 
@@ -20,7 +22,7 @@ namespace Engine
 	enum MOUSEMOVESTATE { DIMMS_X, DIMMS_Y, DIMMS_WHEEL, DIMMS_END };
 	enum TYPE { TYPE_NONANIM, TYPE_ANIM, TYPE_END };
 	enum EASING { EASE_LINEAR, EASE_IN, EASE_IN_FAST, EASE_OUT, EASE_OUT_FAST, EASE_INOUT, EASE_INOUT_FAST, EASE_END };
-    enum KF_PROPERTY {KF_POS, KF_ROT, KF_SCALE, KF_RCOLOR, KF_GCOLOR, KF_BCOLOR, KF_ALPHA, KF_MASK, KF_UVOFFSET, KF_END};
+    enum KF_PROPERTY {KF_POS, KF_ROT, KF_SCALE, KF_RCOLOR, KF_GCOLOR, KF_BCOLOR, KF_ALPHA, KF_MASK, KF_UVOFFSET, KF_MASKUVOFFSET, KF_MASKUVANGLE, KF_END};
     enum RIGID_SHAPE { RIGID_BOX, RIGID_SPHERE, RIGID_CAPSULE, RIGID_END };
     enum INSTANCE_PROPERTY {INSTANCE_DROP, INSTANCE_SPREAD, INSTANCE_DECELERATE, INSTANCE_END};
 
@@ -272,7 +274,12 @@ enum TEXTURETYPE
 };
 
 enum PASS_DEFERRED {
-    DEFERRED_DEBUG, DEFERRED_DIRECTLIGHT, DEFERRED_POINTLIGHT, DEFERRED_FINAL, DEFERRED_BLUR_X, DEFERRED_BLUR_Y, DEFERRED_BLUR_R, DEFERRED_COLORCORRECT, DEFERRED_END
+    DEFERRED_DEBUG, DEFERRED_DIRECTLIGHT, DEFERRED_POINTLIGHT, DEFERRED_FINAL, 
+    DEFERRED_BLUR_X, DEFERRED_BLUR_Y, DEFERRED_BLUR_R, DEFERRED_COLORCORRECT, DEFERRED_DOF_X,
+    DEFERRED_MOTIONBLUR,
+    DEFERRED_UI, DEFERRED_DOF_Y,
+    DEFERRED_DIRECTLIGHT_TOOL, DEFERRED_FINAL_TOOL,
+    DEFERRED_END
 };
 
 #define TEXTURE_TYPE_MAX  TextureType_UNKNOWN
@@ -286,18 +293,30 @@ enum PASS_DEFERRED {
 
 using namespace Engine;
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
+//
+//#define _CRTDBG_MAP_ALLOC
+//#include <stdlib.h>
+//#include <crtdbg.h>
+//
+//#ifndef DBG_NEW 
+//
+//#define new DBG_NEW 
+//#define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ ) 
+//
+//#endif
+//
+//#endif // _DEBUG
 
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
 
-#ifndef DBG_NEW 
+//#ifdef _DEBUG
+//#define new new ( _NORMAL_BLOCK , __FILE__ , __LINE__ ) 
+//#endif // _DEBUG
 
-#define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ ) 
-#define new DBG_NEW 
-
+#ifdef _DEBUG
+#define new new(_CLIENT_BLOCK, __FILE__, __LINE__)
+#define malloc(s) _malloc_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
-
-#endif // _DEBUG
-

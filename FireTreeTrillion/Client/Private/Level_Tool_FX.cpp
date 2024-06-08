@@ -11,14 +11,30 @@ CLevel_Tool_FX::CLevel_Tool_FX(ID3D11Device* pDevice, ID3D11DeviceContext* pCont
 
 HRESULT CLevel_Tool_FX::Initialize()
 {
+	m_pGameInstance->Set_RenderMode(CRenderer::MODE_TOOL);
+
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
 
+
+	//// �¾籤
+	LIGHT_DESC			LightDesc{};
+	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
+	LightDesc.vDirection = _float4(0.3f, -1.f, 0.3f, 0.f);
+
+	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
+	LightDesc.vAmbient = _float4(.2f, .2f, .2f, 1.f);
+
+	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
+		return E_FAIL;
 
 	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
 		return E_FAIL;
 
 	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
+		return E_FAIL;
+
+	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
 		return E_FAIL;
 
 
@@ -64,6 +80,12 @@ HRESULT CLevel_Tool_FX::Ready_Layer_UI(const wstring& strLayerTag)
 {
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_FX, strLayerTag, TEXT("Prototype_GameObject_FXToolDirector"))))
 		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLevel_Tool_FX::Ready_Layer_BackGround(const wstring& strLayerTag)
+{
 
 	return S_OK;
 }

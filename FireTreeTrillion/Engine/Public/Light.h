@@ -17,7 +17,7 @@ public:
 
 public:
 	HRESULT Initialize(const LIGHT_DESC& LightDesc);
-	HRESULT Render(class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
+	HRESULT Render(class CShader* pShader, class CVIBuffer_Rect* pVIBuffer, _bool bForTool);
 
 	// 빛이 죽을 운명인지 Mgr에서 확인한다. (그리고 죽임)
 	_bool	Get_DeadLight() { return m_bDead; }

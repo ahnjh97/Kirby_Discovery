@@ -5,7 +5,7 @@ BEGIN(Engine)
 class CImGUI_Manager final : public CBase
 {
 public:
-	enum STYLE { PINK, PURPLE, DARK, STYLE_END };
+	enum STYLE { PINK, PURPLE, DARK, HYO, STYLE_END };
 	enum FILE_MODE { FILE_SAVE, FILE_LOAD, FILE_NONE };
 
 private:

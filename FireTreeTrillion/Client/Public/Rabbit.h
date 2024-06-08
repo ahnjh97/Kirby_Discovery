@@ -6,6 +6,7 @@
 BEGIN(Engine)
 class CModel;
 class CShader;
+class CTexture;
 END
 
 BEGIN(Client)
@@ -19,24 +20,32 @@ public:
 		RABBIT_JUNMPLANDINGBIG, RABBIT_JUMPLANDINGSMALL, RABBIT_JUMPSMALL, RABBIT_JUMPSTART, RABBIT_JUMPSTARTBIG, RABBIT_JUMPSTARTSMALL, RABBIT_LOOKAROUND, RABBIT_WAIT,
 		RABBIT_END };
 
+	enum RABBITEYE_STATE { RABBITEYE_IDLE, RABBITEYE_ANGER, RABBITEYE_SLEEP, RABBITEYE_HAPPY, RABBITEYE_HALF, RABBITEYE_END };
+
 private:
 	CRabbit(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CRabbit(const CRabbit& rhs);
 	virtual ~CRabbit() = default;
 
 public:
+	void Set_RabbitEye(RABBITEYE_STATE eEyeState) {
+		m_eEyeState = eEyeState;
+	}
 	void Set_Find(_bool bFind) {
 		m_bFind = bFind;
 	}
 	void Set_TimeDelta(_float fTimeDelta) {
-		m_fTimeDelta = fTimeDelta;
+		m_fTempTime = fTimeDelta;
 	}
 
+	_float Get_AnimRatio() {
+		return m_pModelCom->Get_AnimRatio();
+	}
 	_bool Get_Find() {
 		return m_bFind;
 	}
 	_float Get_TimeDelta() {
-		return m_fTimeDelta;
+		return m_fTempTime;
 	}
 
 public:
@@ -54,19 +63,22 @@ public:
 public:
 	void Change_State(RABBIT_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
 	_bool IsAnimFinished();
-	_uint Get_State();
 
 	void Compute_Parabola(_vector vEndPos);
 	_vector JumpAttak(_float fTimeDelta);
 
 private:
-	RABBIT_ANIM	m_eCurrentState = { RABBIT_END };
-
+	_bool bRenderEye = { true };
+	_bool bRenderBody = { true };
+	
+	RABBIT_ANIM		m_eCurrentState = { RABBIT_END };
+	CTexture*		m_pEyeTextureCom = { nullptr };
 
 private:
-	_float	m_fTimeDelta = { 0.f };
+	RABBITEYE_STATE	m_eEyeState = { RABBITEYE_END };
+	_float			m_fTempTime = { 0.f };
 
-	_bool	m_bFind = { false };
+	_bool			m_bFind = { false };
 
 
 	// 포물선 공식에 필요한 변수
@@ -78,7 +90,7 @@ private:
 
 	_float						m_fGravity = {};		// Y축으로의 중력가속도
 	_float						m_fEndTime = {};		// 도착지점까지 도달 시간
-	_float						m_fMaxHeight = { 0.f };// 최대 높이
+	_float						m_fMaxHeight = { 0.f };	// 최대 높이
 	_float						m_fHeight = {};			// 최대 높이Y- 시작지점높이의 Y
 	_float						m_fEndHight = {};		// 도착지점 높이 Y - 시작지점 높이 Y
 	_float						m_fTime = { 0.f };		// 흐르는 시간
@@ -94,6 +106,7 @@ private:
 
 	// FSM
 	void SetUp_FSM();
+	_bool Custom_Face(_uint iMeshIndex);
 
 public:
 	static CRabbit* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

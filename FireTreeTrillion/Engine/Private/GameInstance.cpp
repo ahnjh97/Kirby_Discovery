@@ -14,6 +14,7 @@
 #include "Renderer.h"
 #include "Frustum.h"
 #include "Picking.h"
+#include "TimeController.h"
 
 #ifdef _DEBUG
 #include "ImGUI_Manager.h"
@@ -109,7 +110,9 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 	if (nullptr == m_pComponent_Manager)
 		return E_FAIL;
 
-
+	m_pTimeController = CTimeController::Create();
+	if (nullptr == m_pTimeController)
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -129,22 +132,27 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 	}
 	
 	m_pInput_Device->Tick();
+	m_pTimeController->Update_TimeController(fTimeDelta);
 
-	m_pObject_Manager->Tick(ffTimeDelta);
-	m_pPhysx->Tick(ffTimeDelta);
+	m_pObject_Manager->Tick(fTimeDelta);
+	m_pPhysx->Tick(fTimeDelta);
 	m_pPicking->Update();
 	m_pPipeLine->Tick();
 
 	m_pFrustum->Tick();
 
 #ifdef _DEBUG
-	m_pIMGUI_Manager->Late_Tick(ffTimeDelta);
+
+	m_pIMGUI_Manager->Late_Tick(fTimeDelta);
+
+	m_pLight_Manager->IMGUI_Tick();
+
 #endif
 
-	m_pObject_Manager->Late_Tick(ffTimeDelta);
+	m_pObject_Manager->Late_Tick(fTimeDelta);
 	
 	/* 반복적인 갱신이 필요한 객체들의 Tick함수를 호출한다. */
-	m_pLevel_Manager->Tick(ffTimeDelta);
+	m_pLevel_Manager->Tick(fTimeDelta);
 
 }
 
@@ -306,6 +314,14 @@ HRESULT CGameInstance::Render_LightDepth_For_GameObject(CShader* pShader, CTrans
 	return S_OK;
 }
 
+HRESULT CGameInstance::Render_LightDepth_For_PartObject(CShader* pShader, const _float4x4* pMatrix, CModel* pModel)
+{
+	if (nullptr == m_pRenderer)
+		return E_FAIL;
+
+	return m_pRenderer->Render_LightDepth_For_PartObject(pShader, pMatrix, pModel);
+}
+
 void CGameInstance::Update_LightShadow(_fvector vLightPos, _fvector vFocusPos)
 {
 	if (nullptr == m_pRenderer)
@@ -329,6 +345,45 @@ void CGameInstance::Bind_RendererFunc(_int iTriggerType)
 		return;
 
 	m_pRenderer->Bind_RendererFunc(iTriggerType);
+}
+
+void CGameInstance::Set_BlackBackGround(_bool bSet)
+{
+	if (nullptr == m_pRenderer)
+		return;
+
+	m_pRenderer->Set_BlackBackGround(bSet);
+}
+
+HRESULT CGameInstance::Bind_DeferredTexture(CTexture* pTexture, const _char* pConstantName, _uint iIndex)
+{
+	if (nullptr == m_pRenderer)
+		return E_FAIL;
+
+	return m_pRenderer->Bind_DeferredTexture(pTexture, pConstantName, iIndex);
+}
+
+HRESULT CGameInstance::Bind_DeferredRawValue(const _char* pConstantName, const void* pData, _uint iLength)
+{
+	if (nullptr == m_pRenderer)
+		return E_FAIL;
+
+	return m_pRenderer->Bind_DeferredRawValue(pConstantName, pData, iLength);
+}
+
+void CGameInstance::Set_RenderMode(CRenderer::RENDER_MODE eMode)
+{
+	if (nullptr == m_pRenderer)
+		return;
+
+	m_pRenderer->Set_RenderMode(eMode);
+}
+
+void CGameInstance::Update_Option(CRenderer::OPTION Option, _bool bOn)
+{
+	if (nullptr == m_pRenderer)
+		return;
+	m_pRenderer->Update_Option(Option, bOn);
 }
 
 #ifdef _DEBUG
@@ -569,12 +624,12 @@ HRESULT CGameInstance::Add_Light(const LIGHT_DESC & LightDesc)
 	return m_pLight_Manager->Add_Light(LightDesc);
 }
 
-HRESULT CGameInstance::Render_Lights(CShader * pShader, CVIBuffer_Rect * pVIBuffer)
+HRESULT CGameInstance::Render_Lights(CShader * pShader, CVIBuffer_Rect * pVIBuffer, _bool bForTool)
 {
 	if (m_pLight_Manager == nullptr)
 		return E_FAIL;
 
-	return m_pLight_Manager->Render(pShader, pVIBuffer);
+	return m_pLight_Manager->Render(pShader, pVIBuffer, bForTool);
 }
 
 void CGameInstance::Clear_Light()
@@ -609,6 +664,7 @@ HRESULT CGameInstance::Render_Font(const wstring & strFontTag, const wstring & s
 	return m_pFont_Manager->Render(strFontTag, strText, vPosition, vColor, fRadian);
 }
 
+#pragma region TARGET_MANAGER
 HRESULT CGameInstance::Add_RenderTarget(const wstring & strRenderTargetTag, _uint iSizeX, _uint iSizeY, DXGI_FORMAT ePixelFormat, const _float4 & vClearColor)
 {
 	if (m_pTarget_Manager == nullptr)
@@ -656,6 +712,7 @@ HRESULT CGameInstance::Copy_Resource(const wstring & strRenderTargetTag, ID3D11T
 
 	return m_pTarget_Manager->Copy_Resource(strRenderTargetTag, ppTextureHub);
 }
+#pragma endregion
 
 _bool CGameInstance::isInFrustum_WorldSpace(_fvector vWorldPos, _float fRange)
 {
@@ -914,6 +971,56 @@ _float2 CGameInstance::Get_MouseViewPortPos()
 	return m_pPicking->Get_MouseViewPortPos();
 }
 
+_float CGameInstance::Get_FirstTimer()
+{
+	if (nullptr == m_pTimeController)
+		return _float();
+
+	return m_pTimeController->Get_FirstTimer();
+}
+
+_float CGameInstance::Get_SecondTimer()
+{
+	if (nullptr == m_pTimeController)
+		return _float();
+
+	return m_pTimeController->Get_SecondTimer();
+}
+
+void CGameInstance::Set_FirstTimerRatio(_float fRatio)
+{
+	if (nullptr == m_pTimeController)
+		return;
+
+	m_pTimeController->Set_FirstTimerRatio(fRatio);
+}
+
+void CGameInstance::Set_SecondTimerRatio(_float fRatio)
+{
+	if (nullptr == m_pTimeController)
+		return;
+
+	m_pTimeController->Set_SecondTimerRatio(fRatio);
+}
+
+void CGameInstance::Restore_FirstTimer()
+{
+	if (nullptr == m_pTimeController)
+		return;
+
+	m_pTimeController->Restore_FirstTimer();
+}
+
+void CGameInstance::Restore_SecondTimer()
+{
+	if (nullptr == m_pTimeController)
+		return;
+
+	m_pTimeController->Restore_SecondTimer();
+}
+
+
+
 void CGameInstance::Release_Engine()
 {
 	CGameInstance::Get_Instance()->Free();
@@ -922,6 +1029,7 @@ void CGameInstance::Release_Engine()
 
 void CGameInstance::Free()
 {
+	Safe_Release(m_pTimeController);
 	Safe_Release(m_pFrustum);
 	Safe_Release(m_pExtractor);
 	Safe_Release(m_pTarget_Manager);

@@ -6,12 +6,12 @@
 
 
 CAnimToolObject::CAnimToolObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CGameObject{ pDevice, pContext }
+	: CCharacter{ pDevice, pContext }
 {
 }
 
 CAnimToolObject::CAnimToolObject(const CAnimToolObject& rhs)
-	: CGameObject{ rhs }
+	: CCharacter{ rhs }
 {
 }
 

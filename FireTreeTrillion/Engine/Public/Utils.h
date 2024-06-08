@@ -9,7 +9,11 @@ public:
 	enum STATE { STATE_RIGHT, STATE_UP, STATE_LOOK, STATE_POSITION, STATE_END };
 
 	static wstring  StrToWstr(const string& value);
+	static wstring  StrToWstrUTF8(const string& value);
 	static string   WstrToStr(const wstring& value);
+	static string   WstrToStrUTF8(const wstring& value);
+	static string	StrToUTF8(const string& value);
+
 	static void		WCharToChar(const wchar_t* szWchar, char* szChar);
 
 	static _int		Make_RandomInt(_int min, _int max);
@@ -23,6 +27,11 @@ public:
 	// 벡터의 방향과 랜덤 범위각도를 지정하고, 벡터 길이의 최소값, 최대값을 입력하면 랜덤한 벡터가 나온다.
 	static _vector	Make_RandomAngle_Vector(_float fDirAngle, _fvector vDir, _float fminlength, _float fmaxlength);
 
+	// Matrix 던져 회전 상태를 쿼터니언으로 받는다.
+	static Quaternion Make_Quat_FromMatrix(const _float4x4& _mat);
+	// Dir 던져 회전 상태를 쿼터니언으로 받는다.
+	static Quaternion Make_Quat_FromDir(const _float4& _dir);
+	//static _float2 
 
 	// Matrix 계산기
 	static void		Set_State_Matrix(_Inout_ _float4x4& matrix, STATE eState, _fvector vState);

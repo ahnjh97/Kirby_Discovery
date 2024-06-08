@@ -163,9 +163,6 @@
     <Filter Include="01.Utility\01.GameObjects\Effect">
       <UniqueIdentifier>{2026ddf7-bd14-41e0-b167-12803eb4c159}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Utility\01.GameObjects\UI">
-      <UniqueIdentifier>{dce35891-6f80-4098-9884-4f3d2a82009a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Utility\02.Components\FSM">
       <UniqueIdentifier>{bdbde33a-39dd-4f3a-a51a-46ec6b1eaa6a}</UniqueIdentifier>
     </Filter>
@@ -177,9 +174,6 @@
     </Filter>
     <Filter Include="01.Utility\01.GameObjects\UIObject">
       <UniqueIdentifier>{dce35891-6f80-4098-9884-4f3d2a82009a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Utility\01.GameObjects\CharacterObject">
-      <UniqueIdentifier>{a091b18d-883d-4cc0-97ba-e07d34fdf205}</UniqueIdentifier>
     </Filter>
     <Filter Include="01.Utility\11.Picking">
       <UniqueIdentifier>{c488df90-9908-489e-a087-3329ef1da7cf}</UniqueIdentifier>
@@ -195,6 +189,9 @@
     </Filter>
     <Filter Include="01.Utility\02.Components\Model\MergedMesh">
       <UniqueIdentifier>{be936d1b-112b-4ee8-afd7-2d63485fb3a0}</UniqueIdentifier>
+	</Filter>
+    <Filter Include="01.Utility\12.TimeController">
+      <UniqueIdentifier>{bcf5e0f1-895c-4733-bd87-8aca7e79dfb9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -381,9 +378,6 @@
     <ClCompile Include="..\Private\CharacterController.cpp">
       <Filter>01.Utility\02.Components\PhysX\CharacterController</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Character.cpp">
-      <Filter>01.Utility\01.GameObjects\CharacterObject</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\FSM_State.cpp">
       <Filter>01.Utility\02.Components\FSM\State</Filter>
     </ClCompile>
@@ -404,6 +398,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\MergedMesh.cpp">
       <Filter>01.Utility\02.Components\Model\MergedMesh</Filter>
+	</ClCompile>
+    <ClCompile Include="..\Private\TimeController.cpp">
+      <Filter>01.Utility\12.TimeController</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -617,9 +614,6 @@
     <ClInclude Include="..\Public\CharacterController.h">
       <Filter>01.Utility\02.Components\PhysX\CharacterController</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Character.h">
-      <Filter>01.Utility\01.GameObjects\CharacterObject</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\FSM_State.h">
       <Filter>01.Utility\02.Components\FSM\State</Filter>
     </ClInclude>
@@ -640,6 +634,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\MergedMesh.h">
       <Filter>01.Utility\02.Components\Model\MergedMesh</Filter>
+	</ClInclude>
+    <ClInclude Include="..\Public\TimeController.h">
+      <Filter>01.Utility\12.TimeController</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

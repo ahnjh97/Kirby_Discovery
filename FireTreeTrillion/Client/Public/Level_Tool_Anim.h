@@ -26,7 +26,6 @@ private:
 	HRESULT Ready_Lights();
 	HRESULT Ready_Layer_Camera(const wstring& strLayerTag);
 	HRESULT Ready_Layer_Ground(const wstring& strLayerTag);
-	HRESULT Ready_Layer_Character(const wstring& strLayerTag);
 	HRESULT Ready_Layer_IMGUI(const wstring& strLayerTag);
 	
 public:

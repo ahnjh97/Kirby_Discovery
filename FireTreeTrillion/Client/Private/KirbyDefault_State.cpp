@@ -9,9 +9,9 @@ CKirbyDefault_Idle_State::CKirbyDefault_Idle_State()
 {
 }
 
-void CKirbyDefault_Idle_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CKirbyDefault_Idle_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CKirbyDefault_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -99,6 +99,14 @@ void CKirbyDefault_Idle_State::Key_X(CGameObject* pGameObject, _float fTimeDelta
 		DESC(m_fVacuumTime) = 0.f;
 		DESC(m_eEyeState) = CKirby::EYE_IDLE;
 		pKirby->Change_State(CKirby::STATE_INHALESTART, 60.f, false, false, CKirby::BODY_VACUUM);
+
+		CMultiEffect::MULTI_FX_DESC FXDesc{};
+		FXDesc.vInitPos = { 0.f, .6f, .4f };
+		FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Vacuum_v1"), &FXDesc)))
+			return;
+		pKirby->Add_KirbyEffect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+
 	}
 }
 
@@ -186,9 +194,9 @@ CKirbyDefault_Run_State::CKirbyDefault_Run_State()
 {
 }
 
-void CKirbyDefault_Run_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CKirbyDefault_Run_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -207,7 +215,7 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	{
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		_float4 vMyPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
-		//vMyPos += pTransformCom->Get_State(CTransform::STATE_LOOK) * .4f;
+		vMyPos += pTransformCom->Get_State(CTransform::STATE_LOOK) * .4f;
 		FXDesc.vInitPos = { vMyPos.x, vMyPos.y + .3f, vMyPos.z };
 		FXDesc.vInitScale = { 1.3f, 1.3f, 1.3f };
 
@@ -221,7 +229,6 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 		_float3 vAngle = { 0.f, fAngleDiff, 0.f };
 		FXDesc.vInitRot = vAngle;
-
 
 		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
 			return;
@@ -258,6 +265,13 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		DESC(m_fVacuumTime) = 0.f;
 		DESC(m_eEyeState) = CKirby::EYE_IDLE;
 		pKirby->Change_State(CKirby::STATE_INHALEWALK, 50.f, true, true, CKirby::BODY_VACUUM);
+
+		CMultiEffect::MULTI_FX_DESC FXDesc{};
+		FXDesc.vInitPos = { 0.f, .65f, .4f };
+		FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Vacuum_v1"), &FXDesc)))
+			return;
+		pKirby->Add_KirbyEffect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 	}
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_Z, KEY_DOWN))
@@ -314,9 +328,9 @@ CKirbyDefault_Jump_State::CKirbyDefault_Jump_State()
 {
 }
 
-void CKirbyDefault_Jump_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CKirbyDefault_Jump_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -326,12 +340,6 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
 	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
-
-	if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_UP))
-	{
-		// 때는 순간 트루가 되고, 점프 가능 시점에 다시 누를 때 까지 C에대한 누적 등 반응하지 않는다.
-		DESC(m_bRePressBlock) = true;
-	}
 
 
 	if (pKirby->Get_State() == CKirby::STATE_LANDINGSMALL || pKirby->Get_State() == CKirby::STATE_LANDINGEND)
@@ -353,31 +361,8 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 	}
 
 
-	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
-	{
-		DESC(m_fVacuumTime) = 0.f;
-		DESC(m_eEyeState) = CKirby::EYE_IDLE;
-		pKirby->Change_State(CKirby::STATE_INHALEFALL, 50.f, true, true, CKirby::BODY_VACUUM);
-	}
-
-	if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN) &&
-		(pKirby->Get_State() == CKirby::STATE_LANDINGSMALL || pKirby->Get_State() == CKirby::STATE_LANDINGEND) == false)
-	{
-		if (pController->Compute_Height() < 3.f &&
-			(pKirby->Get_State() == CKirby::STATE_JUMPL || pKirby->Get_State() == CKirby::STATE_JUMPR ||
-				pKirby->Get_State() == CKirby::STATE_JUMPEND))
-		{
-			DESC(m_bReserveJumpKey) = true;
-		}
-		else
-		{
-			DESC(m_fFlyTime) = 0.f;
-			DESC(m_fJumpVelocity) = 4.f;
-			pKirby->Change_State(CKirby::STATE_FLIGHTSTART, 60.f, false, false, CKirby::BODY_BALLOON);
-		}
-	}
-
-
+	Key_X(pGameObject, fTimeDelta);
+	Key_C(pGameObject, fTimeDelta);
 
 
 	// 떨어지는 것
@@ -530,10 +515,57 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 				pKirby->Change_State(CKirby::STATE_LANDINGSMALL, 50.f, false, false, CKirby::BODY_DEFAULT);
 				if (CUtils::Make_RandomInt(0, 1) > 0)
 					DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+
+#pragma region 가라 이펙트 세팅
+				CMultiEffect::MULTI_FX_DESC FXDesc{};
+				_float4 vMyPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+				//vMyPos += pTransformCom->Get_State(CTransform::STATE_LOOK) * 1.2f;
+				FXDesc.vInitPos = { vMyPos.x, vMyPos.y + .4f, vMyPos.z };
+				FXDesc.vInitScale = { 1.3f, 1.3f, 1.3f };
+
+				//_float3 vDir = -pTransformCom->Get_State(CTransform::STATE_LOOK);
+				//vDir.Normalize();
+				//_float3 vLook = { 0.f, 0.f, 1.f };
+
+				//_float fAngleLook = atan2f(vLook.z, vLook.x);
+				//_float fAngleDiff = fAngleLook - atan2f(vDir.z, vDir.x);
+				//fAngleDiff = ToDegree(fAngleDiff);
+
+				//_float3 vAngle = { 0.f, fAngleDiff, 0.f };
+
+				FXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 360.f), 0.f };
+
+				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
+					return;
+
+				FXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 360.f), 0.f };
+
+				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
+					return;
+
+				FXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 360.f), 0.f };
+
+				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
+					return;
+
+				FXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 360.f), 0.f };
+
+				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
+					return;
+
+				FXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 360.f), 0.f };
+
+				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
+					return;
+
+				FXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 360.f), 0.f };
+
+				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
+					return;
+#pragma endregion
+
 			}
 		}
-
-
 	}
 	// 뽀잉
 	else if (pKirby->Get_State() == CKirby::STATE_LANDINGEND || pKirby->Get_State() == CKirby::STATE_LANDINGSMALL)
@@ -586,27 +618,128 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_Z, KEY_PRESS))
 		{
-			pKirby->Change_State(CKirby::STATE_GUARD, 60.f, true, true, CKirby::BODY_DEFAULT);
+			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_GUARD);
 		}
 
 		// 바로 방향키를 갈겼다면
 		if (m_fChangeRunTime > fChangeRunTime && JoyStick_controller(Kirbydesc, pCamera))
 		{
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
-			pKirby->Change_State(CKirby::STATE_RUNSTART, 120.f, true, true, CKirby::BODY_DEFAULT);
+
+			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_RUNSTART);
 		}
 		// 자연스럽게 끝났다면
 		else if (pKirby->isAnimFinish())
 		{
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
-			pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+
+			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_IDLE);
 		}
+
+		// Idle일 때, X를 누르면 1타 공격을 시작한다.
+		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
+		{
+			DESC(m_eEyeState) = CKirby::EYE_ANGER;
+
+			// 조이스틱을 만지지 않았을 경우 현재 Dir 으로 공격 방향이 정해진다.
+			if (JoyStick_controller_Attack(Kirbydesc, pCamera) == false)
+				DESC(m_vAttackDir) = DESC(m_vMoveDir);
+
+			if (DESC(m_ePreAttackState) == CKirby::SWORDSTATE_DECISIVESLASH)
+			{
+				pKirby->Change_State(CKirby::SWORDSTATE_SIDESLASH, 60.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				DESC(m_ePreAttackState) = CKirby::SWORDSTATE_SIDESLASH;
+			}
+			else if (DESC(m_ePreAttackState) == CKirby::SWORDSTATE_SIDESLASH)
+			{
+				pKirby->Change_State(CKirby::SWORDSTATE_MULITSWORDATTACK, 60.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				DESC(m_ePreAttackState) = CKirby::SWORDSTATE_MULITSWORDATTACK;
+
+			}
+			else if (DESC(m_ePreAttackState) == CKirby::SWORDSTATE_MULITSWORDATTACK)
+			{
+				pKirby->Change_State(CKirby::SWORDSTATE_DECISIVESLASH, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				DESC(m_ePreAttackState) = CKirby::SWORDSTATE_DECISIVESLASH;
+				DESC(m_fMoveSpeed) = 0.f;
+
+			}
+		}
+
 	}
 }
 
 void CKirbyDefault_Jump_State::OnStateExit()
 {
 	m_fChangeRunTime = 0.f;
+}
+
+void CKirbyDefault_Jump_State::Key_X(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+
+
+	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
+	{
+		// 디폴트 상태일때만 빨아들인다.
+		if (pKirby->Get_AbilityType() == ABILITY_DEFAULT)
+		{
+			DESC(m_fVacuumTime) = 0.f;
+			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			pKirby->Change_State(CKirby::STATE_INHALEFALL, 50.f, true, true, CKirby::BODY_VACUUM);
+
+			CMultiEffect::MULTI_FX_DESC FXDesc{};
+			FXDesc.vInitPos = { 0.f, .65f, .4f };
+			FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+			if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Vacuum_v1"), &FXDesc)))
+				return;
+			pKirby->Add_KirbyEffect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+		}
+		// 칼 상태일땐 공중제비를 돈다.
+		else if (pKirby->Get_AbilityType() == ABILITY_SWORD)
+		{
+			DESC(m_fJumpVelocity) = 10.f;
+			DESC(m_eEyeState) = CKirby::EYE_ANGER;
+			pKirby->Change_State(CKirby::SWORDSTATE_SWORDSPINSTART, 60.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		}
+	}
+
+}
+
+void CKirbyDefault_Jump_State::Key_C(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
+	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
+
+
+	if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_UP))
+	{
+		// 때는 순간 트루가 되고, 점프 가능 시점에 다시 누를 때 까지 C에대한 누적 등 반응하지 않는다.
+		DESC(m_bRePressBlock) = true;
+	}
+
+	if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN) &&
+		(pKirby->Get_State() == CKirby::STATE_LANDINGSMALL || pKirby->Get_State() == CKirby::STATE_LANDINGEND) == false)
+	{
+		// 점프 예약을 한다.
+		if (pController->Compute_Height() < 3.f &&
+			(pKirby->Get_State() == CKirby::STATE_JUMPL || pKirby->Get_State() == CKirby::STATE_JUMPR ||
+				pKirby->Get_State() == CKirby::STATE_JUMPEND))
+		{
+			DESC(m_bReserveJumpKey) = true;
+		}
+		else
+		{
+			DESC(m_fFlyTime) = 0.f;
+			DESC(m_fJumpVelocity) = 4.f;
+			pKirby->Change_State(CKirby::STATE_FLIGHTSTART, 60.f, false, false, CKirby::BODY_BALLOON);
+		}
+	}
+
 }
 
 CKirbyDefault_Jump_State* CKirbyDefault_Jump_State::Create()
@@ -628,9 +761,9 @@ CKirbyDefault_Guard_State::CKirbyDefault_Guard_State()
 {
 }
 
-void CKirbyDefault_Guard_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CKirbyDefault_Guard_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CKirbyDefault_Guard_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -712,7 +845,7 @@ void CKirbyDefault_Guard_State::OnStateUpdate(CGameObject* pGameObject, _float f
 		if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_PRESS))
 		{
 			DESC(m_vMoveDir) = DESC(m_vDodgeDir);
-			pKirby->Change_State(CKirby::STATE_SLIDESTART, 60.f, false, false, CKirby::BODY_DEFAULT);
+			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_SLIDESTART);
 		}
 		// 끝나면 바로 본격적인 닷지 스타트 ( 여기서 애니메이션을 분기한다.)
 		if (pKirby->isAnimFinish() == true)
@@ -751,7 +884,7 @@ void CKirbyDefault_Guard_State::OnStateUpdate(CGameObject* pGameObject, _float f
 
 		if (pController->Is_Terrain() == true)
 		{
-			pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_IDLE);
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			DESC(m_fMoveSpeed) = 0.f;
 		}
@@ -778,7 +911,7 @@ void CKirbyDefault_Guard_State::OnStateUpdate(CGameObject* pGameObject, _float f
 
 		if (pController->Is_Terrain() == true)
 		{
-			pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_IDLE);
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			DESC(m_fMoveSpeed) = 0.f;
 
@@ -806,7 +939,7 @@ void CKirbyDefault_Guard_State::OnStateUpdate(CGameObject* pGameObject, _float f
 
 		if (pController->Is_Terrain() == true)
 		{
-			pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_IDLE);
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			DESC(m_fMoveSpeed) = 0.f;
 		}
@@ -833,7 +966,7 @@ void CKirbyDefault_Guard_State::OnStateUpdate(CGameObject* pGameObject, _float f
 
 		if (pController->Is_Terrain() == true)
 		{
-			pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_IDLE);
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			DESC(m_fMoveSpeed) = 0.f;
 		}
@@ -864,9 +997,9 @@ CKirbyDefault_Slide_State::CKirbyDefault_Slide_State()
 {
 }
 
-void CKirbyDefault_Slide_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CKirbyDefault_Slide_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CKirbyDefault_Slide_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -941,9 +1074,9 @@ CKirbyDefault_Happy_State::CKirbyDefault_Happy_State()
 
 }
 
-void CKirbyDefault_Happy_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CKirbyDefault_Happy_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CKirbyDefault_Happy_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)

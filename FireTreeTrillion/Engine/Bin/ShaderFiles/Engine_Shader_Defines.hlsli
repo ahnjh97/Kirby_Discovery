@@ -108,3 +108,9 @@ BlendState BS_Blend
 
 
 
+////만드는 pbr 용 함수임다~~
+//float3 fresnelSchlick(float3 F0, float cosTheta)
+//{
+//    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+//}
+

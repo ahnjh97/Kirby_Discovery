@@ -1,10 +1,13 @@
 #include "Animation.h"
+
+#include "GameInstance.h"
+
 #include "Channel.h"
 #include "Bone.h"
+#include "Model.h"
 
 CAnimation::CAnimation()
 {
-
 }
 
 CAnimation::CAnimation(const CAnimation & rhs)
@@ -15,12 +18,19 @@ CAnimation::CAnimation(const CAnimation & rhs)
 	, m_Channels{ rhs.m_Channels }
 	, m_CurrentKeyFrameIndices{ rhs.m_CurrentKeyFrameIndices }
 	, m_IsFinished{ rhs.m_IsFinished }
+	, m_vecEventInfo{rhs.m_vecEventInfo }
 
 {
 	for (auto& pChannel : m_Channels)
 		Safe_AddRef(pChannel);
 
 	strcpy_s(m_szName, rhs.m_szName);
+}
+
+void CAnimation::Set_AnimEventData(ANIM_INFO tAnimInfo)
+{
+	m_fTickPerSecond = tAnimInfo.fAnimSpeed;
+	m_vecEventInfo = tAnimInfo.vecEventInfo;
 }
 
 HRESULT CAnimation::Initialize(const vector<class CBone*>& Bones, ifstream& fileStream)
@@ -40,7 +50,7 @@ HRESULT CAnimation::Initialize(const vector<class CBone*>& Bones, ifstream& file
 	return S_OK;
 }
 
-void CAnimation::Invalidate_TransformationMatrix(_float fTimeDelta, const vector<CBone*>& Bones, _bool bIsLooping)
+void CAnimation::Invalidate_TransformationMatrix(_float fTimeDelta, const vector<CBone*>& Bones, _bool bIsLooping, CModel* model)
 {
 	// 선형보간 부분
 	if (m_bRatio)
@@ -68,7 +78,21 @@ void CAnimation::Invalidate_TransformationMatrix(_float fTimeDelta, const vector
 
 	m_IsFinished = false;
 
+	_float preTrackPosition = m_fTrackPosition;
 	m_fTrackPosition += m_fTickPerSecond * fTimeDelta;
+
+	// 해당 애니메이션에서, 프레임 사이에 있는 이벤트 이름을 알아온다.
+	// 그 이벤트 이름에 넣어준 함수를 실행
+	if (*CGameInstance::Get_Instance()->Get_CurrentLevelID() != 6)
+	{
+		for (auto& eventInfo : m_vecEventInfo)
+		{
+			if ((_int)m_fTrackPosition == eventInfo.iStartFrame)
+			{
+				model->CallEvent(eventInfo.strEventName);
+			}
+		}
+	}
 
 	if (m_fDuration <= m_fTrackPosition)
 	{
@@ -86,7 +110,6 @@ void CAnimation::Invalidate_TransformationMatrix(_float fTimeDelta, const vector
 		/* 이 뼈의 상태행렬을 만들어서 CBone의 TransformationMatrix를 바꿔라. */
 		m_Channels[i]->Invalidate_TransformationMatrix(Bones, m_fTrackPosition, &m_CurrentKeyFrameIndices[i]);
 	}
-
 }
 
 void CAnimation::Read_AnimationData(ifstream& fileStream)
@@ -123,7 +146,6 @@ CAnimation * CAnimation::Clone()
 {
 	return new CAnimation(*this);
 }
-
 
 void CAnimation::Free()
 {

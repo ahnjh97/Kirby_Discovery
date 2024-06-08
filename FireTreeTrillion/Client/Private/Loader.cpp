@@ -4,6 +4,7 @@
 #include <codecvt>
 #include <locale>
 #include "GameInstance.h"
+#include "tinyxml2.h"
 
 //맵툴
 #include "OrbitingCamera.h"
@@ -29,10 +30,7 @@
 #endif
 
 //#include "TestUI.h"
-#include "Single_UI.h"
-#include "Multi_UI.h"
-#include "HUD.h"
-
+#include "LayerUI.h"
 #pragma endregion
 
 //이펙트 툴
@@ -47,20 +45,33 @@
 #include "AnimToolHelper.h"
 #include "AnimToolObject.h"
 
-//클라이언트
+// 클라이언트
+
+#pragma region 컴포넌트
+#include "RigidBody.h"
+#include "CharacterController.h"
+#pragma endregion
+
+#pragma region 객체
 #include "Camera_Free.h"
 #include "TestModel.h"
 #include "TestTerrain.h"
 #include "Kirby.h"
+
+// 몬스터
+#include "KirbyWeapons.h"
+#include "KirbyArmours.h"
 #include "Awoofy.h"
-#include "RigidBody.h"
-#include "CharacterController.h"
 #include "Rabbit.h"
 #include "Buffahorn.h"
 #include "BladeKnight.h"
 #include "BladeKnightSword.h"
+#include "Kabu.h"
 
 #include "Moon.h"
+#include "WasteCan.h"
+#pragma endregion
+
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
@@ -191,23 +202,28 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BG"), CBG);
 
 	// UI
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Single_UI"), CSingle_UI);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Multi_UI"), CMulti_UI);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("LayerUI"), CLayerUI);
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("Multi_UI"), CMulti_UI);
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
 	
 #pragma region FOR CLIENT
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kirby"), CKirby);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KirbyWeapons"), CKirbyWeapons);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KirbyArmours"), CKirbyArmours);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Awoofy"), CAwoofy);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Rabbit"), CRabbit);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Buffahorn"), CBuffahorn);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BladeKnight"), CBladeKnight);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BladeKnightSword"), CBladeKnightSword);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kabu"), CKabu);
+
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BackGround"), CBackGround);
 	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_Test"), CTestUI);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestMap"), CTestTerrain);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Moon"), CMoon);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("WasteCan"), CWasteCan);
 #pragma endregion
 
 	return S_OK;
@@ -231,6 +247,19 @@ HRESULT CLoader::Loading_StaticComponentAll()
 	hr = Add_Texture(eLevel, "FX_SimpleSolid", "Simple/simpleSolid_%d.png", 2);
 	CHECK_FAILED(hr);
 	hr = Add_Texture(eLevel, "FX_SimpleStar", "Effects/SimpleStar.png");
+	CHECK_FAILED(hr);
+
+	hr = Add_Texture(eLevel, "FX_VacuumTornado", "Effects/wind01.png");
+	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "FX_VacuumWind", "Effects/scroll07.png");
+	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "FX_VacuumDGB", "Effects/twinkle02.png");
+	CHECK_FAILED(hr);
+
+	hr = Add_Texture(eLevel, "FX_Wind", "Effects/wind_%d.png", 2);
+	CHECK_FAILED(hr);
+
+	hr = Add_Texture(eLevel, "FX_Shockwave", "Effects/shockwave_%d.png", 1);
 	CHECK_FAILED(hr);
 
 	wstring wstrPrototypeTag = L"Prototype_Component_Shader_";
@@ -335,6 +364,18 @@ HRESULT CLoader::Loading_For_GamePlay()
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Moon", "Moon.png")))
 		return E_FAIL;
+	if(FAILED(Add_Texture(eLevel, "GsLandTopNoize_Fur", "Map/GsLandTopNoize_Fur.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Level_0_Env", "Map/Level_0_Env.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "BRDF_LUT", "Map/BRDF_LUT.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "RandomNormal", "Map/RandomNormal.png")))
+		return E_FAIL;
+
+
+	hr = Add_Texture(eLevel, "GameComplete", "UI/GAMECOMPLETE/GameComplete_%d.png", 21);
+	CHECK_FAILED(hr);
 
 	// 커비 얼굴 텍스쳐 로드
 	Add_KirbyFaceTexture(eLevel);
@@ -343,6 +384,7 @@ HRESULT CLoader::Loading_For_GamePlay()
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
 	#pragma region 모델
 	// 모아놓은 Model 한번에 생성.
+	Load_AnimToolInfo();
 	hr = Add_Models(eLevel);
 	CHECK_FAILED(hr);
 	#pragma endregion
@@ -428,8 +470,12 @@ HRESULT CLoader::Loading_For_Tool_Anim()
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
 	#pragma region 모델
+	Load_AnimToolInfo();
 	if (FAILED(Add_AllModelTxts(eLevel, TYPE_ANIM)))
 		return E_FAIL;
+	hr = Add_Models(eLevel);
+	CHECK_FAILED(hr);
+
 	#pragma endregion
 
 	m_strLoadingText = TEXT("물리 컴포넌트(을) 로딩 중 입니다.");
@@ -511,15 +557,22 @@ HRESULT CLoader::Add_Models(LEVEL eLevel)
 	// SetUp_ModelScaleRotation 함수에서 모아놓은 Model들을 타입에 따라서 Component 생성한다.
 	for (auto& ModelInfo : m_vecModelInfo)
 	{
-
-		if (ModelInfo.strModelName == "KirbyDefault")
-		{
+		if (ModelInfo.strModelName == "KirbyDefault"){
 			_int i = 0;
+		}
+
+		// 애님툴에서 조정하여 저장한 값을 불러서
+		// 모델 이름이 같을 경우, model의 정보들을 읽어오기
+		for (auto& pair : m_mapSequence)
+		{
+			if (ModelInfo.strModelName == pair.first)
+			{
+				ModelInfo.umapAnimInfo = pair.second;
+			}
 		}
 
 		wstring wstrModelName = CUtils::StrToWstr(ModelInfo.strModelName);
 		wstring wstrPrototypeTag = L"Prototype_Component_Model_" + wstrModelName;
-
 		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag,
 			CModel::Create(m_pDevice, m_pContext, ModelInfo))))
 			return E_FAIL;
@@ -544,6 +597,13 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("SmokeSplit", TYPE_NONANIM );
 		m_vecModelInfo.emplace_back("SmokeTail", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("Tornado", TYPE_NONANIM );
+
+		//커비 회오리
+		m_vecModelInfo.emplace_back("VacuumTornado", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("VacuumWind", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("VacuumDGB", TYPE_NONANIM);
+
+		m_vecModelInfo.emplace_back("SwordTrail", TYPE_NONANIM);
 
 	}
 	else if (eLevel == LEVEL_LOGO)
@@ -581,6 +641,13 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("KirbyBalloon", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("KirbyDefault", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("KirbyVacuum", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbySwordDefault", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbySwordBalloon", TYPE_ANIM, 1.f, 180.f);
+		// For Kirby Weapon
+		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
+		// For Kirby Armour
+		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
+
 
 		m_vecModelInfo.emplace_back("GsBenchAL", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("Level0Stage1Step01", TYPE_NONANIM);
@@ -595,26 +662,27 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Buffahorn", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("BladeKnight", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("BladeKnightSword", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("Kabu", TYPE_ANIM, 2.f, 180.f);
+
+		// For Mab Interactive Object
+		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM, 1.f);
 	}
-	else if (eLevel == LEVEL_TOOL_MAP) 
-	{		
+	else if (eLevel == LEVEL_TOOL_MAP)
+	{
 		// 맵툴에서는 크기나 회전 상태 바꾸고 싶은 모델만 여기에 등록. 안바꾸고싶으면 NonAnim, 크기1, 회전 0도로 자동 추가됨
 		m_vecModelInfo.emplace_back("Book", TYPE_NONANIM, 0.01f);
 		m_vecModelInfo.emplace_back("TestMap2", TYPE_NONANIM, 0.01f);
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f);
-		m_vecModelInfo.emplace_back("Camera", TYPE_NONANIM, 0.2f , 270.f);
+		m_vecModelInfo.emplace_back("Camera", TYPE_NONANIM, 0.2f, 270.f);
 		m_vecModelInfo.emplace_back("Dummy", TYPE_NONANIM, 0.01f);
 
 		//m_vecModelInfo.emplace_back("Level1Stage1Step01", TYPE_NONANIM, 1.f, 0.f, 0, true);
 	}
 	else if (eLevel == LEVEL_TOOL_ANIM)
 	{
-		m_vecModelInfo.emplace_back("Kirby", TYPE_ANIM );
-
-		// For Kirby Body
-		m_vecModelInfo.emplace_back("KirbyBalloon", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyVacuum", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("BladeKnightSword",  TYPE_NONANIM, 1.f);
 	}
 
 }
@@ -710,9 +778,22 @@ HRESULT CLoader::Add_KirbyFaceTexture(LEVEL eLevel)
 	if (FAILED(Add_Texture(eLevel, "mouth_surprise", "KirbyFace/mouth_surprise.png")))
 		return E_FAIL;
 
+	// Awoofy Eye
+	if (FAILED(Add_Texture(eLevel, "Awoofy_Eye", "AwoofyEye/NormalEnemyEye%d.dds", 5)))
+		return E_FAIL;
+
+	// Rabbit Eye
+	if (FAILED(Add_Texture(eLevel, "Rabbit_Eye", "RabbitEye/RabbitEnemyEye.0%d.dds", 5)))
+		return E_FAIL;
+
+	// Buffahorn Eye
+	if (FAILED(Add_Texture(eLevel, "Buffahorn_Eye", "BuffahornEye/TackleEnemyEye.0%d.dds", 4)))
+		return E_FAIL;
+
 	return S_OK;
 }
 
+// TOOL_MAP, TOOL_ANIM에서 사용중인 함수.
 HRESULT CLoader::Add_AllModelTxts(LEVEL eLevel, TYPE eType)
 {
 	HRESULT hr = S_OK;
@@ -740,9 +821,30 @@ HRESULT CLoader::Add_AllModelTxts(LEVEL eLevel, TYPE eType)
 		string strModelName = CUtils::WstrToStr(wstrModelName);
 		
 		_bool bFound = { false };
+		
+		// 원래 버전
+		//MODEL tModelInfo = MODEL{ strModelName ,  eType };
+		//for (auto& modelInfo : m_vecModelInfo)
+		//{
+		//	if (modelInfo.strModelName == strModelName)
+		//	{
+		//		tModelInfo = modelInfo;
+		//		break;
+		//	}
+		//}
+		
 		MODEL tModelInfo = MODEL{ strModelName ,  eType };
 		for (auto& modelInfo : m_vecModelInfo)
 		{
+			// 애님툴에서 조정하여 저장한 값을 불러서
+			// 모델 이름이 같을 경우, model의 정보들을 읽어오기
+			for (auto& pair : m_mapSequence)
+			{
+				if (modelInfo.strModelName == pair.first)
+				{
+					modelInfo.umapAnimInfo = pair.second;
+				}
+			}
 			if (modelInfo.strModelName == strModelName)
 			{
 				tModelInfo = modelInfo;
@@ -756,9 +858,6 @@ HRESULT CLoader::Add_AllModelTxts(LEVEL eLevel, TYPE eType)
 		wstring wstrPrototypeTag = TEXT("Prototype_Component_Model_") + CUtils::StrToWstr(tModelInfo.strModelName);
 		hr = m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CModel::Create(m_pDevice, m_pContext, tModelInfo));
 		CHECK_FAILED(hr);
-
-		if (FAILED(hr))
-			return E_FAIL;
 	}
 
 	FindClose(hFind);
@@ -771,26 +870,125 @@ void CLoader::TraverseModelTxts(const wstring& rootFolderPath, list<wstring>& fi
 	WIN32_FIND_DATA findFileData;
 	HANDLE hFind = FindFirstFile((rootFolderPath + L"\\*").c_str(), &findFileData);
 
-	if (hFind == INVALID_HANDLE_VALUE) {
+	if (hFind == INVALID_HANDLE_VALUE) 
+	{
 		MSG_BOX(TEXT("폴더를 찾을수없습니다"));
 		return;
 	}
 
 	do 
 	{
-		if (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+		if (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) 
+		{
 			if (wcscmp(findFileData.cFileName, L".") != 0 && wcscmp(findFileData.cFileName, L"..") != 0) {
 				// 재귀적으로 하위 폴더도 순회
 				TraverseModelTxts(rootFolderPath + L"\\" + findFileData.cFileName, fileList);
 			}
 		}
-		else {
+		else 
+		{
 			// 파일이면 리스트에 추가
 			fileList.push_back(wstring(findFileData.cFileName));
 		}
 	} while (FindNextFile(hFind, &findFileData) != 0);
 
 	FindClose(hFind);
+}
+
+// AnimTool에서 만들어놓은 파일을 읽어서 가지고있는 함수
+void CLoader::Load_AnimToolInfo()
+{
+	// XML 파일을 읽어올 경로 설정
+	const char* filePath = "../Bin/Resources/Data/AnimationData.xml";
+
+	// XMLDocument 객체 생성
+	tinyxml2::XMLDocument m_xmlDocument;
+
+	// XML 파일 로드
+	if (m_xmlDocument.LoadFile(filePath) != tinyxml2::XML_SUCCESS)
+	{
+		MSG_BOX(TEXT("Failed to load XML file"));
+		return;
+	}
+
+	// 루트 요소 가져오기
+	tinyxml2::XMLElement* pRoot = m_xmlDocument.RootElement();
+
+	// ModelName 및 Animation 정보를 읽어옴
+	for (tinyxml2::XMLElement* pModelElement = pRoot->FirstChildElement("ModelName");
+		pModelElement != nullptr;
+		pModelElement = pModelElement->NextSiblingElement("ModelName"))
+	{
+
+		// 문자열 끝 부분의 공백 제거
+		string modelNameStr(pModelElement->GetText());
+		modelNameStr.erase(std::find_if(modelNameStr.rbegin(), modelNameStr.rend(), [](_ubyte ch) {
+			return !std::isspace(ch);
+			}).base(), modelNameStr.end());
+
+		if (!modelNameStr.empty())
+		{
+			// ModelName에 해당하는 AnimMap을 생성
+			AnimToolMap::mapped_type& animMap = m_mapSequence[string(modelNameStr)];
+
+			// Animation 정보 읽기
+			for (tinyxml2::XMLElement* pAnimElement = pModelElement->FirstChildElement("Animation");
+				pAnimElement != nullptr;
+				pAnimElement = pAnimElement->NextSiblingElement("Animation"))
+			{
+				const char* animName = pAnimElement->GetText();
+				if (animName)
+				{
+					// ANIM_INFO 객체 생성 및 초기화
+					ANIM_INFO animInfo;
+
+					// AnimSpeed 읽기
+					tinyxml2::XMLElement* pAnimSpeedElement = pAnimElement->NextSiblingElement("AnimSpeed");
+					if (pAnimSpeedElement)
+					{
+						_float animSpeed;
+						pAnimSpeedElement->QueryFloatText(&animSpeed);
+						animInfo.fAnimSpeed = animSpeed;
+					}
+
+					// Count 값 읽기
+					tinyxml2::XMLElement* pCountElement = pAnimElement->NextSiblingElement("Count");
+					if (pCountElement)
+					{
+						_uint count;
+						pCountElement->QueryUnsignedText(&count);
+
+						// Event 정보 읽기
+						for (unsigned int i = 0; i < count; ++i)
+						{
+							std::string dataName = "Data" + std::to_string(i);
+							tinyxml2::XMLElement* pDataElement = pCountElement->NextSiblingElement(dataName.c_str());
+							if (pDataElement)
+							{
+								EVENT_INFO eventInfo;
+
+								// EventName, StartFrame, EndFrame 읽기
+								const char* eventName = pDataElement->Attribute("EventName");
+								int startFrame, endFrame;
+								pDataElement->QueryIntAttribute("StartFrame", &startFrame);
+								pDataElement->QueryIntAttribute("EndFrame", &endFrame);
+
+								eventInfo.strEventName = eventName ? eventName : "";
+								eventInfo.iStartFrame = startFrame;
+								eventInfo.iEndFrame = endFrame;
+
+								// ANIM_INFO의 vecEventInfo에 추가
+								animInfo.vecEventInfo.push_back(eventInfo);
+							}
+						}
+					}
+
+					// ANIM_INFO 객체를 AnimMap에 추가
+					animMap[string(animName)] = animInfo;
+				}
+			}
+		}
+	}
 }
 
 CLoader * CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID)

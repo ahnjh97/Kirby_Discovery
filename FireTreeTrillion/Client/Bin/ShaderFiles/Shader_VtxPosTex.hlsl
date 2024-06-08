@@ -7,12 +7,17 @@ texture2D	g_DiffuseTexture;
 texture2D	g_MaskTexture;
 texture2D	g_DepthTexture;
 
-//컬러, 마스크 임계 등
-vector g_vRColor = { 1.f, 1.f, 1.f, 1.f };
-vector g_vGColor = { 1.f, 1.f, 1.f, 1.f };
-vector g_vBColor = { 1.f, 1.f, 1.f, 1.f };
+//컬러, 마스크 임계 등 이펙트 관련 변수
+float3 g_vRColor = { 1.f, 1.f, 1.f};
+float3 g_vGColor = { 1.f, 1.f, 1.f};
+float3 g_vBColor = { 1.f, 1.f, 1.f};
 
-float g_fAlpha;
+float g_fAlpha = { 1.f };
+float g_fMaskThreshold = { 0.f };
+
+float2 g_vUVOffset = { 0.f, 0.f };
+float2 g_vMaskUVOffset = { 0.f, 0.f };
+float2 g_vMaskUVAngle = { 0.f, 0.f };
 
 struct VS_IN
 {
@@ -137,20 +142,73 @@ PS_OUT PS_MAIN_BLOOM(PS_IN_ALPHABLEND In)
     return Out;
 }
 
-PS_OUT PS_MAIN_WHITE_FX(PS_IN_ALPHABLEND In)
+PS_OUT PS_MAIN_BLEND_FX(PS_IN_ALPHABLEND In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
-    float vBrightness = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord).r;
+    //float vBrightness = g_DiffuseTexture.Sample(PointSampler, In.vTexcoord + g_vUVOffset).r;
 	
+    //if (vBrightness < .1f)
+    //    discard;
 	
-    Out.vColor = g_vRColor * vBrightness;
+    //float vMaskValue = g_MaskTexture.Sample(PointSampler, In.vTexcoord).r;
+    //if (vMaskValue < g_fMaskThreshold)
+    //    discard;
 	
-    Out.vColor.a = vBrightness; // 어두울수록 투명
+    //Out.vColor.rgb = ( 1.f, 1.f, 1.f );
+    //Out.vColor.rgb *= g_vRColor /* * vBrightness*/;
+	
+    //Out.vColor.a = vBrightness * g_fAlpha; // 어두울수록 투명
+	
+    vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord + g_vMaskUVOffset);
     
-    
-    if (Out.vColor.a < .05f)
+    if (vMask.a < .01f && vMask.a < g_fMaskThreshold)
         discard;
+    else if (vMask.r < .1f && vMask.r < g_fMaskThreshold)
+        discard;
+    
+
+    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord + g_vUVOffset);
+    if (vDiffuse.a < .01f || (vDiffuse.r < 0.1f && vDiffuse.g < 0.1f && vDiffuse.b < 0.1f))
+        discard;
+
+    Out.vColor.rgb = vDiffuse.rgb * g_vRColor;
+    Out.vColor.a = vDiffuse.a * g_fAlpha;
+	
+	 //소프트 이펙트 보정
+    float2 vTexcoord = (float2) 0.f;
+
+    vTexcoord.x = (In.vProjPos.x / In.vProjPos.w) * 0.5f + 0.5f;
+    vTexcoord.y = (In.vProjPos.y / In.vProjPos.w) * -0.5f + 0.5f;
+
+    float4 vDepthDesc = g_DepthTexture.Sample(PointSampler, vTexcoord);
+    float fOldViewZ = vDepthDesc.y * 1000.f;
+
+    Out.vColor.a = Out.vColor.a * saturate(fOldViewZ - In.vProjPos.w);
+    
+    Out.vNonBlur = vector(0.f, 1.f, 0.f, 0.f);
+	
+    return Out;
+}
+
+PS_OUT PS_MAIN_DEFAULT_FX(PS_IN_ALPHABLEND In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    //마스크 값으로 자르기
+    vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord + g_vMaskUVOffset);
+    if (vMask.a < .01f && vMask.a < g_fMaskThreshold)
+        discard;
+    else if (vMask.r < .1f && vMask.r < g_fMaskThreshold)
+        discard;
+    
+    //diffuse 알파 테스팅
+    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord + g_vUVOffset);
+    if (vDiffuse.a < .01f)
+        discard;
+    
+    
+    Out.vColor = vDiffuse;
 	
     return Out;
 }
@@ -186,18 +244,18 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 PS_MAIN_ALPHABLEND();
 	}
 
-	// 하얀 부분만 그리는 패스. 알파 테스팅 ( 2 )
-    pass WhiteFX
+    //블렌드되는 이펙트. 알파 블렌딩 + 마스크 + 소프트 이펙트 ( 2 )
+    pass BlendFX
     {
-        SetRasterizerState(RS_Default);
-        SetDepthStencilState(DSS_Default, 0);
+        SetRasterizerState(RS_NonCull);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
         VertexShader = compile vs_5_0 VS_MAIN_ALPHABLEND();
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 PS_MAIN_WHITE_FX();
+        PixelShader = compile ps_5_0 PS_MAIN_BLEND_FX();
     }
 
 	// For Bloom ( 3 )
@@ -212,5 +270,19 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_BLOOM();
+    }
+
+	// 기본 이펙트 패스. 알파 테스팅 + 마스크 ( 4 )
+    pass DefaultFX
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN_ALPHABLEND();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_DEFAULT_FX();
     }
 }

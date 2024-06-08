@@ -2,8 +2,10 @@
 #include "Level_GamePlay.h"
 #include "Camera_Free.h"
 #include "BasicMap.h"
+#include "UIObject.h"
 #include "Trigger.h"
 #include "Kirby.h"
+#include "Kabu.h"
 #include "BG.h"
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -14,7 +16,14 @@ CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 
 HRESULT CLevel_GamePlay::Initialize()
 {
+	m_pGameInstance->Set_RenderMode(CRenderer::MODE_GAMEPLAY);
+	CLevelChanger::Get_Instance()->Load();
+
 	if (FAILED(__super::Initialize()))
+		return E_FAIL;
+
+	// 환경맵을 추가한다.
+	if (FAILED(Add_EnvMap()))
 		return E_FAIL;
 	
 	if (FAILED(Ready_Lights()))
@@ -32,16 +41,16 @@ HRESULT CLevel_GamePlay::Initialize()
 	/* 구한정보들을 각 랜드오브젝트르 생성할 때 던진다. */
 	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
 		return E_FAIL;
-
-	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
-		return E_FAIL;
 	
 	if (FAILED(Ready_ParsedObjects()))
 		return E_FAIL;
 
-	// TEST (블러와 블랜드의 관계)
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Moon"), TEXT("Prototype_GameObject_Moon"))))
+	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
 		return E_FAIL;
+
+	// TEST (블러와 블랜드의 관계)
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Moon"), TEXT("Prototype_GameObject_Moon"))))
+	//	return E_FAIL;
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
@@ -78,7 +87,6 @@ HRESULT CLevel_GamePlay::Render()
 		m_iFPS = 0;
 	}
 
-
 	return S_OK;
 }
 
@@ -87,7 +95,7 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 	//// 예시코드 1 : 태양광
 	LIGHT_DESC			LightDesc{};
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
-	LightDesc.vDirection = _float4(0.f, -1.f, 0.f, 0.f);
+	LightDesc.vDirection = _float4(0.3f, -1.f, -0.3f, 0.f);
 
 	LightDesc.vDiffuse = _float4(0.8f, 0.8f, 0.8f, 1.f);
 	LightDesc.vAmbient = _float4(0.6f, 0.6f, 0.6f, 1.f);
@@ -120,12 +128,11 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
 
 HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
-
 	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_SkySphere"));
 	CHECK_FAILED(hr);
 
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_TestMap"))))
-	//	return E_FAIL;
+	hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_WasteCan"));
+	CHECK_FAILED(hr);
 
 	return S_OK;
 }
@@ -161,8 +168,61 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const wstring & strLayerTag)
 
 HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& strLayerTag)
 {
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_UI_Test"))))
-	//	return E_FAIL;
+	string strFilePath = { "../../../UI_txt/" };
+	string strUITag = { "LayerUI_Orig.txt" };
+
+	std::ifstream InputFile(strFilePath + strUITag, ios::in | std::ios::binary);
+
+	if (!InputFile.is_open()) //==FALSE 
+	{
+		MSG_BOX(TEXT("Failed to Open : FileData"));
+		return FALSE;
+	}
+
+	size_t size = 0;
+	InputFile.read(reinterpret_cast<char*>(&size), sizeof(size));
+	//m_LayerUIs.reserve(size);
+
+	for (size_t i = 0; i < size; ++i)
+	{
+		string strProtoTag = {};
+		_uint iProtoTagLen = {};
+		InputFile.read(reinterpret_cast<char*>(&iProtoTagLen), sizeof(iProtoTagLen));
+		strProtoTag.resize(iProtoTagLen);
+		InputFile.read(&strProtoTag[0], iProtoTagLen);
+
+		if (0 == strProtoTag.size())
+			return FALSE;
+
+		CUIObject::UIOBJ_DESC UIobj_Desc{};
+		string strUITag = {};
+		_uint iUITagLen = {};
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.eUIType), sizeof(UIobj_Desc.eUIType));
+
+		InputFile.read(reinterpret_cast<char*>(&iUITagLen), sizeof(iUITagLen));
+		strUITag.resize(iUITagLen);
+		InputFile.read(&strUITag[0], iUITagLen);
+
+		UIobj_Desc.wstrUITag = CUtils::StrToWstr(strUITag);
+
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vCenter), sizeof(UIobj_Desc.vCenter));
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vSize), sizeof(UIobj_Desc.vSize));
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vPos), sizeof(UIobj_Desc.vPos));
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.fDegree), sizeof(UIobj_Desc.fDegree));
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.iTexIndex), sizeof(UIobj_Desc.iTexIndex));
+
+		string strText = {};
+		_uint iUIextLen = {};
+		InputFile.read(reinterpret_cast<char*>(&iUIextLen), sizeof(iUIextLen));
+		strText.resize(iUIextLen);
+		InputFile.read(&strText[0], iUIextLen);
+		UIobj_Desc.wstrText = CUtils::StrToWstr(strText);
+
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vColorRGBA), sizeof(UIobj_Desc.vColorRGBA));
+
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, CUtils::StrToWstr(strProtoTag), &UIobj_Desc)))
+			return E_FAIL;
+	}
 
 	return S_OK;
 }
@@ -269,7 +329,17 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BladeKnight"), &tempDesc)))
 				return E_FAIL;
 		}
-		else if (strModelName == "Level1Stage1Step01")
+		else if (strModelName == "NonAnim_Kabu")
+		{
+			CKabu::KABU_DESC KabuDesc = {};
+			KabuDesc.matWorld = matWorld;
+			KabuDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			KabuDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기
+			KabuDesc.eMoveState = CKabu::KABUMOVING_PATROL;
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Kabu"), &KabuDesc)))
+				return E_FAIL;
+		}
+		else if (strModelName == "Level1Stage1Step01" || strModelName == "Level1Stage1Step01_Blend")
 		{
 			CBasicMap::MAP_DESC tMapDesc{};
 			tMapDesc.matWorld = tempDesc.matWorld;
@@ -339,6 +409,41 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 	return S_OK;
 }
 
+HRESULT CLevel_GamePlay::Add_EnvMap()
+{
+	HRESULT hr;
+
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Level_0_Env"),
+		TEXT("Com_Texture1"), (CComponent**)&m_pEnvTexture[TYPE_ENV]);
+	CHECK_FAILED(hr);
+
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_BRDF_LUT"),
+		TEXT("Com_Texture2"), (CComponent**)&m_pEnvTexture[TYPE_LUT]);
+	CHECK_FAILED(hr);
+
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_RandomNormal"),
+		TEXT("Com_Texture3"), (CComponent**)&m_pEnvTexture[TYPE_NORMAL]);
+	CHECK_FAILED(hr);
+
+
+
+
+	// 환경맵을 던진다.
+	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture[TYPE_ENV], "g_EnvTexture")))
+		return E_FAIL;
+
+	//LUT 던진다.
+	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture[TYPE_LUT], "g_LUTTexture")))
+		return E_FAIL;
+
+	//Normal 던진다.
+	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture[TYPE_NORMAL], "g_RandomNormalTexture")))
+		return E_FAIL;
+
+
+	return S_OK;
+}
+
 CLevel_GamePlay * CLevel_GamePlay::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CLevel_GamePlay*		pInstance = new CLevel_GamePlay(pDevice, pContext);
@@ -356,4 +461,9 @@ void CLevel_GamePlay::Free()
 {
 	__super::Free();
 	m_pGameInstance->Clear_EventCallBack();
+
+	for(auto& tex : m_pEnvTexture)
+		Safe_Release(tex);
+
+	CLevelChanger::Get_Instance()->Save();
 }

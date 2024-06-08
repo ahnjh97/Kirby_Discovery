@@ -45,8 +45,14 @@ public: /* For.Renderer */
 	void Setting_RadialBlur(_fvector vWorldPos, _float fRadial, _float fSubtraction = 70.f);
 	void Setting_RadialBlur(_float fRadial, _float fSubtraction = 70.f);
 	HRESULT Render_LightDepth_For_GameObject(class CShader* pShader, class CTransform* pTransform, class CModel* pModel);
+	HRESULT Render_LightDepth_For_PartObject(class CShader* pShader, const _float4x4* pMatrix, class CModel* pModel);
 	void Update_LightShadow(_fvector vLightPos, _fvector vFocusPos);
 	void Update_DofFocus(_fvector vWorldPos);
+	void Set_BlackBackGround(_bool bSet);
+	HRESULT Bind_DeferredTexture(CTexture* pTexture, const _char* pConstantName, _uint iIndex = 0);
+	HRESULT Bind_DeferredRawValue(const _char* pConstantName, const void* pData, _uint iLength);
+	void Set_RenderMode(CRenderer::RENDER_MODE eMode);
+	void Update_Option(CRenderer::OPTION Option, _bool bOn);
 	void Bind_RendererFunc(_int iTriggerType);
 
 #ifdef _DEBUG
@@ -103,7 +109,7 @@ public: /* For.PipeLine */
 public: /* For.Light_Manager */
 	const LIGHT_DESC* Get_LightDesc(_uint iIndex);
 	HRESULT Add_Light(const LIGHT_DESC& LightDesc);
-	HRESULT Render_Lights(class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
+	HRESULT Render_Lights(class CShader* pShader, class CVIBuffer_Rect* pVIBuffer, _bool bForTool = false);
 	void Clear_Light();
 	class CLight* Get_LightLastAddress();
 
@@ -187,6 +193,15 @@ public: /* For. Picking */
 	void Transform_PickingToLocalSpace(const class CTransform* pTransform, _Out_ _float3* pRayDir, _Out_ _float3* pRayPos);
 	_float2 Get_MouseViewPortPos();
 
+public: /* For. TimeController */
+	_float	Get_FirstTimer();
+	_float	Get_SecondTimer();
+	void	Set_FirstTimerRatio(_float fRatio);
+	void	Set_SecondTimerRatio(_float fRatio);
+	void	Restore_FirstTimer();
+	void	Restore_SecondTimer();
+
+
 	_uint Get_NumOctree() { return g_iNumOctree; }
 	void IncreaseIndex() { g_iNumOctree++; }
 
@@ -210,6 +225,7 @@ private:
 #endif
 	class CPhysX*					m_pPhysx = { nullptr };
 	class CPicking*					m_pPicking = { nullptr };
+	class CTimeController*			m_pTimeController = { nullptr };
 
 	_uint	m_iCurrentLevelID		= { 0 };
 	_uint	g_iNumOctree			= {};

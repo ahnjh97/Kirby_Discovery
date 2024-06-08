@@ -11,6 +11,8 @@ CLevel_Tool_Anim::CLevel_Tool_Anim(ID3D11Device* pDevice, ID3D11DeviceContext* p
 
 HRESULT CLevel_Tool_Anim::Initialize()
 {
+	m_pGameInstance->Set_RenderMode(CRenderer::MODE_TOOL);
+
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
 
@@ -22,9 +24,6 @@ HRESULT CLevel_Tool_Anim::Initialize()
 
 	if (FAILED(Ready_Layer_Ground(TEXT("Layer_Ground"))))
 		return E_FAIL;
-
-	//if (FAILED(Ready_Layer_Character(TEXT("Layer_Character"))))
-	//	return E_FAIL;
 
 	if (FAILED(Ready_Layer_IMGUI(TEXT("Layer_IMGUI"))))
 		return E_FAIL;
@@ -94,14 +93,6 @@ HRESULT CLevel_Tool_Anim::Ready_Layer_Ground(const wstring& strLayerTag)
 		return E_FAIL;
 
 	m_pGameInstance->Ready_TestGround();
-
-	return S_OK;
-}
-
-HRESULT CLevel_Tool_Anim::Ready_Layer_Character(const wstring & strLayerTag)
-{
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_ANIM, strLayerTag, TEXT("Prototype_GameObject_Kirby"))))
-	//	return E_FAIL;
 
 	return S_OK;
 }

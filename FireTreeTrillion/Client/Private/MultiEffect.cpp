@@ -72,6 +72,8 @@ HRESULT CMultiEffect::Initialize(void* pArg)
 					(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI"), 0))->Find_Effect(FXName);
 				if (nullptr != pFX)
 					m_FXs.push_back(pFX);
+
+				m_fDuration.second = pFX->Get_BiggerDuration(m_fDuration.second);
 			}
 		}
 		return S_OK;
@@ -99,12 +101,15 @@ HRESULT CMultiEffect::Initialize(void* pArg)
 				SingleFXDesc.vInitScale = FXDesc.vInitScale;
 				m_bIsColorRender = true;
 				SingleFXDesc.bIsColorRender = true;
+				SingleFXDesc.pSocketMatrix = FXDesc.pSocketMatrix;
+
 				wstring wstrProtoName = L"Prototype_GameObject_" + CUtils::StrToWstr(FXName);
 
 				CSingleEffect* pFX = static_cast<CSingleEffect*>(m_pGameInstance->Clone_GameObject(wstrProtoName, &SingleFXDesc));
 				CHECK_NULLPTR(pFX);
 
 				m_FXs.push_back(pFX);
+				m_fDuration.second = pFX->Get_BiggerDuration(m_fDuration.second);
 
 				/*for (auto& comPair : *pStaticProtoMap)
 				{
@@ -169,11 +174,21 @@ void CMultiEffect::Late_Tick(_float fTimeDelta)
 	if (m_bDead)
 		return;
 
-	if (m_bIsColorRender)
-		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+ 	//if ((CRenderer::RENDERGROUP)m_eRenderGroup != CRenderer::RENDER_END)
+		//m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 
-	if (m_bIsBloom)
-		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
+	for (auto& pEffect : m_FXs)
+	{
+		pEffect->Late_Tick(fTimeDelta);
+		//if (FAILED())
+		//{
+		//	_ASSERT_EXPR(FALSE, TEXT("Failed To Render Composite Effect"));
+		//	return E_FAIL;
+		//}
+	}
+
+	//if (m_bIsBloom)
+	//	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
 }
 
 HRESULT CMultiEffect::Render()
@@ -181,14 +196,14 @@ HRESULT CMultiEffect::Render()
 	if (0.f < m_fStartDelay)
 		return S_OK;
 
-	for (auto& pEffect : m_FXs)
-	{
-		if (FAILED(pEffect->Render()))
-		{
-			_ASSERT_EXPR(FALSE, TEXT("Failed To Render Composite Effect"));
-			return E_FAIL;
-		}
-	}
+	//for (auto& pEffect : m_FXs)
+	//{
+	//	if (FAILED(pEffect->Render()))
+	//	{
+	//		_ASSERT_EXPR(FALSE, TEXT("Failed To Render Composite Effect"));
+	//		return E_FAIL;
+	//	}
+	//}
 
 	return S_OK;
 }
@@ -231,13 +246,14 @@ CGameObject* CMultiEffect::Clone(void* pArg)
 		Safe_Release(pInstance);
 	}
 
-	return pInstance;;
+	return pInstance;
 }
 
 void CMultiEffect::Free()
 {
 	for (auto& pEffect : m_FXs)
 		Safe_Release(pEffect);
+
 	m_FXs.clear();
 
 	__super::Free();

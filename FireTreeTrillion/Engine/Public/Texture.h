@@ -19,6 +19,8 @@ public:
 #pragma endregion
 
 public:
+	_uint Get_TextureNum() { return m_iNumTextures; }
+	
 	virtual HRESULT Initialize_Prototype(const wstring& strTextureFilePath, _uint iNumTexture);
 	virtual HRESULT Initialize(void* pArg) override;
 

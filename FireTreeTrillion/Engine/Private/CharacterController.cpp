@@ -93,17 +93,21 @@ _float4 CCharacterController::Get_FootPosition()
 /// <summary> 객체의 Look방향으로 '이동'하는 함수 </summary>
 /// <param name="pTransform"> 객체의 Transform </param>
 /// <param name="fSpeed"> 이동 속도 </param>
-void CCharacterController::Move(CTransform* pTransform, _float fSpeed, _float fTimeDelta)
+void CCharacterController::Move(CTransform* pTransform, _fvector vPosition, _float fTimeDelta)
 {
-	PxVec3 movement(0.f);
-	_vector vLook = pTransform->Get_State_Vector(CTransform::STATE_LOOK);
-	movement += CUtils::To_PxVec3(XMVector3Normalize(vLook)) * fSpeed * fTimeDelta;
+	PxExtendedVec3 pxCurrentPos = m_pController->getPosition();
+	PxVec3 moveVector((_float)pxCurrentPos.x, (_float)pxCurrentPos.y, (_float)pxCurrentPos.z);
+	//// 이동
+	//PxControllerCollisionFlags collisionFlags = m_pController->move(moveVector, 0.001f, fTimeDelta, PxControllerFilters());
+
+	PxVec3 displacement = CUtils::To_PxVec3(vPosition) - moveVector;
 
 	PxControllerFilters filter;
-	PxControllerCollisionFlags collisionFlags = m_pController->move(movement, 0.001f, fTimeDelta, filter);
+	PxControllerCollisionFlags collisionFlags = m_pController->move(displacement, 0.001f, fTimeDelta, filter);
 
 	PxExtendedVec3 pxPos = m_pController->getPosition();
-	PxVec3 pos ((_float)pxPos.x,(_float)pxPos.y,(_float)pxPos.z);
+	PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
+
 	_vector xmPos = XMVectorSet(pos.x, pos.y - m_fOffset, pos.z, 0.f);
 
 	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
@@ -159,7 +163,7 @@ _bool CCharacterController::Jump(CTransform* pTransform, _float fFallVelocity, _
 	return true;
 }
 
-_bool CCharacterController::Jump_Parabola(CTransform* pTransform, _vector vGoPos, _float fTimeDelta)
+_bool CCharacterController::Jump_Parabola(CTransform* pTransform, _fvector vGoPos, _float fTimeDelta)
 {
 	PxExtendedVec3 pxCurrentPos = m_pController->getPosition();
 	PxVec3 moveVector((_float)pxCurrentPos.x, (_float)pxCurrentPos.y, (_float)pxCurrentPos.z);
@@ -270,10 +274,10 @@ PxVec3 CCharacterController::Compute_Slope(CTransform* pTransform)
 /// </summary>
 /// <param name="pTransform"></param>
 /// <returns></returns>
-_float CCharacterController::Compute_Height()
+_float CCharacterController::Compute_Height(_fvector vAxis)
 {
 	PxExtendedVec3 position = m_pController->getPosition();
-	PxVec3 rayOrigin = PxVec3((_float)position.x, (_float)position.y, (_float)position.z);
+	PxVec3 rayOrigin = PxVec3((_float)position.x, (_float)position.y, (_float)position.z) + CUtils::To_PxVec3(XMVector3Normalize(vAxis));
 
 	PxVec3 rayDirection = PxVec3(0.f, -1.f, 0.f);
 	_float fMaxDistance = 10.f;
@@ -514,6 +518,7 @@ void CCharacterController::Free()
 {
 	__super::Free();
 
+	Safe_Release(m_pObject);
 	Release_Controller();
 }
 

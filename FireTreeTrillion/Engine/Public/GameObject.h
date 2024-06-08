@@ -95,6 +95,8 @@ protected:
 
 	_bool									m_bHide = { false };
 
+	_float									m_fRimWidth = { 0.2f };
+
 	_uint									m_iShaderVars = {};
 	_float									m_fRimLightThickness = {};
 

@@ -1,6 +1,4 @@
 #pragma once
-
-
 #include "GameInstance.h"
 
 namespace Client
@@ -13,8 +11,11 @@ namespace Client
                 //============= TOOL
                  LEVEL_TOOL_FX,
                  LEVEL_TOOL_UI,
-                 LEVEL_TOOL_ANIM,
+                 LEVEL_TOOL_ANIM = 6, // ANIM툴은 6으로 고정 ! 부탁드립니댜
                  LEVEL_TOOL_MAP,
+                
+                //============ GAME
+                // 여기에서 이어서 
 
                  LEVEL_END };
 
@@ -48,11 +49,14 @@ enum PASS_POSTEX {
 };
 
 enum PASS_MODEL {
-    MODEL_NORMAL_O, MODEL_NORMAL_X, MODEL_SHADOW, MODEL_SKY, MODEL_BLOOM, MODEL_BLEND, MODEL_TRIGGER, MODEL_END
+    MODEL_NORMAL_O, MODEL_NORMAL_X, MODEL_SHADOW, MODEL_SKY, MODEL_BLOOM, MODEL_BLEND, MODEL_TRIGGER, 
+    MODEL_DEFAULTFX, MODEL_BLENDFX, MODEL_DEFERREDINFO,
+    MODEL_END
 };
 
 enum PASS_ANIMMODEL {
     ANIMMODEL_NORMAL_O, ANIMMODEL_NORMAL_X, ANIMMODEL_SHADOW, ANIMMODEL_KIRBYMOUTH, ANIMMODEL_KIRBYEYE, ANIMMODEL_BLOOM, ANIMMODEL_BLEND, ANIMMODEL_DEFERREDINFO,
+    ANIMMODEL_KIRBY,
     ANIMMODEL_END
 };
 

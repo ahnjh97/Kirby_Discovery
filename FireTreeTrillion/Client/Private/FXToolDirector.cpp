@@ -27,6 +27,8 @@ CFXToolDirector::CFXToolDirector(const CFXToolDirector& rhs)
 {
 }
 
+
+//세 이펙트를 만든다.
 void CFXToolDirector::Make_Effect(SINGLE_FX_DATA& _FXData)
 {
 	CSingleEffect::FX_DESC FXDesc{};
@@ -50,11 +52,27 @@ void CFXToolDirector::Make_Effect(SINGLE_FX_DATA& _FXData)
 	FXDesc.bIsBloom = _FXData.bIsBloom;
 
 	FXDesc.fRimLightThreshold = _FXData.fRimLightThreshold;
-
+	FXDesc.eRenderGroup = _FXData.eRenderGroup;
 
 	for (_uint i = 0; i < _FXData.iPropertyMapNum; ++i)
 	{
 		FXDesc.Keyframes.emplace( _FXData.vecKeyframeInfo[i].first, _FXData.vecKeyframes[i] );
+	}
+
+	if (_FXData.iPropertyMapNum < KF_MASKUVANGLE)
+	{
+		//기본 세팅된 키프레임들.
+		vector<FX_KEYFRAME> newProperty;
+		FX_KEYFRAME newStartKeyframe{ 0.f, Vector3::Zero, EASE_LINEAR };
+		FX_KEYFRAME newEndKeyframe{ 1.f, Vector3::Zero, EASE_LINEAR };
+
+		//위치
+		newProperty.push_back(newStartKeyframe);
+		newProperty.push_back(newEndKeyframe);
+
+		FXDesc.Keyframes.emplace(KF_MASKUVOFFSET, newProperty);
+		FXDesc.Keyframes.emplace(KF_MASKUVANGLE, newProperty);
+
 	}
 
 	CSingleEffect* pSingleFX = static_cast<CSingleEffect*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_SingleEffect"), &FXDesc));
@@ -72,6 +90,7 @@ void CFXToolDirector::Make_Effect(PARTICLE_DATA& _FXData)
 	ParticleDesc.strTexTag = _FXData.strTexName;
 	ParticleDesc.strMaskTexTag = _FXData.strMaskTexName;
 	ParticleDesc.iNumInstance = _FXData.iNumInstance;
+	ParticleDesc.eRenderGroup = _FXData.eRenderGroup;
 
 
 	InstanceDesc.fLifetime = _FXData.fLifetime;
@@ -102,7 +121,7 @@ void CFXToolDirector::Make_Effect(PARTICLE_DATA& _FXData)
 
 	CParticle* pParticle = static_cast<CParticle*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle"), &ParticleDesc));
 	m_FXs.emplace_back(pParticle);
-	pParticle->Update_InstanceInfo(InstanceDesc);
+	pParticle->Update_InstanceInfo(&InstanceDesc);
 
 }
 
@@ -118,7 +137,7 @@ void CFXToolDirector::Make_Effect(MULTI_FX_DATA& _FXData)
 	m_MultiFXs.emplace_back(pMultiFX);
 }
 
-
+//이펙트 찾기
 CEffect* CFXToolDirector::Find_Effect(string strName)
 {
 	for (CEffect* FX : m_FXs)
@@ -136,6 +155,8 @@ CEffect* CFXToolDirector::Find_Effect(string strName)
 	return nullptr;
 }
 
+
+//이펙트 싹 저장
 HRESULT CFXToolDirector::Save_AllEffect()
 {
 	for (auto& FX : m_FXs)
@@ -215,6 +236,9 @@ HRESULT CFXToolDirector::Save_Effect(CEffect* pEffect, const wstring& strFileNam
 		}
 	}
 
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.eRenderGroup), sizeof(_uint));
+
+
 	OutputFile.close();
 
 	return S_OK;
@@ -285,6 +309,8 @@ HRESULT CFXToolDirector::Save_Particle(CEffect* pEffect, const wstring& strFileN
 		OutputFile.write(reinterpret_cast<const char*>(&bCommand), sizeof(_bool));
 	}
 
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.eRenderGroup), sizeof(_uint));
+
 
 	OutputFile.close();
 	return S_OK;
@@ -317,6 +343,7 @@ HRESULT CFXToolDirector::Save_MultiEffect(CEffect* pEffect, const wstring& strFi
 	return S_OK;
 }
 
+//이펙트 싹 로드
 HRESULT CFXToolDirector::Load_AllEffect()
 {
 	path FXPath("../Bin/Resources/Effects/Single/");
@@ -459,6 +486,9 @@ HRESULT CFXToolDirector::Load_Effect(path _FilePath, SINGLE_FX_DATA* _pData)
 		}
 	}
 
+	InputFile.read(reinterpret_cast<char*>(&_pData->eRenderGroup), sizeof(_uint));
+
+
 	return S_OK;
 }
 
@@ -539,6 +569,7 @@ HRESULT CFXToolDirector::Load_Effect(path _FilePath, PARTICLE_DATA* _pData)
 		InputFile.read(reinterpret_cast<char*>(&KF), sizeof(_bool));
 	}
 	
+	InputFile.read(reinterpret_cast<char*>(&_pData->eRenderGroup), sizeof(_uint));
 
 
 	return S_OK;
@@ -590,27 +621,25 @@ HRESULT CFXToolDirector::Initialize(void* pArg)
 		GameObjectDesc = *(GAMEOBJECT_DESC*)pArg;
 	}
 
-	//if (FAILED(__super::Initialize(&GameObjectDesc)))
-	//	return E_FAIL;
-
 
 	HRESULT hr = __super::Initialize(pArg);
 	CHECK_FAILED_MSG(hr, "Failed To Initialize : CFXToolDirector");
 
-
 	hr = Add_Components();
 	CHECK_FAILED_MSG(hr, "Failed To Add Components : CFXToolDirector");
 
+	//static 프로토타입 중 이펙트 툴에서 사용할 컴포넌트의 이름을 가져온다.
 	hr = Ready_FXPrototypeVector();
 	CHECK_FAILED_MSG(hr, "Failed To Add Components : CFXToolDirector");
 
-	//SetupImGuiStyle(true, .8f);
+	m_pGameInstance->Set_IMGUIStyle(CImGUI_Manager::HYO);
 
 	return S_OK;
 }
 
 _int CFXToolDirector::Tick(_float _fTimeDelta)
 {
+	//이펙트 저장 / 불러오기
 	if (m_pGameInstance->Get_KeyState(DIK_LCONTROL, KEY_PRESS))
 	{
 		if (m_pGameInstance->Get_KeyState(DIK_S, KEY_DOWN))
@@ -623,23 +652,16 @@ _int CFXToolDirector::Tick(_float _fTimeDelta)
 		}
 	}
 
+
+	//플레이 바 재생 중일 때 이펙트 틱 돌리기
 	if (m_bPlayingBar)
 	{
 		if (m_eSelected == SELECTED_SINGLE_FX)
-		{
 			m_FXs[m_iSelectedFXIdx]->Tick(_fTimeDelta);
-			//m_fCurPlayDuration = m_FXs[m_iSelectedFXIdx]->m_fDuration.first;
-		}
 		else if (m_eSelected == SELECTED_PARTICLE_FX)
-		{
 			m_FXs[m_iSelectedFXIdx]->Tick(_fTimeDelta);
-			//m_fCurPlayDuration = m_FXs[m_iSelectedFXIdx]->m_fDuration.first;
-		}
 		else if (m_eSelected == SELECTED_MULTI_FX)
-		{
 			m_MultiFXs[m_iSelectedMultiFXIdx]->Tick(_fTimeDelta);
-			//m_fCurPlayDuration += m_MultiFXs[m_iSelectedMultiFXIdx]->m_fDuration.first;
-		}
 	}
 
 	return OBJ_NOEVENT;
@@ -647,19 +669,32 @@ _int CFXToolDirector::Tick(_float _fTimeDelta)
 
 void CFXToolDirector::Late_Tick(_float _fTimeDelta)
 {
-	//Matrix viewMat = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW);
-	//Matrix projMat = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
-	//Matrix identityMat = XMMatrixIdentity();
 
+	//0, 0 중심선을 긋는다.
 	Render_AxisLines();
+
+	//그리드를 그린다.
 	m_pGameInstance->RenderGrid();
 
+	//단일 이펙트 생성, 목록 확인
 	Render_FXHierarchy();
+
+	//복합 이펙트 생성, 목록 확인
 	Render_MultiFXHierarchy();
+
+	//이펙트들의 변수 설정
 	Render_FXProperty();
 
+	//이펙트의 재생 바 설정
 	Render_FXPlayBar(_fTimeDelta);
 
+	//복합 이펙트 아니면 FX에 있는 이펙트 업데이트
+	if (m_eSelected == SELECTED_SINGLE_FX || m_eSelected == SELECTED_PARTICLE_FX)
+		m_FXs[m_iSelectedFXIdx]->Late_Tick(_fTimeDelta);
+
+	//아니면 복합 이펙트 업데이트
+	else if (m_eSelected == SELECTED_MULTI_FX)
+		m_MultiFXs[m_iSelectedMultiFXIdx]->Late_Tick(_fTimeDelta);
 
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_UI, this);
@@ -674,7 +709,6 @@ void CFXToolDirector::Render_AxisLines()
 	ProjMatrix = m_pGameInstance->Get_Transform(CPipeLine::D3DTS_PROJ);
 
 	_float4x4 VPMatrix = ViewMatrix * ProjMatrix;
-
 
 	auto TransformToScreen = [&](XMVECTOR worldPos)
 		{
@@ -699,22 +733,36 @@ void CFXToolDirector::Render_AxisLines()
 	ImVec2 screenXAxisEnd = TransformToScreen(xAxisEnd);
 	ImVec2 screenZAxisEnd = TransformToScreen(zAxisEnd);
 
-	// Draw lines
-	drawList->AddLine(screenXAxisStart, screenOrigin, IM_COL32(255, 50, 255, 255), 1.f); // Red line for X axis
-	drawList->AddLine(screenOrigin, screenXAxisEnd, IM_COL32(255, 50, 255, 255), 1.f); // Red line for X axis
-	drawList->AddLine(screenZAxisStart, screenOrigin, IM_COL32(50, 50, 255, 255), 1.f); // Blue line for Z axis
-	drawList->AddLine(screenOrigin, screenZAxisEnd, IM_COL32(50, 50, 255, 255), 1.f); // Blue line for Z axis
+
+	// 화살표를 그리는 람다 함수
+	auto AddArrow = [drawList](ImVec2 p1, ImVec2 p2, ImU32 col, float thickness, float arrowSize)
+		{
+			ImVec2 direction = ImVec2(p2.x - p1.x, p2.y - p1.y);
+			float length = sqrtf(direction.x * direction.x + direction.y * direction.y);
+			direction.x /= length;
+			direction.y /= length;
+
+			drawList->AddLine(p1, p2, col, thickness);
+
+			ImVec2 arrowLeft = ImVec2(
+				p2.x - direction.x * arrowSize - direction.y * arrowSize * 0.5f,
+				p2.y - direction.y * arrowSize + direction.x * arrowSize * 0.5f
+			);
+			ImVec2 arrowRight = ImVec2(
+				p2.x - direction.x * arrowSize + direction.y * arrowSize * 0.5f,
+				p2.y - direction.y * arrowSize - direction.x * arrowSize * 0.5f
+			);
+
+			drawList->AddTriangleFilled(p2, arrowLeft, arrowRight, col);
+		};
+
+	// 화살표 그리기
+	AddArrow(screenOrigin, screenXAxisEnd, IM_COL32(255, 50, 255, 255), 1.0f, 12.0f);
+	AddArrow(screenOrigin, screenZAxisEnd, IM_COL32(50, 50, 255, 255), 1.0f, 12.0f);
 }
 
 HRESULT CFXToolDirector::Render()
 {
-	//복합 이펙트 아니면 FX에 있는 이펙트 렌더
-	if (m_eSelected == SELECTED_SINGLE_FX || m_eSelected == SELECTED_PARTICLE_FX)
-		m_FXs[m_iSelectedFXIdx]->Render();
-	//아니면 복합 이펙트 렌더
-	else if (m_eSelected == SELECTED_MULTI_FX)
-		m_MultiFXs[m_iSelectedMultiFXIdx]->Render();
-
 	return S_OK;
 }
 
@@ -723,21 +771,26 @@ void CFXToolDirector::Render_IMGUI()
 	__super::Render_IMGUI();
 }
 
+//단일 이펙트들의 생성 세팅, 계층을 보여준다.
 void CFXToolDirector::Render_FXHierarchy()
 {
 	Begin(u8"만들기");
 
+	//색 텍스쳐
 	Combo(u8"디퓨즈 텍스쳐", &m_iAddingFXTexIdx, m_FXTexList.data(), (_int)m_FXTexList.size());
+
+	//마스크 텍스쳐
 	Combo(u8"마스크 텍스쳐", &m_iAddingFXMaskTexIdx, m_FXMaskTexList.data(), (_int)m_FXMaskTexList.size());
 
 	Separator();
 	Columns(2);
 
+	//버퍼
 	Combo(u8"버퍼", &m_iAddingFXBufferIdx, m_FXBufferList.data(), (_int)m_FXBufferList.size());
 
+	//single effect를 생성한다.
 	if (Button(u8"이펙트 생성"))
 	{
-
 		//이름 정해주기
 		CSingleEffect::FX_DESC singleFXDesc{};
 		string strComponentTag = "Prototype_Component_";
@@ -745,11 +798,13 @@ void CFXToolDirector::Render_FXHierarchy()
 		string strBaseName{ "Default FX " };
 		switch (m_iAddingFXBufferIdx)
 		{
+		case 0:
+			strBaseName = "Rect FX ";
+			break;
 		case 1:
 			break;
 		default:
-			strBaseName = "Rect FX ";
-			//singleFXDesc.strBufferTag = "Rect";
+			strBaseName = "New FX ";
 			break;
 		}
 
@@ -776,7 +831,6 @@ void CFXToolDirector::Render_FXHierarchy()
 
 			++szSuffix;
 		}
-
 
 		//버퍼, 텍스쳐, 마스크 텍스쳐 컴포넌트 이름 떤져준다.
 		singleFXDesc.strBufferTag = strComponentTag + m_FXBufferList[m_iAddingFXBufferIdx];
@@ -806,16 +860,16 @@ void CFXToolDirector::Render_FXHierarchy()
 		newProperty.clear();
 		newStartKeyframe.vValue = Vector3::One;
 		newStartKeyframe.eEasing = EASE_IN;
-		newEndKeyframe.vValue = { .01f, .01f, .01f };
+		newEndKeyframe.vValue = Vector3::One;
 		newProperty.push_back(newStartKeyframe);
 		newProperty.push_back(newEndKeyframe);
 		singleFXDesc.Keyframes.emplace(KF_SCALE, newProperty);
 
 
-		//R
+		//R(색상)
 		newProperty.clear();
-		newStartKeyframe.vValue = { 1.f, 0.f, 0.f };
-		newEndKeyframe.vValue = { 1.f, 0.f, 0.f };
+		newStartKeyframe.vValue = { 1.f, 1.f, 1.f };
+		newEndKeyframe.vValue = { 1.f, 1.f, 1.f };
 		newProperty.push_back(newStartKeyframe);
 		newProperty.push_back(newEndKeyframe);
 		singleFXDesc.Keyframes.emplace(KF_RCOLOR, newProperty);
@@ -853,10 +907,15 @@ void CFXToolDirector::Render_FXHierarchy()
 
 		newProperty.clear();
 		newStartKeyframe.vValue = Vector3::Zero;
+		newStartKeyframe.eEasing = EASE_LINEAR;
 		newEndKeyframe.vValue = Vector3::Zero;
 		newProperty.push_back(newStartKeyframe);
 		newProperty.push_back(newEndKeyframe);
 		singleFXDesc.Keyframes.emplace(KF_UVOFFSET, newProperty);
+
+		singleFXDesc.Keyframes.emplace(KF_MASKUVOFFSET, newProperty);
+
+		singleFXDesc.Keyframes.emplace(KF_MASKUVANGLE, newProperty);
 
 		CSingleEffect* pSingleFX = static_cast<CSingleEffect*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_SingleEffect"), &singleFXDesc));
 		m_FXs.emplace_back(pSingleFX);
@@ -869,9 +928,8 @@ void CFXToolDirector::Render_FXHierarchy()
 
 	if (Button(u8"파티클 생성"))
 	{
-		//		m_bOpenKeyframeEditor = false;
 
-				//이름 정해주기
+		//이름 정해주기
 		CParticle::PARTICLE_DESC ParticleDesc{};
 		string strComponentTag = "Prototype_Component_";
 
@@ -882,7 +940,6 @@ void CFXToolDirector::Render_FXHierarchy()
 			break;
 		default:
 			strBaseName = "Particle ";
-			//singleFXDesc.strBufferTag = "Rect";
 			break;
 		}
 
@@ -925,43 +982,53 @@ void CFXToolDirector::Render_FXHierarchy()
 	//이펙트 초기 값과 키프레임 값을 편집한다.
 	Begin(u8"편집하기");
 
-	SeparatorText(u8"목록");
+	SeparatorText(u8"단일 이펙트 목록");
 	BeginChild(u8"목록", ImVec2(0, 200), true);
 	for (_int i = 0; i < m_FXs.size(); ++i)
 	{
-
+		//목록 중 하나 선택하면 해당 객체의 값을 ui에 매칭
 		if (Selectable(m_FXs[i]->m_strFXName.c_str(), m_iSelectedFXIdx == i))
 		{
-			//			m_bOpenKeyframeEditor = false;
 			m_iSelectedFXIdx = i;
 
 			m_eSelected = _bool{ dynamic_cast<CSingleEffect*>(m_FXs[i]) != nullptr } ? SELECTED_SINGLE_FX : SELECTED_PARTICLE_FX;
-
 			m_bPlayingBar = false;
 			m_bLooping = m_FXs[i]->m_bIsLoop;
 			m_iCurFXPassIdx = m_FXs[i]->m_iPassIdx;
 			m_iCurFXTexIdx = m_FXs[i]->m_iTexIdx;
 			m_iCurFXMaskTexIdx = m_FXs[i]->m_iMaskTexIdx;
-
+			m_iCurRenderGroup = m_FXs[i]->m_eRenderGroup;
 			m_fTotalPlayDuration = m_FXs[i]->m_fDuration.second;
 			m_fLifetime[0] = m_FXs[i]->m_fLifetime.first;
 			m_fLifetime[1] = m_FXs[i]->m_fLifetime.second;
 
+			//파티클이면 추가 변수 매칭
+			if (m_eSelected == SELECTED_PARTICLE_FX)
+			{
+				CParticle* pCurParticle = static_cast<CParticle*>(m_FXs[i]);
+				memcpy(m_vCenter, &pCurParticle->m_InstanceDesc.vCenter, sizeof(_float3));
+				memcpy(m_vRange, &pCurParticle->m_InstanceDesc.vRange, sizeof(_float3));
+				memcpy(m_vRotation, &pCurParticle->m_InstanceDesc.vRotation, sizeof(_float3));
+				memcpy(m_vRotationRandomOffset, &pCurParticle->m_InstanceDesc.vRotationRandomOffset, sizeof(_float3));
+				memcpy(m_vScale, &pCurParticle->m_InstanceDesc.vScale, sizeof(_float3));
+				memcpy(m_vScaleRandomOffset, &pCurParticle->m_InstanceDesc.vScaleRandomOffset, sizeof(_float3));
+				memcpy(m_vDir, &pCurParticle->m_InstanceDesc.vDir, sizeof(_float3));
+				memcpy(m_vDirRandomOffset, &pCurParticle->m_InstanceDesc.vDirRandomOffset, sizeof(_float3));
+				memcpy(m_vColor, &pCurParticle->m_InstanceDesc.vColor, sizeof(_float3));
+				memcpy(m_vColorRandomOffset, &pCurParticle->m_InstanceDesc.vColorRandomOffset, sizeof(_float3));
+				memcpy(m_vPivot, &pCurParticle->m_InstanceDesc.vPivot, sizeof(_float3));
+			}
 		}
 
 		if (m_iSelectedFXIdx == i && IsItemHovered() && IsMouseReleased(1))
 			OpenPopup("FXMenu");
 
-
-		//if (bOpenSelectableMenu)
-
-		//bOpenSelectableMenu = true;
-
 	}
+
+
+	//우측 키를 누르면 나오는 메뉴들
 	if (BeginPopup("FXMenu"))
 	{
-		//Begin(u8"제발", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse);
-
 		if (MenuItem(u8"선택된 이펙트 그룹에 추가") && m_iSelectedFXIdx != -1 && m_iSelectedMultiFXIdx != -1)
 		{
 			m_MultiFXs[m_iSelectedMultiFXIdx]->Add_Effect(m_FXs[m_iSelectedFXIdx]);
@@ -981,7 +1048,7 @@ void CFXToolDirector::Render_FXHierarchy()
 				FxDesc.strFXName = strBaseName + szSuffix;
 
 				//중복 이름 있으면 안됨
-				for (const auto& fx : m_FXs)
+				for (const auto& fx : m_MultiFXs)
 				{
 					if (fx->m_strFXName == FxDesc.strFXName)
 					{
@@ -1017,41 +1084,119 @@ void CFXToolDirector::Render_FXHierarchy()
 				m_iSelectedFXIdx = -1;
 			}
 		}
-		if (MenuItem(u8"복사"))
-		{
 
+		if (MenuItem(u8"모두 복사 생성"))
+		{
+			//일단 단일 이펙트만
+			SINGLE_FX_DATA FXData{};
+			m_FXs[m_iSelectedFXIdx]->Fill_SaveData(&FXData);
+
+			//이름 정해줘
+			string strBaseName{ "New FX " };
+
+			//default 이펙트 이름 뒤에 중복 존재 시 알파벳을 붙인다.
+			char szSuffix = 'A';
+			while (true)
+			{
+				_bool bDoesExistSameName{ false };
+				FXData.strName = strBaseName + szSuffix;
+
+				//중복 이름 있으면 안됨
+				for (const auto& fx : m_FXs)
+				{
+					if (fx->m_strFXName == FXData.strName)
+					{
+						bDoesExistSameName = true;
+						break;
+					}
+				}
+
+				//중복 이름이 없거나, 알파벳이 초과하면 반복 끝
+				if (!bDoesExistSameName || 'Z' <= szSuffix)
+					break;
+				++szSuffix;
+			}
+
+			Make_Effect(FXData);
+		}
+
+		if (MenuItem(u8"변수만 복사 생성"))
+		{
+			//일단 단일 이펙트만
+			SINGLE_FX_DATA FXData{};
+			m_FXs[m_iSelectedFXIdx]->Fill_SaveData(&FXData);
+
+			//이름 정해줘
+			string strBaseName{ "New FX " };
+
+			//default 이펙트 이름 뒤에 중복 존재 시 알파벳을 붙인다.
+			char szSuffix = 'A';
+			while (true)
+			{
+				_bool bDoesExistSameName{ false };
+				FXData.strName = strBaseName + szSuffix;
+
+				//중복 이름 있으면 안됨
+				for (const auto& fx : m_FXs)
+				{
+					if (fx->m_strFXName == FXData.strName)
+					{
+						bDoesExistSameName = true;
+						break;
+					}
+				}
+
+				//중복 이름이 없거나, 알파벳이 초과하면 반복 끝
+				if (!bDoesExistSameName || 'Z' <= szSuffix)
+					break;
+				++szSuffix;
+			}
+
+			//버퍼, 텍스쳐, 마스크 텍스쳐 컴포넌트 이름 떤져준다.
+			string strComponentTag = "Prototype_Component_";
+			FXData.strBufferName = strComponentTag + m_FXBufferList[m_iAddingFXBufferIdx];
+			FXData.strTexName = strComponentTag + m_FXTexList[m_iAddingFXTexIdx];
+			FXData.strMaskTexName = strComponentTag + m_FXMaskTexList[m_iAddingFXMaskTexIdx];
+
+			Make_Effect(FXData);
 		}
 
 		EndPopup();
-		//End();
 	}
+
+
 	EndChild();
-
-
 	End();
 
 }
 
+
+//싱글 이펙트의 상시 변수를 조정한다.
 void CFXToolDirector::Render_FXProperty()
 {
-	if ((m_eSelected == SELECTED_SINGLE_FX || m_eSelected == SELECTED_PARTICLE_FX) && m_iSelectedFXIdx == -1)
-		return;
-	if (m_eSelected == SELECTED_MULTI_FX && m_iSelectedMultiFXIdx == -1)
-		return;
+	//아무것도 안 누른 상태면 보이지 않음
 	if (m_eSelected == SELECTED_END)
 		return;
 
+	//단일 or 파티클 이펙트를 특정하지 않으면 보이지 않음
+	if ((m_eSelected == SELECTED_SINGLE_FX || m_eSelected == SELECTED_PARTICLE_FX) && m_iSelectedFXIdx == -1)
+		return;
+	//복합 이펙트를 특정하지 않으면 보이지 않음
+	if (m_eSelected == SELECTED_MULTI_FX && m_iSelectedMultiFXIdx == -1)
+		return;
 
+	
 	//이펙트 기본 변수 세팅
 	Begin(u8"속성 편집");
 
-
+	//현재 선택한 이펙트를 다르게 한다.
 	CEffect* pCurFX = m_eSelected == SELECTED_SINGLE_FX || m_eSelected == SELECTED_PARTICLE_FX ?
 		m_FXs[m_iSelectedFXIdx] : m_MultiFXs[m_iSelectedMultiFXIdx];
+
+	//파티클인가?
 	_bool bIsParticle = _bool{ dynamic_cast<CSingleEffect*>(pCurFX) == nullptr };
 
 
-	//이름: 공통
 	char tempBuf[256];
 	strncpy_s(tempBuf, pCurFX->m_strFXName.c_str(), sizeof(tempBuf));
 	tempBuf[sizeof(tempBuf) - 1] = 0;
@@ -1066,16 +1211,34 @@ void CFXToolDirector::Render_FXProperty()
 		pCurFX->m_strFXName = m_curFXName;
 	}
 
-	if (m_eSelected == SELECTED_MULTI_FX)
-	{
+	Text(u8"버퍼");
+	SameLine();
+	Text(CUtils::WstrToStr(pCurFX->m_strBufferTag).c_str());
 
-	}
-	else
+	Text(u8"텍스쳐");
+	SameLine();
+	Text(CUtils::WstrToStr(pCurFX->m_strTexTag).c_str());
+
+	Text(u8"마스크 텍스쳐");
+	SameLine();
+	Text(CUtils::WstrToStr(pCurFX->m_strMaskTexTag).c_str());
+
+	//단일 이펙트가 가지고 있는 변수
+	if (m_eSelected != SELECTED_MULTI_FX)
 	{
 		//루프, 빌보드
 		Checkbox(u8"루프", &pCurFX->m_bIsLoop);
 		SameLine();
 		Checkbox(u8"빌보딩", &pCurFX->m_bIsBillboard);
+
+		//ui처럼 보이는 직교 이펙트
+		if (!bIsParticle)
+		{
+			SameLine();
+			Checkbox(u8"직교", &pCurFX->m_bIsOrthographic);
+		}
+
+		//블룸 효과
 		if (Checkbox(u8"블룸", &pCurFX->m_bIsBloom))
 		{
 			pCurFX->m_bIsBloom ?
@@ -1083,20 +1246,54 @@ void CFXToolDirector::Render_FXProperty()
 				pCurFX->m_bIsColorRender = true;
 		}
 
-		if (!bIsParticle)
+		//렌더 그룹 설정
+		if (RadioButton(u8"No Render", m_iCurRenderGroup == CRenderer::RENDER_END))
 		{
-			SameLine();
-			Checkbox(u8"직교", &pCurFX->m_bIsOrthographic);
+			m_iCurRenderGroup = CRenderer::RENDER_END;
+			pCurFX->m_eRenderGroup = CRenderer::RENDER_END;
 		}
+		SameLine();
+
+		if (RadioButton(u8"NonBlend", m_iCurRenderGroup == CRenderer::RENDER_NONBLEND))
+		{
+			m_iCurRenderGroup = CRenderer::RENDER_NONBLEND;
+			pCurFX->m_eRenderGroup = CRenderer::RENDER_NONBLEND;
+		}
+		SameLine();
+
+		if (RadioButton(u8"Nonlight", m_iCurRenderGroup == CRenderer::RENDER_NONLIGHT))
+		{
+			m_iCurRenderGroup = CRenderer::RENDER_NONLIGHT;
+			pCurFX->m_eRenderGroup = CRenderer::RENDER_NONLIGHT;
+		}
+
+		SameLine();
+
+		if (RadioButton(u8"Blend", m_iCurRenderGroup == CRenderer::RENDER_BLEND))
+		{
+			m_iCurRenderGroup = CRenderer::RENDER_BLEND;
+			pCurFX->m_eRenderGroup = CRenderer::RENDER_BLEND;
+		}
+
 	}
 
 	Separator();
 
 	//전체 시간
-	if (DragFloat(u8"재생 시간", &pCurFX->m_fDuration.second, .1f, 0.f, 30.f, "%.2f"))
+	if (DragFloat(u8"재생 시간", &pCurFX->m_fDuration.second, .1f, 0.f, 300.f, "%.2f"))
 	{
 		m_fTotalPlayDuration = pCurFX->m_fDuration.second;
 	}
+
+
+
+	//복합 이펙트는 재생 시간까지만 보인다.
+	if (m_eSelected == SELECTED_MULTI_FX)
+	{
+		End();
+		return;
+	}
+
 
 	//이펙트의 재생 수명
 	if (DragFloat2(u8"수명", m_fLifetime, .1f, 0.f, pCurFX->m_fDuration.second, "%.2f"))
@@ -1140,13 +1337,129 @@ void CFXToolDirector::Render_FXProperty()
 		pCurFX->m_iMaskTexIdx = m_iCurFXMaskTexIdx;
 	}
 
-	End();
-	//if (bIsParticle)
-	//{
-	//	DragFloat3(u8"범위", m_fRange, .01f, -100.f, 100.f, "%.2f");
-	//	DragFloat3(u8"범위", m_fRange, .01f, -100.f, 100.f, "%.2f");
+	//단일 이펙트는 여기까지만 보인다.
+	if (!bIsParticle)
+	{
+		End();
+		return;
+	}
 
-	//}
+#pragma region  파티클 편집. 캐스팅한다.
+	CParticle* pCurParticle = static_cast<CParticle*>(pCurFX);
+
+	_bool bEdited{ false };
+	auto moveIter = pCurParticle->m_InstanceDesc.vecMoveCommands.begin();
+
+	static _bool bDrop = &pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DROP];
+
+	if (Checkbox(u8"Drop", &bDrop))
+	{
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DROP] = bDrop;
+		bEdited = true;
+	}
+	SameLine();
+
+	static _bool bSpread = &pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_SPREAD];
+	if (Checkbox(u8"Spread", &bSpread))
+	{
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_SPREAD] = bSpread;
+		bEdited = true;
+	}
+	SameLine();
+
+	static _bool bDecelerate = &pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DECELERATE];
+	if (Checkbox(u8"Decelerate", &bDecelerate))
+	{
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DECELERATE] = bDecelerate;
+		bEdited = true;
+	}
+
+	Separator();
+
+	if (DragFloat(u8"시작 딜레이", &pCurParticle->m_InstanceDesc.fStartDelay, .1f, 0.f, 100.f, "%.2f"))
+		bEdited = true;
+	if (DragFloat(u8"시작 딜레이 랜덤", &pCurParticle->m_InstanceDesc.fStarDelayRandomOffset, .1f, 0.f, 100.f, "%.1f"))
+		bEdited = true;
+
+
+
+	if (DragFloat3(u8"중점", m_vCenter, .01f, -100.f, 100.f, "%.2f"))
+	{
+		pCurParticle->m_InstanceDesc.vCenter = { m_vCenter[0], m_vCenter[1], m_vCenter[2] };
+		bEdited = true;
+	}
+	if (DragFloat3(u8"범위", m_vRange, .01f, 0.f, 100.f, "%.2f"))
+	{
+		pCurParticle->m_InstanceDesc.vRange = { m_vRange[0], m_vRange[1], m_vRange[2] };
+		bEdited = true;
+	}
+	if (DragFloat3(u8"회전", m_vRotation, .01f, -180.f, 180.f, "%.2f"))
+	{
+		pCurParticle->m_InstanceDesc.vRotation = { m_vRotation[0], m_vRotation[1], m_vRotation[2] };
+		bEdited = true;
+	}
+	if (DragFloat3(u8"회전 랜덤", m_vRotationRandomOffset, .01f, 0.f, 50.f, "%.2f"))
+	{
+		pCurParticle->m_InstanceDesc.vRotationRandomOffset = { m_vRotationRandomOffset[0], m_vRotationRandomOffset[1], m_vRotationRandomOffset[2] };
+		bEdited = true;
+	}
+	if (DragFloat3(u8"크기", m_vScale, .01f, 0.011f, 100.f, "%.2f"))
+	{
+		pCurParticle->m_InstanceDesc.vScale = { m_vScale[0], m_vScale[1], m_vScale[2] };
+		bEdited = true;
+	}
+	if (DragFloat3(u8"크기 랜덤", m_vScaleRandomOffset, .01f, 0.f, 50.f, "%.2f"))
+	{
+		pCurParticle->m_InstanceDesc.vScaleRandomOffset = { m_vScaleRandomOffset[0], m_vScaleRandomOffset[1], m_vScaleRandomOffset[2] };
+		bEdited = true;
+	}
+	if (DragFloat3(u8"방향", m_vDir, .01f, 0.f, 100.f, "%.2f"))
+	{
+		pCurParticle->m_InstanceDesc.vDir = { m_vDir[0], m_vDir[1], m_vDir[2] };
+		bEdited = true;
+	}
+	if (DragFloat3(u8"방향 랜덤", m_vDirRandomOffset, .01f, 0.f, 100.f, "%.2f"))
+	{
+		pCurParticle->m_InstanceDesc.vDirRandomOffset = { m_vDirRandomOffset[0], m_vDirRandomOffset[1], m_vDirRandomOffset[2] };
+		bEdited = true;
+	}
+	if (DragFloat(u8"속도", &pCurParticle->m_InstanceDesc.fSpeed, .01f, 0.f, 100.f, "%.2f"))
+		bEdited = true;
+	if (DragFloat(u8"속도 랜덤", &pCurParticle->m_InstanceDesc.fSpeedRandomOffset, .01f, 0.f, 100.f, "%.2f"))
+		bEdited = true;
+
+ 	if (ColorEdit3(u8"색상", m_vColor))
+	{
+		pCurParticle->m_InstanceDesc.vColor = { m_vColor[0], m_vColor[1], m_vColor[2] };
+		bEdited = true;
+	}
+
+	if (DragFloat3(u8"색상 랜덤", m_vColorRandomOffset, .1f, 0.f, 100.f, "%.2f"))
+	{
+		pCurParticle->m_InstanceDesc.vColorRandomOffset = { m_vColorRandomOffset[0], m_vColorRandomOffset[1], m_vColorRandomOffset[2] };
+		bEdited = true;
+	}
+
+	if (DragFloat(u8"알파", &pCurParticle->m_InstanceDesc.fAlpha, .01f, 0.f, 100.f, "%.2f"))
+		bEdited = true;
+	if (DragFloat(u8"알파 랜덤", &pCurParticle->m_InstanceDesc.fAlphaRandomOffset, .01f, 0.f, 100.f, "%.2f"))
+		bEdited = true;
+
+	if (DragFloat3(u8"피봇", m_vPivot, .1f, -50.f, 50.f, "%.2f"))
+	{
+		pCurParticle->m_InstanceDesc.vPivot = { m_vPivot[0], m_vPivot[1], m_vPivot[2] };
+		bEdited = true;
+	}
+
+#pragma endregion
+
+	End();
+
+	if (bEdited)
+	{
+		pCurParticle->Update_InstanceInfo();
+	}
+
 
 }
 
@@ -1169,80 +1482,43 @@ void CFXToolDirector::Render_FXPlayBar(_float _fTimeDelta)
 
 	CHECK_NULLPTR(pCurFX);
 
-	Columns(2);
+	Columns(3);
 	SetColumnWidth(0, 220.f);
+	SetColumnWidth(1, 110.f);
 
 	m_eSelected == SELECTED_MULTI_FX ? Text("Cur Duration %.2f", pCurFX->m_fDuration.first) :
 		Text("Cur Lifetime %.2f", pCurFX->m_fLifeRatio);
 
 	if (m_eSelected == SELECTED_SINGLE_FX)
 	{
-		Dummy(ImVec2(0, 58));
+		Dummy(ImVec2(0, 78));
 
 		//플레이 바의 첫번째 열에 이펙트의 현재 속성 값을 띄운다.
 
 		Text(u8"위치");
 		SameLine();
 		Text("%.2f %.2f %.2f\t", pCurFX->m_vCurPos.x, pCurFX->m_vCurPos.y, pCurFX->m_vCurPos.z);
-		SameLine();
+		//SameLine();
 
-		if (SmallButton(u8"위치 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
-		{
-			////m_bOpenKeyframeEditor = false;
-			FX_KEYFRAME newKeyframe{};
-			newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
-			newKeyframe.eEasing = EASE_OUT;
-			newKeyframe.vValue = pCurFX->m_vCurPos;
-
-			pCurFX->Add_Keyframe(newKeyframe, KF_POS);
-		}
+		
 
 		Text(u8"회전");
 		SameLine();
 		Text("%.2f %.2f %.2f\t", pCurFX->m_vCurRot.x, pCurFX->m_vCurRot.y, pCurFX->m_vCurRot.z);
-		SameLine();
+		//SameLine();
 
-		if (SmallButton(u8"회전 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
-		{
-			////m_bOpenKeyframeEditor = false;
-			FX_KEYFRAME newKeyframe{};
-			newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
-			newKeyframe.eEasing = EASE_OUT;
-			newKeyframe.vValue = pCurFX->m_vCurRot;
-
-			pCurFX->Add_Keyframe(newKeyframe, KF_ROT);
-		}
+		
 
 		Text(u8"크기");
 		SameLine();
 		Text("%.2f %.2f %.2f\t", pCurFX->m_vCurScale.x, pCurFX->m_vCurScale.y, pCurFX->m_vCurScale.z);
-		SameLine();
-		if (SmallButton(u8"크기 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
-		{
-			////m_bOpenKeyframeEditor = false;
-			FX_KEYFRAME newKeyframe{};
-			newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
-			newKeyframe.eEasing = EASE_OUT;
-			newKeyframe.vValue = pCurFX->m_vCurScale;
+		
 
-			pCurFX->Add_Keyframe(newKeyframe, KF_SCALE);
-		}
-
-		Text(u8"R");
+		Text(u8"Color");
 		SameLine();
 		Text("\t%.2f %.2f %.2f\t", pCurFX->m_vCurRColor.x, pCurFX->m_vCurRColor.y, pCurFX->m_vCurRColor.z);
-		SameLine();
-		if (SmallButton(u8"R 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
-		{
-			////m_bOpenKeyframeEditor = false;
-			FX_KEYFRAME newKeyframe{};
-			newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
-			newKeyframe.eEasing = EASE_OUT;
-			newKeyframe.vValue = pCurFX->m_vCurRColor;
-
-			pCurFX->Add_Keyframe(newKeyframe, KF_RCOLOR);
-		}
-
+		
+/*
 		Text(u8"G");
 		SameLine();
 		Text("\t%.2f %.2f %.2f\t", pCurFX->m_vCurGColor.x, pCurFX->m_vCurGColor.y, pCurFX->m_vCurGColor.z);
@@ -1272,55 +1548,140 @@ void CFXToolDirector::Render_FXPlayBar(_float _fTimeDelta)
 
 			pCurFX->Add_Keyframe(newKeyframe, KF_BCOLOR);
 		}
-
+		*/
 		Text(u8"알파");
 		SameLine();
 		Text("\t%.2f\t\t\t", pCurFX->m_fCurAlpha);
-		SameLine();
-		if (SmallButton(u8"알파 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
-		{
-			////m_bOpenKeyframeEditor = false;
-			FX_KEYFRAME newKeyframe{};
-			newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
-			newKeyframe.eEasing = EASE_OUT;
-			newKeyframe.vValue = { pCurFX->m_fCurAlpha, 0.f, 0.f };
-
-			pCurFX->Add_Keyframe(newKeyframe, KF_ALPHA);
-		}
+		
 
 		Text(u8"마스크 임계");
 		SameLine();
 		Text("\t%.2f\t", pCurFX->m_fCurMaskThreshold);
-		SameLine();
-		if (SmallButton(u8"임계 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
-		{
-			////m_bOpenKeyframeEditor = false;
-			FX_KEYFRAME newKeyframe{};
-			newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
-			newKeyframe.eEasing = EASE_OUT;
-			newKeyframe.vValue = { pCurFX->m_fCurMaskThreshold, 0.f, 0.f };
+		
 
-			pCurFX->Add_Keyframe(newKeyframe, KF_MASK);
-		}
-
-		Text(u8"UV 오프셋");
+		Text(u8"UV 이동 오프셋");
 		SameLine();
 		Text("\t%.2f %.2f\t", pCurFX->m_vCurUVOffset.x, pCurFX->m_vCurUVOffset.y);
-		SameLine();
-		if (SmallButton(u8"UV 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
-		{
-			////m_bOpenKeyframeEditor = false;
-			FX_KEYFRAME newKeyframe{};
-			newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
-			newKeyframe.eEasing = EASE_OUT;
-			newKeyframe.vValue = { pCurFX->m_vCurUVOffset.x, pCurFX->m_vCurUVOffset.y, 0.f };
+		
 
-			pCurFX->Add_Keyframe(newKeyframe, KF_UVOFFSET);
-		}
+		Text(u8"마스크 UV 이동 오프셋");
+		SameLine();
+		Text("\t%.2f %.2f\t", pCurFX->m_vCurMaskUVOffset.x, pCurFX->m_vCurMaskUVOffset.y);
+		
+
+		Text(u8"마스크 UV 회전 오프셋");
+		SameLine();
+		Text("\t%.2f\t", pCurFX->m_vCurMaskUVAngle);
+		
 	}
 
+	//SetColumnWidth(0, 70.f);
 	NextColumn();
+	Dummy(ImVec2(0, 98));
 
+	if (SmallButton(u8"위치 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
+	{
+		////m_bOpenKeyframeEditor = false;
+		FX_KEYFRAME newKeyframe{};
+		newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
+		newKeyframe.eEasing = EASE_OUT;
+		newKeyframe.vValue = pCurFX->m_vCurPos;
+
+		pCurFX->Add_Keyframe(newKeyframe, KF_POS);
+	}
+
+	if (SmallButton(u8"회전 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
+	{
+		////m_bOpenKeyframeEditor = false;
+		FX_KEYFRAME newKeyframe{};
+		newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
+		newKeyframe.eEasing = EASE_OUT;
+		newKeyframe.vValue = pCurFX->m_vCurRot;
+
+		pCurFX->Add_Keyframe(newKeyframe, KF_ROT);
+	}
+
+	
+	if (SmallButton(u8"크기 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
+	{
+		////m_bOpenKeyframeEditor = false;
+		FX_KEYFRAME newKeyframe{};
+		newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
+		newKeyframe.eEasing = EASE_OUT;
+		newKeyframe.vValue = pCurFX->m_vCurScale;
+
+		pCurFX->Add_Keyframe(newKeyframe, KF_SCALE);
+	}
+	
+	if (SmallButton(u8"색 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
+	{
+		////m_bOpenKeyframeEditor = false;
+		FX_KEYFRAME newKeyframe{};
+		newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
+		newKeyframe.eEasing = EASE_OUT;
+		newKeyframe.vValue = pCurFX->m_vCurRColor;
+
+		pCurFX->Add_Keyframe(newKeyframe, KF_RCOLOR);
+	}
+
+	
+	if (SmallButton(u8"알파 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
+	{
+		FX_KEYFRAME newKeyframe{};
+		newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
+		newKeyframe.eEasing = EASE_OUT;
+		newKeyframe.vValue = { pCurFX->m_fCurAlpha, 0.f, 0.f };
+
+		pCurFX->Add_Keyframe(newKeyframe, KF_ALPHA);
+	}
+
+	
+	if (SmallButton(u8"임계 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
+	{
+		FX_KEYFRAME newKeyframe{};
+		newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
+		newKeyframe.eEasing = EASE_OUT;
+		newKeyframe.vValue = { pCurFX->m_fCurMaskThreshold, 0.f, 0.f };
+
+		pCurFX->Add_Keyframe(newKeyframe, KF_MASK);
+	}
+
+	if (SmallButton(u8"uv 이동 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
+	{
+
+		FX_KEYFRAME newKeyframe{};
+		newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
+		newKeyframe.eEasing = EASE_OUT;
+		newKeyframe.vValue = { pCurFX->m_vCurUVOffset.x, pCurFX->m_vCurUVOffset.y, 0.f };
+
+		pCurFX->Add_Keyframe(newKeyframe, KF_UVOFFSET);
+	}
+
+	if (SmallButton(u8"Mask 이동 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
+	{
+
+		FX_KEYFRAME newKeyframe{};
+		newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
+		newKeyframe.eEasing = EASE_OUT;
+		newKeyframe.vValue = { pCurFX->m_vCurMaskUVOffset.x, pCurFX->m_vCurMaskUVOffset.y, 0.f };
+
+		pCurFX->Add_Keyframe(newKeyframe, KF_MASKUVOFFSET);
+	}
+
+	
+	if (SmallButton(u8"Mask 회전 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
+	{
+		FX_KEYFRAME newKeyframe{};
+		newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
+		newKeyframe.eEasing = EASE_OUT;
+		newKeyframe.vValue = { pCurFX->m_vCurMaskUVAngle, 0.f, 0.f };
+
+		pCurFX->Add_Keyframe(newKeyframe, KF_MASKUVANGLE);
+	}
+
+
+	NextColumn();
+	
 	if (m_bPlayingBar)
 		PushStyleColor(ImGuiCol_Button, COLOR_ORANGE);
 	else
@@ -1409,162 +1770,42 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 	if (SliderFloat("##", &m_fCurPlayDuration, 0.f, m_fTotalPlayDuration, "%.2f"))
 	{
 		m_FXs[m_iSelectedFXIdx]->m_fDuration.first = m_fCurPlayDuration;
-	}
 
-	//키프레임 편집 창을 띄워주는 static 변수들
-	//static KF_PROPERTY	m_eSelectedProperty = { KF_END };
-	//static _int			m_iSelectedKFIdx = { -1 };
+		if(!m_bPlayingBar)
+			m_FXs[m_iSelectedFXIdx]->Tick(_fTimeDelta);
+	}
 
 	//키프레임 팝업 사이즈
 	ImVec2 vPopupSize = { 160.f, 140.f };
 
 	//서로 서로 띄워준다.
-	Dummy(ImVec2(0, 15));
+	Dummy(ImVec2(0, 35));
 
 	ImVec2 vPos = GetCursorScreenPos();
 	_float fInitialYPos = vPos.y - 250.f;
-
-	//_int iTempKFIdx{ 0 };
-	//ImDrawList* pDrawList = GetWindowDrawList();
-
-	//pDrawList->AddLine(vPos, ImVec2(vPos.x + _fWidth, vPos.y), IM_COL32(255, 0, 100, 255), 1.f);
 
 	//각 키프레임 플레이 바의 위치의 상대 위치로 매칭하기.
 
 	//위치
 	Make_KeyframeList(_fWidth, fInitialYPos, pCurFX, KF_POS);
 
-	/*
-	for (auto& keyframe : pCurFX->m_Keyframes[KF_POS])
-	{
-		_float fRatio = (pCurFX->m_fLifetime.first + (keyframe.fTimeRatio * (pCurFX->m_fLifetime.second - pCurFX->m_fLifetime.first)));
-		_float fPosX = fRatio * _fWidth / pCurFX->m_fDuration.second;
-		ImVec2 vCurPos = vPos + ImVec2{ fPosX, 2.f };
-
-		GetWindowDrawList()->AddCircleFilled(vCurPos, 6.0f, IM_COL32(255, 255, 100, 255));
-
-		ImVec2 mousePos = GetIO().MousePos;
-		float fDistance = (_float)sqrt(pow(mousePos.x - vCurPos.x, 2) + pow(mousePos.y - vCurPos.y, 2));
-
-		//키프레임 범위 안에서 마우스 클릭 발생 시 키프레임 위치에 ui 띄움
-		if (fDistance <= 8.0f && IsMouseClicked(0))
-		{
-			m_eSelectedProperty = KF_POS;
-			m_iSelectedKFIdx = iTempKFIdx;
-
-			//위치, 스케일 키프레임 옆에 맞춘다
-			SetNextWindowSize(vPopupSize);
-			SetNextWindowPos(ImVec2(vCurPos.x, fInitialYPos));
-
-			_float3 vValue = m_FXs[m_iSelectedFXIdx]->m_Keyframes[m_eSelectedProperty][m_iSelectedKFIdx].vValue;
-			memcpy(m_vKFPopupValue, &vValue, sizeof(_float3));
-			m_eKFPopupEasing = m_FXs[m_iSelectedFXIdx]->m_Keyframes[m_eSelectedProperty][m_iSelectedKFIdx].eEasing;
-
-			OpenPopup(u8"키프레임");
-
-		}
-
-		++iTempKFIdx;
-	}
-
-	*/
-
 	//회전
 	Dummy(ImVec2(0, 15));
 	Make_KeyframeList(_fWidth, fInitialYPos, pCurFX, KF_ROT);
-
-	/*
-	iTempKFIdx = 0;
-	vPos = GetCursorScreenPos();
-	pDrawList->AddLine(vPos, ImVec2(vPos.x + _fWidth, vPos.y), IM_COL32(255, 0, 100, 255), 1.f);
-
-	for (auto& keyframe : pCurFX->m_Keyframes[KF_ROT])
-	{
-		//재생 위치로 cur pos 맞추기
-		_float fRatio = (pCurFX->m_fLifetime.first + (keyframe.fTimeRatio * (pCurFX->m_fLifetime.second - pCurFX->m_fLifetime.first)));
-		_float fPosX = fRatio * _fWidth / pCurFX->m_fDuration.second;
-		ImVec2 vCurPos = vPos + ImVec2{ fPosX, 2.f };
-
-		GetWindowDrawList()->AddCircleFilled(vCurPos, 6.0f, IM_COL32(255, 255, 100, 255));
-
-		ImVec2 mousePos = GetIO().MousePos;
-		float distance = (_float)sqrt(pow(mousePos.x - vCurPos.x, 2) + pow(mousePos.y - vCurPos.y, 2));
-
-		//키프레임 범위 안에서 마우스 클릭 발생 시 키프레임 위치에 ui 띄움
-		if (distance <= 8.0f && IsMouseClicked(0))
-		{
-			////m_bOpenKeyframeEditor = true;
-			m_eSelectedProperty = KF_ROT;
-			m_iSelectedKFIdx = iTempKFIdx;
-
-			//위치, 스케일 키프레임 옆에 맞춘다
-			SetNextWindowSize(vPopupSize);
-			SetNextWindowPos(ImVec2(vCurPos.x, fInitialYPos));
-
-			_float3 vValue = m_FXs[m_iSelectedFXIdx]->m_Keyframes[m_eSelectedProperty][m_iSelectedKFIdx].vValue;
-			memcpy(m_vKFPopupValue, &vValue, sizeof(_float3));
-			m_eKFPopupEasing = m_FXs[m_iSelectedFXIdx]->m_Keyframes[m_eSelectedProperty][m_iSelectedKFIdx].eEasing;
-
-			OpenPopup(u8"키프레임");
-		}
-
-		++iTempKFIdx;
-	}
-	*/
 
 	//크기
 	Dummy(ImVec2(0, 15));
 	Make_KeyframeList(_fWidth, fInitialYPos, pCurFX, KF_SCALE);
 
-	/*
-	iTempKFIdx = 0;
-	vPos = GetCursorScreenPos();
-
-	pDrawList->AddLine(vPos, ImVec2(vPos.x + _fWidth, vPos.y), IM_COL32(255, 0, 100, 255), 1.f);
-	for (auto& keyframe : pCurFX->m_Keyframes[KF_SCALE])
-	{
-		_float fRatio = (pCurFX->m_fLifetime.first + (keyframe.fTimeRatio * (pCurFX->m_fLifetime.second - pCurFX->m_fLifetime.first)));
-		_float fPosX = fRatio * _fWidth / pCurFX->m_fDuration.second;
-		ImVec2 vCurPos = vPos + ImVec2{ fPosX, 2.f };
-
-		GetWindowDrawList()->AddCircleFilled(vCurPos, 6.0f, IM_COL32(255, 255, 100, 255));
-
-		ImVec2 mousePos = GetIO().MousePos;
-		float distance = (_float)sqrt(pow(mousePos.x - vCurPos.x, 2) + pow(mousePos.y - vCurPos.y, 2));
-
-		//키프레임 범위 안에서 마우스 클릭 발생 시 키프레임 위치에 ui 띄움
-		if (distance <= 8.0f && IsMouseClicked(0))
-		{
-			m_eSelectedProperty = KF_SCALE;
-			m_iSelectedKFIdx = iTempKFIdx;
-
-			//위치, 스케일 키프레임 옆에 맞춘다
-			SetNextWindowSize(vPopupSize);
-			SetNextWindowPos(ImVec2(vCurPos.x, fInitialYPos));
-
-			//띄울 키프레임의 값을 매칭해 준다.
-			_float3 vValue = m_FXs[m_iSelectedFXIdx]->m_Keyframes[m_eSelectedProperty][m_iSelectedKFIdx].vValue;
-
-
-			memcpy(m_vKFPopupValue, &vValue, sizeof(_float3));
-			m_eKFPopupEasing = m_FXs[m_iSelectedFXIdx]->m_Keyframes[m_eSelectedProperty][m_iSelectedKFIdx].eEasing;
-
-			OpenPopup(u8"키프레임");
-		}
-
-		++iTempKFIdx;
-	}
-
-	*/
 
 	Dummy(ImVec2(0, 15));
 	Make_KeyframeList(_fWidth, fInitialYPos, pCurFX, KF_RCOLOR);
 
-	Dummy(ImVec2(0, 15));
-	Make_KeyframeList(_fWidth, fInitialYPos, pCurFX, KF_GCOLOR);
+	//Dummy(ImVec2(0, 15));
+	//Make_KeyframeList(_fWidth, fInitialYPos, pCurFX, KF_GCOLOR);
 
-	Dummy(ImVec2(0, 15));
-	Make_KeyframeList(_fWidth, fInitialYPos, pCurFX, KF_BCOLOR);
+	//Dummy(ImVec2(0, 15));
+	//Make_KeyframeList(_fWidth, fInitialYPos, pCurFX, KF_BCOLOR);
 
 	Dummy(ImVec2(0, 15));
 	Make_KeyframeList(_fWidth, fInitialYPos, pCurFX, KF_ALPHA);
@@ -1574,6 +1815,12 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 
 	Dummy(ImVec2(0, 15));
 	Make_KeyframeList(_fWidth, fInitialYPos, pCurFX, KF_UVOFFSET);
+
+	Dummy(ImVec2(0, 15));
+	Make_KeyframeList(_fWidth, fInitialYPos, pCurFX, KF_MASKUVOFFSET);
+
+	Dummy(ImVec2(0, 15));
+	Make_KeyframeList(_fWidth, fInitialYPos, pCurFX, KF_MASKUVANGLE);
 
 
 	if (BeginPopup(u8"키프레임"))
@@ -1594,7 +1841,7 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 			strTitle = "Scale";
 			break;
 		case KF_RCOLOR:
-			strTitle = "R";
+			strTitle = "Color";
 			break;
 		case KF_GCOLOR:
 			strTitle = "G";
@@ -1610,6 +1857,12 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 			break;
 		case KF_UVOFFSET:
 			strTitle = "UV Offset";
+			break;
+		case KF_MASKUVOFFSET:
+			strTitle = "Mask UV Offset";
+			break;
+		case KF_MASKUVANGLE:
+			strTitle = "Mask UV Angle";
 			break;
 		default:
 			break;
@@ -1637,11 +1890,15 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 		if (DragFloat3("Value", m_vKFPopupValue, .01f, vValueRange.x, vValueRange.y, "%.2f"))
 		{
 			m_FXs[m_iSelectedFXIdx]->m_Keyframes[m_eSelectedProperty][m_iSelectedKFIdx].vValue = _float3{ m_vKFPopupValue[0], m_vKFPopupValue[1], m_vKFPopupValue[2] };
+			m_FXs[m_iSelectedFXIdx]->Tick(_fTimeDelta);
+			m_FXs[m_iSelectedFXIdx]->m_fDuration.first = m_fCurPlayDuration;
 
 		}
 		if (Combo(u8"Easing", &m_eKFPopupEasing, m_Easing.data(), (_int)m_Easing.size()))
 		{
 			m_FXs[m_iSelectedFXIdx]->m_Keyframes[m_eSelectedProperty][m_iSelectedKFIdx].eEasing = (EASING)m_eKFPopupEasing;
+			m_FXs[m_iSelectedFXIdx]->Tick(_fTimeDelta);
+			m_FXs[m_iSelectedFXIdx]->m_fDuration.first = m_fCurPlayDuration;
 		}
 
 		if (Button(u8"키프레임 삭제"))
@@ -1668,7 +1925,11 @@ void CFXToolDirector::Make_KeyframeList(_float _fWidth, _float _fInitialYPos, CE
 	ImVec2 vPopupSize = { 160.f, 140.f };
 	_int iTempKFIdx = 0;
 
-	GetWindowDrawList()->AddLine(vPos, ImVec2(vPos.x + _fWidth, vPos.y), IM_COL32(255, 0, 100, 255), 1.f);
+	ImU32 vColor = IM_COL32(255, 0, 100, 255);
+	if (IsMouseHoveringRect(ImVec2(vPos.x, vPos.y-5), ImVec2(vPos.x + _fWidth, vPos.y + 5)))
+		vColor = IM_COL32(255, 255, 100, 255);
+
+	GetWindowDrawList()->AddLine(vPos, ImVec2(vPos.x + _fWidth, vPos.y), vColor, 1.f);
 
 	for (auto& keyframe : _pCurFX->m_Keyframes[_eRenderProperty])
 	{
@@ -1711,6 +1972,15 @@ void CFXToolDirector::MakeBar_ParticleFXProperty(_float _fTimeDelta, _float _fWi
 		return;
 
 
+	CEffect* pCurFX = m_FXs[m_iSelectedFXIdx];
+	CHECK_NULLPTR(pCurFX);
+
+
+	if (SliderFloat("##", &m_fCurPlayDuration, 0.f, m_fTotalPlayDuration, "%.2f"))
+	{
+		m_FXs[m_iSelectedFXIdx]->Tick(_fTimeDelta);
+		m_FXs[m_iSelectedFXIdx]->m_fDuration.first = m_fCurPlayDuration;
+	}
 }
 
 void CFXToolDirector::MakeBar_MultiFXProperty(_float _fTimeDelta, _float _fWidth)
@@ -1724,6 +1994,7 @@ void CFXToolDirector::MakeBar_MultiFXProperty(_float _fTimeDelta, _float _fWidth
 
 	if (SliderFloat("##", &m_fCurPlayDuration, 0.f, m_fTotalPlayDuration, "%.2f"))
 	{
+		m_MultiFXs[m_iSelectedMultiFXIdx]->Tick(_fTimeDelta);
 		m_MultiFXs[m_iSelectedMultiFXIdx]->m_fDuration.first = m_fCurPlayDuration;
 	}
 }
@@ -1732,7 +2003,7 @@ void CFXToolDirector::Render_MultiFXHierarchy()
 {
 	Begin(u8"복합 이펙트", nullptr, ImGuiWindowFlags_NoCollapse);
 
-	SeparatorText(u8"목록");
+	SeparatorText(u8"복합 이펙트 목록");
 	BeginChild(u8"목록", ImVec2(0, 200), true);
 
 	for (_int i = 0; i < m_MultiFXs.size(); ++i)
@@ -1800,7 +2071,7 @@ void CFXToolDirector::Render_MultiFXHierarchy()
 					++szSuffix;
 				}
 
-				CMultiEffect* pMultiFX = static_cast<CMultiEffect*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_MultiEffect"), &pMultiFX));
+				CMultiEffect* pMultiFX = static_cast<CMultiEffect*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_MultiEffect"), &FxDesc));
 				m_MultiFXs.emplace_back(pMultiFX);
 
 				//m_MultiFXs.back()->Add_Effect(*m_FXs[m_iSelectedFXIdx]);
@@ -1820,10 +2091,10 @@ void CFXToolDirector::Render_MultiFXHierarchy()
 					m_iSelectedMultiFXIdx = -1;
 				}
 			}
-			if (MenuItem(u8"복사"))
-			{
+			//if (MenuItem(u8"복사"))
+			//{
 
-			}
+			//}
 
 			EndPopup();
 			//End();
@@ -1888,6 +2159,7 @@ void CFXToolDirector::Ready_Ingredient(wstring wstrSearchTag, vector<char*>* vec
 			char* tempStr = new char[strComName.size() + 1];
 			strcpy_s(tempStr, strComName.size() + 1, strComName.c_str());
 			vecCombo->push_back(tempStr);
+			//Safe_Delete_Array(tempStr);
 		}
 	}
 }
@@ -1936,6 +2208,18 @@ void CFXToolDirector::Free()
 		Safe_Release(pFX);
 
 	m_MultiFXs.clear();
+
+	for (auto& sz : m_FXTexList)
+		Safe_Delete(sz);
+	m_FXTexList.clear();
+
+	for (auto& sz : m_FXBufferList)
+		Safe_Delete(sz);
+	m_FXBufferList.clear();
+
+	for (auto& sz : m_FXMaskTexList)
+		Safe_Delete(sz);
+	m_FXMaskTexList.clear();
 
 	__super::Free();
 }

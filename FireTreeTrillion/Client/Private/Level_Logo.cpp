@@ -13,6 +13,8 @@ CLevel_Logo::CLevel_Logo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 HRESULT CLevel_Logo::Initialize()
 {
+	m_pGameInstance->Set_RenderMode(CRenderer::MODE_TOOL);
+
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
 
@@ -38,7 +40,7 @@ HRESULT CLevel_Logo::Render()
 	++m_iFPS;
 
 	_tchar szFPS[MAX_PATH] = TEXT("");
-	wsprintf(szFPS, TEXT("Level GamePlay, %d FPS"), m_iFPS);
+	wsprintf(szFPS, TEXT("Level Logo, %d FPS"), m_iFPS);
 
 	if (m_fAccDelta >= 1.f)
 	{

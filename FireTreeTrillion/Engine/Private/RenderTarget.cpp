@@ -58,6 +58,22 @@ HRESULT CRenderTarget::Bind_ShaderResource(CShader * pShader, const _char * pCon
 
 HRESULT CRenderTarget::Copy_Resource(ID3D11Texture2D ** ppTextureHub)
 {
+	//06.05) 리소스 정보 카피 이전 텍스처 정보가 없을 경우 크래시 발생을 보정
+
+	//검색한 RTV의 원본 Texture2D 정보를 가져옴
+	D3D11_TEXTURE2D_DESC OrigTexDesc{};
+
+	m_pRTV->GetResource((ID3D11Resource**)&m_pTexture2D);
+	if (nullptr != m_pTexture2D)
+		m_pTexture2D->GetDesc(&OrigTexDesc);
+
+	if (nullptr == *ppTextureHub)
+	{
+		if (FAILED(m_pDevice->CreateTexture2D(&OrigTexDesc, nullptr, ppTextureHub)))
+			return E_FAIL;
+	}
+
+	//위 로직이 S_OK일 경우 정상적으로 카피 수행
 	m_pContext->CopyResource(*ppTextureHub, m_pTexture2D);
 
 	return S_OK;

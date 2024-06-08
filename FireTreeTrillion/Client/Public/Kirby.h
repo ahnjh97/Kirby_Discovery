@@ -2,14 +2,15 @@
 
 #include "Client_Defines.h"
 #include "Character.h"
+#include "Effect.h"
+
 #define	INFO(state) m_tKirbyInfo.state
 
 BEGIN(Engine)
 class CModel;
 class CShader;
 class CTexture;
-class CFSM;
-class CCharacterController;
+class CPartObject;
 END
 
 BEGIN(Client)
@@ -31,12 +32,20 @@ public:
 		_float4			m_vTargetDir = { 0.f, 0.f, 0.f, 0.f };
 		_float4			m_vDodgeDir = { 0.f, 0.f, 0.f, 0.f };
 
+		// 다양한 무기 움직임에 사용 될 것이다.
+		_float4			m_vAttackDir = { 0.f, 0.f, 0.f, 0.f };
+		_float			m_fAttackMoveSpeed = { 0.f };
+
 		// 눈, 입, 몸체의 상태를 담당한다.
 		EYESTATE		m_eEyeState = { EYE_END };
 		MOUTHSTATE		m_eMouthState = { MOUTH_END };
 		BODYSTATE		m_eBodyState = { BODY_END };
 		DIR				m_eKirbyDir = { DIR_END };
 		STATE			m_eJumpState = { STATE_JUMPR };
+
+		// 먹은 놈을 소화시키기 전에 잠깐 저장해놓는 곳. (현재 입에 있는 놈)
+		ABILITYTYPE		m_eTemporaryEatType = { ABILITY_END };
+
 		// 중력 및 점프
 		_float			m_fJumpVelocity = { 0.f };
 		_float			m_fGravityOffset = { 6.f };
@@ -67,6 +76,18 @@ public:
 		// Fly
 		_float			m_fFlyTime = { 0.f };
 
+		// 땅에 능력 버리는 시간
+		_float			m_fDumpAbilityTime = { 0.f };
+
+		// Ability Sword
+		// PRESS 시, 차지시간을 정해주는 변수
+		_float			m_fChargeTime = { 0.f };
+		// 어택 시, 다음 어택모션이 정해질 시간변수
+		_float			m_fAttackTime = { 0.f };
+		STATE			m_ePreAttackState = { SWORDSTATE_DECISIVESLASH };
+		_bool			m_bWalkingCharge = { true };
+		_bool			m_bUpWardSlash = { false };
+
 	}KIRBY_INFODESC;
 
 
@@ -93,8 +114,7 @@ public:
 		m_tKirbyInfo = _tInfo;
 	}
 
-	_uint			Get_State();
-	void			Change_State(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, BODYSTATE eBody);
+	void			Change_State(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, BODYSTATE eBody, _uint iOffSet = 0);
 	void			Set_Animation(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
 	void			Set_Animation(_int iAnimIndex);
 
@@ -102,6 +122,32 @@ public:
 	void			DefaultIdle();
 
 	_float4			Compute_TerrainPosition();
+
+#pragma region 이펙트 리스트 실험
+	//안녕하세요 디버깅 용으로 이펙트 리스트를 추가했습니다
+	void			Add_KirbyEffect(CEffect* pEffect)
+	{
+		m_KirbyFXList.emplace_back(pEffect);
+		Safe_AddRef(pEffect);
+	}
+	void			Delete_KirbyEffect()
+	{
+		if (m_KirbyFXList.empty())
+			return;
+
+		for (auto& FX : m_KirbyFXList)
+		{
+			FX->Set_Dead();
+			Safe_Release(FX);
+		}
+		m_KirbyFXList.clear();
+	}
+
+private:
+	list<CEffect*> m_KirbyFXList;
+
+#pragma endregion
+
 
 	// 기타 세부적인 제어
 private:
@@ -115,6 +161,7 @@ private:
 
 private:
 	HRESULT			Add_Components();
+	HRESULT			Add_PartObjects();
 	HRESULT			Bind_ShaderResources();
 	_bool			Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex);
 	// FSM
@@ -125,6 +172,13 @@ private:
 	CTexture*				m_pEyeTexture[EYE_END] = { nullptr };
 	CTexture*				m_pMouthTexture[MOUTH_END] = { nullptr };
 	class CCamera_Free*		m_pCamera = { nullptr };
+
+private:
+	void			Update_PartObjectMatrix();
+	class CKirbyWeapons* m_pWeapons = { nullptr };
+	class CKirbyArmours* m_pArmours = { nullptr };
+	_float4x4			 m_WeaponMatrix;
+	_float4x4			 m_ArmourMatrix;
 
 	_int					m_iTestAnim = { 0 };
 

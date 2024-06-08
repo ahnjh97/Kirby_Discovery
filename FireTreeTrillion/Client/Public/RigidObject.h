@@ -3,10 +3,7 @@
 #include "PhysXObject.h"
 
 BEGIN(Engine)
-class CModel;
 class CShader;
-class CFSM;
-//class CCharacterController;
 END
 
 BEGIN(Client)
@@ -30,18 +27,7 @@ public:
 #endif
 
 protected:
-	//CCharacterController*	m_pControllerCom	= { nullptr };
-	CShader*				m_pShaderCom = { nullptr };
-//	CFSM*					m_pFSM = { nullptr };
-//
-//protected:
-//	// For_PhysX
-//	_float			m_fOffsetTurn = { 7.f };
-//	_float4			m_vOriginUp = { 0.f, 1.f, 0.f, 0.f };
-//		
-//protected:
-//	void			SetOn_Slope(_float fTimeDelta);
-//	void			Lerp_UpVector(_fvector _vTargetUp, _float _maxAngle, _float fTimeDelta);
+	CShader*		m_pShaderCom = { nullptr };
 
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;

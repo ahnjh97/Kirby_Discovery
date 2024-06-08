@@ -16,7 +16,8 @@ public:
 	_uint Get_NumMeshes() const { return m_iNumMeshes; }
 	class CBone* Get_BonePtr(const _char* pBoneName) const;
 
-	MODEL Get_ModelInfo() { return m_tModel; }
+	MODEL Get_ModelInfo() const { return m_tModel; }
+	string Get_ModelName() const { return m_tModel.strModelName; }
 
 	_bool IsFinished() { return m_Animations[m_iCurrentAnimIndex]->IsFinished(); }
 	_bool IsFinished(_uint iCurrentAnimIndex) { return m_Animations[iCurrentAnimIndex]->IsFinished(); }
@@ -77,6 +78,9 @@ public:
 	HRESULT CreateStaticActor(_float4 vPos);
 
 	_float4 Check_Meshes(const class CTransform* pTransform, _Out_ _int& iMeshIndex) const;
+	void	Add_Event(const string& EventName, function<void()>&& Callback);
+	void	CallEvent(const string& EventName);
+
 
 	void Find_MinMax(_float3& vMin, _float3& vMax);
 	class COcTree* Create_OcTree(_float3 vMin, _float3 vMax, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors);
@@ -108,6 +112,8 @@ private:
 	vector<class CAnimation*>	m_Animations;
 
 	_float4x4					m_MeshBoneMatrices[512];
+
+	unordered_map<string, function<void()>>	m_AnimEvents;
 
 	// 파일입출력 변수
 	string						m_strDirectory;

@@ -11,9 +11,9 @@ CBuffahorn_Idle_State::CBuffahorn_Idle_State()
 {
 }
 
-void CBuffahorn_Idle_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CBuffahorn_Idle_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CBuffahorn_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -37,6 +37,11 @@ void CBuffahorn_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	// 일정 거리 안으로 플레이어가 들어오면 상태 전환
 	if (15.f > fDistance)
 		pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_FIND, 50.f, false, true);
+
+	if (0.5f < pBuffahorn->Get_AnimRatio() && 0.55f > pBuffahorn->Get_AnimRatio())
+		pBuffahorn->Set_BuffahornEye(CBuffahorn::BUFFAHORNEYE_SLEEP);
+	else
+		pBuffahorn->Set_BuffahornEye(CBuffahorn::BUFFAHORNEYE_IDLE);
 }
 
 void CBuffahorn_Idle_State::OnStateExit()
@@ -65,9 +70,9 @@ CBuffahorn_Find_State::CBuffahorn_Find_State()
 {
 }
 
-void CBuffahorn_Find_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CBuffahorn_Find_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CBuffahorn_Find_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -86,7 +91,10 @@ void CBuffahorn_Find_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 1.5f);
 
 	if (true == pBuffahorn->IsAnimFinished())
+	{
+		pBuffahorn->Set_BuffahornEye(CBuffahorn::BUFFAHORNEYE_IDLE);
 		pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_WAIT, 50.f, true, true);
+	}
 }
 
 void CBuffahorn_Find_State::OnStateExit()
@@ -115,9 +123,9 @@ CBuffahorn_Wait_State::CBuffahorn_Wait_State()
 {
 }
 
-void CBuffahorn_Wait_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CBuffahorn_Wait_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CBuffahorn_Wait_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -142,9 +150,20 @@ void CBuffahorn_Wait_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 	// 일정 거리 안으로 플레이어가 들어오면 상태 전환
 	if (13.f > fDistance)
+	{
+		pBuffahorn->Set_BuffahornEye(CBuffahorn::BUFFAHORNEYE_IDLE);
 		pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_RUNSTART, 50.f, false, true);
+	}
 	else if(15.f < fDistance)
+	{
+		pBuffahorn->Set_BuffahornEye(CBuffahorn::BUFFAHORNEYE_IDLE);
 		pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_CHARGEWAIT, 50.f, true, true);
+	}
+
+	if (0.5f < pBuffahorn->Get_AnimRatio() && 0.55f > pBuffahorn->Get_AnimRatio())
+		pBuffahorn->Set_BuffahornEye(CBuffahorn::BUFFAHORNEYE_SLEEP);
+	else
+		pBuffahorn->Set_BuffahornEye(CBuffahorn::BUFFAHORNEYE_IDLE);
 }
 
 void CBuffahorn_Wait_State::OnStateExit()
@@ -171,9 +190,9 @@ CBuffahorn_Run_State::CBuffahorn_Run_State()
 {
 }
 
-void CBuffahorn_Run_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CBuffahorn_Run_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 
 	m_fTimeDelta = 0.f;
 }
@@ -193,12 +212,23 @@ void CBuffahorn_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	{
 		m_fTimeDelta += fTimeDelta;
 
-		if(2.f > m_fTimeDelta)
-			pController->Move_Dir(pTransformCom, pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 0.2f, fTimeDelta);
+		if (2.f > m_fTimeDelta)
+			pController->Move_Dir(pTransformCom, pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * fTimeDelta * 10.f, fTimeDelta);
 		else
+		{
+			pBuffahorn->Set_BuffahornEye(CBuffahorn::BUFFAHORNEYE_IDLE);
 			pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_BRAKE, 50.f, false, true);
+		}
 	}
 
+	_float fHeight = pController->Compute_Height(pTransformCom->Get_State_Vector(CTransform::STATE_LOOK));
+
+	if(2.f < fHeight)
+	{
+		pBuffahorn->Set_JumpTime(15.f);
+		pBuffahorn->Set_BuffahornEye(CBuffahorn::BUFFAHORNEYE_IDLE);
+		pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_JUMP, 80.f, false, true);
+	}
 }
 
 void CBuffahorn_Run_State::OnStateExit()
@@ -227,9 +257,9 @@ CBuffahorn_Brake_State::CBuffahorn_Brake_State()
 {
 }
 
-void CBuffahorn_Brake_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CBuffahorn_Brake_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 
 	m_fSpeed = 1.f;
 }
@@ -251,12 +281,15 @@ void CBuffahorn_Brake_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 	if (true == pBuffahorn->IsAnimFinished())
 		pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_BRAKEEND, 45.f, false, true);
 	else
-		pController->Move_Dir(pTransformCom, (pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 0.1f) * fDeceleration, fTimeDelta);
+		pController->Move_Dir(pTransformCom, (pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * fTimeDelta * 10.f) * fDeceleration, fTimeDelta);
 
 	if (CBuffahorn::BUFFAHORN_BRAKEEND == pBuffahorn->Get_State())
 	{
 		if(true == pBuffahorn->IsAnimFinished())
-			pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_CHARGEWAIT, 45.f, true, true);
+		{
+			pBuffahorn->Set_BuffahornEye(CBuffahorn::BUFFAHORNEYE_IDLE);
+			pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_CHARGEWAIT, 50.f, true, true);
+		}
 	}
 }
 
@@ -271,6 +304,66 @@ CBuffahorn_Brake_State* CBuffahorn_Brake_State::Create()
 }
 
 void CBuffahorn_Brake_State::Free()
+{
+	__super::Free();
+}
+
+#pragma endregion
+
+
+#pragma region JUMP STATE
+//*********************************
+//			 JUMP STATE
+//*********************************
+CBuffahorn_Jump_State::CBuffahorn_Jump_State()
+{
+}
+
+void CBuffahorn_Jump_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+}
+
+void CBuffahorn_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CBuffahorn* pBuffahorn = static_cast<CBuffahorn*>(pGameObject);
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+
+	pController->Move_Dir(pTransformCom, pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * fTimeDelta * 6.f, fTimeDelta);
+
+	_float fJumpVelocity = pBuffahorn->Get_JumpTime();
+	fJumpVelocity -= GRAVITY * fTimeDelta * 3.f;
+	pController->Jump(pTransformCom, fJumpVelocity, fTimeDelta);
+	pBuffahorn->Set_JumpTime(fJumpVelocity);
+
+	if (true == pBuffahorn->IsAnimFinished() && true == pController->Is_Terrain())
+	{
+		pBuffahorn->Set_BuffahornEye(CBuffahorn::BUFFAHORNEYE_IDLE);
+		pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_RETURNJUMPEND, 100.f, false, true);
+	}
+
+	if (CBuffahorn::BUFFAHORN_RETURNJUMPEND == pBuffahorn->Get_State())
+	{
+		if (true == pBuffahorn->IsAnimFinished())
+		{
+			pBuffahorn->Set_BuffahornEye(CBuffahorn::BUFFAHORNEYE_IDLE);
+			pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_RUN, 50.f, true, true);
+		}
+	}
+}
+
+void CBuffahorn_Jump_State::OnStateExit()
+{
+}
+
+CBuffahorn_Jump_State* CBuffahorn_Jump_State::Create()
+{
+	CBuffahorn_Jump_State* pInstance = new CBuffahorn_Jump_State();
+	return pInstance;
+}
+
+void CBuffahorn_Jump_State::Free()
 {
 	__super::Free();
 }

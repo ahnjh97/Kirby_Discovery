@@ -126,6 +126,7 @@ namespace Engine
 		vector<pair<KF_PROPERTY, _uint>> vecKeyframeInfo;
 		vector<vector<FX_KEYFRAME>> vecKeyframes;
 
+		_uint eRenderGroup = { 0 };
 
 	}SINGLE_FX_DATA;
 
@@ -189,6 +190,9 @@ namespace Engine
 
 		_uint			iMoveCommandsNum;
 		vector<_bool>	vecMoveCommands;
+
+		_uint eRenderGroup = { 0 };
+
 
 	}PARTICLE_DATA;
 
@@ -267,10 +271,10 @@ namespace Engine
 
 	typedef struct ENGINE_DLL
 	{
-		XMFLOAT4		vRight;
-		XMFLOAT4		vUp;
-		XMFLOAT4		vLook;
-		XMFLOAT4		vPosition;		
+		_float4		vRight;
+		_float4		vUp;
+		_float4		vLook;
+		_float4		vPosition;		
 		bool			bAlive;
 
 	}VTXMATRIX;
@@ -315,15 +319,30 @@ namespace Engine
 		static const D3D11_INPUT_ELEMENT_DESC	Elements[6];
 	}VTXANIMMESH;
 
+	struct ENGINE_DLL EVENT_INFO
+	{
+		string	strEventName;
+		_int	iStartFrame;
+		_int	iEndFrame;
+	};
+
+	struct ENGINE_DLL ANIM_INFO
+	{
+		_float				fAnimSpeed;
+		vector<EVENT_INFO>	vecEventInfo;
+	};
+
 	struct ENGINE_DLL MODEL
 	{
 		string strModelName = "";
 		TYPE eType = { TYPE_END };
 
-		_float fScale = { 1.f };
-		_float fDegree = { 0.f };
-		_uint iRootNode = { 4 };
+		_float	fScale = { 1.f };
+		_float	fDegree = { 0.f };
+		_uint	iRootNode = { 4 };
 		_bool bOctree = { false };
+		// 애니메이션 정보 저장
+		unordered_map< string, ANIM_INFO > umapAnimInfo;
 
 		MODEL(string _strModelName = "",
 			TYPE _eType = { TYPE_END },
@@ -356,4 +375,6 @@ namespace Engine
 		static const unsigned int	iNumElements = { 6 };
 		static const D3D11_INPUT_ELEMENT_DESC	Elements[6];
 	};
+
+
 }

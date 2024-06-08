@@ -8,9 +8,9 @@ CKirbyVacuum_Spit_State::CKirbyVacuum_Spit_State()
 {
 }
 
-void CKirbyVacuum_Spit_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CKirbyVacuum_Spit_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-    __super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+    __super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CKirbyVacuum_Spit_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -31,6 +31,7 @@ void CKirbyVacuum_Spit_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		DESC(m_isEat) = false;
 		DESC(m_eEyeState) = CKirby::EYE_IDLE;
 		DESC(m_eMouthState) = CKirby::MOUTH_IDLE;
+		DESC(m_eTemporaryEatType) = ABILITY_END;
 
 		// ¾Ö´Ô ³¡³µ´Âµ¥ ¶¥À» ¹â¾ÒÀ» °æ¿ì
 		if (pController->Is_Terrain() == true)
@@ -64,17 +65,15 @@ void CKirbyVacuum_Spit_State::Free()
 #pragma endregion
 
 
-
-
 #pragma region Vacuum STATE
 
 CKirbyVacuum_Vacuum_State::CKirbyVacuum_Vacuum_State()
 {
 }
 
-void CKirbyVacuum_Vacuum_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CKirbyVacuum_Vacuum_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CKirbyVacuum_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -148,7 +147,7 @@ void CKirbyVacuum_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float f
 	}
 	else if (pKirby->Get_State() == CKirby::STATE_SUPERINHALESTART)
 	{
-		DESC(m_eEyeState) = CKirby::EYE_IDLE;
+		DESC(m_eEyeState) = CKirby::EYE_ANGER;
 		Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
 
 		// Á¶ÀÌ½ºÆ½ ¸¸Á³À»¶© ¹Ù·Î ½´ÆÛ·Î ³Ñ¾î°¨.
@@ -203,7 +202,7 @@ void CKirbyVacuum_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float f
 		}
 
 		pController->FreeFall(pTransformCom, fTimeDelta, Kirbydesc->m_fGravityOffset);
-
+		pKirby->Delete_KirbyEffect();
 
 	}
 	else if (pKirby->Get_State() == CKirby::STATE_INHALEFALL)
@@ -284,17 +283,15 @@ void CKirbyVacuum_Vacuum_State::Free()
 #pragma endregion
 
 
-
-
 #pragma region VacuumWalk STATE
 
 CKirbyVacuum_VacuumWalk_State::CKirbyVacuum_VacuumWalk_State()
 {
 }
 
-void CKirbyVacuum_VacuumWalk_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CKirbyVacuum_VacuumWalk_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CKirbyVacuum_VacuumWalk_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -383,10 +380,6 @@ void CKirbyVacuum_VacuumWalk_State::Free()
 #pragma endregion
 
 
-
-
-
-
 #pragma region Vacuuming STATE
 
 CKirbyVacuum_Vacuuming_State::CKirbyVacuum_Vacuuming_State()
@@ -394,9 +387,9 @@ CKirbyVacuum_Vacuuming_State::CKirbyVacuum_Vacuuming_State()
 
 }
 
-void CKirbyVacuum_Vacuuming_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CKirbyVacuum_Vacuuming_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CKirbyVacuum_Vacuuming_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)

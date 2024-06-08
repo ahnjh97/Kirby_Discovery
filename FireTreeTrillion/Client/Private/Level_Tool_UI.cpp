@@ -11,6 +11,8 @@ CLevel_Tool_UI::CLevel_Tool_UI(ID3D11Device* pDevice, ID3D11DeviceContext* pCont
 
 HRESULT CLevel_Tool_UI::Initialize()
 {
+	m_pGameInstance->Set_RenderMode(CRenderer::MODE_TOOL);
+
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
 
@@ -21,14 +23,12 @@ HRESULT CLevel_Tool_UI::Initialize()
 		return E_FAIL;
 
 #ifdef _DEBUG
+	//IMGUI_STYLE 세팅
 	m_pGameInstance->Set_IMGUIStyle(CImGUI_Manager::STYLE::PURPLE);
 #endif // DEBUG
 
 	if (FAILED(Ready_Layer_IMGUI(TEXT("Layer_IMGUI"))))
 		return E_FAIL;
-
-	//IMGUI_STYLE 세팅
-
 
 	return S_OK;
 }
@@ -106,8 +106,8 @@ HRESULT CLevel_Tool_UI::Ready_Layer_UI(const wstring& strLayerTag)
 
 
 	//다중 (상속)
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_UI, strLayerTag, TEXT("Prototype_GameObject_Multi_UI"))))
-		return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_UI, strLayerTag, TEXT("Prototype_GameObject_Multi_UI"))))
+	//	return E_FAIL;
 
 	return S_OK;
 }

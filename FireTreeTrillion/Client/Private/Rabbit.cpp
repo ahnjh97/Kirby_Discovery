@@ -48,6 +48,7 @@ HRESULT CRabbit::Initialize(void* pArg)
 	m_fAttack = 10.f;
 	m_eVacuumSize = SIZE_SMALL;
 	m_eAbilityType = ABILITY_DEFAULT;
+	m_eEyeState = RABBITEYE_IDLE;
 
 	return S_OK;
 }
@@ -57,39 +58,20 @@ _int CRabbit::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return OBJ_DEAD;
 
-	// 지면의 up벡터
-	//PxVec3 slope = m_pControllerCom->Compute_Slope(m_pTransformCom);
-	//_vector vTerrainNormal = CUtils::To_Vector(slope);
-	//Lerp_UpVector(vTerrainNormal, 10.f, fTimeDelta);
-
-	//if (m_pGameInstance->Get_DIKeyState(DIK_W, KEY_PRESS))
-	//{
-	//	m_pTransformCom->Go_Straight(fTimeDelta);
-	//	//m_pControllerCom->Move_Dir(m_pTransformCom, m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), fTimeDelta);
-	//}
-
-	//if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_PRESS))
-	//{
-	//	m_pTransformCom->Turn(XMVectorSet(0.f, -1.f, 0.f, 0.f), fTimeDelta);
-	//}
-
-	//if (m_pGameInstance->Get_DIKeyState(DIK_D, KEY_PRESS))
-	//{
-	//	m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta);
-	//}
+	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
 		// 빨릴 때
 	if (m_bVacuuming == true)
 		Change_State(CRabbit::RABBIT_DAMAGE, 120.f, true, false);
 
-	__super::Tick(fTimeDelta);
+	__super::Tick(m_fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
 
 void CRabbit::Late_Tick(_float fTimeDelta)
 {
-	m_pModelCom->Play_Animation(fTimeDelta);
+	m_pModelCom->Play_Animation(m_fTimeDelta);
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
@@ -107,17 +89,42 @@ HRESULT CRabbit::Render()
 
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
+		if (Custom_Face(i) == true)
+			continue;
+
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
 			return E_FAIL;
+
+		//몸통이라면 나머지 텍스쳐까지 바인딩 함
+		if (i == 1)
+		{
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
+				return E_FAIL;
+		}
 
 		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
 
-		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom->Begin(1)))
-			return E_FAIL;
 
-		m_pModelCom->Render(i);
+		//몸통(1)은 normal O, 눈까리(0)는 normal x 패스
+		if (i == 1 && bRenderBody)
+		{
+			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Render(i)))
+				return E_FAIL;
+		}
+		else if( i == 0 && bRenderEye)
+		{
+			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_X)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Render(i)))
+				return E_FAIL;
+		}
+
+		
 	}
 
 	return S_OK;
@@ -143,6 +150,11 @@ void CRabbit::Render_IMGUI()
 		ImGui::TreePop();
 	}
 
+
+	ImGui::Checkbox(u8"눈까리", &bRenderEye);
+	ImGui::Checkbox(u8"몸통", &bRenderBody);
+
+
 	//ImGui::Text("RePress : %d", m_bRePressBlock);
 	//ImGui::Text("Land : %d", INFO(m_isLanding));
 
@@ -161,6 +173,7 @@ void CRabbit::Render_IMGUI()
 void CRabbit::Collision_Attack(CGameObject* pOtherObj)
 {
 	Change_State(CRabbit::RABBIT_DAMAGE, 50.f, false, true);
+	m_eEyeState = RABBITEYE_HAPPY;
 }
 
 void CRabbit::Change_State(RABBIT_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
@@ -171,11 +184,6 @@ void CRabbit::Change_State(RABBIT_ANIM eState, _float _fAnimSpeed, _bool _bLoop,
 _bool CRabbit::IsAnimFinished()
 {
 	return m_pModelCom->IsFinished();
-}
-
-_uint CRabbit::Get_State()
-{
-	return m_pFSM->Get_State();
 }
 
 void CRabbit::Compute_Parabola(_vector vEndPos)
@@ -207,7 +215,7 @@ _vector CRabbit::JumpAttak(_float fTimeDelta)
 	m_vGoPos.x = m_vStartPos.x + m_fAxisX * fTimeDelta;
 	m_vGoPos.y = m_vStartPos.y + (m_fAxisY * fTimeDelta) - (0.5f * m_fGravity * fTimeDelta * fTimeDelta);
 	m_vGoPos.z = m_vStartPos.z + m_fAxisZ * fTimeDelta;
-	 
+
 	return m_vGoPos;
 }
 
@@ -222,6 +230,11 @@ HRESULT CRabbit::Add_Components()
 	/* For.Com_Model */
 	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Rabbit"),
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+	CHECK_FAILED(hr);
+
+	/* For.Com_Texture */
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Rabbit_Eye"),
+		TEXT("Com_Texture"), (CComponent**)&m_pEyeTextureCom);
 	CHECK_FAILED(hr);
 
 	/* For.Com_CharacterController */
@@ -259,6 +272,8 @@ HRESULT CRabbit::Bind_ShaderResources()
 	_bool bMotionBlur = true;
 	m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
 	m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+	if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
+		return E_FAIL;
 	m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
 		return E_FAIL;
@@ -278,13 +293,13 @@ void CRabbit::SetUp_FSM()
 
 	m_pFSM->Add_State(RABBIT_FIND, CRabbit_Find_State::Create());
 
-	m_pFSM->Add_State(RABBIT_DAMAGE, CRabbit_Jump_State::Create());
 	m_pFSM->Add_State(RABBIT_JUMPSTART, CRabbit_Jump_State::Create());
 	m_pFSM->Add_State(RABBIT_JUMP, CRabbit_Jump_State::Create());
 	m_pFSM->Add_State(RABBIT_JUMPFALL, CRabbit_Jump_State::Create());
 	m_pFSM->Add_State(RABBIT_JUMPEND, CRabbit_Jump_State::Create());
 
 	m_pFSM->Add_State(RABBIT_JUMPLANDING, CRabbit_JumpLanding_State::Create());
+
 	//m_pFSM->Add_State(RABBIT_BRAKE, CRabbit_Brake_State::Create());
 	//m_pFSM->Add_State(RABBIT_LOOKAROUNDAFTERBRAKE, CRabbit_LookAroundAfterBrake_State::Create());
 
@@ -295,6 +310,37 @@ void CRabbit::SetUp_FSM()
 	FSM_Desc.iState = RABBIT_WAIT;
 	FSM_Desc.pModel = &m_pModelCom;
 	m_pFSM->Initialize(&FSM_Desc);
+}
+
+_bool CRabbit::Custom_Face(_uint iMeshIndex)
+{
+	if (iMeshIndex == 0)
+	{
+		HRESULT hr;
+
+		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", iMeshIndex, TextureType_DIFFUSE);
+		CHECK_FAILED(hr);
+
+		hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", iMeshIndex);
+		CHECK_FAILED(hr);
+
+		hr = m_pEyeTextureCom->Bind_ShaderResource(m_pShaderCom, "g_KirbyEyeTexture", (_uint)m_eEyeState);
+		CHECK_FAILED(hr);
+
+		_bool bStencil = true;
+		_bool bRimLight = true;
+		_bool bMotionBlur = true;
+		m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
+
+		m_pShaderCom->Begin(ANIMMODEL_KIRBYEYE);
+		m_pModelCom->Render(iMeshIndex);
+
+		return true;
+	}
+
+	return false;
 }
 
 CRabbit* CRabbit::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -328,5 +374,5 @@ void CRabbit::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_pFSM);
+	Safe_Release(m_pEyeTextureCom);
 }
