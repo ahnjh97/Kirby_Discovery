@@ -34,6 +34,7 @@ private:
 	HRESULT Loading_StaticComponentAll();
 
 	HRESULT Loading_For_Logo();
+	HRESULT Loading_For_Intro();
 	HRESULT Loading_For_GamePlay();
 	HRESULT Loading_For_Tool_UI();
 	HRESULT Loading_For_Tool_FX();

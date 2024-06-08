@@ -1,6 +1,5 @@
 #include "Model.h"
 #include "GameInstance.h"
-#include "TextureArray.h"
 #include "MergedMesh.h"
 #include "OcTree.h"
 //#include "Channel.h"
@@ -358,92 +357,92 @@ void CModel::Create_MergedMesh(_fmatrix TransformMatrix)
 
 void CModel::Bind_TextureArrays()
 {
-	if(nullptr != m_pSamplerState)
-		m_pContext->PSSetSamplers(5, 1, &m_pSamplerState);
-	for (_uint i = 4; i < 4 + m_vecTextureArraySRVs.size(); i++)
-		m_pContext->PSSetShaderResources(i, 1, &m_vecTextureArraySRVs[i-4]);
+	//if(nullptr != m_pSamplerState)
+	//	m_pContext->PSSetSamplers(5, 1, &m_pSamplerState);
+	//for (_uint i = 4; i < 4 + m_vecTextureArraySRVs.size(); i++)
+	//	m_pContext->PSSetShaderResources(i, 1, &m_vecTextureArraySRVs[i-4]);
 }
 
-ID3D11ShaderResourceView* CModel::CreateTexture2DArraySRV(const vector<wstring>& filePaths) {
-	ID3D10Multithread* pMultithread = nullptr;
-	if (FAILED(m_pDevice->QueryInterface(__uuidof(ID3D10Multithread), reinterpret_cast<void**>(&pMultithread)))) {
-		MSG_BOX(TEXT("ID3D10Multithread Failed."));
-		return nullptr;
-	}
-	pMultithread->SetMultithreadProtected(TRUE);
-	pMultithread->Enter();
-
-	vector<ID3D11Texture2D*> textures;
-	D3D11_TEXTURE2D_DESC textureDesc = {};
-	bool firstTexture = true;
-
-	for (const auto& filePath : filePaths) {
-		ID3D11ShaderResourceView* pSRV = nullptr;
-		ID3D11Resource* pResource = nullptr;
-		HRESULT hr = DirectX::CreateDDSTextureFromFile(m_pDevice, filePath.c_str(), &pResource, &pSRV);
-		if (FAILED(hr)) {
-			return nullptr;
-		}
-
-		ID3D11Texture2D* texture = nullptr;
-		hr = pResource->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&texture);
-		if (FAILED(hr)) {
-			pSRV->Release();
-			pResource->Release();
-			return nullptr;
-		}
-
-		textures.push_back(texture);
-
-		if (firstTexture) {
-			texture->GetDesc(&textureDesc);
-			firstTexture = false;
-		}
-
-		pSRV->Release();
-		pResource->Release();
-	}
-
-	textureDesc.ArraySize = static_cast<_uint>(textures.size());
-	textureDesc.Usage = D3D11_USAGE_DEFAULT;
-	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-	textureDesc.CPUAccessFlags = 0;
-	textureDesc.MiscFlags = 0;
-
-	ID3D11Texture2D* textureArray = nullptr;
-	HRESULT hr = m_pDevice->CreateTexture2D(&textureDesc, nullptr, &textureArray);
-	if (FAILED(hr)) {
-		for (auto& texture : textures) {
-			texture->Release();
-		}
-		return nullptr;
-	}
-
-	for (_uint i = 0; i < textures.size(); ++i) {
-		for (_uint mipLevel = 0; mipLevel < textureDesc.MipLevels; ++mipLevel) {
-			m_pContext->CopySubresourceRegion(textureArray, D3D11CalcSubresource(mipLevel, i, textureDesc.MipLevels), 0, 0, 0, textures[i], mipLevel, nullptr);
-		}
-		textures[i]->Release();
-	}
-
-	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-	srvDesc.Format = textureDesc.Format;
-	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
-	srvDesc.Texture2DArray.MostDetailedMip = 0;
-	srvDesc.Texture2DArray.MipLevels = textureDesc.MipLevels;
-	srvDesc.Texture2DArray.FirstArraySlice = 0;
-	srvDesc.Texture2DArray.ArraySize = textureDesc.ArraySize;
-
-	ID3D11ShaderResourceView* srv = nullptr;
-	hr = m_pDevice->CreateShaderResourceView(textureArray, &srvDesc, &srv);
-	textureArray->Release();
-	pMultithread->Leave();
-	pMultithread->Release();
-	if (FAILED(hr))
-		return nullptr;
-
-	return srv;
-}
+//ID3D11ShaderResourceView* CModel::CreateTexture2DArraySRV(const vector<wstring>& filePaths) {
+//	ID3D10Multithread* pMultithread = nullptr;
+//	if (FAILED(m_pDevice->QueryInterface(__uuidof(ID3D10Multithread), reinterpret_cast<void**>(&pMultithread)))) {
+//		MSG_BOX(TEXT("ID3D10Multithread Failed."));
+//		return nullptr;
+//	}
+//	pMultithread->SetMultithreadProtected(TRUE);
+//	pMultithread->Enter();
+//
+//	vector<ID3D11Texture2D*> textures;
+//	D3D11_TEXTURE2D_DESC textureDesc = {};
+//	bool firstTexture = true;
+//
+//	for (const auto& filePath : filePaths) {
+//		ID3D11ShaderResourceView* pSRV = nullptr;
+//		ID3D11Resource* pResource = nullptr;
+//		HRESULT hr = DirectX::CreateDDSTextureFromFile(m_pDevice, filePath.c_str(), &pResource, &pSRV);
+//		if (FAILED(hr)) {
+//			return nullptr;
+//		}
+//
+//		ID3D11Texture2D* texture = nullptr;
+//		hr = pResource->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&texture);
+//		if (FAILED(hr)) {
+//			pSRV->Release();
+//			pResource->Release();
+//			return nullptr;
+//		}
+//
+//		textures.push_back(texture);
+//
+//		if (firstTexture) {
+//			texture->GetDesc(&textureDesc);
+//			firstTexture = false;
+//		}
+//
+//		pSRV->Release();
+//		pResource->Release();
+//	}
+//
+//	textureDesc.ArraySize = static_cast<_uint>(textures.size());
+//	textureDesc.Usage = D3D11_USAGE_DEFAULT;
+//	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+//	textureDesc.CPUAccessFlags = 0;
+//	textureDesc.MiscFlags = 0;
+//
+//	ID3D11Texture2D* textureArray = nullptr;
+//	HRESULT hr = m_pDevice->CreateTexture2D(&textureDesc, nullptr, &textureArray);
+//	if (FAILED(hr)) {
+//		for (auto& texture : textures) {
+//			texture->Release();
+//		}
+//		return nullptr;
+//	}
+//
+//	for (_uint i = 0; i < textures.size(); ++i) {
+//		for (_uint mipLevel = 0; mipLevel < textureDesc.MipLevels; ++mipLevel) {
+//			m_pContext->CopySubresourceRegion(textureArray, D3D11CalcSubresource(mipLevel, i, textureDesc.MipLevels), 0, 0, 0, textures[i], mipLevel, nullptr);
+//		}
+//		textures[i]->Release();
+//	}
+//
+//	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+//	srvDesc.Format = textureDesc.Format;
+//	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
+//	srvDesc.Texture2DArray.MostDetailedMip = 0;
+//	srvDesc.Texture2DArray.MipLevels = textureDesc.MipLevels;
+//	srvDesc.Texture2DArray.FirstArraySlice = 0;
+//	srvDesc.Texture2DArray.ArraySize = textureDesc.ArraySize;
+//
+//	ID3D11ShaderResourceView* srv = nullptr;
+//	hr = m_pDevice->CreateShaderResourceView(textureArray, &srvDesc, &srv);
+//	textureArray->Release();
+//	pMultithread->Leave();
+//	pMultithread->Release();
+//	if (FAILED(hr))
+//		return nullptr;
+//
+//	return srv;
+//}
 
 void CModel::CreateSamplerState()
 {

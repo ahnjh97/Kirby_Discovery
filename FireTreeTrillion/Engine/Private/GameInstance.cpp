@@ -323,6 +323,14 @@ void CGameInstance::Update_DofFocus(_fvector vWorldPos)
 
 }
 
+void CGameInstance::Bind_RendererFunc(_int iTriggerType)
+{
+	if (nullptr == m_pRenderer)
+		return;
+
+	m_pRenderer->Bind_RendererFunc(iTriggerType);
+}
+
 #ifdef _DEBUG
 
 HRESULT CGameInstance::Add_DebugComponents(CComponent * pRenderComponent)

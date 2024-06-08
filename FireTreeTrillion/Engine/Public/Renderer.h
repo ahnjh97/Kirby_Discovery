@@ -50,7 +50,7 @@ public:
 		m_vShadowEyePos = vLightPos;
 		m_vShadowFocusPos = vFocusPos;
 	}
-
+	void Bind_RendererFunc(_int iTriggerType);
 
 #ifdef _DEBUG
 public:

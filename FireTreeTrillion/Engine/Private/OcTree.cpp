@@ -429,8 +429,10 @@ void COcTree::RenderAll(CShader* pShaderCom)
 	for (_uint iMeshIdx = 0; iMeshIdx < m_vecMeshes.size(); iMeshIdx++)
 	{
 		m_vecMaterials[iMeshIdx][TEX_DIFFUSE]->Bind_ShaderResource(pShaderCom, "g_DiffuseTexture");
-		m_vecMaterials[iMeshIdx][TEX_NORMAL]->Bind_ShaderResource(pShaderCom, "g_NormalTexture");
-		m_vecMaterials[iMeshIdx][TEX_MRA]->Bind_ShaderResource(pShaderCom, "g_MRATexture");
+		if(nullptr != m_vecMaterials[iMeshIdx][TEX_NORMAL])
+			m_vecMaterials[iMeshIdx][TEX_NORMAL]->Bind_ShaderResource(pShaderCom, "g_NormalTexture");
+		if (nullptr != m_vecMaterials[iMeshIdx][TEX_MRA])
+			m_vecMaterials[iMeshIdx][TEX_MRA]->Bind_ShaderResource(pShaderCom, "g_MRATexture");
 
 		pShaderCom->Bind_RawValue("g_fSamplingFactor", &m_vecSamplingFactors[iMeshIdx], sizeof(_float));
 		pShaderCom->Begin(m_vecPassIndices[iMeshIdx]);
@@ -444,8 +446,10 @@ void COcTree::RenderMyMesh(CShader* pShaderCom)
 	for (_uint iMeshIdx = 0; iMeshIdx < m_vecMyMeshes.size(); iMeshIdx++)
 	{
 		m_vecMyMaterials[iMeshIdx][TEX_DIFFUSE]->Bind_ShaderResource(pShaderCom, "g_DiffuseTexture");
-		m_vecMyMaterials[iMeshIdx][TEX_NORMAL]->Bind_ShaderResource(pShaderCom, "g_NormalTexture");
-		m_vecMyMaterials[iMeshIdx][TEX_MRA]->Bind_ShaderResource(pShaderCom, "g_MRATexture");
+		if(nullptr != m_vecMyMaterials[iMeshIdx][TEX_NORMAL])
+			m_vecMyMaterials[iMeshIdx][TEX_NORMAL]->Bind_ShaderResource(pShaderCom, "g_NormalTexture");
+		if(nullptr != m_vecMyMaterials[iMeshIdx][TEX_MRA])
+			m_vecMyMaterials[iMeshIdx][TEX_MRA]->Bind_ShaderResource(pShaderCom, "g_MRATexture");
 
 		pShaderCom->Bind_RawValue("g_fSamplingFactor", &m_vecMySamplingFactors[iMeshIdx], sizeof(_float));
 		pShaderCom->Begin(m_vecMyPassIndices[iMeshIdx]);

@@ -90,13 +90,14 @@ HRESULT CBasicMap::Render()
 {
     if (FAILED(Bind_ShaderResources()))
         return E_FAIL;
-    if (LEVEL_GAMEPLAY == *m_pGameInstance->Get_CurrentLevelID() && false == m_bBlendMap)
+    if ((LEVEL_GAMEPLAY == *m_pGameInstance->Get_CurrentLevelID()
+        || LEVEL_INTRO == *m_pGameInstance->Get_CurrentLevelID())
+        && false == m_bBlendMap)
     {
         if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fNonMatchTime, sizeof(_float))))
             return E_FAIL;
 
-        m_iRenderAll = 0;
-        m_iRenderMyMesh = 0;
+        m_iRenderAll = m_iRenderMyMesh = 0;
         m_pOcTree->Culling(m_pGameInstance, m_pShaderCom, m_iRenderAll, m_iRenderMyMesh);
     }
     else

@@ -70,6 +70,9 @@ HRESULT CKirby::Initialize(void* pArg)
 	m_fAttack = 5.f;
 	m_eAbilityType = ABILITY_DEFAULT;
 
+	CCharacterController* pController = dynamic_cast<CCharacterController*>(Get_Component(TEXT("Com_Controller")));
+	pController->RegisterAsPlayer();
+
 	return S_OK;
 }
 

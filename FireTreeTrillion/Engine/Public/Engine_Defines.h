@@ -119,6 +119,7 @@ using namespace physx;
 #include <filesystem>
 #include <sstream>
 #include <mutex>
+#include <unordered_set>
 
 //#include <tchar.h>
 //#include <memory.h>

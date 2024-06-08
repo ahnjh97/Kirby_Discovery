@@ -83,7 +83,7 @@ public:
 
 	void Create_MergedMesh(_fmatrix TransformMatrix);
 	void Bind_TextureArrays();
-	ID3D11ShaderResourceView* CreateTexture2DArraySRV(const vector<wstring>& filePaths);
+	/*ID3D11ShaderResourceView* CreateTexture2DArraySRV(const vector<wstring>& filePaths);*/
 	void CreateSamplerState();
 
 private:

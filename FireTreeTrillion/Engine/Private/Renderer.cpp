@@ -361,8 +361,6 @@ HRESULT CRenderer::Initialize()
 
 #endif
 
-	function<void(_int)> TriggerFunc = bind(&CRenderer::Set_ColorSet_ByIndex, this, placeholders::_1);
-	m_pGameInstance->Emplace_TriggerFunc(1, TriggerFunc);
 	return S_OK;
 }
 
@@ -607,6 +605,12 @@ HRESULT CRenderer::Render_LightDepth_For_GameObject(CShader* pShader, CTransform
 
 
 #ifdef _DEBUG
+
+void CRenderer::Bind_RendererFunc(_int iTriggerType)
+{
+	function<void(_int)> TriggerFunc = bind(&CRenderer::Set_ColorSet_ByIndex, this, placeholders::_1);
+	m_pGameInstance->Emplace_TriggerFunc(iTriggerType, TriggerFunc);
+}
 
 HRESULT CRenderer::Add_DebugComponents(CComponent* pRenderComponent)
 {

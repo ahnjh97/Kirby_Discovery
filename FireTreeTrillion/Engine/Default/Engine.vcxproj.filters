@@ -405,9 +405,6 @@
     <ClCompile Include="..\Private\MergedMesh.cpp">
       <Filter>01.Utility\02.Components\Model\MergedMesh</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\TextureArray.cpp">
-      <Filter>01.Utility\02.Components\Texture</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Base.h">
@@ -643,9 +640,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\MergedMesh.h">
       <Filter>01.Utility\02.Components\Model\MergedMesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\TextureArray.h">
-      <Filter>01.Utility\02.Components\Texture</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

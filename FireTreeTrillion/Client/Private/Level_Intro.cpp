@@ -1,46 +1,35 @@
 #include "stdafx.h"
-#include "Level_GamePlay.h"
+#include "Level_Intro.h"
 #include "Camera_Free.h"
 #include "BasicMap.h"
 #include "Trigger.h"
 #include "Kirby.h"
 #include "BG.h"
 
-CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CLevel_Intro::CLevel_Intro(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
 {
 
 }
 
-HRESULT CLevel_GamePlay::Initialize()
+HRESULT CLevel_Intro::Initialize()
 {
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
-	
+
 	if (FAILED(Ready_Lights()))
 		return E_FAIL;
-	
-	if(FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
+
+	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
 		return E_FAIL;
 
 	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
 		return E_FAIL;
 
-	if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))
-		return E_FAIL;
-
-	/* 구한정보들을 각 랜드오브젝트르 생성할 때 던진다. */
-	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
-		return E_FAIL;
-
 	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
 		return E_FAIL;
-	
-	if (FAILED(Ready_ParsedObjects()))
-		return E_FAIL;
 
-	// TEST (블러와 블랜드의 관계)
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Moon"), TEXT("Prototype_GameObject_Moon"))))
+	if (FAILED(Ready_ParsedObjects()))
 		return E_FAIL;
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
@@ -48,28 +37,22 @@ HRESULT CLevel_GamePlay::Initialize()
 	return S_OK;
 }
 
-void CLevel_GamePlay::Tick(_float fTimeDelta)
+void CLevel_Intro::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 	m_fAccDelta += fTimeDelta;
 }
 
-HRESULT CLevel_GamePlay::Render()
+HRESULT CLevel_Intro::Render()
 {
 	if (FAILED(__super::Render()))
 		return E_FAIL;
-
-	//CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject_ByTag(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby")));
-	//_float4 vPos = pKirby->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION);
-	//wstring wstrMsg = TEXT("게임플레이레벨입니다. 커비 위치 : ")
-	//	+ to_wstring(vPos.x) + TEXT(", ") + to_wstring(vPos.y) + TEXT(", ") + to_wstring(vPos.z);
-	//SetWindowText(g_hWnd, wstrMsg.c_str());
 
 	//윈도우 바 FPS 체크
 	++m_iFPS;
 
 	_tchar szFPS[MAX_PATH] = TEXT("");
-	wsprintf(szFPS, TEXT("Level GamePlay, %d FPS"), m_iFPS);
+	wsprintf(szFPS, TEXT("Level Intro, %d FPS"), m_iFPS);
 
 	if (m_fAccDelta >= 1.f)
 	{
@@ -82,7 +65,7 @@ HRESULT CLevel_GamePlay::Render()
 	return S_OK;
 }
 
-HRESULT CLevel_GamePlay::Ready_Lights()
+HRESULT CLevel_Intro::Ready_Lights()
 {
 	//// 예시코드 1 : 태양광
 	LIGHT_DESC			LightDesc{};
@@ -99,7 +82,7 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 	return S_OK;
 }
 
-HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
+HRESULT CLevel_Intro::Ready_Layer_Camera(const wstring& strLayerTag)
 {
 	CCamera_Free::CAMERA_FREE_DESC		CameraDesc{};
 	CameraDesc.fMouseSensor = 0.1f;
@@ -111,71 +94,42 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
 	CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
 	CameraDesc.fSpeedPerSec = 10.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
-	
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
+
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
 		return E_FAIL;
-	
+
 	return S_OK;
 }
 
-HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const wstring& strLayerTag)
+HRESULT CLevel_Intro::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
 
-	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_SkySphere"));
+	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_INTRO, strLayerTag, TEXT("Prototype_GameObject_SkySphere"));
 	CHECK_FAILED(hr);
 
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_TestMap"))))
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, strLayerTag, TEXT("Prototype_GameObject_TestMap"))))
 	//	return E_FAIL;
 
 	return S_OK;
 }
 
-HRESULT CLevel_GamePlay::Ready_Layer_Player(const wstring & strLayerTag)
+HRESULT CLevel_Intro::Ready_Layer_UI(const wstring& strLayerTag)
 {
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_TestModel"))))
-	//	return E_FAIL;
-
-	// Kirby
-	/*if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Kirby"))))
-		return E_FAIL;*/
-
-	return S_OK;
-}
-
-HRESULT CLevel_GamePlay::Ready_Layer_Monster(const wstring & strLayerTag)
-{
-	//// Awoofy
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Awoofy"))))
-	//	return E_FAIL;
-
-	//// Rabbit
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Rabbit"))))
-	//	return E_FAIL;
-
-	// Buffahorn
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Buffahorn"))))
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, strLayerTag, TEXT("Prototype_GameObject_UI_Test"))))
 	//	return E_FAIL;
 
 	return S_OK;
 }
 
-HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& strLayerTag)
+HRESULT CLevel_Intro::Ready_ParsedObjects()
 {
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_UI_Test"))))
-	//	return E_FAIL;
+	LEVEL eLevel = LEVEL_INTRO;
 
-	return S_OK;
-}
-
-HRESULT CLevel_GamePlay::Ready_ParsedObjects()
-{
-	LEVEL eLevel = LEVEL_GAMEPLAY;
-
-	string strFileName = "../../../objects_txt/GamePlay.txt";
+	string strFileName = "../../../objects_txt/Intro.txt";
 	fstream fileStream(strFileName, ios::in | ios::binary);
 	if (fileStream.is_open() == false)
 	{
-		MSG_BOX(TEXT("Failed to open : GamePlay.txt"));
+		MSG_BOX(TEXT("Failed to open : Intro.txt"));
 		return E_FAIL;
 	}
 
@@ -203,7 +157,7 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 		fileStream.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
 		fileStream.read(reinterpret_cast<char*>(&fRimLightThickness), sizeof(fRimLightThickness));
 
-		if ("Camera" == strModelName) 
+		if ("Camera" == strModelName)
 		{
 			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
 			camMatrices.emplace(iTriggerIndex, matWorld);
@@ -224,9 +178,9 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 
 			_vector vDir = XMVector3Normalize(XMVectorSet(matWorld._31, matWorld._32, matWorld._33, 0));
 
-			if(CAM_FRONT == iCamType)
+			if (CAM_FRONT == iCamType)
 				frontDirRadii.emplace(iTriggerIndex, pair<_vector, _float>(vDir, fRadius));
-			else if(CAM_REAR == iCamType)
+			else if (CAM_REAR == iCamType)
 				rearDirRadii.emplace(iTriggerIndex, pair<_vector, _float>(vDir, fRadius));
 		}
 
@@ -269,12 +223,12 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BladeKnight"), &tempDesc)))
 				return E_FAIL;
 		}
-		else if (strModelName == "Level1Stage1Step01")
+		else if (strModelName == "Level0Stage1Step01")
 		{
 			CBasicMap::MAP_DESC tMapDesc{};
 			tMapDesc.matWorld = tempDesc.matWorld;
 			tMapDesc.wstrModelName = tempDesc.wstrModelName;
-			
+
 			_float3 vMin{}, vMax{};
 			fileStream.read(reinterpret_cast<char*>(&vMin), sizeof(vMin));
 			fileStream.read(reinterpret_cast<char*>(&vMax), sizeof(vMax));
@@ -284,7 +238,7 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_BasicMap"), &tMapDesc)))
 				return E_FAIL;
 		}
-		else if (strModelName == "Level1Stage1Step01_Blend")
+		else if (strModelName == "Level0Stage1Step01_Blend")
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_BasicMap"), &tempDesc)))
 				return E_FAIL;
@@ -307,7 +261,7 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 	}
 	fileStream.close();
 
-	CCamera_Free* pCamera = dynamic_cast<CCamera_Free*> (m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Camera")));
+	CCamera_Free* pCamera = dynamic_cast<CCamera_Free*> (m_pGameInstance->Get_GameObject(LEVEL_INTRO, TEXT("Layer_Camera")));
 	if (nullptr == pCamera)
 		return E_FAIL;
 
@@ -317,7 +271,7 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 
 		pCamera->Set_MatrixIndex(0);
 	}
-	
+
 	if (!frontDirRadii.empty())
 	{
 		for (auto& pair : frontDirRadii)
@@ -339,20 +293,20 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 	return S_OK;
 }
 
-CLevel_GamePlay * CLevel_GamePlay::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CLevel_Intro* CLevel_Intro::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	CLevel_GamePlay*		pInstance = new CLevel_GamePlay(pDevice, pContext);
+	CLevel_Intro* pInstance = new CLevel_Intro(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize()))
 	{
-		MSG_BOX(TEXT("Failed To Create : CLevel_GamePlay"));
+		MSG_BOX(TEXT("Failed To Create : CLevel_Intro"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CLevel_GamePlay::Free()
+void CLevel_Intro::Free()
 {
 	__super::Free();
 	m_pGameInstance->Clear_EventCallBack();

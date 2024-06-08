@@ -81,7 +81,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		fTimeAcc += pGameInstance->Compute_TimeDelta(TEXT("Timer_Default"));
 
-		if (fTimeAcc > 1.f / 300.f)
+		if (fTimeAcc > 1.f / 60.f)
 		{
             _float fTickTimeDelta = pGameInstance->Compute_TimeDelta(TEXT("Timer_60"));
 			pMainApp->Tick(fTickTimeDelta);
@@ -207,6 +207,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 break;
 
             /* ============= LEVEL ÀÌµ¿ ============= */
+            case INTRO:
+            {
+                HRESULT hr;
+                hr = pMainApp->Open_Level(LEVEL_INTRO);
+                CHECK_FAILED(hr);
+                break;
+            }
             case GAMEPLAY: // LEVEL_GAMEPLAY
             {
                 HRESULT hr;

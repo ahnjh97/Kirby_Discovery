@@ -25,7 +25,7 @@ HRESULT CCharacterController::Initialize(void* pArg)
 
 	Set_DefaultValue();
 	Create_Controller();
-	m_pGameInstance->Register_Player(m_pController->getActor());
+
 	return S_OK;
 }
 
@@ -401,6 +401,11 @@ void CCharacterController::Get_ShapeInfo(physx::PxCapsuleGeometry& CapsuleGeo, p
 		}
 		pxTransform = physx::PxShapeExt::getGlobalPose(*shape, *m_pController->getActor());
 	}
+}
+
+void CCharacterController::RegisterAsPlayer()
+{
+	m_pGameInstance->Register_Player(m_pController->getActor());
 }
 
 void CCharacterController::Create_Controller()
