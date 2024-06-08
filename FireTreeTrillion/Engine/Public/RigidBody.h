@@ -60,6 +60,7 @@ public:
 
 	// ³¯¸®±â
 	void			Add_Force(_float3 vForce);
+	void			Overlap_Hitbox();
 
 public:
 	PxTransform	Get_PxTransform();
