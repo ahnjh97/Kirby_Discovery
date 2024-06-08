@@ -155,6 +155,16 @@ HRESULT CShader::Bind_RawValue(const _char * pConstantName, const void * pData, 
 	return pVariable->SetRawValue(pData, 0, iLength);	
 }
 
+HRESULT CShader::Bind_RawArray(const _char* pConstantName, const void* pData, _uint iLength)
+{
+	/* 타입의 구분없이 pConstantName이름을 가진 전역변수에 기능을 할 수 있는 컴객체를 얻어온다. */
+	ID3DX11EffectVariable* pVariable = m_pEffect->GetVariableByName(pConstantName);
+	if (nullptr == pVariable)
+		return E_FAIL;
+
+	return pVariable->AsScalar()->SetRawValue(pData, 0, iLength);
+}
+
 
 CShader * CShader::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const wstring & strShaderFilePath, const D3D11_INPUT_ELEMENT_DESC* pElements, _uint iNumElements)
 {

@@ -10,6 +10,8 @@ CLevel_Tool_Map::CLevel_Tool_Map(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 
 HRESULT CLevel_Tool_Map::Initialize()
 {
+	m_pGameInstance->Set_RenderMode(CRenderer::MODE_TOOL);
+
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
 

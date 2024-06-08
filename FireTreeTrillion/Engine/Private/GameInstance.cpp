@@ -357,6 +357,21 @@ HRESULT CGameInstance::Bind_DeferredRawValue(const _char* pConstantName, const v
 	return m_pRenderer->Bind_DeferredRawValue(pConstantName, pData, iLength);
 }
 
+void CGameInstance::Set_RenderMode(CRenderer::RENDER_MODE eMode)
+{
+	if (nullptr == m_pRenderer)
+		return;
+
+	m_pRenderer->Set_RenderMode(eMode);
+}
+
+void CGameInstance::Update_Option(CRenderer::OPTION Option, _bool bOn)
+{
+	if (nullptr == m_pRenderer)
+		return;
+	m_pRenderer->Update_Option(Option, bOn);
+}
+
 #ifdef _DEBUG
 
 HRESULT CGameInstance::Add_DebugComponents(CComponent * pRenderComponent)
@@ -595,12 +610,12 @@ HRESULT CGameInstance::Add_Light(const LIGHT_DESC & LightDesc)
 	return m_pLight_Manager->Add_Light(LightDesc);
 }
 
-HRESULT CGameInstance::Render_Lights(CShader * pShader, CVIBuffer_Rect * pVIBuffer)
+HRESULT CGameInstance::Render_Lights(CShader * pShader, CVIBuffer_Rect * pVIBuffer, _bool bForTool)
 {
 	if (m_pLight_Manager == nullptr)
 		return E_FAIL;
 
-	return m_pLight_Manager->Render(pShader, pVIBuffer);
+	return m_pLight_Manager->Render(pShader, pVIBuffer, bForTool);
 }
 
 void CGameInstance::Clear_Light()
