@@ -80,12 +80,6 @@ namespace Engine
 // SimpleMath
 #include <DirectXTK/SimpleMath.h>
 
-// RapidJSON
-#include "rapidjson/document.h"
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-#include "rapidjson/prettywriter.h"
-
 // PhysX
 #include "PxPhysics.h"
 #include "PxPhysicsAPI.h"
@@ -124,6 +118,8 @@ using namespace physx;
 //#include <memory.h>
 #include <utility>
 
+//json
+#include "nlohmann/json.hpp"
 //// for Fmod
 #include "fmod.h"
 #include "fmod.hpp"
@@ -132,9 +128,8 @@ using namespace physx;
 #pragma comment (lib, "fmod_vc.lib")
 
 using namespace std;
-using namespace rapidjson;
 using namespace filesystem;
-
+using json = nlohmann::json;
 namespace Engine
 {
 	const wstring g_strTransformTag = TEXT("Com_Transform");
