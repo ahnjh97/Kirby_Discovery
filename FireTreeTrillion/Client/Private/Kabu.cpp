@@ -133,6 +133,8 @@ void CKabu::Late_Tick(_float fTimeDelta)
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 	}
+
+	//m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
 }
 
 HRESULT CKabu::Render()
@@ -238,7 +240,19 @@ HRESULT CKabu::Add_Components()
 	m_vecRallyPoint.push_back(XMVectorSet(3.f, 7.f, -176.f, 1.f));
 	//m_vecRallyPoint.push_back(XMVectorSet(2.f, 6.5f, -187.f, 1.f));
 	
-	//SetUp_FSM();
+	/* For.Com_RigidBody */
+	CRigidBody::RIGIDBODY_DESC rigidDesc {};
+	rigidDesc.bTrigger = false;
+	rigidDesc.bDynamic = true;
+	rigidDesc.bKinematic = true;
+	rigidDesc.eShapeType = RIGID_SPHERE;
+	rigidDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
+	hr = __super::Add_Component(TEXT("Prototype_Component_RigidBody"),
+		TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &rigidDesc);
+	CHECK_FAILED(hr);
+	m_pRigidBodyCom->Set_Object(this);
+	// QZR : 처음값을 false로 하고, RigidBodyCom을 언제 Activate = true로 바꿀까.
+	m_pRigidBodyCom->Activate(true);
 
 	return S_OK;
 }
@@ -289,7 +303,6 @@ void CKabu::SetUp_FSM()
 	m_pFSM = CFSM::Create();
 	m_pFSM->Add_State(KABU_WAIT, CKabu_Idle_State::Create());
 
-
 	//상태 Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};
 	FSM_Desc.iState = KABU_WAIT;
@@ -327,4 +340,6 @@ CGameObject* CKabu::Clone(void* pArg)
 void CKabu::Free()
 {
 	__super::Free();
+
+	Safe_Release(m_pRigidBodyCom);
 }

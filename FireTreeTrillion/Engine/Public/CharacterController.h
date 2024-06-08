@@ -54,9 +54,6 @@ public:
 	_vector			Compute_TerrainPosition_Vector();
 	PxVec3			TerrainRayCast_Collision(PxVec3 _rayOrigin, PxVec3 _rayDirection, _float _fMaxDistance);
 
-	// 충돌에 대한 함수
-	void			Overlap_Hitbox();
-
 	_bool	Is_Activated();
 	void	Activate(_bool bActive);
 

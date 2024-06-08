@@ -54,6 +54,7 @@ public:
 	
 	// 충돌처리 함수
 	virtual void		Collision_Attack(CGameObject* pGameObject);
+	virtual void		Collision_Overlap(CGameObject* pGameObject);
 
 protected:
 	HRESULT				Add_Component(_uint iLevelIndex, const wstring& strPrototypeTag, const wstring& strComponentTag, class CComponent** ppOut, void* pArg = nullptr);

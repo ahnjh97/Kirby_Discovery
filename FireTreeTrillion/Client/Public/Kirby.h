@@ -97,23 +97,20 @@ private:
 	virtual ~CKirby() = default;
 
 public:
-	virtual HRESULT Initialize_Prototype() override;
-	virtual HRESULT Initialize(void* pArg) override;
-	virtual _int	Tick(_float fTimeDelta) override;
-	virtual void	Late_Tick(_float fTimeDelta) override;
-	virtual HRESULT Render() override;
-	virtual HRESULT Render_LightDepth() override;
+	virtual HRESULT Initialize_Prototype()						override;
+	virtual HRESULT Initialize(void* pArg)						override;
+	virtual _int	Tick(_float fTimeDelta)						override;
+	virtual void	Late_Tick(_float fTimeDelta)				override;
+	virtual HRESULT Render()									override;
+	virtual HRESULT Render_LightDepth()							override;
 #ifdef _DEBUG
-	virtual void	Render_IMGUI() override;
+	virtual void	Render_IMGUI()								override;
 #endif
-	virtual HRESULT	Render_DeferredInfo()					 override;
+	virtual HRESULT	Render_DeferredInfo()						override;
 
-	virtual void	Add_AnimEvent()							 override;
-	virtual void	Collision_Attack(CGameObject* pOtherObj) override;
-	
-	// for overlap 충돌 처리
-	void			Collision_Overlap();
-	void			PerformHitboxOverlapTest();
+	virtual void	Add_AnimEvent()								override;
+	virtual void	Collision_Attack(CGameObject* pOtherObj)	override;
+	virtual void	Collision_Overlap(CGameObject* pGameObject) override;
 
 	KIRBY_INFODESC* Get_KirbyInfo() { return &m_tKirbyInfo; }
 	void			Set_KirbyInfo(KIRBY_INFODESC _tInfo) {

@@ -4,6 +4,8 @@
 #include "GameObject.h"
 #include "Transform.h"
 
+#define OVERLAP_MAX 8
+
 CRigidBody::CRigidBody(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CComponent{ pDevice, pContext }
 {
@@ -82,11 +84,9 @@ void CRigidBody::Render_IMGUI()
 	ImGui::Checkbox("bKinematic",	&m_bKinematic);
 	ImGui::InputFloat("Density",	&m_fDensity);
 
-	ImGui::Indent(20.f);
-	if (ImGui::CollapsingHeader("Origin Trasnform"))
-	{
-	}
-	ImGui::Unindent(20.f);
+	//static _bool bActivate = false;
+	//ImGui::Checkbox("bActivate", &bActivate);
+	//Activate(bActivate);
 }
 
 #endif
@@ -162,7 +162,6 @@ void CRigidBody::Create_Actor()
 	}
 }
 
-//정현아 여길 봐줘
 /// <summary>
 /// RigidBody를 어떻게 사용할 것인지 세팅 플래그 변경하는 함수
 /// +) Create_Actor의 하단에 호출중
@@ -171,12 +170,13 @@ void CRigidBody::SetUp_Actor()
 {
 	if (m_bTrigger)
 	{
-		if(true == m_bDynamic)
+		if (m_bDynamic)
 			m_pActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, true);
 	}
 	else
 	{
-		m_pActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, m_bKinematic);
+		//if (m_bDynamic)
+			m_pActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, m_bKinematic);
 	}
 
 	if(nullptr != m_pActor)
@@ -281,44 +281,46 @@ _bool CRigidBody::Is_Activated()
 	return m_pActor != nullptr && m_pActor->getScene() != nullptr;
 }
 
-void CRigidBody::Overlap_Hitbox()
+// 함수 내에 해당 코드를 포함한다고 가정
+void CRigidBody::Overlap_Hitbox(CGameObject* pGameObject, _float4 vPos, _float fRadius)
 {
-	// 히트박스 기하학적 모양 정의 (박스 형태)
-	PxBoxGeometry hitboxGeometry(PxVec3(5.0f, 5.0f, 5.0f)); // 히트박스 크기
+	// 겹침을 검사할 구체의 기하학적 모양 생성
+	PxSphereGeometry overlapShape = PxSphereGeometry(fRadius);
 
-	// 컨트롤러의 위치 가져오기
-	_vector pos = _vector{ -3.f, 7.f, -185.f, 1.f };
-	//PxVec3 controllerPosition = CUtils::To_PxVec3(pos);
-	PxVec3 hitboxPosition = CUtils::To_PxVec3(pos);// controllerPosition + PxVec3(0.5f, -0.5f, 0.0f);
-	PxQuat rotation = PxQuat(PxIdentity);
+	// 초기 위치와 회전을 설정하는 PxTransform 객체 생성
+	//PxTransform shapePose = PxTransform(pos, PxQuat(physx::PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f)));
+	//PxTransform shapePose = m_pActor->getGlobalPose();
+	PxTransform pxTransform(PxVec3(vPos.x, vPos.y, vPos.z));
 
-	// 히트박스의 변환 생성
-	PxTransform hitboxPose(hitboxPosition, rotation);
-
-	// Overlap 테스트 실행
-	PxOverlapBuffer hitBuffer; // 충돌 정보를 저장할 버퍼
-	PxScene* myScene = m_pGameInstance->Get_Scene();//m_pController->getActor()->getScene();
-	_bool status = myScene->overlap(hitboxGeometry, hitboxPose, hitBuffer);
-
-	if (status)
+	// Overlap 결과를 저장할 배열 동적 할당
+	PxOverlapHit* hitOverlap = new PxOverlapHit[OVERLAP_MAX]; 	//const int maxHits = 8; //= 4096;
+	PxScene* myScene = m_pGameInstance->Get_Scene();
+	_int howMany = PxSceneQueryExt::overlapMultiple(*myScene, overlapShape, pxTransform, hitOverlap, OVERLAP_MAX, PxQueryFilterData(PxQueryFlag::eDYNAMIC/*PxQueryFlag::eSTATIC | PxQueryFlag::eNO_BLOCK*/));
+	
+	CGameObject* pPlayer = nullptr;
+	for (_int i = 0; i < howMany; ++i) 
 	{
-		cout << "Hitbox overlap detected with " << hitBuffer.getNbAnyHits() << " objects." << endl;
-		for (PxU32 i = 0; i < hitBuffer.getNbAnyHits(); i++)
-		{
-			const PxOverlapHit& hit = hitBuffer.getAnyHit(i);
-			PxActor* actor = hit.actor;
-			if (actor)
-			{
-				const char* name = actor->getName();
-				cout << "Hit object: " << (name ? name : "Unnamed Actor") << endl;
-				// 몬스터와의 충돌 처리
-			}
-		}
+		PxOverlapHit& hit = hitOverlap[i];
+		PxRigidActor* actor = hit.actor;  // 충돌된 객체의 액터
+		// FOR TEST
+		if (howMany > 2)
+			_int b = 3;
+		if (actor->userData == "RigidMesh")
+			continue;// _int a = 3;
+
+		const char* actorName = actor->getName();
+		CComponent* pComponent = static_cast<CComponent*>(actor->userData);
+		if (pComponent == nullptr) continue;
+
+		// ======================================== FOR TEST : 임시 ========================================
+		CGameObject* pActorObject = pComponent->Get_Object();
+		if (pActorObject == nullptr) continue;
+		if (pActorObject->Get_PrototypeTag() != pGameObject->Get_PrototypeTag())
+			pGameObject->Collision_Overlap(pActorObject); // actorObject가 플레이어가 아닐경우 collision_overlap 실행
+		// =================================================================================================
 	}
-	else
-	{
-		//No hitbox overlap detected.
-	}
+
+	Safe_Delete_Array(hitOverlap);
 }
 
 CRigidBody * CRigidBody::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
@@ -355,4 +357,3 @@ void CRigidBody::Free()
 	Release_Actor();
 }
 
- 

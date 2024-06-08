@@ -53,6 +53,8 @@ public:
 	_bool IsAnimFinished();
 
 private:
+	CRigidBody*			m_pRigidBodyCom = { nullptr };
+
 	KABU_ANIM			m_eCurrentState = { KABU_END };
 	KABUMOVING_STATE	m_eMoveState = { KABUMOVING_END };
 

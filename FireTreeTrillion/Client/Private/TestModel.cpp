@@ -226,7 +226,7 @@ void CTestModel::Late_Tick(_float fTimeDelta)
     //m_pRigidBodyCom->Update(m_pTransformCom);
     m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
 
-    m_pRigidBodyCom->Overlap_Hitbox();
+    //m_pRigidBodyCom->Overlap_Hitbox();
 
 #ifdef _DEBUG
     //m_pGameInstance->RenderGrid();

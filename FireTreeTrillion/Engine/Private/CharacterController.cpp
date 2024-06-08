@@ -348,110 +348,6 @@ PxVec3 CCharacterController::TerrainRayCast_Collision(PxVec3 _rayOrigin, PxVec3 
 		return PxVec3(0.0f, 1.0f, 0.0f);
 }
 
-// NOT YET
-//PxControllerCollisionFlags CCharacterController::Move(_float3 vVelocity, _float fTimeDelta, _float minDist)
-//{
-//	// Disp == direction * speed * delta(delta 시간 동안의 이동량)
-//	vVelocity *= fTimeDelta;
-//
-//	const physx::PxVec3 vDisp{vVelocity.x, vVelocity.y, vVelocity.z};
-//	return m_pController->move(vDisp, minDist, fTimeDelta, m_ControllerFilters);
-//}
- 
-// NOT YET
-//PxControllerCollisionFlags CCharacterController::MoveDisp(_float3 vPosDelta, _float fTimeDelta, _float minDist)
-//{
-//	const physx::PxVec3 vDisp{vPosDelta.x, vPosDelta.y, vPosDelta.z};
-//	return m_pController->move(vDisp, minDist, fTimeDelta, m_ControllerFilters);
-//}
-
-/*
-void CCharacterController::Overlap_Hitbox()
-{
-	// 히트박스 기하학적 모양 정의 (박스 형태)
-	PxBoxGeometry hitboxGeometry(PxVec3(1.0f, 1.0f, 1.0f)); // 히트박스 크기
-
-	// 히트박스 위치 설정 (플레이어 앞)
-	PxExtendedVec3 pxPos = m_pController->getPosition() + PxExtendedVec3(2.0f, 0.0f, 0.0f);
-
-	// PxVec3로 변환
-	PxVec3 translation(pxPos.x, pxPos.y, pxPos.z);
-	// 회전은 기본값으로 설정
-	PxQuat rotation;
-	// PxTransform 생성하여 반환
-	PxTransform hitboxPose(translation, rotation);// = (m_pController->getPosition() + PxVec3(2.0f, 0.0f, 0.0f)); // 플레이어 앞 2.0m 위치
-	
-	// Overlap 테스트 실행
-	PxOverlapBuffer hitBuffer; // 충돌 정보를 저장할 버퍼
-	bool status = m_pController->getActor()->getScene()->overlap(hitboxGeometry, hitboxPose, hitBuffer);
-
-	if (status)
-	{
-		cout << "Hitbox overlap detected with " << hitBuffer.getNbAnyHits() << " objects." << endl;
-		for (PxU32 i = 0; i < hitBuffer.getNbAnyHits(); i++) {
-			const PxOverlapHit& hit = hitBuffer.getAnyHit(i);
-			PxActor* actor = hit.actor;
-			if (actor)
-			{
-				const char* name = actor->getName();
-				cout << "Hit object: " << (name ? name : "Unnamed Actor") << endl;
-				// 몬스터와의 충돌 처리
-			}
-		}
-	}
-	else
-	{
-		//No hitbox overlap detected.
-	}
-}
-*/
-
-void CCharacterController::Overlap_Hitbox()
-{
-	// 히트박스 기하학적 모양 정의 (박스 형태)
-	PxBoxGeometry hitboxGeometry(PxVec3(5.0f, 5.0f, 5.0f)); // 히트박스 크기
-
-	// 컨트롤러의 위치 가져오기
-	PxExtendedVec3 controllerPosition = m_pController->getPosition();
-
-	// PxExtendedVec3에서 PxVec3로 변환
-	PxVec3 controllerVec3Position((_float)controllerPosition.x, (_float)controllerPosition.y, (_float)controllerPosition.z);
-
-	// 히트박스 위치 설정 (플레이어 앞)
-	PxVec3 hitboxPosition = PxVec3(3.f, 9.f, -171.f); //controllerVec3Position + PxVec3(0.5f, -0.5f, 0.0f);
-
-	// 회전은 기본값으로 설정 (항등 쿼터니언)
-	PxQuat rotation = PxQuat(PxIdentity);
-
-	// 히트박스의 변환 생성
-	PxTransform hitboxPose(hitboxPosition, rotation);
-
-	// Overlap 테스트 실행
-	PxOverlapBuffer hitBuffer; // 충돌 정보를 저장할 버퍼
-	PxScene* myScene = m_pController->getActor()->getScene();
-	_bool status = myScene->overlap(hitboxGeometry, hitboxPose, hitBuffer);
-
-	if (status)
-	{
-		cout << "Hitbox overlap detected with " << hitBuffer.getNbAnyHits() << " objects." << endl;
-		for (PxU32 i = 0; i < hitBuffer.getNbAnyHits(); i++) 
-		{
-			const PxOverlapHit& hit = hitBuffer.getAnyHit(i);
-			PxActor* actor = hit.actor;
-			if (actor)
-			{
-				const char* name = actor->getName();
-				cout << "Hit object: " << (name ? name : "Unnamed Actor") << endl;
-				// 몬스터와의 충돌 처리
-			}
-		}
-	}
-	else
-	{
-		//No hitbox overlap detected.
-	}
-}
-
 _bool CCharacterController::Is_Activated()
 {
 	return m_pController != nullptr && m_pController->getActor()->getScene() != nullptr;
@@ -504,7 +400,6 @@ void CCharacterController::Create_Controller()
 	m_pController->getActor()->getShapes(&shape, 1);
 	shape->setSimulationFilterData(physx::PxFilterData{ /*static_cast<physx::PxU32>(m_eCollisionType)*/1, 1, 0, 0 });
 	shape->setQueryFilterData(physx::PxFilterData{/*static_cast<physx::PxU32>(1)*/ 1, 1, 0, 0});//});
-	//m_pGameInstance->RemoveActor(*m_pController->getActor());
 
 	if (m_pObject != nullptr)
 		Set_FootPosition(m_pObject->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION));

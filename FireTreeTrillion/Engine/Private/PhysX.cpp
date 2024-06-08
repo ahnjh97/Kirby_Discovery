@@ -211,14 +211,6 @@ void CPhysX::Clear_EventCallBack()
 //    //return itr->second;
 //}
 
-// Actor에 넣어둔 data를 가져온다. >> Not Yet >> 이 부분은 사용하려는 것의 정보를 가져오게 설정 바꿀것.
-//CComponent* CPhysX::Get_Component(physx::PxActor* pActor)
-//{
-//    if (pActor == nullptr || pActor->userData == nullptr)
-//        return nullptr;
-//    return static_cast<CComponent*>(pActor->userData);
-//}
-
 PxRigidDynamic* CPhysX::CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)
 {
     PxCookingParams tParams(mToleranceScale);
@@ -262,6 +254,7 @@ PxRigidDynamic* CPhysX::CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, 
     pShape->setSimulationFilterData(physx::PxFilterData{ 1, 1, 0, 0 });
     //pShape->setSimulationFilterData(physx::PxFilterData{ 1, 1, 0, 0 });
 
+    pDynamicActor->userData = "RigidMesh";
     pDynamicActor->attachShape(*pShape);
     m_pScene->addActor(*pDynamicActor);
     pMesh->release();
@@ -494,60 +487,6 @@ void CUserControllerHitReport::CollsionEvent(CGameObject* pObj, CGameObject* pOt
     break;
     }
 }
-
-//void CUserControllerHitReport::onControllerHit(const PxControllersHit& hit)
-//{
-//    PxController* MeController = hit.controller;
-//    PxController* otherController = hit.other;
-//
-//    // wi
-//    CComponent* pComponentDst = static_cast<CComponent*>(MeController->getUserData());
-//    CComponent* pComponentSrc = static_cast<CComponent*>(otherController->getUserData());
-//
-//    if (pComponentDst != nullptr && pComponentSrc != nullptr)
-//    {
-//        CGameObject* pActorObjectDst = pComponentDst->Get_Object();
-//        COLLISION_TYPE objectTypeDst = pActorObjectDst->Get_CollisionGroup();
-//
-//        CGameObject* pActorObjectSrc = pComponentSrc->Get_Object();
-//        COLLISION_TYPE objectTypeSrc = pActorObjectSrc->Get_CollisionGroup();
-//
-//
-//        switch (objectTypeDst)
-//        {
-//        case COLLISION_TYPE::PLAYER:
-//            pActorObjectDst->Collision_Attack(pActorObjectSrc);
-//            //handlePlayerCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[0]), static_cast<PxRigidDynamic*>(pairHeader.actors[1]));
-//            break;
-//        case COLLISION_TYPE::MONSTER:
-//            pActorObjectDst->Collision_Attack();
-//            //handleEnemyCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[0]), static_cast<PxRigidDynamic*>(pairHeader.actors[1]));
-//            break;
-//        case COLLISION_TYPE::INTERACT:
-//            //MSG_BOX(TEXT("충돌 주체가 FRIEND"));
-//            //handleObstacleCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[0]), static_cast<PxRigidDynamic*>(pairHeader.actors[1]));
-//            break;
-//        }
-//
-//        switch (objectTypeSrc)
-//        {
-//        case COLLISION_TYPE::PLAYER:
-//            pActorObjectSrc->Collision_Attack();
-//            //MSG_BOX(TEXT("충돌 대상자가 PLAYER"));
-//            //handlePlayerCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[1]), static_cast<PxRigidDynamic*>(pairHeader.actors[0]));
-//            break;
-//        case COLLISION_TYPE::MONSTER:
-//            pActorObjectSrc->Collision_Attack();
-//            //MSG_BOX(TEXT("충돌 대상자가 MONSTER"));
-//            //handleEnemyCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[1]), static_cast<PxRigidDynamic*>(pairHeader.actors[0]));
-//            break;
-//        case COLLISION_TYPE::INTERACT:
-//            //handleObstacleCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[1]), static_cast<PxRigidDynamic*>(pairHeader.actors[0]));
-//            break;
-//        }
-//    }
-//}
-
 
 PxFilterFlags CustomFilterShader(PxFilterObjectAttributes attributes0, PxFilterData filterData0,
     PxFilterObjectAttributes attributes1, PxFilterData filterData1, PxPairFlags& pairFlags, const void* constantBlock, PxU32 constantBlockSize)

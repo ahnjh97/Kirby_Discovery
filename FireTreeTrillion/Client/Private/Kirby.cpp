@@ -85,7 +85,6 @@ HRESULT CKirby::Initialize(void* pArg)
 
 _int CKirby::Tick(_float fTimeDelta)
 {
-
 	if (m_bDead == true)
 		return OBJ_DEAD;
 
@@ -112,7 +111,6 @@ _int CKirby::Tick(_float fTimeDelta)
 
 void CKirby::Late_Tick(_float fTimeDelta)
 {
-
 	m_pModelCom[INFO(m_eBodyState)]->Play_Animation(m_fTimeDelta);
 
 	if (INFO(m_eBodyState) != BODY_DEFAULT)
@@ -131,11 +129,7 @@ void CKirby::Late_Tick(_float fTimeDelta)
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_DEFERREDINFO, this);
 	}
-
-	//if (m_pControllerCom != nullptr)
-		//m_pControllerCom->Overlap_Hitbox();
-
-	//m_pRigidBodyCom->Set_PxWorldMatrix(m_pTransformCom->Get_WorldFloat4x4());
+	m_pRigidBodyCom->Overlap_Hitbox(this, GET_POS);
 }
 
 HRESULT CKirby::Render()
@@ -197,12 +191,11 @@ void CKirby::Render_IMGUI()
 		ImGui::TreePop();
 	}
 
-
-	ImGui::Text("Vacuuming : %d", m_bVacuuming);
-	ImGui::Text("ObjectAddress : %d", INFO(m_pObject));
-	ImGui::Text("ChargeTime : %.2f", INFO(m_fChargeTime));
-	ImGui::Text("MoveSpeed : %.2f", INFO(m_fMoveSpeed));
-	ImGui::Text("PREATTACKSTATE : %d", INFO(m_ePreAttackState));
+	ImGui::Text("Vacuuming : %d",		 m_bVacuuming);
+	ImGui::Text("ObjectAddress : %d",	 INFO(m_pObject));
+	ImGui::Text("ChargeTime : %.2f",	 INFO(m_fChargeTime));
+	ImGui::Text("MoveSpeed : %.2f",		 INFO(m_fMoveSpeed));
+	ImGui::Text("PREATTACKSTATE : %d",	 INFO(m_ePreAttackState));
 	ImGui::Text("TemporaryEatType : %d", INFO(m_eTemporaryEatType));
 
 	ImGui::Text("FSM : %d", m_pFSM->Get_State());
@@ -254,8 +247,8 @@ void CKirby::Add_AnimEvent()
 	// 3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
 	m_pModelCom[INFO(m_eBodyState)]->Add_Event("ApplyDamage", [this]() {
 
-		//데미지 처리
-
+		// 커비의 RigidBody가 충돌된 부분을 판정
+		//m_pRigidBodyCom->Overlap_Hitbox();
 
 		});
 }
@@ -321,41 +314,11 @@ void CKirby::Collision_Attack(CGameObject* pOtherObj)
 	}
 }
 
-void CKirby::Collision_Overlap()
+void CKirby::Collision_Overlap(CGameObject* pGameObject)
 {
-	//PerformHitboxOverlapTest();
-}
-
-void CKirby::PerformHitboxOverlapTest() 
-{
-	//// 히트박스 기하학적 모양 정의 (박스 형태)
-	//PxBoxGeometry hitboxGeometry(PxVec3(1.0f, 1.0f, 1.0f)); // 히트박스 크기
-
-	//// 히트박스 위치 설정 (플레이어 앞)
-	//PxTransform hitboxPose(mActor->getGlobalPose().p + PxVec3(2.0f, 0.0f, 0.0f)); // 플레이어 앞 2.0m 위치
-
-	//// Overlap 테스트 실행
-	//PxOverlapBuffer hitBuffer; // 충돌 정보를 저장할 버퍼
-	//bool status = mScene->overlap(hitboxGeometry, hitboxPose, hitBuffer);
-
-	//if (status) 
-	//{
-	//	cout << "Hitbox overlap detected with " << hitBuffer.getNbAnyHits() << " objects." << endl;
-	//	for (PxU32 i = 0; i < hitBuffer.getNbAnyHits(); i++) {
-	//		const PxOverlapHit& hit = hitBuffer.getAnyHit(i);
-	//		PxActor* actor = hit.actor;
-	//		if (actor) 
-	//		{
-	//			const char* name = actor->getName();
-	//			cout << "Hit object: " << (name ? name : "Unnamed Actor") << endl;
-	//			// 몬스터와의 충돌 처리
-	//		}
-	//	}
-	//}
-	//else 
-	//{
-	//	//No hitbox overlap detected.
-	//}
+	// kirby의 뱃살에서 충돌이 일어날 경우 처리해야하는 일들
+	// 여기서부터 n차 회의 진행할것 QZR
+	_int a = 3;
 }
 
 _float3 CKirby::Make_RepulsiveDir(CPhysXObject* pObject)
@@ -387,21 +350,21 @@ void CKirby::Setting_KirbyBalance()
 	// 카메라 기준 실시간 방향 탐색
 	CTransform* pCameraTransform = m_pCamera->Get_TransformCom();
 	_float4 vCamRight = pCameraTransform->Get_State_Vector(CTransform::STATE_RIGHT);
-	_float4 vCamLook = XMVector3Cross(vCamRight, XMVectorSet(0.f, 1.f, 0.f, 1.f));
+	_float4 vCamLook  = XMVector3Cross(vCamRight, XMVectorSet(0.f, 1.f, 0.f, 1.f));
 	_float fCX = vCamLook.x;
 	_float fCZ = vCamLook.z;
 	_float fKX = INFO(m_vMoveDir).x;
 	_float fKZ = INFO(m_vMoveDir).z;
 	_float fAngle = (atan2f(fCX, fCZ) * 180.0f / XM_PI) - (atan2f(fKX, fKZ) * 180.0f / XM_PI);
 	if (fAngle < 0.f) fAngle += 360.0f;
-	if (fAngle >= 337.5f || fAngle < 22.5f) INFO(m_eKirbyDir) = DIR_FRONT;
-	else if (fAngle >= 22.5f && fAngle < 67.5f) INFO(m_eKirbyDir) = DIR_LF;
-	else if (fAngle >= 67.5f && fAngle < 112.5f) INFO(m_eKirbyDir) = DIR_LEFT;
+	if (fAngle >= 337.5f || fAngle < 22.5f)		  INFO(m_eKirbyDir) = DIR_FRONT;
+	else if (fAngle >= 22.5f && fAngle < 67.5f)   INFO(m_eKirbyDir) = DIR_LF;
+	else if (fAngle >= 67.5f && fAngle < 112.5f)  INFO(m_eKirbyDir) = DIR_LEFT;
 	else if (fAngle >= 112.5f && fAngle < 157.5f) INFO(m_eKirbyDir) = DIR_LB;
 	else if (fAngle >= 157.5f && fAngle < 202.5f) INFO(m_eKirbyDir) = DIR_BACK;
 	else if (fAngle >= 202.5f && fAngle < 247.5f) INFO(m_eKirbyDir) = DIR_RB;
 	else if (fAngle >= 247.5f && fAngle < 292.5f) INFO(m_eKirbyDir) = DIR_RIGHT;
-	else if (fAngle >= 292.5 && fAngle < 337.5f) INFO(m_eKirbyDir) = DIR_RF;
+	else if (fAngle >= 292.5 && fAngle < 337.5f)  INFO(m_eKirbyDir) = DIR_RF;
 }
 
 void CKirby::Key_Input(_float fTimeDelta)
@@ -561,13 +524,17 @@ HRESULT CKirby::Add_Components()
 	CRigidBody::RIGIDBODY_DESC rigidDesc {};
 	rigidDesc.bTrigger = false;
 	rigidDesc.bDynamic = true;
+	rigidDesc.bKinematic = true;
 	rigidDesc.eShapeType = RIGID_SPHERE;
 	rigidDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
 	hr = __super::Add_Component(TEXT("Prototype_Component_RigidBody"),
 								TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &rigidDesc);
 	CHECK_FAILED(hr);
 	m_pRigidBodyCom->Set_Object(this);
+	// JYWI(QZR) : 처음값을 false로 하고, RigidBodyCom을 언제 Activate = true로 바꿀까.
 	m_pRigidBodyCom->Activate(true);
+	// JYWI(QZR) : 정현이한테 혼날 것 같은 set함수 for test 추후 구조 바꿀게요.
+	m_pRigidBodyCom->Set_ActorName(CUtils::WstrToStr(m_wstrPrototypeTag));
 
 	// FOR ANIMTOOL
 	m_ppModelForAnimTool = &m_pModelCom[BODY_DEFAULT];
@@ -576,14 +543,11 @@ HRESULT CKirby::Add_Components()
 	/* FSM */
 	SetUp_FSM();
 
-
-
 	return S_OK;
 }
 
 HRESULT CKirby::Add_PartObjects()
 {
-
 	CKirbyWeapons::KIRBYWEAPON_DESC	WeaponDesc{};
 	//CModel* pModel = (CModel*)Get_Component(TEXT("Com_Model_SwordDefault"));
 	WeaponDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
