@@ -349,15 +349,9 @@ HRESULT CRenderer::Initialize()
 	// DEFERRED INFO
 	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_DeferredInfo"), 900.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
 		return E_FAIL;
-
-#pragma region READY_UI
-
-	//06.04) UI ∑ª¥ı≈∏∞Ÿ ∫‰ ª˝º∫ π◊ ¡ÿ∫Ò
-	//∑ª¥ı«“ ∫‰∆˜∆Æ ºº∆√
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_UI"), 50.f, 50.f, 100.f, 100.f)))
+	
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_UI"), 50.f, 75.f, 100.f, 100.f)))
 		return E_FAIL;
-
-#pragma endregion
 
 #endif
 
@@ -571,7 +565,6 @@ HRESULT CRenderer::Bind_DeferredRawValue(const _char* pConstantName, const void*
 	return S_OK;
 }
 
-
 void CRenderer::Set_ColorSet(COLOR_DATA destColorData)
 {
 	//¿œ¥‹ -1∑Œ √ ±‚»≠
@@ -727,7 +720,6 @@ HRESULT CRenderer::Render_LightDepth_For_PartObject(CShader* pShader, const _flo
 }
 
 #ifdef _DEBUG
-
 HRESULT CRenderer::Add_DebugComponents(CComponent* pRenderComponent)
 {
 	m_DebugComponents.emplace_back(pRenderComponent);
@@ -736,7 +728,6 @@ HRESULT CRenderer::Add_DebugComponents(CComponent* pRenderComponent)
 
 	return S_OK;
 }
-
 #endif
 
 HRESULT CRenderer::Render_Priority()

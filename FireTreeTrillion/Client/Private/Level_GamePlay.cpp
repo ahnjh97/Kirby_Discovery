@@ -208,7 +208,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& strLayerTag)
 		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vCenter), sizeof(UIobj_Desc.vCenter));
 		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vSize), sizeof(UIobj_Desc.vSize));
 		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vPos), sizeof(UIobj_Desc.vPos));
-		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.fDegree), sizeof(UIobj_Desc.fDegree));
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vPersDegree), sizeof(UIobj_Desc.vPersDegree));
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.fOrthoDegree), sizeof(UIobj_Desc.fOrthoDegree));
 		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.iTexIndex), sizeof(UIobj_Desc.iTexIndex));
 
 		string strText = {};
@@ -221,19 +222,31 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& strLayerTag)
 		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vColorRGB), sizeof(UIobj_Desc.vColorRGB));
 		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.fAlpha), sizeof(UIobj_Desc.fAlpha));
 
-		//UITag 레이어명에 따라 객체를 생성
-		if ("LayerUI" != strUITag)
-			continue;
-		//if ("HUD_kribyStatus" == strUITag)
+		//if ("LayerUI" == strUITag)
+		//	return;
+		
+		//else
 		//{
-		//	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, CUtils::StrToWstr(strProtoTag), &UIobj_Desc)))
-		//		return E_FAIL;
+			//UITag 레이어명에 따라 객체를 생성 > 프로토타입을 저장할떄 변경할거라 Tag는 추후 처리
+			//size_t strPos = strProtoTag.find("_"); //찾을 문자열 위치
+			//if (wstrUITag == m_UIObjDesc.wstrUITag)
+			//{
+			//}
+			//if (strPos != string::npos) //문자열 위치에 언더바가 존재할 경우
+			//{
+			//	strProtoTag = strProtoTag.substr(0, strPos); //언더바 이전 문자열만 남김
+				//++i;
+				//wstrNum = to_wstring(i);
+				// 
+				//strProtoTag += TEXT("-") + strUITag;
+			//}
+			//wstrUITag += TEXT("-") + wstrNum;
 		//}
-		else
-		{
+
+		//{
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, CUtils::StrToWstr(strProtoTag), &UIobj_Desc)))
 				return E_FAIL;
-		}
+		//}
 	}
 
 	return S_OK;

@@ -9,6 +9,8 @@ class ENGINE_DLL CUIObject abstract : public CGameObject
 protected:
 	enum UI_TYPE { UI_TEXTURE, UI_FONT, UI_NONE };
 	enum UI_STATE { UI_LAYER, UI_GROUP, UI_END };
+
+	enum UI_PROJ { PROJ_ORTHO, PROJ_PERSPEC, PROJ_NONE };
 	enum GROUP_TYPE { GROUP_ALL, GROUP_SELECT, GROUP_NONE };
 
 protected:
@@ -25,11 +27,12 @@ protected:
 public:
 	typedef struct : public CGameObject::GAMEOBJECT_DESC
 	{
-		UI_TYPE		eUIType = { UI_NONE }; //
+		UI_TYPE		eUIType = { UI_NONE };
+		UI_PROJ		eUIProj = { PROJ_NONE };
 		wstring		wstrUITag = { TEXT("") };
 
-		_float3		vCenter, vSize, vPos = { 0.f, 0.f, 0.f };
-		_float		fDegree = { 0.f };
+		_float3		vCenter, vSize, vPos, vPersDegree = { 0.f, 0.f, 0.f };
+		_float		fOrthoDegree = { 0.f };
 		_int		iTexIndex = { 0 };
 		
 		wstring		wstrText = { TEXT("") };
@@ -98,6 +101,7 @@ protected:
 
 	UIOBJ_DESC					m_UIObjDesc{};
 	UI_TYPE						m_eUIType = { UI_NONE };
+	UI_PROJ						m_eUIProj = { PROJ_NONE };
 	UIANIM_DESC					m_UIAnimDesc{};
 	
 	_uint						m_iTexIndex = { 0 };

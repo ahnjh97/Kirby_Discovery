@@ -47,10 +47,27 @@ HRESULT CLayerUI::Initialize(void* _pArg)
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, 
 			XMVectorSet(m_UIObjDesc.vPos.x - m_UIObjDesc.vCenter.x + m_UIObjDesc.vCenter.x,
 						m_UIObjDesc.vPos.y - m_UIObjDesc.vCenter.y + m_UIObjDesc.vCenter.y, 0.f, 1.f));
-		m_pTransformCom->Rotation(XMVectorSet(0.f, 0.f, 1.f, 1.f), XMConvertToRadians(m_UIObjDesc.fDegree));
+
+
+#pragma region SET_PROJ
+
+	if (PROJ_ORTHO == m_UIObjDesc.eUIProj)
+	{
+		m_UIObjDesc.fOrthoDegree = (*LayerUI_Desc).fOrthoDegree;
+		m_pTransformCom->Rotation(XMVectorSet(0.f, 0.f, 1.f, 1.f), XMConvertToRadians(m_UIObjDesc.fOrthoDegree));
+		XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
+	}
+
+	if (PROJ_PERSPEC == m_UIObjDesc.eUIProj)
+	{
+		m_UIObjDesc.vPersDegree = (*LayerUI_Desc).vPersDegree;
+		//m_pTransformCom->Rotation(XMVectorSet(0.f, 0.f, 1.f, 1.f), XMConvertToRadians(m_UIObjDesc.fDegree));
+
+	}
+		
+#pragma endregion
 
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
-	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 
 	return S_OK;
 }
@@ -84,7 +101,7 @@ HRESULT CLayerUI::Render()
 		//스프라이트 폰트 렌더 (폰트 테스트용)
 		if (FAILED(m_pGameInstance->
 			Render_Font(TEXT("Font_HUDSub_KR15"), m_UIObjDesc.wstrText, vFontPos, vFontRGBA,
-				XMConvertToRadians(m_UIObjDesc.fDegree))))
+				XMConvertToRadians(m_UIObjDesc.fOrthoDegree))))
 			return E_FAIL;
 	}
 

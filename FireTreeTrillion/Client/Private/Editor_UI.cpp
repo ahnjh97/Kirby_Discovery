@@ -21,6 +21,24 @@ CEditor_UI::CEditor_UI(const CEditor_UI& _rhs)
 {
 }
 
+static _int g_iSelectUI, g_iSelectTex = -1;
+static vector<_int> g_SelectUIs;
+
+enum POPUP_TYPE { POPUP_CREATE, POPUP_DELETE, POPUP_GROUP, POPUP_SAVE, POPUP_LOAD, POPUP_MODIFY, POPUP_NONE };
+enum POPUP_DETAIL {
+	NEED_CREATE, NEED_SELECT,
+	FILE_OPEN, FILE_COPY,
+	DETAIL_NONE
+};
+
+static POPUP_TYPE g_eOpenPopup = { POPUP_NONE };
+static POPUP_DETAIL g_ePopupDetail = { DETAIL_NONE };
+
+static _bool g_IsSuccessed = { FALSE };
+static _bool g_IsOrthoProj = { TRUE };
+string g_strResult, g_strPopupTag, g_strMessage, g_strDetail = { u8" " };
+string strUITag = { "LayerUI" };
+
 HRESULT CEditor_UI::Initialize_Prototype()
 {
 	return S_OK;
@@ -99,7 +117,10 @@ void CEditor_UI::Late_Tick(_float _fTimeDelta)
 HRESULT CEditor_UI::Render()
 {
 	ImGuizmo::BeginFrame(); //기즈모 생성 및 초기화
-	ImGuizmo::SetOrthographic(TRUE); //기즈모 직교기준
+
+	//기즈모 직교/원근 세팅
+	if (g_IsOrthoProj) { ImGuizmo::SetOrthographic(TRUE); }
+	else { ImGuizmo::SetOrthographic(FALSE); }
 
 	Window_PopupAlert();
 	Set_DockSpace(); //IMGUI DOCKSPACE
@@ -215,23 +236,6 @@ _bool CEditor_UI::Set_DockSpace()
 	return TRUE;
 }
 
-static _int iSelectUI, iSelectTex = -1;
-static vector<_int> SelectUIs;
-
-enum POPUP_TYPE { POPUP_CREATE, POPUP_DELETE, POPUP_GROUP, POPUP_SAVE, POPUP_LOAD, POPUP_MODIFY, POPUP_NONE };
-enum POPUP_DETAIL {
-	NEED_CREATE, NEED_SELECT,
-	FILE_OPEN, FILE_COPY,
-	DETAIL_NONE
-};
-
-static POPUP_TYPE eOpenPopup = { POPUP_NONE };
-static POPUP_DETAIL ePopupDetail = { DETAIL_NONE };
-
-static _bool IsSuccessed = { FALSE };
-string strResult, strPopupTag, strMessage, strDetail = { u8" " };
-string strUITag = { "LayerUI" };
-
 _bool CEditor_UI::Window_Directories()
 {
 	ImGuiWindowFlags Dirwindow_Flags{}; /*= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize;*/
@@ -269,9 +273,9 @@ _bool CEditor_UI::Tab_LayerList()
 				if (strUITag.empty()) //wstrUITag 값에 대한 예외처리
 					strUITag = "##";
 
-				//const _bool IsSelected = iSelectUI == iUI;
+				//const _bool IsSelected = g_iSelectUI == iUI;
 				//if (ImGui::Selectable(strUITag.c_str(), IsSelected)) //리스트박스 항목 단일 선택
-				//	iSelectUI = iUI;
+				//	g_iSelectUI = iUI;
 				//if (IsSelected) //목록 선택할 경우, 선택 대상에게 기즈모 동기화
 				//{
 				//	ImGui::SetItemDefaultFocus();
@@ -280,25 +284,25 @@ _bool CEditor_UI::Tab_LayerList()
 				//}
 
 #pragma region LISTBOX 다중선택
-				const _bool IsSelected = find(SelectUIs.begin(), SelectUIs.end(), iUI) != SelectUIs.end();
+				const _bool IsSelected = find(g_SelectUIs.begin(), g_SelectUIs.end(), iUI) != g_SelectUIs.end();
 				if (ImGui::Selectable(strUITag.c_str(), IsSelected)) //리스트박스 항목 선택 여부 확인
 				{
 					if (ImGui::GetIO().KeyShift) //다중 선택
 					{
 						if (!IsSelected)
-							SelectUIs.push_back(iUI);
+							g_SelectUIs.push_back(iUI);
 					}
 					else //단일 선택
 					{
-						SelectUIs.clear();
-						SelectUIs.push_back(iUI);
+						g_SelectUIs.clear();
+						g_SelectUIs.push_back(iUI);
 					}
 				}
 				if (IsSelected) //목록 선택할 경우, 선택 대상에게 기즈모 동기화
 				{
 					ImGui::SetItemDefaultFocus();
 
-					if (!m_LayerUIs.empty() && !SelectUIs.empty())
+					if (!m_LayerUIs.empty() && !g_SelectUIs.empty())
 					{
 						Set_GizmoSync(m_LayerUIs[iUI]); //기즈모와 위젯, 오브젝트 동기화 작업
 					}
@@ -323,7 +327,7 @@ _bool CEditor_UI::Tab_LayerList()
 
 					if (ImGui::MenuItem(u8"Modify 변경")) //레이어Tag 변경
 					{
-						IsSuccessed = TRUE; eOpenPopup = POPUP_MODIFY;
+						g_IsSuccessed = TRUE; g_eOpenPopup = POPUP_MODIFY;
 					}
 
 					ImGui::EndPopup();
@@ -361,7 +365,7 @@ _bool CEditor_UI::Tab_GroupList()
 		}
 
 		ImGui::PushItemWidth(290.f);
-		if (ImGui::BeginCombo(u8"##", (iSelectUI >= 0 && iSelectUI < m_GroupUIs.size()) 
+		if (ImGui::BeginCombo(u8"##", (g_iSelectUI >= 0 && g_iSelectUI < m_GroupUIs.size()) 
 			? strUITag.c_str() : u8"그룹을 선택해주세요."))
 		{
 			for (size_t iGroupIx = 0; iGroupIx < m_GroupUIs.size(); ++iGroupIx)
@@ -374,9 +378,9 @@ _bool CEditor_UI::Tab_GroupList()
 					if (strUITag.empty()) //wstrUITag 값에 대한 예외처리
 						strUITag = "##";
 
-					const _bool IsSelected = iSelectUI == iGroupIx;
+					const _bool IsSelected = g_iSelectUI == iGroupIx;
 					if (ImGui::Selectable(strUITag.c_str(), IsSelected))
-						iSelectUI = iGroupIx;
+						g_iSelectUI = iGroupIx;
 				}
 			}
 			ImGui::EndCombo();
@@ -396,18 +400,18 @@ _bool CEditor_UI::Tab_GroupList()
 					if (strUITag.empty()) //wstrUITag 값에 대한 예외처리
 						strUITag = "##";
 
-					const _bool IsSelected = find(SelectUIs.begin(), SelectUIs.end(), iGroupIx) != SelectUIs.end();
+					const _bool IsSelected = find(g_SelectUIs.begin(), g_SelectUIs.end(), iGroupIx) != g_SelectUIs.end();
 					if (ImGui::Selectable(strUITag.c_str(), IsSelected)) //리스트박스 항목 선택 여부 확인
 					{
 						if (ImGui::GetIO().KeyShift) //다중 선택
 						{
 							if (!IsSelected)
-								SelectUIs.push_back(iLayerIx);
+								g_SelectUIs.push_back(iLayerIx);
 						}
 						else //단일 선택
 						{
-							SelectUIs.clear();
-							SelectUIs.push_back(iLayerIx);
+							g_SelectUIs.clear();
+							g_SelectUIs.push_back(iLayerIx);
 						}
 					}
 					if (IsSelected) //목록 선택할 경우, 선택 대상에게 기즈모 동기화
@@ -459,26 +463,26 @@ _bool CEditor_UI::Window_Textures()
 		//vecUI의 UIObj 순회하며 해당 오브젝트가 가진 텍스처 목록을 출력 
 		if (ImGui::BeginListBox(u8"##Texture List", ImVec2(-FLT_MIN, 10 * ImGui::GetTextLineHeightWithSpacing())))
 		{
-			if ((iSelectUI >= 0 && iSelectUI < m_LayerUIs.size()))
+			if ((g_iSelectUI >= 0 && g_iSelectUI < m_LayerUIs.size()))
 			{
 				//해당 오브젝트의 텍스처 정보
-				CTexture* pUITex = dynamic_cast<CTexture*>(m_LayerUIs[iSelectUI]->Get_Component(TEXT("Com_Texture")));
+				CTexture* pUITex = dynamic_cast<CTexture*>(m_LayerUIs[g_iSelectUI]->Get_Component(TEXT("Com_Texture")));
 				if (!pUITex)
 					return FALSE;
 
 				_uint iMaxTex = pUITex->Get_NumTexture();
 				for (size_t iTex = 0; iTex < iMaxTex; ++iTex)
 					{
-						_uint iTexIndex = m_LayerUIs[iSelectUI]->Get_UIObj_Desc().iTexIndex;
-						string strTexTag = CUtils::WstrToStr(m_LayerUIs[iSelectUI]->Get_UIObj_Desc().wstrUITag);
+						_uint iTexIndex = m_LayerUIs[g_iSelectUI]->Get_UIObj_Desc().iTexIndex;
+						string strTexTag = CUtils::WstrToStr(m_LayerUIs[g_iSelectUI]->Get_UIObj_Desc().wstrUITag);
 						strTexTag += "_" + to_string(iTex);
 
 						if (strTexTag.empty()) //strTexTag 값에 대한 예외처리
 							strTexTag = "##";
 
-						const _bool IsSelected = (iSelectTex == iTex);
+						const _bool IsSelected = (g_iSelectTex == iTex);
 						if (ImGui::Selectable(strTexTag.c_str(), IsSelected))
-							iSelectTex = iTex;
+							g_iSelectTex = iTex;
 
 						if (IsSelected)
 						{
@@ -486,7 +490,7 @@ _bool CEditor_UI::Window_Textures()
 
 							//선택 오브젝트의 텍스처를 보여줌
 							//if (!m_LayerUIs.empty())
-							//	iSelectTex = m_LayerUIs[iSelectUI]->Get_TexIndex(); 
+							//	g_iSelectTex = m_LayerUIs[g_iSelectUI]->Get_TexIndex(); 
 						}
 
 						if (ImGui::BeginPopupContextItem()) // 우클릭하면 컨텍스트 메뉴 표시
@@ -494,8 +498,8 @@ _bool CEditor_UI::Window_Textures()
 							if (ImGui::MenuItem(u8"Modify 변경"))
 							{
 								if (!m_LayerUIs.empty())
-									//m_LayerUIs[iSelectUI]->Set_UIObj_Desc();
-									m_LayerUIs[iSelectUI]->Set_TexIndex(iSelectTex); //선택 텍스처로 변경
+									//m_LayerUIs[g_iSelectUI]->Set_UIObj_Desc();
+									m_LayerUIs[g_iSelectUI]->Set_TexIndex(g_iSelectTex); //선택 텍스처로 변경
 							}
 
 							ImGui::EndPopup();
@@ -522,11 +526,11 @@ _bool CEditor_UI::Window_Properties()
 			{
 				ImGui::SeparatorText(u8"Transform Edit 상태 편집");
 
-				if (!SelectUIs.empty())
+				if (!g_SelectUIs.empty())
 				{
-					iSelectUI = SelectUIs.front();
-					if ((iSelectUI >= 0 && iSelectUI < m_LayerUIs.size()))
-						Edit_Transform(m_LayerUIs[iSelectUI]);
+					g_iSelectUI = g_SelectUIs.front();
+					if ((g_iSelectUI >= 0 && g_iSelectUI < m_LayerUIs.size()))
+						Edit_Transform(m_LayerUIs[g_iSelectUI]);
 				}
 
 				ImGui::EndTabItem();
@@ -595,67 +599,67 @@ _bool CEditor_UI::Window_Sequencer()
 //완료) 전반적인 안내팝업 설정
 void CEditor_UI::Window_PopupAlert()
 {
-	if (!SelectUIs.empty())
+	if (!g_SelectUIs.empty())
 	{
-		iSelectUI = SelectUIs.front();
-		if ((iSelectUI >= 0 && iSelectUI < m_LayerUIs.size()))
+		g_iSelectUI = g_SelectUIs.front();
+		if ((g_iSelectUI >= 0 && g_iSelectUI < m_LayerUIs.size()))
 		{
-			wstring wstrUITag = m_LayerUIs[iSelectUI]->Get_UIObj_Desc().wstrUITag;
+			wstring wstrUITag = m_LayerUIs[g_iSelectUI]->Get_UIObj_Desc().wstrUITag;
 			strUITag = CUtils::WstrToStr(wstrUITag); //{ " LayerUI" };
 		}
 	}
 
-	if (IsSuccessed) strResult = { "Successed" };
-	else strResult = { "Failed" };
+	if (g_IsSuccessed) g_strResult = { "Successed" };
+	else g_strResult = { "Failed" };
 	//{
-	switch (eOpenPopup)
+	switch (g_eOpenPopup)
 	{
-	case POPUP_CREATE:	strPopupTag = { "Create" };
-		switch (ePopupDetail)
-		{	default: strDetail = { u8" " };	break;	}
-		ImGui::OpenPopup(strPopupTag.c_str());
+	case POPUP_CREATE:	g_strPopupTag = { "Create" };
+		switch (g_ePopupDetail)
+		{	default: g_strDetail = { u8" " };	break;	}
+		ImGui::OpenPopup(g_strPopupTag.c_str());
 		break;
 
-	case POPUP_DELETE:	strPopupTag = { "Delete" };
-		switch (ePopupDetail)
-		{	default: strDetail = { u8" " };	break;	}
-		ImGui::OpenPopup(strPopupTag.c_str());
+	case POPUP_DELETE:	g_strPopupTag = { "Delete" };
+		switch (g_ePopupDetail)
+		{	default: g_strDetail = { u8" " };	break;	}
+		ImGui::OpenPopup(g_strPopupTag.c_str());
 		break;
 
-	case POPUP_GROUP:	strPopupTag = { "Group" };
-		switch (ePopupDetail)
+	case POPUP_GROUP:	g_strPopupTag = { "Group" };
+		switch (g_ePopupDetail)
 		{
-		case NEED_CREATE:	strDetail = { u8"Need to Create Layer 생성한 레이어가 없습니다" }; break;
-		case NEED_SELECT:	strDetail = { u8"Need to Select Layer 레이어를 선택해주세요" }; break;
-		default: strDetail = { u8" " }; break;
+		case NEED_CREATE:	g_strDetail = { u8"Need to Create Layer 생성한 레이어가 없습니다" }; break;
+		case NEED_SELECT:	g_strDetail = { u8"Need to Select Layer 레이어를 선택해주세요" }; break;
+		default: g_strDetail = { u8" " }; break;
 		}
-		ImGui::OpenPopup(strPopupTag.c_str());
+		ImGui::OpenPopup(g_strPopupTag.c_str());
 		break;
 
-	case POPUP_SAVE:	strPopupTag = { "Save" };
-		switch (ePopupDetail)
+	case POPUP_SAVE:	g_strPopupTag = { "Save" };
+		switch (g_ePopupDetail)
 		{
-		case NEED_CREATE:	strDetail = { u8"Need to Create Layer 생성한 레이어가 없습니다" }; break;
-		case FILE_OPEN:		strDetail = { u8"Check the File Path & Name 파일 경로와 이름을 확인해주세요" }; break;
-		case FILE_COPY:		strDetail = { u8"Copy Failed" }; break;
-		case DETAIL_NONE: default: strDetail = { u8" " }; break;
+		case NEED_CREATE:	g_strDetail = { u8"Need to Create Layer 생성한 레이어가 없습니다" }; break;
+		case FILE_OPEN:		g_strDetail = { u8"Check the File Path & Name 파일 경로와 이름을 확인해주세요" }; break;
+		case FILE_COPY:		g_strDetail = { u8"Copy Failed" }; break;
+		case DETAIL_NONE: default: g_strDetail = { u8" " }; break;
 		}
-		ImGui::OpenPopup(strPopupTag.c_str());
+		ImGui::OpenPopup(g_strPopupTag.c_str());
 		break;
 
-	case POPUP_LOAD:	strPopupTag = { "Load" };
-		switch (ePopupDetail)
+	case POPUP_LOAD:	g_strPopupTag = { "Load" };
+		switch (g_ePopupDetail)
 		{
-		case FILE_OPEN:		strDetail = { u8"Check the File Path & Name 파일 경로와 이름을 확인해주세요" }; break;
-		case DETAIL_NONE: default: strDetail = { u8" " }; break;
+		case FILE_OPEN:		g_strDetail = { u8"Check the File Path & Name 파일 경로와 이름을 확인해주세요" }; break;
+		case DETAIL_NONE: default: g_strDetail = { u8" " }; break;
 		}
-		ImGui::OpenPopup(strPopupTag.c_str());
+		ImGui::OpenPopup(g_strPopupTag.c_str());
 		break;
 
-	case POPUP_MODIFY:	strPopupTag = { "Modify" };
-		switch (ePopupDetail)
-		{	default: strDetail = { u8" " };	break;	}
-		ImGui::OpenPopup(strPopupTag.c_str());
+	case POPUP_MODIFY:	g_strPopupTag = { "Modify" };
+		switch (g_ePopupDetail)
+		{	default: g_strDetail = { u8" " };	break;	}
+		ImGui::OpenPopup(g_strPopupTag.c_str());
 		break;
 	}
 
@@ -665,17 +669,17 @@ void CEditor_UI::Window_PopupAlert()
 	ImGuiWindowFlags Popup_Flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove;
 	ImGui::SetNextWindowPos(ViewCenter, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 	ImGui::SetNextWindowSize(ViewCenter * 0.3f);
-	if (ImGui::BeginPopupModal(strPopupTag.c_str(), NULL, Popup_Flags))
+	if (ImGui::BeginPopupModal(g_strPopupTag.c_str(), NULL, Popup_Flags))
 	{
 		ImVec2 WindowSize = ImGui::GetWindowSize();
-		ImVec2 MessageSize = ImGui::CalcTextSize(strMessage.c_str());
+		ImVec2 MessageSize = ImGui::CalcTextSize(g_strMessage.c_str());
 		_float MessagePosX = (WindowSize.x - MessageSize.x) * 0.5f;
 		ImGui::SetCursorPos(ImVec2(MessagePosX, WindowSize.y * 0.5f - 20.f));
-		ImGui::Text(strMessage.c_str());
+		ImGui::Text(g_strMessage.c_str());
 
-		ImVec2 DetailSize = ImGui::CalcTextSize(strDetail.c_str());
+		ImVec2 DetailSize = ImGui::CalcTextSize(g_strDetail.c_str());
 		_float DetailPosX = (WindowSize.x - DetailSize.x) * 0.5f;
-		if ("Modify" == strPopupTag)
+		if ("Modify" == g_strPopupTag)
 		{
 			static string strInput(1024 * 16, '\0');
 			ImVec2 InputSize = { 200.f, 0.f };
@@ -690,7 +694,7 @@ void CEditor_UI::Window_PopupAlert()
 		else
 		{
 			ImGui::SetCursorPos(ImVec2(DetailPosX, WindowSize.y * 0.5f - 5.f));
-			ImGui::Text(strDetail.c_str());
+			ImGui::Text(g_strDetail.c_str());
 		
 			ImGui::Spacing();
 			ImGui::Separator();
@@ -702,8 +706,8 @@ void CEditor_UI::Window_PopupAlert()
 		ImGui::SetCursorPos(ImVec2(ButtonPosX, 100.f));
 		if (ImGui::Button("OK", ButtonSize) || m_pGameInstance->Get_DIKeyState(DIK_RETURN, KEY_DOWN)) 
 		{	
-			if ("Modify" == strPopupTag)
-				m_LayerUIs[iSelectUI]->Set_UIObj_Desc(m_UIObjDesc);
+			if ("Modify" == g_strPopupTag)
+				m_LayerUIs[g_iSelectUI]->Set_UIObj_Desc(m_UIObjDesc);
 				
 			ImGui::CloseCurrentPopup(); 
 		}
@@ -713,13 +717,13 @@ void CEditor_UI::Window_PopupAlert()
 
 #pragma endregion
 
-	if ("Modify" == strPopupTag)
-		strMessage = { u8"변경할 레이어 이름을 입력해주세요" };
+	if ("Modify" == g_strPopupTag)
+		g_strMessage = { u8"변경할 레이어 이름을 입력해주세요" };
 
 	else
-		strMessage = strResult + " to " + strPopupTag + " : " + strUITag;
+		g_strMessage = g_strResult + " to " + g_strPopupTag + " : " + strUITag;
 
-	eOpenPopup = POPUP_NONE;
+	g_eOpenPopup = POPUP_NONE;
 
 }
 
@@ -745,9 +749,31 @@ _bool CEditor_UI::Edit_Transform(CUIObject* _pUIObj)
 	UIOBJ_DESC pUIObj_Desc = _pUIObj->Get_UIObj_Desc();
 	pUIObj_Desc.vSize = (_float3)Scale;
 	pUIObj_Desc.vPos = (_float3)Translate;
-	pUIObj_Desc.fDegree = (_float)Rotate[2];
+	pUIObj_Desc.fOrthoDegree = (_float)Rotate[2];
+	pUIObj_Desc.vPersDegree = (_float3)Rotate;
 
-	ImGui::PushItemWidth(ImGui::GetColumnOffset());
+	//직교, 원근투영 옵션 스왑
+	ImGuiStyle Style = ImGui::GetStyle();
+	ImVec2 vPrePadding = Style.FramePadding;
+	Style.FramePadding = ImVec2(20.f, 10.f);
+
+	if (ImGui::RadioButton(u8"Ortho 직교", g_IsOrthoProj)) 
+		g_IsOrthoProj = TRUE;
+	ImGui::SameLine();
+
+	if (ImGui::RadioButton(u8"Perspect 원근", !g_IsOrthoProj)) 
+		g_IsOrthoProj = FALSE;
+	//Style.FramePadding = vPrePadding;
+
+	ImGui::PushItemWidth(175.f/*ImGui::GetColumnOffset()*/);
+	ImGui::Text(u8"Rotate 회전");
+	ImGui::SameLine(); HelpMarker(u8"Ctrl+R");
+	ImGui::SameLine(fTextWidth + 35);
+
+	if (g_IsOrthoProj == TRUE)
+		ImGui::DragFloat("##Rotate Ortho", (_float*)&Rotate[2], 0.1f, (_int)-360, (_int)360, u8"Degree 각도 : %.1f");
+	else {	ImGui::DragFloat3("##Rotate Perspec", (_float*)&Rotate, 0.1f, (_int)-360, (_int)360, "%.1f");	}
+
 	ImGui::Text(u8"Scale 크기");
 	ImGui::SameLine(); HelpMarker(u8"Ctrl+E");
 	ImGui::SameLine(fTextWidth + 35);
@@ -758,10 +784,6 @@ _bool CEditor_UI::Edit_Transform(CUIObject* _pUIObj)
 	ImGui::SameLine(fTextWidth + 35);
 	ImGui::DragFloat3("##Translate", (_float*)&Translate, 1.f, (_float)-0.1 * g_iWinSizeX, (_float)g_iWinSizeX, "%.1f");
 
-	ImGui::Text(u8"Rotate 회전");
-	ImGui::SameLine(); HelpMarker(u8"Ctrl+R");
-	ImGui::SameLine(fTextWidth + 35);
-	ImGui::DragFloat("##Rotate", (_float*)&Rotate[2], 0.1f, (_int)-360, (_int)360, u8"Degree 각도 : %.1f");
 	ImGui::PopItemWidth();
 
 	_pUIObj->Set_UIObj_Desc(pUIObj_Desc);
@@ -774,35 +796,28 @@ _bool CEditor_UI::Edit_Transform(CUIObject* _pUIObj)
 	return TRUE;
 }
 
-//완료) 객체의 색상, 알파 값 편집
+//1차 완료) 객체의 색상, 알파 값 편집
+//텍스트 편집 시 간헐적 색상 비정상 적용 버그
 _bool CEditor_UI::Edit_RGBAColor()
 {
-	//static ImVec4 color = ImVec4(
-	//	(127.0f / 255.0f) / 1.f,
-	//	127.0f / 255.0f,
-	//	127.0f / 255.0f,
-	//	127.0f / 255.0f);
-
-	// Generate a default palette. The palette will persist and can be edited.
-	static _bool saved_palette_init = true;
-	static ImVec4 saved_palette[32] = {};
-	if (saved_palette_init)
-	{
-		for (int n = 0; n < IM_ARRAYSIZE(saved_palette); n++)
-		{
-			ImGui::ColorConvertHSVtoRGB(n / 31.0f, 0.8f, 0.8f,
-				saved_palette[n].x, saved_palette[n].y, saved_palette[n].z);
-			saved_palette[n].w = 1.0f; // Alpha
-		}
-		saved_palette_init = FALSE;
-	}
+	//static _bool saved_palette_init = true;
+	//static ImVec4 saved_palette[32] = {};
+	//if (saved_palette_init)
+	//{
+	//	for (int n = 0; n < IM_ARRAYSIZE(saved_palette); n++)
+	//	{
+	//		ImGui::ColorConvertHSVtoRGB(n / 31.0f, 0.8f, 0.8f,
+	//			saved_palette[n].x, saved_palette[n].y, saved_palette[n].z);
+	//		saved_palette[n].w = 1.0f; // Alpha
+	//	}
+	//	saved_palette_init = FALSE;
+	//}
 	ImGuiColorEditFlags ColorButton_Flags = ImGuiColorEditFlags_NoBorder | ImGuiColorEditFlags_AlphaPreviewHalf /*| ImGuiColorEditFlags_NoTooltip*/;
 	ImGuiColorEditFlags ColorEditRGBA_Flags = ImGuiColorEditFlags_NoSmallPreview;
 	ImGuiColorEditFlags ColorEditHex_Flags = ImGuiColorEditFlags_NoSmallPreview | ImGuiColorEditFlags_DisplayHex;
 	ImGuiColorEditFlags ColorPicker_Flags = { ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar };
-
 	
-	static ImVec4 vColorRGBA{ 0.f, 0.f, 0.f, 1.f };
+	static ImVec4 vColorRGBA{	1.f, 1.f, 1.f, 1.f };
 
 	ImGui::ColorButton("##ColorButton", *(ImVec4*)&vColorRGBA, ColorButton_Flags, ImVec2(50, 45));
 	ImGui::SameLine();
@@ -810,24 +825,24 @@ _bool CEditor_UI::Edit_RGBAColor()
 	ImGui::BeginGroup();
 	ImGui::PushItemWidth(ImGui::GetColumnOffset());
 	ImGui::ColorEdit4("##ColorEdit_RGBA", (_float*)&vColorRGBA, ColorEditRGBA_Flags);
-	ImGui::PopItemWidth();
+	//ImGui::PopItemWidth();
 
-	ImGui::PushItemWidth(ImGui::GetColumnOffset());
+	//ImGui::PushItemWidth(ImGui::GetColumnOffset());
 	ImGui::ColorEdit4("##ColorEdit_HEX", (_float*)&vColorRGBA, ColorEditHex_Flags);
 	ImGui::PopItemWidth();
 	ImGui::EndGroup();
 	//ImGui::NewLine();
 
-	//ImGui::PushItemWidth(ImGui::GetColumnOffset());
+	ImGui::PushItemWidth(245.f);
 	ImGui::ColorPicker4("##ColorPicker", (_float*)&vColorRGBA, ColorPicker_Flags);
-	//ImGui::PopItemWidth();
+	ImGui::PopItemWidth();
 
-	if (!SelectUIs.empty())
+	if (!g_SelectUIs.empty())
 	{
-		iSelectUI = SelectUIs.front();
-		if ((iSelectUI >= 0 && iSelectUI < m_LayerUIs.size()))
+		g_iSelectUI = g_SelectUIs.front();
+		if ((g_iSelectUI >= 0 && g_iSelectUI < m_LayerUIs.size()))
 		{
-			UIOBJ_DESC LayerUIDesc = m_LayerUIs[iSelectUI]->Get_UIObj_Desc();
+			UIOBJ_DESC LayerUIDesc = m_LayerUIs[g_iSelectUI]->Get_UIObj_Desc();
 			
 			//위젯 동기화
 			LayerUIDesc.vColorRGB.x = vColorRGBA.x;
@@ -835,7 +850,7 @@ _bool CEditor_UI::Edit_RGBAColor()
 			LayerUIDesc.vColorRGB.z = vColorRGBA.z;
 			LayerUIDesc.fAlpha = vColorRGBA.w;
 				
-			m_LayerUIs[iSelectUI]->Set_UIObj_Desc(LayerUIDesc);
+			m_LayerUIs[g_iSelectUI]->Set_UIObj_Desc(LayerUIDesc);
 		}
 	}
 
@@ -858,13 +873,13 @@ _bool CEditor_UI::Edit_Text()
 	wstring wstrText{};
 	UIOBJ_DESC LayerUIDesc{};
 
-	if (!SelectUIs.empty())
+	if (!g_SelectUIs.empty())
 	{
-		iSelectUI = SelectUIs.front();
-		if ((iSelectUI >= 0 && iSelectUI < m_LayerUIs.size()))
+		g_iSelectUI = g_SelectUIs.front();
+		if ((g_iSelectUI >= 0 && g_iSelectUI < m_LayerUIs.size()))
 		{
 			//UTF-8 인코딩 변환 작업
-			LayerUIDesc = m_LayerUIs[iSelectUI]->Get_UIObj_Desc();
+			LayerUIDesc = m_LayerUIs[g_iSelectUI]->Get_UIObj_Desc();
 
 			wstrText = CUtils::StrToWstrUTF8(strInput);
 			LayerUIDesc.wstrText = wstrText;
@@ -874,14 +889,14 @@ _bool CEditor_UI::Edit_Text()
 			//FontDesc.wstrText = wstrText;
 			//strInputText = CUtils::StrToUTF8(strInputText); //strANSI > strUTF8 변환 (만약 이미 UTF8이면 변환 안해도됨)
 
-			m_LayerUIs[iSelectUI]->Set_UIObj_Desc(LayerUIDesc);
+			m_LayerUIs[g_iSelectUI]->Set_UIObj_Desc(LayerUIDesc);
 			//strTempText = strInputText;
 
 			//if (strInputText != strTempText) //이전에 입력한 값이랑 현재 값이랑 다를 경우
 			//{
-			//	FontDesc = m_LayerUIs[iSelectUI]->Get_UIObj_Desc();
+			//	FontDesc = m_LayerUIs[g_iSelectUI]->Get_UIObj_Desc();
 			//	FontDesc.wstrText = wstrText;
-			//	m_LayerUIs[iSelectUI]->Set_UIObj_Desc(FontDesc);
+			//	m_LayerUIs[g_iSelectUI]->Set_UIObj_Desc(FontDesc);
 			//}
 		}		
 	}
@@ -897,18 +912,18 @@ CUIObject::UIOBJ_DESC CEditor_UI::Edit_LayerUITag(string _strInput)
 	static wstring wstrUITag{};
 	UIOBJ_DESC LayerUIDesc{};
 
-	if (!SelectUIs.empty())
+	if (!g_SelectUIs.empty())
 	{
-		iSelectUI = SelectUIs.front();
-		if ((iSelectUI >= 0 && iSelectUI < m_LayerUIs.size()))
+		g_iSelectUI = g_SelectUIs.front();
+		if ((g_iSelectUI >= 0 && g_iSelectUI < m_LayerUIs.size()))
 		{
-			LayerUIDesc = m_LayerUIs[iSelectUI]->Get_UIObj_Desc();
+			LayerUIDesc = m_LayerUIs[g_iSelectUI]->Get_UIObj_Desc();
 
 			wstrUITag = CUtils::StrToWstrUTF8(_strInput);
 			LayerUIDesc.wstrUITag = wstrUITag;
 
 			return LayerUIDesc;
-			//m_LayerUIs[iSelectUI]->Set_UIObj_Desc(LayerUIDesc);
+			//m_LayerUIs[g_iSelectUI]->Set_UIObj_Desc(LayerUIDesc);
 		}
 	}
 
@@ -1022,12 +1037,14 @@ void CEditor_UI::Create_UIObject(UI_STATE _eUIState, UI_TYPE _eUIType)
 	if (UI_LAYER == _eUIState) //레이어 생성
 	{
 		UIOBJ_DESC LayerUI_Desc{};
-		//LayerUI_Desc.eUIType = { TYPE_LAYER };
 		LayerUI_Desc.wstrUITag = { TEXT("LayerUI") };
+
+		LayerUI_Desc.eUIProj = PROJ_ORTHO; //직교투영 기본값
 		LayerUI_Desc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f };
 		LayerUI_Desc.vSize = { 100.f, 100.f };
-		LayerUI_Desc.vPos = { 0.f, 0.f };
-		LayerUI_Desc.fDegree = { 0.f };
+		LayerUI_Desc.vPos = { 0.f, 0.f, 0.f };
+		LayerUI_Desc.vPersDegree = { 0.f, 0.f, 0.f };
+		LayerUI_Desc.fOrthoDegree = { 0.f };
 		LayerUI_Desc.vColorRGB = { 1.f, 1.f, 1.f };
 		LayerUI_Desc.fAlpha = { 1.f };
 
@@ -1048,13 +1065,13 @@ void CEditor_UI::Create_UIObject(UI_STATE _eUIState, UI_TYPE _eUIType)
 		CUIObject* pLayerUI = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(CUtils::StrToWstr(strProtoTag), &LayerUI_Desc));
 		if (nullptr == pLayerUI)
 		{
-			IsSuccessed = FALSE;
-			eOpenPopup = POPUP_CREATE;
+			g_IsSuccessed = FALSE;
+			g_eOpenPopup = POPUP_CREATE;
 			CHECK_NULLPTR(pLayerUI);
 		}
 		m_LayerUIs.push_back(pLayerUI);
 
-		IsSuccessed = TRUE; eOpenPopup = POPUP_CREATE;
+		g_IsSuccessed = TRUE; g_eOpenPopup = POPUP_CREATE;
 	}
 
 	if (UI_GROUP == _eUIState) //레이어그룹(캔버스) 생성
@@ -1066,16 +1083,16 @@ void CEditor_UI::Create_UIObject(UI_STATE _eUIState, UI_TYPE _eUIType)
 void CEditor_UI::Delete_UIObject(UI_STATE _eUIState)
 {
 	if (m_LayerUIs.empty())
-		IsSuccessed = FALSE; eOpenPopup = POPUP_DELETE; ePopupDetail = NEED_CREATE;
+		g_IsSuccessed = FALSE; g_eOpenPopup = POPUP_DELETE; g_ePopupDetail = NEED_CREATE;
 
 	if (UI_LAYER == _eUIState) //레이어 삭제
 	{
 		//ListBox에서 선택한 레이어를 삭제
-		if (iSelectUI >= 0 && iSelectUI < m_LayerUIs.size())
+		if (g_iSelectUI >= 0 && g_iSelectUI < m_LayerUIs.size())
 		{
-			m_LayerUIs.erase(m_LayerUIs.begin() + iSelectUI);
-			iSelectUI = -1; // 삭제 후 선택한 UI 인덱스 초기화
-			IsSuccessed = TRUE; eOpenPopup = POPUP_DELETE;
+			m_LayerUIs.erase(m_LayerUIs.begin() + g_iSelectUI);
+			g_iSelectUI = -1; // 삭제 후 선택한 UI 인덱스 초기화
+			g_IsSuccessed = TRUE; g_eOpenPopup = POPUP_DELETE;
 		}
 	}
 
@@ -1089,12 +1106,12 @@ void CEditor_UI::Group_UIObject(GROUP_TYPE _eUIGroup)
 {
 	if (m_LayerUIs.empty()) //레이어가 없음
 	{
-		IsSuccessed = FALSE; eOpenPopup = POPUP_GROUP; ePopupDetail = NEED_CREATE;
+		g_IsSuccessed = FALSE; g_eOpenPopup = POPUP_GROUP; g_ePopupDetail = NEED_CREATE;
 		return;
 	}
-	if (SelectUIs.empty()) //선택 레이어가 없음
+	if (g_SelectUIs.empty()) //선택 레이어가 없음
 	{
-		IsSuccessed = FALSE; eOpenPopup = POPUP_GROUP; ePopupDetail = NEED_SELECT;
+		g_IsSuccessed = FALSE; g_eOpenPopup = POPUP_GROUP; g_ePopupDetail = NEED_SELECT;
 		return;
 	}
 
@@ -1102,17 +1119,17 @@ void CEditor_UI::Group_UIObject(GROUP_TYPE _eUIGroup)
 	{
 		m_GroupUIs.push_back(m_LayerUIs);
 
-		//strDetail = { "Group All" };
-		IsSuccessed = TRUE; eOpenPopup = POPUP_GROUP; ePopupDetail = DETAIL_NONE;
+		//g_strDetail = { "Group All" };
+		g_IsSuccessed = TRUE; g_eOpenPopup = POPUP_GROUP; g_ePopupDetail = DETAIL_NONE;
 	}
 
 	vector<CUIObject*> TpSelectUIs; //임시 벡터
 
 	if (GROUP_SELECT == _eUIGroup) //선택 레이어 그룹화
 	{
-		for (auto& SelectIndex : SelectUIs) //선택한 항목의 벡터 인덱스 검색
+		for (auto& SelectIndex : g_SelectUIs) //선택한 항목의 벡터 인덱스 검색
 		{
-			if ((iSelectUI >= 0 && iSelectUI < m_LayerUIs.size()))
+			if ((g_iSelectUI >= 0 && g_iSelectUI < m_LayerUIs.size()))
 			{
 				TpSelectUIs.push_back(m_LayerUIs[SelectIndex]);
 			}
@@ -1121,11 +1138,11 @@ void CEditor_UI::Group_UIObject(GROUP_TYPE _eUIGroup)
 		if (!TpSelectUIs.empty()) //선택 레이어가 존재할 경우
 		{
 			m_GroupUIs.push_back(TpSelectUIs); //선택 항목의 요소를 벡터에 추가
-			SelectUIs.clear(); //선택 항목 해제
+			g_SelectUIs.clear(); //선택 항목 해제
 		}
 
-		//strDetail = { "Group Select" };
-		IsSuccessed = TRUE; eOpenPopup = POPUP_GROUP; ePopupDetail = DETAIL_NONE;
+		//g_strDetail = { "Group Select" };
+		g_IsSuccessed = TRUE; g_eOpenPopup = POPUP_GROUP; g_ePopupDetail = DETAIL_NONE;
 	}
 
 }
@@ -1143,13 +1160,88 @@ void CEditor_UI::Save_Texture(const string& _strFilePath, ID3D11RenderTargetView
 	wstring wstrFilePath = CUtils::StrToWstr(strFilePath);
 
 	if (m_LayerUIs.empty())
-		IsSuccessed = FALSE; eOpenPopup = POPUP_SAVE; ePopupDetail = NEED_CREATE;
+		g_IsSuccessed = FALSE; g_eOpenPopup = POPUP_SAVE; g_ePopupDetail = NEED_CREATE;
 
 	//텍스처 저장
 	if (FAILED(DirectX::SaveDDSTextureToFile(m_pContext, m_pTexture2D, wstrFilePath.c_str())))
-		IsSuccessed = FALSE; eOpenPopup = POPUP_SAVE; ePopupDetail = FILE_OPEN;
+		g_IsSuccessed = FALSE; g_eOpenPopup = POPUP_SAVE; g_ePopupDetail = FILE_OPEN;
 
-	IsSuccessed = TRUE; eOpenPopup = POPUP_SAVE;
+	g_IsSuccessed = TRUE; g_eOpenPopup = POPUP_SAVE;
+
+#pragma region READY_UI
+
+	//06.04) UI 렌더타겟 뷰 생성 및 준비
+	//렌더할 뷰포트 세팅
+	//if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_UI"), 50.f, 50.f, 100.f, 100.f)))
+	//	return E_FAIL;
+
+	//ViewportDesc.Width * 0.25f, ViewportDesc.Height * 0.25f
+
+	//ID3D11Texture2D* pCopyTex2D = { nullptr };
+	//if (FAILED(m_pGameInstance->Copy_Resource(TEXT("Target_UI"), &pCopyTex2D)))
+	//	return E_FAIL;
+	//
+	//D3D11_TEXTURE2D_DESC CopyTexDesc{};
+	//ZeroMemory(&CopyTexDesc, sizeof(D3D11_TEXTURE2D_DESC));
+
+	//pCopyTex2D->GetDesc(&CopyTexDesc);
+
+	//RTV 직접 접근하면 IMGUI에러로 크래시 발생 (사용안함)
+	//D3D11_RENDER_TARGET_VIEW_DESC CopyRTVDesc = {};
+	//CopyRTVDesc.Format = CopyTexDesc.Format;
+	//CopyRTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+	//CopyRTVDesc.Texture2D.MipSlice = 0;
+	//m_pDevice->CreateRenderTargetView(pCopyTex2D, &CopyRTVDesc, &m_pUIRTV);
+
+	//생성한 RTV 데이터 SRV에 복사
+	//D3D11_SHADER_RESOURCE_VIEW_DESC		CopySRVDesc = {};
+	//CopySRVDesc.Format = CopyTexDesc.Format;
+	//CopySRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	//CopySRVDesc.Texture2D.MostDetailedMip = 0;
+	//CopySRVDesc.Texture2D.MipLevels = 1;
+
+	//복사한 데이터를 기반으로 SRV 생성
+	//m_pDevice->CreateShaderResourceView(pCopyTex2D, &CopySRVDesc, &m_pUISRV);
+	//Safe_Release(pCopyTex2D);
+
+#pragma endregion
+
+#pragma region RENDER_RTV IMGUI
+
+	//레벨 별 옵션 ON/OFF
+	//_uint* iCurrLevel = m_pGameInstance->Get_CurrentLevelID();
+	//if (5 == *iCurrLevel) //LEVEL_TOOL_UI 만
+	//{
+	//	ImGuiWindowFlags Dirwindow_Flags{}; /*= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize;*/
+	//	if (ImGui::Begin(u8"Preview 미리보기", 0, Dirwindow_Flags))
+	//	{
+	//		D3D11_VIEWPORT		ViewportDesc{};
+	//		_uint				iNumViewports = { 1 };
+	//		m_pContext->RSGetViewports(&iNumViewports, &ViewportDesc);
+
+	//		ImVec2 vWinSize = { ViewportDesc.Width * 0.1f, ViewportDesc.Height * 0.1f }; //ImGui::GetWindowSize();
+	//		//06.05) UI 렌더타겟 뷰 렌더
+	//			//m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("UI Default"),
+	//			//	_float2(5.f, 10.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+	//			//이미 생성한 RTV 데이터 저장 및 DESC에 복사
+
+	//		XMStoreFloat4x4(&m_WorldMatrix, XMMatrixIdentity());
+
+	//		m_WorldMatrix._11 = ViewportDesc.Width;
+	//		m_WorldMatrix._22 = ViewportDesc.Height;
+	//		m_WorldMatrix._41 = 0.f;
+	//		m_WorldMatrix._42 = 0.f;
+
+	//		XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
+	//		XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(ViewportDesc.Width, ViewportDesc.Height, 0.f, 1.f));
+
+	//		ImGui::Image((void*)m_pUISRV, vWinSize);
+
+	//	}
+	//	ImGui::End();
+	//}
+
+#pragma endregion
 }
 
 //완료) 데이터 저장
@@ -1166,7 +1258,7 @@ _bool CEditor_UI::Save_FileData(const string& _strFilePath)
 	//벡터가 비었을 경우 
 	if (m_LayerUIs.empty())
 	{
-		IsSuccessed = FALSE; eOpenPopup = POPUP_SAVE; ePopupDetail = NEED_CREATE;
+		g_IsSuccessed = FALSE; g_eOpenPopup = POPUP_SAVE; g_ePopupDetail = NEED_CREATE;
 		return FALSE;
 	}
 
@@ -1177,7 +1269,7 @@ _bool CEditor_UI::Save_FileData(const string& _strFilePath)
 
 	if (!OutputFile.is_open())
 	{
-		IsSuccessed = FALSE; eOpenPopup = POPUP_SAVE; ePopupDetail = FILE_OPEN;
+		g_IsSuccessed = FALSE; g_eOpenPopup = POPUP_SAVE; g_ePopupDetail = FILE_OPEN;
 		return FALSE;
 	}
 
@@ -1186,7 +1278,8 @@ _bool CEditor_UI::Save_FileData(const string& _strFilePath)
 
 	//for (size_t i = 0; i < m_LayerUIs.size(); ++i)
 	for (auto& pUIObj : m_LayerUIs)
-	{
+	{	
+		//strUITag와 조합해서 ProtoTag 변경 후, 클라이언트 파싱 시점에 프로토타입을 찾아 Add Clone을 진행
 		//ProtoType Tag
 		wstring wstProtoTag = pUIObj->Get_PrototypeTag();
 		string strProtoTag = CUtils::WstrToStr(wstProtoTag);
@@ -1197,6 +1290,7 @@ _bool CEditor_UI::Save_FileData(const string& _strFilePath)
 		//eUIType
 		UIOBJ_DESC UIobj_Desc = pUIObj->Get_UIObj_Desc();
 		OutputFile.write(reinterpret_cast<const char*>(&UIobj_Desc.eUIType), sizeof(UIobj_Desc.eUIType));
+		OutputFile.write(reinterpret_cast<const char*>(&UIobj_Desc.eUIProj), sizeof(UIobj_Desc.eUIProj));
 
 		//UITag
 		wstring wstrUITag = UIobj_Desc.wstrUITag;
@@ -1205,52 +1299,31 @@ _bool CEditor_UI::Save_FileData(const string& _strFilePath)
 		OutputFile.write(reinterpret_cast<const char*>(&iUITagLen), sizeof(iUITagLen));
 		OutputFile.write(strUITag.c_str(), iUITagLen);
 
-		//size_t wstrPos = wstrUITag.find(L"-"); //문자열 위치
-		//저장할 때 wstrUITag에 대한 예외처리
-		//if (wstrUITag == m_UIObjDesc.wstrUITag)
-		//{
-		//}
-		//if (wstrPos != wstring::npos) //문자열 위치에 언더바가 존재할 경우
-		//{
-		//	wstrUITag = wstrUITag.substr(0, wstrPos); //언더바 이전 문자열만 남김
-		//	++i;
-		//	wstrNum = to_wstring(i);
-		//	wstrUITag += TEXT("-") + wstrNum;
-		//}
-		//wstrUITag += TEXT("-") + wstrNum;
-
-
 		OutputFile.write(reinterpret_cast<const char*>(&UIobj_Desc.vCenter), sizeof(UIobj_Desc.vCenter));
 		OutputFile.write(reinterpret_cast<const char*>(&UIobj_Desc.vSize), sizeof(UIobj_Desc.vSize));
 		OutputFile.write(reinterpret_cast<const char*>(&UIobj_Desc.vPos), sizeof(UIobj_Desc.vPos));
-		OutputFile.write(reinterpret_cast<const char*>(&UIobj_Desc.fDegree), sizeof(UIobj_Desc.fDegree));
+		OutputFile.write(reinterpret_cast<const char*>(&UIobj_Desc.vPersDegree), sizeof(UIobj_Desc.vPersDegree));
+		OutputFile.write(reinterpret_cast<const char*>(&UIobj_Desc.fOrthoDegree), sizeof(UIobj_Desc.fOrthoDegree));
 
-		//if (UI_TEXTURE == eUIType)
-		//{
-			_uint iTexIndex = pUIObj->Get_TexIndex();
-			OutputFile.write(reinterpret_cast<const char*>(&iTexIndex), sizeof(iTexIndex));
-		//}
+		_uint iTexIndex = pUIObj->Get_TexIndex();
+		OutputFile.write(reinterpret_cast<const char*>(&iTexIndex), sizeof(iTexIndex));
 
-		//if (UI_FONT == eUIType)
-		//{
-			wstring wstrText = pUIObj->Get_UIObj_Desc().wstrText;
-			string strText = CUtils::WstrToStr(wstrText);
-			_uint iUIextLen = strText.length();
+		wstring wstrText = pUIObj->Get_UIObj_Desc().wstrText;
+		string strText = CUtils::WstrToStr(wstrText);
+		_uint iUIextLen = strText.length();
 
-			OutputFile.write(reinterpret_cast<const char*>(&iUIextLen), sizeof(iUIextLen));
-			OutputFile.write(strText.c_str(), iUIextLen);
-			//OutputFile.write(reinterpret_cast<const char*>(&UIobj_Desc.wstrText), sizeof(UIobj_Desc.wstrText));
+		OutputFile.write(reinterpret_cast<const char*>(&iUIextLen), sizeof(iUIextLen));
+		OutputFile.write(strText.c_str(), iUIextLen);
 
-			OutputFile.write(reinterpret_cast<const char*>(&UIobj_Desc.vColorRGB), sizeof(UIobj_Desc.vColorRGB));
-			OutputFile.write(reinterpret_cast<const char*>(&UIobj_Desc.fAlpha), sizeof(UIobj_Desc.fAlpha));
-		//}
+		OutputFile.write(reinterpret_cast<const char*>(&UIobj_Desc.vColorRGB), sizeof(UIobj_Desc.vColorRGB));
+		OutputFile.write(reinterpret_cast<const char*>(&UIobj_Desc.fAlpha), sizeof(UIobj_Desc.fAlpha));
 	}
 
 	OutputFile.close();
 
 	//if (!OutputFile)
 	//{
-	//	IsSuccessed = FALSE; eOpenPopup = POPUP_SAVE; ePopupDetail = FILE_WRITE;
+	//	g_IsSuccessed = FALSE; g_eOpenPopup = POPUP_SAVE; g_ePopupDetail = FILE_WRITE;
 	//	remove(strTempName.c_str()); 	//기존 파일 삭제
 	//	return FALSE;
 	//}
@@ -1259,13 +1332,12 @@ _bool CEditor_UI::Save_FileData(const string& _strFilePath)
 
 	if (rename(strTempName.c_str(), strOriginName.c_str()) != 0) //임시 파일 > 최종 파일
 	{
-		IsSuccessed = FALSE; eOpenPopup = POPUP_SAVE; ePopupDetail = FILE_COPY;
+		g_IsSuccessed = FALSE; g_eOpenPopup = POPUP_SAVE; g_ePopupDetail = FILE_COPY;
 		remove(strOriginName.c_str());
 		return FALSE;
 	}
 
-	//MSG_BOX(TEXT("Successed to Save : FileData"));
-	IsSuccessed = TRUE; eOpenPopup = POPUP_SAVE; ePopupDetail = DETAIL_NONE;
+	g_IsSuccessed = TRUE; g_eOpenPopup = POPUP_SAVE; g_ePopupDetail = DETAIL_NONE;
 	return TRUE;
 }
 
@@ -1276,8 +1348,7 @@ _bool CEditor_UI::Load_FileData(const string& _strFilePath)
 
 	if (!InputFile.is_open()) //==FALSE 
 	{
-		//MSG_BOX(TEXT("Failed to Open : FileData"));
-		IsSuccessed = FALSE; eOpenPopup = POPUP_LOAD; ePopupDetail = FILE_OPEN;
+		g_IsSuccessed = FALSE; g_eOpenPopup = POPUP_LOAD; g_ePopupDetail = FILE_OPEN;
 		return FALSE;
 	}
 
@@ -1300,6 +1371,7 @@ _bool CEditor_UI::Load_FileData(const string& _strFilePath)
 		string strUITag = {};
 		_uint iUITagLen = {};
 		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.eUIType), sizeof(UIobj_Desc.eUIType));
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.eUIProj), sizeof(UIobj_Desc.eUIProj));
 
 		InputFile.read(reinterpret_cast<char*>(&iUITagLen), sizeof(iUITagLen));
 		strUITag.resize(iUITagLen);
@@ -1310,24 +1382,20 @@ _bool CEditor_UI::Load_FileData(const string& _strFilePath)
 		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vCenter), sizeof(UIobj_Desc.vCenter));
 		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vSize), sizeof(UIobj_Desc.vSize));
 		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vPos), sizeof(UIobj_Desc.vPos));
-		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.fDegree), sizeof(UIobj_Desc.fDegree));
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vPersDegree), sizeof(UIobj_Desc.vPersDegree));
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.fOrthoDegree), sizeof(UIobj_Desc.fOrthoDegree));
 
-		//if (UI_TEXTURE == UIobj_Desc.eUIType)
-			InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.iTexIndex), sizeof(UIobj_Desc.iTexIndex));
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.iTexIndex), sizeof(UIobj_Desc.iTexIndex));
 
-		//if (UI_FONT == UIobj_Desc.eUIType)
-		//{
-			string strText = {};
-			_uint iUIextLen = {};
-			InputFile.read(reinterpret_cast<char*>(&iUIextLen), sizeof(iUIextLen));
-			strText.resize(iUIextLen);
-			InputFile.read(&strText[0], iUIextLen);
-			UIobj_Desc.wstrText = CUtils::StrToWstr(strText);
+		string strText = {};
+		_uint iUIextLen = {};
+		InputFile.read(reinterpret_cast<char*>(&iUIextLen), sizeof(iUIextLen));
+		strText.resize(iUIextLen);
+		InputFile.read(&strText[0], iUIextLen);
+		UIobj_Desc.wstrText = CUtils::StrToWstr(strText);
 
-			InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vColorRGB), sizeof(UIobj_Desc.vColorRGB));
-			InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.fAlpha), sizeof(UIobj_Desc.fAlpha));
-			//}
-
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vColorRGB), sizeof(UIobj_Desc.vColorRGB));
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.fAlpha), sizeof(UIobj_Desc.fAlpha));
 
 		CUIObject* pUIObject = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(CUtils::StrToWstr(strProtoTag), &UIobj_Desc));
 		m_LayerUIs.push_back(pUIObject);
@@ -1335,8 +1403,7 @@ _bool CEditor_UI::Load_FileData(const string& _strFilePath)
 
 	InputFile.close();
 
-	//MSG_BOX(TEXT("Successed to Load : FileData"));
-	IsSuccessed = TRUE; eOpenPopup = POPUP_LOAD; ePopupDetail = DETAIL_NONE;
+	g_IsSuccessed = TRUE; g_eOpenPopup = POPUP_LOAD; g_ePopupDetail = DETAIL_NONE;
 	return TRUE;
 }
 

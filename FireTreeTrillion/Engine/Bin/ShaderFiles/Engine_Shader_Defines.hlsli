@@ -95,6 +95,16 @@ BlendState BS_AlphaBlend
     BlendOp = Add;
 };
 
+BlendState BS_ABTexturizer //텍스처화를 위한 블렌드 옵션
+{
+    BlendEnable[0] = true;
+
+    SrcBlend = src_alpha;
+    DestBlend = inv_src_alpha;
+    SrcBlendAlpha = src_alpha;
+    DestBlendAlpha = ONE;
+    BlendOp = Add;
+};
 
 BlendState BS_Blend
 {
@@ -105,7 +115,6 @@ BlendState BS_Blend
     DestBlend = one;
     BlendOp = Add;
 };
-
 
 
 ////만드는 pbr 용 함수임다~~

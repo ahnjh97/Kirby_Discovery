@@ -21,12 +21,13 @@ HRESULT CBackGround::Initialize(void* pArg)
 		return E_FAIL;
 	if (FAILED(Add_Components()))
 		return E_FAIL;
+
 	UIOBJ_DESC BG_DESC = {};
 	BG_DESC.wstrUITag = { TEXT("BG_Logo") };
 	BG_DESC.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f };
 	BG_DESC.vSize = { (_float)g_iWinSizeX, (_float)g_iWinSizeY };
 	BG_DESC.vPos = { BG_DESC.vCenter.x, BG_DESC.vCenter.y };
-	BG_DESC.fDegree = { 0.f };
+	BG_DESC.fOrthoDegree = { 0.f };
 	BG_DESC.iTexIndex = { 0 };
 
 	m_pTransformCom->Set_Scaled(BG_DESC.vSize.x, BG_DESC.vSize.y, 1.f);

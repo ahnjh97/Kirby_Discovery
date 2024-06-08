@@ -128,8 +128,13 @@ PS_OUT PS_MAIN_ALPHABLEND(PS_IN_ALPHABLEND In)
 
     //Out.vColor.rgb = vDiffuse.rgb * g_vRColor;
     //Out.vColor.a = vDiffuse.a * g_fAlpha;
+    
+    //알파 값 예외처리
+    if (Out.vColor.a < 0.1f)
+        discard;
+    
     Out.vColor.rgb = g_vRColor;
-    Out.vColor *= g_fAlpha;
+    Out.vColor.a *= g_fAlpha;
 
     Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
 	
