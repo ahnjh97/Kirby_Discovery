@@ -42,6 +42,9 @@ using namespace Client;
             return E_FAIL; \
     } while (0)
 
+#define AXIS_X 1.f, 0.f, 0.f, 0.f
+#define AXIS_Y 0.f, 1.f, 0.f, 0.f
+#define AXIS_Z 0.f, 0.f, 1.f, 0.f
 
 enum PASS_POSTEX {
     POSTEX_DEFAULT, POSTEX_ALPHABLEND, POSTEX_WHITE, POSTEX_BLOOM, POSTEX_END

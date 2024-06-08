@@ -27,7 +27,7 @@ static vector<_int> g_SelectUIs;
 enum POPUP_TYPE { POPUP_CREATE, POPUP_DELETE, POPUP_GROUP, POPUP_SAVE, POPUP_LOAD, POPUP_MODIFY, POPUP_NONE };
 enum POPUP_DETAIL {
 	NEED_CREATE, NEED_SELECT,
-	FILE_OPEN, FILE_COPY,
+	FILE_OPEN, FILE_COPY, FILE_READ,
 	DETAIL_NONE
 };
 
@@ -117,10 +117,6 @@ void CEditor_UI::Late_Tick(_float _fTimeDelta)
 HRESULT CEditor_UI::Render()
 {
 	ImGuizmo::BeginFrame(); //기즈모 생성 및 초기화
-
-	//기즈모 직교/원근 세팅
-	if (g_IsOrthoProj) { ImGuizmo::SetOrthographic(TRUE); }
-	else { ImGuizmo::SetOrthographic(FALSE); }
 
 	Window_PopupAlert();
 	Set_DockSpace(); //IMGUI DOCKSPACE
@@ -651,6 +647,7 @@ void CEditor_UI::Window_PopupAlert()
 		switch (g_ePopupDetail)
 		{
 		case FILE_OPEN:		g_strDetail = { u8"Check the File Path & Name 파일 경로와 이름을 확인해주세요" }; break;
+		case FILE_READ:		g_strDetail = { u8"파일 데이터를 다시 확인해주세요" }; break;
 		case DETAIL_NONE: default: g_strDetail = { u8" " }; break;
 		}
 		ImGui::OpenPopup(g_strPopupTag.c_str());
@@ -734,7 +731,7 @@ _bool CEditor_UI::Edit_Transform(CUIObject* _pUIObj)
 	_float fTextWidth = ImGui::CalcTextSize(DragTag).x;
 	_float Translate[3], Rotate[3], Scale[3] = { 0.f, 0.f, 0.f };
 
-	if (nullptr == _pUIObj) //|| UI_FONT == _pUIObj->Get_UIObj_Desc().eUIType)
+	if (nullptr == _pUIObj)
 		return FALSE;
 
 	CTransform* pUITrans = (CTransform*)_pUIObj->Get_Component(g_strTransformTag);
@@ -749,21 +746,26 @@ _bool CEditor_UI::Edit_Transform(CUIObject* _pUIObj)
 	UIOBJ_DESC pUIObj_Desc = _pUIObj->Get_UIObj_Desc();
 	pUIObj_Desc.vSize = (_float3)Scale;
 	pUIObj_Desc.vPos = (_float3)Translate;
-	pUIObj_Desc.fOrthoDegree = (_float)Rotate[2];
-	pUIObj_Desc.vPersDegree = (_float3)Rotate;
 
 	//직교, 원근투영 옵션 스왑
 	ImGuiStyle Style = ImGui::GetStyle();
-	ImVec2 vPrePadding = Style.FramePadding;
-	Style.FramePadding = ImVec2(20.f, 10.f);
+	//ImVec2 vPrePadding = Style.FramePadding;
+	Style.FramePadding = ImVec2(20.f, 20.f);
+
+	ImGui::Text(u8"Proj 투영");
+	ImGui::SameLine(); HelpMarker(u8"~");
+	ImGui::SameLine(fTextWidth + 35);
+
+	if (m_pGameInstance->Get_DIKeyState(DIK_GRAVE, KEY_DOWN))
+		g_IsOrthoProj != g_IsOrthoProj;
 
 	if (ImGui::RadioButton(u8"Ortho 직교", g_IsOrthoProj)) 
 		g_IsOrthoProj = TRUE;
+
 	ImGui::SameLine();
 
 	if (ImGui::RadioButton(u8"Perspect 원근", !g_IsOrthoProj)) 
 		g_IsOrthoProj = FALSE;
-	//Style.FramePadding = vPrePadding;
 
 	ImGui::PushItemWidth(175.f/*ImGui::GetColumnOffset()*/);
 	ImGui::Text(u8"Rotate 회전");
@@ -771,8 +773,17 @@ _bool CEditor_UI::Edit_Transform(CUIObject* _pUIObj)
 	ImGui::SameLine(fTextWidth + 35);
 
 	if (g_IsOrthoProj == TRUE)
+	{
 		ImGui::DragFloat("##Rotate Ortho", (_float*)&Rotate[2], 0.1f, (_int)-360, (_int)360, u8"Degree 각도 : %.1f");
-	else {	ImGui::DragFloat3("##Rotate Perspec", (_float*)&Rotate, 0.1f, (_int)-360, (_int)360, "%.1f");	}
+		pUIObj_Desc.eUIProj = PROJ_ORTHO;
+		pUIObj_Desc.fOrthoDegree = (_float)Rotate[2];
+	}
+	else 
+	{	
+		ImGui::DragFloat3("##Rotte Perspec", (_float*)&Rotate, 0.1f, (_int)-360, (_int)360, "%.1f");	
+		pUIObj_Desc.eUIProj = PROJ_PERSPEC;
+		pUIObj_Desc.vPersDegree = (_float3)Rotate;
+	}
 
 	ImGui::Text(u8"Scale 크기");
 	ImGui::SameLine(); HelpMarker(u8"Ctrl+E");
@@ -930,15 +941,13 @@ CUIObject::UIOBJ_DESC CEditor_UI::Edit_LayerUITag(string _strInput)
 	return LayerUIDesc;
 }
 
-//사용안함) 직교투영 세팅
+//사용 안함) 직교투영 세팅
 _bool CEditor_UI::Set_OrthoProj()
 {
 	// 05.24) 직교투영 스페이스 변환
 	_float4x4 WorldMatrix, ViewMatrix, ProjMatrix;
 	ViewMatrix = m_pTransformCom->Get_WorldMatrix_Inverse();
 	m_pGameInstance->Set_Transform(CPipeLine::D3DTS_VIEW, ViewMatrix);
-
-	//XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f);
 
 	// 뷰볼륨 조정
 	_float2 ViewVolume;
@@ -985,20 +994,30 @@ _bool CEditor_UI::Set_GizmoSync(CUIObject* _pUIObj)
 	if (nullptr == pUITrans)
 		return FALSE;
 
-	// 뷰, 투영 행렬 정보 로드
-	_float4x4 ViewMatrix, ProjMatrix;
-	XMStoreFloat4x4(&ViewMatrix, XMMatrixIdentity());
-	XMStoreFloat4x4(&ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
-
 	//static _bool useSnap(false);
 	_float fGizmoSpeed[3] = {
 		0.01f,		//Translate
 		0.01f,		//Rotate
 		0.01f };		//Scale
 
+	// 뷰, 투영 행렬 정보 로드
+	_float4x4 ViewMatrix, ProjMatrix{};
+	if (g_IsOrthoProj) //== TRUE
+	{
+		XMStoreFloat4x4(&ViewMatrix, XMMatrixIdentity());
+		XMStoreFloat4x4(&ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
+		ImGuizmo::SetOrthographic(TRUE);
+	}
+	else //g_IsOrthoProj //== FALSE
+	{
+		XMStoreFloat4x4(&ViewMatrix, XMMatrixIdentity());
+		//ViewMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW);
+		ProjMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
+		ImGuizmo::SetOrthographic(FALSE);
+	}
+
 	//기즈모로 변환 값 적용
-	ImGuizmo::Manipulate(ViewMatrix.m[0], ProjMatrix.m[0], eCurGizmoOper, eCurGizmoMode,
-		UIWorldMat.m[0], NULL, fGizmoSpeed); /*useSnap ? &snap.x : NULL*/
+	ImGuizmo::Manipulate(ViewMatrix.m[0], ProjMatrix.m[0], eCurGizmoOper, eCurGizmoMode, UIWorldMat.m[0], NULL, fGizmoSpeed); /*useSnap ? &snap.x : NULL*/
 
 	//월드행렬 세팅
 	pUITrans->Set_WorldMatrix(UIWorldMat);
@@ -1029,7 +1048,7 @@ _bool CEditor_UI::Set_GizmoGrid()
 	return TRUE;
 }
 
-//추가 필요) 레이어그룹(캔버스) 생성
+//추가 필요) 레이어그룹 생성
 void CEditor_UI::Create_UIObject(UI_STATE _eUIState, UI_TYPE _eUIType)
 {
 	string strProtoTag = { "Prototype_GameObject_" };
@@ -1147,8 +1166,7 @@ void CEditor_UI::Group_UIObject(GROUP_TYPE _eUIGroup)
 
 }
 
-//진행 보류) 텍스처화 :: RTV 기준으로 저장 (저장은 되나, RTV 세팅 필요(셰이더 담당자 협업)) 
-// 엔진에서 렌더한 RTV 정보를 받아 저장하는 방식
+//진행 보류) 텍스처화 :: 엔진에서 렌더한 RTV 정보를 Texture2D로 받아 저장하는 방식
 void CEditor_UI::Save_Texture(const string& _strFilePath, ID3D11RenderTargetView* _pRTV)
 {
 	string strFilePath = { "../Bin/Resources/Textures/UI/DDS/" };
@@ -1365,7 +1383,10 @@ _bool CEditor_UI::Load_FileData(const string& _strFilePath)
 		InputFile.read(&strProtoTag[0], iProtoTagLen);
 
 		if (0 == strProtoTag.size())
+		{
+			g_IsSuccessed = FALSE; g_eOpenPopup = POPUP_LOAD; g_ePopupDetail = FILE_READ;
 			return FALSE;
+		}
 
 		UIOBJ_DESC UIobj_Desc{};
 		string strUITag = {};

@@ -199,6 +199,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& strLayerTag)
 		string strUITag = {};
 		_uint iUITagLen = {};
 		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.eUIType), sizeof(UIobj_Desc.eUIType));
+		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.eUIProj), sizeof(UIobj_Desc.eUIProj));
 
 		InputFile.read(reinterpret_cast<char*>(&iUITagLen), sizeof(iUITagLen));
 		strUITag.resize(iUITagLen);
@@ -210,6 +211,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& strLayerTag)
 		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vPos), sizeof(UIobj_Desc.vPos));
 		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vPersDegree), sizeof(UIobj_Desc.vPersDegree));
 		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.fOrthoDegree), sizeof(UIobj_Desc.fOrthoDegree));
+
 		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.iTexIndex), sizeof(UIobj_Desc.iTexIndex));
 
 		string strText = {};
