@@ -593,7 +593,7 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
         Out.vSSAO -= vSSAO;
     }
     
-    Out.vResultColor = float4(directLighting + ambientLighting, 1.f) * fAmbientOcclusion;
+    Out.vResultColor = float4((directLighting + ambientLighting) * fAmbientOcclusion, 1.f);
     Out.vSpecular = vLightspecular;
     return Out;
 }
