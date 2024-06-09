@@ -33,8 +33,6 @@ HRESULT CMapToolObject::Initialize(void* pArg)
 	m_iTriggerType = GameObjectDesc.iTriggerType;
 	m_iCamType = GameObjectDesc.iCamType;
 	m_fRadius = GameObjectDesc.fRadius;
-	m_iShaderVars = GameObjectDesc.iShaderVars;
-	m_fRimLightThickness = GameObjectDesc.fRimLightThickness;
 
 	if (FAILED(Add_Components(GameObjectDesc.wstrModelName)))
 		return E_FAIL;

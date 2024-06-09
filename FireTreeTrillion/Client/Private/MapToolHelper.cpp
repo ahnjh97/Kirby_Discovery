@@ -445,7 +445,7 @@ void CMapToolHelper::Edit_Object()
 	ImGui::Begin(m_strCurModel.c_str());
 
 	_uint iShaderVars = m_pPickedObject->Get_ShaderVars();
-	_float fRimLightThickNess = m_pPickedObject->Get_RimLightThickness();
+	_float fRimWidth = m_pPickedObject->Get_RimWidth();
 
 	_bool bStencil = (iShaderVars >> 2) & 1;
 	_bool bRimLight = (iShaderVars >> 1) & 1;
@@ -471,8 +471,8 @@ void CMapToolHelper::Edit_Object()
 	ImGui::Text("Thickness ");
 	ImGui::SameLine();
 	ImGui::SetNextItemWidth(100);
-	if (ImGui::InputFloat("##RimLightThickness", &fRimLightThickNess, 0.005f, 1.0f, "%.3f"))
-		m_pPickedObject->Set_RimLightThickness(fRimLightThickNess);
+	if (ImGui::InputFloat("##fRimWidth", &fRimWidth, 0.01f, 1.0f, "%.3f"))
+		m_pPickedObject->Set_RimWidth(fRimWidth);
 
 	_float4x4 tempMatrix = pTransform->Get_WorldFloat4x4();
 	m_pGameInstance->EditTransform(tempMatrix); // 선택한 모델의 월드행렬을 수정 
@@ -642,13 +642,13 @@ void CMapToolHelper::Save_Level()
 		_float4x4 matWorld = pTransform->Get_WorldMatrix();
 		_uint iStrLength = strModelName.length();
 		_uint iShaderVars = object->Get_ShaderVars();
-		_float fRimLightThickness = object->Get_RimLightThickness();
+		_float fRimWidth = object->Get_RimWidth();
 
 		outputFile.write(reinterpret_cast<const char*>(&iStrLength), sizeof(iStrLength));
 		outputFile.write(strModelName.c_str(), iStrLength);
 		outputFile.write(reinterpret_cast<const char*>(&matWorld), sizeof(_float4x4));
 		outputFile.write(reinterpret_cast<const char*>(&iShaderVars), sizeof(iShaderVars));
-		outputFile.write(reinterpret_cast<const char*>(&fRimLightThickness), sizeof(fRimLightThickness));
+		outputFile.write(reinterpret_cast<const char*>(&fRimWidth), sizeof(fRimWidth));
 
 		if ("Camera" == strModelName || "Trigger" == strModelName) {
 			CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(object);
@@ -757,7 +757,7 @@ void CMapToolHelper::Load_Level()
 	_float fRadius{};
 	_float3 vMin{}, vMax{};
 	_uint iShaderVars{};
-	_float fRimLightThickness{};
+	_float fRimWidth{};
 
 	while (!fileStream.eof()) 
 	{
@@ -767,7 +767,7 @@ void CMapToolHelper::Load_Level()
 		fileStream.read(&strModelName[0], iStrLength);
 		fileStream.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
 		fileStream.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
-		fileStream.read(reinterpret_cast<char*>(&fRimLightThickness), sizeof(fRimLightThickness));
+		fileStream.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
 
 		if ("Camera" == strModelName || "Trigger" == strModelName) {
 			if ("Trigger" == strModelName)
@@ -799,7 +799,7 @@ void CMapToolHelper::Load_Level()
 		tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
 		tDesc.matWorld = matWorld;
 		tDesc.iShaderVars = iShaderVars;
-		tDesc.fRimLightThickness = fRimLightThickness;
+		tDesc.fRimWidth = fRimWidth;
 
 		if ("Camera" == strModelName || "Trigger" == strModelName)
 		{

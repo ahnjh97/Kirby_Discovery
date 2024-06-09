@@ -154,14 +154,11 @@ HRESULT CKirby::Render()
 		if (FAILED(m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
 
-		_bool bStencil = true;
-		_bool bRimLight = true;
-		_bool bMotionBlur = true;
-		m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
 		if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
 			return E_FAIL;
-		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
 		if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
 			return E_FAIL;
 
@@ -563,13 +560,11 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
 		m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
 		m_pMouthTexture[INFO(m_eMouthState)]->Bind_ShaderResource(m_pShaderCom, "g_KirbyMouthTexture", 0);
-		_bool bStencil = true;
-		_bool bRimLight = true;
-		_bool bMotionBlur = true;
-		m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+
+		m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float));
-		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
 
 		m_pShaderCom->Begin(ANIMMODEL_KIRBYMOUTH);
 		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
@@ -585,13 +580,11 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
 		m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
 		m_pEyeTexture[INFO(m_eEyeState)]->Bind_ShaderResource(m_pShaderCom, "g_KirbyEyeTexture", 0);
-		_bool bStencil = true;
-		_bool bRimLight = true;
-		_bool bMotionBlur = true;
-		m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+
+		m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float));
-		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
 		m_pShaderCom->Begin(ANIMMODEL_KIRBYEYE);
 		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
 		return true;
@@ -601,12 +594,11 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 	{
 		m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
 		m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
-		_bool bStencil = true;
+
 		_bool bRimLight = false;
-		_bool bMotionBlur = true;
-		m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
 		m_pShaderCom->Begin(ANIMMODEL_NORMAL_X);
 		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
 		return true;

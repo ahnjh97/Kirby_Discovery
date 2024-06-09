@@ -49,7 +49,7 @@ HRESULT CAwoofy::Initialize(void* pArg)
 	m_eAbilityType = ABILITY_DEFAULT;
 	m_eEyeState = AWOOFYEYE_IDLE;
 
-	m_fRimWidth = 5.f;
+	//m_fRimWidth = 5.f;
 	Add_AnimEvent();
 
 	return S_OK;
@@ -319,17 +319,13 @@ HRESULT CAwoofy::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
-	_bool bStencil = true;
-	_bool bRimLight = true;
-	_bool bMotionBlur = true;
-
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool))))
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool))))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool))))
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool))))
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
 		return E_FAIL;

@@ -142,7 +142,7 @@ PS_OUT NO_NORMALMAP_PS_MAIN(PS_IN In)
     Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
     Out.vFieldDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 0.0f);
-    Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
+    Out.vMRA = vector(0, 1, 1, 1);
 
     if (g_fTime < 0.5f)
         Out.vDiffuse.rgb += vDamageColor * smoothstep(0.0f, 1.0f, g_fTime);

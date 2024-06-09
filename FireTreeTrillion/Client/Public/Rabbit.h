@@ -38,9 +38,6 @@ public:
 		m_fTempTime = fTimeDelta;
 	}
 
-	_float Get_AnimRatio() {
-		return m_pModelCom->Get_AnimRatio();
-	}
 	_bool Get_Find() {
 		return m_bFind;
 	}

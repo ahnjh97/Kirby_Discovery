@@ -248,7 +248,7 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 	_float fRadius{};
 	_float4x4 matInverse{};
 	_uint iShaderVars{};
-	_float fRimLightThickness{};
+	_float fRimWidth{};
 	map<_int, _float4x4> camMatrices;
 	map<_int, pair<_vector, _float>> frontDirRadii;
 	map<_int, pair<_vector, _float>> rearDirRadii;
@@ -262,7 +262,7 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 		fileStream.read(&strModelName[0], iStrLength);
 		fileStream.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
 		fileStream.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
-		fileStream.read(reinterpret_cast<char*>(&fRimLightThickness), sizeof(fRimLightThickness));
+		fileStream.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
 
 		if ("Camera" == strModelName) 
 		{
@@ -298,7 +298,7 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 		tempDesc.matWorld = matWorld;
 		tempDesc.wstrModelName = CUtils::StrToWstr(strModelName);
 		tempDesc.iShaderVars = iShaderVars;
-		tempDesc.fRimLightThickness = fRimLightThickness;
+		tempDesc.fRimWidth = fRimWidth;
 
 		if ("NonAnim_Kirby" == strModelName)
 		{
