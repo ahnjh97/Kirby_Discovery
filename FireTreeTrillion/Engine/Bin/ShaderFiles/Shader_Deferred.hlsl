@@ -620,124 +620,138 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
     
     
     
-        float fCamLightAngle = acos(dot(normalize(g_vCamLook), normalize(g_vGodPos - g_vCamPosition)));
-        fCamLightAngle = (degrees(fCamLightAngle));
-        float fCullingAngle = 90;
+    float fCamLightAngle = acos(dot(normalize(g_vCamLook), normalize(g_vGodPos - g_vCamPosition)));
+    fCamLightAngle = (degrees(fCamLightAngle));
+    float fCullingAngle = 80;
     
     
     /// 렌즈 플레어
     float4 vLensFlare = 0;
     {
-
+        if (fCamLightAngle > fCullingAngle)
+        {
+            vLensFlare.rgb = 0;
+        }
+        else
+        {
+        
         //신의 투영 포즈
-        float4 vGodPos;
-        vGodPos = mul(g_vGodPos, g_GodViewMatrix);
-        vGodPos = mul(vGodPos, g_GodProjMatrix);
-        vGodPos /= vGodPos.w;
+            float4 vGodPos;
+            vGodPos = mul(g_vGodPos, g_GodViewMatrix);
+            vGodPos = mul(vGodPos, g_GodProjMatrix);
+            vGodPos /= vGodPos.w;
+            
+         
         
         
         //신의 TexCoord
-        float2 vGodCoord;
-        vGodCoord.x = vGodPos.x * 0.5f + 0.5f;
-        vGodCoord.y = vGodPos.y * -0.5f + 0.5f;
-        
+            float2 vGodCoord;
+            vGodCoord.x = vGodPos.x * 0.5f + 0.5f;
+            vGodCoord.y = vGodPos.y * -0.5f + 0.5f;
+                    
         //// 화면상의 비율이다.
-        float fScreenRatio = g_fTexW / g_fTexH;
+            float fScreenRatio = g_fTexW / g_fTexH;
 
 
         //////// 여기는 앞으로 쓰지 않습니다. 해 그리면 끝남
         
         //신 -> me
-        float2 vSunDir = In.vTexcoord - vGodCoord;
-        vSunDir.x *= fScreenRatio;
+            float2 vSunDir = In.vTexcoord - vGodCoord;
+            vSunDir.x *= fScreenRatio;
         
-        float2 vF2Dir = In.vTexcoord * (length(In.vTexcoord));
+            float2 vF2Dir = In.vTexcoord * (length(In.vTexcoord));
    
         //해의 각도
-        float fAngle = atan2(vSunDir.x, vSunDir.y);
+            float fAngle = atan2(vSunDir.x, vSunDir.y);
         
-        float fdistance = length(vSunDir);
-        fdistance = pow(fdistance, .1);
+            float fdistance = length(vSunDir);
+            fdistance = pow(fdistance, .1);
         
-        float f0 = 1.0 / (length(vSunDir) * 16.0 + 1.0);
-        f0 = f0 + f0 * (sin(getRandom(sin(fAngle * 2. + vGodCoord.x) * 4.0 - cos(fAngle * 3. + vGodCoord.y)) * 16.) * .1 + fdistance * .1 + .8);
+            float f0 = 1.0 / (length(vSunDir) * 16.0 + 1.0);
+            f0 = f0 + f0 * (sin(getRandom(sin(fAngle * 2. + vGodCoord.x) * 4.0 - cos(fAngle * 3. + vGodCoord.y)) * 16.) * .1 + fdistance * .1 + .8);
 
         ////////
         
         
         //해에서 중점으로 가는 방향
-        float2 vCenter = 0.5;
-        float2 vUVDir = vCenter - vGodCoord;
+            float2 vCenter = 0.5;
+            float2 vUVDir = vCenter - vGodCoord;
 
         //적용 값 : 플레어의 목표 위치를 잡고, 이를 현재 픽셀의 coord와 빼 준다.
-        float2 vFlarePos = vCenter + vUVDir;
+            float2 vFlarePos = vCenter + vUVDir;
         
-        float2 f2Diff = (vFlarePos + 0.8 * vUVDir) - In.vTexcoord;
-        float2 f22Diff = (vFlarePos + 0.85 * vUVDir) - In.vTexcoord;
-        float2 f23Diff = (vFlarePos + 0.9 * vUVDir) - In.vTexcoord;
+            float2 f2Diff = (vFlarePos + 0.8 * vUVDir) - In.vTexcoord;
+            float2 f22Diff = (vFlarePos + 0.85 * vUVDir) - In.vTexcoord;
+            float2 f23Diff = (vFlarePos + 0.9 * vUVDir) - In.vTexcoord;
         
-        f2Diff.x *= fScreenRatio;
-        f22Diff.x *= fScreenRatio;
-        f23Diff.x *= fScreenRatio;
-        float f2 = max(1.0 / (1.0 + 32.0 * pow(length(f2Diff), 2.0)), .0) * 0.25;
-        float f22 = max(1.0 / (1.0 + 32.0 * pow(length(f22Diff), 2.0)), .0) * 0.23;
-        float f23 = max(1.0 / (1.0 + 32.0 * pow(length(f23Diff), 2.0)), .0) * 0.21;
+            f2Diff.x *= fScreenRatio;
+            f22Diff.x *= fScreenRatio;
+            f23Diff.x *= fScreenRatio;
+            float f2 = max(1.0 / (1.0 + 32.0 * pow(length(f2Diff), 2.0)), .0) * 0.25;
+            float f22 = max(1.0 / (1.0 + 32.0 * pow(length(f22Diff), 2.0)), .0) * 0.23;
+            float f23 = max(1.0 / (1.0 + 32.0 * pow(length(f23Diff), 2.0)), .0) * 0.21;
 
         
         //f4 플레어의 기준 위치
-        vFlarePos = vCenter + (vUVDir * 0.3);
+            vFlarePos = vCenter + (vUVDir * 0.1);
         
-        float2 f4Diff = (vFlarePos + 0.2 * vUVDir) - In.vTexcoord;
-        float2 f42Diff = (vFlarePos + 0.4 * vUVDir) - In.vTexcoord;
-        float2 f43Diff = (vFlarePos + 0.6 * vUVDir) - In.vTexcoord;
-        f4Diff.x *= fScreenRatio;
-        f42Diff.x *= fScreenRatio;
-        f43Diff.x *= fScreenRatio;
-        float f4 = max(0.01 - pow(length(f4Diff), 2.4), .0) * 6.0;
-        float f42 = max(0.01 - pow(length(f42Diff), 2.4), .0) * 5.0;
-        float f43 = max(0.01 - pow(length(f43Diff), 2.4), .0) * 3.0;
+            float2 f4Diff = (vFlarePos + 0.2 * vUVDir) - In.vTexcoord;
+            float2 f42Diff = (vFlarePos + 0.4 * vUVDir) - In.vTexcoord;
+            float2 f43Diff = (vFlarePos + 0.6 * vUVDir) - In.vTexcoord;
+            f4Diff.x *= fScreenRatio;
+            f42Diff.x *= fScreenRatio;
+            f43Diff.x *= fScreenRatio;
+            float f4 = max(0.01 - pow(length(f4Diff), 2.4), .0) * 6.0;
+            float f42 = max(0.01 - pow(length(f42Diff), 2.4), .0) * 5.0;
+            float f43 = max(0.01 - pow(length(f43Diff), 2.4), .0) * 3.0;
     
         
-        vFlarePos = vCenter + (vUVDir * 0.3);
+            vFlarePos = vCenter + (vUVDir * 0.1);
 
-        float2 f5Diff = (vFlarePos + 0.2 * vUVDir) - In.vTexcoord;
-        float2 f52Diff = (vFlarePos + 0.4 * vUVDir) - In.vTexcoord;
-        float2 f53Diff = (vFlarePos + 0.6 * vUVDir) - In.vTexcoord;
-        f5Diff.x *= fScreenRatio;
-        f52Diff.x *= fScreenRatio;
-        f53Diff.x *= fScreenRatio;
-        float f5 = max(0.01 - pow(length(f5Diff), 5.5), .0) * 2.0;
-        float f52 = max(0.01 - pow(length(f52Diff), 5.5), .0) * 2.0;
-        float f53 = max(0.01 - pow(length(f53Diff), 5.5), .0) * 2.0;
+            float2 f5Diff = (vFlarePos + 0.2 * vUVDir) - In.vTexcoord;
+            float2 f52Diff = (vFlarePos + 0.4 * vUVDir) - In.vTexcoord;
+            float2 f53Diff = (vFlarePos + 0.6 * vUVDir) - In.vTexcoord;
+            f5Diff.x *= fScreenRatio;
+            f52Diff.x *= fScreenRatio;
+            f53Diff.x *= fScreenRatio;
+            float f5 = max(0.01 - pow(length(f5Diff), 4.5), .0) * 2.0;
+            float f52 = max(0.01 - pow(length(f52Diff), 4.5), .0) * 2.0;
+            float f53 = max(0.01 - pow(length(f53Diff), 4.5), .0) * 2.0;
    
         
         
         
         
-        vFlarePos = vCenter + (vUVDir * 0.1);
+            vFlarePos = vCenter + (vUVDir * 0.035);
 
-        float2 f6Diff = (vFlarePos - 0.3 * vUVDir) - In.vTexcoord;
-        float2 f62Diff = (vFlarePos - 0.325 * vUVDir) - In.vTexcoord;
-        float2 f63Diff = (vFlarePos - 0.35 * vUVDir) - In.vTexcoord;
+            float2 f6Diff = (vFlarePos - 0.3 * vUVDir) - In.vTexcoord;
+            float2 f62Diff = (vFlarePos - 0.325 * vUVDir) - In.vTexcoord;
+            float2 f63Diff = (vFlarePos - 0.35 * vUVDir) - In.vTexcoord;
 
         
-        f6Diff.x *= fScreenRatio;
-        f62Diff.x *= fScreenRatio;
-        f63Diff.x *= fScreenRatio;
-        float f6 = max(0.01 - pow(length(f6Diff), 1.6), .0) * 6.0;
-        float f62 = max(0.01 - pow(length(f62Diff), 1.6), .0) * 3.0;
-        float f63 = max(0.01 - pow(length(f63Diff), 1.6), .0) * 5.0;
+            f6Diff.x *= fScreenRatio;
+            f62Diff.x *= fScreenRatio;
+            f63Diff.x *= fScreenRatio;
+            float f6 = max(0.01 - pow(length(f6Diff), 1.6), .0) * 6.0;
+            float f62 = max(0.01 - pow(length(f62Diff), 1.6), .0) * 3.0;
+            float f63 = max(0.01 - pow(length(f63Diff), 1.6), .0) * 5.0;
    
-        float3 c = 0;
+            float3 c = 0;
    
-        c.r += f2 + f4 + f5 + f6;
-        c.g += f22 + f42 + f52 + f62;
-        c.b += f23 + f43 + f53 + f63;
-
-        c = (c * 3 - float3(1.f, 1.f, 1.f) * length(vUVDir) * .05) * pow(((fCullingAngle - fCamLightAngle) / fCullingAngle), 2);
-        c += f0;
+            if (g_DiffuseTexture.Sample(LinearSampler, vGodCoord).a == 0)
+            {
+                c.r += (f2 + f4 + f5 + f6) * 6.f;
+                c.g += (f22 + f42 + f52 + f62) * 6.f;
+                c.b += (f23 + f43 + f53 + f63) * 6.f;
+            }
+            
+            c = (c * 3 - float3(1.f, 1.f, 1.f) * length(vUVDir) * .05) * pow(((fCullingAngle - fCamLightAngle) / fCullingAngle), 2);
+            
+            if (vDiffuse.a == 0)
+                c += f0;
         
-        vLensFlare.rgb = c;
+            vLensFlare.rgb = c;
+        }
     }
           
     
