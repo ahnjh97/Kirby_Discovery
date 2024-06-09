@@ -6,6 +6,9 @@ matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 matrix g_LightViewMatrix, g_LightProjMatrix;
 matrix g_ViewMatrixInv, g_ProjMatrixInv;
 
+// 갓 레이 전용 뷰, 투영
+matrix g_GodViewMatrix, g_GodProjMatrix;
+
 //색 보정 글로별 번수
 bool g_bApplyCorrection = true;
 
@@ -78,18 +81,20 @@ float g_intensity = 3.f;
 
 
 //**** 갓 레이 ****//
-
+float4 g_vGodPos;
 texture2D g_GodRayTexture;
+
 // 노출도
-float g_fRayExposure = 0.3f;
+float g_fRayExposure = 0.15f;
 // 빛의 감쇠율
-float g_fRayDecay = .9f;
+//float g_fRayDecay = 0.96815;
+float g_fRayDecay = 0.96815;
 // 샘플의 누적 감쇠율
-float g_fRayIlluminationDecay = 1.f;
+float g_fRayIlluminationDecay = 0.8f;
 // 광선의 길이와 밀도
-float g_fRayDensity = .5f;
+float g_fRayDensity = 0.5;
 // 광선의 길이와 밀도
-float g_fWeight = .4f;
+float g_fWeight = 0.5;
 ////////////////
 
 
@@ -142,7 +147,7 @@ bool g_bRimTest;
 float g_fBlackBackGround;
 
 float4 g_vCamPosition;
-
+float4 g_vCamLook;
 
 //////////////////////////////////// For PBR 
 
@@ -451,6 +456,7 @@ struct PS_IN
 struct PS_OUT
 {
     float4 vColor : SV_TARGET0;
+    float4 vSubColor : SV_TARGET1;
 };
 
 PS_OUT PS_MAIN(PS_IN In)
@@ -467,7 +473,6 @@ struct PS_OUT_LIGHT
     float4 vResultColor : SV_TARGET0;
     float4 vSpecular : SV_TARGET1;
     float4 vSSAO : SV_TARGET2;
-    float4 vGodRay : SV_TARGET3;
 };
 
 /* 빛 하나당 480000 수행되는 쉐이더. */
@@ -613,7 +618,8 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
         Out.vSSAO -= vSSAO;
     }
     
-    Out.vResultColor = float4(directLighting + ambientLighting, 1.f) * fAmbientOcclusion;
+    
+    Out.vResultColor = float4((directLighting + ambientLighting), 1.f) * fAmbientOcclusion;
     Out.vSpecular = vLightspecular;
     
     return Out;
@@ -633,71 +639,62 @@ PS_OUT_LIGHT PS_MAIN_POINT(PS_IN In)
     return Out;
 }
 
-PS_OUT_LIGHT PS_MAIN_GODRAY(PS_IN In)
+PS_OUT PS_MAIN_GODRAY(PS_IN In)
 {
-    PS_OUT_LIGHT Out = (PS_OUT_LIGHT) 0;
-
-    //float2 vViewportSize = float2(g_fTexW, g_fTexH);
-    float2 vScreenRatio = float2(1 / g_fTexW, 1 / g_fTexH);
-    float fScreenRatio = g_fTexW / g_fTexH;
+    PS_OUT Out = (PS_OUT) 0;    
     
+    float fCamLightAngle = acos(dot(normalize(g_vCamLook), normalize(g_vGodPos - g_vCamPosition)));
     
-    vector vRayPos = g_vLightPos;
+    fCamLightAngle = (degrees(fCamLightAngle));
     
-    vRayPos = mul(vRayPos, g_ViewMatrix);
-    vRayPos = mul(vRayPos, g_ProjMatrix);
-    //광선의 투영 공간 위치
-    vRayPos /= vRayPos.w;
-    vRayPos /= g_fFar;
-
+    float fCullingAngle = 40;
     
-    //광선의 texCoord
-    float2 vRayCoord;
-    vRayCoord.x = (vRayPos.x + 1.0) * 0.5;
-    vRayCoord.y = ((vRayPos.y * -0.5) + 0.5);
-    
-    //픽셀의 투영 공간 위치
-    float2 vMyPos;
-    vMyPos.x = (In.vTexcoord.x * 2.f) - 1.f;
-    vMyPos.y = (In.vTexcoord.y * -2.f) + 1.f;
-
-    
-    if ( length ( abs(In.vTexcoord - vRayCoord.xy) ) < .15f)
+    if (fCamLightAngle > fCullingAngle)
     {
-        //Out.vGodRay = float4(1, 0, 1, 1);
-        //return Out;
-        //샘플링하는 횟수.
-        int iSampleNum = 64;
-        
-//광선 위치부터 현재 픽셀로 향하는 방향을 구한다.
-        //float2 vDirDelta = In.vTexcoord - vRayCoord;
-        float2 vDirDelta = normalize(In.vTexcoord - vRayCoord.xy);
-        
-//density만큼 방향 길이를 보정한다.
-        vDirDelta *= (1.0 / iSampleNum) * g_fRayDensity;
-        float fIlluminationDecay = g_fRayIlluminationDecay;
+        Out.vColor = g_GodRayTexture.Sample(LinearSampler, In.vTexcoord);
+    }
+    else
+    {
     
+        int iNum_Samples = 50;
     
-//샘플링 기준 위치
-        float2 vSampleUV = In.vTexcoord;
-  
-        for (int i = 0; i < iSampleNum; ++i)
+        float4 vGodPos;
+    
+        vGodPos = mul(g_vGodPos, g_GodViewMatrix);
+        vGodPos = mul(vGodPos, g_GodProjMatrix);
+        vGodPos /= vGodPos.w;
+    
+        float2 vGodCoord;
+    
+        vGodCoord.x = vGodPos.x * 0.5f + 0.5f;
+        vGodCoord.y = vGodPos.y * -0.5f + 0.5f;
+    
+        vGodCoord.x = max(0.f, min(1.f, vGodCoord.x));
+        vGodCoord.y = max(0.f, min(1.f, vGodCoord.y));
+        
+        float2 tc = In.vTexcoord;
+        float2 deltatexCoord = (tc - vGodCoord);
+        deltatexCoord *= 1.0 / float(iNum_Samples) * g_fRayDensity;
+        float illuminationDecay = g_fRayIlluminationDecay;
+
+        float4 vGodRayColor = g_GodRayTexture.Sample(LinearSampler, tc) * pow(((fCullingAngle - fCamLightAngle) / fCullingAngle), 0.8) * 0.8f;
+        for (int i = 0; i < iNum_Samples; i++)
         {
-        //광선 방향으로 돌아가며 샘플한다.
-            vSampleUV -= vDirDelta;
-        
-            float fSampleZ = g_DepthTexture.Sample(ClampSampler, vSampleUV).g;
-            //float fRayZ = g_DepthTexture.Sample(ClampSampler, vRayCoord).g;
-        
-            if (fSampleZ * g_fFar < mul(g_vLightPos, g_ViewMatrix).z )
+            tc -= deltatexCoord;
+            float4 samp = g_GodRayTexture.Sample(LinearSampler, tc) * pow(((fCullingAngle - fCamLightAngle) / fCullingAngle), 0.8) * 0.8f;
+            
+            if (length(samp.xyz) > 1.9f)
             {
-                Out.vGodRay += g_vLightDiffuse * fIlluminationDecay * g_fWeight;
-                fIlluminationDecay *= g_fRayDecay;
+                illuminationDecay *= g_fRayDecay * g_fRayDecay;
+                continue;
             }
+            
+            samp *= illuminationDecay * g_fWeight;
+            vGodRayColor += samp;
+            illuminationDecay *= g_fRayDecay * g_fRayDecay;
         }
-    
-        Out.vGodRay *= g_fRayExposure;
-        //Out.vGodRay = float4(1, 0, 1, 1);
+        float4 vRealColor = g_GodRayTexture.Sample(LinearSampler, In.vTexcoord);
+        Out.vColor = vRealColor + float4((vGodRayColor * g_fRayExposure).xyz, 1);
     }
     
     return Out;
@@ -818,7 +815,7 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
     vector vBlur = g_BlurTexture.Sample(LinearSampler, In.vTexcoord);
     vector vEffect = g_EffectTexture.Sample(LinearSampler, In.vTexcoord);
     vector vSky = g_SkyTexture.Sample(LinearSampler, In.vTexcoord);
-    vector vGodRay = g_GodRayTexture.Sample(LinearSampler, In.vTexcoord);
+    //vector vGodRay = g_GodRayTexture.Sample(LinearSampler, In.vTexcoord);
     
     // 스카이박스와 이펙트의 결합 ( 블룸 및 블랜드 )
     if (0.0f == vDiffuse.a)
@@ -836,7 +833,10 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
     Out.vColor += vEffect + (vBlur * 2);
         
     //갓 레이를 더한다.
-    Out.vColor.rgb += vGodRay.rgb;
+    //Out.vColor.rgb *= 1.f - (vGodRay.r / Out.vColor.r);
+    //Out.vColor.rgb += vGodRay.rgb;
+    
+    
     
     if (g_DeferredInfoTexture.Sample(LinearSampler, In.vTexcoord).g == 1.f && g_StencilTexture.Sample(LinearSampler, In.vTexcoord).r != 1.f)
     {
@@ -946,6 +946,7 @@ PS_OUT PS_MAIN_BLUR_X(PS_IN In)
     PS_OUT Out = (PS_OUT) 0;
 
     Out.vColor = Blur_X(In.vTexcoord);
+    Out.vSubColor = FreeBlur_X(In.vTexcoord, g_SSAOTexture, 1.f);
     
     return Out;
 }
@@ -955,6 +956,7 @@ PS_OUT PS_MAIN_BLUR_Y(PS_IN In)
     PS_OUT Out = (PS_OUT) 0;
 
     Out.vColor = Blur_Y(In.vTexcoord);
+    Out.vSubColor = FreeBlur_Y(In.vTexcoord, g_SSAOTexture, 1.f);
     
     return Out;
 }
@@ -1201,6 +1203,7 @@ PS_OUT PS_UI_Default(PS_IN In)
     return Out;
 }
 
+
 technique11 DefaultTechnique
 {
     pass Debug
@@ -1263,6 +1266,8 @@ technique11 DefaultTechnique
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_BLUR_X();
     }
     // 블러 Y ( 5 )
@@ -1274,6 +1279,8 @@ technique11 DefaultTechnique
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_BLUR_Y();
     }
 
@@ -1287,6 +1294,8 @@ technique11 DefaultTechnique
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_RADIAL_BLUR();
     }
 
@@ -1299,6 +1308,8 @@ technique11 DefaultTechnique
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_COLORCORRECT();
     }
 
@@ -1311,6 +1322,8 @@ technique11 DefaultTechnique
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_DOFBlur();
     }
 
@@ -1323,6 +1336,8 @@ technique11 DefaultTechnique
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_MotionBlur();
     }
 
@@ -1335,6 +1350,8 @@ technique11 DefaultTechnique
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_UI_Default();
     }
 
@@ -1347,6 +1364,8 @@ technique11 DefaultTechnique
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_DOFBlur_Result();
     }
 
@@ -1361,6 +1380,8 @@ technique11 DefaultTechnique
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_DIRECTIONAL_FOR_TOOL();
     }
 
@@ -1373,6 +1394,8 @@ technique11 DefaultTechnique
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_FINAL_FOR_TOOL();
     }
 
@@ -1385,6 +1408,9 @@ technique11 DefaultTechnique
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_GODRAY();
     }
+
 }

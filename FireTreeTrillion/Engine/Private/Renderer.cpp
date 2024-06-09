@@ -32,6 +32,7 @@ HRESULT CRenderer::Initialize()
 	Color_Initialize();
 	Set_ColorSet(Find_ColorSet("Stage1"));
 
+
 #pragma region MRT_Sky
 	// 스카이와 블룸이 공존할 수 있게 랜더타겟으로 별도로 스카이박스를 처리한다.
 	/* For.Target_Sky */
@@ -102,16 +103,14 @@ HRESULT CRenderer::Initialize()
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_SSAO"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_GodRay"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
-		return E_FAIL;
+
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_ResultColor"), TEXT("Target_ResultColor"))))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_ResultColor"), TEXT("Target_Specular"))))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_ResultColor"), TEXT("Target_SSAO"))))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_ResultColor"), TEXT("Target_GodRay"))))
-		return E_FAIL;
+
 #pragma endregion
 
 #pragma region MRT_ShadowObject
@@ -153,11 +152,28 @@ HRESULT CRenderer::Initialize()
 
 	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Blur_X"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
 		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_SSAO_X"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_Blur_X"), TEXT("Target_Blur_X"))))
 		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_Blur_X"), TEXT("Target_SSAO_X"))))
+		return E_FAIL;
+
 	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Blur_Y"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
 		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_SSAO_Y"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_Blur_Y"), TEXT("Target_Blur_Y"))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_Blur_Y"), TEXT("Target_SSAO_Y"))))
+		return E_FAIL;
+#pragma endregion
+
+#pragma region MRT_GodRay
+	/* For.Target_RadialBlur */
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_GodRay"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GodRay"), TEXT("Target_GodRay"))))
 		return E_FAIL;
 #pragma endregion
 
@@ -354,8 +370,8 @@ HRESULT CRenderer::Initialize()
 	//if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_DeferredInfo"), 900.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
 	//	return E_FAIL;
 
-#pragma region READY_UI
 
+#pragma region READY_UI
 	//06.04) UI 렌더타겟 뷰 생성 및 준비
 	//렌더할 뷰포트 세팅
 	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_UI"), 50.f, 50.f, 100.f, 100.f)))
@@ -488,6 +504,10 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 			if (FAILED(Render_Radial_Result(fTimeDelta)))
 				return E_FAIL;
 		}
+
+		// 갓 레이 적용
+		if (FAILED(Render_GodRay()))
+			return E_FAIL;
 		// DOF블러 적용
 		if (FAILED(Render_DOF_Result()))
 			return E_FAIL;
@@ -649,6 +669,14 @@ void CRenderer::Update_DofFocus(_fvector vWorldPos)
 	_float fScreenY = (XMVectorGetY(vScreenPos) + 1.f) * 0.5f;
 
 	m_vDofFocus = _float2(fScreenX, 1.f - fScreenY);
+}
+
+void CRenderer::Setting_GodRay(_fvector vWorldPos)
+{
+	m_vGodPos = vWorldPos;
+
+	if (FAILED(m_pShader->Bind_RawValue("g_vGodPos", &m_vGodPos, sizeof(_float4))))
+		return;
 }
 
 HRESULT CRenderer::Render_LightDepth_For_GameObject(CShader* pShader, CTransform* pTransform, CModel* pModel)
@@ -970,6 +998,10 @@ HRESULT CRenderer::Render_EffectResult()
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Specular"), "g_SpecularTexture")))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_SSAO"), "g_SSAOTexture")))
+		return E_FAIL;
+
+
 	m_pVIBuffer->Bind_Buffers();
 
 	m_pShader->Begin(DEFERRED_BLUR_X);
@@ -987,6 +1019,10 @@ HRESULT CRenderer::Render_EffectResult()
 
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Blend"), "g_BlendTexture")))
 		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_SSAO_X"), "g_SSAOTexture")))
+		return E_FAIL;
+
 
 	m_pVIBuffer->Bind_Buffers();
 
@@ -1021,19 +1057,10 @@ HRESULT CRenderer::Render_DeferredInfo()
 
 HRESULT CRenderer::Render_Result()
 {
-	// 최적화를 위해 레디얼 블러가 작동중일때만, MRT_RadialBlur가 작동하도록 한다.
-	if (m_isRadial == true)
-	{
-		// 최종적으로 레디얼 블러 및 다른 블러를 먹일 생각이다.
-		if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_RadialBlur"))))
-			return E_FAIL;
-	}
-	else
-	{
-		// DOF에 담는다.
-		if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_DOFBlur"))))
-			return E_FAIL;
-	}
+	// God에 보낸다.
+	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_GodRay"))))
+		return E_FAIL;
+
 
 	if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
 		return E_FAIL;
@@ -1049,8 +1076,6 @@ HRESULT CRenderer::Render_Result()
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_FieldDepth"), "g_FieldDepthTexture")))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_ResultColor"), "g_LinearTexture")))
-		return E_FAIL;
-	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_GodRay"), "g_GodRayTexture")))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_LightDepth"), "g_LightDepthTexture")))
 		return E_FAIL;
@@ -1069,8 +1094,8 @@ HRESULT CRenderer::Render_Result()
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_NonLight"), "g_NonLightTexture")))
 		return E_FAIL;
 
-	// SSAO 연산
-	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_SSAO"), "g_SSAOTexture")))
+	//// SSAO 연산
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_SSAO_Y"), "g_SSAOTexture")))
 		return E_FAIL;
 
 	// 카메라 포지션
@@ -1181,6 +1206,63 @@ HRESULT CRenderer::Render_Result_For_Tool()
 
 	if (FAILED(m_pGameInstance->End_MRT()))
 		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CRenderer::Render_GodRay()
+{
+	// 최적화를 위해 레디얼 블러가 작동중일때만, MRT_RadialBlur가 작동하도록 한다.
+	if (m_isRadial == true)
+	{
+		// 최종적으로 레디얼 블러 및 다른 블러를 먹일 생각이다.
+		if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_RadialBlur"))))
+			return E_FAIL;
+	}
+	else
+	{
+		// DOF에 담는다.
+		if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_DOFBlur"))))
+			return E_FAIL;
+	}
+
+	if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_GodRay"), "g_GodRayTexture")))
+		return E_FAIL;
+
+
+	if (FAILED(m_pShader->Bind_Matrix("g_GodViewMatrix", &m_pGameInstance->Get_Transform(CPipeLine::D3DTS_VIEW))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_Matrix("g_GodProjMatrix", &m_pGameInstance->Get_Transform(CPipeLine::D3DTS_PROJ))))
+		return E_FAIL;
+
+	//_float4 vTemp = Dir(m_pGameInstance->Get_Transform_Inv(CPipeLine::D3DTS_VIEW).Forward());
+	_float4 asd = CUtils::Get_State_Vector_Matrix(m_pGameInstance->Get_Transform_Inv(CPipeLine::D3DTS_VIEW), CUtils::STATE_LOOK);
+
+	// 카메라 포지션
+	if (FAILED(m_pShader->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_vCamLook", &asd, sizeof(_float4))))
+		return E_FAIL;
+
+	if (FAILED(m_pShader->Begin(DEFERRED_GODRAY)))
+		return E_FAIL;
+
+	if (FAILED(m_pVIBuffer->Bind_Buffers()))
+		return E_FAIL;
+
+	if (FAILED(m_pVIBuffer->Render()))
+		return  E_FAIL;
+
+	if (FAILED(m_pGameInstance->End_MRT()))
+		return E_FAIL;
+
 
 	return S_OK;
 }
@@ -1790,6 +1872,8 @@ HRESULT CRenderer::Render_Debug()
 	if (FAILED(m_pGameInstance->Draw_RTVDebug(TEXT("MRT_MotionBlur"), m_pShader, m_pVIBuffer)))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Draw_RTVDebug(TEXT("MRT_DeferredInfo"), m_pShader, m_pVIBuffer)))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Draw_RTVDebug(TEXT("MRT_GodRay"), m_pShader, m_pVIBuffer)))
 		return E_FAIL;
 
 	if (FAILED(m_pGameInstance->Draw_RTVDebug(TEXT("MRT_UI"), m_pShader, m_pVIBuffer)))

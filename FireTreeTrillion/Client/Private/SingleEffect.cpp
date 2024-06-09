@@ -280,13 +280,8 @@ HRESULT CSingleEffect::Bind_ShaderResources(_int iTexIdx, _int iMaskTexIdx)
 	//직교일 경우, 직교 행렬 바인딩
 	if (!m_bIsOrthographic)
 	{
-		//hr = m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform(CPipeLine::D3DTS_VIEW));
-		//CHECK_FAILED(hr);
-
-		_float4x4 viewMat = XMMatrixIdentity();
-		hr = m_pShaderCom->Bind_Matrix("g_ViewMatrix", &viewMat);
+		hr = m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform(CPipeLine::D3DTS_VIEW));
 		CHECK_FAILED(hr);
-
 
 		hr = m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform(CPipeLine::D3DTS_PROJ));
 		CHECK_FAILED(hr);

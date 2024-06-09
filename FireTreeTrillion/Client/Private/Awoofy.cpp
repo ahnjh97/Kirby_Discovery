@@ -49,7 +49,7 @@ HRESULT CAwoofy::Initialize(void* pArg)
 	m_eAbilityType = ABILITY_DEFAULT;
 	m_eEyeState = AWOOFYEYE_IDLE;
 
-	m_fRimWidth = 5.f;
+	//m_fRimWidth = 5.f;
 	Add_AnimEvent();
 
 	return S_OK;

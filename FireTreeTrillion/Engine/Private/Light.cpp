@@ -84,22 +84,6 @@ HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer, _bool bFor
 
 		iPassIndex = DEFERRED_POINTLIGHT;
 	}
-	//갓 레이 용 패스로 틀어준다.
-	else if (LIGHT_DESC::TYPE_GODRAY == m_LightDesc.eType)
-	{
-		if (FAILED(pShader->Bind_RawValue("g_vLightPos", &m_LightDesc.vPosition, sizeof(_float4))))
-			return E_FAIL;
-		if (FAILED(pShader->Bind_RawValue("g_fLightRange", &m_LightDesc.fRange, sizeof(_float))))
-			return E_FAIL;
-
-		if (FAILED(pShader->Bind_Matrix("g_ViewMatrix", &CGameInstance::Get_Instance()->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
-			return E_FAIL;
-		if (FAILED(pShader->Bind_Matrix("g_ProjMatrix", &CGameInstance::Get_Instance()->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
-			return E_FAIL;
-
-
-		iPassIndex = DEFERRED_GODRAY;
-	}
 
 	if (FAILED(pShader->Bind_RawValue("g_vLightDiffuse", &m_LightDesc.vDiffuse, sizeof(_float4))))
 		return E_FAIL;

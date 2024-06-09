@@ -53,7 +53,7 @@ public: /* For.Renderer */
 	HRESULT Bind_DeferredRawValue(const _char* pConstantName, const void* pData, _uint iLength);
 	void Set_RenderMode(CRenderer::RENDER_MODE eMode);
 	void Update_Option(CRenderer::OPTION Option, _bool bOn);
-
+	void Setting_GodRay(_fvector vWorldPos);
 
 #ifdef _DEBUG
 public:
