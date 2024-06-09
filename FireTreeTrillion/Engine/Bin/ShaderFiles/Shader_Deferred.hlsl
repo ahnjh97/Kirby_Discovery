@@ -10,10 +10,10 @@ matrix g_ViewMatrixInv, g_ProjMatrixInv;
 bool g_bApplyCorrection = true;
 
 // 디퍼드 옵션 설정
-bool g_bRenderShadow = { true };
-bool g_bRenderSSAO = { true };
-bool g_bRenderDOF = { true };
-bool g_bRenderMotionBlur = { true };
+bool g_bRenderShadow = {true};
+bool g_bRenderSSAO = {true};
+bool g_bRenderDOF = {true};
+bool g_bRenderMotionBlur = {true};
 
 
 float g_fExposure = 1.4f;
@@ -75,25 +75,6 @@ float g_sample_radius = 3.f;
 float g_intensity = 3.f;
 
 ////////////////
-
-
-//**** 갓 레이 ****//
-
-texture2D g_GodRayTexture;
-// 노출도
-float g_fRayExposure = 0.1f;
-// 빛의 감쇠율
-float g_fRayDecay = 1.f;
-// 샘플의 누적 감쇠율
-float g_fRayIlluminationDecay = 1.f;
-// 광선의 길이와 밀도
-float g_fRayDensity = .96f;
-// 광선의 길이와 밀도
-float g_fWeight = .4f;
-////////////////
-
-
-
 
 TextureCube g_EnvTexture;
 Texture2D g_LUTTexture;
@@ -467,7 +448,6 @@ struct PS_OUT_LIGHT
     float4 vResultColor : SV_TARGET0;
     float4 vSpecular : SV_TARGET1;
     float4 vSSAO : SV_TARGET2;
-    float4 vGodRay : SV_TARGET3;
 };
 
 /* 빛 하나당 480000 수행되는 쉐이더. */
@@ -573,7 +553,7 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
     float4 vLightspecular = 0.0;
     {
         float3 vReflect = reflect(normalize(g_vLightDir.xyz), N);
-        float fLightspecular = saturate(pow(max(dot(normalize(vReflect), normalize(Lo)), 0.0), 20.f * (max(0.5, 1.f - fRoughness * 2.f))) * saturate(1.f - fRoughness * 1.05f));
+        float fLightspecular = saturate(pow(max(dot(normalize(vReflect), normalize(Lo)), 0.0), 20.f * ( max(0.5, 1.f - fRoughness * 2.f) )) * saturate(1.f - fRoughness * 1.05f));
         vLightspecular = fLightspecular;
 
         vLightspecular += vDiffuse * vLightspecular.a;
@@ -615,7 +595,6 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
     
     Out.vResultColor = float4(directLighting + ambientLighting, 1.f) * fAmbientOcclusion;
     Out.vSpecular = vLightspecular;
-    
     return Out;
 }
 
@@ -630,54 +609,6 @@ PS_OUT_LIGHT PS_MAIN_POINT(PS_IN In)
     vDiffuse = pow(vDiffuse, 2.2f);
        
 
-    return Out;
-}
-
-PS_OUT_LIGHT PS_MAIN_GODRAY(PS_IN In)
-{
-    PS_OUT_LIGHT Out = (PS_OUT_LIGHT) 0;
-
-    
-    //광선의 투영 공간 위치 연산
-    vector vRayPos = g_vLightPos;
-    vRayPos = mul(vRayPos, g_ViewMatrix);
-    vRayPos = mul(vRayPos, g_ProjMatrix);
-    vRayPos /= vRayPos.w;
-
-    //texcoord로 변환
-    vRayPos.x = (vRayPos.x * .5f) + .5f;
-    vRayPos.y = (vRayPos.y * -.5f) + .5f;
-    
- 
-    //샘플링하는 횟수.
-    int iSampleNum = 64;
-    
-    //광선 위치부터 현재 픽셀로 향하는 방향을 구한다.
-    float2 vDirDelta = In.vTexcoord - vRayPos.xy;
-    
-    //density만큼 방향 길이를 보정한다.
-    //vDirDelta = normalize(vDirDelta) / iSampleNum;
-    vDirDelta *= (1.0 / iSampleNum) * g_fRayDensity;
-    float fIlluminationDecay = g_fRayIlluminationDecay;
-    //샘플링 기준 위치
-    float2 vSampleUV = In.vTexcoord;
-    
-    for (int i = 0; i < iSampleNum; ++i)
-    {
-        //방향으로 나아가며 샘플한다.
-        vSampleUV -= vDirDelta;
-        
-        float fSampleZ = g_DepthTexture.Sample(PointSampler, vSampleUV).y * g_fFar;
-        
-        if (fSampleZ < g_DepthTexture.Sample(PointSampler, vRayPos.xy).y * g_fFar)
-        {
-            Out.vGodRay += g_vLightDiffuse * fIlluminationDecay * g_fWeight;
-            fIlluminationDecay *= g_fRayDecay;
-        }
-    }
-    
-    Out.vGodRay *= g_fRayExposure;
-    
     return Out;
 }
 
@@ -727,9 +658,8 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
 
     vector vDiffuse = g_LinearTexture.Sample(LinearSampler, In.vTexcoord);
     
-    Out.vColor.rgb = pow(vDiffuse, 1.0f / 2.2f);
-
-
+    Out.vColor = pow(vDiffuse, 1.0f / 2.2f);
+    
     if (g_bRenderSSAO == true)
         Out.vColor *= g_SSAOTexture.Sample(LinearSampler, In.vTexcoord);
     
@@ -796,7 +726,6 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
     vector vBlur = g_BlurTexture.Sample(LinearSampler, In.vTexcoord);
     vector vEffect = g_EffectTexture.Sample(LinearSampler, In.vTexcoord);
     vector vSky = g_SkyTexture.Sample(LinearSampler, In.vTexcoord);
-    vector vGodRay = g_GodRayTexture.Sample(LinearSampler, In.vTexcoord);
     
     // 스카이박스와 이펙트의 결합 ( 블룸 및 블랜드 )
     if (0.0f == vDiffuse.a)
@@ -813,8 +742,7 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
     // 기존 디퓨즈와 가산되어 그려진다.
     Out.vColor += vEffect + (vBlur * 2);
         
-    //갓 레이를 더한다.
-    Out.vColor.rgb += vGodRay.rgb;
+    
     
     if (g_DeferredInfoTexture.Sample(LinearSampler, In.vTexcoord).g == 1.f && g_StencilTexture.Sample(LinearSampler, In.vTexcoord).r != 1.f)
     {
@@ -892,7 +820,7 @@ PS_OUT PS_MAIN_FINAL_FOR_TOOL(PS_IN In)
     if (vPosition.w > (vLightDepthDesc.x * 2000.f) && g_StencilTexture.Sample(LinearSampler, In.vTexcoord).x == 0.f)
     {
         Out.vColor *= 0.6f;
-    }
+    }    
         
     vector vNonLight = g_NonLightTexture.Sample(LinearSampler, In.vTexcoord);
     vector vBlend = g_BlendTexture.Sample(LinearSampler, In.vTexcoord);
@@ -1030,6 +958,7 @@ PS_OUT PS_MAIN_COLORCORRECT(PS_IN In)
     return Out;
 }
 
+
 PS_OUT PS_MAIN_DOFBlur(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
@@ -1053,20 +982,20 @@ PS_OUT PS_MAIN_DOFBlur(PS_IN In)
     float fDOFTotal = 0.f;
     
      // 초점 깊이와 현재 깊이의 차이
-    float fDepthDifference = abs(fKirbyViewZ - fMyViewZ);
+    float fDepthDifference = abs(fKirbyViewZ - fMyViewZ);    
     float fDOFWeight = 0.f;
         
     //커비보다 내가 가까우면
-    if (fMyViewZ < fKirbyViewZ)
+    if(fMyViewZ < fKirbyViewZ)
     {
         float fDOFFar = fKirbyViewZ;
         // DOFWeight 계산 (스케일링 및 클램핑)
-        fDOFWeight = saturate(pow(fDepthDifference / fDOFFar, 5.0) * 20.0);
+        fDOFWeight = saturate( pow(fDepthDifference / fDOFFar, 5.0) * 20.0);
     }
     else
     {
         float fDOFFar = g_fFar - fKirbyViewZ;
-        fDOFWeight = saturate(pow(fDepthDifference / 100, 15.0) * 2.0);
+        fDOFWeight = saturate( pow(fDepthDifference / 100, 15.0) * 2.0);
     }
     
     
@@ -1122,7 +1051,7 @@ PS_OUT PS_MAIN_DOFBlur_Result(PS_IN In)
     
     
     Out.vColor = FreeBlur_Y(In.vTexcoord, g_DOFBlur_Result, fDOFWeight);
-    return Out;
+    return Out;    
     
 }
 
@@ -1166,7 +1095,7 @@ PS_OUT PS_UI_Default(PS_IN In)
     
     vector vColor = g_FinalTexture.Sample(LinearSampler, In.vTexcoord);
  
-    vector vUIColor = g_UITexture.Sample(LinearSampler, In.vTexcoord);
+    vector vUIColor = g_UITexture.Sample(LinearSampler, In.vTexcoord);   
     
     Out.vColor = vColor;
     
@@ -1354,15 +1283,4 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_FINAL_FOR_TOOL();
     }
 
-    // God Ray 용 빛 렌더 ( 14 )
-    pass GodRay
-    {
-        SetRasterizerState(RS_Default);
-        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
-        SetBlendState(BS_Blend, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xffffffff);
-
-        VertexShader = compile vs_5_0 VS_MAIN();
-        GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_MAIN_GODRAY();
-    }
 }
