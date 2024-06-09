@@ -170,9 +170,9 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& strLayerTag)
 {
 	//파일명과 UITag 별도로 지정 필요
 	string strFilePath = { "../../../UI_txt/" };
-	string strUITag = { "LayerUI_Orig.txt" };
+	string strFileTag = { "Perspec_Orig.txt" };
 
-	std::ifstream InputFile(strFilePath + strUITag, ios::in | std::ios::binary);
+	std::ifstream InputFile(strFilePath + strFileTag, ios::in | std::ios::binary);
 
 	if (!InputFile.is_open()) //==FALSE 
 	{

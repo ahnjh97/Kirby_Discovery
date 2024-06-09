@@ -41,7 +41,7 @@ private:
 	_bool			Window_Sequencer();
 	void			Window_PopupAlert();
 
-	_bool			Set_OrthoProj(); //투영스페이스 직교 
+	_bool			Set_Projection(); //투영공간 설정
 	_bool			Set_GizmoGrid(); //기즈모 위젯 그리드 세팅
 	_bool			Set_GizmoSync(CUIObject* _pUIObj); //기즈모 위젯 동기화 및 세팅
 

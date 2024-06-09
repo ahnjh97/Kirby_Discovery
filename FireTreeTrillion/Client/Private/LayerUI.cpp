@@ -54,7 +54,7 @@ HRESULT CLayerUI::Initialize(void* _pArg)
 	if (PROJ_ORTHO == m_UIObjDesc.eUIProj)
 	{
 		m_UIObjDesc.fOrthoDegree = (*LayerUI_Desc).fOrthoDegree;
-		m_pTransformCom->Rotation(XMVectorSet(0.f, 0.f, 1.f, 1.f), XMConvertToRadians(m_UIObjDesc.fOrthoDegree));
+		m_pTransformCom->Rotation(XMVectorSet(AXIS_Z), XMConvertToRadians(m_UIObjDesc.fOrthoDegree));
 		XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 	}
 

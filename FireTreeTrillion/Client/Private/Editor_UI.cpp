@@ -64,7 +64,6 @@ _int CEditor_UI::Tick(_float _fTimeDelta)
 {
 	__super::Tick(_fTimeDelta);
 
-	//Set_OrthoProj();
 	if (!m_LayerUIs.empty())
 	{
 		for (auto& pUIObj : m_LayerUIs)
@@ -170,9 +169,9 @@ _bool CEditor_UI::Set_DockSpace()
 			{
 				if (ImGui::BeginMenu(u8"New/Create 생성"))
 				{
-					if (ImGui::BeginMenu(u8"Layer 레이어", "Ctrl+N"))
+					if (ImGui::BeginMenu(u8"Layer 레이어"))
 					{
-						if (ImGui::MenuItem(u8"Texture 텍스처"))
+						if (ImGui::MenuItem(u8"Texture 텍스처", "Ctrl+N"))
 							Create_UIObject(UI_LAYER, UI_TEXTURE);
 
 						if (ImGui::MenuItem(u8"Font 폰트"))
@@ -537,7 +536,7 @@ _bool CEditor_UI::Window_Tools()
 				ImGui::SeparatorText(u8"Color Edit 색상 편집");
 				if (!g_SelectUIs.empty())
 				{
-					g_iSelectUI = g_SelectUIs.front();
+					//g_iSelectUI = g_SelectUIs.front();
 					if ((g_iSelectUI >= 0 && g_iSelectUI < m_LayerUIs.size()))
 						Edit_RGBAColor(m_LayerUIs[g_iSelectUI]);
 				}
@@ -776,43 +775,42 @@ _bool CEditor_UI::Edit_Transform(CUIObject* _pUIObj)
 	LayerUIDesc.vSize = (_float3)Scale;
 	LayerUIDesc.vPos = (_float3)Translate;
 
+#pragma region SET_PROJECTION
+
 	//직교, 원근투영 옵션 스왑
 	ImGuiStyle Style = ImGui::GetStyle();
 	//ImVec2 vPrePadding = Style.FramePadding;
 	Style.FramePadding = ImVec2(20.f, 20.f);
 
-	ImGui::Text(u8"Proj 투영");
-	ImGui::SameLine(); HelpMarker(u8"~");
+	ImGui::Text(u8"Projection 투영");
+	ImGui::SameLine(); HelpMarker(u8"단축키 설정필요");
 	ImGui::SameLine(fTextWidth + 35);
 
-	if (m_pGameInstance->Get_DIKeyState(DIK_GRAVE, KEY_DOWN))
-		g_IsOrthoProj != g_IsOrthoProj;
-
-	if (ImGui::RadioButton(u8"Ortho 직교", g_IsOrthoProj)) 
-		g_IsOrthoProj = TRUE;
-
+	if (ImGui::RadioButton(u8"Ortho 직교", g_IsOrthoProj)) { g_IsOrthoProj = TRUE; }
 	ImGui::SameLine();
-
-	if (ImGui::RadioButton(u8"Perspect 원근", !g_IsOrthoProj)) 
-		g_IsOrthoProj = FALSE;
+	if (ImGui::RadioButton(u8"Perspect 원근", !g_IsOrthoProj)) {	g_IsOrthoProj = FALSE;	}
 
 	ImGui::PushItemWidth(175.f/*ImGui::GetColumnOffset()*/);
 	ImGui::Text(u8"Rotate 회전");
 	ImGui::SameLine(); HelpMarker(u8"Ctrl+R");
 	ImGui::SameLine(fTextWidth + 35);
 
-	if (g_IsOrthoProj == TRUE)
+	if (PROJ_ORTHO == LayerUIDesc.eUIProj)
 	{
+		g_IsOrthoProj = TRUE;
 		ImGui::DragFloat("##Rotate Ortho", (_float*)&Rotate[2], 0.1f, (_int)-360, (_int)360, u8"Degree 각도 : %.1f");
-		LayerUIDesc.eUIProj = PROJ_ORTHO;
 		LayerUIDesc.fOrthoDegree = (_float)Rotate[2];
 	}
-	else 
-	{	
-		ImGui::DragFloat3("##Rotte Perspec", (_float*)&Rotate, 0.1f, (_int)-360, (_int)360, "%.1f");	
-		LayerUIDesc.eUIProj = PROJ_PERSPEC;
+
+	else //(PROJ_PERSPEC == LayerUIDesc.eUIProj)
+	{
+		g_IsOrthoProj = FALSE;
+		ImGui::DragFloat3("##Rotte Perspec", (_float*)&Rotate, 0.1f, (_int)-360, (_int)360, "%.1f");
 		LayerUIDesc.vPersDegree = (_float3)Rotate;
 	}
+
+#pragma endregion
+
 
 	ImGui::Text(u8"Scale 크기");
 	ImGui::SameLine(); HelpMarker(u8"Ctrl+E");
@@ -860,7 +858,8 @@ _bool CEditor_UI::Edit_RGBAColor(CUIObject* _pUIObj)
 	ImGuiColorEditFlags ColorEditHex_Flags = ImGuiColorEditFlags_NoSmallPreview | ImGuiColorEditFlags_DisplayHex;
 	ImGuiColorEditFlags ColorPicker_Flags = { ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar };
 	
-	static ImVec4 vColorRGBA{	1.f, 1.f, 1.f, 1.f };
+	UIOBJ_DESC LayerUIDesc = _pUIObj->Get_UIObj_Desc();
+	ImVec4 vColorRGBA = ImVec4(LayerUIDesc.vColorRGB.x, LayerUIDesc.vColorRGB.y, LayerUIDesc.vColorRGB.z, LayerUIDesc.fAlpha);
 
 	ImGui::ColorButton("##ColorButton", *(ImVec4*)&vColorRGBA, ColorButton_Flags, ImVec2(50, 45));
 	ImGui::SameLine();
@@ -880,9 +879,7 @@ _bool CEditor_UI::Edit_RGBAColor(CUIObject* _pUIObj)
 	ImGui::ColorPicker4("##ColorPicker", (_float*)&vColorRGBA, ColorPicker_Flags);
 	ImGui::PopItemWidth();
 
-	UIOBJ_DESC LayerUIDesc = _pUIObj->Get_UIObj_Desc();
-
-	//위젯 동기화 및 값 적용
+	//위젯 값 객체에 다시 적용
 	LayerUIDesc.vColorRGB.x = vColorRGBA.x;
 	LayerUIDesc.vColorRGB.y = vColorRGBA.y;
 	LayerUIDesc.vColorRGB.z = vColorRGBA.z;
@@ -964,30 +961,30 @@ wstring CEditor_UI::Edit_LayerUITag(string _strInput)
 
 }
 
-//사용 안함) 직교투영 세팅
-_bool CEditor_UI::Set_OrthoProj()
-{
+//진행 중) 직교/원근투영 스왑
+_bool CEditor_UI::Set_Projection()
+{	
 	// 05.24) 직교투영 스페이스 변환
-	_float4x4 WorldMatrix, ViewMatrix, ProjMatrix;
-	ViewMatrix = m_pTransformCom->Get_WorldMatrix_Inverse();
-	m_pGameInstance->Set_Transform(CPipeLine::D3DTS_VIEW, ViewMatrix);
+	//_float4x4 WorldMatrix, ViewMatrix, ProjMatrix;
+	//ViewMatrix = m_pTransformCom->Get_WorldMatrix_Inverse();
+	//m_pGameInstance->Set_Transform(CPipeLine::D3DTS_VIEW, ViewMatrix);
 
-	// 뷰볼륨 조정
-	_float2 ViewVolume;
-	ViewVolume.x -= g_iWinSizeX * 0.01f;
-	ViewVolume.y -= g_iWinSizeY * 0.01f;
+	//// 뷰볼륨 조정
+	//_float2 ViewVolume;
+	//ViewVolume.x -= g_iWinSizeX * 0.01f;
+	//ViewVolume.y -= g_iWinSizeY * 0.01f;
 
-	if (g_iWinSizeX <= ViewVolume.x || g_iWinSizeY <= ViewVolume.y)
-		return FALSE;
+	//if (g_iWinSizeX <= ViewVolume.x || g_iWinSizeY <= ViewVolume.y)
+	//	return FALSE;
 
-	ProjMatrix = XMMatrixOrthographicLH(ViewVolume.x, ViewVolume.y, 0.0f, 1600.f);
-	m_pGameInstance->Set_Transform(CPipeLine::D3DTS_PROJ, ProjMatrix);
+	//ProjMatrix = XMMatrixOrthographicLH(ViewVolume.x, ViewVolume.y, 0.0f, 1600.f);
+	//m_pGameInstance->Set_Transform(CPipeLine::D3DTS_PROJ, ProjMatrix);
 
-	//const CTransform* pUIEditorTrans = dynamic_cast<const CTransform*>(m_pGameInstance->
-	//	Get_Component(LEVEL_TOOL_UI, TEXT("Layer_UI"), g_strTransformTag));
-	CTransform* pUIEditorTrans = dynamic_cast<CTransform*>(this->Get_Component(g_strTransformTag));
+	////const CTransform* pUIEditorTrans = dynamic_cast<const CTransform*>(m_pGameInstance->
+	////	Get_Component(LEVEL_TOOL_UI, TEXT("Layer_UI"), g_strTransformTag));
+	//CTransform* pUIEditorTrans = dynamic_cast<CTransform*>(this->Get_Component(g_strTransformTag));
 
-	WorldMatrix = pUIEditorTrans->Get_WorldMatrix();
+	//WorldMatrix = pUIEditorTrans->Get_WorldMatrix();
 
 	return TRUE;
 }
