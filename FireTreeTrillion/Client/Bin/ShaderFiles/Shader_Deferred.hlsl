@@ -1301,7 +1301,7 @@ PS_OUT PS_MAIN_MotionBlur(PS_IN In)
     float2 vMyBlurDir = vMotionBlurSample.xy;
     
     
-    float fMotionblurRaduis = 500.f;
+    float fMotionblurRaduis = 300.f;
     
     if (vMotionBlurSample.z == 1.f)
         fMotionblurRaduis = 1000.f;
