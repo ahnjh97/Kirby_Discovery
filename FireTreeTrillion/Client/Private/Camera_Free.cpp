@@ -213,12 +213,12 @@ void CCamera_Free::Track_Target(_float fTimeDelta)
 			vTargetPos.y = vTerrainPos.y;
 		}
 
-		_float4 vBackDir = -m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+		_float4 vBackDir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 		vBackDir.Normalize();
-		//vBackDir *= m_fTrackDistance;
+		vBackDir *= m_fTrackDistance;
 		m_vDestCamDir = vBackDir;
-		//m_vDestCamPos = vTargetPos + vBackDir;
-		//m_vDestCamDir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+		m_vDestCamPos = vTargetPos + vBackDir;
+		m_vDestCamDir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 
 	}
 
@@ -407,13 +407,13 @@ void CCamera_Free::Track_Target(_float fTimeDelta)
 
 	//}
 	//
-	//if (m_bLerpByTriggerInfo)
-	//{
+	/*if (m_bLerpByTriggerInfo)
+	{
 
-	//_float4 vLerpedDir = SlerpDirVec(vCamLook, vDestLook, m_fSlerpRatio);
-	//m_pTransformCom->Look_At_Axis(vLerpedDir);
+		_float4 vLerpedDir = SlerpDirVec(vCamLook, vDestLook, m_fSlerpRatio);
+		m_pTransformCom->Look_At_Axis(vLerpedDir);
 
-	//}
+	}*/
 
 
 

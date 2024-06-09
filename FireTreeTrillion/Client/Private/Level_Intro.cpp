@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "LevelChanger.h"
 #include "Level_Intro.h"
 #include "Camera_Free.h"
 #include "BasicMap.h"
@@ -14,6 +15,9 @@ CLevel_Intro::CLevel_Intro(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 HRESULT CLevel_Intro::Initialize()
 {
+	m_pGameInstance->Set_RenderMode(CRenderer::MODE_GAMEPLAY);
+	CLevelChanger::Get_Instance()->Load();
+
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
 
