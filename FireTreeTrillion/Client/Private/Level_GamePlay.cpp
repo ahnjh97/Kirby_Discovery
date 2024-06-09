@@ -111,14 +111,14 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 	
 
 	//// 예시코드 2 : God Ray
-	LIGHT_DESC		GodRayDesc{};
-	GodRayDesc.eType = LIGHT_DESC::TYPE_GODRAY;
-	GodRayDesc.vPosition = _float4(100.f, 74.f, 7.f, 1.f);
-	GodRayDesc.fRange = 80.f;
+	//LIGHT_DESC		GodRayDesc{};
+	//GodRayDesc.eType = LIGHT_DESC::TYPE_GODRAY;
+	//GodRayDesc.vPosition = _float4(100.f, 74.f, 7.f, 1.f);
+	//GodRayDesc.fRange = 80.f;
 
-	GodRayDesc.vDiffuse = _float4(.5f, .5f, .5f, 1.f);
-	GodRayDesc.vAmbient = _float4(0.6f, 0.6f, 0.6f, 1.f);
-	GodRayDesc.vSpecular = _float4(0.2f, 0.2f, 0.2f, 1.f);
+	//GodRayDesc.vDiffuse = _float4(.5f, .5f, .5f, 1.f);
+	//GodRayDesc.vAmbient = _float4(0.6f, 0.6f, 0.6f, 1.f);
+	//GodRayDesc.vSpecular = _float4(0.2f, 0.2f, 0.2f, 1.f);
 	//if (FAILED(CGameInstance::Get_Instance()->Add_Light(GodRayDesc)))
 	//	return E_FAIL;
 
@@ -139,8 +139,8 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 	//	return E_FAIL;
 
 	//GodRayDesc.vPosition = _float4(13.f, 50.f, 9.f, 1.f);
-	if (FAILED(CGameInstance::Get_Instance()->Add_Light(GodRayDesc)))
-		return E_FAIL;
+	//if (FAILED(CGameInstance::Get_Instance()->Add_Light(GodRayDesc)))
+	//	return E_FAIL;
 
 	return S_OK;
 }

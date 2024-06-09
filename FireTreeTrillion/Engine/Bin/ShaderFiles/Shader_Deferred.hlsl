@@ -814,7 +814,7 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
     Out.vColor += vEffect + (vBlur * 2);
         
     //갓 레이를 더한다.
-    Out.vColor.rgb += vGodRay.rgb;
+    //Out.vColor.rgb += vGodRay.rgb;
     
     if (g_DeferredInfoTexture.Sample(LinearSampler, In.vTexcoord).g == 1.f && g_StencilTexture.Sample(LinearSampler, In.vTexcoord).r != 1.f)
     {
