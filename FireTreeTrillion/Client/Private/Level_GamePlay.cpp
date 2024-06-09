@@ -93,6 +93,8 @@ HRESULT CLevel_GamePlay::Render()
 HRESULT CLevel_GamePlay::Ready_Lights()
 {
 
+
+
 	//// 예시코드 1 : 태양광
 	LIGHT_DESC		LightDesc{};
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;

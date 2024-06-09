@@ -80,8 +80,6 @@ HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer, _bool bFor
 		if (FAILED(pShader->Bind_RawValue("g_fLightRange", &m_LightDesc.fRange, sizeof(_float))))
 			return E_FAIL;
 
-
-
 		iPassIndex = DEFERRED_POINTLIGHT;
 	}
 
