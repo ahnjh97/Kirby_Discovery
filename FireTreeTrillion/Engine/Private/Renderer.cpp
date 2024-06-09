@@ -585,7 +585,7 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 		m_DestColorData = Find_ColorSet("Tutorial");
 		break;
 	case 2:
-		m_DestColorData = Find_ColorSet("Night");
+		m_DestColorData = Find_ColorSet("Tutorial");
 		break;
 	case 3:
 		m_DestColorData = Find_ColorSet("Stage1");
@@ -721,6 +721,13 @@ HRESULT CRenderer::Render_LightDepth_For_PartObject(CShader* pShader, const _flo
 }
 
 #ifdef _DEBUG
+
+void CRenderer::Bind_RendererFunc(_int iTriggerType)
+{
+	function<void(_int)> TriggerFunc = bind(&CRenderer::Set_ColorSet_ByIndex, this, placeholders::_1);
+	m_pGameInstance->Emplace_TriggerFunc(iTriggerType, TriggerFunc);
+}
+
 HRESULT CRenderer::Add_DebugComponents(CComponent* pRenderComponent)
 {
 	m_DebugComponents.emplace_back(pRenderComponent);

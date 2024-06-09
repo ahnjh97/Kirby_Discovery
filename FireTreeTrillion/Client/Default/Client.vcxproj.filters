@@ -208,8 +208,14 @@
     <Filter Include="02.GameObjects\PhysXObject\RigidObject\WasteCan">
       <UniqueIdentifier>{f175b95e-a1d4-47cd-9d10-49f323d1f526}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\UI\HUD\Status">
-      <UniqueIdentifier>{40b17e1d-b951-4cde-ac57-e7be68df93a9}</UniqueIdentifier>
+    <Filter Include="02.GameObjects\Map\BG">
+      <UniqueIdentifier>{28a5f192-89d1-46d7-bf46-1aafeee88d03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\Intro">
+      <UniqueIdentifier>{892828e4-f620-440a-8c8b-727c32537a71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\Logo">
+      <UniqueIdentifier>{7fa67ac9-2f2d-435f-bf35-849f5cbedd3c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -423,8 +429,12 @@
     <ClInclude Include="..\Public\WasteCan.h">
       <Filter>02.GameObjects\PhysXObject\RigidObject\WasteCan</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\HUD_KirbyStatus.h">
-      <Filter>02.GameObjects\UI\HUD</Filter>
+    <ClInclude Include="..\Public\Multi_UI.h" />
+    <ClInclude Include="..\Public\BG.h">
+      <Filter>02.GameObjects\Map\BG</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_Intro.h">
+      <Filter>01.Levels\Intro</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -620,8 +630,12 @@
     <ClCompile Include="..\Private\WasteCan.cpp">
       <Filter>02.GameObjects\PhysXObject\RigidObject\WasteCan</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\HUD_KirbyStatus.cpp">
-      <Filter>02.GameObjects\UI\HUD</Filter>
+    <ClCompile Include="..\Private\Multi_UI.cpp" />
+    <ClCompile Include="..\Private\BG.cpp">
+      <Filter>02.GameObjects\Map\BG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Intro.cpp">
+      <Filter>01.Levels\Intro</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

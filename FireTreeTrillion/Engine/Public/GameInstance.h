@@ -53,7 +53,7 @@ public: /* For.Renderer */
 	HRESULT Bind_DeferredRawValue(const _char* pConstantName, const void* pData, _uint iLength);
 	void Set_RenderMode(CRenderer::RENDER_MODE eMode);
 	void Update_Option(CRenderer::OPTION Option, _bool bOn);
-
+	void Bind_RendererFunc(_int iTriggerType);
 
 #ifdef _DEBUG
 public:
@@ -140,8 +140,8 @@ public: /* For.PhysX */
 	PxPhysics*				Get_Physics();
 	PxMaterial*				Get_Material();
 	PxControllerManager*	Get_ControllerManager();
-	void		AddActor(physx::PxActor& pActor);
-	void		RemoveActor(physx::PxActor& pActor);
+	void		AddActor(PxActor& pActor);
+	void		RemoveActor(PxActor& pActor);
 
 	void		Test();
 	_float4x4	Update(_fmatrix matrix);
@@ -202,6 +202,9 @@ public: /* For. TimeController */
 	void	Restore_SecondTimer();
 
 
+	_uint Get_NumOctree() { return g_iNumOctree; }
+	void IncreaseIndex() { g_iNumOctree++; }
+
 private:
 	class CGraphic_Device*			m_pGraphic_Device = { nullptr };
 	class CInput_Device*			m_pInput_Device = { nullptr };
@@ -225,6 +228,7 @@ private:
 	class CTimeController*			m_pTimeController = { nullptr };
 
 	_uint	m_iCurrentLevelID		= { 0 };
+	_uint	g_iNumOctree			= {};
 
 public:		
 	static void Release_Engine();

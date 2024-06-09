@@ -33,6 +33,7 @@ public:
 	//}
 	void			Get_ShapeInfo(physx::PxCapsuleGeometry& CapsuleGeo, physx::PxTransform& pxTransform);
 	_float			Get_Radius() const { return m_tControllerDesc.radius; }
+	void			RegisterAsPlayer();
 
 public:
 	virtual HRESULT Initialize(void* pArg)	override;
