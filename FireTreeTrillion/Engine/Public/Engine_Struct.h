@@ -7,11 +7,12 @@ namespace Engine
 		HWND			hWnd;
 		bool			isWindowed;
 		unsigned int	iWinSizeX, iWinSizeY;
+
 	}ENGINE_DESC;
 
 	typedef struct
 	{
-		enum TYPE { TYPE_DIRECTIONAL, TYPE_POINT, TYPE_FLASH, TYPE_SUPERFLASH, TYPE_END };
+		enum TYPE { TYPE_DIRECTIONAL, TYPE_POINT, TYPE_FLASH, TYPE_SUPERFLASH, TYPE_GODRAY, TYPE_END };
 		TYPE		eType;
 
 		XMFLOAT4	vDirection;
