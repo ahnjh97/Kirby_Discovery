@@ -35,7 +35,8 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 
 	m_pGameInstance->Add_Camera(this);
 
-	if (*m_pGameInstance->Get_CurrentLevelID() == LEVEL_GAMEPLAY) {
+	if (*m_pGameInstance->Get_CurrentLevelID() == LEVEL_INTRO || 
+		*m_pGameInstance->Get_CurrentLevelID() == LEVEL_GAMEPLAY) {
 		function<void(_int)> func = bind(&CCamera_Free::StartLerpByTriggerInfo, this, placeholders::_1);
 		m_pGameInstance->Emplace_TriggerFunc(TRIGGER_CAMERA, func);
 
@@ -212,12 +213,12 @@ void CCamera_Free::Track_Target(_float fTimeDelta)
 			vTargetPos.y = vTerrainPos.y;
 		}
 
-		_float4 vBackDir = -m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+		_float4 vBackDir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 		vBackDir.Normalize();
-		//vBackDir *= m_fTrackDistance;
+		vBackDir *= m_fTrackDistance;
 		m_vDestCamDir = vBackDir;
-		//m_vDestCamPos = vTargetPos + vBackDir;
-		//m_vDestCamDir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+		m_vDestCamPos = vTargetPos + vBackDir;
+		m_vDestCamDir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 
 	}
 
@@ -406,13 +407,13 @@ void CCamera_Free::Track_Target(_float fTimeDelta)
 
 	//}
 	//
-	//if (m_bLerpByTriggerInfo)
-	//{
+	/*if (m_bLerpByTriggerInfo)
+	{
 
-	//_float4 vLerpedDir = SlerpDirVec(vCamLook, vDestLook, m_fSlerpRatio);
-	//m_pTransformCom->Look_At_Axis(vLerpedDir);
+		_float4 vLerpedDir = SlerpDirVec(vCamLook, vDestLook, m_fSlerpRatio);
+		m_pTransformCom->Look_At_Axis(vLerpedDir);
 
-	//}
+	}*/
 
 
 

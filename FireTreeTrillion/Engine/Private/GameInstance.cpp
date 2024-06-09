@@ -125,6 +125,12 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 		nullptr == m_pPipeLine)
 		return;
 
+	_float ffTimeDelta = fTimeDelta;
+	if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_W, KEY_PRESS))
+	{
+		ffTimeDelta = fTimeDelta * 0.5f;
+	}
+	
 	m_pInput_Device->Tick();
 	m_pTimeController->Update_TimeController(fTimeDelta);
 
@@ -331,6 +337,14 @@ void CGameInstance::Update_DofFocus(_fvector vWorldPos)
 
 	m_pRenderer->Update_DofFocus(vWorldPos);
 
+}
+
+void CGameInstance::Bind_RendererFunc(_int iTriggerType)
+{
+	if (nullptr == m_pRenderer)
+		return;
+
+	m_pRenderer->Bind_RendererFunc(iTriggerType);
 }
 
 void CGameInstance::Set_BlackBackGround(_bool bSet)

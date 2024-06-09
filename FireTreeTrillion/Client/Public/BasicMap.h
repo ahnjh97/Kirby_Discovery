@@ -12,6 +12,15 @@ BEGIN(Client)
 
 class CBasicMap final : public CGameObject
 {
+	enum TEX_MAP { TEX_NOISE, TEX_HEIGHT, TEX_END };
+
+public:
+	struct MAP_DESC : public GAMEOBJECT_DESC
+	{
+		_float3 vMin{};
+		_float3 vMax{};
+	};
+
 public:
 	void Set_PassIndex(_uint iIndex, _uint iPassIndex) { m_vecPassIndices[iIndex] = iPassIndex; }
 	void Set_SamplingFactor(_uint iIndex, _float fSamplingFactor) { m_vecSamplingFactors[iIndex] = fSamplingFactor; }
@@ -36,7 +45,7 @@ public:
 private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
-	CTexture* m_pTextureCom = { nullptr };
+	CTexture* m_pTextureCom[TEX_END] = {nullptr};
 	CGameObject* m_pBlendMap = { nullptr }; 
 
 	vector<_uint> m_vecPassIndices;
@@ -45,6 +54,11 @@ private:
 	_float m_fTime = { };
 	_uint m_iMeshIndex = {};
 	_float m_fNonMatchTime = {};
+	_bool m_bCull = { false };
+	_bool m_bBlendMap = { false };
+
+	class COcTree* m_pOcTree = { nullptr };
+	_uint m_iRenderAll{}, m_iRenderMyMesh{};
 
 private:
 	HRESULT Add_Components(const wstring& _wstrModelTag);
@@ -54,6 +68,8 @@ private:
 	void SetUpShaderInfo(const wstring& _wstrModelTag);
 
 	_bool CheckIfBlendMapExists(const wstring& _wstrModelTag);
+
+	void Save_OctreeData();
 		
 public:
 	static CBasicMap* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

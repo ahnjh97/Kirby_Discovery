@@ -1,6 +1,5 @@
 #pragma once
 #include "Base.h"
-#include <fstream>
 
 /* 하나의 애니메이션이 몇개의 뼈를 컨트롤해야하는지. 그 뼈들은 무엇인지.  */
 /* 이 애니메이션을 재생하는데 걸리는 총 거리.. */

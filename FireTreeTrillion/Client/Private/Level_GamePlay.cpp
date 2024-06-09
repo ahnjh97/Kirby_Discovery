@@ -1,13 +1,13 @@
 #include "stdafx.h"
-#include "..\Public\Level_GamePlay.h"
-#include "LevelChanger.h"
-
-#include "Kirby.h"
 #include "Level_GamePlay.h"
+#include "LevelChanger.h"
 #include "Camera_Free.h"
-#include "Trigger.h"
+#include "BasicMap.h"
 #include "UIObject.h"
+#include "Trigger.h"
+#include "Kirby.h"
 #include "Kabu.h"
+#include "BG.h"
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -53,6 +53,7 @@ HRESULT CLevel_GamePlay::Initialize()
 	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Moon"), TEXT("Prototype_GameObject_Moon"))))
 	//	return E_FAIL;
 
+	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
 	return S_OK;
 }
@@ -236,11 +237,11 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 {
 	LEVEL eLevel = LEVEL_GAMEPLAY;
 
-	string strFileName = "../../../objects_txt/GamePlay.txt";
+	string strFileName = "../../../objects_txt/Stage1.txt";
 	fstream fileStream(strFileName, ios::in | ios::binary);
 	if (fileStream.is_open() == false)
 	{
-		MSG_BOX(TEXT("Failed to open : GamePlay.txt"));
+		MSG_BOX(TEXT("Failed to open : Stage1.txt"));
 		return E_FAIL;
 	}
 
@@ -251,6 +252,8 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 	_int iCamType{};
 	_float fRadius{};
 	_float4x4 matInverse{};
+	_uint iShaderVars{};
+	_float fRimWidth{};
 	map<_int, _float4x4> camMatrices;
 	map<_int, pair<_vector, _float>> frontDirRadii;
 	map<_int, pair<_vector, _float>> rearDirRadii;
@@ -263,6 +266,8 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 		strModelName.resize(iStrLength);
 		fileStream.read(&strModelName[0], iStrLength);
 		fileStream.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
+		fileStream.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
+		fileStream.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
 
 		if ("Camera" == strModelName) 
 		{
@@ -297,6 +302,8 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 		CGameObject::GAMEOBJECT_DESC tempDesc = {};
 		tempDesc.matWorld = matWorld;
 		tempDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+		tempDesc.iShaderVars = iShaderVars;
+		tempDesc.fRimWidth = fRimWidth;
 
 		if ("NonAnim_Kirby" == strModelName)
 		{
@@ -340,6 +347,21 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 		}
 		else if (strModelName == "Level1Stage1Step01" || strModelName == "Level1Stage1Step01_Blend")
 		{
+			CBasicMap::MAP_DESC tMapDesc{};
+			tMapDesc.matWorld = tempDesc.matWorld;
+			tMapDesc.wstrModelName = tempDesc.wstrModelName;
+			
+			_float3 vMin{}, vMax{};
+			fileStream.read(reinterpret_cast<char*>(&vMin), sizeof(vMin));
+			fileStream.read(reinterpret_cast<char*>(&vMax), sizeof(vMax));
+
+			tMapDesc.vMin = vMin;
+			tMapDesc.vMax = vMax;
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_BasicMap"), &tMapDesc)))
+				return E_FAIL;
+		}
+		else if (strModelName == "Level1Stage1Step01_Blend")
+		{
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_BasicMap"), &tempDesc)))
 				return E_FAIL;
 		}
@@ -351,6 +373,11 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 			tTriggerDesc.iTriggerType = iTriggerType;
 			tTriggerDesc.iTriggerIndex = iTriggerIndex;
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Trigger"), TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc)))
+				return E_FAIL;
+		}
+		else if (strModelName == "BG1")
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_BG"), &tempDesc)))
 				return E_FAIL;
 		}
 	}

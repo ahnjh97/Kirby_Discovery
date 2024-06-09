@@ -341,7 +341,7 @@ namespace Engine
 		_float	fScale = { 1.f };
 		_float	fDegree = { 0.f };
 		_uint	iRootNode = { 4 };
-
+		_bool bOctree = { false };
 		// 애니메이션 정보 저장
 		unordered_map< string, ANIM_INFO > umapAnimInfo;
 
@@ -349,8 +349,32 @@ namespace Engine
 			TYPE _eType = { TYPE_END },
 			_float _fScale = { 1.f },
 			_float _fDegree = { 0.f },
-			_uint _iRootNode = { 4 }
-		) : strModelName(_strModelName), eType(_eType), fScale(_fScale), fDegree(_fDegree), iRootNode(_iRootNode) {}
+			_uint _iRootNode = { 4 },
+			_bool _bOctree = { false }
+		) : strModelName(_strModelName), eType(_eType), fScale(_fScale), fDegree(_fDegree), iRootNode(_iRootNode), bOctree(_bOctree) {}
+	};
+
+	struct FACE
+	{
+		_uint iA;
+		_uint iB;
+		_uint iC;
+
+		FACE(_uint _iA, _uint _iB, _uint _iC) : iA(_iA), iB(_iB), iC(_iC) {}
+		FACE() : iA(0), iB(0), iC(0) {}
+	};
+
+	struct ENGINE_DLL VTXMERGEDMESH
+	{
+		_float3		vPosition;
+		_float3		vNormal;
+		_float2		vTexcoord;
+		_float3		vTangent;
+		_float		fSamplingFactor;
+		_uint		iTextureIndex;
+
+		static const unsigned int	iNumElements = { 6 };
+		static const D3D11_INPUT_ELEMENT_DESC	Elements[6];
 	};
 
 

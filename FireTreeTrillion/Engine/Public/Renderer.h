@@ -99,6 +99,7 @@ public:
 
 	// 환경설정 업데이트
 	void Update_Option(OPTION Option, _bool bOn);
+	void Bind_RendererFunc(_int iTriggerType);
 
 #ifdef _DEBUG
 public:

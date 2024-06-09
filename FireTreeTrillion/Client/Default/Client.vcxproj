@@ -179,6 +179,7 @@
     <ClInclude Include="..\Public\Awoofy_State.h" />
     <ClInclude Include="..\public\BackGround.h" />
     <ClInclude Include="..\Public\BasicMap.h" />
+    <ClInclude Include="..\Public\BG.h" />
     <ClInclude Include="..\Public\BladeKnight.h" />
     <ClInclude Include="..\Public\BladeKnightSword.h" />
     <ClInclude Include="..\Public\BladeKnight_State.h" />
@@ -200,6 +201,7 @@
     </ClInclude>
     <ClInclude Include="..\Public\Kabu.h" />
     <ClInclude Include="..\Public\Kabu_State.h" />
+    <ClInclude Include="..\Public\Level_Intro.h" />
     <ClInclude Include="..\Public\Multi_UI.h" />
     <ClInclude Include="..\Public\LevelChanger.h" />
     <ClInclude Include="..\Public\KirbyArmours.h" />
@@ -269,6 +271,7 @@
     <ClCompile Include="..\Private\Awoofy_State.cpp" />
     <ClCompile Include="..\private\BackGround.cpp" />
     <ClCompile Include="..\Private\BasicMap.cpp" />
+    <ClCompile Include="..\Private\BG.cpp" />
     <ClCompile Include="..\Private\BladeKnight.cpp" />
     <ClCompile Include="..\Private\BladeKnightSword.cpp" />
     <ClCompile Include="..\Private\BladeKnight_State.cpp" />
@@ -289,6 +292,7 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kabu.cpp" />
     <ClCompile Include="..\Private\Kabu_State.cpp" />
+    <ClCompile Include="..\Private\Level_Intro.cpp" />
     <ClCompile Include="..\Private\Multi_UI.cpp" />
     <ClCompile Include="..\Private\LevelChanger.cpp" />
     <ClCompile Include="..\Private\KirbyArmours.cpp" />

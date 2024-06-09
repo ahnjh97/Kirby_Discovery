@@ -54,7 +54,6 @@ HRESULT CMonster::Render_LightDepth()
 void CMonster::Render_IMGUI()
 {
 	__super::Render_IMGUI();
-
 }
 #endif
 
