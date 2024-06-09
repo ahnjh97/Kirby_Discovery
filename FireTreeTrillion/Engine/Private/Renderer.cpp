@@ -1423,6 +1423,15 @@ HRESULT CRenderer::Render_FinalResult()
 	if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
+	_float4 vCamLook = CUtils::Get_State_Vector_Matrix(m_pGameInstance->Get_Transform_Inv(CPipeLine::D3DTS_VIEW), CUtils::STATE_LOOK);
+
+	// 카메라 포지션
+	if (FAILED(m_pShader->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_vCamLook", &vCamLook, sizeof(_float4))))
+		return E_FAIL;
+
+
 	//// LensFlare 연산
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_LensFlare"), "g_LensFlareTexture")))
 		return E_FAIL;
