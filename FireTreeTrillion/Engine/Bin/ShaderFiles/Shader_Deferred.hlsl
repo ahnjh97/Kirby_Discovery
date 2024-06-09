@@ -81,13 +81,13 @@ float g_intensity = 3.f;
 
 texture2D g_GodRayTexture;
 // 노출도
-float g_fRayExposure = 0.3f;
+float g_fRayExposure = 0.1f;
 // 빛의 감쇠율
-float g_fRayDecay = .9f;
+float g_fRayDecay = 1.f;
 // 샘플의 누적 감쇠율
 float g_fRayIlluminationDecay = 1.f;
 // 광선의 길이와 밀도
-float g_fRayDensity = .5f;
+float g_fRayDensity = .96f;
 // 광선의 길이와 밀도
 float g_fWeight = .4f;
 ////////////////
@@ -637,68 +637,46 @@ PS_OUT_LIGHT PS_MAIN_GODRAY(PS_IN In)
 {
     PS_OUT_LIGHT Out = (PS_OUT_LIGHT) 0;
 
-    //float2 vViewportSize = float2(g_fTexW, g_fTexH);
-    float2 vScreenRatio = float2(1 / g_fTexW, 1 / g_fTexH);
-    float fScreenRatio = g_fTexW / g_fTexH;
     
-    
+    //광선의 투영 공간 위치 연산
     vector vRayPos = g_vLightPos;
-    
     vRayPos = mul(vRayPos, g_ViewMatrix);
     vRayPos = mul(vRayPos, g_ProjMatrix);
-    //광선의 투영 공간 위치
     vRayPos /= vRayPos.w;
-    vRayPos /= g_fFar;
 
+    //texcoord로 변환
+    vRayPos.x = (vRayPos.x * .5f) + .5f;
+    vRayPos.y = (vRayPos.y * -.5f) + .5f;
     
-    //광선의 texCoord
-    float2 vRayCoord;
-    vRayCoord.x = (vRayPos.x + 1.0) * 0.5;
-    vRayCoord.y = ((vRayPos.y * -0.5) + 0.5);
+ 
+    //샘플링하는 횟수.
+    int iSampleNum = 64;
     
-    //픽셀의 투영 공간 위치
-    float2 vMyPos;
-    vMyPos.x = (In.vTexcoord.x * 2.f) - 1.f;
-    vMyPos.y = (In.vTexcoord.y * -2.f) + 1.f;
-
+    //광선 위치부터 현재 픽셀로 향하는 방향을 구한다.
+    float2 vDirDelta = In.vTexcoord - vRayPos.xy;
     
-    if ( length ( abs(In.vTexcoord - vRayCoord.xy) ) < .15f)
+    //density만큼 방향 길이를 보정한다.
+    //vDirDelta = normalize(vDirDelta) / iSampleNum;
+    vDirDelta *= (1.0 / iSampleNum) * g_fRayDensity;
+    float fIlluminationDecay = g_fRayIlluminationDecay;
+    //샘플링 기준 위치
+    float2 vSampleUV = In.vTexcoord;
+    
+    for (int i = 0; i < iSampleNum; ++i)
     {
-        //Out.vGodRay = float4(1, 0, 1, 1);
-        //return Out;
-        //샘플링하는 횟수.
-        int iSampleNum = 64;
+        //방향으로 나아가며 샘플한다.
+        vSampleUV -= vDirDelta;
         
-//광선 위치부터 현재 픽셀로 향하는 방향을 구한다.
-        //float2 vDirDelta = In.vTexcoord - vRayCoord;
-        float2 vDirDelta = normalize(In.vTexcoord - vRayCoord.xy);
+        float fSampleZ = g_DepthTexture.Sample(PointSampler, vSampleUV).y * g_fFar;
         
-//density만큼 방향 길이를 보정한다.
-        vDirDelta *= (1.0 / iSampleNum) * g_fRayDensity;
-        float fIlluminationDecay = g_fRayIlluminationDecay;
-    
-    
-//샘플링 기준 위치
-        float2 vSampleUV = In.vTexcoord;
-  
-        for (int i = 0; i < iSampleNum; ++i)
+        if (fSampleZ < g_DepthTexture.Sample(PointSampler, vRayPos.xy).y * g_fFar)
         {
-        //광선 방향으로 돌아가며 샘플한다.
-            vSampleUV -= vDirDelta;
-        
-            float fSampleZ = g_DepthTexture.Sample(ClampSampler, vSampleUV).g;
-            //float fRayZ = g_DepthTexture.Sample(ClampSampler, vRayCoord).g;
-        
-            if (fSampleZ * g_fFar < mul(g_vLightPos, g_ViewMatrix).z )
-            {
-                Out.vGodRay += g_vLightDiffuse * fIlluminationDecay * g_fWeight;
-                fIlluminationDecay *= g_fRayDecay;
-            }
+            Out.vGodRay += g_vLightDiffuse * fIlluminationDecay * g_fWeight;
+            fIlluminationDecay *= g_fRayDecay;
         }
-    
-        Out.vGodRay *= g_fRayExposure;
-        //Out.vGodRay = float4(1, 0, 1, 1);
     }
+    
+    Out.vGodRay *= g_fRayExposure;
     
     return Out;
 }

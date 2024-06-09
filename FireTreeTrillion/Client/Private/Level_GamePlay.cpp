@@ -93,6 +93,8 @@ HRESULT CLevel_GamePlay::Render()
 HRESULT CLevel_GamePlay::Ready_Lights()
 {
 
+
+
 	//// 예시코드 1 : 태양광
 	LIGHT_DESC		LightDesc{};
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
@@ -111,7 +113,7 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 	//// 예시코드 2 : God Ray
 	LIGHT_DESC		GodRayDesc{};
 	GodRayDesc.eType = LIGHT_DESC::TYPE_GODRAY;
-	GodRayDesc.vPosition = _float4(120.f, 53.f, 14.f, 1.f);
+	GodRayDesc.vPosition = _float4(100.f, 74.f, 7.f, 1.f);
 	GodRayDesc.fRange = 80.f;
 
 	GodRayDesc.vDiffuse = _float4(.5f, .5f, .5f, 1.f);
