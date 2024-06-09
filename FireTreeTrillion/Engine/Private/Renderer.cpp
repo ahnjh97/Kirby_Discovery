@@ -103,12 +103,16 @@ HRESULT CRenderer::Initialize()
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_SSAO"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
 		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_LensFlare"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+		return E_FAIL;
 
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_ResultColor"), TEXT("Target_ResultColor"))))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_ResultColor"), TEXT("Target_Specular"))))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_ResultColor"), TEXT("Target_SSAO"))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_ResultColor"), TEXT("Target_LensFlare"))))
 		return E_FAIL;
 
 #pragma endregion
@@ -317,6 +321,8 @@ HRESULT CRenderer::Initialize()
 	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_MRA"), 1300.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_LensFlare"), 1400.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
+		return E_FAIL;
 
 	// LightAcc
 	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_ResultColor"), 700.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
@@ -431,11 +437,14 @@ void CRenderer::Color_Initialize()
 		0.07f, 0.579137f, 0.633162f, 0.769912f, 0.51f, 0.973451f, 0.771999f, 0.323048f, 0.72f, 0.08f, 0.63f
 		});
 
+	//Save_ColorSet("Stage1",
+	//	COLOR_DATA{
+	//	0.829539f, 1.f, 1.00999f, 1.44943f, 1.17964f, 1.14037f, 1.11018f, 0.720338f, 0.6f, 0.6f, 1.3f, 1.06f, 1.1f, 0.0649942f, 0.0378847f, 0.199115f, 0.00958735f, 0.466084f, 0.676991f, 0.218674f, 0.0796085f, 0.499961f, 0.912908f, 0.99115f, 0.209722f, 0.209559f, 0.340393f
+	//	});
 	Save_ColorSet("Stage1",
 		COLOR_DATA{
-		0.829539f, 1.f, 1.00999f, 1.44943f, 1.17964f, 1.14037f, 1.11018f, 0.720338f, 0.6f, 0.6f, 1.3f, 1.06f, 1.1f, 0.0649942f, 0.0378847f, 0.199115f, 0.00958735f, 0.466084f, 0.676991f, 0.218674f, 0.0796085f, 0.499961f, 0.912908f, 0.99115f, 0.209722f, 0.209559f, 0.340393f
+		0.01f, 1.f, 1.00999f, 1.44943f, 1.17964f, 1.14037f, 1.11018f, 0.720338f, 0.6f, 0.6f, 1.3f, 1.06f, 1.1f, 0.0649942f, 0.0378847f, 0.199115f, 0.00958735f, 0.466084f, 0.676991f, 0.218674f, 0.0796085f, 0.499961f, 0.912908f, 0.99115f, 0.209722f, 0.209559f, 0.340393f
 		});
-
 
 	//쉐이더 타입 트리거는 idx 1, 접촉하면 해당 함수를 호출!
 	function<void(_int)> TriggerFunc = bind(&CRenderer::Set_ColorSet_ByIndex, this, placeholders::_1);
@@ -860,6 +869,9 @@ HRESULT CRenderer::Render_NonBlend()
 
 HRESULT CRenderer::Render_Lights()
 {
+	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_ResultColor"))))
+		return E_FAIL;
+
 	if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
 		return E_FAIL;
 	if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
@@ -881,10 +893,12 @@ HRESULT CRenderer::Render_Lights()
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_MRA"), "g_MRATexture")))
 		return E_FAIL;
 
-	if (FAILED(m_pVIBuffer->Bind_Buffers()))
+	if (FAILED(m_pShader->Bind_Matrix("g_GodViewMatrix", &m_pGameInstance->Get_Transform(CPipeLine::D3DTS_VIEW))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_Matrix("g_GodProjMatrix", &m_pGameInstance->Get_Transform(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_ResultColor"))))
+	if (FAILED(m_pVIBuffer->Bind_Buffers()))
 		return E_FAIL;
 
 	if (FAILED(m_pGameInstance->Render_Lights(m_pShader, m_pVIBuffer)))
@@ -1103,7 +1117,6 @@ HRESULT CRenderer::Render_Result()
 	//// SSAO 연산
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_SSAO_Y"), "g_SSAOTexture")))
 		return E_FAIL;
-
 	// 카메라 포지션
 	if (FAILED(m_pShader->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
 		return E_FAIL;
@@ -1410,6 +1423,9 @@ HRESULT CRenderer::Render_FinalResult()
 	if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
+	//// LensFlare 연산
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_LensFlare"), "g_LensFlareTexture")))
+		return E_FAIL;
 
 #pragma region 색감 보정 변수 바인딩
 
