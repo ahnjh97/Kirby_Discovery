@@ -602,19 +602,19 @@ void CEditor_UI::Window_PopupAlert()
 	//{
 	switch (g_eOpenPopup)
 	{
-	case POPUP_CREATE:	g_strPopupTag = { u8"Create" }; g_strUITag = { "LayerUI" }; //생성할 땐 태그를 기본값으로
+	case POPUP_CREATE:	g_strPopupTag = { u8"Create 생성" }; g_strUITag = { "LayerUI" }; //생성할 땐 태그를 기본값으로
 		switch (g_ePopupDetail)
 		{	default: g_strDetail = { u8" " };	break;	}
 		ImGui::OpenPopup(g_strPopupTag.c_str());
 		break;
 
-	case POPUP_DELETE:	g_strPopupTag = { u8"Delete" };
+	case POPUP_DELETE:	g_strPopupTag = { u8"Delete 삭제" };
 		switch (g_ePopupDetail)
 		{	default: g_strDetail = { u8" " };	break;	}
 		ImGui::OpenPopup(g_strPopupTag.c_str());
 		break;
 
-	case POPUP_GROUP:	g_strPopupTag = { u8"Group" };
+	case POPUP_GROUP:	g_strPopupTag = { u8"Group 그룹핑" };
 		switch (g_ePopupDetail)
 		{
 		case NEED_CREATE:	g_strDetail = { u8"Need to Create Layer 생성한 레이어가 없습니다" }; break;
@@ -624,7 +624,7 @@ void CEditor_UI::Window_PopupAlert()
 		ImGui::OpenPopup(g_strPopupTag.c_str());
 		break;
 
-	case POPUP_SAVE:	g_strPopupTag = { u8"Save" };
+	case POPUP_SAVE:	g_strPopupTag = { u8"Save 저장" };
 		switch (g_ePopupDetail)
 		{
 		case NEED_CREATE:	g_strDetail = { u8"Need to Create Layer 생성한 레이어가 없습니다" }; break;
@@ -635,7 +635,7 @@ void CEditor_UI::Window_PopupAlert()
 		ImGui::OpenPopup(g_strPopupTag.c_str());
 		break;
 
-	case POPUP_LOAD:	g_strPopupTag = { u8"Load" };
+	case POPUP_LOAD:	g_strPopupTag = { u8"Load 로드" };
 		switch (g_ePopupDetail)
 		{
 		case FILE_OPEN:		g_strDetail = { u8"Check the File Path & Name 파일 경로와 이름을 확인해주세요" }; break;
@@ -645,7 +645,7 @@ void CEditor_UI::Window_PopupAlert()
 		ImGui::OpenPopup(g_strPopupTag.c_str());
 		break;
 
-	case POPUP_MODIFY:	g_strPopupTag = { u8"Modify" };
+	case POPUP_MODIFY:	g_strPopupTag = { u8"Modify 편집" };
 		switch (g_ePopupDetail)
 		{	default: g_strDetail = { u8" " };	break;	}
 		ImGui::OpenPopup(g_strPopupTag.c_str());
@@ -677,7 +677,7 @@ void CEditor_UI::Window_PopupAlert()
 		_float InputPosX = (WindowSize.x - InputSize.x) * 0.5f;
 
 		string strFilePath = { "../../../UI_txt/" };
-		if (u8"Modify" == g_strPopupTag)
+		if (u8"Modify 편집" == g_strPopupTag)
 		{
 			ImGui::SetNextItemWidth(200.f);
 			ImGui::SetCursorPos(ImVec2(InputPosX, WindowSize.y * 0.5f + 3.5f));
@@ -686,7 +686,7 @@ void CEditor_UI::Window_PopupAlert()
 			m_UIObjDesc.wstrUITag = Edit_LayerUITag(strInput);
 		}
 
-		if (u8"Load" == g_strPopupTag)
+		if (u8"Load 로드" == g_strPopupTag)
 		{
 			ImGui::SetNextItemWidth(200.f);
 			ImGui::SetCursorPos(ImVec2(InputPosX, WindowSize.y * 0.5f + 3.5f));
@@ -708,13 +708,13 @@ void CEditor_UI::Window_PopupAlert()
 		ImGui::SetCursorPos(ImVec2(ButtonPosX, 100.f));
 		if (ImGui::Button(u8"OK 확인", ButtonSize) || m_pGameInstance->Get_DIKeyState(DIK_RETURN, KEY_DOWN))
 		{
-			if (u8"Modify" == g_strPopupTag)
+			if (u8"Modify 편집" == g_strPopupTag)
 			{
 				m_LayerUIs[g_iSelectUI]->Set_LayerUITag(m_UIObjDesc.wstrUITag);
 				ImGui::CloseCurrentPopup(); 
 			}
 
-			if (u8"Load" == g_strPopupTag)
+			if (u8"Load 로드" == g_strPopupTag)
 			{
 				if (TRUE == Load_FileData(strFilePath + strInput + "_Orig.txt"))
 				{	g_IsSuccessed = TRUE;  g_eOpenPopup = POPUP_LOAD; g_ePopupDetail = DETAIL_NONE;	

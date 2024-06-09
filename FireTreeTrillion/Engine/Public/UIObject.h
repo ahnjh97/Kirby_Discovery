@@ -70,6 +70,8 @@ public:
 	_uint			Get_TexIndex() { return m_iTexIndex; }
 	void			Set_TexIndex(_uint _iTexIndex) { m_iTexIndex = _iTexIndex; }
 
+	void			Set_LayerUITag(wstring _wstrUITag) { m_UIObjDesc.wstrUITag = _wstrUITag; }
+
 	constexpr _bool	Get_IsRender() const noexcept { return m_bIsRender; }
 	void			Set_IsRender(_bool _isRender) { m_bIsRender = _isRender; }
 

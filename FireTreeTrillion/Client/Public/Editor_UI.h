@@ -46,10 +46,10 @@ private:
 	_bool			Set_GizmoSync(CUIObject* _pUIObj); //기즈모 위젯 동기화 및 세팅
 
 	_bool			Edit_Transform(CUIObject* _pUIObj); //변환
-	_bool			Edit_RGBAColor(); //색상 편집
+	_bool			Edit_RGBAColor(CUIObject* _pUIObj); //색상 편집
 
 	_bool			Edit_Text(); //텍스트 편집
-	UIOBJ_DESC		Edit_LayerUITag(string _strInput);
+	wstring			Edit_LayerUITag(string _strInput);
 
 	void			Create_UIObject(UI_STATE _eUIState, UI_TYPE _eUIType);
 	void			Delete_UIObject(UI_STATE _eUIState);

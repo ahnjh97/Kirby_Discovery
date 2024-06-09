@@ -376,7 +376,7 @@ _bool CMainApp::Render_RTVFonts()
 
 	//UI
 	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("UI"),
-		_float2(5.f, 35.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+		_float2(5.f, 45.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
 
 	return TRUE;
 }
