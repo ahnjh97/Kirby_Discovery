@@ -20,6 +20,8 @@ public:
 		_int iTriggerIndex = { -1 };
 		_float fRadius = { 0.f };
 		_int iCamType = { -1 };
+		_uint iShaderVars = {};
+		_float fRimLightThickness = {};
 	};
 
 public:

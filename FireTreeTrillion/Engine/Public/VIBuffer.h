@@ -14,6 +14,15 @@ protected:
 	virtual ~CVIBuffer() = default;
 
 public:
+	_float3* Get_VerticesPtr() { return m_pVerticesPos; }
+	_uint Get_NumVertices() { return m_iNumVertices; }
+	_uint* Get_IndicesPtr() { return m_pIndices; }
+	_uint Get_NumIndices() { return m_iNumIndices; }
+	ID3D11Buffer* Get_IndexBufferPtr() { return m_pIB; }
+
+	void Set_NumIndices(_uint iNumIndices) { m_iNumIndices = iNumIndices; }
+
+public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
 	virtual HRESULT Render();
@@ -41,7 +50,8 @@ protected:
 	DXGI_FORMAT					m_eIndexFormat = {  };
 	D3D11_PRIMITIVE_TOPOLOGY	m_ePrimitiveTopology = { };
 
-	_float3*					m_pVerticesPos = { nullptr };
+	_float3*					m_pVerticesPos = { nullptr }; // 정점 버퍼
+	_uint*						m_pIndices = { nullptr }; // 인덱스 버퍼 
 
 protected:
 	HRESULT Create_Buffer(_Out_ ID3D11Buffer** ppBuffer);

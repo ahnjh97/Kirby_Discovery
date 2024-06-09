@@ -184,6 +184,12 @@
     <Filter Include="02.PhysX\_Manager">
       <UniqueIdentifier>{f88af5e5-4183-40e4-9180-afb42c69dfc5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\02.Components\Model\OcTree">
+      <UniqueIdentifier>{11710d6a-3e27-44aa-b551-74fa08ad3193}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\02.Components\Model\MergedMesh">
+      <UniqueIdentifier>{be936d1b-112b-4ee8-afd7-2d63485fb3a0}</UniqueIdentifier>
+	</Filter>
     <Filter Include="01.Utility\12.TimeController">
       <UniqueIdentifier>{bcf5e0f1-895c-4733-bd87-8aca7e79dfb9}</UniqueIdentifier>
     </Filter>
@@ -387,6 +393,12 @@
     <ClCompile Include="..\Private\Model.cpp">
       <Filter>01.Utility\02.Components\Model</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\OcTree.cpp">
+      <Filter>01.Utility\02.Components\Model\OcTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MergedMesh.cpp">
+      <Filter>01.Utility\02.Components\Model\MergedMesh</Filter>
+	</ClCompile>
     <ClCompile Include="..\Private\TimeController.cpp">
       <Filter>01.Utility\12.TimeController</Filter>
     </ClCompile>
@@ -617,6 +629,12 @@
     <ClInclude Include="..\Public\Model.h">
       <Filter>01.Utility\02.Components\Model</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\OcTree.h">
+      <Filter>01.Utility\02.Components\Model\OcTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MergedMesh.h">
+      <Filter>01.Utility\02.Components\Model\MergedMesh</Filter>
+	</ClInclude>
     <ClInclude Include="..\Public\TimeController.h">
       <Filter>01.Utility\12.TimeController</Filter>
     </ClInclude>

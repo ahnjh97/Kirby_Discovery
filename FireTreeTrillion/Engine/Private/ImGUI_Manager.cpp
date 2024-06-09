@@ -148,9 +148,7 @@ void CImGUI_Manager::RenderGrid()
 
 void CImGUI_Manager::EditTransform(_float4x4& matrix)
 {
-
 #ifdef _DEBUG
-
 	ImGui::Separator();
 	ImGui::NewLine();
 
@@ -207,7 +205,6 @@ void CImGUI_Manager::EditTransform(_float4x4& matrix)
 	ImGuizmo::Manipulate(ViewMatrix.m[0], ProjMatrix.m[0], mCurrentGizmoOperation, mCurrentGizmoMode, matrix.m[0], NULL, useSnap ? &snap.x : NULL);
 
 #endif
-
 }
 
 CImGUI_Manager::FILE_MODE CImGUI_Manager::Set_FileDialog()

@@ -11,6 +11,8 @@ public:
 	{		
 		_float4x4	matWorld = _float4x4::Identity;
 		wstring		wstrModelName;
+		_uint		iShaderVars = {};
+		_float		fRimLightThickness = {};
 	}GAMEOBJECT_DESC;
 
 protected:
@@ -38,6 +40,11 @@ public:
 	//FOR ANIM TOOL
 	class CModel**		Get_ModelAddress()   { return m_ppModelForAnimTool; }
 	_uint				Get_ModelCnt() const { return m_uModelCnt; }
+
+	_uint Get_ShaderVars() { return m_iShaderVars; }
+	_float Get_RimLightThickness() { return m_fRimLightThickness; }
+	void Set_ShaderVars(_uint iShaderVars) { m_iShaderVars = iShaderVars; }
+	void Set_RimLightThickness(_float fRimLightThickness) { m_fRimLightThickness = fRimLightThickness; }
 	
 public:
 	virtual HRESULT		Initialize_Prototype();
@@ -89,6 +96,9 @@ protected:
 	_bool									m_bHide = { false };
 
 	_float									m_fRimWidth = { 0.2f };
+
+	_uint									m_iShaderVars = {};
+	_float									m_fRimLightThickness = {};
 
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;

@@ -12,7 +12,7 @@
 #define IDI_SMALL                       108
 #define IDC_CLIENT                      109
 #define IDR_MAINFRAME                   128
-#define ID_32771                        32771
+#define INTRO	                        32771
 #define GAMEPLAY                        32772
 #define TOOL_FX                         32773
 #define TOOL_UI                         32774

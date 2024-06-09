@@ -1,8 +1,6 @@
 #pragma once
-
 #include "Client_Defines.h"
 #include "Level.h"
-
 
 /* 1. 레벨에 필요한 객체들을 생성한다. */
 /* 2. 레벨을 반복적으로 갱신하여 화면에 보여준다. */

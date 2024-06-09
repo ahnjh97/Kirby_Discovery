@@ -2,7 +2,6 @@
 
 #include "Component.h"
 #include "Animation.h"
-#include <fstream>
 
 BEGIN(Engine)
 
@@ -24,14 +23,9 @@ public:
 	_bool IsFinished(_uint iCurrentAnimIndex) { return m_Animations[iCurrentAnimIndex]->IsFinished(); }
 
 	string Get_MeshName(_uint iMeshIndex);
-
 	_float Get_Duration() { return m_Animations[m_iCurrentAnimIndex]->Get_Duration(); }
-
 	_float Get_Trackposition() { return m_Animations[m_iCurrentAnimIndex]->Get_TrackPosition(); }
-
-	_float Get_AnimRatio() {
-		return m_Animations[m_iCurrentAnimIndex]->Get_AnimRatio();
-	}
+	_float Get_AnimRatio() { return m_Animations[m_iCurrentAnimIndex]->Get_AnimRatio(); }
 
 public:
 	void Set_TickPerSecond(_float _fTickPerSecond) { m_Animations[m_iCurrentAnimIndex]->Set_TickPerSecond(_fTickPerSecond); }
@@ -62,15 +56,13 @@ public:
 	const _char* Get_AnimationName() const { return m_Animations[m_iCurrentAnimIndex]->Get_AnimationName(); }
 	_uint Get_AnimCnt() const { return m_Animations.size(); }
 	vector<class CAnimation*>* const Get_Animations() { return &m_Animations; }
-
-
+	
 public:
 	virtual HRESULT Initialize_Prototype(MODEL tModel);
 	virtual HRESULT Initialize(void* pArg)  override;
 #ifdef _DEBUG
 	virtual void	Render_IMGUI()			override;
 #endif
-
 
 public:
 	HRESULT Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex);
@@ -80,6 +72,7 @@ public:
 	void	Stop_Animation() { m_bStop = true; }
 	void	Replay_Animation() { m_bStop = false; }
 	HRESULT Render(_uint iMeshIndex);
+	HRESULT Render();
 
 	HRESULT CreateDynamicActor(_float4 vPos);
 	HRESULT CreateStaticActor(_float4 vPos);
@@ -88,6 +81,14 @@ public:
 	void	Add_Event(const string& EventName, function<void()>&& Callback);
 	void	CallEvent(const string& EventName);
 
+
+	void Find_MinMax(_float3& vMin, _float3& vMax);
+	class COcTree* Create_OcTree(_float3 vMin, _float3 vMax, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors);
+
+	void Create_MergedMesh(_fmatrix TransformMatrix);
+	void Bind_TextureArrays();
+	/*ID3D11ShaderResourceView* CreateTexture2DArraySRV(const vector<wstring>& filePaths);*/
+	void CreateSamplerState();
 
 private:
 	_uint						m_iNumMeshes = { 0 };
@@ -99,6 +100,9 @@ private:
 	_float4x4					m_TransformMatrix;
 
 	vector<class CBone*>		m_Bones;
+
+	_float3						m_vMin = {};
+	_float3						m_vMax = {};
 
 	// 애니메이션
 	_uint						m_iNumAnimations = { 0 };
@@ -118,9 +122,15 @@ private:
 	// 모델 정보
 	MODEL						m_tModel;
 
+	class CMergedMesh*			m_pMergedMesh = { nullptr };
+	vector<vector<wstring>>		m_vecTexturePaths;
+	vector<ID3D11ShaderResourceView*>	m_vecTextureArraySRVs;
+	ID3D11SamplerState*			m_pSamplerState = { nullptr };
+
+
 private:
-	HRESULT Ready_Meshes();
-	HRESULT Ready_Materials(const _char* pModelFilePath);
+	HRESULT Ready_Meshes(_bool bOctree);
+	HRESULT Ready_Materials(const _char* pModelFilePath, _bool bOctree);
 	HRESULT Ready_Bones();
 	HRESULT Ready_Animations();
 

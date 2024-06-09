@@ -2,13 +2,14 @@
 #include "MapToolHelper.h"
 #include "MapToolObject.h"
 #include "BasicMap.h"
-#include <filesystem>
 #include "Utils.h"
 
-using namespace filesystem;
+static _int iMapTxtIdx = -1;
+static _int iTriggerTxtIdx = -1;
+static _int iMonsterTxtIdx = -1;
 static _int iNonAnimIdx = -1;
-static _int iAnimIdx = -1;
 static _int iLevelIndex = 0;
+static _int iTempLevelIdx = -1;
 
 static const _char* triggerTypes[] = {"Camera", "Shader"};
 static _int iTriggerType = -1;
@@ -38,7 +39,7 @@ CMapToolHelper::CMapToolHelper(ID3D11Device* pDevice, ID3D11DeviceContext* pCont
 }
 
 CMapToolHelper::CMapToolHelper(const CMapToolHelper& rhs)
-	: CGameObject(rhs)
+	: CGameObject{ rhs }
 {
 }
 
@@ -53,15 +54,20 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	hr = __super::Initialize(pArg);
 	CHECK_FAILED(hr);
 
-	m_vecLevelName = { "Level_Static", "Level_Loading", "Level_Logo", // 두번째 줄에 실제 인게임 레벨 추가
-			"GamePlay",
-			"Level_Tool_UI", "Level_Tool_FX", "Level_Tool_Anim", "Level_Tool_Map", "Level_End" };
-	m_vecMapModelNames = { "Level0Stage1Step01", "Level1Stage1Step01"};
+	m_vecLevelName = { "Level_Static", "Level_Loading", "Level_Logo", "GamePlay",
+			"Level_Tool_UI", "Level_Tool_FX", "Level_Tool_Anim", "Level_Tool_Map",
+		"Intro", "Stage1", "Level_End" };
+
+	m_vecMapModelNames = { "Level0Stage1Step01", "Level1Stage1Step01" };
+
+	m_setMapNames = { "Level0Stage1Step01", "Level1Stage1Step01", "BG1" };
+	m_setMonsterNames = { "NonAnim_Awoofy", "NonAnim_BladeKnight", "NonAnim_Buffahorn", "NonAnim_Rabbit" };
+	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy" };
+
 	vecPassIndices.resize(m_vecMapModelNames.size());
 	vecSamplingFactors.resize(m_vecMapModelNames.size());
 
-	SetUpTxtVectors(TYPE_ANIM);
-	SetUpTxtVectors(TYPE_NONANIM);
+	SetUpTxtVectors();
 
 	return S_OK;
 }
@@ -77,10 +83,26 @@ _int CMapToolHelper::Tick(_float fTimeDelta)
 void CMapToolHelper::Late_Tick(_float fTimeDelta)
 {
 	ImGui::Begin("MapTool");
+
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10, 10));
+	ImGui::PushFont(ImGui::GetFont()); // 기본 폰트를 가져와서 스케일 조정
+	ImGui::SetWindowFontScale(1.1f); // 텍스트 크기를 키움
+
 	Menu_Level();
 	Menu_NonAnimModels();
-	Menu_TriggerInfo();
-	Menu_MapShaderInfo();
+
+	if (nullptr != m_pPickedObject) 
+	{
+		Menu_TriggerInfo();
+		Menu_MapShaderInfo();
+		Menu_MonsterInfo();
+	}
+
+	// 스타일 복원
+	ImGui::SetWindowFontScale(1.0f);
+	ImGui::PopFont();
+	ImGui::PopStyleVar();
+
 	ImGui::End();
 
 	if(m_pGameInstance->Get_KeyState(DIMKS_RBUTTON, KEY_DOWN))
@@ -108,13 +130,9 @@ void CMapToolHelper::Render_IMGUI()
 
 }
 
-void CMapToolHelper::SetUpTxtVectors(TYPE _eType)
+void CMapToolHelper::SetUpTxtVectors()
 {
-	string strPath = "../../../model_txt/";
-	if (TYPE_ANIM == _eType)
-		strPath += "Anim/";
-	else if (TYPE_NONANIM == _eType)
-		strPath += "NonAnim/";
+	string strPath = "../../../model_txt/NonAnim/";
 
 	directory_iterator end_iter;  // 디렉토리 순회의 끝을 나타내는 iterator
 	directory_iterator dir_iter(strPath);  // 지정된 경로의 시작 iterator
@@ -122,11 +140,19 @@ void CMapToolHelper::SetUpTxtVectors(TYPE _eType)
 	while (dir_iter != end_iter) {
 		if (is_regular_file(*dir_iter)) {
 			string strFilePath = dir_iter->path().filename().string();
+			string strModelName = strFilePath.substr(0, strFilePath.length() - 4);
 
-			if (TYPE_ANIM == _eType)
-				m_vecAnimTxts.emplace_back(strFilePath.substr(0, strFilePath.length() - 4));
-			else if (TYPE_NONANIM == _eType)
-				m_vecNonAnimTxts.emplace_back(strFilePath.substr(0, strFilePath.length() - 4));
+			if (false == ExcludeModel(strModelName))
+			{
+				if(true == IsMap(strModelName))
+					m_vecMapTxts.emplace_back(strModelName);
+				else if (true == IsMonster(strModelName))
+					m_vecMonsterTxts.emplace_back(strModelName);
+				else if (true == IsTrigger(strModelName))
+					m_vecTriggerTxts.emplace_back(strModelName);
+				else
+					m_vecObjectTxts.emplace_back(strModelName);
+			}
 		}
 		++dir_iter;
 	}
@@ -135,10 +161,47 @@ void CMapToolHelper::SetUpTxtVectors(TYPE _eType)
 void CMapToolHelper::Menu_Level()
 {
 	ImGui::SeparatorText("Level");
-	for (_int i = LEVEL_GAMEPLAY; i < LEVEL_GAMEPLAY + 1; i++)
+	for (_int i = LEVEL_INTRO; i <= LEVEL_STAGE1; i++)
 	{
-		if (ImGui::RadioButton(m_vecLevelName[i].c_str(), iLevelIndex == i - LEVEL_GAMEPLAY))
-			iLevelIndex = i - LEVEL_GAMEPLAY; // 선택 시 실행할 로직 추가
+		if (ImGui::RadioButton(m_vecLevelName[i].c_str(), iLevelIndex == i - LEVEL_INTRO)) {
+			ImGui::OpenPopup("Level Change");
+			iTempLevelIdx = i - LEVEL_INTRO;
+		}
+
+		if (iTempLevelIdx == i - LEVEL_INTRO && ImGui::BeginPopup("Level Change"))
+		{
+			string strPopUp = "Switch to " + m_vecLevelName[i] + "?";
+
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10, 10));
+			ImGui::PushFont(ImGui::GetFont()); // 기본 폰트를 가져와서 스케일 조정
+			ImGui::SetWindowFontScale(1.2f); // 텍스트 크기를 1.2배로 키움
+			// 텍스트를 가운데 정렬
+			_float windowWidth = ImGui::GetWindowSize().x;
+			_float textWidth = ImGui::CalcTextSize(strPopUp.c_str()).x;
+			ImGui::SetCursorPosX((windowWidth - textWidth) * 0.5f);
+
+			ImGui::Text(strPopUp.c_str());
+
+			if (ImGui::Button("Yes", ImVec2(90, 35)))
+			{
+				iLevelIndex = iTempLevelIdx;
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::SameLine();
+
+			if (ImGui::Button("Close", ImVec2(90, 35)))
+				ImGui::CloseCurrentPopup();
+
+			// 스타일 복원
+			ImGui::SetWindowFontScale(1.0f);
+			ImGui::PopFont();
+			ImGui::PopStyleVar();
+
+			ImGui::EndPopup();
+		}
+
+		if (i % 2 == 0)
+			ImGui::SameLine();
 	}
 	if (ImGui::Button("Save", ImVec2(100, 40)))
 		Save_Level();
@@ -155,38 +218,67 @@ void CMapToolHelper::Menu_Level()
 
 void CMapToolHelper::Menu_NonAnimModels()
 {
-	ImGui::SeparatorText("NonAnim");
-	ImGui::SetNextItemWidth(200.0f);
-
-	vector<const _char*> vecNonAnimModelNames(m_vecNonAnimTxts.size());
-	for (_int i = 0; i < m_vecNonAnimTxts.size(); ++i)
-		vecNonAnimModelNames[i] = m_vecNonAnimTxts[i].c_str();
-
-	if (ImGui::ListBox("##NonAnim", &iNonAnimIdx, vecNonAnimModelNames.data(), m_vecNonAnimTxts.size(), 9))
+	ImGui::SeparatorText("Models");
+	if (ImGui::CollapsingHeader("Map"))
 	{
-		m_strCurModel = m_vecNonAnimTxts[iNonAnimIdx];
-		iAnimIdx = -1;
+		ImGui::SetNextItemWidth(200.0f);
+		vector<const _char*> vecMapNames(m_vecMapTxts.size());
+		for (_int i = 0; i < m_vecMapTxts.size(); ++i)
+			vecMapNames[i] = m_vecMapTxts[i].c_str();
+		if (ImGui::ListBox("##Maps", &iMapTxtIdx, vecMapNames.data(), m_vecMapTxts.size(), 3)) {
+			iTriggerTxtIdx = iMonsterTxtIdx = iNonAnimIdx = -1;
+			m_strSelectedTxt = m_vecMapTxts[iMapTxtIdx];
+		}
+	}
+
+	if (ImGui::CollapsingHeader("Triggers"))
+	{
+		ImGui::SetNextItemWidth(200.0f);
+		vector<const _char*> vecTriggerNames(m_vecTriggerTxts.size());
+		for (_int i = 0; i < m_vecTriggerTxts.size(); ++i)
+			vecTriggerNames[i] = m_vecTriggerTxts[i].c_str();
+		if (ImGui::ListBox("##Triggers", &iTriggerTxtIdx, vecTriggerNames.data(), m_vecTriggerTxts.size(), 3)) {
+			iMapTxtIdx = iMonsterTxtIdx = iNonAnimIdx = -1;
+			m_strSelectedTxt = m_vecTriggerTxts[iTriggerTxtIdx];
+		}
+	}
+
+	if (ImGui::CollapsingHeader("Monsters"))
+	{
+		ImGui::SetNextItemWidth(200.0f);
+		vector<const _char*> vecMonsterNames(m_vecMonsterTxts.size());
+		for (_int i = 0; i < m_vecMonsterTxts.size(); ++i)
+			vecMonsterNames[i] = m_vecMonsterTxts[i].c_str();
+		if (ImGui::ListBox("##Monsters", &iMonsterTxtIdx, vecMonsterNames.data(), m_vecMonsterTxts.size(), 4)) {
+			iMapTxtIdx = iTriggerTxtIdx = iNonAnimIdx = -1;
+			m_strSelectedTxt = m_vecMonsterTxts[iMonsterTxtIdx];
+		}
+	}
+
+	if (ImGui::CollapsingHeader("Objects"))
+	{
+		ImGui::SetNextItemWidth(200.0f);
+		vector<const _char*> vecObjectNames(m_vecObjectTxts.size());
+		for (_int i = 0; i < m_vecObjectTxts.size(); ++i)
+			vecObjectNames[i] = m_vecObjectTxts[i].c_str();
+		if (ImGui::ListBox("##Objects", &iNonAnimIdx, vecObjectNames.data(), m_vecObjectTxts.size(), 9)) {
+			iMapTxtIdx = iTriggerTxtIdx = iMonsterTxtIdx = -1;
+			m_strSelectedTxt = m_vecObjectTxts[iNonAnimIdx];
+		}
 	}
 }
 
 void CMapToolHelper::Menu_TriggerInfo()
 {
-	if (nullptr == m_pPickedObject)
-		return;
-
-	CModel* pModel = dynamic_cast<CModel*>(m_pPickedObject->Get_Component(TEXT("Com_Model")));
-	if (nullptr == pModel)
-		return;
-
-	string strModelName = pModel->Get_ModelInfo().strModelName;
-	if (strModelName == "Camera" || strModelName == "Trigger" || strModelName == "Dummy")
+	if (m_strCurModel == "Camera" || m_strCurModel == "Trigger" || m_strCurModel == "Dummy")
 	{
 		CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(m_pPickedObject);
 		iTriggerType = pMapToolObject->Get_TriggerType();
 		iTriggerIdx = pMapToolObject->Get_TriggerIndex();
 
-		ImGui::Begin(strModelName.c_str());
-		if (strModelName == "Trigger" || strModelName == "Dummy") {
+		string strTrigger = "[ " + m_strCurModel + " ]";
+		ImGui::Begin(strTrigger.c_str());
+		if (m_strCurModel == "Trigger" || m_strCurModel == "Dummy") {
 			ImGui::SetCursorPosX(37);
 			ImGui::Text("TYPE");
 			ImGui::SameLine();
@@ -197,14 +289,14 @@ void CMapToolHelper::Menu_TriggerInfo()
 		ImGui::Text("INDEX");
 
 
-		if (strModelName == "Trigger")
+		if (m_strCurModel == "Trigger")
 		{
 			ImGui::SetNextItemWidth(80);
 			if (ImGui::Combo("##Type", &iTriggerType, triggerTypes, IM_ARRAYSIZE(triggerTypes)))
 				pMapToolObject->Set_TriggerType(iTriggerType);
 			ImGui::SameLine();
 		}
-		else if (strModelName == "Dummy")
+		else if (m_strCurModel == "Dummy")
 		{
 			ImGui::SetNextItemWidth(80);
 			if (ImGui::Combo("##Type", &iCamType, camTypes, IM_ARRAYSIZE(camTypes)))
@@ -218,7 +310,7 @@ void CMapToolHelper::Menu_TriggerInfo()
 			pMapToolObject->Set_TriggerIndex(iTriggerIdx);
 		}
 
-		if (strModelName == "Dummy")
+		if (m_strCurModel == "Dummy")
 			Menu_CamLerpInfo(pMapToolObject);
 
 		ImGui::End();
@@ -240,9 +332,6 @@ void CMapToolHelper::Menu_CamLerpInfo(CMapToolObject* _pMapToolObject)
 
 void CMapToolHelper::Menu_MapShaderInfo()
 {
-	if (nullptr == m_pPickedObject)
-		return;
-
 	CModel* pModel = dynamic_cast<CModel*>(m_pPickedObject->Get_Component(TEXT("Com_Model")));
 	if (nullptr == pModel)
 		return;
@@ -289,6 +378,11 @@ void CMapToolHelper::Menu_MapShaderInfo()
 	ImGui::SetCursorPosX(fButtonPosX + fButtonWidth * 0.6f);
 	if (ImGui::Button("Load", ImVec2(fButtonWidth, 30)))
 		Load_MapShaderInfo();
+	ImGui::SameLine();
+
+	ImGui::SetCursorPosX(fButtonPosX + fButtonWidth * 3.1f);
+	if (ImGui::Button("SaveOctree", ImVec2(fButtonWidth, 30)))
+		Save_Octree();
 
 	for (_uint j = 0; j < iNumMesh; j++)
 	{
@@ -319,26 +413,79 @@ void CMapToolHelper::Menu_MapShaderInfo()
 	ImGui::End();
 }
 
+void CMapToolHelper::Menu_MonsterInfo()
+{
+	if (false == IsMonster(m_strCurModel))
+		return;
+
+	CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(m_pPickedObject);
+	iTriggerIdx = pMapToolObject->Get_TriggerIndex();
+
+	string strMonsterName = m_strCurModel.substr(8);
+	ImGui::Begin(strMonsterName.c_str());
+	ImGui::SetCursorPosX(33);
+	ImGui::Text("INDEX");
+	ImGui::SetNextItemWidth(80);
+	if (ImGui::Combo("##Index", &iTriggerIdx, triggerIndices, IM_ARRAYSIZE(triggerIndices)))
+		pMapToolObject->Set_TriggerIndex(iTriggerIdx);
+
+	ImGui::End();
+}
+
 void CMapToolHelper::Edit_Object()
 {
-	if (nullptr != m_pPickedObject)
-	{
-		CTransform* pTransform = dynamic_cast<CTransform*>(m_pPickedObject->Get_Component(g_strTransformTag));
-		if (pTransform != nullptr)
-		{
-			ImGui::Begin("Guizmo");
-			Safe_AddRef(pTransform);
-			_float4x4 tempMatrix = pTransform->Get_WorldFloat4x4();
-			m_pGameInstance->EditTransform(tempMatrix); // 선택한 모델의 월드행렬을 수정 
-			pTransform->Set_WorldMatrix(tempMatrix);
-			Safe_Release(pTransform);
-			ImGui::End();
-		}
-	}
+	if (nullptr == m_pPickedObject)
+		return;
+
+	CTransform* pTransform = dynamic_cast<CTransform*>(m_pPickedObject->Get_Component(g_strTransformTag));
+	if (nullptr == pTransform)
+		return;
+	
+	Safe_AddRef(pTransform);
+	ImGui::Begin(m_strCurModel.c_str());
+
+	_uint iShaderVars = m_pPickedObject->Get_ShaderVars();
+	_float fRimLightThickNess = m_pPickedObject->Get_RimLightThickness();
+
+	_bool bStencil = (iShaderVars >> 2) & 1;
+	_bool bRimLight = (iShaderVars >> 1) & 1;
+	_bool bMotionBlur = iShaderVars & 1;
+	if (ImGui::Checkbox("Stencil", &bStencil))
+		iShaderVars ^= 4;
+	ImGui::SameLine();
+	if (ImGui::Checkbox("RimLight", &bRimLight))
+		iShaderVars ^= 2;
+	ImGui::SameLine();
+	if (ImGui::Checkbox("MotionBlur", &bMotionBlur))
+		iShaderVars ^= 1;
+	m_pPickedObject->Set_ShaderVars(iShaderVars);
+	
+	float windowWidth = ImGui::GetContentRegionAvail().x;
+	float inputFloatWidth = 100; // 설정된 너비
+	float thicknessTextWidth = ImGui::CalcTextSize("Thickness ").x;
+	float totalWidth = thicknessTextWidth + inputFloatWidth + ImGui::GetStyle().ItemSpacing.x;
+	float offset = (windowWidth - totalWidth) * 0.5f;
+	if (offset > 0.0f)
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offset);
+
+	ImGui::Text("Thickness ");
+	ImGui::SameLine();
+	ImGui::SetNextItemWidth(100);
+	if (ImGui::InputFloat("##RimLightThickness", &fRimLightThickNess, 0.005f, 1.0f, "%.3f"))
+		m_pPickedObject->Set_RimLightThickness(fRimLightThickNess);
+
+	_float4x4 tempMatrix = pTransform->Get_WorldFloat4x4();
+	m_pGameInstance->EditTransform(tempMatrix); // 선택한 모델의 월드행렬을 수정 
+	pTransform->Set_WorldMatrix(tempMatrix);
+	Safe_Release(pTransform);
+	ImGui::End();
 }
 
 void CMapToolHelper::OnLeftClick()
 {
+	if (ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow))
+		return;
+
 	CGameObject* pPickedObject = Select_ModelByPicking();
 	if (nullptr == pPickedObject)
 		return;
@@ -346,10 +493,10 @@ void CMapToolHelper::OnLeftClick()
 	m_pPickedObject = pPickedObject;
 
 	CModel* pModel = dynamic_cast<CModel*>(m_pPickedObject->Get_Component(TEXT("Com_Model")));
-	string strModelName = pModel->Get_ModelInfo().strModelName;
+	m_strCurModel = pModel->Get_ModelInfo().strModelName;
 	_uint iNumMeshes = pModel->Get_NumMeshes();
 
-	_int iIndex = Compute_MapIndex(strModelName);
+	_int iIndex = Compute_MapIndex(m_strCurModel);
 
 	if (-1 == iIndex) // 피킹한 객체가 맵이 아님
 		return;
@@ -370,7 +517,7 @@ void CMapToolHelper::OnLeftClick()
 
 void CMapToolHelper::OnRightClick()
 {
-	if (iAnimIdx == -1 && iNonAnimIdx == -1)
+	if (iMapTxtIdx == -1 && iTriggerTxtIdx == -1 && iMonsterTxtIdx == -1 && iNonAnimIdx == -1)
 		return;
 
 	_float2 vMouseViewPortPos = m_pGameInstance->Get_MouseViewPortPos();
@@ -400,13 +547,21 @@ void CMapToolHelper::OnRightClick()
 		_float4 vTemp(m_vPickPos.x, m_vPickPos.y, m_vPickPos.z, 1.0f); // 위치
 		CMapToolObject::MAPTOOLOBJECT_DESC tMapToolDesc = {};
 		memcpy(&tMapToolDesc.matWorld.m[CTransform::STATE_POSITION], &vTemp, sizeof(_float4));
-		tMapToolDesc.wstrModelName = CUtils::StrToWstr(m_vecNonAnimTxts[iNonAnimIdx]);
+		tMapToolDesc.wstrModelName = CUtils::StrToWstr(m_strSelectedTxt);
 
-		if (Compute_MapIndex(m_vecNonAnimTxts[iNonAnimIdx]) == -1) // 맵이 아닐때
+		if (Compute_MapIndex(m_strSelectedTxt) == -1) // 맵이 아닐때
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), 
-				TEXT("Prototype_GameObject_MapToolObject"), &tMapToolDesc)))
-				return;
+			if (tMapToolDesc.wstrModelName == TEXT("BG1")) {
+				if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"),
+					TEXT("Prototype_GameObject_BG"), &tMapToolDesc)))
+					return;
+			}
+			else
+			{
+				if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"),
+					TEXT("Prototype_GameObject_MapToolObject"), &tMapToolDesc)))
+					return;
+			}
 		}
 		else
 		{
@@ -419,16 +574,19 @@ void CMapToolHelper::OnRightClick()
 				return;
 		}
 
-		iAnimIdx = iNonAnimIdx = -1;
-
 		list<CGameObject*>* pObjList = m_pGameInstance->Get_List(LEVEL_TOOL_MAP, TEXT("Layer_Parse"));
 		m_pPickedObject = pObjList->back();
+		m_strCurModel = m_strSelectedTxt;
+
+		iMapTxtIdx = iTriggerTxtIdx = iMonsterTxtIdx = iNonAnimIdx = -1;
 	}
 }
 
 void CMapToolHelper::On_DIK_Escape()
 {
-	iAnimIdx = -1;
+	iMapTxtIdx = -1;
+	iTriggerTxtIdx = -1;
+	iMonsterTxtIdx = -1;
 	iNonAnimIdx = -1;
 	m_pPickedObject = nullptr;
 }
@@ -445,7 +603,7 @@ void CMapToolHelper::Save_Level()
 	if (iLevelIndex < 0)
 		return;
 
-	string strLevel = m_vecLevelName[iLevelIndex + LEVEL_GAMEPLAY];
+	string strLevel = m_vecLevelName[iLevelIndex + LEVEL_INTRO];
 	string tempFileName = "temp_" + strLevel + ".txt";
 	
 	ofstream outputFile(tempFileName, ios::out | ios::binary);
@@ -483,10 +641,14 @@ void CMapToolHelper::Save_Level()
 		string strModelName = pModel->Get_ModelInfo().strModelName;
 		_float4x4 matWorld = pTransform->Get_WorldMatrix();
 		_uint iStrLength = strModelName.length();
+		_uint iShaderVars = object->Get_ShaderVars();
+		_float fRimLightThickness = object->Get_RimLightThickness();
 
 		outputFile.write(reinterpret_cast<const char*>(&iStrLength), sizeof(iStrLength));
 		outputFile.write(strModelName.c_str(), iStrLength);
 		outputFile.write(reinterpret_cast<const char*>(&matWorld), sizeof(_float4x4));
+		outputFile.write(reinterpret_cast<const char*>(&iShaderVars), sizeof(iShaderVars));
+		outputFile.write(reinterpret_cast<const char*>(&fRimLightThickness), sizeof(fRimLightThickness));
 
 		if ("Camera" == strModelName || "Trigger" == strModelName) {
 			CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(object);
@@ -509,6 +671,23 @@ void CMapToolHelper::Save_Level()
 			outputFile.write(reinterpret_cast<const char*>(&iTriggerIndex), sizeof(iTriggerIndex));
 			outputFile.write(reinterpret_cast<const char*>(&iCamType), sizeof(iCamType));
 			outputFile.write(reinterpret_cast<const char*>(&fRadius), sizeof(fRadius));
+		}
+		else if (-1 != Compute_MapIndex(strModelName)) // 맵인 경우
+		{
+			if (0 != strModelName.compare(strModelName.size() - 5, 5, "Blend")) // Blend맵이 아닌 경우
+			{
+				_float3 vMin{FLT_MAX, FLT_MAX, FLT_MAX}, vMax{-FLT_MAX, -FLT_MAX , -FLT_MAX };
+				pModel->Find_MinMax(vMin, vMax);
+				
+				outputFile.write(reinterpret_cast<const char*>(&vMin), sizeof(vMin));
+				outputFile.write(reinterpret_cast<const char*>(&vMax), sizeof(vMax));
+			}
+		}
+		else if (true == IsMonster(strModelName))
+		{
+			CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(object);
+			_int iTriggerIndex = pMapToolObject->Get_TriggerIndex();
+			outputFile.write(reinterpret_cast<const char*>(&iTriggerIndex), sizeof(iTriggerIndex));
 		}
 	}
 
@@ -559,7 +738,7 @@ void CMapToolHelper::Load_Level()
 	On_DIK_Delete();
 	m_pGameInstance->Clear_Layer(LEVEL_TOOL_MAP, TEXT("Layer_Parse"));
 
-	string strLevel = m_vecLevelName[iLevelIndex + LEVEL_GAMEPLAY];
+	string strLevel = m_vecLevelName[iLevelIndex + LEVEL_INTRO];
 	string strFileName = "../../../objects_txt/" + strLevel + ".txt";
 
 	fstream fileStream(strFileName, ios::in | ios::binary);
@@ -576,6 +755,9 @@ void CMapToolHelper::Load_Level()
 	_int iTriggerIndex{};
 	_int iCamType{};
 	_float fRadius{};
+	_float3 vMin{}, vMax{};
+	_uint iShaderVars{};
+	_float fRimLightThickness{};
 
 	while (!fileStream.eof()) 
 	{
@@ -584,6 +766,8 @@ void CMapToolHelper::Load_Level()
 		strModelName.resize(iStrLength);
 		fileStream.read(&strModelName[0], iStrLength);
 		fileStream.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
+		fileStream.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
+		fileStream.read(reinterpret_cast<char*>(&fRimLightThickness), sizeof(fRimLightThickness));
 
 		if ("Camera" == strModelName || "Trigger" == strModelName) {
 			if ("Trigger" == strModelName)
@@ -597,6 +781,16 @@ void CMapToolHelper::Load_Level()
 			fileStream.read(reinterpret_cast<char*>(&iCamType), sizeof(iCamType));
 			fileStream.read(reinterpret_cast<char*>(&fRadius), sizeof(fRadius));
 		}
+		else if (-1 != Compute_MapIndex(strModelName)) // 맵이면
+		{
+			if (0 != strModelName.compare(strModelName.size() - 5, 5, "Blend")) // Blend맵이 아닌 경우
+			{
+				fileStream.read(reinterpret_cast<char*>(&vMin), sizeof(vMin));
+				fileStream.read(reinterpret_cast<char*>(&vMax), sizeof(vMax));
+			}
+		}
+		else if(true == IsMonster(strModelName))
+			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
 
 		if (fileStream.eof())
 			break;
@@ -604,6 +798,9 @@ void CMapToolHelper::Load_Level()
 		CMapToolObject::MAPTOOLOBJECT_DESC tDesc{};
 		tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
 		tDesc.matWorld = matWorld;
+		tDesc.iShaderVars = iShaderVars;
+		tDesc.fRimLightThickness = fRimLightThickness;
+
 		if ("Camera" == strModelName || "Trigger" == strModelName)
 		{
 			if("Trigger" == strModelName)
@@ -616,19 +813,43 @@ void CMapToolHelper::Load_Level()
 			tDesc.iCamType = iCamType;
 			tDesc.fRadius = fRadius;
 		}
+		else if(true == IsMonster(strModelName))
+			tDesc.iTriggerIndex = iTriggerIndex;
 		
+
 		wstring wstrGameObjectTag;
+
 		if (Compute_MapIndex(strModelName) != -1) // 맵인 경우
-			wstrGameObjectTag = TEXT("BasicMap");
-		else
-			wstrGameObjectTag = TEXT("MapToolObject");
-		
-		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
 		{
-			wstring wstrErrorMsg = TEXT("Failed to Clone MapToolObject") + wstrGameObjectTag;
-			MSG_BOX(wstrErrorMsg.c_str());
-			fileStream.close();
-			return;
+			CBasicMap::MAP_DESC tMapDesc{};
+			tMapDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			tMapDesc.matWorld = matWorld;
+			tMapDesc.vMin = vMin;
+			tMapDesc.vMax = vMax;
+			wstrGameObjectTag = TEXT("BasicMap");
+
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tMapDesc)))
+			{
+				wstring wstrErrorMsg = TEXT("Failed to Clone MapToolObject") + wstrGameObjectTag;
+				MSG_BOX(wstrErrorMsg.c_str());
+				fileStream.close();
+				return;
+			}
+		}	
+		else
+		{
+			if ("BG1" == strModelName)
+				wstrGameObjectTag = TEXT("BG");
+			else
+				wstrGameObjectTag = TEXT("MapToolObject");
+			
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
+			{
+				wstring wstrErrorMsg = TEXT("Failed to Clone: ") + wstrGameObjectTag;
+				MSG_BOX(wstrErrorMsg.c_str());
+				fileStream.close();
+				return;
+			}
 		}
 	}
 
@@ -801,6 +1022,30 @@ _int CMapToolHelper::Compute_MapIndex(const string& _strModelName)
 	return -1;
 }
 
+_bool CMapToolHelper::IsMap(const string& _strModelName)
+{
+	if (m_setMapNames.end() != m_setMapNames.find(_strModelName))
+		return true;
+
+	return _bool();
+}
+
+_bool CMapToolHelper::IsTrigger(const string& _strModelName)
+{
+	if (m_setTriggerNames.end() != m_setTriggerNames.find(_strModelName))
+		return true;
+
+	return _bool();
+}
+
+_bool CMapToolHelper::IsMonster(const string& _strModelName)
+{
+	if (m_setMonsterNames.end() != m_setMonsterNames.find(_strModelName))
+		return true;
+		
+	return false;
+}
+
 void CMapToolHelper::HideTriggers(_bool bHideTriggers)
 {
 	list<CGameObject*>* pObjectList = m_pGameInstance->Get_List(LEVEL_TOOL_MAP, TEXT("Layer_Parse"));
@@ -825,6 +1070,19 @@ void CMapToolHelper::HideTriggers(_bool bHideTriggers)
 	}
 }
 
+_bool CMapToolHelper::ExcludeModel(string& _strModelName)
+{
+	if (_strModelName.size() < 4)
+		return false;
+
+	if (_strModelName.substr(0, 5) == "Smoke" || _strModelName.substr(0, 4) == "Test"
+		|| _strModelName.substr(0, 9) == "SkySphere" || _strModelName.substr(_strModelName.size() - 5) == "Blend"
+		|| "Tornado" == _strModelName)
+		return true;
+
+	return _bool();
+}
+
 void CMapToolHelper::Reset_MapShaderInfo()
 {
 	if (nullptr == m_pPickedObject)
@@ -838,6 +1096,11 @@ void CMapToolHelper::Reset_MapShaderInfo()
 	vecPassIndices[iMapIndex].resize(iNumMesh);
 	vecSamplingFactors[iMapIndex].resize(iNumMesh);
 	fill(vecSamplingFactors[iMapIndex].begin(), vecSamplingFactors[iMapIndex].end(), 1.f);
+}
+
+void CMapToolHelper::Save_Octree()
+{
+
 }
 
 CMapToolHelper* CMapToolHelper::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

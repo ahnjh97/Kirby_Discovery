@@ -80,6 +80,9 @@ HRESULT CKirby::Initialize(void* pArg)
 	//m_eAbilityType = ABILITY_DEFAULT;
 	m_eAbilityType = ABILITY_SWORD;
 
+	CCharacterController* pController = dynamic_cast<CCharacterController*>(Get_Component(TEXT("Com_Controller")));
+	pController->RegisterAsPlayer();
+
 	return S_OK;
 }
 
