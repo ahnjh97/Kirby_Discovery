@@ -288,7 +288,6 @@ void CModel::CallEvent(const string& EventName)
 		EventIter->second();
 }
 
-HRESULT CModel::Ready_Meshes()
 void CModel::Find_MinMax(_float3& vMin, _float3& vMax)
 {
 	for (auto& mesh : m_Meshes)

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Level_GamePlay.h"
+#include "LevelChanger.h"
 #include "Camera_Free.h"
 #include "BasicMap.h"
 #include "UIObject.h"
@@ -231,11 +232,11 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 {
 	LEVEL eLevel = LEVEL_GAMEPLAY;
 
-	string strFileName = "../../../objects_txt/GamePlay.txt";
+	string strFileName = "../../../objects_txt/Stage1.txt";
 	fstream fileStream(strFileName, ios::in | ios::binary);
 	if (fileStream.is_open() == false)
 	{
-		MSG_BOX(TEXT("Failed to open : GamePlay.txt"));
+		MSG_BOX(TEXT("Failed to open : Stage1.txt"));
 		return E_FAIL;
 	}
 

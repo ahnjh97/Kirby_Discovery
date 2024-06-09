@@ -54,9 +54,9 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	hr = __super::Initialize(pArg);
 	CHECK_FAILED(hr);
 
-	m_vecLevelName = { "Level_Static", "Level_Loading", "Level_Logo", // 두번째 줄에 실제 인게임 레벨 추가
-			"Intro", "GamePlay",
-			"Level_Tool_UI", "Level_Tool_FX", "Level_Tool_Anim", "Level_Tool_Map", "Level_End" };
+	m_vecLevelName = { "Level_Static", "Level_Loading", "Level_Logo", "GamePlay",
+			"Level_Tool_UI", "Level_Tool_FX", "Level_Tool_Anim", "Level_Tool_Map",
+		"Intro", "Stage1", "Level_End" };
 
 	m_vecMapModelNames = { "Level0Stage1Step01", "Level1Stage1Step01" };
 
@@ -161,7 +161,7 @@ void CMapToolHelper::SetUpTxtVectors()
 void CMapToolHelper::Menu_Level()
 {
 	ImGui::SeparatorText("Level");
-	for (_int i = LEVEL_INTRO; i <= LEVEL_GAMEPLAY; i++)
+	for (_int i = LEVEL_INTRO; i <= LEVEL_STAGE1; i++)
 	{
 		if (ImGui::RadioButton(m_vecLevelName[i].c_str(), iLevelIndex == i - LEVEL_INTRO)) {
 			ImGui::OpenPopup("Level Change");
@@ -200,7 +200,7 @@ void CMapToolHelper::Menu_Level()
 			ImGui::EndPopup();
 		}
 
-		if (i % 2 == 1)
+		if (i % 2 == 0)
 			ImGui::SameLine();
 	}
 	if (ImGui::Button("Save", ImVec2(100, 40)))

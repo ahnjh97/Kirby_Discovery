@@ -75,20 +75,6 @@ void CUIObject::Free()
 
 	__super::Free();
 
-	if (m_UIs.empty())
-	{
-		for (auto& uiObj : m_UIs)
-			Safe_Release(uiObj);
-		m_UIs.clear();
-	}
-
-	if (m_MultiUIs.empty())
-	{
-		for (auto& uiObj : m_MultiUIs)
-			Safe_Release(uiObj);
-		m_MultiUIs.clear();
-	}
-
 	Safe_Release(m_pTextureCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pVIBufferCom);

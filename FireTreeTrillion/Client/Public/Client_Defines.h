@@ -5,7 +5,6 @@ namespace Client
 {
 	enum LEVEL { LEVEL_STATIC, LEVEL_LOADING, 
                  LEVEL_LOGO = 2, 
-                 LEVEL_INTRO,
                  LEVEL_GAMEPLAY, 
 
                 //============= TOOL
@@ -13,9 +12,10 @@ namespace Client
                  LEVEL_TOOL_UI,
                  LEVEL_TOOL_ANIM = 6, // ANIM툴은 6으로 고정 ! 부탁드립니댜
                  LEVEL_TOOL_MAP,
-                
                 //============ GAME
                 // 여기에서 이어서 
+                 LEVEL_INTRO,
+                 LEVEL_STAGE1,
 
                  LEVEL_END };
 
