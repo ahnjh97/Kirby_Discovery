@@ -195,8 +195,8 @@ _int CTestModel::Tick(_float fTimeDelta)
     }
 
     // FSM Á¦¾î
-    Update_FSMState(fTimeDelta);
-    m_pFSM->Update(this, fTimeDelta);
+    //Update_FSMState(fTimeDelta);
+    //m_pFSM->Update(this, fTimeDelta);
 
     return OBJ_NOEVENT;
 }
@@ -214,14 +214,15 @@ void CTestModel::Late_Tick(_float fTimeDelta)
         m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
     }
 
-    //if (m_pGameInstance->Get_DIKeyState(DIK_L, KEY_DOWN))
-    //{
-    //    CGameObject* pCamera = m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Camera"), 0);
-    //    _float4 vForce = static_cast<CTransform*>(pCamera->Get_Component(g_strTransformTag))->Get_State_Float4(CTransform::STATE_LOOK);
-    //    //_float4 vForce = CUtils::Make_RandomAngle_Vector(20.f, XMVectorSet(0.f, 1.f, 0.f, 0.f));
-    //    _float3 force = _float3{ vForce.x * 10000.f, vForce.y * 10000.f, vForce.z * 10000.f };
-    //    m_pRigidBodyCom->Add_Force(force);
-    //}
+    CGameObject* pCamera = m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Camera"), 0);
+    _float4 vForce = static_cast<CTransform*>(pCamera->Get_Component(g_strTransformTag))->Get_State_Float4(CTransform::STATE_LOOK);
+    _float3 force = _float3{ vForce.x * 10000.f, vForce.y * 10000.f, vForce.z * 10000.f };
+    if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD7, KEY_DOWN))
+        m_pRigidBodyCom->Add_Force(force);
+    if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD8, KEY_DOWN))
+        m_pRigidBodyCom->Add_Torque(force);
+    if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD9, KEY_DOWN))
+        m_pRigidBodyCom->Add_Velocity(force);
 
     //m_pRigidBodyCom->Update(m_pTransformCom);
     m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
@@ -329,7 +330,7 @@ HRESULT CTestModel::Add_Components()
     CRigidBody::RIGIDBODY_DESC rigidDesc {};
     rigidDesc.bTrigger = false;
     rigidDesc.bDynamic = true;
-    rigidDesc.bKinematic = true;
+    rigidDesc.bKinematic = false;
     rigidDesc.eShapeType = RIGID_CAPSULE;
     rigidDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
     hr = __super::Add_Component(TEXT("Prototype_Component_RigidBody"),
@@ -346,7 +347,7 @@ HRESULT CTestModel::Add_Components()
     //    TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 
     /* FSM */
-    SetUp_FSM();
+    //SetUp_FSM();
 
     return S_OK;
 }
@@ -484,7 +485,7 @@ void CTestModel::Free()
     //Safe_Release(m_pControllerCom);
     
     Safe_Release(m_pLight);
-    Safe_Release(m_pFSM);
+    //Safe_Release(m_pFSM);
     
     // not yet [240520]
     //for (auto& iter : m_mapRigidBodies)

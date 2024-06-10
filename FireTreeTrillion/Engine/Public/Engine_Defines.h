@@ -26,16 +26,6 @@ namespace Engine
     enum RIGID_SHAPE { RIGID_BOX, RIGID_SPHERE, RIGID_CAPSULE, RIGID_END };
     enum INSTANCE_PROPERTY {INSTANCE_DROP, INSTANCE_SPREAD, INSTANCE_DECELERATE, INSTANCE_END};
 
-    enum COLLISION_TYPE
-    { 
-        PLAYER = 0, PLAYER_EFFECT,
-        MONSTER,
-        INTERACT,
-        ITEM,
-        TRIGGER,
-        COLLISION_END
-    };
-
     enum COLLISION_CONTENT
     {
         CONTENT_ATTACK,		// 공격 - 피격 처리
@@ -43,6 +33,36 @@ namespace Engine
         CONTENT_ACQUIRE,	// 만나면 ObjDest가 삭제되는 충돌액션
         CONTENT_NONEVENT,	// 공통적인 충돌처리가 없는 경우
         CONTENT_END
+    };
+
+    enum COLLISION_RESULT
+    {
+        CONTROLLER,
+        KINETIC_DYNAMIC_RIGID,
+        DYNAMIC_RIGID,
+        STATIC_RIGID,
+        COLLISION_RESULT_END
+    };
+
+    enum COLLISION_TYPE
+    {
+        PLAYER_ATTACK,
+        PLAYER,
+        MONSTER,
+        GROUND,
+        INTERACT,
+        ITEM,
+        TRIGGER,
+        COLLISION_END
+    };
+
+    enum BIT_COLLIDER_TYPE
+    {
+        //BIT_PLAYER_ATTACK = 1 << PLAYER_ATTACK,
+        BIT_PLAYER  = 1 << PLAYER,
+        BIT_MONSTER = 1 << MONSTER,
+        BIT_GROUND  = 1 << GROUND,
+        //BIT_MONSTER_ATTACK = 1 << BIT_MONSTER_ATTACK,
     };
 }
 

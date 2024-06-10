@@ -129,7 +129,6 @@ void CKirby::Late_Tick(_float fTimeDelta)
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_DEFERREDINFO, this);
 	}
-	m_pRigidBodyCom->Overlap_Hitbox(this, GET_POS);
 }
 
 HRESULT CKirby::Render()
@@ -247,8 +246,6 @@ void CKirby::Add_AnimEvent()
 	// 3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
 	m_pModelCom[INFO(m_eBodyState)]->Add_Event("ApplyDamage", [this]() {
 
-		// 커비의 RigidBody가 충돌된 부분을 판정
-		//m_pRigidBodyCom->Overlap_Hitbox();
 
 		});
 }
@@ -518,23 +515,6 @@ HRESULT CKirby::Add_Components()
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	m_pControllerCom->Set_Object(this);
 	//m_pControllerCom->Set_CollisionType(m_eCollisionGroup);
-
-
-	/* For.Com_RigidBody */
-	CRigidBody::RIGIDBODY_DESC rigidDesc {};
-	rigidDesc.bTrigger = false;
-	rigidDesc.bDynamic = true;
-	rigidDesc.bKinematic = true;
-	rigidDesc.eShapeType = RIGID_SPHERE;
-	rigidDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
-	hr = __super::Add_Component(TEXT("Prototype_Component_RigidBody"),
-								TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &rigidDesc);
-	CHECK_FAILED(hr);
-	m_pRigidBodyCom->Set_Object(this);
-	// JYWI(QZR) : 처음값을 false로 하고, RigidBodyCom을 언제 Activate = true로 바꿀까.
-	m_pRigidBodyCom->Activate(true);
-	// JYWI(QZR) : 정현이한테 혼날 것 같은 set함수 for test 추후 구조 바꿀게요.
-	m_pRigidBodyCom->Set_ActorName(CUtils::WstrToStr(m_wstrPrototypeTag));
 
 	// FOR ANIMTOOL
 	m_ppModelForAnimTool = &m_pModelCom[BODY_DEFAULT];
@@ -906,7 +886,5 @@ void CKirby::Free()
 	Safe_Release(m_pArmours);
 	for (auto& fx : m_KirbyFXList)
 		Safe_Release(fx);
-	
-	Safe_Release(m_pRigidBodyCom);
 }
 

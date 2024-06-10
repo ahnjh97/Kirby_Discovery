@@ -27,11 +27,12 @@ public:
 	_float4			Get_Position();
 	_float4			Get_FootPosition();
 
+
 	//PxControllerCollisionFlag getCollisionFlags()
 	//{
 	//	return collisionFlags;
 	//}
-	void			Get_ShapeInfo(physx::PxCapsuleGeometry& CapsuleGeo, physx::PxTransform& pxTransform);
+	//void			Get_ShapeInfo(physx::PxCapsuleGeometry& CapsuleGeo, physx::PxTransform& pxTransform);
 	_float			Get_Radius() const { return m_tControllerDesc.radius; }
 
 public:
@@ -53,6 +54,7 @@ public:
 	PxVec3			Compute_TerrainPosition();
 	_vector			Compute_TerrainPosition_Vector();
 	PxVec3			TerrainRayCast_Collision(PxVec3 _rayOrigin, PxVec3 _rayDirection, _float _fMaxDistance);
+	//void			Overlap_Hitbox(CGameObject* pGameObject, _float4 vPos, _float fRadius);
 
 	_bool	Is_Activated();
 	void	Activate(_bool bActive);
@@ -87,7 +89,7 @@ protected:
 	
 	class CControllerBehaviorCallback*	m_pControllerCallBack = nullptr;
 	class CUserControllerHitReport*		m_pControllerHitReport = nullptr;
-	
+	class CControllerFilterCallback*	m_pControllerFilterCallback = nullptr;
 	_float								m_fSlopeLimitDegree = 45.f;
 	_float								m_fFallVelocity = { 0.f };
 	_float								m_fFallAcceleration = { 0.f };

@@ -43,9 +43,9 @@ public:
 	virtual void	Render_IMGUI()			override;
 #endif
 
-	void			Update(class CTransform* pTransform);
 	void			Update(_fmatrix matrix);
-	void			Update_PhysX(CTransform* pTransform);
+	void			Update(_float4 vPos);
+	void			Update_PhysX(class CTransform* pTransform);
 
 public:
 	void			Create_Actor();
@@ -58,6 +58,9 @@ public:
 
 	// ³¯¸®±â
 	void			Add_Force(_float3 vForce);
+	void			Add_Torque(_float3 vTorque);
+	void			Add_Velocity(_float3 vVelocity);
+
 	void			Overlap_Hitbox(CGameObject* pGameObject, _float4 vPos, _float fRadius = 1.f);
 
 public:

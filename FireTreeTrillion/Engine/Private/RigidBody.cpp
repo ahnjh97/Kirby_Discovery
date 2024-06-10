@@ -37,30 +37,22 @@ HRESULT CRigidBody::Initialize(void * pArg)
 	return S_OK;
 }
 
-void CRigidBody::Update(CTransform* pTransform)
-{
-	if(!m_bKinematic)
-		Set_PxWorldMatrix(pTransform->Get_WorldFloat4x4());
-	else if (m_bKinematic && Is_Activated())
-		m_pActor->setKinematicTarget(physx::PxTransform{CUtils::To_Float4x4(pTransform->Get_WorldFloat4x4())});
-}
-
 void CRigidBody::Update(_fmatrix matrix)
 {
 	if (!m_bKinematic)
 		Set_PxWorldMatrix(matrix);
 	else if (m_bKinematic && Is_Activated())
-		m_pActor->setKinematicTarget(physx::PxTransform{CUtils::To_Float4x4(matrix)});
+		m_pActor->setKinematicTarget(PxTransform{CUtils::To_Float4x4(matrix)});
+}
+
+void CRigidBody::Update(_float4 vPos)
+{
+	if (m_bKinematic && Is_Activated())
+		m_pActor->setKinematicTarget(PxTransform{ vPos.x, vPos.y, vPos.z });
 }
 
 void CRigidBody::Update_PhysX(CTransform* pTransform)
 {
-	if (Is_Activated() == false) return;
-	if (m_bKinematic && Is_Activated())
-	{
-		Update(pTransform);
-	}
-	
 	if (false == m_bKinematic && false == m_bTrigger)
 	{
 		pTransform->Set_WorldMatrix(Get_PxWorldMatrix());
@@ -76,6 +68,10 @@ void CRigidBody::Render_IMGUI()
 	// ReCreateActor(for change shape or scale)
 	if (ImGui::Button("Update Changes"))
 	{
+		PxTransform globalPose = m_pActor->getGlobalPose();
+		PxMat44 globalPoseMatrix = PxMat44(globalPose);
+		m_OriginTransformMatrix = CUtils::To_Float4x4(globalPoseMatrix);
+		
 		Create_Actor();
 		if (!Is_Activated())
 			m_pGameInstance->Get_Scene()->addActor(*m_pActor);
@@ -84,9 +80,6 @@ void CRigidBody::Render_IMGUI()
 	ImGui::Checkbox("bKinematic",	&m_bKinematic);
 	ImGui::InputFloat("Density",	&m_fDensity);
 
-	//static _bool bActivate = false;
-	//ImGui::Checkbox("bActivate", &bActivate);
-	//Activate(bActivate);
 }
 
 #endif
@@ -112,7 +105,6 @@ void CRigidBody::Create_Actor()
 	}
 	
 	PxMaterial* pMtrl = m_pGameInstance->Get_Physics()->createMaterial(m_vMaterial.x, m_vMaterial.y, m_vMaterial.z);
-
 	switch (m_eShapeType)
 	{
 	case RIGID_BOX:
@@ -130,18 +122,8 @@ void CRigidBody::Create_Actor()
 		NODEFAULT;
 	}
 
-	PxFilterData filterData;
-	filterData.word0 = 1;  // 충돌 그룹 설정
-	filterData.word1 = 1;  // 이 값과 충돌할 그룹을 설정
-	//m_pShape->setSimulationFilterData(filterData);
-	m_pShape->setSimulationFilterData(physx::PxFilterData{ 1, 1, 0, 0 });
-
-	// 쿼리 필터 데이터 설정
-	PxFilterData queryFilterData;
-	queryFilterData.word0 = 1;  // 쿼리 그룹 설정
-	queryFilterData.word1 = 1;  // 쿼리 그룹 설정
-	//m_pShape->setQueryFilterData(queryFilterData);
-	m_pShape->setQueryFilterData(physx::PxFilterData{ 1, 1, 0, 0 });
+	m_pShape->setSimulationFilterData(physx::PxFilterData{ 10, 0, 0, 0 });
+	m_pShape->setQueryFilterData(physx::PxFilterData{ 10, 0, 0, 0 });
 
 	// Transform 설정 (위치와 회전)
 	PxMat44 pxMat = CUtils::To_Float4x4(OriginMatrix);
@@ -150,15 +132,20 @@ void CRigidBody::Create_Actor()
 	{
 		m_pActor = pPhysics->createRigidDynamic(transform);
 		SetUp_Actor();
-
 		m_pActor->attachShape(*m_pShape);
+		PxScene* scene = m_pGameInstance->Get_Scene();
+		scene->addActor(*m_pActor);
+
 		physx::PxRigidBodyExt::updateMassAndInertia(*m_pActor, m_fDensity);
 	}
 	else 
 	{
 		m_pStaticActor = pPhysics->createRigidStatic(transform);
 		SetUp_Actor();
+
 		m_pStaticActor->attachShape(*m_pShape);
+		PxScene* scene = m_pGameInstance->Get_Scene();
+		scene->addActor(*m_pStaticActor);
 	}
 }
 
@@ -175,7 +162,7 @@ void CRigidBody::SetUp_Actor()
 	}
 	else
 	{
-		//if (m_bDynamic)
+		if (m_bDynamic)
 			m_pActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, m_bKinematic);
 	}
 
@@ -184,15 +171,15 @@ void CRigidBody::SetUp_Actor()
 
 	if (m_bTrigger)
 	{
-		m_pShape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, false);
-		m_pShape->setFlag(physx::PxShapeFlag::eSCENE_QUERY_SHAPE, false);
-		m_pShape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, true);
+		m_pShape->setFlag(PxShapeFlag::eSIMULATION_SHAPE,  false);
+		m_pShape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, false);
+		m_pShape->setFlag(PxShapeFlag::eTRIGGER_SHAPE,	   true);
 	}
 	else
 	{
-		m_pShape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, true);
-		m_pShape->setFlag(physx::PxShapeFlag::eSCENE_QUERY_SHAPE, true);
-		m_pShape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, false);
+		m_pShape->setFlag(PxShapeFlag::eSIMULATION_SHAPE,  true);
+		m_pShape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, true);
+		m_pShape->setFlag(PxShapeFlag::eTRIGGER_SHAPE,	   false);
 	}
 }
 
@@ -255,6 +242,24 @@ void CRigidBody::Add_Force(_float3 vForce)
 	}
 }
 
+void CRigidBody::Add_Torque(_float3 vTorque)
+{
+	if (false == (m_bTrigger && m_bKinematic))
+	{
+		physx::PxVec3 PxToque = physx::PxVec3(vTorque.x, vTorque.y, vTorque.z);
+		m_pActor->addTorque(PxToque, physx::PxForceMode::eFORCE);
+	}
+}
+
+void CRigidBody::Add_Velocity(_float3 vVelocity)
+{
+	if (false == (m_bTrigger && m_bKinematic))
+	{
+		physx::PxVec3 PxForce = physx::PxVec3(vVelocity.x, vVelocity.y, vVelocity.z);
+		m_pActor->addForce(PxForce, physx::PxForceMode::eVELOCITY_CHANGE);
+	}
+}
+
 physx::PxTransform CRigidBody::Get_PxTransform()
 {
 	return physx::PxShapeExt::getGlobalPose(*m_pShape, *m_pActor);
@@ -264,7 +269,6 @@ physx::PxTransform CRigidBody::Get_PxTransform()
 void CRigidBody::Set_PxWorldMatrix(const _float4x4& _worldMatrix)
 {
 	m_pActor->setGlobalPose(physx::PxTransform{CUtils::To_Float4x4(_worldMatrix)});
-	
 }
 
 // physX에서의 행렬을 DX에서의 행렬로 변환하여 가져온다.

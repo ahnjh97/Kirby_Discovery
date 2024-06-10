@@ -172,7 +172,6 @@ private:
 
 private:
 	CModel*					m_pModelCom[BODY_END] = {nullptr};
-	CRigidBody*				m_pRigidBodyCom = { nullptr };
 
 	CTexture*				m_pEyeTexture[EYE_END] = { nullptr };
 	CTexture*				m_pMouthTexture[MOUTH_END] = { nullptr };

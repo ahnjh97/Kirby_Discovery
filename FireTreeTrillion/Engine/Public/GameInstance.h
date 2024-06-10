@@ -141,6 +141,7 @@ public: /* For.PhysX */
 	_float4x4	Update(_fmatrix matrix);
 	_uint		Get_CollisionContent(COLLISION_TYPE eMeType, COLLISION_TYPE eOtherType);
 	void		Ready_TestGround();
+	void		Overlap_Hitbox(CGameObject* pGameObject, _float4 vPos, _float fRadius);
 
 #ifdef _DEBUG
 	HRESULT Ready_RTVDebug(const wstring& strRenderTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY);

@@ -4,6 +4,9 @@
 #include "GameInstance.h"
 #include "PhysX.h"
 
+#define OVERLAP_MAX 8
+
+
 CCharacterController::CCharacterController(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CComponent(pDevice, pContext)
 {
@@ -98,12 +101,11 @@ void CCharacterController::Move(CTransform* pTransform, _fvector vPosition, _flo
 	PxExtendedVec3 pxCurrentPos = m_pController->getPosition();
 	PxVec3 moveVector((_float)pxCurrentPos.x, (_float)pxCurrentPos.y, (_float)pxCurrentPos.z);
 	//// 이동
-	//PxControllerCollisionFlags collisionFlags = m_pController->move(moveVector, 0.001f, fTimeDelta, PxControllerFilters());
 
 	PxVec3 displacement = CUtils::To_PxVec3(vPosition) - moveVector;
 
 	PxControllerFilters filter;
-	PxControllerCollisionFlags collisionFlags = m_pController->move(displacement, 0.001f, fTimeDelta, filter);
+	PxControllerCollisionFlags collisionFlags = m_pController->move(displacement, 0.001f, fTimeDelta, m_ControllerFilters);
 
 	PxExtendedVec3 pxPos = m_pController->getPosition();
 	PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
@@ -119,7 +121,7 @@ void CCharacterController::Move_Dir(CTransform* pTransform, _fvector fDelta, _fl
 	movement += CUtils::To_PxVec3(fDelta);
 
 	PxControllerFilters filter;
-	PxControllerCollisionFlags collisionFlags = m_pController->move(movement, 0.001f, fTimeDelta, filter);
+	PxControllerCollisionFlags collisionFlags = m_pController->move(movement, 0.001f, fTimeDelta, m_ControllerFilters);
 
 	PxExtendedVec3 pxPos = m_pController->getPosition();
 	PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
@@ -137,7 +139,7 @@ _bool CCharacterController::Jump(CTransform* pTransform, _float fFallVelocity, _
 {
 	// 이동
 	PxVec3 moveVector = PxVec3(0.f, fFallVelocity, 0.f) * fTimeDelta;
-	PxControllerCollisionFlags collisionFlags = m_pController->move(moveVector, 0.001f, fTimeDelta, PxControllerFilters());
+	PxControllerCollisionFlags collisionFlags = m_pController->move(moveVector, 0.001f, fTimeDelta, m_ControllerFilters);
 
 	// 객체의 충돌 상태 받아오기
 	PxControllerState m_pPxState;
@@ -175,7 +177,7 @@ _bool CCharacterController::Jump_Parabola(CTransform* pTransform, _fvector vGoPo
 	if (vGoPos.m128_f32[1] > 0.0f)
 	{
 		PxControllerFilters filters;
-		m_pController->move(displacement, 0.0f, fTimeDelta, filters);
+		m_pController->move(displacement, 0.0f, fTimeDelta, m_ControllerFilters);
 
 		// 객체의 충돌 상태 받아오기
 		PxControllerState m_pPxState;
@@ -192,12 +194,11 @@ _bool CCharacterController::Jump_Parabola(CTransform* pTransform, _fvector vGoPo
 
 		pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
 	}
+
 	// 객체의 위치 받아오기
 	//PxExtendedVec3 pxCurPos = m_pController->getPosition();     
 	//PxVec3 pos((_float)pxCurrentPos.x, (_float)pxCurrentPos.y, (_float)pxCurrentPos.z);
-
 	//_vector xmPos = XMVectorSet(pos.x, pos.y - 0.5f, pos.z, 0.f);
-
 	//pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
 
 	return true;
@@ -211,7 +212,7 @@ void CCharacterController::FreeFall(CTransform* pTransform, _float fTimeDelta, _
 
 	PxVec3 moveVector = PxVec3(0.f, m_fFallVelocity, 0.f) * fTimeDelta;
 
-	PxControllerCollisionFlags collisionFlags = m_pController->move(moveVector, 0.001f, fTimeDelta, PxControllerFilters());
+	PxControllerCollisionFlags collisionFlags = m_pController->move(moveVector, 0.001f, fTimeDelta, PxControllerFilters()); //m_ControllerFilters);
 
 	PxControllerState m_pPxState;
 	m_pController->getState(m_pPxState);
@@ -348,6 +349,7 @@ PxVec3 CCharacterController::TerrainRayCast_Collision(PxVec3 _rayOrigin, PxVec3 
 		return PxVec3(0.0f, 1.0f, 0.0f);
 }
 
+
 _bool CCharacterController::Is_Activated()
 {
 	return m_pController != nullptr && m_pController->getActor()->getScene() != nullptr;
@@ -367,22 +369,22 @@ void CCharacterController::Activate(_bool _bActive)
 	}
 }
 
-void CCharacterController::Get_ShapeInfo(physx::PxCapsuleGeometry& CapsuleGeo, physx::PxTransform& pxTransform)
-{
-	if (m_pController)
-	{
-		PxShape* shape;
-		m_pController->getActor()->getShapes(&shape, 1);
-		PxGeometryHolder geomHolder = shape->getGeometry();
-		//CapsuleGeo = shape->getGeometry().getType();
-		if (geomHolder.getType() == PxGeometryType::eCAPSULE)
-		{
-			const PxCapsuleGeometry& capsuleGeometry = geomHolder.capsule();
-			CapsuleGeo = capsuleGeometry;
-		}
-		pxTransform = physx::PxShapeExt::getGlobalPose(*shape, *m_pController->getActor());
-	}
-}
+//void CCharacterController::Get_ShapeInfo(physx::PxCapsuleGeometry& CapsuleGeo, physx::PxTransform& pxTransform)
+//{
+//	if (m_pController)
+//	{
+//		PxShape* shape;
+//		m_pController->getActor()->getShapes(&shape, 1);
+//		PxGeometryHolder geomHolder = shape->getGeometry();
+//		//CapsuleGeo = shape->getGeometry().getType();
+//		if (geomHolder.getType() == PxGeometryType::eCAPSULE)
+//		{
+//			const PxCapsuleGeometry& capsuleGeometry = geomHolder.capsule();
+//			CapsuleGeo = capsuleGeometry;
+//		}
+//		pxTransform = PxShapeExt::getGlobalPose(*shape, *m_pController->getActor());
+//	}
+//}
 
 void CCharacterController::Create_Controller()
 {
@@ -395,11 +397,12 @@ void CCharacterController::Create_Controller()
 	m_ControllerMaterial = m_pGameInstance->Get_Physics()->createMaterial(m_vMaterialOptions.x, m_vMaterialOptions.y, m_vMaterialOptions.z);
 	m_tControllerDesc.material = m_ControllerMaterial;
 	m_pController = m_pGameInstance->Get_ControllerManager()->createController(m_tControllerDesc);
-
+	
 	PxShape* shape;
 	m_pController->getActor()->getShapes(&shape, 1);
-	shape->setSimulationFilterData(physx::PxFilterData{ /*static_cast<physx::PxU32>(m_eCollisionType)*/1, 1, 0, 0 });
-	shape->setQueryFilterData(physx::PxFilterData{/*static_cast<physx::PxU32>(1)*/ 1, 1, 0, 0});//});
+	shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);
+	shape->setSimulationFilterData(PxFilterData{ static_cast<physx::PxU32>(m_eCollisionType), 0, 0, 0 });
+	shape->setQueryFilterData(PxFilterData{static_cast<physx::PxU32>(m_eCollisionType), 0, 0, 0});
 
 	if (m_pObject != nullptr)
 		Set_FootPosition(m_pObject->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION));
@@ -412,6 +415,7 @@ void CCharacterController::Release_Controller()
 	if (nullptr != m_pController)
 	{
 		Safe_Delete(m_pControllerCallBack);
+		Safe_Delete(m_pControllerFilterCallback);
 		Safe_Delete(m_pControllerHitReport);
 
 		if (m_pController->getActor()->getScene())
@@ -435,7 +439,9 @@ void CCharacterController::Set_DefaultValue()
 	// 사용자 정의 데이터
 	m_tControllerDesc.userData = this;
 	// ControllerFilters
-	m_ControllerFilters.mFilterData = &m_tFilterDesc;
+	m_ControllerFilters.mFilterData = &physx::PxFilterData{ static_cast<physx::PxU32>(m_eCollisionType), 0, 0, 0 };
+	m_pControllerFilterCallback = new CControllerFilterCallback();
+	m_ControllerFilters.mCCTFilterCallback = m_pControllerFilterCallback;
 	#pragma endregion
 
 	// 컨트롤러의 질량(밀도)
@@ -445,7 +451,6 @@ void CCharacterController::Set_DefaultValue()
 	m_tControllerDesc.stepOffset = 0.f;
 
 	// 캐릭터와 환경 간의 물리적 상호작용을 위해 사용되는 물질
-	//PxMaterial* material = m_pGameInstance->Get_Material();
 	m_ControllerMaterial = m_pGameInstance->Get_Physics()->createMaterial(0.5f, 0.5f, 0.5f);
 	m_tControllerDesc.material = m_ControllerMaterial;
 
