@@ -429,12 +429,14 @@
     <ClInclude Include="..\Public\WasteCan.h">
       <Filter>02.GameObjects\PhysXObject\RigidObject\WasteCan</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Multi_UI.h" />
     <ClInclude Include="..\Public\BG.h">
       <Filter>02.GameObjects\Map\BG</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Intro.h">
       <Filter>01.Levels\Intro</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\HUD_KirbyStatus.h">
+      <Filter>02.GameObjects\UI\HUD</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -630,12 +632,14 @@
     <ClCompile Include="..\Private\WasteCan.cpp">
       <Filter>02.GameObjects\PhysXObject\RigidObject\WasteCan</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Multi_UI.cpp" />
     <ClCompile Include="..\Private\BG.cpp">
       <Filter>02.GameObjects\Map\BG</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Intro.cpp">
       <Filter>01.Levels\Intro</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HUD_KirbyStatus.cpp">
+      <Filter>02.GameObjects\UI\HUD</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

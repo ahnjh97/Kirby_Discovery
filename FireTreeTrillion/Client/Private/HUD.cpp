@@ -16,36 +16,60 @@ HRESULT CHUD::Initialize_Prototype()
     return S_OK;
 }
 
-HRESULT CHUD::Initialize(void* pArg)
+HRESULT CHUD::Initialize(void* _pArg)
 {
-	HRESULT hr = __super::Initialize(pArg);
+	HRESULT hr = __super::Initialize(_pArg);
 	CHECK_FAILED(hr);
 
-	//CUIObject::UIOBJ_DESC HUD_KirbyDESC{};
-	//HUD_KirbyDESC.wstrUITag = { TEXT("HUD_Kirby") };
-	//HUD_KirbyDESC.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f };
-	//HUD_KirbyDESC.vSize = { 100.f, 100.f };
-	//HUD_KirbyDESC.vPos = { HUD_KirbyDESC.vCenter.x/* - 200.f*/,
-	//						HUD_KirbyDESC.vCenter.y/* - 200.f */ };
-	//HUD_KirbyDESC.fDegree = { 0.f };
-	//HUD_KirbyDESC.iTexIndex = { 0 };
+	UIOBJ_DESC* HUDUI_Desc{};
+	if (nullptr != _pArg)
+		HUDUI_Desc = (UIOBJ_DESC*)_pArg;
 
-	//CUIObject* pUIObj = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_HUD_Kirby"), &HUD_KirbyDESC));
-	//CHECK_NULLPTR(pUIObj);
-	//m_vecSingleUI.push_back(pUIObj);
+	m_UIObjDesc = (*HUDUI_Desc);
+
+	CHUD::HUD_STATUS eHUDType = { STAT_KIRBY };
+	CUIObject* pUIObj = { nullptr };
+
+	switch (eHUDType)
+	{
+	case STAT_KIRBY:
+		pUIObj = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_HUD_KirbyStatus"), &m_UIObjDesc));
+		CHECK_NULLPTR(pUIObj);
+		m_HUDs.push_back(pUIObj);
+		break;
+
+	case STAT_COIN:
+		//pUIObj = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_HUD_KirbyStatus"), &HUDUI_Desc));
+		//CHECK_NULLPTR(pUIObj);
+		//m_HUDs.push_back(pUIObj);
+		break;
+
+	default: break;
+	}
 
 	return S_OK;
 }
 
 _int CHUD::Tick(_float _fTimeDelta)
-{		
+{
+	__super::Tick(_fTimeDelta);
+
+	if (!m_HUDs.empty())
+	{
+		for (auto& pUIObj : m_HUDs)
+			pUIObj->Tick(_fTimeDelta);
+	}
+
 	return OBJ_NOEVENT;
 }
 
 void CHUD::Late_Tick(_float _fTimeDelta)
 {
-	//for (auto& pUIObj : m_vecSingleUI)
-	//	pUIObj->Late_Tick(_fTimeDelta);
+	if (!m_HUDs.empty())
+	{
+		for (auto& pUIObj : m_HUDs)
+			pUIObj->Late_Tick(_fTimeDelta);
+	}
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_UI, this);
 }
@@ -89,6 +113,14 @@ CGameObject* CHUD::Clone(void* pArg)
 
 void CHUD::Free()
 {
+	if (!m_HUDs.empty())
+	{
+		for (auto& pHUD : m_HUDs)
+			Safe_Release(pHUD);
+
+		m_HUDs.clear();
+	}
+
 	__super::Free();	
 }
 

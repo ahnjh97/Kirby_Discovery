@@ -426,14 +426,18 @@ _bool CLevel_GamePlay::Load_FileData(const string& _strFilePath, FILE_TYPE _eFil
 		InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.fAlpha), sizeof(LayerUIDesc.fAlpha));
 
 		//파일 경로명으로 prototag를 받아 생성하는 방식
+		//Prototype_GameObject_
 		size_t strFileFrontPos = _strFilePath.find("txt/");
 		if (strFileFrontPos != string::npos)
+		{
 			strUITag = _strFilePath.substr(strFileFrontPos + 4);
+		}
 
-		//Prototype_GameObject_
 		size_t strFileBackPos = strUITag.find("_Orig");
 		if (strFileBackPos != string::npos)
+		{
 			strUITag = strUITag.substr(0, strFileBackPos);
+		}
 
 		size_t strProtoPos = strProtoTag.find("t_"); //찾을 문자열 위치
 		if (strProtoPos != string::npos)
@@ -444,6 +448,9 @@ _bool CLevel_GamePlay::Load_FileData(const string& _strFilePath, FILE_TYPE _eFil
 
 		HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, _strLayerTag, CUtils::StrToWstr(strProtoTag), &LayerUIDesc);
 		CHECK_FAILED(hr);
+
+		//CUIObject* pUIObject = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(CUtils::StrToWstr(strProtoTag), &LayerUIDesc));
+		//m_HUDs.push_back(pUIObject);
 	}
 
 	return S_OK;

@@ -6,9 +6,9 @@ BEGIN(Client)
 
 class CHUD : public CUIObject
 {
-protected:
-	//enum HUD_STATUS { STAT_HP, STAT_SP, STAT_NONE };
-	//enum HUD_STATFONT { STFONT_1, STFONT_10, STFONT_100, STFONT_SLASH, STFONT_NONE };
+public:
+	enum HUD_STATUS { STAT_KIRBY, STAT_BOSS, STAT_COIN, STAT_NONE };
+	enum HUD_STATFONT { STFONT_1, STFONT_10, STFONT_100, STFONT_SLASH, STFONT_NONE };
 
 protected:
 	CHUD(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

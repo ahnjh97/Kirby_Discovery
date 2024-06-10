@@ -25,16 +25,14 @@ HRESULT CLayerUI::Initialize(void* _pArg)
 	if (nullptr != _pArg)
 		LayerUI_Desc = (UIOBJ_DESC*)_pArg;
 
-	//if (UI_TEXTURE == (*LayerUI_Desc).eUIType)
-	//{
 	if (FAILED(Add_Components()))
 		return E_FAIL;
-	//}
 
 	m_UIObjDesc = (*LayerUI_Desc);
 	m_UIObjDesc.eUIType = (*LayerUI_Desc).eUIType;
 	m_UIObjDesc.vColorRGB = (*LayerUI_Desc).vColorRGB;
 	m_UIObjDesc.fAlpha = (*LayerUI_Desc).fAlpha;
+	m_UIObjDesc.vDegree = (*LayerUI_Desc).vDegree;
 
 	if (UI_TEXTURE == m_UIObjDesc.eUIType)
 		m_iTexIndex = (*LayerUI_Desc).iTexIndex;
@@ -49,24 +47,27 @@ HRESULT CLayerUI::Initialize(void* _pArg)
 					m_UIObjDesc.vPos.y - m_UIObjDesc.vCenter.y + m_UIObjDesc.vCenter.y, 
 					m_UIObjDesc.vPos.z, 1.f));
 
-	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
+
+#pragma region SET_PROJ
 
 	if (PROJ_ORTHO == m_UIObjDesc.eUIProj)
 	{
-		m_UIObjDesc.fOrthoDegree = (*LayerUI_Desc).fOrthoDegree;
-		m_pTransformCom->Rotation(XMVectorSet(AXIS_Z), XMConvertToRadians(m_UIObjDesc.fOrthoDegree));
+		m_UIObjDesc.vDegree.z = (*LayerUI_Desc).vDegree.z;
+		m_pTransformCom->Rotation(XMVectorSet(AXIS_Z), XMConvertToRadians(m_UIObjDesc.vDegree.z));
 		XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 	}
 
 	if (PROJ_PERSPEC == m_UIObjDesc.eUIProj)
 	{
-		m_UIObjDesc.vPersDegree = (*LayerUI_Desc).vPersDegree;
-
-		m_pTransformCom->Rotation(XMVectorSet(AXIS_X), XMConvertToRadians(m_UIObjDesc.vPersDegree.x));
-		m_pTransformCom->Rotation(XMVectorSet(AXIS_Y), XMConvertToRadians(m_UIObjDesc.vPersDegree.y));
-		m_pTransformCom->Rotation(XMVectorSet(AXIS_Z), XMConvertToRadians(m_UIObjDesc.vPersDegree.z));
+		m_UIObjDesc.vDegree = (*LayerUI_Desc).vDegree;
+		m_pTransformCom->Rotation(XMVectorSet(AXIS_X), XMConvertToRadians(m_UIObjDesc.vDegree.x));
+		m_pTransformCom->Rotation(XMVectorSet(AXIS_Y), XMConvertToRadians(m_UIObjDesc.vDegree.y));
+		m_pTransformCom->Rotation(XMVectorSet(AXIS_Z), XMConvertToRadians(m_UIObjDesc.vDegree.z));
 	}
+
+#pragma endregion
 		
+	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 
 	return S_OK;
 }
@@ -91,7 +92,7 @@ HRESULT CLayerUI::Render()
 			Render_OrthoProj(m_pShaderCom, m_pTransformCom);
 
 		if (PROJ_PERSPEC == m_UIObjDesc.eUIProj)
-			Render_PerspecProj(m_pShaderCom, m_pTransformCom);
+			Render_PerspecProj(m_pShaderCom, m_pTransformCom); //원근 회전의 데이터는 잘 로드되나 렌더 시에 실적용이 안되는 현상
 	}
 
 	if (UI_FONT == m_UIObjDesc.eUIType)
@@ -100,13 +101,11 @@ HRESULT CLayerUI::Render()
 							- m_UIObjDesc.vPos.y + m_UIObjDesc.vCenter.y};
 
 		_float4 vFontRGBA = { m_UIObjDesc.vColorRGB.x, m_UIObjDesc.vColorRGB.y, m_UIObjDesc.vColorRGB.z, m_UIObjDesc.fAlpha };
-		//스프라이트 폰트 렌더 (폰트 테스트용)
 		if (FAILED(m_pGameInstance->
 			Render_Font(TEXT("Font_HUDSub_KR15"), m_UIObjDesc.wstrText, vFontPos, vFontRGBA,
-				XMConvertToRadians(m_UIObjDesc.fOrthoDegree))))
+				XMConvertToRadians(m_UIObjDesc.vDegree.z))))
 			return E_FAIL;
 	}
-
 
 	return S_OK;
 }

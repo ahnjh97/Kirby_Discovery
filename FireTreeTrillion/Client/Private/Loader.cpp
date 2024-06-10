@@ -23,9 +23,8 @@
 #pragma region TOOL_UI
 #ifdef _DEBUG
 #include "Editor_UI.h"
-#endif
 #include "LayerUI.h"
-
+#endif
 #pragma endregion
 
 //¿Ã∆Â∆Æ ≈¯
@@ -68,6 +67,7 @@
 
 //UI
 #include "BackGround.h"
+#include "HUD.h"
 #include "HUD_KirbyStatus.h"
 #pragma endregion
 
@@ -204,8 +204,8 @@ HRESULT CLoader::Loading_ObjectAll()
 
 	// UI
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("LayerUI"), CLayerUI);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_KirbyStatus"), CHUD_KirbyStatus);
-	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_StarPoint"), CHUD_StarPoint);
 	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_HPBoss"), CHUD_HPBoss);
 	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_Mission"), CHUD_Mission);
 

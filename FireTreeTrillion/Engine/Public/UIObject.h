@@ -31,8 +31,7 @@ public:
 		UI_PROJ		eUIProj = { PROJ_NONE };
 		wstring		wstrUITag = { TEXT("") };
 
-		_float3		vCenter, vSize, vPos, vPersDegree = { 0.f, 0.f, 0.f };
-		_float		fOrthoDegree = { 0.f };
+		_float3		vCenter, vSize, vPos, vDegree = { 0.f, 0.f, 0.f };
 		_int		iTexIndex = { 0 };
 		
 		wstring		wstrText = { TEXT("") };
@@ -118,6 +117,8 @@ protected:
 
 	vector<CUIObject*>			m_LayerUIs;
 	vector <vector<CUIObject*>>	m_GroupUIs;
+
+	vector<CUIObject*>			m_HUDs;
 	
 public:
 	virtual CGameObject* Clone(_uint iLevelIndex, void* pArg) { return nullptr; }
