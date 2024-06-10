@@ -253,7 +253,7 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		FXDesc.vInitPos = { vMyPos.x, vMyPos.y + .3f, vMyPos.z };
 		FXDesc.vInitScale = { 1.3f, 1.3f, 1.3f };
 
-		_float3 vDir = -pTransformCom->Get_State(CTransform::STATE_LOOK);
+		_float3 vDir = pTransformCom->Get_State(CTransform::STATE_LOOK);
 		vDir.Normalize();
 		_float3 vLook = { 0.f, 0.f, 1.f };
 
