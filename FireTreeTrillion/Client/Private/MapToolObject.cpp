@@ -33,6 +33,8 @@ HRESULT CMapToolObject::Initialize(void* pArg)
 	m_iTriggerType = GameObjectDesc.iTriggerType;
 	m_iCamType = GameObjectDesc.iCamType;
 	m_fRadius = GameObjectDesc.fRadius;
+	m_RallyPoints = GameObjectDesc.RallyPoints;
+	m_strConnectedMonster = GameObjectDesc.strConnectedMonster;
 
 	if (FAILED(Add_Components(GameObjectDesc.wstrModelName)))
 		return E_FAIL;

@@ -687,8 +687,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f);
 		m_vecModelInfo.emplace_back("Camera", TYPE_NONANIM, 0.2f, 270.f);
 		m_vecModelInfo.emplace_back("Dummy", TYPE_NONANIM, 0.01f);
-
-		//m_vecModelInfo.emplace_back("Level1Stage1Step01", TYPE_NONANIM, 1.f, 0.f, 0, true);
+		m_vecModelInfo.emplace_back("RallyPoint", TYPE_NONANIM, 2.f);
+		m_vecModelInfo.emplace_back("LightBulb", TYPE_NONANIM, 0.02f);
 	}
 	else if (eLevel == LEVEL_TOOL_ANIM)
 	{

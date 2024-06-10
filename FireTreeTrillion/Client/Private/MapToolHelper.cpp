@@ -32,6 +32,10 @@ static const _char* camTypes[] = { "Front", "Rear"};
 static _int iCamType = -1;
 
 static _bool bHideTriggers = { false };
+static _bool bHideGrid = { true };
+
+static _int iRallyPointIndex = -1;
+static _int iConnectedMonster = -1;
 
 CMapToolHelper::CMapToolHelper(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -63,12 +67,16 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	m_setMapNames = { "BG0", "BG1", "Level0Stage1Step01", "Level1Stage1Step01" };
 	m_setMonsterNames = { "NonAnim_Awoofy", "NonAnim_BladeKnight", "NonAnim_Buffahorn", "NonAnim_Rabbit"
 						, "NonAnim_Kabu" };
-	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy" };
+	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy", "RallyPoint", "LightBulb" };
+	m_setRallyingMonsters = { "NonAnim_Kabu", "NonAnim_BrontoBurt" };
 
 	vecPassIndices.resize(m_vecMapModelNames.size());
 	vecSamplingFactors.resize(m_vecMapModelNames.size());
 
 	SetUpTxtVectors();
+
+	HideGrid(bHideGrid);
+	HideTriggers(bHideTriggers);
 
 	return S_OK;
 }
@@ -97,6 +105,7 @@ void CMapToolHelper::Late_Tick(_float fTimeDelta)
 		Menu_TriggerInfo();
 		Menu_MapShaderInfo();
 		Menu_MonsterInfo();
+		Menu_RallyPointInfo();
 	}
 
 	// 스타일 복원
@@ -214,6 +223,11 @@ void CMapToolHelper::Menu_Level()
 	if (ImGui::RadioButton("Hide Triggers", bHideTriggers)) {
 		bHideTriggers = !bHideTriggers;
 		HideTriggers(bHideTriggers);
+	}
+	ImGui::SameLine();
+	if (ImGui::RadioButton("Hide Grid", bHideGrid)) {
+		bHideGrid = !bHideGrid;
+		HideGrid(bHideGrid);
 	}
 }
 
@@ -433,6 +447,40 @@ void CMapToolHelper::Menu_MonsterInfo()
 	ImGui::End();
 }
 
+void CMapToolHelper::Menu_RallyPointInfo()
+{
+	if (m_strCurModel != "RallyPoint")
+		return;
+
+	string strRallyInfo = m_strCurModel + " Info";
+	ImGui::Begin(strRallyInfo.c_str());
+
+	CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(m_pPickedObject);
+
+	string strConnectedMonster = pMapToolObject->Get_ConnectedMonster();
+	iConnectedMonster = Compute_RallyingMonsterIndex(strConnectedMonster);
+
+	vector<const _char*> vecRallyingMonsterNames;
+	for (auto& monsterName : m_setRallyingMonsters)
+		vecRallyingMonsterNames.push_back(monsterName.c_str());
+
+	ImGui::SetNextItemWidth(150);
+	if (ImGui::Combo("##ConnectedMonster", &iConnectedMonster, vecRallyingMonsterNames.data(), vecRallyingMonsterNames.size())) {
+		string strMonsterName(vecRallyingMonsterNames[iConnectedMonster]);
+		pMapToolObject->Set_ConnectedMonster(strMonsterName);
+	}
+		
+	iTriggerIdx = pMapToolObject->Get_TriggerIndex();
+
+	ImGui::Text("INDEX");
+	ImGui::SameLine();
+	ImGui::SetNextItemWidth(80);
+	if (ImGui::Combo("##RallyPointIndex", &iTriggerIdx, triggerIndices, IM_ARRAYSIZE(triggerIndices)))
+		pMapToolObject->Set_TriggerIndex(iTriggerIdx);
+
+	ImGui::End();
+}
+
 void CMapToolHelper::Edit_Object()
 {
 	if (nullptr == m_pPickedObject)
@@ -625,6 +673,8 @@ void CMapToolHelper::Save_Level()
 		MSG_BOX(TEXT("List is empty."));
 		return;
 	}
+
+	RegisterRallyPoints(pObjectsList);
 		
 	for (auto& object : *pObjectsList)
 	{
@@ -688,6 +738,31 @@ void CMapToolHelper::Save_Level()
 		{
 			CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(object);
 			_int iTriggerIndex = pMapToolObject->Get_TriggerIndex();
+			outputFile.write(reinterpret_cast<const char*>(&iTriggerIndex), sizeof(iTriggerIndex));
+			
+			map<_uint, _float3> rallyPoints = pMapToolObject->Get_RallyPoints();
+			_uint iNumRallyPoints = rallyPoints.size();
+
+			outputFile.write(reinterpret_cast<const char*>(&iNumRallyPoints), sizeof(iNumRallyPoints));
+
+			for (_uint iRallyPointIdx = 0; iRallyPointIdx < iNumRallyPoints; iRallyPointIdx++)
+			{
+				auto mapIter = rallyPoints.find(iRallyPointIdx);
+				if (mapIter == rallyPoints.end())
+					continue;
+
+				_float3 vPos = mapIter->second;
+				outputFile.write(reinterpret_cast<const char*>(&vPos), sizeof(vPos));
+			}
+		}
+		else if ("RallyPoint" == strModelName)
+		{
+			CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(object);
+			string strConnectedMonster = pMapToolObject->Get_ConnectedMonster();
+			_int iTriggerIndex = pMapToolObject->Get_TriggerIndex();
+			_uint iStrSize = strConnectedMonster.size();
+			outputFile.write(reinterpret_cast<const char*>(&iStrSize), sizeof(iStrSize));
+			outputFile.write(strConnectedMonster.c_str(), iStrSize);
 			outputFile.write(reinterpret_cast<const char*>(&iTriggerIndex), sizeof(iTriggerIndex));
 		}
 	}
@@ -759,6 +834,8 @@ void CMapToolHelper::Load_Level()
 	_float3 vMin{}, vMax{};
 	_uint iShaderVars{};
 	_float fRimWidth{};
+	map<_uint, _float3> rallyPoints;
+	string strConnectedMonster;
 
 	while (!fileStream.eof()) 
 	{
@@ -790,8 +867,29 @@ void CMapToolHelper::Load_Level()
 				fileStream.read(reinterpret_cast<char*>(&vMax), sizeof(vMax));
 			}
 		}
-		else if(true == IsMonster(strModelName))
+		else if (true == IsMonster(strModelName)) {
 			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
+
+			_uint iNumRallyPoint{};
+			fileStream.read(reinterpret_cast<char*>(&iNumRallyPoint), sizeof(iNumRallyPoint));
+
+			rallyPoints.clear();
+			_float3 vRallyPointPos{};
+			for (_uint iRallyPointIdx = 0; iRallyPointIdx < iNumRallyPoint; iRallyPointIdx++)
+			{
+				fileStream.read(reinterpret_cast<char*>(&vRallyPointPos), sizeof(vRallyPointPos));
+				rallyPoints.emplace(iRallyPointIdx, vRallyPointPos);
+			}
+		}
+		else if ("RallyPoint" == strModelName)
+		{
+			_uint iStrSize{};
+			fileStream.read(reinterpret_cast<char*>(&iStrSize), sizeof(iStrSize));
+			strConnectedMonster.resize(iStrSize);
+			fileStream.read(&strConnectedMonster[0], iStrSize);
+			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
+		}
+			
 
 		if (fileStream.eof())
 			break;
@@ -814,9 +912,15 @@ void CMapToolHelper::Load_Level()
 			tDesc.iCamType = iCamType;
 			tDesc.fRadius = fRadius;
 		}
-		else if(true == IsMonster(strModelName))
+		else if (true == IsMonster(strModelName)) {
 			tDesc.iTriggerIndex = iTriggerIndex;
-		
+			tDesc.RallyPoints = rallyPoints;
+		}
+		else if ("RallyPoint" == strModelName) {
+			tDesc.iTriggerIndex = iTriggerIndex;
+			tDesc.strConnectedMonster = strConnectedMonster;
+		}
+			
 
 		wstring wstrGameObjectTag;
 
@@ -1023,6 +1127,18 @@ _int CMapToolHelper::Compute_MapIndex(const string& _strModelName)
 	return -1;
 }
 
+_int CMapToolHelper::Compute_RallyingMonsterIndex(const string& _strModelName)
+{
+	_int iCount{};
+	for (auto& monsterName : m_setRallyingMonsters) {
+		if (monsterName == _strModelName)
+			return iCount;
+		iCount++;
+	}
+
+	return -1;
+}
+
 _bool CMapToolHelper::IsMap(const string& _strModelName)
 {
 	if (m_setMapNames.end() != m_setMapNames.find(_strModelName))
@@ -1044,6 +1160,14 @@ _bool CMapToolHelper::IsMonster(const string& _strModelName)
 	if (m_setMonsterNames.end() != m_setMonsterNames.find(_strModelName))
 		return true;
 		
+	return false;
+}
+
+_bool CMapToolHelper::IsRallyingMonster(const string& _strModelName)
+{
+	if (m_setRallyingMonsters.end() != m_setRallyingMonsters.find(_strModelName))
+		return true;
+
 	return false;
 }
 
@@ -1071,6 +1195,15 @@ void CMapToolHelper::HideTriggers(_bool bHideTriggers)
 	}
 }
 
+void CMapToolHelper::HideGrid(_bool bHideGrid)
+{
+	CGameObject* pGrid = m_pGameInstance->Get_GameObject(LEVEL_TOOL_MAP, TEXT("Layer_Grid"));
+	if (nullptr == pGrid)
+		return;
+
+	pGrid->Set_Hide(bHideGrid);
+}
+
 _bool CMapToolHelper::ExcludeModel(string& _strModelName)
 {
 	if (_strModelName.size() < 4)
@@ -1078,7 +1211,8 @@ _bool CMapToolHelper::ExcludeModel(string& _strModelName)
 
 	if (_strModelName.substr(0, 5) == "Smoke" || _strModelName.substr(0, 4) == "Test"
 		|| _strModelName.substr(0, 9) == "SkySphere" || _strModelName.substr(_strModelName.size() - 5) == "Blend"
-		|| "Tornado" == _strModelName || _strModelName.substr(0, 6) == "Vacuum")
+		|| "Tornado" == _strModelName || _strModelName.substr(0, 6) == "Vacuum" || _strModelName.substr(0, 5) == "Sword"
+		|| _strModelName.substr(_strModelName.size() - 5) == "Sword" )
 		return true;
 
 	return _bool();
@@ -1102,6 +1236,70 @@ void CMapToolHelper::Reset_MapShaderInfo()
 void CMapToolHelper::Save_Octree()
 {
 
+}
+
+void CMapToolHelper::RegisterRallyPoints(list<CGameObject*>* _pObjList)
+{
+	vector<CMapToolObject*> vecRallyingMonsterPtrs;
+	vector<CMapToolObject*> vecRallyPoints;
+
+	for (auto& obj : *_pObjList)
+	{
+		if (nullptr == obj)
+			continue;
+
+		CModel* pModel = dynamic_cast<CModel*>(obj->Get_Component(TEXT("Com_Model")));
+		string strModelName = pModel->Get_ModelName();
+		if (true == IsRallyingMonster(strModelName))
+			vecRallyingMonsterPtrs.push_back(dynamic_cast<CMapToolObject*>(obj));
+		else if ("RallyPoint" == strModelName)
+			vecRallyPoints.push_back(dynamic_cast<CMapToolObject*>(obj));
+	}
+
+	if (vecRallyingMonsterPtrs.empty() || vecRallyPoints.empty())
+		return;
+
+	for (auto& rallyPoint : vecRallyPoints)
+	{
+		if (nullptr == rallyPoint)
+			continue;
+
+		_float fShortest = { FLT_MAX };
+		CMapToolObject* pNearestMonster = { nullptr };
+
+		CTransform* pTransform = rallyPoint->Get_TransformCom();
+		_vector vPos = pTransform->Get_State_Vector(CTransform::STATE_POSITION);
+
+		for (auto& monster : vecRallyingMonsterPtrs)
+		{
+			if (nullptr == monster)
+				continue;
+
+			CModel* pMonsterModel = dynamic_cast<CModel*>(monster->Get_Component(TEXT("Com_Model")));
+			string strMonsterName = pMonsterModel->Get_ModelName();
+
+			if (rallyPoint->Get_ConnectedMonster() != strMonsterName)
+				continue;
+
+			CTransform* pMonsterTransform = monster->Get_TransformCom();
+			_vector vMonsterPos = pMonsterTransform->Get_State_Vector(CTransform::STATE_POSITION);
+			_float fDis = XMVectorGetX(XMVector3Length(vPos - vMonsterPos));
+
+			if (fDis < fShortest)
+			{
+				fShortest = fDis;
+				pNearestMonster = monster;
+			}
+		}
+
+		if (nullptr == pNearestMonster)
+			continue;
+
+		_uint iRallyPointIndex = static_cast<_uint>(rallyPoint->Get_TriggerIndex());
+		_float3 vFloatPos = vPos;
+
+		pNearestMonster->Emplace_RallyPoint(iRallyPointIndex, vFloatPos);
+	}
 }
 
 CMapToolHelper* CMapToolHelper::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

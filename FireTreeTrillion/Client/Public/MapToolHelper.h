@@ -31,6 +31,7 @@ private:
 	void	Menu_CamLerpInfo(class CMapToolObject* _pMapToolObject);
 	void	Menu_MapShaderInfo();
 	void	Menu_MonsterInfo();
+	void	Menu_RallyPointInfo();
 	void	Edit_Object();
 
 	// On Key/Mouse Input 
@@ -47,16 +48,21 @@ private:
 	void	Reset_MapShaderInfo();
 	void	Save_Octree();
 
+	void	RegisterRallyPoints(list<CGameObject*>* _pObjList);
+
 	// Picking
 	CGameObject* Select_ModelByPicking(const wstring& wstrLayerTag = TEXT("Layer_Parse"));
-	_int Compute_MapIndex(const string& strModelName);
+	_int Compute_MapIndex(const string& _strModelName);
+	_int Compute_RallyingMonsterIndex(const string& _strModelName);
 
 	_bool IsMap(const string& _strModelName);
 	_bool IsTrigger(const string& _strModelName);
 	_bool IsMonster(const string& _strModelName);
+	_bool IsRallyingMonster(const string& _strModelName);
 
 	// Options
 	void HideTriggers(_bool bHideTriggers);
+	void HideGrid(_bool bHideGrid);
 	_bool ExcludeModel(string& _strModelName);
 
 private:
@@ -66,7 +72,8 @@ private:
 	// For Menu Separation
 	unordered_set<string>	m_setMapNames;
 	unordered_set<string>	m_setMonsterNames; 
-	unordered_set<string>	m_setTriggerNames; 
+	unordered_set<string>	m_setTriggerNames;
+	unordered_set<string>	m_setRallyingMonsters;
 
 	vector<string>	m_vecMapTxts;
 	vector<string>	m_vecTriggerTxts;
@@ -79,8 +86,8 @@ private:
 	_float3 m_vPickPos = {};
 
 public:
-	static	CMapToolHelper* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	virtual CGameObject* Clone(void* pArg) override;
+	static	CMapToolHelper*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	virtual CGameObject*	Clone(void* pArg) override;
 	virtual void			Free() override;
 
 };

@@ -20,6 +20,8 @@ public:
 		_int iTriggerIndex = { -1 };
 		_float fRadius = { 0.f };
 		_int iCamType = { -1 };
+		map<_uint, _float3> RallyPoints;
+		string strConnectedMonster;
 	};
 
 public:
@@ -27,11 +29,14 @@ public:
 	_int Get_TriggerIndex() { return m_iTriggerIndex; }
 	_float Get_Radius() { return m_fRadius; }
 	_int Get_CamType() { return m_iCamType; }
+	string Get_ConnectedMonster() { return m_strConnectedMonster; }
+	map<_uint, _float3>& Get_RallyPoints() { return m_RallyPoints; }
 
 	void Set_TriggerType(_int iTriggerType) { m_iTriggerType = iTriggerType; }
 	void Set_TriggerIndex(_int iTriggerIndex) { m_iTriggerIndex = iTriggerIndex; }
 	void Set_CamType(_int iCamType) { m_iCamType = iCamType; }
 	void Set_Radius(_float fRadius) { m_fRadius = fRadius; }
+	void Set_ConnectedMonster(string& strConnectedMonster) { m_strConnectedMonster = strConnectedMonster; }
 
 	virtual void Set_Hide(_bool bHide) { m_bHide = bHide; if (nullptr != m_pOrbitingCamera) m_pOrbitingCamera->Set_Hide(bHide); }
 
@@ -47,11 +52,17 @@ public:
 	virtual void Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
+public:
+	void Emplace_RallyPoint(_uint iIndex, _float3 vPos) { m_RallyPoints.emplace(iIndex, vPos); }
+
 private:
 	_int m_iTriggerType = { -1 };
 	_int m_iTriggerIndex = { -1 };
 	_float m_fRadius = { 0.f };
 	_int m_iCamType = { -1 };
+
+	string m_strConnectedMonster;
+	map<_uint, _float3> m_RallyPoints;
 
 private:
 	CModel* m_pModelCom = { nullptr };
