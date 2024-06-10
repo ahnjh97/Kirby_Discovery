@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Level_GamePlay.h"
 #include "LevelChanger.h"
+#include "Camera_Main.h"
 #include "Camera_Free.h"
 #include "BasicMap.h"
 #include "UIObject.h"
@@ -115,6 +116,26 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 
 HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
 {
+	LEVEL eLevel = LEVEL_GAMEPLAY;
+
+
+	CCamera_Main::CAMERA_KIRBY_DESC		MainCamDesc{};
+	MainCamDesc.fFovy = XMConvertToRadians(30.0f);
+	MainCamDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
+	MainCamDesc.fNear = 0.1f;
+	MainCamDesc.fFar = 1000.0f;
+	MainCamDesc.vEye = _float4(0.f, 3.f, -1.f, 1.f);
+	MainCamDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
+	MainCamDesc.fSpeedPerSec = 10.f;
+	MainCamDesc.fRotationPerSec = XMConvertToRadians(90.0f);
+	MainCamDesc.fOrigDistance = 20.f;
+	MainCamDesc.fCamSensor = .3f;
+
+	if (FAILED(m_pGameInstance->Add_Clone(eLevel, strLayerTag, TEXT("Prototype_GameObject_Camera_Main"), &MainCamDesc)))
+		return E_FAIL;
+
+
+
 	CCamera_Free::CAMERA_FREE_DESC		CameraDesc{};
 	CameraDesc.fMouseSensor = 0.1f;
 	CameraDesc.fFovy = XMConvertToRadians(40.0f);
@@ -126,7 +147,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
 	CameraDesc.fSpeedPerSec = 10.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
+	if (FAILED(m_pGameInstance->Add_Clone(eLevel, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
 		return E_FAIL;
 	
 	return S_OK;
@@ -383,7 +404,7 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 	}
 	fileStream.close();
 
-	CCamera_Free* pCamera = dynamic_cast<CCamera_Free*> (m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Camera")));
+	CCamera_Main* pCamera = dynamic_cast<CCamera_Main*> (m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Camera")));
 	if (nullptr == pCamera)
 		return E_FAIL;
 

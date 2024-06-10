@@ -53,7 +53,11 @@
 #pragma endregion
 
 #pragma region °´Ã¼
+//Ä«¸Þ¶ó
 #include "Camera_Free.h"
+#include "Camera_Main.h"
+
+
 #include "TestModel.h"
 #include "TestTerrain.h"
 #include "Kirby.h"
@@ -218,8 +222,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kabu"), CKabu);
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BackGround"), CBackGround);
-	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_Test"), CTestUI);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Main"), CCamera_Main);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestMap"), CTestTerrain);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Moon"), CMoon);

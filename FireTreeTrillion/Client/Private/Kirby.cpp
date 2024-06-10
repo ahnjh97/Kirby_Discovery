@@ -56,14 +56,37 @@ HRESULT CKirby::Initialize(void* pArg)
 	INFO(m_eMouthState) = MOUTH_IDLE;
 	INFO(m_eEyeState) = EYE_IDLE;
 
-	// 카메라 기준으로 움직이기에 미리 받아둔다.
+
+	// 첫 카메라 기준으로 움직이기에 미리 받아둔다.
 	if (m_pCamera == nullptr)
 	{
-		m_pCamera = static_cast<CCamera_Free*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Camera"), 0));
+		//인트로, 게임플레이 스테이지라면 카메라로 main camera를 저장한다.
+		(*m_pCurrentLevelID == LEVEL_INTRO || *m_pCurrentLevelID == LEVEL_GAMEPLAY) ?
+			m_pCamera = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main"))) :
+
+		//나머지 레벨이라면 다른 카메라를 저장한다.
+			m_pCamera = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Free")));
+
+		if (m_pCamera == nullptr)
+		{
+			ALARM_FAIL(TEXT("망했어 카메라 없다"));
+			return E_FAIL;
+		}
+
 		Safe_AddRef(m_pCamera);
 	}
 
 	m_pCamera->Set_Target(m_pTransformCom);
+
+
+	//게임 레벨에 free camera 있다면 그놈에게도 타겟 등록해 준다.
+	if ((*m_pCurrentLevelID == LEVEL_INTRO || *m_pCurrentLevelID == LEVEL_GAMEPLAY))
+	{
+		CCamera* pCameraFree = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Free")));
+		if (pCameraFree != nullptr)
+			pCameraFree->Set_Target(m_pTransformCom);
+	}
+
 
 	_float4 m_pCameraLook = m_pCamera->Get_TransformCom()->Get_State_Vector(CTransform::STATE_LOOK);
 	m_pCameraLook.y = 0.f;
@@ -349,7 +372,7 @@ void CKirby::Setting_KirbyBalance()
 
 void CKirby::Key_Input(_float fTimeDelta)
 {
-	#pragma region 커비 연구소 (애니메이션 제어)
+#pragma region 커비 연구소 (애니메이션 제어)
 
 	//Test
 	if (m_pGameInstance->Get_DIKeyState(DIK_P, KEY_DOWN))
@@ -421,73 +444,73 @@ HRESULT CKirby::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
-	#pragma region Kirby Model
-		// 커비의 기본 상태 모델
-		hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyDefault"),
-			TEXT("Com_Model_Default"), (CComponent**)&m_pModelCom[BODY_DEFAULT]);
-		CHECK_FAILED(hr);
+#pragma region Kirby Model
+	// 커비의 기본 상태 모델
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyDefault"),
+		TEXT("Com_Model_Default"), (CComponent**)&m_pModelCom[BODY_DEFAULT]);
+	CHECK_FAILED(hr);
 
-		// 커비의 빨아들이는 상태 모델
-		hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyVacuum"),
-			TEXT("Com_Model_Vacuum"), (CComponent**)&m_pModelCom[BODY_VACUUM]);
-		CHECK_FAILED(hr);
+	// 커비의 빨아들이는 상태 모델
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyVacuum"),
+		TEXT("Com_Model_Vacuum"), (CComponent**)&m_pModelCom[BODY_VACUUM]);
+	CHECK_FAILED(hr);
 
-		// 커비의 풍선 모드 상태 모델
-		hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyBalloon"),
-			TEXT("Com_Model_Balloon"), (CComponent**)&m_pModelCom[BODY_BALLOON]);
-		CHECK_FAILED(hr);
+	// 커비의 풍선 모드 상태 모델
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyBalloon"),
+		TEXT("Com_Model_Balloon"), (CComponent**)&m_pModelCom[BODY_BALLOON]);
+	CHECK_FAILED(hr);
 
-		// 커비의 Sword Body 상태 모델
-		hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbySwordDefault"),
-			TEXT("Com_Model_SwordDefault"), (CComponent**)&m_pModelCom[BODY_SWORDDEFAULT]);
-		CHECK_FAILED(hr);
+	// 커비의 Sword Body 상태 모델
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbySwordDefault"),
+		TEXT("Com_Model_SwordDefault"), (CComponent**)&m_pModelCom[BODY_SWORDDEFAULT]);
+	CHECK_FAILED(hr);
 
-		// 커비의 Sword Balloon 상태 모델
-		hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbySwordBalloon"),
-			TEXT("Com_Model_SwordBalloon"), (CComponent**)&m_pModelCom[BODY_SWORDBALLOON]);
-		CHECK_FAILED(hr);
+	// 커비의 Sword Balloon 상태 모델
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbySwordBalloon"),
+		TEXT("Com_Model_SwordBalloon"), (CComponent**)&m_pModelCom[BODY_SWORDBALLOON]);
+	CHECK_FAILED(hr);
 
 
-	#pragma endregion
+#pragma endregion
 
-	#pragma region Kirby Eye
-		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_idle"),
-			TEXT("Com_Texture_Eye_Idle"), (CComponent**)&m_pEyeTexture[EYE_IDLE]);
-		CHECK_FAILED(hr);
-		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_doubt"),
-			TEXT("Com_Texture_Eye_Doubt"), (CComponent**)&m_pEyeTexture[EYE_SADNESS]);
-		CHECK_FAILED(hr);
-		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_close"),
-			TEXT("Com_Texture_Eye_Close"), (CComponent**)&m_pEyeTexture[EYE_CLOSE]);
-		CHECK_FAILED(hr);
-		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_blink"),
-			TEXT("Com_Texture_Eye_Blink"), (CComponent**)&m_pEyeTexture[EYE_BLINK]);
-		CHECK_FAILED(hr);
-		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_anger"),
-			TEXT("Com_Texture_Eye_Anger"), (CComponent**)&m_pEyeTexture[EYE_ANGER]);
-		CHECK_FAILED(hr);
-		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_pupil"),
-			TEXT("Com_Texture_Eye_Pupil"), (CComponent**)&m_pEyeTexture[EYE_PUPIL]);
-		CHECK_FAILED(hr);
-	#pragma endregion
+#pragma region Kirby Eye
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_idle"),
+		TEXT("Com_Texture_Eye_Idle"), (CComponent**)&m_pEyeTexture[EYE_IDLE]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_doubt"),
+		TEXT("Com_Texture_Eye_Doubt"), (CComponent**)&m_pEyeTexture[EYE_SADNESS]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_close"),
+		TEXT("Com_Texture_Eye_Close"), (CComponent**)&m_pEyeTexture[EYE_CLOSE]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_blink"),
+		TEXT("Com_Texture_Eye_Blink"), (CComponent**)&m_pEyeTexture[EYE_BLINK]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_anger"),
+		TEXT("Com_Texture_Eye_Anger"), (CComponent**)&m_pEyeTexture[EYE_ANGER]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_pupil"),
+		TEXT("Com_Texture_Eye_Pupil"), (CComponent**)&m_pEyeTexture[EYE_PUPIL]);
+	CHECK_FAILED(hr);
+#pragma endregion
 
-	#pragma region Kirby Mouth
-		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_base"),
-			TEXT("Com_Texture_Mouth_Idle"), (CComponent**)&m_pMouthTexture[MOUTH_IDLE]);
-		CHECK_FAILED(hr);
-		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_anger"),
-			TEXT("Com_Texture_Mouth_Anger"), (CComponent**)&m_pMouthTexture[MOUTH_ANGER]);
-		CHECK_FAILED(hr);
-		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_happy"),
-			TEXT("Com_Texture_Mouth_Happy"), (CComponent**)&m_pMouthTexture[MOUTH_HAPPY]);
-		CHECK_FAILED(hr);
-		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_smile"),
-			TEXT("Com_Texture_Mouth_Smile"), (CComponent**)&m_pMouthTexture[MOUTH_SMILE]);
-		CHECK_FAILED(hr);
-		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_surprise"),
-			TEXT("Com_Texture_Mouth_Surprise"), (CComponent**)&m_pMouthTexture[MOUTH_SURPRISE]);
-		CHECK_FAILED(hr);
-	#pragma endregion
+#pragma region Kirby Mouth
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_base"),
+		TEXT("Com_Texture_Mouth_Idle"), (CComponent**)&m_pMouthTexture[MOUTH_IDLE]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_anger"),
+		TEXT("Com_Texture_Mouth_Anger"), (CComponent**)&m_pMouthTexture[MOUTH_ANGER]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_happy"),
+		TEXT("Com_Texture_Mouth_Happy"), (CComponent**)&m_pMouthTexture[MOUTH_HAPPY]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_smile"),
+		TEXT("Com_Texture_Mouth_Smile"), (CComponent**)&m_pMouthTexture[MOUTH_SMILE]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_surprise"),
+		TEXT("Com_Texture_Mouth_Surprise"), (CComponent**)&m_pMouthTexture[MOUTH_SURPRISE]);
+	CHECK_FAILED(hr);
+#pragma endregion
 
 	/* For.Com_CharacterController */
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
@@ -603,7 +626,7 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
 		return true;
 	}
-	
+
 	return false;
 }
 
@@ -867,5 +890,5 @@ void CKirby::Free()
 	Safe_Release(m_pArmours);
 	for (auto& fx : m_KirbyFXList)
 		Safe_Release(fx);
-	
+
 }
