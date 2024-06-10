@@ -1,44 +1,44 @@
 #include "stdafx.h"
-#include "HUD_KirbyStatus.h"
+#include "HUD_StarPoint.h"
 
-CHUD_KirbyStatus::CHUD_KirbyStatus(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext)
+CHUD_StarPoint::CHUD_StarPoint(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext)
 	: CUIObject{ _pDevice, _pContext }
 {
 }
 
-CHUD_KirbyStatus::CHUD_KirbyStatus(const CHUD_KirbyStatus& _rhs)
+CHUD_StarPoint::CHUD_StarPoint(const CHUD_StarPoint& _rhs)
 	: CUIObject{ _rhs }
 {
 }
 
-HRESULT CHUD_KirbyStatus::Initialize_Prototype()
+HRESULT CHUD_StarPoint::Initialize_Prototype()
 {
 	return S_OK;
 }
 
-HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
+HRESULT CHUD_StarPoint::Initialize(void* _pArg)
 {
 	HRESULT hr = __super::Initialize(_pArg);
 	CHECK_FAILED(hr);
 
-	UIOBJ_DESC* HUDKirby_Desc{};
+	UIOBJ_DESC* HUDStarPoint_Desc{};
 	if (nullptr != _pArg)
-		HUDKirby_Desc = (UIOBJ_DESC*)_pArg;
+		HUDStarPoint_Desc = (UIOBJ_DESC*)_pArg;
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 	
-	m_UIObjDesc = (*HUDKirby_Desc);
-	m_UIObjDesc.eUIType = (*HUDKirby_Desc).eUIType;
-	m_UIObjDesc.vColorRGB = (*HUDKirby_Desc).vColorRGB;
-	m_UIObjDesc.fAlpha = (*HUDKirby_Desc).fAlpha;
-	m_UIObjDesc.vDegree = (*HUDKirby_Desc).vDegree;
+	m_UIObjDesc = (*HUDStarPoint_Desc);
+	m_UIObjDesc.eUIType = (*HUDStarPoint_Desc).eUIType;
+	m_UIObjDesc.vColorRGB = (*HUDStarPoint_Desc).vColorRGB;
+	m_UIObjDesc.fAlpha = (*HUDStarPoint_Desc).fAlpha;
+	m_UIObjDesc.vDegree = (*HUDStarPoint_Desc).vDegree;
 
 	if (UI_TEXTURE == m_UIObjDesc.eUIType)
-		m_iTexIndex = (*HUDKirby_Desc).iTexIndex;
+		m_iTexIndex = (*HUDStarPoint_Desc).iTexIndex;
 
 	if (UI_FONT == m_UIObjDesc.eUIType)
-		m_UIObjDesc.wstrText = (*HUDKirby_Desc).wstrText;
+		m_UIObjDesc.wstrText = (*HUDStarPoint_Desc).wstrText;
 
 
 	m_pTransformCom->Set_Scaled(m_UIObjDesc.vSize.x, m_UIObjDesc.vSize.y, 1.f);
@@ -68,19 +68,19 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 	return S_OK;
 }
 
-_int CHUD_KirbyStatus::Tick(_float fTimeDelta)
+_int CHUD_StarPoint::Tick(_float fTimeDelta)
 {	
 	__super::Tick(fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
 
-void CHUD_KirbyStatus::Late_Tick(_float fTimeDelta)
+void CHUD_StarPoint::Late_Tick(_float fTimeDelta)
 {
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_UI, this);
 }
 
-HRESULT CHUD_KirbyStatus::Render()
+HRESULT CHUD_StarPoint::Render()
 {
 	if (UI_TEXTURE == m_UIObjDesc.eUIType)
 	{
@@ -106,13 +106,13 @@ HRESULT CHUD_KirbyStatus::Render()
 	return S_OK;
 }
 
-HRESULT CHUD_KirbyStatus::Add_Components()
+HRESULT CHUD_StarPoint::Add_Components()
 {
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex"),
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_StatusBar_Kirby"),
+	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_StarPoint"),
 		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
 		return E_FAIL;
 
@@ -123,7 +123,7 @@ HRESULT CHUD_KirbyStatus::Add_Components()
 	return S_OK;
 }
 
-HRESULT CHUD_KirbyStatus::Render_OrthoProj(CShader* _pShaderCom, CTransform* _pTransCom)
+HRESULT CHUD_StarPoint::Render_OrthoProj(CShader* _pShaderCom, CTransform* _pTransCom)
 {
 	CHECK_NULLPTR(_pShaderCom);
 
@@ -143,7 +143,7 @@ HRESULT CHUD_KirbyStatus::Render_OrthoProj(CShader* _pShaderCom, CTransform* _pT
 	return S_OK;
 }
 
-HRESULT CHUD_KirbyStatus::Render_PerspecProj(CShader* _pShaderCom, CTransform* _pTransCom)
+HRESULT CHUD_StarPoint::Render_PerspecProj(CShader* _pShaderCom, CTransform* _pTransCom)
 {
 	CHECK_NULLPTR(_pShaderCom);
 
@@ -167,7 +167,7 @@ HRESULT CHUD_KirbyStatus::Render_PerspecProj(CShader* _pShaderCom, CTransform* _
 	return S_OK;
 }
 
-HRESULT CHUD_KirbyStatus::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTexture* _pTextureCom, _uint _iTexIndex)
+HRESULT CHUD_StarPoint::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTexture* _pTextureCom, _uint _iTexIndex)
 {
 	//셰이더 파일의 텍스처 정보를 가져와 바인딩
 	_pTextureCom->Bind_ShaderResource(_pShaderCom, "g_DiffuseTexture", _iTexIndex);
@@ -186,7 +186,7 @@ HRESULT CHUD_KirbyStatus::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPas
 	return S_OK;
 }
 
-HRESULT CHUD_KirbyStatus::Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom)
+HRESULT CHUD_StarPoint::Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom)
 {
 	if (FAILED(_pVIBufferCom->Bind_Buffers()))
 		return E_FAIL;
@@ -197,33 +197,33 @@ HRESULT CHUD_KirbyStatus::Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom)
 	return S_OK;
 }
 
-CHUD_KirbyStatus* CHUD_KirbyStatus::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CHUD_StarPoint* CHUD_StarPoint::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	CHUD_KirbyStatus* pInstance = new CHUD_KirbyStatus(pDevice, pContext);
+	CHUD_StarPoint* pInstance = new CHUD_StarPoint(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CHUD_KirbyStatus"));
+		MSG_BOX(TEXT("Failed To Created : CHUD_StarPoint"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CGameObject* CHUD_KirbyStatus::Clone(void* pArg)
+CGameObject* CHUD_StarPoint::Clone(void* pArg)
 {
-	CHUD_KirbyStatus* pInstance = new CHUD_KirbyStatus(*this);
+	CHUD_StarPoint* pInstance = new CHUD_StarPoint(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Clone : CHUD_KirbyStatus"));
+		MSG_BOX(TEXT("Failed To Clone : CHUD_StarPoint"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CHUD_KirbyStatus::Free()
+void CHUD_StarPoint::Free()
 {
 	Safe_Release(m_pTextureCom);
 	Safe_Release(m_pShaderCom);

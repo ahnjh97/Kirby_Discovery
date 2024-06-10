@@ -217,6 +217,9 @@
     <Filter Include="01.Levels\Logo">
       <UniqueIdentifier>{7fa67ac9-2f2d-435f-bf35-849f5cbedd3c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\UI\HUD\StarPoint">
+      <UniqueIdentifier>{669d365e-f184-4ce6-9002-4b913d841713}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -438,6 +441,9 @@
     <ClInclude Include="..\Public\HUD_KirbyStatus.h">
       <Filter>02.GameObjects\UI\HUD</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\HUD_StarPoint.h">
+      <Filter>02.GameObjects\UI\HUD\StarPoint</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -640,6 +646,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\HUD_KirbyStatus.cpp">
       <Filter>02.GameObjects\UI\HUD</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HUD_StarPoint.cpp">
+      <Filter>02.GameObjects\UI\HUD\StarPoint</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -116,8 +116,8 @@ HRESULT CLayerUI::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_KirbyStatus"),
-	//if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_GameComplete"),
+	//if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_StatusBar_Kirby"),
+	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_StarPoint"),
 		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
 		return E_FAIL;
 
@@ -142,7 +142,7 @@ HRESULT CLayerUI::Render_OrthoProj(CShader* _pShaderCom, CTransform* _pTransCom)
 	if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
-	if (FAILED(Bind_ShaderResources(_pShaderCom, PS_ALPHABLEND, m_pTextureCom, m_iTexIndex)))
+	if (FAILED(Bind_ShaderResources(_pShaderCom, PS_DEFAULT /*PS_ALPHABLEND*/, m_pTextureCom, m_iTexIndex)))
 		return E_FAIL;
 
 	return S_OK;

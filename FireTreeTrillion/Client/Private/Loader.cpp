@@ -69,6 +69,7 @@
 #include "BackGround.h"
 #include "HUD.h"
 #include "HUD_KirbyStatus.h"
+#include "HUD_StarPoint.h"
 #pragma endregion
 
 
@@ -206,6 +207,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("LayerUI"), CLayerUI);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_KirbyStatus"), CHUD_KirbyStatus);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_StarPoint"), CHUD_StarPoint);
+	// 
 	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_HPBoss"), CHUD_HPBoss);
 	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_Mission"), CHUD_Mission);
 
@@ -378,10 +381,13 @@ HRESULT CLoader::Loading_For_GamePlay()
 	if (FAILED(Add_Texture(eLevel, "RandomNormal", "Map/RandomNormal.png")))
 		return E_FAIL;
 
+#pragma region UI
 
-	hr = Add_Texture(eLevel, "GameComplete", "UI/GAMECOMPLETE/GameComplete_%d.png", 21);
-	hr = Add_Texture(eLevel, "HUD_KirbyStatus", "UI/HUD/Kirby/PanelHard/HeroPanelHard_%d.png", 16);
+	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.png", 19);
+	hr = Add_Texture(eLevel, "HUD_StarPoint", "UI/HUD/Kirby/StarPoint/StarPoint_%d.png", 4);
 	CHECK_FAILED(hr);
+
+#pragma endregion
 
 	// 커비 얼굴 텍스쳐 로드
 	Add_KirbyFaceTexture(eLevel);
@@ -544,8 +550,8 @@ HRESULT CLoader::Loading_For_Tool_UI()
 
 #pragma region TEXTURE
 
-	hr = Add_Texture(eLevel, "GameComplete", "UI/GAMECOMPLETE/GameComplete_%d.png", 21);
-	hr = Add_Texture(eLevel, "HUD_KirbyStatus", "UI/HUD/Kirby/PanelHard/HeroPanelHard_%d.png", 16);
+	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.png", 19);
+	hr = Add_Texture(eLevel, "HUD_StarPoint", "UI/HUD/Kirby/StarPoint/StarPoint_%d.png", 4);
 	CHECK_FAILED(hr);
 
 	m_strLoadingText = TEXT("Loading For Texture : Complete!");

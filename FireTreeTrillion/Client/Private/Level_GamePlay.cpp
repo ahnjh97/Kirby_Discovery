@@ -173,7 +173,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& strLayerTag)
 	//파일명과 UITag 별도로 지정 필요
 	string strFilePath = { "../../../UI_txt/" };
 	string strFileExt = { "_Orig.txt" };
-	string strUITag = { "HUD" };
+	string strUITag = { "HUD_KirbyStatus" };
 
 	//switch (CHUD::HUD_STATUS eHUDType{})
 	//{

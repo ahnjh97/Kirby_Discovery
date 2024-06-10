@@ -27,25 +27,10 @@ HRESULT CHUD::Initialize(void* _pArg)
 
 	m_UIObjDesc = (*HUDUI_Desc);
 
-	CHUD::HUD_STATUS eHUDType = { STAT_KIRBY };
 	CUIObject* pUIObj = { nullptr };
 
-	switch (eHUDType)
-	{
-	case STAT_KIRBY:
-		pUIObj = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_HUD_KirbyStatus"), &m_UIObjDesc));
-		CHECK_NULLPTR(pUIObj);
-		m_HUDs.push_back(pUIObj);
-		break;
-
-	case STAT_COIN:
-		//pUIObj = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_HUD_KirbyStatus"), &HUDUI_Desc));
-		//CHECK_NULLPTR(pUIObj);
-		//m_HUDs.push_back(pUIObj);
-		break;
-
-	default: break;
-	}
+	pUIObj = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_HUD_KirbyStatus"), &m_UIObjDesc));
+	m_HUDs.push_back(pUIObj);
 
 	return S_OK;
 }
