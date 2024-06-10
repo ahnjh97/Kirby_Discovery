@@ -60,8 +60,9 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 	m_vecMapModelNames = { "Level0Stage1Step01", "Level1Stage1Step01" };
 
-	m_setMapNames = { "Level0Stage1Step01", "Level1Stage1Step01", "BG1" };
-	m_setMonsterNames = { "NonAnim_Awoofy", "NonAnim_BladeKnight", "NonAnim_Buffahorn", "NonAnim_Rabbit" };
+	m_setMapNames = { "BG0", "BG1", "Level0Stage1Step01", "Level1Stage1Step01" };
+	m_setMonsterNames = { "NonAnim_Awoofy", "NonAnim_BladeKnight", "NonAnim_Buffahorn", "NonAnim_Rabbit"
+						, "NonAnim_Kabu" };
 	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy" };
 
 	vecPassIndices.resize(m_vecMapModelNames.size());
@@ -838,7 +839,7 @@ void CMapToolHelper::Load_Level()
 		}	
 		else
 		{
-			if ("BG1" == strModelName)
+			if ("BG0" == strModelName || "BG1" == strModelName)
 				wstrGameObjectTag = TEXT("BG");
 			else
 				wstrGameObjectTag = TEXT("MapToolObject");
@@ -1077,7 +1078,7 @@ _bool CMapToolHelper::ExcludeModel(string& _strModelName)
 
 	if (_strModelName.substr(0, 5) == "Smoke" || _strModelName.substr(0, 4) == "Test"
 		|| _strModelName.substr(0, 9) == "SkySphere" || _strModelName.substr(_strModelName.size() - 5) == "Blend"
-		|| "Tornado" == _strModelName)
+		|| "Tornado" == _strModelName || _strModelName.substr(0, 6) == "Vacuum")
 		return true;
 
 	return _bool();

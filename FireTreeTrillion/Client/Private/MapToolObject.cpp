@@ -75,6 +75,12 @@ HRESULT CMapToolObject::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
+	string strModelName = m_pModelCom->Get_ModelInfo().strModelName;
+
+	_uint iPassIndex{};
+	if ("Trigger" == strModelName)
+		iPassIndex = MODEL_TRIGGER;
+
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 
 	for (size_t i = 0; i < iNumMeshes; i++)
@@ -84,9 +90,7 @@ HRESULT CMapToolObject::Render()
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
 			return E_FAIL;
 			/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		_uint iPassIndex{};
-		if (m_pModelCom->Get_ModelInfo().strModelName == "Trigger")
-			iPassIndex = MODEL_TRIGGER;
+
 		if (FAILED(m_pShaderCom->Begin(iPassIndex)))
 			return E_FAIL;
 
@@ -127,6 +131,11 @@ HRESULT CMapToolObject::Bind_ShaderResources()
 		if (FAILED(m_pShaderCom->Bind_RawValue("g_iTriggerType", &m_iTriggerType, sizeof(_uint))))
 			return E_FAIL;
 	}
+	m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
+	m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
+	if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
+		return E_FAIL;
+	m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
 
 	return S_OK;
 }

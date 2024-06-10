@@ -257,7 +257,7 @@ HRESULT CLevel_Intro::Ready_ParsedObjects()
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Trigger"), TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc)))
 				return E_FAIL;
 		}
-		else if (strModelName == "BG1")
+		else if (strModelName == "BG0")
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_BG"), &tempDesc)))
 				return E_FAIL;
