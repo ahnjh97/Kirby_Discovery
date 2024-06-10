@@ -82,6 +82,8 @@ public:
 	void Setting_RadialBlur(_float fRadial, _float fSubtraction);
 	// DOF 초점을 업데이트한다.
 	void Update_DofFocus(_fvector vWorldPos);
+	// GodRay 위치를 설정한다.
+	void Setting_GodRay(_fvector vWorldPos);
 
 	HRESULT Render_LightDepth_For_GameObject(class CShader* pShader, class CTransform* pTransform, class CModel* pModel);
 	HRESULT Render_LightDepth_For_PartObject(class CShader* pShader, const _float4x4* pMatrix, class CModel* pModel);
@@ -153,6 +155,9 @@ private:
 	HRESULT Render_DeferredInfo();
 
 	HRESULT Render_Result();			HRESULT Render_Result_For_Tool();
+
+	HRESULT Render_GodRay();
+
 	HRESULT Render_Radial_Result(_float fTimeDelta);
 	HRESULT Render_DOF_Result();
 	HRESULT Render_MotionBlur();
@@ -180,6 +185,8 @@ private:
 	_float m_fBlackBackground = { 1.f };
 	// For.DOF
 	_float2 m_vDofFocus = { 0.f, 0.f };
+	// For.GodRay
+	_float4 m_vGodPos = { 0.f, 0.f, 0.f, 0.f };
 
 	// For.ColorCorrection
 	_bool m_bApplyCorrection = { true };

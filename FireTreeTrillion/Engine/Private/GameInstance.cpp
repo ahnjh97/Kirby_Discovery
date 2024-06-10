@@ -386,6 +386,14 @@ void CGameInstance::Update_Option(CRenderer::OPTION Option, _bool bOn)
 	m_pRenderer->Update_Option(Option, bOn);
 }
 
+void CGameInstance::Setting_GodRay(_fvector vWorldPos)
+{
+	if (nullptr == m_pRenderer)
+		return;
+
+	m_pRenderer->Setting_GodRay(vWorldPos);
+}
+
 #ifdef _DEBUG
 
 HRESULT CGameInstance::Add_DebugComponents(CComponent * pRenderComponent)

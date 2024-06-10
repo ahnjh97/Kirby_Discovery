@@ -93,8 +93,11 @@ HRESULT CLevel_GamePlay::Render()
 
 HRESULT CLevel_GamePlay::Ready_Lights()
 {
+
+
+
 	//// 예시코드 1 : 태양광
-	LIGHT_DESC			LightDesc{};
+	LIGHT_DESC		LightDesc{};
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
 	LightDesc.vDirection = _float4(0.3f, -1.f, -0.3f, 0.f);
 
@@ -104,6 +107,8 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 
 	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
 		return E_FAIL;
+
+	m_pGameInstance->Setting_GodRay(_float4(320.f, 600.f, 1800.f, 1.f));
 
 	return S_OK;
 }

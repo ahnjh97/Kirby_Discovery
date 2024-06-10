@@ -213,12 +213,12 @@ void CCamera_Free::Track_Target(_float fTimeDelta)
 			vTargetPos.y = vTerrainPos.y;
 		}
 
-		_float4 vBackDir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+		_float4 vBackDir = -m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 		vBackDir.Normalize();
-		vBackDir *= m_fTrackDistance;
+		//vBackDir *= m_fTrackDistance;
 		m_vDestCamDir = vBackDir;
 		m_vDestCamPos = vTargetPos + vBackDir;
-		m_vDestCamDir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+		//m_vDestCamDir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 
 	}
 
@@ -277,8 +277,6 @@ void CCamera_Free::Track_Target(_float fTimeDelta)
 		//}
 
 #pragma endregion
-
-
 
 #pragma region ¹æ¹ý 4
 		/*
