@@ -147,6 +147,9 @@ PS_OUT PS_MAIN(PS_IN In)
     if (g_bMotionBlur == true)
         Out.vMotionBlur = g_vMotionVelocity;
     
+    if (Out.vMRA.b < 0.001)
+        Out.vMRA.b = 1.f;
+    
 	return Out;
 }
 
@@ -171,6 +174,10 @@ PS_OUT NO_NORMALMAP_PS_MAIN(PS_IN In)
 
     if (g_bMotionBlur == true)
         Out.vMotionBlur = g_vMotionVelocity;
+    
+    
+    if (Out.vMRA.b < 0.001)
+        Out.vMRA.b = 1.f;
     
     return Out;
 }
@@ -253,7 +260,11 @@ PS_OUT PS_MAIN_DEFAULT_FX(PS_IN In)
     
     
     Out.vDiffuse = vDiffuse;
-	
+    
+    
+    if (Out.vMRA.b < 0.001)
+        Out.vMRA.b = 1.f;
+    
     return Out;
 }
 
@@ -287,6 +298,7 @@ PS_OUT_EFFECT PS_MAIN_BLEND_FX(PS_IN In)
     float fOldViewZ = vDepthDesc.y * 1000.f;
 
     Out.vColor.a = Out.vColor.a * saturate(fOldViewZ - In.vProjPos.w);
+
     
     Out.vNonBlur = vector(0.f, 1.f, 0.f, 0.f);
     

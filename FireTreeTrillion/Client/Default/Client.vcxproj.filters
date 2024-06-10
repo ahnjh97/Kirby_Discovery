@@ -217,6 +217,9 @@
     <Filter Include="01.Levels\Logo">
       <UniqueIdentifier>{7fa67ac9-2f2d-435f-bf35-849f5cbedd3c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyBoom_State">
+      <UniqueIdentifier>{df88d3db-f381-4d13-8ca4-1ddc4df3cb3d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -436,6 +439,9 @@
     <ClInclude Include="..\Public\Level_Intro.h">
       <Filter>01.Levels\Intro</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\KirbyBoom_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyBoom_State</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -636,6 +642,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Level_Intro.cpp">
       <Filter>01.Levels\Intro</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Public\KirbyBoom_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyBoom_State</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

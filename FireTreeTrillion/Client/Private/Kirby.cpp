@@ -9,6 +9,7 @@
 #include "KirbyDamage_State.h"
 #include "KirbyContents_State.h"
 #include "KirbySword_State.h"
+#include "KirbyBoom_State.h"
 
 #include "KirbyWeapons.h"
 #include "KirbyArmours.h"
@@ -78,7 +79,7 @@ HRESULT CKirby::Initialize(void* pArg)
 	m_fHp = 100.f;
 	m_fAttack = 5.f;
 	//m_eAbilityType = ABILITY_DEFAULT;
-	m_eAbilityType = ABILITY_SWORD;
+	m_eAbilityType = ABILITY_BOMB;
 
 	CCharacterController* pController = dynamic_cast<CCharacterController*>(Get_Component(TEXT("Com_Controller")));
 	pController->RegisterAsPlayer();
@@ -121,12 +122,8 @@ void CKirby::Late_Tick(_float fTimeDelta)
 	if (INFO(m_eBodyState) != BODY_DEFAULT)
 		m_pModelCom[BODY_DEFAULT]->Play_Animation(m_fTimeDelta);
 
-	// 임시로 진행한다. 나중에 능력 분기되면 파츠오브젝트 많이 생겨야함.
-	if (m_eAbilityType == ABILITY_SWORD)
-	{
-		m_pWeapons->Late_Tick(m_fTimeDelta);
-		m_pArmours->Late_Tick(m_fTimeDelta);
-	}
+	m_pWeapons->Late_Tick(m_fTimeDelta);
+	m_pArmours->Late_Tick(m_fTimeDelta);
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
@@ -386,12 +383,7 @@ void CKirby::Key_Input(_float fTimeDelta)
 	}
 	else if (m_pGameInstance->Get_DIKeyState(DIK_7, KEY_DOWN))
 	{
-		INFO(m_eBodyState) = BODY_SWORDDEFAULT;
-		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
-	}
-	else if (m_pGameInstance->Get_DIKeyState(DIK_6, KEY_DOWN))
-	{
-		INFO(m_eBodyState) = BODY_SWORDBALLOON;
+		INFO(m_eBodyState) = BODY_BOOMDEFAULT;
 		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
 	}
 
@@ -445,6 +437,11 @@ HRESULT CKirby::Add_Components()
 		// 커비의 Sword Balloon 상태 모델
 		hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbySwordBalloon"),
 			TEXT("Com_Model_SwordBalloon"), (CComponent**)&m_pModelCom[BODY_SWORDBALLOON]);
+		CHECK_FAILED(hr);
+
+		// 커비의 Boom Body 상태 모델
+		hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyBoomDefault"),
+			TEXT("Com_Model_BoomDefault"), (CComponent**)&m_pModelCom[BODY_BOOMDEFAULT]);
 		CHECK_FAILED(hr);
 
 
@@ -515,10 +512,9 @@ HRESULT CKirby::Add_PartObjects()
 {
 
 	CKirbyWeapons::KIRBYWEAPON_DESC	WeaponDesc{};
-	//CModel* pModel = (CModel*)Get_Component(TEXT("Com_Model_SwordDefault"));
 	WeaponDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-	//WeaponDesc.pSocket = pModel->Get_BonePtr("HatL");
 	WeaponDesc.pBoneMatrix = &m_WeaponMatrix;
+	WeaponDesc.pAbilityType = &m_eAbilityType;
 	m_pWeapons = static_cast<CKirbyWeapons*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_KirbyWeapons"), &WeaponDesc));
 	if (nullptr == m_pWeapons)
 		return E_FAIL;
@@ -526,6 +522,7 @@ HRESULT CKirby::Add_PartObjects()
 	CKirbyArmours::KIRBYARMOURS_DESC ArmourDesc{};
 	ArmourDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 	ArmourDesc.pBoneMatrix = &m_ArmourMatrix;
+	ArmourDesc.pAbilityType = &m_eAbilityType;
 	m_pArmours = static_cast<CKirbyArmours*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_KirbyArmours"), &ArmourDesc));
 	if (nullptr == m_pArmours)
 		return E_FAIL;
@@ -555,7 +552,8 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 	if ((_eBodyState == BODY_DEFAULT && _iMeshIndex == 0) ||
 		(_eBodyState == BODY_BALLOON && _iMeshIndex == 4) ||
 		(_eBodyState == BODY_SWORDDEFAULT && _iMeshIndex == 0) ||
-		(_eBodyState == BODY_SWORDBALLOON && _iMeshIndex == 4))
+		(_eBodyState == BODY_SWORDBALLOON && _iMeshIndex == 4) ||
+		(_eBodyState == BODY_BOOMDEFAULT && _iMeshIndex == 0))
 	{
 		m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
 		m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
@@ -575,7 +573,8 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		(_eBodyState == BODY_VACUUM && _iMeshIndex == 2) ||
 		(_eBodyState == BODY_BALLOON && _iMeshIndex == 3) ||
 		(_eBodyState == BODY_SWORDDEFAULT && _iMeshIndex == 3) ||
-		(_eBodyState == BODY_SWORDBALLOON && _iMeshIndex == 3))
+		(_eBodyState == BODY_SWORDBALLOON && _iMeshIndex == 3) ||
+		(_eBodyState == BODY_BOOMDEFAULT && _iMeshIndex == 3))
 	{
 		m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
 		m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
@@ -696,7 +695,7 @@ void CKirby::SetUp_FSM()
 	m_pFSM->Add_State(STATE_ITENGETWAIT, CKirbyGet_State::Create());
 	m_pFSM->Add_State(STATE_ABILITYDUMP, CKirbyGet_State::Create());
 
-
+#pragma region SWORD
 	// For Sword
 	m_pFSM->Add_State(SWORDSTATE_WAIT, CKirbySword_Idle_State::Create());
 	m_pFSM->Add_State(SWORDSTATE_RUN, CKirbySword_Run_State::Create());
@@ -731,6 +730,17 @@ void CKirby::SetUp_FSM()
 	m_pFSM->Add_State(SWORDSTATE_SWORDSPIN, CKirbySword_JumpAttack_State::Create());
 	m_pFSM->Add_State(SWORDSTATE_SWORDSPINSTART, CKirbySword_JumpAttack_State::Create());
 	m_pFSM->Add_State(SWORDSTATE_SPINAFTER, CKirbySword_JumpAttack_State::Create());
+#pragma endregion
+
+#pragma region BOOM
+	m_pFSM->Add_State(BOOMSTATE_BOOMFALL, CKirbyBoom_Fall_State::Create());
+	m_pFSM->Add_State(BOOMSTATE_BOOMSHOOT, CKirbyBoom_Attack_State::Create());
+	m_pFSM->Add_State(BOOMSTATE_THROW, CKirbyBoom_Attack_State::Create());
+	m_pFSM->Add_State(BOOMSTATE_THROWAIR, CKirbyBoom_Fall_State::Create());
+	m_pFSM->Add_State(BOOMSTATE_THROWCHARGE, CKirbyBoom_ChargeAttack_State::Create());
+	m_pFSM->Add_State(BOOMSTATE_THROWROTATE, CKirbyBoom_ChargeAttack_State::Create());
+#pragma endregion
+
 
 
 	CFSM::FSM_INFO		FSM_Info_Desc = {};

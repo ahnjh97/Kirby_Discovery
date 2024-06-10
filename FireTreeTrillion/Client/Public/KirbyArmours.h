@@ -16,6 +16,7 @@ public:
 	typedef struct : public CPartObject::PARTOBJECT_DESC
 	{
 		_float4x4* pBoneMatrix = { nullptr };
+		ABILITYTYPE* pAbilityType = { nullptr };
 	}KIRBYARMOURS_DESC;
 
 private:
@@ -34,7 +35,12 @@ public:
 
 
 private:
-	CModel* m_pModelCom = { nullptr };
+	// 랜더가 되지 않아야 하는 것들
+	_bool Block_Render() {
+		return *m_pAbilityType == ABILITY_END || *m_pAbilityType == ABILITY_DEFAULT;
+	}
+
+	CModel* m_pModelCom[ABILITY_END] = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
 
 private:
@@ -42,6 +48,7 @@ private:
 	_float4			m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
 
 	_float4x4* m_pBoneMatrix = { nullptr };
+	ABILITYTYPE* m_pAbilityType = { nullptr };
 
 private:
 	HRESULT Add_Components();

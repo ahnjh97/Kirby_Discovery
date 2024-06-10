@@ -201,6 +201,7 @@
     </ClInclude>
     <ClInclude Include="..\Public\Kabu.h" />
     <ClInclude Include="..\Public\Kabu_State.h" />
+    <ClInclude Include="..\Public\KirbyBoom_State.h" />
     <ClInclude Include="..\Public\Level_Intro.h" />
     <ClInclude Include="..\Public\Multi_UI.h" />
     <ClInclude Include="..\Public\LevelChanger.h" />
@@ -344,6 +345,7 @@
     </ClCompile>
     <ClCompile Include="..\private\WaddleDee.cpp" />
     <ClCompile Include="..\Private\WasteCan.cpp" />
+    <ClCompile Include="..\Public\KirbyBoom_State.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
