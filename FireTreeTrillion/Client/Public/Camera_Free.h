@@ -69,8 +69,11 @@ private:
 
 	_float			m_fSlerpRatio = { .2f };
 
-	_float4 m_vDestCamPos = {};
-	_float4 m_vDestCamDir = {};
+	_float4			m_vDestCamPos = {};
+	_float4			m_vDestCamDir = {};
+
+
+	_float			m_fDestFovy = { ToRadian(30.f)};
 
 	void			Track_Target(_float fTimeDelta);
 

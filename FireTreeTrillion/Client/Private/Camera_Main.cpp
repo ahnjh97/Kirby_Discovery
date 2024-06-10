@@ -277,7 +277,7 @@ void CCamera_Main::Control(_float fTimeDelta)
 	}
 
 	//fov y 를 보간하여 갱신한다.
-	if (.05f < abs(m_fFovy - m_fDestFovy))
+	if (.01f < abs(m_fFovy - m_fDestFovy))
 		m_fFovy += (m_fDestFovy - m_fFovy) * fTimeDelta * 3.f;
 }
 
@@ -484,6 +484,13 @@ void CCamera_Main::Render_IMGUI()
 	//ImGui::Text("SlerpedDir: %.2f, %.2f, %.2f", XMVectorGetX(m_vSlerpedDir), XMVectorGetY(m_vSlerpedDir), XMVectorGetZ(m_vSlerpedDir));
 	//ImGui::Text("LerpedRadius: %.2f", m_fLerpedRadius);
 	ImGui::Dummy(ImVec2(0, 20));
+
+	static _float fFOVY = ToDegree(m_fDestFovy);
+
+	if (ImGui::DragFloat(u8"FOV", &fFOVY, .1f, 10.f, 50.f, "%.1f"))
+	{
+		m_fDestFovy = ToRadian(fFOVY);
+	}
 
 
 	ImGui::DragFloat(u8"타겟까지의 목표 거리", &m_fDestDistance, .1f, 10.f, 50.f, "%.1f");

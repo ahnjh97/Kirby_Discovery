@@ -54,6 +54,10 @@ _int CCamera_Free::Tick(_float fTimeDelta)
 
 	Control(fTimeDelta);
 
+	//fov y 를 보간하여 갱신한다.
+	if (.01f < abs(m_fFovy - m_fDestFovy))
+		m_fFovy += (m_fDestFovy - m_fFovy) * fTimeDelta * 3.f;
+
 	return OBJ_NOEVENT;
 }
 
@@ -79,6 +83,17 @@ void CCamera_Free::Render_IMGUI()
 	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._21, WorldMat._22, WorldMat._23, WorldMat._24);
 	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._31, WorldMat._32, WorldMat._33, WorldMat._34);
 	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._41, WorldMat._42, WorldMat._43, WorldMat._44);
+
+
+
+
+	static _float fFOVY = ToDegree(m_fDestFovy);
+
+	if (ImGui::DragFloat(u8"FOV", &fFOVY, .1f, 10.f, 50.f, "%.1f"))
+	{
+		m_fDestFovy = ToRadian(fFOVY);
+	}
+
 
 	//ImGui::Text("X: %.2f", vPosition.x);
 	//ImGui::SameLine();
