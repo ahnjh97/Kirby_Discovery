@@ -47,7 +47,11 @@
 #pragma endregion
 
 #pragma region 객체
+//카메라
 #include "Camera_Free.h"
+#include "Camera_Main.h"
+
+
 #include "TestModel.h"
 #include "TestTerrain.h"
 #include "Kirby.h"
@@ -226,8 +230,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kabu"), CKabu);
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BackGround"), CBackGround);
-	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_Test"), CTestUI);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Main"), CCamera_Main);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestMap"), CTestTerrain);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Moon"), CMoon);
@@ -569,10 +573,6 @@ HRESULT CLoader::Add_Models(LEVEL eLevel)
 	// SetUp_ModelScaleRotation 함수에서 모아놓은 Model들을 타입에 따라서 Component 생성한다.
 	for (auto& ModelInfo : m_vecModelInfo)
 	{
-		if (ModelInfo.strModelName == "KirbyDefault"){
-			_int i = 0;
-		}
-
 		// 애님툴에서 조정하여 저장한 값을 불러서
 		// 모델 이름이 같을 경우, model의 정보들을 읽어오기
 		for (auto& pair : m_mapSequence)
@@ -631,13 +631,19 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("KirbyVacuum", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("KirbySwordDefault", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("KirbySwordBalloon", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbyBoomDefault", TYPE_ANIM, 1.f, 180.f);
+
 		// For Kirby Weapon
 		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
 		// For Kirby Armour
 		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
+
 
 		m_vecModelInfo.emplace_back("Level0Stage1Step01", TYPE_NONANIM, 1.f, 0.f, 0, true);
+		m_vecModelInfo.emplace_back("Level0Stage1Step01_Blend", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f);
+		m_vecModelInfo.emplace_back("BG0", TYPE_NONANIM);
 
 		// For Monster
 		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.f, 180.f);
@@ -665,8 +671,11 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("KirbyVacuum", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("KirbySwordDefault", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("KirbySwordBalloon", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbyBoomDefault", TYPE_ANIM, 1.f, 180.f);
+
 		// For Kirby Weapon
 		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
 		// For Kirby Armour
 		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
 
@@ -697,8 +706,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f);
 		m_vecModelInfo.emplace_back("Camera", TYPE_NONANIM, 0.2f, 270.f);
 		m_vecModelInfo.emplace_back("Dummy", TYPE_NONANIM, 0.01f);
-
-		//m_vecModelInfo.emplace_back("Level1Stage1Step01", TYPE_NONANIM, 1.f, 0.f, 0, true);
+		m_vecModelInfo.emplace_back("RallyPoint", TYPE_NONANIM, 2.f);
+		m_vecModelInfo.emplace_back("LightBulb", TYPE_NONANIM, 0.02f);
 	}
 	else if (eLevel == LEVEL_TOOL_ANIM)
 	{

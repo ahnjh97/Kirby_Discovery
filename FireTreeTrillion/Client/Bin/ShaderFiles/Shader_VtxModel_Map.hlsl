@@ -27,8 +27,6 @@ struct VS_OUT
 
 	float3		vTangent : TANGENT;
 	float3		vBinormal : BINORMAL;
-
-
 };
 
 /* ¡§¡° Ω¶¿Ã¥ı */

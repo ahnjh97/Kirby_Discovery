@@ -19,6 +19,8 @@ public:
 	virtual void OnStateExit()														override;
 
 public:
+	_bool	m_bSpitTrigger = true;
+	_float	m_fSpitTime = { 0.f };
 	static	CKirbyVacuum_Spit_State* Create();
 	virtual void						Free() override;
 };

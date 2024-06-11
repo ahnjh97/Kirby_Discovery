@@ -1,4 +1,4 @@
-#include "stdafx.h"
+//#include "stdafx.h"
 #include "Loader.h"
 #include <process.h>
 #include "GameInstance.h"

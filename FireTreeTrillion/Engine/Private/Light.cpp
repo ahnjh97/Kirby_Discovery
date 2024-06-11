@@ -83,7 +83,6 @@ HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer, _bool bFor
 		iPassIndex = DEFERRED_POINTLIGHT;
 	}
 
-
 	if (FAILED(pShader->Bind_RawValue("g_vLightDiffuse", &m_LightDesc.vDiffuse, sizeof(_float4))))
 		return E_FAIL;
 	if (FAILED(pShader->Bind_RawValue("g_vLightAmbient", &m_LightDesc.vAmbient, sizeof(_float4))))

@@ -50,6 +50,9 @@ HRESULT CBladeKnight::Initialize(void* pArg)
 	m_eVacuumSize = SIZE_SMALL;
 	m_eAbilityType = ABILITY_SWORD;
 
+
+	m_bStencil = true;
+
 	return S_OK;
 }
 

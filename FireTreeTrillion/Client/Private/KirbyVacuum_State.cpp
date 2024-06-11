@@ -24,6 +24,33 @@ void CKirbyVacuum_Spit_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 	pKirby->DefaultIdle();
 
+	m_fSpitTime += fTimeDelta;
+	if (m_fSpitTime > 0.05f && m_bSpitTrigger == true )
+	{
+		// 날려 보낸다. 날려보내는 순간 나의 관할이 아니기 때문에 그냥 보내버린다.
+		// 또한 보내기전에 마지막으로 Fly로 만들어준다. 또한 방향을 여기서 정해준다.
+		if (DESC(m_pObject) != nullptr)
+		{
+			CTransform* pObjectTransform = DESC(m_pObject)->Get_TransformCom();
+			pObjectTransform->Set_Scaled(1.f, 1.f, 1.f);
+			DESC(m_pObject)->Set_PhyXState(PO_FLYAWAY);
+			DESC(m_pObject)->Set_DamageMoving(pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), 1.f);
+
+			_vector vNewUp = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+			_vector vNewLook = XMVector3Cross(vNewUp, XMVectorSet(0.f, 1.f, 0.f, 0.f));
+			_vector vNewRight = XMVector3Cross(vNewUp, vNewLook);
+			pObjectTransform->Set_State(CTransform::STATE_UP, vNewUp);
+			pObjectTransform->Set_State(CTransform::STATE_RIGHT, vNewRight);
+			pObjectTransform->Set_State(CTransform::STATE_LOOK, vNewLook);
+
+			Safe_Release(DESC(m_pObject));
+			DESC(m_pObject) = nullptr;
+		}
+		m_bSpitTrigger = false;
+	}
+
+
+
 	// 뱉는다.
 	if (pKirby->isAnimFinish())
 	{
@@ -48,7 +75,8 @@ void CKirbyVacuum_Spit_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 void CKirbyVacuum_Spit_State::OnStateExit()
 {
-
+	m_bSpitTrigger = true;
+	m_fSpitTime = 0.f;
 }
 
 CKirbyVacuum_Spit_State* CKirbyVacuum_Spit_State::Create()

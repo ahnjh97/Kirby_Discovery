@@ -1,4 +1,4 @@
-#include "stdafx.h"
+//#include "stdafx.h"
 #include "..\Public\BackGround.h"
 
 CBackGround::CBackGround(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

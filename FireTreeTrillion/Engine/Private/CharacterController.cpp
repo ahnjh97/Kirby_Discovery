@@ -68,9 +68,11 @@ void CCharacterController::Render_IMGUI()
 #endif
 
 
-void CCharacterController::Set_Position(const _float4& vPos)
+void CCharacterController::Set_Position(CTransform* pTransform, const _float4& vPos)
 {
 	m_pController->setPosition({(_double)vPos.x, (_double)vPos.y, (_double)vPos.z});
+
+	pTransform->Set_State(CTransform::STATE_POSITION, vPos);
 }
 
 void CCharacterController::Set_FootPosition(const _float4& vPos)
@@ -179,6 +181,7 @@ _bool CCharacterController::Jump_Parabola(CTransform* pTransform, _fvector vGoPo
 
 		// 객체의 충돌 상태 받아오기
 		PxControllerState m_pPxState;
+		lock_guard<mutex> lock(mutex);
 		m_pController->getState(m_pPxState);
 
 		// 지면 판정, 천장 판정 처리

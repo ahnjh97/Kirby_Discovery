@@ -22,6 +22,7 @@ HRESULT CKirbyArmours::Initialize(void* pArg)
     KIRBYARMOURS_DESC* pArmourDesc = (KIRBYARMOURS_DESC*)pArg;
 
     m_pBoneMatrix = pArmourDesc->pBoneMatrix;
+    m_pAbilityType = pArmourDesc->pAbilityType;
 
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
@@ -46,12 +47,14 @@ _int CKirbyArmours::Tick(_float fTimeDelta)
 
 void CKirbyArmours::Late_Tick(_float fTimeDelta)
 {
-    if (true == m_pGameInstance->isInFrustum_WorldSpace(XMVectorSet(m_WorldMatrix._41, m_WorldMatrix._42, m_WorldMatrix._43, m_WorldMatrix._44), 2.0f))
+    if (Block_Render() == false)
     {
-        m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
-        m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
-        m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_DEFERREDINFO, this);
-
+        if (true == m_pGameInstance->isInFrustum_WorldSpace(XMVectorSet(m_WorldMatrix._41, m_WorldMatrix._42, m_WorldMatrix._43, m_WorldMatrix._44), 2.0f))
+        {
+            m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+            m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
+            m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_DEFERREDINFO, this);
+        }
     }
 }
 
@@ -60,22 +63,22 @@ HRESULT CKirbyArmours::Render()
     if (FAILED(Bind_ShaderResources()))
         return E_FAIL;
 
-    _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
+    _uint iNumMeshes = m_pModelCom[*m_pAbilityType]->Get_NumMeshes();
 
     for (size_t i = 0; i < iNumMeshes; i++)
     {
-        if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
+        if (FAILED(m_pModelCom[*m_pAbilityType]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
             return E_FAIL;
-        if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
+        if (FAILED(m_pModelCom[*m_pAbilityType]->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
             return E_FAIL;
-        if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
+        if (FAILED(m_pModelCom[*m_pAbilityType]->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
             return E_FAIL;
 
         /* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
         if (FAILED(m_pShaderCom->Begin(MODEL_NORMAL_O)))
             return E_FAIL;
 
-        m_pModelCom->Render(i);
+        m_pModelCom[*m_pAbilityType]->Render(i);
     }
 
     return S_OK;
@@ -83,7 +86,7 @@ HRESULT CKirbyArmours::Render()
 
 HRESULT CKirbyArmours::Render_LightDepth()
 {
-    if (FAILED(m_pGameInstance->Render_LightDepth_For_PartObject(m_pShaderCom, &m_WorldMatrix, m_pModelCom)))
+    if (FAILED(m_pGameInstance->Render_LightDepth_For_PartObject(m_pShaderCom, &m_WorldMatrix, m_pModelCom[*m_pAbilityType])))
         return E_FAIL;
 
     return S_OK;
@@ -98,19 +101,19 @@ HRESULT CKirbyArmours::Render_DeferredInfo()
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
         return E_FAIL;
 
-    _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
+    _uint iNumMeshes = m_pModelCom[*m_pAbilityType]->Get_NumMeshes();
 
     for (size_t i = 0; i < iNumMeshes; i++)
     {
 
-        if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
+        if (FAILED(m_pModelCom[*m_pAbilityType]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
             return E_FAIL;
 
         /* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
         if (FAILED(m_pShaderCom->Begin(MODEL_DEFERREDINFO)))
             return E_FAIL;
 
-        if (FAILED(m_pModelCom->Render(i)))
+        if (FAILED(m_pModelCom[*m_pAbilityType]->Render(i)))
             return E_FAIL;
     }
 
@@ -127,7 +130,12 @@ HRESULT CKirbyArmours::Add_Components()
 
     /* For.Com_Model */
     hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyArmour_Sword"),
-        TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+        TEXT("Com_Model_Sword"), (CComponent**)&m_pModelCom[ABILITY_SWORD]);
+    CHECK_FAILED(hr);
+
+    /* For.Com_Model */
+    hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyArmour_Boom"),
+        TEXT("Com_Model_Boom"), (CComponent**)&m_pModelCom[ABILITY_BOMB]);
     CHECK_FAILED(hr);
 
     return S_OK;
@@ -211,6 +219,8 @@ void CKirbyArmours::Free()
     __super::Free();
 
     Safe_Release(m_pShaderCom);
-    Safe_Release(m_pModelCom);
+
+    for (auto& pModel : m_pModelCom)
+        Safe_Release(pModel);
 
 }

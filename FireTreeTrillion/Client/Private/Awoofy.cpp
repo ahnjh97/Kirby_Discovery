@@ -46,10 +46,9 @@ HRESULT CAwoofy::Initialize(void* pArg)
 	m_fHp = 10.f;
 	m_fAttack = 8.f;
 	m_eVacuumSize = SIZE_SMALL;
-	m_eAbilityType = ABILITY_DEFAULT;
+	m_eAbilityType = ABILITY_BOMB;
 	m_eEyeState = AWOOFYEYE_IDLE;
 
-	//m_fRimWidth = 5.f;
 	Add_AnimEvent();
 
 	return S_OK;
@@ -67,7 +66,7 @@ _int CAwoofy::Tick(_float fTimeDelta)
 	__super::Tick(m_fTimeDelta);
 
 	// 빨릴 때
-	if (m_bVacuuming == true)
+	if (m_ePhyXState == PO_VACUUMING)
 		Change_State(CAwoofy::AWOOFY_DAMAGE, 120.f, true, false);
 
 	return OBJ_NOEVENT;
@@ -75,7 +74,13 @@ _int CAwoofy::Tick(_float fTimeDelta)
 
 void CAwoofy::Late_Tick(_float fTimeDelta)
 {
-	m_pModelCom->Play_Animation(m_fTimeDelta);
+	// 커비 입 안에 있고, Fly가 아닐땐 입 안에 있는 상황이므로, Render되지않는다.
+	if (m_ePhyXState == PO_KIRBYMOUTH)
+		return;
+
+	// 날아갈 땐, 애니메이션 재생이 되지 않는다.
+	if (m_ePhyXState != PO_FLYAWAY)
+		m_pModelCom->Play_Animation(m_fTimeDelta);
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
@@ -200,8 +205,21 @@ void CAwoofy::Render_IMGUI()
 
 void CAwoofy::Collision_Attack(CGameObject* pOtherObj)
 {
-	Change_State(CAwoofy::AWOOFY_DAMAGE, 50.f, false, true);
-	m_eEyeState = AWOOFYEYE_HAPPY;
+	CPhysXObject* pObject = static_cast<CPhysXObject*>(pOtherObj);
+
+	// 날아온게 FlyAway 상태인 몬스터였을 경우
+	if (pObject->Get_PhyXState() == PO_FLYAWAY)
+	{
+		// 같이 처맞고 날아가자.
+
+	}
+	// 일반 충돌
+	else
+	{
+		Change_State(CAwoofy::AWOOFY_DAMAGE, 50.f, false, true);
+		m_eEyeState = AWOOFYEYE_HAPPY;
+	}
+
 }
 
 void CAwoofy::Change_State(AWOOFY_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)

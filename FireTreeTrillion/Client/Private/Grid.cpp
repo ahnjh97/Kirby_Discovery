@@ -53,6 +53,9 @@ void CGrid::Late_Tick(_float fTimeDelta)
 
 HRESULT CGrid::Render()
 {
+	if (true == m_bHide)
+		return S_OK;
+
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 

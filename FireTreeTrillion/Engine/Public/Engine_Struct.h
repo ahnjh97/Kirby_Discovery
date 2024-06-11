@@ -7,6 +7,7 @@ namespace Engine
 		HWND			hWnd;
 		bool			isWindowed;
 		unsigned int	iWinSizeX, iWinSizeY;
+
 	}ENGINE_DESC;
 
 	typedef struct
