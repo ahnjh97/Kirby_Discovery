@@ -402,6 +402,14 @@ void CAwoofy_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			pAwoofy->Change_State(CAwoofy::AWOOFY_WAIT, 40.f, false, true);
 		}
 	}
+	// 날아가는 도중이였다.
+	else if (pAwoofy->Get_FlyAway() == true)
+	{
+		_float3 vDamegeDir = pAwoofy->Get_DamegeDir();
+		pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 6.f, fTimeDelta);
+	}
+
+
 }
 
 void CAwoofy_Damage_State::OnStateExit()

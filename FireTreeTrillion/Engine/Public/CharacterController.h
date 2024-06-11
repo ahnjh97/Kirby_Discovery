@@ -20,7 +20,7 @@ protected:
 public:
 	//void			Set_CollisionType(COLLISION_TYPE _CollisionType){ m_eCollisionType = _CollisionType; }
 	// 갑자기 위치값이 변화되는 경우 사용하시오.(ex. 텔레포트 등)
-	void			Set_Position(const _float4& vPos);
+	void			Set_Position(class CTransform* pTransform, const _float4& vPos);
 	// 발 위치값 지정
 	void			Set_FootPosition(const _float4& vPos);
 

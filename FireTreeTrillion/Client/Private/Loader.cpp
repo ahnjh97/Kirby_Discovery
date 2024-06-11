@@ -557,10 +557,6 @@ HRESULT CLoader::Add_Models(LEVEL eLevel)
 	// SetUp_ModelScaleRotation 함수에서 모아놓은 Model들을 타입에 따라서 Component 생성한다.
 	for (auto& ModelInfo : m_vecModelInfo)
 	{
-		if (ModelInfo.strModelName == "KirbyDefault"){
-			_int i = 0;
-		}
-
 		// 애님툴에서 조정하여 저장한 값을 불러서
 		// 모델 이름이 같을 경우, model의 정보들을 읽어오기
 		for (auto& pair : m_mapSequence)

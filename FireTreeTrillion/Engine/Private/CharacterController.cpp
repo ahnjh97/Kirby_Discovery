@@ -68,9 +68,11 @@ void CCharacterController::Render_IMGUI()
 #endif
 
 
-void CCharacterController::Set_Position(const _float4& vPos)
+void CCharacterController::Set_Position(CTransform* pTransform, const _float4& vPos)
 {
 	m_pController->setPosition({(_double)vPos.x, (_double)vPos.y, (_double)vPos.z});
+
+	pTransform->Set_State(CTransform::STATE_POSITION, vPos);
 }
 
 void CCharacterController::Set_FootPosition(const _float4& vPos)

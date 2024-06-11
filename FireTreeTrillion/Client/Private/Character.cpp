@@ -132,8 +132,12 @@ void CCharacter::Character_SystemTick(_float fTimeDelta)
 			m_pFSM->Update(this, fTimeDelta);
 	}
 
-	// 터레인 경사면 보간 제어
-	SetOn_Slope(fTimeDelta);
+	// 날아가는 도중엔 경사면 보간 제어가 필요없다.
+	if (m_bFlyAway == false)
+	{
+		// 터레인 경사면 보간 제어
+		SetOn_Slope(fTimeDelta);
+	}
 }
 
 void CCharacter::Free()

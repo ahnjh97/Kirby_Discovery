@@ -133,6 +133,9 @@ void CKirbyBoom_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
+
+	pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
+
 	if (pKirby->Get_State() == CKirby::BOOMSTATE_BOOMSHOOT)
 	{
 		// 폭탄을 던지면서 이동 로직이 필요하다.
@@ -239,6 +242,9 @@ void CKirbyBoom_ChargeAttack_State::OnStateUpdate(CGameObject* pGameObject, _flo
 	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
 	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
+
+	pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
+
 
 
 	if (pKirby->Get_State() == CKirby::BOOMSTATE_THROWCHARGE)

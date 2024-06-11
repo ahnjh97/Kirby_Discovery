@@ -78,8 +78,8 @@ HRESULT CKirby::Initialize(void* pArg)
 	m_fMaxHp = 100.f;
 	m_fHp = 100.f;
 	m_fAttack = 5.f;
-	//m_eAbilityType = ABILITY_DEFAULT;
-	m_eAbilityType = ABILITY_BOMB;
+	m_eAbilityType = ABILITY_DEFAULT;
+	//m_eAbilityType = ABILITY_BOMB;
 
 	CCharacterController* pController = dynamic_cast<CCharacterController*>(Get_Component(TEXT("Com_Controller")));
 	pController->RegisterAsPlayer();
@@ -241,8 +241,8 @@ void CKirby::Collision_Attack(CGameObject* pOtherObj)
 {
 	CPhysXObject* pObject = static_cast<CPhysXObject*>(pOtherObj);
 
-	// 흡수될 운명인 몬스터
-	if (pObject->Get_Vacuuming())
+	// 흡수중인 몬스터
+	if (pObject->Get_Vacuuming() == true && pObject->Get_KirbyMouth() == false && pObject->Get_FlyAway() == false)
 	{
 		// 일단 EAT으로 넘기는건 같으나, EAT이 끝날 시점에 내가 삼켰던 것이 무엇이였는지 판단 후 애니메이션이 분기된다.
 		INFO(m_isEat) = true;
@@ -253,15 +253,29 @@ void CKirby::Collision_Attack(CGameObject* pOtherObj)
 		// 임시 보관소. 먹은게 끝났을 떄, 비로소 커비의 어빌리티 타입이 바뀐다.
 		INFO(m_eTemporaryEatType) = pObject->Get_AbilityType();
 
-		// 먹은애는 죽여놓는다. *****나중에 수정이 필요할 것이다. 먹은애를 날려야 하기 때문에*****
-		if (INFO(m_pObject) != nullptr)
+		if (pObject != nullptr)
 		{
-			INFO(m_pObject)->Set_Dead();
-			Safe_Release(INFO(m_pObject));
-			INFO(m_pObject) = nullptr;
+			pObject->Set_KirbyMouth(true);
 		}
 
 		Delete_KirbyEffect();
+	}
+	// 입에 머금은 상태의 몬스터
+	else if (pObject->Get_Vacuuming() == true && pObject->Get_KirbyMouth() == true && pObject->Get_FlyAway() == false)
+	{
+		// 서로 반응이 없어야 한다. (단, 이친구는 항상 나를 따라다닐것이다.)
+
+
+
+	}
+	// 발사중인 몬스터
+	else if (pObject->Get_Vacuuming() == true && pObject->Get_KirbyMouth() == true && pObject->Get_FlyAway() == true)
+	{
+		// 서로 반응이 없어야 한다.
+
+
+
+
 	}
 	// 슬라이드중의 충돌
 	else if (Get_State() == STATE_SLIDE)
@@ -833,6 +847,22 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 			}
 		}
 	}
+
+
+	// 물고 있을 때, 물고있는 객체를 계속 나의 입에 위치시키는 로직이다.
+	if (INFO(m_pObject) != nullptr)
+	{
+		// 커비 입 속에 있다면?
+		if (INFO(m_pObject)->Get_KirbyMouth() == true)
+		{
+			CCharacterController* pObjectController = static_cast<CCharacterController*>(INFO(m_pObject)->Get_Component(TEXT("Com_Controller")));
+			CTransform* pObjectTransform = INFO(m_pObject)->Get_TransformCom();
+			_vector vMouthPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+			vMouthPos.m128_f32[1] += 1.f;
+			pObjectController->Set_Position(pObjectTransform, vMouthPos);
+		}
+	}
+
 }
 
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

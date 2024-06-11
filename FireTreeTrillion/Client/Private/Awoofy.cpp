@@ -46,10 +46,9 @@ HRESULT CAwoofy::Initialize(void* pArg)
 	m_fHp = 10.f;
 	m_fAttack = 8.f;
 	m_eVacuumSize = SIZE_SMALL;
-	m_eAbilityType = ABILITY_DEFAULT;
+	m_eAbilityType = ABILITY_BOMB;
 	m_eEyeState = AWOOFYEYE_IDLE;
 
-	//m_fRimWidth = 5.f;
 	Add_AnimEvent();
 
 	return S_OK;
