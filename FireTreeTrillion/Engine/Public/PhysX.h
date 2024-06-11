@@ -144,4 +144,14 @@ public:
 };
 
 
+class cQueryFilterCallback : public PxQueryFilterCallback
+{
+public:
+    virtual PxQueryHitType::Enum preFilter(const PxFilterData& filterData, const PxShape* shape, const PxRigidActor* actor, PxHitFlags& queryFlags) override;
+
+    virtual PxQueryHitType::Enum postFilter(const PxFilterData& filterData, const PxQueryHit& hit, const PxShape* shape, const PxRigidActor* actor) override;
+
+};
+
+
 END

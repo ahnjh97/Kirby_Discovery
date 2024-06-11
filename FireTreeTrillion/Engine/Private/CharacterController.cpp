@@ -212,7 +212,7 @@ void CCharacterController::FreeFall(CTransform* pTransform, _float fTimeDelta, _
 
 	PxVec3 moveVector = PxVec3(0.f, m_fFallVelocity, 0.f) * fTimeDelta;
 
-	PxControllerCollisionFlags collisionFlags = m_pController->move(moveVector, 0.001f, fTimeDelta, PxControllerFilters()); //m_ControllerFilters);
+	PxControllerCollisionFlags collisionFlags = m_pController->move(moveVector, 0.001f, fTimeDelta, PxControllerFilters()); // m_ControllerFilters);
 
 	PxControllerState m_pPxState;
 	m_pController->getState(m_pPxState);
@@ -417,7 +417,8 @@ void CCharacterController::Release_Controller()
 		Safe_Delete(m_pControllerCallBack);
 		Safe_Delete(m_pControllerFilterCallback);
 		Safe_Delete(m_pControllerHitReport);
-
+		Safe_Delete(m_pQueryFilterCallback);
+		
 		if (m_pController->getActor()->getScene())
 			m_pGameInstance->RemoveActor(*m_pController->getActor());
 		
@@ -440,8 +441,17 @@ void CCharacterController::Set_DefaultValue()
 	m_tControllerDesc.userData = this;
 	// ControllerFilters
 	m_ControllerFilters.mFilterData = &physx::PxFilterData{ static_cast<physx::PxU32>(m_eCollisionType), 0, 0, 0 };
+	m_pQueryFilterCallback = new cQueryFilterCallback();
+	m_ControllerFilters.mFilterCallback = m_pQueryFilterCallback;
 	m_pControllerFilterCallback = new CControllerFilterCallback();
 	m_ControllerFilters.mCCTFilterCallback = m_pControllerFilterCallback;
+	
+	/* CCT-vs-shapes:
+	const PxFilterData*			mFilterData;
+	PxQueryFilterCallback*		mFilterCallback;
+	PxQueryFlags				mFilterFlags;
+	// CCT-vs-CCT:
+	PxControllerFilterCallback* mCCTFilterCallback;*/
 	#pragma endregion
 
 	// 컨트롤러의 질량(밀도)

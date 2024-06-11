@@ -90,6 +90,7 @@ protected:
 	class CControllerBehaviorCallback*	m_pControllerCallBack = nullptr;
 	class CUserControllerHitReport*		m_pControllerHitReport = nullptr;
 	class CControllerFilterCallback*	m_pControllerFilterCallback = nullptr;
+	class cQueryFilterCallback*			m_pQueryFilterCallback = nullptr;
 	_float								m_fSlopeLimitDegree = 45.f;
 	_float								m_fFallVelocity = { 0.f };
 	_float								m_fFallAcceleration = { 0.f };

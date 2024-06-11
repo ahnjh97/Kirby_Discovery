@@ -540,3 +540,23 @@ bool CControllerFilterCallback::filter(const PxController& pObj, const PxControl
 
     return true;
 }
+
+PxQueryHitType::Enum cQueryFilterCallback::preFilter(const PxFilterData& filterData, const PxShape* shape, const PxRigidActor* actor, PxHitFlags& queryFlags)
+{
+    // 지형 (PxRigidStatic)과의 충돌을 인지하기 위해 actor의 유형을 체크
+    if (actor->is<PxRigidStatic>())
+    {
+        // 지형과의 충돌을 인지
+       // MSG_BOX(TEXT("지형이랑 충돌이 일어났음."));
+        return PxQueryHitType::eBLOCK;
+    }
+
+    // 다른 객체들과의 충돌 기본 처리
+    return PxQueryHitType::eBLOCK;
+}
+
+PxQueryHitType::Enum cQueryFilterCallback::postFilter(const PxFilterData& filterData, const PxQueryHit& hit, const PxShape* shape, const PxRigidActor* actor)
+{
+    // 후처리 필터링 로직 (필요시 추가 구현)
+    return PxQueryHitType::eBLOCK;
+}
