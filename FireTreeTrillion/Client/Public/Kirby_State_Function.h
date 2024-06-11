@@ -706,6 +706,54 @@ static _bool Vacuum_Object(CKirby* pKirby, _float fTimeDelta)
 	return false;
 }
 
+// 주변에서 가장 가까운 목표 지점을 반환한다. 몬스터만 구현함.
+static _float4 Spit_Target_Object(CKirby* pKirby)
+{
+	CTransform* pTransformCom = pKirby->Get_TransformCom();
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+	_float fDistance = 30.f;
+	_float4 vTargetPos = { 0.f, 0.f, 0.f, 0.f };
+
+	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+
+	// 1차로 우선순위인 몬스터들 순회를 돈다.
+	if (nullptr != GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), g_strLayerMonster))
+	{
+
+		for (auto& pObject : *GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), g_strLayerMonster))
+		{
+			CTransform* pObjectTransform = pObject->Get_TransformCom();
+			_vector vObjectPos = pObjectTransform->Get_State_Vector(CTransform::STATE_POSITION);
+			_vector vObjectDir = vObjectPos - vPos;
+			_float fObjectDistance = XMVectorGetX(XMVector3Length(vObjectDir));
+
+			// 만약, 목표 오브젝트가 거리보다 멀었을 경우
+			if (fObjectDistance > fDistance)
+				continue;
+			// 만약, 목표 오브젝트가 거리보다 가까웠을 경우
+			else
+			{
+				_vector vLook = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+				// 내적 ( 30도 )
+				_float fDot = XMVectorGetX(XMVector3Dot(XMVector3Normalize(vObjectDir), vLook));
+				// 각도 계산 (도 단위)
+				_float fDegrees = XMConvertToDegrees(acosf(fDot));
+
+				if (fDegrees > 60.f)
+					continue;
+
+				// 최고기록 갱신
+				fDistance = fObjectDistance;
+				vTargetPos = vObjectPos;
+			}
+		}
+	}
+
+
+
+	return vTargetPos;
+}
+
 // 커비가 빌보드 한다.
 static void Kirby_Billboard(CTransform* pTransformCom, CGameObject* pCamera)
 {

@@ -46,7 +46,7 @@ HRESULT CAwoofy::Initialize(void* pArg)
 	m_fHp = 10.f;
 	m_fAttack = 8.f;
 	m_eVacuumSize = SIZE_SMALL;
-	m_eAbilityType = ABILITY_BOMB;
+	m_eAbilityType = ABILITY_DEFAULT;
 	m_eEyeState = AWOOFYEYE_IDLE;
 
 	Add_AnimEvent();
@@ -66,7 +66,7 @@ _int CAwoofy::Tick(_float fTimeDelta)
 	__super::Tick(m_fTimeDelta);
 
 	// 빨릴 때
-	if (m_ePhyXState == PO_VACUUMING)
+	if (m_ePhyXState == PO_VACUUMING || m_ePhyXState == PO_FLYDEADAWAY)
 		Change_State(CAwoofy::AWOOFY_DAMAGE, 120.f, true, false);
 
 	return OBJ_NOEVENT;
@@ -80,7 +80,9 @@ void CAwoofy::Late_Tick(_float fTimeDelta)
 
 	// 날아갈 땐, 애니메이션 재생이 되지 않는다.
 	if (m_ePhyXState != PO_FLYAWAY)
-		m_pModelCom->Play_Animation(m_fTimeDelta);
+	{
+		m_ePhyXState == PO_FLYDEADAWAY ? m_pModelCom->Play_Animation(m_fTimeDelta * 0.3f) : m_pModelCom->Play_Animation(m_fTimeDelta);
+	}
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
@@ -203,7 +205,15 @@ void CAwoofy::Render_IMGUI()
 }
 #endif
 
-void CAwoofy::Collision_Attack(CGameObject* pOtherObj)
+void CAwoofy::Collision_Body(CGameObject* pOtherObj)
+{
+	CPhysXObject* pObject = static_cast<CPhysXObject*>(pOtherObj);
+
+	Change_State(CAwoofy::AWOOFY_DAMAGE, 50.f, false, true);
+	m_eEyeState = AWOOFYEYE_HAPPY;
+}
+
+void CAwoofy::Collision_Object(CGameObject* pOtherObj)
 {
 	CPhysXObject* pObject = static_cast<CPhysXObject*>(pOtherObj);
 
@@ -211,15 +221,24 @@ void CAwoofy::Collision_Attack(CGameObject* pOtherObj)
 	if (pObject->Get_PhyXState() == PO_FLYAWAY)
 	{
 		// 같이 처맞고 날아가자.
+		pObject->Set_PhyXState(PO_FLYDEADAWAY);
+		m_ePhyXState = PO_FLYDEADAWAY;
+
+		CTransform* pObjectTransformCom = pObject->Get_TransformCom();
+
+		_vector vObjectPos = pObjectTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+
+		_vector vObjectDeadDir = vObjectPos - vPos;
+		_vector vMyDeadDir = vPos - vObjectPos;
+
+		vObjectDeadDir.m128_f32[1] = 0.f;
+		vMyDeadDir.m128_f32[1] = 0.f;
+
+		Set_DamageMoving(XMVector3Normalize(vMyDeadDir), 20.f);
+		pObject->Set_DamageMoving(XMVector3Normalize(vObjectDeadDir) * 0.5f, 15.f);
 
 	}
-	// 일반 충돌
-	else
-	{
-		Change_State(CAwoofy::AWOOFY_DAMAGE, 50.f, false, true);
-		m_eEyeState = AWOOFYEYE_HAPPY;
-	}
-
 }
 
 void CAwoofy::Change_State(AWOOFY_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)

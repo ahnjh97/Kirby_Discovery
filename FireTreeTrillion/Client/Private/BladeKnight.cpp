@@ -159,7 +159,7 @@ void CBladeKnight::Render_IMGUI()
 }
 #endif
 
-void CBladeKnight::Collision_Attack(CGameObject* pOtherObj)
+void CBladeKnight::Collision_Body(CGameObject* pOtherObj)
 {
 	//Change_State(BLADEKNIGHT_DAMAGE, 50.f, false, true);
 }

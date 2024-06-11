@@ -201,7 +201,7 @@ void CKabu::Render_IMGUI()
 }
 #endif
 
-void CKabu::Collision_Attack(CGameObject* pOtherObj)
+void CKabu::Collision_Body(CGameObject* pOtherObj)
 {
 }
 

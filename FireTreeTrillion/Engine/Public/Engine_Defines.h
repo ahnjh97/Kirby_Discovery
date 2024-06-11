@@ -38,7 +38,10 @@ namespace Engine
 
     enum COLLISION_CONTENT
     {
-        CONTENT_ATTACK,		// 공격 - 피격 처리
+        CONTENT_BODY,		    // 몸 끼리 박음
+        CONTENT_ATTACK,         // 충돌박스와의 충돌
+        CONTENT_VACUUMOBJECT,   // 커비가 흡수 후 날리는 것들과의 충돌
+
         CONTENT_INTERACT,	// 상호작용하는 객체끼리의 충돌
         CONTENT_ACQUIRE,	// 만나면 ObjDest가 삭제되는 충돌액션
         CONTENT_NONEVENT,	// 공통적인 충돌처리가 없는 경우

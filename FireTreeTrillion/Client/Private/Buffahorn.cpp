@@ -144,7 +144,7 @@ void CBuffahorn::Render_IMGUI()
 }
 #endif
 
-void CBuffahorn::Collision_Attack(CGameObject* pOtherObj)
+void CBuffahorn::Collision_Body(CGameObject* pOtherObj)
 {
 
 }

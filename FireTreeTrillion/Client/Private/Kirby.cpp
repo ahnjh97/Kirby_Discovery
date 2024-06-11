@@ -95,7 +95,6 @@ HRESULT CKirby::Initialize(void* pArg)
 	INFO(m_vMoveDir) = -1.f * m_pCameraLook;
 	INFO(m_vTargetDir) = INFO(m_vMoveDir);
 
-	//Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
 	m_pModelCom[INFO(m_eBodyState)]->Set_Animation(STATE_IDLE, 60.f, true, true);
 
 	m_fMaxHp = 100.f;
@@ -259,7 +258,7 @@ HRESULT CKirby::Render_DeferredInfo()
 
 }
 
-void CKirby::Collision_Attack(CGameObject* pOtherObj)
+void CKirby::Collision_Body(CGameObject* pOtherObj)
 {
 	CPhysXObject* pObject = static_cast<CPhysXObject*>(pOtherObj);
 
@@ -927,6 +926,10 @@ void CKirby::Free()
 
 	Safe_Release(m_pWeapons);
 	Safe_Release(m_pArmours);
+
+	if (INFO(m_pObject) != nullptr)
+		Safe_Release(INFO(m_pObject));
+
 	for (auto& fx : m_KirbyFXList)
 		Safe_Release(fx);
 
