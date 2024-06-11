@@ -207,10 +207,13 @@ void CAwoofy::Render_IMGUI()
 
 void CAwoofy::Collision_Body(CGameObject* pOtherObj)
 {
-	CPhysXObject* pObject = static_cast<CPhysXObject*>(pOtherObj);
+	if (m_ePhyXState == PO_NORMAL)
+	{
+		CPhysXObject* pObject = static_cast<CPhysXObject*>(pOtherObj);
 
-	Change_State(CAwoofy::AWOOFY_DAMAGE, 50.f, false, true);
-	m_eEyeState = AWOOFYEYE_HAPPY;
+		Change_State(CAwoofy::AWOOFY_DAMAGE, 50.f, false, true);
+		m_eEyeState = AWOOFYEYE_HAPPY;
+	}
 }
 
 void CAwoofy::Collision_Object(CGameObject* pOtherObj)

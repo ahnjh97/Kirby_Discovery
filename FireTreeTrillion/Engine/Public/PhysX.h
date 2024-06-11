@@ -41,7 +41,8 @@ public:
     
     _uint                               Get_CollisionContent(COLLISION_TYPE eMeType, COLLISION_TYPE eOtherType) 
     { 
-        return arrCollisionContents[eMeType][eOtherType];
+        return arrCollisionContents[eMeType][eOtherType] == CONTENT_END ? 
+            arrCollisionContents[eOtherType][eMeType] : arrCollisionContents[eMeType][eOtherType];
     }
 
     // NOT YET

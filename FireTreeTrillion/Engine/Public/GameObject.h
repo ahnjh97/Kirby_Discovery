@@ -63,6 +63,7 @@ public:
 	virtual void		Collision_Body(CGameObject* pGameObject) {}
 	virtual void		Collision_Object(CGameObject* pGameObject) {}
 	virtual void		Collision_Attack(CGameObject* pGameObject) {}
+	virtual void		Collision_Acquire(CGameObject* pGameObject) {}
 
 protected:
 	HRESULT				Add_Component(_uint iLevelIndex, const wstring& strPrototypeTag, const wstring& strComponentTag, class CComponent** ppOut, void* pArg = nullptr);

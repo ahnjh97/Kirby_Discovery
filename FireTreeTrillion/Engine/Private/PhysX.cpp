@@ -76,9 +76,17 @@ HRESULT CPhysX::Initialize()
 /// <summary> Initialize 'COLLISION_CONTENT' </summary>
 HRESULT CPhysX::Ready_CollisionContents()
 {
+    for (_int i = 0; i < COLLISION_END; i++)
+    {
+        for (_int j = 0; j < COLLISION_END; j++)
+        {
+            arrCollisionContents[i][j] = CONTENT_END;
+        }
+    }
+
+
     // 플레이어와 몬스터의 BODY충돌
     arrCollisionContents[PLAYER][MONSTER] = CONTENT_BODY;
-    arrCollisionContents[MONSTER][PLAYER] = CONTENT_BODY;
 
     // 커비의 히트박스와의 충돌
     //arrCollisionContents[플레이어 히트박스][MONSTER] = CONTENT_ATTACK;
@@ -493,8 +501,8 @@ void CUserControllerHitReport::CollsionEvent(CGameObject* pObj, CGameObject* pOt
 
     case CONTENT_ACQUIRE:
     {
-        //pObj->Collision_Acquire(pOtherObj);
-        //pOtherObj->Collision_Acquire(pObj);
+        pObj->Collision_Acquire(pOtherObj);
+        pOtherObj->Collision_Acquire(pObj);
     }
     break;
 
