@@ -168,24 +168,32 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const wstring & strLayerTag)
 	return S_OK;
 }
 
-HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& strLayerTag)
+HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& _wstrLayerTag)
 {
-	//파일명과 UITag 별도로 지정 필요
-	string strFilePath = { "../../../UI_txt/" };
-	string strFileExt = { "_Orig.txt" };
-	string strUITag = { "HUD_KirbyStatus" };
+	//모든 HUD를 준비
+	string strUITag = { "LayerUI" };
+	CHUD::HUD_STATUS eHUDType = CHUD::STAT_NONE;
 
-	//switch (CHUD::HUD_STATUS eHUDType{})
-	//{
-	//case CHUD::STAT_KIRBY:	strUITag = { "HUD_KirbyStatus" };	break;
-	//case CHUD::STAT_BOSS:	strUITag = { "HUD_KirbyStatus" };	break;
-	//case CHUD::STAT_COIN:	strUITag = { "HUD" };	break;
-	//default:	strUITag = { "LayerUI" };  break;
-	//}
+	map<CHUD::HUD_STATUS, string> HUDmap = 
+	{
+		{CHUD::STAT_KIRBY, "HUD_KirbyStatus"},
+		{CHUD::STAT_STARPOINT, "HUD_StarPoint"},
+		//{CHUD::STAT_NONE, "LayerUI"},
+	};
 
-	strFilePath += strUITag.c_str() + strFileExt;
-	if (FAILED(Load_FileData(strFilePath, FILE_UI, strLayerTag)))
-		return E_FAIL;
+	//auto it = HUDmap.find(eHUDType);
+	//if (it != HUDmap.end()) { strUITag = it->second;	}
+	//else {	strUITag = "LayerUI"; }
+
+	for (const auto& [eHUDType, strUITag] : HUDmap)
+	{
+		string strFilePath = { "../../../UI_txt/" };
+		string strFileExt = { "_Orig.txt" };
+
+		strFilePath += strUITag.c_str() + strFileExt;
+		if (FAILED(Load_FileData(strFilePath, FILE_UI, _wstrLayerTag)))
+			return E_FAIL;
+	}
 
 	return S_OK;
 }
@@ -372,7 +380,7 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 	return S_OK;
 }
 
-_bool CLevel_GamePlay::Load_FileData(const string& _strFilePath, FILE_TYPE _eFileType, const wstring& _strLayerTag)
+_bool CLevel_GamePlay::Load_FileData(const string& _strFilePath, FILE_TYPE _eFileType, const wstring& _wstrLayerTag)
 {
 	std::ifstream InputFile(_strFilePath, ios::in | std::ios::binary);
 
@@ -442,7 +450,7 @@ _bool CLevel_GamePlay::Load_FileData(const string& _strFilePath, FILE_TYPE _eFil
 			strProtoTag += strUITag;
 		}
 
-		HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, _strLayerTag, CUtils::StrToWstr(strProtoTag), &LayerUIDesc);
+		HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, _wstrLayerTag, CUtils::StrToWstr(strProtoTag), &LayerUIDesc);
 		CHECK_FAILED(hr);
 	}
 

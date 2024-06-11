@@ -350,8 +350,8 @@ HRESULT CRenderer::Initialize()
 	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_DeferredInfo"), 900.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
 		return E_FAIL;
 	
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_UI"), ViewportDesc.Width * 0.15f / 2.f, 100.f,
-		ViewportDesc.Width * 0.15f, ViewportDesc.Height * 0.15f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_UI"), ViewportDesc.Width * 0.1f / 2.f, ViewportDesc.Height * 0.1f / 2.f,
+		ViewportDesc.Width * 0.1f, ViewportDesc.Height * 0.1f)))
 		return E_FAIL;
 
 #endif

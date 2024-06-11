@@ -69,8 +69,25 @@ HRESULT CHUD_StarPoint::Initialize(void* _pArg)
 }
 
 _int CHUD_StarPoint::Tick(_float fTimeDelta)
-{	
+{
 	__super::Tick(fTimeDelta);
+
+	//Effect :: 코인 획득할 경우, 해당 이펙트 애니메이션 재생
+	if (m_UIObjDesc.wstrUITag == TEXT("StarPoint_Effect")){	}
+
+	if (m_pGameInstance->Get_DIKeyState(DIK_1, KEY_DOWN))
+	{
+		if (m_UIObjDesc.wstrUITag == TEXT("Font") || m_UIObjDesc.wstrUITag == TEXT("Font_Shadow"))
+		{
+			_uint iCount = stoi(m_UIObjDesc.wstrText);
+			iCount++;
+
+			if (iCount > 9) iCount = 0;
+			m_UIObjDesc.wstrText = to_wstring(iCount);
+		}
+
+	}
+
 
 	return OBJ_NOEVENT;
 }
@@ -84,6 +101,10 @@ HRESULT CHUD_StarPoint::Render()
 {
 	if (UI_TEXTURE == m_UIObjDesc.eUIType)
 	{
+		//Effect 기본값 :: 렌더 안하게 처리
+		if (m_UIObjDesc.wstrUITag == TEXT("StarPoint_Effect"))
+				return S_OK;
+
 		if (PROJ_ORTHO == m_UIObjDesc.eUIProj)
 			Render_OrthoProj(m_pShaderCom, m_pTransformCom);
 
@@ -97,10 +118,14 @@ HRESULT CHUD_StarPoint::Render()
 							-m_UIObjDesc.vPos.y + m_UIObjDesc.vCenter.y };
 
 		_float4 vFontRGBA = { m_UIObjDesc.vColorRGB.x, m_UIObjDesc.vColorRGB.y, m_UIObjDesc.vColorRGB.z, m_UIObjDesc.fAlpha };
-		if (FAILED(m_pGameInstance->
-			Render_Font(TEXT("Font_HUDSub_KR15"), m_UIObjDesc.wstrText, vFontPos, vFontRGBA,
-				XMConvertToRadians(m_UIObjDesc.vDegree.z))))
-			return E_FAIL;
+
+		wstring wstrFontTag = { TEXT("Font_HUD_StarPoint_NUM30") };
+
+		if (m_UIObjDesc.wstrUITag == TEXT("Font_Shadow"))
+			wstrFontTag = TEXT("Font_HUD_StarPoint_NUM37");
+
+		m_pGameInstance->Render_Font(wstrFontTag, m_UIObjDesc.wstrText, vFontPos, vFontRGBA, 
+									XMConvertToRadians(m_UIObjDesc.vDegree.z));
 	}
 
 	return S_OK;
@@ -137,7 +162,12 @@ HRESULT CHUD_StarPoint::Render_OrthoProj(CShader* _pShaderCom, CTransform* _pTra
 	if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
-	if (FAILED(Bind_ShaderResources(_pShaderCom, PS_ALPHABLEND, m_pTextureCom, m_iTexIndex)))
+	//아이콘의 경우, 기본값으로 렌더
+	SHADER_PS ePSIndex = { PS_ALPHABLEND };
+	if (m_UIObjDesc.wstrUITag == TEXT("StarPoint_Icon"))
+		ePSIndex = PS_DEFAULT;
+
+	if (FAILED(Bind_ShaderResources(_pShaderCom, ePSIndex, m_pTextureCom, m_iTexIndex)))
 		return E_FAIL;
 
 	return S_OK;

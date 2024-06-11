@@ -64,13 +64,13 @@ HRESULT CLevel_Tool_UI::Ready_Layer_Camera(const wstring& strLayerTag)
 {
 	CCamera_Free::CAMERA_FREE_DESC		CameraDesc{};
 	CameraDesc.fMouseSensor = 0.1f;
-	CameraDesc.fFovy = XMConvertToRadians(1.0f);
+	CameraDesc.fFovy = XMConvertToRadians(30.0f);
 
 	CameraDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	CameraDesc.fNear = 0.1f;
 	CameraDesc.fFar = 1000.0f;
 
-	CameraDesc.vEye = _float4(0.f, 0.f, -250.f/*g_iWinSizeX * -0.1f*/, 1.f);
+	CameraDesc.vEye = _float4(0.f, 0.f, -25.f, 1.f);
 	CameraDesc.vAt = _float4(0.f, 0.f, 1.f, 1.f);
 	CameraDesc.fSpeedPerSec = 10.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);

@@ -556,6 +556,7 @@ _bool CEditor_UI::Window_Tools()
 	return TRUE;
 }
 
+//보류) 애니메이션 키프레임 제어 및 설정 기능
 _bool CEditor_UI::Window_Sequencer()
 {
 	if (ImGui::Begin(u8"애니메이션 Animation"))
@@ -648,7 +649,7 @@ void CEditor_UI::Window_PopupAlert()
 		break;
 	}
 
-#pragma region POPUP ALERT
+#pragma region POPUP ALERT UI
 	ImVec2 ViewCenter = ImGui::GetMainViewport()->GetCenter();
 	ImGuiWindowFlags Popup_Flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove;
 	ImGui::SetNextWindowPos(ViewCenter, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
@@ -680,7 +681,7 @@ void CEditor_UI::Window_PopupAlert()
 			ImGui::SetCursorPos(ImVec2(InputPosX, WindowSize.y * 0.5f + 3.5f));
 			ImGui::InputText(u8"##", &strInput[0], strInput.capacity());
 
-			m_UIObjDesc.wstrUITag = Edit_LayerUITag(strInput);
+			m_UIObjDesc.wstrUITag = Edit_LayerUITag(strInput.c_str());
 		}
 
 		if (u8"Save" == g_strPopupTag || u8"Load" == g_strPopupTag)
@@ -772,7 +773,7 @@ void CEditor_UI::Window_PopupAlert()
 
 }
 
-//완료) 객체에 대한 변환(크기, 회전, 이동) 편집
+//완료) 객체에 대한 변환(크기, 회전, 이동, 직교&원근) 편집
 _bool CEditor_UI::Edit_Transform(CUIObject* _pUIObj)
 {
 	const char* DragTag = { "Translate 위치" };
@@ -816,7 +817,6 @@ _bool CEditor_UI::Edit_Transform(CUIObject* _pUIObj)
 	Style.FramePadding = ImVec2(20.f, 20.f);
 
 	ImGui::Text(u8"Projection 투영");
-	ImGui::SameLine(); HelpMarker(u8"단축키 설정필요");
 	ImGui::SameLine(fTextWidth + 35);
 
 	if (ImGui::RadioButton(u8"Ortho 직교", g_IsOrthoProj)) { g_IsOrthoProj = TRUE; }
@@ -842,7 +842,6 @@ _bool CEditor_UI::Edit_Transform(CUIObject* _pUIObj)
 
 #pragma endregion
 
-
 	ImGui::Text(u8"Scale 크기");
 	ImGui::SameLine(); HelpMarker(u8"Ctrl+E");
 	ImGui::SameLine(fTextWidth + 35);
@@ -857,7 +856,6 @@ _bool CEditor_UI::Edit_Transform(CUIObject* _pUIObj)
 	LayerUIDesc.vPos = (_float3)Translate;
 	LayerUIDesc.vDegree = (_float3)Rotate;
 	LayerUIDesc.vSize = (_float3)Scale;
-
 
 	_pUIObj->Set_UIObj_Desc(LayerUIDesc);
 
@@ -924,7 +922,7 @@ _bool CEditor_UI::Edit_RGBAColor(CUIObject* _pUIObj)
 	return TRUE;
 }
 
-//온료) 텍스트 편집
+//완료) 텍스트 편집
 _bool CEditor_UI::Edit_Text()
 {				
 	//폰트 편집 동기화
@@ -985,8 +983,6 @@ wstring CEditor_UI::Edit_LayerUITag(string _strInput)
 		if ((g_iSelectUI >= 0 && g_iSelectUI < m_LayerUIs.size()))
 		{
 			LayerUIDesc = m_LayerUIs[g_iSelectUI]->Get_UIObj_Desc();
-
-			//wstrUITag = CUtils::StrToWstrUTF8(_strInput);
 			wstrUITag = CUtils::StrToWstr(_strInput);
 			LayerUIDesc.wstrUITag = wstrUITag;
 
@@ -996,7 +992,7 @@ wstring CEditor_UI::Edit_LayerUITag(string _strInput)
 
 }
 
-//보류) 직교/원근투영 스왑
+//보류) 직교/원근투영 스왑 (카메라 담당자와 협의 필요)
 _bool CEditor_UI::Set_Projection()
 {	
 	// 05.24) 직교투영 스페이스 변환
@@ -1174,7 +1170,7 @@ void CEditor_UI::Delete_UIObject(UI_STATE _eUIState)
 	}
 }
 
-//진행 보류) 그룹 선택 후 기즈모 상속 동기화
+//보류) 그룹 선택 후 기즈모 상속 동기화
 void CEditor_UI::Group_UIObject(GROUP_TYPE _eUIGroup)
 {
 	if (m_LayerUIs.empty()) //레이어가 없음
@@ -1220,7 +1216,7 @@ void CEditor_UI::Group_UIObject(GROUP_TYPE _eUIGroup)
 
 }
 
-//진행 보류) 텍스처화 :: 엔진에서 렌더한 RTV 정보를 Texture2D로 받아 저장하는 방식
+//보류) 텍스처화 :: 엔진에서 렌더한 RTV 정보를 Texture2D로 받아 저장하는 방식
 void CEditor_UI::Save_Texture(const string& _strFilePath, ID3D11RenderTargetView* _pRTV)
 {
 	string strFilePath = { "../Bin/Resources/Textures/UI/DDS/" };
