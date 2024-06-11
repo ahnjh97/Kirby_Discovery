@@ -41,9 +41,13 @@
 
 #define Dir(vec3)					_float4{(vec3).x,( vec3).y, (vec3).z, 0.f}
 #define Pos(vec3)					_float4{(vec3).x, (vec3).y, (vec3).z, 1.f}
+#define F4toF3(vec4)				_float3{vec4.x, vec4.y, vec4.z}
 
 //어떤 범위 안의 값을 다른 범위로 매핑한다.
 #define MAPVALUE(x,  min1,  max1,  min2,  max2) (min2 + (x - min1) * (max2 - min2) / (max1 - min1))
+
+//float 보간 매크로
+#define LERP(start, dest, curRatio) _float(start + curRatio * (dest - start))
 
 #define BEGIN(NAMESPACE)	namespace NAMESPACE {
 #define END					}

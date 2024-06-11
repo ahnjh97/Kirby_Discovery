@@ -7,9 +7,8 @@ BEGIN(Client)
 
 class CCamera_Main final : public CCamera
 {
+public:
 	enum CAMSEQ { SEQ_ZOOMINOUT, SEQ_END };
-	enum CAMFOCUS { FOCUS_FIRST, FOCUS_SECOND, FOCUS_BOTH, FOCUS_END };
-
 
 	//카메라 시퀀스 구조체
 	typedef struct
@@ -40,31 +39,55 @@ private:
 	CCamera_Main(const CCamera_Main& rhs);
 	virtual ~CCamera_Main() = default;
 
-	//트래킹할 타겟을 세팅한다. (둘째 인수: 첫 번째 타겟? 두 번째 타겟?)
-	void Set_Target(CTransform* pTarget, _uint iTargetIdx = 0)
+
+//카메라 트리거 관련 함수
+public:
+	virtual void Set_Target(CTransform* pTarget, CAMFOCUS eFocus = FOCUS_FIRST) override
 	{
 		if (nullptr == pTarget)
 			return;
 
-		if (iTargetIdx == 0)
+		if (eFocus == FOCUS_FIRST)
 		{
 			if (nullptr != m_pFirstTarget)
 				Safe_Release(m_pFirstTarget);
 
 			m_pFirstTarget = pTarget;
 			Safe_AddRef(pTarget);
-
+			m_eCamFocus = eFocus;
 		}
-		else
+		else if(eFocus == FOCUS_SECOND)
 		{
 			if (nullptr != m_pSecondTarget)
 				Safe_Release(m_pSecondTarget);
 
 			m_pSecondTarget = pTarget;
 			Safe_AddRef(pTarget);
-
+			m_eCamFocus = eFocus;
 		}
 	}
+
+
+	void Set_MatrixIndex(_int iMatrixIndex);
+	void EmplaceBackCamMatrix(const _float4x4& matWorld);
+	void EmplaceBackDirRadius(_int iCamType, _fvector vDir, _float fRadius);
+	void LerpByTriggerInfo(_int iTriggerIndex);
+
+	void EmplaceBackTriggerInfo(const _float4x4& matWorld, _float fScale);
+
+	_float Compute_TriggerPosRatio(_int iTriggerIndex);
+
+	void StartLerpByTriggerInfo(_int iTriggerIndex) { m_bLerpByTriggerInfo = true; m_iMatrixIndex = iTriggerIndex; }
+	void EndLerpByTriggerInfo() { m_bLerpByTriggerInfo = false; };
+
+	_vector SlerpDirVec(_fvector vStart, _fvector vEnd, _float fRatio);
+
+
+
+//카메라 세팅(타겟, 기타 카메라 값) 관련 함수
+public:
+	void Set_CamFocus(CAMFOCUS eFocus) { m_eCamFocus = eFocus; }
+
 	//FOV를 세팅한다.
 	void Set_FOVY(_float fFOVYDegree) { m_fDestFovy = XMConvertToRadians(fFOVYDegree); }
 
@@ -86,21 +109,40 @@ private:
 	void Make_Sequence_FromQuat(EASING eEaseFlag, _float fDuration, _vector vDestQuat, _float fDestZoom = -1.f);
 
 
+
+
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual _int Tick(_float fTimeDelta) override;
 	//virtual _int Tick(_float fTimeDelta) override;
 	virtual void Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
-
+#ifdef _DEBUG
+	virtual void Render_IMGUI() override;
+#endif
 private:
+/*카메라 트리거*/
+	vector<_float4x4>	m_vecCamMatrices;
+	_int				m_iMatrixIndex = { -1 };
+
+	vector<pair<_vector, _float>>	m_vecFrontDirRadius;
+	vector<pair<_vector, _float>>	m_vecRearDirRadius;
+	vector<pair<_float4x4, _float>>	m_vecTriggerInfo; // Trigger InverseMatrix and Scale
+
+	_float m_fTriggerRatio = {};
+	_bool m_bLerpByTriggerInfo = { false };
+	_bool m_bPreLerpByTriggerInfo = { false };
+
+	_vector m_vSlerpedDir = {};
+	_float m_fLerpedRadius = {};
+
+
+	_float m_fDestUpOffset = { 0.f };
+	_float m_fCurUpOffset = { 0.f };
 
 /*타겟 트래킹*/
 
-	//카메라가 트래킹할 주요 타겟
-	CTransform* m_pFirstTarget = { nullptr };
-	//카메라가 트래킹할 보조 타겟
-	CTransform* m_pSecondTarget = { nullptr };
+
 	//현재 트래킹 설정
 	CAMFOCUS m_eCamFocus = { FOCUS_END };
 
@@ -108,7 +150,7 @@ private:
 	//카메라가 포커징할 기준점 
 	_float3 m_vAnchor = { 0.f, 0.f, 0.f };
 	//카메라의 실제 목표 위치
-	_float3 m_vCamDestPos = { 0.f, 0.f, 0.f };
+	_float3 m_vDestCamPos = { 0.f, 0.f, 0.f };
 
 
 	//기준점으로부터 현재 거리
@@ -118,6 +160,12 @@ private:
 	//(시퀀스 시)시작, 목표 거리
 	_float m_fStartDistance = { 0.f };
 	_float m_fDestDistance = { 0.f };
+
+	_float3 m_vCurCamDir = {0.f, 0.f, 0.f};
+	_float3 m_vDestCamDir = { 0.f, 0.f, 0.f };
+
+
+
 
 	//카메라 움직임 감도
 	_float	m_fCamSensor = { 0.f };

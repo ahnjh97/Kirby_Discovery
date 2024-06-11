@@ -1,4 +1,4 @@
-#include "stdafx.h"
+//#include "stdafx.h"
 #include "Level_MapTool.h"
 #include "Camera_Free.h"
 #include "ImGui_Client.h"

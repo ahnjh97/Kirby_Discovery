@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Level_GamePlay.h"
 #include "LevelChanger.h"
+#include "Camera_Main.h"
 #include "Camera_Free.h"
 #include "BasicMap.h"
 #include "UIObject.h"
@@ -115,6 +116,26 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 
 HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
 {
+	LEVEL eLevel = LEVEL_GAMEPLAY;
+
+
+	CCamera_Main::CAMERA_KIRBY_DESC		MainCamDesc{};
+	MainCamDesc.fFovy = XMConvertToRadians(30.0f);
+	MainCamDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
+	MainCamDesc.fNear = 0.1f;
+	MainCamDesc.fFar = 1000.0f;
+	MainCamDesc.vEye = _float4(0.f, 3.f, -1.f, 1.f);
+	MainCamDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
+	MainCamDesc.fSpeedPerSec = 10.f;
+	MainCamDesc.fRotationPerSec = XMConvertToRadians(90.0f);
+	MainCamDesc.fOrigDistance = 20.f;
+	MainCamDesc.fCamSensor = .3f;
+
+	if (FAILED(m_pGameInstance->Add_Clone(eLevel, strLayerTag, TEXT("Prototype_GameObject_Camera_Main"), &MainCamDesc)))
+		return E_FAIL;
+
+
+
 	CCamera_Free::CAMERA_FREE_DESC		CameraDesc{};
 	CameraDesc.fMouseSensor = 0.1f;
 	CameraDesc.fFovy = XMConvertToRadians(40.0f);
@@ -126,7 +147,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
 	CameraDesc.fSpeedPerSec = 10.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
+	if (FAILED(m_pGameInstance->Add_Clone(eLevel, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
 		return E_FAIL;
 	
 	return S_OK;
@@ -261,6 +282,10 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 	map<_int, pair<_vector, _float>> frontDirRadii;
 	map<_int, pair<_vector, _float>> rearDirRadii;
 	map<_int, pair<_float4x4, _float>> triggerInfos;
+	_uint iNumRallyPoints{};
+	_float3 vRallyPointPos{};
+	vector<_float4> vecRallyPoints;
+	string strConnectedMonster;
 
 	while (!fileStream.eof())
 	{
@@ -298,8 +323,26 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 			else if(CAM_REAR == iCamType)
 				rearDirRadii.emplace(iTriggerIndex, pair<_vector, _float>(vDir, fRadius));
 		}
-		else if ("NonAnim" == strModelName.substr(0, 7) && strModelName.substr(strModelName.size() -5) != "Kirby")
-			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
+		else if ("NonAnim" == strModelName.substr(0, 7) && strModelName.substr(strModelName.size() - 5) != "Kirby")
+		{
+			vecRallyPoints.clear();
+			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex)); // Monster Enum
+			fileStream.read(reinterpret_cast<char*>(&iNumRallyPoints), sizeof(iNumRallyPoints));
+			for (_uint iRallyPointIdx = 0; iRallyPointIdx < iNumRallyPoints; iRallyPointIdx++) {
+				fileStream.read(reinterpret_cast<char*>(&vRallyPointPos), sizeof(vRallyPointPos));
+				vecRallyPoints.push_back(_float4(vRallyPointPos.x, vRallyPointPos.y, vRallyPointPos.z, 1));
+			}
+		}
+		else if ("RallyPoint" == strModelName)
+		{
+			_uint iStrSize{};
+			fileStream.read(reinterpret_cast<char*>(&iStrSize), sizeof(iStrSize));
+			strConnectedMonster.resize(iStrSize);
+			fileStream.read(&strConnectedMonster[0], iStrSize);
+			_int iTempIdx{};
+			fileStream.read(reinterpret_cast<char*>(&iTempIdx), sizeof(iTempIdx));
+			continue;
+		}
 
 		if (fileStream.eof())
 			break;
@@ -309,34 +352,33 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 		tempDesc.wstrModelName = CUtils::StrToWstr(strModelName);
 		tempDesc.iShaderVars = iShaderVars;
 		tempDesc.fRimWidth = fRimWidth;
-
+		if (strModelName.size() >= 8) { // NonAnim_ 부분 지우기
+			if ("NonAnim" == strModelName.substr(0, 7))
+				tempDesc.wstrModelName.erase(0, 8);
+		}
+			
 		if ("NonAnim_Kirby" == strModelName)
 		{
-			tempDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby"), &tempDesc)))
 				return E_FAIL;
 		}
 		else if (strModelName == "NonAnim_Awoofy")
 		{
-			tempDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Awoofy"), &tempDesc)))
 				return E_FAIL;
 		}
 		else if (strModelName == "NonAnim_Rabbit")
 		{
-			tempDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Rabbit"), &tempDesc)))
 				return E_FAIL;
 		}
 		else if (strModelName == "NonAnim_Buffahorn")
 		{
-			tempDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Buffahorn"), &tempDesc)))
 				return E_FAIL;
 		}
 		else if (strModelName == "NonAnim_BladeKnight")
 		{
-			tempDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BladeKnight"), &tempDesc)))
 				return E_FAIL;
 		}
@@ -344,9 +386,9 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 		{
 			CKabu::KABU_DESC KabuDesc = {};
 			KabuDesc.matWorld = matWorld;
-			KabuDesc.wstrModelName = CUtils::StrToWstr(strModelName);
-			KabuDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기
-			KabuDesc.eMoveState = CKabu::KABUMOVING_PATROL;
+			KabuDesc.wstrModelName = tempDesc.wstrModelName;
+			KabuDesc.eMoveState = CKabu::KABUMOVING_STATE(iTriggerIndex);
+			KabuDesc.vecRallyPoints = vecRallyPoints;
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Kabu"), &KabuDesc)))
 				return E_FAIL;
 		}
@@ -374,7 +416,7 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 		{
 			CTrigger::TRIGGER_DESC tTriggerDesc{};
 			tTriggerDesc.matWorld = matWorld;
-			tTriggerDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			tTriggerDesc.wstrModelName = tempDesc.wstrModelName;
 			tTriggerDesc.iTriggerType = iTriggerType;
 			tTriggerDesc.iTriggerIndex = iTriggerIndex;
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Trigger"), TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc)))
@@ -386,9 +428,11 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 				return E_FAIL;
 		}
 	}
+
+
 	fileStream.close();
 
-	CCamera_Free* pCamera = dynamic_cast<CCamera_Free*> (m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Camera")));
+	CCamera_Main* pCamera = dynamic_cast<CCamera_Main*> (m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Camera")));
 	if (nullptr == pCamera)
 		return E_FAIL;
 

@@ -81,7 +81,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		fTimeAcc += pGameInstance->Compute_TimeDelta(TEXT("Timer_Default"));
 
-		if (fTimeAcc > 1.f / 144.f)
+        _float fFpsLimit = { 60.f };
+        _uint iCurLevel = *pGameInstance->Get_CurrentLevelID();
+        if (LEVEL_INTRO == iCurLevel || LEVEL_GAMEPLAY == iCurLevel)
+            fFpsLimit = 144.f;
+
+		if (fTimeAcc > 1.f / fFpsLimit)
 		{
             _float fTickTimeDelta = pGameInstance->Compute_TimeDelta(TEXT("Timer_60"));
 			pMainApp->Tick(fTickTimeDelta);

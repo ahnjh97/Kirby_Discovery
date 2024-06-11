@@ -171,7 +171,7 @@ private:
 	CModel*					m_pModelCom[BODY_END] = {nullptr};
 	CTexture*				m_pEyeTexture[EYE_END] = { nullptr };
 	CTexture*				m_pMouthTexture[MOUTH_END] = { nullptr };
-	class CCamera_Free*		m_pCamera = { nullptr };
+	class CCamera*		m_pCamera = { nullptr };
 
 private:
 	void			Update_PartObjectMatrix();

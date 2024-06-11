@@ -1618,7 +1618,7 @@ void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 	if (!m_bApplyCorrection)
 		return;
 
-	_float fInterpolateSpeed = 3.f * _fTimeDelta;
+	_float fInterpolateSpeed = 2.f * _fTimeDelta;
 
 	if (.01f < abs(m_fExposure - m_DestColorData.fExposure))
 	{

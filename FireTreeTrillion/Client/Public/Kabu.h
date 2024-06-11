@@ -24,6 +24,7 @@ public:
 
 	struct KABU_DESC : public CMonster::MONSTER_DESC {
 		KABUMOVING_STATE eMoveState = { KABUMOVING_END };
+		vector<_float4> vecRallyPoints;
 	};
 
 private:

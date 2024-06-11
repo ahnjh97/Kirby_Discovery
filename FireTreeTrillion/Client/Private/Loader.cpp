@@ -53,7 +53,11 @@
 #pragma endregion
 
 #pragma region °´Ã¼
+//Ä«¸Þ¶ó
 #include "Camera_Free.h"
+#include "Camera_Main.h"
+
+
 #include "TestModel.h"
 #include "TestTerrain.h"
 #include "Kirby.h"
@@ -218,8 +222,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kabu"), CKabu);
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BackGround"), CBackGround);
-	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_Test"), CTestUI);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Main"), CCamera_Main);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestMap"), CTestTerrain);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Moon"), CMoon);
@@ -625,7 +629,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 
 		m_vecModelInfo.emplace_back("Level0Stage1Step01", TYPE_NONANIM, 1.f, 0.f, 0, true);
+		m_vecModelInfo.emplace_back("Level0Stage1Step01_Blend", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f);
+		m_vecModelInfo.emplace_back("BG0", TYPE_NONANIM);
 
 		// For Monster
 		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.f, 180.f);
@@ -688,8 +694,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f);
 		m_vecModelInfo.emplace_back("Camera", TYPE_NONANIM, 0.2f, 270.f);
 		m_vecModelInfo.emplace_back("Dummy", TYPE_NONANIM, 0.01f);
-
-		//m_vecModelInfo.emplace_back("Level1Stage1Step01", TYPE_NONANIM, 1.f, 0.f, 0, true);
+		m_vecModelInfo.emplace_back("RallyPoint", TYPE_NONANIM, 2.f);
+		m_vecModelInfo.emplace_back("LightBulb", TYPE_NONANIM, 0.02f);
 	}
 	else if (eLevel == LEVEL_TOOL_ANIM)
 	{
