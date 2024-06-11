@@ -440,6 +440,8 @@ void CKirbyBalloon_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	{
 		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
 		{
+			Kirbydesc->m_fJumpVelocity = 0.f;
+			pController->Reset_FallVelocity();
 			pKirby->Change_State(CKirby::STATE_FLIGHTLANDING, 70.f, false, false, CKirby::BODY_VACUUM);
 		}
 	}

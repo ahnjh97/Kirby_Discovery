@@ -163,7 +163,7 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 		_float4x4 socketMatrix = *m_pSoketMatrix;
 		socketMatrix.Right().Normalize();
 		socketMatrix.Up().Normalize();
-		socketMatrix.Forward().Normalize();
+		socketMatrix.Backward().Normalize();
 
 		m_pTransformCom->Set_WorldMatrix( m_pTransformCom->Get_WorldMatrix() * socketMatrix);
 	}

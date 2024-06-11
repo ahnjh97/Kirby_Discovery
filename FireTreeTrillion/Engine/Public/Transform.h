@@ -32,7 +32,7 @@ public:
 		case STATE_UP:
 			return Dir(m_WorldMatrix.Up());
 		case STATE_LOOK:
-			return Dir(m_WorldMatrix.Forward());
+			return Dir(m_WorldMatrix.Backward());
 		case STATE_POSITION:
 			return Pos(m_WorldMatrix.Translation());
 		default:

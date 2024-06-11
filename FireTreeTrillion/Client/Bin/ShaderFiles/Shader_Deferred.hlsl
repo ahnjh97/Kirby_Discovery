@@ -199,9 +199,9 @@ float2 getRandom(in float2 uv)
 
 float doAmbientOcclusion(in float2 tcoord, in float2 uv, in float3 p, in float3 cnorm)
 {
-    float2 vUV = tcoord + uv;
+    float2 vUV = saturate(tcoord + uv);
     
-    vector vSSAO_DepthDesc = g_DepthTexture.Sample(PointSampler, vUV);
+    vector vSSAO_DepthDesc = g_DepthTexture.Sample(ClampSampler, vUV);
     float fSSAO_ViewZ = vSSAO_DepthDesc.y * g_fFar;
     float4 vSSAO_WorldPos;
     /* 로컬위치 * 월드행렬 * 뷰행렬 * 투영행렬 / View.z */
