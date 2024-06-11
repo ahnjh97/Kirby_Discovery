@@ -700,6 +700,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Dummy", TYPE_NONANIM, 0.01f);
 		m_vecModelInfo.emplace_back("RallyPoint", TYPE_NONANIM, 2.f);
 		m_vecModelInfo.emplace_back("LightBulb", TYPE_NONANIM, 0.02f);
+		m_vecModelInfo.emplace_back("Level0Stage1Step01", TYPE_NONANIM, 1.f, 0.f, 0, true);
+		m_vecModelInfo.emplace_back("Level1Stage1Step01", TYPE_NONANIM, 1.f, 0.f, 0, true);
 	}
 	else if (eLevel == LEVEL_TOOL_ANIM)
 	{
@@ -707,7 +709,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("BladeKnightSword",  TYPE_NONANIM, 1.f);
 	}
-
 }
 
 HRESULT CLoader::Add_Shaders(LEVEL eLevel)

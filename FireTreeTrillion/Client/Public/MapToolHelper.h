@@ -49,6 +49,7 @@ private:
 	void	Save_Octree();
 
 	void	RegisterRallyPoints(list<CGameObject*>* _pObjList);
+	void	InsertObjectsToOctree();
 
 	// Picking
 	CGameObject* Select_ModelByPicking(const wstring& wstrLayerTag = TEXT("Layer_Parse"));
@@ -74,6 +75,7 @@ private:
 	unordered_set<string>	m_setMonsterNames; 
 	unordered_set<string>	m_setTriggerNames;
 	unordered_set<string>	m_setRallyingMonsters;
+	unordered_set<string>	m_setObjectTxts;
 
 	vector<string>	m_vecMapTxts;
 	vector<string>	m_vecTriggerTxts;

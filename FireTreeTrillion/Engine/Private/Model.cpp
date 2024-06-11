@@ -335,9 +335,11 @@ COcTree* CModel::Create_OcTree(_float3 vMin, _float3 vMax, vector<_uint>& _vecPa
 	string strFilePath = "../../../objects_txt/" + m_tModel.strModelName + "_Octree.txt";
 	ifstream fileInput(strFilePath, ios::in | ios::binary);
 
+	vector<string> vecConstantNames = { "", "", "", "" };
+
 	COcTree* pOctree = COcTree::Create(m_pDevice, m_pContext, vCenter, vHalfExtents, vecVerticesPtrs, vecNumVertices
-		, vecNormalsPtrs, vecTexCoordsPtrs, vecTangentsPtrs,vecIndicesPtrs, vecNumIndices
-		, fileInput, m_Meshes, m_Materials, _vecPassIndices, _vecSamplingFactors);
+		, vecNormalsPtrs, vecTexCoordsPtrs, vecTangentsPtrs, vecIndicesPtrs, vecNumIndices
+		, fileInput, m_Meshes, m_Materials, _vecPassIndices, _vecSamplingFactors, vecConstantNames);
 
 	fileInput.close();
 
@@ -473,6 +475,25 @@ void CModel::CreateSamplerState()
 		Safe_Release(m_pSamplerState);
 		return;
 	}
+}
+
+HRESULT CModel::Bind_StencilRimLightMotionBlur(CShader* pShader, vector<string>& _vecConstantNames)
+{
+	if (pShader->Bind_RawValue(_vecConstantNames[0].c_str(), &m_bStencil, sizeof(m_bStencil)))
+		return E_FAIL;
+	if (pShader->Bind_RawValue(_vecConstantNames[1].c_str(), &m_bRimLight, sizeof(m_bRimLight)))
+		return E_FAIL;
+	if (pShader->Bind_RawValue(_vecConstantNames[2].c_str(), &m_fRimWidth, sizeof(m_fRimWidth)))
+		return E_FAIL;
+	if (pShader->Bind_RawValue(_vecConstantNames[3].c_str(), &m_bMotionBlur, sizeof(m_bMotionBlur)))
+		return E_FAIL;
+	
+	return S_OK;
+}
+
+void CModel::SetUpStencilRimLightMotionBlur(_uint iShaderVars, _float fRimWidth)
+{
+	
 }
 
 HRESULT CModel::Ready_Meshes(_bool bOctree)

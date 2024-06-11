@@ -166,6 +166,9 @@ void CMapToolHelper::SetUpTxtVectors()
 		}
 		++dir_iter;
 	}
+
+	for (auto& objTxt : m_vecObjectTxts)
+		m_setObjectTxts.insert(objTxt);
 }
 
 void CMapToolHelper::Menu_Level()
@@ -804,6 +807,8 @@ void CMapToolHelper::Save_Level()
 		return;
 	}
 
+	Save_Octree();
+
 	wstring wstrSaveMsg = CUtils::StrToWstr(strLevel) + TEXT(" Saved.");
 	MSG_BOX(wstrSaveMsg.c_str());
 }
@@ -1212,7 +1217,7 @@ _bool CMapToolHelper::ExcludeModel(string& _strModelName)
 	if (_strModelName.substr(0, 5) == "Smoke" || _strModelName.substr(0, 4) == "Test"
 		|| _strModelName.substr(0, 9) == "SkySphere" || _strModelName.substr(_strModelName.size() - 5) == "Blend"
 		|| "Tornado" == _strModelName || _strModelName.substr(0, 6) == "Vacuum" || _strModelName.substr(0, 5) == "Sword"
-		|| _strModelName.substr(_strModelName.size() - 5) == "Sword" )
+		|| _strModelName.substr(_strModelName.size() - 5) == "Sword" || _strModelName.substr(0, 5) == "Kirby")
 		return true;
 
 	return _bool();
@@ -1235,6 +1240,10 @@ void CMapToolHelper::Reset_MapShaderInfo()
 
 void CMapToolHelper::Save_Octree()
 {
+	InsertObjectsToOctree();
+
+
+
 
 }
 
@@ -1300,6 +1309,20 @@ void CMapToolHelper::RegisterRallyPoints(list<CGameObject*>* _pObjList)
 
 		pNearestMonster->Emplace_RallyPoint(iRallyPointIndex, vFloatPos);
 	}
+}
+
+void CMapToolHelper::InsertObjectsToOctree()
+{
+	list<CGameObject*>* pObjList = m_pGameInstance->Get_List(LEVEL_TOOL_MAP, TEXT("Layer_Parse"));
+
+	if (nullptr == pObjList || pObjList->empty())
+		return;
+
+	list<CGameObject*> nonCollisionList; // Anim X, StaticActorX
+	list<CGameObject*> animList;	// Anim O, StaticActor X
+	list<CGameObject*> staticActorList; // Anim X, StaticActor O;
+
+
 }
 
 CMapToolHelper* CMapToolHelper::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

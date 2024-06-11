@@ -11,7 +11,7 @@ public:
 	{		
 		_float4x4	matWorld = _float4x4::Identity;
 		wstring		wstrModelName;
-		_uint		iShaderVars = { 2 };
+		_uint		iShaderVars = { 6 };
 		_float		fRimWidth = { 0.2f };
 	}GAMEOBJECT_DESC;
 
@@ -97,7 +97,7 @@ protected:
 
 	_float									m_fRimWidth = { 0.2f };
 	_uint									m_iShaderVars = {};
-	_bool									m_bStencil = { false };
+	_bool									m_bStencil = { true };
 	_bool									m_bRimLight = { true };
 	_bool									m_bMotionBlur = { false };
 

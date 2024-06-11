@@ -90,6 +90,9 @@ public:
 	/*ID3D11ShaderResourceView* CreateTexture2DArraySRV(const vector<wstring>& filePaths);*/
 	void CreateSamplerState();
 
+	HRESULT Bind_StencilRimLightMotionBlur(class CShader* pShader, vector<string>& _vecConstantNames); // For Binding at Octree
+	void SetUpStencilRimLightMotionBlur(_uint iShaderVars, _float fRimWidth); // For Binding at Octree
+
 private:
 	_uint						m_iNumMeshes = { 0 };
 	vector<class CMesh*>		m_Meshes;
@@ -127,6 +130,11 @@ private:
 	vector<ID3D11ShaderResourceView*>	m_vecTextureArraySRVs;
 	ID3D11SamplerState*			m_pSamplerState = { nullptr };
 
+	_float						m_fRimWidth = { 0.2f }; // For Binding at Octree
+	_uint						m_iShaderVars = {};
+	_bool						m_bStencil = { true };
+	_bool						m_bRimLight = { true };
+	_bool						m_bMotionBlur = { false };
 
 private:
 	HRESULT Ready_Meshes(_bool bOctree);

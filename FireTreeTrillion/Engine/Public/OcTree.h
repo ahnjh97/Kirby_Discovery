@@ -19,13 +19,13 @@ public:
 		, const vector<_float2*>& _vecTexCoordsPtrs, const vector<_float3*>& _vecTangentsPtrs
 		, const vector<_uint*>& _vecIndicesPtrs, const vector<_uint>& _vecNumIndices, ifstream& fileInput
 		, const vector<class CMesh*>& _vecMeshes, const vector<MESH_MATERIAL>& _vecMaterials
-		, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors);
+		, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors, vector<string>& _vecConstantNames, _bool bLoadFromFile);
 
 	HRESULT Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _float3 vCenter, _float3 vHalfExtents
 		, const vector<_float3*>& _vecVerticesPtrs, const vector<_uint>& _vecNumVertices, const vector<_float3*>& _vecNormalPtrs
 		, const vector<_float2*>& _vecTexCoordsPtrs, const vector<_float3*>& _vecTangentsPtrs
 		, vector<vector<FACE>>& _vecMeshFaces, ifstream& fileInput, const vector<vector<class CTexture*>>& _vecSortedMaterials
-		, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors);
+		, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors, vector<string>& _vecConstantNames, _bool bLoadFromFile);
 
 	void Culling(class CGameInstance* pGameInstance, class CShader* pShaderCom, _uint& iRenderAll, _uint& iRenderMyMesh);
 	_bool IsDrawable(class CGameInstance* pGameInstance);
@@ -43,6 +43,11 @@ public:
 	void RenderAll(class CShader* pShaderCom);
 	void RenderMyMesh(class CShader* pShaderCom);
 
+	
+	void InsertNonColModels(vector<class CModel*>& _vecNonColModels);
+	void InsertColNonAnimModels(vector<class CModel*>& _vecColNonAnimModels);
+	void InsertColAnimModels(vector<class CModel*>& _vecColAnimModels);
+
 private:
 	_uint					m_iNumMeshes = {};
 
@@ -58,25 +63,30 @@ private:
 	vector<_uint>			m_vecPassIndices;
 	vector<_float>			m_vecSamplingFactors;
 
-
 	vector<class CMesh*>	m_vecMyMeshes;
 	vector<vector<class CTexture*>>	m_vecMyMaterials;
 	vector<_uint>			m_vecMyPassIndices;
 	vector<_float>			m_vecMySamplingFactors;
 
+	vector<class CModel*>	m_vecNonColModels;
+	vector<class CModel*>	m_vecColNonAnimModels;
+	vector<class CModel*>	m_vecColAnimModels;
+
+	vector<string>			m_vecConstantNames;
+	
 public:
 	static COcTree* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _float3 vCenter, _float3 vHalfExtents
 		, const vector<_float3*>& _vecVerticesPtrs, const vector<_uint>& _vecNumVertices, const vector<_float3*>& _vecNormalPtrs
 		, const vector<_float2*>& _vecTexCoordsPtrs, const vector<_float3*>& _vecTangentsPtrs
 		, const vector<_uint*>& _vecIndicesPtrs, const vector<_uint>& _vecNumIndices, ifstream& fileInput
 		, const vector<class CMesh*>& _vecMeshes, const vector<MESH_MATERIAL>& _vecMaterials
-		, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors);
+		, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors, vector<string>& _vecConstantNames,  _bool bLoadFromFile = false);
 
 	static COcTree* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _float3 vCenter, _float3 vHalfExtents
 		, const vector<_float3*>& _vecVerticesPtrs, const vector<_uint>& _vecNumVertices, const vector<_float3*>& _vecNormalPtrs
 		, const vector<_float2*>& _vecTexCoordsPtrs, const vector<_float3*>& _vecTangentsPtrs
 		, vector<vector<FACE>>& _vecMeshFaces, ifstream& fileInput, const vector<vector<class CTexture*>>& _vecSortedMaterials
-		, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors);
+		, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors, vector<string>& _vecConstantNames, _bool bLoadFromFile = false);
 
 public:
 	virtual void Free() override;

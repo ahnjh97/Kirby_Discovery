@@ -14,7 +14,7 @@ HRESULT COcTree::Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext
 	, const vector<_float2*>& _vecTexCoordsPtrs, const vector<_float3*>& _vecTangentsPtrs
 	, const vector<_uint*>& _vecIndicesPtrs, const vector<_uint>& _vecNumIndices, ifstream& fileInput
 	, const vector<CMesh*>& _vecMeshes, const vector<MESH_MATERIAL>& _vecMaterials
-	, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors)
+	, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors, vector<string>& _vecConstantNames, _bool bLoadFromFile)
 {
 	if (false == _vecMeshes.empty())
 		m_vecMeshes = _vecMeshes;
@@ -31,6 +31,7 @@ HRESULT COcTree::Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext
 	m_vecMaterials.resize(m_iNumMeshes);
 	for (auto& vecTex : m_vecMaterials)
 		vecTex.resize(3); // Diffuse, Normal, MRA
+	m_vecConstantNames = _vecConstantNames;
 
 	SetUp_Edges(vCenter, vHalfExtents);
 
@@ -54,7 +55,10 @@ HRESULT COcTree::Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext
 		Safe_AddRef(_vecMaterials[iMatIndex].MaterialTextures[TextureType_METALNESS]);
 	}
 
-	if (false == Load_OctreeData(fileInput))
+
+	if (true == bLoadFromFile)
+		Load_OctreeData(fileInput);
+	else
 	{
 		vector<vector<FACE>> vecMeshResultFaces(m_iNumMeshes);
 
@@ -62,90 +66,9 @@ HRESULT COcTree::Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext
 			vecMeshResultFaces[iMeshIdx].resize(_vecNumIndices[iMeshIdx] / 3);
 			memcpy(vecMeshResultFaces[iMeshIdx].data(), _vecIndicesPtrs[iMeshIdx], _vecNumIndices[iMeshIdx] * sizeof(_uint));
 		}
-		
-		for (_uint iMeshIdx = 0; iMeshIdx < m_iNumMeshes; iMeshIdx++)
-			IdentifyOctant(iMeshIdx, _vecVerticesPtrs[iMeshIdx], _vecNumVertices[iMeshIdx], vecMeshResultFaces[iMeshIdx]);
-	}
-
-
-	// Create MyMesh
-	for (_uint iMeshIdx = 0; iMeshIdx < m_iNumMeshes; iMeshIdx++) {
-		if (m_vecMeshFaces[iMeshIdx].empty())
-			continue;
-
-		CMesh* pMyMesh = CMesh::Create(pDevice, pContext, _vecVerticesPtrs[iMeshIdx], _vecNumVertices[iMeshIdx], _vecNormalPtrs[iMeshIdx]
-			,_vecTexCoordsPtrs[iMeshIdx], _vecTangentsPtrs[iMeshIdx], m_vecMeshFaces[iMeshIdx]);
-
-		if (nullptr == pMyMesh)
-			continue;
-
-		m_vecMyMeshes.push_back(pMyMesh);
-		m_vecMyMaterials.push_back(m_vecMaterials[iMeshIdx]);
-		for (auto& tex : m_vecMaterials[iMeshIdx])
-			Safe_AddRef(tex);
-		m_vecMyPassIndices.push_back(m_vecPassIndices[iMeshIdx]);
-		m_vecMySamplingFactors.push_back(m_vecSamplingFactors[iMeshIdx]);
-	}
-	
-
-	// Create Children
-	vector<_float3> vecChildrenCenters(OC_END);
-
-	_float3 vQuarterExtents = _float3(vHalfExtents.x * 0.5f, vHalfExtents.y * 0.5f, vHalfExtents.z * 0.5f);
-	SetUp_ChildrenCenter(vCenter, vQuarterExtents, vecChildrenCenters);
-
-	for (_int j = 0; j < OC_END; j++) {
-		m_vecChildren[j] = COcTree::Create(pDevice, pContext, vecChildrenCenters[j], vQuarterExtents
-			, _vecVerticesPtrs, _vecNumVertices, _vecNormalPtrs, _vecTexCoordsPtrs, _vecTangentsPtrs
-			,m_vecChildrenFaces[j], fileInput, m_vecMaterials, _vecPassIndices, _vecSamplingFactors);
-	}
-
-	return S_OK;
-}
-
-HRESULT COcTree::Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _float3 vCenter, _float3 vHalfExtents
-	, const vector<_float3*>& _vecVerticesPtrs, const vector<_uint>& _vecNumVertices, const vector<_float3*>& _vecNormalPtrs
-	, const vector<_float2*>& _vecTexCoordsPtrs, const vector<_float3*>& _vecTangentsPtrs
-	, vector<vector<FACE>>& _vecMeshFaces, ifstream& fileInput, const vector<vector<CTexture*>>& _vecSortedMaterials
-	, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors)
-{
-	m_iNumMeshes = _vecVerticesPtrs.size();
-	m_vCenter = vCenter;
-	m_vecEdges.resize(OC_END);
-	m_vecChildren.resize(OC_END);
-	m_vecMeshFaces.resize(m_iNumMeshes);
-	m_vecChildrenFaces.resize(OC_END);
-	for (auto& vecChildFaces : m_vecChildrenFaces)
-		vecChildFaces.resize(m_iNumMeshes);
-
-	SetUp_Edges(vCenter, vHalfExtents);
-
-	if (false == Load_OctreeData(fileInput))
-	{
-		vector<vector<FACE>> vecMeshResultFaces(m_iNumMeshes);
-		vecMeshResultFaces = _vecMeshFaces;
 
 		for (_uint iMeshIdx = 0; iMeshIdx < m_iNumMeshes; iMeshIdx++)
 			IdentifyOctant(iMeshIdx, _vecVerticesPtrs[iMeshIdx], _vecNumVertices[iMeshIdx], vecMeshResultFaces[iMeshIdx]);
-	}
-		// Create Mesh
-		for (_uint iMeshIdx = 0; iMeshIdx < m_iNumMeshes; iMeshIdx++) {
-			if (_vecMeshFaces[iMeshIdx].empty())
-				continue;
-
-			CMesh* pMyMesh = CMesh::Create(pDevice, pContext, _vecVerticesPtrs[iMeshIdx], _vecNumVertices[iMeshIdx], _vecNormalPtrs[iMeshIdx]
-				, _vecTexCoordsPtrs[iMeshIdx], _vecTangentsPtrs[iMeshIdx], _vecMeshFaces[iMeshIdx]);
-
-			if (nullptr == pMyMesh)
-				continue;
-
-			m_vecMeshes.push_back(pMyMesh);
-			m_vecMaterials.push_back(_vecSortedMaterials[iMeshIdx]);
-			for (auto& tex : _vecSortedMaterials[iMeshIdx])
-				Safe_AddRef(tex);
-			m_vecPassIndices.push_back(_vecPassIndices[iMeshIdx]);
-			m_vecSamplingFactors.push_back(_vecSamplingFactors[iMeshIdx]);
-		}
 
 		// Create MyMesh
 		for (_uint iMeshIdx = 0; iMeshIdx < m_iNumMeshes; iMeshIdx++) {
@@ -159,11 +82,93 @@ HRESULT COcTree::Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext
 				continue;
 
 			m_vecMyMeshes.push_back(pMyMesh);
-			m_vecMyMaterials.push_back(_vecSortedMaterials[iMeshIdx]);
-			for(auto& tex : _vecSortedMaterials[iMeshIdx])
+			m_vecMyMaterials.push_back(m_vecMaterials[iMeshIdx]);
+			for (auto& tex : m_vecMaterials[iMeshIdx])
 				Safe_AddRef(tex);
-			m_vecMyPassIndices.push_back(_vecPassIndices[iMeshIdx]);
-			m_vecMySamplingFactors.push_back(_vecSamplingFactors[iMeshIdx]);
+			m_vecMyPassIndices.push_back(m_vecPassIndices[iMeshIdx]);
+			m_vecMySamplingFactors.push_back(m_vecSamplingFactors[iMeshIdx]);
+		}
+	}
+
+	// Create Children
+	vector<_float3> vecChildrenCenters(OC_END);
+
+	_float3 vQuarterExtents = _float3(vHalfExtents.x * 0.5f, vHalfExtents.y * 0.5f, vHalfExtents.z * 0.5f);
+	SetUp_ChildrenCenter(vCenter, vQuarterExtents, vecChildrenCenters);
+
+	for (_int j = 0; j < OC_END; j++) {
+		m_vecChildren[j] = COcTree::Create(pDevice, pContext, vecChildrenCenters[j], vQuarterExtents
+			, _vecVerticesPtrs, _vecNumVertices, _vecNormalPtrs, _vecTexCoordsPtrs, _vecTangentsPtrs
+			,m_vecChildrenFaces[j], fileInput, m_vecMaterials, _vecPassIndices, _vecSamplingFactors
+			, _vecConstantNames, bLoadFromFile);
+	}
+
+	return S_OK;
+}
+
+HRESULT COcTree::Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _float3 vCenter, _float3 vHalfExtents
+	, const vector<_float3*>& _vecVerticesPtrs, const vector<_uint>& _vecNumVertices, const vector<_float3*>& _vecNormalPtrs
+	, const vector<_float2*>& _vecTexCoordsPtrs, const vector<_float3*>& _vecTangentsPtrs
+	, vector<vector<FACE>>& _vecMeshFaces, ifstream& fileInput, const vector<vector<CTexture*>>& _vecSortedMaterials
+	, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors, vector<string>& _vecConstantNames, _bool bLoadFromFile)
+{
+	m_iNumMeshes = _vecVerticesPtrs.size();
+	m_vCenter = vCenter;
+	m_vecEdges.resize(OC_END);
+	m_vecChildren.resize(OC_END);
+	m_vecMeshFaces.resize(m_iNumMeshes);
+	m_vecChildrenFaces.resize(OC_END);
+	for (auto& vecChildFaces : m_vecChildrenFaces)
+		vecChildFaces.resize(m_iNumMeshes);
+	m_vecConstantNames = _vecConstantNames;
+
+	SetUp_Edges(vCenter, vHalfExtents);
+
+	if (false == Load_OctreeData(fileInput))
+	{
+		vector<vector<FACE>> vecMeshResultFaces(m_iNumMeshes);
+		vecMeshResultFaces = _vecMeshFaces;
+
+		for (_uint iMeshIdx = 0; iMeshIdx < m_iNumMeshes; iMeshIdx++)
+			IdentifyOctant(iMeshIdx, _vecVerticesPtrs[iMeshIdx], _vecNumVertices[iMeshIdx], vecMeshResultFaces[iMeshIdx]);
+	}
+
+	// Create Mesh
+	for (_uint iMeshIdx = 0; iMeshIdx < m_iNumMeshes; iMeshIdx++) {
+		if (_vecMeshFaces[iMeshIdx].empty())
+			continue;
+
+		CMesh* pMyMesh = CMesh::Create(pDevice, pContext, _vecVerticesPtrs[iMeshIdx], _vecNumVertices[iMeshIdx], _vecNormalPtrs[iMeshIdx]
+			, _vecTexCoordsPtrs[iMeshIdx], _vecTangentsPtrs[iMeshIdx], _vecMeshFaces[iMeshIdx]);
+
+		if (nullptr == pMyMesh)
+			continue;
+
+		m_vecMeshes.push_back(pMyMesh);
+		m_vecMaterials.push_back(_vecSortedMaterials[iMeshIdx]);
+		for (auto& tex : _vecSortedMaterials[iMeshIdx])
+			Safe_AddRef(tex);
+		m_vecPassIndices.push_back(_vecPassIndices[iMeshIdx]);
+		m_vecSamplingFactors.push_back(_vecSamplingFactors[iMeshIdx]);
+	}
+
+	// Create MyMesh
+	for (_uint iMeshIdx = 0; iMeshIdx < m_iNumMeshes; iMeshIdx++) {
+		if (m_vecMeshFaces[iMeshIdx].empty())
+			continue;
+
+		CMesh* pMyMesh = CMesh::Create(pDevice, pContext, _vecVerticesPtrs[iMeshIdx], _vecNumVertices[iMeshIdx], _vecNormalPtrs[iMeshIdx]
+			, _vecTexCoordsPtrs[iMeshIdx], _vecTangentsPtrs[iMeshIdx], m_vecMeshFaces[iMeshIdx]);
+
+		if (nullptr == pMyMesh)
+			continue;
+
+		m_vecMyMeshes.push_back(pMyMesh);
+		m_vecMyMaterials.push_back(_vecSortedMaterials[iMeshIdx]);
+		for(auto& tex : _vecSortedMaterials[iMeshIdx])
+			Safe_AddRef(tex);
+		m_vecMyPassIndices.push_back(_vecPassIndices[iMeshIdx]);
+		m_vecMySamplingFactors.push_back(_vecSamplingFactors[iMeshIdx]);
 	}
 
 	_uint iTotal{};
@@ -183,7 +188,8 @@ HRESULT COcTree::Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext
 	for (_int j = 0; j < OC_END; j++) {
 		m_vecChildren[j] = COcTree::Create(pDevice, pContext, vecChildrenCenters[j], vQuarterExtents
 			, _vecVerticesPtrs, _vecNumVertices, _vecNormalPtrs, _vecTexCoordsPtrs, _vecTangentsPtrs
-			, m_vecChildrenFaces[j], fileInput, _vecSortedMaterials, _vecPassIndices, _vecSamplingFactors);
+			, m_vecChildrenFaces[j], fileInput, _vecSortedMaterials, _vecPassIndices, _vecSamplingFactors
+			, _vecConstantNames, bLoadFromFile);
 	}
 	
 	return S_OK;
@@ -464,18 +470,33 @@ void COcTree::RenderMyMesh(CShader* pShaderCom)
 		pChild->RenderAll(pShaderCom);
 }
 
+void COcTree::InsertNonColModels(vector<class CModel*>& _vecNonColModels)
+{
+
+}
+
+void COcTree::InsertColNonAnimModels(vector<class CModel*>& _vecColNonAnimModels)
+{
+
+}
+
+void COcTree::InsertColAnimModels(vector<class CModel*>& _vecColAnimModels)
+{
+
+}
+
 COcTree* COcTree::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _float3 vCenter, _float3 vHalfExtents
 	, const vector<_float3*>& _vecVerticesPtrs, const vector<_uint>& _vecNumVertices, const vector<_float3*>& _vecNormalPtrs
 	, const vector<_float2*>& _vecTexCoordsPtrs, const vector<_float3*>& _vecTangentsPtrs
 	, const vector<_uint*>& _vecIndicesPtrs, const vector<_uint>& _vecNumIndices, ifstream& fileInput
 	, const vector<class CMesh*>& _vecMeshes, const vector<MESH_MATERIAL>& _vecMaterials
-	, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors)
+	, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors, vector<string>& _vecConstantNames, _bool bLoadFromFile)
 {
 	COcTree* pInstance = new COcTree();
 
 	if (FAILED(pInstance->Initialize(pDevice, pContext, vCenter, vHalfExtents, _vecVerticesPtrs, _vecNumVertices
 		, _vecNormalPtrs, _vecTexCoordsPtrs, _vecTangentsPtrs,  _vecIndicesPtrs, _vecNumIndices, fileInput, _vecMeshes
-		, _vecMaterials, _vecPassIndices, _vecSamplingFactors)))
+		, _vecMaterials, _vecPassIndices, _vecSamplingFactors, _vecConstantNames, bLoadFromFile)))
 	{
 		MSG_BOX(TEXT("Failed to Create : COcTree"));
 		Safe_Release(pInstance);
@@ -488,12 +509,13 @@ COcTree* COcTree::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _
 	, const vector<_float3*>& _vecVerticesPtrs, const vector<_uint>& _vecNumVertices, const vector<_float3*>& _vecNormalPtrs
 	, const vector<_float2*>& _vecTexCoordsPtrs, const vector<_float3*>& _vecTangentsPtrs
 	, vector<vector<FACE>>& _vecMeshFaces, ifstream& fileInput, const vector<vector<CTexture*>>& _vecSortedMaterials
-	, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors)
+	, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors, vector<string>& _vecConstantNames, _bool bLoadFromFile)
 {
 	COcTree* pInstance = new COcTree();
 
 	if (FAILED(pInstance->Initialize(pDevice, pContext, vCenter, vHalfExtents, _vecVerticesPtrs, _vecNumVertices, _vecNormalPtrs
-		, _vecTexCoordsPtrs, _vecTangentsPtrs, _vecMeshFaces, fileInput, _vecSortedMaterials, _vecPassIndices, _vecSamplingFactors)))
+		, _vecTexCoordsPtrs, _vecTangentsPtrs, _vecMeshFaces, fileInput, _vecSortedMaterials, _vecPassIndices, _vecSamplingFactors
+		, _vecConstantNames, bLoadFromFile)))
 	{
 		MSG_BOX(TEXT("Failed to Create : COcTree"));
 		Safe_Release(pInstance);
