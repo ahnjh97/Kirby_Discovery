@@ -379,6 +379,7 @@ HRESULT CRenderer::Initialize()
 	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_UI"), ViewportDesc.Width * 0.1f / 2.f, ViewportDesc.Height * 0.1f / 2.f,
 		ViewportDesc.Width * 0.1f, ViewportDesc.Height * 0.1f)))
 
+#endif
 
 	return S_OK;
 }

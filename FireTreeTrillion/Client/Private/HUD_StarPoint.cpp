@@ -82,7 +82,7 @@ _int CHUD_StarPoint::Tick(_float fTimeDelta)
 			_uint iCount = stoi(m_UIObjDesc.wstrText);
 			iCount++;
 
-			if (iCount > 9) iCount = 0;
+			/*if (iCount % 100 > 9) iCount = 0;*/
 			m_UIObjDesc.wstrText = to_wstring(iCount);
 		}
 

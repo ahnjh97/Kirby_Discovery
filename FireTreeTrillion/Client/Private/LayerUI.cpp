@@ -142,7 +142,7 @@ HRESULT CLayerUI::Render_OrthoProj(CShader* _pShaderCom, CTransform* _pTransCom)
 	if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
-	if (FAILED(Bind_ShaderResources(_pShaderCom, /*PS_ALPHABLEND*/ PS_DEFAULT, m_pTextureCom, m_iTexIndex)))
+	if (FAILED(Bind_ShaderResources(_pShaderCom, PS_ALPHABLEND, m_pTextureCom, m_iTexIndex)))
 		return E_FAIL;
 
 	return S_OK;
