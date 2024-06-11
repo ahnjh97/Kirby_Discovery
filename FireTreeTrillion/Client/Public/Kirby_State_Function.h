@@ -687,8 +687,8 @@ static _bool Vacuum_Object(CKirby* pKirby, _float fTimeDelta)
 		// 참조하면서 애니메이션으로 끌고간다.
 		Safe_AddRef(DESC(m_pObject));
 		// 커비가 동일한 애니메이션으로 몬스터를 포착해서 꽤 긴 시간동안 서로 짝짝꿍하겠다는 것이다.
-		pKirby->Set_Vacuuming(true);
-		DESC(m_pObject)->Set_Vacuuming(true);
+		//pKirby->Set_PhyXState(PO_VACUUMING);
+		DESC(m_pObject)->Set_PhyXState(PO_VACUUMING);
 
 		if (DESC(m_pObject)->Get_VacuumSize() == SIZE_SMALL)
 			pKirby->Change_State(CKirby::STATE_VACUUM, 50.f, true, true, CKirby::BODY_VACUUM);

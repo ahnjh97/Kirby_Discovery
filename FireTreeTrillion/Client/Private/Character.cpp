@@ -115,7 +115,7 @@ void CCharacter::Compute_MotionBlur()
 
 	m_vMotionVelocity.x = (m_vPreScreenPos - vCurScreenPos).x;
 	m_vMotionVelocity.y = (m_vPreScreenPos - vCurScreenPos).y;
-	m_vMotionVelocity.z = m_bVacuuming == true ? 1.f : 0.f;
+	m_vMotionVelocity.z = m_ePhyXState != PO_NORMAL ? 1.f : 0.f;
 
 	m_vPreScreenPos = vCurScreenPos;
 }
@@ -133,7 +133,7 @@ void CCharacter::Character_SystemTick(_float fTimeDelta)
 	}
 
 	// 날아가는 도중엔 경사면 보간 제어가 필요없다.
-	if (m_bFlyAway == false)
+	if (m_ePhyXState == PO_NORMAL)
 	{
 		// 터레인 경사면 보간 제어
 		SetOn_Slope(fTimeDelta);

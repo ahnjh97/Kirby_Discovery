@@ -33,7 +33,7 @@ void CKirbyVacuum_Spit_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		{
 			CTransform* pObjectTransform = DESC(m_pObject)->Get_TransformCom();
 			pObjectTransform->Set_Scaled(1.f, 1.f, 1.f);
-			DESC(m_pObject)->Set_FlyAway(true);
+			DESC(m_pObject)->Set_PhyXState(PO_FLYAWAY);
 			DESC(m_pObject)->Set_DamageMoving(pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), 1.f);
 
 			_vector vNewUp = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);

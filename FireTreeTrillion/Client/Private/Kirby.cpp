@@ -190,7 +190,6 @@ void CKirby::Render_IMGUI()
 	}
 
 
-	ImGui::Text("Vacuuming : %d", m_bVacuuming);
 	ImGui::Text("ObjectAddress : %d", INFO(m_pObject));
 	ImGui::Text("ChargeTime : %.2f", INFO(m_fChargeTime));
 	ImGui::Text("MoveSpeed : %.2f", INFO(m_fMoveSpeed));
@@ -242,26 +241,26 @@ void CKirby::Collision_Attack(CGameObject* pOtherObj)
 	CPhysXObject* pObject = static_cast<CPhysXObject*>(pOtherObj);
 
 	// 흡수중인 몬스터
-	if (pObject->Get_Vacuuming() == true && pObject->Get_KirbyMouth() == false && pObject->Get_FlyAway() == false)
+	if (pObject->Get_PhyXState() == PO_VACUUMING)
 	{
 		// 일단 EAT으로 넘기는건 같으나, EAT이 끝날 시점에 내가 삼켰던 것이 무엇이였는지 판단 후 애니메이션이 분기된다.
 		INFO(m_isEat) = true;
 		INFO(m_eEyeState) = EYE_IDLE;
 		INFO(m_eMouthState) = MOUTH_ANGER;
-		m_bVacuuming = false;
+		//m_ePhyXState = PO_NORMAL;
 		Change_State(STATE_EAT, 100.f, false, false, BODY_BALLOON);
 		// 임시 보관소. 먹은게 끝났을 떄, 비로소 커비의 어빌리티 타입이 바뀐다.
 		INFO(m_eTemporaryEatType) = pObject->Get_AbilityType();
 
 		if (pObject != nullptr)
 		{
-			pObject->Set_KirbyMouth(true);
+			pObject->Set_PhyXState(PO_KIRBYMOUTH);
 		}
 
 		Delete_KirbyEffect();
 	}
 	// 입에 머금은 상태의 몬스터
-	else if (pObject->Get_Vacuuming() == true && pObject->Get_KirbyMouth() == true && pObject->Get_FlyAway() == false)
+	else if (pObject->Get_PhyXState() == PO_KIRBYMOUTH)
 	{
 		// 서로 반응이 없어야 한다. (단, 이친구는 항상 나를 따라다닐것이다.)
 
@@ -269,7 +268,7 @@ void CKirby::Collision_Attack(CGameObject* pOtherObj)
 
 	}
 	// 발사중인 몬스터
-	else if (pObject->Get_Vacuuming() == true && pObject->Get_KirbyMouth() == true && pObject->Get_FlyAway() == true)
+	else if (pObject->Get_PhyXState() == PO_FLYAWAY)
 	{
 		// 서로 반응이 없어야 한다.
 
@@ -853,7 +852,7 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 	if (INFO(m_pObject) != nullptr)
 	{
 		// 커비 입 속에 있다면?
-		if (INFO(m_pObject)->Get_KirbyMouth() == true)
+		if (INFO(m_pObject)->Get_PhyXState() == PO_KIRBYMOUTH)
 		{
 			CCharacterController* pObjectController = static_cast<CCharacterController*>(INFO(m_pObject)->Get_Component(TEXT("Com_Controller")));
 			CTransform* pObjectTransform = INFO(m_pObject)->Get_TransformCom();

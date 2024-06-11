@@ -61,7 +61,7 @@ _int CRabbit::Tick(_float fTimeDelta)
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
 	// 빨릴 때
-	if (m_bVacuuming == true)
+	if (m_ePhyXState == PO_VACUUMING)
 		Change_State(CRabbit::RABBIT_DAMAGE, 120.f, true, false);
 
 	__super::Tick(m_fTimeDelta);
@@ -72,11 +72,11 @@ _int CRabbit::Tick(_float fTimeDelta)
 void CRabbit::Late_Tick(_float fTimeDelta)
 {
 	// 커비 입 안에 있고, Fly가 아닐땐 입 안에 있는 상황이므로, Render되지않는다.
-	if (m_bInKirbyMouth == true && m_bFlyAway == false)
+	if (m_ePhyXState == PO_KIRBYMOUTH)
 		return;
 
 	// 날아갈 땐, 애니메이션 재생이 되지 않는다.
-	if (m_bFlyAway == false)
+	if (m_ePhyXState != PO_FLYAWAY)
 		m_pModelCom->Play_Animation(m_fTimeDelta);
 
 
@@ -183,14 +183,9 @@ void CRabbit::Collision_Attack(CGameObject* pOtherObj)
 
 
 	// 날아온게 FlyAway 상태인 몬스터였을 경우
-	if (pObject->Get_FlyAway())
+	if (pObject->Get_PhyXState() == PO_FLYAWAY)
 	{
-		pObject->Set_Vacuuming(false);
-		pObject->Set_KirbyMouth(false);
-		pObject->Set_FlyAway(false);
-		pObject->Set_
-
-
+		// 같이 처맞고 날아가자.
 
 	}
 	// 일반 충돌

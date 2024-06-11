@@ -378,8 +378,7 @@ void CAwoofy_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 
-	// 일반 충돌 상태 (Get_Vacuuming()이 true라면 빨아들이는 상태이다.
-	if (pAwoofy->Get_Vacuuming() == false)
+	if (pAwoofy->Get_PhyXState() == PO_NORMAL)
 	{
 		// 일단 그 방향으로 바라보게만 한다.
 		_float3 vDamegeDir = pAwoofy->Get_DamegeDir();
@@ -402,11 +401,17 @@ void CAwoofy_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			pAwoofy->Change_State(CAwoofy::AWOOFY_WAIT, 40.f, false, true);
 		}
 	}
-	// 날아가는 도중이였다.
-	else if (pAwoofy->Get_FlyAway() == true)
+	// 날아가는 도중이다.  1초에 360도 회전하며, 30의 거리로 날아간다.
+	else if (pAwoofy->Get_PhyXState() == PO_FLYAWAY)
 	{
 		_float3 vDamegeDir = pAwoofy->Get_DamegeDir();
-		pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 6.f, fTimeDelta);
+		pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 30.f, fTimeDelta);
+		pTransformCom->Turn(pTransformCom->Get_State_Vector(CTransform::STATE_UP), fTimeDelta, 360.f);
+		m_fFlyTime += fTimeDelta;
+		if (m_fFlyTime > 2.f)
+		{
+			pAwoofy->Set_Dead();
+		}
 	}
 
 
