@@ -36,8 +36,7 @@ HRESULT CHitBox::Initialize(void* pArg)
 
 _int CHitBox::Tick(_float fTimeDelta)
 {
-	if (true == m_bDead)
-		return OBJ_DEAD;
+	if (!m_bAlive) return OBJ_NOEVENT;
 
 	_float4 vRight = XMVector3Normalize(m_pOwnerTransform->Get_State_Float4(CTransform::STATE_RIGHT)) * (-0.05f);
 	_float4 vLook  = XMVector3Normalize(m_pOwnerTransform->Get_State_Float4(CTransform::STATE_LOOK)) * 0.8f;
@@ -51,12 +50,16 @@ _int CHitBox::Tick(_float fTimeDelta)
 
 void CHitBox::Late_Tick(_float fTimeDelta)
 {
+	if (!m_bAlive) return;
+
 	//if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	//	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
 
 HRESULT CHitBox::Render()
 {
+	if (!m_bAlive) return S_OK;
+
 	/*if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;*/
 
@@ -91,6 +94,8 @@ HRESULT CHitBox::Render_LightDepth()
 #ifdef _DEBUG
 void CHitBox::Render_IMGUI()
 {
+	if (!m_bAlive) return;
+
 	if (ImGui::TreeNode("Guizmo"))
 	{
 		_float4x4 matWorld = m_pTransformCom->Get_WorldFloat4x4();
@@ -104,21 +109,22 @@ void CHitBox::Render_IMGUI()
 
 	__super::Render_IMGUI();
 }
+
 #endif
 
-_int CHitBox::Check_Collision(_float fTimeDelta)
+void CHitBox::Collision_Overlap(CGameObject* pGameObject)
 {
-	// HitBox와 충돌된 친구들을 모아봅니다.
-	// 충돌된 친구들에게 특정한 함수를 호출시킵니다. like Collision_Overlap
-	//auto controllers = m_pControllerCom->Get_Controllers();
-	//for(auto& controller : controllers)
-	//{
-	//	// 히트박스와 충돌처리를 해주는 함수 발동
-	//	// controller->HitBox_Attack(this);
-	//}
+	//pGameObject의 정보를 Kirby에게 넘긴다.
+	m_pOwner->Collision_Overlap(pGameObject);
 
-	//m_pControllerCom->Clear_Collisions();  // 충돌 기록 초기화
-	return _int();
+	m_bAlive = false;
+	m_pControllerCom->Activate(false);
+}
+
+void CHitBox::Check_Collision()
+{
+	m_bAlive = true;
+	m_pControllerCom->Activate(true);
 }
 
 HRESULT CHitBox::Add_Components()
@@ -145,6 +151,7 @@ HRESULT CHitBox::Add_Components()
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 								TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	m_pControllerCom->Set_Object(this);
+	m_pControllerCom->Activate(false);
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 

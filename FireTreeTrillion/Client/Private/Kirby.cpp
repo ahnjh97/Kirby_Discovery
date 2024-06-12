@@ -106,7 +106,10 @@ _int CKirby::Tick(_float fTimeDelta)
 
 	m_pWeapons->Tick(m_fTimeDelta);
 	m_pArmours->Tick(m_fTimeDelta);
-	m_pHitBox->Tick(m_fTimeDelta);
+
+	//if(칼을 휘두른 순간!)
+	if(m_pHitBox != nullptr)
+		m_pHitBox->Tick(m_fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
@@ -123,7 +126,6 @@ void CKirby::Late_Tick(_float fTimeDelta)
 	{
 		m_pWeapons->Late_Tick(m_fTimeDelta);
 		m_pArmours->Late_Tick(m_fTimeDelta);
-		m_pHitBox->Late_Tick(m_fTimeDelta);
 	}
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
@@ -237,7 +239,6 @@ HRESULT CKirby::Render_DeferredInfo()
 	}
 
 	return S_OK;
-
 }
 
 void CKirby::Add_AnimEvent()
@@ -249,6 +250,7 @@ void CKirby::Add_AnimEvent()
 	// 3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
 	m_pModelCom[INFO(m_eBodyState)]->Add_Event("ApplyDamage", [this]() {
 
+		m_pHitBox->Check_Collision();
 
 		});
 }

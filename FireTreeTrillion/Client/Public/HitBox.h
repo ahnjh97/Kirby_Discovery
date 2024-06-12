@@ -32,8 +32,9 @@ public:
 #ifdef _DEBUG
 	virtual void	Render_IMGUI() override;
 #endif
-	_int			Check_Collision(_float fTimeDelta);
-
+	virtual void	Collision_Overlap(CGameObject* pGameObject);
+	void			Check_Collision();
+	
 private:
 	HRESULT			Add_Components();
 	HRESULT			Bind_ShaderResources();
@@ -41,6 +42,8 @@ private:
 private:
 	class CGameObject*	m_pOwner			= nullptr;
 	class CTransform*	m_pOwnerTransform	= nullptr;
+
+	_bool				m_bAlive = false;
 
 public:
 	static CHitBox* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

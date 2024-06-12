@@ -151,7 +151,6 @@ private:
 
 #pragma endregion
 
-
 	// 기타 세부적인 제어
 private:
 	// 커비의 움직임을 담은 구조체
@@ -178,14 +177,16 @@ private:
 	class CCamera_Free*		m_pCamera = { nullptr };
 
 private:
-	void			Update_PartObjectMatrix();
-	class CKirbyWeapons* m_pWeapons = { nullptr };
-	class CKirbyArmours* m_pArmours = { nullptr };
-	class CHitBox*		 m_pHitBox  = { nullptr };
-	_float4x4			 m_WeaponMatrix;
-	_float4x4			 m_ArmourMatrix;
+	void		   Update_PartObjectMatrix();
 
-	_int					m_iTestAnim = { 0 };
+	class CKirbyWeapons*  m_pWeapons = { nullptr };
+	class CKirbyArmours*  m_pArmours = { nullptr };
+	class CHitBox*		  m_pHitBox  = { nullptr };
+
+	_float4x4			  m_WeaponMatrix;
+	_float4x4			  m_ArmourMatrix;
+
+	_int				  m_iTestAnim = { 0 };
 
 
 public:
