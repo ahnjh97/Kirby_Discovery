@@ -625,6 +625,9 @@ static _bool Vacuum_Object(CKirby* pKirby, _float fTimeDelta)
 
 		for (auto& pObject : *GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), g_strLayerMonster))
 		{
+			if (static_cast<CPhysXObject*>(pObject)->Get_PhyXState() != PO_NORMAL)
+				continue;
+
 			CTransform* pObjectTransform = pObject->Get_TransformCom();
 			_vector vObjectPos = pObjectTransform->Get_State_Vector(CTransform::STATE_POSITION);
 			_vector vObjectDir = vObjectPos - vPos;
@@ -722,6 +725,9 @@ static _float4 Spit_Target_Object(CKirby* pKirby)
 
 		for (auto& pObject : *GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), g_strLayerMonster))
 		{
+			if (static_cast<CPhysXObject*>(pObject)->Get_PhyXState() != PO_NORMAL)
+				continue;
+
 			CTransform* pObjectTransform = pObject->Get_TransformCom();
 			_vector vObjectPos = pObjectTransform->Get_State_Vector(CTransform::STATE_POSITION);
 			_vector vObjectDir = vObjectPos - vPos;

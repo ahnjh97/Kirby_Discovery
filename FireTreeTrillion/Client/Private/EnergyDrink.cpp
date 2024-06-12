@@ -53,16 +53,58 @@ _int CEnergyDrink::Tick(_float fTimeDelta)
 
 
 	// 충돌이 아직 안 되었다면
-	if (m_bCollisionComplete == false)
-		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), m_fTimeDelta, 270.f);
+	m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), m_fTimeDelta, 270.f);
+
 	// 충돌이 완료 되었다면
-	else
+	if (m_bCollisionComplete == true)
 	{
+		if (m_fDrinkTime < 0.3f)
+		{
+			m_fDrinkTime += m_fTimeDelta;
+			_float fScaled = (0.3f + m_fDrinkTime) / 0.4f;
+			if (fScaled > 1.f)
+				fScaled = 1.f;
 
+			m_pTransformCom->Set_Scaled(fScaled, fScaled, fScaled);
 
+			_vector vTargetPos = m_pPlayer->Get_TransformCom()->Get_State_Vector(CTransform::STATE_POSITION);
+			vTargetPos.m128_f32[1] += 2.f;
 
+			_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+			_vector vDir = vTargetPos - vPos;
 
+			m_pControllerCom->Move_Dir(m_pTransformCom, vDir * m_fTimeDelta * 10.f, m_fTimeDelta);
+		}
+		else if (0.3f <= m_fDrinkTime && m_fDrinkTime <= 0.8f)
+		{
+			m_fDrinkTime += m_fTimeDelta;
 
+			_vector vTargetPos = m_pPlayer->Get_TransformCom()->Get_State_Vector(CTransform::STATE_POSITION);
+			vTargetPos.m128_f32[1] += 2.f;
+
+			_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+			_vector vDir = vTargetPos - vPos;
+
+			m_pControllerCom->Move_Dir(m_pTransformCom, vDir * m_fTimeDelta * 10.f, m_fTimeDelta);
+		}
+		else
+		{
+			m_fDrinkTime += m_fTimeDelta * 4.f;
+
+			_float fScaled = (1.8f - m_fDrinkTime) / 1.0f;
+			m_pTransformCom->Set_Scaled(fScaled, fScaled, fScaled);
+			if (fScaled < 0.05f)
+			{
+				m_bDead = true;
+			}
+
+			_vector vTargetPos = m_pPlayer->Get_TransformCom()->Get_State_Vector(CTransform::STATE_POSITION);
+			_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+			_vector vDir = vTargetPos - vPos;
+
+			m_pControllerCom->Move_Dir(m_pTransformCom, vDir * m_fTimeDelta * 10.f, m_fTimeDelta);
+
+		}
 	}
 
 
@@ -88,6 +130,10 @@ HRESULT CEnergyDrink::Render()
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
 			return E_FAIL;
 
 		m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
