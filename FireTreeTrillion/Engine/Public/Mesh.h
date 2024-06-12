@@ -24,6 +24,8 @@ public:
 		, _fmatrix TransformMatrix, _bool bOctree);
 	virtual HRESULT Initialize_Prototype(const _float3* pVerticePos, _uint iNumVertices, const _float3* pNormals
 		, const _float2* pTexCoords, const _float3* pTangents, vector<FACE>& _vecFaces);
+	virtual HRESULT Initialize_Prototype(const _float3* _pVerticePos, _uint _iNumVertices, const _float3* _pNormals
+		, const _float2* _pTexCoords, const _float3* _pTangents, const _uint* _pIndices, _uint _iNumIndices);
 	virtual HRESULT Initialize(void* pArg) override;
 #ifdef _DEBUG
 	virtual void	Render_IMGUI();
@@ -75,6 +77,9 @@ public:
 		, ifstream& fileStream, const vector<class CBone*>& Bones, _fmatrix TransformMatrix, _bool bOctree);
 	static CMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _float3* pVerticePos, _uint iNumVertices
 		, const _float3* pNormals, const _float2* pTexCoords, const _float3* pTangents, vector<FACE>& _vecFaces);
+	static CMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _float3* pVerticePos, _uint iNumVertices
+		, const _float3* pNormals, const _float2* pTexCoords, const _float3* pTangents
+		, const _uint* pIndices, _uint iNumIndices);
 	virtual CMesh* Clone(void* pArg);
 	virtual void Free() override;
 };

@@ -49,15 +49,32 @@ HRESULT CBasicMap::Initialize(void* pArg)
                 return E_FAIL;
         }
 
-        m_pOcTree = m_pModelCom->Create_OcTree(GameObjectDesc.vMin, GameObjectDesc.vMax, m_vecPassIndices, m_vecSamplingFactors);
-        //m_pModelCom->CreateSamplerState();
+        vector<string> vecConstantNames = { "g_DiffuseTexture", "g_NormalTexture", "g_MRATexture", "g_fSamplingFactor"
+            , "g_bStencil", "g_bRimLight", "m_fRimWidth", "g_bMotionBlur" };
+
+        /*if (LEVEL_TOOL_MAP == *m_pCurrentLevelID)*/
+            m_pOcTree = m_pModelCom->Create_OcTree(GameObjectDesc.vMin, GameObjectDesc.vMax, m_vecPassIndices, m_vecSamplingFactors, vecConstantNames);
+           
+        /*else {
+            string strLevel;
+            if (LEVEL_INTRO == *m_pCurrentLevelID)
+                strLevel = "Intro";
+            else if (LEVEL_GAMEPLAY == *m_pCurrentLevelID)
+                strLevel = "Stage1";
+
+            string strPath = "../../../objects_txt/" + strLevel + "_Octree.txt";
+            ifstream octreeFile(strPath, ios::binary);
+
+            m_pOcTree = COcTree::Create(m_pDevice, m_pContext, octreeFile, vecConstantNames);
+
+            octreeFile.close();
+        } */  
     }
 
     if (FAILED(m_pModelCom->CreateStaticActor(m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION))))
         return E_FAIL;
 
-    m_fTime = 100.f;
-    m_fNonMatchTime = 100.f;
+    m_fTime = m_fNonMatchTime = 100.f;
 
     return S_OK;
 }
@@ -275,10 +292,9 @@ _bool CBasicMap::CheckIfBlendMapExists(const wstring& _wstrModelTag)
     return _bool();
 }
 
-void CBasicMap::Save_OctreeData()
+void CBasicMap::Save_OctreeData(const string& strLevel)
 {
-    string strModelName = m_pModelCom->Get_ModelInfo().strModelName;
-    string tempFileName = "temp_" + strModelName + "_Octree.txt";
+    string tempFileName = "temp_" + strLevel + "_Octree.txt";
     ofstream outputFile(tempFileName, ios::out | ios::binary);
     if (!outputFile.is_open()) // 임시파일 열렸는지 확인
     {
@@ -310,8 +326,8 @@ void CBasicMap::Save_OctreeData()
     char buffer[80];
     strftime(buffer, sizeof(buffer), "%H%M%S", &timeinfo);
 
-    string fileName_Time = "../../../objects_txt/" + string(buffer) + "_" + strModelName + "_Octree.txt";
-    string fileName = "../../../objects_txt/" + strModelName + "_Octree.txt";
+    string fileName_Time = "../../../objects_txt/" + string(buffer) + "_" + strLevel + "_Octree.txt";
+    string fileName = "../../../objects_txt/" + strLevel + "_Octree.txt";
     if (rename(fileName.c_str(), fileName_Time.c_str()) != 0)
     {
         MSG_BOX(TEXT("Failed to rename original file."));

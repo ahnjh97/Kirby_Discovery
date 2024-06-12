@@ -86,6 +86,7 @@ HRESULT CMesh::Initialize_Prototype(TYPE eModelType, string strDirectory, const 
 HRESULT CMesh::Initialize_Prototype(const _float3* pVerticePos, _uint iNumVertices, const _float3* pNormals
 	, const _float2* pTexCoords, const _float3* pTangents, vector<FACE>& _vecFaces)
 {
+	m_iNumVertices = iNumVertices;
 	m_iNumIndices = _vecFaces.size() * 3;
 	m_iIndexStride = sizeof(_uint);
 	m_iNumVertexBuffers = 1;
@@ -106,6 +107,11 @@ HRESULT CMesh::Initialize_Prototype(const _float3* pVerticePos, _uint iNumVertic
 
 	VTXMESH* pVertices = new VTXMESH[iNumVertices];
 	ZeroMemory(pVertices, sizeof(VTXMESH) * iNumVertices);
+
+	m_pVerticesPos = new _float3[iNumVertices];
+	m_pNormals = new _float3[iNumVertices];
+	m_pTexCoords = new _float2[iNumVertices];
+	m_pTangents = new _float3[iNumVertices];
 
 	for (size_t i = 0; i < iNumVertices; i++)
 	{
@@ -137,10 +143,86 @@ HRESULT CMesh::Initialize_Prototype(const _float3* pVerticePos, _uint iNumVertic
 	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	m_BufferDesc.CPUAccessFlags = 0;
 
+
 	_uint* pIndices = new _uint[m_iNumIndices];
 	ZeroMemory(pIndices, sizeof(_uint) * m_iNumIndices);
 
 	memcpy(pIndices, _vecFaces.data(), m_iNumIndices * sizeof(_uint));
+
+	m_pIndices = new _uint[m_iNumIndices];
+	memcpy(m_pIndices, _vecFaces.data(), m_iNumIndices * sizeof(_uint));
+
+	ZeroMemory(&m_InitialData, sizeof m_InitialData);
+	m_InitialData.pSysMem = pIndices;
+
+	if (FAILED(__super::Create_Buffer(&m_pIB)))
+		return E_FAIL;
+
+	Safe_Delete_Array(pIndices);
+#pragma endregion
+
+	return S_OK;
+}
+
+HRESULT CMesh::Initialize_Prototype(const _float3* _pVerticePos, _uint _iNumVertices, const _float3* _pNormals
+	, const _float2* _pTexCoords, const _float3* _pTangents, const _uint* _pIndices, _uint _iNumIndices)
+{
+	m_iNumVertices = _iNumVertices;
+	m_iNumIndices = _iNumIndices;
+	m_iIndexStride = sizeof(_uint);
+	m_iNumVertexBuffers = 1;
+	m_eIndexFormat = DXGI_FORMAT_R32_UINT;
+	m_ePrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
+#pragma region VERTEX_BUFFER
+	m_iVertexStride = sizeof(VTXMESH);
+
+	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
+
+	m_BufferDesc.ByteWidth = m_iVertexStride * _iNumVertices;
+	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	m_BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	m_BufferDesc.CPUAccessFlags = 0;
+	m_BufferDesc.MiscFlags = 0;
+	m_BufferDesc.StructureByteStride = m_iVertexStride;
+
+	VTXMESH* pVertices = new VTXMESH[_iNumVertices];
+	ZeroMemory(pVertices, sizeof(VTXMESH) * _iNumVertices);
+
+	for (size_t i = 0; i < _iNumVertices; i++)
+	{
+		pVertices[i].vPosition = _pVerticePos[i];
+		pVertices[i].vNormal = _pNormals[i];
+		pVertices[i].vTexcoord = _pTexCoords[i];
+		pVertices[i].vTangent = _pTangents[i];
+	}
+
+	ZeroMemory(&m_InitialData, sizeof m_InitialData);
+	m_InitialData.pSysMem = pVertices;
+
+	if (FAILED(__super::Create_Buffer(&m_pVB)))
+		return E_FAIL;
+
+	Safe_Delete_Array(pVertices);
+#pragma endregion
+
+
+#pragma region INDEX_BUFFER
+
+	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
+	/* 인덱스 버퍼의 byte크기 */
+	m_BufferDesc.ByteWidth = m_iIndexStride * m_iNumIndices;
+	m_BufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	m_BufferDesc.MiscFlags = 0;
+	m_BufferDesc.StructureByteStride = 0;
+	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	m_BufferDesc.CPUAccessFlags = 0;
+
+
+	_uint* pIndices = new _uint[m_iNumIndices];
+	ZeroMemory(pIndices, sizeof(_uint) * m_iNumIndices);
+
+	memcpy(pIndices, _pIndices, m_iNumIndices * sizeof(_uint));
 
 	ZeroMemory(&m_InitialData, sizeof m_InitialData);
 	m_InitialData.pSysMem = pIndices;
@@ -401,6 +483,21 @@ CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const
 	CMesh* pInstance = new CMesh(pDevice, pContext, ifstream());
 
 	if (FAILED(pInstance->Initialize_Prototype(pVerticePos, iNumVertices, pNormals, pTexCoords, pTangents, _vecFaces)))
+	{
+		MSG_BOX(TEXT("Failed To Create : CMesh"));
+
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
+CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _float3* pVerticePos, _uint iNumVertices
+	, const _float3* pNormals, const _float2* pTexCoords, const _float3* pTangents, const _uint* pIndices, _uint iNumIndices)
+{
+	CMesh* pInstance = new CMesh(pDevice, pContext, ifstream());
+
+	if (FAILED(pInstance->Initialize_Prototype(pVerticePos, iNumVertices, pNormals, pTexCoords, pTangents, pIndices, iNumIndices)))
 	{
 		MSG_BOX(TEXT("Failed To Create : CMesh"));
 

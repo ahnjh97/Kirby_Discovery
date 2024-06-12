@@ -41,6 +41,8 @@ public:
 	virtual void	Render_IMGUI() override;
 #endif
 
+public:
+	void Save_OctreeData(const string& strLevel);
 
 private:
 	CModel* m_pModelCom = { nullptr };
@@ -68,8 +70,6 @@ private:
 	void SetUpShaderInfo(const wstring& _wstrModelTag);
 
 	_bool CheckIfBlendMapExists(const wstring& _wstrModelTag);
-
-	void Save_OctreeData();
 		
 public:
 	static CBasicMap* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

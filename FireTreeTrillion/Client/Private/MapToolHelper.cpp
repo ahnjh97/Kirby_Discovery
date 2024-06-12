@@ -807,8 +807,6 @@ void CMapToolHelper::Save_Level()
 		return;
 	}
 
-	Save_Octree();
-
 	wstring wstrSaveMsg = CUtils::StrToWstr(strLevel) + TEXT(" Saved.");
 	MSG_BOX(wstrSaveMsg.c_str());
 }
@@ -1240,11 +1238,8 @@ void CMapToolHelper::Reset_MapShaderInfo()
 
 void CMapToolHelper::Save_Octree()
 {
-	InsertObjectsToOctree();
-
-
-
-
+	CBasicMap* pBasicMap = dynamic_cast<CBasicMap*>(m_pPickedObject);
+	pBasicMap->Save_OctreeData(m_vecLevelName[iLevelIndex + LEVEL_INTRO]);
 }
 
 void CMapToolHelper::RegisterRallyPoints(list<CGameObject*>* _pObjList)
@@ -1311,18 +1306,87 @@ void CMapToolHelper::RegisterRallyPoints(list<CGameObject*>* _pObjList)
 	}
 }
 
-void CMapToolHelper::InsertObjectsToOctree()
+void CMapToolHelper::SaveMapDecoObjects()
 {
+	string strLevel = m_vecLevelName[iLevelIndex + LEVEL_INTRO];
+	string tempFileName = "temp_" + m_vecLevelName[iLevelIndex + LEVEL_INTRO] + "_DecoObjs.txt";
+
+	ofstream fileOutput(tempFileName, ios::binary);
+
 	list<CGameObject*>* pObjList = m_pGameInstance->Get_List(LEVEL_TOOL_MAP, TEXT("Layer_Parse"));
 
 	if (nullptr == pObjList || pObjList->empty())
 		return;
 
-	list<CGameObject*> nonCollisionList; // Anim X, StaticActorX
-	list<CGameObject*> animList;	// Anim O, StaticActor X
-	list<CGameObject*> staticActorList; // Anim X, StaticActor O;
+	for (auto& obj : *pObjList)
+	{
+		if (nullptr == obj)
+			continue;
 
+		CMapToolObject* pMapToolObj = dynamic_cast<CMapToolObject*>(obj);
+		_uint iMapObjType = pMapToolObj->Get_MapObjType();
+		
+		fileOutput.write(reinterpret_cast<const char*>(&iMapObjType), sizeof(iMapObjType));
 
+		CModel* pModel = dynamic_cast<CModel*>(obj->Get_Component(TEXT("Com_Model")));
+		if (nullptr == pModel)
+			continue;
+		CTransform* pTransform = dynamic_cast<CTransform*>(obj->Get_Component(g_strTransformTag));
+		if (nullptr == pTransform)
+			continue;
+
+		string strModelName = pModel->Get_ModelInfo().strModelName;
+		_float4x4 matWorld = pTransform->Get_WorldMatrix();
+		_uint iStrLength = strModelName.length();
+		_uint iShaderVars = obj->Get_ShaderVars();
+		_float fRimWidth = obj->Get_RimWidth();
+
+		fileOutput.write(reinterpret_cast<const char*>(&iStrLength), sizeof(iStrLength));
+		fileOutput.write(strModelName.c_str(), iStrLength);
+		fileOutput.write(reinterpret_cast<const char*>(&matWorld), sizeof(_float4x4));
+		fileOutput.write(reinterpret_cast<const char*>(&iShaderVars), sizeof(iShaderVars));
+		fileOutput.write(reinterpret_cast<const char*>(&fRimWidth), sizeof(fRimWidth));
+	}
+
+	fileOutput.close();
+
+	if (!fileOutput)
+	{
+		wstring wstrError = TEXT("Failed to write data to ") + CUtils::StrToWstr(tempFileName);
+		MSG_BOX(wstrError.c_str());
+		remove(tempFileName.c_str()); // 임시파일 삭제
+		return;
+	}
+
+	// 현재시간 받아오기
+	auto now = chrono::system_clock::now();
+	time_t currentTime = chrono::system_clock::to_time_t(now);
+
+	struct tm timeinfo;
+	localtime_s(&timeinfo, &currentTime);
+
+	// 현재 시간을 문자열로 변환
+	char buffer[80];
+	strftime(buffer, sizeof(buffer), "%H%M%S", &timeinfo);
+
+	string fileName_Time = "../../../objects_txt/" + string(buffer) + "_" + strLevel + "_DecoObjs.txt";
+	string fileName = "../../../objects_txt/" + strLevel + "_DecoObjs.txt";
+	if (rename(fileName.c_str(), fileName_Time.c_str()) != 0)
+	{
+		MSG_BOX(TEXT("Failed to rename original file."));
+		return;
+	}
+
+	if (rename(tempFileName.c_str(), fileName.c_str()) != 0) // 임시파일 이름을 level 이름으로 변경
+	{
+		wstring wstrError2 = TEXT("Failed to rename ") + CUtils::StrToWstr(tempFileName);
+		MSG_BOX(wstrError2.c_str());
+		remove(tempFileName.c_str()); // 임시파일 삭제
+		return;
+	}
+
+	wstring wstrSaveMsg = CUtils::StrToWstr(strLevel) + TEXT("_DecoObjs Saved.");
+	MSG_BOX(wstrSaveMsg.c_str());
 }
 
 CMapToolHelper* CMapToolHelper::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

@@ -20,7 +20,9 @@
 #include "ImGUI_Manager.h"
 #endif
 
+#include "OcTree.h"
 #include "PhysX.h"
+
 
 IMPLEMENT_SINGLETON(CGameInstance)
 
@@ -1026,8 +1028,6 @@ void CGameInstance::Restore_SecondTimer()
 
 	m_pTimeController->Restore_SecondTimer();
 }
-
-
 
 void CGameInstance::Release_Engine()
 {

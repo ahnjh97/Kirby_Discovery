@@ -294,7 +294,8 @@ void CModel::Find_MinMax(_float3& vMin, _float3& vMax)
 		mesh->Find_MinMax(vMin, vMax);
 }
 
-COcTree* CModel::Create_OcTree(_float3 vMin, _float3 vMax, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors)
+COcTree* CModel::Create_OcTree(_float3 vMin, _float3 vMax, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors
+	, vector<string>& _vecConstantNames)
 {
 	if (vMin.x == 0 || false == m_tModel.bOctree)
 		return nullptr;
@@ -323,25 +324,9 @@ COcTree* CModel::Create_OcTree(_float3 vMin, _float3 vMax, vector<_uint>& _vecPa
 		vecNumIndices.push_back(mesh->Get_NumIndices());
 	}
 
-	//vector<FACE> vecFaces;
-
-	//_int iCount{};
-	//for (_uint i = 0; i < iNumIndices / 3; i++)
-	//{
-	//	vecFaces.emplace_back(pIndicesPtr[iCount], pIndicesPtr[iCount + 1], pIndicesPtr[iCount + 2]);
-	//	iCount += 3;
-	//}
-
-	string strFilePath = "../../../objects_txt/" + m_tModel.strModelName + "_Octree.txt";
-	ifstream fileInput(strFilePath, ios::in | ios::binary);
-
-	vector<string> vecConstantNames = { "", "", "", "" };
-
 	COcTree* pOctree = COcTree::Create(m_pDevice, m_pContext, vCenter, vHalfExtents, vecVerticesPtrs, vecNumVertices
 		, vecNormalsPtrs, vecTexCoordsPtrs, vecTangentsPtrs, vecIndicesPtrs, vecNumIndices
-		, fileInput, m_Meshes, m_Materials, _vecPassIndices, _vecSamplingFactors, vecConstantNames);
-
-	fileInput.close();
+		, m_Meshes, m_Materials, _vecPassIndices, _vecSamplingFactors, _vecConstantNames);
 
 	return pOctree;
 }
@@ -493,7 +478,10 @@ HRESULT CModel::Bind_StencilRimLightMotionBlur(CShader* pShader, vector<string>&
 
 void CModel::SetUpStencilRimLightMotionBlur(_uint iShaderVars, _float fRimWidth)
 {
-	
+	m_bStencil = (iShaderVars >> 2) & 1;
+	m_bRimLight = (iShaderVars >> 1) & 1;
+	m_bMotionBlur = iShaderVars & 1;
+	m_fRimWidth = fRimWidth;
 }
 
 HRESULT CModel::Ready_Meshes(_bool bOctree)

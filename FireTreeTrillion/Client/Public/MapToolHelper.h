@@ -49,7 +49,7 @@ private:
 	void	Save_Octree();
 
 	void	RegisterRallyPoints(list<CGameObject*>* _pObjList);
-	void	InsertObjectsToOctree();
+	void	SaveMapDecoObjects();
 
 	// Picking
 	CGameObject* Select_ModelByPicking(const wstring& wstrLayerTag = TEXT("Layer_Parse"));

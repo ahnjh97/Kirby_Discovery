@@ -83,7 +83,8 @@ public:
 
 
 	void Find_MinMax(_float3& vMin, _float3& vMax);
-	class COcTree* Create_OcTree(_float3 vMin, _float3 vMax, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors);
+	class COcTree* Create_OcTree(_float3 vMin, _float3 vMax, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors
+		, vector<string>& _vecConstantNames);
 
 	void Create_MergedMesh(_fmatrix TransformMatrix);
 	void Bind_TextureArrays();
@@ -131,7 +132,6 @@ private:
 	ID3D11SamplerState*			m_pSamplerState = { nullptr };
 
 	_float						m_fRimWidth = { 0.2f }; // For Binding at Octree
-	_uint						m_iShaderVars = {};
 	_bool						m_bStencil = { true };
 	_bool						m_bRimLight = { true };
 	_bool						m_bMotionBlur = { false };
