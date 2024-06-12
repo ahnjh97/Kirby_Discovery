@@ -53,6 +53,7 @@ namespace Engine
         INTERACT,
         ITEM,
         TRIGGER,
+        HITBOX,
         COLLISION_END
     };
 
@@ -124,6 +125,7 @@ using namespace physx;
 #include <map>
 #include <array>
 #include <set>
+#include <unordered_set>
 #include <queue>
 #include <unordered_map>
 #include <cassert>

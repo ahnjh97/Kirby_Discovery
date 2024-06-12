@@ -208,6 +208,9 @@
     <Filter Include="02.GameObjects\PhysXObject\RigidObject\WasteCan">
       <UniqueIdentifier>{f175b95e-a1d4-47cd-9d10-49f323d1f526}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\HitBox">
+      <UniqueIdentifier>{a1b4ff10-d4bc-4546-ac70-09ef8f4501a8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -421,6 +424,9 @@
       <Filter>02.GameObjects\PhysXObject\RigidObject\WasteCan</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Multi_UI.h" />
+    <ClInclude Include="..\Public\HitBox.h">
+      <Filter>02.GameObjects\PhysXObject\Character\HitBox</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -616,6 +622,9 @@
       <Filter>02.GameObjects\PhysXObject\RigidObject\WasteCan</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Multi_UI.cpp" />
+    <ClCompile Include="..\Private\HitBox.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\HitBox</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

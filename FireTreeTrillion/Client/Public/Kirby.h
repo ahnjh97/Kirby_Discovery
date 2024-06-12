@@ -181,6 +181,7 @@ private:
 	void			Update_PartObjectMatrix();
 	class CKirbyWeapons* m_pWeapons = { nullptr };
 	class CKirbyArmours* m_pArmours = { nullptr };
+	class CHitBox*		 m_pHitBox  = { nullptr };
 	_float4x4			 m_WeaponMatrix;
 	_float4x4			 m_ArmourMatrix;
 

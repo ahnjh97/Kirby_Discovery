@@ -2,14 +2,33 @@
 #include "Component.h"
 
 BEGIN(Engine)
+class CTransform;
 
 class ENGINE_DLL CCharacterController : public CComponent
 {
 public:
+	enum TYPE { CAPSULE, BOX, TYPE_END };
+
+public:
+	struct CAPSULE_SHAPE
+	{
+		_float	fRadius = 0.5f;
+		_float	fHeight = 1.f;
+	};
+	struct BOX_SHAPE
+	{
+		_float	fHalfForwardExtent	= 0.5f;
+		_float	fHalfHeight			= 0.5f;
+		_float	fHalfSideExtent		= 0.5f;
+	};
 	struct CONTROLLER_DESC
 	{
-		_float4 vInitialPos;
-		_uint	uCollisionType;
+		_float4			vInitialPos;
+		_uint			uCollisionType;
+
+		TYPE			eType = CAPSULE;
+		CAPSULE_SHAPE	tCapsuleShape;
+		BOX_SHAPE		tBoxShape;
 	};
 
 protected:
@@ -18,22 +37,16 @@ protected:
 	virtual ~CCharacterController() = default;
 
 public:
-	//void			Set_CollisionType(COLLISION_TYPE _CollisionType){ m_eCollisionType = _CollisionType; }
 	// 갑자기 위치값이 변화되는 경우 사용하시오.(ex. 텔레포트 등)
-	void			Set_Position(const _float4& vPos);
-	// 발 위치값 지정
+	void			Set_Position(CTransform* pTransform, const _float4& vPos);
 	void			Set_FootPosition(const _float4& vPos);
 
 	_float4			Get_Position();
 	_float4			Get_FootPosition();
 
-
-	//PxControllerCollisionFlag getCollisionFlags()
-	//{
-	//	return collisionFlags;
-	//}
-	//void			Get_ShapeInfo(physx::PxCapsuleGeometry& CapsuleGeo, physx::PxTransform& pxTransform);
-	_float			Get_Radius() const { return m_tControllerDesc.radius; }
+	_float			Get_Radius() const { return m_tControllerCapsuleDesc.radius; }
+	void			Clear_Collisions();
+	_bool			Has_Collided();
 
 public:
 	virtual HRESULT Initialize(void* pArg)	override;
@@ -83,19 +96,24 @@ protected:
 	physx::PxMaterial*					m_ControllerMaterial = nullptr;
 	_float3								m_vMaterialOptions = _float3(0.5f, 0.5f, 0.5f);
 
-	physx::PxCapsuleControllerDesc		m_tControllerDesc;
+	//PxControllerDesc를 상속시켜서 사용하고 싶었으나 안되었음
+	physx::PxCapsuleControllerDesc		m_tControllerCapsuleDesc;
+	physx::PxBoxControllerDesc 			m_tControllerBoxDesc;
+
 	physx::PxControllerFilters			m_ControllerFilters;
 	physx::PxFilterData					m_tFilterDesc;
 	
 	class CControllerBehaviorCallback*	m_pControllerCallBack = nullptr;
 	class CUserControllerHitReport*		m_pControllerHitReport = nullptr;
 	class CControllerFilterCallback*	m_pControllerFilterCallback = nullptr;
-	class cQueryFilterCallback*			m_pQueryFilterCallback = nullptr;
 	_float								m_fSlopeLimitDegree = 45.f;
 	_float								m_fFallVelocity = { 0.f };
 	_float								m_fFallAcceleration = { 0.f };
 
 	_float								m_fOffset = { 1.f };
+	TYPE								m_eType = TYPE::CAPSULE;
+	//CAPSULE_SHAPE						m_tCapsuleShape;
+	//BOX_SHAPE							m_tBoxShape;
 
 public:
 	static	CCharacterController*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

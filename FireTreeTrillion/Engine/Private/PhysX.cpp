@@ -421,8 +421,6 @@ void CPhysX::Free()
     if (m_pFoundation != nullptr)
         m_pFoundation->release();
 
-
-    //PxCooking*                        m_pCooking = nullptr;
 }
 
 
@@ -467,7 +465,13 @@ PxControllerBehaviorFlags CControllerBehaviorCallback::getBehaviorFlags(const Px
 
 void CUserControllerHitReport::onShapeHit(const physx::PxControllerShapeHit& hit)
 {
-    int a = 3;
+    PxController* MeController = hit.controller;
+    CComponent* pComponentDst = static_cast<CComponent*>(MeController->getUserData());
+    if (pComponentDst != nullptr)
+    {
+        CGameObject* pActorObjectDst = pComponentDst->Get_Object();
+
+    }
 }
 
 void CUserControllerHitReport::onControllerHit(const PxControllersHit& hit)
@@ -484,7 +488,7 @@ void CUserControllerHitReport::onControllerHit(const PxControllersHit& hit)
 		CGameObject* pActorObjectDst = pComponentDst->Get_Object();
 		CGameObject* pActorObjectSrc = pComponentSrc->Get_Object();
 
-        CollsionEvent(pActorObjectDst, pActorObjectSrc);
+       /* CollsionEvent(pActorObjectDst, pActorObjectSrc);*/
 	}
 }
 
@@ -499,11 +503,11 @@ void CUserControllerHitReport::CollsionEvent(CGameObject* pObj, CGameObject* pOt
     // 공-피격, 상호작용
     case CONTENT_ATTACK:
     {
-        //pOtherObj->Collision_Attack(pObj);
-        //pObj->Collision_Attack(pOtherObj);
+        pOtherObj->Collision_Attack(pObj);
+        pObj->Collision_Attack(pOtherObj);
     }
     break;
-    // 트리거, NPC 충돌
+    // NPC 충돌
     case CONTENT_INTERACT:
     {
     }
@@ -523,40 +527,47 @@ void CUserControllerHitReport::CollsionEvent(CGameObject* pObj, CGameObject* pOt
     }
 }
 
-
-bool CControllerFilterCallback::filter(const PxController& pObj, const PxController& pOtherObj)
+/// <summary> 히트박스와 콜라이더의 충돌을 개별처리하기 위해 사용하는 콜백클래스의 함수입니다. </summary>
+_bool CControllerFilterCallback::filter(const PxController& pObj, const PxController& pOtherObj)
 {
-    CComponent* pComponentDst = static_cast<CComponent*>(pObj.getUserData());
-    CComponent* pComponentSrc = static_cast<CComponent*>(pOtherObj.getUserData());
+    CComponent* pComponentObj = static_cast<CComponent*>(pObj.getUserData());
+    CComponent* pComponentOtherObj = static_cast<CComponent*>(pOtherObj.getUserData());
 
-    if (pComponentDst != nullptr && pComponentSrc != nullptr)
+    if (pComponentObj != nullptr && pComponentOtherObj != nullptr)
     {
-        CGameObject* pActorObjectDst = pComponentDst->Get_Object();
-        CGameObject* pActorObjectSrc = pComponentSrc->Get_Object();
+        CGameObject* pActorObject = pComponentObj->Get_Object();
+        CGameObject* pActorOther  = pComponentOtherObj->Get_Object();
         
-        // 두 PxController 간의 충돌을 무시하려면 false를 반환
-        return false;
+        // 충돌한 친구들은 m_setControllers에 모입니다.
+        if (pActorObject->Get_CollisionGroup() == HITBOX)
+        {
+            // 커비의 뱃살(HitBox)와 충돌난 친구들
+            //m_setControllers.insert(&pOtherObj);
+            return false;  // 물리적인 충돌 X
+        }
+        else if (pActorOther->Get_CollisionGroup() == HITBOX)
+        {
+            // 커비의 뱃살(HitBox)와 충돌난 친구들
+            //m_setControllers.insert(&pObj);
+            return false;  // 물리적인 충돌 X
+        }
     }
-
     return true;
 }
 
-PxQueryHitType::Enum cQueryFilterCallback::preFilter(const PxFilterData& filterData, const PxShape* shape, const PxRigidActor* actor, PxHitFlags& queryFlags)
+const unordered_set<const PxController*> CControllerFilterCallback::Get_Controllers()
 {
-    // 지형 (PxRigidStatic)과의 충돌을 인지하기 위해 actor의 유형을 체크
-    if (actor->is<PxRigidStatic>())
-    {
-        // 지형과의 충돌을 인지
-       // MSG_BOX(TEXT("지형이랑 충돌이 일어났음."));
-        return PxQueryHitType::eBLOCK;
-    }
-
-    // 다른 객체들과의 충돌 기본 처리
-    return PxQueryHitType::eBLOCK;
+    return m_setControllers;
 }
 
-PxQueryHitType::Enum cQueryFilterCallback::postFilter(const PxFilterData& filterData, const PxQueryHit& hit, const PxShape* shape, const PxRigidActor* actor)
+void CControllerFilterCallback::Clear_Collisions()
 {
-    // 후처리 필터링 로직 (필요시 추가 구현)
-    return PxQueryHitType::eBLOCK;
+    m_setControllers.clear();
 }
+
+// 개별로 충돌이 일어났는 지 체크하는 친구
+_bool CControllerFilterCallback::Has_Collided(const PxController* controller) const
+{
+    return m_setControllers.find(controller) != m_setControllers.end();
+}
+

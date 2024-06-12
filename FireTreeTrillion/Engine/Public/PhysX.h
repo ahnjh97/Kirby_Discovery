@@ -139,19 +139,19 @@ public:
 class CControllerFilterCallback : public PxControllerFilterCallback
 {
 public:
-    virtual bool filter(const PxController& a, const PxController& b) override;
+    virtual bool                             filter(const PxController& a, const PxController& b) override;
+    
+    const unordered_set<const PxController*> Get_Controllers();
+    void                                     Clear_Collisions();
+    
+    // NOT YET
+    bool                                     Has_Collided(const PxController* controller) const;
+
+private:
+    unordered_set<const PxController*>       m_setControllers;
 
 };
-
-
-class cQueryFilterCallback : public PxQueryFilterCallback
-{
-public:
-    virtual PxQueryHitType::Enum preFilter(const PxFilterData& filterData, const PxShape* shape, const PxRigidActor* actor, PxHitFlags& queryFlags) override;
-
-    virtual PxQueryHitType::Enum postFilter(const PxFilterData& filterData, const PxQueryHit& hit, const PxShape* shape, const PxRigidActor* actor) override;
-
-};
-
 
 END
+
+  

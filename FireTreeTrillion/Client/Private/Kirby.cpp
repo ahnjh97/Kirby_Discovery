@@ -12,6 +12,7 @@
 
 #include "KirbyWeapons.h"
 #include "KirbyArmours.h"
+#include "HitBox.h"
 
 #include "Utils.h"
 #include "Bone.h"
@@ -105,6 +106,7 @@ _int CKirby::Tick(_float fTimeDelta)
 
 	m_pWeapons->Tick(m_fTimeDelta);
 	m_pArmours->Tick(m_fTimeDelta);
+	m_pHitBox->Tick(m_fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
@@ -121,6 +123,7 @@ void CKirby::Late_Tick(_float fTimeDelta)
 	{
 		m_pWeapons->Late_Tick(m_fTimeDelta);
 		m_pArmours->Late_Tick(m_fTimeDelta);
+		m_pHitBox->Late_Tick(m_fTimeDelta);
 	}
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
@@ -514,7 +517,6 @@ HRESULT CKirby::Add_Components()
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	m_pControllerCom->Set_Object(this);
-	//m_pControllerCom->Set_CollisionType(m_eCollisionGroup);
 
 	// FOR ANIMTOOL
 	m_ppModelForAnimTool = &m_pModelCom[BODY_DEFAULT];
@@ -530,19 +532,22 @@ HRESULT CKirby::Add_PartObjects()
 {
 	CKirbyWeapons::KIRBYWEAPON_DESC	WeaponDesc{};
 	//CModel* pModel = (CModel*)Get_Component(TEXT("Com_Model_SwordDefault"));
-	WeaponDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 	//WeaponDesc.pSocket = pModel->Get_BonePtr("HatL");
+	WeaponDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 	WeaponDesc.pBoneMatrix = &m_WeaponMatrix;
 	m_pWeapons = static_cast<CKirbyWeapons*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_KirbyWeapons"), &WeaponDesc));
-	if (nullptr == m_pWeapons)
-		return E_FAIL;
+	CHECK_NULLPTR(m_pWeapons);
 
 	CKirbyArmours::KIRBYARMOURS_DESC ArmourDesc{};
 	ArmourDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 	ArmourDesc.pBoneMatrix = &m_ArmourMatrix;
 	m_pArmours = static_cast<CKirbyArmours*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_KirbyArmours"), &ArmourDesc));
-	if (nullptr == m_pArmours)
-		return E_FAIL;
+	CHECK_NULLPTR(m_pArmours);
+
+	CHitBox::HITBOX_DESC HitBoxDesc{};
+	HitBoxDesc.pOwner = this;
+	m_pHitBox = static_cast<CHitBox*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_HitBox"), &HitBoxDesc));
+	CHECK_NULLPTR(m_pHitBox);
 
 	return S_OK;
 }
@@ -557,6 +562,7 @@ HRESULT CKirby::Bind_ShaderResources()
 
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
+
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
@@ -884,6 +890,7 @@ void CKirby::Free()
 
 	Safe_Release(m_pWeapons);
 	Safe_Release(m_pArmours);
+	Safe_Release(m_pHitBox);
 	for (auto& fx : m_KirbyFXList)
 		Safe_Release(fx);
 }
