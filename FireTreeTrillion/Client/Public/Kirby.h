@@ -107,7 +107,7 @@ public:
 	virtual void	Render_IMGUI() override;
 #endif
 	virtual HRESULT	Render_DeferredInfo() override;
-	virtual void	Collision_Body(CGameObject* pOtherObj) override;
+	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
 	KIRBY_INFODESC* Get_KirbyInfo() { return &m_tKirbyInfo; }
 	void			Set_KirbyInfo(KIRBY_INFODESC _tInfo) {

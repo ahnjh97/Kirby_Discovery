@@ -220,6 +220,15 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyBoom_State">
       <UniqueIdentifier>{df88d3db-f381-4d13-8ca4-1ddc4df3cb3d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03.Collision">
+      <UniqueIdentifier>{e1c9a7b9-efac-424b-9bcd-62d41980db04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Item">
+      <UniqueIdentifier>{dcd6e3c0-cd2f-4f4e-8add-51eb6748dc29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Item\EnergyDrink">
+      <UniqueIdentifier>{e5a44464-aceb-4ed8-97a0-0e8e21890bb7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -442,6 +451,15 @@
     <ClInclude Include="..\Public\KirbyBoom_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyBoom_State</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\CollisionCenter.h">
+      <Filter>03.Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ItemObject.h">
+      <Filter>02.GameObjects\PhysXObject\Item</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnergyDrink.h">
+      <Filter>02.GameObjects\PhysXObject\Item\EnergyDrink</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -645,6 +663,15 @@
     </ClCompile>
     <ClCompile Include="..\Public\KirbyBoom_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyBoom_State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CollisionCenter.cpp">
+      <Filter>03.Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ItemObject.cpp">
+      <Filter>02.GameObjects\PhysXObject\Item</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EnergyDrink.cpp">
+      <Filter>02.GameObjects\PhysXObject\Item\EnergyDrink</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

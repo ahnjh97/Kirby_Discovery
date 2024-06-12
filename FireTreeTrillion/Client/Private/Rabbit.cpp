@@ -179,41 +179,20 @@ void CRabbit::Render_IMGUI()
 }
 #endif
 
-void CRabbit::Collision_Body(CGameObject* pOtherObj)
+void CRabbit::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
-	CPhysXObject* pObject = static_cast<CPhysXObject*>(pOtherObj);
-
-	Change_State(CRabbit::RABBIT_DAMAGE, 50.f, false, true);
-	m_eEyeState = RABBITEYE_HAPPY;
-}
-
-void CRabbit::Collision_Object(CGameObject* pOtherObj)
-{
-	CPhysXObject* pObject = static_cast<CPhysXObject*>(pOtherObj);
-
-
-	// 날아온게 FlyAway 상태인 몬스터였을 경우
-	if (pObject->Get_PhyXState() == PO_FLYAWAY)
+	if (eContent == CCollisionCenter::CONTENT_BODY)
 	{
-		// 같이 처맞고 날아가자.
-		pObject->Set_PhyXState(PO_FLYDEADAWAY);
-		m_ePhyXState = PO_FLYDEADAWAY;
-
-		CTransform* pObjectTransformCom = pObject->Get_TransformCom();
-
-		_vector vObjectPos = pObjectTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-
-		_vector vObjectDeadDir = vObjectPos - vPos;
-		_vector vMyDeadDir = vPos - vObjectPos;
-
-		vObjectDeadDir.m128_f32[1] = 0.f;
-		vMyDeadDir.m128_f32[1] = 0.f;
-
-		Set_DamageMoving(XMVector3Normalize(vMyDeadDir), 20.f);
-		pObject->Set_DamageMoving(XMVector3Normalize(vObjectDeadDir) * 0.5f, 15.f);
+		if (m_ePhyXState == PO_NORMAL)
+		{
+			Change_State(CRabbit::RABBIT_DAMAGE, 50.f, false, true);
+			m_eEyeState = RABBITEYE_HAPPY;
+		}
 	}
+	else if (eContent == CCollisionCenter::CONTENT_VACUUMOBJECT)
+	{
 
+	}
 }
 
 void CRabbit::Change_State(RABBIT_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
@@ -281,11 +260,9 @@ HRESULT CRabbit::Add_Components()
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
-	desc.uCollisionType = m_eCollisionGroup;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	m_pControllerCom->Set_Object(this);
-	//m_pControllerCom->Set_CollisionType(m_eCollisionGroup);
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 

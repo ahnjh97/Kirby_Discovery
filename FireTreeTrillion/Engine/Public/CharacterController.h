@@ -56,9 +56,7 @@ public:
 	_vector			Compute_TerrainPosition_Vector();
 	PxVec3			TerrainRayCast_Collision(PxVec3 _rayOrigin, PxVec3 _rayDirection, _float _fMaxDistance);
 
-	// 이동용, 기본 중력없기 때문에 이 함수로 중력 만들어 줄 것
-	/*physx::PxControllerCollisionFlags Move(_float3 vVelocity, _float fTimeDelta, _float minDist = 0.001f);
-	physx::PxControllerCollisionFlags MoveDisp(_float3 vPosDelta, _float fTimeDelta, _float minDist = 0.001f);*/
+
 
 	_bool	Is_Activated();
 	void	Activate(_bool bActive);
@@ -81,7 +79,6 @@ protected:
 
 protected:
 	class CGameObject*					m_pObject = nullptr;
-	COLLISION_TYPE						m_eCollisionType = COLLISION_END;
 
 	physx::PxController*				m_pController = nullptr;
 	physx::PxMaterial*					m_ControllerMaterial = nullptr;
@@ -99,6 +96,8 @@ protected:
 	_float								m_fFallAcceleration = { 0.f };
 
 	_float								m_fOffset = { 1.f };
+
+	_bool								m_isCollision = { false };
 
 public:
 	static	CCharacterController*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

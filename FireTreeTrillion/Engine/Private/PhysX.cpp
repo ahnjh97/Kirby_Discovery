@@ -67,42 +67,6 @@ HRESULT CPhysX::Initialize()
     //    }
     //}
 
-    // 충돌처리할 그룹들을 나누어 충돌결과를 관리한다.
-    Ready_CollisionContents();
-
-    return S_OK;
-}
-
-/// <summary> Initialize 'COLLISION_CONTENT' </summary>
-HRESULT CPhysX::Ready_CollisionContents()
-{
-    for (_int i = 0; i < COLLISION_END; i++)
-    {
-        for (_int j = 0; j < COLLISION_END; j++)
-        {
-            arrCollisionContents[i][j] = CONTENT_END;
-        }
-    }
-
-
-    // 플레이어와 몬스터의 BODY충돌
-    arrCollisionContents[PLAYER][MONSTER] = CONTENT_BODY;
-
-    // 커비의 히트박스와의 충돌
-    //arrCollisionContents[플레이어 히트박스][MONSTER] = CONTENT_ATTACK;
-
-
-    // 커비가 먹고 날리는것들과의 충돌.
-    arrCollisionContents[MONSTER][MONSTER]  = CONTENT_VACUUMOBJECT;
-    //arrCollisionContents[MONSTER][돌멩이 등] = CONTENT_VACUUMOBJECT;
-    //arrCollisionContents[MONSTER][상자 등] = CONTENT_VACUUMOBJECT;
-
-
-
-    //arrCollisionContents[MONSTER][PLAYER]	= CONTENT_BODY;
-    arrCollisionContents[PLAYER][INTERACT]  = CONTENT_INTERACT;
-    arrCollisionContents[PLAYER][ITEM]      = CONTENT_ACQUIRE;
-
     return S_OK;
 }
 
@@ -380,8 +344,6 @@ void CPhysX::Free()
     if (m_pFoundation != nullptr)
         m_pFoundation->release();
 
-
-    //PxCooking*                        m_pCooking = nullptr;
 }
 
 
@@ -456,115 +418,20 @@ void CUserControllerHitReport::onControllerHit(const PxControllersHit& hit)
 	PxController* MeController = hit.controller;
 	PxController* otherController = hit.other;
 
+   /* static _int iCnt{0};
+    ++iCnt;
+
+    printf("Cnt: %d", iCnt);*/
+
     // wi
-	CComponent* pComponentDst = static_cast<CComponent*>(MeController->getUserData());
-	CComponent* pComponentSrc = static_cast<CComponent*>(otherController->getUserData());
-
-	if (pComponentDst != nullptr && pComponentSrc != nullptr)
+	CComponent* pComponentSrc = static_cast<CComponent*>(MeController->getUserData());
+	CComponent* pComponentDst = static_cast<CComponent*>(otherController->getUserData());
+    //pComponentDst->Alarm_YouAreCollidedToAnotherController
+	if (pComponentSrc != nullptr && pComponentDst != nullptr)
 	{
-		CGameObject* pActorObjectDst = pComponentDst->Get_Object();
 		CGameObject* pActorObjectSrc = pComponentSrc->Get_Object();
+		CGameObject* pActorObjectDst = pComponentDst->Get_Object();
 
-        CollsionEvent(pActorObjectDst, pActorObjectSrc);
-	}
-}
-
-void CUserControllerHitReport::CollsionEvent(CGameObject* pObj, CGameObject* pOtherObj/*, COLLISION_TYPE eOwnCollsionGroup, COLLISION_TYPE eOtherCollsionGroup*/)
-{
-    COLLISION_TYPE ObjGroup = pObj->Get_CollisionGroup();
-    COLLISION_TYPE OtherGroup = pOtherObj->Get_CollisionGroup();
-    
-    _uint iCollisionContent = CGameInstance::Get_Instance()->Get_CollisionContent(ObjGroup, OtherGroup);
-    switch (iCollisionContent)
-    {
-        // 공-피격, 상호작용
-    case CONTENT_BODY:
-    {
-        pOtherObj->Collision_Body(pObj);
-        pObj->Collision_Body(pOtherObj);
-    }
-    break;
-
-    case CONTENT_VACUUMOBJECT:
-    {
-        pOtherObj->Collision_Object(pObj);
-        pObj->Collision_Object(pOtherObj);
-    }
-    break;
-    // 트리거, NPC 충돌
-    case CONTENT_INTERACT:
-    {
-
-    }
-
-    break;
-
-    case CONTENT_ACQUIRE:
-    {
-        pObj->Collision_Acquire(pOtherObj);
-        pOtherObj->Collision_Acquire(pObj);
-    }
-    break;
-
-    case CONTENT_NONEVENT:
-    {
-        //pObj->Collision_BlockEvent();
-        //pOtherObj->
-    }
-    break;
+        CGameInstance::Get_Instance()->Add_CollisionObjects(pActorObjectSrc, pActorObjectDst);
     }
 }
-
-//
-//void CUserControllerHitReport::onControllerHit(const PxControllersHit& hit)
-//{
-//    PxController* MeController = hit.controller;
-//    PxController* otherController = hit.other;
-//
-//    // wi
-//    CComponent* pComponentDst = static_cast<CComponent*>(MeController->getUserData());
-//    CComponent* pComponentSrc = static_cast<CComponent*>(otherController->getUserData());
-//
-//    if (pComponentDst != nullptr && pComponentSrc != nullptr)
-//    {
-//        CGameObject* pActorObjectDst = pComponentDst->Get_Object();
-//        COLLISION_TYPE objectTypeDst = pActorObjectDst->Get_CollisionGroup();
-//
-//        CGameObject* pActorObjectSrc = pComponentSrc->Get_Object();
-//        COLLISION_TYPE objectTypeSrc = pActorObjectSrc->Get_CollisionGroup();
-//
-//
-//        switch (objectTypeDst)
-//        {
-//        case COLLISION_TYPE::PLAYER:
-//            pActorObjectDst->Collision_Body(pActorObjectSrc);
-//            //handlePlayerCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[0]), static_cast<PxRigidDynamic*>(pairHeader.actors[1]));
-//            break;
-//        case COLLISION_TYPE::MONSTER:
-//            pActorObjectDst->Collision_Body();
-//            //handleEnemyCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[0]), static_cast<PxRigidDynamic*>(pairHeader.actors[1]));
-//            break;
-//        case COLLISION_TYPE::INTERACT:
-//            //MSG_BOX(TEXT("충돌 주체가 FRIEND"));
-//            //handleObstacleCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[0]), static_cast<PxRigidDynamic*>(pairHeader.actors[1]));
-//            break;
-//        }
-//
-//        switch (objectTypeSrc)
-//        {
-//        case COLLISION_TYPE::PLAYER:
-//            pActorObjectSrc->Collision_Body();
-//            //MSG_BOX(TEXT("충돌 대상자가 PLAYER"));
-//            //handlePlayerCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[1]), static_cast<PxRigidDynamic*>(pairHeader.actors[0]));
-//            break;
-//        case COLLISION_TYPE::MONSTER:
-//            pActorObjectSrc->Collision_Body();
-//            //MSG_BOX(TEXT("충돌 대상자가 MONSTER"));
-//            //handleEnemyCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[1]), static_cast<PxRigidDynamic*>(pairHeader.actors[0]));
-//            break;
-//        case COLLISION_TYPE::INTERACT:
-//            //handleObstacleCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[1]), static_cast<PxRigidDynamic*>(pairHeader.actors[0]));
-//            break;
-//        }
-//    }
-//}

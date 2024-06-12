@@ -11,6 +11,8 @@
 #include "Particle.h"
 #include "MultiEffect.h"
 
+#include "CollisionCenter.h"
+
 
 CMainApp::CMainApp()
 	: m_pGameInstance(CGameInstance::Get_Instance())
@@ -45,6 +47,8 @@ HRESULT CMainApp::Initialize()
 		return E_FAIL;
 	
 	Create_JSON();
+
+	CCollisionCenter::Get_Instance()->Initialize();
 
 	return S_OK;
 }
@@ -87,6 +91,10 @@ void CMainApp::Tick(_float fTimeDelta)
 				return;
 		}
 	}
+
+	CCollisionCenter::Get_Instance()->Collision_Tick(fTimeDelta);
+
+	m_pGameInstance->LateTick_Engine(fTimeDelta);
 }
 
 HRESULT CMainApp::Render(_float fTimeDelta)
@@ -651,4 +659,7 @@ void CMainApp::Free()
 
 	CLevelChanger::Get_Instance()->Release_LevelChanger();
 	CGameInstance::Release_Engine();
+
+
+	CCollisionCenter::Destroy_Instance();
 }

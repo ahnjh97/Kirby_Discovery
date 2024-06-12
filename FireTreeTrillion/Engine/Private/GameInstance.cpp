@@ -24,7 +24,7 @@
 
 IMPLEMENT_SINGLETON(CGameInstance)
 
-CGameInstance::CGameInstance()	
+CGameInstance::CGameInstance()
 {
 
 }
@@ -33,8 +33,8 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 {
 	/* 그래픽 디바이스를 초기화한다 .*/
 	m_pGraphic_Device = CGraphic_Device::Create(EngineDesc, ppDevice, ppContext);
-	if(nullptr == m_pGraphic_Device)
-		return E_FAIL;	
+	if (nullptr == m_pGraphic_Device)
+		return E_FAIL;
 
 	m_pInput_Device = CInput_Device::Create(hInstance, EngineDesc.hWnd);
 	if (nullptr == m_pInput_Device)
@@ -99,7 +99,7 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 	m_pExtractor = CExtractor::Create(*ppDevice, *ppContext);
 	if (nullptr == m_pExtractor)
 		return E_FAIL;
-	
+
 #ifdef _DEBUG
 	/* IMGUI 매니저의 공간 예약을 한다. */
 	m_pIMGUI_Manager = CImGUI_Manager::Create(EngineDesc.hWnd, *ppDevice, *ppContext);
@@ -120,8 +120,8 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 
 void CGameInstance::Tick_Engine(_float fTimeDelta)
 {
-	if (nullptr == m_pLevel_Manager || 
-		nullptr == m_pObject_Manager || 
+	if (nullptr == m_pLevel_Manager ||
+		nullptr == m_pObject_Manager ||
 		nullptr == m_pPipeLine)
 		return;
 
@@ -130,7 +130,7 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 	{
 		ffTimeDelta = fTimeDelta * 0.5f;
 	}
-	
+
 	m_pInput_Device->Tick();
 	m_pTimeController->Update_TimeController(fTimeDelta);
 
@@ -138,8 +138,8 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 	m_pPhysx->Tick(fTimeDelta);
 	m_pPicking->Update();
 	m_pPipeLine->Tick();
-
 	m_pFrustum->Tick();
+	m_pLevel_Manager->Tick(fTimeDelta);
 
 #ifdef _DEBUG
 
@@ -147,16 +147,16 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 
 	m_pLight_Manager->IMGUI_Tick();
 
-#endif
-
-	m_pObject_Manager->Late_Tick(fTimeDelta);
-	
-	/* 반복적인 갱신이 필요한 객체들의 Tick함수를 호출한다. */
-	m_pLevel_Manager->Tick(fTimeDelta);
+#endif	
 
 }
 
-HRESULT CGameInstance::Begin_Draw(const _float4 & vClearColor)
+void CGameInstance::LateTick_Engine(_float fTimeDelta)
+{
+	m_pObject_Manager->Late_Tick(fTimeDelta);
+}
+
+HRESULT CGameInstance::Begin_Draw(const _float4& vClearColor)
 {
 	if (nullptr == m_pGraphic_Device)
 		return E_FAIL;
@@ -175,7 +175,7 @@ HRESULT CGameInstance::End_Draw()
 
 HRESULT CGameInstance::Draw(_float fTimeDelta)
 {
-	if (nullptr == m_pGraphic_Device || 
+	if (nullptr == m_pGraphic_Device ||
 		nullptr == m_pLevel_Manager)
 		return E_FAIL;
 
@@ -187,7 +187,7 @@ HRESULT CGameInstance::Draw(_float fTimeDelta)
 	/* But. CRenderer객체의 렌더함수를 호출하여 객체를 그리낟. */
 	m_pRenderer->Render(fTimeDelta);
 
-	m_pLevel_Manager->Render();	
+	m_pLevel_Manager->Render();
 
 #ifdef _DEBUG
 	m_pIMGUI_Manager->Render();
@@ -211,7 +211,7 @@ HRESULT CGameInstance::Clear(_uint iClearLevelIndex)
 
 	/* 컴포넌트 원형 */
 	m_pComponent_Manager->Clear(iClearLevelIndex);
-	
+
 
 	return S_OK;
 }
@@ -280,12 +280,12 @@ _bool CGameInstance::Get_WindowActive()
 	return m_pInput_Device->Get_WindowActive();
 }
 
-HRESULT CGameInstance::Add_RenderGroup(CRenderer::RENDERGROUP eRenderGroup, CGameObject * pRenderObject)
+HRESULT CGameInstance::Add_RenderGroup(CRenderer::RENDERGROUP eRenderGroup, CGameObject* pRenderObject)
 {
 	if (nullptr == m_pRenderer)
 		return E_FAIL;
 
-	return m_pRenderer->Add_RenderGroup(eRenderGroup, pRenderObject);	
+	return m_pRenderer->Add_RenderGroup(eRenderGroup, pRenderObject);
 }
 
 void CGameInstance::Setting_RadialBlur(_fvector vWorldPos, _float fRadial, _float fSubtraction)
@@ -396,7 +396,7 @@ void CGameInstance::Setting_GodRay(_fvector vWorldPos)
 
 #ifdef _DEBUG
 
-HRESULT CGameInstance::Add_DebugComponents(CComponent * pRenderComponent)
+HRESULT CGameInstance::Add_DebugComponents(CComponent* pRenderComponent)
 {
 
 	if (nullptr == m_pRenderer)
@@ -407,7 +407,7 @@ HRESULT CGameInstance::Add_DebugComponents(CComponent * pRenderComponent)
 
 #endif
 
-HRESULT CGameInstance::Open_Level(_uint iNewLevelID, CLevel * pNewLevel)
+HRESULT CGameInstance::Open_Level(_uint iNewLevelID, CLevel* pNewLevel)
 {
 	if (nullptr == m_pLevel_Manager)
 		return E_FAIL;
@@ -415,15 +415,15 @@ HRESULT CGameInstance::Open_Level(_uint iNewLevelID, CLevel * pNewLevel)
 	return m_pLevel_Manager->Open_Level(iNewLevelID, pNewLevel);
 }
 
-HRESULT CGameInstance::Add_Prototype(const wstring & strPrototypeTag, CGameObject * pPrototype)
+HRESULT CGameInstance::Add_Prototype(const wstring& strPrototypeTag, CGameObject* pPrototype)
 {
 	if (nullptr == m_pObject_Manager)
 		return E_FAIL;
 
-	return m_pObject_Manager->Add_Prototype(strPrototypeTag, pPrototype);	
+	return m_pObject_Manager->Add_Prototype(strPrototypeTag, pPrototype);
 }
 
-HRESULT CGameInstance::Add_Clone(_uint iLevelIndex, const wstring & strLayerTag, const wstring & strPrototypeTag, void * pArg)
+HRESULT CGameInstance::Add_Clone(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strPrototypeTag, void* pArg)
 {
 	if (nullptr == m_pObject_Manager)
 		return E_FAIL;
@@ -431,7 +431,7 @@ HRESULT CGameInstance::Add_Clone(_uint iLevelIndex, const wstring & strLayerTag,
 	return m_pObject_Manager->Add_Clone(iLevelIndex, strLayerTag, strPrototypeTag, pArg);
 }
 
-CGameObject * CGameInstance::Clone_GameObject(const wstring & strPrototypeTag, void * pArg)
+CGameObject* CGameInstance::Clone_GameObject(const wstring& strPrototypeTag, void* pArg)
 {
 	if (nullptr == m_pObject_Manager)
 		return nullptr;
@@ -439,7 +439,7 @@ CGameObject * CGameInstance::Clone_GameObject(const wstring & strPrototypeTag, v
 	return m_pObject_Manager->Clone_GameObject(strPrototypeTag, pArg);
 }
 
-const CComponent * CGameInstance::Get_Component(_uint iLevelIndex, const wstring & strLayerTag, const wstring & strComTag, _uint iIndex)
+const CComponent* CGameInstance::Get_Component(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strComTag, _uint iIndex)
 {
 	CHECK_NULLPTR(m_pObject_Manager);
 	return m_pObject_Manager->Get_Component(iLevelIndex, strLayerTag, strComTag, iIndex);
@@ -491,13 +491,13 @@ CGameObject* CGameInstance::Get_GameObject_ByTag(_uint iLevelIndex, const wstrin
 	return m_pObject_Manager->Get_GameObject_ByTag(iLevelIndex, strLayerTag, _tag);
 }
 
-HRESULT CGameInstance::Add_Prototype(_uint iLevelIndex, const wstring & strPrototypeTag, CComponent * pPrototype)
+HRESULT CGameInstance::Add_Prototype(_uint iLevelIndex, const wstring& strPrototypeTag, CComponent* pPrototype)
 {
 	CHECK_NULLPTR(m_pComponent_Manager);
 	return m_pComponent_Manager->Add_Prototype(iLevelIndex, strPrototypeTag, pPrototype);
 }
 
-CComponent * CGameInstance::Clone_Component(_uint iLevelIndex, const wstring & strPrototypeTag, void * pArg)
+CComponent* CGameInstance::Clone_Component(_uint iLevelIndex, const wstring& strPrototypeTag, void* pArg)
 {
 	CHECK_NULLPTR(m_pComponent_Manager);
 	return m_pComponent_Manager->Clone_Component(iLevelIndex, strPrototypeTag, pArg);
@@ -508,15 +508,15 @@ CComponent_Manager::PROTOTYPES* CGameInstance::Get_ComMap(_uint iLevelIdx)
 	return m_pComponent_Manager->Get_ComMap(iLevelIdx);
 }
 
-HRESULT CGameInstance::Add_Timer(const wstring & strTimerTag)
+HRESULT CGameInstance::Add_Timer(const wstring& strTimerTag)
 {
 	if (nullptr == m_pTimer_Manager)
 		return E_FAIL;
 
-	return m_pTimer_Manager->Add_Timer(strTimerTag);	
+	return m_pTimer_Manager->Add_Timer(strTimerTag);
 }
 
-_float CGameInstance::Compute_TimeDelta(const wstring & strTimerTag)
+_float CGameInstance::Compute_TimeDelta(const wstring& strTimerTag)
 {
 	if (nullptr == m_pTimer_Manager)
 		return 0.0f;
@@ -616,7 +616,7 @@ CCamera* CGameInstance::Get_CurCameraPtr()
 	return m_pPipeLine->Get_CurCameraPtr();
 }
 
-const LIGHT_DESC * CGameInstance::Get_LightDesc(_uint iIndex)
+const LIGHT_DESC* CGameInstance::Get_LightDesc(_uint iIndex)
 {
 	if (m_pLight_Manager == nullptr)
 		return nullptr;
@@ -624,7 +624,7 @@ const LIGHT_DESC * CGameInstance::Get_LightDesc(_uint iIndex)
 	return m_pLight_Manager->Get_LightDesc(iIndex);
 }
 
-HRESULT CGameInstance::Add_Light(const LIGHT_DESC & LightDesc)
+HRESULT CGameInstance::Add_Light(const LIGHT_DESC& LightDesc)
 {
 	if (m_pLight_Manager == nullptr)
 		return E_FAIL;
@@ -632,7 +632,7 @@ HRESULT CGameInstance::Add_Light(const LIGHT_DESC & LightDesc)
 	return m_pLight_Manager->Add_Light(LightDesc);
 }
 
-HRESULT CGameInstance::Render_Lights(CShader * pShader, CVIBuffer_Rect * pVIBuffer, _bool bForTool)
+HRESULT CGameInstance::Render_Lights(CShader* pShader, CVIBuffer_Rect* pVIBuffer, _bool bForTool)
 {
 	if (m_pLight_Manager == nullptr)
 		return E_FAIL;
@@ -656,15 +656,15 @@ CLight* CGameInstance::Get_LightLastAddress()
 	return m_pLight_Manager->Get_LightLastAddress();
 }
 
-HRESULT CGameInstance::Add_Font(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const wstring & strFontTag, const wstring & strFontFilePath)
+HRESULT CGameInstance::Add_Font(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const wstring& strFontTag, const wstring& strFontFilePath)
 {
 	if (m_pFont_Manager == nullptr)
 		return E_FAIL;
 
-	return m_pFont_Manager->Add_Font(pDevice, pContext, strFontTag, strFontFilePath);	
+	return m_pFont_Manager->Add_Font(pDevice, pContext, strFontTag, strFontFilePath);
 }
 
-HRESULT CGameInstance::Render_Font(const wstring & strFontTag, const wstring & strText, const _float2 & vPosition, _fvector vColor, _float fRadian)
+HRESULT CGameInstance::Render_Font(const wstring& strFontTag, const wstring& strText, const _float2& vPosition, _fvector vColor, _float fRadian)
 {
 	if (m_pFont_Manager == nullptr)
 		return E_FAIL;
@@ -673,7 +673,7 @@ HRESULT CGameInstance::Render_Font(const wstring & strFontTag, const wstring & s
 }
 
 #pragma region TARGET_MANAGER
-HRESULT CGameInstance::Add_RenderTarget(const wstring & strRenderTargetTag, _uint iSizeX, _uint iSizeY, DXGI_FORMAT ePixelFormat, const _float4 & vClearColor)
+HRESULT CGameInstance::Add_RenderTarget(const wstring& strRenderTargetTag, _uint iSizeX, _uint iSizeY, DXGI_FORMAT ePixelFormat, const _float4& vClearColor)
 {
 	if (m_pTarget_Manager == nullptr)
 		return E_FAIL;
@@ -681,7 +681,7 @@ HRESULT CGameInstance::Add_RenderTarget(const wstring & strRenderTargetTag, _uin
 	return m_pTarget_Manager->Add_RenderTarget(strRenderTargetTag, iSizeX, iSizeY, ePixelFormat, vClearColor);
 }
 
-HRESULT CGameInstance::Add_MRT(const wstring & strMRTTag, const wstring & strRenderTargetTag)
+HRESULT CGameInstance::Add_MRT(const wstring& strMRTTag, const wstring& strRenderTargetTag)
 {
 	if (m_pTarget_Manager == nullptr)
 		return E_FAIL;
@@ -689,7 +689,7 @@ HRESULT CGameInstance::Add_MRT(const wstring & strMRTTag, const wstring & strRen
 	return m_pTarget_Manager->Add_MRT(strMRTTag, strRenderTargetTag);
 }
 
-HRESULT CGameInstance::Begin_MRT(const wstring & strMRTTag, ID3D11DepthStencilView* pDSV)
+HRESULT CGameInstance::Begin_MRT(const wstring& strMRTTag, ID3D11DepthStencilView* pDSV)
 {
 	if (m_pTarget_Manager == nullptr)
 		return E_FAIL;
@@ -705,7 +705,7 @@ HRESULT CGameInstance::End_MRT()
 	return m_pTarget_Manager->End_MRT();
 }
 
-HRESULT CGameInstance::Bind_RTShaderResource(CShader * pShader, const wstring & strRenderTargetTag, const _char * pConstantName)
+HRESULT CGameInstance::Bind_RTShaderResource(CShader* pShader, const wstring& strRenderTargetTag, const _char* pConstantName)
 {
 	if (m_pTarget_Manager == nullptr)
 		return E_FAIL;
@@ -713,7 +713,7 @@ HRESULT CGameInstance::Bind_RTShaderResource(CShader * pShader, const wstring & 
 	return m_pTarget_Manager->Bind_ShaderResource(pShader, strRenderTargetTag, pConstantName);
 }
 
-HRESULT CGameInstance::Copy_Resource(const wstring & strRenderTargetTag, ID3D11Texture2D ** ppTextureHub)
+HRESULT CGameInstance::Copy_Resource(const wstring& strRenderTargetTag, ID3D11Texture2D** ppTextureHub)
 {
 	if (m_pTarget_Manager == nullptr)
 		return E_FAIL;
@@ -746,7 +746,7 @@ void CGameInstance::TransformFrustum_LocalSpace(_fmatrix WorldMatrixInv)
 	m_pFrustum->Transform_LocalSpace(WorldMatrixInv);
 }
 
-_vector CGameInstance::Compute_WorldPos(const _float2 & vViewportPos, const wstring & strZRenderTargetTag, _uint iOffset)
+_vector CGameInstance::Compute_WorldPos(const _float2& vViewportPos, const wstring& strZRenderTargetTag, _uint iOffset)
 {
 	if (m_pExtractor == nullptr)
 		return XMVectorZero();
@@ -794,10 +794,6 @@ _float4x4 CGameInstance::Update(_fmatrix matrix)
 	return m_pPhysx->Update(matrix);
 }
 
-_uint CGameInstance::Get_CollisionContent(COLLISION_TYPE eMeType, COLLISION_TYPE eOtherType)
-{
-	return m_pPhysx->Get_CollisionContent(eMeType, eOtherType);
-}
 
 void CGameInstance::Ready_TestGround()
 {
@@ -805,14 +801,14 @@ void CGameInstance::Ready_TestGround()
 }
 
 #ifdef _DEBUG
-HRESULT CGameInstance::Ready_RTVDebug(const wstring & strRenderTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY)
+HRESULT CGameInstance::Ready_RTVDebug(const wstring& strRenderTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY)
 {
 	if (m_pTarget_Manager == nullptr)
 		return E_FAIL;
 
 	return m_pTarget_Manager->Ready_Debug(strRenderTargetTag, fX, fY, fSizeX, fSizeY);
 }
-HRESULT CGameInstance::Draw_RTVDebug(const wstring& strMRTTag, CShader * pShader, CVIBuffer_Rect * pVIBuffer)
+HRESULT CGameInstance::Draw_RTVDebug(const wstring& strMRTTag, CShader* pShader, CVIBuffer_Rect* pVIBuffer)
 {
 	if (m_pTarget_Manager == nullptr)
 		return E_FAIL;
@@ -1027,6 +1023,43 @@ void CGameInstance::Restore_SecondTimer()
 	m_pTimeController->Restore_SecondTimer();
 }
 
+void CGameInstance::Add_CollisionObjects(CGameObject* Src, CGameObject* Dst)
+{
+	if (Src == nullptr || Dst == nullptr)
+		return;
+
+
+	std::pair<CGameObject*, CGameObject*> collisionPair = std::minmax(Src, Dst);
+
+	auto result = m_CollisionObjects.insert(collisionPair);
+	if (result.second) { // 삽입이 성공했을 때만 레퍼런스 카운트 증가
+		Safe_AddRef(Src);
+		Safe_AddRef(Dst);
+	}
+
+	static _int iDnt{0};
+	++iDnt;
+	printf("Object Size(): %d\n", m_CollisionObjects.size());
+}
+
+void CGameInstance::Get_CollisionObjects(_Inout_ set<pair<CGameObject*, CGameObject*>>& CollisionObjects)
+{
+	if (m_CollisionObjects.empty() == true)
+		return;
+
+	if (CollisionObjects.empty() == false)
+		return;
+
+
+	//static _int iCnt{0};
+	//++iCnt;
+	//ImGui::Begin(u8"야 이거 뭐냐?");
+	//ImGui::Text("%d", iCnt);
+	//ImGui::End();
+
+	CollisionObjects = move(m_CollisionObjects);
+}
+
 
 
 void CGameInstance::Release_Engine()
@@ -1048,7 +1081,7 @@ void CGameInstance::Free()
 	Safe_Release(m_pLight_Manager);
 	Safe_Release(m_pPipeLine);
 	Safe_Release(m_pTimer_Manager);
-	Safe_Release(m_pRenderer);	
+	Safe_Release(m_pRenderer);
 	Safe_Release(m_pObject_Manager);
 	Safe_Release(m_pComponent_Manager);
 	Safe_Release(m_pPicking);
@@ -1057,4 +1090,13 @@ void CGameInstance::Free()
 	Safe_Release(m_pSound_Manager);
 	Safe_Release(m_pPhysx);
 	Safe_Release(m_pGraphic_Device);
+
+	for (auto& Object : m_CollisionObjects)
+	{
+		CGameObject* pSrc = Object.first;
+		Safe_Release(pSrc);
+		pSrc = Object.second;
+		Safe_Release(pSrc);
+	}
+	m_CollisionObjects.clear();
 }

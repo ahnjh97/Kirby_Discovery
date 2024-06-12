@@ -20,7 +20,6 @@ HRESULT CCharacterController::Initialize(void* pArg)
 	CONTROLLER_DESC* pDes = (CONTROLLER_DESC*)pArg;
 	_float4 vInitialPos = pDes->vInitialPos;
 	m_tControllerDesc.position = PxExtendedVec3(vInitialPos.x, vInitialPos.y, vInitialPos.z);
-	m_eCollisionType = (COLLISION_TYPE)pDes->uCollisionType;
 	__super::Initialize(pArg);
 
 	Set_DefaultValue();
@@ -429,9 +428,6 @@ void CCharacterController::Create_Controller()
 
 	PxShape* shape;
 	m_pController->getActor()->getShapes(&shape, 1);
-	shape->setSimulationFilterData(physx::PxFilterData{ static_cast<physx::PxU32>(m_eCollisionType), 0, 0, 0 });
-	//shape->setQueryFilterData(physx::PxFilterData{static_cast<physx::PxU32>(1), 0, 0, 0});
-	//m_pGameInstance->RemoveActor(*m_pController->getActor());
 
 	if (m_pObject != nullptr)
 		Set_FootPosition(m_pObject->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION));

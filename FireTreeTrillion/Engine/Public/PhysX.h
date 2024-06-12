@@ -39,12 +39,6 @@ public:
     PxScene*                            Get_Scene() { return m_pScene; }
     PxControllerManager*                Get_ControllerManager() { return m_pControllerManager; }
     
-    _uint                               Get_CollisionContent(COLLISION_TYPE eMeType, COLLISION_TYPE eOtherType) 
-    { 
-        return arrCollisionContents[eMeType][eOtherType] == CONTENT_END ? 
-            arrCollisionContents[eOtherType][eMeType] : arrCollisionContents[eMeType][eOtherType];
-    }
-
     // NOT YET
     //PxMaterial*                       FindMaterial(const string& strMtrlTag);
     //PxCooking*                        GetCooking() { return m_pCooking; }
@@ -80,12 +74,6 @@ private:
 
     map<string, PxMaterial*>    m_mapMaterials;
 
-
-
-private:
-    // 충돌처리할 그룹들의 결과컨텐츠를 2차원 배열로 저장합니다.
-    _uint arrCollisionContents[COLLISION_END][COLLISION_END];
-
 public:
     static CPhysX*  Create();
     virtual void    Free() override;
@@ -120,30 +108,18 @@ public:
 };
 
 // PxUserControllerHitReport : Controller의 모든 충돌 정보를 가지고옴.
-class CUserControllerHitReport : public physx::PxUserControllerHitReport 
+class ENGINE_DLL CUserControllerHitReport : public physx::PxUserControllerHitReport
 {
-private:
-    void Initialize();
 
 public:
     // 캐릭터 컨트롤러의 충돌 이벤트 처리
     virtual void onShapeHit(const physx::PxControllerShapeHit& hit) override;
     
     virtual void onControllerHit(const PxControllersHit& hit) override;
-
-    // NOT YET
-    //virtual void onControllerShapeHit(const PxControllerShapeHit& hit) override {}
     
-    // for 순수가상함수
     virtual void onObstacleHit(const PxControllerObstacleHit& hit) override {}
 
-    void    CollsionEvent(class CGameObject* pObj, class CGameObject* pOtherObj/*, COLLISION_TYPE eOwnCollsionGroup, COLLISION_TYPE eOtherCollsionGroup*/);
-
-//private:
-    // CollisionGroup끼리 부딪혔을 때, 충돌 컨텐츠 지정. Initialize에서 내용물 채워주기.
-    //_uint arrCollisionContents[COLLISION_END][COLLISION_END];
 
 };
-
 
 END

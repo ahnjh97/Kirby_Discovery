@@ -40,8 +40,7 @@ public:
 #ifdef _DEBUG
 	virtual void	Render_IMGUI() override;
 #endif
-	virtual void	Collision_Body(CGameObject* pOtherObj) override;
-	virtual void	Collision_Object(CGameObject* pOtherObj) override;
+	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
 
 public:

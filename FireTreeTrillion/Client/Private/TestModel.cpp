@@ -19,7 +19,7 @@ CTestModel::CTestModel(const CTestModel& rhs)
 
 HRESULT CTestModel::Initialize_Prototype()
 {
-    m_eCollisionGroup = COLLISION_TYPE::INTERACT;
+    //m_eCollisionGroup = COLLISION_TYPE::INTERACT;
 
     return S_OK;
 }

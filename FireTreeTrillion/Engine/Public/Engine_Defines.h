@@ -25,28 +25,6 @@ namespace Engine
     enum KF_PROPERTY {KF_POS, KF_ROT, KF_SCALE, KF_RCOLOR, KF_GCOLOR, KF_BCOLOR, KF_ALPHA, KF_MASK, KF_UVOFFSET, KF_MASKUVOFFSET, KF_MASKUVANGLE, KF_END};
     enum RIGID_SHAPE { RIGID_BOX, RIGID_SPHERE, RIGID_CAPSULE, RIGID_END };
     enum INSTANCE_PROPERTY {INSTANCE_DROP, INSTANCE_SPREAD, INSTANCE_DECELERATE, INSTANCE_END};
-
-    enum COLLISION_TYPE
-    { 
-        PLAYER = 0, PLAYER_EFFECT,
-        MONSTER,
-        INTERACT,
-        ITEM,
-        TRIGGER,
-        COLLISION_END
-    };
-
-    enum COLLISION_CONTENT
-    {
-        CONTENT_BODY,		    // 몸 끼리 박음
-        CONTENT_ATTACK,         // 충돌박스와의 충돌
-        CONTENT_VACUUMOBJECT,   // 커비가 흡수 후 날리는 것들과의 충돌
-
-        CONTENT_INTERACT,	// 상호작용하는 객체끼리의 충돌
-        CONTENT_ACQUIRE,	// 만나면 ObjDest가 삭제되는 충돌액션
-        CONTENT_NONEVENT,	// 공통적인 충돌처리가 없는 경우
-        CONTENT_END
-    };
 }
 
 // Set_Dead() 매크로

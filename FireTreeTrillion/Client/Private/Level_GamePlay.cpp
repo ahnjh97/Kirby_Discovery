@@ -50,9 +50,9 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
 		return E_FAIL;
 
-	// TEST (블러와 블랜드의 관계)
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Moon"), TEXT("Prototype_GameObject_Moon"))))
-	//	return E_FAIL;
+	// TEST (아이템 보이)
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Item"), TEXT("Prototype_GameObject_EnergyDrink"))))
+		return E_FAIL;
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 

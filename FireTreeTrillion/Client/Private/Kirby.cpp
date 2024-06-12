@@ -103,9 +103,7 @@ HRESULT CKirby::Initialize(void* pArg)
 	m_eAbilityType = ABILITY_DEFAULT;
 	//m_eAbilityType = ABILITY_BOMB;
 
-	CCharacterController* pController = dynamic_cast<CCharacterController*>(Get_Component(TEXT("Com_Controller")));
-	pController->RegisterAsPlayer();
-
+	m_pControllerCom->RegisterAsPlayer();
 	return S_OK;
 }
 
@@ -212,7 +210,7 @@ void CKirby::Render_IMGUI()
 	}
 
 
-	ImGui::Text("ObjectAddress : %d", INFO(m_pObject));
+	ImGui::Text("HP : %d", (_int)m_fHp);
 	ImGui::Text("ChargeTime : %.2f", INFO(m_fChargeTime));
 	ImGui::Text("MoveSpeed : %.2f", INFO(m_fMoveSpeed));
 	ImGui::Text("PREATTACKSTATE : %d", INFO(m_ePreAttackState));
@@ -258,79 +256,60 @@ HRESULT CKirby::Render_DeferredInfo()
 
 }
 
-void CKirby::Collision_Body(CGameObject* pOtherObj)
+void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
-	CPhysXObject* pObject = static_cast<CPhysXObject*>(pOtherObj);
-
-	// 흡수중인 몬스터
-	if (pObject->Get_PhyXState() == PO_VACUUMING)
+	if (eContent == CCollisionCenter::CONTENT_BODY)
 	{
-		// 일단 EAT으로 넘기는건 같으나, EAT이 끝날 시점에 내가 삼켰던 것이 무엇이였는지 판단 후 애니메이션이 분기된다.
-		INFO(m_isEat) = true;
-		INFO(m_eEyeState) = EYE_IDLE;
-		INFO(m_eMouthState) = MOUTH_ANGER;
-		//m_ePhyXState = PO_NORMAL;
-		Change_State(STATE_EAT, 100.f, false, false, BODY_BALLOON);
-		// 임시 보관소. 먹은게 끝났을 떄, 비로소 커비의 어빌리티 타입이 바뀐다.
-		INFO(m_eTemporaryEatType) = pObject->Get_AbilityType();
-
-		if (pObject != nullptr)
+		// 흡수중인 몬스터
+		if (pObject->Get_PhyXState() == PO_VACUUMING)
 		{
-			pObject->Set_PhyXState(PO_KIRBYMOUTH);
+			// 일단 EAT으로 넘기는건 같으나, EAT이 끝날 시점에 내가 삼켰던 것이 무엇이였는지 판단 후 애니메이션이 분기된다.
+			INFO(m_isEat) = true;
+			INFO(m_eEyeState) = EYE_IDLE;
+			INFO(m_eMouthState) = MOUTH_ANGER;
+			Change_State(STATE_EAT, 100.f, false, false, BODY_BALLOON);
+			// 임시 보관소. 먹은게 끝났을 떄, 비로소 커비의 어빌리티 타입이 바뀐다.
+			INFO(m_eTemporaryEatType) = pObject->Get_AbilityType();
+
+			if (pObject != nullptr)
+				pObject->Set_PhyXState(PO_KIRBYMOUTH);
+
+			Delete_KirbyEffect();
 		}
-
-		Delete_KirbyEffect();
-	}
-	// 입에 머금은 상태의 몬스터
-	else if (pObject->Get_PhyXState() == PO_KIRBYMOUTH)
-	{
-		// 서로 반응이 없어야 한다. (단, 이친구는 항상 나를 따라다닐것이다.)
-
-
-
-	}
-	// 발사중인 몬스터
-	else if (pObject->Get_PhyXState() == PO_FLYAWAY)
-	{
-		// 서로 반응이 없어야 한다.
-
-
-
-
-	}
-	// 슬라이드중의 충돌
-	else if (Get_State() == STATE_SLIDE)
-	{
-		pObject->Set_DamageMoving(Make_RepulsiveDir(pObject), 10.f);
-		INFO(m_fJumpVelocity) = 11.f;
-		//INFO(m_fMoveSpeed) = 0.f;
-		Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
-	}
-	// 서로 박치기 해였을 때 충돌
-	else
-	{
-		pObject->Set_DamageMoving(Make_RepulsiveDir(pObject), 5.f);
-
-		INFO(m_fJumpVelocity) = 11.f;
-
-		// 먹은 상태인 경우
-		if (INFO(m_isEat) == true)
+		// 입에 머금은 상태의 몬스터
+		else if (pObject->Get_PhyXState() == PO_KIRBYMOUTH)
 		{
-			Change_State(STATE_EATDAMAGE, 60.f, false, false, BODY_BALLOON);
+
 		}
-		// 나는 상태일 경우 . . .
-		else if (true == (Get_State() == STATE_FLIGHTSTART || Get_State() == STATE_FLIGHTFALL || Get_State() == STATE_FLIGHT ||
-			Get_State() == STATE_FLIGHTLANDING || Get_State() == STATE_FLIGHTLIMIT || Get_State() == STATE_FLIGHTLIMITFALL))
+		// 발사중인 몬스터
+		else if (pObject->Get_PhyXState() == PO_FLYAWAY)
 		{
-			Change_State(STATE_FILGHTDAMAGE, 60.f, false, false, BODY_BALLOON);
+
 		}
-		// 평범한 상태에서...
 		else
 		{
-			Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
+			// 먹은 상태인 경우
+			if (INFO(m_isEat) == true)
+			{
+				Change_State(STATE_EATDAMAGE, 60.f, false, false, BODY_BALLOON);
+			}
+			// 나는 상태일 경우 . . .
+			else if (true == (Get_State() == STATE_FLIGHTSTART || Get_State() == STATE_FLIGHTFALL || Get_State() == STATE_FLIGHT ||
+				Get_State() == STATE_FLIGHTLANDING || Get_State() == STATE_FLIGHTLIMIT || Get_State() == STATE_FLIGHTLIMITFALL))
+			{
+				Change_State(STATE_FILGHTDAMAGE, 60.f, false, false, BODY_BALLOON);
+			}
+			// 평범한 상태에서...
+			else
+			{
+				Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
+			}
+
+			Delete_KirbyEffect();
 		}
-		Delete_KirbyEffect();
 	}
+
+
 }
 
 _float3 CKirby::Make_RepulsiveDir(CPhysXObject* pObject)
@@ -525,11 +504,9 @@ HRESULT CKirby::Add_Components()
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
-	desc.uCollisionType = m_eCollisionGroup;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	m_pControllerCom->Set_Object(this);
-	//m_pControllerCom->Set_CollisionType(m_eCollisionGroup);
 
 	// FOR ANIMTOOL
 	m_ppModelForAnimTool = &m_pModelCom[BODY_DEFAULT];

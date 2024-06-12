@@ -74,6 +74,9 @@
 
 #include "Moon.h"
 #include "WasteCan.h"
+
+// æ∆¿Ã≈€
+#include "EnergyDrink.h"
 #pragma endregion
 
 
@@ -228,6 +231,9 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Moon"), CMoon);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("WasteCan"), CWasteCan);
+
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("EnergyDrink"), CEnergyDrink);
+
 #pragma endregion
 
 	return S_OK;
@@ -643,6 +649,10 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// For Mab Interactive Object
 		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM);
+
+		// For Item
+		m_vecModelInfo.emplace_back("Item_EnergyDrink", TYPE_NONANIM, 3.f);
+
 	}
 	else if (eLevel == LEVEL_GAMEPLAY)
 	{
@@ -685,6 +695,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// For Mab Interactive Object
 		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM);
+
+		// For Item
+		m_vecModelInfo.emplace_back("Item_EnergyDrink", TYPE_NONANIM, 3.f);
 	}
 	else if (eLevel == LEVEL_TOOL_MAP)
 	{

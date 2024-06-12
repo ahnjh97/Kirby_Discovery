@@ -19,6 +19,7 @@ private:
 public:
 	HRESULT Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, const ENGINE_DESC& EngineDesc, _Inout_ ID3D11Device** ppDevice, _Inout_ ID3D11DeviceContext** ppContext);
 	void Tick_Engine(_float fTimeDelta);
+	void LateTick_Engine(_float fTimeDelta);
 	HRESULT Begin_Draw(const _float4 & vClearColor);
 	HRESULT End_Draw();
 	HRESULT Draw(_float fTimeDelta);
@@ -147,7 +148,6 @@ public: /* For.PhysX */
 
 	void		Test();
 	_float4x4	Update(_fmatrix matrix);
-	_uint		Get_CollisionContent(COLLISION_TYPE eMeType, COLLISION_TYPE eOtherType);
 	void		Ready_TestGround();
 
 #ifdef _DEBUG
@@ -207,6 +207,12 @@ public: /* For. TimeController */
 	_uint Get_NumOctree() { return g_iNumOctree; }
 	void IncreaseIndex() { g_iNumOctree++; }
 
+public: // For Collision
+	void	Add_CollisionObjects(class CGameObject* Src, class CGameObject* Dst);
+	void	Get_CollisionObjects(_Inout_ set<pair<class CGameObject*, class CGameObject*>>& CollisionObjects);
+
+
+
 private:
 	class CGraphic_Device*			m_pGraphic_Device = { nullptr };
 	class CInput_Device*			m_pInput_Device = { nullptr };
@@ -231,6 +237,9 @@ private:
 
 	_uint	m_iCurrentLevelID		= { 0 };
 	_uint	g_iNumOctree			= {};
+
+
+	set<pair<class CGameObject*, class CGameObject*>> m_CollisionObjects;
 
 public:		
 	static void Release_Engine();
