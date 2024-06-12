@@ -2,14 +2,33 @@
 #include "Component.h"
 
 BEGIN(Engine)
+class CTransform;
 
 class ENGINE_DLL CCharacterController : public CComponent
 {
 public:
+	enum TYPE { CAPSULE, BOX, TYPE_END };
+
+public:
+	struct CAPSULE_SHAPE
+	{
+		_float	fRadius = 0.5f;
+		_float	fHeight = 1.f;
+	};
+	struct BOX_SHAPE
+	{
+		_float	fHalfForwardExtent	= 0.5f;
+		_float	fHalfHeight			= 0.5f;
+		_float	fHalfSideExtent		= 0.5f;
+	};
 	struct CONTROLLER_DESC
 	{
-		_float4 vInitialPos;
-		_uint	uCollisionType;
+		_float4			vInitialPos;
+		_uint			uCollisionType;
+
+		TYPE			eType = CAPSULE;
+		CAPSULE_SHAPE	tCapsuleShape;
+		BOX_SHAPE		tBoxShape;
 	};
 
 protected:
@@ -18,7 +37,6 @@ protected:
 	virtual ~CCharacterController() = default;
 
 public:
-	//void			Set_CollisionType(COLLISION_TYPE _CollisionType){ m_eCollisionType = _CollisionType; }
 	// 갑자기 위치값이 변화되는 경우 사용하시오.(ex. 텔레포트 등)
 	void			Set_Position(class CTransform* pTransform, const _float4& vPos);
 	// 발 위치값 지정
@@ -27,12 +45,7 @@ public:
 	_float4			Get_Position();
 	_float4			Get_FootPosition();
 
-	//PxControllerCollisionFlag getCollisionFlags()
-	//{
-	//	return collisionFlags;
-	//}
-	void			Get_ShapeInfo(physx::PxCapsuleGeometry& CapsuleGeo, physx::PxTransform& pxTransform);
-	_float			Get_Radius() const { return m_tControllerDesc.radius; }
+	_float			Get_Radius() const { return m_tControllerCapsuleDesc.radius; }
 	void			RegisterAsPlayer();
 
 public:
@@ -44,11 +57,11 @@ public:
 
 public:
 	// 이동에 대한 함수
-	void			Move(class CTransform* pTransform, _fvector vPosition, _float fTimeDelta);				// look방향으로 움직임
+	void			Move(class CTransform* pTransform, _fvector vPosition, _float fTimeDelta, _float fHeight = 1.f);				// look방향으로 움직임	void			Move_Dir(class CTransform* pTransform, _fvector fDelta, _float fTimeDelta);			// 방향 벡터로 움직임
 	void			Move_Dir(class CTransform* pTransform, _fvector fDelta, _float fTimeDelta);			// 방향 벡터로 움직임
 	_bool			Jump(CTransform* pTransform, _float fFallVelocity, _float fTimeDelta);				// 점프
 	_bool			Jump_Parabola(CTransform* pTransform, _fvector vGoPos, _float fTimeDelta);			// 목표 지점으로 점프
-	void			FreeFall(CTransform* pTransform, _float fTimeDelta, _float fOffset = 1.f);			// 자유 낙하
+	void			FreeFall(CTransform* pTransform, _float fTimeDelta, _float fOffset = 6.f, _float fHeight = 1.f);			// 자유 낙하
 	void			Reset_FallVelocity() { m_fFallVelocity = 0.f; }										// 자유 낙하 중력값 초기화
 	PxVec3			Compute_Slope(CTransform* pTransform);												// 경사면의 노말벡터 계산
 	_float			Compute_Height(_fvector vAxis = XMVectorSet(0.f, 0.f, 0.f, 0.f));																	// 경사면의 노말벡터 계산
@@ -56,7 +69,7 @@ public:
 	_vector			Compute_TerrainPosition_Vector();
 	PxVec3			TerrainRayCast_Collision(PxVec3 _rayOrigin, PxVec3 _rayDirection, _float _fMaxDistance);
 
-	// 이동용, 기본 중력없기 때문에 이 함수로 중력 만들어 줄 것
+
 	/*physx::PxControllerCollisionFlags Move(_float3 vVelocity, _float fTimeDelta, _float minDist = 0.001f);
 	physx::PxControllerCollisionFlags MoveDisp(_float3 vPosDelta, _float fTimeDelta, _float minDist = 0.001f);*/
 
@@ -81,24 +94,31 @@ protected:
 
 protected:
 	class CGameObject*					m_pObject = nullptr;
-	COLLISION_TYPE						m_eCollisionType = COLLISION_END;
 
 	physx::PxController*				m_pController = nullptr;
 	physx::PxMaterial*					m_ControllerMaterial = nullptr;
 	_float3								m_vMaterialOptions = _float3(0.5f, 0.5f, 0.5f);
 
-	physx::PxCapsuleControllerDesc		m_tControllerDesc;
+	//PxControllerDesc를 상속시켜서 사용하고 싶었으나 안되었음
+	physx::PxCapsuleControllerDesc		m_tControllerCapsuleDesc;
+	physx::PxBoxControllerDesc 			m_tControllerBoxDesc;
+
 	physx::PxControllerFilters			m_ControllerFilters;
 	physx::PxFilterData					m_tFilterDesc;
 	
 	class CControllerBehaviorCallback*	m_pControllerCallBack = nullptr;
 	class CUserControllerHitReport*		m_pControllerHitReport = nullptr;
-	
+	class CControllerFilterCallback*	m_pControllerFilterCallback = nullptr;
 	_float								m_fSlopeLimitDegree = 45.f;
 	_float								m_fFallVelocity = { 0.f };
 	_float								m_fFallAcceleration = { 0.f };
 
 	_float								m_fOffset = { 1.f };
+	TYPE								m_eType = TYPE::CAPSULE;
+	//CAPSULE_SHAPE						m_tCapsuleShape;
+	//BOX_SHAPE							m_tBoxShape;
+
+	_bool								m_isCollision = { false };
 
 public:
 	static	CCharacterController*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

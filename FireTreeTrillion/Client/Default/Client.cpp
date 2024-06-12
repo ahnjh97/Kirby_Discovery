@@ -8,6 +8,7 @@
 #include "GameInstance.h"
 
 #define MAX_LOADSTRING 100
+//#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
 
 // 전역 변수:
 HINSTANCE g_hInst;                                // 현재 인스턴스입니다.
@@ -72,7 +73,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		{
 			if (WM_QUIT == msg.message)
 				break;
-			if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+			if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) 
 			{
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);

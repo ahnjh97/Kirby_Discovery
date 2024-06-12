@@ -21,20 +21,21 @@ HRESULT CBackGround::Initialize(void* pArg)
 		return E_FAIL;
 	if (FAILED(Add_Components()))
 		return E_FAIL;
+
 	UIOBJ_DESC BG_DESC = {};
 	BG_DESC.wstrUITag = { TEXT("BG_Logo") };
 	BG_DESC.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f };
 	BG_DESC.vSize = { (_float)g_iWinSizeX, (_float)g_iWinSizeY };
 	BG_DESC.vPos = { BG_DESC.vCenter.x, BG_DESC.vCenter.y };
-	BG_DESC.fDegree = { 0.f };
+	BG_DESC.vDegree = { 0.f, 0.f, 0.f };
 	BG_DESC.iTexIndex = { 0 };
 
 	m_pTransformCom->Set_Scaled(BG_DESC.vSize.x, BG_DESC.vSize.y, 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(
 		BG_DESC.vPos.x - BG_DESC.vCenter.x,
 		-BG_DESC.vPos.y + BG_DESC.vCenter.y, 0.f, 1.f));
-	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 
+	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 
 	return S_OK;

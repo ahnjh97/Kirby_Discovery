@@ -402,3 +402,64 @@ void CBladeKnight_TornadoAttack_State::Free()
 }
 
 #pragma endregion
+
+
+#pragma region DAMAGE STATE
+//*********************************
+//			 DAMAGE STATE
+//*********************************
+CBladeKnight_Damage_State::CBladeKnight_Damage_State()
+{
+}
+
+void CBladeKnight_Damage_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+}
+
+void CBladeKnight_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CBladeKnight* pBladeKnight = static_cast<CBladeKnight*>(pGameObject);
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+
+	//// 일반 충돌 상태 (Get_Vacuuming()이 true라면 빨아들이는 상태이다.
+	//if (pBladeKnight->Get_Vacuuming() == false)
+	//{
+	//	// 일단 그 방향으로 바라보게만 한다.
+	//	_float3 vDamegeDir = pBladeKnight->Get_DamegeDir();
+	//	pTransformCom->Look_At_Axis(-vDamegeDir);
+
+	//	// 이제 날아가는 것을 구현해보자.
+	//	pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 6.f, fTimeDelta);
+
+	//	// 점프되는 체공시간을 구현해보자.
+	//	_float fDamageJumpPower = pBladeKnight->Get_DamageJumpPower();
+	//	pController->Jump(pTransformCom, fDamageJumpPower, fTimeDelta);
+	//	fDamageJumpPower -= GRAVITY * fTimeDelta * 3.f;
+	//	pBladeKnight->Set_DamageJumpPower(fDamageJumpPower);
+
+
+	//	if (true == pBladeKnight->IsAnimFinished() || pController->Is_Terrain())
+	//	{
+	//		pBladeKnight->Change_State(CBladeKnight::BLADEKNIGHT_WAIT, 50.f, false, true);
+	//	}
+	//}
+}
+
+void CBladeKnight_Damage_State::OnStateExit()
+{
+}
+
+CBladeKnight_Damage_State* CBladeKnight_Damage_State::Create()
+{
+	CBladeKnight_Damage_State* pInstance = new CBladeKnight_Damage_State();
+	return pInstance;
+}
+
+void CBladeKnight_Damage_State::Free()
+{
+	__super::Free();
+}
+
+#pragma endregion

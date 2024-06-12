@@ -159,9 +159,9 @@ void CBladeKnight::Render_IMGUI()
 }
 #endif
 
-void CBladeKnight::Collision_Attack(CGameObject* pOtherObj)
+void CBladeKnight::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
-	//Change_State(BLADEKNIGHT_DAMAGE, 50.f, false, true);
+	Change_State(BLADEKNIGHT_DAMAGE, 50.f, false, true);
 }
 
 void CBladeKnight::Change_State(BLADEKNIGHT_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
@@ -206,7 +206,6 @@ HRESULT CBladeKnight::Add_Components()
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
-	desc.uCollisionType = m_eCollisionGroup;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	CHECK_FAILED(hr);
@@ -290,7 +289,7 @@ void CBladeKnight::SetUp_FSM()
 	m_pFSM->Add_State(BLADEKNIGHT_TORNADOATTACKCHARGE, CBladeKnight_TornadoAttack_State::Create());
 	m_pFSM->Add_State(BLADEKNIGHT_TORNADOATTACK, CBladeKnight_TornadoAttack_State::Create());
 
-	//m_pFSM->Add_State(BLADEKNIGHT_DAMAGE, CBladeKnight_Damage_State::Create());
+	m_pFSM->Add_State(BLADEKNIGHT_DAMAGE, CBladeKnight_Damage_State::Create());
 
 	// ป๓ลย Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};

@@ -46,7 +46,7 @@ HRESULT CAwoofy::Initialize(void* pArg)
 	m_fHp = 10.f;
 	m_fAttack = 8.f;
 	m_eVacuumSize = SIZE_SMALL;
-	m_eAbilityType = ABILITY_BOMB;
+	m_eAbilityType = ABILITY_DEFAULT;
 	m_eEyeState = AWOOFYEYE_IDLE;
 
 	Add_AnimEvent();
@@ -65,8 +65,7 @@ _int CAwoofy::Tick(_float fTimeDelta)
 
 	__super::Tick(m_fTimeDelta);
 
-	// 빨릴 때
-	if (m_ePhyXState == PO_VACUUMING)
+	if (m_ePhyXState == PO_VACUUMING || m_ePhyXState == PO_FLYDEADAWAY)
 		Change_State(CAwoofy::AWOOFY_DAMAGE, 120.f, true, false);
 
 	return OBJ_NOEVENT;
@@ -80,7 +79,9 @@ void CAwoofy::Late_Tick(_float fTimeDelta)
 
 	// 날아갈 땐, 애니메이션 재생이 되지 않는다.
 	if (m_ePhyXState != PO_FLYAWAY)
-		m_pModelCom->Play_Animation(m_fTimeDelta);
+	{
+		m_ePhyXState == PO_FLYDEADAWAY ? m_pModelCom->Play_Animation(m_fTimeDelta * 0.3f) : m_pModelCom->Play_Animation(m_fTimeDelta);
+	}
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
@@ -132,11 +133,11 @@ HRESULT CAwoofy::Render_LightDepth()
 
 void CAwoofy::Add_AnimEvent()
 {
-	//__super::Add_AnimEvent();
+	__super::Add_AnimEvent();
 	
-	//1. 한 애니메이션에서 같은 이름의 이벤트 가능
-	//2. 현재 실행되는 애니메이션에 따라 이벤트가 발생하도록 한다.
-	//3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
+	// 1. 한 애니메이션에서 같은 이름의 이벤트 가능
+	// 2. 재생 기준은 애님툴에서 지정한 애니메이션인지 + 시작 프레임이 애니메이션 프레임안에 들어가는 지
+	// 3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
 	m_pModelCom->Add_Event("Bboong", [this]() {
 		//파티클 생성
 		static _float fBbongTime{ 0.f };
@@ -203,23 +204,20 @@ void CAwoofy::Render_IMGUI()
 }
 #endif
 
-void CAwoofy::Collision_Attack(CGameObject* pOtherObj)
+void CAwoofy::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
-	CPhysXObject* pObject = static_cast<CPhysXObject*>(pOtherObj);
-
-	// 날아온게 FlyAway 상태인 몬스터였을 경우
-	if (pObject->Get_PhyXState() == PO_FLYAWAY)
+	if (eContent == CCollisionCenter::CONTENT_BODY)
 	{
-		// 같이 처맞고 날아가자.
+		if (m_ePhyXState == PO_NORMAL)
+		{
+			Change_State(CAwoofy::AWOOFY_DAMAGE, 50.f, false, true);
+			m_eEyeState = AWOOFYEYE_HAPPY;
+		}
+	}
+	else if (eContent == CCollisionCenter::CONTENT_VACUUMOBJECT)
+	{
 
 	}
-	// 일반 충돌
-	else
-	{
-		Change_State(CAwoofy::AWOOFY_DAMAGE, 50.f, false, true);
-		m_eEyeState = AWOOFYEYE_HAPPY;
-	}
-
 }
 
 void CAwoofy::Change_State(AWOOFY_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
@@ -296,17 +294,15 @@ HRESULT CAwoofy::Add_Components()
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
-#pragma region Awoofy Eye
+	/* For.Com_Texture */
 	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Awoofy_Eye"),
 		TEXT("Com_Texture"), (CComponent**)&m_pEyeTextureCom);
 	CHECK_FAILED(hr);
-#pragma endregion
 
 	/* For.Com_CharacterController */
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
-	desc.uCollisionType = m_eCollisionGroup;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	CHECK_FAILED(hr);

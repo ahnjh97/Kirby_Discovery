@@ -32,7 +32,7 @@ _int CCharacter::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
-	// FSM Update , SetOn_Slope, MotionBlur // 
+	// FSM Update , SetOn_Slope, MotionBlur //
 	Character_SystemTick(fTimeDelta);
 
 	return OBJ_NOEVENT;

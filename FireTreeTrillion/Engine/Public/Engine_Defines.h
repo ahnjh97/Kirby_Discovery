@@ -26,24 +26,15 @@ namespace Engine
     enum RIGID_SHAPE { RIGID_BOX, RIGID_SPHERE, RIGID_CAPSULE, RIGID_END };
     enum INSTANCE_PROPERTY {INSTANCE_DROP, INSTANCE_SPREAD, INSTANCE_DECELERATE, INSTANCE_END};
 
-    enum COLLISION_TYPE
-    { 
-        PLAYER = 0, PLAYER_EFFECT,
-        MONSTER,
-        INTERACT,
-        ITEM,
-        TRIGGER,
-        COLLISION_END
+    enum COLLISION_RESULT
+    {
+        CONTROLLER,
+        KINETIC_DYNAMIC_RIGID,
+        DYNAMIC_RIGID,
+        STATIC_RIGID,
+        COLLISION_RESULT_END
     };
 
-    enum COLLISION_CONTENT
-    {
-        CONTENT_ATTACK,		// 공격 - 피격 처리
-        CONTENT_INTERACT,	// 상호작용하는 객체끼리의 충돌
-        CONTENT_ACQUIRE,	// 만나면 ObjDest가 삭제되는 충돌액션
-        CONTENT_NONEVENT,	// 공통적인 충돌처리가 없는 경우
-        CONTENT_END
-    };
 }
 
 // Set_Dead() 매크로
@@ -79,12 +70,6 @@ namespace Engine
 
 // SimpleMath
 #include <DirectXTK/SimpleMath.h>
-
-// RapidJSON
-#include "rapidjson/document.h"
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-#include "rapidjson/prettywriter.h"
 
 // PhysX
 #include "PxPhysics.h"
@@ -127,6 +112,8 @@ using namespace physx;
 //#include <memory.h>
 #include <utility>
 
+//json
+#include "nlohmann/json.hpp"
 //// for Fmod
 #include "fmod.h"
 #include "fmod.hpp"
@@ -135,9 +122,8 @@ using namespace physx;
 #pragma comment (lib, "fmod_vc.lib")
 
 using namespace std;
-using namespace rapidjson;
 using namespace filesystem;
-
+using json = nlohmann::json;
 namespace Engine
 {
 	const wstring g_strTransformTag = TEXT("Com_Transform");
