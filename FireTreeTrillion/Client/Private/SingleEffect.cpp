@@ -147,7 +147,7 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 	_float3 vDir = _float3::TransformNormal(m_vCurPos, RotMat);
 
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, Pos(m_vInitPos) + Dir(vDir));
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, Pos(m_vInitPos) + Dir(vDir * m_vInitScale));
 
 	Quaternion vInitQuat = Quaternion::CreateFromYawPitchRoll(vInitRadianRot);
 
@@ -241,7 +241,7 @@ HRESULT CSingleEffect::Add_Components(FX_DESC& FXDesc)
 		CHECK_FAILED(hr);
 
 		//현재 VtxPosTex Shader Pass 4까지
-		m_iMaxPassIdx = 4;
+		m_iMaxPassIdx = 6;
 	}
 	else
 	{
