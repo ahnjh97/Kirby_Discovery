@@ -13,6 +13,7 @@
 
 #include "KirbyWeapons.h"
 #include "KirbyArmours.h"
+#include "HitBox.h"
 
 #include "Utils.h"
 #include "Bone.h"
@@ -109,7 +110,6 @@ HRESULT CKirby::Initialize(void* pArg)
 
 _int CKirby::Tick(_float fTimeDelta)
 {
-
 	if (m_bDead == true)
 		return OBJ_DEAD;
 
@@ -131,12 +131,15 @@ _int CKirby::Tick(_float fTimeDelta)
 	m_pWeapons->Tick(m_fTimeDelta);
 	m_pArmours->Tick(m_fTimeDelta);
 
+	//if(칼을 휘두른 순간!)
+	if(m_pHitBox != nullptr)
+		m_pHitBox->Tick(m_fTimeDelta);
+
 	return OBJ_NOEVENT;
 }
 
 void CKirby::Late_Tick(_float fTimeDelta)
 {
-
 	m_pModelCom[INFO(m_eBodyState)]->Play_Animation(m_fTimeDelta);
 
 	if (INFO(m_eBodyState) != BODY_DEFAULT)
@@ -253,7 +256,20 @@ HRESULT CKirby::Render_DeferredInfo()
 	}
 
 	return S_OK;
+}
 
+void CKirby::Add_AnimEvent()
+{
+	__super::Add_AnimEvent();
+
+	// 1. 한 애니메이션에서 같은 이름의 이벤트 가능
+	// 2. 재생 기준은 애님툴에서 지정한 애니메이션인지 + 시작 프레임이 애니메이션 프레임안에 들어가는 지
+	// 3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
+	m_pModelCom[INFO(m_eBodyState)]->Add_Event("ApplyDamage", [this]() {
+
+		m_pHitBox->Check_Collision();
+
+		});
 }
 
 void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
@@ -312,6 +328,13 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 
 }
 
+void CKirby::Collision_Overlap(CGameObject* pGameObject)
+{
+	// kirby의 뱃살에서 충돌이 일어날 경우 처리해야하는 일들
+	// 여기서부터 n차 회의 진행할것 QZR
+	_int a = 3;
+}
+
 _float3 CKirby::Make_RepulsiveDir(CPhysXObject* pObject)
 {
 	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
@@ -341,21 +364,21 @@ void CKirby::Setting_KirbyBalance()
 	// 카메라 기준 실시간 방향 탐색
 	CTransform* pCameraTransform = m_pCamera->Get_TransformCom();
 	_float4 vCamRight = pCameraTransform->Get_State_Vector(CTransform::STATE_RIGHT);
-	_float4 vCamLook = XMVector3Cross(vCamRight, XMVectorSet(0.f, 1.f, 0.f, 1.f));
+	_float4 vCamLook  = XMVector3Cross(vCamRight, XMVectorSet(0.f, 1.f, 0.f, 1.f));
 	_float fCX = vCamLook.x;
 	_float fCZ = vCamLook.z;
 	_float fKX = INFO(m_vMoveDir).x;
 	_float fKZ = INFO(m_vMoveDir).z;
 	_float fAngle = (atan2f(fCX, fCZ) * 180.0f / XM_PI) - (atan2f(fKX, fKZ) * 180.0f / XM_PI);
 	if (fAngle < 0.f) fAngle += 360.0f;
-	if (fAngle >= 337.5f || fAngle < 22.5f) INFO(m_eKirbyDir) = DIR_FRONT;
-	else if (fAngle >= 22.5f && fAngle < 67.5f) INFO(m_eKirbyDir) = DIR_LF;
-	else if (fAngle >= 67.5f && fAngle < 112.5f) INFO(m_eKirbyDir) = DIR_LEFT;
+	if (fAngle >= 337.5f || fAngle < 22.5f)		  INFO(m_eKirbyDir) = DIR_FRONT;
+	else if (fAngle >= 22.5f && fAngle < 67.5f)   INFO(m_eKirbyDir) = DIR_LF;
+	else if (fAngle >= 67.5f && fAngle < 112.5f)  INFO(m_eKirbyDir) = DIR_LEFT;
 	else if (fAngle >= 112.5f && fAngle < 157.5f) INFO(m_eKirbyDir) = DIR_LB;
 	else if (fAngle >= 157.5f && fAngle < 202.5f) INFO(m_eKirbyDir) = DIR_BACK;
 	else if (fAngle >= 202.5f && fAngle < 247.5f) INFO(m_eKirbyDir) = DIR_RB;
 	else if (fAngle >= 247.5f && fAngle < 292.5f) INFO(m_eKirbyDir) = DIR_RIGHT;
-	else if (fAngle >= 292.5 && fAngle < 337.5f) INFO(m_eKirbyDir) = DIR_RF;
+	else if (fAngle >= 292.5 && fAngle < 337.5f)  INFO(m_eKirbyDir) = DIR_RF;
 }
 
 void CKirby::Key_Input(_float fTimeDelta)
@@ -515,29 +538,30 @@ HRESULT CKirby::Add_Components()
 	/* FSM */
 	SetUp_FSM();
 
-
-
 	return S_OK;
 }
 
 HRESULT CKirby::Add_PartObjects()
 {
-
 	CKirbyWeapons::KIRBYWEAPON_DESC	WeaponDesc{};
+
 	WeaponDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 	WeaponDesc.pBoneMatrix = &m_WeaponMatrix;
 	WeaponDesc.pAbilityType = &m_eAbilityType;
 	m_pWeapons = static_cast<CKirbyWeapons*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_KirbyWeapons"), &WeaponDesc));
-	if (nullptr == m_pWeapons)
-		return E_FAIL;
+	CHECK_NULLPTR(m_pWeapons);
 
 	CKirbyArmours::KIRBYARMOURS_DESC ArmourDesc{};
 	ArmourDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 	ArmourDesc.pBoneMatrix = &m_ArmourMatrix;
 	ArmourDesc.pAbilityType = &m_eAbilityType;
 	m_pArmours = static_cast<CKirbyArmours*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_KirbyArmours"), &ArmourDesc));
-	if (nullptr == m_pArmours)
-		return E_FAIL;
+	CHECK_NULLPTR(m_pArmours);
+
+	CHitBox::HITBOX_DESC HitBoxDesc{};
+	HitBoxDesc.pOwner = this;
+	m_pHitBox = static_cast<CHitBox*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_HitBox"), &HitBoxDesc));
+	CHECK_NULLPTR(m_pHitBox);
 
 	return S_OK;
 }
@@ -552,6 +576,7 @@ HRESULT CKirby::Bind_ShaderResources()
 
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
+
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
@@ -907,7 +932,9 @@ void CKirby::Free()
 	if (INFO(m_pObject) != nullptr)
 		Safe_Release(INFO(m_pObject));
 
+	Safe_Release(m_pHitBox);
 	for (auto& fx : m_KirbyFXList)
 		Safe_Release(fx);
 
 }
+

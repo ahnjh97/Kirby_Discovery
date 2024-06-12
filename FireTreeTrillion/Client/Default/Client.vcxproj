@@ -197,7 +197,10 @@
     <ClInclude Include="..\Public\Grid.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\Public\HitBox.h" />
     <ClInclude Include="..\Public\HUD.h" />
+    <ClInclude Include="..\Public\HUD_KirbyStatus.h" />
+    <ClInclude Include="..\Public\HUD_StarPoint.h" />
     <ClInclude Include="..\Public\ImSequencer.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
@@ -206,7 +209,6 @@
     <ClInclude Include="..\Public\Kabu_State.h" />
     <ClInclude Include="..\Public\KirbyBoom_State.h" />
     <ClInclude Include="..\Public\Level_Intro.h" />
-    <ClInclude Include="..\Public\Multi_UI.h" />
     <ClInclude Include="..\Public\LevelChanger.h" />
     <ClInclude Include="..\Public\KirbyArmours.h" />
     <ClInclude Include="..\Public\KirbyContents_State.h" />
@@ -292,7 +294,10 @@
     <ClCompile Include="..\Private\Grid.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\Private\HitBox.cpp" />
     <ClCompile Include="..\Private\HUD.cpp" />
+    <ClCompile Include="..\Private\HUD_KirbyStatus.cpp" />
+    <ClCompile Include="..\Private\HUD_StarPoint.cpp" />
     <ClCompile Include="..\Private\ImSequencer.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -300,7 +305,6 @@
     <ClCompile Include="..\Private\Kabu.cpp" />
     <ClCompile Include="..\Private\Kabu_State.cpp" />
     <ClCompile Include="..\Private\Level_Intro.cpp" />
-    <ClCompile Include="..\Private\Multi_UI.cpp" />
     <ClCompile Include="..\Private\LevelChanger.cpp" />
     <ClCompile Include="..\Private\KirbyArmours.cpp" />
     <ClCompile Include="..\Private\KirbyContents_State.cpp" />

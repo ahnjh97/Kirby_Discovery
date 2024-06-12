@@ -375,15 +375,9 @@ HRESULT CRenderer::Initialize()
 	//// DEFERRED INFO 이 자리 god ray 확인용으로 좀 써주게여
 	//if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_DeferredInfo"), 900.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
 	//	return E_FAIL;
-
-
-#pragma region READY_UI
-	//06.04) UI 렌더타겟 뷰 생성 및 준비
-	//렌더할 뷰포트 세팅
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_UI"), 50.f, 50.f, 100.f, 100.f)))
-		return E_FAIL;
-
-#pragma endregion
+	
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_UI"), ViewportDesc.Width * 0.1f / 2.f, ViewportDesc.Height * 0.1f / 2.f,
+		ViewportDesc.Width * 0.1f, ViewportDesc.Height * 0.1f)))
 
 #endif
 
@@ -601,7 +595,6 @@ HRESULT CRenderer::Bind_DeferredRawValue(const _char* pConstantName, const void*
 	return S_OK;
 }
 
-
 void CRenderer::Set_ColorSet(COLOR_DATA destColorData)
 {
 	//일단 -1로 초기화
@@ -780,7 +773,6 @@ HRESULT CRenderer::Add_DebugComponents(CComponent* pRenderComponent)
 
 	return S_OK;
 }
-
 #endif
 
 HRESULT CRenderer::Render_Priority()
@@ -1801,7 +1793,6 @@ void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 
 		}
 	}
-
 }
 
 void CRenderer::Interpolate_BlackBackground(_float fTimeDelta)

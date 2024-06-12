@@ -139,6 +139,10 @@ void CGameObject::Render_IMGUI()
 #endif
 
 
+void CGameObject::Collision_Overlap(CGameObject* pGameObject)
+{
+}
+
 
 HRESULT CGameObject::Add_Component(_uint iLevelIndex, const wstring & strPrototypeTag, const wstring & strComponentTag, CComponent** ppOut, void * pArg)
 {

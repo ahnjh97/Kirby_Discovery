@@ -97,15 +97,19 @@ private:
 	virtual ~CKirby() = default;
 
 public:
-	virtual HRESULT Initialize_Prototype() override;
-	virtual HRESULT Initialize(void* pArg) override;
-	virtual _int	Tick(_float fTimeDelta) override;
-	virtual void	Late_Tick(_float fTimeDelta) override;
-	virtual HRESULT Render() override;
-	virtual HRESULT Render_LightDepth() override;
+	virtual HRESULT Initialize_Prototype()						override;
+	virtual HRESULT Initialize(void* pArg)						override;
+	virtual _int	Tick(_float fTimeDelta)						override;
+	virtual void	Late_Tick(_float fTimeDelta)				override;
+	virtual HRESULT Render()									override;
+	virtual HRESULT Render_LightDepth()							override;
 #ifdef _DEBUG
-	virtual void	Render_IMGUI() override;
+	virtual void	Render_IMGUI()								override;
 #endif
+	virtual HRESULT	Render_DeferredInfo()						override;
+
+	virtual void	Add_AnimEvent()								override;
+	virtual void	Collision_Overlap(CGameObject* pGameObject) override;
 	virtual HRESULT	Render_DeferredInfo() override;
 	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
@@ -148,7 +152,6 @@ private:
 
 #pragma endregion
 
-
 	// 기타 세부적인 제어
 private:
 	// 커비의 움직임을 담은 구조체
@@ -169,18 +172,22 @@ private:
 
 private:
 	CModel*					m_pModelCom[BODY_END] = {nullptr};
+
 	CTexture*				m_pEyeTexture[EYE_END] = { nullptr };
 	CTexture*				m_pMouthTexture[MOUTH_END] = { nullptr };
 	class CCamera*		m_pCamera = { nullptr };
 
 private:
-	void			Update_PartObjectMatrix();
-	class CKirbyWeapons* m_pWeapons = { nullptr };
-	class CKirbyArmours* m_pArmours = { nullptr };
-	_float4x4			 m_WeaponMatrix;
-	_float4x4			 m_ArmourMatrix;
+	void		   Update_PartObjectMatrix();
 
-	_int					m_iTestAnim = { 0 };
+	class CKirbyWeapons*  m_pWeapons = { nullptr };
+	class CKirbyArmours*  m_pArmours = { nullptr };
+	class CHitBox*		  m_pHitBox  = { nullptr };
+
+	_float4x4			  m_WeaponMatrix;
+	_float4x4			  m_ArmourMatrix;
+
+	_int				  m_iTestAnim = { 0 };
 
 
 public:

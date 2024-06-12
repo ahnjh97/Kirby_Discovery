@@ -36,10 +36,10 @@ public:
 	virtual void	Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render()				override;
 	virtual HRESULT Render_LightDepth()		override;
-	virtual void	Add_AnimEvent()			override;
 #ifdef _DEBUG
 	virtual void	Render_IMGUI() override;
 #endif
+	virtual void	Add_AnimEvent()			override;
 	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
 

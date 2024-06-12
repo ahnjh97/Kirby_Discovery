@@ -37,7 +37,6 @@ public:
 	virtual _int			Tick(_float fTimeDelta)				override;
 	virtual void			Late_Tick(_float fTimeDelta)		override;
 	virtual HRESULT			Render()							override;
-	//virtual void			Render_IMGUI()						override;
 
 private:
 	void					Ready_AnimModels();
@@ -45,7 +44,6 @@ private:
 
 	// RENDER
 	void					Render_ObjectList();
-	void					Render_AnimationList();
 	void					Render_AnimationList(const wstring& wstrObjectTag);
 	void					Render_FrameLine(class CAnimation** pModel, const string& strAnimationTag);
 
@@ -66,6 +64,7 @@ private:
 	AnimToolMap								m_mapSequence;
 
 	// 객체별 띄우는 로직으로 변경
+	// 현재 선택된 객체
 	class CCharacter*						m_pCharacter = nullptr;
 	vector<class CCharacter*>				m_vecCharacter;
 

@@ -4,7 +4,6 @@
 #include "GameInstance.h"
 #include "ImGuizmo.h"
 #include "PipeLine.h"
-#include "../../Client/Public/Editor_UI.h"
 
 #include "ImGuiFileDialog.h"
 #include "ImGuiFileDialogConfig.h"

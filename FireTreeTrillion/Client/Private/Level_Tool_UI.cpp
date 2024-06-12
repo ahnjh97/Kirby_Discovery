@@ -64,16 +64,16 @@ HRESULT CLevel_Tool_UI::Ready_Layer_Camera(const wstring& strLayerTag)
 {
 	CCamera_Free::CAMERA_FREE_DESC		CameraDesc{};
 	CameraDesc.fMouseSensor = 0.1f;
-	CameraDesc.fFovy = XMConvertToRadians(5.0f);
+	CameraDesc.fFovy = XMConvertToRadians(30.0f);
 
 	CameraDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	CameraDesc.fNear = 0.1f;
-	CameraDesc.fFar = 10000.0f;
-	CameraDesc.vEye = _float4(0.f, 0.f, -250.f/*g_iWinSizeX * -0.1f*/, 1.f);
+	CameraDesc.fFar = 1000.0f;
 
+	CameraDesc.vEye = _float4(0.f, 0.f, -25.f, 1.f);
 	CameraDesc.vAt = _float4(0.f, 0.f, 1.f, 1.f);
 	CameraDesc.fSpeedPerSec = 10.f;
-	CameraDesc.fRotationPerSec = XMConvertToRadians(0.0f);
+	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_UI, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
 		return E_FAIL;
@@ -91,24 +91,6 @@ HRESULT CLevel_Tool_UI::Ready_Layer_IMGUI(const wstring& strLayerTag)
 
 HRESULT CLevel_Tool_UI::Ready_Layer_UI(const wstring& strLayerTag)
 {
-	//CUIObject::UIOBJ_DESC SingleUI_Desc{};
-	//SingleUI_Desc.wstrUITag = { TEXT("Single_UI") };
-	//SingleUI_Desc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f };
-	//SingleUI_Desc.vSize = { 100.f, 100.f };
-	//SingleUI_Desc.vPos = { SingleUI_Desc.vCenter.x/* - 200.f*/,
-	//						SingleUI_Desc.vCenter.y/* - 200.f */ };
-	//SingleUI_Desc.fDegree = { 0.f };
-	//SingleUI_Desc.iTexIndex = { 0 };
-
-	////단일 
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_UI, strLayerTag, TEXT("Prototype_GameObject_Single_UI"), &SingleUI_Desc)))
-	//	return E_FAIL;
-
-
-	//다중 (상속)
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_UI, strLayerTag, TEXT("Prototype_GameObject_Multi_UI"))))
-	//	return E_FAIL;
-
 	return S_OK;
 }
 

@@ -21,6 +21,8 @@ namespace Client
 
     enum TRIGGER_TYPE { TRIGGER_CAMERA, TRIGGER_SHADER, TRIGGER_END };
     enum CAMERA_TYPE { CAM_FRONT, CAM_REAR, CAM_END };
+
+    enum FILE_TYPE { FILE_UI, FILE_NONE };
     
     const unsigned int	g_iWinSizeX = 1600; //1280;
     const unsigned int	g_iWinSizeY = 900; //720;
@@ -43,6 +45,9 @@ using namespace Client;
             return E_FAIL; \
     } while (0)
 
+#define AXIS_X 1.f, 0.f, 0.f, 0.f
+#define AXIS_Y 0.f, 1.f, 0.f, 0.f
+#define AXIS_Z 0.f, 0.f, 1.f, 0.f
 
 enum PASS_POSTEX {
     POSTEX_DEFAULT, POSTEX_ALPHABLEND, POSTEX_WHITE, POSTEX_BLOOM, POSTEX_END

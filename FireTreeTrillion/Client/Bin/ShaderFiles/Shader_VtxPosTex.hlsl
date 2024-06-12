@@ -110,7 +110,7 @@ PS_OUT PS_MAIN_ALPHABLEND(PS_IN_ALPHABLEND In)
 {
 	PS_OUT			Out = (PS_OUT)0;
 
-	Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    Out.vColor = g_DiffuseTexture.Sample(PointSampler, In.vTexcoord);
 
 	//float2		vTexcoord = (float2)0.f;
 
@@ -122,9 +122,20 @@ PS_OUT PS_MAIN_ALPHABLEND(PS_IN_ALPHABLEND In)
 
 	//Out.vColor.a = Out.vColor.a  * saturate(fOldViewZ - In.vProjPos.w);
 	
-	
-    Out.vColor *= g_fAlpha;
-	
+    //vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord + g_vUVOffset);
+    //if (vDiffuse.a < .01f || (vDiffuse.r < 0.1f && vDiffuse.g < 0.1f && vDiffuse.b < 0.1f))
+    //    discard;
+
+    //Out.vColor.rgb = vDiffuse.rgb * g_vRColor;
+    //Out.vColor.a = vDiffuse.a * g_fAlpha;
+    
+    //알파 값 예외처리
+    if (Out.vColor.a < 0.1f)
+        discard;
+    
+    Out.vColor.rgb = g_vRColor;
+    Out.vColor.a *= g_fAlpha;
+
     Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
 	
 	return Out;
@@ -215,7 +226,6 @@ PS_OUT PS_MAIN_DEFAULT_FX(PS_IN_ALPHABLEND In)
 
 technique11 DefaultTechnique
 {
-
 	// 기본 패스. 알파 테스팅 ( 0 )
 	pass Default
 	{
@@ -234,7 +244,7 @@ technique11 DefaultTechnique
 	pass Blend
 	{
 		SetRasterizerState(RS_Default);
-		SetDepthStencilState(DSS_Default, 0);
+        SetDepthStencilState(DSS_Default, 0);
 		SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
 		VertexShader = compile vs_5_0 VS_MAIN_ALPHABLEND();
@@ -285,4 +295,19 @@ technique11 DefaultTechnique
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_DEFAULT_FX();
     }
+
+	// Z test 안함
+    pass Blend_NOZTEST
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN_ALPHABLEND();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_ALPHABLEND();
+    }
+
 }
