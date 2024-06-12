@@ -53,6 +53,12 @@ void CMainApp::Tick(_float fTimeDelta)
 
 	if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_LALT, KEY_PRESS))
 	{
+		if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_GRAVE, KEY_DOWN))
+		{
+			if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_INTRO))))
+				return;
+		}
+
 		if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_1, KEY_DOWN))
 		{
 			if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_GAMEPLAY))))
@@ -116,10 +122,21 @@ HRESULT CMainApp::Ready_Fonts()
 	// MakeSpriteFont "³Ø½¼lv1°íµñ Bold" /FontSize:30 /FastPack /CharacterRegion:0x0020-0x00FF /CharacterRegion:0x3131-0x3163 /CharacterRegion:0xAC00-0xD800 /DefaultCharacter:0xAC00 142.spritefont
 
 	// 05.25) aÀÚ¸·Ã¼ ¿µ¹® ÆùÆ® Ãß°¡
-	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUDSub_EN10"), TEXT("../Bin/Resources/Fonts/HUD_Sub_EN10.spritefont"))))
+	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUDSub_EN10"), 
+		TEXT("../Bin/Resources/Fonts/HUD_Sub_EN10.spritefont"))))
 		return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUDSub_KR15"), TEXT("../Bin/Resources/Fonts/HUD_Sub_KR15.SpriteFont"))))
+	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUDSub_KR15"), 
+		TEXT("../Bin/Resources/Fonts/HUD_Sub_KR15.SpriteFont"))))
+		return E_FAIL;
+
+	// FOT-Seurat Pro EB /Fontsize 30 /CharacterRegion: 0x0030-0x0039 (¼ýÀÚ¸¸)
+	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUD_StarPoint_NUM30"), 
+		TEXT("../Bin/Resources/Fonts/HUD_StarPoint_NUM30.spritefont"))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUD_StarPoint_NUM37"), 
+		TEXT("../Bin/Resources/Fonts/HUD_StarPoint_NUM37.spritefont"))))
 		return E_FAIL;
 
 	return S_OK;
@@ -313,7 +330,7 @@ _bool CMainApp::Render_RTVFonts()
 
 	//UI
 	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("UI"),
-		_float2(5.f, 10.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+		_float2(5.f, 5.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
 
 	return TRUE;
 }

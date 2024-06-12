@@ -96,16 +96,23 @@ void CKirbyDefault_Idle_State::Key_X(CGameObject* pGameObject, _float fTimeDelta
 	// Idle일 때, X를 누르면 흡수를 시작한다.
 	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
 	{
-		DESC(m_fVacuumTime) = 0.f;
-		DESC(m_eEyeState) = CKirby::EYE_IDLE;
-		pKirby->Change_State(CKirby::STATE_INHALESTART, 60.f, false, false, CKirby::BODY_VACUUM);
-
-		CMultiEffect::MULTI_FX_DESC FXDesc{};
-		FXDesc.vInitPos = { 0.f, .6f, .4f };
-		FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Vacuum_v1"), &FXDesc)))
-			return;
-		pKirby->Add_KirbyEffect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+		if (pKirby->Get_AbilityType() == ABILITY_BOMB)
+		{
+			DESC(m_eEyeState) = CKirby::EYE_ANGER;
+			pKirby->Change_State(CKirby::BOOMSTATE_THROW, 60.f, false, false, CKirby::BODY_BOOMDEFAULT, CKirby::OFFSET_BOOM);
+		}
+		else
+		{
+			DESC(m_fVacuumTime) = 0.f;
+			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			pKirby->Change_State(CKirby::STATE_INHALESTART, 60.f, false, false, CKirby::BODY_VACUUM);
+			CMultiEffect::MULTI_FX_DESC FXDesc{};
+			FXDesc.vInitPos = { 0.f, .6f, .4f };
+			FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+			if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Vacuum_v1"), &FXDesc)))
+				return;
+			pKirby->Add_KirbyEffect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+		}
 
 	}
 }
@@ -142,6 +149,33 @@ void CKirbyDefault_Idle_State::Key_C(CGameObject* pGameObject, _float fTimeDelta
 
 void CKirbyDefault_Idle_State::Key_V(CGameObject* pGameObject, _float fTimeDelta)
 {
+
+	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+
+	if (pKirby->Get_AbilityType() == ABILITY_DEFAULT || pKirby->Get_AbilityType() == ABILITY_END)
+		return;
+
+	// 능력을 땅에 버리는 로직이다.
+	if (m_pGameInstance->Get_DIKeyState(DIK_V, KEY_PRESS))
+	{
+		DESC(m_fDumpAbilityTime) += fTimeDelta;
+
+		if (DESC(m_fDumpAbilityTime) > 1.f)
+		{
+			DESC(m_fDumpAbilityTime) = 0.f;
+			pKirby->Change_State(CKirby::STATE_ABILITYDUMP, 60.f, false, false, CKirby::BODY_DEFAULT);
+		}
+	}
+	else
+	{
+		if (DESC(m_fDumpAbilityTime) > 0.f)
+			DESC(m_fDumpAbilityTime) -= fTimeDelta * 2.f;
+
+		if (DESC(m_fDumpAbilityTime) < 0.f)
+			DESC(m_fDumpAbilityTime) = 0.f;
+	}
+
 }
 
 void CKirbyDefault_Idle_State::Key_Happy(CGameObject* pGameObject, _float fTimeDelta)
@@ -219,7 +253,7 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		FXDesc.vInitPos = { vMyPos.x, vMyPos.y + .3f, vMyPos.z };
 		FXDesc.vInitScale = { 1.3f, 1.3f, 1.3f };
 
-		_float3 vDir = -pTransformCom->Get_State(CTransform::STATE_LOOK);
+		_float3 vDir = pTransformCom->Get_State(CTransform::STATE_LOOK);
 		vDir.Normalize();
 		_float3 vLook = { 0.f, 0.f, 1.f };
 
@@ -262,16 +296,47 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	// X를 누르면 흡수를 시작한다.
 	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
 	{
-		DESC(m_fVacuumTime) = 0.f;
-		DESC(m_eEyeState) = CKirby::EYE_IDLE;
-		pKirby->Change_State(CKirby::STATE_INHALEWALK, 50.f, true, true, CKirby::BODY_VACUUM);
+		if (pKirby->Get_AbilityType() == ABILITY_BOMB)
+		{
+			DESC(m_eEyeState) = CKirby::EYE_ANGER;
+			pKirby->Change_State(CKirby::BOOMSTATE_BOOMSHOOT, 60.f, false, false, CKirby::BODY_BOOMDEFAULT, CKirby::OFFSET_BOOM);
+		}
+		else
+		{
+			DESC(m_fVacuumTime) = 0.f;
+			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			pKirby->Change_State(CKirby::STATE_INHALEWALK, 50.f, true, true, CKirby::BODY_VACUUM);
 
-		CMultiEffect::MULTI_FX_DESC FXDesc{};
-		FXDesc.vInitPos = { 0.f, .65f, .4f };
-		FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Vacuum_v1"), &FXDesc)))
-			return;
-		pKirby->Add_KirbyEffect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+			CMultiEffect::MULTI_FX_DESC FXDesc{};
+			FXDesc.vInitPos = { 0.f, .65f, .4f };
+			FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+			if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Vacuum_v1"), &FXDesc)))
+				return;
+			pKirby->Add_KirbyEffect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+		}
+	}
+
+
+	// 능력을 땅에 버리는 로직이다.
+	if (m_pGameInstance->Get_DIKeyState(DIK_V, KEY_PRESS) &&
+		(pKirby->Get_AbilityType() != ABILITY_DEFAULT || pKirby->Get_AbilityType() != ABILITY_END))
+	{
+
+		DESC(m_fDumpAbilityTime) += fTimeDelta;
+
+		if (DESC(m_fDumpAbilityTime) > 1.f)
+		{
+			DESC(m_fDumpAbilityTime) = 0.f;
+			pKirby->Change_State(CKirby::STATE_ABILITYDUMP, 60.f, false, false, CKirby::BODY_DEFAULT);
+		}
+	}
+	else
+	{
+		if (DESC(m_fDumpAbilityTime) > 0.f)
+			DESC(m_fDumpAbilityTime) -= fTimeDelta * 2.f;
+
+		if (DESC(m_fDumpAbilityTime) < 0.f)
+			DESC(m_fDumpAbilityTime) = 0.f;
 	}
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_Z, KEY_DOWN))
@@ -678,6 +743,7 @@ void CKirbyDefault_Jump_State::Key_X(CGameObject* pGameObject, _float fTimeDelta
 	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
 	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
@@ -702,6 +768,11 @@ void CKirbyDefault_Jump_State::Key_X(CGameObject* pGameObject, _float fTimeDelta
 			DESC(m_fJumpVelocity) = 10.f;
 			DESC(m_eEyeState) = CKirby::EYE_ANGER;
 			pKirby->Change_State(CKirby::SWORDSTATE_SWORDSPINSTART, 60.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		}
+		else if (pKirby->Get_AbilityType() == ABILITY_BOMB)
+		{
+			pController->Reset_FallVelocity();
+			pKirby->Change_State(CKirby::BOOMSTATE_BOOMFALL, 60.f, true, false, CKirby::BODY_BOOMDEFAULT, CKirby::OFFSET_BOOM);
 		}
 	}
 

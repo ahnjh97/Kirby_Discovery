@@ -9,6 +9,7 @@
 #include "KirbyDamage_State.h"
 #include "KirbyContents_State.h"
 #include "KirbySword_State.h"
+#include "KirbyBoom_State.h"
 
 #include "KirbyWeapons.h"
 #include "KirbyArmours.h"
@@ -56,14 +57,37 @@ HRESULT CKirby::Initialize(void* pArg)
 	INFO(m_eMouthState) = MOUTH_IDLE;
 	INFO(m_eEyeState) = EYE_IDLE;
 
-	// 카메라 기준으로 움직이기에 미리 받아둔다.
+
+	// 첫 카메라 기준으로 움직이기에 미리 받아둔다.
 	if (m_pCamera == nullptr)
 	{
-		m_pCamera = static_cast<CCamera_Free*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Camera"), 0));
+		//인트로, 게임플레이 스테이지라면 카메라로 main camera를 저장한다.
+		(*m_pCurrentLevelID == LEVEL_INTRO || *m_pCurrentLevelID == LEVEL_GAMEPLAY) ?
+			m_pCamera = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main"))) :
+
+		//나머지 레벨이라면 다른 카메라를 저장한다.
+			m_pCamera = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Free")));
+
+		if (m_pCamera == nullptr)
+		{
+			ALARM_FAIL(TEXT("망했어 카메라 없다"));
+			return E_FAIL;
+		}
+
 		Safe_AddRef(m_pCamera);
 	}
 
 	m_pCamera->Set_Target(m_pTransformCom);
+
+
+	//게임 레벨에 free camera 있다면 그놈에게도 타겟 등록해 준다.
+	if ((*m_pCurrentLevelID == LEVEL_INTRO || *m_pCurrentLevelID == LEVEL_GAMEPLAY))
+	{
+		CCamera* pCameraFree = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Free")));
+		if (pCameraFree != nullptr)
+			pCameraFree->Set_Target(m_pTransformCom);
+	}
+
 
 	_float4 m_pCameraLook = m_pCamera->Get_TransformCom()->Get_State_Vector(CTransform::STATE_LOOK);
 	m_pCameraLook.y = 0.f;
@@ -77,8 +101,11 @@ HRESULT CKirby::Initialize(void* pArg)
 	m_fMaxHp = 100.f;
 	m_fHp = 100.f;
 	m_fAttack = 5.f;
-	//m_eAbilityType = ABILITY_DEFAULT;
-	m_eAbilityType = ABILITY_SWORD;
+	m_eAbilityType = ABILITY_DEFAULT;
+	//m_eAbilityType = ABILITY_BOMB;
+
+	CCharacterController* pController = dynamic_cast<CCharacterController*>(Get_Component(TEXT("Com_Controller")));
+	pController->RegisterAsPlayer();
 
 	return S_OK;
 }
@@ -118,12 +145,8 @@ void CKirby::Late_Tick(_float fTimeDelta)
 	if (INFO(m_eBodyState) != BODY_DEFAULT)
 		m_pModelCom[BODY_DEFAULT]->Play_Animation(m_fTimeDelta);
 
-	// 임시로 진행한다. 나중에 능력 분기되면 파츠오브젝트 많이 생겨야함.
-	if (m_eAbilityType == ABILITY_SWORD)
-	{
-		m_pWeapons->Late_Tick(m_fTimeDelta);
-		m_pArmours->Late_Tick(m_fTimeDelta);
-	}
+	m_pWeapons->Late_Tick(m_fTimeDelta);
+	m_pArmours->Late_Tick(m_fTimeDelta);
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
@@ -151,14 +174,11 @@ HRESULT CKirby::Render()
 		if (FAILED(m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
 
-		_bool bStencil = true;
-		_bool bRimLight = true;
-		_bool bMotionBlur = true;
-		m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
 		if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
 			return E_FAIL;
-		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
 		if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
 			return E_FAIL;
 
@@ -193,7 +213,6 @@ void CKirby::Render_IMGUI()
 	}
 
 
-	ImGui::Text("Vacuuming : %d", m_bVacuuming);
 	ImGui::Text("ObjectAddress : %d", INFO(m_pObject));
 	ImGui::Text("ChargeTime : %.2f", INFO(m_fChargeTime));
 	ImGui::Text("MoveSpeed : %.2f", INFO(m_fMoveSpeed));
@@ -244,27 +263,41 @@ void CKirby::Collision_Attack(CGameObject* pOtherObj)
 {
 	CPhysXObject* pObject = static_cast<CPhysXObject*>(pOtherObj);
 
-	// 흡수될 운명인 몬스터
-	if (pObject->Get_Vacuuming())
+	// 흡수중인 몬스터
+	if (pObject->Get_PhyXState() == PO_VACUUMING)
 	{
 		// 일단 EAT으로 넘기는건 같으나, EAT이 끝날 시점에 내가 삼켰던 것이 무엇이였는지 판단 후 애니메이션이 분기된다.
 		INFO(m_isEat) = true;
 		INFO(m_eEyeState) = EYE_IDLE;
 		INFO(m_eMouthState) = MOUTH_ANGER;
-		m_bVacuuming = false;
+		//m_ePhyXState = PO_NORMAL;
 		Change_State(STATE_EAT, 100.f, false, false, BODY_BALLOON);
 		// 임시 보관소. 먹은게 끝났을 떄, 비로소 커비의 어빌리티 타입이 바뀐다.
 		INFO(m_eTemporaryEatType) = pObject->Get_AbilityType();
 
-		// 먹은애는 죽여놓는다. *****나중에 수정이 필요할 것이다. 먹은애를 날려야 하기 때문에*****
-		if (INFO(m_pObject) != nullptr)
+		if (pObject != nullptr)
 		{
-			INFO(m_pObject)->Set_Dead();
-			Safe_Release(INFO(m_pObject));
-			INFO(m_pObject) = nullptr;
+			pObject->Set_PhyXState(PO_KIRBYMOUTH);
 		}
 
 		Delete_KirbyEffect();
+	}
+	// 입에 머금은 상태의 몬스터
+	else if (pObject->Get_PhyXState() == PO_KIRBYMOUTH)
+	{
+		// 서로 반응이 없어야 한다. (단, 이친구는 항상 나를 따라다닐것이다.)
+
+
+
+	}
+	// 발사중인 몬스터
+	else if (pObject->Get_PhyXState() == PO_FLYAWAY)
+	{
+		// 서로 반응이 없어야 한다.
+
+
+
+
 	}
 	// 슬라이드중의 충돌
 	else if (Get_State() == STATE_SLIDE)
@@ -349,7 +382,7 @@ void CKirby::Setting_KirbyBalance()
 
 void CKirby::Key_Input(_float fTimeDelta)
 {
-	#pragma region 커비 연구소 (애니메이션 제어)
+#pragma region 커비 연구소 (애니메이션 제어)
 
 	//Test
 	if (m_pGameInstance->Get_DIKeyState(DIK_P, KEY_DOWN))
@@ -386,12 +419,7 @@ void CKirby::Key_Input(_float fTimeDelta)
 	}
 	else if (m_pGameInstance->Get_DIKeyState(DIK_7, KEY_DOWN))
 	{
-		INFO(m_eBodyState) = BODY_SWORDDEFAULT;
-		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
-	}
-	else if (m_pGameInstance->Get_DIKeyState(DIK_6, KEY_DOWN))
-	{
-		INFO(m_eBodyState) = BODY_SWORDBALLOON;
+		INFO(m_eBodyState) = BODY_BOOMDEFAULT;
 		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
 	}
 
@@ -421,73 +449,78 @@ HRESULT CKirby::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
-	#pragma region Kirby Model
-		// 커비의 기본 상태 모델
-		hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyDefault"),
-			TEXT("Com_Model_Default"), (CComponent**)&m_pModelCom[BODY_DEFAULT]);
+#pragma region Kirby Model
+	// 커비의 기본 상태 모델
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyDefault"),
+		TEXT("Com_Model_Default"), (CComponent**)&m_pModelCom[BODY_DEFAULT]);
+	CHECK_FAILED(hr);
+
+	// 커비의 빨아들이는 상태 모델
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyVacuum"),
+		TEXT("Com_Model_Vacuum"), (CComponent**)&m_pModelCom[BODY_VACUUM]);
+	CHECK_FAILED(hr);
+
+	// 커비의 풍선 모드 상태 모델
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyBalloon"),
+		TEXT("Com_Model_Balloon"), (CComponent**)&m_pModelCom[BODY_BALLOON]);
+	CHECK_FAILED(hr);
+
+	// 커비의 Sword Body 상태 모델
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbySwordDefault"),
+		TEXT("Com_Model_SwordDefault"), (CComponent**)&m_pModelCom[BODY_SWORDDEFAULT]);
+	CHECK_FAILED(hr);
+
+	// 커비의 Sword Balloon 상태 모델
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbySwordBalloon"),
+		TEXT("Com_Model_SwordBalloon"), (CComponent**)&m_pModelCom[BODY_SWORDBALLOON]);
+	CHECK_FAILED(hr);
+
+		// 커비의 Boom Body 상태 모델
+		hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyBoomDefault"),
+			TEXT("Com_Model_BoomDefault"), (CComponent**)&m_pModelCom[BODY_BOOMDEFAULT]);
 		CHECK_FAILED(hr);
 
-		// 커비의 빨아들이는 상태 모델
-		hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyVacuum"),
-			TEXT("Com_Model_Vacuum"), (CComponent**)&m_pModelCom[BODY_VACUUM]);
-		CHECK_FAILED(hr);
 
-		// 커비의 풍선 모드 상태 모델
-		hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyBalloon"),
-			TEXT("Com_Model_Balloon"), (CComponent**)&m_pModelCom[BODY_BALLOON]);
-		CHECK_FAILED(hr);
+#pragma endregion
 
-		// 커비의 Sword Body 상태 모델
-		hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbySwordDefault"),
-			TEXT("Com_Model_SwordDefault"), (CComponent**)&m_pModelCom[BODY_SWORDDEFAULT]);
-		CHECK_FAILED(hr);
+#pragma region Kirby Eye
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_idle"),
+		TEXT("Com_Texture_Eye_Idle"), (CComponent**)&m_pEyeTexture[EYE_IDLE]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_doubt"),
+		TEXT("Com_Texture_Eye_Doubt"), (CComponent**)&m_pEyeTexture[EYE_SADNESS]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_close"),
+		TEXT("Com_Texture_Eye_Close"), (CComponent**)&m_pEyeTexture[EYE_CLOSE]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_blink"),
+		TEXT("Com_Texture_Eye_Blink"), (CComponent**)&m_pEyeTexture[EYE_BLINK]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_anger"),
+		TEXT("Com_Texture_Eye_Anger"), (CComponent**)&m_pEyeTexture[EYE_ANGER]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_pupil"),
+		TEXT("Com_Texture_Eye_Pupil"), (CComponent**)&m_pEyeTexture[EYE_PUPIL]);
+	CHECK_FAILED(hr);
+#pragma endregion
 
-		// 커비의 Sword Balloon 상태 모델
-		hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbySwordBalloon"),
-			TEXT("Com_Model_SwordBalloon"), (CComponent**)&m_pModelCom[BODY_SWORDBALLOON]);
-		CHECK_FAILED(hr);
-
-
-	#pragma endregion
-
-	#pragma region Kirby Eye
-		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_idle"),
-			TEXT("Com_Texture_Eye_Idle"), (CComponent**)&m_pEyeTexture[EYE_IDLE]);
-		CHECK_FAILED(hr);
-		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_doubt"),
-			TEXT("Com_Texture_Eye_Doubt"), (CComponent**)&m_pEyeTexture[EYE_SADNESS]);
-		CHECK_FAILED(hr);
-		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_close"),
-			TEXT("Com_Texture_Eye_Close"), (CComponent**)&m_pEyeTexture[EYE_CLOSE]);
-		CHECK_FAILED(hr);
-		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_blink"),
-			TEXT("Com_Texture_Eye_Blink"), (CComponent**)&m_pEyeTexture[EYE_BLINK]);
-		CHECK_FAILED(hr);
-		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_anger"),
-			TEXT("Com_Texture_Eye_Anger"), (CComponent**)&m_pEyeTexture[EYE_ANGER]);
-		CHECK_FAILED(hr);
-		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_pupil"),
-			TEXT("Com_Texture_Eye_Pupil"), (CComponent**)&m_pEyeTexture[EYE_PUPIL]);
-		CHECK_FAILED(hr);
-	#pragma endregion
-
-	#pragma region Kirby Mouth
-		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_base"),
-			TEXT("Com_Texture_Mouth_Idle"), (CComponent**)&m_pMouthTexture[MOUTH_IDLE]);
-		CHECK_FAILED(hr);
-		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_anger"),
-			TEXT("Com_Texture_Mouth_Anger"), (CComponent**)&m_pMouthTexture[MOUTH_ANGER]);
-		CHECK_FAILED(hr);
-		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_happy"),
-			TEXT("Com_Texture_Mouth_Happy"), (CComponent**)&m_pMouthTexture[MOUTH_HAPPY]);
-		CHECK_FAILED(hr);
-		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_smile"),
-			TEXT("Com_Texture_Mouth_Smile"), (CComponent**)&m_pMouthTexture[MOUTH_SMILE]);
-		CHECK_FAILED(hr);
-		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_surprise"),
-			TEXT("Com_Texture_Mouth_Surprise"), (CComponent**)&m_pMouthTexture[MOUTH_SURPRISE]);
-		CHECK_FAILED(hr);
-	#pragma endregion
+#pragma region Kirby Mouth
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_base"),
+		TEXT("Com_Texture_Mouth_Idle"), (CComponent**)&m_pMouthTexture[MOUTH_IDLE]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_anger"),
+		TEXT("Com_Texture_Mouth_Anger"), (CComponent**)&m_pMouthTexture[MOUTH_ANGER]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_happy"),
+		TEXT("Com_Texture_Mouth_Happy"), (CComponent**)&m_pMouthTexture[MOUTH_HAPPY]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_smile"),
+		TEXT("Com_Texture_Mouth_Smile"), (CComponent**)&m_pMouthTexture[MOUTH_SMILE]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_surprise"),
+		TEXT("Com_Texture_Mouth_Surprise"), (CComponent**)&m_pMouthTexture[MOUTH_SURPRISE]);
+	CHECK_FAILED(hr);
+#pragma endregion
 
 	/* For.Com_CharacterController */
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
@@ -515,10 +548,9 @@ HRESULT CKirby::Add_PartObjects()
 {
 
 	CKirbyWeapons::KIRBYWEAPON_DESC	WeaponDesc{};
-	//CModel* pModel = (CModel*)Get_Component(TEXT("Com_Model_SwordDefault"));
 	WeaponDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-	//WeaponDesc.pSocket = pModel->Get_BonePtr("HatL");
 	WeaponDesc.pBoneMatrix = &m_WeaponMatrix;
+	WeaponDesc.pAbilityType = &m_eAbilityType;
 	m_pWeapons = static_cast<CKirbyWeapons*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_KirbyWeapons"), &WeaponDesc));
 	if (nullptr == m_pWeapons)
 		return E_FAIL;
@@ -526,6 +558,7 @@ HRESULT CKirby::Add_PartObjects()
 	CKirbyArmours::KIRBYARMOURS_DESC ArmourDesc{};
 	ArmourDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 	ArmourDesc.pBoneMatrix = &m_ArmourMatrix;
+	ArmourDesc.pAbilityType = &m_eAbilityType;
 	m_pArmours = static_cast<CKirbyArmours*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_KirbyArmours"), &ArmourDesc));
 	if (nullptr == m_pArmours)
 		return E_FAIL;
@@ -555,18 +588,17 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 	if ((_eBodyState == BODY_DEFAULT && _iMeshIndex == 0) ||
 		(_eBodyState == BODY_BALLOON && _iMeshIndex == 4) ||
 		(_eBodyState == BODY_SWORDDEFAULT && _iMeshIndex == 0) ||
-		(_eBodyState == BODY_SWORDBALLOON && _iMeshIndex == 4))
+		(_eBodyState == BODY_SWORDBALLOON && _iMeshIndex == 4) ||
+		(_eBodyState == BODY_BOOMDEFAULT && _iMeshIndex == 0))
 	{
 		m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
 		m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
 		m_pMouthTexture[INFO(m_eMouthState)]->Bind_ShaderResource(m_pShaderCom, "g_KirbyMouthTexture", 0);
-		_bool bStencil = true;
-		_bool bRimLight = true;
-		_bool bMotionBlur = true;
-		m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+
+		m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float));
-		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
 
 		m_pShaderCom->Begin(ANIMMODEL_KIRBYMOUTH);
 		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
@@ -577,18 +609,17 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		(_eBodyState == BODY_VACUUM && _iMeshIndex == 2) ||
 		(_eBodyState == BODY_BALLOON && _iMeshIndex == 3) ||
 		(_eBodyState == BODY_SWORDDEFAULT && _iMeshIndex == 3) ||
-		(_eBodyState == BODY_SWORDBALLOON && _iMeshIndex == 3))
+		(_eBodyState == BODY_SWORDBALLOON && _iMeshIndex == 3) ||
+		(_eBodyState == BODY_BOOMDEFAULT && _iMeshIndex == 3))
 	{
 		m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
 		m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
 		m_pEyeTexture[INFO(m_eEyeState)]->Bind_ShaderResource(m_pShaderCom, "g_KirbyEyeTexture", 0);
-		_bool bStencil = true;
-		_bool bRimLight = true;
-		_bool bMotionBlur = true;
-		m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+
+		m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float));
-		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
 		m_pShaderCom->Begin(ANIMMODEL_KIRBYEYE);
 		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
 		return true;
@@ -598,17 +629,16 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 	{
 		m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
 		m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
-		_bool bStencil = true;
+
 		_bool bRimLight = false;
-		_bool bMotionBlur = true;
-		m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
 		m_pShaderCom->Begin(ANIMMODEL_NORMAL_X);
 		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
 		return true;
 	}
-	
+
 	return false;
 }
 
@@ -701,7 +731,7 @@ void CKirby::SetUp_FSM()
 	m_pFSM->Add_State(STATE_ITENGETWAIT, CKirbyGet_State::Create());
 	m_pFSM->Add_State(STATE_ABILITYDUMP, CKirbyGet_State::Create());
 
-
+#pragma region SWORD
 	// For Sword
 	m_pFSM->Add_State(SWORDSTATE_WAIT, CKirbySword_Idle_State::Create());
 	m_pFSM->Add_State(SWORDSTATE_RUN, CKirbySword_Run_State::Create());
@@ -736,6 +766,17 @@ void CKirby::SetUp_FSM()
 	m_pFSM->Add_State(SWORDSTATE_SWORDSPIN, CKirbySword_JumpAttack_State::Create());
 	m_pFSM->Add_State(SWORDSTATE_SWORDSPINSTART, CKirbySword_JumpAttack_State::Create());
 	m_pFSM->Add_State(SWORDSTATE_SPINAFTER, CKirbySword_JumpAttack_State::Create());
+#pragma endregion
+
+#pragma region BOOM
+	m_pFSM->Add_State(BOOMSTATE_BOOMFALL, CKirbyBoom_Fall_State::Create());
+	m_pFSM->Add_State(BOOMSTATE_BOOMSHOOT, CKirbyBoom_Attack_State::Create());
+	m_pFSM->Add_State(BOOMSTATE_THROW, CKirbyBoom_Attack_State::Create());
+	m_pFSM->Add_State(BOOMSTATE_THROWAIR, CKirbyBoom_Fall_State::Create());
+	m_pFSM->Add_State(BOOMSTATE_THROWCHARGE, CKirbyBoom_ChargeAttack_State::Create());
+	m_pFSM->Add_State(BOOMSTATE_THROWROTATE, CKirbyBoom_ChargeAttack_State::Create());
+#pragma endregion
+
 
 
 	CFSM::FSM_INFO		FSM_Info_Desc = {};
@@ -828,6 +869,22 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 			}
 		}
 	}
+
+
+	// 물고 있을 때, 물고있는 객체를 계속 나의 입에 위치시키는 로직이다.
+	if (INFO(m_pObject) != nullptr)
+	{
+		// 커비 입 속에 있다면?
+		if (INFO(m_pObject)->Get_PhyXState() == PO_KIRBYMOUTH)
+		{
+			CCharacterController* pObjectController = static_cast<CCharacterController*>(INFO(m_pObject)->Get_Component(TEXT("Com_Controller")));
+			CTransform* pObjectTransform = INFO(m_pObject)->Get_TransformCom();
+			_vector vMouthPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+			vMouthPos.m128_f32[1] += 1.f;
+			pObjectController->Set_Position(pObjectTransform, vMouthPos);
+		}
+	}
+
 }
 
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -872,5 +929,5 @@ void CKirby::Free()
 	Safe_Release(m_pArmours);
 	for (auto& fx : m_KirbyFXList)
 		Safe_Release(fx);
-	
+
 }

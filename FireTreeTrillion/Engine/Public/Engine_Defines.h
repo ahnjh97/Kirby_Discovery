@@ -114,6 +114,9 @@ using namespace physx;
 #include <fstream>
 #include <filesystem>
 #include <sstream>
+#include <mutex>
+#include <unordered_set>
+
 //#include <tchar.h>
 //#include <memory.h>
 #include <utility>
@@ -271,6 +274,7 @@ enum PASS_DEFERRED {
     DEFERRED_MOTIONBLUR,
     DEFERRED_UI, DEFERRED_DOF_Y,
     DEFERRED_DIRECTLIGHT_TOOL, DEFERRED_FINAL_TOOL,
+    DEFERRED_GODRAY, 
     DEFERRED_END
 };
 

@@ -35,6 +35,14 @@ CComponent * CGameObject::Get_Component(const wstring & strComTag)
 	return iter->second;	
 }
 
+void CGameObject::Set_ShaderVars(_uint iShaderVars)
+{
+	m_iShaderVars = iShaderVars;
+	m_bStencil = (iShaderVars >> 2) & 1;
+	m_bRimLight = (iShaderVars >> 1) & 1;
+	m_bMotionBlur = iShaderVars & 1;
+}
+
 HRESULT CGameObject::Initialize_Prototype()
 {
 	return S_OK;
@@ -59,11 +67,17 @@ HRESULT CGameObject::Initialize(void* pArg)
 
 	Safe_AddRef(m_pTransformCom);
 
-	if (nullptr != pArg)
+	if (nullptr != pArg) {
 		m_pTransformCom->Set_WorldMatrix(pGameObjectDesc->matWorld);
-
+		m_iShaderVars = pGameObjectDesc->iShaderVars;
+		m_fRimWidth = pGameObjectDesc->fRimWidth;
+		m_bStencil = (m_iShaderVars >> 2) & 1;
+		m_bRimLight = (m_iShaderVars >> 1) & 1;
+		m_bMotionBlur = m_iShaderVars & 1;
+	}
+		
 	m_pCurrentLevelID = m_pGameInstance->Get_CurrentLevelID();
-	
+
 	return S_OK;
 }
 
@@ -100,6 +114,28 @@ void CGameObject::Render_IMGUI()
 			com.second->Render_IMGUI();
 	}
 	ImGui::EndChild();
+	
+#pragma region Stencil RimLight MotionBlur
+	ImGui::Checkbox("Stencil", &m_bStencil);
+	ImGui::SameLine();
+	ImGui::Checkbox("RimLight", &m_bRimLight);
+	ImGui::SameLine();
+	ImGui::Checkbox("MotionBlur", &m_bMotionBlur);
+
+	float windowWidth = ImGui::GetContentRegionAvail().x;
+	float inputFloatWidth = 100; // 설정된 너비
+	float thicknessTextWidth = ImGui::CalcTextSize("Thickness ").x;
+	float totalWidth = thicknessTextWidth + inputFloatWidth + ImGui::GetStyle().ItemSpacing.x;
+	float offset = (windowWidth - totalWidth) * 0.5f;
+	if (offset > 0.0f)
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offset);
+
+	ImGui::Text("Thickness ");
+	ImGui::SameLine();
+	ImGui::SetNextItemWidth(100);
+	ImGui::InputFloat("##fRimWidth", &m_fRimWidth, 0.01f, 1.0f, "%.3f");
+#pragma endregion
+
 }
 #endif
 

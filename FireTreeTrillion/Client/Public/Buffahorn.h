@@ -29,19 +29,10 @@ private:
 	virtual ~CBuffahorn() = default;
 
 public:
-	void Set_BuffahornEye(BUFFAHORNEYE_STATE eEyeState) {
-		m_eEyeState = eEyeState;
-	}
-	void Set_JumpTime(_float fTimeDelta) {
-		m_fJumpTime = fTimeDelta;
-	}
+	void Set_BuffahornEye(BUFFAHORNEYE_STATE eEyeState) { m_eEyeState = eEyeState; }
+	void Set_JumpTime(_float fTimeDelta) { m_fJumpTime = fTimeDelta; }
 
-	_float Get_AnimRatio() {
-		return m_pModelCom->Get_AnimRatio();
-	}
-	_float Get_JumpTime() {
-		return m_fJumpTime;
-	}
+	_float Get_JumpTime() { return m_fJumpTime; }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;

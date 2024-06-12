@@ -1,4 +1,4 @@
-#include "stdafx.h"
+//#include "stdafx.h"
 #include "ImGui_Client.h"
 #include "GameInstance.h"
 #include "Monster.h"

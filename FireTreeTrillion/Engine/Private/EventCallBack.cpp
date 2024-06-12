@@ -7,7 +7,7 @@ void CEventCallBack::onTrigger(PxTriggerPair* pairs, PxU32 count)
         if (nullptr == m_pPlayerActor)
             continue;
 
-        if (pairs[i].otherActor == m_pPlayerActor && IsActorInTriggerList(pairs[i].triggerActor)) {
+        if (pairs[i].otherActor ==  m_pPlayerActor && IsActorInTriggerList(pairs[i].triggerActor)) {
             if (m_iTriggerType == 1)
             {
                 auto functionIter = m_TriggerFuncs.find(m_iTriggerType);
@@ -27,10 +27,9 @@ void CEventCallBack::onTrigger(PxTriggerPair* pairs, PxU32 count)
                     auto exitFuncIter = m_ExitFuncs.find(m_iTriggerType);
                     if (exitFuncIter != m_ExitFuncs.end())
                         exitFuncIter->second();
-                    //MSG_BOX(TEXT("Touch Lost"));
                 }
             }
-
+ 
         }
     }
 }

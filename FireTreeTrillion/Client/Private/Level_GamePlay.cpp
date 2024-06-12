@@ -1,13 +1,15 @@
 #include "stdafx.h"
-#include "..\Public\Level_GamePlay.h"
-#include "LevelChanger.h"
-
-#include "Kirby.h"
 #include "Level_GamePlay.h"
+#include "LevelChanger.h"
+#include "Camera_Main.h"
 #include "Camera_Free.h"
-#include "Trigger.h"
+#include "BasicMap.h"
 #include "UIObject.h"
+#include "Trigger.h"
+#include "Kirby.h"
 #include "Kabu.h"
+#include "BG.h"
+#include "HUD.h"
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -53,6 +55,7 @@ HRESULT CLevel_GamePlay::Initialize()
 	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Moon"), TEXT("Prototype_GameObject_Moon"))))
 	//	return E_FAIL;
 
+	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
 	return S_OK;
 }
@@ -92,8 +95,11 @@ HRESULT CLevel_GamePlay::Render()
 
 HRESULT CLevel_GamePlay::Ready_Lights()
 {
+
+
+
 	//// 예시코드 1 : 태양광
-	LIGHT_DESC			LightDesc{};
+	LIGHT_DESC		LightDesc{};
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
 	LightDesc.vDirection = _float4(0.3f, -1.f, -0.3f, 0.f);
 
@@ -104,11 +110,33 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
 		return E_FAIL;
 
+	m_pGameInstance->Setting_GodRay(_float4(320.f, 600.f, 1800.f, 1.f));
+
 	return S_OK;
 }
 
 HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
 {
+	LEVEL eLevel = LEVEL_GAMEPLAY;
+
+
+	CCamera_Main::CAMERA_KIRBY_DESC		MainCamDesc{};
+	MainCamDesc.fFovy = XMConvertToRadians(30.0f);
+	MainCamDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
+	MainCamDesc.fNear = 0.1f;
+	MainCamDesc.fFar = 1000.0f;
+	MainCamDesc.vEye = _float4(0.f, 3.f, -1.f, 1.f);
+	MainCamDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
+	MainCamDesc.fSpeedPerSec = 10.f;
+	MainCamDesc.fRotationPerSec = XMConvertToRadians(90.0f);
+	MainCamDesc.fOrigDistance = 20.f;
+	MainCamDesc.fCamSensor = .3f;
+
+	if (FAILED(m_pGameInstance->Add_Clone(eLevel, strLayerTag, TEXT("Prototype_GameObject_Camera_Main"), &MainCamDesc)))
+		return E_FAIL;
+
+
+
 	CCamera_Free::CAMERA_FREE_DESC		CameraDesc{};
 	CameraDesc.fMouseSensor = 0.1f;
 	CameraDesc.fFovy = XMConvertToRadians(40.0f);
@@ -120,7 +148,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
 	CameraDesc.fSpeedPerSec = 10.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
+	if (FAILED(m_pGameInstance->Add_Clone(eLevel, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
 		return E_FAIL;
 	
 	return S_OK;
@@ -131,8 +159,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const wstring& strLayerTag)
 	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_SkySphere"));
 	CHECK_FAILED(hr);
 
-	hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_WasteCan"));
-	CHECK_FAILED(hr);
+	/*hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_WasteCan"));
+	CHECK_FAILED(hr);*/
 
 	return S_OK;
 }
@@ -163,64 +191,36 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const wstring & strLayerTag)
 	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Buffahorn"))))
 	//	return E_FAIL;
 
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BladeKnight"))))
+	//	return E_FAIL;
+
 	return S_OK;
 }
 
-HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& strLayerTag)
+HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& _wstrLayerTag)
 {
-	string strFilePath = { "../../../UI_txt/" };
-	string strUITag = { "LayerUI_Orig.txt" };
+	//모든 HUD를 준비
+	string strUITag = { "LayerUI" };
+	CHUD::HUD_STATUS eHUDType = CHUD::STAT_NONE;
 
-	std::ifstream InputFile(strFilePath + strUITag, ios::in | std::ios::binary);
-
-	if (!InputFile.is_open()) //==FALSE 
+	map<CHUD::HUD_STATUS, string> HUDmap = 
 	{
-		MSG_BOX(TEXT("Failed to Open : FileData"));
-		return FALSE;
-	}
+		{CHUD::STAT_KIRBY, "HUD_KirbyStatus"},
+		{CHUD::STAT_STARPOINT, "HUD_StarPoint"},
+		//{CHUD::STAT_NONE, "LayerUI"},
+	};
 
-	size_t size = 0;
-	InputFile.read(reinterpret_cast<char*>(&size), sizeof(size));
-	//m_LayerUIs.reserve(size);
+	//auto it = HUDmap.find(eHUDType);
+	//if (it != HUDmap.end()) { strUITag = it->second;	}
+	//else {	strUITag = "LayerUI"; }
 
-	for (size_t i = 0; i < size; ++i)
+	for (const auto& [eHUDType, strUITag] : HUDmap)
 	{
-		string strProtoTag = {};
-		_uint iProtoTagLen = {};
-		InputFile.read(reinterpret_cast<char*>(&iProtoTagLen), sizeof(iProtoTagLen));
-		strProtoTag.resize(iProtoTagLen);
-		InputFile.read(&strProtoTag[0], iProtoTagLen);
+		string strFilePath = { "../../../UI_txt/" };
+		string strFileExt = { "_Orig.txt" };
 
-		if (0 == strProtoTag.size())
-			return FALSE;
-
-		CUIObject::UIOBJ_DESC UIobj_Desc{};
-		string strUITag = {};
-		_uint iUITagLen = {};
-		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.eUIType), sizeof(UIobj_Desc.eUIType));
-
-		InputFile.read(reinterpret_cast<char*>(&iUITagLen), sizeof(iUITagLen));
-		strUITag.resize(iUITagLen);
-		InputFile.read(&strUITag[0], iUITagLen);
-
-		UIobj_Desc.wstrUITag = CUtils::StrToWstr(strUITag);
-
-		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vCenter), sizeof(UIobj_Desc.vCenter));
-		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vSize), sizeof(UIobj_Desc.vSize));
-		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vPos), sizeof(UIobj_Desc.vPos));
-		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.fDegree), sizeof(UIobj_Desc.fDegree));
-		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.iTexIndex), sizeof(UIobj_Desc.iTexIndex));
-
-		string strText = {};
-		_uint iUIextLen = {};
-		InputFile.read(reinterpret_cast<char*>(&iUIextLen), sizeof(iUIextLen));
-		strText.resize(iUIextLen);
-		InputFile.read(&strText[0], iUIextLen);
-		UIobj_Desc.wstrText = CUtils::StrToWstr(strText);
-
-		InputFile.read(reinterpret_cast<char*>(&UIobj_Desc.vColorRGBA), sizeof(UIobj_Desc.vColorRGBA));
-
-		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, CUtils::StrToWstr(strProtoTag), &UIobj_Desc)))
+		strFilePath += strUITag.c_str() + strFileExt;
+		if (FAILED(Load_FileData(strFilePath, FILE_UI, _wstrLayerTag)))
 			return E_FAIL;
 	}
 
@@ -231,11 +231,11 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 {
 	LEVEL eLevel = LEVEL_GAMEPLAY;
 
-	string strFileName = "../../../objects_txt/GamePlay.txt";
+	string strFileName = "../../../objects_txt/Stage1.txt";
 	fstream fileStream(strFileName, ios::in | ios::binary);
 	if (fileStream.is_open() == false)
 	{
-		MSG_BOX(TEXT("Failed to open : GamePlay.txt"));
+		MSG_BOX(TEXT("Failed to open : Stage1.txt"));
 		return E_FAIL;
 	}
 
@@ -246,10 +246,16 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 	_int iCamType{};
 	_float fRadius{};
 	_float4x4 matInverse{};
+	_uint iShaderVars{};
+	_float fRimWidth{};
 	map<_int, _float4x4> camMatrices;
 	map<_int, pair<_vector, _float>> frontDirRadii;
 	map<_int, pair<_vector, _float>> rearDirRadii;
 	map<_int, pair<_float4x4, _float>> triggerInfos;
+	_uint iNumRallyPoints{};
+	_float3 vRallyPointPos{};
+	vector<_float4> vecRallyPoints;
+	string strConnectedMonster;
 
 	while (!fileStream.eof())
 	{
@@ -258,6 +264,8 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 		strModelName.resize(iStrLength);
 		fileStream.read(&strModelName[0], iStrLength);
 		fileStream.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
+		fileStream.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
+		fileStream.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
 
 		if ("Camera" == strModelName) 
 		{
@@ -285,6 +293,26 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 			else if(CAM_REAR == iCamType)
 				rearDirRadii.emplace(iTriggerIndex, pair<_vector, _float>(vDir, fRadius));
 		}
+		else if ("NonAnim" == strModelName.substr(0, 7) && strModelName.substr(strModelName.size() - 5) != "Kirby")
+		{
+			vecRallyPoints.clear();
+			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex)); // Monster Enum
+			fileStream.read(reinterpret_cast<char*>(&iNumRallyPoints), sizeof(iNumRallyPoints));
+			for (_uint iRallyPointIdx = 0; iRallyPointIdx < iNumRallyPoints; iRallyPointIdx++) {
+				fileStream.read(reinterpret_cast<char*>(&vRallyPointPos), sizeof(vRallyPointPos));
+				vecRallyPoints.push_back(_float4(vRallyPointPos.x, vRallyPointPos.y, vRallyPointPos.z, 1));
+			}
+		}
+		else if ("RallyPoint" == strModelName)
+		{
+			_uint iStrSize{};
+			fileStream.read(reinterpret_cast<char*>(&iStrSize), sizeof(iStrSize));
+			strConnectedMonster.resize(iStrSize);
+			fileStream.read(&strConnectedMonster[0], iStrSize);
+			_int iTempIdx{};
+			fileStream.read(reinterpret_cast<char*>(&iTempIdx), sizeof(iTempIdx));
+			continue;
+		}
 
 		if (fileStream.eof())
 			break;
@@ -292,34 +320,35 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 		CGameObject::GAMEOBJECT_DESC tempDesc = {};
 		tempDesc.matWorld = matWorld;
 		tempDesc.wstrModelName = CUtils::StrToWstr(strModelName);
-
+		tempDesc.iShaderVars = iShaderVars;
+		tempDesc.fRimWidth = fRimWidth;
+		if (strModelName.size() >= 8) { // NonAnim_ 부분 지우기
+			if ("NonAnim" == strModelName.substr(0, 7))
+				tempDesc.wstrModelName.erase(0, 8);
+		}
+			
 		if ("NonAnim_Kirby" == strModelName)
 		{
-			tempDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby"), &tempDesc)))
 				return E_FAIL;
 		}
 		else if (strModelName == "NonAnim_Awoofy")
 		{
-			tempDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Awoofy"), &tempDesc)))
 				return E_FAIL;
 		}
 		else if (strModelName == "NonAnim_Rabbit")
 		{
-			tempDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Rabbit"), &tempDesc)))
 				return E_FAIL;
 		}
 		else if (strModelName == "NonAnim_Buffahorn")
 		{
-			tempDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Buffahorn"), &tempDesc)))
 				return E_FAIL;
 		}
 		else if (strModelName == "NonAnim_BladeKnight")
 		{
-			tempDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BladeKnight"), &tempDesc)))
 				return E_FAIL;
 		}
@@ -327,13 +356,28 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 		{
 			CKabu::KABU_DESC KabuDesc = {};
 			KabuDesc.matWorld = matWorld;
-			KabuDesc.wstrModelName = CUtils::StrToWstr(strModelName);
-			KabuDesc.wstrModelName.erase(0, 8); // NonAnim_ 부분 지우기
-			KabuDesc.eMoveState = CKabu::KABUMOVING_PATROL;
+			KabuDesc.wstrModelName = tempDesc.wstrModelName;
+			KabuDesc.eMoveState = CKabu::KABUMOVING_STATE(iTriggerIndex);
+			KabuDesc.vecRallyPoints = vecRallyPoints;
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Kabu"), &KabuDesc)))
 				return E_FAIL;
 		}
 		else if (strModelName == "Level1Stage1Step01" || strModelName == "Level1Stage1Step01_Blend")
+		{
+			CBasicMap::MAP_DESC tMapDesc{};
+			tMapDesc.matWorld = tempDesc.matWorld;
+			tMapDesc.wstrModelName = tempDesc.wstrModelName;
+			
+			_float3 vMin{}, vMax{};
+			fileStream.read(reinterpret_cast<char*>(&vMin), sizeof(vMin));
+			fileStream.read(reinterpret_cast<char*>(&vMax), sizeof(vMax));
+
+			tMapDesc.vMin = vMin;
+			tMapDesc.vMax = vMax;
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_BasicMap"), &tMapDesc)))
+				return E_FAIL;
+		}
+		else if (strModelName == "Level1Stage1Step01_Blend")
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_BasicMap"), &tempDesc)))
 				return E_FAIL;
@@ -342,16 +386,23 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 		{
 			CTrigger::TRIGGER_DESC tTriggerDesc{};
 			tTriggerDesc.matWorld = matWorld;
-			tTriggerDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			tTriggerDesc.wstrModelName = tempDesc.wstrModelName;
 			tTriggerDesc.iTriggerType = iTriggerType;
 			tTriggerDesc.iTriggerIndex = iTriggerIndex;
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Trigger"), TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc)))
 				return E_FAIL;
 		}
+		else if (strModelName == "BG1")
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_BG"), &tempDesc)))
+				return E_FAIL;
+		}
 	}
+
+
 	fileStream.close();
 
-	CCamera_Free* pCamera = dynamic_cast<CCamera_Free*> (m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Camera")));
+	CCamera_Main* pCamera = dynamic_cast<CCamera_Main*> (m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Camera")));
 	if (nullptr == pCamera)
 		return E_FAIL;
 
@@ -378,6 +429,83 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 	{
 		for (auto& pair : triggerInfos)
 			pCamera->EmplaceBackTriggerInfo(pair.second.first, pair.second.second);
+	}
+
+	return S_OK;
+}
+
+_bool CLevel_GamePlay::Load_FileData(const string& _strFilePath, FILE_TYPE _eFileType, const wstring& _wstrLayerTag)
+{
+	std::ifstream InputFile(_strFilePath, ios::in | std::ios::binary);
+
+	if (!InputFile.is_open()) //==FALSE 
+	{
+		MSG_BOX(TEXT("Failed to Open : FileData"));
+		return E_FAIL;
+	}
+
+	size_t size = 0;
+	InputFile.read(reinterpret_cast<char*>(&size), sizeof(size));
+	//m_LayerUIs.reserve(size);
+
+	for (size_t i = 0; i < size; ++i)
+	{
+		string strProtoTag = {};
+		_uint iProtoTagLen = {};
+		InputFile.read(reinterpret_cast<char*>(&iProtoTagLen), sizeof(iProtoTagLen));
+		strProtoTag.resize(iProtoTagLen);
+		InputFile.read(&strProtoTag[0], iProtoTagLen);
+
+		if (0 == strProtoTag.size())
+			return E_FAIL;
+
+		CUIObject::UIOBJ_DESC LayerUIDesc{};
+		string strUITag = {};
+		_uint iUITagLen = {};
+		InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.eUIType), sizeof(LayerUIDesc.eUIType));
+		InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.eUIProj), sizeof(LayerUIDesc.eUIProj));
+
+		InputFile.read(reinterpret_cast<char*>(&iUITagLen), sizeof(iUITagLen));
+		strUITag.resize(iUITagLen);
+		InputFile.read(&strUITag[0], iUITagLen);
+		LayerUIDesc.wstrUITag = CUtils::StrToWstr(strUITag);
+
+		InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.vCenter), sizeof(LayerUIDesc.vCenter));
+		InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.vSize), sizeof(LayerUIDesc.vSize));
+		InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.vPos), sizeof(LayerUIDesc.vPos));
+		InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.vDegree), sizeof(LayerUIDesc.vDegree));
+
+		InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.iTexIndex), sizeof(LayerUIDesc.iTexIndex));
+
+		string strText = {};
+		_uint iUIextLen = {};
+		InputFile.read(reinterpret_cast<char*>(&iUIextLen), sizeof(iUIextLen));
+		strText.resize(iUIextLen);
+		InputFile.read(&strText[0], iUIextLen);
+		LayerUIDesc.wstrText = CUtils::StrToWstr(strText);
+
+		InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.vColorRGB), sizeof(LayerUIDesc.vColorRGB));
+		InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.fAlpha), sizeof(LayerUIDesc.fAlpha));
+
+		//파일 경로명으로 prototag를 받아 생성하는 방식
+		size_t strFileFrontPos = _strFilePath.find("txt/");
+		if (strFileFrontPos != string::npos)
+			strUITag = _strFilePath.substr(strFileFrontPos + 4);
+
+		//Prototype_GameObject_
+		size_t strFileBackPos = strUITag.find("_Orig");
+		if (strFileBackPos != string::npos)
+			strUITag = strUITag.substr(0, strFileBackPos);
+
+		size_t strProtoPos = strProtoTag.find("t_"); //찾을 문자열 위치
+		if (strProtoPos != string::npos)
+		{
+			strProtoTag = strProtoTag.substr(0, strProtoPos + 2); //해당 문자열 이후만 남김
+			strProtoTag += strUITag;
+		}
+
+		HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, _wstrLayerTag, CUtils::StrToWstr(strProtoTag), &LayerUIDesc);
+		CHECK_FAILED(hr);
 	}
 
 	return S_OK;

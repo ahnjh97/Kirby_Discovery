@@ -125,6 +125,12 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 		nullptr == m_pPipeLine)
 		return;
 
+	_float ffTimeDelta = fTimeDelta;
+	if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_W, KEY_PRESS))
+	{
+		ffTimeDelta = fTimeDelta * 0.5f;
+	}
+	
 	m_pInput_Device->Tick();
 	m_pTimeController->Update_TimeController(fTimeDelta);
 
@@ -333,6 +339,14 @@ void CGameInstance::Update_DofFocus(_fvector vWorldPos)
 
 }
 
+void CGameInstance::Bind_RendererFunc(_int iTriggerType)
+{
+	if (nullptr == m_pRenderer)
+		return;
+
+	m_pRenderer->Bind_RendererFunc(iTriggerType);
+}
+
 void CGameInstance::Set_BlackBackGround(_bool bSet)
 {
 	if (nullptr == m_pRenderer)
@@ -370,6 +384,14 @@ void CGameInstance::Update_Option(CRenderer::OPTION Option, _bool bOn)
 	if (nullptr == m_pRenderer)
 		return;
 	m_pRenderer->Update_Option(Option, bOn);
+}
+
+void CGameInstance::Setting_GodRay(_fvector vWorldPos)
+{
+	if (nullptr == m_pRenderer)
+		return;
+
+	m_pRenderer->Setting_GodRay(vWorldPos);
 }
 
 #ifdef _DEBUG

@@ -36,6 +36,12 @@ HRESULT CKabu::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pKabuDesc)))
 		return E_FAIL;
 
+	m_vecRallyPoint = pKabuDesc->vecRallyPoints;
+	if(!m_vecRallyPoint.empty())
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecRallyPoint[0]);
+
+	m_vOriginPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
@@ -231,12 +237,6 @@ HRESULT CKabu::Add_Components()
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	m_pControllerCom->Set_Object(this);
 	//m_pControllerCom->Set_CollisionType(m_eCollisionGroup);
-
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
-	m_vOriginPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-	m_vecRallyPoint.push_back(vPos);
-	m_vecRallyPoint.push_back(XMVectorSet(3.f, 7.f, -176.f, 1.f));
-	//m_vecRallyPoint.push_back(XMVectorSet(2.f, 6.5f, -187.f, 1.f));
 	
 	//SetUp_FSM();
 
@@ -256,12 +256,9 @@ HRESULT CKabu::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
-	_bool bStencil = true;
-	_bool bRimLight = true;
-	_bool bMotionBlur = true;
-	m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
-	m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
-	m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
+	m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
+	m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
+	m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
 		return E_FAIL;
 

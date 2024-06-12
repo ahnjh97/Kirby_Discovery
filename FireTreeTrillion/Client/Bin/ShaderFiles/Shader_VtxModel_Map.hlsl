@@ -27,8 +27,6 @@ struct VS_OUT
 
 	float3		vTangent : TANGENT;
 	float3		vBinormal : BINORMAL;
-
-
 };
 
 /* ¡§¡° Ω¶¿Ã¥ı */
@@ -107,12 +105,6 @@ PS_OUT PS_MAIN(PS_IN In)
 		discard;
 
     vector vNormalTex = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
-    //vNormalTex.y = 1- vNormalTex.y;
-    //float3 vNormal = float3(vNormalTex.r, vNormalTex.g, vNormalTex.b);
-    //float3 vNormal = 0;
-
-    //vNormal.xy = vNormalTex.wy * 2.f - 1.f;
-    //vNormal.z = sqrt(1 - saturate(dot(vNormalTex.xy, vNormalTex.xy)));
 
     float3 vNormal = vNormalTex.xyz * 2.f - 1.f;
     float3x3 WorldMatrix = float3x3(In.vTangent, In.vBinormal, In.vNormal);
@@ -124,6 +116,8 @@ PS_OUT PS_MAIN(PS_IN In)
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
     Out.vFieldDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 0.0f);
     Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
+    if (Out.vMRA.z == 0)
+        Out.vMRA.z = 0.001f;
     
     if (g_fTime < 0.5f)
         Out.vDiffuse.rgb += vDamageColor * smoothstep(0.0f, 1.0f, g_fTime);
@@ -148,7 +142,7 @@ PS_OUT NO_NORMALMAP_PS_MAIN(PS_IN In)
     Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
     Out.vFieldDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 0.0f);
-    Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
+    Out.vMRA = vector(0, 1, 1, 1);
 
     if (g_fTime < 0.5f)
         Out.vDiffuse.rgb += vDamageColor * smoothstep(0.0f, 1.0f, g_fTime);

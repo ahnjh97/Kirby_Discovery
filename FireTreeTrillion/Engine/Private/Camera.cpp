@@ -59,7 +59,9 @@ HRESULT CCamera::Bind_PipeLines()
 
 void CCamera::Free()
 {
-	__super::Free();
+	Safe_Release(m_pFirstTarget);
+	Safe_Release(m_pSecondTarget);
 
+	__super::Free();
 
 }

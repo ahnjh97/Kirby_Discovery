@@ -26,6 +26,9 @@ protected:
 	virtual ~CMonster() = default;
 
 public:
+	_float Get_AnimRatio() { return m_pModelCom->Get_AnimRatio(); }
+
+public:
 	virtual HRESULT Initialize_Prototype()			override;
 	virtual HRESULT Initialize(void* pArg)			override;
 	virtual _int	Tick(_float fTimeDelta)			override;
