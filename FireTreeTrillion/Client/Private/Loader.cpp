@@ -13,23 +13,18 @@
 #include "BasicMap.h"
 #include "Trigger.h"
 #include "Grid.h"
+#include "BG.h"
 
 
 //스카이 스피어
 #include "SkySphere.h"
 
-
+//UI 툴
 #pragma region TOOL_UI
-
-#include "Editor_UI.h"
-#include "BackGround.h"
-
 #ifdef _DEBUG
 #include "Editor_UI.h"
-#endif
-
-//#include "TestUI.h"
 #include "LayerUI.h"
+#endif
 #pragma endregion
 
 //이펙트 툴
@@ -52,7 +47,11 @@
 #pragma endregion
 
 #pragma region 객체
+//카메라
 #include "Camera_Free.h"
+#include "Camera_Main.h"
+
+
 #include "TestModel.h"
 #include "TestTerrain.h"
 #include "Kirby.h"
@@ -70,6 +69,12 @@
 
 #include "Moon.h"
 #include "WasteCan.h"
+
+//UI
+#include "BackGround.h"
+#include "HUD.h"
+#include "HUD_KirbyStatus.h"
+#include "HUD_StarPoint.h"
 #pragma endregion
 
 
@@ -123,7 +128,6 @@ HRESULT CLoader::Start()
 	{
 	case LEVEL_LOGO:
 	{
-
 		hr = Loading_ObjectAll();
 		CHECK_FAILED(hr);
 
@@ -134,6 +138,10 @@ HRESULT CLoader::Start()
 		hr = Loading_For_Logo();
 		break;
 	}
+	case LEVEL_INTRO:
+		hr = Loading_For_Intro();
+		break;
+
 	case LEVEL_GAMEPLAY:
 		hr = Loading_For_GamePlay();
 		break;
@@ -196,11 +204,20 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BasicMap"), CBasicMap);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Trigger"), CTrigger);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("OrbitingCamera"), COrbitingCamera);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BG"), CBG);
+
+#pragma region UI
 
 	// UI
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("LayerUI"), CLayerUI);
-	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("Multi_UI"), CMulti_UI);
-	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_KirbyStatus"), CHUD_KirbyStatus);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_StarPoint"), CHUD_StarPoint);
+	// 
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_HPBoss"), CHUD_HPBoss);
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_Mission"), CHUD_Mission);
+
+#pragma endregion
 	
 #pragma region FOR CLIENT
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kirby"), CKirby);
@@ -215,8 +232,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kabu"), CKabu);
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BackGround"), CBackGround);
-	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_Test"), CTestUI);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Main"), CCamera_Main);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestMap"), CTestTerrain);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Moon"), CMoon);
@@ -303,6 +320,53 @@ HRESULT CLoader::Loading_For_Logo()
 	return S_OK;
 }
 
+HRESULT CLoader::Loading_For_Intro()
+{
+	HRESULT hr = S_OK;
+	LEVEL eLevel = LEVEL_INTRO;
+
+
+	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
+#pragma region 텍스쳐
+	if (FAILED(Add_Texture(eLevel, "Logo", "Logo/Logo.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Moon", "Moon.png")))
+		return E_FAIL;
+
+	// 커비 얼굴 텍스쳐 로드
+	Add_KirbyFaceTexture(eLevel);
+#pragma endregion
+
+	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
+#pragma region 모델
+	// 모아놓은 Model 한번에 생성.
+	hr = Add_Models(eLevel);
+	CHECK_FAILED(hr);
+#pragma endregion
+
+	m_strLoadingText = TEXT("물리 컴포넌트(을) 로딩 중 입니다.");
+#pragma region 물리 컴포넌트
+	/* 리지드바디 */
+	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_RigidBody"), CRigidBody::Create(m_pDevice, m_pContext));
+	CHECK_FAILED(hr);
+	/* 캐릭터 컨트롤러 */
+	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_CharacterController"), CCharacterController::Create(m_pDevice, m_pContext));
+	CHECK_FAILED(hr);
+#pragma endregion
+
+	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
+#pragma region 셰이더
+	// 모아놓은 Shaders 한번에 생성
+	hr = Add_Shaders(eLevel);
+	CHECK_FAILED(hr);
+#pragma endregion
+
+	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
+	m_IsFinished = true;
+
+	return S_OK;
+}
+
 HRESULT CLoader::Loading_For_GamePlay()
 {
 	HRESULT hr = S_OK;
@@ -316,9 +380,20 @@ HRESULT CLoader::Loading_For_GamePlay()
 		return E_FAIL;
 	if(FAILED(Add_Texture(eLevel, "GsLandTopNoize_Fur", "Map/GsLandTopNoize_Fur.dds")))
 		return E_FAIL;
-	
-	hr = Add_Texture(eLevel, "GameComplete", "UI/GAMECOMPLETE/GameComplete_%d.png", 21);
+	if (FAILED(Add_Texture(eLevel, "Level_0_Env", "Map/Level_0_Env.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "BRDF_LUT", "Map/BRDF_LUT.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "RandomNormal", "Map/RandomNormal.png")))
+		return E_FAIL;
+
+#pragma region UI
+
+	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 19);
+	hr = Add_Texture(eLevel, "HUD_StarPoint", "UI/HUD/Kirby/StarPoint/StarPoint_%d.dds", 4);
 	CHECK_FAILED(hr);
+
+#pragma endregion
 
 	// 커비 얼굴 텍스쳐 로드
 	Add_KirbyFaceTexture(eLevel);
@@ -449,8 +524,10 @@ HRESULT CLoader::Loading_For_Tool_Map()
 	LEVEL eLevel = LEVEL_TOOL_MAP;
 
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
-	if (FAILED(Add_Texture(eLevel, "GsLandTopNoize_Fur", "Map/GsLandTopNoize_Fur.dds")))
-		return E_FAIL;
+	//if (FAILED(Add_Texture(eLevel, "GsLandTopNoize_Fur", "Map/GsLandTopNoize_Fur.dds")))
+	//	return E_FAIL;
+	//if (FAILED(Add_Texture(eLevel, "GsDefaultSideRockC_Height", "Map/GsDefaultSideRockC_Height.dds")))
+	//	return E_FAIL;
 
 	m_strLoadingText = TEXT("VI버퍼(을) 로딩 중 입니다.");
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Grid"),
@@ -479,8 +556,8 @@ HRESULT CLoader::Loading_For_Tool_UI()
 
 #pragma region TEXTURE
 
-	//hr = Add_Texture(eLevel, "KirbyBarHard", "UI/HUD/Hero/BarHard/HeroPanelBarHard_%d.png", 3);
-	hr = Add_Texture(eLevel, "GameComplete", "UI/GAMECOMPLETE/GameComplete_%d.png", 21);
+	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 19);
+	hr = Add_Texture(eLevel, "HUD_StarPoint", "UI/HUD/Kirby/StarPoint/StarPoint_%d.dds", 4);
 	CHECK_FAILED(hr);
 
 	m_strLoadingText = TEXT("Loading For Texture : Complete!");
@@ -498,10 +575,6 @@ HRESULT CLoader::Add_Models(LEVEL eLevel)
 	// SetUp_ModelScaleRotation 함수에서 모아놓은 Model들을 타입에 따라서 Component 생성한다.
 	for (auto& ModelInfo : m_vecModelInfo)
 	{
-		if (ModelInfo.strModelName == "KirbyDefault"){
-			_int i = 0;
-		}
-
 		// 애님툴에서 조정하여 저장한 값을 불러서
 		// 모델 이름이 같을 경우, model의 정보들을 읽어오기
 		for (auto& pair : m_mapSequence)
@@ -551,11 +624,45 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	{
 
 	}
+	else if (eLevel == LEVEL_INTRO)
+	{
+		m_vecModelInfo.emplace_back("Kirby", TYPE_ANIM, 1.f, 180.f);
+		// For Kirby Body
+		m_vecModelInfo.emplace_back("KirbyBalloon", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbyDefault", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbyVacuum", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbySwordDefault", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbySwordBalloon", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbyBoomDefault", TYPE_ANIM, 1.f, 180.f);
+
+		// For Kirby Weapon
+		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
+		// For Kirby Armour
+		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
+
+
+		m_vecModelInfo.emplace_back("Level0Stage1Step01", TYPE_NONANIM, 1.f, 0.f, 0, true);
+		m_vecModelInfo.emplace_back("Level0Stage1Step01_Blend", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f);
+		m_vecModelInfo.emplace_back("BG0", TYPE_NONANIM);
+
+		// For Monster
+		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("Rabbit", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("Buffahorn", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("BladeKnight", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("BladeKnightSword", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("Kabu", TYPE_ANIM, 2.f, 180.f);
+
+		// For Mab Interactive Object
+		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM);
+	}
 	else if (eLevel == LEVEL_GAMEPLAY)
 	{
 		m_vecModelInfo.emplace_back("Fiona", TYPE_ANIM );
 		m_vecModelInfo.emplace_back("Dee", TYPE_ANIM, 0.01f);
-		m_vecModelInfo.emplace_back("Kirby", TYPE_ANIM);
+		m_vecModelInfo.emplace_back("Kirby", TYPE_ANIM, 1.f, 180.f);
 
 		m_vecModelInfo.emplace_back("TestMap", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("TestMap2", TYPE_NONANIM, 0.01f);
@@ -566,28 +673,32 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("KirbyVacuum", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("KirbySwordDefault", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("KirbySwordBalloon", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbyBoomDefault", TYPE_ANIM, 1.f, 180.f);
+
 		// For Kirby Weapon
 		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
 		// For Kirby Armour
 		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
 
 
 		m_vecModelInfo.emplace_back("GsBenchAL", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("Level0Stage1Step01", TYPE_NONANIM);
-		m_vecModelInfo.emplace_back("Level1Stage1Step01", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("Level1Stage1Step01", TYPE_NONANIM, 1.f, 0.f, 0, true);
 		m_vecModelInfo.emplace_back("Level1Stage1Step01_Blend", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f);
+		m_vecModelInfo.emplace_back("BG1", TYPE_NONANIM);
 
 		// For Monster
 		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("Rabbit", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("Buffahorn", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("BladeKnight", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("BladeKnightSword", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("BladeKnightSword", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("Kabu", TYPE_ANIM, 2.f, 180.f);
 
 		// For Mab Interactive Object
-		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM);
 	}
 	else if (eLevel == LEVEL_TOOL_MAP)
 	{
@@ -597,6 +708,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f);
 		m_vecModelInfo.emplace_back("Camera", TYPE_NONANIM, 0.2f, 270.f);
 		m_vecModelInfo.emplace_back("Dummy", TYPE_NONANIM, 0.01f);
+		m_vecModelInfo.emplace_back("RallyPoint", TYPE_NONANIM, 2.f);
+		m_vecModelInfo.emplace_back("LightBulb", TYPE_NONANIM, 0.02f);
 	}
 	else if (eLevel == LEVEL_TOOL_ANIM)
 	{
@@ -735,7 +848,7 @@ HRESULT CLoader::Add_AllModelTxts(LEVEL eLevel, TYPE eType)
 	list<wstring> txtList;
 	TraverseModelTxts(wstrRootFolderPath, txtList);
 
-	for (auto listIter : txtList)
+	for (auto& listIter : txtList)
 	{
 		wstring wstrModelName = listIter.substr(0, listIter.length() - 4);
 		string strModelName = CUtils::WstrToStr(wstrModelName);
@@ -771,6 +884,9 @@ HRESULT CLoader::Add_AllModelTxts(LEVEL eLevel, TYPE eType)
 				break;
 			}
 		}
+
+		if (strModelName.size() > 8 && "NonAnim" == strModelName.substr(0, 7))
+			tModelInfo.fDegree = tModelInfo.fDegree + 180.f;
 
 		wstring wstrPrototypeTag = TEXT("Prototype_Component_Model_") + CUtils::StrToWstr(tModelInfo.strModelName);
 		hr = m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CModel::Create(m_pDevice, m_pContext, tModelInfo));

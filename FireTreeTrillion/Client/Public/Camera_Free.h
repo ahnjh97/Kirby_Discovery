@@ -20,17 +20,17 @@ private:
 
 public:
 	//트래킹할 타겟을 세팅한다.
-	void Set_Target(CTransform* pTarget)
-	{
-		if (nullptr == pTarget)
-			return;
+	//void Set_Target(CTransform* pTarget)
+	//{
+	//	if (nullptr == pTarget)
+	//		return;
 
-		if (nullptr != m_pTarget)
-			Safe_Release(m_pTarget);
+	//	if (nullptr != m_pTarget)
+	//		Safe_Release(m_pTarget);
 
-		m_pTarget = pTarget;
-		Safe_AddRef(pTarget);
-	}
+	//	m_pTarget = pTarget;
+	//	Safe_AddRef(pTarget);
+	//}
 	void Track_Target(_bool _bTrackTarget) { m_bTrackTarget = _bTrackTarget; }
 
 private:
@@ -69,8 +69,11 @@ private:
 
 	_float			m_fSlerpRatio = { .2f };
 
-	_float4 m_vDestCamPos = {};
-	_float4 m_vDestCamDir = {};
+	_float4			m_vDestCamPos = {};
+	_float4			m_vDestCamDir = {};
+
+
+	_float			m_fDestFovy = { ToRadian(30.f)};
 
 	void			Track_Target(_float fTimeDelta);
 

@@ -35,7 +35,8 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 
 	m_pGameInstance->Add_Camera(this);
 
-	if (*m_pGameInstance->Get_CurrentLevelID() == LEVEL_GAMEPLAY) {
+	if (*m_pGameInstance->Get_CurrentLevelID() == LEVEL_INTRO || 
+		*m_pGameInstance->Get_CurrentLevelID() == LEVEL_GAMEPLAY) {
 		function<void(_int)> func = bind(&CCamera_Free::StartLerpByTriggerInfo, this, placeholders::_1);
 		m_pGameInstance->Emplace_TriggerFunc(TRIGGER_CAMERA, func);
 
@@ -47,11 +48,15 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 
 _int CCamera_Free::Tick(_float fTimeDelta)
 {
+	//내가 현재 카메라가 아니라면 바쁘게 타겟 따라가기
+	if (m_pGameInstance->Get_CurCameraPtr() != this)
+		m_bTrackTarget = true;
+
 	Control(fTimeDelta);
-	//Orbit_Target(fTimeDelta);
 
-
-
+	//fov y 를 보간하여 갱신한다.
+	if (.01f < abs(m_fFovy - m_fDestFovy))
+		m_fFovy += (m_fDestFovy - m_fFovy) * fTimeDelta * 3.f;
 
 	return OBJ_NOEVENT;
 }
@@ -78,6 +83,17 @@ void CCamera_Free::Render_IMGUI()
 	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._21, WorldMat._22, WorldMat._23, WorldMat._24);
 	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._31, WorldMat._32, WorldMat._33, WorldMat._34);
 	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._41, WorldMat._42, WorldMat._43, WorldMat._44);
+
+
+
+
+	static _float fFOVY = ToDegree(m_fDestFovy);
+
+	if (ImGui::DragFloat(u8"FOV", &fFOVY, .1f, 10.f, 50.f, "%.1f"))
+	{
+		m_fDestFovy = ToRadian(fFOVY);
+	}
+
 
 	//ImGui::Text("X: %.2f", vPosition.x);
 	//ImGui::SameLine();
@@ -196,10 +212,10 @@ _float CCamera_Free::LerpRadius(_float fStart, _float fEnd, _float fRatio)
 
 void CCamera_Free::Track_Target(_float fTimeDelta)
 {
-	if (nullptr == m_pTarget)
+	if (nullptr == m_pFirstTarget)
 		return;
 
-		_float4 vTargetPos = m_pTarget->Get_State(CTransform::STATE_POSITION);
+	_float4 vTargetPos = m_pFirstTarget->Get_State(CTransform::STATE_POSITION);
 
 	if (m_bLerpByTriggerInfo)
 		LerpByTriggerInfo(m_iMatrixIndex);
@@ -224,12 +240,12 @@ void CCamera_Free::Track_Target(_float fTimeDelta)
 	//m_vDestCamDir = m_vSlerpedDir;
 	//m_fTrackDistance = m_fLerpedRadius;
 
-	m_vDestCamPos = vTargetPos - m_vDestCamDir * m_fTrackDistance;
-;	//if (m_bLerpByTriggerInfo)
-	//{
+	m_vDestCamPos = vTargetPos + m_vDestCamDir * m_fTrackDistance;
+	;	//if (m_bLerpByTriggerInfo)
+		//{
 
-		//_float4 vCamLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-		//_float4 vDestLook = m_pTarget->Get_State(CTransform::STATE_POSITION) - m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+			//_float4 vCamLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+			//_float4 vDestLook = m_pFirstTarget->Get_State(CTransform::STATE_POSITION) - m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
 #pragma region 방법 1 - 절대 쿼터니언
 		/*
@@ -263,7 +279,7 @@ void CCamera_Free::Track_Target(_float fTimeDelta)
 #pragma region 방법 3 - 방향 벡터 lerp
 
 		//_float4 vCamLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-		//_float4 vDestLook = m_pTarget->Get_State(CTransform::STATE_POSITION) - m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		//_float4 vDestLook = m_pFirstTarget->Get_State(CTransform::STATE_POSITION) - m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
 		//if (vCamLook.Dot(vDestLook) < .95f)
 		//{
@@ -277,12 +293,10 @@ void CCamera_Free::Track_Target(_float fTimeDelta)
 
 #pragma endregion
 
-
-
 #pragma region 방법 4
 		/*
 		_float4 vCamLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-		_float4 vDestLook = m_pTarget->Get_State(CTransform::STATE_POSITION) - m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		_float4 vDestLook = m_pFirstTarget->Get_State(CTransform::STATE_POSITION) - m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
 
 		if (vCamLook == vDestLook)
@@ -344,8 +358,6 @@ void CCamera_Free::Track_Target(_float fTimeDelta)
 	_float4 vDestXZDir = { vDestDir.x, 0.f, vDestDir.z , 0.f };
 	_float4 vDestYDir = { 0.f, vDestDir.y, 0.f , 0.f };
 
-	//m_pTransformCom->Look_At(m_pt);
-
 
 	if (.1f <= vDestXZDir.Length())
 		m_pTransformCom->Move(vDestXZDir * .04f);
@@ -358,8 +370,8 @@ void CCamera_Free::Track_Target(_float fTimeDelta)
 
 	//if (m_bLerpByTriggerInfo)
 	//{
-		_float4 vCamLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-		_float4 vDestLook = m_vDestCamDir;
+	_float4 vCamLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+	_float4 vDestLook = m_vDestCamDir;
 
 	if (vCamLook.Dot(vDestLook) < .95f)
 	{
@@ -368,7 +380,6 @@ void CCamera_Free::Track_Target(_float fTimeDelta)
 		//m_pTransformCom->Turn(vDestQuat);
 
 		m_pTransformCom->Look_At_Interpolate(m_pTransformCom->Get_State(CTransform::STATE_POSITION) + Dir(m_vDestCamDir), fTimeDelta);
-
 	}
 
 	//}
@@ -406,20 +417,20 @@ void CCamera_Free::Track_Target(_float fTimeDelta)
 
 	//}
 	//
-	//if (m_bLerpByTriggerInfo)
-	//{
+	/*if (m_bLerpByTriggerInfo)
+	{
 
-	//_float4 vLerpedDir = SlerpDirVec(vCamLook, vDestLook, m_fSlerpRatio);
-	//m_pTransformCom->Look_At_Axis(vLerpedDir);
+		_float4 vLerpedDir = SlerpDirVec(vCamLook, vDestLook, m_fSlerpRatio);
+		m_pTransformCom->Look_At_Axis(vLerpedDir);
 
-	//}
+	}*/
 
 
 
 	//m_pTransformCom->Look_At_Axis(vLerpedDir);
 	/*
 	Quaternion vStartQuat = CUtils::Make_Quat_FromDir(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
-	Quaternion vDestQuat = CUtils::Make_Quat_FromDir(m_pTarget->Get_State(CTransform::STATE_POSITION) - m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+	Quaternion vDestQuat = CUtils::Make_Quat_FromDir(m_pFirstTarget->Get_State(CTransform::STATE_POSITION) - m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
 	Quaternion vInterpolateQuat = Quaternion::Slerp(vStartQuat, vDestQuat, 1.f);
 
@@ -432,11 +443,17 @@ void CCamera_Free::Track_Target(_float fTimeDelta)
 void CCamera_Free::Control(_float fTimeDelta)
 {
 
-	if (m_pGameInstance->Get_KeyState(DIK_TAB, KEY_DOWN))
-		m_bTrackTarget = !m_bTrackTarget;
+	//tab으로 하는 track target 빠졌어요 imgui로 해주삼
+	//if (m_pGameInstance->Get_KeyState(DIK_TAB, KEY_DOWN))
+	//	m_bTrackTarget = !m_bTrackTarget;
 
 	if (m_bTrackTarget)
 		Track_Target(fTimeDelta);
+
+
+	//내가 현재 카메라가 아니라면 컨트롤은 못하게 하기
+	if (m_pGameInstance->Get_CurCameraPtr() != this)
+		return;
 
 
 	if (/**m_pCurrentLevelID == LEVEL_TOOL_MAP ||*/ m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
@@ -486,13 +503,6 @@ void CCamera_Free::Control(_float fTimeDelta)
 			}
 		}
 	}
-
-
-	//if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_PRESS))
-	//{
-	//	m_pTransformCom->Go_Left(fTimeDelta);
-
-	//}
 
 }
 

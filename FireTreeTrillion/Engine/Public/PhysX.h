@@ -59,26 +59,28 @@ private:
     PxDefaultErrorCallback      mDefaultErrorCallback;
     PxTolerancesScale           mToleranceScale;
 
-    PxControllerManager*        m_pControllerManager = nullptr;
+    PxControllerManager*        m_pControllerManager = { nullptr };
     
-    PxDefaultCpuDispatcher*     m_pDispatcher = nullptr;
-    PxPvdTransport*             m_pPvdTransport = nullptr;
-    PxFoundation*               m_pFoundation = nullptr;
-    PxPhysics*                  m_pPhysics = nullptr;
-    PxShape*                    m_pShape = nullptr;
+    PxDefaultCpuDispatcher*     m_pDispatcher       = { nullptr };
+    PxPvdTransport*             m_pPvdTransport     = { nullptr };
+    PxFoundation*               m_pFoundation       = { nullptr };
+    PxPhysics*                  m_pPhysics          = { nullptr };
+    PxShape*                    m_pShape            = { nullptr };
     
-    PxMaterial*                 m_pMaterial = nullptr;
+    PxMaterial*                 m_pMaterial         = { nullptr };
     
-    PxPvd*                      m_pPvd = nullptr;
-    PxScene*                    m_pScene = nullptr;
-    PxPvdSceneClient*           m_pPvdSceneClient = nullptr;
+    PxPvd*                      m_pPvd              = { nullptr };
+    PxScene*                    m_pScene            = { nullptr };
+    PxPvdSceneClient*           m_pPvdSceneClient   = { nullptr };
 
-    //PxCooking*                m_pCooking = nullptr;
-    PxRigidDynamic*             m_pRigidDynamic = nullptr;
+    //PxCooking*                        m_pCooking = nullptr;
+    PxRigidDynamic*             m_pRigidDynamic     = { nullptr };
 
-    class CEventCallBack*       m_pEventCallBack = nullptr;
+    class CEventCallBack*       m_pEventCallBack    = { nullptr };
 
     map<string, PxMaterial*>    m_mapMaterials;
+
+
 
 private:
     // 충돌처리할 그룹들의 결과컨텐츠를 2차원 배열로 저장합니다.

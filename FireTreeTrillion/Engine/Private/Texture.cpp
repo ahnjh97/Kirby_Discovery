@@ -11,12 +11,13 @@ CTexture::CTexture(const CTexture & rhs)
 	: CComponent{ rhs }
 	, m_Textures{ rhs.m_Textures }
 	, m_iNumTextures{ rhs.m_iNumTextures }
+	, m_wstrTexturePath{ rhs.m_wstrTexturePath }
 {
 	for (auto& pSRV : m_Textures)
 		Safe_AddRef(pSRV);
 }
 
-HRESULT CTexture::Initialize_Prototype(const wstring & strTextureFilePath, _uint iNumTextures)
+HRESULT CTexture::Initialize_Prototype(const wstring& strTextureFilePath, _uint iNumTextures)
 {
 	_tchar		szEXT[MAX_PATH] = TEXT("");
 
@@ -24,6 +25,8 @@ HRESULT CTexture::Initialize_Prototype(const wstring & strTextureFilePath, _uint
 
 	/* ..\Bin\Á¤ÀÇÈÆ\141\Framework\Client\Bin\Resources\Textures\Test.jpg */
 	_wsplitpath_s(strTextureFilePath.c_str(), nullptr, 0, nullptr, 0, nullptr, 0, szEXT, MAX_PATH);
+
+	m_wstrTexturePath = strTextureFilePath;
 
 	HRESULT hr = { 0 };
 
@@ -95,7 +98,7 @@ CTexture * CTexture::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pConte
 
 	if (FAILED(pInstance->Initialize_Prototype(strTextureFilePath, iNumTexture)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CTexture"));
+		MSG_BOX(TEXT("Failed To Create : CTexture"));
 
 		Safe_Release(pInstance);
 	}
@@ -109,7 +112,7 @@ CComponent * CTexture::Clone(void * pArg)
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Cloned : CTexture"));
+		MSG_BOX(TEXT("Failed To Clone : CTexture"));
 
 		Safe_Release(pInstance);
 	}

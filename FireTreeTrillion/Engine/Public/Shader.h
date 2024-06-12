@@ -22,6 +22,7 @@ public:
 	HRESULT Bind_Texture(const _char* pConstantName, ID3D11ShaderResourceView* pSRV);
 	HRESULT Bind_Textures(const _char* pConstantName, ID3D11ShaderResourceView** ppSRVs, _uint iNumTextures);
 	HRESULT Bind_RawValue(const _char* pConstantName, const void* pData, _uint iLength);
+	HRESULT Bind_RawArray(const _char* pConstantName, const void* pData, _uint iLength);
 
 private:
 	ID3DX11Effect*					m_pEffect = { nullptr };

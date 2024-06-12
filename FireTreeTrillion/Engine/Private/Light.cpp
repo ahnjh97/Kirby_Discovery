@@ -13,7 +13,7 @@ HRESULT CLight::Initialize(const LIGHT_DESC & LightDesc)
 	return S_OK;
 }
 
-HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer)
+HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer, _bool bForTool)
 {
 	_uint		iPassIndex = { 0 };
 
@@ -25,8 +25,8 @@ HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer)
 		if (FAILED(pShader->Bind_RawValue("g_vLightDir", &m_LightDesc.vDirection, sizeof(_float4))))
 			return E_FAIL;
 
-		iPassIndex = DEFERRED_DIRECTLIGHT;
-
+		
+		iPassIndex = bForTool == true ? DEFERRED_DIRECTLIGHT_TOOL : DEFERRED_DIRECTLIGHT;
 	}
 
 	else if (LIGHT_DESC::TYPE_POINT == m_LightDesc.eType)
@@ -38,6 +38,7 @@ HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer)
 			return E_FAIL;
 
 		iPassIndex = DEFERRED_POINTLIGHT;
+
 	}
 	else if (LIGHT_DESC::TYPE_FLASH == m_LightDesc.eType)
 	{
@@ -81,7 +82,6 @@ HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer)
 
 		iPassIndex = DEFERRED_POINTLIGHT;
 	}
-
 
 	if (FAILED(pShader->Bind_RawValue("g_vLightDiffuse", &m_LightDesc.vDiffuse, sizeof(_float4))))
 		return E_FAIL;

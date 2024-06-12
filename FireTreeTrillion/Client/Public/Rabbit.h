@@ -38,9 +38,6 @@ public:
 		m_fTempTime = fTimeDelta;
 	}
 
-	_float Get_AnimRatio() {
-		return m_pModelCom->Get_AnimRatio();
-	}
 	_bool Get_Find() {
 		return m_bFind;
 	}
@@ -68,10 +65,13 @@ public:
 	_vector JumpAttak(_float fTimeDelta);
 
 private:
+	_bool bRenderEye = { true };
+	_bool bRenderBody = { true };
+	
+	RABBIT_ANIM		m_eCurrentState = { RABBIT_END };
 	CTexture*		m_pEyeTextureCom = { nullptr };
 
 private:
-	RABBIT_ANIM		m_eCurrentState = { RABBIT_END };
 	RABBITEYE_STATE	m_eEyeState = { RABBITEYE_END };
 	_float			m_fTempTime = { 0.f };
 

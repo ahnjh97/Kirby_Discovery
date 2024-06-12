@@ -24,17 +24,13 @@ public:
 
 	struct KABU_DESC : public CMonster::MONSTER_DESC {
 		KABUMOVING_STATE eMoveState = { KABUMOVING_END };
+		vector<_float4> vecRallyPoints;
 	};
 
 private:
 	CKabu(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CKabu(const CKabu& rhs);
 	virtual ~CKabu() = default;
-
-public:
-	_float Get_AnimRatio() {
-		return m_pModelCom->Get_AnimRatio();
-	}
 
 public:
 	virtual HRESULT Initialize_Prototype() override;

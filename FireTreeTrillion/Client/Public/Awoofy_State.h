@@ -143,6 +143,9 @@ public:
 
 private:
 	_vector m_vKirbyLook = {};
+	_float		m_fFlyTime = { 0.f };
+	_float		m_fDeadTime = { 0.f };
+
 
 public:
 	static	CAwoofy_Damage_State* Create();

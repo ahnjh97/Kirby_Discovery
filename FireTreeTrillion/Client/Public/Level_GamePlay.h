@@ -1,11 +1,12 @@
 #pragma once
-
 #include "Client_Defines.h"
 #include "Level.h"
 
-
 /* 1. 레벨에 필요한 객체들을 생성한다. */
 /* 2. 레벨을 반복적으로 갱신하여 화면에 보여준다. */
+BEGIN(Engine)
+class CTexture;
+END
 
 BEGIN(Client)
 
@@ -30,6 +31,11 @@ private:
 	HRESULT Ready_ParsedObjects();
 	HRESULT Ready_Layer_MapObject(const wstring& strLayerTag);
 	
+	_bool	Load_FileData(const string& _strFilePath, FILE_TYPE _eFileType, const wstring& _strLayerTag);
+
+	HRESULT Add_EnvMap();
+	enum TEXTURETYPE { TYPE_ENV, TYPE_LUT, TYPE_NORMAL, TYPE_END };
+	CTexture* m_pEnvTexture[TYPE_END] = { nullptr };
 
 public:
 	static CLevel_GamePlay* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

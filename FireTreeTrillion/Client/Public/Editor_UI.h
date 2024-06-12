@@ -23,6 +23,7 @@ public:
 	virtual _int	Tick(_float fTimeDelta)						override;
 	virtual void	Late_Tick(_float fTimeDelta)				override;
 	virtual HRESULT Render()									override;
+
 #ifdef _DEBUG
 	virtual void	Render_IMGUI()								override;
 #endif
@@ -37,21 +38,25 @@ private:
 	_bool			Window_Textures();
 	_bool			Window_Properties();
 	_bool			Window_Tools();
+	_bool			Window_Sequencer();
+	void			Window_PopupAlert();
 
-	_bool			Set_OrthoProj(); //투영스페이스 직교 
+	_bool			Set_Projection(); //투영공간 설정
 	_bool			Set_GizmoGrid(); //기즈모 위젯 그리드 세팅
 	_bool			Set_GizmoSync(CUIObject* _pUIObj); //기즈모 위젯 동기화 및 세팅
 
 	_bool			Edit_Transform(CUIObject* _pUIObj); //변환
-	_bool			Edit_RGBAColor(); //색상 편집
-	_bool			Edit_Text(); //텍스트 편집
+	_bool			Edit_RGBAColor(CUIObject* _pUIObj); //색상 편집
 
-	_bool			Create_UIObject(UI_TYPE _eUIType);
-	_bool			Delete_UIObject();
-	_bool			Grouping_UIObject(UI_GROUP _eUIGroup);
+	_bool			Edit_Text(); //텍스트 편집
+	wstring			Edit_LayerUITag(string _strInput);
+
+	void			Create_UIObject(UI_STATE _eUIState, UI_TYPE _eUIType);
+	void			Delete_UIObject(UI_STATE _eUIState);
+	void			Group_UIObject(GROUP_TYPE _eUIGroup);
 
 public:
-	_bool			Save_Texture(const string& _strFilePath, ID3D11RenderTargetView* _pRTV);
+	void			Save_Texture(const string& _strFilePath, ID3D11RenderTargetView* _pRTV);
 	_bool			Save_FileData(const string& _strFilePath);
 	_bool			Load_FileData(const string& _strFilePath);	
 
@@ -59,6 +64,9 @@ public:
 	static CEditor_UI*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject*	Clone(void* pArg) override;
 	virtual void			Free() override;
+
+private:
+	wstring					m_wstrInputText = {};
 };
 
 

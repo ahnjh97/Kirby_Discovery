@@ -761,6 +761,7 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
+	pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
 
 	// 기본 차징 모션이다. 
 	if (pKirby->Get_State() == CKirby::SWORDSTATE_SPINSLASHCHARGE)

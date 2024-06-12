@@ -112,7 +112,7 @@ PS_OUT_LIGHTDEPTH PS_MAIN_LIGHTDEPTH(PS_IN In)
 {
     PS_OUT_LIGHTDEPTH Out = (PS_OUT_LIGHTDEPTH) 0;
 
-    Out.vLightDepth = float4(In.vProjPos.w / 1000.f, 0.f, 0.f, 0.f);
+    Out.vLightDepth = float4(In.vProjPos.w / 2000.f, 0.f, 0.f, 0.f);
 
     return Out;
 }
@@ -147,6 +147,9 @@ PS_OUT PS_MAIN(PS_IN In)
     if (g_bMotionBlur == true)
         Out.vMotionBlur = g_vMotionVelocity;
     
+    if (Out.vMRA.b < 0.001)
+        Out.vMRA.b = 1.f;
+    
 	return Out;
 }
 
@@ -171,6 +174,10 @@ PS_OUT NO_NORMALMAP_PS_MAIN(PS_IN In)
 
     if (g_bMotionBlur == true)
         Out.vMotionBlur = g_vMotionVelocity;
+    
+    
+    if (Out.vMRA.b < 0.001)
+        Out.vMRA.b = 1.f;
     
     return Out;
 }
@@ -248,12 +255,21 @@ PS_OUT PS_MAIN_DEFAULT_FX(PS_IN In)
     
     //diffuse 알파 테스팅
     vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord + g_vUVOffset);
-    if (vDiffuse.a < .01f)
+    if (vDiffuse.a < .2f)
         discard;
     
+
+
+    Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
     
+    Out.vMRA = float4(0.f, .8f, 0.f, 1.f);
     Out.vDiffuse = vDiffuse;
-	
+    
+        
+    if (Out.vMRA.b < 0.001)
+        Out.vMRA.b = 1.f;
+    
     return Out;
 }
 
@@ -287,6 +303,7 @@ PS_OUT_EFFECT PS_MAIN_BLEND_FX(PS_IN In)
     float fOldViewZ = vDepthDesc.y * 1000.f;
 
     Out.vColor.a = Out.vColor.a * saturate(fOldViewZ - In.vProjPos.w);
+
     
     Out.vNonBlur = vector(0.f, 1.f, 0.f, 0.f);
     

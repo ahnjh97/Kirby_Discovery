@@ -2,7 +2,6 @@
 /* 디자이너분들이 저장해준 정점과 인덱스의 정보를 바탕으로해서 정점, 인덱스버퍼를 새엏나다.  */
 #include "VIBuffer.h"
 #include "Model.h"
-#include <fstream>
 
 BEGIN(Engine)
 
@@ -16,9 +15,15 @@ private:
 public:
 	_uint Get_MaterialIndex() const { return m_iMaterialIndex; }
 	string Get_Name() { return string(m_szName); }
+	_float3* Get_NormalsPtr() { return m_pNormals; }
+	_float2* Get_TexCoordsPtr() { return m_pTexCoords; }
+	_float3* Get_TangentsPtr() { return m_pTangents; }
 
 public:
-	virtual HRESULT Initialize_Prototype(TYPE eModelType, string strDirectory, const vector<CBone*>& Bones, _fmatrix TransformMatrix);
+	virtual HRESULT Initialize_Prototype(TYPE eModelType, string strDirectory, const vector<CBone*>& Bones
+		, _fmatrix TransformMatrix, _bool bOctree);
+	virtual HRESULT Initialize_Prototype(const _float3* pVerticePos, _uint iNumVertices, const _float3* pNormals
+		, const _float2* pTexCoords, const _float3* pTangents, vector<FACE>& _vecFaces);
 	virtual HRESULT Initialize(void* pArg) override;
 #ifdef _DEBUG
 	virtual void	Render_IMGUI();
@@ -34,6 +39,8 @@ public:
 	HRESULT		CreateStaticActor(_float4 vPos);
 
 	_float4 Get_PickPos(const class CTransform* pTransform) const;
+
+	void Find_MinMax(_float3& vMin, _float3& vMax);
 
 private:
 	_char					m_szName[MAX_PATH] = { "" };
@@ -52,21 +59,25 @@ private:
 	_uint		m_iFaces = { 0 };
 	string		m_strDirectory;
 	streampos	m_filePointerPos;
-	ifstream& m_InputFile;
-	_float3* m_pVerticesPos = { nullptr }; // 정점 위치 
-	_uint* m_pIndices = { nullptr }; // 인덱스 버퍼 
+	ifstream&	m_InputFile;
+
+	_float3*	m_pNormals = { nullptr };
+	_float2*	m_pTexCoords = { nullptr };
+	_float3*	m_pTangents = { nullptr };
 
 	class PxTriangleMeshGeometry m_TriangleMeshGeometry;
 	class PxTriangleMesh* m_pTriangleMesh = { nullptr };
 	class PxRigidActor* m_pActor = { nullptr };
 
 private:
-	HRESULT Ready_Vertices_For_NonAnimModel(_fmatrix TransformationMatrix);
+	HRESULT Ready_Vertices_For_NonAnimModel(_fmatrix TransformationMatrix, _bool bOcTree);
 	HRESULT Ready_Vertices_For_AnimModel(const vector<CBone*>& Bones);
 
 public:
 	static CMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eModelType, string strDirectory
-		, ifstream& fileStream, const vector<class CBone*>& Bones, _fmatrix TransformMatrix);
+		, ifstream& fileStream, const vector<class CBone*>& Bones, _fmatrix TransformMatrix, _bool bOctree);
+	static CMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _float3* pVerticePos, _uint iNumVertices
+		, const _float3* pNormals, const _float2* pTexCoords, const _float3* pTangents, vector<FACE>& _vecFaces);
 	virtual CMesh* Clone(void* pArg);
 	virtual void Free() override;
 };

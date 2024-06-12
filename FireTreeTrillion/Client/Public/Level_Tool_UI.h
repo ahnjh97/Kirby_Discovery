@@ -24,7 +24,6 @@ private:
 	//HRESULT Ready_Layer_Monster(const wstring& strLayerTag);
 	HRESULT Ready_Layer_IMGUI(const wstring& strLayerTag);
 	HRESULT Ready_Layer_UI(const wstring& strLayerTag);
-	HRESULT Ready_RTV(const wstring& strLayerTag);
 
 public:
 	static CLevel_Tool_UI* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

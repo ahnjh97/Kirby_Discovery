@@ -28,7 +28,7 @@
 #define IMGUI_HAS_TABLE
 
 /*
-#include "stdafx.h"
+//#include "stdafx.h"
 Index of this file:
 // [SECTION] Header mess
 // [SECTION] Forward declarations and basic types

@@ -104,9 +104,6 @@ void CKirbyBalloon_Idle_State::Free()
 #pragma endregion
 
 
-
-
-
 #pragma region RUN STATE
 
 CKirbyBalloon_Run_State::CKirbyBalloon_Run_State()
@@ -183,7 +180,6 @@ void CKirbyBalloon_Run_State::Free()
 }
 
 #pragma endregion
-
 
 
 #pragma region JUMP STATE
@@ -403,7 +399,6 @@ void CKirbyBalloon_Jump_State::Free()
 #pragma endregion
 
 
-
 #pragma region FLY STATE
 
 CKirbyBalloon_Fly_State::CKirbyBalloon_Fly_State()
@@ -440,6 +435,8 @@ void CKirbyBalloon_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	{
 		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
 		{
+			Kirbydesc->m_fJumpVelocity = 0.f;
+			pController->Reset_FallVelocity();
 			pKirby->Change_State(CKirby::STATE_FLIGHTLANDING, 70.f, false, false, CKirby::BODY_VACUUM);
 		}
 	}
@@ -691,6 +688,15 @@ void CKirbyBalloon_Swallow_State::OnStateUpdate(CGameObject* pGameObject, _float
 			pKirby->Set_AbilityType(DESC(m_eTemporaryEatType));
 			// 이제 먹었으니까. 입에 머금고 있는 능력을 삭제한다.
 			DESC(m_eTemporaryEatType) = ABILITY_END;
+
+
+			// 능력을 먹었을 때, 오브젝트 제대로 삭제한다.
+			if (DESC(m_pObject) != nullptr)
+			{
+				DESC(m_pObject)->Set_Dead();
+				Safe_Release(DESC(m_pObject));
+				DESC(m_pObject) = nullptr;
+			}
 
 			pKirby->Change_State(CKirby::STATE_GETABILITY, 70.f, false, false, CKirby::BODY_DEFAULT);
 		}

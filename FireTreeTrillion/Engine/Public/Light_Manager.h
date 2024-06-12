@@ -16,7 +16,7 @@ public:
 public:
 	HRESULT Initialize();
 	HRESULT Add_Light(const LIGHT_DESC& LightDesc);
-	HRESULT Render(class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
+	HRESULT Render(class CShader* pShader, class CVIBuffer_Rect* pVIBuffer, _bool bForTool);
 	void	IMGUI_Tick();
 
 	// 방금 추가한 놈의 주소를 뜯어온다. ( 빛을 따라오게 하는 용도 )

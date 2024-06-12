@@ -72,7 +72,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		{
 			if (WM_QUIT == msg.message)
 				break;
-			if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+			if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) 
 			{
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
@@ -81,13 +81,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		fTimeAcc += pGameInstance->Compute_TimeDelta(TEXT("Timer_Default"));
 
-		if (fTimeAcc > 1.f / 60.0f)
+        _float fFpsLimit = { 60.f };
+        _uint iCurLevel = *pGameInstance->Get_CurrentLevelID();
+        if (LEVEL_INTRO == iCurLevel || LEVEL_GAMEPLAY == iCurLevel)
+            fFpsLimit = 144.f;
+
+		if (fTimeAcc > 1.f / fFpsLimit)
 		{
             _float fTickTimeDelta = pGameInstance->Compute_TimeDelta(TEXT("Timer_60"));
 			pMainApp->Tick(fTickTimeDelta);
 			pMainApp->Render(fTickTimeDelta);
 
-			fTimeAcc = 0.f;
+			fTimeAcc = 0.f; 
 		}		
 	}
 
@@ -207,6 +212,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 break;
 
             /* ============= LEVEL ÀÌµ¿ ============= */
+            case INTRO:
+            {
+                HRESULT hr;
+                hr = pMainApp->Open_Level(LEVEL_INTRO);
+                CHECK_FAILED(hr);
+                break;
+            }
             case GAMEPLAY: // LEVEL_GAMEPLAY
             {
                 HRESULT hr;

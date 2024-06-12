@@ -38,7 +38,8 @@ protected:
 
 public:
 	// 갑자기 위치값이 변화되는 경우 사용하시오.(ex. 텔레포트 등)
-	void			Set_Position(CTransform* pTransform, const _float4& vPos);
+	void			Set_Position(class CTransform* pTransform, const _float4& vPos);
+	// 발 위치값 지정
 	void			Set_FootPosition(const _float4& vPos);
 
 	_float4			Get_Position();
@@ -47,6 +48,7 @@ public:
 	_float			Get_Radius() const { return m_tControllerCapsuleDesc.radius; }
 	void			Clear_Collisions();
 	_bool			Has_Collided();
+	void			RegisterAsPlayer();
 
 public:
 	virtual HRESULT Initialize(void* pArg)	override;
@@ -62,6 +64,7 @@ public:
 	_bool			Jump(CTransform* pTransform, _float fFallVelocity, _float fTimeDelta);				// 점프
 	_bool			Jump_Parabola(CTransform* pTransform, _fvector vGoPos, _float fTimeDelta);			// 목표 지점으로 점프
 	void			FreeFall(CTransform* pTransform, _float fTimeDelta, _float fOffset = 1.f);			// 자유 낙하
+	void			Reset_FallVelocity() { m_fFallVelocity = 0.f; }										// 자유 낙하 중력값 초기화
 	PxVec3			Compute_Slope(CTransform* pTransform);												// 경사면의 노말벡터 계산
 	_float			Compute_Height(_fvector vAxis = XMVectorSet(0.f, 0.f, 0.f, 0.f));																	// 경사면의 노말벡터 계산
 	PxVec3			Compute_TerrainPosition();

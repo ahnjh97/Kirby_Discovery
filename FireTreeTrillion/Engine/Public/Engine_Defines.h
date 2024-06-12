@@ -101,12 +101,6 @@ namespace Engine
 // SimpleMath
 #include <DirectXTK/SimpleMath.h>
 
-// RapidJSON
-#include "rapidjson/document.h"
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-#include "rapidjson/prettywriter.h"
-
 // PhysX
 #include "PxPhysics.h"
 #include "PxPhysicsAPI.h"
@@ -142,10 +136,15 @@ using namespace physx;
 #include <fstream>
 #include <filesystem>
 #include <sstream>
+#include <mutex>
+#include <unordered_set>
+
 //#include <tchar.h>
 //#include <memory.h>
 #include <utility>
 
+//json
+#include "nlohmann/json.hpp"
 //// for Fmod
 #include "fmod.h"
 #include "fmod.hpp"
@@ -154,9 +153,8 @@ using namespace physx;
 #pragma comment (lib, "fmod_vc.lib")
 
 using namespace std;
-using namespace rapidjson;
 using namespace filesystem;
-
+using json = nlohmann::json;
 namespace Engine
 {
 	const wstring g_strTransformTag = TEXT("Com_Transform");
@@ -293,7 +291,13 @@ enum TEXTURETYPE
 };
 
 enum PASS_DEFERRED {
-    DEFERRED_DEBUG, DEFERRED_DIRECTLIGHT, DEFERRED_POINTLIGHT, DEFERRED_FINAL, DEFERRED_BLUR_X, DEFERRED_BLUR_Y, DEFERRED_BLUR_R, DEFERRED_COLORCORRECT, DEFERRED_END
+    DEFERRED_DEBUG, DEFERRED_DIRECTLIGHT, DEFERRED_POINTLIGHT, DEFERRED_FINAL, 
+    DEFERRED_BLUR_X, DEFERRED_BLUR_Y, DEFERRED_BLUR_R, DEFERRED_COLORCORRECT, DEFERRED_DOF_X,
+    DEFERRED_MOTIONBLUR,
+    DEFERRED_UI, DEFERRED_DOF_Y,
+    DEFERRED_DIRECTLIGHT_TOOL, DEFERRED_FINAL_TOOL,
+    DEFERRED_GODRAY, 
+    DEFERRED_END
 };
 
 #define TEXTURE_TYPE_MAX  TextureType_UNKNOWN
@@ -307,22 +311,30 @@ enum PASS_DEFERRED {
 
 using namespace Engine;
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
+//
+//#define _CRTDBG_MAP_ALLOC
+//#include <stdlib.h>
+//#include <crtdbg.h>
+//
+//#ifndef DBG_NEW 
+//
+//#define new DBG_NEW 
+//#define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ ) 
+//
+//#endif
+//
+//#endif // _DEBUG
 
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
 
-#ifndef DBG_NEW 
-
-#define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ ) 
-#define new DBG_NEW 
-
-#endif
-
-#endif // _DEBUG
-
 //#ifdef _DEBUG
-//#define new new(_CLIENT_BLOCK, __FILE__, __LINE__)
-//#define malloc(s) _malloc_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
-//#endif
+//#define new new ( _NORMAL_BLOCK , __FILE__ , __LINE__ ) 
+//#endif // _DEBUG
+
+#ifdef _DEBUG
+#define new new(_CLIENT_BLOCK, __FILE__, __LINE__)
+#define malloc(s) _malloc_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
+#endif

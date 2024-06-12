@@ -27,13 +27,7 @@ private:
 	virtual ~CAwoofy() = default;
 
 public:
-	void Set_AwoofyEye(AWOOFYEYE_STATE eEyeState) {
-		m_eEyeState = eEyeState;
-	}
-
-	_float Get_AnimRatio() {
-		return m_pModelCom->Get_AnimRatio();
-	}
+	void Set_AwoofyEye(AWOOFYEYE_STATE eEyeState) { m_eEyeState = eEyeState; }
 
 public:
 	virtual HRESULT Initialize_Prototype()	override;

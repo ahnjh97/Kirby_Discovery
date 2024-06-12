@@ -46,10 +46,9 @@ HRESULT CAwoofy::Initialize(void* pArg)
 	m_fHp = 10.f;
 	m_fAttack = 8.f;
 	m_eVacuumSize = SIZE_SMALL;
-	m_eAbilityType = ABILITY_DEFAULT;
+	m_eAbilityType = ABILITY_BOMB;
 	m_eEyeState = AWOOFYEYE_IDLE;
 
-	m_fRimWidth = 5.f;
 	Add_AnimEvent();
 
 	return S_OK;
@@ -67,7 +66,7 @@ _int CAwoofy::Tick(_float fTimeDelta)
 	__super::Tick(m_fTimeDelta);
 
 	// 빨릴 때
-	if (m_bVacuuming == true)
+	if (m_ePhyXState == PO_VACUUMING)
 		Change_State(CAwoofy::AWOOFY_DAMAGE, 120.f, true, false);
 
 	return OBJ_NOEVENT;
@@ -75,7 +74,13 @@ _int CAwoofy::Tick(_float fTimeDelta)
 
 void CAwoofy::Late_Tick(_float fTimeDelta)
 {
-	m_pModelCom->Play_Animation(m_fTimeDelta);
+	// 커비 입 안에 있고, Fly가 아닐땐 입 안에 있는 상황이므로, Render되지않는다.
+	if (m_ePhyXState == PO_KIRBYMOUTH)
+		return;
+
+	// 날아갈 땐, 애니메이션 재생이 되지 않는다.
+	if (m_ePhyXState != PO_FLYAWAY)
+		m_pModelCom->Play_Animation(m_fTimeDelta);
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
@@ -98,12 +103,17 @@ HRESULT CAwoofy::Render()
 
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
 			return E_FAIL;
+		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
+			return E_FAIL;
+
 
 		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
 
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom->Begin(MODEL_NORMAL_X)))
+		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
 			return E_FAIL;
 
 		m_pModelCom->Render(i);
@@ -195,8 +205,21 @@ void CAwoofy::Render_IMGUI()
 
 void CAwoofy::Collision_Attack(CGameObject* pOtherObj)
 {
-	Change_State(CAwoofy::AWOOFY_DAMAGE, 50.f, false, true);
-	m_eEyeState = AWOOFYEYE_HAPPY;
+	CPhysXObject* pObject = static_cast<CPhysXObject*>(pOtherObj);
+
+	// 날아온게 FlyAway 상태인 몬스터였을 경우
+	if (pObject->Get_PhyXState() == PO_FLYAWAY)
+	{
+		// 같이 처맞고 날아가자.
+
+	}
+	// 일반 충돌
+	else
+	{
+		Change_State(CAwoofy::AWOOFY_DAMAGE, 50.f, false, true);
+		m_eEyeState = AWOOFYEYE_HAPPY;
+	}
+
 }
 
 void CAwoofy::Change_State(AWOOFY_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
@@ -231,7 +254,7 @@ void CAwoofy::Compute_Angle(_vector vOrginLook, _vector vTargetLook)
 
 _bool CAwoofy::Custom_Face(_uint iMeshIndex)
 {
-	if (iMeshIndex == 0)
+	if (iMeshIndex == 1)
 	{
 		HRESULT hr;
 
@@ -314,17 +337,13 @@ HRESULT CAwoofy::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
-	_bool bStencil = true;
-	_bool bRimLight = true;
-	_bool bMotionBlur = true;
-
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool))))
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool))))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool))))
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool))))
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
 		return E_FAIL;

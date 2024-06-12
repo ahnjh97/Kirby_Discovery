@@ -62,6 +62,65 @@ static void Turn_Interpolate(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTra
 
 }
 
+// 방향키를 누르면 그쪽으로 2차원 원형 보간이 된다. (속도 조정가능)
+static void Turn_Interpolate(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTransformCom, _float fTimeDelta, _float fInterpolateSpeed)
+{
+	if (Kirbydesc->m_vMoveDir == Kirbydesc->m_vTargetDir)
+		return;
+
+	///////// 보간 속도 조정임
+	_float fInterpolate = fTimeDelta * fInterpolateSpeed;
+	_vector vTargetDir = Kirbydesc->m_vTargetDir;
+	_vector vMoveDir = Kirbydesc->m_vMoveDir;
+	_vector vTargetDirXZ = XMVectorSet(XMVectorGetX(vTargetDir), 0.0f, XMVectorGetZ(vTargetDir), 0.0f);
+	_vector vMoveDirXZ = XMVectorSet(XMVectorGetX(vMoveDir), 0.0f, XMVectorGetZ(vMoveDir), 0.0f);
+
+	vTargetDirXZ = XMVector3Normalize(vTargetDirXZ);
+	vMoveDirXZ = XMVector3Normalize(vMoveDirXZ);
+	_float fcosTheta = XMVectorGetX(XMVector4Dot(vTargetDirXZ, vMoveDirXZ));
+
+	if (fcosTheta < -0.96f)
+	{
+		Kirbydesc->m_fMoveSpeed *= 0.3f;
+	}
+
+	if (fcosTheta < -0.9995f || fcosTheta > 0.9995f)
+	{
+		// 180도로 NaN 방지 랜덤으로 -1, 1도 틀어줌
+		_float4x4 rotationMatrix;
+		XMStoreFloat4x4(&rotationMatrix, XMMatrixIdentity());
+		CUtils::Turn_OtherMatrix(rotationMatrix, XMVectorSet(0.f, 1.f, 0.f, 0.f), 1.f, CUtils::Make_RandomInt(0, 1) == 1 ? 1.f : -1.f);
+		Kirbydesc->m_vMoveDir = XMVector3Transform(Kirbydesc->m_vMoveDir, XMLoadFloat4x4(&rotationMatrix));
+		Kirbydesc->m_vMoveDir = XMVectorSetW(Kirbydesc->m_vMoveDir, 0.0f);
+	}
+	else
+	{
+		_float ftheta = acos(fcosTheta);
+		_float fAngleDegrees = XMConvertToDegrees(ftheta);
+
+		if (fAngleDegrees < 10.0f)
+		{
+			Kirbydesc->m_vMoveDir = Kirbydesc->m_vTargetDir;
+		}
+		else
+		{
+			_float fsinTheta = sqrt(1.0f - fcosTheta * fcosTheta);
+			_float fAlpha = sin((1 - fInterpolate) * ftheta) / fsinTheta;
+			_float fBeta = sin(fInterpolate * ftheta) / fsinTheta;
+			_float4 vResult = vMoveDirXZ * fAlpha + vTargetDirXZ * fBeta;
+			Kirbydesc->m_vMoveDir = XMVector4Normalize(vResult);
+			Kirbydesc->m_vMoveDir = XMVector3Normalize(Kirbydesc->m_vMoveDir);
+
+		}
+	}
+	///////////
+
+
+
+
+}
+
+
 // 조이스틱의 방향이 꺾일 때, Dir방향으로 Z 회전하는 기능 (오토바이 무빙)
 static void Turn_Z_Interpolate(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTransformCom, _float fTimeDelta)
 {
@@ -107,8 +166,8 @@ static void Turn_Z_Interpolate(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pT
 static void Moving_Logic(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTransformCom, CCharacterController* pController, _float fTimeDelta)
 {
 	Kirbydesc->m_fMoveSpeed += fTimeDelta * 70.f;
-	if (Kirbydesc->m_fMoveSpeed > 10.f)
-		Kirbydesc->m_fMoveSpeed = 10.f;
+	if (Kirbydesc->m_fMoveSpeed > 8.3f)
+		Kirbydesc->m_fMoveSpeed = 8.3f;
 
 	// 타겟기준
 	_vector vMoveDelta = Kirbydesc->m_vTargetDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
@@ -628,8 +687,8 @@ static _bool Vacuum_Object(CKirby* pKirby, _float fTimeDelta)
 		// 참조하면서 애니메이션으로 끌고간다.
 		Safe_AddRef(DESC(m_pObject));
 		// 커비가 동일한 애니메이션으로 몬스터를 포착해서 꽤 긴 시간동안 서로 짝짝꿍하겠다는 것이다.
-		pKirby->Set_Vacuuming(true);
-		DESC(m_pObject)->Set_Vacuuming(true);
+		//pKirby->Set_PhyXState(PO_VACUUMING);
+		DESC(m_pObject)->Set_PhyXState(PO_VACUUMING);
 
 		if (DESC(m_pObject)->Get_VacuumSize() == SIZE_SMALL)
 			pKirby->Change_State(CKirby::STATE_VACUUM, 50.f, true, true, CKirby::BODY_VACUUM);

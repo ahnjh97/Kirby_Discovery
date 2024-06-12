@@ -60,8 +60,8 @@ _int CRabbit::Tick(_float fTimeDelta)
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
-		// 빨릴 때
-	if (m_bVacuuming == true)
+	// 빨릴 때
+	if (m_ePhyXState == PO_VACUUMING)
 		Change_State(CRabbit::RABBIT_DAMAGE, 120.f, true, false);
 
 	__super::Tick(m_fTimeDelta);
@@ -71,7 +71,14 @@ _int CRabbit::Tick(_float fTimeDelta)
 
 void CRabbit::Late_Tick(_float fTimeDelta)
 {
-	m_pModelCom->Play_Animation(m_fTimeDelta);
+	// 커비 입 안에 있고, Fly가 아닐땐 입 안에 있는 상황이므로, Render되지않는다.
+	if (m_ePhyXState == PO_KIRBYMOUTH)
+		return;
+
+	// 날아갈 땐, 애니메이션 재생이 되지 않는다.
+	if (m_ePhyXState != PO_FLYAWAY)
+		m_pModelCom->Play_Animation(m_fTimeDelta);
+
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
@@ -95,14 +102,36 @@ HRESULT CRabbit::Render()
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
 			return E_FAIL;
 
+		//몸통이라면 나머지 텍스쳐까지 바인딩 함
+		if (i == 1)
+		{
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
+				return E_FAIL;
+		}
+
 		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
 
-		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom->Begin(1)))
-			return E_FAIL;
 
-		m_pModelCom->Render(i);
+		//몸통(1)은 normal O, 눈까리(0)는 normal x 패스
+		if (i == 1 && bRenderBody)
+		{
+			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Render(i)))
+				return E_FAIL;
+		}
+		else if( i == 0 && bRenderEye)
+		{
+			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_X)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Render(i)))
+				return E_FAIL;
+		}
+
+		
 	}
 
 	return S_OK;
@@ -128,6 +157,11 @@ void CRabbit::Render_IMGUI()
 		ImGui::TreePop();
 	}
 
+
+	ImGui::Checkbox(u8"눈까리", &bRenderEye);
+	ImGui::Checkbox(u8"몸통", &bRenderBody);
+
+
 	//ImGui::Text("RePress : %d", m_bRePressBlock);
 	//ImGui::Text("Land : %d", INFO(m_isLanding));
 
@@ -145,8 +179,21 @@ void CRabbit::Render_IMGUI()
 
 void CRabbit::Collision_Attack(CGameObject* pOtherObj)
 {
-	Change_State(CRabbit::RABBIT_DAMAGE, 50.f, false, true);
-	m_eEyeState = RABBITEYE_HAPPY;
+	CPhysXObject* pObject = static_cast<CPhysXObject*>(pOtherObj);
+
+
+	// 날아온게 FlyAway 상태인 몬스터였을 경우
+	if (pObject->Get_PhyXState() == PO_FLYAWAY)
+	{
+		// 같이 처맞고 날아가자.
+
+	}
+	// 일반 충돌
+	else
+	{
+		Change_State(CRabbit::RABBIT_DAMAGE, 50.f, false, true);
+		m_eEyeState = RABBITEYE_HAPPY;
+	}
 }
 
 void CRabbit::Change_State(RABBIT_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
@@ -188,7 +235,7 @@ _vector CRabbit::JumpAttak(_float fTimeDelta)
 	m_vGoPos.x = m_vStartPos.x + m_fAxisX * fTimeDelta;
 	m_vGoPos.y = m_vStartPos.y + (m_fAxisY * fTimeDelta) - (0.5f * m_fGravity * fTimeDelta * fTimeDelta);
 	m_vGoPos.z = m_vStartPos.z + m_fAxisZ * fTimeDelta;
-	 
+
 	return m_vGoPos;
 }
 
@@ -239,14 +286,11 @@ HRESULT CRabbit::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
-	_bool bStencil = true;
-	_bool bRimLight = true;
-	_bool bMotionBlur = true;
-	m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
-	m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+	m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
+	m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
 	if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
 		return E_FAIL;
-	m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
+	m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
 		return E_FAIL;
 
@@ -286,7 +330,7 @@ void CRabbit::SetUp_FSM()
 
 _bool CRabbit::Custom_Face(_uint iMeshIndex)
 {
-	if (iMeshIndex == 1)
+	if (iMeshIndex == 0)
 	{
 		HRESULT hr;
 

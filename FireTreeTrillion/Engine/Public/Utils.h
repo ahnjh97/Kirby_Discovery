@@ -9,7 +9,11 @@ public:
 	enum STATE { STATE_RIGHT, STATE_UP, STATE_LOOK, STATE_POSITION, STATE_END };
 
 	static wstring  StrToWstr(const string& value);
+	static wstring  StrToWstrUTF8(const string& value);
 	static string   WstrToStr(const wstring& value);
+	static string   WstrToStrUTF8(const wstring& value);
+	static string	StrToUTF8(const string& value);
+
 	static void		WCharToChar(const wchar_t* szWchar, char* szChar);
 
 	static _int		Make_RandomInt(_int min, _int max);

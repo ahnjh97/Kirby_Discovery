@@ -95,16 +95,35 @@ BlendState BS_AlphaBlend
     BlendOp = Add;
 };
 
+BlendState BS_ABTexturizer //텍스처화를 위한 블렌드 옵션
+{
+    BlendEnable[0] = true;
+
+    SrcBlend = src_alpha;
+    DestBlend = inv_src_alpha;
+    SrcBlendAlpha = src_alpha;
+    DestBlendAlpha = ONE;
+    BlendOp = Add;
+};
 
 BlendState BS_Blend
 {
     BlendEnable[0] = true;
     BlendEnable[1] = true;
+    BlendEnable[2] = true;
+    BlendEnable[3] = true;
 
-    SrcBlend = one;
-    DestBlend = one;
+    SrcBlend = ONE;
+    DestBlend = ONE;
+    SrcBlendAlpha = ONE;
+    DestBlendAlpha = ONE;
     BlendOp = Add;
 };
 
 
+////만드는 pbr 용 함수임다~~
+//float3 fresnelSchlick(float3 F0, float cosTheta)
+//{
+//    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+//}
 

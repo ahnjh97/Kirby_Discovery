@@ -42,8 +42,6 @@ HRESULT CCharacterController::Initialize(void* pArg)
 
 	Set_DefaultValue();
 	Create_Controller();
-	m_pGameInstance->Register_Player(m_pController->getActor());
-	
 	return S_OK;
 }
 
@@ -239,6 +237,7 @@ _bool CCharacterController::Jump_Parabola(CTransform* pTransform, _fvector vGoPo
 
 		// 객체의 충돌 상태 받아오기
 		PxControllerState m_pPxState;
+		lock_guard<mutex> lock(mutex);
 		m_pController->getState(m_pPxState);
 
 		// 지면 판정, 천장 판정 처리
@@ -443,6 +442,11 @@ void CCharacterController::Activate(_bool _bActive)
 //		pxTransform = PxShapeExt::getGlobalPose(*shape, *m_pController->getActor());
 //	}
 //}
+
+void CCharacterController::RegisterAsPlayer()
+{
+	m_pGameInstance->Register_Player(m_pController->getActor());
+}
 
 void CCharacterController::Create_Controller()
 {

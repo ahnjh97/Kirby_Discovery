@@ -11,6 +11,8 @@ CLevel_Tool_Anim::CLevel_Tool_Anim(ID3D11Device* pDevice, ID3D11DeviceContext* p
 
 HRESULT CLevel_Tool_Anim::Initialize()
 {
+	m_pGameInstance->Set_RenderMode(CRenderer::MODE_TOOL);
+
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
 

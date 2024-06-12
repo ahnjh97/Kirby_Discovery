@@ -125,6 +125,12 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 		nullptr == m_pPipeLine)
 		return;
 
+	_float ffTimeDelta = fTimeDelta;
+	if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_W, KEY_PRESS))
+	{
+		ffTimeDelta = fTimeDelta * 0.5f;
+	}
+	
 	m_pInput_Device->Tick();
 	m_pTimeController->Update_TimeController(fTimeDelta);
 
@@ -308,6 +314,14 @@ HRESULT CGameInstance::Render_LightDepth_For_GameObject(CShader* pShader, CTrans
 	return S_OK;
 }
 
+HRESULT CGameInstance::Render_LightDepth_For_PartObject(CShader* pShader, const _float4x4* pMatrix, CModel* pModel)
+{
+	if (nullptr == m_pRenderer)
+		return E_FAIL;
+
+	return m_pRenderer->Render_LightDepth_For_PartObject(pShader, pMatrix, pModel);
+}
+
 void CGameInstance::Update_LightShadow(_fvector vLightPos, _fvector vFocusPos)
 {
 	if (nullptr == m_pRenderer)
@@ -325,12 +339,59 @@ void CGameInstance::Update_DofFocus(_fvector vWorldPos)
 
 }
 
+void CGameInstance::Bind_RendererFunc(_int iTriggerType)
+{
+	if (nullptr == m_pRenderer)
+		return;
+
+	m_pRenderer->Bind_RendererFunc(iTriggerType);
+}
+
 void CGameInstance::Set_BlackBackGround(_bool bSet)
 {
 	if (nullptr == m_pRenderer)
 		return;
 
 	m_pRenderer->Set_BlackBackGround(bSet);
+}
+
+HRESULT CGameInstance::Bind_DeferredTexture(CTexture* pTexture, const _char* pConstantName, _uint iIndex)
+{
+	if (nullptr == m_pRenderer)
+		return E_FAIL;
+
+	return m_pRenderer->Bind_DeferredTexture(pTexture, pConstantName, iIndex);
+}
+
+HRESULT CGameInstance::Bind_DeferredRawValue(const _char* pConstantName, const void* pData, _uint iLength)
+{
+	if (nullptr == m_pRenderer)
+		return E_FAIL;
+
+	return m_pRenderer->Bind_DeferredRawValue(pConstantName, pData, iLength);
+}
+
+void CGameInstance::Set_RenderMode(CRenderer::RENDER_MODE eMode)
+{
+	if (nullptr == m_pRenderer)
+		return;
+
+	m_pRenderer->Set_RenderMode(eMode);
+}
+
+void CGameInstance::Update_Option(CRenderer::OPTION Option, _bool bOn)
+{
+	if (nullptr == m_pRenderer)
+		return;
+	m_pRenderer->Update_Option(Option, bOn);
+}
+
+void CGameInstance::Setting_GodRay(_fvector vWorldPos)
+{
+	if (nullptr == m_pRenderer)
+		return;
+
+	m_pRenderer->Setting_GodRay(vWorldPos);
 }
 
 #ifdef _DEBUG
@@ -571,12 +632,12 @@ HRESULT CGameInstance::Add_Light(const LIGHT_DESC & LightDesc)
 	return m_pLight_Manager->Add_Light(LightDesc);
 }
 
-HRESULT CGameInstance::Render_Lights(CShader * pShader, CVIBuffer_Rect * pVIBuffer)
+HRESULT CGameInstance::Render_Lights(CShader * pShader, CVIBuffer_Rect * pVIBuffer, _bool bForTool)
 {
 	if (m_pLight_Manager == nullptr)
 		return E_FAIL;
 
-	return m_pLight_Manager->Render(pShader, pVIBuffer);
+	return m_pLight_Manager->Render(pShader, pVIBuffer, bForTool);
 }
 
 void CGameInstance::Clear_Light()
@@ -611,6 +672,7 @@ HRESULT CGameInstance::Render_Font(const wstring & strFontTag, const wstring & s
 	return m_pFont_Manager->Render(strFontTag, strText, vPosition, vColor, fRadian);
 }
 
+#pragma region TARGET_MANAGER
 HRESULT CGameInstance::Add_RenderTarget(const wstring & strRenderTargetTag, _uint iSizeX, _uint iSizeY, DXGI_FORMAT ePixelFormat, const _float4 & vClearColor)
 {
 	if (m_pTarget_Manager == nullptr)
@@ -658,6 +720,7 @@ HRESULT CGameInstance::Copy_Resource(const wstring & strRenderTargetTag, ID3D11T
 
 	return m_pTarget_Manager->Copy_Resource(strRenderTargetTag, ppTextureHub);
 }
+#pragma endregion
 
 _bool CGameInstance::isInFrustum_WorldSpace(_fvector vWorldPos, _float fRange)
 {
