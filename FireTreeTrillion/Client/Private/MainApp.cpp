@@ -135,10 +135,6 @@ HRESULT CMainApp::Ready_Fonts()
 		TEXT("../Bin/Resources/Fonts/HUD_StarPoint_NUM30.spritefont"))))
 		return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUD_StarPoint_NUM37"), 
-		TEXT("../Bin/Resources/Fonts/HUD_StarPoint_NUM37.spritefont"))))
-		return E_FAIL;
-
 	return S_OK;
 }
 

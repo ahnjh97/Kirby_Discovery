@@ -27,6 +27,17 @@ HRESULT CCustomFont::Render(const wstring& strText, const _float2& vPosition, _f
 	return S_OK;
 }
 
+HRESULT CCustomFont::Render(const wstring& strText, const _float2& vPosition, _fvector vColor, _float fRadian, _fvector vOrigin, _gvector vScale)
+{
+	m_pBatch->Begin();
+
+	m_pFont->DrawString(m_pBatch, strText.c_str(), vPosition, vColor, fRadian, vOrigin, vScale);
+
+	m_pBatch->End();
+
+	return S_OK;
+}
+
 CCustomFont * CCustomFont::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const wstring & strFontFilePath)
 {
 	CCustomFont*		pInstance = new CCustomFont(pDevice, pContext);

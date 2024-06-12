@@ -41,10 +41,10 @@ HRESULT CHUD_StarPoint::Initialize(void* _pArg)
 		m_UIObjDesc.wstrText = (*HUDStarPoint_Desc).wstrText;
 
 
-	m_pTransformCom->Set_Scaled(m_UIObjDesc.vSize.x, m_UIObjDesc.vSize.y, 1.f);
+	m_pTransformCom->Set_Scaled(m_UIObjDesc.vSize.x, m_UIObjDesc.vSize.y, m_UIObjDesc.vSize.z);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
 		XMVectorSet(m_UIObjDesc.vPos.x - m_UIObjDesc.vCenter.x + m_UIObjDesc.vCenter.x,
-			m_UIObjDesc.vPos.y - m_UIObjDesc.vCenter.y + m_UIObjDesc.vCenter.y, 0.f, 1.f));
+			m_UIObjDesc.vPos.y - m_UIObjDesc.vCenter.y + m_UIObjDesc.vCenter.y, m_UIObjDesc.vPos.z, 1.f));
 
 #pragma region SET_PROJ
 
@@ -70,25 +70,92 @@ HRESULT CHUD_StarPoint::Initialize(void* _pArg)
 
 _int CHUD_StarPoint::Tick(_float fTimeDelta)
 {
+	_float fFrameAcc{};
+
 	__super::Tick(fTimeDelta);
-
-	//Effect :: 코인 획득할 경우, 해당 이펙트 애니메이션 재생
-	if (m_UIObjDesc.wstrUITag == TEXT("StarPoint_Effect")){	}
-
+	
 	if (m_pGameInstance->Get_DIKeyState(DIK_1, KEY_DOWN))
+		m_IsLoot = TRUE;
+
+	if (fFrameAcc >= 0.14f) //50 > 64 KeyFrame
 	{
-		if (m_UIObjDesc.wstrUITag == TEXT("Font") || m_UIObjDesc.wstrUITag == TEXT("Font_Shadow"))
+		m_IsLoot = FALSE;
+		fFrameAcc = 0.f;
+		m_iTexIndex = 3;
+	}
+
+	if (m_IsLoot == TRUE)
+	{
+		fFrameAcc += fTimeDelta;
+
+		if (m_UIObjDesc.wstrUITag == TEXT("Effect"))
+		{
+			if (m_iTexIndex >= 8)	m_iTexIndex = 2;
+			++m_iTexIndex;
+		}
+
+		if (m_UIObjDesc.wstrUITag == TEXT("Effect_Mask")) //스케일, 회전 및 알파 값 변화
+		{
+			m_UIObjDesc.vDegree.z += fFrameAcc * 100.f;
+			m_pTransformCom->Rotation(XMVectorSet(AXIS_Z), XMConvertToRadians(m_UIObjDesc.vDegree.z));
+
+			m_UIObjDesc.vSize.x += fFrameAcc * 1.f;
+			m_UIObjDesc.vSize.y += fFrameAcc * 1.f;
+			m_pTransformCom->Set_Scaled(m_UIObjDesc.vSize.x, m_UIObjDesc.vSize.y, m_UIObjDesc.vSize.z);
+
+			m_UIObjDesc.fAlpha -= fFrameAcc * 1.f;
+			m_UIObjDesc.fAlpha = clamp(m_UIObjDesc.fAlpha, 0.1f, 1.f);
+		}
+
+		if (m_UIObjDesc.wstrUITag == TEXT("Font"))
 		{
 			_uint iCount = stoi(m_UIObjDesc.wstrText);
 			iCount++;
-
-			/*if (iCount % 100 > 9) iCount = 0;*/
 			m_UIObjDesc.wstrText = to_wstring(iCount);
+
+			if (m_IsMovingUP)
+			{
+				m_UIObjDesc.vPos.y += 1.f;
+				if (m_UIObjDesc.vPos.y >= 430.f)
+				{
+					m_UIObjDesc.vPos.y = 430.f;	
+					m_IsMovingUP = FALSE;
+				}
+			}
+			else
+			{
+				m_UIObjDesc.vPos.y -= 1.f;
+				if (m_UIObjDesc.vPos.y <= 417.f)
+				{
+					m_UIObjDesc.vPos.y = 417.f;	
+					m_IsMovingUP = TRUE;
+				}
+			}
 		}
+		if (m_UIObjDesc.wstrUITag == TEXT("Font_Shadow"))
+		{
+			_uint iCount = stoi(m_UIObjDesc.wstrText);
+			iCount++;
+			m_UIObjDesc.wstrText = to_wstring(iCount);
 
+			if (m_IsMovingUP)
+			{
+				m_UIObjDesc.vPos.y += 1.f;
+				if (m_UIObjDesc.vPos.y >= 434.f)
+				{
+					m_UIObjDesc.vPos.y = 434.f;	m_IsMovingUP = FALSE;
+				}
+			}
+			else
+			{
+				m_UIObjDesc.vPos.y -= 1.f;
+				if (m_UIObjDesc.vPos.y <= 421.f)
+				{
+					m_UIObjDesc.vPos.y = 421.f; m_IsMovingUP = TRUE;
+				}
+			}
+		}
 	}
-
-
 	return OBJ_NOEVENT;
 }
 
@@ -101,10 +168,6 @@ HRESULT CHUD_StarPoint::Render()
 {
 	if (UI_TEXTURE == m_UIObjDesc.eUIType)
 	{
-		//Effect 기본값 :: 렌더 안하게 처리
-		if (m_UIObjDesc.wstrUITag == TEXT("StarPoint_Effect"))
-				return S_OK;
-
 		if (PROJ_ORTHO == m_UIObjDesc.eUIProj)
 			Render_OrthoProj(m_pShaderCom, m_pTransformCom);
 
@@ -118,14 +181,15 @@ HRESULT CHUD_StarPoint::Render()
 							-m_UIObjDesc.vPos.y + m_UIObjDesc.vCenter.y };
 
 		_float4 vFontRGBA = { m_UIObjDesc.vColorRGB.x, m_UIObjDesc.vColorRGB.y, m_UIObjDesc.vColorRGB.z, m_UIObjDesc.fAlpha };
-
-		wstring wstrFontTag = { TEXT("Font_HUD_StarPoint_NUM30") };
+		_float2 vFontOrig = { 1.f, 1.f };
+		_float2 vFontScale = { 1.f, 1.f };
 
 		if (m_UIObjDesc.wstrUITag == TEXT("Font_Shadow"))
-			wstrFontTag = TEXT("Font_HUD_StarPoint_NUM37");
+			vFontScale = { 1.1f, 1.1f };
 
-		m_pGameInstance->Render_Font(wstrFontTag, m_UIObjDesc.wstrText, vFontPos, vFontRGBA, 
-									XMConvertToRadians(m_UIObjDesc.vDegree.z));
+		wstring wstrFontTag = { TEXT("Font_HUD_StarPoint_NUM30") };
+		m_pGameInstance->Render_Font(wstrFontTag, m_UIObjDesc.wstrText, vFontPos, vFontRGBA,
+			XMConvertToRadians(m_UIObjDesc.vDegree.z), vFontOrig, vFontScale);
 	}
 
 	return S_OK;
@@ -150,6 +214,9 @@ HRESULT CHUD_StarPoint::Add_Components()
 
 HRESULT CHUD_StarPoint::Render_OrthoProj(CShader* _pShaderCom, CTransform* _pTransCom)
 {
+	if (m_UIObjDesc.wstrUITag == TEXT("Effect_Mask") && m_UIObjDesc.fAlpha <= 0.1f)
+		return S_OK;
+
 	CHECK_NULLPTR(_pShaderCom);
 
 	if (FAILED(_pTransCom->Bind_ShaderResource(_pShaderCom, "g_WorldMatrix")))
@@ -164,7 +231,7 @@ HRESULT CHUD_StarPoint::Render_OrthoProj(CShader* _pShaderCom, CTransform* _pTra
 
 	//아이콘의 경우, 기본값으로 렌더
 	SHADER_PS ePSIndex = { PS_ALPHABLEND };
-	if (m_UIObjDesc.wstrUITag == TEXT("StarPoint_Icon"))
+	if (m_UIObjDesc.wstrUITag == TEXT("Icon") || m_UIObjDesc.wstrUITag == TEXT("Effect_Mask"))
 		ePSIndex = PS_DEFAULT;
 
 	if (FAILED(Bind_ShaderResources(_pShaderCom, ePSIndex, m_pTextureCom, m_iTexIndex)))

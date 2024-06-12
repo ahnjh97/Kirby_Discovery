@@ -8,7 +8,6 @@ class CHUD : public CUIObject
 {
 public:
 	enum HUD_STATUS { STAT_KIRBY, STAT_STARPOINT, STAT_NONE };
-	enum HUD_STATFONT { STFONT_1, STFONT_10, STFONT_100, STFONT_SLASH, STFONT_NONE };
 
 protected:
 	CHUD(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

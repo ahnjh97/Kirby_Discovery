@@ -38,6 +38,10 @@ public:
 	static CHUD_StarPoint* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void				Free() override;
+
+private:
+	_bool					m_IsMovingUP = { TRUE };
+	_bool					m_IsLoot = { FALSE };
 };
 
 

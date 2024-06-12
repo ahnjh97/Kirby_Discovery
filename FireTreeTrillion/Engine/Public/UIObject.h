@@ -9,6 +9,7 @@ class ENGINE_DLL CUIObject abstract : public CGameObject
 protected:
 	enum UI_TYPE { UI_TEXTURE, UI_FONT, UI_NONE };
 	enum UI_STATE { UI_LAYER, UI_GROUP, UI_END };
+	enum FONT_TYPE { FONT_KIRBYFORM, FONT_STARPOINT, FONT_SCRIPT, FONT_NONE };
 
 	enum UI_PROJ { PROJ_ORTHO, PROJ_PERSPEC, PROJ_NONE };
 	enum GROUP_TYPE { GROUP_ALL, GROUP_SELECT, GROUP_NONE };
@@ -34,6 +35,7 @@ public:
 		_float3		vCenter, vSize, vPos, vDegree = { 0.f, 0.f, 0.f };
 		_int		iTexIndex = { 0 };
 		
+		FONT_TYPE	eFontType = { FONT_NONE };
 		wstring		wstrText = { TEXT("") };
 		_float3		vColorRGB = { 1.f, 1.f, 1.f };
 		_float		fAlpha = { 1.f };
