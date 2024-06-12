@@ -215,7 +215,6 @@ void CKirby::Render_IMGUI()
 		ImGui::TreePop();
 	}
 
-	ImGui::Text("Vacuuming : %d",		 m_bVacuuming);
 	ImGui::Text("ObjectAddress : %d",	 INFO(m_pObject));
 	ImGui::Text("ChargeTime : %.2f",	 INFO(m_fChargeTime));
 	ImGui::Text("MoveSpeed : %.2f",		 INFO(m_fMoveSpeed));
