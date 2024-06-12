@@ -49,16 +49,11 @@ private:
 	//CFSM*			m_pFSM = { nullptr };
 	BLADEKNIGHT_ANIM					m_eCurrentState = { BLADEKNIGHT_END };
 
-	_float2								m_vPreScreenPos = { 0.f, 0.f };
-	_float4								m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
-
 
 private:
 	HRESULT Add_Components();
 	HRESULT Add_PartObjects();
 	HRESULT Bind_ShaderResources();
-
-	void	Compute_MotionBlur();
 
 	// FSM
 	void SetUp_FSM();

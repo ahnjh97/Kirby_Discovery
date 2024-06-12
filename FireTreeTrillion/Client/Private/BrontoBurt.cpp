@@ -331,31 +331,18 @@ HRESULT CBrontoBurt::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
-	_bool bStencil = true;
-	_bool bRimLight = true;
-	_bool bMotionBlur = true;
-	m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
-	m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
-	m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool))))
+		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
 		return E_FAIL;
 
 	return S_OK;
-}
-
-void CBrontoBurt::Compute_MotionBlur()
-{
-	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-	_matrix ViewProjectionMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW) * m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
-	_vector vScreenPos = XMVector3TransformCoord(vPos, ViewProjectionMatrix);
-	_float fScreenX = (XMVectorGetX(vScreenPos) + 1.f) * 0.5f;
-	_float fScreenY = (XMVectorGetY(vScreenPos) + 1.f) * 0.5f;
-
-	_float2 vCurScreenPos = _float2(fScreenX, 1.f - fScreenY);
-
-	m_vMotionVelocity.x = (m_vPreScreenPos - vCurScreenPos).x;
-	m_vMotionVelocity.y = (m_vPreScreenPos - vCurScreenPos).y;
-	m_vPreScreenPos = vCurScreenPos;
 }
 
 void CBrontoBurt::SetUp_FSM()
@@ -389,12 +376,11 @@ _bool CBrontoBurt::Custom_Face(_uint iMeshIndex)
 		hr = m_pEyeTextureCom->Bind_ShaderResource(m_pShaderCom, "g_KirbyEyeTexture", (_uint)m_eEyeState);
 		CHECK_FAILED(hr);
 
-		_bool bStencil = true;
-		_bool bRimLight = true;
-		_bool bMotionBlur = true;
-		m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float));
+		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4));
 
 		m_pShaderCom->Begin(ANIMMODEL_KIRBYEYE);
 		m_pModelCom->Render(iMeshIndex);

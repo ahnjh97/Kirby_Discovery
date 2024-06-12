@@ -61,26 +61,59 @@ void CKabu_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 
-	//// 일반 충돌 상태 (Get_Vacuuming()이 true라면 빨아들이는 상태이다.
-	//if (pKabu->Get_Vacuuming() == false)
-	//{
-	//	// 일단 그 방향으로 바라보게만 한다.
-	//	_float3 vDamegeDir = pKabu->Get_DamegeDir();
-	//	pTransformCom->Look_At_Axis(pKabu->Get_Look());
+	if (pKabu->Get_PhyXState() == PO_NORMAL)
+	{
+		// 일단 그 방향으로 바라보게만 한다.
+		_float3 vDamegeDir = pKabu->Get_DamegeDir();
+		pTransformCom->Look_At_Axis(pKabu->Get_Look());
 
-	//	// 이제 날아가는 것을 구현해보자.
-	//	pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 6.f, fTimeDelta);
+		// 이제 날아가는 것을 구현해보자.
+		pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 6.f, fTimeDelta);
 
-	//	// 점프되는 체공시간을 구현해보자.
-	//	_float fDamageJumpPower = pKabu->Get_DamageJumpPower();
-	//	pController->Jump(pTransformCom, fDamageJumpPower, fTimeDelta);
-	//	fDamageJumpPower -= GRAVITY * fTimeDelta * 3.f;
-	//	pKabu->Set_DamageJumpPower(fDamageJumpPower);
+		// 점프되는 체공시간을 구현해보자.
+		_float fDamageJumpPower = pKabu->Get_DamageJumpPower();
+		pController->Jump(pTransformCom, fDamageJumpPower, fTimeDelta);
+		fDamageJumpPower -= GRAVITY * fTimeDelta * 3.f;
+		pKabu->Set_DamageJumpPower(fDamageJumpPower);
 
+		if (true == pKabu->IsAnimFinished())
+			pKabu->Change_State(CKabu::KABU_WARP1, 40.f, false, true);
 
-	//	if (true == pKabu->IsAnimFinished())
-	//		pKabu->Change_State(CKabu::KABU_WARP1, 40.f, false, true);
-	//}
+	}
+	// 날아가는 도중이다.  1초에 360도 회전하며, 30의 거리로 날아간다.
+	else if (pKabu->Get_PhyXState() == PO_FLYAWAY)
+	{
+		_float3 vDamegeDir = pKabu->Get_DamegeDir();
+		pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 30.f, fTimeDelta);
+		pTransformCom->Turn(pTransformCom->Get_State_Vector(CTransform::STATE_UP), fTimeDelta, 360.f);
+		m_fFlyTime += fTimeDelta;
+		if (m_fFlyTime > 2.f)
+		{
+			pKabu->Set_Dead();
+		}
+	}
+	// 죽는 도중이다.	 (날아가다 터질예정임)
+	else if (pKabu->Get_PhyXState() == PO_FLYDEADAWAY)
+	{
+		m_fDeadTime += fTimeDelta;
+
+		// 일단 그 방향으로 바라보게만 한다.
+		_float3 vDamegeDir = pKabu->Get_DamegeDir();
+		pTransformCom->Look_At_Axis(-vDamegeDir);
+
+		// 이제 날아가는 것을 구현해보자.
+		pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 10.f, fTimeDelta);
+
+		// 점프되는 체공시간을 구현해보자.
+		_float fDamageJumpPower = pKabu->Get_DamageJumpPower();
+		pController->Jump(pTransformCom, fDamageJumpPower, fTimeDelta);
+		fDamageJumpPower -= GRAVITY * fTimeDelta * 3.f;
+
+		pKabu->Set_DamageJumpPower(fDamageJumpPower);
+
+		if (m_fDeadTime > 0.7f)
+			pKabu->Set_Dead();
+	}
 }
 
 void CKabu_Damage_State::OnStateExit()

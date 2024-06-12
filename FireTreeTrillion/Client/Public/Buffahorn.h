@@ -63,8 +63,6 @@ private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
 
-	void	Compute_MotionBlur();
-
 	// FSM
 	void SetUp_FSM();
 	_bool Custom_Face(_uint iMeshIndex);

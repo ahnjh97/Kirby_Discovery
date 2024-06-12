@@ -42,12 +42,11 @@ HRESULT CPoppyBrosJr::Initialize(void* pArg)
 	m_pModelCom->Set_Animation(POPPY_WALK, 50.f, true, true);
 
 
-	m_fMaxHp = 15.f;
-	m_fHp = 15.f;
+	m_fMaxHp = 10.f;
+	m_fHp = 10.f;
 	m_fAttack = 10.f;
 	m_eVacuumSize = SIZE_SMALL;
-	m_eAbilityType = ABILITY_DEFAULT;
-	//m_eEyeState = BUFFAHORNEYE_IDLE;
+	m_eAbilityType = ABILITY_BOMB;
 
 	return S_OK;
 }
@@ -61,12 +60,24 @@ _int CPoppyBrosJr::Tick(_float fTimeDelta)
 
 	__super::Tick(m_fTimeDelta);
 
+	if (m_ePhyXState == PO_VACUUMING || m_ePhyXState == PO_FLYDEADAWAY)
+		Change_State(POPPY_DAMAGE, 50.f, false, true);
+
+
 	return OBJ_NOEVENT;
 }
 
 void CPoppyBrosJr::Late_Tick(_float fTimeDelta)
 {
-	m_pModelCom->Play_Animation(m_fTimeDelta);
+	// 커비 입 안에 있고, Fly가 아닐땐 입 안에 있는 상황이므로, Render되지않는다.
+	if (m_ePhyXState == PO_KIRBYMOUTH)
+		return;
+
+	// 날아갈 땐, 애니메이션 재생이 되지 않는다.
+	if (m_ePhyXState != PO_FLYAWAY)
+	{
+		m_ePhyXState == PO_FLYDEADAWAY ? m_pModelCom->Play_Animation(m_fTimeDelta * 0.3f) : m_pModelCom->Play_Animation(m_fTimeDelta);
+	}
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
@@ -215,33 +226,15 @@ HRESULT CPoppyBrosJr::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
-	_bool bStencil = true;
-	_bool bRimLight = true;
-	_bool bMotionBlur = true;
-	m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
-	m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+	m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
+	m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
 	if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
 		return E_FAIL;
-	m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
+	m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
 		return E_FAIL;
 
 	return S_OK;
-}
-
-void CPoppyBrosJr::Compute_MotionBlur()
-{
-	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-	_matrix ViewProjectionMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW) * m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
-	_vector vScreenPos = XMVector3TransformCoord(vPos, ViewProjectionMatrix);
-	_float fScreenX = (XMVectorGetX(vScreenPos) + 1.f) * 0.5f;
-	_float fScreenY = (XMVectorGetY(vScreenPos) + 1.f) * 0.5f;
-
-	_float2 vCurScreenPos = _float2(fScreenX, 1.f - fScreenY);
-
-	m_vMotionVelocity.x = (m_vPreScreenPos - vCurScreenPos).x;
-	m_vMotionVelocity.y = (m_vPreScreenPos - vCurScreenPos).y;
-	m_vPreScreenPos = vCurScreenPos;
 }
 
 void CPoppyBrosJr::SetUp_FSM()
