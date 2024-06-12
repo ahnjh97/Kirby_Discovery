@@ -80,7 +80,7 @@ public:
 	virtual _int	Get_Size() { return 1; }
 	string			Get_Name() { return m_strFXName; }
 
-	virtual void	Reset_Duration() { m_fDuration.first = 0.f; }
+	virtual void	Reset_Duration();
 	virtual void	Fill_SaveData(_Out_ SINGLE_FX_DATA* pFXData);
 	virtual void	Fill_SaveData(_Out_ PARTICLE_DATA* pFXData) {}
 	virtual void	Fill_SaveData(_Out_ MULTI_FX_DATA* pFXData) {}

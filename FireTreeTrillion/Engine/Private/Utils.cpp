@@ -392,7 +392,7 @@ HRESULT CUtils::Load_Effect(path _FilePath, PARTICLE_DATA* _pData)
 
 	InputFile.read(reinterpret_cast<char*>(&_pData->bIsLoop), sizeof(_bool));
 	InputFile.read(reinterpret_cast<char*>(&_pData->bIsBillboard), sizeof(_bool));
-	InputFile.read(reinterpret_cast<char*>(&_pData->bIsColorRender), sizeof(_bool));
+	//InputFile.read(reinterpret_cast<char*>(&_pData->bIsColorRender), sizeof(_bool));
 	InputFile.read(reinterpret_cast<char*>(&_pData->bIsBloom), sizeof(_bool));
 
 
