@@ -267,6 +267,9 @@ HRESULT CFXToolDirector::Save_Particle(CEffect* pEffect, const wstring& strFileN
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.iMaskTexStrLen), sizeof(_uint));
 	OutputFile.write(FXData.strMaskTexName.c_str(), FXData.iMaskTexStrLen);
 
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.iNumInstance), sizeof(_uint));
+
+
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.fDuration), sizeof(_float));
 
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.fLifetime), sizeof(_float));
@@ -523,6 +526,7 @@ HRESULT CFXToolDirector::Load_Effect(path _FilePath, PARTICLE_DATA* _pData)
 	_pData->strMaskTexName.resize(_pData->iMaskTexStrLen);
 	InputFile.read(&_pData->strMaskTexName[0], _pData->iMaskTexStrLen);
 
+	InputFile.read(reinterpret_cast<char*>(&_pData->iNumInstance), sizeof(_uint));
 
 	InputFile.read(reinterpret_cast<char*>(&_pData->fDuration), sizeof(_float));
 

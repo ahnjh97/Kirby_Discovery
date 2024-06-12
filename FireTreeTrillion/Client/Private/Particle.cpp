@@ -21,6 +21,10 @@ HRESULT CParticle::Initialize_Prototype()
 
 HRESULT CParticle::Initialize_Prototype(PARTICLE_DESC FXDesc)
 {
+
+	m_strFXName = FXDesc.strFXName;
+	m_FXDesc = FXDesc;
+
 	return S_OK;
 }
 
@@ -28,7 +32,13 @@ HRESULT CParticle::Initialize(void* pArg)
 {
 	PARTICLE_DESC FXDesc{};
 
-	if (pArg != nullptr)
+	//prototype 만드는 단계에서 이미 정보를 저장한 상황.
+	if (m_FXDesc.strFXName != "NONE")
+	{
+		FXDesc = m_FXDesc;
+	}
+
+	else if (pArg != nullptr)
 	{
 		FXDesc = *(PARTICLE_DESC*)pArg;
 	}
@@ -41,7 +51,13 @@ HRESULT CParticle::Initialize(void* pArg)
 	hr = Add_Components(FXDesc);
 	CHECK_FAILED(hr);
 
-	m_fDuration.second = 10.f;
+
+	//fx 툴 레벨에서는 clone할 때 정보를 새로 기입하는 상황.
+	if (*m_pCurrentLevelID == LEVEL_TOOL_FX)
+		m_FXDesc = FXDesc;
+
+	//m_fDuration.second = 10.f;
+
 	//기본 상태 세팅
 	INSTANCE_DESC instanceDesc{};
 
@@ -69,7 +85,7 @@ HRESULT CParticle::Initialize(void* pArg)
 void CParticle::Update_InstanceInfo(INSTANCE_DESC* _instanceDesc)
 {
 	//이건 파티클에 저장하는 거. 값 있을 때만.
-	if(nullptr != _instanceDesc)
+	if (nullptr != _instanceDesc)
 		m_InstanceDesc = *_instanceDesc;
 
 	m_pVIBufferCom->Update_InstanceDesc(m_InstanceDesc);

@@ -38,7 +38,6 @@ HRESULT CVIBuffer_Instance::Initialize_Prototype(_uint _iNumInstance)
 
 HRESULT CVIBuffer_Instance::Initialize(void * pArg)
 {
-
 	m_iInstanceStride = sizeof(VTXMATRIX);
 	m_iIndexCountPerInstance = 1;
 

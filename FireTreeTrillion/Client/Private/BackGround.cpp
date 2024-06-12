@@ -52,7 +52,7 @@ void CBackGround::Late_Tick(_float fTimeDelta)
 
 HRESULT CBackGround::Render()
 {
-	if (FAILED(Bind_ShaderResources(m_pShaderCom, PS_DEFAULT, m_pTransformCom, m_pTextureCom, m_iTexIndex)))
+	if (FAILED(Bind_ShaderResources(m_pShaderCom, PS_DEFAULT, m_pTransformCom, m_pTextureCom, 0)))
 		return E_FAIL;
 
 	return S_OK;
@@ -90,9 +90,9 @@ HRESULT CBackGround::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassInde
 		return E_FAIL;
 	if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
-	_pTextureCom->Bind_ShaderResource(_pShaderCom, "g_DiffuseTexture", _iPassIndex);
+	_pTextureCom->Bind_ShaderResource(_pShaderCom, "g_DiffuseTexture", _iTexIndex);
 
-	if (FAILED(_pShaderCom->Begin(0)))
+	if (FAILED(_pShaderCom->Begin(1)))
 		return E_FAIL;
 	if (FAILED(Bind_VIBuffer(m_pVIBufferCom)))
 		return E_FAIL;

@@ -29,7 +29,8 @@ HRESULT CSingleEffect::Initialize(void* pArg)
 {
 	FX_DESC FXDesc{};
 
-	if (m_FXDesc.strFXName != "NONE")
+	//미리 세팅된 값이 있다면
+	if (m_strFXName != "NONE")
 	{
 		FXDesc = m_FXDesc;
 
