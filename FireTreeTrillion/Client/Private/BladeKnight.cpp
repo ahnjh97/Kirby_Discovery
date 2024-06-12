@@ -161,7 +161,7 @@ void CBladeKnight::Render_IMGUI()
 
 void CBladeKnight::Collision_Attack(CGameObject* pOtherObj)
 {
-	//Change_State(BLADEKNIGHT_DAMAGE, 50.f, false, true);
+	Change_State(BLADEKNIGHT_DAMAGE, 50.f, false, true);
 }
 
 void CBladeKnight::Change_State(BLADEKNIGHT_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
@@ -290,7 +290,7 @@ void CBladeKnight::SetUp_FSM()
 	m_pFSM->Add_State(BLADEKNIGHT_TORNADOATTACKCHARGE, CBladeKnight_TornadoAttack_State::Create());
 	m_pFSM->Add_State(BLADEKNIGHT_TORNADOATTACK, CBladeKnight_TornadoAttack_State::Create());
 
-	//m_pFSM->Add_State(BLADEKNIGHT_DAMAGE, CBladeKnight_Damage_State::Create());
+	m_pFSM->Add_State(BLADEKNIGHT_DAMAGE, CBladeKnight_Damage_State::Create());
 
 	// ป๓ลย Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};

@@ -33,6 +33,11 @@ private:
 	virtual ~CKabu() = default;
 
 public:
+	_float4 Get_Look() {
+		return m_vLook;
+	}
+
+public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual _int	Tick(_float fTimeDelta) override;
@@ -52,6 +57,8 @@ private:
 	KABU_ANIM			m_eCurrentState = { KABU_END };
 	KABUMOVING_STATE	m_eMoveState = { KABUMOVING_END };
 
+	_float4				m_vLook = {};
+
 	// 회전 상태의 카부
 	_float				m_fDistance = { 0.f };
 	_float				m_fAngle = { 0.f };
@@ -64,7 +71,7 @@ private:
 	_uint				m_iCnt = { 0 };
 	_bool				m_bConvert = { false };
 
-	vector<_float4>		m_vecRallyPoint = {};
+	vector<_float4>		m_vecRallyPoint;
 
 	_float				m_fMoveTime = { 0.f };
 	_float				m_fSpeed = { 0.f };

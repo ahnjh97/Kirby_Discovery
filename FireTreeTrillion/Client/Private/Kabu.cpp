@@ -31,12 +31,12 @@ HRESULT CKabu::Initialize(void* pArg)
 		pKabuDesc->fSpeedPerSec = 7.f;
 		pKabuDesc->fRotationPerSec = XMConvertToRadians(90.0f);
 		m_eMoveState = pKabuDesc->eMoveState;
+		m_vecRallyPoint = pKabuDesc->vecRallyPoints;
 	}
 
 	if (FAILED(__super::Initialize(pKabuDesc)))
 		return E_FAIL;
 
-	m_vecRallyPoint = pKabuDesc->vecRallyPoints;
 	if(!m_vecRallyPoint.empty())
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecRallyPoint[0]);
 
@@ -69,60 +69,65 @@ _int CKabu::Tick(_float fTimeDelta)
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
-	m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), m_fTimeDelta * 5.f);
-
-	if(KABUMOVING_CIRCLE == m_eMoveState)
+	if (KABU_WAIT == Get_State())
 	{
-		m_fAngle += m_fTimeDelta * 50.f;
+		m_pControllerCom->FreeFall(m_pTransformCom, m_fTimeDelta, 6.f);
 
-		m_vRotatePos.x = m_vOriginPos.x + (m_fDistance * sin(XMConvertToRadians(m_fAngle)));
-		m_vRotatePos.z = m_vOriginPos.z - (m_fDistance * cos(XMConvertToRadians(m_fAngle)));
+		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), m_fTimeDelta * 5.f);
 
-		m_pControllerCom->Move(m_pTransformCom, m_vRotatePos, m_fTimeDelta);
-	}
-	else if (KABUMOVING_PATROL == m_eMoveState)
-	{
-		m_fMoveTime += m_fTimeDelta;
-
-		if (1.f < m_fMoveTime)
-			m_fSpeed -= m_fTimeDelta * 10.f;
-		else if (1.f >= m_fMoveTime)
-			m_fSpeed += m_fTimeDelta * 10.f;
-
-		if (2.f < m_fMoveTime)
+		if (KABUMOVING_CIRCLE == m_eMoveState)
 		{
-			m_fMoveTime = 0.f;
-			m_fSpeed = 0.f;
+			m_fAngle += m_fTimeDelta * 50.f;
 
-			if (m_iCnt == 0)
+			m_vRotatePos.x = m_vOriginPos.x + (m_fDistance * sin(XMConvertToRadians(m_fAngle)));
+			m_vRotatePos.z = m_vOriginPos.z - (m_fDistance * cos(XMConvertToRadians(m_fAngle)));
+
+			m_pControllerCom->Move(m_pTransformCom, m_vRotatePos, m_fTimeDelta);
+		}
+		else if (KABUMOVING_PATROL == m_eMoveState)
+		{
+			m_fMoveTime += m_fTimeDelta;
+
+			if (1.f < m_fMoveTime)
+				m_fSpeed -= m_fTimeDelta * 10.f;
+			else if (1.f >= m_fMoveTime)
+				m_fSpeed += m_fTimeDelta * 10.f;
+
+			if (2.f < m_fMoveTime)
 			{
-				m_bConvert = false;
-				m_vRally = m_vecRallyPoint[m_iCnt + 1] - m_vecRallyPoint[m_iCnt];
-				m_iCnt++;
-			}
-			else if (m_iCnt < m_vecRallyPoint.size() - 1)
-			{
-				if(false == m_bConvert)
+				m_fMoveTime = 0.f;
+				m_fSpeed = 0.f;
+
+				if (m_iCnt == 0)
 				{
+					m_bConvert = false;
 					m_vRally = m_vecRallyPoint[m_iCnt + 1] - m_vecRallyPoint[m_iCnt];
 					m_iCnt++;
 				}
+				else if (m_iCnt < m_vecRallyPoint.size() - 1)
+				{
+					if (false == m_bConvert)
+					{
+						m_vRally = m_vecRallyPoint[m_iCnt + 1] - m_vecRallyPoint[m_iCnt];
+						m_iCnt++;
+					}
+					else
+					{
+						m_iCnt--;
+						m_vRally = m_vecRallyPoint[m_iCnt] - m_vecRallyPoint[m_iCnt + 1];
+					}
+				}
 				else
 				{
+					//m_iCnt = 0;
+					m_bConvert = true;
 					m_iCnt--;
 					m_vRally = m_vecRallyPoint[m_iCnt] - m_vecRallyPoint[m_iCnt + 1];
 				}
 			}
-			else
-			{
-				//m_iCnt = 0;
-				m_bConvert = true;
-				m_iCnt--;
-				m_vRally = m_vecRallyPoint[m_iCnt] - m_vecRallyPoint[m_iCnt + 1];
-			}
-		}
 
-		m_pControllerCom->Move_Dir(m_pTransformCom, XMVector3Normalize(m_vRally) * m_fTimeDelta * m_fSpeed, m_fTimeDelta);
+			m_pControllerCom->Move_Dir(m_pTransformCom, XMVector3Normalize(m_vRally) * m_fTimeDelta * m_fSpeed, m_fTimeDelta);
+		}
 	}
 
 	__super::Tick(m_fTimeDelta);
@@ -203,6 +208,8 @@ void CKabu::Render_IMGUI()
 
 void CKabu::Collision_Attack(CGameObject* pOtherObj)
 {
+	m_vLook = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+	Change_State(KABU_DAMAGE, 50.f, false, true);
 }
 
 void CKabu::Change_State(KABU_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
@@ -238,7 +245,7 @@ HRESULT CKabu::Add_Components()
 	m_pControllerCom->Set_Object(this);
 	//m_pControllerCom->Set_CollisionType(m_eCollisionGroup);
 	
-	//SetUp_FSM();
+	SetUp_FSM();
 
 	return S_OK;
 }
@@ -286,6 +293,8 @@ void CKabu::SetUp_FSM()
 	m_pFSM = CFSM::Create();
 	m_pFSM->Add_State(KABU_WAIT, CKabu_Idle_State::Create());
 
+	m_pFSM->Add_State(KABU_DAMAGE, CKabu_Damage_State::Create());
+	m_pFSM->Add_State(KABU_WARP1, CKabu_Warp_State::Create());
 
 	//ป๓ลย Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};

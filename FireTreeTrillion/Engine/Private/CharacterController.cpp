@@ -95,7 +95,7 @@ _float4 CCharacterController::Get_FootPosition()
 /// <summary> 객체의 Look방향으로 '이동'하는 함수 </summary>
 /// <param name="pTransform"> 객체의 Transform </param>
 /// <param name="fSpeed"> 이동 속도 </param>
-void CCharacterController::Move(CTransform* pTransform, _fvector vPosition, _float fTimeDelta)
+void CCharacterController::Move(CTransform* pTransform, _fvector vPosition, _float fTimeDelta, _float fHeight)
 {
 	PxExtendedVec3 pxCurrentPos = m_pController->getPosition();
 	PxVec3 moveVector((_float)pxCurrentPos.x, (_float)pxCurrentPos.y, (_float)pxCurrentPos.z);
@@ -110,7 +110,7 @@ void CCharacterController::Move(CTransform* pTransform, _fvector vPosition, _flo
 	PxExtendedVec3 pxPos = m_pController->getPosition();
 	PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
 
-	_vector xmPos = XMVectorSet(pos.x, pos.y - m_fOffset, pos.z, 0.f);
+	_vector xmPos = XMVectorSet(pos.x, pos.y - fHeight, pos.z, 0.f);
 
 	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
 }
@@ -181,7 +181,6 @@ _bool CCharacterController::Jump_Parabola(CTransform* pTransform, _fvector vGoPo
 
 		// 객체의 충돌 상태 받아오기
 		PxControllerState m_pPxState;
-		lock_guard<mutex> lock(mutex);
 		m_pController->getState(m_pPxState);
 
 		// 지면 판정, 천장 판정 처리
@@ -207,7 +206,7 @@ _bool CCharacterController::Jump_Parabola(CTransform* pTransform, _fvector vGoPo
 }
 
 /// <summary> 자 유 낙 하 </summary>
-void CCharacterController::FreeFall(CTransform* pTransform, _float fTimeDelta, _float fOffset)
+void CCharacterController::FreeFall(CTransform* pTransform, _float fTimeDelta, _float fOffset, _float fHeight)
 {
 	// 자유낙하용 velocity
 	m_fFallVelocity -= GRAVITY * fTimeDelta * fOffset;
@@ -222,7 +221,7 @@ void CCharacterController::FreeFall(CTransform* pTransform, _float fTimeDelta, _
 	PxExtendedVec3 pxPos = m_pController->getPosition();
 	PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
 
-	_vector xmPos = XMVectorSet(pos.x, pos.y - m_fOffset, pos.z, 0.f);
+	_vector xmPos = XMVectorSet(pos.x, pos.y - fHeight, pos.z, 0.f);
 
 	if (m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_DOWN || m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_UP)
 	{

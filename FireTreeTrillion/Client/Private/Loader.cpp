@@ -65,6 +65,9 @@
 #include "BladeKnight.h"
 #include "BladeKnightSword.h"
 #include "Kabu.h"
+#include "BrontoBurt.h"
+#include "PoppyBrosJr.h"
+#include "PoppyBomb.h"
 
 #include "Moon.h"
 #include "WasteCan.h"
@@ -228,6 +231,9 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BladeKnight"), CBladeKnight);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BladeKnightSword"), CBladeKnightSword);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kabu"), CKabu);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BrontoBurt"), CBrontoBurt);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PoppyBrosJr"), CPoppyBrosJr);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PoppyBomb"), CPoppyBomb);
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BackGround"), CBackGround);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
@@ -692,8 +698,11 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Rabbit", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("Buffahorn", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("BladeKnight", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("BladeKnightSword", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("BladeKnightSword", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("Kabu", TYPE_ANIM, 2.f, 180.f);
+		m_vecModelInfo.emplace_back("BrontoBurt", TYPE_ANIM, 2.f, 180.f);
+		m_vecModelInfo.emplace_back("PoppyBrosJr", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_NONANIM, 1.f, 180.f);
 
 		// For Mab Interactive Object
 		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM);
@@ -819,6 +828,10 @@ HRESULT CLoader::Add_KirbyFaceTexture(LEVEL eLevel)
 
 	// Buffahorn Eye
 	if (FAILED(Add_Texture(eLevel, "Buffahorn_Eye", "BuffahornEye/TackleEnemyEye.0%d.dds", 4)))
+		return E_FAIL;
+
+	// BrontoBurt Eye
+	if (FAILED(Add_Texture(eLevel, "BrontoBurt_Eye", "BrontoBurtEye/Face.0%d.dds", 2)))
 		return E_FAIL;
 
 	return S_OK;

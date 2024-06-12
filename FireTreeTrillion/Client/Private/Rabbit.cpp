@@ -224,7 +224,12 @@ void CRabbit::Compute_Parabola(_vector vEndPos)
 	_float b = -2.f * m_fAxisY;
 	_float c = 2.f * m_fEndHight;
 
-	m_fEndTime = (-b + sqrtf(b * b - 4.f * m_fGravity * c)) / (2.f * m_fGravity);
+	_float fResult = b * b - 4.f * m_fGravity * c;
+
+	if (0.f > fResult)
+		m_fEndTime = -b;
+	else
+		m_fEndTime = (-b + sqrtf(fResult)) / (2.f * m_fGravity);
 
 	m_fAxisX = -(m_vStartPos.x - m_vEndPos.x) / m_fEndTime;
 	m_fAxisZ = -(m_vStartPos.z - m_vEndPos.z) / m_fEndTime;

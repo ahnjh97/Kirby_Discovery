@@ -8,6 +8,7 @@
 #include "Trigger.h"
 #include "Kirby.h"
 #include "Kabu.h"
+#include "BrontoBurt.h"
 #include "BG.h"
 #include "HUD.h"
 
@@ -352,6 +353,11 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BladeKnight"), &tempDesc)))
 				return E_FAIL;
 		}
+		else if (strModelName == "NonAnim_PoppyBrosJr")
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_PoppyBrosJr"), &tempDesc)))
+				return E_FAIL;
+		}
 		else if (strModelName == "NonAnim_Kabu")
 		{
 			CKabu::KABU_DESC KabuDesc = {};
@@ -360,6 +366,16 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 			KabuDesc.eMoveState = CKabu::KABUMOVING_STATE(iTriggerIndex);
 			KabuDesc.vecRallyPoints = vecRallyPoints;
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Kabu"), &KabuDesc)))
+				return E_FAIL;
+		}
+		else if (strModelName == "NonAnim_BrontoBurt")
+		{
+			CBrontoBurt::BRONTOBURT_DESC BrontoBurtDesc = {};
+			BrontoBurtDesc.matWorld = matWorld;
+			BrontoBurtDesc.wstrModelName = tempDesc.wstrModelName;
+			BrontoBurtDesc.eMoveState = CBrontoBurt::BRONTOBURTMOVING_STATE(iTriggerIndex);
+			BrontoBurtDesc.vecRallyPoints = vecRallyPoints;
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BrontoBurt"), &BrontoBurtDesc)))
 				return E_FAIL;
 		}
 		else if (strModelName == "Level1Stage1Step01" || strModelName == "Level1Stage1Step01_Blend")

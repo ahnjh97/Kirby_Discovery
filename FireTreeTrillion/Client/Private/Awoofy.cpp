@@ -296,11 +296,10 @@ HRESULT CAwoofy::Add_Components()
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
-#pragma region Awoofy Eye
+	/* For.Com_Texture */
 	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Awoofy_Eye"),
 		TEXT("Com_Texture"), (CComponent**)&m_pEyeTextureCom);
 	CHECK_FAILED(hr);
-#pragma endregion
 
 	/* For.Com_CharacterController */
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);

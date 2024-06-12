@@ -183,6 +183,8 @@
     <ClInclude Include="..\Public\BladeKnight.h" />
     <ClInclude Include="..\Public\BladeKnightSword.h" />
     <ClInclude Include="..\Public\BladeKnight_State.h" />
+    <ClInclude Include="..\Public\BrontoBurt.h" />
+    <ClInclude Include="..\Public\BrontoBurt_State.h" />
     <ClInclude Include="..\Public\Buffahorn.h" />
     <ClInclude Include="..\Public\Buffahorn_State.h" />
     <ClInclude Include="..\public\Camera_Free.h" />
@@ -241,6 +243,9 @@
     <ClInclude Include="..\Public\OrbitingCamera.h" />
     <ClInclude Include="..\Public\Particle.h" />
     <ClInclude Include="..\Public\PhysXObject.h" />
+    <ClInclude Include="..\Public\PoppyBomb.h" />
+    <ClInclude Include="..\Public\PoppyBrosJr.h" />
+    <ClInclude Include="..\Public\PoppyBrosJr_State.h" />
     <ClInclude Include="..\Public\Rabbit.h" />
     <ClInclude Include="..\Public\Rabbit_State.h" />
     <ClInclude Include="..\Public\RigidObject.h" />
@@ -277,6 +282,8 @@
     <ClCompile Include="..\Private\BladeKnight.cpp" />
     <ClCompile Include="..\Private\BladeKnightSword.cpp" />
     <ClCompile Include="..\Private\BladeKnight_State.cpp" />
+    <ClCompile Include="..\Private\BrontoBurt.cpp" />
+    <ClCompile Include="..\Private\BrontoBurt_State.cpp" />
     <ClCompile Include="..\Private\Buffahorn.cpp" />
     <ClCompile Include="..\Private\Buffahorn_State.cpp" />
     <ClCompile Include="..\private\Camera_Free.cpp" />
@@ -331,6 +338,9 @@
     <ClCompile Include="..\Private\OrbitingCamera.cpp" />
     <ClCompile Include="..\Private\Particle.cpp" />
     <ClCompile Include="..\Private\PhysXObject.cpp" />
+    <ClCompile Include="..\Private\PoppyBomb.cpp" />
+    <ClCompile Include="..\Private\PoppyBrosJr.cpp" />
+    <ClCompile Include="..\Private\PoppyBrosJr_State.cpp" />
     <ClCompile Include="..\Private\Rabbit.cpp" />
     <ClCompile Include="..\Private\Rabbit_State.cpp" />
     <ClCompile Include="..\Private\RigidObject.cpp" />

@@ -44,11 +44,11 @@ public:
 
 public:
 	// 이동에 대한 함수
-	void			Move(class CTransform* pTransform, _fvector vPosition, _float fTimeDelta);				// look방향으로 움직임
+	void			Move(class CTransform* pTransform, _fvector vPosition, _float fTimeDelta, _float fHeight = 1.f);				// look방향으로 움직임	void			Move_Dir(class CTransform* pTransform, _fvector fDelta, _float fTimeDelta);			// 방향 벡터로 움직임
 	void			Move_Dir(class CTransform* pTransform, _fvector fDelta, _float fTimeDelta);			// 방향 벡터로 움직임
 	_bool			Jump(CTransform* pTransform, _float fFallVelocity, _float fTimeDelta);				// 점프
 	_bool			Jump_Parabola(CTransform* pTransform, _fvector vGoPos, _float fTimeDelta);			// 목표 지점으로 점프
-	void			FreeFall(CTransform* pTransform, _float fTimeDelta, _float fOffset = 1.f);			// 자유 낙하
+	void			FreeFall(CTransform* pTransform, _float fTimeDelta, _float fOffset = 6.f, _float fHeight = 1.f);			// 자유 낙하
 	void			Reset_FallVelocity() { m_fFallVelocity = 0.f; }										// 자유 낙하 중력값 초기화
 	PxVec3			Compute_Slope(CTransform* pTransform);												// 경사면의 노말벡터 계산
 	_float			Compute_Height(_fvector vAxis = XMVectorSet(0.f, 0.f, 0.f, 0.f));																	// 경사면의 노말벡터 계산
