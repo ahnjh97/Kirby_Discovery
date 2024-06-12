@@ -30,7 +30,7 @@ HRESULT CSingleEffect::Initialize(void* pArg)
 	FX_DESC FXDesc{};
 
 	//미리 세팅된 값이 있다면
-	if (m_strFXName != "NONE")
+	if (m_FXDesc.strFXName != "NONE")
 	{
 		FXDesc = m_FXDesc;
 
@@ -98,12 +98,11 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 	if (Calculate_Duration(_fTimeDelta))
 	{
 		//툴에서는 다시 시작하기
-		if (*m_pCurrentLevelID == LEVEL_TOOL_FX)
+		if (*m_pCurrentLevelID != LEVEL_TOOL_FX)
 		{
-			m_fDuration.first = 0.f;
-		}
-		else
 			m_bDead = true;
+			//m_fDuration.first = 0.f;
+		}
 	}
 
 	//true 반환하면 lifetime 끝난 것.
@@ -166,7 +165,7 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 		socketMatrix.Up().Normalize();
 		socketMatrix.Backward().Normalize();
 
-		m_pTransformCom->Set_WorldMatrix( m_pTransformCom->Get_WorldMatrix() * socketMatrix);
+		m_pTransformCom->Set_WorldMatrix(m_pTransformCom->Get_WorldMatrix() * socketMatrix);
 	}
 
 
