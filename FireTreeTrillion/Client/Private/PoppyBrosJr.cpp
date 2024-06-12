@@ -142,9 +142,19 @@ void CPoppyBrosJr::Render_IMGUI()
 }
 #endif
 
-void CPoppyBrosJr::Collision_Attack(CGameObject* pOtherObj)
+void CPoppyBrosJr::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
-	Change_State(POPPY_DAMAGE, 50.f, false, true);
+	if (eContent == CCollisionCenter::CONTENT_BODY)
+	{
+		if (m_ePhyXState == PO_NORMAL)
+		{
+			Change_State(POPPY_DAMAGE, 50.f, false, true);
+		}
+	}
+	else if (eContent == CCollisionCenter::CONTENT_VACUUMOBJECT)
+	{
+
+	}
 }
 
 void CPoppyBrosJr::Change_State(POPPY_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)

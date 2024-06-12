@@ -50,7 +50,7 @@ public:
 #ifdef _DEBUG
 	virtual void	Render_IMGUI() override;
 #endif
-	virtual void	Collision_Attack(CGameObject* pOtherObj) override;
+	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
 public:
 	void Change_State(BRONTOBURT_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);

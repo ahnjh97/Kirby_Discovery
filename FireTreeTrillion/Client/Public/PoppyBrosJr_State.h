@@ -69,6 +69,10 @@ public:
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
 	virtual void OnStateExit()														override;
 
+private:
+	_float		m_fFlyTime = { 0.f };
+	_float		m_fDeadTime = { 0.f };
+
 public:
 	static	CPoppyBrosJr_Damage_State* Create();
 	virtual void Free() override;

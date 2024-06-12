@@ -153,27 +153,61 @@ void CPoppyBrosJr_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float f
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 
-	//// 일반 충돌 상태 (Get_Vacuuming()이 true라면 빨아들이는 상태이다.
-	//if (pPoppyJr->Get_Vacuuming() == false)
-	//{
-	//	// 일단 그 방향으로 바라보게만 한다.
-	//	_float3 vDamegeDir = pPoppyJr->Get_DamegeDir();
-	//	pTransformCom->Look_At_Axis(-vDamegeDir);
+	if (pPoppyJr->Get_PhyXState() == PO_NORMAL)
+	{
+		// 일단 그 방향으로 바라보게만 한다.
+		_float3 vDamegeDir = pPoppyJr->Get_DamegeDir();
+		pTransformCom->Look_At_Axis(-vDamegeDir);
 
-	//	// 이제 날아가는 것을 구현해보자.
-	//	pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 6.f, fTimeDelta);
+		// 이제 날아가는 것을 구현해보자.
+		pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 6.f, fTimeDelta);
 
-	//	// 점프되는 체공시간을 구현해보자.
-	//	_float fDamageJumpPower = pPoppyJr->Get_DamageJumpPower();
-	//	pController->Jump(pTransformCom, fDamageJumpPower, fTimeDelta);
-	//	fDamageJumpPower -= GRAVITY * fTimeDelta * 3.f;
-	//	pPoppyJr->Set_DamageJumpPower(fDamageJumpPower);
+		// 점프되는 체공시간을 구현해보자.
+		_float fDamageJumpPower = pPoppyJr->Get_DamageJumpPower();
+		pController->Jump(pTransformCom, fDamageJumpPower, fTimeDelta);
+		fDamageJumpPower -= GRAVITY * fTimeDelta * 3.f;
+		pPoppyJr->Set_DamageJumpPower(fDamageJumpPower);
 
-	//	if (true == pPoppyJr->IsAnimFinished() || pController->Is_Terrain())
-	//	{
-	//		pPoppyJr->Change_State(CPoppyBrosJr::POPPY_WALK, 40.f, false, true);
-	//	}
-	//}
+
+		if (true == pPoppyJr->IsAnimFinished() || pController->Is_Terrain())
+		{
+			pPoppyJr->Change_State(CPoppyBrosJr::POPPY_WALK, 40.f, true, true);
+		}
+	}
+	// 날아가는 도중이다.  1초에 360도 회전하며, 30의 거리로 날아간다.
+	else if (pPoppyJr->Get_PhyXState() == PO_FLYAWAY)
+	{
+		_float3 vDamegeDir = pPoppyJr->Get_DamegeDir();
+		pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 30.f, fTimeDelta);
+		pTransformCom->Turn(pTransformCom->Get_State_Vector(CTransform::STATE_UP), fTimeDelta, 360.f);
+		m_fFlyTime += fTimeDelta;
+		if (m_fFlyTime > 2.f)
+		{
+			pPoppyJr->Set_Dead();
+		}
+	}
+	// 죽는 도중이다.	 (날아가다 터질예정임)
+	else if (pPoppyJr->Get_PhyXState() == PO_FLYDEADAWAY)
+	{
+		m_fDeadTime += fTimeDelta;
+
+		// 일단 그 방향으로 바라보게만 한다.
+		_float3 vDamegeDir = pPoppyJr->Get_DamegeDir();
+		pTransformCom->Look_At_Axis(-vDamegeDir);
+
+		// 이제 날아가는 것을 구현해보자.
+		pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 10.f, fTimeDelta);
+
+		// 점프되는 체공시간을 구현해보자.
+		_float fDamageJumpPower = pPoppyJr->Get_DamageJumpPower();
+		pController->Jump(pTransformCom, fDamageJumpPower, fTimeDelta);
+		fDamageJumpPower -= GRAVITY * fTimeDelta * 3.f;
+
+		pPoppyJr->Set_DamageJumpPower(fDamageJumpPower);
+
+		if (m_fDeadTime > 0.7f)
+			pPoppyJr->Set_Dead();
+	}
 }
 
 void CPoppyBrosJr_Damage_State::OnStateExit()

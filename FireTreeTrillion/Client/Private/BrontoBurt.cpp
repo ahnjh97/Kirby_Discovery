@@ -167,6 +167,9 @@ _int CBrontoBurt::Tick(_float fTimeDelta)
 			m_pControllerCom->Move_Dir(m_pTransformCom, XMVector3Normalize(m_vRally) * m_fTimeDelta * m_fSpeed, m_fTimeDelta);
 		}
 	}
+	
+	if (m_ePhyXState == PO_VACUUMING || m_ePhyXState == PO_FLYDEADAWAY)
+		Change_State(BRONTOBURT_DAMAGE, 120.f, true, false);
 
 	__super::Tick(m_fTimeDelta);
 
@@ -175,6 +178,16 @@ _int CBrontoBurt::Tick(_float fTimeDelta)
 
 void CBrontoBurt::Late_Tick(_float fTimeDelta)
 {
+	// 커비 입 안에 있고, Fly가 아닐땐 입 안에 있는 상황이므로, Render되지않는다.
+	if (m_ePhyXState == PO_KIRBYMOUTH)
+		return;
+
+	// 날아갈 땐, 애니메이션 재생이 되지 않는다.
+	if (m_ePhyXState != PO_FLYAWAY)
+	{
+		m_ePhyXState == PO_FLYDEADAWAY ? m_pModelCom->Play_Animation(m_fTimeDelta * 0.3f) : m_pModelCom->Play_Animation(m_fTimeDelta);
+	}
+
 	m_pModelCom->Play_Animation(m_fTimeDelta);
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
@@ -247,12 +260,19 @@ void CBrontoBurt::Render_IMGUI()
 }
 #endif
 
-void CBrontoBurt::Collision_Attack(CGameObject* pOtherObj)
+void CBrontoBurt::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
-	m_vLastPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-	Change_State(BRONTOBURT_DAMAGE, 50.f, false, true);
-	m_eEyeState = BRONTOBURTEYE_HALF;
-	m_bReturn = true;
+	if (eContent == CCollisionCenter::CONTENT_BODY)
+	{
+		if (m_ePhyXState == PO_NORMAL)
+		{
+			Change_State(BRONTOBURT_DAMAGE, 50.f, false, true);
+		}
+	}
+	else if (eContent == CCollisionCenter::CONTENT_VACUUMOBJECT)
+	{
+
+	}
 }
 
 void CBrontoBurt::Change_State(BRONTOBURT_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
