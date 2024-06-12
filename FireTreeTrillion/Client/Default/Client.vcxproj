@@ -195,6 +195,7 @@
     <ClInclude Include="..\Public\Grid.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\Public\HitBox.h" />
     <ClInclude Include="..\Public\HUD.h" />
     <ClInclude Include="..\Public\HUD_KirbyStatus.h" />
     <ClInclude Include="..\Public\HUD_StarPoint.h" />
@@ -288,6 +289,7 @@
     <ClCompile Include="..\Private\Grid.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\Private\HitBox.cpp" />
     <ClCompile Include="..\Private\HUD.cpp" />
     <ClCompile Include="..\Private\HUD_KirbyStatus.cpp" />
     <ClCompile Include="..\Private\HUD_StarPoint.cpp" />

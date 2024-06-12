@@ -29,6 +29,7 @@ private:
 	HRESULT Ready_Layer_Monster(const wstring& strLayerTag);
 	HRESULT Ready_Layer_UI(const wstring& strLayerTag);
 	HRESULT Ready_ParsedObjects();
+	HRESULT Ready_Layer_MapObject(const wstring& strLayerTag);
 	
 	_bool	Load_FileData(const string& _strFilePath, FILE_TYPE _eFileType, const wstring& _strLayerTag);
 

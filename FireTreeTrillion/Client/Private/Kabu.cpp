@@ -139,6 +139,7 @@ void CKabu::Late_Tick(_float fTimeDelta)
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 	}
+
 }
 
 HRESULT CKabu::Render()
@@ -236,9 +237,6 @@ HRESULT CKabu::Add_Components()
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	m_pControllerCom->Set_Object(this);
-	//m_pControllerCom->Set_CollisionType(m_eCollisionGroup);
-	
-	//SetUp_FSM();
 
 	return S_OK;
 }
@@ -286,7 +284,6 @@ void CKabu::SetUp_FSM()
 	m_pFSM = CFSM::Create();
 	m_pFSM->Add_State(KABU_WAIT, CKabu_Idle_State::Create());
 
-
 	//ป๓ลย Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};
 	FSM_Desc.iState = KABU_WAIT;
@@ -324,4 +321,5 @@ CGameObject* CKabu::Clone(void* pArg)
 void CKabu::Free()
 {
 	__super::Free();
+
 }

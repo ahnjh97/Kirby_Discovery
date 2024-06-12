@@ -812,6 +812,11 @@ void CGameInstance::Ready_TestGround()
 	m_pPhysx->Ready_TestGround();
 }
 
+void CGameInstance::Overlap_Hitbox(CGameObject* pGameObject, _float4 vPos, _float fRadius)
+{
+	m_pPhysx->Overlap_Hitbox(pGameObject, vPos, fRadius);
+}
+
 #ifdef _DEBUG
 HRESULT CGameInstance::Ready_RTVDebug(const wstring & strRenderTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY)
 {

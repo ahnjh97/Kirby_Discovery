@@ -64,6 +64,7 @@ private:
 	AnimToolMap								m_mapSequence;
 
 	// 객체별 띄우는 로직으로 변경
+	// 현재 선택된 객체
 	class CCharacter*						m_pCharacter = nullptr;
 	vector<class CCharacter*>				m_vecCharacter;
 

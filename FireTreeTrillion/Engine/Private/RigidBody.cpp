@@ -4,6 +4,8 @@
 #include "GameObject.h"
 #include "Transform.h"
 
+#define OVERLAP_MAX 8
+
 CRigidBody::CRigidBody(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CComponent{ pDevice, pContext }
 {
@@ -28,27 +30,30 @@ HRESULT CRigidBody::Initialize(void * pArg)
 	m_vMaterial				= pDesc->vMaterial;
 	m_fOffsetSize			= pDesc->fOffsetSize;
 	m_bDynamic				= pDesc->bDynamic;
+	m_bKinematic			= pDesc->bKinematic;
 	m_pActorObject			= pDesc->pObj;
 
 	Create_Actor();
 	return S_OK;
 }
 
-void CRigidBody::Update(CTransform* pTransform)
-{
-	Set_PxWorldMatrix(pTransform->Get_WorldFloat4x4());
-}
-
 void CRigidBody::Update(_fmatrix matrix)
 {
-	Set_PxWorldMatrix(matrix);
+	if (!m_bKinematic)
+		Set_PxWorldMatrix(matrix);
+	else if (m_bKinematic && Is_Activated())
+		m_pActor->setKinematicTarget(PxTransform{CUtils::To_Float4x4(matrix)});
+}
+
+void CRigidBody::Update(_float4 vPos)
+{
+	if (m_bKinematic && Is_Activated())
+		m_pActor->setKinematicTarget(PxTransform{ vPos.x, vPos.y, vPos.z });
 }
 
 void CRigidBody::Update_PhysX(CTransform* pTransform)
 {
-	if (Is_Activated() == false) return;
-
-	if (false == m_bTrigger)
+	if (false == m_bKinematic && false == m_bTrigger)
 	{
 		pTransform->Set_WorldMatrix(Get_PxWorldMatrix());
 	}
@@ -63,18 +68,18 @@ void CRigidBody::Render_IMGUI()
 	// ReCreateActor(for change shape or scale)
 	if (ImGui::Button("Update Changes"))
 	{
+		PxTransform globalPose = m_pActor->getGlobalPose();
+		PxMat44 globalPoseMatrix = PxMat44(globalPose);
+		m_OriginTransformMatrix = CUtils::To_Float4x4(globalPoseMatrix);
+		
 		Create_Actor();
 		if (!Is_Activated())
 			m_pGameInstance->Get_Scene()->addActor(*m_pActor);
 	}
 	ImGui::Checkbox("bTrigger",		&m_bTrigger);
+	ImGui::Checkbox("bKinematic",	&m_bKinematic);
 	ImGui::InputFloat("Density",	&m_fDensity);
 
-	ImGui::Indent(20.f);
-	if (ImGui::CollapsingHeader("Origin Trasnform"))
-	{
-	}
-	ImGui::Unindent(20.f);
 }
 
 #endif
@@ -100,7 +105,6 @@ void CRigidBody::Create_Actor()
 	}
 	
 	PxMaterial* pMtrl = m_pGameInstance->Get_Physics()->createMaterial(m_vMaterial.x, m_vMaterial.y, m_vMaterial.z);
-
 	switch (m_eShapeType)
 	{
 	case RIGID_BOX:
@@ -118,6 +122,9 @@ void CRigidBody::Create_Actor()
 		NODEFAULT;
 	}
 
+	m_pShape->setSimulationFilterData(physx::PxFilterData{ 10, 0, 0, 0 });
+	m_pShape->setQueryFilterData(physx::PxFilterData{ 10, 0, 0, 0 });
+
 	// Transform 설정 (위치와 회전)
 	PxMat44 pxMat = CUtils::To_Float4x4(OriginMatrix);
 	PxTransform transform = CUtils::mat44ToTransform(pxMat);
@@ -125,20 +132,23 @@ void CRigidBody::Create_Actor()
 	{
 		m_pActor = pPhysics->createRigidDynamic(transform);
 		SetUp_Actor();
-
 		m_pActor->attachShape(*m_pShape);
+		PxScene* scene = m_pGameInstance->Get_Scene();
+		scene->addActor(*m_pActor);
+
 		physx::PxRigidBodyExt::updateMassAndInertia(*m_pActor, m_fDensity);
 	}
 	else 
 	{
 		m_pStaticActor = pPhysics->createRigidStatic(transform);
 		SetUp_Actor();
+
 		m_pStaticActor->attachShape(*m_pShape);
+		PxScene* scene = m_pGameInstance->Get_Scene();
+		scene->addActor(*m_pStaticActor);
 	}
 }
 
-
-//정현아 여길 봐줘
 /// <summary>
 /// RigidBody를 어떻게 사용할 것인지 세팅 플래그 변경하는 함수
 /// +) Create_Actor의 하단에 호출중
@@ -147,8 +157,13 @@ void CRigidBody::SetUp_Actor()
 {
 	if (m_bTrigger)
 	{
-		if(true == m_bDynamic)
+		if (m_bDynamic)
 			m_pActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, true);
+	}
+	else
+	{
+		if (m_bDynamic)
+			m_pActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, m_bKinematic);
 	}
 
 	if(nullptr != m_pActor)
@@ -156,15 +171,15 @@ void CRigidBody::SetUp_Actor()
 
 	if (m_bTrigger)
 	{
-		m_pShape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, false);
-		m_pShape->setFlag(physx::PxShapeFlag::eSCENE_QUERY_SHAPE, false);
-		m_pShape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, true);
+		m_pShape->setFlag(PxShapeFlag::eSIMULATION_SHAPE,  false);
+		m_pShape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, false);
+		m_pShape->setFlag(PxShapeFlag::eTRIGGER_SHAPE,	   true);
 	}
 	else
 	{
-		m_pShape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, true);
-		m_pShape->setFlag(physx::PxShapeFlag::eSCENE_QUERY_SHAPE, true);
-		m_pShape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, false);
+		m_pShape->setFlag(PxShapeFlag::eSIMULATION_SHAPE,  true);
+		m_pShape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, true);
+		m_pShape->setFlag(PxShapeFlag::eTRIGGER_SHAPE,	   false);
 	}
 }
 
@@ -220,9 +235,29 @@ void CRigidBody::Add_Force(_float3 vForce)
 {
 	if (m_pActor == nullptr) return;
 
-	// Trigger는 어떻게 사용할 지 추후 의논 예정
-	physx::PxVec3 PxForce = physx::PxVec3(vForce.x, vForce.y, vForce.z);
-	m_pActor->addForce(PxForce, physx::PxForceMode::eFORCE);
+	if (false == m_bKinematic && false == m_bTrigger)
+	{
+		physx::PxVec3 PxForce = physx::PxVec3(vForce.x, vForce.y, vForce.z);
+		m_pActor->addForce(PxForce, physx::PxForceMode::eFORCE);
+	}
+}
+
+void CRigidBody::Add_Torque(_float3 vTorque)
+{
+	if (false == (m_bTrigger && m_bKinematic))
+	{
+		physx::PxVec3 PxToque = physx::PxVec3(vTorque.x, vTorque.y, vTorque.z);
+		m_pActor->addTorque(PxToque, physx::PxForceMode::eFORCE);
+	}
+}
+
+void CRigidBody::Add_Velocity(_float3 vVelocity)
+{
+	if (false == (m_bTrigger && m_bKinematic))
+	{
+		physx::PxVec3 PxForce = physx::PxVec3(vVelocity.x, vVelocity.y, vVelocity.z);
+		m_pActor->addForce(PxForce, physx::PxForceMode::eVELOCITY_CHANGE);
+	}
 }
 
 physx::PxTransform CRigidBody::Get_PxTransform()
@@ -234,7 +269,6 @@ physx::PxTransform CRigidBody::Get_PxTransform()
 void CRigidBody::Set_PxWorldMatrix(const _float4x4& _worldMatrix)
 {
 	m_pActor->setGlobalPose(physx::PxTransform{CUtils::To_Float4x4(_worldMatrix)});
-	
 }
 
 // physX에서의 행렬을 DX에서의 행렬로 변환하여 가져온다.
@@ -249,6 +283,48 @@ _float4x4 CRigidBody::Get_PxWorldMatrix()
 _bool CRigidBody::Is_Activated()
 {
 	return m_pActor != nullptr && m_pActor->getScene() != nullptr;
+}
+
+// 함수 내에 해당 코드를 포함한다고 가정
+void CRigidBody::Overlap_Hitbox(CGameObject* pGameObject, _float4 vPos, _float fRadius)
+{
+	// 겹침을 검사할 구체의 기하학적 모양 생성
+	PxSphereGeometry overlapShape = PxSphereGeometry(fRadius);
+
+	// 초기 위치와 회전을 설정하는 PxTransform 객체 생성
+	//PxTransform shapePose = PxTransform(pos, PxQuat(physx::PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f)));
+	//PxTransform shapePose = m_pActor->getGlobalPose();
+	PxTransform pxTransform(PxVec3(vPos.x, vPos.y, vPos.z));
+
+	// Overlap 결과를 저장할 배열 동적 할당
+	PxOverlapHit* hitOverlap = new PxOverlapHit[OVERLAP_MAX]; 	//const int maxHits = 8; //= 4096;
+	PxScene* myScene = m_pGameInstance->Get_Scene();
+	_int howMany = PxSceneQueryExt::overlapMultiple(*myScene, overlapShape, pxTransform, hitOverlap, OVERLAP_MAX, PxQueryFilterData(PxQueryFlag::eDYNAMIC/*PxQueryFlag::eSTATIC | PxQueryFlag::eNO_BLOCK*/));
+	
+	CGameObject* pPlayer = nullptr;
+	for (_int i = 0; i < howMany; ++i) 
+	{
+		PxOverlapHit& hit = hitOverlap[i];
+		PxRigidActor* actor = hit.actor;  // 충돌된 객체의 액터
+		// FOR TEST
+		if (howMany > 2)
+			_int b = 3;
+		if (actor->userData == "RigidMesh")
+			continue;// _int a = 3;
+
+		const char* actorName = actor->getName();
+		CComponent* pComponent = static_cast<CComponent*>(actor->userData);
+		if (pComponent == nullptr) continue;
+
+		// ======================================== FOR TEST : 임시 ========================================
+		CGameObject* pActorObject = pComponent->Get_Object();
+		if (pActorObject == nullptr) continue;
+		if (pActorObject->Get_PrototypeTag() != pGameObject->Get_PrototypeTag())
+			pGameObject->Collision_Overlap(pActorObject); // actorObject가 플레이어가 아닐경우 collision_overlap 실행
+		// =================================================================================================
+	}
+
+	Safe_Delete_Array(hitOverlap);
 }
 
 CRigidBody * CRigidBody::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
@@ -285,4 +361,3 @@ void CRigidBody::Free()
 	Release_Actor();
 }
 
- 

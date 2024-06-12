@@ -52,6 +52,7 @@ public:
 public:
     PxRigidDynamic* CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
     PxRigidStatic*  CreateStaticActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
+    void            Overlap_Hitbox(CGameObject* pGameObject, _float4 vPos, _float fRadius);
 
 private:
     PxDefaultAllocator          mDefaultAllocatorCallback;
@@ -86,11 +87,11 @@ private:
     _uint arrCollisionContents[COLLISION_END][COLLISION_END];
 
 public:
+
     static CPhysX*  Create();
     virtual void    Free() override;
 
 };
-
 
 // PxSimulationEventCallback : RigidBody의 충돌처리에 대한 콜백 결과를 받아오는 클래스
 class ENGINE_DLL CSimulationEventCallback : public physx::PxSimulationEventCallback
@@ -108,41 +109,51 @@ class ENGINE_DLL CControllerBehaviorCallback : public PxControllerBehaviorCallba
 {
 public:
     // 컨트롤러가 다른 객체와 충돌했을 때 호출되는 함수
-    virtual PxControllerBehaviorFlags getBehaviorFlags(const PxShape& shape, const PxActor& actor) override;
-
+    virtual PxControllerBehaviorFlags getBehaviorFlags(const PxShape& shape, const PxActor& actor) override {
+        return PxControllerBehaviorFlag::eCCT_SLIDE;
+    }
     // 컨트롤러가 다른 컨트롤러와 충돌했을 때 호출되는 함수
     virtual PxControllerBehaviorFlags getBehaviorFlags(const PxController& controller) override;
 
     // 사용하지 않지만 순수가상함수로 상속받아야하는 함수. 절대 지우지 말 것!
-    virtual PxControllerBehaviorFlags getBehaviorFlags(const PxObstacle&) override;
+    virtual PxControllerBehaviorFlags getBehaviorFlags(const PxObstacle&) override {
+        return PxControllerBehaviorFlag::eCCT_SLIDE;
+    }
     
 };
 
 // PxUserControllerHitReport : Controller의 모든 충돌 정보를 가지고옴.
 class CUserControllerHitReport : public physx::PxUserControllerHitReport 
 {
-private:
-    void Initialize();
-
 public:
     // 캐릭터 컨트롤러의 충돌 이벤트 처리
-    virtual void onShapeHit(const physx::PxControllerShapeHit& hit) override;
+    virtual void    onShapeHit(const physx::PxControllerShapeHit& hit) override;
     
-    virtual void onControllerHit(const PxControllersHit& hit) override;
+    virtual void    onControllerHit(const PxControllersHit& hit) override;
 
-    // NOT YET
-    //virtual void onControllerShapeHit(const PxControllerShapeHit& hit) override {}
-    
     // for 순수가상함수
-    virtual void onObstacleHit(const PxControllerObstacleHit& hit) override {}
+    virtual void    onObstacleHit(const PxControllerObstacleHit& hit) override {}
 
-    void    CollsionEvent(class CGameObject* pObj, class CGameObject* pOtherObj/*, COLLISION_TYPE eOwnCollsionGroup, COLLISION_TYPE eOtherCollsionGroup*/);
-
-//private:
-    // CollisionGroup끼리 부딪혔을 때, 충돌 컨텐츠 지정. Initialize에서 내용물 채워주기.
-    //_uint arrCollisionContents[COLLISION_END][COLLISION_END];
+    void            CollsionEvent(class CGameObject* pObj, class CGameObject* pOtherObj);
 
 };
 
+class CControllerFilterCallback : public PxControllerFilterCallback
+{
+public:
+    virtual bool                             filter(const PxController& a, const PxController& b) override;
+    
+    const unordered_set<const PxController*> Get_Controllers();
+    void                                     Clear_Collisions();
+    
+    // NOT YET
+    bool                                     Has_Collided(const PxController* controller) const;
+
+private:
+    unordered_set<const PxController*>       m_setControllers;
+
+};
 
 END
+
+  

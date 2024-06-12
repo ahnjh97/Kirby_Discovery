@@ -132,11 +132,11 @@ HRESULT CAwoofy::Render_LightDepth()
 
 void CAwoofy::Add_AnimEvent()
 {
-	//__super::Add_AnimEvent();
+	__super::Add_AnimEvent();
 	
-	//1. 한 애니메이션에서 같은 이름의 이벤트 가능
-	//2. 현재 실행되는 애니메이션에 따라 이벤트가 발생하도록 한다.
-	//3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
+	// 1. 한 애니메이션에서 같은 이름의 이벤트 가능
+	// 2. 재생 기준은 애님툴에서 지정한 애니메이션인지 + 시작 프레임이 애니메이션 프레임안에 들어가는 지
+	// 3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
 	m_pModelCom->Add_Event("Bboong", [this]() {
 		//파티클 생성
 		static _float fBbongTime{ 0.f };
