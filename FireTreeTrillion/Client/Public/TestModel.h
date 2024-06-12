@@ -61,9 +61,9 @@ private:
 	CShader*		m_pShaderCom = { nullptr };
 	class CLight*	m_pLight = { nullptr };
 
-	//CRigidBody*		m_pRigidBodyCom = { nullptr };
+	CRigidBody*		m_pRigidBodyCom = { nullptr };
 	//map<string, CRigidBody*> m_mapRigidBodies;
-	CCharacterController* m_pControllerCom = { nullptr };
+	//CCharacterController* m_pControllerCom = { nullptr };
 
 	// Player FSM 및 Jump 관련 변수들
 	CFSM*			m_pFSM = { nullptr };

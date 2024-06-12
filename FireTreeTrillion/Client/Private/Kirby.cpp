@@ -13,6 +13,7 @@
 
 #include "KirbyWeapons.h"
 #include "KirbyArmours.h"
+#include "HitBox.h"
 
 #include "Utils.h"
 #include "Bone.h"
@@ -95,7 +96,6 @@ HRESULT CKirby::Initialize(void* pArg)
 	INFO(m_vMoveDir) = -1.f * m_pCameraLook;
 	INFO(m_vTargetDir) = INFO(m_vMoveDir);
 
-	//Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
 	m_pModelCom[INFO(m_eBodyState)]->Set_Animation(STATE_IDLE, 60.f, true, true);
 
 	m_fMaxHp = 100.f;
@@ -104,15 +104,12 @@ HRESULT CKirby::Initialize(void* pArg)
 	m_eAbilityType = ABILITY_DEFAULT;
 	//m_eAbilityType = ABILITY_BOMB;
 
-	CCharacterController* pController = dynamic_cast<CCharacterController*>(Get_Component(TEXT("Com_Controller")));
-	pController->RegisterAsPlayer();
-
+	m_pControllerCom->RegisterAsPlayer();
 	return S_OK;
 }
 
 _int CKirby::Tick(_float fTimeDelta)
 {
-
 	if (m_bDead == true)
 		return OBJ_DEAD;
 
@@ -134,12 +131,15 @@ _int CKirby::Tick(_float fTimeDelta)
 	m_pWeapons->Tick(m_fTimeDelta);
 	m_pArmours->Tick(m_fTimeDelta);
 
+	//if(칼을 휘두른 순간!)
+	if(m_pHitBox != nullptr)
+		m_pHitBox->Tick(m_fTimeDelta);
+
 	return OBJ_NOEVENT;
 }
 
 void CKirby::Late_Tick(_float fTimeDelta)
 {
-
 	m_pModelCom[INFO(m_eBodyState)]->Play_Animation(m_fTimeDelta);
 
 	if (INFO(m_eBodyState) != BODY_DEFAULT)
@@ -213,7 +213,7 @@ void CKirby::Render_IMGUI()
 	}
 
 
-	ImGui::Text("ObjectAddress : %d", INFO(m_pObject));
+	ImGui::Text("HP : %d", (_int)m_fHp);
 	ImGui::Text("ChargeTime : %.2f", INFO(m_fChargeTime));
 	ImGui::Text("MoveSpeed : %.2f", INFO(m_fMoveSpeed));
 	ImGui::Text("PREATTACKSTATE : %d", INFO(m_ePreAttackState));
@@ -256,82 +256,83 @@ HRESULT CKirby::Render_DeferredInfo()
 	}
 
 	return S_OK;
+}
+
+void CKirby::Add_AnimEvent()
+{
+	__super::Add_AnimEvent();
+
+	// 1. 한 애니메이션에서 같은 이름의 이벤트 가능
+	// 2. 재생 기준은 애님툴에서 지정한 애니메이션인지 + 시작 프레임이 애니메이션 프레임안에 들어가는 지
+	// 3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
+	m_pModelCom[INFO(m_eBodyState)]->Add_Event("ApplyDamage", [this]() {
+
+		m_pHitBox->Check_Collision();
+
+		});
+}
+
+void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
+{
+	if (eContent == CCollisionCenter::CONTENT_BODY)
+	{
+		// 흡수중인 몬스터
+		if (pObject->Get_PhyXState() == PO_VACUUMING)
+		{
+			// 일단 EAT으로 넘기는건 같으나, EAT이 끝날 시점에 내가 삼켰던 것이 무엇이였는지 판단 후 애니메이션이 분기된다.
+			INFO(m_isEat) = true;
+			INFO(m_eEyeState) = EYE_IDLE;
+			INFO(m_eMouthState) = MOUTH_ANGER;
+			Change_State(STATE_EAT, 100.f, false, false, BODY_BALLOON);
+			// 임시 보관소. 먹은게 끝났을 떄, 비로소 커비의 어빌리티 타입이 바뀐다.
+			INFO(m_eTemporaryEatType) = pObject->Get_AbilityType();
+
+			if (pObject != nullptr)
+				pObject->Set_PhyXState(PO_KIRBYMOUTH);
+
+			Delete_KirbyEffect();
+		}
+		// 입에 머금은 상태의 몬스터
+		else if (pObject->Get_PhyXState() == PO_KIRBYMOUTH)
+		{
+
+		}
+		// 발사중인 몬스터
+		else if (pObject->Get_PhyXState() == PO_FLYAWAY)
+		{
+
+		}
+		else
+		{
+			// 먹은 상태인 경우
+			if (INFO(m_isEat) == true)
+			{
+				Change_State(STATE_EATDAMAGE, 60.f, false, false, BODY_BALLOON);
+			}
+			// 나는 상태일 경우 . . .
+			else if (true == (Get_State() == STATE_FLIGHTSTART || Get_State() == STATE_FLIGHTFALL || Get_State() == STATE_FLIGHT ||
+				Get_State() == STATE_FLIGHTLANDING || Get_State() == STATE_FLIGHTLIMIT || Get_State() == STATE_FLIGHTLIMITFALL))
+			{
+				Change_State(STATE_FILGHTDAMAGE, 60.f, false, false, BODY_BALLOON);
+			}
+			// 평범한 상태에서...
+			else
+			{
+				Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
+			}
+
+			Delete_KirbyEffect();
+		}
+	}
+
 
 }
 
-void CKirby::Collision_Attack(CGameObject* pOtherObj)
+void CKirby::Collision_Overlap(CGameObject* pGameObject)
 {
-	CPhysXObject* pObject = static_cast<CPhysXObject*>(pOtherObj);
-
-	// 흡수중인 몬스터
-	if (pObject->Get_PhyXState() == PO_VACUUMING)
-	{
-		// 일단 EAT으로 넘기는건 같으나, EAT이 끝날 시점에 내가 삼켰던 것이 무엇이였는지 판단 후 애니메이션이 분기된다.
-		INFO(m_isEat) = true;
-		INFO(m_eEyeState) = EYE_IDLE;
-		INFO(m_eMouthState) = MOUTH_ANGER;
-		//m_ePhyXState = PO_NORMAL;
-		Change_State(STATE_EAT, 100.f, false, false, BODY_BALLOON);
-		// 임시 보관소. 먹은게 끝났을 떄, 비로소 커비의 어빌리티 타입이 바뀐다.
-		INFO(m_eTemporaryEatType) = pObject->Get_AbilityType();
-
-		if (pObject != nullptr)
-		{
-			pObject->Set_PhyXState(PO_KIRBYMOUTH);
-		}
-
-		Delete_KirbyEffect();
-	}
-	// 입에 머금은 상태의 몬스터
-	else if (pObject->Get_PhyXState() == PO_KIRBYMOUTH)
-	{
-		// 서로 반응이 없어야 한다. (단, 이친구는 항상 나를 따라다닐것이다.)
-
-
-
-	}
-	// 발사중인 몬스터
-	else if (pObject->Get_PhyXState() == PO_FLYAWAY)
-	{
-		// 서로 반응이 없어야 한다.
-
-
-
-
-	}
-	// 슬라이드중의 충돌
-	else if (Get_State() == STATE_SLIDE)
-	{
-		pObject->Set_DamageMoving(Make_RepulsiveDir(pObject), 10.f);
-		INFO(m_fJumpVelocity) = 11.f;
-		//INFO(m_fMoveSpeed) = 0.f;
-		Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
-	}
-	// 서로 박치기 해였을 때 충돌
-	else
-	{
-		pObject->Set_DamageMoving(Make_RepulsiveDir(pObject), 5.f);
-
-		INFO(m_fJumpVelocity) = 11.f;
-
-		// 먹은 상태인 경우
-		if (INFO(m_isEat) == true)
-		{
-			Change_State(STATE_EATDAMAGE, 60.f, false, false, BODY_BALLOON);
-		}
-		// 나는 상태일 경우 . . .
-		else if (true == (Get_State() == STATE_FLIGHTSTART || Get_State() == STATE_FLIGHTFALL || Get_State() == STATE_FLIGHT ||
-			Get_State() == STATE_FLIGHTLANDING || Get_State() == STATE_FLIGHTLIMIT || Get_State() == STATE_FLIGHTLIMITFALL))
-		{
-			Change_State(STATE_FILGHTDAMAGE, 60.f, false, false, BODY_BALLOON);
-		}
-		// 평범한 상태에서...
-		else
-		{
-			Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
-		}
-		Delete_KirbyEffect();
-	}
+	// kirby의 뱃살에서 충돌이 일어날 경우 처리해야하는 일들
+	// 여기서부터 n차 회의 진행할것 QZR
+	_int a = 3;
 }
 
 _float3 CKirby::Make_RepulsiveDir(CPhysXObject* pObject)
@@ -363,21 +364,21 @@ void CKirby::Setting_KirbyBalance()
 	// 카메라 기준 실시간 방향 탐색
 	CTransform* pCameraTransform = m_pCamera->Get_TransformCom();
 	_float4 vCamRight = pCameraTransform->Get_State_Vector(CTransform::STATE_RIGHT);
-	_float4 vCamLook = XMVector3Cross(vCamRight, XMVectorSet(0.f, 1.f, 0.f, 1.f));
+	_float4 vCamLook  = XMVector3Cross(vCamRight, XMVectorSet(0.f, 1.f, 0.f, 1.f));
 	_float fCX = vCamLook.x;
 	_float fCZ = vCamLook.z;
 	_float fKX = INFO(m_vMoveDir).x;
 	_float fKZ = INFO(m_vMoveDir).z;
 	_float fAngle = (atan2f(fCX, fCZ) * 180.0f / XM_PI) - (atan2f(fKX, fKZ) * 180.0f / XM_PI);
 	if (fAngle < 0.f) fAngle += 360.0f;
-	if (fAngle >= 337.5f || fAngle < 22.5f) INFO(m_eKirbyDir) = DIR_FRONT;
-	else if (fAngle >= 22.5f && fAngle < 67.5f) INFO(m_eKirbyDir) = DIR_LF;
-	else if (fAngle >= 67.5f && fAngle < 112.5f) INFO(m_eKirbyDir) = DIR_LEFT;
+	if (fAngle >= 337.5f || fAngle < 22.5f)		  INFO(m_eKirbyDir) = DIR_FRONT;
+	else if (fAngle >= 22.5f && fAngle < 67.5f)   INFO(m_eKirbyDir) = DIR_LF;
+	else if (fAngle >= 67.5f && fAngle < 112.5f)  INFO(m_eKirbyDir) = DIR_LEFT;
 	else if (fAngle >= 112.5f && fAngle < 157.5f) INFO(m_eKirbyDir) = DIR_LB;
 	else if (fAngle >= 157.5f && fAngle < 202.5f) INFO(m_eKirbyDir) = DIR_BACK;
 	else if (fAngle >= 202.5f && fAngle < 247.5f) INFO(m_eKirbyDir) = DIR_RB;
 	else if (fAngle >= 247.5f && fAngle < 292.5f) INFO(m_eKirbyDir) = DIR_RIGHT;
-	else if (fAngle >= 292.5 && fAngle < 337.5f) INFO(m_eKirbyDir) = DIR_RF;
+	else if (fAngle >= 292.5 && fAngle < 337.5f)  INFO(m_eKirbyDir) = DIR_RF;
 }
 
 void CKirby::Key_Input(_float fTimeDelta)
@@ -526,11 +527,9 @@ HRESULT CKirby::Add_Components()
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
-	desc.uCollisionType = m_eCollisionGroup;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	m_pControllerCom->Set_Object(this);
-	//m_pControllerCom->Set_CollisionType(m_eCollisionGroup);
 
 	// FOR ANIMTOOL
 	m_ppModelForAnimTool = &m_pModelCom[BODY_DEFAULT];
@@ -539,29 +538,30 @@ HRESULT CKirby::Add_Components()
 	/* FSM */
 	SetUp_FSM();
 
-
-
 	return S_OK;
 }
 
 HRESULT CKirby::Add_PartObjects()
 {
-
 	CKirbyWeapons::KIRBYWEAPON_DESC	WeaponDesc{};
+
 	WeaponDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 	WeaponDesc.pBoneMatrix = &m_WeaponMatrix;
 	WeaponDesc.pAbilityType = &m_eAbilityType;
 	m_pWeapons = static_cast<CKirbyWeapons*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_KirbyWeapons"), &WeaponDesc));
-	if (nullptr == m_pWeapons)
-		return E_FAIL;
+	CHECK_NULLPTR(m_pWeapons);
 
 	CKirbyArmours::KIRBYARMOURS_DESC ArmourDesc{};
 	ArmourDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 	ArmourDesc.pBoneMatrix = &m_ArmourMatrix;
 	ArmourDesc.pAbilityType = &m_eAbilityType;
 	m_pArmours = static_cast<CKirbyArmours*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_KirbyArmours"), &ArmourDesc));
-	if (nullptr == m_pArmours)
-		return E_FAIL;
+	CHECK_NULLPTR(m_pArmours);
+
+	CHitBox::HITBOX_DESC HitBoxDesc{};
+	HitBoxDesc.pOwner = this;
+	m_pHitBox = static_cast<CHitBox*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_HitBox"), &HitBoxDesc));
+	CHECK_NULLPTR(m_pHitBox);
 
 	return S_OK;
 }
@@ -576,6 +576,7 @@ HRESULT CKirby::Bind_ShaderResources()
 
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
+
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
@@ -927,7 +928,13 @@ void CKirby::Free()
 
 	Safe_Release(m_pWeapons);
 	Safe_Release(m_pArmours);
+
+	if (INFO(m_pObject) != nullptr)
+		Safe_Release(INFO(m_pObject));
+
+	Safe_Release(m_pHitBox);
 	for (auto& fx : m_KirbyFXList)
 		Safe_Release(fx);
 
 }
+

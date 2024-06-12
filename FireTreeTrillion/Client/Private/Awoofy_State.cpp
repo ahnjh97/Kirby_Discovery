@@ -413,6 +413,29 @@ void CAwoofy_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			pAwoofy->Set_Dead();
 		}
 	}
+	// 죽는 도중이다.	 (날아가다 터질예정임)
+	else if (pAwoofy->Get_PhyXState() == PO_FLYDEADAWAY)
+	{
+		m_fDeadTime += fTimeDelta;
+
+		// 일단 그 방향으로 바라보게만 한다.
+		_float3 vDamegeDir = pAwoofy->Get_DamegeDir();
+		pTransformCom->Look_At_Axis(-vDamegeDir);
+
+		// 이제 날아가는 것을 구현해보자.
+		pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 10.f, fTimeDelta);
+
+		// 점프되는 체공시간을 구현해보자.
+		_float fDamageJumpPower = pAwoofy->Get_DamageJumpPower();
+		pController->Jump(pTransformCom, fDamageJumpPower, fTimeDelta);
+		fDamageJumpPower -= GRAVITY * fTimeDelta * 3.f;
+
+		pAwoofy->Set_DamageJumpPower(fDamageJumpPower);
+
+		if (m_fDeadTime > 0.7f)
+			pAwoofy->Set_Dead();
+
+	}
 
 
 }

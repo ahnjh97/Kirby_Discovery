@@ -52,9 +52,13 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
 		return E_FAIL;
 
-	// TEST (블러와 블랜드의 관계)
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Moon"), TEXT("Prototype_GameObject_Moon"))))
-	//	return E_FAIL;
+	// TEST (아이템 보이)
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Item"), TEXT("Prototype_GameObject_EnergyDrink"))))
+		return E_FAIL;
+
+	if (FAILED(Ready_Layer_MapObject(TEXT("Layer_MapObject"))))
+		return E_FAIL;
+
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
@@ -159,9 +163,6 @@ HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
 	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_SkySphere"));
 	CHECK_FAILED(hr);
-
-	/*hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_WasteCan"));
-	CHECK_FAILED(hr);*/
 
 	return S_OK;
 }
@@ -450,6 +451,14 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 	return S_OK;
 }
 
+HRESULT CLevel_GamePlay::Ready_Layer_MapObject(const wstring& strLayerTag)
+{
+	HRESULT hr;
+	hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_WasteCan"));
+	CHECK_FAILED(hr);
+	return S_OK;
+}
+
 _bool CLevel_GamePlay::Load_FileData(const string& _strFilePath, FILE_TYPE _eFileType, const wstring& _wstrLayerTag)
 {
 	std::ifstream InputFile(_strFilePath, ios::in | std::ios::binary);
@@ -557,7 +566,6 @@ HRESULT CLevel_GamePlay::Add_EnvMap()
 	//Normal 던진다.
 	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture[TYPE_NORMAL], "g_RandomNormalTexture")))
 		return E_FAIL;
-
 
 	return S_OK;
 }

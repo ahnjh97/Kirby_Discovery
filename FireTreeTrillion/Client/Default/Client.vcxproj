@@ -191,18 +191,22 @@
     <ClInclude Include="..\public\Camera_Main.h" />
     <ClInclude Include="..\Public\Character.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
+    <ClInclude Include="..\Public\CollisionCenter.h" />
+    <ClInclude Include="..\Public\EnergyDrink.h" />
     <ClInclude Include="..\Public\FXToolDirector.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\Public\Grid.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\Public\HitBox.h" />
     <ClInclude Include="..\Public\HUD.h" />
     <ClInclude Include="..\Public\HUD_KirbyStatus.h" />
     <ClInclude Include="..\Public\HUD_StarPoint.h" />
     <ClInclude Include="..\Public\ImSequencer.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\Public\ItemObject.h" />
     <ClInclude Include="..\Public\Kabu.h" />
     <ClInclude Include="..\Public\Kabu_State.h" />
     <ClInclude Include="..\Public\KirbyBoom_State.h" />
@@ -289,18 +293,22 @@
     <ClCompile Include="..\private\Camera_Free.cpp" />
     <ClCompile Include="..\private\Camera_Main.cpp" />
     <ClCompile Include="..\Private\Character.cpp" />
+    <ClCompile Include="..\Private\CollisionCenter.cpp" />
+    <ClCompile Include="..\Private\EnergyDrink.cpp" />
     <ClCompile Include="..\Private\FXToolDirector.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\Private\Grid.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\Private\HitBox.cpp" />
     <ClCompile Include="..\Private\HUD.cpp" />
     <ClCompile Include="..\Private\HUD_KirbyStatus.cpp" />
     <ClCompile Include="..\Private\HUD_StarPoint.cpp" />
     <ClCompile Include="..\Private\ImSequencer.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\Private\ItemObject.cpp" />
     <ClCompile Include="..\Private\Kabu.cpp" />
     <ClCompile Include="..\Private\Kabu_State.cpp" />
     <ClCompile Include="..\Private\Level_Intro.cpp" />

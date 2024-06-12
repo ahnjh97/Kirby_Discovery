@@ -1,6 +1,7 @@
 #pragma once
 #include "Client_Defines.h"
 #include "GameObject.h"
+#include "CollisionCenter.h"
 
 BEGIN(Client)
 
@@ -25,6 +26,9 @@ public:
 	virtual HRESULT Render()						override;
 	virtual HRESULT Render_LightDepth()				override;
 
+	// 충돌처리 함수 ( 피직스를 사용하는 것들 끼리 충돌했을 때 발생하는 함수이다. )
+	virtual void		Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) {}
+
 #ifdef _DEBUG
 	virtual void	Render_IMGUI()					override;
 #endif
@@ -46,6 +50,8 @@ public:
 
 	void				Set_PhyXState(PHYXOBJECT_CURSTATE eState) { m_ePhyXState = eState; }
 	PHYXOBJECT_CURSTATE Get_PhyXState() { return m_ePhyXState; }
+
+	COLLISION_TYPE		Get_CollisionType() { return m_eCollisionGroup; }
 
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;
@@ -70,6 +76,7 @@ protected:
 	// 피직스 오브젝트들의 현재 큰 상태를 의미한다.
 	PHYXOBJECT_CURSTATE m_ePhyXState = { PO_NORMAL };
 
+	COLLISION_TYPE m_eCollisionGroup = { COLLISION_END };
 };
 
 END

@@ -55,6 +55,7 @@
 #include "TestModel.h"
 #include "TestTerrain.h"
 #include "Kirby.h"
+#include "HitBox.h"
 
 // 몬스터
 #include "KirbyWeapons.h"
@@ -77,6 +78,9 @@
 #include "HUD.h"
 #include "HUD_KirbyStatus.h"
 #include "HUD_StarPoint.h"
+
+// 아이템
+#include "EnergyDrink.h"
 #pragma endregion
 
 
@@ -225,6 +229,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kirby"), CKirby);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KirbyWeapons"), CKirbyWeapons);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KirbyArmours"), CKirbyArmours);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HitBox"), CHitBox);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Awoofy"), CAwoofy);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Rabbit"), CRabbit);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Buffahorn"), CBuffahorn);
@@ -242,6 +247,9 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Moon"), CMoon);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("WasteCan"), CWasteCan);
+
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("EnergyDrink"), CEnergyDrink);
+
 #pragma endregion
 
 	return S_OK;
@@ -661,6 +669,10 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// For Mab Interactive Object
 		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM);
+
+		// For Item
+		m_vecModelInfo.emplace_back("Item_EnergyDrink", TYPE_NONANIM, 3.f);
+
 	}
 	else if (eLevel == LEVEL_GAMEPLAY)
 	{
@@ -706,6 +718,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// For Mab Interactive Object
 		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM);
+
+		// For Item
+		m_vecModelInfo.emplace_back("Item_EnergyDrink", TYPE_NONANIM, 3.f);
 	}
 	else if (eLevel == LEVEL_TOOL_MAP)
 	{
@@ -722,6 +737,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	{
 		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
+
 		m_vecModelInfo.emplace_back("BladeKnightSword",  TYPE_NONANIM, 1.f);
 	}
 

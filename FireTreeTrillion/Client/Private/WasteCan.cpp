@@ -29,7 +29,7 @@ HRESULT CWasteCan::Initialize(void* pArg)
 	CHECK_FAILED(hr);
 
 	Add_Components();
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(0.f, 10.f, -180.f, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(rand() % 20, 15.f, -180.f, 1.f));
 
 	hr = m_pModelCom->CreateDynamicActor(m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION));
 	CHECK_FAILED(hr);
@@ -52,6 +52,8 @@ void CWasteCan::Late_Tick(_float fTimeDelta)
 	__super::Late_Tick(fTimeDelta);
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+
+	m_pModelCom->Update_ActorTransform(m_pTransformCom);
 }
 
 HRESULT CWasteCan::Render()

@@ -34,17 +34,6 @@ private:
 	_bool	Render_RTVFonts();
 #endif // _DEBUG
 
-	//Parsing TEST
-	void		CreateXML();
-	void		Read_XML();
-	void		Create_N_ReadJSON();
-	void		Create_JSON();
-
-	_bool	ParseJson(Document& doc, const string& jsonData);
-	string	JsonDocToString(Document& doc, bool isPretty = false);
-	void	TestJson_Parse();
-	void	TestJson_AddMember();
-
 public:	
 	static CMainApp* Create();
 	virtual void Free() override;

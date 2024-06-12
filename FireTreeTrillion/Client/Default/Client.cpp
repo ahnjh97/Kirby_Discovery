@@ -8,6 +8,7 @@
 #include "GameInstance.h"
 
 #define MAX_LOADSTRING 100
+//#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
 
 // 전역 변수:
 HINSTANCE g_hInst;                                // 현재 인스턴스입니다.
