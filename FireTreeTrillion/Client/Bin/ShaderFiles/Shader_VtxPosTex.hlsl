@@ -223,7 +223,7 @@ PS_OUT PS_MAIN_WHITEFX(PS_IN_ALPHABLEND In)
     
     //diffuse 알파 테스팅
     vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord + g_vUVOffset);
-    if (vDiffuse.a < .01f)
+    if (vDiffuse.a < .01f || (vDiffuse.r < 0.1f && vDiffuse.g < 0.1f && vDiffuse.b < 0.1f))
         discard;
     
     Out.vColor.rgb = vDiffuse.rgb * g_vRColor;
