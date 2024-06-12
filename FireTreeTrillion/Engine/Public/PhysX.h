@@ -121,22 +121,13 @@ public:
 
     // for 순수가상함수
     virtual void    onObstacleHit(const PxControllerObstacleHit& hit) override {}
-
-    void            CollsionEvent(class CGameObject* pObj, class CGameObject* pOtherObj);
-
 };
 
 class CControllerFilterCallback : public PxControllerFilterCallback
 {
 public:
-    virtual bool                             filter(const PxController& a, const PxController& b) override;
+    virtual bool                             filter(const PxController& a, const PxController& b) override { return true; }
     
-    const unordered_set<const PxController*> Get_Controllers();
-    void                                     Clear_Collisions();
-    
-    // NOT YET
-    bool                                     Has_Collided(const PxController* controller) const;
-
 private:
     unordered_set<const PxController*>       m_setControllers;
 

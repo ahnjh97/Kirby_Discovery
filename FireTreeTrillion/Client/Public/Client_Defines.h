@@ -90,5 +90,6 @@ enum COLLISION_TYPE
     INTERACT,
     ITEM,
     TRIGGER,
+    HITBOX,
     COLLISION_END
 };

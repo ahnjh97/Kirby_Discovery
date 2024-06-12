@@ -46,8 +46,6 @@ public:
 	_float4			Get_FootPosition();
 
 	_float			Get_Radius() const { return m_tControllerCapsuleDesc.radius; }
-	void			Clear_Collisions();
-	_bool			Has_Collided();
 	void			RegisterAsPlayer();
 
 public:

@@ -19,7 +19,6 @@ HRESULT CCharacterController::Initialize(void* pArg)
 {
 	CONTROLLER_DESC* pDes = (CONTROLLER_DESC*)pArg;
 	_float4 vInitialPos = pDes->vInitialPos;
-	m_eCollisionType = (COLLISION_TYPE)pDes->uCollisionType;
 	m_eType = pDes->eType;
 	if (m_eType == CAPSULE)
 	{
@@ -130,22 +129,6 @@ _float4 CCharacterController::Get_FootPosition()
 	const auto vPos = m_pController->getFootPosition();
 	return _float4{(_float)vPos.x, (_float)vPos.y, (_float)vPos.z, 1.f};
 }
-
-
-// ======================== HITBOX를 위한 함수들 ========================
-// HITBOX와 충돌처리된 controller들을 담은 unordered_set을 초기화
-void CCharacterController::Clear_Collisions()
-{
-	m_pControllerFilterCallback->Clear_Collisions();
-}
-
-// HITBOX와 충돌된 controller들을 배출
-_bool CCharacterController::Has_Collided()
-{
-	return m_pControllerFilterCallback->Has_Collided(m_pController);
-}
-// ====================================================================
-
 
 /// <summary> 객체의 Look방향으로 '이동'하는 함수 </summary>
 /// <param name="pTransform"> 객체의 Transform </param>
