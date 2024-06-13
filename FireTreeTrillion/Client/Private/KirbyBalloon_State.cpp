@@ -50,6 +50,8 @@ void CKirbyBalloon_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 				CMultiEffect::MULTI_FX_DESC FXDesc{};
 
 				_float4 vMyPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+				vMyPos += pTransformCom->Get_State(CTransform::STATE_LOOK) * .2f;
+
 				FXDesc.vInitPos = { vMyPos.x, vMyPos.y + .3f, vMyPos.z };
 				FXDesc.vInitScale = { 2.f, 2.f, 2.f };
 
@@ -70,17 +72,17 @@ void CKirbyBalloon_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 				_float3 vAngle = { 0.f, fAngleDiff, 0.f };
 				FXDesc.vInitRot = vAngle;
 
-				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star Pink"), &FXDesc)))
+				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star Pink_bloom"), &FXDesc)))
 					return;
 
 				FXDesc.fStartDelay = .15f;
-				FXDesc.vInitScale = { 1.3f, 1.3f, 1.3f };
+				//FXDesc.vInitScale = { 1.3f, 1.3f, 1.3f };
 
-				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star Pink"), &FXDesc)))
+				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star Pink_nonBloom"), &FXDesc)))
 					return;
 
 				FXDesc.fStartDelay = .3f;
-				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star Pink"), &FXDesc)))
+				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star Pink_nonBloom"), &FXDesc)))
 					return;
 			}
 		}
