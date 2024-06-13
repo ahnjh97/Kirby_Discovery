@@ -60,15 +60,7 @@ void CKirbyBalloon_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 				FXDesc.vInitPos = { vMyPos.x, vMyPos.y + 1.f, vMyPos.z };
 
 				_float3 vDir = CUtils::Get_State_Vector_Matrix(m_pGameInstance->Get_Transform_Inv(CPipeLine::D3DTS_VIEW), CUtils::STATE_LOOK);
-				vDir.Normalize();
-				_float3 vLook = { 0.f, 0.f, 1.f };
-
-				_float fAngleLook = atan2f(vLook.z, vLook.x);
-				_float fAngleDiff = fAngleLook - atan2f(vDir.z, vDir.x);
-				fAngleDiff = ToDegree(fAngleDiff);
-
-				_float3 vAngle = { 0.f, fAngleDiff, 0.f };
-				FXDesc.vInitRot = vAngle;
+				FXDesc.vInitRot = CUtils::Make_Degree_FromDir(vDir);
 
 				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star Pink"), &FXDesc)))
 					return;

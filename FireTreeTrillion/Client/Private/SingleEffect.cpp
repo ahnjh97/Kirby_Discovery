@@ -169,6 +169,9 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 	}
 
 
+	if (m_bIsBillboard)
+		Billboard_Effect();
+
 	return OBJ_NOEVENT;
 }
 
