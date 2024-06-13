@@ -247,6 +247,9 @@
     <Filter Include="02.GameObjects\PhysXObject\Item\EnergyDrink">
       <UniqueIdentifier>{e5a44464-aceb-4ed8-97a0-0e8e21890bb7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Item\Coin">
+      <UniqueIdentifier>{fec82fe1-9a7e-4145-957f-e7c4662e02ff}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -497,6 +500,9 @@
     <ClInclude Include="..\Public\EnergyDrink.h">
       <Filter>02.GameObjects\PhysXObject\Item\EnergyDrink</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Coin.h">
+      <Filter>02.GameObjects\PhysXObject\Item\Coin</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -728,6 +734,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\EnergyDrink.cpp">
       <Filter>02.GameObjects\PhysXObject\Item\EnergyDrink</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Coin.cpp">
+      <Filter>02.GameObjects\PhysXObject\Item\Coin</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,25 +1,24 @@
 #include "stdafx.h"
-#include "EnergyDrink.h"
+#include "Coin.h"
 
-
-CEnergyDrink::CEnergyDrink(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CCoin::CCoin(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CItemObject{ pDevice, pContext }
 {
 }
 
-CEnergyDrink::CEnergyDrink(const CEnergyDrink& rhs)
+CCoin::CCoin(const CCoin& rhs)
 	: CItemObject{ rhs }
 {
 }
 
-HRESULT CEnergyDrink::Initialize_Prototype()
+HRESULT CCoin::Initialize_Prototype()
 {
 	m_eCollisionGroup = ITEM;
 
 	return S_OK;
 }
 
-HRESULT CEnergyDrink::Initialize(void* pArg)
+HRESULT CCoin::Initialize(void* pArg)
 {
 	GAMEOBJECT_DESC		GameObjectDesc{};
 	if (nullptr != pArg)
@@ -31,19 +30,22 @@ HRESULT CEnergyDrink::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(10.f, 10.f, -180.f, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(5.f, 10.f, -175.f, 1.f));
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
+	m_eItemType = ITEM_COIN;
+	m_iItemPoint = 1;
 
-	m_eItemType = ITEM_FOOD;
-	m_iItemPoint = 30;
+
+	m_vTargetPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	m_vTargetPos.y += 4.f;
 
 	return S_OK;
 }
 
-_int CEnergyDrink::Tick(_float fTimeDelta)
+_int CCoin::Tick(_float fTimeDelta)
 {
 	if (m_bDead == true)
 		return OBJ_DEAD;
@@ -52,75 +54,50 @@ _int CEnergyDrink::Tick(_float fTimeDelta)
 	__super::Tick(m_fTimeDelta);
 
 
-	// 충돌이 아직 안 되었다면
-	m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), m_fTimeDelta, 270.f);
-
 	// 충돌이 완료 되었다면
 	if (m_bCollisionComplete == true)
 	{
-		if (m_fDrinkTime < 0.3f)
+		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), m_fTimeDelta, 960.f);
+
+		m_fCoinTime += m_fTimeDelta;
+		_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+
+		_float4 fUpDelta = (m_vTargetPos - vPos);
+
+		if (m_fCoinTime > 0.7f)
 		{
-			m_fDrinkTime += m_fTimeDelta;
-			_float fScaled = (0.3f + m_fDrinkTime) / 0.4f;
-			if (fScaled > 1.f)
-				fScaled = 1.f;
-
-			m_pTransformCom->Set_Scaled(fScaled, fScaled, fScaled);
-
-			_vector vTargetPos = m_pPlayer->Get_TransformCom()->Get_State_Vector(CTransform::STATE_POSITION);
-			vTargetPos.m128_f32[1] += 2.f;
-
-			_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-			_vector vDir = vTargetPos - vPos;
-
-			m_pControllerCom->Move_Dir(m_pTransformCom, vDir * m_fTimeDelta * 10.f, m_fTimeDelta);
+			m_bDead = true;
 		}
-		else if (0.3f <= m_fDrinkTime && m_fDrinkTime <= 0.8f)
-		{
-			m_fDrinkTime += m_fTimeDelta;
 
-			_vector vTargetPos = m_pPlayer->Get_TransformCom()->Get_State_Vector(CTransform::STATE_POSITION);
-			vTargetPos.m128_f32[1] += 2.f;
 
-			_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-			_vector vDir = vTargetPos - vPos;
-
-			m_pControllerCom->Move_Dir(m_pTransformCom, vDir * m_fTimeDelta * 10.f, m_fTimeDelta);
-		}
-		else
-		{
-			m_fDrinkTime += m_fTimeDelta * 4.f;
-
-			_float fScaled = (1.8f - m_fDrinkTime) / 1.0f;
-			m_pTransformCom->Set_Scaled(fScaled, fScaled, fScaled);
-			if (fScaled < 0.05f)
-			{
-				m_bDead = true;
-			}
-
-			_vector vTargetPos = m_pPlayer->Get_TransformCom()->Get_State_Vector(CTransform::STATE_POSITION);
-			_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-			_vector vDir = vTargetPos - vPos;
-
-			m_pControllerCom->Move_Dir(m_pTransformCom, vDir * m_fTimeDelta * 10.f, m_fTimeDelta);
-
-		}
+		m_pControllerCom->Move_Dir(m_pTransformCom, fUpDelta * m_fTimeDelta * 5.f, m_fTimeDelta);
+	}
+	// 충돌이 안 되었다면
+	else
+	{
+		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), m_fTimeDelta, 270.f);
 	}
 
 
 	return OBJ_NOEVENT;
 }
 
-void CEnergyDrink::Late_Tick(_float fTimeDelta)
+void CCoin::Late_Tick(_float fTimeDelta)
 {
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
+
+		if (m_fCoinTime > 0.35f)
+		{
+			m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
+		}
 	}
+
 }
 
-HRESULT CEnergyDrink::Render()
+HRESULT CCoin::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
@@ -151,7 +128,7 @@ HRESULT CEnergyDrink::Render()
 	return S_OK;
 }
 
-HRESULT CEnergyDrink::Render_LightDepth()
+HRESULT CCoin::Render_LightDepth()
 {
 	if (FAILED(m_pGameInstance->Render_LightDepth_For_GameObject(m_pShaderCom, m_pTransformCom, m_pModelCom)))
 		return E_FAIL;
@@ -159,30 +136,19 @@ HRESULT CEnergyDrink::Render_LightDepth()
 	return S_OK;
 }
 
-#ifdef _DEBUG
-void CEnergyDrink::Render_IMGUI()
+void CCoin::Render_IMGUI()
 {
-
 }
-#endif
 
-void CEnergyDrink::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
+void CCoin::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
 	if (eContent == CCollisionCenter::CONTENT_ITEM)
 	{
-		if (m_pPlayer == nullptr)
-		{
-			m_pPlayer = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"));
-			Safe_AddRef(m_pPlayer);
-
-
-			// 충돌이 완료되었다는 뜻. 반드시 해주어야 함.
-			m_bCollisionComplete = true;
-		}
+		m_bCollisionComplete = true;
 	}
 }
 
-HRESULT CEnergyDrink::Add_Components()
+HRESULT CCoin::Add_Components()
 {
 	HRESULT hr;
 
@@ -191,7 +157,7 @@ HRESULT CEnergyDrink::Add_Components()
 	CHECK_FAILED(hr);
 
 	// 커비의 기본 상태 모델
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Item_EnergyDrink"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Item_Coin"),
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
@@ -204,9 +170,10 @@ HRESULT CEnergyDrink::Add_Components()
 	m_pControllerCom->Set_Object(this);
 
 	return S_OK;
+
 }
 
-HRESULT CEnergyDrink::Bind_ShaderResources()
+HRESULT CCoin::Bind_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
@@ -222,38 +189,35 @@ HRESULT CEnergyDrink::Bind_ShaderResources()
 	return S_OK;
 }
 
-CEnergyDrink* CEnergyDrink::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CCoin* CCoin::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	CEnergyDrink* pInstance = new CEnergyDrink(pDevice, pContext);
+	CCoin* pInstance = new CCoin(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CEnergyDrink"));
+		MSG_BOX(TEXT("Failed To Created : CCoin"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CGameObject* CEnergyDrink::Clone(void* pArg)
+CGameObject* CCoin::Clone(void* pArg)
 {
-	CEnergyDrink* pInstance = new CEnergyDrink(*this);
+	CCoin* pInstance = new CCoin(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CEnergyDrink"));
+		MSG_BOX(TEXT("Failed To Created : CCoin"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CEnergyDrink::Free()
+void CCoin::Free()
 {
 	__super::Free();
-
-	if (m_pPlayer != nullptr)
-		Safe_Release(m_pPlayer);
 
 	Safe_Release(m_pModelCom);
 }

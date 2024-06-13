@@ -198,8 +198,8 @@ _bool CCollisionCenter::Kirby_Dodge_SlowMotionSystem(CPhysXObject* pPlayer)
 		_vector vKirbyPos = pKirby->Get_TransformCom()->Get_State_Vector(CTransform::STATE_POSITION);
 
 		GAMEINSTANCE Set_FirstTimerRatio(0.5f);
-		GAMEINSTANCE Set_SecondTimerRatio(0.5f);
-		GAMEINSTANCE Setting_RadialBlur(vKirbyPos, 30.f, 15.f);
+		GAMEINSTANCE Set_SecondTimerRatio(0.2f);
+		GAMEINSTANCE Setting_RadialBlur(vKirbyPos, 30.f, 10.f);
 		GAMEINSTANCE Set_BlackBackGround(true);
 		m_bCheckTimer = true;
 		return true;
@@ -309,7 +309,7 @@ void CCollisionCenter::Timer_System(_float fTimeDelta)
 			GAMEINSTANCE Set_BlackBackGround(false);
 		}
 		
-		if (m_fTimeDeltaResetTime > 2.f)
+		if (m_fTimeDeltaResetTime > 4.f)
 		{
 			GAMEINSTANCE Restore_SecondTimer();
 

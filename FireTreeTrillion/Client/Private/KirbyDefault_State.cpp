@@ -275,7 +275,7 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_B, KEY_DOWN))
 	{
-		pKirby->Change_State(CKirby::STATE_LADDERWAITSTART, 50.f, false, false, CKirby::BODY_DEFAULT);
+		pKirby->Change_State(CKirby::STATE_LADDERWAITSTART, 200.f, false, false, CKirby::BODY_DEFAULT);
 
 	}
 
@@ -1261,6 +1261,8 @@ void CKirbyDefault_Ladder_State::OnStateUpdate(CGameObject* pGameObject, _float 
 	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
+	Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
+
 	// 레더 Wait 대기모션
 	if (pKirby->Get_State() == CKirby::STATE_LADDERWAITSTART)
 	{
@@ -1273,11 +1275,11 @@ void CKirbyDefault_Ladder_State::OnStateUpdate(CGameObject* pGameObject, _float 
 	{
 		if (GAMEINSTANCE Get_DIKeyState(DIK_UP, KEY_PRESS))
 		{
-			pKirby->Change_State(CKirby::STATE_LADDERUP, 60.f, true, true, CKirby::BODY_DEFAULT);
+			pKirby->Change_State(CKirby::STATE_LADDERUP, 80.f, true, true, CKirby::BODY_DEFAULT);
 		}
 		else if (GAMEINSTANCE Get_DIKeyState(DIK_DOWN, KEY_PRESS))
 		{
-			pKirby->Change_State(CKirby::STATE_LADDERDOWN, 60.f, true, true, CKirby::BODY_DEFAULT);
+			pKirby->Change_State(CKirby::STATE_LADDERDOWN, 80.f, true, true, CKirby::BODY_DEFAULT);
 		}
 
 
@@ -1308,7 +1310,7 @@ void CKirbyDefault_Ladder_State::OnStateUpdate(CGameObject* pGameObject, _float 
 			pKirby->Change_State(CKirby::STATE_LADDERWAIT, 60.f, true, true, CKirby::BODY_DEFAULT);
 		}
 
-
+		pController->Move_Dir(pTransformCom, vLadderDir * fTimeDelta * 8.f, fTimeDelta);
 
 	}
 	else if (pKirby->Get_State() == CKirby::STATE_LADDERDOWN)
@@ -1318,8 +1320,10 @@ void CKirbyDefault_Ladder_State::OnStateUpdate(CGameObject* pGameObject, _float 
 			pKirby->Change_State(CKirby::STATE_LADDERWAIT, 60.f, true, true, CKirby::BODY_DEFAULT);
 		}
 
+		pController->Move_Dir(pTransformCom, vLadderDir * fTimeDelta * -8.f, fTimeDelta);
 
-
+		if (pController->Is_Terrain())
+			pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
 	}
 
 }

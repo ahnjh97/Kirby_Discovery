@@ -186,6 +186,7 @@ public:
 	virtual void OnStateExit()														override;
 
 public:
+	_float4	vLadderDir = { 0.f, 1.f, 0.f, 0.f };
 	static	CKirbyDefault_Ladder_State* Create();
 	virtual void						Free() override;
 };
