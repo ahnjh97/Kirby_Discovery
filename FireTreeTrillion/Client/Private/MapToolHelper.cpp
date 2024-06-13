@@ -673,7 +673,7 @@ void CMapToolHelper::Save_Level()
 		MSG_BOX(TEXT("List is empty."));
 		return;
 	}
-
+	
 	RegisterRallyPoints(pObjectsList);
 		
 	for (auto& object : *pObjectsList)

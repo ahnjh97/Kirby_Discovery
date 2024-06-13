@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "EnergyDrink.h"
-
+#include "MultiEffect.h"
 
 CEnergyDrink::CEnergyDrink(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CItemObject{ pDevice, pContext }
@@ -39,6 +39,19 @@ HRESULT CEnergyDrink::Initialize(void* pArg)
 
 	m_eItemType = ITEM_FOOD;
 	m_iItemPoint = 30;
+
+
+
+	CMultiEffect::MULTI_FX_DESC FXDesc{};
+
+	//_float4 vMyPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	FXDesc.vInitPos = { 0.f, .3f, 0.f };
+	FXDesc.vInitScale = { 1.8f, 1.8f, 1.8f };
+	FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+
+	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_ItemBubble"), &FXDesc)))
+		return E_FAIL;
+
 
 	return S_OK;
 }
@@ -162,6 +175,7 @@ HRESULT CEnergyDrink::Render_LightDepth()
 #ifdef _DEBUG
 void CEnergyDrink::Render_IMGUI()
 {
+
 }
 #endif
 

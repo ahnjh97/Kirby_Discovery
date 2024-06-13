@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "KirbyBalloon_State.h"
 #include "Kirby_State_Function.h"
-
+#include "MultiEffect.h"
 #pragma region BALLOON IDLE STATE
 
 CKirbyBalloon_Idle_State::CKirbyBalloon_Idle_State()
@@ -46,6 +46,36 @@ void CKirbyBalloon_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 			{
 				DESC(m_isEat) = false;
 				pKirby->Change_State(CKirby::STATE_SWALLOWSTART, 60.f, false, false, CKirby::BODY_BALLOON);
+
+				CMultiEffect::MULTI_FX_DESC FXDesc{};
+
+				_float4 vMyPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+				vMyPos += pTransformCom->Get_State(CTransform::STATE_LOOK) * .2f;
+
+				FXDesc.vInitPos = { vMyPos.x, vMyPos.y + .3f, vMyPos.z };
+				FXDesc.vInitScale = { 2.f, 2.f, 2.f };
+
+				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Smoke"), &FXDesc)))
+					return;
+
+
+
+				_float3 vDir = CUtils::Get_State_Vector_Matrix(m_pGameInstance->Get_Transform_Inv(CPipeLine::D3DTS_VIEW), CUtils::STATE_LOOK);
+				vMyPos += static_cast<_float4>(vDir);
+				FXDesc.vInitPos = { vMyPos.x, vMyPos.y + 1.f, vMyPos.z };
+				
+				FXDesc.vInitRot = CUtils::Make_Degree_FromDir(vDir);
+
+				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star Pink"), &FXDesc)))
+					return;
+
+				FXDesc.fStartDelay = .15f;
+				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star Pink_nonBloom"), &FXDesc)))
+					return;
+
+				FXDesc.fStartDelay = .3f;
+				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star Pink_nonBloom"), &FXDesc)))
+					return;
 			}
 		}
 	}

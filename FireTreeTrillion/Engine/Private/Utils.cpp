@@ -138,9 +138,34 @@ Quaternion CUtils::Make_Quat_FromDir(const _float4& _dir)
 {
 	_float3 vStartDir{ 0.f, 0.f, 1.f };
 	_float3 vDestDir = _dir;
-	
+	vDestDir.Normalize();
 
 	return Quaternion::FromToRotation(vStartDir, vDestDir);
+}
+
+Quaternion CUtils::Make_Quat_FromDir(const _float3& _dir)
+{
+	_float3 vStartDir{ 0.f, 0.f, 1.f };
+	_float3 vDestDir = _dir;
+	vDestDir.Normalize();
+
+	return Quaternion::FromToRotation(vStartDir, vDestDir);
+}
+
+_float3 CUtils::Make_Degree_FromDir(const _float4& _dir)
+{
+	Quaternion vQuat = Make_Quat_FromDir(_dir);
+	_float3 vEulerAngle = vQuat.ToEuler();
+
+	return _float3( ToDegree(vEulerAngle.x), ToDegree(vEulerAngle.y), ToDegree(vEulerAngle.z) );
+}
+
+_float3 CUtils::Make_Degree_FromDir(const _float3& _dir)
+{
+	Quaternion vQuat = Make_Quat_FromDir(_dir);
+	_float3 vEulerAngle = vQuat.ToEuler();
+
+	return _float3(ToDegree(vEulerAngle.x), ToDegree(vEulerAngle.y), ToDegree(vEulerAngle.z));
 }
 
 void CUtils::Set_State_Matrix(_Inout_ _float4x4& matrix, STATE eState, _fvector vState)
@@ -392,7 +417,7 @@ HRESULT CUtils::Load_Effect(path _FilePath, PARTICLE_DATA* _pData)
 
 	InputFile.read(reinterpret_cast<char*>(&_pData->bIsLoop), sizeof(_bool));
 	InputFile.read(reinterpret_cast<char*>(&_pData->bIsBillboard), sizeof(_bool));
-	InputFile.read(reinterpret_cast<char*>(&_pData->bIsColorRender), sizeof(_bool));
+	//InputFile.read(reinterpret_cast<char*>(&_pData->bIsColorRender), sizeof(_bool));
 	InputFile.read(reinterpret_cast<char*>(&_pData->bIsBloom), sizeof(_bool));
 
 

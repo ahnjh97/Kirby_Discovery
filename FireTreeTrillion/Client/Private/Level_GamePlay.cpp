@@ -52,9 +52,11 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
 		return E_FAIL;
 
-	// TEST (아이템 보이)
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Item"), TEXT("Prototype_GameObject_EnergyDrink"))))
-	//	return E_FAIL;
+	// Item Test
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Item"), TEXT("Prototype_GameObject_EnergyDrink"))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Item"), TEXT("Prototype_GameObject_Coin"))))
+		return E_FAIL;
 
 	if (FAILED(Ready_Layer_MapObject(TEXT("Layer_MapObject"))))
 		return E_FAIL;
@@ -144,11 +146,11 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
 
 	CCamera_Free::CAMERA_FREE_DESC		CameraDesc{};
 	CameraDesc.fMouseSensor = 0.1f;
-	CameraDesc.fFovy = XMConvertToRadians(40.0f);
+	CameraDesc.fFovy = XMConvertToRadians(30.0f);
 	CameraDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	CameraDesc.fNear = 0.1f;
 	CameraDesc.fFar = 1000.0f;
-	CameraDesc.vEye = _float4(0.f, 2.f, -1.f, 1.f);
+	CameraDesc.vEye = _float4(0.f, .5f, -1.f, 1.f);
 	CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
 	CameraDesc.fSpeedPerSec = 10.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
@@ -363,7 +365,9 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 		{
 			CKabu::KABU_DESC KabuDesc = {};
 			KabuDesc.matWorld = matWorld;
-			KabuDesc.wstrModelName = tempDesc.wstrModelName;
+			KabuDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			KabuDesc.iShaderVars = iShaderVars;
+			KabuDesc.fRimWidth = fRimWidth;
 			KabuDesc.eMoveState = CKabu::KABUMOVING_STATE(iTriggerIndex);
 			KabuDesc.vecRallyPoints = vecRallyPoints;
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Kabu"), &KabuDesc)))
@@ -373,7 +377,9 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 		{
 			CBrontoBurt::BRONTOBURT_DESC BrontoBurtDesc = {};
 			BrontoBurtDesc.matWorld = matWorld;
-			BrontoBurtDesc.wstrModelName = tempDesc.wstrModelName;
+			BrontoBurtDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			BrontoBurtDesc.iShaderVars = iShaderVars;
+			BrontoBurtDesc.fRimWidth = fRimWidth;
 			BrontoBurtDesc.eMoveState = CBrontoBurt::BRONTOBURTMOVING_STATE(iTriggerIndex);
 			BrontoBurtDesc.vecRallyPoints = vecRallyPoints;
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BrontoBurt"), &BrontoBurtDesc)))
@@ -459,7 +465,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_MapObject(const wstring& strLayerTag)
 	return S_OK;
 }
 
-_bool CLevel_GamePlay::Load_FileData(const string& _strFilePath, FILE_TYPE _eFileType, const wstring& _wstrLayerTag)
+HRESULT CLevel_GamePlay::Load_FileData(const string& _strFilePath, FILE_TYPE _eFileType, const wstring& _wstrLayerTag)
 {
 	std::ifstream InputFile(_strFilePath, ios::in | std::ios::binary);
 

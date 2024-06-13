@@ -41,8 +41,9 @@ private:
 	HRESULT Loading_For_Tool_Anim();
 	HRESULT Loading_For_Tool_Map();
 
-	// 240518
 	HRESULT Add_Models(LEVEL eLevel);
+	HRESULT Add_FXTexture();
+	HRESULT Add_ModelsForAnimTool();
 	void SetUp_ModelScaleRotation(LEVEL eLevel);
 
 	// 셰이더 추가하고

@@ -191,6 +191,7 @@
     <ClInclude Include="..\public\Camera_Main.h" />
     <ClInclude Include="..\Public\Character.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
+    <ClInclude Include="..\Public\Coin.h" />
     <ClInclude Include="..\Public\CollisionCenter.h" />
     <ClInclude Include="..\Public\EnergyDrink.h" />
     <ClInclude Include="..\Public\FXToolDirector.h">
@@ -292,6 +293,7 @@
     <ClCompile Include="..\private\Camera_Free.cpp" />
     <ClCompile Include="..\private\Camera_Main.cpp" />
     <ClCompile Include="..\Private\Character.cpp" />
+    <ClCompile Include="..\Private\Coin.cpp" />
     <ClCompile Include="..\Private\CollisionCenter.cpp" />
     <ClCompile Include="..\Private\EnergyDrink.cpp" />
     <ClCompile Include="..\Private\FXToolDirector.cpp">

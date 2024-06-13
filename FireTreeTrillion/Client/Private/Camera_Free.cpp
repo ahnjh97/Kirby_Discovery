@@ -33,16 +33,21 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
+
+
 	m_pGameInstance->Add_Camera(this);
 
-	if (*m_pGameInstance->Get_CurrentLevelID() == LEVEL_INTRO || 
-		*m_pGameInstance->Get_CurrentLevelID() == LEVEL_GAMEPLAY) {
-		function<void(_int)> func = bind(&CCamera_Free::StartLerpByTriggerInfo, this, placeholders::_1);
-		m_pGameInstance->Emplace_TriggerFunc(TRIGGER_CAMERA, func);
+	//if (*m_pGameInstance->Get_CurrentLevelID() == LEVEL_INTRO || 
+	//	*m_pGameInstance->Get_CurrentLevelID() == LEVEL_GAMEPLAY) {
+	//	function<void(_int)> func = bind(&CCamera_Free::StartLerpByTriggerInfo, this, placeholders::_1);
+	//	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_CAMERA, func);
 
-		function<void(void)> exitFunc = bind(&CCamera_Free::EndLerpByTriggerInfo, this);
-		m_pGameInstance->Emplace_ExitFunc(TRIGGER_CAMERA, exitFunc);
-	}
+	//	function<void(void)> exitFunc = bind(&CCamera_Free::EndLerpByTriggerInfo, this);
+	//	m_pGameInstance->Emplace_ExitFunc(TRIGGER_CAMERA, exitFunc);
+	//}
+
+	m_vDestCamDir = static_cast<_float3>(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+
 	return S_OK;
 }
 
@@ -51,12 +56,16 @@ _int CCamera_Free::Tick(_float fTimeDelta)
 	//내가 현재 카메라가 아니라면 바쁘게 타겟 따라가기
 	if (m_pGameInstance->Get_CurCameraPtr() != this)
 		m_bTrackTarget = true;
+	else
+		m_bTrackTarget = false;
 
 	Control(fTimeDelta);
 
 	//fov y 를 보간하여 갱신한다.
 	if (.01f < abs(m_fFovy - m_fDestFovy))
 		m_fFovy += (m_fDestFovy - m_fFovy) * fTimeDelta * 3.f;
+
+	m_bWasMainCamera = (m_pGameInstance->Get_CurCameraPtr() != this);
 
 	return OBJ_NOEVENT;
 }
@@ -95,12 +104,6 @@ void CCamera_Free::Render_IMGUI()
 	}
 
 
-	//ImGui::Text("X: %.2f", vPosition.x);
-	//ImGui::SameLine();
-	//ImGui::Text("Y: %.2f", vPosition.y);
-	//ImGui::SameLine();
-	//ImGui::Text("Z: %.2f", vPosition.z);
-
 	ImGui::SliderFloat("CameraFree Speed", &fSpeed, 0.f, 200.f);
 
 	ImGui::Checkbox(u8"타겟 따라가기", &m_bTrackTarget);
@@ -114,17 +117,6 @@ void CCamera_Free::Render_IMGUI()
 	ImGui::DragFloat(u8"타겟까지의 거리", &m_fTrackDistance, .1f, 10.f, 50.f, "%.1f");
 	ImGui::Text(u8" 목표 Dir %.2f\t%.2f\t%.2f", m_vDestCamDir.x, m_vDestCamDir.y, m_vDestCamDir.z);
 
-	//m_pTransformCom->Set_Speed(fSpeed);
-	/*
-	ImGui::SliderFloat("CameraFree Smooth Speed", &m_fSmoothSpeed, 0.f, 0.3f);
-	m_pTransformCom->Set_Speed(fSpeed);
-
-	ImGui::Separator();
-	ImGui::DragFloat3("CameraFree Position", &fPosition.x);
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, fPosition);
-
-	ImGui::Separator();
-	ImGui::DragFloat3("CameraFree Offset", &m_vOffset.x);*/
 }
 #endif
 
@@ -175,9 +167,6 @@ void CCamera_Free::LerpByTriggerInfo(_int iTriggerIndex)
 
 	m_vDestCamDir = m_vSlerpedDir;
 	m_fTrackDistance = m_fLerpedRadius;
-	//m_vDestCamPos = pKirbyPos - m_vSlerpedDir * m_fLerpedRadius;
-	//m_pTransformCom->Set_State(CTransform::STATE_POSITION, pKirbyPos - m_vSlerpedDir * m_fLerpedRadius);
-	//m_pTransformCom->Look_At(pKirbyPos);
 }
 
 _float CCamera_Free::Compute_TriggerPosRatio(_int iTriggerIndex)
@@ -215,81 +204,67 @@ void CCamera_Free::Track_Target(_float fTimeDelta)
 	if (nullptr == m_pFirstTarget)
 		return;
 
-	_float4 vTargetPos = m_pFirstTarget->Get_State(CTransform::STATE_POSITION);
+	_float3 vTargetPos = m_pFirstTarget->Get_State(CTransform::STATE_POSITION);
 
-	if (m_bLerpByTriggerInfo)
-		LerpByTriggerInfo(m_iMatrixIndex);
-	else
+
+	if (*m_pCurrentLevelID == LEVEL_GAMEPLAY)
 	{
-
-		if (*m_pCurrentLevelID == LEVEL_GAMEPLAY)
-		{
-			_float4 vTerrainPos = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0))->Compute_TerrainPosition();
-			vTargetPos.y = vTerrainPos.y;
-		}
-
-		_float4 vBackDir = -m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-		vBackDir.Normalize();
-		//vBackDir *= m_fTrackDistance;
-		m_vDestCamDir = vBackDir;
-		//m_vDestCamPos = vTargetPos + vBackDir;
-		//m_vDestCamDir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-
+		_float4 vTerrainPos = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0))->Compute_TerrainPosition();
+		vTargetPos.y = vTerrainPos.y;
 	}
 
-	//m_vDestCamDir = m_vSlerpedDir;
-	//m_fTrackDistance = m_fLerpedRadius;
+	//**** 목표 위치 마지막 저장 ****//
 
-	m_vDestCamPos = vTargetPos + m_vDestCamDir * m_fTrackDistance;
-	;	//if (m_bLerpByTriggerInfo)
-		//{
+	//타겟 기준으로 뒤 위치를 목표한다.
+	_float3 vBackDir = -m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+	vBackDir.Normalize();
+	//실제 카메라 목표 위치를 저장한다.
+	m_vDestCamPos = Pos(vTargetPos + _float3(0.f, 10.f, 0.f) - (m_vDestCamDir * m_fTrackDistance));
 
-			//_float4 vCamLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-			//_float4 vDestLook = m_pFirstTarget->Get_State(CTransform::STATE_POSITION) - m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
 #pragma region 방법 1 - 절대 쿼터니언
-		/*
-		//_float4
-		Quaternion vStartQuat = CUtils::Make_Quat_FromDir(vCamLook);
-		Quaternion vDestQuat = CUtils::Make_Quat_FromDir(vDestLook);
+	/*
+	//_float4
+	Quaternion vStartQuat = CUtils::Make_Quat_FromDir(vCamLook);
+	Quaternion vDestQuat = CUtils::Make_Quat_FromDir(vDestLook);
 
-		Quaternion vResultQuat = Quaternion::Slerp(vStartQuat, vDestQuat, m_fSlerpRatio);
+	Quaternion vResultQuat = Quaternion::Slerp(vStartQuat, vDestQuat, m_fSlerpRatio);
 
 
-		float dot = vCamLook.Dot(vDestLook);
-		if (dot < 0.9999f) {
+	float dot = vCamLook.Dot(vDestLook);
+	if (dot < 0.9999f) {
 
-			//커비 위치와 내 위치를 비교하여 방향 보간하기
-			m_pTransformCom->Turn_Absolute(vResultQuat);
-		}
-		*/
+		//커비 위치와 내 위치를 비교하여 방향 보간하기
+		m_pTransformCom->Turn_Absolute(vResultQuat);
+	}
+	*/
 #pragma endregion
 
 #pragma region 방법 2 - 변환 쿼터니언
-		/*_float3 vCamLook3 = vCamLook;
-		_float3 vDestLook3 = vDestLook;
-		vCamLook3.Normalize();
-		vDestLook3.Normalize();
-		Quaternion vDestQuat = Quaternion::FromToRotation(vCamLook3, vDestLook3);
-		Quaternion vSlerpedQuat = Quaternion::Slerp(Quaternion::Identity, vDestQuat, fTimeDelta);
-		m_pTransformCom->Turn(vSlerpedQuat);*/
+	/*_float3 vCamLook3 = vCamLook;
+	_float3 vDestLook3 = vDestLook;
+	vCamLook3.Normalize();
+	vDestLook3.Normalize();
+	Quaternion vDestQuat = Quaternion::FromToRotation(vCamLook3, vDestLook3);
+	Quaternion vSlerpedQuat = Quaternion::Slerp(Quaternion::Identity, vDestQuat, fTimeDelta);
+	m_pTransformCom->Turn(vSlerpedQuat);*/
 
 #pragma endregion
 
 #pragma region 방법 3 - 방향 벡터 lerp
 
-		//_float4 vCamLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-		//_float4 vDestLook = m_pFirstTarget->Get_State(CTransform::STATE_POSITION) - m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	//_float4 vCamLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+	//_float4 vDestLook = m_pFirstTarget->Get_State(CTransform::STATE_POSITION) - m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
-		//if (vCamLook.Dot(vDestLook) < .95f)
-		//{
-		//	_float4 vCamDestDir = _float4::Lerp(vCamLook, vDestLook, m_fSlerpRatio);
-		//	//Quaternion vDestQuat = Quaternion::FromToRotation((_float3)vCamLook, (_float3)vCamDestDir);
-		//	//m_pTransformCom->Turn(vDestQuat);
+	//if (vCamLook.Dot(vDestLook) < .95f)
+	//{
+	//	_float4 vCamDestDir = _float4::Lerp(vCamLook, vDestLook, m_fSlerpRatio);
+	//	//Quaternion vDestQuat = Quaternion::FromToRotation((_float3)vCamLook, (_float3)vCamDestDir);
+	//	//m_pTransformCom->Turn(vDestQuat);
 
-		//	m_pTransformCom->Look_At_Interpolate( m_pTransformCom->Get_State(CTransform::STATE_POSITION) + Dir(vCamDestDir), fTimeDelta);
+	//	m_pTransformCom->Look_At_Interpolate( m_pTransformCom->Get_State(CTransform::STATE_POSITION) + Dir(vCamDestDir), fTimeDelta);
 
-		//}
+	//}
 
 #pragma endregion
 
@@ -343,10 +318,11 @@ void CCamera_Free::Track_Target(_float fTimeDelta)
 		}
 
 		m_pTransformCom->Look_At_Dir(vCamLook);
+		
 		///////////
 		*/
 #pragma endregion
-		//}
+
 
 
 	_float4 vCurPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
@@ -367,76 +343,6 @@ void CCamera_Free::Track_Target(_float fTimeDelta)
 		m_pTransformCom->Move(vDestYDir * .02f);
 
 
-
-	//if (m_bLerpByTriggerInfo)
-	//{
-	_float4 vCamLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-	_float4 vDestLook = m_vDestCamDir;
-
-	if (vCamLook.Dot(vDestLook) < .95f)
-	{
-		_float4 vCamDestDir = _float4::Lerp(vCamLook, vDestLook, m_fSlerpRatio);
-		//Quaternion vDestQuat = Quaternion::FromToRotation((_float3)vCamLook, (_float3)vCamDestDir);
-		//m_pTransformCom->Turn(vDestQuat);
-
-		m_pTransformCom->Look_At_Interpolate(m_pTransformCom->Get_State(CTransform::STATE_POSITION) + Dir(m_vDestCamDir), fTimeDelta);
-	}
-
-	//}
-	/*
-
-
-	Quaternion vResultQuat;
-
-
-	float dot = vCamLook.Dot(vDestLook);
-	//if (dot > 0.9999f) {
-	//	// 벡터들이 너무 가까울 때, 단위 쿼터니언 반환
-	//	vResultQuat =  Quaternion::Identity;
-	//}
-	//else if (dot < -0.9999f)
-	//{
-	//	// 벡터들이 반대 방향을 가리킬 때, 180도 회전 쿼터니언 반환
-	//	Vector3 orthogonal = Vector3::Right.Cross(vCamLook);
-	//	if (orthogonal.LengthSquared() < 0.01f)
-	//	{
-	//		orthogonal = Vector3::Up.Cross(vCamLook);
-	//	}
-	//	orthogonal.Normalize();
-	//	vResultQuat =  Quaternion(orthogonal, XM_PI);
-	//}
-	//else
-	//{
-	if ( -.999f <= dot && dot < .999f)
-	{
-		vResultQuat = Quaternion::FromToRotation(vCamLook, vDestLook);
-		m_pTransformCom->Turn_Absolute(vResultQuat);
-	}
-	*/
-
-
-	//}
-	//
-	/*if (m_bLerpByTriggerInfo)
-	{
-
-		_float4 vLerpedDir = SlerpDirVec(vCamLook, vDestLook, m_fSlerpRatio);
-		m_pTransformCom->Look_At_Axis(vLerpedDir);
-
-	}*/
-
-
-
-	//m_pTransformCom->Look_At_Axis(vLerpedDir);
-	/*
-	Quaternion vStartQuat = CUtils::Make_Quat_FromDir(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
-	Quaternion vDestQuat = CUtils::Make_Quat_FromDir(m_pFirstTarget->Get_State(CTransform::STATE_POSITION) - m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-
-	Quaternion vInterpolateQuat = Quaternion::Slerp(vStartQuat, vDestQuat, 1.f);
-
-	*/
-
-
 }
 
 
@@ -453,7 +359,11 @@ void CCamera_Free::Control(_float fTimeDelta)
 
 	//내가 현재 카메라가 아니라면 컨트롤은 못하게 하기
 	if (m_pGameInstance->Get_CurCameraPtr() != this)
+	{
+		if (m_bWasMainCamera)
+			m_pTransformCom->Look_At(m_pFirstTarget->Get_State(CTransform::STATE_POSITION));
 		return;
+	}
 
 
 	if (/**m_pCurrentLevelID == LEVEL_TOOL_MAP ||*/ m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))

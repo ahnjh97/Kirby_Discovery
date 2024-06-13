@@ -188,6 +188,11 @@ HRESULT CKirby::Render()
 			return E_FAIL;
 		if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
 			return E_FAIL;
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
+			return E_FAIL;
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_fOverPowerColor", &m_fOverPowerColor, sizeof(_float))))
+			return E_FAIL;
+
 
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
 		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_KIRBY)))
@@ -312,6 +317,9 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 		}
 		else
 		{
+			if (m_bOverPower == true)
+				return;
+
 			// 먹은 상태인 경우
 			if (INFO(m_isEat) == true)
 			{
@@ -429,20 +437,6 @@ void CKirby::Key_Input(_float fTimeDelta)
 	{
 		INFO(m_eBodyState) = BODY_BOOMDEFAULT;
 		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
-	}
-
-
-	// B : Radial Blur Center
-	if (m_pGameInstance->Get_DIKeyState(DIK_B, KEY_DOWN))
-	{
-		m_pGameInstance->Setting_RadialBlur(30.f, 120.f);
-	}
-
-	// N : Radial Blur Center
-	if (m_pGameInstance->Get_DIKeyState(DIK_N, KEY_DOWN))
-	{
-		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-		m_pGameInstance->Setting_RadialBlur(vPos, 30.f, 120.f);
 	}
 
 
@@ -611,6 +605,8 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float));
 		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
+
 
 		m_pShaderCom->Begin(ANIMMODEL_KIRBYMOUTH);
 		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
@@ -632,6 +628,8 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float));
 		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
+
 		m_pShaderCom->Begin(ANIMMODEL_KIRBYEYE);
 		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
 		return true;
@@ -646,6 +644,8 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
+
 		m_pShaderCom->Begin(ANIMMODEL_NORMAL_X);
 		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
 		return true;
@@ -781,12 +781,21 @@ void CKirby::SetUp_FSM()
 #pragma endregion
 
 #pragma region BOOM
+	// For BOMB
 	m_pFSM->Add_State(BOOMSTATE_BOOMFALL, CKirbyBoom_Fall_State::Create());
 	m_pFSM->Add_State(BOOMSTATE_BOOMSHOOT, CKirbyBoom_Attack_State::Create());
 	m_pFSM->Add_State(BOOMSTATE_THROW, CKirbyBoom_Attack_State::Create());
 	m_pFSM->Add_State(BOOMSTATE_THROWAIR, CKirbyBoom_Fall_State::Create());
 	m_pFSM->Add_State(BOOMSTATE_THROWCHARGE, CKirbyBoom_ChargeAttack_State::Create());
 	m_pFSM->Add_State(BOOMSTATE_THROWROTATE, CKirbyBoom_ChargeAttack_State::Create());
+#pragma endregion
+
+#pragma region 사다리 타기
+	m_pFSM->Add_State(STATE_LADDERDOWN, CKirbyDefault_Ladder_State::Create());
+	m_pFSM->Add_State(STATE_LADDERUP, CKirbyDefault_Ladder_State::Create());
+	m_pFSM->Add_State(STATE_LADDERWAIT, CKirbyDefault_Ladder_State::Create());
+	m_pFSM->Add_State(STATE_LADDERWAITSTART, CKirbyDefault_Ladder_State::Create());
+
 #pragma endregion
 
 
@@ -803,6 +812,38 @@ void CKirby::Update_PartObjectMatrix()
 {
 	m_ArmourMatrix = *(m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("HatL")->Get_CombinedTransformationMatrix());
 	m_WeaponMatrix = *(m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("RHaveL")->Get_CombinedTransformationMatrix());
+}
+
+void CKirby::OverPower()
+{
+	if (m_fPreHp > m_fHp)
+	{
+		m_bOverPower = true;
+	}
+
+	if (m_bOverPower == true)
+	{
+		m_fOverPowerTime += m_fTimeDelta;
+		m_fFlashOverPowerTime += m_fTimeDelta;
+		_float fFlashTime = 0.02f;
+
+		if (m_fFlashOverPowerTime > fFlashTime)
+		{
+			m_fOverPowerColor = m_fOverPowerColor == 0.f ? 0.25f : 0.f;
+			m_fFlashOverPowerTime -= fFlashTime;
+		}
+
+		if (m_fOverPowerTime > 3.f)
+		{
+			m_bOverPower = false;
+			m_fOverPowerTime = 0.f;
+			m_fOverPowerColor = 0.f;
+			m_fFlashOverPowerTime = 0.f;
+		}
+	}
+
+
+	m_fPreHp = m_fHp;
 }
 
 void CKirby::Change_State(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, BODYSTATE eBody, _uint iOffSet)
@@ -897,6 +938,8 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 		}
 	}
 
+	// 무적 상태 관리소
+	OverPower();
 }
 
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

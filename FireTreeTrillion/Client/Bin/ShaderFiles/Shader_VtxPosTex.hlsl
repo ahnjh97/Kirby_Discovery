@@ -156,20 +156,6 @@ PS_OUT PS_MAIN_BLOOM(PS_IN_ALPHABLEND In)
 PS_OUT PS_MAIN_BLEND_FX(PS_IN_ALPHABLEND In)
 {
     PS_OUT Out = (PS_OUT) 0;
-
-    //float vBrightness = g_DiffuseTexture.Sample(PointSampler, In.vTexcoord + g_vUVOffset).r;
-	
-    //if (vBrightness < .1f)
-    //    discard;
-	
-    //float vMaskValue = g_MaskTexture.Sample(PointSampler, In.vTexcoord).r;
-    //if (vMaskValue < g_fMaskThreshold)
-    //    discard;
-	
-    //Out.vColor.rgb = ( 1.f, 1.f, 1.f );
-    //Out.vColor.rgb *= g_vRColor /* * vBrightness*/;
-	
-    //Out.vColor.a = vBrightness * g_fAlpha; // 어두울수록 투명
 	
     vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord + g_vMaskUVOffset);
     
@@ -220,6 +206,28 @@ PS_OUT PS_MAIN_DEFAULT_FX(PS_IN_ALPHABLEND In)
     
     
     Out.vColor = vDiffuse;
+	
+    return Out;
+}
+
+PS_OUT PS_MAIN_WHITEFX(PS_IN_ALPHABLEND In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    //마스크 값으로 자르기
+    vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord + g_vMaskUVOffset);
+    if (vMask.a < .01f && vMask.a < g_fMaskThreshold)
+        discard;
+    else if (vMask.r < .1f && vMask.r < g_fMaskThreshold)
+        discard;
+    
+    //diffuse 알파 테스팅
+    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord + g_vUVOffset);
+    if (vDiffuse.a < .01f || (vDiffuse.r < 0.1f && vDiffuse.g < 0.1f && vDiffuse.b < 0.1f))
+        discard;
+    
+    Out.vColor.rgb = g_vRColor;
+    Out.vColor.a = vDiffuse.a * g_fAlpha;
 	
     return Out;
 }
@@ -310,4 +318,17 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_ALPHABLEND();
     }
 
+	// 화이트 이펙트 패스. 알파 테스팅 + 마스크 + no z text ( 6 )
+    pass WhiteFX
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN_ALPHABLEND();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_WHITEFX();
+    }
 }

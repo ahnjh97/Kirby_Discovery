@@ -343,6 +343,9 @@ HRESULT CBrontoBurt::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
 		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
+		return E_FAIL;
+
 
 	return S_OK;
 }
@@ -384,7 +387,7 @@ _bool CBrontoBurt::Custom_Face(_uint iMeshIndex)
 		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4));
 
-		m_pShaderCom->Begin(ANIMMODEL_KIRBYEYE);
+		m_pShaderCom->Begin(ANIMMODEL_EYE);
 		m_pModelCom->Render(iMeshIndex);
 
 		return true;

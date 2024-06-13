@@ -73,13 +73,23 @@ HRESULT CEffect::Initialize(void* pArg)
     //iSize = m_iCurKeyframeIdxs[3];
     //ZeroMemory(m_iCurKeyframeIdxs, )
     //_int iSize = m;
-    //m_vCurRColor = effectDesc.vRColor;
+    //m_vCurRColor = effectDesc.vRColor;f
     //m_vCurGColor = effectDesc.vGColor;
     //m_vCurBColor = effectDesc.vBColor;
 
     //m_keyfra = effectDesc.Keyframes;
 
     return S_OK;
+}
+
+void CEffect::Reset_Duration()
+{
+    m_fDuration.first = 0.f;
+
+    for (size_t i = KF_POS; i < KF_END; ++i)
+    {
+        m_iCurKeyframeIdxs[i] = 0;
+    }
 }
 
 void CEffect::Fill_SaveData(_Out_ SINGLE_FX_DATA* pFXData)
@@ -370,6 +380,30 @@ _float4 CEffect::Calculate_CurValue_Slerp(_float fTimeDelta, KF_PROPERTY eProper
 
 
     return vResultValue;
+}
+
+void CEffect::Billboard_Effect()
+{
+    // ºôº¸µå
+    _float3   vScale = m_pTransformCom->Get_Scaled();
+    //_float4x4      CamMatrix;
+
+    //const CTransform* pCamTransform = m_pGameInstance->get;
+    _matrix CamMatrix = m_pGameInstance->Get_Transform_Inv(CPipeLine::D3DTS_VIEW);
+
+    _vector vRight, vUp, vLook;
+
+    vRight = CamMatrix.r[0];
+    vUp = CamMatrix.r[1];
+    vLook = CamMatrix.r[2];
+
+
+    vRight = XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 1.f), vLook);
+    vLook = XMVector3Cross(vRight, vUp);
+    m_pTransformCom->Set_State(CTransform::STATE_RIGHT, XMVector3Normalize(vRight) * vScale.x);
+    m_pTransformCom->Set_State(CTransform::STATE_UP, XMVector3Normalize(vUp) * vScale.y);
+    m_pTransformCom->Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLook) * vScale.z);
+
 }
 
 void CEffect::Free()
