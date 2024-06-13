@@ -50,6 +50,8 @@ void CKirbyBalloon_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 				CMultiEffect::MULTI_FX_DESC FXDesc{};
 
 				_float4 vMyPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+				vMyPos += pTransformCom->Get_State(CTransform::STATE_LOOK) * .2f;
+
 				FXDesc.vInitPos = { vMyPos.x, vMyPos.y + .3f, vMyPos.z };
 				FXDesc.vInitScale = { 2.f, 2.f, 2.f };
 

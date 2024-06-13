@@ -497,6 +497,11 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 
 	if (m_eRenderMode == MODE_GAMEPLAY)
 	{
+
+		// 갓 레이 적용
+		if (FAILED(Render_GodRay()))
+			return E_FAIL;
+
 		// 레디얼 블러 값이 있을때만 레디얼블러를 가동한다.
 		if (m_isRadial == true)
 		{
@@ -505,9 +510,6 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 				return E_FAIL;
 		}
 
-		// 갓 레이 적용
-		if (FAILED(Render_GodRay()))
-			return E_FAIL;
 		// DOF블러 적용
 		if (FAILED(Render_DOF_Result()))
 			return E_FAIL;
@@ -651,6 +653,9 @@ void CRenderer::Setting_RadialBlur(_fvector vWorldPos, _float fRadial, _float fS
 	m_vScreenPos = _float2(fScreenX, 1.f - fScreenY);
 	m_fRadialBlurRadius = fRadial;
 	m_fRadialRadiusSubtraction = fSubtraction;
+
+	m_isRadial = true;
+
 }
 
 void CRenderer::Setting_RadialBlur(_float fRadial, _float fSubtraction)
@@ -658,6 +663,9 @@ void CRenderer::Setting_RadialBlur(_float fRadial, _float fSubtraction)
 	m_vScreenPos = _float2(0.5f, 0.5f);
 	m_fRadialBlurRadius = fRadial;
 	m_fRadialRadiusSubtraction = fSubtraction;
+
+	m_isRadial = true;
+
 }
 
 void CRenderer::Update_DofFocus(_fvector vWorldPos)
@@ -1824,8 +1832,6 @@ void CRenderer::Interpolate_RadialBlur(_float fTimeDelta)
 
 	if (m_fRadialBlurRadius == 0.f)
 		m_isRadial = false;
-	else
-		m_isRadial = true;
 
 }
 

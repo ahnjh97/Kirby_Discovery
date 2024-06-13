@@ -138,6 +138,12 @@ void CCharacter::Character_SystemTick(_float fTimeDelta)
 		// 터레인 경사면 보간 제어
 		SetOn_Slope(fTimeDelta);
 	}
+
+	if (m_fWhiteColorDiffuse > 0.f)
+	{
+		// 0.2초만에 다시 원래 색상으로 복귀한다.
+		m_fWhiteColorDiffuse -= fTimeDelta * 5.f;
+	}
 }
 
 void CCharacter::Free()

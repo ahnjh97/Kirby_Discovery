@@ -44,6 +44,7 @@ public:
 			m_fHp = m_fMaxHp;
 		else if (m_fHp < 0.f)
 			m_fHp = 0.f;
+		m_fWhiteColorDiffuse = 1.f;
 	}
 	_float	Get_Hp() { return m_fHp; }
 	_float	Get_MaxHp() { return m_fMaxHp; }
@@ -72,6 +73,8 @@ protected:
 	void			Compute_MotionBlur();
 	_float2			m_vPreScreenPos = { 0.f, 0.f };
 	_float4			m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
+
+	_float			m_fWhiteColorDiffuse = { 0.f };
 
 	// 05.31) 현재 지면 경사보간, 모션블러계산, FSM Update가 포함되어있다.
 	void			Character_SystemTick(_float fTimeDelta);

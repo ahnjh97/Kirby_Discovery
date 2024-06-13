@@ -51,7 +51,7 @@ public:
 	static void		Turn_OtherMatrix(_Inout_ _float4x4& matrix, _fvector vAxis, _float fTimeDelta, _float fAngle);
 
 	// physX 관련 함수
-	static PxMat44	To_Float4x4(const _float4x4& mat);
+	static PxMat44			To_Float4x4(const _float4x4& mat);
 	static _float4x4		To_Float4x4(const PxMat44& mat);
 	static PxVec3			To_PxVec3(const _fvector& vector);
 	static _vector			To_Vector(const PxVec3 pxVec3);
@@ -61,11 +61,10 @@ public:
 	static HRESULT Load_Effect(path _FilePath, _Out_ SINGLE_FX_DATA* _pData);
 	static HRESULT Load_Effect(path _FilePath, _Out_ PARTICLE_DATA* _pData);
 	static HRESULT Load_Effect(path _FilePath, _Out_ MULTI_FX_DATA* _pData);
-
-	//이펙트 생성
 	static void Make_Effect(SINGLE_FX_DATA& _FXData);
 	static void Make_Effect(MULTI_FX_DATA& _FXData);
 	static void Make_Effect(PARTICLE_DATA& _FXData);
+
 };
 
 template <typename T, std::size_t N>
