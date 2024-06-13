@@ -26,6 +26,7 @@ HRESULT CTrigger::Initialize(void * pArg)
 		m_iTriggerIndex		= tTriggerDesc.iTriggerIndex;
 		m_eCollisionGroup	= tTriggerDesc.eCollisionGroup;
 		m_vSize				= tTriggerDesc.vTriggerSize;
+		m_vInitialPos		= tTriggerDesc.vInitialPos;
 	}
 
 	HRESULT hr;
@@ -35,6 +36,9 @@ HRESULT CTrigger::Initialize(void * pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;	
 
+	if (m_eTriggerType == TRIGGER_HITBOX)
+		m_pRigidBodyCom->Set_PxWorldMatrix(m_vInitialPos);
+
 	return S_OK;
 }
 
@@ -43,7 +47,7 @@ _int CTrigger::Tick(_float fTimeDelta)
 	__super::Tick(fTimeDelta);
 
 	// HITBOX용 트리거일경우 받아온 객체의 위치의 look방향의 앞쪽으로 따라다닌다.
-	if (m_eTriggerType == TRIGGER_HITBOX)
+	if ((m_eTriggerType == TRIGGER_HITBOX))
 	{
 		_float4 vRight = XMVector3Normalize(m_pOwnerTransform->Get_State_Float4(CTransform::STATE_RIGHT)) * (-0.05f);
 		_float4 vLook = XMVector3Normalize(m_pOwnerTransform->Get_State_Float4(CTransform::STATE_LOOK)) * 0.8f;
@@ -52,6 +56,13 @@ _int CTrigger::Tick(_float fTimeDelta)
 		_float4 vNewPos = vLook + _float4(vPos.x, vPos.y + 1.f, vPos.z, 1.f);
 		m_pRigidBodyCom->Set_PxWorldMatrix(m_pOwnerTransform->Get_WorldFloat4x4());
 	}
+	else if (m_eTriggerType == TRIGGER_ITEM)
+	{
+		_float4 vPos = m_pOwnerTransform->Get_State_Float4(CTransform::STATE_POSITION);
+		_float4 vNewPos = _float4(vPos.x, vPos.y + 1.f, vPos.z, 1.f);
+		m_pRigidBodyCom->Set_PxWorldMatrix(m_pOwnerTransform->Get_WorldFloat4x4());
+	}
+
 	return OBJ_NOEVENT;
 }
 
@@ -65,7 +76,7 @@ void CTrigger::Late_Tick(_float fTimeDelta)
 
 HRESULT CTrigger::Render()
 {
-	if (m_eTriggerType == TRIGGER_HITBOX)	return S_OK;
+	if (m_eTriggerType == (TRIGGER_HITBOX || TRIGGER_ITEM))	return S_OK;
 
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
@@ -134,6 +145,12 @@ void CTrigger::Set_Owner(CGameObject* pObj)
 	m_pRigidBodyCom->Set_Object(this);
 }
 
+void CTrigger::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
+{
+	CPhysXObject* pOBJ = static_cast<CPhysXObject*>(m_pOwner);
+	pOBJ->Collision(eContent, pObject);
+}
+
 HRESULT CTrigger::Add_Components()
 {
 	HRESULT hr;
@@ -158,6 +175,8 @@ HRESULT CTrigger::Add_Components()
 		if (FAILED(__super::Add_Component(TEXT("Prototype_Component_RigidBody"),
 			TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &tRigidDesc)))
 			return E_FAIL;
+		m_pRigidBodyCom->SetUp_TriggerType(m_eTriggerType);
+		m_pRigidBodyCom->SetUp_TriggerIndex(m_iTriggerIndex);
 	}
 	else if (m_eTriggerType == TRIGGER_HITBOX)
 	{
@@ -172,9 +191,25 @@ HRESULT CTrigger::Add_Components()
 										 TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &tRigidDesc)))
 			return E_FAIL;
 		m_pRigidBodyCom->Activate(false);
+		m_pRigidBodyCom->SetUp_TriggerType(m_eTriggerType);
+		m_pRigidBodyCom->SetUp_TriggerIndex(m_iTriggerIndex);
 	}
-	m_pRigidBodyCom->SetUp_TriggerType(m_eTriggerType);
-	m_pRigidBodyCom->SetUp_TriggerIndex(m_iTriggerIndex);
+	else if (m_eTriggerType == TRIGGER_ITEM)
+	{
+		CRigidBody::RIGIDBODY_DESC tRigidDesc;
+		tRigidDesc.eShapeType = RIGID_BOX;
+		tRigidDesc.matWorld = m_pTransformCom->Get_WorldMatrix();
+		tRigidDesc.bTrigger = true;
+		tRigidDesc.bDynamic = false;
+		tRigidDesc.bKinematic = false;
+		tRigidDesc.fOffsetSize = m_vSize;// _float3{ 1.f, 1.5f, 1.f };
+		if (FAILED(__super::Add_Component(TEXT("Prototype_Component_RigidBody"),
+			TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &tRigidDesc)))
+			return E_FAIL;
+		m_pRigidBodyCom->Activate(true);
+		m_pRigidBodyCom->SetUp_TriggerType(m_eTriggerType);
+		m_pRigidBodyCom->SetUp_TriggerIndex(m_iTriggerIndex);
+	}
 
 	return S_OK;
 }

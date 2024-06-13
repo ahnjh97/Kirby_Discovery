@@ -345,9 +345,6 @@
     <ClInclude Include="..\Public\BasicMap.h">
       <Filter>02.GameObjects\Map\BasicMap</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Trigger.h">
-      <Filter>02.GameObjects\Map\Trigger</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Level_Tool_Map.h">
       <Filter>01.Levels\Tool\Map</Filter>
     </ClInclude>
@@ -497,6 +494,9 @@
     <ClInclude Include="..\Public\Coin.h">
       <Filter>02.GameObjects\PhysXObject\Item\Coin</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Trigger.h">
+      <Filter>02.GameObjects\Map\Trigger</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -582,9 +582,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\BasicMap.cpp">
       <Filter>02.GameObjects\Map\BasicMap</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Trigger.cpp">
-      <Filter>02.GameObjects\Map\Trigger</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Tool_Map.cpp">
       <Filter>01.Levels\Tool\Map</Filter>
@@ -728,6 +725,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Coin.cpp">
       <Filter>02.GameObjects\PhysXObject\Item\Coin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Trigger.cpp">
+      <Filter>02.GameObjects\Map\Trigger</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

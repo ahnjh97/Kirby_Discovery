@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "Coin.h"
+#include "KirbyArmours.h"
+#include "Trigger.h"
 
 CCoin::CCoin(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CItemObject{ pDevice, pContext }
@@ -70,7 +72,7 @@ _int CCoin::Tick(_float fTimeDelta)
 		}
 
 
-		m_pControllerCom->Move_Dir(m_pTransformCom, fUpDelta * m_fTimeDelta * 5.f, m_fTimeDelta);
+		//m_pControllerCom->Move_Dir(m_pTransformCom, fUpDelta * m_fTimeDelta * 5.f, m_fTimeDelta);
 	}
 	// 충돌이 안 되었다면
 	else
@@ -78,6 +80,7 @@ _int CCoin::Tick(_float fTimeDelta)
 		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), m_fTimeDelta, 270.f);
 	}
 
+	m_pTrigger->Tick(m_fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
@@ -162,12 +165,28 @@ HRESULT CCoin::Add_Components()
 	CHECK_FAILED(hr);
 
 	/* For.Com_CharacterController */
-	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+	/*_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
-	m_pControllerCom->Set_Object(this);
+	m_pControllerCom->Set_Object(this);*/
+
+	/* For.Com_Trigger */
+
+	//CKirbyArmours::KIRBYARMOURS_DESC ArmourDesc{};
+	//ArmourDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	////ArmourDesc.pBoneMatrix = &m_ArmourMatrix;
+
+	CTrigger::TRIGGER_DESC tTriggerDesc{};
+	tTriggerDesc.iTriggerType = CTrigger::TRIGGER_ITEM;
+	tTriggerDesc.iTriggerIndex = 0;
+	tTriggerDesc.eCollisionGroup = ITEM;
+	tTriggerDesc.vTriggerSize = _float3(.2f, .2f, .2f);
+	tTriggerDesc.vInitialPos = m_pTransformCom->Get_WorldFloat4x4();
+	m_pTrigger = static_cast<CTrigger*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc));
+	CHECK_NULLPTR(m_pTrigger);
+	m_pTrigger->Set_Owner(this);
 
 	return S_OK;
 
@@ -220,4 +239,5 @@ void CCoin::Free()
 	__super::Free();
 
 	Safe_Release(m_pModelCom);
+	Safe_Release(m_pTrigger);
 }
