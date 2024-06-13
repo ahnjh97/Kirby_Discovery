@@ -93,7 +93,7 @@ HRESULT CBackGround::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassInde
 		return E_FAIL;
 	_pTextureCom->Bind_ShaderResource(_pShaderCom, "g_DiffuseTexture", _iTexIndex);
 
-	if (FAILED(_pShaderCom->Begin(1)))
+	if (FAILED(_pShaderCom->Begin(POSTEX_DEFAULT)))
 		return E_FAIL;
 	if (FAILED(Bind_VIBuffer(m_pVIBufferCom)))
 		return E_FAIL;
