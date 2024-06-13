@@ -70,11 +70,11 @@ void CKirbyBalloon_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 					return;
 
 				FXDesc.fStartDelay = .15f;
-				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star PInk_nonBloom"), &FXDesc)))
+				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star Pink_nonBloom"), &FXDesc)))
 					return;
 
 				FXDesc.fStartDelay = .3f;
-				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star PInk_nonBloom"), &FXDesc)))
+				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star Pink_nonBloom"), &FXDesc)))
 					return;
 			}
 		}
