@@ -233,6 +233,9 @@ HRESULT CPoppyBrosJr::Bind_ShaderResources()
 	m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
 		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
+		return E_FAIL;
+
 
 	return S_OK;
 }
