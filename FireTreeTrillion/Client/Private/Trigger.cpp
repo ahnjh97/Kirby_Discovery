@@ -3,12 +3,12 @@
 #include "GameInstance.h"
 
 CTrigger::CTrigger(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
-	: CGameObject{ pDevice, pContext }
+	: CPhysXObject{ pDevice, pContext }
 {
 }
 
 CTrigger::CTrigger(const CTrigger & rhs)
-	: CGameObject( rhs )
+	: CPhysXObject( rhs )
 {
 }
 
@@ -22,8 +22,10 @@ HRESULT CTrigger::Initialize(void * pArg)
 	TRIGGER_DESC tTriggerDesc{};
 	if (nullptr != pArg) {
 		tTriggerDesc = *(TRIGGER_DESC*)pArg;
-		m_eTriggerType = TRIGGER(tTriggerDesc.iTriggerType);
-		m_iTriggerIndex = tTriggerDesc.iTriggerIndex;
+		m_eTriggerType		= TRIGGER(tTriggerDesc.iTriggerType);
+		m_iTriggerIndex		= tTriggerDesc.iTriggerIndex;
+		m_eCollisionGroup	= tTriggerDesc.eCollisionGroup;
+		m_vSize				= tTriggerDesc.vTriggerSize;
 	}
 
 	HRESULT hr;
@@ -32,14 +34,24 @@ HRESULT CTrigger::Initialize(void * pArg)
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;	
-	
+
 	return S_OK;
 }
 
 _int CTrigger::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
-	
+
+	// HITBOX용 트리거일경우 받아온 객체의 위치의 look방향의 앞쪽으로 따라다닌다.
+	if (m_eTriggerType == TRIGGER_HITBOX)
+	{
+		_float4 vRight = XMVector3Normalize(m_pOwnerTransform->Get_State_Float4(CTransform::STATE_RIGHT)) * (-0.05f);
+		_float4 vLook = XMVector3Normalize(m_pOwnerTransform->Get_State_Float4(CTransform::STATE_LOOK)) * 0.8f;
+		_float4 vPos = m_pOwnerTransform->Get_State_Float4(CTransform::STATE_POSITION) + vRight;
+
+		_float4 vNewPos = vLook + _float4(vPos.x, vPos.y + 1.f, vPos.z, 1.f);
+		m_pRigidBodyCom->Set_PxWorldMatrix(m_pOwnerTransform->Get_WorldFloat4x4());
+	}
 	return OBJ_NOEVENT;
 }
 
@@ -53,6 +65,8 @@ void CTrigger::Late_Tick(_float fTimeDelta)
 
 HRESULT CTrigger::Render()
 {
+	if (m_eTriggerType == TRIGGER_HITBOX)	return S_OK;
+
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
@@ -80,6 +94,22 @@ void CTrigger::Render_IMGUI()
 }
 #endif
 
+void CTrigger::Collision_Overlap(CGameObject* pGameObject)
+{
+	// HitBox 충돌 처리
+	if(m_bAlive)
+		m_pOwner->Collision_Overlap(pGameObject);
+
+	m_bAlive = false;
+	m_pRigidBodyCom->Activate(false);
+}
+
+void CTrigger::Check_Collision()
+{
+	m_bAlive = true;
+	m_pRigidBodyCom->Activate(true);
+}
+
 HRESULT CTrigger::Bind_ShaderResources()
 {
 	CHECK_NULLPTR(m_pShaderCom);
@@ -95,6 +125,15 @@ HRESULT CTrigger::Bind_ShaderResources()
 	return S_OK;
 }
 
+void CTrigger::Set_Owner(CGameObject* pObj)
+{
+	if (pObj == nullptr) return;
+
+	m_pOwner = pObj;
+	m_pOwnerTransform = m_pOwner->Get_TransformCom();
+	m_pRigidBodyCom->Set_Object(this);
+}
+
 HRESULT CTrigger::Add_Components()
 {
 	HRESULT hr;
@@ -105,19 +144,37 @@ HRESULT CTrigger::Add_Components()
 	CHECK_FAILED(hr);
 
 	/* For.Com_Model */
-	if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Model_Trigger"),
-		TEXT("Com_Model"),  (CComponent**)&m_pModelCom)))
-		return E_FAIL;
+	if (m_eTriggerType != TRIGGER_HITBOX)
+	{
+		if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Model_Trigger"),
+			TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+	}
 
-	CRigidBody::RIGIDBODY_DESC tRigidDesc(RIGID_BOX, m_pTransformCom->Get_WorldMatrix(), true, false);
 	/* For.Com_RigidBody */
-	if(FAILED(__super::Add_Component(TEXT("Prototype_Component_RigidBody"),
-		TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &tRigidDesc)))
-		return E_FAIL;
-
+	if (m_eTriggerType == TRIGGER_CAM || m_eTriggerType == TRIGGER_SHADER || m_eTriggerType == TRIGGER_STAR)
+	{
+		CRigidBody::RIGIDBODY_DESC tRigidDesc(RIGID_BOX, m_pTransformCom->Get_WorldMatrix(), true, false);
+		if (FAILED(__super::Add_Component(TEXT("Prototype_Component_RigidBody"),
+			TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &tRigidDesc)))
+			return E_FAIL;
+	}
+	else if (m_eTriggerType == TRIGGER_HITBOX)
+	{
+		CRigidBody::RIGIDBODY_DESC tRigidDesc;
+		tRigidDesc.eShapeType = RIGID_BOX;
+		tRigidDesc.matWorld = m_pTransformCom->Get_WorldMatrix();
+		tRigidDesc.bTrigger = true;
+		tRigidDesc.bDynamic = false;
+		tRigidDesc.bKinematic = false;
+		tRigidDesc.fOffsetSize = m_vSize;// _float3{ 1.f, 1.5f, 1.f };
+		if(FAILED(__super::Add_Component(TEXT("Prototype_Component_RigidBody"),
+										 TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &tRigidDesc)))
+			return E_FAIL;
+		m_pRigidBodyCom->Activate(false);
+	}
 	m_pRigidBodyCom->SetUp_TriggerType(m_eTriggerType);
 	m_pRigidBodyCom->SetUp_TriggerIndex(m_iTriggerIndex);
-	m_pRigidBodyCom->Activate(true);
 
 	return S_OK;
 }
@@ -153,7 +210,8 @@ void CTrigger::Free()
 	__super::Free();
 
 	Safe_Release(m_pShaderCom);	
-	Safe_Release(m_pModelCom);
+	if (m_eTriggerType != TRIGGER_HITBOX)
+		Safe_Release(m_pModelCom);
 	Safe_Release(m_pRigidBodyCom);
 }
 

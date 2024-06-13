@@ -25,6 +25,7 @@ public:
 	{
 		_float4			vInitialPos;
 		_uint			uCollisionType;
+		string			strProtoObjName;
 
 		TYPE			eType = CAPSULE;
 		CAPSULE_SHAPE	tCapsuleShape;
@@ -47,6 +48,7 @@ public:
 
 	_float			Get_Radius() const { return m_tControllerCapsuleDesc.radius; }
 	void			RegisterAsPlayer();
+	void			Register_Controller();
 
 public:
 	virtual HRESULT Initialize(void* pArg)	override;
@@ -119,7 +121,7 @@ protected:
 	//BOX_SHAPE							m_tBoxShape;
 
 	_bool								m_isCollision = { false };
-
+	string								m_strObjectName = "";
 public:
 	static	CCharacterController*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CComponent*				Clone(void* pArg = nullptr) override;

@@ -940,6 +940,12 @@ void CGameInstance::Register_Player(PxActor* pPlayerActor)
 		m_pPhysx->Register_Player(pPlayerActor);
 }
 
+void CGameInstance::Register_Controller(PxActor* pActor, PxController* pController)
+{
+	if (nullptr != m_pPhysx)
+		m_pPhysx->Register_Controller(pActor, pController);
+}
+
 void CGameInstance::Register_Trigger(PxActor* pTriggerActor, _int iTriggerType, _int iTriggerIndex)
 {
 	if (nullptr != m_pPhysx)
@@ -1028,25 +1034,24 @@ void CGameInstance::Restore_SecondTimer()
 	m_pTimeController->Restore_SecondTimer();
 }
 
+/// <summary> 충돌한 쌍을 정렬하여 Pair를 담고있는 std::set에 담아둔다. </summary>
+/// <returns> 그룹별로 물리적 충돌 진행 유무를 리턴 </returns>
 void CGameInstance::Add_CollisionObjects(CGameObject* Src, CGameObject* Dst)
 {
 	if (Src == nullptr || Dst == nullptr)
 		return;
 
-
-	std::pair<CGameObject*, CGameObject*> collisionPair = std::minmax(Src, Dst);
-
+	// Collision Group에 충돌된 쌍 정리하기
+	pair<CGameObject*, CGameObject*> collisionPair = minmax(Src, Dst);
 	auto result = m_CollisionObjects.insert(collisionPair);
-	if (result.second) { // 삽입이 성공했을 때만 레퍼런스 카운트 증가
+	if (result.second) // 삽입이 성공했을 때만 레퍼런스 카운트 증가
+	{ 
 		Safe_AddRef(Src);
 		Safe_AddRef(Dst);
 	}
-
-	static _int iDnt{0};
-	++iDnt;
-	printf("Object Size(): %d\n", m_CollisionObjects.size());
 }
 
+/// <summary> CollisionCenter에게 충돌된 쌍들을 관리하는 std::set을 넘긴다. </summary>
 void CGameInstance::Get_CollisionObjects(_Inout_ set<pair<CGameObject*, CGameObject*>>& CollisionObjects)
 {
 	if (m_CollisionObjects.empty() == true)
@@ -1054,7 +1059,6 @@ void CGameInstance::Get_CollisionObjects(_Inout_ set<pair<CGameObject*, CGameObj
 
 	if (CollisionObjects.empty() == false)
 		return;
-
 
 	//static _int iCnt{0};
 	//++iCnt;
@@ -1065,7 +1069,10 @@ void CGameInstance::Get_CollisionObjects(_Inout_ set<pair<CGameObject*, CGameObj
 	CollisionObjects = move(m_CollisionObjects);
 }
 
-
+_bool CGameInstance::Is_PassingGroup(CGameObject* pObj)
+{
+	return pObj->Get_CollisionType() >= PASSING_GROUP;
+}
 
 void CGameInstance::Release_Engine()
 {

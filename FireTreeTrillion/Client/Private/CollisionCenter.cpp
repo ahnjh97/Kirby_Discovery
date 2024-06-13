@@ -30,6 +30,9 @@ void CCollisionCenter::Initialize()
 	// For CONTENT_ITEM
 	m_eColliderType[PLAYER][ITEM] = CONTENT_ITEM;
 
+	// For CONTENT_ATTACK
+	m_eColliderType[HITBOX][MONSTER] = CONTENT_ATTACK;
+
 }
 
 void CCollisionCenter::Collision_Tick(_float fTimeDelta)
@@ -66,8 +69,8 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 
 CCollisionCenter::CONTENT_TYPE CCollisionCenter::Find_ColliderType(CPhysXObject* pSrc, CPhysXObject* pDst)
 {
-	COLLISION_TYPE eSrcCollisionType = pSrc->Get_CollisionType();
-	COLLISION_TYPE eDstCollisionType = pDst->Get_CollisionType();
+	COLLISION_TYPE eSrcCollisionType = static_cast<COLLISION_TYPE>(pSrc->Get_CollisionType());
+	COLLISION_TYPE eDstCollisionType = static_cast<COLLISION_TYPE>(pDst->Get_CollisionType());
 
 	// 둘 사이에 지정된 CONTENTTYPE을 받는다.
 	CONTENT_TYPE eContentType = m_eColliderType[eSrcCollisionType][eDstCollisionType];
@@ -162,6 +165,13 @@ void CCollisionCenter::Collision_Collider(CONTENT_TYPE eType, CPhysXObject* pSrc
 			Compute_SuperPower(pPlayer, pItem);
 			break;
 		}
+	}
+
+	// 커비 HITBOX x 몬스터
+	else if (eType == CONTENT_ATTACK)
+	{
+		pSrcObject->Collision_Overlap(pDstObject);
+		pDstObject->Collision_Overlap(pSrcObject);
 	}
 
 }

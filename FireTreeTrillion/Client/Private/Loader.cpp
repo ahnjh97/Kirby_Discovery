@@ -55,7 +55,6 @@
 #include "TestModel.h"
 #include "TestTerrain.h"
 #include "Kirby.h"
-#include "HitBox.h"
 
 // ∏ÛΩ∫≈Õ
 #include "KirbyWeapons.h"
@@ -229,7 +228,6 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kirby"), CKirby);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KirbyWeapons"), CKirbyWeapons);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KirbyArmours"), CKirbyArmours);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HitBox"), CHitBox);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Awoofy"), CAwoofy);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Rabbit"), CRabbit);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Buffahorn"), CBuffahorn);

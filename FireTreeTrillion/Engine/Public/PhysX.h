@@ -29,6 +29,7 @@ public:
 
     //EventCallBack ÇÔ¼öµé
     void Register_Player(PxActor* pPlayerActor);
+    void Register_Controller(PxActor* pActor, PxController* pController);
     void Register_Trigger(PxActor* pTriggerActor, _int iTriggerType, _int iTriggerIndex);
     void Emplace_TriggerFunc(_int iTriggerType, function<void(_int)> func);
     void Emplace_ExitFunc(_int iTriggerType, function<void(void)> exitFunc);
@@ -126,11 +127,7 @@ public:
 class CControllerFilterCallback : public PxControllerFilterCallback
 {
 public:
-    virtual bool                             filter(const PxController& a, const PxController& b) override { return true; }
-    
-private:
-    unordered_set<const PxController*>       m_setControllers;
-
+    virtual bool    filter(const PxController& pObj, const PxController& pOtherObj) override;
 };
 
 END
