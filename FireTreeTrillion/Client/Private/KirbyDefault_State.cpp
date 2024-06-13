@@ -273,10 +273,11 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 #pragma endregion
 
-	if (m_pGameInstance->Get_DIKeyState(DIK_B, KEY_DOWN))
+	if (DESC(m_bCanLadder) == true)
 	{
 		pKirby->Change_State(CKirby::STATE_LADDERWAITSTART, 200.f, false, false, CKirby::BODY_DEFAULT);
-
+		pController->Set_Position(pTransformCom, DESC(m_vLadderPoint));
+		DESC(m_vMoveDir) = DESC(m_vTargetDir) = DESC(m_vLadderLook);
 	}
 
 	// Idle일 때, C를 누르면 점프를 한다.

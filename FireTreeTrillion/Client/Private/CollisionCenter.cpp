@@ -190,6 +190,7 @@ void CCollisionCenter::Ladder_Collider()
 {
 	if (m_Ladders.empty() == true)
 		return;
+
 	CKirby* pKirby = static_cast<CKirby*>(GAMEINSTANCE Get_GameObject(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
 	_vector vKirbyPos = pKirby->Get_TransformCom()->Get_State_Vector(CTransform::STATE_POSITION);
 	_bool bCollide = { false };
@@ -204,12 +205,18 @@ void CCollisionCenter::Ladder_Collider()
 			// 검사를 했는데, 충돌이 됐다고 했을 때
 			if (bCollide == true)
 			{
-				// 커비에게 탈 수 있다는 정보와, 해당 X, Z 좌표를 준다.
+				CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+				Kirbydesc->m_bCanLadder = true;
+				Kirbydesc->m_vLadderPoint = pLadder->Get_LadderPoint();
+				Kirbydesc->m_vLadderLook = pLadder->Get_TransformCom()->Get_State_Float4(CTransform::STATE_LOOK);
+				// 커비에게 탈 수 있다는 정보와, 해당 포인팅 좌표를 준다.
 			}
 		}
 
+		// 항상 릴리즈 해준다.
 		Safe_Release(pLadder);
 	}
+	m_Ladders.clear();
 }
 
 void CCollisionCenter::Camera_Shaking(_float fPower, _float fTime, _float2 vDir)

@@ -252,6 +252,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("EnergyDrink"), CEnergyDrink);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Coin"), CCoin);
 
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Ladder"), CLadder);
 #pragma endregion
 
 	return S_OK;

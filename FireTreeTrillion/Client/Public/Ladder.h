@@ -28,6 +28,7 @@ public:
 	virtual void	Render_IMGUI() override;
 #endif
 	_bool			Is_Collide(_fvector vPos);
+	_float4			Get_LadderPoint() { return m_vLadderPoint; }
 
 private:
 	HRESULT Add_Components();
@@ -35,10 +36,11 @@ private:
 
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
-	CGameObject* m_pPlayer = { nullptr };
 
-	_float	m_fHeight = { 8.f };
+	_float	m_fHeight = { 10.f };
 	_float	m_fRadius = { 2.f };
+	_float4 m_vLadderPoint = { 0.f, 0.f, 0.f, 0.f };
+	_float4 m_vLadderOriginalPos = { 0.f, 0.f, 0.f, 0.f };
 
 
 

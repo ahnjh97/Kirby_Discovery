@@ -30,7 +30,7 @@ HRESULT CLadder::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(10.f, 10.f, -180.f, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(10.f, 3.f, -180.f, 1.f));
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;
@@ -45,6 +45,8 @@ _int CLadder::Tick(_float fTimeDelta)
 {
 	if (m_bDead == true)
 		return OBJ_DEAD;
+
+
 
 
 	CCollisionCenter::Get_Instance()->Add_Ladder(this);
@@ -105,9 +107,14 @@ _bool CLadder::Is_Collide(_fvector vPos)
 {
 	// X 와 Z 검사를 진행한다.
 	_float4 vLadderPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	_float4 vLadderLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 	_float4 vKirbyPos = vPos;
 
+	_float2 vMyXZOffSet = { vLadderLook.x * 0.8f, vLadderLook.z * 0.8f };
 	_float2 vMyXZ = { vLadderPos.x, vLadderPos.z };
+
+	vMyXZ -= vMyXZOffSet;
+
 	_float2 vKirbyXZ = { vKirbyPos.x, vKirbyPos.z };
 
 	_float fLadder_XZDistance = XMVectorGetX(XMVector2Length(vMyXZ - vKirbyXZ));
@@ -123,7 +130,12 @@ _bool CLadder::Is_Collide(_fvector vPos)
 
 	// 사다리의 최소Y, 최대Y를 비교했을 때, 안에 들었다면 최종적인 충돌을 하였을 것이다.
 	if (fMinY < vKirbyPos.y && vKirbyPos.y < fMaxY)
+	{
+		//vMyXZ.y 는 포지션의 z값으로 쓰이기 때문에 나중에 헷갈리지 말라.
+		m_vLadderPoint = { vMyXZ.x, vKirbyPos.y, vMyXZ.y, 1.f };
+		m_vLadderOriginalPos = vLadderPos;
 		return true;
+	}
 
 	// 위 조건에서 true로 빠져나가지 못 했다면, 충돌을 하지 않은 것이다.
 	return false;
@@ -191,4 +203,6 @@ void CLadder::Free()
 {
 	__super::Free();
 	Safe_Release(m_pModelCom);
+	Safe_Release(m_pShaderCom);
+
 }
