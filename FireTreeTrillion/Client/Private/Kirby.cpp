@@ -184,6 +184,11 @@ HRESULT CKirby::Render()
 			return E_FAIL;
 		if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
 			return E_FAIL;
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
+			return E_FAIL;
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_fOverPowerColor", &m_fOverPowerColor, sizeof(_float))))
+			return E_FAIL;
+
 
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
 		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_KIRBY)))
@@ -603,6 +608,9 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float));
 		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
+			return E_FAIL;
+
 
 		m_pShaderCom->Begin(ANIMMODEL_KIRBYMOUTH);
 		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
@@ -624,6 +632,9 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float));
 		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
+			return E_FAIL;
+
 		m_pShaderCom->Begin(ANIMMODEL_KIRBYEYE);
 		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
 		return true;
@@ -638,6 +649,9 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
+			return E_FAIL;
+
 		m_pShaderCom->Begin(ANIMMODEL_NORMAL_X);
 		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
 		return true;
@@ -797,6 +811,38 @@ void CKirby::Update_PartObjectMatrix()
 	m_WeaponMatrix = *(m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("RHaveL")->Get_CombinedTransformationMatrix());
 }
 
+void CKirby::OverPower()
+{
+	if (m_fPreHp > m_fHp)
+	{
+		m_bOverPower = true;
+	}
+
+	if (m_bOverPower == true)
+	{
+		m_fOverPowerTime += m_fTimeDelta;
+		m_fFlashOverPowerTime += m_fTimeDelta;
+		_float fFlashTime = 0.02f;
+
+		if (m_fFlashOverPowerTime > fFlashTime)
+		{
+			m_fOverPowerColor = m_fOverPowerColor == 0.f ? 0.25f : 0.f;
+			m_fFlashOverPowerTime -= fFlashTime;
+		}
+
+		if (m_fOverPowerTime > 3.f)
+		{
+			m_bOverPower = false;
+			m_fOverPowerTime = 0.f;
+			m_fOverPowerColor = 0.f;
+			m_fFlashOverPowerTime = 0.f;
+		}
+	}
+
+
+	m_fPreHp = m_fHp;
+}
+
 void CKirby::Change_State(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, BODYSTATE eBody, _uint iOffSet)
 {
 	INFO(m_eBodyState) = eBody;
@@ -889,6 +935,8 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 		}
 	}
 
+	// 무적 상태 관리소
+	OverPower();
 }
 
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
