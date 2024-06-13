@@ -1,6 +1,8 @@
 #include "stdafx.h"
+#include "MapToolObject.h"
 #include "BasicMap.h"
 #include "OcTree.h"
+#include "Model.h"
 
 CBasicMap::CBasicMap(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
     : CGameObject{ pDevice, pContext }
@@ -52,23 +54,9 @@ HRESULT CBasicMap::Initialize(void* pArg)
         vector<string> vecConstantNames = { "g_DiffuseTexture", "g_NormalTexture", "g_MRATexture", "g_fSamplingFactor"
             , "g_bStencil", "g_bRimLight", "m_fRimWidth", "g_bMotionBlur" };
 
-        /*if (LEVEL_TOOL_MAP == *m_pCurrentLevelID)*/
-            m_pOcTree = m_pModelCom->Create_OcTree(GameObjectDesc.vMin, GameObjectDesc.vMax, m_vecPassIndices, m_vecSamplingFactors, vecConstantNames);
-           
-        /*else {
-            string strLevel;
-            if (LEVEL_INTRO == *m_pCurrentLevelID)
-                strLevel = "Intro";
-            else if (LEVEL_GAMEPLAY == *m_pCurrentLevelID)
-                strLevel = "Stage1";
-
-            string strPath = "../../../objects_txt/" + strLevel + "_Octree.txt";
-            ifstream octreeFile(strPath, ios::binary);
-
-            m_pOcTree = COcTree::Create(m_pDevice, m_pContext, octreeFile, vecConstantNames);
-
-            octreeFile.close();
-        } */  
+        m_pOcTree = m_pModelCom->Create_OcTree(GameObjectDesc.vMin, GameObjectDesc.vMax, m_vecPassIndices, m_vecSamplingFactors, vecConstantNames);
+        
+        InsertMapDecos();
     }
 
     if (FAILED(m_pModelCom->CreateStaticActor(m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION))))
@@ -115,7 +103,8 @@ HRESULT CBasicMap::Render()
             return E_FAIL;
 
         m_iRenderAll = m_iRenderMyMesh = 0;
-        m_pOcTree->Culling(m_pGameInstance, m_pShaderCom, m_iRenderAll, m_iRenderMyMesh);
+        m_pOcTree->Culling(m_pGameInstance, m_pShaderCom, m_pNonAnimShaderCom, m_pAnimShaderCom
+            , m_iRenderAll, m_iRenderMyMesh);
     }
     else
     {
@@ -188,15 +177,18 @@ HRESULT CBasicMap::Add_Components(const wstring& _wstrModelTag)
         TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
         return E_FAIL;
 
-    ///* For. Com_Texture_Noise */
-    //if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Texture_GsLandTopNoize_Fur"),
-    //    TEXT("Com_Texture_Noise"), (CComponent**)&m_pTextureCom[TEX_NOISE])))
-    //    return E_FAIL;
+    if (*m_pCurrentLevelID != LEVEL_TOOL_MAP)
+    {
+        /* For.Com_Shader */
+        if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Shader_VtxModel"),
+            TEXT("Com_Shader_NonAnim"), (CComponent**)&m_pNonAnimShaderCom)))
+            return E_FAIL;
 
-    ///* For. Com_Texture */
-    //if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Texture_GsDefaultSideRockC_Height"),
-    //    TEXT("Com_Texture_Height"), (CComponent**)&m_pTextureCom[TEX_HEIGHT])))
-    //    return E_FAIL;
+        /* For.Com_Shader */
+        if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Shader_VtxAnimModel"),
+            TEXT("Com_Shader_Anim"), (CComponent**)&m_pAnimShaderCom)))
+            return E_FAIL;
+    }
 
     return S_OK;
 }
@@ -212,8 +204,23 @@ HRESULT CBasicMap::Bind_ShaderResources()
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
         return E_FAIL;
-    //if (FAILED(m_pTextureCom[TEX_NOISE]->Bind_ShaderResources(m_pShaderCom, "g_NoiseTexture")))
-    //    return E_FAIL;
+
+    if (LEVEL_TOOL_MAP == *m_pCurrentLevelID)
+        return S_OK;
+
+    if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pAnimShaderCom, "g_WorldMatrix")))
+        return E_FAIL;
+    if (FAILED(m_pAnimShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
+        return E_FAIL;
+    if (FAILED(m_pAnimShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
+        return E_FAIL;
+
+    if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pNonAnimShaderCom, "g_WorldMatrix")))
+        return E_FAIL;
+    if (FAILED(m_pNonAnimShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
+        return E_FAIL;
+    if (FAILED(m_pNonAnimShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
+        return E_FAIL;
 
     return S_OK;
 }
@@ -290,6 +297,94 @@ _bool CBasicMap::CheckIfBlendMapExists(const wstring& _wstrModelTag)
     }
 
     return _bool();
+}
+
+void CBasicMap::InsertMapDecos()
+{
+    if (nullptr == m_pOcTree)
+        return;
+
+    string strLevel;
+    if (LEVEL_INTRO == *m_pCurrentLevelID)
+        strLevel = "Intro";
+    else if (LEVEL_GAMEPLAY == *m_pCurrentLevelID)
+        strLevel = "Stage1";
+    else
+        return;
+
+    string strPath = "../../../objects_txt/" + strLevel + "_DecoObjs.txt";
+
+    ifstream fileInput(strPath, ios::binary);
+    if (!fileInput.is_open())
+    {
+        wstring wstrError = L"Failed to Open:" + CUtils::StrToWstr(strLevel) + L"_DecoObjs.txt";
+        MSG_BOX(wstrError.c_str());
+        return;
+    }
+    
+    vector<CModel*> vecNonCols;
+    vector<CModel*> vecAnims;
+    vector<CModel*> vecActors;
+
+    _uint iMapObjType{};
+    _uint iStrLength{};
+    string strModelName;
+    _float4x4 matWorld{};
+    _uint iShaderVars{};
+    _float fRimWidth{};
+
+    while (!fileInput.eof())
+    {
+        fileInput.read(reinterpret_cast<char*>(&iMapObjType), sizeof(iMapObjType));
+        fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
+        strModelName.resize(iStrLength);
+        fileInput.read(&strModelName[0], iStrLength);
+        fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
+        fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
+        fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
+
+        TYPE eType = TYPE_NONANIM;
+        if (CMapToolObject::MAPOBJ_ANIM == iMapObjType)
+            eType = TYPE_ANIM;
+
+        if (fileInput.eof())
+            break;
+       
+       CModel* pModel = CModel::Create(m_pDevice, m_pContext, MODEL{ strModelName, eType, 1.f, 0.f, 0, false, true });
+       if (nullptr == pModel) {
+           fileInput.close();
+           return;
+       }
+           
+        pModel->SetUpStencilRimLightMotionBlurPassIndex(iShaderVars, fRimWidth, 0);
+
+        switch (iMapObjType)
+        {
+        case CMapToolObject::MAPOBJ_NONCOL:
+            vecNonCols.push_back(pModel);
+            break;
+        case CMapToolObject::MAPOBJ_ANIM:
+            vecAnims.push_back(pModel);
+            break;
+        case CMapToolObject::MAPOBJ_ACTOR:
+            vecActors.push_back(pModel);
+            break;
+        }
+    }
+
+    fileInput.close();
+
+    for (auto& colNonAnim : vecActors)
+    {
+        if (nullptr == colNonAnim)
+            continue;
+
+        colNonAnim->CreateStaticActor(m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION));
+    }
+
+    m_pOcTree->InsertNonCols(vecNonCols);
+    m_pOcTree->InsertColAnims(vecAnims);
+    m_pOcTree->InsertColNonAnims(vecActors);
 }
 
 void CBasicMap::Save_OctreeData(const string& strLevel)
@@ -383,4 +478,6 @@ void CBasicMap::Free()
 
     Safe_Release(m_pShaderCom);
     Safe_Release(m_pModelCom);
+    Safe_Release(m_pNonAnimShaderCom);
+    Safe_Release(m_pAnimShaderCom);
 }

@@ -72,7 +72,7 @@ public:
 	void	Stop_Animation() { m_bStop = true; }
 	void	Replay_Animation() { m_bStop = false; }
 	HRESULT Render(_uint iMeshIndex);
-	HRESULT Render();
+	HRESULT RenderMergedMesh();
 
 	HRESULT CreateDynamicActor(_float4 vPos);
 	HRESULT CreateStaticActor(_float4 vPos);
@@ -92,7 +92,8 @@ public:
 	void CreateSamplerState();
 
 	HRESULT Bind_StencilRimLightMotionBlur(class CShader* pShader, vector<string>& _vecConstantNames); // For Binding at Octree
-	void SetUpStencilRimLightMotionBlur(_uint iShaderVars, _float fRimWidth); // For Binding at Octree
+	void SetUpStencilRimLightMotionBlurPassIndex(_uint iShaderVars, _float fRimWidth, _uint iPassIndex); // For Binding at Octree
+	_uint Get_ModelPassIndex() { return m_iPassIndex; }
 
 private:
 	_uint						m_iNumMeshes = { 0 };
@@ -135,6 +136,7 @@ private:
 	_bool						m_bStencil = { true };
 	_bool						m_bRimLight = { true };
 	_bool						m_bMotionBlur = { false };
+	_uint						m_iPassIndex = {};
 
 private:
 	HRESULT Ready_Meshes(_bool bOctree);

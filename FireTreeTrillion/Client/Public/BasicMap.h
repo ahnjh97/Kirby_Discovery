@@ -47,6 +47,8 @@ public:
 private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
+	CShader* m_pNonAnimShaderCom = { nullptr };
+	CShader* m_pAnimShaderCom = { nullptr };
 	CTexture* m_pTextureCom[TEX_END] = {nullptr};
 	CGameObject* m_pBlendMap = { nullptr }; 
 
@@ -70,6 +72,7 @@ private:
 	void SetUpShaderInfo(const wstring& _wstrModelTag);
 
 	_bool CheckIfBlendMapExists(const wstring& _wstrModelTag);
+	void InsertMapDecos();
 		
 public:
 	static CBasicMap* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

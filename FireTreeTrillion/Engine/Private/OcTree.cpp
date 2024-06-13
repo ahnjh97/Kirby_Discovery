@@ -208,7 +208,8 @@ HRESULT COcTree::Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext
 	return S_OK;
 }
 
-void COcTree::Culling(CGameInstance* pGameInstance, CShader* pShaderCom, _uint& iRenderAll, _uint& iRenderMyMesh)
+void COcTree::Culling(CGameInstance* pGameInstance, CShader* pMapShader, CShader* pNonAnimShader, CShader* pAnimShader
+	, _uint& iRenderAll, _uint& iRenderMyMesh)
 {
 	_float	fRadius = XMVectorGetX(XMVector3Length(XMLoadFloat3(&m_vecEdges[OC_XYZ]) - XMLoadFloat3(&m_vCenter)));
 
@@ -219,7 +220,7 @@ void COcTree::Culling(CGameInstance* pGameInstance, CShader* pShaderCom, _uint& 
 	}
 
 	if (iInFrustum >= OC_END) {
-		RenderAll(pShaderCom);
+		RenderAll(pMapShader, pNonAnimShader, pAnimShader);
 		iRenderAll++;
 		return;
 	}
@@ -227,16 +228,16 @@ void COcTree::Culling(CGameInstance* pGameInstance, CShader* pShaderCom, _uint& 
 	else if (iInFrustum > 0)
 	{
 		if (nullptr == m_vecChildren[OC_XYZ]) {
-			RenderAll(pShaderCom);
+			RenderAll(pMapShader, pNonAnimShader, pAnimShader);
 			iRenderAll++;
 			return;
 		}
 		
-		RenderMyMesh(pShaderCom);
+		RenderMyMesh(pMapShader, pNonAnimShader, pAnimShader);
 		iRenderMyMesh++;
 
 		for (auto& child : m_vecChildren)
-			child->Culling(pGameInstance, pShaderCom, iRenderAll, iRenderMyMesh);
+			child->Culling(pGameInstance, pMapShader, pNonAnimShader, pAnimShader, iRenderAll, iRenderMyMesh);
 	}
 }
 
@@ -595,44 +596,100 @@ void COcTree::SetUp_ChildrenCenter(_float3 vCenter, _float3 vQuarterExtents, vec
 	_vecChildrenCenters[OC_xYz] = _float3(vCenter.x - vQuarterExtents.x, vCenter.y + vQuarterExtents.y, vCenter.z - vQuarterExtents.z);
 }
 
-void COcTree::RenderAll(CShader* pShaderCom)
+void COcTree::RenderAll(CShader* pMapShader, CShader* pNonAnimShader, CShader* pAnimShader)
 {
 	for (_uint iMeshIdx = 0; iMeshIdx < m_vecMeshes.size(); iMeshIdx++)
 	{
-		m_vecMaterials[iMeshIdx][TEX_DIFFUSE]->Bind_ShaderResource(pShaderCom, "g_DiffuseTexture");
+		m_vecMaterials[iMeshIdx][TEX_DIFFUSE]->Bind_ShaderResource(pMapShader, "g_DiffuseTexture");
 		if(nullptr != m_vecMaterials[iMeshIdx][TEX_NORMAL])
-			m_vecMaterials[iMeshIdx][TEX_NORMAL]->Bind_ShaderResource(pShaderCom, "g_NormalTexture");
+			m_vecMaterials[iMeshIdx][TEX_NORMAL]->Bind_ShaderResource(pMapShader, "g_NormalTexture");
 		if (nullptr != m_vecMaterials[iMeshIdx][TEX_MRA])
-			m_vecMaterials[iMeshIdx][TEX_MRA]->Bind_ShaderResource(pShaderCom, "g_MRATexture");
+			m_vecMaterials[iMeshIdx][TEX_MRA]->Bind_ShaderResource(pMapShader, "g_MRATexture");
 
-		pShaderCom->Bind_RawValue("g_fSamplingFactor", &m_vecSamplingFactors[iMeshIdx], sizeof(_float));
-		pShaderCom->Begin(m_vecPassIndices[iMeshIdx]);
+		pMapShader->Bind_RawValue("g_fSamplingFactor", &m_vecSamplingFactors[iMeshIdx], sizeof(_float));
+		pMapShader->Begin(m_vecPassIndices[iMeshIdx]);
 		m_vecMeshes[iMeshIdx]->Bind_Buffers();
 		m_vecMeshes[iMeshIdx]->Render();
 	}
+
+	for (auto& nonCol : m_vecNonCols) {
+		if (nullptr == nonCol)
+			continue;
+
+		_uint iNumMeshes = nonCol->Get_NumMeshes();
+		vector<string> vecStrings = {m_vecConstantNames[4], m_vecConstantNames[5], m_vecConstantNames[6], m_vecConstantNames[7] };
+
+		nonCol->Bind_StencilRimLightMotionBlur(pNonAnimShader, vecStrings);
+
+		for (_uint i = 0; i < iNumMeshes; i++) {
+			if (FAILED(nonCol->Bind_ShaderResource(pNonAnimShader, m_vecConstantNames[0].c_str(), i, TextureType_DIFFUSE)))
+				return;
+			if (FAILED(nonCol->Bind_ShaderResource(pNonAnimShader, m_vecConstantNames[1].c_str(), i, TextureType_NORMALS)))
+				return;
+			if (FAILED(nonCol->Bind_ShaderResource(pNonAnimShader, m_vecConstantNames[2].c_str(), i, TextureType_METALNESS)))
+				return;
+			if (FAILED(pNonAnimShader->Begin(nonCol->Get_ModelPassIndex())))
+				return;
+			if (FAILED(nonCol->Render(i)))
+				return;
+		}
+	}
+
+	for (auto& colNonAnim : m_vecColNonAnims)
+	{
+		if (nullptr == colNonAnim)
+			continue;
+
+		_uint iNumMeshes = colNonAnim->Get_NumMeshes();
+		vector<string> vecStrings = { m_vecConstantNames[4], m_vecConstantNames[5], m_vecConstantNames[6], m_vecConstantNames[7] };
+
+		colNonAnim->Bind_StencilRimLightMotionBlur(pNonAnimShader, vecStrings);
+
+		for (_uint i = 0; i < iNumMeshes; i++) {
+			if (FAILED(colNonAnim->Bind_ShaderResource(pNonAnimShader, m_vecConstantNames[0].c_str(), i, TextureType_DIFFUSE)))
+				return;
+			if (FAILED(colNonAnim->Bind_ShaderResource(pNonAnimShader, m_vecConstantNames[1].c_str(), i, TextureType_NORMALS)))
+				return;
+			if (FAILED(colNonAnim->Bind_ShaderResource(pNonAnimShader, m_vecConstantNames[2].c_str(), i, TextureType_METALNESS)))
+				return;
+			if (FAILED(pNonAnimShader->Begin(colNonAnim->Get_ModelPassIndex())))
+				return;
+			if (FAILED(colNonAnim->Render(i)))
+				return;
+		}
+	}
 }
 
-void COcTree::RenderMyMesh(CShader* pShaderCom)
+void COcTree::RenderMyMesh(CShader* pMapShader, CShader* pNonAnimShader, CShader* pAnimShader)
 {
 	for (_uint iMeshIdx = 0; iMeshIdx < m_vecMyMeshes.size(); iMeshIdx++)
 	{
-		m_vecMyMaterials[iMeshIdx][TEX_DIFFUSE]->Bind_ShaderResource(pShaderCom, "g_DiffuseTexture");
+		m_vecMyMaterials[iMeshIdx][TEX_DIFFUSE]->Bind_ShaderResource(pMapShader, "g_DiffuseTexture");
 		if(nullptr != m_vecMyMaterials[iMeshIdx][TEX_NORMAL])
-			m_vecMyMaterials[iMeshIdx][TEX_NORMAL]->Bind_ShaderResource(pShaderCom, "g_NormalTexture");
+			m_vecMyMaterials[iMeshIdx][TEX_NORMAL]->Bind_ShaderResource(pMapShader, "g_NormalTexture");
 		if(nullptr != m_vecMyMaterials[iMeshIdx][TEX_MRA])
-			m_vecMyMaterials[iMeshIdx][TEX_MRA]->Bind_ShaderResource(pShaderCom, "g_MRATexture");
+			m_vecMyMaterials[iMeshIdx][TEX_MRA]->Bind_ShaderResource(pMapShader, "g_MRATexture");
 
-		pShaderCom->Bind_RawValue("g_fSamplingFactor", &m_vecMySamplingFactors[iMeshIdx], sizeof(_float));
-		pShaderCom->Begin(m_vecMyPassIndices[iMeshIdx]);
+		pMapShader->Bind_RawValue("g_fSamplingFactor", &m_vecMySamplingFactors[iMeshIdx], sizeof(_float));
+		pMapShader->Begin(m_vecMyPassIndices[iMeshIdx]);
 		m_vecMyMeshes[iMeshIdx]->Bind_Buffers();
 		m_vecMyMeshes[iMeshIdx]->Render();
 	}
+}
 
-	if (nullptr == m_vecChildren[OC_XYZ])
-		return;
+void COcTree::InsertNonCols(vector<class CModel*>& _vecNonCols)
+{
+	m_vecNonCols = _vecNonCols;
+}
 
-	for (auto& pChild : m_vecChildren)
-		pChild->RenderAll(pShaderCom);
+void COcTree::InsertColNonAnims(vector<class CModel*>& _vecColNonAnims)
+{
+	m_vecColNonAnims = _vecColNonAnims;
+}
+
+void COcTree::InsertColAnims(vector<class CModel*>& _vecColAnims)
+{
+	m_vecColAnims = _vecColAnims;
 }
 
 COcTree* COcTree::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _float3 vCenter, _float3 vHalfExtents

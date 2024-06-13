@@ -527,6 +527,8 @@ HRESULT CLoader::Loading_For_Tool_Map()
 	m_strLoadingText = TEXT("모델(을) 로딩 중 입니다.");
 	if(FAILED(Add_AllModelTxts(eLevel, TYPE_NONANIM)))
 		return E_FAIL;
+	if (FAILED(Add_AllModelTxts(eLevel, TYPE_ANIM, true)))
+		return E_FAIL;
 	
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 
@@ -818,11 +820,13 @@ HRESULT CLoader::Add_KirbyFaceTexture(LEVEL eLevel)
 }
 
 // TOOL_MAP, TOOL_ANIM에서 사용중인 함수.
-HRESULT CLoader::Add_AllModelTxts(LEVEL eLevel, TYPE eType)
+HRESULT CLoader::Add_AllModelTxts(LEVEL eLevel, TYPE eType, _bool bMapDeco)
 {
 	HRESULT hr = S_OK;
 
 	wstring wstrRootFolderPath = TEXT("../../../model_txt/");
+	if (bMapDeco == true)
+		wstrRootFolderPath += L"MapDeco/";
 	if (TYPE_ANIM == eType)
 		wstrRootFolderPath += TEXT("Anim/");
 	else if (TYPE_NONANIM == eType)

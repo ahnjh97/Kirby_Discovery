@@ -74,6 +74,9 @@ HRESULT CModel::Initialize_Prototype(MODEL tModel)
 	if (m_tModel.eType == TYPE_NONANIM)
 		strFolderName = "Non" + strFolderName;
 
+	if (true == m_tModel.bMapDeco)
+		strFolderName = "OptimizedMapDecos/" + strFolderName;
+
 	m_strDirectory = "../../../model_txt/" + strFolderName + m_tModel.strModelName + strTxt;
 
 	m_InputFile.open(m_strDirectory.c_str(), ios::in | ios::binary);
@@ -111,29 +114,6 @@ HRESULT CModel::Initialize_Prototype(MODEL tModel)
 	}
 
 	m_InputFile.close();
-
-	if (true == tModel.bOctree) {
-		/*Create_MergedMesh(TransformMatrix);
-		CreateSamplerState();
-
-		vector<wstring> vecDiffuse;
-		for (auto& vecPaths : m_vecTexturePaths)
-			vecDiffuse.push_back(vecPaths[TextureType_DIFFUSE]);
-		m_vecTextureArraySRVs.emplace_back(CreateTexture2DArraySRV(vecDiffuse));
-
-		vector<wstring> vecNormal;
-		for (auto& vecPaths : m_vecTexturePaths)
-			vecNormal.push_back(vecPaths[TextureType_NORMALS]);
-		m_vecTextureArraySRVs.emplace_back(CreateTexture2DArraySRV(vecNormal));
-
-		vector<wstring> vecMRA;
-		for (auto& vecPaths : m_vecTexturePaths)
-			vecMRA.push_back(vecPaths[TextureType_METALNESS]);
-		m_vecTextureArraySRVs.emplace_back(CreateTexture2DArraySRV(vecMRA));*/
-
-		//wstring wstrFullPath = L"../../../Resources/Models/NonAnim/Level1Stage1Step01/GsAllBuildingCeilingConcreteC_MRA._622887136.dds";
-		//vecTexPath.emplace_back(wstrFullPath);
-	}
 		
 	return S_OK;
 }
@@ -220,7 +200,7 @@ HRESULT CModel::Render(_uint iMeshIndex)
 	return S_OK;
 }
 
-HRESULT CModel::Render()
+HRESULT CModel::RenderMergedMesh()
 {
 	if (nullptr == m_pMergedMesh)
 		return S_OK;
@@ -476,12 +456,13 @@ HRESULT CModel::Bind_StencilRimLightMotionBlur(CShader* pShader, vector<string>&
 	return S_OK;
 }
 
-void CModel::SetUpStencilRimLightMotionBlur(_uint iShaderVars, _float fRimWidth)
+void CModel::SetUpStencilRimLightMotionBlurPassIndex(_uint iShaderVars, _float fRimWidth, _uint iPassIndex)
 {
 	m_bStencil = (iShaderVars >> 2) & 1;
 	m_bRimLight = (iShaderVars >> 1) & 1;
 	m_bMotionBlur = iShaderVars & 1;
 	m_fRimWidth = fRimWidth;
+	m_iPassIndex = iPassIndex;
 }
 
 HRESULT CModel::Ready_Meshes(_bool bOctree)

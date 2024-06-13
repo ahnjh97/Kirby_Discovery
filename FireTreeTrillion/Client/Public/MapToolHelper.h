@@ -49,7 +49,10 @@ private:
 	void	Save_Octree();
 
 	void	RegisterRallyPoints(list<CGameObject*>* _pObjList);
-	void	SaveMapDecoObjects();
+	void	SaveMapDecoObjects(vector<CGameObject*>& _vecDecoObjs);
+	void	LoadMapDecoObjects();
+	void	WriteLocalizedAnimMapDecos(vector<pair<string, _float4x4>>& _vecAnimDecos);
+	void	WriteLocalizedNonAnimMapDecos(vector<pair<string, _float4x4>>& _vecNonAnimDecos);
 
 	// Picking
 	CGameObject* Select_ModelByPicking(const wstring& wstrLayerTag = TEXT("Layer_Parse"));
@@ -76,6 +79,10 @@ private:
 	unordered_set<string>	m_setTriggerNames;
 	unordered_set<string>	m_setRallyingMonsters;
 	unordered_set<string>	m_setObjectTxts;
+
+	unordered_set<string>	m_setNonColDecos;
+	unordered_set<string>	m_setAnimDecos;
+	unordered_set<string>	m_setActorDecos;
 
 	vector<string>	m_vecMapTxts;
 	vector<string>	m_vecTriggerTxts;

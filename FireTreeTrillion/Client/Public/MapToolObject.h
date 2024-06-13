@@ -69,7 +69,7 @@ private:
 
 	string m_strConnectedMonster;
 	map<_uint, _float3> m_RallyPoints;
-	TYPE_MAPOBJ m_eMapObjType = { MAPOBJ_END };
+	TYPE_MAPOBJ m_eMapObjType = { MAPOBJ_ACTOR };
 
 private:
 	CModel* m_pModelCom = { nullptr };

@@ -70,6 +70,10 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy", "RallyPoint", "LightBulb" };
 	m_setRallyingMonsters = { "NonAnim_Kabu", "NonAnim_BrontoBurt" };
 
+	m_setNonColDecos = {};
+	m_setAnimDecos = {};
+	m_setActorDecos = { "SeDriftWoodAL", "SeDriftWoodBL", "SeDriftWoodCL", "GsBenchAL" };
+
 	vecPassIndices.resize(m_vecMapModelNames.size());
 	vecSamplingFactors.resize(m_vecMapModelNames.size());
 
@@ -679,6 +683,8 @@ void CMapToolHelper::Save_Level()
 
 	RegisterRallyPoints(pObjectsList);
 		
+	vector<CGameObject*> vecDecoObjs;
+
 	for (auto& object : *pObjectsList)
 	{
 		if (nullptr == object)
@@ -693,6 +699,11 @@ void CMapToolHelper::Save_Level()
 			continue;
 
 		string strModelName = pModel->Get_ModelInfo().strModelName;
+		if (m_setObjectTxts.end() != m_setObjectTxts.find(strModelName)) {
+			vecDecoObjs.push_back(object);
+			continue;
+		}
+
 		_float4x4 matWorld = pTransform->Get_WorldMatrix();
 		_uint iStrLength = strModelName.length();
 		_uint iShaderVars = object->Get_ShaderVars();
@@ -807,6 +818,8 @@ void CMapToolHelper::Save_Level()
 		return;
 	}
 
+	SaveMapDecoObjects(vecDecoObjs);
+
 	wstring wstrSaveMsg = CUtils::StrToWstr(strLevel) + TEXT(" Saved.");
 	MSG_BOX(wstrSaveMsg.c_str());
 }
@@ -842,7 +855,7 @@ void CMapToolHelper::Load_Level()
 
 	while (!fileStream.eof()) 
 	{
-		_uint iStrLength;
+		_uint iStrLength{};
 		fileStream.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
 		strModelName.resize(iStrLength);
 		fileStream.read(&strModelName[0], iStrLength);
@@ -962,6 +975,8 @@ void CMapToolHelper::Load_Level()
 	}
 
 	fileStream.close();
+
+	LoadMapDecoObjects();
 }
 
 void CMapToolHelper::Save_MapShaderInfo()
@@ -1306,31 +1321,33 @@ void CMapToolHelper::RegisterRallyPoints(list<CGameObject*>* _pObjList)
 	}
 }
 
-void CMapToolHelper::SaveMapDecoObjects()
+void CMapToolHelper::SaveMapDecoObjects(vector<CGameObject*>& _vecDecoObjs)
 {
 	string strLevel = m_vecLevelName[iLevelIndex + LEVEL_INTRO];
 	string tempFileName = "temp_" + m_vecLevelName[iLevelIndex + LEVEL_INTRO] + "_DecoObjs.txt";
 
 	ofstream fileOutput(tempFileName, ios::binary);
 
-	list<CGameObject*>* pObjList = m_pGameInstance->Get_List(LEVEL_TOOL_MAP, TEXT("Layer_Parse"));
+	vector<pair<string, _float4x4>> vecAnimDecos;
+	vector<pair<string, _float4x4>> vecNonAnimDecos;
 
-	if (nullptr == pObjList || pObjList->empty())
+	if (_vecDecoObjs.empty())
 		return;
 
-	for (auto& obj : *pObjList)
+	for (auto& obj : _vecDecoObjs)
 	{
 		if (nullptr == obj)
 			continue;
 
-		CMapToolObject* pMapToolObj = dynamic_cast<CMapToolObject*>(obj);
-		_uint iMapObjType = pMapToolObj->Get_MapObjType();
-		
-		fileOutput.write(reinterpret_cast<const char*>(&iMapObjType), sizeof(iMapObjType));
-
 		CModel* pModel = dynamic_cast<CModel*>(obj->Get_Component(TEXT("Com_Model")));
 		if (nullptr == pModel)
 			continue;
+
+		CMapToolObject* pMapToolObj = dynamic_cast<CMapToolObject*>(obj);
+		_uint iMapObjType = pMapToolObj->Get_MapObjType();
+
+		fileOutput.write(reinterpret_cast<const char*>(&iMapObjType), sizeof(iMapObjType));
+
 		CTransform* pTransform = dynamic_cast<CTransform*>(obj->Get_Component(g_strTransformTag));
 		if (nullptr == pTransform)
 			continue;
@@ -1340,6 +1357,11 @@ void CMapToolHelper::SaveMapDecoObjects()
 		_uint iStrLength = strModelName.length();
 		_uint iShaderVars = obj->Get_ShaderVars();
 		_float fRimWidth = obj->Get_RimWidth();
+
+		if (CMapToolObject::MAPOBJ_ANIM == iMapObjType)
+			vecAnimDecos.emplace_back(strModelName, matWorld);
+		else
+			vecNonAnimDecos.emplace_back(strModelName, matWorld);
 
 		fileOutput.write(reinterpret_cast<const char*>(&iStrLength), sizeof(iStrLength));
 		fileOutput.write(strModelName.c_str(), iStrLength);
@@ -1385,8 +1407,211 @@ void CMapToolHelper::SaveMapDecoObjects()
 		return;
 	}
 
-	wstring wstrSaveMsg = CUtils::StrToWstr(strLevel) + TEXT("_DecoObjs Saved.");
-	MSG_BOX(wstrSaveMsg.c_str());
+	WriteLocalizedAnimMapDecos(vecAnimDecos);
+	WriteLocalizedNonAnimMapDecos(vecNonAnimDecos);
+}
+
+void CMapToolHelper::LoadMapDecoObjects()
+{
+	string strLevel = m_vecLevelName[iLevelIndex + LEVEL_INTRO];
+	if ("Intro" != strLevel)
+		return;
+
+	string strFileName = "../../../objects_txt/" + strLevel + "_DecoObjs.txt";
+
+	ifstream fileInput(strFileName, ios::binary);
+	if (fileInput.is_open() == false)
+	{
+		wstring wstrError = TEXT("Failed to open : ") + CUtils::StrToWstr(strLevel) + TEXT("_DecoObjs.txt");
+		MSG_BOX(wstrError.c_str());
+		return;
+	}
+
+	_uint iMapObjType{};
+	string strModelName;
+	_float4x4 matWorld{};
+	_uint iStrLength{};
+	_uint iShaderVars{};
+	_float fRimWidth{};
+
+	while (!fileInput.eof())
+	{
+		fileInput.read(reinterpret_cast<char*>(&iMapObjType), sizeof(iMapObjType));
+		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
+		strModelName.resize(iStrLength);
+		fileInput.read(&strModelName[0], iStrLength);
+		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
+		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
+		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
+
+		CMapToolObject::MAPTOOLOBJECT_DESC tDesc{};
+		tDesc.eMapObjType = CMapToolObject::TYPE_MAPOBJ(iMapObjType);
+		tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+		tDesc.matWorld = matWorld;
+		tDesc.iShaderVars = iShaderVars;
+		tDesc.fRimWidth = fRimWidth;
+
+		if (fileInput.eof())
+			break;
+
+		wstring wstrGameObjectTag = TEXT("MapToolObject");
+
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
+		{
+			wstring wstrErrorMsg = TEXT("Failed to Clone: ") + wstrGameObjectTag;
+			MSG_BOX(wstrErrorMsg.c_str());
+			fileInput.close();
+			return;
+		}
+	}
+
+	fileInput.close();
+}
+
+void CMapToolHelper::WriteLocalizedAnimMapDecos(vector<pair<string, _float4x4>>& _vecAnimDecos)
+{
+	if (_vecAnimDecos.empty())
+		return;
+
+	for (auto& Name_Matrix : _vecAnimDecos)
+	{
+		string strPath = "../../../model_txt/MapDeco/Anim/" + Name_Matrix.first + ".txt";
+		ifstream inputFile(strPath, ios::binary);
+		if (false == inputFile.is_open()) {
+			MSG_BOX(TEXT("원본파일 열기실패"));
+			return;
+		}
+
+		string strLocalized = "../../../model_txt/OptimizedMapDecos/Anim/" + Name_Matrix.first + ".txt";
+		ofstream outputFile(strLocalized, ios::binary | ios::trunc); // 같은 이름을 가진 파일 있을 경우 삭제
+		if (!outputFile.is_open()) {
+			MSG_BOX(TEXT("새 파일 열기실패"));
+			return;
+		}
+
+		//Bones
+
+		_uint iNumBones = {};
+
+		inputFile.read(reinterpret_cast<char*>(&iNumBones), sizeof(iNumBones));
+		outputFile.write(reinterpret_cast<const char*>(&iNumBones), sizeof(iNumBones));
+
+		for (_uint i = 0; i < iNumBones; i++)
+		{
+			constexpr _uint iBytesToCopy = sizeof(_int) + MAX_PATH + sizeof(_float4x4);
+			_char copyBuf[iBytesToCopy];
+			inputFile.read(copyBuf, iBytesToCopy);
+			outputFile.write(copyBuf, iBytesToCopy);
+		}
+
+		_uint iNumMeshes{};
+		inputFile.read(reinterpret_cast<char*>(&iNumMeshes), sizeof(iNumMeshes));
+		outputFile.write(reinterpret_cast<const char*>(&iNumMeshes), sizeof(iNumMeshes));
+
+		_matrix matWorld = XMLoadFloat4x4(&Name_Matrix.second);
+
+		for (_uint i = 0; i < iNumMeshes; i++)
+		{
+			_char szName[MAX_PATH] = {};
+			_uint iMaterialIndex{};
+			_uint iNumVertices{};
+			_uint iFaces{};
+			inputFile.read(reinterpret_cast<char*>(&szName), sizeof(szName));
+			inputFile.read(reinterpret_cast<char*>(&iMaterialIndex), sizeof(iMaterialIndex));
+			inputFile.read(reinterpret_cast<char*>(&iNumVertices), sizeof(iNumVertices));
+			inputFile.read(reinterpret_cast<char*>(&iFaces), sizeof(iFaces));
+			outputFile.write(szName, MAX_PATH);
+			outputFile.write(reinterpret_cast<const char*>(&iMaterialIndex), sizeof(iMaterialIndex));
+			outputFile.write(reinterpret_cast<const char*>(&iNumVertices), sizeof(iNumVertices));
+			outputFile.write(reinterpret_cast<const char*>(&iFaces), sizeof(iFaces));
+
+			for (_uint j = 0; j < iNumVertices; j++)
+			{
+				_float3 vPos{};
+				inputFile.read(reinterpret_cast<char*>(&vPos), sizeof(vPos));
+
+				_vector vTempPos = ::XMLoadFloat3(&vPos);
+				_vector vResult = XMVector3TransformCoord(vTempPos, matWorld);
+				::XMStoreFloat3(&vPos, vResult);
+				outputFile.write(reinterpret_cast<const char*>(&vPos), sizeof(vPos));
+
+				constexpr _uint iBytesToCopy = sizeof(_float3) + sizeof(_float2) + sizeof(_float3);
+				_char copyBuf[iBytesToCopy];
+				inputFile.read(copyBuf, iBytesToCopy);
+				outputFile.write(copyBuf, iBytesToCopy);
+			}
+		}
+
+		outputFile << inputFile.rdbuf();
+		inputFile.close();
+		outputFile.close();
+	}
+}
+
+void CMapToolHelper::WriteLocalizedNonAnimMapDecos(vector<pair<string, _float4x4>>& _vecNonAnimDecos)
+{
+	if (_vecNonAnimDecos.empty())
+		return;
+
+	for (auto& nameWorldMat : _vecNonAnimDecos)
+	{
+		string strPath = "../../../model_txt/NonAnim/" + nameWorldMat.first + ".txt";
+
+		ifstream inputFile(strPath, ios::binary);
+		if (false == inputFile.is_open()) {
+			MSG_BOX(TEXT("원본파일 열기실패"));
+			return;
+		}
+
+		string strLocalized = "../../../model_txt/OptimizedMapDecos/NonAnim/" + nameWorldMat.first + ".txt";
+		ofstream outputFile(strLocalized, ios::binary | ios::trunc);
+		if (!outputFile.is_open()) {
+			MSG_BOX(TEXT("새 파일 열기실패"));
+			return;
+		}
+
+		_uint iNumMeshes{};
+		inputFile.read(reinterpret_cast<char*>(&iNumMeshes), sizeof(iNumMeshes));
+		outputFile.write(reinterpret_cast<const char*>(&iNumMeshes), sizeof(iNumMeshes));
+
+		_matrix matWorld = XMLoadFloat4x4(&nameWorldMat.second);
+
+		for (_uint i = 0; i < iNumMeshes; i++)
+		{
+			_char szName[MAX_PATH] = {};
+			_uint iMaterialIndex{};
+			_uint iNumVertices{};
+			_uint iFaces{};
+			inputFile.read(reinterpret_cast<char*>(&szName), sizeof(szName));
+			inputFile.read(reinterpret_cast<char*>(&iMaterialIndex), sizeof(iMaterialIndex));
+			inputFile.read(reinterpret_cast<char*>(&iNumVertices), sizeof(iNumVertices));
+			inputFile.read(reinterpret_cast<char*>(&iFaces), sizeof(iFaces));
+			outputFile.write(szName, MAX_PATH);
+			outputFile.write(reinterpret_cast<const char*>(&iMaterialIndex), sizeof(iMaterialIndex));
+			outputFile.write(reinterpret_cast<const char*>(&iNumVertices), sizeof(iNumVertices));
+			outputFile.write(reinterpret_cast<const char*>(&iFaces), sizeof(iFaces));
+
+			for (_uint j = 0; j < iNumVertices; j++)
+			{
+				_float3 vPos{};
+				inputFile.read(reinterpret_cast<char*>(&vPos), sizeof(vPos));
+
+				_vector vTempPos = ::XMLoadFloat3(&vPos);
+				_vector vResult = XMVector3TransformCoord(vTempPos, matWorld);
+				::XMStoreFloat3(&vPos, vResult);
+				outputFile.write(reinterpret_cast<const char*>(&vPos), sizeof(vPos));
+
+				constexpr _uint iBytesToCopy = sizeof(_float3) + sizeof(_float2) + sizeof(_float3);
+				_char copyBuf[iBytesToCopy];
+				inputFile.read(copyBuf, iBytesToCopy);
+				outputFile.write(copyBuf, iBytesToCopy);
+			}
+		}
+
+		outputFile << inputFile.rdbuf();
+		inputFile.close();
+		outputFile.close();
+	}
 }
 
 CMapToolHelper* CMapToolHelper::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

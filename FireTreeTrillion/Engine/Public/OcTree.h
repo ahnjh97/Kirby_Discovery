@@ -29,7 +29,8 @@ public:
 
 	HRESULT Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, ifstream& octreeFile, vector<string>& _vecConstantNames);
 
-	void Culling(class CGameInstance* pGameInstance, class CShader* pShaderCom, _uint& iRenderAll, _uint& iRenderMyMesh);
+	void Culling(CGameInstance* pGameInstance, class CShader* pMapShader, class CShader* pNonAnimShader, class CShader* pAnimShader
+		, _uint& iRenderAll, _uint& iRenderMyMesh);
 	_bool IsDrawable(class CGameInstance* pGameInstance);
 
 	void IdentifyOctant(_uint _iMeshIdx, const _float3* _pVerticesPos, const _uint _iNumVertices, const vector<FACE>& _vecMeshFaces); // 어떤 8분면에 속하는지를 검사
@@ -42,13 +43,12 @@ public:
 	void SetUp_Edges(_float3 vCenter, _float3 vHalfExtents);
 	void SetUp_ChildrenCenter(_float3 vCenter, _float3 vQuarterExtents, vector<_float3>& _vecChildrenCenters);
 
-	void RenderAll(class CShader* pShaderCom);
-	void RenderMyMesh(class CShader* pShaderCom);
+	void RenderAll(class CShader* pMapShader, class CShader* pNonAnimShader, class CShader* pAnimShader);
+	void RenderMyMesh(class CShader* pMapShader, class CShader* pNonAnimShader, class CShader* pAnimShader);
 
-	
-	void InsertNonColModels(vector<class CModel*>& _vecNonColModels);
-	void InsertColNonAnimModels(vector<class CModel*>& _vecColNonAnimModels);
-	void InsertColAnimModels(vector<class CModel*>& _vecColAnimModels);
+	void InsertNonCols(vector<class CModel*>& _vecNonCols);
+	void InsertColNonAnims(vector<class CModel*>& _vecColNonAnims);
+	void InsertColAnims(vector<class CModel*>& _vecColAnims);
 
 private:
 	_uint					m_iNumMeshes = {};
@@ -81,6 +81,7 @@ private:
 	vector<string>			m_vecConstantNames;
 
 	_uint					m_iZero = {};
+	_float					m_fOne = { 1 };
 	
 public:
 	static COcTree* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _float3 vCenter, _float3 vHalfExtents
