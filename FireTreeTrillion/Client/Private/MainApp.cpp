@@ -17,9 +17,9 @@
 CMainApp::CMainApp()
 	: m_pGameInstance(CGameInstance::Get_Instance())
 {
-	Safe_AddRef(m_pGameInstance);		
+	Safe_AddRef(m_pGameInstance);
 
-	
+
 }
 
 
@@ -32,20 +32,20 @@ HRESULT CMainApp::Initialize()
 	EngineDesc.iWinSizeX = g_iWinSizeX;
 	EngineDesc.iWinSizeY = g_iWinSizeY;
 
-	/* ³» °ÔÀÓÀÇ ±âÃÊ ÃÊ±âÈ­ °úÁ¤À» °ÅÄ¡ÀÚ. */
+	/* ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½. */
 	if (FAILED(m_pGameInstance->Initialize_Engine(g_hInst, LEVEL_END, EngineDesc, &m_pDevice, &m_pContext)))
 		return E_FAIL;
 
 	if (FAILED(Ready_Fonts()))
 		return E_FAIL;
 
-	//loaderÀÇ Loading_StaticComponentAll() ·Î ¿Å±è
+	//loaderï¿½ï¿½ Loading_StaticComponentAll() ï¿½ï¿½ ï¿½Å±ï¿½
 	if (FAILED(Ready_Prototype_Component_For_Static()))
 		return E_FAIL;
 
 	if (FAILED(Open_Level(LEVEL_LOGO)))
 		return E_FAIL;
-	
+
 
 	CCollisionCenter::Get_Instance()->Initialize();
 
@@ -100,26 +100,26 @@ HRESULT CMainApp::Render(_float fTimeDelta)
 {
 	if (nullptr == m_pGameInstance)
 		return E_FAIL;
-	
+
 	m_pGameInstance->Begin_Draw(_float4(0.5f, 0.f, 1.f, 1.f));
 
 	m_pGameInstance->Draw(fTimeDelta);
 
 #ifdef _DEBUG
-	
-	//·»´õ Å¸°Ù ºä ON/OFF
+
+	//ï¿½ï¿½ï¿½ï¿½ Å¸ï¿½ï¿½ ï¿½ï¿½ ON/OFF
 	if (m_pGameInstance->Get_DIKeyState(DIK_F1, KEY_DOWN))
 		m_IsRenderRTV = !m_IsRenderRTV;
 
 
-	// RTV_FONT Ãß°¡
+	// RTV_FONT ï¿½ß°ï¿½
 #pragma region GAME_OBJ
 
 	if (m_IsRenderRTV)
 		Render_RTVFonts();
 
 #endif // _DEBUG
-	
+
 
 	m_pGameInstance->End_Draw();
 
@@ -128,19 +128,19 @@ HRESULT CMainApp::Render(_float fTimeDelta)
 
 HRESULT CMainApp::Ready_Fonts()
 {
-	// MakeSpriteFont "³Ø½¼lv1°íµñ Bold" /FontSize:30 /FastPack /CharacterRegion:0x0020-0x00FF /CharacterRegion:0x3131-0x3163 /CharacterRegion:0xAC00-0xD800 /DefaultCharacter:0xAC00 142.spritefont
+	// MakeSpriteFont "ï¿½Ø½ï¿½lv1ï¿½ï¿½ï¿½ï¿½ Bold" /FontSize:30 /FastPack /CharacterRegion:0x0020-0x00FF /CharacterRegion:0x3131-0x3163 /CharacterRegion:0xAC00-0xD800 /DefaultCharacter:0xAC00 142.spritefont
 
-	// 05.25) aÀÚ¸·Ã¼ ¿µ¹® ÆùÆ® Ãß°¡
-	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUDSub_EN10"), 
+	// 05.25) aï¿½Ú¸ï¿½Ã¼ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ® ï¿½ß°ï¿½
+	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUDSub_EN10"),
 		TEXT("../Bin/Resources/Fonts/HUD_Sub_EN10.spritefont"))))
 		return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUDSub_KR15"), 
+	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUDSub_KR15"),
 		TEXT("../Bin/Resources/Fonts/HUD_Sub_KR15.SpriteFont"))))
 		return E_FAIL;
 
-	// FOT-Seurat Pro EB /Fontsize 30 /CharacterRegion: 0x0030-0x0039 (¼ýÀÚ¸¸)
-	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUD_StarPoint_NUM30"), 
+	// FOT-Seurat Pro EB /Fontsize 30 /CharacterRegion: 0x0030-0x0039 (ï¿½ï¿½ï¿½Ú¸ï¿½)
+	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUD_StarPoint_NUM30"),
 		TEXT("../Bin/Resources/Fonts/HUD_StarPoint_NUM30.spritefont"))))
 		return E_FAIL;
 
@@ -160,14 +160,16 @@ HRESULT CMainApp::Open_Level(LEVEL eLevelID)
 HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 {
 
+	HRESULT hr;
+
 	path FXPath("../Bin/Resources/Effects/Single/");
 	if (!exists(FXPath) || !is_directory(FXPath))
 	{
-		ALARM_FAIL(TEXT("¸ÁÇß¾î °æ·Î ¾ø´Ù"));
+		ALARM_FAIL(TEXT("ï¿½ï¿½ï¿½ß¾ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½"));
 		return E_FAIL;
 	}
 
-	//´ÜÀÏ ÀÌÆåÆ®
+	//ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®
 	for (auto& entry : directory_iterator(FXPath))
 	{
 		auto& filePath = entry.path();
@@ -211,10 +213,10 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 
 		wstring wstrProtoName = { TEXT("Prototype_GameObject_") + CUtils::StrToWstr(strname) };
 
-		if (FAILED(m_pGameInstance->Add_Prototype(wstrProtoName, CSingleEffect::Create(m_pDevice, m_pContext, FXDesc))))
-			return E_FAIL;
+		hr = m_pGameInstance->Add_Prototype(wstrProtoName, CSingleEffect::Create(m_pDevice, m_pContext, FXDesc));
+		CHECK_FAILED(hr);
 
-		
+
 		//Make_Effect(FXData);
 	}
 
@@ -223,11 +225,11 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 	FXPath = "../Bin/Resources/Effects/Multi/";
 	if (!exists(FXPath) || !is_directory(FXPath))
 	{
-		ALARM_FAIL(TEXT("¸ÁÇß¾î °æ·Î ¾ø´Ù"));
+		ALARM_FAIL(TEXT("ï¿½ï¿½ï¿½ß¾ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½"));
 		return E_FAIL;
 	}
 
-	//º¹ÇÕ ÀÌÆåÆ®
+	//ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®
 	for (auto& entry : directory_iterator(FXPath))
 	{
 		auto& filePath = entry.path();
@@ -238,7 +240,7 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 
 		MULTI_FX_DATA FXData = {};
 		CUtils::Load_Effect(filePath, &FXData);
-		
+
 		CMultiEffect::MULTI_FX_DESC FXDesc = {};
 
 		FXDesc.strFXName = FXData.strName;
@@ -248,8 +250,8 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 
 		wstring wstrProtoName = { TEXT("Prototype_GameObject_") + CUtils::StrToWstr(strname) };
 
-		if (FAILED(m_pGameInstance->Add_Prototype(wstrProtoName, CMultiEffect::Create(m_pDevice, m_pContext, FXDesc))))
-			return E_FAIL;
+		hr = m_pGameInstance->Add_Prototype(wstrProtoName, CMultiEffect::Create(m_pDevice, m_pContext, FXDesc));
+		CHECK_FAILED(hr);
 
 	}
 
@@ -261,7 +263,7 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 #ifdef _DEBUG
 _bool CMainApp::Render_RTVFonts()
 {
-	// RTV_FONT Ãß°¡
+	// RTV_FONT ï¿½ß°ï¿½
 #pragma region GAME_OBJ
 
 	_float fRTVFont = { 100.f };
@@ -342,14 +344,14 @@ _bool CMainApp::Render_RTVFonts()
 #endif // _DEBUG
 
 
-CMainApp * CMainApp::Create()
+CMainApp* CMainApp::Create()
 {
-	CMainApp*		pInstance = new CMainApp();
+	CMainApp* pInstance = new CMainApp();
 
 	if (FAILED(pInstance->Initialize()))
 	{
 		MSG_BOX(TEXT("Failed To Created : CMainApp"));
-		
+
 		Safe_Release(pInstance);
 	}
 

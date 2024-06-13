@@ -1370,26 +1370,26 @@ void CFXToolDirector::Render_FXProperty()
 		pCurFX->m_iPassIdx = m_iCurFXPassIdx;
 	}
 
-	if (InputInt(u8"디퓨즈 인덱스", &pCurFX->m_iTexIdx, 1, pCurFX->m_iMaxTexIdx))
+	if (InputInt(u8"디퓨즈 인덱스", &m_iCurFXTexIdx, 1, pCurFX->m_iMaxTexIdx))
 	{
 		//가능한 인덱스로 한 번 보정해 주기
 		if (m_iCurFXTexIdx < 0)
 			m_iCurFXTexIdx = 0;
 
-		//if(pCurFX->m_iMaskTexIdx < m_iCurFXTexIdx)
-		//	m_iCurFXTexIdx = pCurFX->m_iMaskTexIdx;
+		if(pCurFX->m_iMaxTexIdx < m_iCurFXTexIdx)
+			m_iCurFXTexIdx = pCurFX->m_iMaskTexIdx;
 
 		pCurFX->m_iTexIdx = m_iCurFXTexIdx;
 	}
 
-	if (InputInt(u8"마스크 인덱스", &pCurFX->m_iMaskTexIdx, 1, pCurFX->m_iMaxMaskTexIdx))
+	if (InputInt(u8"마스크 인덱스", &m_iCurFXMaskTexIdx, 1, pCurFX->m_iMaxMaskTexIdx))
 	{
 		//가능한 인덱스로 한 번 보정해 주기
 		if (m_iCurFXMaskTexIdx < 0)
 			m_iCurFXMaskTexIdx = 0;
 
-		//if (pCurFX->m_iMaskTexIdx < m_iCurFXMaskTexIdx)
-		//	m_iCurFXMaskTexIdx = pCurFX->m_iMaskTexIdx;
+		if (pCurFX->m_iMaxMaskTexIdx < m_iCurFXMaskTexIdx)
+			m_iCurFXMaskTexIdx = pCurFX->m_iMaskTexIdx;
 
 		pCurFX->m_iMaskTexIdx = m_iCurFXMaskTexIdx;
 	}
@@ -2090,6 +2090,7 @@ void CFXToolDirector::Render_MultiFXHierarchy()
 			m_iCurFXMaskTexIdx = m_FXs[i]->m_iMaskTexIdx;*/
 
 			m_fTotalPlayDuration = m_MultiFXs[i]->m_fDuration.second;
+
 			//m_fLifetime[0] = m_MultiFXs[i]->m_fLifetime.first;
 			//m_fLifetime[1] = m_MultiFXs[i]->m_fLifetime.second;
 

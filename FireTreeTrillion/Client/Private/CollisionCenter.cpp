@@ -31,15 +31,19 @@ void CCollisionCenter::Initialize()
 	// For CONTENT_ITEM
 	m_eColliderType[PLAYER][ITEM] = CONTENT_ITEM;
 
+	// 레디얼 기름칠
+	GAMEINSTANCE Setting_RadialBlur(5.f, 300.f);
 }
 
 void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 {
 	GAMEINSTANCE Get_CollisionObjects(m_WaitingList);
 
+	// 게임 흐름에 있어서 필요한 슬로우 모션을 충돌에 따라 이곳에서 관리한다.
+	Timer_System(fTimeDelta);
+
 	if (m_WaitingList.empty() == true)
 		return;
-
 
 	// 받아온 두개의 포인터를 사용하여 해당 타입에 맞는 콜라이더를 발동시킨다.
 	for (auto& Pair : m_WaitingList)
@@ -109,18 +113,17 @@ void CCollisionCenter::Collision_Collider(CONTENT_TYPE eType, CPhysXObject* pSrc
 
 		if (pMonster->Get_PhyXState() == PO_NORMAL)
 		{
+			if (Kirby_Dodge_SlowMotionSystem(pPlayer) == true)
+				return;
+
 			// 몬스터의 상태가 노말일 때만, 서로 넉백이 발생하며, 데미지가 발생한다.
 			Player_Monster_Knock_back(pPlayer, pMonster);
 			Compute_Damage(pPlayer, pMonster);
-
-			Camera_Shaking(1.2f);
 		}
 
 		// 흡수 등 로직이 있다. 건들지 마 시 오 ( 관리자 : 윤영우 )
 		pPlayer->Collision(CONTENT_BODY, pMonster);
 		pMonster->Collision(CONTENT_BODY, pMonster);
-
-
 	}
 
 	// 커비가 뱉은 물체에 맞는 충돌처리
@@ -178,6 +181,34 @@ void CCollisionCenter::Camera_Shaking(_float fPower, _float fTime, _float2 vDir)
 	pCamera->Make_Shake(fPower, fTime, vDir);
 }
 
+_bool CCollisionCenter::Kirby_Dodge_SlowMotionSystem(CPhysXObject* pPlayer)
+{
+	if (m_bCheckTimer == true)
+		return true;
+
+
+	CKirby* pKirby = static_cast<CKirby*>(pPlayer);
+	
+	if (pKirby->Get_State() == CKirby::STATE_DODGEBACK1 ||
+		pKirby->Get_State() == CKirby::STATE_DODGEFRONT1 ||
+		pKirby->Get_State() == CKirby::STATE_DODGELEFT1 ||
+		pKirby->Get_State() == CKirby::STATE_DODGERIGHT1 ||
+		pKirby->Get_State() == CKirby::STATE_DODGESTART)
+	{
+		_vector vKirbyPos = pKirby->Get_TransformCom()->Get_State_Vector(CTransform::STATE_POSITION);
+
+		GAMEINSTANCE Set_FirstTimerRatio(0.5f);
+		GAMEINSTANCE Set_SecondTimerRatio(0.5f);
+		GAMEINSTANCE Setting_RadialBlur(vKirbyPos, 30.f, 15.f);
+		GAMEINSTANCE Set_BlackBackGround(true);
+		m_bCheckTimer = true;
+		return true;
+	}
+
+
+	return false;
+}
+
 void CCollisionCenter::Player_Monster_Knock_back(CPhysXObject* pPlayer, CPhysXObject* pMonster)
 {
 	CTransform* pPlayerTransform = pPlayer->Get_TransformCom();
@@ -225,13 +256,19 @@ void CCollisionCenter::Knock_back(CPhysXObject* pObject, _float3 vKnockbackDir, 
 
 void CCollisionCenter::Compute_Damage(CPhysXObject* pPlayer, CPhysXObject* pMonster)
 {
-	CCharacter* pCPlayer = static_cast<CCharacter*>(pPlayer);
+	CKirby* pKirby = static_cast<CKirby*>(pPlayer);
 	CCharacter* pCMonster = static_cast<CCharacter*>(pMonster);
 
-	_float fMonsterAttack = pCMonster->Get_Attack();
-	pCPlayer->Minus_Hp(fMonsterAttack);
-	_float fPlayerAttack = pCPlayer->Get_Attack();
-	pCMonster->Minus_Hp(fMonsterAttack);
+	// 무적이 아닐 경우
+	if (pKirby->isOverPower() == false)
+	{
+		_float fMonsterAttack = pCMonster->Get_Attack();
+		pKirby->Minus_Hp(fMonsterAttack);
+		Camera_Shaking(1.2f);
+	}
+
+	_float fPlayerAttack = pKirby->Get_Attack();
+	pCMonster->Minus_Hp(fPlayerAttack);
 }
 
 void CCollisionCenter::Compute_Heal(CPhysXObject* pPlayer, CPhysXObject* pItem)
@@ -258,6 +295,29 @@ void CCollisionCenter::Compute_SuperPower(CPhysXObject* pPlayer, CPhysXObject* p
 
 
 	// 무적시간을 커비에게 넣어주면 됨.
+}
+
+void CCollisionCenter::Timer_System(_float fTimeDelta)
+{
+	if (m_bCheckTimer == true)
+	{
+		m_fTimeDeltaResetTime += fTimeDelta;
+
+		if (m_fTimeDeltaResetTime > 0.5f)
+		{
+			GAMEINSTANCE Restore_FirstTimer();
+			GAMEINSTANCE Set_BlackBackGround(false);
+		}
+		
+		if (m_fTimeDeltaResetTime > 2.f)
+		{
+			GAMEINSTANCE Restore_SecondTimer();
+
+			m_bCheckTimer = false;
+			m_fTimeDeltaResetTime = 0.f;
+		}
+
+	}
 }
 
 void CCollisionCenter::Free()

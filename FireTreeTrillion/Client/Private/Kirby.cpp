@@ -312,6 +312,9 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 		}
 		else
 		{
+			if (m_bOverPower == true)
+				return;
+
 			// 먹은 상태인 경우
 			if (INFO(m_isEat) == true)
 			{

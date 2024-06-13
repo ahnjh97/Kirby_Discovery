@@ -45,6 +45,7 @@ private:
     // ±â´Éµé
 private:
     void Camera_Shaking(_float fPower = 1.f, _float fTime = 0.5f, _float2 vDir = {0.f, -1.f});
+    _bool Kirby_Dodge_SlowMotionSystem(CPhysXObject* pPlayer);
 
     void Player_Monster_Knock_back(CPhysXObject* pPlayer, CPhysXObject* pMonster);
     void Fly_DeadAway(CPhysXObject* pSrc, CPhysXObject* pDst);
@@ -54,6 +55,11 @@ private:
     void Compute_Heal(CPhysXObject* pPlayer, CPhysXObject* pItem);
     void Compute_Coin(CPhysXObject* pPlayer, CPhysXObject* pItem);
     void Compute_SuperPower(CPhysXObject* pPlayer, CPhysXObject* pItem);
+
+    void Timer_System(_float fTimeDelta);
+    _bool  m_bCheckTimer = { false };
+    _float m_fTimeDeltaResetTime = { 0.f };
+
 
 private:
     CONTENT_TYPE m_eColliderType[COLLISION_END][COLLISION_END];
