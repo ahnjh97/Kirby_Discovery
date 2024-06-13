@@ -41,7 +41,6 @@ HRESULT CEnergyDrink::Initialize(void* pArg)
 	m_iItemPoint = 30;
 
 
-
 	CMultiEffect::MULTI_FX_DESC FXDesc{};
 
 	//_float4 vMyPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);

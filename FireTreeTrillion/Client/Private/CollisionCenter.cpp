@@ -44,6 +44,9 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 	// 게임 흐름에 있어서 필요한 슬로우 모션을 충돌에 따라 이곳에서 관리한다.
 	Timer_System(fTimeDelta);
 
+	// 게임 흐름에 있어서 필요한 사다리 등 충돌에 따라 Kirby가 작동하도록 이곳에서 관리한다.
+	Ladder_Collider();
+
 	if (m_WaitingList.empty() == true)
 		return;
 
@@ -69,6 +72,12 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 	}
 
 	m_WaitingList.clear();
+}
+
+void CCollisionCenter::Add_Ladder(CLadder* pLadder)
+{
+	m_Ladders.emplace_back(pLadder);
+	Safe_AddRef(pLadder);
 }
 
 CCollisionCenter::CONTENT_TYPE CCollisionCenter::Find_ColliderType(CPhysXObject* pSrc, CPhysXObject* pDst)
@@ -175,6 +184,32 @@ void CCollisionCenter::Collision_Collider(CONTENT_TYPE eType, CPhysXObject* pSrc
 		}
 	}
 
+}
+
+void CCollisionCenter::Ladder_Collider()
+{
+	if (m_Ladders.empty() == true)
+		return;
+	CKirby* pKirby = static_cast<CKirby*>(GAMEINSTANCE Get_GameObject(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+	_vector vKirbyPos = pKirby->Get_TransformCom()->Get_State_Vector(CTransform::STATE_POSITION);
+	_bool bCollide = { false };
+
+	for (auto& pLadder : m_Ladders)
+	{
+		// 충돌이 될 때까지 계속 검사한다.
+		if (bCollide == false)
+		{
+			bCollide = pLadder->Is_Collide(vKirbyPos);
+
+			// 검사를 했는데, 충돌이 됐다고 했을 때
+			if (bCollide == true)
+			{
+				// 커비에게 탈 수 있다는 정보와, 해당 X, Z 좌표를 준다.
+			}
+		}
+
+		Safe_Release(pLadder);
+	}
 }
 
 void CCollisionCenter::Camera_Shaking(_float fPower, _float fTime, _float2 vDir)
@@ -339,6 +374,10 @@ void CCollisionCenter::Free()
 		Safe_Release(pSrc);
 	}
 	m_WaitingList.clear();
+
+	for (auto& pLadder : m_Ladders)
+		Safe_Release(pLadder);
+	m_Ladders.clear();
 
 	__super::Free();
 

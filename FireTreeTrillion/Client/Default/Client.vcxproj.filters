@@ -250,6 +250,9 @@
     <Filter Include="02.GameObjects\PhysXObject\Item\Coin">
       <UniqueIdentifier>{fec82fe1-9a7e-4145-957f-e7c4662e02ff}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\Ladder">
+      <UniqueIdentifier>{43deb6bb-9178-48a0-9aee-6bd3fca04327}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -503,6 +506,9 @@
     <ClInclude Include="..\Public\Coin.h">
       <Filter>02.GameObjects\PhysXObject\Item\Coin</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Ladder.h">
+      <Filter>02.GameObjects\Map\Ladder</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -737,6 +743,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Coin.cpp">
       <Filter>02.GameObjects\PhysXObject\Item\Coin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Ladder.cpp">
+      <Filter>02.GameObjects\Map\Ladder</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

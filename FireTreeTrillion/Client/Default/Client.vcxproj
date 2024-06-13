@@ -211,6 +211,7 @@
     <ClInclude Include="..\Public\Kabu.h" />
     <ClInclude Include="..\Public\Kabu_State.h" />
     <ClInclude Include="..\Public\KirbyBoom_State.h" />
+    <ClInclude Include="..\Public\Ladder.h" />
     <ClInclude Include="..\Public\Level_Intro.h" />
     <ClInclude Include="..\Public\LevelChanger.h" />
     <ClInclude Include="..\Public\KirbyArmours.h" />
@@ -313,6 +314,7 @@
     <ClCompile Include="..\Private\ItemObject.cpp" />
     <ClCompile Include="..\Private\Kabu.cpp" />
     <ClCompile Include="..\Private\Kabu_State.cpp" />
+    <ClCompile Include="..\Private\Ladder.cpp" />
     <ClCompile Include="..\Private\Level_Intro.cpp" />
     <ClCompile Include="..\Private\LevelChanger.cpp" />
     <ClCompile Include="..\Private\KirbyArmours.cpp" />
