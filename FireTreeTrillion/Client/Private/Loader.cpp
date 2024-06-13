@@ -608,14 +608,14 @@ HRESULT CLoader::Add_FXTexture()
 
 	// 주로 사용되는 텍스쳐들
 	hr = Add_Texture(LEVEL_STATIC, "FX_Star", "Effects/Basic/common_star.dds");	CHECK_FAILED(hr);
-	hr = Add_Texture(LEVEL_STATIC, "FX_Bubble", "Effects/Basic/common_bubble.dds");	CHECK_FAILED(hr);
-	hr = Add_Texture(LEVEL_STATIC, "FX_Circles", "Effects/Basic/common_circle_%d.dds", 3);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Bubble", "Effects/Basic/common_bubble.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Circles", "Effects/Basic/common_circle_%d.png", 3);	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Grad", "Effects/Basic/common_gradation.dds");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Hit", "Effects/Basic/common_ring_0.dds");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Smoke", "Effects/Basic/common_smoke.dds");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Line", "Effects/Basic/common_line_0.dds");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Jump", "Effects/Basic/common_jump.png");	CHECK_FAILED(hr);
-	hr = Add_Texture(LEVEL_STATIC, "FX_Sparkle", "Effects/Basic/common_sparkle.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Sparkle", "Effects/Basic/common_sparkle.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Lead", "Effects/Basic/leaf.dds");	CHECK_FAILED(hr);
 
 

@@ -17,9 +17,9 @@
 CMainApp::CMainApp()
 	: m_pGameInstance(CGameInstance::Get_Instance())
 {
-	Safe_AddRef(m_pGameInstance);		
+	Safe_AddRef(m_pGameInstance);
 
-	
+
 }
 
 
@@ -45,7 +45,7 @@ HRESULT CMainApp::Initialize()
 
 	if (FAILED(Open_Level(LEVEL_LOGO)))
 		return E_FAIL;
-	
+
 
 	CCollisionCenter::Get_Instance()->Initialize();
 
@@ -100,13 +100,13 @@ HRESULT CMainApp::Render(_float fTimeDelta)
 {
 	if (nullptr == m_pGameInstance)
 		return E_FAIL;
-	
+
 	m_pGameInstance->Begin_Draw(_float4(0.5f, 0.f, 1.f, 1.f));
 
 	m_pGameInstance->Draw(fTimeDelta);
 
 #ifdef _DEBUG
-	
+
 	//·»´õ Å¸°Ù ºä ON/OFF
 	if (m_pGameInstance->Get_DIKeyState(DIK_F1, KEY_DOWN))
 		m_IsRenderRTV = !m_IsRenderRTV;
@@ -119,7 +119,7 @@ HRESULT CMainApp::Render(_float fTimeDelta)
 		Render_RTVFonts();
 
 #endif // _DEBUG
-	
+
 
 	m_pGameInstance->End_Draw();
 
@@ -131,20 +131,20 @@ HRESULT CMainApp::Ready_Fonts()
 	// MakeSpriteFont "³Ø½¼lv1°íµñ Bold" /FontSize:30 /FastPack /CharacterRegion:0x0020-0x00FF /CharacterRegion:0x3131-0x3163 /CharacterRegion:0xAC00-0xD800 /DefaultCharacter:0xAC00 142.spritefont
 
 	// 05.25) aÀÚ¸·Ã¼ ¿µ¹® ÆùÆ® Ãß°¡
-	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUDSub_EN10"), 
+	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUDSub_EN10"),
 		TEXT("../Bin/Resources/Fonts/HUD_Sub_EN10.spritefont"))))
 		return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUDSub_KR15"), 
+	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUDSub_KR15"),
 		TEXT("../Bin/Resources/Fonts/HUD_Sub_KR15.SpriteFont"))))
 		return E_FAIL;
 
 	// FOT-Seurat Pro EB /Fontsize 30 /CharacterRegion: 0x0030-0x0039 (¼ýÀÚ¸¸)
-	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUD_StarPoint_NUM30"), 
+	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUD_StarPoint_NUM30"),
 		TEXT("../Bin/Resources/Fonts/HUD_StarPoint_NUM30.spritefont"))))
 		return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUD_StarPoint_NUM37"), 
+	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUD_StarPoint_NUM37"),
 		TEXT("../Bin/Resources/Fonts/HUD_StarPoint_NUM37.spritefont"))))
 		return E_FAIL;
 
@@ -163,6 +163,8 @@ HRESULT CMainApp::Open_Level(LEVEL eLevelID)
 
 HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 {
+
+	HRESULT hr;
 
 	path FXPath("../Bin/Resources/Effects/Single/");
 	if (!exists(FXPath) || !is_directory(FXPath))
@@ -215,10 +217,10 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 
 		wstring wstrProtoName = { TEXT("Prototype_GameObject_") + CUtils::StrToWstr(strname) };
 
-		if (FAILED(m_pGameInstance->Add_Prototype(wstrProtoName, CSingleEffect::Create(m_pDevice, m_pContext, FXDesc))))
-			return E_FAIL;
+		hr = m_pGameInstance->Add_Prototype(wstrProtoName, CSingleEffect::Create(m_pDevice, m_pContext, FXDesc));
+		CHECK_FAILED(hr);
 
-		
+
 		//Make_Effect(FXData);
 	}
 
@@ -242,7 +244,7 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 
 		MULTI_FX_DATA FXData = {};
 		CUtils::Load_Effect(filePath, &FXData);
-		
+
 		CMultiEffect::MULTI_FX_DESC FXDesc = {};
 
 		FXDesc.strFXName = FXData.strName;
@@ -252,8 +254,8 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 
 		wstring wstrProtoName = { TEXT("Prototype_GameObject_") + CUtils::StrToWstr(strname) };
 
-		if (FAILED(m_pGameInstance->Add_Prototype(wstrProtoName, CMultiEffect::Create(m_pDevice, m_pContext, FXDesc))))
-			return E_FAIL;
+		hr = m_pGameInstance->Add_Prototype(wstrProtoName, CMultiEffect::Create(m_pDevice, m_pContext, FXDesc));
+		CHECK_FAILED(hr);
 
 	}
 
@@ -346,14 +348,14 @@ _bool CMainApp::Render_RTVFonts()
 #endif // _DEBUG
 
 
-CMainApp * CMainApp::Create()
+CMainApp* CMainApp::Create()
 {
-	CMainApp*		pInstance = new CMainApp();
+	CMainApp* pInstance = new CMainApp();
 
 	if (FAILED(pInstance->Initialize()))
 	{
 		MSG_BOX(TEXT("Failed To Created : CMainApp"));
-		
+
 		Safe_Release(pInstance);
 	}
 
