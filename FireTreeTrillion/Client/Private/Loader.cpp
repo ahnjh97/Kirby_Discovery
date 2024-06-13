@@ -81,6 +81,7 @@
 
 // æ∆¿Ã≈€
 #include "EnergyDrink.h"
+#include "Coin.h"
 #pragma endregion
 
 
@@ -249,6 +250,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("WasteCan"), CWasteCan);
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("EnergyDrink"), CEnergyDrink);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Coin"), CCoin);
 
 #pragma endregion
 
@@ -697,6 +699,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// For Item
 		m_vecModelInfo.emplace_back("Item_EnergyDrink", TYPE_NONANIM, 3.f);
+		m_vecModelInfo.emplace_back("Item_Coin", TYPE_NONANIM, 1.f);
 
 	}
 	else if (eLevel == LEVEL_GAMEPLAY)
@@ -746,6 +749,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// For Item
 		m_vecModelInfo.emplace_back("Item_EnergyDrink", TYPE_NONANIM, 3.f);
+		m_vecModelInfo.emplace_back("Item_Coin", TYPE_NONANIM, 1.f);
 	}
 	else if (eLevel == LEVEL_TOOL_MAP)
 	{

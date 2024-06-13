@@ -5,6 +5,8 @@
 #include "ItemObject.h"
 #include "Camera_Main.h"
 
+#include "HUD_StarPoint.h"
+
 #define GAMEINSTANCE CGameInstance::Get_Instance()->
 
 IMPLEMENT_SINGLETON(CCollisionCenter)
@@ -198,8 +200,8 @@ _bool CCollisionCenter::Kirby_Dodge_SlowMotionSystem(CPhysXObject* pPlayer)
 		_vector vKirbyPos = pKirby->Get_TransformCom()->Get_State_Vector(CTransform::STATE_POSITION);
 
 		GAMEINSTANCE Set_FirstTimerRatio(0.5f);
-		GAMEINSTANCE Set_SecondTimerRatio(0.5f);
-		GAMEINSTANCE Setting_RadialBlur(vKirbyPos, 30.f, 15.f);
+		GAMEINSTANCE Set_SecondTimerRatio(0.2f);
+		GAMEINSTANCE Setting_RadialBlur(vKirbyPos, 30.f, 10.f);
 		GAMEINSTANCE Set_BlackBackGround(true);
 		m_bCheckTimer = true;
 		return true;
@@ -265,10 +267,14 @@ void CCollisionCenter::Compute_Damage(CPhysXObject* pPlayer, CPhysXObject* pMons
 		_float fMonsterAttack = pCMonster->Get_Attack();
 		pKirby->Minus_Hp(fMonsterAttack);
 		Camera_Shaking(1.2f);
+
+		// fMonsterAttack는 몬스터의 공격력으로, 커비에게 데미지를 주는 곳. 카메라 쉐이킹 추가 완료
+		// 여기에 Damage를 입히는 함수를 작동시키면 됨 (SJ)
 	}
 
 	_float fPlayerAttack = pKirby->Get_Attack();
 	pCMonster->Minus_Hp(fPlayerAttack);
+
 }
 
 void CCollisionCenter::Compute_Heal(CPhysXObject* pPlayer, CPhysXObject* pItem)
@@ -285,7 +291,10 @@ void CCollisionCenter::Compute_Coin(CPhysXObject* pPlayer, CPhysXObject* pItem)
 	CItemObject* pIItem = static_cast<CItemObject*>(pItem);
 	_float fItemPoint = (_float)pIItem->Get_ItemPoint();
 
-	// 코인을 증가시키는 함수를 넣으면 됨.
+	// fItemPoint는 코인이 오르는 포인트임 저게 올라야할 "코인점수"임
+	// 만약, int 형으로 올라야한다면 형변환 꼭 해주셔!!!
+	 
+	// 코인을 증가시키는 함수를 넣으면 됨 (SJ)
 }
 
 void CCollisionCenter::Compute_SuperPower(CPhysXObject* pPlayer, CPhysXObject* pItem)
@@ -309,7 +318,7 @@ void CCollisionCenter::Timer_System(_float fTimeDelta)
 			GAMEINSTANCE Set_BlackBackGround(false);
 		}
 		
-		if (m_fTimeDeltaResetTime > 2.f)
+		if (m_fTimeDeltaResetTime > 4.f)
 		{
 			GAMEINSTANCE Restore_SecondTimer();
 

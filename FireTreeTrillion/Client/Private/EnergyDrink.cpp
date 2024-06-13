@@ -175,6 +175,7 @@ HRESULT CEnergyDrink::Render_LightDepth()
 #ifdef _DEBUG
 void CEnergyDrink::Render_IMGUI()
 {
+
 }
 #endif
 

@@ -436,20 +436,6 @@ void CKirby::Key_Input(_float fTimeDelta)
 	}
 
 
-	// B : Radial Blur Center
-	if (m_pGameInstance->Get_DIKeyState(DIK_B, KEY_DOWN))
-	{
-		m_pGameInstance->Setting_RadialBlur(30.f, 120.f);
-	}
-
-	// N : Radial Blur Center
-	if (m_pGameInstance->Get_DIKeyState(DIK_N, KEY_DOWN))
-	{
-		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-		m_pGameInstance->Setting_RadialBlur(vPos, 30.f, 120.f);
-	}
-
-
 #pragma endregion
 }
 
@@ -611,8 +597,7 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float));
 		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
-			return E_FAIL;
+		m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
 
 
 		m_pShaderCom->Begin(ANIMMODEL_KIRBYMOUTH);
@@ -635,8 +620,7 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float));
 		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
-			return E_FAIL;
+		m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
 
 		m_pShaderCom->Begin(ANIMMODEL_KIRBYEYE);
 		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
@@ -652,8 +636,7 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
-			return E_FAIL;
+		m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
 
 		m_pShaderCom->Begin(ANIMMODEL_NORMAL_X);
 		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
@@ -790,12 +773,21 @@ void CKirby::SetUp_FSM()
 #pragma endregion
 
 #pragma region BOOM
+	// For BOMB
 	m_pFSM->Add_State(BOOMSTATE_BOOMFALL, CKirbyBoom_Fall_State::Create());
 	m_pFSM->Add_State(BOOMSTATE_BOOMSHOOT, CKirbyBoom_Attack_State::Create());
 	m_pFSM->Add_State(BOOMSTATE_THROW, CKirbyBoom_Attack_State::Create());
 	m_pFSM->Add_State(BOOMSTATE_THROWAIR, CKirbyBoom_Fall_State::Create());
 	m_pFSM->Add_State(BOOMSTATE_THROWCHARGE, CKirbyBoom_ChargeAttack_State::Create());
 	m_pFSM->Add_State(BOOMSTATE_THROWROTATE, CKirbyBoom_ChargeAttack_State::Create());
+#pragma endregion
+
+#pragma region 사다리 타기
+	m_pFSM->Add_State(STATE_LADDERDOWN, CKirbyDefault_Ladder_State::Create());
+	m_pFSM->Add_State(STATE_LADDERUP, CKirbyDefault_Ladder_State::Create());
+	m_pFSM->Add_State(STATE_LADDERWAIT, CKirbyDefault_Ladder_State::Create());
+	m_pFSM->Add_State(STATE_LADDERWAITSTART, CKirbyDefault_Ladder_State::Create());
+
 #pragma endregion
 
 
