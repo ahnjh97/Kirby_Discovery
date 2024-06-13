@@ -247,7 +247,6 @@ HRESULT CSingleEffect::Add_Components(FX_DESC& FXDesc)
 	{
 		hr = __super::Add_Component(LEVEL_STATIC, CUtils::StrToWstr(FXDesc.strBufferTag),
 			TEXT("Com_Model"), (CComponent**)&m_pModelCom);
-
 		CHECK_FAILED(hr);
 
 
