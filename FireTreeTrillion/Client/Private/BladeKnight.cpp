@@ -50,9 +50,6 @@ HRESULT CBladeKnight::Initialize(void* pArg)
 	m_eVacuumSize = SIZE_SMALL;
 	m_eAbilityType = ABILITY_SWORD;
 
-
-	m_bStencil = true;
-
 	return S_OK;
 }
 
@@ -63,17 +60,11 @@ _int CBladeKnight::Tick(_float fTimeDelta)
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
+	if (m_ePhyXState == PO_VACUUMING || m_ePhyXState == PO_FLYDEADAWAY)
+		Change_State(BLADEKNIGHT_DAMAGE, 50.f, false, true);
+
+
 	__super::Tick(m_fTimeDelta);
-
-	Compute_ViewZ();
-
-	__super::SetOn_Slope(m_fTimeDelta);
-
-	Compute_MotionBlur();
-
-	//  // FSM 제어
-	   //if (m_pFSM != nullptr)
-	   //	m_pFSM->Update(this, fTimeDelta);
 
 	for (auto& Pair : m_PartObjects)
 		Pair.second->Tick(m_fTimeDelta);
@@ -83,7 +74,15 @@ _int CBladeKnight::Tick(_float fTimeDelta)
 
 void CBladeKnight::Late_Tick(_float fTimeDelta)
 {
-	m_pModelCom->Play_Animation(m_fTimeDelta);
+	// 커비 입 안에 있고, Fly가 아닐땐 입 안에 있는 상황이므로, Render되지않는다.
+	if (m_ePhyXState == PO_KIRBYMOUTH)
+		return;
+
+	// 날아갈 땐, 애니메이션 재생이 되지 않는다.
+	if (m_ePhyXState != PO_FLYAWAY)
+	{
+		m_ePhyXState == PO_FLYDEADAWAY ? m_pModelCom->Play_Animation(m_fTimeDelta * 0.3f) : m_pModelCom->Play_Animation(m_fTimeDelta);
+	}
 
 	for (auto& Pair : m_PartObjects)
 		Pair.second->Late_Tick(m_fTimeDelta);
@@ -161,7 +160,17 @@ void CBladeKnight::Render_IMGUI()
 
 void CBladeKnight::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
-	Change_State(BLADEKNIGHT_DAMAGE, 50.f, false, true);
+	if (eContent == CCollisionCenter::CONTENT_BODY)
+	{
+		if (m_ePhyXState == PO_NORMAL)
+		{
+			Change_State(BLADEKNIGHT_DAMAGE, 50.f, false, true);
+		}
+	}
+	else if (eContent == CCollisionCenter::CONTENT_VACUUMOBJECT)
+	{
+
+	}
 }
 
 void CBladeKnight::Change_State(BLADEKNIGHT_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
@@ -172,21 +181,6 @@ void CBladeKnight::Change_State(BLADEKNIGHT_ANIM eState, _float _fAnimSpeed, _bo
 _bool CBladeKnight::IsAnimFinished()
 {
 	return m_pModelCom->IsFinished();
-}
-
-void CBladeKnight::Compute_MotionBlur()
-{
-	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-	_matrix ViewProjectionMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW) * m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
-	_vector vScreenPos = XMVector3TransformCoord(vPos, ViewProjectionMatrix);
-	_float fScreenX = (XMVectorGetX(vScreenPos) + 1.f) * 0.5f;
-	_float fScreenY = (XMVectorGetY(vScreenPos) + 1.f) * 0.5f;
-
-	_float2 vCurScreenPos = _float2(fScreenX, 1.f - fScreenY);
-
-	m_vMotionVelocity.x = (m_vPreScreenPos - vCurScreenPos).x;
-	m_vMotionVelocity.y = (m_vPreScreenPos - vCurScreenPos).y;
-	m_vPreScreenPos = vCurScreenPos;
 }
 
 HRESULT CBladeKnight::Add_Components()

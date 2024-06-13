@@ -86,15 +86,9 @@ private:
 	_float				m_fMoveTime = { 0.f };
 	_float				m_fSpeed = { 0.f };
 
-	_float2				m_vPreScreenPos = { 0.f, 0.f };
-	_float4				m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
-
-
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
-
-	void	Compute_MotionBlur();
 
 	// FSM
 	void SetUp_FSM();

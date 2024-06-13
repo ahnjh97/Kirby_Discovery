@@ -43,6 +43,9 @@ public:
 	virtual void OnStateExit()														override;
 
 public:
+	_float		m_fFlyTime = { 0.f };
+	_float		m_fDeadTime = { 0.f };
+
 	static	CKabu_Damage_State* Create();
 	virtual void Free() override;
 };
