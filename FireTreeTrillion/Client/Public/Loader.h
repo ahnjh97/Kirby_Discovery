@@ -43,6 +43,7 @@ private:
 
 	// 240518
 	HRESULT Add_Models(LEVEL eLevel);
+	HRESULT Add_FXTexture();
 	HRESULT Add_ModelsForAnimTool();
 	void SetUp_ModelScaleRotation(LEVEL eLevel);
 

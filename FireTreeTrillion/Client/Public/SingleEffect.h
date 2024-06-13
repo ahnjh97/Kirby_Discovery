@@ -26,6 +26,11 @@ public:
 	{
 		m_fDuration.first = 0.f;
 
+		for (size_t i = KF_POS; i < KF_END; ++i)
+		{
+			m_iCurKeyframeIdxs[i] = 0;
+		}
+
 		m_fLifetime.second -= m_fLifetime.first;
 		m_fLifetime.first -= m_fLifetime.first;
 	}

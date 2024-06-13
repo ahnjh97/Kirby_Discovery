@@ -265,28 +265,16 @@ HRESULT CLoader::Loading_StaticComponentAll()
 	hr = Add_Models(eLevel);
 	CHECK_FAILED(hr);
 
+
+
 	//이펙트 텍스쳐
-	hr = Add_Texture(eLevel, "FX_Test", "Effects/test.png");
-	CHECK_FAILED(hr);
-	hr = Add_Texture(eLevel, "FX_Logo", "Logo/Logo.png");
-	CHECK_FAILED(hr);
-	hr = Add_Texture(eLevel, "FX_SimpleSolid", "Simple/simpleSolid_%d.png", 2);
-	CHECK_FAILED(hr);
-	hr = Add_Texture(eLevel, "FX_SimpleStar", "Effects/SimpleStar.png");
-	CHECK_FAILED(hr);
+	
+	Add_FXTexture();
 
-	hr = Add_Texture(eLevel, "FX_VacuumTornado", "Effects/wind01.png");
-	CHECK_FAILED(hr);
-	hr = Add_Texture(eLevel, "FX_VacuumWind", "Effects/scroll07.png");
-	CHECK_FAILED(hr);
-	hr = Add_Texture(eLevel, "FX_VacuumDGB", "Effects/twinkle02.png");
-	CHECK_FAILED(hr);
 
-	hr = Add_Texture(eLevel, "FX_Wind", "Effects/wind_%d.png", 2);
-	CHECK_FAILED(hr);
 
-	hr = Add_Texture(eLevel, "FX_Shockwave", "Effects/shockwave_%d.png", 1);
-	CHECK_FAILED(hr);
+
+
 
 	wstring wstrPrototypeTag = L"Prototype_Component_Shader_";
 	hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + TEXT("VtxPosTex"),
@@ -605,6 +593,43 @@ HRESULT CLoader::Add_Models(LEVEL eLevel)
 	}
 
 	return S_OK;
+}
+
+HRESULT CLoader::Add_FXTexture()
+{
+	HRESULT hr;
+
+	//테스트용
+	hr = Add_Texture(LEVEL_STATIC, "FX_Test", "Effects/test.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_SimpleStar", "Effects/simpleStar.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Logo", "Effects/simpleStar.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_SimpleSolid", "Simple/simpleSolid_%d.png", 2);	CHECK_FAILED(hr);
+
+
+	// 주로 사용되는 텍스쳐들
+	hr = Add_Texture(LEVEL_STATIC, "FX_Star", "Effects/Basic/common_star.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Bubble", "Effects/Basic/common_bubble.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Circles", "Effects/Basic/common_circle_%d.dds", 3);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Grad", "Effects/Basic/common_gradation.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Hit", "Effects/Basic/common_ring_0.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Smoke", "Effects/Basic/common_smoke.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Line", "Effects/Basic/common_line_0.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Jump", "Effects/Basic/common_jump.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Sparkle", "Effects/Basic/common_sparkle.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Lead", "Effects/Basic/leaf.dds");	CHECK_FAILED(hr);
+
+
+
+
+	hr = Add_Texture(LEVEL_STATIC, "FX_VacuumTornado", "Effects/Basic/wind01.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_VacuumWind", "Effects/Basic/scroll07.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_VacuumDGB", "Effects/Basic/twinkle02.png");	CHECK_FAILED(hr);
+
+	hr = Add_Texture(LEVEL_STATIC, "FX_Wind", "Effects/Basic/wind_%d.png", 2);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Shockwave", "Effects/Basic/shockwave_%d.png", 1);	CHECK_FAILED(hr);
+
+
+	return E_NOTIMPL;
 }
 
 // 여기다가 모든 Model을 셋업한다.

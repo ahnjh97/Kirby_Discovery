@@ -34,7 +34,6 @@ namespace Engine
         STATIC_RIGID,
         COLLISION_RESULT_END
     };
-
 }
 
 // Set_Dead() ∏≈≈©∑Œ
