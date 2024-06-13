@@ -44,7 +44,7 @@ private:
 
     // ±â´Éµé
 private:
-    void Camera_Shaking(_float fShakePower);
+    void Camera_Shaking(_float fPower = 1.f, _float fTime = 0.5f, _float2 vDir = {0.f, -1.f});
 
     void Player_Monster_Knock_back(CPhysXObject* pPlayer, CPhysXObject* pMonster);
     void Fly_DeadAway(CPhysXObject* pSrc, CPhysXObject* pDst);

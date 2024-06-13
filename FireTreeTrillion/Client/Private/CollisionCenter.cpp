@@ -3,6 +3,7 @@
 #include "GameInstance.h"
 #include "Kirby.h"
 #include "ItemObject.h"
+#include "Camera_Main.h"
 
 #define GAMEINSTANCE CGameInstance::Get_Instance()->
 
@@ -111,8 +112,11 @@ void CCollisionCenter::Collision_Collider(CONTENT_TYPE eType, CPhysXObject* pSrc
 			// 몬스터의 상태가 노말일 때만, 서로 넉백이 발생하며, 데미지가 발생한다.
 			Player_Monster_Knock_back(pPlayer, pMonster);
 			Compute_Damage(pPlayer, pMonster);
+
+			Camera_Shaking(1.2f);
 		}
 
+		// 흡수 등 로직이 있다. 건들지 마 시 오 ( 관리자 : 윤영우 )
 		pPlayer->Collision(CONTENT_BODY, pMonster);
 		pMonster->Collision(CONTENT_BODY, pMonster);
 
@@ -129,6 +133,8 @@ void CCollisionCenter::Collision_Collider(CONTENT_TYPE eType, CPhysXObject* pSrc
 			pSrcObject->Collision(CONTENT_VACUUMOBJECT, pDstObject);
 			pDstObject->Collision(CONTENT_VACUUMOBJECT, pSrcObject);
 			Fly_DeadAway(pSrcObject, pDstObject);
+
+			Camera_Shaking(1.2f);
 		}
 	}
 
@@ -166,10 +172,10 @@ void CCollisionCenter::Collision_Collider(CONTENT_TYPE eType, CPhysXObject* pSrc
 
 }
 
-void CCollisionCenter::Camera_Shaking(_float fShakePower)
+void CCollisionCenter::Camera_Shaking(_float fPower, _float fTime, _float2 vDir)
 {
-
-
+	CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
+	pCamera->Make_Shake(fPower, fTime, vDir);
 }
 
 void CCollisionCenter::Player_Monster_Knock_back(CPhysXObject* pPlayer, CPhysXObject* pMonster)
