@@ -545,6 +545,7 @@ _bool CEditor_UI::Window_Tools()
 			{
 				ImGui::SeparatorText(u8"Text Edit 텍스트 편집");
 
+				/*
 				string strUITag = {};
 				ImGui::PushItemWidth(265.f);
 				if (ImGui::BeginCombo(u8"##", (g_iSelectUI >= 0 && g_iSelectUI < m_GroupUIs.size())
@@ -565,6 +566,9 @@ _bool CEditor_UI::Window_Tools()
 					//}
 					ImGui::EndCombo();
 				}
+				ImGui::PopItemWidth();
+				*/
+
 				Edit_Text();
 
 				ImGui::EndTabItem();
@@ -1116,10 +1120,12 @@ void CEditor_UI::Create_UIObject(UI_STATE _eUIState, UI_TYPE _eUIType)
 
 	if (UI_LAYER == _eUIState) //레이어 생성
 	{
+#pragma region UI INFO
+
 		UIOBJ_DESC LayerUI_Desc{};
 		LayerUI_Desc.wstrUITag = { TEXT("LayerUI") };
 
-		LayerUI_Desc.eUIProj = PROJ_ORTHO; //직교투영 기본값
+		LayerUI_Desc.eUIProj = { PROJ_ORTHO }; //직교투영 기본값
 		LayerUI_Desc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f };
 		LayerUI_Desc.vSize = { 100.f, 100.f };
 		LayerUI_Desc.vPos = { 0.f, 0.f, 0.f };
@@ -1127,6 +1133,32 @@ void CEditor_UI::Create_UIObject(UI_STATE _eUIState, UI_TYPE _eUIType)
 		LayerUI_Desc.vColorRGB = { 1.f, 1.f, 1.f };
 		LayerUI_Desc.fAlpha = { 1.f };
 
+#pragma endregion
+
+#pragma region  UI_ANIMINFO
+
+		/*
+		UIANIM_DESC LayerUIAnim_Desc{};
+		LayerUIAnim_Desc.eUIAnimState = { ANIM_END };
+		LayerUIAnim_Desc.fAnimFPS = { 0.f };
+
+		LayerUIAnim_Desc.iPreFrame = { 0 };
+		LayerUIAnim_Desc.iCurrFrame = { 0 };
+		LayerUIAnim_Desc.iStartFrame = { 0 };
+		LayerUIAnim_Desc.iEndFrame = { 0 };
+		LayerUIAnim_Desc.fFrameAcc = { 0.f };
+
+		LayerUIAnim_Desc.eUIAnimType = { ANIM_NONE };
+		LayerUIAnim_Desc.vScale = { 0.f, 0.f, 0.f };
+		LayerUIAnim_Desc.vTrans = { 0.f, 0.f, 0.f };
+		LayerUIAnim_Desc.vRotate = { 0.f, 0.f, 0.f };
+		LayerUIAnim_Desc.fDuration = { 0.f };
+
+		LayerUIAnim_Desc.strAnimTag = { "" };;
+		*/
+
+#pragma endregion
+		
 		strProtoTag += CUtils::WstrToStr(LayerUI_Desc.wstrUITag);
 		
 		if (UI_TEXTURE == _eUIType)
@@ -1144,8 +1176,7 @@ void CEditor_UI::Create_UIObject(UI_STATE _eUIState, UI_TYPE _eUIType)
 		CUIObject* pLayerUI = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(CUtils::StrToWstr(strProtoTag), &LayerUI_Desc));
 		if (nullptr == pLayerUI)
 		{
-			g_IsSuccessed = FALSE;
-			g_eOpenPopup = POPUP_CREATE;
+			g_IsSuccessed = FALSE;	g_eOpenPopup = POPUP_CREATE;
 			CHECK_NULLPTR(pLayerUI);
 		}
 		m_LayerUIs.push_back(pLayerUI);

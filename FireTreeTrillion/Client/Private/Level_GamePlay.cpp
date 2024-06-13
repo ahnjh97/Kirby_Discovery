@@ -463,7 +463,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_MapObject(const wstring& strLayerTag)
 	return S_OK;
 }
 
-_bool CLevel_GamePlay::Load_FileData(const string& _strFilePath, FILE_TYPE _eFileType, const wstring& _wstrLayerTag)
+HRESULT CLevel_GamePlay::Load_FileData(const string& _strFilePath, FILE_TYPE _eFileType, const wstring& _wstrLayerTag)
 {
 	std::ifstream InputFile(_strFilePath, ios::in | std::ios::binary);
 

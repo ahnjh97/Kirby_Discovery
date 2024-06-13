@@ -1,6 +1,7 @@
 #pragma once
 #include "Client_Defines.h"
 #include "UIObject.h"
+#include "HUD.h"
 
 BEGIN(Engine)
 class CShader;
@@ -9,7 +10,7 @@ class CVIBuffer_Rect;
 END
 
 BEGIN(Client)
-class CHUD_StarPoint : public CUIObject
+class CHUD_StarPoint : public CHUD
 {
 private:
 	CHUD_StarPoint(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -33,6 +34,8 @@ private:
 	HRESULT						Render_PerspecProj(CShader* _pShaderCom, CTransform* _pTransCom);
 	HRESULT						Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTexture* _pTextureCom, _uint _iTexIndex);
 	HRESULT						Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom);
+
+	void						Play_Animation(_float _fTimeDelta, HUD_STARPOINT _eSPstate);
 
 public:
 	static CHUD_StarPoint* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

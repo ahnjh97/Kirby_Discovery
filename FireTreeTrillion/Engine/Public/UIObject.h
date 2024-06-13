@@ -48,8 +48,8 @@ public:
 		_float			fAnimFPS = { 0.f }; //초당 속도
 		
 		//애니메이션 타이밍
-		_float			fPreFrame, fCurFrame = { 0.f }; //이전, 현재 프레임
-		_float			fStartFrame, fEndFrame = { 0.f }; //첫, 끝 프레임
+		_uint			iPreFrame, iCurFrame = { 0 }; //이전, 현재 프레임
+		_uint			iStartFrame, iEndFrame = { 0 }; //첫, 끝 프레임
 		_float			fFrameAcc = { 0.f }; //누적 시간
 
 		//키프레임 정보
@@ -95,6 +95,8 @@ public:
 #endif
 
 protected:
+	_float						m_fAccTime = { 0.f }; //구조체로 정보 보내기전 임시변수
+	
 	CShader*					m_pShaderCom = { nullptr };
 	CVIBuffer_Rect*				m_pVIBufferCom = { nullptr };
 	CTexture*					m_pTextureCom = { nullptr };
