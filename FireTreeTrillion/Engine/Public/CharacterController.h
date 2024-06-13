@@ -46,8 +46,6 @@ public:
 	_float4			Get_FootPosition();
 
 	_float			Get_Radius() const { return m_tControllerCapsuleDesc.radius; }
-	void			Clear_Collisions();
-	_bool			Has_Collided();
 	void			RegisterAsPlayer();
 
 public:
@@ -59,18 +57,21 @@ public:
 
 public:
 	// 이동에 대한 함수
-	void			Move(class CTransform* pTransform, _fvector vPosition, _float fTimeDelta);				// look방향으로 움직임
+	void			Move(class CTransform* pTransform, _fvector vPosition, _float fTimeDelta, _float fHeight = 1.f);				// look방향으로 움직임	void			Move_Dir(class CTransform* pTransform, _fvector fDelta, _float fTimeDelta);			// 방향 벡터로 움직임
 	void			Move_Dir(class CTransform* pTransform, _fvector fDelta, _float fTimeDelta);			// 방향 벡터로 움직임
 	_bool			Jump(CTransform* pTransform, _float fFallVelocity, _float fTimeDelta);				// 점프
 	_bool			Jump_Parabola(CTransform* pTransform, _fvector vGoPos, _float fTimeDelta);			// 목표 지점으로 점프
-	void			FreeFall(CTransform* pTransform, _float fTimeDelta, _float fOffset = 1.f);			// 자유 낙하
+	void			FreeFall(CTransform* pTransform, _float fTimeDelta, _float fOffset = 6.f, _float fHeight = 1.f);			// 자유 낙하
 	void			Reset_FallVelocity() { m_fFallVelocity = 0.f; }										// 자유 낙하 중력값 초기화
 	PxVec3			Compute_Slope(CTransform* pTransform);												// 경사면의 노말벡터 계산
 	_float			Compute_Height(_fvector vAxis = XMVectorSet(0.f, 0.f, 0.f, 0.f));																	// 경사면의 노말벡터 계산
 	PxVec3			Compute_TerrainPosition();
 	_vector			Compute_TerrainPosition_Vector();
 	PxVec3			TerrainRayCast_Collision(PxVec3 _rayOrigin, PxVec3 _rayDirection, _float _fMaxDistance);
-	//void			Overlap_Hitbox(CGameObject* pGameObject, _float4 vPos, _float fRadius);
+
+
+	/*physx::PxControllerCollisionFlags Move(_float3 vVelocity, _float fTimeDelta, _float minDist = 0.001f);
+	physx::PxControllerCollisionFlags MoveDisp(_float3 vPosDelta, _float fTimeDelta, _float minDist = 0.001f);*/
 
 	_bool	Is_Activated();
 	void	Activate(_bool bActive);
@@ -93,7 +94,6 @@ protected:
 
 protected:
 	class CGameObject*					m_pObject = nullptr;
-	COLLISION_TYPE						m_eCollisionType = COLLISION_END;
 
 	physx::PxController*				m_pController = nullptr;
 	physx::PxMaterial*					m_ControllerMaterial = nullptr;
@@ -117,6 +117,8 @@ protected:
 	TYPE								m_eType = TYPE::CAPSULE;
 	//CAPSULE_SHAPE						m_tCapsuleShape;
 	//BOX_SHAPE							m_tBoxShape;
+
+	_bool								m_isCollision = { false };
 
 public:
 	static	CCharacterController*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

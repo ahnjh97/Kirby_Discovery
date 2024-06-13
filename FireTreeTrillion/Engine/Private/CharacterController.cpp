@@ -4,9 +4,6 @@
 #include "GameInstance.h"
 #include "PhysX.h"
 
-#define OVERLAP_MAX 8
-
-
 CCharacterController::CCharacterController(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CComponent(pDevice, pContext)
 {
@@ -22,7 +19,6 @@ HRESULT CCharacterController::Initialize(void* pArg)
 {
 	CONTROLLER_DESC* pDes = (CONTROLLER_DESC*)pArg;
 	_float4 vInitialPos = pDes->vInitialPos;
-	m_eCollisionType = (COLLISION_TYPE)pDes->uCollisionType;
 	m_eType = pDes->eType;
 	if (m_eType == CAPSULE)
 	{
@@ -134,26 +130,10 @@ _float4 CCharacterController::Get_FootPosition()
 	return _float4{(_float)vPos.x, (_float)vPos.y, (_float)vPos.z, 1.f};
 }
 
-
-// ======================== HITBOX를 위한 함수들 ========================
-// HITBOX와 충돌처리된 controller들을 담은 unordered_set을 초기화
-void CCharacterController::Clear_Collisions()
-{
-	m_pControllerFilterCallback->Clear_Collisions();
-}
-
-// HITBOX와 충돌된 controller들을 배출
-_bool CCharacterController::Has_Collided()
-{
-	return m_pControllerFilterCallback->Has_Collided(m_pController);
-}
-// ====================================================================
-
-
 /// <summary> 객체의 Look방향으로 '이동'하는 함수 </summary>
 /// <param name="pTransform"> 객체의 Transform </param>
 /// <param name="fSpeed"> 이동 속도 </param>
-void CCharacterController::Move(CTransform* pTransform, _fvector vPosition, _float fTimeDelta)
+void CCharacterController::Move(CTransform* pTransform, _fvector vPosition, _float fTimeDelta, _float fHeight)
 {
 	PxExtendedVec3 pxCurrentPos = m_pController->getPosition();
 	PxVec3 moveVector((_float)pxCurrentPos.x, (_float)pxCurrentPos.y, (_float)pxCurrentPos.z);
@@ -167,7 +147,8 @@ void CCharacterController::Move(CTransform* pTransform, _fvector vPosition, _flo
 	PxExtendedVec3 pxPos = m_pController->getPosition();
 	PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
 
-	_vector xmPos = XMVectorSet(pos.x, pos.y - m_fOffset, pos.z, 0.f);
+	_vector xmPos = XMVectorSet(pos.x, pos.y - fHeight, pos.z, 0.f);
+
 	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
 }
 
@@ -237,7 +218,6 @@ _bool CCharacterController::Jump_Parabola(CTransform* pTransform, _fvector vGoPo
 
 		// 객체의 충돌 상태 받아오기
 		PxControllerState m_pPxState;
-		lock_guard<mutex> lock(mutex);
 		m_pController->getState(m_pPxState);
 
 		// 지면 판정, 천장 판정 처리
@@ -262,7 +242,7 @@ _bool CCharacterController::Jump_Parabola(CTransform* pTransform, _fvector vGoPo
 }
 
 /// <summary> 자 유 낙 하 </summary>
-void CCharacterController::FreeFall(CTransform* pTransform, _float fTimeDelta, _float fOffset)
+void CCharacterController::FreeFall(CTransform* pTransform, _float fTimeDelta, _float fOffset, _float fHeight)
 {
 	// 자유낙하용 velocity
 	m_fFallVelocity -= GRAVITY * fTimeDelta * fOffset;
@@ -277,7 +257,7 @@ void CCharacterController::FreeFall(CTransform* pTransform, _float fTimeDelta, _
 	PxExtendedVec3 pxPos = m_pController->getPosition();
 	PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
 
-	_vector xmPos = XMVectorSet(pos.x, pos.y - m_fOffset, pos.z, 0.f);
+	_vector xmPos = XMVectorSet(pos.x, pos.y - fHeight, pos.z, 0.f);
 
 	if (m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_DOWN || m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_UP)
 	{
@@ -472,9 +452,6 @@ void CCharacterController::Create_Controller()
 	}
 	PxShape* shape;
 	m_pController->getActor()->getShapes(&shape, 1);
-	shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);
-	shape->setSimulationFilterData(PxFilterData{ static_cast<physx::PxU32>(m_eCollisionType), 0, 0, 0 });
-	shape->setQueryFilterData(PxFilterData{static_cast<physx::PxU32>(m_eCollisionType), 0, 0, 0});
 
 	if (m_pObject != nullptr)
 		Set_FootPosition(m_pObject->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION));

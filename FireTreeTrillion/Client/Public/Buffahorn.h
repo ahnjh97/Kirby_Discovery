@@ -44,7 +44,7 @@ public:
 #ifdef _DEBUG
 	virtual void	Render_IMGUI() override;
 #endif
-	virtual void	Collision_Attack(CGameObject* pOtherObj) override;
+	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
 public:
 	void Change_State(BUFFAHORN_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
@@ -62,8 +62,6 @@ private:
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
-
-	void	Compute_MotionBlur();
 
 	// FSM
 	void SetUp_FSM();

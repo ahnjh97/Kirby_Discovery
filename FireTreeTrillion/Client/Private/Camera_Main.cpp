@@ -115,10 +115,6 @@ void CCamera_Main::LerpByTriggerInfo(_int iTriggerIndex)
 	//_float fUpDiff = m_vecf
 
 
-
-
-
-
 	m_vDestCamDir = m_vSlerpedDir;
 	m_fDestDistance = m_fLerpedRadius;
 }
@@ -195,11 +191,15 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 }
 
 //원하는 정도의 카메라 쉐이킹을 세팅한다.
-void CCamera_Main::Make_Shake(_float fPower, _int iShakeCnt)
+void CCamera_Main::Make_Shake(_float fPower, _float fTime, _float2 vDir)
 {
 	m_bIsShaking = true;
 	m_fShakePower = fPower;
-	m_iShakeCnt = iShakeCnt;
+	m_fShakeTime = fTime;
+
+	vDir.Normalize();
+	m_vShakeDir = vDir;
+	//m_iShakeCnt = iShakeCnt;
 }
 
 void CCamera_Main::Make_Sequence_FromAngle(EASING eEaseFlag, _float fDuration, _float3 fDestAngle, _float fDestZoom)
@@ -223,7 +223,6 @@ _int CCamera_Main::Tick(_float fTimeDelta)
 
 	Control(fTimeDelta);
 
-
 	UpdatePos_FromAnchor(fTimeDelta);
 
 
@@ -241,6 +240,12 @@ HRESULT CCamera_Main::Render()
 
 void CCamera_Main::Control(_float fTimeDelta)
 {
+
+	if (m_pGameInstance->Get_KeyState(DIK_F9, KEY_DOWN))
+	{
+		Make_Shake();
+	}
+
 	//특정 시퀀스가 세팅되어 있는 경우 업데이트한다.
 	if (m_eSpecialSeq != SEQ_END)
 	{
@@ -307,7 +312,6 @@ void CCamera_Main::UpdatePos_FromAnchor(_float fTimeDelta)
 		(m_pFirstTarget->Get_State(CTransform::STATE_POSITION)
 			+ m_pSecondTarget->Get_State(CTransform::STATE_POSITION)) * .5f;
 
-
 	//y 위치 보정
 	_float3 vTerrainPos = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0))->Compute_TerrainPosition();
 	vTargetPos.y = vTerrainPos.y;
@@ -352,11 +356,51 @@ void CCamera_Main::UpdatePos_FromAnchor(_float fTimeDelta)
 
 
 
+
+
+	//**** 카메라 쉐이킹 오프셋 ****//
+
+	_float3 vShakeDir = XMVectorZero();
+
+	//쉐이크 세팅 존재 시, 그만큼 팅궈준다.
+	if (m_bIsShaking)
+	{
+		_float fSinOffset = sinf(m_fShakeTime * m_fShakeFrequency) * m_fShakePower * m_fShakeAmplitude * m_fShakeTime;
+
+		vShakeDir = static_cast<_float3>(m_vShakeDir * fSinOffset);
+
+		//_float3 vRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
+		//_float3 vUp = m_pTransformCom->Get_State(CTransform::STATE_UP);
+
+		////0.3 ~ 0.7의 비율
+		////_float fXOffset = m_pGameInstance->GetRandomInt(3, 7) * .1f;
+		//_float fXOffset = 5.f * .1f;
+		//_float fYOffset = 1.f - fXOffset;
+
+		////_bool bOffset = _bool(m_pGameInstance->GetRandomNumber(0, 1));
+
+		////vRight *= (m_fShakePower + fXOffset) * (_bool(m_pGameInstance->GetRandomInt(0, 1)) ? 1.f : -1.f);
+		//vRight *= (m_fShakePower + fXOffset) * 1.f;
+		////vUp *= (m_fShakePower + fYOffset) * (_bool(m_pGameInstance->GetRandomInt(0, 1)) ? -1.f : 1.f);
+		//vUp *= (m_fShakePower + fYOffset) * 1.f;
+
+		//vShakeDir = XMVectorSetW(vRight + vUp, 0.f);
+
+
+
+		if (m_fShakeTime <= 0.f)
+		{
+			m_bIsShaking = false;
+			m_fShakeTime = 0.f;
+		}
+		m_fShakeTime -= fTimeDelta;
+	}
+
 	//**** 목표 위치를 따라간다 ****//
 
 	_float4 vCurPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
-	_float4 vDestDir = Dir(Pos(m_vDestCamPos) - Pos(vCurPos));
+	_float4 vDestDir = Dir( Pos(m_vDestCamPos + vShakeDir) - Pos(vCurPos));
 	_float4 vDestXZDir = { vDestDir.x, 0.f, vDestDir.z , 0.f };
 	_float4 vDestYDir = { 0.f, vDestDir.y, 0.f , 0.f };
 
@@ -370,57 +414,6 @@ void CCamera_Main::UpdatePos_FromAnchor(_float fTimeDelta)
 		m_pTransformCom->Move(vDestYDir * fTimeDelta * 2.f);
 
 
-	//**** 카메라 쉐이킹 오프셋 ****//
-
-	_float4 vShakeDir = XMVectorZero();
-
-	//쉐이크 세팅 존재 시, 그만큼 팅궈준다.
-	if (m_bIsShaking)
-	{
-		_vector vRight = m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT);
-		_vector vUp = m_pTransformCom->Get_State_Vector(CTransform::STATE_UP);
-
-		//0.3 ~ 0.7의 비율
-		//_float fXOffset = m_pGameInstance->GetRandomInt(3, 7) * .1f;
-		_float fXOffset = 5.f * .1f;
-		_float fYOffset = 1.f - fXOffset;
-
-		//_bool bOffset = _bool(m_pGameInstance->GetRandomNumber(0, 1));
-
-		//vRight *= (m_fShakePower + fXOffset) * (_bool(m_pGameInstance->GetRandomInt(0, 1)) ? 1.f : -1.f);
-		vRight *= (m_fShakePower + fXOffset) * 1.f;
-		//vUp *= (m_fShakePower + fYOffset) * (_bool(m_pGameInstance->GetRandomInt(0, 1)) ? -1.f : 1.f);
-		vUp *= (m_fShakePower + fYOffset) * 1.f;
-
-		vShakeDir = XMVectorSetW(vRight + vUp, 0.f);
-
-		if (m_iShakeCnt <= 0)
-		{
-			m_bIsShaking = false;
-			m_iShakeCnt = 0;
-		}
-		--m_iShakeCnt;
-	}
-
-
-	//_float4 vCamLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-	//_float4 vDestLook = m_vDestCamDir;
-
-	//카메라의 dest dir을 보간하면서 맞춘다.
-
-		//SlerpDirVec(m_vCurCamDir, m_vDestCamDir, fTimeDelta * 2.f);
-
-
-		//Quaternion q1 = XMQuaternionRotationNormal(m_vCurCamDir, 0.0f);
-		//Quaternion q2 = XMQuaternionRotationNormal(m_vDestCamDir, 0.0f);
-
-		//Quaternion slerpedQuat = XMQuaternionSlerp(q1, q2, fTimeDelta * 2.f);
-
-		//m_vCurCamDir = XMVector3Rotate(m_vCurCamDir, slerpedQuat);
-
-
-
-		//m_pTransformCom->Look_At_Interpolate(m_vAnchor, fTimeDelta * 5.f);
 	m_pTransformCom->Look_At_Interpolate(m_pTransformCom->Get_State(CTransform::STATE_POSITION) + Dir(m_vCurCamDir), fTimeDelta);
 
 }

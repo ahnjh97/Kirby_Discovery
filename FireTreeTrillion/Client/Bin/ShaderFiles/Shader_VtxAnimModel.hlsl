@@ -17,6 +17,8 @@ bool g_bRimLight;
 float m_fRimWidth;
 bool g_bMotionBlur;
 float4 g_vMotionVelocity;
+float g_fWhiteColorDiffuse;
+float g_fOverPowerColor;
 
 
 struct VS_IN
@@ -128,7 +130,7 @@ PS_OUT PS_MAIN(PS_IN In)
 
     float3 vWorldNormal = mul(vNormal, WorldMatrix);
 
-    Out.vDiffuse = vMtrlDiffuse;
+    Out.vDiffuse = vMtrlDiffuse + g_fWhiteColorDiffuse;
     Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
     Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
@@ -153,7 +155,7 @@ PS_OUT NO_NORMALMAP_PS_MAIN(PS_IN In)
     if (0.3f >= vMtrlDiffuse.a)
         discard;
 
-    Out.vDiffuse = vMtrlDiffuse;
+    Out.vDiffuse = vMtrlDiffuse + g_fWhiteColorDiffuse;
     Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
     //Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
@@ -180,7 +182,7 @@ PS_OUT FOR_KIRBY_PS_MAIN(PS_IN In)
     if (0.3f >= vMtrlDiffuse.a)
         discard;
 
-    Out.vDiffuse = vMtrlDiffuse;
+    Out.vDiffuse = vMtrlDiffuse + g_fWhiteColorDiffuse + g_fOverPowerColor;
     Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
     Out.vMRA = vector(0.f, 1.f, 1.f, 1.f);
@@ -195,6 +197,33 @@ PS_OUT FOR_KIRBY_PS_MAIN(PS_IN In)
     return Out;
 }
 
+
+PS_OUT FOR_MOUTH_PS_MAIN(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrlDiffuse = g_KirbyMouthTexture.Sample(ClampSampler, In.vTexcoord);
+    if (0.3f >= vMtrlDiffuse.a)
+        discard;
+
+    Out.vDiffuse = vMtrlDiffuse + g_fWhiteColorDiffuse;
+    Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vMRA = vector(0.f, 1.f, 1.f, 1.f);
+    
+    if (g_bStencil == true)
+        Out.vStencil = vector(1.f, 0.f, 0.0f, 1.f);
+    
+    if (g_bRimLight == true)
+        Out.vRimLight = vector(0.f, m_fRimWidth, 1.f, 1.f);
+
+    if (g_bMotionBlur == true)
+        Out.vMotionBlur = g_vMotionVelocity;
+
+    
+    return Out;
+
+}
 
 PS_OUT FOR_KIRBYMOUTH_PS_MAIN(PS_IN In)
 {
@@ -204,7 +233,7 @@ PS_OUT FOR_KIRBYMOUTH_PS_MAIN(PS_IN In)
     if (0.3f >= vMtrlDiffuse.a)
         discard;
 
-    Out.vDiffuse = vMtrlDiffuse;
+    Out.vDiffuse = vMtrlDiffuse + g_fWhiteColorDiffuse + g_fOverPowerColor;
     Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
     Out.vMRA = vector(0.f, 1.f, 1.f, 1.f);
@@ -223,7 +252,8 @@ PS_OUT FOR_KIRBYMOUTH_PS_MAIN(PS_IN In)
 
 }
 
-PS_OUT FOR_KIRBYEYE_PS_MAIN(PS_IN In)
+
+PS_OUT FOR_EYE_PS_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
@@ -231,7 +261,7 @@ PS_OUT FOR_KIRBYEYE_PS_MAIN(PS_IN In)
     if (0.3f >= vMtrlDiffuse.a)
         discard;
 
-    Out.vDiffuse = vMtrlDiffuse;
+    Out.vDiffuse = vMtrlDiffuse + g_fWhiteColorDiffuse;
     Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
     Out.vMRA = vector(0.f, 1.f, 1.f, 1.f);
@@ -249,6 +279,34 @@ PS_OUT FOR_KIRBYEYE_PS_MAIN(PS_IN In)
     return Out;
 
 }
+
+PS_OUT FOR_KIRBYEYE_PS_MAIN(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrlDiffuse = g_KirbyEyeTexture.Sample(ClampSampler, In.vTexcoord);
+    if (0.3f >= vMtrlDiffuse.a)
+        discard;
+
+    Out.vDiffuse = vMtrlDiffuse + g_fWhiteColorDiffuse + g_fOverPowerColor;
+    Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vMRA = vector(0.f, 1.f, 1.f, 1.f);
+
+  
+    if (g_bStencil == true)
+        Out.vStencil = vector(1.f, 0.f, 0.0f, 1.f);
+    
+    if (g_bRimLight == true)
+        Out.vRimLight = vector(0.f, m_fRimWidth, 1.f, 1.f);
+
+    if (g_bMotionBlur == true)
+        Out.vMotionBlur = g_vMotionVelocity;
+    
+    return Out;
+
+}
+
 
 PS_OUT_LIGHTDEPTH PS_MAIN_LIGHTDEPTH(PS_IN In)
 {
@@ -342,8 +400,8 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 PS_MAIN_LIGHTDEPTH();
 	}
         
-    // For Kirby Mouth (3)
-    pass Kirby_Mouth
+    // For Mouth (3)
+    pass Mouth
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -353,11 +411,11 @@ technique11 DefaultTechnique
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 FOR_KIRBYMOUTH_PS_MAIN();
+        PixelShader = compile ps_5_0 FOR_MOUTH_PS_MAIN();
     }
 
-    // For Kirby Eye (4)
-    pass Kirby_Eye
+    // For Eye (4)
+    pass Eye
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -367,7 +425,7 @@ technique11 DefaultTechnique
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 FOR_KIRBYEYE_PS_MAIN();
+        PixelShader = compile ps_5_0 FOR_EYE_PS_MAIN();
     }
     // ºí·ë Ã³¸® ÇÒ ¸ðµ¨ ( 5 )
     pass Blur_Default
@@ -421,6 +479,34 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 FOR_KIRBY_PS_MAIN();
+    }
+
+    // For Kirby Mouth ( 9 )
+    pass Kirby_Mouth
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 FOR_KIRBYMOUTH_PS_MAIN();
+    }
+
+    // For Kirby Eye ( 10 )
+    pass Kirby_Eye
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 FOR_KIRBYEYE_PS_MAIN();
     }
 
 }

@@ -96,7 +96,6 @@ HRESULT CKirby::Initialize(void* pArg)
 	INFO(m_vMoveDir) = -1.f * m_pCameraLook;
 	INFO(m_vTargetDir) = INFO(m_vMoveDir);
 
-	//Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
 	m_pModelCom[INFO(m_eBodyState)]->Set_Animation(STATE_IDLE, 60.f, true, true);
 
 	m_fMaxHp = 100.f;
@@ -105,9 +104,7 @@ HRESULT CKirby::Initialize(void* pArg)
 	m_eAbilityType = ABILITY_DEFAULT;
 	//m_eAbilityType = ABILITY_BOMB;
 
-	CCharacterController* pController = dynamic_cast<CCharacterController*>(Get_Component(TEXT("Com_Controller")));
-	pController->RegisterAsPlayer();
-
+	m_pControllerCom->RegisterAsPlayer();
 	return S_OK;
 }
 
@@ -177,13 +174,21 @@ HRESULT CKirby::Render()
 		if (FAILED(m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
 
-		m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool))))
+			return E_FAIL;
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool))))
+			return E_FAIL;
 		if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
 			return E_FAIL;
-		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool))))
+			return E_FAIL;
 		if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
 			return E_FAIL;
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
+			return E_FAIL;
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_fOverPowerColor", &m_fOverPowerColor, sizeof(_float))))
+			return E_FAIL;
+
 
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
 		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_KIRBY)))
@@ -215,10 +220,11 @@ void CKirby::Render_IMGUI()
 		ImGui::TreePop();
 	}
 
-	ImGui::Text("ObjectAddress : %d",	 INFO(m_pObject));
-	ImGui::Text("ChargeTime : %.2f",	 INFO(m_fChargeTime));
-	ImGui::Text("MoveSpeed : %.2f",		 INFO(m_fMoveSpeed));
-	ImGui::Text("PREATTACKSTATE : %d",	 INFO(m_ePreAttackState));
+
+	ImGui::Text("HP : %d", (_int)m_fHp);
+	ImGui::Text("ChargeTime : %.2f", INFO(m_fChargeTime));
+	ImGui::Text("MoveSpeed : %.2f", INFO(m_fMoveSpeed));
+	ImGui::Text("PREATTACKSTATE : %d", INFO(m_ePreAttackState));
 	ImGui::Text("TemporaryEatType : %d", INFO(m_eTemporaryEatType));
 
 	ImGui::Text("FSM : %d", m_pFSM->Get_State());
@@ -274,79 +280,60 @@ void CKirby::Add_AnimEvent()
 		});
 }
 
-void CKirby::Collision_Attack(CGameObject* pOtherObj)
+void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
-	CPhysXObject* pObject = static_cast<CPhysXObject*>(pOtherObj);
-
-	// 흡수중인 몬스터
-	if (pObject->Get_PhyXState() == PO_VACUUMING)
+	if (eContent == CCollisionCenter::CONTENT_BODY)
 	{
-		// 일단 EAT으로 넘기는건 같으나, EAT이 끝날 시점에 내가 삼켰던 것이 무엇이였는지 판단 후 애니메이션이 분기된다.
-		INFO(m_isEat) = true;
-		INFO(m_eEyeState) = EYE_IDLE;
-		INFO(m_eMouthState) = MOUTH_ANGER;
-		//m_ePhyXState = PO_NORMAL;
-		Change_State(STATE_EAT, 100.f, false, false, BODY_BALLOON);
-		// 임시 보관소. 먹은게 끝났을 떄, 비로소 커비의 어빌리티 타입이 바뀐다.
-		INFO(m_eTemporaryEatType) = pObject->Get_AbilityType();
-
-		if (pObject != nullptr)
+		// 흡수중인 몬스터
+		if (pObject->Get_PhyXState() == PO_VACUUMING)
 		{
-			pObject->Set_PhyXState(PO_KIRBYMOUTH);
+			// 일단 EAT으로 넘기는건 같으나, EAT이 끝날 시점에 내가 삼켰던 것이 무엇이였는지 판단 후 애니메이션이 분기된다.
+			INFO(m_isEat) = true;
+			INFO(m_eEyeState) = EYE_IDLE;
+			INFO(m_eMouthState) = MOUTH_ANGER;
+			Change_State(STATE_EAT, 100.f, false, false, BODY_BALLOON);
+			// 임시 보관소. 먹은게 끝났을 떄, 비로소 커비의 어빌리티 타입이 바뀐다.
+			INFO(m_eTemporaryEatType) = pObject->Get_AbilityType();
+
+			if (pObject != nullptr)
+				pObject->Set_PhyXState(PO_KIRBYMOUTH);
+
+			Delete_KirbyEffect();
 		}
-
-		Delete_KirbyEffect();
-	}
-	// 입에 머금은 상태의 몬스터
-	else if (pObject->Get_PhyXState() == PO_KIRBYMOUTH)
-	{
-		// 서로 반응이 없어야 한다. (단, 이친구는 항상 나를 따라다닐것이다.)
-
-
-
-	}
-	// 발사중인 몬스터
-	else if (pObject->Get_PhyXState() == PO_FLYAWAY)
-	{
-		// 서로 반응이 없어야 한다.
-
-
-
-
-	}
-	// 슬라이드중의 충돌
-	else if (Get_State() == STATE_SLIDE)
-	{
-		pObject->Set_DamageMoving(Make_RepulsiveDir(pObject), 10.f);
-		INFO(m_fJumpVelocity) = 11.f;
-		//INFO(m_fMoveSpeed) = 0.f;
-		Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
-	}
-	// 서로 박치기 해였을 때 충돌
-	else
-	{
-		pObject->Set_DamageMoving(Make_RepulsiveDir(pObject), 5.f);
-
-		INFO(m_fJumpVelocity) = 11.f;
-
-		// 먹은 상태인 경우
-		if (INFO(m_isEat) == true)
+		// 입에 머금은 상태의 몬스터
+		else if (pObject->Get_PhyXState() == PO_KIRBYMOUTH)
 		{
-			Change_State(STATE_EATDAMAGE, 60.f, false, false, BODY_BALLOON);
+
 		}
-		// 나는 상태일 경우 . . .
-		else if (true == (Get_State() == STATE_FLIGHTSTART || Get_State() == STATE_FLIGHTFALL || Get_State() == STATE_FLIGHT ||
-			Get_State() == STATE_FLIGHTLANDING || Get_State() == STATE_FLIGHTLIMIT || Get_State() == STATE_FLIGHTLIMITFALL))
+		// 발사중인 몬스터
+		else if (pObject->Get_PhyXState() == PO_FLYAWAY)
 		{
-			Change_State(STATE_FILGHTDAMAGE, 60.f, false, false, BODY_BALLOON);
+
 		}
-		// 평범한 상태에서...
 		else
 		{
-			Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
+			// 먹은 상태인 경우
+			if (INFO(m_isEat) == true)
+			{
+				Change_State(STATE_EATDAMAGE, 60.f, false, false, BODY_BALLOON);
+			}
+			// 나는 상태일 경우 . . .
+			else if (true == (Get_State() == STATE_FLIGHTSTART || Get_State() == STATE_FLIGHTFALL || Get_State() == STATE_FLIGHT ||
+				Get_State() == STATE_FLIGHTLANDING || Get_State() == STATE_FLIGHTLIMIT || Get_State() == STATE_FLIGHTLIMITFALL))
+			{
+				Change_State(STATE_FILGHTDAMAGE, 60.f, false, false, BODY_BALLOON);
+			}
+			// 평범한 상태에서...
+			else
+			{
+				Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
+			}
+
+			Delete_KirbyEffect();
 		}
-		Delete_KirbyEffect();
 	}
+
+
 }
 
 void CKirby::Collision_Overlap(CGameObject* pGameObject)
@@ -548,7 +535,6 @@ HRESULT CKirby::Add_Components()
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
-	desc.uCollisionType = m_eCollisionGroup;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	m_pControllerCom->Set_Object(this);
@@ -622,6 +608,9 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float));
 		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
+			return E_FAIL;
+
 
 		m_pShaderCom->Begin(ANIMMODEL_KIRBYMOUTH);
 		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
@@ -643,6 +632,9 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float));
 		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
+			return E_FAIL;
+
 		m_pShaderCom->Begin(ANIMMODEL_KIRBYEYE);
 		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
 		return true;
@@ -657,6 +649,9 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
+			return E_FAIL;
+
 		m_pShaderCom->Begin(ANIMMODEL_NORMAL_X);
 		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
 		return true;
@@ -816,6 +811,38 @@ void CKirby::Update_PartObjectMatrix()
 	m_WeaponMatrix = *(m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("RHaveL")->Get_CombinedTransformationMatrix());
 }
 
+void CKirby::OverPower()
+{
+	if (m_fPreHp > m_fHp)
+	{
+		m_bOverPower = true;
+	}
+
+	if (m_bOverPower == true)
+	{
+		m_fOverPowerTime += m_fTimeDelta;
+		m_fFlashOverPowerTime += m_fTimeDelta;
+		_float fFlashTime = 0.02f;
+
+		if (m_fFlashOverPowerTime > fFlashTime)
+		{
+			m_fOverPowerColor = m_fOverPowerColor == 0.f ? 0.25f : 0.f;
+			m_fFlashOverPowerTime -= fFlashTime;
+		}
+
+		if (m_fOverPowerTime > 3.f)
+		{
+			m_bOverPower = false;
+			m_fOverPowerTime = 0.f;
+			m_fOverPowerColor = 0.f;
+			m_fFlashOverPowerTime = 0.f;
+		}
+	}
+
+
+	m_fPreHp = m_fHp;
+}
+
 void CKirby::Change_State(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, BODYSTATE eBody, _uint iOffSet)
 {
 	INFO(m_eBodyState) = eBody;
@@ -908,6 +935,8 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 		}
 	}
 
+	// 무적 상태 관리소
+	OverPower();
 }
 
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -950,6 +979,10 @@ void CKirby::Free()
 
 	Safe_Release(m_pWeapons);
 	Safe_Release(m_pArmours);
+
+	if (INFO(m_pObject) != nullptr)
+		Safe_Release(INFO(m_pObject));
+
 	Safe_Release(m_pHitBox);
 	for (auto& fx : m_KirbyFXList)
 		Safe_Release(fx);

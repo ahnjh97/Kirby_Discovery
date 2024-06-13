@@ -77,23 +77,6 @@ HRESULT CPhysX::Initialize()
     //    }
     //}
 
-    // 충돌처리할 그룹들을 나누어 충돌결과를 관리한다.
-    Ready_CollisionContents();
-
-    return S_OK;
-}
-
-/// <summary> Initialize 'COLLISION_CONTENT' </summary>
-HRESULT CPhysX::Ready_CollisionContents()
-{
-    // BLOCK EVENT
-    arrCollisionContents[PLAYER][MONSTER]   = CONTENT_ATTACK;
-    arrCollisionContents[MONSTER][PLAYER]   = CONTENT_ATTACK;
-
-    //arrCollisionContents[MONSTER][PLAYER]	= CONTENT_ATTACK;
-    arrCollisionContents[PLAYER][INTERACT]  = CONTENT_INTERACT;
-    arrCollisionContents[PLAYER][ITEM]      = CONTENT_ACQUIRE;
-
     return S_OK;
 }
 
@@ -245,9 +228,7 @@ PxRigidDynamic* CPhysX::CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, 
     }
 
     PxShape* pShape = { nullptr };
-    // [시도1] 1 1 1 : ?? / 커비가 못참 / 탱탱볼처럼 튕겨짐
-    //pMaterial = m_pPhysics->createMaterial(.1f, .1f, .5f);
-    if (nullptr == pMaterial)
+    if(nullptr == pMaterial)
         pShape = m_pPhysics->createShape(meshGeometry, *m_pMaterial);
     else
         pShape = m_pPhysics->createShape(meshGeometry, *pMaterial);
@@ -257,12 +238,7 @@ PxRigidDynamic* CPhysX::CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, 
         pDynamicActor->release();
         return nullptr;
     }
-    pShape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);
 
-    pShape->setSimulationFilterData(physx::PxFilterData{ INTERACT, 0, 0, 0 });
-    pShape->setQueryFilterData(physx::PxFilterData{ INTERACT, 0, 0, 0 });
-
-    pDynamicActor->userData = "RigidMesh";
     pDynamicActor->attachShape(*pShape);
     m_pScene->addActor(*pDynamicActor);
     pMesh->release();
@@ -304,11 +280,6 @@ PxRigidStatic* CPhysX::CreateStaticActor(_float4 vPos, _float3* pVerticesPos, _u
     }
     else
         pShape = m_pPhysics->createShape(triGeom, *pMaterial);
-    
-    pShape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);
-
-    pShape->setSimulationFilterData(physx::PxFilterData{ GROUND, 0, 0, 0 });
-    pShape->setQueryFilterData(physx::PxFilterData{ GROUND, 0, 0, 0 });
 
     pStaticActor->attachShape(*pShape);
     m_pScene->addActor(*pStaticActor);
@@ -460,13 +431,6 @@ PxControllerBehaviorFlags CControllerBehaviorCallback::getBehaviorFlags(const Px
 
 void CUserControllerHitReport::onShapeHit(const PxControllerShapeHit& hit)
 {
-    PxController* MeController = hit.controller;
-    CComponent* pComponentDst = static_cast<CComponent*>(MeController->getUserData());
-    if (pComponentDst != nullptr)
-    {
-        CGameObject* pActorObjectDst = pComponentDst->Get_Object();
-
-    }
 }
 
 void CUserControllerHitReport::onControllerHit(const PxControllersHit& hit)
@@ -474,95 +438,20 @@ void CUserControllerHitReport::onControllerHit(const PxControllersHit& hit)
 	PxController* MeController = hit.controller;
 	PxController* otherController = hit.other;
 
+   /* static _int iCnt{0};
+    ++iCnt;
+
+    printf("Cnt: %d", iCnt);*/
+
     // wi
-	CComponent* pComponentDst = static_cast<CComponent*>(MeController->getUserData());
-	CComponent* pComponentSrc = static_cast<CComponent*>(otherController->getUserData());
-
-	if (pComponentDst != nullptr && pComponentSrc != nullptr)
+	CComponent* pComponentSrc = static_cast<CComponent*>(MeController->getUserData());
+	CComponent* pComponentDst = static_cast<CComponent*>(otherController->getUserData());
+    //pComponentDst->Alarm_YouAreCollidedToAnotherController
+	if (pComponentSrc != nullptr && pComponentDst != nullptr)
 	{
-		CGameObject* pActorObjectDst = pComponentDst->Get_Object();
 		CGameObject* pActorObjectSrc = pComponentSrc->Get_Object();
+		CGameObject* pActorObjectDst = pComponentDst->Get_Object();
 
-       /* CollsionEvent(pActorObjectDst, pActorObjectSrc);*/
-	}
-}
-
-void CUserControllerHitReport::CollsionEvent(CGameObject* pObj, CGameObject* pOtherObj/*, COLLISION_TYPE eOwnCollsionGroup, COLLISION_TYPE eOtherCollsionGroup*/)
-{
-    COLLISION_TYPE ObjGroup = pObj->Get_CollisionGroup();
-    COLLISION_TYPE OtherGroup = pOtherObj->Get_CollisionGroup();
-    
-    _uint iCollisionContent = CGameInstance::Get_Instance()->Get_CollisionContent(ObjGroup, OtherGroup);
-    switch (iCollisionContent)
-    {
-    // 공-피격, 상호작용
-    case CONTENT_ATTACK:
-    {
-        pOtherObj->Collision_Attack(pObj);
-        pObj->Collision_Attack(pOtherObj);
-    }
-    break;
-    // NPC 충돌
-    case CONTENT_INTERACT:
-    {
-    }
-    break;
-    case CONTENT_ACQUIRE:
-    {
-        //pObj->Collision_Acquire(pOtherObj);
-        //pOtherObj->Collision_Acquire(pObj);
-    }
-    break;
-    case CONTENT_NONEVENT:
-    {
-        //pObj->Collision_BlockEvent();
-        //pOtherObj->
-    }
-    break;
+        CGameInstance::Get_Instance()->Add_CollisionObjects(pActorObjectSrc, pActorObjectDst);
     }
 }
-
-/// <summary> 히트박스와 콜라이더의 충돌을 개별처리하기 위해 사용하는 콜백클래스의 함수입니다. </summary>
-_bool CControllerFilterCallback::filter(const PxController& pObj, const PxController& pOtherObj)
-{
-    CComponent* pComponentObj = static_cast<CComponent*>(pObj.getUserData());
-    CComponent* pComponentOtherObj = static_cast<CComponent*>(pOtherObj.getUserData());
-
-    if (pComponentObj != nullptr && pComponentOtherObj != nullptr)
-    {
-        CGameObject* pActorObject = pComponentObj->Get_Object();
-        CGameObject* pActorOther  = pComponentOtherObj->Get_Object();
-        
-        // 충돌한 친구들은 m_setControllers에 모입니다.
-        if (pActorObject->Get_CollisionGroup() == HITBOX)
-        {
-            // 커비의 뱃살(HitBox)와 충돌난 친구들
-            //m_setControllers.insert(&pOtherObj);
-            return false;  // 물리적인 충돌 X
-        }
-        else if (pActorOther->Get_CollisionGroup() == HITBOX)
-        {
-            // 커비의 뱃살(HitBox)와 충돌난 친구들
-            //m_setControllers.insert(&pObj);
-            return false;  // 물리적인 충돌 X
-        }
-    }
-    return true;
-}
-
-const unordered_set<const PxController*> CControllerFilterCallback::Get_Controllers()
-{
-    return m_setControllers;
-}
-
-void CControllerFilterCallback::Clear_Collisions()
-{
-    m_setControllers.clear();
-}
-
-// 개별로 충돌이 일어났는 지 체크하는 친구
-_bool CControllerFilterCallback::Has_Collided(const PxController* controller) const
-{
-    return m_setControllers.find(controller) != m_setControllers.end();
-}
-

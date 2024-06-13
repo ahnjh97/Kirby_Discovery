@@ -66,6 +66,9 @@
 #include "BladeKnight.h"
 #include "BladeKnightSword.h"
 #include "Kabu.h"
+#include "BrontoBurt.h"
+#include "PoppyBrosJr.h"
+#include "PoppyBomb.h"
 
 #include "Moon.h"
 #include "WasteCan.h"
@@ -75,6 +78,9 @@
 #include "HUD.h"
 #include "HUD_KirbyStatus.h"
 #include "HUD_StarPoint.h"
+
+// 아이템
+#include "EnergyDrink.h"
 #pragma endregion
 
 
@@ -230,6 +236,9 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BladeKnight"), CBladeKnight);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BladeKnightSword"), CBladeKnightSword);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kabu"), CKabu);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BrontoBurt"), CBrontoBurt);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PoppyBrosJr"), CPoppyBrosJr);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PoppyBomb"), CPoppyBomb);
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BackGround"), CBackGround);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
@@ -238,6 +247,9 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TestModel"), CTestModel);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Moon"), CMoon);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("WasteCan"), CWasteCan);
+
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("EnergyDrink"), CEnergyDrink);
+
 #pragma endregion
 
 	return S_OK;
@@ -253,28 +265,16 @@ HRESULT CLoader::Loading_StaticComponentAll()
 	hr = Add_Models(eLevel);
 	CHECK_FAILED(hr);
 
+
+
 	//이펙트 텍스쳐
-	hr = Add_Texture(eLevel, "FX_Test", "Effects/test.png");
-	CHECK_FAILED(hr);
-	hr = Add_Texture(eLevel, "FX_Logo", "Logo/Logo.png");
-	CHECK_FAILED(hr);
-	hr = Add_Texture(eLevel, "FX_SimpleSolid", "Simple/simpleSolid_%d.png", 2);
-	CHECK_FAILED(hr);
-	hr = Add_Texture(eLevel, "FX_SimpleStar", "Effects/SimpleStar.png");
-	CHECK_FAILED(hr);
+	
+	Add_FXTexture();
 
-	hr = Add_Texture(eLevel, "FX_VacuumTornado", "Effects/wind01.png");
-	CHECK_FAILED(hr);
-	hr = Add_Texture(eLevel, "FX_VacuumWind", "Effects/scroll07.png");
-	CHECK_FAILED(hr);
-	hr = Add_Texture(eLevel, "FX_VacuumDGB", "Effects/twinkle02.png");
-	CHECK_FAILED(hr);
 
-	hr = Add_Texture(eLevel, "FX_Wind", "Effects/wind_%d.png", 2);
-	CHECK_FAILED(hr);
 
-	hr = Add_Texture(eLevel, "FX_Shockwave", "Effects/shockwave_%d.png", 1);
-	CHECK_FAILED(hr);
+
+
 
 	wstring wstrPrototypeTag = L"Prototype_Component_Shader_";
 	hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + TEXT("VtxPosTex"),
@@ -595,6 +595,43 @@ HRESULT CLoader::Add_Models(LEVEL eLevel)
 	return S_OK;
 }
 
+HRESULT CLoader::Add_FXTexture()
+{
+	HRESULT hr;
+
+	//테스트용
+	hr = Add_Texture(LEVEL_STATIC, "FX_Test", "Effects/test.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_SimpleStar", "Effects/simpleStar.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Logo", "Effects/simpleStar.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_SimpleSolid", "Simple/simpleSolid_%d.png", 2);	CHECK_FAILED(hr);
+
+
+	// 주로 사용되는 텍스쳐들
+	hr = Add_Texture(LEVEL_STATIC, "FX_Star", "Effects/Basic/common_star.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Bubble", "Effects/Basic/common_bubble.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Circles", "Effects/Basic/common_circle_%d.dds", 3);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Grad", "Effects/Basic/common_gradation.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Hit", "Effects/Basic/common_ring_0.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Smoke", "Effects/Basic/common_smoke.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Line", "Effects/Basic/common_line_0.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Jump", "Effects/Basic/common_jump.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Sparkle", "Effects/Basic/common_sparkle.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Lead", "Effects/Basic/leaf.dds");	CHECK_FAILED(hr);
+
+
+
+
+	hr = Add_Texture(LEVEL_STATIC, "FX_VacuumTornado", "Effects/Basic/wind01.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_VacuumWind", "Effects/Basic/scroll07.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_VacuumDGB", "Effects/Basic/twinkle02.png");	CHECK_FAILED(hr);
+
+	hr = Add_Texture(LEVEL_STATIC, "FX_Wind", "Effects/Basic/wind_%d.png", 2);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Shockwave", "Effects/Basic/shockwave_%d.png", 1);	CHECK_FAILED(hr);
+
+
+	return E_NOTIMPL;
+}
+
 // 여기다가 모든 Model을 셋업한다.
 void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 {
@@ -657,6 +694,10 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// For Mab Interactive Object
 		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM);
+
+		// For Item
+		m_vecModelInfo.emplace_back("Item_EnergyDrink", TYPE_NONANIM, 3.f);
+
 	}
 	else if (eLevel == LEVEL_GAMEPLAY)
 	{
@@ -694,11 +735,17 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Rabbit", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("Buffahorn", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("BladeKnight", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("BladeKnightSword", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("BladeKnightSword", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("Kabu", TYPE_ANIM, 2.f, 180.f);
+		m_vecModelInfo.emplace_back("BrontoBurt", TYPE_ANIM, 2.f, 180.f);
+		m_vecModelInfo.emplace_back("PoppyBrosJr", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_NONANIM, 1.f, 180.f);
 
 		// For Mab Interactive Object
 		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM);
+
+		// For Item
+		m_vecModelInfo.emplace_back("Item_EnergyDrink", TYPE_NONANIM, 3.f);
 	}
 	else if (eLevel == LEVEL_TOOL_MAP)
 	{
@@ -823,6 +870,10 @@ HRESULT CLoader::Add_KirbyFaceTexture(LEVEL eLevel)
 
 	// Buffahorn Eye
 	if (FAILED(Add_Texture(eLevel, "Buffahorn_Eye", "BuffahornEye/TackleEnemyEye.0%d.dds", 4)))
+		return E_FAIL;
+
+	// BrontoBurt Eye
+	if (FAILED(Add_Texture(eLevel, "BrontoBurt_Eye", "BrontoBurtEye/Face.0%d.dds", 2)))
 		return E_FAIL;
 
 	return S_OK;

@@ -66,7 +66,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 	m_setMapNames = { "BG0", "BG1", "Level0Stage1Step01", "Level1Stage1Step01" };
 	m_setMonsterNames = { "NonAnim_Awoofy", "NonAnim_BladeKnight", "NonAnim_Buffahorn", "NonAnim_Rabbit"
-						, "NonAnim_Kabu" };
+						, "NonAnim_Kabu", "NonAnim_BrontoBurt", "NonAnim_PoppyBrosJr" };
 	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy", "RallyPoint", "LightBulb" };
 	m_setRallyingMonsters = { "NonAnim_Kabu", "NonAnim_BrontoBurt" };
 
@@ -673,7 +673,7 @@ void CMapToolHelper::Save_Level()
 		MSG_BOX(TEXT("List is empty."));
 		return;
 	}
-
+	
 	RegisterRallyPoints(pObjectsList);
 		
 	for (auto& object : *pObjectsList)

@@ -6,13 +6,13 @@
 #endif
 
 CMultiEffect::CMultiEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    :CEffect{ pDevice, pContext }
+	:CEffect{ pDevice, pContext }
 {
 }
 
 CMultiEffect::CMultiEffect(const CMultiEffect& rhs)
-    :CEffect{ rhs }
-    , m_FXDesc{ rhs.m_FXDesc }
+	:CEffect{ rhs }
+	, m_FXDesc{ rhs.m_FXDesc }
 {
 }
 
@@ -32,7 +32,7 @@ void CMultiEffect::Fill_SaveData(MULTI_FX_DATA* pFXData)
 
 HRESULT CMultiEffect::Initialize_Prototype()
 {
-    return S_OK;
+	return S_OK;
 }
 
 HRESULT CMultiEffect::Initialize_Prototype(MULTI_FX_DESC FXDesc)
@@ -40,7 +40,7 @@ HRESULT CMultiEffect::Initialize_Prototype(MULTI_FX_DESC FXDesc)
 	m_strFXName = FXDesc.strFXName;
 	m_FXDesc = FXDesc;
 
-    return S_OK;
+	return S_OK;
 }
 
 HRESULT CMultiEffect::Initialize(void* pArg)
@@ -88,10 +88,6 @@ HRESULT CMultiEffect::Initialize(void* pArg)
 		//정보 들어왔을 때 크자이를 같이 전달해 준다.
 		if (!m_FXDesc.FXs.empty())
 		{
-			//CComponent_Manager::PROTOTYPES* pStaticProtoMap{ nullptr };
-			//pStaticProtoMap = m_pGameInstance->Get_ComMap(LEVEL_STATIC);
-			//if (nullptr == pStaticProtoMap)
-			//	return E_FAIL;
 
 			for (auto& FXName : m_FXDesc.FXs)
 			{
@@ -111,26 +107,13 @@ HRESULT CMultiEffect::Initialize(void* pArg)
 				m_FXs.push_back(pFX);
 				m_fDuration.second = pFX->Get_BiggerDuration(m_fDuration.second);
 
-				/*for (auto& comPair : *pStaticProtoMap)
-				{
-					if (comPair.first.find(CUtils::StrToWstr(FXName)) != wstring::npos)
-					{
-						Add_Effect()
-
-						string strComName = CUtils::WstrToStr(comPair.first);
-						strComName = string(strComName.begin() + 20, strComName.end());
-						char* tempStr = new char[strComName.size() + 1];
-						strcpy_s(tempStr, strComName.size() + 1, strComName.c_str());
-						vecCombo->push_back(tempStr);
-					}
-				}*/
-
 			}
 		}
 	}
 
+	m_fStartDelay = FXDesc.fStartDelay;
 
-    return S_OK;
+	return S_OK;
 }
 
 _int CMultiEffect::Tick(_float fTimeDelta)
@@ -153,7 +136,7 @@ _int CMultiEffect::Tick(_float fTimeDelta)
 	{
 		m_bDead = true;
 	}
-	else if(m_bIsLoop)
+	else if (m_bIsLoop)
 	{
 		m_fDuration.first = 0.f;
 		for (auto& pEffect : m_FXs)
@@ -163,7 +146,7 @@ _int CMultiEffect::Tick(_float fTimeDelta)
 	for (auto& pEffect : m_FXs)
 		pEffect->Tick(fTimeDelta);
 
-    return OBJ_NOEVENT;
+	return OBJ_NOEVENT;
 }
 
 void CMultiEffect::Late_Tick(_float fTimeDelta)
@@ -174,7 +157,7 @@ void CMultiEffect::Late_Tick(_float fTimeDelta)
 	if (m_bDead)
 		return;
 
- 	//if ((CRenderer::RENDERGROUP)m_eRenderGroup != CRenderer::RENDER_END)
+	//if ((CRenderer::RENDERGROUP)m_eRenderGroup != CRenderer::RENDER_END)
 		//m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 
 	for (auto& pEffect : m_FXs)

@@ -32,7 +32,7 @@ _int CCharacter::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
-	// FSM Update , SetOn_Slope, MotionBlur // 
+	// FSM Update , SetOn_Slope, MotionBlur //
 	Character_SystemTick(fTimeDelta);
 
 	return OBJ_NOEVENT;
@@ -137,6 +137,12 @@ void CCharacter::Character_SystemTick(_float fTimeDelta)
 	{
 		// 터레인 경사면 보간 제어
 		SetOn_Slope(fTimeDelta);
+	}
+
+	if (m_fWhiteColorDiffuse > 0.f)
+	{
+		// 0.2초만에 다시 원래 색상으로 복귀한다.
+		m_fWhiteColorDiffuse -= fTimeDelta * 5.f;
 	}
 }
 

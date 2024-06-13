@@ -31,8 +31,6 @@ public:
 	_bool				Get_Hide() { return m_bHide; }
 	virtual void		Set_Hide(_bool bHide) { m_bHide = bHide; }
 
-	COLLISION_TYPE		Get_CollisionGroup() const { return m_eCollisionGroup; }
-
 	// prototypeTag
 	const wstring&		Get_PrototypeTag() const { return m_wstrPrototypeTag; }
 	void				Set_PrototypeTag(wstring _wstrProtoTag) { m_wstrPrototypeTag = _wstrProtoTag; }
@@ -60,7 +58,6 @@ public:
 	virtual HRESULT		Render_DeferredInfo() { return S_OK; }
 	
 	// 충돌처리 함수
-	virtual void		Collision_Attack(CGameObject* pGameObject);
 	virtual void		Collision_Overlap(CGameObject* pGameObject);
 
 protected:
@@ -84,8 +81,6 @@ protected:
 	_bool									m_bDead = { false };
 	// prototypeName을 들고 있는다.
 	wstring									m_wstrPrototypeTag = wstring();
-	// collision group을 지정하여 충돌체크를 진행합니다.
-	COLLISION_TYPE							m_eCollisionGroup = COLLISION_END;
 	
 	_float									m_fViewZ = { 0.f };
 	_float3									m_vViewPos = _float3{ 0.f, 0.f, 0.f };

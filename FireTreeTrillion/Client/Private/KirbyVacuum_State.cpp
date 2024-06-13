@@ -23,6 +23,7 @@ void CKirbyVacuum_Spit_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
 	pKirby->DefaultIdle();
+	Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
 
 	m_fSpitTime += fTimeDelta;
 	if (m_fSpitTime > 0.05f && m_bSpitTrigger == true )
@@ -34,14 +35,38 @@ void CKirbyVacuum_Spit_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 			CTransform* pObjectTransform = DESC(m_pObject)->Get_TransformCom();
 			pObjectTransform->Set_Scaled(1.f, 1.f, 1.f);
 			DESC(m_pObject)->Set_PhyXState(PO_FLYAWAY);
-			DESC(m_pObject)->Set_DamageMoving(pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), 1.f);
 
-			_vector vNewUp = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
-			_vector vNewLook = XMVector3Cross(vNewUp, XMVectorSet(0.f, 1.f, 0.f, 0.f));
-			_vector vNewRight = XMVector3Cross(vNewUp, vNewLook);
-			pObjectTransform->Set_State(CTransform::STATE_UP, vNewUp);
-			pObjectTransform->Set_State(CTransform::STATE_RIGHT, vNewRight);
-			pObjectTransform->Set_State(CTransform::STATE_LOOK, vNewLook);
+			_float4 vTargetPos = Spit_Target_Object(pKirby);
+
+			if (vTargetPos == _float4(0.f, 0.f, 0.f, 0.f))
+			{
+				DESC(m_pObject)->Set_DamageMoving(pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), 1.f);
+
+				_vector vNewUp = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+				_vector vNewLook = XMVector3Cross(vNewUp, XMVectorSet(0.f, 1.f, 0.f, 0.f));
+				_vector vNewRight = XMVector3Cross(vNewUp, vNewLook);
+				pObjectTransform->Set_State(CTransform::STATE_UP, vNewUp);
+				pObjectTransform->Set_State(CTransform::STATE_RIGHT, vNewRight);
+				pObjectTransform->Set_State(CTransform::STATE_LOOK, vNewLook);
+
+			}
+			else
+			{
+				_float4 vObjectPos = pObjectTransform->Get_State(CTransform::STATE_POSITION);
+				_vector vObjectToTargetDir = XMVector3Normalize(vTargetPos - vObjectPos);
+				DESC(m_pObject)->Set_DamageMoving(vObjectToTargetDir, 1.f);
+
+				vObjectToTargetDir.m128_f32[1] = 0.f;
+				DESC(m_vTargetDir) = XMVector3Normalize(vObjectToTargetDir);
+
+				_vector vNewUp = vObjectToTargetDir;
+				_vector vNewLook = XMVector3Cross(vNewUp, XMVectorSet(0.f, 1.f, 0.f, 0.f));
+				_vector vNewRight = XMVector3Cross(vNewUp, vNewLook);
+				pObjectTransform->Set_State(CTransform::STATE_UP, vNewUp);
+				pObjectTransform->Set_State(CTransform::STATE_RIGHT, vNewRight);
+				pObjectTransform->Set_State(CTransform::STATE_LOOK, vNewLook);
+			}
+
 
 			Safe_Release(DESC(m_pObject));
 			DESC(m_pObject) = nullptr;

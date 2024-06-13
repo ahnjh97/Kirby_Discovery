@@ -223,6 +223,30 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyBoom_State">
       <UniqueIdentifier>{df88d3db-f381-4d13-8ca4-1ddc4df3cb3d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BrontoBurt">
+      <UniqueIdentifier>{f298ee5c-af62-41d9-ba80-4bea30e15abc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\PoppyBrosJr">
+      <UniqueIdentifier>{e5bcf268-b501-40ab-9e8e-31f871c7571e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BrontoBurt\State">
+      <UniqueIdentifier>{205db8bd-743b-446a-a3c9-0abe24e12f05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\PoppyBrosJr\State">
+      <UniqueIdentifier>{972ab19b-8668-4996-8aad-6136da78b6fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\PoppyBrosJr\PoppyBomb">
+      <UniqueIdentifier>{7bedbad2-eaee-4fc2-864c-e9d696e6ca05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.Collision">
+      <UniqueIdentifier>{e1c9a7b9-efac-424b-9bcd-62d41980db04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Item">
+      <UniqueIdentifier>{dcd6e3c0-cd2f-4f4e-8add-51eb6748dc29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Item\EnergyDrink">
+      <UniqueIdentifier>{e5a44464-aceb-4ed8-97a0-0e8e21890bb7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -447,6 +471,32 @@
     <ClInclude Include="..\Public\KirbyBoom_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyBoom_State</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\HUD_KirbyStatus.h" />
+    <ClInclude Include="..\Public\HUD_StarPoint.h" />
+    <ClInclude Include="..\Public\BrontoBurt.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\BrontoBurt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PoppyBrosJr.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\PoppyBrosJr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BrontoBurt_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\BrontoBurt\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PoppyBrosJr_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\PoppyBrosJr\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PoppyBomb.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\PoppyBrosJr\PoppyBomb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CollisionCenter.h">
+      <Filter>03.Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ItemObject.h">
+      <Filter>02.GameObjects\PhysXObject\Item</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnergyDrink.h">
+      <Filter>02.GameObjects\PhysXObject\Item\EnergyDrink</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -652,6 +702,32 @@
     </ClCompile>
     <ClCompile Include="..\Public\KirbyBoom_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyBoom_State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HUD_KirbyStatus.cpp" />
+    <ClCompile Include="..\Private\HUD_StarPoint.cpp" />
+    <ClCompile Include="..\Private\BrontoBurt.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\BrontoBurt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PoppyBrosJr.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\PoppyBrosJr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BrontoBurt_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\BrontoBurt\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PoppyBrosJr_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\PoppyBrosJr\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PoppyBomb.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\PoppyBrosJr\PoppyBomb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CollisionCenter.cpp">
+      <Filter>03.Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ItemObject.cpp">
+      <Filter>02.GameObjects\PhysXObject\Item</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EnergyDrink.cpp">
+      <Filter>02.GameObjects\PhysXObject\Item\EnergyDrink</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

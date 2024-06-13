@@ -73,13 +73,23 @@ HRESULT CEffect::Initialize(void* pArg)
     //iSize = m_iCurKeyframeIdxs[3];
     //ZeroMemory(m_iCurKeyframeIdxs, )
     //_int iSize = m;
-    //m_vCurRColor = effectDesc.vRColor;
+    //m_vCurRColor = effectDesc.vRColor;f
     //m_vCurGColor = effectDesc.vGColor;
     //m_vCurBColor = effectDesc.vBColor;
 
     //m_keyfra = effectDesc.Keyframes;
 
     return S_OK;
+}
+
+void CEffect::Reset_Duration()
+{
+    m_fDuration.first = 0.f;
+
+    for (size_t i = KF_POS; i < KF_END; ++i)
+    {
+        m_iCurKeyframeIdxs[i] = 0;
+    }
 }
 
 void CEffect::Fill_SaveData(_Out_ SINGLE_FX_DATA* pFXData)

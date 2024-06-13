@@ -61,7 +61,7 @@ _int CRabbit::Tick(_float fTimeDelta)
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
 	// 빨릴 때
-	if (m_ePhyXState == PO_VACUUMING)
+	if (m_ePhyXState == PO_VACUUMING || m_ePhyXState == PO_FLYDEADAWAY)
 		Change_State(CRabbit::RABBIT_DAMAGE, 120.f, true, false);
 
 	__super::Tick(m_fTimeDelta);
@@ -77,7 +77,9 @@ void CRabbit::Late_Tick(_float fTimeDelta)
 
 	// 날아갈 땐, 애니메이션 재생이 되지 않는다.
 	if (m_ePhyXState != PO_FLYAWAY)
-		m_pModelCom->Play_Animation(m_fTimeDelta);
+	{
+		m_ePhyXState == PO_FLYDEADAWAY ? m_pModelCom->Play_Animation(m_fTimeDelta * 0.3f) : m_pModelCom->Play_Animation(m_fTimeDelta);
+	}
 
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
@@ -89,6 +91,7 @@ void CRabbit::Late_Tick(_float fTimeDelta)
 
 HRESULT CRabbit::Render()
 {
+
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
@@ -177,22 +180,19 @@ void CRabbit::Render_IMGUI()
 }
 #endif
 
-void CRabbit::Collision_Attack(CGameObject* pOtherObj)
+void CRabbit::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
-	CPhysXObject* pObject = static_cast<CPhysXObject*>(pOtherObj);
-
-
-	// 날아온게 FlyAway 상태인 몬스터였을 경우
-	if (pObject->Get_PhyXState() == PO_FLYAWAY)
+	if (eContent == CCollisionCenter::CONTENT_BODY)
 	{
-		// 같이 처맞고 날아가자.
-
+		if (m_ePhyXState == PO_NORMAL)
+		{
+			Change_State(CRabbit::RABBIT_DAMAGE, 50.f, false, true);
+			m_eEyeState = RABBITEYE_HAPPY;
+		}
 	}
-	// 일반 충돌
-	else
+	else if (eContent == CCollisionCenter::CONTENT_VACUUMOBJECT)
 	{
-		Change_State(CRabbit::RABBIT_DAMAGE, 50.f, false, true);
-		m_eEyeState = RABBITEYE_HAPPY;
+
 	}
 }
 
@@ -224,7 +224,12 @@ void CRabbit::Compute_Parabola(_vector vEndPos)
 	_float b = -2.f * m_fAxisY;
 	_float c = 2.f * m_fEndHight;
 
-	m_fEndTime = (-b + sqrtf(b * b - 4.f * m_fGravity * c)) / (2.f * m_fGravity);
+	_float fResult = b * b - 4.f * m_fGravity * c;
+
+	if (0.f > fResult)
+		m_fEndTime = -b;
+	else
+		m_fEndTime = (-b + sqrtf(fResult)) / (2.f * m_fGravity);
 
 	m_fAxisX = -(m_vStartPos.x - m_vEndPos.x) / m_fEndTime;
 	m_fAxisZ = -(m_vStartPos.z - m_vEndPos.z) / m_fEndTime;
@@ -261,7 +266,6 @@ HRESULT CRabbit::Add_Components()
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
-	desc.uCollisionType = m_eCollisionGroup;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	m_pControllerCom->Set_Object(this);
@@ -286,13 +290,19 @@ HRESULT CRabbit::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
-	m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
-	m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool))))
+		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
 		return E_FAIL;
-	m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool))))
+		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
 		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
+		return E_FAIL;
+
 
 
 	return S_OK;
@@ -350,7 +360,7 @@ _bool CRabbit::Custom_Face(_uint iMeshIndex)
 		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
 
-		m_pShaderCom->Begin(ANIMMODEL_KIRBYEYE);
+		m_pShaderCom->Begin(ANIMMODEL_EYE);
 		m_pModelCom->Render(iMeshIndex);
 
 		return true;

@@ -109,8 +109,8 @@ public:
 	virtual HRESULT	Render_DeferredInfo()						override;
 
 	virtual void	Add_AnimEvent()								override;
-	virtual void	Collision_Attack(CGameObject* pOtherObj)	override;
 	virtual void	Collision_Overlap(CGameObject* pGameObject) override;
+	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
 	KIRBY_INFODESC* Get_KirbyInfo() { return &m_tKirbyInfo; }
 	void			Set_KirbyInfo(KIRBY_INFODESC _tInfo) {
@@ -125,6 +125,9 @@ public:
 	void			DefaultIdle();
 
 	_float4			Compute_TerrainPosition();
+
+	// 현재 커비가 무적상태인지 아닌지 판별하는 부울 값
+	_bool			isOverPower() { return m_bOverPower; }
 
 #pragma region 이펙트 리스트 실험
 	//안녕하세요 디버깅 용으로 이펙트 리스트를 추가했습니다
@@ -185,6 +188,13 @@ private:
 
 	_float4x4			  m_WeaponMatrix;
 	_float4x4			  m_ArmourMatrix;
+
+	void				  OverPower();
+	_bool				  m_bOverPower = { false };
+	_float				  m_fOverPowerColor = { 0.f };
+	_float				  m_fOverPowerTime = { 0.f };
+	_float				  m_fFlashOverPowerTime = { 0.f };
+	_float				  m_fPreHp = { 0.f };
 
 	_int				  m_iTestAnim = { 0 };
 

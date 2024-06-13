@@ -8,6 +8,7 @@
 #include "Trigger.h"
 #include "Kirby.h"
 #include "Kabu.h"
+#include "BrontoBurt.h"
 #include "BG.h"
 #include "HUD.h"
 
@@ -51,12 +52,13 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
 		return E_FAIL;
 
+	// TEST (아이템 보이)
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Item"), TEXT("Prototype_GameObject_EnergyDrink"))))
+	//	return E_FAIL;
+
 	if (FAILED(Ready_Layer_MapObject(TEXT("Layer_MapObject"))))
 		return E_FAIL;
 
-	// TEST (블러와 블랜드의 관계)
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Moon"), TEXT("Prototype_GameObject_Moon"))))
-	//	return E_FAIL;
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
@@ -142,11 +144,11 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
 
 	CCamera_Free::CAMERA_FREE_DESC		CameraDesc{};
 	CameraDesc.fMouseSensor = 0.1f;
-	CameraDesc.fFovy = XMConvertToRadians(40.0f);
+	CameraDesc.fFovy = XMConvertToRadians(30.0f);
 	CameraDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	CameraDesc.fNear = 0.1f;
 	CameraDesc.fFar = 1000.0f;
-	CameraDesc.vEye = _float4(0.f, 2.f, -1.f, 1.f);
+	CameraDesc.vEye = _float4(0.f, .5f, -1.f, 1.f);
 	CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
 	CameraDesc.fSpeedPerSec = 10.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
@@ -167,8 +169,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const wstring& strLayerTag)
 
 HRESULT CLevel_GamePlay::Ready_Layer_Player(const wstring & strLayerTag)
 {
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_TestModel"))))
-		return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_TestModel"))))
+	//	return E_FAIL;
 
 	// Kirby
 	/*if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Kirby"))))
@@ -352,14 +354,33 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BladeKnight"), &tempDesc)))
 				return E_FAIL;
 		}
+		else if (strModelName == "NonAnim_PoppyBrosJr")
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_PoppyBrosJr"), &tempDesc)))
+				return E_FAIL;
+		}
 		else if (strModelName == "NonAnim_Kabu")
 		{
 			CKabu::KABU_DESC KabuDesc = {};
 			KabuDesc.matWorld = matWorld;
-			KabuDesc.wstrModelName = tempDesc.wstrModelName;
+			KabuDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			KabuDesc.iShaderVars = iShaderVars;
+			KabuDesc.fRimWidth = fRimWidth;
 			KabuDesc.eMoveState = CKabu::KABUMOVING_STATE(iTriggerIndex);
 			KabuDesc.vecRallyPoints = vecRallyPoints;
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Kabu"), &KabuDesc)))
+				return E_FAIL;
+		}
+		else if (strModelName == "NonAnim_BrontoBurt")
+		{
+			CBrontoBurt::BRONTOBURT_DESC BrontoBurtDesc = {};
+			BrontoBurtDesc.matWorld = matWorld;
+			BrontoBurtDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			BrontoBurtDesc.iShaderVars = iShaderVars;
+			BrontoBurtDesc.fRimWidth = fRimWidth;
+			BrontoBurtDesc.eMoveState = CBrontoBurt::BRONTOBURTMOVING_STATE(iTriggerIndex);
+			BrontoBurtDesc.vecRallyPoints = vecRallyPoints;
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BrontoBurt"), &BrontoBurtDesc)))
 				return E_FAIL;
 		}
 		else if (strModelName == "Level1Stage1Step01" || strModelName == "Level1Stage1Step01_Blend")
