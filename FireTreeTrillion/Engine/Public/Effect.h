@@ -187,6 +187,7 @@ protected:
 	_bool			Calculate_Lifetime(_float _fTimeDelta);
 	_float3			Calculate_CurValue_Lerp(_float fTimeDelta, KF_PROPERTY eProperty, _bool bIsInEditor = false);
 	_float4			Calculate_CurValue_Slerp(_float fTimeDelta,  KF_PROPERTY eProperty, _bool bIsInEditor = false);
+	void			Billboard_Effect();
 
 public:
 	virtual void Free() override;

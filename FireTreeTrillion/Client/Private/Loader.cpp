@@ -392,7 +392,7 @@ HRESULT CLoader::Loading_For_GamePlay()
 #pragma region UI
 
 	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 19);
-	hr = Add_Texture(eLevel, "HUD_StarPoint", "UI/HUD/Kirby/StarPoint/StarPoint_%d.dds", 4);
+	hr = Add_Texture(eLevel, "HUD_StarPoint", "UI/HUD/Kirby/StarPoint/StarPoint_%d.dds", 10);
 	CHECK_FAILED(hr);
 
 #pragma endregion
@@ -559,7 +559,7 @@ HRESULT CLoader::Loading_For_Tool_UI()
 #pragma region TEXTURE
 
 	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 19);
-	hr = Add_Texture(eLevel, "HUD_StarPoint", "UI/HUD/Kirby/StarPoint/StarPoint_%d.dds", 4);
+	hr = Add_Texture(eLevel, "HUD_StarPoint", "UI/HUD/Kirby/StarPoint/StarPoint_%d.dds", 10);
 	CHECK_FAILED(hr);
 
 	m_strLoadingText = TEXT("Loading For Texture : Complete!");
@@ -610,14 +610,14 @@ HRESULT CLoader::Add_FXTexture()
 
 	// 주로 사용되는 텍스쳐들
 	hr = Add_Texture(LEVEL_STATIC, "FX_Star", "Effects/Basic/common_star.dds");	CHECK_FAILED(hr);
-	hr = Add_Texture(LEVEL_STATIC, "FX_Bubble", "Effects/Basic/common_bubble.dds");	CHECK_FAILED(hr);
-	hr = Add_Texture(LEVEL_STATIC, "FX_Circles", "Effects/Basic/common_circle_%d.dds", 3);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Bubble", "Effects/Basic/common_bubble.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Circles", "Effects/Basic/common_circle_%d.png", 3);	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Grad", "Effects/Basic/common_gradation.dds");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Hit", "Effects/Basic/common_ring_0.dds");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Smoke", "Effects/Basic/common_smoke.dds");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Line", "Effects/Basic/common_line_0.dds");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Jump", "Effects/Basic/common_jump.png");	CHECK_FAILED(hr);
-	hr = Add_Texture(LEVEL_STATIC, "FX_Sparkle", "Effects/Basic/common_sparkle.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Sparkle", "Effects/Basic/common_sparkle.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Lead", "Effects/Basic/leaf.dds");	CHECK_FAILED(hr);
 
 

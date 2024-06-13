@@ -226,7 +226,7 @@ PS_OUT PS_MAIN_WHITEFX(PS_IN_ALPHABLEND In)
     if (vDiffuse.a < .01f || (vDiffuse.r < 0.1f && vDiffuse.g < 0.1f && vDiffuse.b < 0.1f))
         discard;
     
-    Out.vColor.rgb = vDiffuse.rgb * g_vRColor;
+    Out.vColor.rgb = g_vRColor;
     Out.vColor.a = vDiffuse.a * g_fAlpha;
 	
     return Out;
@@ -318,7 +318,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_ALPHABLEND();
     }
 
-	// 화이트 이펙트 패스. 알파 테스팅 + 마스크 ( 6 )
+	// 화이트 이펙트 패스. 알파 테스팅 + 마스크 + no z text ( 6 )
     pass WhiteFX
     {
         SetRasterizerState(RS_Default);

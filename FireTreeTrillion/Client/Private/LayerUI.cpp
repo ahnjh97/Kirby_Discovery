@@ -101,10 +101,13 @@ HRESULT CLayerUI::Render()
 							- m_UIObjDesc.vPos.y + m_UIObjDesc.vCenter.y};
 
 		_float4 vFontRGBA = { m_UIObjDesc.vColorRGB.x, m_UIObjDesc.vColorRGB.y, m_UIObjDesc.vColorRGB.z, m_UIObjDesc.fAlpha };
-		if (FAILED(m_pGameInstance->
-			Render_Font(TEXT("Font_HUD_StarPoint_NUM30"), m_UIObjDesc.wstrText, vFontPos, vFontRGBA,
-				XMConvertToRadians(m_UIObjDesc.vDegree.z))))
-			return E_FAIL;
+		_float2 vFontOrig = {	1.f, 1.f  };
+		_float2 vFontScale = {	1.f, 1.f  };
+
+		wstring wstrFontTag = { TEXT("Font_HUD_StarPoint_NUM30") };
+
+		m_pGameInstance->Render_Font(wstrFontTag, m_UIObjDesc.wstrText, vFontPos, vFontRGBA, 
+			XMConvertToRadians(m_UIObjDesc.vDegree.z), vFontOrig, vFontScale);
 	}
 
 	return S_OK;

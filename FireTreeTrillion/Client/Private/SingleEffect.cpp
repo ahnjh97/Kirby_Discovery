@@ -169,6 +169,9 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 	}
 
 
+	if (m_bIsBillboard)
+		Billboard_Effect();
+
 	return OBJ_NOEVENT;
 }
 
@@ -218,16 +221,18 @@ HRESULT CSingleEffect::Add_Components(FX_DESC& FXDesc)
 {
 	HRESULT hr;
 
+
 	hr = __super::Add_Component(LEVEL_STATIC, CUtils::StrToWstr(FXDesc.strTexTag),
 		TEXT("Com_DiffuseTexture"), (CComponent**)&m_pTextureCom[TEX_DIFFUSE]);
 	CHECK_FAILED(hr);
 
-	m_iMaxTexIdx = m_pTextureCom[TEX_DIFFUSE]->Get_TextureNum();
+	m_iMaxTexIdx = m_pTextureCom[TEX_DIFFUSE]->Get_TextureNum()-1;
 
 	hr = __super::Add_Component(LEVEL_STATIC, CUtils::StrToWstr(FXDesc.strMaskTexTag),
 		TEXT("Com_MaskTexture"), (CComponent**)&m_pTextureCom[TEX_MASK]);
 	CHECK_FAILED(hr);
 
+	m_iMaxMaskTexIdx = m_pTextureCom[TEX_MASK]->Get_TextureNum() - 1;
 
 	if (FXDesc.strBufferTag == "Prototype_Component_VIBuffer_Rect")
 	{
@@ -240,7 +245,7 @@ HRESULT CSingleEffect::Add_Components(FX_DESC& FXDesc)
 			TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 		CHECK_FAILED(hr);
 
-		//현재 VtxPosTex Shader Pass 4까지
+		//현재 VtxPosTex Shader Pass 6까지
 		m_iMaxPassIdx = 6;
 	}
 	else

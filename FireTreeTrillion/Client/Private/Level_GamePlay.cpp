@@ -52,7 +52,7 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
 		return E_FAIL;
 
-	// TEST (아이템 보이)
+	// Item Test
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Item"), TEXT("Prototype_GameObject_EnergyDrink"))))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Item"), TEXT("Prototype_GameObject_Coin"))))
@@ -465,7 +465,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_MapObject(const wstring& strLayerTag)
 	return S_OK;
 }
 
-_bool CLevel_GamePlay::Load_FileData(const string& _strFilePath, FILE_TYPE _eFileType, const wstring& _wstrLayerTag)
+HRESULT CLevel_GamePlay::Load_FileData(const string& _strFilePath, FILE_TYPE _eFileType, const wstring& _wstrLayerTag)
 {
 	std::ifstream InputFile(_strFilePath, ios::in | std::ios::binary);
 

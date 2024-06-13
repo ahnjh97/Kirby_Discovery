@@ -672,6 +672,14 @@ HRESULT CGameInstance::Render_Font(const wstring& strFontTag, const wstring& str
 	return m_pFont_Manager->Render(strFontTag, strText, vPosition, vColor, fRadian);
 }
 
+HRESULT CGameInstance::Render_Font(const wstring& strFontTag, const wstring& strText, const _float2& vPosition, _fvector vColor, _float fRadian, _fvector vOrigin, _gvector vScale)
+{
+	if (m_pFont_Manager == nullptr)
+		return E_FAIL;
+
+	return m_pFont_Manager->Render(strFontTag, strText, vPosition, vColor, fRadian, vOrigin, vScale);
+}
+
 #pragma region TARGET_MANAGER
 HRESULT CGameInstance::Add_RenderTarget(const wstring& strRenderTargetTag, _uint iSizeX, _uint iSizeY, DXGI_FORMAT ePixelFormat, const _float4& vClearColor)
 {

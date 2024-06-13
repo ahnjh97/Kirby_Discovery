@@ -544,6 +544,31 @@ _bool CEditor_UI::Window_Tools()
 			if (ImGui::BeginTabItem(u8"Text 텍스트 편집"))
 			{
 				ImGui::SeparatorText(u8"Text Edit 텍스트 편집");
+
+				/*
+				string strUITag = {};
+				ImGui::PushItemWidth(265.f);
+				if (ImGui::BeginCombo(u8"##", (g_iSelectUI >= 0 && g_iSelectUI < m_GroupUIs.size())
+					? strUITag.c_str() : u8"폰트를 선택해주세요."))
+				{
+					//for (size_t iGroupIx = 0; iGroupIx < m_GroupUIs.size(); ++iGroupIx)
+					//{
+					//	for (auto& GroupUI : m_GroupUIs)
+					//	{
+					//		string strUITag = CUtils::WstrToStr(GroupUI[iGroupIx]->Get_UIObj_Desc().wstrUITag);
+					//		strUITag += "_Group_[" + to_string(iGroupIx) + "]";
+					//		if (strUITag.empty()) //wstrUITag 값에 대한 예외처리
+					//			strUITag = "##";
+					//		const _bool IsSelected = g_iSelectUI == iGroupIx;
+					//		if (ImGui::Selectable(strUITag.c_str(), IsSelected))
+					//			g_iSelectUI = iGroupIx;
+					//	}
+					//}
+					ImGui::EndCombo();
+				}
+				ImGui::PopItemWidth();
+				*/
+
 				Edit_Text();
 
 				ImGui::EndTabItem();
@@ -658,6 +683,9 @@ void CEditor_UI::Window_PopupAlert()
 	static string strInput(1024 * 16, '\0');
 	if (ImGui::BeginPopupModal(g_strPopupTag.c_str(), NULL, Popup_Flags))
 	{
+		if (m_pGameInstance->Get_DIKeyState(DIK_GRAVE, KEY_DOWN))
+			ImGui::CloseCurrentPopup();
+
 		if (ImGui::IsWindowAppearing()) //팝업 오픈 시점에 선택 항목의 태그를 인풋박스에 출력
 			strInput = g_strUITag;
 
@@ -809,6 +837,11 @@ _bool CEditor_UI::Edit_Transform(CUIObject* _pUIObj)
 	// 기즈모 연동
 	ImGuizmo::DecomposeMatrixToComponents(UIWorldMat.m[0], Translate, Rotate, Scale);
 
+	ImGui::Text(u8"Translate 위치");
+	ImGui::SameLine(); HelpMarker(u8"Ctrl+T");
+	ImGui::SameLine(fTextWidth + 35);
+	ImGui::DragFloat3("##Translate", (_float*)&Translate, 1.f, (_float)-0.1 * g_iWinSizeX, (_float)g_iWinSizeX, "%.1f");
+
 #pragma region SET_PROJECTION
 
 	//직교, 원근투영 옵션 스왑
@@ -842,16 +875,15 @@ _bool CEditor_UI::Edit_Transform(CUIObject* _pUIObj)
 
 #pragma endregion
 
-	ImGui::Text(u8"Scale 크기");
+	ImGui::Text(u8"Size 크기");
 	ImGui::SameLine(); HelpMarker(u8"Ctrl+E");
 	ImGui::SameLine(fTextWidth + 35);
-	ImGui::DragFloat3("##Scale", (_float*)&Scale, 1.f, 0.f, g_iWinSizeX, "%.1f");
+	ImGui::DragFloat3("##Size", (_float*)&Scale, 1.f, 0.f, g_iWinSizeX, "%.1f");
 
-	ImGui::Text(u8"Translate 위치");
-	ImGui::SameLine(); HelpMarker(u8"Ctrl+T");
-	ImGui::SameLine(fTextWidth + 35);
-	ImGui::DragFloat3("##Translate", (_float*)&Translate, 1.f, (_float)-0.1 * g_iWinSizeX, (_float)g_iWinSizeX, "%.1f");
-	ImGui::PopItemWidth();
+	//ImGui::Text(u8"Scale ");
+	//ImGui::SameLine(fTextWidth + 35);
+	//ImGui::DragFloat3("##Scale", (_float*)&Scale, 1.f, 0.f, g_iWinSizeX, "%.1f");
+	//ImGui::PopItemWidth();
 
 	LayerUIDesc.vPos = (_float3)Translate;
 	LayerUIDesc.vDegree = (_float3)Rotate;
@@ -930,17 +962,14 @@ _bool CEditor_UI::Edit_Text()
 	//ImGuiInputTextFlags InputText_flags{}; //= ImGuiInputTextFlags_AllowTabInput;
 
 	ImGui::InputTextMultiline(u8"##", &strInput[0],
-		strInput.capacity(), /*IM_ARRAYSIZE(strInputText.c_str()*/
-		ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing())); /*ImGui::GetTextLineHeight() * 10*/
-
-#pragma region FONT_SYNC
+		strInput.capacity(), ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing()));
 
 	wstring wstrText{};
 	UIOBJ_DESC LayerUIDesc{};
 
 	if (!g_SelectUIs.empty())
 	{
-		g_iSelectUI = g_SelectUIs.front();
+		//g_iSelectUI = g_SelectUIs.front();
 		if ((g_iSelectUI >= 0 && g_iSelectUI < m_LayerUIs.size()))
 		{
 			//UTF-8 인코딩 변환 작업
@@ -949,24 +978,9 @@ _bool CEditor_UI::Edit_Text()
 			wstrText = CUtils::StrToWstrUTF8(strInput);
 			LayerUIDesc.wstrText = wstrText;
 
-			//strInput = CUtils::WstrToStr(FontDesc.wstrText);
-			//wstrText = CUtils::StrToWstr(strInput);
-			//FontDesc.wstrText = wstrText;
-			//strInputText = CUtils::StrToUTF8(strInputText); //strANSI > strUTF8 변환 (만약 이미 UTF8이면 변환 안해도됨)
-
 			m_LayerUIs[g_iSelectUI]->Set_UIObj_Desc(LayerUIDesc);
-			//strTempText = strInputText;
-
-			//if (strInputText != strTempText) //이전에 입력한 값이랑 현재 값이랑 다를 경우
-			//{
-			//	FontDesc = m_LayerUIs[g_iSelectUI]->Get_UIObj_Desc();
-			//	FontDesc.wstrText = wstrText;
-			//	m_LayerUIs[g_iSelectUI]->Set_UIObj_Desc(FontDesc);
-			//}
 		}		
 	}
-
-#pragma endregion
 
 	return TRUE;
 }
@@ -1106,10 +1120,12 @@ void CEditor_UI::Create_UIObject(UI_STATE _eUIState, UI_TYPE _eUIType)
 
 	if (UI_LAYER == _eUIState) //레이어 생성
 	{
+#pragma region UI INFO
+
 		UIOBJ_DESC LayerUI_Desc{};
 		LayerUI_Desc.wstrUITag = { TEXT("LayerUI") };
 
-		LayerUI_Desc.eUIProj = PROJ_ORTHO; //직교투영 기본값
+		LayerUI_Desc.eUIProj = { PROJ_ORTHO }; //직교투영 기본값
 		LayerUI_Desc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f };
 		LayerUI_Desc.vSize = { 100.f, 100.f };
 		LayerUI_Desc.vPos = { 0.f, 0.f, 0.f };
@@ -1117,6 +1133,32 @@ void CEditor_UI::Create_UIObject(UI_STATE _eUIState, UI_TYPE _eUIType)
 		LayerUI_Desc.vColorRGB = { 1.f, 1.f, 1.f };
 		LayerUI_Desc.fAlpha = { 1.f };
 
+#pragma endregion
+
+#pragma region  UI_ANIMINFO
+
+		/*
+		UIANIM_DESC LayerUIAnim_Desc{};
+		LayerUIAnim_Desc.eUIAnimState = { ANIM_END };
+		LayerUIAnim_Desc.fAnimFPS = { 0.f };
+
+		LayerUIAnim_Desc.iPreFrame = { 0 };
+		LayerUIAnim_Desc.iCurrFrame = { 0 };
+		LayerUIAnim_Desc.iStartFrame = { 0 };
+		LayerUIAnim_Desc.iEndFrame = { 0 };
+		LayerUIAnim_Desc.fFrameAcc = { 0.f };
+
+		LayerUIAnim_Desc.eUIAnimType = { ANIM_NONE };
+		LayerUIAnim_Desc.vScale = { 0.f, 0.f, 0.f };
+		LayerUIAnim_Desc.vTrans = { 0.f, 0.f, 0.f };
+		LayerUIAnim_Desc.vRotate = { 0.f, 0.f, 0.f };
+		LayerUIAnim_Desc.fDuration = { 0.f };
+
+		LayerUIAnim_Desc.strAnimTag = { "" };;
+		*/
+
+#pragma endregion
+		
 		strProtoTag += CUtils::WstrToStr(LayerUI_Desc.wstrUITag);
 		
 		if (UI_TEXTURE == _eUIType)
@@ -1134,8 +1176,7 @@ void CEditor_UI::Create_UIObject(UI_STATE _eUIState, UI_TYPE _eUIType)
 		CUIObject* pLayerUI = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(CUtils::StrToWstr(strProtoTag), &LayerUI_Desc));
 		if (nullptr == pLayerUI)
 		{
-			g_IsSuccessed = FALSE;
-			g_eOpenPopup = POPUP_CREATE;
+			g_IsSuccessed = FALSE;	g_eOpenPopup = POPUP_CREATE;
 			CHECK_NULLPTR(pLayerUI);
 		}
 		m_LayerUIs.push_back(pLayerUI);
