@@ -64,7 +64,6 @@ HRESULT CHitBox::Render()
 		return E_FAIL;*/
 
 	//_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
-
 	//for (size_t i = 0; i < iNumMeshes; i++)
 	//{
 	//	if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
@@ -152,7 +151,6 @@ HRESULT CHitBox::Add_Components()
 								TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	m_pControllerCom->Set_Object(this);
 	m_pControllerCom->Activate(false);
-
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 
 	return S_OK;
@@ -202,5 +200,8 @@ CGameObject* CHitBox::Clone(void* pArg)
 void CHitBox::Free()
 {
 	__super::Free();
+
+	Safe_Release(m_pOwner);
+	Safe_Release(m_pOwnerTransform);
 }
 

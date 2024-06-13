@@ -34,6 +34,8 @@ public:
 #endif
 	virtual void	Collision_Overlap(CGameObject* pGameObject);
 	void			Check_Collision();
+
+	_bool			Is_Alive() const { return m_bAlive; }
 	
 private:
 	HRESULT			Add_Components();

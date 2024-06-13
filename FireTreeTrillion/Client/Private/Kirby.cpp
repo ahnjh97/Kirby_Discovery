@@ -131,8 +131,7 @@ _int CKirby::Tick(_float fTimeDelta)
 	m_pWeapons->Tick(m_fTimeDelta);
 	m_pArmours->Tick(m_fTimeDelta);
 
-	//if(Ä®À» ÈÖµÎ¸¥ ¼ø°£!)
-	if(m_pHitBox != nullptr)
+	if(m_pHitBox->Is_Alive())
 		m_pHitBox->Tick(m_fTimeDelta);
 
 	return OBJ_NOEVENT;
@@ -231,7 +230,6 @@ void CKirby::Render_IMGUI()
 
 HRESULT CKirby::Render_DeferredInfo()
 {
-
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
