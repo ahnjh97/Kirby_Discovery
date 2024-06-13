@@ -101,7 +101,7 @@ public:
 	//카메라에게 특정 동작들을 시퀀스로 선예약한다.
 	//인덱스 대신, enum으로 구별하게 하기
 	void Make_Sequence(CAMSEQ eSeq);
-	void Make_Shake(_float fPower = .5f, _int iShakeCnt = 3);
+	void Make_Shake(_float fPower = 1.f, _float fTime = .5f, _float2 vDir = _float2(0.f, -1.f));
 
 	//카메라에게 동작을 수행시킨다.
 	void Make_Sequence_FromAngle(EASING eEaseFlag, _float fDuration, _float3 fDestAngle, _float fDestZoom = -1.f);
@@ -185,7 +185,14 @@ private:
 	//몇 번 흔들 것인가?
 	_int m_iShakeCnt = { 0 };
 	//얼마나 세게 흔들 것인가?
-	_float m_fShakePower = { .5f };
+	_float m_fShakePower = { 0.f };
+	//카메라 쉐이크 방향
+	_float2 m_vShakeDir = { 0.f, 0.f };
+
+	//카메라 움직임 관련 변수들
+	_float m_fShakeAmplitude = { 5.f };
+	_float m_fShakeFrequency = { 50.f };
+	_float m_fShakeTime = { 0.f };
 
 
 /*카메라 시퀀스*/
