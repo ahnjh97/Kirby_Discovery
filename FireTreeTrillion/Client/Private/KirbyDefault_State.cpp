@@ -273,7 +273,11 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 #pragma endregion
 
+	if (m_pGameInstance->Get_DIKeyState(DIK_B, KEY_DOWN))
+	{
+		pKirby->Change_State(CKirby::STATE_LADDERWAITSTART, 50.f, false, false, CKirby::BODY_DEFAULT);
 
+	}
 
 	// Idle일 때, C를 누르면 점프를 한다.
 	if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
@@ -1230,6 +1234,107 @@ CKirbyDefault_Happy_State* CKirbyDefault_Happy_State::Create()
 }
 
 void CKirbyDefault_Happy_State::Free()
+{
+	__super::Free();
+}
+
+#pragma endregion
+
+
+
+#pragma region LADDER STATE
+
+CKirbyDefault_Ladder_State::CKirbyDefault_Ladder_State()
+{
+}
+
+void CKirbyDefault_Ladder_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+}
+
+void CKirbyDefault_Ladder_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
+	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
+
+	// 레더 Wait 대기모션
+	if (pKirby->Get_State() == CKirby::STATE_LADDERWAITSTART)
+	{
+		if (pKirby->isAnimFinish())
+		{
+			pKirby->Change_State(CKirby::STATE_LADDERWAIT, 60.f, true, false, CKirby::BODY_DEFAULT);
+		}
+	}
+	else if (pKirby->Get_State() == CKirby::STATE_LADDERWAIT)
+	{
+		if (GAMEINSTANCE Get_DIKeyState(DIK_UP, KEY_PRESS))
+		{
+			pKirby->Change_State(CKirby::STATE_LADDERUP, 60.f, true, true, CKirby::BODY_DEFAULT);
+		}
+		else if (GAMEINSTANCE Get_DIKeyState(DIK_DOWN, KEY_PRESS))
+		{
+			pKirby->Change_State(CKirby::STATE_LADDERDOWN, 60.f, true, true, CKirby::BODY_DEFAULT);
+		}
+
+
+
+		if (GAMEINSTANCE Get_DIKeyState(DIK_C, KEY_DOWN))
+		{
+			// 점프의 초기 파워
+			DESC(m_fJumpVelocity) = 22.f;
+
+			DESC(m_eJumpState) == CKirby::STATE_JUMPL ? DESC(m_eJumpState) = CKirby::STATE_JUMPR : DESC(m_eJumpState) = CKirby::STATE_JUMPL;
+			pKirby->Change_State(DESC(m_eJumpState), 50.f, false, true, CKirby::BODY_DEFAULT);
+
+			DESC(m_fChangeVelocityZeroTime) = 0.f;
+			// 공중에서 체공하는 시간 0.15초
+			DESC(m_fHoldAirTime) = 0.f;
+			// 점프키를 누르는 시간
+			DESC(m_fJumpHoldTime) = 0.f;
+			// 재입력 블락기능 초기화
+			DESC(m_bRePressBlock) = false;
+		}
+
+
+	}
+	else if (pKirby->Get_State() == CKirby::STATE_LADDERUP)
+	{
+		if (GAMEINSTANCE Get_DIKeyState(DIK_UP, KEY_PRESS) == false)
+		{
+			pKirby->Change_State(CKirby::STATE_LADDERWAIT, 60.f, true, true, CKirby::BODY_DEFAULT);
+		}
+
+
+
+	}
+	else if (pKirby->Get_State() == CKirby::STATE_LADDERDOWN)
+	{
+		if (GAMEINSTANCE Get_DIKeyState(DIK_DOWN, KEY_PRESS) == false)
+		{
+			pKirby->Change_State(CKirby::STATE_LADDERWAIT, 60.f, true, true, CKirby::BODY_DEFAULT);
+		}
+
+
+
+	}
+
+}
+
+void CKirbyDefault_Ladder_State::OnStateExit()
+{
+}
+
+CKirbyDefault_Ladder_State* CKirbyDefault_Ladder_State::Create()
+{
+	CKirbyDefault_Ladder_State* pInstance = new CKirbyDefault_Ladder_State();
+	return pInstance;
+}
+
+void CKirbyDefault_Ladder_State::Free()
 {
 	__super::Free();
 }
