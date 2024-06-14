@@ -30,7 +30,7 @@ HRESULT CLadder::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(10.f, 3.f, -180.f, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(10.f, 6.f, -180.f, 1.f));
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;
@@ -132,7 +132,7 @@ _bool CLadder::Is_Collide(_fvector vPos)
 	if (fMinY < vKirbyPos.y && vKirbyPos.y < fMaxY)
 	{
 		//vMyXZ.y 는 포지션의 z값으로 쓰이기 때문에 나중에 헷갈리지 말라.
-		m_vLadderPoint = { vMyXZ.x, vKirbyPos.y, vMyXZ.y, 1.f };
+		m_vLadderPoint = { vMyXZ.x, vKirbyPos.y + 1.f, vMyXZ.y, 1.f };
 		m_vLadderOriginalPos = vLadderPos;
 		return true;
 	}
