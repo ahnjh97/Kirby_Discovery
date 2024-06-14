@@ -2,6 +2,7 @@
 
 #include "Client_Defines.h"
 #include "GameObject.h"
+#include "Ladder.h"
 #include "Base.h"
 
 BEGIN(Client)
@@ -31,14 +32,16 @@ public:
 
 public:
     void Collision_Tick(_float fTimeDelta);
-
-
+    void Add_Ladder(CLadder* pLadder);
 
 private:
     CONTENT_TYPE Find_ColliderType(class CPhysXObject* pSrc, class CPhysXObject* pDst);
     class CPhysXObject* Find_TypePtr(COLLISION_TYPE eType, CPhysXObject* pSrc, CPhysXObject* pDst);
     void Collision_Collider(CONTENT_TYPE eType, class CPhysXObject* pSrc, class CPhysXObject* pDst);
+    void Ladder_Collider();
+
     set< pair<CGameObject*, CGameObject*> > m_WaitingList;
+    list<CLadder*>                          m_Ladders;
 
 
 

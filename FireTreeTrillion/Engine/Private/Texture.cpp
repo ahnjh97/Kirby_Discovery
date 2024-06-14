@@ -45,10 +45,8 @@ HRESULT CTexture::Initialize_Prototype(const wstring& strTextureFilePath, _uint 
 
 			CHECK_FAILED(hr);
 				
-
 			m_Textures.push_back(pSRV);
 		}
-
 	}
 	else if (false == lstrcmp(szEXT, TEXT(".tga")))
 	{

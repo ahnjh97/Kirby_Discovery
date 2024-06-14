@@ -53,6 +53,15 @@ public:
 		_float			m_fChangeVelocityZeroTime = { 0.f };
 		_float			m_fHoldAirTime = { 0.f };
 
+		// 사다리
+		_bool			m_bCanLadder = { false };
+		_float4			m_vLadderPoint = { 0.f, 0.f, 0.f, 0.f };
+		_float4			m_vLadderLook = { 0.f, 0.f, 0.f, 0.f };
+		_float4			m_vLadderOriginalPos = { 0.f, 0.f, 0.f, 0.f };
+		// 다시 바로 사다리를 타는 행위를 막는다.
+		_bool			m_bBlockLadder = { false };
+
+
 		// 점프 중 재입력 방지
 		_bool			m_bRePressBlock = { false };
 

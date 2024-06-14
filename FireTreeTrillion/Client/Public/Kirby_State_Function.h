@@ -120,7 +120,6 @@ static void Turn_Interpolate(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTra
 
 }
 
-
 // 조이스틱의 방향이 꺾일 때, Dir방향으로 Z 회전하는 기능 (오토바이 무빙)
 static void Turn_Z_Interpolate(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTransformCom, _float fTimeDelta)
 {
@@ -820,4 +819,51 @@ static void Kirby_AbilityType_Assist(CKirby* pKirby, CKirby::STATE eState)
 			pKirby->Change_State(CKirby::STATE_FLIGHT, 60.f, false, false, CKirby::BODY_BALLOON);
 	}
 
+}
+
+// 커비가 사다리로 넘어가느냐 마느냐의 운명을 결정짓는 함수이다.
+static _bool Kirby_Ladder_Logic(CKirby* pKirby, CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTransformCom)
+{
+	// 사다리에 탑승 가능한 상태가 아닐경우
+	if (DESC(m_bCanLadder) == false)
+		return false;
+
+	// 다시 사다리에 올라가는걸 Block하는 기능이 켜져 있다면, 바로 탑승 불가 처리한다.
+	if (DESC(m_bBlockLadder) == true)
+		return false;
+
+	_float4 vToLadderDir = DESC(m_vLadderOriginalPos) - pTransformCom->Get_State(CTransform::STATE_POSITION);
+	vToLadderDir.y = 0.f;
+	vToLadderDir = XMVector3Normalize(vToLadderDir);
+
+	_float fDegree = acos(DESC(m_vMoveDir).Dot(vToLadderDir));
+	fDegree = ToDegree(fDegree);
+
+	// 만약, 내가 보고있는 방향에 사다리가 있을 때, 강제로 타진다.
+	if (fDegree < 70.f)
+		return true;
+
+	// 그 외의 상황일 경우 false
+	return false;
+}
+// 내가 누른 키가 사다리와 내적 했을 때, 제대로 붙어지는지 여부를 알 수 있는 함수
+static _bool Kirby_JoyStickLadder_Logic(CKirby* pKirby, CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTransformCom, CGameObject* pCamera)
+{
+	if (JoyStick_On())
+	{
+		_float4 vJoyStickDir = JoyStick_controller_OtherDir(pCamera);
+		_float4 vToLadderDir = DESC(m_vLadderOriginalPos) - pTransformCom->Get_State(CTransform::STATE_POSITION);
+		vToLadderDir.y = 0.f;
+		vToLadderDir = XMVector3Normalize(vToLadderDir);
+
+		_float fDegree = acos(vJoyStickDir.Dot(vToLadderDir));
+		fDegree = ToDegree(fDegree);
+
+		if (fDegree < 70.f)
+			return true;
+
+	}
+
+
+	return false;
 }

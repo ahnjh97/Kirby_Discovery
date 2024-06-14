@@ -273,10 +273,11 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 #pragma endregion
 
-	if (m_pGameInstance->Get_DIKeyState(DIK_B, KEY_DOWN))
+	if (Kirby_Ladder_Logic(pKirby, Kirbydesc, pTransformCom))
 	{
 		pKirby->Change_State(CKirby::STATE_LADDERWAITSTART, 200.f, false, false, CKirby::BODY_DEFAULT);
-
+		pController->Set_Position(pTransformCom, DESC(m_vLadderPoint));
+		DESC(m_vMoveDir) = DESC(m_vTargetDir) = DESC(m_vLadderLook);
 	}
 
 	// Idle일 때, C를 누르면 점프를 한다.
@@ -433,6 +434,25 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 	Key_X(pGameObject, fTimeDelta);
 	Key_C(pGameObject, fTimeDelta);
 
+	// 처음에 범위에 바로 들어갔을 때, 사다리에 스냅한다. 단, block이 켜져있을 땐, 절대 못붙음
+	if (Kirby_Ladder_Logic(pKirby, Kirbydesc, pTransformCom))
+	{
+		pKirby->Change_State(CKirby::STATE_LADDERWAITSTART, 200.f, false, false, CKirby::BODY_DEFAULT);
+		pController->Set_Position(pTransformCom, DESC(m_vLadderPoint));
+		DESC(m_vMoveDir) = DESC(m_vTargetDir) = DESC(m_vLadderLook);
+	}
+	// 위에 block이 켜져있을 때 아마 여기로 들어왔을 것이다.
+	else if (DESC(m_bCanLadder) == true)
+	{
+		// 낙하중이면서, 내 방향이 사다리 방향일 때 붙게 한다.
+		if (Kirby_JoyStickLadder_Logic(pKirby, Kirbydesc, pTransformCom, pCamera) == true
+			&& DESC(m_fJumpVelocity) < 0.f)
+		{
+			pKirby->Change_State(CKirby::STATE_LADDERWAITSTART, 200.f, false, false, CKirby::BODY_DEFAULT);
+			pController->Set_Position(pTransformCom, DESC(m_vLadderPoint));
+			DESC(m_vMoveDir) = DESC(m_vTargetDir) = DESC(m_vLadderLook);
+		}
+	}
 
 	// 떨어지는 것
 	if (pKirby->Get_State() == CKirby::STATE_FALL)
@@ -1240,8 +1260,6 @@ void CKirbyDefault_Happy_State::Free()
 
 #pragma endregion
 
-
-
 #pragma region LADDER STATE
 
 CKirbyDefault_Ladder_State::CKirbyDefault_Ladder_State()
@@ -1299,8 +1317,9 @@ void CKirbyDefault_Ladder_State::OnStateUpdate(CGameObject* pGameObject, _float 
 			DESC(m_fJumpHoldTime) = 0.f;
 			// 재입력 블락기능 초기화
 			DESC(m_bRePressBlock) = false;
+			// 다시 사다리를 타면 안 된다.
+			DESC(m_bBlockLadder) = true;
 		}
-
 
 	}
 	else if (pKirby->Get_State() == CKirby::STATE_LADDERUP)
@@ -1309,6 +1328,39 @@ void CKirbyDefault_Ladder_State::OnStateUpdate(CGameObject* pGameObject, _float 
 		{
 			pKirby->Change_State(CKirby::STATE_LADDERWAIT, 60.f, true, true, CKirby::BODY_DEFAULT);
 		}
+
+		// 사다리 수명 종료
+		if (DESC(m_bCanLadder) == false)
+		{
+			// 점프의 초기 파워
+			DESC(m_fJumpVelocity) = 10.f;
+			// 재입력 블락기능 초기화
+			DESC(m_bRePressBlock) = false;
+			// 다시 사다리를 타면 안 된다.
+			DESC(m_bBlockLadder) = true;
+
+			pKirby->Change_State(CKirby::STATE_JUMPEND, 60.f, false, true, CKirby::BODY_DEFAULT);
+		}
+
+		if (GAMEINSTANCE Get_DIKeyState(DIK_C, KEY_DOWN))
+		{
+			// 점프의 초기 파워
+			DESC(m_fJumpVelocity) = 22.f;
+
+			DESC(m_eJumpState) == CKirby::STATE_JUMPL ? DESC(m_eJumpState) = CKirby::STATE_JUMPR : DESC(m_eJumpState) = CKirby::STATE_JUMPL;
+			pKirby->Change_State(DESC(m_eJumpState), 50.f, false, true, CKirby::BODY_DEFAULT);
+
+			DESC(m_fChangeVelocityZeroTime) = 0.f;
+			// 공중에서 체공하는 시간 0.15초
+			DESC(m_fHoldAirTime) = 0.f;
+			// 점프키를 누르는 시간
+			DESC(m_fJumpHoldTime) = 0.f;
+			// 재입력 블락기능 초기화
+			DESC(m_bRePressBlock) = false;
+			// 다시 사다리를 타면 안 된다.
+			DESC(m_bBlockLadder) = true;
+		}
+
 
 		pController->Move_Dir(pTransformCom, vLadderDir * fTimeDelta * 8.f, fTimeDelta);
 
@@ -1322,8 +1374,32 @@ void CKirbyDefault_Ladder_State::OnStateUpdate(CGameObject* pGameObject, _float 
 
 		pController->Move_Dir(pTransformCom, vLadderDir * fTimeDelta * -8.f, fTimeDelta);
 
+
+		if (GAMEINSTANCE Get_DIKeyState(DIK_C, KEY_DOWN))
+		{
+			// 점프의 초기 파워
+			DESC(m_fJumpVelocity) = 22.f;
+
+			DESC(m_eJumpState) == CKirby::STATE_JUMPL ? DESC(m_eJumpState) = CKirby::STATE_JUMPR : DESC(m_eJumpState) = CKirby::STATE_JUMPL;
+			pKirby->Change_State(DESC(m_eJumpState), 50.f, false, true, CKirby::BODY_DEFAULT);
+
+			DESC(m_fChangeVelocityZeroTime) = 0.f;
+			// 공중에서 체공하는 시간 0.15초
+			DESC(m_fHoldAirTime) = 0.f;
+			// 점프키를 누르는 시간
+			DESC(m_fJumpHoldTime) = 0.f;
+			// 재입력 블락기능 초기화
+			DESC(m_bRePressBlock) = false;
+			// 다시 사다리를 타면 안 된다.
+			DESC(m_bBlockLadder) = true;
+		}
+
+
 		if (pController->Is_Terrain())
+		{
+			DESC(m_bBlockLadder) = true;
 			pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+		}
 	}
 
 }

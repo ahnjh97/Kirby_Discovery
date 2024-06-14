@@ -250,6 +250,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("EnergyDrink"), CEnergyDrink);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Coin"), CCoin);
 
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Ladder"), CLadder);
 #pragma endregion
 
 	return S_OK;
@@ -685,6 +686,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Level0Stage1Step01_Blend", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f);
 		m_vecModelInfo.emplace_back("BG0", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("Ladder", TYPE_NONANIM, 1.f);
 
 		// For Monster
 		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.f, 180.f);
@@ -746,6 +748,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// For Mab Interactive Object
 		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("Ladder", TYPE_NONANIM, 1.f);
+
 
 		// For Item
 		m_vecModelInfo.emplace_back("Item_EnergyDrink", TYPE_NONANIM, 3.f);
