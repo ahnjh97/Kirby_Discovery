@@ -78,58 +78,44 @@ _int CHUD_StarPoint::Tick(_float fTimeDelta)
 	{
 		m_fAccTime = 0.f;
 		m_eSPstate = STARPOINT_LOOT;
+		if (m_UIObjDesc.wstrUITag == TEXT("Font100") || m_UIObjDesc.wstrUITag == TEXT("Font10") || m_UIObjDesc.wstrUITag == TEXT("Font1")
+			|| m_UIObjDesc.wstrUITag == TEXT("Font100_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font10_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font1_Shadow"))
+		{
+			_uint iCount = stoi(m_UIObjDesc.wstrText);
+			iCount += 1;
+
+			m_UIObjDesc.wstrText = to_wstring(iCount);
+		}
 	}
 
 	switch (m_eSPstate)
 	{
 	case CHUD::STARPOINT_IDLE:
 		m_fAccTime = 0.f;
-		if (m_fAccTime >= 10.f / 144.f) //시간 경과하면 HIDE 처리
-			m_eSPstate = STARPOINT_HIDE;
+		Play_Animation(fTimeDelta, STARPOINT_IDLE);
 
-		if (m_UIObjDesc.wstrUITag == TEXT("Effect"))
+		if (STARPOINT_LOOT == m_eSPrePstate)
 		{
-			m_bIsRender = FALSE;
-			m_iTexIndex = 3;
-		}
-
-		if (m_UIObjDesc.wstrUITag == TEXT("Effect_Mask"))
-		{
-			m_bIsRender = FALSE;
-
-			m_UIObjDesc.vDegree.z = 0.f;
-			m_UIObjDesc.vSize.x = 128.f;
-			m_UIObjDesc.vSize.y = 128.f;
-
-			m_UIObjDesc.fAlpha = 10.f / 255.f;
-		}
-
-		if (m_UIObjDesc.wstrUITag == TEXT("Font100") || m_UIObjDesc.wstrUITag == TEXT("Font10") || m_UIObjDesc.wstrUITag == TEXT("Font1"))
-			m_UIObjDesc.vPos.y = 417.f;
-
-		if (m_UIObjDesc.wstrUITag == TEXT("Font100_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font10_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font1_Shadow"))
-			m_UIObjDesc.vPos.y = 421.f;
-
+			if (m_fAccTime >= 100.f / 144.f)
+				m_eSPstate = STARPOINT_HIDE;
+		}		
 		break;
 
 	case CHUD::STARPOINT_HIDE: //Frame 344 > 354
-		m_fAccTime += fTimeDelta;
-		if (m_fAccTime >= 10.f / 144.f)
-			m_eSPstate = STARPOINT_IDLE;	
-
 		Play_Animation(fTimeDelta, STARPOINT_HIDE);
 		break;
 
 	case CHUD::STARPOINT_SHOW: //Frame 213 > 223
-
 		Play_Animation(fTimeDelta, STARPOINT_SHOW);
 		break;
 
 	case CHUD::STARPOINT_LOOT: //Frame 50 > 64
 		m_fAccTime += fTimeDelta;
 		if (m_fAccTime >= 14.f / 144.f)
+		{
 			m_eSPstate = STARPOINT_IDLE;
-
+			m_eSPrePstate = STARPOINT_HIDE;
+		}
 		Play_Animation(m_fAccTime, STARPOINT_LOOT);
 		break;
 
@@ -169,9 +155,19 @@ HRESULT CHUD_StarPoint::Render()
 		_float2 vFontScale = { 1.f, 1.f };
 
 		if (m_UIObjDesc.wstrUITag == TEXT("Font_Shadow"))
-			vFontScale = { 1.2f, 1.2f };
+			vFontScale = { 1.f, 1.f };
 
 		wstring wstrFontTag = { TEXT("Font_HUD_StarPoint_NUM30") };
+
+		//if (m_bIsRender == FALSE)
+		//{
+		//	if (m_UIObjDesc.wstrUITag == TEXT("Font100") || m_UIObjDesc.wstrUITag == TEXT("Font10"))
+		//		return S_OK;
+		//
+		//	if (m_UIObjDesc.wstrUITag == TEXT("Font100_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font10_Shadow"))
+		//		return S_OK;
+		//}
+
 		m_pGameInstance->Render_Font(wstrFontTag, m_UIObjDesc.wstrText, vFontPos, vFontRGBA,
 			XMConvertToRadians(m_UIObjDesc.vDegree.z), vFontOrig, vFontScale);
 	}
@@ -198,11 +194,14 @@ HRESULT CHUD_StarPoint::Add_Components()
 
 HRESULT CHUD_StarPoint::Render_OrthoProj(CShader* _pShaderCom, CTransform* _pTransCom)
 {
-	if (m_UIObjDesc.wstrUITag == TEXT("Effect") && m_bIsRender == FALSE)
-		return S_OK;
+	if (m_bIsRender == FALSE)
+	{
+		if (m_UIObjDesc.wstrUITag == TEXT("Effect"))
+			return S_OK;
 
-	if (m_UIObjDesc.wstrUITag == TEXT("Effect_Mask") && m_bIsRender == FALSE)
-		return S_OK;
+		if (m_UIObjDesc.wstrUITag == TEXT("Effect_Mask"))
+			return S_OK;
+	}
 
 	CHECK_NULLPTR(_pShaderCom);
 
@@ -285,20 +284,43 @@ void CHUD_StarPoint::Play_Animation(_float _fAccTime, HUD_STARPOINT _eSPstate)
 {
 	switch (_eSPstate)
 	{
-	//case CHUD::STARPOINT_IDLE:
-	//	break;
+	case CHUD::STARPOINT_IDLE:
+		if (m_UIObjDesc.wstrUITag == TEXT("Effect"))
+		{
+			m_bIsRender = FALSE;
+			m_iTexIndex = 3;
+		}
 
-	case CHUD::STARPOINT_HIDE:
+		if (m_UIObjDesc.wstrUITag == TEXT("Effect_Mask"))
+		{
+			m_bIsRender = FALSE;
+
+			m_UIObjDesc.vDegree.z = 0.f;
+			m_UIObjDesc.vSize.x = 128.f;
+			m_UIObjDesc.vSize.y = 128.f;
+
+			m_UIObjDesc.fAlpha = 10.f / 255.f;
+		}
+
+		if (m_UIObjDesc.wstrUITag == TEXT("Font100") || m_UIObjDesc.wstrUITag == TEXT("Font10") || m_UIObjDesc.wstrUITag == TEXT("Font1"))
+			m_UIObjDesc.vPos.y = 417.f;
+
+		if (m_UIObjDesc.wstrUITag == TEXT("Font100_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font10_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font1_Shadow"))
+			m_UIObjDesc.vPos.y = 413.f;
+
+	break;
+
+	case CHUD::STARPOINT_HIDE: //X값 우측 이동, 알파 값 죽이기
 		m_UIObjDesc.vPos.x += m_fAccTime * 10.f;
 
 		m_UIObjDesc.fAlpha -= 1.f / 255.f * _fAccTime;
 
 		if (m_UIObjDesc.fAlpha < 1.f / 255.f)
 			m_UIObjDesc.fAlpha = 1.f / 255.f;
-		break;
+	break;
 
 	case CHUD::STARPOINT_SHOW:
-		break;
+	break;
 
 	case CHUD::STARPOINT_LOOT:
 		if (m_UIObjDesc.wstrUITag == TEXT("Effect"))
@@ -327,81 +349,93 @@ void CHUD_StarPoint::Play_Animation(_float _fAccTime, HUD_STARPOINT _eSPstate)
 		}
 
 		if (m_UIObjDesc.wstrUITag == TEXT("Font100") || m_UIObjDesc.wstrUITag == TEXT("Font10")
-			|| m_UIObjDesc.wstrUITag == TEXT("Font1"))
+			|| m_UIObjDesc.wstrUITag == TEXT("Font1") || m_UIObjDesc.wstrUITag == TEXT("Font100_Shadow")
+			|| m_UIObjDesc.wstrUITag == TEXT("Font10_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font1_Shadow"))
 		{
 			_uint iCount = stoi(m_UIObjDesc.wstrText);
-			iCount++;
 
-			if (iCount > 999) iCount = 0;
-			wstring strCount = to_wstring(iCount);
+			_uint iFont1 = iCount % 10;
+			_uint iFont10 = (iCount / 10) % 10;
+			_uint iFont100 = (iCount / 100) % 10;
 
-			wchar_t Font100 = strCount.length() > 2 ? strCount[strCount.length() - 3] : '0';
-			wchar_t Font10 = strCount.length() > 1 ? strCount[strCount.length() - 2] : '0';
-			wchar_t Font1 = strCount.length() > 0 ? strCount[strCount.length() - 1] : '0';
+			if (m_UIObjDesc.wstrUITag == TEXT("Font100") || m_UIObjDesc.wstrUITag == TEXT("Font100_Shadow"))
+			{
+				if (iFont100 > 0)
+				{
+					m_bIsRender = TRUE;
+					m_UIObjDesc.wstrText = to_wstring(iFont10);
+				}
+				
+				m_bIsRender = FALSE;
+			}
+
+			if (m_UIObjDesc.wstrUITag == TEXT("Font10") || m_UIObjDesc.wstrUITag == TEXT("Font10_Shadow"))
+			{
+				if (iFont10 > 0)
+				{
+					m_bIsRender = TRUE;
+					m_UIObjDesc.wstrText = to_wstring(iFont10);
+				}
+
+				m_bIsRender = FALSE;
+			}
+
+			if (m_UIObjDesc.wstrUITag == TEXT("Font1") || m_UIObjDesc.wstrUITag == TEXT("Font1_Shadow"))
+				m_UIObjDesc.wstrText = to_wstring(iFont1);
 			
-			if (m_UIObjDesc.wstrUITag == TEXT("Font100"))
-				m_UIObjDesc.wstrText = Font100;
-
-			else if (m_UIObjDesc.wstrUITag == TEXT("Font10"))
-				m_UIObjDesc.wstrText = Font10;
-
-			else if (m_UIObjDesc.wstrUITag == TEXT("Font1"))
-				m_UIObjDesc.wstrText = Font1;
-
-			// 각 자리수에 맞는 텍스트 설정
 			if (m_IsMovingUP)
 			{
 				m_UIObjDesc.vPos.y += 1.f;
-				if (m_UIObjDesc.vPos.y >= 430.f)
+
+				if (m_UIObjDesc.wstrUITag == TEXT("Font100") || m_UIObjDesc.wstrUITag == TEXT("Font10")
+					|| m_UIObjDesc.wstrUITag == TEXT("Font1"))
 				{
-					m_UIObjDesc.vPos.y = 430.f;
-					m_IsMovingUP = FALSE;
+					if (m_UIObjDesc.vPos.y >= 430.f)
+					{
+						m_UIObjDesc.vPos.y = 430.f;
+						m_IsMovingUP = FALSE;
+					}
+				}
+
+				if (m_UIObjDesc.wstrUITag == TEXT("Font100_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font10_Shadow")
+					|| m_UIObjDesc.wstrUITag == TEXT("Font1_Shadow"))
+				{
+					if (m_UIObjDesc.vPos.y >= 434.f)
+					{
+						m_UIObjDesc.vPos.y = 434.f;
+						m_IsMovingUP = FALSE;
+					}
 				}
 			}
 			else
 			{
 				m_UIObjDesc.vPos.y -= 1.f;
-				if (m_UIObjDesc.vPos.y <= 417.f)
+
+				if (m_UIObjDesc.wstrUITag == TEXT("Font100") || m_UIObjDesc.wstrUITag == TEXT("Font10")
+					|| m_UIObjDesc.wstrUITag == TEXT("Font1"))
 				{
-					m_UIObjDesc.vPos.y = 417.f;
-					m_IsMovingUP = TRUE;
+					if (m_UIObjDesc.vPos.y <= 417.f)
+					{
+						m_UIObjDesc.vPos.y = 417.f;
+						m_IsMovingUP = TRUE;
+					}
+				}
+
+				if (m_UIObjDesc.wstrUITag == TEXT("Font100_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font10_Shadow")
+					|| m_UIObjDesc.wstrUITag == TEXT("Font1_Shadow"))
+				{
+					if (m_UIObjDesc.vPos.y <= 421.f)
+					{
+						m_UIObjDesc.vPos.y = 421.f; 
+						m_IsMovingUP = TRUE;
+					}
 				}
 			}
 		}
-		
-		/*
-		if (m_UIObjDesc.wstrUITag == TEXT("Font100_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font10_Shadow")
-			|| m_UIObjDesc.wstrUITag == TEXT("Font1_Shadow"))
-		{
-			_uint iCount = stoi(m_UIObjDesc.wstrText);
-			iCount++;
-
-			if (iCount > 999) iCount = 0;
-			m_UIObjDesc.wstrText = to_wstring(iCount);
-
-			if (m_IsMovingUP)
-			{
-				m_UIObjDesc.vPos.y += 1.f;
-				if (m_UIObjDesc.vPos.y >= 434.f)
-				{
-					m_UIObjDesc.vPos.y = 434.f;	m_IsMovingUP = FALSE;
-				}
-			}
-			else
-			{
-				m_UIObjDesc.vPos.y -= 1.f;
-				if (m_UIObjDesc.vPos.y <= 421.f)
-				{
-					m_UIObjDesc.vPos.y = 421.f; m_IsMovingUP = TRUE;
-				}
-			}
-		}
-		*/
-	
-		break;
+	break;
 
 	case CHUD::STARPOINT_DROP:
-		break;
+	break;
 	}
 }
 

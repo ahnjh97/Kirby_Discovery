@@ -104,7 +104,8 @@ HRESULT CLayerUI::Render()
 		_float2 vFontOrig = {	1.f, 1.f  };
 		_float2 vFontScale = {	1.f, 1.f  };
 
-		wstring wstrFontTag = { TEXT("Font_HUD_StarPoint_NUM30") };
+		//wstring wstrFontTag = { TEXT("Font_HUD_StarPoint_NUM30") };
+		wstring wstrFontTag = { TEXT("Font_HUDSub_KR15") };
 
 		m_pGameInstance->Render_Font(wstrFontTag, m_UIObjDesc.wstrText, vFontPos, vFontRGBA, 
 			XMConvertToRadians(m_UIObjDesc.vDegree.z), vFontOrig, vFontScale);
@@ -119,8 +120,8 @@ HRESULT CLayerUI::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_StarPoint"),
-	//if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_StatusBar_Kirby"),
+	//if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_StarPoint"),
+	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_StatusBar_Kirby"),
 		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
 		return E_FAIL;
 
