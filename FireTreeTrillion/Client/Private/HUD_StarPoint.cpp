@@ -159,14 +159,14 @@ HRESULT CHUD_StarPoint::Render()
 
 		wstring wstrFontTag = { TEXT("Font_HUD_StarPoint_NUM30") };
 
-		//if (m_bIsRender == FALSE)
-		//{
-		//	if (m_UIObjDesc.wstrUITag == TEXT("Font100") || m_UIObjDesc.wstrUITag == TEXT("Font10"))
-		//		return S_OK;
-		//
-		//	if (m_UIObjDesc.wstrUITag == TEXT("Font100_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font10_Shadow"))
-		//		return S_OK;
-		//}
+		if (m_bIsRender == FALSE)
+		{
+			if (m_UIObjDesc.wstrUITag == TEXT("Font100") || m_UIObjDesc.wstrUITag == TEXT("Font10"))
+				return S_OK;
+		
+			if (m_UIObjDesc.wstrUITag == TEXT("Font100_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font10_Shadow"))
+				return S_OK;
+		}
 
 		m_pGameInstance->Render_Font(wstrFontTag, m_UIObjDesc.wstrText, vFontPos, vFontRGBA,
 			XMConvertToRadians(m_UIObjDesc.vDegree.z), vFontOrig, vFontScale);
@@ -363,7 +363,7 @@ void CHUD_StarPoint::Play_Animation(_float _fAccTime, HUD_STARPOINT _eSPstate)
 				if (iFont100 > 0)
 				{
 					m_bIsRender = TRUE;
-					m_UIObjDesc.wstrText = to_wstring(iFont10);
+					m_UIObjDesc.wstrText = to_wstring(iFont100);
 				}
 				
 				m_bIsRender = FALSE;
@@ -382,6 +382,7 @@ void CHUD_StarPoint::Play_Animation(_float _fAccTime, HUD_STARPOINT _eSPstate)
 
 			if (m_UIObjDesc.wstrUITag == TEXT("Font1") || m_UIObjDesc.wstrUITag == TEXT("Font1_Shadow"))
 				m_UIObjDesc.wstrText = to_wstring(iFont1);
+
 			
 			if (m_IsMovingUP)
 			{
