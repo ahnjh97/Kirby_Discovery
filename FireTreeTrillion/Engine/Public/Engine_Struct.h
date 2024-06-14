@@ -342,7 +342,7 @@ namespace Engine
 		_float	fDegree = { 0.f };
 		_uint	iRootNode = { 4 };
 		_bool bOctree = { false };
-		_bool bMapDeco = { false };
+		string strFolder = string();
 		// 애니메이션 정보 저장
 		unordered_map< string, ANIM_INFO > umapAnimInfo;
 
@@ -352,9 +352,9 @@ namespace Engine
 			_float _fDegree = { 0.f },
 			_uint _iRootNode = { 4 },
 			_bool _bOctree = { false },
-			_bool _bMapDeco = { false }
+			string _strFolder = string()
 		) : strModelName(_strModelName), eType(_eType), fScale(_fScale), fDegree(_fDegree), iRootNode(_iRootNode), bOctree(_bOctree)
-			, bMapDeco(_bMapDeco){}
+			, strFolder(_strFolder){}
 	};
 
 	struct FACE

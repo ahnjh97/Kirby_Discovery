@@ -23,6 +23,7 @@ public:
 
 private:
 	void	SetUpTxtVectors();
+	void	ReadMapDecoTxts(TYPE eType);
 	
 	// ImGui
 	void	Menu_Level();
@@ -79,6 +80,7 @@ private:
 	unordered_set<string>	m_setTriggerNames;
 	unordered_set<string>	m_setRallyingMonsters;
 	unordered_set<string>	m_setObjectTxts;
+	unordered_set<string>	m_setMapDecoTxts;
 
 	unordered_set<string>	m_setNonColDecos;
 	unordered_set<string>	m_setAnimDecos;
@@ -88,6 +90,7 @@ private:
 	vector<string>	m_vecTriggerTxts;
 	vector<string>	m_vecMonsterTxts;
 	vector<string>	m_vecObjectTxts;
+	vector<string>	m_vecMapDecoTxts;
 
 	string m_strSelectedTxt;
 	string m_strCurModel;

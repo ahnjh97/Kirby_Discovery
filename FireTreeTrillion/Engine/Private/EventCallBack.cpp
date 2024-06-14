@@ -1,5 +1,6 @@
 #include "EventCallBack.h"
 #include "GameInstance.h"
+#include "Model.h"
 
 void CEventCallBack::onTrigger(PxTriggerPair* pairs, PxU32 count)
 {
@@ -29,7 +30,21 @@ void CEventCallBack::onTrigger(PxTriggerPair* pairs, PxU32 count)
                         exitFuncIter->second();
                 }
             }
- 
+        }
+        else if (pairs[i].status & PxPairFlag::eNOTIFY_TOUCH_FOUND) // For Map Deco Anim
+        {
+            if (pairs[i].otherActor == m_pPlayerActor && IsMapDecoAnimTrigger(pairs[i].triggerActor))
+            {
+                auto iter = m_TriggerToMapDecoAnimMap.find(pairs[i].triggerActor);
+                if (iter != m_TriggerToMapDecoAnimMap.end())
+                {
+                    for (auto& pRenderingModel : iter->second)
+                    {
+                        if (find(m_vecRenderingAnimDecos.begin(), m_vecRenderingAnimDecos.end(), pRenderingModel) != m_vecRenderingAnimDecos.end())
+                            pRenderingModel->Set_Animation(0, 50, false, true);
+                    }
+                }
+            }
         }
     }
 }
@@ -47,6 +62,13 @@ void CEventCallBack::Clear_EventCallBack()
     m_Triggers.clear();
     m_TriggerFuncs.clear();
     m_ExitFuncs.clear();
+}
+
+void CEventCallBack::Clear_RenderingAnimDecoVector()
+{
+    for (auto& renderingAnimDeco : m_vecRenderingAnimDecos)
+        Safe_Release(renderingAnimDeco);
+    m_vecRenderingAnimDecos.clear();
 }
 
 _bool CEventCallBack::IsActorInTriggerList(PxActor* pRigidActor)

@@ -220,7 +220,7 @@ void COcTree::Culling(CGameInstance* pGameInstance, CShader* pMapShader, CShader
 	}
 
 	if (iInFrustum >= OC_END) {
-		RenderAll(pMapShader, pNonAnimShader, pAnimShader);
+		RenderAll(pGameInstance, pMapShader, pNonAnimShader, pAnimShader);
 		iRenderAll++;
 		return;
 	}
@@ -228,12 +228,12 @@ void COcTree::Culling(CGameInstance* pGameInstance, CShader* pMapShader, CShader
 	else if (iInFrustum > 0)
 	{
 		if (nullptr == m_vecChildren[OC_XYZ]) {
-			RenderAll(pMapShader, pNonAnimShader, pAnimShader);
+			RenderAll(pGameInstance, pMapShader, pNonAnimShader, pAnimShader);
 			iRenderAll++;
 			return;
 		}
 		
-		RenderMyMesh(pMapShader, pNonAnimShader, pAnimShader);
+		RenderMyMesh(pGameInstance, pMapShader, pNonAnimShader, pAnimShader);
 		iRenderMyMesh++;
 
 		for (auto& child : m_vecChildren)
@@ -596,7 +596,7 @@ void COcTree::SetUp_ChildrenCenter(_float3 vCenter, _float3 vQuarterExtents, vec
 	_vecChildrenCenters[OC_xYz] = _float3(vCenter.x - vQuarterExtents.x, vCenter.y + vQuarterExtents.y, vCenter.z - vQuarterExtents.z);
 }
 
-void COcTree::RenderAll(CShader* pMapShader, CShader* pNonAnimShader, CShader* pAnimShader)
+void COcTree::RenderAll(CGameInstance* pGameInstance, CShader* pMapShader, CShader* pNonAnimShader, CShader* pAnimShader)
 {
 	for (_uint iMeshIdx = 0; iMeshIdx < m_vecMeshes.size(); iMeshIdx++)
 	{
@@ -658,9 +658,44 @@ void COcTree::RenderAll(CShader* pMapShader, CShader* pNonAnimShader, CShader* p
 				return;
 		}
 	}
+
+	for (auto& colAnim : m_vecColAnims)
+	{
+		if (nullptr == colAnim)
+			continue;
+
+		_uint iNumMeshes = colAnim->Get_NumMeshes();
+		vector<string> vecStrings = { m_vecConstantNames[4], m_vecConstantNames[5], m_vecConstantNames[6], m_vecConstantNames[7] };
+
+		if (FAILED(colAnim->Play_Animation(pGameInstance->Get_SecondTimer())))
+			return;
+		if(FAILED(colAnim->Bind_StencilRimLightMotionBlur(pAnimShader, vecStrings)))
+			return;
+		if (FAILED(colAnim->Bind_WorldMatrixForOctree(pAnimShader)))
+			return;
+		/*if (FAILED(pAnimShader->Bind_Matrix("g_ViewMatrix", &pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
+			return;
+		if (FAILED(pAnimShader->Bind_Matrix("g_ProjMatrix", &pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
+			return;*/
+
+		for (_uint i = 0; i < iNumMeshes; i++) {
+			if (FAILED(colAnim->Bind_ShaderResource(pAnimShader, m_vecConstantNames[0].c_str(), i, TextureType_DIFFUSE)))
+				return;
+			if (FAILED(colAnim->Bind_ShaderResource(pAnimShader, m_vecConstantNames[1].c_str(), i, TextureType_NORMALS)))
+				return;
+			if (FAILED(colAnim->Bind_ShaderResource(pAnimShader, m_vecConstantNames[2].c_str(), i, TextureType_METALNESS)))
+				return;
+			if (FAILED(colAnim->Bind_BoneMatrices(pAnimShader, m_vecConstantNames[8].c_str(), i)))
+				return;
+			if (FAILED(pAnimShader->Begin(colAnim->Get_ModelPassIndex())))
+				return;
+			if (FAILED(colAnim->Render(i)))
+				return;
+		}
+	}
 }
 
-void COcTree::RenderMyMesh(CShader* pMapShader, CShader* pNonAnimShader, CShader* pAnimShader)
+void COcTree::RenderMyMesh(CGameInstance* pGameInstance, CShader* pMapShader, CShader* pNonAnimShader, CShader* pAnimShader)
 {
 	for (_uint iMeshIdx = 0; iMeshIdx < m_vecMyMeshes.size(); iMeshIdx++)
 	{

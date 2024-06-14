@@ -52,6 +52,7 @@ public:
 			m_Animations[m_iCurrentAnimIndex]->Reset_Ratio();
 		}
 	}
+	void Set_TrackPosition(_float fTrackPosition) { m_Animations[m_iCurrentAnimIndex]->Set_TrackPosition(fTrackPosition); }
 
 	const _char* Get_AnimationName() const { return m_Animations[m_iCurrentAnimIndex]->Get_AnimationName(); }
 	_uint Get_AnimCnt() const { return m_Animations.size(); }
@@ -94,6 +95,8 @@ public:
 	HRESULT Bind_StencilRimLightMotionBlur(class CShader* pShader, vector<string>& _vecConstantNames); // For Binding at Octree
 	void SetUpStencilRimLightMotionBlurPassIndex(_uint iShaderVars, _float fRimWidth, _uint iPassIndex); // For Binding at Octree
 	_uint Get_ModelPassIndex() { return m_iPassIndex; }
+	void Set_WorldMatrixForOctree(_float4x4 _matWorld) { m_matWorld = _matWorld; }
+	HRESULT Bind_WorldMatrixForOctree(class CShader* pShader, string& strConstantName = string("g_WorldMatrix"));
 
 private:
 	_uint						m_iNumMeshes = { 0 };
@@ -137,6 +140,7 @@ private:
 	_bool						m_bRimLight = { true };
 	_bool						m_bMotionBlur = { false };
 	_uint						m_iPassIndex = {};
+	_float4x4					m_matWorld = {};
 
 private:
 	HRESULT Ready_Meshes(_bool bOctree);

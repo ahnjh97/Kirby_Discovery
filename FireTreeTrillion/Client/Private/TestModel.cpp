@@ -35,7 +35,7 @@ HRESULT CTestModel::Initialize(void* pArg)
     //CGameInstance::Get_Instance()->Test();
     
     // position 세팅은 항상 Add_Components() 앞에 둘것
-    _vector vPos = XMVectorSet(0.f, 15.f, -180.f, 1.f);
+    _vector vPos = XMVectorSet(-128.f, 6.f, -80.f, 1.f);
     m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
     m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(-16.f));
 
@@ -86,10 +86,10 @@ _int CTestModel::Tick(_float fTimeDelta)
 
     // 점프용 velocity(속도)
     m_fJumpVelocity -= GRAVITY * fTimeDelta;
-    if (true == m_isJump)
+    /*if (true == m_isJump)
         m_isJump = m_pControllerCom->Jump(m_pTransformCom, m_fJumpVelocity, fTimeDelta);
     else
-        m_pControllerCom->FreeFall(m_pTransformCom, fTimeDelta);
+        m_pControllerCom->FreeFall(m_pTransformCom, fTimeDelta);*/
 
     // 예시코드 5 : 계산기 예시 코드 (월드 매트리스로 예시든거임 이건 정신나간 코드이므로 참고해주셈)
     // 예시코드 6 : DInput + KeyPress 예시 코드
@@ -225,7 +225,7 @@ void CTestModel::Late_Tick(_float fTimeDelta)
 
     //m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
 #ifdef _DEBUG
-    m_pGameInstance->RenderGrid();
+    /*m_pGameInstance->RenderGrid();*/
 #endif
 }
 
@@ -239,7 +239,10 @@ HRESULT CTestModel::Render()
     {
         if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
             return E_FAIL;
-
+        if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
+            return E_FAIL;
+        if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
+            return E_FAIL;
         if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
             return E_FAIL;
 
@@ -284,10 +287,10 @@ void CTestModel::Render_IMGUI()
 void CTestModel::SetOn_Slope(_float fTimeDelta)
 {
     // 지면의 up벡터
-    PxVec3 slope = m_pControllerCom->Compute_Slope(m_pTransformCom);
+   /* PxVec3 slope = m_pControllerCom->Compute_Slope(m_pTransformCom);
     _vector vTerrainNormal = CUtils::To_Vector(slope);
 
-    Lerp_UpVector(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), vTerrainNormal, 10.f, fTimeDelta);
+    Lerp_UpVector(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), vTerrainNormal, 10.f, fTimeDelta);*/
 }
 
 /// <summary> 객체와 지면의 up벡터를 비교하여 객체의 각도를 보간한다. </summary>
@@ -315,7 +318,7 @@ HRESULT CTestModel::Add_Components()
     CHECK_FAILED(hr);
 
     /* For.Com_Model */
-    hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyVacuum"),
+    hr = __super::Add_Component(TEXT("Prototype_Component_Model_BushM"),
         TEXT("Com_Model"), (CComponent**)&m_pModelCom);
     CHECK_FAILED(hr);
     // for animTool
@@ -333,12 +336,12 @@ HRESULT CTestModel::Add_Components()
     ////m_pRigidBodyCom->Set_PhysXObject(this);
     //m_pRigidBodyCom->Activate(true);
 
-    /* For.Com_CharacterController */
-    _float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
-    CCharacterController::CONTROLLER_DESC desc{};
-    desc.vInitialPos = vPos;
-    hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
-        TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
+    ///* For.Com_CharacterController */
+    //_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+    //CCharacterController::CONTROLLER_DESC desc{};
+    //desc.vInitialPos = vPos;
+    //hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
+    //    TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 
     /* FSM */
     SetUp_FSM();

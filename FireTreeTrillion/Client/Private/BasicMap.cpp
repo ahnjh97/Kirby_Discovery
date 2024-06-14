@@ -52,7 +52,7 @@ HRESULT CBasicMap::Initialize(void* pArg)
         }
 
         vector<string> vecConstantNames = { "g_DiffuseTexture", "g_NormalTexture", "g_MRATexture", "g_fSamplingFactor"
-            , "g_bStencil", "g_bRimLight", "m_fRimWidth", "g_bMotionBlur" };
+            , "g_bStencil", "g_bRimLight", "m_fRimWidth", "g_bMotionBlur", "g_BoneMatrices" };
 
         m_pOcTree = m_pModelCom->Create_OcTree(GameObjectDesc.vMin, GameObjectDesc.vMax, m_vecPassIndices, m_vecSamplingFactors, vecConstantNames);
         
@@ -208,8 +208,8 @@ HRESULT CBasicMap::Bind_ShaderResources()
     if (LEVEL_TOOL_MAP == *m_pCurrentLevelID)
         return S_OK;
 
-    if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pAnimShaderCom, "g_WorldMatrix")))
-        return E_FAIL;
+    //if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pAnimShaderCom, "g_WorldMatrix")))
+    //    return E_FAIL;
     if (FAILED(m_pAnimShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
         return E_FAIL;
     if (FAILED(m_pAnimShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
@@ -344,17 +344,22 @@ void CBasicMap::InsertMapDecos()
         fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
 
         TYPE eType = TYPE_NONANIM;
+        string strFolder = string("OptimizedMapDecos/");
         if (CMapToolObject::MAPOBJ_ANIM == iMapObjType)
+        {
             eType = TYPE_ANIM;
+            strFolder = string("MapDeco/");
+        }
 
         if (fileInput.eof())
             break;
        
-       CModel* pModel = CModel::Create(m_pDevice, m_pContext, MODEL{ strModelName, eType, 1.f, 0.f, 0, false, true });
-       if (nullptr == pModel) {
+        CModel* pModel = CModel::Create(m_pDevice, m_pContext, MODEL{ strModelName, eType, 1.f, 0.f, 0, false, strFolder});
+
+        if (nullptr == pModel) {
            fileInput.close();
            return;
-       }
+        }
            
         pModel->SetUpStencilRimLightMotionBlurPassIndex(iShaderVars, fRimWidth, 0);
 
@@ -364,6 +369,11 @@ void CBasicMap::InsertMapDecos()
             vecNonCols.push_back(pModel);
             break;
         case CMapToolObject::MAPOBJ_ANIM:
+            pModel->Set_Animation(0, 50, false);
+            pModel->Set_TrackPosition(1);
+            //pModel->Play_Animation(10000);
+            
+            pModel->Set_WorldMatrixForOctree(matWorld);
             vecAnims.push_back(pModel);
             break;
         case CMapToolObject::MAPOBJ_ACTOR:

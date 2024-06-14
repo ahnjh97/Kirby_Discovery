@@ -43,8 +43,10 @@ public:
 	void SetUp_Edges(_float3 vCenter, _float3 vHalfExtents);
 	void SetUp_ChildrenCenter(_float3 vCenter, _float3 vQuarterExtents, vector<_float3>& _vecChildrenCenters);
 
-	void RenderAll(class CShader* pMapShader, class CShader* pNonAnimShader, class CShader* pAnimShader);
-	void RenderMyMesh(class CShader* pMapShader, class CShader* pNonAnimShader, class CShader* pAnimShader);
+	void RenderAll(class CGameInstance* pGameInstance, class CShader* pMapShader, class CShader* pNonAnimShader
+		, class CShader* pAnimShader);
+	void RenderMyMesh(class CGameInstance* pGameInstance, class CShader* pMapShader, class CShader* pNonAnimShader
+		, class CShader* pAnimShader);
 
 	void InsertNonCols(vector<class CModel*>& _vecNonCols);
 	void InsertColNonAnims(vector<class CModel*>& _vecColNonAnims);

@@ -70,14 +70,16 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy", "RallyPoint", "LightBulb" };
 	m_setRallyingMonsters = { "NonAnim_Kabu", "NonAnim_BrontoBurt" };
 
-	m_setNonColDecos = {};
-	m_setAnimDecos = {};
+	m_setNonColDecos = { "BushMCut" };
+	m_setAnimDecos = { "BushM", "PopFlower"};
 	m_setActorDecos = { "SeDriftWoodAL", "SeDriftWoodBL", "SeDriftWoodCL", "GsBenchAL" };
 
 	vecPassIndices.resize(m_vecMapModelNames.size());
 	vecSamplingFactors.resize(m_vecMapModelNames.size());
 
 	SetUpTxtVectors();
+	//ReadMapDecoTxts(TYPE_ANIM);
+	ReadMapDecoTxts(TYPE_NONANIM);
 
 	HideGrid(bHideGrid);
 	HideTriggers(bHideTriggers);
@@ -173,6 +175,30 @@ void CMapToolHelper::SetUpTxtVectors()
 
 	for (auto& objTxt : m_vecObjectTxts)
 		m_setObjectTxts.insert(objTxt);
+}
+
+void CMapToolHelper::ReadMapDecoTxts(TYPE eType)
+{
+	string strPath;
+	if(eType == TYPE_ANIM)
+		strPath =  "../../../model_txt/MapDeco/Anim/";
+	else if(eType == TYPE_NONANIM)
+		strPath = "../../../model_txt/MapDeco/NonAnim/";
+
+	directory_iterator end_iter;  // 디렉토리 순회의 끝을 나타내는 iterator
+	directory_iterator dir_iter(strPath);  // 지정된 경로의 시작 iterator
+
+	while (dir_iter != end_iter) {
+		if (is_regular_file(*dir_iter)) {
+			string strFilePath = dir_iter->path().filename().string();
+			string strModelName = strFilePath.substr(0, strFilePath.length() - 4);
+			m_vecMapDecoTxts.emplace_back(strModelName);
+		}
+		++dir_iter;
+	}
+
+	for (auto& objTxt : m_vecMapDecoTxts)
+		m_setMapDecoTxts.insert(objTxt);
 }
 
 void CMapToolHelper::Menu_Level()
@@ -286,6 +312,18 @@ void CMapToolHelper::Menu_NonAnimModels()
 		if (ImGui::ListBox("##Objects", &iNonAnimIdx, vecObjectNames.data(), m_vecObjectTxts.size(), 9)) {
 			iMapTxtIdx = iTriggerTxtIdx = iMonsterTxtIdx = -1;
 			m_strSelectedTxt = m_vecObjectTxts[iNonAnimIdx];
+		}
+	}
+
+	if (ImGui::CollapsingHeader("MapDecos"))
+	{
+		ImGui::SetNextItemWidth(200.0f);
+		vector<const _char*> vecMapDecoNames(m_vecMapDecoTxts.size());
+		for (_int i = 0; i < m_vecMapDecoTxts.size(); ++i)
+			vecMapDecoNames[i] = m_vecMapDecoTxts[i].c_str();
+		if (ImGui::ListBox("##Objects", &iNonAnimIdx, vecMapDecoNames.data(), m_vecMapDecoTxts.size(), 9)) {
+			iMapTxtIdx = iTriggerTxtIdx = iMonsterTxtIdx = -1;
+			m_strSelectedTxt = m_vecMapDecoTxts[iNonAnimIdx];
 		}
 	}
 }
@@ -634,6 +672,9 @@ void CMapToolHelper::OnRightClick()
 		m_pPickedObject = pObjList->back();
 		m_strCurModel = m_strSelectedTxt;
 
+		if (m_setMapDecoTxts.end() != m_setMapDecoTxts.find(m_strCurModel))
+			m_pPickedObject->Set_ShaderVars(2);
+
 		iMapTxtIdx = iTriggerTxtIdx = iMonsterTxtIdx = iNonAnimIdx = -1;
 	}
 }
@@ -699,7 +740,7 @@ void CMapToolHelper::Save_Level()
 			continue;
 
 		string strModelName = pModel->Get_ModelInfo().strModelName;
-		if (m_setObjectTxts.end() != m_setObjectTxts.find(strModelName)) {
+		if (m_setMapDecoTxts.end() != m_setMapDecoTxts.find(strModelName)) {
 			vecDecoObjs.push_back(object);
 			continue;
 		}
@@ -1342,17 +1383,22 @@ void CMapToolHelper::SaveMapDecoObjects(vector<CGameObject*>& _vecDecoObjs)
 		CModel* pModel = dynamic_cast<CModel*>(obj->Get_Component(TEXT("Com_Model")));
 		if (nullptr == pModel)
 			continue;
-
-		CMapToolObject* pMapToolObj = dynamic_cast<CMapToolObject*>(obj);
-		_uint iMapObjType = pMapToolObj->Get_MapObjType();
-
-		fileOutput.write(reinterpret_cast<const char*>(&iMapObjType), sizeof(iMapObjType));
-
 		CTransform* pTransform = dynamic_cast<CTransform*>(obj->Get_Component(g_strTransformTag));
 		if (nullptr == pTransform)
 			continue;
-
 		string strModelName = pModel->Get_ModelInfo().strModelName;
+
+		CMapToolObject* pMapToolObj = dynamic_cast<CMapToolObject*>(obj);
+		_uint iMapObjType{};
+		if (m_setNonColDecos.end() != m_setNonColDecos.find(strModelName))
+			iMapObjType = CMapToolObject::MAPOBJ_NONCOL;
+		else if (m_setAnimDecos.end() != m_setAnimDecos.find(strModelName))
+			iMapObjType = CMapToolObject::MAPOBJ_ANIM;
+		else if (m_setActorDecos.end() != m_setActorDecos.find(strModelName))
+			iMapObjType = CMapToolObject::MAPOBJ_ACTOR;
+
+		fileOutput.write(reinterpret_cast<const char*>(&iMapObjType), sizeof(iMapObjType));
+
 		_float4x4 matWorld = pTransform->Get_WorldMatrix();
 		_uint iStrLength = strModelName.length();
 		_uint iShaderVars = obj->Get_ShaderVars();
@@ -1525,6 +1571,28 @@ void CMapToolHelper::WriteLocalizedAnimMapDecos(vector<pair<string, _float4x4>>&
 			outputFile.write(reinterpret_cast<const char*>(&iNumVertices), sizeof(iNumVertices));
 			outputFile.write(reinterpret_cast<const char*>(&iFaces), sizeof(iFaces));
 
+			_uint iNumBones{};
+			inputFile.read(reinterpret_cast<char*>(&iNumBones), sizeof(iNumBones));
+			outputFile.write(reinterpret_cast<const char*>(&iNumBones), sizeof(iNumBones));
+
+			_float4x4 matTransformation{};
+			for (_uint j = 0; j < iNumBones; j++)
+			{
+				constexpr _uint iBoneBytes = MAX_PATH;
+				_char copyBuf0[iBoneBytes];
+				inputFile.read(copyBuf0, iBoneBytes);
+				outputFile.write(copyBuf0, iBoneBytes);
+
+				inputFile.read(reinterpret_cast<char*>(&matTransformation), sizeof(_float4x4));
+
+				_matrix transformationMatrix = XMLoadFloat4x4(&matTransformation);
+				_matrix matNewTransformation = transformationMatrix * matWorld;
+				_float4x4 matResult{};
+				XMStoreFloat4x4(&matResult, matNewTransformation);
+
+				outputFile.write(reinterpret_cast<const char*>(&matResult), sizeof(_float4x4));
+			}
+
 			for (_uint j = 0; j < iNumVertices; j++)
 			{
 				_float3 vPos{};
@@ -1535,10 +1603,17 @@ void CMapToolHelper::WriteLocalizedAnimMapDecos(vector<pair<string, _float4x4>>&
 				::XMStoreFloat3(&vPos, vResult);
 				outputFile.write(reinterpret_cast<const char*>(&vPos), sizeof(vPos));
 
-				constexpr _uint iBytesToCopy = sizeof(_float3) + sizeof(_float2) + sizeof(_float3);
-				_char copyBuf[iBytesToCopy];
-				inputFile.read(copyBuf, iBytesToCopy);
-				outputFile.write(copyBuf, iBytesToCopy);
+				constexpr _uint iAnimMeshBytes = sizeof(_float3) + sizeof(_float2) + sizeof(_float3) + sizeof(XMUINT4) + sizeof(_float4) ;
+				_char copyBuf1[iAnimMeshBytes];
+				inputFile.read(copyBuf1, iAnimMeshBytes);
+				outputFile.write(copyBuf1, iAnimMeshBytes);
+			}
+
+			for (_uint k = 0; k < iFaces; k++)
+			{
+				_char copyBuf2[sizeof(_uint) * 3];
+				inputFile.read(copyBuf2, sizeof(_uint) * 3);
+				outputFile.write(copyBuf2, sizeof(_uint) * 3);
 			}
 		}
 
@@ -1555,7 +1630,7 @@ void CMapToolHelper::WriteLocalizedNonAnimMapDecos(vector<pair<string, _float4x4
 
 	for (auto& nameWorldMat : _vecNonAnimDecos)
 	{
-		string strPath = "../../../model_txt/NonAnim/" + nameWorldMat.first + ".txt";
+		string strPath = "../../../model_txt/MapDeco/NonAnim/" + nameWorldMat.first + ".txt";
 
 		ifstream inputFile(strPath, ios::binary);
 		if (false == inputFile.is_open()) {
@@ -1605,6 +1680,13 @@ void CMapToolHelper::WriteLocalizedNonAnimMapDecos(vector<pair<string, _float4x4
 				_char copyBuf[iBytesToCopy];
 				inputFile.read(copyBuf, iBytesToCopy);
 				outputFile.write(copyBuf, iBytesToCopy);
+			}
+
+			for (_uint k = 0; k < iFaces; k++)
+			{
+				_char copyBuf[sizeof(_uint) * 3];
+				inputFile.read(copyBuf, sizeof(_uint) * 3);
+				outputFile.write(copyBuf, sizeof(_uint) * 3);
 			}
 		}
 

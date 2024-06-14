@@ -527,9 +527,10 @@ HRESULT CLoader::Loading_For_Tool_Map()
 	m_strLoadingText = TEXT("모델(을) 로딩 중 입니다.");
 	if(FAILED(Add_AllModelTxts(eLevel, TYPE_NONANIM)))
 		return E_FAIL;
-	if (FAILED(Add_AllModelTxts(eLevel, TYPE_ANIM, true)))
+	//if (FAILED(Add_AllModelTxts(eLevel, TYPE_ANIM, L"MapDeco/")))
+	//	return E_FAIL;
+	if (FAILED(Add_AllModelTxts(eLevel, TYPE_NONANIM, L"MapDeco/")))
 		return E_FAIL;
-	
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 
 	m_IsFinished = true;
@@ -649,6 +650,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// For Mab Interactive Object
 		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM);
+
+		m_vecModelInfo.emplace_back("BushM", TYPE_ANIM, 1.f, 0.f, 0, false, string("OptimizedMapDecos/"));
+		m_vecModelInfo.emplace_back("PopFlower", TYPE_ANIM, 1.f, 0.f, 0, false, string("OptimizedMapDecos/"));
 	}
 	else if (eLevel == LEVEL_GAMEPLAY)
 	{
@@ -673,8 +677,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		// For Kirby Armour
 		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
 
-
-		m_vecModelInfo.emplace_back("GsBenchAL", TYPE_NONANIM);
+		//m_vecModelInfo.emplace_back("GsBenchAL", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("Level0Stage1Step01", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("Level1Stage1Step01", TYPE_NONANIM, 1.f, 0.f, 0, true);
 		m_vecModelInfo.emplace_back("Level1Stage1Step01_Blend", TYPE_NONANIM);
@@ -820,13 +823,13 @@ HRESULT CLoader::Add_KirbyFaceTexture(LEVEL eLevel)
 }
 
 // TOOL_MAP, TOOL_ANIM에서 사용중인 함수.
-HRESULT CLoader::Add_AllModelTxts(LEVEL eLevel, TYPE eType, _bool bMapDeco)
+HRESULT CLoader::Add_AllModelTxts(LEVEL eLevel, TYPE eType, wstring wstrFolder)
 {
 	HRESULT hr = S_OK;
 
 	wstring wstrRootFolderPath = TEXT("../../../model_txt/");
-	if (bMapDeco == true)
-		wstrRootFolderPath += L"MapDeco/";
+	wstrRootFolderPath += wstrFolder;
+
 	if (TYPE_ANIM == eType)
 		wstrRootFolderPath += TEXT("Anim/");
 	else if (TYPE_NONANIM == eType)
@@ -882,6 +885,8 @@ HRESULT CLoader::Add_AllModelTxts(LEVEL eLevel, TYPE eType, _bool bMapDeco)
 
 		if (strModelName.size() > 8 && "NonAnim" == strModelName.substr(0, 7))
 			tModelInfo.fDegree = tModelInfo.fDegree + 180.f;
+
+		tModelInfo.strFolder = CUtils::WstrToStr(wstrFolder);
 
 		wstring wstrPrototypeTag = TEXT("Prototype_Component_Model_") + CUtils::StrToWstr(tModelInfo.strModelName);
 		hr = m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CModel::Create(m_pDevice, m_pContext, tModelInfo));

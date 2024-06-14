@@ -1,8 +1,6 @@
 #pragma once
 #include "Base.h"
 #include <PxPhysicsAPI.h>
-#include <functional>
-#include <iostream>
 
 using namespace physx;
 
@@ -15,6 +13,9 @@ public:
     void Register_Trigger(PxActor* pTriggerActor, _int iType, _int iIndex) { m_Triggers.emplace_back(pTriggerActor, iType, iIndex); }
     void Emplace_TriggerFunc(_int iType, function<void(_int)> func) { m_TriggerFuncs.emplace(iType, func); }
     void Emplace_ExitFunc(_int iType, function<void(void)> func) { m_ExitFuncs.emplace(iType, func); }
+    void Emplace_TriggerForMapDeco(PxActor* pTriggerActor, vector<class CModel*>& _vecMapDecoModels)
+            { m_TriggerToMapDecoAnimMap.emplace(pTriggerActor, _vecMapDecoModels); }
+    void EmplaceBackRenderingModel(class CModel* pRenderingModel) { m_vecRenderingAnimDecos.emplace_back(pRenderingModel); }
 
 public:
     virtual void onTrigger(PxTriggerPair* pairs, PxU32 count) override;
@@ -30,9 +31,11 @@ public:
 
 public:
     void Clear_EventCallBack();
+    void Clear_RenderingAnimDecoVector();
 
 private:
     _bool IsActorInTriggerList(PxActor* pRigidActor);
+    _bool IsMapDecoAnimTrigger(PxActor* pActor) { return m_TriggerToMapDecoAnimMap.find(pActor) != m_TriggerToMapDecoAnimMap.end(); }
 
 private:
     _int m_iTriggerType = {};
@@ -43,6 +46,9 @@ private:
     list<tuple<PxActor*, _int, _int>> m_Triggers; // 
     map<_int, function<void(_int)>> m_TriggerFuncs;
     map<_int, function<void(void)>>  m_ExitFuncs;
+
+    unordered_map<PxActor*, vector<class CModel*>> m_TriggerToMapDecoAnimMap;
+    vector<class CModel*> m_vecRenderingAnimDecos;
 };
 
 END

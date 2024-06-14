@@ -25,7 +25,8 @@ public:
 	void Set_Animation(_uint iAnimIndex, _bool isLoop) { m_iCurrentAnimIndex = iAnimIndex; m_isLoop = isLoop; }
 
 public:
-	virtual HRESULT Initialize_Prototype(TYPE eType, const string& strModelFilePath, _fmatrix TransformMatrix);
+	virtual HRESULT Initialize_Prototype(TYPE eType, const string& strModelFilePath, _fmatrix TransformMatrix
+		, string& strTypeFolder);
 	virtual HRESULT Initialize(void* pArg) override;
 
 public:
@@ -65,11 +66,12 @@ private:
 	HRESULT Ready_Bones(aiNode* pAINode, _int iParentIndex = -1);
 	HRESULT Ready_Animations();
 
-	HRESULT RenameBinaryFile();
+	HRESULT RenameBinaryFile(const string& strTypeFolder);
 	void Create_NonAnimVersion(const string& strModelName, _fmatrix TransformMatrix);
 
 public:
-	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eType, const string& strModelFilePath, _fmatrix TransformMatrix);
+	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eType, const string& strModelFilePath
+		, _fmatrix TransformMatrix, string& strTypeFolder = string());
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Free() override;
 };

@@ -216,7 +216,8 @@ HRESULT CLoader::Add_AnimMapDecoPrototype(wstring& ModelName)
 	/*TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));*/
 
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, L"Prototype_Component_Model_" + ModelName,
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Resources/Models/MapDeco/Anim/" + strModelName + "/" + strModelName + ".fbx", TransformMatrix))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Resources/Models/MapDeco/Anim/" + strModelName + "/" + strModelName + ".fbx"
+			, TransformMatrix, string("MapDeco/")))))
 		return E_FAIL;
 	return S_OK;
 }
@@ -231,7 +232,8 @@ HRESULT CLoader::Add_NonAnimMapDecoPrototype(wstring& ModelName)
 	/*TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));*/
 
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, L"Prototype_Component_Model_" + ModelName,
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Resources/Models/MapDeco/NonAnim/" + strModelName + "/" + strModelName + ".fbx", TransformMatrix))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Resources/Models/MapDeco/NonAnim/" + strModelName + "/" + strModelName + ".fbx"
+			, TransformMatrix, string("MapDeco/")))))
 		return E_FAIL;
 	return S_OK;
 }
