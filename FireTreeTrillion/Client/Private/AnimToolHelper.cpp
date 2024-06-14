@@ -164,6 +164,10 @@ void CAnimToolHelper::Ready_AnimObjects(const wstring& strLayerTag)
 	pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Awoofy")));
 	CHECK_NULLPTR(pCharacter);
 	m_vecCharacter.push_back(pCharacter);
+
+	pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_BladeKnight")));
+	CHECK_NULLPTR(pCharacter);
+	m_vecCharacter.push_back(pCharacter);
 }
 
 void CAnimToolHelper::Render_ObjectList()
@@ -259,6 +263,19 @@ void CAnimToolHelper::Render_AnimationList(const wstring& wstrObjectTag)
 							// 해당 모델이 가지고 있는 애니메이션 개수
 							_uint uAnimCnt = pModel[w]->Get_AnimCnt();
 							vector<CAnimation*>* pVecAnims = pModel[w]->Get_Animations();
+							
+							// 키보드 입력을 통해 현재 선택된 항목 변경
+							if (ImGui::IsKeyPressed(ImGuiKey_UpArrow) && item_current_idx > 0)
+							{
+								item_current_idx--;
+								m_bOnceAnim = true;
+							}
+							if (ImGui::IsKeyPressed(ImGuiKey_DownArrow) && item_current_idx < uAnimCnt - 1)
+							{
+								item_current_idx++;
+								m_bOnceAnim = true;
+							}
+
 							for (_uint n = 0; n < uAnimCnt; n++)
 							{
 								const _bool is_selected = (item_current_idx == n);
@@ -275,7 +292,6 @@ void CAnimToolHelper::Render_AnimationList(const wstring& wstrObjectTag)
 										m_pModel = pModel[w];
 										m_strModelName = m_pModel->Get_ModelName();
 										m_bOnce = true;
-
 									}
 								}
 
@@ -285,6 +301,13 @@ void CAnimToolHelper::Render_AnimationList(const wstring& wstrObjectTag)
 									ImGui::SetItemDefaultFocus();
 									// 애니메이션 창 띄우기
 									Render_FrameLine(&(*pVecAnims)[n], animName);
+									if (m_bOnceAnim)
+									{
+										pModel[w]->Set_Animation(item_current_idx);
+										m_pModel = pModel[w];
+										m_strModelName = m_pModel->Get_ModelName();
+										m_bOnceAnim = false;
+									}
 								}
 							}
 							ImGui::EndListBox();
@@ -447,7 +470,7 @@ void CAnimToolHelper::Render_FrameLine(CAnimation** ppAnimation, const string& s
 					}
 				}
 				
-				if (!bCheckSame)
+				if (!bCheckSame) // 추가되는것까지는 되는데 m_vecSequenceItems에서 보관이 안되는 듯
 				{
 					mySequence.m_vecSequenceItems.push_back(EVENT_INFO{ charEventName, 0, 1 });
 					memset(charEventName, 0, sizeof(charEventName));

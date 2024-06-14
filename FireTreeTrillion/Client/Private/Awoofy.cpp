@@ -291,6 +291,8 @@ HRESULT CAwoofy::Add_Components()
 	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Awoofy"),
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
+	// FOR ANIMTOOL
+	m_ppModelForAnimTool = &m_pModelCom;
 
 	/* For.Com_Texture */
 	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Awoofy_Eye"),
@@ -307,9 +309,6 @@ HRESULT CAwoofy::Add_Components()
 	m_pControllerCom->Set_Object(this);
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
-
-	// FOR ANIMTOOL
-	m_ppModelForAnimTool = &m_pModelCom;
 
 	/* FSM */
 	SetUp_FSM();

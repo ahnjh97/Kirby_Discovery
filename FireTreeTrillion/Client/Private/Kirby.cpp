@@ -562,11 +562,12 @@ HRESULT CKirby::Add_PartObjects()
 	m_pArmours = static_cast<CKirbyArmours*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_KirbyArmours"), &ArmourDesc));
 	CHECK_NULLPTR(m_pArmours);
 
+	/* Ä¿ºñÀÇ HITBOX */
 	CTrigger::TRIGGER_DESC tTriggerDesc{};
 	tTriggerDesc.iTriggerType = CTrigger::TRIGGER_HITBOX;
-	tTriggerDesc.iTriggerIndex = 0; // kirby
-	tTriggerDesc.eCollisionGroup = HITBOX; // kirby
-	tTriggerDesc.vTriggerSize = _float3(2.f, 1.5f, 2.f); // kirby
+	tTriggerDesc.iTriggerIndex = 0;
+	tTriggerDesc.eCollisionGroup = HITBOX;
+	tTriggerDesc.vTriggerSize = _float3(2.f, 1.5f, 2.f);
 	m_pHitBoxTrigger = static_cast<CTrigger*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc));
 	CHECK_NULLPTR(m_pHitBoxTrigger);
 	m_pHitBoxTrigger->Set_Owner(this);
