@@ -136,7 +136,8 @@ PS_OUT PS_MAIN_ALPHABLEND(PS_IN_ALPHABLEND In)
     Out.vColor.rgb = g_vRColor;
     Out.vColor.a *= g_fAlpha;
 
-    Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
+    if (0.01f <= Out.vColor.a)
+        Out.vNonBlur = vector(0.f, 1.f, 0.f, 0.f);
 	
 	return Out;
 }
@@ -183,7 +184,8 @@ PS_OUT PS_MAIN_BLEND_FX(PS_IN_ALPHABLEND In)
 
     Out.vColor.a = Out.vColor.a * saturate(fOldViewZ - In.vProjPos.w);
     
-    Out.vNonBlur = vector(0.f, 1.f, 0.f, 0.f);
+    if ( 0.01f <= Out.vColor.a )
+        Out.vNonBlur = vector(0.f, 1.f, 0.f, 0.f);
 	
     return Out;
 }

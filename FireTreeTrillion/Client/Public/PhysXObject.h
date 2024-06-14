@@ -2,6 +2,7 @@
 #include "Client_Defines.h"
 #include "GameObject.h"
 #include "CollisionCenter.h"
+#include "Effect.h"
 
 BEGIN(Client)
 
@@ -51,6 +52,16 @@ public:
 	void				Set_PhyXState(PHYXOBJECT_CURSTATE eState) { m_ePhyXState = eState; }
 	PHYXOBJECT_CURSTATE Get_PhyXState() { return m_ePhyXState; }
 
+
+
+
+	//이펙트를 자신의 리스트에 추가한다.
+	void	Add_Effect(CEffect* pEffect);
+	void	Delete_AllEffect();
+	void	Delete_Effect(string strTag);
+
+
+
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;
 	virtual void Free() override;
@@ -73,6 +84,9 @@ protected:
 
 	// 피직스 오브젝트들의 현재 큰 상태를 의미한다.
 	PHYXOBJECT_CURSTATE m_ePhyXState = { PO_NORMAL };
+
+	//피직스 오브젝트들에게 귀속되어 움직이는 이펙트들
+	list<CEffect*> m_FXList;
 
 };
 

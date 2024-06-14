@@ -304,7 +304,7 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 			if (pObject != nullptr)
 				pObject->Set_PhyXState(PO_KIRBYMOUTH);
 
-			Delete_KirbyEffect();
+			Delete_AllEffect();
 		}
 		// 입에 머금은 상태의 몬스터
 		else if (pObject->Get_PhyXState() == PO_KIRBYMOUTH)
@@ -338,7 +338,7 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 				Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
 			}
 
-			Delete_KirbyEffect();
+			Delete_AllEffect();
 		}
 	}
 
@@ -990,8 +990,7 @@ void CKirby::Free()
 		Safe_Release(INFO(m_pObject));
 
 	Safe_Release(m_pHitBoxTrigger);
-	for (auto& fx : m_KirbyFXList)
-		Safe_Release(fx);
+
 
 }
 
