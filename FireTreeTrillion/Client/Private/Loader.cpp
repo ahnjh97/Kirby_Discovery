@@ -392,7 +392,9 @@ HRESULT CLoader::Loading_For_GamePlay()
 
 	//hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 19);
 	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 23);
+	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby_Mask", "UI/HUD/Kirby/StatusBar/KirbyHPMask.png");
 	hr = Add_Texture(eLevel, "HUD_StarPoint", "UI/HUD/Kirby/StarPoint/StarPoint_%d.dds", 10);
+
 	CHECK_FAILED(hr);
 
 #pragma endregion
