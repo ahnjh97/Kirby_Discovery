@@ -208,9 +208,6 @@
     <Filter Include="02.GameObjects\PhysXObject\RigidObject\WasteCan">
       <UniqueIdentifier>{f175b95e-a1d4-47cd-9d10-49f323d1f526}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\PhysXObject\Character\HitBox">
-      <UniqueIdentifier>{a1b4ff10-d4bc-4546-ac70-09ef8f4501a8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Map\BG">
       <UniqueIdentifier>{28a5f192-89d1-46d7-bf46-1aafeee88d03}</UniqueIdentifier>
     </Filter>
@@ -351,9 +348,6 @@
     <ClInclude Include="..\Public\BasicMap.h">
       <Filter>02.GameObjects\Map\BasicMap</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Trigger.h">
-      <Filter>02.GameObjects\Map\Trigger</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Level_Tool_Map.h">
       <Filter>01.Levels\Tool\Map</Filter>
     </ClInclude>
@@ -465,9 +459,6 @@
     <ClInclude Include="..\Public\WasteCan.h">
       <Filter>02.GameObjects\PhysXObject\RigidObject\WasteCan</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\HitBox.h">
-      <Filter>02.GameObjects\PhysXObject\Character\HitBox</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\BG.h">
       <Filter>02.GameObjects\Map\BG</Filter>
     </ClInclude>
@@ -508,6 +499,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Ladder.h">
       <Filter>02.GameObjects\Map\Ladder</Filter>
+	</ClInclude>
+	<ClInclude Include="..\Public\Trigger.h">
+      <Filter>02.GameObjects\Map\Trigger</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -594,9 +588,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\BasicMap.cpp">
       <Filter>02.GameObjects\Map\BasicMap</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Trigger.cpp">
-      <Filter>02.GameObjects\Map\Trigger</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Tool_Map.cpp">
       <Filter>01.Levels\Tool\Map</Filter>
@@ -703,9 +694,6 @@
     <ClCompile Include="..\Private\WasteCan.cpp">
       <Filter>02.GameObjects\PhysXObject\RigidObject\WasteCan</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\HitBox.cpp">
-      <Filter>02.GameObjects\PhysXObject\Character\HitBox</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\BG.cpp">
       <Filter>02.GameObjects\Map\BG</Filter>
     </ClCompile>
@@ -746,6 +734,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Ladder.cpp">
       <Filter>02.GameObjects\Map\Ladder</Filter>
+	</ClCompile>
+	<ClCompile Include="..\Private\Trigger.cpp">
+      <Filter>02.GameObjects\Map\Trigger</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

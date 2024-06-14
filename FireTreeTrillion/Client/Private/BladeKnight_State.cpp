@@ -441,7 +441,7 @@ void CBladeKnight_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float f
 
 		if (true == pBladeKnight->IsAnimFinished() || pController->Is_Terrain())
 		{
-			pBladeKnight->Change_State(CBladeKnight::BLADEKNIGHT_WAIT, 50.f, false, true);
+			pBladeKnight->Change_State(CBladeKnight::BLADEKNIGHT_WAIT, 50.f, true, true);
 		}
 	}
 	// 날아가는 도중이다.  1초에 360도 회전하며, 30의 거리로 날아간다.

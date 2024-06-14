@@ -193,7 +193,7 @@ private:
 
 	class CKirbyWeapons*  m_pWeapons = { nullptr };
 	class CKirbyArmours*  m_pArmours = { nullptr };
-	class CHitBox*		  m_pHitBox  = { nullptr };
+	class CTrigger*		  m_pHitBoxTrigger  = { nullptr };
 
 	_float4x4			  m_WeaponMatrix;
 	_float4x4			  m_ArmourMatrix;
@@ -212,6 +212,9 @@ public:
 	static CKirby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
+
+	//test
+	_bool		m_bOnce = false;
 };
 
 END

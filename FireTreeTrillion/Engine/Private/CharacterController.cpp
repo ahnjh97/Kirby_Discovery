@@ -20,6 +20,8 @@ HRESULT CCharacterController::Initialize(void* pArg)
 	CONTROLLER_DESC* pDes = (CONTROLLER_DESC*)pArg;
 	_float4 vInitialPos = pDes->vInitialPos;
 	m_eType = pDes->eType;
+	m_strObjectName = pDes->strProtoObjName;
+
 	if (m_eType == CAPSULE)
 	{
 		m_tControllerCapsuleDesc.position = PxExtendedVec3(vInitialPos.x, vInitialPos.y, vInitialPos.z);
@@ -426,6 +428,12 @@ void CCharacterController::Activate(_bool _bActive)
 void CCharacterController::RegisterAsPlayer()
 {
 	m_pGameInstance->Register_Player(m_pController->getActor());
+}
+
+void CCharacterController::Register_Controller()
+{
+	m_pController->getActor()->setName(m_strObjectName.c_str());
+	m_pGameInstance->Register_Controller(m_pController->getActor(), m_pController);
 }
 
 void CCharacterController::Create_Controller()
