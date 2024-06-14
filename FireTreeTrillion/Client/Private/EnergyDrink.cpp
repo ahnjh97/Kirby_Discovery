@@ -40,12 +40,14 @@ HRESULT CEnergyDrink::Initialize(void* pArg)
 	m_eItemType = ITEM_FOOD;
 	m_iItemPoint = 30;
 
+	m_ItemSocketMatrix = _float4x4::Identity;
+	CUtils::Set_State_Matrix(m_ItemSocketMatrix, CUtils::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
 	CMultiEffect::MULTI_FX_DESC FXDesc{};
 
 	FXDesc.vInitPos = { 0.f, .3f, 0.f };
-	FXDesc.vInitScale = { 1.3f, 1.3f, 1.3f };
-	FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
+	FXDesc.pSocketMatrix = &m_ItemSocketMatrix;
 
 	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_ItemBubble2"), &FXDesc)))
 		return E_FAIL;
@@ -117,6 +119,10 @@ _int CEnergyDrink::Tick(_float fTimeDelta)
 		}
 	}
 
+
+
+	m_ItemSocketMatrix = _float4x4::Identity;
+	CUtils::Set_State_Matrix(m_ItemSocketMatrix, CUtils::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
 	return OBJ_NOEVENT;
 }
