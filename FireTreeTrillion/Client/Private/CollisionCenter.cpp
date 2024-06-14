@@ -5,6 +5,8 @@
 #include "ItemObject.h"
 #include "Camera_Main.h"
 
+#include "HUD_StarPoint.h"
+
 #define GAMEINSTANCE CGameInstance::Get_Instance()->
 
 IMPLEMENT_SINGLETON(CCollisionCenter)
@@ -30,6 +32,9 @@ void CCollisionCenter::Initialize()
 
 	// For CONTENT_ITEM
 	m_eColliderType[PLAYER][ITEM] = CONTENT_ITEM;
+
+	// For CONTENT_ATTACK
+	m_eColliderType[HITBOX][MONSTER] = CONTENT_ATTACK;
 
 	// 레디얼 기름칠
 	GAMEINSTANCE Setting_RadialBlur(5.f, 300.f);
@@ -71,8 +76,8 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 
 CCollisionCenter::CONTENT_TYPE CCollisionCenter::Find_ColliderType(CPhysXObject* pSrc, CPhysXObject* pDst)
 {
-	COLLISION_TYPE eSrcCollisionType = pSrc->Get_CollisionType();
-	COLLISION_TYPE eDstCollisionType = pDst->Get_CollisionType();
+	COLLISION_TYPE eSrcCollisionType = static_cast<COLLISION_TYPE>(pSrc->Get_CollisionType());
+	COLLISION_TYPE eDstCollisionType = static_cast<COLLISION_TYPE>(pDst->Get_CollisionType());
 
 	// 둘 사이에 지정된 CONTENTTYPE을 받는다.
 	CONTENT_TYPE eContentType = m_eColliderType[eSrcCollisionType][eDstCollisionType];
@@ -173,6 +178,13 @@ void CCollisionCenter::Collision_Collider(CONTENT_TYPE eType, CPhysXObject* pSrc
 		}
 	}
 
+	// 커비 HITBOX x 몬스터
+	else if (eType == CONTENT_ATTACK)
+	{
+		pSrcObject->Collision_Overlap(pDstObject);
+		pDstObject->Collision_Overlap(pSrcObject);
+	}
+
 }
 
 void CCollisionCenter::Camera_Shaking(_float fPower, _float fTime, _float2 vDir)
@@ -198,8 +210,8 @@ _bool CCollisionCenter::Kirby_Dodge_SlowMotionSystem(CPhysXObject* pPlayer)
 		_vector vKirbyPos = pKirby->Get_TransformCom()->Get_State_Vector(CTransform::STATE_POSITION);
 
 		GAMEINSTANCE Set_FirstTimerRatio(0.5f);
-		GAMEINSTANCE Set_SecondTimerRatio(0.5f);
-		GAMEINSTANCE Setting_RadialBlur(vKirbyPos, 30.f, 15.f);
+		GAMEINSTANCE Set_SecondTimerRatio(0.2f);
+		GAMEINSTANCE Setting_RadialBlur(vKirbyPos, 30.f, 10.f);
 		GAMEINSTANCE Set_BlackBackGround(true);
 		m_bCheckTimer = true;
 		return true;
@@ -265,10 +277,14 @@ void CCollisionCenter::Compute_Damage(CPhysXObject* pPlayer, CPhysXObject* pMons
 		_float fMonsterAttack = pCMonster->Get_Attack();
 		pKirby->Minus_Hp(fMonsterAttack);
 		Camera_Shaking(1.2f);
+
+		// fMonsterAttack는 몬스터의 공격력으로, 커비에게 데미지를 주는 곳. 카메라 쉐이킹 추가 완료
+		// 여기에 Damage를 입히는 함수를 작동시키면 됨 (SJ)
 	}
 
 	_float fPlayerAttack = pKirby->Get_Attack();
 	pCMonster->Minus_Hp(fPlayerAttack);
+
 }
 
 void CCollisionCenter::Compute_Heal(CPhysXObject* pPlayer, CPhysXObject* pItem)
@@ -285,7 +301,10 @@ void CCollisionCenter::Compute_Coin(CPhysXObject* pPlayer, CPhysXObject* pItem)
 	CItemObject* pIItem = static_cast<CItemObject*>(pItem);
 	_float fItemPoint = (_float)pIItem->Get_ItemPoint();
 
-	// 코인을 증가시키는 함수를 넣으면 됨.
+	// fItemPoint는 코인이 오르는 포인트임 저게 올라야할 "코인점수"임
+	// 만약, int 형으로 올라야한다면 형변환 꼭 해주셔!!!
+	 
+	// 코인을 증가시키는 함수를 넣으면 됨 (SJ)
 }
 
 void CCollisionCenter::Compute_SuperPower(CPhysXObject* pPlayer, CPhysXObject* pItem)
@@ -309,7 +328,7 @@ void CCollisionCenter::Timer_System(_float fTimeDelta)
 			GAMEINSTANCE Set_BlackBackGround(false);
 		}
 		
-		if (m_fTimeDeltaResetTime > 2.f)
+		if (m_fTimeDeltaResetTime > 4.f)
 		{
 			GAMEINSTANCE Restore_SecondTimer();
 

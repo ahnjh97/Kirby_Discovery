@@ -60,7 +60,8 @@ void CKirbyWeapons::Late_Tick(_float fTimeDelta)
 
 HRESULT CKirbyWeapons::Render()
 {
-    if (*m_pCurrentLevelID == LEVEL_TOOL_ANIM) return S_OK;
+    if (Block_Render()) return S_OK;
+    //if (*m_pCurrentLevelID == LEVEL_TOOL_ANIM) 
 
     if (FAILED(Bind_ShaderResources()))
         return E_FAIL;
@@ -97,7 +98,8 @@ HRESULT CKirbyWeapons::Render_LightDepth()
 
 HRESULT CKirbyWeapons::Render_DeferredInfo()
 {
-    if (*m_pCurrentLevelID == LEVEL_TOOL_ANIM) return S_OK;
+    if (Block_Render()) return S_OK;
+    //if (*m_pCurrentLevelID == LEVEL_TOOL_ANIM) return S_OK;
 
     if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
         return E_FAIL;

@@ -41,7 +41,6 @@ private:
 	HRESULT Loading_For_Tool_Anim();
 	HRESULT Loading_For_Tool_Map();
 
-	// 240518
 	HRESULT Add_Models(LEVEL eLevel);
 	HRESULT Add_FXTexture();
 	HRESULT Add_ModelsForAnimTool();

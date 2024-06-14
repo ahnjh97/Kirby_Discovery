@@ -13,7 +13,7 @@
 
 #include "KirbyWeapons.h"
 #include "KirbyArmours.h"
-#include "HitBox.h"
+#include "Trigger.h"
 
 #include "Utils.h"
 #include "Bone.h"
@@ -105,6 +105,7 @@ HRESULT CKirby::Initialize(void* pArg)
 	//m_eAbilityType = ABILITY_BOMB;
 
 	m_pControllerCom->RegisterAsPlayer();
+	m_pControllerCom->Register_Controller();
 	return S_OK;
 }
 
@@ -131,9 +132,13 @@ _int CKirby::Tick(_float fTimeDelta)
 	m_pWeapons->Tick(m_fTimeDelta);
 	m_pArmours->Tick(m_fTimeDelta);
 
-	//if(칼을 휘두른 순간!)
-	if(m_pHitBox != nullptr)
-		m_pHitBox->Tick(m_fTimeDelta);
+	if(m_pHitBoxTrigger->Is_Alive())
+		m_pHitBoxTrigger->Tick(m_fTimeDelta);
+
+	if (m_pGameInstance->Get_DIKeyState(DIK_5, KEY_DOWN))
+	{
+		m_pHitBoxTrigger->Check_Collision();
+	}
 
 	return OBJ_NOEVENT;
 }
@@ -150,8 +155,8 @@ void CKirby::Late_Tick(_float fTimeDelta)
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
-		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
-		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND,	 this);
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW,		 this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_DEFERREDINFO, this);
 	}
 }
@@ -230,13 +235,14 @@ void CKirby::Render_IMGUI()
 	ImGui::Text("FSM : %d", m_pFSM->Get_State());
 	ImGui::Separator(); ImGui::NewLine();
 
+	//m_pHitBox->Render_IMGUI();
+
 	__super::Render_IMGUI();
 }
 #endif
 
 HRESULT CKirby::Render_DeferredInfo()
 {
-
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
@@ -275,7 +281,7 @@ void CKirby::Add_AnimEvent()
 	// 3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
 	m_pModelCom[INFO(m_eBodyState)]->Add_Event("ApplyDamage", [this]() {
 
-		m_pHitBox->Check_Collision();
+		//m_pHitBox->Check_Collision();
 
 		});
 }
@@ -342,8 +348,7 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 void CKirby::Collision_Overlap(CGameObject* pGameObject)
 {
 	// kirby의 뱃살에서 충돌이 일어날 경우 처리해야하는 일들
-	// 여기서부터 n차 회의 진행할것 QZR
-	_int a = 3;
+	//MSG_BOX(TEXT("히트박스에 충돌이 일어나서 커비에 전달됨"));
 }
 
 _float3 CKirby::Make_RepulsiveDir(CPhysXObject* pObject)
@@ -436,20 +441,6 @@ void CKirby::Key_Input(_float fTimeDelta)
 	}
 
 
-	// B : Radial Blur Center
-	if (m_pGameInstance->Get_DIKeyState(DIK_B, KEY_DOWN))
-	{
-		m_pGameInstance->Setting_RadialBlur(30.f, 120.f);
-	}
-
-	// N : Radial Blur Center
-	if (m_pGameInstance->Get_DIKeyState(DIK_N, KEY_DOWN))
-	{
-		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-		m_pGameInstance->Setting_RadialBlur(vPos, 30.f, 120.f);
-	}
-
-
 #pragma endregion
 }
 
@@ -538,6 +529,8 @@ HRESULT CKirby::Add_Components()
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
+	desc.tCapsuleShape.fHeight = 1.f;
+	desc.tCapsuleShape.fRadius = 0.5f;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	m_pControllerCom->Set_Object(this);
@@ -569,10 +562,14 @@ HRESULT CKirby::Add_PartObjects()
 	m_pArmours = static_cast<CKirbyArmours*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_KirbyArmours"), &ArmourDesc));
 	CHECK_NULLPTR(m_pArmours);
 
-	CHitBox::HITBOX_DESC HitBoxDesc{};
-	HitBoxDesc.pOwner = this;
-	m_pHitBox = static_cast<CHitBox*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_HitBox"), &HitBoxDesc));
-	CHECK_NULLPTR(m_pHitBox);
+	CTrigger::TRIGGER_DESC tTriggerDesc{};
+	tTriggerDesc.iTriggerType = CTrigger::TRIGGER_HITBOX;
+	tTriggerDesc.iTriggerIndex = 0; // kirby
+	tTriggerDesc.eCollisionGroup = HITBOX; // kirby
+	tTriggerDesc.vTriggerSize = _float3(2.f, 1.5f, 2.f); // kirby
+	m_pHitBoxTrigger = static_cast<CTrigger*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc));
+	CHECK_NULLPTR(m_pHitBoxTrigger);
+	m_pHitBoxTrigger->Set_Owner(this);
 
 	return S_OK;
 }
@@ -611,8 +608,7 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float));
 		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
-			return E_FAIL;
+		m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
 
 
 		m_pShaderCom->Begin(ANIMMODEL_KIRBYMOUTH);
@@ -635,8 +631,7 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float));
 		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
-			return E_FAIL;
+		m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
 
 		m_pShaderCom->Begin(ANIMMODEL_KIRBYEYE);
 		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
@@ -652,8 +647,7 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
-			return E_FAIL;
+		m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
 
 		m_pShaderCom->Begin(ANIMMODEL_NORMAL_X);
 		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
@@ -790,12 +784,21 @@ void CKirby::SetUp_FSM()
 #pragma endregion
 
 #pragma region BOOM
+	// For BOMB
 	m_pFSM->Add_State(BOOMSTATE_BOOMFALL, CKirbyBoom_Fall_State::Create());
 	m_pFSM->Add_State(BOOMSTATE_BOOMSHOOT, CKirbyBoom_Attack_State::Create());
 	m_pFSM->Add_State(BOOMSTATE_THROW, CKirbyBoom_Attack_State::Create());
 	m_pFSM->Add_State(BOOMSTATE_THROWAIR, CKirbyBoom_Fall_State::Create());
 	m_pFSM->Add_State(BOOMSTATE_THROWCHARGE, CKirbyBoom_ChargeAttack_State::Create());
 	m_pFSM->Add_State(BOOMSTATE_THROWROTATE, CKirbyBoom_ChargeAttack_State::Create());
+#pragma endregion
+
+#pragma region 사다리 타기
+	m_pFSM->Add_State(STATE_LADDERDOWN, CKirbyDefault_Ladder_State::Create());
+	m_pFSM->Add_State(STATE_LADDERUP, CKirbyDefault_Ladder_State::Create());
+	m_pFSM->Add_State(STATE_LADDERWAIT, CKirbyDefault_Ladder_State::Create());
+	m_pFSM->Add_State(STATE_LADDERWAITSTART, CKirbyDefault_Ladder_State::Create());
+
 #pragma endregion
 
 
@@ -986,7 +989,7 @@ void CKirby::Free()
 	if (INFO(m_pObject) != nullptr)
 		Safe_Release(INFO(m_pObject));
 
-	Safe_Release(m_pHitBox);
+	Safe_Release(m_pHitBoxTrigger);
 	for (auto& fx : m_KirbyFXList)
 		Safe_Release(fx);
 

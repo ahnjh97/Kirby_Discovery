@@ -16,7 +16,7 @@ public:
 		_bool		bTrigger;
 		_bool		bDynamic;
 		_bool		bKinematic;
-		_float		fOffsetSize;
+		_float3		fOffsetSize;
 		_float3		vMaterial = {0.5f, 0.5f, 0.5f};
 		CGameObject* pObj = { nullptr };
 		RIGIDBODY_DESC
@@ -25,7 +25,7 @@ public:
 			_bool _bTrigger = { false },
 			_bool _bDynamic = { true },
 			_bool _bKinematic = { false },
-			_float _fOffsetSize = {},
+			_float3 _fOffsetSize = {},
 			_float3 _vMaterial = { 0.5f, 0.5f, 0.5f },
 			CGameObject* _pObj = {}
 		) : eShapeType(_eShapeType), matWorld(_matWorld), bTrigger(_bTrigger), bDynamic(_bDynamic), bKinematic(_bKinematic),fOffsetSize(_fOffsetSize), vMaterial(_vMaterial), pObj(_pObj) {}
@@ -37,31 +37,31 @@ private:
 	virtual ~CRigidBody() = default;
 
 public:
-	virtual HRESULT Initialize_Prototype()  override;
-	virtual HRESULT Initialize(void* pArg)  override;
+	virtual HRESULT		Initialize_Prototype()  override;
+	virtual HRESULT		Initialize(void* pArg)  override;
 #ifdef _DEBUG
-	virtual void	Render_IMGUI()			override;
+	virtual void		Render_IMGUI()			override;
 #endif
 
-	void			Update(_fmatrix matrix);
-	void			Update(_float4 vPos);
-	void			Update_PhysX(class CTransform* pTransform);
+	void				Update(_fmatrix matrix);
+	void				Update(_float4 vPos);
+	void				Update_PhysX(class CTransform* pTransform);
 
 public:
-	void			Create_Actor();
-	void			SetUp_Actor();
-	void			Release_Actor();
+	void				Create_Actor();
+	void				SetUp_Actor();
+	void				Release_Actor();
 
-	void			Activate(_bool _bActive);
-	void			SetUp_TriggerType(_int iTriggerType) { m_iTriggerType = iTriggerType; }
-	void			SetUp_TriggerIndex(_int iTriggerIndex) { m_iTriggerIndex = iTriggerIndex; }
+	void				Activate(_bool _bActive);
+	void				SetUp_TriggerType(_int iTriggerType) { m_iTriggerType = iTriggerType; }
+	void				SetUp_TriggerIndex(_int iTriggerIndex) { m_iTriggerIndex = iTriggerIndex; }
 
 	// 날리기
-	void			Add_Force(_float3 vForce);
-	void			Add_Torque(_float3 vTorque);
-	void			Add_Velocity(_float3 vVelocity);
+	void				Add_Force(_float3 vForce);
+	void				Add_Torque(_float3 vTorque);
+	void				Add_Velocity(_float3 vVelocity);
 
-	void			Overlap_Hitbox(CGameObject* pGameObject, _float4 vPos, _float fRadius = 1.f);
+	void				Overlap_Hitbox(CGameObject* pGameObject, _float4 vPos, _float fRadius = 1.f);
 
 public:
 	PxTransform			Get_PxTransform();
@@ -85,15 +85,15 @@ protected:
 	_float					m_fDensity				= { 10.f };
 
 	// 현 RigidBody의 형태
-	RIGID_SHAPE			m_eShapeType = { RIGID_CAPSULE };
-	_float4x4			m_OriginTransformMatrix = { _float4x4::Identity };
-	_float3				m_vMaterial = { 0.5f, 0.5f, 0.6f };
-	_float				m_fOffsetSize = { 1.f };
-	_bool				m_bDynamic = { true };
-	_bool				m_bKinematic = { false };
+	RIGID_SHAPE				m_eShapeType = { RIGID_CAPSULE };
+	_float4x4				m_OriginTransformMatrix = { _float4x4::Identity };
+	_float3					m_vMaterial = { 0.5f, 0.5f, 0.6f };
+	_float3					m_fOffsetSize = { 1.f, 1.f, 1.f };
+	_bool					m_bDynamic = { true };
+	_bool					m_bKinematic = { false };
 
-	_int				m_iTriggerType = { -1 };
-	_int				m_iTriggerIndex = { -1 };
+	_int					m_iTriggerType = { -1 };
+	_int					m_iTriggerIndex = { -1 };
 
 public:
 	static CRigidBody*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

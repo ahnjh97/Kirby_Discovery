@@ -93,9 +93,9 @@ void CRigidBody::Create_Actor()
 	// scale 긁어오기
 	_matrix OriginMatrix = m_OriginTransformMatrix;
 	_float3 vScale = _float3();
-	if (m_fOffsetSize != _float())
+	if (m_fOffsetSize != _float3())
 	{
-		vScale = _float3(m_fOffsetSize, m_fOffsetSize, m_fOffsetSize);
+		vScale = m_fOffsetSize;
 	}
 	else
 	{
@@ -168,6 +168,8 @@ void CRigidBody::SetUp_Actor()
 
 	if(nullptr != m_pActor)
 		m_pActor->userData = this;
+	if (nullptr != m_pStaticActor)
+		m_pStaticActor->userData = this;
 
 	if (m_bTrigger)
 	{
@@ -204,6 +206,25 @@ void CRigidBody::Release_Actor()
 		m_pActor->release();
 		m_pActor = nullptr;
 	}
+	else if (m_pStaticActor)
+	{
+		m_pStaticActor->userData = nullptr;
+		if (m_pStaticActor->getScene())
+		{
+			auto pScene = m_pGameInstance->Get_Scene();
+			pScene->removeActor(*m_pStaticActor);
+		}
+
+		if (m_pShape)
+		{
+			m_pStaticActor->detachShape(*m_pShape);
+			m_pShape->release();
+			m_pShape = nullptr;
+		}
+
+		m_pStaticActor->release();
+		m_pStaticActor = nullptr;
+	}
 }
 
 /// <summary> physX의 RigidBody를 on/off해주는 함수 </summary>
@@ -226,8 +247,16 @@ void CRigidBody::Activate(_bool _bActive)
 	}
 	else
 	{
-		if (m_pActor->getScene())
-			m_pGameInstance->RemoveActor(*m_pActor);
+		if (nullptr != m_pActor)
+		{
+			if (m_pActor->getScene())
+				m_pGameInstance->RemoveActor(*m_pActor);
+		}
+		else
+		{
+			if (m_pStaticActor->getScene())
+				m_pGameInstance->RemoveActor(*m_pStaticActor);
+		}
 	}
 }
 
@@ -237,7 +266,7 @@ void CRigidBody::Add_Force(_float3 vForce)
 
 	if (false == m_bKinematic && false == m_bTrigger)
 	{
-		physx::PxVec3 PxForce = physx::PxVec3(vForce.x, vForce.y, vForce.z);
+		PxVec3 PxForce = physx::PxVec3(vForce.x, vForce.y, vForce.z);
 		m_pActor->addForce(PxForce, physx::PxForceMode::eFORCE);
 	}
 }
@@ -246,7 +275,7 @@ void CRigidBody::Add_Torque(_float3 vTorque)
 {
 	if (false == (m_bTrigger && m_bKinematic))
 	{
-		physx::PxVec3 PxToque = physx::PxVec3(vTorque.x, vTorque.y, vTorque.z);
+		PxVec3 PxToque = physx::PxVec3(vTorque.x, vTorque.y, vTorque.z);
 		m_pActor->addTorque(PxToque, physx::PxForceMode::eFORCE);
 	}
 }
@@ -255,26 +284,29 @@ void CRigidBody::Add_Velocity(_float3 vVelocity)
 {
 	if (false == (m_bTrigger && m_bKinematic))
 	{
-		physx::PxVec3 PxForce = physx::PxVec3(vVelocity.x, vVelocity.y, vVelocity.z);
+		PxVec3 PxForce = PxVec3(vVelocity.x, vVelocity.y, vVelocity.z);
 		m_pActor->addForce(PxForce, physx::PxForceMode::eVELOCITY_CHANGE);
 	}
 }
 
-physx::PxTransform CRigidBody::Get_PxTransform()
+PxTransform CRigidBody::Get_PxTransform()
 {
-	return physx::PxShapeExt::getGlobalPose(*m_pShape, *m_pActor);
+	return PxShapeExt::getGlobalPose(*m_pShape, *m_pActor);
 }
 
 // 현 actor의 physX에서의 행렬을 지정해준다.
 void CRigidBody::Set_PxWorldMatrix(const _float4x4& _worldMatrix)
 {
-	m_pActor->setGlobalPose(physx::PxTransform{CUtils::To_Float4x4(_worldMatrix)});
+	if(m_pActor != nullptr)
+		m_pActor->setGlobalPose(physx::PxTransform{CUtils::To_Float4x4(_worldMatrix)});
+	if(m_pStaticActor != nullptr)
+		m_pStaticActor->setGlobalPose(physx::PxTransform{CUtils::To_Float4x4(_worldMatrix)});
 }
 
 // physX에서의 행렬을 DX에서의 행렬로 변환하여 가져온다.
 _float4x4 CRigidBody::Get_PxWorldMatrix()
 {
-	physx::PxMat44 pos(physx::PxShapeExt::getGlobalPose(*m_pShape, *m_pActor));
+	PxMat44 pos(PxShapeExt::getGlobalPose(*m_pShape, *m_pActor));
 	return CUtils::To_Float4x4(pos);
 }
 

@@ -55,7 +55,6 @@
 #include "TestModel.h"
 #include "TestTerrain.h"
 #include "Kirby.h"
-#include "HitBox.h"
 
 // 몬스터
 #include "KirbyWeapons.h"
@@ -81,6 +80,7 @@
 
 // 아이템
 #include "EnergyDrink.h"
+#include "Coin.h"
 #pragma endregion
 
 
@@ -229,7 +229,6 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kirby"), CKirby);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KirbyWeapons"), CKirbyWeapons);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KirbyArmours"), CKirbyArmours);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HitBox"), CHitBox);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Awoofy"), CAwoofy);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Rabbit"), CRabbit);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Buffahorn"), CBuffahorn);
@@ -249,6 +248,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("WasteCan"), CWasteCan);
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("EnergyDrink"), CEnergyDrink);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Coin"), CCoin);
 
 #pragma endregion
 
@@ -699,6 +699,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// For Item
 		m_vecModelInfo.emplace_back("Item_EnergyDrink", TYPE_NONANIM, 3.f);
+		m_vecModelInfo.emplace_back("Item_Coin", TYPE_NONANIM, 1.f);
 
 	}
 	else if (eLevel == LEVEL_GAMEPLAY)
@@ -748,6 +749,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// For Item
 		m_vecModelInfo.emplace_back("Item_EnergyDrink", TYPE_NONANIM, 3.f);
+		m_vecModelInfo.emplace_back("Item_Coin", TYPE_NONANIM, 1.f);
 	}
 	else if (eLevel == LEVEL_TOOL_MAP)
 	{

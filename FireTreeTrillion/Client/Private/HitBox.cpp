@@ -30,13 +30,12 @@ HRESULT CHitBox::Initialize(void* pArg)
 	HITBOX_DESC* pDesc = (HITBOX_DESC*)pArg;
 	m_pOwner = pDesc->pOwner;
 	m_pOwnerTransform = m_pOwner->Get_TransformCom();
-
 	return S_OK;
 }
 
 _int CHitBox::Tick(_float fTimeDelta)
 {
-	if (!m_bAlive) return OBJ_NOEVENT;
+	//if (!m_bAlive) return OBJ_NOEVENT;
 
 	_float4 vRight = XMVector3Normalize(m_pOwnerTransform->Get_State_Float4(CTransform::STATE_RIGHT)) * (-0.05f);
 	_float4 vLook  = XMVector3Normalize(m_pOwnerTransform->Get_State_Float4(CTransform::STATE_LOOK)) * 0.8f;
@@ -64,7 +63,6 @@ HRESULT CHitBox::Render()
 		return E_FAIL;*/
 
 	//_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
-
 	//for (size_t i = 0; i < iNumMeshes; i++)
 	//{
 	//	if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
@@ -94,20 +92,9 @@ HRESULT CHitBox::Render_LightDepth()
 #ifdef _DEBUG
 void CHitBox::Render_IMGUI()
 {
-	if (!m_bAlive) return;
-
-	if (ImGui::TreeNode("Guizmo"))
-	{
-		_float4x4 matWorld = m_pTransformCom->Get_WorldFloat4x4();
-		m_pGameInstance->EditTransform(matWorld);
-		m_pTransformCom->Set_WorldMatrix(matWorld);
-		ImGui::Separator(); ImGui::NewLine();
-		ImGui::TreePop();
-	}
-
 	ImGui::Separator(); ImGui::NewLine();
-
-	__super::Render_IMGUI();
+	ImGui::Text("m_bAlive: %s", m_bAlive ? "true" : "false");
+	ImGui::Text("m_bAlive: %d", m_bAlive);
 }
 
 #endif
@@ -115,6 +102,10 @@ void CHitBox::Render_IMGUI()
 void CHitBox::Collision_Overlap(CGameObject* pGameObject)
 {
 	//pGameObject의 정보를 Kirby에게 넘긴다.
+	if (m_bAlive == false || m_pControllerCom->Is_Activated() == false)
+		return;
+
+	// HitBox 충돌 처리
 	m_pOwner->Collision_Overlap(pGameObject);
 
 	m_bAlive = false;
@@ -152,7 +143,6 @@ HRESULT CHitBox::Add_Components()
 								TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	m_pControllerCom->Set_Object(this);
 	m_pControllerCom->Activate(false);
-
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 
 	return S_OK;

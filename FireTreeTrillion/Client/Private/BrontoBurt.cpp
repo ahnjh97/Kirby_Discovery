@@ -41,6 +41,7 @@ HRESULT CBrontoBurt::Initialize(void* pArg)
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecRallyPoint[0]);
 
 	m_vOriginPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+	m_vOriginPos.y += 1.f;
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;
@@ -60,6 +61,8 @@ HRESULT CBrontoBurt::Initialize(void* pArg)
 	
 	if(BRONTOBURTMOVING_PATROL == m_eMoveState)
 		m_pTransformCom->Look_At_Dir(m_vecRallyPoint[0] - m_vecRallyPoint[1]);
+
+	Set_Slope(false);
 
 	return S_OK;
 }
@@ -91,13 +94,16 @@ _int CBrontoBurt::Tick(_float fTimeDelta)
 		else if (true == m_bLerp)
 		{
 			_vector vLook = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
-			_float fAngle = ::XMVectorGetX(::XMVector3AngleBetweenVectors(vLook, -XMLoadFloat4(&m_vRally)));
-			_float fY = ::XMVectorGetY(::XMVector3Cross(vLook, -XMLoadFloat4(&m_vRally)));
+			vLook.m128_f32[1] = 0.f;
+			//_float fAngle = XMVectorGetX(XMVector3AngleBetweenVectors(vLook, XMLoadFloat4(&m_vRally)));
+			_float dotProduct = max(-1.0f, min(1.0f, XMVectorGetX(XMVector3Dot(vLook, XMVector3Normalize(m_vRally)))));
+			_float fAngle = acosf(dotProduct);
+			_float fY = XMVectorGetY(XMVector3Cross(vLook, XMLoadFloat4(&m_vRally)));
 			if (fY < 0)
 				fAngle = -fAngle;
 			_float fRadian = XMConvertToRadians(5.f);
 			if (abs(fAngle) >= fRadian)
-				m_pTransformCom->Turn(::XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * fAngle * 5.f);
+				m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), m_fTimeDelta * fAngle * 5.f);
 			else
 				m_bLerp = false;
 		}
@@ -268,7 +274,10 @@ void CBrontoBurt::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObjec
 	{
 		if (m_ePhyXState == PO_NORMAL)
 		{
+			m_vLastPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 			Change_State(BRONTOBURT_DAMAGE, 50.f, false, true);
+			m_eEyeState = BRONTOBURTEYE_HALF;
+			m_bReturn = true;
 		}
 	}
 	else if (eContent == CCollisionCenter::CONTENT_VACUUMOBJECT)

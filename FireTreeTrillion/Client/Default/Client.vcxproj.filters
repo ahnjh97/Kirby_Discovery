@@ -208,9 +208,6 @@
     <Filter Include="02.GameObjects\PhysXObject\RigidObject\WasteCan">
       <UniqueIdentifier>{f175b95e-a1d4-47cd-9d10-49f323d1f526}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\PhysXObject\Character\HitBox">
-      <UniqueIdentifier>{a1b4ff10-d4bc-4546-ac70-09ef8f4501a8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Map\BG">
       <UniqueIdentifier>{28a5f192-89d1-46d7-bf46-1aafeee88d03}</UniqueIdentifier>
     </Filter>
@@ -246,6 +243,9 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Item\EnergyDrink">
       <UniqueIdentifier>{e5a44464-aceb-4ed8-97a0-0e8e21890bb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Item\Coin">
+      <UniqueIdentifier>{fec82fe1-9a7e-4145-957f-e7c4662e02ff}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -344,9 +344,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\BasicMap.h">
       <Filter>02.GameObjects\Map\BasicMap</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Trigger.h">
-      <Filter>02.GameObjects\Map\Trigger</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Tool_Map.h">
       <Filter>01.Levels\Tool\Map</Filter>
@@ -459,9 +456,6 @@
     <ClInclude Include="..\Public\WasteCan.h">
       <Filter>02.GameObjects\PhysXObject\RigidObject\WasteCan</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\HitBox.h">
-      <Filter>02.GameObjects\PhysXObject\Character\HitBox</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\BG.h">
       <Filter>02.GameObjects\Map\BG</Filter>
     </ClInclude>
@@ -496,6 +490,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\EnergyDrink.h">
       <Filter>02.GameObjects\PhysXObject\Item\EnergyDrink</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Coin.h">
+      <Filter>02.GameObjects\PhysXObject\Item\Coin</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Trigger.h">
+      <Filter>02.GameObjects\Map\Trigger</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -582,9 +582,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\BasicMap.cpp">
       <Filter>02.GameObjects\Map\BasicMap</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Trigger.cpp">
-      <Filter>02.GameObjects\Map\Trigger</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Tool_Map.cpp">
       <Filter>01.Levels\Tool\Map</Filter>
@@ -691,9 +688,6 @@
     <ClCompile Include="..\Private\WasteCan.cpp">
       <Filter>02.GameObjects\PhysXObject\RigidObject\WasteCan</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\HitBox.cpp">
-      <Filter>02.GameObjects\PhysXObject\Character\HitBox</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\BG.cpp">
       <Filter>02.GameObjects\Map\BG</Filter>
     </ClCompile>
@@ -728,6 +722,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\EnergyDrink.cpp">
       <Filter>02.GameObjects\PhysXObject\Item\EnergyDrink</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Coin.cpp">
+      <Filter>02.GameObjects\PhysXObject\Item\Coin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Trigger.cpp">
+      <Filter>02.GameObjects\Map\Trigger</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

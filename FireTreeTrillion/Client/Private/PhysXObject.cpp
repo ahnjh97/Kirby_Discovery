@@ -10,7 +10,6 @@ CPhysXObject::CPhysXObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 CPhysXObject::CPhysXObject(const CPhysXObject& rhs)
 	: CGameObject{ rhs }
-	, m_eCollisionGroup(rhs.m_eCollisionGroup)
 {
 }
 

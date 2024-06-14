@@ -30,10 +30,12 @@ public:
 	virtual HRESULT Render() override;
 	virtual HRESULT Render_LightDepth() override;
 #ifdef _DEBUG
-	virtual void	Render_IMGUI() override;
+	void	Render_IMGUI();
 #endif
 	virtual void	Collision_Overlap(CGameObject* pGameObject);
 	void			Check_Collision();
+
+	_bool			Is_Alive() const { return m_bAlive; }
 	
 private:
 	HRESULT			Add_Components();
