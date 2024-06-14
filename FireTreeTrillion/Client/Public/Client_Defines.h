@@ -88,8 +88,9 @@ enum COLLISION_TYPE
     PLAYER = 0, PLAYER_EFFECT,
     MONSTER,
     INTERACT,
-    ITEM,
     TRIGGER,
+
+    ITEM = 50,
     HITBOX,
     COLLISION_END
 };

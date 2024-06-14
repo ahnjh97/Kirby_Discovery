@@ -18,6 +18,7 @@ CGameObject::CGameObject(const CGameObject & rhs)
 	, m_pContext(rhs.m_pContext)
 	, m_pGameInstance(rhs.m_pGameInstance)
 	, m_wstrPrototypeTag(rhs.m_wstrPrototypeTag)
+	, m_eCollisionGroup(rhs.m_eCollisionGroup)
 {
 	Safe_AddRef(m_pGameInstance);
 	Safe_AddRef(m_pDevice);

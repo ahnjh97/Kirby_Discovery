@@ -8,6 +8,9 @@
 
 #define GRAVITY 9.81f
 
+//FOR COLLISION GROUP
+#define	PASSING_GROUP 50
+
 
 // assert로 확인하고자하는 코드 체크
 // ※ DEBUG용으로 RELEASE모드에서 동작하는 소스엔 사용하지 마십시오.

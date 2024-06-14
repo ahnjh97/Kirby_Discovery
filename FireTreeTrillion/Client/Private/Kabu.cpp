@@ -58,6 +58,7 @@ HRESULT CKabu::Initialize(void* pArg)
 	m_fSpeed = 0.f;
 
 	//m_vRally = m_vecRallyPoint[m_iCnt + 1] - m_vecRallyPoint[m_iCnt];
+	m_pControllerCom->Register_Controller();
 
 	return S_OK;
 }
@@ -227,7 +228,6 @@ void CKabu::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pOb
 {
 	if (eContent == CCollisionCenter::CONTENT_BODY)
 	{
-
 		m_vLook = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
 		Change_State(KABU_DAMAGE, 50.f, false, true);
 	}
@@ -235,7 +235,11 @@ void CKabu::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pOb
 	{
 
 	}
+}
 
+void CKabu::Collision_Overlap(CGameObject* pGameObject)
+{
+	MSG_BOX(TEXT("KABU가 히트박스에 맞음"));
 }
 
 void CKabu::Change_State(KABU_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
@@ -265,14 +269,12 @@ HRESULT CKabu::Add_Components()
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
+	desc.strProtoObjName = CUtils::WstrToStr(m_wstrPrototypeTag);
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	m_pControllerCom->Set_Object(this);
-
-	//m_pControllerCom->Set_CollisionType(m_eCollisionGroup);
 	
 	SetUp_FSM();
-
 
 	return S_OK;
 }

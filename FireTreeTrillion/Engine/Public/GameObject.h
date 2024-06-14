@@ -24,6 +24,7 @@ public:
 	class CComponent*	Get_Component(const wstring& strComTag);
 	CTransform*			Get_TransformCom() const { return m_pTransformCom; }
 	_float				Get_ViewZ() const { return m_fViewZ; }
+	_uint				Get_CollisionType() { return m_eCollisionGroup; }
 
 	_bool				Get_Dead() { return m_bDead; }
 	void				Set_Dead() { m_bDead = true; }
@@ -39,11 +40,12 @@ public:
 	class CModel**		Get_ModelAddress()   { return m_ppModelForAnimTool; }
 	_uint				Get_ModelCnt() const { return m_uModelCnt; }
 
-	_uint Get_ShaderVars() { return m_iShaderVars; }
-	_float Get_RimWidth() { return m_fRimWidth; }
-	void Set_ShaderVars(_uint iShaderVars);
-	void Set_RimWidth(_float fRimWidth) { m_fRimWidth = fRimWidth; }
-	
+	// SHADER
+	_uint				Get_ShaderVars() { return m_iShaderVars; }
+	void				Set_ShaderVars(_uint iShaderVars);
+	_float				Get_RimWidth() { return m_fRimWidth; }
+	void				Set_RimWidth(_float fRimWidth) { m_fRimWidth = fRimWidth; }
+
 public:
 	virtual HRESULT		Initialize_Prototype();
 	virtual HRESULT		Initialize(void* pArg);
@@ -65,6 +67,7 @@ protected:
 	HRESULT				Add_Component(const wstring& strPrototypeTag, const wstring& strComponentTag, class CComponent** ppOut, void* pArg = nullptr);
 	void				Delete_Component(const wstring& strPrototypeTag, const wstring& strComponentTag, class CComponent** ppOut);
 	HRESULT				Compute_ViewZ();
+
 
 protected:
 	ID3D11Device*							m_pDevice = { nullptr };
@@ -96,6 +99,8 @@ protected:
 	_bool									m_bStencil = { false };
 	_bool									m_bRimLight = { true };
 	_bool									m_bMotionBlur = { false };
+	_uint									m_eCollisionGroup = { INT_MAX };
+
 
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;

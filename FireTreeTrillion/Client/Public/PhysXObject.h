@@ -51,8 +51,6 @@ public:
 	void				Set_PhyXState(PHYXOBJECT_CURSTATE eState) { m_ePhyXState = eState; }
 	PHYXOBJECT_CURSTATE Get_PhyXState() { return m_ePhyXState; }
 
-	COLLISION_TYPE		Get_CollisionType() { return m_eCollisionGroup; }
-
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;
 	virtual void Free() override;
@@ -76,7 +74,6 @@ protected:
 	// 피직스 오브젝트들의 현재 큰 상태를 의미한다.
 	PHYXOBJECT_CURSTATE m_ePhyXState = { PO_NORMAL };
 
-	COLLISION_TYPE m_eCollisionGroup = { COLLISION_END };
 };
 
 END

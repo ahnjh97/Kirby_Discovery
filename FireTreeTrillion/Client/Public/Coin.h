@@ -1,5 +1,6 @@
 #pragma once
 #include "ItemObject.h"
+#include "Trigger.h"
 
 BEGIN(Engine)
 class CModel;
@@ -26,15 +27,16 @@ public:
 #endif
 	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
-
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
 
-	CModel* m_pModelCom = { nullptr };
-	_float  m_fCoinTime = { 0.f };
+private:
+	CTrigger*		m_pTrigger = nullptr;
+	CModel*			m_pModelCom = { nullptr };
+	_float			m_fCoinTime = { 0.f };
 
-	_float4 m_vTargetPos = { 0.f, 0.f, 0.f, 0.f };
+	_float4			m_vTargetPos = { 0.f, 0.f, 0.f, 0.f };
 
 public:
 	static CCoin* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

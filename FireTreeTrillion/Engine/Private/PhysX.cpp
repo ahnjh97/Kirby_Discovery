@@ -161,6 +161,14 @@ void CPhysX::Register_Player(PxActor* pPlayerActor)
     m_pEventCallBack->Register_Player(pPlayerActor);
 }
 
+void CPhysX::Register_Controller(PxActor* pActor, PxController* pController)
+{
+    if (nullptr == m_pEventCallBack)
+        return;
+
+    m_pEventCallBack->Register_Controller(pActor, pController);
+}
+
 void CPhysX::Register_Trigger(PxActor* pTriggerActor, _int iTriggerType, _int iTriggerIndex)
 {
     if (nullptr == m_pEventCallBack)
@@ -412,6 +420,7 @@ void CSimulationEventCallback::onContact(const PxContactPairHeader& pairHeader, 
 
 void CSimulationEventCallback::onTrigger(PxTriggerPair* pairs, PxU32 count)
 {
+    _int a = 3;
 }
 
 // ====================================================================================================================
@@ -437,16 +446,12 @@ void CUserControllerHitReport::onControllerHit(const PxControllersHit& hit)
 {
 	PxController* MeController = hit.controller;
 	PxController* otherController = hit.other;
+    // physX에서 사라지게 한 Actor 예외처리
+    if (MeController->getActor() == nullptr || otherController->getActor() == nullptr)
+        return;
 
-   /* static _int iCnt{0};
-    ++iCnt;
-
-    printf("Cnt: %d", iCnt);*/
-
-    // wi
 	CComponent* pComponentSrc = static_cast<CComponent*>(MeController->getUserData());
 	CComponent* pComponentDst = static_cast<CComponent*>(otherController->getUserData());
-    //pComponentDst->Alarm_YouAreCollidedToAnotherController
 	if (pComponentSrc != nullptr && pComponentDst != nullptr)
 	{
 		CGameObject* pActorObjectSrc = pComponentSrc->Get_Object();
@@ -455,3 +460,27 @@ void CUserControllerHitReport::onControllerHit(const PxControllersHit& hit)
         CGameInstance::Get_Instance()->Add_CollisionObjects(pActorObjectSrc, pActorObjectDst);
     }
 }
+
+/// <summary> 히트박스와 콜라이더의 충돌을 어떻게 처리할 것인지 정의하는 PhysX의 콜백함수입니다. </summary>
+_bool CControllerFilterCallback::filter(const PxController& pObj, const PxController& pOtherObj)
+{
+    if (pObj.getActor() != nullptr && pOtherObj.getActor() != nullptr)
+    {
+        CComponent* pComponentObj    = static_cast<CComponent*>(pObj.getUserData());
+        CComponent* pComponentOther  = static_cast<CComponent*>(pOtherObj.getUserData());
+
+        if (pComponentObj != nullptr && pComponentOther != nullptr)
+        {
+            CGameObject* pActorObject = pComponentObj->Get_Object();
+            CGameObject* pActorOther  = pComponentOther->Get_Object();
+            // 둘중에 하나가 true라면 (둘 중에 하나가 히트박스 또는 아이템 등인 것이다) return false 하여 물리적 충돌을 피한다.
+            if ((CGameInstance::Get_Instance()->Is_PassingGroup(pActorObject) 
+                || CGameInstance::Get_Instance()->Is_PassingGroup(pActorOther)) == true)
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
