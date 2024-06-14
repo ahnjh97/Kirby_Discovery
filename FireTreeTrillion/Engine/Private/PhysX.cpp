@@ -251,8 +251,15 @@ PxRigidDynamic* CPhysX::CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, 
     m_pScene->addActor(*pDynamicActor);
     pMesh->release();
     pShape->release(); 
-
+    m_pRigidDynamic = pDynamicActor;
     return pDynamicActor;
+}
+
+void CPhysX::Kick_DynamicActor(_float3 _kickDirection, _float impulseMagnitude)
+{
+    PxVec3 kickDirection(_kickDirection.x, _kickDirection.y, _kickDirection.z);
+    PxVec3 impulse = kickDirection * impulseMagnitude;
+    m_pRigidDynamic->addForce(impulse, PxForceMode::eIMPULSE);
 }
 
 PxRigidStatic* CPhysX::CreateStaticActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)

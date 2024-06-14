@@ -71,8 +71,9 @@ _int CCoin::Tick(_float fTimeDelta)
 			m_bDead = true;
 		}
 
-
+		//_float vRevisedPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 		//m_pControllerCom->Move_Dir(m_pTransformCom, fUpDelta * m_fTimeDelta * 5.f, m_fTimeDelta);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + (fUpDelta * m_fTimeDelta * 5.f));
 	}
 	// 충돌이 안 되었다면
 	else
@@ -80,7 +81,7 @@ _int CCoin::Tick(_float fTimeDelta)
 		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), m_fTimeDelta, 270.f);
 	}
 
-	m_pTrigger->Tick(m_fTimeDelta);
+	//m_pTrigger->Tick(m_fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
@@ -177,17 +178,17 @@ HRESULT CCoin::Add_Components()
 	//CKirbyArmours::KIRBYARMOURS_DESC ArmourDesc{};
 	//ArmourDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 	////ArmourDesc.pBoneMatrix = &m_ArmourMatrix;
-
+	/*
 	CTrigger::TRIGGER_DESC tTriggerDesc{};
 	tTriggerDesc.iTriggerType = CTrigger::TRIGGER_ITEM;
 	tTriggerDesc.iTriggerIndex = 0;
 	tTriggerDesc.eCollisionGroup = ITEM;
-	tTriggerDesc.vTriggerSize = _float3(.2f, .2f, .2f);
+	tTriggerDesc.vTriggerSize = _float3(.5f, .2f, .5f);
 	tTriggerDesc.vInitialPos = m_pTransformCom->Get_WorldFloat4x4();
 	m_pTrigger = static_cast<CTrigger*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc));
 	CHECK_NULLPTR(m_pTrigger);
 	m_pTrigger->Set_Owner(this);
-
+	*/
 	return S_OK;
 
 }
@@ -239,5 +240,5 @@ void CCoin::Free()
 	__super::Free();
 
 	Safe_Release(m_pModelCom);
-	Safe_Release(m_pTrigger);
+	//Safe_Release(m_pTrigger);
 }

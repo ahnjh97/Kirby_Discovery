@@ -175,6 +175,8 @@ HRESULT CTrigger::Add_Components()
 		if (FAILED(__super::Add_Component(TEXT("Prototype_Component_RigidBody"),
 			TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &tRigidDesc)))
 			return E_FAIL;
+		m_pRigidBodyCom->Activate(true);
+
 		m_pRigidBodyCom->SetUp_TriggerType(m_eTriggerType);
 		m_pRigidBodyCom->SetUp_TriggerIndex(m_iTriggerIndex);
 	}

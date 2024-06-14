@@ -44,6 +44,12 @@ _int CWasteCan::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return OBJ_DEAD;
 
+	if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD6, KEY_DOWN))
+	{
+		_float3 force = _float3{ 0.5f, 3.f , 0.5f };
+		m_pGameInstance->Kick_DynamicActor(force, 100.f);
+	}
+
 	return OBJ_NOEVENT;
 }
 

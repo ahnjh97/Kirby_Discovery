@@ -20,7 +20,7 @@ CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 
 HRESULT CLevel_GamePlay::Initialize()
 {
-	m_pGameInstance->Set_RenderMode(CRenderer::MODE_GAMEPLAY);
+	m_pGameInstance->Set_RenderMode(CRenderer::MODE_TOOL);
 	CLevelChanger::Get_Instance()->Load();
 
 	if (FAILED(__super::Initialize()))
@@ -52,15 +52,14 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
 		return E_FAIL;
 
-	// Item Test
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Item"), TEXT("Prototype_GameObject_EnergyDrink"))))
+	// Ladder Test
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Ladder"), TEXT("Prototype_GameObject_Ladder"))))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Item"), TEXT("Prototype_GameObject_Coin"))))
 		return E_FAIL;
 
 	if (FAILED(Ready_Layer_MapObject(TEXT("Layer_MapObject"))))
 		return E_FAIL;
-
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
@@ -459,9 +458,9 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 
 HRESULT CLevel_GamePlay::Ready_Layer_MapObject(const wstring& strLayerTag)
 {
-	HRESULT hr;
-	hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_WasteCan"));
-	CHECK_FAILED(hr);
+	//HRESULT hr;
+	//hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_WasteCan"));
+	//CHECK_FAILED(hr);
 	return S_OK;
 }
 

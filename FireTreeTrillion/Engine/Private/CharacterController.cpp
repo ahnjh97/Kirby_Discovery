@@ -21,6 +21,7 @@ HRESULT CCharacterController::Initialize(void* pArg)
 	_float4 vInitialPos = pDes->vInitialPos;
 	m_eType = pDes->eType;
 	m_strObjectName = pDes->strProtoObjName;
+	m_fHeightOffset = pDes->fOffset;
 
 	if (m_eType == CAPSULE)
 	{
@@ -109,10 +110,10 @@ void CCharacterController::Set_Position(CTransform* pTransform, const _float4& v
 	// 내가 원하는 곳에 physX 위치 이동
 	m_pController->setPosition({(_double)vPos.x, (_double)vPos.y, (_double)vPos.z});
 
-	PxExtendedVec3 pxPos = m_pController->getPosition();
-	PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
-	_vector xmPos = XMVectorSet(pos.x, pos.y - m_fOffset, pos.z, 0.f);
-	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
+	//PxExtendedVec3 pxPos = m_pController->getPosition();
+	//PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
+	//_vector xmPos = XMVectorSet(pos.x, pos.y - m_fHeightOffset, pos.z, 0.f);
+	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(vPos, 1.f));
 }
 
 void CCharacterController::Set_FootPosition(const _float4& vPos)
@@ -132,9 +133,8 @@ _float4 CCharacterController::Get_FootPosition()
 	return _float4{(_float)vPos.x, (_float)vPos.y, (_float)vPos.z, 1.f};
 }
 
-/// <summary> 객체의 Look방향으로 '이동'하는 함수 </summary>
-/// <param name="pTransform"> 객체의 Transform </param>
-/// <param name="fSpeed"> 이동 속도 </param>
+// 강제로 원하는 위치로 이동시키는 함수
+// 예) 점프같은 내가 이동해야하는 position이 정해져 있을때의 움직임
 void CCharacterController::Move(CTransform* pTransform, _fvector vPosition, _float fTimeDelta, _float fHeight)
 {
 	PxExtendedVec3 pxCurrentPos = m_pController->getPosition();
@@ -149,11 +149,13 @@ void CCharacterController::Move(CTransform* pTransform, _fvector vPosition, _flo
 	PxExtendedVec3 pxPos = m_pController->getPosition();
 	PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
 
-	_vector xmPos = XMVectorSet(pos.x, pos.y - fHeight, pos.z, 0.f);
+	_vector xmPos = XMVectorSet(pos.x, pos.y - m_fHeightOffset, pos.z, 0.f);
 
 	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
 }
 
+// 현재 위치에서 순수 델타량만큼의 변화량을 더해주며 이동시키는 함수
+// 예) 룩방향으로의 이동
 void CCharacterController::Move_Dir(CTransform* pTransform, _fvector fDelta, _float fTimeDelta)
 {
 	PxVec3 movement(0.f);
@@ -165,7 +167,7 @@ void CCharacterController::Move_Dir(CTransform* pTransform, _fvector fDelta, _fl
 	PxExtendedVec3 pxPos = m_pController->getPosition();
 	PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
 
-	_vector xmPos = XMVectorSet(pos.x, pos.y - m_fOffset, pos.z, 0.f);
+	_vector xmPos = XMVectorSet(pos.x, pos.y - m_fHeightOffset, pos.z, 0.f);
 
 	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
 }
@@ -196,7 +198,7 @@ _bool CCharacterController::Jump(CTransform* pTransform, _float fFallVelocity, _
 	PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
 
 	// 객체 FOOT POSITION 조정 using OFFSET
-	_vector xmPos = XMVectorSet(pos.x, pos.y - m_fOffset, pos.z, 0.f);
+	_vector xmPos = XMVectorSet(pos.x, pos.y - m_fHeightOffset, pos.z, 0.f);
 
 	// 객체 위치 지정
 	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
@@ -259,7 +261,7 @@ void CCharacterController::FreeFall(CTransform* pTransform, _float fTimeDelta, _
 	PxExtendedVec3 pxPos = m_pController->getPosition();
 	PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
 
-	_vector xmPos = XMVectorSet(pos.x, pos.y - fHeight, pos.z, 0.f);
+	_vector xmPos = XMVectorSet(pos.x, pos.y - m_fHeightOffset, pos.z, 0.f);
 
 	if (m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_DOWN || m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_UP)
 	{

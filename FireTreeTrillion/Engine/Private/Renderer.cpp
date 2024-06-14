@@ -555,14 +555,20 @@ void CRenderer::Render_SystemTick(_float fTimeDelta)
 void CRenderer::Key_Input()
 {
 	// 고사양, 저사양 모드
-	if (m_pGameInstance->Get_DIKeyState(DIK_E, KEY_DOWN) && m_eRenderMode == MODE_GAMEPLAY)
+	//if (m_pGameInstance->Get_DIKeyState(DIK_E, KEY_DOWN) && m_eRenderMode == MODE_GAMEPLAY)
+	//{
+	//	m_bDebugOptionControl = !m_bDebugOptionControl;
+	//	for (size_t i = OPTION_SHADOW; i < OPTION_END; ++i)
+	//	{
+	//		m_bRenderOption[i] = m_bDebugOptionControl;
+	//		Update_Option((OPTION)i, m_bRenderOption[i]);
+	//	}
+	//}
+	
+	//리얼 초저사양모드
+	if (m_pGameInstance->Get_DIKeyState(DIK_E, KEY_DOWN))
 	{
-		m_bDebugOptionControl = !m_bDebugOptionControl;
-		for (size_t i = OPTION_SHADOW; i < OPTION_END; ++i)
-		{
-			m_bRenderOption[i] = m_bDebugOptionControl;
-			Update_Option((OPTION)i, m_bRenderOption[i]);
-		}
+		m_eRenderMode == MODE_GAMEPLAY ? Set_RenderMode(MODE_TOOL) : Set_RenderMode(MODE_GAMEPLAY);
 	}
 
 

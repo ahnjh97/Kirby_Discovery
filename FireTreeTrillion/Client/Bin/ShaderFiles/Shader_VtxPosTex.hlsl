@@ -19,6 +19,11 @@ float2 g_vUVOffset = { 0.f, 0.f };
 float2 g_vMaskUVOffset = { 0.f, 0.f };
 float2 g_vMaskUVAngle = { 0.f, 0.f };
 
+float g_fMaskRatio = { 1.f };
+
+float g_fAlarmColor = { 0.f };
+
+
 struct VS_IN
 {
 	float3		vPosition : POSITION;
@@ -234,6 +239,54 @@ PS_OUT PS_MAIN_WHITEFX(PS_IN_ALPHABLEND In)
     return Out;
 }
 
+PS_OUT PS_MAIN_FOR_HP(PS_IN_ALPHABLEND In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    //마스크 값으로 자르기
+    vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord);
+    Out.vColor = g_DiffuseTexture.Sample(PointSampler, In.vTexcoord);
+    if (Out.vColor.a < 0.1f)
+        discard;
+
+    if (vMask.r > g_fMaskRatio)
+        discard;
+    
+    //diffuse 알파 테스팅
+    //vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    Out.vColor.rgb = g_vRColor;
+    Out.vColor.a *= g_fAlpha;
+    
+    Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
+    
+    return Out;
+}
+
+PS_OUT PS_MAIN_FOR_HPDAMAGE(PS_IN_ALPHABLEND In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    //마스크 값으로 자르기
+    vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord);
+    Out.vColor = g_DiffuseTexture.Sample(PointSampler, In.vTexcoord);
+    if (Out.vColor.a < 0.1f)
+        discard;
+
+    if (vMask.r > g_fMaskRatio)
+        discard;
+    
+    //diffuse 알파 테스팅
+    //vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    Out.vColor.rgb = g_vRColor + g_fAlarmColor;
+    Out.vColor.a *= g_fAlpha;
+    
+    Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
+    
+    return Out;
+}
+
+
+
 technique11 DefaultTechnique
 {
 	// 기본 패스. 알파 테스팅 ( 0 )
@@ -333,4 +386,33 @@ technique11 DefaultTechnique
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_WHITEFX();
     }
+
+    // Mask를 이용한 UI ( 7 )
+    pass UI_MASK
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN_ALPHABLEND();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_FOR_HP();
+    }
+
+    // Mask를 이용한 UI 2 ( 8 )
+    pass UI_MASK2
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN_ALPHABLEND();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_FOR_HPDAMAGE();
+    }
+
 }

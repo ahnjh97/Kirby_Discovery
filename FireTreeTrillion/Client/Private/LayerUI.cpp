@@ -105,6 +105,7 @@ HRESULT CLayerUI::Render()
 		_float2 vFontScale = {	1.f, 1.f  };
 
 		wstring wstrFontTag = { TEXT("Font_HUD_StarPoint_NUM30") };
+		//wstring wstrFontTag = { TEXT("Font_HUDSub_KR15") };
 
 		m_pGameInstance->Render_Font(wstrFontTag, m_UIObjDesc.wstrText, vFontPos, vFontRGBA, 
 			XMConvertToRadians(m_UIObjDesc.vDegree.z), vFontOrig, vFontScale);

@@ -792,6 +792,11 @@ void CGameInstance::RemoveActor(physx::PxActor& pActor)
 	m_pPhysx->RemoveActor(pActor);
 }
 
+void CGameInstance::Kick_DynamicActor(_float3 _kickDirection, _float impulseMagnitude)
+{
+	m_pPhysx->Kick_DynamicActor(_kickDirection, impulseMagnitude);
+}
+
 void CGameInstance::Test()
 {
 	m_pPhysx->Test();

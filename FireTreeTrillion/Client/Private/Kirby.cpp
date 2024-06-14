@@ -225,10 +225,14 @@ void CKirby::Render_IMGUI()
 		ImGui::TreePop();
 	}
 
-
+	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	ImGui::Text("HP : %d", (_int)m_fHp);
-	ImGui::Text("ChargeTime : %.2f", INFO(m_fChargeTime));
-	ImGui::Text("MoveSpeed : %.2f", INFO(m_fMoveSpeed));
+	ImGui::Text("m_fOverPowerColor : %.2f", m_fOverPowerColor);
+	ImGui::Text("m_bCanLadder : %d", INFO(m_bCanLadder));
+	ImGui::Text("m_vLadderPoint.x : %.2f, m_vLadderPoint.y : %.2f m_vLadderPoint.z : %.2f", INFO(m_vLadderPoint).x, INFO(m_vLadderPoint).y, INFO(m_vLadderPoint).z);
+	ImGui::Text("m_vLadderLook.x : %.2f, m_vLadderLook.y : %.2f m_vLadderLook.z : %.2f", INFO(m_vLadderLook).x, INFO(m_vLadderLook).y, INFO(m_vLadderLook).z);
+	ImGui::Text("m_vPos.x : %.2f, m_vPos.y : %.2f m_vPos.z : %.2f", vPos.x, vPos.y, vPos.z);
+
 	ImGui::Text("PREATTACKSTATE : %d", INFO(m_ePreAttackState));
 	ImGui::Text("TemporaryEatType : %d", INFO(m_eTemporaryEatType));
 
@@ -348,7 +352,7 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 void CKirby::Collision_Overlap(CGameObject* pGameObject)
 {
 	// kirby의 뱃살에서 충돌이 일어날 경우 처리해야하는 일들
-	//MSG_BOX(TEXT("히트박스에 충돌이 일어나서 커비에 전달됨"));
+	MSG_BOX(TEXT("커비 overlap 충돌"));
 }
 
 _float3 CKirby::Make_RepulsiveDir(CPhysXObject* pObject)
@@ -529,8 +533,9 @@ HRESULT CKirby::Add_Components()
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
-	desc.tCapsuleShape.fHeight = 1.f;
-	desc.tCapsuleShape.fRadius = 0.5f;
+	desc.fOffset = 0.5f;
+	desc.tCapsuleShape.fHeight = 0.4f;// 1.f;
+	desc.tCapsuleShape.fRadius = 0.4f;// 0.5f;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	m_pControllerCom->Set_Object(this);
@@ -562,11 +567,12 @@ HRESULT CKirby::Add_PartObjects()
 	m_pArmours = static_cast<CKirbyArmours*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_KirbyArmours"), &ArmourDesc));
 	CHECK_NULLPTR(m_pArmours);
 
+	/* 커비의 HITBOX */
 	CTrigger::TRIGGER_DESC tTriggerDesc{};
 	tTriggerDesc.iTriggerType = CTrigger::TRIGGER_HITBOX;
-	tTriggerDesc.iTriggerIndex = 0; // kirby
-	tTriggerDesc.eCollisionGroup = HITBOX; // kirby
-	tTriggerDesc.vTriggerSize = _float3(2.f, 1.5f, 2.f); // kirby
+	tTriggerDesc.iTriggerIndex = 0;
+	tTriggerDesc.eCollisionGroup = HITBOX;
+	tTriggerDesc.vTriggerSize = _float3(2.f, 1.5f, 2.f);
 	m_pHitBoxTrigger = static_cast<CTrigger*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc));
 	CHECK_NULLPTR(m_pHitBoxTrigger);
 	m_pHitBoxTrigger->Set_Owner(this);
@@ -943,6 +949,9 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 
 	// 무적 상태 관리소
 	OverPower();
+
+	// 사다리 상태 초기화
+	INFO(m_bCanLadder) = false;
 }
 
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

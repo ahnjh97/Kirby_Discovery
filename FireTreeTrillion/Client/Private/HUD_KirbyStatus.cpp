@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "HUD_KirbyStatus.h"
+#include "Kirby.h"
 
 CHUD_KirbyStatus::CHUD_KirbyStatus(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext)
 	: CUIObject{ _pDevice, _pContext }
@@ -65,12 +66,22 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 
+	m_fSaveMyY = m_UIObjDesc.vPos.y - m_UIObjDesc.vCenter.y + m_UIObjDesc.vCenter.y;
+
+	// 쉐이킹 진폭 초기화
+	m_fAmplitude = 20.f;
+
 	return S_OK;
 }
 
 _int CHUD_KirbyStatus::Tick(_float fTimeDelta)
 {	
 	__super::Tick(fTimeDelta);
+
+
+	Compute_Player_Hp(fTimeDelta);
+
+
 
 	return OBJ_NOEVENT;
 }
@@ -116,6 +127,10 @@ HRESULT CHUD_KirbyStatus::Add_Components()
 		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
 		return E_FAIL;
 
+	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_StatusBar_Kirby_Mask"),
+		TEXT("Com_Texture_Mask"), (CComponent**)&m_pTextureMask)))
+		return E_FAIL;
+
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),
 		TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom)))
 		return E_FAIL;
@@ -127,18 +142,94 @@ HRESULT CHUD_KirbyStatus::Render_OrthoProj(CShader* _pShaderCom, CTransform* _pT
 {
 	CHECK_NULLPTR(_pShaderCom);
 
-	if (FAILED(_pTransCom->Bind_ShaderResource(_pShaderCom, "g_WorldMatrix")))
-		return E_FAIL;
+	// 분홍색 게이지
+	if (m_UIObjDesc.wstrUITag == TEXT("Gauge"))
+	{
+		if (FAILED(_pTransCom->Bind_ShaderResource(_pShaderCom, "g_WorldMatrix")))
+			return E_FAIL;
 
-	//셰이더 파일의 매트릭스 정보를 가져와 바인딩
-	if (FAILED(_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
-		return E_FAIL;
+		//셰이더 파일의 매트릭스 정보를 가져와 바인딩
+		if (FAILED(_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+			return E_FAIL;
 
-	if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
-		return E_FAIL;
+		if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+			return E_FAIL;
 
-	if (FAILED(Bind_ShaderResources(_pShaderCom, PS_ALPHABLEND, m_pTextureCom, m_iTexIndex)))
-		return E_FAIL;
+		//셰이더 파일의 텍스처 정보를 가져와 바인딩
+		if (FAILED(m_pTextureCom->Bind_ShaderResource(_pShaderCom, "g_DiffuseTexture", m_iTexIndex)))
+			return E_FAIL;
+		if (FAILED(m_pTextureMask->Bind_ShaderResource(_pShaderCom, "g_MaskTexture", 0)))
+			return E_FAIL;
+
+		//셰이더의 원시데이터 가져와 저장
+		if (FAILED(_pShaderCom->Bind_RawValue("g_vRColor", &m_UIObjDesc.vColorRGB, sizeof(_float3))))
+			return E_FAIL;
+		if (FAILED(_pShaderCom->Bind_RawValue("g_fAlpha", &m_UIObjDesc.fAlpha, sizeof(_float))))
+			return E_FAIL;
+		if (FAILED(_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fHpRatio, sizeof(_float))))
+			return E_FAIL;
+
+		//Begin() > Apply() 함수 호출 전 셰이더 전역 데이터를 저장해야함
+		if (FAILED(_pShaderCom->Begin(7)))
+			return E_FAIL;
+
+		if (FAILED(Bind_VIBuffer(m_pVIBufferCom)))
+			return E_FAIL;
+
+		return S_OK;
+	}
+
+	// 노란색 게이지
+	else if (m_UIObjDesc.wstrUITag == TEXT("Gauge_Damage"))
+	{
+		if (FAILED(_pTransCom->Bind_ShaderResource(_pShaderCom, "g_WorldMatrix")))
+			return E_FAIL;
+
+		//셰이더 파일의 매트릭스 정보를 가져와 바인딩
+		if (FAILED(_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+			return E_FAIL;
+
+		if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+			return E_FAIL;
+
+		//셰이더 파일의 텍스처 정보를 가져와 바인딩
+		if (FAILED(m_pTextureCom->Bind_ShaderResource(_pShaderCom, "g_DiffuseTexture", m_iTexIndex)))
+			return E_FAIL;
+		if (FAILED(m_pTextureMask->Bind_ShaderResource(_pShaderCom, "g_MaskTexture", 0)))
+			return E_FAIL;
+
+		//셰이더의 원시데이터 가져와 저장
+		if (FAILED(_pShaderCom->Bind_RawValue("g_vRColor", &m_UIObjDesc.vColorRGB, sizeof(_float3))))
+			return E_FAIL;
+		if (FAILED(_pShaderCom->Bind_RawValue("g_fAlpha", &m_UIObjDesc.fAlpha, sizeof(_float))))
+			return E_FAIL;
+		if (FAILED(_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fHpSlowRatio, sizeof(_float))))
+			return E_FAIL;
+		if (FAILED(_pShaderCom->Bind_RawValue("g_fAlarmColor", &m_fAlarmColor, sizeof(_float))))
+			return E_FAIL;
+
+		//Begin() > Apply() 함수 호출 전 셰이더 전역 데이터를 저장해야함
+		if (FAILED(_pShaderCom->Begin(8)))
+			return E_FAIL;
+
+		if (FAILED(Bind_VIBuffer(m_pVIBufferCom)))
+			return E_FAIL;
+	}
+	else
+	{
+		if (FAILED(_pTransCom->Bind_ShaderResource(_pShaderCom, "g_WorldMatrix")))
+			return E_FAIL;
+
+		//셰이더 파일의 매트릭스 정보를 가져와 바인딩
+		if (FAILED(_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+			return E_FAIL;
+
+		if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+			return E_FAIL;
+
+		if (FAILED(Bind_ShaderResources(_pShaderCom, PS_ALPHABLEND, m_pTextureCom, m_iTexIndex)))
+			return E_FAIL;
+	}
 
 	return S_OK;
 }
@@ -197,6 +288,151 @@ HRESULT CHUD_KirbyStatus::Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom)
 	return S_OK;
 }
 
+void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta)
+{
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+
+	if (pKirby == nullptr)
+		return;
+
+#pragma region 분홍색 게이지 공식
+	// 현재 커비의 HP 맥스치
+	_float fKirbyHpMax = pKirby->Get_MaxHp();
+	_float fKirbyHp = pKirby->Get_Hp();
+
+	// 이 비율은 0 ~ 1 사이에 있어야 한다.
+	m_fHpRatio = (fKirbyHp / fKirbyHpMax);
+
+#pragma endregion
+
+
+
+#pragma region 노란색 게이지 공식
+
+	// 피가 닳았다는 신호이다.
+	if (m_fHpRatio < m_fHpSlowRatio)
+	{
+		// 만약, 현재 피통과 느리게 따라오는 피통의 비율이 다를경우 가산하기 시작한다.
+		m_fAccDamageTime += fTimeDelta;
+
+		// 여기에서부터 반짝이 시작
+		m_bAlarm = true;
+
+
+		// 한번만 발동시켜주는 트리거
+		if (m_bShakingTrigger == true)
+		{
+			// 여기서부터 쉐이킹 시작
+			m_bShaking = true;
+			m_bShakingTrigger = false;
+		}
+	}
+	// 회복 되었을 경우
+	else if (m_fHpRatio > m_fHpSlowRatio)
+	{
+
+		// 이곳은 피가 차는 곳이다.
+	}
+
+
+	// 만약, 0.8초가 지났으면 그제서야 m_fHpSlowRatio 가 HpRatio 를 따라간다.
+	// 이곳은 피가 닳았을 때
+	if (m_fAccDamageTime > 0.8f)
+	{
+		// 한번 계산을 위해 키는 불 값
+		if (m_bComputeDeltaGauge == true)
+		{
+			// 0.8초가 지났을 때, 내가 가야하는 거리를 계산한 것이다.
+			m_fDistanceGauge = m_fHpSlowRatio - m_fHpRatio;
+
+			m_bComputeDeltaGauge = false;
+		}
+		else
+		{
+
+			_float fOffSet = 2.f;
+			m_fHpSlowRatio -= fTimeDelta * m_fDistanceGauge * fOffSet;
+
+			// Slow비율이 만약, 현재 HP보다 작아졌다면? (따라왔다는 뜻)
+			if (m_fHpSlowRatio < m_fHpRatio)
+			{
+				m_fHpSlowRatio = m_fHpRatio;
+				m_bComputeDeltaGauge = true;
+				m_fAccDamageTime = 0.f;
+
+				// 다시 흔들 준비를 한다.
+				m_bShakingTrigger = true;
+
+				// 여기에서 반짝이 끝
+				m_bAlarm = false;
+			}
+		}
+	}
+
+	// 피가 차는 로직
+	if (true)
+	{
+
+	}
+
+
+
+	// 노란 게이지가 반짝이가 되는 중
+	if (m_bAlarm == true)
+	{
+		m_fAlarmTime += fTimeDelta * 40.f;
+
+		//				-1 ~ 1 사이의 범위 -> -0.5 ~ 0.5 사이의 범위
+		m_fAlarmColor = (sin(m_fAlarmTime)) * 0.5f;
+	}
+	// 노란 게이지가 반짝이지 않는 중
+	else
+	{
+		m_fAlarmColor = 0.f;
+		m_fAlarmTime = 0.f;
+	}
+
+
+	
+#pragma endregion
+
+
+
+
+
+#pragma region 피통 UI 쉐이킹 코드
+
+	if(m_bShaking == true)
+	{
+
+		// 진동 주기
+		_float fCycle = 50.f;
+
+
+		m_fShakingTime += fTimeDelta;
+		m_fShakingAcc += fTimeDelta * fCycle;
+		_float fShakePosY = sin(m_fShakingAcc) * m_fAmplitude;
+
+		m_fAmplitude -= fTimeDelta * 50.f;
+
+		_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		vPos.y = m_fSaveMyY + fShakePosY;
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION,vPos);
+
+		if (m_fShakingTime > 0.4f)
+		{
+			m_fShakingTime = 0.f;
+			m_bShaking = false;
+			m_fAmplitude = 20.f;
+		}
+	}
+
+#pragma endregion
+
+
+
+}
+
 CHUD_KirbyStatus* CHUD_KirbyStatus::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CHUD_KirbyStatus* pInstance = new CHUD_KirbyStatus(pDevice, pContext);
@@ -228,6 +464,8 @@ void CHUD_KirbyStatus::Free()
 	Safe_Release(m_pTextureCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pVIBufferCom);
+	Safe_Release(m_pTextureMask);
+
 
 	__super::Free();
 }
