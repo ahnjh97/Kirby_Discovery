@@ -250,6 +250,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("EnergyDrink"), CEnergyDrink);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Coin"), CCoin);
 
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Ladder"), CLadder);
 #pragma endregion
 
 	return S_OK;
@@ -389,8 +390,11 @@ HRESULT CLoader::Loading_For_GamePlay()
 
 #pragma region UI
 
-	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 19);
+	//hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 19);
+	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 23);
+	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby_Mask", "UI/HUD/Kirby/StatusBar/KirbyHPMask.png");
 	hr = Add_Texture(eLevel, "HUD_StarPoint", "UI/HUD/Kirby/StarPoint/StarPoint_%d.dds", 10);
+
 	CHECK_FAILED(hr);
 
 #pragma endregion
@@ -556,7 +560,8 @@ HRESULT CLoader::Loading_For_Tool_UI()
 
 #pragma region TEXTURE
 
-	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 19);
+	//hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 19);
+	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 23);
 	hr = Add_Texture(eLevel, "HUD_StarPoint", "UI/HUD/Kirby/StarPoint/StarPoint_%d.dds", 10);
 	CHECK_FAILED(hr);
 
@@ -683,6 +688,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Level0Stage1Step01_Blend", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f);
 		m_vecModelInfo.emplace_back("BG0", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("Ladder", TYPE_NONANIM, 1.f);
 
 		// For Monster
 		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.f, 180.f);
@@ -744,6 +750,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// For Mab Interactive Object
 		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("Ladder", TYPE_NONANIM, 1.f);
+
 
 		// For Item
 		m_vecModelInfo.emplace_back("Item_EnergyDrink", TYPE_NONANIM, 3.f);

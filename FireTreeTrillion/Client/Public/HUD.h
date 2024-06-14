@@ -31,6 +31,7 @@ public:
 	virtual void				Free() override;
 
 protected:
+	HUD_STARPOINT				m_eSPrePstate = { STARPOINT_NONE };
 	HUD_STARPOINT				m_eSPstate = { STARPOINT_NONE };
 };
 

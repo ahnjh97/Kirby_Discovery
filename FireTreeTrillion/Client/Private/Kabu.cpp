@@ -54,7 +54,7 @@ HRESULT CKabu::Initialize(void* pArg)
 	m_eVacuumSize = SIZE_SMALL;
 	m_eAbilityType = ABILITY_DEFAULT;
 
-	m_fDistance = 10.f;
+	m_fDistance = 5.f;
 	m_fSpeed = 0.f;
 
 	//m_vRally = m_vecRallyPoint[m_iCnt + 1] - m_vecRallyPoint[m_iCnt];
@@ -85,6 +85,7 @@ _int CKabu::Tick(_float fTimeDelta)
 			m_fAngle += m_fTimeDelta * 50.f;
 
 			m_vRotatePos.x = m_vOriginPos.x + (m_fDistance * sin(XMConvertToRadians(m_fAngle)));
+			m_vRotatePos.y = m_vOriginPos.y;
 			m_vRotatePos.z = m_vOriginPos.z - (m_fDistance * cos(XMConvertToRadians(m_fAngle)));
 
 			m_pControllerCom->Move(m_pTransformCom, m_vRotatePos, m_fTimeDelta);

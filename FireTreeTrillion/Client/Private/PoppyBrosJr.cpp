@@ -39,7 +39,7 @@ HRESULT CPoppyBrosJr::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	m_pModelCom->Set_Animation(POPPY_WALK, 50.f, true, true);
+	m_pModelCom->Set_Animation(POPPY_ENEMYWAIT2, 50.f, true, true);
 
 
 	m_fMaxHp = 10.f;
@@ -191,6 +191,9 @@ HRESULT CPoppyBrosJr::Add_Components()
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
+	// FOR ANIMTOOL
+	m_ppModelForAnimTool = &m_pModelCom;
+
 	///* For.Com_Texture */
 	//hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Buffahorn_Eye"),
 	//	TEXT("Com_Texture"), (CComponent**)&m_pEyeTextureCom);
@@ -247,12 +250,12 @@ void CPoppyBrosJr::SetUp_FSM()
 
 	//ป๓ลย Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};
-	m_pFSM->Add_State(POPPY_WALK, CPoppyBrosJr_Idle_State::Create());
+	m_pFSM->Add_State(POPPY_ENEMYWAIT2, CPoppyBrosJr_Idle_State::Create());
 	m_pFSM->Add_State(POPPY_THROW, CPoppyBrosJr_Attack_State::Create());
 
 	m_pFSM->Add_State(POPPY_DAMAGE, CPoppyBrosJr_Damage_State::Create());
 
-	FSM_Desc.iState = POPPY_WALK;
+	FSM_Desc.iState = POPPY_ENEMYWAIT2;
 	FSM_Desc.pModel = &m_pModelCom;
 	m_pFSM->Initialize(&FSM_Desc);
 }

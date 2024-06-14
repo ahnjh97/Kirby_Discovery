@@ -60,6 +60,11 @@ _int CPoppyBomb::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return OBJ_DEAD;
 
+	if (m_pGameInstance->Get_KeyState(DIK_F, KEY_DOWN))
+		m_pGameInstance->Set_SecondTimerRatio(0.2f);
+	if (m_pGameInstance->Get_KeyState(DIK_D, KEY_DOWN))
+		m_pGameInstance->Restore_SecondTimer();
+
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
 	// 폭탄이 손에서 날아갈 타이밍
@@ -114,6 +119,7 @@ _int CPoppyBomb::Tick(_float fTimeDelta)
 		_vector vGravityPerpendicular = vGravity - vGravityParallel;
 
 		// 마찰력 계산
+		// 마찰력은 중력과 반대 방향으로 작용하며, 타임 델타를 반영하여 계산
 		_vector vFriction = -0.5f * vGravityPerpendicular;
 
 		// 가속도 계산
@@ -121,21 +127,25 @@ _int CPoppyBomb::Tick(_float fTimeDelta)
 
 		// 속도 계산
 		_vector vVelocity = {};
-		vVelocity += vAcceleration;
+		vVelocity += vAcceleration * m_fTimeDelta;
 
 		// 이동
 		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-		vPos += (vVelocity * m_fTimeDelta * 5.f + (XMVector3Normalize(m_vLookDir) * 0.2f * m_fMoveTime));
+		vPos += (vVelocity + (XMVector3Normalize(m_vLookDir) * 0.2f * m_fMoveTime)) * m_fTimeDelta * 50.f;
 		m_pControllerCom->Move(m_pTransformCom, vPos, m_fTimeDelta, 0.5f);
+
 		if (0.f < m_fMoveTime)
 		{
 			m_fMoveTime -= m_fTimeDelta;
 		}
 		else
+		{
 			m_fMoveTime = 0.f;
+		}
 
 		_vector vLook = vPos - m_vBeforePos;
 		_float fDistance = XMVectorGetX(XMVector3Length(vLook)) / m_fTimeDelta;
+
 		// 벡터가 0 벡터가 아닌지 확인
 		if (!XMVector3Equal(vLook, XMVectorZero()))
 		{
