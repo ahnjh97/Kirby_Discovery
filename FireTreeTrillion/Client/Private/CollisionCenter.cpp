@@ -193,6 +193,12 @@ void CCollisionCenter::Camera_Shaking(_float fPower, _float fTime, _float2 vDir)
 	pCamera->Make_Shake(fPower, fTime, vDir);
 }
 
+void CCollisionCenter::Camera_Zooming(_float fZoom)
+{
+	CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
+	pCamera->Zoom(fZoom);
+}
+
 _bool CCollisionCenter::Kirby_Dodge_SlowMotionSystem(CPhysXObject* pPlayer)
 {
 	if (m_bCheckTimer == true)
@@ -209,6 +215,7 @@ _bool CCollisionCenter::Kirby_Dodge_SlowMotionSystem(CPhysXObject* pPlayer)
 	{
 		_vector vKirbyPos = pKirby->Get_TransformCom()->Get_State_Vector(CTransform::STATE_POSITION);
 
+		Camera_Zooming(-5.f);
 		GAMEINSTANCE Set_FirstTimerRatio(0.5f);
 		GAMEINSTANCE Set_SecondTimerRatio(0.2f);
 		GAMEINSTANCE Setting_RadialBlur(vKirbyPos, 30.f, 10.f);
@@ -321,6 +328,7 @@ void CCollisionCenter::Timer_System(_float fTimeDelta)
 	if (m_bCheckTimer == true)
 	{
 		m_fTimeDeltaResetTime += fTimeDelta;
+		Camera_Zooming((m_fTimeDeltaResetTime * 1.25f) - 5.f);
 
 		if (m_fTimeDeltaResetTime > 0.5f)
 		{
@@ -332,6 +340,7 @@ void CCollisionCenter::Timer_System(_float fTimeDelta)
 		{
 			GAMEINSTANCE Restore_SecondTimer();
 
+			Camera_Zooming(0.f);
 			m_bCheckTimer = false;
 			m_fTimeDeltaResetTime = 0.f;
 		}

@@ -699,6 +699,10 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Item_EnergyDrink", TYPE_NONANIM, 3.f);
 		m_vecModelInfo.emplace_back("Item_Coin", TYPE_NONANIM, 1.f);
 
+		// For Interaction Decor
+		m_vecModelInfo.emplace_back("BushM", TYPE_ANIM, 10.f);
+
+
 	}
 	else if (eLevel == LEVEL_GAMEPLAY)
 	{

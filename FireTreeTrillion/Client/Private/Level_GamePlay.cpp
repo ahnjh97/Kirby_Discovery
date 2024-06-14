@@ -472,6 +472,7 @@ HRESULT CLevel_GamePlay::Load_FileData(const string& _strFilePath, FILE_TYPE _eF
 	if (!InputFile.is_open()) //==FALSE 
 	{
 		MSG_BOX(TEXT("Failed to Open : FileData"));
+		ALARM_FAIL(TEXT("Failed to Open : FileData"));
 		return E_FAIL;
 	}
 

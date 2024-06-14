@@ -1,4 +1,5 @@
 #include "Utils.h"
+#include "GameInstance.h"
 
 // string --> wstring º¯È¯
 wstring CUtils::StrToWstr(const string& value)
@@ -209,6 +210,18 @@ void CUtils::Turn_OtherMatrix(_Inout_ _float4x4& matrix, _fvector vAxis, _float 
 		Set_State_Matrix(matrix, (STATE)i,
 			XMVector4Transform(Get_State_Vector_Matrix(matrix, (STATE)i), RotationMatrix));
 	}
+}
+
+void CUtils::Make_World_ToScreen(_Inout_ _float3& vPos)
+{
+	vPos = XMVector3TransformCoord(vPos, CGameInstance::Get_Instance()->Get_Transform(CPipeLine::D3DTS_VIEW));
+	vPos = XMVector3TransformCoord(vPos, CGameInstance::Get_Instance()->Get_Transform(CPipeLine::D3DTS_PROJ));
+}
+ 
+void CUtils::Make_Screen_ToWorld(_Inout_ _float3& vPos)
+{
+	vPos = XMVector3TransformCoord(vPos, CGameInstance::Get_Instance()->Get_Transform_Inv(CPipeLine::D3DTS_PROJ));
+	vPos = XMVector3TransformCoord(vPos, CGameInstance::Get_Instance()->Get_Transform_Inv(CPipeLine::D3DTS_VIEW));
 }
 
 physx::PxMat44 CUtils::To_Float4x4(const _float4x4& mat)
