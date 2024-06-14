@@ -1,22 +1,22 @@
 #include "stdafx.h"
-#include "Moon.h"
+#include "BombOrbitGlow.h"
 
-CMoon::CMoon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CBombOrbitGlow::CBombOrbitGlow(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
 {
 }
 
-CMoon::CMoon(const CMoon& rhs)
+CBombOrbitGlow::CBombOrbitGlow(const CBombOrbitGlow& rhs)
 	: CGameObject{ rhs }
 {
 }
 
-HRESULT CMoon::Initialize_Prototype()
+HRESULT CBombOrbitGlow::Initialize_Prototype()
 {
 	return S_OK;
 }
 
-HRESULT CMoon::Initialize(void* pArg)
+HRESULT CBombOrbitGlow::Initialize(void* pArg)
 {
 	GAMEOBJECT_DESC		GameObjectDesc{};
 	GameObjectDesc.fSpeedPerSec = 1.f;
@@ -28,35 +28,31 @@ HRESULT CMoon::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	_vector vSetPos = XMVectorSet(0.f, 9.f, -180.f, 1.f);
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vSetPos);
-	m_pTransformCom->Set_Scaled(3.f, 3.f, 3.f);
-
 	return S_OK;
 }
 
-_int CMoon::Tick(_float fTimeDelta)
+_int CBombOrbitGlow::Tick(_float fTimeDelta)
 {
-
+	if (m_bDead == true)
+		return OBJ_DEAD;
 
 
 	return OBJ_NOEVENT;
 }
 
-void CMoon::Late_Tick(_float fTimeDelta)
+void CBombOrbitGlow::Late_Tick(_float fTimeDelta)
 {
-	Effect_Billboard(fTimeDelta);
+	Billboard(fTimeDelta);
 	Compute_ViewZ();
-	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, this);
 }
 
-HRESULT CMoon::Render()
+HRESULT CBombOrbitGlow::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
-	/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
 
-	if (FAILED(m_pShaderCom->Begin(3)))
+	if (FAILED(m_pShaderCom->Begin(POSTEX_ALPHABLEND)))
 		return E_FAIL;
 	if (FAILED(m_pVIBufferCom->Bind_Buffers()))
 		return E_FAIL;
@@ -66,7 +62,13 @@ HRESULT CMoon::Render()
 	return S_OK;
 }
 
-HRESULT CMoon::Add_Components()
+void CBombOrbitGlow::Update_GlowPosition(_fvector vPos)
+{
+
+
+}
+
+HRESULT CBombOrbitGlow::Add_Components()
 {
 	// UI 셰이더 전용
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex"),
@@ -86,7 +88,7 @@ HRESULT CMoon::Add_Components()
 	return S_OK;
 }
 
-HRESULT CMoon::Bind_ShaderResources()
+HRESULT CBombOrbitGlow::Bind_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
@@ -106,12 +108,12 @@ HRESULT CMoon::Bind_ShaderResources()
 	return S_OK;
 }
 
-void CMoon::Effect_Billboard(_float fTimeDelta)
+void CBombOrbitGlow::Billboard(_float fTimeDelta)
 {
 	// 빌보드
 	_float3   vScale = m_pTransformCom->Get_Scaled();
 	_float4x4      CamMatrix;
-	const CTransform* pCamTransform = dynamic_cast<const CTransform*>(m_pGameInstance->Get_Component(LEVEL_GAMEPLAY, TEXT("Layer_Camera"), g_strTransformTag));
+	const CTransform* pCamTransform = static_cast<const CTransform*>(m_pGameInstance->Get_Component(*m_pCurrentLevelID, TEXT("Layer_Camera"), g_strTransformTag));
 	CamMatrix = pCamTransform->Get_WorldFloat4x4();
 
 	_vector vLook, vRight, vUp;
@@ -126,28 +128,29 @@ void CMoon::Effect_Billboard(_float fTimeDelta)
 	m_pTransformCom->Set_State(CTransform::STATE_UP, XMVector3Normalize(vUp) * vScale.y);
 	m_pTransformCom->Set_State(CTransform::STATE_RIGHT, XMVector3Normalize(vRight) * vScale.x);
 	// 빌보드 끝
+
 }
 
-CMoon* CMoon::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CBombOrbitGlow* CBombOrbitGlow::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	CMoon* pInstance = new CMoon(pDevice, pContext);
+	CBombOrbitGlow* pInstance = new CBombOrbitGlow(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CMoon"));
+		MSG_BOX(TEXT("Failed To Created : CBombOrbitGlow"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CGameObject* CMoon::Clone(void* pArg)
+CGameObject* CBombOrbitGlow::Clone(void* pArg)
 {
-	CMoon* pInstance = new CMoon(*this);
+	CBombOrbitGlow* pInstance = new CBombOrbitGlow(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CMoon"));
+		MSG_BOX(TEXT("Failed To Created : CBombOrbitGlow"));
 
 		Safe_Release(pInstance);
 	}
@@ -155,7 +158,7 @@ CGameObject* CMoon::Clone(void* pArg)
 	return pInstance;
 }
 
-void CMoon::Free()
+void CBombOrbitGlow::Free()
 {
 	__super::Free();
 

@@ -55,6 +55,9 @@
 #include "TestModel.h"
 #include "TestTerrain.h"
 #include "Kirby.h"
+#include "BombOrbitGlow.h"
+#include "BombOrbit.h"
+
 
 // 몬스터
 #include "KirbyWeapons.h"
@@ -78,9 +81,12 @@
 #include "HUD_KirbyStatus.h"
 #include "HUD_StarPoint.h"
 
+
 // 아이템
 #include "EnergyDrink.h"
 #include "Coin.h"
+
+
 #pragma endregion
 
 
