@@ -71,8 +71,9 @@ _int CCoin::Tick(_float fTimeDelta)
 			m_bDead = true;
 		}
 
-
+		//_float vRevisedPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 		//m_pControllerCom->Move_Dir(m_pTransformCom, fUpDelta * m_fTimeDelta * 5.f, m_fTimeDelta);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + (fUpDelta * m_fTimeDelta * 5.f));
 	}
 	// 충돌이 안 되었다면
 	else
@@ -182,7 +183,7 @@ HRESULT CCoin::Add_Components()
 	tTriggerDesc.iTriggerType = CTrigger::TRIGGER_ITEM;
 	tTriggerDesc.iTriggerIndex = 0;
 	tTriggerDesc.eCollisionGroup = ITEM;
-	tTriggerDesc.vTriggerSize = _float3(.2f, .2f, .2f);
+	tTriggerDesc.vTriggerSize = _float3(.5f, .2f, .5f);
 	tTriggerDesc.vInitialPos = m_pTransformCom->Get_WorldFloat4x4();
 	m_pTrigger = static_cast<CTrigger*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc));
 	CHECK_NULLPTR(m_pTrigger);

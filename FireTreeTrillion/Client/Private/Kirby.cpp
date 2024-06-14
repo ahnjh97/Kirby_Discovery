@@ -533,8 +533,9 @@ HRESULT CKirby::Add_Components()
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
-	desc.tCapsuleShape.fHeight = 1.f;
-	desc.tCapsuleShape.fRadius = 0.5f;
+	desc.fOffset = 0.5f;
+	desc.tCapsuleShape.fHeight = 0.4f;// 1.f;
+	desc.tCapsuleShape.fRadius = 0.4f;// 0.5f;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	m_pControllerCom->Set_Object(this);
