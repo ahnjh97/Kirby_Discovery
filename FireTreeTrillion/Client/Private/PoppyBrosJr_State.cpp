@@ -108,7 +108,7 @@ void CPoppyBrosJr_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float f
 		PoppyBombDesc.vLook = pTransformCom->Get_State_Float4(CTransform::STATE_LOOK);
 		PoppyBombDesc.vTargetPosition = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 		PoppyBombDesc.pGameObject = pPoppyJr;
-		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Bomb"), TEXT("Prototype_GameObject_PoppyBomb"), &PoppyBombDesc);
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Monster"), TEXT("Prototype_GameObject_PoppyBomb"), &PoppyBombDesc);
 		CHECK_FAILED(hr);
 	}
 

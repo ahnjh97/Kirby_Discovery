@@ -846,6 +846,7 @@ static _bool Kirby_Ladder_Logic(CKirby* pKirby, CKirby::KIRBY_INFODESC* Kirbydes
 	// 그 외의 상황일 경우 false
 	return false;
 }
+
 // 내가 누른 키가 사다리와 내적 했을 때, 제대로 붙어지는지 여부를 알 수 있는 함수
 static _bool Kirby_JoyStickLadder_Logic(CKirby* pKirby, CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTransformCom, CGameObject* pCamera)
 {
@@ -863,7 +864,6 @@ static _bool Kirby_JoyStickLadder_Logic(CKirby* pKirby, CKirby::KIRBY_INFODESC* 
 			return true;
 
 	}
-
 
 	return false;
 }
