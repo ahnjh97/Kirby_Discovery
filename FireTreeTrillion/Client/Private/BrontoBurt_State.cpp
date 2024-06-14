@@ -66,7 +66,7 @@ void CBrontoBurt_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 		pTransformCom->Look_At_Axis(-vDamegeDir);
 
 		// 이제 날아가는 것을 구현해보자.
-		pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 6.f, fTimeDelta);
+		pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 14.f, fTimeDelta);
 
 		// 점프되는 체공시간을 구현해보자.
 		_float fDamageJumpPower = pBrontoBurt->Get_DamageJumpPower();
@@ -75,11 +75,8 @@ void CBrontoBurt_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 		pBrontoBurt->Set_DamageJumpPower(fDamageJumpPower);
 
 
-		if (true == pBrontoBurt->IsAnimFinished() || pController->Is_Terrain())
-		{
-			// Awoofy 눈 상태
+		if (true == pBrontoBurt->IsAnimFinished())
 			pBrontoBurt->Change_State(CBrontoBurt::BRONTOBURT_FLY, 40.f, true, true);
-		}
 	}
 	// 날아가는 도중이다.  1초에 360도 회전하며, 30의 거리로 날아간다.
 	else if (pBrontoBurt->Get_PhyXState() == PO_FLYAWAY)

@@ -46,7 +46,7 @@ void CPoppyBrosJr_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	{
 		// 일정 거리 안으로 플레이어가 들어오면 상태 전환
 		if (10.f > fDistance)
-			pPoppyJr->Change_State(CPoppyBrosJr::POPPY_THROW, 40.f, false, true);
+			pPoppyJr->Change_State(CPoppyBrosJr::POPPY_THROW, 50.f, false, true);
 
 		m_fTimeDelta = 0.f;
 	}
@@ -113,7 +113,7 @@ void CPoppyBrosJr_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float f
 	}
 
 	if (true == pPoppyJr->IsAnimFinished())
-		pPoppyJr->Change_State(CPoppyBrosJr::POPPY_WALK, 40.f, true, true);
+		pPoppyJr->Change_State(CPoppyBrosJr::POPPY_ENEMYWAIT2, 50.f, true, true);
 }
 
 void CPoppyBrosJr_Attack_State::OnStateExit()
@@ -171,7 +171,7 @@ void CPoppyBrosJr_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float f
 
 		if (true == pPoppyJr->IsAnimFinished() || pController->Is_Terrain())
 		{
-			pPoppyJr->Change_State(CPoppyBrosJr::POPPY_WALK, 40.f, true, true);
+			pPoppyJr->Change_State(CPoppyBrosJr::POPPY_ENEMYWAIT2, 50.f, true, true);
 		}
 	}
 	// 날아가는 도중이다.  1초에 360도 회전하며, 30의 거리로 날아간다.
