@@ -107,7 +107,7 @@ HRESULT CAnimToolHelper::Initialize(void* pArg)
 
 	Ready_AnimObjects(L"Layer_AnimObjects");
 
-	Load();
+	//Load();
 
 	return S_OK;
 }
@@ -379,20 +379,21 @@ void CAnimToolHelper::Render_FrameLine(CAnimation** ppAnimation, const string& s
 		ImGui::End();
 		return;
 	}
+	// 애니메이션 처음 들어올때만 파싱이벤트 정보 가져오기
 	unordered_map< string, ANIM_INFO > umapAnim = m_pModel->Get_ModelInfo().umapAnimInfo;
 	auto it = umapAnim.find((*ppAnimation)->Get_AnimationName());
-	if (it != umapAnim.end())
+	if (m_bOnce)
 	{
-		if (m_bOnce)
+		if (it != umapAnim.end())
 		{
 			m_fAnimationSpeed = it->second.fAnimSpeed;
 			mySequence.m_vecSequenceItems = it->second.vecEventInfo;
-			m_bOnce = false;
 		}
-	}
-	else
-	{
-		mySequence.m_vecSequenceItems.clear();
+		else
+		{
+			mySequence.m_vecSequenceItems.clear();
+		}
+		m_bOnce = false;
 	}
 
 	// QZR : 어떠한 이벤트가 없을때의 처리

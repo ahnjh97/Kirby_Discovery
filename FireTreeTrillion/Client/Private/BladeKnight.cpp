@@ -51,6 +51,8 @@ HRESULT CBladeKnight::Initialize(void* pArg)
 	m_eVacuumSize = SIZE_SMALL;
 	m_eAbilityType = ABILITY_SWORD;
 
+	Add_AnimEvent();
+
 	return S_OK;
 }
 
@@ -72,6 +74,11 @@ _int CBladeKnight::Tick(_float fTimeDelta)
 
 	if (m_pHitBoxTrigger->Is_Alive())
 		m_pHitBoxTrigger->Tick(m_fTimeDelta);
+
+	if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD5, KEY_DOWN))
+	{
+		m_pHitBoxTrigger->Check_Collision();
+	}
 
 	return OBJ_NOEVENT;
 }

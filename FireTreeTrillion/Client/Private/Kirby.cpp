@@ -348,7 +348,7 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 void CKirby::Collision_Overlap(CGameObject* pGameObject)
 {
 	// kirby의 뱃살에서 충돌이 일어날 경우 처리해야하는 일들
-	//MSG_BOX(TEXT("히트박스에 충돌이 일어나서 커비에 전달됨"));
+	MSG_BOX(TEXT("커비 overlap 충돌"));
 }
 
 _float3 CKirby::Make_RepulsiveDir(CPhysXObject* pObject)

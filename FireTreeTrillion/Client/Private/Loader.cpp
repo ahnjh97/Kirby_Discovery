@@ -488,9 +488,9 @@ HRESULT CLoader::Loading_For_Tool_Anim()
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
 	#pragma region 모델
+	// 애님툴에서 저장한 데이터들을 읽어온다.
 	Load_AnimToolInfo();
-	if (FAILED(Add_AllModelTxts(eLevel, TYPE_ANIM)))
-		return E_FAIL;
+	// 애님툴에서 필요한 모델들의 프로토타입을 추가한다. 또한 필요한 데이터정리를 시행한다.
 	hr = Add_Models(eLevel);
 	CHECK_FAILED(hr);
 
@@ -762,11 +762,32 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	}
 	else if (eLevel == LEVEL_TOOL_ANIM)
 	{
-		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("Kirby", TYPE_ANIM, 1.f, 180.f);
 
-		m_vecModelInfo.emplace_back("BladeKnightSword",  TYPE_NONANIM, 1.f);
+		// For Kirby Body
+		m_vecModelInfo.emplace_back("KirbyBalloon", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbyDefault", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbyVacuum", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbySwordDefault", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbySwordBalloon", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbyBoomDefault", TYPE_ANIM, 1.f, 180.f);
+
+		// For Kirby Weapon
+		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
+		// For Kirby Armour
+		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
+
+		// For Monster
+		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("Rabbit", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("Buffahorn", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("BladeKnight", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("BladeKnightSword", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("Kabu", TYPE_ANIM, 2.f, 180.f);
+		m_vecModelInfo.emplace_back("BrontoBurt", TYPE_ANIM, 2.f, 180.f);
+		m_vecModelInfo.emplace_back("PoppyBrosJr", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_NONANIM, 1.f, 180.f);
 	}
 
 }
@@ -881,7 +902,7 @@ HRESULT CLoader::Add_KirbyFaceTexture(LEVEL eLevel)
 	return S_OK;
 }
 
-// TOOL_MAP, TOOL_ANIM에서 사용중인 함수.
+// TOOL_MAP에서 사용중인 함수.
 HRESULT CLoader::Add_AllModelTxts(LEVEL eLevel, TYPE eType)
 {
 	HRESULT hr = S_OK;
@@ -910,29 +931,9 @@ HRESULT CLoader::Add_AllModelTxts(LEVEL eLevel, TYPE eType)
 		
 		_bool bFound = { false };
 		
-		// 원래 버전
-		//MODEL tModelInfo = MODEL{ strModelName ,  eType };
-		//for (auto& modelInfo : m_vecModelInfo)
-		//{
-		//	if (modelInfo.strModelName == strModelName)
-		//	{
-		//		tModelInfo = modelInfo;
-		//		break;
-		//	}
-		//}
-		
 		MODEL tModelInfo = MODEL{ strModelName ,  eType };
 		for (auto& modelInfo : m_vecModelInfo)
 		{
-			// 애님툴에서 조정하여 저장한 값을 불러서
-			// 모델 이름이 같을 경우, model의 정보들을 읽어오기
-			for (auto& pair : m_mapSequence)
-			{
-				if (modelInfo.strModelName == pair.first)
-				{
-					modelInfo.umapAnimInfo = pair.second;
-				}
-			}
 			if (modelInfo.strModelName == strModelName)
 			{
 				tModelInfo = modelInfo;
@@ -1024,8 +1025,10 @@ void CLoader::Load_AnimToolInfo()
 				pAnimElement != nullptr;
 				pAnimElement = pAnimElement->NextSiblingElement("Animation"))
 			{
-				const char* animName = pAnimElement->GetText();
-				if (animName)
+				// string animName = Remove_BeforeLastPipe(anim.first);
+				// const char* animName = pAnimElement->GetText();
+				string animName = Remove_BeforeLastPipe(pAnimElement->GetText());
+				if (!animName.empty())
 				{
 					// ANIM_INFO 객체 생성 및 초기화
 					ANIM_INFO animInfo;
@@ -1070,13 +1073,22 @@ void CLoader::Load_AnimToolInfo()
 							}
 						}
 					}
-
 					// ANIM_INFO 객체를 AnimMap에 추가
-					animMap[string(animName)] = animInfo;
+					animMap[animName] = animInfo;
 				}
 			}
 		}
 	}
+}
+
+string CLoader::Remove_BeforeLastPipe(const string& str)
+{
+	size_t pos = str.find_last_of('|');
+	if (pos != string::npos)
+	{
+		return str.substr(pos + 1); // 마지막 '|' 이후의 문자열 반환
+	}
+	return str; // '|'가 없으면 원래 문자열 반환
 }
 
 CLoader * CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID)

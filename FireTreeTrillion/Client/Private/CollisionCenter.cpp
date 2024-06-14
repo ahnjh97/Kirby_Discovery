@@ -35,6 +35,7 @@ void CCollisionCenter::Initialize()
 
 	// For CONTENT_ATTACK
 	m_eColliderType[HITBOX][MONSTER] = CONTENT_ATTACK;
+	m_eColliderType[HITBOX][PLAYER]  = CONTENT_ATTACK;
 
 	// 레디얼 기름칠
 	GAMEINSTANCE Setting_RadialBlur(5.f, 300.f);
