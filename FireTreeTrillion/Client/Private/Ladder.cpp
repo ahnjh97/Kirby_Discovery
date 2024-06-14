@@ -30,7 +30,7 @@ HRESULT CLadder::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(10.f, 6.f, -180.f, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(40.33f, 8.f, -32.5f, 1.f));
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;
