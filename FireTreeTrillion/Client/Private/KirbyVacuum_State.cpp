@@ -34,7 +34,6 @@ void CKirbyVacuum_Spit_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		{
 			CTransform* pObjectTransform = DESC(m_pObject)->Get_TransformCom();
 			pObjectTransform->Set_Scaled(1.f, 1.f, 1.f);
-			DESC(m_pObject)->Set_PhyXState(PO_FLYAWAY);
 
 			_float4 vTargetPos = Spit_Target_Object(pKirby);
 
@@ -69,7 +68,7 @@ void CKirbyVacuum_Spit_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 			}
 
-
+			DESC(m_pObject)->Set_PhyXState(PO_FLYAWAY);
 			Safe_Release(DESC(m_pObject));
 			DESC(m_pObject) = nullptr;
 		}

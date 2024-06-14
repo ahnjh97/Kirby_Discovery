@@ -49,7 +49,7 @@ public:
 	_float	Get_DamageJumpPower() { return m_fDamageJumpPower; }
 	void	Set_DamageJumpPower(_float fDamageJumpPower) { m_fDamageJumpPower = fDamageJumpPower; }
 
-	void				Set_PhyXState(PHYXOBJECT_CURSTATE eState) { m_ePhyXState = eState; }
+	void				Set_PhyXState(PHYXOBJECT_CURSTATE eState);
 	PHYXOBJECT_CURSTATE Get_PhyXState() { return m_ePhyXState; }
 
 
@@ -86,8 +86,8 @@ protected:
 	PHYXOBJECT_CURSTATE m_ePhyXState = { PO_NORMAL };
 
 	//피직스 오브젝트들에게 귀속되어 움직이는 이펙트들
-	list<CEffect*> m_FXList;
-
+	list<CEffect*>	m_FXList;
+	_float4x4		m_EffectSocket;
 };
 
 END

@@ -52,8 +52,6 @@ protected:
 	// 충돌되면 true로 바뀌고, 더 이상 충돌되지 않는다.
 	_bool	 m_bCollisionComplete = { false };
 
-	_float4x4 m_ItemSocketMatrix;
-
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;
 	virtual void Free() override;

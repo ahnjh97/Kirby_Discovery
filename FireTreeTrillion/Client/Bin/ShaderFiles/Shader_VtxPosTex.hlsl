@@ -160,9 +160,9 @@ PS_OUT PS_MAIN_BLEND_FX(PS_IN_ALPHABLEND In)
 	
     vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord + g_vMaskUVOffset);
     
-    if (vMask.a < .01f && vMask.a < g_fMaskThreshold)
+    if (vMask.a < g_fMaskThreshold)
         discard;
-    else if (vMask.r < .1f && vMask.r < g_fMaskThreshold)
+    else if (vMask.r < g_fMaskThreshold)
         discard;
     
 
@@ -196,9 +196,9 @@ PS_OUT PS_MAIN_DEFAULT_FX(PS_IN_ALPHABLEND In)
 
     //마스크 값으로 자르기
     vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord + g_vMaskUVOffset);
-    if (vMask.a < .01f && vMask.a < g_fMaskThreshold)
+    if (vMask.a < g_fMaskThreshold)
         discard;
-    else if (vMask.r < .1f && vMask.r < g_fMaskThreshold)
+    else if (vMask.r < g_fMaskThreshold)
         discard;
     
     //diffuse 알파 테스팅
@@ -218,9 +218,9 @@ PS_OUT PS_MAIN_WHITEFX(PS_IN_ALPHABLEND In)
 
     //마스크 값으로 자르기
     vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord + g_vMaskUVOffset);
-    if (vMask.a < .01f && vMask.a < g_fMaskThreshold)
+    if (vMask.a < g_fMaskThreshold)
         discard;
-    else if (vMask.r < .1f && vMask.r < g_fMaskThreshold)
+    else if (vMask.r < g_fMaskThreshold)
         discard;
     
     //diffuse 알파 테스팅
