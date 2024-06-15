@@ -52,15 +52,19 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 
 	if (PROJ_ORTHO == m_UIObjDesc.eUIProj)
 	{
+		m_UIObjDesc.vDegree.z = (*HUDKirby_Desc).vDegree.z;
 		m_pTransformCom->Rotation(XMVectorSet(AXIS_Z), XMConvertToRadians(m_UIObjDesc.vDegree.z));
 		XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 	}
 
 	if (PROJ_PERSPEC == m_UIObjDesc.eUIProj)
 	{
-		m_pTransformCom->Rotation(XMVectorSet(AXIS_X), XMConvertToRadians(m_UIObjDesc.vDegree.x));
-		m_pTransformCom->Rotation(XMVectorSet(AXIS_Y), XMConvertToRadians(m_UIObjDesc.vDegree.y));
-		m_pTransformCom->Rotation(XMVectorSet(AXIS_Z), XMConvertToRadians(m_UIObjDesc.vDegree.z));
+		m_UIObjDesc.vDegree = (*HUDKirby_Desc).vDegree;
+
+		_float fRadianX = XMConvertToRadians(m_UIObjDesc.vDegree.x);
+		_float fRadianY = XMConvertToRadians(m_UIObjDesc.vDegree.y);
+		_float fRadianZ = XMConvertToRadians(m_UIObjDesc.vDegree.z);
+		m_pTransformCom->Rotation(fRadianX, fRadianY, fRadianZ);
 	}
 
 #pragma endregion
@@ -93,6 +97,9 @@ HRESULT CHUD_KirbyStatus::Render()
 {
 	if (UI_TEXTURE == m_UIObjDesc.eUIType)
 	{
+		if (PROJ_ORTHO == m_UIObjDesc.eUIProj)
+			return S_OK;
+
 		if (PROJ_PERSPEC == m_UIObjDesc.eUIProj)
 			Render_PerspecProj(m_pShaderCom, m_pTransformCom);
 	}

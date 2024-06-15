@@ -228,7 +228,7 @@ PS_OUT PS_MAIN_FOR_HP(PS_IN_ALPHABLEND In)
 
     //마스크 값으로 자르기
     vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord);
-    Out.vColor = g_DiffuseTexture.Sample(PointSampler, In.vTexcoord);
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
     if (Out.vColor.a < 0.1f)
         discard;
 
@@ -251,7 +251,7 @@ PS_OUT PS_MAIN_FOR_HPDAMAGE(PS_IN_ALPHABLEND In)
 
     //마스크 값으로 자르기
     vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord);
-    Out.vColor = g_DiffuseTexture.Sample(PointSampler, In.vTexcoord);
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
     if (Out.vColor.a < 0.1f)
         discard;
 

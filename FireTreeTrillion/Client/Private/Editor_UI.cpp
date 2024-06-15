@@ -1004,7 +1004,6 @@ _bool CEditor_UI::Edit_Projection(CUIObject* _pUIObj)
 	ImGui::SliderFloat("##FarZ", &g_fFar, 0.2f, 1000.f, "%.2f", ProjFlag);
 
 	_float4x4 ProjMatrix = _pUIObj->Get_ProjMatrix();
-	m_UIObjDesc = _pUIObj->Get_UIObj_Desc();
 
 	//투영행렬 받아와서 변경 값 적용
 	if (!g_IsOrthoProj)
@@ -1019,8 +1018,10 @@ _bool CEditor_UI::Edit_Projection(CUIObject* _pUIObj)
 		XMStoreFloat4x4(&ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 	}
 	
+	LayerUIDesc.eUIProj = m_UIObjDesc.eUIProj;
+
 	_pUIObj->Set_ProjMatrix(ProjMatrix);
-	_pUIObj->Set_UIObj_Desc(m_UIObjDesc);
+	_pUIObj->Set_UIObj_Desc(LayerUIDesc);
 
 	return TRUE;
 }
