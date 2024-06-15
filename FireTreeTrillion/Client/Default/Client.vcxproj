@@ -183,6 +183,8 @@
     <ClInclude Include="..\Public\BladeKnight.h" />
     <ClInclude Include="..\Public\BladeKnightSword.h" />
     <ClInclude Include="..\Public\BladeKnight_State.h" />
+    <ClInclude Include="..\Public\BombOrbit.h" />
+    <ClInclude Include="..\Public\BombOrbitGlow.h" />
     <ClInclude Include="..\Public\BrontoBurt.h" />
     <ClInclude Include="..\Public\BrontoBurt_State.h" />
     <ClInclude Include="..\Public\Buffahorn.h" />
@@ -210,6 +212,7 @@
     <ClInclude Include="..\Public\Kabu.h" />
     <ClInclude Include="..\Public\Kabu_State.h" />
     <ClInclude Include="..\Public\KickableRock.h" />
+    <ClInclude Include="..\Public\KirbyBomb.h" />
     <ClInclude Include="..\Public\KirbyBoom_State.h" />
     <ClInclude Include="..\Public\Ladder.h" />
     <ClInclude Include="..\Public\Level_Intro.h" />
@@ -290,6 +293,8 @@
     <ClCompile Include="..\Private\BladeKnight.cpp" />
     <ClCompile Include="..\Private\BladeKnightSword.cpp" />
     <ClCompile Include="..\Private\BladeKnight_State.cpp" />
+    <ClCompile Include="..\Private\BombOrbit.cpp" />
+    <ClCompile Include="..\Private\BombOrbitGlow.cpp" />
     <ClCompile Include="..\Private\BrontoBurt.cpp" />
     <ClCompile Include="..\Private\BrontoBurt_State.cpp" />
     <ClCompile Include="..\Private\Buffahorn.cpp" />
@@ -316,6 +321,7 @@
     <ClCompile Include="..\Private\Kabu.cpp" />
     <ClCompile Include="..\Private\Kabu_State.cpp" />
     <ClCompile Include="..\Private\KickableRock.cpp" />
+    <ClCompile Include="..\Private\KirbyBomb.cpp" />
     <ClCompile Include="..\Private\Ladder.cpp" />
     <ClCompile Include="..\Private\Level_Intro.cpp" />
     <ClCompile Include="..\Private\LevelChanger.cpp" />

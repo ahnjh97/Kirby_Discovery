@@ -491,4 +491,3 @@ void CTestModel::Free()
     //for (auto& iter : m_mapRigidBodies)
     //    Safe_Release(iter.second);
 }
-

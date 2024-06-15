@@ -242,7 +242,6 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
 
-#pragma region 가라 이펙트 세팅
 	static _float fBbongTime{ 0.f };
 	fBbongTime += fTimeDelta;
 	if (.2f < fBbongTime)
@@ -250,28 +249,16 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		_float4 vMyPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
 		vMyPos += pTransformCom->Get_State(CTransform::STATE_LOOK) * .4f;
+
 		FXDesc.vInitPos = { vMyPos.x, vMyPos.y + .3f, vMyPos.z };
+		FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK)).y, 0.f };
 		FXDesc.vInitScale = { 1.3f, 1.3f, 1.3f };
-
-		_float3 vDir = pTransformCom->Get_State(CTransform::STATE_LOOK);
-		vDir.Normalize();
-		_float3 vLook = { 0.f, 0.f, 1.f };
-
-		_float fAngleLook = atan2f(vLook.z, vLook.x);
-		_float fAngleDiff = fAngleLook - atan2f(vDir.z, vDir.x);
-		fAngleDiff = ToDegree(fAngleDiff);
-
-		_float3 vAngle = { 0.f, fAngleDiff, 0.f };
-		FXDesc.vInitRot = vAngle;
 
 		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
 			return;
 
 		fBbongTime = 0.f;
-
 	}
-
-#pragma endregion
 
 	if (Kirby_Ladder_Logic(pKirby, Kirbydesc, pTransformCom))
 	{
@@ -374,6 +361,7 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	Turn_Z_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
 	pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
 }
+
 void CKirbyDefault_Run_State::OnStateExit()
 {
 	m_fRunStartTime = 0.f;
@@ -549,54 +537,20 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 				if (CUtils::Make_RandomInt(0, 1) > 0)
 					DESC(m_eEyeState) = CKirby::EYE_CLOSE;
 
-
-#pragma region 가라 이펙트 세팅
 				CMultiEffect::MULTI_FX_DESC FXDesc{};
-				_float4 vMyPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
-				//vMyPos += pTransformCom->Get_State(CTransform::STATE_LOOK) * 1.2f;
-				FXDesc.vInitPos = { vMyPos.x, vMyPos.y + .4f, vMyPos.z };
+				_float4 vKirbyPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+				_float4 vKirbyLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+
+				FXDesc.vInitPos = { vKirbyPos.x, vKirbyPos.y + .4f, vKirbyPos.z };
+				FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(vKirbyLook).y + 20.f, 0.f };
 				FXDesc.vInitScale = { 1.3f, 1.3f, 1.3f };
 
-				//_float3 vDir = -pTransformCom->Get_State(CTransform::STATE_LOOK);
-				//vDir.Normalize();
-				//_float3 vLook = { 0.f, 0.f, 1.f };
-
-				//_float fAngleLook = atan2f(vLook.z, vLook.x);
-				//_float fAngleDiff = fAngleLook - atan2f(vDir.z, vDir.x);
-				//fAngleDiff = ToDegree(fAngleDiff);
-
-				//_float3 vAngle = { 0.f, fAngleDiff, 0.f };
-
-				FXDesc.vInitRot = {0.f, CUtils::Make_RandomFloat(0.f, 360.f), 0.f};
-
-				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
+				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Smoke Fast"), &FXDesc)))
 					return;
 
-				FXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 360.f), 0.f };
-
-				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
+				FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(vKirbyLook).y - 20.f, 0.f };
+				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Smoke Fast"), &FXDesc)))
 					return;
-
-				FXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 360.f), 0.f };
-
-				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
-					return;
-
-				FXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 360.f), 0.f };
-
-				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
-					return;
-
-				FXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 360.f), 0.f };
-
-				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
-					return;
-
-				FXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 360.f), 0.f };
-
-				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
-					return;
-#pragma endregion
 
 			}
 			else
@@ -605,53 +559,20 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 				if (CUtils::Make_RandomInt(0, 1) > 0)
 					DESC(m_eEyeState) = CKirby::EYE_CLOSE;
 
-#pragma region 가라 이펙트 세팅
 				CMultiEffect::MULTI_FX_DESC FXDesc{};
-				_float4 vMyPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
-				//vMyPos += pTransformCom->Get_State(CTransform::STATE_LOOK) * 1.2f;
-				FXDesc.vInitPos = { vMyPos.x, vMyPos.y + .4f, vMyPos.z };
+				_float4 vKirbyPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+				_float4 vKirbyLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+
+				FXDesc.vInitPos = { vKirbyPos.x, vKirbyPos.y + .4f, vKirbyPos.z };
+				FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(vKirbyLook).y + 20.f, 0.f };
 				FXDesc.vInitScale = { 1.3f, 1.3f, 1.3f };
 
-				//_float3 vDir = -pTransformCom->Get_State(CTransform::STATE_LOOK);
-				//vDir.Normalize();
-				//_float3 vLook = { 0.f, 0.f, 1.f };
-
-				//_float fAngleLook = atan2f(vLook.z, vLook.x);
-				//_float fAngleDiff = fAngleLook - atan2f(vDir.z, vDir.x);
-				//fAngleDiff = ToDegree(fAngleDiff);
-
-				//_float3 vAngle = { 0.f, fAngleDiff, 0.f };
-
-				FXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 360.f), 0.f };
-
 				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
 					return;
 
-				FXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 360.f), 0.f };
-
+				FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(vKirbyLook).y - 20.f, 0.f };
 				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
 					return;
-
-				FXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 360.f), 0.f };
-
-				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
-					return;
-
-				FXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 360.f), 0.f };
-
-				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
-					return;
-
-				FXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 360.f), 0.f };
-
-				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
-					return;
-
-				FXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 360.f), 0.f };
-
-				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
-					return;
-#pragma endregion
 
 			}
 		}
@@ -796,6 +717,7 @@ void CKirbyDefault_Jump_State::Key_X(CGameObject* pGameObject, _float fTimeDelta
 		else if (pKirby->Get_AbilityType() == ABILITY_BOMB)
 		{
 			pController->Reset_FallVelocity();
+			//DESC(m_vMoveDir) = DESC(m_vTargetDir);
 			pKirby->Change_State(CKirby::BOOMSTATE_BOOMFALL, 60.f, true, false, CKirby::BODY_BOOMDEFAULT, CKirby::OFFSET_BOOM);
 		}
 	}

@@ -268,6 +268,9 @@
     <Filter Include="02.GameObjects\PhysXObject\MapObject\TrashCan">
       <UniqueIdentifier>{43a0db8c-5d6d-4b60-af2f-a7f2af0d1d47}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\Kirby\Bomb">
+      <UniqueIdentifier>{9bbb5c7f-e811-452d-aabb-3b3015d522c7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -530,6 +533,15 @@
     <ClInclude Include="..\Public\MapObject.h">
       <Filter>02.GameObjects\PhysXObject\MapObject</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\BombOrbit.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\Bomb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BombOrbitGlow.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\Bomb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KirbyBomb.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\Bomb</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -773,6 +785,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\MapObject.cpp">
       <Filter>02.GameObjects\PhysXObject\MapObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BombOrbit.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\Bomb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BombOrbitGlow.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\Bomb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KirbyBomb.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\Bomb</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -98,6 +98,7 @@ public: /* For.PipeLine */
 	_float4x4 Get_Transform_Inv(CPipeLine::TRANSFORMSTATE _eState) const;
 
 	_float4 Get_CamPosition() const;
+	_float4 Get_CamLook() const;
 
 	HRESULT Add_Camera(class CCamera* pCamera);
 	HRESULT Switch_CurCamera(_int iIdx);
