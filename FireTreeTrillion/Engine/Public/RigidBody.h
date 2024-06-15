@@ -61,8 +61,6 @@ public:
 	void				Add_Torque(_float3 vTorque);
 	void				Add_Velocity(_float3 vVelocity);
 
-	void				Overlap_Hitbox(CGameObject* pGameObject, _float4 vPos, _float fRadius = 1.f);
-
 public:
 	PxTransform			Get_PxTransform();
 

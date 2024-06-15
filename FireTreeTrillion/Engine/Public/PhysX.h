@@ -49,7 +49,7 @@ public:
     PxRigidDynamic* CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
     void            Kick_DynamicActor(_float3 _kickDirection, _float impulseMagnitude);
     PxRigidStatic*  CreateStaticActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
-    void            Overlap_Hitbox(CGameObject* pGameObject, _float4 vPos, _float fRadius);
+    //void            Overlap_Hitbox(CGameObject* pGameObject, _float4 vPos, _float fRadius);
 
 private:
     PxDefaultAllocator          mDefaultAllocatorCallback;

@@ -48,7 +48,7 @@ public:
 	virtual void	Render_IMGUI() override;
 #endif
 	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
-	virtual void	Collision_Overlap(CGameObject* pGameObject);
+	virtual void	Collision_Hitbox(CPhysXObject* pGameObject);
 
 public:
 	void Change_State(KABU_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);

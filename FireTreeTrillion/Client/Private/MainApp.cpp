@@ -364,7 +364,7 @@ void CMainApp::Free()
 
 	Safe_Release(m_pGameInstance);
 
-	CLevelChanger::Get_Instance()->Release_LevelChanger();
+	//CLevelChanger::Get_Instance()->Release_LevelChanger();
 	CGameInstance::Release_Engine();
 
 

@@ -21,7 +21,7 @@ CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 HRESULT CLevel_GamePlay::Initialize()
 {
 	m_pGameInstance->Set_RenderMode(CRenderer::MODE_TOOL);
-	CLevelChanger::Get_Instance()->Load();
+	//CLevelChanger::Get_Instance()->Load();
 
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
@@ -597,5 +597,5 @@ void CLevel_GamePlay::Free()
 	for(auto& tex : m_pEnvTexture)
 		Safe_Release(tex);
 
-	CLevelChanger::Get_Instance()->Save();
+	//CLevelChanger::Get_Instance()->Save();
 }
