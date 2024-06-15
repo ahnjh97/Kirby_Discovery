@@ -172,11 +172,12 @@ HRESULT CHUD_KirbyStatus::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPas
 	{
 		m_pTextureMask->Bind_ShaderResource(_pShaderCom, "g_MaskTexture", 0);
 		_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fHpRatio, sizeof(_float));
+		_pShaderCom->Bind_RawValue("g_fAlarmColor", &m_fAlarmColor, sizeof(_float));
 	}
 	if (TEXT("Gauge_Damage") == m_UIObjDesc.wstrUITag)
 	{
 		m_pTextureMask->Bind_ShaderResource(_pShaderCom, "g_MaskTexture", 0);
-		_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fHpRatio, sizeof(_float));
+		_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fHpSlowRatio, sizeof(_float));
 		_pShaderCom->Bind_RawValue("g_fAlarmColor", &m_fAlarmColor, sizeof(_float));
 	}
 
