@@ -29,7 +29,8 @@ public:
 	virtual HRESULT Render() override;
 
 	// 레이를 쏘다가, 도달한 첫 터레인에 포지션과 노말을 쏴줘서 위치시킨다.
-	void	Update_OrbitPosition(_fvector vPos, _fvector vNormal);
+	void	Update_OrbitPosition(_float4 vPos, _float4 vNormal);
+
 
 private:
 	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };

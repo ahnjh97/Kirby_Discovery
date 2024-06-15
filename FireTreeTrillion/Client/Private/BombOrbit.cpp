@@ -28,6 +28,7 @@ HRESULT CBombOrbit::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
+
 	return S_OK;
 }
 
@@ -37,12 +38,14 @@ _int CBombOrbit::Tick(_float fTimeDelta)
 		return OBJ_DEAD;
 
 
+
 	return OBJ_NOEVENT;
 }
 
 void CBombOrbit::Late_Tick(_float fTimeDelta)
 {
 	Compute_ViewZ();
+
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, this);
 }
 
@@ -61,10 +64,25 @@ HRESULT CBombOrbit::Render()
 	return S_OK;
 }
 
-void CBombOrbit::Update_OrbitPosition(_fvector vPos, _fvector vNormal)
+void CBombOrbit::Update_OrbitPosition(_float4 vPos, _float4 vNormal)
 {
+	_float4 vNewLook = -1.f * vNormal;
 
+	_vector vWorldUpVec =
+		(vNewLook == _float4(0.f, 1.f, 0.f, 0.f)) || (vNewLook == _float4(0.f, -1.f, 0.f, 0.f)) ?
+		_float4(0.0001f, 1.f, 0.f, 0.f) : _float4(0.f, 1.f, 0.f, 0.f);
 
+	vWorldUpVec = XMVector3Normalize(vWorldUpVec);
+
+	_vector vNewRight = XMVector3Normalize(XMVector3Cross(vNewLook, vWorldUpVec));
+	_vector vNewUp = XMVector3Normalize(XMVector3Cross(vNewLook, vNewRight));
+
+	m_pTransformCom->Set_State(CTransform::STATE_LOOK, vNewLook);
+	m_pTransformCom->Set_State(CTransform::STATE_RIGHT, vNewRight);
+	m_pTransformCom->Set_State(CTransform::STATE_UP, vNewUp);
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos - (vNewLook * 0.3f) );
+
+	m_pTransformCom->Set_Scaled(2.f, 2.f, 1.f);
 }
 
 HRESULT CBombOrbit::Add_Components()
@@ -80,7 +98,7 @@ HRESULT CBombOrbit::Add_Components()
 		return E_FAIL;
 
 	// ÃÑ ÀÌÆåÆ® (ºÒ²É)
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Moon"),
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_BombOrbit"),
 		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
 		return E_FAIL;
 
@@ -103,6 +121,15 @@ HRESULT CBombOrbit::Bind_ShaderResources()
 
 	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0)))
 		return E_FAIL;
+
+	_float3 vColor = { 1.f, 0.f, 0.f };
+	_float fAlpha = { 1.f };
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vRColor", &vColor, sizeof(_float3))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &fAlpha, sizeof(_float))))
+		return E_FAIL;
+
 
 	return S_OK;
 }

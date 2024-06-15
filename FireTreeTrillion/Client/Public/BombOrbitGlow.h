@@ -28,7 +28,12 @@ public:
 	virtual void Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
-	void	Update_GlowPosition(_fvector vPos);
+	// 궤적의 루트를 그려줌. 포지션 업데이트
+	void	Update_GlowPosition(_float4 vPos, _float4 vOriginPos);
+	// Render를 할지말지 결정한다.
+
+	_bool	RayCast_Terrain(const _float3 vMoveDir, _Inout_ _float4& vRayCastPos, _Inout_ _float4& vTerrainNormal);
+	_float4		m_vOriginPos = { 0.f, 0.f, 0.f, 0.f };
 
 private:
 	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };

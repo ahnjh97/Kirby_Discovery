@@ -796,6 +796,7 @@ void CKirbyDefault_Jump_State::Key_X(CGameObject* pGameObject, _float fTimeDelta
 		else if (pKirby->Get_AbilityType() == ABILITY_BOMB)
 		{
 			pController->Reset_FallVelocity();
+			//DESC(m_vMoveDir) = DESC(m_vTargetDir);
 			pKirby->Change_State(CKirby::BOOMSTATE_BOOMFALL, 60.f, true, false, CKirby::BODY_BOOMDEFAULT, CKirby::OFFSET_BOOM);
 		}
 	}

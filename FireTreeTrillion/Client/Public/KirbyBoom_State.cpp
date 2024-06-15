@@ -50,15 +50,22 @@ void CKirbyBoom_Fall_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == false)
 		{
+			DESC(m_bBombOrbit) = false;
 			DESC(m_eEyeState) = CKirby::EYE_ANGER;
 			pKirby->Change_State(CKirby::BOOMSTATE_THROWAIR, 60.f, false, false, CKirby::BODY_BOOMDEFAULT, CKirby::OFFSET_BOOM);
 		}
 		// X를 꾹 유지할 경우
 		else
 		{
-			if (JoyStick_controller(Kirbydesc, pCamera) == true)
+			DESC(m_bBombOrbit) = true;
+
+			if (JoyStick_On() == true)
 			{
-				Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta, 3.f);
+				DESC(m_vBombTargetDir) += JoyStick_controller_OtherDir(pCamera) * 0.15f;
+				_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+				_float4 vTargetDir = DESC(m_vBombTargetPos) - vPos;
+				vTargetDir.y = 0.f;
+				DESC(m_vMoveDir) = XMVector3Normalize(vTargetDir);
 			}
 
 			pController->FreeFall(pTransformCom, fTimeDelta, 1.2f);
@@ -249,6 +256,8 @@ void CKirbyBoom_ChargeAttack_State::OnStateUpdate(CGameObject* pGameObject, _flo
 
 	if (pKirby->Get_State() == CKirby::BOOMSTATE_THROWCHARGE)
 	{
+		DESC(m_bBombOrbit) = true;
+
 		// 방향키로 에임을 조절하는 순간 ROTATE로 넘어간다.
 		if (JoyStick_On() == true)
 		{
@@ -258,15 +267,27 @@ void CKirbyBoom_ChargeAttack_State::OnStateUpdate(CGameObject* pGameObject, _flo
 		// X 를 땠을 경우
 		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == false)
 		{
+			DESC(m_bBombOrbit) = false;
 			pKirby->Change_State(CKirby::BOOMSTATE_THROW, 60.f, false, false, CKirby::BODY_BOOMDEFAULT, CKirby::OFFSET_BOOM);
 		}
+
+
 	}
 	else if (pKirby->Get_State() == CKirby::BOOMSTATE_THROWROTATE)
 	{
+		DESC(m_bBombOrbit) = true;
+
+
 		// 방향키로 에임을 조절할 수 있다.
-		if (JoyStick_controller(Kirbydesc, pCamera) == true)
+		if (JoyStick_On() == true)
 		{
-			Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta, 3.f);
+			//Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta, 3.f);
+
+			DESC(m_vBombTargetDir) += JoyStick_controller_OtherDir(pCamera) * 0.15f;
+			_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+			_float4 vTargetDir = DESC(m_vBombTargetPos) - vPos;
+			vTargetDir.y = 0.f;
+			DESC(m_vMoveDir) = XMVector3Normalize(vTargetDir);
 		}
 		else
 		{
@@ -277,8 +298,11 @@ void CKirbyBoom_ChargeAttack_State::OnStateUpdate(CGameObject* pGameObject, _flo
 		// X 를 땠을 경우
 		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == false)
 		{
+			DESC(m_bBombOrbit) = false;
 			pKirby->Change_State(CKirby::BOOMSTATE_THROW, 60.f, false, false, CKirby::BODY_BOOMDEFAULT, CKirby::OFFSET_BOOM);
 		}
+
+
 	}
 
 }

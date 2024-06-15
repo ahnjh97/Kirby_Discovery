@@ -80,6 +80,8 @@
 #include "HUD.h"
 #include "HUD_KirbyStatus.h"
 #include "HUD_StarPoint.h"
+#include "BombOrbit.h"
+#include "BombOrbitGlow.h"
 
 
 // æ∆¿Ã≈€
@@ -235,6 +237,9 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kirby"), CKirby);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KirbyWeapons"), CKirbyWeapons);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KirbyArmours"), CKirbyArmours);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BombOrbit"), CBombOrbit);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BombOrbitGlow"), CBombOrbitGlow);
+
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Awoofy"), CAwoofy);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Rabbit"), CRabbit);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Buffahorn"), CBuffahorn);
@@ -875,6 +880,13 @@ HRESULT CLoader::Add_KirbyFaceTexture(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "mouth_surprise", "KirbyFace/mouth_surprise.png")))
 		return E_FAIL;
+
+	// Kirby Guide UI
+	if (FAILED(Add_Texture(eLevel, "BombOrbit", "KirbyBombOrbit/BombOrbit.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "BombOrbitGlow", "KirbyBombOrbit/BombOrbitGlow.dds")))
+		return E_FAIL;
+
 
 	// Awoofy Eye
 	if (FAILED(Add_Texture(eLevel, "Awoofy_Eye", "AwoofyEye/NormalEnemyEye%d.dds", 5)))

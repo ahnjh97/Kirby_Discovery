@@ -28,6 +28,8 @@ HRESULT CBombOrbitGlow::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
+	m_pTransformCom->Set_Scaled(0.2f, 0.2f, 0.2f);
+
 	return S_OK;
 }
 
@@ -44,6 +46,7 @@ void CBombOrbitGlow::Late_Tick(_float fTimeDelta)
 {
 	Billboard(fTimeDelta);
 	Compute_ViewZ();
+
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, this);
 }
 
@@ -52,7 +55,7 @@ HRESULT CBombOrbitGlow::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Begin(POSTEX_ALPHABLEND)))
+	if (FAILED(m_pShaderCom->Begin(POSTEX_DEFAULT)))
 		return E_FAIL;
 	if (FAILED(m_pVIBufferCom->Bind_Buffers()))
 		return E_FAIL;
@@ -62,10 +65,33 @@ HRESULT CBombOrbitGlow::Render()
 	return S_OK;
 }
 
-void CBombOrbitGlow::Update_GlowPosition(_fvector vPos)
+void CBombOrbitGlow::Update_GlowPosition(_float4 vPos, _float4 vOriginPos)
 {
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+	m_vOriginPos = vOriginPos;
+}
 
+_bool CBombOrbitGlow::RayCast_Terrain(const _float3 vMoveDir, _Inout_ _float4& vRayCastPos, _Inout_ _float4& vTerrainNormal)
+{
+	PxVec3 rayOrigin = PxVec3((_float)m_vOriginPos.x, (_float)m_vOriginPos.y, (_float)m_vOriginPos.z);
+	PxVec3 rayDirection = PxVec3(vMoveDir.x, vMoveDir.y, vMoveDir.z);
+	_float fMaxDistance = 3.f;
 
+	PxRaycastHit hit;
+	PxRaycastBuffer hitBuffer;
+	PxQueryFilterData filterData(PxQueryFlag::eSTATIC);
+
+	_bool isRayCast = m_pGameInstance->Get_Scene()->raycast(rayOrigin, rayDirection, fMaxDistance, hitBuffer, PxHitFlag::eNORMAL, filterData);
+
+	if (isRayCast == true)
+	{
+		hit = hitBuffer.block;
+		vRayCastPos = XMVectorSetW(CUtils::To_Vector(hit.position), 1.f);
+		vTerrainNormal = XMVectorSetW(CUtils::To_Vector(hit.normal), 0.f);
+		return true;
+	}
+	// ·¹ÀÌ ½ú´Âµ¥ ÅÍ·¹ÀÎÀÌ ¾ø¾ú´Ù.
+	return false;
 }
 
 HRESULT CBombOrbitGlow::Add_Components()
@@ -81,7 +107,7 @@ HRESULT CBombOrbitGlow::Add_Components()
 		return E_FAIL;
 
 	// ÃÑ ÀÌÆåÆ® (ºÒ²É)
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Moon"),
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_BombOrbitGlow"),
 		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
 		return E_FAIL;
 
