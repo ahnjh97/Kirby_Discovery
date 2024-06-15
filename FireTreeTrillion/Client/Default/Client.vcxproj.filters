@@ -250,6 +250,9 @@
     <Filter Include="02.GameObjects\Map\Ladder">
       <UniqueIdentifier>{43deb6bb-9178-48a0-9aee-6bd3fca04327}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\Kirby\Bomb">
+      <UniqueIdentifier>{9bbb5c7f-e811-452d-aabb-3b3015d522c7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -499,9 +502,15 @@
     </ClInclude>
     <ClInclude Include="..\Public\Ladder.h">
       <Filter>02.GameObjects\Map\Ladder</Filter>
-	</ClInclude>
-	<ClInclude Include="..\Public\Trigger.h">
+    </ClInclude>
+    <ClInclude Include="..\Public\Trigger.h">
       <Filter>02.GameObjects\Map\Trigger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BombOrbit.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\Bomb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BombOrbitGlow.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\Bomb</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -734,9 +743,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\Ladder.cpp">
       <Filter>02.GameObjects\Map\Ladder</Filter>
-	</ClCompile>
-	<ClCompile Include="..\Private\Trigger.cpp">
+    </ClCompile>
+    <ClCompile Include="..\Private\Trigger.cpp">
       <Filter>02.GameObjects\Map\Trigger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BombOrbit.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\Bomb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BombOrbitGlow.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\Bomb</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

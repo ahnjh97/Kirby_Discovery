@@ -3,6 +3,8 @@
 #include "Client_Defines.h"
 #include "Character.h"
 #include "Effect.h"
+#include "BombOrbitGlow.h"
+#include "BombOrbit.h"
 
 #define	INFO(state) m_tKirbyInfo.state
 
@@ -61,7 +63,6 @@ public:
 		// 다시 바로 사다리를 타는 행위를 막는다.
 		_bool			m_bBlockLadder = { false };
 
-
 		// 점프 중 재입력 방지
 		_bool			m_bRePressBlock = { false };
 
@@ -96,6 +97,14 @@ public:
 		STATE			m_ePreAttackState = { SWORDSTATE_DECISIVESLASH };
 		_bool			m_bWalkingCharge = { true };
 		_bool			m_bUpWardSlash = { false };
+
+		// Ability Bomb
+		// 포물선 점선을 랜더할 상황인가?
+		_bool			m_bBombOrbit = { false };
+		// 폭탄의 목표 타겟 (커비 기준 방향벡터이다)
+		_float4			m_vBombTargetDir = { 0.f, 0.f, 0.f, 0.f };
+		// 폭탄의 목표 최종 타겟
+		_float4			m_vBombTargetPos = { 0.f, 0.f, 0.f, 0.f };
 
 	}KIRBY_INFODESC;
 
@@ -180,6 +189,16 @@ private:
 	_float				  m_fOverPowerTime = { 0.f };
 	_float				  m_fFlashOverPowerTime = { 0.f };
 	_float				  m_fPreHp = { 0.f };
+
+	// For Bomb
+	vector<CBombOrbitGlow*> m_OrbitGlows;
+	CBombOrbit* m_pOrbit = { nullptr };
+	void Ready_BombOrbit();
+	void Update_BombOrbit(_float fTimeDelta);
+	_float4 Compute_Parabola(_float fOrbitTime, _float4 vStartPos, _float4 vEndPos);
+	_bool				  m_bInitializeTargetPos = { true };
+	_float				  m_fOrbitTime = { 0.f };
+	_float				  m_fOrbitRenderDelay = { 0.f };
 
 	_int				  m_iTestAnim = { 0 };
 
