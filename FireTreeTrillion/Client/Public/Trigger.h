@@ -13,7 +13,7 @@ class CTrigger final : public CPhysXObject
 {
 public:
 	enum TRIGGER {  TRIGGER_CAM, TRIGGER_SHADER, TRIGGER_STAR, 
-					TRIGGER_HITBOX = 50, TRIGGER_ITEM, TRIGGER_END };
+					TRIGGER_ITEM = 50, TRIGGER_HITBOX, TRIGGER_END };
 
 
 	typedef struct : public GAMEOBJECT_DESC
