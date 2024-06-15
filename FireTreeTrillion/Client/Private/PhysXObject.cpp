@@ -98,9 +98,9 @@ void CPhysXObject::Set_PhyXState(PHYXOBJECT_CURSTATE eState)
 
 		//m_pTransformCom->Get_Scaled();
 
-		FXDesc.vInitPos = { 0.f, 0.f, 1.f };
+		FXDesc.vInitPos = { 0.f, 0.f, 0.5f };
 		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(m_pTransformCom->Get_State(CTransform::STATE_UP));
-		FXDesc.vInitScale = { 3.f, 3.f, 3.f };
+		FXDesc.vInitScale = { 5.f, 5.f, 5.f };
 		FXDesc.pSocketMatrix = &m_EffectSocket;
 
 		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_FlyingBubble_v1"), &FXDesc)))
