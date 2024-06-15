@@ -626,8 +626,6 @@ HRESULT CLoader::Add_FXTexture()
 	hr = Add_Texture(LEVEL_STATIC, "FX_Collide", "Effects/Basic/common_hit.png");	CHECK_FAILED(hr);
 
 
-
-
 	hr = Add_Texture(LEVEL_STATIC, "FX_VacuumTornado", "Effects/Basic/wind01.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_VacuumWind", "Effects/Basic/scroll07.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_VacuumDGB", "Effects/Basic/twinkle02.png");	CHECK_FAILED(hr);
@@ -662,6 +660,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("VacuumDGB", TYPE_NONANIM);
 
 		m_vecModelInfo.emplace_back("SwordTrail", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("SwordSlash_hrzt", TYPE_NONANIM);
 
 	}
 	else if (eLevel == LEVEL_LOGO)
