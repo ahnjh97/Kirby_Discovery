@@ -52,14 +52,12 @@ HRESULT CLayerUI::Initialize(void* _pArg)
 
 	if (PROJ_ORTHO == m_UIObjDesc.eUIProj)
 	{
-		m_UIObjDesc.vDegree.z = (*LayerUI_Desc).vDegree.z;
 		m_pTransformCom->Rotation(XMVectorSet(AXIS_Z), XMConvertToRadians(m_UIObjDesc.vDegree.z));
 		XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 	}
 
 	if (PROJ_PERSPEC == m_UIObjDesc.eUIProj)
 	{
-		m_UIObjDesc.vDegree = (*LayerUI_Desc).vDegree;
 		m_pTransformCom->Rotation(XMVectorSet(AXIS_X), XMConvertToRadians(m_UIObjDesc.vDegree.x));
 		m_pTransformCom->Rotation(XMVectorSet(AXIS_Y), XMConvertToRadians(m_UIObjDesc.vDegree.y));
 		m_pTransformCom->Rotation(XMVectorSet(AXIS_Z), XMConvertToRadians(m_UIObjDesc.vDegree.z));
@@ -92,7 +90,7 @@ HRESULT CLayerUI::Render()
 			Render_OrthoProj(m_pShaderCom, m_pTransformCom);
 
 		if (PROJ_PERSPEC == m_UIObjDesc.eUIProj)
-			Render_PerspecProj(m_pShaderCom, m_pTransformCom); //원근 회전의 데이터는 잘 로드되나 렌더 시에 실적용이 안되는 현상
+			Render_PerspecProj(m_pShaderCom, m_pTransformCom);
 	}
 
 	if (UI_FONT == m_UIObjDesc.eUIType)

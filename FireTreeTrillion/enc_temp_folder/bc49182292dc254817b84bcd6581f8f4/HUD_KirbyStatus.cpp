@@ -93,6 +93,9 @@ HRESULT CHUD_KirbyStatus::Render()
 {
 	if (UI_TEXTURE == m_UIObjDesc.eUIType)
 	{
+		if (PROJ_ORTHO == m_UIObjDesc.eUIProj)
+			Render_OrthoProj(m_pShaderCom, m_pTransformCom);
+
 		if (PROJ_PERSPEC == m_UIObjDesc.eUIProj)
 			Render_PerspecProj(m_pShaderCom, m_pTransformCom);
 	}
@@ -136,6 +139,102 @@ HRESULT CHUD_KirbyStatus::Add_Components()
 	return S_OK;
 }
 
+HRESULT CHUD_KirbyStatus::Render_OrthoProj(CShader* _pShaderCom, CTransform* _pTransCom)
+{
+	CHECK_NULLPTR(_pShaderCom);
+
+	// 분홍색 게이지
+	if (m_UIObjDesc.wstrUITag == TEXT("Gauge"))
+	{
+		if (FAILED(_pTransCom->Bind_ShaderResource(_pShaderCom, "g_WorldMatrix")))
+			return E_FAIL;
+
+		//셰이더 파일의 매트릭스 정보를 가져와 바인딩
+		if (FAILED(_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+			return E_FAIL;
+
+		if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+			return E_FAIL;
+
+		//셰이더 파일의 텍스처 정보를 가져와 바인딩
+		if (FAILED(m_pTextureCom->Bind_ShaderResource(_pShaderCom, "g_DiffuseTexture", m_iTexIndex)))
+			return E_FAIL;
+		if (FAILED(m_pTextureMask->Bind_ShaderResource(_pShaderCom, "g_MaskTexture", 0)))
+			return E_FAIL;
+
+		//셰이더의 원시데이터 가져와 저장
+		if (FAILED(_pShaderCom->Bind_RawValue("g_vRColor", &m_UIObjDesc.vColorRGB, sizeof(_float3))))
+			return E_FAIL;
+		if (FAILED(_pShaderCom->Bind_RawValue("g_fAlpha", &m_UIObjDesc.fAlpha, sizeof(_float))))
+			return E_FAIL;
+		if (FAILED(_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fHpRatio, sizeof(_float))))
+			return E_FAIL;
+
+		//Begin() > Apply() 함수 호출 전 셰이더 전역 데이터를 저장해야함
+		if (FAILED(_pShaderCom->Begin(7)))
+			return E_FAIL;
+
+		if (FAILED(Bind_VIBuffer(m_pVIBufferCom)))
+			return E_FAIL;
+
+		return S_OK;
+	}
+
+	// 노란색 게이지
+	else if (m_UIObjDesc.wstrUITag == TEXT("Gauge_Damage"))
+	{
+		if (FAILED(_pTransCom->Bind_ShaderResource(_pShaderCom, "g_WorldMatrix")))
+			return E_FAIL;
+
+		//셰이더 파일의 매트릭스 정보를 가져와 바인딩
+		if (FAILED(_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+			return E_FAIL;
+
+		if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+			return E_FAIL;
+
+		//셰이더 파일의 텍스처 정보를 가져와 바인딩
+		if (FAILED(m_pTextureCom->Bind_ShaderResource(_pShaderCom, "g_DiffuseTexture", m_iTexIndex)))
+			return E_FAIL;
+		if (FAILED(m_pTextureMask->Bind_ShaderResource(_pShaderCom, "g_MaskTexture", 0)))
+			return E_FAIL;
+
+		//셰이더의 원시데이터 가져와 저장
+		if (FAILED(_pShaderCom->Bind_RawValue("g_vRColor", &m_UIObjDesc.vColorRGB, sizeof(_float3))))
+			return E_FAIL;
+		if (FAILED(_pShaderCom->Bind_RawValue("g_fAlpha", &m_UIObjDesc.fAlpha, sizeof(_float))))
+			return E_FAIL;
+		if (FAILED(_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fHpSlowRatio, sizeof(_float))))
+			return E_FAIL;
+		if (FAILED(_pShaderCom->Bind_RawValue("g_fAlarmColor", &m_fAlarmColor, sizeof(_float))))
+			return E_FAIL;
+
+		//Begin() > Apply() 함수 호출 전 셰이더 전역 데이터를 저장해야함
+		if (FAILED(_pShaderCom->Begin(8)))
+			return E_FAIL;
+
+		if (FAILED(Bind_VIBuffer(m_pVIBufferCom)))
+			return E_FAIL;
+	}
+	else
+	{
+		if (FAILED(_pTransCom->Bind_ShaderResource(_pShaderCom, "g_WorldMatrix")))
+			return E_FAIL;
+
+		//셰이더 파일의 매트릭스 정보를 가져와 바인딩
+		if (FAILED(_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+			return E_FAIL;
+
+		if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+			return E_FAIL;
+
+		if (FAILED(Bind_ShaderResources(_pShaderCom, PS_ALPHABLEND, m_pTextureCom, m_iTexIndex)))
+			return E_FAIL;
+	}
+
+	return S_OK;
+}
+
 HRESULT CHUD_KirbyStatus::Render_PerspecProj(CShader* _pShaderCom, CTransform* _pTransCom)
 {
 	CHECK_NULLPTR(_pShaderCom);
@@ -155,7 +254,7 @@ HRESULT CHUD_KirbyStatus::Render_PerspecProj(CShader* _pShaderCom, CTransform* _
 	if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
-	SHADER_PS eUIPass = { PS_ALPHABLEND }; //셰이더 패스 기본값
+	SHADER_PS eUIPass = { PS_ALPHABLEND };
 	if (TEXT("Gauge") == m_UIObjDesc.wstrUITag){	eUIPass = PS_MASK_HP;	}
 	if (TEXT("Gauge_Damage") == m_UIObjDesc.wstrUITag){	eUIPass = PS_MASK_HPDAMAGE;	}
 
@@ -168,12 +267,7 @@ HRESULT CHUD_KirbyStatus::Render_PerspecProj(CShader* _pShaderCom, CTransform* _
 HRESULT CHUD_KirbyStatus::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTexture* _pTextureCom, _uint _iTexIndex)
 {
 
-	if (TEXT("Gauge") == m_UIObjDesc.wstrUITag)
-	{
-		m_pTextureMask->Bind_ShaderResource(_pShaderCom, "g_MaskTexture", 0);
-		_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fHpRatio, sizeof(_float));
-	}
-	if (TEXT("Gauge_Damage") == m_UIObjDesc.wstrUITag)
+	if (TEXT("Gauge") == m_UIObjDesc.wstrUITag || TEXT("Gauge_Damage") == m_UIObjDesc.wstrUITag)
 	{
 		m_pTextureMask->Bind_ShaderResource(_pShaderCom, "g_MaskTexture", 0);
 		_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fHpRatio, sizeof(_float));

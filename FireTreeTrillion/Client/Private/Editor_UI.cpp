@@ -517,9 +517,7 @@ _bool CEditor_UI::Window_Properties()
 						Edit_Transform(m_LayerUIs[g_iSelectUI]);
 						Edit_Projection(m_LayerUIs[g_iSelectUI]);
 					}
-
 				}
-
 				ImGui::EndTabItem();
 			}
 			ImGui::EndTabBar();
@@ -987,6 +985,9 @@ _bool CEditor_UI::Edit_Projection(CUIObject* _pUIObj)
 	if (ImGui::RadioButton(u8"Ortho 직교", g_IsOrthoProj)) { g_IsOrthoProj = TRUE; }
 	ImGui::SameLine();
 	if (ImGui::RadioButton(u8"Perspect 원근", !g_IsOrthoProj)) { g_IsOrthoProj = FALSE; }
+
+	UIOBJ_DESC LayerUIDesc = _pUIObj->Get_UIObj_Desc();
+	m_UIObjDesc.eUIProj = LayerUIDesc.eUIProj;
 
 	_float fFOVDegree = XMConvertToDegrees(g_fFOV);
 
