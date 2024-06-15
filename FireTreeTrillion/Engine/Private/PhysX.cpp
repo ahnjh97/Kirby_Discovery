@@ -35,7 +35,7 @@ HRESULT CPhysX::Initialize()
     m_pPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *m_pFoundation, mToleranceScale, true, m_pPvd);
     m_pEventCallBack = new CEventCallBack();
     PxSceneDesc sceneDesc(m_pPhysics->getTolerancesScale());
-    sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
+    sceneDesc.gravity = PxVec3(0.0f, -9.81f * 3.f, 0.0f);
     m_pDispatcher = PxDefaultCpuDispatcherCreate(2);
     sceneDesc.cpuDispatcher = m_pDispatcher;
     sceneDesc.simulationEventCallback = m_pEventCallBack;

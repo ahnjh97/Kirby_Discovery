@@ -57,6 +57,7 @@
 #include "Kirby.h"
 #include "BombOrbitGlow.h"
 #include "BombOrbit.h"
+#include "KirbyBomb.h"
 
 
 // ∏ÛΩ∫≈Õ
@@ -239,6 +240,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KirbyArmours"), CKirbyArmours);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BombOrbit"), CBombOrbit);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BombOrbitGlow"), CBombOrbitGlow);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KirbyBomb"), CKirbyBomb);
+
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Awoofy"), CAwoofy);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Rabbit"), CRabbit);
@@ -741,8 +744,10 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// For Kirby Weapon
 		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("KirbyBombDefault", TYPE_ANIM, 1.f, 180.f);
+
 		// For Kirby Armour
+		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
 
 

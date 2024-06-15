@@ -512,6 +512,9 @@
     <ClInclude Include="..\Public\BombOrbitGlow.h">
       <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\Bomb</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\KirbyBomb.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\Bomb</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -751,6 +754,9 @@
       <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\Bomb</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BombOrbitGlow.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\Bomb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KirbyBomb.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\Bomb</Filter>
     </ClCompile>
   </ItemGroup>

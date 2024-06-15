@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "KirbyBoom_State.h"
 #include "Kirby_State_Function.h"
+#include "KirbyBomb.h"
 
 #pragma region BOOM JUMP STATE
 
@@ -53,6 +54,19 @@ void CKirbyBoom_Fall_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			DESC(m_bBombOrbit) = false;
 			DESC(m_eEyeState) = CKirby::EYE_ANGER;
 			pKirby->Change_State(CKirby::BOOMSTATE_THROWAIR, 60.f, false, false, CKirby::BODY_BOOMDEFAULT, CKirby::OFFSET_BOOM);
+
+			_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+
+			CKirbyBomb::KIRBYBOMB_DESC desc = {};
+			desc.vPos = pTransformCom->Get_State(CTransform::STATE_POSITION) + vLook;
+			desc.vPos.y += 1.f;
+			desc.vDir = vLook;
+			desc.vDir.y += 1.f;
+			desc.vDir = XMVector3Normalize(desc.vDir);
+			desc.fPower = 600.f;
+			if (FAILED(m_pGameInstance->Add_Clone(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_Bomb"), TEXT("Prototype_GameObject_KirbyBomb"), &desc)))
+				return;
+
 		}
 		// X를 꾹 유지할 경우
 		else
@@ -71,6 +85,7 @@ void CKirbyBoom_Fall_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			pController->FreeFall(pTransformCom, fTimeDelta, 1.2f);
 			if (pController->Is_Terrain())
 			{
+
 				pKirby->Change_State(CKirby::BOOMSTATE_THROWCHARGE, 60.f, true, true, CKirby::BODY_BOOMDEFAULT, CKirby::OFFSET_BOOM);
 			}
 		}
@@ -194,6 +209,18 @@ void CKirbyBoom_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		{
 			if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS))
 			{
+				_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+
+				CKirbyBomb::KIRBYBOMB_DESC desc = {};
+				desc.vPos = pTransformCom->Get_State(CTransform::STATE_POSITION) + vLook;
+				desc.vPos.y += 1.f;
+				desc.vDir = vLook;
+				desc.vDir.y += 1.f;
+				desc.vDir = XMVector3Normalize(desc.vDir);
+				desc.fPower = 300.f;
+				if (FAILED(m_pGameInstance->Add_Clone(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_Bomb"), TEXT("Prototype_GameObject_KirbyBomb"), &desc)))
+					return;
+
 				pKirby->Change_State(CKirby::BOOMSTATE_THROWCHARGE, 60.f, true, false, CKirby::BODY_BOOMDEFAULT, CKirby::OFFSET_BOOM);
 			}
 		}

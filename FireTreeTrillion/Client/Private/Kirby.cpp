@@ -163,7 +163,7 @@ void CKirby::Late_Tick(_float fTimeDelta)
 	m_pArmours->Late_Tick(m_fTimeDelta);
 
 
-	if (m_fOrbitRenderDelay > 0.1f)
+	if (m_fOrbitRenderDelay > 0.5f)
 	{
 		for (auto& Glow : m_OrbitGlows)
 			Glow->Late_Tick(fTimeDelta);
@@ -459,7 +459,7 @@ void CKirby::Update_BombOrbit(_float fTimeDelta)
 				bFind = true;
 				m_pOrbit->Update_OrbitPosition(vOrbitPos, vOrbitLook);
 
-				if (m_fOrbitRenderDelay > 0.1f)
+				if (m_fOrbitRenderDelay > 0.5f)
 					m_pOrbit->Late_Tick(fTimeDelta);
 			}
 		}
