@@ -51,7 +51,7 @@ _int CPhysXObject::Ready_Dead()
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.vInitPos = static_cast<_float3>(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(m_pGameInstance->Get_CamLook());
-		FXDesc.vInitScale = { 3.f, 3.f, 3.f };
+		FXDesc.vInitScale = { 1.8f, 1.8f, 1.8f };
 
 		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_ObjDead"), &FXDesc)))
 			return OBJ_DEAD;
@@ -100,7 +100,7 @@ void CPhysXObject::Set_PhyXState(PHYXOBJECT_CURSTATE eState)
 
 		FXDesc.vInitPos = { 0.f, 0.f, 1.f };
 		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(m_pTransformCom->Get_State(CTransform::STATE_UP));
-		FXDesc.vInitScale = { 4.f, 4.f, 4.f };
+		FXDesc.vInitScale = { 3.f, 3.f, 3.f };
 		FXDesc.pSocketMatrix = &m_EffectSocket;
 
 		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_FlyingBubble_v1"), &FXDesc)))
@@ -116,7 +116,7 @@ void CPhysXObject::Set_PhyXState(PHYXOBJECT_CURSTATE eState)
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.vInitPos = static_cast<_float3>(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(m_pGameInstance->Get_CamLook());
-		FXDesc.vInitScale = { 3.f, 3.f, 3.f };
+		FXDesc.vInitScale = { 1.8f, 1.8f, 1.8f };
 
 		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
 			return;
