@@ -44,6 +44,22 @@ _int CPhysXObject::Tick(_float fTimeDelta)
 	return OBJ_NOEVENT;
 }
 
+_int CPhysXObject::Ready_Dead()
+{
+	if (m_ePhyXState != PO_KIRBYMOUTH)
+	{
+		CMultiEffect::MULTI_FX_DESC FXDesc{};
+		FXDesc.vInitPos = static_cast<_float3>(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(m_pGameInstance->Get_CamLook());
+		FXDesc.vInitScale = { 3.f, 3.f, 3.f };
+
+		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_ObjDead"), &FXDesc)))
+			return OBJ_DEAD;
+	}
+
+	return OBJ_DEAD;
+}
+
 void CPhysXObject::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
@@ -97,20 +113,18 @@ void CPhysXObject::Set_PhyXState(PHYXOBJECT_CURSTATE eState)
 
 		Delete_AllEffect();
 
-		//TODO: 충돌 함수 추가해야해
-		/*
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
+		FXDesc.vInitPos = static_cast<_float3>(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(m_pGameInstance->Get_CamLook());
+		FXDesc.vInitScale = { 3.f, 3.f, 3.f };
 
-		FXDesc.vInitPos = { 0.f, .3f, 0.f };
-		FXDesc.vInitScale = { 5.f, 5.f, 5.f };
-		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-
-
-		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_FlyingBubble_v1"), &FXDesc)))
+		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
 			return;
 
-		Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
-		*/
+
+
+
+
 	}
 }
 
@@ -147,3 +161,5 @@ void CPhysXObject::Free()
 		Safe_Release(fx);
 	m_FXList.clear();
 }
+
+

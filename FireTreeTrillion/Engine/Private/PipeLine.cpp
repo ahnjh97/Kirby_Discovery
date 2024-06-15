@@ -51,8 +51,9 @@ void CPipeLine::Bind_Pipeline()
 		m_TransformInverseMatrices[i] = m_TransformMatrices[i].Invert();
 	}
 
-	//memcpy(&m_vCamPos, &m_PipelineInvMatrices[D3DPS_VIEW].m[3][0], sizeof(_float4));
 	m_vCamPosition = Pos(m_TransformInverseMatrices->Translation());
+	//m_vCamLook = CUtils::Get_State_Vector_Matrix(m_TransformInverseMatrices[D3DTS_VIEW], CUtils::STATE_LOOK);
+	m_vCamLook = static_cast<_float4>(m_TransformInverseMatrices[D3DTS_VIEW].Backward());
 }
 
 HRESULT CPipeLine::Initialize()

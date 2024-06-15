@@ -23,6 +23,7 @@ public:
 	_float4x4	Get_Transform_Inv(TRANSFORMSTATE _eState) const { return m_TransformInverseMatrices[_eState]; }
 
 	_float4		Get_CamPosition /*_Float4*/() const { return m_vCamPosition; }
+	_float4		Get_CamLook /*_Float4*/() const { return m_vCamLook; }
 
 
 public:
@@ -66,6 +67,7 @@ private:
 	_float4x4			m_TransformMatrices[D3DTS_END];
 	_float4x4			m_TransformInverseMatrices[D3DTS_END];
 	_float4				m_vCamPosition;
+	_float4				m_vCamLook;
 
 
 public:

@@ -70,7 +70,7 @@ HRESULT CBrontoBurt::Initialize(void* pArg)
 _int CBrontoBurt::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
-		return OBJ_DEAD;
+		return Ready_Dead();
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
