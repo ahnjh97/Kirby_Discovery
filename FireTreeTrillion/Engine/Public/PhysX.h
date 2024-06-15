@@ -12,7 +12,6 @@ private:
 
 public:
     HRESULT Initialize();
-    HRESULT Ready_CollisionContents();
     void    Tick(_float fTimeDelta);
 
     // For Animation

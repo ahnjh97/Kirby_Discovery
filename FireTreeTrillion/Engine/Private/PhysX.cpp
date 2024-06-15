@@ -110,31 +110,29 @@ void CPhysX::Ready_TestGround()
 
 void CPhysX::Test()
 {
-    // create simulation
-    m_pMaterial = m_pPhysics->createMaterial(0.5f, 0.5f, 0.6f);
-    PxRigidStatic* groundPlane = PxCreatePlane(*m_pPhysics, PxPlane(0, 1, 0, 0), *m_pMaterial);
-    m_pScene->addActor(*groundPlane);
-
-    float halfExtent = .5f;
-    m_pShape = m_pPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *m_pMaterial);
-    PxU32 size = 30;
-    PxTransform t(PxVec3(0));
-
-    PxTransform localTm(PxVec3(0, 0, 0) * halfExtent);
-    m_pRigidDynamic = m_pPhysics->createRigidDynamic(t.transform(localTm));
-    m_pRigidDynamic->attachShape(*m_pShape);
-    PxRigidBodyExt::updateMassAndInertia(*m_pRigidDynamic, 10.0f);
-    m_pScene->addActor(*m_pRigidDynamic);
+//    // create simulation
+//    m_pMaterial = m_pPhysics->createMaterial(0.5f, 0.5f, 0.6f);
+//    PxRigidStatic* groundPlane = PxCreatePlane(*m_pPhysics, PxPlane(0, 1, 0, 0), *m_pMaterial);
+//    m_pScene->addActor(*groundPlane);
+//
+//    float halfExtent = .5f;
+//    m_pShape = m_pPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *m_pMaterial);
+//    PxU32 size = 30;
+//    PxTransform t(PxVec3(0));
+//
+//    PxTransform localTm(PxVec3(0, 0, 0) * halfExtent);
+//    m_pRigidDynamic = m_pPhysics->createRigidDynamic(t.transform(localTm));
+//    m_pRigidDynamic->attachShape(*m_pShape);
+//    PxRigidBodyExt::updateMassAndInertia(*m_pRigidDynamic, 10.0f);
+//    m_pScene->addActor(*m_pRigidDynamic);
 }
 
 _float4x4 CPhysX::Update(_fmatrix matrix)
 {
-    //PxVec3 pos = CUtils::To_Float4x4(matrix).getPosition();
-    //PxTransform newPose(pos);
-    //m_pRigidDynamic->setGlobalPose(newPose);
-    PxTransform trans = m_pRigidDynamic->getGlobalPose();
-    _float4x4 matPos = CUtils::To_Float4x4(trans);
-    return matPos;
+    //PxTransform trans = m_pRigidDynamic->getGlobalPose();
+    //_float4x4 matPos = CUtils::To_Float4x4(trans);
+    //return matPos;
+    return _float4x4();
 }
 
 void CPhysX::AddActor(physx::PxActor& pActor)
@@ -249,9 +247,11 @@ PxRigidDynamic* CPhysX::CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, 
 
     pDynamicActor->attachShape(*pShape);
     m_pScene->addActor(*pDynamicActor);
+    //physx::PxRigidBodyExt::updateMassAndInertia(*pDynamicActor, 10000.f);
+
     pMesh->release();
     pShape->release(); 
-    m_pRigidDynamic = pDynamicActor;
+    //m_pRigidDynamic = pDynamicActor;
     return pDynamicActor;
 }
 
@@ -368,9 +368,6 @@ void CPhysX::Free()
         m_pShape->release();
 
     m_pControllerManager->release();
-
-    if (m_pRigidDynamic != nullptr)
-        m_pRigidDynamic->release();
 
     Safe_Delete(m_pEventCallBack);
 
