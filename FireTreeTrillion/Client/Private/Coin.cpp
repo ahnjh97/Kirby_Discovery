@@ -81,7 +81,8 @@ _int CCoin::Tick(_float fTimeDelta)
 		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), m_fTimeDelta, 270.f);
 	}
 
-	//m_pTrigger->Tick(m_fTimeDelta);
+	//if(m_pTrigger)
+	m_pTrigger->Tick(m_fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
@@ -174,11 +175,6 @@ HRESULT CCoin::Add_Components()
 	m_pControllerCom->Set_Object(this);*/
 
 	/* For.Com_Trigger */
-
-	//CKirbyArmours::KIRBYARMOURS_DESC ArmourDesc{};
-	//ArmourDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-	////ArmourDesc.pBoneMatrix = &m_ArmourMatrix;
-	/*
 	CTrigger::TRIGGER_DESC tTriggerDesc{};
 	tTriggerDesc.iTriggerType = CTrigger::TRIGGER_ITEM;
 	tTriggerDesc.iTriggerIndex = 0;
@@ -188,7 +184,7 @@ HRESULT CCoin::Add_Components()
 	m_pTrigger = static_cast<CTrigger*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc));
 	CHECK_NULLPTR(m_pTrigger);
 	m_pTrigger->Set_Owner(this);
-	*/
+	
 	return S_OK;
 
 }
@@ -240,5 +236,5 @@ void CCoin::Free()
 	__super::Free();
 
 	Safe_Release(m_pModelCom);
-	//Safe_Release(m_pTrigger);
+	Safe_Release(m_pTrigger);
 }
