@@ -42,8 +42,9 @@ public:
 	void			Set_Owner(class CPhysXObject* pObj);
 	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 	void			Collision_Hitbox(CPhysXObject* pGameObject);
-	_bool			Is_Alive(){ return m_bAlive; }
+	_bool			Is_Alive() { return m_bAlive; }
 	void			Check_Collision();
+	void			Close_Collision();
 
 private:
 	HRESULT			Add_Components();

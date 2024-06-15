@@ -402,33 +402,7 @@ void CPhysX::Free()
 }
 
 
-// =========================================== 충돌 이벤트들을 던져주는 클래스 ===========================================
-//eNOTIFY_TOUCH_FOUND    : 두 물체가 서로 접촉을 시작했을 때 이벤트를 발생시킵니다. (동적 객체와 정적 객체 모두에 적용 가능)
-//eNOTIFY_TOUCH_LOST     : 두 물체가 서로의 접촉을 끝냈을 때 이벤트를 발생시킵니다. (동적 객체와 정적 객체 모두에 적용 가능)
-//eNOTIFY_TOUCH_PERSISTS : 두 물체가 접촉을 유지하는 동안 이벤트를 지속적으로 발생시킵니다. (동적 객체와 정적 객체 모두에 적용 가능)
-//eNOTIFY_TOUCH_FORCE_THRESHOLD : 접촉하는 물체의 힘이 일정 임계값 이상일 때 이벤트를 발생시킵니다. (동적 객체와 정적 객체 모두에 적용 가능)
-
-// 충돌처리함수
-void CSimulationEventCallback::onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs)
-{
-	CComponent* pComponentDst = static_cast<CComponent*>(pairHeader.actors[0]->userData);
-	CComponent* pComponentSrc = static_cast<CComponent*>(pairHeader.actors[1]->userData);
-	if (pComponentDst != nullptr && pComponentSrc != nullptr)
-	{
-        /*if (pComponentDst->Get_Object()->Get_PrototypeTag() == L"Prototype_GameObject_Kirby")
-            int a = 3;
-        if (pComponentSrc->Get_Object()->Get_PrototypeTag() == L"Prototype_GameObject_Kirby")
-            int b = 3;*/
-	}
-}
-
-void CSimulationEventCallback::onTrigger(PxTriggerPair* pairs, PxU32 count)
-{
-    _int a = 3;
-}
-
 // ====================================================================================================================
-
 PxControllerBehaviorFlags CControllerBehaviorCallback::getBehaviorFlags(const PxController& controller)
 {
     // controller의 속성에 따라 행동을 커스터마이징
@@ -436,8 +410,12 @@ PxControllerBehaviorFlags CControllerBehaviorCallback::getBehaviorFlags(const Px
     CComponent* pComponent = static_cast<CComponent*>(controller.getUserData());
     if (pComponent != nullptr)
     {
+        CGameObject* pActorObject = pComponent->Get_Object();
+        if (pActorObject->Get_PrototypeTag() == L"Prototype_GameObject_StarBlock")
+        {
+            return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
+        }
     }
-
     return PxControllerBehaviorFlag::eCCT_SLIDE;
 }
 
@@ -468,23 +446,6 @@ void CUserControllerHitReport::onControllerHit(const PxControllersHit& hit)
 /// <summary> 히트박스와 콜라이더의 충돌을 어떻게 처리할 것인지 정의하는 PhysX의 콜백함수입니다. </summary>
 _bool CControllerFilterCallback::filter(const PxController& pObj, const PxController& pOtherObj)
 {
-    if (pObj.getActor() != nullptr && pOtherObj.getActor() != nullptr)
-    {
-        CComponent* pComponentObj    = static_cast<CComponent*>(pObj.getUserData());
-        CComponent* pComponentOther  = static_cast<CComponent*>(pOtherObj.getUserData());
-
-        //if (pComponentObj != nullptr && pComponentOther != nullptr)
-        //{
-        //    CGameObject* pActorObject = pComponentObj->Get_Object();
-        //    CGameObject* pActorOther  = pComponentOther->Get_Object();
-        //    // 둘중에 하나가 true라면 (둘 중에 하나가 히트박스 또는 아이템 등인 것이다) return false 하여 물리적 충돌을 피한다.
-        //    if ((CGameInstance::Get_Instance()->Is_PassingGroup(pActorObject) 
-        //        || CGameInstance::Get_Instance()->Is_PassingGroup(pActorOther)) == true)
-        //    {
-        //        return false;
-        //    }
-        //}
-    }
     return true;
 }
 

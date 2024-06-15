@@ -13,6 +13,7 @@ CStarBlock::CStarBlock(const CStarBlock& rhs)
 
 HRESULT CStarBlock::Initialize_Prototype()
 {
+	m_eCollisionGroup = OBJECT;
 	return S_OK;
 }
 
@@ -28,10 +29,10 @@ HRESULT CStarBlock::Initialize(void* pArg)
 	hr = __super::Initialize(pArg);
 	CHECK_FAILED(hr);
 
-	//fill(m_arrModelCom.begin(), m_arrModelCom.end(), nullptr);
-
-	Add_Components();
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(-3.f, 7.f, -188.f, 1.f));
+	Add_Components();
+
+	m_pControllerCom->Register_Controller();
 
 	return S_OK;
 }
@@ -43,6 +44,7 @@ _int CStarBlock::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return OBJ_DEAD;
 
+	m_pControllerCom->FreeFall(m_pTransformCom, fTimeDelta, 0.5f);
 	return OBJ_NOEVENT;
 }
 
@@ -101,6 +103,13 @@ void CStarBlock::Render_IMGUI()
 }
 #endif
 
+void CStarBlock::Collision_Hitbox(CPhysXObject* pGameObject)
+{
+	m_iHP -= 5;
+	if (m_iHP <= 0)
+		m_bDead = true;
+}
+
 HRESULT CStarBlock::Add_Components()
 {
 	HRESULT hr;
@@ -134,6 +143,21 @@ HRESULT CStarBlock::Add_Components()
 	}
 	break;
 	}
+
+	/* For.Com_CharacterController */
+	CCharacterController::CONTROLLER_DESC desc{};
+	desc.vInitialPos = GET_POS;
+	desc.fOffset = 1.1f;
+	desc.uCollisionType = m_eCollisionGroup;
+	desc.eType = CCharacterController::BOX;
+	desc.tBoxShape.fHalfForwardExtent = 1.f;
+	desc.tBoxShape.fHalfHeight = 1.f;
+	desc.tBoxShape.fHalfSideExtent = 1.f;
+	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
+		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
+	CHECK_FAILED(hr);
+	m_pControllerCom->Set_Object(this);
+
 
 	return S_OK;
 }
@@ -186,5 +210,6 @@ void CStarBlock::Free()
 	__super::Free();
 
 	Safe_Release(m_pModelCom);
+	Safe_Release(m_pControllerCom);
 }
 

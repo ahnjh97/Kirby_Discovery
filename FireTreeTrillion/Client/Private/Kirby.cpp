@@ -138,10 +138,8 @@ _int CKirby::Tick(_float fTimeDelta)
 	if(m_pHitBoxTrigger->Is_Alive())
 		m_pHitBoxTrigger->Tick(m_fTimeDelta);
 
-	if (m_pGameInstance->Get_DIKeyState(DIK_5, KEY_DOWN))
-	{
-		m_pHitBoxTrigger->Check_Collision();
-	}
+	//if (m_pGameInstance->Get_DIKeyState(DIK_5, KEY_DOWN))
+	//	m_pHitBoxTrigger->Check_Collision();
 
 	return OBJ_NOEVENT;
 }
@@ -286,13 +284,11 @@ void CKirby::Add_AnimEvent()
 	// 1. 한 애니메이션에서 같은 이름의 이벤트 가능
 	// 2. 재생 기준은 애님툴에서 지정한 애니메이션인지 + 시작 프레임이 애니메이션 프레임안에 들어가는 지
 	// 3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
-	
-	//m_pModelCom[INFO(m_eBodyState)]->Add_Event("ApplyDamage", [this]() {
-	//	m_pHitBoxTrigger->Check_Collision();
-	//	});
-
 	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("ApplyDamage", [this]() {
 		m_pHitBoxTrigger->Check_Collision();
+		});
+	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("StopDamage", [this]() {
+		m_pHitBoxTrigger->Close_Collision();
 		});
 }
 
@@ -351,14 +347,12 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 			Delete_AllEffect();
 		}
 	}
-
-
 }
 
 void CKirby::Collision_Hitbox(CPhysXObject* pGameObject)
 {
 	// kirby HITBOX 충돌이 일어날 경우 처리해야하는 일들
-	//MSG_BOX(TEXT("커비 overlap 충돌"));
+	// MSG_BOX(TEXT("커비 overlap 충돌"));
 }
 
 _float3 CKirby::Make_RepulsiveDir(CPhysXObject* pObject)

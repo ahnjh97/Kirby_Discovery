@@ -5,6 +5,7 @@
 BEGIN(Engine)
 class CModel;
 class CShader;
+class CCharacterController;
 END
 
 BEGIN(Client)
@@ -34,16 +35,18 @@ public:
 #ifdef _DEBUG
 	virtual void		Render_IMGUI()					override;
 #endif
+	virtual void		Collision_Hitbox(CPhysXObject* pGameObject);
 
 private:
 	HRESULT				Add_Components();
 	HRESULT				Bind_ShaderResources();
 
 private:
-	CModel*				m_pModelCom = nullptr;
-	//array<CModel*, 3>	m_arrModelCom;
+	CModel*					m_pModelCom = nullptr;
+	CCharacterController*	m_pControllerCom = { nullptr };
 
-	SIZE_TYPE			m_eSize = SIZE_END;
+	SIZE_TYPE				m_eSize = SIZE_END;
+	_int	m_iHP = 10;
 	
 public:
 	static CStarBlock*	 Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
