@@ -44,7 +44,8 @@ HRESULT CHUD_StarPoint::Initialize(void* _pArg)
 	m_pTransformCom->Set_Scaled(m_UIObjDesc.vSize.x, m_UIObjDesc.vSize.y, m_UIObjDesc.vSize.z);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
 		XMVectorSet(m_UIObjDesc.vPos.x - m_UIObjDesc.vCenter.x + m_UIObjDesc.vCenter.x,
-			m_UIObjDesc.vPos.y - m_UIObjDesc.vCenter.y + m_UIObjDesc.vCenter.y, m_UIObjDesc.vPos.z, 1.f));
+					m_UIObjDesc.vPos.y - m_UIObjDesc.vCenter.y + m_UIObjDesc.vCenter.y,
+					m_UIObjDesc.vPos.z, 1.f));
 
 #pragma region SET_PROJ
 
@@ -73,36 +74,61 @@ HRESULT CHUD_StarPoint::Initialize(void* _pArg)
 _int CHUD_StarPoint::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
-	
+
 	if (m_pGameInstance->Get_DIKeyState(DIK_1, KEY_DOWN))
 	{
 		m_fAccTime = 0.f;
 		m_eSPstate = STARPOINT_LOOT;
-		if (m_UIObjDesc.wstrUITag == TEXT("Font100") || m_UIObjDesc.wstrUITag == TEXT("Font10") || m_UIObjDesc.wstrUITag == TEXT("Font1")
-			|| m_UIObjDesc.wstrUITag == TEXT("Font100_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font10_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font1_Shadow"))
+
+		//if (m_UIObjDesc.wstrUITag == TEXT("Font10") || m_UIObjDesc.wstrUITag == TEXT("Font10_Shadow")
+		//	|| (m_UIObjDesc.wstrUITag == TEXT("Font1") || m_UIObjDesc.wstrUITag == TEXT("Font1")))
+		//{
+		//	_uint iCount = stoi(m_UIObjDesc.wstrText);
+		//	iCount += 1;
+		//}
+
+	//_uint iFont100 = (iCount / 100) % 10;
+
+		if (m_UIObjDesc.wstrUITag == TEXT("Font10") || m_UIObjDesc.wstrUITag == TEXT("Font10_Shadow"))
 		{
 			_uint iCount = stoi(m_UIObjDesc.wstrText);
-			iCount += 1;
+			_uint iFont10 = (iCount / 10) % 10;
 
-			m_UIObjDesc.wstrText = to_wstring(iCount);
+			if (iFont10 > 0)
+				m_bIsRender = TRUE;
+
+			m_bIsRender = FALSE;
+		}
+		if (m_UIObjDesc.wstrUITag == TEXT("Font1") || m_UIObjDesc.wstrUITag == TEXT("Font1_Shadow"))
+		{
+			_uint iCount = stoi(m_UIObjDesc.wstrText);
+			iCount++;
+
+			_uint iFont1 = iCount % 10;
+			m_UIObjDesc.wstrText = to_wstring(iFont1);
 		}
 	}
 
 	switch (m_eSPstate)
 	{
 	case CHUD::STARPOINT_IDLE:
-		m_fAccTime = 0.f;
 		Play_Animation(fTimeDelta, STARPOINT_IDLE);
 
+		//UI 하이드 모드로 전환
 		if (STARPOINT_LOOT == m_eSPrePstate)
 		{
-			if (m_fAccTime >= 100.f / 144.f)
+			m_fAccTime += fTimeDelta;
+			if (m_fAccTime >= 5.f)
+			{
 				m_eSPstate = STARPOINT_HIDE;
+				m_fAccTime = 0.f;
+			}
 		}		
 		break;
 
 	case CHUD::STARPOINT_HIDE: //Frame 344 > 354
-		Play_Animation(fTimeDelta, STARPOINT_HIDE);
+		//m_fAccTime += fTimeDelta;
+		Play_Animation(m_fAccTime, STARPOINT_HIDE);
 		break;
 
 	case CHUD::STARPOINT_SHOW: //Frame 213 > 223
@@ -113,8 +139,9 @@ _int CHUD_StarPoint::Tick(_float fTimeDelta)
 		m_fAccTime += fTimeDelta;
 		if (m_fAccTime >= 14.f / 144.f)
 		{
+			m_fAccTime = 0.f;
 			m_eSPstate = STARPOINT_IDLE;
-			m_eSPrePstate = STARPOINT_HIDE;
+			m_eSPrePstate = STARPOINT_LOOT;
 		}
 		Play_Animation(m_fAccTime, STARPOINT_LOOT);
 		break;
@@ -159,12 +186,10 @@ HRESULT CHUD_StarPoint::Render()
 
 		wstring wstrFontTag = { TEXT("Font_HUD_StarPoint_NUM30") };
 
-		if (m_bIsRender == FALSE)
+		if (m_UIObjDesc.wstrUITag == TEXT("Font100") || m_UIObjDesc.wstrUITag == TEXT("Font10")
+			|| m_UIObjDesc.wstrUITag == TEXT("Font100_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font10_Shadow"))
 		{
-			if (m_UIObjDesc.wstrUITag == TEXT("Font100") || m_UIObjDesc.wstrUITag == TEXT("Font10"))
-				return S_OK;
-		
-			if (m_UIObjDesc.wstrUITag == TEXT("Font100_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font10_Shadow"))
+			if (m_bIsRender == FALSE)
 				return S_OK;
 		}
 
@@ -233,15 +258,15 @@ HRESULT CHUD_StarPoint::Render_PerspecProj(CShader* _pShaderCom, CTransform* _pT
 	if (FAILED(_pTransCom->Bind_ShaderResource(_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
 
-	_float4x4 ViewMatrix{}; //= m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW);
-	XMStoreFloat4x4(&ViewMatrix, XMMatrixIdentity());
-	_float4x4 ProjMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
+	m_ViewMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW);
+	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
+	m_ProjMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
 
 	//셰이더 파일의 매트릭스 정보를 가져와 바인딩
-	if (FAILED(_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
+	if (FAILED(_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
 		return E_FAIL;
 
-	if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
+	if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
 	if (FAILED(Bind_ShaderResources(_pShaderCom, PS_ALPHABLEND, m_pTextureCom, m_iTexIndex)))
@@ -311,7 +336,8 @@ void CHUD_StarPoint::Play_Animation(_float _fAccTime, HUD_STARPOINT _eSPstate)
 	break;
 
 	case CHUD::STARPOINT_HIDE: //X값 우측 이동, 알파 값 죽이기
-		m_UIObjDesc.vPos.x += m_fAccTime * 10.f;
+		m_UIObjDesc.vPos.x += _fAccTime * 1000.f;
+		//m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_UIObjDesc.vPos);
 
 		m_UIObjDesc.fAlpha -= 1.f / 255.f * _fAccTime;
 
@@ -351,39 +377,7 @@ void CHUD_StarPoint::Play_Animation(_float _fAccTime, HUD_STARPOINT _eSPstate)
 		if (m_UIObjDesc.wstrUITag == TEXT("Font100") || m_UIObjDesc.wstrUITag == TEXT("Font10")
 			|| m_UIObjDesc.wstrUITag == TEXT("Font1") || m_UIObjDesc.wstrUITag == TEXT("Font100_Shadow")
 			|| m_UIObjDesc.wstrUITag == TEXT("Font10_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font1_Shadow"))
-		{
-			_uint iCount = stoi(m_UIObjDesc.wstrText);
-
-			_uint iFont1 = iCount % 10;
-			_uint iFont10 = (iCount / 10) % 10;
-			_uint iFont100 = (iCount / 100) % 10;
-
-			if (m_UIObjDesc.wstrUITag == TEXT("Font100") || m_UIObjDesc.wstrUITag == TEXT("Font100_Shadow"))
-			{
-				if (iFont100 > 0)
-				{
-					m_bIsRender = TRUE;
-					m_UIObjDesc.wstrText = to_wstring(iFont100);
-				}
-				
-				m_bIsRender = FALSE;
-			}
-
-			if (m_UIObjDesc.wstrUITag == TEXT("Font10") || m_UIObjDesc.wstrUITag == TEXT("Font10_Shadow"))
-			{
-				if (iFont10 > 0)
-				{
-					m_bIsRender = TRUE;
-					m_UIObjDesc.wstrText = to_wstring(iFont10);
-				}
-
-				m_bIsRender = FALSE;
-			}
-
-			if (m_UIObjDesc.wstrUITag == TEXT("Font1") || m_UIObjDesc.wstrUITag == TEXT("Font1_Shadow"))
-				m_UIObjDesc.wstrText = to_wstring(iFont1);
-
-			
+		{		
 			if (m_IsMovingUP)
 			{
 				m_UIObjDesc.vPos.y += 1.f;

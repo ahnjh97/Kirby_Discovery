@@ -104,8 +104,8 @@ HRESULT CLayerUI::Render()
 		_float2 vFontOrig = {	1.f, 1.f  };
 		_float2 vFontScale = {	1.f, 1.f  };
 
-		wstring wstrFontTag = { TEXT("Font_HUD_StarPoint_NUM30") };
-		//wstring wstrFontTag = { TEXT("Font_HUDSub_KR15") };
+		//wstring wstrFontTag = { TEXT("Font_HUD_StarPoint_NUM30") };
+		wstring wstrFontTag = { TEXT("Font_HUDSub_KR15") };
 
 		m_pGameInstance->Render_Font(wstrFontTag, m_UIObjDesc.wstrText, vFontPos, vFontRGBA, 
 			XMConvertToRadians(m_UIObjDesc.vDegree.z), vFontOrig, vFontScale);
@@ -120,8 +120,8 @@ HRESULT CLayerUI::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_StarPoint"),
-	//if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_StatusBar_Kirby"),
+	//if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_StarPoint"),
+	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_StatusBar_Kirby"),
 		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
 		return E_FAIL;
 
@@ -159,15 +159,16 @@ HRESULT CLayerUI::Render_PerspecProj(CShader* _pShaderCom, CTransform* _pTransCo
 	if (FAILED(_pTransCom->Bind_ShaderResource(_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
 
-	_float4x4 ViewMatrix{}; //= m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW);
-	XMStoreFloat4x4(&ViewMatrix, XMMatrixIdentity());
-	_float4x4 ProjMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
+	m_ViewMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW);
+	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
+
+	m_ProjMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
 
 	//셰이더 파일의 매트릭스 정보를 가져와 바인딩
-	if (FAILED(_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
+	if (FAILED(_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
 		return E_FAIL;
 
-	if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
+	if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
 	if (FAILED(Bind_ShaderResources(_pShaderCom, PS_ALPHABLEND, m_pTextureCom, m_iTexIndex)))

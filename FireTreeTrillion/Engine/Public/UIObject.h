@@ -64,7 +64,6 @@ public:
 #pragma region Getter/Setter
 
 public:
-
 	UIOBJ_DESC		Get_UIObj_Desc() const { return m_UIObjDesc; }
 	void			Set_UIObj_Desc(UIOBJ_DESC _UIDesc) { m_UIObjDesc = _UIDesc; }
 
@@ -75,6 +74,9 @@ public:
 
 	constexpr _bool	Get_IsRender() const noexcept { return m_bIsRender; }
 	void			Set_IsRender(_bool _isRender) { m_bIsRender = _isRender; }
+
+	_float4x4		Get_ProjMatrix() { return m_ProjMatrix; }
+	void			Set_ProjMatrix(_float4x4 _ProjMatrix) { m_ProjMatrix = _ProjMatrix; }
 
 #pragma endregion
 
@@ -95,34 +97,34 @@ public:
 #endif
 
 protected:
-	_float						m_fAccTime = { 0.f }; //구조체로 정보 보내기전 임시변수
+	_float								m_fAccTime = { 0.f }; //구조체로 정보 보내기전 임시변수
 	
-	CShader*					m_pShaderCom = { nullptr };
-	CVIBuffer_Rect*				m_pVIBufferCom = { nullptr };
-	CTexture*					m_pTextureCom = { nullptr };
+	CShader*							m_pShaderCom = { nullptr };
+	CVIBuffer_Rect*						m_pVIBufferCom = { nullptr };
+	CTexture*							m_pTextureCom = { nullptr };
 
-	ID3D11RenderTargetView*		m_pRTV = { nullptr };
-	ID3D11Texture2D*			m_pTexture2D = { nullptr };
+	ID3D11RenderTargetView*				m_pRTV = { nullptr };
+	ID3D11Texture2D*					m_pTexture2D = { nullptr };
 
-	UIOBJ_DESC					m_UIObjDesc{};
-	UI_TYPE						m_eUIType = { UI_NONE };
-	UI_PROJ						m_eUIProj = { PROJ_NONE };
-	UIANIM_DESC					m_UIAnimDesc{};
+	UIOBJ_DESC							m_UIObjDesc{};
+	UI_TYPE								m_eUIType = { UI_NONE };
+	UI_PROJ								m_eUIProj = { PROJ_NONE };
+	UIANIM_DESC							m_UIAnimDesc{};
 	
-	_uint						m_iTexIndex = { 0 };
-	_float4x4					m_ViewMatrix, m_ProjMatrix;
-	_float4						m_vColorRGBA = { 0.f, 0.f, 0.f, 1.f };
+	_uint								m_iTexIndex = { 0 };
+	_float4x4							m_ViewMatrix, m_ProjMatrix;
+	_float4								m_vColorRGBA = { 0.f, 0.f, 0.f, 1.f };
 
 	//Shader 원시데이터용
-	_float3						m_vColorRGB = { 1.f, 1.f, 1.f };
-	_float						m_fAlpha = { 1.f };
+	_float3								m_vColorRGB = { 1.f, 1.f, 1.f };
+	_float								m_fAlpha = { 1.f };
 
-	_bool						m_bIsRender = false;
+	_bool								m_bIsRender = false;
 
-	vector<CUIObject*>			m_LayerUIs;
-	vector <vector<CUIObject*>>	m_GroupUIs;
+	vector<CUIObject*>					m_LayerUIs;
+	vector <vector<CUIObject*>>			m_GroupUIs;
 
-	vector<CUIObject*>			m_HUDs;
+	vector<CUIObject*>					m_HUDs;
 	
 public:
 	virtual CGameObject* Clone(_uint iLevelIndex, void* pArg) { return nullptr; }

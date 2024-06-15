@@ -45,7 +45,8 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 	m_pTransformCom->Set_Scaled(m_UIObjDesc.vSize.x, m_UIObjDesc.vSize.y, 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
 		XMVectorSet(m_UIObjDesc.vPos.x - m_UIObjDesc.vCenter.x + m_UIObjDesc.vCenter.x,
-			m_UIObjDesc.vPos.y - m_UIObjDesc.vCenter.y + m_UIObjDesc.vCenter.y, 0.f, 1.f));
+					m_UIObjDesc.vPos.y - m_UIObjDesc.vCenter.y + m_UIObjDesc.vCenter.y, 
+					m_UIObjDesc.vPos.z, 1.f));
 
 #pragma region SET_PROJ
 
@@ -60,6 +61,8 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 		m_pTransformCom->Rotation(XMVectorSet(AXIS_X), XMConvertToRadians(m_UIObjDesc.vDegree.x));
 		m_pTransformCom->Rotation(XMVectorSet(AXIS_Y), XMConvertToRadians(m_UIObjDesc.vDegree.y));
 		m_pTransformCom->Rotation(XMVectorSet(AXIS_Z), XMConvertToRadians(m_UIObjDesc.vDegree.z));
+		//XMStoreFloat4x4(&m_ProjMatrix, XMMatrixPerspectiveFovLH(g_fFOV, (_float)g_iWinSizeX / g_iWinSizeY, g_fNear, g_fFar));
+
 	}
 
 #pragma endregion
@@ -241,15 +244,16 @@ HRESULT CHUD_KirbyStatus::Render_PerspecProj(CShader* _pShaderCom, CTransform* _
 	if (FAILED(_pTransCom->Bind_ShaderResource(_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
 
-	_float4x4 ViewMatrix{}; //= m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW);
-	XMStoreFloat4x4(&ViewMatrix, XMMatrixIdentity());
-	_float4x4 ProjMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
+	m_ViewMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW);
+	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
+
+	m_ProjMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
 
 	//셰이더 파일의 매트릭스 정보를 가져와 바인딩
-	if (FAILED(_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
+	if (FAILED(_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
 		return E_FAIL;
 
-	if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
+	if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
 	if (FAILED(Bind_ShaderResources(_pShaderCom, PS_ALPHABLEND, m_pTextureCom, m_iTexIndex)))
