@@ -217,12 +217,12 @@ void CTestModel::Late_Tick(_float fTimeDelta)
     CGameObject* pCamera = m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Camera"), 0);
     _float4 vForce = static_cast<CTransform*>(pCamera->Get_Component(g_strTransformTag))->Get_State_Float4(CTransform::STATE_LOOK);
     _float3 force = _float3{ vForce.x * 10000.f, vForce.y * 10000.f, vForce.z * 10000.f };
-    if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD7, KEY_DOWN))
-        m_pRigidBodyCom->Add_Force(force);
-    if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD8, KEY_DOWN))
-        m_pRigidBodyCom->Add_Torque(force);
-    if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD9, KEY_DOWN))
-        m_pRigidBodyCom->Add_Velocity(force);
+    //if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD7, KEY_DOWN))
+    //    m_pRigidBodyCom->Add_Force(force);
+    //if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD8, KEY_DOWN))
+    //    m_pRigidBodyCom->Add_Torque(force);
+    //if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD9, KEY_DOWN))
+    //    m_pRigidBodyCom->Add_Velocity(force);
 
     //m_pRigidBodyCom->Update(m_pTransformCom);
     m_pRigidBodyCom->Update_PhysX(m_pTransformCom);

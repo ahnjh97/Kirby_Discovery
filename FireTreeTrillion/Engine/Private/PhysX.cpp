@@ -247,7 +247,7 @@ PxRigidDynamic* CPhysX::CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, 
 
     pDynamicActor->attachShape(*pShape);
     m_pScene->addActor(*pDynamicActor);
-    //physx::PxRigidBodyExt::updateMassAndInertia(*pDynamicActor, 10000.f);
+    physx::PxRigidBodyExt::updateMassAndInertia(*pDynamicActor, 0.1f);
 
     pMesh->release();
     pShape->release(); 
@@ -473,17 +473,17 @@ _bool CControllerFilterCallback::filter(const PxController& pObj, const PxContro
         CComponent* pComponentObj    = static_cast<CComponent*>(pObj.getUserData());
         CComponent* pComponentOther  = static_cast<CComponent*>(pOtherObj.getUserData());
 
-        if (pComponentObj != nullptr && pComponentOther != nullptr)
-        {
-            CGameObject* pActorObject = pComponentObj->Get_Object();
-            CGameObject* pActorOther  = pComponentOther->Get_Object();
-            // 둘중에 하나가 true라면 (둘 중에 하나가 히트박스 또는 아이템 등인 것이다) return false 하여 물리적 충돌을 피한다.
-            if ((CGameInstance::Get_Instance()->Is_PassingGroup(pActorObject) 
-                || CGameInstance::Get_Instance()->Is_PassingGroup(pActorOther)) == true)
-            {
-                return false;
-            }
-        }
+        //if (pComponentObj != nullptr && pComponentOther != nullptr)
+        //{
+        //    CGameObject* pActorObject = pComponentObj->Get_Object();
+        //    CGameObject* pActorOther  = pComponentOther->Get_Object();
+        //    // 둘중에 하나가 true라면 (둘 중에 하나가 히트박스 또는 아이템 등인 것이다) return false 하여 물리적 충돌을 피한다.
+        //    if ((CGameInstance::Get_Instance()->Is_PassingGroup(pActorObject) 
+        //        || CGameInstance::Get_Instance()->Is_PassingGroup(pActorOther)) == true)
+        //    {
+        //        return false;
+        //    }
+        //}
     }
     return true;
 }

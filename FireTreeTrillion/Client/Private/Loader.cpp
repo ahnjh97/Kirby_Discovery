@@ -51,7 +51,6 @@
 #include "Camera_Free.h"
 #include "Camera_Main.h"
 
-
 #include "TestModel.h"
 #include "TestTerrain.h"
 #include "Kirby.h"
@@ -69,8 +68,11 @@
 #include "PoppyBrosJr.h"
 #include "PoppyBomb.h"
 
+// ∏  ø¿∫Í¡ß∆Æ
 #include "Moon.h"
+#include "KickableRock.h"
 #include "WasteCan.h"
+#include "StarBlock.h"
 
 //UI
 #include "BackGround.h"
@@ -251,6 +253,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Coin"), CCoin);
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Ladder"), CLadder);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KickableRock"), CKickableRock);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("StarBlock"), CStarBlock);
 #pragma endregion
 
 	return S_OK;
@@ -734,7 +738,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
 		// For Kirby Armour
 		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
-
+		
 
 		m_vecModelInfo.emplace_back("GsBenchAL", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("Level0Stage1Step01", TYPE_NONANIM);
@@ -757,6 +761,10 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		// For Mab Interactive Object
 		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("Ladder", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("GsPebble", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("StarBlockL", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("StarBlockM", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("StarBlockS", TYPE_NONANIM, 1.f);
 
 
 		// For Item
