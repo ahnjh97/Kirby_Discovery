@@ -152,7 +152,7 @@ public: /* For.PhysX */
 	void		Test();
 	_float4x4	Update(_fmatrix matrix);
 	void		Ready_TestGround();
-	void		Overlap_Hitbox(CGameObject* pGameObject, _float4 vPos, _float fRadius);
+	//void		Overlap_Hitbox(CGameObject* pGameObject, _float4 vPos, _float fRadius);
 
 #ifdef _DEBUG
 	HRESULT Ready_RTVDebug(const wstring& strRenderTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY);

@@ -306,43 +306,43 @@ PxRigidStatic* CPhysX::CreateStaticActor(_float4 vPos, _float3* pVerticesPos, _u
 
 
 // 함수 내에 해당 코드를 포함한다고 가정
-void CPhysX::Overlap_Hitbox(CGameObject* pGameObject, _float4 vPos, _float fRadius)
-{
-    // 겹침을 검사할 구체의 기하학적 모양 생성
-    PxSphereGeometry overlapShape = PxSphereGeometry(fRadius);
-    // 초기 위치와 회전을 설정하는 PxTransform 객체 생성
-    PxTransform pxTransform(PxVec3(vPos.x, vPos.y, vPos.z));
-
-    // Overlap 결과를 저장할 배열 동적 할당
-    PxOverlapHit* hitOverlap = new PxOverlapHit[OVERLAP_MAX]; 	//const int maxHits = 8; //= 4096;
-    PxScene* myScene = CGameInstance::Get_Instance()->Get_Scene();
-    _int howMany = PxSceneQueryExt::overlapMultiple(*myScene, overlapShape, pxTransform, hitOverlap, OVERLAP_MAX, PxQueryFilterData(PxQueryFlag::eDYNAMIC | PxQueryFlag::eSTATIC | PxQueryFlag::eNO_BLOCK));
-
-    CGameObject* pPlayer = nullptr;
-    for (_int i = 0; i < howMany; ++i)
-    {
-        PxOverlapHit& hit = hitOverlap[i];
-        PxRigidActor* actor = hit.actor;  // 충돌된 객체의 액터
-        // FOR TEST
-        if (howMany > 2)
-            _int b = 3;
-        if (actor->userData == "RigidMesh")
-            continue;// _int a = 3;
-
-        const char* actorName = actor->getName();
-        CComponent* pComponent = static_cast<CComponent*>(actor->userData);
-        if (pComponent == nullptr) continue;
-
-        // ======================================== FOR TEST : 임시 ========================================
-        CGameObject* pActorObject = pComponent->Get_Object();
-        if (pActorObject == nullptr) continue;
-        if (pActorObject->Get_PrototypeTag() != pPlayer->Get_PrototypeTag())
-            pPlayer->Collision_Overlap(pActorObject); // actorObject가 플레이어가 아닐경우 collision_overlap 실행
-        // =================================================================================================
-    }
-
-    Safe_Delete_Array(hitOverlap);
-}
+//void CPhysX::Overlap_Hitbox(CGameObject* pGameObject, _float4 vPos, _float fRadius)
+//{
+//    // 겹침을 검사할 구체의 기하학적 모양 생성
+//    PxSphereGeometry overlapShape = PxSphereGeometry(fRadius);
+//    // 초기 위치와 회전을 설정하는 PxTransform 객체 생성
+//    PxTransform pxTransform(PxVec3(vPos.x, vPos.y, vPos.z));
+//
+//    // Overlap 결과를 저장할 배열 동적 할당
+//    PxOverlapHit* hitOverlap = new PxOverlapHit[OVERLAP_MAX]; 	//const int maxHits = 8; //= 4096;
+//    PxScene* myScene = CGameInstance::Get_Instance()->Get_Scene();
+//    _int howMany = PxSceneQueryExt::overlapMultiple(*myScene, overlapShape, pxTransform, hitOverlap, OVERLAP_MAX, PxQueryFilterData(PxQueryFlag::eDYNAMIC | PxQueryFlag::eSTATIC | PxQueryFlag::eNO_BLOCK));
+//
+//    CGameObject* pPlayer = nullptr;
+//    for (_int i = 0; i < howMany; ++i)
+//    {
+//        PxOverlapHit& hit = hitOverlap[i];
+//        PxRigidActor* actor = hit.actor;  // 충돌된 객체의 액터
+//        // FOR TEST
+//        if (howMany > 2)
+//            _int b = 3;
+//        if (actor->userData == "RigidMesh")
+//            continue;// _int a = 3;
+//
+//        const char* actorName = actor->getName();
+//        CComponent* pComponent = static_cast<CComponent*>(actor->userData);
+//        if (pComponent == nullptr) continue;
+//
+//        // ======================================== FOR TEST : 임시 ========================================
+//        CGameObject* pActorObject = pComponent->Get_Object();
+//        if (pActorObject == nullptr) continue;
+//        if (pActorObject->Get_PrototypeTag() != pPlayer->Get_PrototypeTag())
+//            pPlayer->Collision_Overlap(pActorObject); // actorObject가 플레이어가 아닐경우 collision_overlap 실행
+//        // =================================================================================================
+//    }
+//
+//    Safe_Delete_Array(hitOverlap);
+//}
 
 
 CPhysX* CPhysX::Create()

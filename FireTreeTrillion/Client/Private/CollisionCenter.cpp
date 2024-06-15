@@ -34,8 +34,8 @@ void CCollisionCenter::Initialize()
 	m_eColliderType[PLAYER][ITEM] = CONTENT_ITEM;
 
 	// For CONTENT_ATTACK
-	m_eColliderType[HITBOX][MONSTER] = CONTENT_ATTACK;
-	m_eColliderType[HITBOX][PLAYER]  = CONTENT_ATTACK;
+	m_eColliderType[HITBOX_PLYAER][MONSTER] = CONTENT_ATTACK;
+	m_eColliderType[HITBOX_MONSTER][PLAYER]  = CONTENT_ATTACK;
 
 	// 레디얼 기름칠
 	GAMEINSTANCE Setting_RadialBlur(5.f, 300.f);
@@ -188,11 +188,11 @@ void CCollisionCenter::Collision_Collider(CONTENT_TYPE eType, CPhysXObject* pSrc
 		}
 	}
 
-	// 커비 HITBOX x 몬스터
+	// HITBOX x 캐릭터
 	else if (eType == CONTENT_ATTACK)
 	{
-		pSrcObject->Collision_Overlap(pDstObject);
-		pDstObject->Collision_Overlap(pSrcObject);
+		pSrcObject->Collision_Hitbox(pDstObject);
+		pDstObject->Collision_Hitbox(pSrcObject);
 	}
 
 }

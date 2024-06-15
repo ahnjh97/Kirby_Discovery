@@ -19,4 +19,34 @@
         <Data1 EventName="Bboong" StartFrame="2" EndFrame="3"/>
         <Data2 EventName="PlaySound" StartFrame="19" EndFrame="40"/>
     </ModelName>
+	<ModelName>KirbySwordDefault
+        <Animation>GigantSpinSlash</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="2" EndFrame="3"/>
+        <Animation>DecisiveSlash</Animation>
+        <AnimSpeed>30</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="2" EndFrame="3"/>
+        <Animation>MultiswordAttack</Animation>
+        <AnimSpeed>30</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="2" EndFrame="3"/>
+        <Animation>SideSlash</Animation>
+        <AnimSpeed>30</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="2" EndFrame="3"/>
+        <Animation>SpinSlash</Animation>
+        <AnimSpeed>30</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="2" EndFrame="3"/>
+        <Animation>SuperSpinSlashLoop</Animation>
+        <AnimSpeed>30</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="2" EndFrame="3"/>
+        <Animation>SwordSpin</Animation>
+        <AnimSpeed>30</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="2" EndFrame="3"/>
+    </ModelName>
 </Root>

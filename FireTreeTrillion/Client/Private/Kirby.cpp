@@ -106,6 +106,9 @@ HRESULT CKirby::Initialize(void* pArg)
 
 	m_pControllerCom->RegisterAsPlayer();
 	m_pControllerCom->Register_Controller();
+	
+	Add_AnimEvent();
+
 	return S_OK;
 }
 
@@ -283,10 +286,13 @@ void CKirby::Add_AnimEvent()
 	// 1. 한 애니메이션에서 같은 이름의 이벤트 가능
 	// 2. 재생 기준은 애님툴에서 지정한 애니메이션인지 + 시작 프레임이 애니메이션 프레임안에 들어가는 지
 	// 3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
-	m_pModelCom[INFO(m_eBodyState)]->Add_Event("ApplyDamage", [this]() {
+	
+	//m_pModelCom[INFO(m_eBodyState)]->Add_Event("ApplyDamage", [this]() {
+	//	m_pHitBoxTrigger->Check_Collision();
+	//	});
 
-		//m_pHitBox->Check_Collision();
-
+	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("ApplyDamage", [this]() {
+		m_pHitBoxTrigger->Check_Collision();
 		});
 }
 
@@ -349,10 +355,10 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 
 }
 
-void CKirby::Collision_Overlap(CGameObject* pGameObject)
+void CKirby::Collision_Hitbox(CPhysXObject* pGameObject)
 {
-	// kirby의 뱃살에서 충돌이 일어날 경우 처리해야하는 일들
-	MSG_BOX(TEXT("커비 overlap 충돌"));
+	// kirby HITBOX 충돌이 일어날 경우 처리해야하는 일들
+	//MSG_BOX(TEXT("커비 overlap 충돌"));
 }
 
 _float3 CKirby::Make_RepulsiveDir(CPhysXObject* pObject)
@@ -571,7 +577,7 @@ HRESULT CKirby::Add_PartObjects()
 	CTrigger::TRIGGER_DESC tTriggerDesc{};
 	tTriggerDesc.iTriggerType = CTrigger::TRIGGER_HITBOX;
 	tTriggerDesc.iTriggerIndex = 0;
-	tTriggerDesc.eCollisionGroup = HITBOX;
+	tTriggerDesc.eCollisionGroup = HITBOX_PLYAER;
 	tTriggerDesc.vTriggerSize = _float3(2.f, 1.5f, 2.f);
 	m_pHitBoxTrigger = static_cast<CTrigger*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc));
 	CHECK_NULLPTR(m_pHitBoxTrigger);

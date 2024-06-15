@@ -238,9 +238,9 @@ void CKabu::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pOb
 	}
 }
 
-void CKabu::Collision_Overlap(CGameObject* pGameObject)
+void CKabu::Collision_Hitbox(CPhysXObject* pGameObject)
 {
-	MSG_BOX(TEXT("KABU가 히트박스에 맞음"));
+	//MSG_BOX(TEXT("KABU가 히트박스에 맞음"));
 }
 
 void CKabu::Change_State(KABU_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
