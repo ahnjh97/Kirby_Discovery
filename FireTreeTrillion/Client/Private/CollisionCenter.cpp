@@ -34,7 +34,8 @@ void CCollisionCenter::Initialize()
 	m_eColliderType[PLAYER][ITEM] = CONTENT_ITEM;
 
 	// For CONTENT_ATTACK
-	m_eColliderType[HITBOX][MONSTER] = CONTENT_ATTACK;
+	m_eColliderType[HITBOX_PLYAER][MONSTER] = CONTENT_ATTACK;
+	m_eColliderType[HITBOX_MONSTER][PLAYER]  = CONTENT_ATTACK;
 
 	// 레디얼 기름칠
 	GAMEINSTANCE Setting_RadialBlur(5.f, 300.f);
@@ -187,11 +188,11 @@ void CCollisionCenter::Collision_Collider(CONTENT_TYPE eType, CPhysXObject* pSrc
 		}
 	}
 
-	// 커비 HITBOX x 몬스터
+	// HITBOX x 캐릭터
 	else if (eType == CONTENT_ATTACK)
 	{
-		pSrcObject->Collision_Overlap(pDstObject);
-		pDstObject->Collision_Overlap(pSrcObject);
+		pSrcObject->Collision_Hitbox(pDstObject);
+		pDstObject->Collision_Hitbox(pSrcObject);
 	}
 
 }
@@ -242,6 +243,12 @@ void CCollisionCenter::Camera_Shaking(_float fPower, _float fTime, _float2 vDir)
 	pCamera->Make_Shake(fPower, fTime, vDir);
 }
 
+void CCollisionCenter::Camera_Zooming(_float fZoom)
+{
+	CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
+	pCamera->Zoom(fZoom);
+}
+
 _bool CCollisionCenter::Kirby_Dodge_SlowMotionSystem(CPhysXObject* pPlayer)
 {
 	if (m_bCheckTimer == true)
@@ -258,6 +265,7 @@ _bool CCollisionCenter::Kirby_Dodge_SlowMotionSystem(CPhysXObject* pPlayer)
 	{
 		_vector vKirbyPos = pKirby->Get_TransformCom()->Get_State_Vector(CTransform::STATE_POSITION);
 
+		Camera_Zooming(-5.f);
 		GAMEINSTANCE Set_FirstTimerRatio(0.5f);
 		GAMEINSTANCE Set_SecondTimerRatio(0.2f);
 		GAMEINSTANCE Setting_RadialBlur(vKirbyPos, 30.f, 10.f);
@@ -370,6 +378,7 @@ void CCollisionCenter::Timer_System(_float fTimeDelta)
 	if (m_bCheckTimer == true)
 	{
 		m_fTimeDeltaResetTime += fTimeDelta;
+		Camera_Zooming((m_fTimeDeltaResetTime * 1.25f) - 5.f);
 
 		if (m_fTimeDeltaResetTime > 0.5f)
 		{
@@ -381,6 +390,7 @@ void CCollisionCenter::Timer_System(_float fTimeDelta)
 		{
 			GAMEINSTANCE Restore_SecondTimer();
 
+			Camera_Zooming(0.f);
 			m_bCheckTimer = false;
 			m_fTimeDeltaResetTime = 0.f;
 		}

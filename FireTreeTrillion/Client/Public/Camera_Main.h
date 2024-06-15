@@ -93,9 +93,9 @@ public:
 
 	void Zoom_In(_float fZoom);
 	void Zoom_Out(_float fZoom);
-	void Zoom_Absolute(_float fZoom)
+	void Zoom(_float fZoom)
 	{
-		m_fCurDistance = fZoom;
+		m_fZoomOffset = fZoom;
 	}
 
 	//카메라에게 특정 동작들을 시퀀스로 선예약한다.
@@ -157,14 +157,17 @@ private:
 	_float m_fCurDistance = { 0.f };
 	//기준 거리
 	_float m_fOrigDistance = { 0.f };
+
+
+	_float m_fZoomOffset = { 0.f };
+	//_float m_fAbsoluteZoomOffset = { 0.f };
+
 	//(시퀀스 시)시작, 목표 거리
 	_float m_fStartDistance = { 0.f };
 	_float m_fDestDistance = { 0.f };
 
 	_float3 m_vCurCamDir = {0.f, 0.f, 0.f};
 	_float3 m_vDestCamDir = { 0.f, 0.f, 0.f };
-
-
 
 
 	//카메라 움직임 감도

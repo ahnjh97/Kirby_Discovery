@@ -3,6 +3,7 @@
 #include "FSM.h"
 #include "BladeKnight_State.h"
 #include "BladeKnightSword.h"
+#include "Trigger.h"
 
 CBladeKnight::CBladeKnight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -50,6 +51,8 @@ HRESULT CBladeKnight::Initialize(void* pArg)
 	m_eVacuumSize = SIZE_SMALL;
 	m_eAbilityType = ABILITY_SWORD;
 
+	Add_AnimEvent();
+
 	return S_OK;
 }
 
@@ -68,6 +71,14 @@ _int CBladeKnight::Tick(_float fTimeDelta)
 
 	for (auto& Pair : m_PartObjects)
 		Pair.second->Tick(m_fTimeDelta);
+
+	if (m_pHitBoxTrigger->Is_Alive())
+		m_pHitBoxTrigger->Tick(m_fTimeDelta);
+
+	if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD5, KEY_DOWN))
+	{
+		m_pHitBoxTrigger->Check_Collision();
+	}
 
 	return OBJ_NOEVENT;
 }
@@ -158,6 +169,20 @@ void CBladeKnight::Render_IMGUI()
 }
 #endif
 
+void CBladeKnight::Add_AnimEvent()
+{
+	__super::Add_AnimEvent();
+
+	// 1. 한 애니메이션에서 같은 이름의 이벤트 가능
+	// 2. 재생 기준은 애님툴에서 지정한 애니메이션인지 + 시작 프레임이 애니메이션 프레임안에 들어가는 지
+	// 3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
+	m_pModelCom->Add_Event("ApplyDamage", [this]() {
+
+		m_pHitBoxTrigger->Check_Collision();
+
+		});
+}
+
 void CBladeKnight::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
 	if (eContent == CCollisionCenter::CONTENT_BODY)
@@ -193,8 +218,10 @@ HRESULT CBladeKnight::Add_Components()
 
 	/* For.Com_Model */
 	hr = __super::Add_Component(TEXT("Prototype_Component_Model_BladeKnight"),
-		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+								TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
+	// FOR ANIMTOOL
+	m_ppModelForAnimTool = &m_pModelCom;
 
 	/* For.Com_CharacterController */
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
@@ -223,7 +250,7 @@ HRESULT CBladeKnight::Add_PartObjects()
 	BladeKnightSwordDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 	BladeKnightSwordDesc.pSocket = pModel->Get_BonePtr("RHaveL");
 
-	pWeaponObject = dynamic_cast<CPartObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_BladeKnightSword"), &BladeKnightSwordDesc));
+	pWeaponObject = static_cast<CPartObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_BladeKnightSword"), &BladeKnightSwordDesc));
 	if (nullptr == pWeaponObject)
 		return E_FAIL;
 
@@ -231,6 +258,15 @@ HRESULT CBladeKnight::Add_PartObjects()
 
 	m_PartObjects.emplace(TEXT("Part_Weapon"), pWeaponObject);
 
+	/* 커비의 HITBOX */
+	CTrigger::TRIGGER_DESC tTriggerDesc{};
+	tTriggerDesc.iTriggerType = CTrigger::TRIGGER_HITBOX;
+	tTriggerDesc.iTriggerIndex = 0;
+	tTriggerDesc.eCollisionGroup = HITBOX_MONSTER;
+	tTriggerDesc.vTriggerSize = _float3(2.f, 1.5f, 2.f);
+	m_pHitBoxTrigger = static_cast<CTrigger*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc));
+	CHECK_NULLPTR(m_pHitBoxTrigger);
+	m_pHitBoxTrigger->Set_Owner(this);
 
 	return S_OK;
 }
@@ -329,4 +365,6 @@ void CBladeKnight::Free()
 		Safe_Release(Pair.second);
 
 	m_PartObjects.clear();
+
+	Safe_Release(m_pHitBoxTrigger);
 }

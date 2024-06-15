@@ -2,6 +2,7 @@
 #include "Client_Defines.h"
 #include "GameObject.h"
 #include "CollisionCenter.h"
+#include "Effect.h"
 
 BEGIN(Client)
 
@@ -28,6 +29,7 @@ public:
 
 	// 충돌처리 함수 ( 피직스를 사용하는 것들 끼리 충돌했을 때 발생하는 함수이다. )
 	virtual void		Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) {}
+	virtual void		Collision_Hitbox(CPhysXObject* pGameObject) {}
 
 #ifdef _DEBUG
 	virtual void	Render_IMGUI()					override;
@@ -48,8 +50,18 @@ public:
 	_float	Get_DamageJumpPower() { return m_fDamageJumpPower; }
 	void	Set_DamageJumpPower(_float fDamageJumpPower) { m_fDamageJumpPower = fDamageJumpPower; }
 
-	void				Set_PhyXState(PHYXOBJECT_CURSTATE eState) { m_ePhyXState = eState; }
+	void				Set_PhyXState(PHYXOBJECT_CURSTATE eState);
 	PHYXOBJECT_CURSTATE Get_PhyXState() { return m_ePhyXState; }
+
+
+
+
+	//이펙트를 자신의 리스트에 추가한다.
+	void	Add_Effect(CEffect* pEffect);
+	void	Delete_AllEffect();
+	void	Delete_Effect(string strTag);
+
+
 
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;
@@ -74,6 +86,9 @@ protected:
 	// 피직스 오브젝트들의 현재 큰 상태를 의미한다.
 	PHYXOBJECT_CURSTATE m_ePhyXState = { PO_NORMAL };
 
+	//피직스 오브젝트들에게 귀속되어 움직이는 이펙트들
+	list<CEffect*>	m_FXList;
+	_float4x4		m_EffectSocket;
 };
 
 END

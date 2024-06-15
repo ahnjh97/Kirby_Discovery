@@ -106,6 +106,9 @@ HRESULT CKirby::Initialize(void* pArg)
 
 	m_pControllerCom->RegisterAsPlayer();
 	m_pControllerCom->Register_Controller();
+	
+	Add_AnimEvent();
+
 	return S_OK;
 }
 
@@ -283,10 +286,13 @@ void CKirby::Add_AnimEvent()
 	// 1. 한 애니메이션에서 같은 이름의 이벤트 가능
 	// 2. 재생 기준은 애님툴에서 지정한 애니메이션인지 + 시작 프레임이 애니메이션 프레임안에 들어가는 지
 	// 3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
-	m_pModelCom[INFO(m_eBodyState)]->Add_Event("ApplyDamage", [this]() {
+	
+	//m_pModelCom[INFO(m_eBodyState)]->Add_Event("ApplyDamage", [this]() {
+	//	m_pHitBoxTrigger->Check_Collision();
+	//	});
 
-		//m_pHitBox->Check_Collision();
-
+	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("ApplyDamage", [this]() {
+		m_pHitBoxTrigger->Check_Collision();
 		});
 }
 
@@ -308,7 +314,7 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 			if (pObject != nullptr)
 				pObject->Set_PhyXState(PO_KIRBYMOUTH);
 
-			Delete_KirbyEffect();
+			Delete_AllEffect();
 		}
 		// 입에 머금은 상태의 몬스터
 		else if (pObject->Get_PhyXState() == PO_KIRBYMOUTH)
@@ -342,17 +348,17 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 				Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
 			}
 
-			Delete_KirbyEffect();
+			Delete_AllEffect();
 		}
 	}
 
 
 }
 
-void CKirby::Collision_Overlap(CGameObject* pGameObject)
+void CKirby::Collision_Hitbox(CPhysXObject* pGameObject)
 {
-	// kirby의 뱃살에서 충돌이 일어날 경우 처리해야하는 일들
-	//MSG_BOX(TEXT("히트박스에 충돌이 일어나서 커비에 전달됨"));
+	// kirby HITBOX 충돌이 일어날 경우 처리해야하는 일들
+	//MSG_BOX(TEXT("커비 overlap 충돌"));
 }
 
 _float3 CKirby::Make_RepulsiveDir(CPhysXObject* pObject)
@@ -533,8 +539,9 @@ HRESULT CKirby::Add_Components()
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
-	desc.tCapsuleShape.fHeight = 1.f;
-	desc.tCapsuleShape.fRadius = 0.5f;
+	desc.fOffset = 0.5f;
+	desc.tCapsuleShape.fHeight = 0.4f;// 1.f;
+	desc.tCapsuleShape.fRadius = 0.4f;// 0.5f;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	m_pControllerCom->Set_Object(this);
@@ -566,11 +573,12 @@ HRESULT CKirby::Add_PartObjects()
 	m_pArmours = static_cast<CKirbyArmours*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_KirbyArmours"), &ArmourDesc));
 	CHECK_NULLPTR(m_pArmours);
 
+	/* 커비의 HITBOX */
 	CTrigger::TRIGGER_DESC tTriggerDesc{};
 	tTriggerDesc.iTriggerType = CTrigger::TRIGGER_HITBOX;
-	tTriggerDesc.iTriggerIndex = 0; // kirby
-	tTriggerDesc.eCollisionGroup = HITBOX; // kirby
-	tTriggerDesc.vTriggerSize = _float3(2.f, 1.5f, 2.f); // kirby
+	tTriggerDesc.iTriggerIndex = 0;
+	tTriggerDesc.eCollisionGroup = HITBOX_PLYAER;
+	tTriggerDesc.vTriggerSize = _float3(2.f, 1.5f, 2.f);
 	m_pHitBoxTrigger = static_cast<CTrigger*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc));
 	CHECK_NULLPTR(m_pHitBoxTrigger);
 	m_pHitBoxTrigger->Set_Owner(this);
@@ -997,8 +1005,7 @@ void CKirby::Free()
 		Safe_Release(INFO(m_pObject));
 
 	Safe_Release(m_pHitBoxTrigger);
-	for (auto& fx : m_KirbyFXList)
-		Safe_Release(fx);
+
 
 }
 

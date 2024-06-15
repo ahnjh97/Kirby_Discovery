@@ -17,25 +17,29 @@ CLevel_Intro::CLevel_Intro(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 HRESULT CLevel_Intro::Initialize()
 {
 	m_pGameInstance->Set_RenderMode(CRenderer::MODE_GAMEPLAY);
-	CLevelChanger::Get_Instance()->Load();
+	//CLevelChanger::Get_Instance()->Load();
 
-	if (FAILED(__super::Initialize()))
-		return E_FAIL;
+	HRESULT hr;
+	hr = __super::Initialize();
+	CHECK_FAILED(hr);
 
-	if (FAILED(Ready_Lights()))
-		return E_FAIL;
+	hr = Ready_Lights();
+	CHECK_FAILED(hr);
 
-	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
-		return E_FAIL;
+	hr = Ready_Layer_Camera(TEXT("Layer_Camera"));
+	CHECK_FAILED(hr);
 
-	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
-		return E_FAIL;
+	hr = Ready_Layer_BackGround(TEXT("Layer_BackGround"));
+	CHECK_FAILED(hr);
 
-	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
-		return E_FAIL;
+	//hr = Ready_Layer_Monsters(TEXT("Layer_Monster"));
+	//CHECK_FAILED(hr);
 
-	if (FAILED(Ready_ParsedObjects()))
-		return E_FAIL;
+	hr = Ready_Layer_UI(TEXT("Layer_UI"));
+	CHECK_FAILED(hr);
+
+	hr = Ready_ParsedObjects();
+	CHECK_FAILED(hr);
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
@@ -89,7 +93,7 @@ HRESULT CLevel_Intro::Ready_Lights()
 
 HRESULT CLevel_Intro::Ready_Layer_Camera(const wstring& strLayerTag)
 {
-	
+
 	CCamera_Main::CAMERA_KIRBY_DESC		MainCamDesc{};
 	MainCamDesc.fFovy = XMConvertToRadians(30.0f);
 	MainCamDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
@@ -104,8 +108,8 @@ HRESULT CLevel_Intro::Ready_Layer_Camera(const wstring& strLayerTag)
 
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, strLayerTag, TEXT("Prototype_GameObject_Camera_Main"), &MainCamDesc)))
 		return E_FAIL;
-		
-	
+
+
 	CCamera_Free::CAMERA_FREE_DESC		CameraDesc{};
 	CameraDesc.fMouseSensor = 0.1f;
 	CameraDesc.fFovy = XMConvertToRadians(30.0f);
@@ -119,7 +123,7 @@ HRESULT CLevel_Intro::Ready_Layer_Camera(const wstring& strLayerTag)
 
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
 		return E_FAIL;
-		
+
 	return S_OK;
 }
 

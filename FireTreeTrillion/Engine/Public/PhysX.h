@@ -47,8 +47,9 @@ public:
 
 public:
     PxRigidDynamic* CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
+    void            Kick_DynamicActor(_float3 _kickDirection, _float impulseMagnitude);
     PxRigidStatic*  CreateStaticActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
-    void            Overlap_Hitbox(CGameObject* pGameObject, _float4 vPos, _float fRadius);
+    //void            Overlap_Hitbox(CGameObject* pGameObject, _float4 vPos, _float fRadius);
 
 private:
     PxDefaultAllocator          mDefaultAllocatorCallback;
@@ -56,7 +57,6 @@ private:
     PxTolerancesScale           mToleranceScale;
 
     PxControllerManager*        m_pControllerManager = { nullptr };
-    
     PxDefaultCpuDispatcher*     m_pDispatcher       = { nullptr };
     PxPvdTransport*             m_pPvdTransport     = { nullptr };
     PxFoundation*               m_pFoundation       = { nullptr };
@@ -69,7 +69,7 @@ private:
     PxScene*                    m_pScene            = { nullptr };
     PxPvdSceneClient*           m_pPvdSceneClient   = { nullptr };
 
-    //PxCooking*                        m_pCooking = nullptr;
+    //PxCooking*                m_pCooking          = nullptr;
     PxRigidDynamic*             m_pRigidDynamic     = { nullptr };
 
     class CEventCallBack*       m_pEventCallBack    = { nullptr };

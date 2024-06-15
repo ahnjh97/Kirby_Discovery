@@ -144,13 +144,14 @@ public: /* For.PhysX */
 	PxPhysics*				Get_Physics();
 	PxMaterial*				Get_Material();
 	PxControllerManager*	Get_ControllerManager();
-	void		AddActor(PxActor& pActor);
-	void		RemoveActor(PxActor& pActor);
+	void					AddActor(PxActor& pActor);
+	void					RemoveActor(PxActor& pActor);
+	void					Kick_DynamicActor(_float3 _kickDirection, _float impulseMagnitude);
 
 	void		Test();
 	_float4x4	Update(_fmatrix matrix);
 	void		Ready_TestGround();
-	void		Overlap_Hitbox(CGameObject* pGameObject, _float4 vPos, _float fRadius);
+	//void		Overlap_Hitbox(CGameObject* pGameObject, _float4 vPos, _float fRadius);
 
 #ifdef _DEBUG
 	HRESULT Ready_RTVDebug(const wstring& strRenderTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY);

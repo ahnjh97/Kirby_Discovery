@@ -118,7 +118,7 @@ public:
 	virtual HRESULT	Render_DeferredInfo()						override;
 
 	virtual void	Add_AnimEvent()								override;
-	virtual void	Collision_Overlap(CGameObject* pGameObject) override;
+	virtual void	Collision_Hitbox(CPhysXObject* pGameObject)  override;
 	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
 	KIRBY_INFODESC* Get_KirbyInfo() { return &m_tKirbyInfo; }
@@ -138,30 +138,6 @@ public:
 	// 현재 커비가 무적상태인지 아닌지 판별하는 부울 값
 	_bool			isOverPower() { return m_bOverPower; }
 
-#pragma region 이펙트 리스트 실험
-	//안녕하세요 디버깅 용으로 이펙트 리스트를 추가했습니다
-	void			Add_KirbyEffect(CEffect* pEffect)
-	{
-		m_KirbyFXList.emplace_back(pEffect);
-		Safe_AddRef(pEffect);
-	}
-	void			Delete_KirbyEffect()
-	{
-		if (m_KirbyFXList.empty())
-			return;
-
-		for (auto& FX : m_KirbyFXList)
-		{
-			FX->Set_Dead();
-			Safe_Release(FX);
-		}
-		m_KirbyFXList.clear();
-	}
-
-private:
-	list<CEffect*> m_KirbyFXList;
-
-#pragma endregion
 
 	// 기타 세부적인 제어
 private:

@@ -105,11 +105,11 @@ void CTrigger::Render_IMGUI()
 }
 #endif
 
-void CTrigger::Collision_Overlap(CGameObject* pGameObject)
+void CTrigger::Collision_Hitbox(CPhysXObject* pGameObject)
 {
 	// HitBox 충돌 처리
 	if(m_bAlive)
-		m_pOwner->Collision_Overlap(pGameObject);
+		m_pOwner->Collision_Hitbox(pGameObject);
 
 	m_bAlive = false;
 	m_pRigidBodyCom->Activate(false);
@@ -136,7 +136,7 @@ HRESULT CTrigger::Bind_ShaderResources()
 	return S_OK;
 }
 
-void CTrigger::Set_Owner(CGameObject* pObj)
+void CTrigger::Set_Owner(CPhysXObject* pObj)
 {
 	if (pObj == nullptr) return;
 
@@ -175,6 +175,8 @@ HRESULT CTrigger::Add_Components()
 		if (FAILED(__super::Add_Component(TEXT("Prototype_Component_RigidBody"),
 			TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &tRigidDesc)))
 			return E_FAIL;
+		m_pRigidBodyCom->Activate(true);
+
 		m_pRigidBodyCom->SetUp_TriggerType(m_eTriggerType);
 		m_pRigidBodyCom->SetUp_TriggerIndex(m_iTriggerIndex);
 	}

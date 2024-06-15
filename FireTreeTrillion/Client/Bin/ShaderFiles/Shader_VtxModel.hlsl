@@ -304,8 +304,8 @@ PS_OUT_EFFECT PS_MAIN_BLEND_FX(PS_IN In)
 
     Out.vColor.a = Out.vColor.a * saturate(fOldViewZ - In.vProjPos.w);
 
-    
-    Out.vNonBlur = vector(0.f, 1.f, 0.f, 0.f);
+    //if(.01 < Out.vColor.a)
+    //    Out.vNonBlur = vector(0.f, 1.f, 0.f, 0.f);
     
     return Out;
 }

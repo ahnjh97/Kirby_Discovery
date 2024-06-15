@@ -77,8 +77,7 @@ void CEventCallBack::Clear_EventCallBack()
         {
             if (nullptr != get<0>(tuple))
             {
-               // QZR
-               // get<0>(tuple)->release();
+               //get<0>(tuple)->release();
             }
         }
     }

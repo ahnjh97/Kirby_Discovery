@@ -268,8 +268,8 @@ void CCamera_Main::Control(_float fTimeDelta)
 			CAMACTION curAction = m_SeqList.front().second;
 
 			//목표 거리 기입되어 있는 경우 set 
-			if (curAction.fDist != -1.f)
-				Zoom_Absolute(curAction.fDist);
+			//if (curAction.fDist != -1.f)
+			//	Zoom_Absolute(curAction.fDist);
 
 			//목표 방향 기입되어 있는 경우 set
 			if (0.f < XMVector3Length(XMLoadFloat3(&curAction.fDir)).m128_f32[0])
@@ -318,13 +318,42 @@ void CCamera_Main::UpdatePos_FromAnchor(_float fTimeDelta)
 
 
 	//실제 타겟 위치에서 조금 위로 기준점 정하기
+
 	//기준점 저장
 	_float fYOffset = 2.f * (m_fCurDistance / 30.f) + m_fCurUpOffset;
+
+
 	m_vAnchor = F4toF3(vTargetPos) + _float3(0.f, fYOffset, 0.f);
 
 
-	//**** 설정 값 보간 ****//
+	_float3 vTargetProjPos = F4toF3(vTargetPos) + _float3(0.f, fYOffset, 0.f);
+	CUtils::Make_World_ToScreen(vTargetProjPos);
 
+
+	//타겟 포지션을 조절
+	//if (.3f < static_cast<_float2>(vTargetProjPos).Length())
+
+		// 타겟 포즈를 중심으로 조절
+	//	_float2 vDir = static_cast<_float2>(vTargetProjPos);
+	//vDir.Normalize();  // 방향 벡터를 정규화
+
+	//// 임계값 범위 내로 조정
+	//vTargetProjPos = _float3((vDir * .3f).x, (vDir * .3f).y, vTargetProjPos.z);
+
+	//// 스크린 좌표를 다시 월드 좌표로 변환
+	//CUtils::Make_Screen_ToWorld(vTargetProjPos);
+
+
+	//m_vAnchor = vTargetProjPos;
+	//타겟 포즈가 중심점에 가까운 거리라면 카메라 이동 하지 않고 유지
+	//if (static_cast<_float2>(vTargetProjPos).Length() < .2f)
+	//{
+	//	m_vAnchor = static_cast<_float3>(m_pTransformCom->Get_State(CTransform::STATE_POSITION) + m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+	//}
+
+
+
+	//**** 설정 값 보간 ****//
 
 	//트리거 안에 들어가 있을 경우 트리거 사이에서의 목표 카메라 설정을 맞춘다.
 	if (m_bLerpByTriggerInfo)
@@ -333,8 +362,9 @@ void CCamera_Main::UpdatePos_FromAnchor(_float fTimeDelta)
 
 
 	//떨어진 거리 보간
-	if (abs(m_fDestDistance - m_fCurDistance) > .1f)
-		m_fCurDistance += (m_fDestDistance - m_fCurDistance) * fTimeDelta * 5.f;
+	if (abs((m_fDestDistance + m_fZoomOffset) - m_fCurDistance) > .1f)
+		m_fCurDistance += ((m_fDestDistance + m_fZoomOffset) - m_fCurDistance) * fTimeDelta * 5.f;
+
 	//y 오프셋 보간
 	//if (abs(m_fDestUpOffset - m_fCurUpOffset) > .1f)
 	//	LERP(m_fCurUpOffset, m_fDestUpOffset, fTimeDelta * 5.f);
@@ -400,18 +430,30 @@ void CCamera_Main::UpdatePos_FromAnchor(_float fTimeDelta)
 
 	_float4 vCurPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
-	_float4 vDestDir = Dir( Pos(m_vDestCamPos + vShakeDir) - Pos(vCurPos));
+	_float4 vDestDir = Dir(Pos(m_vDestCamPos + vShakeDir) - Pos(vCurPos));
 	_float4 vDestXZDir = { vDestDir.x, 0.f, vDestDir.z , 0.f };
 	_float4 vDestYDir = { 0.f, vDestDir.y, 0.f , 0.f };
 
 
+
+
 	//x 가기
-	if (.1f <= vDestXZDir.Length())
+	if (.1f <= vDestXZDir.Length() /*&& .2f < static_cast<_float2>(vTargetProjPos).Length()*/)
 		m_pTransformCom->Move(vDestXZDir * fTimeDelta * 4.f);
 
 	//y로 가기
 	if (.1f <= vDestYDir.Length())
-		m_pTransformCom->Move(vDestYDir * fTimeDelta * 2.f);
+	{
+		if (0.f < vDestYDir.y)
+			m_pTransformCom->Move(vDestYDir * fTimeDelta * 2.5f);
+		//if camera y -
+		else
+		{
+			m_pTransformCom->Move((1.f < vDestYDir.Length()) ? _float4{ 0.f, -1.f, 0.f, 0.f } *fTimeDelta * 3.f : vDestYDir * fTimeDelta * 2.5f);
+
+		}
+
+	}
 
 
 	m_pTransformCom->Look_At_Interpolate(m_pTransformCom->Get_State(CTransform::STATE_POSITION) + Dir(m_vCurCamDir), fTimeDelta);
@@ -485,7 +527,9 @@ void CCamera_Main::Render_IMGUI()
 	}
 
 
-	ImGui::DragFloat(u8"타겟까지의 목표 거리", &m_fDestDistance, .1f, 10.f, 50.f, "%.1f");
+	ImGui::DragFloat(u8"타겟까지의 목표 거리", &m_fDestDistance, .05f, 1.f, 50.f, "%.1f");
+	ImGui::DragFloat(u8"줌 오프셋", &m_fZoomOffset, .05f, -20.f, 20.f, "%.1f");
+
 	ImGui::Text(u8"현재 거리: %.2f", m_fCurDistance);
 
 	ImGui::Dummy(ImVec2(0, 20));
