@@ -42,6 +42,8 @@ HRESULT CPoppyBomb::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
+
+
 	m_fMaxHp = 15.f;
 	m_fHp = 15.f;
 	m_fAttack = 10.f;
@@ -59,11 +61,6 @@ _int CPoppyBomb::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
 		return OBJ_DEAD;
-
-	if (m_pGameInstance->Get_KeyState(DIK_F, KEY_DOWN))
-		m_pGameInstance->Set_SecondTimerRatio(0.2f);
-	if (m_pGameInstance->Get_KeyState(DIK_D, KEY_DOWN))
-		m_pGameInstance->Restore_SecondTimer();
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 

@@ -59,7 +59,7 @@ public:
 
 public:
 	// 이동에 대한 함수
-	void			Move(class CTransform* pTransform, _fvector vPosition, _float fTimeDelta, _float fHeight = 1.f);				// look방향으로 움직임	void			Move_Dir(class CTransform* pTransform, _fvector fDelta, _float fTimeDelta);			// 방향 벡터로 움직임
+	void			Move(class CTransform* pTransform, _fvector vPosition, _float fTimeDelta, _float fHeight = 1.f);
 	void			Move_Dir(class CTransform* pTransform, _fvector fDelta, _float fTimeDelta);			// 방향 벡터로 움직임
 	_bool			Jump(CTransform* pTransform, _float fFallVelocity, _float fTimeDelta);				// 점프
 	_bool			Jump_Parabola(CTransform* pTransform, _fvector vGoPos, _float fTimeDelta);			// 목표 지점으로 점프

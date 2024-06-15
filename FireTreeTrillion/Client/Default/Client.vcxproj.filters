@@ -247,6 +247,18 @@
     <Filter Include="02.GameObjects\PhysXObject\Item\Coin">
       <UniqueIdentifier>{fec82fe1-9a7e-4145-957f-e7c4662e02ff}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Cappy">
+      <UniqueIdentifier>{2644bd8b-3b13-4d9c-8842-edc41dccc1d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Cappy\CappyHat">
+      <UniqueIdentifier>{8dab8ce9-c12e-4dac-b478-a1c1e91dc229}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Cappy\CappyBody">
+      <UniqueIdentifier>{d3a49dbf-e4e8-433d-9c8d-77be4f30a5aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Cappy\State">
+      <UniqueIdentifier>{c2d71bf1-9ad3-4ad4-8a6d-3cfacbcaf42b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -497,6 +509,15 @@
     <ClInclude Include="..\Public\Trigger.h">
       <Filter>02.GameObjects\Map\Trigger</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\CappyBody.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Cappy\CappyBody</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CappyBody_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Cappy\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CappyHat.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Cappy\CappyHat</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -728,6 +749,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\Trigger.cpp">
       <Filter>02.GameObjects\Map\Trigger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CappyBody.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Cappy\CappyBody</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CappyBody_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Cappy\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CappyHat.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Cappy\CappyHat</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -128,6 +128,7 @@ _int CKirby::Tick(_float fTimeDelta)
 	// 유틸업데이트가 들어가있다.
 	__super::Tick(m_fTimeDelta);
 	Kirby_SystemTick(m_fTimeDelta);
+	Other_Collision();
 
 	m_pWeapons->Tick(m_fTimeDelta);
 	m_pArmours->Tick(m_fTimeDelta);
@@ -343,6 +344,41 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 	}
 
 
+}
+
+void CKirby::Other_Collision()
+{
+	if (INFO(m_pObject) != nullptr)
+	{
+		CCharacterController* pObjectController = static_cast<CCharacterController*>(INFO(m_pObject)->Get_Component(TEXT("Com_Controller")));
+		if (pObjectController != nullptr)
+			return;
+
+		
+		_float4 vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+		CTransform* pObjectTransform = INFO(m_pObject)->Get_TransformCom();
+		_float4 vObjectPos = pObjectTransform->Get_State_Vector(CTransform::STATE_POSITION);
+		_float vCurDistance = XMVectorGetX(XMVector3Length(vPos - vObjectPos));
+
+		if (vCurDistance > 0.5f)
+			return;
+
+		// 흡수중인 몬스터
+		if (INFO(m_pObject)->Get_PhyXState() == PO_VACUUMING)
+		{
+			// 일단 EAT으로 넘기는건 같으나, EAT이 끝날 시점에 내가 삼켰던 것이 무엇이였는지 판단 후 애니메이션이 분기된다.
+			INFO(m_isEat) = true;
+			INFO(m_eEyeState) = EYE_IDLE;
+			INFO(m_eMouthState) = MOUTH_ANGER;
+			Change_State(STATE_EAT, 100.f, false, false, BODY_BALLOON);
+			// 임시 보관소. 먹은게 끝났을 떄, 비로소 커비의 어빌리티 타입이 바뀐다.
+			INFO(m_eTemporaryEatType) = INFO(m_pObject)->Get_AbilityType();
+
+			INFO(m_pObject)->Set_PhyXState(PO_KIRBYMOUTH);
+
+			Delete_KirbyEffect();
+		}
+	}
 }
 
 void CKirby::Collision_Overlap(CGameObject* pGameObject)
@@ -934,10 +970,20 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 		if (INFO(m_pObject)->Get_PhyXState() == PO_KIRBYMOUTH)
 		{
 			CCharacterController* pObjectController = static_cast<CCharacterController*>(INFO(m_pObject)->Get_Component(TEXT("Com_Controller")));
-			CTransform* pObjectTransform = INFO(m_pObject)->Get_TransformCom();
-			_vector vMouthPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-			vMouthPos.m128_f32[1] += 1.f;
-			pObjectController->Set_Position(pObjectTransform, vMouthPos);
+			if (pObjectController == nullptr)
+			{
+				CTransform* pObjectTransform = INFO(m_pObject)->Get_TransformCom();
+				_vector vMouthPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+				vMouthPos.m128_f32[1] += 1.f;
+				pObjectTransform->Set_State(CTransform::STATE_POSITION, vMouthPos);
+			}
+			else
+			{
+				CTransform* pObjectTransform = INFO(m_pObject)->Get_TransformCom();
+				_vector vMouthPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+				vMouthPos.m128_f32[1] += 1.f;
+				pObjectController->Set_Position(pObjectTransform, vMouthPos);
+			}
 		}
 	}
 

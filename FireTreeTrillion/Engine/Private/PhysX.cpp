@@ -432,9 +432,10 @@ PxControllerBehaviorFlags CControllerBehaviorCallback::getBehaviorFlags(const Px
     CComponent* pComponent = static_cast<CComponent*>(controller.getUserData());
     if (pComponent != nullptr)
     {
+
     }
 
-    return PxControllerBehaviorFlag::eCCT_SLIDE;
+    return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
 }
 
 

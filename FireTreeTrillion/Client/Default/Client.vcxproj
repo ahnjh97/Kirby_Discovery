@@ -189,6 +189,9 @@
     <ClInclude Include="..\Public\Buffahorn_State.h" />
     <ClInclude Include="..\public\Camera_Free.h" />
     <ClInclude Include="..\public\Camera_Main.h" />
+    <ClInclude Include="..\Public\CappyBody.h" />
+    <ClInclude Include="..\Public\CappyBody_State.h" />
+    <ClInclude Include="..\Public\CappyHat.h" />
     <ClInclude Include="..\Public\Character.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\Coin.h" />
@@ -292,6 +295,9 @@
     <ClCompile Include="..\Private\Buffahorn_State.cpp" />
     <ClCompile Include="..\private\Camera_Free.cpp" />
     <ClCompile Include="..\private\Camera_Main.cpp" />
+    <ClCompile Include="..\Private\CappyBody.cpp" />
+    <ClCompile Include="..\Private\CappyBody_State.cpp" />
+    <ClCompile Include="..\Private\CappyHat.cpp" />
     <ClCompile Include="..\Private\Character.cpp" />
     <ClCompile Include="..\Private\Coin.cpp" />
     <ClCompile Include="..\Private\CollisionCenter.cpp" />
