@@ -8,7 +8,10 @@ class CHUD : public CUIObject
 {
 public:
 	enum HUD_STATUS { STAT_KIRBY, STAT_STARPOINT, STAT_NONE };
-	enum HUD_STARPOINT { STARPOINT_IDLE, STARPOINT_HIDE, STARPOINT_SHOW, STARPOINT_LOOT, STARPOINT_DROP, STARPOINT_NONE };
+	enum HUD_STARPOINT {
+		STARPOINT_IDLE, STARPOINT_WAIT,
+		STARPOINT_HIDE, STARPOINT_SHOW, STARPOINT_LOOT, STARPOINT_DROP, STARPOINT_NONE
+	};
 
 protected:
 	CHUD(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -29,10 +32,6 @@ public:
 	static CHUD*				Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject*		Clone(void* pArg) override;
 	virtual void				Free() override;
-
-protected:
-	HUD_STARPOINT				m_eSPrePstate = { STARPOINT_NONE };
-	HUD_STARPOINT				m_eSPstate = { STARPOINT_NONE };
 };
 
 

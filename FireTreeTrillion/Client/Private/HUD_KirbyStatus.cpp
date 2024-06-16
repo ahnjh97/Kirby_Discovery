@@ -33,7 +33,7 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 	m_UIObjDesc.eUIType = (*HUDKirby_Desc).eUIType;
 	m_UIObjDesc.vColorRGB = (*HUDKirby_Desc).vColorRGB;
 	m_UIObjDesc.fAlpha = (*HUDKirby_Desc).fAlpha;
-	m_UIObjDesc.vDegree = (*HUDKirby_Desc).vDegree;
+	//m_UIObjDesc.vDegree = (*HUDKirby_Desc).vDegree;
 
 	if (UI_TEXTURE == m_UIObjDesc.eUIType)
 		m_iTexIndex = (*HUDKirby_Desc).iTexIndex;
@@ -96,13 +96,7 @@ void CHUD_KirbyStatus::Late_Tick(_float fTimeDelta)
 HRESULT CHUD_KirbyStatus::Render()
 {
 	if (UI_TEXTURE == m_UIObjDesc.eUIType)
-	{
-		if (PROJ_ORTHO == m_UIObjDesc.eUIProj)
-			return S_OK;
-
-		if (PROJ_PERSPEC == m_UIObjDesc.eUIProj)
-			Render_PerspecProj(m_pShaderCom, m_pTransformCom);
-	}
+		Render_BindSet(m_pShaderCom, m_pTransformCom);
 
 	if (UI_FONT == m_UIObjDesc.eUIType)
 	{
@@ -143,17 +137,19 @@ HRESULT CHUD_KirbyStatus::Add_Components()
 	return S_OK;
 }
 
-HRESULT CHUD_KirbyStatus::Render_PerspecProj(CShader* _pShaderCom, CTransform* _pTransCom)
+HRESULT CHUD_KirbyStatus::Render_BindSet(CShader* _pShaderCom, CTransform* _pTransCom)
 {
 	CHECK_NULLPTR(_pShaderCom);
 
 	if (FAILED(_pTransCom->Bind_ShaderResource(_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
 
-	m_ViewMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW);
-	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
-
-	m_ProjMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
+	if (PROJ_PERSPEC == m_UIObjDesc.eUIProj)
+	{
+		//m_ViewMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW);
+		XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
+		m_ProjMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
+	}
 
 	//셰이더 파일의 매트릭스 정보를 가져와 바인딩
 	if (FAILED(_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
@@ -162,11 +158,11 @@ HRESULT CHUD_KirbyStatus::Render_PerspecProj(CShader* _pShaderCom, CTransform* _
 	if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
-	SHADER_PS eUIPass = { PS_ALPHABLEND }; //셰이더 패스 기본값
-	if (TEXT("Gauge") == m_UIObjDesc.wstrUITag){	eUIPass = PS_MASK_HP;	}
-	if (TEXT("Gauge_Damage") == m_UIObjDesc.wstrUITag){	eUIPass = PS_MASK_HPDAMAGE;	}
+	SHADER_PS ePassIndex = { PS_ALPHABLEND }; //셰이더 패스 기본값
+	if (TEXT("Gauge") == m_UIObjDesc.wstrUITag){ ePassIndex = PS_MASK_HP;	}
+	if (TEXT("Gauge_Damage") == m_UIObjDesc.wstrUITag){ ePassIndex = PS_MASK_HPDAMAGE;	}
 
-	if (FAILED(Bind_ShaderResources(_pShaderCom, eUIPass, m_pTextureCom, m_iTexIndex)))
+	if (FAILED(Bind_ShaderResources(_pShaderCom, ePassIndex, m_pTextureCom, m_iTexIndex)))
 		return E_FAIL;
 
 	return S_OK;
@@ -256,8 +252,8 @@ void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta)
 	// 회복 되었을 경우
 	else if (m_fHpRatio > m_fHpSlowRatio)
 	{
-
 		// 이곳은 피가 차는 곳이다.
+
 	}
 
 	// 만약, 0.8초가 지났으면 그제서야 m_fHpSlowRatio 가 HpRatio 를 따라간다.
@@ -300,8 +296,6 @@ void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta)
 
 	}
 
-
-
 	// 노란 게이지가 반짝이가 되는 중
 	if (m_bAlarm == true)
 	{
@@ -321,13 +315,11 @@ void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta)
 
 #pragma region 피통 UI 쉐이킹 코드
 
-	/*
 	if(m_bShaking == true)
 	{
-
+		/*
 		// 진동 주기
 		_float fCycle = 50.f;
-
 
 		m_fShakingTime += fTimeDelta;
 		m_fShakingAcc += fTimeDelta * fCycle;
@@ -345,8 +337,8 @@ void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta)
 			m_bShaking = false;
 			m_fAmplitude = 20.f;
 		}
+		*/
 	}
-	*/
 
 #pragma endregion
 

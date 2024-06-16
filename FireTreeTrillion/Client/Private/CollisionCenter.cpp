@@ -360,7 +360,8 @@ void CCollisionCenter::Compute_Coin(CPhysXObject* pPlayer, CPhysXObject* pItem)
 
 	// fItemPoint는 코인이 오르는 포인트임 저게 올라야할 "코인점수"임
 	// 만약, int 형으로 올라야한다면 형변환 꼭 해주셔!!!
-	 
+	
+
 	// 코인을 증가시키는 함수를 넣으면 됨 (SJ)
 }
 
