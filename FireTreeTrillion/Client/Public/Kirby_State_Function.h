@@ -999,7 +999,7 @@ static void SwordSpinSlash_One(CTransform* pTransformCom)
 		return;
 }
 #pragma endregion 
-}
+
 
 static void Throw_Bomb(CKirby::KIRBY_INFODESC* Kirbydesc, _float4 vDir, _float fPower)
 {
