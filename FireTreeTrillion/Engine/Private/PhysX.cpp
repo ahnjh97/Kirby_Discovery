@@ -261,6 +261,7 @@ PxRigidDynamic* CPhysX::CreateDynamicActor(_float4x4& matWorld, _float3* pVertic
         pDynamicActor->release();
         return nullptr;
     }
+    pShape->setSimulationFilterData(PxFilterData(0, 0, 0, 0));
 
     pDynamicActor->attachShape(*pShape);
     m_pScene->addActor(*pDynamicActor);
@@ -328,6 +329,7 @@ PxRigidStatic* CPhysX::CreateStaticActor(_float4x4& matWorld, _float3* pVertices
     }
     else
         pShape = m_pPhysics->createShape(triGeom, *pMaterial);
+    pShape->setSimulationFilterData(PxFilterData(0, 0, 0, 0));
 
     pStaticActor->attachShape(*pShape);
     m_pScene->addActor(*pStaticActor);
