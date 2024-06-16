@@ -29,6 +29,8 @@ private:
 public:
 	void Set_AwoofyEye(AWOOFYEYE_STATE eEyeState) { m_eEyeState = eEyeState; }
 
+	_float4 Get_Pos() { return m_vPos; }
+
 public:
 	virtual HRESULT Initialize_Prototype()	override;
 	virtual HRESULT Initialize(void* pArg)	override;
@@ -56,6 +58,7 @@ private:
 	AWOOFYEYE_STATE		m_eEyeState = { AWOOFYEYE_END };
 
 	_float				m_fAngle = { 0.f };
+	_float4				m_vPos = {};
 
 private:
 	HRESULT Add_Components();

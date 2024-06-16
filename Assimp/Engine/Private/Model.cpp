@@ -40,7 +40,7 @@ CModel::CModel(const CModel& rhs)
 	}
 }
 
-HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelFilePath, _fmatrix TransformMatrix)
+HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelFilePath, _fmatrix TransformMatrix, string& strTypeFolder)
 {
 	m_eModelType = eType;
 
@@ -95,7 +95,7 @@ HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelFilePath,
 			return E_FAIL;
 	}
 
-	if(FAILED(RenameBinaryFile())) // 파일 닫고, 임시파일-> 최종파일 이름
+	if(FAILED(RenameBinaryFile(strTypeFolder))) // 파일 닫고, 임시파일-> 최종파일 이름
 		return E_FAIL;
 
 	/*if (eType == TYPE_ANIM)
@@ -269,7 +269,7 @@ HRESULT CModel::Ready_Animations()
 	return S_OK;
 }
 
-HRESULT CModel::RenameBinaryFile()
+HRESULT CModel::RenameBinaryFile(const string& strTypeFolder)
 {
 	m_OutputFile.close();
 
@@ -289,11 +289,11 @@ HRESULT CModel::RenameBinaryFile()
 		m_strDirectory = modelName;
 	}
 
-	string strFolderName = "Anim/";
+	string strAnimNonAnim = "Anim/";
 	if (m_eModelType == TYPE_NONANIM)
-		strFolderName = "Non" + strFolderName;
+		strAnimNonAnim = "Non" + strAnimNonAnim;
 
-	m_strDirectory = "../../../model_txt/" + strFolderName + m_strDirectory + ".txt";
+	m_strDirectory = "../../../model_txt/" + strTypeFolder + strAnimNonAnim + m_strDirectory + ".txt";
 	remove(m_strDirectory.c_str());
 
 	// 임시파일의 파일이름을 원본파일의 이름으로 변경
@@ -317,11 +317,12 @@ void CModel::Create_NonAnimVersion(const string& strModelFilePath, _fmatrix Tran
 	m_pGameInstance->Add_Prototype(Level_MapTool, wstrPrototypeTag, Create(m_pDevice, m_pContext, TYPE_NONANIM, strModelFilePath, TransformMatrix));
 }
 
-CModel* CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eType, const string& strModelFilePath, _fmatrix TransformMatrix)
+CModel* CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eType, const string& strModelFilePath
+	, _fmatrix TransformMatrix, string& strTypeFolder)
 {
 	CModel* pInstance = new CModel(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype(eType, strModelFilePath, TransformMatrix)))
+	if (FAILED(pInstance->Initialize_Prototype(eType, strModelFilePath, TransformMatrix, strTypeFolder)))
 	{
 		MSG_BOX(TEXT("Failed To Created : CModel"));
 

@@ -52,6 +52,7 @@ public:
 			m_Animations[m_iCurrentAnimIndex]->Reset_Ratio();
 		}
 	}
+	void Set_TrackPosition(_float fTrackPosition) { m_Animations[m_iCurrentAnimIndex]->Set_TrackPosition(fTrackPosition); }
 
 	const _char* Get_AnimationName() const { return m_Animations[m_iCurrentAnimIndex]->Get_AnimationName(); }
 	_uint Get_AnimCnt() const { return m_Animations.size(); }
@@ -72,12 +73,13 @@ public:
 	void	Stop_Animation() { m_bStop = true; }
 	void	Replay_Animation() { m_bStop = false; }
 	HRESULT Render(_uint iMeshIndex);
-	HRESULT Render();
+	HRESULT RenderMergedMesh();
 
-	HRESULT CreateDynamicActor(_float4 vPos);
+	HRESULT CreateDynamicActor(_float4x4& matWorld);
+	HRESULT CreateStaticActor(_float4x4& matWorld);
+
 	void	Update_ActorTransform(class CTransform* pTransform);
 
-	HRESULT CreateStaticActor(_float4 vPos);
 
 	_float4 Check_Meshes(const class CTransform* pTransform, _Out_ _int& iMeshIndex) const;
 	void	Add_Event(const string& EventName, function<void()>&& Callback);
@@ -85,12 +87,20 @@ public:
 
 
 	void Find_MinMax(_float3& vMin, _float3& vMax);
-	class COcTree* Create_OcTree(_float3 vMin, _float3 vMax, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors);
+	void Find_MinMax_WorldPos(_float3& vMin, _float3& vMax);
+	class COcTree* Create_OcTree(_float3 vMin, _float3 vMax, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors
+		, vector<string>& _vecConstantNames);
 
 	void Create_MergedMesh(_fmatrix TransformMatrix);
 	void Bind_TextureArrays();
 	/*ID3D11ShaderResourceView* CreateTexture2DArraySRV(const vector<wstring>& filePaths);*/
 	void CreateSamplerState();
+
+	HRESULT Bind_StencilRimLightMotionBlur(class CShader* pShader, vector<string>& _vecConstantNames); // For Binding at Octree
+	void SetUpStencilRimLightMotionBlurPassIndex(_uint iShaderVars, _float fRimWidth, _uint iPassIndex); // For Binding at Octree
+	_uint Get_ModelPassIndex() { return m_iPassIndex; }
+	void Set_WorldMatrixForOctree(_float4x4 _matWorld) { m_matWorld = _matWorld; }
+	HRESULT Bind_WorldMatrixForOctree(class CShader* pShader, string& strConstantName = string("g_WorldMatrix"));
 
 private:
 	_uint						m_iNumMeshes = { 0 };
@@ -128,6 +138,13 @@ private:
 	vector<vector<wstring>>		m_vecTexturePaths;
 	vector<ID3D11ShaderResourceView*>	m_vecTextureArraySRVs;
 	ID3D11SamplerState*			m_pSamplerState = { nullptr };
+
+	_float						m_fRimWidth = { 0.2f }; // For Binding at Octree
+	_bool						m_bStencil = { true };
+	_bool						m_bRimLight = { true };
+	_bool						m_bMotionBlur = { false };
+	_uint						m_iPassIndex = {};
+	_float4x4					m_matWorld = {};
 
 
 private:

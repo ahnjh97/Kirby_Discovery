@@ -7,6 +7,7 @@
 static _int iMapTxtIdx = -1;
 static _int iTriggerTxtIdx = -1;
 static _int iMonsterTxtIdx = -1;
+static _int iObjectIdx = -1;
 static _int iNonAnimIdx = -1;
 static _int iLevelIndex = 0;
 static _int iTempLevelIdx = -1;
@@ -66,14 +67,26 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 	m_setMapNames = { "BG0", "BG1", "Level0Stage1Step01", "Level1Stage1Step01" };
 	m_setMonsterNames = { "NonAnim_Awoofy", "NonAnim_BladeKnight", "NonAnim_Buffahorn", "NonAnim_Rabbit"
-						, "NonAnim_Kabu", "NonAnim_BrontoBurt", "NonAnim_PoppyBrosJr" };
+						, "NonAnim_Kabu", "NonAnim_BrontoBurt", "NonAnim_PoppyBrosJr", "NonAnim_CappyBody"};
 	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy", "RallyPoint", "LightBulb" };
 	m_setRallyingMonsters = { "NonAnim_Kabu", "NonAnim_BrontoBurt" };
+
+	/*m_setNonColDecos = { "BushMCut" };*/
+	m_setAnimDecos = { "BushM", "PopFlower" };
+	m_setActorDecos = { "GsBenchAL", "GsFlowerPotAL", "GsFlowerPotBL", "GsSteelFenceA", "GsSteelFenceB"
+		, "GsTreeA", "GsTreeB", "GsTreeC", "GsWallRockA", "GsWallRockB"
+		, "GsWoodBridgeA", "GsWoodBridgeB", "GsRockCL", "GsRockDL", "GsRockEL", "GsRockFL", "GsRockGL"
+		, "JgGrassB", "JgGrassL", "JgGrasslongB", "JgGrassN", "JgWoodD"
+		, "StarBlockL" , "StarBlockM", "StarBlockS", "WoodBox"
+		, "SeDriftWoodAL", "SeDriftWoodBL", "SeDriftWoodCL" };
+	m_setKickableDecos = { "GsPebble", "GsStone", "SeShell" };
 
 	vecPassIndices.resize(m_vecMapModelNames.size());
 	vecSamplingFactors.resize(m_vecMapModelNames.size());
 
 	SetUpTxtVectors();
+	//ReadMapDecoTxts(TYPE_ANIM);
+	ReadMapDecoTxts(TYPE_NONANIM);
 
 	HideGrid(bHideGrid);
 	HideTriggers(bHideTriggers);
@@ -166,6 +179,33 @@ void CMapToolHelper::SetUpTxtVectors()
 		}
 		++dir_iter;
 	}
+
+	for (auto& objTxt : m_vecObjectTxts)
+		m_setObjectTxts.insert(objTxt);
+}
+
+void CMapToolHelper::ReadMapDecoTxts(TYPE eType)
+{
+	string strPath;
+	if(eType == TYPE_ANIM)
+		strPath =  "../../../model_txt/MapDeco/Anim/";
+	else if(eType == TYPE_NONANIM)
+		strPath = "../../../model_txt/MapDeco/NonAnim/";
+
+	directory_iterator end_iter;  // 디렉토리 순회의 끝을 나타내는 iterator
+	directory_iterator dir_iter(strPath);  // 지정된 경로의 시작 iterator
+
+	while (dir_iter != end_iter) {
+		if (is_regular_file(*dir_iter)) {
+			string strFilePath = dir_iter->path().filename().string();
+			string strModelName = strFilePath.substr(0, strFilePath.length() - 4);
+			m_vecMapDecoTxts.emplace_back(strModelName);
+		}
+		++dir_iter;
+	}
+
+	for (auto& objTxt : m_vecMapDecoTxts)
+		m_setMapDecoTxts.insert(objTxt);
 }
 
 void CMapToolHelper::Menu_Level()
@@ -241,7 +281,7 @@ void CMapToolHelper::Menu_NonAnimModels()
 		for (_int i = 0; i < m_vecMapTxts.size(); ++i)
 			vecMapNames[i] = m_vecMapTxts[i].c_str();
 		if (ImGui::ListBox("##Maps", &iMapTxtIdx, vecMapNames.data(), m_vecMapTxts.size(), 3)) {
-			iTriggerTxtIdx = iMonsterTxtIdx = iNonAnimIdx = -1;
+			iTriggerTxtIdx = iMonsterTxtIdx = iNonAnimIdx = iObjectIdx = -1;
 			m_strSelectedTxt = m_vecMapTxts[iMapTxtIdx];
 		}
 	}
@@ -253,7 +293,7 @@ void CMapToolHelper::Menu_NonAnimModels()
 		for (_int i = 0; i < m_vecTriggerTxts.size(); ++i)
 			vecTriggerNames[i] = m_vecTriggerTxts[i].c_str();
 		if (ImGui::ListBox("##Triggers", &iTriggerTxtIdx, vecTriggerNames.data(), m_vecTriggerTxts.size(), 3)) {
-			iMapTxtIdx = iMonsterTxtIdx = iNonAnimIdx = -1;
+			iMapTxtIdx = iMonsterTxtIdx = iNonAnimIdx = iObjectIdx = -1;
 			m_strSelectedTxt = m_vecTriggerTxts[iTriggerTxtIdx];
 		}
 	}
@@ -265,7 +305,7 @@ void CMapToolHelper::Menu_NonAnimModels()
 		for (_int i = 0; i < m_vecMonsterTxts.size(); ++i)
 			vecMonsterNames[i] = m_vecMonsterTxts[i].c_str();
 		if (ImGui::ListBox("##Monsters", &iMonsterTxtIdx, vecMonsterNames.data(), m_vecMonsterTxts.size(), 4)) {
-			iMapTxtIdx = iTriggerTxtIdx = iNonAnimIdx = -1;
+			iMapTxtIdx = iTriggerTxtIdx = iNonAnimIdx = iObjectIdx = -1;
 			m_strSelectedTxt = m_vecMonsterTxts[iMonsterTxtIdx];
 		}
 	}
@@ -276,9 +316,21 @@ void CMapToolHelper::Menu_NonAnimModels()
 		vector<const _char*> vecObjectNames(m_vecObjectTxts.size());
 		for (_int i = 0; i < m_vecObjectTxts.size(); ++i)
 			vecObjectNames[i] = m_vecObjectTxts[i].c_str();
-		if (ImGui::ListBox("##Objects", &iNonAnimIdx, vecObjectNames.data(), m_vecObjectTxts.size(), 9)) {
-			iMapTxtIdx = iTriggerTxtIdx = iMonsterTxtIdx = -1;
-			m_strSelectedTxt = m_vecObjectTxts[iNonAnimIdx];
+		if (ImGui::ListBox("##Objects", &iObjectIdx, vecObjectNames.data(), m_vecObjectTxts.size(), 9)) {
+			iMapTxtIdx = iTriggerTxtIdx = iMonsterTxtIdx = iNonAnimIdx = -1;
+			m_strSelectedTxt = m_vecObjectTxts[iObjectIdx];
+		}
+	}
+
+	if (ImGui::CollapsingHeader("MapDecos"))
+	{
+		ImGui::SetNextItemWidth(200.0f);
+		vector<const _char*> vecMapDecoNames(m_vecMapDecoTxts.size());
+		for (_int i = 0; i < m_vecMapDecoTxts.size(); ++i)
+			vecMapDecoNames[i] = m_vecMapDecoTxts[i].c_str();
+		if (ImGui::ListBox("##MapDecos", &iNonAnimIdx, vecMapDecoNames.data(), m_vecMapDecoTxts.size(), 15)) {
+			iMapTxtIdx = iTriggerTxtIdx = iMonsterTxtIdx = iObjectIdx = -1;
+			m_strSelectedTxt = m_vecMapDecoTxts[iNonAnimIdx];
 		}
 	}
 }
@@ -627,6 +679,9 @@ void CMapToolHelper::OnRightClick()
 		m_pPickedObject = pObjList->back();
 		m_strCurModel = m_strSelectedTxt;
 
+		if (m_setMapDecoTxts.end() != m_setMapDecoTxts.find(m_strCurModel))
+			m_pPickedObject->Set_ShaderVars(2);
+
 		iMapTxtIdx = iTriggerTxtIdx = iMonsterTxtIdx = iNonAnimIdx = -1;
 	}
 }
@@ -676,6 +731,8 @@ void CMapToolHelper::Save_Level()
 	
 	RegisterRallyPoints(pObjectsList);
 		
+	vector<CGameObject*> vecDecoObjs;
+
 	for (auto& object : *pObjectsList)
 	{
 		if (nullptr == object)
@@ -690,6 +747,11 @@ void CMapToolHelper::Save_Level()
 			continue;
 
 		string strModelName = pModel->Get_ModelInfo().strModelName;
+		if (m_setMapDecoTxts.end() != m_setMapDecoTxts.find(strModelName)) {
+			vecDecoObjs.push_back(object);
+			continue;
+		}
+
 		_float4x4 matWorld = pTransform->Get_WorldMatrix();
 		_uint iStrLength = strModelName.length();
 		_uint iShaderVars = object->Get_ShaderVars();
@@ -804,6 +866,8 @@ void CMapToolHelper::Save_Level()
 		return;
 	}
 
+	SaveMapDecoObjects(vecDecoObjs);
+
 	wstring wstrSaveMsg = CUtils::StrToWstr(strLevel) + TEXT(" Saved.");
 	MSG_BOX(wstrSaveMsg.c_str());
 }
@@ -839,7 +903,7 @@ void CMapToolHelper::Load_Level()
 
 	while (!fileStream.eof()) 
 	{
-		_uint iStrLength;
+		_uint iStrLength{};
 		fileStream.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
 		strModelName.resize(iStrLength);
 		fileStream.read(&strModelName[0], iStrLength);
@@ -959,6 +1023,8 @@ void CMapToolHelper::Load_Level()
 	}
 
 	fileStream.close();
+
+	LoadMapDecoObjects();
 }
 
 void CMapToolHelper::Save_MapShaderInfo()
@@ -1073,6 +1139,8 @@ CGameObject* CMapToolHelper::Select_ModelByPicking(const wstring& wstrLayerTag)
 	if (pObjectList->empty())
 		return nullptr;
 
+	_bool bCtrl = m_pGameInstance->Get_DIKeyState(DIK_LCONTROL, KEY_PRESS);
+	
 	for (auto& object : *pObjectList)
 	{
 		if (nullptr == object)
@@ -1087,6 +1155,10 @@ CGameObject* CMapToolHelper::Select_ModelByPicking(const wstring& wstrLayerTag)
 
 		CTransform* pTransform = dynamic_cast<CTransform*>(object->Get_Component(g_strTransformTag));
 		if (nullptr == pTransform)
+			continue;
+
+		string strModelName = pModel->Get_ModelName();
+		if (true == bCtrl && true == IsMap(strModelName))
 			continue;
 
 		_int iMeshIndex{};
@@ -1212,7 +1284,7 @@ _bool CMapToolHelper::ExcludeModel(string& _strModelName)
 	if (_strModelName.substr(0, 5) == "Smoke" || _strModelName.substr(0, 4) == "Test"
 		|| _strModelName.substr(0, 9) == "SkySphere" || _strModelName.substr(_strModelName.size() - 5) == "Blend"
 		|| "Tornado" == _strModelName || _strModelName.substr(0, 6) == "Vacuum" || _strModelName.substr(0, 5) == "Sword"
-		|| _strModelName.substr(_strModelName.size() - 5) == "Sword" )
+		|| _strModelName.substr(_strModelName.size() - 5) == "Sword" || _strModelName.substr(0, 5) == "Kirby")
 		return true;
 
 	return _bool();
@@ -1235,7 +1307,8 @@ void CMapToolHelper::Reset_MapShaderInfo()
 
 void CMapToolHelper::Save_Octree()
 {
-
+	CBasicMap* pBasicMap = dynamic_cast<CBasicMap*>(m_pPickedObject);
+	pBasicMap->Save_OctreeData(m_vecLevelName[iLevelIndex + LEVEL_INTRO]);
 }
 
 void CMapToolHelper::RegisterRallyPoints(list<CGameObject*>* _pObjList)
@@ -1299,6 +1372,340 @@ void CMapToolHelper::RegisterRallyPoints(list<CGameObject*>* _pObjList)
 		_float3 vFloatPos = vPos;
 
 		pNearestMonster->Emplace_RallyPoint(iRallyPointIndex, vFloatPos);
+	}
+}
+
+void CMapToolHelper::SaveMapDecoObjects(vector<CGameObject*>& _vecDecoObjs)
+{
+	string strLevel = m_vecLevelName[iLevelIndex + LEVEL_INTRO];
+	string tempFileName = "temp_" + m_vecLevelName[iLevelIndex + LEVEL_INTRO] + "_DecoObjs.txt";
+
+	ofstream fileOutput(tempFileName, ios::binary);
+
+	vector<pair<string, _float4x4>> vecAnimDecos;
+	vector<pair<string, _float4x4>> vecNonAnimDecos;
+
+	if (_vecDecoObjs.empty())
+		return;
+
+	for (auto& obj : _vecDecoObjs)
+	{
+		if (nullptr == obj)
+			continue;
+
+		CModel* pModel = dynamic_cast<CModel*>(obj->Get_Component(TEXT("Com_Model")));
+		if (nullptr == pModel)
+			continue;
+		CTransform* pTransform = dynamic_cast<CTransform*>(obj->Get_Component(g_strTransformTag));
+		if (nullptr == pTransform)
+			continue;
+		string strModelName = pModel->Get_ModelInfo().strModelName;
+
+		CMapToolObject* pMapToolObj = dynamic_cast<CMapToolObject*>(obj);
+		_uint iMapObjType{};
+		if (m_setAnimDecos.end() != m_setAnimDecos.find(strModelName))
+			iMapObjType = CMapToolObject::MAPOBJ_ANIM;
+		else if (m_setActorDecos.end() != m_setActorDecos.find(strModelName))
+			iMapObjType = CMapToolObject::MAPOBJ_ACTOR;
+		else
+			iMapObjType = CMapToolObject::MAPOBJ_NONCOL;
+
+		fileOutput.write(reinterpret_cast<const char*>(&iMapObjType), sizeof(iMapObjType));
+
+		_float4x4 matWorld = pTransform->Get_WorldMatrix();
+		_uint iStrLength = strModelName.length();
+		_uint iShaderVars = obj->Get_ShaderVars();
+		_float fRimWidth = obj->Get_RimWidth();
+
+		if (CMapToolObject::MAPOBJ_ANIM == iMapObjType)
+			vecAnimDecos.emplace_back(strModelName, matWorld);
+		else
+			vecNonAnimDecos.emplace_back(strModelName, matWorld);
+
+		fileOutput.write(reinterpret_cast<const char*>(&iStrLength), sizeof(iStrLength));
+		fileOutput.write(strModelName.c_str(), iStrLength);
+		fileOutput.write(reinterpret_cast<const char*>(&matWorld), sizeof(_float4x4));
+		fileOutput.write(reinterpret_cast<const char*>(&iShaderVars), sizeof(iShaderVars));
+		fileOutput.write(reinterpret_cast<const char*>(&fRimWidth), sizeof(fRimWidth));
+	}
+
+	fileOutput.close();
+
+	if (!fileOutput)
+	{
+		wstring wstrError = TEXT("Failed to write data to ") + CUtils::StrToWstr(tempFileName);
+		MSG_BOX(wstrError.c_str());
+		remove(tempFileName.c_str()); // 임시파일 삭제
+		return;
+	}
+
+	// 현재시간 받아오기
+	auto now = chrono::system_clock::now();
+	time_t currentTime = chrono::system_clock::to_time_t(now);
+
+	struct tm timeinfo;
+	localtime_s(&timeinfo, &currentTime);
+
+	// 현재 시간을 문자열로 변환
+	char buffer[80];
+	strftime(buffer, sizeof(buffer), "%H%M%S", &timeinfo);
+
+	string fileName_Time = "../../../objects_txt/" + string(buffer) + "_" + strLevel + "_DecoObjs.txt";
+	string fileName = "../../../objects_txt/" + strLevel + "_DecoObjs.txt";
+	if (rename(fileName.c_str(), fileName_Time.c_str()) != 0)
+	{
+		MSG_BOX(TEXT("Failed to rename original file."));
+		return;
+	}
+
+	if (rename(tempFileName.c_str(), fileName.c_str()) != 0) // 임시파일 이름을 level 이름으로 변경
+	{
+		wstring wstrError2 = TEXT("Failed to rename ") + CUtils::StrToWstr(tempFileName);
+		MSG_BOX(wstrError2.c_str());
+		remove(tempFileName.c_str()); // 임시파일 삭제
+		return;
+	}
+
+	/*WriteLocalizedAnimMapDecos(vecAnimDecos);
+	WriteLocalizedNonAnimMapDecos(vecNonAnimDecos);*/
+}
+
+void CMapToolHelper::LoadMapDecoObjects()
+{
+	string strLevel = m_vecLevelName[iLevelIndex + LEVEL_INTRO];
+	if ("Intro" != strLevel)
+		return;
+
+	string strFileName = "../../../objects_txt/" + strLevel + "_DecoObjs.txt";
+
+	ifstream fileInput(strFileName, ios::binary);
+	if (fileInput.is_open() == false)
+	{
+		wstring wstrError = TEXT("Failed to open : ") + CUtils::StrToWstr(strLevel) + TEXT("_DecoObjs.txt");
+		MSG_BOX(wstrError.c_str());
+		return;
+	}
+
+	_uint iMapObjType{};
+	string strModelName;
+	_float4x4 matWorld{};
+	_uint iStrLength{};
+	_uint iShaderVars{};
+	_float fRimWidth{};
+
+	while (!fileInput.eof())
+	{
+		fileInput.read(reinterpret_cast<char*>(&iMapObjType), sizeof(iMapObjType));
+		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
+		strModelName.resize(iStrLength);
+		fileInput.read(&strModelName[0], iStrLength);
+		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
+		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
+		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
+
+		CMapToolObject::MAPTOOLOBJECT_DESC tDesc{};
+		tDesc.eMapObjType = CMapToolObject::TYPE_MAPOBJ(iMapObjType);
+		tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+		tDesc.matWorld = matWorld;
+		tDesc.iShaderVars = iShaderVars;
+		tDesc.fRimWidth = fRimWidth;
+
+		if (fileInput.eof())
+			break;
+
+		wstring wstrGameObjectTag = TEXT("MapToolObject");
+
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
+		{
+			wstring wstrErrorMsg = TEXT("Failed to Clone: ") + wstrGameObjectTag;
+			MSG_BOX(wstrErrorMsg.c_str());
+			fileInput.close();
+			return;
+		}
+	}
+
+	fileInput.close();
+}
+
+void CMapToolHelper::WriteLocalizedAnimMapDecos(vector<pair<string, _float4x4>>& _vecAnimDecos)
+{
+	if (_vecAnimDecos.empty())
+		return;
+
+	for (auto& Name_Matrix : _vecAnimDecos)
+	{
+		string strPath = "../../../model_txt/MapDeco/Anim/" + Name_Matrix.first + ".txt";
+		ifstream inputFile(strPath, ios::binary);
+		if (false == inputFile.is_open()) {
+			MSG_BOX(TEXT("원본파일 열기실패"));
+			return;
+		}
+
+		string strLocalized = "../../../model_txt/OptimizedMapDecos/Anim/" + Name_Matrix.first + ".txt";
+		ofstream outputFile(strLocalized, ios::binary | ios::trunc); // 같은 이름을 가진 파일 있을 경우 삭제
+		if (!outputFile.is_open()) {
+			MSG_BOX(TEXT("새 파일 열기실패"));
+			return;
+		}
+
+		//Bones
+
+		_uint iNumBones = {};
+
+		inputFile.read(reinterpret_cast<char*>(&iNumBones), sizeof(iNumBones));
+		outputFile.write(reinterpret_cast<const char*>(&iNumBones), sizeof(iNumBones));
+
+		for (_uint i = 0; i < iNumBones; i++)
+		{
+			constexpr _uint iBytesToCopy = sizeof(_int) + MAX_PATH + sizeof(_float4x4);
+			_char copyBuf[iBytesToCopy];
+			inputFile.read(copyBuf, iBytesToCopy);
+			outputFile.write(copyBuf, iBytesToCopy);
+		}
+
+		_uint iNumMeshes{};
+		inputFile.read(reinterpret_cast<char*>(&iNumMeshes), sizeof(iNumMeshes));
+		outputFile.write(reinterpret_cast<const char*>(&iNumMeshes), sizeof(iNumMeshes));
+
+		_matrix matWorld = XMLoadFloat4x4(&Name_Matrix.second);
+
+		for (_uint i = 0; i < iNumMeshes; i++)
+		{
+			_char szName[MAX_PATH] = {};
+			_uint iMaterialIndex{};
+			_uint iNumVertices{};
+			_uint iFaces{};
+			inputFile.read(reinterpret_cast<char*>(&szName), sizeof(szName));
+			inputFile.read(reinterpret_cast<char*>(&iMaterialIndex), sizeof(iMaterialIndex));
+			inputFile.read(reinterpret_cast<char*>(&iNumVertices), sizeof(iNumVertices));
+			inputFile.read(reinterpret_cast<char*>(&iFaces), sizeof(iFaces));
+			outputFile.write(szName, MAX_PATH);
+			outputFile.write(reinterpret_cast<const char*>(&iMaterialIndex), sizeof(iMaterialIndex));
+			outputFile.write(reinterpret_cast<const char*>(&iNumVertices), sizeof(iNumVertices));
+			outputFile.write(reinterpret_cast<const char*>(&iFaces), sizeof(iFaces));
+
+			_uint iNumBones{};
+			inputFile.read(reinterpret_cast<char*>(&iNumBones), sizeof(iNumBones));
+			outputFile.write(reinterpret_cast<const char*>(&iNumBones), sizeof(iNumBones));
+
+			_float4x4 matTransformation{};
+			for (_uint j = 0; j < iNumBones; j++)
+			{
+				constexpr _uint iBoneBytes = MAX_PATH;
+				_char copyBuf0[iBoneBytes];
+				inputFile.read(copyBuf0, iBoneBytes);
+				outputFile.write(copyBuf0, iBoneBytes);
+
+				inputFile.read(reinterpret_cast<char*>(&matTransformation), sizeof(_float4x4));
+
+				_matrix transformationMatrix = XMLoadFloat4x4(&matTransformation);
+				_matrix matNewTransformation = transformationMatrix * matWorld;
+				_float4x4 matResult{};
+				XMStoreFloat4x4(&matResult, matNewTransformation);
+
+				outputFile.write(reinterpret_cast<const char*>(&matResult), sizeof(_float4x4));
+			}
+
+			for (_uint j = 0; j < iNumVertices; j++)
+			{
+				_float3 vPos{};
+				inputFile.read(reinterpret_cast<char*>(&vPos), sizeof(vPos));
+
+				_vector vTempPos = ::XMLoadFloat3(&vPos);
+				_vector vResult = XMVector3TransformCoord(vTempPos, matWorld);
+				::XMStoreFloat3(&vPos, vResult);
+				outputFile.write(reinterpret_cast<const char*>(&vPos), sizeof(vPos));
+
+				constexpr _uint iAnimMeshBytes = sizeof(_float3) + sizeof(_float2) + sizeof(_float3) + sizeof(XMUINT4) + sizeof(_float4) ;
+				_char copyBuf1[iAnimMeshBytes];
+				inputFile.read(copyBuf1, iAnimMeshBytes);
+				outputFile.write(copyBuf1, iAnimMeshBytes);
+			}
+
+			for (_uint k = 0; k < iFaces; k++)
+			{
+				_char copyBuf2[sizeof(_uint) * 3];
+				inputFile.read(copyBuf2, sizeof(_uint) * 3);
+				outputFile.write(copyBuf2, sizeof(_uint) * 3);
+			}
+		}
+
+		outputFile << inputFile.rdbuf();
+		inputFile.close();
+		outputFile.close();
+	}
+}
+
+void CMapToolHelper::WriteLocalizedNonAnimMapDecos(vector<pair<string, _float4x4>>& _vecNonAnimDecos)
+{
+	if (_vecNonAnimDecos.empty())
+		return;
+
+	for (auto& nameWorldMat : _vecNonAnimDecos)
+	{
+		string strPath = "../../../model_txt/MapDeco/NonAnim/" + nameWorldMat.first + ".txt";
+
+		ifstream inputFile(strPath, ios::binary);
+		if (false == inputFile.is_open()) {
+			MSG_BOX(TEXT("원본파일 열기실패"));
+			return;
+		}
+
+		string strLocalized = "../../../model_txt/OptimizedMapDecos/NonAnim/" + nameWorldMat.first + ".txt";
+		ofstream outputFile(strLocalized, ios::binary | ios::trunc);
+		if (!outputFile.is_open()) {
+			MSG_BOX(TEXT("새 파일 열기실패"));
+			return;
+		}
+
+		_uint iNumMeshes{};
+		inputFile.read(reinterpret_cast<char*>(&iNumMeshes), sizeof(iNumMeshes));
+		outputFile.write(reinterpret_cast<const char*>(&iNumMeshes), sizeof(iNumMeshes));
+
+		_matrix matWorld = XMLoadFloat4x4(&nameWorldMat.second);
+
+		for (_uint i = 0; i < iNumMeshes; i++)
+		{
+			_char szName[MAX_PATH] = {};
+			_uint iMaterialIndex{};
+			_uint iNumVertices{};
+			_uint iFaces{};
+			inputFile.read(reinterpret_cast<char*>(&szName), sizeof(szName));
+			inputFile.read(reinterpret_cast<char*>(&iMaterialIndex), sizeof(iMaterialIndex));
+			inputFile.read(reinterpret_cast<char*>(&iNumVertices), sizeof(iNumVertices));
+			inputFile.read(reinterpret_cast<char*>(&iFaces), sizeof(iFaces));
+			outputFile.write(szName, MAX_PATH);
+			outputFile.write(reinterpret_cast<const char*>(&iMaterialIndex), sizeof(iMaterialIndex));
+			outputFile.write(reinterpret_cast<const char*>(&iNumVertices), sizeof(iNumVertices));
+			outputFile.write(reinterpret_cast<const char*>(&iFaces), sizeof(iFaces));
+
+			for (_uint j = 0; j < iNumVertices; j++)
+			{
+				_float3 vPos{};
+				inputFile.read(reinterpret_cast<char*>(&vPos), sizeof(vPos));
+
+				_vector vTempPos = ::XMLoadFloat3(&vPos);
+				_vector vResult = XMVector3TransformCoord(vTempPos, matWorld);
+				::XMStoreFloat3(&vPos, vResult);
+				outputFile.write(reinterpret_cast<const char*>(&vPos), sizeof(vPos));
+
+				constexpr _uint iBytesToCopy = sizeof(_float3) + sizeof(_float2) + sizeof(_float3);
+				_char copyBuf[iBytesToCopy];
+				inputFile.read(copyBuf, iBytesToCopy);
+				outputFile.write(copyBuf, iBytesToCopy);
+			}
+
+			for (_uint k = 0; k < iFaces; k++)
+			{
+				_char copyBuf[sizeof(_uint) * 3];
+				inputFile.read(copyBuf, sizeof(_uint) * 3);
+				outputFile.write(copyBuf, sizeof(_uint) * 3);
+			}
+		}
+
+		outputFile << inputFile.rdbuf();
+		inputFile.close();
+		outputFile.close();
 	}
 }
 

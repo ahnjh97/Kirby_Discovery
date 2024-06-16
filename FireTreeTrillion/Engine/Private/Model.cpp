@@ -74,6 +74,8 @@ HRESULT CModel::Initialize_Prototype(MODEL tModel)
 	if (m_tModel.eType == TYPE_NONANIM)
 		strFolderName = "Non" + strFolderName;
 
+	strFolderName = tModel.strFolder + strFolderName;
+
 	m_strDirectory = "../../../model_txt/" + strFolderName + m_tModel.strModelName + strTxt;
 
 	m_InputFile.open(m_strDirectory.c_str(), ios::in | ios::binary);
@@ -111,29 +113,6 @@ HRESULT CModel::Initialize_Prototype(MODEL tModel)
 	}
 
 	m_InputFile.close();
-
-	if (true == tModel.bOctree) {
-		/*Create_MergedMesh(TransformMatrix);
-		CreateSamplerState();
-
-		vector<wstring> vecDiffuse;
-		for (auto& vecPaths : m_vecTexturePaths)
-			vecDiffuse.push_back(vecPaths[TextureType_DIFFUSE]);
-		m_vecTextureArraySRVs.emplace_back(CreateTexture2DArraySRV(vecDiffuse));
-
-		vector<wstring> vecNormal;
-		for (auto& vecPaths : m_vecTexturePaths)
-			vecNormal.push_back(vecPaths[TextureType_NORMALS]);
-		m_vecTextureArraySRVs.emplace_back(CreateTexture2DArraySRV(vecNormal));
-
-		vector<wstring> vecMRA;
-		for (auto& vecPaths : m_vecTexturePaths)
-			vecMRA.push_back(vecPaths[TextureType_METALNESS]);
-		m_vecTextureArraySRVs.emplace_back(CreateTexture2DArraySRV(vecMRA));*/
-
-		//wstring wstrFullPath = L"../../../Resources/Models/NonAnim/Level1Stage1Step01/GsAllBuildingCeilingConcreteC_MRA._622887136.dds";
-		//vecTexPath.emplace_back(wstrFullPath);
-	}
 		
 	return S_OK;
 }
@@ -220,7 +199,7 @@ HRESULT CModel::Render(_uint iMeshIndex)
 	return S_OK;
 }
 
-HRESULT CModel::Render()
+HRESULT CModel::RenderMergedMesh()
 {
 	if (nullptr == m_pMergedMesh)
 		return S_OK;
@@ -231,10 +210,10 @@ HRESULT CModel::Render()
 	return S_OK;
 }
 
-HRESULT CModel::CreateDynamicActor(_float4 vPos)
+HRESULT CModel::CreateDynamicActor(_float4x4& matWorld)
 {
 	for (auto& mesh : m_Meshes)
-		mesh->CreateDynamicActor(vPos);
+		mesh->CreateDynamicActor(matWorld);
 
 	return S_OK;
 }
@@ -245,10 +224,10 @@ void CModel::Update_ActorTransform(CTransform* pTransform)
 		mesh->Update_ActorTransform(pTransform);
 }
 
-HRESULT CModel::CreateStaticActor(_float4 vPos)
+HRESULT CModel::CreateStaticActor(_float4x4& matWorld)
 {
 	for (auto& mesh : m_Meshes)
-		mesh->CreateStaticActor(vPos);
+		mesh->CreateStaticActor(matWorld);
 
 	return S_OK;
 }
@@ -300,7 +279,22 @@ void CModel::Find_MinMax(_float3& vMin, _float3& vMax)
 		mesh->Find_MinMax(vMin, vMax);
 }
 
-COcTree* CModel::Create_OcTree(_float3 vMin, _float3 vMax, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors)
+void CModel::Find_MinMax_WorldPos(_float3& vMin, _float3& vMax)
+{
+	Find_MinMax(vMin, vMax);
+	_vector vMinPos = XMVectorSetW(XMLoadFloat3(&vMin), 1);
+	_vector vMaxPos = XMVectorSetW(XMLoadFloat3(&vMax), 1);
+	_matrix matWorld = XMLoadFloat4x4(&m_matWorld);
+
+	vMinPos = XMVector3TransformCoord(vMinPos, matWorld);
+	vMaxPos = XMVector3TransformCoord(vMaxPos, matWorld);
+
+	XMStoreFloat3(&vMin, vMinPos);
+	XMStoreFloat3(&vMax, vMaxPos);
+}
+
+COcTree* CModel::Create_OcTree(_float3 vMin, _float3 vMax, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors
+	, vector<string>& _vecConstantNames)
 {
 	if (vMin.x == 0 || false == m_tModel.bOctree)
 		return nullptr;
@@ -329,23 +323,9 @@ COcTree* CModel::Create_OcTree(_float3 vMin, _float3 vMax, vector<_uint>& _vecPa
 		vecNumIndices.push_back(mesh->Get_NumIndices());
 	}
 
-	//vector<FACE> vecFaces;
-
-	//_int iCount{};
-	//for (_uint i = 0; i < iNumIndices / 3; i++)
-	//{
-	//	vecFaces.emplace_back(pIndicesPtr[iCount], pIndicesPtr[iCount + 1], pIndicesPtr[iCount + 2]);
-	//	iCount += 3;
-	//}
-
-	string strFilePath = "../../../objects_txt/" + m_tModel.strModelName + "_Octree.txt";
-	ifstream fileInput(strFilePath, ios::in | ios::binary);
-
 	COcTree* pOctree = COcTree::Create(m_pDevice, m_pContext, vCenter, vHalfExtents, vecVerticesPtrs, vecNumVertices
-		, vecNormalsPtrs, vecTexCoordsPtrs, vecTangentsPtrs,vecIndicesPtrs, vecNumIndices
-		, fileInput, m_Meshes, m_Materials, _vecPassIndices, _vecSamplingFactors);
-
-	fileInput.close();
+		, vecNormalsPtrs, vecTexCoordsPtrs, vecTangentsPtrs, vecIndicesPtrs, vecNumIndices
+		, m_Meshes, m_Materials, _vecPassIndices, _vecSamplingFactors, _vecConstantNames);
 
 	return pOctree;
 }
@@ -479,6 +459,37 @@ void CModel::CreateSamplerState()
 		Safe_Release(m_pSamplerState);
 		return;
 	}
+}
+
+HRESULT CModel::Bind_StencilRimLightMotionBlur(CShader* pShader, vector<string>& _vecConstantNames)
+{
+	if (FAILED(pShader->Bind_RawValue(_vecConstantNames[0].c_str(), &m_bStencil, sizeof(m_bStencil))))
+		return E_FAIL;
+	if (FAILED(pShader->Bind_RawValue(_vecConstantNames[1].c_str(), &m_bRimLight, sizeof(m_bRimLight))))
+		return E_FAIL;
+	if (FAILED(pShader->Bind_RawValue(_vecConstantNames[2].c_str(), &m_fRimWidth, sizeof(m_fRimWidth))))
+		return E_FAIL;
+	if (FAILED(pShader->Bind_RawValue(_vecConstantNames[3].c_str(), &m_bMotionBlur, sizeof(m_bMotionBlur))))
+		return E_FAIL;
+	
+	return S_OK;
+}
+
+void CModel::SetUpStencilRimLightMotionBlurPassIndex(_uint iShaderVars, _float fRimWidth, _uint iPassIndex)
+{
+	m_bStencil = (iShaderVars >> 2) & 1;
+	m_bRimLight = (iShaderVars >> 1) & 1;
+	m_bMotionBlur = iShaderVars & 1;
+	m_fRimWidth = fRimWidth;
+	m_iPassIndex = iPassIndex;
+}
+
+HRESULT CModel::Bind_WorldMatrixForOctree(CShader* pShader, string& strConstantName)
+{
+	if (FAILED(pShader->Bind_Matrix(strConstantName.c_str(), &m_matWorld)))
+		return E_FAIL;
+
+	return S_OK;
 }
 
 HRESULT CModel::Ready_Meshes(_bool bOctree)

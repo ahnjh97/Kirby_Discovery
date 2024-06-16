@@ -18,12 +18,7 @@ public:
 		KABU_END
 	};
 
-	enum KABUMOVING_STATE {
-		KABUMOVING_CIRCLE, KABUMOVING_PATROL, KABUMOVING_END
-	};
-
 	struct KABU_DESC : public CMonster::MONSTER_DESC {
-		KABUMOVING_STATE eMoveState = { KABUMOVING_END };
 		vector<_float4> vecRallyPoints;
 	};
 
@@ -56,7 +51,6 @@ public:
 
 private:
 	KABU_ANIM			m_eCurrentState = { KABU_END };
-	KABUMOVING_STATE	m_eMoveState = { KABUMOVING_END };
 
 	_float4				m_vLook = {};
 

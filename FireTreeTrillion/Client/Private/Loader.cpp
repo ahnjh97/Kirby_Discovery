@@ -71,6 +71,8 @@
 #include "BrontoBurt.h"
 #include "PoppyBrosJr.h"
 #include "PoppyBomb.h"
+#include "CappyBody.h"
+#include "CappyHat.h"
 
 // 맵 오브젝트
 #include "Moon.h"
@@ -254,6 +256,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BrontoBurt"), CBrontoBurt);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PoppyBrosJr"), CPoppyBrosJr);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PoppyBomb"), CPoppyBomb);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CappyBody"), CCappyBody);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CappyHat"), CCappyHat);
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BackGround"), CBackGround);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
@@ -563,7 +567,10 @@ HRESULT CLoader::Loading_For_Tool_Map()
 	m_strLoadingText = TEXT("모델(을) 로딩 중 입니다.");
 	if(FAILED(Add_AllModelTxts(eLevel, TYPE_NONANIM)))
 		return E_FAIL;
-	
+	//if (FAILED(Add_AllModelTxts(eLevel, TYPE_ANIM, L"MapDeco/")))
+	//	return E_FAIL;
+	if (FAILED(Add_AllModelTxts(eLevel, TYPE_NONANIM, L"MapDeco/")))
+		return E_FAIL;
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 
 	m_IsFinished = true;
@@ -722,6 +729,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("BladeKnight", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("BladeKnightSword", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("Kabu", TYPE_ANIM, 2.f, 180.f);
+		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_NONANIM, 1.f, 180.f);
 
 		// For Mab Interactive Object
 		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM);
@@ -731,9 +739,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Item_Coin", TYPE_NONANIM, 1.f);
 
 		// For Interaction Decor
-		m_vecModelInfo.emplace_back("BushM", TYPE_ANIM, 10.f);
-
-
+		m_vecModelInfo.emplace_back("BushM", TYPE_ANIM, 1.f, 0.f, 0, false, string("MapDeco/"));
+		m_vecModelInfo.emplace_back("GsWoodBridgeA", TYPE_NONANIM, 1.f, 0.f, 0, false, string("MapDeco/"));
+		m_vecModelInfo.emplace_back("PopFlower", TYPE_ANIM, 1.f, 0.f, 0, false, string("MapDeco/"));
 	}
 	else if (eLevel == LEVEL_GAMEPLAY)
 	{
@@ -760,8 +768,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
 		
-
-		m_vecModelInfo.emplace_back("GsBenchAL", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("Level0Stage1Step01", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("Level1Stage1Step01", TYPE_NONANIM, 1.f, 0.f, 0, true);
 		m_vecModelInfo.emplace_back("Level1Stage1Step01_Blend", TYPE_NONANIM);
@@ -778,14 +784,16 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("BrontoBurt", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("PoppyBrosJr", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_NONANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("CappyBody", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("CappyHat", TYPE_ANIM, 1.f, 180.f);
 
 		// For Mab Interactive Object
 		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM);
-		m_vecModelInfo.emplace_back("Ladder", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("GsPebble", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("StarBlockL", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("StarBlockM", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("StarBlockS", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("Ladder", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("GsPebble", TYPE_NONANIM, 1.f, 0.f, 0, false, string("MapDeco/"));
+		m_vecModelInfo.emplace_back("StarBlockL", TYPE_NONANIM, 1.f, 0.f, 0, false, string("MapDeco/"));
+		m_vecModelInfo.emplace_back("StarBlockM", TYPE_NONANIM, 1.f, 0.f, 0, false, string("MapDeco/"));
+		m_vecModelInfo.emplace_back("StarBlockS", TYPE_NONANIM, 1.f, 0.f, 0, false, string("MapDeco/"));
 
 
 		// For Item
@@ -802,6 +810,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Dummy", TYPE_NONANIM, 0.01f);
 		m_vecModelInfo.emplace_back("RallyPoint", TYPE_NONANIM, 2.f);
 		m_vecModelInfo.emplace_back("LightBulb", TYPE_NONANIM, 0.02f);
+		m_vecModelInfo.emplace_back("Level0Stage1Step01", TYPE_NONANIM, 1.f, 0.f, 0, true);
+		m_vecModelInfo.emplace_back("Level1Stage1Step01", TYPE_NONANIM, 1.f, 0.f, 0, true);
 	}
 	else if (eLevel == LEVEL_TOOL_ANIM)
 	{
@@ -832,7 +842,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("PoppyBrosJr", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_NONANIM, 1.f, 180.f);
 	}
-
 }
 
 HRESULT CLoader::Add_Shaders(LEVEL eLevel)
@@ -952,12 +961,14 @@ HRESULT CLoader::Add_KirbyFaceTexture(LEVEL eLevel)
 	return S_OK;
 }
 
-// TOOL_MAP에서 사용중인 함수.
-HRESULT CLoader::Add_AllModelTxts(LEVEL eLevel, TYPE eType)
+// TOOL_MAP, TOOL_ANIM에서 사용중인 함수.
+HRESULT CLoader::Add_AllModelTxts(LEVEL eLevel, TYPE eType, wstring wstrFolder)
 {
 	HRESULT hr = S_OK;
 
 	wstring wstrRootFolderPath = TEXT("../../../model_txt/");
+	wstrRootFolderPath += wstrFolder;
+
 	if (TYPE_ANIM == eType)
 		wstrRootFolderPath += TEXT("Anim/");
 	else if (TYPE_NONANIM == eType)
@@ -993,6 +1004,8 @@ HRESULT CLoader::Add_AllModelTxts(LEVEL eLevel, TYPE eType)
 
 		if (strModelName.size() > 8 && "NonAnim" == strModelName.substr(0, 7))
 			tModelInfo.fDegree = tModelInfo.fDegree + 180.f;
+
+		tModelInfo.strFolder = CUtils::WstrToStr(wstrFolder);
 
 		wstring wstrPrototypeTag = TEXT("Prototype_Component_Model_") + CUtils::StrToWstr(tModelInfo.strModelName);
 		hr = m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CModel::Create(m_pDevice, m_pContext, tModelInfo));

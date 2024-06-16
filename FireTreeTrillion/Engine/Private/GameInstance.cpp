@@ -20,7 +20,9 @@
 #include "ImGUI_Manager.h"
 #endif
 
+#include "OcTree.h"
 #include "PhysX.h"
+
 
 IMPLEMENT_SINGLETON(CGameInstance)
 
@@ -956,20 +958,20 @@ void CGameInstance::Set_IMGUIStyle(_uint uStyle)
 }
 #endif
 
-PxRigidDynamic* CGameInstance::CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)
+PxRigidDynamic* CGameInstance::CreateDynamicActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)
 {
 	if (nullptr == m_pPhysx)
 		return nullptr;
 
-	return m_pPhysx->CreateDynamicActor(vPos, pVerticesPos, iNumVertices, pIndices, iNumIndices, pMaterial);
+	return m_pPhysx->CreateDynamicActor(matWorld, pVerticesPos, iNumVertices, pIndices, iNumIndices, pMaterial);
 }
 
-PxRigidStatic* CGameInstance::CreateStaticActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)
+PxRigidStatic* CGameInstance::CreateStaticActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)
 {
 	if (nullptr == m_pPhysx)
 		return nullptr;
 
-	return m_pPhysx->CreateStaticActor(vPos, pVerticesPos, iNumVertices, pIndices, iNumIndices, pMaterial);
+	return m_pPhysx->CreateStaticActor(matWorld, pVerticesPos, iNumVertices, pIndices, iNumIndices, pMaterial);
 }
 
 void CGameInstance::Register_Player(PxActor* pPlayerActor)
@@ -1000,6 +1002,12 @@ void CGameInstance::Emplace_ExitFunc(_int iTriggerType, function<void(void)> exi
 {
 	if (nullptr != m_pPhysx)
 		m_pPhysx->Emplace_ExitFunc(iTriggerType, exitFunc);
+}
+
+void CGameInstance::Emplace_MapDecoTrigger(PxActor* pTriggerActor, CModel* pMapDecoModel, _uint iAnimIdx, _float fTickPerSec)
+{
+	if(nullptr != m_pPhysx)
+		m_pPhysx->Emplace_MapDecoTrigger(pTriggerActor, pMapDecoModel, iAnimIdx, fTickPerSec);
 }
 
 void CGameInstance::Clear_EventCallBack()

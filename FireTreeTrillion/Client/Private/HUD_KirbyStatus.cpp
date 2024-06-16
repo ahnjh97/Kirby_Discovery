@@ -78,6 +78,10 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 
 	m_eCurState = KIRBYHP_IDLE;
 	m_ePreState = KIRBYHP_HIDE;
+	
+	// 커비 부르기 
+	m_pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+
 
 	return S_OK;
 }
@@ -346,15 +350,13 @@ void CHUD_KirbyStatus::Play_Animation(_float _fAccTime, HUD_KIRBYHP _eCurState)
 
 void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta)
 {
-	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
-
-	if (pKirby == nullptr)
+	if (m_pKirby == nullptr)
 		return;
 
 #pragma region 분홍색 게이지 공식
 	// 현재 커비의 HP 맥스치
-	_float fKirbyHpMax = pKirby->Get_MaxHp();
-	_float fKirbyHp = pKirby->Get_Hp();
+	_float fKirbyHpMax = m_pKirby->Get_MaxHp();
+	_float fKirbyHp = m_pKirby->Get_Hp();
 
 	// 이 비율은 0 ~ 1 사이에 있어야 한다.
 	m_fHpRatio = (fKirbyHp / fKirbyHpMax);

@@ -30,17 +30,20 @@ HRESULT CKabu::Initialize(void* pArg)
 
 		pKabuDesc->fSpeedPerSec = 7.f;
 		pKabuDesc->fRotationPerSec = XMConvertToRadians(90.0f);
-		m_eMoveState = pKabuDesc->eMoveState;
+		m_eMonState = pKabuDesc->eMonState;
 		m_vecRallyPoint = pKabuDesc->vecRallyPoints;
 	}
 
 	if (FAILED(__super::Initialize(pKabuDesc)))
 		return E_FAIL;
 
-	if(!m_vecRallyPoint.empty())
+	if (MON_PATROL == m_eMonState)
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecRallyPoint[0]);
-
-	m_vOriginPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+	else
+	{
+		m_fDistance = XMVectorGetX(XMVector3Length(m_vecRallyPoint[0] - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
+		m_vOriginPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+	}
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;
@@ -80,7 +83,7 @@ _int CKabu::Tick(_float fTimeDelta)
 
 		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), m_fTimeDelta * 5.f);
 
-		if (KABUMOVING_CIRCLE == m_eMoveState)
+		if (MON_CIRCLE == m_eMonState)
 		{
 			m_fAngle += m_fTimeDelta * 50.f;
 
@@ -90,14 +93,14 @@ _int CKabu::Tick(_float fTimeDelta)
 
 			m_pControllerCom->Move(m_pTransformCom, m_vRotatePos, m_fTimeDelta);
 		}
-		else if (KABUMOVING_PATROL == m_eMoveState)
+		else if (MON_PATROL == m_eMonState)
 		{
 			m_fMoveTime += m_fTimeDelta;
 
 			if (1.f < m_fMoveTime)
-				m_fSpeed -= m_fTimeDelta * 10.f;
+				m_fSpeed -= m_fTimeDelta * 5.f;
 			else if (1.f >= m_fMoveTime)
-				m_fSpeed += m_fTimeDelta * 10.f;
+				m_fSpeed += m_fTimeDelta * 5.f;
 
 			if (2.f < m_fMoveTime)
 			{

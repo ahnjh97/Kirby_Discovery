@@ -42,6 +42,8 @@ HRESULT CPoppyBomb::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
+
+
 	m_fMaxHp = 15.f;
 	m_fHp = 15.f;
 	m_fAttack = 10.f;
@@ -60,20 +62,79 @@ _int CPoppyBomb::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return OBJ_DEAD;
 
-	if (m_pGameInstance->Get_KeyState(DIK_F, KEY_DOWN))
-		m_pGameInstance->Set_SecondTimerRatio(0.2f);
-	if (m_pGameInstance->Get_KeyState(DIK_D, KEY_DOWN))
-		m_pGameInstance->Restore_SecondTimer();
-
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
+	// 바닥에 닿았을 때 물리 영향을 받음
+	if (true == m_bPhysx)
+	{
+		_vector vGravity = XMVectorSet(0.f, -GRAVITY, 0.f, 0.f);
+
+		// 경사면 법선 벡터
+		_vector vNormal = CUtils::To_Vector(m_pControllerCom->Compute_PureSlope());
+
+		// 중력 벡터를 경사면 법선에 투영하여 평면상에서의 중력 계산
+		_vector vGravityParallel = XMVector3Dot(vGravity, vNormal) * vNormal;
+		_vector vGravityPerpendicular = vGravity - vGravityParallel;
+
+		// 마찰력 계산
+		// 마찰력은 중력과 반대 방향으로 작용하며, 타임 델타를 반영하여 계산
+		_vector vFriction = -0.5f * vGravityPerpendicular;
+
+		// 가속도 계산
+		_vector vAcceleration = vGravityPerpendicular + vFriction;
+
+		// 속도 계산
+		_vector vVelocity = {};
+		vVelocity += vAcceleration;
+
+		// 이동
+		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+		vPos += (vVelocity + (XMVector3Normalize(m_vLookDir) * 0.2f * m_fMoveTime)) * m_fTimeDelta * 20.f;
+		m_pControllerCom->Move(m_pTransformCom, vPos, m_fTimeDelta, 0.5f);
+
+		//_float fHeight = m_pControllerCom->Compute_Height();
+
+		//if (2.f < fHeight)
+		//	m_bFall = true;
+
+		if (0.f < m_fMoveTime)
+		{
+			m_fMoveTime -= m_fTimeDelta;
+		}
+		else
+		{
+			m_fMoveTime = 0.f;
+		}
+
+		if (0.f >= m_fMoveTime)
+			m_fLifeTime += m_fTimeDelta;
+
+		if (2.f < m_fLifeTime)
+			m_bDead = true;
+
+
+
+		_vector vLook = vPos - m_vBeforePos;
+		_float fDistance = XMVectorGetX(XMVector3Length(vLook)) / m_fTimeDelta;
+
+		// 벡터가 0 벡터가 아닌지 확인
+		if (!XMVector3Equal(vLook, XMVectorZero()))
+		{
+			_vector vRight = XMVector3Cross(XMVector3Normalize(vLook), XMVector3Normalize(vNormal));
+			if (!XMVector3Equal(vRight, XMVectorZero()))
+			{
+				m_pTransformCom->Turn(-vRight, m_fTimeDelta * fDistance);
+				m_vBeforePos = vPos;
+			}
+		}
+	}
 	// 폭탄이 손에서 날아갈 타이밍
-	if (true == m_bBomb)
+	else if (true == m_bBomb)
 	{
 		// 폭탄이 땅에 떨어졌을 때
 		if (!m_bJump)
 		{
-			m_pControllerCom->FreeFall(m_pTransformCom, m_fTimeDelta, 6.f, 0.5f);
+			//m_pControllerCom->FreeFall(m_pTransformCom, m_fTimeDelta, 6.f, 0.5f);
 			m_bPhysx = true;
 		}
 		// 폭탄이 포물선을 그리며 날아감
@@ -106,57 +167,6 @@ _int CPoppyBomb::Tick(_float fTimeDelta)
 		}
 	}
 
-	// 바닥에 닿았을 때 물리 영향을 받음
-	if (true == m_bPhysx)
-	{
-		_vector vGravity = XMVectorSet(0.f, -GRAVITY, 0.f, 0.f);
-
-		// 경사면 법선 벡터
-		_vector vNormal = CUtils::To_Vector(m_pControllerCom->Compute_Slope(m_pTransformCom));
-
-		// 중력 벡터를 경사면 법선에 투영하여 평면상에서의 중력 계산
-		_vector vGravityParallel = XMVector3Dot(vGravity, vNormal) * vNormal;
-		_vector vGravityPerpendicular = vGravity - vGravityParallel;
-
-		// 마찰력 계산
-		// 마찰력은 중력과 반대 방향으로 작용하며, 타임 델타를 반영하여 계산
-		_vector vFriction = -0.5f * vGravityPerpendicular;
-
-		// 가속도 계산
-		_vector vAcceleration = vGravityPerpendicular + vFriction;
-
-		// 속도 계산
-		_vector vVelocity = {};
-		vVelocity += vAcceleration * m_fTimeDelta;
-
-		// 이동
-		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-		vPos += (vVelocity + (XMVector3Normalize(m_vLookDir) * 0.2f * m_fMoveTime)) * m_fTimeDelta * 50.f;
-		m_pControllerCom->Move(m_pTransformCom, vPos, m_fTimeDelta, 0.5f);
-
-		if (0.f < m_fMoveTime)
-		{
-			m_fMoveTime -= m_fTimeDelta;
-		}
-		else
-		{
-			m_fMoveTime = 0.f;
-		}
-
-		_vector vLook = vPos - m_vBeforePos;
-		_float fDistance = XMVectorGetX(XMVector3Length(vLook)) / m_fTimeDelta;
-
-		// 벡터가 0 벡터가 아닌지 확인
-		if (!XMVector3Equal(vLook, XMVectorZero()))
-		{
-			_vector vRight = XMVector3Cross(XMVector3Normalize(vLook), XMVector3Normalize(vNormal));
-			if (!XMVector3Equal(vRight, XMVectorZero()))
-			{
-				m_pTransformCom->Turn(-vRight, m_fTimeDelta * fDistance);
-				m_vBeforePos = vPos;
-			}
-		}
-	}
 	//__super::Tick(m_fTimeDelta);
 
 	return OBJ_NOEVENT;

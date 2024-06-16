@@ -73,6 +73,9 @@ private:
 	_float						m_fSaveMyY = { 0.f };
 	_float						m_fAmplitude = { 0.f };
 
+
+	class CKirby*				m_pKirby = nullptr;
+
 public:
 	static CHUD_KirbyStatus*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject*		Clone(void* pArg) override;
