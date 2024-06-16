@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "CappyHat.h"
 #include "CappyBody.h"
+#include "FSM.h"
+#include "CappyHat_State.h"
 
 CCappyHat::CCappyHat(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -62,18 +64,19 @@ _int CCappyHat::Tick(_float fTimeDelta)
 
 	if (m_ePhyXState == PO_VACUUMING || m_ePhyXState == PO_FLYDEADAWAY)
 	{
-		static_cast<CCappyBody*>(m_pGameObject)->Change_State(CCappyBody::CAPPYBODY_HATLOSE, 55.f, true, true);
-
 		if(false == m_bController)
 		{
+			static_cast<CCappyBody*>(m_pGameObject)->Change_State(CCappyBody::CAPPYBODY_HATLOSE, 55.f, true, true);
+			Change_State(CCappyHat::CAPPYHAT_FLY, 55.f, true, true);
+
 			HRESULT hr;
 
 			/* For.Com_CharacterController */
 			m_vPosition = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 			CCharacterController::CONTROLLER_DESC desc{};
 			desc.vInitialPos = m_vPosition;
-			desc.tCapsuleShape.fHeight = 0.1f;
-			desc.tCapsuleShape.fRadius = 0.3f;
+			desc.tCapsuleShape.fHeight = 0.5f;
+			desc.tCapsuleShape.fRadius = 0.5f;
 			hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 				TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 			CHECK_FAILED(hr);
@@ -84,51 +87,48 @@ _int CCappyHat::Tick(_float fTimeDelta)
 			m_bController = true;
 		}
 	}
-	else if (m_ePhyXState == PO_FLYAWAY)
+	else if(false == m_bController)
 	{
-		m_pControllerCom->Activate(true);
-		_float3 vDamegeDir = Get_DamegeDir();
-		m_pControllerCom->Move_Dir(m_pTransformCom, vDamegeDir * m_fTimeDelta * 30.f, m_fTimeDelta);
-		m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), m_fTimeDelta, 360.f);
-		m_fFlyTime += m_fTimeDelta;
-		if (m_fFlyTime > 2.f)
-			Set_Dead();
-	}
-	else if (CCappyBody::CAPPYBODY_KASAUP3 != static_cast<CCappyBody*>(m_pGameObject)->Get_State())
-	{
-		m_pModelCom->Set_Animation(CAPPYHAT_FLY, 50.f, false, true);
+		if (CCappyBody::CAPPYBODY_KASAUP3 != static_cast<CCappyBody*>(m_pGameObject)->Get_State())
+		{
+			m_pModelCom->Set_Animation(CAPPYHAT_FLY, 50.f, false, true);
 
-		// 버섯 머리 뼈에 붙힘
-		_float4x4 WorldMatrix = static_cast<CCappyBody*>(m_pGameObject)->Compute_BoneWorldMatrix();
-		m_pTransformCom->Set_WorldMatrix(WorldMatrix);
-		m_fHeightTime = 0.f;
-	}
-	else
-	{
-		m_pModelCom->Set_Animation(CAPPYHAT_FLY, 50.f, false, true);
-
-		_float fAnimRatio = static_cast<CCappyBody*>(m_pGameObject)->Get_AnimRatio();
-		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-		_float fnewY = vPos.m128_f32[1];
-
-		// 애니메이션 비율에 따라 위치를 조정합니다.
-		if (0.5f > fAnimRatio)
-			fnewY += (0.8f * (0.5f - fAnimRatio) + 0.1f) * m_fTimeDelta * 40.f;
+			// 버섯 머리 뼈에 붙힘
+			_float4x4 WorldMatrix = static_cast<CCappyBody*>(m_pGameObject)->Compute_BoneWorldMatrix();
+			m_pTransformCom->Set_WorldMatrix(WorldMatrix);
+			m_fHeightTime = 0.f;
+		}
 		else
-			fnewY -= (0.8f * (fAnimRatio - 0.5f) + 0.1f) * m_fTimeDelta * 40.f;
+		{
+			m_pModelCom->Set_Animation(CAPPYHAT_FLY, 50.f, false, true);
 
-		// 현재 높이를 유지하면서 새로운 y값을 설정합니다.
-		vPos.m128_f32[1] = fnewY;
+			_float fAnimRatio = static_cast<CCappyBody*>(m_pGameObject)->Get_AnimRatio();
+			_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+			_float fnewY = vPos.m128_f32[1];
 
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+			// 애니메이션 비율에 따라 위치를 조정합니다.
+			if (0.5f > fAnimRatio)
+				fnewY += (0.8f * (0.5f - fAnimRatio) + 0.1f) * m_fTimeDelta * 40.f;
+			else
+				fnewY -= (0.8f * (fAnimRatio - 0.5f) + 0.1f) * m_fTimeDelta * 40.f;
 
-		//// 버섯 머리 뼈에 붙힘
-		//_float4x4 WorldMatrix = dynamic_cast<CCappyBody*>(m_pGameObject)->Compute_BoneWorldMatrix(true);
+			// 현재 높이를 유지하면서 새로운 y값을 설정합니다.
+			vPos.m128_f32[1] = fnewY;
 
-		//m_pTransformCom->Set_WorldMatrix(WorldMatrix);
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+
+			//// 버섯 머리 뼈에 붙힘
+			//_float4x4 WorldMatrix = dynamic_cast<CCappyBody*>(m_pGameObject)->Compute_BoneWorldMatrix(true);
+
+			//m_pTransformCom->Set_WorldMatrix(WorldMatrix);
+		}
 	}
 
 	//__super::Tick(m_fTimeDelta);
+
+	// FSM 제어
+	if (m_pFSM != nullptr)
+		m_pFSM->Update(this, fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
@@ -226,7 +226,7 @@ void CCappyHat::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject*
 	{
 		if (m_ePhyXState == PO_NORMAL)
 		{
-			Change_State(CAPPYHAT_WAIT, 50.f, false, true);
+			Change_State(CAPPYHAT_FLY, 50.f, false, true);
 		}
 	}
 	else if (eContent == CCollisionCenter::CONTENT_VACUUMOBJECT)
@@ -241,7 +241,7 @@ void CCappyHat::Collision_Overlap(CGameObject* pGameObject)
 
 void CCappyHat::Change_State(CAPPYHAT_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
 {
-	//m_pFSM->ChangeState((_uint)eState, _fAnimSpeed, _bLoop, _bInterpolation);
+	m_pFSM->ChangeState((_uint)eState, _fAnimSpeed, _bLoop, _bInterpolation);
 }
 
 _bool CCappyHat::IsAnimFinished()
@@ -321,15 +321,16 @@ HRESULT CCappyHat::Bind_ShaderResources()
 
 void CCappyHat::SetUp_FSM()
 {
-	//// FSM 상태 초기화
-	//m_pFSM = CFSM::Create();
-	////m_pFSM->Add_State(CAPPYBODY_HIDINGWAITA, CCappyBody_Idle_State::Create());
+	// FSM 상태 초기화
+	m_pFSM = CFSM::Create();
+	m_pFSM->Add_State(CAPPYHAT_WAIT, CCappyHat_Idle_State::Create());
+	m_pFSM->Add_State(CAPPYHAT_FLY, CCappyHat_Damage_State::Create());
 
-	//// 상태 Initialize
-	//CFSM::FSM_INFO		FSM_Desc = {};
-	//FSM_Desc.iState = CAPPYHAT_WAIT;
-	//FSM_Desc.pModel = &m_pModelCom;
-	//m_pFSM->Initialize(&FSM_Desc);
+	// 상태 Initialize
+	CFSM::FSM_INFO		FSM_Desc = {};
+	FSM_Desc.iState = CAPPYHAT_WAIT;
+	FSM_Desc.pModel = &m_pModelCom;
+	m_pFSM->Initialize(&FSM_Desc);
 }
 
 CCappyHat* CCappyHat::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

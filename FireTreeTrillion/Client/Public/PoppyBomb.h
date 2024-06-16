@@ -51,6 +51,7 @@ private:
 
 	_float		m_fJumpTimeDelta = { 0.f };
 	_float		m_fMoveTime = { 0.f };
+	_float		m_fLifeTime = { 0.f };
 
 	_float4		m_vPosition = {};
 	_float4		m_vLook = {};

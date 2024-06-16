@@ -167,6 +167,8 @@ void CBuffahorn::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject
 		if (m_ePhyXState == PO_NORMAL)
 		{
 			// 커비랑 몸박인데, 몸 끼리 박으면 소는 안 아파하는거 같더라
+			// 맞아 어빌리티만 공격판정인데 
+			//Change_State(BUFFAHORN_DAMAGE, 50.f, false, true);
 		}
 	}
 	else if (eContent == CCollisionCenter::CONTENT_VACUUMOBJECT)
@@ -200,6 +202,9 @@ HRESULT CBuffahorn::Add_Components()
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
+	// FOR ANIMTOOL
+	m_ppModelForAnimTool = &m_pModelCom;
+
 	/* For.Com_Texture */
 	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Buffahorn_Eye"),
 		TEXT("Com_Texture"), (CComponent**)&m_pEyeTextureCom);
@@ -209,6 +214,8 @@ HRESULT CBuffahorn::Add_Components()
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
+	desc.tCapsuleShape.fHeight = 1.f;
+	desc.tCapsuleShape.fRadius = 1.f;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	m_pControllerCom->Set_Object(this);
@@ -268,6 +275,9 @@ void CBuffahorn::SetUp_FSM()
 
 	m_pFSM->Add_State(BUFFAHORN_JUMP, CBuffahorn_Jump_State::Create());
 	m_pFSM->Add_State(BUFFAHORN_RETURNJUMPEND, CBuffahorn_Jump_State::Create());
+
+	m_pFSM->Add_State(BUFFAHORN_DAMAGE, CBuffahorn_Damage_State::Create());
+	m_pFSM->Add_State(BUFFAHORN_BOUNCETOTURN, CBuffahorn_BounceToTurn_State::Create());
 
 	//상태 Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};

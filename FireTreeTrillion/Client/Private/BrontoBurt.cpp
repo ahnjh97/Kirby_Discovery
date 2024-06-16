@@ -30,18 +30,21 @@ HRESULT CBrontoBurt::Initialize(void* pArg)
 
 		pBrontoBurtDesc->fSpeedPerSec = 7.f;
 		pBrontoBurtDesc->fRotationPerSec = XMConvertToRadians(90.0f);
-		m_eMoveState = pBrontoBurtDesc->eMoveState;
+		m_eMonState = pBrontoBurtDesc->eMonState;
 		m_vecRallyPoint = pBrontoBurtDesc->vecRallyPoints;
 	}
 
 	if (FAILED(__super::Initialize(pBrontoBurtDesc)))
 		return E_FAIL;
 
-	if (!m_vecRallyPoint.empty())
+	if(MON_PATROL == m_eMonState)
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecRallyPoint[0]);
-
-	m_vOriginPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
-	m_vOriginPos.y += 1.f;
+	else
+	{
+		m_fDistance = XMVectorGetX(XMVector3Length(m_vecRallyPoint[0] - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
+		m_vOriginPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+		m_vOriginPos.y += 1.f;
+	}
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;
@@ -56,10 +59,9 @@ HRESULT CBrontoBurt::Initialize(void* pArg)
 	m_eAbilityType = ABILITY_DEFAULT;
 	m_eEyeState = BRONTOBURTEYE_IDLE;
 
-	m_fDistance = 5.f;
 	m_fSpeed = 5.f;
 	
-	if(BRONTOBURTMOVING_PATROL == m_eMoveState)
+	if(MON_PATROL == m_eMonState)
 		m_pTransformCom->Look_At_Dir(m_vecRallyPoint[0] - m_vecRallyPoint[1]);
 
 	Set_Slope(false);
@@ -107,7 +109,7 @@ _int CBrontoBurt::Tick(_float fTimeDelta)
 			else
 				m_bLerp = false;
 		}
-		else if (BRONTOBURTMOVING_CIRCLE == m_eMoveState)
+		else if (MON_CIRCLE == m_eMonState)
 		{
 			m_fAngle += m_fTimeDelta * 50.f;
 
@@ -121,7 +123,7 @@ _int CBrontoBurt::Tick(_float fTimeDelta)
 			m_pTransformCom->Look_At_Axis(m_vRally);
 			m_vBeforePos = m_vRotatePos;
 		}
-		else if (BRONTOBURTMOVING_PATROL == m_eMoveState)
+		else if (MON_PATROL == m_eMonState)
 		{
 			m_fMoveTime += m_fTimeDelta;
 			//if (1.f < m_fMoveTime)

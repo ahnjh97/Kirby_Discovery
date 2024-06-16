@@ -429,9 +429,6 @@
     <ClInclude Include="..\Public\BladeKnight_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\State</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\BladeKnightSword.h">
-      <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\ImSequencer.h">
       <Filter>02.GameObjects\Anim</Filter>
     </ClInclude>
@@ -517,6 +514,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\CappyHat.h">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\Cappy\CappyHat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CappyHat_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Cappy\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BladeKnightSword.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\State</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -758,6 +761,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\CappyHat.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\Cappy\CappyHat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CappyHat_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Cappy\State</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

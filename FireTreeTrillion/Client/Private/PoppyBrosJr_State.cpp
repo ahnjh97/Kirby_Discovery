@@ -96,6 +96,7 @@ void CPoppyBrosJr_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float f
 
 	pController->FreeFall(pTransformCom, fTimeDelta, 6.f, 0.5f);
 
+
 	if (true == m_bBomb)
 	{
 		m_bBomb = false;

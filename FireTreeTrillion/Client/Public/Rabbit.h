@@ -22,6 +22,11 @@ public:
 
 	enum RABBITEYE_STATE { RABBITEYE_IDLE, RABBITEYE_ANGER, RABBITEYE_SLEEP, RABBITEYE_HAPPY, RABBITEYE_HALF, RABBITEYE_END };
 
+public:
+	struct RABBIT_DESC : public CMonster::MONSTER_DESC {
+		
+	};
+
 private:
 	CRabbit(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CRabbit(const CRabbit& rhs);

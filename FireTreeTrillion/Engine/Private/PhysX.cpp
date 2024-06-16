@@ -435,7 +435,7 @@ PxControllerBehaviorFlags CControllerBehaviorCallback::getBehaviorFlags(const Px
 
     }
 
-    return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
+    return PxControllerBehaviorFlag::eCCT_SLIDE;
 }
 
 

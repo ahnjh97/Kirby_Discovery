@@ -23,17 +23,18 @@ HRESULT CPoppyBrosJr::Initialize_Prototype()
 
 HRESULT CPoppyBrosJr::Initialize(void* pArg)
 {
-	GAMEOBJECT_DESC* pGameObjectDesc = nullptr;
+	POPPY_DESC* pPoppySDesc = nullptr;
 
 	if (nullptr != pArg)
 	{
-		pGameObjectDesc = (GAMEOBJECT_DESC*)pArg;
+		pPoppySDesc = (POPPY_DESC*)pArg;
 
-		pGameObjectDesc->fSpeedPerSec = 7.f;
-		pGameObjectDesc->fRotationPerSec = XMConvertToRadians(90.0f);
+		pPoppySDesc->fSpeedPerSec = 7.f;
+		pPoppySDesc->fRotationPerSec = XMConvertToRadians(90.0f);
+		m_ePoppyState = pPoppySDesc->ePoppyState;
 	}
 
-	if (FAILED(__super::Initialize(pGameObjectDesc)))
+	if (FAILED(__super::Initialize(pPoppySDesc)))
 		return E_FAIL;
 
 	if (FAILED(Add_Components()))

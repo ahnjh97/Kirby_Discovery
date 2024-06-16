@@ -7,6 +7,7 @@
 #include "UIObject.h"
 #include "Trigger.h"
 #include "Kirby.h"
+#include "Awoofy.h"
 #include "Kabu.h"
 #include "BrontoBurt.h"
 #include "BG.h"
@@ -338,7 +339,13 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 		}
 		else if (strModelName == "NonAnim_Awoofy")
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Awoofy"), &tempDesc)))
+			CMonster::MONSTER_DESC MonsterDesc = {};
+			MonsterDesc.matWorld = matWorld;
+			MonsterDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			MonsterDesc.iShaderVars = iShaderVars;
+			MonsterDesc.fRimWidth = fRimWidth;
+			MonsterDesc.eMonState = CMonster::MONSTER_STATE(iTriggerIndex);
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Awoofy"), &MonsterDesc)))
 				return E_FAIL;
 		}
 		else if (strModelName == "NonAnim_Rabbit")
@@ -373,7 +380,7 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 			KabuDesc.wstrModelName = CUtils::StrToWstr(strModelName);
 			KabuDesc.iShaderVars = iShaderVars;
 			KabuDesc.fRimWidth = fRimWidth;
-			KabuDesc.eMoveState = CKabu::KABUMOVING_STATE(iTriggerIndex);
+			KabuDesc.eMonState = CKabu::MONSTER_STATE(iTriggerIndex);
 			KabuDesc.vecRallyPoints = vecRallyPoints;
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Kabu"), &KabuDesc)))
 				return E_FAIL;
@@ -385,7 +392,7 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 			BrontoBurtDesc.wstrModelName = CUtils::StrToWstr(strModelName);
 			BrontoBurtDesc.iShaderVars = iShaderVars;
 			BrontoBurtDesc.fRimWidth = fRimWidth;
-			BrontoBurtDesc.eMoveState = CBrontoBurt::BRONTOBURTMOVING_STATE(iTriggerIndex);
+			BrontoBurtDesc.eMonState = CBrontoBurt::MONSTER_STATE(iTriggerIndex);
 			BrontoBurtDesc.vecRallyPoints = vecRallyPoints;
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BrontoBurt"), &BrontoBurtDesc)))
 				return E_FAIL;

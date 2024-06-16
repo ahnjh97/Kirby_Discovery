@@ -66,7 +66,9 @@ public:
 	void			FreeFall(CTransform* pTransform, _float fTimeDelta, _float fOffset = 6.f, _float fHeight = 1.f);			// 자유 낙하
 	void			Reset_FallVelocity() { m_fFallVelocity = 0.f; }										// 자유 낙하 중력값 초기화
 	PxVec3			Compute_Slope(CTransform* pTransform);												// 경사면의 노말벡터 계산
-	_float			Compute_Height(_fvector vAxis = XMVectorSet(0.f, 0.f, 0.f, 0.f));																	// 경사면의 노말벡터 계산
+	PxVec3			Compute_PureSlope();												// 경사면의 노말벡터 계산
+	_float			Compute_Height(_fvector vAxis = XMVectorSet(0.f, 0.f, 0.f, 0.f));					// 경사면의 높이 계산
+	_float			Compute_Wall(_fvector vLook);														// 벽면의 노말벡터 계산
 	PxVec3			Compute_TerrainPosition();
 	_vector			Compute_TerrainPosition_Vector();
 	PxVec3			TerrainRayCast_Collision(PxVec3 _rayOrigin, PxVec3 _rayDirection, _float _fMaxDistance);
@@ -86,6 +88,16 @@ public:
 			return true;
 		else
 			return false;                                                                                                                                            
+	}
+
+	_bool	Is_Wall() {
+		PxControllerState m_pPxState;
+		m_pController->getState(m_pPxState);
+
+		if (m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_SIDES)
+			return true;
+		else
+			return false;
 	}
 
 protected:

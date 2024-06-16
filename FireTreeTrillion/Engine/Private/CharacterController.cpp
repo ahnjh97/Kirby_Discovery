@@ -294,7 +294,7 @@ PxVec3 CCharacterController::Compute_Slope(CTransform* pTransform)
 	PxVec3 rayOriginBack  = rayOrigin - look;
 
 	PxVec3 rayDirection = PxVec3(0.f, -1.f, 0.f);
-	_float fMaxDistance = 3.f;
+	_float fMaxDistance = 5.f;
 	
 	PxVec3	normal(0.f);
 	normal += TerrainRayCast_Collision(rayOriginRight, rayDirection, fMaxDistance);
@@ -302,6 +302,22 @@ PxVec3 CCharacterController::Compute_Slope(CTransform* pTransform)
 	normal += TerrainRayCast_Collision(rayOriginFront, rayDirection, fMaxDistance);
 	normal += TerrainRayCast_Collision(rayOriginBack,  rayDirection, fMaxDistance);
 	
+	normal.normalize();
+
+	return normal;
+}
+
+PxVec3 CCharacterController::Compute_PureSlope()
+{
+	PxExtendedVec3 position = m_pController->getPosition();
+	PxVec3 rayOrigin = PxVec3((_float)position.x, (_float)position.y, (_float)position.z);
+
+	PxVec3 rayDirection = PxVec3(0.f, -1.f, 0.f);
+	_float fMaxDistance = 1.f;
+
+	PxVec3	normal(0.f);
+	normal = TerrainRayCast_Collision(rayOrigin, rayDirection, fMaxDistance);
+
 	normal.normalize();
 
 	return normal;
@@ -333,6 +349,34 @@ _float CCharacterController::Compute_Height(_fvector vAxis)
 		return 20.f;
 
 	return fHeight;
+}
+
+_float CCharacterController::Compute_Wall(_fvector vLook)
+{
+	PxExtendedVec3 position = m_pController->getPosition();
+	PxVec3 rayOrigin = PxVec3((_float)position.x, (_float)position.y, (_float)position.z);
+
+	PxVec3 rayDirection = CUtils::To_PxVec3(vLook);
+	_float fMaxDistance = 10.f;
+
+	_float fDistance = { 0.f };
+	PxRaycastHit hit;
+	PxRaycastBuffer hitBuffer;
+	PxQueryFilterData filterData(PxQueryFlag::eSTATIC);
+
+	_bool isRayCast = m_pGameInstance->Get_Scene()->raycast(rayOrigin, rayDirection, fMaxDistance, hitBuffer, PxHitFlag::eNORMAL, filterData);
+
+	if (isRayCast)
+	{
+		// 첫 번째 히트 결과
+		hit = hitBuffer.block;
+
+		fDistance = (rayOrigin - hit.position).magnitude();
+	}
+	else
+		return 20.f;
+
+	return fDistance;
 }
 
 PxVec3 CCharacterController::Compute_TerrainPosition()

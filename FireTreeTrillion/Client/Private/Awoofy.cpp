@@ -23,24 +23,29 @@ HRESULT CAwoofy::Initialize_Prototype()
 
 HRESULT CAwoofy::Initialize(void* pArg)
 {
-	GAMEOBJECT_DESC* pGameObjectDesc = nullptr;
+	MONSTER_DESC* pMonDesc = nullptr;
 
 	if (nullptr != pArg)
 	{
-		pGameObjectDesc = (GAMEOBJECT_DESC*)pArg;
+		pMonDesc = (MONSTER_DESC*)pArg;
 
-		pGameObjectDesc->fSpeedPerSec = 7.f;
-		pGameObjectDesc->fRotationPerSec = XMConvertToRadians(90.0f);
+		pMonDesc->fSpeedPerSec = 7.f;
+		pMonDesc->fRotationPerSec = XMConvertToRadians(90.0f);
+		m_eMonState = pMonDesc->eMonState;
 	}
 
-	if (FAILED(__super::Initialize(pGameObjectDesc)))
+	if (FAILED(__super::Initialize(pMonDesc)))
 		return E_FAIL;
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	m_pModelCom->Set_Animation(AWOOFY_GROOMING, 45.f, false, true);
-
+	if(MON_WAIT == m_eMonState)
+		m_pModelCom->Set_Animation(AWOOFY_GROOMING, 45.f, false, true);
+	else if(MON_CIRCLE == m_eMonState)
+		m_pModelCom->Set_Animation(AWOOFY_WALK, 45.f, true, true);
+	else if(MON_SLEEP == m_eMonState)
+		m_pModelCom->Set_Animation(AWOOFY_SLEEP, 45.f, true, true);
 
 	m_fMaxHp = 10.f;
 	m_fHp = 10.f;
@@ -298,15 +303,15 @@ HRESULT CAwoofy::Add_Components()
 	CHECK_FAILED(hr);
 
 	/* For.Com_CharacterController */
-	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+	m_vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
-	desc.vInitialPos = vPos;
+	desc.vInitialPos = m_vPos;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	CHECK_FAILED(hr);
 	m_pControllerCom->Set_Object(this);
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vPos);
 
 	// FOR ANIMTOOL
 	m_ppModelForAnimTool = &m_pModelCom;
@@ -351,9 +356,13 @@ void CAwoofy::SetUp_FSM()
 {
 	// FSM 상태 초기화
 	m_pFSM = CFSM::Create();
+
+	m_pFSM->Add_State(AWOOFY_WALK, CAwoofy_Walk_State::Create());
+
 	m_pFSM->Add_State(AWOOFY_WAIT, CAwoofy_Idle_State::Create());
 	m_pFSM->Add_State(AWOOFY_GROOMING, CAwoofy_Idle_State::Create());
 	m_pFSM->Add_State(AWOOFY_LOOKAROUND, CAwoofy_Idle_State::Create());
+	m_pFSM->Add_State(AWOOFY_SLEEP, CAwoofy_Idle_State::Create());
 
 	m_pFSM->Add_State(AWOOFY_RUN, CAwoofy_Run_State::Create());
 	m_pFSM->Add_State(AWOOFY_FIND, CAwoofy_Find_State::Create());
@@ -364,7 +373,12 @@ void CAwoofy::SetUp_FSM()
 
 	// 상태 Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};
-	FSM_Desc.iState = AWOOFY_WAIT;
+	if (MON_WAIT == m_eMonState)
+		FSM_Desc.iState = AWOOFY_GROOMING;
+	else if (MON_CIRCLE == m_eMonState)
+		FSM_Desc.iState = AWOOFY_WALK;
+	else if (MON_SLEEP == m_eMonState)
+		FSM_Desc.iState = AWOOFY_SLEEP;
 	FSM_Desc.pModel = &m_pModelCom;
 	m_pFSM->Initialize(&FSM_Desc);
 }
