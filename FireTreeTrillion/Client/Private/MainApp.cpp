@@ -247,6 +247,9 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 
 		wstring wstrProtoName = { TEXT("Prototype_GameObject_") + CUtils::StrToWstr(strname) };
 
+		if (wstrProtoName == TEXT("Prototype_GameObject_SwordTrail_One"))
+			_int a = 0;
+
 		hr = m_pGameInstance->Add_Prototype(wstrProtoName, CMultiEffect::Create(m_pDevice, m_pContext, FXDesc));
 		CHECK_FAILED(hr);
 

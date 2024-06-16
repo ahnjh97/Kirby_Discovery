@@ -313,7 +313,7 @@ HRESULT CSingleEffect::Bind_ShaderResources(_int iTexIdx, _int iMaskTexIdx)
 	hr = m_pShaderCom->Bind_RawValue("g_vMaskUVOffset", &m_vCurMaskUVOffset, sizeof(_float2));
 	CHECK_FAILED(hr);
 
-	hr = m_pShaderCom->Bind_RawValue("g_vMaskUVAngle", &m_vCurMaskUVAngle, sizeof(_float2));
+	hr = m_pShaderCom->Bind_RawValue("g_fMaskUVAngle", &m_vCurMaskUVAngle, sizeof(_float));
 	CHECK_FAILED(hr);
 
 	hr = m_pGameInstance->Bind_RTShaderResource(m_pShaderCom, TEXT("Target_Depth"), "g_DepthTexture");

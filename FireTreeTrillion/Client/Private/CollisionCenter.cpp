@@ -203,6 +203,11 @@ void CCollisionCenter::Ladder_Collider()
 		return;
 
 	CKirby* pKirby = static_cast<CKirby*>(GAMEINSTANCE Get_GameObject(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+
+	if (nullptr == pKirby)
+		return;
+
+
 	_vector vKirbyPos = pKirby->Get_TransformCom()->Get_State_Vector(CTransform::STATE_POSITION);
 	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
 	_bool bCollide = { false };
