@@ -67,7 +67,7 @@ _int CTrigger::Tick(_float fTimeDelta)
 		// 트리거 시간제한 조건
 		if (m_bAlive)
 			m_fTriggerOffTime += m_pOwner->Get_ObjTimeDelta();
-		if (m_fTriggerOffTime >= 0.2f)
+		if (m_fTriggerOffTime >= 0.05f)
 		{
 			Close_Collision();
 			m_fTriggerOffTime = 0.f;
