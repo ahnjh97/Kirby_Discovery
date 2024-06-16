@@ -5,6 +5,7 @@
 #include "Ladder.h"
 #include "Base.h"
 
+
 BEGIN(Client)
 
 class CCollisionCenter :
@@ -14,7 +15,10 @@ class CCollisionCenter :
 public:
     enum CONTENT_TYPE {
         CONTENT_BODY,		    // 캐릭터와 몬스터가 몸끼리 박음
-        CONTENT_ATTACK,         // 충돌박스와의 충돌 (예정)
+
+        CONTENT_ATTACK,         // 플레이어의 히트박스 X 몬스터
+        CONTENT_DAMAGE,         // 몬스터와의 히트박스 X 플레이어
+
         CONTENT_VACUUMOBJECT,   // 커비가 흡수 후 날리는 것들과의 충돌
 
         CONTENT_INTERACT,	    
@@ -41,8 +45,17 @@ private:
     void Ladder_Collider();
 
     set< pair<CGameObject*, CGameObject*> > m_WaitingList;
+    set< class CTrigger* > m_Hitboxes;
     list<CLadder*>                          m_Ladders;
 
+#pragma region KNOCKBACK
+    _bool Small_KnockBack(_uint uKirbyState); 
+
+    _bool Normal_KnockBack(_uint uKirbyState);
+
+    _bool Up_KnockBack(_uint uKirbyState);
+    _bool FlyAway_KnockBack(_uint uKirbyState);
+#pragma endregion
 
 
     // 기능들

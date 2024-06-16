@@ -102,7 +102,7 @@ HRESULT CKirby::Initialize(void* pArg)
 	m_fHp = 100.f;
 	m_fAttack = 5.f;
 	//m_eAbilityType = ABILITY_DEFAULT;
-	m_eAbilityType = ABILITY_BOMB;
+	m_eAbilityType = ABILITY_SWORD;
 
 	m_pControllerCom->RegisterAsPlayer();
 	m_pControllerCom->Register_Controller();
@@ -301,14 +301,21 @@ void CKirby::Add_AnimEvent()
 	// 3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
 	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("ApplyDamage", [this]() {
 		m_pHitBoxTrigger->Check_Collision();
+
+
+
 		});
 	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("StopDamage", [this]() {
-		m_pHitBoxTrigger->Close_Collision();
+		//m_pHitBoxTrigger->Close_Collision();
+
+
+
 		});
 }
 
 void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
+	// 몸끼리 부딪혔을때
 	if (eContent == CCollisionCenter::CONTENT_BODY)
 	{
 		// 흡수중인 몬스터
@@ -362,13 +369,15 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 			Delete_AllEffect();
 		}
 	}
+
+
+
 }
 
 void CKirby::Collision_Hitbox(CPhysXObject* pGameObject)
-
 {
-	// kirby HITBOX 충돌이 일어날 경우 처리해야하는 일들
-	// MSG_BOX(TEXT("커비 overlap 충돌"));
+
+
 }
 
 _float3 CKirby::Make_RepulsiveDir(CPhysXObject* pObject)
@@ -707,7 +716,7 @@ HRESULT CKirby::Add_PartObjects()
 	tTriggerDesc.iTriggerType = CTrigger::TRIGGER_HITBOX;
 	tTriggerDesc.iTriggerIndex = 0;
 	tTriggerDesc.eCollisionGroup = HITBOX_PLYAER;
-	tTriggerDesc.vTriggerSize = _float3(2.f, 1.f, 2.f);
+	tTriggerDesc.vTriggerSize = _float3(2.5f, 1.f, 2.5f);
 	m_pHitBoxTrigger = static_cast<CTrigger*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc));
 	CHECK_NULLPTR(m_pHitBoxTrigger);
 	m_pHitBoxTrigger->Set_Owner(this);

@@ -252,24 +252,7 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
-
-	static _float fBbongTime{ 0.f };
-	fBbongTime += fTimeDelta;
-	if (.2f < fBbongTime)
-	{
-		CMultiEffect::MULTI_FX_DESC FXDesc{};
-		_float4 vMyPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
-		vMyPos += pTransformCom->Get_State(CTransform::STATE_LOOK) * .4f;
-
-		FXDesc.vInitPos = { vMyPos.x, vMyPos.y + .3f, vMyPos.z };
-		FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK)).y, 0.f };
-		FXDesc.vInitScale = { 1.3f, 1.3f, 1.3f };
-
-		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
-			return;
-
-		fBbongTime = 0.f;
-	}
+	Bbong_FX(fTimeDelta, pTransformCom);
 
 	if (Kirby_Ladder_Logic(pKirby, Kirbydesc, pTransformCom))
 	{

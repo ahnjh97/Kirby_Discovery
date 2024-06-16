@@ -42,12 +42,11 @@ HRESULT CLevel_Intro::Initialize()
 	CHECK_FAILED(hr);
 
 
-
 	CGameObject::GAMEOBJECT_DESC ObjDesc{};
 	ObjDesc.fSpeedPerSec = 5.f;
 	ObjDesc.fRotationPerSec = ToRadian(90.f);
 	_float4x4 InitMat = _float4x4::Identity;
-	InitMat.Translation({ -25.f, 16.f, 259.5f });
+	InitMat.Translation({ -25.f, 17.f, 259.5f });
 	ObjDesc.matWorld = InitMat;
 
 	// Ladder Test
