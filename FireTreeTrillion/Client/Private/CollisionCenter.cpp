@@ -2,6 +2,7 @@
 #include "CollisionCenter.h"
 #include "GameInstance.h"
 #include "Kirby.h"
+#include "Trigger.h"
 #include "ItemObject.h"
 #include "Camera_Main.h"
 
@@ -168,20 +169,23 @@ void CCollisionCenter::Collision_Collider(CONTENT_TYPE eType, CPhysXObject* pSrc
 		CPhysXObject* pPlayer = Find_TypePtr(PLAYER, pSrcObject, pDstObject);
 		if (pPlayer == nullptr)
 			return;
-		CPhysXObject* pItem = Find_TypePtr(ITEM, pSrcObject, pDstObject);
-		if (pItem == nullptr)
+
+		CPhysXObject* pTriggerObj = Find_TypePtr(ITEM, pSrcObject, pDstObject);
+		if (pTriggerObj == nullptr)
 			return;
 
-		CItemObject* pIItem = static_cast<CItemObject*>(pItem);
-
+		// 아이템은 트리거와 충돌처리하기에, 트리거로부터 아이템을 가져온다.
+		CTrigger* pTrigger = static_cast<CTrigger*>(pTriggerObj);
+		CItemObject* pItem = static_cast<CItemObject*>(pTrigger->Get_Owner());
+		
 		// 이미 충돌이 완료된 상태라면.
-		if (pIItem->Get_ItemCollisionComplete() == true)
+		if (pItem->Get_ItemCollisionComplete() == true)
 			return;
 
-		pPlayer->Collision(CONTENT_ITEM, pItem);
-		pItem->Collision(CONTENT_ITEM, pPlayer);
+		pPlayer->Collision(CONTENT_ITEM, pTriggerObj);
+		pTriggerObj->Collision(CONTENT_ITEM, pPlayer);
 
-		switch(pIItem->Get_ItemType())
+		switch(pItem->Get_ItemType())
 		{
 		case CItemObject::ITEM_FOOD:
 			Compute_Heal(pPlayer, pItem);
@@ -367,14 +371,13 @@ void CCollisionCenter::Compute_Heal(CPhysXObject* pPlayer, CPhysXObject* pItem)
 
 void CCollisionCenter::Compute_Coin(CPhysXObject* pPlayer, CPhysXObject* pItem)
 {
+	CKirby* pCPlayer = static_cast<CKirby*>(pPlayer);
 	CItemObject* pIItem = static_cast<CItemObject*>(pItem);
-	_float fItemPoint = (_float)pIItem->Get_ItemPoint();
 
 	// fItemPoint는 코인이 오르는 포인트임 저게 올라야할 "코인점수"임
 	// 만약, int 형으로 올라야한다면 형변환 꼭 해주셔!!!
-	
-
-	// 코인을 증가시키는 함수를 넣으면 됨 (SJ)
+	_float fItemPoint = (_float)pIItem->Get_ItemPoint();
+	pCPlayer->Plus_Coin((_uint)fItemPoint);
 }
 
 void CCollisionCenter::Compute_SuperPower(CPhysXObject* pPlayer, CPhysXObject* pItem)
