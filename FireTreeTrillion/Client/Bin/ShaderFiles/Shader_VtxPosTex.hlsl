@@ -116,6 +116,8 @@ PS_OUT PS_MAIN(PS_IN In)
 	//알파 테스트
 	if(Out.vColor.a < .05f)
         discard;
+    
+    Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
 	
 	return Out;
 }

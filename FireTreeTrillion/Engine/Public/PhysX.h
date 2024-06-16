@@ -12,7 +12,6 @@ private:
 
 public:
     HRESULT Initialize();
-    HRESULT Ready_CollisionContents();
     void    Tick(_float fTimeDelta);
 
     // For Animation
@@ -49,7 +48,6 @@ public:
     PxRigidDynamic* CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
     void            Kick_DynamicActor(_float3 _kickDirection, _float impulseMagnitude);
     PxRigidStatic*  CreateStaticActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
-    //void            Overlap_Hitbox(CGameObject* pGameObject, _float4 vPos, _float fRadius);
 
 private:
     PxDefaultAllocator          mDefaultAllocatorCallback;
@@ -82,15 +80,6 @@ public:
 
 };
 
-// PxSimulationEventCallback : RigidBody의 충돌처리에 대한 콜백 결과를 받아오는 클래스
-class ENGINE_DLL CSimulationEventCallback : public physx::PxSimulationEventCallback
-{
-public:
-    virtual void onContact(const physx::PxContactPairHeader& pairHeader, const physx::PxContactPair* pairs, physx::PxU32 nbPairs) override;
-    // 트리거 이벤트 처리
-    virtual void onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 count) override;
-};
-
 
 // PxControllerBehaviorCallback : Controller 끼리의 충돌처리에 대한 콜백 결과를 받아오는 클래스
 // 해당 클래스를 상속받아 이벤트 결과를 활용한다.
@@ -108,7 +97,6 @@ public:
     virtual PxControllerBehaviorFlags getBehaviorFlags(const PxObstacle&) override {
         return PxControllerBehaviorFlag::eCCT_SLIDE;
     }
-    
 };
 
 // PxUserControllerHitReport : Controller의 모든 충돌 정보를 가지고옴.

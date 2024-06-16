@@ -88,6 +88,7 @@ enum COLLISION_TYPE
     PLAYER = 0, PLAYER_EFFECT,
     MONSTER,
     INTERACT,
+    OBJECT,
     TRIGGER,
 
     ITEM = 50,

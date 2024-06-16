@@ -55,6 +55,7 @@ _int CTrigger::Tick(_float fTimeDelta)
 
 		_float4 vNewPos = vLook + _float4(vPos.x, vPos.y + 1.f, vPos.z, 1.f);
 		m_pRigidBodyCom->Set_PxWorldMatrix(m_pOwnerTransform->Get_WorldFloat4x4());
+		return OBJ_DEAD;
 	}
 	else if (m_eTriggerType == TRIGGER_ITEM)
 	{
@@ -111,14 +112,19 @@ void CTrigger::Collision_Hitbox(CPhysXObject* pGameObject)
 	if(m_bAlive)
 		m_pOwner->Collision_Hitbox(pGameObject);
 
-	m_bAlive = false;
-	m_pRigidBodyCom->Activate(false);
+	Close_Collision();
 }
 
 void CTrigger::Check_Collision()
 {
 	m_bAlive = true;
 	m_pRigidBodyCom->Activate(true);
+}
+
+void CTrigger::Close_Collision()
+{
+	m_bAlive = false;
+	m_pRigidBodyCom->Activate(false);
 }
 
 HRESULT CTrigger::Bind_ShaderResources()
