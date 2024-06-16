@@ -57,7 +57,7 @@ _int CTrigger::Tick(_float fTimeDelta)
 		m_pRigidBodyCom->Set_PxWorldMatrix(m_pOwnerTransform->Get_WorldFloat4x4());
 		return OBJ_DEAD;
 	}
-	else if (m_eTriggerType == TRIGGER_ITEM)
+	else if (m_eTriggerType == TRIGGER_ITEM || m_eTriggerType == TRIGGER_MAPOBJ)
 	{
 		_float4 vPos = m_pOwnerTransform->Get_State_Float4(CTransform::STATE_POSITION);
 		_float4 vNewPos = _float4(vPos.x, vPos.y + 1.f, vPos.z, 1.f);
