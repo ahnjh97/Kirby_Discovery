@@ -281,8 +281,8 @@ PS_OUT PS_MAIN_DEFAULT_FX(PS_IN In)
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
     
     Out.vMRA = float4(0.f, .8f, 0.f, 1.f);
-    Out.vDiffuse = vDiffuse;
-    
+    Out.vDiffuse.rgb = vDiffuse.rgb * g_vRColor;
+    Out.vDiffuse.a = 1.f;
         
     if (Out.vMRA.b < 0.001)
         Out.vMRA.b = 1.f;

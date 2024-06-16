@@ -463,17 +463,21 @@ void CKirbySword_Attack_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, 
 	m_fLockTime = 0.f;
 
 
-
-	if (_iAnimIndex == CKirby::SWORDSTATE_SIDESLASH)
+	switch (_iAnimIndex)
+	{
+	case CKirby::SWORDSTATE_SIDESLASH:
 	{
 		SwordSlash_One(pKirby->Get_TransformCom());
 	}
-	else if (_iAnimIndex == CKirby::SWORDSTATE_MULITSWORDATTACK)
+	break;
+	case CKirby::SWORDSTATE_MULITSWORDATTACK:
 	{
 		SwordSlash_Two(pKirby->Get_TransformCom());
 	}
-
-
+	break;
+	default:
+		break;
+	}
 }
 
 void CKirbySword_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -743,6 +747,33 @@ CKirbySword_ChargeSpin_State::CKirbySword_ChargeSpin_State()
 void CKirbySword_ChargeSpin_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+
+	switch (_iAnimIndex)
+	{
+	case CKirby::SWORDSTATE_SPINSLASHCHARGE:
+	{
+		SwordSpinCharge(pKirby->Get_TransformCom());
+	}
+	break;
+	case CKirby::SWORDSTATE_GIGANTSPINSLASH:
+	{
+		SwordSpinSlash_One(pKirby->Get_TransformCom());
+	}
+	break;
+	case CKirby::SWORDSTATE_SUPERSPINSLASHCHARGE:
+	{
+		SwordSpinCharge(pKirby->Get_TransformCom());
+	}
+	break;
+	case CKirby::SWORDSTATE_SUPERSPINSLASHLOOP:
+	{
+		SwordSpinSlash_One(pKirby->Get_TransformCom());
+	}
+	break;
+	default:
+		break;
+	}
 }
 
 void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
