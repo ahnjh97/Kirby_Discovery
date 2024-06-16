@@ -45,7 +45,6 @@ private:
     void Ladder_Collider();
 
     set< pair<CGameObject*, CGameObject*> > m_WaitingList;
-    set< class CTrigger* > m_Hitboxes;
     list<CLadder*>                          m_Ladders;
 
 

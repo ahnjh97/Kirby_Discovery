@@ -83,14 +83,6 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 		Safe_Release(pDst);
 	}
 
-	for (auto& Trigger : m_Hitboxes)
-	{
-		Trigger->Close_Collision();
-		CGameObject* pSrc = Trigger;
-		Safe_Release(pSrc);
-	}
-	m_Hitboxes.clear();
-
 	m_WaitingList.clear();
 }
 
@@ -217,9 +209,8 @@ void CCollisionCenter::Collision_Collider(CONTENT_TYPE eType, CPhysXObject* pSrc
 		CTrigger* pTrigger = static_cast<CTrigger*>(pTriggerObj);
 		if (pTriggerObj == nullptr)
 			return;
-		// 이 친구는 최종적으로, 트리거 작동을 false 해주기 위함이다.
-		m_Hitboxes.insert(pTrigger);
-		Safe_AddRef(pTrigger);
+
+		pTrigger->Close_Collision();
 
 		CKirby* pKirby = static_cast<CKirby*>(pTrigger->Get_Owner());
 
@@ -255,9 +246,10 @@ void CCollisionCenter::Collision_Collider(CONTENT_TYPE eType, CPhysXObject* pSrc
 		}
 
 		pMonsterObj->Collision(CONTENT_ATTACK, pKirby);
+		pKirby->Collision_Hitbox(pMonsterObj);
 		Damage_To_Monster(pKirby, pMonsterObj);
 		HitStop_Rogic(pKirby);
-		Camera_Shaking();
+		Camera_Shaking(0.7f, 0.5f);
 	}
 }
 
@@ -524,13 +516,6 @@ void CCollisionCenter::Free()
 	for (auto& pLadder : m_Ladders)
 		Safe_Release(pLadder);
 	m_Ladders.clear();
-
-	for (auto& pHitboxObject : m_Hitboxes)
-	{
-		CGameObject* pSrc = pHitboxObject;
-		Safe_Release(pSrc);
-	}
-	m_Hitboxes.clear();
 
 	__super::Free();
 

@@ -474,10 +474,15 @@ void CAwoofy_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 		if (true == pAwoofy->IsAnimFinished() || pController->Is_Terrain())
 		{
-			// Awoofy 눈 상태
-			pAwoofy->Set_AwoofyEye(CAwoofy::AWOOFYEYE_IDLE);
-			pAwoofy->Set_MonState(CAwoofy::MON_WAIT);
-			pAwoofy->Change_State(CAwoofy::AWOOFY_WAIT, 40.f, false, true);
+			if (pAwoofy->Get_Hp() <= 0.f)
+				pAwoofy->Set_Dead();
+			else
+			{
+				// Awoofy 눈 상태
+				pAwoofy->Set_AwoofyEye(CAwoofy::AWOOFYEYE_IDLE);
+				pAwoofy->Set_MonState(CAwoofy::MON_WAIT);
+				pAwoofy->Change_State(CAwoofy::AWOOFY_WAIT, 40.f, false, true);
+			}
 		}
 	}
 	// 날아가는 도중이다.  1초에 360도 회전하며, 30의 거리로 날아간다.

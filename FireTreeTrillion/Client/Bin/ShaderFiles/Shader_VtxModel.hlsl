@@ -28,6 +28,10 @@ float2 g_vUVOffset = { 0.f, 0.f };
 float2 g_vMaskUVOffset = { 0.f, 0.f };
 float g_fMaskUVAngle = { 0.f};
 
+float g_fWhiteColorDiffuse;
+float g_fOverPowerColor;
+
+
 // 회전된 UV를 계산
 float2 RotateUV(float2 vCoord, float fAngle)
 {
@@ -169,6 +173,43 @@ PS_OUT PS_MAIN(PS_IN In)
     
 	return Out;
 }
+
+PS_OUT FOR_KIRBY_PARTOBJECT(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    if (0.3f >= vMtrlDiffuse.a)
+        discard;
+
+    vector vNormalDesc = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
+
+    float3 vNormal = vNormalDesc.xyz * 2.f - 1.f;
+
+    float3x3 WorldMatrix = float3x3(In.vTangent, In.vBinormal, In.vNormal);
+
+    float3 vWorldNormal = mul(vNormal, WorldMatrix);
+
+    Out.vDiffuse = vMtrlDiffuse + g_fWhiteColorDiffuse + g_fOverPowerColor;
+    Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
+    
+    if (g_bStencil == true)
+        Out.vStencil = vector(1.f, 0.f, 0.0f, 1.f);
+    
+    if (g_bRimLight == true)
+        Out.vRimLight = vector(0.f, m_fRimWidth, 1.f, 1.f);
+
+    if (g_bMotionBlur == true)
+        Out.vMotionBlur = g_vMotionVelocity;
+    
+    if (Out.vMRA.b < 0.001)
+        Out.vMRA.b = 1.f;
+    
+    return Out;
+}
+
 
 PS_OUT NO_NORMALMAP_PS_MAIN(PS_IN In)
 {
@@ -513,5 +554,18 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_WHITE_FX();
+    }
+    // 커비 파츠 ( 11 )
+    pass KIRBY_PARTOBJECT
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 FOR_KIRBY_PARTOBJECT();
     }
 }

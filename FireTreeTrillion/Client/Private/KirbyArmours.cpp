@@ -23,6 +23,8 @@ HRESULT CKirbyArmours::Initialize(void* pArg)
 
     m_pBoneMatrix = pArmourDesc->pBoneMatrix;
     m_pAbilityType = pArmourDesc->pAbilityType;
+    m_pWhiteColorDiffuse = pArmourDesc->pWhite;
+    m_fOverPowerColor = pArmourDesc->pOverPower;
 
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
@@ -78,7 +80,7 @@ HRESULT CKirbyArmours::Render()
             return E_FAIL;
 
         /* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-        if (FAILED(m_pShaderCom->Begin(MODEL_NORMAL_O)))
+        if (FAILED(m_pShaderCom->Begin(MODEL_KIRBYPART)))
             return E_FAIL;
 
         m_pModelCom[*m_pAbilityType]->Render(i);
@@ -174,6 +176,11 @@ HRESULT CKirbyArmours::Bind_ShaderResources()
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
         return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", m_pWhiteColorDiffuse, sizeof(_float))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fOverPowerColor", m_fOverPowerColor, sizeof(_float))))
+        return E_FAIL;
+
 
     return S_OK;
 }
