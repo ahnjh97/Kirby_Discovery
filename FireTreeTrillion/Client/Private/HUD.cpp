@@ -28,10 +28,10 @@ HRESULT CHUD::Initialize(void* _pArg)
 
 	m_UIObjDesc = (*HUDUI_Desc);
 
-	CUIObject* pUIObj = { nullptr };
+	//CUIObject* pUIObj = { nullptr };
 
-	pUIObj = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_HUD_KirbyStatus"), &m_UIObjDesc));
-	m_HUDs.push_back(pUIObj);
+	//pUIObj = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_HUD_KirbyStatus"), &m_UIObjDesc));
+	//m_HUDs.push_back(pUIObj);
 
 	return S_OK;
 }

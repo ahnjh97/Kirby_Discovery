@@ -45,7 +45,6 @@ public:
 
 private:
 	_bool						m_IsMovingUP = { TRUE };
-	_bool						m_IsLoot = { FALSE };
 
 	HUD_STARPOINT				m_ePreState = { STARPOINT_NONE };
 	HUD_STARPOINT				m_eCurState = { STARPOINT_NONE };

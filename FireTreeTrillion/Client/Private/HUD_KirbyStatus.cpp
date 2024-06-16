@@ -3,12 +3,12 @@
 #include "Kirby.h"
 
 CHUD_KirbyStatus::CHUD_KirbyStatus(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext)
-	: CUIObject{ _pDevice, _pContext }
+	: CHUD{ _pDevice, _pContext }
 {
 }
 
 CHUD_KirbyStatus::CHUD_KirbyStatus(const CHUD_KirbyStatus& _rhs)
-	: CUIObject{ _rhs }
+	: CHUD{ _rhs }
 {
 }
 
@@ -76,6 +76,9 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 	// 쉐이킹 진폭 초기화
 	m_fAmplitude = 20.f;
 
+	m_eCurState = KIRBYHP_IDLE;
+	m_ePreState = KIRBYHP_HIDE;
+
 	return S_OK;
 }
 
@@ -84,6 +87,14 @@ _int CHUD_KirbyStatus::Tick(_float fTimeDelta)
 	__super::Tick(fTimeDelta);
 
 	Compute_Player_Hp(fTimeDelta);
+
+	Update_UIState(fTimeDelta);
+
+	if (m_pGameInstance->Get_DIKeyState(DIK_2, KEY_DOWN))
+	{
+		m_fAccTime = 0.f;
+		m_eCurState = KIRBYHP_DAMAGE;
+	}
 
 	return OBJ_NOEVENT;
 }
@@ -108,6 +119,9 @@ HRESULT CHUD_KirbyStatus::Render()
 		_float2 vFontScale = { 1.2f, 1.2f };
 
 		wstring wstrFontTag = { TEXT("Font_HUDSub_KR15") };
+
+		if (KIRBYHP_WAIT == m_eCurState && KIRBYHP_HIDE == m_ePreState)
+			return S_OK;
 
 		m_pGameInstance->Render_Font(wstrFontTag, m_UIObjDesc.wstrText, vFontPos, vFontRGBA,
 			XMConvertToRadians(m_UIObjDesc.vDegree.z), vFontOrig, vFontScale);
@@ -139,6 +153,9 @@ HRESULT CHUD_KirbyStatus::Add_Components()
 
 HRESULT CHUD_KirbyStatus::Render_BindSet(CShader* _pShaderCom, CTransform* _pTransCom)
 {
+	if (KIRBYHP_IDLE == m_eCurState && KIRBYHP_HIDE == m_ePreState)
+		return S_OK;
+
 	CHECK_NULLPTR(_pShaderCom);
 
 	if (FAILED(_pTransCom->Bind_ShaderResource(_pShaderCom, "g_WorldMatrix")))
@@ -170,7 +187,6 @@ HRESULT CHUD_KirbyStatus::Render_BindSet(CShader* _pShaderCom, CTransform* _pTra
 
 HRESULT CHUD_KirbyStatus::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTexture* _pTextureCom, _uint _iTexIndex)
 {
-
 	if (TEXT("Gauge") == m_UIObjDesc.wstrUITag)
 	{
 		m_pTextureMask->Bind_ShaderResource(_pShaderCom, "g_MaskTexture", 0);
@@ -214,6 +230,118 @@ HRESULT CHUD_KirbyStatus::Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom)
 
 void CHUD_KirbyStatus::Update_UIState(_float _fTimeDelta)
 {
+	switch (m_eCurState)
+	{
+	case CHUD::KIRBYHP_IDLE: // 1) 렌더x 기본 상태
+		if (KIRBYHP_HIDE == m_ePreState)	//이전 상태가 HIDE인 경우, 기본값으로 세팅
+			m_eCurState = KIRBYHP_WAIT;
+		break;
+
+	case CHUD::KIRBYHP_WAIT: // 3) 특정 이벤트 이후 대기 상태
+		Play_Animation(m_fAccTime, KIRBYHP_WAIT);
+		
+		if (KIRBYHP_DAMAGE == m_ePreState)	//이전 피격받았을 경우,
+		{
+			m_fAccTime += _fTimeDelta;
+			if (m_fAccTime > 5.f)
+			{
+				m_eCurState = KIRBYHP_HIDE; //3-A) 이후 숨김 상태로 변경
+				m_fAccTime = 0.f;
+			}
+		}
+		break;
+
+	case CHUD::KIRBYHP_HIDE: // 4) 숨김 상태
+		m_fAccTime += _fTimeDelta;
+		Play_Animation(m_fAccTime, KIRBYHP_HIDE);
+		if (m_fAccTime > 10.f / 144.f)
+		{
+			m_fAccTime = 0.f;
+			m_eCurState = KIRBYHP_IDLE;	//4-A) 시간 경과 후 대기 상태로 변경 (렌더X)
+			m_ePreState = KIRBYHP_HIDE;
+		}
+		break;
+
+	//Frame 52 > 77
+	case CHUD::KIRBYHP_DAMAGE: // 2) 피격 상태
+		m_fAccTime += _fTimeDelta;
+		if (m_fAccTime >= 25.f / 144.f)
+		{
+			m_fAccTime = 0.f;
+			m_eCurState = KIRBYHP_WAIT;
+			m_ePreState = KIRBYHP_DAMAGE;
+		}
+		Play_Animation(m_fAccTime, KIRBYHP_DAMAGE);
+		break;
+
+	case CHUD::KIRBYHP_HEAL: //
+		break;
+
+	case CHUD::KIRBYHP_NONE:
+	default:	break;
+	}
+}
+
+void CHUD_KirbyStatus::Play_Animation(_float _fAccTime, HUD_KIRBYHP _eCurState)
+{
+	_float4 vCurPos = { 0.f, 0.f, 0.f, 0.f }; 
+
+	switch (m_eCurState)
+	{
+	case CHUD::KIRBYHP_IDLE:
+		vCurPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		break;
+
+	case CHUD::KIRBYHP_WAIT:
+		break;
+
+	case CHUD::KIRBYHP_HIDE: //X값 좌측 이동, 알파 값 죽이기
+		if (m_UIObjDesc.wstrUITag == TEXT("Name"))
+			m_UIObjDesc.vPos.x -= 40.f;
+
+		m_UIObjDesc.vPos.x -= 0.05f;
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION,
+			XMVectorSet(m_UIObjDesc.vPos.x - m_UIObjDesc.vCenter.x + m_UIObjDesc.vCenter.x,
+				m_UIObjDesc.vPos.y - m_UIObjDesc.vCenter.y + m_UIObjDesc.vCenter.y,
+				m_UIObjDesc.vPos.z, 1.f));
+
+		m_UIObjDesc.fAlpha -= 1.f / 255.f * _fAccTime;
+
+		if (m_UIObjDesc.fAlpha < 1.f / 255.f)
+			m_UIObjDesc.fAlpha = 1.f / 255.f;
+		break;
+
+	case CHUD::KIRBYHP_DAMAGE:
+		if (m_bShaking == TRUE)
+		{
+			// 진동 주기
+			_float fCycle = 50.f;
+
+			m_fShakingTime += _fAccTime;
+			m_fShakingAcc += _fAccTime * fCycle;
+			_float fShakePosY = sin(m_fShakingAcc) * m_fAmplitude;
+
+			m_fAmplitude -= _fAccTime * 50.f;
+
+			_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+			vPos.y = m_fSaveMyY + fShakePosY;
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION,vPos);
+
+			if (m_fShakingTime > 0.4f)
+			{
+				m_fShakingTime = 0.f;
+				m_bShaking = FALSE;
+				m_fAmplitude = 20.f;
+			}
+		}
+		break;
+
+	case CHUD::KIRBYHP_HEAL:
+		break;
+
+	case CHUD::KIRBYHP_NONE:
+	default:	break;
+	}
 }
 
 void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta)
@@ -316,36 +444,6 @@ void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta)
 	}
 
 #pragma endregion
-
-#pragma region 피통 UI 쉐이킹 코드
-
-	if(m_bShaking == true)
-	{
-		/*
-		// 진동 주기
-		_float fCycle = 50.f;
-
-		m_fShakingTime += fTimeDelta;
-		m_fShakingAcc += fTimeDelta * fCycle;
-		_float fShakePosY = sin(m_fShakingAcc) * m_fAmplitude;
-
-		m_fAmplitude -= fTimeDelta * 50.f;
-
-		_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-		vPos.y = m_fSaveMyY + fShakePosY;
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION,vPos);
-
-		if (m_fShakingTime > 0.4f)
-		{
-			m_fShakingTime = 0.f;
-			m_bShaking = false;
-			m_fAmplitude = 20.f;
-		}
-		*/
-	}
-
-#pragma endregion
-
 }
 
 CHUD_KirbyStatus* CHUD_KirbyStatus::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

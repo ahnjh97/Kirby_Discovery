@@ -118,7 +118,6 @@ _int CHUD_StarPoint::Tick(_float fTimeDelta)
 		}
 	}
 	
-
 	return OBJ_NOEVENT;
 }
 
@@ -278,7 +277,7 @@ void CHUD_StarPoint::Update_UIState(_float _fTimeDelta)
 		}
 		break;
 
-		//Frame 344 > 354
+	//Frame 344 > 354
 	case CHUD::STARPOINT_HIDE: // 4) ¼û±è »óÅÂ
 		m_fAccTime += _fTimeDelta;
 		Play_Animation(m_fAccTime, STARPOINT_HIDE);
@@ -290,7 +289,7 @@ void CHUD_StarPoint::Update_UIState(_float _fTimeDelta)
 		}
 		break;
 
-		//Frame 50 > 64 
+	//Frame 50 > 64 
 	case CHUD::STARPOINT_LOOT: // 2) È¹µæ »óÅÂ
 		m_fAccTime += _fTimeDelta;
 		if (m_fAccTime >= 14.f / 144.f)
@@ -309,10 +308,6 @@ void CHUD_StarPoint::Update_UIState(_float _fTimeDelta)
 
 void CHUD_StarPoint::Play_Animation(_float _fAccTime, HUD_STARPOINT _eCurState)
 {
-	_float fFrameTime = { 0.f };
-	_float fMoveSpeed = { 0.f };
-	_float fAlphaSpeed = { 0.f };
-
 	switch (_eCurState)
 	{
 	case CHUD::STARPOINT_IDLE:
