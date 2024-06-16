@@ -900,7 +900,7 @@ static void SwordSlash_One(CTransform* pTransformCom)
 	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
 
 	MultiFXDesc.vInitPos = static_cast<_float3>(pTransformCom->Get_State(CTransform::STATE_POSITION) + _float4{ 0.f, .3f, 0.f, 0.f } + pTransformCom->Get_State(CTransform::STATE_LOOK) * 2.f);
-	MultiFXDesc.vInitRot = CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK));
+	MultiFXDesc.vInitRot = _float3{ 0.f, CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK)).y, 0.f };
 	MultiFXDesc.vInitScale = { 4.f, 4.f, 4.f };
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SwordTrail_One"), &MultiFXDesc)))
 		return;
@@ -911,9 +911,9 @@ static void SwordSlash_Two(CTransform* pTransformCom)
 	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
 
 	MultiFXDesc.vInitPos = static_cast<_float3>(pTransformCom->Get_State(CTransform::STATE_POSITION) + _float4{ 0.f, .3f, 0.f, 0.f } + pTransformCom->Get_State(CTransform::STATE_LOOK) * 2.f);
-	MultiFXDesc.vInitRot = CUtils::Make_Degree_FromDir(-pTransformCom->Get_State(CTransform::STATE_LOOK));
+	MultiFXDesc.vInitRot = _float3{ 0.f, CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK)).y, 0.f };
 	MultiFXDesc.vInitScale = { 4.f, 4.f, 4.f };
-	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SwordSlash_v2"), &MultiFXDesc)))
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SwordTrail_Multi"), &MultiFXDesc)))
 		return;
 }
 

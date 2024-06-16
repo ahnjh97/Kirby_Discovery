@@ -132,6 +132,7 @@ _int CMultiEffect::Tick(_float fTimeDelta)
 	}
 
 	m_fDuration.first += fTimeDelta;
+
 	if (m_fDuration.second <= m_fDuration.first && (*m_pCurrentLevelID) != LEVEL_TOOL_FX)
 	{
 		m_bDead = true;
@@ -151,27 +152,15 @@ _int CMultiEffect::Tick(_float fTimeDelta)
 
 void CMultiEffect::Late_Tick(_float fTimeDelta)
 {
-	if (0.f < m_fStartDelay)
+	if (0.f < m_fStartDelay || m_bDead ||
+		(m_fDuration.second <= m_fDuration.first && (*m_pCurrentLevelID) != LEVEL_TOOL_FX))
 		return;
-
-	if (m_bDead)
-		return;
-
-	//if ((CRenderer::RENDERGROUP)m_eRenderGroup != CRenderer::RENDER_END)
-		//m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 
 	for (auto& pEffect : m_FXs)
 	{
 		pEffect->Late_Tick(fTimeDelta);
-		//if (FAILED())
-		//{
-		//	_ASSERT_EXPR(FALSE, TEXT("Failed To Render Composite Effect"));
-		//	return E_FAIL;
-		//}
 	}
 
-	//if (m_bIsBloom)
-	//	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
 }
 
 HRESULT CMultiEffect::Render()
@@ -179,14 +168,6 @@ HRESULT CMultiEffect::Render()
 	if (0.f < m_fStartDelay)
 		return S_OK;
 
-	//for (auto& pEffect : m_FXs)
-	//{
-	//	if (FAILED(pEffect->Render()))
-	//	{
-	//		_ASSERT_EXPR(FALSE, TEXT("Failed To Render Composite Effect"));
-	//		return E_FAIL;
-	//	}
-	//}
 
 	return S_OK;
 }
