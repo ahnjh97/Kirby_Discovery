@@ -77,6 +77,10 @@ void CEventCallBack::onTrigger(PxTriggerPair* pairs, PxU32 count)
     }
 }
 
+void CEventCallBack::onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs)
+{
+}
+
 void CEventCallBack::Clear_EventCallBack()
 {
     m_Triggers.clear();
