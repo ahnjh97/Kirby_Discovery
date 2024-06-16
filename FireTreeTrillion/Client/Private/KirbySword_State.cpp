@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "KirbySword_State.h"
 #include "Kirby_State_Function.h"
+#include "SingleEffect.h"
 #include "MultiEffect.h"
 
 #pragma region SWORD IDLE STATE
@@ -78,12 +79,12 @@ void CKirbySword_Idle_State::Key_X(CGameObject* pGameObject, _float fTimeDelta)
 		{
 			pKirby->Change_State(CKirby::SWORDSTATE_SIDESLASH, 60.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 			DESC(m_ePreAttackState) = CKirby::SWORDSTATE_SIDESLASH;
+
 		}
 		else if (DESC(m_ePreAttackState) == CKirby::SWORDSTATE_SIDESLASH)
 		{
 			pKirby->Change_State(CKirby::SWORDSTATE_MULITSWORDATTACK, 60.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 			DESC(m_ePreAttackState) = CKirby::SWORDSTATE_MULITSWORDATTACK;
-
 		}
 		else if (DESC(m_ePreAttackState) == CKirby::SWORDSTATE_MULITSWORDATTACK)
 		{
@@ -92,6 +93,14 @@ void CKirbySword_Idle_State::Key_X(CGameObject* pGameObject, _float fTimeDelta)
 			DESC(m_fMoveSpeed) = 0.f;
 
 		}
+
+		CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+		CTransform* pKirbyTransform = pKirby->Get_TransformCom();
+		MultiFXDesc.vInitPos = static_cast<_float3>(pKirbyTransform->Get_State(CTransform::STATE_POSITION) + _float4{ 0.f, .3f, 0.f, 0.f } + pKirbyTransform->Get_State(CTransform::STATE_LOOK));
+		MultiFXDesc.vInitRot = CUtils::Make_Degree_FromDir(-pKirbyTransform->Get_State(CTransform::STATE_LOOK));
+		MultiFXDesc.vInitScale = { 4.f, 4.f, 4.f };
+		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SwordSlash_v2"), &MultiFXDesc)))
+			return;
 	}
 
 	// Idle일 때, X를 차징하면 기를 모은다. 그러나 키를 누르지 않으면 차징 시간이 0이 된다.
@@ -285,6 +294,14 @@ void CKirbySword_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			DESC(m_ePreAttackState) = CKirby::SWORDSTATE_DECISIVESLASH;
 
 		}
+
+		CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+		CTransform* pKirbyTransform = pKirby->Get_TransformCom();
+		MultiFXDesc.vInitPos = static_cast<_float3>(pKirbyTransform->Get_State(CTransform::STATE_POSITION) + _float4{ 0.f, .3f, 0.f, 0.f} + pKirbyTransform->Get_State(CTransform::STATE_LOOK) * 2.f);
+		MultiFXDesc.vInitRot = CUtils::Make_Degree_FromDir(-pKirbyTransform->Get_State(CTransform::STATE_LOOK));
+		MultiFXDesc.vInitScale = { 4.f, 4.f, 4.f };
+		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SwordSlash_v2"), &MultiFXDesc)))
+			return;
 	}
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_Z, KEY_DOWN))

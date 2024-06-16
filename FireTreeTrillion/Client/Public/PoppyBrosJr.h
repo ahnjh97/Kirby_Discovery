@@ -19,6 +19,14 @@ public:
 		POPPY_END
 	};
 
+	enum POPPY_STATE {
+		PS_TARGET, PS_NONTARGET, PS_END
+	};
+
+	struct POPPY_DESC : public CMonster::MONSTER_DESC {
+		POPPY_STATE ePoppyState = { PS_END };
+	};
+
 	//enum POPPY_STATE { BUFFAHORNEYE_IDLE, BUFFAHORNEYE_HALF, BUFFAHORNEYE_SLEEP, BUFFAHORNEYE_SURPRISE, BUFFAHORNEYE_END };
 
 private:
@@ -33,6 +41,9 @@ public:
 
 	_float Get_AnimRatio() {
 		return m_pModelCom->Get_AnimRatio();
+	}
+	POPPY_STATE Get_PoppyState() {
+		return m_ePoppyState;
 	}
 
 public:
@@ -56,6 +67,7 @@ private:
 	CTexture* m_pEyeTextureCom = { nullptr };
 
 	POPPY_ANIM	m_eCurrentState = { POPPY_END };
+	POPPY_STATE	m_ePoppyState = { PS_END };
 	//BUFFAHORNEYE_STATE	m_eEyeState = { BUFFAHORNEYE_END };
 
 	_float			m_fJumpTime = { 0.f };

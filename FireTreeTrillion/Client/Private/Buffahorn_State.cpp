@@ -229,6 +229,11 @@ void CBuffahorn_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		pBuffahorn->Set_BuffahornEye(CBuffahorn::BUFFAHORNEYE_IDLE);
 		pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_JUMP, 80.f, false, true);
 	}
+
+	if (1.5f > pController->Compute_Wall(XMVector3Normalize(pTransformCom->Get_State_Vector(CTransform::STATE_LOOK))))
+	{
+		pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_BOUNCETOTURN, 50.f, false, true);
+	}
 }
 
 void CBuffahorn_Run_State::OnStateExit()
@@ -368,4 +373,138 @@ void CBuffahorn_Jump_State::Free()
 	__super::Free();
 }
 
+#pragma endregion
+
+
+#pragma region DAMAGE STATE
+//*********************************
+//			 DAMAGE STATE
+//*********************************
+CBuffahorn_Damage_State::CBuffahorn_Damage_State()
+{
+}
+
+void CBuffahorn_Damage_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffSet)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffSet);
+}
+
+void CBuffahorn_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CBuffahorn* pBuffahorn = static_cast<CBuffahorn*>(pGameObject);
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+
+	if (pBuffahorn->Get_PhyXState() == PO_NORMAL)
+	{
+		// 일단 그 방향으로 바라보게만 한다.
+		_float3 vDamegeDir = pBuffahorn->Get_DamegeDir();
+		pTransformCom->Look_At_Axis(-vDamegeDir);
+
+		// 이제 날아가는 것을 구현해보자.
+		//pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 14.f, fTimeDelta);
+
+		// 점프되는 체공시간을 구현해보자.
+		_float fDamageJumpPower = pBuffahorn->Get_DamageJumpPower();
+		pController->Jump(pTransformCom, fDamageJumpPower, fTimeDelta);
+		fDamageJumpPower -= GRAVITY * fTimeDelta * 3.f;
+		pBuffahorn->Set_DamageJumpPower(fDamageJumpPower);
+
+
+		if (true == pBuffahorn->IsAnimFinished())
+			pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_CHARGEWAIT, 50.f, true, true);
+	}
+	// 날아가는 도중이다.  1초에 360도 회전하며, 30의 거리로 날아간다.
+	else if (pBuffahorn->Get_PhyXState() == PO_FLYAWAY)
+	{
+		_float3 vDamegeDir = pBuffahorn->Get_DamegeDir();
+		pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 30.f, fTimeDelta);
+		pTransformCom->Turn(pTransformCom->Get_State_Vector(CTransform::STATE_UP), fTimeDelta, 360.f);
+		m_fFlyTime += fTimeDelta;
+		if (m_fFlyTime > 2.f)
+		{
+			pBuffahorn->Set_Dead();
+		}
+	}
+	// 죽는 도중이다.	 (날아가다 터질예정임)
+	else if (pBuffahorn->Get_PhyXState() == PO_FLYDEADAWAY)
+	{
+		m_fDeadTime += fTimeDelta;
+
+		// 일단 그 방향으로 바라보게만 한다.
+		_float3 vDamegeDir = pBuffahorn->Get_DamegeDir();
+		pTransformCom->Look_At_Axis(-vDamegeDir);
+
+		// 이제 날아가는 것을 구현해보자.
+		pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 10.f, fTimeDelta);
+
+		// 점프되는 체공시간을 구현해보자.
+		_float fDamageJumpPower = pBuffahorn->Get_DamageJumpPower();
+		pController->Jump(pTransformCom, fDamageJumpPower, fTimeDelta);
+		fDamageJumpPower -= GRAVITY * fTimeDelta * 3.f;
+
+		pBuffahorn->Set_DamageJumpPower(fDamageJumpPower);
+
+		if (m_fDeadTime > 0.7f)
+			pBuffahorn->Set_Dead();
+	}
+}
+
+void CBuffahorn_Damage_State::OnStateExit()
+{
+}
+
+CBuffahorn_Damage_State* CBuffahorn_Damage_State::Create()
+{
+	CBuffahorn_Damage_State* pInstance = new CBuffahorn_Damage_State();
+	return pInstance;
+}
+
+void CBuffahorn_Damage_State::Free()
+{
+	__super::Free();
+}
+#pragma endregion
+
+
+#pragma region DAMAGE STATE
+//*********************************
+//			 DAMAGE STATE
+//*********************************
+CBuffahorn_BounceToTurn_State::CBuffahorn_BounceToTurn_State()
+{
+}
+
+void CBuffahorn_BounceToTurn_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffSet)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffSet);
+}
+
+void CBuffahorn_BounceToTurn_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CBuffahorn* pBuffahorn = static_cast<CBuffahorn*>(pGameObject);
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+
+	if (CBuffahorn::BUFFAHORN_BOUNCETOTURN == pBuffahorn->Get_State())
+	{
+		if (true == pBuffahorn->IsAnimFinished())
+			pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_CHARGEWAIT, 50.f, true, true);
+	}
+}
+
+void CBuffahorn_BounceToTurn_State::OnStateExit()
+{
+}
+
+CBuffahorn_BounceToTurn_State* CBuffahorn_BounceToTurn_State::Create()
+{
+	CBuffahorn_BounceToTurn_State* pInstance = new CBuffahorn_BounceToTurn_State();
+	return pInstance;
+}
+
+void CBuffahorn_BounceToTurn_State::Free()
+{
+	__super::Free();
+}
 #pragma endregion

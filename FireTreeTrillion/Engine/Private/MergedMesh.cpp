@@ -122,9 +122,9 @@ HRESULT CMergedMesh::Initialize(void* pArg)
 	return S_OK;
 }
 
-HRESULT CMergedMesh::CreateStaticActor(_float4 vPos)
+HRESULT CMergedMesh::CreateStaticActor(_float4x4& matWorld)
 {
-	m_pActor = m_pGameInstance->CreateStaticActor(vPos, m_pVerticesPos, m_iNumVertices, m_pIndices, m_iNumIndices);
+	m_pActor = m_pGameInstance->CreateStaticActor(matWorld, m_pVerticesPos, m_iNumVertices, m_pIndices, m_iNumIndices);
 	if (m_pActor == nullptr)
 		return E_FAIL;
 

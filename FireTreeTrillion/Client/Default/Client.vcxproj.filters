@@ -247,11 +247,41 @@
     <Filter Include="02.GameObjects\PhysXObject\Item\Coin">
       <UniqueIdentifier>{fec82fe1-9a7e-4145-957f-e7c4662e02ff}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Cappy">
+      <UniqueIdentifier>{2644bd8b-3b13-4d9c-8842-edc41dccc1d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Cappy\CappyHat">
+      <UniqueIdentifier>{8dab8ce9-c12e-4dac-b478-a1c1e91dc229}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Cappy\CappyBody">
+      <UniqueIdentifier>{d3a49dbf-e4e8-433d-9c8d-77be4f30a5aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Cappy\State">
+      <UniqueIdentifier>{c2d71bf1-9ad3-4ad4-8a6d-3cfacbcaf42b}</UniqueIdentifier>
+    </Filter>
     <Filter Include="02.GameObjects\Map\Ladder">
       <UniqueIdentifier>{43deb6bb-9178-48a0-9aee-6bd3fca04327}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\MapObject">
+      <UniqueIdentifier>{86a7592b-d804-482a-9608-14929a70ea40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\MapObject\StarBlock">
+      <UniqueIdentifier>{c6c845b2-a511-4c67-92c8-21ffd9f57984}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\MapObject\WoodBlock">
+      <UniqueIdentifier>{3b0e9e25-176f-4ef8-bfb8-8ac6caa99a83}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\MapObject\TrashCan">
+      <UniqueIdentifier>{43a0db8c-5d6d-4b60-af2f-a7f2af0d1d47}</UniqueIdentifier>
+    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Player\Kirby\Bomb">
       <UniqueIdentifier>{9bbb5c7f-e811-452d-aabb-3b3015d522c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\RigidObject\Rock">
+      <UniqueIdentifier>{81ec4dea-946a-461a-84a8-a25c873503af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\RigidObject\Rock\Kickable">
+      <UniqueIdentifier>{22df7019-4bde-485a-a4fa-b74dfa7b29a5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -423,9 +453,6 @@
     <ClInclude Include="..\Public\BladeKnight_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\State</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\BladeKnightSword.h">
-      <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\ImSequencer.h">
       <Filter>02.GameObjects\Anim</Filter>
     </ClInclude>
@@ -505,6 +532,30 @@
     </ClInclude>
     <ClInclude Include="..\Public\Trigger.h">
       <Filter>02.GameObjects\Map\Trigger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CappyBody.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Cappy\CappyBody</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CappyBody_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Cappy\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CappyHat.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Cappy\CappyHat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CappyHat_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Cappy\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BladeKnightSword.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KickableRock.h">
+      <Filter>02.GameObjects\PhysXObject\RigidObject\Rock\Kickable</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\StarBlock.h">
+      <Filter>02.GameObjects\PhysXObject\MapObject\StarBlock</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MapObject.h">
+      <Filter>02.GameObjects\PhysXObject\MapObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BombOrbit.h">
       <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\Bomb</Filter>
@@ -749,6 +800,27 @@
     </ClCompile>
     <ClCompile Include="..\Private\Trigger.cpp">
       <Filter>02.GameObjects\Map\Trigger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CappyBody.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Cappy\CappyBody</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CappyBody_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Cappy\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CappyHat.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Cappy\CappyHat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CappyHat_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Cappy\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KickableRock.cpp">
+      <Filter>02.GameObjects\PhysXObject\RigidObject\Rock\Kickable</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\StarBlock.cpp">
+      <Filter>02.GameObjects\PhysXObject\MapObject\StarBlock</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MapObject.cpp">
+      <Filter>02.GameObjects\PhysXObject\MapObject</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BombOrbit.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\Bomb</Filter>

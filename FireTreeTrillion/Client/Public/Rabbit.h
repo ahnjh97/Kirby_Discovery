@@ -22,6 +22,13 @@ public:
 
 	enum RABBITEYE_STATE { RABBITEYE_IDLE, RABBITEYE_ANGER, RABBITEYE_SLEEP, RABBITEYE_HAPPY, RABBITEYE_HALF, RABBITEYE_END };
 
+	enum RABBIT_STATE { RS_TARGET, RS_NONTARGET, RS_END };
+
+public:
+	struct RABBIT_DESC : public CMonster::MONSTER_DESC {
+		RABBIT_STATE eRabbitState = { RS_END };
+	};
+
 private:
 	CRabbit(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CRabbit(const CRabbit& rhs);
@@ -44,6 +51,9 @@ public:
 	_float Get_TimeDelta() {
 		return m_fTempTime;
 	}
+	RABBIT_STATE Get_RabbitState() {
+		return m_eRabbitState;
+	}
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -65,14 +75,16 @@ public:
 	_vector JumpAttak(_float fTimeDelta);
 
 private:
+	CTexture* m_pEyeTextureCom = { nullptr };
+
 	_bool bRenderEye = { true };
 	_bool bRenderBody = { true };
-	
-	RABBIT_ANIM		m_eCurrentState = { RABBIT_END };
-	CTexture*		m_pEyeTextureCom = { nullptr };
 
 private:
 	RABBITEYE_STATE	m_eEyeState = { RABBITEYE_END };
+	RABBIT_ANIM		m_eCurrentState = { RABBIT_END };
+	RABBIT_STATE	m_eRabbitState = { RS_END };
+
 	_float			m_fTempTime = { 0.f };
 
 	_bool			m_bFind = { false };

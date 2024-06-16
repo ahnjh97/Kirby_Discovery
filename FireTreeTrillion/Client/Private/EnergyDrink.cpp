@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "EnergyDrink.h"
 #include "MultiEffect.h"
+#include "Trigger.h"
 
 CEnergyDrink::CEnergyDrink(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CItemObject{ pDevice, pContext }
@@ -84,7 +85,8 @@ _int CEnergyDrink::Tick(_float fTimeDelta)
 			_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 			_vector vDir = vTargetPos - vPos;
 
-			m_pControllerCom->Move_Dir(m_pTransformCom, vDir * m_fTimeDelta * 10.f, m_fTimeDelta);
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vDir * m_fTimeDelta * 10.f);
+			//m_pControllerCom->Move_Dir(m_pTransformCom, vDir * m_fTimeDelta * 10.f, m_fTimeDelta);
 		}
 		else if (0.3f <= m_fDrinkTime && m_fDrinkTime <= 0.8f)
 		{
@@ -96,7 +98,8 @@ _int CEnergyDrink::Tick(_float fTimeDelta)
 			_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 			_vector vDir = vTargetPos - vPos;
 
-			m_pControllerCom->Move_Dir(m_pTransformCom, vDir * m_fTimeDelta * 10.f, m_fTimeDelta);
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vDir * m_fTimeDelta * 10.f);
+			//m_pControllerCom->Move_Dir(m_pTransformCom, vDir * m_fTimeDelta * 10.f, m_fTimeDelta);
 		}
 		else
 		{
@@ -113,10 +116,11 @@ _int CEnergyDrink::Tick(_float fTimeDelta)
 			_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 			_vector vDir = vTargetPos - vPos;
 
-			m_pControllerCom->Move_Dir(m_pTransformCom, vDir * m_fTimeDelta * 10.f, m_fTimeDelta);
-
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vDir * m_fTimeDelta * 10.f);
+			//m_pControllerCom->Move_Dir(m_pTransformCom, vDir * m_fTimeDelta * 10.f, m_fTimeDelta);
 		}
 	}
+	m_pTrigger->Tick(m_fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
@@ -185,7 +189,6 @@ void CEnergyDrink::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObje
 			m_pPlayer = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"));
 			Safe_AddRef(m_pPlayer);
 
-
 			// 충돌이 완료되었다는 뜻. 반드시 해주어야 함.
 			m_bCollisionComplete = true;
 		}
@@ -206,12 +209,24 @@ HRESULT CEnergyDrink::Add_Components()
 	CHECK_FAILED(hr);
 
 	/* For.Com_CharacterController */
-	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
-	CCharacterController::CONTROLLER_DESC desc{};
-	desc.vInitialPos = vPos;
-	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
-		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
-	m_pControllerCom->Set_Object(this);
+	//_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+	//CCharacterController::CONTROLLER_DESC desc{};
+	//desc.vInitialPos = vPos;
+	//hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
+	//	TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
+	//m_pControllerCom->Set_Object(this);
+
+	/* For.Com_Trigger */
+	CTrigger::TRIGGER_DESC tTriggerDesc{};
+	tTriggerDesc.iTriggerType = CTrigger::TRIGGER_ITEM;
+	tTriggerDesc.iTriggerIndex = 0;
+	tTriggerDesc.eCollisionGroup = m_eCollisionGroup;
+	tTriggerDesc.vTriggerSize = _float3(.5f, .2f, .5f);
+	tTriggerDesc.vInitialPos = m_pTransformCom->Get_WorldFloat4x4();
+	m_pTrigger = static_cast<CTrigger*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc));
+	CHECK_NULLPTR(m_pTrigger);
+	m_pTrigger->Set_Owner(this);
+
 
 	return S_OK;
 }
@@ -266,4 +281,5 @@ void CEnergyDrink::Free()
 		Safe_Release(m_pPlayer);
 
 	Safe_Release(m_pModelCom);
+	Safe_Release(m_pTrigger);
 }

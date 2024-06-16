@@ -31,49 +31,55 @@ void CAwoofy_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	// 자유 낙하
 	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
 
-	// 플레이어와 몬스터의 거리 계산
-	_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(vPos, vKirbyPos)));
+	if (CAwoofy::MON_SLEEP == pAwoofy->Get_MonState())
+		return;
 
-	// 일정 거리 안으로 플레이어가 들어오면 상태 전환
-	if(6.f > fDistance)
-		pAwoofy->Change_State(CAwoofy::AWOOFY_FIND, 40.f, false, true);
-
-	// 여러 상태의 IDLE로 전환
-	if (true == pAwoofy->IsAnimFinished())
+	else if (CAwoofy::MON_WAIT == pAwoofy->Get_MonState())
 	{
-		if(rand() % 5 == 0)
-			pAwoofy->Change_State(CAwoofy::AWOOFY_GROOMING, 45.f, false, true);
-		else if (rand() % 5 == 1)
-			pAwoofy->Change_State(CAwoofy::AWOOFY_LOOKAROUND, 40.f, false, true);
-		else
-			pAwoofy->Change_State(CAwoofy::AWOOFY_WAIT, 40.f, false, true);
-	}
+		// 플레이어와 몬스터의 거리 계산
+		_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(vPos, vKirbyPos)));
 
-	m_fTimeDelta += fTimeDelta;
+		// 일정 거리 안으로 플레이어가 들어오면 상태 전환
+		if (6.f > fDistance)
+			pAwoofy->Change_State(CAwoofy::AWOOFY_FIND, 40.f, false, true);
 
-	// Awoofy의 역동적인 eye state
-	if(CAwoofy::AWOOFY_WAIT == pAwoofy->Get_State() || CAwoofy::AWOOFY_LOOKAROUND == pAwoofy->Get_State())
-	{
-		if (2.5f < m_fTimeDelta)
+		// 여러 상태의 IDLE로 전환
+		if (true == pAwoofy->IsAnimFinished())
 		{
-			pAwoofy->Set_AwoofyEye(CAwoofy::AWOOFYEYE_SLEEP);
-
-			if (2.65f < m_fTimeDelta)
-				m_fTimeDelta = 0.f;
+			if (rand() % 5 == 0)
+				pAwoofy->Change_State(CAwoofy::AWOOFY_GROOMING, 45.f, false, true);
+			else if (rand() % 5 == 1)
+				pAwoofy->Change_State(CAwoofy::AWOOFY_LOOKAROUND, 40.f, false, true);
+			else
+				pAwoofy->Change_State(CAwoofy::AWOOFY_WAIT, 40.f, false, true);
 		}
-		else
-			pAwoofy->Set_AwoofyEye(CAwoofy::AWOOFYEYE_IDLE);
-	}
-	else if (CAwoofy::AWOOFY_GROOMING == pAwoofy->Get_State())
-	{
-		m_fTimeDelta = 0.f;
 
-		if (0.45f < pAwoofy->Get_AnimRatio() && 0.75f > pAwoofy->Get_AnimRatio())
-			pAwoofy->Set_AwoofyEye(CAwoofy::AWOOFYEYE_HAPPY);
-		else if(0.8f > pAwoofy->Get_AnimRatio())
-			pAwoofy->Set_AwoofyEye(CAwoofy::AWOOFYEYE_IDLE);
-		else if(0.8f <= pAwoofy->Get_AnimRatio())
-			pAwoofy->Set_AwoofyEye(CAwoofy::AWOOFYEYE_ANGER);
+		m_fTimeDelta += fTimeDelta;
+
+		// Awoofy의 역동적인 eye state
+		if (CAwoofy::AWOOFY_WAIT == pAwoofy->Get_State() || CAwoofy::AWOOFY_LOOKAROUND == pAwoofy->Get_State())
+		{
+			if (2.5f < m_fTimeDelta)
+			{
+				pAwoofy->Set_AwoofyEye(CAwoofy::AWOOFYEYE_SLEEP);
+
+				if (2.65f < m_fTimeDelta)
+					m_fTimeDelta = 0.f;
+			}
+			else
+				pAwoofy->Set_AwoofyEye(CAwoofy::AWOOFYEYE_IDLE);
+		}
+		else if (CAwoofy::AWOOFY_GROOMING == pAwoofy->Get_State())
+		{
+			m_fTimeDelta = 0.f;
+
+			if (0.45f < pAwoofy->Get_AnimRatio() && 0.75f > pAwoofy->Get_AnimRatio())
+				pAwoofy->Set_AwoofyEye(CAwoofy::AWOOFYEYE_HAPPY);
+			else if (0.8f > pAwoofy->Get_AnimRatio())
+				pAwoofy->Set_AwoofyEye(CAwoofy::AWOOFYEYE_IDLE);
+			else if (0.8f <= pAwoofy->Get_AnimRatio())
+				pAwoofy->Set_AwoofyEye(CAwoofy::AWOOFYEYE_ANGER);
+		}
 	}
 
 	//if (m_pGameInstance->Get_DIKeyState(DIK_SPACE, KEY_DOWN))
@@ -91,6 +97,76 @@ CAwoofy_Idle_State* CAwoofy_Idle_State::Create()
 }
 
 void CAwoofy_Idle_State::Free()
+{
+	__super::Free();
+}
+
+#pragma endregion
+
+
+#pragma region WALK STATE
+//*********************************
+//			 WALK STATE
+//*********************************
+CAwoofy_Walk_State::CAwoofy_Walk_State()
+{
+}
+
+void CAwoofy_Walk_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+
+	m_fDistance = 3.f;
+}
+
+void CAwoofy_Walk_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CAwoofy* pAwoofy = static_cast<CAwoofy*>(pGameObject);
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
+
+	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+
+	// 자유 낙하
+	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
+
+	m_fAngle += fTimeDelta * 50.f;
+	m_fDistance = 3.f;
+	m_vOriginPos = pAwoofy->Get_Pos();
+
+	m_vRotatePos.x = m_vOriginPos.x + (m_fDistance * sin(XMConvertToRadians(m_fAngle)));
+	m_vRotatePos.y = m_vOriginPos.y;
+	m_vRotatePos.z = m_vOriginPos.z - (m_fDistance * cos(XMConvertToRadians(m_fAngle)));
+
+	pController->Move(pTransformCom, m_vRotatePos, fTimeDelta);
+
+	m_vRally = m_vRotatePos - m_vBeforePos;
+	pTransformCom->Look_At_Axis(m_vRally);
+	m_vBeforePos = m_vRotatePos;
+
+	// 플레이어와 몬스터의 거리 계산
+	_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(vPos, vKirbyPos)));
+
+	// 일정 거리 안으로 플레이어가 들어오면 상태 전환
+	if (6.f > fDistance)
+		pAwoofy->Change_State(CAwoofy::AWOOFY_FIND, 40.f, false, true);
+}
+
+void CAwoofy_Walk_State::OnStateExit()
+{
+}
+
+CAwoofy_Walk_State* CAwoofy_Walk_State::Create()
+{
+	CAwoofy_Walk_State* pInstance = new CAwoofy_Walk_State();
+	return pInstance;
+}
+
+void CAwoofy_Walk_State::Free()
 {
 	__super::Free();
 }
@@ -226,6 +302,7 @@ void CAwoofy_Find_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	{
 		// Awoofy 눈 상태
 		pAwoofy->Set_AwoofyEye(CAwoofy::AWOOFYEYE_ANGER);
+		pAwoofy->Set_MonState(CAwoofy::MON_WAIT);
 		pAwoofy->Change_State(CAwoofy::AWOOFY_RUN, 40.f, true, true);
 	}
 }
@@ -398,6 +475,7 @@ void CAwoofy_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		{
 			// Awoofy 눈 상태
 			pAwoofy->Set_AwoofyEye(CAwoofy::AWOOFYEYE_IDLE);
+			pAwoofy->Set_MonState(CAwoofy::MON_WAIT);
 			pAwoofy->Change_State(CAwoofy::AWOOFY_WAIT, 40.f, false, true);
 		}
 	}
@@ -436,8 +514,6 @@ void CAwoofy_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			pAwoofy->Set_Dead();
 
 	}
-
-
 }
 
 void CAwoofy_Damage_State::OnStateExit()

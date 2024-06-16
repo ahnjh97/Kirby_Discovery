@@ -18,12 +18,7 @@ public:
 		KABU_END
 	};
 
-	enum KABUMOVING_STATE {
-		KABUMOVING_CIRCLE, KABUMOVING_PATROL, KABUMOVING_END
-	};
-
 	struct KABU_DESC : public CMonster::MONSTER_DESC {
-		KABUMOVING_STATE eMoveState = { KABUMOVING_END };
 		vector<_float4> vecRallyPoints;
 	};
 
@@ -48,7 +43,7 @@ public:
 	virtual void	Render_IMGUI() override;
 #endif
 	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
-	virtual void	Collision_Hitbox(CPhysXObject* pGameObject);
+	virtual void	Collision_Hitbox(CPhysXObject* pGameObject) override;
 
 public:
 	void Change_State(KABU_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
@@ -56,7 +51,6 @@ public:
 
 private:
 	KABU_ANIM			m_eCurrentState = { KABU_END };
-	KABUMOVING_STATE	m_eMoveState = { KABUMOVING_END };
 
 	_float4				m_vLook = {};
 

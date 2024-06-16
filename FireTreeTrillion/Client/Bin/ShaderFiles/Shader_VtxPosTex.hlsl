@@ -17,11 +17,28 @@ float g_fMaskThreshold = { 0.f };
 
 float2 g_vUVOffset = { 0.f, 0.f };
 float2 g_vMaskUVOffset = { 0.f, 0.f };
-float2 g_vMaskUVAngle = { 0.f, 0.f };
+float g_fMaskUVAngle = { 0.f};
 
 float g_fMaskRatio = { 1.f };
 
 float g_fAlarmColor = { 0.f };
+
+
+// 회전된 UV를 계산
+float2 RotateUV(float2 vCoord, float fAngle)
+{
+    float2 vCenter = (0.5, 0.5);
+    
+    float fSinAngle = sin(fAngle);
+    float fCosAngle = cos(fAngle);
+    float2x2 RotationMatrix = float2x2(fCosAngle, -fSinAngle, fSinAngle, fCosAngle);
+
+    vCoord -= vCenter;
+    vCoord = mul(vCoord, RotationMatrix);
+    vCoord += vCenter;
+    
+    return vCoord;
+}
 
 
 struct VS_IN
@@ -117,24 +134,7 @@ PS_OUT PS_MAIN_ALPHABLEND(PS_IN_ALPHABLEND In)
 {
 	PS_OUT			Out = (PS_OUT)0;
 
-    Out.vColor = g_DiffuseTexture.Sample(PointSampler, In.vTexcoord);
-
-	//float2		vTexcoord = (float2)0.f;
-
-	//vTexcoord.x = (In.vProjPos.x / In.vProjPos.w) * 0.5f + 0.5f;
-	//vTexcoord.y = (In.vProjPos.y / In.vProjPos.w) * -0.5f + 0.5f;
-
-	//float4		vDepthDesc = g_DepthTexture.Sample(PointSampler, vTexcoord);
-	//float		fOldViewZ = vDepthDesc.y * 1000.f;
-
-	//Out.vColor.a = Out.vColor.a  * saturate(fOldViewZ - In.vProjPos.w);
-	
-    //vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord + g_vUVOffset);
-    //if (vDiffuse.a < .01f || (vDiffuse.r < 0.1f && vDiffuse.g < 0.1f && vDiffuse.b < 0.1f))
-    //    discard;
-
-    //Out.vColor.rgb = vDiffuse.rgb * g_vRColor;
-    //Out.vColor.a = vDiffuse.a * g_fAlpha;
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
     
     //알파 값 예외처리
     if (Out.vColor.a < 0.1f)
@@ -165,7 +165,7 @@ PS_OUT PS_MAIN_BLEND_FX(PS_IN_ALPHABLEND In)
 {
     PS_OUT Out = (PS_OUT) 0;
 	
-    vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord + g_vMaskUVOffset);
+    vector vMask = g_MaskTexture.Sample(ClampSampler, RotateUV(In.vTexcoord + g_vMaskUVOffset, g_fMaskUVAngle));
     
     if (vMask.a < g_fMaskThreshold)
         discard;
@@ -202,7 +202,7 @@ PS_OUT PS_MAIN_DEFAULT_FX(PS_IN_ALPHABLEND In)
     PS_OUT Out = (PS_OUT) 0;
 
     //마스크 값으로 자르기
-    vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord + g_vMaskUVOffset);
+    vector vMask = g_MaskTexture.Sample(ClampSampler, RotateUV(In.vTexcoord + g_vMaskUVOffset, g_fMaskUVAngle));
     if (vMask.a < g_fMaskThreshold)
         discard;
     else if (vMask.r < g_fMaskThreshold)
@@ -224,7 +224,7 @@ PS_OUT PS_MAIN_WHITEFX(PS_IN_ALPHABLEND In)
     PS_OUT Out = (PS_OUT) 0;
 
     //마스크 값으로 자르기
-    vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord + g_vMaskUVOffset);
+    vector vMask = g_MaskTexture.Sample(ClampSampler, RotateUV(In.vTexcoord + g_vMaskUVOffset, g_fMaskUVAngle));
     if (vMask.a < g_fMaskThreshold)
         discard;
     else if (vMask.r < g_fMaskThreshold)
@@ -247,7 +247,7 @@ PS_OUT PS_MAIN_FOR_HP(PS_IN_ALPHABLEND In)
 
     //마스크 값으로 자르기
     vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord);
-    Out.vColor = g_DiffuseTexture.Sample(PointSampler, In.vTexcoord);
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
     if (Out.vColor.a < 0.1f)
         discard;
 
@@ -270,7 +270,7 @@ PS_OUT PS_MAIN_FOR_HPDAMAGE(PS_IN_ALPHABLEND In)
 
     //마스크 값으로 자르기
     vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord);
-    Out.vColor = g_DiffuseTexture.Sample(PointSampler, In.vTexcoord);
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
     if (Out.vColor.a < 0.1f)
         discard;
 

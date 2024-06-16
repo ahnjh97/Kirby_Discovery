@@ -263,12 +263,11 @@ void CRigidBody::Activate(_bool _bActive)
 void CRigidBody::Add_Force(_float3 vForce)
 {
 	if (m_pActor == nullptr) return;
+	if (true == (m_bTrigger && m_bKinematic))
+		return;
 
-	if (false == m_bKinematic && false == m_bTrigger)
-	{
-		PxVec3 PxForce = physx::PxVec3(vForce.x, vForce.y, vForce.z);
-		m_pActor->addForce(PxForce, physx::PxForceMode::eFORCE);
-	}
+	PxVec3 PxForce = physx::PxVec3(vForce.x, vForce.y, vForce.z);
+	m_pActor->addForce(PxForce, physx::PxForceMode::eFORCE);
 }
 
 void CRigidBody::Add_Torque(_float vTorque)

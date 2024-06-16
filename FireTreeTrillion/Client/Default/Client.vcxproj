@@ -191,6 +191,10 @@
     <ClInclude Include="..\Public\Buffahorn_State.h" />
     <ClInclude Include="..\public\Camera_Free.h" />
     <ClInclude Include="..\public\Camera_Main.h" />
+    <ClInclude Include="..\Public\CappyBody.h" />
+    <ClInclude Include="..\Public\CappyBody_State.h" />
+    <ClInclude Include="..\Public\CappyHat.h" />
+    <ClInclude Include="..\Public\CappyHat_State.h" />
     <ClInclude Include="..\Public\Character.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\Coin.h" />
@@ -211,6 +215,7 @@
     <ClInclude Include="..\Public\ItemObject.h" />
     <ClInclude Include="..\Public\Kabu.h" />
     <ClInclude Include="..\Public\Kabu_State.h" />
+    <ClInclude Include="..\Public\KickableRock.h" />
     <ClInclude Include="..\Public\KirbyBomb.h" />
     <ClInclude Include="..\Public\KirbyBoom_State.h" />
     <ClInclude Include="..\Public\Ladder.h" />
@@ -239,6 +244,7 @@
     <ClInclude Include="..\Public\Level_Tool_UI.h" />
     <ClInclude Include="..\Public\Loader.h" />
     <ClInclude Include="..\public\MainApp.h" />
+    <ClInclude Include="..\Public\MapObject.h" />
     <ClInclude Include="..\Public\Monster.h" />
     <ClInclude Include="..\Public\MapToolHelper.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -259,6 +265,7 @@
     <ClInclude Include="..\Public\RigidObject.h" />
     <ClInclude Include="..\Public\SingleEffect.h" />
     <ClInclude Include="..\public\SkySphere.h" />
+    <ClInclude Include="..\Public\StarBlock.h" />
     <ClInclude Include="..\Public\TestModel.h" />
     <ClInclude Include="..\Public\TestModel_State.h" />
     <ClInclude Include="..\Public\TestTerrain.h" />
@@ -298,6 +305,10 @@
     <ClCompile Include="..\Private\Buffahorn_State.cpp" />
     <ClCompile Include="..\private\Camera_Free.cpp" />
     <ClCompile Include="..\private\Camera_Main.cpp" />
+    <ClCompile Include="..\Private\CappyBody.cpp" />
+    <ClCompile Include="..\Private\CappyBody_State.cpp" />
+    <ClCompile Include="..\Private\CappyHat.cpp" />
+    <ClCompile Include="..\Private\CappyHat_State.cpp" />
     <ClCompile Include="..\Private\Character.cpp" />
     <ClCompile Include="..\Private\Coin.cpp" />
     <ClCompile Include="..\Private\CollisionCenter.cpp" />
@@ -317,6 +328,7 @@
     <ClCompile Include="..\Private\ItemObject.cpp" />
     <ClCompile Include="..\Private\Kabu.cpp" />
     <ClCompile Include="..\Private\Kabu_State.cpp" />
+    <ClCompile Include="..\Private\KickableRock.cpp" />
     <ClCompile Include="..\Private\KirbyBomb.cpp" />
     <ClCompile Include="..\Private\Ladder.cpp" />
     <ClCompile Include="..\Private\Level_Intro.cpp" />
@@ -342,6 +354,7 @@
     <ClCompile Include="..\Private\Level_Tool_UI.cpp" />
     <ClCompile Include="..\Private\Loader.cpp" />
     <ClCompile Include="..\private\MainApp.cpp" />
+    <ClCompile Include="..\Private\MapObject.cpp" />
     <ClCompile Include="..\Private\Monster.cpp" />
     <ClCompile Include="..\Private\MapToolHelper.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -362,6 +375,7 @@
     <ClCompile Include="..\Private\RigidObject.cpp" />
     <ClCompile Include="..\Private\SingleEffect.cpp" />
     <ClCompile Include="..\private\SkySphere.cpp" />
+    <ClCompile Include="..\Private\StarBlock.cpp" />
     <ClCompile Include="..\Private\TestModel.cpp" />
     <ClCompile Include="..\Private\TestModel_State.cpp" />
     <ClCompile Include="..\Private\TestTerrain.cpp" />

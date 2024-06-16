@@ -39,6 +39,15 @@ HRESULT CFont_Manager::Render(const wstring& strFontTag, const wstring& strText,
 	return pFont->Render(strText, vPosition, vColor, fRadian, vOrigin, vScale);
 }
 
+HRESULT CFont_Manager::Render_Proj(_matrix _matrix, const wstring& strFontTag, const wstring& strText, const _float2& vPosition, _fvector vColor, _float fRadian, _fvector vOrigin, _gvector vScale)
+{
+	CCustomFont* pFont = Find_Font(strFontTag);
+	if (nullptr == pFont)
+		return E_FAIL;
+
+	return pFont->Render_Proj(_matrix, strText, vPosition, vColor, fRadian, vOrigin, vScale);
+}
+
 CCustomFont * CFont_Manager::Find_Font(const wstring & strFontTag)
 {
 	auto	iter = m_Fonts.find(strFontTag);

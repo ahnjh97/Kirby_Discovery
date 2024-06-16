@@ -99,7 +99,7 @@ float3 vDamageColor = float3(2.f, 0.45f, 0);
 PS_OUT PS_MAIN(PS_IN In)
 {
 	PS_OUT			Out = (PS_OUT)0;
-
+    
 	vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
 	if (0.3f >= vMtrlDiffuse.a)
 		discard;

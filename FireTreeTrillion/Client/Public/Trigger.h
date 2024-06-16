@@ -13,7 +13,7 @@ class CTrigger final : public CPhysXObject
 {
 public:
 	enum TRIGGER {  TRIGGER_CAM, TRIGGER_SHADER, TRIGGER_STAR, 
-					TRIGGER_ITEM = 50, TRIGGER_HITBOX, TRIGGER_END };
+					TRIGGER_ITEM = 50, TRIGGER_HITBOX, TRIGGER_MAPOBJ, TRIGGER_END };
 
 
 	typedef struct : public GAMEOBJECT_DESC
@@ -39,11 +39,13 @@ public:
 #ifdef _DEBUG
 	virtual void	Render_IMGUI()										override;
 #endif
+	CPhysXObject*	Get_Owner() const { return m_pOwner; }
 	void			Set_Owner(class CPhysXObject* pObj);
 	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
-	void			Collision_Hitbox(CPhysXObject* pGameObject);
-	_bool			Is_Alive(){ return m_bAlive; }
+	virtual void	Collision_Hitbox(CPhysXObject* pGameObject)			override;
+	_bool			Is_Alive() { return m_bAlive; }
 	void			Check_Collision();
+	void			Close_Collision();
 
 private:
 	HRESULT			Add_Components();

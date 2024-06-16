@@ -137,17 +137,14 @@ _int CKirby::Tick(_float fTimeDelta)
 	__super::Tick(m_fTimeDelta);
 	Kirby_SystemTick(m_fTimeDelta);
 
-
 	m_pWeapons->Tick(m_fTimeDelta);
 	m_pArmours->Tick(m_fTimeDelta);
 
 	if(m_pHitBoxTrigger->Is_Alive())
 		m_pHitBoxTrigger->Tick(m_fTimeDelta);
 
-	if (m_pGameInstance->Get_DIKeyState(DIK_5, KEY_DOWN))
-	{
-		m_pHitBoxTrigger->Check_Collision();
-	}
+	//if (m_pGameInstance->Get_DIKeyState(DIK_5, KEY_DOWN))
+	//	m_pHitBoxTrigger->Check_Collision();
 
 	return OBJ_NOEVENT;
 }
@@ -302,13 +299,11 @@ void CKirby::Add_AnimEvent()
 	// 1. 한 애니메이션에서 같은 이름의 이벤트 가능
 	// 2. 재생 기준은 애님툴에서 지정한 애니메이션인지 + 시작 프레임이 애니메이션 프레임안에 들어가는 지
 	// 3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
-	
-	//m_pModelCom[INFO(m_eBodyState)]->Add_Event("ApplyDamage", [this]() {
-	//	m_pHitBoxTrigger->Check_Collision();
-	//	});
-
 	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("ApplyDamage", [this]() {
 		m_pHitBoxTrigger->Check_Collision();
+		});
+	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("StopDamage", [this]() {
+		m_pHitBoxTrigger->Close_Collision();
 		});
 }
 
@@ -367,14 +362,13 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 			Delete_AllEffect();
 		}
 	}
-
-
 }
 
 void CKirby::Collision_Hitbox(CPhysXObject* pGameObject)
+
 {
 	// kirby HITBOX 충돌이 일어날 경우 처리해야하는 일들
-	//MSG_BOX(TEXT("커비 overlap 충돌"));
+	// MSG_BOX(TEXT("커비 overlap 충돌"));
 }
 
 _float3 CKirby::Make_RepulsiveDir(CPhysXObject* pObject)
@@ -1081,10 +1075,20 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 		if (INFO(m_pObject)->Get_PhyXState() == PO_KIRBYMOUTH)
 		{
 			CCharacterController* pObjectController = static_cast<CCharacterController*>(INFO(m_pObject)->Get_Component(TEXT("Com_Controller")));
-			CTransform* pObjectTransform = INFO(m_pObject)->Get_TransformCom();
-			_vector vMouthPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-			vMouthPos.m128_f32[1] += 1.f;
-			pObjectController->Set_Position(pObjectTransform, vMouthPos);
+			if (pObjectController == nullptr)
+			{
+				CTransform* pObjectTransform = INFO(m_pObject)->Get_TransformCom();
+				_vector vMouthPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+				vMouthPos.m128_f32[1] += 1.f;
+				pObjectTransform->Set_State(CTransform::STATE_POSITION, vMouthPos);
+			}
+			else
+			{
+				CTransform* pObjectTransform = INFO(m_pObject)->Get_TransformCom();
+				_vector vMouthPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+				vMouthPos.m128_f32[1] += 1.f;
+				pObjectController->Set_Position(pObjectTransform, vMouthPos);
+			}
 		}
 	}
 

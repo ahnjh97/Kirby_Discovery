@@ -38,6 +38,25 @@ HRESULT CCustomFont::Render(const wstring& strText, const _float2& vPosition, _f
 	return S_OK;
 }
 
+//원근투영 폰트 렌더
+HRESULT CCustomFont::Render_Proj(_matrix _matrix, const wstring& strText, const _float2& vPosition, _fvector vColor, _float fRadian, _fvector vOrigin, _gvector vScale)
+{
+	//뷰, 투영행렬 변환컴포넌트 정보로 원근세팅
+	//if (FAILED(_pTransCom->Bind_ShaderResource(_pShaderCom, "g_WorldMatrix")))
+	//	return E_FAIL;
+
+	//_float4x4 VPMatrix, ViewMatrix, ProjMatrix{};
+	//VPMatrix = ViewMatrix * ProjMatrix;
+
+	m_pBatch->Begin(SpriteSortMode_Deferred, nullptr, nullptr, nullptr, nullptr, nullptr, _matrix);
+
+	m_pFont->DrawString(m_pBatch, strText.c_str(), vPosition, vColor, fRadian, vOrigin, vScale);
+
+	m_pBatch->End();
+
+	return S_OK;
+}
+
 CCustomFont * CCustomFont::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const wstring & strFontFilePath)
 {
 	CCustomFont*		pInstance = new CCustomFont(pDevice, pContext);
