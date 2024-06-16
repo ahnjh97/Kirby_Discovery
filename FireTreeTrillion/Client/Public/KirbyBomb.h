@@ -49,8 +49,16 @@ private:
 	HRESULT			Bind_ShaderResources();
 	void			Compute_MotionBlur();
 	_bool			RayCast_Terrain();
+	
+	_int			Boom_Dead();
 	_float2			m_vPreScreenPos = { 0.f, 0.f };
 	_float4			m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
+
+	_float			m_fBombTime = { 0.f };
+
+	_float			m_fBombingTime = { 0.f };
+
+	_float			m_fDontKicking = { 0.f };
 
 private:
 	CModel* m_pModelCom = { nullptr };

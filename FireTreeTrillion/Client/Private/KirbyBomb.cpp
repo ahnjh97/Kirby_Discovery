@@ -46,7 +46,7 @@ HRESULT CKirbyBomb::Initialize(void* pArg)
     if (FAILED(Add_Components()))
         return E_FAIL;
 
-    m_pModelCom->Set_Animation(1, 50.f, true, true);
+    m_pModelCom->Set_Animation(5, 60.f, false, false);
 
     m_bStencil = true;
     m_bRimLight = true;
@@ -58,10 +58,13 @@ HRESULT CKirbyBomb::Initialize(void* pArg)
 _int CKirbyBomb::Tick(_float fTimeDelta)
 {
     if (true == m_bDead)
-        return OBJ_DEAD;
+        return Boom_Dead();
+
+    m_fTimeDelta = m_pGameInstance->Get_FirstTimer();
+    m_fDontKicking += m_fTimeDelta;
 
     Compute_MotionBlur();
-    __super::Tick(fTimeDelta);
+    __super::Tick(m_fTimeDelta);
 
     CKirby::KIRBY_INFODESC* desc = m_pKirby->Get_KirbyInfo();
 
@@ -87,20 +90,37 @@ _int CKirbyBomb::Tick(_float fTimeDelta)
     }
 
 
+    if (m_bThrowTrigger == false)
+    {
+        m_fBombTime += m_fTimeDelta;
+
+        m_fBombingTime += m_fTimeDelta * (1.f / 8.f);
+
+        if (m_fBombTime > 8.f)
+            m_bDead = true;
+    }
+
+    // 등장 애님 끝나면.
+    if (m_pModelCom->IsFinished())
+    {
+        m_pModelCom->Set_Animation(1, 60.f, true, false);
+    }
+
+
     return OBJ_NOEVENT;
 }
 
 void CKirbyBomb::Late_Tick(_float fTimeDelta)
 {
-    __super::Late_Tick(fTimeDelta);
-    m_pModelCom->Play_Animation(fTimeDelta);
+    __super::Late_Tick(m_fTimeDelta);
+    m_pModelCom->Play_Animation(m_fTimeDelta * (1.f + pow(m_fBombingTime, 4.f)));
 
 
     if (m_pRigidBodyCom != nullptr)
     {
         m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
         if (RayCast_Terrain())
-            m_pRigidBodyCom->Add_Torque(-0.9f);
+            m_pRigidBodyCom->Add_Torque(-1.1f);
     }
 
 
@@ -150,9 +170,23 @@ void CKirbyBomb::Render_IMGUI()
 
 void CKirbyBomb::Kicking()
 {
+    if (m_fDontKicking < 1.f)
+    {
+        return;
+    }
+    CTransform* pTransform = m_pKirby->Get_TransformCom();
+    _float4 vKirbyPos = pTransform->Get_State(CTransform::STATE_POSITION);
+    _float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+    _float4 vDir = vPos - vKirbyPos;
 
+    _float fDistance = (vDir).Length();
 
-
+    if (fDistance < 1.8f)
+    {
+        vDir.y = 0.f;
+        m_pRigidBodyCom->Kick_RigidBody(XMVector3Normalize(vDir), 18.f);
+        m_fDontKicking = 0.f;
+    }
 }
 
 void CKirbyBomb::Throwing(CKirby::KIRBY_INFODESC* desc)
@@ -277,6 +311,13 @@ _bool CKirbyBomb::RayCast_Terrain()
     }
     // 레이 쐈는데 터레인이 없었다.
     return false;
+}
+
+_int CKirbyBomb::Boom_Dead()
+{
+
+
+    return OBJ_DEAD;
 }
 
 CKirbyBomb* CKirbyBomb::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
