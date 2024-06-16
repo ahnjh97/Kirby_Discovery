@@ -454,22 +454,31 @@ void CKirbyVacuum_Vacuuming_State::OnStateUpdate(CGameObject* pGameObject, _floa
 	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
+
 	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+
 
 	DESC(m_eEyeState) = CKirby::EYE_CLOSE;
 	CTransform* pObjectTransform = DESC(m_pObject)->Get_TransformCom();
 	_vector vObjectPos = pObjectTransform->Get_State_Vector(CTransform::STATE_POSITION);
 	_float vCurDistance = XMVectorGetX(XMVector3Length(vPos - vObjectPos));
-	_vector vObjectDir = XMVector3Normalize(vPos - vObjectPos);
-	CCharacterController* pObjectController = static_cast<CCharacterController*>(DESC(m_pObject)->Get_Component(TEXT("Com_Controller")));
+	_float4 vObjectDir = XMVector3Normalize(vPos - vObjectPos);
 
-	pObjectController->Move_Dir(pObjectTransform, vObjectDir * fVacuumObjectSpeed * fTimeDelta, fTimeDelta);
+	CCharacterController* pObjectController = static_cast<CCharacterController*>(DESC(m_pObject)->Get_Component(TEXT("Com_Controller")));
+	if (pObjectController == nullptr)
+	{
+		_float4 vPos = pObjectTransform->Get_State(CTransform::STATE_POSITION);
+		pObjectTransform->Set_State(CTransform::STATE_POSITION, vPos + vObjectDir * fVacuumObjectSpeed * fTimeDelta);
+	}
+	else
+	{
+		pObjectController->Move_Dir(pObjectTransform, vObjectDir * fVacuumObjectSpeed * fTimeDelta, fTimeDelta);
+	}
 
 	_float fScaleinverse = 1.f - ((DESC(m_fObjectDistance) - vCurDistance) / DESC(m_fObjectDistance) * 0.3f);
 
 	_float3 vObjectScale = pObjectTransform->Get_Scaled();
 	pObjectTransform->Set_Scaled(DESC(m_vObjectScale).x * fScaleinverse, DESC(m_vObjectScale).y * fScaleinverse, DESC(m_vObjectScale).z * fScaleinverse);
-
 	fVacuumObjectSpeed += fTimeDelta * 150.f;
 }
 

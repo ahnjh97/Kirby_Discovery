@@ -20,7 +20,9 @@
 #include "ImGUI_Manager.h"
 #endif
 
+#include "OcTree.h"
 #include "PhysX.h"
+
 
 IMPLEMENT_SINGLETON(CGameInstance)
 
@@ -664,6 +666,8 @@ CLight* CGameInstance::Get_LightLastAddress()
 	return m_pLight_Manager->Get_LightLastAddress();
 }
 
+#pragma region FONT_MANAGER
+
 HRESULT CGameInstance::Add_Font(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const wstring& strFontTag, const wstring& strFontFilePath)
 {
 	if (m_pFont_Manager == nullptr)
@@ -687,6 +691,16 @@ HRESULT CGameInstance::Render_Font(const wstring& strFontTag, const wstring& str
 
 	return m_pFont_Manager->Render(strFontTag, strText, vPosition, vColor, fRadian, vOrigin, vScale);
 }
+
+HRESULT CGameInstance::Render_ProjFont(_matrix _matrix, const wstring& strFontTag, const wstring& strText, const _float2& vPosition, _fvector vColor, _float fRadian, _fvector vOrigin, _gvector vScale)
+{
+	if (m_pFont_Manager == nullptr)
+		return E_FAIL;
+
+	return m_pFont_Manager->Render_Proj(_matrix, strFontTag, strText, vPosition, vColor, fRadian, vOrigin, vScale);
+}
+
+#pragma endregion
 
 #pragma region TARGET_MANAGER
 HRESULT CGameInstance::Add_RenderTarget(const wstring& strRenderTargetTag, _uint iSizeX, _uint iSizeY, DXGI_FORMAT ePixelFormat, const _float4& vClearColor)
@@ -944,20 +958,20 @@ void CGameInstance::Set_IMGUIStyle(_uint uStyle)
 }
 #endif
 
-PxRigidDynamic* CGameInstance::CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)
+PxRigidDynamic* CGameInstance::CreateDynamicActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)
 {
 	if (nullptr == m_pPhysx)
 		return nullptr;
 
-	return m_pPhysx->CreateDynamicActor(vPos, pVerticesPos, iNumVertices, pIndices, iNumIndices, pMaterial);
+	return m_pPhysx->CreateDynamicActor(matWorld, pVerticesPos, iNumVertices, pIndices, iNumIndices, pMaterial);
 }
 
-PxRigidStatic* CGameInstance::CreateStaticActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)
+PxRigidStatic* CGameInstance::CreateStaticActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)
 {
 	if (nullptr == m_pPhysx)
 		return nullptr;
 
-	return m_pPhysx->CreateStaticActor(vPos, pVerticesPos, iNumVertices, pIndices, iNumIndices, pMaterial);
+	return m_pPhysx->CreateStaticActor(matWorld, pVerticesPos, iNumVertices, pIndices, iNumIndices, pMaterial);
 }
 
 void CGameInstance::Register_Player(PxActor* pPlayerActor)
@@ -988,6 +1002,12 @@ void CGameInstance::Emplace_ExitFunc(_int iTriggerType, function<void(void)> exi
 {
 	if (nullptr != m_pPhysx)
 		m_pPhysx->Emplace_ExitFunc(iTriggerType, exitFunc);
+}
+
+void CGameInstance::Emplace_MapDecoTrigger(PxActor* pTriggerActor, CModel* pMapDecoModel, _uint iAnimIdx, _float fTickPerSec)
+{
+	if(nullptr != m_pPhysx)
+		m_pPhysx->Emplace_MapDecoTrigger(pTriggerActor, pMapDecoModel, iAnimIdx, fTickPerSec);
 }
 
 void CGameInstance::Clear_EventCallBack()

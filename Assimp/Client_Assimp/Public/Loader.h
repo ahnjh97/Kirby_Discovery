@@ -42,9 +42,15 @@ private:
 	HRESULT Add_AnimPrototype(wstring& ModelName);
 	HRESULT Add_NonAnimPrototype(wstring& ModelName);
 
+	HRESULT Add_AnimMapDecoPrototype(wstring& ModelName);
+	HRESULT Add_NonAnimMapDecoPrototype(wstring& ModelName);
+
 	void TraverseAnimModels(const wstring& rootFolderPath); 
 	void TraverseNonAnimModels(const wstring& rootFolderPath);
 	void TraverseDirectory(const wstring& rootFolderPath, list<wstring>& fileList);
+
+	void TraverseAnimMapDecos(const wstring& rootFolderPath);
+	void TraverseNonAnimMapDecos(const wstring& rootFolderPath);
 
 public:
 	static CLoader* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID);

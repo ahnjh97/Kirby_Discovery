@@ -2,6 +2,7 @@
 #include "EventCallBack.h"
 #include "GameInstance.h"
 #include "GameObject.h"
+#include "Model.h"
 
 void CEventCallBack::onTrigger(PxTriggerPair* pairs, PxU32 count)
 {
@@ -60,28 +61,28 @@ void CEventCallBack::onTrigger(PxTriggerPair* pairs, PxU32 count)
                         exitFuncIter->second();
                 }
             }
-        }     
+        }
+        else if (pairs[i].status & PxPairFlag::eNOTIFY_TOUCH_FOUND) // For Map Deco Anim
+        {
+            if (pairs[i].otherActor == m_pPlayerActor && IsMapDecoAnimTrigger(pairs[i].triggerActor))
+            {
+                auto iter = m_TriggerToMapDecoAnimMap.find(pairs[i].triggerActor);
+                if (iter != m_TriggerToMapDecoAnimMap.end())
+                {
+                    CModel* pMapDeco = get<0>(iter->second);
+                    pMapDeco->Set_Animation(get<1>(iter->second), get<2>(iter->second), false, true);
+                }
+            }
+        }
     }
 }
 
 void CEventCallBack::onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs)
 {
-    _int a = 3;
 }
 
 void CEventCallBack::Clear_EventCallBack()
 {
-    if (!m_Triggers.empty())
-    {
-        for (auto& tuple : m_Triggers)
-        {
-            if (nullptr != get<0>(tuple))
-            {
-               //get<0>(tuple)->release();
-            }
-        }
-    }
-
     m_Triggers.clear();
     m_TriggerFuncs.clear();
     m_ExitFuncs.clear();

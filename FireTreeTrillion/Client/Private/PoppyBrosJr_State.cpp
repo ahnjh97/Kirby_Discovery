@@ -34,21 +34,35 @@ void CPoppyBrosJr_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	// 자유 낙하
 	pController->FreeFall(pTransformCom, fTimeDelta, 6.f, 0.5f);
 
-	// 플레이어와 몬스터의 거리 계산
-	_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(vPos, vKirbyPos)));
-
-	// 플레이어를 향해 바라본다
-	pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 2.f);
-
-	m_fTimeDelta += fTimeDelta;
-
-	if (3.f < m_fTimeDelta)
+	if(CPoppyBrosJr::PS_TARGET == pPoppyJr->Get_PoppyState())
 	{
-		// 일정 거리 안으로 플레이어가 들어오면 상태 전환
-		if (10.f > fDistance)
+		// 플레이어와 몬스터의 거리 계산
+		_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(vPos, vKirbyPos)));
+
+		// 플레이어를 향해 바라본다
+		pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 2.f);
+
+		m_fTimeDelta += fTimeDelta;
+
+		if (3.f < m_fTimeDelta)
+		{
+			// 일정 거리 안으로 플레이어가 들어오면 상태 전환
+			if (10.f > fDistance)
+				pPoppyJr->Change_State(CPoppyBrosJr::POPPY_THROW, 50.f, false, true);
+
+			m_fTimeDelta = 0.f;
+		}
+	}
+	else if (CPoppyBrosJr::PS_NONTARGET == pPoppyJr->Get_PoppyState())
+	{
+		m_fTimeDelta += fTimeDelta;
+
+		if (3.f < m_fTimeDelta)
+		{
 			pPoppyJr->Change_State(CPoppyBrosJr::POPPY_THROW, 50.f, false, true);
 
-		m_fTimeDelta = 0.f;
+			m_fTimeDelta = 0.f;
+		}
 	}
 }
 
@@ -94,22 +108,46 @@ void CPoppyBrosJr_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float f
 	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
 	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
 
+	_vector vPoppyPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	_vector vPoppyLook = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+
 	pController->FreeFall(pTransformCom, fTimeDelta, 6.f, 0.5f);
 
-	if (true == m_bBomb)
+	if (CPoppyBrosJr::PS_TARGET == pPoppyJr->Get_PoppyState())
 	{
-		m_bBomb = false;
+		if (true == m_bBomb)
+		{
+			m_bBomb = false;
 
-		HRESULT hr = S_OK;
+			HRESULT hr = S_OK;
 
-		CPoppyBomb::POPPYBOMB_DESC PoppyBombDesc = {};
-		_float4 vPos = pPoppyJr->Compute_BoneWorldMatrix();
-		PoppyBombDesc.vPosition = vPos;
-		PoppyBombDesc.vLook = pTransformCom->Get_State_Float4(CTransform::STATE_LOOK);
-		PoppyBombDesc.vTargetPosition = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-		PoppyBombDesc.pGameObject = pPoppyJr;
-		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Monster"), TEXT("Prototype_GameObject_PoppyBomb"), &PoppyBombDesc);
-		CHECK_FAILED(hr);
+			CPoppyBomb::POPPYBOMB_DESC PoppyBombDesc = {};
+			_float4 vPos = pPoppyJr->Compute_BoneWorldMatrix();
+			PoppyBombDesc.vPosition = vPos;
+			PoppyBombDesc.vLook = vPoppyLook;
+			PoppyBombDesc.vTargetPosition = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+			PoppyBombDesc.pGameObject = pPoppyJr;
+			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Bomb"), TEXT("Prototype_GameObject_PoppyBomb"), &PoppyBombDesc);
+			CHECK_FAILED(hr);
+		}
+	}
+	else if (CPoppyBrosJr::PS_NONTARGET == pPoppyJr->Get_PoppyState())
+	{
+		if (true == m_bBomb)
+		{
+			m_bBomb = false;
+
+			HRESULT hr = S_OK;
+
+			CPoppyBomb::POPPYBOMB_DESC PoppyBombDesc = {};
+			_float4 vPos = pPoppyJr->Compute_BoneWorldMatrix();
+			PoppyBombDesc.vPosition = vPos;
+			PoppyBombDesc.vLook = vPoppyLook;
+			PoppyBombDesc.vTargetPosition = vPoppyPos + XMVector3Normalize(vPoppyLook) * 7.f;
+			PoppyBombDesc.pGameObject = pPoppyJr;
+			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Bomb"), TEXT("Prototype_GameObject_PoppyBomb"), &PoppyBombDesc);
+			CHECK_FAILED(hr);
+		}
 	}
 
 	if (true == pPoppyJr->IsAnimFinished())

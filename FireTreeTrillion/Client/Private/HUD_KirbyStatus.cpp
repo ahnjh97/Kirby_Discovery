@@ -33,7 +33,7 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 	m_UIObjDesc.eUIType = (*HUDKirby_Desc).eUIType;
 	m_UIObjDesc.vColorRGB = (*HUDKirby_Desc).vColorRGB;
 	m_UIObjDesc.fAlpha = (*HUDKirby_Desc).fAlpha;
-	m_UIObjDesc.vDegree = (*HUDKirby_Desc).vDegree;
+	//m_UIObjDesc.vDegree = (*HUDKirby_Desc).vDegree;
 
 	if (UI_TEXTURE == m_UIObjDesc.eUIType)
 		m_iTexIndex = (*HUDKirby_Desc).iTexIndex;
@@ -45,21 +45,26 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 	m_pTransformCom->Set_Scaled(m_UIObjDesc.vSize.x, m_UIObjDesc.vSize.y, 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
 		XMVectorSet(m_UIObjDesc.vPos.x - m_UIObjDesc.vCenter.x + m_UIObjDesc.vCenter.x,
-			m_UIObjDesc.vPos.y - m_UIObjDesc.vCenter.y + m_UIObjDesc.vCenter.y, 0.f, 1.f));
+					m_UIObjDesc.vPos.y - m_UIObjDesc.vCenter.y + m_UIObjDesc.vCenter.y, 
+					m_UIObjDesc.vPos.z, 1.f));
 
 #pragma region SET_PROJ
 
 	if (PROJ_ORTHO == m_UIObjDesc.eUIProj)
 	{
+		m_UIObjDesc.vDegree.z = (*HUDKirby_Desc).vDegree.z;
 		m_pTransformCom->Rotation(XMVectorSet(AXIS_Z), XMConvertToRadians(m_UIObjDesc.vDegree.z));
 		XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 	}
 
 	if (PROJ_PERSPEC == m_UIObjDesc.eUIProj)
 	{
-		m_pTransformCom->Rotation(XMVectorSet(AXIS_X), XMConvertToRadians(m_UIObjDesc.vDegree.x));
-		m_pTransformCom->Rotation(XMVectorSet(AXIS_Y), XMConvertToRadians(m_UIObjDesc.vDegree.y));
-		m_pTransformCom->Rotation(XMVectorSet(AXIS_Z), XMConvertToRadians(m_UIObjDesc.vDegree.z));
+		m_UIObjDesc.vDegree = (*HUDKirby_Desc).vDegree;
+
+		_float fRadianX = XMConvertToRadians(m_UIObjDesc.vDegree.x);
+		_float fRadianY = XMConvertToRadians(m_UIObjDesc.vDegree.y);
+		_float fRadianZ = XMConvertToRadians(m_UIObjDesc.vDegree.z);
+		m_pTransformCom->Rotation(fRadianX, fRadianY, fRadianZ);
 	}
 
 #pragma endregion
@@ -78,10 +83,7 @@ _int CHUD_KirbyStatus::Tick(_float fTimeDelta)
 {	
 	__super::Tick(fTimeDelta);
 
-
 	Compute_Player_Hp(fTimeDelta);
-
-
 
 	return OBJ_NOEVENT;
 }
@@ -94,13 +96,7 @@ void CHUD_KirbyStatus::Late_Tick(_float fTimeDelta)
 HRESULT CHUD_KirbyStatus::Render()
 {
 	if (UI_TEXTURE == m_UIObjDesc.eUIType)
-	{
-		if (PROJ_ORTHO == m_UIObjDesc.eUIProj)
-			Render_OrthoProj(m_pShaderCom, m_pTransformCom);
-
-		if (PROJ_PERSPEC == m_UIObjDesc.eUIProj)
-			Render_PerspecProj(m_pShaderCom, m_pTransformCom);
-	}
+		Render_BindSet(m_pShaderCom, m_pTransformCom);
 
 	if (UI_FONT == m_UIObjDesc.eUIType)
 	{
@@ -108,10 +104,13 @@ HRESULT CHUD_KirbyStatus::Render()
 							-m_UIObjDesc.vPos.y + m_UIObjDesc.vCenter.y };
 
 		_float4 vFontRGBA = { m_UIObjDesc.vColorRGB.x, m_UIObjDesc.vColorRGB.y, m_UIObjDesc.vColorRGB.z, m_UIObjDesc.fAlpha };
-		if (FAILED(m_pGameInstance->
-			Render_Font(TEXT("Font_HUDSub_KR15"), m_UIObjDesc.wstrText, vFontPos, vFontRGBA,
-				XMConvertToRadians(m_UIObjDesc.vDegree.z))))
-			return E_FAIL;
+		_float2 vFontOrig = { 1.f, 1.f };
+		_float2 vFontScale = { 1.2f, 1.2f };
+
+		wstring wstrFontTag = { TEXT("Font_HUDSub_KR15") };
+
+		m_pGameInstance->Render_Font(wstrFontTag, m_UIObjDesc.wstrText, vFontPos, vFontRGBA,
+			XMConvertToRadians(m_UIObjDesc.vDegree.z), vFontOrig, vFontScale);
 	}
 
 	return S_OK;
@@ -138,121 +137,32 @@ HRESULT CHUD_KirbyStatus::Add_Components()
 	return S_OK;
 }
 
-HRESULT CHUD_KirbyStatus::Render_OrthoProj(CShader* _pShaderCom, CTransform* _pTransCom)
-{
-	CHECK_NULLPTR(_pShaderCom);
-
-	// 분홍색 게이지
-	if (m_UIObjDesc.wstrUITag == TEXT("Gauge"))
-	{
-		if (FAILED(_pTransCom->Bind_ShaderResource(_pShaderCom, "g_WorldMatrix")))
-			return E_FAIL;
-
-		//셰이더 파일의 매트릭스 정보를 가져와 바인딩
-		if (FAILED(_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
-			return E_FAIL;
-
-		if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
-			return E_FAIL;
-
-		//셰이더 파일의 텍스처 정보를 가져와 바인딩
-		if (FAILED(m_pTextureCom->Bind_ShaderResource(_pShaderCom, "g_DiffuseTexture", m_iTexIndex)))
-			return E_FAIL;
-		if (FAILED(m_pTextureMask->Bind_ShaderResource(_pShaderCom, "g_MaskTexture", 0)))
-			return E_FAIL;
-
-		//셰이더의 원시데이터 가져와 저장
-		if (FAILED(_pShaderCom->Bind_RawValue("g_vRColor", &m_UIObjDesc.vColorRGB, sizeof(_float3))))
-			return E_FAIL;
-		if (FAILED(_pShaderCom->Bind_RawValue("g_fAlpha", &m_UIObjDesc.fAlpha, sizeof(_float))))
-			return E_FAIL;
-		if (FAILED(_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fHpRatio, sizeof(_float))))
-			return E_FAIL;
-
-		//Begin() > Apply() 함수 호출 전 셰이더 전역 데이터를 저장해야함
-		if (FAILED(_pShaderCom->Begin(7)))
-			return E_FAIL;
-
-		if (FAILED(Bind_VIBuffer(m_pVIBufferCom)))
-			return E_FAIL;
-
-		return S_OK;
-	}
-
-	// 노란색 게이지
-	else if (m_UIObjDesc.wstrUITag == TEXT("Gauge_Damage"))
-	{
-		if (FAILED(_pTransCom->Bind_ShaderResource(_pShaderCom, "g_WorldMatrix")))
-			return E_FAIL;
-
-		//셰이더 파일의 매트릭스 정보를 가져와 바인딩
-		if (FAILED(_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
-			return E_FAIL;
-
-		if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
-			return E_FAIL;
-
-		//셰이더 파일의 텍스처 정보를 가져와 바인딩
-		if (FAILED(m_pTextureCom->Bind_ShaderResource(_pShaderCom, "g_DiffuseTexture", m_iTexIndex)))
-			return E_FAIL;
-		if (FAILED(m_pTextureMask->Bind_ShaderResource(_pShaderCom, "g_MaskTexture", 0)))
-			return E_FAIL;
-
-		//셰이더의 원시데이터 가져와 저장
-		if (FAILED(_pShaderCom->Bind_RawValue("g_vRColor", &m_UIObjDesc.vColorRGB, sizeof(_float3))))
-			return E_FAIL;
-		if (FAILED(_pShaderCom->Bind_RawValue("g_fAlpha", &m_UIObjDesc.fAlpha, sizeof(_float))))
-			return E_FAIL;
-		if (FAILED(_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fHpSlowRatio, sizeof(_float))))
-			return E_FAIL;
-		if (FAILED(_pShaderCom->Bind_RawValue("g_fAlarmColor", &m_fAlarmColor, sizeof(_float))))
-			return E_FAIL;
-
-		//Begin() > Apply() 함수 호출 전 셰이더 전역 데이터를 저장해야함
-		if (FAILED(_pShaderCom->Begin(8)))
-			return E_FAIL;
-
-		if (FAILED(Bind_VIBuffer(m_pVIBufferCom)))
-			return E_FAIL;
-	}
-	else
-	{
-		if (FAILED(_pTransCom->Bind_ShaderResource(_pShaderCom, "g_WorldMatrix")))
-			return E_FAIL;
-
-		//셰이더 파일의 매트릭스 정보를 가져와 바인딩
-		if (FAILED(_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
-			return E_FAIL;
-
-		if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
-			return E_FAIL;
-
-		if (FAILED(Bind_ShaderResources(_pShaderCom, PS_ALPHABLEND, m_pTextureCom, m_iTexIndex)))
-			return E_FAIL;
-	}
-
-	return S_OK;
-}
-
-HRESULT CHUD_KirbyStatus::Render_PerspecProj(CShader* _pShaderCom, CTransform* _pTransCom)
+HRESULT CHUD_KirbyStatus::Render_BindSet(CShader* _pShaderCom, CTransform* _pTransCom)
 {
 	CHECK_NULLPTR(_pShaderCom);
 
 	if (FAILED(_pTransCom->Bind_ShaderResource(_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
 
-	_float4x4 ViewMatrix{}; //= m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW);
-	XMStoreFloat4x4(&ViewMatrix, XMMatrixIdentity());
-	_float4x4 ProjMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
+	if (PROJ_PERSPEC == m_UIObjDesc.eUIProj)
+	{
+		//m_ViewMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW);
+		XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
+		m_ProjMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
+	}
 
 	//셰이더 파일의 매트릭스 정보를 가져와 바인딩
-	if (FAILED(_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
+	if (FAILED(_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
 		return E_FAIL;
 
-	if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
+	if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
-	if (FAILED(Bind_ShaderResources(_pShaderCom, PS_ALPHABLEND, m_pTextureCom, m_iTexIndex)))
+	SHADER_PS ePassIndex = { PS_ALPHABLEND }; //셰이더 패스 기본값
+	if (TEXT("Gauge") == m_UIObjDesc.wstrUITag){ ePassIndex = PS_MASK_HP;	}
+	if (TEXT("Gauge_Damage") == m_UIObjDesc.wstrUITag){ ePassIndex = PS_MASK_HPDAMAGE;	}
+
+	if (FAILED(Bind_ShaderResources(_pShaderCom, ePassIndex, m_pTextureCom, m_iTexIndex)))
 		return E_FAIL;
 
 	return S_OK;
@@ -260,6 +170,20 @@ HRESULT CHUD_KirbyStatus::Render_PerspecProj(CShader* _pShaderCom, CTransform* _
 
 HRESULT CHUD_KirbyStatus::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTexture* _pTextureCom, _uint _iTexIndex)
 {
+
+	if (TEXT("Gauge") == m_UIObjDesc.wstrUITag)
+	{
+		m_pTextureMask->Bind_ShaderResource(_pShaderCom, "g_MaskTexture", 0);
+		_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fHpRatio, sizeof(_float));
+		_pShaderCom->Bind_RawValue("g_fAlarmColor", &m_fAlarmColor, sizeof(_float));
+	}
+	if (TEXT("Gauge_Damage") == m_UIObjDesc.wstrUITag)
+	{
+		m_pTextureMask->Bind_ShaderResource(_pShaderCom, "g_MaskTexture", 0);
+		_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fHpSlowRatio, sizeof(_float));
+		_pShaderCom->Bind_RawValue("g_fAlarmColor", &m_fAlarmColor, sizeof(_float));
+	}
+
 	//셰이더 파일의 텍스처 정보를 가져와 바인딩
 	_pTextureCom->Bind_ShaderResource(_pShaderCom, "g_DiffuseTexture", _iTexIndex);
 
@@ -288,6 +212,10 @@ HRESULT CHUD_KirbyStatus::Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom)
 	return S_OK;
 }
 
+void CHUD_KirbyStatus::Update_UIState(_float _fTimeDelta)
+{
+}
+
 void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta)
 {
 	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
@@ -304,8 +232,6 @@ void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta)
 	m_fHpRatio = (fKirbyHp / fKirbyHpMax);
 
 #pragma endregion
-
-
 
 #pragma region 노란색 게이지 공식
 
@@ -330,10 +256,9 @@ void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta)
 	// 회복 되었을 경우
 	else if (m_fHpRatio > m_fHpSlowRatio)
 	{
-
 		// 이곳은 피가 차는 곳이다.
-	}
 
+	}
 
 	// 만약, 0.8초가 지났으면 그제서야 m_fHpSlowRatio 가 HpRatio 를 따라간다.
 	// 이곳은 피가 닳았을 때
@@ -375,8 +300,6 @@ void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta)
 
 	}
 
-
-
 	// 노란 게이지가 반짝이가 되는 중
 	if (m_bAlarm == true)
 	{
@@ -392,22 +315,15 @@ void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta)
 		m_fAlarmTime = 0.f;
 	}
 
-
-	
 #pragma endregion
-
-
-
-
 
 #pragma region 피통 UI 쉐이킹 코드
 
 	if(m_bShaking == true)
 	{
-
+		/*
 		// 진동 주기
 		_float fCycle = 50.f;
-
 
 		m_fShakingTime += fTimeDelta;
 		m_fShakingAcc += fTimeDelta * fCycle;
@@ -425,11 +341,10 @@ void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta)
 			m_bShaking = false;
 			m_fAmplitude = 20.f;
 		}
+		*/
 	}
 
 #pragma endregion
-
-
 
 }
 

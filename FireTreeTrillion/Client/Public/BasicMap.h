@@ -41,10 +41,14 @@ public:
 	virtual void	Render_IMGUI() override;
 #endif
 
+public:
+	void Save_OctreeData(const string& strLevel);
 
 private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
+	CShader* m_pNonAnimShaderCom = { nullptr };
+	CShader* m_pAnimShaderCom = { nullptr };
 	CTexture* m_pTextureCom[TEX_END] = {nullptr};
 	CGameObject* m_pBlendMap = { nullptr }; 
 
@@ -59,6 +63,10 @@ private:
 
 	class COcTree* m_pOcTree = { nullptr };
 	_uint m_iRenderAll{}, m_iRenderMyMesh{};
+	unordered_map<string, _float> m_ModelShapeRadiiMap;
+	unordered_map<string, pair<_uint, _float>> m_ModelAnimSettingsMap;
+	vector<PxRigidStatic*> m_vecAnimDecoTriggersActors;
+	vector<PxShape*> m_vecShapes;
 
 private:
 	HRESULT Add_Components(const wstring& _wstrModelTag);
@@ -68,8 +76,8 @@ private:
 	void SetUpShaderInfo(const wstring& _wstrModelTag);
 
 	_bool CheckIfBlendMapExists(const wstring& _wstrModelTag);
-
-	void Save_OctreeData();
+	void InsertMapDecos();
+	PxRigidStatic* AddTriggerActorForAnimDeco(const string& _strModelName, _float4x4& _matWorld);
 		
 public:
 	static CBasicMap* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

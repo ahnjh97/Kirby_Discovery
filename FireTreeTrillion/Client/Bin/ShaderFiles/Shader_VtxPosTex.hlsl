@@ -134,24 +134,7 @@ PS_OUT PS_MAIN_ALPHABLEND(PS_IN_ALPHABLEND In)
 {
 	PS_OUT			Out = (PS_OUT)0;
 
-    Out.vColor = g_DiffuseTexture.Sample(PointSampler, In.vTexcoord);
-
-	//float2		vTexcoord = (float2)0.f;
-
-	//vTexcoord.x = (In.vProjPos.x / In.vProjPos.w) * 0.5f + 0.5f;
-	//vTexcoord.y = (In.vProjPos.y / In.vProjPos.w) * -0.5f + 0.5f;
-
-	//float4		vDepthDesc = g_DepthTexture.Sample(PointSampler, vTexcoord);
-	//float		fOldViewZ = vDepthDesc.y * 1000.f;
-
-	//Out.vColor.a = Out.vColor.a  * saturate(fOldViewZ - In.vProjPos.w);
-	
-    //vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord + g_vUVOffset);
-    //if (vDiffuse.a < .01f || (vDiffuse.r < 0.1f && vDiffuse.g < 0.1f && vDiffuse.b < 0.1f))
-    //    discard;
-
-    //Out.vColor.rgb = vDiffuse.rgb * g_vRColor;
-    //Out.vColor.a = vDiffuse.a * g_fAlpha;
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
     
     //알파 값 예외처리
     if (Out.vColor.a < 0.1f)
@@ -264,7 +247,7 @@ PS_OUT PS_MAIN_FOR_HP(PS_IN_ALPHABLEND In)
 
     //마스크 값으로 자르기
     vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord);
-    Out.vColor = g_DiffuseTexture.Sample(PointSampler, In.vTexcoord);
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
     if (Out.vColor.a < 0.1f)
         discard;
 
@@ -287,7 +270,7 @@ PS_OUT PS_MAIN_FOR_HPDAMAGE(PS_IN_ALPHABLEND In)
 
     //마스크 값으로 자르기
     vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord);
-    Out.vColor = g_DiffuseTexture.Sample(PointSampler, In.vTexcoord);
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
     if (Out.vColor.a < 0.1f)
         discard;
 

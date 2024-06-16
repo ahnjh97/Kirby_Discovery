@@ -122,6 +122,7 @@ public: /* For.Font_Manager */
 	HRESULT Add_Font(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const wstring& strFontTag, const wstring& strFontFilePath);
 	HRESULT Render_Font(const wstring& strFontTag, const wstring & strText, const _float2 & vPosition, _fvector vColor, _float fRadian);
 	HRESULT Render_Font(const wstring& strFontTag, const wstring & strText, const _float2 & vPosition, _fvector vColor, _float fRadian, _fvector vOrigin, _gvector vScale);
+	HRESULT Render_ProjFont(_matrix _matrix, const wstring& strFontTag, const wstring& strText, const _float2& vPosition, _fvector vColor, _float fRadian, _fvector vOrigin, _gvector vScale);
 
 
 public: /* For.Target_Manager */
@@ -188,13 +189,14 @@ public: /* For.ImGui_Manager */
 #endif
 
 public: /* For.PhysX */
-	PxRigidDynamic* CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial = nullptr);
-	PxRigidStatic* CreateStaticActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial = nullptr);
+	PxRigidDynamic* CreateDynamicActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial = nullptr);
+	PxRigidStatic* CreateStaticActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial = nullptr);
 	void Register_Player(PxActor* pPlayerActor);
 	void Register_Controller(PxActor* pControllerActor, PxController* pController);
 	void Register_Trigger(PxActor* pTriggerActor, _int iTriggerType, _int iTriggerIndex);
 	void Emplace_TriggerFunc(_int iTriggerType, function<void(_int)> func);
 	void Emplace_ExitFunc(_int iTriggerType, function<void(void)> exitFunc);
+	void Emplace_MapDecoTrigger(PxActor* pTriggerActor, class CModel* pMapDecoModel, _uint iAnimIdx, _float fTickPerSec);
 	void Clear_EventCallBack();
 
 public: /* For. Picking */

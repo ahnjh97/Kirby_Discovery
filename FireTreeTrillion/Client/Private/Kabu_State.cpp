@@ -17,11 +17,6 @@ void CKabu_Idle_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _
 
 void CKabu_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
-	CKabu* pKabu = static_cast<CKabu*>(pGameObject);
-	CTransform* pTransformCom = pGameObject->Get_TransformCom();
-	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
-
-
 }
 
 void CKabu_Idle_State::OnStateExit()

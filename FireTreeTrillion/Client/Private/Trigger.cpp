@@ -77,7 +77,8 @@ void CTrigger::Late_Tick(_float fTimeDelta)
 
 HRESULT CTrigger::Render()
 {
-	if (m_eTriggerType == (TRIGGER_HITBOX || TRIGGER_ITEM))	return S_OK;
+	if (m_eTriggerType == TRIGGER_HITBOX 
+		|| m_eTriggerType == TRIGGER_ITEM)	return S_OK;
 
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;

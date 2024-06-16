@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Base.h"
+#include "Transform.h"
 
 BEGIN(Engine)
 
@@ -14,6 +15,7 @@ public:
 	HRESULT Initialize(const wstring& strFontFilePath);
 	HRESULT Render(const wstring & strText, const _float2 & vPosition, _fvector vColor, _float fRadian);
 	HRESULT Render(const wstring & strText, const _float2& vPosition, _fvector vColor, _float fRadian, _fvector vOrigin, _gvector vScale);
+	HRESULT Render_Proj(_matrix _matrix, const wstring & strText, const _float2& vPosition, _fvector vColor, _float fRadian, _fvector vOrigin, _gvector vScale);
 
 private:
 	ID3D11Device*			m_pDevice = { nullptr };
@@ -21,7 +23,6 @@ private:
 
 	SpriteBatch*			m_pBatch = { nullptr };
 	SpriteFont*				m_pFont = { nullptr };
-
 
 
 public:

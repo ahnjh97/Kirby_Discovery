@@ -1,6 +1,7 @@
 #pragma once
 #include "Client_Defines.h"
 #include "UIObject.h"
+#include "HUD.h"
 
 BEGIN(Engine)
 class CShader;
@@ -29,10 +30,12 @@ public:
 
 private:
 	HRESULT						Add_Components();
-	HRESULT						Render_OrthoProj(CShader* _pShaderCom, CTransform* _pTransCom);
-	HRESULT						Render_PerspecProj(CShader* _pShaderCom, CTransform* _pTransCom);
+	HRESULT						Render_BindSet(CShader* _pShaderCom, CTransform* _pTransCom);
 	HRESULT						Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTexture* _pTextureCom, _uint _iTexIndex);
 	HRESULT						Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom);
+
+	void						Update_UIState(_float _fTimeDelta);
+	//void						Play_Animation(_float _fTimeDelta, HUD_KIRBYHP _eCurState);
 
 	void						Compute_Player_Hp(_float fTimeDelta);
 

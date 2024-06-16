@@ -134,6 +134,8 @@ HRESULT CLoader::Loading_For_GamePlay()
 
 	TraverseAnimModels(TEXT("../../../Resources/Models/Anim/"));
 	TraverseNonAnimModels(TEXT("../../../Resources/Models/NonAnim/"));
+	TraverseAnimMapDecos(TEXT("../../../Resources/Models/MapDeco/Anim/"));
+	TraverseNonAnimMapDecos(TEXT("../../../Resources/Models/MapDeco/NonAnim/"));
 
 	//m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
 	///* For.Prototype_Component_Shader_VtxNorTex */
@@ -204,6 +206,38 @@ HRESULT CLoader::Add_NonAnimPrototype(wstring& ModelName)
 	return S_OK;
 }
 
+HRESULT CLoader::Add_AnimMapDecoPrototype(wstring& ModelName)
+{
+	m_strLoadingText = TEXT("../../../Resources/Models/MapDeco/Anim/") + ModelName + TEXT("/") + ModelName + TEXT(".fbx");
+
+	wstring_convert<codecvt_utf8<wchar_t>> converter;
+	string strModelName = converter.to_bytes(ModelName);
+	_matrix		TransformMatrix = XMMatrixIdentity();
+	/*TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));*/
+
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, L"Prototype_Component_Model_" + ModelName,
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Resources/Models/MapDeco/Anim/" + strModelName + "/" + strModelName + ".fbx"
+			, TransformMatrix, string("MapDeco/")))))
+		return E_FAIL;
+	return S_OK;
+}
+
+HRESULT CLoader::Add_NonAnimMapDecoPrototype(wstring& ModelName)
+{
+	m_strLoadingText = TEXT("../../../Resources/Models/MapDeco/NonAnim/") + ModelName + TEXT("/") + ModelName + TEXT(".fbx");
+
+	wstring_convert<codecvt_utf8<wchar_t>> converter;
+	string strModelName = converter.to_bytes(ModelName);
+	_matrix		TransformMatrix = XMMatrixIdentity();
+	/*TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));*/
+
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, L"Prototype_Component_Model_" + ModelName,
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Resources/Models/MapDeco/NonAnim/" + strModelName + "/" + strModelName + ".fbx"
+			, TransformMatrix, string("MapDeco/")))))
+		return E_FAIL;
+	return S_OK;
+}
+
 void CLoader::TraverseAnimModels(const wstring& rootFolderPath)
 {
 	WIN32_FIND_DATA findFileData;
@@ -254,8 +288,8 @@ void CLoader::TraverseNonAnimModels(const wstring& rootFolderPath)
 		return;
 	}
 
-	list<wstring> AnimtxtList;
-	TraverseDirectory(L"../../../model_txt/Anim/", AnimtxtList);
+	/*list<wstring> AnimtxtList;
+	TraverseDirectory(L"../../../model_txt/Anim/", AnimtxtList);*/
 	list<wstring> txtList;
 	TraverseDirectory(L"../../../model_txt/NonAnim/", txtList);
 
@@ -264,19 +298,19 @@ void CLoader::TraverseNonAnimModels(const wstring& rootFolderPath)
 			if (wcscmp(findFileData.cFileName, L".") != 0 && wcscmp(findFileData.cFileName, L"..") != 0)
 			{
 				wstring temp = wstring(findFileData.cFileName);
-				_bool bNonAnimVersion = { false };
+				/*_bool bNonAnimVersion = { false };*/
 				_bool bExist = { false };
-				for (auto Animtxt : AnimtxtList)
+				/*for (auto Animtxt : AnimtxtList)
 				{
 					if (Animtxt.erase(Animtxt.size() - 4) == temp)
 					{
 						bNonAnimVersion = true;
 						break;
 					}
-				}
+				}*/
 
-				if (bNonAnimVersion == true)
-					continue;
+				/*if (bNonAnimVersion == true)
+					continue;*/
 
 				for (auto txt : txtList)
 				{
@@ -322,6 +356,97 @@ void CLoader::TraverseDirectory(const wstring& rootFolderPath, list<wstring>& fi
 	FindClose(hFind);
 }
 
+void CLoader::TraverseAnimMapDecos(const wstring& rootFolderPath)
+{
+	WIN32_FIND_DATA findFileData;
+	HANDLE hFind = FindFirstFile((rootFolderPath + L"\\*").c_str(), &findFileData);
+
+	if (hFind == INVALID_HANDLE_VALUE) {
+		MSG_BOX(TEXT("폴더를 찾을수없습니다"));
+		return;
+	}
+
+	list<wstring> txtList;
+	TraverseDirectory(L"../../../model_txt/MapDeco/Anim/", txtList);
+
+	do {
+		if (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+			if (wcscmp(findFileData.cFileName, L".") != 0 && wcscmp(findFileData.cFileName, L"..") != 0)
+			{
+				wstring temp = wstring(findFileData.cFileName);
+				if (wstring(findFileData.cFileName) == L"NonAnimModels")
+					continue;
+
+				_bool bExist = { false };
+				for (auto txt : txtList)
+				{
+					if (txt.erase(txt.size() - 4) == temp)
+					{
+						bExist = true;
+						break;
+					}
+				}
+
+				if (bExist == false)
+					Add_AnimMapDecoPrototype(temp);
+			}
+		}
+	} while (FindNextFile(hFind, &findFileData) != 0);
+
+	FindClose(hFind);
+}
+
+void CLoader::TraverseNonAnimMapDecos(const wstring& rootFolderPath)
+{
+	WIN32_FIND_DATA findFileData;
+	HANDLE hFind = FindFirstFile((rootFolderPath + L"\\*").c_str(), &findFileData);
+
+	if (hFind == INVALID_HANDLE_VALUE) {
+		MSG_BOX(TEXT("폴더를 찾을수없습니다"));
+		return;
+	}
+
+	/*list<wstring> AnimtxtList;
+	TraverseDirectory(L"../../../model_txt/Anim/", AnimtxtList);*/
+	list<wstring> txtList;
+	TraverseDirectory(L"../../../model_txt/MapDeco/NonAnim/", txtList);
+
+	do {
+		if (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+			if (wcscmp(findFileData.cFileName, L".") != 0 && wcscmp(findFileData.cFileName, L"..") != 0)
+			{
+				wstring temp = wstring(findFileData.cFileName);
+				/*_bool bNonAnimVersion = { false };*/
+				_bool bExist = { false };
+				/*for (auto Animtxt : AnimtxtList)
+				{
+					if (Animtxt.erase(Animtxt.size() - 4) == temp)
+					{
+						bNonAnimVersion = true;
+						break;
+					}
+				}*/
+
+				/*if (bNonAnimVersion == true)
+					continue;*/
+
+				for (auto txt : txtList)
+				{
+					if (txt.erase(txt.size() - 4) == temp)
+					{
+						bExist = true;
+						break;
+					}
+				}
+
+				if (bExist == false)
+					Add_NonAnimMapDecoPrototype(temp);
+			}
+		}
+	} while (FindNextFile(hFind, &findFileData) != 0);
+
+	FindClose(hFind);
+}
 
 CLoader* CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID)
 {

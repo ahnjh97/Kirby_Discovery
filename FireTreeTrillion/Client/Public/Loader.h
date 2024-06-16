@@ -54,7 +54,7 @@ private:
 	HRESULT Add_Texture(LEVEL eLevel, string strPrototypeName, string strFolderAndFileName, _uint iNumTextures = 1);
 	HRESULT Add_KirbyFaceTexture(LEVEL eLevel);
 
-	HRESULT Add_AllModelTxts(LEVEL eLevel, TYPE eType);
+	HRESULT Add_AllModelTxts(LEVEL eLevel, TYPE eType, wstring wstrFolder = wstring());
 	void	TraverseModelTxts(const wstring& rootFolderPath, list<wstring>& fileList);
 	// animation 정보를 로드하여 모델을 추가할때 넘겨주는 데이터에 넣는다.
 	void	Load_AnimToolInfo();
