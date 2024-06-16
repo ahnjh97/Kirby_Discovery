@@ -25,7 +25,7 @@ void CEventCallBack::onTrigger(PxTriggerPair* pairs, PxU32 count)
                 if (pComponent == nullptr) continue;
                 CGameObject* pContrObj = pComponent->Get_Object();
                 if (pContrObj == nullptr) continue;
-                 
+                
                 // Trigger가 그룹설정이 Passing 그룹 쪽으로 되어있다면 콜리젼 센터로 이양.
                 if (pTriggerObj->Get_CollisionType() >= PASSING_GROUP)
                     CGameInstance::Get_Instance()->Add_CollisionObjects(pTriggerObj, pContrObj);
@@ -77,8 +77,7 @@ void CEventCallBack::Clear_EventCallBack()
         {
             if (nullptr != get<0>(tuple))
             {
-               // QZR
-               // get<0>(tuple)->release();
+               //get<0>(tuple)->release();
             }
         }
     }

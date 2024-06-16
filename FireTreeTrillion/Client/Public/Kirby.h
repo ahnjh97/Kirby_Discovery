@@ -3,6 +3,8 @@
 #include "Client_Defines.h"
 #include "Character.h"
 #include "Effect.h"
+#include "BombOrbitGlow.h"
+#include "BombOrbit.h"
 
 #define	INFO(state) m_tKirbyInfo.state
 
@@ -53,6 +55,14 @@ public:
 		_float			m_fChangeVelocityZeroTime = { 0.f };
 		_float			m_fHoldAirTime = { 0.f };
 
+		// 사다리
+		_bool			m_bCanLadder = { false };
+		_float4			m_vLadderPoint = { 0.f, 0.f, 0.f, 0.f };
+		_float4			m_vLadderLook = { 0.f, 0.f, 0.f, 0.f };
+		_float4			m_vLadderOriginalPos = { 0.f, 0.f, 0.f, 0.f };
+		// 다시 바로 사다리를 타는 행위를 막는다.
+		_bool			m_bBlockLadder = { false };
+
 		// 점프 중 재입력 방지
 		_bool			m_bRePressBlock = { false };
 
@@ -88,6 +98,14 @@ public:
 		_bool			m_bWalkingCharge = { true };
 		_bool			m_bUpWardSlash = { false };
 
+		// Ability Bomb
+		// 포물선 점선을 랜더할 상황인가?
+		_bool			m_bBombOrbit = { false };
+		// 폭탄의 목표 타겟 (커비 기준 방향벡터이다)
+		_float4			m_vBombTargetDir = { 0.f, 0.f, 0.f, 0.f };
+		// 폭탄의 목표 최종 타겟
+		_float4			m_vBombTargetPos = { 0.f, 0.f, 0.f, 0.f };
+
 	}KIRBY_INFODESC;
 
 
@@ -109,7 +127,7 @@ public:
 	virtual HRESULT	Render_DeferredInfo()						override;
 
 	virtual void	Add_AnimEvent()								override;
-	virtual void	Collision_Overlap(CGameObject* pGameObject) override;
+	virtual void	Collision_Hitbox(CPhysXObject* pGameObject)  override;
 	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 	void			Other_Collision();
 
@@ -130,30 +148,6 @@ public:
 	// 현재 커비가 무적상태인지 아닌지 판별하는 부울 값
 	_bool			isOverPower() { return m_bOverPower; }
 
-#pragma region 이펙트 리스트 실험
-	//안녕하세요 디버깅 용으로 이펙트 리스트를 추가했습니다
-	void			Add_KirbyEffect(CEffect* pEffect)
-	{
-		m_KirbyFXList.emplace_back(pEffect);
-		Safe_AddRef(pEffect);
-	}
-	void			Delete_KirbyEffect()
-	{
-		if (m_KirbyFXList.empty())
-			return;
-
-		for (auto& FX : m_KirbyFXList)
-		{
-			FX->Set_Dead();
-			Safe_Release(FX);
-		}
-		m_KirbyFXList.clear();
-	}
-
-private:
-	list<CEffect*> m_KirbyFXList;
-
-#pragma endregion
 
 	// 기타 세부적인 제어
 private:
@@ -196,6 +190,16 @@ private:
 	_float				  m_fOverPowerTime = { 0.f };
 	_float				  m_fFlashOverPowerTime = { 0.f };
 	_float				  m_fPreHp = { 0.f };
+
+	// For Bomb
+	vector<CBombOrbitGlow*> m_OrbitGlows;
+	CBombOrbit* m_pOrbit = { nullptr };
+	void Ready_BombOrbit();
+	void Update_BombOrbit(_float fTimeDelta);
+	_float4 Compute_Parabola(_float fOrbitTime, _float4 vStartPos, _float4 vEndPos);
+	_bool				  m_bInitializeTargetPos = { true };
+	_float				  m_fOrbitTime = { 0.f };
+	_float				  m_fOrbitRenderDelay = { 0.f };
 
 	_int				  m_iTestAnim = { 0 };
 

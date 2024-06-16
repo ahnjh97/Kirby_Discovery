@@ -58,9 +58,7 @@ public:
 	virtual void		Render_IMGUI();
 #endif
 	virtual HRESULT		Render_DeferredInfo() { return S_OK; }
-	
-	// 충돌처리 함수
-	virtual void		Collision_Overlap(CGameObject* pGameObject);
+
 
 protected:
 	HRESULT				Add_Component(_uint iLevelIndex, const wstring& strPrototypeTag, const wstring& strComponentTag, class CComponent** ppOut, void* pArg = nullptr);

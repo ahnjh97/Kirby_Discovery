@@ -46,6 +46,9 @@
 #define Pos(vec3)					_float4{(vec3).x, (vec3).y, (vec3).z, 1.f}
 #define F4toF3(vec4)				_float3{vec4.x, vec4.y, vec4.z}
 
+#define ZeroVecPos					_float4{0.f, 0.f, 0.f, 1.f}
+#define ZeroVecDir					_float4{0.f, 0.f, 0.f, 0.f}
+
 #define GET_POS				m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION)
 #define SET_POS(pos)		m_pTransformCom->Set_State(CTransform::STATE_POSITION, pos)
 

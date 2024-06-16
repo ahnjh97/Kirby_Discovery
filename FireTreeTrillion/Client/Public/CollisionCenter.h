@@ -2,6 +2,7 @@
 
 #include "Client_Defines.h"
 #include "GameObject.h"
+#include "Ladder.h"
 #include "Base.h"
 
 BEGIN(Client)
@@ -31,20 +32,23 @@ public:
 
 public:
     void Collision_Tick(_float fTimeDelta);
-
-
+    void Add_Ladder(CLadder* pLadder);
 
 private:
     CONTENT_TYPE Find_ColliderType(class CPhysXObject* pSrc, class CPhysXObject* pDst);
     class CPhysXObject* Find_TypePtr(COLLISION_TYPE eType, CPhysXObject* pSrc, CPhysXObject* pDst);
     void Collision_Collider(CONTENT_TYPE eType, class CPhysXObject* pSrc, class CPhysXObject* pDst);
+    void Ladder_Collider();
+
     set< pair<CGameObject*, CGameObject*> > m_WaitingList;
+    list<CLadder*>                          m_Ladders;
 
 
 
     // ±â´Éµé
 private:
-    void Camera_Shaking(_float fPower = 1.f, _float fTime = 0.5f, _float2 vDir = {0.f, -1.f});
+    void Camera_Shaking(_float fPower = 1.f, _float fTime = 0.5f, _float2 vDir = { 0.f, -1.f });
+    void Camera_Zooming(_float fZoom);
     _bool Kirby_Dodge_SlowMotionSystem(CPhysXObject* pPlayer);
 
     void Player_Monster_Knock_back(CPhysXObject* pPlayer, CPhysXObject* pMonster);

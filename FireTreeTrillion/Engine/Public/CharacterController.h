@@ -26,6 +26,7 @@ public:
 		_float4			vInitialPos;
 		_uint			uCollisionType;
 		string			strProtoObjName;
+		_float			fOffset;
 
 		TYPE			eType = CAPSULE;
 		CAPSULE_SHAPE	tCapsuleShape;
@@ -127,7 +128,7 @@ protected:
 	_float								m_fFallVelocity = { 0.f };
 	_float								m_fFallAcceleration = { 0.f };
 
-	_float								m_fOffset = { 1.f };
+	_float								m_fHeightOffset = { 1.f };
 	TYPE								m_eType = TYPE::CAPSULE;
 	//CAPSULE_SHAPE						m_tCapsuleShape;
 	//BOX_SHAPE							m_tBoxShape;

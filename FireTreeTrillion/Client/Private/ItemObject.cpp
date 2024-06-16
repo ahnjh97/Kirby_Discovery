@@ -23,7 +23,6 @@ HRESULT CItemObject::Initialize(void* pArg)
     CHECK_FAILED(hr);
 
     return S_OK;
-
 }
 
 _int CItemObject::Tick(_float fTimeDelta)

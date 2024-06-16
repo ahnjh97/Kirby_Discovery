@@ -34,7 +34,15 @@ void CCollisionCenter::Initialize()
 	m_eColliderType[PLAYER][ITEM] = CONTENT_ITEM;
 
 	// For CONTENT_ATTACK
-	m_eColliderType[HITBOX][MONSTER] = CONTENT_ATTACK;
+	m_eColliderType[HITBOX_PLYAER][MONSTER] = CONTENT_ATTACK;
+	m_eColliderType[HITBOX_MONSTER][PLAYER]  = CONTENT_ATTACK;
+
+	// For 상자(OBJECT)
+	m_eColliderType[HITBOX_PLYAER][OBJECT]  = CONTENT_ATTACK;
+	//m_eColliderType[MONSTER][OBJECT]		= CONTENT_ATTACK; // 던진 몬스터와 부딪힐 때, 충돌처리
+	
+	// For 찰 수 있는 오브젝트
+	m_eColliderType[PLAYER][KICKABLE]		= CONTENT_ATTACK;
 
 	// 레디얼 기름칠
 	GAMEINSTANCE Setting_RadialBlur(5.f, 300.f);
@@ -46,6 +54,9 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 
 	// 게임 흐름에 있어서 필요한 슬로우 모션을 충돌에 따라 이곳에서 관리한다.
 	Timer_System(fTimeDelta);
+
+	// 게임 흐름에 있어서 필요한 사다리 등 충돌에 따라 Kirby가 작동하도록 이곳에서 관리한다.
+	Ladder_Collider();
 
 	if (m_WaitingList.empty() == true)
 		return;
@@ -72,6 +83,12 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 	}
 
 	m_WaitingList.clear();
+}
+
+void CCollisionCenter::Add_Ladder(CLadder* pLadder)
+{
+	m_Ladders.emplace_back(pLadder);
+	Safe_AddRef(pLadder);
 }
 
 CCollisionCenter::CONTENT_TYPE CCollisionCenter::Find_ColliderType(CPhysXObject* pSrc, CPhysXObject* pDst)
@@ -178,19 +195,70 @@ void CCollisionCenter::Collision_Collider(CONTENT_TYPE eType, CPhysXObject* pSrc
 		}
 	}
 
-	// 커비 HITBOX x 몬스터
+	// HITBOX x 캐릭터
 	else if (eType == CONTENT_ATTACK)
 	{
-		pSrcObject->Collision_Overlap(pDstObject);
-		pDstObject->Collision_Overlap(pSrcObject);
+		pSrcObject->Collision_Hitbox(pDstObject);
+		pDstObject->Collision_Hitbox(pSrcObject);
 	}
 
+}
+
+void CCollisionCenter::Ladder_Collider()
+{
+	if (m_Ladders.empty() == true)
+		return;
+
+	CKirby* pKirby = static_cast<CKirby*>(GAMEINSTANCE Get_GameObject(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+
+	if (nullptr == pKirby)
+		return;
+
+
+	_vector vKirbyPos = pKirby->Get_TransformCom()->Get_State_Vector(CTransform::STATE_POSITION);
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+	_bool bCollide = { false };
+
+	for (auto& pLadder : m_Ladders)
+	{
+		// 충돌이 될 때까지 계속 검사한다.
+		if (bCollide == false)
+		{
+			bCollide = pLadder->Is_Collide(vKirbyPos);
+
+			// 검사를 했는데, 충돌이 됐다고 했을 때
+			if (bCollide == true)
+			{
+				Kirbydesc->m_bCanLadder = true;
+				Kirbydesc->m_vLadderPoint = pLadder->Get_LadderPoint();
+				Kirbydesc->m_vLadderLook = pLadder->Get_TransformCom()->Get_State_Float4(CTransform::STATE_LOOK);
+				Kirbydesc->m_vLadderOriginalPos = pLadder->Get_LadderOriginalPos();
+				// 커비에게 탈 수 있다는 정보와, 해당 포인팅 좌표를 준다.
+			}
+		}
+
+		// 항상 릴리즈 해준다.
+		Safe_Release(pLadder);
+	}
+
+	// 아무것도 충돌이 안 된 상태였다면, BlockLadder를 초기화한다.
+	if (bCollide == false)
+		Kirbydesc->m_bBlockLadder = false;
+
+
+	m_Ladders.clear();
 }
 
 void CCollisionCenter::Camera_Shaking(_float fPower, _float fTime, _float2 vDir)
 {
 	CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 	pCamera->Make_Shake(fPower, fTime, vDir);
+}
+
+void CCollisionCenter::Camera_Zooming(_float fZoom)
+{
+	CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
+	pCamera->Zoom(fZoom);
 }
 
 _bool CCollisionCenter::Kirby_Dodge_SlowMotionSystem(CPhysXObject* pPlayer)
@@ -209,6 +277,7 @@ _bool CCollisionCenter::Kirby_Dodge_SlowMotionSystem(CPhysXObject* pPlayer)
 	{
 		_vector vKirbyPos = pKirby->Get_TransformCom()->Get_State_Vector(CTransform::STATE_POSITION);
 
+		Camera_Zooming(-5.f);
 		GAMEINSTANCE Set_FirstTimerRatio(0.5f);
 		GAMEINSTANCE Set_SecondTimerRatio(0.2f);
 		GAMEINSTANCE Setting_RadialBlur(vKirbyPos, 30.f, 10.f);
@@ -303,7 +372,8 @@ void CCollisionCenter::Compute_Coin(CPhysXObject* pPlayer, CPhysXObject* pItem)
 
 	// fItemPoint는 코인이 오르는 포인트임 저게 올라야할 "코인점수"임
 	// 만약, int 형으로 올라야한다면 형변환 꼭 해주셔!!!
-	 
+	
+
 	// 코인을 증가시키는 함수를 넣으면 됨 (SJ)
 }
 
@@ -321,6 +391,7 @@ void CCollisionCenter::Timer_System(_float fTimeDelta)
 	if (m_bCheckTimer == true)
 	{
 		m_fTimeDeltaResetTime += fTimeDelta;
+		Camera_Zooming((m_fTimeDeltaResetTime * 1.25f) - 5.f);
 
 		if (m_fTimeDeltaResetTime > 0.5f)
 		{
@@ -332,6 +403,7 @@ void CCollisionCenter::Timer_System(_float fTimeDelta)
 		{
 			GAMEINSTANCE Restore_SecondTimer();
 
+			Camera_Zooming(0.f);
 			m_bCheckTimer = false;
 			m_fTimeDeltaResetTime = 0.f;
 		}
@@ -349,6 +421,10 @@ void CCollisionCenter::Free()
 		Safe_Release(pSrc);
 	}
 	m_WaitingList.clear();
+
+	for (auto& pLadder : m_Ladders)
+		Safe_Release(pLadder);
+	m_Ladders.clear();
 
 	__super::Free();
 

@@ -59,6 +59,7 @@ private:
 	string									m_strAnimationName = string();
 	_float									m_fAnimationSpeed = _float();
 	_bool									m_bOnce = false;
+	_bool									m_bOnceAnim = false;
 
 	//vector<SEQUENCE_ITEM>					m_vecSequence;
 	AnimToolMap								m_mapSequence;

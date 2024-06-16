@@ -32,7 +32,7 @@ HRESULT CRigidBody::Initialize(void * pArg)
 	m_bDynamic				= pDesc->bDynamic;
 	m_bKinematic			= pDesc->bKinematic;
 	m_pActorObject			= pDesc->pObj;
-
+	m_fDensity				= pDesc->fDensity;
 	Create_Actor();
 	return S_OK;
 }
@@ -263,21 +263,26 @@ void CRigidBody::Activate(_bool _bActive)
 void CRigidBody::Add_Force(_float3 vForce)
 {
 	if (m_pActor == nullptr) return;
+	if (true == (m_bTrigger && m_bKinematic))
+		return;
 
-	if (false == m_bKinematic && false == m_bTrigger)
-	{
-		PxVec3 PxForce = physx::PxVec3(vForce.x, vForce.y, vForce.z);
-		m_pActor->addForce(PxForce, physx::PxForceMode::eFORCE);
-	}
+	PxVec3 PxForce = physx::PxVec3(vForce.x, vForce.y, vForce.z);
+	m_pActor->addForce(PxForce, physx::PxForceMode::eFORCE);
 }
 
-void CRigidBody::Add_Torque(_float3 vTorque)
+void CRigidBody::Add_Torque(_float vTorque)
 {
-	if (false == (m_bTrigger && m_bKinematic))
-	{
-		PxVec3 PxToque = physx::PxVec3(vTorque.x, vTorque.y, vTorque.z);
-		m_pActor->addTorque(PxToque, physx::PxForceMode::eFORCE);
-	}
+	//if (false == (m_bTrigger && m_bKinematic))
+	//{
+	//	PxVec3 PxToque = physx::PxVec3(vTorque.x, vTorque.y, vTorque.z);
+	//	m_pActor->addTorque(PxToque, physx::PxForceMode::eFORCE);
+	//}
+	if (true == (m_bTrigger && m_bKinematic))
+		return;
+	PxVec3 angularVelocity = m_pActor->getAngularVelocity();
+	PxVec3 antiTorque = angularVelocity * vTorque; // 회전 저항 값 (적당히 조절)
+	m_pActor->addTorque(antiTorque);
+
 }
 
 void CRigidBody::Add_Velocity(_float3 vVelocity)
@@ -287,6 +292,13 @@ void CRigidBody::Add_Velocity(_float3 vVelocity)
 		PxVec3 PxForce = PxVec3(vVelocity.x, vVelocity.y, vVelocity.z);
 		m_pActor->addForce(PxForce, physx::PxForceMode::eVELOCITY_CHANGE);
 	}
+}
+
+void CRigidBody::Kick_RigidBody(_float3 _kickDirection, _float impulseMagnitude)
+{
+	PxVec3 kickDirection(_kickDirection.x, _kickDirection.y, _kickDirection.z);
+	PxVec3 impulse = kickDirection * impulseMagnitude;
+	m_pActor->addForce(impulse, PxForceMode::eIMPULSE);
 }
 
 PxTransform CRigidBody::Get_PxTransform()
@@ -317,47 +329,6 @@ _bool CRigidBody::Is_Activated()
 	return m_pActor != nullptr && m_pActor->getScene() != nullptr;
 }
 
-// 함수 내에 해당 코드를 포함한다고 가정
-void CRigidBody::Overlap_Hitbox(CGameObject* pGameObject, _float4 vPos, _float fRadius)
-{
-	// 겹침을 검사할 구체의 기하학적 모양 생성
-	PxSphereGeometry overlapShape = PxSphereGeometry(fRadius);
-
-	// 초기 위치와 회전을 설정하는 PxTransform 객체 생성
-	//PxTransform shapePose = PxTransform(pos, PxQuat(physx::PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f)));
-	//PxTransform shapePose = m_pActor->getGlobalPose();
-	PxTransform pxTransform(PxVec3(vPos.x, vPos.y, vPos.z));
-
-	// Overlap 결과를 저장할 배열 동적 할당
-	PxOverlapHit* hitOverlap = new PxOverlapHit[OVERLAP_MAX]; 	//const int maxHits = 8; //= 4096;
-	PxScene* myScene = m_pGameInstance->Get_Scene();
-	_int howMany = PxSceneQueryExt::overlapMultiple(*myScene, overlapShape, pxTransform, hitOverlap, OVERLAP_MAX, PxQueryFilterData(PxQueryFlag::eDYNAMIC/*PxQueryFlag::eSTATIC | PxQueryFlag::eNO_BLOCK*/));
-	
-	CGameObject* pPlayer = nullptr;
-	for (_int i = 0; i < howMany; ++i) 
-	{
-		PxOverlapHit& hit = hitOverlap[i];
-		PxRigidActor* actor = hit.actor;  // 충돌된 객체의 액터
-		// FOR TEST
-		if (howMany > 2)
-			_int b = 3;
-		if (actor->userData == "RigidMesh")
-			continue;// _int a = 3;
-
-		const char* actorName = actor->getName();
-		CComponent* pComponent = static_cast<CComponent*>(actor->userData);
-		if (pComponent == nullptr) continue;
-
-		// ======================================== FOR TEST : 임시 ========================================
-		CGameObject* pActorObject = pComponent->Get_Object();
-		if (pActorObject == nullptr) continue;
-		if (pActorObject->Get_PrototypeTag() != pGameObject->Get_PrototypeTag())
-			pGameObject->Collision_Overlap(pActorObject); // actorObject가 플레이어가 아닐경우 collision_overlap 실행
-		// =================================================================================================
-	}
-
-	Safe_Delete_Array(hitOverlap);
-}
 
 CRigidBody * CRigidBody::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {

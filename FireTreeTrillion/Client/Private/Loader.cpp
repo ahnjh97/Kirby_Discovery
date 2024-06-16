@@ -51,10 +51,13 @@
 #include "Camera_Free.h"
 #include "Camera_Main.h"
 
-
 #include "TestModel.h"
 #include "TestTerrain.h"
 #include "Kirby.h"
+#include "BombOrbitGlow.h"
+#include "BombOrbit.h"
+#include "KirbyBomb.h"
+
 
 // 몬스터
 #include "KirbyWeapons.h"
@@ -71,18 +74,26 @@
 #include "CappyBody.h"
 #include "CappyHat.h"
 
+// 맵 오브젝트
 #include "Moon.h"
+#include "KickableRock.h"
 #include "WasteCan.h"
+#include "StarBlock.h"
 
 //UI
 #include "BackGround.h"
 #include "HUD.h"
 #include "HUD_KirbyStatus.h"
 #include "HUD_StarPoint.h"
+#include "BombOrbit.h"
+#include "BombOrbitGlow.h"
+
 
 // 아이템
 #include "EnergyDrink.h"
 #include "Coin.h"
+
+
 #pragma endregion
 
 
@@ -231,6 +242,11 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kirby"), CKirby);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KirbyWeapons"), CKirbyWeapons);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KirbyArmours"), CKirbyArmours);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BombOrbit"), CBombOrbit);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BombOrbitGlow"), CBombOrbitGlow);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KirbyBomb"), CKirbyBomb);
+
+
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Awoofy"), CAwoofy);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Rabbit"), CRabbit);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Buffahorn"), CBuffahorn);
@@ -254,6 +270,9 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("EnergyDrink"), CEnergyDrink);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Coin"), CCoin);
 
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Ladder"), CLadder);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KickableRock"), CKickableRock);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("StarBlock"), CStarBlock);
 #pragma endregion
 
 	return S_OK;
@@ -393,8 +412,11 @@ HRESULT CLoader::Loading_For_GamePlay()
 
 #pragma region UI
 
-	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 19);
+	//hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 19);
+	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 23);
+	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby_Mask", "UI/HUD/Kirby/StatusBar/KirbyHPMask.png");
 	hr = Add_Texture(eLevel, "HUD_StarPoint", "UI/HUD/Kirby/StarPoint/StarPoint_%d.dds", 10);
+
 	CHECK_FAILED(hr);
 
 #pragma endregion
@@ -492,9 +514,9 @@ HRESULT CLoader::Loading_For_Tool_Anim()
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
 	#pragma region 모델
+	// 애님툴에서 저장한 데이터들을 읽어온다.
 	Load_AnimToolInfo();
-	if (FAILED(Add_AllModelTxts(eLevel, TYPE_ANIM)))
-		return E_FAIL;
+	// 애님툴에서 필요한 모델들의 프로토타입을 추가한다. 또한 필요한 데이터정리를 시행한다.
 	hr = Add_Models(eLevel);
 	CHECK_FAILED(hr);
 
@@ -560,7 +582,8 @@ HRESULT CLoader::Loading_For_Tool_UI()
 
 #pragma region TEXTURE
 
-	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 19);
+	//hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 19);
+	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 23);
 	hr = Add_Texture(eLevel, "HUD_StarPoint", "UI/HUD/Kirby/StarPoint/StarPoint_%d.dds", 10);
 	CHECK_FAILED(hr);
 
@@ -608,12 +631,13 @@ HRESULT CLoader::Add_FXTexture()
 	hr = Add_Texture(LEVEL_STATIC, "FX_SimpleStar", "Effects/simpleStar.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Logo", "Effects/simpleStar.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_SimpleSolid", "Simple/simpleSolid_%d.png", 2);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_BombOrbit", "Effects/BombOrbitGlow.dds");	CHECK_FAILED(hr);
 
 
 	// 주로 사용되는 텍스쳐들
 	hr = Add_Texture(LEVEL_STATIC, "FX_Star", "Effects/Basic/common_star.dds");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Bubble", "Effects/Basic/common_bubble.png");	CHECK_FAILED(hr);
-	hr = Add_Texture(LEVEL_STATIC, "FX_Circles", "Effects/Basic/common_circle_%d.png", 3);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Circles", "Effects/Basic/common_circle_%d.png", 4);	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Grad", "Effects/Basic/common_gradation.dds");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Hit", "Effects/Basic/common_ring_0.dds");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Smoke", "Effects/Basic/common_smoke.dds");	CHECK_FAILED(hr);
@@ -621,8 +645,7 @@ HRESULT CLoader::Add_FXTexture()
 	hr = Add_Texture(LEVEL_STATIC, "FX_Jump", "Effects/Basic/common_jump.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Sparkle", "Effects/Basic/common_sparkle.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Lead", "Effects/Basic/leaf.dds");	CHECK_FAILED(hr);
-
-
+	hr = Add_Texture(LEVEL_STATIC, "FX_Collide", "Effects/Basic/common_hit.png");	CHECK_FAILED(hr);
 
 
 	hr = Add_Texture(LEVEL_STATIC, "FX_VacuumTornado", "Effects/Basic/wind01.png");	CHECK_FAILED(hr);
@@ -631,6 +654,12 @@ HRESULT CLoader::Add_FXTexture()
 
 	hr = Add_Texture(LEVEL_STATIC, "FX_Wind", "Effects/Basic/wind_%d.png", 2);	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Shockwave", "Effects/Basic/shockwave_%d.png", 1);	CHECK_FAILED(hr);
+
+	//칼
+	hr = Add_Texture(LEVEL_STATIC, "FX_SwordSlash", "Effects/Sword/slash_%d.dds", 6);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_SwordTail", "Effects/Sword/sword_tail.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_SwordDecal", "Effects/Sword/sword_decal.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_SwordLine", "Effects/Sword/line.png");	CHECK_FAILED(hr);
 
 
 	return E_NOTIMPL;
@@ -659,6 +688,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("VacuumDGB", TYPE_NONANIM);
 
 		m_vecModelInfo.emplace_back("SwordTrail", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("SwordSlash_hrzt", TYPE_NONANIM);
 
 	}
 	else if (eLevel == LEVEL_LOGO)
@@ -687,6 +717,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Level0Stage1Step01_Blend", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f);
 		m_vecModelInfo.emplace_back("BG0", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("Ladder", TYPE_NONANIM, 1.f);
 
 		// For Monster
 		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.f, 180.f);
@@ -702,6 +733,10 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		// For Item
 		m_vecModelInfo.emplace_back("Item_EnergyDrink", TYPE_NONANIM, 3.f);
 		m_vecModelInfo.emplace_back("Item_Coin", TYPE_NONANIM, 1.f);
+
+		// For Interaction Decor
+		m_vecModelInfo.emplace_back("BushM", TYPE_ANIM, 10.f);
+
 
 	}
 	else if (eLevel == LEVEL_GAMEPLAY)
@@ -723,10 +758,12 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// For Kirby Weapon
 		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
-		// For Kirby Armour
-		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("KirbyBombDefault", TYPE_ANIM, 1.f, 180.f);
 
+		// For Kirby Armour
+		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
+		
 
 		m_vecModelInfo.emplace_back("GsBenchAL", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("Level0Stage1Step01", TYPE_NONANIM);
@@ -742,7 +779,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("BladeKnight", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("BladeKnightSword", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("Kabu", TYPE_ANIM, 2.f, 180.f);
-		m_vecModelInfo.emplace_back("BrontoBurt", TYPE_ANIM, 1.5f, 180.f);
+		m_vecModelInfo.emplace_back("BrontoBurt", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("PoppyBrosJr", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_NONANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("CappyBody", TYPE_ANIM, 1.f, 180.f);
@@ -750,6 +787,12 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// For Mab Interactive Object
 		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("Ladder", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("GsPebble", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("StarBlockL", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("StarBlockM", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("StarBlockS", TYPE_NONANIM, 1.f);
+
 
 		// For Item
 		m_vecModelInfo.emplace_back("Item_EnergyDrink", TYPE_NONANIM, 3.f);
@@ -768,11 +811,32 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	}
 	else if (eLevel == LEVEL_TOOL_ANIM)
 	{
-		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("Kirby", TYPE_ANIM, 1.f, 180.f);
 
-		m_vecModelInfo.emplace_back("BladeKnightSword",  TYPE_NONANIM, 1.f);
+		// For Kirby Body
+		m_vecModelInfo.emplace_back("KirbyBalloon", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbyDefault", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbyVacuum", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbySwordDefault", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbySwordBalloon", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbyBoomDefault", TYPE_ANIM, 1.f, 180.f);
+
+		// For Kirby Weapon
+		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
+		// For Kirby Armour
+		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
+
+		// For Monster
+		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("Rabbit", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("Buffahorn", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("BladeKnight", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("BladeKnightSword", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("Kabu", TYPE_ANIM, 2.f, 180.f);
+		m_vecModelInfo.emplace_back("BrontoBurt", TYPE_ANIM, 2.f, 180.f);
+		m_vecModelInfo.emplace_back("PoppyBrosJr", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_NONANIM, 1.f, 180.f);
 	}
 
 }
@@ -868,6 +932,13 @@ HRESULT CLoader::Add_KirbyFaceTexture(LEVEL eLevel)
 	if (FAILED(Add_Texture(eLevel, "mouth_surprise", "KirbyFace/mouth_surprise.png")))
 		return E_FAIL;
 
+	// Kirby Guide UI
+	if (FAILED(Add_Texture(eLevel, "BombOrbit", "KirbyBombOrbit/BombOrbit.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "BombOrbitGlow", "KirbyBombOrbit/BombOrbitGlow.dds")))
+		return E_FAIL;
+
+
 	// Awoofy Eye
 	if (FAILED(Add_Texture(eLevel, "Awoofy_Eye", "AwoofyEye/NormalEnemyEye%d.dds", 5)))
 		return E_FAIL;
@@ -887,7 +958,7 @@ HRESULT CLoader::Add_KirbyFaceTexture(LEVEL eLevel)
 	return S_OK;
 }
 
-// TOOL_MAP, TOOL_ANIM에서 사용중인 함수.
+// TOOL_MAP에서 사용중인 함수.
 HRESULT CLoader::Add_AllModelTxts(LEVEL eLevel, TYPE eType)
 {
 	HRESULT hr = S_OK;
@@ -916,29 +987,9 @@ HRESULT CLoader::Add_AllModelTxts(LEVEL eLevel, TYPE eType)
 		
 		_bool bFound = { false };
 		
-		// 원래 버전
-		//MODEL tModelInfo = MODEL{ strModelName ,  eType };
-		//for (auto& modelInfo : m_vecModelInfo)
-		//{
-		//	if (modelInfo.strModelName == strModelName)
-		//	{
-		//		tModelInfo = modelInfo;
-		//		break;
-		//	}
-		//}
-		
 		MODEL tModelInfo = MODEL{ strModelName ,  eType };
 		for (auto& modelInfo : m_vecModelInfo)
 		{
-			// 애님툴에서 조정하여 저장한 값을 불러서
-			// 모델 이름이 같을 경우, model의 정보들을 읽어오기
-			for (auto& pair : m_mapSequence)
-			{
-				if (modelInfo.strModelName == pair.first)
-				{
-					modelInfo.umapAnimInfo = pair.second;
-				}
-			}
 			if (modelInfo.strModelName == strModelName)
 			{
 				tModelInfo = modelInfo;
@@ -1030,8 +1081,10 @@ void CLoader::Load_AnimToolInfo()
 				pAnimElement != nullptr;
 				pAnimElement = pAnimElement->NextSiblingElement("Animation"))
 			{
-				const char* animName = pAnimElement->GetText();
-				if (animName)
+				// string animName = Remove_BeforeLastPipe(anim.first);
+				// const char* animName = pAnimElement->GetText();
+				string animName = Remove_BeforeLastPipe(pAnimElement->GetText());
+				if (!animName.empty())
 				{
 					// ANIM_INFO 객체 생성 및 초기화
 					ANIM_INFO animInfo;
@@ -1076,13 +1129,22 @@ void CLoader::Load_AnimToolInfo()
 							}
 						}
 					}
-
 					// ANIM_INFO 객체를 AnimMap에 추가
-					animMap[string(animName)] = animInfo;
+					animMap[animName] = animInfo;
 				}
 			}
 		}
 	}
+}
+
+string CLoader::Remove_BeforeLastPipe(const string& str)
+{
+	size_t pos = str.find_last_of('|');
+	if (pos != string::npos)
+	{
+		return str.substr(pos + 1); // 마지막 '|' 이후의 문자열 반환
+	}
+	return str; // '|'가 없으면 원래 문자열 반환
 }
 
 CLoader * CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID)

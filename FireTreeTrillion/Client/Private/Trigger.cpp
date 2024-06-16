@@ -55,8 +55,9 @@ _int CTrigger::Tick(_float fTimeDelta)
 
 		_float4 vNewPos = vLook + _float4(vPos.x, vPos.y + 1.f, vPos.z, 1.f);
 		m_pRigidBodyCom->Set_PxWorldMatrix(m_pOwnerTransform->Get_WorldFloat4x4());
+		return OBJ_DEAD;
 	}
-	else if (m_eTriggerType == TRIGGER_ITEM)
+	else if (m_eTriggerType == TRIGGER_ITEM || m_eTriggerType == TRIGGER_MAPOBJ)
 	{
 		_float4 vPos = m_pOwnerTransform->Get_State_Float4(CTransform::STATE_POSITION);
 		_float4 vNewPos = _float4(vPos.x, vPos.y + 1.f, vPos.z, 1.f);
@@ -105,20 +106,25 @@ void CTrigger::Render_IMGUI()
 }
 #endif
 
-void CTrigger::Collision_Overlap(CGameObject* pGameObject)
+void CTrigger::Collision_Hitbox(CPhysXObject* pGameObject)
 {
 	// HitBox 충돌 처리
 	if(m_bAlive)
-		m_pOwner->Collision_Overlap(pGameObject);
+		m_pOwner->Collision_Hitbox(pGameObject);
 
-	m_bAlive = false;
-	m_pRigidBodyCom->Activate(false);
+	Close_Collision();
 }
 
 void CTrigger::Check_Collision()
 {
 	m_bAlive = true;
 	m_pRigidBodyCom->Activate(true);
+}
+
+void CTrigger::Close_Collision()
+{
+	m_bAlive = false;
+	m_pRigidBodyCom->Activate(false);
 }
 
 HRESULT CTrigger::Bind_ShaderResources()
@@ -136,7 +142,7 @@ HRESULT CTrigger::Bind_ShaderResources()
 	return S_OK;
 }
 
-void CTrigger::Set_Owner(CGameObject* pObj)
+void CTrigger::Set_Owner(CPhysXObject* pObj)
 {
 	if (pObj == nullptr) return;
 
@@ -169,7 +175,11 @@ HRESULT CTrigger::Add_Components()
 	}
 
 	/* For.Com_RigidBody */
-	if (m_eTriggerType == TRIGGER_CAM || m_eTriggerType == TRIGGER_SHADER || m_eTriggerType == TRIGGER_STAR)
+	switch (m_eTriggerType)
+	{
+	case TRIGGER_CAM:
+	case TRIGGER_SHADER:
+	case TRIGGER_STAR:
 	{
 		CRigidBody::RIGIDBODY_DESC tRigidDesc(RIGID_BOX, m_pTransformCom->Get_WorldMatrix(), true, false);
 		if (FAILED(__super::Add_Component(TEXT("Prototype_Component_RigidBody"),
@@ -177,24 +187,10 @@ HRESULT CTrigger::Add_Components()
 			return E_FAIL;
 		m_pRigidBodyCom->SetUp_TriggerType(m_eTriggerType);
 		m_pRigidBodyCom->SetUp_TriggerIndex(m_iTriggerIndex);
+		m_pRigidBodyCom->Activate(true);
 	}
-	else if (m_eTriggerType == TRIGGER_HITBOX)
-	{
-		CRigidBody::RIGIDBODY_DESC tRigidDesc;
-		tRigidDesc.eShapeType = RIGID_BOX;
-		tRigidDesc.matWorld = m_pTransformCom->Get_WorldMatrix();
-		tRigidDesc.bTrigger = true;
-		tRigidDesc.bDynamic = false;
-		tRigidDesc.bKinematic = false;
-		tRigidDesc.fOffsetSize = m_vSize;// _float3{ 1.f, 1.5f, 1.f };
-		if(FAILED(__super::Add_Component(TEXT("Prototype_Component_RigidBody"),
-										 TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &tRigidDesc)))
-			return E_FAIL;
-		m_pRigidBodyCom->Activate(false);
-		m_pRigidBodyCom->SetUp_TriggerType(m_eTriggerType);
-		m_pRigidBodyCom->SetUp_TriggerIndex(m_iTriggerIndex);
-	}
-	else if (m_eTriggerType == TRIGGER_ITEM)
+	break;
+	case TRIGGER_HITBOX:
 	{
 		CRigidBody::RIGIDBODY_DESC tRigidDesc;
 		tRigidDesc.eShapeType = RIGID_BOX;
@@ -206,11 +202,35 @@ HRESULT CTrigger::Add_Components()
 		if (FAILED(__super::Add_Component(TEXT("Prototype_Component_RigidBody"),
 			TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &tRigidDesc)))
 			return E_FAIL;
-		m_pRigidBodyCom->Activate(true);
 		m_pRigidBodyCom->SetUp_TriggerType(m_eTriggerType);
 		m_pRigidBodyCom->SetUp_TriggerIndex(m_iTriggerIndex);
+		m_pRigidBodyCom->Activate(false);
 	}
-
+	break;
+	case TRIGGER_ITEM:
+	case TRIGGER_MAPOBJ:
+	{
+		CRigidBody::RIGIDBODY_DESC tRigidDesc;
+		tRigidDesc.eShapeType = RIGID_BOX;
+		tRigidDesc.matWorld = m_pTransformCom->Get_WorldMatrix();
+		tRigidDesc.bTrigger = true;
+		tRigidDesc.bDynamic = false;
+		tRigidDesc.bKinematic = false;
+		tRigidDesc.fOffsetSize = m_vSize;// _float3{ 1.f, 1.5f, 1.f };
+		if (FAILED(__super::Add_Component(TEXT("Prototype_Component_RigidBody"),
+			TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &tRigidDesc)))
+			return E_FAIL;
+		m_pRigidBodyCom->SetUp_TriggerType(m_eTriggerType);
+		m_pRigidBodyCom->SetUp_TriggerIndex(m_iTriggerIndex);
+		m_pRigidBodyCom->Activate(true);
+	}
+	break;
+	default:
+	{
+		ALARM_FAIL("Trigger의 타입을 지정해주지 않았습니다. Trigger가 생성되지 않습니다.");
+	}
+	break;
+	}
 	return S_OK;
 }
 

@@ -50,6 +50,11 @@ public:
 	static _float3	Get_Scaled_Matrix(_Inout_ _float4x4& matrix);
 	static void		Turn_OtherMatrix(_Inout_ _float4x4& matrix, _fvector vAxis, _float fTimeDelta, _float fAngle);
 
+	//공간 이동
+	static void		Make_World_ToScreen(_Inout_ _float3& vPos);
+	static void		Make_Screen_ToWorld(_Inout_ _float3& vPos);
+
+
 	// physX 관련 함수
 	static PxMat44			To_Float4x4(const _float4x4& mat);
 	static _float4x4		To_Float4x4(const PxMat44& mat);
@@ -64,6 +69,7 @@ public:
 	static void Make_Effect(SINGLE_FX_DATA& _FXData);
 	static void Make_Effect(MULTI_FX_DATA& _FXData);
 	static void Make_Effect(PARTICLE_DATA& _FXData);
+
 
 };
 

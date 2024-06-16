@@ -53,7 +53,6 @@ HRESULT CTransform::Bind_ShaderResource(CShader * pShader, const _char * pConsta
 	
 }
 
-
 void CTransform::Go_Straight(_float fTimeDelta)
 {
 	_vector		vPosition = Get_State_Vector(STATE_POSITION);
@@ -63,8 +62,6 @@ void CTransform::Go_Straight(_float fTimeDelta)
 
 	Set_State(STATE_POSITION, vPosition);
 }
-
-
 
 void CTransform::Go_Backward(_float fTimeDelta)
 {
@@ -292,15 +289,37 @@ void CTransform::Rotation(_fvector vAxis, _float fRadian)
 		XMVectorSet(0.f, 0.f, 1.f, 0.f) * vScaled.z, 		
 	};
 
-	
 	// XMConvertToRadians(Degree);
-
 	_matrix			RotationMatrix = XMMatrixRotationAxis(vAxis, fRadian);
 
 	for (size_t i = 0; i < STATE_POSITION; i++)
 	{
 		Set_State(STATE(i),
 			XMVector4Transform(vState[(STATE)i], RotationMatrix));
+	}
+}
+
+//X, Y, Z축 회전 모두 적용
+void CTransform::Rotation(_float _fRadianX, _float _fRadianY, _float _fRadianZ)
+{
+	_float3		vScaled = Get_Scaled();
+
+	_vector		vState[] = {
+		XMVectorSet(1.f, 0.f, 0.f, 0.f) * vScaled.x,
+		XMVectorSet(0.f, 1.f, 0.f, 0.f) * vScaled.y, 
+		XMVectorSet(0.f, 0.f, 1.f, 0.f) * vScaled.z, 		
+	};
+
+	_matrix		RotationMatrixX = XMMatrixRotationX(_fRadianX);
+	_matrix		RotationMatrixY = XMMatrixRotationY(_fRadianY);
+	_matrix		RotationMatrixZ = XMMatrixRotationZ(_fRadianZ);
+
+	//회전행렬 결합
+	_matrix RotationMatrix = RotationMatrixZ * RotationMatrixY * RotationMatrixX;
+
+	for (size_t i = 0; i < STATE_POSITION; i++)
+	{
+		Set_State(STATE(i), XMVector4Transform(vState[(STATE)i], RotationMatrix));
 	}
 }
 

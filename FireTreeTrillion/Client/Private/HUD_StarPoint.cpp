@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "HUD_StarPoint.h"
+#include "Kirby.h"
 
 CHUD_StarPoint::CHUD_StarPoint(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext)
 	: CHUD{ _pDevice, _pContext }
@@ -32,7 +33,7 @@ HRESULT CHUD_StarPoint::Initialize(void* _pArg)
 	m_UIObjDesc.eUIType = (*HUDStarPoint_Desc).eUIType;
 	m_UIObjDesc.vColorRGB = (*HUDStarPoint_Desc).vColorRGB;
 	m_UIObjDesc.fAlpha = (*HUDStarPoint_Desc).fAlpha;
-	m_UIObjDesc.vDegree = (*HUDStarPoint_Desc).vDegree;
+	//.vDegree = (*HUDStarPoint_Desc).vDegree;
 
 	if (UI_TEXTURE == m_UIObjDesc.eUIType)
 		m_iTexIndex = (*HUDStarPoint_Desc).iTexIndex;
@@ -44,28 +45,34 @@ HRESULT CHUD_StarPoint::Initialize(void* _pArg)
 	m_pTransformCom->Set_Scaled(m_UIObjDesc.vSize.x, m_UIObjDesc.vSize.y, m_UIObjDesc.vSize.z);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
 		XMVectorSet(m_UIObjDesc.vPos.x - m_UIObjDesc.vCenter.x + m_UIObjDesc.vCenter.x,
-			m_UIObjDesc.vPos.y - m_UIObjDesc.vCenter.y + m_UIObjDesc.vCenter.y, m_UIObjDesc.vPos.z, 1.f));
+					m_UIObjDesc.vPos.y - m_UIObjDesc.vCenter.y + m_UIObjDesc.vCenter.y,
+					m_UIObjDesc.vPos.z, 1.f));
 
 #pragma region SET_PROJ
 
 	if (PROJ_ORTHO == m_UIObjDesc.eUIProj)
 	{
+		m_UIObjDesc.vDegree.z = (*HUDStarPoint_Desc).vDegree.z;
 		m_pTransformCom->Rotation(XMVectorSet(AXIS_Z), XMConvertToRadians(m_UIObjDesc.vDegree.z));
 		XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 	}
 
 	if (PROJ_PERSPEC == m_UIObjDesc.eUIProj)
 	{
-		m_pTransformCom->Rotation(XMVectorSet(AXIS_X), XMConvertToRadians(m_UIObjDesc.vDegree.x));
-		m_pTransformCom->Rotation(XMVectorSet(AXIS_Y), XMConvertToRadians(m_UIObjDesc.vDegree.y));
-		m_pTransformCom->Rotation(XMVectorSet(AXIS_Z), XMConvertToRadians(m_UIObjDesc.vDegree.z));
+		m_UIObjDesc.vDegree = (*HUDStarPoint_Desc).vDegree;
+
+		_float fRadianX = XMConvertToRadians(m_UIObjDesc.vDegree.x);
+		_float fRadianY = XMConvertToRadians(m_UIObjDesc.vDegree.y);
+		_float fRadianZ = XMConvertToRadians(m_UIObjDesc.vDegree.z);
+		m_pTransformCom->Rotation(fRadianX, fRadianY, fRadianZ);
 	}
 
 #pragma endregion
 
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 
-	m_eSPstate = STARPOINT_IDLE;
+	m_eCurState = STARPOINT_WAIT;
+	m_ePreState = STARPOINT_HIDE;
 
 	return S_OK;
 }
@@ -73,72 +80,44 @@ HRESULT CHUD_StarPoint::Initialize(void* _pArg)
 _int CHUD_StarPoint::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
+
+#pragma region STARPOINT(COIN) LOOT 코인 획득 처리
+
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+	//if (pKirby == nullptr)
+	//	return;
+
+
+#pragma endregion
 	
+	Update_UIState(fTimeDelta);
+
+	//현재 키입력으로 확인 가능
 	if (m_pGameInstance->Get_DIKeyState(DIK_1, KEY_DOWN))
 	{
 		m_fAccTime = 0.f;
-		m_eSPstate = STARPOINT_LOOT;
-	}
+		m_eCurState = STARPOINT_LOOT;
 
-	switch (m_eSPstate)
-	{
-	case CHUD::STARPOINT_IDLE:
-		m_fAccTime = 0.f;
-		if (m_fAccTime >= 10.f / 144.f) //시간 경과하면 HIDE 처리
-			m_eSPstate = STARPOINT_HIDE;
-
-		if (m_UIObjDesc.wstrUITag == TEXT("Effect"))
+		if (m_UIObjDesc.wstrUITag == TEXT("Font10") || m_UIObjDesc.wstrUITag == TEXT("Font10_Shadow"))
 		{
-			m_bIsRender = FALSE;
-			m_iTexIndex = 3;
-		}
+			_uint iCount = stoi(m_UIObjDesc.wstrText);
+			_uint iFont10 = (iCount / 10) % 10;
 
-		if (m_UIObjDesc.wstrUITag == TEXT("Effect_Mask"))
+			if (iFont10 > 0)
+				m_bIsRender = TRUE;
+
+			m_bIsRender = FALSE;
+		}
+		if (m_UIObjDesc.wstrUITag == TEXT("Font1") || m_UIObjDesc.wstrUITag == TEXT("Font1_Shadow"))
 		{
-			m_bIsRender = FALSE;
+			_uint iCount = stoi(m_UIObjDesc.wstrText);
+			iCount++;
 
-			m_UIObjDesc.vDegree.z = 0.f;
-			m_UIObjDesc.vSize.x = 128.f;
-			m_UIObjDesc.vSize.y = 128.f;
-
-			m_UIObjDesc.fAlpha = 10.f / 255.f;
+			_uint iFont1 = iCount % 10;
+			m_UIObjDesc.wstrText = to_wstring(iFont1);
 		}
-
-		if (m_UIObjDesc.wstrUITag == TEXT("Font100") || m_UIObjDesc.wstrUITag == TEXT("Font10") || m_UIObjDesc.wstrUITag == TEXT("Font1"))
-			m_UIObjDesc.vPos.y = 417.f;
-
-		if (m_UIObjDesc.wstrUITag == TEXT("Font100_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font10_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font1_Shadow"))
-			m_UIObjDesc.vPos.y = 421.f;
-
-		break;
-
-	case CHUD::STARPOINT_HIDE: //Frame 344 > 354
-		m_fAccTime += fTimeDelta;
-		if (m_fAccTime >= 10.f / 144.f)
-			m_eSPstate = STARPOINT_IDLE;	
-
-		Play_Animation(fTimeDelta, STARPOINT_HIDE);
-		break;
-
-	case CHUD::STARPOINT_SHOW: //Frame 213 > 223
-
-		Play_Animation(fTimeDelta, STARPOINT_SHOW);
-		break;
-
-	case CHUD::STARPOINT_LOOT: //Frame 50 > 64
-		m_fAccTime += fTimeDelta;
-		if (m_fAccTime >= 14.f / 144.f)
-			m_eSPstate = STARPOINT_IDLE;
-
-		Play_Animation(m_fAccTime, STARPOINT_LOOT);
-		break;
-
-	case CHUD::STARPOINT_DROP:
-		break;
-
-	case CHUD::STARPOINT_NONE:
-	default:	break;
 	}
+	
 
 	return OBJ_NOEVENT;
 }
@@ -151,13 +130,7 @@ void CHUD_StarPoint::Late_Tick(_float fTimeDelta)
 HRESULT CHUD_StarPoint::Render()
 {
 	if (UI_TEXTURE == m_UIObjDesc.eUIType)
-	{
-		if (PROJ_ORTHO == m_UIObjDesc.eUIProj)
-			Render_OrthoProj(m_pShaderCom, m_pTransformCom);
-
-		if (PROJ_PERSPEC == m_UIObjDesc.eUIProj)
-			Render_PerspecProj(m_pShaderCom, m_pTransformCom);
-	}
+		Render_BindSet(m_pShaderCom, m_pTransformCom);
 
 	if (UI_FONT == m_UIObjDesc.eUIType)
 	{
@@ -166,12 +139,23 @@ HRESULT CHUD_StarPoint::Render()
 
 		_float4 vFontRGBA = { m_UIObjDesc.vColorRGB.x, m_UIObjDesc.vColorRGB.y, m_UIObjDesc.vColorRGB.z, m_UIObjDesc.fAlpha };
 		_float2 vFontOrig = { 1.f, 1.f };
-		_float2 vFontScale = { 1.f, 1.f };
+		_float2 vFontScale = { m_UIObjDesc.vSize.x, m_UIObjDesc.vSize.y };
 
 		if (m_UIObjDesc.wstrUITag == TEXT("Font_Shadow"))
-			vFontScale = { 1.2f, 1.2f };
+			vFontScale = { 1.f, 1.f };
 
 		wstring wstrFontTag = { TEXT("Font_HUD_StarPoint_NUM30") };
+
+		if (m_UIObjDesc.wstrUITag == TEXT("Font100") || m_UIObjDesc.wstrUITag == TEXT("Font10")
+			|| m_UIObjDesc.wstrUITag == TEXT("Font100_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font10_Shadow"))
+		{
+			if (m_bIsRender == FALSE)
+				return S_OK;
+		}
+	
+		if (STARPOINT_WAIT == m_eCurState && STARPOINT_HIDE == m_ePreState)
+			return S_OK;
+
 		m_pGameInstance->Render_Font(wstrFontTag, m_UIObjDesc.wstrText, vFontPos, vFontRGBA,
 			XMConvertToRadians(m_UIObjDesc.vDegree.z), vFontOrig, vFontScale);
 	}
@@ -196,18 +180,33 @@ HRESULT CHUD_StarPoint::Add_Components()
 	return S_OK;
 }
 
-HRESULT CHUD_StarPoint::Render_OrthoProj(CShader* _pShaderCom, CTransform* _pTransCom)
+HRESULT CHUD_StarPoint::Render_BindSet(CShader* _pShaderCom, CTransform* _pTransCom)
 {
-	if (m_UIObjDesc.wstrUITag == TEXT("Effect") && m_bIsRender == FALSE)
+	if (STARPOINT_WAIT == m_eCurState && STARPOINT_HIDE == m_ePreState)
 		return S_OK;
 
-	if (m_UIObjDesc.wstrUITag == TEXT("Effect_Mask") && m_bIsRender == FALSE)
+	//마스크도 어색해서 잠시 OFF 처리. 추후 디벨롭 필요
+	if (m_UIObjDesc.wstrUITag == TEXT("Effect_Mask"))
 		return S_OK;
+
+	if (m_bIsRender == FALSE)
+	{
+		if (m_UIObjDesc.wstrUITag == TEXT("Effect"))
+			return S_OK;
+
+	}
 
 	CHECK_NULLPTR(_pShaderCom);
 
 	if (FAILED(_pTransCom->Bind_ShaderResource(_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
+
+	if (PROJ_PERSPEC == m_UIObjDesc.eUIProj)
+	{
+		//m_ViewMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW);
+		XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
+		m_ProjMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
+	}
 
 	//셰이더 파일의 매트릭스 정보를 가져와 바인딩
 	if (FAILED(_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
@@ -216,36 +215,11 @@ HRESULT CHUD_StarPoint::Render_OrthoProj(CShader* _pShaderCom, CTransform* _pTra
 	if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
-	//아이콘의 경우, 기본값으로 렌더
-	SHADER_PS ePSIndex = { PS_ALPHABLEND };
-	if (m_UIObjDesc.wstrUITag == TEXT("Icon")) //|| m_UIObjDesc.wstrUITag == TEXT("Effect_Mask"))
-		ePSIndex = PS_DEFAULT;
+	SHADER_PS ePassIndex = { PS_ALPHABLEND }; //셰이더 패스 기본값
+	if (TEXT("Icon") == m_UIObjDesc.wstrUITag) { ePassIndex = PS_DEFAULT; }
+	//if (TEXT("Effect_Mask") == m_UIObjDesc.wstrUITag) { ePassIndex = PS_MASK_HP; }
 
-	if (FAILED(Bind_ShaderResources(_pShaderCom, ePSIndex, m_pTextureCom, m_iTexIndex)))
-		return E_FAIL;
-
-	return S_OK;
-}
-
-HRESULT CHUD_StarPoint::Render_PerspecProj(CShader* _pShaderCom, CTransform* _pTransCom)
-{
-	CHECK_NULLPTR(_pShaderCom);
-
-	if (FAILED(_pTransCom->Bind_ShaderResource(_pShaderCom, "g_WorldMatrix")))
-		return E_FAIL;
-
-	_float4x4 ViewMatrix{}; //= m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW);
-	XMStoreFloat4x4(&ViewMatrix, XMMatrixIdentity());
-	_float4x4 ProjMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
-
-	//셰이더 파일의 매트릭스 정보를 가져와 바인딩
-	if (FAILED(_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
-		return E_FAIL;
-
-	if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
-		return E_FAIL;
-
-	if (FAILED(Bind_ShaderResources(_pShaderCom, PS_ALPHABLEND, m_pTextureCom, m_iTexIndex)))
+	if (FAILED(Bind_ShaderResources(_pShaderCom, ePassIndex, m_pTextureCom, m_iTexIndex)))
 		return E_FAIL;
 
 	return S_OK;
@@ -281,24 +255,130 @@ HRESULT CHUD_StarPoint::Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom)
 	return S_OK;
 }
 
-void CHUD_StarPoint::Play_Animation(_float _fAccTime, HUD_STARPOINT _eSPstate)
+void CHUD_StarPoint::Update_UIState(_float _fTimeDelta)
 {
-	switch (_eSPstate)
+	switch (m_eCurState)
 	{
-	//case CHUD::STARPOINT_IDLE:
-	//	break;
+	case CHUD::STARPOINT_IDLE: // 1) 렌더X 기본 상태
+		if (STARPOINT_HIDE == m_ePreState)	//이전 상태가 HIDE인 경우, 기본값으로 세팅
+			m_eCurState = STARPOINT_WAIT;
+		break;
 
-	case CHUD::STARPOINT_HIDE:
-		m_UIObjDesc.vPos.x += m_fAccTime * 10.f;
+	case CHUD::STARPOINT_WAIT: //3) 특정 이벤트 이후 대기 상태
+		Play_Animation(m_fAccTime, STARPOINT_WAIT);
+
+		if (STARPOINT_LOOT == m_ePreState)
+		{
+			m_fAccTime += _fTimeDelta;
+			if (m_fAccTime >= 5.f)
+			{
+				m_eCurState = STARPOINT_HIDE; //3-A) 시간 경과 후 숨김 상태로 변경
+				m_fAccTime = 0.f;
+			}
+		}
+		break;
+
+		//Frame 344 > 354
+	case CHUD::STARPOINT_HIDE: // 4) 숨김 상태
+		m_fAccTime += _fTimeDelta;
+		Play_Animation(m_fAccTime, STARPOINT_HIDE);
+		if (m_fAccTime >= 10.f / 144.f)
+		{
+			m_fAccTime = 0.f;
+			m_eCurState = STARPOINT_IDLE; //4-A) 시간 경과 후 대기 상태로 변경 (렌더X)
+			m_ePreState = STARPOINT_HIDE;
+		}
+		break;
+
+		//Frame 50 > 64 
+	case CHUD::STARPOINT_LOOT: // 2) 획득 상태
+		m_fAccTime += _fTimeDelta;
+		if (m_fAccTime >= 14.f / 144.f)
+		{
+			m_fAccTime = 0.f;
+			m_eCurState = STARPOINT_WAIT;
+			m_ePreState = STARPOINT_LOOT;
+		}
+		Play_Animation(m_fAccTime, STARPOINT_LOOT);
+		break;
+
+	case CHUD::STARPOINT_NONE:
+	default:	break;
+	}
+}
+
+void CHUD_StarPoint::Play_Animation(_float _fAccTime, HUD_STARPOINT _eCurState)
+{
+	_float fFrameTime = { 0.f };
+	_float fMoveSpeed = { 0.f };
+	_float fAlphaSpeed = { 0.f };
+
+	switch (_eCurState)
+	{
+	case CHUD::STARPOINT_IDLE:
+
+	break;
+	
+	case CHUD::STARPOINT_WAIT:
+		if (TEXT("Base") == m_UIObjDesc.wstrUITag || TEXT("Blur") == m_UIObjDesc.wstrUITag)
+		{
+			m_UIObjDesc.vPos = { 0.4f, 0.22f, 1.0f };
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION,
+				XMVectorSet(m_UIObjDesc.vPos.x - m_UIObjDesc.vCenter.x + m_UIObjDesc.vCenter.x,
+					m_UIObjDesc.vPos.y - m_UIObjDesc.vCenter.y + m_UIObjDesc.vCenter.y,
+					m_UIObjDesc.vPos.z, 1.f));
+		}
+
+		if (TEXT("Icon") == m_UIObjDesc.wstrUITag)
+		{
+			m_UIObjDesc.vPos = { 0.32f, 0.20f, 0.9f };
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION,
+				XMVectorSet(m_UIObjDesc.vPos.x - m_UIObjDesc.vCenter.x + m_UIObjDesc.vCenter.x,
+					m_UIObjDesc.vPos.y - m_UIObjDesc.vCenter.y + m_UIObjDesc.vCenter.y,
+					m_UIObjDesc.vPos.z, 1.f));
+		}
+
+		if (m_UIObjDesc.wstrUITag == TEXT("Effect"))
+		{
+			m_bIsRender = FALSE;
+			m_iTexIndex = 3;
+		}
+
+		if (m_UIObjDesc.wstrUITag == TEXT("Effect_Mask"))
+		{
+			m_bIsRender = FALSE;
+
+			m_UIObjDesc.vDegree.z = 0.f;
+			m_UIObjDesc.vSize.x = 128.f;
+			m_UIObjDesc.vSize.y = 128.f;
+
+			m_UIObjDesc.fAlpha = 10.f / 255.f;
+		}
+		if (m_UIObjDesc.wstrUITag == TEXT("Font100_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font10_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font1_Shadow"))
+			m_UIObjDesc.vPos = { 658.f, 406.f, 0.f };
+
+		if (m_UIObjDesc.wstrUITag == TEXT("Font100") || m_UIObjDesc.wstrUITag == TEXT("Font10") || m_UIObjDesc.wstrUITag == TEXT("Font1"))
+			m_UIObjDesc.vPos = { 658.f, 410.f, 0.f };
+
+		break;
+
+	case CHUD::STARPOINT_HIDE: //X값 우측 이동, 알파 값 죽이기
+		if (m_UIObjDesc.wstrUITag == TEXT("Font1_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font1"))
+			m_UIObjDesc.vPos.x += 40.f;
+
+		m_UIObjDesc.vPos.x += 0.05f;
+ 		m_pTransformCom->Set_State(CTransform::STATE_POSITION,
+			XMVectorSet(m_UIObjDesc.vPos.x - m_UIObjDesc.vCenter.x + m_UIObjDesc.vCenter.x,
+				m_UIObjDesc.vPos.y - m_UIObjDesc.vCenter.y + m_UIObjDesc.vCenter.y,
+				m_UIObjDesc.vPos.z, 1.f));
 
 		m_UIObjDesc.fAlpha -= 1.f / 255.f * _fAccTime;
 
 		if (m_UIObjDesc.fAlpha < 1.f / 255.f)
 			m_UIObjDesc.fAlpha = 1.f / 255.f;
+
 		break;
 
-	case CHUD::STARPOINT_SHOW:
-		break;
 
 	case CHUD::STARPOINT_LOOT:
 		if (m_UIObjDesc.wstrUITag == TEXT("Effect"))
@@ -325,83 +405,55 @@ void CHUD_StarPoint::Play_Animation(_float _fAccTime, HUD_STARPOINT _eSPstate)
 			if (m_UIObjDesc.fAlpha < 1.f / 255.f)
 				m_UIObjDesc.fAlpha = 1.f / 255.f;
 		}
-
-		if (m_UIObjDesc.wstrUITag == TEXT("Font100") || m_UIObjDesc.wstrUITag == TEXT("Font10")
-			|| m_UIObjDesc.wstrUITag == TEXT("Font1"))
-		{
-			_uint iCount = stoi(m_UIObjDesc.wstrText);
-			iCount++;
-
-			if (iCount > 999) iCount = 0;
-			wstring strCount = to_wstring(iCount);
-
-			wchar_t Font100 = strCount.length() > 2 ? strCount[strCount.length() - 3] : '0';
-			wchar_t Font10 = strCount.length() > 1 ? strCount[strCount.length() - 2] : '0';
-			wchar_t Font1 = strCount.length() > 0 ? strCount[strCount.length() - 1] : '0';
-			
-			if (m_UIObjDesc.wstrUITag == TEXT("Font100"))
-				m_UIObjDesc.wstrText = Font100;
-
-			else if (m_UIObjDesc.wstrUITag == TEXT("Font10"))
-				m_UIObjDesc.wstrText = Font10;
-
-			else if (m_UIObjDesc.wstrUITag == TEXT("Font1"))
-				m_UIObjDesc.wstrText = Font1;
-
-			// 각 자리수에 맞는 텍스트 설정
-			if (m_IsMovingUP)
-			{
-				m_UIObjDesc.vPos.y += 1.f;
-				if (m_UIObjDesc.vPos.y >= 430.f)
-				{
-					m_UIObjDesc.vPos.y = 430.f;
-					m_IsMovingUP = FALSE;
-				}
-			}
-			else
-			{
-				m_UIObjDesc.vPos.y -= 1.f;
-				if (m_UIObjDesc.vPos.y <= 417.f)
-				{
-					m_UIObjDesc.vPos.y = 417.f;
-					m_IsMovingUP = TRUE;
-				}
-			}
-		}
-		
-		/*
-		if (m_UIObjDesc.wstrUITag == TEXT("Font100_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font10_Shadow")
-			|| m_UIObjDesc.wstrUITag == TEXT("Font1_Shadow"))
-		{
-			_uint iCount = stoi(m_UIObjDesc.wstrText);
-			iCount++;
-
-			if (iCount > 999) iCount = 0;
-			m_UIObjDesc.wstrText = to_wstring(iCount);
-
-			if (m_IsMovingUP)
-			{
-				m_UIObjDesc.vPos.y += 1.f;
-				if (m_UIObjDesc.vPos.y >= 434.f)
-				{
-					m_UIObjDesc.vPos.y = 434.f;	m_IsMovingUP = FALSE;
-				}
-			}
-			else
-			{
-				m_UIObjDesc.vPos.y -= 1.f;
-				if (m_UIObjDesc.vPos.y <= 421.f)
-				{
-					m_UIObjDesc.vPos.y = 421.f; m_IsMovingUP = TRUE;
-				}
-			}
-		}
-		*/
 	
-		break;
+		if (m_UIObjDesc.wstrUITag == TEXT("Font100_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font10_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font1_Shadow")
+			|| m_UIObjDesc.wstrUITag == TEXT("Font100") || m_UIObjDesc.wstrUITag == TEXT("Font10") || m_UIObjDesc.wstrUITag == TEXT("Font1"))
+		{
+			if (m_IsMovingUP)
+			{
+				m_UIObjDesc.vPos.y += 1.f;
+				
+				if (TEXT("Font100") == m_UIObjDesc.wstrUITag || TEXT("Font10") == m_UIObjDesc.wstrUITag || m_UIObjDesc.wstrUITag == TEXT("Font1"))
+				{
+					if (m_UIObjDesc.vPos.y >= 434.f)
+					{
+						m_UIObjDesc.vPos.y = 434.f;
+						m_IsMovingUP = FALSE;
+					}
+				}
+				
+				else 
+				{
+					if (m_UIObjDesc.vPos.y >= 430.f)
+					{
+						m_UIObjDesc.vPos.y = 430.f;
+						m_IsMovingUP = FALSE;
+					}
+				}
+			}
+			else //m_IsMovingUP = FALSE;
+			{
+				m_UIObjDesc.vPos.y -= 1.f;
 
-	case CHUD::STARPOINT_DROP:
-		break;
+				if (m_UIObjDesc.wstrUITag == TEXT("Font100") || m_UIObjDesc.wstrUITag == TEXT("Font10") || m_UIObjDesc.wstrUITag == TEXT("Font1"))
+				{
+					if (m_UIObjDesc.vPos.y <= 410.f)
+					{
+						m_UIObjDesc.vPos.y = 410.f;
+						m_IsMovingUP = TRUE;
+					}
+				}
+				else
+				{
+					if (m_UIObjDesc.vPos.y <= 406.f)
+					{
+						m_UIObjDesc.vPos.y = 406.f;
+						m_IsMovingUP = TRUE;
+					}
+				}
+			}
+		}
+	break;
 	}
 }
 

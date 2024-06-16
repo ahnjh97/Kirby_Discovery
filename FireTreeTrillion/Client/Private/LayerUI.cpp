@@ -32,7 +32,7 @@ HRESULT CLayerUI::Initialize(void* _pArg)
 	m_UIObjDesc.eUIType = (*LayerUI_Desc).eUIType;
 	m_UIObjDesc.vColorRGB = (*LayerUI_Desc).vColorRGB;
 	m_UIObjDesc.fAlpha = (*LayerUI_Desc).fAlpha;
-	m_UIObjDesc.vDegree = (*LayerUI_Desc).vDegree;
+	//m_UIObjDesc.vDegree = (*LayerUI_Desc).vDegree;
 
 	if (UI_TEXTURE == m_UIObjDesc.eUIType)
 		m_iTexIndex = (*LayerUI_Desc).iTexIndex;
@@ -60,9 +60,11 @@ HRESULT CLayerUI::Initialize(void* _pArg)
 	if (PROJ_PERSPEC == m_UIObjDesc.eUIProj)
 	{
 		m_UIObjDesc.vDegree = (*LayerUI_Desc).vDegree;
-		m_pTransformCom->Rotation(XMVectorSet(AXIS_X), XMConvertToRadians(m_UIObjDesc.vDegree.x));
-		m_pTransformCom->Rotation(XMVectorSet(AXIS_Y), XMConvertToRadians(m_UIObjDesc.vDegree.y));
-		m_pTransformCom->Rotation(XMVectorSet(AXIS_Z), XMConvertToRadians(m_UIObjDesc.vDegree.z));
+
+		_float fRadianX = XMConvertToRadians(m_UIObjDesc.vDegree.x);
+		_float fRadianY = XMConvertToRadians(m_UIObjDesc.vDegree.y);
+		_float fRadianZ = XMConvertToRadians(m_UIObjDesc.vDegree.z);
+		m_pTransformCom->Rotation(fRadianX, fRadianY, fRadianZ);
 	}
 
 #pragma endregion
@@ -87,13 +89,7 @@ void CLayerUI::Late_Tick(_float fTimeDelta)
 HRESULT CLayerUI::Render()
 {
 	if (UI_TEXTURE == m_UIObjDesc.eUIType)
-	{
-		if (PROJ_ORTHO == m_UIObjDesc.eUIProj)
-			Render_OrthoProj(m_pShaderCom, m_pTransformCom);
-
-		if (PROJ_PERSPEC == m_UIObjDesc.eUIProj)
-			Render_PerspecProj(m_pShaderCom, m_pTransformCom); //원근 회전의 데이터는 잘 로드되나 렌더 시에 실적용이 안되는 현상
-	}
+		Render_BindSet(m_pShaderCom, m_pTransformCom);
 
 	if (UI_FONT == m_UIObjDesc.eUIType)
 	{
@@ -102,11 +98,36 @@ HRESULT CLayerUI::Render()
 
 		_float4 vFontRGBA = { m_UIObjDesc.vColorRGB.x, m_UIObjDesc.vColorRGB.y, m_UIObjDesc.vColorRGB.z, m_UIObjDesc.fAlpha };
 		_float2 vFontOrig = {	1.f, 1.f  };
-		_float2 vFontScale = {	1.f, 1.f  };
+		_float2 vFontScale = { m_UIObjDesc.vSize.x, m_UIObjDesc.vSize.y };
 
 		wstring wstrFontTag = { TEXT("Font_HUD_StarPoint_NUM30") };
+		//wstring wstrFontTag = { TEXT("Font_HUDSub_KR15") };
 
-		m_pGameInstance->Render_Font(wstrFontTag, m_UIObjDesc.wstrText, vFontPos, vFontRGBA, 
+		//추후 원근투영 폰트 작업 예정
+		/*
+		if (PROJ_PERSPEC == m_UIObjDesc.eUIProj)
+		{
+			//_float4x4 WorldMatrix = m_pTransformCom->Get_WorldFloat4x4();
+			m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix");
+
+			_float4x4 ViewMatrix{}; 
+			XMStoreFloat4x4(&ViewMatrix, XMMatrixIdentity());
+
+			_float4x4 ProjMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
+
+			if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
+				return E_FAIL;
+
+			if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
+				return E_FAIL;
+
+			_float4x4 WVPMatrix = WorldMatrix * ViewMatrix * ProjMatrix;
+			m_pGameInstance->Render_ProjFont(XMLoadFloat4x4(&WVPMatrix), wstrFontTag, m_UIObjDesc.wstrText, vFontPos, vFontRGBA,
+				XMConvertToRadians(m_UIObjDesc.vDegree.z), vFontOrig, vFontScale);
+		}
+		*/
+
+		m_pGameInstance->Render_Font(wstrFontTag, m_UIObjDesc.wstrText, vFontPos, vFontRGBA,
 			XMConvertToRadians(m_UIObjDesc.vDegree.z), vFontOrig, vFontScale);
 	}
 
@@ -131,12 +152,19 @@ HRESULT CLayerUI::Add_Components()
 	return S_OK;
 }
 
-HRESULT CLayerUI::Render_OrthoProj(CShader* _pShaderCom, CTransform* _pTransCom)
+HRESULT CLayerUI::Render_BindSet(CShader* _pShaderCom, CTransform* _pTransCom)
 {
 	CHECK_NULLPTR(_pShaderCom);
 
 	if (FAILED(_pTransCom->Bind_ShaderResource(_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
+
+	if (PROJ_PERSPEC == m_UIObjDesc.eUIProj)
+	{
+		//m_ViewMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW);
+		XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
+		m_ProjMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
+	}
 
 	//셰이더 파일의 매트릭스 정보를 가져와 바인딩
 	if (FAILED(_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
@@ -145,31 +173,11 @@ HRESULT CLayerUI::Render_OrthoProj(CShader* _pShaderCom, CTransform* _pTransCom)
 	if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
-	if (FAILED(Bind_ShaderResources(_pShaderCom, PS_ALPHABLEND, m_pTextureCom, m_iTexIndex)))
-		return E_FAIL;
+	SHADER_PS ePassIndex = { PS_ALPHABLEND }; //셰이더 패스 기본값
+	if (TEXT("Icon") == m_UIObjDesc.wstrUITag) { ePassIndex = PS_DEFAULT; }
+	//if (TEXT("Effect_Mask") == m_UIObjDesc.wstrUITag) { ePassIndex = PS_MASK_HP; }
 
-	return S_OK;
-}
-
-HRESULT CLayerUI::Render_PerspecProj(CShader* _pShaderCom, CTransform* _pTransCom)
-{
-	CHECK_NULLPTR(_pShaderCom);
-
-	if (FAILED(_pTransCom->Bind_ShaderResource(_pShaderCom, "g_WorldMatrix")))
-		return E_FAIL;
-
-	_float4x4 ViewMatrix{}; //= m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW);
-	XMStoreFloat4x4(&ViewMatrix, XMMatrixIdentity());
-	_float4x4 ProjMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
-
-	//셰이더 파일의 매트릭스 정보를 가져와 바인딩
-	if (FAILED(_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
-		return E_FAIL;
-
-	if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
-		return E_FAIL;
-
-	if (FAILED(Bind_ShaderResources(_pShaderCom, PS_ALPHABLEND, m_pTextureCom, m_iTexIndex)))
+	if (FAILED(Bind_ShaderResources(_pShaderCom, ePassIndex, m_pTextureCom, m_iTexIndex)))
 		return E_FAIL;
 
 	return S_OK;

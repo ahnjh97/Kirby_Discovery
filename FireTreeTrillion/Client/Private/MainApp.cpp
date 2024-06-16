@@ -128,9 +128,6 @@ HRESULT CMainApp::Render(_float fTimeDelta)
 
 HRESULT CMainApp::Ready_Fonts()
 {
-	// MakeSpriteFont "�ؽ�lv1���� Bold" /FontSize:30 /FastPack /CharacterRegion:0x0020-0x00FF /CharacterRegion:0x3131-0x3163 /CharacterRegion:0xAC00-0xD800 /DefaultCharacter:0xAC00 142.spritefont
-
-	// 05.25) a�ڸ�ü ���� ��Ʈ �߰�
 	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUDSub_EN10"),
 		TEXT("../Bin/Resources/Fonts/HUD_Sub_EN10.spritefont"))))
 		return E_FAIL;
@@ -139,7 +136,7 @@ HRESULT CMainApp::Ready_Fonts()
 		TEXT("../Bin/Resources/Fonts/HUD_Sub_KR15.SpriteFont"))))
 		return E_FAIL;
 
-	// FOT-Seurat Pro EB /Fontsize 30 /CharacterRegion: 0x0030-0x0039 (���ڸ�)
+	// FOT-Seurat Pro EB /Fontsize 30 /CharacterRegion: 0x0030-0x0039 (숫자만)
 	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUD_StarPoint_NUM30"),
 		TEXT("../Bin/Resources/Fonts/HUD_StarPoint_NUM30.spritefont"))))
 		return E_FAIL;
@@ -249,6 +246,9 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 
 
 		wstring wstrProtoName = { TEXT("Prototype_GameObject_") + CUtils::StrToWstr(strname) };
+
+		if (wstrProtoName == TEXT("Prototype_GameObject_SwordTrail_One"))
+			_int a = 0;
 
 		hr = m_pGameInstance->Add_Prototype(wstrProtoName, CMultiEffect::Create(m_pDevice, m_pContext, FXDesc));
 		CHECK_FAILED(hr);
@@ -367,7 +367,7 @@ void CMainApp::Free()
 
 	Safe_Release(m_pGameInstance);
 
-	CLevelChanger::Get_Instance()->Release_LevelChanger();
+	//CLevelChanger::Get_Instance()->Release_LevelChanger();
 	CGameInstance::Release_Engine();
 
 

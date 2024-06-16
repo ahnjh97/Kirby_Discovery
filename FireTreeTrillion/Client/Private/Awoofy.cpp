@@ -62,7 +62,7 @@ HRESULT CAwoofy::Initialize(void* pArg)
 _int CAwoofy::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
-		return OBJ_DEAD;
+		return Ready_Dead();
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
@@ -296,6 +296,8 @@ HRESULT CAwoofy::Add_Components()
 	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Awoofy"),
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
+	// FOR ANIMTOOL
+	m_ppModelForAnimTool = &m_pModelCom;
 
 	/* For.Com_Texture */
 	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Awoofy_Eye"),
@@ -312,9 +314,6 @@ HRESULT CAwoofy::Add_Components()
 	m_pControllerCom->Set_Object(this);
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vPos);
-
-	// FOR ANIMTOOL
-	m_ppModelForAnimTool = &m_pModelCom;
 
 	/* FSM */
 	SetUp_FSM();

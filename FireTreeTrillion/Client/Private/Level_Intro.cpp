@@ -17,24 +17,41 @@ CLevel_Intro::CLevel_Intro(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 HRESULT CLevel_Intro::Initialize()
 {
 	m_pGameInstance->Set_RenderMode(CRenderer::MODE_GAMEPLAY);
-	CLevelChanger::Get_Instance()->Load();
+	//CLevelChanger::Get_Instance()->Load();
 
-	if (FAILED(__super::Initialize()))
-		return E_FAIL;
+	HRESULT hr;
+	hr = __super::Initialize();
+	CHECK_FAILED(hr);
 
-	if (FAILED(Ready_Lights()))
-		return E_FAIL;
+	hr = Ready_Lights();
+	CHECK_FAILED(hr);
 
-	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
-		return E_FAIL;
+	hr = Ready_Layer_Camera(TEXT("Layer_Camera"));
+	CHECK_FAILED(hr);
 
-	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
-		return E_FAIL;
+	hr = Ready_Layer_BackGround(TEXT("Layer_BackGround"));
+	CHECK_FAILED(hr);
 
-	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
-		return E_FAIL;
+	//hr = Ready_Layer_Monsters(TEXT("Layer_Monster"));
+	//CHECK_FAILED(hr);
 
-	if (FAILED(Ready_ParsedObjects()))
+	hr = Ready_Layer_UI(TEXT("Layer_UI"));
+	CHECK_FAILED(hr);
+
+	hr = Ready_ParsedObjects();
+	CHECK_FAILED(hr);
+
+
+
+	CGameObject::GAMEOBJECT_DESC ObjDesc{};
+	ObjDesc.fSpeedPerSec = 5.f;
+	ObjDesc.fRotationPerSec = ToRadian(90.f);
+	_float4x4 InitMat = _float4x4::Identity;
+	InitMat.Translation({ -25.f, 16.f, 259.5f });
+	ObjDesc.matWorld = InitMat;
+
+	// Ladder Test
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Ladder"), TEXT("Prototype_GameObject_Ladder"), &ObjDesc)))
 		return E_FAIL;
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
@@ -89,23 +106,23 @@ HRESULT CLevel_Intro::Ready_Lights()
 
 HRESULT CLevel_Intro::Ready_Layer_Camera(const wstring& strLayerTag)
 {
-	
+
 	CCamera_Main::CAMERA_KIRBY_DESC		MainCamDesc{};
 	MainCamDesc.fFovy = XMConvertToRadians(30.0f);
 	MainCamDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	MainCamDesc.fNear = 0.1f;
 	MainCamDesc.fFar = 1000.0f;
-	MainCamDesc.vEye = _float4(0.f, 2.f, -1.f, 1.f);
-	MainCamDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
+	MainCamDesc.vEye = _float4(0.f, 0.f, 0.f, 1.f);
+	MainCamDesc.vAt = _float4(0.f, -.15f, 1.f, 1.f);
 	MainCamDesc.fSpeedPerSec = 10.f;
 	MainCamDesc.fRotationPerSec = XMConvertToRadians(90.0f);
-	MainCamDesc.fOrigDistance = 20.f;
+	MainCamDesc.fOrigDistance = 28.f;
 	MainCamDesc.fCamSensor = .3f;
 
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, strLayerTag, TEXT("Prototype_GameObject_Camera_Main"), &MainCamDesc)))
 		return E_FAIL;
-		
-	
+
+
 	CCamera_Free::CAMERA_FREE_DESC		CameraDesc{};
 	CameraDesc.fMouseSensor = 0.1f;
 	CameraDesc.fFovy = XMConvertToRadians(30.0f);
@@ -119,7 +136,7 @@ HRESULT CLevel_Intro::Ready_Layer_Camera(const wstring& strLayerTag)
 
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
 		return E_FAIL;
-		
+
 	return S_OK;
 }
 
@@ -182,15 +199,22 @@ HRESULT CLevel_Intro::Ready_ParsedObjects()
 		fileStream.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
 		fileStream.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
 
+		if (fileStream.eof())
+			break;
+
 		if ("Camera" == strModelName)
 		{
 			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
+			if (fileStream.eof())
+				break;
 			camMatrices.emplace(iTriggerIndex, matWorld);
 		}
 		else if ("Trigger" == strModelName)
 		{
 			fileStream.read(reinterpret_cast<char*>(&iTriggerType), sizeof(iTriggerType));
 			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
+			if (fileStream.eof())
+				break;
 			_vector vDeterminant{};
 			matInverse = XMMatrixInverse(&vDeterminant, matWorld);
 			triggerInfos.emplace(iTriggerIndex, pair<_float4x4, _float>(matInverse, matWorld._33));
@@ -200,7 +224,8 @@ HRESULT CLevel_Intro::Ready_ParsedObjects()
 			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
 			fileStream.read(reinterpret_cast<char*>(&iCamType), sizeof(iCamType));
 			fileStream.read(reinterpret_cast<char*>(&fRadius), sizeof(fRadius));
-
+			if (fileStream.eof())
+				break;
 			_vector vDir = XMVector3Normalize(XMVectorSet(matWorld._31, matWorld._32, matWorld._33, 0));
 
 			if (CAM_FRONT == iCamType)
@@ -215,6 +240,8 @@ HRESULT CLevel_Intro::Ready_ParsedObjects()
 			fileStream.read(reinterpret_cast<char*>(&iNumRallyPoints), sizeof(iNumRallyPoints));
 			for (_uint iRallyPointIdx = 0; iRallyPointIdx < iNumRallyPoints; iRallyPointIdx++) {
 				fileStream.read(reinterpret_cast<char*>(&vRallyPointPos), sizeof(vRallyPointPos));
+				if (fileStream.eof())
+					break;
 				vecRallyPoints.push_back(_float4(vRallyPointPos.x, vRallyPointPos.y, vRallyPointPos.z, 1));
 			}
 		}
@@ -266,7 +293,8 @@ HRESULT CLevel_Intro::Ready_ParsedObjects()
 			_float3 vMin{}, vMax{};
 			fileStream.read(reinterpret_cast<char*>(&vMin), sizeof(vMin));
 			fileStream.read(reinterpret_cast<char*>(&vMax), sizeof(vMax));
-
+			if (fileStream.eof())
+				break;
 			tMapDesc.vMin = vMin;
 			tMapDesc.vMax = vMax;
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_BasicMap"), &tMapDesc)))

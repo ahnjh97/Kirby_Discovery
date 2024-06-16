@@ -98,6 +98,7 @@ public: /* For.PipeLine */
 	_float4x4 Get_Transform_Inv(CPipeLine::TRANSFORMSTATE _eState) const;
 
 	_float4 Get_CamPosition() const;
+	_float4 Get_CamLook() const;
 
 	HRESULT Add_Camera(class CCamera* pCamera);
 	HRESULT Switch_CurCamera(_int iIdx);
@@ -121,6 +122,7 @@ public: /* For.Font_Manager */
 	HRESULT Add_Font(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const wstring& strFontTag, const wstring& strFontFilePath);
 	HRESULT Render_Font(const wstring& strFontTag, const wstring & strText, const _float2 & vPosition, _fvector vColor, _float fRadian);
 	HRESULT Render_Font(const wstring& strFontTag, const wstring & strText, const _float2 & vPosition, _fvector vColor, _float fRadian, _fvector vOrigin, _gvector vScale);
+	HRESULT Render_ProjFont(_matrix _matrix, const wstring& strFontTag, const wstring& strText, const _float2& vPosition, _fvector vColor, _float fRadian, _fvector vOrigin, _gvector vScale);
 
 
 public: /* For.Target_Manager */
@@ -144,13 +146,15 @@ public: /* For.PhysX */
 	PxPhysics*				Get_Physics();
 	PxMaterial*				Get_Material();
 	PxControllerManager*	Get_ControllerManager();
-	void		AddActor(PxActor& pActor);
-	void		RemoveActor(PxActor& pActor);
+	void					AddActor(PxActor& pActor);
+	void					RemoveActor(PxActor& pActor);
+	void					Add_Force(_float3 vForce);
+	void					Kick_DynamicActor(_float3 _kickDirection, _float impulseMagnitude);
 
 	void		Test();
 	_float4x4	Update(_fmatrix matrix);
 	void		Ready_TestGround();
-	void		Overlap_Hitbox(CGameObject* pGameObject, _float4 vPos, _float fRadius);
+	//void		Overlap_Hitbox(CGameObject* pGameObject, _float4 vPos, _float fRadius);
 
 #ifdef _DEBUG
 	HRESULT Ready_RTVDebug(const wstring& strRenderTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY);

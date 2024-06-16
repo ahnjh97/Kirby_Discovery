@@ -14,6 +14,7 @@
 #include "PoppyBrosJr.h"
 #include "BG.h"
 #include "HUD.h"
+#include "Starblock.h"
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -24,7 +25,8 @@ CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 HRESULT CLevel_GamePlay::Initialize()
 {
 	m_pGameInstance->Set_RenderMode(CRenderer::MODE_TOOL);
-	CLevelChanger::Get_Instance()->Load();
+
+	//CLevelChanger::Get_Instance()->Load();
 
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
@@ -55,15 +57,14 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
 		return E_FAIL;
 
-	// Item Test
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Item"), TEXT("Prototype_GameObject_EnergyDrink"))))
+	// Ladder Test
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Ladder"), TEXT("Prototype_GameObject_Ladder"))))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Item"), TEXT("Prototype_GameObject_Coin"))))
 		return E_FAIL;
 
 	if (FAILED(Ready_Layer_MapObject(TEXT("Layer_MapObject"))))
 		return E_FAIL;
-
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
@@ -105,8 +106,6 @@ HRESULT CLevel_GamePlay::Render()
 
 HRESULT CLevel_GamePlay::Ready_Lights()
 {
-
-
 
 	//// 예시코드 1 : 태양광
 	LIGHT_DESC		LightDesc{};
@@ -488,6 +487,15 @@ HRESULT CLevel_GamePlay::Ready_Layer_MapObject(const wstring& strLayerTag)
 	HRESULT hr;
 	hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_WasteCan"));
 	CHECK_FAILED(hr);
+
+	hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_KickableRock"));
+	CHECK_FAILED(hr);
+
+	CStarBlock::STARBLOCK_DESC desc{};
+	desc.eSize = CStarBlock::MEDIUM;
+	hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_StarBlock"), &desc);
+	CHECK_FAILED(hr);
+
 	return S_OK;
 }
 
@@ -498,6 +506,7 @@ HRESULT CLevel_GamePlay::Load_FileData(const string& _strFilePath, FILE_TYPE _eF
 	if (!InputFile.is_open()) //==FALSE 
 	{
 		MSG_BOX(TEXT("Failed to Open : FileData"));
+		ALARM_FAIL(TEXT("Failed to Open : FileData"));
 		return E_FAIL;
 	}
 
@@ -623,5 +632,5 @@ void CLevel_GamePlay::Free()
 	for(auto& tex : m_pEnvTexture)
 		Safe_Release(tex);
 
-	CLevelChanger::Get_Instance()->Save();
+	//CLevelChanger::Get_Instance()->Save();
 }

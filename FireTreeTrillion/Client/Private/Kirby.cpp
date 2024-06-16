@@ -101,11 +101,19 @@ HRESULT CKirby::Initialize(void* pArg)
 	m_fMaxHp = 100.f;
 	m_fHp = 100.f;
 	m_fAttack = 5.f;
-	m_eAbilityType = ABILITY_DEFAULT;
-	//m_eAbilityType = ABILITY_BOMB;
+	//m_eAbilityType = ABILITY_DEFAULT;
+	m_eAbilityType = ABILITY_BOMB;
 
 	m_pControllerCom->RegisterAsPlayer();
 	m_pControllerCom->Register_Controller();
+
+	// 폭탄 궤적을 만들어 놓는다.
+	Ready_BombOrbit();
+
+
+	
+	Add_AnimEvent();
+
 	return S_OK;
 }
 
@@ -130,16 +138,15 @@ _int CKirby::Tick(_float fTimeDelta)
 	Kirby_SystemTick(m_fTimeDelta);
 	Other_Collision();
 
+
 	m_pWeapons->Tick(m_fTimeDelta);
 	m_pArmours->Tick(m_fTimeDelta);
 
 	if(m_pHitBoxTrigger->Is_Alive())
 		m_pHitBoxTrigger->Tick(m_fTimeDelta);
 
-	if (m_pGameInstance->Get_DIKeyState(DIK_5, KEY_DOWN))
-	{
-		m_pHitBoxTrigger->Check_Collision();
-	}
+	//if (m_pGameInstance->Get_DIKeyState(DIK_5, KEY_DOWN))
+	//	m_pHitBoxTrigger->Check_Collision();
 
 	return OBJ_NOEVENT;
 }
@@ -153,6 +160,13 @@ void CKirby::Late_Tick(_float fTimeDelta)
 
 	m_pWeapons->Late_Tick(m_fTimeDelta);
 	m_pArmours->Late_Tick(m_fTimeDelta);
+
+
+	if (m_fOrbitRenderDelay > 0.5f)
+	{
+		for (auto& Glow : m_OrbitGlows)
+			Glow->Late_Tick(fTimeDelta);
+	}
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
@@ -226,10 +240,14 @@ void CKirby::Render_IMGUI()
 		ImGui::TreePop();
 	}
 
-
+	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	ImGui::Text("HP : %d", (_int)m_fHp);
-	ImGui::Text("ChargeTime : %.2f", INFO(m_fChargeTime));
-	ImGui::Text("MoveSpeed : %.2f", INFO(m_fMoveSpeed));
+	ImGui::Text("m_bBombOrbit : %d", INFO(m_bBombOrbit));
+	ImGui::Text("m_bInitializeTargetPos : %d", m_bInitializeTargetPos);
+	ImGui::Text("m_vLadderPoint.x : %.2f, m_vLadderPoint.y : %.2f m_vLadderPoint.z : %.2f", INFO(m_vLadderPoint).x, INFO(m_vLadderPoint).y, INFO(m_vLadderPoint).z);
+	ImGui::Text("m_vLadderLook.x : %.2f, m_vLadderLook.y : %.2f m_vLadderLook.z : %.2f", INFO(m_vLadderLook).x, INFO(m_vLadderLook).y, INFO(m_vLadderLook).z);
+	ImGui::Text("m_vPos.x : %.2f, m_vPos.y : %.2f m_vPos.z : %.2f", vPos.x, vPos.y, vPos.z);
+
 	ImGui::Text("PREATTACKSTATE : %d", INFO(m_ePreAttackState));
 	ImGui::Text("TemporaryEatType : %d", INFO(m_eTemporaryEatType));
 
@@ -280,10 +298,11 @@ void CKirby::Add_AnimEvent()
 	// 1. 한 애니메이션에서 같은 이름의 이벤트 가능
 	// 2. 재생 기준은 애님툴에서 지정한 애니메이션인지 + 시작 프레임이 애니메이션 프레임안에 들어가는 지
 	// 3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
-	m_pModelCom[INFO(m_eBodyState)]->Add_Event("ApplyDamage", [this]() {
-
-		//m_pHitBox->Check_Collision();
-
+	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("ApplyDamage", [this]() {
+		m_pHitBoxTrigger->Check_Collision();
+		});
+	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("StopDamage", [this]() {
+		m_pHitBoxTrigger->Close_Collision();
 		});
 }
 
@@ -305,7 +324,7 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 			if (pObject != nullptr)
 				pObject->Set_PhyXState(PO_KIRBYMOUTH);
 
-			Delete_KirbyEffect();
+			Delete_AllEffect();
 		}
 		// 입에 머금은 상태의 몬스터
 		else if (pObject->Get_PhyXState() == PO_KIRBYMOUTH)
@@ -339,52 +358,16 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 				Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
 			}
 
-			Delete_KirbyEffect();
-		}
-	}
-
-
-}
-
-void CKirby::Other_Collision()
-{
-	if (INFO(m_pObject) != nullptr)
-	{
-		CCharacterController* pObjectController = static_cast<CCharacterController*>(INFO(m_pObject)->Get_Component(TEXT("Com_Controller")));
-		if (pObjectController != nullptr)
-			return;
-
-		
-		_float4 vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-		CTransform* pObjectTransform = INFO(m_pObject)->Get_TransformCom();
-		_float4 vObjectPos = pObjectTransform->Get_State_Vector(CTransform::STATE_POSITION);
-		_float vCurDistance = XMVectorGetX(XMVector3Length(vPos - vObjectPos));
-
-		if (vCurDistance > 0.5f)
-			return;
-
-		// 흡수중인 몬스터
-		if (INFO(m_pObject)->Get_PhyXState() == PO_VACUUMING)
-		{
-			// 일단 EAT으로 넘기는건 같으나, EAT이 끝날 시점에 내가 삼켰던 것이 무엇이였는지 판단 후 애니메이션이 분기된다.
-			INFO(m_isEat) = true;
-			INFO(m_eEyeState) = EYE_IDLE;
-			INFO(m_eMouthState) = MOUTH_ANGER;
-			Change_State(STATE_EAT, 100.f, false, false, BODY_BALLOON);
-			// 임시 보관소. 먹은게 끝났을 떄, 비로소 커비의 어빌리티 타입이 바뀐다.
-			INFO(m_eTemporaryEatType) = INFO(m_pObject)->Get_AbilityType();
-
-			INFO(m_pObject)->Set_PhyXState(PO_KIRBYMOUTH);
-
-			Delete_KirbyEffect();
+			Delete_AllEffect();
 		}
 	}
 }
 
-void CKirby::Collision_Overlap(CGameObject* pGameObject)
+void CKirby::Collision_Hitbox(CPhysXObject* pGameObject)
+
 {
-	// kirby의 뱃살에서 충돌이 일어날 경우 처리해야하는 일들
-	//MSG_BOX(TEXT("히트박스에 충돌이 일어나서 커비에 전달됨"));
+	// kirby HITBOX 충돌이 일어날 경우 처리해야하는 일들
+	// MSG_BOX(TEXT("커비 overlap 충돌"));
 }
 
 _float3 CKirby::Make_RepulsiveDir(CPhysXObject* pObject)
@@ -395,6 +378,124 @@ _float3 CKirby::Make_RepulsiveDir(CPhysXObject* pObject)
 	m_vDamegeDir = XMVector3Normalize(vPos - vObjectPos);
 
 	return XMVector3Normalize(vObjectPos - vPos);
+}
+
+void CKirby::Ready_BombOrbit()
+{
+	m_OrbitGlows.reserve(15);
+
+	CBombOrbitGlow* pBombOrbitGlow = { nullptr };
+
+	for (_int i = 0; i < 15; ++i)
+	{
+		pBombOrbitGlow = static_cast<CBombOrbitGlow*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_BombOrbitGlow")));
+		if (pBombOrbitGlow == nullptr)
+		{
+			ALARM_FAIL(TEXT("OrbitGlow Create Failed"));
+			return;
+		}
+		m_OrbitGlows.emplace_back(pBombOrbitGlow);
+	}
+
+	m_pOrbit = static_cast<CBombOrbit*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_BombOrbit")));
+	if (m_pOrbit == nullptr)
+	{
+		ALARM_FAIL(TEXT("Orbit Create Failed"));
+		return;
+	}
+}
+
+void CKirby::Update_BombOrbit(_float fTimeDelta)
+{
+
+	if (INFO(m_bBombOrbit) == true)
+	{
+		m_fOrbitRenderDelay += fTimeDelta;
+		_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		vPos.y += 0.7f;
+		if (m_bInitializeTargetPos == true)
+		{
+			_float4 vLook = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+			_float fLookOffset = 10.f;
+			_float4 FinalTargetDir = (vLook * fLookOffset);
+			INFO(m_vBombTargetDir) = FinalTargetDir;
+			m_bInitializeTargetPos = false;
+		}
+
+		// 실시간 Pos
+		INFO(m_vBombTargetPos) = vPos + INFO(m_vBombTargetDir);
+		
+		// 포물선 생성 0 ~ 15의 거리.
+		m_fOrbitTime += fTimeDelta * 0.6f;
+		if (m_fOrbitTime > 0.1f)
+			m_fOrbitTime -= 0.1f;
+
+		_bool bFind = { false };
+
+		for (_int i = 0; i < 15; i++)
+		{
+			_float fOrbitTime = m_fOrbitTime + (0.1f * (_float)i);
+
+			_float4 vOriginPos = Compute_Parabola((0.1f * (_float)i), vPos, INFO(m_vBombTargetPos));
+			m_OrbitGlows[i]->Update_GlowPosition(
+				// 현재 위치를 던진다.
+				Compute_Parabola(fOrbitTime, vPos, INFO(m_vBombTargetPos)), 
+				// 오리지날 위치를 던진다.
+				vOriginPos);
+
+			if (bFind == true)
+				continue;
+
+			_float4 vOrbitPos = { 0.f, 0.f, 0.f, 0.f };
+			_float4 vOrbitLook = { 0.f, 0.f, 0.f, 0.f };
+			_float3 vDir = XMVector3Normalize(Compute_Parabola(0.05f + (0.1f * (_float)i), vPos, INFO(m_vBombTargetPos)) - vOriginPos);
+
+			if (m_OrbitGlows[i]->RayCast_Terrain(vDir, vOrbitPos, vOrbitLook) == true && bFind == false)
+			{
+				bFind = true;
+				m_pOrbit->Update_OrbitPosition(vOrbitPos, vOrbitLook);
+
+				if (m_fOrbitRenderDelay > 0.5f)
+					m_pOrbit->Late_Tick(fTimeDelta);
+			}
+		}
+	}
+	else
+	{
+
+		if (m_bInitializeTargetPos == false)
+		{
+			m_bInitializeTargetPos = true;
+			m_fOrbitRenderDelay = 0.f;
+		}
+
+	}
+}
+
+_float4 CKirby::Compute_Parabola(_float fOrbitTime, _float4 vStartPos, _float4 vEndPos)
+{
+	// 중력 가속도 상수 (임의의 값, 필요에 따라 조정 가능)
+	const _float fGravity = 9.8f;
+
+	// 포물선 최고점 계산 (시작 y 좌표보다 5만큼 높음)
+	const _float fPeakHeight =/* vStartPos.y + */5.0f;
+
+	// 전체 시간 정의 ( 궤적 왕복시간 1.초 )
+	const _float fTotalTime = 1.0f;
+
+	// 초기 속도 계산 (y축)
+  // 최고점에서의 속도는 0이므로 v0 = sqrt(2 * g * h)에서 유도됩니다.
+	_float fInitialVelocityY = -4 * fPeakHeight * (fOrbitTime - 0.5f) * (fOrbitTime - 0.5f) + fPeakHeight;
+	// x, z 축 속도
+	_float fVelocityX = (vEndPos.x - vStartPos.x) / fTotalTime;
+	_float fVelocityZ = (vEndPos.z - vStartPos.z) / fTotalTime;
+
+	//// 현재 시간에서의 위치 계산
+	_float fCurrentX = vStartPos.x + fVelocityX * fOrbitTime;
+	_float fCurrentY = vStartPos.y + fInitialVelocityY;
+	_float fCurrentZ = vStartPos.z + fVelocityZ * fOrbitTime;
+
+	return _float4(fCurrentX, fCurrentY, fCurrentZ, 1.0f);
 }
 
 void CKirby::Setting_KirbyBalance()
@@ -475,7 +576,6 @@ void CKirby::Key_Input(_float fTimeDelta)
 		INFO(m_eBodyState) = BODY_BOOMDEFAULT;
 		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
 	}
-
 
 #pragma endregion
 }
@@ -565,8 +665,9 @@ HRESULT CKirby::Add_Components()
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
-	desc.tCapsuleShape.fHeight = 1.f;
-	desc.tCapsuleShape.fRadius = 0.5f;
+	desc.fOffset = 0.5f;
+	desc.tCapsuleShape.fHeight = 0.4f;// 1.f;
+	desc.tCapsuleShape.fRadius = 0.4f;// 0.5f;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	m_pControllerCom->Set_Object(this);
@@ -598,11 +699,12 @@ HRESULT CKirby::Add_PartObjects()
 	m_pArmours = static_cast<CKirbyArmours*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_KirbyArmours"), &ArmourDesc));
 	CHECK_NULLPTR(m_pArmours);
 
+	/* 커비의 HITBOX */
 	CTrigger::TRIGGER_DESC tTriggerDesc{};
 	tTriggerDesc.iTriggerType = CTrigger::TRIGGER_HITBOX;
-	tTriggerDesc.iTriggerIndex = 0; // kirby
-	tTriggerDesc.eCollisionGroup = HITBOX; // kirby
-	tTriggerDesc.vTriggerSize = _float3(2.f, 1.5f, 2.f); // kirby
+	tTriggerDesc.iTriggerIndex = 0;
+	tTriggerDesc.eCollisionGroup = HITBOX_PLYAER;
+	tTriggerDesc.vTriggerSize = _float3(2.f, 1.5f, 2.f);
 	m_pHitBoxTrigger = static_cast<CTrigger*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc));
 	CHECK_NULLPTR(m_pHitBoxTrigger);
 	m_pHitBoxTrigger->Set_Owner(this);
@@ -989,6 +1091,12 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 
 	// 무적 상태 관리소
 	OverPower();
+
+	// 커비의 폭탄 궤적을 생성한다.
+	Update_BombOrbit(fTimeDelta);
+
+	// 사다리 상태 초기화
+	INFO(m_bCanLadder) = false;
 }
 
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -1036,8 +1144,12 @@ void CKirby::Free()
 		Safe_Release(INFO(m_pObject));
 
 	Safe_Release(m_pHitBoxTrigger);
-	for (auto& fx : m_KirbyFXList)
-		Safe_Release(fx);
+
+	// Bomb
+	Safe_Release(m_pOrbit);
+	for (auto& Glow : m_OrbitGlows)
+		Safe_Release(Glow);
+	m_OrbitGlows.clear();
 
 }
 

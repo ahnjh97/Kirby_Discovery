@@ -18,6 +18,7 @@ public:
 		_bool		bKinematic;
 		_float3		fOffsetSize;
 		_float3		vMaterial = {0.5f, 0.5f, 0.5f};
+		_float		fDensity = {10.f};
 		CGameObject* pObj = { nullptr };
 		RIGIDBODY_DESC
 		(RIGID_SHAPE _eShapeType = { RIGID_END },
@@ -27,8 +28,9 @@ public:
 			_bool _bKinematic = { false },
 			_float3 _fOffsetSize = {},
 			_float3 _vMaterial = { 0.5f, 0.5f, 0.5f },
+			_float _fDensity = { 10.f },
 			CGameObject* _pObj = {}
-		) : eShapeType(_eShapeType), matWorld(_matWorld), bTrigger(_bTrigger), bDynamic(_bDynamic), bKinematic(_bKinematic),fOffsetSize(_fOffsetSize), vMaterial(_vMaterial), pObj(_pObj) {}
+		) : eShapeType(_eShapeType), matWorld(_matWorld), bTrigger(_bTrigger), bDynamic(_bDynamic), bKinematic(_bKinematic),fOffsetSize(_fOffsetSize), vMaterial(_vMaterial), fDensity(_fDensity), pObj(_pObj) {}
 	};
 
 private:
@@ -58,10 +60,9 @@ public:
 
 	// ³¯¸®±â
 	void				Add_Force(_float3 vForce);
-	void				Add_Torque(_float3 vTorque);
+	void				Add_Torque(_float vTorque);
 	void				Add_Velocity(_float3 vVelocity);
-
-	void				Overlap_Hitbox(CGameObject* pGameObject, _float4 vPos, _float fRadius = 1.f);
+	void				Kick_RigidBody(_float3 _kickDirection, _float impulseMagnitude);
 
 public:
 	PxTransform			Get_PxTransform();

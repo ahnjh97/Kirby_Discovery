@@ -41,11 +41,11 @@ private:
 	_bool			Window_Sequencer();
 	void			Window_PopupAlert();
 
-	_bool			Set_Projection(); 
 	_bool			Set_GizmoGrid();
 	_bool			Set_GizmoSync(CUIObject* _pUIObj); 
 
 	_bool			Edit_Transform(CUIObject* _pUIObj); 
+	_bool			Edit_Projection(CUIObject* _pUIObj);
 	_bool			Edit_RGBAColor(CUIObject* _pUIObj); 
 
 	_bool			Edit_Text();

@@ -91,12 +91,7 @@ public:
 	//FOV를 세팅한다.
 	void Set_FOVY(_float fFOVYDegree) { m_fDestFovy = XMConvertToRadians(fFOVYDegree); }
 
-	void Zoom_In(_float fZoom);
-	void Zoom_Out(_float fZoom);
-	void Zoom_Absolute(_float fZoom)
-	{
-		m_fCurDistance = fZoom;
-	}
+	void Zoom(_float fZoom)	{ m_fZoomOffset = fZoom; }
 
 	//카메라에게 특정 동작들을 시퀀스로 선예약한다.
 	//인덱스 대신, enum으로 구별하게 하기
@@ -125,6 +120,8 @@ private:
 	vector<_float4x4>	m_vecCamMatrices;
 	_int				m_iMatrixIndex = { -1 };
 
+
+	_float3 m_vCurKirbyTriggerLocalPos = { 0.f, 0.f, 0.f };
 	vector<pair<_vector, _float>>	m_vecFrontDirRadius;
 	vector<pair<_vector, _float>>	m_vecRearDirRadius;
 	vector<pair<_float4x4, _float>>	m_vecTriggerInfo; // Trigger InverseMatrix and Scale
@@ -137,11 +134,11 @@ private:
 	_float m_fLerpedRadius = {};
 
 
-	_float m_fDestUpOffset = { 0.f };
-	_float m_fCurUpOffset = { 0.f };
+	_float			m_fDestUpOffset = { 0.f };
+	_float			m_fCurUpOffset = { 0.f };
+	vector<_float>	m_CamTriggerUpOffsets = { 0.f, 0.f, 0.f, .15f, .15f, 0.f, 0.f, 0.f };
 
 /*타겟 트래킹*/
-
 
 	//현재 트래킹 설정
 	CAMFOCUS m_eCamFocus = { FOCUS_END };
@@ -157,14 +154,17 @@ private:
 	_float m_fCurDistance = { 0.f };
 	//기준 거리
 	_float m_fOrigDistance = { 0.f };
+
+
+	_float m_fZoomOffset = { 0.f };
+	//_float m_fAbsoluteZoomOffset = { 0.f };
+
 	//(시퀀스 시)시작, 목표 거리
 	_float m_fStartDistance = { 0.f };
 	_float m_fDestDistance = { 0.f };
 
 	_float3 m_vCurCamDir = {0.f, 0.f, 0.f};
 	_float3 m_vDestCamDir = { 0.f, 0.f, 0.f };
-
-
 
 
 	//카메라 움직임 감도

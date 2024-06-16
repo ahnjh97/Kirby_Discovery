@@ -34,7 +34,6 @@ void CKirbyVacuum_Spit_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		{
 			CTransform* pObjectTransform = DESC(m_pObject)->Get_TransformCom();
 			pObjectTransform->Set_Scaled(1.f, 1.f, 1.f);
-			DESC(m_pObject)->Set_PhyXState(PO_FLYAWAY);
 
 			_float4 vTargetPos = Spit_Target_Object(pKirby);
 
@@ -65,9 +64,11 @@ void CKirbyVacuum_Spit_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 				pObjectTransform->Set_State(CTransform::STATE_UP, vNewUp);
 				pObjectTransform->Set_State(CTransform::STATE_RIGHT, vNewRight);
 				pObjectTransform->Set_State(CTransform::STATE_LOOK, vNewLook);
+
+
 			}
 
-
+			DESC(m_pObject)->Set_PhyXState(PO_FLYAWAY);
 			Safe_Release(DESC(m_pObject));
 			DESC(m_pObject) = nullptr;
 		}
@@ -255,7 +256,7 @@ void CKirbyVacuum_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float f
 		}
 
 		pController->FreeFall(pTransformCom, fTimeDelta, Kirbydesc->m_fGravityOffset);
-		pKirby->Delete_KirbyEffect();
+		pKirby->Delete_AllEffect();
 
 	}
 	else if (pKirby->Get_State() == CKirby::STATE_INHALEFALL)

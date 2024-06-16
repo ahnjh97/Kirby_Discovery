@@ -69,7 +69,7 @@ HRESULT CKabu::Initialize(void* pArg)
 _int CKabu::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
-		return OBJ_DEAD;
+		return Ready_Dead();
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
@@ -241,7 +241,7 @@ void CKabu::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pOb
 	}
 }
 
-void CKabu::Collision_Overlap(CGameObject* pGameObject)
+void CKabu::Collision_Hitbox(CPhysXObject* pGameObject)
 {
 	//MSG_BOX(TEXT("KABU가 히트박스에 맞음"));
 }

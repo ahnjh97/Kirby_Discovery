@@ -35,9 +35,13 @@ static POPUP_TYPE g_eOpenPopup = { POPUP_NONE };
 static POPUP_DETAIL g_ePopupDetail = { DETAIL_NONE };
 
 static _int g_IsSuccessed = { -1 };
-static _bool g_IsOrthoProj = { TRUE };
 string g_strResult, g_strPopupTag, g_strMessage, g_strDetail = { u8" " };
 string g_strUITag = { "LayerUI" };
+
+static _bool g_IsOrthoProj = { TRUE };
+_float g_fFOV = XMConvertToRadians(30.0f);
+_float g_fNear = { 0.1f };
+_float g_fFar = { 1000.f };
 
 static void HelpMarker(const char* desc)
 {
@@ -509,9 +513,11 @@ _bool CEditor_UI::Window_Properties()
 				{
 					g_iSelectUI = g_SelectUIs.front();
 					if ((g_iSelectUI >= 0 && g_iSelectUI < m_LayerUIs.size()))
+					{
 						Edit_Transform(m_LayerUIs[g_iSelectUI]);
+						Edit_Projection(m_LayerUIs[g_iSelectUI]);
+					}
 				}
-
 				ImGui::EndTabItem();
 			}
 			ImGui::EndTabBar();
@@ -810,19 +816,7 @@ _bool CEditor_UI::Edit_Transform(CUIObject* _pUIObj)
 	
 	UIOBJ_DESC LayerUIDesc = _pUIObj->Get_UIObj_Desc();
 	(_float3)Translate = LayerUIDesc.vPos;
-
-	if (PROJ_PERSPEC == LayerUIDesc.eUIProj)
-	{
-		g_IsOrthoProj = FALSE;
-		(_float3)Rotate = LayerUIDesc.vDegree;
-	}
-
-	if (PROJ_ORTHO == LayerUIDesc.eUIProj)
-	{
-		g_IsOrthoProj = TRUE;
-		(_float)Rotate[2] = LayerUIDesc.vDegree.z;
-	}
-
+	(_float3)Rotate = LayerUIDesc.vDegree;
 	(_float3)Scale = LayerUIDesc.vSize;
 
 	if (nullptr == _pUIObj)
@@ -837,53 +831,21 @@ _bool CEditor_UI::Edit_Transform(CUIObject* _pUIObj)
 	// 기즈모 연동
 	ImGuizmo::DecomposeMatrixToComponents(UIWorldMat.m[0], Translate, Rotate, Scale);
 
+	ImGui::PushItemWidth(175.f/*ImGui::GetColumnOffset()*/);
 	ImGui::Text(u8"Translate 위치");
 	ImGui::SameLine(); HelpMarker(u8"Ctrl+T");
 	ImGui::SameLine(fTextWidth + 35);
-	ImGui::DragFloat3("##Translate", (_float*)&Translate, 1.f, (_float)-0.1 * g_iWinSizeX, (_float)g_iWinSizeX, "%.1f");
+	ImGui::DragFloat3("##Translate", (_float*)&Translate, 1.f, (_float)-0.1 * g_iWinSizeX, (_float)g_iWinSizeX, "%.2f");
 
-#pragma region SET_PROJECTION
-
-	//직교, 원근투영 옵션 스왑
-	ImGuiStyle Style = ImGui::GetStyle();
-	//ImVec2 vPrePadding = Style.FramePadding;
-	Style.FramePadding = ImVec2(20.f, 20.f);
-
-	ImGui::Text(u8"Projection 투영");
-	ImGui::SameLine(fTextWidth + 35);
-
-	if (ImGui::RadioButton(u8"Ortho 직교", g_IsOrthoProj)) { g_IsOrthoProj = TRUE; }
-	ImGui::SameLine();
-	if (ImGui::RadioButton(u8"Perspect 원근", !g_IsOrthoProj)) {	g_IsOrthoProj = FALSE;	}
-
-	ImGui::PushItemWidth(175.f/*ImGui::GetColumnOffset()*/);
 	ImGui::Text(u8"Rotate 회전");
 	ImGui::SameLine(); HelpMarker(u8"Ctrl+R");
 	ImGui::SameLine(fTextWidth + 35);
-
-	if (g_IsOrthoProj == TRUE)
-	{
-		ImGui::DragFloat("##Rotate Ortho", (_float*)&Rotate[2], 0.1f, (_int)-360, (_int)360, u8"Degree 각도 : %.1f");
-		LayerUIDesc.eUIProj = PROJ_ORTHO;
-	}
-
-	else //(g_IsOrthoProj == FALSE)
-	{
-		ImGui::DragFloat3("##Rotte Perspec", (_float*)&Rotate, 0.1f, (_int)-360, (_int)360, "%.1f");
-		LayerUIDesc.eUIProj = PROJ_PERSPEC;
-	}
-
-#pragma endregion
+	ImGui::DragFloat3("##Rotate", (_float*)&Rotate, 0.1f, (_int)-360, (_int)360, "%.2f");
 
 	ImGui::Text(u8"Size 크기");
 	ImGui::SameLine(); HelpMarker(u8"Ctrl+E");
 	ImGui::SameLine(fTextWidth + 35);
-	ImGui::DragFloat3("##Size", (_float*)&Scale, 1.f, 0.f, g_iWinSizeX, "%.1f");
-
-	//ImGui::Text(u8"Scale ");
-	//ImGui::SameLine(fTextWidth + 35);
-	//ImGui::DragFloat3("##Scale", (_float*)&Scale, 1.f, 0.f, g_iWinSizeX, "%.1f");
-	//ImGui::PopItemWidth();
+	ImGui::DragFloat3("##Size", (_float*)&Scale, 1.f, 0.f, g_iWinSizeX, "%.2f");
 
 	LayerUIDesc.vPos = (_float3)Translate;
 	LayerUIDesc.vDegree = (_float3)Rotate;
@@ -1006,30 +968,60 @@ wstring CEditor_UI::Edit_LayerUITag(string _strInput)
 
 }
 
-//보류) 직교/원근투영 스왑 (카메라 담당자와 협의 필요)
-_bool CEditor_UI::Set_Projection()
+//완료) 직교/원근 투영 조정
+_bool CEditor_UI::Edit_Projection(CUIObject* _pUIObj)
 {	
-	// 05.24) 직교투영 스페이스 변환
+	//뷰 행렬
 	//_float4x4 WorldMatrix, ViewMatrix, ProjMatrix;
 	//ViewMatrix = m_pTransformCom->Get_WorldMatrix_Inverse();
 	//m_pGameInstance->Set_Transform(CPipeLine::D3DTS_VIEW, ViewMatrix);
 
-	//// 뷰볼륨 조정
-	//_float2 ViewVolume;
-	//ViewVolume.x -= g_iWinSizeX * 0.01f;
-	//ViewVolume.y -= g_iWinSizeY * 0.01f;
+	const char* DragTag = { "Translate 위치" };
+	_float fTextWidth = ImGui::CalcTextSize(DragTag).x;
+	ImGuiSliderFlags ProjFlag = { ImGuiSliderFlags_AlwaysClamp };
+	
+	ImGui::SeparatorText(u8"Projection 투영");
 
-	//if (g_iWinSizeX <= ViewVolume.x || g_iWinSizeY <= ViewVolume.y)
-	//	return FALSE;
+	if (ImGui::RadioButton(u8"Ortho 직교", g_IsOrthoProj)) { g_IsOrthoProj = TRUE; }
+	ImGui::SameLine();
+	if (ImGui::RadioButton(u8"Perspect 원근", !g_IsOrthoProj)) { g_IsOrthoProj = FALSE; }
 
-	//ProjMatrix = XMMatrixOrthographicLH(ViewVolume.x, ViewVolume.y, 0.0f, 1600.f);
-	//m_pGameInstance->Set_Transform(CPipeLine::D3DTS_PROJ, ProjMatrix);
+	UIOBJ_DESC LayerUIDesc = _pUIObj->Get_UIObj_Desc();
+	m_UIObjDesc.eUIProj = LayerUIDesc.eUIProj;
 
-	////const CTransform* pUIEditorTrans = dynamic_cast<const CTransform*>(m_pGameInstance->
-	////	Get_Component(LEVEL_TOOL_UI, TEXT("Layer_UI"), g_strTransformTag));
-	//CTransform* pUIEditorTrans = dynamic_cast<CTransform*>(this->Get_Component(g_strTransformTag));
+	_float fFOVDegree = XMConvertToDegrees(g_fFOV);
 
-	//WorldMatrix = pUIEditorTrans->Get_WorldMatrix();
+	ImGui::Text(u8"FOV 시야각");
+	ImGui::SameLine(fTextWidth + 35);
+	ImGui::SliderFloat("##FOV", &fFOVDegree, 0.1f, 179.f, "%.2f", ProjFlag);
+
+	ImGui::Text(u8"NearZ");
+	ImGui::SameLine(fTextWidth + 35);
+	ImGui::SliderFloat("##NearZ", &g_fNear, 0.1f, 1000.f, "%.2f", ProjFlag);
+
+	ImGui::Text(u8"FarZ");
+	ImGui::SameLine(fTextWidth + 35);
+	ImGui::SliderFloat("##FarZ", &g_fFar, 0.2f, 1000.f, "%.2f", ProjFlag);
+
+	_float4x4 ProjMatrix = _pUIObj->Get_ProjMatrix();
+
+	//투영행렬 받아와서 변경 값 적용
+	if (!g_IsOrthoProj)
+	{
+		m_UIObjDesc.eUIProj = PROJ_PERSPEC;
+		XMStoreFloat4x4(&ProjMatrix, XMMatrixPerspectiveFovLH(g_fFOV, (_float) g_iWinSizeX / g_iWinSizeY, g_fNear, g_fFar));
+	}
+
+	else
+	{
+		m_UIObjDesc.eUIProj = PROJ_ORTHO;
+		XMStoreFloat4x4(&ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
+	}
+	
+	LayerUIDesc.eUIProj = m_UIObjDesc.eUIProj;
+
+	_pUIObj->Set_ProjMatrix(ProjMatrix);
+	_pUIObj->Set_UIObj_Desc(LayerUIDesc);
 
 	return TRUE;
 }
@@ -1061,9 +1053,9 @@ _bool CEditor_UI::Set_GizmoSync(CUIObject* _pUIObj)
 
 	//static _bool useSnap(false);
 	_float fGizmoSpeed[3] = {
-		0.01f,		//Translate
-		0.01f,		//Rotate
-		0.01f };		//Scale
+		0.001f,		//Translate
+		0.001f,		//Rotate
+		0.001f };		//Scale
 
 	// 뷰, 투영 행렬 정보 로드
 	_float4x4 ViewMatrix, ProjMatrix{};
@@ -1076,8 +1068,7 @@ _bool CEditor_UI::Set_GizmoSync(CUIObject* _pUIObj)
 	else //g_IsOrthoProj //== FALSE
 	{
 		XMStoreFloat4x4(&ViewMatrix, XMMatrixIdentity());
-		//ViewMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW);
-		ProjMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
+		XMStoreFloat4x4(&ProjMatrix, XMMatrixPerspectiveFovLH(g_fFOV, (_float)g_iWinSizeX / g_iWinSizeY, g_fNear, g_fFar));
 		ImGuizmo::SetOrthographic(FALSE);
 	}
 
@@ -1128,7 +1119,7 @@ void CEditor_UI::Create_UIObject(UI_STATE _eUIState, UI_TYPE _eUIType)
 		LayerUI_Desc.eUIProj = { PROJ_ORTHO }; //직교투영 기본값
 		LayerUI_Desc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f };
 		LayerUI_Desc.vSize = { 100.f, 100.f };
-		LayerUI_Desc.vPos = { 0.f, 0.f, 0.f };
+		LayerUI_Desc.vPos = { 0.f, 0.f, 1.f };
 		LayerUI_Desc.vDegree = { 0.f, 0.f, 0.f };
 		LayerUI_Desc.vColorRGB = { 1.f, 1.f, 1.f };
 		LayerUI_Desc.fAlpha = { 1.f };

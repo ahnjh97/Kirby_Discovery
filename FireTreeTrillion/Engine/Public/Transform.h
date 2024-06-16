@@ -108,6 +108,7 @@ public:
 	void Turn_Absolute(_float4 _vQuat);
 
 	void Rotation(_fvector vAxis, _float fRadian);
+	void Rotation(_float _fRadianX, _float _fRadianY, _float _fRadianZ);
 	void Orbit(_fvector vTarget, _fvector vAxis, _float fTimeDelta);
 
 	_float Get_SpeedPerSec() const { return m_fSpeedPerSec; }
