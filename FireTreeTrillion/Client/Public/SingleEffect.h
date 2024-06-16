@@ -51,6 +51,7 @@ private:
 	CShader*			m_pShaderCom = { nullptr };
 	FX_DESC				m_FXDesc = {};
 
+	_bool				m_bNoRender = { false };
 	HRESULT			Add_Components(FX_DESC& FXDesc);
 	HRESULT			Bind_ShaderResources(_int iTexIdx = 0, _int iMaskTexIdx = 0);
 
