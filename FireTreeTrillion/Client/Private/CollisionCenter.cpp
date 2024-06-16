@@ -37,9 +37,12 @@ void CCollisionCenter::Initialize()
 	m_eColliderType[HITBOX_PLYAER][MONSTER] = CONTENT_ATTACK;
 	m_eColliderType[HITBOX_MONSTER][PLAYER]  = CONTENT_ATTACK;
 
-	// For Object
+	// For 상자(OBJECT)
 	m_eColliderType[HITBOX_PLYAER][OBJECT]  = CONTENT_ATTACK;
 	//m_eColliderType[MONSTER][OBJECT]		= CONTENT_ATTACK; // 던진 몬스터와 부딪힐 때, 충돌처리
+	
+	// For 찰 수 있는 오브젝트
+	m_eColliderType[PLAYER][KICKABLE]		= CONTENT_ATTACK;
 
 	// 레디얼 기름칠
 	GAMEINSTANCE Setting_RadialBlur(5.f, 300.f);

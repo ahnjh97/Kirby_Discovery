@@ -1,6 +1,7 @@
 #pragma once
 #include "Client_Defines.h"
 #include "RigidObject.h"
+#include "Trigger.h"
 
 BEGIN(Engine)
 class CModel;
@@ -16,15 +17,16 @@ private:
 	virtual ~CKickableRock() = default;
 
 public:
-	virtual HRESULT Initialize_Prototype()			override;
-	virtual HRESULT Initialize(void* pArg)			override;
-	virtual _int	Tick(_float fTimeDelta)			override;
-	virtual void	Late_Tick(_float fTimeDelta)	override;
-	virtual HRESULT Render()						override;
-	virtual HRESULT Render_LightDepth()				override;
+	virtual HRESULT Initialize_Prototype()						override;
+	virtual HRESULT Initialize(void* pArg)						override;
+	virtual _int	Tick(_float fTimeDelta)						override;
+	virtual void	Late_Tick(_float fTimeDelta)				override;
+	virtual HRESULT Render()									override;
+	virtual HRESULT Render_LightDepth()							override;
 #ifdef _DEBUG
-	virtual void	Render_IMGUI()					override;
+	virtual void	Render_IMGUI()								override;
 #endif
+	virtual void	Collision_Hitbox(CPhysXObject* pGameObject) override;
 
 private:
 	HRESULT			Add_Components();
@@ -32,6 +34,7 @@ private:
 
 private:
 	CModel*			m_pModelCom = nullptr;
+	CTrigger*		m_pTrigger = nullptr;
 
 public:
 	static CKickableRock*	 Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

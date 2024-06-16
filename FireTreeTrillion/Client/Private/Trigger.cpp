@@ -175,34 +175,22 @@ HRESULT CTrigger::Add_Components()
 	}
 
 	/* For.Com_RigidBody */
-	if (m_eTriggerType == TRIGGER_CAM || m_eTriggerType == TRIGGER_SHADER || m_eTriggerType == TRIGGER_STAR)
+	switch (m_eTriggerType)
+	{
+	case TRIGGER_CAM:
+	case TRIGGER_SHADER:
+	case TRIGGER_STAR:
 	{
 		CRigidBody::RIGIDBODY_DESC tRigidDesc(RIGID_BOX, m_pTransformCom->Get_WorldMatrix(), true, false);
 		if (FAILED(__super::Add_Component(TEXT("Prototype_Component_RigidBody"),
 			TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &tRigidDesc)))
 			return E_FAIL;
+		m_pRigidBodyCom->SetUp_TriggerType(m_eTriggerType);
+		m_pRigidBodyCom->SetUp_TriggerIndex(m_iTriggerIndex);
 		m_pRigidBodyCom->Activate(true);
-
-		m_pRigidBodyCom->SetUp_TriggerType(m_eTriggerType);
-		m_pRigidBodyCom->SetUp_TriggerIndex(m_iTriggerIndex);
 	}
-	else if (m_eTriggerType == TRIGGER_HITBOX)
-	{
-		CRigidBody::RIGIDBODY_DESC tRigidDesc;
-		tRigidDesc.eShapeType = RIGID_BOX;
-		tRigidDesc.matWorld = m_pTransformCom->Get_WorldMatrix();
-		tRigidDesc.bTrigger = true;
-		tRigidDesc.bDynamic = false;
-		tRigidDesc.bKinematic = false;
-		tRigidDesc.fOffsetSize = m_vSize;// _float3{ 1.f, 1.5f, 1.f };
-		if(FAILED(__super::Add_Component(TEXT("Prototype_Component_RigidBody"),
-										 TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &tRigidDesc)))
-			return E_FAIL;
-		m_pRigidBodyCom->Activate(false);
-		m_pRigidBodyCom->SetUp_TriggerType(m_eTriggerType);
-		m_pRigidBodyCom->SetUp_TriggerIndex(m_iTriggerIndex);
-	}
-	else if (m_eTriggerType == TRIGGER_ITEM)
+	break;
+	case TRIGGER_HITBOX:
 	{
 		CRigidBody::RIGIDBODY_DESC tRigidDesc;
 		tRigidDesc.eShapeType = RIGID_BOX;
@@ -214,11 +202,35 @@ HRESULT CTrigger::Add_Components()
 		if (FAILED(__super::Add_Component(TEXT("Prototype_Component_RigidBody"),
 			TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &tRigidDesc)))
 			return E_FAIL;
-		m_pRigidBodyCom->Activate(true);
 		m_pRigidBodyCom->SetUp_TriggerType(m_eTriggerType);
 		m_pRigidBodyCom->SetUp_TriggerIndex(m_iTriggerIndex);
+		m_pRigidBodyCom->Activate(false);
 	}
-
+	break;
+	case TRIGGER_ITEM:
+	case TRIGGER_MAPOBJ:
+	{
+		CRigidBody::RIGIDBODY_DESC tRigidDesc;
+		tRigidDesc.eShapeType = RIGID_BOX;
+		tRigidDesc.matWorld = m_pTransformCom->Get_WorldMatrix();
+		tRigidDesc.bTrigger = true;
+		tRigidDesc.bDynamic = false;
+		tRigidDesc.bKinematic = false;
+		tRigidDesc.fOffsetSize = m_vSize;// _float3{ 1.f, 1.5f, 1.f };
+		if (FAILED(__super::Add_Component(TEXT("Prototype_Component_RigidBody"),
+			TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &tRigidDesc)))
+			return E_FAIL;
+		m_pRigidBodyCom->SetUp_TriggerType(m_eTriggerType);
+		m_pRigidBodyCom->SetUp_TriggerIndex(m_iTriggerIndex);
+		m_pRigidBodyCom->Activate(true);
+	}
+	break;
+	default:
+	{
+		ALARM_FAIL("Trigger의 타입을 지정해주지 않았습니다. Trigger가 생성되지 않습니다.");
+	}
+	break;
+	}
 	return S_OK;
 }
 

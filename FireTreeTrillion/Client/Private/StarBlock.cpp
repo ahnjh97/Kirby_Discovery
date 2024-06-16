@@ -158,7 +158,6 @@ HRESULT CStarBlock::Add_Components()
 	CHECK_FAILED(hr);
 	m_pControllerCom->Set_Object(this);
 
-
 	return S_OK;
 }
 
