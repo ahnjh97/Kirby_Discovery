@@ -64,7 +64,7 @@ _int CBuffahorn::Tick(_float fTimeDelta)
 
 	if (m_ePhyXState == PO_VACUUMING || m_ePhyXState == PO_FLYDEADAWAY)
 	{
-		// 여기에 아파하는거 넣어
+		Change_State(BUFFAHORN_DAMAGE, 50.f, false, true);
 	}
 
 	__super::Tick(m_fTimeDelta);
@@ -168,7 +168,7 @@ void CBuffahorn::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject
 		{
 			// 커비랑 몸박인데, 몸 끼리 박으면 소는 안 아파하는거 같더라
 			// 맞아 어빌리티만 공격판정인데 
-			//Change_State(BUFFAHORN_DAMAGE, 50.f, false, true);
+			Change_State(BUFFAHORN_DAMAGE, 50.f, false, true);
 		}
 	}
 	else if (eContent == CCollisionCenter::CONTENT_VACUUMOBJECT)

@@ -20,17 +20,18 @@ HRESULT CRabbit::Initialize_Prototype()
 
 HRESULT CRabbit::Initialize(void* pArg)
 {
-	GAMEOBJECT_DESC* pGameObjectDesc = nullptr;
+	RABBIT_DESC* pRabbitDesc = nullptr;
 
 	if (nullptr != pArg)
 	{
-		pGameObjectDesc = (GAMEOBJECT_DESC*)pArg;
+		pRabbitDesc = (RABBIT_DESC*)pArg;
 
-		pGameObjectDesc->fSpeedPerSec = 7.f;
-		pGameObjectDesc->fRotationPerSec = XMConvertToRadians(90.0f);
+		pRabbitDesc->fSpeedPerSec = 7.f;
+		pRabbitDesc->fRotationPerSec = XMConvertToRadians(90.0f);
+		m_eRabbitState = pRabbitDesc->eRabbitState;
 	}
 
-	if (FAILED(__super::Initialize(pGameObjectDesc)))
+	if (FAILED(__super::Initialize(pRabbitDesc)))
 		return E_FAIL;
 
 	m_eCollisionGroup = MONSTER;

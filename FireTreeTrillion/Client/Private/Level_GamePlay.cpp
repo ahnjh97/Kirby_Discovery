@@ -8,8 +8,10 @@
 #include "Trigger.h"
 #include "Kirby.h"
 #include "Awoofy.h"
+#include "Rabbit.h"
 #include "Kabu.h"
 #include "BrontoBurt.h"
+#include "PoppyBrosJr.h"
 #include "BG.h"
 #include "HUD.h"
 
@@ -350,7 +352,13 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 		}
 		else if (strModelName == "NonAnim_Rabbit")
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Rabbit"), &tempDesc)))
+			CRabbit::RABBIT_DESC RabbitDesc = {};
+			RabbitDesc.matWorld = matWorld;
+			RabbitDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			RabbitDesc.iShaderVars = iShaderVars;
+			RabbitDesc.fRimWidth = fRimWidth;
+			RabbitDesc.eRabbitState = CRabbit::RABBIT_STATE(iTriggerIndex);
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Rabbit"), &RabbitDesc)))
 				return E_FAIL;
 		}
 		else if (strModelName == "NonAnim_Buffahorn")
@@ -365,7 +373,13 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 		}
 		else if (strModelName == "NonAnim_PoppyBrosJr")
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_PoppyBrosJr"), &tempDesc)))
+			CPoppyBrosJr::POPPY_DESC PoppyDesc = {};
+			PoppyDesc.matWorld = matWorld;
+			PoppyDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			PoppyDesc.iShaderVars = iShaderVars;
+			PoppyDesc.fRimWidth = fRimWidth;
+			PoppyDesc.ePoppyState = CPoppyBrosJr::POPPY_STATE(iTriggerIndex);
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_PoppyBrosJr"), &PoppyDesc)))
 				return E_FAIL;
 		}
 		else if (strModelName == "NonAnim_CappyBody")

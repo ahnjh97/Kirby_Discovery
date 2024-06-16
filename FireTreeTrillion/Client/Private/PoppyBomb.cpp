@@ -92,12 +92,10 @@ _int CPoppyBomb::Tick(_float fTimeDelta)
 		vPos += (vVelocity + (XMVector3Normalize(m_vLookDir) * 0.2f * m_fMoveTime)) * m_fTimeDelta * 20.f;
 		m_pControllerCom->Move(m_pTransformCom, vPos, m_fTimeDelta, 0.5f);
 
-		_float fHeight = m_pControllerCom->Compute_Height(m_vLookDir);
+		//_float fHeight = m_pControllerCom->Compute_Height();
 
-		if (2.f < fHeight)
-		{
-			m_pControllerCom->FreeFall(m_pTransformCom, m_fTimeDelta, 6.f, 0.5f);
-		}
+		//if (2.f < fHeight)
+		//	m_bFall = true;
 
 		if (0.f < m_fMoveTime)
 		{
@@ -113,6 +111,8 @@ _int CPoppyBomb::Tick(_float fTimeDelta)
 
 		if (2.f < m_fLifeTime)
 			m_bDead = true;
+
+
 
 		_vector vLook = vPos - m_vBeforePos;
 		_float fDistance = XMVectorGetX(XMVector3Length(vLook)) / m_fTimeDelta;
