@@ -1,6 +1,8 @@
 #pragma once
 #include "Kirby.h"
 #include "Utils.h"
+#include "KirbyBomb.h"
+
 #define DESC(state) Kirbydesc->state
 #define GAMEINSTANCE CGameInstance::Get_Instance()->
 
@@ -925,4 +927,11 @@ static _bool Kirby_JoyStickLadder_Logic(CKirby* pKirby, CKirby::KIRBY_INFODESC* 
 	}
 
 	return false;
+}
+
+static void Throw_Bomb(CKirby::KIRBY_INFODESC* Kirbydesc, _float4 vDir, _float fPower)
+{
+	DESC(m_bBombHold) = false;
+	DESC(m_vBombThrowDir) = vDir;
+	DESC(m_fBombPower) = fPower;
 }
