@@ -99,7 +99,17 @@ void CKirbyDefault_Idle_State::Key_X(CGameObject* pGameObject, _float fTimeDelta
 		if (pKirby->Get_AbilityType() == ABILITY_BOMB)
 		{
 			DESC(m_eEyeState) = CKirby::EYE_ANGER;
-			pKirby->Change_State(CKirby::BOOMSTATE_THROW, 60.f, false, false, CKirby::BODY_BOOMDEFAULT, CKirby::OFFSET_BOOM);
+
+			// 폭탄을 들고 있어야 하는 상황!
+			DESC(m_bBombHold) = true;
+			pKirby->Change_State(CKirby::BOOMSTATE_THROWCHARGE, 60.f, true, false, CKirby::BODY_BOOMDEFAULT, CKirby::OFFSET_BOOM);
+			CKirbyBomb::KIRBYBOMB_DESC desc = {};
+			desc.pKirby = pKirby;
+			desc.pKirbyHandsMatrix = pKirby->Get_HandsMatrix();
+			desc.pKirbyWorldMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+			if (FAILED(m_pGameInstance->Add_Clone(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_Bomb"), TEXT("Prototype_GameObject_KirbyBomb"), &desc)))
+				return;
+
 		}
 		else
 		{
@@ -290,8 +300,17 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	{
 		if (pKirby->Get_AbilityType() == ABILITY_BOMB)
 		{
+			// 폭탄을 들고 있어야 하는 상황!
+			DESC(m_bBombHold) = true;
 			DESC(m_eEyeState) = CKirby::EYE_ANGER;
 			pKirby->Change_State(CKirby::BOOMSTATE_BOOMSHOOT, 60.f, false, false, CKirby::BODY_BOOMDEFAULT, CKirby::OFFSET_BOOM);
+
+			CKirbyBomb::KIRBYBOMB_DESC desc = {};
+			desc.pKirby = pKirby;
+			desc.pKirbyHandsMatrix = pKirby->Get_HandsMatrix();
+			desc.pKirbyWorldMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+			if (FAILED(m_pGameInstance->Add_Clone(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_Bomb"), TEXT("Prototype_GameObject_KirbyBomb"), &desc)))
+				return;
 		}
 		else
 		{
@@ -717,7 +736,14 @@ void CKirbyDefault_Jump_State::Key_X(CGameObject* pGameObject, _float fTimeDelta
 		else if (pKirby->Get_AbilityType() == ABILITY_BOMB)
 		{
 			pController->Reset_FallVelocity();
-			//DESC(m_vMoveDir) = DESC(m_vTargetDir);
+			// 폭탄을 들고 있어야 하는 상황!
+			DESC(m_bBombHold) = true;
+			CKirbyBomb::KIRBYBOMB_DESC desc = {};
+			desc.pKirby = pKirby;
+			desc.pKirbyHandsMatrix = pKirby->Get_HandsMatrix();
+			desc.pKirbyWorldMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+			if (FAILED(m_pGameInstance->Add_Clone(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_Bomb"), TEXT("Prototype_GameObject_KirbyBomb"), &desc)))
+				return;
 			pKirby->Change_State(CKirby::BOOMSTATE_BOOMFALL, 60.f, true, false, CKirby::BODY_BOOMDEFAULT, CKirby::OFFSET_BOOM);
 		}
 	}

@@ -165,6 +165,9 @@ void CKirby::Late_Tick(_float fTimeDelta)
 
 	if (m_fOrbitRenderDelay > 0.5f)
 	{
+		// 조준했당께요!
+		INFO(m_bBombAimming) = true;
+
 		for (auto& Glow : m_OrbitGlows)
 			Glow->Late_Tick(fTimeDelta);
 	}
@@ -420,7 +423,7 @@ void CKirby::Update_BombOrbit(_float fTimeDelta)
 		if (m_bInitializeTargetPos == true)
 		{
 			_float4 vLook = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
-			_float fLookOffset = 10.f;
+			_float fLookOffset = 6.f;
 			_float4 FinalTargetDir = (vLook * fLookOffset);
 			INFO(m_vBombTargetDir) = FinalTargetDir;
 			m_bInitializeTargetPos = false;
@@ -453,6 +456,8 @@ void CKirby::Update_BombOrbit(_float fTimeDelta)
 			_float4 vOrbitPos = { 0.f, 0.f, 0.f, 0.f };
 			_float4 vOrbitLook = { 0.f, 0.f, 0.f, 0.f };
 			_float3 vDir = XMVector3Normalize(Compute_Parabola(0.05f + (0.1f * (_float)i), vPos, INFO(m_vBombTargetPos)) - vOriginPos);
+			if (i == 0 && m_fOrbitRenderDelay > 0.5f)
+				INFO(m_vBombThrowDir) = XMVectorSetW(vDir, 0.f);
 
 			if (m_OrbitGlows[i]->RayCast_Terrain(vDir, vOrbitPos, vOrbitLook) == true && bFind == false)
 			{

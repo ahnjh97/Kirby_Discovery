@@ -744,7 +744,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// For Kirby Weapon
 		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("KirbyBombDefault", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbyBombDefault", TYPE_ANIM, 1.3f, 180.f);
 
 		// For Kirby Armour
 		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
