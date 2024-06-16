@@ -39,6 +39,7 @@ public:
 #ifdef _DEBUG
 	virtual void	Render_IMGUI()										override;
 #endif
+	CPhysXObject*	Get_Owner() const { return m_pOwner; }
 	void			Set_Owner(class CPhysXObject* pObj);
 	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 	virtual void	Collision_Hitbox(CPhysXObject* pGameObject)			override;
@@ -65,6 +66,7 @@ private:
 private:
 	TRIGGER			m_eTriggerType = { TRIGGER_END };
 	_int			m_iTriggerIndex = { -1 };
+	_float			m_fTriggerOffTime = {0.f};
 
 public:
 	static CTrigger*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

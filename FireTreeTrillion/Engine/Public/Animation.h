@@ -23,6 +23,7 @@ public:
 
 	void Reset_TrackPosition() {
 		m_fTrackPosition = 0.f;
+		m_preTrackPosition = 0.f;
 		for (_uint i = 0; i < m_iNumChannels; ++i)
 		{
 			m_CurrentKeyFrameIndices[i] = 0;
@@ -67,9 +68,10 @@ public:
 private:
 	_char								m_szName[MAX_PATH] = { "" };
 	
-	_float								m_fDuration = { 0.0f };		 /* 전체 재생 길이. */
-	_float								m_fTickPerSecond = { 0.0f }; /* 초당 얼마나 재생을 해야하는가 (속도) */
-	_float								m_fTrackPosition = { 0.0f }; /* 현재 애니메이션이 어디까지 재생되었는지"? */
+	_float								m_fDuration = { 0.0f };		  /* 전체 재생 길이. */
+	_float								m_fTickPerSecond = { 0.0f };  /* 초당 얼마나 재생을 해야하는가 (속도) */
+	_float								m_fTrackPosition = { 0.0f };  /* 현재 애니메이션이 어디까지 재생되었는지"? */
+	_float								m_preTrackPosition = { 0.f }; // 애니메이션이 이전 틱에서 지나간 키프레임
 
 	_uint								m_iNumChannels = { 0 };
 	vector<class CChannel*>				m_Channels;

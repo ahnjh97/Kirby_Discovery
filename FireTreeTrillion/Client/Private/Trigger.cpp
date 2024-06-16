@@ -55,7 +55,17 @@ _int CTrigger::Tick(_float fTimeDelta)
 
 		_float4 vNewPos = vLook + _float4(vPos.x, vPos.y + 1.f, vPos.z, 1.f);
 		m_pRigidBodyCom->Set_PxWorldMatrix(m_pOwnerTransform->Get_WorldFloat4x4());
-		return OBJ_DEAD;
+
+		// 트리거 시간제한 조건
+		if (m_bAlive)
+			m_fTriggerOffTime += m_pOwner->Get_ObjTimeDelta();
+		if (m_fTriggerOffTime >= 0.2f)
+		{
+			Close_Collision();
+			m_fTriggerOffTime = 0.f;
+		}
+
+		return OBJ_NOEVENT;
 	}
 	else if (m_eTriggerType == TRIGGER_ITEM || m_eTriggerType == TRIGGER_MAPOBJ)
 	{
@@ -112,8 +122,7 @@ void CTrigger::Collision_Hitbox(CPhysXObject* pGameObject)
 	// HitBox 충돌 처리
 	if(m_bAlive)
 		m_pOwner->Collision_Hitbox(pGameObject);
-
-	Close_Collision();
+	//Close_Collision();
 }
 
 void CTrigger::Check_Collision()
@@ -194,12 +203,12 @@ HRESULT CTrigger::Add_Components()
 	case TRIGGER_HITBOX:
 	{
 		CRigidBody::RIGIDBODY_DESC tRigidDesc;
-		tRigidDesc.eShapeType = RIGID_BOX;
-		tRigidDesc.matWorld = m_pTransformCom->Get_WorldMatrix();
-		tRigidDesc.bTrigger = true;
-		tRigidDesc.bDynamic = false;
+		tRigidDesc.eShapeType = RIGID_SPHERE;
+		tRigidDesc.matWorld   = m_pTransformCom->Get_WorldMatrix();
+		tRigidDesc.bTrigger   = true;
+		tRigidDesc.bDynamic   = false;
 		tRigidDesc.bKinematic = false;
-		tRigidDesc.fOffsetSize = m_vSize;// _float3{ 1.f, 1.5f, 1.f };
+		tRigidDesc.fOffsetSize = m_vSize;
 		if (FAILED(__super::Add_Component(TEXT("Prototype_Component_RigidBody"),
 			TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &tRigidDesc)))
 			return E_FAIL;

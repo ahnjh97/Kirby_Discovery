@@ -78,7 +78,7 @@ void CAnimation::Invalidate_TransformationMatrix(_float fTimeDelta, const vector
 
 	m_IsFinished = false;
 
-	_float preTrackPosition = m_fTrackPosition;
+	//_float preTrackPosition = m_fTrackPosition;
 	m_fTrackPosition += m_fTickPerSecond * fTimeDelta;
 
 	// 해당 애니메이션에서, 프레임 사이에 있는 이벤트 이름을 알아온다.
@@ -87,11 +87,13 @@ void CAnimation::Invalidate_TransformationMatrix(_float fTimeDelta, const vector
 	{
 		for (auto& eventInfo : m_vecEventInfo)
 		{
-			if ((_int)m_fTrackPosition == eventInfo.iStartFrame)
+			if (m_preTrackPosition < eventInfo.iStartFrame &&
+				eventInfo.iStartFrame <= m_fTrackPosition)
 			{
 				model->CallEvent(eventInfo.strEventName);
 			}
 		}
+		m_preTrackPosition = m_fTrackPosition;
 	}
 
 	if (m_fDuration <= m_fTrackPosition)

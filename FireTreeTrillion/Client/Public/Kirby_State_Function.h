@@ -4,6 +4,8 @@
 #include "SingleEffect.h"
 #include "MultiEffect.h"
 
+#include "KirbyBomb.h"
+
 #define DESC(state) Kirbydesc->state
 #define GAMEINSTANCE CGameInstance::Get_Instance()->
 
@@ -997,3 +999,11 @@ static void SwordSpinSlash_One(CTransform* pTransformCom)
 		return;
 }
 #pragma endregion 
+}
+
+static void Throw_Bomb(CKirby::KIRBY_INFODESC* Kirbydesc, _float4 vDir, _float fPower)
+{
+	DESC(m_bBombHold) = false;
+	DESC(m_vBombThrowDir) = vDir;
+	DESC(m_fBombPower) = fPower;
+}

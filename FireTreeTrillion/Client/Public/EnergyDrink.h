@@ -33,8 +33,9 @@ private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
 
-	CGameObject* m_pPlayer = { nullptr };
-	CModel*		 m_pModelCom = { nullptr };
+	CGameObject*	 m_pPlayer = { nullptr };
+	CModel*			 m_pModelCom = { nullptr };
+	class CTrigger*	 m_pTrigger = nullptr;
 
 	_float		 m_fDrinkTime = { 0.f };
 

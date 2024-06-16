@@ -14,8 +14,10 @@ PxFilterFlags CustomFilterShader(PxFilterObjectAttributes attributes0, PxFilterD
     PxFilterObjectAttributes attributes1, PxFilterData filterData1,
     PxPairFlags& pairFlags, const void* constantBlock, PxU32 constantBlockSize)
 {
-    // 기본 충돌 처리
+    // 모든 충돌을 감지하도록 설정
     pairFlags = PxPairFlag::eCONTACT_DEFAULT;
+    pairFlags |= PxPairFlag::eNOTIFY_TOUCH_FOUND;
+    pairFlags |= PxPairFlag::eNOTIFY_TOUCH_LOST;
     return PxFilterFlag::eDEFAULT;
 }
 
@@ -261,6 +263,7 @@ PxRigidDynamic* CPhysX::CreateDynamicActor(_float4x4& matWorld, _float3* pVertic
         pDynamicActor->release();
         return nullptr;
     }
+    pShape->setSimulationFilterData(PxFilterData(0, 0, 0, 0));
 
     pDynamicActor->attachShape(*pShape);
     m_pScene->addActor(*pDynamicActor);
@@ -328,6 +331,7 @@ PxRigidStatic* CPhysX::CreateStaticActor(_float4x4& matWorld, _float3* pVertices
     }
     else
         pShape = m_pPhysics->createShape(triGeom, *pMaterial);
+    pShape->setSimulationFilterData(PxFilterData(0, 0, 0, 0));
 
     pStaticActor->attachShape(*pShape);
     m_pScene->addActor(*pStaticActor);

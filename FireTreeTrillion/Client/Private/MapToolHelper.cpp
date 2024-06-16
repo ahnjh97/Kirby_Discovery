@@ -72,11 +72,13 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	m_setRallyingMonsters = { "NonAnim_Kabu", "NonAnim_BrontoBurt" };
 
 	/*m_setNonColDecos = { "BushMCut" };*/
-	m_setAnimDecos = { "BushM", "PopFlower" };
-	m_setActorDecos = { "GsBenchAL", "GsFlowerPotAL", "GsFlowerPotBL", "GsSteelFenceA", "GsSteelFenceB"
-		, "GsTreeA", "GsTreeB", "GsTreeC", "GsWallRockA", "GsWallRockB"
+	m_setAnimDecos = { "BushL", "BushM", "BushS", "PopFlower" };
+	m_setActorDecos = {  "CmBuilding1stRoof", "CMGuardrailAL", "CMGuardrailBL"
+		, "CMStreeLightLampA", "CMStreeLightLampE", "CMWaterTankL"
+		, "GsBenchAL", "GsCircleBench", "GsFlowerPotAL", "GsFlowerPotBL", "GsSteelFenceA"
+		, "GsSteelFenceB", "GsTreeA", "GsTreeB", "GsTreeC", "GsWallRockA", "GsWallRockB"
 		, "GsWoodBridgeA", "GsWoodBridgeB", "GsRockCL", "GsRockDL", "GsRockEL", "GsRockFL", "GsRockGL"
-		, "JgGrassB", "JgGrassL", "JgGrasslongB", "JgGrassN", "JgWoodD"
+		, "JgGrassB", "JgGrassL", "JgGrasslongB", "JgGrassN", "JgWoodD", "JgGrassO"
 		, "StarBlockL" , "StarBlockM", "StarBlockS", "WoodBox"
 		, "SeDriftWoodAL", "SeDriftWoodBL", "SeDriftWoodCL" };
 	m_setKickableDecos = { "GsPebble", "GsStone", "SeShell" };

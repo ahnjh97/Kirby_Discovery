@@ -21,6 +21,7 @@ public:
 
 public:
 	_float m_fAirThrowTime = { 0.f };
+	_bool m_bThrowTrigger = { true };
 	static	CKirbyBoom_Fall_State* Create();
 	virtual void			   Free() override;
 
@@ -44,7 +45,8 @@ public:
 	virtual void OnStateExit()														override;
 
 public:
-	_float m_fThrowTime = { 0.f };
+	_float  m_fThrowTime = { 0.f };
+	_bool	m_bThrowTrigger = { true };
 	static	CKirbyBoom_Attack_State* Create();
 	virtual void			   Free() override;
 

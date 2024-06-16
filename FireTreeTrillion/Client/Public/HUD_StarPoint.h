@@ -49,6 +49,8 @@ private:
 
 	HUD_STARPOINT				m_ePreState = { STARPOINT_NONE };
 	HUD_STARPOINT				m_eCurState = { STARPOINT_NONE };
+
+	class CKirby*				m_pKirby = nullptr;
 };
 
 

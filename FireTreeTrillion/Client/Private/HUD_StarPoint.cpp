@@ -74,6 +74,9 @@ HRESULT CHUD_StarPoint::Initialize(void* _pArg)
 	m_eCurState = STARPOINT_WAIT;
 	m_ePreState = STARPOINT_HIDE;
 
+	m_pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+	CHECK_NULLPTR(m_pKirby);
+
 	return S_OK;
 }
 
@@ -83,41 +86,38 @@ _int CHUD_StarPoint::Tick(_float fTimeDelta)
 
 #pragma region STARPOINT(COIN) LOOT 코인 획득 처리
 
-	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
-	//if (pKirby == nullptr)
-	//	return;
-
+	_uint iCount = m_pKirby->Get_Coin();
 
 #pragma endregion
 	
 	Update_UIState(fTimeDelta);
 
 	//현재 키입력으로 확인 가능
-	if (m_pGameInstance->Get_DIKeyState(DIK_1, KEY_DOWN))
-	{
+	//if (m_pGameInstance->Get_DIKeyState(DIK_1, KEY_DOWN))
+	//{
 		m_fAccTime = 0.f;
 		m_eCurState = STARPOINT_LOOT;
 
 		if (m_UIObjDesc.wstrUITag == TEXT("Font10") || m_UIObjDesc.wstrUITag == TEXT("Font10_Shadow"))
 		{
-			_uint iCount = stoi(m_UIObjDesc.wstrText);
+			/*iCount = stoi(m_UIObjDesc.wstrText);
 			_uint iFont10 = (iCount / 10) % 10;
 
 			if (iFont10 > 0)
 				m_bIsRender = TRUE;
 
-			m_bIsRender = FALSE;
+			m_bIsRender = FALSE;*/
 		}
 		if (m_UIObjDesc.wstrUITag == TEXT("Font1") || m_UIObjDesc.wstrUITag == TEXT("Font1_Shadow"))
 		{
-			_uint iCount = stoi(m_UIObjDesc.wstrText);
-			iCount++;
+			// iCount 하시오.
+			//iCount = stoi(m_UIObjDesc.wstrText);
+			//iCount++;
 
 			_uint iFont1 = iCount % 10;
 			m_UIObjDesc.wstrText = to_wstring(iFont1);
 		}
-	}
-	
+	//}
 
 	return OBJ_NOEVENT;
 }

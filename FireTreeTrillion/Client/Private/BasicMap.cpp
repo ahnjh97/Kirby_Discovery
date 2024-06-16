@@ -56,8 +56,12 @@ HRESULT CBasicMap::Initialize(void* pArg)
 
         m_pOcTree = m_pModelCom->Create_OcTree(GameObjectDesc.vMin, GameObjectDesc.vMax, m_vecPassIndices, m_vecSamplingFactors, vecConstantNames);
         
+        m_ModelShapeRadiiMap.emplace(string("BushL"), 1.2f);
+        m_ModelAnimSettingsMap.emplace(string("BushL"), pair<_uint, _float>(0, 60.f));
         m_ModelShapeRadiiMap.emplace(string("BushM"), 1.f);
         m_ModelAnimSettingsMap.emplace(string("BushM"), pair<_uint, _float>(0, 60.f));
+        m_ModelShapeRadiiMap.emplace(string("BushS"), 0.6f);
+        m_ModelAnimSettingsMap.emplace(string("BushS"), pair<_uint, _float>(0, 60.f));
         m_ModelShapeRadiiMap.emplace(string("PopFlower"), 0.6f);
         m_ModelAnimSettingsMap.emplace(string("PopFlower"), pair<_uint, _float>(1, 200.f));
 

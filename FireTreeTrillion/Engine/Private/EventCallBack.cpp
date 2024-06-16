@@ -11,6 +11,9 @@ void CEventCallBack::onTrigger(PxTriggerPair* pairs, PxU32 count)
         for (auto& controllerActor : m_vecControllers) // 컨트롤러들을 따로 받아놓아 데이터를 읽어온다.
         {
             PxActor* TriggerActor = pairs[i].triggerActor;
+            if (pairs[i].otherActor == nullptr) continue;
+            if (controllerActor.first == nullptr || controllerActor.second == nullptr) continue;
+            
             if (controllerActor.first == pairs[i].otherActor)
             {
                 // Trigger (HITBOX 혹은 ITEM)
@@ -79,6 +82,23 @@ void CEventCallBack::onTrigger(PxTriggerPair* pairs, PxU32 count)
 
 void CEventCallBack::onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs)
 {
+    for (PxU32 i = 0; i < nbPairs; i++)
+    {
+        const PxContactPair& cp = pairs[i];
+
+        // 충돌 이벤트 플래그 확인
+        if (cp.events & PxPairFlag::eNOTIFY_TOUCH_FOUND) 
+        {
+            // 첫 번째 객체가 StaticRigid이고 두 번째 객체가 DynamicRigid인 경우
+            if (pairHeader.actors[0]->is<PxRigidStatic>() && pairHeader.actors[1]->is<PxRigidDynamic>()) {
+                printf("StaticRigid collided with DynamicRigid\n");
+            }
+            // 첫 번째 객체가 DynamicRigid이고 두 번째 객체가 StaticRigid인 경우
+            else if (pairHeader.actors[0]->is<PxRigidDynamic>() && pairHeader.actors[1]->is<PxRigidStatic>()) {
+                printf("DynamicRigid collided with StaticRigid\n");
+            }
+        }
+    }
 }
 
 void CEventCallBack::Clear_EventCallBack()

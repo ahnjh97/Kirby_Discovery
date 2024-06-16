@@ -99,13 +99,20 @@ public:
 		_bool			m_bUpWardSlash = { false };
 
 		// Ability Bomb
-		// 포물선 점선을 랜더할 상황인가?
+		// 폭탄을 들고 있어야하는 상황인가?
+		_bool			m_bBombHold = { true };
+		// 포물선 점선을 랜더준비 할 상황인가?
 		_bool			m_bBombOrbit = { false };
 		// 폭탄의 목표 타겟 (커비 기준 방향벡터이다)
 		_float4			m_vBombTargetDir = { 0.f, 0.f, 0.f, 0.f };
 		// 폭탄의 목표 최종 타겟
 		_float4			m_vBombTargetPos = { 0.f, 0.f, 0.f, 0.f };
-
+		// 폭탄을 던지는 방향
+		_float4			m_vBombThrowDir = { 0.f, 0.f, 0.f, 0.f };
+		// 폭탄을 던지는 힘
+		_float			m_fBombPower = { 0.f };
+		// 조준 했을 때 들어오는 bool 값
+		_bool			m_bBombAimming = { false };
 	}KIRBY_INFODESC;
 
 
@@ -138,14 +145,19 @@ public:
 	void			Change_State(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, BODYSTATE eBody, _uint iOffSet = 0);
 	void			Set_Animation(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
 	void			Set_Animation(_int iAnimIndex);
+	_uint			Get_Coin() const { return m_uCoin; }
+	void			Plus_Coin(_uint Coin) {
+		m_uCoin += Coin;
+	}
 
 	_bool			isAnimFinish();
 	void			DefaultIdle();
 
 	_float4			Compute_TerrainPosition();
-
 	// 현재 커비가 무적상태인지 아닌지 판별하는 부울 값
 	_bool			isOverPower() { return m_bOverPower; }
+	// 손에 쥐고있어야 할 때, 필요한 행렬 포인터
+	_float4x4*		Get_HandsMatrix()  { return &m_ArmourMatrix; }
 
 
 	// 기타 세부적인 제어
@@ -171,7 +183,7 @@ private:
 
 	CTexture*				m_pEyeTexture[EYE_END] = { nullptr };
 	CTexture*				m_pMouthTexture[MOUTH_END] = { nullptr };
-	class CCamera*		m_pCamera = { nullptr };
+	class CCamera*			m_pCamera = { nullptr };
 
 private:
 	void		   Update_PartObjectMatrix();
@@ -189,6 +201,7 @@ private:
 	_float				  m_fOverPowerTime = { 0.f };
 	_float				  m_fFlashOverPowerTime = { 0.f };
 	_float				  m_fPreHp = { 0.f };
+	_uint				  m_uCoin = { 0 };
 
 	// For Bomb
 	vector<CBombOrbitGlow*> m_OrbitGlows;
@@ -198,7 +211,9 @@ private:
 	_float4 Compute_Parabola(_float fOrbitTime, _float4 vStartPos, _float4 vEndPos);
 	_bool				  m_bInitializeTargetPos = { true };
 	_float				  m_fOrbitTime = { 0.f };
+	// 폭탄 조준시간. 0.5초가 넘어가면 그제서야 진짜 찐 조준을 한것이다.
 	_float				  m_fOrbitRenderDelay = { 0.f };
+
 
 	_int				  m_iTestAnim = { 0 };
 
