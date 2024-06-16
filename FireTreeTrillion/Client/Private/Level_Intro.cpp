@@ -86,6 +86,8 @@ HRESULT CLevel_Intro::Ready_Lights()
 	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
 		return E_FAIL;
 
+	CGameInstance::Get_Instance()->Setting_GodRay({320.f, 600.f, 1800.f, 1.f});
+
 	return S_OK;
 }
 
@@ -187,6 +189,8 @@ HRESULT CLevel_Intro::Ready_ParsedObjects()
 		if ("Camera" == strModelName)
 		{
 			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
+			if (fileStream.eof())
+				break;
 			camMatrices.emplace(iTriggerIndex, matWorld);
 		}
 		else if ("Trigger" == strModelName)
@@ -195,6 +199,8 @@ HRESULT CLevel_Intro::Ready_ParsedObjects()
 			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
 			_vector vDeterminant{};
 			matInverse = XMMatrixInverse(&vDeterminant, matWorld);
+			if (fileStream.eof())
+				break;
 			triggerInfos.emplace(iTriggerIndex, pair<_float4x4, _float>(matInverse, matWorld._33));
 		}
 		else if ("Dummy" == strModelName)
@@ -202,7 +208,8 @@ HRESULT CLevel_Intro::Ready_ParsedObjects()
 			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
 			fileStream.read(reinterpret_cast<char*>(&iCamType), sizeof(iCamType));
 			fileStream.read(reinterpret_cast<char*>(&fRadius), sizeof(fRadius));
-
+			if (fileStream.eof())
+				break;
 			_vector vDir = XMVector3Normalize(XMVectorSet(matWorld._31, matWorld._32, matWorld._33, 0));
 
 			if (CAM_FRONT == iCamType)
@@ -217,6 +224,8 @@ HRESULT CLevel_Intro::Ready_ParsedObjects()
 			fileStream.read(reinterpret_cast<char*>(&iNumRallyPoints), sizeof(iNumRallyPoints));
 			for (_uint iRallyPointIdx = 0; iRallyPointIdx < iNumRallyPoints; iRallyPointIdx++) {
 				fileStream.read(reinterpret_cast<char*>(&vRallyPointPos), sizeof(vRallyPointPos));
+				if (fileStream.eof())
+					break;
 				vecRallyPoints.push_back(_float4(vRallyPointPos.x, vRallyPointPos.y, vRallyPointPos.z, 1));
 			}
 		}
@@ -268,7 +277,8 @@ HRESULT CLevel_Intro::Ready_ParsedObjects()
 			_float3 vMin{}, vMax{};
 			fileStream.read(reinterpret_cast<char*>(&vMin), sizeof(vMin));
 			fileStream.read(reinterpret_cast<char*>(&vMax), sizeof(vMax));
-
+			if (fileStream.eof())
+				break;
 			tMapDesc.vMin = vMin;
 			tMapDesc.vMax = vMax;
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_BasicMap"), &tMapDesc)))

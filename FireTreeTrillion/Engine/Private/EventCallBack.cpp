@@ -38,11 +38,8 @@ void CEventCallBack::onTrigger(PxTriggerPair* pairs, PxU32 count)
                 auto iter = m_TriggerToMapDecoAnimMap.find(pairs[i].triggerActor);
                 if (iter != m_TriggerToMapDecoAnimMap.end())
                 {
-                    for (auto& pRenderingModel : iter->second)
-                    {
-                        if (find(m_vecRenderingAnimDecos.begin(), m_vecRenderingAnimDecos.end(), pRenderingModel) != m_vecRenderingAnimDecos.end())
-                            pRenderingModel->Set_Animation(0, 50, false, true);
-                    }
+                    CModel* pMapDeco = get<0>(iter->second);
+                    pMapDeco->Set_Animation(get<1>(iter->second), get<2>(iter->second), false, true);
                 }
             }
         }
@@ -51,24 +48,9 @@ void CEventCallBack::onTrigger(PxTriggerPair* pairs, PxU32 count)
 
 void CEventCallBack::Clear_EventCallBack()
 {
-    if (!m_Triggers.empty())
-    {
-        for (auto& tuple : m_Triggers)
-        {
-            if (nullptr != get<0>(tuple))
-                get<0>(tuple)->release();
-        }
-    }
     m_Triggers.clear();
     m_TriggerFuncs.clear();
     m_ExitFuncs.clear();
-}
-
-void CEventCallBack::Clear_RenderingAnimDecoVector()
-{
-    for (auto& renderingAnimDeco : m_vecRenderingAnimDecos)
-        Safe_Release(renderingAnimDeco);
-    m_vecRenderingAnimDecos.clear();
 }
 
 _bool CEventCallBack::IsActorInTriggerList(PxActor* pRigidActor)

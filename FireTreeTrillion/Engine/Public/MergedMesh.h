@@ -18,7 +18,7 @@ public:
 	virtual HRESULT Initialize(void* pArg) override;
 
 public:
-	HRESULT CreateStaticActor(_float4 vPos);
+	HRESULT CreateStaticActor(_float4x4& matWorld);
 	_float4 Get_PickPos(const class CTransform* pTransform) const;
 	void Find_MinMax(_float3& vMin, _float3& vMax);
 	void SetUpShaderInfo(const string& strModelName, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors);

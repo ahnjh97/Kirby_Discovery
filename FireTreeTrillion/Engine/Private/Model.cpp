@@ -210,18 +210,18 @@ HRESULT CModel::RenderMergedMesh()
 	return S_OK;
 }
 
-HRESULT CModel::CreateDynamicActor(_float4 vPos)
+HRESULT CModel::CreateDynamicActor(_float4x4& matWorld)
 {
 	for (auto& mesh : m_Meshes)
-		mesh->CreateDynamicActor(vPos);
+		mesh->CreateDynamicActor(matWorld);
 
 	return S_OK;
 }
 
-HRESULT CModel::CreateStaticActor(_float4 vPos)
+HRESULT CModel::CreateStaticActor(_float4x4& matWorld)
 {
 	for (auto& mesh : m_Meshes)
-		mesh->CreateStaticActor(vPos);
+		mesh->CreateStaticActor(matWorld);
 
 	return S_OK;
 }
@@ -271,6 +271,20 @@ void CModel::Find_MinMax(_float3& vMin, _float3& vMax)
 {
 	for (auto& mesh : m_Meshes)
 		mesh->Find_MinMax(vMin, vMax);
+}
+
+void CModel::Find_MinMax_WorldPos(_float3& vMin, _float3& vMax)
+{
+	Find_MinMax(vMin, vMax);
+	_vector vMinPos = XMVectorSetW(XMLoadFloat3(&vMin), 1);
+	_vector vMaxPos = XMVectorSetW(XMLoadFloat3(&vMax), 1);
+	_matrix matWorld = XMLoadFloat4x4(&m_matWorld);
+
+	vMinPos = XMVector3TransformCoord(vMinPos, matWorld);
+	vMaxPos = XMVector3TransformCoord(vMaxPos, matWorld);
+
+	XMStoreFloat3(&vMin, vMinPos);
+	XMStoreFloat3(&vMax, vMaxPos);
 }
 
 COcTree* CModel::Create_OcTree(_float3 vMin, _float3 vMax, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors

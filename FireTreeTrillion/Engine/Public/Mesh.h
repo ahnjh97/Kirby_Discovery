@@ -34,8 +34,8 @@ public:
 public:
 	HRESULT Stock_Matrices(const vector<CBone*>& Bones, _float4x4* pMeshBoneMatrices);
 
-	HRESULT CreateDynamicActor(_float4 vPos);
-	HRESULT CreateStaticActor(_float4 vPos);
+	HRESULT CreateDynamicActor(_float4x4& matWorld);
+	HRESULT CreateStaticActor(_float4x4& matWorld);
 
 	_float4 Get_PickPos(const class CTransform* pTransform) const;
 

@@ -651,8 +651,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		// For Mab Interactive Object
 		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM);
 
-		m_vecModelInfo.emplace_back("BushM", TYPE_ANIM, 1.f, 0.f, 0, false, string("OptimizedMapDecos/"));
-		m_vecModelInfo.emplace_back("PopFlower", TYPE_ANIM, 1.f, 0.f, 0, false, string("OptimizedMapDecos/"));
+		m_vecModelInfo.emplace_back("BushM", TYPE_ANIM, 1.f, 0.f, 0, false, string("MapDeco/"));
+		m_vecModelInfo.emplace_back("GsWoodBridgeA", TYPE_NONANIM, 1.f, 0.f, 0, false, string("MapDeco/"));
+		m_vecModelInfo.emplace_back("PopFlower", TYPE_ANIM, 1.f, 0.f, 0, false, string("MapDeco/"));
 	}
 	else if (eLevel == LEVEL_GAMEPLAY)
 	{

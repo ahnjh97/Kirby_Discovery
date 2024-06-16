@@ -258,18 +258,18 @@ HRESULT CMesh::Stock_Matrices(const vector<CBone*>& Bones, _float4x4 * pMeshBone
 	return S_OK;
 }
 
-HRESULT CMesh::CreateDynamicActor(_float4 vPos)
+HRESULT CMesh::CreateDynamicActor(_float4x4& matWorld)
 {
-	m_pActor = m_pGameInstance->CreateDynamicActor(vPos, m_pVerticesPos, m_iNumVertices, m_pIndices, m_iNumIndices);
+	m_pActor = m_pGameInstance->CreateDynamicActor(matWorld, m_pVerticesPos, m_iNumVertices, m_pIndices, m_iNumIndices);
 	if (m_pActor == nullptr)
 		return E_FAIL;
 
 	return S_OK;
 }
 
-HRESULT CMesh::CreateStaticActor(_float4 vPos)
+HRESULT CMesh::CreateStaticActor(_float4x4& matWorld)
 {
-	m_pActor = m_pGameInstance->CreateStaticActor(vPos, m_pVerticesPos, m_iNumVertices, m_pIndices, m_iNumIndices);
+	m_pActor = m_pGameInstance->CreateStaticActor(matWorld, m_pVerticesPos, m_iNumVertices, m_pIndices, m_iNumIndices);
 	if (m_pActor == nullptr)
 		return E_FAIL;
 

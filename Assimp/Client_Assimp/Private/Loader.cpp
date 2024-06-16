@@ -224,7 +224,7 @@ HRESULT CLoader::Add_AnimMapDecoPrototype(wstring& ModelName)
 
 HRESULT CLoader::Add_NonAnimMapDecoPrototype(wstring& ModelName)
 {
-	m_strLoadingText = TEXT("../../../Resources/Models/MapDeco/NonAnim") + ModelName + TEXT("/") + ModelName + TEXT(".fbx");
+	m_strLoadingText = TEXT("../../../Resources/Models/MapDeco/NonAnim/") + ModelName + TEXT("/") + ModelName + TEXT(".fbx");
 
 	wstring_convert<codecvt_utf8<wchar_t>> converter;
 	string strModelName = converter.to_bytes(ModelName);

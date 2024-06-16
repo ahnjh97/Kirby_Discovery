@@ -7,6 +7,7 @@
 static _int iMapTxtIdx = -1;
 static _int iTriggerTxtIdx = -1;
 static _int iMonsterTxtIdx = -1;
+static _int iObjectIdx = -1;
 static _int iNonAnimIdx = -1;
 static _int iLevelIndex = 0;
 static _int iTempLevelIdx = -1;
@@ -70,9 +71,15 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy", "RallyPoint", "LightBulb" };
 	m_setRallyingMonsters = { "NonAnim_Kabu", "NonAnim_BrontoBurt" };
 
-	m_setNonColDecos = { "BushMCut" };
-	m_setAnimDecos = { "BushM", "PopFlower"};
-	m_setActorDecos = { "SeDriftWoodAL", "SeDriftWoodBL", "SeDriftWoodCL", "GsBenchAL" };
+	/*m_setNonColDecos = { "BushMCut" };*/
+	m_setAnimDecos = { "BushM", "PopFlower" };
+	m_setActorDecos = { "GsBenchAL", "GsFlowerPotAL", "GsFlowerPotBL", "GsSteelFenceA", "GsSteelFenceB"
+		, "GsTreeA", "GsTreeB", "GsTreeC", "GsWallRockA", "GsWallRockB"
+		, "GsWoodBridgeA", "GsWoodBridgeB", "GsRockCL", "GsRockDL", "GsRockEL", "GsRockFL", "GsRockGL"
+		, "JgGrassB", "JgGrassL", "JgGrasslongB", "JgGrassN", "JgWoodD"
+		, "StarBlockL" , "StarBlockM", "StarBlockS", "WoodBox"
+		, "SeDriftWoodAL", "SeDriftWoodBL", "SeDriftWoodCL" };
+	m_setKickableDecos = { "GsPebble", "GsStone", "SeShell" };
 
 	vecPassIndices.resize(m_vecMapModelNames.size());
 	vecSamplingFactors.resize(m_vecMapModelNames.size());
@@ -274,7 +281,7 @@ void CMapToolHelper::Menu_NonAnimModels()
 		for (_int i = 0; i < m_vecMapTxts.size(); ++i)
 			vecMapNames[i] = m_vecMapTxts[i].c_str();
 		if (ImGui::ListBox("##Maps", &iMapTxtIdx, vecMapNames.data(), m_vecMapTxts.size(), 3)) {
-			iTriggerTxtIdx = iMonsterTxtIdx = iNonAnimIdx = -1;
+			iTriggerTxtIdx = iMonsterTxtIdx = iNonAnimIdx = iObjectIdx = -1;
 			m_strSelectedTxt = m_vecMapTxts[iMapTxtIdx];
 		}
 	}
@@ -286,7 +293,7 @@ void CMapToolHelper::Menu_NonAnimModels()
 		for (_int i = 0; i < m_vecTriggerTxts.size(); ++i)
 			vecTriggerNames[i] = m_vecTriggerTxts[i].c_str();
 		if (ImGui::ListBox("##Triggers", &iTriggerTxtIdx, vecTriggerNames.data(), m_vecTriggerTxts.size(), 3)) {
-			iMapTxtIdx = iMonsterTxtIdx = iNonAnimIdx = -1;
+			iMapTxtIdx = iMonsterTxtIdx = iNonAnimIdx = iObjectIdx = -1;
 			m_strSelectedTxt = m_vecTriggerTxts[iTriggerTxtIdx];
 		}
 	}
@@ -298,7 +305,7 @@ void CMapToolHelper::Menu_NonAnimModels()
 		for (_int i = 0; i < m_vecMonsterTxts.size(); ++i)
 			vecMonsterNames[i] = m_vecMonsterTxts[i].c_str();
 		if (ImGui::ListBox("##Monsters", &iMonsterTxtIdx, vecMonsterNames.data(), m_vecMonsterTxts.size(), 4)) {
-			iMapTxtIdx = iTriggerTxtIdx = iNonAnimIdx = -1;
+			iMapTxtIdx = iTriggerTxtIdx = iNonAnimIdx = iObjectIdx = -1;
 			m_strSelectedTxt = m_vecMonsterTxts[iMonsterTxtIdx];
 		}
 	}
@@ -309,9 +316,9 @@ void CMapToolHelper::Menu_NonAnimModels()
 		vector<const _char*> vecObjectNames(m_vecObjectTxts.size());
 		for (_int i = 0; i < m_vecObjectTxts.size(); ++i)
 			vecObjectNames[i] = m_vecObjectTxts[i].c_str();
-		if (ImGui::ListBox("##Objects", &iNonAnimIdx, vecObjectNames.data(), m_vecObjectTxts.size(), 9)) {
-			iMapTxtIdx = iTriggerTxtIdx = iMonsterTxtIdx = -1;
-			m_strSelectedTxt = m_vecObjectTxts[iNonAnimIdx];
+		if (ImGui::ListBox("##Objects", &iObjectIdx, vecObjectNames.data(), m_vecObjectTxts.size(), 9)) {
+			iMapTxtIdx = iTriggerTxtIdx = iMonsterTxtIdx = iNonAnimIdx = -1;
+			m_strSelectedTxt = m_vecObjectTxts[iObjectIdx];
 		}
 	}
 
@@ -321,8 +328,8 @@ void CMapToolHelper::Menu_NonAnimModels()
 		vector<const _char*> vecMapDecoNames(m_vecMapDecoTxts.size());
 		for (_int i = 0; i < m_vecMapDecoTxts.size(); ++i)
 			vecMapDecoNames[i] = m_vecMapDecoTxts[i].c_str();
-		if (ImGui::ListBox("##Objects", &iNonAnimIdx, vecMapDecoNames.data(), m_vecMapDecoTxts.size(), 9)) {
-			iMapTxtIdx = iTriggerTxtIdx = iMonsterTxtIdx = -1;
+		if (ImGui::ListBox("##MapDecos", &iNonAnimIdx, vecMapDecoNames.data(), m_vecMapDecoTxts.size(), 15)) {
+			iMapTxtIdx = iTriggerTxtIdx = iMonsterTxtIdx = iObjectIdx = -1;
 			m_strSelectedTxt = m_vecMapDecoTxts[iNonAnimIdx];
 		}
 	}
@@ -1132,6 +1139,8 @@ CGameObject* CMapToolHelper::Select_ModelByPicking(const wstring& wstrLayerTag)
 	if (pObjectList->empty())
 		return nullptr;
 
+	_bool bCtrl = m_pGameInstance->Get_DIKeyState(DIK_LCONTROL, KEY_PRESS);
+	
 	for (auto& object : *pObjectList)
 	{
 		if (nullptr == object)
@@ -1146,6 +1155,10 @@ CGameObject* CMapToolHelper::Select_ModelByPicking(const wstring& wstrLayerTag)
 
 		CTransform* pTransform = dynamic_cast<CTransform*>(object->Get_Component(g_strTransformTag));
 		if (nullptr == pTransform)
+			continue;
+
+		string strModelName = pModel->Get_ModelName();
+		if (true == bCtrl && true == IsMap(strModelName))
 			continue;
 
 		_int iMeshIndex{};
@@ -1390,12 +1403,12 @@ void CMapToolHelper::SaveMapDecoObjects(vector<CGameObject*>& _vecDecoObjs)
 
 		CMapToolObject* pMapToolObj = dynamic_cast<CMapToolObject*>(obj);
 		_uint iMapObjType{};
-		if (m_setNonColDecos.end() != m_setNonColDecos.find(strModelName))
-			iMapObjType = CMapToolObject::MAPOBJ_NONCOL;
-		else if (m_setAnimDecos.end() != m_setAnimDecos.find(strModelName))
+		if (m_setAnimDecos.end() != m_setAnimDecos.find(strModelName))
 			iMapObjType = CMapToolObject::MAPOBJ_ANIM;
 		else if (m_setActorDecos.end() != m_setActorDecos.find(strModelName))
 			iMapObjType = CMapToolObject::MAPOBJ_ACTOR;
+		else
+			iMapObjType = CMapToolObject::MAPOBJ_NONCOL;
 
 		fileOutput.write(reinterpret_cast<const char*>(&iMapObjType), sizeof(iMapObjType));
 
@@ -1453,8 +1466,8 @@ void CMapToolHelper::SaveMapDecoObjects(vector<CGameObject*>& _vecDecoObjs)
 		return;
 	}
 
-	WriteLocalizedAnimMapDecos(vecAnimDecos);
-	WriteLocalizedNonAnimMapDecos(vecNonAnimDecos);
+	/*WriteLocalizedAnimMapDecos(vecAnimDecos);
+	WriteLocalizedNonAnimMapDecos(vecNonAnimDecos);*/
 }
 
 void CMapToolHelper::LoadMapDecoObjects()

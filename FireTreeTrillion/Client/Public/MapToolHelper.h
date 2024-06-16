@@ -85,6 +85,7 @@ private:
 	unordered_set<string>	m_setNonColDecos;
 	unordered_set<string>	m_setAnimDecos;
 	unordered_set<string>	m_setActorDecos;
+	unordered_set<string>	m_setKickableDecos;
 
 	vector<string>	m_vecMapTxts;
 	vector<string>	m_vecTriggerTxts;

@@ -31,7 +31,7 @@ HRESULT CWasteCan::Initialize(void* pArg)
 	Add_Components();
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(0.f, 10.f, -180.f, 1.f));
 
-	hr = m_pModelCom->CreateDynamicActor(m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION));
+	hr = m_pModelCom->CreateDynamicActor(pGameObjectDesc->matWorld);
 	CHECK_FAILED(hr);
 	
 	return S_OK;

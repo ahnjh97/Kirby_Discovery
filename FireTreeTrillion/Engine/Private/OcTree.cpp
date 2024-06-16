@@ -219,20 +219,14 @@ void COcTree::Culling(CGameInstance* pGameInstance, CShader* pMapShader, CShader
 			iInFrustum++;
 	}
 
-	if (iInFrustum >= OC_END) {
+	if (iInFrustum >= OC_END || nullptr == m_vecChildren[OC_XYZ]) {
 		RenderAll(pGameInstance, pMapShader, pNonAnimShader, pAnimShader);
 		iRenderAll++;
 		return;
 	}
 		
 	else if (iInFrustum > 0)
-	{
-		if (nullptr == m_vecChildren[OC_XYZ]) {
-			RenderAll(pGameInstance, pMapShader, pNonAnimShader, pAnimShader);
-			iRenderAll++;
-			return;
-		}
-		
+	{	
 		RenderMyMesh(pGameInstance, pMapShader, pNonAnimShader, pAnimShader);
 		iRenderMyMesh++;
 
@@ -612,14 +606,16 @@ void COcTree::RenderAll(CGameInstance* pGameInstance, CShader* pMapShader, CShad
 		m_vecMeshes[iMeshIdx]->Render();
 	}
 
+	vector<string> vecStrings = { m_vecConstantNames[4], m_vecConstantNames[5], m_vecConstantNames[6], m_vecConstantNames[7] };
+
 	for (auto& nonCol : m_vecNonCols) {
 		if (nullptr == nonCol)
 			continue;
 
 		_uint iNumMeshes = nonCol->Get_NumMeshes();
-		vector<string> vecStrings = {m_vecConstantNames[4], m_vecConstantNames[5], m_vecConstantNames[6], m_vecConstantNames[7] };
-
 		nonCol->Bind_StencilRimLightMotionBlur(pNonAnimShader, vecStrings);
+		if (FAILED(nonCol->Bind_WorldMatrixForOctree(pNonAnimShader)))
+			return;
 
 		for (_uint i = 0; i < iNumMeshes; i++) {
 			if (FAILED(nonCol->Bind_ShaderResource(pNonAnimShader, m_vecConstantNames[0].c_str(), i, TextureType_DIFFUSE)))
@@ -641,9 +637,9 @@ void COcTree::RenderAll(CGameInstance* pGameInstance, CShader* pMapShader, CShad
 			continue;
 
 		_uint iNumMeshes = colNonAnim->Get_NumMeshes();
-		vector<string> vecStrings = { m_vecConstantNames[4], m_vecConstantNames[5], m_vecConstantNames[6], m_vecConstantNames[7] };
-
 		colNonAnim->Bind_StencilRimLightMotionBlur(pNonAnimShader, vecStrings);
+		if (FAILED(colNonAnim->Bind_WorldMatrixForOctree(pNonAnimShader)))
+			return;
 
 		for (_uint i = 0; i < iNumMeshes; i++) {
 			if (FAILED(colNonAnim->Bind_ShaderResource(pNonAnimShader, m_vecConstantNames[0].c_str(), i, TextureType_DIFFUSE)))
@@ -665,7 +661,6 @@ void COcTree::RenderAll(CGameInstance* pGameInstance, CShader* pMapShader, CShad
 			continue;
 
 		_uint iNumMeshes = colAnim->Get_NumMeshes();
-		vector<string> vecStrings = { m_vecConstantNames[4], m_vecConstantNames[5], m_vecConstantNames[6], m_vecConstantNames[7] };
 
 		if (FAILED(colAnim->Play_Animation(pGameInstance->Get_SecondTimer())))
 			return;
@@ -710,21 +705,188 @@ void COcTree::RenderMyMesh(CGameInstance* pGameInstance, CShader* pMapShader, CS
 		m_vecMyMeshes[iMeshIdx]->Bind_Buffers();
 		m_vecMyMeshes[iMeshIdx]->Render();
 	}
+	 
+	vector<string> vecStrings = { m_vecConstantNames[4], m_vecConstantNames[5], m_vecConstantNames[6], m_vecConstantNames[7] };
+
+	for (auto& myNonCol : m_vecMyNonCols) {
+		if (nullptr == myNonCol)
+			continue;
+
+		_uint iNumMeshes = myNonCol->Get_NumMeshes();
+		myNonCol->Bind_StencilRimLightMotionBlur(pNonAnimShader, vecStrings);
+		if (FAILED(myNonCol->Bind_WorldMatrixForOctree(pNonAnimShader)))
+			return;
+
+		for (_uint i = 0; i < iNumMeshes; i++) {
+			if (FAILED(myNonCol->Bind_ShaderResource(pNonAnimShader, m_vecConstantNames[0].c_str(), i, TextureType_DIFFUSE)))
+				return;
+			if (FAILED(myNonCol->Bind_ShaderResource(pNonAnimShader, m_vecConstantNames[1].c_str(), i, TextureType_NORMALS)))
+				return;
+			if (FAILED(myNonCol->Bind_ShaderResource(pNonAnimShader, m_vecConstantNames[2].c_str(), i, TextureType_METALNESS)))
+				return;
+			if (FAILED(pNonAnimShader->Begin(myNonCol->Get_ModelPassIndex())))
+				return;
+			if (FAILED(myNonCol->Render(i)))
+				return;
+		}
+	}
+
+	for (auto& myColNonAnim : m_vecMyColNonAnims)
+	{
+		if (nullptr == myColNonAnim)
+			continue;
+
+		_uint iNumMeshes = myColNonAnim->Get_NumMeshes();
+		myColNonAnim->Bind_StencilRimLightMotionBlur(pNonAnimShader, vecStrings);
+		if (FAILED(myColNonAnim->Bind_WorldMatrixForOctree(pNonAnimShader)))
+			return;
+
+		for (_uint i = 0; i < iNumMeshes; i++) {
+			if (FAILED(myColNonAnim->Bind_ShaderResource(pNonAnimShader, m_vecConstantNames[0].c_str(), i, TextureType_DIFFUSE)))
+				return;
+			if (FAILED(myColNonAnim->Bind_ShaderResource(pNonAnimShader, m_vecConstantNames[1].c_str(), i, TextureType_NORMALS)))
+				return;
+			if (FAILED(myColNonAnim->Bind_ShaderResource(pNonAnimShader, m_vecConstantNames[2].c_str(), i, TextureType_METALNESS)))
+				return;
+			if (FAILED(pNonAnimShader->Begin(myColNonAnim->Get_ModelPassIndex())))
+				return;
+			if (FAILED(myColNonAnim->Render(i)))
+				return;
+		}
+	}
+
+	for (auto& myColAnim : m_vecMyColAnims)
+	{
+		if (nullptr == myColAnim)
+			continue;
+
+		_uint iNumMeshes = myColAnim->Get_NumMeshes();
+
+		if (FAILED(myColAnim->Play_Animation(pGameInstance->Get_SecondTimer())))
+			return;
+		if (FAILED(myColAnim->Bind_StencilRimLightMotionBlur(pAnimShader, vecStrings)))
+			return;
+		if (FAILED(myColAnim->Bind_WorldMatrixForOctree(pAnimShader)))
+			return;
+		/*if (FAILED(pAnimShader->Bind_Matrix("g_ViewMatrix", &pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
+			return;
+		if (FAILED(pAnimShader->Bind_Matrix("g_ProjMatrix", &pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
+			return;*/
+
+		for (_uint i = 0; i < iNumMeshes; i++) {
+			if (FAILED(myColAnim->Bind_ShaderResource(pAnimShader, m_vecConstantNames[0].c_str(), i, TextureType_DIFFUSE)))
+				return;
+			if (FAILED(myColAnim->Bind_ShaderResource(pAnimShader, m_vecConstantNames[1].c_str(), i, TextureType_NORMALS)))
+				return;
+			if (FAILED(myColAnim->Bind_ShaderResource(pAnimShader, m_vecConstantNames[2].c_str(), i, TextureType_METALNESS)))
+				return;
+			if (FAILED(myColAnim->Bind_BoneMatrices(pAnimShader, m_vecConstantNames[8].c_str(), i)))
+				return;
+			if (FAILED(pAnimShader->Begin(myColAnim->Get_ModelPassIndex())))
+				return;
+			if (FAILED(myColAnim->Render(i)))
+				return;
+		}
+	}
 }
 
 void COcTree::InsertNonCols(vector<class CModel*>& _vecNonCols)
 {
+	if (_vecNonCols.empty())
+		return;
+
 	m_vecNonCols = _vecNonCols;
+	if (nullptr == m_vecChildren[OC_XYZ])
+		return;
+
+	vector<vector<CModel*>> vecChildrenNonCols(OC_END);
+
+	for (auto& nonCol : _vecNonCols)
+	{
+		if (nullptr == nonCol)
+			continue;
+
+		_float3 vMin{}, vMax{}, vCenter{};
+		nonCol->Find_MinMax(vMin, vMax);
+		vCenter = _float3(vMin.x + vMax.x, vMin.y + vMax.y, vMin.z + vMax.z);
+		OCTANT eOctant = FinalOctant(vCenter, vMin, vMax);
+
+		if (eOctant == OC_END)
+			m_vecMyNonCols.emplace_back(nonCol);
+		else
+			vecChildrenNonCols[eOctant].emplace_back(nonCol);
+
+		Safe_AddRef(nonCol);
+	}
+
+	for (_uint i = 0; i < OC_END; i++)
+		m_vecChildren[i]->InsertNonCols(vecChildrenNonCols[i]);
 }
 
 void COcTree::InsertColNonAnims(vector<class CModel*>& _vecColNonAnims)
 {
+	if (_vecColNonAnims.empty())
+		return;
+
 	m_vecColNonAnims = _vecColNonAnims;
+	if (nullptr == m_vecChildren[OC_XYZ])
+		return;
+
+	vector<vector<CModel*>> vecChildrenColNonAnims(OC_END);
+
+	for (auto& colNonAnim : _vecColNonAnims)
+	{
+		if (nullptr == colNonAnim)
+			return;
+
+		_float3 vMin{}, vMax{}, vCenter{};
+		colNonAnim->Find_MinMax(vMin, vMax);
+		vCenter = _float3(vMin.x + vMax.x, vMin.y + vMax.y, vMin.z + vMax.z);
+		OCTANT eOctant = FinalOctant(vCenter, vMin, vMax);
+
+		if (eOctant == OC_END)
+			m_vecMyColNonAnims.emplace_back(colNonAnim);
+		else
+			vecChildrenColNonAnims[eOctant].emplace_back(colNonAnim);
+
+		Safe_AddRef(colNonAnim);
+	}
+
+	for (_uint i = 0; i < OC_END; i++)
+		m_vecChildren[i]->InsertColNonAnims(vecChildrenColNonAnims[i]);
 }
 
 void COcTree::InsertColAnims(vector<class CModel*>& _vecColAnims)
 {
+	if (_vecColAnims.empty())
+		return;
+
 	m_vecColAnims = _vecColAnims;
+	if (nullptr == m_vecChildren[OC_XYZ])
+		return;
+
+	vector<vector<CModel*>> vecChildrenColAnims(OC_END);
+
+	for (auto& colAnim : _vecColAnims)
+	{
+		if (nullptr == colAnim)
+			continue;
+
+		_float3 vMin{}, vMax{}, vCenter{};
+		colAnim->Find_MinMax_WorldPos(vMin, vMax);
+		vCenter = _float3(vMin.x + vMax.x, vMin.y + vMax.y, vMin.z + vMax.z);
+		OCTANT eOctant = FinalOctant(vCenter, vMin, vMax);
+
+		if (eOctant == OC_END)
+			m_vecMyColAnims.emplace_back(colAnim);
+		else
+			vecChildrenColAnims[eOctant].emplace_back(colAnim);
+
+		Safe_AddRef(colAnim);
+	}
+
+	for (_uint i = 0; i < OC_END; i++)
+		m_vecChildren[i]->InsertColAnims(vecChildrenColAnims[i]);
 }
 
 COcTree* COcTree::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _float3 vCenter, _float3 vHalfExtents

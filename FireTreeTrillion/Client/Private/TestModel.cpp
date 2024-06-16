@@ -35,14 +35,14 @@ HRESULT CTestModel::Initialize(void* pArg)
     //CGameInstance::Get_Instance()->Test();
     
     // position 세팅은 항상 Add_Components() 앞에 둘것
-    _vector vPos = XMVectorSet(-128.f, 6.f, -80.f, 1.f);
+    _vector vPos = XMVectorSet(-85, 6.f, -9.f, 1.f);
     m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
-    m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(-16.f));
+    //m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(-16.f));
 
     if (FAILED(Add_Components()))
         return E_FAIL;
 
-    m_pModelCom->Set_Animation(0, 60.f, true);
+    //m_pModelCom->Set_Animation(0, 60.f, true);
 
     // 예시코드 1 : 태양광
     //LIGHT_DESC			LightDesc{};
@@ -108,29 +108,29 @@ _int CTestModel::Tick(_float fTimeDelta)
     //}
     
     // 예시코드 6 : DInput + KeyPress 예시 코드 
-    if (m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_PRESS))
-    {
-        _float fSpeed = m_pTransformCom->Get_SpeedPerSec();
-        // for test
-        //fSpeed = 5.f;
-        //m_pControllerCom->Move(m_pTransformCom, fSpeed, fTimeDelta);
-    }
+    //if (m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_PRESS))
+    //{
+    //    _float fSpeed = m_pTransformCom->Get_SpeedPerSec();
+    //    // for test
+    //    //fSpeed = 5.f;
+    //    //m_pControllerCom->Move(m_pTransformCom, fSpeed, fTimeDelta);
+    //}
 
-    if (m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_PRESS))
-    {
-        m_pTransformCom->Turn(XMVectorSet(0.f, -1.f, 0.f, 0.f), fTimeDelta);
-    }
+    //if (m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_PRESS))
+    //{
+    //    m_pTransformCom->Turn(XMVectorSet(0.f, -1.f, 0.f, 0.f), fTimeDelta);
+    //}
 
-    if (m_pGameInstance->Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
-    {
-        m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta);
-    }
+    //if (m_pGameInstance->Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
+    //{
+    //    m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta);
+    //}
 
-    if (m_pGameInstance->Get_DIKeyState(DIK_SPACE, KEY_DOWN))
-    {
-        m_isJump = true;
-        m_fJumpVelocity = 5.f;
-    }
+    //if (m_pGameInstance->Get_DIKeyState(DIK_SPACE, KEY_DOWN))
+    //{
+    //    m_isJump = true;
+    //    m_fJumpVelocity = 5.f;
+    //}
 
     //if (m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_PRESS))
     //{
@@ -148,62 +148,62 @@ _int CTestModel::Tick(_float fTimeDelta)
 
     // 예시코드 7 : 랜덤 벡터 뽑기
     // 예시코드 8 : DInput + KeyDown 예시코드
-    if (m_pGameInstance->Get_DIKeyState(DIK_E, KEY_DOWN))
-    {
-        // 0.5f 길이의 랜덤한 방향의 벡터 생성
-        _vector vRandomVector = CUtils::Make_Random_Vector(0.5f);
-        _vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+    //if (m_pGameInstance->Get_DIKeyState(DIK_E, KEY_DOWN))
+    //{
+    //    // 0.5f 길이의 랜덤한 방향의 벡터 생성
+    //    _vector vRandomVector = CUtils::Make_Random_Vector(0.5f);
+    //    _vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 
-        m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vRandomVector);
-    }
-
-
-    // 예시코드 9 : Radial Blur Center
-    if (m_pGameInstance->Get_DIKeyState(DIK_1, KEY_DOWN))
-    {
-        m_pGameInstance->Setting_RadialBlur(10.f, 10.f);
-    }
-
-    // 예시코드 10 : Radial Blur Player
-    if (m_pGameInstance->Get_DIKeyState(DIK_2, KEY_DOWN))
-    {
-        _vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-        m_pGameInstance->Setting_RadialBlur(vPos, 5.f, 10.f);
-    }
+    //    m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vRandomVector);
+    //}
 
 
-    if (m_pGameInstance->Get_DIKeyState(DIK_P, KEY_DOWN))
-    {
-        m_iTestAnim++;
-        if (m_iTestAnim > 290)
-            m_iTestAnim = 290;
+    //// 예시코드 9 : Radial Blur Center
+    //if (m_pGameInstance->Get_DIKeyState(DIK_1, KEY_DOWN))
+    //{
+    //    m_pGameInstance->Setting_RadialBlur(10.f, 10.f);
+    //}
 
-        m_pModelCom->Set_Animation(m_iTestAnim, 60.f, true, true);
-    }
-    else if (m_pGameInstance->Get_DIKeyState(DIK_O, KEY_DOWN))
-    {
-        m_iTestAnim--;
-        if (m_iTestAnim < 0)
-            m_iTestAnim = 0;
+    //// 예시코드 10 : Radial Blur Player
+    //if (m_pGameInstance->Get_DIKeyState(DIK_2, KEY_DOWN))
+    //{
+    //    _vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+    //    m_pGameInstance->Setting_RadialBlur(vPos, 5.f, 10.f);
+    //}
 
-        m_pModelCom->Set_Animation(m_iTestAnim, 60.f, true, true);
 
-    }
-    else if (m_pGameInstance->Get_DIKeyState(DIK_I, KEY_DOWN))
-    {
-        //m_pModelCom->Set_Animation(m_iTestAnim, true, true);
-    }
+    //if (m_pGameInstance->Get_DIKeyState(DIK_P, KEY_DOWN))
+    //{
+    //    m_iTestAnim++;
+    //    if (m_iTestAnim > 290)
+    //        m_iTestAnim = 290;
 
-    // FSM 제어
-    Update_FSMState(fTimeDelta);
-    m_pFSM->Update(this, fTimeDelta);
+    //    m_pModelCom->Set_Animation(m_iTestAnim, 60.f, true, true);
+    //}
+    //else if (m_pGameInstance->Get_DIKeyState(DIK_O, KEY_DOWN))
+    //{
+    //    m_iTestAnim--;
+    //    if (m_iTestAnim < 0)
+    //        m_iTestAnim = 0;
+
+    //    m_pModelCom->Set_Animation(m_iTestAnim, 60.f, true, true);
+
+    //}
+    //else if (m_pGameInstance->Get_DIKeyState(DIK_I, KEY_DOWN))
+    //{
+    //    //m_pModelCom->Set_Animation(m_iTestAnim, true, true);
+    //}
+
+    //// FSM 제어
+    //Update_FSMState(fTimeDelta);
+    //m_pFSM->Update(this, fTimeDelta);
 
     return OBJ_NOEVENT;
 }
 
 void CTestModel::Late_Tick(_float fTimeDelta)
 {
-    m_pModelCom->Play_Animation(fTimeDelta);
+    //m_pModelCom->Play_Animation(fTimeDelta);
 
     //SetOn_Slope(fTimeDelta);
 
@@ -243,11 +243,11 @@ HRESULT CTestModel::Render()
             return E_FAIL;
         if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
             return E_FAIL;
-        if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
-            return E_FAIL;
+        /*if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+            return E_FAIL;*/
 
         /* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-        if (FAILED(m_pShaderCom->Begin(1)))
+        if (FAILED(m_pShaderCom->Begin(0)))
             return E_FAIL;
 
         m_pModelCom->Render(i);
@@ -313,12 +313,12 @@ HRESULT CTestModel::Add_Components()
 {
     HRESULT hr;
     /* For.Com_Shader */
-    hr = __super::Add_Component(TEXT("Prototype_Component_Shader_VtxAnimModel"),
+    hr = __super::Add_Component(TEXT("Prototype_Component_Shader_VtxModel"),
         TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
     CHECK_FAILED(hr);
 
     /* For.Com_Model */
-    hr = __super::Add_Component(TEXT("Prototype_Component_Model_BushM"),
+    hr = __super::Add_Component(TEXT("Prototype_Component_Model_GsWoodBridgeA"),
         TEXT("Com_Model"), (CComponent**)&m_pModelCom);
     CHECK_FAILED(hr);
     // for animTool
@@ -425,8 +425,8 @@ void CTestModel::Update_FSMState(_float fTimeDelta)
 
 void CTestModel::Change_State(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
 {
-    m_eCurrentState = eState;
-    m_pFSM->ChangeState((_uint)eState, _fAnimSpeed, _bLoop, _bInterpolation);
+   /* m_eCurrentState = eState;
+    m_pFSM->ChangeState((_uint)eState, _fAnimSpeed, _bLoop, _bInterpolation);*/
 }
 
 HRESULT CTestModel::Bind_ShaderResources()

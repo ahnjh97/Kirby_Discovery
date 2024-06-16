@@ -56,10 +56,15 @@ HRESULT CBasicMap::Initialize(void* pArg)
 
         m_pOcTree = m_pModelCom->Create_OcTree(GameObjectDesc.vMin, GameObjectDesc.vMax, m_vecPassIndices, m_vecSamplingFactors, vecConstantNames);
         
+        m_ModelShapeRadiiMap.emplace(string("BushM"), 1.f);
+        m_ModelAnimSettingsMap.emplace(string("BushM"), pair<_uint, _float>(0, 60.f));
+        m_ModelShapeRadiiMap.emplace(string("PopFlower"), 0.6f);
+        m_ModelAnimSettingsMap.emplace(string("PopFlower"), pair<_uint, _float>(1, 200.f));
+
         InsertMapDecos();
     }
 
-    if (FAILED(m_pModelCom->CreateStaticActor(m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION))))
+    if (FAILED(m_pModelCom->CreateStaticActor(GameObjectDesc.matWorld)))
         return E_FAIL;
 
     m_fTime = m_fNonMatchTime = 100.f;
@@ -215,8 +220,8 @@ HRESULT CBasicMap::Bind_ShaderResources()
     if (FAILED(m_pAnimShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
         return E_FAIL;
 
-    if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pNonAnimShaderCom, "g_WorldMatrix")))
-        return E_FAIL;
+    //if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pNonAnimShaderCom, "g_WorldMatrix")))
+    //    return E_FAIL;
     if (FAILED(m_pNonAnimShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
         return E_FAIL;
     if (FAILED(m_pNonAnimShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
@@ -344,7 +349,7 @@ void CBasicMap::InsertMapDecos()
         fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
 
         TYPE eType = TYPE_NONANIM;
-        string strFolder = string("OptimizedMapDecos/");
+        string strFolder = string("MapDeco/");
         if (CMapToolObject::MAPOBJ_ANIM == iMapObjType)
         {
             eType = TYPE_ANIM;
@@ -363,20 +368,29 @@ void CBasicMap::InsertMapDecos()
            
         pModel->SetUpStencilRimLightMotionBlurPassIndex(iShaderVars, fRimWidth, 0);
 
+        PxRigidStatic* pRigidStatic = { nullptr };
+        pModel->Set_WorldMatrixForOctree(matWorld);
+        auto iter = m_ModelAnimSettingsMap.end();
         switch (iMapObjType)
         {
         case CMapToolObject::MAPOBJ_NONCOL:
             vecNonCols.push_back(pModel);
             break;
         case CMapToolObject::MAPOBJ_ANIM:
-            pModel->Set_Animation(0, 50, false);
-            pModel->Set_TrackPosition(1);
-            //pModel->Play_Animation(10000);
+            pModel->Set_Animation(2, 50, true, true); 
             
-            pModel->Set_WorldMatrixForOctree(matWorld);
+            pRigidStatic = AddTriggerActorForAnimDeco(strModelName, matWorld);
+            if (nullptr == pRigidStatic)
+                return;
+            iter = m_ModelAnimSettingsMap.find(strModelName);
+            if (iter == m_ModelAnimSettingsMap.end())
+                break;
+           
+            m_pGameInstance->Emplace_MapDecoTrigger(pRigidStatic, pModel, iter->second.first, iter->second.second);
             vecAnims.push_back(pModel);
             break;
         case CMapToolObject::MAPOBJ_ACTOR:
+            pModel->CreateStaticActor(matWorld);
             vecActors.push_back(pModel);
             break;
         }
@@ -384,17 +398,52 @@ void CBasicMap::InsertMapDecos()
 
     fileInput.close();
 
-    for (auto& colNonAnim : vecActors)
+ /*   for (auto& colNonAnim : vecActors)
     {
         if (nullptr == colNonAnim)
             continue;
 
         colNonAnim->CreateStaticActor(m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION));
-    }
+    }*/
 
     m_pOcTree->InsertNonCols(vecNonCols);
     m_pOcTree->InsertColAnims(vecAnims);
     m_pOcTree->InsertColNonAnims(vecActors);
+}
+
+PxRigidStatic* CBasicMap::AddTriggerActorForAnimDeco(const string& _strModelName, _float4x4& _matWorld)
+{
+    auto pPhysics = m_pGameInstance->Get_Physics();
+    PxMaterial* pMtrl = m_pGameInstance->Get_Physics()->createMaterial(0.5f, 0.5f, 0.6f);
+
+    auto iter = m_ModelShapeRadiiMap.find(_strModelName);
+    if (iter == m_ModelShapeRadiiMap.end()) {
+        MSG_BOX(TEXT("Failed to Create: CBasicMap::TriggerActorForAnimDeco"));
+        return nullptr;
+    }
+
+    _float fRadius = iter->second;
+
+    PxShape* pShape = pPhysics->createShape(PxSphereGeometry(fRadius), *pMtrl);
+
+    PxMat44 pxMat = CUtils::To_Float4x4(_matWorld);
+    PxTransform transform = CUtils::mat44ToTransform(pxMat);
+
+    PxRigidStatic* pStaticActor = pPhysics->createRigidStatic(transform);
+    pShape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
+    pShape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, false);
+    pShape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
+    pStaticActor->attachShape(*pShape);
+
+    if (nullptr == pShape || nullptr == pStaticActor)
+    {
+        MSG_BOX(TEXT("Failed to Create: CBasicMap::TriggerActorForAnimDeco"));
+        return nullptr;
+    }
+    m_pGameInstance->AddActor(*pStaticActor);
+    m_vecAnimDecoTriggersActors.emplace_back(pStaticActor);
+    m_vecShapes.emplace_back(pShape);
+    return pStaticActor;
 }
 
 void CBasicMap::Save_OctreeData(const string& strLevel)
@@ -481,6 +530,26 @@ void CBasicMap::Free()
 {
     __super::Free();
 
+    for (_uint iActorIdx = 0; iActorIdx < m_vecAnimDecoTriggersActors.size(); iActorIdx++)
+    {
+        PxRigidStatic* pActor = m_vecAnimDecoTriggersActors[iActorIdx];
+        if (nullptr != pActor)
+        {
+            auto pScene = pActor->getScene();
+            pScene->removeActor(*pActor);
+
+            PxShape* pShape = m_vecShapes[iActorIdx];
+            pActor->detachShape(*pShape);
+            pShape->release();
+            pShape = nullptr;
+
+            pActor->release();
+            pActor = nullptr;
+        }
+    }
+    m_vecAnimDecoTriggersActors.clear();
+    m_vecShapes.clear();
+        
     Safe_Release(m_pOcTree);
     Safe_Release(m_pBlendMap);
     for(_uint i = 0; i < TEX_END; i++)

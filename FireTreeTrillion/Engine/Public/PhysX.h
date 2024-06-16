@@ -32,6 +32,7 @@ public:
     void Register_Trigger(PxActor* pTriggerActor, _int iTriggerType, _int iTriggerIndex);
     void Emplace_TriggerFunc(_int iTriggerType, function<void(_int)> func);
     void Emplace_ExitFunc(_int iTriggerType, function<void(void)> exitFunc);
+    void Emplace_MapDecoTrigger(PxActor* pTriggerActor, CModel* pMapDecoModel, _uint iAnimIdx, _float fTickPerSec);
     void Clear_EventCallBack();
 
     PxPhysics*                          Get_Physics() { return m_pPhysics; }
@@ -50,8 +51,8 @@ public:
     //class CComponent*                 Get_Component(physx::PxActor* pActor);
 
 public:
-    PxRigidDynamic* CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
-    PxRigidStatic*  CreateStaticActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
+    PxRigidDynamic* CreateDynamicActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
+    PxRigidStatic*  CreateStaticActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
 
 private:
     PxDefaultAllocator          mDefaultAllocatorCallback;

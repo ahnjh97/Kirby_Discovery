@@ -75,8 +75,8 @@ public:
 	HRESULT Render(_uint iMeshIndex);
 	HRESULT RenderMergedMesh();
 
-	HRESULT CreateDynamicActor(_float4 vPos);
-	HRESULT CreateStaticActor(_float4 vPos);
+	HRESULT CreateDynamicActor(_float4x4& matWorld);
+	HRESULT CreateStaticActor(_float4x4& matWorld);
 
 	_float4 Check_Meshes(const class CTransform* pTransform, _Out_ _int& iMeshIndex) const;
 	void	Add_Event(const string& EventName, function<void()>&& Callback);
@@ -84,6 +84,7 @@ public:
 
 
 	void Find_MinMax(_float3& vMin, _float3& vMax);
+	void Find_MinMax_WorldPos(_float3& vMin, _float3& vMax);
 	class COcTree* Create_OcTree(_float3 vMin, _float3 vMax, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors
 		, vector<string>& _vecConstantNames);
 
@@ -141,6 +142,7 @@ private:
 	_bool						m_bMotionBlur = { false };
 	_uint						m_iPassIndex = {};
 	_float4x4					m_matWorld = {};
+
 
 private:
 	HRESULT Ready_Meshes(_bool bOctree);

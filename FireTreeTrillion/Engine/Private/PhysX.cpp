@@ -192,6 +192,14 @@ void CPhysX::Emplace_ExitFunc(_int iTriggerType, function<void(void)> exitFunc)
     m_pEventCallBack->Emplace_ExitFunc(iTriggerType, exitFunc);
 }
 
+void CPhysX::Emplace_MapDecoTrigger(PxActor* pTriggerActor, CModel* pMapDecoModel, _uint iAnimIdx, _float fTickPerSec)
+{
+    if (nullptr == m_pEventCallBack)
+        return;
+
+    m_pEventCallBack->Emplace_MapDecoTrigger(pTriggerActor, pMapDecoModel, iAnimIdx, fTickPerSec);
+}
+
 void CPhysX::Clear_EventCallBack()
 {
     if (nullptr == m_pEventCallBack)
@@ -215,7 +223,7 @@ void CPhysX::Clear_EventCallBack()
 //    return static_cast<CComponent*>(pActor->userData);
 //}
 
-PxRigidDynamic* CPhysX::CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)
+PxRigidDynamic* CPhysX::CreateDynamicActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)
 {
     PxCookingParams tParams(mToleranceScale);
 
@@ -231,11 +239,19 @@ PxRigidDynamic* CPhysX::CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, 
         return nullptr;
     }
 
-    PxMeshScale meshScale(PxVec3(1.0f, 1.0f, 1.0f));
-    PxMeshGeometryFlags meshFlags = PxMeshGeometryFlags();
-    PxConvexMeshGeometry meshGeometry(pMesh);
+    _float3 vScale{};
+    _float4 vQuaternion{};
+    _vector vScaleVector, vRotQuat, vTrans;
+    ::XMMatrixDecompose(&vScaleVector, &vRotQuat, &vTrans, XMLoadFloat4x4(&matWorld));
+    XMStoreFloat3(&vScale, vScaleVector);
+    XMStoreFloat4(&vQuaternion, vRotQuat);
 
-    PxTransform pxTransform(PxVec3(vPos.x, vPos.y, vPos.z));
+    PxMeshScale meshScale(PxVec3(vScale.x, vScale.y, vScale.z));
+    PxConvexMeshGeometryFlags meshFlags = PxConvexMeshGeometryFlags();
+    PxConvexMeshGeometry meshGeometry(pMesh, meshScale, meshFlags);
+
+    PxTransform pxTransform(PxVec3(matWorld._41, matWorld._42, matWorld._43), PxQuat(vQuaternion.x, vQuaternion.y, vQuaternion.z, vQuaternion.w));
+
     PxRigidDynamic* pDynamicActor = m_pPhysics->createRigidDynamic(pxTransform);
     if (nullptr == pDynamicActor) {
         MSG_BOX(TEXT("Failed to Create RigidDynamic."));
@@ -262,7 +278,7 @@ PxRigidDynamic* CPhysX::CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, 
     return pDynamicActor;
 }
 
-PxRigidStatic* CPhysX::CreateStaticActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)
+PxRigidStatic* CPhysX::CreateStaticActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)
 {
     PxCookingParams tParams(mToleranceScale);
     tParams.buildTriangleAdjacencies = true;
@@ -274,12 +290,21 @@ PxRigidStatic* CPhysX::CreateStaticActor(_float4 vPos, _float3* pVerticesPos, _u
     triDesc.triangles.count = iNumIndices / 3;  // »ï°¢Çü °³¼ö
     triDesc.triangles.stride = 3 * sizeof(PxU32);
     triDesc.triangles.data = pIndices;
+    
+    _float3 vScale{};
+    _float4 vQuaternion{};
+    _vector vScaleVector, vRotQuat, vTrans;
+    ::XMMatrixDecompose(&vScaleVector, &vRotQuat, &vTrans, XMLoadFloat4x4(&matWorld));
+    XMStoreFloat3(&vScale, vScaleVector);
+    XMStoreFloat4(&vQuaternion, vRotQuat);
     PxTriangleMesh* pTriMesh = PxCreateTriangleMesh(tParams, triDesc);
-    PxMeshScale meshScale(PxVec3(1.0f, 1.0f, 1.0f));
+    
+    PxMeshScale meshScale(PxVec3(vScale.x, vScale.y, vScale.z));
     PxMeshGeometryFlags meshFlags = PxMeshGeometryFlags();
     PxTriangleMeshGeometry triGeom(pTriMesh, meshScale, meshFlags);
 
-    PxTransform pxTransform(PxVec3(vPos.x, vPos.y, vPos.z));
+    PxTransform pxTransform(PxVec3(matWorld._41, matWorld._42, matWorld._43), PxQuat(vQuaternion.x, vQuaternion.y, vQuaternion.z, vQuaternion.w));
+
     PxRigidStatic* pStaticActor = m_pPhysics->createRigidStatic(pxTransform);
     if (nullptr == pStaticActor) {
         MSG_BOX(TEXT("Failed to Create RigidStatic."));
@@ -291,7 +316,6 @@ PxRigidStatic* CPhysX::CreateStaticActor(_float4 vPos, _float3* pVerticesPos, _u
     {
         PxMaterial* pMtrl = m_pPhysics->createMaterial(0.5f, 0.5f, 0.6f);
         pShape = m_pPhysics->createShape(triGeom, *pMtrl);
-
     }
     else
         pShape = m_pPhysics->createShape(triGeom, *pMaterial);
