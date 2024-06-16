@@ -48,13 +48,17 @@ private:
     set< class CTrigger* > m_Hitboxes;
     list<CLadder*>                          m_Ladders;
 
+
+    // 히트박스 관련
 #pragma region KNOCKBACK
     _bool Small_KnockBack(_uint uKirbyState); 
-
     _bool Normal_KnockBack(_uint uKirbyState);
-
     _bool Up_KnockBack(_uint uKirbyState);
     _bool FlyAway_KnockBack(_uint uKirbyState);
+
+    void HitStop_Rogic(class CKirby* pKirby);
+
+    void Damage_To_Monster(class CKirby* pKirby, CPhysXObject* pMonster);
 #pragma endregion
 
 

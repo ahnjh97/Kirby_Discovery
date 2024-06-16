@@ -159,6 +159,9 @@ public:
 	// 손에 쥐고있어야 할 때, 필요한 행렬 포인터
 	_float4x4*		Get_HandsMatrix()  { return &m_ArmourMatrix; }
 
+	void			Set_HitStop() { m_bHitStop = true; }
+
+	
 
 	// 기타 세부적인 제어
 private:
@@ -202,6 +205,11 @@ private:
 	_float				  m_fFlashOverPowerTime = { 0.f };
 	_float				  m_fPreHp = { 0.f };
 	_uint				  m_uCoin = { 0 };
+
+	void				  HitStop_System(_float fTimeDelta);
+	_bool				  m_bHitStop = { false };
+	_float				  m_fHitStopTime = { 0.f };
+
 
 	// For Bomb
 	vector<CBombOrbitGlow*> m_OrbitGlows;

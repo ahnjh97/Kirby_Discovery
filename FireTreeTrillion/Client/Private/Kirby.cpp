@@ -123,6 +123,7 @@ _int CKirby::Tick(_float fTimeDelta)
 		return OBJ_DEAD;
 
 	m_fTimeDelta = m_pGameInstance->Get_FirstTimer();
+	HitStop_System(fTimeDelta);
 
 	// 파트 오브젝트의 뼈 행렬을 업데이트한다.
 	Update_PartObjectMatrix();
@@ -997,6 +998,21 @@ void CKirby::OverPower()
 
 
 	m_fPreHp = m_fHp;
+}
+
+void CKirby::HitStop_System(_float fTimeDelta)
+{
+	if (m_bHitStop == true)
+	{
+		m_fTimeDelta = 0.f;
+		m_fHitStopTime += fTimeDelta;
+
+		if (m_fHitStopTime > 0.12f)
+		{
+			m_fHitStopTime = 0.f;
+			m_bHitStop = false;
+		}
+	}
 }
 
 void CKirby::Change_State(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, BODYSTATE eBody, _uint iOffSet)
