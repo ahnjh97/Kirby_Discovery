@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "CollisionCenter.h"
 #include "GameInstance.h"
-#include "Kirby.h"
 #include "Trigger.h"
 #include "ItemObject.h"
 #include "Camera_Main.h"
+#include "Kirby.h"
 
 #include "HUD_StarPoint.h"
 
@@ -36,7 +36,7 @@ void CCollisionCenter::Initialize()
 
 	// For CONTENT_ATTACK
 	m_eColliderType[HITBOX_PLYAER][MONSTER] = CONTENT_ATTACK;
-	m_eColliderType[HITBOX_MONSTER][PLAYER]  = CONTENT_ATTACK;
+	m_eColliderType[HITBOX_MONSTER][PLAYER]  = CONTENT_DAMAGE;
 
 	// For 상자(OBJECT)
 	m_eColliderType[HITBOX_PLYAER][OBJECT]  = CONTENT_ATTACK;
@@ -82,6 +82,14 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 		Safe_Release(pSrc);
 		Safe_Release(pDst);
 	}
+
+	for (auto& Trigger : m_Hitboxes)
+	{
+		Trigger->Close_Collision();
+		CGameObject* pSrc = Trigger;
+		Safe_Release(pSrc);
+	}
+	m_Hitboxes.clear();
 
 	m_WaitingList.clear();
 }
@@ -199,11 +207,51 @@ void CCollisionCenter::Collision_Collider(CONTENT_TYPE eType, CPhysXObject* pSrc
 		}
 	}
 
-	// HITBOX x 캐릭터
+	// HITBOX x 몬스터
 	else if (eType == CONTENT_ATTACK)
 	{
-		pSrcObject->Collision_Hitbox(pDstObject);
-		pDstObject->Collision_Hitbox(pSrcObject);
+		// m_Hitboxes 여기다가 충돌박스인 놈을 담아야한다...
+		// HitBox를 선별하여... 
+		CPhysXObject* pTriggerObj = Find_TypePtr(HITBOX_PLYAER, pSrcObject, pDstObject);
+		CPhysXObject* pMonsterObj = Find_TypePtr(MONSTER, pSrcObject, pDstObject);
+		CTrigger* pTrigger = static_cast<CTrigger*>(pTriggerObj);
+		if (pTriggerObj == nullptr)
+			return;
+		// 이 친구는 최종적으로, 트리거 작동을 false 해주기 위함이다.
+		m_Hitboxes.insert(pTrigger);
+		Safe_AddRef(pTrigger);
+
+		CKirby* pKirby = static_cast<CKirby*>(pTrigger->Get_Owner());
+
+		CTransform* pPlayerTransform = pKirby->Get_TransformCom();
+		_vector vPos = pPlayerTransform->Get_State_Vector(CTransform::STATE_POSITION);
+		CTransform* pMonsterTransform = pMonsterObj->Get_TransformCom();
+		_vector vMonsterPos = pMonsterTransform->Get_State_Vector(CTransform::STATE_POSITION);
+		// 넉백 방향
+		_vector vPlayerKnockbackDir = XMVector3Normalize(vMonsterPos - vPos);
+
+		// 만약, 작은 넉백이였을 경우
+		if (Small_KnockBack(pKirby->Get_State()))
+		{
+			Knock_back(pMonsterObj, vPlayerKnockbackDir, 5.f);
+		}
+		// 만약, 적당한 넉백이였을 경우
+		else if (Normal_KnockBack(pKirby->Get_State()))
+		{
+			Knock_back(pMonsterObj, vPlayerKnockbackDir * 1.5f, 8.f);
+		}
+		// 위로 뜨는 공격이였을 경우.
+		else if (Up_KnockBack(pKirby->Get_State()))
+		{
+			Knock_back(pMonsterObj, vPlayerKnockbackDir * 0.5f, 13.f);
+		}
+		// 아예 날아가는 공격이였을 경우.
+		else if (FlyAway_KnockBack(pKirby->Get_State()))
+		{
+			Knock_back(pMonsterObj, vPlayerKnockbackDir * 4.f, 20.f);
+		}
+
+		pMonsterObj->Collision(CONTENT_ATTACK, pKirby);
 	}
 
 }
@@ -251,6 +299,28 @@ void CCollisionCenter::Ladder_Collider()
 
 
 	m_Ladders.clear();
+}
+
+_bool CCollisionCenter::Small_KnockBack(_uint uKirbyState)
+{
+	return uKirbyState == CKirby::SWORDSTATE_SIDESLASH ||
+		uKirbyState == CKirby::SWORDSTATE_MULITSWORDATTACK ||
+		uKirbyState == CKirby::SWORDSTATE_GIGANTSPINSLASH;
+}
+
+_bool CCollisionCenter::Normal_KnockBack(_uint uKirbyState)
+{
+	return uKirbyState == CKirby::SWORDSTATE_DECISIVESLASH;
+}
+
+_bool CCollisionCenter::Up_KnockBack(_uint uKirbyState)
+{
+	return false;
+}
+
+_bool CCollisionCenter::FlyAway_KnockBack(_uint uKirbyState)
+{
+	return false;
 }
 
 void CCollisionCenter::Camera_Shaking(_float fPower, _float fTime, _float2 vDir)
@@ -337,6 +407,7 @@ void CCollisionCenter::Fly_DeadAway(CPhysXObject* pSrc, CPhysXObject* pDst)
 
 void CCollisionCenter::Knock_back(CPhysXObject* pObject, _float3 vKnockbackDir, _float fPower)
 {
+	pObject->Set_DamageMoving(vKnockbackDir, fPower);
 }
 
 void CCollisionCenter::Compute_Damage(CPhysXObject* pPlayer, CPhysXObject* pMonster)
@@ -428,6 +499,13 @@ void CCollisionCenter::Free()
 	for (auto& pLadder : m_Ladders)
 		Safe_Release(pLadder);
 	m_Ladders.clear();
+
+	for (auto& pHitboxObject : m_Hitboxes)
+	{
+		CGameObject* pSrc = pHitboxObject;
+		Safe_Release(pSrc);
+	}
+	m_Hitboxes.clear();
 
 	__super::Free();
 

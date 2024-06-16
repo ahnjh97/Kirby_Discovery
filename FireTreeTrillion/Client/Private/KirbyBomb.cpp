@@ -317,6 +317,9 @@ _int CKirbyBomb::Boom_Dead()
 {
 
 
+
+
+
     return OBJ_DEAD;
 }
 

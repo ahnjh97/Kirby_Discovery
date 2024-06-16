@@ -61,7 +61,6 @@ HRESULT CKabu::Initialize(void* pArg)
 	m_fSpeed = 0.f;
 
 	//m_vRally = m_vecRallyPoint[m_iCnt + 1] - m_vecRallyPoint[m_iCnt];
-	m_pControllerCom->Register_Controller();
 
 	return S_OK;
 }
@@ -277,6 +276,7 @@ HRESULT CKabu::Add_Components()
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	m_pControllerCom->Set_Object(this);
+	m_pControllerCom->Register_Controller();
 	
 	SetUp_FSM();
 
