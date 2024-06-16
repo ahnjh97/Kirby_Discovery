@@ -61,7 +61,7 @@ private:
 
 	_float		m_fFlyTime = { 0.f };
 	_float		m_fDeadTime = { 0.f };
-	_float		m_bController = { false };
+	_bool		m_bController = { false };
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
