@@ -41,8 +41,10 @@ private:
 	HRESULT Loading_For_Tool_Anim();
 	HRESULT Loading_For_Tool_Map();
 
-	// 240518
 	HRESULT Add_Models(LEVEL eLevel);
+	string  Remove_BeforeLastPipe(const string& str);
+
+	HRESULT Add_FXTexture();
 	HRESULT Add_ModelsForAnimTool();
 	void SetUp_ModelScaleRotation(LEVEL eLevel);
 
@@ -69,6 +71,7 @@ private:
 
 	vector<MODEL>				m_vecModelInfo;
 
+	// first : 모델명, second : 모델의 "애니메이션-애니메이션프레임정보"
 	using AnimToolMap = unordered_map< string, unordered_map< string, ANIM_INFO >>;
 	AnimToolMap					m_mapSequence;
 

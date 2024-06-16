@@ -23,6 +23,59 @@ void CKirbyVacuum_Spit_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
 	pKirby->DefaultIdle();
+	Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
+
+	m_fSpitTime += fTimeDelta;
+	if (m_fSpitTime > 0.05f && m_bSpitTrigger == true )
+	{
+		// 날려 보낸다. 날려보내는 순간 나의 관할이 아니기 때문에 그냥 보내버린다.
+		// 또한 보내기전에 마지막으로 Fly로 만들어준다. 또한 방향을 여기서 정해준다.
+		if (DESC(m_pObject) != nullptr)
+		{
+			CTransform* pObjectTransform = DESC(m_pObject)->Get_TransformCom();
+			pObjectTransform->Set_Scaled(1.f, 1.f, 1.f);
+
+			_float4 vTargetPos = Spit_Target_Object(pKirby);
+
+			if (vTargetPos == _float4(0.f, 0.f, 0.f, 0.f))
+			{
+				DESC(m_pObject)->Set_DamageMoving(pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), 1.f);
+
+				_vector vNewUp = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+				_vector vNewLook = XMVector3Cross(vNewUp, XMVectorSet(0.f, 1.f, 0.f, 0.f));
+				_vector vNewRight = XMVector3Cross(vNewUp, vNewLook);
+				pObjectTransform->Set_State(CTransform::STATE_UP, vNewUp);
+				pObjectTransform->Set_State(CTransform::STATE_RIGHT, vNewRight);
+				pObjectTransform->Set_State(CTransform::STATE_LOOK, vNewLook);
+
+			}
+			else
+			{
+				_float4 vObjectPos = pObjectTransform->Get_State(CTransform::STATE_POSITION);
+				_vector vObjectToTargetDir = XMVector3Normalize(vTargetPos - vObjectPos);
+				DESC(m_pObject)->Set_DamageMoving(vObjectToTargetDir, 1.f);
+
+				vObjectToTargetDir.m128_f32[1] = 0.f;
+				DESC(m_vTargetDir) = XMVector3Normalize(vObjectToTargetDir);
+
+				_vector vNewUp = vObjectToTargetDir;
+				_vector vNewLook = XMVector3Cross(vNewUp, XMVectorSet(0.f, 1.f, 0.f, 0.f));
+				_vector vNewRight = XMVector3Cross(vNewUp, vNewLook);
+				pObjectTransform->Set_State(CTransform::STATE_UP, vNewUp);
+				pObjectTransform->Set_State(CTransform::STATE_RIGHT, vNewRight);
+				pObjectTransform->Set_State(CTransform::STATE_LOOK, vNewLook);
+
+
+			}
+
+			DESC(m_pObject)->Set_PhyXState(PO_FLYAWAY);
+			Safe_Release(DESC(m_pObject));
+			DESC(m_pObject) = nullptr;
+		}
+		m_bSpitTrigger = false;
+	}
+
+
 
 	// 뱉는다.
 	if (pKirby->isAnimFinish())
@@ -48,7 +101,8 @@ void CKirbyVacuum_Spit_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 void CKirbyVacuum_Spit_State::OnStateExit()
 {
-
+	m_bSpitTrigger = true;
+	m_fSpitTime = 0.f;
 }
 
 CKirbyVacuum_Spit_State* CKirbyVacuum_Spit_State::Create()
@@ -202,7 +256,7 @@ void CKirbyVacuum_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float f
 		}
 
 		pController->FreeFall(pTransformCom, fTimeDelta, Kirbydesc->m_fGravityOffset);
-		pKirby->Delete_KirbyEffect();
+		pKirby->Delete_AllEffect();
 
 	}
 	else if (pKirby->Get_State() == CKirby::STATE_INHALEFALL)
@@ -400,22 +454,31 @@ void CKirbyVacuum_Vacuuming_State::OnStateUpdate(CGameObject* pGameObject, _floa
 	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
+
 	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+
 
 	DESC(m_eEyeState) = CKirby::EYE_CLOSE;
 	CTransform* pObjectTransform = DESC(m_pObject)->Get_TransformCom();
 	_vector vObjectPos = pObjectTransform->Get_State_Vector(CTransform::STATE_POSITION);
 	_float vCurDistance = XMVectorGetX(XMVector3Length(vPos - vObjectPos));
-	_vector vObjectDir = XMVector3Normalize(vPos - vObjectPos);
-	CCharacterController* pObjectController = static_cast<CCharacterController*>(DESC(m_pObject)->Get_Component(TEXT("Com_Controller")));
+	_float4 vObjectDir = XMVector3Normalize(vPos - vObjectPos);
 
-	pObjectController->Move_Dir(pObjectTransform, vObjectDir * fVacuumObjectSpeed * fTimeDelta, fTimeDelta);
+	CCharacterController* pObjectController = static_cast<CCharacterController*>(DESC(m_pObject)->Get_Component(TEXT("Com_Controller")));
+	if (pObjectController == nullptr)
+	{
+		_float4 vPos = pObjectTransform->Get_State(CTransform::STATE_POSITION);
+		pObjectTransform->Set_State(CTransform::STATE_POSITION, vPos + vObjectDir * fVacuumObjectSpeed * fTimeDelta);
+	}
+	else
+	{
+		pObjectController->Move_Dir(pObjectTransform, vObjectDir * fVacuumObjectSpeed * fTimeDelta, fTimeDelta);
+	}
 
 	_float fScaleinverse = 1.f - ((DESC(m_fObjectDistance) - vCurDistance) / DESC(m_fObjectDistance) * 0.3f);
 
 	_float3 vObjectScale = pObjectTransform->Get_Scaled();
 	pObjectTransform->Set_Scaled(DESC(m_vObjectScale).x * fScaleinverse, DESC(m_vObjectScale).y * fScaleinverse, DESC(m_vObjectScale).z * fScaleinverse);
-
 	fVacuumObjectSpeed += fTimeDelta * 150.f;
 }
 

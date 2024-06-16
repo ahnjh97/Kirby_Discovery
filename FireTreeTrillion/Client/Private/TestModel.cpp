@@ -19,7 +19,7 @@ CTestModel::CTestModel(const CTestModel& rhs)
 
 HRESULT CTestModel::Initialize_Prototype()
 {
-    m_eCollisionGroup = COLLISION_TYPE::INTERACT;
+    //m_eCollisionGroup = COLLISION_TYPE::INTERACT;
 
     return S_OK;
 }
@@ -35,14 +35,14 @@ HRESULT CTestModel::Initialize(void* pArg)
     //CGameInstance::Get_Instance()->Test();
     
     // position 세팅은 항상 Add_Components() 앞에 둘것
-    _vector vPos = XMVectorSet(-85, 6.f, -9.f, 1.f);
+    _vector vPos = XMVectorSet(0.f, 8.f, -180.f, 1.f);
     m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
-    //m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(-16.f));
+    m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(-16.f));
 
     if (FAILED(Add_Components()))
         return E_FAIL;
 
-    //m_pModelCom->Set_Animation(0, 60.f, true);
+    m_pModelCom->Set_Animation(0, 60.f, true);
 
     // 예시코드 1 : 태양광
     //LIGHT_DESC			LightDesc{};
@@ -85,27 +85,27 @@ _int CTestModel::Tick(_float fTimeDelta)
         m_pLight->Update_LightPos(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
 
     // 점프용 velocity(속도)
-    m_fJumpVelocity -= GRAVITY * fTimeDelta;
-    /*if (true == m_isJump)
-        m_isJump = m_pControllerCom->Jump(m_pTransformCom, m_fJumpVelocity, fTimeDelta);
-    else
-        m_pControllerCom->FreeFall(m_pTransformCom, fTimeDelta);*/
+    //m_fJumpVelocity -= GRAVITY * fTimeDelta;
+    //if (true == m_isJump)
+    //    m_isJump = m_pControllerCom->Jump(m_pTransformCom, m_fJumpVelocity, fTimeDelta);
+    //else
+    //    m_pControllerCom->FreeFall(m_pTransformCom, fTimeDelta);
 
     // 예시코드 5 : 계산기 예시 코드 (월드 매트리스로 예시든거임 이건 정신나간 코드이므로 참고해주셈)
     // 예시코드 6 : DInput + KeyPress 예시 코드
-    //if (m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_PRESS))
-    //{
-    //    _float4x4 Worldmatrix = m_pTransformCom->Get_WorldFloat4x4();
-    //    _vector vLook = CUtils::Get_State_Vector_Matrix(Worldmatrix, CUtils::STATE_LOOK);
-    //    _vector vPos = CUtils::Get_State_Vector_Matrix(Worldmatrix, CUtils::STATE_POSITION);
-    //    _float fSpeed = 3.f;
+    if (m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_PRESS) && m_pGameInstance->Get_DIKeyState(DIK_LCONTROL, KEY_PRESS))
+    {
+        _float4x4 Worldmatrix = m_pTransformCom->Get_WorldFloat4x4();
+        _vector vLook = CUtils::Get_State_Vector_Matrix(Worldmatrix, CUtils::STATE_LOOK);
+        _vector vPos = CUtils::Get_State_Vector_Matrix(Worldmatrix, CUtils::STATE_POSITION);
+        _float fSpeed = 3.f;
 
-    //    vPos += vLook * fTimeDelta * fSpeed;
+        vPos += vLook * fTimeDelta * fSpeed;
 
-    //    CUtils::Set_State_Matrix(Worldmatrix, CUtils::STATE_POSITION, vPos);
+        CUtils::Set_State_Matrix(Worldmatrix, CUtils::STATE_POSITION, vPos);
 
-    //    m_pTransformCom->Set_WorldMatrix(Worldmatrix);
-    //}
+        m_pTransformCom->Set_WorldMatrix(Worldmatrix);
+    }
     
     // 예시코드 6 : DInput + KeyPress 예시 코드 
     //if (m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_PRESS))
@@ -113,7 +113,7 @@ _int CTestModel::Tick(_float fTimeDelta)
     //    _float fSpeed = m_pTransformCom->Get_SpeedPerSec();
     //    // for test
     //    //fSpeed = 5.f;
-    //    //m_pControllerCom->Move(m_pTransformCom, fSpeed, fTimeDelta);
+    //    m_pControllerCom->Move(m_pTransformCom, fSpeed, fTimeDelta);
     //}
 
     //if (m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_PRESS))
@@ -158,43 +158,43 @@ _int CTestModel::Tick(_float fTimeDelta)
     //}
 
 
-    //// 예시코드 9 : Radial Blur Center
-    //if (m_pGameInstance->Get_DIKeyState(DIK_1, KEY_DOWN))
-    //{
-    //    m_pGameInstance->Setting_RadialBlur(10.f, 10.f);
-    //}
+    // 예시코드 9 : Radial Blur Center
+    if (m_pGameInstance->Get_DIKeyState(DIK_1, KEY_DOWN))
+    {
+        m_pGameInstance->Setting_RadialBlur(10.f, 10.f);
+    }
 
-    //// 예시코드 10 : Radial Blur Player
-    //if (m_pGameInstance->Get_DIKeyState(DIK_2, KEY_DOWN))
-    //{
-    //    _vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-    //    m_pGameInstance->Setting_RadialBlur(vPos, 5.f, 10.f);
-    //}
+    // 예시코드 10 : Radial Blur Player
+    if (m_pGameInstance->Get_DIKeyState(DIK_2, KEY_DOWN))
+    {
+        _vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+        m_pGameInstance->Setting_RadialBlur(vPos, 5.f, 10.f);
+    }
 
 
-    //if (m_pGameInstance->Get_DIKeyState(DIK_P, KEY_DOWN))
-    //{
-    //    m_iTestAnim++;
-    //    if (m_iTestAnim > 290)
-    //        m_iTestAnim = 290;
+    if (m_pGameInstance->Get_DIKeyState(DIK_P, KEY_DOWN))
+    {
+        m_iTestAnim++;
+        if (m_iTestAnim > 290)
+            m_iTestAnim = 290;
 
-    //    m_pModelCom->Set_Animation(m_iTestAnim, 60.f, true, true);
-    //}
-    //else if (m_pGameInstance->Get_DIKeyState(DIK_O, KEY_DOWN))
-    //{
-    //    m_iTestAnim--;
-    //    if (m_iTestAnim < 0)
-    //        m_iTestAnim = 0;
+        m_pModelCom->Set_Animation(m_iTestAnim, 60.f, true, true);
+    }
+    else if (m_pGameInstance->Get_DIKeyState(DIK_O, KEY_DOWN))
+    {
+        m_iTestAnim--;
+        if (m_iTestAnim < 0)
+            m_iTestAnim = 0;
 
-    //    m_pModelCom->Set_Animation(m_iTestAnim, 60.f, true, true);
+        m_pModelCom->Set_Animation(m_iTestAnim, 60.f, true, true);
 
-    //}
-    //else if (m_pGameInstance->Get_DIKeyState(DIK_I, KEY_DOWN))
-    //{
-    //    //m_pModelCom->Set_Animation(m_iTestAnim, true, true);
-    //}
+    }
+    else if (m_pGameInstance->Get_DIKeyState(DIK_I, KEY_DOWN))
+    {
+        //m_pModelCom->Set_Animation(m_iTestAnim, true, true);
+    }
 
-    //// FSM 제어
+    // FSM 제어
     //Update_FSMState(fTimeDelta);
     //m_pFSM->Update(this, fTimeDelta);
 
@@ -203,7 +203,7 @@ _int CTestModel::Tick(_float fTimeDelta)
 
 void CTestModel::Late_Tick(_float fTimeDelta)
 {
-    //m_pModelCom->Play_Animation(fTimeDelta);
+    m_pModelCom->Play_Animation(fTimeDelta);
 
     //SetOn_Slope(fTimeDelta);
 
@@ -214,18 +214,23 @@ void CTestModel::Late_Tick(_float fTimeDelta)
         m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
     }
 
-    //if (m_pGameInstance->Get_DIKeyState(DIK_L, KEY_DOWN))
-    //{
-    //    CGameObject* pCamera = m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Camera"), 0);
-    //    _float4 vForce = static_cast<CTransform*>(pCamera->Get_Component(g_strTransformTag))->Get_State_Float4(CTransform::STATE_LOOK);
-    //    //_float4 vForce = CUtils::Make_RandomAngle_Vector(20.f, XMVectorSet(0.f, 1.f, 0.f, 0.f));
-    //    _float3 force = _float3{ vForce.x * 10000.f, vForce.y * 10000.f, vForce.z * 10000.f };
+    CGameObject* pCamera = m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Camera"), 0);
+    _float4 vForce = static_cast<CTransform*>(pCamera->Get_Component(g_strTransformTag))->Get_State_Float4(CTransform::STATE_LOOK);
+    _float3 force = _float3{ vForce.x * 10000.f, vForce.y * 10000.f, vForce.z * 10000.f };
+    //if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD7, KEY_DOWN))
     //    m_pRigidBodyCom->Add_Force(force);
-    //}
+    //if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD8, KEY_DOWN))
+    //    m_pRigidBodyCom->Add_Torque(force);
+    //if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD9, KEY_DOWN))
+    //    m_pRigidBodyCom->Add_Velocity(force);
 
-    //m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
+    //m_pRigidBodyCom->Update(m_pTransformCom);
+    m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
+
+    //m_pRigidBodyCom->Overlap_Hitbox();
+
 #ifdef _DEBUG
-    /*m_pGameInstance->RenderGrid();*/
+    //m_pGameInstance->RenderGrid();
 #endif
 }
 
@@ -239,15 +244,12 @@ HRESULT CTestModel::Render()
     {
         if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
             return E_FAIL;
-        if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
+
+        if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
             return E_FAIL;
-        if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
-            return E_FAIL;
-        /*if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
-            return E_FAIL;*/
 
         /* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-        if (FAILED(m_pShaderCom->Begin(0)))
+        if (FAILED(m_pShaderCom->Begin(1)))
             return E_FAIL;
 
         m_pModelCom->Render(i);
@@ -284,14 +286,14 @@ void CTestModel::Render_IMGUI()
 #endif
 
 // ==================================== 커비 전용 ===================================
-void CTestModel::SetOn_Slope(_float fTimeDelta)
-{
-    // 지면의 up벡터
-   /* PxVec3 slope = m_pControllerCom->Compute_Slope(m_pTransformCom);
-    _vector vTerrainNormal = CUtils::To_Vector(slope);
-
-    Lerp_UpVector(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), vTerrainNormal, 10.f, fTimeDelta);*/
-}
+//void CTestModel::`(_float fTimeDelta)
+//{
+//    // 지면의 up벡터
+//    PxVec3 slope = m_pControllerCom->Compute_Slope(m_pTransformCom);
+//    _vector vTerrainNormal = CUtils::To_Vector(slope);
+//
+//    Lerp_UpVector(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), vTerrainNormal, 10.f, fTimeDelta);
+//}
 
 /// <summary> 객체와 지면의 up벡터를 비교하여 객체의 각도를 보간한다. </summary>
 /// <param name="_vOriginUp"> 객체의 up 벡터 </param>
@@ -313,28 +315,29 @@ HRESULT CTestModel::Add_Components()
 {
     HRESULT hr;
     /* For.Com_Shader */
-    hr = __super::Add_Component(TEXT("Prototype_Component_Shader_VtxModel"),
+    hr = __super::Add_Component(TEXT("Prototype_Component_Shader_VtxAnimModel"),
         TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
     CHECK_FAILED(hr);
 
     /* For.Com_Model */
-    hr = __super::Add_Component(TEXT("Prototype_Component_Model_GsWoodBridgeA"),
+    hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyVacuum"),
         TEXT("Com_Model"), (CComponent**)&m_pModelCom);
     CHECK_FAILED(hr);
     // for animTool
     m_ppModelForAnimTool = &m_pModelCom;
 
     /* For.Com_RigidBody */
-    //CRigidBody::RIGIDBODY_DESC rigidDesc {};
-    //rigidDesc.bTrigger = false;
-    //rigidDesc.eShapeType = RIGID_BOX;
-    //rigidDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
-    //hr = __super::Add_Component(TEXT("Prototype_Component_RigidBody"),
-    //    TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &rigidDesc);
-    //CHECK_FAILED(hr);
-    //m_pRigidBodyCom->Set_Object(this);
-    ////m_pRigidBodyCom->Set_PhysXObject(this);
-    //m_pRigidBodyCom->Activate(true);
+    CRigidBody::RIGIDBODY_DESC rigidDesc {};
+    rigidDesc.bTrigger = false;
+    rigidDesc.bDynamic = true;
+    rigidDesc.bKinematic = false;
+    rigidDesc.eShapeType = RIGID_CAPSULE;
+    rigidDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
+    hr = __super::Add_Component(TEXT("Prototype_Component_RigidBody"),
+        TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &rigidDesc);
+    CHECK_FAILED(hr);
+    m_pRigidBodyCom->Set_Object(this);
+    m_pRigidBodyCom->Activate(true);
 
     ///* For.Com_CharacterController */
     //_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
@@ -344,7 +347,7 @@ HRESULT CTestModel::Add_Components()
     //    TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 
     /* FSM */
-    SetUp_FSM();
+    //SetUp_FSM();
 
     return S_OK;
 }
@@ -425,8 +428,8 @@ void CTestModel::Update_FSMState(_float fTimeDelta)
 
 void CTestModel::Change_State(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
 {
-   /* m_eCurrentState = eState;
-    m_pFSM->ChangeState((_uint)eState, _fAnimSpeed, _bLoop, _bInterpolation);*/
+    m_eCurrentState = eState;
+    m_pFSM->ChangeState((_uint)eState, _fAnimSpeed, _bLoop, _bInterpolation);
 }
 
 HRESULT CTestModel::Bind_ShaderResources()
@@ -478,14 +481,13 @@ void CTestModel::Free()
 
     Safe_Release(m_pShaderCom);
     Safe_Release(m_pModelCom);
-    //Safe_Release(m_pRigidBodyCom);
-    Safe_Release(m_pControllerCom);
+    Safe_Release(m_pRigidBodyCom);
+    //Safe_Release(m_pControllerCom);
     
     Safe_Release(m_pLight);
-    Safe_Release(m_pFSM);
+    //Safe_Release(m_pFSM);
     
     // not yet [240520]
     //for (auto& iter : m_mapRigidBodies)
     //    Safe_Release(iter.second);
 }
-

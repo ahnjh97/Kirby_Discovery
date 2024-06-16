@@ -24,14 +24,13 @@ public:
 	class CComponent*	Get_Component(const wstring& strComTag);
 	CTransform*			Get_TransformCom() const { return m_pTransformCom; }
 	_float				Get_ViewZ() const { return m_fViewZ; }
+	_uint				Get_CollisionType() { return m_eCollisionGroup; }
 
 	_bool				Get_Dead() { return m_bDead; }
 	void				Set_Dead() { m_bDead = true; }
 
 	_bool				Get_Hide() { return m_bHide; }
 	virtual void		Set_Hide(_bool bHide) { m_bHide = bHide; }
-
-	COLLISION_TYPE		Get_CollisionGroup() const { return m_eCollisionGroup; }
 
 	// prototypeTag
 	const wstring&		Get_PrototypeTag() const { return m_wstrPrototypeTag; }
@@ -41,11 +40,12 @@ public:
 	class CModel**		Get_ModelAddress()   { return m_ppModelForAnimTool; }
 	_uint				Get_ModelCnt() const { return m_uModelCnt; }
 
-	_uint Get_ShaderVars() { return m_iShaderVars; }
-	_float Get_RimWidth() { return m_fRimWidth; }
-	void Set_ShaderVars(_uint iShaderVars);
-	void Set_RimWidth(_float fRimWidth) { m_fRimWidth = fRimWidth; }
-	
+	// SHADER
+	_uint				Get_ShaderVars() { return m_iShaderVars; }
+	void				Set_ShaderVars(_uint iShaderVars);
+	_float				Get_RimWidth() { return m_fRimWidth; }
+	void				Set_RimWidth(_float fRimWidth) { m_fRimWidth = fRimWidth; }
+
 public:
 	virtual HRESULT		Initialize_Prototype();
 	virtual HRESULT		Initialize(void* pArg);
@@ -58,15 +58,14 @@ public:
 	virtual void		Render_IMGUI();
 #endif
 	virtual HRESULT		Render_DeferredInfo() { return S_OK; }
-	
-	// 충돌처리 함수
-	virtual void		Collision_Attack(CGameObject* pGameObject);
+
 
 protected:
 	HRESULT				Add_Component(_uint iLevelIndex, const wstring& strPrototypeTag, const wstring& strComponentTag, class CComponent** ppOut, void* pArg = nullptr);
 	HRESULT				Add_Component(const wstring& strPrototypeTag, const wstring& strComponentTag, class CComponent** ppOut, void* pArg = nullptr);
 	void				Delete_Component(const wstring& strPrototypeTag, const wstring& strComponentTag, class CComponent** ppOut);
 	HRESULT				Compute_ViewZ();
+
 
 protected:
 	ID3D11Device*							m_pDevice = { nullptr };
@@ -83,8 +82,6 @@ protected:
 	_bool									m_bDead = { false };
 	// prototypeName을 들고 있는다.
 	wstring									m_wstrPrototypeTag = wstring();
-	// collision group을 지정하여 충돌체크를 진행합니다.
-	COLLISION_TYPE							m_eCollisionGroup = COLLISION_END;
 	
 	_float									m_fViewZ = { 0.f };
 	_float3									m_vViewPos = _float3{ 0.f, 0.f, 0.f };
@@ -100,6 +97,8 @@ protected:
 	_bool									m_bStencil = { true };
 	_bool									m_bRimLight = { true };
 	_bool									m_bMotionBlur = { false };
+	_uint									m_eCollisionGroup = { INT_MAX };
+
 
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;

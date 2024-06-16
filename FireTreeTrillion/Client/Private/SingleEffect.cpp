@@ -29,6 +29,7 @@ HRESULT CSingleEffect::Initialize(void* pArg)
 {
 	FX_DESC FXDesc{};
 
+	//미리 세팅된 값이 있다면
 	if (m_FXDesc.strFXName != "NONE")
 	{
 		FXDesc = m_FXDesc;
@@ -97,12 +98,11 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 	if (Calculate_Duration(_fTimeDelta))
 	{
 		//툴에서는 다시 시작하기
-		if (*m_pCurrentLevelID == LEVEL_TOOL_FX)
+		if (*m_pCurrentLevelID != LEVEL_TOOL_FX)
 		{
-			m_fDuration.first = 0.f;
-		}
-		else
 			m_bDead = true;
+			//m_fDuration.first = 0.f;
+		}
 	}
 
 	//true 반환하면 lifetime 끝난 것.
@@ -147,7 +147,7 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 	_float3 vDir = _float3::TransformNormal(m_vCurPos, RotMat);
 
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, Pos(m_vInitPos) + Dir(vDir));
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, Pos(m_vInitPos) + Dir(vDir * m_vInitScale));
 
 	Quaternion vInitQuat = Quaternion::CreateFromYawPitchRoll(vInitRadianRot);
 
@@ -165,9 +165,12 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 		socketMatrix.Up().Normalize();
 		socketMatrix.Backward().Normalize();
 
-		m_pTransformCom->Set_WorldMatrix( m_pTransformCom->Get_WorldMatrix() * socketMatrix);
+		m_pTransformCom->Set_WorldMatrix(m_pTransformCom->Get_WorldMatrix() * socketMatrix);
 	}
 
+
+	if (m_bIsBillboard)
+		Billboard_Effect();
 
 	return OBJ_NOEVENT;
 }
@@ -218,16 +221,18 @@ HRESULT CSingleEffect::Add_Components(FX_DESC& FXDesc)
 {
 	HRESULT hr;
 
+
 	hr = __super::Add_Component(LEVEL_STATIC, CUtils::StrToWstr(FXDesc.strTexTag),
 		TEXT("Com_DiffuseTexture"), (CComponent**)&m_pTextureCom[TEX_DIFFUSE]);
 	CHECK_FAILED(hr);
 
-	m_iMaxTexIdx = m_pTextureCom[TEX_DIFFUSE]->Get_TextureNum();
+	m_iMaxTexIdx = m_pTextureCom[TEX_DIFFUSE]->Get_TextureNum()-1;
 
 	hr = __super::Add_Component(LEVEL_STATIC, CUtils::StrToWstr(FXDesc.strMaskTexTag),
 		TEXT("Com_MaskTexture"), (CComponent**)&m_pTextureCom[TEX_MASK]);
 	CHECK_FAILED(hr);
 
+	m_iMaxMaskTexIdx = m_pTextureCom[TEX_MASK]->Get_TextureNum() - 1;
 
 	if (FXDesc.strBufferTag == "Prototype_Component_VIBuffer_Rect")
 	{
@@ -240,14 +245,13 @@ HRESULT CSingleEffect::Add_Components(FX_DESC& FXDesc)
 			TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 		CHECK_FAILED(hr);
 
-		//현재 VtxPosTex Shader Pass 4까지
-		m_iMaxPassIdx = 4;
+		//현재 VtxPosTex Shader Pass 6까지
+		m_iMaxPassIdx = 6;
 	}
 	else
 	{
 		hr = __super::Add_Component(LEVEL_STATIC, CUtils::StrToWstr(FXDesc.strBufferTag),
 			TEXT("Com_Model"), (CComponent**)&m_pModelCom);
-
 		CHECK_FAILED(hr);
 
 
@@ -309,7 +313,7 @@ HRESULT CSingleEffect::Bind_ShaderResources(_int iTexIdx, _int iMaskTexIdx)
 	hr = m_pShaderCom->Bind_RawValue("g_vMaskUVOffset", &m_vCurMaskUVOffset, sizeof(_float2));
 	CHECK_FAILED(hr);
 
-	hr = m_pShaderCom->Bind_RawValue("g_vMaskUVAngle", &m_vCurMaskUVAngle, sizeof(_float2));
+	hr = m_pShaderCom->Bind_RawValue("g_fMaskUVAngle", &m_vCurMaskUVAngle, sizeof(_float));
 	CHECK_FAILED(hr);
 
 	hr = m_pGameInstance->Bind_RTShaderResource(m_pShaderCom, TEXT("Target_Depth"), "g_DepthTexture");

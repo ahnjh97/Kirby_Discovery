@@ -1,4 +1,5 @@
 #include "Utils.h"
+#include "GameInstance.h"
 
 // string --> wstring º¯È¯
 wstring CUtils::StrToWstr(const string& value)
@@ -138,9 +139,34 @@ Quaternion CUtils::Make_Quat_FromDir(const _float4& _dir)
 {
 	_float3 vStartDir{ 0.f, 0.f, 1.f };
 	_float3 vDestDir = _dir;
-	
+	vDestDir.Normalize();
 
 	return Quaternion::FromToRotation(vStartDir, vDestDir);
+}
+
+Quaternion CUtils::Make_Quat_FromDir(const _float3& _dir)
+{
+	_float3 vStartDir{ 0.f, 0.f, 1.f };
+	_float3 vDestDir = _dir;
+	vDestDir.Normalize();
+
+	return Quaternion::FromToRotation(vStartDir, vDestDir);
+}
+
+_float3 CUtils::Make_Degree_FromDir(const _float4& _dir)
+{
+	Quaternion vQuat = Make_Quat_FromDir(_dir);
+	_float3 vEulerAngle = vQuat.ToEuler();
+
+	return _float3( ToDegree(vEulerAngle.x), ToDegree(vEulerAngle.y), ToDegree(vEulerAngle.z) );
+}
+
+_float3 CUtils::Make_Degree_FromDir(const _float3& _dir)
+{
+	Quaternion vQuat = Make_Quat_FromDir(_dir);
+	_float3 vEulerAngle = vQuat.ToEuler();
+
+	return _float3(ToDegree(vEulerAngle.x), ToDegree(vEulerAngle.y), ToDegree(vEulerAngle.z));
 }
 
 void CUtils::Set_State_Matrix(_Inout_ _float4x4& matrix, STATE eState, _fvector vState)
@@ -184,6 +210,18 @@ void CUtils::Turn_OtherMatrix(_Inout_ _float4x4& matrix, _fvector vAxis, _float 
 		Set_State_Matrix(matrix, (STATE)i,
 			XMVector4Transform(Get_State_Vector_Matrix(matrix, (STATE)i), RotationMatrix));
 	}
+}
+
+void CUtils::Make_World_ToScreen(_Inout_ _float3& vPos)
+{
+	vPos = XMVector3TransformCoord(vPos, CGameInstance::Get_Instance()->Get_Transform(CPipeLine::D3DTS_VIEW));
+	vPos = XMVector3TransformCoord(vPos, CGameInstance::Get_Instance()->Get_Transform(CPipeLine::D3DTS_PROJ));
+}
+ 
+void CUtils::Make_Screen_ToWorld(_Inout_ _float3& vPos)
+{
+	vPos = XMVector3TransformCoord(vPos, CGameInstance::Get_Instance()->Get_Transform_Inv(CPipeLine::D3DTS_PROJ));
+	vPos = XMVector3TransformCoord(vPos, CGameInstance::Get_Instance()->Get_Transform_Inv(CPipeLine::D3DTS_VIEW));
 }
 
 physx::PxMat44 CUtils::To_Float4x4(const _float4x4& mat)
@@ -392,7 +430,7 @@ HRESULT CUtils::Load_Effect(path _FilePath, PARTICLE_DATA* _pData)
 
 	InputFile.read(reinterpret_cast<char*>(&_pData->bIsLoop), sizeof(_bool));
 	InputFile.read(reinterpret_cast<char*>(&_pData->bIsBillboard), sizeof(_bool));
-	InputFile.read(reinterpret_cast<char*>(&_pData->bIsColorRender), sizeof(_bool));
+	//InputFile.read(reinterpret_cast<char*>(&_pData->bIsColorRender), sizeof(_bool));
 	InputFile.read(reinterpret_cast<char*>(&_pData->bIsBloom), sizeof(_bool));
 
 

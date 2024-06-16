@@ -218,6 +218,12 @@ HRESULT CModel::CreateDynamicActor(_float4x4& matWorld)
 	return S_OK;
 }
 
+void CModel::Update_ActorTransform(CTransform* pTransform)
+{
+	for (auto& mesh : m_Meshes)
+		mesh->Update_ActorTransform(pTransform);
+}
+
 HRESULT CModel::CreateStaticActor(_float4x4& matWorld)
 {
 	for (auto& mesh : m_Meshes)

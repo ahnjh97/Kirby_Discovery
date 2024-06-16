@@ -4,6 +4,8 @@
 #include "GameObject.h"
 #include "Transform.h"
 
+#define OVERLAP_MAX 8
+
 CRigidBody::CRigidBody(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CComponent{ pDevice, pContext }
 {
@@ -28,27 +30,30 @@ HRESULT CRigidBody::Initialize(void * pArg)
 	m_vMaterial				= pDesc->vMaterial;
 	m_fOffsetSize			= pDesc->fOffsetSize;
 	m_bDynamic				= pDesc->bDynamic;
+	m_bKinematic			= pDesc->bKinematic;
 	m_pActorObject			= pDesc->pObj;
-
+	m_fDensity				= pDesc->fDensity;
 	Create_Actor();
 	return S_OK;
 }
 
-void CRigidBody::Update(CTransform* pTransform)
-{
-	Set_PxWorldMatrix(pTransform->Get_WorldFloat4x4());
-}
-
 void CRigidBody::Update(_fmatrix matrix)
 {
-	Set_PxWorldMatrix(matrix);
+	if (!m_bKinematic)
+		Set_PxWorldMatrix(matrix);
+	else if (m_bKinematic && Is_Activated())
+		m_pActor->setKinematicTarget(PxTransform{CUtils::To_Float4x4(matrix)});
+}
+
+void CRigidBody::Update(_float4 vPos)
+{
+	if (m_bKinematic && Is_Activated())
+		m_pActor->setKinematicTarget(PxTransform{ vPos.x, vPos.y, vPos.z });
 }
 
 void CRigidBody::Update_PhysX(CTransform* pTransform)
 {
-	if (Is_Activated() == false) return;
-
-	if (false == m_bTrigger)
+	if (false == m_bKinematic && false == m_bTrigger)
 	{
 		pTransform->Set_WorldMatrix(Get_PxWorldMatrix());
 	}
@@ -63,18 +68,18 @@ void CRigidBody::Render_IMGUI()
 	// ReCreateActor(for change shape or scale)
 	if (ImGui::Button("Update Changes"))
 	{
+		PxTransform globalPose = m_pActor->getGlobalPose();
+		PxMat44 globalPoseMatrix = PxMat44(globalPose);
+		m_OriginTransformMatrix = CUtils::To_Float4x4(globalPoseMatrix);
+		
 		Create_Actor();
 		if (!Is_Activated())
 			m_pGameInstance->Get_Scene()->addActor(*m_pActor);
 	}
 	ImGui::Checkbox("bTrigger",		&m_bTrigger);
+	ImGui::Checkbox("bKinematic",	&m_bKinematic);
 	ImGui::InputFloat("Density",	&m_fDensity);
 
-	ImGui::Indent(20.f);
-	if (ImGui::CollapsingHeader("Origin Trasnform"))
-	{
-	}
-	ImGui::Unindent(20.f);
 }
 
 #endif
@@ -88,9 +93,9 @@ void CRigidBody::Create_Actor()
 	// scale 긁어오기
 	_matrix OriginMatrix = m_OriginTransformMatrix;
 	_float3 vScale = _float3();
-	if (m_fOffsetSize != _float())
+	if (m_fOffsetSize != _float3())
 	{
-		vScale = _float3(m_fOffsetSize, m_fOffsetSize, m_fOffsetSize);
+		vScale = m_fOffsetSize;
 	}
 	else
 	{
@@ -100,7 +105,6 @@ void CRigidBody::Create_Actor()
 	}
 	
 	PxMaterial* pMtrl = m_pGameInstance->Get_Physics()->createMaterial(m_vMaterial.x, m_vMaterial.y, m_vMaterial.z);
-
 	switch (m_eShapeType)
 	{
 	case RIGID_BOX:
@@ -118,6 +122,9 @@ void CRigidBody::Create_Actor()
 		NODEFAULT;
 	}
 
+	m_pShape->setSimulationFilterData(physx::PxFilterData{ 10, 0, 0, 0 });
+	m_pShape->setQueryFilterData(physx::PxFilterData{ 10, 0, 0, 0 });
+
 	// Transform 설정 (위치와 회전)
 	PxMat44 pxMat = CUtils::To_Float4x4(OriginMatrix);
 	PxTransform transform = CUtils::mat44ToTransform(pxMat);
@@ -125,20 +132,23 @@ void CRigidBody::Create_Actor()
 	{
 		m_pActor = pPhysics->createRigidDynamic(transform);
 		SetUp_Actor();
-
 		m_pActor->attachShape(*m_pShape);
+		PxScene* scene = m_pGameInstance->Get_Scene();
+		scene->addActor(*m_pActor);
+
 		physx::PxRigidBodyExt::updateMassAndInertia(*m_pActor, m_fDensity);
 	}
 	else 
 	{
 		m_pStaticActor = pPhysics->createRigidStatic(transform);
 		SetUp_Actor();
+
 		m_pStaticActor->attachShape(*m_pShape);
+		PxScene* scene = m_pGameInstance->Get_Scene();
+		scene->addActor(*m_pStaticActor);
 	}
 }
 
-
-//정현아 여길 봐줘
 /// <summary>
 /// RigidBody를 어떻게 사용할 것인지 세팅 플래그 변경하는 함수
 /// +) Create_Actor의 하단에 호출중
@@ -147,24 +157,31 @@ void CRigidBody::SetUp_Actor()
 {
 	if (m_bTrigger)
 	{
-		if(true == m_bDynamic)
+		if (m_bDynamic)
 			m_pActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, true);
+	}
+	else
+	{
+		if (m_bDynamic)
+			m_pActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, m_bKinematic);
 	}
 
 	if(nullptr != m_pActor)
 		m_pActor->userData = this;
+	if (nullptr != m_pStaticActor)
+		m_pStaticActor->userData = this;
 
 	if (m_bTrigger)
 	{
-		m_pShape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, false);
-		m_pShape->setFlag(physx::PxShapeFlag::eSCENE_QUERY_SHAPE, false);
-		m_pShape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, true);
+		m_pShape->setFlag(PxShapeFlag::eSIMULATION_SHAPE,  false);
+		m_pShape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, false);
+		m_pShape->setFlag(PxShapeFlag::eTRIGGER_SHAPE,	   true);
 	}
 	else
 	{
-		m_pShape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, true);
-		m_pShape->setFlag(physx::PxShapeFlag::eSCENE_QUERY_SHAPE, true);
-		m_pShape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, false);
+		m_pShape->setFlag(PxShapeFlag::eSIMULATION_SHAPE,  true);
+		m_pShape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, true);
+		m_pShape->setFlag(PxShapeFlag::eTRIGGER_SHAPE,	   false);
 	}
 }
 
@@ -189,6 +206,25 @@ void CRigidBody::Release_Actor()
 		m_pActor->release();
 		m_pActor = nullptr;
 	}
+	else if (m_pStaticActor)
+	{
+		m_pStaticActor->userData = nullptr;
+		if (m_pStaticActor->getScene())
+		{
+			auto pScene = m_pGameInstance->Get_Scene();
+			pScene->removeActor(*m_pStaticActor);
+		}
+
+		if (m_pShape)
+		{
+			m_pStaticActor->detachShape(*m_pShape);
+			m_pShape->release();
+			m_pShape = nullptr;
+		}
+
+		m_pStaticActor->release();
+		m_pStaticActor = nullptr;
+	}
 }
 
 /// <summary> physX의 RigidBody를 on/off해주는 함수 </summary>
@@ -211,36 +247,78 @@ void CRigidBody::Activate(_bool _bActive)
 	}
 	else
 	{
-		if (m_pActor->getScene())
-			m_pGameInstance->RemoveActor(*m_pActor);
+		if (nullptr != m_pActor)
+		{
+			if (m_pActor->getScene())
+				m_pGameInstance->RemoveActor(*m_pActor);
+		}
+		else
+		{
+			if (m_pStaticActor->getScene())
+				m_pGameInstance->RemoveActor(*m_pStaticActor);
+		}
 	}
 }
 
 void CRigidBody::Add_Force(_float3 vForce)
 {
 	if (m_pActor == nullptr) return;
+	if (true == (m_bTrigger && m_bKinematic))
+		return;
 
-	// Trigger는 어떻게 사용할 지 추후 의논 예정
-	physx::PxVec3 PxForce = physx::PxVec3(vForce.x, vForce.y, vForce.z);
+	PxVec3 PxForce = physx::PxVec3(vForce.x, vForce.y, vForce.z);
 	m_pActor->addForce(PxForce, physx::PxForceMode::eFORCE);
 }
 
-physx::PxTransform CRigidBody::Get_PxTransform()
+void CRigidBody::Add_Torque(_float vTorque)
 {
-	return physx::PxShapeExt::getGlobalPose(*m_pShape, *m_pActor);
+	//if (false == (m_bTrigger && m_bKinematic))
+	//{
+	//	PxVec3 PxToque = physx::PxVec3(vTorque.x, vTorque.y, vTorque.z);
+	//	m_pActor->addTorque(PxToque, physx::PxForceMode::eFORCE);
+	//}
+	if (true == (m_bTrigger && m_bKinematic))
+		return;
+	PxVec3 angularVelocity = m_pActor->getAngularVelocity();
+	PxVec3 antiTorque = angularVelocity * vTorque; // 회전 저항 값 (적당히 조절)
+	m_pActor->addTorque(antiTorque);
+
+}
+
+void CRigidBody::Add_Velocity(_float3 vVelocity)
+{
+	if (false == (m_bTrigger && m_bKinematic))
+	{
+		PxVec3 PxForce = PxVec3(vVelocity.x, vVelocity.y, vVelocity.z);
+		m_pActor->addForce(PxForce, physx::PxForceMode::eVELOCITY_CHANGE);
+	}
+}
+
+void CRigidBody::Kick_RigidBody(_float3 _kickDirection, _float impulseMagnitude)
+{
+	PxVec3 kickDirection(_kickDirection.x, _kickDirection.y, _kickDirection.z);
+	PxVec3 impulse = kickDirection * impulseMagnitude;
+	m_pActor->addForce(impulse, PxForceMode::eIMPULSE);
+}
+
+PxTransform CRigidBody::Get_PxTransform()
+{
+	return PxShapeExt::getGlobalPose(*m_pShape, *m_pActor);
 }
 
 // 현 actor의 physX에서의 행렬을 지정해준다.
 void CRigidBody::Set_PxWorldMatrix(const _float4x4& _worldMatrix)
 {
-	m_pActor->setGlobalPose(physx::PxTransform{CUtils::To_Float4x4(_worldMatrix)});
-	
+	if(m_pActor != nullptr)
+		m_pActor->setGlobalPose(physx::PxTransform{CUtils::To_Float4x4(_worldMatrix)});
+	if(m_pStaticActor != nullptr)
+		m_pStaticActor->setGlobalPose(physx::PxTransform{CUtils::To_Float4x4(_worldMatrix)});
 }
 
 // physX에서의 행렬을 DX에서의 행렬로 변환하여 가져온다.
 _float4x4 CRigidBody::Get_PxWorldMatrix()
 {
-	physx::PxMat44 pos(physx::PxShapeExt::getGlobalPose(*m_pShape, *m_pActor));
+	PxMat44 pos(PxShapeExt::getGlobalPose(*m_pShape, *m_pActor));
 	return CUtils::To_Float4x4(pos);
 }
 
@@ -250,6 +328,7 @@ _bool CRigidBody::Is_Activated()
 {
 	return m_pActor != nullptr && m_pActor->getScene() != nullptr;
 }
+
 
 CRigidBody * CRigidBody::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
@@ -285,4 +364,3 @@ void CRigidBody::Free()
 	Release_Actor();
 }
 
- 

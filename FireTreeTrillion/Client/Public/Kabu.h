@@ -18,12 +18,7 @@ public:
 		KABU_END
 	};
 
-	enum KABUMOVING_STATE {
-		KABUMOVING_CIRCLE, KABUMOVING_PATROL, KABUMOVING_END
-	};
-
 	struct KABU_DESC : public CMonster::MONSTER_DESC {
-		KABUMOVING_STATE eMoveState = { KABUMOVING_END };
 		vector<_float4> vecRallyPoints;
 	};
 
@@ -31,6 +26,11 @@ private:
 	CKabu(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CKabu(const CKabu& rhs);
 	virtual ~CKabu() = default;
+
+public:
+	_float4 Get_Look() {
+		return m_vLook;
+	}
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -42,7 +42,8 @@ public:
 #ifdef _DEBUG
 	virtual void	Render_IMGUI() override;
 #endif
-	virtual void	Collision_Attack(CGameObject* pOtherObj) override;
+	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
+	virtual void	Collision_Hitbox(CPhysXObject* pGameObject) override;
 
 public:
 	void Change_State(KABU_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
@@ -50,7 +51,8 @@ public:
 
 private:
 	KABU_ANIM			m_eCurrentState = { KABU_END };
-	KABUMOVING_STATE	m_eMoveState = { KABUMOVING_END };
+
+	_float4				m_vLook = {};
 
 	// 회전 상태의 카부
 	_float				m_fDistance = { 0.f };
@@ -64,20 +66,14 @@ private:
 	_uint				m_iCnt = { 0 };
 	_bool				m_bConvert = { false };
 
-	vector<_float4>		m_vecRallyPoint = {};
+	vector<_float4>		m_vecRallyPoint;
 
 	_float				m_fMoveTime = { 0.f };
 	_float				m_fSpeed = { 0.f };
 
-	_float2				m_vPreScreenPos = { 0.f, 0.f };
-	_float4				m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
-
-
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
-
-	void	Compute_MotionBlur();
 
 	// FSM
 	void SetUp_FSM();

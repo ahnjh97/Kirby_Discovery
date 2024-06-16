@@ -38,23 +38,25 @@ private:
 	_bool			Window_Textures();
 	_bool			Window_Properties();
 	_bool			Window_Tools();
+	_bool			Window_Sequencer();
+	void			Window_PopupAlert();
 
-	_bool			Set_OrthoProj(); //투영스페이스 직교 
-	_bool			Set_GizmoGrid(); //기즈모 위젯 그리드 세팅
-	_bool			Set_GizmoSync(CUIObject* _pUIObj); //기즈모 위젯 동기화 및 세팅
+	_bool			Set_GizmoGrid();
+	_bool			Set_GizmoSync(CUIObject* _pUIObj); 
 
-	_bool			Edit_Transform(CUIObject* _pUIObj); //변환
-	_bool			Edit_RGBAColor(); //색상 편집
+	_bool			Edit_Transform(CUIObject* _pUIObj); 
+	_bool			Edit_Projection(CUIObject* _pUIObj);
+	_bool			Edit_RGBAColor(CUIObject* _pUIObj); 
 
-	_bool			Edit_Text(); //텍스트 편집
-	_bool			Set_TextSync(string _strInput);
+	_bool			Edit_Text();
+	wstring			Edit_LayerUITag(string _strInput);
 
-	_bool			Create_UIObject(LAYER_TYPE _eLayerType, UI_TYPE _eUIType);
-	_bool			Delete_UIObject(LAYER_TYPE _eLayerType);
-	_bool			Grouping_UIObject(UI_GROUP _eUIGroup);
+	void			Create_UIObject(UI_STATE _eUIState, UI_TYPE _eUIType);
+	void			Delete_UIObject(UI_STATE _eUIState);
+	void			Group_UIObject(GROUP_TYPE _eUIGroup);
 
 public:
-	_bool			Save_Texture(const string& _strFilePath, ID3D11RenderTargetView* _pRTV);
+	void			Save_Texture(const string& _strFilePath, ID3D11RenderTargetView* _pRTV);
 	_bool			Save_FileData(const string& _strFilePath);
 	_bool			Load_FileData(const string& _strFilePath);	
 

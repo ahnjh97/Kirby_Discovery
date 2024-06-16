@@ -8,6 +8,17 @@ CPhysX::CPhysX()
 {
 }
 
+#define OVERLAP_MAX 8
+
+PxFilterFlags CustomFilterShader(PxFilterObjectAttributes attributes0, PxFilterData filterData0,
+    PxFilterObjectAttributes attributes1, PxFilterData filterData1,
+    PxPairFlags& pairFlags, const void* constantBlock, PxU32 constantBlockSize)
+{
+    // 기본 충돌 처리
+    pairFlags = PxPairFlag::eCONTACT_DEFAULT;
+    return PxFilterFlag::eDEFAULT;
+}
+
 HRESULT CPhysX::Initialize()
 {
     // init physx
@@ -24,7 +35,7 @@ HRESULT CPhysX::Initialize()
     m_pPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *m_pFoundation, mToleranceScale, true, m_pPvd);
     m_pEventCallBack = new CEventCallBack();
     PxSceneDesc sceneDesc(m_pPhysics->getTolerancesScale());
-    sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
+    sceneDesc.gravity = PxVec3(0.0f, -9.81f * 3.f, 0.0f);
     m_pDispatcher = PxDefaultCpuDispatcherCreate(2);
     sceneDesc.cpuDispatcher = m_pDispatcher;
     sceneDesc.simulationEventCallback = m_pEventCallBack;
@@ -32,7 +43,6 @@ HRESULT CPhysX::Initialize()
     sceneDesc.broadPhaseType = PxBroadPhaseType::eSAP; // 또는 eMBP
 
     m_pScene = m_pPhysics->createScene(sceneDesc);
-    
     m_pPvdSceneClient = m_pScene->getScenePvdClient();
     if (m_pPvdSceneClient)
     {
@@ -44,16 +54,16 @@ HRESULT CPhysX::Initialize()
     // create simulation
     m_pMaterial = m_pPhysics->createMaterial(0.5f, 0.5f, 0.6f);
     m_pControllerManager = PxCreateControllerManager(*m_pScene);
-
     //physx::PxRigidStatic* groundPlane = PxCreatePlane(*m_pPhysics, physx::PxPlane(0, 1, 0, 0), *m_pMaterial);
     //m_pScene->addActor(*groundPlane);
-
     //float halfExtent = .5f;
     //m_pShape = m_pPhysics->createShape(physx::PxBoxGeometry(halfExtent, halfExtent, halfExtent), *m_pMaterial);
     //physx::PxU32 size = 30;
     //physx::PxTransform t(physx::PxVec3(0));
-    //for (physx::PxU32 i = 0; i < size; i++) {
-    //    for (physx::PxU32 j = 0; j < size - i; j++) {
+    //for (physx::PxU32 i = 0; i < size; i++) 
+    //{
+    //    for (physx::PxU32 j = 0; j < size - i; j++) 
+    //    {
     //        physx::PxTransform localTm(physx::PxVec3(physx::PxReal(j * 2) - physx::PxReal(size - i), physx::PxReal(i * 2 + 1), 0) * halfExtent);
     //        physx::PxRigidDynamic* body = m_pPhysics->createRigidDynamic(t.transform(localTm));
     //        body->attachShape(*m_pShape);
@@ -66,23 +76,6 @@ HRESULT CPhysX::Initialize()
     //        mScene->addActor(*body);
     //    }
     //}
-
-    // 충돌처리할 그룹들을 나누어 충돌결과를 관리한다.
-    Ready_CollisionContents();
-
-    return S_OK;
-}
-
-/// <summary> Initialize 'COLLISION_CONTENT' </summary>
-HRESULT CPhysX::Ready_CollisionContents()
-{
-    // BLOCK EVENT
-    arrCollisionContents[PLAYER][MONSTER]   = CONTENT_ATTACK;
-    arrCollisionContents[MONSTER][PLAYER]   = CONTENT_ATTACK;
-
-    //arrCollisionContents[MONSTER][PLAYER]	= CONTENT_ATTACK;
-    arrCollisionContents[PLAYER][INTERACT]  = CONTENT_INTERACT;
-    arrCollisionContents[PLAYER][ITEM]      = CONTENT_ACQUIRE;
 
     return S_OK;
 }
@@ -117,31 +110,29 @@ void CPhysX::Ready_TestGround()
 
 void CPhysX::Test()
 {
-    // create simulation
-    m_pMaterial = m_pPhysics->createMaterial(0.5f, 0.5f, 0.6f);
-    PxRigidStatic* groundPlane = PxCreatePlane(*m_pPhysics, PxPlane(0, 1, 0, 0), *m_pMaterial);
-    m_pScene->addActor(*groundPlane);
-
-    float halfExtent = .5f;
-    m_pShape = m_pPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *m_pMaterial);
-    PxU32 size = 30;
-    PxTransform t(PxVec3(0));
-
-    PxTransform localTm(PxVec3(0, 0, 0) * halfExtent);
-    m_pRigidDynamic = m_pPhysics->createRigidDynamic(t.transform(localTm));
-    m_pRigidDynamic->attachShape(*m_pShape);
-    PxRigidBodyExt::updateMassAndInertia(*m_pRigidDynamic, 10.0f);
-    m_pScene->addActor(*m_pRigidDynamic);
+//    // create simulation
+//    m_pMaterial = m_pPhysics->createMaterial(0.5f, 0.5f, 0.6f);
+//    PxRigidStatic* groundPlane = PxCreatePlane(*m_pPhysics, PxPlane(0, 1, 0, 0), *m_pMaterial);
+//    m_pScene->addActor(*groundPlane);
+//
+//    float halfExtent = .5f;
+//    m_pShape = m_pPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *m_pMaterial);
+//    PxU32 size = 30;
+//    PxTransform t(PxVec3(0));
+//
+//    PxTransform localTm(PxVec3(0, 0, 0) * halfExtent);
+//    m_pRigidDynamic = m_pPhysics->createRigidDynamic(t.transform(localTm));
+//    m_pRigidDynamic->attachShape(*m_pShape);
+//    PxRigidBodyExt::updateMassAndInertia(*m_pRigidDynamic, 10.0f);
+//    m_pScene->addActor(*m_pRigidDynamic);
 }
 
 _float4x4 CPhysX::Update(_fmatrix matrix)
 {
-    //PxVec3 pos = CUtils::To_Float4x4(matrix).getPosition();
-    //PxTransform newPose(pos);
-    //m_pRigidDynamic->setGlobalPose(newPose);
-    PxTransform trans = m_pRigidDynamic->getGlobalPose();
-    _float4x4 matPos = CUtils::To_Float4x4(trans);
-    return matPos;
+    //PxTransform trans = m_pRigidDynamic->getGlobalPose();
+    //_float4x4 matPos = CUtils::To_Float4x4(trans);
+    //return matPos;
+    return _float4x4();
 }
 
 void CPhysX::AddActor(physx::PxActor& pActor)
@@ -166,6 +157,14 @@ void CPhysX::Register_Player(PxActor* pPlayerActor)
         return;
 
     m_pEventCallBack->Register_Player(pPlayerActor);
+}
+
+void CPhysX::Register_Controller(PxActor* pActor, PxController* pController)
+{
+    if (nullptr == m_pEventCallBack)
+        return;
+
+    m_pEventCallBack->Register_Controller(pActor, pController);
 }
 
 void CPhysX::Register_Trigger(PxActor* pTriggerActor, _int iTriggerType, _int iTriggerIndex)
@@ -215,13 +214,6 @@ void CPhysX::Clear_EventCallBack()
 //    //return itr->second;
 //}
 
-// Actor에 넣어둔 data를 가져온다. >> Not Yet >> 이 부분은 사용하려는 것의 정보를 가져오게 설정 바꿀것.
-//CComponent* CPhysX::Get_Component(physx::PxActor* pActor)
-//{
-//    if (pActor == nullptr || pActor->userData == nullptr)
-//        return nullptr;
-//    return static_cast<CComponent*>(pActor->userData);
-//}
 
 PxRigidDynamic* CPhysX::CreateDynamicActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)
 {
@@ -272,10 +264,27 @@ PxRigidDynamic* CPhysX::CreateDynamicActor(_float4x4& matWorld, _float3* pVertic
 
     pDynamicActor->attachShape(*pShape);
     m_pScene->addActor(*pDynamicActor);
+    physx::PxRigidBodyExt::updateMassAndInertia(*pDynamicActor, 0.1f);
+
     pMesh->release();
     pShape->release(); 
-
+    m_pRigidDynamic = pDynamicActor;
     return pDynamicActor;
+}
+
+void CPhysX::Add_Force(_float3 vForce)
+{
+    if (m_pRigidDynamic == nullptr) return;
+
+    PxVec3 PxForce = physx::PxVec3(vForce.x, vForce.y, vForce.z);
+    m_pRigidDynamic->addForce(PxForce, physx::PxForceMode::eFORCE);
+}
+
+void CPhysX::Kick_DynamicActor(_float3 _kickDirection, _float impulseMagnitude)
+{
+    PxVec3 kickDirection(_kickDirection.x, _kickDirection.y, _kickDirection.z);
+    PxVec3 impulse = kickDirection * impulseMagnitude;
+    m_pRigidDynamic->addForce(impulse, PxForceMode::eIMPULSE);
 }
 
 PxRigidStatic* CPhysX::CreateStaticActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)
@@ -328,6 +337,47 @@ PxRigidStatic* CPhysX::CreateStaticActor(_float4x4& matWorld, _float3* pVertices
     return pStaticActor;
 }
 
+
+// 함수 내에 해당 코드를 포함한다고 가정
+//void CPhysX::Overlap_Hitbox(CGameObject* pGameObject, _float4 vPos, _float fRadius)
+//{
+//    // 겹침을 검사할 구체의 기하학적 모양 생성
+//    PxSphereGeometry overlapShape = PxSphereGeometry(fRadius);
+//    // 초기 위치와 회전을 설정하는 PxTransform 객체 생성
+//    PxTransform pxTransform(PxVec3(vPos.x, vPos.y, vPos.z));
+//
+//    // Overlap 결과를 저장할 배열 동적 할당
+//    PxOverlapHit* hitOverlap = new PxOverlapHit[OVERLAP_MAX]; 	//const int maxHits = 8; //= 4096;
+//    PxScene* myScene = CGameInstance::Get_Instance()->Get_Scene();
+//    _int howMany = PxSceneQueryExt::overlapMultiple(*myScene, overlapShape, pxTransform, hitOverlap, OVERLAP_MAX, PxQueryFilterData(PxQueryFlag::eDYNAMIC | PxQueryFlag::eSTATIC | PxQueryFlag::eNO_BLOCK));
+//
+//    CGameObject* pPlayer = nullptr;
+//    for (_int i = 0; i < howMany; ++i)
+//    {
+//        PxOverlapHit& hit = hitOverlap[i];
+//        PxRigidActor* actor = hit.actor;  // 충돌된 객체의 액터
+//        // FOR TEST
+//        if (howMany > 2)
+//            _int b = 3;
+//        if (actor->userData == "RigidMesh")
+//            continue;// _int a = 3;
+//
+//        const char* actorName = actor->getName();
+//        CComponent* pComponent = static_cast<CComponent*>(actor->userData);
+//        if (pComponent == nullptr) continue;
+//
+//        // ======================================== FOR TEST : 임시 ========================================
+//        CGameObject* pActorObject = pComponent->Get_Object();
+//        if (pActorObject == nullptr) continue;
+//        if (pActorObject->Get_PrototypeTag() != pPlayer->Get_PrototypeTag())
+//            pPlayer->Collision_Overlap(pActorObject); // actorObject가 플레이어가 아닐경우 collision_overlap 실행
+//        // =================================================================================================
+//    }
+//
+//    Safe_Delete_Array(hitOverlap);
+//}
+
+
 CPhysX* CPhysX::Create()
 {
     CPhysX* pInstance = new CPhysX();
@@ -351,9 +401,6 @@ void CPhysX::Free()
         m_pShape->release();
 
     m_pControllerManager->release();
-
-    if (m_pRigidDynamic != nullptr)
-        m_pRigidDynamic->release();
 
     Safe_Delete(m_pEventCallBack);
 
@@ -385,55 +432,10 @@ void CPhysX::Free()
     if (m_pFoundation != nullptr)
         m_pFoundation->release();
 
-
-    //PxCooking*                        m_pCooking = nullptr;
 }
 
-
-// =========================================== 충돌 이벤트들을 던져주는 클래스 ===========================================
-//eNOTIFY_TOUCH_FOUND    : 두 물체가 서로 접촉을 시작했을 때 이벤트를 발생시킵니다. (동적 객체와 정적 객체 모두에 적용 가능)
-//eNOTIFY_TOUCH_LOST     : 두 물체가 서로의 접촉을 끝냈을 때 이벤트를 발생시킵니다. (동적 객체와 정적 객체 모두에 적용 가능)
-//eNOTIFY_TOUCH_PERSISTS : 두 물체가 접촉을 유지하는 동안 이벤트를 지속적으로 발생시킵니다. (동적 객체와 정적 객체 모두에 적용 가능)
-//eNOTIFY_TOUCH_FORCE_THRESHOLD : 접촉하는 물체의 힘이 일정 임계값 이상일 때 이벤트를 발생시킵니다. (동적 객체와 정적 객체 모두에 적용 가능)
-
-// 충돌처리함수
-void CSimulationEventCallback::onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs)
-{
-	CComponent* pComponentDst = static_cast<CComponent*>(pairHeader.actors[0]->userData);
-	CComponent* pComponentSrc = static_cast<CComponent*>(pairHeader.actors[1]->userData);
-	if (pComponentDst != nullptr && pComponentSrc != nullptr)
-	{
-		
-	}
-}
-
-void CSimulationEventCallback::onTrigger(PxTriggerPair* pairs, PxU32 count)
-{
-}
 
 // ====================================================================================================================
-
-// RIGIDBODY 충돌을 여기서 상세히 기록할 것 
-PxControllerBehaviorFlags CControllerBehaviorCallback::getBehaviorFlags(const PxShape& shape, const PxActor& actor)
-{
-    // 특정 조건에 따라 행동을 정의
-    //if (actor.is<PxRigidStatic>())
-    CComponent* pComponent = static_cast<CComponent*>(actor.userData);
-    if (pComponent != nullptr)
-    {
-        CGameObject* pObj = pComponent->Get_Object();
-        //MSG_BOX(TEXT("뚜뚱 어떠한 것과 충 돌"));
-    }
-    if (actor.is<PxRigidStatic>())  // PxController
-    {
-        //MSG_BOX(TEXT("floor collision"));
-        return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
-    }
-    return PxControllerBehaviorFlag::eCCT_SLIDE;
-}
-
-
-// 컨트롤러에 대한 충돌을 나눠야하는데 
 PxControllerBehaviorFlags CControllerBehaviorCallback::getBehaviorFlags(const PxController& controller)
 {
     // controller의 속성에 따라 행동을 커스터마이징
@@ -441,13 +443,12 @@ PxControllerBehaviorFlags CControllerBehaviorCallback::getBehaviorFlags(const Px
     CComponent* pComponent = static_cast<CComponent*>(controller.getUserData());
     if (pComponent != nullptr)
     {
+        CGameObject* pActorObject = pComponent->Get_Object();
+        if (pActorObject->Get_PrototypeTag() == L"Prototype_GameObject_StarBlock")
+        {
+            return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
+        }
     }
-
-    return PxControllerBehaviorFlag::eCCT_SLIDE;
-}
-
-PxControllerBehaviorFlags CControllerBehaviorCallback::getBehaviorFlags(const PxObstacle&)
-{
     return PxControllerBehaviorFlag::eCCT_SLIDE;
 }
 
@@ -460,105 +461,24 @@ void CUserControllerHitReport::onControllerHit(const PxControllersHit& hit)
 {
 	PxController* MeController = hit.controller;
 	PxController* otherController = hit.other;
+    // physX에서 사라지게 한 Actor 예외처리
+    if (MeController->getActor() == nullptr || otherController->getActor() == nullptr)
+        return;
 
-    // wi
-	CComponent* pComponentDst = static_cast<CComponent*>(MeController->getUserData());
-	CComponent* pComponentSrc = static_cast<CComponent*>(otherController->getUserData());
-
-	if (pComponentDst != nullptr && pComponentSrc != nullptr)
+	CComponent* pComponentSrc = static_cast<CComponent*>(MeController->getUserData());
+	CComponent* pComponentDst = static_cast<CComponent*>(otherController->getUserData());
+	if (pComponentSrc != nullptr && pComponentDst != nullptr)
 	{
-		CGameObject* pActorObjectDst = pComponentDst->Get_Object();
 		CGameObject* pActorObjectSrc = pComponentSrc->Get_Object();
+		CGameObject* pActorObjectDst = pComponentDst->Get_Object();
 
-        CollsionEvent(pActorObjectDst, pActorObjectSrc);
-	}
+        CGameInstance::Get_Instance()->Add_CollisionObjects(pActorObjectSrc, pActorObjectDst);
+    }
 }
 
-void CUserControllerHitReport::CollsionEvent(CGameObject* pObj, CGameObject* pOtherObj/*, COLLISION_TYPE eOwnCollsionGroup, COLLISION_TYPE eOtherCollsionGroup*/)
+/// <summary> 히트박스와 콜라이더의 충돌을 어떻게 처리할 것인지 정의하는 PhysX의 콜백함수입니다. </summary>
+_bool CControllerFilterCallback::filter(const PxController& pObj, const PxController& pOtherObj)
 {
-    COLLISION_TYPE ObjGroup = pObj->Get_CollisionGroup();
-    COLLISION_TYPE OtherGroup = pOtherObj->Get_CollisionGroup();
-    
-    _uint iCollisionContent = CGameInstance::Get_Instance()->Get_CollisionContent(ObjGroup, OtherGroup);
-    switch (iCollisionContent)
-    {
-    // 공-피격, 상호작용
-    case CONTENT_ATTACK:
-    {
-        pOtherObj->Collision_Attack(pObj);
-        pObj->Collision_Attack(pOtherObj);
-    }
-    break;
-    // 트리거, NPC 충돌
-    case CONTENT_INTERACT:
-    {
-    }
-    break;
-    case CONTENT_ACQUIRE:
-    {
-        //pObj->Collision_Acquire(pOtherObj);
-        //pOtherObj->Collision_Acquire(pObj);
-    }
-    break;
-    case CONTENT_NONEVENT:
-    {
-        //pObj->Collision_BlockEvent();
-        //pOtherObj->
-    }
-    break;
-    }
+    return true;
 }
 
-//
-//void CUserControllerHitReport::onControllerHit(const PxControllersHit& hit)
-//{
-//    PxController* MeController = hit.controller;
-//    PxController* otherController = hit.other;
-//
-//    // wi
-//    CComponent* pComponentDst = static_cast<CComponent*>(MeController->getUserData());
-//    CComponent* pComponentSrc = static_cast<CComponent*>(otherController->getUserData());
-//
-//    if (pComponentDst != nullptr && pComponentSrc != nullptr)
-//    {
-//        CGameObject* pActorObjectDst = pComponentDst->Get_Object();
-//        COLLISION_TYPE objectTypeDst = pActorObjectDst->Get_CollisionGroup();
-//
-//        CGameObject* pActorObjectSrc = pComponentSrc->Get_Object();
-//        COLLISION_TYPE objectTypeSrc = pActorObjectSrc->Get_CollisionGroup();
-//
-//
-//        switch (objectTypeDst)
-//        {
-//        case COLLISION_TYPE::PLAYER:
-//            pActorObjectDst->Collision_Attack(pActorObjectSrc);
-//            //handlePlayerCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[0]), static_cast<PxRigidDynamic*>(pairHeader.actors[1]));
-//            break;
-//        case COLLISION_TYPE::MONSTER:
-//            pActorObjectDst->Collision_Attack();
-//            //handleEnemyCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[0]), static_cast<PxRigidDynamic*>(pairHeader.actors[1]));
-//            break;
-//        case COLLISION_TYPE::INTERACT:
-//            //MSG_BOX(TEXT("충돌 주체가 FRIEND"));
-//            //handleObstacleCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[0]), static_cast<PxRigidDynamic*>(pairHeader.actors[1]));
-//            break;
-//        }
-//
-//        switch (objectTypeSrc)
-//        {
-//        case COLLISION_TYPE::PLAYER:
-//            pActorObjectSrc->Collision_Attack();
-//            //MSG_BOX(TEXT("충돌 대상자가 PLAYER"));
-//            //handlePlayerCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[1]), static_cast<PxRigidDynamic*>(pairHeader.actors[0]));
-//            break;
-//        case COLLISION_TYPE::MONSTER:
-//            pActorObjectSrc->Collision_Attack();
-//            //MSG_BOX(TEXT("충돌 대상자가 MONSTER"));
-//            //handleEnemyCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[1]), static_cast<PxRigidDynamic*>(pairHeader.actors[0]));
-//            break;
-//        case COLLISION_TYPE::INTERACT:
-//            //handleObstacleCollision(static_cast<PxRigidDynamic*>(pairHeader.actors[1]), static_cast<PxRigidDynamic*>(pairHeader.actors[0]));
-//            break;
-//        }
-//    }
-//}

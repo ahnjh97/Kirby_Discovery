@@ -8,7 +8,10 @@ CMesh::CMesh(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, ifstream& f
 }
 
 CMesh::CMesh(const CMesh & rhs)
-	: CVIBuffer(rhs), m_iFaces{ rhs.m_iFaces }, m_InputFile(ifstream())
+	: CVIBuffer(rhs), 
+	m_iFaces{ rhs.m_iFaces }, 
+	m_InputFile(ifstream()),
+	m_pActor{ rhs.m_pActor }
 {
 
 }
@@ -265,6 +268,17 @@ HRESULT CMesh::CreateDynamicActor(_float4x4& matWorld)
 		return E_FAIL;
 
 	return S_OK;
+}
+
+// 물리 시뮬레이션 결과를 가져오는 함수
+void CMesh::Update_ActorTransform(CTransform* pTransform)
+{
+	// PhysX 변환 행렬을 가져옴
+	PxTransform transform = m_pActor->getGlobalPose();
+	PxMat44 mat(transform);
+	
+	// PhysX 행렬을 DirectX 행렬로 변환
+	pTransform->Set_WorldMatrix(CUtils::To_Float4x4(mat));
 }
 
 HRESULT CMesh::CreateStaticActor(_float4x4& matWorld)

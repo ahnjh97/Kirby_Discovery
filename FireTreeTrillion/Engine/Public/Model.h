@@ -78,6 +78,9 @@ public:
 	HRESULT CreateDynamicActor(_float4x4& matWorld);
 	HRESULT CreateStaticActor(_float4x4& matWorld);
 
+	void	Update_ActorTransform(class CTransform* pTransform);
+
+
 	_float4 Check_Meshes(const class CTransform* pTransform, _Out_ _int& iMeshIndex) const;
 	void	Add_Event(const string& EventName, function<void()>&& Callback);
 	void	CallEvent(const string& EventName);

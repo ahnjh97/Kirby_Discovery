@@ -19,6 +19,7 @@ private:
 public:
 	HRESULT Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, const ENGINE_DESC& EngineDesc, _Inout_ ID3D11Device** ppDevice, _Inout_ ID3D11DeviceContext** ppContext);
 	void Tick_Engine(_float fTimeDelta);
+	void LateTick_Engine(_float fTimeDelta);
 	HRESULT Begin_Draw(const _float4 & vClearColor);
 	HRESULT End_Draw();
 	HRESULT Draw(_float fTimeDelta);
@@ -97,6 +98,7 @@ public: /* For.PipeLine */
 	_float4x4 Get_Transform_Inv(CPipeLine::TRANSFORMSTATE _eState) const;
 
 	_float4 Get_CamPosition() const;
+	_float4 Get_CamLook() const;
 
 	HRESULT Add_Camera(class CCamera* pCamera);
 	HRESULT Switch_CurCamera(_int iIdx);
@@ -119,6 +121,8 @@ public: /* For.Light_Manager */
 public: /* For.Font_Manager */
 	HRESULT Add_Font(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const wstring& strFontTag, const wstring& strFontFilePath);
 	HRESULT Render_Font(const wstring& strFontTag, const wstring & strText, const _float2 & vPosition, _fvector vColor, _float fRadian);
+	HRESULT Render_Font(const wstring& strFontTag, const wstring & strText, const _float2 & vPosition, _fvector vColor, _float fRadian, _fvector vOrigin, _gvector vScale);
+	HRESULT Render_ProjFont(_matrix _matrix, const wstring& strFontTag, const wstring& strText, const _float2& vPosition, _fvector vColor, _float fRadian, _fvector vOrigin, _gvector vScale);
 
 
 public: /* For.Target_Manager */
@@ -142,13 +146,15 @@ public: /* For.PhysX */
 	PxPhysics*				Get_Physics();
 	PxMaterial*				Get_Material();
 	PxControllerManager*	Get_ControllerManager();
-	void		AddActor(PxActor& pActor);
-	void		RemoveActor(PxActor& pActor);
+	void					AddActor(PxActor& pActor);
+	void					RemoveActor(PxActor& pActor);
+	void					Add_Force(_float3 vForce);
+	void					Kick_DynamicActor(_float3 _kickDirection, _float impulseMagnitude);
 
 	void		Test();
 	_float4x4	Update(_fmatrix matrix);
-	_uint		Get_CollisionContent(COLLISION_TYPE eMeType, COLLISION_TYPE eOtherType);
 	void		Ready_TestGround();
+	//void		Overlap_Hitbox(CGameObject* pGameObject, _float4 vPos, _float fRadius);
 
 #ifdef _DEBUG
 	HRESULT Ready_RTVDebug(const wstring& strRenderTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY);
@@ -186,6 +192,7 @@ public: /* For.PhysX */
 	PxRigidDynamic* CreateDynamicActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial = nullptr);
 	PxRigidStatic* CreateStaticActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial = nullptr);
 	void Register_Player(PxActor* pPlayerActor);
+	void Register_Controller(PxActor* pControllerActor, PxController* pController);
 	void Register_Trigger(PxActor* pTriggerActor, _int iTriggerType, _int iTriggerIndex);
 	void Emplace_TriggerFunc(_int iTriggerType, function<void(_int)> func);
 	void Emplace_ExitFunc(_int iTriggerType, function<void(void)> exitFunc);
@@ -207,6 +214,12 @@ public: /* For. TimeController */
 
 	_uint Get_NumOctree() { return g_iNumOctree; }
 	void IncreaseIndex() { g_iNumOctree++; }
+
+public: // For Collision
+	void	Add_CollisionObjects(class CGameObject* Src, class CGameObject* Dst);
+	void	Get_CollisionObjects(_Inout_ set<pair<class CGameObject*, class CGameObject*>>& CollisionObjects);
+	_bool	Is_PassingGroup(class CGameObject* pObj);
+
 
 private:
 	class CGraphic_Device*			m_pGraphic_Device = { nullptr };
@@ -232,6 +245,9 @@ private:
 
 	_uint	m_iCurrentLevelID		= { 0 };
 	_uint	g_iNumOctree			= {};
+
+
+	set<pair<class CGameObject*, class CGameObject*>> m_CollisionObjects;
 
 public:		
 	static void Release_Engine();

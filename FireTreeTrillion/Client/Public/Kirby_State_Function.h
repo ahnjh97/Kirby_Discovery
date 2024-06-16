@@ -120,7 +120,6 @@ static void Turn_Interpolate(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTra
 
 }
 
-
 // 조이스틱의 방향이 꺾일 때, Dir방향으로 Z 회전하는 기능 (오토바이 무빙)
 static void Turn_Z_Interpolate(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTransformCom, _float fTimeDelta)
 {
@@ -619,12 +618,74 @@ static _bool Vacuum_Object(CKirby* pKirby, _float fTimeDelta)
 	_float fDistance = 9.f;
 	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 
+
+	// 0차 목표인 버섯의 갓을 탐색한다.
+	if (nullptr != GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_CappyHat")))
+	{
+		for (auto& pObject : *GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_CappyHat")))
+		{
+			if (static_cast<CPhysXObject*>(pObject)->Get_PhyXState() != PO_NORMAL)
+				continue;
+
+			CTransform* pObjectTransform = pObject->Get_TransformCom();
+			_vector vObjectPos = pObjectTransform->Get_State_Vector(CTransform::STATE_POSITION);
+			_vector vObjectDir = vObjectPos - vPos;
+			_float fObjectDistance = XMVectorGetX(XMVector3Length(vObjectDir));
+			// 만약, 목표 오브젝트가 거리보다 멀었을 경우
+			if (fObjectDistance > fDistance)
+				continue;
+			// 만약, 목표 오브젝트가 거리보다 가까웠을 경우
+			else
+			{
+				_vector vLook = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+				// 내적 ( 30도 )
+				_float fDot = XMVectorGetX(XMVector3Dot(XMVector3Normalize(vObjectDir), vLook));
+				// 각도 계산 (도 단위)
+				_float fDegrees = XMConvertToDegrees(acosf(fDot));
+
+				// 각도가 30도 이상이면 스킵한다.
+				if (fDegrees > 60.f)
+					continue;
+
+				// 작은 흡입일때 진정코 흡수를 시작한다.
+				if (pKirby->Get_State() == CKirby::STATE_INHALE ||
+					pKirby->Get_State() == CKirby::STATE_INHALEFALL ||
+					pKirby->Get_State() == CKirby::STATE_INHALELANDING ||
+					pKirby->Get_State() == CKirby::STATE_INHALEWALK ||
+					pKirby->Get_State() == CKirby::STATE_SUPERINHALEWALK ||
+					pKirby->Get_State() == CKirby::STATE_SUPERINHALE ||
+					pKirby->Get_State() == CKirby::STATE_SUPERINHALESTART)
+				{
+					fDistance = fObjectDistance;
+					DESC(m_pObject) = static_cast<CPhysXObject*>(pObject);
+					DESC(m_vObjectScale) = pObjectTransform->Get_Scaled();
+					DESC(m_fObjectDistance) = fObjectDistance;
+				}
+			}
+		}
+	}
+
+	if (DESC(m_pObject) != nullptr)
+	{
+		// 참조하면서 애니메이션으로 끌고간다.
+		Safe_AddRef(DESC(m_pObject));
+		// 커비가 동일한 애니메이션으로 몬스터를 포착해서 꽤 긴 시간동안 서로 짝짝꿍하겠다는 것이다.
+		//pKirby->Set_PhyXState(PO_VACUUMING);
+		DESC(m_pObject)->Set_PhyXState(PO_VACUUMING);
+		pKirby->Change_State(CKirby::STATE_VACUUM, 50.f, true, true, CKirby::BODY_VACUUM);
+		return true;
+	}
+
+
 	// 1차로 우선순위인 몬스터들 순회를 돈다.
 	if (nullptr != GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), g_strLayerMonster))
 	{
 
 		for (auto& pObject : *GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), g_strLayerMonster))
 		{
+			if (static_cast<CPhysXObject*>(pObject)->Get_PhyXState() != PO_NORMAL)
+				continue;
+
 			CTransform* pObjectTransform = pObject->Get_TransformCom();
 			_vector vObjectPos = pObjectTransform->Get_State_Vector(CTransform::STATE_POSITION);
 			_vector vObjectDir = vObjectPos - vPos;
@@ -687,8 +748,8 @@ static _bool Vacuum_Object(CKirby* pKirby, _float fTimeDelta)
 		// 참조하면서 애니메이션으로 끌고간다.
 		Safe_AddRef(DESC(m_pObject));
 		// 커비가 동일한 애니메이션으로 몬스터를 포착해서 꽤 긴 시간동안 서로 짝짝꿍하겠다는 것이다.
-		pKirby->Set_Vacuuming(true);
-		DESC(m_pObject)->Set_Vacuuming(true);
+		//pKirby->Set_PhyXState(PO_VACUUMING);
+		DESC(m_pObject)->Set_PhyXState(PO_VACUUMING);
 
 		if (DESC(m_pObject)->Get_VacuumSize() == SIZE_SMALL)
 			pKirby->Change_State(CKirby::STATE_VACUUM, 50.f, true, true, CKirby::BODY_VACUUM);
@@ -704,6 +765,57 @@ static _bool Vacuum_Object(CKirby* pKirby, _float fTimeDelta)
 
 
 	return false;
+}
+
+// 주변에서 가장 가까운 목표 지점을 반환한다. 몬스터만 구현함.
+static _float4 Spit_Target_Object(CKirby* pKirby)
+{
+	CTransform* pTransformCom = pKirby->Get_TransformCom();
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+	_float fDistance = 30.f;
+	_float4 vTargetPos = { 0.f, 0.f, 0.f, 0.f };
+
+	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+
+	// 1차로 우선순위인 몬스터들 순회를 돈다.
+	if (nullptr != GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), g_strLayerMonster))
+	{
+
+		for (auto& pObject : *GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), g_strLayerMonster))
+		{
+			if (static_cast<CPhysXObject*>(pObject)->Get_PhyXState() != PO_NORMAL)
+				continue;
+
+			CTransform* pObjectTransform = pObject->Get_TransformCom();
+			_vector vObjectPos = pObjectTransform->Get_State_Vector(CTransform::STATE_POSITION);
+			_vector vObjectDir = vObjectPos - vPos;
+			_float fObjectDistance = XMVectorGetX(XMVector3Length(vObjectDir));
+
+			// 만약, 목표 오브젝트가 거리보다 멀었을 경우
+			if (fObjectDistance > fDistance)
+				continue;
+			// 만약, 목표 오브젝트가 거리보다 가까웠을 경우
+			else
+			{
+				_vector vLook = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+				// 내적 ( 30도 )
+				_float fDot = XMVectorGetX(XMVector3Dot(XMVector3Normalize(vObjectDir), vLook));
+				// 각도 계산 (도 단위)
+				_float fDegrees = XMConvertToDegrees(acosf(fDot));
+
+				if (fDegrees > 60.f)
+					continue;
+
+				// 최고기록 갱신
+				fDistance = fObjectDistance;
+				vTargetPos = vObjectPos;
+			}
+		}
+	}
+
+
+
+	return vTargetPos;
 }
 
 // 커비가 빌보드 한다.
@@ -766,4 +878,51 @@ static void Kirby_AbilityType_Assist(CKirby* pKirby, CKirby::STATE eState)
 			pKirby->Change_State(CKirby::STATE_FLIGHT, 60.f, false, false, CKirby::BODY_BALLOON);
 	}
 
+}
+
+// 커비가 사다리로 넘어가느냐 마느냐의 운명을 결정짓는 함수이다.
+static _bool Kirby_Ladder_Logic(CKirby* pKirby, CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTransformCom)
+{
+	// 사다리에 탑승 가능한 상태가 아닐경우
+	if (DESC(m_bCanLadder) == false)
+		return false;
+
+	// 다시 사다리에 올라가는걸 Block하는 기능이 켜져 있다면, 바로 탑승 불가 처리한다.
+	if (DESC(m_bBlockLadder) == true)
+		return false;
+
+	_float4 vToLadderDir = DESC(m_vLadderOriginalPos) - pTransformCom->Get_State(CTransform::STATE_POSITION);
+	vToLadderDir.y = 0.f;
+	vToLadderDir = XMVector3Normalize(vToLadderDir);
+
+	_float fDegree = acos(DESC(m_vMoveDir).Dot(vToLadderDir));
+	fDegree = ToDegree(fDegree);
+
+	// 만약, 내가 보고있는 방향에 사다리가 있을 때, 강제로 타진다.
+	if (fDegree < 70.f)
+		return true;
+
+	// 그 외의 상황일 경우 false
+	return false;
+}
+
+// 내가 누른 키가 사다리와 내적 했을 때, 제대로 붙어지는지 여부를 알 수 있는 함수
+static _bool Kirby_JoyStickLadder_Logic(CKirby* pKirby, CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTransformCom, CGameObject* pCamera)
+{
+	if (JoyStick_On())
+	{
+		_float4 vJoyStickDir = JoyStick_controller_OtherDir(pCamera);
+		_float4 vToLadderDir = DESC(m_vLadderOriginalPos) - pTransformCom->Get_State(CTransform::STATE_POSITION);
+		vToLadderDir.y = 0.f;
+		vToLadderDir = XMVector3Normalize(vToLadderDir);
+
+		_float fDegree = acos(vJoyStickDir.Dot(vToLadderDir));
+		fDegree = ToDegree(fDegree);
+
+		if (fDegree < 70.f)
+			return true;
+
+	}
+
+	return false;
 }

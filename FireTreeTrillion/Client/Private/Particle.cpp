@@ -21,6 +21,10 @@ HRESULT CParticle::Initialize_Prototype()
 
 HRESULT CParticle::Initialize_Prototype(PARTICLE_DESC FXDesc)
 {
+
+	m_strFXName = FXDesc.strFXName;
+	m_FXDesc = FXDesc;
+
 	return S_OK;
 }
 
@@ -28,7 +32,13 @@ HRESULT CParticle::Initialize(void* pArg)
 {
 	PARTICLE_DESC FXDesc{};
 
-	if (pArg != nullptr)
+	//prototype 만드는 단계에서 이미 정보를 저장한 상황.
+	if (m_FXDesc.strFXName != "NONE")
+	{
+		FXDesc = m_FXDesc;
+	}
+
+	else if (pArg != nullptr)
 	{
 		FXDesc = *(PARTICLE_DESC*)pArg;
 	}
@@ -41,14 +51,19 @@ HRESULT CParticle::Initialize(void* pArg)
 	hr = Add_Components(FXDesc);
 	CHECK_FAILED(hr);
 
-	m_fDuration.second = 10.f;
+
+	//fx 툴 레벨에서는 clone할 때 정보를 새로 기입하는 상황.
+	if (*m_pCurrentLevelID == LEVEL_TOOL_FX)
+		m_FXDesc = FXDesc;
+
+
 	//기본 상태 세팅
 	INSTANCE_DESC instanceDesc{};
 
-	instanceDesc.vecMoveCommands.resize(INSTANCE_END);
-	instanceDesc.vecMoveCommands[INSTANCE_DROP] = true;
-	instanceDesc.vecMoveCommands[INSTANCE_SPREAD] = true;
-	instanceDesc.vecMoveCommands[INSTANCE_DECELERATE] = true;
+	//instanceDesc.vecMoveCommands.resize(INSTANCE_END);
+	//instanceDesc.vecMoveCommands[INSTANCE_DROP] = true;
+	//instanceDesc.vecMoveCommands[INSTANCE_SPREAD] = true;
+	//instanceDesc.vecMoveCommands[INSTANCE_DECELERATE] = true;
 
 	instanceDesc.vPivot = { 0.f, -1.f, 0.f };
 	instanceDesc.vRange = { 2.f, 2.f, 2.f };
@@ -69,8 +84,13 @@ HRESULT CParticle::Initialize(void* pArg)
 void CParticle::Update_InstanceInfo(INSTANCE_DESC* _instanceDesc)
 {
 	//이건 파티클에 저장하는 거. 값 있을 때만.
-	if(nullptr != _instanceDesc)
+	if (nullptr != _instanceDesc)
 		m_InstanceDesc = *_instanceDesc;
+
+	//loop가 두개여
+	m_InstanceDesc.bIsLoop = m_bIsLoop;
+	//m_InstanceDesc.bIsBillboard = m_bIsBillboard;
+	//m_InstanceDesc.bIsBloom = m_bIsBloom;
 
 	m_pVIBufferCom->Update_InstanceDesc(m_InstanceDesc);
 }
@@ -89,6 +109,16 @@ void CParticle::Fill_SaveData(PARTICLE_DATA* pFXData)
 	pFXData->iMaskTexStrLen = (_uint)m_strMaskTexTag.size();
 	pFXData->strMaskTexName = CUtils::WstrToStr(m_strMaskTexTag);
 
+
+	pFXData->iPassIdx = m_iPassIdx;
+	pFXData->iTexIdx = m_iTexIdx;
+	pFXData->iMaskTexIdx = m_iMaskTexIdx;
+
+	pFXData->bIsLoop = m_bIsLoop;
+	pFXData->bIsBillboard = m_bIsBillboard;
+	pFXData->bIsBloom = m_bIsBloom;
+
+
 	pFXData->iNumInstance = m_FXDesc.iNumInstance;
 
 	pFXData->fDuration = m_fDuration.second;
@@ -96,6 +126,10 @@ void CParticle::Fill_SaveData(PARTICLE_DATA* pFXData)
 	pFXData->fLifetimeRandomOffset = m_InstanceDesc.fLifetimeRandomOffset;
 	pFXData->fStartDelay = m_InstanceDesc.fStartDelay;
 	pFXData->fStarDelayRandomOffset = m_InstanceDesc.fStarDelayRandomOffset;
+
+	pFXData->eRenderGroup = m_eRenderGroup;
+
+
 	pFXData->vCenter = m_InstanceDesc.vCenter;
 	pFXData->vRange = m_InstanceDesc.vRange;
 	pFXData->vRotation = m_InstanceDesc.vRotation;
@@ -112,14 +146,12 @@ void CParticle::Fill_SaveData(PARTICLE_DATA* pFXData)
 	pFXData->fAlphaRandomOffset = m_InstanceDesc.fAlphaRandomOffset;
 
 	pFXData->vPivot = m_InstanceDesc.vPivot;
-	pFXData->bIsLoop = m_InstanceDesc.bIsLoop;
-	pFXData->bIsBillboard = m_InstanceDesc.bIsBillboard;
-	pFXData->bIsColorRender = m_InstanceDesc.bIsColorRender;
-	pFXData->bIsBloom = m_InstanceDesc.bIsBloom;
+
+	//pFXData->bIsColorRender = m_InstanceDesc.bIsColorRender;
+
 	pFXData->iMoveCommandsNum = m_InstanceDesc.vecMoveCommands.size();
 	pFXData->vecMoveCommands = m_InstanceDesc.vecMoveCommands;
 
-	pFXData->eRenderGroup = m_eRenderGroup;
 }
 
 _int CParticle::Tick(_float _fTimeDelta)

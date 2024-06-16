@@ -220,6 +220,69 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyBoom_State">
       <UniqueIdentifier>{df88d3db-f381-4d13-8ca4-1ddc4df3cb3d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BrontoBurt">
+      <UniqueIdentifier>{f298ee5c-af62-41d9-ba80-4bea30e15abc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\PoppyBrosJr">
+      <UniqueIdentifier>{e5bcf268-b501-40ab-9e8e-31f871c7571e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BrontoBurt\State">
+      <UniqueIdentifier>{205db8bd-743b-446a-a3c9-0abe24e12f05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\PoppyBrosJr\State">
+      <UniqueIdentifier>{972ab19b-8668-4996-8aad-6136da78b6fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\PoppyBrosJr\PoppyBomb">
+      <UniqueIdentifier>{7bedbad2-eaee-4fc2-864c-e9d696e6ca05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.Collision">
+      <UniqueIdentifier>{e1c9a7b9-efac-424b-9bcd-62d41980db04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Item">
+      <UniqueIdentifier>{dcd6e3c0-cd2f-4f4e-8add-51eb6748dc29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Item\EnergyDrink">
+      <UniqueIdentifier>{e5a44464-aceb-4ed8-97a0-0e8e21890bb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Item\Coin">
+      <UniqueIdentifier>{fec82fe1-9a7e-4145-957f-e7c4662e02ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Cappy">
+      <UniqueIdentifier>{2644bd8b-3b13-4d9c-8842-edc41dccc1d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Cappy\CappyHat">
+      <UniqueIdentifier>{8dab8ce9-c12e-4dac-b478-a1c1e91dc229}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Cappy\CappyBody">
+      <UniqueIdentifier>{d3a49dbf-e4e8-433d-9c8d-77be4f30a5aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Cappy\State">
+      <UniqueIdentifier>{c2d71bf1-9ad3-4ad4-8a6d-3cfacbcaf42b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Ladder">
+      <UniqueIdentifier>{43deb6bb-9178-48a0-9aee-6bd3fca04327}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\MapObject">
+      <UniqueIdentifier>{86a7592b-d804-482a-9608-14929a70ea40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\MapObject\StarBlock">
+      <UniqueIdentifier>{c6c845b2-a511-4c67-92c8-21ffd9f57984}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\MapObject\WoodBlock">
+      <UniqueIdentifier>{3b0e9e25-176f-4ef8-bfb8-8ac6caa99a83}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\MapObject\TrashCan">
+      <UniqueIdentifier>{43a0db8c-5d6d-4b60-af2f-a7f2af0d1d47}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\Kirby\Bomb">
+      <UniqueIdentifier>{9bbb5c7f-e811-452d-aabb-3b3015d522c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\RigidObject\Rock">
+      <UniqueIdentifier>{81ec4dea-946a-461a-84a8-a25c873503af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\RigidObject\Rock\Kickable">
+      <UniqueIdentifier>{22df7019-4bde-485a-a4fa-b74dfa7b29a5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -318,9 +381,6 @@
     <ClInclude Include="..\Public\BasicMap.h">
       <Filter>02.GameObjects\Map\BasicMap</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Trigger.h">
-      <Filter>02.GameObjects\Map\Trigger</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Level_Tool_Map.h">
       <Filter>01.Levels\Tool\Map</Filter>
     </ClInclude>
@@ -393,9 +453,6 @@
     <ClInclude Include="..\Public\BladeKnight_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\State</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\BladeKnightSword.h">
-      <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\ImSequencer.h">
       <Filter>02.GameObjects\Anim</Filter>
     </ClInclude>
@@ -432,7 +489,6 @@
     <ClInclude Include="..\Public\WasteCan.h">
       <Filter>02.GameObjects\PhysXObject\RigidObject\WasteCan</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Multi_UI.h" />
     <ClInclude Include="..\Public\BG.h">
       <Filter>02.GameObjects\Map\BG</Filter>
     </ClInclude>
@@ -441,6 +497,74 @@
     </ClInclude>
     <ClInclude Include="..\Public\KirbyBoom_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyBoom_State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\HUD_KirbyStatus.h" />
+    <ClInclude Include="..\Public\HUD_StarPoint.h" />
+    <ClInclude Include="..\Public\BrontoBurt.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\BrontoBurt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PoppyBrosJr.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\PoppyBrosJr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BrontoBurt_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\BrontoBurt\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PoppyBrosJr_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\PoppyBrosJr\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PoppyBomb.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\PoppyBrosJr\PoppyBomb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CollisionCenter.h">
+      <Filter>03.Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ItemObject.h">
+      <Filter>02.GameObjects\PhysXObject\Item</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnergyDrink.h">
+      <Filter>02.GameObjects\PhysXObject\Item\EnergyDrink</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Coin.h">
+      <Filter>02.GameObjects\PhysXObject\Item\Coin</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Ladder.h">
+      <Filter>02.GameObjects\Map\Ladder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Trigger.h">
+      <Filter>02.GameObjects\Map\Trigger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CappyBody.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Cappy\CappyBody</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CappyBody_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Cappy\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CappyHat.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Cappy\CappyHat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CappyHat_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Cappy\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BladeKnightSword.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KickableRock.h">
+      <Filter>02.GameObjects\PhysXObject\RigidObject\Rock\Kickable</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\StarBlock.h">
+      <Filter>02.GameObjects\PhysXObject\MapObject\StarBlock</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MapObject.h">
+      <Filter>02.GameObjects\PhysXObject\MapObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BombOrbit.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\Bomb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BombOrbitGlow.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\Bomb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KirbyBomb.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\Bomb</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -527,9 +651,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\BasicMap.cpp">
       <Filter>02.GameObjects\Map\BasicMap</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Trigger.cpp">
-      <Filter>02.GameObjects\Map\Trigger</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Tool_Map.cpp">
       <Filter>01.Levels\Tool\Map</Filter>
@@ -636,7 +757,6 @@
     <ClCompile Include="..\Private\WasteCan.cpp">
       <Filter>02.GameObjects\PhysXObject\RigidObject\WasteCan</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Multi_UI.cpp" />
     <ClCompile Include="..\Private\BG.cpp">
       <Filter>02.GameObjects\Map\BG</Filter>
     </ClCompile>
@@ -645,6 +765,71 @@
     </ClCompile>
     <ClCompile Include="..\Public\KirbyBoom_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyBoom_State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HUD_KirbyStatus.cpp" />
+    <ClCompile Include="..\Private\HUD_StarPoint.cpp" />
+    <ClCompile Include="..\Private\BrontoBurt.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\BrontoBurt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PoppyBrosJr.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\PoppyBrosJr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BrontoBurt_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\BrontoBurt\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PoppyBrosJr_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\PoppyBrosJr\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PoppyBomb.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\PoppyBrosJr\PoppyBomb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CollisionCenter.cpp">
+      <Filter>03.Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ItemObject.cpp">
+      <Filter>02.GameObjects\PhysXObject\Item</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EnergyDrink.cpp">
+      <Filter>02.GameObjects\PhysXObject\Item\EnergyDrink</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Coin.cpp">
+      <Filter>02.GameObjects\PhysXObject\Item\Coin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Ladder.cpp">
+      <Filter>02.GameObjects\Map\Ladder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Trigger.cpp">
+      <Filter>02.GameObjects\Map\Trigger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CappyBody.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Cappy\CappyBody</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CappyBody_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Cappy\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CappyHat.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Cappy\CappyHat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CappyHat_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Cappy\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KickableRock.cpp">
+      <Filter>02.GameObjects\PhysXObject\RigidObject\Rock\Kickable</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\StarBlock.cpp">
+      <Filter>02.GameObjects\PhysXObject\MapObject\StarBlock</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MapObject.cpp">
+      <Filter>02.GameObjects\PhysXObject\MapObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BombOrbit.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\Bomb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BombOrbitGlow.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\Bomb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KirbyBomb.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\Bomb</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

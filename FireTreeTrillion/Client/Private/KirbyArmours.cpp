@@ -60,6 +60,9 @@ void CKirbyArmours::Late_Tick(_float fTimeDelta)
 
 HRESULT CKirbyArmours::Render()
 {
+    if (Block_Render()) return S_OK;
+    //if (*m_pCurrentLevelID == LEVEL_TOOL_ANIM) return S_OK;
+
     if (FAILED(Bind_ShaderResources()))
         return E_FAIL;
 
@@ -94,6 +97,9 @@ HRESULT CKirbyArmours::Render_LightDepth()
 
 HRESULT CKirbyArmours::Render_DeferredInfo()
 {
+    if (Block_Render()) return S_OK;
+    //if (*m_pCurrentLevelID == LEVEL_TOOL_ANIM) return S_OK;
+
     if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))

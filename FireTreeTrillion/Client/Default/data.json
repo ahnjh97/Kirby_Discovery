@@ -1,0 +1,11 @@
+{
+    "age": 30,
+    "city": "New York",
+    "name": "John",
+    "skells": [
+        "Python",
+        "C++",
+        "Java"
+    ],
+    "update": null
+}

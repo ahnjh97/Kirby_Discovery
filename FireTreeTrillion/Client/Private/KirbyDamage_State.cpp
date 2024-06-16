@@ -29,8 +29,12 @@ void CKirbyDamage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	if (pKirby->Get_State() == CKirby::STATE_DAMAGE)
 	{
 		DESC(m_eEyeState) = CKirby::EYE_CLOSE;
-		DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
-		pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
+		//DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
+		//pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
+		_float fDamageJumpPower = pKirby->Get_DamageJumpPower();
+		pController->Jump(pTransformCom, fDamageJumpPower, fTimeDelta);
+		fDamageJumpPower -= GRAVITY * fTimeDelta * 3.f;
+		pKirby->Set_DamageJumpPower(fDamageJumpPower);
 
 		if (pController->Is_Terrain() || pKirby->isAnimFinish())
 		{
@@ -41,8 +45,13 @@ void CKirbyDamage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	else if (pKirby->Get_State() == CKirby::STATE_EATDAMAGE)
 	{
 		DESC(m_eEyeState) = CKirby::EYE_CLOSE;
-		DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
-		pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
+		//DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
+		//pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
+		_float fDamageJumpPower = pKirby->Get_DamageJumpPower();
+		pController->Jump(pTransformCom, fDamageJumpPower, fTimeDelta);
+		fDamageJumpPower -= GRAVITY * fTimeDelta * 3.f;
+		pKirby->Set_DamageJumpPower(fDamageJumpPower);
+
 
 		if (pController->Is_Terrain() || pKirby->isAnimFinish())
 		{
@@ -54,8 +63,12 @@ void CKirbyDamage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	else if (pKirby->Get_State() == CKirby::STATE_FILGHTDAMAGE)
 	{
 		DESC(m_eEyeState) = CKirby::EYE_CLOSE;
-		DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
-		pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
+		//DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
+		//pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
+		_float fDamageJumpPower = pKirby->Get_DamageJumpPower();
+		pController->Jump(pTransformCom, fDamageJumpPower, fTimeDelta);
+		fDamageJumpPower -= GRAVITY * fTimeDelta * 3.f;
+		pKirby->Set_DamageJumpPower(fDamageJumpPower);
 
 		if (pController->Is_Terrain() || pKirby->isAnimFinish())
 		{

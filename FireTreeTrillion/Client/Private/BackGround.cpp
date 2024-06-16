@@ -21,20 +21,21 @@ HRESULT CBackGround::Initialize(void* pArg)
 		return E_FAIL;
 	if (FAILED(Add_Components()))
 		return E_FAIL;
+
 	UIOBJ_DESC BG_DESC = {};
 	BG_DESC.wstrUITag = { TEXT("BG_Logo") };
 	BG_DESC.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f };
 	BG_DESC.vSize = { (_float)g_iWinSizeX, (_float)g_iWinSizeY };
 	BG_DESC.vPos = { BG_DESC.vCenter.x, BG_DESC.vCenter.y };
-	BG_DESC.fDegree = { 0.f };
+	BG_DESC.vDegree = { 0.f, 0.f, 0.f };
 	BG_DESC.iTexIndex = { 0 };
 
 	m_pTransformCom->Set_Scaled(BG_DESC.vSize.x, BG_DESC.vSize.y, 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(
 		BG_DESC.vPos.x - BG_DESC.vCenter.x,
 		-BG_DESC.vPos.y + BG_DESC.vCenter.y, 0.f, 1.f));
-	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 
+	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 
 	return S_OK;
@@ -52,7 +53,7 @@ void CBackGround::Late_Tick(_float fTimeDelta)
 
 HRESULT CBackGround::Render()
 {
-	if (FAILED(Bind_ShaderResources(m_pShaderCom, PS_DEFAULT, m_pTransformCom, m_pTextureCom, m_iTexIndex)))
+	if (FAILED(Bind_ShaderResources(m_pShaderCom, PS_DEFAULT, m_pTransformCom, m_pTextureCom, 0)))
 		return E_FAIL;
 
 	return S_OK;
@@ -90,9 +91,9 @@ HRESULT CBackGround::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassInde
 		return E_FAIL;
 	if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
-	_pTextureCom->Bind_ShaderResource(_pShaderCom, "g_DiffuseTexture", _iPassIndex);
+	_pTextureCom->Bind_ShaderResource(_pShaderCom, "g_DiffuseTexture", _iTexIndex);
 
-	if (FAILED(_pShaderCom->Begin(0)))
+	if (FAILED(_pShaderCom->Begin(POSTEX_DEFAULT)))
 		return E_FAIL;
 	if (FAILED(Bind_VIBuffer(m_pVIBufferCom)))
 		return E_FAIL;

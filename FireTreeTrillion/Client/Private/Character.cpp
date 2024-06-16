@@ -32,7 +32,7 @@ _int CCharacter::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
-	// FSM Update , SetOn_Slope, MotionBlur // 
+	// FSM Update , SetOn_Slope, MotionBlur //
 	Character_SystemTick(fTimeDelta);
 
 	return OBJ_NOEVENT;
@@ -115,7 +115,7 @@ void CCharacter::Compute_MotionBlur()
 
 	m_vMotionVelocity.x = (m_vPreScreenPos - vCurScreenPos).x;
 	m_vMotionVelocity.y = (m_vPreScreenPos - vCurScreenPos).y;
-	m_vMotionVelocity.z = m_bVacuuming == true ? 1.f : 0.f;
+	m_vMotionVelocity.z = m_ePhyXState != PO_NORMAL ? 1.f : 0.f;
 
 	m_vPreScreenPos = vCurScreenPos;
 }
@@ -132,8 +132,22 @@ void CCharacter::Character_SystemTick(_float fTimeDelta)
 			m_pFSM->Update(this, fTimeDelta);
 	}
 
-	// 터레인 경사면 보간 제어
-	SetOn_Slope(fTimeDelta);
+	// 날아가는 도중엔 경사면 보간 제어가 필요없다.
+	if (m_ePhyXState == PO_NORMAL)
+	{
+		// 터레인 경사면 보간 제어
+		if (true == m_bSlope)
+			SetOn_Slope(fTimeDelta);
+	}
+
+	if (m_fWhiteColorDiffuse > 0.f)
+	{
+		// 0.2초만에 다시 원래 색상으로 복귀한다.
+		m_fWhiteColorDiffuse -= fTimeDelta * 5.f;
+
+		if (m_fWhiteColorDiffuse < 0.f)
+			m_fWhiteColorDiffuse = 0.f;
+	}
 }
 
 void CCharacter::Free()

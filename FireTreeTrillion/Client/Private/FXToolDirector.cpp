@@ -56,7 +56,7 @@ void CFXToolDirector::Make_Effect(SINGLE_FX_DATA& _FXData)
 
 	for (_uint i = 0; i < _FXData.iPropertyMapNum; ++i)
 	{
-		FXDesc.Keyframes.emplace( _FXData.vecKeyframeInfo[i].first, _FXData.vecKeyframes[i] );
+		FXDesc.Keyframes.emplace(_FXData.vecKeyframeInfo[i].first, _FXData.vecKeyframes[i]);
 	}
 
 	if (_FXData.iPropertyMapNum < KF_MASKUVANGLE)
@@ -89,8 +89,23 @@ void CFXToolDirector::Make_Effect(PARTICLE_DATA& _FXData)
 	ParticleDesc.strBufferTag = _FXData.strBufferName;
 	ParticleDesc.strTexTag = _FXData.strTexName;
 	ParticleDesc.strMaskTexTag = _FXData.strMaskTexName;
+
+	ParticleDesc.iPassIdx = _FXData.iPassIdx;
+	ParticleDesc.iTexIdx = _FXData.iTexIdx;
+	ParticleDesc.iMaskTexIdx = _FXData.iMaskTexIdx;
+
 	ParticleDesc.iNumInstance = _FXData.iNumInstance;
 	ParticleDesc.eRenderGroup = _FXData.eRenderGroup;
+
+	ParticleDesc.bIsLoop = _FXData.bIsLoop;
+	ParticleDesc.bIsBillboard = _FXData.bIsBillboard;
+	ParticleDesc.bIsBloom = _FXData.bIsBloom;
+
+	ParticleDesc.fDuration = _FXData.fDuration;
+	ParticleDesc.fLifetime.second = _FXData.fLifetime;
+
+	InstanceDesc.vecMoveCommands = _FXData.vecMoveCommands;
+
 
 
 	InstanceDesc.fLifetime = _FXData.fLifetime;
@@ -112,11 +127,6 @@ void CFXToolDirector::Make_Effect(PARTICLE_DATA& _FXData)
 	InstanceDesc.fAlpha = _FXData.fAlpha;
 	InstanceDesc.fAlphaRandomOffset = _FXData.fAlpha;
 	InstanceDesc.vPivot = _FXData.vPivot;
-	InstanceDesc.bIsLoop = _FXData.bIsLoop;
-	InstanceDesc.bIsBillboard = _FXData.bIsBillboard;
-	InstanceDesc.bIsColorRender = _FXData.bIsColorRender;
-	InstanceDesc.bIsBloom = _FXData.bIsBloom;
-	InstanceDesc.vecMoveCommands = _FXData.vecMoveCommands;
 
 
 	CParticle* pParticle = static_cast<CParticle*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle"), &ParticleDesc));
@@ -255,17 +265,30 @@ HRESULT CFXToolDirector::Save_Particle(CEffect* pEffect, const wstring& strFileN
 	PARTICLE_DATA FXData{};
 	pEffect->Fill_SaveData(&FXData);
 
-	OutputFile.write(reinterpret_cast<const char*>(&FXData.iNameStrLen), sizeof(_uint));
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.iNameStrLen), sizeof(_int));
 	OutputFile.write(FXData.strName.c_str(), FXData.iNameStrLen);
 
-	OutputFile.write(reinterpret_cast<const char*>(&FXData.iBufferStrLen), sizeof(_uint));
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.iBufferStrLen), sizeof(_int));
 	OutputFile.write(FXData.strBufferName.c_str(), FXData.iBufferStrLen);
 
-	OutputFile.write(reinterpret_cast<const char*>(&FXData.iTexStrLen), sizeof(_uint));
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.iTexStrLen), sizeof(_int));
 	OutputFile.write(FXData.strTexName.c_str(), FXData.iTexStrLen);
 
-	OutputFile.write(reinterpret_cast<const char*>(&FXData.iMaskTexStrLen), sizeof(_uint));
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.iMaskTexStrLen), sizeof(_int));
 	OutputFile.write(FXData.strMaskTexName.c_str(), FXData.iMaskTexStrLen);
+
+
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.iPassIdx), sizeof(_int));
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.iTexIdx), sizeof(_int));
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.iMaskTexIdx), sizeof(_int));
+
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.bIsLoop), sizeof(_bool));
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.bIsBillboard), sizeof(_bool));
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.bIsBloom), sizeof(_bool));
+
+
+
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.iNumInstance), sizeof(_int));
 
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.fDuration), sizeof(_float));
 
@@ -298,21 +321,31 @@ HRESULT CFXToolDirector::Save_Particle(CEffect* pEffect, const wstring& strFileN
 
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.vPivot), sizeof(_float3));
 
-	OutputFile.write(reinterpret_cast<const char*>(&FXData.bIsLoop), sizeof(_bool));
-	OutputFile.write(reinterpret_cast<const char*>(&FXData.bIsBillboard), sizeof(_bool));
-	OutputFile.write(reinterpret_cast<const char*>(&FXData.bIsColorRender), sizeof(_bool));
-	OutputFile.write(reinterpret_cast<const char*>(&FXData.bIsBloom), sizeof(_bool));
 
-	OutputFile.write(reinterpret_cast<const char*>(&FXData.iMoveCommandsNum), sizeof(_uint));
-	for (auto bCommand : FXData.vecMoveCommands)
-	{
-		OutputFile.write(reinterpret_cast<const char*>(&bCommand), sizeof(_bool));
-	}
-
-	OutputFile.write(reinterpret_cast<const char*>(&FXData.eRenderGroup), sizeof(_uint));
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.iMoveCommandsNum), sizeof(_int));
 
 
+	//for (auto& move : FXData.vecMoveCommands)
+	//{
+	//	//_int iTemp = static_cast<_int>(move); // _bool 값을 _int로 변환
+	//	OutputFile.write(reinterpret_cast<const char*>(&move), sizeof(_bool));
+	//}
+
+	_bool bA = FXData.vecMoveCommands[0];
+	_bool bB = FXData.vecMoveCommands[1];
+	_bool bC = FXData.vecMoveCommands[2];
+
+
+	OutputFile.write(reinterpret_cast<const char*>(&bA), sizeof(_bool));
+	OutputFile.write(reinterpret_cast<const char*>(&bB), sizeof(_bool));
+	OutputFile.write(reinterpret_cast<const char*>(&bC), sizeof(_bool));
+
+
+
+
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.eRenderGroup), sizeof(_int));
 	OutputFile.close();
+
 	return S_OK;
 }
 
@@ -501,28 +534,40 @@ HRESULT CFXToolDirector::Load_Effect(path _FilePath, PARTICLE_DATA* _pData)
 
 
 	//이펙트 이름
-	InputFile.read(reinterpret_cast<char*>(&_pData->iNameStrLen), sizeof(_uint));
+	InputFile.read(reinterpret_cast<char*>(&_pData->iNameStrLen), sizeof(_int));
 	_pData->strName.resize(_pData->iNameStrLen);
 	InputFile.read(&_pData->strName[0], _pData->iNameStrLen);
 
 
 	//버퍼 이름
-	InputFile.read(reinterpret_cast<char*>(&_pData->iBufferStrLen), sizeof(_uint));
+	InputFile.read(reinterpret_cast<char*>(&_pData->iBufferStrLen), sizeof(_int));
 	_pData->strBufferName.resize(_pData->iBufferStrLen);
 	InputFile.read(&_pData->strBufferName[0], _pData->iBufferStrLen);
 
 
 	//텍스쳐 이름
-	InputFile.read(reinterpret_cast<char*>(&_pData->iTexStrLen), sizeof(_uint));
+	InputFile.read(reinterpret_cast<char*>(&_pData->iTexStrLen), sizeof(_int));
 	_pData->strTexName.resize(_pData->iTexStrLen);
 	InputFile.read(&_pData->strTexName[0], _pData->iTexStrLen);
 
 
 	//마스크 텍스쳐 이름
-	InputFile.read(reinterpret_cast<char*>(&_pData->iMaskTexStrLen), sizeof(_uint));
+	InputFile.read(reinterpret_cast<char*>(&_pData->iMaskTexStrLen), sizeof(_int));
 	_pData->strMaskTexName.resize(_pData->iMaskTexStrLen);
 	InputFile.read(&_pData->strMaskTexName[0], _pData->iMaskTexStrLen);
 
+
+	InputFile.read(reinterpret_cast<char*>(&_pData->iPassIdx), sizeof(_int));
+	InputFile.read(reinterpret_cast<char*>(&_pData->iTexIdx), sizeof(_int));
+	InputFile.read(reinterpret_cast<char*>(&_pData->iMaskTexIdx), sizeof(_int));
+
+	InputFile.read(reinterpret_cast<char*>(&_pData->bIsLoop), sizeof(_bool));
+	InputFile.read(reinterpret_cast<char*>(&_pData->bIsBillboard), sizeof(_bool));
+	InputFile.read(reinterpret_cast<char*>(&_pData->bIsBloom), sizeof(_bool));
+
+
+
+	InputFile.read(reinterpret_cast<char*>(&_pData->iNumInstance), sizeof(_int));
 
 	InputFile.read(reinterpret_cast<char*>(&_pData->fDuration), sizeof(_float));
 
@@ -547,36 +592,37 @@ HRESULT CFXToolDirector::Load_Effect(path _FilePath, PARTICLE_DATA* _pData)
 	InputFile.read(reinterpret_cast<char*>(&_pData->fSpeed), sizeof(_float));
 	InputFile.read(reinterpret_cast<char*>(&_pData->fSpeedRandomOffset), sizeof(_float));
 
-	InputFile.read(reinterpret_cast<char*>(&_pData->fAlpha), sizeof(_float3));
-	InputFile.read(reinterpret_cast<char*>(&_pData->fAlphaRandomOffset), sizeof(_float3));
+	InputFile.read(reinterpret_cast<char*>(&_pData->vColor), sizeof(_float3));
+	InputFile.read(reinterpret_cast<char*>(&_pData->vColorRandomOffset), sizeof(_float3));
+
+	InputFile.read(reinterpret_cast<char*>(&_pData->fAlpha), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&_pData->fAlphaRandomOffset), sizeof(_float));
 
 
 	InputFile.read(reinterpret_cast<char*>(&_pData->vPivot), sizeof(_float3));
 
 
-	InputFile.read(reinterpret_cast<char*>(&_pData->bIsLoop), sizeof(_bool));
-	InputFile.read(reinterpret_cast<char*>(&_pData->bIsBillboard), sizeof(_bool));
-	InputFile.read(reinterpret_cast<char*>(&_pData->bIsColorRender), sizeof(_bool));
-	InputFile.read(reinterpret_cast<char*>(&_pData->bIsBloom), sizeof(_bool));
+	InputFile.read(reinterpret_cast<char*>(&_pData->iMoveCommandsNum), sizeof(_int));
+	_pData->vecMoveCommands.clear();
+	_pData->vecMoveCommands.reserve(_pData->iMoveCommandsNum);
 
-
-	InputFile.read(reinterpret_cast<char*>(&_pData->iMoveCommandsNum), sizeof(_uint));
-
-	_pData->vecMoveCommands.resize(_pData->iMoveCommandsNum);
-
-	for (auto& KF : _pData->vecMoveCommands)
-	{
-		InputFile.read(reinterpret_cast<char*>(&KF), sizeof(_bool));
-	}
 	
-	InputFile.read(reinterpret_cast<char*>(&_pData->eRenderGroup), sizeof(_uint));
+	for (_int i = 0; i < _pData->iMoveCommandsNum; ++i)
+	{
+		_bool bTemp = { false };
+		InputFile.read(reinterpret_cast<char*>(&bTemp), sizeof(_bool));
+		_pData->vecMoveCommands.emplace_back(bTemp);
+	}
 
+	InputFile.read(reinterpret_cast<char*>(&_pData->eRenderGroup), sizeof(_int));
 
+	InputFile.close();
 	return S_OK;
 }
 
 HRESULT CFXToolDirector::Load_Effect(path _FilePath, MULTI_FX_DATA* _pData)
 {
+
 	ifstream InputFile(_FilePath, ios::binary | ios::in);
 
 	if (!InputFile.is_open())
@@ -973,6 +1019,7 @@ void CFXToolDirector::Render_FXHierarchy()
 		ParticleDesc.strTexTag = strComponentTag + m_FXTexList[m_iAddingFXTexIdx];
 		ParticleDesc.strMaskTexTag = strComponentTag + m_FXMaskTexList[m_iAddingFXMaskTexIdx];
 		ParticleDesc.iNumInstance = m_iAddingInstanceNum;
+		ParticleDesc.fDuration = 5.f;
 		CParticle* pParticle = static_cast<CParticle*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle"), &ParticleDesc));
 		m_FXs.emplace_back(pParticle);
 	}
@@ -1185,7 +1232,7 @@ void CFXToolDirector::Render_FXProperty()
 	if (m_eSelected == SELECTED_MULTI_FX && m_iSelectedMultiFXIdx == -1)
 		return;
 
-	
+
 	//이펙트 기본 변수 세팅
 	Begin(u8"속성 편집");
 
@@ -1227,9 +1274,19 @@ void CFXToolDirector::Render_FXProperty()
 	if (m_eSelected != SELECTED_MULTI_FX)
 	{
 		//루프, 빌보드
-		Checkbox(u8"루프", &pCurFX->m_bIsLoop);
+		if (Checkbox(u8"루프", &pCurFX->m_bIsLoop) && bIsParticle)
+		{
+			m_bPlayingBar = false;
+			pCurFX->Reset_Duration();
+			static_cast<CParticle*>(pCurFX)->Update_InstanceInfo();
+		}
 		SameLine();
-		Checkbox(u8"빌보딩", &pCurFX->m_bIsBillboard);
+		if (Checkbox(u8"빌보딩", &pCurFX->m_bIsBillboard) && bIsParticle)
+		{
+			m_bPlayingBar = false;
+			pCurFX->Reset_Duration();
+			static_cast<CParticle*>(pCurFX)->Update_InstanceInfo();
+		}
 
 		//ui처럼 보이는 직교 이펙트
 		if (!bIsParticle)
@@ -1239,11 +1296,11 @@ void CFXToolDirector::Render_FXProperty()
 		}
 
 		//블룸 효과
-		if (Checkbox(u8"블룸", &pCurFX->m_bIsBloom))
+		if (Checkbox(u8"블룸", &pCurFX->m_bIsBloom) && bIsParticle)
 		{
-			pCurFX->m_bIsBloom ?
-				pCurFX->m_bIsColorRender = false :
-				pCurFX->m_bIsColorRender = true;
+			m_bPlayingBar = false;
+			pCurFX->Reset_Duration();
+			static_cast<CParticle*>(pCurFX)->Update_InstanceInfo();
 		}
 
 		//렌더 그룹 설정
@@ -1313,26 +1370,26 @@ void CFXToolDirector::Render_FXProperty()
 		pCurFX->m_iPassIdx = m_iCurFXPassIdx;
 	}
 
-	if (InputInt(u8"디퓨즈 인덱스", &pCurFX->m_iTexIdx, 1, pCurFX->m_iMaxTexIdx))
+	if (InputInt(u8"디퓨즈 인덱스", &m_iCurFXTexIdx, 1, pCurFX->m_iMaxTexIdx))
 	{
 		//가능한 인덱스로 한 번 보정해 주기
 		if (m_iCurFXTexIdx < 0)
 			m_iCurFXTexIdx = 0;
 
-		//if(pCurFX->m_iMaskTexIdx < m_iCurFXTexIdx)
-		//	m_iCurFXTexIdx = pCurFX->m_iMaskTexIdx;
+		if(pCurFX->m_iMaxTexIdx < m_iCurFXTexIdx)
+			m_iCurFXTexIdx = pCurFX->m_iMaskTexIdx;
 
 		pCurFX->m_iTexIdx = m_iCurFXTexIdx;
 	}
 
-	if (InputInt(u8"마스크 인덱스", &pCurFX->m_iMaskTexIdx, 1, pCurFX->m_iMaxMaskTexIdx))
+	if (InputInt(u8"마스크 인덱스", &m_iCurFXMaskTexIdx, 1, pCurFX->m_iMaxMaskTexIdx))
 	{
 		//가능한 인덱스로 한 번 보정해 주기
 		if (m_iCurFXMaskTexIdx < 0)
 			m_iCurFXMaskTexIdx = 0;
 
-		//if (pCurFX->m_iMaskTexIdx < m_iCurFXMaskTexIdx)
-		//	m_iCurFXMaskTexIdx = pCurFX->m_iMaskTexIdx;
+		if (pCurFX->m_iMaxMaskTexIdx < m_iCurFXMaskTexIdx)
+			m_iCurFXMaskTexIdx = pCurFX->m_iMaskTexIdx;
 
 		pCurFX->m_iMaskTexIdx = m_iCurFXMaskTexIdx;
 	}
@@ -1350,7 +1407,7 @@ void CFXToolDirector::Render_FXProperty()
 	_bool bEdited{ false };
 	auto moveIter = pCurParticle->m_InstanceDesc.vecMoveCommands.begin();
 
-	static _bool bDrop = &pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DROP];
+	_bool bDrop = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DROP];
 
 	if (Checkbox(u8"Drop", &bDrop))
 	{
@@ -1359,7 +1416,7 @@ void CFXToolDirector::Render_FXProperty()
 	}
 	SameLine();
 
-	static _bool bSpread = &pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_SPREAD];
+	_bool bSpread = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_SPREAD];
 	if (Checkbox(u8"Spread", &bSpread))
 	{
 		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_SPREAD] = bSpread;
@@ -1367,7 +1424,7 @@ void CFXToolDirector::Render_FXProperty()
 	}
 	SameLine();
 
-	static _bool bDecelerate = &pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DECELERATE];
+	_bool bDecelerate = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DECELERATE];
 	if (Checkbox(u8"Decelerate", &bDecelerate))
 	{
 		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DECELERATE] = bDecelerate;
@@ -1428,7 +1485,7 @@ void CFXToolDirector::Render_FXProperty()
 	if (DragFloat(u8"속도 랜덤", &pCurParticle->m_InstanceDesc.fSpeedRandomOffset, .01f, 0.f, 100.f, "%.2f"))
 		bEdited = true;
 
- 	if (ColorEdit3(u8"색상", m_vColor))
+	if (ColorEdit3(u8"색상", m_vColor))
 	{
 		pCurParticle->m_InstanceDesc.vColor = { m_vColor[0], m_vColor[1], m_vColor[2] };
 		bEdited = true;
@@ -1500,79 +1557,79 @@ void CFXToolDirector::Render_FXPlayBar(_float _fTimeDelta)
 		Text("%.2f %.2f %.2f\t", pCurFX->m_vCurPos.x, pCurFX->m_vCurPos.y, pCurFX->m_vCurPos.z);
 		//SameLine();
 
-		
+
 
 		Text(u8"회전");
 		SameLine();
 		Text("%.2f %.2f %.2f\t", pCurFX->m_vCurRot.x, pCurFX->m_vCurRot.y, pCurFX->m_vCurRot.z);
 		//SameLine();
 
-		
+
 
 		Text(u8"크기");
 		SameLine();
 		Text("%.2f %.2f %.2f\t", pCurFX->m_vCurScale.x, pCurFX->m_vCurScale.y, pCurFX->m_vCurScale.z);
-		
+
 
 		Text(u8"Color");
 		SameLine();
 		Text("\t%.2f %.2f %.2f\t", pCurFX->m_vCurRColor.x, pCurFX->m_vCurRColor.y, pCurFX->m_vCurRColor.z);
-		
-/*
-		Text(u8"G");
-		SameLine();
-		Text("\t%.2f %.2f %.2f\t", pCurFX->m_vCurGColor.x, pCurFX->m_vCurGColor.y, pCurFX->m_vCurGColor.z);
-		SameLine();
-		if (SmallButton(u8"G 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
-		{
-			////m_bOpenKeyframeEditor = false;
-			FX_KEYFRAME newKeyframe{};
-			newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
-			newKeyframe.eEasing = EASE_OUT;
-			newKeyframe.vValue = pCurFX->m_vCurGColor;
 
-			pCurFX->Add_Keyframe(newKeyframe, KF_GCOLOR);
-		}
+		/*
+				Text(u8"G");
+				SameLine();
+				Text("\t%.2f %.2f %.2f\t", pCurFX->m_vCurGColor.x, pCurFX->m_vCurGColor.y, pCurFX->m_vCurGColor.z);
+				SameLine();
+				if (SmallButton(u8"G 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
+				{
+					////m_bOpenKeyframeEditor = false;
+					FX_KEYFRAME newKeyframe{};
+					newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
+					newKeyframe.eEasing = EASE_OUT;
+					newKeyframe.vValue = pCurFX->m_vCurGColor;
 
-		Text(u8"B");
-		SameLine();
-		Text("\t%.2f %.2f %.2f\t", pCurFX->m_vCurBColor.x, pCurFX->m_vCurBColor.y, pCurFX->m_vCurBColor.z);
-		SameLine();
-		if (SmallButton(u8"B 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
-		{
-			////m_bOpenKeyframeEditor = false;
-			FX_KEYFRAME newKeyframe{};
-			newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
-			newKeyframe.eEasing = EASE_OUT;
-			newKeyframe.vValue = pCurFX->m_vCurBColor;
+					pCurFX->Add_Keyframe(newKeyframe, KF_GCOLOR);
+				}
 
-			pCurFX->Add_Keyframe(newKeyframe, KF_BCOLOR);
-		}
-		*/
+				Text(u8"B");
+				SameLine();
+				Text("\t%.2f %.2f %.2f\t", pCurFX->m_vCurBColor.x, pCurFX->m_vCurBColor.y, pCurFX->m_vCurBColor.z);
+				SameLine();
+				if (SmallButton(u8"B 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
+				{
+					////m_bOpenKeyframeEditor = false;
+					FX_KEYFRAME newKeyframe{};
+					newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
+					newKeyframe.eEasing = EASE_OUT;
+					newKeyframe.vValue = pCurFX->m_vCurBColor;
+
+					pCurFX->Add_Keyframe(newKeyframe, KF_BCOLOR);
+				}
+				*/
 		Text(u8"알파");
 		SameLine();
 		Text("\t%.2f\t\t\t", pCurFX->m_fCurAlpha);
-		
+
 
 		Text(u8"마스크 임계");
 		SameLine();
 		Text("\t%.2f\t", pCurFX->m_fCurMaskThreshold);
-		
+
 
 		Text(u8"UV 이동 오프셋");
 		SameLine();
 		Text("\t%.2f %.2f\t", pCurFX->m_vCurUVOffset.x, pCurFX->m_vCurUVOffset.y);
-		
+
 
 		Text(u8"마스크 UV 이동 오프셋");
 		SameLine();
 		Text("\t%.2f %.2f\t", pCurFX->m_vCurMaskUVOffset.x, pCurFX->m_vCurMaskUVOffset.y);
-		
+
 
 		Text(u8"마스크 UV 회전 오프셋");
 		SameLine();
 		Text("\t%.2f\t", pCurFX->m_vCurMaskUVAngle);
-		
+
 	}
 
 	//SetColumnWidth(0, 70.f);
@@ -1601,7 +1658,7 @@ void CFXToolDirector::Render_FXPlayBar(_float _fTimeDelta)
 		pCurFX->Add_Keyframe(newKeyframe, KF_ROT);
 	}
 
-	
+
 	if (SmallButton(u8"크기 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
 	{
 		////m_bOpenKeyframeEditor = false;
@@ -1612,7 +1669,7 @@ void CFXToolDirector::Render_FXPlayBar(_float _fTimeDelta)
 
 		pCurFX->Add_Keyframe(newKeyframe, KF_SCALE);
 	}
-	
+
 	if (SmallButton(u8"색 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
 	{
 		////m_bOpenKeyframeEditor = false;
@@ -1624,7 +1681,7 @@ void CFXToolDirector::Render_FXPlayBar(_float _fTimeDelta)
 		pCurFX->Add_Keyframe(newKeyframe, KF_RCOLOR);
 	}
 
-	
+
 	if (SmallButton(u8"알파 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
 	{
 		FX_KEYFRAME newKeyframe{};
@@ -1635,7 +1692,7 @@ void CFXToolDirector::Render_FXPlayBar(_float _fTimeDelta)
 		pCurFX->Add_Keyframe(newKeyframe, KF_ALPHA);
 	}
 
-	
+
 	if (SmallButton(u8"임계 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
 	{
 		FX_KEYFRAME newKeyframe{};
@@ -1668,7 +1725,7 @@ void CFXToolDirector::Render_FXPlayBar(_float _fTimeDelta)
 		pCurFX->Add_Keyframe(newKeyframe, KF_MASKUVOFFSET);
 	}
 
-	
+
 	if (SmallButton(u8"Mask 회전 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
 	{
 		FX_KEYFRAME newKeyframe{};
@@ -1681,7 +1738,7 @@ void CFXToolDirector::Render_FXPlayBar(_float _fTimeDelta)
 
 
 	NextColumn();
-	
+
 	if (m_bPlayingBar)
 		PushStyleColor(ImGuiCol_Button, COLOR_ORANGE);
 	else
@@ -1690,23 +1747,33 @@ void CFXToolDirector::Render_FXPlayBar(_float _fTimeDelta)
 	//재생
 	if (ArrowButton(u8"Play", ImGuiDir_Right) || m_pGameInstance->Get_KeyState(DIK_SPACE, KEY_DOWN))
 	{
-		//		m_bOpenKeyframeEditor = false;
-
 		m_bPlayingBar = !m_bPlayingBar;
-		//if(m_iSelectedMultiFXIdx != -1)
 
-		//재생 다 끝났을 시 duration 0
-		if (m_bPlayingBar && m_fCurPlayDuration >= m_fTotalPlayDuration)
+		//재생 다시 시작하는 상태에서 
+		if (m_bPlayingBar)
 		{
-			m_fCurPlayDuration = 0.f;
 
-			if (m_eSelected == SELECTED_SINGLE_FX || m_eSelected == SELECTED_PARTICLE_FX /*&& m_iSelectedFXIdx != -1*/)
+			//파티클은 무조건 reset duration 하도록 하세요
+			if (m_eSelected == SELECTED_PARTICLE_FX)
 			{
 				m_FXs[m_iSelectedFXIdx]->Reset_Duration();
+				m_fCurPlayDuration = 0.f;
+				static_cast<CParticle*>(m_FXs[m_iSelectedFXIdx])->Update_InstanceInfo();
 			}
-			else if (m_eSelected == SELECTED_MULTI_FX/* && m_iSelectedMultiFXIdx != -1*/)
+			//나머지 fx 편집 중 재생 시 duration이 넘어가 있었다면 ? duration reset
+			else if (m_fCurPlayDuration >= m_fTotalPlayDuration)
 			{
-				m_MultiFXs[m_iSelectedMultiFXIdx]->Reset_Duration();
+				m_fCurPlayDuration = 0.f;
+
+				if (m_eSelected == SELECTED_SINGLE_FX)
+				{
+					m_FXs[m_iSelectedFXIdx]->Reset_Duration();
+				}
+				else if (m_eSelected == SELECTED_MULTI_FX)
+				{
+					m_MultiFXs[m_iSelectedMultiFXIdx]->Reset_Duration();
+				}
+
 			}
 
 		}
@@ -1746,7 +1813,7 @@ void CFXToolDirector::Render_FXPlayBar(_float _fTimeDelta)
 
 		if (m_fTotalPlayDuration <= m_fCurPlayDuration)
 		{
-			m_fCurPlayDuration = m_bLoopingBar ? 0.f : m_fTotalPlayDuration;
+			m_fCurPlayDuration = m_fTotalPlayDuration;
 			m_bPlayingBar = m_bLoopingBar ? true : false;
 
 
@@ -1771,7 +1838,7 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 	{
 		m_FXs[m_iSelectedFXIdx]->m_fDuration.first = m_fCurPlayDuration;
 
-		if(!m_bPlayingBar)
+		if (!m_bPlayingBar)
 			m_FXs[m_iSelectedFXIdx]->Tick(_fTimeDelta);
 	}
 
@@ -1885,7 +1952,8 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 			vValueRange = { -180.f, 180.f };
 		else if (m_eSelectedProperty == KF_SCALE)
 			vValueRange = { .001f, 50.f };
-
+		else if (m_eSelectedProperty == KF_UVOFFSET)
+			vValueRange = { -10.f, 10.f };
 
 		if (DragFloat3("Value", m_vKFPopupValue, .01f, vValueRange.x, vValueRange.y, "%.2f"))
 		{
@@ -1926,7 +1994,7 @@ void CFXToolDirector::Make_KeyframeList(_float _fWidth, _float _fInitialYPos, CE
 	_int iTempKFIdx = 0;
 
 	ImU32 vColor = IM_COL32(255, 0, 100, 255);
-	if (IsMouseHoveringRect(ImVec2(vPos.x, vPos.y-5), ImVec2(vPos.x + _fWidth, vPos.y + 5)))
+	if (IsMouseHoveringRect(ImVec2(vPos.x, vPos.y - 5), ImVec2(vPos.x + _fWidth, vPos.y + 5)))
 		vColor = IM_COL32(255, 255, 100, 255);
 
 	GetWindowDrawList()->AddLine(vPos, ImVec2(vPos.x + _fWidth, vPos.y), vColor, 1.f);
@@ -2023,6 +2091,7 @@ void CFXToolDirector::Render_MultiFXHierarchy()
 			m_iCurFXMaskTexIdx = m_FXs[i]->m_iMaskTexIdx;*/
 
 			m_fTotalPlayDuration = m_MultiFXs[i]->m_fDuration.second;
+
 			//m_fLifetime[0] = m_MultiFXs[i]->m_fLifetime.first;
 			//m_fLifetime[1] = m_MultiFXs[i]->m_fLifetime.second;
 

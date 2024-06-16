@@ -20,17 +20,18 @@ HRESULT CRabbit::Initialize_Prototype()
 
 HRESULT CRabbit::Initialize(void* pArg)
 {
-	GAMEOBJECT_DESC* pGameObjectDesc = nullptr;
+	RABBIT_DESC* pRabbitDesc = nullptr;
 
 	if (nullptr != pArg)
 	{
-		pGameObjectDesc = (GAMEOBJECT_DESC*)pArg;
+		pRabbitDesc = (RABBIT_DESC*)pArg;
 
-		pGameObjectDesc->fSpeedPerSec = 7.f;
-		pGameObjectDesc->fRotationPerSec = XMConvertToRadians(90.0f);
+		pRabbitDesc->fSpeedPerSec = 7.f;
+		pRabbitDesc->fRotationPerSec = XMConvertToRadians(90.0f);
+		m_eRabbitState = pRabbitDesc->eRabbitState;
 	}
 
-	if (FAILED(__super::Initialize(pGameObjectDesc)))
+	if (FAILED(__super::Initialize(pRabbitDesc)))
 		return E_FAIL;
 
 	m_eCollisionGroup = MONSTER;
@@ -56,12 +57,12 @@ HRESULT CRabbit::Initialize(void* pArg)
 _int CRabbit::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
-		return OBJ_DEAD;
+		return Ready_Dead();
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
-		// 빨릴 때
-	if (m_bVacuuming == true)
+	// 빨릴 때
+	if (m_ePhyXState == PO_VACUUMING || m_ePhyXState == PO_FLYDEADAWAY)
 		Change_State(CRabbit::RABBIT_DAMAGE, 120.f, true, false);
 
 	__super::Tick(m_fTimeDelta);
@@ -71,7 +72,16 @@ _int CRabbit::Tick(_float fTimeDelta)
 
 void CRabbit::Late_Tick(_float fTimeDelta)
 {
-	m_pModelCom->Play_Animation(m_fTimeDelta);
+	// 커비 입 안에 있고, Fly가 아닐땐 입 안에 있는 상황이므로, Render되지않는다.
+	if (m_ePhyXState == PO_KIRBYMOUTH)
+		return;
+
+	// 날아갈 땐, 애니메이션 재생이 되지 않는다.
+	if (m_ePhyXState != PO_FLYAWAY)
+	{
+		m_ePhyXState == PO_FLYDEADAWAY ? m_pModelCom->Play_Animation(m_fTimeDelta * 0.3f) : m_pModelCom->Play_Animation(m_fTimeDelta);
+	}
+
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
@@ -82,6 +92,7 @@ void CRabbit::Late_Tick(_float fTimeDelta)
 
 HRESULT CRabbit::Render()
 {
+
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
@@ -170,10 +181,20 @@ void CRabbit::Render_IMGUI()
 }
 #endif
 
-void CRabbit::Collision_Attack(CGameObject* pOtherObj)
+void CRabbit::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
-	Change_State(CRabbit::RABBIT_DAMAGE, 50.f, false, true);
-	m_eEyeState = RABBITEYE_HAPPY;
+	if (eContent == CCollisionCenter::CONTENT_BODY)
+	{
+		if (m_ePhyXState == PO_NORMAL)
+		{
+			Change_State(CRabbit::RABBIT_DAMAGE, 50.f, false, true);
+			m_eEyeState = RABBITEYE_HAPPY;
+		}
+	}
+	else if (eContent == CCollisionCenter::CONTENT_VACUUMOBJECT)
+	{
+
+	}
 }
 
 void CRabbit::Change_State(RABBIT_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
@@ -204,7 +225,12 @@ void CRabbit::Compute_Parabola(_vector vEndPos)
 	_float b = -2.f * m_fAxisY;
 	_float c = 2.f * m_fEndHight;
 
-	m_fEndTime = (-b + sqrtf(b * b - 4.f * m_fGravity * c)) / (2.f * m_fGravity);
+	_float fResult = b * b - 4.f * m_fGravity * c;
+
+	if (0.f > fResult)
+		m_fEndTime = -b;
+	else
+		m_fEndTime = (-b + sqrtf(fResult)) / (2.f * m_fGravity);
 
 	m_fAxisX = -(m_vStartPos.x - m_vEndPos.x) / m_fEndTime;
 	m_fAxisZ = -(m_vStartPos.z - m_vEndPos.z) / m_fEndTime;
@@ -241,11 +267,9 @@ HRESULT CRabbit::Add_Components()
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
-	desc.uCollisionType = m_eCollisionGroup;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	m_pControllerCom->Set_Object(this);
-	//m_pControllerCom->Set_CollisionType(m_eCollisionGroup);
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 
@@ -267,13 +291,19 @@ HRESULT CRabbit::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
-	m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
-	m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool))))
+		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
 		return E_FAIL;
-	m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool))))
+		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
 		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
+		return E_FAIL;
+
 
 
 	return S_OK;
@@ -331,7 +361,7 @@ _bool CRabbit::Custom_Face(_uint iMeshIndex)
 		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
 
-		m_pShaderCom->Begin(ANIMMODEL_KIRBYEYE);
+		m_pShaderCom->Begin(ANIMMODEL_EYE);
 		m_pModelCom->Render(iMeshIndex);
 
 		return true;

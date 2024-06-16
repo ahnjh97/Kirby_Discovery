@@ -8,6 +8,9 @@
 
 #define GRAVITY 9.81f
 
+//FOR COLLISION GROUP
+#define	PASSING_GROUP 50
+
 
 // assert로 확인하고자하는 코드 체크
 // ※ DEBUG용으로 RELEASE모드에서 동작하는 소스엔 사용하지 마십시오.
@@ -42,6 +45,12 @@
 #define Dir(vec3)					_float4{(vec3).x,( vec3).y, (vec3).z, 0.f}
 #define Pos(vec3)					_float4{(vec3).x, (vec3).y, (vec3).z, 1.f}
 #define F4toF3(vec4)				_float3{vec4.x, vec4.y, vec4.z}
+
+#define ZeroVecPos					_float4{0.f, 0.f, 0.f, 1.f}
+#define ZeroVecDir					_float4{0.f, 0.f, 0.f, 0.f}
+
+#define GET_POS				m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION)
+#define SET_POS(pos)		m_pTransformCom->Set_State(CTransform::STATE_POSITION, pos)
 
 //어떤 범위 안의 값을 다른 범위로 매핑한다.
 #define MAPVALUE(x,  min1,  max1,  min2,  max2) (min2 + (x - min1) * (max2 - min2) / (max1 - min1))

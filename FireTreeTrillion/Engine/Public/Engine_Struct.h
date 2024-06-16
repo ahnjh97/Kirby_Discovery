@@ -65,9 +65,9 @@ namespace Engine
 		_float3		vPivot;
 
 		_bool		bIsLoop;
-		_bool		bIsBillboard;
-		_bool		bIsColorRender;
-		_bool		bIsBloom;
+		//_bool		bIsBillboard;
+		//_bool		bIsColorRender;
+		//_bool		bIsBloom;
 
 		vector<_bool> vecMoveCommands;
 
@@ -133,19 +133,19 @@ namespace Engine
 
 	typedef struct
 	{
-		_uint		iNameStrLen;
+		_int		iNameStrLen;
 		string		strName;
 
-		_uint		iBufferStrLen;
+		_int		iBufferStrLen;
 		string		strBufferName;
 
-		_uint		iTexStrLen;
+		_int		iTexStrLen;
 		string		strTexName;
 
-		_uint		iMaskTexStrLen;
+		_int		iMaskTexStrLen;
 		string		strMaskTexName;
 
-		_uint		iNumInstance = { 0 };
+		_int		iNumInstance = { 0 };
 
 		_float		fDuration = { 1.f };
 
@@ -154,6 +154,17 @@ namespace Engine
 
 		_float		fStartDelay;
 		_float		fStarDelayRandomOffset;
+
+		_int		iPassIdx = { 0 };
+		_int		iTexIdx = { 0 };
+		_int		iMaskTexIdx = { 0 };
+
+		_bool		bIsLoop;
+		_bool		bIsBillboard;
+		_bool		bIsBloom;
+
+	
+
 
 		//시작 범위(랜덤X)
 		_float3		vCenter;
@@ -184,15 +195,10 @@ namespace Engine
 		//기준점(랜덤X)
 		_float3		vPivot;
 
-		_bool		bIsLoop;
-		_bool		bIsBillboard;
-		_bool		bIsColorRender;
-		_bool		bIsBloom;
-
-		_uint			iMoveCommandsNum;
+		_int			iMoveCommandsNum;
 		vector<_bool>	vecMoveCommands;
 
-		_uint eRenderGroup = { 0 };
+		_int eRenderGroup = { 0 };
 
 
 	}PARTICLE_DATA;

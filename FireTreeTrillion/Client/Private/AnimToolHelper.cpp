@@ -11,6 +11,7 @@
 
 // 객체모음집
 #include "Awoofy.h"
+#include "Kirby.h"
 
 
 static string	g_strProtoObjTag = "";
@@ -106,7 +107,7 @@ HRESULT CAnimToolHelper::Initialize(void* pArg)
 
 	Ready_AnimObjects(L"Layer_AnimObjects");
 
-	Load();
+	//Load();
 
 	return S_OK;
 }
@@ -163,6 +164,18 @@ void CAnimToolHelper::Ready_AnimObjects(const wstring& strLayerTag)
 	pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Awoofy")));
 	CHECK_NULLPTR(pCharacter);
 	m_vecCharacter.push_back(pCharacter);
+
+	pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_BladeKnight")));
+	CHECK_NULLPTR(pCharacter);
+	m_vecCharacter.push_back(pCharacter);
+
+	pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_PoppyBrosJr")));
+	CHECK_NULLPTR(pCharacter);
+	m_vecCharacter.push_back(pCharacter);
+
+	pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Buffahorn")));
+	CHECK_NULLPTR(pCharacter);
+	m_vecCharacter.push_back(pCharacter);
 }
 
 void CAnimToolHelper::Render_ObjectList()
@@ -206,95 +219,6 @@ void CAnimToolHelper::Render_ObjectList()
 	ImGui::End();
 }
 
-void CAnimToolHelper::Render_AnimationList()
-{
-	ImGui::Begin("ANIMATION LIST");
-
-	float windowHeight = ImGui::GetWindowHeight();
-	float listBoxHeight = windowHeight - 100;
-	ImGui::SetNextWindowSizeConstraints(ImVec2(-1, windowHeight), ImVec2(-1, windowHeight));
-
-
-	static ImGuiTextFilter filter;
-	ImGui::Text("Search Animation");
-	filter.Draw();
-
-	m_pModel = static_cast<CModel*>(m_pAnimToolObj->Get_Component(TEXT("Com_Model")));
-
-	ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
-	if (ImGui::BeginTabBar("MyTabBar", tab_bar_flags))
-	{
-		//MODEL tModelInfo = pModel[w]->Get_ModelInfo();
-		if (ImGui::BeginTabItem(m_strModelName.c_str())) // 모델이름으로 Tab Name 형성
-		{
-			//g_iActiveModelNum = w;
-			_float childwindowHeight = ImGui::GetWindowHeight();
-			_float childlistBoxHeight = windowHeight - 110;
-			ImGui::SetNextWindowSizeConstraints(ImVec2(-1, childlistBoxHeight), ImVec2(-1, childlistBoxHeight));
-
-			static _int item_current_idx = -1;
-			static _int item_previous_idx = -1;
-
-			if (ImGui::BeginListBox(" ", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing())))
-			{
-				// 해당 모델이 가지고 있는 애니메이션 개수
-				_int uAnimCnt = (_int)m_pModel->Get_AnimCnt();
-				vector<CAnimation*>* pVecAnims = m_pModel->Get_Animations();
-
-				if (m_pGameInstance->Get_KeyState(DIK_UP, KEY_DOWN))
-				{
-					item_current_idx--;
-					if (item_current_idx < 0)
-						item_current_idx = uAnimCnt - 1;
-				}
-				if (m_pGameInstance->Get_KeyState(DIK_DOWN, KEY_DOWN))
-				{
-					item_current_idx++;
-					if (item_current_idx >= uAnimCnt)
-						item_current_idx = 0;
-				}
-
-				// 인덱스가 변경되었을 때 애니메이션 설정 호출
-				if (item_previous_idx != item_current_idx)
-				{
-					m_pModel->Set_Animation(item_current_idx);
-					item_previous_idx = item_current_idx;
-				}
-
-				for (_int n = 0; n < uAnimCnt; n++)
-				{
-					const _bool is_selected = (item_current_idx == n);
-					const _char* animName = (*pVecAnims)[n]->Get_AnimationName();
-					m_strAnimationName = animName;
-					if (animName == nullptr) continue;
-
-					if (filter.PassFilter(animName))
-					{
-						if (ImGui::Selectable(animName, is_selected))
-						{
-							item_current_idx = n;
-							m_pModel->Set_Animation(n);
-						}
-
-						if (is_selected)
-						{
-							// 해당 애니메이션 ListBox 포커싱
-							ImGui::SetItemDefaultFocus();
-							ImGui::SetScrollHereY();
-							// 애니메이션 창 띄우기
-							Render_FrameLine(&(*pVecAnims)[n], animName);
-						}
-					}
-				}
-				ImGui::EndListBox();
-			}
-			ImGui::EndTabItem();
-		}
-		ImGui::EndTabBar();
-	}
-	ImGui::End();
-}
-
 void CAnimToolHelper::Render_AnimationList(const wstring& wstrObjectTag)
 {
 	ImGui::Begin("ANIMATION LIST");
@@ -324,6 +248,18 @@ void CAnimToolHelper::Render_AnimationList(const wstring& wstrObjectTag)
 					MODEL tModelInfo = pModel[w]->Get_ModelInfo();
 					if (ImGui::BeginTabItem(tModelInfo.strModelName.c_str())) // 모델이름으로 Tab Name 형성
 					{
+						if (m_pCharacter->Get_PrototypeTag() == L"Prototype_GameObject_Kirby")
+						{
+							CKirby::KIRBY_INFODESC* pKirbyDesc = static_cast<CKirby*>(m_pCharacter)->Get_KirbyInfo();
+							pKirbyDesc->m_eBodyState = (CKirby::BODYSTATE)w;
+							static_cast<CKirby*>(m_pCharacter)->Set_KirbyInfo(*pKirbyDesc);
+						
+							if (tModelInfo.strModelName.find("Sword") != string::npos)
+								m_pCharacter->Set_AbilityType(ABILITY_SWORD);
+							else
+								m_pCharacter->Set_AbilityType(ABILITY_DEFAULT);
+						}
+						
 						g_iActiveModelNum = w;
 						_float childwindowHeight = ImGui::GetWindowHeight();
 						_float childlistBoxHeight = windowHeight - 110;
@@ -335,6 +271,19 @@ void CAnimToolHelper::Render_AnimationList(const wstring& wstrObjectTag)
 							// 해당 모델이 가지고 있는 애니메이션 개수
 							_uint uAnimCnt = pModel[w]->Get_AnimCnt();
 							vector<CAnimation*>* pVecAnims = pModel[w]->Get_Animations();
+							
+							// 키보드 입력을 통해 현재 선택된 항목 변경
+							if (ImGui::IsKeyPressed(ImGuiKey_UpArrow) && item_current_idx > 0)
+							{
+								item_current_idx--;
+								m_bOnceAnim = true;
+							}
+							if (ImGui::IsKeyPressed(ImGuiKey_DownArrow) && item_current_idx < uAnimCnt - 1)
+							{
+								item_current_idx++;
+								m_bOnceAnim = true;
+							}
+
 							for (_uint n = 0; n < uAnimCnt; n++)
 							{
 								const _bool is_selected = (item_current_idx == n);
@@ -351,7 +300,6 @@ void CAnimToolHelper::Render_AnimationList(const wstring& wstrObjectTag)
 										m_pModel = pModel[w];
 										m_strModelName = m_pModel->Get_ModelName();
 										m_bOnce = true;
-
 									}
 								}
 
@@ -361,6 +309,13 @@ void CAnimToolHelper::Render_AnimationList(const wstring& wstrObjectTag)
 									ImGui::SetItemDefaultFocus();
 									// 애니메이션 창 띄우기
 									Render_FrameLine(&(*pVecAnims)[n], animName);
+									if (m_bOnceAnim)
+									{
+										pModel[w]->Set_Animation(item_current_idx);
+										m_pModel = pModel[w];
+										m_strModelName = m_pModel->Get_ModelName();
+										m_bOnceAnim = false;
+									}
 								}
 							}
 							ImGui::EndListBox();
@@ -432,20 +387,21 @@ void CAnimToolHelper::Render_FrameLine(CAnimation** ppAnimation, const string& s
 		ImGui::End();
 		return;
 	}
+	// 애니메이션 처음 들어올때만 파싱이벤트 정보 가져오기
 	unordered_map< string, ANIM_INFO > umapAnim = m_pModel->Get_ModelInfo().umapAnimInfo;
 	auto it = umapAnim.find((*ppAnimation)->Get_AnimationName());
-	if (it != umapAnim.end())
+	if (m_bOnce)
 	{
-		if (m_bOnce)
+		if (it != umapAnim.end())
 		{
 			m_fAnimationSpeed = it->second.fAnimSpeed;
 			mySequence.m_vecSequenceItems = it->second.vecEventInfo;
-			m_bOnce = false;
 		}
-	}
-	else
-	{
-		mySequence.m_vecSequenceItems.clear();
+		else
+		{
+			mySequence.m_vecSequenceItems.clear();
+		}
+		m_bOnce = false;
 	}
 
 	// QZR : 어떠한 이벤트가 없을때의 처리
@@ -523,7 +479,7 @@ void CAnimToolHelper::Render_FrameLine(CAnimation** ppAnimation, const string& s
 					}
 				}
 				
-				if (!bCheckSame)
+				if (!bCheckSame) // 추가되는것까지는 되는데 m_vecSequenceItems에서 보관이 안되는 듯
 				{
 					mySequence.m_vecSequenceItems.push_back(EVENT_INFO{ charEventName, 0, 1 });
 					memset(charEventName, 0, sizeof(charEventName));
@@ -736,8 +692,14 @@ void CAnimToolHelper::Free()
 {
 	__super::Free();
 
+	m_vecAnimModels.clear();
+	
+	for (auto& character : m_vecCharacter)
+		Safe_Release(character);
+	m_vecCharacter.clear();
+
+	Safe_Release(m_pCharacter);
 	Safe_Release(m_pAnimToolObj);
 	Safe_Release(m_pModel);
-	m_vecAnimModels.clear();
 }
 

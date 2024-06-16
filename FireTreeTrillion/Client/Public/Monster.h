@@ -15,9 +15,13 @@ BEGIN(Client)
 class CMonster abstract : public CCharacter
 {
 public:
+	enum MONSTER_STATE {
+		MON_CIRCLE, MON_PATROL, MON_WAIT, MON_SLEEP, MON_END
+	};
+
 	struct MONSTER_DESC : public CGameObject::GAMEOBJECT_DESC
 	{
-
+		MONSTER_STATE eMonState = { MON_END };
 	};
 
 protected:
@@ -26,7 +30,10 @@ protected:
 	virtual ~CMonster() = default;
 
 public:
+	void Set_MonState(MONSTER_STATE eMonState) { m_eMonState = eMonState; }
+
 	_float Get_AnimRatio() { return m_pModelCom->Get_AnimRatio(); }
+	MONSTER_STATE Get_MonState() { return m_eMonState; }
 
 public:
 	virtual HRESULT Initialize_Prototype()			override;
@@ -38,10 +45,14 @@ public:
 #ifdef _DEBUG
 	virtual void	Render_IMGUI()					override;
 #endif
+	virtual void	Add_AnimEvent()  override {}
+
 
 protected:
 	// JSPark : 우선 몬스터들은 modelCom을 하나만 가지고 있다는 전제하에
 	CModel*					m_pModelCom	 = { nullptr };
+
+	MONSTER_STATE			m_eMonState = { MON_END };
 
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;

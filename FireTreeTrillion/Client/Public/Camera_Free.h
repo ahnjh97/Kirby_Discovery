@@ -61,16 +61,17 @@ public:
 	_float LerpRadius(_float fStart, _float fEnd, _float fRatio);
 
 private:
+	_bool			m_bWasMainCamera = { false };
 	_float			m_fMouseSensor = { 0.0f };
 
 	CTransform*		m_pTarget = { nullptr };
 	_bool			m_bTrackTarget = { false };
-	_float			m_fTrackDistance = { 20.f };
+	_float			m_fTrackDistance = { 40.f };
 
 	_float			m_fSlerpRatio = { .2f };
 
 	_float4			m_vDestCamPos = {};
-	_float4			m_vDestCamDir = {};
+	_float3			m_vDestCamDir = {};
 
 
 	_float			m_fDestFovy = { ToRadian(30.f)};
@@ -89,13 +90,10 @@ private:
 	_bool m_bLerpByTriggerInfo = { false };
 	_bool m_bPreLerpByTriggerInfo = { false };
 
-
-
 	_vector m_vSlerpedDir = {};
 	_float m_fLerpedRadius = {};
-	//Vector3			m_vOrbitPos = { 0.f, 0.f, 0.f };
+
 private:
-	//void Orbit_Target(_float fTimeDelta);
 	void Control(_float fTimeDelta);
 
 public:

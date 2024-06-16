@@ -3,6 +3,7 @@
 #include "FSM.h"
 #include "BladeKnight_State.h"
 #include "BladeKnightSword.h"
+#include "Trigger.h"
 
 CBladeKnight::CBladeKnight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -50,37 +51,49 @@ HRESULT CBladeKnight::Initialize(void* pArg)
 	m_eVacuumSize = SIZE_SMALL;
 	m_eAbilityType = ABILITY_SWORD;
 
+	Add_AnimEvent();
+
 	return S_OK;
 }
 
 _int CBladeKnight::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
-		return OBJ_DEAD;
+		return Ready_Dead();
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
+	if (m_ePhyXState == PO_VACUUMING || m_ePhyXState == PO_FLYDEADAWAY)
+		Change_State(BLADEKNIGHT_DAMAGE, 50.f, false, true);
+
+
 	__super::Tick(m_fTimeDelta);
-
-	Compute_ViewZ();
-
-	__super::SetOn_Slope(m_fTimeDelta);
-
-	Compute_MotionBlur();
-
-	//  // FSM 제어
-	   //if (m_pFSM != nullptr)
-	   //	m_pFSM->Update(this, fTimeDelta);
 
 	for (auto& Pair : m_PartObjects)
 		Pair.second->Tick(m_fTimeDelta);
+
+	if (m_pHitBoxTrigger->Is_Alive())
+		m_pHitBoxTrigger->Tick(m_fTimeDelta);
+
+	if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD5, KEY_DOWN))
+	{
+		m_pHitBoxTrigger->Check_Collision();
+	}
 
 	return OBJ_NOEVENT;
 }
 
 void CBladeKnight::Late_Tick(_float fTimeDelta)
 {
-	m_pModelCom->Play_Animation(m_fTimeDelta);
+	// 커비 입 안에 있고, Fly가 아닐땐 입 안에 있는 상황이므로, Render되지않는다.
+	if (m_ePhyXState == PO_KIRBYMOUTH)
+		return;
+
+	// 날아갈 땐, 애니메이션 재생이 되지 않는다.
+	if (m_ePhyXState != PO_FLYAWAY)
+	{
+		m_ePhyXState == PO_FLYDEADAWAY ? m_pModelCom->Play_Animation(m_fTimeDelta * 0.3f) : m_pModelCom->Play_Animation(m_fTimeDelta);
+	}
 
 	for (auto& Pair : m_PartObjects)
 		Pair.second->Late_Tick(m_fTimeDelta);
@@ -156,9 +169,33 @@ void CBladeKnight::Render_IMGUI()
 }
 #endif
 
-void CBladeKnight::Collision_Attack(CGameObject* pOtherObj)
+void CBladeKnight::Add_AnimEvent()
 {
-	//Change_State(BLADEKNIGHT_DAMAGE, 50.f, false, true);
+	__super::Add_AnimEvent();
+
+	// 1. 한 애니메이션에서 같은 이름의 이벤트 가능
+	// 2. 재생 기준은 애님툴에서 지정한 애니메이션인지 + 시작 프레임이 애니메이션 프레임안에 들어가는 지
+	// 3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
+	m_pModelCom->Add_Event("ApplyDamage", [this]() {
+
+		m_pHitBoxTrigger->Check_Collision();
+
+		});
+}
+
+void CBladeKnight::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
+{
+	if (eContent == CCollisionCenter::CONTENT_BODY)
+	{
+		if (m_ePhyXState == PO_NORMAL)
+		{
+			Change_State(BLADEKNIGHT_DAMAGE, 50.f, false, true);
+		}
+	}
+	else if (eContent == CCollisionCenter::CONTENT_VACUUMOBJECT)
+	{
+
+	}
 }
 
 void CBladeKnight::Change_State(BLADEKNIGHT_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
@@ -171,21 +208,6 @@ _bool CBladeKnight::IsAnimFinished()
 	return m_pModelCom->IsFinished();
 }
 
-void CBladeKnight::Compute_MotionBlur()
-{
-	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-	_matrix ViewProjectionMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW) * m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
-	_vector vScreenPos = XMVector3TransformCoord(vPos, ViewProjectionMatrix);
-	_float fScreenX = (XMVectorGetX(vScreenPos) + 1.f) * 0.5f;
-	_float fScreenY = (XMVectorGetY(vScreenPos) + 1.f) * 0.5f;
-
-	_float2 vCurScreenPos = _float2(fScreenX, 1.f - fScreenY);
-
-	m_vMotionVelocity.x = (m_vPreScreenPos - vCurScreenPos).x;
-	m_vMotionVelocity.y = (m_vPreScreenPos - vCurScreenPos).y;
-	m_vPreScreenPos = vCurScreenPos;
-}
-
 HRESULT CBladeKnight::Add_Components()
 {
 	HRESULT hr;
@@ -196,14 +218,15 @@ HRESULT CBladeKnight::Add_Components()
 
 	/* For.Com_Model */
 	hr = __super::Add_Component(TEXT("Prototype_Component_Model_BladeKnight"),
-		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+								TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
+	// FOR ANIMTOOL
+	m_ppModelForAnimTool = &m_pModelCom;
 
 	/* For.Com_CharacterController */
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
-	desc.uCollisionType = m_eCollisionGroup;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	CHECK_FAILED(hr);
@@ -227,7 +250,7 @@ HRESULT CBladeKnight::Add_PartObjects()
 	BladeKnightSwordDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 	BladeKnightSwordDesc.pSocket = pModel->Get_BonePtr("RHaveL");
 
-	pWeaponObject = dynamic_cast<CPartObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_BladeKnightSword"), &BladeKnightSwordDesc));
+	pWeaponObject = static_cast<CPartObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_BladeKnightSword"), &BladeKnightSwordDesc));
 	if (nullptr == pWeaponObject)
 		return E_FAIL;
 
@@ -235,6 +258,15 @@ HRESULT CBladeKnight::Add_PartObjects()
 
 	m_PartObjects.emplace(TEXT("Part_Weapon"), pWeaponObject);
 
+	/* 커비의 HITBOX */
+	CTrigger::TRIGGER_DESC tTriggerDesc{};
+	tTriggerDesc.iTriggerType = CTrigger::TRIGGER_HITBOX;
+	tTriggerDesc.iTriggerIndex = 0;
+	tTriggerDesc.eCollisionGroup = HITBOX_MONSTER;
+	tTriggerDesc.vTriggerSize = _float3(2.f, 1.5f, 2.f);
+	m_pHitBoxTrigger = static_cast<CTrigger*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc));
+	CHECK_NULLPTR(m_pHitBoxTrigger);
+	m_pHitBoxTrigger->Set_Owner(this);
 
 	return S_OK;
 }
@@ -263,6 +295,8 @@ HRESULT CBladeKnight::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
 		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -287,7 +321,7 @@ void CBladeKnight::SetUp_FSM()
 	m_pFSM->Add_State(BLADEKNIGHT_TORNADOATTACKCHARGE, CBladeKnight_TornadoAttack_State::Create());
 	m_pFSM->Add_State(BLADEKNIGHT_TORNADOATTACK, CBladeKnight_TornadoAttack_State::Create());
 
-	//m_pFSM->Add_State(BLADEKNIGHT_DAMAGE, CBladeKnight_Damage_State::Create());
+	m_pFSM->Add_State(BLADEKNIGHT_DAMAGE, CBladeKnight_Damage_State::Create());
 
 	// 상태 Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};
@@ -331,4 +365,6 @@ void CBladeKnight::Free()
 		Safe_Release(Pair.second);
 
 	m_PartObjects.clear();
+
+	Safe_Release(m_pHitBoxTrigger);
 }

@@ -26,7 +26,24 @@ float g_fMaskThreshold = { 0.f };
 
 float2 g_vUVOffset = { 0.f, 0.f };
 float2 g_vMaskUVOffset = { 0.f, 0.f };
-float2 g_vMaskUVAngle = { 0.f, 0.f };
+float g_fMaskUVAngle = { 0.f};
+
+// 회전된 UV를 계산
+float2 RotateUV(float2 vCoord, float fAngle)
+{
+    float2 vCenter = (0.5, 0.5);
+    
+    float fSinAngle = sin(fAngle);
+    float fCosAngle = cos(fAngle);
+    float2x2 RotationMatrix = float2x2(fCosAngle, -fSinAngle, fSinAngle, fCosAngle);
+
+    //float2 vDir = vCoord - vCenter;
+    vCoord -= vCenter;
+    vCoord = mul(vCoord, RotationMatrix);
+    vCoord += vCenter;
+    
+    return mul(vCoord, RotationMatrix);
+}
 
 
 struct VS_IN
@@ -247,7 +264,7 @@ PS_OUT PS_MAIN_DEFAULT_FX(PS_IN In)
     PS_OUT Out = (PS_OUT) 0;
 
     //마스크 값으로 자르기
-    vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord + g_vMaskUVOffset);
+    vector vMask = g_MaskTexture.Sample(ClampSampler, RotateUV(In.vTexcoord + g_vMaskUVOffset, g_fMaskUVAngle));
     if (vMask.a < .01f && vMask.a < g_fMaskThreshold)
         discard;
     else if (vMask.r < .1f && vMask.r < g_fMaskThreshold)
@@ -277,11 +294,11 @@ PS_OUT_EFFECT PS_MAIN_BLEND_FX(PS_IN In)
 {
     PS_OUT_EFFECT Out = (PS_OUT_EFFECT) 0;
 
-    vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord + g_vMaskUVOffset);
+    vector vMask = g_MaskTexture.Sample(ClampSampler, RotateUV(In.vTexcoord + g_vMaskUVOffset, g_fMaskUVAngle));
     
-    if(vMask.a < .01f && vMask.a < g_fMaskThreshold)
+    if(vMask.a < g_fMaskThreshold)
         discard;
-    else if (vMask.r < .1f && vMask.r < g_fMaskThreshold)
+    else if (vMask.r < g_fMaskThreshold)
         discard;
     
 
@@ -304,8 +321,8 @@ PS_OUT_EFFECT PS_MAIN_BLEND_FX(PS_IN In)
 
     Out.vColor.a = Out.vColor.a * saturate(fOldViewZ - In.vProjPos.w);
 
-    
-    Out.vNonBlur = vector(0.f, 1.f, 0.f, 0.f);
+    //if(.01 < Out.vColor.a)
+    //    Out.vNonBlur = vector(0.f, 1.f, 0.f, 0.f);
     
     return Out;
 }

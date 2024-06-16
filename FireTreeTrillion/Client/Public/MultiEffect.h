@@ -4,7 +4,7 @@
 
 BEGIN(Client)
 
-class CMultiEffect final :  public CEffect
+class CMultiEffect final : public CEffect
 {
 #ifdef _DEBUG
 	friend class CFXToolDirector;

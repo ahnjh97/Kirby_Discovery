@@ -11,13 +11,15 @@
 #include "Particle.h"
 #include "MultiEffect.h"
 
+#include "CollisionCenter.h"
+
 
 CMainApp::CMainApp()
 	: m_pGameInstance(CGameInstance::Get_Instance())
 {
-	Safe_AddRef(m_pGameInstance);		
+	Safe_AddRef(m_pGameInstance);
 
-	
+
 }
 
 
@@ -30,21 +32,22 @@ HRESULT CMainApp::Initialize()
 	EngineDesc.iWinSizeX = g_iWinSizeX;
 	EngineDesc.iWinSizeY = g_iWinSizeY;
 
-	/* ³» °ÔÀÓÀÇ ±âÃÊ ÃÊ±âÈ­ °úÁ¤À» °ÅÄ¡ÀÚ. */
+	/* ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½. */
 	if (FAILED(m_pGameInstance->Initialize_Engine(g_hInst, LEVEL_END, EngineDesc, &m_pDevice, &m_pContext)))
 		return E_FAIL;
 
 	if (FAILED(Ready_Fonts()))
 		return E_FAIL;
 
-	//loaderÀÇ Loading_StaticComponentAll() ·Î ¿Å±è
+	//loaderï¿½ï¿½ Loading_StaticComponentAll() ï¿½ï¿½ ï¿½Å±ï¿½
 	if (FAILED(Ready_Prototype_Component_For_Static()))
 		return E_FAIL;
 
 	if (FAILED(Open_Level(LEVEL_LOGO)))
 		return E_FAIL;
-	
-	Create_JSON();
+
+
+	CCollisionCenter::Get_Instance()->Initialize();
 
 	return S_OK;
 }
@@ -87,32 +90,36 @@ void CMainApp::Tick(_float fTimeDelta)
 				return;
 		}
 	}
+
+	CCollisionCenter::Get_Instance()->Collision_Tick(fTimeDelta);
+
+	m_pGameInstance->LateTick_Engine(fTimeDelta);
 }
 
 HRESULT CMainApp::Render(_float fTimeDelta)
 {
 	if (nullptr == m_pGameInstance)
 		return E_FAIL;
-	
+
 	m_pGameInstance->Begin_Draw(_float4(0.5f, 0.f, 1.f, 1.f));
 
 	m_pGameInstance->Draw(fTimeDelta);
 
 #ifdef _DEBUG
-	
-	//·»´õ Å¸°Ù ºä ON/OFF
+
+	//ï¿½ï¿½ï¿½ï¿½ Å¸ï¿½ï¿½ ï¿½ï¿½ ON/OFF
 	if (m_pGameInstance->Get_DIKeyState(DIK_F1, KEY_DOWN))
 		m_IsRenderRTV = !m_IsRenderRTV;
 
 
-	// RTV_FONT Ãß°¡
+	// RTV_FONT ï¿½ß°ï¿½
 #pragma region GAME_OBJ
 
 	if (m_IsRenderRTV)
 		Render_RTVFonts();
 
 #endif // _DEBUG
-	
+
 
 	m_pGameInstance->End_Draw();
 
@@ -121,13 +128,17 @@ HRESULT CMainApp::Render(_float fTimeDelta)
 
 HRESULT CMainApp::Ready_Fonts()
 {
-	// MakeSpriteFont "³Ø½¼lv1°íµñ Bold" /FontSize:30 /FastPack /CharacterRegion:0x0020-0x00FF /CharacterRegion:0x3131-0x3163 /CharacterRegion:0xAC00-0xD800 /DefaultCharacter:0xAC00 142.spritefont
-
-	// 05.25) aÀÚ¸·Ã¼ ¿µ¹® ÆùÆ® Ãß°¡
-	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUDSub_EN10"), TEXT("../Bin/Resources/Fonts/HUD_Sub_EN10.spritefont"))))
+	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUDSub_EN10"),
+		TEXT("../Bin/Resources/Fonts/HUD_Sub_EN10.spritefont"))))
 		return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUDSub_KR15"), TEXT("../Bin/Resources/Fonts/HUD_Sub_KR15.SpriteFont"))))
+	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUDSub_KR15"),
+		TEXT("../Bin/Resources/Fonts/HUD_Sub_KR15.SpriteFont"))))
+		return E_FAIL;
+
+	// FOT-Seurat Pro EB /Fontsize 30 /CharacterRegion: 0x0030-0x0039 (ìˆ«ìë§Œ)
+	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUD_StarPoint_NUM30"),
+		TEXT("../Bin/Resources/Fonts/HUD_StarPoint_NUM30.spritefont"))))
 		return E_FAIL;
 
 	return S_OK;
@@ -143,78 +154,19 @@ HRESULT CMainApp::Open_Level(LEVEL eLevelID)
 	return	S_OK;
 }
 
-//HRESULT CMainApp::Ready_Prototype_Component_For_Static()
-//{
-//
-//	//HRESULT hr;
-//
-//
-//	///* For.Prototype_Component_VIBuffer_Rect */
-//	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),
-//	//	CVIBuffer_Rect::Create(m_pDevice, m_pContext))))
-//	//	return E_FAIL;
-//
-//	///* For.Prototype_Component_VIBuffer_Instance_Point */
-//	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Instance_Point"),
-//	//	CVIBuffer_Instance_Point::Create(m_pDevice, m_pContext))))
-//	//	return E_FAIL;
-//
-//	///* For.Prototype_Component_Shader_VtxPosTex */
-//	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex"),
-//	//	CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
-//	//	return E_FAIL;
-//
-//	////point instance ½¦ÀÌ´õ
-//	///* For.Prototype_Component_Shader_VtxInstance_Point */
-//	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxInstance_Point"),
-//	//	CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxInstance_Point.hlsl"), VTXINSTANCE_POINT::Elements, VTXINSTANCE_POINT::iNumElements))))
-//	//	return E_FAIL;
-//
-//	//wstring wstrPrototypeTag = L"Prototype_Component_FXModel_";
-//
-//	//hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"Logo",
-//	//	CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Logo/Logo.png")));
-//	//CHECK_FAILED(hr);
-//
-//
-//	//ÀÌÆåÆ® µğ¹ö±ë¿ë ÀÌÆåÆ® ÅØ½ºÃÄ(FX Texture)
-//	//wstrPrototypeTag = L"Prototype_Component_FXTexture_";
-//
-//	//hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"Logo",
-//	//	CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Logo/Logo.png")));
-//	//CHECK_FAILED(hr);
-//
-//	//hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"Test",
-//	//	CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effects/test.png")));
-//	//CHECK_FAILED(hr);
-//
-//	//hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"SimpleStar",
-//	//	CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effects/simpleStar.png")));
-//	//CHECK_FAILED(hr);
-//
-//	//hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + L"SimpleSolid",
-//	//	CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Simple/simpleSolid_%d.png"), 2));
-//	//CHECK_FAILED(hr);
-//
-//
-//
-//	//if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CTexture::Create(m_pDevice, m_pContext, wstrFullPath, iNumTextures))))
-//	//	return E_FAIL;
-//
-//	return	S_OK;
-//}
-
 HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 {
+
+	HRESULT hr;
 
 	path FXPath("../Bin/Resources/Effects/Single/");
 	if (!exists(FXPath) || !is_directory(FXPath))
 	{
-		ALARM_FAIL(TEXT("¸ÁÇß¾î °æ·Î ¾ø´Ù"));
+		ALARM_FAIL(TEXT("ï¿½ï¿½ï¿½ß¾ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½"));
 		return E_FAIL;
 	}
 
-	//´ÜÀÏ ÀÌÆåÆ®
+	//ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®
 	for (auto& entry : directory_iterator(FXPath))
 	{
 		auto& filePath = entry.path();
@@ -258,10 +210,10 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 
 		wstring wstrProtoName = { TEXT("Prototype_GameObject_") + CUtils::StrToWstr(strname) };
 
-		if (FAILED(m_pGameInstance->Add_Prototype(wstrProtoName, CSingleEffect::Create(m_pDevice, m_pContext, FXDesc))))
-			return E_FAIL;
+		hr = m_pGameInstance->Add_Prototype(wstrProtoName, CSingleEffect::Create(m_pDevice, m_pContext, FXDesc));
+		CHECK_FAILED(hr);
 
-		
+
 		//Make_Effect(FXData);
 	}
 
@@ -270,11 +222,11 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 	FXPath = "../Bin/Resources/Effects/Multi/";
 	if (!exists(FXPath) || !is_directory(FXPath))
 	{
-		ALARM_FAIL(TEXT("¸ÁÇß¾î °æ·Î ¾ø´Ù"));
+		ALARM_FAIL(TEXT("ï¿½ï¿½ï¿½ß¾ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½"));
 		return E_FAIL;
 	}
 
-	//º¹ÇÕ ÀÌÆåÆ®
+	//ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®
 	for (auto& entry : directory_iterator(FXPath))
 	{
 		auto& filePath = entry.path();
@@ -285,7 +237,7 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 
 		MULTI_FX_DATA FXData = {};
 		CUtils::Load_Effect(filePath, &FXData);
-		
+
 		CMultiEffect::MULTI_FX_DESC FXDesc = {};
 
 		FXDesc.strFXName = FXData.strName;
@@ -295,8 +247,11 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 
 		wstring wstrProtoName = { TEXT("Prototype_GameObject_") + CUtils::StrToWstr(strname) };
 
-		if (FAILED(m_pGameInstance->Add_Prototype(wstrProtoName, CMultiEffect::Create(m_pDevice, m_pContext, FXDesc))))
-			return E_FAIL;
+		if (wstrProtoName == TEXT("Prototype_GameObject_SwordTrail_One"))
+			_int a = 0;
+
+		hr = m_pGameInstance->Add_Prototype(wstrProtoName, CMultiEffect::Create(m_pDevice, m_pContext, FXDesc));
+		CHECK_FAILED(hr);
 
 	}
 
@@ -308,7 +263,7 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 #ifdef _DEBUG
 _bool CMainApp::Render_RTVFonts()
 {
-	// RTV_FONT Ãß°¡
+	// RTV_FONT ï¿½ß°ï¿½
 #pragma region GAME_OBJ
 
 	_float fRTVFont = { 100.f };
@@ -382,258 +337,21 @@ _bool CMainApp::Render_RTVFonts()
 
 	//UI
 	m_pGameInstance->Render_Font(TEXT("Font_HUDSub_EN10"), TEXT("UI"),
-		_float2(5.f, 10.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
+		_float2(5.f, 5.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f);
 
 	return TRUE;
 }
 #endif // _DEBUG
-/// <summary>
-/// 1. ³»°¡ ÀúÀåÇÏ°íÀÚ ÇÏ´Â ¿ø¼ÒµéÀÇ °³¼ö(iCnt)¸¦ ÀúÀåÇÑ´Ù.
-/// 2. ÀúÀåÇÏ°íÀÚÇÏ´Â Elementµé(Çö ¿¹½Ã 4°³)À» ¿øÇÏ´Â °æ·Î(strPath)¿¡ ÀúÀåÇÏ´Â ÇÔ¼ö
-/// 3. Ãß°¡ÇØ¾ßÇÏ´Â Çì´õÆÄÀÏ #include "tinyxml2.h", #include "Utils.h"
-/// </summary>
-void CMainApp::CreateXML()
+
+
+CMainApp* CMainApp::Create()
 {
-	string strPath = "../Bin/Resources/Data/ItemInfo.xml";
-
-	tinyxml2::XMLDocument	m_xmlDocument;
-	tinyxml2::XMLNode* m_pNode;
-
-	m_pNode = m_xmlDocument.NewElement("Root");
-	m_xmlDocument.InsertFirstChild(m_pNode);
-
-	tinyxml2::XMLElement* m_pElement = m_xmlDocument.NewElement("Version");
-	m_pElement->SetText(240405);
-	m_pNode->InsertEndChild(m_pElement);
-
-	m_pElement = m_xmlDocument.NewElement("Count");
-	_uint iCnt = 1;								 // ÀúÀåÇÏ°íÀÚ ÇÏ´Â dataµéÀÇ °³¼ö : m_vecItemInfo.size();
-	m_pElement->SetText(iCnt);
-	m_pNode->InsertEndChild(m_pElement);
-
-	for (_uint i = 0; i < iCnt; ++i)
-	{
-		string strData = "Data" + to_string(i);
-		m_pElement = m_xmlDocument.NewElement(strData.c_str());
-
-		string strTemp = "test";				// ÀúÀåÇÏ°íÀÚ ÇÏ´Â data 1 : m_vecItemInfo[i].strName;
-		m_pElement->SetAttribute("Name", strTemp.c_str());
-
-		wstring wstrTemp = L"test2";			// ÀúÀåÇÏ°íÀÚ ÇÏ´Â data 2 : m_vecItemInfo[i].wstrItemObj_ProtoTAG;
-		strTemp = CUtils::WstrToStr(wstrTemp);
-		m_pElement->SetAttribute("ItemObj_ProtoTAG", strTemp.c_str());
-
-		wstrTemp = L"test3";					// ÀúÀåÇÏ°íÀÚ ÇÏ´Â data 3 : m_vecItemInfo[i].wstrUITexture_ProtoTAG;
-		strTemp = CUtils::WstrToStr(wstrTemp);
-		m_pElement->SetAttribute("UITexture_ProtoTAG", strTemp.c_str());
-
-		_int itemCnt = 1;						// ÀúÀåÇÏ°íÀÚ ÇÏ´Â data 4 : m_vecItemInfo[i].iEA;
-		m_pElement->SetText(itemCnt);
-
-		m_pNode->InsertEndChild(m_pElement);
-	}
-
-	tinyxml2::XMLError error = m_xmlDocument.SaveFile(strPath.c_str());
-}
-
-/// <summary>
-/// 1. ³»°¡ ºÒ·¯¿À°íÀÚ ÇÏ´Â ¿ø¼ÒµéÀÇ °³¼ö(iCnt)¸¦ ºÒ·¯¿Â´Ù.
-/// 2. ¿¹½ÃÄÚµå¿£ ºÒ·¯¿À´Â µ¥ÀÌÅÍµéÀ» ±¸Á¶Ã¼´ã¾Æ¼­ vector ÄÁÅ×ÀÌ³Ê¿¡ ÀúÀåÇÑ ÇüÅÂÀÔ´Ï´Ù.
-/// 3. Ãß°¡ÇØ¾ßÇÏ´Â Çì´õÆÄÀÏ #include "tinyxml2.h", #include "Utils.h"
-/// </summary>
-void CMainApp::Read_XML()
-{
-	tinyxml2::XMLDocument	m_xmlDocument;
-	tinyxml2::XMLNode* m_pNode;
-	tinyxml2::XMLElement* m_pElement;
-
-	tinyxml2::XMLError error = m_xmlDocument.LoadFile("../Bin/Resources/Data/ItemInfo.xml");
-	m_pNode = m_xmlDocument.FirstChild();
-
-	_int	iRead, iCnt/*, iEA*/;
-
-	m_pElement = m_pNode->FirstChildElement("Version");
-	m_pElement->QueryIntText(&iRead);
-	m_pElement = m_pNode->FirstChildElement("Count");
-	m_pElement->QueryIntText(&iCnt);
-
-	for (_int i = 0; i < iCnt; ++i)
-	{
-		string strData = "Data" + to_string(i);
-		m_pElement = m_pNode->FirstChildElement(strData.c_str());
-
-		// ÀĞ¾îµéÀÌ´Â dataµéÀ» ±¸Á¶Ã¼¿¡ ´ã¾Æ¼­ »ç¿ë
-		//ITEM_INFO itemInfo{};
-		//itemInfo.strName = m_pElement->Attribute("Name");
-		//itemInfo.wstrItemObj_ProtoTAG = CUtils::StrToWstr(m_pElement->Attribute("ItemObj_ProtoTAG"));
-		//itemInfo.wstrUITexture_ProtoTAG = CUtils::StrToWstr(m_pElement->Attribute("UITexture_ProtoTAG"));
-		//m_pElement->QueryIntText(&iEA);
-		//itemInfo.iEA = iEA;
-
-		// ±¸Á¶Ã¼µéÀ» °ü¸®ÇÏ´Â ÄÁÅ×ÀÌ³Ê¿¡ ´ã±â
-		//m_vecItemInfo.push_back(itemInfo);
-	}
-}
-
-/// <summary>
-/// 1. 
-/// 2. Ãß°¡ÇÒ #include ÆÄÀÏÀº ¾ø½À´Ï´Ù.
-/// </summary>
-void CMainApp::Create_N_ReadJSON()
-{
-	try
-	{
-		// JSON ÆÄÀÏÀ» ÀĞ±â ¸ğµå·Î ¿­±â : ±âº» À§Ä¡´Â '..\Client\Default\'ÀÓ!
-		ifstream ifs("../Bin/Resources/Data/example.json");
-		if (!ifs.is_open())
-		{
-			throw runtime_error("failed to open the file");
-		}
-
-		// ÆÄÀÏ ³»¿ëÀ» ¹®ÀÚ¿­·Î ÀĞ±â
-		string json((istreambuf_iterator<char>(ifs)), (istreambuf_iterator<char>()));
-
-		// JSON ¹®ÀÚ¿­ ÆÄ½Ì
-		Document doc;
-		doc.Parse(json.c_str());
-
-		// JSON °´Ã¼ ÆíÁı
-		Value& title = doc["title"];
-		title.SetString("New Title");
-
-		Value& email = doc["authors"][0]["email"];
-		email.SetString("newemail@example.com");
-
-		// JSON ¹®ÀÚ¿­ »ı¼º
-		StringBuffer buffer;
-		PrettyWriter<StringBuffer> writer(buffer);
-		doc.Accept(writer);
-
-		// ÆÄÀÏ¿¡ JSON ¹®ÀÚ¿­ ¾²±â
-		ofstream ofs("new_example.json");
-		ofs << buffer.GetString();
-
-		ofs << endl;
-	}
-	catch (std::exception& e)
-	{
-		std::cerr << "Error: " << e.what() << std::endl;
-		return;
-	}
-}
-
-void CMainApp::Create_JSON()
-{
-	try
-	{
-		// JSON ÆÄÀÏÀ» ÀĞ±â ¸ğµå·Î ¿­±â : ±âº» À§Ä¡´Â '..\Client\Default\'ÀÓ!
-		ifstream ifs("../Bin/Resources/Data/example.json");
-		if (!ifs.is_open())
-		{
-			throw runtime_error("failed to open the file");
-		}
-
-		// ÆÄÀÏ ³»¿ëÀ» ¹®ÀÚ¿­·Î ÀĞ±â
-		string json((istreambuf_iterator<char>(ifs)), (istreambuf_iterator<char>()));
-
-		// JSON ¹®ÀÚ¿­ ÆÄ½Ì
-		Document doc;
-		doc.Parse(json.c_str());
-
-		// JSON °´Ã¼ ÆíÁı
-		Value& title = doc["title"];
-		title.SetString("New Title");
-
-		Value& email = doc["authors"][0]["email"];
-		email.SetString("newemail@example.com");
-
-		// JSON ¹®ÀÚ¿­ »ı¼º
-		StringBuffer buffer;
-		PrettyWriter<StringBuffer> writer(buffer);
-		doc.Accept(writer);
-
-		// ÆÄÀÏ¿¡ JSON ¹®ÀÚ¿­ ¾²±â
-		ofstream ofs("../Bin/Resources/Data/new_example.json");
-		ofs << buffer.GetString();
-
-		ofs << endl;
-	}
-	catch (std::exception& e)
-	{
-		std::cerr << "Error: " << e.what() << std::endl;
-		return;
-	}
-}
-
-bool ParseJson(Document& doc, const string& jsonData)
-{
-	if (doc.Parse(jsonData.c_str()).HasParseError())
-	{
-		return false;
-	}
-
-	return doc.IsObject();
-
-	//rapidjson::ParseResult result = doc.Parse(jsonData.c_str());
-	//if (result.IsError())
-	//printf( "RapidJson parse error: %s (%lu)\n", rapidjson::GetParseError_En(result.Code()), result.Offset());
-	//return !result.IsError();
-}
-
-string JsonDocToString(Document& doc, bool isPretty = false)
-{
-	StringBuffer buffer;
-	if (isPretty)
-	{
-		PrettyWriter<StringBuffer> writer(buffer);
-		doc.Accept(writer);
-	}
-	else
-	{
-		Writer<StringBuffer> writer(buffer);
-		doc.Accept(writer);
-	}
-	return buffer.GetString();
-}
-
-void TestJson_Parse()
-{
-	// 1. Parse a JSON string into DOM.
-	const char* json = "{\"project\":\"rapidjson\",\"stars\":10}";
-	Document doc;
-	ParseJson(doc, json);
-
-	// 2. Modify it by DOM.
-	Value& s = doc["stars"];
-	s.SetInt(s.GetInt() + 1);
-
-	string jsonString = JsonDocToString(doc, true);
-	printf(jsonString.c_str());
-}
-
-void TestJson_AddMember()
-{
-	// 1. Parse a JSON string into DOM.
-	//Document doc;
-	//doc.SetObject();
-	Document doc(kObjectType);
-
-	Document::AllocatorType& allocator = doc.GetAllocator();
-	doc.AddMember("project", "rapidjson", allocator);
-	doc.AddMember("stars", 10, allocator);
-
-	string jsonString = JsonDocToString(doc, true);
-	printf(jsonString.c_str());
-}
-
-CMainApp * CMainApp::Create()
-{
-	CMainApp*		pInstance = new CMainApp();
+	CMainApp* pInstance = new CMainApp();
 
 	if (FAILED(pInstance->Initialize()))
 	{
 		MSG_BOX(TEXT("Failed To Created : CMainApp"));
-		
+
 		Safe_Release(pInstance);
 	}
 
@@ -649,6 +367,9 @@ void CMainApp::Free()
 
 	Safe_Release(m_pGameInstance);
 
-	CLevelChanger::Get_Instance()->Release_LevelChanger();
+	//CLevelChanger::Get_Instance()->Release_LevelChanger();
 	CGameInstance::Release_Engine();
+
+
+	CCollisionCenter::Destroy_Instance();
 }

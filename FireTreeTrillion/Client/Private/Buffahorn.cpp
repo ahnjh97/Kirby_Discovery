@@ -50,16 +50,22 @@ HRESULT CBuffahorn::Initialize(void* pArg)
 
 	//for test
 	//31 8 -102
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(31.f, 8.f, -102.f, 1.f));
+	//m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(31.f, 8.f, -102.f, 1.f));
 	return S_OK;
 }
 
 _int CBuffahorn::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
-		return OBJ_DEAD;
+		return Ready_Dead();
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+
+
+	if (m_ePhyXState == PO_VACUUMING || m_ePhyXState == PO_FLYDEADAWAY)
+	{
+		Change_State(BUFFAHORN_DAMAGE, 50.f, false, true);
+	}
 
 	__super::Tick(m_fTimeDelta);
 
@@ -68,7 +74,15 @@ _int CBuffahorn::Tick(_float fTimeDelta)
 
 void CBuffahorn::Late_Tick(_float fTimeDelta)
 {
-	m_pModelCom->Play_Animation(m_fTimeDelta);
+	// 커비 입 안에 있고, Fly가 아닐땐 입 안에 있는 상황이므로, Render되지않는다.
+	if (m_ePhyXState == PO_KIRBYMOUTH)
+		return;
+
+	// 날아갈 땐, 애니메이션 재생이 되지 않는다.
+	if (m_ePhyXState != PO_FLYAWAY)
+	{
+		m_ePhyXState == PO_FLYDEADAWAY ? m_pModelCom->Play_Animation(m_fTimeDelta * 0.3f) : m_pModelCom->Play_Animation(m_fTimeDelta);
+	}
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 12.0f))
 	{
@@ -142,10 +156,26 @@ void CBuffahorn::Render_IMGUI()
 	//	ImGui::Text("TargetDir X : %.2f \tTargetDir Y : %.2f \tTargetDir Z : %.2f ", INFO(m_vTargetDir).x, INFO(m_vTargetDir).y, INFO(m_vTargetDir).z);
 	__super::Render_IMGUI();
 }
+
 #endif
 
-void CBuffahorn::Collision_Attack(CGameObject* pOtherObj)
+
+void CBuffahorn::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
+	if (eContent == CCollisionCenter::CONTENT_BODY)
+	{
+		if (m_ePhyXState == PO_NORMAL)
+		{
+			// 커비랑 몸박인데, 몸 끼리 박으면 소는 안 아파하는거 같더라
+			// 맞아 어빌리티만 공격판정인데 
+			Change_State(BUFFAHORN_DAMAGE, 50.f, false, true);
+		}
+	}
+	else if (eContent == CCollisionCenter::CONTENT_VACUUMOBJECT)
+	{
+
+	}
+
 
 }
 
@@ -172,6 +202,9 @@ HRESULT CBuffahorn::Add_Components()
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
+	// FOR ANIMTOOL
+	m_ppModelForAnimTool = &m_pModelCom;
+
 	/* For.Com_Texture */
 	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Buffahorn_Eye"),
 		TEXT("Com_Texture"), (CComponent**)&m_pEyeTextureCom);
@@ -181,11 +214,11 @@ HRESULT CBuffahorn::Add_Components()
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
-	desc.uCollisionType = m_eCollisionGroup;
+	desc.tCapsuleShape.fHeight = 1.f;
+	desc.tCapsuleShape.fRadius = 1.f;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	m_pControllerCom->Set_Object(this);
-	//m_pControllerCom->Set_CollisionType(m_eCollisionGroup);
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 
@@ -207,30 +240,21 @@ HRESULT CBuffahorn::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
-	m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
-	m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool))))
+		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
 		return E_FAIL;
-	m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool))))
+		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
 		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
+		return E_FAIL;
+
 
 	return S_OK;
-}
-
-void CBuffahorn::Compute_MotionBlur()
-{
-	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-	_matrix ViewProjectionMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW) * m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
-	_vector vScreenPos = XMVector3TransformCoord(vPos, ViewProjectionMatrix);
-	_float fScreenX = (XMVectorGetX(vScreenPos) + 1.f) * 0.5f;
-	_float fScreenY = (XMVectorGetY(vScreenPos) + 1.f) * 0.5f;
-
-	_float2 vCurScreenPos = _float2(fScreenX, 1.f - fScreenY);
-
-	m_vMotionVelocity.x = (m_vPreScreenPos - vCurScreenPos).x;
-	m_vMotionVelocity.y = (m_vPreScreenPos - vCurScreenPos).y;
-	m_vPreScreenPos = vCurScreenPos;
 }
 
 void CBuffahorn::SetUp_FSM()
@@ -251,6 +275,9 @@ void CBuffahorn::SetUp_FSM()
 
 	m_pFSM->Add_State(BUFFAHORN_JUMP, CBuffahorn_Jump_State::Create());
 	m_pFSM->Add_State(BUFFAHORN_RETURNJUMPEND, CBuffahorn_Jump_State::Create());
+
+	m_pFSM->Add_State(BUFFAHORN_DAMAGE, CBuffahorn_Damage_State::Create());
+	m_pFSM->Add_State(BUFFAHORN_BOUNCETOTURN, CBuffahorn_BounceToTurn_State::Create());
 
 	//상태 Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};
@@ -281,7 +308,7 @@ _bool CBuffahorn::Custom_Face(_uint iMeshIndex)
 		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
 
-		m_pShaderCom->Begin(ANIMMODEL_KIRBYEYE);
+		m_pShaderCom->Begin(ANIMMODEL_EYE);
 		m_pModelCom->Render(iMeshIndex);
 
 		return true;

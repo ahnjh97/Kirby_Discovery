@@ -6,9 +6,15 @@ BEGIN(Client)
 
 class CHUD : public CUIObject
 {
-protected:
-	//enum HUD_STATUS { STAT_HP, STAT_SP, STAT_NONE };
-	//enum HUD_STATFONT { STFONT_1, STFONT_10, STFONT_100, STFONT_SLASH, STFONT_NONE };
+public:
+	enum HUD_STATUS { STAT_KIRBY, STAT_STARPOINT, STAT_NONE };
+	enum HUD_KIRBYHP { KIRBYHP_IDLE, KIRBYHP_DAMAGE, KIRBYHP_NONE
+	};
+
+	enum HUD_STARPOINT {
+		STARPOINT_IDLE, STARPOINT_WAIT,
+		STARPOINT_HIDE, STARPOINT_SHOW, STARPOINT_LOOT, STARPOINT_DROP, STARPOINT_NONE
+	};
 
 protected:
 	CHUD(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -29,7 +35,6 @@ public:
 	static CHUD*				Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject*		Clone(void* pArg) override;
 	virtual void				Free() override;
-
 };
 
 

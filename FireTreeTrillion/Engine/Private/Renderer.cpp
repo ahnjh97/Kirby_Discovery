@@ -375,15 +375,10 @@ HRESULT CRenderer::Initialize()
 	//// DEFERRED INFO 이 자리 god ray 확인용으로 좀 써주게여
 	//if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_DeferredInfo"), 900.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
 	//	return E_FAIL;
-
-
-#pragma region READY_UI
-	//06.04) UI 렌더타겟 뷰 생성 및 준비
-	//렌더할 뷰포트 세팅
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_UI"), 50.f, 50.f, 100.f, 100.f)))
+	
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_UI"), ViewportDesc.Width * 0.1f / 2.f, ViewportDesc.Height * 0.1f / 2.f,
+		ViewportDesc.Width * 0.1f, ViewportDesc.Height * 0.1f)))
 		return E_FAIL;
-
-#pragma endregion
 
 #endif
 
@@ -502,6 +497,11 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 
 	if (m_eRenderMode == MODE_GAMEPLAY)
 	{
+
+		// 갓 레이 적용
+		if (FAILED(Render_GodRay()))
+			return E_FAIL;
+
 		// 레디얼 블러 값이 있을때만 레디얼블러를 가동한다.
 		if (m_isRadial == true)
 		{
@@ -510,9 +510,6 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 				return E_FAIL;
 		}
 
-		// 갓 레이 적용
-		if (FAILED(Render_GodRay()))
-			return E_FAIL;
 		// DOF블러 적용
 		if (FAILED(Render_DOF_Result()))
 			return E_FAIL;
@@ -558,14 +555,20 @@ void CRenderer::Render_SystemTick(_float fTimeDelta)
 void CRenderer::Key_Input()
 {
 	// 고사양, 저사양 모드
-	if (m_pGameInstance->Get_DIKeyState(DIK_E, KEY_DOWN) && m_eRenderMode == MODE_GAMEPLAY)
+	//if (m_pGameInstance->Get_DIKeyState(DIK_E, KEY_DOWN) && m_eRenderMode == MODE_GAMEPLAY)
+	//{
+	//	m_bDebugOptionControl = !m_bDebugOptionControl;
+	//	for (size_t i = OPTION_SHADOW; i < OPTION_END; ++i)
+	//	{
+	//		m_bRenderOption[i] = m_bDebugOptionControl;
+	//		Update_Option((OPTION)i, m_bRenderOption[i]);
+	//	}
+	//}
+	
+	//리얼 초저사양모드
+	if (m_pGameInstance->Get_DIKeyState(DIK_E, KEY_DOWN))
 	{
-		m_bDebugOptionControl = !m_bDebugOptionControl;
-		for (size_t i = OPTION_SHADOW; i < OPTION_END; ++i)
-		{
-			m_bRenderOption[i] = m_bDebugOptionControl;
-			Update_Option((OPTION)i, m_bRenderOption[i]);
-		}
+		m_eRenderMode == MODE_GAMEPLAY ? Set_RenderMode(MODE_TOOL) : Set_RenderMode(MODE_GAMEPLAY);
 	}
 
 
@@ -600,7 +603,6 @@ HRESULT CRenderer::Bind_DeferredRawValue(const _char* pConstantName, const void*
 
 	return S_OK;
 }
-
 
 void CRenderer::Set_ColorSet(COLOR_DATA destColorData)
 {
@@ -657,6 +659,9 @@ void CRenderer::Setting_RadialBlur(_fvector vWorldPos, _float fRadial, _float fS
 	m_vScreenPos = _float2(fScreenX, 1.f - fScreenY);
 	m_fRadialBlurRadius = fRadial;
 	m_fRadialRadiusSubtraction = fSubtraction;
+
+	m_isRadial = true;
+
 }
 
 void CRenderer::Setting_RadialBlur(_float fRadial, _float fSubtraction)
@@ -664,6 +669,9 @@ void CRenderer::Setting_RadialBlur(_float fRadial, _float fSubtraction)
 	m_vScreenPos = _float2(0.5f, 0.5f);
 	m_fRadialBlurRadius = fRadial;
 	m_fRadialRadiusSubtraction = fSubtraction;
+
+	m_isRadial = true;
+
 }
 
 void CRenderer::Update_DofFocus(_fvector vWorldPos)
@@ -780,7 +788,6 @@ HRESULT CRenderer::Add_DebugComponents(CComponent* pRenderComponent)
 
 	return S_OK;
 }
-
 #endif
 
 HRESULT CRenderer::Render_Priority()
@@ -1801,7 +1808,6 @@ void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 
 		}
 	}
-
 }
 
 void CRenderer::Interpolate_BlackBackground(_float fTimeDelta)
@@ -1832,8 +1838,6 @@ void CRenderer::Interpolate_RadialBlur(_float fTimeDelta)
 
 	if (m_fRadialBlurRadius == 0.f)
 		m_isRadial = false;
-	else
-		m_isRadial = true;
 
 }
 
