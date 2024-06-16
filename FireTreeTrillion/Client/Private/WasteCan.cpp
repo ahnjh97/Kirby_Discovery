@@ -116,7 +116,7 @@ void CWasteCan::Render_IMGUI()
 
 void CWasteCan::Collision_Hitbox(CPhysXObject* pGameObject)
 {
-	HRESULT hr = m_pModelCom->CreateDynamicActor(m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION));
+	HRESULT hr = m_pModelCom->CreateDynamicActor(m_pTransformCom->Get_WorldFloat4x4());
 	CHECK_FAILED(hr);
 
 	m_bActivatePhysX = true;

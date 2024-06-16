@@ -17,17 +17,20 @@ public:
 	HRESULT Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _float3 vCenter, _float3 vHalfExtents
 		, const vector<_float3*>& _vecVerticesPtrs, const vector<_uint>& _vecNumVertices, const vector<_float3*>& _vecNormalPtrs
 		, const vector<_float2*>& _vecTexCoordsPtrs, const vector<_float3*>& _vecTangentsPtrs
-		, const vector<_uint*>& _vecIndicesPtrs, const vector<_uint>& _vecNumIndices, ifstream& fileInput
+		, const vector<_uint*>& _vecIndicesPtrs, const vector<_uint>& _vecNumIndices
 		, const vector<class CMesh*>& _vecMeshes, const vector<MESH_MATERIAL>& _vecMaterials
-		, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors);
+		, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors, vector<string>& _vecConstantNames);
 
 	HRESULT Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _float3 vCenter, _float3 vHalfExtents
 		, const vector<_float3*>& _vecVerticesPtrs, const vector<_uint>& _vecNumVertices, const vector<_float3*>& _vecNormalPtrs
 		, const vector<_float2*>& _vecTexCoordsPtrs, const vector<_float3*>& _vecTangentsPtrs
-		, vector<vector<FACE>>& _vecMeshFaces, ifstream& fileInput, const vector<vector<class CTexture*>>& _vecSortedMaterials
-		, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors);
+		, vector<vector<FACE>>& _vecMeshFaces, const vector<vector<class CTexture*>>& _vecSortedMaterials
+		, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors, vector<string>& _vecConstantNames);
 
-	void Culling(class CGameInstance* pGameInstance, class CShader* pShaderCom, _uint& iRenderAll, _uint& iRenderMyMesh);
+	HRESULT Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, ifstream& octreeFile, vector<string>& _vecConstantNames);
+
+	void Culling(CGameInstance* pGameInstance, class CShader* pMapShader, class CShader* pNonAnimShader, class CShader* pAnimShader
+		, _uint& iRenderAll, _uint& iRenderMyMesh);
 	_bool IsDrawable(class CGameInstance* pGameInstance);
 
 	void IdentifyOctant(_uint _iMeshIdx, const _float3* _pVerticesPos, const _uint _iNumVertices, const vector<FACE>& _vecMeshFaces); // 어떤 8분면에 속하는지를 검사
@@ -35,13 +38,19 @@ public:
 	OCTANT FinalOctant(const _float3& _vA, const _float3& _vB, const _float3& _vC);
 
 	void Save_OctreeData(ofstream& fileOutput);
-	_bool Load_OctreeData(ifstream& fileInput);
+	void Load_OctreeData(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, ifstream& fileInput);
 
 	void SetUp_Edges(_float3 vCenter, _float3 vHalfExtents);
 	void SetUp_ChildrenCenter(_float3 vCenter, _float3 vQuarterExtents, vector<_float3>& _vecChildrenCenters);
 
-	void RenderAll(class CShader* pShaderCom);
-	void RenderMyMesh(class CShader* pShaderCom);
+	void RenderAll(class CGameInstance* pGameInstance, class CShader* pMapShader, class CShader* pNonAnimShader
+		, class CShader* pAnimShader);
+	void RenderMyMesh(class CGameInstance* pGameInstance, class CShader* pMapShader, class CShader* pNonAnimShader
+		, class CShader* pAnimShader);
+
+	void InsertNonCols(vector<class CModel*>& _vecNonCols);
+	void InsertColNonAnims(vector<class CModel*>& _vecColNonAnims);
+	void InsertColAnims(vector<class CModel*>& _vecColAnims);
 
 private:
 	_uint					m_iNumMeshes = {};
@@ -58,25 +67,39 @@ private:
 	vector<_uint>			m_vecPassIndices;
 	vector<_float>			m_vecSamplingFactors;
 
-
 	vector<class CMesh*>	m_vecMyMeshes;
 	vector<vector<class CTexture*>>	m_vecMyMaterials;
 	vector<_uint>			m_vecMyPassIndices;
 	vector<_float>			m_vecMySamplingFactors;
 
+	vector<class CModel*>	m_vecNonCols;
+	vector<class CModel*>	m_vecColNonAnims;
+	vector<class CModel*>	m_vecColAnims;
+	
+	vector<class CModel*>	m_vecMyNonCols;
+	vector<class CModel*>	m_vecMyColNonAnims;
+	vector<class CModel*>	m_vecMyColAnims;
+
+	vector<string>			m_vecConstantNames;
+
+	_uint					m_iZero = {};
+	_float					m_fOne = { 1 };
+	
 public:
 	static COcTree* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _float3 vCenter, _float3 vHalfExtents
 		, const vector<_float3*>& _vecVerticesPtrs, const vector<_uint>& _vecNumVertices, const vector<_float3*>& _vecNormalPtrs
 		, const vector<_float2*>& _vecTexCoordsPtrs, const vector<_float3*>& _vecTangentsPtrs
-		, const vector<_uint*>& _vecIndicesPtrs, const vector<_uint>& _vecNumIndices, ifstream& fileInput
+		, const vector<_uint*>& _vecIndicesPtrs, const vector<_uint>& _vecNumIndices
 		, const vector<class CMesh*>& _vecMeshes, const vector<MESH_MATERIAL>& _vecMaterials
-		, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors);
+		, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors, vector<string>& _vecConstantNames);
 
 	static COcTree* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _float3 vCenter, _float3 vHalfExtents
 		, const vector<_float3*>& _vecVerticesPtrs, const vector<_uint>& _vecNumVertices, const vector<_float3*>& _vecNormalPtrs
 		, const vector<_float2*>& _vecTexCoordsPtrs, const vector<_float3*>& _vecTangentsPtrs
-		, vector<vector<FACE>>& _vecMeshFaces, ifstream& fileInput, const vector<vector<class CTexture*>>& _vecSortedMaterials
-		, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors);
+		, vector<vector<FACE>>& _vecMeshFaces, const vector<vector<class CTexture*>>& _vecSortedMaterials
+		, vector<_uint>& _vecPassIndices, vector<_float>& _vecSamplingFactors, vector<string>& _vecConstantNames);
+
+	static COcTree* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, ifstream& octreeFile, vector<string>& _vecConstantNames);
 
 public:
 	virtual void Free() override;

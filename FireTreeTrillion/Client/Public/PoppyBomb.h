@@ -51,6 +51,7 @@ private:
 
 	_float		m_fJumpTimeDelta = { 0.f };
 	_float		m_fMoveTime = { 0.f };
+	_float		m_fLifeTime = { 0.f };
 
 	_float4		m_vPosition = {};
 	_float4		m_vLook = {};
@@ -62,6 +63,7 @@ private:
 	_bool		m_bBomb = { false };
 	_bool		m_bJump = { false };
 	_bool		m_bPhysx = { false };
+	_bool		m_bFall = { false };
 
 	// 포물선 공식에 필요한 변수
 	_float4		m_vStartPos = {};			// 스킬 시작했을 때의 초기지점

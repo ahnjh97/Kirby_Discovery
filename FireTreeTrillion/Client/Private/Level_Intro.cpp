@@ -54,6 +54,8 @@ HRESULT CLevel_Intro::Initialize()
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Ladder"), TEXT("Prototype_GameObject_Ladder"), &ObjDesc)))
 		return E_FAIL;
 
+	/*if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Test"), TEXT("Prototype_GameObject_TestModel"))))
+		return E_FAIL;*/
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
 	return S_OK;
@@ -100,6 +102,8 @@ HRESULT CLevel_Intro::Ready_Lights()
 
 	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
 		return E_FAIL;
+
+	CGameInstance::Get_Instance()->Setting_GodRay({320.f, 600.f, 1800.f, 1.f});
 
 	return S_OK;
 }
@@ -217,6 +221,8 @@ HRESULT CLevel_Intro::Ready_ParsedObjects()
 				break;
 			_vector vDeterminant{};
 			matInverse = XMMatrixInverse(&vDeterminant, matWorld);
+			if (fileStream.eof())
+				break;
 			triggerInfos.emplace(iTriggerIndex, pair<_float4x4, _float>(matInverse, matWorld._33));
 		}
 		else if ("Dummy" == strModelName)

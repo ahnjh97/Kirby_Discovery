@@ -137,7 +137,6 @@ _int CKirby::Tick(_float fTimeDelta)
 	__super::Tick(m_fTimeDelta);
 	Kirby_SystemTick(m_fTimeDelta);
 
-
 	m_pWeapons->Tick(m_fTimeDelta);
 	m_pArmours->Tick(m_fTimeDelta);
 
@@ -363,6 +362,7 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 }
 
 void CKirby::Collision_Hitbox(CPhysXObject* pGameObject)
+
 {
 	// kirby HITBOX 충돌이 일어날 경우 처리해야하는 일들
 	// MSG_BOX(TEXT("커비 overlap 충돌"));
@@ -1070,10 +1070,20 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 		if (INFO(m_pObject)->Get_PhyXState() == PO_KIRBYMOUTH)
 		{
 			CCharacterController* pObjectController = static_cast<CCharacterController*>(INFO(m_pObject)->Get_Component(TEXT("Com_Controller")));
-			CTransform* pObjectTransform = INFO(m_pObject)->Get_TransformCom();
-			_vector vMouthPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-			vMouthPos.m128_f32[1] += 1.f;
-			pObjectController->Set_Position(pObjectTransform, vMouthPos);
+			if (pObjectController == nullptr)
+			{
+				CTransform* pObjectTransform = INFO(m_pObject)->Get_TransformCom();
+				_vector vMouthPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+				vMouthPos.m128_f32[1] += 1.f;
+				pObjectTransform->Set_State(CTransform::STATE_POSITION, vMouthPos);
+			}
+			else
+			{
+				CTransform* pObjectTransform = INFO(m_pObject)->Get_TransformCom();
+				_vector vMouthPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+				vMouthPos.m128_f32[1] += 1.f;
+				pObjectController->Set_Position(pObjectTransform, vMouthPos);
+			}
 		}
 	}
 
