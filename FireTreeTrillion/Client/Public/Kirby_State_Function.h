@@ -979,9 +979,10 @@ static void SwordSpinCharge(CTransform* pTransformCom)
 {
 	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
 
-	MultiFXDesc.vInitPos = static_cast<_float3>(pTransformCom->Get_State(CTransform::STATE_POSITION) + _float4{ 0.f, .2f, 0.f, 0.f });
+	MultiFXDesc.vInitPos = static_cast<_float3>(pTransformCom->Get_State(CTransform::STATE_POSITION) + _float4{ 0.f, -.1f, 0.f, 0.f });
 	MultiFXDesc.vInitRot = CUtils::Make_Degree_FromDir(CGameInstance::Get_Instance()->Get_CamLook());
 	MultiFXDesc.vInitScale = { 4.f, 4.f, 4.f };
+	//MultiFXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Sword_Copy Bubble_One"), &MultiFXDesc)))
 		return;
 }
@@ -989,9 +990,9 @@ static void SwordSpinSlash_One(CTransform* pTransformCom)
 {
 	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
 
-	MultiFXDesc.vInitPos = static_cast<_float3>(pTransformCom->Get_State(CTransform::STATE_POSITION) + _float4{ 0.f, .5f, 0.f, 0.f });
-	MultiFXDesc.vInitRot = CUtils::Make_Degree_FromDir(CGameInstance::Get_Instance()->Get_CamLook());
+	MultiFXDesc.vInitPos = _float3{ 0.f, .2f, 0.f};
 	MultiFXDesc.vInitScale = { 5.f, 5.f, 5.f };
+	MultiFXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Sword_Spin Attack A"), &MultiFXDesc)))
 		return;
 }

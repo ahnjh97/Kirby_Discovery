@@ -108,7 +108,7 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 	//true 반환하면 lifetime 끝난 것.
 	if (Calculate_Lifetime(_fTimeDelta))
 	{
-
+		m_bNoRender = true;
 	}
 
 
@@ -177,6 +177,9 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 
 void CSingleEffect::Late_Tick(_float _fTimeDelta)
 {
+	//if (m_fLifeRatio >= 1.f)
+	//	return;
+
 	if ((CRenderer::RENDERGROUP)m_eRenderGroup != CRenderer::RENDER_END)
 		m_pGameInstance->Add_RenderGroup((CRenderer::RENDERGROUP)m_eRenderGroup, this);
 
@@ -187,6 +190,9 @@ void CSingleEffect::Late_Tick(_float _fTimeDelta)
 
 HRESULT CSingleEffect::Render()
 {
+	if (m_bNoRender)
+		return S_OK;
+
 	HRESULT hr;
 
 	if (m_pModelCom == nullptr)

@@ -133,7 +133,7 @@ _int CMultiEffect::Tick(_float fTimeDelta)
 
 	m_fDuration.first += fTimeDelta;
 
-	if (m_fDuration.second <= m_fDuration.first && (*m_pCurrentLevelID) != LEVEL_TOOL_FX)
+	if (m_fDuration.second - .05f <= m_fDuration.first && (*m_pCurrentLevelID) != LEVEL_TOOL_FX)
 	{
 		m_bDead = true;
 	}
@@ -153,7 +153,7 @@ _int CMultiEffect::Tick(_float fTimeDelta)
 void CMultiEffect::Late_Tick(_float fTimeDelta)
 {
 	if (0.f < m_fStartDelay || m_bDead ||
-		(m_fDuration.second <= m_fDuration.first && (*m_pCurrentLevelID) != LEVEL_TOOL_FX))
+		(m_fDuration.second - .05f <= m_fDuration.first && (*m_pCurrentLevelID) != LEVEL_TOOL_FX))
 		return;
 
 	for (auto& pEffect : m_FXs)
