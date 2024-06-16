@@ -121,6 +121,7 @@ HRESULT CKirbyBomb::Add_Components()
     hr = __super::Add_Component(TEXT("Prototype_Component_Model_PoppyBomb"),
         TEXT("Com_Model"), (CComponent**)&m_pModelCom);
     CHECK_FAILED(hr);
+
     /* For.Com_RigidBody */
     CRigidBody::RIGIDBODY_DESC rigidDesc {};
     rigidDesc.bTrigger = false;

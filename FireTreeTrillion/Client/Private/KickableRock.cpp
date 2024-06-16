@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "KickableRock.h"
+#include "Trigger.h"
 
 CKickableRock::CKickableRock(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CRigidObject{ pDevice, pContext }
@@ -13,6 +14,8 @@ CKickableRock::CKickableRock(const CKickableRock& rhs)
 
 HRESULT CKickableRock::Initialize_Prototype()
 {
+	m_eCollisionGroup = KICKABLE;
+
 	return S_OK;
 }
 
@@ -21,15 +24,13 @@ HRESULT CKickableRock::Initialize(void* pArg)
 	GAMEOBJECT_DESC* pGameObjectDesc = nullptr;
 
 	if (nullptr != pArg)
-	{
 		pGameObjectDesc = (GAMEOBJECT_DESC*)pArg;
-	}
 
 	HRESULT  hr = __super::Initialize(pGameObjectDesc);
 	CHECK_FAILED(hr);
 
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(0.f, 6.5f, -183.f, 1.f));
 	Add_Components();
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(-3.f, 8.f, -188.f, 1.f));
 
 	return S_OK;
 }
@@ -41,11 +42,13 @@ _int CKickableRock::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return OBJ_DEAD;
 
-	if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD6, KEY_DOWN))
+	if (m_pGameInstance->Get_DIKeyState(DIK_4, KEY_DOWN))
 	{
+		// 이 부분은 테스트가 끝나고 Collision_Hitbox에 넣기
 		_float3 force = _float3{ 0.5f, 3.f , 0.5f };
-		m_pGameInstance->Kick_DynamicActor(force, 100.f);
+		m_pRigidBodyCom->Kick_RigidBody(XMVector3Normalize(force), 400.f);
 	}
+	m_pTrigger->Tick(m_fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
@@ -54,16 +57,8 @@ void CKickableRock::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
 
-	//CGameObject* pCamera = m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Camera"), 0);
-	//_float4 vForce = static_cast<CTransform*>(pCamera->Get_Component(g_strTransformTag))->Get_State_Float4(CTransform::STATE_LOOK);
-	//_float3 force = _float3{ vForce.x * 10000.f, vForce.y * 10000.f, vForce.z * 10000.f };
-	//if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD7, KEY_DOWN))
-	//	m_pRigidBodyCom->Add_Force(force);
-	//if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD8, KEY_DOWN))
-	//	m_pRigidBodyCom->Add_Torque(force);
-	//if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD9, KEY_DOWN))
-	//	m_pRigidBodyCom->Add_Velocity(force);
-	//m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
+	m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
+	m_pRigidBodyCom->Add_Force(_float3(0.f, -0.5f, 0.f));
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
@@ -114,7 +109,16 @@ void CKickableRock::Render_IMGUI()
 
 	__super::Render_IMGUI();
 }
+
 #endif
+
+void CKickableRock::Collision_Hitbox(CPhysXObject* pGameObject)
+{
+	m_pRigidBodyCom->Activate(true);
+
+	_float3 force = _float3{ 0.5f, 3.f , 0.5f };
+	m_pRigidBodyCom->Kick_RigidBody(XMVector3Normalize(force), 530.f);
+}
 
 HRESULT CKickableRock::Add_Components()
 {
@@ -135,12 +139,27 @@ HRESULT CKickableRock::Add_Components()
 	rigidDesc.bDynamic = true;
 	rigidDesc.bKinematic = false;
 	rigidDesc.eShapeType = RIGID_SPHERE;
+	rigidDesc.fOffsetSize = { 0.5f, 0.5f, 0.5f };
+	rigidDesc.vMaterial = _float3(10.f, 1.f, 0.8f);
+	rigidDesc.fDensity = 800.f;
 	rigidDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
 	hr = __super::Add_Component(TEXT("Prototype_Component_RigidBody"),
 		TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &rigidDesc);
 	CHECK_FAILED(hr);
 	m_pRigidBodyCom->Set_Object(this);
-	m_pRigidBodyCom->Activate(true);
+	m_pRigidBodyCom->Activate(false);
+
+	/* For.Com_Trigger */
+	CTrigger::TRIGGER_DESC tTriggerDesc{};
+	tTriggerDesc.iTriggerType = CTrigger::TRIGGER_MAPOBJ;
+	tTriggerDesc.iTriggerIndex = 0;
+	tTriggerDesc.eCollisionGroup = m_eCollisionGroup;
+	tTriggerDesc.vTriggerSize = _float3(.3f, .3f, .3f);
+	tTriggerDesc.vInitialPos = m_pTransformCom->Get_WorldFloat4x4();
+	m_pTrigger = static_cast<CTrigger*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc));
+	CHECK_NULLPTR(m_pTrigger);
+	m_pTrigger->Set_Owner(this);
+	m_pTrigger->Check_Collision();
 
 	return S_OK;
 }
@@ -152,8 +171,10 @@ HRESULT CKickableRock::Bind_ShaderResources()
 
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
+
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
+
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
@@ -192,6 +213,6 @@ void CKickableRock::Free()
 
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pRigidBodyCom);
-
-}
+	Safe_Release(m_pTrigger);
+} 
 

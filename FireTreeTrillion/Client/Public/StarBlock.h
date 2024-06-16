@@ -35,7 +35,7 @@ public:
 #ifdef _DEBUG
 	virtual void		Render_IMGUI()					override;
 #endif
-	virtual void		Collision_Hitbox(CPhysXObject* pGameObject);
+	virtual void		Collision_Hitbox(CPhysXObject* pGameObject) override;
 
 private:
 	HRESULT				Add_Components();

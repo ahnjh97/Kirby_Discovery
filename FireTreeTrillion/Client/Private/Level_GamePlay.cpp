@@ -458,11 +458,8 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 HRESULT CLevel_GamePlay::Ready_Layer_MapObject(const wstring& strLayerTag)
 {
 	HRESULT hr;
-	//hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_WasteCan"));
-	//CHECK_FAILED(hr);
-
-	//hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_KickableRock"));
-	//CHECK_FAILED(hr);
+	hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_WasteCan"));
+	CHECK_FAILED(hr);
 
 	hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_KickableRock"));
 	CHECK_FAILED(hr);

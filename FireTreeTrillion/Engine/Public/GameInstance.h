@@ -147,6 +147,7 @@ public: /* For.PhysX */
 	PxControllerManager*	Get_ControllerManager();
 	void					AddActor(PxActor& pActor);
 	void					RemoveActor(PxActor& pActor);
+	void					Add_Force(_float3 vForce);
 	void					Kick_DynamicActor(_float3 _kickDirection, _float impulseMagnitude);
 
 	void		Test();
