@@ -6,6 +6,7 @@
 
 void CEventCallBack::onTrigger(PxTriggerPair* pairs, PxU32 count)
 {
+    if (*CGameInstance::Get_Instance()->Get_CurrentLevelID() == 6) return;
     for (PxU32 i = 0; i < count; i++) 
     {
         for (auto& controllerActor : m_vecControllers) // 컨트롤러들을 따로 받아놓아 데이터를 읽어온다.

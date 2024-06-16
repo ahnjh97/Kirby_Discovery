@@ -350,6 +350,9 @@ _int CKirbyBomb::Boom_Dead()
     if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BombParticle_v1"), &MultiFXDesc)))
         return OBJ_DEAD;
 
+
+
+
     return OBJ_DEAD;
 }
 

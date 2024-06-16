@@ -39,7 +39,7 @@ public:
 #ifdef _DEBUG
 	virtual void	Render_IMGUI()										override;
 #endif
-	CPhysXObject*	Get_Owner() const { return m_pOwner; }
+	CPhysXObject*	Get_Owner() { return m_pOwner; }
 	void			Set_Owner(class CPhysXObject* pObj);
 	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 	virtual void	Collision_Hitbox(CPhysXObject* pGameObject)			override;

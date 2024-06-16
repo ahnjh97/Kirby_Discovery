@@ -44,22 +44,30 @@ HRESULT CTrigger::Initialize(void * pArg)
 
 _int CTrigger::Tick(_float fTimeDelta)
 {
-	__super::Tick(fTimeDelta);
+	// 만약, 트리거가 발동중이 아니라면 false 처리한다.
+	/*if (m_bAlive == false)
+		return OBJ_NOEVENT;*/
+
+	//__super::Tick(fTimeDelta);
 
 	// HITBOX용 트리거일경우 받아온 객체의 위치의 look방향의 앞쪽으로 따라다닌다.
 	if ((m_eTriggerType == TRIGGER_HITBOX))
 	{
-		_float4 vRight = XMVector3Normalize(m_pOwnerTransform->Get_State_Float4(CTransform::STATE_RIGHT)) * (-0.05f);
-		_float4 vLook = XMVector3Normalize(m_pOwnerTransform->Get_State_Float4(CTransform::STATE_LOOK)) * 0.8f;
-		_float4 vPos = m_pOwnerTransform->Get_State_Float4(CTransform::STATE_POSITION) + vRight;
+		_float4 vRight = XMVector3Normalize(m_pOwnerTransform->Get_State_Float4(CTransform::STATE_RIGHT));
+		_float4 vLook = XMVector3Normalize(m_pOwnerTransform->Get_State_Float4(CTransform::STATE_LOOK));
+		_float4 vUp = XMVector3Normalize(m_pOwnerTransform->Get_State_Float4(CTransform::STATE_UP));
+		_float4 vPos = m_pOwnerTransform->Get_State_Float4(CTransform::STATE_POSITION);
 
-		_float4 vNewPos = vLook + _float4(vPos.x, vPos.y + 1.f, vPos.z, 1.f);
-		m_pRigidBodyCom->Set_PxWorldMatrix(m_pOwnerTransform->Get_WorldFloat4x4());
+		_float4 vNewPos = vPos + vUp + vLook;
+		_float4x4 vNewWorldMatrix;
+		CUtils::Set_State_Matrix(vNewWorldMatrix, CUtils::STATE_POSITION, vNewPos);
+		
+		m_pRigidBodyCom->Set_PxWorldMatrix(vNewWorldMatrix);
 
 		// 트리거 시간제한 조건
 		if (m_bAlive)
 			m_fTriggerOffTime += m_pOwner->Get_ObjTimeDelta();
-		if (m_fTriggerOffTime >= 0.2f)
+		if (m_fTriggerOffTime >= 0.05f)
 		{
 			Close_Collision();
 			m_fTriggerOffTime = 0.f;
@@ -122,7 +130,6 @@ void CTrigger::Collision_Hitbox(CPhysXObject* pGameObject)
 	// HitBox 충돌 처리
 	if(m_bAlive)
 		m_pOwner->Collision_Hitbox(pGameObject);
-	//Close_Collision();
 }
 
 void CTrigger::Check_Collision()
@@ -203,7 +210,7 @@ HRESULT CTrigger::Add_Components()
 	case TRIGGER_HITBOX:
 	{
 		CRigidBody::RIGIDBODY_DESC tRigidDesc;
-		tRigidDesc.eShapeType = RIGID_SPHERE;
+		tRigidDesc.eShapeType = RIGID_BOX;
 		tRigidDesc.matWorld   = m_pTransformCom->Get_WorldMatrix();
 		tRigidDesc.bTrigger   = true;
 		tRigidDesc.bDynamic   = false;
