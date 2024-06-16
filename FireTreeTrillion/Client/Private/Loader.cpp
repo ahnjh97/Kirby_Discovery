@@ -291,10 +291,6 @@ HRESULT CLoader::Loading_StaticComponentAll()
 	Add_FXTexture();
 
 
-
-
-
-
 	wstring wstrPrototypeTag = L"Prototype_Component_Shader_";
 	hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + TEXT("VtxPosTex"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements));
@@ -652,8 +648,8 @@ HRESULT CLoader::Add_FXTexture()
 	hr = Add_Texture(LEVEL_STATIC, "FX_Shockwave", "Effects/Basic/shockwave_%d.png", 1);	CHECK_FAILED(hr);
 
 	//Į
-	hr = Add_Texture(LEVEL_STATIC, "FX_SwordSlash", "Effects/Sword/slash_%d.dds", 6);	CHECK_FAILED(hr);
-	hr = Add_Texture(LEVEL_STATIC, "FX_SwordTail", "Effects/Sword/sword_tail.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_SwordSlash", "Effects/Sword/slash_%d.png", 6);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_SwordTail", "Effects/Sword/sword_tail.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_SwordDecal", "Effects/Sword/sword_decal.dds");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_SwordLine", "Effects/Sword/line.png");	CHECK_FAILED(hr);
 

@@ -259,8 +259,8 @@ HRESULT CSingleEffect::Add_Components(FX_DESC& FXDesc)
 			TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 		CHECK_FAILED(hr);
 
-		//현재 VtxModel Shader Pass 8까지
-		m_iMaxPassIdx = 8;
+		//현재 VtxModel Shader Pass 9까지
+		m_iMaxPassIdx = 9;
 	}
 
 	return S_OK;
@@ -292,7 +292,7 @@ HRESULT CSingleEffect::Bind_ShaderResources(_int iTexIdx, _int iMaskTexIdx)
 	}
 
 
-	hr = m_pTextureCom[TEX_DIFFUSE]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", iTexIdx);
+ 	hr = m_pTextureCom[TEX_DIFFUSE]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", iTexIdx);
 	CHECK_FAILED(hr);
 
 	hr = m_pTextureCom[TEX_MASK]->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", iMaskTexIdx);

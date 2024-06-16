@@ -1,6 +1,9 @@
 #pragma once
 #include "Kirby.h"
 #include "Utils.h"
+#include "SingleEffect.h"
+#include "MultiEffect.h"
+
 #define DESC(state) Kirbydesc->state
 #define GAMEINSTANCE CGameInstance::Get_Instance()->
 
@@ -867,3 +870,51 @@ static _bool Kirby_JoyStickLadder_Logic(CKirby* pKirby, CKirby::KIRBY_INFODESC* 
 
 	return false;
 }
+
+
+#pragma region Hyo Effect
+
+static void Bbong_FX(_float fTimeDelta, CTransform* pTransformCom)
+{
+	static _float fBbongTime{ 0.f };
+	fBbongTime += fTimeDelta;
+	if (.2f < fBbongTime)
+	{
+		CMultiEffect::MULTI_FX_DESC FXDesc{};
+		_float4 vMyPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+		vMyPos += pTransformCom->Get_State(CTransform::STATE_LOOK) * .4f;
+
+		FXDesc.vInitPos = { vMyPos.x, vMyPos.y + .3f, vMyPos.z };
+		FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK)).y, 0.f };
+		FXDesc.vInitScale = { 1.3f, 1.3f, 1.3f };
+
+		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
+			return;
+
+		fBbongTime = 0.f;
+	}
+}
+
+static void SwordSlash_One(CTransform* pTransformCom)
+{
+	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+
+	MultiFXDesc.vInitPos = static_cast<_float3>(pTransformCom->Get_State(CTransform::STATE_POSITION) + _float4{ 0.f, .3f, 0.f, 0.f } + pTransformCom->Get_State(CTransform::STATE_LOOK) * 2.f);
+	MultiFXDesc.vInitRot = CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK));
+	MultiFXDesc.vInitScale = { 4.f, 4.f, 4.f };
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SwordTrail_One"), &MultiFXDesc)))
+		return;
+}
+
+static void SwordSlash_Two(CTransform* pTransformCom)
+{
+	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+
+	MultiFXDesc.vInitPos = static_cast<_float3>(pTransformCom->Get_State(CTransform::STATE_POSITION) + _float4{ 0.f, .3f, 0.f, 0.f } + pTransformCom->Get_State(CTransform::STATE_LOOK) * 2.f);
+	MultiFXDesc.vInitRot = CUtils::Make_Degree_FromDir(-pTransformCom->Get_State(CTransform::STATE_LOOK));
+	MultiFXDesc.vInitScale = { 4.f, 4.f, 4.f };
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SwordSlash_v2"), &MultiFXDesc)))
+		return;
+}
+
+#pragma endregion 

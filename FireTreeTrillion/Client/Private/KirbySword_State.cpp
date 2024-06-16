@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "KirbySword_State.h"
 #include "Kirby_State_Function.h"
-#include "SingleEffect.h"
-#include "MultiEffect.h"
 
 #pragma region SWORD IDLE STATE
 
@@ -94,13 +92,13 @@ void CKirbySword_Idle_State::Key_X(CGameObject* pGameObject, _float fTimeDelta)
 
 		}
 
-		CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
-		CTransform* pKirbyTransform = pKirby->Get_TransformCom();
-		MultiFXDesc.vInitPos = static_cast<_float3>(pKirbyTransform->Get_State(CTransform::STATE_POSITION) + _float4{ 0.f, .3f, 0.f, 0.f } + pKirbyTransform->Get_State(CTransform::STATE_LOOK));
-		MultiFXDesc.vInitRot = CUtils::Make_Degree_FromDir(-pKirbyTransform->Get_State(CTransform::STATE_LOOK));
-		MultiFXDesc.vInitScale = { 4.f, 4.f, 4.f };
-		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SwordSlash_v2"), &MultiFXDesc)))
-			return;
+		//CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+		//CTransform* pKirbyTransform = pKirby->Get_TransformCom();
+		//MultiFXDesc.vInitPos = static_cast<_float3>(pKirbyTransform->Get_State(CTransform::STATE_POSITION) + _float4{ 0.f, .3f, 0.f, 0.f } + pKirbyTransform->Get_State(CTransform::STATE_LOOK));
+		//MultiFXDesc.vInitRot = CUtils::Make_Degree_FromDir(-pKirbyTransform->Get_State(CTransform::STATE_LOOK));
+		//MultiFXDesc.vInitScale = { 4.f, 4.f, 4.f };
+		//if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SwordSlash_v2"), &MultiFXDesc)))
+		//	return;
 	}
 
 	// Idle일 때, X를 차징하면 기를 모은다. 그러나 키를 누르지 않으면 차징 시간이 0이 된다.
@@ -211,35 +209,7 @@ void CKirbySword_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
-#pragma region 가라 이펙트 세팅
-	static _float fBbongTime{ 0.f };
-	fBbongTime += fTimeDelta;
-	if (.2f < fBbongTime)
-	{
-		CMultiEffect::MULTI_FX_DESC FXDesc{};
-		_float4 vMyPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
-		//vMyPos += pTransformCom->Get_State(CTransform::STATE_LOOK) * .4f;
-		FXDesc.vInitPos = { vMyPos.x, vMyPos.y + .3f, vMyPos.z };
-		FXDesc.vInitScale = { 1.3f, 1.3f, 1.3f };
-
-		_float3 vDir = -pTransformCom->Get_State(CTransform::STATE_LOOK);
-		vDir.Normalize();
-		_float3 vLook = { 0.f, 0.f, 1.f };
-
-		_float fAngleLook = atan2f(vLook.z, vLook.x);
-		_float fAngleDiff = fAngleLook - atan2f(vDir.z, vDir.x);
-		fAngleDiff = ToDegree(fAngleDiff);
-
-		_float3 vAngle = { 0.f, fAngleDiff, 0.f };
-		FXDesc.vInitRot = vAngle;
-
-
-		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
-			return;
-
-		fBbongTime = 0.f;
-	}
-#pragma endregion
+	Bbong_FX(fTimeDelta, pTransformCom);
 
 	if (Kirby_Ladder_Logic(pKirby, Kirbydesc, pTransformCom))
 	{
@@ -295,13 +265,13 @@ void CKirbySword_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 		}
 
-		CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
-		CTransform* pKirbyTransform = pKirby->Get_TransformCom();
-		MultiFXDesc.vInitPos = static_cast<_float3>(pKirbyTransform->Get_State(CTransform::STATE_POSITION) + _float4{ 0.f, .3f, 0.f, 0.f} + pKirbyTransform->Get_State(CTransform::STATE_LOOK) * 2.f);
-		MultiFXDesc.vInitRot = CUtils::Make_Degree_FromDir(-pKirbyTransform->Get_State(CTransform::STATE_LOOK));
-		MultiFXDesc.vInitScale = { 4.f, 4.f, 4.f };
-		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SwordSlash_v2"), &MultiFXDesc)))
-			return;
+		//CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+		//CTransform* pKirbyTransform = pKirby->Get_TransformCom();
+		//MultiFXDesc.vInitPos = static_cast<_float3>(pKirbyTransform->Get_State(CTransform::STATE_POSITION) + _float4{ 0.f, .3f, 0.f, 0.f} + pKirbyTransform->Get_State(CTransform::STATE_LOOK) * 2.f);
+		//MultiFXDesc.vInitRot = CUtils::Make_Degree_FromDir(-pKirbyTransform->Get_State(CTransform::STATE_LOOK));
+		//MultiFXDesc.vInitScale = { 4.f, 4.f, 4.f };
+		//if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SwordSlash_v2"), &MultiFXDesc)))
+		//	return;
 	}
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_Z, KEY_DOWN))
@@ -507,6 +477,33 @@ void CKirbySword_Attack_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, 
 	m_fAttackSpeed = DESC(m_fMoveSpeed);
 	m_fAnimTime = 0.f;
 	m_fLockTime = 0.f;
+
+
+
+	if (_iAnimIndex == CKirby::SWORDSTATE_SIDESLASH)
+	{
+		SwordSlash_One(pKirby->Get_TransformCom());
+
+		//CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+		//CTransform* pKirbyTransform = pKirby->Get_TransformCom();
+		//MultiFXDesc.vInitPos = static_cast<_float3>(pKirbyTransform->Get_State(CTransform::STATE_POSITION) + _float4{ 0.f, .3f, 0.f, 0.f } + pKirbyTransform->Get_State(CTransform::STATE_LOOK) * 2.f);
+		//MultiFXDesc.vInitRot = CUtils::Make_Degree_FromDir(-pKirbyTransform->Get_State(CTransform::STATE_LOOK));
+		//MultiFXDesc.vInitScale = { 4.f, 4.f, 4.f };
+		//if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SwordSlash_v2"), &MultiFXDesc)))
+		//	return;
+	}
+	else if (_iAnimIndex == CKirby::SWORDSTATE_MULITSWORDATTACK)
+	{
+		CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+		CTransform* pKirbyTransform = pKirby->Get_TransformCom();
+		MultiFXDesc.vInitPos = static_cast<_float3>(pKirbyTransform->Get_State(CTransform::STATE_POSITION) + _float4{ 0.f, .3f, 0.f, 0.f } + pKirbyTransform->Get_State(CTransform::STATE_LOOK) * 2.f);
+		MultiFXDesc.vInitRot = CUtils::Make_Degree_FromDir(-pKirbyTransform->Get_State(CTransform::STATE_LOOK));
+		MultiFXDesc.vInitScale = { 4.f, 4.f, 4.f };
+		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SwordSlash_v2"), &MultiFXDesc)))
+			return;
+	}
+
+
 }
 
 void CKirbySword_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
