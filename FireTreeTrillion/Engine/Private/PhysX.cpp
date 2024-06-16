@@ -35,7 +35,7 @@ HRESULT CPhysX::Initialize()
     m_pPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *m_pFoundation, mToleranceScale, true, m_pPvd);
     m_pEventCallBack = new CEventCallBack();
     PxSceneDesc sceneDesc(m_pPhysics->getTolerancesScale());
-    sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
+    sceneDesc.gravity = PxVec3(0.0f, -9.81f * 3.f, 0.0f);
     m_pDispatcher = PxDefaultCpuDispatcherCreate(2);
     sceneDesc.cpuDispatcher = m_pDispatcher;
     sceneDesc.simulationEventCallback = m_pEventCallBack;
@@ -110,31 +110,29 @@ void CPhysX::Ready_TestGround()
 
 void CPhysX::Test()
 {
-    // create simulation
-    m_pMaterial = m_pPhysics->createMaterial(0.5f, 0.5f, 0.6f);
-    PxRigidStatic* groundPlane = PxCreatePlane(*m_pPhysics, PxPlane(0, 1, 0, 0), *m_pMaterial);
-    m_pScene->addActor(*groundPlane);
-
-    float halfExtent = .5f;
-    m_pShape = m_pPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *m_pMaterial);
-    PxU32 size = 30;
-    PxTransform t(PxVec3(0));
-
-    PxTransform localTm(PxVec3(0, 0, 0) * halfExtent);
-    m_pRigidDynamic = m_pPhysics->createRigidDynamic(t.transform(localTm));
-    m_pRigidDynamic->attachShape(*m_pShape);
-    PxRigidBodyExt::updateMassAndInertia(*m_pRigidDynamic, 10.0f);
-    m_pScene->addActor(*m_pRigidDynamic);
+//    // create simulation
+//    m_pMaterial = m_pPhysics->createMaterial(0.5f, 0.5f, 0.6f);
+//    PxRigidStatic* groundPlane = PxCreatePlane(*m_pPhysics, PxPlane(0, 1, 0, 0), *m_pMaterial);
+//    m_pScene->addActor(*groundPlane);
+//
+//    float halfExtent = .5f;
+//    m_pShape = m_pPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *m_pMaterial);
+//    PxU32 size = 30;
+//    PxTransform t(PxVec3(0));
+//
+//    PxTransform localTm(PxVec3(0, 0, 0) * halfExtent);
+//    m_pRigidDynamic = m_pPhysics->createRigidDynamic(t.transform(localTm));
+//    m_pRigidDynamic->attachShape(*m_pShape);
+//    PxRigidBodyExt::updateMassAndInertia(*m_pRigidDynamic, 10.0f);
+//    m_pScene->addActor(*m_pRigidDynamic);
 }
 
 _float4x4 CPhysX::Update(_fmatrix matrix)
 {
-    //PxVec3 pos = CUtils::To_Float4x4(matrix).getPosition();
-    //PxTransform newPose(pos);
-    //m_pRigidDynamic->setGlobalPose(newPose);
-    PxTransform trans = m_pRigidDynamic->getGlobalPose();
-    _float4x4 matPos = CUtils::To_Float4x4(trans);
-    return matPos;
+    //PxTransform trans = m_pRigidDynamic->getGlobalPose();
+    //_float4x4 matPos = CUtils::To_Float4x4(trans);
+    //return matPos;
+    return _float4x4();
 }
 
 void CPhysX::AddActor(physx::PxActor& pActor)
@@ -249,10 +247,20 @@ PxRigidDynamic* CPhysX::CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, 
 
     pDynamicActor->attachShape(*pShape);
     m_pScene->addActor(*pDynamicActor);
+    physx::PxRigidBodyExt::updateMassAndInertia(*pDynamicActor, 0.1f);
+
     pMesh->release();
     pShape->release(); 
     m_pRigidDynamic = pDynamicActor;
     return pDynamicActor;
+}
+
+void CPhysX::Add_Force(_float3 vForce)
+{
+    if (m_pRigidDynamic == nullptr) return;
+
+    PxVec3 PxForce = physx::PxVec3(vForce.x, vForce.y, vForce.z);
+    m_pRigidDynamic->addForce(PxForce, physx::PxForceMode::eFORCE);
 }
 
 void CPhysX::Kick_DynamicActor(_float3 _kickDirection, _float impulseMagnitude)
@@ -369,9 +377,6 @@ void CPhysX::Free()
 
     m_pControllerManager->release();
 
-    if (m_pRigidDynamic != nullptr)
-        m_pRigidDynamic->release();
-
     Safe_Delete(m_pEventCallBack);
 
     // 2. Scene 해제
@@ -405,33 +410,7 @@ void CPhysX::Free()
 }
 
 
-// =========================================== 충돌 이벤트들을 던져주는 클래스 ===========================================
-//eNOTIFY_TOUCH_FOUND    : 두 물체가 서로 접촉을 시작했을 때 이벤트를 발생시킵니다. (동적 객체와 정적 객체 모두에 적용 가능)
-//eNOTIFY_TOUCH_LOST     : 두 물체가 서로의 접촉을 끝냈을 때 이벤트를 발생시킵니다. (동적 객체와 정적 객체 모두에 적용 가능)
-//eNOTIFY_TOUCH_PERSISTS : 두 물체가 접촉을 유지하는 동안 이벤트를 지속적으로 발생시킵니다. (동적 객체와 정적 객체 모두에 적용 가능)
-//eNOTIFY_TOUCH_FORCE_THRESHOLD : 접촉하는 물체의 힘이 일정 임계값 이상일 때 이벤트를 발생시킵니다. (동적 객체와 정적 객체 모두에 적용 가능)
-
-// 충돌처리함수
-void CSimulationEventCallback::onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs)
-{
-	CComponent* pComponentDst = static_cast<CComponent*>(pairHeader.actors[0]->userData);
-	CComponent* pComponentSrc = static_cast<CComponent*>(pairHeader.actors[1]->userData);
-	if (pComponentDst != nullptr && pComponentSrc != nullptr)
-	{
-        /*if (pComponentDst->Get_Object()->Get_PrototypeTag() == L"Prototype_GameObject_Kirby")
-            int a = 3;
-        if (pComponentSrc->Get_Object()->Get_PrototypeTag() == L"Prototype_GameObject_Kirby")
-            int b = 3;*/
-	}
-}
-
-void CSimulationEventCallback::onTrigger(PxTriggerPair* pairs, PxU32 count)
-{
-    _int a = 3;
-}
-
 // ====================================================================================================================
-
 PxControllerBehaviorFlags CControllerBehaviorCallback::getBehaviorFlags(const PxController& controller)
 {
     // controller의 속성에 따라 행동을 커스터마이징
@@ -439,8 +418,12 @@ PxControllerBehaviorFlags CControllerBehaviorCallback::getBehaviorFlags(const Px
     CComponent* pComponent = static_cast<CComponent*>(controller.getUserData());
     if (pComponent != nullptr)
     {
+        CGameObject* pActorObject = pComponent->Get_Object();
+        if (pActorObject->Get_PrototypeTag() == L"Prototype_GameObject_StarBlock")
+        {
+            return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
+        }
     }
-
     return PxControllerBehaviorFlag::eCCT_SLIDE;
 }
 
@@ -471,23 +454,6 @@ void CUserControllerHitReport::onControllerHit(const PxControllersHit& hit)
 /// <summary> 히트박스와 콜라이더의 충돌을 어떻게 처리할 것인지 정의하는 PhysX의 콜백함수입니다. </summary>
 _bool CControllerFilterCallback::filter(const PxController& pObj, const PxController& pOtherObj)
 {
-    if (pObj.getActor() != nullptr && pOtherObj.getActor() != nullptr)
-    {
-        CComponent* pComponentObj    = static_cast<CComponent*>(pObj.getUserData());
-        CComponent* pComponentOther  = static_cast<CComponent*>(pOtherObj.getUserData());
-
-        if (pComponentObj != nullptr && pComponentOther != nullptr)
-        {
-            CGameObject* pActorObject = pComponentObj->Get_Object();
-            CGameObject* pActorOther  = pComponentOther->Get_Object();
-            // 둘중에 하나가 true라면 (둘 중에 하나가 히트박스 또는 아이템 등인 것이다) return false 하여 물리적 충돌을 피한다.
-            if ((CGameInstance::Get_Instance()->Is_PassingGroup(pActorObject) 
-                || CGameInstance::Get_Instance()->Is_PassingGroup(pActorOther)) == true)
-            {
-                return false;
-            }
-        }
-    }
     return true;
 }
 

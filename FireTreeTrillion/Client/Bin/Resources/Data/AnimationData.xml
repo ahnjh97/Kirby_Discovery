@@ -3,13 +3,16 @@
     <ModelName>BladeKnight
         <Animation>Attack</Animation>
         <AnimSpeed>30</AnimSpeed>
-        <Count>1</Count>
-        <Data0 EventName="ApplyDamage" StartFrame="8" EndFrame="14"/>
+        <Count>3</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="8" EndFrame="9"/>
+        <Data1 EventName="StopDamage" StartFrame="11" EndFrame="12"/>
+		<Data2 EventName="StopDamage" StartFrame="12" EndFrame="13"/>
         <Animation>TornadoAttack</Animation>
         <AnimSpeed>30</AnimSpeed>
-        <Count>2</Count>
-        <Data0 EventName="ApplyDamage" StartFrame="2" EndFrame="3"/>
-        <Data1 EventName="ApplyDamage" StartFrame="3" EndFrame="4"/>
+        <Count>3</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="3" EndFrame="4"/>
+		<Data1 EventName="StopDamage" StartFrame="6" EndFrame="7"/>
+		<Data2 EventName="StopDamage" StartFrame="7" EndFrame="8"/>
     </ModelName>
 	 <ModelName>Awoofy
         <Animation>Run</Animation>
@@ -22,31 +25,45 @@
 	<ModelName>KirbySwordDefault
         <Animation>GigantSpinSlash</Animation>
         <AnimSpeed>60</AnimSpeed>
-        <Count>1</Count>
-        <Data0 EventName="ApplyDamage" StartFrame="2" EndFrame="3"/>
+        <Count>3</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="4" EndFrame="5"/>
+		<Data1 EventName="StopDamage" StartFrame="15" EndFrame="16"/>
+		<Data2 EventName="StopDamage" StartFrame="16" EndFrame="16"/>
         <Animation>DecisiveSlash</Animation>
         <AnimSpeed>30</AnimSpeed>
-        <Count>1</Count>
-        <Data0 EventName="ApplyDamage" StartFrame="2" EndFrame="3"/>
+        <Count>3</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="4" EndFrame="5"/>
+		<Data1 EventName="StopDamage" StartFrame="15" EndFrame="16"/>
+		<Data2 EventName="StopDamage" StartFrame="16" EndFrame="16"/>
         <Animation>MultiswordAttack</Animation>
         <AnimSpeed>30</AnimSpeed>
-        <Count>1</Count>
-        <Data0 EventName="ApplyDamage" StartFrame="2" EndFrame="3"/>
+        <Count>3</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="4" EndFrame="5"/>
+		<Data1 EventName="StopDamage" StartFrame="15" EndFrame="16"/>
+		<Data2 EventName="StopDamage" StartFrame="16" EndFrame="16"/>
         <Animation>SideSlash</Animation>
         <AnimSpeed>30</AnimSpeed>
-        <Count>1</Count>
-        <Data0 EventName="ApplyDamage" StartFrame="2" EndFrame="3"/>
+        <Count>3</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="4" EndFrame="5"/>
+		<Data1 EventName="StopDamage" StartFrame="15" EndFrame="16"/>
+		<Data2 EventName="StopDamage" StartFrame="16" EndFrame="16"/>
         <Animation>SpinSlash</Animation>
         <AnimSpeed>30</AnimSpeed>
-        <Count>1</Count>
-        <Data0 EventName="ApplyDamage" StartFrame="2" EndFrame="3"/>
+        <Count>3</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="4" EndFrame="5"/>
+		<Data1 EventName="StopDamage" StartFrame="15" EndFrame="16"/>
+		<Data2 EventName="StopDamage" StartFrame="16" EndFrame="16"/>
         <Animation>SuperSpinSlashLoop</Animation>
         <AnimSpeed>30</AnimSpeed>
-        <Count>1</Count>
-        <Data0 EventName="ApplyDamage" StartFrame="2" EndFrame="3"/>
+        <Count>3</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="4" EndFrame="5"/>
+		<Data1 EventName="StopDamage" StartFrame="15" EndFrame="16"/>
+		<Data2 EventName="StopDamage" StartFrame="16" EndFrame="16"/>
         <Animation>SwordSpin</Animation>
         <AnimSpeed>30</AnimSpeed>
-        <Count>1</Count>
-        <Data0 EventName="ApplyDamage" StartFrame="2" EndFrame="3"/>
+        <Count>3</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="4" EndFrame="5"/>
+		<Data1 EventName="StopDamage" StartFrame="15" EndFrame="16"/>
+		<Data2 EventName="StopDamage" StartFrame="16" EndFrame="16"/>
     </ModelName>
 </Root>

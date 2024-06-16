@@ -68,6 +68,8 @@ public:
 	virtual void Free() override;
 
 protected:
+	virtual _int Ready_Dead();
+
 	// 현재 이 객체의 타입
 	ABILITYTYPE m_eAbilityType = { ABILITY_END };
 

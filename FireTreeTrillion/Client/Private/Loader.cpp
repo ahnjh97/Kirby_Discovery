@@ -51,10 +51,13 @@
 #include "Camera_Free.h"
 #include "Camera_Main.h"
 
-
 #include "TestModel.h"
 #include "TestTerrain.h"
 #include "Kirby.h"
+#include "BombOrbitGlow.h"
+#include "BombOrbit.h"
+#include "KirbyBomb.h"
+
 
 // 몬스터
 #include "KirbyWeapons.h"
@@ -69,18 +72,26 @@
 #include "PoppyBrosJr.h"
 #include "PoppyBomb.h"
 
+// 맵 오브젝트
 #include "Moon.h"
+#include "KickableRock.h"
 #include "WasteCan.h"
+#include "StarBlock.h"
 
 //UI
 #include "BackGround.h"
 #include "HUD.h"
 #include "HUD_KirbyStatus.h"
 #include "HUD_StarPoint.h"
+#include "BombOrbit.h"
+#include "BombOrbitGlow.h"
+
 
 // 아이템
 #include "EnergyDrink.h"
 #include "Coin.h"
+
+
 #pragma endregion
 
 
@@ -229,6 +240,11 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kirby"), CKirby);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KirbyWeapons"), CKirbyWeapons);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KirbyArmours"), CKirbyArmours);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BombOrbit"), CBombOrbit);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BombOrbitGlow"), CBombOrbitGlow);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KirbyBomb"), CKirbyBomb);
+
+
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Awoofy"), CAwoofy);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Rabbit"), CRabbit);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Buffahorn"), CBuffahorn);
@@ -251,6 +267,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Coin"), CCoin);
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Ladder"), CLadder);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KickableRock"), CKickableRock);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("StarBlock"), CStarBlock);
 #pragma endregion
 
 	return S_OK;
@@ -626,14 +644,18 @@ HRESULT CLoader::Add_FXTexture()
 	hr = Add_Texture(LEVEL_STATIC, "FX_Collide", "Effects/Basic/common_hit.png");	CHECK_FAILED(hr);
 
 
-
-
 	hr = Add_Texture(LEVEL_STATIC, "FX_VacuumTornado", "Effects/Basic/wind01.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_VacuumWind", "Effects/Basic/scroll07.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_VacuumDGB", "Effects/Basic/twinkle02.png");	CHECK_FAILED(hr);
 
 	hr = Add_Texture(LEVEL_STATIC, "FX_Wind", "Effects/Basic/wind_%d.png", 2);	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Shockwave", "Effects/Basic/shockwave_%d.png", 1);	CHECK_FAILED(hr);
+
+	//칼
+	hr = Add_Texture(LEVEL_STATIC, "FX_SwordSlash", "Effects/Sword/slash_%d.dds", 6);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_SwordTail", "Effects/Sword/sword_tail.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_SwordDecal", "Effects/Sword/sword_decal.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_SwordLine", "Effects/Sword/line.png");	CHECK_FAILED(hr);
 
 
 	return E_NOTIMPL;
@@ -662,6 +684,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("VacuumDGB", TYPE_NONANIM);
 
 		m_vecModelInfo.emplace_back("SwordTrail", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("SwordSlash_hrzt", TYPE_NONANIM);
 
 	}
 	else if (eLevel == LEVEL_LOGO)
@@ -731,10 +754,12 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// For Kirby Weapon
 		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
-		// For Kirby Armour
-		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("KirbyBombDefault", TYPE_ANIM, 1.f, 180.f);
 
+		// For Kirby Armour
+		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
+		
 
 		m_vecModelInfo.emplace_back("GsBenchAL", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("Level0Stage1Step01", TYPE_NONANIM);
@@ -750,13 +775,17 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("BladeKnight", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("BladeKnightSword", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("Kabu", TYPE_ANIM, 2.f, 180.f);
-		m_vecModelInfo.emplace_back("BrontoBurt", TYPE_ANIM, 2.f, 180.f);
+		m_vecModelInfo.emplace_back("BrontoBurt", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("PoppyBrosJr", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_NONANIM, 1.f, 180.f);
 
 		// For Mab Interactive Object
 		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("Ladder", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("GsPebble", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("StarBlockL", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("StarBlockM", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("StarBlockS", TYPE_NONANIM, 1.f);
 
 
 		// For Item
@@ -896,6 +925,13 @@ HRESULT CLoader::Add_KirbyFaceTexture(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "mouth_surprise", "KirbyFace/mouth_surprise.png")))
 		return E_FAIL;
+
+	// Kirby Guide UI
+	if (FAILED(Add_Texture(eLevel, "BombOrbit", "KirbyBombOrbit/BombOrbit.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "BombOrbitGlow", "KirbyBombOrbit/BombOrbitGlow.dds")))
+		return E_FAIL;
+
 
 	// Awoofy Eye
 	if (FAILED(Add_Texture(eLevel, "Awoofy_Eye", "AwoofyEye/NormalEnemyEye%d.dds", 5)))

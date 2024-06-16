@@ -1,0 +1,223 @@
+#include "stdafx.h"
+#include "KirbyBomb.h"
+
+CKirbyBomb::CKirbyBomb(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+    : CRigidObject{ pDevice, pContext }
+{
+}
+
+CKirbyBomb::CKirbyBomb(const CKirbyBomb& rhs)
+    : CRigidObject{ rhs }
+{
+}
+
+HRESULT CKirbyBomb::Initialize_Prototype()
+{
+    //m_eCollisionGroup = PLAYER;
+
+    return S_OK;
+}
+
+HRESULT CKirbyBomb::Initialize(void* pArg)
+{
+    GAMEOBJECT_DESC		GameObjectDesc{};
+    GameObjectDesc.fSpeedPerSec = 7.f;
+    GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
+
+    KIRBYBOMB_DESC desc = *(KIRBYBOMB_DESC*)pArg;
+
+    if (FAILED(__super::Initialize(&GameObjectDesc)))
+        return E_FAIL;
+
+    m_pTransformCom->Set_State(CTransform::STATE_POSITION, desc.vPos);
+
+    if (FAILED(Add_Components()))
+        return E_FAIL;
+
+    //m_pModelCom->Set_Animation(0, 60.f, true, true);
+
+    _float3 force = desc.vDir;
+    m_pRigidBodyCom->Kick_RigidBody(force, desc.fPower);
+
+    m_bStencil = true;
+    m_bRimLight = true;
+    m_bMotionBlur = true;
+
+    return S_OK;
+}
+
+_int CKirbyBomb::Tick(_float fTimeDelta)
+{
+    if (true == m_bDead)
+        return OBJ_DEAD;
+
+    Compute_MotionBlur();
+
+    __super::Tick(fTimeDelta);
+
+    return OBJ_NOEVENT;
+}
+
+void CKirbyBomb::Late_Tick(_float fTimeDelta)
+{
+    __super::Late_Tick(fTimeDelta);
+    //m_pModelCom->Play_Animation(fTimeDelta);
+
+    m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
+    m_pRigidBodyCom->Add_Torque(-90.f);
+
+
+    m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+}
+
+HRESULT CKirbyBomb::Render()
+{
+    HRESULT hr;
+    if (FAILED(Bind_ShaderResources()))
+        return E_FAIL;
+
+    _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
+
+    for (size_t i = 0; i < iNumMeshes; i++)
+    {
+        hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE);
+        CHECK_FAILED(hr);
+        hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS);
+        CHECK_FAILED(hr);
+        hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS);
+        CHECK_FAILED(hr);
+        //if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+       //     return E_FAIL;
+        hr = m_pShaderCom->Begin(ANIMMODEL_NORMAL_O);
+        CHECK_FAILED(hr);
+
+        m_pModelCom->Render(i);
+    }
+
+    return S_OK;
+}
+
+HRESULT CKirbyBomb::Render_LightDepth()
+{
+    if (FAILED(m_pGameInstance->Render_LightDepth_For_GameObject(m_pShaderCom, m_pTransformCom, m_pModelCom)))
+        return E_FAIL;
+
+    return S_OK;
+}
+
+void CKirbyBomb::Render_IMGUI()
+{
+}
+
+HRESULT CKirbyBomb::Add_Components()
+{
+    HRESULT hr;
+    /* For.Com_Shader */
+    hr = __super::Add_Component(TEXT("Prototype_Component_Shader_VtxModel"),
+        TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
+    CHECK_FAILED(hr);
+
+    /* For.Com_Model Prototype_Component_Model_KirbyBombDefault*/
+    hr = __super::Add_Component(TEXT("Prototype_Component_Model_PoppyBomb"),
+        TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+    CHECK_FAILED(hr);
+
+    /* For.Com_RigidBody */
+    CRigidBody::RIGIDBODY_DESC rigidDesc {};
+    rigidDesc.bTrigger = false;
+    rigidDesc.bDynamic = true;
+    rigidDesc.bKinematic = false;
+    rigidDesc.eShapeType = RIGID_SPHERE;
+    //rigidDesc.fOffsetSize = { 1.f, 1.f, 1.f };
+    rigidDesc.vMaterial = _float3(1.f, 1.f, 0.02f);
+    rigidDesc.fDensity = 100.f;
+    rigidDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
+    hr = __super::Add_Component(TEXT("Prototype_Component_RigidBody"),
+        TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &rigidDesc);
+    CHECK_FAILED(hr);
+    m_pRigidBodyCom->Set_Object(this);
+    m_pRigidBodyCom->Activate(true);
+
+    return S_OK;
+}
+
+HRESULT CKirbyBomb::Bind_ShaderResources()
+{
+    if (nullptr == m_pShaderCom)
+        return E_FAIL;
+
+    if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
+        return E_FAIL;
+
+
+    return S_OK;
+}
+
+void CKirbyBomb::Compute_MotionBlur()
+{
+    _vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+    _matrix ViewProjectionMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW) * m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
+    _vector vScreenPos = XMVector3TransformCoord(vPos, ViewProjectionMatrix);
+    _float fScreenX = (XMVectorGetX(vScreenPos) + 1.f) * 0.5f;
+    _float fScreenY = (XMVectorGetY(vScreenPos) + 1.f) * 0.5f;
+
+    _float2 vCurScreenPos = _float2(fScreenX, 1.f - fScreenY);
+
+    m_vMotionVelocity.x = (m_vPreScreenPos - vCurScreenPos).x;
+    m_vMotionVelocity.y = (m_vPreScreenPos - vCurScreenPos).y;
+    m_vMotionVelocity.z = m_ePhyXState != PO_NORMAL ? 1.f : 0.f;
+
+    m_vPreScreenPos = vCurScreenPos;
+}
+
+CKirbyBomb* CKirbyBomb::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+{
+    CKirbyBomb* pInstance = new CKirbyBomb(pDevice, pContext);
+
+    if (FAILED(pInstance->Initialize_Prototype()))
+    {
+        MSG_BOX(TEXT("Failed To Created : CKirby"));
+        Safe_Release(pInstance);
+    }
+
+    return pInstance;
+}
+
+CGameObject* CKirbyBomb::Clone(void* pArg)
+{
+    CKirbyBomb* pInstance = new CKirbyBomb(*this);
+
+    if (FAILED(pInstance->Initialize(pArg)))
+    {
+        MSG_BOX(TEXT("Failed To Created : CKirbyBomb"));
+        Safe_Release(pInstance);
+    }
+
+    return pInstance;
+}
+
+void CKirbyBomb::Free()
+{
+    __super::Free();
+
+    Safe_Release(m_pModelCom);
+    Safe_Release(m_pRigidBodyCom);
+
+}

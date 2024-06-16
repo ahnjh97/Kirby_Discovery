@@ -32,7 +32,7 @@ HRESULT CRigidBody::Initialize(void * pArg)
 	m_bDynamic				= pDesc->bDynamic;
 	m_bKinematic			= pDesc->bKinematic;
 	m_pActorObject			= pDesc->pObj;
-
+	m_fDensity				= pDesc->fDensity;
 	Create_Actor();
 	return S_OK;
 }
@@ -263,21 +263,26 @@ void CRigidBody::Activate(_bool _bActive)
 void CRigidBody::Add_Force(_float3 vForce)
 {
 	if (m_pActor == nullptr) return;
+	if (true == (m_bTrigger && m_bKinematic))
+		return;
 
-	if (false == m_bKinematic && false == m_bTrigger)
-	{
-		PxVec3 PxForce = physx::PxVec3(vForce.x, vForce.y, vForce.z);
-		m_pActor->addForce(PxForce, physx::PxForceMode::eFORCE);
-	}
+	PxVec3 PxForce = physx::PxVec3(vForce.x, vForce.y, vForce.z);
+	m_pActor->addForce(PxForce, physx::PxForceMode::eFORCE);
 }
 
-void CRigidBody::Add_Torque(_float3 vTorque)
+void CRigidBody::Add_Torque(_float vTorque)
 {
-	if (false == (m_bTrigger && m_bKinematic))
-	{
-		PxVec3 PxToque = physx::PxVec3(vTorque.x, vTorque.y, vTorque.z);
-		m_pActor->addTorque(PxToque, physx::PxForceMode::eFORCE);
-	}
+	//if (false == (m_bTrigger && m_bKinematic))
+	//{
+	//	PxVec3 PxToque = physx::PxVec3(vTorque.x, vTorque.y, vTorque.z);
+	//	m_pActor->addTorque(PxToque, physx::PxForceMode::eFORCE);
+	//}
+	if (true == (m_bTrigger && m_bKinematic))
+		return;
+	PxVec3 angularVelocity = m_pActor->getAngularVelocity();
+	PxVec3 antiTorque = angularVelocity * vTorque; // 회전 저항 값 (적당히 조절)
+	m_pActor->addTorque(antiTorque);
+
 }
 
 void CRigidBody::Add_Velocity(_float3 vVelocity)
@@ -287,6 +292,13 @@ void CRigidBody::Add_Velocity(_float3 vVelocity)
 		PxVec3 PxForce = PxVec3(vVelocity.x, vVelocity.y, vVelocity.z);
 		m_pActor->addForce(PxForce, physx::PxForceMode::eVELOCITY_CHANGE);
 	}
+}
+
+void CRigidBody::Kick_RigidBody(_float3 _kickDirection, _float impulseMagnitude)
+{
+	PxVec3 kickDirection(_kickDirection.x, _kickDirection.y, _kickDirection.z);
+	PxVec3 impulse = kickDirection * impulseMagnitude;
+	m_pActor->addForce(impulse, PxForceMode::eIMPULSE);
 }
 
 PxTransform CRigidBody::Get_PxTransform()

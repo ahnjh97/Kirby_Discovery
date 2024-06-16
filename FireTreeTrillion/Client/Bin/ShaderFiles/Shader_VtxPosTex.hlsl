@@ -17,11 +17,28 @@ float g_fMaskThreshold = { 0.f };
 
 float2 g_vUVOffset = { 0.f, 0.f };
 float2 g_vMaskUVOffset = { 0.f, 0.f };
-float2 g_vMaskUVAngle = { 0.f, 0.f };
+float g_fMaskUVAngle = { 0.f};
 
 float g_fMaskRatio = { 1.f };
 
 float g_fAlarmColor = { 0.f };
+
+
+// 회전된 UV를 계산
+float2 RotateUV(float2 vCoord, float fAngle)
+{
+    float2 vCenter = (0.5, 0.5);
+    
+    float fSinAngle = sin(fAngle);
+    float fCosAngle = cos(fAngle);
+    float2x2 RotationMatrix = float2x2(fCosAngle, -fSinAngle, fSinAngle, fCosAngle);
+
+    vCoord -= vCenter;
+    vCoord = mul(vCoord, RotationMatrix);
+    vCoord += vCenter;
+    
+    return vCoord;
+}
 
 
 struct VS_IN
@@ -99,6 +116,8 @@ PS_OUT PS_MAIN(PS_IN In)
 	//알파 테스트
 	if(Out.vColor.a < .05f)
         discard;
+    
+    Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
 	
 	return Out;
 }
@@ -146,7 +165,7 @@ PS_OUT PS_MAIN_BLEND_FX(PS_IN_ALPHABLEND In)
 {
     PS_OUT Out = (PS_OUT) 0;
 	
-    vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord + g_vMaskUVOffset);
+    vector vMask = g_MaskTexture.Sample(ClampSampler, RotateUV(In.vTexcoord + g_vMaskUVOffset, g_fMaskUVAngle));
     
     if (vMask.a < g_fMaskThreshold)
         discard;
@@ -183,7 +202,7 @@ PS_OUT PS_MAIN_DEFAULT_FX(PS_IN_ALPHABLEND In)
     PS_OUT Out = (PS_OUT) 0;
 
     //마스크 값으로 자르기
-    vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord + g_vMaskUVOffset);
+    vector vMask = g_MaskTexture.Sample(ClampSampler, RotateUV(In.vTexcoord + g_vMaskUVOffset, g_fMaskUVAngle));
     if (vMask.a < g_fMaskThreshold)
         discard;
     else if (vMask.r < g_fMaskThreshold)
@@ -205,7 +224,7 @@ PS_OUT PS_MAIN_WHITEFX(PS_IN_ALPHABLEND In)
     PS_OUT Out = (PS_OUT) 0;
 
     //마스크 값으로 자르기
-    vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord + g_vMaskUVOffset);
+    vector vMask = g_MaskTexture.Sample(ClampSampler, RotateUV(In.vTexcoord + g_vMaskUVOffset, g_fMaskUVAngle));
     if (vMask.a < g_fMaskThreshold)
         discard;
     else if (vMask.r < g_fMaskThreshold)

@@ -11,6 +11,7 @@
 #include "BrontoBurt.h"
 #include "BG.h"
 #include "HUD.h"
+#include "Starblock.h"
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -101,8 +102,6 @@ HRESULT CLevel_GamePlay::Render()
 
 HRESULT CLevel_GamePlay::Ready_Lights()
 {
-
-
 
 	//// 예시코드 1 : 태양광
 	LIGHT_DESC		LightDesc{};
@@ -458,9 +457,18 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 
 HRESULT CLevel_GamePlay::Ready_Layer_MapObject(const wstring& strLayerTag)
 {
-	//HRESULT hr;
-	//hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_WasteCan"));
-	//CHECK_FAILED(hr);
+	HRESULT hr;
+	hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_WasteCan"));
+	CHECK_FAILED(hr);
+
+	hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_KickableRock"));
+	CHECK_FAILED(hr);
+
+	CStarBlock::STARBLOCK_DESC desc{};
+	desc.eSize = CStarBlock::MEDIUM;
+	hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_StarBlock"), &desc);
+	CHECK_FAILED(hr);
+
 	return S_OK;
 }
 

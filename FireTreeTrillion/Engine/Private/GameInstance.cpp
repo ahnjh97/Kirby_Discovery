@@ -596,6 +596,14 @@ _float4 CGameInstance::Get_CamPosition() const
 	return m_pPipeLine->Get_CamPosition();
 }
 
+_float4 CGameInstance::Get_CamLook() const
+{
+	if (nullptr == m_pPipeLine)
+		return _float4();
+
+	return m_pPipeLine->Get_CamLook();
+}
+
 HRESULT CGameInstance::Add_Camera(CCamera* pCamera)
 {
 	return m_pPipeLine->Add_Camera(pCamera);
@@ -802,6 +810,11 @@ void CGameInstance::AddActor(physx::PxActor& pActor)
 void CGameInstance::RemoveActor(physx::PxActor& pActor)
 {
 	m_pPhysx->RemoveActor(pActor);
+}
+
+void CGameInstance::Add_Force(_float3 vForce)
+{
+	m_pPhysx->Add_Force(vForce);
 }
 
 void CGameInstance::Kick_DynamicActor(_float3 _kickDirection, _float impulseMagnitude)

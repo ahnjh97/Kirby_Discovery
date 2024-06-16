@@ -54,7 +54,7 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 	m_pTransformCom->Look_At(pCamDesc.vAt);
 
 	_float4 vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-	m_vDestCamDir = _float3{ 0.f, -.5f, 1.f };
+	m_vDestCamDir = _float3{ 0.f, -.15f, 1.f };
 	m_vDestCamDir.Normalize();
 	m_vCurCamDir = m_vDestCamDir;
 
@@ -111,9 +111,7 @@ void CCamera_Main::LerpByTriggerInfo(_int iTriggerIndex)
 	m_vSlerpedDir = SlerpDirVec(m_vecFrontDirRadius[m_iMatrixIndex].first, m_vecRearDirRadius[m_iMatrixIndex].first, m_fTriggerRatio);
 	m_fLerpedRadius = LERP(m_vecFrontDirRadius[m_iMatrixIndex].second, m_vecRearDirRadius[m_iMatrixIndex].second, m_fTriggerRatio);
 
-
-	//_float fUpDiff = m_vecf
-
+	m_fDestUpOffset = m_CamTriggerUpOffsets[m_iMatrixIndex];
 
 	m_vDestCamDir = m_vSlerpedDir;
 	m_fDestDistance = m_fLerpedRadius;
@@ -136,10 +134,9 @@ _float CCamera_Main::Compute_TriggerPosRatio(_int iTriggerIndex)
 	if (m_vecTriggerInfo.empty())
 		return _float();
 
-	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0));
-	CTransform* pKirbyTransform = static_cast<CTransform*>(pKirby->Get_Component(g_strTransformTag));
-	_float fZ = XMVectorGetZ(XMVector4Transform(pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION)
-		, m_vecTriggerInfo[iTriggerIndex].first));
+
+	_float3 vLocalTargetPos = m_pFirstTarget->Get_State(CTransform::STATE_POSITION);
+	_float fZ = _float3::Transform(vLocalTargetPos, m_vecTriggerInfo[iTriggerIndex].first).z;
 
 	// rear : 0, middle : 0.5, front: 1
 	_float fRatio = 0.5f * fZ + 0.5f;
@@ -156,13 +153,6 @@ _vector CCamera_Main::SlerpDirVec(_fvector vStart, _fvector vEnd, _float fRatio)
 	return XMVector3Normalize(vStart * cosf(fTheta) + vRelative * sinf(fTheta));
 }
 
-void CCamera_Main::Zoom_In(_float fZoom)
-{
-}
-
-void CCamera_Main::Zoom_Out(_float fZoom)
-{
-}
 
 //일련의 동작을 하나의 시퀀스로 선예약한다.
 void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
@@ -314,7 +304,7 @@ void CCamera_Main::UpdatePos_FromAnchor(_float fTimeDelta)
 
 	//y 위치 보정
 	_float3 vTerrainPos = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0))->Compute_TerrainPosition();
-	vTargetPos.y = vTerrainPos.y;
+	vTargetPos.y = (vTargetPos.y + vTerrainPos.y) * .5f;
 
 
 	//실제 타겟 위치에서 조금 위로 기준점 정하기
@@ -366,6 +356,9 @@ void CCamera_Main::UpdatePos_FromAnchor(_float fTimeDelta)
 		m_fCurDistance += ((m_fDestDistance + m_fZoomOffset) - m_fCurDistance) * fTimeDelta * 5.f;
 
 	//y 오프셋 보간
+	if (abs(m_fDestUpOffset - m_fCurUpOffset) > .001f)
+		m_fCurUpOffset += (m_fDestUpOffset - m_fCurUpOffset) * fTimeDelta * 2.f;
+
 	//if (abs(m_fDestUpOffset - m_fCurUpOffset) > .1f)
 	//	LERP(m_fCurUpOffset, m_fDestUpOffset, fTimeDelta * 5.f);
 
@@ -384,10 +377,6 @@ void CCamera_Main::UpdatePos_FromAnchor(_float fTimeDelta)
 	m_vDestCamPos = m_vAnchor - (m_vCurCamDir * m_fCurDistance);
 
 
-
-
-
-
 	//**** 카메라 쉐이킹 오프셋 ****//
 
 	_float3 vShakeDir = XMVectorZero();
@@ -398,25 +387,6 @@ void CCamera_Main::UpdatePos_FromAnchor(_float fTimeDelta)
 		_float fSinOffset = sinf(m_fShakeTime * m_fShakeFrequency) * m_fShakePower * m_fShakeAmplitude * m_fShakeTime;
 
 		vShakeDir = static_cast<_float3>(m_vShakeDir * fSinOffset);
-
-		//_float3 vRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
-		//_float3 vUp = m_pTransformCom->Get_State(CTransform::STATE_UP);
-
-		////0.3 ~ 0.7의 비율
-		////_float fXOffset = m_pGameInstance->GetRandomInt(3, 7) * .1f;
-		//_float fXOffset = 5.f * .1f;
-		//_float fYOffset = 1.f - fXOffset;
-
-		////_bool bOffset = _bool(m_pGameInstance->GetRandomNumber(0, 1));
-
-		////vRight *= (m_fShakePower + fXOffset) * (_bool(m_pGameInstance->GetRandomInt(0, 1)) ? 1.f : -1.f);
-		//vRight *= (m_fShakePower + fXOffset) * 1.f;
-		////vUp *= (m_fShakePower + fYOffset) * (_bool(m_pGameInstance->GetRandomInt(0, 1)) ? -1.f : 1.f);
-		//vUp *= (m_fShakePower + fYOffset) * 1.f;
-
-		//vShakeDir = XMVectorSetW(vRight + vUp, 0.f);
-
-
 
 		if (m_fShakeTime <= 0.f)
 		{
@@ -456,7 +426,7 @@ void CCamera_Main::UpdatePos_FromAnchor(_float fTimeDelta)
 	}
 
 
-	m_pTransformCom->Look_At_Interpolate(m_pTransformCom->Get_State(CTransform::STATE_POSITION) + Dir(m_vCurCamDir), fTimeDelta);
+	m_pTransformCom->Look_At_Interpolate(m_pTransformCom->Get_State(CTransform::STATE_POSITION) + Dir(m_vCurCamDir) + _float4{0.f, m_fCurUpOffset, 0.f, 0.f}, fTimeDelta);
 
 }
 
@@ -519,12 +489,18 @@ void CCamera_Main::Render_IMGUI()
 	//ImGui::Text("LerpedRadius: %.2f", m_fLerpedRadius);
 	ImGui::Dummy(ImVec2(0, 20));
 
+	ImGui::Text(u8"보간 ratio: %.2f", m_fTriggerRatio);
+	ImGui::Text(u8"현재 up offset: %.2f", m_fCurUpOffset);
+
+
 	static _float fFOVY = ToDegree(m_fDestFovy);
 
 	if (ImGui::DragFloat(u8"FOV", &fFOVY, .1f, 10.f, 50.f, "%.1f"))
 	{
 		m_fDestFovy = ToRadian(fFOVY);
 	}
+
+
 
 
 	ImGui::DragFloat(u8"타겟까지의 목표 거리", &m_fDestDistance, .05f, 1.f, 50.f, "%.1f");

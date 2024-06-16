@@ -28,6 +28,7 @@ public:
 
 protected:
 	CShader*		m_pShaderCom = { nullptr };
+	CRigidBody*		m_pRigidBodyCom = { nullptr };
 
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;
