@@ -251,8 +251,16 @@ PxRigidDynamic* CPhysX::CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, 
 
     pMesh->release();
     pShape->release(); 
-    //m_pRigidDynamic = pDynamicActor;
+    m_pRigidDynamic = pDynamicActor;
     return pDynamicActor;
+}
+
+void CPhysX::Add_Force(_float3 vForce)
+{
+    if (m_pRigidDynamic == nullptr) return;
+
+    PxVec3 PxForce = physx::PxVec3(vForce.x, vForce.y, vForce.z);
+    m_pRigidDynamic->addForce(PxForce, physx::PxForceMode::eFORCE);
 }
 
 void CPhysX::Kick_DynamicActor(_float3 _kickDirection, _float impulseMagnitude)

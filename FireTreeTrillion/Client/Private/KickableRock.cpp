@@ -29,7 +29,7 @@ HRESULT CKickableRock::Initialize(void* pArg)
 	HRESULT  hr = __super::Initialize(pGameObjectDesc);
 	CHECK_FAILED(hr);
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(-3.f, 40.f, -188.f, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(0.f, 6.5f, -183.f, 1.f));
 	Add_Components();
 
 	return S_OK;
@@ -114,6 +114,8 @@ void CKickableRock::Render_IMGUI()
 
 void CKickableRock::Collision_Hitbox(CPhysXObject* pGameObject)
 {
+	m_pRigidBodyCom->Activate(true);
+
 	_float3 force = _float3{ 0.5f, 3.f , 0.5f };
 	m_pRigidBodyCom->Kick_RigidBody(XMVector3Normalize(force), 530.f);
 }
@@ -145,7 +147,7 @@ HRESULT CKickableRock::Add_Components()
 		TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &rigidDesc);
 	CHECK_FAILED(hr);
 	m_pRigidBodyCom->Set_Object(this);
-	m_pRigidBodyCom->Activate(true);
+	m_pRigidBodyCom->Activate(false);
 
 	/* For.Com_Trigger */
 	CTrigger::TRIGGER_DESC tTriggerDesc{};
@@ -157,6 +159,7 @@ HRESULT CKickableRock::Add_Components()
 	m_pTrigger = static_cast<CTrigger*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc));
 	CHECK_NULLPTR(m_pTrigger);
 	m_pTrigger->Set_Owner(this);
+	m_pTrigger->Check_Collision();
 
 	return S_OK;
 }

@@ -250,12 +250,6 @@
     <Filter Include="02.GameObjects\Map\Ladder">
       <UniqueIdentifier>{43deb6bb-9178-48a0-9aee-6bd3fca04327}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\PhysXObject\RigidObject\Rock">
-      <UniqueIdentifier>{81ec4dea-946a-461a-84a8-a25c873503af}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\PhysXObject\RigidObject\Rock\Kickable">
-      <UniqueIdentifier>{22df7019-4bde-485a-a4fa-b74dfa7b29a5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\MapObject">
       <UniqueIdentifier>{86a7592b-d804-482a-9608-14929a70ea40}</UniqueIdentifier>
     </Filter>
@@ -270,6 +264,12 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Player\Kirby\Bomb">
       <UniqueIdentifier>{9bbb5c7f-e811-452d-aabb-3b3015d522c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\RigidObject\Rock">
+      <UniqueIdentifier>{81ec4dea-946a-461a-84a8-a25c873503af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\RigidObject\Rock\Kickable">
+      <UniqueIdentifier>{22df7019-4bde-485a-a4fa-b74dfa7b29a5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

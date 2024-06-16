@@ -47,6 +47,7 @@ public:
 public:
     PxRigidDynamic* CreateDynamicActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
     void            Kick_DynamicActor(_float3 _kickDirection, _float impulseMagnitude);
+    void            Add_Force(_float3 _kickDirection);
     PxRigidStatic*  CreateStaticActor(_float4 vPos, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
 
 private:
