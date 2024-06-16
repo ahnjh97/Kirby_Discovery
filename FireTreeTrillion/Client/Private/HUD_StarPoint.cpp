@@ -307,13 +307,13 @@ void CHUD_StarPoint::Update_UIState(_float _fTimeDelta)
 	}
 }
 
-void CHUD_StarPoint::Play_Animation(_float _fAccTime, HUD_STARPOINT _eSPstate)
+void CHUD_StarPoint::Play_Animation(_float _fAccTime, HUD_STARPOINT _eCurState)
 {
 	_float fFrameTime = { 0.f };
 	_float fMoveSpeed = { 0.f };
 	_float fAlphaSpeed = { 0.f };
 
-	switch (_eSPstate)
+	switch (_eCurState)
 	{
 	case CHUD::STARPOINT_IDLE:
 

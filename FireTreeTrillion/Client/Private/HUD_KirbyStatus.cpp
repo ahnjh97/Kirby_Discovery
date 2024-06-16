@@ -212,6 +212,10 @@ HRESULT CHUD_KirbyStatus::Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom)
 	return S_OK;
 }
 
+void CHUD_KirbyStatus::Update_UIState(_float _fTimeDelta)
+{
+}
+
 void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta)
 {
 	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
