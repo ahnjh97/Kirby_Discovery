@@ -107,7 +107,7 @@ HRESULT CBombOrbitGlow::Add_Components()
 		return E_FAIL;
 
 	// √— ¿Ã∆Â∆Æ (∫“≤…)
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_BombOrbitGlow"),
+	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_BombOrbitGlow"),
 		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
 		return E_FAIL;
 

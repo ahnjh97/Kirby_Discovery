@@ -136,8 +136,6 @@ _int CKirby::Tick(_float fTimeDelta)
 	// 유틸업데이트가 들어가있다.
 	__super::Tick(m_fTimeDelta);
 	Kirby_SystemTick(m_fTimeDelta);
-	Other_Collision();
-
 
 	m_pWeapons->Tick(m_fTimeDelta);
 	m_pArmours->Tick(m_fTimeDelta);

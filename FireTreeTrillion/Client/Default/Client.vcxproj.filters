@@ -282,7 +282,6 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\RigidObject\Rock\Kickable">
       <UniqueIdentifier>{22df7019-4bde-485a-a4fa-b74dfa7b29a5}</UniqueIdentifier>
->>>>>>> main
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -566,7 +565,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\KirbyBomb.h">
       <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\Bomb</Filter>
->>>>>>> main
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

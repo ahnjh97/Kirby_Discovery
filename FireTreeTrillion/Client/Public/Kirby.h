@@ -129,7 +129,6 @@ public:
 	virtual void	Add_AnimEvent()								override;
 	virtual void	Collision_Hitbox(CPhysXObject* pGameObject)  override;
 	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
-	void			Other_Collision();
 
 	KIRBY_INFODESC* Get_KirbyInfo() { return &m_tKirbyInfo; }
 	void			Set_KirbyInfo(KIRBY_INFODESC _tInfo) {
