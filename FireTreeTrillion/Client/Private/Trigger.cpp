@@ -175,10 +175,13 @@ HRESULT CTrigger::Add_Components()
 		if (FAILED(__super::Add_Component(TEXT("Prototype_Component_RigidBody"),
 			TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &tRigidDesc)))
 			return E_FAIL;
-		m_pRigidBodyCom->Activate(true);
+
+		if (m_eTriggerType == TRIGGER_CAM)
+			int a = 0;
 
 		m_pRigidBodyCom->SetUp_TriggerType(m_eTriggerType);
 		m_pRigidBodyCom->SetUp_TriggerIndex(m_iTriggerIndex);
+		m_pRigidBodyCom->Activate(true);
 	}
 	else if (m_eTriggerType == TRIGGER_HITBOX)
 	{
@@ -192,9 +195,9 @@ HRESULT CTrigger::Add_Components()
 		if(FAILED(__super::Add_Component(TEXT("Prototype_Component_RigidBody"),
 										 TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &tRigidDesc)))
 			return E_FAIL;
-		m_pRigidBodyCom->Activate(false);
 		m_pRigidBodyCom->SetUp_TriggerType(m_eTriggerType);
 		m_pRigidBodyCom->SetUp_TriggerIndex(m_iTriggerIndex);
+		m_pRigidBodyCom->Activate(false);
 	}
 	else if (m_eTriggerType == TRIGGER_ITEM)
 	{
@@ -208,9 +211,9 @@ HRESULT CTrigger::Add_Components()
 		if (FAILED(__super::Add_Component(TEXT("Prototype_Component_RigidBody"),
 			TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &tRigidDesc)))
 			return E_FAIL;
-		m_pRigidBodyCom->Activate(true);
 		m_pRigidBodyCom->SetUp_TriggerType(m_eTriggerType);
 		m_pRigidBodyCom->SetUp_TriggerIndex(m_iTriggerIndex);
+		m_pRigidBodyCom->Activate(true);
 	}
 
 	return S_OK;
