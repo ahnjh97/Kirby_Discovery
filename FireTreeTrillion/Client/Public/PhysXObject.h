@@ -52,7 +52,7 @@ public:
 
 	void				Set_PhyXState(PHYXOBJECT_CURSTATE eState);
 	PHYXOBJECT_CURSTATE Get_PhyXState() { return m_ePhyXState; }
-
+	_float	Get_ObjTimeDelta() const { return m_fTimeDelta; }
 
 
 

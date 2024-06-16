@@ -66,6 +66,7 @@ private:
 private:
 	TRIGGER			m_eTriggerType = { TRIGGER_END };
 	_int			m_iTriggerIndex = { -1 };
+	_float			m_fTriggerOffTime = {0.f};
 
 public:
 	static CTrigger*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

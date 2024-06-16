@@ -47,7 +47,7 @@ _int CWasteCan::Tick(_float fTimeDelta)
 	if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD6, KEY_DOWN))
 	{
 		_float3 force = _float3{ 0.5f, 3.f , 0.5f };
-		m_pGameInstance->Kick_DynamicActor(force, 100.f);
+		m_pGameInstance->Kick_DynamicActor(force, 10.f);
 	}
 	m_pTrigger->Tick(m_fTimeDelta);
 
@@ -58,11 +58,11 @@ void CWasteCan::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
 
-	if (m_bActivatePhysX)
+	/*if (m_bActivatePhysX)
 	{
 		m_pModelCom->Update_ActorTransform(m_pTransformCom);
 		m_pGameInstance->Add_Force(_float3(0.f, -0.5f, 0.f));
-	}
+	}*/
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
 
@@ -119,9 +119,9 @@ void CWasteCan::Collision_Hitbox(CPhysXObject* pGameObject)
 	HRESULT hr = m_pModelCom->CreateDynamicActor(m_pTransformCom->Get_WorldFloat4x4());
 	CHECK_FAILED(hr);
 
-	m_bActivatePhysX = true;
-	_float3 force = _float3{ 0.5f, 3.f , 0.5f };
-	m_pGameInstance->Kick_DynamicActor(XMVector3Normalize(force), 530.f);
+	//m_bActivatePhysX = true;
+	/*_float3 force = _float3{ 0.5f, 3.f , 0.5f };
+	m_pGameInstance->Kick_DynamicActor(XMVector3Normalize(force), 530.f);*/
 }
 
 HRESULT CWasteCan::Add_Components()
