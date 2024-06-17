@@ -376,6 +376,6 @@ CLevel_Intro* CLevel_Intro::Create(ID3D11Device* pDevice, ID3D11DeviceContext* p
 
 void CLevel_Intro::Free()
 {
-	__super::Free();
 	m_pGameInstance->Clear_EventCallBack();
+	__super::Free();
 }
