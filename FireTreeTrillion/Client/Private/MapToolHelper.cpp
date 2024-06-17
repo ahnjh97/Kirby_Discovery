@@ -73,8 +73,10 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 	/*m_setNonColDecos = { "BushMCut" };*/
 	m_setAnimDecos = { "BushL", "BushM", "BushS", "PopFlower" };
-	m_setActorDecos = {  "CmBuilding1stRoof", "CMGuardrailAL", "CMGuardrailBL"
-		, "CMStreeLightLampA", "CMStreeLightLampE", "CMWaterTankL"
+	m_setActorDecos = {  "CmBuilding1stRoof", "CMBuildingParts", "CMGuardrailAL", "CMGuardrailBL"
+		, "CMStreeLightLampA", "CMStreeLightLampE", "CMWaterTankL", "CMHighwayGuardrailACL", "CMHighwayGuardrailAL"
+		, "CMHighwayGuardrailALL", "CMHighwayGuardrailARL", "CMHighwayGuardrailBL", "CMHighwayGuardrailBLL"
+		, "CMHighwayGuardrailBRL", "CMHighwayGuardrailCCL", "CMHighwayGuardrailCL", "CMHighwayGuardrailCLL", "CMHighwayGuardrailCRL"
 		, "GsBenchAL", "GsCircleBench", "GsFlowerPotAL", "GsFlowerPotBL", "GsSteelFenceA"
 		, "GsSteelFenceB", "GsTreeA", "GsTreeB", "GsTreeC", "GsWallRockA", "GsWallRockB"
 		, "GsWoodBridgeA", "GsWoodBridgeB", "GsRockCL", "GsRockDL", "GsRockEL", "GsRockFL", "GsRockGL"
