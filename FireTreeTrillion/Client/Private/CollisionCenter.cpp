@@ -40,8 +40,8 @@ void CCollisionCenter::Initialize()
 	m_eColliderType[HITBOX_MONSTER][PLAYER]  = CONTENT_DAMAGE;
 
 	// For 상자(OBJECT)
-	m_eColliderType[HITBOX_PLYAER][OBJECT]  = CONTENT_ATTACK;
-	//m_eColliderType[MONSTER][OBJECT]		= CONTENT_ATTACK; // 던진 몬스터와 부딪힐 때, 충돌처리
+	m_eColliderType[HITBOX_PLYAER][OBJECT]  = CONTENT_KICK;
+	//m_eColliderType[MONSTER][OBJECT]		= CONTENT_KICK; // 던진 몬스터와 부딪힐 때, 충돌처리
 	
 	// For 찰 수 있는 오브젝트
 	m_eColliderType[PLAYER][KICKABLE]		= CONTENT_KICK;

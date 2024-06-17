@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "StarBlock.h"
+#include "StarBlockPiece.h"
 
 CStarBlock::CStarBlock(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMapObject{ pDevice, pContext }
@@ -69,6 +70,9 @@ HRESULT CStarBlock::Render()
 		CHECK_FAILED(hr);
 		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS);
 		CHECK_FAILED(hr);
+		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS);
+		CHECK_FAILED(hr);
+
 		hr = m_pShaderCom->Begin(MODEL_NORMAL_O);
 		CHECK_FAILED(hr);
 		
@@ -103,11 +107,22 @@ void CStarBlock::Render_IMGUI()
 }
 #endif
 
-void CStarBlock::Collision_Hitbox(CPhysXObject* pGameObject)
+void CStarBlock::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
 	m_iHP -= 5;
 	if (m_iHP <= 0)
+	{
+		// 여기서 StarBlockPiece 뿌리기
+		HRESULT hr = S_OK;
+		CStarBlockPiece::PIECE_DESC desc{};
+		_float4 vInitialpos = GET_POS;
+		desc.vInitialPos = _float4(vInitialpos.x + 1.f, vInitialpos.y + 1.5f, vInitialpos.z + 1.f, 1.f);
+		//desc.vDir =k
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_MapObject"), TEXT("Prototype_GameObject_StarBlockPiece"), &desc);
+		CHECK_FAILED(hr);
+
 		m_bDead = true;
+	}
 }
 
 HRESULT CStarBlock::Add_Components()
