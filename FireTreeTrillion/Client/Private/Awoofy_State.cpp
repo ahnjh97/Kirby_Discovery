@@ -523,7 +523,7 @@ void CAwoofy_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 		pAwoofy->Set_DamageJumpPower(fDamageJumpPower);
 
-		if (m_fDeadTime > 0.7f)
+		if (m_fDeadTime > 0.4f || pController->Is_Terrain())
 			pAwoofy->Set_Dead();
 
 	}

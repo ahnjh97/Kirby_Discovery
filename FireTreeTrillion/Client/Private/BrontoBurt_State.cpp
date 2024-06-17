@@ -123,7 +123,7 @@ void CBrontoBurt_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 
 		pBrontoBurt->Set_DamageJumpPower(fDamageJumpPower);
 
-		if (m_fDeadTime > 0.7f)
+		if (m_fDeadTime > 0.4f || pController->Is_Terrain())
 			pBrontoBurt->Set_Dead();
 	}
 }
