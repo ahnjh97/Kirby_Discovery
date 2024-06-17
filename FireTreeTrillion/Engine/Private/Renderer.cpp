@@ -626,7 +626,10 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 		m_DestColorData = Find_ColorSet("Tutorial");
 		break;
 	case 3:
+	{
 		m_DestColorData = Find_ColorSet("Stage1");
+		m_pGameInstance->PlayBGM(L"Running Through the New World.mp3");
+	}
 		break;
 	default:
 		m_DestColorData = Find_ColorSet("Default");
