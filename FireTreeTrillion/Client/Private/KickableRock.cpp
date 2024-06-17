@@ -29,7 +29,7 @@ HRESULT CKickableRock::Initialize(void* pArg)
 	HRESULT  hr = __super::Initialize(pGameObjectDesc);
 	CHECK_FAILED(hr);
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(0.f, 6.5f, -183.f, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, CUtils::Get_State_Vector_Matrix(pGameObjectDesc->matWorld, CUtils::STATE_POSITION));
 	Add_Components();
 
 	return S_OK;

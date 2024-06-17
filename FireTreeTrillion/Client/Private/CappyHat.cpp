@@ -58,7 +58,7 @@ HRESULT CCappyHat::Initialize(void* pArg)
 _int CCappyHat::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
-		return OBJ_DEAD;
+		return Ready_Dead();
 
 	if (static_cast<CCappyBody*>(m_pGameObject)->Get_Dead())
 		m_bDead = true;

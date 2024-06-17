@@ -746,8 +746,10 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("CappyBody", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("CappyHat", TYPE_ANIM, 1.f, 180.f);
 
+
 		// For Mab Interactive Object
 		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("GsPebble", TYPE_NONANIM, 1.f, 0.f, 0, false, string("MapDeco/"));
 
 		// For Item
 		m_vecModelInfo.emplace_back("Item_EnergyDrink", TYPE_NONANIM, 3.f);

@@ -62,6 +62,79 @@ HRESULT CLevel_Intro::Initialize()
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Ladder"), TEXT("Prototype_GameObject_Ladder"), &ObjDesc)))
 		return E_FAIL;
 
+	ObjDesc.fSpeedPerSec = 5.f;
+	ObjDesc.fRotationPerSec = ToRadian(90.f);
+	InitMat = _float4x4::Identity;
+	InitMat.Translation({ -129.8f, 5.3f, -10.f });
+	ObjDesc.matWorld = InitMat;
+
+	// Ladder Test
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Item"), TEXT("Prototype_GameObject_Coin"), &ObjDesc)))
+		return E_FAIL;
+
+	ObjDesc.fSpeedPerSec = 5.f;
+	ObjDesc.fRotationPerSec = ToRadian(90.f);
+	InitMat = _float4x4::Identity;
+	InitMat.Translation({ -81.8f, 6.5f, -5.4f });
+	ObjDesc.matWorld = InitMat;
+
+	// Ladder Test
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Item"), TEXT("Prototype_GameObject_Coin"), &ObjDesc)))
+		return E_FAIL;
+
+	ObjDesc.fSpeedPerSec = 5.f;
+	ObjDesc.fRotationPerSec = ToRadian(90.f);
+	InitMat = _float4x4::Identity;
+	InitMat.Translation({ -10.8f, 10.7f, 223.4f });
+	ObjDesc.matWorld = InitMat;
+
+	// Ladder Test
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Item"), TEXT("Prototype_GameObject_Coin"), &ObjDesc)))
+		return E_FAIL;
+
+
+	ObjDesc.fSpeedPerSec = 5.f;
+	ObjDesc.fRotationPerSec = ToRadian(90.f);
+	InitMat = _float4x4::Identity;
+	InitMat.Translation({ -7.6f, 15.8f, 257.8f });
+	ObjDesc.matWorld = InitMat;
+
+	// Ladder Test
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Item"), TEXT("Prototype_GameObject_EnergyDrink"), &ObjDesc)))
+		return E_FAIL;
+
+
+	ObjDesc.fSpeedPerSec = 5.f;
+	ObjDesc.fRotationPerSec = ToRadian(90.f);
+	InitMat = _float4x4::Identity;
+	InitMat.Translation({ -17.7f, 4.3f, 207.f });
+	ObjDesc.matWorld = InitMat;
+
+	// Ladder Test
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Item"), TEXT("Prototype_GameObject_WasteCan"), &ObjDesc)))
+		return E_FAIL;
+
+	ObjDesc.fSpeedPerSec = 5.f;
+	ObjDesc.fRotationPerSec = ToRadian(90.f);
+	InitMat = _float4x4::Identity;
+	InitMat.Translation({ -53.3f, 11.2f, 152.f });
+	ObjDesc.matWorld = InitMat;
+
+	// Ladder Test
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Item"), TEXT("Prototype_GameObject_KickableRock"), &ObjDesc)))
+		return E_FAIL;
+
+	ObjDesc.fSpeedPerSec = 5.f;
+	ObjDesc.fRotationPerSec = ToRadian(90.f);
+	InitMat = _float4x4::Identity;
+	InitMat.Translation({ 54.5f, 26.f, 306.6f });
+	ObjDesc.matWorld = InitMat;
+
+	// Ladder Test
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Item"), TEXT("Prototype_GameObject_KickableRock"), &ObjDesc)))
+		return E_FAIL;
+
+
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
