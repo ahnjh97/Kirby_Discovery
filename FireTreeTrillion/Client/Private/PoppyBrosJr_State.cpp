@@ -32,7 +32,7 @@ void CPoppyBrosJr_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 
 	// ÀÚÀ¯ ³«ÇÏ
-	pController->FreeFall(pTransformCom, fTimeDelta, 6.f, 0.5f);
+	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
 
 	if(CPoppyBrosJr::PS_TARGET == pPoppyJr->Get_PoppyState())
 	{
@@ -111,7 +111,7 @@ void CPoppyBrosJr_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float f
 	_vector vPoppyPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 	_vector vPoppyLook = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
 
-	pController->FreeFall(pTransformCom, fTimeDelta, 6.f, 0.5f);
+	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
 
 	if (CPoppyBrosJr::PS_TARGET == pPoppyJr->Get_PoppyState())
 	{
