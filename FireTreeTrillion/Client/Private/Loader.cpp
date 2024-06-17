@@ -213,6 +213,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Editor_UI"), CEditor_UI);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("AnimToolHelper"), CAnimToolHelper);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("AnimToolObject"), CAnimToolObject);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("LayerUI"), CLayerUI);
+
 #endif
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SingleEffect"), CSingleEffect);
@@ -229,7 +231,6 @@ HRESULT CLoader::Loading_ObjectAll()
 #pragma region UI
 
 	// UI
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("LayerUI"), CLayerUI);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_KirbyStatus"), CHUD_KirbyStatus);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_StarPoint"), CHUD_StarPoint);

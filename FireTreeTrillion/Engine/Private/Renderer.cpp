@@ -777,13 +777,14 @@ HRESULT CRenderer::Render_LightDepth_For_PartObject(CShader* pShader, const _flo
 	return S_OK;
 }
 
-#ifdef _DEBUG
 
 void CRenderer::Bind_RendererFunc(_int iTriggerType)
 {
 	function<void(_int)> TriggerFunc = bind(&CRenderer::Set_ColorSet_ByIndex, this, placeholders::_1);
 	m_pGameInstance->Emplace_TriggerFunc(iTriggerType, TriggerFunc);
 }
+
+#ifdef _DEBUG
 
 HRESULT CRenderer::Add_DebugComponents(CComponent* pRenderComponent)
 {
