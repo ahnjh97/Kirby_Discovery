@@ -169,9 +169,13 @@ HRESULT CKirbyBomb::Render_LightDepth()
     return S_OK;
 }
 
+#ifdef _DEBUG
+
 void CKirbyBomb::Render_IMGUI()
 {
 }
+
+#endif
 
 void CKirbyBomb::Kicking()
 {

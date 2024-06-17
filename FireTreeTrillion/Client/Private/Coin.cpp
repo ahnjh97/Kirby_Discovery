@@ -137,9 +137,13 @@ HRESULT CCoin::Render_LightDepth()
 	return S_OK;
 }
 
+#ifdef _DEBUG
+
 void CCoin::Render_IMGUI()
 {
 }
+
+#endif
 
 void CCoin::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {

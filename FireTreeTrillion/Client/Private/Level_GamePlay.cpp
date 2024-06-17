@@ -25,7 +25,7 @@ CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 
 HRESULT CLevel_GamePlay::Initialize()
 {
-	m_pGameInstance->Set_RenderMode(CRenderer::MODE_TOOL);
+	m_pGameInstance->Set_RenderMode(CRenderer::MODE_GAMEPLAY);
 
 	//CLevelChanger::Get_Instance()->Load();
 
