@@ -81,8 +81,8 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "GsSteelFenceB", "GsTreeA", "GsTreeB", "GsTreeC", "GsWallRockA", "GsWallRockB"
 		, "GsWoodBridgeA", "GsWoodBridgeB", "GsRockCL", "GsRockDL", "GsRockEL", "GsRockFL", "GsRockGL"
 		, "JgGrassB", "JgGrassL", "JgGrasslongB", "JgGrassN", "JgWoodD", "JgGrassO"
-		, "StarBlockL" , "StarBlockM", "StarBlockS", "WoodBox"
-		, "SeDriftWoodAL", "SeDriftWoodBL", "SeDriftWoodCL" };
+		, "StarBlockL" , "StarBlockM", "StarBlockS", "SeDriftWoodAL", "SeDriftWoodBL", "SeDriftWoodCL"
+		, "VpFactoryParts", "VpFactoryPartsBlend", "WoodBox" };
 	m_setKickableDecos = { "GsPebble", "GsStone", "SeShell" };
 
 	vecPassIndices.resize(m_vecMapModelNames.size());
@@ -622,7 +622,7 @@ void CMapToolHelper::OnLeftClick()
 
 void CMapToolHelper::OnRightClick()
 {
-	if (iMapTxtIdx == -1 && iTriggerTxtIdx == -1 && iMonsterTxtIdx == -1 && iNonAnimIdx == -1)
+	if (iMapTxtIdx == -1 && iTriggerTxtIdx == -1 && iMonsterTxtIdx == -1 &&  iObjectIdx == -1 && iNonAnimIdx == -1)
 		return;
 
 	_float2 vMouseViewPortPos = m_pGameInstance->Get_MouseViewPortPos();
@@ -686,7 +686,7 @@ void CMapToolHelper::OnRightClick()
 		if (m_setMapDecoTxts.end() != m_setMapDecoTxts.find(m_strCurModel))
 			m_pPickedObject->Set_ShaderVars(2);
 
-		iMapTxtIdx = iTriggerTxtIdx = iMonsterTxtIdx = iNonAnimIdx = -1;
+		iMapTxtIdx = iTriggerTxtIdx = iMonsterTxtIdx = iNonAnimIdx = iObjectIdx = -1;
 	}
 }
 
@@ -833,6 +833,10 @@ void CMapToolHelper::Save_Level()
 			outputFile.write(reinterpret_cast<const char*>(&iStrSize), sizeof(iStrSize));
 			outputFile.write(strConnectedMonster.c_str(), iStrSize);
 			outputFile.write(reinterpret_cast<const char*>(&iTriggerIndex), sizeof(iTriggerIndex));
+		}
+		else if ("Item_Coin" == strModelName)
+		{
+			_int a = 0;
 		}
 	}
 
@@ -1014,6 +1018,11 @@ void CMapToolHelper::Load_Level()
 		}	
 		else
 		{
+
+			if ("Item_Coin" == strModelName)
+			{
+				_int a = 0;
+			}
 			if ("BG0" == strModelName || "BG1" == strModelName)
 				wstrGameObjectTag = TEXT("BG");
 			else

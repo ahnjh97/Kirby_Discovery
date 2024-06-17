@@ -211,6 +211,12 @@ HRESULT CLevel_Intro::Ready_ParsedObjects()
 		fileStream.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
 		fileStream.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
 
+		if (string("Item_Coin") == strModelName)
+		{
+			_int a = 0;
+			_int b = 0;
+		}
+
 		if (fileStream.eof())
 			break;
 

@@ -110,6 +110,11 @@ HRESULT CBasicMap::Render()
     {
         if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fNonMatchTime, sizeof(_float))))
             return E_FAIL;
+        _float fWhiteColorDiffuse = 0;
+        if (FAILED(m_pNonAnimShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &fWhiteColorDiffuse, sizeof(_float))))
+            return E_FAIL;
+        if (FAILED(m_pAnimShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &fWhiteColorDiffuse, sizeof(_float))))
+            return E_FAIL;
 
         m_iRenderAll = m_iRenderMyMesh = 0;
         m_pOcTree->Culling(m_pGameInstance, m_pShaderCom, m_pNonAnimShaderCom, m_pAnimShaderCom

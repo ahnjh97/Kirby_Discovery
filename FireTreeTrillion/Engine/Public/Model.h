@@ -98,6 +98,7 @@ public:
 
 	HRESULT Bind_StencilRimLightMotionBlur(class CShader* pShader, vector<string>& _vecConstantNames); // For Binding at Octree
 	void SetUpStencilRimLightMotionBlurPassIndex(_uint iShaderVars, _float fRimWidth, _uint iPassIndex); // For Binding at Octree
+	void Set_ModelPassIndex(_uint iPassIndex) { m_iPassIndex = iPassIndex; }
 	_uint Get_ModelPassIndex() { return m_iPassIndex; }
 	void Set_WorldMatrixForOctree(_float4x4 _matWorld) { m_matWorld = _matWorld; }
 	HRESULT Bind_WorldMatrixForOctree(class CShader* pShader, string& strConstantName = string("g_WorldMatrix"));
