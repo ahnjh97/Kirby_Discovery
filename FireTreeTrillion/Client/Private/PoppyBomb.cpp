@@ -90,7 +90,7 @@ _int CPoppyBomb::Tick(_float fTimeDelta)
 		// ÀÌµ¿
 		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 		vPos += (vVelocity + (XMVector3Normalize(m_vLookDir) * 0.2f * m_fMoveTime)) * m_fTimeDelta * 20.f;
-		m_pControllerCom->Move(m_pTransformCom, vPos, m_fTimeDelta, 0.5f);
+		m_pControllerCom->Move(m_pTransformCom, vPos, m_fTimeDelta);
 
 		//_float fHeight = m_pControllerCom->Compute_Height();
 
@@ -233,6 +233,7 @@ HRESULT CPoppyBomb::Add_Components()
 	/* For.Com_CharacterController */
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = m_vPosition;
+	desc.fOffset = 0.5f;
 	desc.uCollisionType = m_eCollisionGroup;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
