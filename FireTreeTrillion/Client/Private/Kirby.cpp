@@ -244,7 +244,7 @@ void CKirby::Render_IMGUI()
 
 	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	ImGui::Text("HP : %d", (_int)m_fHp);
-	ImGui::Text("m_bBombOrbit : %d", INFO(m_bBombOrbit));
+	ImGui::Text("m_iTestAnim : %d", m_iTestAnim);
 	ImGui::Text("m_bInitializeTargetPos : %d", m_bInitializeTargetPos);
 	ImGui::Text("m_vLadderPoint.x : %.2f, m_vLadderPoint.y : %.2f m_vLadderPoint.z : %.2f", INFO(m_vLadderPoint).x, INFO(m_vLadderPoint).y, INFO(m_vLadderPoint).z);
 	ImGui::Text("m_vLadderLook.x : %.2f, m_vLadderLook.y : %.2f m_vLadderLook.z : %.2f", INFO(m_vLadderLook).x, INFO(m_vLadderLook).y, INFO(m_vLadderLook).z);
@@ -345,6 +345,10 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 		{
 
 		}
+		else if (pObject->Get_PhyXState() == PO_FLYDEADAWAY)
+		{
+
+		}
 		else
 		{
 			if (m_bOverPower == true)
@@ -371,12 +375,6 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 		}
 	}
 
-
-
-}
-
-void CKirby::Collision_Hitbox(CPhysXObject* pGameObject)
-{
 
 
 }
@@ -702,6 +700,8 @@ HRESULT CKirby::Add_PartObjects()
 	WeaponDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 	WeaponDesc.pBoneMatrix = &m_WeaponMatrix;
 	WeaponDesc.pAbilityType = &m_eAbilityType;
+	WeaponDesc.pWhite = &m_fWhiteColorDiffuse;
+	WeaponDesc.pOverPower = &m_fOverPowerColor;
 	m_pWeapons = static_cast<CKirbyWeapons*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_KirbyWeapons"), &WeaponDesc));
 	CHECK_NULLPTR(m_pWeapons);
 
@@ -709,6 +709,8 @@ HRESULT CKirby::Add_PartObjects()
 	ArmourDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 	ArmourDesc.pBoneMatrix = &m_ArmourMatrix;
 	ArmourDesc.pAbilityType = &m_eAbilityType;
+	ArmourDesc.pWhite = &m_fWhiteColorDiffuse;
+	ArmourDesc.pOverPower = &m_fOverPowerColor;
 	m_pArmours = static_cast<CKirbyArmours*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_KirbyArmours"), &ArmourDesc));
 	CHECK_NULLPTR(m_pArmours);
 

@@ -5,6 +5,7 @@
 #include "ItemObject.h"
 #include "Camera_Main.h"
 #include "Kirby.h"
+#include "Monster.h"
 
 #include "HUD_StarPoint.h"
 
@@ -43,7 +44,7 @@ void CCollisionCenter::Initialize()
 	//m_eColliderType[MONSTER][OBJECT]		= CONTENT_ATTACK; // 던진 몬스터와 부딪힐 때, 충돌처리
 	
 	// For 찰 수 있는 오브젝트
-	m_eColliderType[PLAYER][KICKABLE]		= CONTENT_ATTACK;
+	m_eColliderType[PLAYER][KICKABLE]		= CONTENT_KICK;
 
 	// 레디얼 기름칠
 	GAMEINSTANCE Setting_RadialBlur(5.f, 300.f);
@@ -82,14 +83,6 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 		Safe_Release(pSrc);
 		Safe_Release(pDst);
 	}
-
-	for (auto& Trigger : m_Hitboxes)
-	{
-		Trigger->Close_Collision();
-		CGameObject* pSrc = Trigger;
-		Safe_Release(pSrc);
-	}
-	m_Hitboxes.clear();
 
 	m_WaitingList.clear();
 }
@@ -132,7 +125,7 @@ void CCollisionCenter::Collision_Collider(CONTENT_TYPE eType, CPhysXObject* pSrc
 	CPhysXObject* pDstObject = static_cast<CPhysXObject*>(pDst);
 
 
-	// 캐릭터 X 몬스터 몸박
+	// 캐릭터 X 몬스터 몸박 : 슬로우모션시스템, 서로 넉백, 몬스터 무적시간, 데미지 계산
 	if (eType == CONTENT_BODY)
 	{
 		CPhysXObject* pPlayer = Find_TypePtr(PLAYER, pSrcObject, pDstObject);
@@ -140,6 +133,10 @@ void CCollisionCenter::Collision_Collider(CONTENT_TYPE eType, CPhysXObject* pSrc
 			return;
 		CPhysXObject* pMonster = Find_TypePtr(MONSTER, pSrcObject, pDstObject);
 		if (pMonster == nullptr)
+			return;
+
+		// 무적상태인가?
+		if (static_cast<CMonster*>(pMonster)->Get_MonsterOverPower() == true)
 			return;
 
 		if (pMonster->Get_PhyXState() == PO_NORMAL)
@@ -214,15 +211,18 @@ void CCollisionCenter::Collision_Collider(CONTENT_TYPE eType, CPhysXObject* pSrc
 		// HitBox를 선별하여... 
 		CPhysXObject* pTriggerObj = Find_TypePtr(HITBOX_PLYAER, pSrcObject, pDstObject);
 		CPhysXObject* pMonsterObj = Find_TypePtr(MONSTER, pSrcObject, pDstObject);
+
+		// 무적상태인가?
+		if (static_cast<CMonster*>(pMonsterObj)->Get_MonsterOverPower() == true)
+			return;
+
 		CTrigger* pTrigger = static_cast<CTrigger*>(pTriggerObj);
 		if (pTriggerObj == nullptr)
 			return;
-		// 이 친구는 최종적으로, 트리거 작동을 false 해주기 위함이다.
-		m_Hitboxes.insert(pTrigger);
-		Safe_AddRef(pTrigger);
+
+		pTrigger->Close_Collision();
 
 		CKirby* pKirby = static_cast<CKirby*>(pTrigger->Get_Owner());
-
 		CTransform* pPlayerTransform = pKirby->Get_TransformCom();
 		_vector vPos = pPlayerTransform->Get_State_Vector(CTransform::STATE_POSITION);
 		CTransform* pMonsterTransform = pMonsterObj->Get_TransformCom();
@@ -257,8 +257,15 @@ void CCollisionCenter::Collision_Collider(CONTENT_TYPE eType, CPhysXObject* pSrc
 		pMonsterObj->Collision(CONTENT_ATTACK, pKirby);
 		Damage_To_Monster(pKirby, pMonsterObj);
 		HitStop_Rogic(pKirby);
-		Camera_Shaking();
+		Camera_Shaking(0.7f, 0.5f);
 	}
+
+	else if (eType == CONTENT_KICK)
+	{
+		pSrcObject->Collision(CONTENT_KICK, pDstObject);
+		pDstObject->Collision(CONTENT_KICK, pSrcObject);
+	}
+
 }
 
 void CCollisionCenter::Ladder_Collider()
@@ -524,13 +531,6 @@ void CCollisionCenter::Free()
 	for (auto& pLadder : m_Ladders)
 		Safe_Release(pLadder);
 	m_Ladders.clear();
-
-	for (auto& pHitboxObject : m_Hitboxes)
-	{
-		CGameObject* pSrc = pHitboxObject;
-		Safe_Release(pSrc);
-	}
-	m_Hitboxes.clear();
 
 	__super::Free();
 

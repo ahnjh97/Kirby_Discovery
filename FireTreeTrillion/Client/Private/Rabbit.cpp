@@ -195,6 +195,14 @@ void CRabbit::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* p
 	{
 
 	}
+	else if (eContent == CCollisionCenter::CONTENT_ATTACK)
+	{
+		if (m_ePhyXState == PO_NORMAL)
+		{
+			Change_State(CRabbit::RABBIT_DAMAGE, 50.f, false, true);
+			m_eEyeState = RABBITEYE_HAPPY;
+		}
+	}
 }
 
 void CRabbit::Change_State(RABBIT_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
@@ -267,9 +275,11 @@ HRESULT CRabbit::Add_Components()
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
+	desc.fOffset = 1.f;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	m_pControllerCom->Set_Object(this);
+	m_pControllerCom->Register_Controller();
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 
