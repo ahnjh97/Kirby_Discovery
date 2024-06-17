@@ -41,6 +41,7 @@ private:
 
 private:
 	_bool						m_IsMovingUP = { TRUE };
+	_bool						m_IsKirbyEX = { FALSE };
 
 	HUD_KIRBYHP					m_ePreState = { KIRBYHP_NONE };
 	HUD_KIRBYHP					m_eCurState = { KIRBYHP_NONE };

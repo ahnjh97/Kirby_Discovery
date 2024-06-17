@@ -361,6 +361,16 @@ HRESULT CLoader::Loading_For_Intro()
 	if (FAILED(Add_Texture(eLevel, "RandomNormal", "Map/RandomNormal.png")))
 		return E_FAIL;
 
+#pragma region UI
+
+	//hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 19);
+	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 23);
+	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby_Mask", "UI/HUD/Kirby/StatusBar/KirbyHPMask.png");
+	hr = Add_Texture(eLevel, "HUD_StarPoint", "UI/HUD/Kirby/StarPoint/StarPoint_%d.dds", 10);
+
+	CHECK_FAILED(hr);
+
+#pragma endregion
 
 	// 커비 얼굴 텍스쳐 로드
 	Add_KirbyFaceTexture(eLevel);

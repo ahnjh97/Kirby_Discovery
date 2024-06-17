@@ -78,10 +78,6 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 
 	m_eCurState = KIRBYHP_WAIT;
 	m_ePreState = KIRBYHP_HIDE;
-	
-	// 커비 부르기 
-	m_pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
-
 
 	return S_OK;
 }
@@ -90,7 +86,17 @@ _int CHUD_KirbyStatus::Tick(_float fTimeDelta)
 {	
 	__super::Tick(fTimeDelta);
 
-	Compute_Player_Hp(fTimeDelta);
+
+	if (m_IsKirbyEX == FALSE)
+	{
+		m_pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+		//CHECK_NULLPTR(m_pKirby);
+		if (m_pKirby)
+			Compute_Player_Hp(fTimeDelta);
+	}
+
+	if (m_pKirby == nullptr)
+		return OBJ_NOEVENT;
 
 	Update_UIState(fTimeDelta);
 
