@@ -62,8 +62,7 @@ HRESULT CLevel_Intro::Initialize()
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Ladder"), TEXT("Prototype_GameObject_Ladder"), &ObjDesc)))
 		return E_FAIL;
 
-	/*if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Test"), TEXT("Prototype_GameObject_TestModel"))))
-		return E_FAIL;*/
+
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
 	return S_OK;
