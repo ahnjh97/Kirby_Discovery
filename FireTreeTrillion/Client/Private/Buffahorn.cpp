@@ -166,14 +166,22 @@ void CBuffahorn::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject
 	{
 		if (m_ePhyXState == PO_NORMAL)
 		{
-			// 커비랑 몸박인데, 몸 끼리 박으면 소는 안 아파하는거 같더라
-			// 맞아 어빌리티만 공격판정인데 
-			Change_State(BUFFAHORN_DAMAGE, 50.f, false, true);
+
+
 		}
 	}
 	else if (eContent == CCollisionCenter::CONTENT_VACUUMOBJECT)
 	{
 
+	}
+	else if (eContent == CCollisionCenter::CONTENT_ATTACK)
+	{
+		if (m_ePhyXState == PO_NORMAL)
+		{
+			// 커비랑 몸박인데, 몸 끼리 박으면 소는 안 아파하는거 같더라
+			// 맞아 어빌리티만 공격판정인데 
+			Change_State(BUFFAHORN_DAMAGE, 50.f, false, true);
+		}
 	}
 
 
@@ -220,6 +228,7 @@ HRESULT CBuffahorn::Add_Components()
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	m_pControllerCom->Set_Object(this);
+	m_pControllerCom->Register_Controller();
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 

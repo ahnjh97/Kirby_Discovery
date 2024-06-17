@@ -231,12 +231,23 @@ void CKabu::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pOb
 {
 	if (eContent == CCollisionCenter::CONTENT_BODY)
 	{
-		m_vLook = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
-		Change_State(KABU_DAMAGE, 50.f, false, true);
+		if (m_ePhyXState == PO_NORMAL)
+		{
+			m_vLook = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+			Change_State(KABU_DAMAGE, 50.f, false, true);
+		}
 	}
 	else if (eContent == CCollisionCenter::CONTENT_VACUUMOBJECT)
 	{
 
+	}
+	else if (eContent == CCollisionCenter::CONTENT_ATTACK)
+	{
+		if (m_ePhyXState == PO_NORMAL)
+		{
+			m_vLook = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+			Change_State(KABU_DAMAGE, 50.f, false, true);
+		}
 	}
 }
 

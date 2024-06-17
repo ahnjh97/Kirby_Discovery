@@ -399,7 +399,8 @@ void CBuffahorn_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	{
 		// 일단 그 방향으로 바라보게만 한다.
 		_float3 vDamegeDir = pBuffahorn->Get_DamegeDir();
-		pTransformCom->Look_At_Axis(-vDamegeDir);
+		if (vDamegeDir != XMVectorZero())
+			pTransformCom->Look_At_Axis(-vDamegeDir);
 
 		// 이제 날아가는 것을 구현해보자.
 		//pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 14.f, fTimeDelta);
@@ -429,7 +430,7 @@ void CBuffahorn_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		pTransformCom->Turn(pTransformCom->Get_State_Vector(CTransform::STATE_UP), fTimeDelta, 360.f);
 		m_fFlyTime += fTimeDelta;
 
-		if (1.f > pController->Compute_Wall(vDamegeDir))
+		if (2.f > pController->Compute_Wall(vDamegeDir))
 		{
 			pBuffahorn->Set_PhyXState(PO_FLYDEADAWAY);
 			pBuffahorn->Set_DamageMoving(-1.f * vDamegeDir, 10.f);

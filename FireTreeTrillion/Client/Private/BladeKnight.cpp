@@ -196,6 +196,13 @@ void CBladeKnight::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObje
 	{
 
 	}
+	else if (eContent == CCollisionCenter::CONTENT_ATTACK)
+	{
+		if (m_ePhyXState == PO_NORMAL)
+		{
+			Change_State(BLADEKNIGHT_DAMAGE, 50.f, false, true);
+		}
+	}
 }
 
 void CBladeKnight::Change_State(BLADEKNIGHT_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
@@ -232,6 +239,7 @@ HRESULT CBladeKnight::Add_Components()
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	CHECK_FAILED(hr);
 	m_pControllerCom->Set_Object(this);
+	m_pControllerCom->Register_Controller();
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 

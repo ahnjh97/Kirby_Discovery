@@ -427,7 +427,8 @@ void CBladeKnight_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float f
 	{
 		// 일단 그 방향으로 바라보게만 한다.
 		_float3 vDamegeDir = pBladeKnight->Get_DamegeDir();
-		pTransformCom->Look_At_Axis(-vDamegeDir);
+		if (vDamegeDir != XMVectorZero())
+			pTransformCom->Look_At_Axis(-vDamegeDir);
 
 		// 이제 날아가는 것을 구현해보자.
 		pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 6.f, fTimeDelta);

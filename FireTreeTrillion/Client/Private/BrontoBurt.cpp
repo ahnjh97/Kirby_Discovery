@@ -286,6 +286,16 @@ void CBrontoBurt::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObjec
 	{
 
 	}
+	else if (eContent == CCollisionCenter::CONTENT_ATTACK)
+	{
+		if (m_ePhyXState == PO_NORMAL)
+		{
+			m_vLastPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+			Change_State(BRONTOBURT_DAMAGE, 50.f, false, true);
+			m_eEyeState = BRONTOBURTEYE_HALF;
+			m_bReturn = true;
+		}
+	}
 }
 
 void CBrontoBurt::Change_State(BRONTOBURT_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
@@ -325,6 +335,8 @@ HRESULT CBrontoBurt::Add_Components()
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	m_pControllerCom->Set_Object(this);
+	m_pControllerCom->Register_Controller();
+
 	//m_pControllerCom->Set_CollisionType(m_eCollisionGroup);
 
 	SetUp_FSM();
