@@ -283,6 +283,9 @@
     <Filter Include="02.GameObjects\PhysXObject\RigidObject\Rock\Kickable">
       <UniqueIdentifier>{22df7019-4bde-485a-a4fa-b74dfa7b29a5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\MapObject\StarBlock\Piece">
+      <UniqueIdentifier>{d518caec-9d94-4f91-8c37-5ac238833664}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -566,6 +569,9 @@
     <ClInclude Include="..\Public\KirbyBomb.h">
       <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\Bomb</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\StarBlockPiece.h">
+      <Filter>02.GameObjects\PhysXObject\MapObject\StarBlock\Piece</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -830,6 +836,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\KirbyBomb.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\Bomb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\StarBlockPiece.cpp">
+      <Filter>02.GameObjects\PhysXObject\MapObject\StarBlock\Piece</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
