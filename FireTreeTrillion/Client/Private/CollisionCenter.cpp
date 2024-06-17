@@ -256,8 +256,6 @@ void CCollisionCenter::Collision_Collider(CONTENT_TYPE eType, CPhysXObject* pSrc
 
 		pMonsterObj->Collision(CONTENT_ATTACK, pKirby);
 		Damage_And_Effect_For_Monster(pKirby, pMonsterObj);
-		HitStop_Rogic(pKirby);
-		Camera_Shaking(0.7f, 0.5f);
 	}
 
 	else if (eType == CONTENT_KICK)
@@ -339,16 +337,7 @@ _bool CCollisionCenter::FlyAway_KnockBack(_uint uKirbyState)
 
 void CCollisionCenter::HitStop_Rogic(CKirby* pKirby)
 {
-	_uint uKirbyState = pKirby->Get_State();
-
-	// 역경직이 필요한 놈들은 여기서 정의한다.
-	if (uKirbyState == CKirby::SWORDSTATE_SIDESLASH ||
-		uKirbyState == CKirby::SWORDSTATE_MULITSWORDATTACK ||
-		uKirbyState == CKirby::SWORDSTATE_GIGANTSPINSLASH ||
-		uKirbyState == CKirby::SWORDSTATE_DECISIVESLASH ||
-		uKirbyState == CKirby::SWORDSTATE_UPWARDSLASH ||
-		uKirbyState == CKirby::SWORDSTATE_SUPERSPINSLASHLOOP)
-		pKirby->Set_HitStop();
+	pKirby->Set_HitStop();
 }
 
 void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObject* pMonster)
@@ -371,6 +360,9 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 	case CKirby::SWORDSTATE_SIDESLASH:
 	{
 		fAttack = 5.f;
+		HitStop_Rogic(pKirby);
+		Camera_Shaking(0.7f, 0.5f);
+
 
 	}
 	break;
@@ -378,6 +370,9 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 	case CKirby::SWORDSTATE_MULITSWORDATTACK:
 	{
 		fAttack = 5.f;
+		HitStop_Rogic(pKirby);
+		Camera_Shaking(0.7f, 0.5f);
+
 
 
 	}
@@ -386,6 +381,9 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 	case CKirby::SWORDSTATE_DECISIVESLASH:
 	{
 		fAttack = 10.f;
+		HitStop_Rogic(pKirby);
+		Camera_Shaking();
+
 
 
 	}
@@ -394,6 +392,9 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 	case CKirby::SWORDSTATE_GIGANTSPINSLASH:
 	{
 		fAttack = 5.f;
+		HitStop_Rogic(pKirby);
+		Camera_Shaking(0.7f, 0.5f);
+
 
 
 	}
@@ -402,6 +403,9 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 	case CKirby::SWORDSTATE_SUPERSPINSLASHLOOP:
 	{
 		fAttack = 5.f;
+		HitStop_Rogic(pKirby);
+		Camera_Shaking(0.7f, 0.5f);
+
 
 
 	}
@@ -410,6 +414,9 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 	case CKirby::SWORDSTATE_UPWARDSLASH:
 	{
 		fAttack = 10.f;
+		HitStop_Rogic(pKirby);
+		Camera_Shaking();
+
 
 
 	}
