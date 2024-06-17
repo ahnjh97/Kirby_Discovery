@@ -76,7 +76,7 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 	// 쉐이킹 진폭 초기화
 	m_fAmplitude = 0.001f;
 
-	m_eCurState = KIRBYHP_IDLE;
+	m_eCurState = KIRBYHP_WAIT;
 	m_ePreState = KIRBYHP_HIDE;
 	
 	// 커비 부르기 
@@ -91,6 +91,7 @@ _int CHUD_KirbyStatus::Tick(_float fTimeDelta)
 	__super::Tick(fTimeDelta);
 
 	Compute_Player_Hp(fTimeDelta);
+
 	Update_UIState(fTimeDelta);
 
 	return OBJ_NOEVENT;
@@ -150,7 +151,7 @@ HRESULT CHUD_KirbyStatus::Add_Components()
 
 HRESULT CHUD_KirbyStatus::Render_BindSet(CShader* _pShaderCom, CTransform* _pTransCom)
 {
-	if (KIRBYHP_IDLE == m_eCurState && KIRBYHP_HIDE == m_ePreState)
+	if (KIRBYHP_WAIT == m_eCurState && KIRBYHP_HIDE == m_ePreState)
 		return S_OK;
 
 	CHECK_NULLPTR(_pShaderCom);
@@ -235,8 +236,6 @@ void CHUD_KirbyStatus::Update_UIState(_float _fTimeDelta)
 		break;
 
 	case CHUD::KIRBYHP_WAIT: // 3) 특정 이벤트 이후 대기 상태
-		Play_Animation(m_fAccTime, KIRBYHP_WAIT);
-		
 		if (KIRBYHP_DAMAGE == m_ePreState)	//이전 피격받았을 경우,
 		{
 			m_fAccTime += _fTimeDelta;
@@ -246,17 +245,20 @@ void CHUD_KirbyStatus::Update_UIState(_float _fTimeDelta)
 				m_fAccTime = 0.f;
 			}
 		}
+		else
+			Play_Animation(m_fAccTime, KIRBYHP_WAIT);
 		break;
 
 	case CHUD::KIRBYHP_HIDE: // 4) 숨김 상태
 		m_fAccTime += _fTimeDelta;
-		Play_Animation(m_fAccTime, KIRBYHP_HIDE);
-		if (m_fAccTime > 10.f / 144.f)
+		if (m_fAccTime > 0.16f)
 		{
-			m_fAccTime = 0.f;
+ 			m_fAccTime = 0.f;
 			m_eCurState = KIRBYHP_IDLE;	//4-A) 시간 경과 후 대기 상태로 변경 (렌더X)
 			m_ePreState = KIRBYHP_HIDE;
 		}
+		else
+			Play_Animation(m_fAccTime, KIRBYHP_HIDE);
 		break;
 
 	//Frame 52 > 77
@@ -268,7 +270,8 @@ void CHUD_KirbyStatus::Update_UIState(_float _fTimeDelta)
 			m_eCurState = KIRBYHP_WAIT;
 			m_ePreState = KIRBYHP_DAMAGE;
 		}
-		Play_Animation(m_fAccTime, KIRBYHP_DAMAGE);
+		else
+			Play_Animation(m_fAccTime, KIRBYHP_DAMAGE);
 		break;
 
 	case CHUD::KIRBYHP_HEAL: //
@@ -281,19 +284,41 @@ void CHUD_KirbyStatus::Update_UIState(_float _fTimeDelta)
 
 void CHUD_KirbyStatus::Play_Animation(_float _fAccTime, HUD_KIRBYHP _eCurState)
 {
-	_float4 vCurPos = { 0.f, 0.f, 0.f, 0.f }; 
+	_float4 vWAITPos = { 0.f, 0.f, 0.f, 0.f };
 
 	switch (m_eCurState)
 	{
-	case CHUD::KIRBYHP_IDLE:
-		vCurPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	case CHUD::KIRBYHP_IDLE: //기본 상태에서 위치 값을 저장
 		break;
 
 	case CHUD::KIRBYHP_WAIT:
+		//vWAITPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		if (TEXT("Base") == m_UIObjDesc.wstrUITag || TEXT("Shadow") == m_UIObjDesc.wstrUITag)
+			m_UIObjDesc.vPos = { -0.39f, 0.21f, 1.0f };
+
+		if (TEXT("Blur") == m_UIObjDesc.wstrUITag)
+			m_UIObjDesc.vPos = { -0.39f, 0.21f, 0.99f };
+
+		if (TEXT("Gauge_Base") == m_UIObjDesc.wstrUITag)
+			m_UIObjDesc.vPos = { -0.35f, 0.19f, 0.9f };
+
+		if (TEXT("Gauge_Damage") == m_UIObjDesc.wstrUITag)
+			m_UIObjDesc.vPos = { -0.35f, 0.19f, 0.89f };
+
+		if (TEXT("Gauge") == m_UIObjDesc.wstrUITag)
+			m_UIObjDesc.vPos = { -0.34f, 0.18f, 0.88f };
+
+		if (TEXT("Name") == m_UIObjDesc.wstrUITag)
+			m_UIObjDesc.vPos = { -750.f, 413.f, 0.f };
+
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION,
+			XMVectorSet(m_UIObjDesc.vPos.x - m_UIObjDesc.vCenter.x + m_UIObjDesc.vCenter.x,
+				m_UIObjDesc.vPos.y - m_UIObjDesc.vCenter.y + m_UIObjDesc.vCenter.y,
+				m_UIObjDesc.vPos.z, 1.f));
+	
 		break;
 
 	case CHUD::KIRBYHP_HIDE: //X값 좌측 이동, 알파 값 죽이기
-		/*
 		if (m_UIObjDesc.wstrUITag == TEXT("Name"))
 			m_UIObjDesc.vPos.x -= 40.f;
 
@@ -307,10 +332,10 @@ void CHUD_KirbyStatus::Play_Animation(_float _fAccTime, HUD_KIRBYHP _eCurState)
 
 		if (m_UIObjDesc.fAlpha < 1.f / 255.f)
 			m_UIObjDesc.fAlpha = 1.f / 255.f;
-		*/
 		break;
 
 	case CHUD::KIRBYHP_DAMAGE:
+		//m_pTransformCom->Set_State(CTransform::STATE_POSITION, vStateWAITPos);
 		break;
 
 	case CHUD::KIRBYHP_HEAL:
@@ -340,6 +365,8 @@ void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta)
 	// 피가 닳았다는 신호이다.
 	if (m_fHpRatio < m_fHpSlowRatio)
 	{
+		m_eCurState = KIRBYHP_DAMAGE;
+
 		// 만약, 현재 피통과 느리게 따라오는 피통의 비율이 다를경우 가산하기 시작한다.
 		m_fAccDamageTime += fTimeDelta;
 

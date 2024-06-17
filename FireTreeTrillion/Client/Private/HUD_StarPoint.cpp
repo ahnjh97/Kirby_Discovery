@@ -292,7 +292,7 @@ void CHUD_StarPoint::Update_UIState(_float _fTimeDelta)
 	//Frame 50 > 64 
 	case CHUD::STARPOINT_LOOT: // 2) È¹µæ »óÅÂ
 		m_fAccTime += _fTimeDelta;
-		if (m_fAccTime >= 0.12f)
+		if (m_fAccTime >= 0.125f)
 		{
 			m_fAccTime = 0.f;
 			m_eCurState = STARPOINT_WAIT;
