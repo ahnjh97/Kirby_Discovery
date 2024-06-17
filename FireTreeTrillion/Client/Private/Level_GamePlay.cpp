@@ -627,8 +627,9 @@ CLevel_GamePlay * CLevel_GamePlay::Create(ID3D11Device* pDevice, ID3D11DeviceCon
 
 void CLevel_GamePlay::Free()
 {
-	__super::Free();
 	m_pGameInstance->Clear_EventCallBack();
+
+	__super::Free();
 
 	for(auto& tex : m_pEnvTexture)
 		Safe_Release(tex);
