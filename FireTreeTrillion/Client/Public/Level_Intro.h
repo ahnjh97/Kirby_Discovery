@@ -22,6 +22,13 @@ private:
 	HRESULT Ready_Layer_UI(const wstring& strLayerTag);
 	HRESULT Ready_ParsedObjects();
 
+
+
+	HRESULT Add_EnvMap();
+	enum TEXTURETYPE { TYPE_ENV, TYPE_LUT, TYPE_NORMAL, TYPE_END };
+	CTexture* m_pEnvTexture[TYPE_END] = { nullptr };
+
+
 public:
 	static CLevel_Intro* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual void Free() override;

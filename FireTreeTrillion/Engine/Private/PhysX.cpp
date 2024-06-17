@@ -38,7 +38,7 @@ HRESULT CPhysX::Initialize()
     m_pEventCallBack = new CEventCallBack();
     PxSceneDesc sceneDesc(m_pPhysics->getTolerancesScale());
     sceneDesc.gravity = PxVec3(0.0f, -9.81f * 3.f, 0.0f);
-    m_pDispatcher = PxDefaultCpuDispatcherCreate(2);
+    m_pDispatcher = PxDefaultCpuDispatcherCreate(1);
     sceneDesc.cpuDispatcher = m_pDispatcher;
     sceneDesc.simulationEventCallback = m_pEventCallBack;
     sceneDesc.filterShader = PxDefaultSimulationFilterShader;
@@ -327,6 +327,7 @@ PxRigidStatic* CPhysX::CreateStaticActor(_float4x4& matWorld, _float3* pVertices
     if (nullptr == pMaterial)
     {
         PxMaterial* pMtrl = m_pPhysics->createMaterial(0.5f, 0.5f, 0.6f);
+        //PxMaterial* pMtrl = m_pPhysics->createMaterial(0.f, 0.f, 0.6f);
         pShape = m_pPhysics->createShape(triGeom, *pMtrl);
     }
     else

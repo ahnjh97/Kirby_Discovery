@@ -21,12 +21,16 @@ CLevel_Intro::CLevel_Intro(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 HRESULT CLevel_Intro::Initialize()
 {
-	m_pGameInstance->Set_RenderMode(CRenderer::MODE_GAMEPLAY);
+	m_pGameInstance->Set_RenderMode(CRenderer::MODE_TOOL);
 	//CLevelChanger::Get_Instance()->Load();
 
 	HRESULT hr;
 	hr = __super::Initialize();
 	CHECK_FAILED(hr);
+
+	// 환경맵을 추가한다.
+	if (FAILED(Add_EnvMap()))
+		return E_FAIL;
 
 	hr = Ready_Lights();
 	CHECK_FAILED(hr);
@@ -422,6 +426,38 @@ HRESULT CLevel_Intro::Ready_ParsedObjects()
 	return S_OK;
 }
 
+HRESULT CLevel_Intro::Add_EnvMap()
+{
+	HRESULT hr;
+
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Level_0_Env"),
+		TEXT("Com_Texture1"), (CComponent**)&m_pEnvTexture[TYPE_ENV]);
+	CHECK_FAILED(hr);
+
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_BRDF_LUT"),
+		TEXT("Com_Texture2"), (CComponent**)&m_pEnvTexture[TYPE_LUT]);
+	CHECK_FAILED(hr);
+
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_RandomNormal"),
+		TEXT("Com_Texture3"), (CComponent**)&m_pEnvTexture[TYPE_NORMAL]);
+	CHECK_FAILED(hr);
+
+
+	// 환경맵을 던진다.
+	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture[TYPE_ENV], "g_EnvTexture")))
+		return E_FAIL;
+
+	//LUT 던진다.
+	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture[TYPE_LUT], "g_LUTTexture")))
+		return E_FAIL;
+
+	//Normal 던진다.
+	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture[TYPE_NORMAL], "g_RandomNormalTexture")))
+		return E_FAIL;
+
+	return S_OK;
+}
+
 CLevel_Intro* CLevel_Intro::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CLevel_Intro* pInstance = new CLevel_Intro(pDevice, pContext);
@@ -439,4 +475,8 @@ void CLevel_Intro::Free()
 {
 	m_pGameInstance->Clear_EventCallBack();
 	__super::Free();
+
+	for (auto& tex : m_pEnvTexture)
+		Safe_Release(tex);
+
 }
