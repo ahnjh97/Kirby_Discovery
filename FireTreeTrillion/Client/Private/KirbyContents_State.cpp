@@ -68,6 +68,8 @@ void CKirbyGet_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 		else
 			Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
 
+		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
+
 		if (pKirby->isAnimFinish())
 		{
 			// 어빌리티 타입에 맞는 아이템 드랍. (미구현)

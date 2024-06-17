@@ -486,7 +486,7 @@ void CBladeKnight_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float f
 
 		pBladeKnight->Set_DamageJumpPower(fDamageJumpPower);
 
-		if (m_fDeadTime > 0.7f)
+		if (m_fDeadTime > 0.4f || pController->Is_Terrain())
 			pBladeKnight->Set_Dead();
 	}
 

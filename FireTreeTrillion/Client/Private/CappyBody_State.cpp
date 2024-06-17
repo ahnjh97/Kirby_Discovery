@@ -330,7 +330,7 @@ void CCappyBody_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 		pCappy->Set_DamageJumpPower(fDamageJumpPower);
 
-		if (m_fDeadTime > 0.7f)
+		if (m_fDeadTime > 0.4f || pController->Is_Terrain())
 			pCappy->Set_Dead();
 
 	}
