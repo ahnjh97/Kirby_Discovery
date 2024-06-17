@@ -379,11 +379,6 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 
 }
 
-void CKirby::Collision_Hitbox(CPhysXObject* pGameObject)
-{
-	m_iTestAnim++;
-}
-
 _float3 CKirby::Make_RepulsiveDir(CPhysXObject* pObject)
 {
 	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
