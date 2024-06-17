@@ -227,7 +227,10 @@ void CCollisionCenter::Collision_Collider(CONTENT_TYPE eType, CPhysXObject* pSrc
 		CTransform* pMonsterTransform = pMonsterObj->Get_TransformCom();
 		_vector vMonsterPos = pMonsterTransform->Get_State_Vector(CTransform::STATE_POSITION);
 		// 넉백 방향
-		_vector vPlayerKnockbackDir = XMVector3Normalize(vMonsterPos - vPos);
+		_float4 vDistance = vMonsterPos - vPos;
+		vDistance.y = 0.f;
+		_vector vPlayerKnockbackDir = XMVector3Normalize(vDistance);
+
 
 		// 만약, 작은 넉백이였을 경우
 		if (Small_KnockBack(pKirby->Get_State()))
@@ -251,6 +254,9 @@ void CCollisionCenter::Collision_Collider(CONTENT_TYPE eType, CPhysXObject* pSrc
 		}
 
 		pMonsterObj->Collision(CONTENT_ATTACK, pKirby);
+		Damage_To_Monster(pKirby, pMonsterObj);
+		HitStop_Rogic(pKirby);
+		Camera_Shaking();
 	}
 
 	else if (eType == CONTENT_KICK)
@@ -326,6 +332,26 @@ _bool CCollisionCenter::Up_KnockBack(_uint uKirbyState)
 _bool CCollisionCenter::FlyAway_KnockBack(_uint uKirbyState)
 {
 	return false;
+}
+
+void CCollisionCenter::HitStop_Rogic(CKirby* pKirby)
+{
+	_uint uKirbyState = pKirby->Get_State();
+
+	if (uKirbyState == CKirby::SWORDSTATE_SIDESLASH ||
+		uKirbyState == CKirby::SWORDSTATE_MULITSWORDATTACK ||
+		uKirbyState == CKirby::SWORDSTATE_GIGANTSPINSLASH ||
+		uKirbyState == CKirby::SWORDSTATE_DECISIVESLASH)
+		pKirby->Set_HitStop();
+
+}
+
+void CCollisionCenter::Damage_To_Monster(CKirby* pKirby, CPhysXObject* pMonster)
+{
+	CCharacter* pCMonster = static_cast<CCharacter*>(pMonster);
+
+	_float fAttack = pKirby->Get_Attack();
+	pCMonster->Minus_Hp(fAttack);
 }
 
 void CCollisionCenter::Camera_Shaking(_float fPower, _float fTime, _float2 vDir)
