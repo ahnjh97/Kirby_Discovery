@@ -1201,6 +1201,11 @@ CKirbyDefault_Ladder_State::CKirbyDefault_Ladder_State()
 void CKirbyDefault_Ladder_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+
+	CTransform* pKirbyTransform = m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0)->Get_TransformCom();
+	if (_iAnimIndex == CKirby::STATE_LADDERWAITSTART)
+		LadderStart_FX(pKirbyTransform);
+
 }
 
 void CKirbyDefault_Ladder_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)

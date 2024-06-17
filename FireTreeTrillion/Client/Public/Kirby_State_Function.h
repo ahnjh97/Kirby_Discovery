@@ -935,6 +935,17 @@ static _bool Kirby_JoyStickLadder_Logic(CKirby* pKirby, CKirby::KIRBY_INFODESC* 
 
 #pragma region Hyo Effect
 
+static void LadderStart_FX(CTransform* pTransformCom)
+{
+	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+
+	MultiFXDesc.vInitPos = static_cast<_float3>(pTransformCom->Get_State(CTransform::STATE_POSITION) + _float4{ 0.f, .3f, 0.f, 0.f });
+	MultiFXDesc.vInitRot = CUtils::Make_Degree_FromDir(CGameInstance::Get_Instance()->Get_CamLook());
+	MultiFXDesc.vInitScale = { 2.f, 2.f, 2.f };
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Ladder Star"), &MultiFXDesc)))
+		return;
+}
+
 static void Bbong_FX(_float fTimeDelta, CTransform* pTransformCom)
 {
 	static _float fBbongTime{ 0.f };
