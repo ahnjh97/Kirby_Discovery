@@ -44,7 +44,7 @@ void CCollisionCenter::Initialize()
 	//m_eColliderType[MONSTER][OBJECT]		= CONTENT_ATTACK; // 던진 몬스터와 부딪힐 때, 충돌처리
 	
 	// For 찰 수 있는 오브젝트
-	//m_eColliderType[PLAYER][KICKABLE]		= CONTENT_ATTACK;
+	m_eColliderType[PLAYER][KICKABLE]		= CONTENT_KICK;
 
 	// 레디얼 기름칠
 	GAMEINSTANCE Setting_RadialBlur(5.f, 300.f);
@@ -256,10 +256,16 @@ void CCollisionCenter::Collision_Collider(CONTENT_TYPE eType, CPhysXObject* pSrc
 
 		pMonsterObj->Collision(CONTENT_ATTACK, pKirby);
 		Damage_To_Monster(pKirby, pMonsterObj);
-		pKirby->Collision_Hitbox(pMonsterObj);
 		HitStop_Rogic(pKirby);
 		Camera_Shaking(0.7f, 0.5f);
 	}
+
+	else if (eType == CONTENT_KICK)
+	{
+		pSrcObject->Collision(CONTENT_KICK, pDstObject);
+		pDstObject->Collision(CONTENT_KICK, pSrcObject);
+	}
+
 }
 
 void CCollisionCenter::Ladder_Collider()

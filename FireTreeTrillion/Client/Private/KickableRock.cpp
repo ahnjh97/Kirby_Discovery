@@ -57,8 +57,18 @@ void CKickableRock::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
 
-	m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
-	m_pRigidBodyCom->Add_Force(_float3(0.f, -0.5f, 0.f));
+	if (m_pRigidBodyCom->Is_Activated())
+	{
+		m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
+		m_pRigidBodyCom->Add_Force(_float3(0.f, -0.5f, 0.f));
+
+		m_fLifeTime += m_fTimeDelta;
+		if (m_fLifeTime >= 1.f)
+		{
+			m_fLifeTime = 0.f;
+			m_bDead = true;
+		}
+	}
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
@@ -112,7 +122,8 @@ void CKickableRock::Render_IMGUI()
 
 #endif
 
-void CKickableRock::Collision_Hitbox(CPhysXObject* pGameObject)
+
+void CKickableRock::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
 	m_pRigidBodyCom->Activate(true);
 

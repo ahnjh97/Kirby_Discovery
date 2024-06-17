@@ -31,7 +31,7 @@ HRESULT CWasteCan::Initialize(void* pArg)
 	HRESULT  hr = __super::Initialize(pGameObjectDesc);
 	CHECK_FAILED(hr);
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(0.f, 7.5f, -180.f, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(0.f, 7.f, -190.f, 1.f));
 	Add_Components();
 
 	return S_OK;
@@ -44,10 +44,12 @@ _int CWasteCan::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return OBJ_DEAD;
 
+	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+
 	if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD6, KEY_DOWN))
 	{
 		_float3 force = _float3{ 0.5f, 3.f , 0.5f };
-		m_pGameInstance->Kick_DynamicActor(force, 10.f);
+		m_pGameInstance->Kick_DynamicActor(force, 500.f);
 	}
 	m_pTrigger->Tick(m_fTimeDelta);
 
@@ -58,11 +60,18 @@ void CWasteCan::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
 
-	/*if (m_bActivatePhysX)
+	if (m_bActivatePhysX)
 	{
 		m_pModelCom->Update_ActorTransform(m_pTransformCom);
 		m_pGameInstance->Add_Force(_float3(0.f, -0.5f, 0.f));
-	}*/
+
+		m_fLifeTime += m_fTimeDelta;
+		if (m_fLifeTime >= 1.f)
+		{
+			m_fLifeTime = 0.f;
+			m_bDead = true;
+		}
+	}
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
 
@@ -114,14 +123,15 @@ void CWasteCan::Render_IMGUI()
 }
 #endif
 
-void CWasteCan::Collision_Hitbox(CPhysXObject* pGameObject)
+void CWasteCan::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
 	HRESULT hr = m_pModelCom->CreateDynamicActor(m_pTransformCom->Get_WorldFloat4x4());
 	CHECK_FAILED(hr);
 
-	//m_bActivatePhysX = true;
-	/*_float3 force = _float3{ 0.5f, 3.f , 0.5f };
-	m_pGameInstance->Kick_DynamicActor(XMVector3Normalize(force), 530.f);*/
+	m_bActivatePhysX = true;
+	
+	//_float3 force = _float3{ 0.5f, 3.f , 0.5f };
+	//m_pGameInstance->Kick_DynamicActor(XMVector3Normalize(force), 10.f);
 }
 
 HRESULT CWasteCan::Add_Components()
