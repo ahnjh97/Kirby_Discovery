@@ -100,8 +100,8 @@ HRESULT CLayerUI::Render()
 		_float2 vFontOrig = {	1.f, 1.f  };
 		_float2 vFontScale = { m_UIObjDesc.vSize.x, m_UIObjDesc.vSize.y };
 
-		wstring wstrFontTag = { TEXT("Font_HUD_StarPoint_NUM30") };
-		//wstring wstrFontTag = { TEXT("Font_HUDSub_KR15") };
+		//wstring wstrFontTag = { TEXT("Font_HUD_StarPoint_NUM30") };
+		wstring wstrFontTag = { TEXT("Font_HUDSub_KR15") };
 
 		//추후 원근투영 폰트 작업 예정
 		/*
@@ -140,8 +140,8 @@ HRESULT CLayerUI::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_StarPoint"),
-	//if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_StatusBar_Kirby"),
+	//if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_StarPoint"),
+	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_StatusBar_Kirby"),
 		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
 		return E_FAIL;
 

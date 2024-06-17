@@ -12,6 +12,9 @@ CKirbyGet_State::CKirbyGet_State()
 void CKirbyGet_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+
+	if(_iAnimIndex == CKirby::STATE_ABILITYDUMP)
+		LadderStart_FX(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0)->Get_TransformCom());
 }
 
 void CKirbyGet_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -44,7 +47,11 @@ void CKirbyGet_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 				pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 			if (pKirby->Get_AbilityType() == ABILITY_BOMB)
 				pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+
+			static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr())->Zoom(0.f);
+
 		}
+
 	}
 	else if (pKirby->Get_State() == CKirby::STATE_ITEMGET)
 	{
@@ -60,6 +67,8 @@ void CKirbyGet_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 			Moving_Logic(Kirbydesc, pTransformCom, pController, fTimeDelta);
 		else
 			Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
+
+		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
 
 		if (pKirby->isAnimFinish())
 		{
