@@ -8,6 +8,7 @@
 #include "Monster.h"
 
 #include "HUD_StarPoint.h"
+#include "Kirby_State_Function.h"
 
 #define GAMEINSTANCE CGameInstance::Get_Instance()->
 
@@ -362,7 +363,7 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		fAttack = 5.f;
 		HitStop_Rogic(pKirby);
 		Camera_Shaking(0.7f, 0.5f);
-
+		SwordHit(pMonsterTransform);
 
 	}
 	break;
@@ -372,7 +373,7 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		fAttack = 5.f;
 		HitStop_Rogic(pKirby);
 		Camera_Shaking(0.7f, 0.5f);
-
+		SwordHit(pMonsterTransform);
 
 
 	}
@@ -383,8 +384,7 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		fAttack = 10.f;
 		HitStop_Rogic(pKirby);
 		Camera_Shaking();
-
-
+		SwordHit_Big(pMonsterTransform);
 
 	}
 	break;
@@ -394,8 +394,7 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		fAttack = 5.f;
 		HitStop_Rogic(pKirby);
 		Camera_Shaking(0.7f, 0.5f);
-
-
+		SwordHit(pMonsterTransform);
 
 	}
 	break;
@@ -405,8 +404,7 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		fAttack = 5.f;
 		HitStop_Rogic(pKirby);
 		Camera_Shaking(0.7f, 0.5f);
-
-
+		SwordHit(pMonsterTransform);
 
 	}
 	break;
@@ -416,8 +414,7 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		fAttack = 10.f;
 		HitStop_Rogic(pKirby);
 		Camera_Shaking();
-
-
+		SwordHit(pMonsterTransform);
 
 	}
 	break;

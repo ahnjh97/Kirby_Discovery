@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "KirbyDefault_State.h"
 #include "Kirby_State_Function.h"
-#include "MultiEffect.h"
-#include "SingleEffect.h"
 
 #pragma region IDLE STATE
 
