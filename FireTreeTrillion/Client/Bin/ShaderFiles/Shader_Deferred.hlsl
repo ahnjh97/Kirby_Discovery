@@ -616,6 +616,7 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
         }
         
         Out.vSSAO -= vSSAO;
+        
     }
     
     
@@ -755,9 +756,10 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
     }
           
     
-    Out.vResultColor = float4(directLighting + ambientLighting, 1.f) * fAmbientOcclusion;
+    Out.vResultColor = saturate (float4(directLighting + ambientLighting, 1.f) * fAmbientOcclusion);
     Out.vSpecular = saturate(vLightspecular);
     Out.vLensFlare = saturate(vLensFlare);
+    Out.vSSAO = saturate(Out.vSSAO);
     
     return Out;
 }
