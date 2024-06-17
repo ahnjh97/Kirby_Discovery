@@ -345,6 +345,7 @@ HRESULT CLevel_Intro::Ready_ParsedObjects()
 		else if (strModelName == "NonAnim_BrontoBurt")
 		{
 			CBrontoBurt::BRONTOBURT_DESC BrontoBurtDesc = {};
+			matWorld._42 += 2.f;
 			BrontoBurtDesc.matWorld = matWorld;
 			BrontoBurtDesc.wstrModelName = CUtils::StrToWstr(strModelName);
 			BrontoBurtDesc.iShaderVars = iShaderVars;
