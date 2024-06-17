@@ -310,22 +310,9 @@ void CKirby::Add_AnimEvent()
 		});
 
 	// 사운드 처리
-	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("PlaySpin", [this]() {
+	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("SpinSlash", [this]() {
 		m_pGameInstance->PlaySound_Free(L"Spin.wav", 0.5f); // 0 ~ 1
 		});
-
-	//m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("PlaySpin", [this]() {
-	//	m_pGameInstance->PlaySound_Free(L"Spin.wav", 0.5f); // 0 ~ 1
-	//	});
-
-	//m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("PlaySpin", [this]() {
-	//	m_pGameInstance->PlaySound_Free(L"Spin.wav", 0.5f); // 0 ~ 1
-	//	});
-
-	//m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("PlaySpin", [this]() {
-	//	m_pGameInstance->PlaySound_Free(L"Spin.wav", 0.5f); // 0 ~ 1
-	//	});
-
 }
 
 void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)

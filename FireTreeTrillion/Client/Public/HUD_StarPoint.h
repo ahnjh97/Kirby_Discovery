@@ -39,18 +39,21 @@ private:
 	void						Play_Animation(_float _fTimeDelta, HUD_STARPOINT _eSPstate);
 
 public:
-	static CHUD_StarPoint* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	virtual CGameObject* Clone(void* pArg) override;
+	static CHUD_StarPoint*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	virtual CGameObject*		Clone(void* pArg) override;
 	virtual void				Free() override;
 
 private:
+	class CKirby*				m_pKirby = { nullptr };
+
 	_bool						m_IsMovingUP = { TRUE };
-	_bool						m_IsLoot = { FALSE };
+	_bool						m_IsLootTrigger = { FALSE };
 
 	HUD_STARPOINT				m_ePreState = { STARPOINT_NONE };
 	HUD_STARPOINT				m_eCurState = { STARPOINT_NONE };
+	
+	_uint						m_iPreCoin = { 0 };
 
-	class CKirby*				m_pKirby = nullptr;
 };
 
 

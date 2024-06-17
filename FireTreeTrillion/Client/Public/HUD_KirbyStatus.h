@@ -10,7 +10,7 @@ class CVIBuffer_Rect;
 END
 
 BEGIN(Client)
-class CHUD_KirbyStatus : public CUIObject
+class CHUD_KirbyStatus : public CHUD
 {
 private:
 	CHUD_KirbyStatus(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -35,17 +35,21 @@ private:
 	HRESULT						Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom);
 
 	void						Update_UIState(_float _fTimeDelta);
-	//void						Play_Animation(_float _fTimeDelta, HUD_KIRBYHP _eCurState);
+	void						Play_Animation(_float _fAccTime, HUD_KIRBYHP _eCurState);
 
 	void						Compute_Player_Hp(_float fTimeDelta);
 
-	// 마스킹을 위한 텍스쳐
-	CTexture* m_pTextureMask = { nullptr };
+private:
+	_bool						m_IsMovingUP = { TRUE };
 
+	HUD_KIRBYHP					m_ePreState = { KIRBYHP_NONE };
+	HUD_KIRBYHP					m_eCurState = { KIRBYHP_NONE };
+
+	// 마스킹을 위한 텍스쳐
+	CTexture*					m_pTextureMask = { nullptr };
 
 	// 분홍색 게이지에 대한 마스킹 비율
 	_float						m_fHpRatio = { 1.f };
-
 
 	// 노란색 게이지에 대한 마스킹 비율
 	_float						m_fHpSlowRatio = { 1.f };
@@ -53,6 +57,8 @@ private:
 	_float						m_fAlarmColor = { 0.f };
 
 	_float						m_fAccDamageTime = { 0.f };
+	_float						m_fAccHealTime = { 0.f };
+
 	//_bool						m_bInitializeRatio = { true };
 	_bool						m_bComputeDeltaGauge = { true };
 
@@ -73,8 +79,8 @@ private:
 	class CKirby*				m_pKirby = nullptr;
 
 public:
-	static CHUD_KirbyStatus* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	virtual CGameObject* Clone(void* pArg) override;
+	static CHUD_KirbyStatus*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	virtual CGameObject*		Clone(void* pArg) override;
 	virtual void				Free() override;
 };
 

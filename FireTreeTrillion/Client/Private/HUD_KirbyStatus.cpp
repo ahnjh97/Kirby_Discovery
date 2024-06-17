@@ -3,12 +3,12 @@
 #include "Kirby.h"
 
 CHUD_KirbyStatus::CHUD_KirbyStatus(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext)
-	: CUIObject{ _pDevice, _pContext }
+	: CHUD{ _pDevice, _pContext }
 {
 }
 
 CHUD_KirbyStatus::CHUD_KirbyStatus(const CHUD_KirbyStatus& _rhs)
-	: CUIObject{ _rhs }
+	: CHUD{ _rhs }
 {
 }
 
@@ -74,8 +74,11 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 	m_fSaveMyY = m_UIObjDesc.vPos.y - m_UIObjDesc.vCenter.y + m_UIObjDesc.vCenter.y;
 
 	// 쉐이킹 진폭 초기화
-	m_fAmplitude = 20.f;
+	m_fAmplitude = 0.001f;
 
+	m_eCurState = KIRBYHP_WAIT;
+	m_ePreState = KIRBYHP_HIDE;
+	
 	// 커비 부르기 
 	m_pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
 
@@ -88,6 +91,8 @@ _int CHUD_KirbyStatus::Tick(_float fTimeDelta)
 	__super::Tick(fTimeDelta);
 
 	Compute_Player_Hp(fTimeDelta);
+
+	Update_UIState(fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
@@ -112,6 +117,9 @@ HRESULT CHUD_KirbyStatus::Render()
 		_float2 vFontScale = { 1.2f, 1.2f };
 
 		wstring wstrFontTag = { TEXT("Font_HUDSub_KR15") };
+
+		if (KIRBYHP_WAIT == m_eCurState && KIRBYHP_HIDE == m_ePreState)
+			return S_OK;
 
 		m_pGameInstance->Render_Font(wstrFontTag, m_UIObjDesc.wstrText, vFontPos, vFontRGBA,
 			XMConvertToRadians(m_UIObjDesc.vDegree.z), vFontOrig, vFontScale);
@@ -143,6 +151,9 @@ HRESULT CHUD_KirbyStatus::Add_Components()
 
 HRESULT CHUD_KirbyStatus::Render_BindSet(CShader* _pShaderCom, CTransform* _pTransCom)
 {
+	if (KIRBYHP_WAIT == m_eCurState && KIRBYHP_HIDE == m_ePreState)
+		return S_OK;
+
 	CHECK_NULLPTR(_pShaderCom);
 
 	if (FAILED(_pTransCom->Bind_ShaderResource(_pShaderCom, "g_WorldMatrix")))
@@ -174,7 +185,6 @@ HRESULT CHUD_KirbyStatus::Render_BindSet(CShader* _pShaderCom, CTransform* _pTra
 
 HRESULT CHUD_KirbyStatus::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTexture* _pTextureCom, _uint _iTexIndex)
 {
-
 	if (TEXT("Gauge") == m_UIObjDesc.wstrUITag)
 	{
 		m_pTextureMask->Bind_ShaderResource(_pShaderCom, "g_MaskTexture", 0);
@@ -218,6 +228,122 @@ HRESULT CHUD_KirbyStatus::Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom)
 
 void CHUD_KirbyStatus::Update_UIState(_float _fTimeDelta)
 {
+	switch (m_eCurState)
+	{
+	case CHUD::KIRBYHP_IDLE: // 1) 렌더x 기본 상태
+		if (KIRBYHP_HIDE == m_ePreState)	//이전 상태가 HIDE인 경우, 기본값으로 세팅
+			m_eCurState = KIRBYHP_WAIT;
+		break;
+
+	case CHUD::KIRBYHP_WAIT: // 3) 특정 이벤트 이후 대기 상태
+		if (KIRBYHP_DAMAGE == m_ePreState)	//이전 피격받았을 경우,
+		{
+			m_fAccTime += _fTimeDelta;
+			if (m_fAccTime > 5.f)
+			{
+				m_eCurState = KIRBYHP_HIDE; //3-A) 이후 숨김 상태로 변경
+				m_fAccTime = 0.f;
+			}
+		}
+		else
+			Play_Animation(m_fAccTime, KIRBYHP_WAIT);
+		break;
+
+	case CHUD::KIRBYHP_HIDE: // 4) 숨김 상태
+		m_fAccTime += _fTimeDelta;
+		if (m_fAccTime > 0.16f)
+		{
+ 			m_fAccTime = 0.f;
+			m_eCurState = KIRBYHP_IDLE;	//4-A) 시간 경과 후 대기 상태로 변경 (렌더X)
+			m_ePreState = KIRBYHP_HIDE;
+		}
+		else
+			Play_Animation(m_fAccTime, KIRBYHP_HIDE);
+		break;
+
+	//Frame 52 > 77
+	case CHUD::KIRBYHP_DAMAGE: // 2) 피격 상태
+		m_fAccTime += _fTimeDelta;
+		if (m_fAccTime >= 25.f / 144.f)
+		{
+			m_fAccTime = 0.f;
+			m_eCurState = KIRBYHP_WAIT;
+			m_ePreState = KIRBYHP_DAMAGE;
+		}
+		else
+			Play_Animation(m_fAccTime, KIRBYHP_DAMAGE);
+		break;
+
+	case CHUD::KIRBYHP_HEAL: //
+		break;
+
+	case CHUD::KIRBYHP_NONE:
+	default:	break;
+	}
+}
+
+void CHUD_KirbyStatus::Play_Animation(_float _fAccTime, HUD_KIRBYHP _eCurState)
+{
+	_float4 vWAITPos = { 0.f, 0.f, 0.f, 0.f };
+
+	switch (m_eCurState)
+	{
+	case CHUD::KIRBYHP_IDLE: //기본 상태에서 위치 값을 저장
+		break;
+
+	case CHUD::KIRBYHP_WAIT:
+		//vWAITPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		if (TEXT("Base") == m_UIObjDesc.wstrUITag || TEXT("Shadow") == m_UIObjDesc.wstrUITag)
+			m_UIObjDesc.vPos = { -0.39f, 0.21f, 1.0f };
+
+		if (TEXT("Blur") == m_UIObjDesc.wstrUITag)
+			m_UIObjDesc.vPos = { -0.39f, 0.21f, 0.99f };
+
+		if (TEXT("Gauge_Base") == m_UIObjDesc.wstrUITag)
+			m_UIObjDesc.vPos = { -0.35f, 0.19f, 0.9f };
+
+		if (TEXT("Gauge_Damage") == m_UIObjDesc.wstrUITag)
+			m_UIObjDesc.vPos = { -0.35f, 0.19f, 0.89f };
+
+		if (TEXT("Gauge") == m_UIObjDesc.wstrUITag)
+			m_UIObjDesc.vPos = { -0.34f, 0.18f, 0.88f };
+
+		if (TEXT("Name") == m_UIObjDesc.wstrUITag)
+			m_UIObjDesc.vPos = { -750.f, 413.f, 0.f };
+
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION,
+			XMVectorSet(m_UIObjDesc.vPos.x - m_UIObjDesc.vCenter.x + m_UIObjDesc.vCenter.x,
+				m_UIObjDesc.vPos.y - m_UIObjDesc.vCenter.y + m_UIObjDesc.vCenter.y,
+				m_UIObjDesc.vPos.z, 1.f));
+	
+		break;
+
+	case CHUD::KIRBYHP_HIDE: //X값 좌측 이동, 알파 값 죽이기
+		if (m_UIObjDesc.wstrUITag == TEXT("Name"))
+			m_UIObjDesc.vPos.x -= 40.f;
+
+		m_UIObjDesc.vPos.x -= 0.05f;
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION,
+			XMVectorSet(m_UIObjDesc.vPos.x - m_UIObjDesc.vCenter.x + m_UIObjDesc.vCenter.x,
+				m_UIObjDesc.vPos.y - m_UIObjDesc.vCenter.y + m_UIObjDesc.vCenter.y,
+				m_UIObjDesc.vPos.z, 1.f));
+
+		m_UIObjDesc.fAlpha -= 1.f / 255.f * _fAccTime;
+
+		if (m_UIObjDesc.fAlpha < 1.f / 255.f)
+			m_UIObjDesc.fAlpha = 1.f / 255.f;
+		break;
+
+	case CHUD::KIRBYHP_DAMAGE:
+		//m_pTransformCom->Set_State(CTransform::STATE_POSITION, vStateWAITPos);
+		break;
+
+	case CHUD::KIRBYHP_HEAL:
+		break;
+
+	case CHUD::KIRBYHP_NONE:
+	default:	break;
+	}
 }
 
 void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta)
@@ -236,16 +362,16 @@ void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta)
 #pragma endregion
 
 #pragma region 노란색 게이지 공식
-
 	// 피가 닳았다는 신호이다.
 	if (m_fHpRatio < m_fHpSlowRatio)
 	{
+		m_eCurState = KIRBYHP_DAMAGE;
+
 		// 만약, 현재 피통과 느리게 따라오는 피통의 비율이 다를경우 가산하기 시작한다.
 		m_fAccDamageTime += fTimeDelta;
 
 		// 여기에서부터 반짝이 시작
 		m_bAlarm = true;
-
 
 		// 한번만 발동시켜주는 트리거
 		if (m_bShakingTrigger == true)
@@ -259,7 +385,8 @@ void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta)
 	else if (m_fHpRatio > m_fHpSlowRatio)
 	{
 		// 이곳은 피가 차는 곳이다.
-
+		m_fAccHealTime += fTimeDelta;
+		m_bAlarm = TRUE;
 	}
 
 	// 만약, 0.8초가 지났으면 그제서야 m_fHpSlowRatio 가 HpRatio 를 따라간다.
@@ -296,10 +423,33 @@ void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta)
 		}
 	}
 
-	// 피가 차는 로직
-	if (true)
+	// 피 회복 (셰이킹 x)
+	if (m_fAccHealTime > 0.8f)
 	{
+		// 한번 계산을 위해 키는 불 값
+		if (m_bComputeDeltaGauge == true)
+		{
+			// 0.8초가 지났을 때, 내가 가야하는 거리를 계산한 것이다.
+			m_fDistanceGauge = m_fHpSlowRatio - m_fHpRatio;
 
+			m_bComputeDeltaGauge = false;
+		}
+		else
+		{
+			_float fOffSet = 2.f;
+			m_fHpSlowRatio -= fTimeDelta * m_fDistanceGauge * fOffSet;
+
+			// Slow비율이 만약, 현재 HP보다 작아졌다면? (따라왔다는 뜻)
+			if (m_fHpSlowRatio > m_fHpRatio)
+			{
+				m_fHpSlowRatio = m_fHpRatio;
+				m_bComputeDeltaGauge = true;
+				m_fAccDamageTime = 0.f;
+
+				// 여기에서 반짝이 끝
+				m_bAlarm = false;
+			}
+		}
 	}
 
 	// 노란 게이지가 반짝이가 되는 중
@@ -307,7 +457,7 @@ void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta)
 	{
 		m_fAlarmTime += fTimeDelta * 40.f;
 
-		//				-1 ~ 1 사이의 범위 -> -0.5 ~ 0.5 사이의 범위
+		//-1 ~ 1 사이의 범위 -> -0.5 ~ 0.5 사이의 범위
 		m_fAlarmColor = (sin(m_fAlarmTime)) * 0.5f;
 	}
 	// 노란 게이지가 반짝이지 않는 중
@@ -316,14 +466,12 @@ void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta)
 		m_fAlarmColor = 0.f;
 		m_fAlarmTime = 0.f;
 	}
-
 #pragma endregion
 
 #pragma region 피통 UI 쉐이킹 코드
 
-	if(m_bShaking == true)
+	if (m_bShaking == TRUE)
 	{
-		/*
 		// 진동 주기
 		_float fCycle = 50.f;
 
@@ -331,21 +479,22 @@ void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta)
 		m_fShakingAcc += fTimeDelta * fCycle;
 		_float fShakePosY = sin(m_fShakingAcc) * m_fAmplitude;
 
-		m_fAmplitude -= fTimeDelta * 50.f;
+		m_fAmplitude -= fTimeDelta * 0.005f;
 
 		_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 		vPos.y = m_fSaveMyY + fShakePosY;
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION,vPos);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 
 		if (m_fShakingTime > 0.4f)
 		{
 			m_fShakingTime = 0.f;
-			m_bShaking = false;
-			m_fAmplitude = 20.f;
-		}
-		*/
-	}
+			m_bShaking = FALSE;
+			m_fAmplitude = 0.005f;
 
+			vPos.y = m_fSaveMyY;
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+		}
+	}
 #pragma endregion
 
 }
