@@ -79,6 +79,7 @@
 #include "KickableRock.h"
 #include "WasteCan.h"
 #include "StarBlock.h"
+#include "StarBlockPiece.h"
 
 //UI
 #include "BackGround.h"
@@ -273,6 +274,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Ladder"), CLadder);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KickableRock"), CKickableRock);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("StarBlock"), CStarBlock);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("StarBlockPiece"), CStarBlockPiece);
 #pragma endregion
 
 	return S_OK;
@@ -351,6 +353,13 @@ HRESULT CLoader::Loading_For_Intro()
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Moon", "Moon.png")))
 		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Level_0_Env", "Map/Level_0_Env.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "BRDF_LUT", "Map/BRDF_LUT.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "RandomNormal", "Map/RandomNormal.png")))
+		return E_FAIL;
+
 
 	// 커비 얼굴 텍스쳐 로드
 	Add_KirbyFaceTexture(eLevel);
@@ -358,6 +367,7 @@ HRESULT CLoader::Loading_For_Intro()
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
 #pragma region 모델
+	Load_AnimToolInfo();
 	// 모아놓은 Model 한번에 생성.
 	hr = Add_Models(eLevel);
 	CHECK_FAILED(hr);
@@ -802,6 +812,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("StarBlockM", TYPE_NONANIM, 1.f, 0.f, 0, false, string("MapDeco/"));
 		m_vecModelInfo.emplace_back("StarBlockS", TYPE_NONANIM, 1.f, 0.f, 0, false, string("MapDeco/"));
 		m_vecModelInfo.emplace_back("WoodParts", TYPE_ANIM, 1.f, 0.f, 0, false, string("MapDeco/"));
+		m_vecModelInfo.emplace_back("StarBlockPiece", TYPE_NONANIM, 0.5f, 180.f);
+		m_vecModelInfo.emplace_back("StarBlockPieceStar", TYPE_NONANIM, 0.5f, 180.f);
 
 
 		// For Item

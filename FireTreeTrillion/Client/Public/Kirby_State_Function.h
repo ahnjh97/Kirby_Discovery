@@ -1059,8 +1059,8 @@ static void SwordHit(CTransform* pTransformCom)
 	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
 
 	MultiFXDesc.vInitPos = pTransformCom->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, .4f, 0.f };
-	MultiFXDesc.vInitScale = {5.f, 5.f, 5.f };
-	MultiFXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(CGameInstance::Get_Instance()->Get_CamLook()).y, CUtils::Make_RandomFloat(-10.f, 10.f)};
+	MultiFXDesc.vInitScale = {3.f, 3.f, 3.f };
+	MultiFXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(CGameInstance::Get_Instance()->Get_CamLook()).y, CUtils::Make_RandomFloat(-5.f, 5.f)};
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SwordHit_v1"), &MultiFXDesc)))
 		return;
 }
@@ -1071,7 +1071,7 @@ static void SwordHit_Big(CTransform* pTransformCom)
 
 	MultiFXDesc.vInitPos = pTransformCom->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, .4f, 0.f };
 	MultiFXDesc.vInitScale = { 10.f, 10.f, 10.f };
-	MultiFXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(CGameInstance::Get_Instance()->Get_CamLook()).y, CUtils::Make_RandomFloat(-10.f, 10.f) };
+	MultiFXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(CGameInstance::Get_Instance()->Get_CamLook()).y, CUtils::Make_RandomFloat(-5.f, 5.f) };
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SwordHit_v1"), &MultiFXDesc)))
 		return;
 }
