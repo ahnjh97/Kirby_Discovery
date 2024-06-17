@@ -30,7 +30,7 @@ HRESULT CRenderer::Initialize()
 	m_pContext->RSGetViewports(&iNumViewports, &ViewportDesc);
 
 	Color_Initialize();
-	Set_ColorSet(Find_ColorSet("Stage1"));
+	Set_ColorSet(Find_ColorSet("Tutorial"));
 
 
 #pragma region MRT_Sky
@@ -404,17 +404,19 @@ void CRenderer::Color_Initialize()
 
 	Save_ColorSet("Tutorial",
 		COLOR_DATA{
-		.39f, 1.f, .80f,	1.74f, .99f, .90f, 1.05f,
-		{.94f, .6f, .6f},
-		{1.05f, 1.01f, 1.22f},
-		{73.f / 255.f, 15.f / 255.f, 89.f / 255.f},
-		.29f,
-		{61.f / 255.f, 186.f / 255.f, 173.f / 255.f},
-		.48f,
-		{1.f, 216.f / 255.f, 65.f / 255.f},
-		.34f,
-		.33f,
-		.60f
+		1.00999f,
+		1.f,
+		0.940155f,
+		1.30984f,0.859977f, 1.04722f, 1.05019f, 0.690178f,0.6f,0.6f,1.02006f,0.960001f,1.04f,0.253046f,0.0210087f,0.0958922f,0.129992f,0.917647f,0.513726f,
+		0.145098f, 0.16998f, 1.f, 0.847059f, 0.254902f, 0.330203f, 0.13988f, 0.559918f
+		});
+
+	Save_ColorSet("Forest",
+		COLOR_DATA{
+		0.749935f, 1.f, 0.950082f, 1.29995f, 0.940233f,
+		1.03741f, 1.04021f, 0.770378f, 0.6f, 0.6f, 0.680005f, 0.96f,
+		1.04f, 0.262838f, 0.0217608f, 0.115752f, 0.120319f, 0.917647f, 0.513726f, 0.145098f, 0.179724f, 1.f, 0.847059f,
+		0.254902f, 0.339907f, 0.130231f, 0.569551f
 		});
 
 	Save_ColorSet("Night",
@@ -434,7 +436,7 @@ void CRenderer::Color_Initialize()
 
 	Save_ColorSet("Stage1",
 		COLOR_DATA{
-		0.829539f, 1.f, 1.00999f, 1.44943f, 1.17964f, 1.14037f, 1.11018f, 0.720338f, 0.6f, 0.6f, 1.3f, 1.06f, 1.1f, 0.0649942f, 0.0378847f, 0.199115f, 0.00958735f, 0.466084f, 0.676991f, 0.218674f, 0.0796085f, 0.499961f, 0.912908f, 0.99115f, 0.209722f, 0.209559f, 0.340393f
+		0.79f, 1.f, 1.00999f, 1.44943f, 1.17964f, 1.14037f, 1.11018f, 0.720338f, 0.6f, 0.6f, 1.3f, 1.06f, 1.1f, 0.0649942f, 0.0378847f, 0.199115f, 0.00958735f, 0.466084f, 0.676991f, 0.218674f, 0.0796085f, 0.499961f, 0.912908f, 0.99115f, 0.209722f, 0.209559f, 0.340393f
 		});
 
 	//쉐이더 타입 트리거는 idx 1, 접촉하면 해당 함수를 호출!
@@ -579,9 +581,9 @@ void CRenderer::Key_Input()
 #endif
 
 	if (m_pGameInstance->Get_KeyState(DIK_F5, KEY_DOWN))
-		Set_ColorSet(Find_ColorSet("Default"));
-	if (m_pGameInstance->Get_KeyState(DIK_F6, KEY_DOWN))
 		Set_ColorSet(Find_ColorSet("Tutorial"));
+	if (m_pGameInstance->Get_KeyState(DIK_F6, KEY_DOWN))
+		Set_ColorSet(Find_ColorSet("Forest"));
 	if (m_pGameInstance->Get_KeyState(DIK_F7, KEY_DOWN))
 		Set_ColorSet(Find_ColorSet("Night"));
 	if (m_pGameInstance->Get_KeyState(DIK_F8, KEY_DOWN))
@@ -617,19 +619,22 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 	switch (iSetIdx)
 	{
 	case 0:
-		m_DestColorData = Find_ColorSet("Default");
+		m_DestColorData = Find_ColorSet("Tutorial");
 		break;
 	case 1:
 		m_DestColorData = Find_ColorSet("Tutorial");
 		break;
 	case 2:
-		m_DestColorData = Find_ColorSet("Tutorial");
+		m_DestColorData = Find_ColorSet("Night");
 		break;
 	case 3:
+	{
 		m_DestColorData = Find_ColorSet("Stage1");
+		m_pGameInstance->PlayBGM(L"Running Through the New World.mp3");
+	}
 		break;
 	default:
-		m_DestColorData = Find_ColorSet("Default");
+		m_DestColorData = Find_ColorSet("Tutorial");
 		break;
 	}
 }

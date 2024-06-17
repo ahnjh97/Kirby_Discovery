@@ -418,7 +418,8 @@ void CCamera_Main::UpdatePos_FromAnchor(_float fTimeDelta)
 			m_pTransformCom->Move(vDestYDir * fTimeDelta * 2.5f);
 		else
 		{
-			m_pTransformCom->Move((1.f < vDestYDir.Length()) ? _float4{ 0.f, -1.f, 0.f, 0.f } *fTimeDelta * 6.f : vDestYDir * fTimeDelta * 2.5f);
+			m_pTransformCom->Move((1.f < vDestYDir.Length()) ? _float4{ 0.f, -1.f, 0.f, 0.f } *fTimeDelta * 3.f : vDestYDir * fTimeDelta * 2.5f);
+
 		}
 
 	}

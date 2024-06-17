@@ -565,13 +565,13 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 				_float4 vKirbyLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
 
 				FXDesc.vInitPos = { vKirbyPos.x, vKirbyPos.y + .4f, vKirbyPos.z };
-				FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(vKirbyLook).y + 20.f, 0.f };
-				FXDesc.vInitScale = { 1.3f, 1.3f, 1.3f };
+				FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(vKirbyLook).y + 30.f, 0.f };
+				FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
 
 				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
 					return;
 
-				FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(vKirbyLook).y - 20.f, 0.f };
+				FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(vKirbyLook).y - -30.f, 0.f };
 				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
 					return;
 

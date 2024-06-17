@@ -326,8 +326,10 @@ PxRigidStatic* CPhysX::CreateStaticActor(_float4x4& matWorld, _float3* pVertices
     PxShape* pShape = { nullptr };
     if (nullptr == pMaterial)
     {
+\
         PxMaterial* pMtrl = m_pPhysics->createMaterial(0.5f, 0.5f, 0.6f);
         //PxMaterial* pMtrl = m_pPhysics->createMaterial(0.f, 0.f, 0.6f);
+\
         pShape = m_pPhysics->createShape(triGeom, *pMtrl);
     }
     else

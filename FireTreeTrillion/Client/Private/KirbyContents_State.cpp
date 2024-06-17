@@ -48,7 +48,7 @@ void CKirbyGet_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 			if (pKirby->Get_AbilityType() == ABILITY_BOMB)
 				pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
 
-			static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr())->Zoom(0.f);
+			static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr())->Set_FOVY(30.f);
 
 		}
 

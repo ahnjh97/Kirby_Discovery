@@ -310,9 +310,52 @@ void CKirby::Add_AnimEvent()
 		});
 
 	// 사운드 처리
-	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("SpinSlash", [this]() {
-		m_pGameInstance->PlaySound_Free(L"Spin.wav", 0.5f); // 0 ~ 1
+
+#pragma region SLASH
+
+	//SideSlash
+	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("Sound_Slash", [this]() {
+		m_pGameInstance->PlaySound_Free(L"Slash.wav", 0.5f);
 		});
+
+	//SuperSpinSlashEnd, GigantSpinSlash
+	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("Sound_SuperSlash", [this]() {
+		m_pGameInstance->PlaySound_Free(L"SuperSlash.wav", 0.5f);
+		});
+
+
+#pragma endregion
+
+#pragma region SPINSLASH
+
+	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("Sound_SpinSlash", [this]() {
+		m_pGameInstance->PlaySound_Free(L"Spin.wav", 0.5f);
+		});
+
+	//SuperSpinSlashLoop
+	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("Sound_SuperSpinSlash", [this]() {
+		m_pGameInstance->PlaySound_Free(L"SuperSpin.wav", 0.5f);
+		});
+
+#pragma endregion
+
+
+#pragma region CHARGE
+
+	//SpinSlashCharge :: SWORDSTATE_SPINSLASHCHARGE
+	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("Sound_Charge", [this]() {
+		m_pGameInstance->PlaySound_Free(L"Charge.wav", 0.5f);
+		});
+	
+	//완료) SuperSpinSlashChargeStart :: SWORDSTATE_SUPERSPINSLASHCHARGE
+	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("Sound_SuperCharge", [this]() {
+		m_pGameInstance->PlaySound_Free(L"SuperCharge.wav", 0.5f);
+		});
+
+#pragma endregion
+
+
+
 }
 
 void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)

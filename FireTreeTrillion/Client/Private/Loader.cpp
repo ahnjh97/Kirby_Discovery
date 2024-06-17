@@ -79,6 +79,7 @@
 #include "KickableRock.h"
 #include "WasteCan.h"
 #include "StarBlock.h"
+#include "StarBlockPiece.h"
 
 //UI
 #include "BackGround.h"
@@ -273,6 +274,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Ladder"), CLadder);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KickableRock"), CKickableRock);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("StarBlock"), CStarBlock);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("StarBlockPiece"), CStarBlockPiece);
 #pragma endregion
 
 	return S_OK;
@@ -810,6 +812,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("StarBlockM", TYPE_NONANIM, 1.f, 0.f, 0, false, string("MapDeco/"));
 		m_vecModelInfo.emplace_back("StarBlockS", TYPE_NONANIM, 1.f, 0.f, 0, false, string("MapDeco/"));
 		m_vecModelInfo.emplace_back("WoodParts", TYPE_ANIM, 1.f, 0.f, 0, false, string("MapDeco/"));
+		m_vecModelInfo.emplace_back("StarBlockPiece", TYPE_NONANIM, 0.5f, 180.f);
+		m_vecModelInfo.emplace_back("StarBlockPieceStar", TYPE_NONANIM, 0.5f, 180.f);
 
 
 		// For Item
