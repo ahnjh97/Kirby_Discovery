@@ -6,6 +6,11 @@
 #include "BasicMap.h"
 #include "Trigger.h"
 #include "Kirby.h"
+#include "Awoofy.h"
+#include "Rabbit.h"
+#include "Kabu.h"
+#include "BrontoBurt.h"
+#include "PoppyBrosJr.h"
 #include "BG.h"
 
 CLevel_Intro::CLevel_Intro(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -198,6 +203,10 @@ HRESULT CLevel_Intro::Ready_ParsedObjects()
 		fileStream.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
 		strModelName.resize(iStrLength);
 		fileStream.read(&strModelName[0], iStrLength);
+		if (strModelName == "NonAnim_BrontoBurt")
+		{
+			int a = 0;
+		}
 		fileStream.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
 		fileStream.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
 		fileStream.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
@@ -271,12 +280,24 @@ HRESULT CLevel_Intro::Ready_ParsedObjects()
 		}
 		else if (strModelName == "NonAnim_Awoofy")
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Awoofy"), &tempDesc)))
+			CMonster::MONSTER_DESC MonsterDesc = {};
+			MonsterDesc.matWorld = matWorld;
+			MonsterDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			MonsterDesc.iShaderVars = iShaderVars;
+			MonsterDesc.fRimWidth = fRimWidth;
+			MonsterDesc.eMonState = CMonster::MONSTER_STATE(iTriggerIndex);
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Awoofy"), &MonsterDesc)))
 				return E_FAIL;
 		}
 		else if (strModelName == "NonAnim_Rabbit")
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Rabbit"), &tempDesc)))
+			CRabbit::RABBIT_DESC RabbitDesc = {};
+			RabbitDesc.matWorld = matWorld;
+			RabbitDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			RabbitDesc.iShaderVars = iShaderVars;
+			RabbitDesc.fRimWidth = fRimWidth;
+			RabbitDesc.eRabbitState = CRabbit::RABBIT_STATE(iTriggerIndex);
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Rabbit"), &RabbitDesc)))
 				return E_FAIL;
 		}
 		else if (strModelName == "NonAnim_Buffahorn")
@@ -287,6 +308,46 @@ HRESULT CLevel_Intro::Ready_ParsedObjects()
 		else if (strModelName == "NonAnim_BladeKnight")
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BladeKnight"), &tempDesc)))
+				return E_FAIL;
+		}
+		else if (strModelName == "NonAnim_PoppyBrosJr")
+		{
+			CPoppyBrosJr::POPPY_DESC PoppyDesc = {};
+			PoppyDesc.matWorld = matWorld;
+			PoppyDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			PoppyDesc.iShaderVars = iShaderVars;
+			PoppyDesc.fRimWidth = fRimWidth;
+			PoppyDesc.ePoppyState = CPoppyBrosJr::POPPY_STATE(iTriggerIndex);
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_PoppyBrosJr"), &PoppyDesc)))
+				return E_FAIL;
+		}
+		else if (strModelName == "NonAnim_CappyBody")
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_CappyBody"), &tempDesc)))
+				return E_FAIL;
+		}
+		else if (strModelName == "NonAnim_Kabu")
+		{
+			CKabu::KABU_DESC KabuDesc = {};
+			KabuDesc.matWorld = matWorld;
+			KabuDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			KabuDesc.iShaderVars = iShaderVars;
+			KabuDesc.fRimWidth = fRimWidth;
+			KabuDesc.eMonState = CKabu::MONSTER_STATE(iTriggerIndex);
+			KabuDesc.vecRallyPoints = vecRallyPoints;
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Kabu"), &KabuDesc)))
+				return E_FAIL;
+		}
+		else if (strModelName == "NonAnim_BrontoBurt")
+		{
+			CBrontoBurt::BRONTOBURT_DESC BrontoBurtDesc = {};
+			BrontoBurtDesc.matWorld = matWorld;
+			BrontoBurtDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			BrontoBurtDesc.iShaderVars = iShaderVars;
+			BrontoBurtDesc.fRimWidth = fRimWidth;
+			BrontoBurtDesc.eMonState = CBrontoBurt::MONSTER_STATE(iTriggerIndex);
+			BrontoBurtDesc.vecRallyPoints = vecRallyPoints;
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BrontoBurt"), &BrontoBurtDesc)))
 				return E_FAIL;
 		}
 		else if (strModelName == "Level0Stage1Step01")

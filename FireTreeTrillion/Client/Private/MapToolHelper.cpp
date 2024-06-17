@@ -73,7 +73,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 	/*m_setNonColDecos = { "BushMCut" };*/
 	m_setAnimDecos = { "BushL", "BushM", "BushS", "PopFlower" };
-	m_setActorDecos = {  "CmBuilding1stRoof", "CMBuildingParts", "CMGuardrailAL", "CMGuardrailBL"
+	m_setActorDecos = {  "CMBillBoardC", "CmBuilding1stRoof", "CMBuildingParts", "CMGuardrailAL", "CMGuardrailBL"
 		, "CMStreeLightLampA", "CMStreeLightLampE", "CMWaterTankL", "CMHighwayGuardrailACL", "CMHighwayGuardrailAL"
 		, "CMHighwayGuardrailALL", "CMHighwayGuardrailARL", "CMHighwayGuardrailBL", "CMHighwayGuardrailBLL"
 		, "CMHighwayGuardrailBRL", "CMHighwayGuardrailCCL", "CMHighwayGuardrailCL", "CMHighwayGuardrailCLL", "CMHighwayGuardrailCRL"
@@ -810,7 +810,10 @@ void CMapToolHelper::Save_Level()
 			_uint iNumRallyPoints = rallyPoints.size();
 
 			outputFile.write(reinterpret_cast<const char*>(&iNumRallyPoints), sizeof(iNumRallyPoints));
-
+			if (strModelName == "NonAnim_BrontoBurt")
+			{
+				_int a = 0;
+			}
 			for (_uint iRallyPointIdx = 0; iRallyPointIdx < iNumRallyPoints; iRallyPointIdx++)
 			{
 				auto mapIter = rallyPoints.find(iRallyPointIdx);
