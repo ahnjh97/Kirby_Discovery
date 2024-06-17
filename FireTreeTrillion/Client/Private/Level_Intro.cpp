@@ -386,6 +386,11 @@ HRESULT CLevel_Intro::Ready_ParsedObjects()
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_BG"), &tempDesc)))
 				return E_FAIL;
 		}
+		else if (strModelName == "Item_Coin")
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Item"), TEXT("Prototype_GameObject_Coin"), &tempDesc)))
+				return E_FAIL;
+		}
 	}
 	fileStream.close();
 

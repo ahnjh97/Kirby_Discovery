@@ -686,7 +686,7 @@ void CMapToolHelper::OnRightClick()
 		if (m_setMapDecoTxts.end() != m_setMapDecoTxts.find(m_strCurModel))
 			m_pPickedObject->Set_ShaderVars(2);
 
-		iMapTxtIdx = iTriggerTxtIdx = iMonsterTxtIdx = iNonAnimIdx = -1;
+		iMapTxtIdx = iTriggerTxtIdx = iMonsterTxtIdx = iNonAnimIdx = iObjectIdx = -1;
 	}
 }
 
@@ -990,6 +990,10 @@ void CMapToolHelper::Load_Level()
 		else if ("RallyPoint" == strModelName) {
 			tDesc.iTriggerIndex = iTriggerIndex;
 			tDesc.strConnectedMonster = strConnectedMonster;
+		}
+		else if ("Item_Coin" == strModelName)
+		{
+			_int a = 0;
 		}
 			
 
