@@ -1335,7 +1335,7 @@ void CKirbyDefault_Ladder_State::OnStateUpdate(CGameObject* pGameObject, _float 
 		if (pController->Is_Terrain())
 		{
 			DESC(m_bBlockLadder) = true;
-			pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_IDLE);
 		}
 	}
 

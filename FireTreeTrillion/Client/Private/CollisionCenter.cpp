@@ -255,9 +255,7 @@ void CCollisionCenter::Collision_Collider(CONTENT_TYPE eType, CPhysXObject* pSrc
 		}
 
 		pMonsterObj->Collision(CONTENT_ATTACK, pKirby);
-		Damage_To_Monster(pKirby, pMonsterObj);
-		HitStop_Rogic(pKirby);
-		Camera_Shaking(0.7f, 0.5f);
+		Damage_And_Effect_For_Monster(pKirby, pMonsterObj);
 	}
 
 	else if (eType == CONTENT_KICK)
@@ -317,7 +315,8 @@ _bool CCollisionCenter::Small_KnockBack(_uint uKirbyState)
 {
 	return uKirbyState == CKirby::SWORDSTATE_SIDESLASH ||
 		uKirbyState == CKirby::SWORDSTATE_MULITSWORDATTACK ||
-		uKirbyState == CKirby::SWORDSTATE_GIGANTSPINSLASH;
+		uKirbyState == CKirby::SWORDSTATE_GIGANTSPINSLASH ||
+		uKirbyState == CKirby::SWORDSTATE_SUPERSPINSLASHLOOP;
 }
 
 _bool CCollisionCenter::Normal_KnockBack(_uint uKirbyState)
@@ -327,7 +326,7 @@ _bool CCollisionCenter::Normal_KnockBack(_uint uKirbyState)
 
 _bool CCollisionCenter::Up_KnockBack(_uint uKirbyState)
 {
-	return false;
+	return uKirbyState == CKirby::SWORDSTATE_UPWARDSLASH;
 }
 
 _bool CCollisionCenter::FlyAway_KnockBack(_uint uKirbyState)
@@ -335,23 +334,98 @@ _bool CCollisionCenter::FlyAway_KnockBack(_uint uKirbyState)
 	return false;
 }
 
+
 void CCollisionCenter::HitStop_Rogic(CKirby* pKirby)
 {
-	_uint uKirbyState = pKirby->Get_State();
-
-	if (uKirbyState == CKirby::SWORDSTATE_SIDESLASH ||
-		uKirbyState == CKirby::SWORDSTATE_MULITSWORDATTACK ||
-		uKirbyState == CKirby::SWORDSTATE_GIGANTSPINSLASH ||
-		uKirbyState == CKirby::SWORDSTATE_DECISIVESLASH)
-		pKirby->Set_HitStop();
-
+	pKirby->Set_HitStop();
 }
 
-void CCollisionCenter::Damage_To_Monster(CKirby* pKirby, CPhysXObject* pMonster)
+void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObject* pMonster)
 {
 	CCharacter* pCMonster = static_cast<CCharacter*>(pMonster);
+	_float fAttack = { 0.f };
+	_uint uKirbyState = pKirby->Get_State();
 
-	_float fAttack = pKirby->Get_Attack();
+	CTransform* pMonsterTransform = pCMonster->Get_TransformCom();
+	CTransform* pKirbyTransform = pKirby->Get_TransformCom();
+	_float4 vMonsterPos = pMonsterTransform->Get_State(CTransform::STATE_POSITION);
+	_float4 vKirbyPos = pKirbyTransform->Get_State(CTransform::STATE_POSITION);
+
+	_float4 vEffectLook = XMVector3Normalize(vKirbyPos - vMonsterPos);
+	_float4 vEffectRandomPos = vMonsterPos + (vEffectLook * 0.5f) + (_float4)CUtils::Make_Random_Vector(0.5f);
+
+	switch (uKirbyState)
+	{
+	// SWORD 연속기 1타
+	case CKirby::SWORDSTATE_SIDESLASH:
+	{
+		fAttack = 5.f;
+		HitStop_Rogic(pKirby);
+		Camera_Shaking(0.7f, 0.5f);
+
+
+	}
+	break;
+	// SWORD 연속기 2타
+	case CKirby::SWORDSTATE_MULITSWORDATTACK:
+	{
+		fAttack = 5.f;
+		HitStop_Rogic(pKirby);
+		Camera_Shaking(0.7f, 0.5f);
+
+
+
+	}
+	break;
+	// SWORD 연속기 3타
+	case CKirby::SWORDSTATE_DECISIVESLASH:
+	{
+		fAttack = 10.f;
+		HitStop_Rogic(pKirby);
+		Camera_Shaking();
+
+
+
+	}
+	break;
+	// 덜 차징 회전베기
+	case CKirby::SWORDSTATE_GIGANTSPINSLASH:
+	{
+		fAttack = 5.f;
+		HitStop_Rogic(pKirby);
+		Camera_Shaking(0.7f, 0.5f);
+
+
+
+	}
+	break;
+	// 풀 차징 회전베기
+	case CKirby::SWORDSTATE_SUPERSPINSLASHLOOP:
+	{
+		fAttack = 5.f;
+		HitStop_Rogic(pKirby);
+		Camera_Shaking(0.7f, 0.5f);
+
+
+
+	}
+	break;
+	// 위로 올려베기 (대쉬기 중 점프 키)
+	case CKirby::SWORDSTATE_UPWARDSLASH:
+	{
+		fAttack = 10.f;
+		HitStop_Rogic(pKirby);
+		Camera_Shaking();
+
+
+
+	}
+	break;
+	default:
+		fAttack = 5.f;
+		break;
+	}
+
 	pCMonster->Minus_Hp(fAttack);
 }
 
