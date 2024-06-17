@@ -13,8 +13,8 @@ void CKirbyGet_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _f
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 
-	//if(_iAnimIndex == CKirby::STATE_ABILITYDUMP)
-	//	Copy_Star(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0)->Get_TransformCom());
+	if(_iAnimIndex == CKirby::STATE_ABILITYDUMP)
+		LadderStart_FX(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0)->Get_TransformCom());
 }
 
 void CKirbyGet_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
