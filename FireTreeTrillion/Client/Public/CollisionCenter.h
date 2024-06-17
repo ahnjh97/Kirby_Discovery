@@ -58,7 +58,7 @@ private:
 
     void HitStop_Rogic(class CKirby* pKirby);
 
-    void Damage_To_Monster(class CKirby* pKirby, CPhysXObject* pMonster);
+    void Damage_And_Effect_For_Monster(class CKirby* pKirby, CPhysXObject* pMonster);
 #pragma endregion
 
 
