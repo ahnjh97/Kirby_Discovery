@@ -26,7 +26,7 @@ public:
 #ifdef _DEBUG
 	virtual void	Render_IMGUI()								override;
 #endif
-	virtual void	Collision_Hitbox(CPhysXObject* pGameObject) override;
+	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
 private:
 	HRESULT			Add_Components();
@@ -36,6 +36,7 @@ private:
 	CModel*			m_pModelCom = nullptr;
 	CTrigger*		m_pTrigger = nullptr;
 	_bool			m_bActivatePhysX = false;
+	_float			m_fLifeTime = _float();
 
 public:
 	static CWasteCan*	 Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

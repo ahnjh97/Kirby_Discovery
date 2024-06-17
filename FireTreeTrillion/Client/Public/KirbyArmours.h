@@ -17,6 +17,8 @@ public:
 	{
 		_float4x4* pBoneMatrix = { nullptr };
 		ABILITYTYPE* pAbilityType = { nullptr };
+		_float* pWhite = { nullptr };
+		_float* pOverPower = { nullptr };
 	}KIRBYARMOURS_DESC;
 
 private:
@@ -49,6 +51,9 @@ private:
 
 	_float4x4* m_pBoneMatrix = { nullptr };
 	ABILITYTYPE* m_pAbilityType = { nullptr };
+
+	_float* m_pWhiteColorDiffuse = { nullptr };
+	_float* m_fOverPowerColor = { nullptr };
 
 private:
 	HRESULT Add_Components();

@@ -399,7 +399,8 @@ void CBuffahorn_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	{
 		// 일단 그 방향으로 바라보게만 한다.
 		_float3 vDamegeDir = pBuffahorn->Get_DamegeDir();
-		pTransformCom->Look_At_Axis(-vDamegeDir);
+		if (vDamegeDir != XMVectorZero())
+			pTransformCom->Look_At_Axis(-vDamegeDir);
 
 		// 이제 날아가는 것을 구현해보자.
 		//pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 14.f, fTimeDelta);
@@ -412,7 +413,14 @@ void CBuffahorn_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 
 		if (true == pBuffahorn->IsAnimFinished())
-			pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_CHARGEWAIT, 50.f, true, true);
+		{
+			if (pBuffahorn->Get_Hp() <= 0.f)
+				pBuffahorn->Set_Dead();
+			else
+			{
+				pBuffahorn->Change_State(CBuffahorn::BUFFAHORN_CHARGEWAIT, 50.f, true, true);
+			}
+		}
 	}
 	// 날아가는 도중이다.  1초에 360도 회전하며, 30의 거리로 날아간다.
 	else if (pBuffahorn->Get_PhyXState() == PO_FLYAWAY)
@@ -421,6 +429,13 @@ void CBuffahorn_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 30.f, fTimeDelta);
 		pTransformCom->Turn(pTransformCom->Get_State_Vector(CTransform::STATE_UP), fTimeDelta, 360.f);
 		m_fFlyTime += fTimeDelta;
+
+		if (2.f > pController->Compute_Wall(vDamegeDir))
+		{
+			pBuffahorn->Set_PhyXState(PO_FLYDEADAWAY);
+			pBuffahorn->Set_DamageMoving(-1.f * vDamegeDir, 10.f);
+		}
+
 		if (m_fFlyTime > 2.f)
 		{
 			pBuffahorn->Set_Dead();

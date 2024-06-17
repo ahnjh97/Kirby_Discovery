@@ -231,12 +231,23 @@ void CKabu::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pOb
 {
 	if (eContent == CCollisionCenter::CONTENT_BODY)
 	{
-		m_vLook = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
-		Change_State(KABU_DAMAGE, 50.f, false, true);
+		if (m_ePhyXState == PO_NORMAL)
+		{
+			m_vLook = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+			Change_State(KABU_DAMAGE, 50.f, false, true);
+		}
 	}
 	else if (eContent == CCollisionCenter::CONTENT_VACUUMOBJECT)
 	{
 
+	}
+	else if (eContent == CCollisionCenter::CONTENT_ATTACK)
+	{
+		if (m_ePhyXState == PO_NORMAL)
+		{
+			m_vLook = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+			Change_State(KABU_DAMAGE, 50.f, false, true);
+		}
 	}
 }
 
@@ -272,6 +283,7 @@ HRESULT CKabu::Add_Components()
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
+	desc.fOffset = 1.f;
 	desc.strProtoObjName = CUtils::WstrToStr(m_wstrPrototypeTag);
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
