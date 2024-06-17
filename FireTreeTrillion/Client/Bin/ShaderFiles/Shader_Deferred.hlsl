@@ -996,6 +996,7 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
         Out.vColor *= g_fBlackBackGround;
     }
     
+    Out.vColor = saturate(Out.vColor);
     return Out;
 }
 
@@ -1068,7 +1069,7 @@ PS_OUT PS_MAIN_FINAL_FOR_TOOL(PS_IN In)
 
     // 기존 디퓨즈와 가산되어 그려진다.
     Out.vColor += vEffect + (vBlur * 2);
-        
+    Out.vColor = saturate(Out.vColor);
     
     return Out;
 }
@@ -1185,6 +1186,7 @@ PS_OUT PS_MAIN_COLORCORRECT(PS_IN In)
     
     Out.vColor = vColor + vLensFlare;
     
+    Out.vColor = saturate(Out.vColor);
     return Out;
 }
 
