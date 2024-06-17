@@ -60,6 +60,9 @@ _int CCappyHat::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return OBJ_DEAD;
 
+	if (static_cast<CCappyBody*>(m_pGameObject)->Get_Dead())
+		m_bDead = true;
+
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
 	if (m_ePhyXState == PO_VACUUMING || m_ePhyXState == PO_FLYDEADAWAY)

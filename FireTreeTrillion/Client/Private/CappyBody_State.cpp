@@ -228,6 +228,9 @@ void CCappyBody_HatLose_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, 
 
 void CCappyBody_HatLose_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
+	CCappyBody* pCappyBody = static_cast<CCappyBody*>(pGameObject);
+
+	pCappyBody->Set_Render(false);
 }
 
 void CCappyBody_HatLose_State::OnStateExit()
