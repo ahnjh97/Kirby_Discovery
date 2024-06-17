@@ -57,6 +57,8 @@ private:
 	_float						m_fAlarmColor = { 0.f };
 
 	_float						m_fAccDamageTime = { 0.f };
+	_float						m_fAccHealTime = { 0.f };
+
 	//_bool						m_bInitializeRatio = { true };
 	_bool						m_bComputeDeltaGauge = { true };
 

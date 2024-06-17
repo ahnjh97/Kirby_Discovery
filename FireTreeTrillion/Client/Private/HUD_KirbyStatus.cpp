@@ -74,7 +74,7 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 	m_fSaveMyY = m_UIObjDesc.vPos.y - m_UIObjDesc.vCenter.y + m_UIObjDesc.vCenter.y;
 
 	// 쉐이킹 진폭 초기화
-	m_fAmplitude = 20.f;
+	m_fAmplitude = 0.001f;
 
 	m_eCurState = KIRBYHP_IDLE;
 	m_ePreState = KIRBYHP_HIDE;
@@ -91,14 +91,7 @@ _int CHUD_KirbyStatus::Tick(_float fTimeDelta)
 	__super::Tick(fTimeDelta);
 
 	Compute_Player_Hp(fTimeDelta);
-
 	Update_UIState(fTimeDelta);
-
-	if (m_pGameInstance->Get_DIKeyState(DIK_2, KEY_DOWN))
-	{
-		m_fAccTime = 0.f;
-		m_eCurState = KIRBYHP_DAMAGE;
-	}
 
 	return OBJ_NOEVENT;
 }
@@ -300,6 +293,7 @@ void CHUD_KirbyStatus::Play_Animation(_float _fAccTime, HUD_KIRBYHP _eCurState)
 		break;
 
 	case CHUD::KIRBYHP_HIDE: //X값 좌측 이동, 알파 값 죽이기
+		/*
 		if (m_UIObjDesc.wstrUITag == TEXT("Name"))
 			m_UIObjDesc.vPos.x -= 40.f;
 
@@ -313,31 +307,10 @@ void CHUD_KirbyStatus::Play_Animation(_float _fAccTime, HUD_KIRBYHP _eCurState)
 
 		if (m_UIObjDesc.fAlpha < 1.f / 255.f)
 			m_UIObjDesc.fAlpha = 1.f / 255.f;
+		*/
 		break;
 
 	case CHUD::KIRBYHP_DAMAGE:
-		if (m_bShaking == TRUE)
-		{
-			// 진동 주기
-			_float fCycle = 50.f;
-
-			m_fShakingTime += _fAccTime;
-			m_fShakingAcc += _fAccTime * fCycle;
-			_float fShakePosY = sin(m_fShakingAcc) * m_fAmplitude;
-
-			m_fAmplitude -= _fAccTime * 50.f;
-
-			_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-			vPos.y = m_fSaveMyY + fShakePosY;
-			m_pTransformCom->Set_State(CTransform::STATE_POSITION,vPos);
-
-			if (m_fShakingTime > 0.4f)
-			{
-				m_fShakingTime = 0.f;
-				m_bShaking = FALSE;
-				m_fAmplitude = 20.f;
-			}
-		}
 		break;
 
 	case CHUD::KIRBYHP_HEAL:
@@ -364,7 +337,6 @@ void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta)
 #pragma endregion
 
 #pragma region 노란색 게이지 공식
-
 	// 피가 닳았다는 신호이다.
 	if (m_fHpRatio < m_fHpSlowRatio)
 	{
@@ -373,7 +345,6 @@ void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta)
 
 		// 여기에서부터 반짝이 시작
 		m_bAlarm = true;
-
 
 		// 한번만 발동시켜주는 트리거
 		if (m_bShakingTrigger == true)
@@ -387,7 +358,8 @@ void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta)
 	else if (m_fHpRatio > m_fHpSlowRatio)
 	{
 		// 이곳은 피가 차는 곳이다.
-
+		m_fAccHealTime += fTimeDelta;
+		m_bAlarm = TRUE;
 	}
 
 	// 만약, 0.8초가 지났으면 그제서야 m_fHpSlowRatio 가 HpRatio 를 따라간다.
@@ -424,10 +396,33 @@ void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta)
 		}
 	}
 
-	// 피가 차는 로직
-	if (true)
+	// 피 회복 (셰이킹 x)
+	if (m_fAccHealTime > 0.8f)
 	{
+		// 한번 계산을 위해 키는 불 값
+		if (m_bComputeDeltaGauge == true)
+		{
+			// 0.8초가 지났을 때, 내가 가야하는 거리를 계산한 것이다.
+			m_fDistanceGauge = m_fHpSlowRatio - m_fHpRatio;
 
+			m_bComputeDeltaGauge = false;
+		}
+		else
+		{
+			_float fOffSet = 2.f;
+			m_fHpSlowRatio -= fTimeDelta * m_fDistanceGauge * fOffSet;
+
+			// Slow비율이 만약, 현재 HP보다 작아졌다면? (따라왔다는 뜻)
+			if (m_fHpSlowRatio > m_fHpRatio)
+			{
+				m_fHpSlowRatio = m_fHpRatio;
+				m_bComputeDeltaGauge = true;
+				m_fAccDamageTime = 0.f;
+
+				// 여기에서 반짝이 끝
+				m_bAlarm = false;
+			}
+		}
 	}
 
 	// 노란 게이지가 반짝이가 되는 중
@@ -435,7 +430,7 @@ void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta)
 	{
 		m_fAlarmTime += fTimeDelta * 40.f;
 
-		//				-1 ~ 1 사이의 범위 -> -0.5 ~ 0.5 사이의 범위
+		//-1 ~ 1 사이의 범위 -> -0.5 ~ 0.5 사이의 범위
 		m_fAlarmColor = (sin(m_fAlarmTime)) * 0.5f;
 	}
 	// 노란 게이지가 반짝이지 않는 중
@@ -444,8 +439,37 @@ void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta)
 		m_fAlarmColor = 0.f;
 		m_fAlarmTime = 0.f;
 	}
-
 #pragma endregion
+
+#pragma region 피통 UI 쉐이킹 코드
+
+	if (m_bShaking == TRUE)
+	{
+		// 진동 주기
+		_float fCycle = 50.f;
+
+		m_fShakingTime += fTimeDelta;
+		m_fShakingAcc += fTimeDelta * fCycle;
+		_float fShakePosY = sin(m_fShakingAcc) * m_fAmplitude;
+
+		m_fAmplitude -= fTimeDelta * 0.005f;
+
+		_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		vPos.y = m_fSaveMyY + fShakePosY;
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+
+		if (m_fShakingTime > 0.4f)
+		{
+			m_fShakingTime = 0.f;
+			m_bShaking = FALSE;
+			m_fAmplitude = 0.005f;
+
+			vPos.y = m_fSaveMyY;
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+		}
+	}
+#pragma endregion
+
 }
 
 CHUD_KirbyStatus* CHUD_KirbyStatus::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

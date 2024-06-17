@@ -477,8 +477,6 @@ void CCollisionCenter::Compute_Coin(CPhysXObject* pPlayer, CPhysXObject* pItem)
 	CKirby* pCPlayer = static_cast<CKirby*>(pPlayer);
 	CItemObject* pIItem = static_cast<CItemObject*>(pItem);
 
-	// fItemPoint는 코인이 오르는 포인트임 저게 올라야할 "코인점수"임
-	// 만약, int 형으로 올라야한다면 형변환 꼭 해주셔!!!
 	_float fItemPoint = (_float)pIItem->Get_ItemPoint();
 	pCPlayer->Plus_Coin((_uint)fItemPoint);
 }
