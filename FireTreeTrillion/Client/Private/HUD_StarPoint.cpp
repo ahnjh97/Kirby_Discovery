@@ -71,12 +71,8 @@ HRESULT CHUD_StarPoint::Initialize(void* _pArg)
 
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 
-	//m_eCurState = STARPOINT_WAIT;
-	//m_ePreState = STARPOINT_HIDE;
-
-	m_pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
-	CHECK_NULLPTR(m_pKirby);
-	m_iPreCoin = m_pKirby->Get_Coin();
+	m_eCurState = STARPOINT_WAIT;
+	m_ePreState = STARPOINT_HIDE;
 
 	return S_OK;
 }
@@ -85,11 +81,27 @@ _int CHUD_StarPoint::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
-	//Update_UIState(fTimeDelta);
+	Update_UIState(fTimeDelta);
+
+	
+	if (m_IsKirbyEX == FALSE)
+	{
+		m_pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+		//CHECK_NULLPTR(m_pKirby);
+		if (m_pKirby)
+		{
+			m_iPreCoin = m_pKirby->Get_Coin();
+			m_IsKirbyEX = TRUE;
+		}
+	}
+
+	if (m_pKirby == nullptr)
+		return OBJ_NOEVENT;
 
 	//이전 재화량 대비 현재 재화량 비교
- 	_uint iCurCoin = m_pKirby->Get_Coin();
+	_uint iCurCoin = m_pKirby->Get_Coin();
 	if (iCurCoin > m_iPreCoin)
+	//if (m_pGameInstance->Get_DIKeyState(DIK_1, KEY_DOWN)) //테스트용
 	{
 		m_IsLootTrigger = TRUE;
 		m_iPreCoin = iCurCoin;
@@ -151,8 +163,8 @@ HRESULT CHUD_StarPoint::Render()
 				return S_OK;
 		}
 	
-		//if (STARPOINT_WAIT == m_eCurState && STARPOINT_HIDE == m_ePreState)
-		//	return S_OK;
+		if (STARPOINT_WAIT == m_eCurState && STARPOINT_HIDE == m_ePreState)
+			return S_OK;
 
 		m_pGameInstance->Render_Font(wstrFontTag, m_UIObjDesc.wstrText, vFontPos, vFontRGBA,
 			XMConvertToRadians(m_UIObjDesc.vDegree.z), vFontOrig, vFontScale);
@@ -180,8 +192,8 @@ HRESULT CHUD_StarPoint::Add_Components()
 
 HRESULT CHUD_StarPoint::Render_BindSet(CShader* _pShaderCom, CTransform* _pTransCom)
 {
-	//if (STARPOINT_WAIT == m_eCurState && STARPOINT_HIDE == m_ePreState)
-	//	return S_OK;
+	if (STARPOINT_WAIT == m_eCurState && STARPOINT_HIDE == m_ePreState)
+		return S_OK;
 
 	//마스크도 어색해서 잠시 OFF 처리. 추후 디벨롭 필요
 	if (m_UIObjDesc.wstrUITag == TEXT("Effect_Mask"))
@@ -318,22 +330,10 @@ void CHUD_StarPoint::Play_Animation(_float _fAccTime, HUD_STARPOINT _eCurState)
 	
 	case CHUD::STARPOINT_WAIT:
 		if (TEXT("Base") == m_UIObjDesc.wstrUITag || TEXT("Blur") == m_UIObjDesc.wstrUITag)
-		{
 			m_UIObjDesc.vPos = { 0.4f, 0.22f, 1.0f };
-			m_pTransformCom->Set_State(CTransform::STATE_POSITION,
-				XMVectorSet(m_UIObjDesc.vPos.x - m_UIObjDesc.vCenter.x + m_UIObjDesc.vCenter.x,
-					m_UIObjDesc.vPos.y - m_UIObjDesc.vCenter.y + m_UIObjDesc.vCenter.y,
-					m_UIObjDesc.vPos.z, 1.f));
-		}
 
 		if (TEXT("Icon") == m_UIObjDesc.wstrUITag)
-		{
 			m_UIObjDesc.vPos = { 0.32f, 0.20f, 0.9f };
-			m_pTransformCom->Set_State(CTransform::STATE_POSITION,
-				XMVectorSet(m_UIObjDesc.vPos.x - m_UIObjDesc.vCenter.x + m_UIObjDesc.vCenter.x,
-					m_UIObjDesc.vPos.y - m_UIObjDesc.vCenter.y + m_UIObjDesc.vCenter.y,
-					m_UIObjDesc.vPos.z, 1.f));
-		}
 
 		if (m_UIObjDesc.wstrUITag == TEXT("Effect"))
 		{
@@ -351,6 +351,13 @@ void CHUD_StarPoint::Play_Animation(_float _fAccTime, HUD_STARPOINT _eCurState)
 
 			m_UIObjDesc.fAlpha = 10.f / 255.f;
 		}
+
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION,
+			XMVectorSet(m_UIObjDesc.vPos.x - m_UIObjDesc.vCenter.x + m_UIObjDesc.vCenter.x,
+				m_UIObjDesc.vPos.y - m_UIObjDesc.vCenter.y + m_UIObjDesc.vCenter.y,
+				m_UIObjDesc.vPos.z, 1.f));
+
+
 		if (m_UIObjDesc.wstrUITag == TEXT("Font100_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font10_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font1_Shadow"))
 			m_UIObjDesc.vPos = { 658.f, 406.f, 0.f };
 
