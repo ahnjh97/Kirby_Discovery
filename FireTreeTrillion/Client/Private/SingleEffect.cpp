@@ -108,7 +108,8 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 	//true 반환하면 lifetime 끝난 것.
 	if (Calculate_Lifetime(_fTimeDelta))
 	{
-		m_bNoRender = true;
+		if(*m_pCurrentLevelID != LEVEL_TOOL_FX)
+			m_bNoRender = true;
 	}
 
 
