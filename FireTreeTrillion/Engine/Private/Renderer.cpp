@@ -411,6 +411,14 @@ void CRenderer::Color_Initialize()
 		0.145098f, 0.16998f, 1.f, 0.847059f, 0.254902f, 0.330203f, 0.13988f, 0.559918f
 		});
 
+	Save_ColorSet("Forest",
+		COLOR_DATA{
+		0.749935f, 1.f, 0.950082f, 1.29995f, 0.940233f,
+		1.03741f, 1.04021f, 0.770378f, 0.6f, 0.6f, 0.680005f, 0.96f,
+		1.04f, 0.262838f, 0.0217608f, 0.115752f, 0.120319f, 0.917647f, 0.513726f, 0.145098f, 0.179724f, 1.f, 0.847059f,
+		0.254902f, 0.339907f, 0.130231f, 0.569551f
+		});
+
 	Save_ColorSet("Night",
 		COLOR_DATA{
 		0.75f,
@@ -573,9 +581,9 @@ void CRenderer::Key_Input()
 #endif
 
 	if (m_pGameInstance->Get_KeyState(DIK_F5, KEY_DOWN))
-		Set_ColorSet(Find_ColorSet("Default"));
-	if (m_pGameInstance->Get_KeyState(DIK_F6, KEY_DOWN))
 		Set_ColorSet(Find_ColorSet("Tutorial"));
+	if (m_pGameInstance->Get_KeyState(DIK_F6, KEY_DOWN))
+		Set_ColorSet(Find_ColorSet("Forest"));
 	if (m_pGameInstance->Get_KeyState(DIK_F7, KEY_DOWN))
 		Set_ColorSet(Find_ColorSet("Night"));
 	if (m_pGameInstance->Get_KeyState(DIK_F8, KEY_DOWN))
