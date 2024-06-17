@@ -120,7 +120,8 @@ _int CBrontoBurt::Tick(_float fTimeDelta)
 			m_pControllerCom->Move(m_pTransformCom, m_vRotatePos, m_fTimeDelta);
 
 			m_vRally = m_vRotatePos - m_vBeforePos;
-			m_pTransformCom->Look_At_Axis(m_vRally);
+			if (m_vRally != XMVectorZero())
+				m_pTransformCom->Look_At_Axis(m_vRally);
 			m_vBeforePos = m_vRotatePos;
 		}
 		else if (MON_PATROL == m_eMonState)
@@ -328,6 +329,7 @@ HRESULT CBrontoBurt::Add_Components()
 
 	/* For.Com_CharacterController */
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+	vPos.y += 1.f;
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
 	desc.fOffset = 1.f;

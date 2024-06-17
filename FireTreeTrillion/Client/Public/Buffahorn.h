@@ -51,13 +51,15 @@ public:
 	_bool IsAnimFinished();
 
 private:
-	CTexture*		m_pEyeTextureCom = { nullptr };
+	CTexture*			m_pEyeTextureCom = { nullptr };
 
-	BUFFAHORN_ANIM	m_eCurrentState = { BUFFAHORN_END };
+	BUFFAHORN_ANIM		m_eCurrentState = { BUFFAHORN_END };
 	BUFFAHORNEYE_STATE	m_eEyeState = { BUFFAHORNEYE_END };
 
-	_float			m_fJumpTime = { 0.f };
+	_float				m_fJumpTime = { 0.f };
 
+	_bool				m_bRenderEye = { true };
+	_bool				m_bRenderBody = { true };
 
 private:
 	HRESULT Add_Components();

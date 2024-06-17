@@ -60,6 +60,9 @@ private:
 	_float				m_fAngle = { 0.f };
 	_float4				m_vPos = {};
 
+	_bool				m_bRenderEye = { true };
+	_bool				m_bRenderBody = { true };
+
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();

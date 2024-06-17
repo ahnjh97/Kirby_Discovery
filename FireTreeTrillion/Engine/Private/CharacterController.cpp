@@ -248,6 +248,7 @@ _bool CCharacterController::Jump_Parabola(CTransform* pTransform, _fvector vGoPo
 /// <summary> 切 政 開 馬 </summary>
 void CCharacterController::FreeFall(CTransform* pTransform, _float fTimeDelta, _float fOffset)
 {
+
 	// 切政開馬遂 velocity
 	m_fFallVelocity -= GRAVITY * fTimeDelta * fOffset;
 
@@ -255,11 +256,11 @@ void CCharacterController::FreeFall(CTransform* pTransform, _float fTimeDelta, _
 
 	PxControllerCollisionFlags collisionFlags = m_pController->move(moveVector, 0.001f, fTimeDelta,  m_ControllerFilters);//PxControllerFilters()); //
 
-	PxControllerState m_pPxState;
-	m_pController->getState(m_pPxState);
-
 	PxExtendedVec3 pxPos = m_pController->getPosition();
 	PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
+
+	PxControllerState m_pPxState;
+	m_pController->getState(m_pPxState);
 
 	_vector xmPos = XMVectorSet(pos.x, pos.y - m_fHeightOffset, pos.z, 0.f);
 

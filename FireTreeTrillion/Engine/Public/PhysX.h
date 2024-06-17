@@ -90,7 +90,7 @@ class ENGINE_DLL CControllerBehaviorCallback : public PxControllerBehaviorCallba
 public:
     // 컨트롤러가 다른 객체와 충돌했을 때 호출되는 함수
     virtual PxControllerBehaviorFlags getBehaviorFlags(const PxShape& shape, const PxActor& actor) override {
-        return PxControllerBehaviorFlag::eCCT_SLIDE;
+        return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
     }
     // 컨트롤러가 다른 컨트롤러와 충돌했을 때 호출되는 함수
     virtual PxControllerBehaviorFlags getBehaviorFlags(const PxController& controller) override;
