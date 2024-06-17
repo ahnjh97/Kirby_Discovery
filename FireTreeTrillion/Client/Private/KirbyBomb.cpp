@@ -88,6 +88,10 @@ _int CKirbyBomb::Tick(_float fTimeDelta)
 
         // 근처에 플레이어가 있을 경우 발로 찬다.
         Kicking();
+
+        // 근처에 몬스터 또는 폭탄이 있을 때 폭발한다.
+        SuddenBoom();
+
     }
 
 
@@ -200,6 +204,64 @@ void CKirbyBomb::Throwing(CKirby::KIRBY_INFODESC* desc)
         m_pRigidBodyCom->Kick_RigidBody((_float3)desc->m_vBombThrowDir, desc->m_fBombPower);
         m_bThrowTrigger = false;
     }
+}
+
+void CKirbyBomb::SuddenBoom()
+{
+
+    if (m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_Bomb")) != nullptr)
+    {
+        _float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+
+        for (auto& Bomb : *m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_Bomb")))
+        {
+            if (Bomb == this)
+                continue;
+
+            CTransform* pOtherBombTransformCom = Bomb->Get_TransformCom();
+            _float4 vOtherBombPos = pOtherBombTransformCom->Get_State(CTransform::STATE_POSITION);
+            _float4 vDir = vPos - vOtherBombPos;
+
+            _float fDistance = vDir.Length();
+
+            if (fDistance < 1.8f)
+            {
+                Bomb->Set_Dead();
+                this->Set_Dead();
+                return;
+            }
+        }
+    }
+
+    if (m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_Monster")) != nullptr)
+    {
+        _float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+
+        for (auto& Monster : *m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_Monster")))
+        {
+            CTransform* pMonsterTransformCom = Monster->Get_TransformCom();
+            _float4 vMonsterBombPos = pMonsterTransformCom->Get_State(CTransform::STATE_POSITION);
+            _float4 vDir = vPos - vMonsterBombPos;
+
+            _float fDistance = vDir.Length();
+
+            if (fDistance < 1.8f)
+            {
+                CPhysXObject* pMonster = static_cast<CPhysXObject*>(Monster);
+                pMonster->Set_PhyXState(PO_FLYDEADAWAY);
+                vDir.y = 0.f;
+                pMonster->Set_DamageMoving(-XMVector3Normalize(vDir) * 0.4f, 10.f);
+                this->Set_Dead();
+                return;
+            }
+        }
+
+
+
+    }
+
+
+
 }
 
 HRESULT CKirbyBomb::Add_Components()

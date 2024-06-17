@@ -43,6 +43,8 @@ public:
 	void			Throwing(CKirby::KIRBY_INFODESC* desc);
 	_bool			m_bThrowTrigger = { true };
 
+	void			SuddenBoom();
+
 private:
 	HRESULT			Add_Components();
 	HRESULT			Add_Rigid();
@@ -57,8 +59,9 @@ private:
 	_float			m_fBombTime = { 0.f };
 
 	_float			m_fBombingTime = { 0.f };
-
 	_float			m_fDontKicking = { 0.f };
+
+
 
 private:
 	CModel* m_pModelCom = { nullptr };

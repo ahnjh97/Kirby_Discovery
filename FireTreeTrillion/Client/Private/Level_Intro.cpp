@@ -102,7 +102,7 @@ HRESULT CLevel_Intro::Ready_Lights()
 	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
 		return E_FAIL;
 
-	CGameInstance::Get_Instance()->Setting_GodRay({320.f, 600.f, 1800.f, 1.f});
+	CGameInstance::Get_Instance()->Setting_GodRay({-650.f, 300.f, 1200.f, 1.f});
 
 	return S_OK;
 }
