@@ -71,8 +71,8 @@ HRESULT CHUD_StarPoint::Initialize(void* _pArg)
 
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 
-	m_eCurState = STARPOINT_WAIT;
-	m_ePreState = STARPOINT_HIDE;
+	//m_eCurState = STARPOINT_WAIT;
+	//m_ePreState = STARPOINT_HIDE;
 
 	m_pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
 	CHECK_NULLPTR(m_pKirby);
@@ -85,7 +85,7 @@ _int CHUD_StarPoint::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
-	Update_UIState(fTimeDelta);
+	//Update_UIState(fTimeDelta);
 
 	//이전 재화량 대비 현재 재화량 비교
  	_uint iCurCoin = m_pKirby->Get_Coin();
@@ -151,8 +151,8 @@ HRESULT CHUD_StarPoint::Render()
 				return S_OK;
 		}
 	
-		if (STARPOINT_WAIT == m_eCurState && STARPOINT_HIDE == m_ePreState)
-			return S_OK;
+		//if (STARPOINT_WAIT == m_eCurState && STARPOINT_HIDE == m_ePreState)
+		//	return S_OK;
 
 		m_pGameInstance->Render_Font(wstrFontTag, m_UIObjDesc.wstrText, vFontPos, vFontRGBA,
 			XMConvertToRadians(m_UIObjDesc.vDegree.z), vFontOrig, vFontScale);
@@ -180,8 +180,8 @@ HRESULT CHUD_StarPoint::Add_Components()
 
 HRESULT CHUD_StarPoint::Render_BindSet(CShader* _pShaderCom, CTransform* _pTransCom)
 {
-	if (STARPOINT_WAIT == m_eCurState && STARPOINT_HIDE == m_ePreState)
-		return S_OK;
+	//if (STARPOINT_WAIT == m_eCurState && STARPOINT_HIDE == m_ePreState)
+	//	return S_OK;
 
 	//마스크도 어색해서 잠시 OFF 처리. 추후 디벨롭 필요
 	if (m_UIObjDesc.wstrUITag == TEXT("Effect_Mask"))

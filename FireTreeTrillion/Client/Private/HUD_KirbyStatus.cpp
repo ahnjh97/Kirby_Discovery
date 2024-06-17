@@ -292,30 +292,20 @@ void CHUD_KirbyStatus::Play_Animation(_float _fAccTime, HUD_KIRBYHP _eCurState)
 		break;
 
 	case CHUD::KIRBYHP_WAIT:
-		//vWAITPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-		if (TEXT("Base") == m_UIObjDesc.wstrUITag || TEXT("Shadow") == m_UIObjDesc.wstrUITag)
-			m_UIObjDesc.vPos = { -0.39f, 0.21f, 1.0f };
-
-		if (TEXT("Blur") == m_UIObjDesc.wstrUITag)
-			m_UIObjDesc.vPos = { -0.39f, 0.21f, 0.99f };
-
-		if (TEXT("Gauge_Base") == m_UIObjDesc.wstrUITag)
-			m_UIObjDesc.vPos = { -0.35f, 0.19f, 0.9f };
-
-		if (TEXT("Gauge_Damage") == m_UIObjDesc.wstrUITag)
-			m_UIObjDesc.vPos = { -0.35f, 0.19f, 0.89f };
-
-		if (TEXT("Gauge") == m_UIObjDesc.wstrUITag)
-			m_UIObjDesc.vPos = { -0.34f, 0.18f, 0.88f };
-
 		if (TEXT("Name") == m_UIObjDesc.wstrUITag)
 			m_UIObjDesc.vPos = { -750.f, 413.f, 0.f };
+
+		if (TEXT("Base") == m_UIObjDesc.wstrUITag || TEXT("Shadow") == m_UIObjDesc.wstrUITag || (TEXT("Blur") == m_UIObjDesc.wstrUITag))
+			m_UIObjDesc.vPos = { -0.39f, 0.21f, 1.f };
+
+		if (TEXT("Gauge_Base") == m_UIObjDesc.wstrUITag || (TEXT("Gauge_Damage") == m_UIObjDesc.wstrUITag || TEXT("Gauge") == m_UIObjDesc.wstrUITag))
+			m_UIObjDesc.vPos = { -0.39f, 0.21f, 1.f };
 
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION,
 			XMVectorSet(m_UIObjDesc.vPos.x - m_UIObjDesc.vCenter.x + m_UIObjDesc.vCenter.x,
 				m_UIObjDesc.vPos.y - m_UIObjDesc.vCenter.y + m_UIObjDesc.vCenter.y,
 				m_UIObjDesc.vPos.z, 1.f));
-	
+
 		break;
 
 	case CHUD::KIRBYHP_HIDE: //X값 좌측 이동, 알파 값 죽이기
