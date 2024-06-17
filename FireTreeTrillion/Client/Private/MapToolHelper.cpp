@@ -622,7 +622,7 @@ void CMapToolHelper::OnLeftClick()
 
 void CMapToolHelper::OnRightClick()
 {
-	if (iMapTxtIdx == -1 && iTriggerTxtIdx == -1 && iMonsterTxtIdx == -1 && iNonAnimIdx == -1)
+	if (iMapTxtIdx == -1 && iTriggerTxtIdx == -1 && iMonsterTxtIdx == -1 && iObjectIdx == -1 && iNonAnimIdx == -1)
 		return;
 
 	_float2 vMouseViewPortPos = m_pGameInstance->Get_MouseViewPortPos();
