@@ -304,7 +304,7 @@ void CCamera_Main::UpdatePos_FromAnchor(_float fTimeDelta)
 
 	//y 위치 보정
 	_float3 vTerrainPos = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0))->Compute_TerrainPosition();
-	vTargetPos.y = (vTargetPos.y + vTerrainPos.y) * .5f;
+	vTargetPos.y = (vTargetPos.y * .7f) + (vTerrainPos.y * .3f);
 
 
 	//실제 타겟 위치에서 조금 위로 기준점 정하기

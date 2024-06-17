@@ -60,7 +60,7 @@ void CKirbyBalloon_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 
 				Copy_Star(pTransformCom);
 
-				static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr())->Zoom(-10.f);
+				static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr())->Set_FOVY(20.f);
 			}
 		}
 	}

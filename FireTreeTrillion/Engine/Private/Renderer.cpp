@@ -30,7 +30,7 @@ HRESULT CRenderer::Initialize()
 	m_pContext->RSGetViewports(&iNumViewports, &ViewportDesc);
 
 	Color_Initialize();
-	Set_ColorSet(Find_ColorSet("Stage1"));
+	Set_ColorSet(Find_ColorSet("Tutorial"));
 
 
 #pragma region MRT_Sky
@@ -404,17 +404,11 @@ void CRenderer::Color_Initialize()
 
 	Save_ColorSet("Tutorial",
 		COLOR_DATA{
-		.39f, 1.f, .80f,	1.74f, .99f, .90f, 1.05f,
-		{.94f, .6f, .6f},
-		{1.05f, 1.01f, 1.22f},
-		{73.f / 255.f, 15.f / 255.f, 89.f / 255.f},
-		.29f,
-		{61.f / 255.f, 186.f / 255.f, 173.f / 255.f},
-		.48f,
-		{1.f, 216.f / 255.f, 65.f / 255.f},
-		.34f,
-		.33f,
-		.60f
+		1.00999f,
+		1.f,
+		0.940155f,
+		1.30984f,0.859977f, 1.04722f, 1.05019f, 0.690178f,0.6f,0.6f,1.02006f,0.960001f,1.04f,0.253046f,0.0210087f,0.0958922f,0.129992f,0.917647f,0.513726f,
+		0.145098f, 0.16998f, 1.f, 0.847059f, 0.254902f, 0.330203f, 0.13988f, 0.559918f
 		});
 
 	Save_ColorSet("Night",
