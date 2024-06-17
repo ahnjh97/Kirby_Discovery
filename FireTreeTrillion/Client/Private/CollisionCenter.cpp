@@ -1,10 +1,11 @@
 #include "stdafx.h"
 #include "CollisionCenter.h"
 #include "GameInstance.h"
-#include "Kirby.h"
 #include "Trigger.h"
 #include "ItemObject.h"
 #include "Camera_Main.h"
+#include "Kirby.h"
+#include "Monster.h"
 
 #include "HUD_StarPoint.h"
 
@@ -36,14 +37,14 @@ void CCollisionCenter::Initialize()
 
 	// For CONTENT_ATTACK
 	m_eColliderType[HITBOX_PLYAER][MONSTER] = CONTENT_ATTACK;
-	m_eColliderType[HITBOX_MONSTER][PLAYER]  = CONTENT_ATTACK;
+	m_eColliderType[HITBOX_MONSTER][PLAYER]  = CONTENT_DAMAGE;
 
 	// For 상자(OBJECT)
 	m_eColliderType[HITBOX_PLYAER][OBJECT]  = CONTENT_ATTACK;
 	//m_eColliderType[MONSTER][OBJECT]		= CONTENT_ATTACK; // 던진 몬스터와 부딪힐 때, 충돌처리
 	
 	// For 찰 수 있는 오브젝트
-	m_eColliderType[PLAYER][KICKABLE]		= CONTENT_ATTACK;
+	m_eColliderType[PLAYER][KICKABLE]		= CONTENT_KICK;
 
 	// 레디얼 기름칠
 	GAMEINSTANCE Setting_RadialBlur(5.f, 300.f);
@@ -124,7 +125,7 @@ void CCollisionCenter::Collision_Collider(CONTENT_TYPE eType, CPhysXObject* pSrc
 	CPhysXObject* pDstObject = static_cast<CPhysXObject*>(pDst);
 
 
-	// 캐릭터 X 몬스터 몸박
+	// 캐릭터 X 몬스터 몸박 : 슬로우모션시스템, 서로 넉백, 몬스터 무적시간, 데미지 계산
 	if (eType == CONTENT_BODY)
 	{
 		CPhysXObject* pPlayer = Find_TypePtr(PLAYER, pSrcObject, pDstObject);
@@ -132,6 +133,10 @@ void CCollisionCenter::Collision_Collider(CONTENT_TYPE eType, CPhysXObject* pSrc
 			return;
 		CPhysXObject* pMonster = Find_TypePtr(MONSTER, pSrcObject, pDstObject);
 		if (pMonster == nullptr)
+			return;
+
+		// 무적상태인가?
+		if (static_cast<CMonster*>(pMonster)->Get_MonsterOverPower() == true)
 			return;
 
 		if (pMonster->Get_PhyXState() == PO_NORMAL)
@@ -199,11 +204,66 @@ void CCollisionCenter::Collision_Collider(CONTENT_TYPE eType, CPhysXObject* pSrc
 		}
 	}
 
-	// HITBOX x 캐릭터
+	// HITBOX x 몬스터
 	else if (eType == CONTENT_ATTACK)
 	{
-		pSrcObject->Collision_Hitbox(pDstObject);
-		pDstObject->Collision_Hitbox(pSrcObject);
+		// m_Hitboxes 여기다가 충돌박스인 놈을 담아야한다...
+		// HitBox를 선별하여... 
+		CPhysXObject* pTriggerObj = Find_TypePtr(HITBOX_PLYAER, pSrcObject, pDstObject);
+		CPhysXObject* pMonsterObj = Find_TypePtr(MONSTER, pSrcObject, pDstObject);
+
+		// 무적상태인가?
+		if (static_cast<CMonster*>(pMonsterObj)->Get_MonsterOverPower() == true)
+			return;
+
+		CTrigger* pTrigger = static_cast<CTrigger*>(pTriggerObj);
+		if (pTriggerObj == nullptr)
+			return;
+
+		pTrigger->Close_Collision();
+
+		CKirby* pKirby = static_cast<CKirby*>(pTrigger->Get_Owner());
+		CTransform* pPlayerTransform = pKirby->Get_TransformCom();
+		_vector vPos = pPlayerTransform->Get_State_Vector(CTransform::STATE_POSITION);
+		CTransform* pMonsterTransform = pMonsterObj->Get_TransformCom();
+		_vector vMonsterPos = pMonsterTransform->Get_State_Vector(CTransform::STATE_POSITION);
+		// 넉백 방향
+		_float4 vDistance = vMonsterPos - vPos;
+		vDistance.y = 0.f;
+		_vector vPlayerKnockbackDir = XMVector3Normalize(vDistance);
+
+
+		// 만약, 작은 넉백이였을 경우
+		if (Small_KnockBack(pKirby->Get_State()))
+		{
+			Knock_back(pMonsterObj, vPlayerKnockbackDir, 5.f);
+		}
+		// 만약, 적당한 넉백이였을 경우
+		else if (Normal_KnockBack(pKirby->Get_State()))
+		{
+			Knock_back(pMonsterObj, vPlayerKnockbackDir * 1.5f, 8.f);
+		}
+		// 위로 뜨는 공격이였을 경우.
+		else if (Up_KnockBack(pKirby->Get_State()))
+		{
+			Knock_back(pMonsterObj, vPlayerKnockbackDir * 0.5f, 13.f);
+		}
+		// 아예 날아가는 공격이였을 경우.
+		else if (FlyAway_KnockBack(pKirby->Get_State()))
+		{
+			Knock_back(pMonsterObj, vPlayerKnockbackDir * 4.f, 20.f);
+		}
+
+		pMonsterObj->Collision(CONTENT_ATTACK, pKirby);
+		Damage_To_Monster(pKirby, pMonsterObj);
+		HitStop_Rogic(pKirby);
+		Camera_Shaking(0.7f, 0.5f);
+	}
+
+	else if (eType == CONTENT_KICK)
+	{
+		pSrcObject->Collision(CONTENT_KICK, pDstObject);
+		pDstObject->Collision(CONTENT_KICK, pSrcObject);
 	}
 
 }
@@ -251,6 +311,48 @@ void CCollisionCenter::Ladder_Collider()
 
 
 	m_Ladders.clear();
+}
+
+_bool CCollisionCenter::Small_KnockBack(_uint uKirbyState)
+{
+	return uKirbyState == CKirby::SWORDSTATE_SIDESLASH ||
+		uKirbyState == CKirby::SWORDSTATE_MULITSWORDATTACK ||
+		uKirbyState == CKirby::SWORDSTATE_GIGANTSPINSLASH;
+}
+
+_bool CCollisionCenter::Normal_KnockBack(_uint uKirbyState)
+{
+	return uKirbyState == CKirby::SWORDSTATE_DECISIVESLASH;
+}
+
+_bool CCollisionCenter::Up_KnockBack(_uint uKirbyState)
+{
+	return false;
+}
+
+_bool CCollisionCenter::FlyAway_KnockBack(_uint uKirbyState)
+{
+	return false;
+}
+
+void CCollisionCenter::HitStop_Rogic(CKirby* pKirby)
+{
+	_uint uKirbyState = pKirby->Get_State();
+
+	if (uKirbyState == CKirby::SWORDSTATE_SIDESLASH ||
+		uKirbyState == CKirby::SWORDSTATE_MULITSWORDATTACK ||
+		uKirbyState == CKirby::SWORDSTATE_GIGANTSPINSLASH ||
+		uKirbyState == CKirby::SWORDSTATE_DECISIVESLASH)
+		pKirby->Set_HitStop();
+
+}
+
+void CCollisionCenter::Damage_To_Monster(CKirby* pKirby, CPhysXObject* pMonster)
+{
+	CCharacter* pCMonster = static_cast<CCharacter*>(pMonster);
+
+	_float fAttack = pKirby->Get_Attack();
+	pCMonster->Minus_Hp(fAttack);
 }
 
 void CCollisionCenter::Camera_Shaking(_float fPower, _float fTime, _float2 vDir)
@@ -337,6 +439,7 @@ void CCollisionCenter::Fly_DeadAway(CPhysXObject* pSrc, CPhysXObject* pDst)
 
 void CCollisionCenter::Knock_back(CPhysXObject* pObject, _float3 vKnockbackDir, _float fPower)
 {
+	pObject->Set_DamageMoving(vKnockbackDir, fPower);
 }
 
 void CCollisionCenter::Compute_Damage(CPhysXObject* pPlayer, CPhysXObject* pMonster)

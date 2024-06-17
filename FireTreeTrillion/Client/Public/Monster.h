@@ -47,12 +47,21 @@ public:
 #endif
 	virtual void	Add_AnimEvent()  override {}
 
+	void			Damage_Delay(_float fTimeDelta);
+	_bool			Get_MonsterOverPower() { return m_bMonsterOverPower; }
+
 
 protected:
 	// JSPark : 우선 몬스터들은 modelCom을 하나만 가지고 있다는 전제하에
 	CModel*					m_pModelCom	 = { nullptr };
 
 	MONSTER_STATE			m_eMonState = { MON_END };
+
+
+	// 무적상태 제어
+	_bool					m_bMonsterOverPower = { false };
+	_float					m_fMonsterOverPowerTime = { 0.f };
+	_float					m_fPreHp = { 0.f };
 
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;

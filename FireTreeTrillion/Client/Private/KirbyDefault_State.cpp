@@ -100,7 +100,17 @@ void CKirbyDefault_Idle_State::Key_X(CGameObject* pGameObject, _float fTimeDelta
 		if (pKirby->Get_AbilityType() == ABILITY_BOMB)
 		{
 			DESC(m_eEyeState) = CKirby::EYE_ANGER;
-			pKirby->Change_State(CKirby::BOOMSTATE_THROW, 60.f, false, false, CKirby::BODY_BOOMDEFAULT, CKirby::OFFSET_BOOM);
+
+			// 폭탄을 들고 있어야 하는 상황!
+			DESC(m_bBombHold) = true;
+			pKirby->Change_State(CKirby::BOOMSTATE_THROWCHARGE, 60.f, true, false, CKirby::BODY_BOOMDEFAULT, CKirby::OFFSET_BOOM);
+			CKirbyBomb::KIRBYBOMB_DESC desc = {};
+			desc.pKirby = pKirby;
+			desc.pKirbyHandsMatrix = pKirby->Get_HandsMatrix();
+			desc.pKirbyWorldMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+			if (FAILED(m_pGameInstance->Add_Clone(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_Bomb"), TEXT("Prototype_GameObject_KirbyBomb"), &desc)))
+				return;
+
 		}
 		else
 		{
@@ -242,24 +252,7 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
-
-	static _float fBbongTime{ 0.f };
-	fBbongTime += fTimeDelta;
-	if (.2f < fBbongTime)
-	{
-		CMultiEffect::MULTI_FX_DESC FXDesc{};
-		_float4 vMyPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
-		vMyPos += pTransformCom->Get_State(CTransform::STATE_LOOK) * .4f;
-
-		FXDesc.vInitPos = { vMyPos.x, vMyPos.y + .3f, vMyPos.z };
-		FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK)).y, 0.f };
-		FXDesc.vInitScale = { 1.3f, 1.3f, 1.3f };
-
-		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
-			return;
-
-		fBbongTime = 0.f;
-	}
+	Bbong_FX(fTimeDelta, pTransformCom);
 
 	if (Kirby_Ladder_Logic(pKirby, Kirbydesc, pTransformCom))
 	{
@@ -291,8 +284,17 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	{
 		if (pKirby->Get_AbilityType() == ABILITY_BOMB)
 		{
+			// 폭탄을 들고 있어야 하는 상황!
+			DESC(m_bBombHold) = true;
 			DESC(m_eEyeState) = CKirby::EYE_ANGER;
 			pKirby->Change_State(CKirby::BOOMSTATE_BOOMSHOOT, 60.f, false, false, CKirby::BODY_BOOMDEFAULT, CKirby::OFFSET_BOOM);
+
+			CKirbyBomb::KIRBYBOMB_DESC desc = {};
+			desc.pKirby = pKirby;
+			desc.pKirbyHandsMatrix = pKirby->Get_HandsMatrix();
+			desc.pKirbyWorldMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+			if (FAILED(m_pGameInstance->Add_Clone(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_Bomb"), TEXT("Prototype_GameObject_KirbyBomb"), &desc)))
+				return;
 		}
 		else
 		{
@@ -718,7 +720,14 @@ void CKirbyDefault_Jump_State::Key_X(CGameObject* pGameObject, _float fTimeDelta
 		else if (pKirby->Get_AbilityType() == ABILITY_BOMB)
 		{
 			pController->Reset_FallVelocity();
-			//DESC(m_vMoveDir) = DESC(m_vTargetDir);
+			// 폭탄을 들고 있어야 하는 상황!
+			DESC(m_bBombHold) = true;
+			CKirbyBomb::KIRBYBOMB_DESC desc = {};
+			desc.pKirby = pKirby;
+			desc.pKirbyHandsMatrix = pKirby->Get_HandsMatrix();
+			desc.pKirbyWorldMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+			if (FAILED(m_pGameInstance->Add_Clone(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_Bomb"), TEXT("Prototype_GameObject_KirbyBomb"), &desc)))
+				return;
 			pKirby->Change_State(CKirby::BOOMSTATE_BOOMFALL, 60.f, true, false, CKirby::BODY_BOOMDEFAULT, CKirby::OFFSET_BOOM);
 		}
 	}

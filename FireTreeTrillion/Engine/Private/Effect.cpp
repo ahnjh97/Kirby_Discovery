@@ -177,8 +177,6 @@ _bool CEffect::Calculate_Lifetime(_float _fTimeDelta)
 {
     if ( m_fDuration.first < m_fLifetime.first)
         return false;
-
-    //m_fLifetime.first += _fTimeDelta;
     
     if (m_fLifetime.second <= m_fDuration.first)
     {

@@ -102,7 +102,7 @@ HRESULT CKirby::Initialize(void* pArg)
 	m_fHp = 100.f;
 	m_fAttack = 5.f;
 	//m_eAbilityType = ABILITY_DEFAULT;
-	m_eAbilityType = ABILITY_BOMB;
+	m_eAbilityType = ABILITY_SWORD;
 
 	m_pControllerCom->RegisterAsPlayer();
 	m_pControllerCom->Register_Controller();
@@ -123,6 +123,7 @@ _int CKirby::Tick(_float fTimeDelta)
 		return OBJ_DEAD;
 
 	m_fTimeDelta = m_pGameInstance->Get_FirstTimer();
+	HitStop_System(fTimeDelta);
 
 	// 파트 오브젝트의 뼈 행렬을 업데이트한다.
 	Update_PartObjectMatrix();
@@ -162,6 +163,9 @@ void CKirby::Late_Tick(_float fTimeDelta)
 
 	if (m_fOrbitRenderDelay > 0.5f)
 	{
+		// 조준했당께요!
+		INFO(m_bBombAimming) = true;
+
 		for (auto& Glow : m_OrbitGlows)
 			Glow->Late_Tick(fTimeDelta);
 	}
@@ -240,7 +244,7 @@ void CKirby::Render_IMGUI()
 
 	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	ImGui::Text("HP : %d", (_int)m_fHp);
-	ImGui::Text("m_bBombOrbit : %d", INFO(m_bBombOrbit));
+	ImGui::Text("m_iTestAnim : %d", m_iTestAnim);
 	ImGui::Text("m_bInitializeTargetPos : %d", m_bInitializeTargetPos);
 	ImGui::Text("m_vLadderPoint.x : %.2f, m_vLadderPoint.y : %.2f m_vLadderPoint.z : %.2f", INFO(m_vLadderPoint).x, INFO(m_vLadderPoint).y, INFO(m_vLadderPoint).z);
 	ImGui::Text("m_vLadderLook.x : %.2f, m_vLadderLook.y : %.2f m_vLadderLook.z : %.2f", INFO(m_vLadderLook).x, INFO(m_vLadderLook).y, INFO(m_vLadderLook).z);
@@ -298,14 +302,21 @@ void CKirby::Add_AnimEvent()
 	// 3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
 	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("ApplyDamage", [this]() {
 		m_pHitBoxTrigger->Check_Collision();
+
+
+
 		});
 	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("StopDamage", [this]() {
-		m_pHitBoxTrigger->Close_Collision();
+		//m_pHitBoxTrigger->Close_Collision();
+
+
+
 		});
 }
 
 void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
+	// 몸끼리 부딪혔을때
 	if (eContent == CCollisionCenter::CONTENT_BODY)
 	{
 		// 흡수중인 몬스터
@@ -334,6 +345,10 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 		{
 
 		}
+		else if (pObject->Get_PhyXState() == PO_FLYDEADAWAY)
+		{
+
+		}
 		else
 		{
 			if (m_bOverPower == true)
@@ -359,13 +374,9 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 			Delete_AllEffect();
 		}
 	}
-}
 
-void CKirby::Collision_Hitbox(CPhysXObject* pGameObject)
 
-{
-	// kirby HITBOX 충돌이 일어날 경우 처리해야하는 일들
-	// MSG_BOX(TEXT("커비 overlap 충돌"));
+
 }
 
 _float3 CKirby::Make_RepulsiveDir(CPhysXObject* pObject)
@@ -414,7 +425,7 @@ void CKirby::Update_BombOrbit(_float fTimeDelta)
 		if (m_bInitializeTargetPos == true)
 		{
 			_float4 vLook = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
-			_float fLookOffset = 10.f;
+			_float fLookOffset = 6.f;
 			_float4 FinalTargetDir = (vLook * fLookOffset);
 			INFO(m_vBombTargetDir) = FinalTargetDir;
 			m_bInitializeTargetPos = false;
@@ -447,6 +458,8 @@ void CKirby::Update_BombOrbit(_float fTimeDelta)
 			_float4 vOrbitPos = { 0.f, 0.f, 0.f, 0.f };
 			_float4 vOrbitLook = { 0.f, 0.f, 0.f, 0.f };
 			_float3 vDir = XMVector3Normalize(Compute_Parabola(0.05f + (0.1f * (_float)i), vPos, INFO(m_vBombTargetPos)) - vOriginPos);
+			if (i == 0 && m_fOrbitRenderDelay > 0.5f)
+				INFO(m_vBombThrowDir) = XMVectorSetW(vDir, 0.f);
 
 			if (m_OrbitGlows[i]->RayCast_Terrain(vDir, vOrbitPos, vOrbitLook) == true && bFind == false)
 			{
@@ -687,6 +700,8 @@ HRESULT CKirby::Add_PartObjects()
 	WeaponDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 	WeaponDesc.pBoneMatrix = &m_WeaponMatrix;
 	WeaponDesc.pAbilityType = &m_eAbilityType;
+	WeaponDesc.pWhite = &m_fWhiteColorDiffuse;
+	WeaponDesc.pOverPower = &m_fOverPowerColor;
 	m_pWeapons = static_cast<CKirbyWeapons*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_KirbyWeapons"), &WeaponDesc));
 	CHECK_NULLPTR(m_pWeapons);
 
@@ -694,6 +709,8 @@ HRESULT CKirby::Add_PartObjects()
 	ArmourDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 	ArmourDesc.pBoneMatrix = &m_ArmourMatrix;
 	ArmourDesc.pAbilityType = &m_eAbilityType;
+	ArmourDesc.pWhite = &m_fWhiteColorDiffuse;
+	ArmourDesc.pOverPower = &m_fOverPowerColor;
 	m_pArmours = static_cast<CKirbyArmours*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_KirbyArmours"), &ArmourDesc));
 	CHECK_NULLPTR(m_pArmours);
 
@@ -702,7 +719,7 @@ HRESULT CKirby::Add_PartObjects()
 	tTriggerDesc.iTriggerType = CTrigger::TRIGGER_HITBOX;
 	tTriggerDesc.iTriggerIndex = 0;
 	tTriggerDesc.eCollisionGroup = HITBOX_PLYAER;
-	tTriggerDesc.vTriggerSize = _float3(2.f, 1.5f, 2.f);
+	tTriggerDesc.vTriggerSize = _float3(2.5f, 1.f, 2.5f);
 	m_pHitBoxTrigger = static_cast<CTrigger*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc));
 	CHECK_NULLPTR(m_pHitBoxTrigger);
 	m_pHitBoxTrigger->Set_Owner(this);
@@ -983,6 +1000,21 @@ void CKirby::OverPower()
 
 
 	m_fPreHp = m_fHp;
+}
+
+void CKirby::HitStop_System(_float fTimeDelta)
+{
+	if (m_bHitStop == true)
+	{
+		m_fTimeDelta = 0.f;
+		m_fHitStopTime += fTimeDelta;
+
+		if (m_fHitStopTime > 0.12f)
+		{
+			m_fHitStopTime = 0.f;
+			m_bHitStop = false;
+		}
+	}
 }
 
 void CKirby::Change_State(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, BODYSTATE eBody, _uint iOffSet)

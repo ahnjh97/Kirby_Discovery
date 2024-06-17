@@ -32,7 +32,7 @@ void CPoppyBrosJr_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 
 	// 자유 낙하
-	pController->FreeFall(pTransformCom, fTimeDelta, 6.f, 0.5f);
+	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
 
 	if(CPoppyBrosJr::PS_TARGET == pPoppyJr->Get_PoppyState())
 	{
@@ -111,7 +111,7 @@ void CPoppyBrosJr_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float f
 	_vector vPoppyPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 	_vector vPoppyLook = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
 
-	pController->FreeFall(pTransformCom, fTimeDelta, 6.f, 0.5f);
+	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
 
 	if (CPoppyBrosJr::PS_TARGET == pPoppyJr->Get_PoppyState())
 	{
@@ -195,7 +195,8 @@ void CPoppyBrosJr_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float f
 	{
 		// 일단 그 방향으로 바라보게만 한다.
 		_float3 vDamegeDir = pPoppyJr->Get_DamegeDir();
-		pTransformCom->Look_At_Axis(-vDamegeDir);
+		if (vDamegeDir != XMVectorZero())
+			pTransformCom->Look_At_Axis(-vDamegeDir);
 
 		// 이제 날아가는 것을 구현해보자.
 		pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 6.f, fTimeDelta);
@@ -209,7 +210,12 @@ void CPoppyBrosJr_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float f
 
 		if (true == pPoppyJr->IsAnimFinished() || pController->Is_Terrain())
 		{
-			pPoppyJr->Change_State(CPoppyBrosJr::POPPY_ENEMYWAIT2, 50.f, true, true);
+			if (pPoppyJr->Get_Hp() <= 0.f)
+				pPoppyJr->Set_Dead();
+			else
+			{
+				pPoppyJr->Change_State(CPoppyBrosJr::POPPY_ENEMYWAIT2, 50.f, true, true);
+			}
 		}
 	}
 	// 날아가는 도중이다.  1초에 360도 회전하며, 30의 거리로 날아간다.
@@ -219,6 +225,13 @@ void CPoppyBrosJr_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float f
 		pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 30.f, fTimeDelta);
 		pTransformCom->Turn(pTransformCom->Get_State_Vector(CTransform::STATE_UP), fTimeDelta, 360.f);
 		m_fFlyTime += fTimeDelta;
+
+		if (1.f > pController->Compute_Wall(vDamegeDir))
+		{
+			pPoppyJr->Set_PhyXState(PO_FLYDEADAWAY);
+			pPoppyJr->Set_DamageMoving(-1.f * vDamegeDir, 10.f);
+		}
+
 		if (m_fFlyTime > 2.f)
 		{
 			pPoppyJr->Set_Dead();

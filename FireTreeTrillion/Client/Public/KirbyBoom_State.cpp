@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "KirbyBoom_State.h"
 #include "Kirby_State_Function.h"
-#include "KirbyBomb.h"
 
 #pragma region BOOM JUMP STATE
 
@@ -54,19 +53,6 @@ void CKirbyBoom_Fall_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			DESC(m_bBombOrbit) = false;
 			DESC(m_eEyeState) = CKirby::EYE_ANGER;
 			pKirby->Change_State(CKirby::BOOMSTATE_THROWAIR, 60.f, false, false, CKirby::BODY_BOOMDEFAULT, CKirby::OFFSET_BOOM);
-
-			_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
-
-			CKirbyBomb::KIRBYBOMB_DESC desc = {};
-			desc.vPos = pTransformCom->Get_State(CTransform::STATE_POSITION) + vLook;
-			desc.vPos.y += 1.f;
-			desc.vDir = vLook;
-			desc.vDir.y += 1.f;
-			desc.vDir = XMVector3Normalize(desc.vDir);
-			desc.fPower = 600.f;
-			if (FAILED(m_pGameInstance->Add_Clone(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_Bomb"), TEXT("Prototype_GameObject_KirbyBomb"), &desc)))
-				return;
-
 		}
 		// X를 꾹 유지할 경우
 		else
@@ -75,7 +61,11 @@ void CKirbyBoom_Fall_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 			if (JoyStick_On() == true)
 			{
-				DESC(m_vBombTargetDir) += JoyStick_controller_OtherDir(pCamera) * 0.15f;
+				DESC(m_vBombTargetDir) += JoyStick_controller_OtherDir(pCamera) * fTimeDelta * 10.f;
+				if (10.f < XMVectorGetX(XMVector3Length(DESC(m_vBombTargetDir))))
+				{
+					DESC(m_vBombTargetDir) -= JoyStick_controller_OtherDir(pCamera) * fTimeDelta * 10.f;
+				}
 				_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
 				_float4 vTargetDir = DESC(m_vBombTargetPos) - vPos;
 				vTargetDir.y = 0.f;
@@ -85,7 +75,6 @@ void CKirbyBoom_Fall_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			pController->FreeFall(pTransformCom, fTimeDelta, 1.2f);
 			if (pController->Is_Terrain())
 			{
-
 				pKirby->Change_State(CKirby::BOOMSTATE_THROWCHARGE, 60.f, true, true, CKirby::BODY_BOOMDEFAULT, CKirby::OFFSET_BOOM);
 			}
 		}
@@ -94,6 +83,25 @@ void CKirbyBoom_Fall_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	{
 
 		m_fAirThrowTime += fTimeDelta;
+
+
+		// 폭탄을 던진다! ( 조준해서 )
+		if (DESC(m_bBombAimming) == true && m_bThrowTrigger == true && m_fAirThrowTime > 0.1f)
+		{
+			Throw_Bomb(Kirbydesc, DESC(m_vBombThrowDir), 20.f);
+			m_bThrowTrigger = false;
+			DESC(m_bBombAimming) = false;
+		}
+		// 평범하게 던진다! (일반 공격)
+		else if (m_bThrowTrigger && m_fAirThrowTime > 0.1f)
+		{
+			_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+			vLook.y += 1.f;
+			JoyStick_On() == true ? 
+				Throw_Bomb(Kirbydesc, XMVector3Normalize(vLook), 15.f) : Throw_Bomb(Kirbydesc, XMVector3Normalize(vLook), 7.f);
+			m_bThrowTrigger = false;
+		}
+
 
 		if (m_fAirThrowTime < 0.25f)
 			DESC(m_fJumpVelocity) = 1.f;
@@ -116,6 +124,7 @@ void CKirbyBoom_Fall_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 void CKirbyBoom_Fall_State::OnStateExit()
 {
+	m_bThrowTrigger = true;
 	m_fAirThrowTime = 0.f;
 }
 
@@ -193,6 +202,13 @@ void CKirbyBoom_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 
 		// 폭탄을 던지는 로직이 필요하다.
+		if (m_bThrowTrigger && m_fThrowTime > 0.1f)
+		{
+			_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+			vLook.y += 0.01f;
+			Throw_Bomb(Kirbydesc, vLook, 18.f);
+			m_bThrowTrigger = false;
+		}
 
 
 		if (pKirby->isAnimFinish())
@@ -201,30 +217,30 @@ void CKirbyBoom_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 			pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
 		}
 	}
+
+
+
 	// 정지 샷
 	else if (pKirby->Get_State() == CKirby::BOOMSTATE_THROW)
 	{
 		m_fThrowTime += fTimeDelta;
-		if (m_fThrowTime < 0.05f)
+
+
+		// 폭탄을 던진다! ( 조준해서 )
+		if (DESC(m_bBombAimming) == true && m_bThrowTrigger == true && m_fThrowTime > 0.1f)
 		{
-			if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS))
-			{
-				_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
-
-				CKirbyBomb::KIRBYBOMB_DESC desc = {};
-				desc.vPos = pTransformCom->Get_State(CTransform::STATE_POSITION) + vLook;
-				desc.vPos.y += 1.f;
-				desc.vDir = vLook;
-				desc.vDir.y += 1.f;
-				desc.vDir = XMVector3Normalize(desc.vDir);
-				desc.fPower = 300.f;
-				if (FAILED(m_pGameInstance->Add_Clone(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_Bomb"), TEXT("Prototype_GameObject_KirbyBomb"), &desc)))
-					return;
-
-				pKirby->Change_State(CKirby::BOOMSTATE_THROWCHARGE, 60.f, true, false, CKirby::BODY_BOOMDEFAULT, CKirby::OFFSET_BOOM);
-			}
+			Throw_Bomb(Kirbydesc, DESC(m_vBombThrowDir), 20.f);
+			m_bThrowTrigger = false;
+			DESC(m_bBombAimming) = false;
 		}
-		// 폭탄을 던진다!
+		// 평범하게 던진다! (일반 공격)
+		else if (m_bThrowTrigger && m_fThrowTime > 0.1f)
+		{
+			_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+			vLook.y += 1.f;
+			Throw_Bomb(Kirbydesc, XMVector3Normalize(vLook), 7.f);
+			m_bThrowTrigger = false;
+		}
 
 		if (pKirby->isAnimFinish())
 		{
@@ -238,6 +254,7 @@ void CKirbyBoom_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 void CKirbyBoom_Attack_State::OnStateExit()
 {
 	m_fThrowTime = 0.f;
+	m_bThrowTrigger = true;
 }
 
 CKirbyBoom_Attack_State* CKirbyBoom_Attack_State::Create()
@@ -308,9 +325,12 @@ void CKirbyBoom_ChargeAttack_State::OnStateUpdate(CGameObject* pGameObject, _flo
 		// 방향키로 에임을 조절할 수 있다.
 		if (JoyStick_On() == true)
 		{
-			//Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta, 3.f);
+			DESC(m_vBombTargetDir) += JoyStick_controller_OtherDir(pCamera) * fTimeDelta * 10.f;
+			if (10.f < XMVectorGetX(XMVector3Length(DESC(m_vBombTargetDir))))
+			{
+				DESC(m_vBombTargetDir) -= JoyStick_controller_OtherDir(pCamera) * fTimeDelta * 10.f;
+			}
 
-			DESC(m_vBombTargetDir) += JoyStick_controller_OtherDir(pCamera) * 0.15f;
 			_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
 			_float4 vTargetDir = DESC(m_vBombTargetPos) - vPos;
 			vTargetDir.y = 0.f;

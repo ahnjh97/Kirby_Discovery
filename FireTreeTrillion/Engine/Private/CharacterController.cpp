@@ -135,7 +135,7 @@ _float4 CCharacterController::Get_FootPosition()
 
 // 강제로 원하는 위치로 이동시키는 함수
 // 예) 점프같은 내가 이동해야하는 position이 정해져 있을때의 움직임
-void CCharacterController::Move(CTransform* pTransform, _fvector vPosition, _float fTimeDelta, _float fHeight)
+void CCharacterController::Move(CTransform* pTransform, _fvector vPosition, _float fTimeDelta)
 {
 	PxExtendedVec3 pxCurrentPos = m_pController->getPosition();
 	PxVec3 moveVector((_float)pxCurrentPos.x, (_float)pxCurrentPos.y, (_float)pxCurrentPos.z);
@@ -246,7 +246,7 @@ _bool CCharacterController::Jump_Parabola(CTransform* pTransform, _fvector vGoPo
 }
 
 /// <summary> 자 유 낙 하 </summary>
-void CCharacterController::FreeFall(CTransform* pTransform, _float fTimeDelta, _float fOffset, _float fHeight)
+void CCharacterController::FreeFall(CTransform* pTransform, _float fTimeDelta, _float fOffset)
 {
 	// 자유낙하용 velocity
 	m_fFallVelocity -= GRAVITY * fTimeDelta * fOffset;

@@ -126,7 +126,7 @@ _bool CLadder::Is_Collide(_fvector vPos)
 
 	// 사다리 위 아래 보정치
 	_float fOffSet = 0.5f;
-	_float fMinY = vLadderPos.y - fOffSet;
+	_float fMinY = vLadderPos.y - fOffSet * 3.f;
 	_float fMaxY = vLadderPos.y + m_fHeight + fOffSet;
 
 	// 사다리의 최소Y, 최대Y를 비교했을 때, 안에 들었다면 최종적인 충돌을 하였을 것이다.

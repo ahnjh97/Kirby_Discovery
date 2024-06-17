@@ -60,7 +60,8 @@ void CKabu_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	{
 		// 일단 그 방향으로 바라보게만 한다.
 		_float3 vDamegeDir = pKabu->Get_DamegeDir();
-		pTransformCom->Look_At_Axis(pKabu->Get_Look());
+		if (vDamegeDir != XMVectorZero())
+			pTransformCom->Look_At_Axis(pKabu->Get_Look());
 
 		// 이제 날아가는 것을 구현해보자.
 		pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 6.f, fTimeDelta);
@@ -72,7 +73,12 @@ void CKabu_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 		pKabu->Set_DamageJumpPower(fDamageJumpPower);
 
 		if (true == pKabu->IsAnimFinished())
-			pKabu->Change_State(CKabu::KABU_WARP1, 40.f, false, true);
+		{
+			if (pKabu->Get_Hp() <= 0.f)
+				pKabu->Set_Dead();
+			else
+				pKabu->Change_State(CKabu::KABU_WARP1, 40.f, false, true);
+		}
 
 	}
 	// 날아가는 도중이다.  1초에 360도 회전하며, 30의 거리로 날아간다.
@@ -82,6 +88,13 @@ void CKabu_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 		pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 30.f, fTimeDelta);
 		pTransformCom->Turn(pTransformCom->Get_State_Vector(CTransform::STATE_UP), fTimeDelta, 360.f);
 		m_fFlyTime += fTimeDelta;
+
+		if (1.f > pController->Compute_Wall(vDamegeDir))
+		{
+			pKabu->Set_PhyXState(PO_FLYDEADAWAY);
+			pKabu->Set_DamageMoving(-1.f * vDamegeDir, 10.f);
+		}
+
 		if (m_fFlyTime > 2.f)
 		{
 			pKabu->Set_Dead();

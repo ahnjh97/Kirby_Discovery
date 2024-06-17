@@ -66,7 +66,7 @@ void CKirbyBalloon_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 				
 				FXDesc.vInitRot = CUtils::Make_Degree_FromDir(vDir);
 
-				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star Pink"), &FXDesc)))
+				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star Pink_bloom"), &FXDesc)))
 					return;
 
 				FXDesc.fStartDelay = .15f;
