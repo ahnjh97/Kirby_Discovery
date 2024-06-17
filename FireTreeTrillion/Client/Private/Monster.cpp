@@ -30,6 +30,9 @@ _int CMonster::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
+	// 무적시간을 담당한다.
+	Damage_Delay(fTimeDelta);
+
 	return OBJ_NOEVENT;
 }
 
@@ -51,11 +54,33 @@ HRESULT CMonster::Render_LightDepth()
 	return S_OK;
 }
 
+void CMonster::Damage_Delay(_float fTimeDelta)
+{
+	if (m_fPreHp > m_fHp)
+	{
+		m_bMonsterOverPower = true;
+	}
+
+	if (m_bMonsterOverPower == true)
+	{
+		m_fMonsterOverPowerTime += fTimeDelta;
+
+		if (m_fMonsterOverPowerTime > 0.1f)
+		{
+			m_bMonsterOverPower = false;
+			m_fMonsterOverPowerTime = 0.f;
+		}
+	}
+
+	m_fPreHp = m_fHp;
+}
+
 #ifdef _DEBUG
 void CMonster::Render_IMGUI()
 {
 	__super::Render_IMGUI();
 }
+
 #endif
 
 void CMonster::Free()

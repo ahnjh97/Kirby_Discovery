@@ -345,6 +345,10 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 		{
 
 		}
+		else if (pObject->Get_PhyXState() == PO_FLYDEADAWAY)
+		{
+
+		}
 		else
 		{
 			if (m_bOverPower == true)
@@ -378,7 +382,6 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 void CKirby::Collision_Hitbox(CPhysXObject* pGameObject)
 {
 	m_iTestAnim++;
-
 }
 
 _float3 CKirby::Make_RepulsiveDir(CPhysXObject* pObject)

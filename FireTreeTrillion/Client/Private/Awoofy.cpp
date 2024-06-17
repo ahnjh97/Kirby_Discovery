@@ -47,8 +47,8 @@ HRESULT CAwoofy::Initialize(void* pArg)
 	else if(MON_SLEEP == m_eMonState)
 		m_pModelCom->Set_Animation(AWOOFY_SLEEP, 45.f, true, true);
 
-	m_fMaxHp = 150.f;
-	m_fHp = 150.f;
+	m_fMaxHp = 10.f;
+	m_fHp = 10.f;
 	m_fAttack = 8.f;
 	m_eVacuumSize = SIZE_SMALL;
 	m_eAbilityType = ABILITY_DEFAULT;
