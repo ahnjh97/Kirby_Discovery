@@ -428,7 +428,7 @@ void CRenderer::Color_Initialize()
 
 	Save_ColorSet("Stage1",
 		COLOR_DATA{
-		0.829539f, 1.f, 1.00999f, 1.44943f, 1.17964f, 1.14037f, 1.11018f, 0.720338f, 0.6f, 0.6f, 1.3f, 1.06f, 1.1f, 0.0649942f, 0.0378847f, 0.199115f, 0.00958735f, 0.466084f, 0.676991f, 0.218674f, 0.0796085f, 0.499961f, 0.912908f, 0.99115f, 0.209722f, 0.209559f, 0.340393f
+		0.79f, 1.f, 1.00999f, 1.44943f, 1.17964f, 1.14037f, 1.11018f, 0.720338f, 0.6f, 0.6f, 1.3f, 1.06f, 1.1f, 0.0649942f, 0.0378847f, 0.199115f, 0.00958735f, 0.466084f, 0.676991f, 0.218674f, 0.0796085f, 0.499961f, 0.912908f, 0.99115f, 0.209722f, 0.209559f, 0.340393f
 		});
 
 	//쉐이더 타입 트리거는 idx 1, 접촉하면 해당 함수를 호출!
@@ -611,7 +611,7 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 	switch (iSetIdx)
 	{
 	case 0:
-		m_DestColorData = Find_ColorSet("Default");
+		m_DestColorData = Find_ColorSet("Tutorial");
 		break;
 	case 1:
 		m_DestColorData = Find_ColorSet("Tutorial");
