@@ -492,6 +492,13 @@ void CAwoofy_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 30.f, fTimeDelta);
 		pTransformCom->Turn(pTransformCom->Get_State_Vector(CTransform::STATE_UP), fTimeDelta, 360.f);
 		m_fFlyTime += fTimeDelta;
+
+		if (1.f > pController->Compute_Wall(vDamegeDir))
+		{
+			pAwoofy->Set_PhyXState(PO_FLYDEADAWAY);
+			pAwoofy->Set_DamageMoving(-1.f * vDamegeDir, 10.f);
+		}
+
 		if (m_fFlyTime > 2.f)
 		{
 			pAwoofy->Set_Dead();

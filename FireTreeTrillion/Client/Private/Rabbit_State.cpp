@@ -395,8 +395,13 @@ void CRabbit_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 		if (true == pRabbit->IsAnimFinished() || pController->Is_Terrain())
 		{
-			pRabbit->Set_RabbitEye(CRabbit::RABBITEYE_IDLE);
-			pRabbit->Change_State(CRabbit::RABBIT_WAIT, 45.f, false, true);
+			if (pRabbit->Get_Hp() <= 0.f)
+				pRabbit->Set_Dead();
+			else
+			{
+				pRabbit->Set_RabbitEye(CRabbit::RABBITEYE_IDLE);
+				pRabbit->Change_State(CRabbit::RABBIT_WAIT, 45.f, false, true);
+			}
 		}
 	}
 	// 날아가는 도중이다.  1초에 360도 회전하며, 30의 거리로 날아간다.
@@ -406,6 +411,13 @@ void CRabbit_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 30.f, fTimeDelta);
 		pTransformCom->Turn(pTransformCom->Get_State_Vector(CTransform::STATE_UP), fTimeDelta, 360.f);
 		m_fFlyTime += fTimeDelta;
+
+		if (1.f > pController->Compute_Wall(vDamegeDir))
+		{
+			pRabbit->Set_PhyXState(PO_FLYDEADAWAY);
+			pRabbit->Set_DamageMoving(-1.f * vDamegeDir, 10.f);
+		}
+
 		if (m_fFlyTime > 2.f)
 		{
 			pRabbit->Set_Dead();

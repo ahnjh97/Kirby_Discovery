@@ -209,7 +209,12 @@ void CPoppyBrosJr_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float f
 
 		if (true == pPoppyJr->IsAnimFinished() || pController->Is_Terrain())
 		{
-			pPoppyJr->Change_State(CPoppyBrosJr::POPPY_ENEMYWAIT2, 50.f, true, true);
+			if (pPoppyJr->Get_Hp() <= 0.f)
+				pPoppyJr->Set_Dead();
+			else
+			{
+				pPoppyJr->Change_State(CPoppyBrosJr::POPPY_ENEMYWAIT2, 50.f, true, true);
+			}
 		}
 	}
 	// 날아가는 도중이다.  1초에 360도 회전하며, 30의 거리로 날아간다.
@@ -219,6 +224,13 @@ void CPoppyBrosJr_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float f
 		pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 30.f, fTimeDelta);
 		pTransformCom->Turn(pTransformCom->Get_State_Vector(CTransform::STATE_UP), fTimeDelta, 360.f);
 		m_fFlyTime += fTimeDelta;
+
+		if (1.f > pController->Compute_Wall(vDamegeDir))
+		{
+			pPoppyJr->Set_PhyXState(PO_FLYDEADAWAY);
+			pPoppyJr->Set_DamageMoving(-1.f * vDamegeDir, 10.f);
+		}
+
 		if (m_fFlyTime > 2.f)
 		{
 			pPoppyJr->Set_Dead();

@@ -284,7 +284,10 @@ void CCappyBody_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 		if (true == pCappy->IsAnimFinished() || pController->Is_Terrain())
 		{
-			pCappy->Change_State(CCappyBody::CAPPYBODY_WAIT, 40.f, false, true);
+			if (pCappy->Get_Hp() <= 0.f)
+				pCappy->Set_Dead();
+			else
+				pCappy->Change_State(CCappyBody::CAPPYBODY_WAIT, 40.f, false, true);
 		}
 	}
 	// 날아가는 도중이다.  1초에 360도 회전하며, 30의 거리로 날아간다.
@@ -294,10 +297,18 @@ void CCappyBody_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 30.f, fTimeDelta);
 		pTransformCom->Turn(pTransformCom->Get_State_Vector(CTransform::STATE_UP), fTimeDelta, 360.f);
 		m_fFlyTime += fTimeDelta;
+
+		if (1.f > pController->Compute_Wall(vDamegeDir))
+		{
+			pCappy->Set_PhyXState(PO_FLYDEADAWAY);
+			pCappy->Set_DamageMoving(-1.f * vDamegeDir, 10.f);
+		}
+
 		if (m_fFlyTime > 2.f)
 		{
 			pCappy->Set_Dead();
 		}
+
 	}
 	// 죽는 도중이다.	 (날아가다 터질예정임)
 	else if (pCappy->Get_PhyXState() == PO_FLYDEADAWAY)
