@@ -25,11 +25,8 @@ private:
 	HRESULT Ready_Lights();
 	HRESULT Ready_Layer_Camera(const wstring& strLayerTag);
 	HRESULT Ready_Layer_BackGround(const wstring& strLayerTag);
-	HRESULT Ready_Layer_Player(const wstring& strLayerTag);
-	HRESULT Ready_Layer_Monster(const wstring& strLayerTag);
 	HRESULT Ready_Layer_UI(const wstring& strLayerTag);
 	HRESULT Ready_ParsedObjects();
-	HRESULT Ready_Layer_MapObject(const wstring& strLayerTag);
 	
 	HRESULT	Load_FileData(const string& _strFilePath, FILE_TYPE _eFileType, const wstring& _strLayerTag);
 
