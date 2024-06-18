@@ -58,6 +58,13 @@ void CAnimation::Invalidate_TransformationMatrix(_float fTimeDelta, const vector
 		// 재생바를 계속 증가시킨다.
 		m_fRatioTime += fTimeDelta;
 
+		if (m_fRatioTime > m_fLerpTime)
+		{
+			Reset_TrackPosition();
+			m_fRatioTime = 0.f;
+			m_bRatio = false;
+		}
+
 		for (_uint i = 0; i < m_iNumChannels; ++i)
 		{
 			//Channel의 뼈 
@@ -66,12 +73,7 @@ void CAnimation::Invalidate_TransformationMatrix(_float fTimeDelta, const vector
 
 		m_fTrackPosition += fTimeDelta;
 
-		if (m_fRatioTime > 0.1f)
-		{
-			Reset_TrackPosition();
-			m_fRatioTime = 0.f;
-			m_bRatio = false;
-		}
+
 		return;
 	}
 

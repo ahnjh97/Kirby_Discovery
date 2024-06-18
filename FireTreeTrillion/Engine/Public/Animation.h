@@ -56,6 +56,8 @@ public:
 	const _char* Get_AnimationName() const { return m_szName; }
 	_float		 Get_Duration() const { return m_fDuration; }
 
+	void		Set_LerpTime(_float fLerpTime) { m_fLerpTime = fLerpTime; }
+
 	// 애님툴에서 작업한 데이터 가져오기
 	void		 Set_AnimEventData(ANIM_INFO tAnimInfo);
 
@@ -80,9 +82,10 @@ private:
 	_bool								m_IsFinished = { false };	
 	_float								m_fRatioTime = { 0.f };
 	_bool								m_bRatio = { false };
+	_float								m_fLerpTime = { 0.1f };
 
 	vector<EVENT_INFO>					m_vecEventInfo;
-
+	
 public:
 	static CAnimation*	Create(const vector<class CBone*>& Bones, ifstream& fileStream);
 	CAnimation*			Clone();

@@ -38,7 +38,7 @@ public:
 		m_Animations[m_iCurrentAnimIndex]->Reset_Finished();
 		m_Animations[m_iCurrentAnimIndex]->Remove_Ratio();
 	}
-	void Set_Animation(_uint iAnimIndex, _float fTickPerSecond, _bool bIsLooping, _bool bInterpolation = false) {
+	void Set_Animation(_uint iAnimIndex, _float fTickPerSecond, _bool bIsLooping, _bool bInterpolation = false, _float fLerpTime = 0.1f) {
 		m_iCurrentAnimIndex = iAnimIndex;	
 		m_isLoop = bIsLooping;
 
@@ -50,6 +50,7 @@ public:
 		{
 			// 바뀔 애니메이션을 대상으로 선형보간 ON
 			m_Animations[m_iCurrentAnimIndex]->Reset_Ratio();
+			m_Animations[m_iCurrentAnimIndex]->Set_LerpTime(fLerpTime);
 		}
 	}
 	void Set_TrackPosition(_float fTrackPosition) { m_Animations[m_iCurrentAnimIndex]->Set_TrackPosition(fTrackPosition); }
@@ -102,6 +103,8 @@ public:
 	_uint Get_ModelPassIndex() { return m_iPassIndex; }
 	void Set_WorldMatrixForOctree(_float4x4 _matWorld) { m_matWorld = _matWorld; }
 	HRESULT Bind_WorldMatrixForOctree(class CShader* pShader, string& strConstantName = string("g_WorldMatrix"));
+	void SetUp_ModelIdleAnimForOctree(_uint iAnimIndex, _float fTickPerSec) { m_iIdleAnimIndex = iAnimIndex; m_fIdleAnimTickPerSec = fTickPerSec; }
+	void ReturnToIdle() { Set_Animation(m_iIdleAnimIndex, m_fIdleAnimTickPerSec, true, true, 0.2f); }
 
 private:
 	_uint						m_iNumMeshes = { 0 };
@@ -146,7 +149,8 @@ private:
 	_bool						m_bMotionBlur = { false };
 	_uint						m_iPassIndex = {};
 	_float4x4					m_matWorld = {};
-
+	_uint						m_iIdleAnimIndex = {};
+	_float						m_fIdleAnimTickPerSec = {};
 
 private:
 	HRESULT Ready_Meshes(_bool bOctree);

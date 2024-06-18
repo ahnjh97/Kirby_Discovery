@@ -59,8 +59,6 @@ void CUIObject::Free()
 		{
 			for (auto& pUIObj : pGroupUI)
 				Safe_Release(pUIObj);
-
-			m_GroupUIs.clear();
 		}
 		m_GroupUIs.clear();
 	}
