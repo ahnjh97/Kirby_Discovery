@@ -49,9 +49,21 @@ private:
 	void	Reset_MapShaderInfo();
 	void	Save_Octree();
 
+	_bool	Save_Map(const string& _strLevel, vector<CGameObject*>& _vecMap);
+	_bool	Save_Triggers(const string& _strLevel, vector<CGameObject*>& _vecTriggers);
+	_bool	Save_Monsters(const string& _strLevel, vector<CGameObject*>& _vecMonsters);
+	_bool	Save_RallyPoints(const string& _strLevel, vector<CGameObject*>& _vecRallyPoints);
+	_bool	Save_Decos(const string& _strLevel, vector<CGameObject*>& _vecDecos);
+	_bool	Save_Items(const string& _strLevel, vector<CGameObject*>& _vecItems);
+
+	void	Load_Map(const string& _strLevel);
+	void	Load_Triggers(const string& _strLevel);
+	void	Load_Monsters(const string& _strLevel);
+	void	Load_RallyPoints(const string& _strLevel);
+	void	Load_Decos(const string& _strLevel);
+	void	Load_Items(const string& _strLevel);
+
 	void	RegisterRallyPoints(list<CGameObject*>* _pObjList);
-	void	SaveMapDecoObjects(vector<CGameObject*>& _vecDecoObjs);
-	void	LoadMapDecoObjects();
 	void	WriteLocalizedAnimMapDecos(vector<pair<string, _float4x4>>& _vecAnimDecos);
 	void	WriteLocalizedNonAnimMapDecos(vector<pair<string, _float4x4>>& _vecNonAnimDecos);
 
@@ -63,7 +75,11 @@ private:
 	_bool IsMap(const string& _strModelName);
 	_bool IsTrigger(const string& _strModelName);
 	_bool IsMonster(const string& _strModelName);
+	_bool IsDeco(const string& _strModelName);
+	_bool IsItem(const string& _strModelName);
 	_bool IsRallyingMonster(const string& _strModelName);
+
+	_bool RenameFile(const string& _strLevel, const string& _tempFileName, const string& _strCustom);
 
 	// Options
 	void HideTriggers(_bool bHideTriggers);
@@ -81,6 +97,7 @@ private:
 	unordered_set<string>	m_setRallyingMonsters;
 	unordered_set<string>	m_setObjectTxts;
 	unordered_set<string>	m_setMapDecoTxts;
+	unordered_set<string>	m_setItemTxts;
 
 	unordered_set<string>	m_setNonColDecos;
 	unordered_set<string>	m_setAnimDecos;

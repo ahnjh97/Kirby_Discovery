@@ -21,6 +21,10 @@ private:
 	HRESULT Ready_Layer_BackGround(const wstring& strLayerTag);
 	HRESULT Ready_Layer_UI(const wstring& strLayerTag);
 	HRESULT Ready_ParsedObjects();
+	HRESULT Ready_Map();
+	HRESULT Ready_Triggers();
+	HRESULT Ready_Monsters();
+	HRESULT Ready_Items();
 
 public:
 	static CLevel_Intro* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

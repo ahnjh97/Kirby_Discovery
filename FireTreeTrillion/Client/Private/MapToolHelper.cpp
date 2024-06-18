@@ -68,7 +68,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	m_setMapNames = { "BG0", "BG1", "Level0Stage1Step01", "Level1Stage1Step01" };
 	m_setMonsterNames = { "NonAnim_Awoofy", "NonAnim_BladeKnight", "NonAnim_Buffahorn", "NonAnim_Rabbit"
 						, "NonAnim_Kabu", "NonAnim_BrontoBurt", "NonAnim_PoppyBrosJr", "NonAnim_CappyBody"};
-	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy", "RallyPoint", "LightBulb" };
+	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy" };
 	m_setRallyingMonsters = { "NonAnim_Kabu", "NonAnim_BrontoBurt" };
 
 	/*m_setNonColDecos = { "BushMCut" };*/
@@ -84,6 +84,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "StarBlockL" , "StarBlockM", "StarBlockS", "SeDriftWoodAL", "SeDriftWoodBL", "SeDriftWoodCL"
 		, "VpFactoryParts", "VpFactoryPartsBlend", "WoodBox" };
 	m_setKickableDecos = { "GsPebble", "GsStone", "SeShell" };
+	m_setItemTxts = { "Item_Coin" };
 
 	vecPassIndices.resize(m_vecMapModelNames.size());
 	vecSamplingFactors.resize(m_vecMapModelNames.size());
@@ -713,7 +714,7 @@ void CMapToolHelper::Save_Level()
 
 	string strLevel = m_vecLevelName[iLevelIndex + LEVEL_INTRO];
 	string tempFileName = "temp_" + strLevel + ".txt";
-	
+
 	ofstream outputFile(tempFileName, ios::out | ios::binary);
 	if (!outputFile.is_open()) // 임시파일 열렸는지 확인
 	{
@@ -732,10 +733,15 @@ void CMapToolHelper::Save_Level()
 		MSG_BOX(TEXT("List is empty."));
 		return;
 	}
-	
+
 	RegisterRallyPoints(pObjectsList);
-		
-	vector<CGameObject*> vecDecoObjs;
+
+	vector<CGameObject*> vecMap;
+	vector<CGameObject*> vecTriggers;
+	vector<CGameObject*> vecMonsters;
+	vector<CGameObject*> vecRallyPoints;
+	vector<CGameObject*> vecDecos;
+	vector<CGameObject*> vecItems;
 
 	for (auto& object : *pObjectsList)
 	{
@@ -751,8 +757,30 @@ void CMapToolHelper::Save_Level()
 			continue;
 
 		string strModelName = pModel->Get_ModelInfo().strModelName;
-		if (m_setMapDecoTxts.end() != m_setMapDecoTxts.find(strModelName)) {
-			vecDecoObjs.push_back(object);
+		if (true == IsMap(strModelName))
+		{
+			vecMap.push_back(object);
+			continue;
+		}
+		if (true == IsTrigger(strModelName))
+		{
+			vecTriggers.push_back(object);
+			continue;
+		}
+		if (true == IsDeco(strModelName)) {
+			vecDecos.push_back(object);
+			continue;
+		}
+		if (true == IsMonster(strModelName)) {
+			vecMonsters.push_back(object);
+			continue;
+		}
+		if (true == IsItem(strModelName)) {
+			vecItems.push_back(object);
+			continue;
+		}
+		if("RallyPoint" == strModelName){
+			vecRallyPoints.push_back(object);
 			continue;
 		}
 
@@ -766,78 +794,6 @@ void CMapToolHelper::Save_Level()
 		outputFile.write(reinterpret_cast<const char*>(&matWorld), sizeof(_float4x4));
 		outputFile.write(reinterpret_cast<const char*>(&iShaderVars), sizeof(iShaderVars));
 		outputFile.write(reinterpret_cast<const char*>(&fRimWidth), sizeof(fRimWidth));
-
-		if ("Camera" == strModelName || "Trigger" == strModelName) {
-			CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(object);
-
-			if ("Trigger" == strModelName)
-			{
-				_int triggerType = pMapToolObject->Get_TriggerType();
-				outputFile.write(reinterpret_cast<const char*>(&triggerType), sizeof(triggerType));
-			}
-			_int iTriggerIndex = pMapToolObject->Get_TriggerIndex();
-			outputFile.write(reinterpret_cast<const char*>(&iTriggerIndex), sizeof(iTriggerIndex));
-		}
-		else if ("Dummy" == strModelName)
-		{
-			CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(object);
-			_int iTriggerIndex = pMapToolObject->Get_TriggerIndex();
-			_int iCamType = pMapToolObject->Get_CamType();
-			_float fRadius = pMapToolObject->Get_Radius();
-
-			outputFile.write(reinterpret_cast<const char*>(&iTriggerIndex), sizeof(iTriggerIndex));
-			outputFile.write(reinterpret_cast<const char*>(&iCamType), sizeof(iCamType));
-			outputFile.write(reinterpret_cast<const char*>(&fRadius), sizeof(fRadius));
-		}
-		else if (-1 != Compute_MapIndex(strModelName)) // 맵인 경우
-		{
-			if (0 != strModelName.compare(strModelName.size() - 5, 5, "Blend")) // Blend맵이 아닌 경우
-			{
-				_float3 vMin{FLT_MAX, FLT_MAX, FLT_MAX}, vMax{-FLT_MAX, -FLT_MAX , -FLT_MAX };
-				pModel->Find_MinMax(vMin, vMax);
-				
-				outputFile.write(reinterpret_cast<const char*>(&vMin), sizeof(vMin));
-				outputFile.write(reinterpret_cast<const char*>(&vMax), sizeof(vMax));
-			}
-		}
-		else if (true == IsMonster(strModelName))
-		{
-			CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(object);
-			_int iTriggerIndex = pMapToolObject->Get_TriggerIndex();
-			outputFile.write(reinterpret_cast<const char*>(&iTriggerIndex), sizeof(iTriggerIndex));
-			
-			map<_uint, _float3> rallyPoints = pMapToolObject->Get_RallyPoints();
-			_uint iNumRallyPoints = rallyPoints.size();
-
-			outputFile.write(reinterpret_cast<const char*>(&iNumRallyPoints), sizeof(iNumRallyPoints));
-			if (strModelName == "NonAnim_BrontoBurt")
-			{
-				_int a = 0;
-			}
-			for (_uint iRallyPointIdx = 0; iRallyPointIdx < iNumRallyPoints; iRallyPointIdx++)
-			{
-				auto mapIter = rallyPoints.find(iRallyPointIdx);
-				if (mapIter == rallyPoints.end())
-					continue;
-
-				_float3 vPos = mapIter->second;
-				outputFile.write(reinterpret_cast<const char*>(&vPos), sizeof(vPos));
-			}
-		}
-		else if ("RallyPoint" == strModelName)
-		{
-			CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(object);
-			string strConnectedMonster = pMapToolObject->Get_ConnectedMonster();
-			_int iTriggerIndex = pMapToolObject->Get_TriggerIndex();
-			_uint iStrSize = strConnectedMonster.size();
-			outputFile.write(reinterpret_cast<const char*>(&iStrSize), sizeof(iStrSize));
-			outputFile.write(strConnectedMonster.c_str(), iStrSize);
-			outputFile.write(reinterpret_cast<const char*>(&iTriggerIndex), sizeof(iTriggerIndex));
-		}
-		else if ("Item_Coin" == strModelName)
-		{
-			_int a = 0;
-		}
 	}
 
 	outputFile.close();
@@ -850,37 +806,40 @@ void CMapToolHelper::Save_Level()
 		return;
 	}
 
-	// 현재시간 받아오기
-	auto now = chrono::system_clock::now();
-	time_t currentTime = chrono::system_clock::to_time_t(now);
+	RenameFile(strLevel, tempFileName, string());
 
-	struct tm timeinfo;
-	localtime_s(&timeinfo, &currentTime);
+	wstring wstrSave;
+	if (true == Save_Map(strLevel, vecMap))
+		wstrSave += L"Map O\n";
+	else
+		wstrSave += L"Map X\n";
 
-	// 현재 시간을 문자열로 변환
-	char buffer[80];
-	strftime(buffer, sizeof(buffer), "%H%M%S", &timeinfo);
+	if (true == Save_Triggers(strLevel, vecTriggers))
+		wstrSave += L"Triggers O\n";
+	else
+		wstrSave += L"Triggers X\n";
 
-	string fileName_Time = "../../../objects_txt/" + string(buffer) + "_" + strLevel + ".txt";
-	string fileName = "../../../objects_txt/" + strLevel + ".txt";
-	if (rename(fileName.c_str(), fileName_Time.c_str()) != 0)
-	{
-		MSG_BOX(TEXT("Failed to rename original file."));
-		return;
-	}
+	if (true == Save_Decos(strLevel, vecDecos))
+		wstrSave += L"Decos O\n";
+	else
+		wstrSave += L"Decos X\n";
 
-	if (rename(tempFileName.c_str(), fileName.c_str()) != 0) // 임시파일 이름을 level 이름으로 변경
-	{
-		wstring wstrError2 = TEXT("Failed to rename ") + CUtils::StrToWstr(tempFileName);
-		MSG_BOX(wstrError2.c_str());
-		remove(tempFileName.c_str()); // 임시파일 삭제
-		return;
-	}
+	if(true == Save_Monsters(strLevel, vecMonsters))
+		wstrSave += L"Monsters O\n";
+	else
+		wstrSave += L"Monsters X\n";
 
-	SaveMapDecoObjects(vecDecoObjs);
+	if(true == Save_RallyPoints(strLevel, vecRallyPoints))
+		wstrSave += L"RallyPoints O\n";
+	else
+		wstrSave += L"RallyPoints X\n";
 
-	wstring wstrSaveMsg = CUtils::StrToWstr(strLevel) + TEXT(" Saved.");
-	MSG_BOX(wstrSaveMsg.c_str());
+	if (true == Save_Items(strLevel, vecItems))
+		wstrSave += L"Items O\n";
+	else
+		wstrSave += L"Items X\n";
+
+	MSG_BOX(wstrSave.c_str());
 }
 
 void CMapToolHelper::Load_Level()
@@ -922,50 +881,6 @@ void CMapToolHelper::Load_Level()
 		fileStream.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
 		fileStream.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
 
-		if ("Camera" == strModelName || "Trigger" == strModelName) {
-			if ("Trigger" == strModelName)
-				fileStream.read(reinterpret_cast<char*>(&triggerType), sizeof(triggerType));
-
-			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
-		}
-		else if ("Dummy" == strModelName)
-		{
-			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
-			fileStream.read(reinterpret_cast<char*>(&iCamType), sizeof(iCamType));
-			fileStream.read(reinterpret_cast<char*>(&fRadius), sizeof(fRadius));
-		}
-		else if (-1 != Compute_MapIndex(strModelName)) // 맵이면
-		{
-			if (0 != strModelName.compare(strModelName.size() - 5, 5, "Blend")) // Blend맵이 아닌 경우
-			{
-				fileStream.read(reinterpret_cast<char*>(&vMin), sizeof(vMin));
-				fileStream.read(reinterpret_cast<char*>(&vMax), sizeof(vMax));
-			}
-		}
-		else if (true == IsMonster(strModelName)) {
-			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
-
-			_uint iNumRallyPoint{};
-			fileStream.read(reinterpret_cast<char*>(&iNumRallyPoint), sizeof(iNumRallyPoint));
-
-			rallyPoints.clear();
-			_float3 vRallyPointPos{};
-			for (_uint iRallyPointIdx = 0; iRallyPointIdx < iNumRallyPoint; iRallyPointIdx++)
-			{
-				fileStream.read(reinterpret_cast<char*>(&vRallyPointPos), sizeof(vRallyPointPos));
-				rallyPoints.emplace(iRallyPointIdx, vRallyPointPos);
-			}
-		}
-		else if ("RallyPoint" == strModelName)
-		{
-			_uint iStrSize{};
-			fileStream.read(reinterpret_cast<char*>(&iStrSize), sizeof(iStrSize));
-			strConnectedMonster.resize(iStrSize);
-			fileStream.read(&strConnectedMonster[0], iStrSize);
-			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
-		}
-			
-
 		if (fileStream.eof())
 			break;
 
@@ -974,73 +889,25 @@ void CMapToolHelper::Load_Level()
 		tDesc.matWorld = matWorld;
 		tDesc.iShaderVars = iShaderVars;
 		tDesc.fRimWidth = fRimWidth;
+		wstring wstrGameObjectTag = TEXT("MapToolObject");
 
-		if ("Camera" == strModelName || "Trigger" == strModelName)
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
 		{
-			if("Trigger" == strModelName)
-				tDesc.iTriggerType = triggerType;
-			tDesc.iTriggerIndex = iTriggerIndex;
-		}
-		else if ("Dummy" == strModelName)
-		{
-			tDesc.iTriggerIndex = iTriggerIndex;
-			tDesc.iCamType = iCamType;
-			tDesc.fRadius = fRadius;
-		}
-		else if (true == IsMonster(strModelName)) {
-			tDesc.iTriggerIndex = iTriggerIndex;
-			tDesc.RallyPoints = rallyPoints;
-		}
-		else if ("RallyPoint" == strModelName) {
-			tDesc.iTriggerIndex = iTriggerIndex;
-			tDesc.strConnectedMonster = strConnectedMonster;
-		}
-			
-
-		wstring wstrGameObjectTag;
-
-		if (Compute_MapIndex(strModelName) != -1) // 맵인 경우
-		{
-			CBasicMap::MAP_DESC tMapDesc{};
-			tMapDesc.wstrModelName = CUtils::StrToWstr(strModelName);
-			tMapDesc.matWorld = matWorld;
-			tMapDesc.vMin = vMin;
-			tMapDesc.vMax = vMax;
-			wstrGameObjectTag = TEXT("BasicMap");
-
-			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tMapDesc)))
-			{
-				wstring wstrErrorMsg = TEXT("Failed to Clone MapToolObject") + wstrGameObjectTag;
-				MSG_BOX(wstrErrorMsg.c_str());
-				fileStream.close();
-				return;
-			}
-		}	
-		else
-		{
-
-			if ("Item_Coin" == strModelName)
-			{
-				_int a = 0;
-			}
-			if ("BG0" == strModelName || "BG1" == strModelName)
-				wstrGameObjectTag = TEXT("BG");
-			else
-				wstrGameObjectTag = TEXT("MapToolObject");
-			
-			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
-			{
-				wstring wstrErrorMsg = TEXT("Failed to Clone: ") + wstrGameObjectTag;
-				MSG_BOX(wstrErrorMsg.c_str());
-				fileStream.close();
-				return;
-			}
+			wstring wstrErrorMsg = TEXT("Failed to Clone: ") + wstrGameObjectTag;
+			MSG_BOX(wstrErrorMsg.c_str());
+			fileStream.close();
+			return;
 		}
 	}
 
 	fileStream.close();
 
-	LoadMapDecoObjects();
+	Load_Map(strLevel);
+	Load_Decos(strLevel);
+	Load_Triggers(strLevel);
+	Load_Monsters(strLevel);
+	Load_RallyPoints(strLevel);
+	Load_Items(strLevel);
 }
 
 void CMapToolHelper::Save_MapShaderInfo()
@@ -1248,7 +1115,23 @@ _bool CMapToolHelper::IsMonster(const string& _strModelName)
 	if (m_setMonsterNames.end() != m_setMonsterNames.find(_strModelName))
 		return true;
 		
-	return false;
+	return _bool();
+}
+
+_bool CMapToolHelper::IsDeco(const string& _strModelName)
+{
+	if (m_setMapDecoTxts.end() != m_setMapDecoTxts.find(_strModelName))
+		return true;
+
+	return _bool();
+}
+
+_bool CMapToolHelper::IsItem(const string& _strModelName)
+{
+	if (m_setItemTxts.end() != m_setItemTxts.find(_strModelName))
+		return true;
+
+	return _bool();
 }
 
 _bool CMapToolHelper::IsRallyingMonster(const string& _strModelName)
@@ -1257,6 +1140,41 @@ _bool CMapToolHelper::IsRallyingMonster(const string& _strModelName)
 		return true;
 
 	return false;
+}
+
+_bool CMapToolHelper::RenameFile(const string& _strLevel, const string& _tempFileName, const string& _strCustom)
+{
+	// 현재시간 받아오기
+	auto now = chrono::system_clock::now();
+	time_t currentTime = chrono::system_clock::to_time_t(now);
+
+	struct tm timeinfo;
+	localtime_s(&timeinfo, &currentTime);
+
+	// 현재 시간을 문자열로 변환
+	char buffer[80];
+	strftime(buffer, sizeof(buffer), "%H%M%S", &timeinfo);
+
+	string fileName_Time = "../../../objects_txt/" + string(buffer) + "_" + _strLevel + _strCustom + ".txt";
+	string fileName = "../../../objects_txt/" + _strLevel + _strCustom + ".txt";
+	
+	if (rename(fileName.c_str(), fileName_Time.c_str()) != 0)
+	{
+		string strFile = _strLevel + _strCustom + ".txt";
+		wstring wstrRenameErr = L"Failed to Rename : " + CUtils::StrToWstr(strFile);
+		MSG_BOX(wstrRenameErr.c_str());
+		return false;
+	}
+
+	if (rename(_tempFileName.c_str(), fileName.c_str()) != 0) // 임시파일 이름을 level 이름으로 변경
+	{
+		wstring wstrError2 = TEXT("Failed to rename ") + CUtils::StrToWstr(_tempFileName);
+		MSG_BOX(wstrError2.c_str());
+		remove(_tempFileName.c_str()); // 임시파일 삭제
+		return false;
+	}
+
+	return true;
 }
 
 void CMapToolHelper::HideTriggers(_bool bHideTriggers)
@@ -1327,6 +1245,731 @@ void CMapToolHelper::Save_Octree()
 	pBasicMap->Save_OctreeData(m_vecLevelName[iLevelIndex + LEVEL_INTRO]);
 }
 
+_bool CMapToolHelper::Save_Map(const string& _strLevel, vector<CGameObject*>& _vecMap)
+{
+	if (_vecMap.empty())
+		return true;
+
+	string strCustom = "_Map";
+	string tempFileName = "temp_" + _strLevel + strCustom + ".txt";
+
+	ofstream outputFile(tempFileName, ios::out | ios::binary);
+	if (!outputFile.is_open()) // 임시파일 열렸는지 확인
+	{
+		wstring wstrErrorMsg = TEXT("Failed to Open: ") + CUtils::StrToWstr(tempFileName);
+		MSG_BOX(wstrErrorMsg.c_str());
+		return false;
+	}
+
+	_uint iNumObjects = _vecMap.size();
+	outputFile.write(reinterpret_cast<const char*>(&iNumObjects), sizeof(iNumObjects));
+
+	for (auto& map : _vecMap)
+	{
+		CModel* pModel = dynamic_cast<CModel*>(map->Get_Component(TEXT("Com_Model")));
+		CTransform* pTransform = dynamic_cast<CTransform*>(map->Get_Component(g_strTransformTag));
+
+		string strModelName = pModel->Get_ModelInfo().strModelName;
+		_float4x4 matWorld = pTransform->Get_WorldMatrix();
+		_uint iStrLength = strModelName.length();
+
+		_float3 vMin{ FLT_MAX, FLT_MAX, FLT_MAX }, vMax{ -FLT_MAX, -FLT_MAX , -FLT_MAX };
+		pModel->Find_MinMax(vMin, vMax);
+
+		outputFile.write(reinterpret_cast<const char*>(&iStrLength), sizeof(iStrLength));
+		outputFile.write(strModelName.c_str(), iStrLength);
+		outputFile.write(reinterpret_cast<const char*>(&matWorld), sizeof(_float4x4));
+
+		outputFile.write(reinterpret_cast<const char*>(&vMin), sizeof(vMin));
+		outputFile.write(reinterpret_cast<const char*>(&vMax), sizeof(vMax));
+	}
+
+	outputFile.close();
+
+	if (!outputFile)
+	{
+		wstring wstrError = TEXT("Failed to write data to ") + CUtils::StrToWstr(tempFileName);
+		MSG_BOX(wstrError.c_str());
+		remove(tempFileName.c_str()); // 임시파일 삭제
+		return false;
+	}
+
+	if(false == RenameFile(_strLevel, tempFileName, strCustom))
+		return false;
+	
+	return true;
+}
+
+_bool CMapToolHelper::Save_Triggers(const string& _strLevel, vector<CGameObject*>& _vecTriggers)
+{
+	if (_vecTriggers.empty())
+		return true;
+
+	string strCustom = "_Triggers";
+	string tempFileName = "temp_" + _strLevel + strCustom + ".txt";
+
+	ofstream outputFile(tempFileName, ios::out | ios::binary);
+	if (!outputFile.is_open()) // 임시파일 열렸는지 확인
+	{
+		wstring wstrErrorMsg = TEXT("Failed to Open: ") + CUtils::StrToWstr(tempFileName);
+		MSG_BOX(wstrErrorMsg.c_str());
+		return false;
+	}
+
+	_uint iNumObjects = _vecTriggers.size();
+	outputFile.write(reinterpret_cast<const char*>(&iNumObjects), sizeof(iNumObjects));
+
+	for (auto& trigger : _vecTriggers)
+	{
+		CModel* pModel = dynamic_cast<CModel*>(trigger->Get_Component(TEXT("Com_Model")));
+		CTransform* pTransform = dynamic_cast<CTransform*>(trigger->Get_Component(g_strTransformTag));
+
+		string strModelName = pModel->Get_ModelInfo().strModelName;
+		_float4x4 matWorld = pTransform->Get_WorldMatrix();
+		_uint iStrLength = strModelName.length();
+		_uint iShaderVars = trigger->Get_ShaderVars();
+		_float fRimWidth = trigger->Get_RimWidth();
+
+		CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(trigger);
+		_int iTriggerIndex = pMapToolObject->Get_TriggerIndex();
+		_int triggerType = pMapToolObject->Get_TriggerType();
+		_int iCamType = pMapToolObject->Get_CamType();
+		_float fRadius = pMapToolObject->Get_Radius();
+
+		outputFile.write(reinterpret_cast<const char*>(&iStrLength), sizeof(iStrLength));
+		outputFile.write(strModelName.c_str(), iStrLength);
+		outputFile.write(reinterpret_cast<const char*>(&matWorld), sizeof(_float4x4));
+		outputFile.write(reinterpret_cast<const char*>(&iShaderVars), sizeof(iShaderVars));
+		outputFile.write(reinterpret_cast<const char*>(&fRimWidth), sizeof(fRimWidth));
+
+		outputFile.write(reinterpret_cast<const char*>(&iTriggerIndex), sizeof(iTriggerIndex));
+		outputFile.write(reinterpret_cast<const char*>(&triggerType), sizeof(triggerType));
+		outputFile.write(reinterpret_cast<const char*>(&iCamType), sizeof(iCamType));
+		outputFile.write(reinterpret_cast<const char*>(&fRadius), sizeof(fRadius));
+	}
+
+	outputFile.close();
+
+	if (!outputFile)
+	{
+		wstring wstrError = TEXT("Failed to write data to ") + CUtils::StrToWstr(tempFileName);
+		MSG_BOX(wstrError.c_str());
+		remove(tempFileName.c_str()); // 임시파일 삭제
+		return false;
+	}
+
+	if (false == RenameFile(_strLevel, tempFileName, strCustom))
+		return false;
+
+	return true;
+}
+
+_bool CMapToolHelper::Save_Monsters(const string& _strLevel, vector<CGameObject*>& _vecMonsters)
+{
+	if (_vecMonsters.empty())
+		return true;
+
+	string strCustom = "_Monsters";
+	string tempFileName = "temp_" + _strLevel + strCustom + ".txt";
+
+	ofstream outputFile(tempFileName, ios::out | ios::binary);
+	if (!outputFile.is_open()) // 임시파일 열렸는지 확인
+	{
+		wstring wstrErrorMsg = TEXT("Failed to Open: ") + CUtils::StrToWstr(tempFileName);
+		MSG_BOX(wstrErrorMsg.c_str());
+		return false;
+	}
+
+	_uint iNumObjects = _vecMonsters.size();
+	outputFile.write(reinterpret_cast<const char*>(&iNumObjects), sizeof(iNumObjects));
+
+	for (auto& monster : _vecMonsters)
+	{
+		CModel* pModel = dynamic_cast<CModel*>(monster->Get_Component(TEXT("Com_Model")));
+		CTransform* pTransform = dynamic_cast<CTransform*>(monster->Get_Component(g_strTransformTag));
+
+		CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(monster);
+		_int iTriggerIndex = pMapToolObject->Get_TriggerIndex(); // Monster Enum
+		map<_uint, _float3> rallyPoints = pMapToolObject->Get_RallyPoints();
+		_uint iNumRallyPoints = rallyPoints.size();
+
+		string strModelName = pModel->Get_ModelInfo().strModelName;
+		_float4x4 matWorld = pTransform->Get_WorldMatrix();
+		_uint iStrLength = strModelName.length();
+		_uint iShaderVars = monster->Get_ShaderVars();
+		_float fRimWidth = monster->Get_RimWidth();
+
+		outputFile.write(reinterpret_cast<const char*>(&iStrLength), sizeof(iStrLength));
+		outputFile.write(strModelName.c_str(), iStrLength);
+		outputFile.write(reinterpret_cast<const char*>(&matWorld), sizeof(_float4x4));
+		outputFile.write(reinterpret_cast<const char*>(&iShaderVars), sizeof(iShaderVars));
+		outputFile.write(reinterpret_cast<const char*>(&fRimWidth), sizeof(fRimWidth));
+
+		outputFile.write(reinterpret_cast<const char*>(&iTriggerIndex), sizeof(iTriggerIndex)); 
+		outputFile.write(reinterpret_cast<const char*>(&iNumRallyPoints), sizeof(iNumRallyPoints));
+
+		for (_uint iRallyPointIdx = 0; iRallyPointIdx < iNumRallyPoints; iRallyPointIdx++)
+		{
+			auto mapIter = rallyPoints.find(iRallyPointIdx);
+			if (mapIter == rallyPoints.end())
+				continue;
+
+			_float3 vPos = mapIter->second;
+			outputFile.write(reinterpret_cast<const char*>(&vPos), sizeof(vPos));
+		}
+	}
+
+	outputFile.close();
+
+	if (!outputFile)
+	{
+		wstring wstrError = TEXT("Failed to write data to ") + CUtils::StrToWstr(tempFileName);
+		MSG_BOX(wstrError.c_str());
+		remove(tempFileName.c_str()); // 임시파일 삭제
+		return false;
+	}
+
+	if (false == RenameFile(_strLevel, tempFileName, strCustom))
+		return false;
+
+	return true;
+}
+
+_bool CMapToolHelper::Save_RallyPoints(const string& _strLevel, vector<CGameObject*>& _vecRallyPoints)
+{
+	if(_vecRallyPoints.empty())
+		return true;
+
+	string strCustom = "_RallyPoints";
+	string tempFileName = "temp_" + _strLevel + strCustom + ".txt";
+
+	ofstream outputFile(tempFileName, ios::out | ios::binary);
+	if (!outputFile.is_open()) // 임시파일 열렸는지 확인
+	{
+		wstring wstrErrorMsg = TEXT("Failed to Open: ") + CUtils::StrToWstr(tempFileName);
+		MSG_BOX(wstrErrorMsg.c_str());
+		return false;
+	}
+
+	_uint iNumObjects = _vecRallyPoints.size();
+	outputFile.write(reinterpret_cast<const char*>(&iNumObjects), sizeof(iNumObjects));
+
+	for (auto& rallyPoint : _vecRallyPoints)
+	{
+		CModel* pModel = dynamic_cast<CModel*>(rallyPoint->Get_Component(TEXT("Com_Model")));
+		CTransform* pTransform = dynamic_cast<CTransform*>(rallyPoint->Get_Component(g_strTransformTag));
+
+		string strModelName = pModel->Get_ModelInfo().strModelName;
+		_float4x4 matWorld = pTransform->Get_WorldMatrix();
+		_uint iStrLength = strModelName.length();
+
+		CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(rallyPoint);
+		_int iTriggerIndex = pMapToolObject->Get_TriggerIndex();
+		string strConnectedMonster = pMapToolObject->Get_ConnectedMonster();
+		_uint iMonsterStrLength = strConnectedMonster.length();
+
+		outputFile.write(reinterpret_cast<const char*>(&iStrLength), sizeof(iStrLength));
+		outputFile.write(strModelName.c_str(), iStrLength);
+		outputFile.write(reinterpret_cast<const char*>(&matWorld), sizeof(_float4x4));
+
+		outputFile.write(reinterpret_cast<const char*>(&iTriggerIndex), sizeof(iTriggerIndex));
+		outputFile.write(reinterpret_cast<const char*>(&iMonsterStrLength), sizeof(iMonsterStrLength));
+		outputFile.write(strConnectedMonster.c_str(), iMonsterStrLength);
+	}
+
+	outputFile.close();
+
+	if (!outputFile)
+	{
+		wstring wstrError = TEXT("Failed to write data to ") + CUtils::StrToWstr(tempFileName);
+		MSG_BOX(wstrError.c_str());
+		remove(tempFileName.c_str()); // 임시파일 삭제
+		return false;
+	}
+
+	if (false == RenameFile(_strLevel, tempFileName, strCustom))
+		return false;
+
+	return true;
+}
+
+_bool CMapToolHelper::Save_Decos(const string& _strLevel, vector<CGameObject*>& _vecDecos)
+{
+	if (_vecDecos.empty())
+		return true;
+
+	string strCustom = "_DecoObjs";
+	string tempFileName = "temp_" + _strLevel + strCustom + ".txt";
+
+	ofstream outputFile(tempFileName, ios::binary);
+	if (!outputFile.is_open()) // 임시파일 열렸는지 확인
+	{
+		wstring wstrErrorMsg = TEXT("Failed to Open: ") + CUtils::StrToWstr(tempFileName);
+		MSG_BOX(wstrErrorMsg.c_str());
+		return false;
+	}
+
+	vector<pair<string, _float4x4>> vecAnimDecos;
+	vector<pair<string, _float4x4>> vecNonAnimDecos;
+
+	_uint iNumObjects = _vecDecos.size();
+	outputFile.write(reinterpret_cast<const char*>(&iNumObjects), sizeof(iNumObjects));
+
+	for (auto& obj : _vecDecos)
+	{
+		CModel* pModel = dynamic_cast<CModel*>(obj->Get_Component(TEXT("Com_Model")));
+		CTransform* pTransform = dynamic_cast<CTransform*>(obj->Get_Component(g_strTransformTag));
+		string strModelName = pModel->Get_ModelInfo().strModelName;
+
+		CMapToolObject* pMapToolObj = dynamic_cast<CMapToolObject*>(obj);
+		_uint iMapObjType{};
+		if (m_setAnimDecos.end() != m_setAnimDecos.find(strModelName))
+			iMapObjType = CMapToolObject::MAPOBJ_ANIM;
+		else if (m_setActorDecos.end() != m_setActorDecos.find(strModelName))
+			iMapObjType = CMapToolObject::MAPOBJ_ACTOR;
+		else
+			iMapObjType = CMapToolObject::MAPOBJ_NONCOL;
+
+		outputFile.write(reinterpret_cast<const char*>(&iMapObjType), sizeof(iMapObjType));
+
+		_float4x4 matWorld = pTransform->Get_WorldMatrix();
+		_uint iStrLength = strModelName.length();
+		_uint iShaderVars = obj->Get_ShaderVars();
+		_float fRimWidth = obj->Get_RimWidth();
+
+		if (CMapToolObject::MAPOBJ_ANIM == iMapObjType)
+			vecAnimDecos.emplace_back(strModelName, matWorld);
+		else
+			vecNonAnimDecos.emplace_back(strModelName, matWorld);
+
+		outputFile.write(reinterpret_cast<const char*>(&iStrLength), sizeof(iStrLength));
+		outputFile.write(strModelName.c_str(), iStrLength);
+		outputFile.write(reinterpret_cast<const char*>(&matWorld), sizeof(_float4x4));
+		outputFile.write(reinterpret_cast<const char*>(&iShaderVars), sizeof(iShaderVars));
+		outputFile.write(reinterpret_cast<const char*>(&fRimWidth), sizeof(fRimWidth));
+	}
+
+	outputFile.close();
+
+	if (!outputFile)
+	{
+		wstring wstrError = TEXT("Failed to write data to ") + CUtils::StrToWstr(tempFileName);
+		MSG_BOX(wstrError.c_str());
+		remove(tempFileName.c_str()); // 임시파일 삭제
+		return false;
+	}
+
+	if (false == RenameFile(_strLevel, tempFileName, strCustom))
+		return false;
+
+	return true;
+}
+
+_bool CMapToolHelper::Save_Items(const string& _strLevel, vector<CGameObject*>& _vecItems)
+{
+	if (_vecItems.empty())
+		return true;
+
+	string strCustom = "_Items";
+	string tempFileName = "temp_" + _strLevel + strCustom + ".txt";
+
+	ofstream outputFile(tempFileName, ios::out | ios::binary);
+	if (!outputFile.is_open()) // 임시파일 열렸는지 확인
+	{
+		wstring wstrErrorMsg = TEXT("Failed to Open: ") + CUtils::StrToWstr(tempFileName);
+		MSG_BOX(wstrErrorMsg.c_str());
+		return false;
+	}
+
+	_uint iNumObjects = _vecItems.size();
+	outputFile.write(reinterpret_cast<const char*>(&iNumObjects), sizeof(iNumObjects));
+
+	for (auto& item : _vecItems)
+	{
+		CModel* pModel = dynamic_cast<CModel*>(item->Get_Component(TEXT("Com_Model")));
+		CTransform* pTransform = dynamic_cast<CTransform*>(item->Get_Component(g_strTransformTag));
+
+		string strModelName = pModel->Get_ModelInfo().strModelName;
+		_float4x4 matWorld = pTransform->Get_WorldMatrix();
+		_uint iStrLength = strModelName.length();
+		_uint iShaderVars = item->Get_ShaderVars();
+		_float fRimWidth = item->Get_RimWidth();
+
+		outputFile.write(reinterpret_cast<const char*>(&iStrLength), sizeof(iStrLength));
+		outputFile.write(strModelName.c_str(), iStrLength);
+		outputFile.write(reinterpret_cast<const char*>(&matWorld), sizeof(_float4x4));
+		outputFile.write(reinterpret_cast<const char*>(&iShaderVars), sizeof(iShaderVars));
+		outputFile.write(reinterpret_cast<const char*>(&fRimWidth), sizeof(fRimWidth));
+	}
+
+	outputFile.close();
+
+	if (!outputFile)
+	{
+		wstring wstrError = TEXT("Failed to write data to ") + CUtils::StrToWstr(tempFileName);
+		MSG_BOX(wstrError.c_str());
+		remove(tempFileName.c_str()); // 임시파일 삭제
+		return false;
+	}
+
+	if (false == RenameFile(_strLevel, tempFileName, strCustom))
+		return false;
+
+	return true;
+}
+
+void CMapToolHelper::Load_Map(const string& _strLevel)
+{
+	if ("Intro" != _strLevel)
+		return;
+
+	string strFileName = "../../../objects_txt/" + _strLevel + "_Map.txt";
+
+	ifstream fileInput(strFileName, ios::binary);
+	if (fileInput.is_open() == false)
+	{
+		wstring wstrError = TEXT("Failed to open : ") + CUtils::StrToWstr(_strLevel) + TEXT("_Map.txt");
+		MSG_BOX(wstrError.c_str());
+		return;
+	}
+
+	_uint iNumObjects{};
+	fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
+
+	_uint iStrLength{};
+	string strModelName;
+	_float4x4 matWorld{};
+	_float3 vMin{}, vMax{};
+
+	wstring wstrGameObjectTag;
+
+	for (_uint i = 0; i < iNumObjects; i++)
+	{
+		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
+		strModelName.resize(iStrLength);
+		fileInput.read(&strModelName[0], iStrLength);
+		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
+		fileInput.read(reinterpret_cast<char*>(&vMin), sizeof(vMin));
+		fileInput.read(reinterpret_cast<char*>(&vMax), sizeof(vMax));
+
+		CBasicMap::MAP_DESC tMapDesc{};
+		tMapDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+		tMapDesc.matWorld = matWorld;
+		tMapDesc.vMin = vMin;
+		tMapDesc.vMax = vMax;
+
+		if ("BG0" == strModelName || "BG1" == strModelName)
+			wstrGameObjectTag = TEXT("BG");
+		else
+			wstrGameObjectTag = TEXT("BasicMap");
+
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tMapDesc)))
+		{
+			wstring wstrErrorMsg = TEXT("Failed to Clone: ") + wstrGameObjectTag;
+			MSG_BOX(wstrErrorMsg.c_str());
+			fileInput.close();
+			return;
+		}
+	}
+
+	fileInput.close();
+}
+
+void CMapToolHelper::Load_Triggers(const string& _strLevel)
+{
+	if ("Intro" != _strLevel)
+		return;
+
+	string strFileName = "../../../objects_txt/" + _strLevel + "_Triggers.txt";
+
+	ifstream fileInput(strFileName, ios::binary);
+	if (fileInput.is_open() == false)
+	{
+		wstring wstrError = TEXT("Failed to open : ") + CUtils::StrToWstr(_strLevel) + TEXT("_Triggers.txt");
+		MSG_BOX(wstrError.c_str());
+		return;
+	}
+
+	_uint iNumObjects{};
+	fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
+
+	_uint iStrLength{};
+	string strModelName;
+	_float4x4 matWorld{};
+	_uint iShaderVars{};
+	_float fRimWidth{};
+
+	_int iTriggerIndex{};
+	_int triggerType{};
+	_int iCamType{};
+	_float fRadius{};
+	wstring wstrGameObjectTag = TEXT("MapToolObject");
+
+	for (_uint i = 0; i < iNumObjects; i++)
+	{
+		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
+		strModelName.resize(iStrLength);
+		fileInput.read(&strModelName[0], iStrLength);
+		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
+		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
+		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
+
+		fileInput.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
+		fileInput.read(reinterpret_cast<char*>(&triggerType), sizeof(triggerType));
+		fileInput.read(reinterpret_cast<char*>(&iCamType), sizeof(iCamType));
+		fileInput.read(reinterpret_cast<char*>(&fRadius), sizeof(fRadius));
+
+		CMapToolObject::MAPTOOLOBJECT_DESC tDesc{};
+		tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+		tDesc.matWorld = matWorld;
+		tDesc.iTriggerIndex = iTriggerIndex;
+		tDesc.iTriggerType = triggerType;
+		tDesc.iCamType = iCamType;
+		tDesc.fRadius = fRadius;
+
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
+		{
+			wstring wstrErrorMsg = TEXT("Failed to Clone: ") + wstrGameObjectTag;
+			MSG_BOX(wstrErrorMsg.c_str());
+			fileInput.close();
+			return;
+		}
+	}
+
+	fileInput.close();
+}
+
+void CMapToolHelper::Load_Monsters(const string& _strLevel)
+{
+	if ("Intro" != _strLevel)
+		return;
+
+	string strFileName = "../../../objects_txt/" + _strLevel + "_Monsters.txt";
+
+	ifstream fileInput(strFileName, ios::binary);
+	if (fileInput.is_open() == false)
+	{
+		wstring wstrError = TEXT("Failed to open : ") + CUtils::StrToWstr(_strLevel) + TEXT("_Monsters.txt");
+		MSG_BOX(wstrError.c_str());
+		return;
+	}
+
+	_uint iNumObjects{};
+	fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
+
+	_uint iStrLength{};
+	string strModelName;
+	_float4x4 matWorld{};
+	_uint iShaderVars{};
+	_float fRimWidth{};
+	_int iTriggerIndex{};
+	_uint iNumRallyPoints{};
+	map<_uint, _float3> rallyPoints;
+	wstring wstrGameObjectTag = TEXT("MapToolObject");
+
+	for (_uint i = 0; i < iNumObjects; i++)
+	{
+		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
+		strModelName.resize(iStrLength);
+		fileInput.read(&strModelName[0], iStrLength);
+		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
+		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
+		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
+
+		fileInput.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
+		fileInput.read(reinterpret_cast<char*>(&iNumRallyPoints), sizeof(iNumRallyPoints));
+
+		_float3 vRallyPointPos{};
+		rallyPoints.clear();
+		for (_uint iRallyPointIdx = 0; iRallyPointIdx < iNumRallyPoints; iRallyPointIdx++)
+		{
+			fileInput.read(reinterpret_cast<char*>(&vRallyPointPos), sizeof(vRallyPointPos));
+			rallyPoints.emplace(iRallyPointIdx, vRallyPointPos);
+		}
+
+		CMapToolObject::MAPTOOLOBJECT_DESC tDesc{};
+		tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+		tDesc.matWorld = matWorld;
+		tDesc.iShaderVars = iShaderVars;
+		tDesc.fRimWidth = fRimWidth;
+		tDesc.iTriggerIndex = iTriggerIndex; // Monster Enum
+		tDesc.RallyPoints = rallyPoints;
+
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
+		{
+			wstring wstrErrorMsg = TEXT("Failed to Clone: ") + wstrGameObjectTag;
+			MSG_BOX(wstrErrorMsg.c_str());
+			fileInput.close();
+			return;
+		}
+	}
+
+	fileInput.close();
+}
+
+void CMapToolHelper::Load_RallyPoints(const string& _strLevel)
+{
+	if ("Intro" != _strLevel)
+		return;
+
+	string strFileName = "../../../objects_txt/" + _strLevel + "_RallyPoints.txt";
+
+	ifstream fileInput(strFileName, ios::binary);
+	if (fileInput.is_open() == false)
+	{
+		wstring wstrError = TEXT("Failed to open : ") + CUtils::StrToWstr(_strLevel) + TEXT("_RallyPoints.txt");
+		MSG_BOX(wstrError.c_str());
+		return;
+	}
+
+	_uint iNumObjects{};
+	fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
+
+	string strModelName;
+	_float4x4 matWorld{};
+	_uint iStrLength{};
+	_int iTriggerIndex{};
+	string strConnectedMonster;
+	_uint iMonsterStrLength{};
+	wstring wstrGameObjectTag = TEXT("MapToolObject");
+
+	for (_uint i = 0; i < iNumObjects; i++)
+	{
+		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
+		strModelName.resize(iStrLength);
+		fileInput.read(&strModelName[0], iStrLength);
+		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
+
+		fileInput.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
+		fileInput.read(reinterpret_cast<char*>(&iMonsterStrLength), sizeof(iMonsterStrLength));
+		strConnectedMonster.resize(iMonsterStrLength);
+		fileInput.read(&strConnectedMonster[0], iMonsterStrLength);
+
+		CMapToolObject::MAPTOOLOBJECT_DESC tDesc{};
+		tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+		tDesc.matWorld = matWorld;
+		tDesc.iTriggerIndex = iTriggerIndex; // Monster Enum
+		tDesc.strConnectedMonster = strConnectedMonster;
+
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
+		{
+			wstring wstrErrorMsg = TEXT("Failed to Clone: ") + wstrGameObjectTag;
+			MSG_BOX(wstrErrorMsg.c_str());
+			fileInput.close();
+			return;
+		}
+	}
+
+	fileInput.close();
+}
+
+void CMapToolHelper::Load_Decos(const string& _strLevel)
+{
+	if ("Intro" != _strLevel)
+		return;
+
+	string strFileName = "../../../objects_txt/" + _strLevel + "_DecoObjs.txt";
+
+	ifstream fileInput(strFileName, ios::binary);
+	if (fileInput.is_open() == false)
+	{
+		wstring wstrError = TEXT("Failed to open : ") + CUtils::StrToWstr(_strLevel) + TEXT("_DecoObjs.txt");
+		MSG_BOX(wstrError.c_str());
+		return;
+	}
+
+	_uint iNumObjects{};
+	fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
+
+	_uint iMapObjType{};
+	string strModelName;
+	_float4x4 matWorld{};
+	_uint iStrLength{};
+	_uint iShaderVars{};
+	_float fRimWidth{};
+	wstring wstrGameObjectTag = TEXT("MapToolObject");
+
+	for (_uint i = 0; i < iNumObjects; i++)
+	{
+		fileInput.read(reinterpret_cast<char*>(&iMapObjType), sizeof(iMapObjType));
+		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
+		strModelName.resize(iStrLength);
+		fileInput.read(&strModelName[0], iStrLength);
+		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
+		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
+		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
+
+		CMapToolObject::MAPTOOLOBJECT_DESC tDesc{};
+		tDesc.eMapObjType = CMapToolObject::TYPE_MAPOBJ(iMapObjType);
+		tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+		tDesc.matWorld = matWorld;
+		tDesc.iShaderVars = iShaderVars;
+		tDesc.fRimWidth = fRimWidth;
+
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
+		{
+			wstring wstrErrorMsg = TEXT("Failed to Clone: ") + wstrGameObjectTag;
+			MSG_BOX(wstrErrorMsg.c_str());
+			fileInput.close();
+			return;
+		}
+	}
+
+	fileInput.close();
+}
+
+void CMapToolHelper::Load_Items(const string& _strLevel)
+{
+	if ("Intro" != _strLevel)
+		return;
+
+	string strFileName = "../../../objects_txt/" + _strLevel + "_Items.txt";
+
+	ifstream fileInput(strFileName, ios::binary);
+	if (fileInput.is_open() == false)
+	{
+		wstring wstrError = TEXT("Failed to open : ") + CUtils::StrToWstr(_strLevel) + TEXT("_Items.txt");
+		MSG_BOX(wstrError.c_str());
+		return;
+	}
+
+	_uint iNumObjects{};
+	fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
+
+	string strModelName;
+	_float4x4 matWorld{};
+	_uint iStrLength{};
+	_uint iShaderVars{};
+	_float fRimWidth{};
+	wstring wstrGameObjectTag = TEXT("MapToolObject");
+
+	for (_uint i = 0; i < iNumObjects; i++)
+	{
+		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
+		strModelName.resize(iStrLength);
+		fileInput.read(&strModelName[0], iStrLength);
+		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
+		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
+		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
+
+		CMapToolObject::MAPTOOLOBJECT_DESC tDesc{};
+		tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+		tDesc.matWorld = matWorld;
+		tDesc.iShaderVars = iShaderVars;
+		tDesc.fRimWidth = fRimWidth;
+
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
+		{
+			wstring wstrErrorMsg = TEXT("Failed to Clone: ") + wstrGameObjectTag;
+			MSG_BOX(wstrErrorMsg.c_str());
+			fileInput.close();
+			return;
+		}
+	}
+
+	fileInput.close();
+}
+
 void CMapToolHelper::RegisterRallyPoints(list<CGameObject*>* _pObjList)
 {
 	vector<CMapToolObject*> vecRallyingMonsterPtrs;
@@ -1389,158 +2032,6 @@ void CMapToolHelper::RegisterRallyPoints(list<CGameObject*>* _pObjList)
 
 		pNearestMonster->Emplace_RallyPoint(iRallyPointIndex, vFloatPos);
 	}
-}
-
-void CMapToolHelper::SaveMapDecoObjects(vector<CGameObject*>& _vecDecoObjs)
-{
-	string strLevel = m_vecLevelName[iLevelIndex + LEVEL_INTRO];
-	string tempFileName = "temp_" + m_vecLevelName[iLevelIndex + LEVEL_INTRO] + "_DecoObjs.txt";
-
-	ofstream fileOutput(tempFileName, ios::binary);
-
-	vector<pair<string, _float4x4>> vecAnimDecos;
-	vector<pair<string, _float4x4>> vecNonAnimDecos;
-
-	if (_vecDecoObjs.empty())
-		return;
-
-	for (auto& obj : _vecDecoObjs)
-	{
-		if (nullptr == obj)
-			continue;
-
-		CModel* pModel = dynamic_cast<CModel*>(obj->Get_Component(TEXT("Com_Model")));
-		if (nullptr == pModel)
-			continue;
-		CTransform* pTransform = dynamic_cast<CTransform*>(obj->Get_Component(g_strTransformTag));
-		if (nullptr == pTransform)
-			continue;
-		string strModelName = pModel->Get_ModelInfo().strModelName;
-
-		CMapToolObject* pMapToolObj = dynamic_cast<CMapToolObject*>(obj);
-		_uint iMapObjType{};
-		if (m_setAnimDecos.end() != m_setAnimDecos.find(strModelName))
-			iMapObjType = CMapToolObject::MAPOBJ_ANIM;
-		else if (m_setActorDecos.end() != m_setActorDecos.find(strModelName))
-			iMapObjType = CMapToolObject::MAPOBJ_ACTOR;
-		else
-			iMapObjType = CMapToolObject::MAPOBJ_NONCOL;
-
-		fileOutput.write(reinterpret_cast<const char*>(&iMapObjType), sizeof(iMapObjType));
-
-		_float4x4 matWorld = pTransform->Get_WorldMatrix();
-		_uint iStrLength = strModelName.length();
-		_uint iShaderVars = obj->Get_ShaderVars();
-		_float fRimWidth = obj->Get_RimWidth();
-
-		if (CMapToolObject::MAPOBJ_ANIM == iMapObjType)
-			vecAnimDecos.emplace_back(strModelName, matWorld);
-		else
-			vecNonAnimDecos.emplace_back(strModelName, matWorld);
-
-		fileOutput.write(reinterpret_cast<const char*>(&iStrLength), sizeof(iStrLength));
-		fileOutput.write(strModelName.c_str(), iStrLength);
-		fileOutput.write(reinterpret_cast<const char*>(&matWorld), sizeof(_float4x4));
-		fileOutput.write(reinterpret_cast<const char*>(&iShaderVars), sizeof(iShaderVars));
-		fileOutput.write(reinterpret_cast<const char*>(&fRimWidth), sizeof(fRimWidth));
-	}
-
-	fileOutput.close();
-
-	if (!fileOutput)
-	{
-		wstring wstrError = TEXT("Failed to write data to ") + CUtils::StrToWstr(tempFileName);
-		MSG_BOX(wstrError.c_str());
-		remove(tempFileName.c_str()); // 임시파일 삭제
-		return;
-	}
-
-	// 현재시간 받아오기
-	auto now = chrono::system_clock::now();
-	time_t currentTime = chrono::system_clock::to_time_t(now);
-
-	struct tm timeinfo;
-	localtime_s(&timeinfo, &currentTime);
-
-	// 현재 시간을 문자열로 변환
-	char buffer[80];
-	strftime(buffer, sizeof(buffer), "%H%M%S", &timeinfo);
-
-	string fileName_Time = "../../../objects_txt/" + string(buffer) + "_" + strLevel + "_DecoObjs.txt";
-	string fileName = "../../../objects_txt/" + strLevel + "_DecoObjs.txt";
-	if (rename(fileName.c_str(), fileName_Time.c_str()) != 0)
-	{
-		MSG_BOX(TEXT("Failed to rename original file."));
-		return;
-	}
-
-	if (rename(tempFileName.c_str(), fileName.c_str()) != 0) // 임시파일 이름을 level 이름으로 변경
-	{
-		wstring wstrError2 = TEXT("Failed to rename ") + CUtils::StrToWstr(tempFileName);
-		MSG_BOX(wstrError2.c_str());
-		remove(tempFileName.c_str()); // 임시파일 삭제
-		return;
-	}
-
-	/*WriteLocalizedAnimMapDecos(vecAnimDecos);
-	WriteLocalizedNonAnimMapDecos(vecNonAnimDecos);*/
-}
-
-void CMapToolHelper::LoadMapDecoObjects()
-{
-	string strLevel = m_vecLevelName[iLevelIndex + LEVEL_INTRO];
-	if ("Intro" != strLevel)
-		return;
-
-	string strFileName = "../../../objects_txt/" + strLevel + "_DecoObjs.txt";
-
-	ifstream fileInput(strFileName, ios::binary);
-	if (fileInput.is_open() == false)
-	{
-		wstring wstrError = TEXT("Failed to open : ") + CUtils::StrToWstr(strLevel) + TEXT("_DecoObjs.txt");
-		MSG_BOX(wstrError.c_str());
-		return;
-	}
-
-	_uint iMapObjType{};
-	string strModelName;
-	_float4x4 matWorld{};
-	_uint iStrLength{};
-	_uint iShaderVars{};
-	_float fRimWidth{};
-
-	while (!fileInput.eof())
-	{
-		fileInput.read(reinterpret_cast<char*>(&iMapObjType), sizeof(iMapObjType));
-		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
-		strModelName.resize(iStrLength);
-		fileInput.read(&strModelName[0], iStrLength);
-		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
-		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
-		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
-
-		CMapToolObject::MAPTOOLOBJECT_DESC tDesc{};
-		tDesc.eMapObjType = CMapToolObject::TYPE_MAPOBJ(iMapObjType);
-		tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
-		tDesc.matWorld = matWorld;
-		tDesc.iShaderVars = iShaderVars;
-		tDesc.fRimWidth = fRimWidth;
-
-		if (fileInput.eof())
-			break;
-
-		wstring wstrGameObjectTag = TEXT("MapToolObject");
-
-		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
-		{
-			wstring wstrErrorMsg = TEXT("Failed to Clone: ") + wstrGameObjectTag;
-			MSG_BOX(wstrErrorMsg.c_str());
-			fileInput.close();
-			return;
-		}
-	}
-
-	fileInput.close();
 }
 
 void CMapToolHelper::WriteLocalizedAnimMapDecos(vector<pair<string, _float4x4>>& _vecAnimDecos)

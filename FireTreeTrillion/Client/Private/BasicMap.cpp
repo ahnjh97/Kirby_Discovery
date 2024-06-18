@@ -347,7 +347,10 @@ void CBasicMap::InsertMapDecos()
     _uint iShaderVars{};
     _float fRimWidth{};
 
-    while (!fileInput.eof())
+    _uint iNumObjects{};
+    fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
+
+    for(_uint i = 0; i < iNumObjects; i++)
     {
         fileInput.read(reinterpret_cast<char*>(&iMapObjType), sizeof(iMapObjType));
         fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
@@ -365,16 +368,13 @@ void CBasicMap::InsertMapDecos()
             strFolder = string("MapDeco/");
         }
 
-        if (fileInput.eof())
-            break;
-       
-        CModel* pModel = CModel::Create(m_pDevice, m_pContext, MODEL{ strModelName, eType, 1.f, 0.f, 0, false, strFolder});
+        CModel* pModel = CModel::Create(m_pDevice, m_pContext, MODEL{ strModelName, eType, 1.f, 0.f, 0, false, strFolder });
 
         if (nullptr == pModel) {
-           fileInput.close();
-           return;
+            fileInput.close();
+            return;
         }
-           
+
         pModel->SetUpStencilRimLightMotionBlurPassIndex(iShaderVars, fRimWidth, 0);
 
         PxRigidStatic* pRigidStatic = { nullptr };
@@ -386,15 +386,15 @@ void CBasicMap::InsertMapDecos()
             vecNonCols.push_back(pModel);
             break;
         case CMapToolObject::MAPOBJ_ANIM:
-            pModel->Set_Animation(2, 50, true, true); 
-            
+            pModel->Set_Animation(2, 50, true, true);
+
             pRigidStatic = AddTriggerActorForAnimDeco(strModelName, matWorld);
             if (nullptr == pRigidStatic)
                 return;
             iter = m_ModelAnimSettingsMap.find(strModelName);
             if (iter == m_ModelAnimSettingsMap.end())
                 break;
-           
+
             m_pGameInstance->Emplace_MapDecoTrigger(pRigidStatic, pModel, iter->second.first, iter->second.second);
             vecAnims.push_back(pModel);
             break;
@@ -406,14 +406,6 @@ void CBasicMap::InsertMapDecos()
     }
 
     fileInput.close();
-
- /*   for (auto& colNonAnim : vecActors)
-    {
-        if (nullptr == colNonAnim)
-            continue;
-
-        colNonAnim->CreateStaticActor(m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION));
-    }*/
 
     m_pOcTree->InsertNonCols(vecNonCols);
     m_pOcTree->InsertColAnims(vecAnims);
