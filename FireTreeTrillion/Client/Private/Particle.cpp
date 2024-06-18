@@ -59,8 +59,10 @@ HRESULT CParticle::Initialize(void* pArg)
 
 	//기본 상태 세팅
 	INSTANCE_DESC instanceDesc{};
+	instanceDesc.vecMoveCommands.resize(INSTANCE_END);
+	for (auto& moveCmd : instanceDesc.vecMoveCommands)
+		moveCmd = false;
 
-	//instanceDesc.vecMoveCommands.resize(INSTANCE_END);
 	//instanceDesc.vecMoveCommands[INSTANCE_DROP] = true;
 	//instanceDesc.vecMoveCommands[INSTANCE_SPREAD] = true;
 	//instanceDesc.vecMoveCommands[INSTANCE_DECELERATE] = true;
@@ -129,7 +131,6 @@ void CParticle::Fill_SaveData(PARTICLE_DATA* pFXData)
 
 	pFXData->eRenderGroup = m_eRenderGroup;
 	pFXData->eTimer = m_eTimer;
-
 
 	pFXData->vCenter = m_InstanceDesc.vCenter;
 	pFXData->vRange = m_InstanceDesc.vRange;
@@ -264,7 +265,7 @@ HRESULT CParticle::Add_Components(PARTICLE_DESC& _FXDesc)
 		CHECK_FAILED(hr);
 
 		//현재 VtxInstance Shader Pass 2까지
-		m_iMaxPassIdx = 1;
+		m_iMaxPassIdx = INSTANCEPOINT_END - 1;
 	}
 	else
 	{
@@ -301,7 +302,11 @@ HRESULT CParticle::Bind_ShaderResources(_int iTexIdx, _int iMaskTexIdx)
 		return E_FAIL;
 
 
-	hr = m_pShaderCom->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition(), sizeof(_float4));
+ 	hr = m_pShaderCom->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition(), sizeof(_float4));
+	CHECK_FAILED(hr);
+
+	_float4 vLook = m_pGameInstance->Get_CamLook();
+	hr = m_pShaderCom->Bind_RawValue("g_vCamLook", &vLook, sizeof(_float4));
 	CHECK_FAILED(hr);
 
 	hr = m_pShaderCom->Bind_RawValue("g_vRColor", &m_InstanceDesc.vColor, sizeof(_float3));
@@ -315,8 +320,6 @@ HRESULT CParticle::Bind_ShaderResources(_int iTexIdx, _int iMaskTexIdx)
 
 	hr = m_pTextureCom[TEX_MASK]->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", m_iMaskTexIdx);
 	CHECK_FAILED(hr);
-
-
 
 
 	return S_OK;
