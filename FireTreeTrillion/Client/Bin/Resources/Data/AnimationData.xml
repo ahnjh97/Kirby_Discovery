@@ -51,5 +51,13 @@
         <AnimSpeed>30</AnimSpeed>
         <Count>1</Count>
         <Data0 EventName="ApplyDamage" StartFrame="4" EndFrame="5"/>
+        <Animation>SwordDive</Animation>
+        <AnimSpeed>30</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="1" EndFrame="2"/>
+        <Animation>UpwardSlash</Animation>
+        <AnimSpeed>30</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="1" EndFrame="2"/>
     </ModelName>
 </Root>

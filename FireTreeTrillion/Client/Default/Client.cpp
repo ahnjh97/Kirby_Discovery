@@ -84,8 +84,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
         _float fFpsLimit = { 60.f };
         _uint iCurLevel = *pGameInstance->Get_CurrentLevelID();
-        if (LEVEL_INTRO == iCurLevel || LEVEL_GAMEPLAY == iCurLevel)
-            fFpsLimit = 144.f;
+      /*  if (LEVEL_INTRO == iCurLevel || LEVEL_GAMEPLAY == iCurLevel)
+            fFpsLimit = 144.f;*/
 
 		if (fTimeAcc > 1.f / fFpsLimit)
 		{

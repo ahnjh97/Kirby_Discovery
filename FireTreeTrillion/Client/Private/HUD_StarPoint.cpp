@@ -81,9 +81,9 @@ _int CHUD_StarPoint::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
-	Update_UIState(fTimeDelta);
+	//Update_UIState(fTimeDelta);
 
-	
+	/*
 	if (m_IsKirbyEX == FALSE)
 	{
 		m_pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
@@ -121,20 +121,23 @@ _int CHUD_StarPoint::Tick(_float fTimeDelta)
 		/*if (iFont10 > 0)
 			m_bIsRender = TRUE;
 
-		m_bIsRender = FALSE;*/
+		m_bIsRender = FALSE;
 	}
-	if (TEXT("Font1") == m_UIObjDesc.wstrUITag || TEXT("Font1_Shadow") == m_UIObjDesc.wstrUITag)
+	/*
+if (TEXT("Font1") == m_UIObjDesc.wstrUITag || TEXT("Font1_Shadow") == m_UIObjDesc.wstrUITag)
 	{
 		_uint iFont1 = iCurCoin % 10;
 		m_UIObjDesc.wstrText = to_wstring(iFont1);
 	}
+	*/
+
 
 	return OBJ_NOEVENT;
 }
 
 void CHUD_StarPoint::Late_Tick(_float fTimeDelta)
 {
-	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_UI, this);
+	//m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_UI, this);
 }
 
 HRESULT CHUD_StarPoint::Render()
