@@ -1620,9 +1620,6 @@ _bool CMapToolHelper::Save_Items(const string& _strLevel, vector<CGameObject*>& 
 
 void CMapToolHelper::Load_Map(const string& _strLevel)
 {
-	if ("Intro" != _strLevel)
-		return;
-
 	string strFileName = "../../../objects_txt/" + _strLevel + "_Map.txt";
 
 	ifstream fileInput(strFileName, ios::binary);
@@ -1677,9 +1674,6 @@ void CMapToolHelper::Load_Map(const string& _strLevel)
 
 void CMapToolHelper::Load_Triggers(const string& _strLevel)
 {
-	if ("Intro" != _strLevel)
-		return;
-
 	string strFileName = "../../../objects_txt/" + _strLevel + "_Triggers.txt";
 
 	ifstream fileInput(strFileName, ios::binary);
@@ -1741,9 +1735,6 @@ void CMapToolHelper::Load_Triggers(const string& _strLevel)
 
 void CMapToolHelper::Load_Monsters(const string& _strLevel)
 {
-	if ("Intro" != _strLevel)
-		return;
-
 	string strFileName = "../../../objects_txt/" + _strLevel + "_Monsters.txt";
 
 	ifstream fileInput(strFileName, ios::binary);
@@ -1809,9 +1800,6 @@ void CMapToolHelper::Load_Monsters(const string& _strLevel)
 
 void CMapToolHelper::Load_RallyPoints(const string& _strLevel)
 {
-	if ("Intro" != _strLevel)
-		return;
-
 	string strFileName = "../../../objects_txt/" + _strLevel + "_RallyPoints.txt";
 
 	ifstream fileInput(strFileName, ios::binary);
@@ -1865,9 +1853,6 @@ void CMapToolHelper::Load_RallyPoints(const string& _strLevel)
 
 void CMapToolHelper::Load_Decos(const string& _strLevel)
 {
-	if ("Intro" != _strLevel)
-		return;
-
 	string strFileName = "../../../objects_txt/" + _strLevel + "_DecoObjs.txt";
 
 	ifstream fileInput(strFileName, ios::binary);
@@ -1920,9 +1905,6 @@ void CMapToolHelper::Load_Decos(const string& _strLevel)
 
 void CMapToolHelper::Load_Items(const string& _strLevel)
 {
-	if ("Intro" != _strLevel)
-		return;
-
 	string strFileName = "../../../objects_txt/" + _strLevel + "_Items.txt";
 
 	ifstream fileInput(strFileName, ios::binary);
