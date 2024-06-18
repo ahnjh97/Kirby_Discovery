@@ -13,10 +13,10 @@
 
 #include "KirbyWeapons.h"
 #include "KirbyArmours.h"
-#include "Trigger.h"
 
 #include "Utils.h"
 #include "Bone.h"
+#include "HitBox.h"
 
 
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -31,8 +31,6 @@ CKirby::CKirby(const CKirby& rhs)
 
 HRESULT CKirby::Initialize_Prototype()
 {
-	m_eCollisionGroup = PLAYER;
-
 	return S_OK;
 }
 
@@ -105,13 +103,10 @@ HRESULT CKirby::Initialize(void* pArg)
 	//m_eAbilityType = ABILITY_SWORD;
 
 	m_pControllerCom->RegisterAsPlayer();
-	m_pControllerCom->Register_Controller();
 
 	// 폭탄 궤적을 만들어 놓는다.
 	Ready_BombOrbit();
 
-
-	
 	Add_AnimEvent();
 
 	return S_OK;
@@ -140,12 +135,6 @@ _int CKirby::Tick(_float fTimeDelta)
 
 	m_pWeapons->Tick(m_fTimeDelta);
 	m_pArmours->Tick(m_fTimeDelta);
-
-	if(m_pHitBoxTrigger->Is_Alive())
-		m_pHitBoxTrigger->Tick(m_fTimeDelta);
-
-	//if (m_pGameInstance->Get_DIKeyState(DIK_5, KEY_DOWN))
-	//	m_pHitBoxTrigger->Check_Collision();
 
 	return OBJ_NOEVENT;
 }
@@ -244,7 +233,7 @@ void CKirby::Render_IMGUI()
 
 	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	ImGui::Text("HP : %d", (_int)m_fHp);
-	ImGui::Text("m_iTestAnim : %d", m_iTestAnim);
+	ImGui::Text("m_fVacuumTime : %.2f", INFO(m_fVacuumTime));
 	ImGui::Text("m_bInitializeTargetPos : %d", m_bInitializeTargetPos);
 	ImGui::Text("m_vLadderPoint.x : %.2f, m_vLadderPoint.y : %.2f m_vLadderPoint.z : %.2f", INFO(m_vLadderPoint).x, INFO(m_vLadderPoint).y, INFO(m_vLadderPoint).z);
 	ImGui::Text("m_vLadderLook.x : %.2f, m_vLadderLook.y : %.2f m_vLadderLook.z : %.2f", INFO(m_vLadderLook).x, INFO(m_vLadderLook).y, INFO(m_vLadderLook).z);
@@ -301,11 +290,9 @@ void CKirby::Add_AnimEvent()
 	// 2. 재생 기준은 애님툴에서 지정한 애니메이션인지 + 시작 프레임이 애니메이션 프레임안에 들어가는 지
 	// 3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
 	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("ApplyDamage", [this]() {
-		m_pHitBoxTrigger->Check_Collision();
-
+		Set_FrustumCollider(0.5f, 4.f, 90.f);
 		});
 	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("StopDamage", [this]() {
-		//m_pHitBoxTrigger->Close_Collision();
 
 		});
 
@@ -367,6 +354,7 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 		if (pObject->Get_PhyXState() == PO_VACUUMING)
 		{
 			// 일단 EAT으로 넘기는건 같으나, EAT이 끝날 시점에 내가 삼켰던 것이 무엇이였는지 판단 후 애니메이션이 분기된다.
+			INFO(m_fVacuumTime) = 0.f;
 			INFO(m_isEat) = true;
 			INFO(m_eEyeState) = EYE_IDLE;
 			INFO(m_eMouthState) = MOUTH_ANGER;
@@ -758,15 +746,21 @@ HRESULT CKirby::Add_PartObjects()
 	m_pArmours = static_cast<CKirbyArmours*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_KirbyArmours"), &ArmourDesc));
 	CHECK_NULLPTR(m_pArmours);
 
-	/* 커비의 HITBOX */
-	CTrigger::TRIGGER_DESC tTriggerDesc{};
-	tTriggerDesc.iTriggerType = CTrigger::TRIGGER_HITBOX;
-	tTriggerDesc.iTriggerIndex = 0;
-	tTriggerDesc.eCollisionGroup = HITBOX_PLYAER;
-	tTriggerDesc.vTriggerSize = _float3(2.5f, 1.f, 2.5f);
-	m_pHitBoxTrigger = static_cast<CTrigger*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc));
-	CHECK_NULLPTR(m_pHitBoxTrigger);
-	m_pHitBoxTrigger->Set_Owner(this);
+	
+	CHitBox::HITBOX_DESC HitBox{};
+	HitBox.pOwner = this;
+	HitBox.pDesc = &m_tColliderDesc[BODY];
+	HitBox.pCollisionType = PLAYER;
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
+		return E_FAIL;
+	Set_BodyCollider(COLLIDER_SPHERE, 0.7f, 0.f, 0.6f);
+
+	HitBox.pDesc = &m_tColliderDesc[ATTACK];
+	HitBox.pCollisionType = HITBOX_PLYAER;
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
+		return E_FAIL;
+	Set_FrustumCollider(0.5f, 4.f, 90.f);
+
 
 	return S_OK;
 }
@@ -1216,8 +1210,6 @@ void CKirby::Free()
 
 	if (INFO(m_pObject) != nullptr)
 		Safe_Release(INFO(m_pObject));
-
-	Safe_Release(m_pHitBoxTrigger);
 
 	// Bomb
 	Safe_Release(m_pOrbit);

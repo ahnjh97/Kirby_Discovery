@@ -32,6 +32,7 @@ void CKirbySword_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 	{
 		DESC(m_eEyeState) = CKirby::EYE_IDLE;
 		pKirby->Change_State(CKirby::STATE_FALL, 50.f, false, true, CKirby::BODY_DEFAULT);
+		return;
 	}
 
 	// Idle일 때, 방향키를 눌렀을 때 RUN 으로 간다.
@@ -39,6 +40,7 @@ void CKirbySword_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 	{
 		DESC(m_eEyeState) = CKirby::EYE_IDLE;
 		pKirby->Change_State(CKirby::SWORDSTATE_RUN, 120.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		return;
 	}
 
 	Key_Z(pGameObject, fTimeDelta);
@@ -48,17 +50,20 @@ void CKirbySword_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 
 }
 
-void CKirbySword_Idle_State::Key_Z(CGameObject* pGameObject, _float fTimeDelta)
+_bool CKirbySword_Idle_State::Key_Z(CGameObject* pGameObject, _float fTimeDelta)
 {
 	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_Z, KEY_PRESS))
 	{
 		pKirby->Change_State(CKirby::SWORDSTATE_GUARD, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		return true;
 	}
+
+	return false;
 }
 
-void CKirbySword_Idle_State::Key_X(CGameObject* pGameObject, _float fTimeDelta)
+_bool CKirbySword_Idle_State::Key_X(CGameObject* pGameObject, _float fTimeDelta)
 {
 	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
 	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
@@ -77,19 +82,21 @@ void CKirbySword_Idle_State::Key_X(CGameObject* pGameObject, _float fTimeDelta)
 		{
 			pKirby->Change_State(CKirby::SWORDSTATE_SIDESLASH, 60.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 			DESC(m_ePreAttackState) = CKirby::SWORDSTATE_SIDESLASH;
+			return true;
 
 		}
 		else if (DESC(m_ePreAttackState) == CKirby::SWORDSTATE_SIDESLASH)
 		{
 			pKirby->Change_State(CKirby::SWORDSTATE_MULITSWORDATTACK, 60.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 			DESC(m_ePreAttackState) = CKirby::SWORDSTATE_MULITSWORDATTACK;
+			return true;
 		}
 		else if (DESC(m_ePreAttackState) == CKirby::SWORDSTATE_MULITSWORDATTACK)
 		{
 			pKirby->Change_State(CKirby::SWORDSTATE_DECISIVESLASH, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 			DESC(m_ePreAttackState) = CKirby::SWORDSTATE_DECISIVESLASH;
 			DESC(m_fMoveSpeed) = 0.f;
-
+			return true;
 		}
 	}
 
@@ -104,13 +111,16 @@ void CKirbySword_Idle_State::Key_X(CGameObject* pGameObject, _float fTimeDelta)
 			pKirby->Change_State(CKirby::SWORDSTATE_SPINSLASHCHARGE, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 			// 다시 차징시간 0.f 부터 시작한다.
 			DESC(m_fChargeTime) = 0.f;
+			return true;
 		}
 	}
 	else
 		DESC(m_fChargeTime) = 0.f;
+
+	return false;
 }
 
-void CKirbySword_Idle_State::Key_C(CGameObject* pGameObject, _float fTimeDelta)
+_bool CKirbySword_Idle_State::Key_C(CGameObject* pGameObject, _float fTimeDelta)
 {
 	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
 	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
@@ -123,7 +133,6 @@ void CKirbySword_Idle_State::Key_C(CGameObject* pGameObject, _float fTimeDelta)
 		DESC(m_eEyeState) = CKirby::EYE_IDLE;
 
 		DESC(m_eJumpState) == DESC(m_eJumpState) ? CKirby::STATE_JUMPR : DESC(m_eJumpState) = CKirby::STATE_JUMPL;
-		pKirby->Change_State(DESC(m_eJumpState), 50.f, false, true, CKirby::BODY_DEFAULT);
 
 		DESC(m_fChangeVelocityZeroTime) = 0.f;
 		// 공중에서 체공하는 시간 0.15초
@@ -133,10 +142,15 @@ void CKirbySword_Idle_State::Key_C(CGameObject* pGameObject, _float fTimeDelta)
 
 		// 재입력 블락기능 초기화
 		DESC(m_bRePressBlock) = false;
+
+		pKirby->Change_State(DESC(m_eJumpState), 50.f, false, true, CKirby::BODY_DEFAULT);
+		return true;
 	}
+
+	return false;
 }
 
-void CKirbySword_Idle_State::Key_V(CGameObject* pGameObject, _float fTimeDelta)
+_bool CKirbySword_Idle_State::Key_V(CGameObject* pGameObject, _float fTimeDelta)
 {
 	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
 	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
@@ -150,6 +164,7 @@ void CKirbySword_Idle_State::Key_V(CGameObject* pGameObject, _float fTimeDelta)
 		{
 			DESC(m_fDumpAbilityTime) = 0.f;
 			pKirby->Change_State(CKirby::STATE_ABILITYDUMP, 60.f, false, false, CKirby::BODY_DEFAULT);
+			return true;
 		}
 	}
 	else
@@ -160,6 +175,8 @@ void CKirbySword_Idle_State::Key_V(CGameObject* pGameObject, _float fTimeDelta)
 		if (DESC(m_fDumpAbilityTime) < 0.f)
 			DESC(m_fDumpAbilityTime) = 0.f;
 	}
+
+	return false;
 }
 
 
@@ -202,12 +219,17 @@ void CKirbySword_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
 	Bbong_FX(fTimeDelta, pTransformCom);
+	Moving_Logic(Kirbydesc, pTransformCom, pController, fTimeDelta);
+	Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
+	Turn_Z_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
+	pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
 
 	if (Kirby_Ladder_Logic(pKirby, Kirbydesc, pTransformCom))
 	{
-		pKirby->Change_State(CKirby::STATE_LADDERWAITSTART, 200.f, false, false, CKirby::BODY_DEFAULT);
 		pController->Set_Position(pTransformCom, DESC(m_vLadderPoint));
 		DESC(m_vMoveDir) = DESC(m_vTargetDir) = DESC(m_vLadderLook);
+		pKirby->Change_State(CKirby::STATE_LADDERWAITSTART, 200.f, false, false, CKirby::BODY_DEFAULT);
+		return;
 	}
 
 
@@ -218,7 +240,6 @@ void CKirbySword_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		DESC(m_fJumpVelocity) = 22.f;
 
 		DESC(m_eJumpState) == CKirby::STATE_JUMPL ? DESC(m_eJumpState) = CKirby::STATE_JUMPR : DESC(m_eJumpState) = CKirby::STATE_JUMPL;
-		pKirby->Change_State(DESC(m_eJumpState), 50.f, false, true, CKirby::BODY_DEFAULT);
 
 		DESC(m_fChangeVelocityZeroTime) = 0.f;
 		// 공중에서 체공하는 시간 0.15초
@@ -227,6 +248,8 @@ void CKirbySword_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		DESC(m_fJumpHoldTime) = 0.f;
 		// 재입력 블락기능 초기화
 		DESC(m_bRePressBlock) = false;
+		pKirby->Change_State(DESC(m_eJumpState), 50.f, false, true, CKirby::BODY_DEFAULT);
+		return;
 	}
 
 	// Run일 때, X를 누르면 1타 공격을 시작한다.
@@ -254,13 +277,15 @@ void CKirbySword_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			pKirby->Change_State(CKirby::SWORDSTATE_DECISIVESLASH, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 			DESC(m_fMoveSpeed) = 0.f;
 			DESC(m_ePreAttackState) = CKirby::SWORDSTATE_DECISIVESLASH;
-
 		}
+
+		return;
 	}
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_Z, KEY_DOWN))
 	{
 		pKirby->Change_State(CKirby::SWORDSTATE_GUARD, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		return;
 	}
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_V, KEY_PRESS))
@@ -271,6 +296,7 @@ void CKirbySword_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		{
 			DESC(m_fDumpAbilityTime) = 0.f;
 			pKirby->Change_State(CKirby::STATE_ABILITYDUMP, 60.f, false, false, CKirby::BODY_DEFAULT);
+			return;
 		}
 	}
 	else
@@ -285,17 +311,17 @@ void CKirbySword_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 
 	if (false == JoyStick_controller(Kirbydesc, pCamera))
+	{
 		pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		return;
+	}
 
 	if (pController->Compute_Height() > 2.f)
 	{
 		pKirby->Change_State(CKirby::STATE_FALL, 50.f, false, true, CKirby::BODY_DEFAULT);
+		return;
 	}
 
-	Moving_Logic(Kirbydesc, pTransformCom, pController, fTimeDelta);
-	Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
-	Turn_Z_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
-	pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
 }
 
 void CKirbySword_Run_State::OnStateExit()
@@ -352,17 +378,22 @@ void CKirbySword_Guard_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 			m_pGameInstance->Get_DIKeyState(DIK_RIGHT, KEY_DOWN))
 		{
 			pKirby->Change_State(CKirby::STATE_DODGESTART, 50.f, false, false, CKirby::BODY_DEFAULT);
+			return;
 		}
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
 		{
 			if (JoyStick_controller(Kirbydesc, pCamera))
+			{
 				pKirby->Change_State(CKirby::STATE_DODGESTART, 50.f, false, false, CKirby::BODY_DEFAULT);
+				return;
+			}
 			else
 			{
 				_vector vLook = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
 				DESC(m_vDodgeDir) = vLook;
 				pKirby->Change_State(CKirby::SWORDSTATE_SWORDSLIDESTART, 60.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				return;
 			}
 		}
 
@@ -371,6 +402,7 @@ void CKirbySword_Guard_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		{
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			return;
 		}
 	}
 
@@ -383,6 +415,7 @@ void CKirbySword_Guard_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		{
 			pKirby->Change_State(CKirby::SWORDSTATE_SWORDSLIDE, 60.f, true, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 			DESC(m_fMoveSpeed) = 18.f;
+			return;
 		}
 	}
 	else if (pKirby->Get_State() == CKirby::SWORDSTATE_SWORDSLIDE)
@@ -398,6 +431,7 @@ void CKirbySword_Guard_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		{
 			pKirby->Change_State(CKirby::SWORDSTATE_SWORDSLIDEEND, 120.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 			DESC(m_fMoveSpeed) = 0.f;
+			return;
 		}
 
 		// 슬라이드 중에 C를 누르면 공중 공격을 한다.
@@ -405,6 +439,7 @@ void CKirbySword_Guard_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		{
 			DESC(m_fJumpVelocity) = 22.f;
 			pKirby->Change_State(CKirby::SWORDSTATE_UPWARDSLASH, 60.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			return;
 		}
 
 	}
@@ -417,11 +452,13 @@ void CKirbySword_Guard_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 			if (m_pGameInstance->Get_DIKeyState(DIK_Z, KEY_PRESS))
 			{
 				pKirby->Change_State(CKirby::SWORDSTATE_GUARD, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				return;
 			}
 			else
 			{
 				DESC(m_eEyeState) = CKirby::EYE_IDLE;
 				pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				return;
 			}
 		}
 	}
@@ -553,16 +590,21 @@ void CKirbySword_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 			{
 				pKirby->Change_State(CKirby::SWORDSTATE_MULITSWORDATTACK, 60.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 				DESC(m_ePreAttackState) = CKirby::SWORDSTATE_MULITSWORDATTACK;
+				return;
 			}
 			else
+			{
 				pKirby->Change_State(CKirby::SWORDSTATE_SIDESLASHEND, 60.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				return;
+			}
 
 			if (DESC(m_fChargeTime) > 0.15f)
 			{
 				DESC(m_eEyeState) = CKirby::EYE_ANGER;
-				pKirby->Change_State(CKirby::SWORDSTATE_SPINSLASHCHARGE, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 				// 다시 차징시간 0.f 부터 시작한다.
 				DESC(m_fChargeTime) = 0.f;
+				pKirby->Change_State(CKirby::SWORDSTATE_SPINSLASHCHARGE, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				return;
 			}
 
 		}
@@ -586,14 +628,16 @@ void CKirbySword_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 		{
 			pKirby->Change_State(CKirby::SWORDSTATE_MULITSWORDATTACK, 60.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 			DESC(m_ePreAttackState) = CKirby::SWORDSTATE_MULITSWORDATTACK;
+			return;
 		}
 
 		if (pKirby->isAnimFinish())
 		{
-			pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			// 0.7초간 유예시간을 준다.
 			DESC(m_fAttackTime) = 0.5f;
+			pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			return;
 		}
 	}
 
@@ -644,26 +688,30 @@ void CKirbySword_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 			// 다음 공격으로 넘어간다는 시그널이 있을 경우
 			if (m_bPassNextAttackMotion == true)
 			{
-				pKirby->Change_State(CKirby::SWORDSTATE_DECISIVESLASH, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 				DESC(m_ePreAttackState) = CKirby::SWORDSTATE_DECISIVESLASH;
 				DESC(m_fMoveSpeed) = 0.f;
+				pKirby->Change_State(CKirby::SWORDSTATE_DECISIVESLASH, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				return;
+
 			}
 			else
 			{
-				pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 				DESC(m_eEyeState) = CKirby::EYE_IDLE;
 				// 0.7초간 유예시간을 준다.
 				DESC(m_fAttackTime) = 0.5f;
+				pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				return;
+
 			}
 
 
 			if (DESC(m_fChargeTime) > 0.15f)
 			{
 				DESC(m_eEyeState) = CKirby::EYE_ANGER;
-				pKirby->Change_State(CKirby::SWORDSTATE_SPINSLASHCHARGE, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 				// 다시 차징시간 0.f 부터 시작한다.
 				DESC(m_fChargeTime) = 0.f;
-
+				pKirby->Change_State(CKirby::SWORDSTATE_SPINSLASHCHARGE, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				return;
 			}
 
 		}
@@ -711,14 +759,16 @@ void CKirbySword_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 			if (DESC(m_fChargeTime) > 0.15f)
 			{
 				DESC(m_eEyeState) = CKirby::EYE_ANGER;
-				pKirby->Change_State(CKirby::SWORDSTATE_SPINSLASHCHARGE, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 				// 다시 차징시간 0.f 부터 시작한다.
 				DESC(m_fChargeTime) = 0.f;
+				pKirby->Change_State(CKirby::SWORDSTATE_SPINSLASHCHARGE, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				return;
 			}
 			else
 			{
-				pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 				DESC(m_eEyeState) = CKirby::EYE_IDLE;
+				pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				return;
 			}
 		}
 	}
@@ -810,15 +860,22 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 				CKirby::DIR eDir = Kirby_Standard_Angle(DESC(m_vMoveDir), DESC(m_vAttackDir));
 
 				if (eDir == CKirby::DIR_FRONT || eDir == CKirby::DIR_BACK)
+				{
 					pKirby->Change_State(CKirby::SWORDSTATE_SHUFFIEFRONT, 120.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+					return;
+				}
 				else
+				{
 					pKirby->Change_State(CKirby::SWORDSTATE_SHUFFIERIGHT, 120.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+					return;
+				}
 			}
 
 			// 1초간 차징시간이 더 추가되었을 때, 슈퍼 차지모드로 변경된다.
 			if (DESC(m_fChargeTime) > 1.f)
 			{
 				pKirby->Change_State(CKirby::SWORDSTATE_SUPERSPINSLASHCHARGESTART, 60.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				return;
 			}
 		}
 		else
@@ -826,13 +883,15 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 			if (DESC(m_ePreAttackState) == CKirby::SWORDSTATE_SIDESLASH && DESC(m_fChargeTime) < 0.2f)
 			{
 				DESC(m_eEyeState) = CKirby::EYE_IDLE;
-				pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 				DESC(m_ePreAttackState) = CKirby::SWORDSTATE_DECISIVESLASH;
+				pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				return;
 			}
 			else
 			{
 				DESC(m_eEyeState) = CKirby::EYE_ANGER;
 				pKirby->Change_State(CKirby::SWORDSTATE_GIGANTSPINSLASH, 60.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				return;
 			}
 		}
 	}
@@ -861,28 +920,20 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS))
 		{
 			DESC(m_fChargeTime) += fTimeDelta;
-			//if (JoyStick_On() == true)
-			//{
-			//	// 내가 누른 방향에 따라, 이동개념이 달라진다.
-			//	JoyStick_controller_Attack(Kirbydesc, pCamera);
-			//	CKirby::DIR eDir = Kirby_Standard_Angle(DESC(m_vMoveDir), DESC(m_vAttackDir));
-			//	if (eDir == CKirby::DIR_FRONT || eDir == CKirby::DIR_BACK)
-			//		pKirby->Change_State(CKirby::SWORDSTATE_SHUFFIEFRONT, 120.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
-			//	else
-			//		pKirby->Change_State(CKirby::SWORDSTATE_SHUFFIERIGHT, 120.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
-			//}
 		}
 		// 이때 X를 떼면 바로 슈퍼스핀.
 		else
 		{
 			DESC(m_eEyeState) = CKirby::EYE_ANGER;
 			pKirby->Change_State(CKirby::SWORDSTATE_SUPERSPINSLASHSTART, 60.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			return;
 		}
 
 		// 이게 핵심이다.
 		if (pKirby->isAnimFinish())
 		{
 			pKirby->Change_State(CKirby::SWORDSTATE_SUPERSPINSLASHCHARGE, 60.f, true, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			return;
 		}
 	}
 
@@ -902,9 +953,15 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 				CKirby::DIR eDir = Kirby_Standard_Angle(DESC(m_vMoveDir), DESC(m_vAttackDir));
 
 				if (eDir == CKirby::DIR_FRONT || eDir == CKirby::DIR_BACK)
+				{
 					pKirby->Change_State(CKirby::SWORDSTATE_SHUFFIEFRONT, 120.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+					return;
+				}
 				else
+				{
 					pKirby->Change_State(CKirby::SWORDSTATE_SHUFFIERIGHT, 120.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+					return;
+				}
 			}
 		}
 		// 이때 X를 떼면 바로 슈퍼스핀.
@@ -912,6 +969,7 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 		{
 			DESC(m_eEyeState) = CKirby::EYE_ANGER;
 			pKirby->Change_State(CKirby::SWORDSTATE_SUPERSPINSLASHSTART, 60.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			return;
 		}
 	}
 
@@ -938,7 +996,10 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 				CKirby::DIR eDir = Kirby_Standard_Angle(DESC(m_vMoveDir), DESC(m_vAttackDir));
 
 				if (eDir == CKirby::DIR_LEFT || eDir == CKirby::DIR_RIGHT)
+				{
 					pKirby->Change_State(CKirby::SWORDSTATE_SHUFFIERIGHT, 120.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+					return;
+				}
 			}
 			else
 			{
@@ -949,18 +1010,24 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 					pKirby->Change_State(CKirby::SWORDSTATE_SUPERSPINSLASHCHARGE, 60.f, true, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 				else
 					pKirby->Change_State(CKirby::SWORDSTATE_SPINSLASHCHARGE, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+
+				return;
 			}
 
 			if (DESC(m_bWalkingCharge) == true && DESC(m_fChargeTime) > 1.f)
+			{
 				pKirby->Change_State(CKirby::SWORDSTATE_SUPERSPINSLASHCHARGESTART, 60.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				return;
+			}
 		}
 		else
 		{
 			if (DESC(m_ePreAttackState) == CKirby::SWORDSTATE_SIDESLASH && DESC(m_fChargeTime) < 0.2f)
 			{
 				DESC(m_eEyeState) = CKirby::EYE_IDLE;
-				pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 				DESC(m_ePreAttackState) = CKirby::SWORDSTATE_DECISIVESLASH;
+				pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				return;
 			}
 			else
 			{
@@ -970,6 +1037,7 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 					pKirby->Change_State(CKirby::SWORDSTATE_SUPERSPINSLASHSTART, 60.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 				else
 					pKirby->Change_State(CKirby::SWORDSTATE_GIGANTSPINSLASH, 60.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				return;
 			}
 		}
 	}
@@ -997,7 +1065,10 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 				CKirby::DIR eDir = Kirby_Standard_Angle(DESC(m_vMoveDir), DESC(m_vAttackDir));
 
 				if (eDir == CKirby::DIR_FRONT || eDir == CKirby::DIR_BACK)
+				{
 					pKirby->Change_State(CKirby::SWORDSTATE_SHUFFIEFRONT, 120.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+					return;
+				}
 			}
 			else
 			{
@@ -1007,10 +1078,16 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 					pKirby->Change_State(CKirby::SWORDSTATE_SUPERSPINSLASHCHARGE, 60.f, true, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 				else
 					pKirby->Change_State(CKirby::SWORDSTATE_SPINSLASHCHARGE, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+
+				return;
+
 			}
 
 			if (DESC(m_bWalkingCharge) == true && DESC(m_fChargeTime) > 1.f)
+			{
 				pKirby->Change_State(CKirby::SWORDSTATE_SUPERSPINSLASHCHARGESTART, 60.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				return;
+			}
 
 		}
 		else
@@ -1018,8 +1095,9 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 			if (DESC(m_ePreAttackState) == CKirby::SWORDSTATE_SIDESLASH && DESC(m_fChargeTime) < 0.2f)
 			{
 				DESC(m_eEyeState) = CKirby::EYE_IDLE;
-				pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 				DESC(m_ePreAttackState) = CKirby::SWORDSTATE_DECISIVESLASH;
+				pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				return;
 			}
 			else
 			{
@@ -1028,6 +1106,7 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 					pKirby->Change_State(CKirby::SWORDSTATE_SUPERSPINSLASHSTART, 60.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 				else
 					pKirby->Change_State(CKirby::SWORDSTATE_GIGANTSPINSLASH, 60.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				return;
 			}
 		}
 	}
@@ -1065,6 +1144,7 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 
 			DESC(m_eEyeState) = CKirby::EYE_ANGER;
 			pKirby->Change_State(CKirby::SWORDSTATE_SPINSLASHEND, 100.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			return;
 		}
 	}
 
@@ -1087,6 +1167,7 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 			DESC(m_ePreAttackState) = CKirby::SWORDSTATE_DECISIVESLASH;
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			return;
 		}
 
 	}
@@ -1123,6 +1204,7 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 		{
 			DESC(m_fChargeTime) = 0.f;
 			pKirby->Change_State(CKirby::SWORDSTATE_SUPERSPINSLASHLOOP, 60.f, true, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			return;
 		}
 	}
 
@@ -1159,6 +1241,7 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 		if (DESC(m_fChargeTime) > 1.1f)
 		{
 			pKirby->Change_State(CKirby::SWORDSTATE_SUPERSPINSLASHEND, 100.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			return;
 		}
 	}
 
@@ -1182,6 +1265,7 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 			DESC(m_ePreAttackState) = CKirby::SWORDSTATE_DECISIVESLASH;
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			return;
 		}
 	}
 
@@ -1242,6 +1326,7 @@ void CKirbySword_JumpAttack_State::OnStateUpdate(CGameObject* pGameObject, _floa
 		{
 			DESC(m_bUpWardSlash) = true;
 			pKirby->Change_State(CKirby::SWORDSTATE_SPINAFTER, 600.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			return;
 		}
 	}
 	// 어퍼컷 공격 후 내려찍기
@@ -1252,7 +1337,7 @@ void CKirbySword_JumpAttack_State::OnStateUpdate(CGameObject* pGameObject, _floa
 
 
 
-
+		return;
 	}
 	// 공중제비 시작
 	else if (pKirby->Get_State() == CKirby::SWORDSTATE_SWORDSPINSTART)
@@ -1285,6 +1370,7 @@ void CKirbySword_JumpAttack_State::OnStateUpdate(CGameObject* pGameObject, _floa
 		if (pKirby->isAnimFinish())
 		{
 			pKirby->Change_State(CKirby::SWORDSTATE_SWORDSPIN, 60.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			return;
 		}
 
 
@@ -1319,6 +1405,7 @@ void CKirbySword_JumpAttack_State::OnStateUpdate(CGameObject* pGameObject, _floa
 		if (pKirby->isAnimFinish())
 		{
 			pKirby->Change_State(CKirby::SWORDSTATE_SPINAFTER, 600.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			return;
 		}
 	}
 	else if (pKirby->Get_State() == CKirby::SWORDSTATE_SPINAFTER)
@@ -1348,12 +1435,14 @@ void CKirbySword_JumpAttack_State::OnStateUpdate(CGameObject* pGameObject, _floa
 			DESC(m_fJumpVelocity) = 10.f;
 			DESC(m_eEyeState) = CKirby::EYE_ANGER;
 			pKirby->Change_State(CKirby::SWORDSTATE_SWORDSPINSTART, 60.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			return;
 		}
 
 		if (pController->Is_Terrain())
 		{
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			return;
 		}
 	}
 }
@@ -1418,6 +1507,7 @@ void CKirbySword_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			Kirbydesc->m_fJumpVelocity = 0.f;
 			pController->Reset_FallVelocity();
 			pKirby->Change_State(CKirby::STATE_FLIGHTLANDING, 70.f, false, false, CKirby::BODY_VACUUM);
+			return;
 		}
 	}
 
@@ -1434,11 +1524,13 @@ void CKirbySword_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	if (pController->Is_Terrain())
 	{
 		pKirby->Change_State(CKirby::STATE_FLIGHTLANDING, 70.f, false, false, CKirby::BODY_VACUUM);
+		return;
 	}
 	// 끝나면 FALL로 돌아간다.
 	if (pKirby->isAnimFinish())
 	{
 		pKirby->Change_State(CKirby::STATE_FLIGHTFALL, 60.f, true, true, CKirby::BODY_BALLOON);
+		return;
 	}
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))

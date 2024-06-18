@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "StarBlockPiece.h"
-#include "Trigger.h"
 
 CStarBlockPiece::CStarBlockPiece(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CRigidObject{ pDevice, pContext }

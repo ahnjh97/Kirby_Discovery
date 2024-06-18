@@ -368,6 +368,9 @@ void CRabbit_Damage_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _flo
 
 	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
 	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
+
+	m_fDeadMaxTime = CUtils::Make_RandomFloat(0.35f, 0.7f);
+
 }
 
 void CRabbit_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -443,7 +446,7 @@ void CRabbit_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 		pRabbit->Set_DamageJumpPower(fDamageJumpPower);
 
-		if (m_fDeadTime > 0.4f || pController->Is_Terrain())
+		if (m_fDeadTime > m_fDeadMaxTime || pController->Is_Terrain())
 			pRabbit->Set_Dead();
 		
 	}

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "KickableRock.h"
-#include "Trigger.h"
+#include "HitBox.h"
 
 CKickableRock::CKickableRock(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CRigidObject{ pDevice, pContext }
@@ -14,7 +14,6 @@ CKickableRock::CKickableRock(const CKickableRock& rhs)
 
 HRESULT CKickableRock::Initialize_Prototype()
 {
-	m_eCollisionGroup = KICKABLE;
 
 	return S_OK;
 }
@@ -39,16 +38,21 @@ _int CKickableRock::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
+	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+
 	if (true == m_bDead)
-		return OBJ_DEAD;
+		return Ready_Dead(0.9f);
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_4, KEY_DOWN))
 	{
-		// 이 부분은 테스트가 끝나고 Collision_Hitbox에 넣기
+		m_pRigidBodyCom->Activate(true);
+
 		_float3 force = _float3{ 0.5f, 3.f , 0.5f };
-		m_pRigidBodyCom->Kick_RigidBody(XMVector3Normalize(force), 400.f);
+		m_pRigidBodyCom->Kick_RigidBody(XMVector3Normalize(force), 480.f);
+
+		// 힘이 한번만 작용되게 한다.
+		m_bLockCollision = true;
 	}
-	m_pTrigger->Tick(m_fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
@@ -57,13 +61,13 @@ void CKickableRock::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
 
-	if (m_pRigidBodyCom->Is_Activated())
+	if (m_bLockCollision == true)
 	{
 		m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
 		m_pRigidBodyCom->Add_Force(_float3(0.f, -0.5f, 0.f));
 
 		m_fLifeTime += m_fTimeDelta;
-		if (m_fLifeTime >= 1.f)
+		if (m_fLifeTime >= 1.5f)
 		{
 			m_fLifeTime = 0.f;
 			m_bDead = true;
@@ -125,10 +129,24 @@ void CKickableRock::Render_IMGUI()
 
 void CKickableRock::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
-	m_pRigidBodyCom->Activate(true);
+	if (m_bLockCollision == false)
+	{
+		m_pRigidBodyCom->Activate(true);
+		CGameObject* pPlayer = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"));
+		_float4 vPlayerPos = static_cast<CTransform*>(pPlayer->Get_TransformCom())->Get_State(CTransform::STATE_POSITION);
+		_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
-	_float3 force = _float3{ 0.5f, 3.f , 0.5f };
-	m_pRigidBodyCom->Kick_RigidBody(XMVector3Normalize(force), 530.f);
+		_float3 vDir = vPos - vPlayerPos;
+		vDir.y = 0.f;
+		vDir.Normalize();
+		vDir.y += 1.f;
+		vDir.Normalize();
+		_float3 force = vDir;
+		m_pRigidBodyCom->Kick_RigidBody(XMVector3Normalize(force), 480.f);
+
+		// 힘이 한번만 작용되게 한다.
+		m_bLockCollision = true;
+	}
 }
 
 HRESULT CKickableRock::Add_Components()
@@ -151,7 +169,7 @@ HRESULT CKickableRock::Add_Components()
 	rigidDesc.bKinematic = false;
 	rigidDesc.eShapeType = RIGID_SPHERE;
 	rigidDesc.fOffsetSize = { 0.5f, 0.5f, 0.5f };
-	rigidDesc.vMaterial = _float3(10.f, 1.f, 0.8f);
+	rigidDesc.vMaterial = _float3(10.f, 1.f, 0.85f);
 	rigidDesc.fDensity = 800.f;
 	rigidDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
 	hr = __super::Add_Component(TEXT("Prototype_Component_RigidBody"),
@@ -160,17 +178,15 @@ HRESULT CKickableRock::Add_Components()
 	m_pRigidBodyCom->Set_Object(this);
 	m_pRigidBodyCom->Activate(false);
 
-	/* For.Com_Trigger */
-	CTrigger::TRIGGER_DESC tTriggerDesc{};
-	tTriggerDesc.iTriggerType = CTrigger::TRIGGER_MAPOBJ;
-	tTriggerDesc.iTriggerIndex = 0;
-	tTriggerDesc.eCollisionGroup = m_eCollisionGroup;
-	tTriggerDesc.vTriggerSize = _float3(.3f, .3f, .3f);
-	tTriggerDesc.vInitialPos = m_pTransformCom->Get_WorldFloat4x4();
-	m_pTrigger = static_cast<CTrigger*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc));
-	CHECK_NULLPTR(m_pTrigger);
-	m_pTrigger->Set_Owner(this);
-	m_pTrigger->Check_Collision();
+
+	CHitBox::HITBOX_DESC HitBox{};
+	HitBox.pOwner = this;
+	HitBox.pDesc = &m_tColliderDesc[BODY];
+	HitBox.pCollisionType = OBJECT;
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
+		return E_FAIL;
+	Set_BodyCollider(COLLIDER_SPHERE, 0.f, 0.f, 1.f);
+
 
 	return S_OK;
 }
@@ -224,6 +240,5 @@ void CKickableRock::Free()
 
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pRigidBodyCom);
-	Safe_Release(m_pTrigger);
 } 
 

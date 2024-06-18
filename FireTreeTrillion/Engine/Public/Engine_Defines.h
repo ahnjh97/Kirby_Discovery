@@ -34,6 +34,13 @@ namespace Engine
         STATIC_RIGID,
         COLLISION_RESULT_END
     };
+
+
+    enum HITBOX {
+        COLLIDER_CYLINDER, COLLIDER_SPHERE, COLLIDER_FRUSTUM, COLLIDER_TUBE,
+        COLLIDER_END
+    };
+
 }
 
 // Set_Dead() ∏≈≈©∑Œ

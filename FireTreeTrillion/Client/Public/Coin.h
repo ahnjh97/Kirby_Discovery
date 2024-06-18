@@ -1,6 +1,5 @@
 #pragma once
 #include "ItemObject.h"
-#include "Trigger.h"
 
 BEGIN(Engine)
 class CModel;
@@ -32,7 +31,6 @@ private:
 	HRESULT Bind_ShaderResources();
 
 private:
-	CTrigger*		m_pTrigger = nullptr;
 	CModel*			m_pModelCom = { nullptr };
 	_float			m_fCoinTime = { 0.f };
 

@@ -61,6 +61,7 @@ public: /* For.Renderer */
 #ifdef _DEBUG
 public:
 	HRESULT Add_DebugComponents(class CComponent* pRenderComponent);
+	_bool	Get_HitBoxRender();
 #endif
 
 public: /* For.Level_Manager */
@@ -192,7 +193,6 @@ public: /* For.PhysX */
 	PxRigidDynamic* CreateDynamicActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial = nullptr);
 	PxRigidStatic* CreateStaticActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial = nullptr);
 	void Register_Player(PxActor* pPlayerActor);
-	void Register_Controller(PxActor* pControllerActor, PxController* pController);
 	void Register_Trigger(PxActor* pTriggerActor, _int iTriggerType, _int iTriggerIndex);
 	void Emplace_TriggerFunc(_int iTriggerType, function<void(_int)> func);
 	void Emplace_ExitFunc(_int iTriggerType, function<void(void)> exitFunc);
@@ -216,8 +216,6 @@ public: /* For. TimeController */
 	void IncreaseIndex() { g_iNumOctree++; }
 
 public: // For Collision
-	void	Add_CollisionObjects(class CGameObject* Src, class CGameObject* Dst);
-	void	Get_CollisionObjects(_Inout_ set<pair<class CGameObject*, class CGameObject*>>& CollisionObjects);
 	_bool	Is_PassingGroup(class CGameObject* pObj);
 
 
@@ -245,9 +243,6 @@ private:
 
 	_uint	m_iCurrentLevelID		= { 0 };
 	_uint	g_iNumOctree			= {};
-
-
-	set<pair<class CGameObject*, class CGameObject*>> m_CollisionObjects;
 
 public:		
 	static void Release_Engine();

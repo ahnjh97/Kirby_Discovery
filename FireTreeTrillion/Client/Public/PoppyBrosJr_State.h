@@ -72,6 +72,7 @@ public:
 private:
 	_float		m_fFlyTime = { 0.f };
 	_float		m_fDeadTime = { 0.f };
+	_float		m_fDeadMaxTime = { 0.f };
 
 public:
 	static	CPoppyBrosJr_Damage_State* Create();

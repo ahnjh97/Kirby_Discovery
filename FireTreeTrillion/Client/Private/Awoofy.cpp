@@ -4,6 +4,8 @@
 #include "Awoofy_State.h"
 #include "MultiEffect.h"
 
+#include "HitBox.h"
+
 CAwoofy::CAwoofy(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
 {
@@ -334,13 +336,19 @@ HRESULT CAwoofy::Add_Components()
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	CHECK_FAILED(hr);
 	m_pControllerCom->Set_Object(this);
-	m_pControllerCom->Register_Controller();
-
-
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vPos);
 
 	/* FSM */
 	SetUp_FSM();
+
+
+	CHitBox::HITBOX_DESC HitBox{};
+	HitBox.pOwner = this;
+	HitBox.pDesc = &m_tColliderDesc[BODY];
+	HitBox.pCollisionType = MONSTER;
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
+		return E_FAIL;
+	Set_BodyCollider(COLLIDER_CYLINDER, 0.5f, 1.f, 0.85f);
 
 	return S_OK;
 }

@@ -35,7 +35,6 @@ private:
 
 	CGameObject*	 m_pPlayer = { nullptr };
 	CModel*			 m_pModelCom = { nullptr };
-	class CTrigger*	 m_pTrigger = nullptr;
 
 	_float		 m_fDrinkTime = { 0.f };
 

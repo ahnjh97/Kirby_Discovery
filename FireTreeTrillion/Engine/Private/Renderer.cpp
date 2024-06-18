@@ -578,6 +578,9 @@ void CRenderer::Key_Input()
 	//·»´õ Å¸°Ù ºä ON/OFF
 	if (m_pGameInstance->Get_DIKeyState(DIK_F1, KEY_DOWN))
 		m_IsRenderRTV = !m_IsRenderRTV;
+
+	if (m_pGameInstance->Get_DIKeyState(DIK_F2, KEY_DOWN))
+		m_IsRenderHitBox = !m_IsRenderHitBox;
 #endif
 
 	if (m_pGameInstance->Get_KeyState(DIK_F5, KEY_DOWN))

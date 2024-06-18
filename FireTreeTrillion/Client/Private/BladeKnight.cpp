@@ -3,7 +3,7 @@
 #include "FSM.h"
 #include "BladeKnight_State.h"
 #include "BladeKnightSword.h"
-#include "Trigger.h"
+#include "HitBox.h"
 
 CBladeKnight::CBladeKnight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -71,14 +71,6 @@ _int CBladeKnight::Tick(_float fTimeDelta)
 
 	for (auto& Pair : m_PartObjects)
 		Pair.second->Tick(m_fTimeDelta);
-
-	if (m_pHitBoxTrigger->Is_Alive())
-		m_pHitBoxTrigger->Tick(m_fTimeDelta);
-
-	if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD5, KEY_DOWN))
-	{
-		m_pHitBoxTrigger->Check_Collision();
-	}
 
 	return OBJ_NOEVENT;
 }
@@ -178,8 +170,6 @@ void CBladeKnight::Add_AnimEvent()
 	// 3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
 	m_pModelCom->Add_Event("ApplyDamage", [this]() {
 
-		m_pHitBoxTrigger->Check_Collision();
-
 		});
 }
 
@@ -239,11 +229,21 @@ HRESULT CBladeKnight::Add_Components()
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	CHECK_FAILED(hr);
 	m_pControllerCom->Set_Object(this);
-	m_pControllerCom->Register_Controller();
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 
 	SetUp_FSM();
+
+
+
+	CHitBox::HITBOX_DESC HitBox{};
+	HitBox.pOwner = this;
+	HitBox.pDesc = &m_tColliderDesc[BODY];
+	HitBox.pCollisionType = MONSTER;
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
+		return E_FAIL;
+	Set_BodyCollider(COLLIDER_CYLINDER, 0.5f, 1.f, 0.85f);
+
 
 	return S_OK;
 }
@@ -266,16 +266,6 @@ HRESULT CBladeKnight::Add_PartObjects()
 	m_pSword = dynamic_cast<CBladeKnightSword*>(pWeaponObject);
 
 	m_PartObjects.emplace(TEXT("Part_Weapon"), pWeaponObject);
-
-	/* 커비의 HITBOX */
-	CTrigger::TRIGGER_DESC tTriggerDesc{};
-	tTriggerDesc.iTriggerType = CTrigger::TRIGGER_HITBOX;
-	tTriggerDesc.iTriggerIndex = 0;
-	tTriggerDesc.eCollisionGroup = HITBOX_MONSTER;
-	tTriggerDesc.vTriggerSize = _float3(2.f, 1.f, 2.f);
-	m_pHitBoxTrigger = static_cast<CTrigger*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc));
-	CHECK_NULLPTR(m_pHitBoxTrigger);
-	m_pHitBoxTrigger->Set_Owner(this);
 
 	return S_OK;
 }
@@ -374,6 +364,4 @@ void CBladeKnight::Free()
 		Safe_Release(Pair.second);
 
 	m_PartObjects.clear();
-
-	Safe_Release(m_pHitBoxTrigger);
 }
