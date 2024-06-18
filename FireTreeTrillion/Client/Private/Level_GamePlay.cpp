@@ -45,12 +45,6 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
 		return E_FAIL;
 
-	if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))
-		return E_FAIL;
-
-	/* 구한정보들을 각 랜드오브젝트르 생성할 때 던진다. */
-	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
-		return E_FAIL;
 	HRESULT hr{};
 	hr = Ready_Map();
 	CHECK_FAILED(hr);
@@ -850,9 +844,6 @@ HRESULT CLevel_GamePlay::Ready_Items()
 		}
 	}
 	fileInput.close();
-
-	return S_OK;
-}
 
 	return S_OK;
 }
