@@ -106,7 +106,6 @@ HRESULT CMultiEffect::Initialize(void* pArg)
 
 				m_FXs.push_back(pFX);
 				m_fDuration.second = pFX->Get_BiggerDuration(m_fDuration.second);
-
 			}
 		}
 	}
@@ -215,10 +214,12 @@ CGameObject* CMultiEffect::Clone(void* pArg)
 
 void CMultiEffect::Free()
 {
-	for (auto& pEffect : m_FXs)
-		Safe_Release(pEffect);
-
-	m_FXs.clear();
+	if (!m_FXs.empty())
+	{
+		for (auto& pEffect : m_FXs)
+			Safe_Release(pEffect);
+		m_FXs.clear();
+	}
 
 	__super::Free();
 }
