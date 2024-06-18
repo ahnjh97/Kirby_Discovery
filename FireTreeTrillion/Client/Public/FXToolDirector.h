@@ -91,6 +91,7 @@ private:
 	_int m_iCurFXTexIdx = { 0 };
 	_int m_iCurFXMaskTexIdx = { 0 };
 	_int m_iCurRenderGroup = { 2 };
+	_int m_iCurTimer = { 0 };
 
 	//¼ö¸í
 	//_float m_fDuration = { 1.f };

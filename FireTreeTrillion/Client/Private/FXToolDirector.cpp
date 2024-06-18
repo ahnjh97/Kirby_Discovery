@@ -53,6 +53,8 @@ void CFXToolDirector::Make_Effect(SINGLE_FX_DATA& _FXData)
 
 	FXDesc.fRimLightThreshold = _FXData.fRimLightThreshold;
 	FXDesc.eRenderGroup = _FXData.eRenderGroup;
+	FXDesc.eTimer = _FXData.eTimer;
+
 
 	for (_uint i = 0; i < _FXData.iPropertyMapNum; ++i)
 	{
@@ -96,6 +98,7 @@ void CFXToolDirector::Make_Effect(PARTICLE_DATA& _FXData)
 
 	ParticleDesc.iNumInstance = _FXData.iNumInstance;
 	ParticleDesc.eRenderGroup = _FXData.eRenderGroup;
+	ParticleDesc.eTimer = _FXData.eTimer;
 
 	ParticleDesc.bIsLoop = _FXData.bIsLoop;
 	ParticleDesc.bIsBillboard = _FXData.bIsBillboard;
@@ -247,6 +250,7 @@ HRESULT CFXToolDirector::Save_Effect(CEffect* pEffect, const wstring& strFileNam
 	}
 
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.eRenderGroup), sizeof(_uint));
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.eTimer), sizeof(TIMER));
 
 
 	OutputFile.close();
@@ -344,6 +348,8 @@ HRESULT CFXToolDirector::Save_Particle(CEffect* pEffect, const wstring& strFileN
 
 
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.eRenderGroup), sizeof(_int));
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.eTimer), sizeof(TIMER));
+
 	OutputFile.close();
 
 	return S_OK;
@@ -520,6 +526,7 @@ HRESULT CFXToolDirector::Load_Effect(path _FilePath, SINGLE_FX_DATA* _pData)
 	}
 
 	InputFile.read(reinterpret_cast<char*>(&_pData->eRenderGroup), sizeof(_uint));
+	InputFile.read(reinterpret_cast<char*>(&_pData->eTimer), sizeof(TIMER));
 
 
 	return S_OK;
@@ -615,6 +622,8 @@ HRESULT CFXToolDirector::Load_Effect(path _FilePath, PARTICLE_DATA* _pData)
 	}
 
 	InputFile.read(reinterpret_cast<char*>(&_pData->eRenderGroup), sizeof(_int));
+	InputFile.read(reinterpret_cast<char*>(&_pData->eTimer), sizeof(TIMER));
+
 
 	InputFile.close();
 	return S_OK;
@@ -1045,6 +1054,7 @@ void CFXToolDirector::Render_FXHierarchy()
 			m_iCurFXTexIdx = m_FXs[i]->m_iTexIdx;
 			m_iCurFXMaskTexIdx = m_FXs[i]->m_iMaskTexIdx;
 			m_iCurRenderGroup = m_FXs[i]->m_eRenderGroup;
+			m_iCurTimer = m_FXs[i]->m_eTimer;
 			m_fTotalPlayDuration = m_FXs[i]->m_fDuration.second;
 			m_fLifetime[0] = m_FXs[i]->m_fLifetime.first;
 			m_fLifetime[1] = m_FXs[i]->m_fLifetime.second;
@@ -1330,6 +1340,29 @@ void CFXToolDirector::Render_FXProperty()
 		{
 			m_iCurRenderGroup = CRenderer::RENDER_BLEND;
 			pCurFX->m_eRenderGroup = CRenderer::RENDER_BLEND;
+		}
+
+		Dummy({0.f, 20.f});
+
+		//타이머 설정
+		if (RadioButton(u8"Timer None", m_iCurTimer == TIMER_NONE))
+		{
+			m_iCurTimer = TIMER_NONE;
+			pCurFX->m_eTimer = TIMER_NONE;
+		}
+		SameLine();
+
+		if (RadioButton(u8"First Timer", m_iCurTimer == TIMER_FIRST))
+		{
+			m_iCurTimer = TIMER_FIRST;
+			pCurFX->m_eRenderGroup = TIMER_FIRST;
+		}
+		SameLine();
+
+		if (RadioButton(u8"Second Timer", m_iCurTimer == TIMER_SECOND))
+		{
+			m_iCurTimer = TIMER_SECOND;
+			pCurFX->m_eRenderGroup = TIMER_SECOND;
 		}
 
 	}

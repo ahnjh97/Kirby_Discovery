@@ -60,6 +60,7 @@ HRESULT CEffect::Initialize(void* pArg)
     m_fDuration.second = effectDesc.fDuration;
     m_fLifetime = effectDesc.fLifetime;
     m_eRenderGroup = effectDesc.eRenderGroup;
+    m_eTimer = effectDesc.eTimer;
 
     if (effectDesc.pSocketMatrix != nullptr)
     {
@@ -130,6 +131,7 @@ void CEffect::Fill_SaveData(_Out_ SINGLE_FX_DATA* pFXData)
     }
 
     pFXData->eRenderGroup = m_eRenderGroup;
+    pFXData->eTimer = m_eTimer;
 
 }
 

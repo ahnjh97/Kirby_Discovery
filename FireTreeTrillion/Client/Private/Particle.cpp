@@ -128,6 +128,7 @@ void CParticle::Fill_SaveData(PARTICLE_DATA* pFXData)
 	pFXData->fStarDelayRandomOffset = m_InstanceDesc.fStarDelayRandomOffset;
 
 	pFXData->eRenderGroup = m_eRenderGroup;
+	pFXData->eTimer = m_eTimer;
 
 
 	pFXData->vCenter = m_InstanceDesc.vCenter;
@@ -159,7 +160,23 @@ _int CParticle::Tick(_float _fTimeDelta)
 	if (m_bDead)
 		return OBJ_DEAD;
 
-	if (Calculate_Duration(_fTimeDelta))
+
+	//현재 설정 값으로 적용할 타임델타 값을 바꾼다.
+	_float fMyTimeDelta = _fTimeDelta;
+	switch (m_eTimer)
+	{
+	case TIMER_FIRST:
+		fMyTimeDelta = m_pGameInstance->Get_FirstTimer();
+		break;
+	case TIMER_SECOND:
+		fMyTimeDelta = m_pGameInstance->Get_SecondTimer();
+		break;
+	default:
+		break;
+	}
+
+
+	if (Calculate_Duration(fMyTimeDelta))
 	{
 		//툴에서는 다시 시작하기
 		if (*m_pCurrentLevelID == LEVEL_TOOL_FX)
@@ -171,7 +188,7 @@ _int CParticle::Tick(_float _fTimeDelta)
 			m_bDead = true;
 	}
 
-	m_pVIBufferCom->Compute_AllLifeTime(_fTimeDelta);
+	m_pVIBufferCom->Compute_AllLifeTime(fMyTimeDelta);
 
 	if (m_fDuration.second <= m_fDuration.first)
 		return OBJ_NOEVENT;
@@ -179,13 +196,13 @@ _int CParticle::Tick(_float _fTimeDelta)
 
 
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_DROP])
-		m_pVIBufferCom->Drop(_fTimeDelta);
+		m_pVIBufferCom->Drop(fMyTimeDelta);
 
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_SPREAD])
-		m_pVIBufferCom->Spread(_fTimeDelta);
+		m_pVIBufferCom->Spread(fMyTimeDelta);
 
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_DECELERATE])
-		m_pVIBufferCom->Decelerate(_fTimeDelta);
+		m_pVIBufferCom->Decelerate(fMyTimeDelta);
 
 
 	return OBJ_NOEVENT;

@@ -61,6 +61,7 @@ public:
 		_float3 vInitScale = { 1.f, 1.f, 1.f };
 
 		_uint eRenderGroup = { 0 };
+		TIMER eTimer = { TIMER_END };
 
 
 	}FX_DESC;
@@ -130,7 +131,7 @@ protected:
 	_bool			m_bIsBloom = { false };
 
 	_uint			m_eRenderGroup = { (_uint)CRenderer::RENDER_NONBLEND };
-
+	TIMER			m_eTimer = { TIMER_END };
 
 	_float			m_fRimLightThreshold = { 0.f };
 

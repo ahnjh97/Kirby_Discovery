@@ -128,6 +128,7 @@ namespace Engine
 		vector<vector<FX_KEYFRAME>> vecKeyframes;
 
 		_uint eRenderGroup = { 0 };
+		TIMER eTimer = { TIMER_END };
 
 	}SINGLE_FX_DATA;
 
@@ -199,7 +200,7 @@ namespace Engine
 		vector<_bool>	vecMoveCommands;
 
 		_int eRenderGroup = { 0 };
-
+		TIMER eTimer = { TIMER_END };
 
 	}PARTICLE_DATA;
 
