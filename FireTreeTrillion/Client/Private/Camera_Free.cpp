@@ -360,6 +360,7 @@ void CCamera_Free::Control(_float fTimeDelta)
 	//내가 현재 카메라가 아니라면 컨트롤은 못하게 하기
 	if (m_pGameInstance->Get_CurCameraPtr() != this)
 	{
+		if (m_pFirstTarget == nullptr) return;
 		if (m_bWasMainCamera)
 			m_pTransformCom->Look_At(m_pFirstTarget->Get_State(CTransform::STATE_POSITION));
 		return;
