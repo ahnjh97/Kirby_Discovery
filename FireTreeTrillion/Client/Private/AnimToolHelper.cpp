@@ -100,14 +100,16 @@ HRESULT CAnimToolHelper::Initialize(void* pArg)
 	HRESULT hr;
 	hr = __super::Initialize(pArg);
 	CHECK_FAILED(hr);
-
+	
 	// 테스트 객체 생성
 	//m_pAnimToolObj = static_cast<CAnimToolObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_AnimToolObject")));
 	//CHECK_NULLPTR(m_pAnimToolObj);
 
 	Ready_AnimObjects(L"Layer_AnimObjects");
 
-	//Load();
+	// 로더에서 불러와 보관하는 map은 애니메이션 반영용.
+	// 여기서 불러와 보관하는 map은 애니메이션 누적 파싱용.
+	Load();
 
 	return S_OK;
 }
@@ -510,7 +512,7 @@ void CAnimToolHelper::Save()
 
 	// 버전 요소 생성 및 추가
 	tinyxml2::XMLElement* m_pElement = m_xmlDocument.NewElement("Version");
-	m_pElement->SetText(240602);
+	m_pElement->SetText(240618); // 애니메이션 툴 찐마지막 수정 날짜 for developer
 	m_pRootNode->InsertEndChild(m_pElement);
 
 	// 맵 시퀀스를 순회
@@ -537,16 +539,28 @@ void CAnimToolHelper::Save()
 			m_pElement->SetText(AnimInfo.fAnimSpeed);
 			m_pModelElement->InsertEndChild(m_pElement);
 
+			// 현재 애니메이션의 이벤트 정보를 순회
+			_uint iCnt = AnimInfo.vecEventInfo.size();
+			_uint iRealDataCnt = 0;
+			for (auto& _event : AnimInfo.vecEventInfo)
+			{
+				if (_event.strEventName == "Notify")
+					continue;
+				iRealDataCnt++;
+			}
+			
 			// ModelName 하위에 Count 요소 생성 및 추가
 			m_pElement = m_xmlDocument.NewElement("Count");
-			_uint iCnt = AnimInfo.vecEventInfo.size();
-			m_pElement->SetText(iCnt);
+			m_pElement->SetText(iRealDataCnt);
 			m_pModelElement->InsertEndChild(m_pElement);
 
-			// 현재 애니메이션의 이벤트 정보를 순회
+			iRealDataCnt = 0;
 			for (_uint i = 0; i < iCnt; ++i)
 			{
-				string strData = "Data" + to_string(i);
+				if (AnimInfo.vecEventInfo[i].strEventName == "Notify")
+					continue;
+
+				string strData = "Data" + to_string(iRealDataCnt);
 				m_pElement = m_xmlDocument.NewElement(strData.c_str());
 
 				// Data 요소에 속성 추가
@@ -561,7 +575,9 @@ void CAnimToolHelper::Save()
 
 				// Data 요소를 ModelName 하위에 추가
 				m_pModelElement->InsertEndChild(m_pElement);
+				iRealDataCnt++;
 			}
+
 		}
 	}
 
@@ -598,7 +614,7 @@ void CAnimToolHelper::Load()
 		modelNameStr.erase(std::find_if(modelNameStr.rbegin(), modelNameStr.rend(), [](_ubyte ch) {
 			return !std::isspace(ch);
 			}).base(), modelNameStr.end());
-		
+
 		if (!modelNameStr.empty())
 		{
 			// ModelName에 해당하는 AnimMap을 생성
@@ -609,8 +625,8 @@ void CAnimToolHelper::Load()
 				pAnimElement != nullptr;
 				pAnimElement = pAnimElement->NextSiblingElement("Animation"))
 			{
-				const char* animName = pAnimElement->GetText();
-				if (animName)
+				string animName = Remove_BeforeLastPipe(pAnimElement->GetText());
+				if (!animName.empty())
 				{
 					// ANIM_INFO 객체 생성 및 초기화
 					ANIM_INFO animInfo;
@@ -642,6 +658,8 @@ void CAnimToolHelper::Load()
 
 								// EventName, StartFrame, EndFrame 읽기
 								const char* eventName = pDataElement->Attribute("EventName");
+								if (eventName && strcmp(eventName, "Notify") == 0)
+									continue;
 								int startFrame, endFrame;
 								pDataElement->QueryIntAttribute("StartFrame", &startFrame);
 								pDataElement->QueryIntAttribute("EndFrame", &endFrame);
@@ -655,13 +673,22 @@ void CAnimToolHelper::Load()
 							}
 						}
 					}
-
 					// ANIM_INFO 객체를 AnimMap에 추가
-					animMap[string(animName)] = animInfo;
+					animMap[animName] = animInfo;
 				}
 			}
 		}
 	}
+}
+
+string CAnimToolHelper::Remove_BeforeLastPipe(const string& str)
+{
+	size_t pos = str.find_last_of('|');
+	if (pos != string::npos)
+	{
+		return str.substr(pos + 1); // 마지막 '|' 이후의 문자열 반환
+	}
+	return str; // '|'가 없으면 원래 문자열 반환
 }
 
 CAnimToolHelper* CAnimToolHelper::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

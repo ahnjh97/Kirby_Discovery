@@ -34,15 +34,18 @@ public:
 	}
 
 public:
-	virtual HRESULT Initialize_Prototype() override;
-	virtual HRESULT Initialize(void* pArg) override;
-	virtual _int	Tick(_float fTimeDelta) override;
-	virtual void	Late_Tick(_float fTimeDelta) override;
-	virtual HRESULT Render() override;
-	virtual HRESULT Render_LightDepth() override;
+	virtual HRESULT Initialize_Prototype()			override;
+	virtual HRESULT Initialize(void* pArg)			override;
+	virtual _int	Tick(_float fTimeDelta)			override;
+	virtual void	Late_Tick(_float fTimeDelta)	override;
+	virtual HRESULT Render()						override;
+	virtual HRESULT Render_LightDepth()				override;
+#ifdef _DEBUG
+	virtual	void CPoppyBomb::Render_IMGUI()			override;
+#endif
 
 private:
-	//CModel*					m_pModelCom = { nullptr };
+	//CModel*				m_pModelCom = { nullptr };
 	//CShader*				m_pShaderCom = { nullptr };
 	//CCharacterController*	m_pControllerCom = { nullptr };
 

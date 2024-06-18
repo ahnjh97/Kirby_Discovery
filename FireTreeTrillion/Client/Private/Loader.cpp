@@ -15,7 +15,6 @@
 #include "Grid.h"
 #include "BG.h"
 
-
 //스카이 스피어
 #include "SkySphere.h"
 
@@ -40,7 +39,6 @@
 #include "AnimToolObject.h"
 
 // 클라이언트
-
 #pragma region 컴포넌트
 #include "RigidBody.h"
 #include "CharacterController.h"
@@ -1121,8 +1119,6 @@ void CLoader::Load_AnimToolInfo()
 				pAnimElement != nullptr;
 				pAnimElement = pAnimElement->NextSiblingElement("Animation"))
 			{
-				// string animName = Remove_BeforeLastPipe(anim.first);
-				// const char* animName = pAnimElement->GetText();
 				string animName = Remove_BeforeLastPipe(pAnimElement->GetText());
 				if (!animName.empty())
 				{
@@ -1156,6 +1152,8 @@ void CLoader::Load_AnimToolInfo()
 
 								// EventName, StartFrame, EndFrame 읽기
 								const char* eventName = pDataElement->Attribute("EventName");
+								if (eventName && strcmp(eventName, "Notify") == 0)
+									continue;
 								int startFrame, endFrame;
 								pDataElement->QueryIntAttribute("StartFrame", &startFrame);
 								pDataElement->QueryIntAttribute("EndFrame", &endFrame);

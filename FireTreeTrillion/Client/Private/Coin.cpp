@@ -32,7 +32,7 @@ HRESULT CCoin::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, CUtils::Get_State_Vector_Matrix(GameObjectDesc.matWorld, CUtils::STATE_POSITION));
+	//m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(5.f, 10.f, -175.f, 1.f));
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;

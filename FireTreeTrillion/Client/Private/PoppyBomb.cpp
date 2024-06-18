@@ -217,6 +217,23 @@ HRESULT CPoppyBomb::Render_LightDepth()
 	return S_OK;
 }
 
+#ifdef _DEBUG
+void CPoppyBomb::Render_IMGUI()
+{
+	if (ImGui::TreeNode("Guizmo"))
+	{
+		_float4x4 matWorld = m_pTransformCom->Get_WorldFloat4x4();
+		m_pGameInstance->EditTransform(matWorld);
+		m_pTransformCom->Set_WorldMatrix(matWorld);
+		ImGui::Separator(); ImGui::NewLine();
+		ImGui::TreePop();
+	}
+	ImGui::Separator(); ImGui::NewLine();
+
+	__super::Render_IMGUI();
+}
+#endif
+
 HRESULT CPoppyBomb::Add_Components()
 {
 	HRESULT hr;
