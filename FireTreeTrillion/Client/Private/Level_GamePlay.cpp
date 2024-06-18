@@ -45,34 +45,58 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
 		return E_FAIL;
 
-	if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))
-		return E_FAIL;
-
-	/* 구한정보들을 각 랜드오브젝트르 생성할 때 던진다. */
-	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
-		return E_FAIL;
-	
 	if (FAILED(Ready_ParsedObjects()))
 		return E_FAIL;
 
 	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
 		return E_FAIL;
 
-	// Ladder Test
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Ladder"), TEXT("Prototype_GameObject_Ladder"))))
-		return E_FAIL;
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Item"), TEXT("Prototype_GameObject_Coin"))))
-		return E_FAIL;
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Item"), TEXT("Prototype_GameObject_EnergyDrink"))))
-		return E_FAIL;
+	// ------------------------------------------------------------ FOR TEST ------------------------------------------------------------
+	CGameObject::GAMEOBJECT_DESC ObjDesc{};
+	ObjDesc.fSpeedPerSec = 5.f;
+	ObjDesc.fRotationPerSec = ToRadian(90.f);
+	_float4x4 InitMat = _float4x4::Identity;
+	InitMat.Translation({ 0.f, 7.f, -185.f });
+	ObjDesc.matWorld = InitMat;
 
-	CStarBlockPiece::PIECE_DESC desc{};
-	desc.vInitialPos = _float4(1.f, 15.f, -179.f,1.f);
-	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_MapObject"), TEXT("Prototype_GameObject_StarBlockPiece"), &desc);
-	CHECK_FAILED(hr);
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Ladder"), TEXT("Prototype_GameObject_Ladder"),	&ObjDesc)))
+	//	return E_FAIL;
 
-	if (FAILED(Ready_Layer_MapObject(TEXT("Layer_MapObject"))))
-		return E_FAIL;
+	//InitMat.Translation({ 0.f, 7.f, -180.f });
+	//ObjDesc.matWorld = InitMat;
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Item"), TEXT("Prototype_GameObject_Coin"),		&ObjDesc)))
+	//	return E_FAIL;
+	//
+	//InitMat.Translation({ 5.f, 7.f, -182.f });
+	//ObjDesc.matWorld = InitMat;
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Item"), TEXT("Prototype_GameObject_EnergyDrink"), &ObjDesc)))
+	//	return E_FAIL;
+
+	//InitMat.Translation({ 3.f, 7.f, -188.f });
+	//ObjDesc.matWorld = InitMat;
+	//HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_MapObject"), TEXT("Prototype_GameObject_WasteCan"), &ObjDesc);
+	//CHECK_FAILED(hr);
+
+	//InitMat.Translation({ -3.f, 7.f, -180.f });
+	//ObjDesc.matWorld = InitMat;
+	//hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_MapObject"), TEXT("Prototype_GameObject_KickableRock"),		&ObjDesc);
+	//CHECK_FAILED(hr);
+
+	// **** 맵 오브제
+	//CStarBlock::STARBLOCK_DESC StarBlockdesc{};
+	//StarBlockdesc.eSize = CStarBlock::MEDIUM;
+	//hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_MapObject"), TEXT("Prototype_GameObject_StarBlock"), &StarBlockdesc);
+	//CHECK_FAILED(hr);
+	
+	//CStarBlockPiece::PIECE_DESC StarBlockPieceDesc{};
+	//StarBlockPieceDesc.vInitialPos = _float4(1.f, 15.f, -179.f, 1.f);
+	//HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_MapObject"), TEXT("Prototype_GameObject_StarBlockPiece"), &StarBlockPieceDesc);
+	//CHECK_FAILED(hr);
+
+	// **** 테스트 모델
+	/*if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_TestModel"))))
+	return E_FAIL;*/
+	// ---------------------------------------------------------------------------------------------------------------------------------
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
@@ -135,8 +159,7 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
 {
 	LEVEL eLevel = LEVEL_GAMEPLAY;
-
-
+	
 	CCamera_Main::CAMERA_KIRBY_DESC		MainCamDesc{};
 	MainCamDesc.fFovy = XMConvertToRadians(30.0f);
 	MainCamDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
@@ -148,11 +171,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
 	MainCamDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	MainCamDesc.fOrigDistance = 20.f;
 	MainCamDesc.fCamSensor = .3f;
-
 	if (FAILED(m_pGameInstance->Add_Clone(eLevel, strLayerTag, TEXT("Prototype_GameObject_Camera_Main"), &MainCamDesc)))
 		return E_FAIL;
-
-
 
 	CCamera_Free::CAMERA_FREE_DESC		CameraDesc{};
 	CameraDesc.fMouseSensor = 0.1f;
@@ -164,7 +184,6 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
 	CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
 	CameraDesc.fSpeedPerSec = 10.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
-	
 	if (FAILED(m_pGameInstance->Add_Clone(eLevel, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
 		return E_FAIL;
 	
@@ -175,38 +194,6 @@ HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
 	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_SkySphere"));
 	CHECK_FAILED(hr);
-
-	return S_OK;
-}
-
-HRESULT CLevel_GamePlay::Ready_Layer_Player(const wstring & strLayerTag)
-{
-	/*if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_TestModel"))))
-		return E_FAIL;*/
-
-	// Kirby
-	/*if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Kirby"))))
-		return E_FAIL;*/
-
-	return S_OK;
-}
-
-HRESULT CLevel_GamePlay::Ready_Layer_Monster(const wstring & strLayerTag)
-{
-	//// Awoofy
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Awoofy"))))
-	//	return E_FAIL;
-
-	//// Rabbit
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Rabbit"))))
-	//	return E_FAIL;
-
-	// Buffahorn
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Buffahorn"))))
-	//	return E_FAIL;
-
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BladeKnight"))))
-	//	return E_FAIL;
 
 	return S_OK;
 }
@@ -497,23 +484,6 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 		for (auto& pair : triggerInfos)
 			pCamera->EmplaceBackTriggerInfo(pair.second.first, pair.second.second);
 	}
-
-	return S_OK;
-}
-
-HRESULT CLevel_GamePlay::Ready_Layer_MapObject(const wstring& strLayerTag)
-{
-	HRESULT hr;
-	hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_WasteCan"));
-	CHECK_FAILED(hr);
-
-	hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_KickableRock"));
-	CHECK_FAILED(hr);
-
-	CStarBlock::STARBLOCK_DESC desc{};
-	desc.eSize = CStarBlock::MEDIUM;
-	hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_StarBlock"), &desc);
-	CHECK_FAILED(hr);
 
 	return S_OK;
 }
