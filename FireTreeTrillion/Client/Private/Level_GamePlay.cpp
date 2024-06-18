@@ -51,28 +51,34 @@ HRESULT CLevel_GamePlay::Initialize()
 	/* 구한정보들을 각 랜드오브젝트르 생성할 때 던진다. */
 	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
 		return E_FAIL;
-	
-	if (FAILED(Ready_ParsedObjects()))
-		return E_FAIL;
+	HRESULT hr{};
+	hr = Ready_Map();
+	CHECK_FAILED(hr);
+	hr = Ready_Triggers();
+	CHECK_FAILED(hr);
+	hr = Ready_Monsters();
+	CHECK_FAILED(hr);
+	hr = Ready_Items();
+	CHECK_FAILED(hr);
 
 	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
 		return E_FAIL;
 
 	// Ladder Test
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Ladder"), TEXT("Prototype_GameObject_Ladder"))))
-		return E_FAIL;
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Item"), TEXT("Prototype_GameObject_Coin"))))
-		return E_FAIL;
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Item"), TEXT("Prototype_GameObject_EnergyDrink"))))
-		return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Ladder"), TEXT("Prototype_GameObject_Ladder"))))
+	//	return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Item"), TEXT("Prototype_GameObject_Coin"))))
+	//	return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Item"), TEXT("Prototype_GameObject_EnergyDrink"))))
+	//	return E_FAIL;
 
 	CStarBlockPiece::PIECE_DESC desc{};
 	desc.vInitialPos = _float4(1.f, 15.f, -179.f,1.f);
-	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_MapObject"), TEXT("Prototype_GameObject_StarBlockPiece"), &desc);
-	CHECK_FAILED(hr);
+	//hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_MapObject"), TEXT("Prototype_GameObject_StarBlockPiece"), &desc);
+	//CHECK_FAILED(hr);
 
-	if (FAILED(Ready_Layer_MapObject(TEXT("Layer_MapObject"))))
-		return E_FAIL;
+	//if (FAILED(Ready_Layer_MapObject(TEXT("Layer_MapObject"))))
+	//	return E_FAIL;
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
@@ -497,6 +503,359 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 		for (auto& pair : triggerInfos)
 			pCamera->EmplaceBackTriggerInfo(pair.second.first, pair.second.second);
 	}
+
+	return S_OK;
+}
+
+HRESULT CLevel_GamePlay::Ready_Map()
+{
+	LEVEL eLevel = LEVEL_GAMEPLAY;
+	string strFileName = "../../../objects_txt/Stage1_Map.txt";
+	ifstream fileInput(strFileName, ios::binary);
+	if (fileInput.is_open() == false)
+	{
+		MSG_BOX(TEXT("Failed to open : Stage1_Map.txt"));
+		return E_FAIL;
+	}
+
+	_uint iNumObjects{};
+	fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
+
+	_uint iStrLength{};
+	string strModelName;
+	_float4x4 matWorld{};
+	_float3 vMin{}, vMax{};
+	wstring wstrGameObjectTag;
+
+	for (_uint i = 0; i < iNumObjects; i++)
+	{
+		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
+		strModelName.resize(iStrLength);
+		fileInput.read(&strModelName[0], iStrLength);
+		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
+		fileInput.read(reinterpret_cast<char*>(&vMin), sizeof(vMin));
+		fileInput.read(reinterpret_cast<char*>(&vMax), sizeof(vMax));
+
+		CBasicMap::MAP_DESC tMapDesc{};
+		tMapDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+		tMapDesc.matWorld = matWorld;
+		tMapDesc.vMin = vMin;
+		tMapDesc.vMax = vMax;
+
+		if ("BG0" == strModelName || "BG1" == strModelName)
+			wstrGameObjectTag = TEXT("BG");
+		else
+			wstrGameObjectTag = TEXT("BasicMap");
+
+		if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tMapDesc)))
+		{
+			wstring wstrErrorMsg = TEXT("Failed to Clone: ") + wstrGameObjectTag;
+			MSG_BOX(wstrErrorMsg.c_str());
+			fileInput.close();
+			return E_FAIL;
+		}
+	}
+
+	fileInput.close();
+
+	return S_OK;
+}
+
+HRESULT CLevel_GamePlay::Ready_Triggers()
+{
+	LEVEL eLevel = LEVEL_GAMEPLAY;
+	string strFileName = "../../../objects_txt/Stage1_Triggers.txt";
+	ifstream fileInput(strFileName, ios::binary);
+	if (fileInput.is_open() == false)
+	{
+		MSG_BOX(TEXT("Failed to open : Stage1_Triggers.txt"));
+		return E_FAIL;
+	}
+
+	_uint iNumObjects{};
+	fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
+
+	_uint iStrLength{};
+	string strModelName;
+	_float4x4 matWorld{};
+	_uint iShaderVars{};
+	_float fRimWidth{};
+
+	_int iTriggerIndex{};
+	_int triggerType{};
+	_int iCamType{};
+	_float fRadius{};
+	wstring wstrGameObjectTag = TEXT("MapToolObject");
+
+	map<_int, _float4x4> camMatrices;
+	map<_int, pair<_vector, _float>> frontDirRadii;
+	map<_int, pair<_vector, _float>> rearDirRadii;
+	map<_int, pair<_float4x4, _float>> triggerInfos;
+
+	for (_uint i = 0; i < iNumObjects; i++)
+	{
+		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
+		strModelName.resize(iStrLength);
+		fileInput.read(&strModelName[0], iStrLength);
+		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
+		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
+		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
+
+		fileInput.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
+		fileInput.read(reinterpret_cast<char*>(&triggerType), sizeof(triggerType));
+		fileInput.read(reinterpret_cast<char*>(&iCamType), sizeof(iCamType));
+		fileInput.read(reinterpret_cast<char*>(&fRadius), sizeof(fRadius));
+
+		if ("Camera" == strModelName) {
+			camMatrices.emplace(iTriggerIndex, matWorld);
+			continue;
+		}
+		if ("Dummy" == strModelName) {
+			_vector vDir = XMVector3Normalize(XMVectorSet(matWorld._31, matWorld._32, matWorld._33, 0));
+			if (CAM_FRONT == iCamType)
+				frontDirRadii.emplace(iTriggerIndex, pair<_vector, _float>(vDir, fRadius));
+			else if (CAM_REAR == iCamType)
+				rearDirRadii.emplace(iTriggerIndex, pair<_vector, _float>(vDir, fRadius));
+			continue;
+		}
+
+		if ("Trigger" == strModelName)
+		{
+			_vector vDeterminant{};
+			_float4x4 matInverse{};
+			matInverse = XMMatrixInverse(&vDeterminant, matWorld);
+			triggerInfos.emplace(iTriggerIndex, pair<_float4x4, _float>(matInverse, matWorld._33));
+
+			CTrigger::TRIGGER_DESC tTriggerDesc{};
+			tTriggerDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			tTriggerDesc.matWorld = matWorld;
+			tTriggerDesc.iTriggerIndex = iTriggerIndex;
+			tTriggerDesc.iTriggerType = triggerType;
+
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Trigger"), TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc)))
+				return E_FAIL;
+		}
+		if ("NonAnim_Kirby" == strModelName)
+		{
+			CGameObject::GAMEOBJECT_DESC tempDesc = {};
+			tempDesc.matWorld = matWorld;
+			tempDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			tempDesc.iShaderVars = iShaderVars;
+			tempDesc.fRimWidth = fRimWidth;
+			if (strModelName.size() >= 8) { // NonAnim_ 부분 지우기
+				if ("NonAnim" == strModelName.substr(0, 7))
+					tempDesc.wstrModelName.erase(0, 8);
+			}
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby"), &tempDesc)))
+				return E_FAIL;
+		}
+	}
+
+	CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(eLevel, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+	if (nullptr == pCamera)
+		return E_FAIL;
+
+	fileInput.close();
+
+	if (!camMatrices.empty()) { // 카메라 행렬 세팅
+		for (auto& pair : camMatrices)
+			pCamera->EmplaceBackCamMatrix(pair.second);
+
+		pCamera->Set_MatrixIndex(0);
+	}
+
+	for (auto& pair : frontDirRadii)
+		pCamera->EmplaceBackDirRadius(CAM_FRONT, pair.second.first, pair.second.second);
+
+
+	for (auto& pair : rearDirRadii)
+		pCamera->EmplaceBackDirRadius(CAM_REAR, pair.second.first, pair.second.second);
+
+
+	for (auto& pair : triggerInfos)
+		pCamera->EmplaceBackTriggerInfo(pair.second.first, pair.second.second);
+
+
+	return S_OK;
+}
+
+HRESULT CLevel_GamePlay::Ready_Monsters()
+{
+	LEVEL eLevel = LEVEL_GAMEPLAY;
+	string strFileName = "../../../objects_txt/Stage1_Monsters.txt";
+
+	ifstream fileInput(strFileName, ios::binary);
+	if (fileInput.is_open() == false)
+	{
+		MSG_BOX(TEXT("Failed to open : Stage1_Monsters.txt"));
+		return E_FAIL;
+	}
+
+	_uint iNumObjects{};
+	fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
+
+	_uint iStrLength{};
+	string strModelName;
+	_float4x4 matWorld{};
+	_uint iShaderVars{};
+	_float fRimWidth{};
+	_int iTriggerIndex{};
+	_uint iNumRallyPoints{};
+	vector<_float4> vecRallyPoints;
+	wstring wstrGameObjectTag;
+
+	for (_uint i = 0; i < iNumObjects; i++)
+	{
+		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
+		strModelName.resize(iStrLength);
+		fileInput.read(&strModelName[0], iStrLength);
+		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
+		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
+		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
+
+		fileInput.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
+		fileInput.read(reinterpret_cast<char*>(&iNumRallyPoints), sizeof(iNumRallyPoints));
+
+		vecRallyPoints.clear();
+		_float3 vRallyPointPos{};
+		for (_uint iRallyPointIdx = 0; iRallyPointIdx < iNumRallyPoints; iRallyPointIdx++)
+		{
+			fileInput.read(reinterpret_cast<char*>(&vRallyPointPos), sizeof(vRallyPointPos));
+			vecRallyPoints.push_back(_float4(vRallyPointPos.x, vRallyPointPos.y, vRallyPointPos.z, 1));
+		}
+
+		CGameObject::GAMEOBJECT_DESC tempDesc = {};
+		tempDesc.matWorld = matWorld;
+		tempDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+		tempDesc.iShaderVars = iShaderVars;
+		tempDesc.fRimWidth = fRimWidth;
+		if (strModelName.size() >= 8) { // NonAnim_ 부분 지우기
+			if ("NonAnim" == strModelName.substr(0, 7))
+				tempDesc.wstrModelName.erase(0, 8);
+		}
+
+		if (L"Awoofy" == tempDesc.wstrModelName)
+		{
+			CMonster::MONSTER_DESC MonsterDesc = {};
+			MonsterDesc.matWorld = matWorld;
+			MonsterDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			MonsterDesc.iShaderVars = iShaderVars;
+			MonsterDesc.fRimWidth = fRimWidth;
+			MonsterDesc.eMonState = CMonster::MONSTER_STATE(iTriggerIndex);
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Awoofy"), &MonsterDesc)))
+				return E_FAIL;
+		}
+		else if (L"Rabbit" == tempDesc.wstrModelName)
+		{
+			CRabbit::RABBIT_DESC RabbitDesc = {};
+			RabbitDesc.matWorld = matWorld;
+			RabbitDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			RabbitDesc.iShaderVars = iShaderVars;
+			RabbitDesc.fRimWidth = fRimWidth;
+			RabbitDesc.eRabbitState = CRabbit::RABBIT_STATE(iTriggerIndex);
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Rabbit"), &RabbitDesc)))
+				return E_FAIL;
+		}
+		else if (L"Buffahorn" == tempDesc.wstrModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Buffahorn"), &tempDesc)))
+				return E_FAIL;
+		}
+		else if (L"BladeKnight" == tempDesc.wstrModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BladeKnight"), &tempDesc)))
+				return E_FAIL;
+		}
+		else if (L"PoppyBrosJr" == tempDesc.wstrModelName)
+		{
+			CPoppyBrosJr::POPPY_DESC PoppyDesc = {};
+			PoppyDesc.matWorld = matWorld;
+			PoppyDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			PoppyDesc.iShaderVars = iShaderVars;
+			PoppyDesc.fRimWidth = fRimWidth;
+			PoppyDesc.ePoppyState = CPoppyBrosJr::POPPY_STATE(iTriggerIndex);
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_PoppyBrosJr"), &PoppyDesc)))
+				return E_FAIL;
+		}
+		else if (L"CappyBody" == tempDesc.wstrModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_CappyBody"), &tempDesc)))
+				return E_FAIL;
+		}
+		else if (L"NonAnim_Kabu" == tempDesc.wstrModelName)
+		{
+			CKabu::KABU_DESC KabuDesc = {};
+			KabuDesc.matWorld = matWorld;
+			KabuDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			KabuDesc.iShaderVars = iShaderVars;
+			KabuDesc.fRimWidth = fRimWidth;
+			KabuDesc.eMonState = CKabu::MONSTER_STATE(iTriggerIndex);
+			KabuDesc.vecRallyPoints = vecRallyPoints;
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Kabu"), &KabuDesc)))
+				return E_FAIL;
+		}
+		else if (strModelName == "NonAnim_BrontoBurt")
+		{
+			CBrontoBurt::BRONTOBURT_DESC BrontoBurtDesc = {};
+			BrontoBurtDesc.matWorld = matWorld;
+			BrontoBurtDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			BrontoBurtDesc.iShaderVars = iShaderVars;
+			BrontoBurtDesc.fRimWidth = fRimWidth;
+			BrontoBurtDesc.eMonState = CBrontoBurt::MONSTER_STATE(iTriggerIndex);
+			BrontoBurtDesc.vecRallyPoints = vecRallyPoints;
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BrontoBurt"), &BrontoBurtDesc)))
+				return E_FAIL;
+		}
+	}
+
+	fileInput.close();
+
+	return S_OK;
+}
+
+HRESULT CLevel_GamePlay::Ready_Items()
+{
+	LEVEL eLevel = LEVEL_GAMEPLAY;
+	string strFileName = "../../../objects_txt/Stage1_Items.txt";
+
+	ifstream fileInput(strFileName, ios::binary);
+	if (fileInput.is_open() == false)
+	{
+		MSG_BOX(TEXT("Failed to open : Stage1_Items.txt"));
+		return E_FAIL;
+	}
+
+	_uint iNumObjects{};
+	fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
+
+	_uint iStrLength{};
+	string strModelName;
+	_float4x4 matWorld{};
+	_uint iShaderVars{};
+	_float fRimWidth{};
+
+	for (_uint i = 0; i < iNumObjects; i++)
+	{
+		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
+		strModelName.resize(iStrLength);
+		fileInput.read(&strModelName[0], iStrLength);
+		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
+		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
+		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
+
+		CGameObject::GAMEOBJECT_DESC tDesc{};
+		tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+		tDesc.matWorld = matWorld;
+		tDesc.iShaderVars = iShaderVars;
+		tDesc.fRimWidth = fRimWidth;
+
+		if ("Item_Coin" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Item"), TEXT("Prototype_GameObject_Coin"), &tDesc)))
+				return E_FAIL;
+		}
+	}
+	fileInput.close();
 
 	return S_OK;
 }
