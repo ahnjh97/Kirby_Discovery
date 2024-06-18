@@ -271,7 +271,6 @@ _float3 CEffect::Calculate_CurValue_Lerp(_float fTimeDelta, KF_PROPERTY ePropert
 
     vResultValue = _float3::Lerp(curKeyframes[m_iCurKeyframeIdxs[eProperty]].vValue, curKeyframes[m_iCurKeyframeIdxs[eProperty] + 1].vValue, fInterpolateRatio);
 
-
     return vResultValue;
 }
 
@@ -305,14 +304,12 @@ _float4 CEffect::Calculate_CurValue_Slerp(_float fTimeDelta, KF_PROPERTY eProper
             curKeyframes[iTempIdx + 1].fTimeRatio <= m_fLifeRatio)
             ++iTempIdx;
 
-
         m_iCurKeyframeIdxs[eProperty] = iTempIdx;
     }
 
     //마지막 키프레임이면 하지마!!
     if (curKeyframes.size() - 1 <= m_iCurKeyframeIdxs[eProperty])
         return vResultValue;
-
 
 
     //진~짜 보간합니다 레츠고
@@ -345,12 +342,6 @@ _float4 CEffect::Calculate_CurValue_Slerp(_float fTimeDelta, KF_PROPERTY eProper
         break;
     }
 
-    //_float4 vFirstQuat = XMQuaternionRotationRollPitchYawFromVector(m_pGameInstance->MakeRollPitchYaw(m_KeyFrames[m_iCurKFIdx].vRotation));
-    //_float4 vFirstQuat =   curKeyframes[m_iCurKeyframeIdxs[eProperty]].vValue.r;
-    //_float4 vSecondQuat = XMQuaternionRotationRollPitchYawFromVector(m_pGameInstance->MakeRollPitchYaw(m_KeyFrames[m_iCurKFIdx + 1].vRotation));
-    //_float4 vResultQuat = XMQuaternionSlerp(vFirstQuat, vSecondQuat, fInterpolateRatio);
-    //_float3 vFirstDegree, vSecondDegree;
-
     _float3 vFirstRadian{ curKeyframes[m_iCurKeyframeIdxs[eProperty]].vValue };
     vFirstRadian = { ToRadian(vFirstRadian.x), ToRadian(vFirstRadian.y) , ToRadian(vFirstRadian.z) };
     _float3 vSecondRadian{ curKeyframes[m_iCurKeyframeIdxs[eProperty] + 1].vValue };
@@ -361,23 +352,6 @@ _float4 CEffect::Calculate_CurValue_Slerp(_float fTimeDelta, KF_PROPERTY eProper
     vSecondQuat = Quaternion::CreateFromYawPitchRoll(vSecondRadian);
 
     vResultValue = Quaternion::Slerp(vFirstQuat, vSecondQuat, fInterpolateRatio);
-
-    //return 
-
-    ////회전
-    //_vector vInitialRot = XMQuaternionRotationRollPitchYawFromVector(m_pGameInstance->MakeRollPitchYaw(m_vInitialRot));
-    //_vector vResultRotQuat = XMQuaternionMultiply(vCurRotation, vInitialRot);
-
-    ////_vector vResultRollPitchYaw = m_pGameInstance->QuaternionToEulerAngles(vResultRotQuat);
-    ////XMQuaternionMultiply(vInitialRot, vCurRotation);
-    //VecToF3(m_vCurRotation, m_pGameInstance->QuaternionToEulerAngles(vResultRotQuat));
-    //VecToF4(m_vCurRotQuat, vResultRotQuat);
-
-
-
-
-    //vResultValue = _float3::Lerp(curKeyframes[m_iCurKeyframeIdxs[eProperty]].vValue, curKeyframes[m_iCurKeyframeIdxs[eProperty] + 1].vValue, fInterpolateRatio);
-
 
     return vResultValue;
 }
