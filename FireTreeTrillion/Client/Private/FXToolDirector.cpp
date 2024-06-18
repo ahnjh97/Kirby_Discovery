@@ -52,6 +52,7 @@ void CFXToolDirector::Make_Effect(SINGLE_FX_DATA& _FXData)
 	FXDesc.bIsBloom = _FXData.bIsBloom;
 
 	FXDesc.fRimLightThreshold = _FXData.fRimLightThreshold;
+	FXDesc.vContinuousRotation = _FXData.vContinuousRotation;
 	FXDesc.eRenderGroup = _FXData.eRenderGroup;
 	FXDesc.eTimer = _FXData.eTimer;
 
@@ -204,7 +205,8 @@ HRESULT CFXToolDirector::Save_Effect(CEffect* pEffect, const wstring& strFileNam
 
 	SINGLE_FX_DATA FXData{};
 	pEffect->Fill_SaveData(&FXData);
-
+	if (FXData.strName == "FlowerLeaf A")
+		int a = 0;
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.iNameStrLen), sizeof(_uint));
 	OutputFile.write(FXData.strName.c_str(), FXData.iNameStrLen);
 
@@ -234,6 +236,9 @@ HRESULT CFXToolDirector::Save_Effect(CEffect* pEffect, const wstring& strFileNam
 
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.fRimLightThreshold), sizeof(_float));
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.vContinuousRotation), sizeof(_float3));
+
+	if (FXData.vContinuousRotation.x != 0.f)
+		int a = 0;
 
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.iPropertyMapNum), sizeof(_uint));
 
@@ -505,7 +510,10 @@ HRESULT CFXToolDirector::Load_Effect(path _FilePath, SINGLE_FX_DATA* _pData)
 
 	InputFile.read(reinterpret_cast<char*>(&_pData->fRimLightThreshold), sizeof(_float));
 	InputFile.read(reinterpret_cast<char*>(&_pData->vContinuousRotation), sizeof(_float3));
-
+	if (_pData->vContinuousRotation.x != 0.f)
+	{
+		int a = 0;
+	}
 
 	InputFile.read(reinterpret_cast<char*>(&_pData->iPropertyMapNum), sizeof(_uint));
 
@@ -615,7 +623,7 @@ HRESULT CFXToolDirector::Load_Effect(path _FilePath, PARTICLE_DATA* _pData)
 	_pData->vecMoveCommands.clear();
 	_pData->vecMoveCommands.reserve(_pData->iMoveCommandsNum);
 
-	
+
 	for (_int i = 0; i < _pData->iMoveCommandsNum; ++i)
 	{
 		_bool bTemp = { false };
@@ -761,6 +769,40 @@ void CFXToolDirector::Render_AxisLines()
 {
 	ImDrawList* drawList = GetForegroundDrawList();
 
+
+
+	_float3 vCenter = { 0.f, 0.f, 0.f };
+	CUtils::Make_World_ToScreen(vCenter);
+
+	ImVec2 center = { vCenter.x, vCenter.y };
+	_float fBottomRadius = 5.0f;
+	_float fTopRadius = 5.0f;
+	_float fHeight = 5.0f;
+	_int iSliceCnt = 20;
+
+
+	//Draw_Cylinder(center, 5.0f, 5.0f, 10.0f, 20, color);
+
+	ImVec4 color = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+	ImVec2 screenPosBottom, screenPosTop;
+
+	for (int j = 0; j <= iSliceCnt; ++j)
+	{
+		float theta = j * 2.0f * DirectX::XM_PI / iSliceCnt;
+		ImVec2 posBottom = center + ImVec2(fBottomRadius * cosf(theta), fHeight / 2);
+		ImVec2 posTop = center + ImVec2(fTopRadius * cosf(theta), -fHeight / 2);
+		if (j > 0)
+		{
+			drawList->AddLine(screenPosBottom, posBottom, ImColor(color.x, color.y, color.z, color.w));
+			drawList->AddLine(screenPosTop, posTop, ImColor(color.x, color.y, color.z, color.w));
+			drawList->AddLine(screenPosBottom, screenPosTop, ImColor(color.x, color.y, color.z, color.w));
+		}
+		screenPosBottom = posBottom;
+		screenPosTop = posTop;
+	}
+
+
+
 	_float4x4 ViewMatrix, ProjMatrix;
 	ViewMatrix = m_pGameInstance->Get_Transform(CPipeLine::D3DTS_VIEW);
 	ProjMatrix = m_pGameInstance->Get_Transform(CPipeLine::D3DTS_PROJ);
@@ -825,8 +867,34 @@ HRESULT CFXToolDirector::Render()
 
 void CFXToolDirector::Render_IMGUI()
 {
+
+
+
 	__super::Render_IMGUI();
 }
+
+void CFXToolDirector::Draw_Cylinder(const ImVec2& center, float bottomRadius, float topRadius, float height, int sliceCount, const ImVec4& color)
+{
+	ImDrawList* drawList = GetForegroundDrawList();
+	ImVec2 screenPosBottom, screenPosTop;
+
+	for (int j = 0; j <= sliceCount; ++j)
+	{
+		float theta = j * 2.0f * DirectX::XM_PI / sliceCount;
+		ImVec2 posBottom = center + ImVec2(bottomRadius * cosf(theta), height / 2);
+		ImVec2 posTop = center + ImVec2(topRadius * cosf(theta), -height / 2);
+		if (j > 0)
+		{
+			drawList->AddLine(screenPosBottom, posBottom, ImColor(color.x, color.y, color.z, color.w));
+			drawList->AddLine(screenPosTop, posTop, ImColor(color.x, color.y, color.z, color.w));
+			drawList->AddLine(screenPosBottom, screenPosTop, ImColor(color.x, color.y, color.z, color.w));
+		}
+		screenPosBottom = posBottom;
+		screenPosTop = posTop;
+	}
+}
+
+
 
 //단일 이펙트들의 생성 세팅, 계층을 보여준다.
 void CFXToolDirector::Render_FXHierarchy()
@@ -1058,8 +1126,10 @@ void CFXToolDirector::Render_FXHierarchy()
 			m_iCurRenderGroup = m_FXs[i]->m_eRenderGroup;
 			m_iCurTimer = m_FXs[i]->m_eTimer;
 			m_fTotalPlayDuration = m_FXs[i]->m_fDuration.second;
-			m_fLifetime[0] = m_FXs[i]->m_fLifetime.first;
-			m_fLifetime[1] = m_FXs[i]->m_fLifetime.second;
+
+			memcpy(m_fLifetime, &m_FXs[i]->m_fLifetime, sizeof(_float2));
+			memcpy(m_vRotation, &m_FXs[i]->m_vContinuousRotation, sizeof(_float3));
+
 
 			//파티클이면 추가 변수 매칭
 			if (m_eSelected == SELECTED_PARTICLE_FX)
@@ -1307,6 +1377,7 @@ void CFXToolDirector::Render_FXProperty()
 			Checkbox(u8"직교", &pCurFX->m_bIsOrthographic);
 		}
 
+		SameLine();
 		//블룸 효과
 		if (Checkbox(u8"블룸", &pCurFX->m_bIsBloom) && bIsParticle)
 		{
@@ -1344,7 +1415,7 @@ void CFXToolDirector::Render_FXProperty()
 			pCurFX->m_eRenderGroup = CRenderer::RENDER_BLEND;
 		}
 
-		Dummy({0.f, 20.f});
+		Spacing();
 
 		//타이머 설정
 		if (RadioButton(u8"Timer None", m_iCurTimer == TIMER_NONE))
@@ -1367,6 +1438,13 @@ void CFXToolDirector::Render_FXProperty()
 			pCurFX->m_eRenderGroup = TIMER_SECOND;
 		}
 
+		Spacing();
+		if (!bIsParticle && DragFloat3(u8"지속 회전", m_vRotation, .05f, -180.f, 180.f, "%.2f"))
+		{
+			pCurFX->m_vContinuousRotation.x = m_vRotation[0];
+			pCurFX->m_vContinuousRotation.y = m_vRotation[1];
+			pCurFX->m_vContinuousRotation.z = m_vRotation[2];
+		}
 	}
 
 	Separator();
@@ -1411,7 +1489,7 @@ void CFXToolDirector::Render_FXProperty()
 		if (m_iCurFXTexIdx < 0)
 			m_iCurFXTexIdx = 0;
 
-		if(pCurFX->m_iMaxTexIdx < m_iCurFXTexIdx)
+		if (pCurFX->m_iMaxTexIdx < m_iCurFXTexIdx)
 			m_iCurFXTexIdx = pCurFX->m_iMaskTexIdx;
 
 		pCurFX->m_iTexIdx = m_iCurFXTexIdx;

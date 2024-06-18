@@ -335,6 +335,7 @@ HRESULT CUtils::Load_Effect(path _FilePath, SINGLE_FX_DATA* _pData)
 	InputFile.read(reinterpret_cast<char*>(&_pData->bIsBloom), sizeof(_bool));
 
 	InputFile.read(reinterpret_cast<char*>(&_pData->fRimLightThreshold), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&_pData->vContinuousRotation), sizeof(_float3));
 
 
 	InputFile.read(reinterpret_cast<char*>(&_pData->iPropertyMapNum), sizeof(_uint));
@@ -358,10 +359,7 @@ HRESULT CUtils::Load_Effect(path _FilePath, SINGLE_FX_DATA* _pData)
 	}
 
 	InputFile.read(reinterpret_cast<char*>(&_pData->eRenderGroup), sizeof(_uint));
-	if (_pData->eRenderGroup == 5)
-	{
-		_int a = 5;
-	}
+	InputFile.read(reinterpret_cast<char*>(&_pData->eTimer), sizeof(TIMER));
 
 	return S_OK;
 }
@@ -444,6 +442,7 @@ HRESULT CUtils::Load_Effect(path _FilePath, PARTICLE_DATA* _pData)
 	}
 
 	InputFile.read(reinterpret_cast<char*>(&_pData->eRenderGroup), sizeof(_uint));
+	InputFile.read(reinterpret_cast<char*>(&_pData->eTimer), sizeof(TIMER));
 
 	return S_OK;
 }

@@ -281,8 +281,12 @@ void CCamera_Main::Control(_float fTimeDelta)
 //타겟 위치로부터 카메라 위치를 갱신, 보간한다.
 void CCamera_Main::UpdatePos_FromAnchor(_float fTimeDelta)
 {
+	
 	if (nullptr == m_pFirstTarget)
 		return;
+
+	_float fRealTimeDelta = fTimeDelta;
+
 
 	//**** 타겟 위치를 만듬 ****//
 
@@ -350,20 +354,23 @@ void CCamera_Main::UpdatePos_FromAnchor(_float fTimeDelta)
 		LerpByTriggerInfo(m_iMatrixIndex);
 
 
+	if (.1f < fRealTimeDelta)
+		fRealTimeDelta = 1.f / 30.f;
+
 
 	//떨어진 거리 보간
 	if (abs((m_fDestDistance + m_fZoomOffset) - m_fCurDistance) > .1f)
-		m_fCurDistance += ((m_fDestDistance + m_fZoomOffset) - m_fCurDistance) * fTimeDelta * 5.f;
+		m_fCurDistance += ((m_fDestDistance + m_fZoomOffset) - m_fCurDistance) * fRealTimeDelta * 5.f;
 
 	//y 오프셋 보간
 	if (abs(m_fDestUpOffset - m_fCurUpOffset) > .001f)
-		m_fCurUpOffset += (m_fDestUpOffset - m_fCurUpOffset) * fTimeDelta * 2.f;
+		m_fCurUpOffset += (m_fDestUpOffset - m_fCurUpOffset) * fRealTimeDelta * 2.f;
 
 	//if (abs(m_fDestUpOffset - m_fCurUpOffset) > .1f)
-	//	LERP(m_fCurUpOffset, m_fDestUpOffset, fTimeDelta * 5.f);
+	//	LERP(m_fCurUpOffset, m_fDestUpOffset, fRealTimeDelta * 5.f);
 
 	//각도 보간
-	m_vCurCamDir = SlerpDirVec(m_vCurCamDir, m_vDestCamDir, fTimeDelta * 4.f);
+	m_vCurCamDir = SlerpDirVec(m_vCurCamDir, m_vDestCamDir, fRealTimeDelta * 4.f);
 
 
 
@@ -393,7 +400,7 @@ void CCamera_Main::UpdatePos_FromAnchor(_float fTimeDelta)
 			m_bIsShaking = false;
 			m_fShakeTime = 0.f;
 		}
-		m_fShakeTime -= fTimeDelta;
+		m_fShakeTime -= fRealTimeDelta;
 	}
 
 	//**** 목표 위치를 따라간다 ****//
@@ -409,23 +416,23 @@ void CCamera_Main::UpdatePos_FromAnchor(_float fTimeDelta)
 
 	//x 가기
 	if (.1f <= vDestXZDir.Length() /*&& .2f < static_cast<_float2>(vTargetProjPos).Length()*/)
-		m_pTransformCom->Move(vDestXZDir * fTimeDelta * 4.f);
+		m_pTransformCom->Move(vDestXZDir * fRealTimeDelta * 4.f);
 
 	//y로 가기
 	if (.1f <= vDestYDir.Length())
 	{
 		if (0.f < vDestYDir.y)
-			m_pTransformCom->Move(vDestYDir * fTimeDelta * 2.5f);
+			m_pTransformCom->Move(vDestYDir * fRealTimeDelta * 2.5f);
 		else
 		{
-			m_pTransformCom->Move((1.f < vDestYDir.Length()) ? _float4{ 0.f, -1.f, 0.f, 0.f } *fTimeDelta * 3.f : vDestYDir * fTimeDelta * 2.5f);
+			m_pTransformCom->Move((1.f < vDestYDir.Length()) ? _float4{ 0.f, -1.f, 0.f, 0.f } *fRealTimeDelta * 3.f : vDestYDir * fRealTimeDelta * 2.5f);
 
 		}
 
 	}
 
 
-	m_pTransformCom->Look_At_Interpolate(m_pTransformCom->Get_State(CTransform::STATE_POSITION) + Dir(m_vCurCamDir) + _float4{0.f, m_fCurUpOffset, 0.f, 0.f}, fTimeDelta);
+	m_pTransformCom->Look_At_Interpolate(m_pTransformCom->Get_State(CTransform::STATE_POSITION) + Dir(m_vCurCamDir) + _float4{ 0.f, m_fCurUpOffset, 0.f, 0.f }, fRealTimeDelta);
 
 }
 

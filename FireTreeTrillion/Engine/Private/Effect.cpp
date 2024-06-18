@@ -61,7 +61,9 @@ HRESULT CEffect::Initialize(void* pArg)
     m_fLifetime = effectDesc.fLifetime;
     m_eRenderGroup = effectDesc.eRenderGroup;
     m_eTimer = effectDesc.eTimer;
-
+    m_vContinuousRotation = effectDesc.vContinuousRotation;
+    if (0.f < m_vContinuousRotation.Length())
+        int a = 0;
     if (effectDesc.pSocketMatrix != nullptr)
     {
         m_pSoketMatrix = effectDesc.pSocketMatrix;
@@ -82,6 +84,8 @@ void CEffect::Reset_Duration()
 
 void CEffect::Fill_SaveData(_Out_ SINGLE_FX_DATA* pFXData)
 {
+
+
     pFXData->iNameStrLen = (_uint)m_strFXName.size();
     pFXData->strName = m_strFXName;
 
@@ -109,6 +113,8 @@ void CEffect::Fill_SaveData(_Out_ SINGLE_FX_DATA* pFXData)
 
     pFXData->fRimLightThreshold = m_fRimLightThreshold;
     pFXData->vContinuousRotation = m_vContinuousRotation;
+    if (m_vContinuousRotation.y != 0.f)
+        int a = 0;
 
     pFXData->iPropertyMapNum = m_Keyframes.size();
 
