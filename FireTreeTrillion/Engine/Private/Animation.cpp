@@ -73,7 +73,6 @@ void CAnimation::Invalidate_TransformationMatrix(_float fTimeDelta, const vector
 
 		m_fTrackPosition += fTimeDelta;
 
-
 		return;
 	}
 
