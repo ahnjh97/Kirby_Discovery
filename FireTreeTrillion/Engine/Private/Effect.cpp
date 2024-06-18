@@ -67,19 +67,6 @@ HRESULT CEffect::Initialize(void* pArg)
         m_pSoketMatrix = effectDesc.pSocketMatrix;
     }
 
-
-    //_int iSize = m_iCurKeyframeIdxs[0];
-    //iSize = m_iCurKeyframeIdxs[1];
-    //iSize = m_iCurKeyframeIdxs[2];
-    //iSize = m_iCurKeyframeIdxs[3];
-    //ZeroMemory(m_iCurKeyframeIdxs, )
-    //_int iSize = m;
-    //m_vCurRColor = effectDesc.vRColor;f
-    //m_vCurGColor = effectDesc.vGColor;
-    //m_vCurBColor = effectDesc.vBColor;
-
-    //m_keyfra = effectDesc.Keyframes;
-
     return S_OK;
 }
 
@@ -121,6 +108,7 @@ void CEffect::Fill_SaveData(_Out_ SINGLE_FX_DATA* pFXData)
     pFXData->bIsBloom = m_bIsBloom;
 
     pFXData->fRimLightThreshold = m_fRimLightThreshold;
+    pFXData->vContinuousRotation = m_vContinuousRotation;
 
     pFXData->iPropertyMapNum = m_Keyframes.size();
 

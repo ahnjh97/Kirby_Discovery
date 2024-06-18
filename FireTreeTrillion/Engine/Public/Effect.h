@@ -41,8 +41,8 @@ public:
 		_bool bIsColorRender = { false };
 		_bool bIsBloom = { false };
 
-		_float fRimLightThreshold = { 0.f };
-
+		_float		fRimLightThreshold = { 0.f };
+		_float3		vContinuousRotation = { 0.f, 0.f, 0.f };
 
 		map<KF_PROPERTY, vector<FX_KEYFRAME>> Keyframes;
 
@@ -134,6 +134,9 @@ protected:
 	TIMER			m_eTimer = { TIMER_END };
 
 	_float			m_fRimLightThreshold = { 0.f };
+
+	//지속하여 회전을 시켜주는 속도
+	_float3			m_vContinuousRotation = { 0.f, 0.f, 0.f };
 
 	//기본 시작 크자이
 	_float3 m_vInitPos = { 0.f, 0.f, 0.f };

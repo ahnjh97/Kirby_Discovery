@@ -233,6 +233,7 @@ HRESULT CFXToolDirector::Save_Effect(CEffect* pEffect, const wstring& strFileNam
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.bIsBloom), sizeof(_bool));
 
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.fRimLightThreshold), sizeof(_float));
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.vContinuousRotation), sizeof(_float3));
 
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.iPropertyMapNum), sizeof(_uint));
 
@@ -503,6 +504,7 @@ HRESULT CFXToolDirector::Load_Effect(path _FilePath, SINGLE_FX_DATA* _pData)
 	InputFile.read(reinterpret_cast<char*>(&_pData->bIsBloom), sizeof(_bool));
 
 	InputFile.read(reinterpret_cast<char*>(&_pData->fRimLightThreshold), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&_pData->vContinuousRotation), sizeof(_float3));
 
 
 	InputFile.read(reinterpret_cast<char*>(&_pData->iPropertyMapNum), sizeof(_uint));
