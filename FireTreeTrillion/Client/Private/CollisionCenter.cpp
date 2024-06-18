@@ -8,6 +8,7 @@
 #include "Monster.h"
 
 #include "HUD_StarPoint.h"
+#include "Kirby_State_Function.h"
 
 #define GAMEINSTANCE CGameInstance::Get_Instance()->
 
@@ -40,8 +41,8 @@ void CCollisionCenter::Initialize()
 	m_eColliderType[HITBOX_MONSTER][PLAYER]  = CONTENT_DAMAGE;
 
 	// For 상자(OBJECT)
-	m_eColliderType[HITBOX_PLYAER][OBJECT]  = CONTENT_ATTACK;
-	//m_eColliderType[MONSTER][OBJECT]		= CONTENT_ATTACK; // 던진 몬스터와 부딪힐 때, 충돌처리
+	m_eColliderType[HITBOX_PLYAER][OBJECT]  = CONTENT_KICK;
+	//m_eColliderType[MONSTER][OBJECT]		= CONTENT_KICK; // 던진 몬스터와 부딪힐 때, 충돌처리
 	
 	// For 찰 수 있는 오브젝트
 	m_eColliderType[PLAYER][KICKABLE]		= CONTENT_KICK;
@@ -362,7 +363,7 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		fAttack = 5.f;
 		HitStop_Rogic(pKirby);
 		Camera_Shaking(0.7f, 0.5f);
-
+		SwordHit(pMonsterTransform);
 
 	}
 	break;
@@ -372,7 +373,7 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		fAttack = 5.f;
 		HitStop_Rogic(pKirby);
 		Camera_Shaking(0.7f, 0.5f);
-
+		SwordHit(pMonsterTransform);
 
 
 	}
@@ -383,8 +384,7 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		fAttack = 10.f;
 		HitStop_Rogic(pKirby);
 		Camera_Shaking();
-
-
+		SwordHit_Big(pMonsterTransform);
 
 	}
 	break;
@@ -394,8 +394,7 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		fAttack = 5.f;
 		HitStop_Rogic(pKirby);
 		Camera_Shaking(0.7f, 0.5f);
-
-
+		SwordHit(pMonsterTransform);
 
 	}
 	break;
@@ -405,8 +404,7 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		fAttack = 5.f;
 		HitStop_Rogic(pKirby);
 		Camera_Shaking(0.7f, 0.5f);
-
-
+		SwordHit(pMonsterTransform);
 
 	}
 	break;
@@ -416,8 +414,7 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		fAttack = 10.f;
 		HitStop_Rogic(pKirby);
 		Camera_Shaking();
-
-
+		SwordHit(pMonsterTransform);
 
 	}
 	break;
@@ -551,8 +548,6 @@ void CCollisionCenter::Compute_Coin(CPhysXObject* pPlayer, CPhysXObject* pItem)
 	CKirby* pCPlayer = static_cast<CKirby*>(pPlayer);
 	CItemObject* pIItem = static_cast<CItemObject*>(pItem);
 
-	// fItemPoint는 코인이 오르는 포인트임 저게 올라야할 "코인점수"임
-	// 만약, int 형으로 올라야한다면 형변환 꼭 해주셔!!!
 	_float fItemPoint = (_float)pIItem->Get_ItemPoint();
 	pCPlayer->Plus_Coin((_uint)fItemPoint);
 }

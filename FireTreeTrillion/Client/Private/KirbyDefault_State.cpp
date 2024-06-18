@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "KirbyDefault_State.h"
 #include "Kirby_State_Function.h"
-#include "MultiEffect.h"
-#include "SingleEffect.h"
 
 #pragma region IDLE STATE
 
@@ -567,13 +565,13 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 				_float4 vKirbyLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
 
 				FXDesc.vInitPos = { vKirbyPos.x, vKirbyPos.y + .4f, vKirbyPos.z };
-				FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(vKirbyLook).y + 20.f, 0.f };
-				FXDesc.vInitScale = { 1.3f, 1.3f, 1.3f };
+				FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(vKirbyLook).y + 30.f, 0.f };
+				FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
 
 				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
 					return;
 
-				FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(vKirbyLook).y - 20.f, 0.f };
+				FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(vKirbyLook).y - -30.f, 0.f };
 				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
 					return;
 
@@ -1201,6 +1199,11 @@ CKirbyDefault_Ladder_State::CKirbyDefault_Ladder_State()
 void CKirbyDefault_Ladder_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+
+	CTransform* pKirbyTransform = m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0)->Get_TransformCom();
+	if (_iAnimIndex == CKirby::STATE_LADDERWAITSTART)
+		LadderStart_FX(pKirbyTransform);
+
 }
 
 void CKirbyDefault_Ladder_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)

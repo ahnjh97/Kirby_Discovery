@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "KirbyBalloon_State.h"
 #include "Kirby_State_Function.h"
-#include "MultiEffect.h"
+
 #pragma region BALLOON IDLE STATE
 
 CKirbyBalloon_Idle_State::CKirbyBalloon_Idle_State()
@@ -58,24 +58,9 @@ void CKirbyBalloon_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Smoke"), &FXDesc)))
 					return;
 
+				Copy_Star(pTransformCom);
 
-
-				_float3 vDir = CUtils::Get_State_Vector_Matrix(m_pGameInstance->Get_Transform_Inv(CPipeLine::D3DTS_VIEW), CUtils::STATE_LOOK);
-				vMyPos += static_cast<_float4>(vDir);
-				FXDesc.vInitPos = { vMyPos.x, vMyPos.y + 1.f, vMyPos.z };
-				
-				FXDesc.vInitRot = CUtils::Make_Degree_FromDir(vDir);
-
-				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star Pink_bloom"), &FXDesc)))
-					return;
-
-				FXDesc.fStartDelay = .15f;
-				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star Pink_nonBloom"), &FXDesc)))
-					return;
-
-				FXDesc.fStartDelay = .3f;
-				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star Pink_nonBloom"), &FXDesc)))
-					return;
+				static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr())->Set_FOVY(20.f);
 			}
 		}
 	}
@@ -438,6 +423,10 @@ CKirbyBalloon_Fly_State::CKirbyBalloon_Fly_State()
 void CKirbyBalloon_Fly_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+
+
+	if (_iAnimIndex == CKirby::STATE_FLIGHTLANDING)
+		FlyEnd_Smoke(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0)->Get_TransformCom());
 }
 
 void CKirbyBalloon_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)

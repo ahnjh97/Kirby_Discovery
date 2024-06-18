@@ -144,10 +144,10 @@ public:
 	void			Change_State(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, BODYSTATE eBody, _uint iOffSet = 0);
 	void			Set_Animation(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
 	void			Set_Animation(_int iAnimIndex);
+
 	_uint			Get_Coin() const { return m_uCoin; }
-	void			Plus_Coin(_uint Coin) {
-		m_uCoin += Coin;
-	}
+	void			Set_Coin(_uint uCoin) { m_uCoin = uCoin; }
+	void			Plus_Coin(_uint uCoin) { m_uCoin += uCoin;	}
 
 	_bool			isAnimFinish();
 	void			DefaultIdle();

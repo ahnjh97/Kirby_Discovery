@@ -463,6 +463,7 @@ void CKirbySword_Attack_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, 
 	m_fLockTime = 0.f;
 
 
+	
 	switch (_iAnimIndex)
 	{
 	case CKirby::SWORDSTATE_SIDESLASH:
@@ -475,9 +476,15 @@ void CKirbySword_Attack_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, 
 		SwordSlash_Two(pKirby->Get_TransformCom());
 	}
 	break;
+	case CKirby::SWORDSTATE_DECISIVESLASH:
+	{
+		SwordSlash_Final(pKirby->Get_TransformCom());
+	}
+	break;
 	default:
 		break;
 	}
+	
 }
 
 void CKirbySword_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -1408,6 +1415,8 @@ void CKirbySword_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	{
 		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
 		{
+			Kirbydesc->m_fJumpVelocity = 0.f;
+			pController->Reset_FallVelocity();
 			pKirby->Change_State(CKirby::STATE_FLIGHTLANDING, 70.f, false, false, CKirby::BODY_VACUUM);
 		}
 	}

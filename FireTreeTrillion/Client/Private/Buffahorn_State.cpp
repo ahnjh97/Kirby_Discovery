@@ -460,7 +460,7 @@ void CBuffahorn_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 		pBuffahorn->Set_DamageJumpPower(fDamageJumpPower);
 
-		if (m_fDeadTime > 0.7f)
+		if (m_fDeadTime > 0.4f || pController->Is_Terrain())
 			pBuffahorn->Set_Dead();
 	}
 }

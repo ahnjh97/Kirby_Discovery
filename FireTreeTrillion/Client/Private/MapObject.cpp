@@ -52,11 +52,15 @@ HRESULT CMapObject::Render_LightDepth()
     return S_OK;
 }
 
+#ifdef _DEBUG
+
 void CMapObject::Render_IMGUI()
 {
     __super::Render_IMGUI();
 
 }
+
+#endif
 
 CGameObject* CMapObject::Clone(void* pArg)
 {

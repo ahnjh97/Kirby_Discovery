@@ -616,6 +616,7 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
         }
         
         Out.vSSAO -= vSSAO;
+        
     }
     
     
@@ -755,9 +756,10 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
     }
           
     
-    Out.vResultColor = float4(directLighting + ambientLighting, 1.f) * fAmbientOcclusion;
+    Out.vResultColor = saturate (float4(directLighting + ambientLighting, 1.f) * fAmbientOcclusion);
     Out.vSpecular = saturate(vLightspecular);
     Out.vLensFlare = saturate(vLensFlare);
+    Out.vSSAO = saturate(Out.vSSAO);
     
     return Out;
 }
@@ -833,7 +835,7 @@ PS_OUT PS_MAIN_GODRAY(PS_IN In)
         float4 vRealColor = g_GodRayTexture.Sample(LinearSampler, In.vTexcoord);
         Out.vColor = vRealColor + float4((vGodRayColor * g_fRayExposure).xyz, 1);
     }
-    
+    Out.vColor = saturate(Out.vColor);
     return Out;
 }
 
@@ -872,7 +874,8 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL_FOR_TOOL(PS_IN In)
     float fSpecular = pow(max(dot(normalize(vLook) * -1.f, normalize(vReflect)), 0.f), 30.f);
 
     Out.vSpecular = g_vLightSpecular * fSpecular;
-
+    Out.vSpecular = saturate(Out.vSpecular);
+    
     return Out;
 }
 
@@ -996,6 +999,7 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
         Out.vColor *= g_fBlackBackGround;
     }
     
+    Out.vColor = saturate(Out.vColor);
     return Out;
 }
 
@@ -1068,7 +1072,7 @@ PS_OUT PS_MAIN_FINAL_FOR_TOOL(PS_IN In)
 
     // 기존 디퓨즈와 가산되어 그려진다.
     Out.vColor += vEffect + (vBlur * 2);
-        
+    Out.vColor = saturate(Out.vColor);
     
     return Out;
 }
@@ -1131,7 +1135,7 @@ PS_OUT PS_MAIN_COLORCORRECT(PS_IN In)
     {
         //톤매핑
         vColor.rgb = ToneMapping(vColor.rgb, g_fExposure);
-        
+        vColor.rgb = saturate(vColor.rgb);
         float fLuminance = dot(vColor.rgb, float3(0.299, 0.587, 0.114));
         
         float3 vTonerColor = 0.f;
@@ -1159,32 +1163,33 @@ PS_OUT PS_MAIN_COLORCORRECT(PS_IN In)
         
         if (0 < iTotalNum)
             vColor.rgb += (vTonerColor / iTotalNum);
-        
+        vColor.rgb = saturate(vColor.rgb);
         
         vColor.rgb = AdjustWhiteBalance(vColor.rgb, g_vWhiteBalance);
-        
+        vColor.rgb = saturate(vColor.rgb);
         
         vColor.rgb = AdjustContrast(vColor.rgb, g_fContrast);
-        
+        vColor.rgb = saturate(vColor.rgb);
         
         //Color Balance
         vColor.rgb = AdjustColorBalance(vColor.rgb, g_vColorBalance);
-        
+        vColor.rgb = saturate(vColor.rgb);
         //HSV
         vColor.rgb = ColorGrading(vColor.rgb, g_fHue, g_fSaturation, g_fBrightness);
-        
+        vColor.rgb = saturate(vColor.rgb);
         //활기
         vColor.rgb = AdjustVibrance(vColor.rgb, g_fVibrance);
-    
+        vColor.rgb = saturate(vColor.rgb);
         //감마
         vColor.rgb = GammaCorrection(vColor.rgb, g_fGamma);
-        
+        vColor.rgb = saturate(vColor.rgb);
         vColor = saturate(float4(vColor.rgb, 1));
 
     }
     
     Out.vColor = vColor + vLensFlare;
     
+    Out.vColor = saturate(Out.vColor);
     return Out;
 }
 
@@ -1234,6 +1239,7 @@ PS_OUT PS_MAIN_DOFBlur(PS_IN In)
     float3 airColor = float3(-0.05, 0.01, 0.08); // 공기색 (파란색 계열)
     
     Out.vColor += float4(airFactor * airColor, 0.f);
+    Out.vColor = saturate(Out.vColor);
     return Out;
     
     
@@ -1280,6 +1286,7 @@ PS_OUT PS_MAIN_DOFBlur_Result(PS_IN In)
     
     
     Out.vColor = FreeBlur_Y(In.vTexcoord, g_DOFBlur_Result, fDOFWeight);
+    Out.vColor = saturate(Out.vColor);
     return Out;
     
 }
@@ -1314,7 +1321,7 @@ PS_OUT PS_MAIN_MotionBlur(PS_IN In)
         Out.vColor += fWeight[6 + i] * (g_DiffuseMotionBlur.Sample(ClampSampler, vUV));
     }
     Out.vColor /= fTotal;
-
+    Out.vColor = saturate(Out.vColor);
     return Out;
 }
 
@@ -1333,7 +1340,7 @@ PS_OUT PS_UI_Default(PS_IN In)
         Out.vColor *= (1 - vUIColor.a);
         Out.vColor += vUIColor;
     }
-        
+    Out.vColor = saturate(Out.vColor);
     return Out;
 }
 

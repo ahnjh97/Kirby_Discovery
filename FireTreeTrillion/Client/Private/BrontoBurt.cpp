@@ -34,6 +34,9 @@ HRESULT CBrontoBurt::Initialize(void* pArg)
 		m_vecRallyPoint = pBrontoBurtDesc->vecRallyPoints;
 	}
 
+	for (_int i = 0; i < m_vecRallyPoint.size(); i++)
+		m_vecRallyPoint[i].y += 3.f;
+
 	if (FAILED(__super::Initialize(pBrontoBurtDesc)))
 		return E_FAIL;
 
@@ -43,7 +46,6 @@ HRESULT CBrontoBurt::Initialize(void* pArg)
 	{
 		m_fDistance = XMVectorGetX(XMVector3Length(m_vecRallyPoint[0] - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
 		m_vOriginPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
-		m_vOriginPos.y += 1.f;
 	}
 
 	if (FAILED(Add_Components()))
@@ -120,7 +122,8 @@ _int CBrontoBurt::Tick(_float fTimeDelta)
 			m_pControllerCom->Move(m_pTransformCom, m_vRotatePos, m_fTimeDelta);
 
 			m_vRally = m_vRotatePos - m_vBeforePos;
-			m_pTransformCom->Look_At_Axis(m_vRally);
+			if (m_vRally != XMVectorZero())
+				m_pTransformCom->Look_At_Axis(m_vRally);
 			m_vBeforePos = m_vRotatePos;
 		}
 		else if (MON_PATROL == m_eMonState)

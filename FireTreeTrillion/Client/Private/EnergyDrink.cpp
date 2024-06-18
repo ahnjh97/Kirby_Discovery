@@ -32,7 +32,7 @@ HRESULT CEnergyDrink::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(10.f, 10.f, -180.f, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, CUtils::Get_State_Vector_Matrix(GameObjectDesc.matWorld, CUtils::STATE_POSITION));
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;

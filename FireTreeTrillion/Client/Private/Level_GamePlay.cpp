@@ -15,6 +15,7 @@
 #include "BG.h"
 #include "HUD.h"
 #include "Starblock.h"
+#include "StarblockPiece.h"
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -24,7 +25,7 @@ CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 
 HRESULT CLevel_GamePlay::Initialize()
 {
-	m_pGameInstance->Set_RenderMode(CRenderer::MODE_TOOL);
+	m_pGameInstance->Set_RenderMode(CRenderer::MODE_GAMEPLAY);
 
 	//CLevelChanger::Get_Instance()->Load();
 
@@ -64,6 +65,12 @@ HRESULT CLevel_GamePlay::Initialize()
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Item"), TEXT("Prototype_GameObject_EnergyDrink"))))
 		return E_FAIL;
+
+	CStarBlockPiece::PIECE_DESC desc{};
+	desc.vInitialPos = _float4(1.f, 15.f, -179.f,1.f);
+	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_MapObject"), TEXT("Prototype_GameObject_StarBlockPiece"), &desc);
+	CHECK_FAILED(hr);
+
 	if (FAILED(Ready_Layer_MapObject(TEXT("Layer_MapObject"))))
 		return E_FAIL;
 

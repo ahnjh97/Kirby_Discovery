@@ -32,7 +32,10 @@ void CAwoofy_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
 
 	if (CAwoofy::MON_SLEEP == pAwoofy->Get_MonState())
+	{
+		pAwoofy->Set_AwoofyEye(CAwoofy::AWOOFYEYE_SLEEP);
 		return;
+	}
 
 	else if (CAwoofy::MON_WAIT == pAwoofy->Get_MonState())
 	{
@@ -523,7 +526,7 @@ void CAwoofy_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 		pAwoofy->Set_DamageJumpPower(fDamageJumpPower);
 
-		if (m_fDeadTime > 0.7f)
+		if (m_fDeadTime > 0.4f || pController->Is_Terrain())
 			pAwoofy->Set_Dead();
 
 	}

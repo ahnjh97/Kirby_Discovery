@@ -3,8 +3,8 @@
 #include "Utils.h"
 #include "SingleEffect.h"
 #include "MultiEffect.h"
-
 #include "KirbyBomb.h"
+#include "Camera_Main.h"
 
 #define DESC(state) Kirbydesc->state
 #define GAMEINSTANCE CGameInstance::Get_Instance()->
@@ -935,6 +935,50 @@ static _bool Kirby_JoyStickLadder_Logic(CKirby* pKirby, CKirby::KIRBY_INFODESC* 
 
 #pragma region Hyo Effect
 
+static void LadderStart_FX(CTransform* pTransformCom)
+{
+	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+
+	MultiFXDesc.vInitPos = static_cast<_float3>(pTransformCom->Get_State(CTransform::STATE_POSITION) + _float4{ 0.f, .8f, 0.f, 0.f });
+	MultiFXDesc.vInitPos += static_cast<_float3>(pTransformCom->Get_State(CTransform::STATE_LOOK) * .4f);
+	MultiFXDesc.vInitRot = CUtils::Make_Degree_FromDir(CGameInstance::Get_Instance()->Get_CamLook());
+	MultiFXDesc.vInitScale = { 2.f, 2.f, 2.f };
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Ladder Star"), &MultiFXDesc)))
+		return;
+}
+
+static void FlyEnd_Smoke(CTransform* pTransformCom)
+{
+	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+
+	MultiFXDesc.vInitPos = static_cast<_float3>(pTransformCom->Get_State(CTransform::STATE_POSITION) + pTransformCom->Get_State(CTransform::STATE_LOOK) * 2.f + _float4{ 0.f, .3f, 0.f, 0.f } );
+	MultiFXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK)).y, 0.f };
+	MultiFXDesc.vInitScale = { 1.f, 1.f, 1.f };
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Fly End Smoke"), &MultiFXDesc)))
+		return;
+}
+
+static void Copy_Star(CTransform* pTransformCom)
+{
+	CMultiEffect::MULTI_FX_DESC FXDesc{};
+
+	_float3 vCamDir = CGameInstance::Get_Instance()->Get_CamLook();
+	FXDesc.vInitPos =  (_float3)pTransformCom->Get_State(CTransform::STATE_POSITION) + vCamDir + _float3{0.f, 1.f, 0.f} ;
+	FXDesc.vInitRot = CUtils::Make_Degree_FromDir(vCamDir);
+
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star Pink_bloom"), &FXDesc)))
+		return;
+
+	FXDesc.fStartDelay = .15f;
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star Pink_nonBloom"), &FXDesc)))
+		return;
+
+	FXDesc.fStartDelay = .3f;
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star Pink_nonBloom"), &FXDesc)))
+		return;
+
+}
+
 static void Bbong_FX(_float fTimeDelta, CTransform* pTransformCom)
 {
 	static _float fBbongTime{ 0.f };
@@ -967,6 +1011,18 @@ static void SwordSlash_One(CTransform* pTransformCom)
 		return;
 }
 
+static void SwordSlash_Final(CTransform* pTransformCom)
+{
+	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+
+	MultiFXDesc.vInitPos = static_cast<_float3>(pTransformCom->Get_State(CTransform::STATE_POSITION) + _float4{ 0.f, .3f, 0.f, 0.f } + pTransformCom->Get_State(CTransform::STATE_LOOK) * 2.f);
+	MultiFXDesc.vInitRot = _float3{ 0.f, CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK)).y, 0.f };
+	MultiFXDesc.vInitScale = { 5.f, 5.f, 5.f };
+	MultiFXDesc.fStartDelay = .1f;
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SwordTrail_One"), &MultiFXDesc)))
+		return;
+}
+
 static void SwordSlash_Two(CTransform* pTransformCom)
 {
 	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
@@ -981,10 +1037,9 @@ static void SwordSpinCharge(CTransform* pTransformCom)
 {
 	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
 
-	MultiFXDesc.vInitPos = static_cast<_float3>(pTransformCom->Get_State(CTransform::STATE_POSITION) + _float4{ 0.f, -.1f, 0.f, 0.f });
+	MultiFXDesc.vInitPos = static_cast<_float3>(pTransformCom->Get_State(CTransform::STATE_POSITION) + _float4{ 0.f, -.4f, 0.f, 0.f });
 	MultiFXDesc.vInitRot = CUtils::Make_Degree_FromDir(CGameInstance::Get_Instance()->Get_CamLook());
 	MultiFXDesc.vInitScale = { 4.f, 4.f, 4.f };
-	//MultiFXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Sword_Copy Bubble_One"), &MultiFXDesc)))
 		return;
 }
@@ -998,6 +1053,29 @@ static void SwordSpinSlash_One(CTransform* pTransformCom)
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Sword_Spin Attack A"), &MultiFXDesc)))
 		return;
 }
+
+static void SwordHit(CTransform* pTransformCom)
+{
+	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+
+	MultiFXDesc.vInitPos = pTransformCom->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, .4f, 0.f };
+	MultiFXDesc.vInitScale = {3.f, 3.f, 3.f };
+	MultiFXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(CGameInstance::Get_Instance()->Get_CamLook()).y, CUtils::Make_RandomFloat(-5.f, 5.f)};
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SwordHit_v1"), &MultiFXDesc)))
+		return;
+}
+
+static void SwordHit_Big(CTransform* pTransformCom)
+{
+	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+
+	MultiFXDesc.vInitPos = pTransformCom->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, .4f, 0.f };
+	MultiFXDesc.vInitScale = { 10.f, 10.f, 10.f };
+	MultiFXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(CGameInstance::Get_Instance()->Get_CamLook()).y, CUtils::Make_RandomFloat(-5.f, 5.f) };
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SwordHit_v1"), &MultiFXDesc)))
+		return;
+}
+
 #pragma endregion 
 
 

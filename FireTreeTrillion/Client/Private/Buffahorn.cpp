@@ -113,9 +113,21 @@ HRESULT CBuffahorn::Render()
 		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
 
-		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
-			return E_FAIL;
+		//몸통(1)은 normal O, 눈까리(0)는 normal x 패스
+		if (i == 0 && m_bRenderBody)
+		{
+			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Render(i)))
+				return E_FAIL;
+		}
+		else if (i == 1 && m_bRenderEye)
+		{
+			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_X)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Render(i)))
+				return E_FAIL;
+		}
 
 		m_pModelCom->Render(i);
 	}

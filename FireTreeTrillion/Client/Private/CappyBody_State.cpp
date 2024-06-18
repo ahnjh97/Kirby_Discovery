@@ -228,6 +228,9 @@ void CCappyBody_HatLose_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, 
 
 void CCappyBody_HatLose_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
+	CCappyBody* pCappyBody = static_cast<CCappyBody*>(pGameObject);
+
+	pCappyBody->Set_Render(false);
 }
 
 void CCappyBody_HatLose_State::OnStateExit()
@@ -330,7 +333,7 @@ void CCappyBody_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 		pCappy->Set_DamageJumpPower(fDamageJumpPower);
 
-		if (m_fDeadTime > 0.7f)
+		if (m_fDeadTime > 0.4f || pController->Is_Terrain())
 			pCappy->Set_Dead();
 
 	}

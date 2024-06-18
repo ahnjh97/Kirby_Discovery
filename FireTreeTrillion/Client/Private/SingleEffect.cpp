@@ -108,7 +108,8 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 	//true 반환하면 lifetime 끝난 것.
 	if (Calculate_Lifetime(_fTimeDelta))
 	{
-		m_bNoRender = true;
+		if(*m_pCurrentLevelID != LEVEL_TOOL_FX)
+			m_bNoRender = true;
 	}
 
 
@@ -252,7 +253,7 @@ HRESULT CSingleEffect::Add_Components(FX_DESC& FXDesc)
 		CHECK_FAILED(hr);
 
 		//현재 VtxPosTex Shader Pass 6까지
-		m_iMaxPassIdx = 6;
+		m_iMaxPassIdx = POSTEX_END - 1;
 	}
 	else
 	{
@@ -265,8 +266,8 @@ HRESULT CSingleEffect::Add_Components(FX_DESC& FXDesc)
 			TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 		CHECK_FAILED(hr);
 
-		//현재 VtxModel Shader Pass 9까지
-		m_iMaxPassIdx = 9;
+		//현재 VtxModel Shader Pass 10까지
+		m_iMaxPassIdx = MODEL_END - 1;
 	}
 
 	return S_OK;
