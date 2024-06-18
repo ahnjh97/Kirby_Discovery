@@ -770,43 +770,9 @@ void CFXToolDirector::Render_AxisLines()
 	ImDrawList* drawList = GetForegroundDrawList();
 
 
-
-	_float3 vCenter = { 0.f, 0.f, 0.f };
-	CUtils::Make_World_ToScreen(vCenter);
-
-	ImVec2 center = { vCenter.x, vCenter.y };
-	_float fBottomRadius = 5.0f;
-	_float fTopRadius = 5.0f;
-	_float fHeight = 5.0f;
-	_int iSliceCnt = 20;
-
-
-	//Draw_Cylinder(center, 5.0f, 5.0f, 10.0f, 20, color);
-
-	ImVec4 color = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
-	ImVec2 screenPosBottom, screenPosTop;
-
-	for (int j = 0; j <= iSliceCnt; ++j)
-	{
-		float theta = j * 2.0f * DirectX::XM_PI / iSliceCnt;
-		ImVec2 posBottom = center + ImVec2(fBottomRadius * cosf(theta), fHeight / 2);
-		ImVec2 posTop = center + ImVec2(fTopRadius * cosf(theta), -fHeight / 2);
-		if (j > 0)
-		{
-			drawList->AddLine(screenPosBottom, posBottom, ImColor(color.x, color.y, color.z, color.w));
-			drawList->AddLine(screenPosTop, posTop, ImColor(color.x, color.y, color.z, color.w));
-			drawList->AddLine(screenPosBottom, screenPosTop, ImColor(color.x, color.y, color.z, color.w));
-		}
-		screenPosBottom = posBottom;
-		screenPosTop = posTop;
-	}
-
-
-
 	_float4x4 ViewMatrix, ProjMatrix;
 	ViewMatrix = m_pGameInstance->Get_Transform(CPipeLine::D3DTS_VIEW);
 	ProjMatrix = m_pGameInstance->Get_Transform(CPipeLine::D3DTS_PROJ);
-
 	_float4x4 VPMatrix = ViewMatrix * ProjMatrix;
 
 	auto TransformToScreen = [&](XMVECTOR worldPos)
@@ -816,6 +782,47 @@ void CFXToolDirector::Render_AxisLines()
 			screenPos = XMVectorMultiply(screenPos, XMVectorSet(g_iWinSizeX, g_iWinSizeY, 1.f, 0.f));
 			return ImVec2(XMVectorGetX(screenPos), XMVectorGetY(screenPos));
 		};
+
+
+	/*
+	_float3 vCenter = { 0.f, 0.f, 0.f };
+	ImVec2 center = TransformToScreen(XMLoadFloat3(&vCenter));
+
+	_float fRadius = 3.0f;
+
+	_float fBottomRadius = 5.0f;
+	_float fTopRadius = 5.0f;
+	_float fHeight = 10.0f;
+	_int iSliceCnt = 20;
+
+	ImVec4 color = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+
+	std::vector<ImVec2> bottomCircle, topCircle;
+
+
+	// 원기둥의 하단과 상단 점 계산
+	for (int j = 0; j <= iSliceCnt; ++j)
+	{
+		float theta = j * 2.0f * DirectX::XM_PI / iSliceCnt;
+		float cosTheta = cosf(theta);
+		float sinTheta = sinf(theta);
+
+		_float3 bottomPoint = vCenter + _float3(fBottomRadius * cosTheta, 0.0f, fBottomRadius * sinTheta);
+		_float3 topPoint = vCenter + _float3(fTopRadius * cosTheta, fHeight, fTopRadius * sinTheta);
+
+		bottomCircle.push_back(TransformToScreen(XMLoadFloat3(&bottomPoint)));
+		topCircle.push_back(TransformToScreen(XMLoadFloat3(&topPoint)));
+	}
+
+	// 원기둥 그리기
+	for (int j = 0; j < iSliceCnt; ++j)
+	{
+		drawList->AddLine(bottomCircle[j], bottomCircle[j + 1], ImColor(color.x, color.y, color.z, color.w));
+		drawList->AddLine(topCircle[j], topCircle[j + 1], ImColor(color.x, color.y, color.z, color.w));
+		drawList->AddLine(bottomCircle[j], topCircle[j], ImColor(color.x, color.y, color.z, color.w));
+	}
+	*/
+
 
 	// Define points in world space
 	XMVECTOR origin = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
