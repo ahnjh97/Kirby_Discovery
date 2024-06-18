@@ -20,6 +20,9 @@ public:
 	class CGameObject*		Get_GameObject(_uint iLevelIndex, const wstring& strLayerTag, _uint iIndex);
 	class CGameObject*		Get_GameObject(_uint iLevelIndex, const wstring& wstrLayerTag);
 	class CGameObject*		Get_GameObject_ByTag(_uint iLevelIndex, const wstring& strLayerTag, wstring _tag);
+
+	class CGameObject*		Find_Prototype(const wstring& strPrototypeTag);
+
 	void					Set_CurrentLevel(_int _CurrentLevel) { m_iCurrentLevel = _CurrentLevel; }
 	_uint					Get_GameObject_Num(_uint _iLevelIndex, const wstring& _strLayerTag);
 
@@ -50,7 +53,6 @@ private:
 	map<const wstring, class CLayer*>*					m_pLayers = { nullptr };
 
 private:
-	class CGameObject*		Find_Prototype(const wstring& strPrototypeTag);
 	class CLayer*			Find_Layer(_uint iLevelIndex, const wstring& strLayerTag);
 
 #ifdef _DEBUG

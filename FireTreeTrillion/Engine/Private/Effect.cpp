@@ -127,7 +127,8 @@ void CEffect::Fill_SaveData(_Out_ SINGLE_FX_DATA* pFXData)
 
     pFXData->eRenderGroup = m_eRenderGroup;
     pFXData->eTimer = m_eTimer;
-
+    if (m_eTimer == TIMER_SECOND)
+        int a = 0;
 }
 
 void CEffect::Add_Keyframe(FX_KEYFRAME& newKeyframe, KF_PROPERTY eProperty)

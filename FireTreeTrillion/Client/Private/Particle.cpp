@@ -10,6 +10,8 @@ CParticle::CParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 CParticle::CParticle(const CParticle& rhs)
 	:CEffect{ rhs }
+	,m_FXDesc{rhs.m_FXDesc}
+	,m_InstanceDesc{rhs.m_InstanceDesc}
 {
 }
 
@@ -36,6 +38,15 @@ HRESULT CParticle::Initialize(void* pArg)
 	if (m_FXDesc.strFXName != "NONE")
 	{
 		FXDesc = m_FXDesc;
+
+		//clone 하면서 새로 들어오는 값!
+		if (pArg != nullptr)
+		{
+			FXDesc.vInitPos = (*(FX_DESC*)pArg).vInitPos;
+			FXDesc.vInitRot = (*(FX_DESC*)pArg).vInitRot;
+			FXDesc.vInitScale = (*(FX_DESC*)pArg).vInitScale;
+			FXDesc.pSocketMatrix = (*(FX_DESC*)pArg).pSocketMatrix;
+		}
 	}
 
 	else if (pArg != nullptr)
@@ -52,33 +63,38 @@ HRESULT CParticle::Initialize(void* pArg)
 	CHECK_FAILED(hr);
 
 
+	INSTANCE_DESC instanceDesc{};
+
 	//fx 툴 레벨에서는 clone할 때 정보를 새로 기입하는 상황.
 	if (*m_pCurrentLevelID == LEVEL_TOOL_FX)
+	{
 		m_FXDesc = FXDesc;
 
+		//기본 상태 세팅
+		instanceDesc.vecMoveCommands.resize(INSTANCE_END);
+		for (auto& moveCmd : instanceDesc.vecMoveCommands)
+			moveCmd = false;
 
-	//기본 상태 세팅
-	INSTANCE_DESC instanceDesc{};
-	instanceDesc.vecMoveCommands.resize(INSTANCE_END);
-	for (auto& moveCmd : instanceDesc.vecMoveCommands)
-		moveCmd = false;
+		instanceDesc.vPivot = { 0.f, -1.f, 0.f };
+		instanceDesc.vRange = { 2.f, 2.f, 2.f };
+		instanceDesc.fSpeed = { 3.f };
+		instanceDesc.fSpeedRandomOffset = { 1.f };
 
-	//instanceDesc.vecMoveCommands[INSTANCE_DROP] = true;
-	//instanceDesc.vecMoveCommands[INSTANCE_SPREAD] = true;
-	//instanceDesc.vecMoveCommands[INSTANCE_DECELERATE] = true;
+		instanceDesc.fStartDelay = { .1f };
+		instanceDesc.fStarDelayRandomOffset = { .2f };
 
-	instanceDesc.vPivot = { 0.f, -1.f, 0.f };
-	instanceDesc.vRange = { 2.f, 2.f, 2.f };
-	instanceDesc.fSpeed = { 3.f };
-	instanceDesc.fSpeedRandomOffset = { 1.f };
+		instanceDesc.fLifetime = { 1.4f };
+		instanceDesc.fLifetimeRandomOffset = { .3f };
+		instanceDesc.bIsLoop = true;
+		Update_InstanceInfo(&instanceDesc);
+	}
+	else
+	{
+		Update_InstanceInfo(&m_InstanceDesc);
+	}
 
-	instanceDesc.fStartDelay = { .1f };
-	instanceDesc.fStarDelayRandomOffset = { .2f };
-
-	instanceDesc.fLifetime = { 1.4f };
-	instanceDesc.fLifetimeRandomOffset = { .3f };
-	instanceDesc.bIsLoop = true;
-	Update_InstanceInfo(&instanceDesc);
+	if (m_InstanceDesc.vecMoveCommands.size() < INSTANCE_END)
+		m_InstanceDesc.vecMoveCommands.resize(INSTANCE_END);
 
 	return S_OK;
 }
@@ -91,10 +107,10 @@ void CParticle::Update_InstanceInfo(INSTANCE_DESC* _instanceDesc)
 
 	//loop가 두개여
 	m_InstanceDesc.bIsLoop = m_bIsLoop;
-	//m_InstanceDesc.bIsBillboard = m_bIsBillboard;
-	//m_InstanceDesc.bIsBloom = m_bIsBloom;
+	m_InstanceDesc.vCenter += m_vInitPos;
 
-	m_pVIBufferCom->Update_InstanceDesc(m_InstanceDesc);
+	if (nullptr != m_pVIBufferCom)
+		m_pVIBufferCom->Update_InstanceDesc(m_InstanceDesc);
 }
 
 void CParticle::Fill_SaveData(PARTICLE_DATA* pFXData)
@@ -195,24 +211,38 @@ _int CParticle::Tick(_float _fTimeDelta)
 		return OBJ_NOEVENT;
 
 
+	VTXMATRIX* pVertices = m_pVIBufferCom->Map();
 
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_DROP])
-		m_pVIBufferCom->Drop(fMyTimeDelta);
+		m_pVIBufferCom->Drop(fMyTimeDelta, pVertices);
 
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_SPREAD])
-		m_pVIBufferCom->Spread(fMyTimeDelta);
+		m_pVIBufferCom->Spread(fMyTimeDelta, pVertices);
+
+	if (m_InstanceDesc.vecMoveCommands[INSTANCE_APPEAR])
+		m_pVIBufferCom->Appear(fMyTimeDelta, pVertices);
+
+	if (m_InstanceDesc.vecMoveCommands[INSTANCE_DISAPPEAR])
+		m_pVIBufferCom->Disappear(fMyTimeDelta, pVertices);
 
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_DECELERATE])
-		m_pVIBufferCom->Decelerate(fMyTimeDelta);
+		m_pVIBufferCom->Decelerate(fMyTimeDelta, pVertices);
 
+	if (m_InstanceDesc.vecMoveCommands[INSTANCE_WIGGLE])
+		m_pVIBufferCom->Wiggle(fMyTimeDelta, pVertices);
+
+	if (m_InstanceDesc.vecMoveCommands[INSTANCE_TAIL])
+		m_pVIBufferCom->Tail(fMyTimeDelta, pVertices);
+
+	m_pVIBufferCom->Unmap();
 
 	return OBJ_NOEVENT;
 }
 
 void CParticle::Late_Tick(_float fTimeDelta)
 {
-	if (m_bIsColorRender)
-		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+	if ((CRenderer::RENDERGROUP)m_eRenderGroup != CRenderer::RENDER_END)
+		m_pGameInstance->Add_RenderGroup((CRenderer::RENDERGROUP)m_eRenderGroup, this);
 
 	if (m_bIsBloom)
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
@@ -302,7 +332,7 @@ HRESULT CParticle::Bind_ShaderResources(_int iTexIdx, _int iMaskTexIdx)
 		return E_FAIL;
 
 
- 	hr = m_pShaderCom->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition(), sizeof(_float4));
+	hr = m_pShaderCom->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition(), sizeof(_float4));
 	CHECK_FAILED(hr);
 
 	_float4 vLook = m_pGameInstance->Get_CamLook();
@@ -321,6 +351,8 @@ HRESULT CParticle::Bind_ShaderResources(_int iTexIdx, _int iMaskTexIdx)
 	hr = m_pTextureCom[TEX_MASK]->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", m_iMaskTexIdx);
 	CHECK_FAILED(hr);
 
+	hr = m_pGameInstance->Bind_RTShaderResource(m_pShaderCom, TEXT("Target_Depth"), "g_DepthTexture");
+	CHECK_FAILED(hr);
 
 	return S_OK;
 }

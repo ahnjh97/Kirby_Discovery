@@ -27,10 +27,16 @@ public:
 	//Color + Alpha °è»ê
 	virtual _float4 Compute_RandColor() = 0;
 
+	virtual VTXMATRIX* Map();
+	virtual void Unmap();
 
-	virtual void Drop(_float fTimeDelta);
-	virtual void Spread(_float fTimeDelta);
-	virtual void Decelerate(_float fTimeDelta);
+	virtual void Drop(_float fTimeDelta, VTXMATRIX* pVertices);
+	virtual void Spread(_float fTimeDelta, VTXMATRIX* pVertices);
+	virtual void Decelerate(_float fTimeDelta, VTXMATRIX* pVertices);
+	virtual void Appear(_float fTimeDelta, VTXMATRIX* pVertices);
+	virtual void Disappear(_float fTimeDelta, VTXMATRIX* pVertices);
+	virtual void Wiggle(_float fTimeDelta, VTXMATRIX* pVertices);
+	virtual void Tail(_float fTimeDelta, VTXMATRIX* pVertices);
 
 	void Compute_AllLifeTime( _float fTimeDelta);
 
@@ -72,6 +78,7 @@ protected:
 	_float3*					m_pDirections = { nullptr };
 	_float3*					m_pInitialScales = { nullptr };
 	_float*						m_pInitialSpeeds = { nullptr };
+	_float3*					m_pPrePositions = { nullptr };
 	_float*						m_pSpeeds = { nullptr };
 	_float3*					m_pColors = { nullptr };
 	_float*						m_pAlphas = { nullptr };
