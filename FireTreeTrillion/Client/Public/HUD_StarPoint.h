@@ -48,6 +48,7 @@ private:
 
 	_bool						m_IsMovingUP = { TRUE };
 	_bool						m_IsLootTrigger = { FALSE };
+	_bool						m_IsKirbyEX = { FALSE };
 
 	HUD_STARPOINT				m_ePreState = { STARPOINT_NONE };
 	HUD_STARPOINT				m_eCurState = { STARPOINT_NONE };

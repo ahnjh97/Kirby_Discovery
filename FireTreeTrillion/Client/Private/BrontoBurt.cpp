@@ -34,6 +34,9 @@ HRESULT CBrontoBurt::Initialize(void* pArg)
 		m_vecRallyPoint = pBrontoBurtDesc->vecRallyPoints;
 	}
 
+	for (_int i = 0; i < m_vecRallyPoint.size(); i++)
+		m_vecRallyPoint[i].y += 3.f;
+
 	if (FAILED(__super::Initialize(pBrontoBurtDesc)))
 		return E_FAIL;
 
@@ -43,7 +46,6 @@ HRESULT CBrontoBurt::Initialize(void* pArg)
 	{
 		m_fDistance = XMVectorGetX(XMVector3Length(m_vecRallyPoint[0] - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
 		m_vOriginPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
-		m_vOriginPos.y += 1.f;
 	}
 
 	if (FAILED(Add_Components()))
@@ -329,7 +331,6 @@ HRESULT CBrontoBurt::Add_Components()
 
 	/* For.Com_CharacterController */
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
-	vPos.y += 1.f;
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
 	desc.fOffset = 1.f;

@@ -587,7 +587,10 @@ void CRenderer::Key_Input()
 	if (m_pGameInstance->Get_KeyState(DIK_F7, KEY_DOWN))
 		Set_ColorSet(Find_ColorSet("Night"));
 	if (m_pGameInstance->Get_KeyState(DIK_F8, KEY_DOWN))
+	{
 		Set_ColorSet(Find_ColorSet("Stage1"));
+		m_pGameInstance->PlayBGM(L"Running Through the New World.mp3");
+	}
 }
 
 HRESULT CRenderer::Bind_DeferredTexture(CTexture* pTexture, const _char* pConstantName, _uint iIndex)
