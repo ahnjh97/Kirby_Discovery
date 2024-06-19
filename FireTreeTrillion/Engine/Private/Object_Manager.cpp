@@ -2,6 +2,7 @@
 #include "GameObject.h"
 #include "Layer.h"
 #include "Utils.h"
+#include "Model.h"
 
 CObject_Manager::CObject_Manager()
 {
@@ -181,6 +182,7 @@ list<CGameObject*>*CObject_Manager::Get_List(_uint iLevelIndex, const wstring & 
 	return pLayer->Get_list();
 }
 
+static _char filter[MAX_PATH] = "";
 #ifdef _DEBUG
 /// <summary> 객체를 Clone할 당시에 자동으로 추가되어 관리되는 IMGUI 함수 </summary>
 void CObject_Manager::IMGUI_Tick()
@@ -193,35 +195,87 @@ void CObject_Manager::IMGUI_Tick()
 	ImGui::Text("%.2f", ImGui::GetIO().Framerate);
 	ImGui::Separator();  ImGui::NewLine();
 
-	for (auto& map : m_pLayers[m_iCurrentLevel])
+	if (m_iCurrentLevel != 7) // MapTool
 	{
-		auto ObjList = map.second->Get_GameObjectList();
-
-		string LayerName = CUtils::WstrToStr(map.first);
-
-		if (ImGui::TreeNode(LayerName.c_str()))
+		for (auto& map : m_pLayers[m_iCurrentLevel])
 		{
-			int index = 0;
-			for (auto& obj : ObjList)
+			auto ObjList = map.second->Get_GameObjectList();
+
+			string LayerName = CUtils::WstrToStr(map.first);
+
+			if (ImGui::TreeNode(LayerName.c_str()))
 			{
-				auto iter = m_mapCloneObjs.find(obj);
-				if (iter == m_mapCloneObjs.end())
+				int index = 0;
+				for (auto& obj : ObjList)
 				{
-					MSG_BOX(TEXT("오브젝트 매니저에서 IMGUI 못찾고있음!!"));
-					continue;
+					auto iter = m_mapCloneObjs.find(obj);
+					if (iter == m_mapCloneObjs.end())
+					{
+						MSG_BOX(TEXT("오브젝트 매니저에서 IMGUI 못찾고있음!!"));
+						continue;
+					}
+
+					const string& ProtoName = CUtils::WstrToStr(iter->second) + to_string(index);
+					if (ImGui::TreeNode(ProtoName.c_str()))
+					{
+						obj->Render_IMGUI();
+						ImGui::TreePop();
+					}
+
+					++index;
 				}
 
-				const string& ProtoName = CUtils::WstrToStr(iter->second) + to_string(index);
-				if (ImGui::TreeNode(ProtoName.c_str()))
-				{
-					obj->Render_IMGUI();
-					ImGui::TreePop();
-				}
-
-				++index;
+				ImGui::TreePop();
 			}
+		}
+	}
+	else
+	{
+		for (auto& map : m_pLayers[m_iCurrentLevel])
+		{
+			auto ObjList = map.second->Get_GameObjectList();
 
-			ImGui::TreePop();
+			string LayerName = CUtils::WstrToStr(map.first);
+			if(LayerName == "Layer_Parse")
+				ImGui::InputText("##Filter", filter, IM_ARRAYSIZE(filter)); // 필터 입력받기
+
+			if (ImGui::TreeNode(LayerName.c_str()))
+			{
+				_int index = 0;
+				for (auto& obj : ObjList)
+				{
+					if (nullptr == obj)
+						continue;
+
+					auto iter = m_mapCloneObjs.find(obj);
+					if (iter == m_mapCloneObjs.end())
+					{
+						MSG_BOX(TEXT("오브젝트 매니저에서 IMGUI 못찾고있음!!"));
+						continue;
+					}
+
+					CModel* pModel = dynamic_cast<CModel*>(obj->Get_Component(TEXT("Com_Model")));
+					if (nullptr == pModel)
+						continue;
+
+					string strModelName = pModel->Get_ModelName() + "_" + to_string(index);
+					string strLower = strModelName;
+					transform(strLower.begin(), strLower.end(), strLower.begin(), ::tolower);
+
+					string strFilter = string(filter);
+					transform(strFilter.begin(), strFilter.end(), strFilter.begin(), ::tolower);
+					if (strLower.find(strFilter) != string::npos) {
+						if (ImGui::TreeNode(strModelName.c_str())) {
+							obj->Render_IMGUI();
+							ImGui::TreePop();
+						}
+					}
+
+					++index;
+				}
+
+				ImGui::TreePop();
+			}
 		}
 	}
 
@@ -252,7 +306,6 @@ CLayer * CObject_Manager::Find_Layer(_uint iLevelIndex, const wstring & strLayer
 
 	return iter->second;
 }
-
 
 CObject_Manager * CObject_Manager::Create(_uint iNumLevels)
 {

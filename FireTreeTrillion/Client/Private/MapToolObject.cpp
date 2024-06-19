@@ -108,11 +108,13 @@ void CMapToolObject::Render_IMGUI()
 {
 	if (nullptr == m_pModelCom)
 		return;
-	string strModelName = m_pModelCom->Get_ModelName();
 
-	ImGui::BeginChild(strModelName.c_str());
+	/*string strModelName = m_pModelCom->Get_ModelName();
 
-	ImGui::EndChild();
+	if (ImGui::TreeNode(strModelName.c_str()))
+	{
+		ImGui::TreePop();
+	}*/
 }
 #endif
 
