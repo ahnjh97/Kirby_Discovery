@@ -223,10 +223,10 @@ _float4 CVIBuffer_Instance_Point::Compute_RandDirection()
 
 _float4 CVIBuffer_Instance_Point::Compute_RandColor()
 {
-	return {	m_InstanceDesc.vColor.x + CUtils::Make_RandomFloat(-m_InstanceDesc.vColorRandomOffset.x, m_InstanceDesc.vColorRandomOffset.x),
-				m_InstanceDesc.vColor.y + CUtils::Make_RandomFloat(-m_InstanceDesc.vColorRandomOffset.y, m_InstanceDesc.vColorRandomOffset.y),
-				m_InstanceDesc.vColor.z + CUtils::Make_RandomFloat(-m_InstanceDesc.vColorRandomOffset.z, m_InstanceDesc.vColorRandomOffset.z),
-				m_InstanceDesc.fAlpha + CUtils::Make_RandomFloat(-m_InstanceDesc.fAlphaRandomOffset, m_InstanceDesc.fAlphaRandomOffset) };
+	return { SATURATE(m_InstanceDesc.vColor.x + CUtils::Make_RandomFloat(-m_InstanceDesc.vColorRandomOffset.x, m_InstanceDesc.vColorRandomOffset.x)),
+				SATURATE(m_InstanceDesc.vColor.y + CUtils::Make_RandomFloat(-m_InstanceDesc.vColorRandomOffset.y, m_InstanceDesc.vColorRandomOffset.y)),
+				SATURATE(m_InstanceDesc.vColor.z + CUtils::Make_RandomFloat(-m_InstanceDesc.vColorRandomOffset.z, m_InstanceDesc.vColorRandomOffset.z)),
+				SATURATE(m_InstanceDesc.fAlpha + CUtils::Make_RandomFloat(-m_InstanceDesc.fAlphaRandomOffset, m_InstanceDesc.fAlphaRandomOffset)) };
 }
 
 

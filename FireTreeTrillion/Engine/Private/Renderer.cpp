@@ -1,6 +1,7 @@
 #include "Renderer.h"
 #include "GameObject.h"
 #include "GameInstance.h"
+#include "Effect.h"
 
 _uint		g_iSizeX = 8192;
 _uint		g_iSizeY = 4608;
@@ -381,8 +382,8 @@ HRESULT CRenderer::Initialize()
 		return E_FAIL;
 
 #endif
-
 	return S_OK;
+
 }
 
 void CRenderer::Color_Initialize()
@@ -637,6 +638,64 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 	{
 		m_DestColorData = Find_ColorSet("Stage1");
 		m_pGameInstance->PlayBGM(L"Running Through the New World.mp3");
+
+		CEffect::FX_DESC FXDesc{};
+
+		FXDesc.vInitPos = { -44.f, 17.f, 121.f };
+		FXDesc.vInitScale = { 1.f, 1.f, 1.f };
+		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Flower Particle"), &FXDesc)))
+			return;
+
+		FXDesc.vInitPos = { -44.f, 17.f, 100.f };
+		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Flower Particle"), &FXDesc)))
+			return;
+
+		for (_int i = 0; i < 40; ++i)
+		{
+			_float3 vRandom = { CUtils::Make_Random_Vector(CUtils::Make_RandomFloat( 25.f, 35.f)) };
+			FXDesc.vInitPos =
+				_float3{ -44.f + CUtils::Make_RandomFloat(-20.f, 20.f),
+				30.f + CUtils::Make_RandomFloat(-10.f, 4.f),
+				131.f + CUtils::Make_RandomFloat(-20.f, 20.f) };
+			FXDesc.vInitRot = CUtils::Make_Degree_FromDir( (_float3)CUtils::Make_RandomAngle_Vector(50.f, _float3{0.f, 0.5f, 1.f}));
+			FXDesc.fStartDelay = CUtils::Make_RandomFloat(0.f, 3.f);
+			wstring strPrototypeTag = TEXT("Prototype_GameObject_FlowerLeaf ");
+			switch (CUtils::Make_RandomInt(1, 4))
+			{
+			case 1: strPrototypeTag += L"A"; break;
+			case 2: strPrototypeTag += L"B"; break;
+			case 3: strPrototypeTag += L"C"; break;
+			case 4: strPrototypeTag += L"D"; break;
+			default:
+				break;
+			}
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), strPrototypeTag, &FXDesc)))
+				return;
+		}
+
+		for (_int i = 0; i < 25; ++i)
+		{
+			_float3 vRandom = { CUtils::Make_Random_Vector(CUtils::Make_RandomFloat(25.f, 35.f)) };
+			FXDesc.vInitPos =
+				_float3{ -44.f + CUtils::Make_RandomFloat(-20.f, 20.f),
+				30.f + CUtils::Make_RandomFloat(-10.f, 4.f),
+				171.f + CUtils::Make_RandomFloat(-20.f, 20.f) };
+			FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_RandomAngle_Vector(50.f, _float3{ 0.f, 0.5f, 1.f }));
+			FXDesc.fStartDelay = CUtils::Make_RandomFloat(5.f, 8.f);
+			wstring strPrototypeTag = TEXT("Prototype_GameObject_FlowerLeaf ");
+			switch (CUtils::Make_RandomInt(1, 4))
+			{
+			case 1: strPrototypeTag += L"A"; break;
+			case 2: strPrototypeTag += L"B"; break;
+			case 3: strPrototypeTag += L"C"; break;
+			case 4: strPrototypeTag += L"D"; break;
+			default:
+				break;
+			}
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), strPrototypeTag, &FXDesc)))
+				return;
+		}
+
 	}
 		break;
 	default:
