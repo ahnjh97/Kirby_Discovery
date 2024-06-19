@@ -407,6 +407,14 @@ HRESULT CGameInstance::Add_DebugComponents(CComponent* pRenderComponent)
 	return m_pRenderer->Add_DebugComponents(pRenderComponent);
 }
 
+_bool CGameInstance::Get_HitBoxRender()
+{
+	if (nullptr == m_pRenderer)
+		return false;
+
+	return m_pRenderer->Get_HitBoxRender();
+}
+
 #endif
 
 HRESULT CGameInstance::Open_Level(_uint iNewLevelID, CLevel* pNewLevel)
@@ -986,12 +994,6 @@ void CGameInstance::Register_Player(PxActor* pPlayerActor)
 		m_pPhysx->Register_Player(pPlayerActor);
 }
 
-void CGameInstance::Register_Controller(PxActor* pActor, PxController* pController)
-{
-	if (nullptr != m_pPhysx)
-		m_pPhysx->Register_Controller(pActor, pController);
-}
-
 void CGameInstance::Register_Trigger(PxActor* pTriggerActor, _int iTriggerType, _int iTriggerIndex)
 {
 	if (nullptr != m_pPhysx)
@@ -1086,41 +1088,6 @@ void CGameInstance::Restore_SecondTimer()
 	m_pTimeController->Restore_SecondTimer();
 }
 
-/// <summary> 충돌한 쌍을 정렬하여 Pair를 담고있는 std::set에 담아둔다. </summary>
-/// <returns> 그룹별로 물리적 충돌 진행 유무를 리턴 </returns>
-void CGameInstance::Add_CollisionObjects(CGameObject* Src, CGameObject* Dst)
-{
-	if (Src == nullptr || Dst == nullptr)
-		return;
-
-	// Collision Group에 충돌된 쌍 정리하기
-	pair<CGameObject*, CGameObject*> collisionPair = minmax(Src, Dst);
-	auto result = m_CollisionObjects.insert(collisionPair);
-	if (result.second) // 삽입이 성공했을 때만 레퍼런스 카운트 증가
-	{ 
-		Safe_AddRef(Src);
-		Safe_AddRef(Dst);
-	}
-}
-
-/// <summary> CollisionCenter에게 충돌된 쌍들을 관리하는 std::set을 넘긴다. </summary>
-void CGameInstance::Get_CollisionObjects(_Inout_ set<pair<CGameObject*, CGameObject*>>& CollisionObjects)
-{
-	if (m_CollisionObjects.empty() == true)
-		return;
-
-	if (CollisionObjects.empty() == false)
-		return;
-
-	//static _int iCnt{0};
-	//++iCnt;
-	//ImGui::Begin(u8"야 이거 뭐냐?");
-	//ImGui::Text("%d", iCnt);
-	//ImGui::End();
-
-	CollisionObjects = move(m_CollisionObjects);
-}
-
 _bool CGameInstance::Is_PassingGroup(CGameObject* pObj)
 {
 	return pObj->Get_CollisionType() >= PASSING_GROUP;
@@ -1154,13 +1121,4 @@ void CGameInstance::Free()
 	Safe_Release(m_pSound_Manager);
 	Safe_Release(m_pPhysx);
 	Safe_Release(m_pGraphic_Device);
-
-	for (auto& Object : m_CollisionObjects)
-	{
-		CGameObject* pSrc = Object.first;
-		Safe_Release(pSrc);
-		pSrc = Object.second;
-		Safe_Release(pSrc);
-	}
-	m_CollisionObjects.clear();
 }

@@ -49,7 +49,6 @@ public:
 
 	_float			Get_Radius() const { return m_tControllerCapsuleDesc.radius; }
 	void			RegisterAsPlayer();
-	void			Register_Controller();
 
 public:
 	virtual HRESULT Initialize(void* pArg)	override;

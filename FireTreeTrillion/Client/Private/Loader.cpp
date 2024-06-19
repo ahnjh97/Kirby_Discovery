@@ -92,6 +92,9 @@
 #include "EnergyDrink.h"
 #include "Coin.h"
 
+// 콜라이더
+#include "HitBox.h"
+
 
 #pragma endregion
 
@@ -226,6 +229,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("OrbitingCamera"), COrbitingCamera);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BG"), CBG);
 
+	// For HitBox
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HitBox"), CHitBox);
 #pragma region UI
 
 	// UI

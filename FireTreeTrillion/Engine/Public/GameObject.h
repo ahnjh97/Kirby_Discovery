@@ -15,6 +15,8 @@ public:
 		_float		fRimWidth = { 0.2f };
 	}GAMEOBJECT_DESC;
 
+	enum COLLISION_VALUE { BODY, ATTACK, VALUE_END };
+
 protected:
 	CGameObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CGameObject(const CGameObject& rhs);
@@ -45,6 +47,7 @@ public:
 	void				Set_ShaderVars(_uint iShaderVars);
 	_float				Get_RimWidth() { return m_fRimWidth; }
 	void				Set_RimWidth(_float fRimWidth) { m_fRimWidth = fRimWidth; }
+
 
 public:
 	virtual HRESULT		Initialize_Prototype();
@@ -99,6 +102,17 @@ protected:
 	_bool									m_bMotionBlur = { false };
 	_uint									m_eCollisionGroup = { INT_MAX };
 
+	COLLISION_DESC							m_tColliderDesc[VALUE_END] = {};
+	// 원기둥 (CYLINDER 전용)
+	void		Set_CylenderCollider(_float fOffSetY, _float fHeight, _float fRadius);
+	// 구 (SPHERE 전용)
+	void		Set_SphereCollider(_float fOffSetY, _float fRadius);
+	// 절두체 (FRUSTUM 전용)
+	void		Set_FrustumCollider(_float fOffSetY, _float fRadius, _float fAngle);
+	// 튜브 형태 전용
+	void		Set_TubeCollider(_float fOffSetY, _float fHeight, _float fMinRadius, _float fMaxRadius);
+	// 몸 콜라이더 전용
+	void		Set_BodyCollider(HITBOX eType, _float fOffSetY, _float fHeight, _float fRadius);
 
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;

@@ -48,6 +48,7 @@ public:
 	virtual void	Add_AnimEvent()  override {}
 
 	void			Damage_Delay(_float fTimeDelta);
+	void			Set_Damage_Delay(_float fMaxTime) { m_fMonsterOverPowerMaxTime = fMaxTime; }
 	_bool			Get_MonsterOverPower() { return m_bMonsterOverPower; }
 
 
@@ -61,6 +62,7 @@ protected:
 	// 무적상태 제어
 	_bool					m_bMonsterOverPower = { false };
 	_float					m_fMonsterOverPowerTime = { 0.f };
+	_float					m_fMonsterOverPowerMaxTime = { 0.f };
 	_float					m_fPreHp = { 0.f };
 
 public:

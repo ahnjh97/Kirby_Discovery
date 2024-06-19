@@ -1,7 +1,6 @@
 #pragma once
 #include "Client_Defines.h"
 #include "RigidObject.h"
-#include "Trigger.h"
 
 BEGIN(Engine)
 class CModel;
@@ -34,7 +33,6 @@ private:
 
 private:
 	CModel*			m_pModelCom = nullptr;
-	CTrigger*		m_pTrigger = nullptr;
 	_bool			m_bActivatePhysX = false;
 	_float			m_fLifeTime = _float();
 

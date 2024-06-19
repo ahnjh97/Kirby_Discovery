@@ -44,14 +44,14 @@ _int CPhysXObject::Tick(_float fTimeDelta)
 	return OBJ_NOEVENT;
 }
 
-_int CPhysXObject::Ready_Dead()
+_int CPhysXObject::Ready_Dead(_float fDeadScale)
 {
 	if (m_ePhyXState != PO_KIRBYMOUTH)
 	{
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.vInitPos = static_cast<_float3>(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(m_pGameInstance->Get_CamLook());
-		FXDesc.vInitScale = { 1.8f, 1.8f, 1.8f };
+		FXDesc.vInitScale = { fDeadScale, fDeadScale, fDeadScale };
 		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_ObjDead"), &FXDesc)))
 			return OBJ_DEAD;
 	}

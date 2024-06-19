@@ -1,21 +1,19 @@
 #pragma once
 #include "Client_Defines.h"
-#include "Character.h"
+#include "GameObject.h"
 
-BEGIN(Engine)
-class CModel;
-class CShader;
-END
 
 BEGIN(Client)
 
 // Ä¿ºñÀÇ ¹î»ì
-class CHitBox final : public CCharacter
+class CHitBox final : public CGameObject
 {
 public:
 	struct HITBOX_DESC
 	{
 		CGameObject* pOwner;
+		COLLISION_DESC* pDesc;
+		_uint		 pCollisionType;
 	};
 private:
 	CHitBox(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -32,10 +30,13 @@ public:
 #ifdef _DEBUG
 	void	Render_IMGUI();
 #endif
-	virtual void	Collision_Overlap(CGameObject* pGameObject);
-	void			Check_Collision();
+	_bool			Is_Alive() const { return m_pOwnerCollisionDesc->bAlive; }
+	void			Set_Alive(_bool bAlive) { m_pOwnerCollisionDesc->bAlive = bAlive; }
 
-	_bool			Is_Alive() const { return m_bAlive; }
+	class CGameObject* Get_Owner() { return m_pOwner; }
+	COLLISION_DESC*	   Get_CollisionDesc() { return m_pOwnerCollisionDesc; }
+
+	void			Restore_Logic(_float fTimeDelta);
 	
 private:
 	HRESULT			Add_Components();
@@ -45,7 +46,11 @@ private:
 	class CGameObject*	m_pOwner			= nullptr;
 	class CTransform*	m_pOwnerTransform	= nullptr;
 
-	_bool				m_bAlive = false;
+	_float				m_fCollisionTime = { 0.f };
+
+	COLLISION_DESC*		m_pOwnerCollisionDesc = { nullptr };
+	COLLISION_VALUE     m_eValue = { VALUE_END };
+
 
 public:
 	static CHitBox* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

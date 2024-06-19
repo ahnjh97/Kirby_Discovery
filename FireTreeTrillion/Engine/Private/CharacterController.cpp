@@ -477,12 +477,6 @@ void CCharacterController::RegisterAsPlayer()
 	m_pGameInstance->Register_Player(m_pController->getActor());
 }
 
-void CCharacterController::Register_Controller()
-{
-	m_pController->getActor()->setName(m_strObjectName.c_str());
-	m_pGameInstance->Register_Controller(m_pController->getActor(), m_pController);
-}
-
 void CCharacterController::Create_Controller()
 {
 	Release_Controller();

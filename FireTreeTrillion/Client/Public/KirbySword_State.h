@@ -19,10 +19,10 @@ public:
 	// 상태 진입되어 있는 상태에서 매 tick마다 호출
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
 
-	void Key_Z(class CGameObject* pGameObject, _float fTimeDelta);
-	void Key_X(class CGameObject* pGameObject, _float fTimeDelta);
-	void Key_C(class CGameObject* pGameObject, _float fTimeDelta);
-	void Key_V(class CGameObject* pGameObject, _float fTimeDelta);
+	_bool Key_Z(class CGameObject* pGameObject, _float fTimeDelta);
+	_bool Key_X(class CGameObject* pGameObject, _float fTimeDelta);
+	_bool Key_C(class CGameObject* pGameObject, _float fTimeDelta);
+	_bool Key_V(class CGameObject* pGameObject, _float fTimeDelta);
 	virtual void OnStateExit()														override;
 
 public:
