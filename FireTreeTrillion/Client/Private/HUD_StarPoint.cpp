@@ -85,106 +85,106 @@ _int CHUD_StarPoint::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
-	Update_UIState(fTimeDelta);
+	//Update_UIState(fTimeDelta);
 
-	if (m_IsKirbyEX == FALSE)
-	{
-		m_pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
-		//CHECK_NULLPTR(m_pKirby);
-		if (m_pKirby)
-		{
-			m_iPreCoin = m_pKirby->Get_Coin();
-			m_IsKirbyEX = TRUE;
-		}
-	}
+	//if (m_IsKirbyEX == FALSE)
+	//{
+	//	m_pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+	//	//CHECK_NULLPTR(m_pKirby);
+	//	if (m_pKirby)
+	//	{
+	//		m_iPreCoin = m_pKirby->Get_Coin();
+	//		m_IsKirbyEX = TRUE;
+	//	}
+	//}
 
-	if (m_pKirby == nullptr)
-		return OBJ_NOEVENT;
+	//if (m_pKirby == nullptr)
+	//	return OBJ_NOEVENT;
 
-	//이전 재화량 대비 현재 재화량 비교
-	_uint iCurCoin = m_pKirby->Get_Coin();
-	if (iCurCoin > m_iPreCoin)
-	{
-		m_IsLootTrigger = TRUE;
-		m_iPreCoin = iCurCoin; 
-		m_pKirby->Set_Coin(m_iPreCoin);
+	////이전 재화량 대비 현재 재화량 비교
+	//_uint iCurCoin = m_pKirby->Get_Coin();
+	//if (iCurCoin > m_iPreCoin)
+	//{
+	//	m_IsLootTrigger = TRUE;
+	//	m_iPreCoin = iCurCoin; 
+	//	m_pKirby->Set_Coin(m_iPreCoin);
 
-		if (m_IsLootTrigger) //== TRUE;
-		{
-			m_eCurState = STARPOINT_LOOT;
-			m_IsLootTrigger = FALSE;
-		}
-	}
+	//	if (m_IsLootTrigger) //== TRUE;
+	//	{
+	//		m_eCurState = STARPOINT_LOOT;
+	//		m_IsLootTrigger = FALSE;
+	//	}
+	//}
 
 	return OBJ_NOEVENT;
 }
 
 void CHUD_StarPoint::Late_Tick(_float fTimeDelta)
 {
-	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_UI, this);
+	//m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_UI, this);
 }
 
 HRESULT CHUD_StarPoint::Render()
 {
-	//해당 상태의 경우에는 렌더x
-	if (STARPOINT_WAIT == m_eCurState && STARPOINT_HIDE == m_ePreState)
-		return S_OK;
+	////해당 상태의 경우에는 렌더x
+	//if (STARPOINT_WAIT == m_eCurState && STARPOINT_HIDE == m_ePreState)
+	//	return S_OK;
 
-	if (UI_TEXTURE == m_UIObjDesc.eUIType)
-		Render_BindSet(m_pShaderCom, m_pTransformCom);
+	//if (UI_TEXTURE == m_UIObjDesc.eUIType)
+	//	Render_BindSet(m_pShaderCom, m_pTransformCom);
 
-	if (UI_FONT == m_UIObjDesc.eUIType)
-	{
-		_float2 vFontPos = { m_UIObjDesc.vPos.x + m_UIObjDesc.vCenter.x,
-							-m_UIObjDesc.vPos.y + m_UIObjDesc.vCenter.y };
+	//if (UI_FONT == m_UIObjDesc.eUIType)
+	//{
+	//	_float2 vFontPos = { m_UIObjDesc.vPos.x + m_UIObjDesc.vCenter.x,
+	//						-m_UIObjDesc.vPos.y + m_UIObjDesc.vCenter.y };
 
-		_float4 vFontRGBA = { m_UIObjDesc.vColorRGB.x, m_UIObjDesc.vColorRGB.y, m_UIObjDesc.vColorRGB.z, m_UIObjDesc.fAlpha };
-		_float2 vFontOrig = { 1.f, 1.f };
-		_float2 vFontScale = { m_UIObjDesc.vSize.x, m_UIObjDesc.vSize.y };
+	//	_float4 vFontRGBA = { m_UIObjDesc.vColorRGB.x, m_UIObjDesc.vColorRGB.y, m_UIObjDesc.vColorRGB.z, m_UIObjDesc.fAlpha };
+	//	_float2 vFontOrig = { 1.f, 1.f };
+	//	_float2 vFontScale = { m_UIObjDesc.vSize.x, m_UIObjDesc.vSize.y };
 
-		wstring wstrFontTag = { TEXT("Font_HUD_StarPoint_NUM30") };
-		
-		_uint iCurCoin = m_pKirby->Get_Coin();
-		_uint iFont100 = iCurCoin / 100;
-		_uint iFont10 = (iCurCoin % 100) / 10;
-		_uint iFont1 = iCurCoin % 10;
+	//	wstring wstrFontTag = { TEXT("Font_HUD_StarPoint_NUM30") };
+	//	
+	//	_uint iCurCoin = m_pKirby->Get_Coin();
+	//	_uint iFont100 = iCurCoin / 100;
+	//	_uint iFont10 = (iCurCoin % 100) / 10;
+	//	_uint iFont1 = iCurCoin % 10;
 
-		if (TEXT("Font100") == m_UIObjDesc.wstrUITag || TEXT("Font100_Shadow") == m_UIObjDesc.wstrUITag)
-			return S_OK;
-			//m_UIObjDesc.wstrText = to_wstring(iFont100);
+	//	if (TEXT("Font100") == m_UIObjDesc.wstrUITag || TEXT("Font100_Shadow") == m_UIObjDesc.wstrUITag)
+	//		return S_OK;
+	//		//m_UIObjDesc.wstrText = to_wstring(iFont100);
 
-		if (TEXT("Font10") == m_UIObjDesc.wstrUITag || TEXT("Font10_Shadow") == m_UIObjDesc.wstrUITag)
-		{
-			if (iFont10 > 0)
-			{
-				m_UIObjDesc.wstrText = to_wstring(iFont10);
+	//	if (TEXT("Font10") == m_UIObjDesc.wstrUITag || TEXT("Font10_Shadow") == m_UIObjDesc.wstrUITag)
+	//	{
+	//		if (iFont10 > 0)
+	//		{
+	//			m_UIObjDesc.wstrText = to_wstring(iFont10);
 
-				m_UIObjDesc.vPos.x = m_vInitPos.x + 12.f;
-				m_UIObjDesc.vPos.y = m_vInitPos.y;
-				m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_UIObjDesc.vPos);
-			}
-			
-			else			
-				return S_OK;
-		}
+	//			m_UIObjDesc.vPos.x = m_vInitPos.x + 12.f;
+	//			m_UIObjDesc.vPos.y = m_vInitPos.y;
+	//			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_UIObjDesc.vPos);
+	//		}
+	//		
+	//		else			
+	//			return S_OK;
+	//	}
 
-		if (TEXT("Font1") == m_UIObjDesc.wstrUITag || TEXT("Font1_Shadow") == m_UIObjDesc.wstrUITag)
-		{
-			m_UIObjDesc.wstrText = to_wstring(iFont1);
+	//	if (TEXT("Font1") == m_UIObjDesc.wstrUITag || TEXT("Font1_Shadow") == m_UIObjDesc.wstrUITag)
+	//	{
+	//		m_UIObjDesc.wstrText = to_wstring(iFont1);
 
-			if (iFont10 > 0)
-			{
-				m_UIObjDesc.vPos.x = m_vInitPos.x + 12.f;
-				m_UIObjDesc.vPos.y = m_vInitPos.y;
-				m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_UIObjDesc.vPos);
-			}
-			else
-				m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_UIObjDesc.vPos);
-		}
+	//		if (iFont10 > 0)
+	//		{
+	//			m_UIObjDesc.vPos.x = m_vInitPos.x + 12.f;
+	//			m_UIObjDesc.vPos.y = m_vInitPos.y;
+	//			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_UIObjDesc.vPos);
+	//		}
+	//		else
+	//			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_UIObjDesc.vPos);
+	//	}
 
-		m_pGameInstance->Render_Font(wstrFontTag, m_UIObjDesc.wstrText, vFontPos, vFontRGBA,
-			XMConvertToRadians(m_UIObjDesc.vDegree.z), vFontOrig, vFontScale);
-	}
+	//	m_pGameInstance->Render_Font(wstrFontTag, m_UIObjDesc.wstrText, vFontPos, vFontRGBA,
+	//		XMConvertToRadians(m_UIObjDesc.vDegree.z), vFontOrig, vFontScale);
+	//}
 
 	return S_OK;
 }
@@ -332,11 +332,11 @@ void CHUD_StarPoint::Update_UIState(_float _fTimeDelta)
 void CHUD_StarPoint::Play_Animation(_float _fAccTime, STARPOINT_STATE _eCurState)
 {
 	_float4 vCurPos{};
-	if (!m_pKirby) //==nullptr
-		return;
+	//if (!m_pKirby) //==nullptr
+	//	return;
 
-	_uint iCurCoin = m_pKirby->Get_Coin();
-	_uint iFont10 = (iCurCoin % 100) / 10;
+	//_uint iCurCoin = m_pKirby->Get_Coin();
+	//_uint iFont10 = (iCurCoin % 100) / 10;
 
 	switch (_eCurState)
 	{
