@@ -117,7 +117,7 @@ _int CBrontoBurt::Tick(_float fTimeDelta)
 		}
 		else if (MON_CIRCLE == m_eMonState)
 		{
-			m_fAngle += m_fTimeDelta * 50.f;
+			m_fAngle += m_fTimeDelta * 70.f;
 
 			m_vRotatePos.x = m_vOriginPos.x + (m_fDistance * sin(XMConvertToRadians(m_fAngle)));
 			m_vRotatePos.y = m_vOriginPos.y;
@@ -177,20 +177,6 @@ _int CBrontoBurt::Tick(_float fTimeDelta)
 				fAngle = -fAngle;
 			if (abs(fAngle) >= XMConvertToRadians(3.f))
 				m_pTransformCom->Turn(::XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * fAngle * 5.f);
-			//_vector   vLook = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
-			//_float fAngle = ::XMVectorGetX(::XMVector3AngleBetweenVectors(vLook, XMLoadFloat4(&m_vRally)));
-			//_float fY = ::XMVectorGetY(::XMVector3Cross(vLook, XMLoadFloat4(&m_vRally)));
-			//if (fY < 0)
-			//	fAngle = -fAngle;
-			//if (abs(fAngle) >= XMConvertToRadians(3.f))
-			//	m_pTransformCom->Turn(::XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * fAngle * 5.f);
-
-			//m_pControllerCom->Move_Dir(m_pTransformCom, XMVector3Normalize(m_vRally) * m_fTimeDelta * m_fSpeed, m_fTimeDelta);
-			//_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), m_vecRallyPoint[m_iCnt])));
-
-			//if (0.1f < fDistance)
-			//	m_pControllerCom->Move_Dir(m_pTransformCom, XMVector3Normalize(m_vRally) * m_fTimeDelta * m_fSpeed, m_fTimeDelta);
-			//m_pControllerCom->Move_Dir(m_pTransformCom, XMVector3Normalize(m_vRally) * m_fTimeDelta * m_fSpeed, m_fTimeDelta);
 		}
 	}
 	

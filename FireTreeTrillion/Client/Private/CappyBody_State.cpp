@@ -41,28 +41,28 @@ void CCappyBody_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	// 플레이어와 몬스터의 거리 계산
 	_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(vPos, vKirbyPos)));
 
-	if (6.f > fDistance)
-		pCappyBody->Change_State(CCappyBody::CAPPYBODY_KASAUP1, 55.f, false, true);
+	if (8.f > fDistance)
+		pCappyBody->Change_State(CCappyBody::CAPPYBODY_KASAUP1, 60.f, false, true);
 
 	if (CCappyBody::CAPPYBODY_HIDINGWAITA == pCappyBody->Get_State())
 	{
 		if (true == pCappyBody->IsAnimFinished())
-			pCappyBody->Change_State(CCappyBody::CAPPYBODY_HIDINGJUMPA, 55.f, false, true);
+			pCappyBody->Change_State(CCappyBody::CAPPYBODY_HIDINGJUMPA, 60.f, false, true);
 	}
 	else if(CCappyBody::CAPPYBODY_HIDINGJUMPA == pCappyBody->Get_State())
 	{
 		if (true == pCappyBody->IsAnimFinished())
-			pCappyBody->Change_State(CCappyBody::CAPPYBODY_HIDINGWAITB, 55.f, false, true);
+			pCappyBody->Change_State(CCappyBody::CAPPYBODY_HIDINGWAITB, 60.f, false, true);
 	}
 	else if (CCappyBody::CAPPYBODY_HIDINGWAITB == pCappyBody->Get_State())
 	{
 		if (true == pCappyBody->IsAnimFinished())
-			pCappyBody->Change_State(CCappyBody::CAPPYBODY_HIDINGJUMPB, 55.f, false, true);
+			pCappyBody->Change_State(CCappyBody::CAPPYBODY_HIDINGJUMPB, 60.f, false, true);
 	}
 	else if (CCappyBody::CAPPYBODY_HIDINGJUMPB == pCappyBody->Get_State())
 	{
 		if (true == pCappyBody->IsAnimFinished())
-			pCappyBody->Change_State(CCappyBody::CAPPYBODY_HIDINGWAITA, 55.f, false, true);
+			pCappyBody->Change_State(CCappyBody::CAPPYBODY_HIDINGWAITA, 60.f, false, true);
 	}
 }
 
@@ -108,7 +108,7 @@ void CCappyBody_Find_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	pCappyBody->Set_Render(false);
 
 	if (true == pCappyBody->IsAnimFinished())
-		pCappyBody->Change_State(CCappyBody::CAPPYBODY_WAIT, 55.f, true, true);
+		pCappyBody->Change_State(CCappyBody::CAPPYBODY_WAIT, 60.f, true, true);
 
 	// 플레이어를 향해 바라본다
 	//pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 2.f);
@@ -168,7 +168,7 @@ void CCappyBody_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(vPos, vKirbyPos)));
 
 	if (15.f < fDistance)
-		pCappyBody->Change_State(CCappyBody::CAPPYBODY_HIDINGWAITA, 55.f, false, true);
+		pCappyBody->Change_State(CCappyBody::CAPPYBODY_HIDINGWAITA, 60.f, false, true);
 
 	// 커비를 바라보며 쫒아감
 	_vector		vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - vPos;

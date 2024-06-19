@@ -713,7 +713,7 @@ HRESULT CLevel_Intro::Ready_Monsters()
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_CappyBody"), &tempDesc)))
 				return E_FAIL;
 		}
-		else if (L"NonAnim_Kabu" == tempDesc.wstrModelName)
+		else if (L"Kabu" == tempDesc.wstrModelName)
 		{
 			CKabu::KABU_DESC KabuDesc = {};
 			KabuDesc.matWorld = matWorld;
