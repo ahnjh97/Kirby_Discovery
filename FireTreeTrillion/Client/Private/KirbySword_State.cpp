@@ -585,6 +585,15 @@ void CKirbySword_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 
 		if (pKirby->isAnimFinish())
 		{
+			if (DESC(m_fChargeTime) > 0.15f)
+			{
+				DESC(m_eEyeState) = CKirby::EYE_ANGER;
+				// 다시 차징시간 0.f 부터 시작한다.
+				DESC(m_fChargeTime) = 0.f;
+				pKirby->Change_State(CKirby::SWORDSTATE_SPINSLASHCHARGE, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				return;
+			}
+
 			// 다음 공격으로 넘어간다는 시그널이 있을 경우
 			if (m_bPassNextAttackMotion == true)
 			{
@@ -598,14 +607,6 @@ void CKirbySword_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 				return;
 			}
 
-			if (DESC(m_fChargeTime) > 0.15f)
-			{
-				DESC(m_eEyeState) = CKirby::EYE_ANGER;
-				// 다시 차징시간 0.f 부터 시작한다.
-				DESC(m_fChargeTime) = 0.f;
-				pKirby->Change_State(CKirby::SWORDSTATE_SPINSLASHCHARGE, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
-				return;
-			}
 
 		}
 	}
@@ -685,6 +686,15 @@ void CKirbySword_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 
 		if (pKirby->isAnimFinish())
 		{
+			if (DESC(m_fChargeTime) > 0.15f)
+			{
+				DESC(m_eEyeState) = CKirby::EYE_ANGER;
+				// 다시 차징시간 0.f 부터 시작한다.
+				DESC(m_fChargeTime) = 0.f;
+				pKirby->Change_State(CKirby::SWORDSTATE_SPINSLASHCHARGE, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				return;
+			}
+
 			// 다음 공격으로 넘어간다는 시그널이 있을 경우
 			if (m_bPassNextAttackMotion == true)
 			{
@@ -705,14 +715,6 @@ void CKirbySword_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 			}
 
 
-			if (DESC(m_fChargeTime) > 0.15f)
-			{
-				DESC(m_eEyeState) = CKirby::EYE_ANGER;
-				// 다시 차징시간 0.f 부터 시작한다.
-				DESC(m_fChargeTime) = 0.f;
-				pKirby->Change_State(CKirby::SWORDSTATE_SPINSLASHCHARGE, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
-				return;
-			}
 
 		}
 	}

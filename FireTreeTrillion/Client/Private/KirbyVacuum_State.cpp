@@ -282,7 +282,9 @@ void CKirbyVacuum_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float f
 			Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
 
 		// ¹Ù´Ú¿¡ ´ê¾Ò´Ù¸é
-		pController->FreeFall(pTransformCom, fTimeDelta, Kirbydesc->m_fGravityOffset);
+		//pController->FreeFall(pTransformCom, fTimeDelta, Kirbydesc->m_fGravityOffset);
+		pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
+		DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
 
 		if (pController->Is_Terrain())
 		{

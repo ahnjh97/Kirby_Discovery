@@ -466,8 +466,7 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 
 	if (Key_X(pGameObject, fTimeDelta) == true)
 		return;
-	if (Key_C(pGameObject, fTimeDelta) == true)
-		return;
+	Key_C(pGameObject, fTimeDelta);
 
 	// 처음에 범위에 바로 들어갔을 때, 사다리에 스냅한다. 단, block이 켜져있을 땐, 절대 못붙음
 	if (Kirby_Ladder_Logic(pKirby, Kirbydesc, pTransformCom))
@@ -505,7 +504,6 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 					DESC(m_eEyeState) = CKirby::EYE_CLOSE;
 				m_fFallTime = 0.f;
 				pKirby->Change_State(CKirby::STATE_LANDINGEND, 30.f, false, false, CKirby::BODY_DEFAULT);
-				return;
 			}
 			else
 			{
@@ -513,7 +511,6 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 					DESC(m_eEyeState) = CKirby::EYE_CLOSE;
 				m_fFallTime = 0.f;
 				pKirby->Change_State(CKirby::STATE_LANDINGSMALL, 50.f, false, false, CKirby::BODY_DEFAULT);
-				return;
 			}
 		}
 	}
@@ -576,8 +573,9 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 		if (DESC(m_fJumpHoldTime) > 0.3f)
 		{
 			pKirby->Change_State(CKirby::STATE_JUMPEND, 60.f, false, true, CKirby::BODY_DEFAULT);
-			return;
+			//DESC(m_fJumpHoldTime) = 0.f;
 		}
+
 
 		// 만약, 땅에 안전하게 착지했을 경우, 홀딩 시간에 따라 뽀잉 애니메이션이 분기된다.
 		if (pController->Is_Terrain())
@@ -602,7 +600,6 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Smoke Fast"), &FXDesc)))
 					return;
 				pKirby->Change_State(CKirby::STATE_LANDINGEND, 30.f, false, false, CKirby::BODY_DEFAULT);
-				return;
 			}
 			else
 			{
@@ -625,7 +622,6 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 					return;
 
 				pKirby->Change_State(CKirby::STATE_LANDINGSMALL, 50.f, false, false, CKirby::BODY_DEFAULT);
-				return;
 			}
 		}
 	}
@@ -651,7 +647,6 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 			// 예약 초기화
 			DESC(m_bReserveJumpKey) = false;
 			pKirby->Change_State(DESC(m_eJumpState), 50.f, false, true, CKirby::BODY_DEFAULT);
-			return;
 		}
 
 		// 최소 애니메이션이 재생되는 시간이다. ( 방향키를 누르면 0.2초 후 바로 Run 상태가 됨 )
@@ -676,13 +671,11 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 			// 재입력 블락기능 초기화
 			DESC(m_bRePressBlock) = false;
 			pKirby->Change_State(DESC(m_eJumpState), 50.f, false, true, CKirby::BODY_DEFAULT);
-			return;
 		}
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_Z, KEY_PRESS))
 		{
 			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_GUARD);
-			return;
 		}
 
 		// 바로 방향키를 갈겼다면
@@ -691,7 +684,6 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 
 			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_RUNSTART);
-			return;
 
 		}
 		// 자연스럽게 끝났다면
@@ -700,7 +692,6 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 
 			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_IDLE);
-			return;
 
 		}
 
@@ -717,20 +708,17 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 			{
 				DESC(m_ePreAttackState) = CKirby::SWORDSTATE_SIDESLASH;
 				pKirby->Change_State(CKirby::SWORDSTATE_SIDESLASH, 60.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
-				return;
 			}
 			else if (DESC(m_ePreAttackState) == CKirby::SWORDSTATE_SIDESLASH)
 			{
 				DESC(m_ePreAttackState) = CKirby::SWORDSTATE_MULITSWORDATTACK;
 				pKirby->Change_State(CKirby::SWORDSTATE_MULITSWORDATTACK, 60.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
-				return;
 			}
 			else if (DESC(m_ePreAttackState) == CKirby::SWORDSTATE_MULITSWORDATTACK)
 			{
 				DESC(m_ePreAttackState) = CKirby::SWORDSTATE_DECISIVESLASH;
 				DESC(m_fMoveSpeed) = 0.f;
 				pKirby->Change_State(CKirby::SWORDSTATE_DECISIVESLASH, 100.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
-				return;
 			}
 		}
 
@@ -765,6 +753,8 @@ _bool CKirbyDefault_Jump_State::Key_X(CGameObject* pGameObject, _float fTimeDelt
 				return true;
 			pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 			pKirby->Change_State(CKirby::STATE_INHALEFALL, 50.f, true, true, CKirby::BODY_VACUUM);
+			pController->Reset_FallVelocity();
+			DESC(m_fJumpVelocity) = 0.f;
 			return true;
 		}
 		// 칼 상태일땐 공중제비를 돈다.
