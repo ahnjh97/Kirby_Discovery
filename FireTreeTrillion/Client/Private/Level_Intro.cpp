@@ -47,12 +47,12 @@ HRESULT CLevel_Intro::Initialize()
 
 	/*hr = Ready_ParsedObjects();
 	CHECK_FAILED(hr);*/
-	//hr = Ready_Map();
-	//CHECK_FAILED(hr);
+	hr = Ready_Map();
+	CHECK_FAILED(hr);
 	hr = Ready_Triggers();
 	CHECK_FAILED(hr);
-	//hr = Ready_Monsters();
-	//CHECK_FAILED(hr);
+	hr = Ready_Monsters();
+	CHECK_FAILED(hr);
 	hr = Ready_Items();
 	CHECK_FAILED(hr);
 
