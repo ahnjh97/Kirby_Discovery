@@ -375,10 +375,6 @@ void CVIBuffer_Instance::Wiggle(_float fTimeDelta, VTXMATRIX* pVertices)
 
 void CVIBuffer_Instance::Tail(_float fTimeDelta, VTXMATRIX* pVertices)
 {
-	//D3D11_MAPPED_SUBRESOURCE		SubResource{};
-	//m_pContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
-	//VTXMATRIX* pVertices = ((VTXMATRIX*)SubResource.pData);
-
 
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
@@ -417,8 +413,6 @@ void CVIBuffer_Instance::Tail(_float fTimeDelta, VTXMATRIX* pVertices)
 	{
 		m_pPrePositions[i] = static_cast<_float3>(pVertices[i].vPosition);
 	}
-
-	//m_pContext->Unmap(m_pVBInstance, 0);
 }
 
 
@@ -567,11 +561,6 @@ void CVIBuffer_Instance::Change_InstanceInfo(VTXMATRIX* pVertices, _uint iInstan
 	m_pAlphas[iInstanceIndex] = vColor.w;
 
 }
-
-//void CVIBuffer_Instance::Update_Buffer(_uint _iNumInstance)
-//{
-//}
-
 void CVIBuffer_Instance::Free()
 {
 	__super::Free();

@@ -1670,15 +1670,15 @@ void CFXToolDirector::Render_FXProperty()
 		bEdited = true;
 	}
 
-	if (DragFloat3(u8"»ö»ó ·£´ý", m_vColorRandomOffset, .1f, 0.f, 100.f, "%.2f"))
+	if (DragFloat3(u8"»ö»ó ·£´ý", m_vColorRandomOffset, .02f, 0.f, 1.f, "%.2f"))
 	{
 		pCurParticle->m_InstanceDesc.vColorRandomOffset = { m_vColorRandomOffset[0], m_vColorRandomOffset[1], m_vColorRandomOffset[2] };
 		bEdited = true;
 	}
 
-	if (DragFloat(u8"¾ËÆÄ", &pCurParticle->m_InstanceDesc.fAlpha, .01f, 0.f, 100.f, "%.2f"))
+	if (DragFloat(u8"¾ËÆÄ", &pCurParticle->m_InstanceDesc.fAlpha, .01f, 0.f, 1.f, "%.2f"))
 		bEdited = true;
-	if (DragFloat(u8"¾ËÆÄ ·£´ý", &pCurParticle->m_InstanceDesc.fAlphaRandomOffset, .01f, 0.f, 100.f, "%.2f"))
+	if (DragFloat(u8"¾ËÆÄ ·£´ý", &pCurParticle->m_InstanceDesc.fAlphaRandomOffset, .01f, 0.f, 1.f, "%.2f"))
 		bEdited = true;
 
 	if (DragFloat3(u8"ÇÇº¿", m_vPivot, .1f, -50.f, 50.f, "%.2f"))

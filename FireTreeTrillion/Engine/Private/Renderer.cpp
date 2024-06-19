@@ -1,6 +1,7 @@
 #include "Renderer.h"
 #include "GameObject.h"
 #include "GameInstance.h"
+#include "Effect.h"
 
 _uint		g_iSizeX = 8192;
 _uint		g_iSizeY = 4608;
@@ -381,8 +382,8 @@ HRESULT CRenderer::Initialize()
 		return E_FAIL;
 
 #endif
-
 	return S_OK;
+
 }
 
 void CRenderer::Color_Initialize()
@@ -637,6 +638,13 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 	{
 		m_DestColorData = Find_ColorSet("Stage1");
 		m_pGameInstance->PlayBGM(L"Running Through the New World.mp3");
+
+		CEffect::FX_DESC ParticleDesc{};
+
+		ParticleDesc.vInitPos = { -44.f, 17.f, 121.f };
+		ParticleDesc.vInitScale = { 1.3f, 1.3f, 1.3f };
+		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Particle C"), &ParticleDesc)))
+			return;
 	}
 		break;
 	default:
