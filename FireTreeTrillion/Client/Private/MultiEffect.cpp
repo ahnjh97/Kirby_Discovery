@@ -95,8 +95,6 @@ HRESULT CMultiEffect::Initialize(void* pArg)
 				SingleFXDesc.vInitPos = FXDesc.vInitPos;
 				SingleFXDesc.vInitRot = FXDesc.vInitRot;
 				SingleFXDesc.vInitScale = FXDesc.vInitScale;
-				//m_bIsColorRender = true;
-				//SingleFXDesc.bIsColorRender = true;
 				SingleFXDesc.pSocketMatrix = FXDesc.pSocketMatrix;
 
 				wstring wstrProtoName = L"Prototype_GameObject_" + CUtils::StrToWstr(FXName);

@@ -253,7 +253,7 @@ void CVIBuffer_Instance::Spread(_float fTimeDelta, VTXMATRIX* pVertices)
 		}
 
 		_float4		vDir = Dir(pVertices[i].vPosition - Pos(m_InstanceDesc.vPivot));
-
+		vDir.Normalize();
 		pVertices[i].vPosition += vDir * m_pSpeeds[i] * fTimeDelta;
 
 

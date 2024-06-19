@@ -41,6 +41,7 @@ HRESULT CSingleEffect::Initialize(void* pArg)
 			FXDesc.vInitRot = (*(FX_DESC*)pArg).vInitRot;
 			FXDesc.vInitScale = (*(FX_DESC*)pArg).vInitScale;
 			FXDesc.pSocketMatrix = (*(FX_DESC*)pArg).pSocketMatrix;
+			FXDesc.fStartDelay = (*(FX_DESC*)pArg).fStartDelay;
 		}
 	}
 	else if (pArg != nullptr)
@@ -78,11 +79,7 @@ HRESULT CSingleEffect::Initialize(void* pArg)
 	m_pTransformCom->Turn_Absolute(vResultQuat);
 	m_pTransformCom->Set_Scaled(m_vInitScale * m_vCurScale);
 
-	/*m_pTransformCom->Set_State(CTransform::STATE_POSITION, Pos(m_vInitPos));
-	_float3 vInitRadianRot = { ToRadian(m_vInitRot.x), ToRadian(m_vInitRot.y) , ToRadian(m_vInitRot.z) };
-	Quaternion vInitQuat = Quaternion::CreateFromYawPitchRoll(vInitRadianRot);
-	m_pTransformCom->Turn_Absolute(vInitQuat);
-	m_pTransformCom->Set_Scaled(m_vInitScale);*/
+	m_fStartDelay = FXDesc.fStartDelay;
 	return S_OK;
 }
 
@@ -104,6 +101,17 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 	default:
 		break;
 	}
+
+	if (0.f < m_fStartDelay)
+	{
+		m_fStartDelay -= fMyTimeDelta;
+
+		if (m_fStartDelay <= 0.f)
+			m_fStartDelay = 0.f;
+
+		return OBJ_NOEVENT;
+	}
+
 
 	//true 반환하면 duration 끝난 것.
 	if (Calculate_Duration(fMyTimeDelta))
@@ -192,6 +200,8 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 
 void CSingleEffect::Late_Tick(_float _fTimeDelta)
 {
+	if (0.f < m_fStartDelay)
+		return;
 
 	if ((CRenderer::RENDERGROUP)m_eRenderGroup != CRenderer::RENDER_END)
 		m_pGameInstance->Add_RenderGroup((CRenderer::RENDERGROUP)m_eRenderGroup, this);
@@ -203,7 +213,7 @@ void CSingleEffect::Late_Tick(_float _fTimeDelta)
 
 HRESULT CSingleEffect::Render()
 {
-	if (m_bNoRender)
+	if (m_bNoRender || 0.f < m_fStartDelay)
 		return S_OK;
 
 	HRESULT hr;
