@@ -48,8 +48,14 @@ public:
 	virtual _int Tick(_float _fTimeDelta) override;
 	virtual void Late_Tick(_float _fTimeDelta) override;
 	virtual HRESULT Render() override;
+
+
 #ifdef _DEBUG
 	virtual void	Render_IMGUI() override;
+	void			Draw_Cylinder(const ImVec2& center, float bottomRadius, float topRadius, float height, int sliceCount, const ImVec4& color);
+
+
+
 #endif
 
 private:
@@ -91,6 +97,7 @@ private:
 	_int m_iCurFXTexIdx = { 0 };
 	_int m_iCurFXMaskTexIdx = { 0 };
 	_int m_iCurRenderGroup = { 2 };
+	_int m_iCurTimer = { 0 };
 
 	//¼ö¸í
 	//_float m_fDuration = { 1.f };

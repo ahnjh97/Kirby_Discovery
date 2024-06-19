@@ -186,8 +186,8 @@ _float CVIBuffer_Instance_Point::Compute_RandStartDelay()
 _float3 CVIBuffer_Instance_Point::Compute_RandScale()
 {
 	return { m_InstanceDesc.vScale.x + CUtils::Make_RandomFloat(-m_InstanceDesc.vScaleRandomOffset.x, m_InstanceDesc.vScaleRandomOffset.x),
-			m_InstanceDesc.vScale.y + CUtils::Make_RandomFloat(-m_InstanceDesc.vScaleRandomOffset.y, m_InstanceDesc.vScaleRandomOffset.y),
-			m_InstanceDesc.vScale.z + CUtils::Make_RandomFloat(-m_InstanceDesc.vScaleRandomOffset.z, m_InstanceDesc.vScaleRandomOffset.z)};
+			m_InstanceDesc.vScale.y + CUtils::Make_RandomFloat(-m_InstanceDesc.vScaleRandomOffset.x, m_InstanceDesc.vScaleRandomOffset.x),
+			m_InstanceDesc.vScale.z + CUtils::Make_RandomFloat(-m_InstanceDesc.vScaleRandomOffset.x, m_InstanceDesc.vScaleRandomOffset.x)};
 }
 
 _float3 CVIBuffer_Instance_Point::Compute_RandRotation()
