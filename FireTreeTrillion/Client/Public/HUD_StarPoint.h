@@ -44,7 +44,6 @@ public:
 	virtual void				Free() override;
 
 private:
-	class CKirby*				m_pKirby = { nullptr };
 
 	_bool						m_IsMovingUP = { TRUE };
 	_bool						m_IsLootTrigger = { FALSE };

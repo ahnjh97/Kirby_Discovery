@@ -15,21 +15,25 @@ void CKirbyVacuum_Spit_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _
 
 void CKirbyVacuum_Spit_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
-	// 뱉는 로직
+	// 뱉는 로직이다.
 	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
 	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
+	// 커비는 모델이 여러개기 때문에, 항상 Default가 Idle로 위치하도록 보정해주어야 한다.
 	pKirby->DefaultIdle();
 	Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
 
+	// 뱉는 시간을 측정한다.
 	m_fSpitTime += fTimeDelta;
+
 	if (m_fSpitTime > 0.05f && m_bSpitTrigger == true )
 	{
 		// 날려 보낸다. 날려보내는 순간 나의 관할이 아니기 때문에 그냥 보내버린다.
 		// 또한 보내기전에 마지막으로 Fly로 만들어준다. 또한 방향을 여기서 정해준다.
+		// 이곳에선 상대가 컨트롤러든 뭐시기든 아무런 상관이 없다. 내가 정해준 방향을 사용하여 객체의 움직임 구현대로 나가는것이기 때문이다. 
 		if (DESC(m_pObject) != nullptr)
 		{
 			CTransform* pObjectTransform = DESC(m_pObject)->Get_TransformCom();
@@ -76,11 +80,10 @@ void CKirbyVacuum_Spit_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	}
 
 
-
-	// 뱉는다.
+	// 뱉는 모션의 마지막이다.
 	if (pKirby->isAnimFinish())
 	{
-		// 이제 먹은 상태가 아니여.
+		// 이제 먹은 상태가 아니며, 표정이 전부 원래대로 들어온다.
 		DESC(m_isEat) = false;
 		DESC(m_eEyeState) = CKirby::EYE_IDLE;
 		DESC(m_eMouthState) = CKirby::MOUTH_IDLE;
@@ -475,15 +478,15 @@ void CKirbyVacuum_Vacuuming_State::OnStateEnter(CModel* _pModel, _uint _iAnimInd
 
 void CKirbyVacuum_Vacuuming_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
+	// 흡수하는 로직으로, 이곳에서 모든 흡수처리를 담당한다.
+	// 강제적으로 상호작용할 기물을 나에게 끌어당기는 로직이고, 실제 Body충돌처리로 커비 스테이트가 바뀌고, 물체의 스테이트도 바뀐다.
 	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
 	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
-
 	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-
 
 	DESC(m_eEyeState) = CKirby::EYE_CLOSE;
 	CTransform* pObjectTransform = DESC(m_pObject)->Get_TransformCom();
@@ -491,24 +494,30 @@ void CKirbyVacuum_Vacuuming_State::OnStateUpdate(CGameObject* pGameObject, _floa
 	_float vCurDistance = XMVectorGetX(XMVector3Length(vPos - vObjectPos));
 	_float4 vObjectDir = XMVector3Normalize(vPos - vObjectPos);
 
-	if (DESC(m_fVacuumTime) < 1.2f)
-		DESC(m_fVacuumTime) += fTimeDelta;
+	//if (DESC(m_fVacuumTime) < 1.2f)
+	//	DESC(m_fVacuumTime) += fTimeDelta;
 
+	// 상대의 컨트롤러를 탐색한다.
 	CCharacterController* pObjectController = static_cast<CCharacterController*>(DESC(m_pObject)->Get_Component(TEXT("Com_Controller")));
+
+	// 만약 이 과정에서, Controller 가 nullptr 일 경우 그것은 컨트롤러가 아닌것이다. 트랜스폼을 직접 움직여주어야 한다.
 	if (pObjectController == nullptr)
 	{
 		_float4 vPos = pObjectTransform->Get_State(CTransform::STATE_POSITION);
 		pObjectTransform->Set_State(CTransform::STATE_POSITION, vPos + vObjectDir * fVacuumObjectSpeed * fTimeDelta);
 	}
+	// 만약 이 과정에서, Controller 가 nullptr이 아닐 경우 그것은 컨트롤러가 맞고, Move_Dir로 나에게 당겨준다.
 	else
 	{
 		pObjectController->Move_Dir(pObjectTransform, vObjectDir * fVacuumObjectSpeed * fTimeDelta, fTimeDelta);
 	}
 
+	// 그 외, 스케일 변화를 준다.
 	_float fScaleinverse = 1.f - ((DESC(m_fObjectDistance) - vCurDistance) / DESC(m_fObjectDistance) * 0.3f);
-
 	_float3 vObjectScale = pObjectTransform->Get_Scaled();
 	pObjectTransform->Set_Scaled(DESC(m_vObjectScale).x * fScaleinverse, DESC(m_vObjectScale).y * fScaleinverse, DESC(m_vObjectScale).z * fScaleinverse);
+
+	// 물체가 나에게 오는 시간을 타임델타 기반으로 가산시켜준다.
 	fVacuumObjectSpeed += fTimeDelta * 150.f;
 }
 

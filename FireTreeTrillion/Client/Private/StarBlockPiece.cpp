@@ -171,7 +171,7 @@ HRESULT CStarBlockPiece::Add_Components()
 	hr = __super::Add_Component(TEXT("Prototype_Component_RigidBody"),
 		TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &rigidDesc);
 	CHECK_FAILED(hr);
-	m_pRigidBodyCom->Set_Object(this);
+	//m_pRigidBodyCom->Set_Object(this);
 	m_pRigidBodyCom->Activate(true);
 
 	return S_OK;

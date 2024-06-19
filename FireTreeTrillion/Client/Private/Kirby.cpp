@@ -98,7 +98,7 @@ HRESULT CKirby::Initialize(void* pArg)
 	m_fHp = 100.f;
 	m_fAttack = 5.f;
 	m_eAbilityType = ABILITY_DEFAULT;
-	m_eAbilityType = ABILITY_SWORD;
+	m_eAbilityType = ABILITY_BOMB;
 
 	m_pControllerCom->RegisterAsPlayer();
 
@@ -348,7 +348,7 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 	// 몸끼리 부딪혔을때
 	if (eContent == CCollisionCenter::CONTENT_BODY)
 	{
-		// 흡수중인 몬스터
+		// 흡수중인 몬스터일 경우 충돌은 되지 않고, 내 입속으로 들어간다.
 		if (pObject->Get_PhyXState() == PO_VACUUMING)
 		{
 			// 일단 EAT으로 넘기는건 같으나, EAT이 끝날 시점에 내가 삼켰던 것이 무엇이였는지 판단 후 애니메이션이 분기된다.
@@ -360,6 +360,7 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 			// 임시 보관소. 먹은게 끝났을 떄, 비로소 커비의 어빌리티 타입이 바뀐다.
 			INFO(m_eTemporaryEatType) = pObject->Get_AbilityType();
 
+			// 입 속에 있는 걸로 바꿔준다.
 			if (pObject != nullptr)
 				pObject->Set_PhyXState(PO_KIRBYMOUTH);
 
@@ -404,9 +405,28 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 			Delete_AllEffect();
 		}
 	}
+	// 맵 오브젝트들과의 충돌.
+	if (eContent == CCollisionCenter::CONTENT_KICK)
+	{
+		// 내가 빨아들일때만 충돌반응함.
+		if (pObject->Get_PhyXState() == PO_VACUUMING)
+		{
+			// 일단 EAT으로 넘기는건 같으나, EAT이 끝날 시점에 내가 삼켰던 것이 무엇이였는지 판단 후 애니메이션이 분기된다.
+			INFO(m_fVacuumTime) = 0.f;
+			INFO(m_isEat) = true;
+			INFO(m_eEyeState) = EYE_IDLE;
+			INFO(m_eMouthState) = MOUTH_ANGER;
+			Change_State(STATE_EAT, 100.f, false, false, BODY_BALLOON);
+			// 임시 보관소. 먹은게 끝났을 떄, 비로소 커비의 어빌리티 타입이 바뀐다.
+			INFO(m_eTemporaryEatType) = pObject->Get_AbilityType();
 
+			// 입 속에 있는 걸로 바꿔준다.
+			if (pObject != nullptr)
+				pObject->Set_PhyXState(PO_KIRBYMOUTH);
 
-
+			Delete_AllEffect();
+		}
+	}
 }
 
 _float3 CKirby::Make_RepulsiveDir(CPhysXObject* pObject)
@@ -711,7 +731,7 @@ HRESULT CKirby::Add_Components()
 	desc.tCapsuleShape.fRadius = 0.4f;// 0.5f;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
-	m_pControllerCom->Set_Object(this);
+	//m_pControllerCom->Set_Object(this);
 
 	// FOR ANIMTOOL
 	m_ppModelForAnimTool = &m_pModelCom[BODY_DEFAULT];
@@ -1131,20 +1151,25 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 	}
 
 
-	// 물고 있을 때, 물고있는 객체를 계속 나의 입에 위치시키는 로직이다.
+	// 물고 있을 때, 물고있는 객체를 계속 나의 입에 위치시키는 로직이다. Vacuum State 에서 강제로 흡수시키고 충돌처리가 되었을 때 PO_KIRBYMOUTH 상태로 변경될 것이다.
 	if (INFO(m_pObject) != nullptr)
 	{
 		// 커비 입 속에 있다면?
 		if (INFO(m_pObject)->Get_PhyXState() == PO_KIRBYMOUTH)
 		{
+			// 이곳에서도 마찬가지. 컨트롤러를 쓰고 있는지 쓰고 있지 않은지 탐색을 한다.
 			CCharacterController* pObjectController = static_cast<CCharacterController*>(INFO(m_pObject)->Get_Component(TEXT("Com_Controller")));
+
+			// 만약, 컨트롤러를 쓰지 않고 있다고 판단되었다면?
 			if (pObjectController == nullptr)
 			{
+				// 직접 트랜스폼을 움직여서 내 위치에서 위쪽으로 맞춰준다.
 				CTransform* pObjectTransform = INFO(m_pObject)->Get_TransformCom();
 				_vector vMouthPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 				vMouthPos.m128_f32[1] += 1.f;
 				pObjectTransform->Set_State(CTransform::STATE_POSITION, vMouthPos);
 			}
+			// 만약, 컨트롤러를 쓰고 있다고 판단될경우? 내 위치에서 위쪽으로 강제로 맞춰준다.
 			else
 			{
 				CTransform* pObjectTransform = INFO(m_pObject)->Get_TransformCom();
@@ -1211,6 +1236,7 @@ void CKirby::Free()
 
 	// Bomb
 	Safe_Release(m_pOrbit);
+
 	for (auto& Glow : m_OrbitGlows)
 		Safe_Release(Glow);
 	m_OrbitGlows.clear();

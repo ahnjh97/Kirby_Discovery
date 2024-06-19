@@ -136,6 +136,8 @@ void CCharacter::Character_SystemTick(_float fTimeDelta)
 	if (m_ePhyXState == PO_NORMAL)
 	{
 		// 터레인 경사면 보간 제어
+
+
 		if (true == m_bSlope)
 			SetOn_Slope(fTimeDelta);
 	}
