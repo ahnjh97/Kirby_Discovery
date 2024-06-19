@@ -56,14 +56,11 @@ HRESULT CBasicMap::Initialize(void* pArg)
 
         m_pOcTree = m_pModelCom->Create_OcTree(GameObjectDesc.vMin, GameObjectDesc.vMax, m_vecPassIndices, m_vecSamplingFactors, vecConstantNames);
         
-        m_ModelShapeRadiiMap.emplace(string("BushL"), 1.2f);
-        m_ModelAnimSettingsMap.emplace(string("BushL"), pair<_uint, _float>(0, 60.f));
-        m_ModelShapeRadiiMap.emplace(string("BushM"), 1.f);
-        m_ModelAnimSettingsMap.emplace(string("BushM"), pair<_uint, _float>(0, 60.f));
-        m_ModelShapeRadiiMap.emplace(string("BushS"), 0.6f);
-        m_ModelAnimSettingsMap.emplace(string("BushS"), pair<_uint, _float>(0, 60.f));
-        m_ModelShapeRadiiMap.emplace(string("PopFlower"), 0.6f);
-        m_ModelAnimSettingsMap.emplace(string("PopFlower"), pair<_uint, _float>(1, 200.f));
+        // --- ModelName -- TriggerRadius -- IdleIndex & Speed -- ActionIndex & Speed ----------
+        SetUpAnimDecoInfo("BushL", 1.5f, 2, 60.f, 0, 50.f);
+        SetUpAnimDecoInfo("BushM", 1.1f, 2, 60.f, 0, 50.f);
+        SetUpAnimDecoInfo("BushS", 0.8f, 2, 60.f, 0, 50.f);
+        SetUpAnimDecoInfo("PopFlower", 0.8f, 2, 100.f, 1, 100.f);
 
         InsertMapDecos();
     }
@@ -222,15 +219,11 @@ HRESULT CBasicMap::Bind_ShaderResources()
     if (LEVEL_TOOL_MAP == *m_pCurrentLevelID)
         return S_OK;
 
-    //if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pAnimShaderCom, "g_WorldMatrix")))
-    //    return E_FAIL;
     if (FAILED(m_pAnimShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
         return E_FAIL;
     if (FAILED(m_pAnimShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
         return E_FAIL;
 
-    //if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pNonAnimShaderCom, "g_WorldMatrix")))
-    //    return E_FAIL;
     if (FAILED(m_pNonAnimShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
         return E_FAIL;
     if (FAILED(m_pNonAnimShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
@@ -350,7 +343,7 @@ void CBasicMap::InsertMapDecos()
     _uint iNumObjects{};
     fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
 
-    for(_uint i = 0; i < iNumObjects; i++)
+    for (_uint i = 0; i < iNumObjects; i++)
     {
         fileInput.read(reinterpret_cast<char*>(&iMapObjType), sizeof(iMapObjType));
         fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
@@ -379,29 +372,35 @@ void CBasicMap::InsertMapDecos()
 
         PxRigidStatic* pRigidStatic = { nullptr };
         pModel->Set_WorldMatrixForOctree(matWorld);
-        auto iter = m_ModelAnimSettingsMap.end();
-        switch (iMapObjType)
+ 
+        if (CMapToolObject::MAPOBJ_NONCOL == iMapObjType)
         {
-        case CMapToolObject::MAPOBJ_NONCOL:
             vecNonCols.push_back(pModel);
-            break;
-        case CMapToolObject::MAPOBJ_ANIM:
-            pModel->Set_Animation(2, 50, true, true);
+        }
+        else if (CMapToolObject::MAPOBJ_ANIM == iMapObjType)
+        {
+            auto idleIter = m_ModelIdleAnimMap.find(strModelName);
+            if (idleIter == m_ModelIdleAnimMap.end())
+                continue;
+            _uint iIdleIndex = idleIter->second.first;
+            _float iIdleSpeed = idleIter->second.second;
+            pModel->Set_Animation(iIdleIndex, iIdleSpeed, true, true);
+            pModel->SetUp_ModelIdleAnimForOctree(iIdleIndex, iIdleSpeed);
 
             pRigidStatic = AddTriggerActorForAnimDeco(strModelName, matWorld);
             if (nullptr == pRigidStatic)
-                return;
-            iter = m_ModelAnimSettingsMap.find(strModelName);
-            if (iter == m_ModelAnimSettingsMap.end())
-                break;
+                continue;
+            auto animIter = m_ModelActionAnimMap.find(strModelName);
+            if (animIter == m_ModelActionAnimMap.end())
+                continue;
 
-            m_pGameInstance->Emplace_MapDecoTrigger(pRigidStatic, pModel, iter->second.first, iter->second.second);
+            m_pGameInstance->Emplace_MapDecoTrigger(pRigidStatic, pModel, animIter->second.first, animIter->second.second);
             vecAnims.push_back(pModel);
-            break;
-        case CMapToolObject::MAPOBJ_ACTOR:
+        }
+        else if (CMapToolObject::MAPOBJ_ACTOR == iMapObjType)
+        {
             pModel->CreateStaticActor(matWorld);
             vecActors.push_back(pModel);
-            break;
         }
     }
 
@@ -445,6 +444,13 @@ PxRigidStatic* CBasicMap::AddTriggerActorForAnimDeco(const string& _strModelName
     m_vecAnimDecoTriggersActors.emplace_back(pStaticActor);
     m_vecShapes.emplace_back(pShape);
     return pStaticActor;
+}
+
+void CBasicMap::SetUpAnimDecoInfo(const string& _strModelName, _float _fTriggerRadius, _uint iIdleIndex, _float fIdleAnimSpeed, _uint iActionIndex, _float fActionAnimSpeed)
+{
+    m_ModelShapeRadiiMap.emplace(_strModelName, _fTriggerRadius);
+    m_ModelIdleAnimMap.emplace(_strModelName, pair<_uint, _float>(iIdleIndex, fIdleAnimSpeed));
+    m_ModelActionAnimMap.emplace(_strModelName, pair<_uint, _float>(iActionIndex, fActionAnimSpeed));
 }
 
 void CBasicMap::Save_OctreeData(const string& strLevel)

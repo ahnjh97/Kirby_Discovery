@@ -64,7 +64,8 @@ private:
 	class COcTree* m_pOcTree = { nullptr };
 	_uint m_iRenderAll{}, m_iRenderMyMesh{};
 	unordered_map<string, _float> m_ModelShapeRadiiMap;
-	unordered_map<string, pair<_uint, _float>> m_ModelAnimSettingsMap;
+	unordered_map<string, pair<_uint, _float>> m_ModelActionAnimMap;
+	unordered_map<string, pair<_uint, _float>> m_ModelIdleAnimMap;
 	vector<PxRigidStatic*> m_vecAnimDecoTriggersActors;
 	vector<PxShape*> m_vecShapes;
 
@@ -78,6 +79,8 @@ private:
 	_bool CheckIfBlendMapExists(const wstring& _wstrModelTag);
 	void InsertMapDecos();
 	PxRigidStatic* AddTriggerActorForAnimDeco(const string& _strModelName, _float4x4& _matWorld);
+	void SetUpAnimDecoInfo(const string& _strModelName, _float _fTriggerRadius, _uint iIdleIndex, _float fIdleAnimSpeed
+		, _uint iActionIndex, _float fActionAnimSpeed);
 		
 public:
 	static CBasicMap* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

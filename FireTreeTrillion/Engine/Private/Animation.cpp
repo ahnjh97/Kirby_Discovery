@@ -64,14 +64,15 @@ void CAnimation::Invalidate_TransformationMatrix(_float fTimeDelta, const vector
 			m_Channels[i]->Ratio_TransformationMatrix(Bones, m_fTrackPosition, &m_CurrentKeyFrameIndices[i]);
 		}
 
-		m_fTrackPosition += fTimeDelta;
-
-		if (m_fRatioTime > 0.1f)
+		if (m_fRatioTime > m_fLerpTime)
 		{
 			Reset_TrackPosition();
 			m_fRatioTime = 0.f;
 			m_bRatio = false;
 		}
+
+		m_fTrackPosition += fTimeDelta;
+
 		return;
 	}
 
