@@ -14,6 +14,7 @@ CHitBox::CHitBox(const CHitBox& rhs)
 
 HRESULT CHitBox::Initialize_Prototype()
 {
+
 	return S_OK;
 }
 
@@ -329,9 +330,8 @@ CGameObject* CHitBox::Clone(void* pArg)
 
 void CHitBox::Free()
 {
+	__super::Free();
 	Safe_Release(m_pOwner);
 	Safe_Release(m_pOwnerTransform);
-	__super::Free();
-
 }
 

@@ -731,7 +731,7 @@ HRESULT CKirby::Add_Components()
 	desc.tCapsuleShape.fRadius = 0.4f;// 0.5f;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
-	m_pControllerCom->Set_Object(this);
+	//m_pControllerCom->Set_Object(this);
 
 	// FOR ANIMTOOL
 	m_ppModelForAnimTool = &m_pModelCom[BODY_DEFAULT];
@@ -1236,6 +1236,7 @@ void CKirby::Free()
 
 	// Bomb
 	Safe_Release(m_pOrbit);
+
 	for (auto& Glow : m_OrbitGlows)
 		Safe_Release(Glow);
 	m_OrbitGlows.clear();

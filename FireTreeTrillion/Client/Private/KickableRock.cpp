@@ -211,17 +211,17 @@ HRESULT CKickableRock::Add_Components()
 	hr = __super::Add_Component(TEXT("Prototype_Component_RigidBody"),
 		TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &rigidDesc);
 	CHECK_FAILED(hr);
-	m_pRigidBodyCom->Set_Object(this);
+	//m_pRigidBodyCom->Set_Object(this);
 	m_pRigidBodyCom->Activate(false);
 
 
-	//CHitBox::HITBOX_DESC HitBox{};
-	//HitBox.pOwner = this;
-	//HitBox.pDesc = &m_tColliderDesc[BODY];
-	//HitBox.pCollisionType = OBJECT;
-	//if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
-	//	return E_FAIL;
-	//Set_BodyCollider(COLLIDER_SPHERE, 0.f, 0.f, 1.f);
+	CHitBox::HITBOX_DESC HitBox{};
+	HitBox.pOwner = this;
+	HitBox.pDesc = &m_tColliderDesc[BODY];
+	HitBox.pCollisionType = OBJECT;
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
+		return E_FAIL;
+	Set_BodyCollider(COLLIDER_SPHERE, 0.f, 0.f, 1.f);
 
 
 	return S_OK;

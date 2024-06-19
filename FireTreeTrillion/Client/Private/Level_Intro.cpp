@@ -675,7 +675,7 @@ HRESULT CLevel_Intro::Ready_Monsters()
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Awoofy"), &MonsterDesc)))
 				return E_FAIL;
 		}
-		else if (L"Rabbit" == tempDesc.wstrModelName)
+		/*else if (L"Rabbit" == tempDesc.wstrModelName)
 		{
 			CRabbit::RABBIT_DESC RabbitDesc = {};
 			RabbitDesc.matWorld = matWorld;
@@ -685,18 +685,18 @@ HRESULT CLevel_Intro::Ready_Monsters()
 			RabbitDesc.eRabbitState = CRabbit::RABBIT_STATE(iTriggerIndex);
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Rabbit"), &RabbitDesc)))
 				return E_FAIL;
-		}
-		else if (L"Buffahorn" == tempDesc.wstrModelName)
-		{
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Buffahorn"), &tempDesc)))
-				return E_FAIL;
-		}
-		else if (L"BladeKnight" == tempDesc.wstrModelName)
-		{
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BladeKnight"), &tempDesc)))
-				return E_FAIL;
-		}
-		else if (L"PoppyBrosJr" == tempDesc.wstrModelName)
+		}*/
+		//else if (L"Buffahorn" == tempDesc.wstrModelName)
+		//{
+		//	if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Buffahorn"), &tempDesc)))
+		//		return E_FAIL;
+		//}
+		//else if (L"BladeKnight" == tempDesc.wstrModelName)
+		//{
+		//	if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BladeKnight"), &tempDesc)))
+		//		return E_FAIL;
+		//}
+		/*else if (L"PoppyBrosJr" == tempDesc.wstrModelName)
 		{
 			CPoppyBrosJr::POPPY_DESC PoppyDesc = {};
 			PoppyDesc.matWorld = matWorld;
@@ -706,36 +706,36 @@ HRESULT CLevel_Intro::Ready_Monsters()
 			PoppyDesc.ePoppyState = CPoppyBrosJr::POPPY_STATE(iTriggerIndex);
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_PoppyBrosJr"), &PoppyDesc)))
 				return E_FAIL;
-		}
-		else if (L"CappyBody" == tempDesc.wstrModelName)
-		{
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_CappyBody"), &tempDesc)))
-				return E_FAIL;
-		}
-		else if (L"NonAnim_Kabu" == tempDesc.wstrModelName)
-		{
-			CKabu::KABU_DESC KabuDesc = {};
-			KabuDesc.matWorld = matWorld;
-			KabuDesc.wstrModelName = CUtils::StrToWstr(strModelName);
-			KabuDesc.iShaderVars = iShaderVars;
-			KabuDesc.fRimWidth = fRimWidth;
-			KabuDesc.eMonState = CKabu::MONSTER_STATE(iTriggerIndex);
-			KabuDesc.vecRallyPoints = vecRallyPoints;
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Kabu"), &KabuDesc)))
-				return E_FAIL;
-		}
-		else if (strModelName == "NonAnim_BrontoBurt")
-		{
-			CBrontoBurt::BRONTOBURT_DESC BrontoBurtDesc = {};
-			BrontoBurtDesc.matWorld = matWorld;
-			BrontoBurtDesc.wstrModelName = CUtils::StrToWstr(strModelName);
-			BrontoBurtDesc.iShaderVars = iShaderVars;
-			BrontoBurtDesc.fRimWidth = fRimWidth;
-			BrontoBurtDesc.eMonState = CBrontoBurt::MONSTER_STATE(iTriggerIndex);
-			BrontoBurtDesc.vecRallyPoints = vecRallyPoints;
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BrontoBurt"), &BrontoBurtDesc)))
-				return E_FAIL;
-		}
+		}*/
+		//else if (L"CappyBody" == tempDesc.wstrModelName)
+		//{
+		//	if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_CappyBody"), &tempDesc)))
+		//		return E_FAIL;
+		//}
+		//else if (L"NonAnim_Kabu" == tempDesc.wstrModelName)
+		//{
+		//	CKabu::KABU_DESC KabuDesc = {};
+		//	KabuDesc.matWorld = matWorld;
+		//	KabuDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+		//	KabuDesc.iShaderVars = iShaderVars;
+		//	KabuDesc.fRimWidth = fRimWidth;
+		//	KabuDesc.eMonState = CKabu::MONSTER_STATE(iTriggerIndex);
+		//	KabuDesc.vecRallyPoints = vecRallyPoints;
+		//	if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Kabu"), &KabuDesc)))
+		//		return E_FAIL;
+		//}
+		//else if (strModelName == "NonAnim_BrontoBurt")
+		//{
+		//	CBrontoBurt::BRONTOBURT_DESC BrontoBurtDesc = {};
+		//	BrontoBurtDesc.matWorld = matWorld;
+		//	BrontoBurtDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+		//	BrontoBurtDesc.iShaderVars = iShaderVars;
+		//	BrontoBurtDesc.fRimWidth = fRimWidth;
+		//	BrontoBurtDesc.eMonState = CBrontoBurt::MONSTER_STATE(iTriggerIndex);
+		//	BrontoBurtDesc.vecRallyPoints = vecRallyPoints;
+		//	if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BrontoBurt"), &BrontoBurtDesc)))
+		//		return E_FAIL;
+		//}
 	}
 
 	fileInput.close();

@@ -279,7 +279,7 @@ HRESULT CRabbit::Add_Components()
 	desc.fOffset = 1.f;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
-	m_pControllerCom->Set_Object(this);
+	//m_pControllerCom->Set_Object(this);
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 

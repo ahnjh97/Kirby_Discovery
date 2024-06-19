@@ -33,8 +33,6 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 	Ladder_Collider();
 
 
-
-
 	// 깔끔하게 완료되었음 : 플레이어 X 몬스터
 	Collision_Collider(m_GameObjects[PLAYER], m_GameObjects[MONSTER], this,
 		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
@@ -951,12 +949,16 @@ void CCollisionCenter::Free()
 		Safe_Release(pLadder);
 	m_Ladders.clear();
 
+
+
 	for (auto& ObjectVector : m_GameObjects)
 	{
 		for (auto& pObject : ObjectVector)
 			Safe_Release(pObject);
 		ObjectVector.clear();
 	}
+
+
 
 	__super::Free();
 

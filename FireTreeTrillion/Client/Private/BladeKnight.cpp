@@ -228,7 +228,7 @@ HRESULT CBladeKnight::Add_Components()
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	CHECK_FAILED(hr);
-	m_pControllerCom->Set_Object(this);
+	//m_pControllerCom->Set_Object(this);
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 
@@ -262,8 +262,6 @@ HRESULT CBladeKnight::Add_PartObjects()
 	pWeaponObject = static_cast<CPartObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_BladeKnightSword"), &BladeKnightSwordDesc));
 	if (nullptr == pWeaponObject)
 		return E_FAIL;
-
-	m_pSword = dynamic_cast<CBladeKnightSword*>(pWeaponObject);
 
 	m_PartObjects.emplace(TEXT("Part_Weapon"), pWeaponObject);
 

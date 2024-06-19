@@ -19,7 +19,6 @@ public:
 		_float3		fOffsetSize;
 		_float3		vMaterial = {0.5f, 0.5f, 0.5f};
 		_float		fDensity = {10.f};
-		CGameObject* pObj = { nullptr };
 		RIGIDBODY_DESC
 		(RIGID_SHAPE _eShapeType = { RIGID_END },
 			_float4x4 _matWorld = {},
@@ -28,9 +27,8 @@ public:
 			_bool _bKinematic = { false },
 			_float3 _fOffsetSize = {},
 			_float3 _vMaterial = { 0.5f, 0.5f, 0.5f },
-			_float _fDensity = { 10.f },
-			CGameObject* _pObj = {}
-		) : eShapeType(_eShapeType), matWorld(_matWorld), bTrigger(_bTrigger), bDynamic(_bDynamic), bKinematic(_bKinematic),fOffsetSize(_fOffsetSize), vMaterial(_vMaterial), fDensity(_fDensity), pObj(_pObj) {}
+			_float _fDensity = { 10.f }
+		) : eShapeType(_eShapeType), matWorld(_matWorld), bTrigger(_bTrigger), bDynamic(_bDynamic), bKinematic(_bKinematic),fOffsetSize(_fOffsetSize), vMaterial(_vMaterial), fDensity(_fDensity) {}
 	};
 
 private:
@@ -79,7 +77,6 @@ protected:
 
 	PxShape*				m_pShape				= { nullptr };
 	PxController*			m_pCapsuleController	= { nullptr };
-	class CGameObject*		m_pActorObject			= { nullptr };
 
 	_bool					m_bTrigger				= { false };
 	// 물체의 질량

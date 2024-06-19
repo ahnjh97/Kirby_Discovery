@@ -31,7 +31,6 @@ HRESULT CRigidBody::Initialize(void * pArg)
 	m_fOffsetSize			= pDesc->fOffsetSize;
 	m_bDynamic				= pDesc->bDynamic;
 	m_bKinematic			= pDesc->bKinematic;
-	m_pActorObject			= pDesc->pObj;
 	m_fDensity				= pDesc->fDensity;
 	Create_Actor();
 	return S_OK;
@@ -359,8 +358,6 @@ CComponent * CRigidBody::Clone(void * pArg)
 void CRigidBody::Free()
 {
 	__super::Free();
-
-	Safe_Release(m_pActorObject);
 	Release_Actor();
 }
 
