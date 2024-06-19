@@ -61,6 +61,5 @@ void CRigidObject::Render_IMGUI()
 void CRigidObject::Free()
 {
 	__super::Free();
-
 	Safe_Release(m_pShaderCom);
 }

@@ -43,8 +43,6 @@ public:
 	void			Throwing(CKirby::KIRBY_INFODESC* desc);
 	_bool			m_bThrowTrigger = { true };
 
-	void			SuddenBoom();
-
 private:
 	HRESULT			Add_Components();
 	HRESULT			Add_Rigid();

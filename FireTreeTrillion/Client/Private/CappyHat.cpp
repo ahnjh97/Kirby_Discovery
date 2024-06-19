@@ -85,7 +85,7 @@ _int CCappyHat::Tick(_float fTimeDelta)
 			hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 				TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 			CHECK_FAILED(hr);
-			m_pControllerCom->Set_Object(this);
+			//m_pControllerCom->Set_Object(this);
 			m_pControllerCom->Activate(false);
 			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vPosition);
 
@@ -152,14 +152,15 @@ void CCappyHat::Late_Tick(_float fTimeDelta)
 	if (m_ePhyXState == PO_KIRBYMOUTH)
 		return;
 
-	// 날아갈 땐, 애니메이션 재생이 되지 않는다.
-	if (m_ePhyXState != PO_FLYAWAY)
-	{
-		m_ePhyXState == PO_FLYDEADAWAY ? m_pModelCom->Play_Animation(m_fTimeDelta * 0.3f) : m_pModelCom->Play_Animation(m_fTimeDelta);
-	}
-
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 12.0f))
 	{
+		// 날아갈 땐, 애니메이션 재생이 되지 않는다.
+		if (m_ePhyXState != PO_FLYAWAY)
+		{
+			if (Compute_OptimizationAnimation(m_fTimeDelta) == true)
+				m_ePhyXState == PO_FLYDEADAWAY ? m_pModelCom->Play_Animation(m_fAccTime * 0.3f) : m_pModelCom->Play_Animation(m_fAccTime);
+		}
+
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 	}
