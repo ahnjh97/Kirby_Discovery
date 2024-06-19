@@ -405,9 +405,28 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 			Delete_AllEffect();
 		}
 	}
+	// 맵 오브젝트들과의 충돌.
+	if (eContent == CCollisionCenter::CONTENT_KICK)
+	{
+		// 내가 빨아들일때만 충돌반응함.
+		if (pObject->Get_PhyXState() == PO_VACUUMING)
+		{
+			// 일단 EAT으로 넘기는건 같으나, EAT이 끝날 시점에 내가 삼켰던 것이 무엇이였는지 판단 후 애니메이션이 분기된다.
+			INFO(m_fVacuumTime) = 0.f;
+			INFO(m_isEat) = true;
+			INFO(m_eEyeState) = EYE_IDLE;
+			INFO(m_eMouthState) = MOUTH_ANGER;
+			Change_State(STATE_EAT, 100.f, false, false, BODY_BALLOON);
+			// 임시 보관소. 먹은게 끝났을 떄, 비로소 커비의 어빌리티 타입이 바뀐다.
+			INFO(m_eTemporaryEatType) = pObject->Get_AbilityType();
 
+			// 입 속에 있는 걸로 바꿔준다.
+			if (pObject != nullptr)
+				pObject->Set_PhyXState(PO_KIRBYMOUTH);
 
-
+			Delete_AllEffect();
+		}
+	}
 }
 
 _float3 CKirby::Make_RepulsiveDir(CPhysXObject* pObject)
