@@ -11,6 +11,7 @@
 #include "Kabu.h"
 #include "BrontoBurt.h"
 #include "PoppyBrosJr.h"
+
 #include "BG.h"
 #include "HUD.h"
 
@@ -232,12 +233,12 @@ HRESULT CLevel_Intro::Ready_Layer_UI(const wstring& _wstrLayerTag)
 {
 	//모든 HUD를 준비
 	string strUITag = { "LayerUI" };
-	CHUD::HUD_STATUS eHUDType = CHUD::STAT_NONE;
+	CHUD::UI_TAG eHUDType = CHUD::TAG_NONE;
 
-	map<CHUD::HUD_STATUS, string> HUDmap =
+	map<CHUD::UI_TAG, string> HUDmap =
 	{
-		{CHUD::STAT_KIRBY, "HUD_KirbyStatus"},
-		{CHUD::STAT_STARPOINT, "HUD_StarPoint"},
+		{CHUD::HUD_KIRBYHP, "HUD_KirbyStatus"},
+		{CHUD::HUD_STARPOINT, "HUD_StarPoint"},
 		//{CHUD::STAT_NONE, "LayerUI"},
 	};
 

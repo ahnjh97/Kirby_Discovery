@@ -179,7 +179,7 @@ HRESULT CHUD_KirbyStatus::Render_BindSet(CShader* _pShaderCom, CTransform* _pTra
 	if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
-	SHADER_PS ePassIndex = { PS_ALPHABLEND }; //셰이더 패스 기본값
+	SHADER_PS ePassIndex = { PS_APBLEND_NOZTEST }; //셰이더 패스 기본값
 	if (TEXT("Gauge") == m_UIObjDesc.wstrUITag){ ePassIndex = PS_MASK_HP;	}
 	if (TEXT("Gauge_Damage") == m_UIObjDesc.wstrUITag){ ePassIndex = PS_MASK_HPDAMAGE;	}
 
@@ -288,7 +288,7 @@ void CHUD_KirbyStatus::Update_UIState(_float _fTimeDelta)
 	}
 }
 
-void CHUD_KirbyStatus::Play_Animation(_float _fAccTime, HUD_KIRBYHP _eCurState)
+void CHUD_KirbyStatus::Play_Animation(_float _fAccTime, KIRBYHP_STATE _eCurState)
 {
 	_float4 vWAITPos = { 0.f, 0.f, 0.f, 0.f };
 
