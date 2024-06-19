@@ -35,18 +35,18 @@ float g_fOverPowerColor;
 // 회전된 UV를 계산
 float2 RotateUV(float2 vCoord, float fAngle)
 {
-    float2 vCenter = (0.5, 0.5);
-    
+    float2 vCenter = float2(0.5, 0.5); // 중점 좌표 설정
+
     float fSinAngle = sin(fAngle);
     float fCosAngle = cos(fAngle);
     float2x2 RotationMatrix = float2x2(fCosAngle, -fSinAngle, fSinAngle, fCosAngle);
 
-    //float2 vDir = vCoord - vCenter;
+    // 텍스처 좌표를 중점을 기준으로 이동시키고 회전 변환 적용
     vCoord -= vCenter;
     vCoord = mul(vCoord, RotationMatrix);
     vCoord += vCenter;
-    
-    return mul(vCoord, RotationMatrix);
+
+    return vCoord;
 }
 
 

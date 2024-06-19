@@ -1027,7 +1027,31 @@ static void SwordSlash_Final(CTransform* pTransformCom)
 	MultiFXDesc.vInitRot = _float3{ 0.f, CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK)).y, 0.f };
 	MultiFXDesc.vInitScale = { 5.f, 5.f, 5.f };
 	MultiFXDesc.fStartDelay = .1f;
-	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SwordTrail_One"), &MultiFXDesc)))
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SwordTrail_Last"), &MultiFXDesc)))
+		return;
+}
+
+static void SwordSlash_Up(CTransform* pTransformCom)
+{
+	CEffect::FX_DESC FXDesc{};
+
+	FXDesc.vInitPos = static_cast<_float3>(pTransformCom->Get_State(CTransform::STATE_POSITION) + _float4{ 0.f, .3f, 0.f, 0.f } + pTransformCom->Get_State(CTransform::STATE_LOOK) * 2.f);
+	FXDesc.vInitRot = _float3{ 0.f, CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK)).y, 0.f };
+	FXDesc.vInitScale = { 5.f, 5.f, 5.f };
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Sword Upward Slash A"), &FXDesc)))
+		return;
+}
+
+static void SwordDash(CTransform* pTransformCom)
+{
+	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+
+	MultiFXDesc.vInitPos = _float3{ 0.f, 0.f, 4.f };
+	//MultiFXDesc.vInitRot = _float3{ 0.f, CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK)).y, 0.f };
+	MultiFXDesc.vInitScale = { 3.f, 3.f, 3.f };
+	MultiFXDesc.fStartDelay = .1f;
+	MultiFXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Sword Dash Test A"), &MultiFXDesc)))
 		return;
 }
 

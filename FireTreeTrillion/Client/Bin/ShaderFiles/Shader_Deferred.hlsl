@@ -99,8 +99,6 @@ float g_fWeight = 0.5;
 ////////////////
 
 
-
-
 TextureCube g_EnvTexture;
 Texture2D g_LUTTexture;
 
