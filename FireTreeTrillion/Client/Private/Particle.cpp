@@ -192,7 +192,7 @@ _int CParticle::Tick(_float _fTimeDelta)
 		break;
 	}
 
-
+	//duration 다 끝났다면
 	if (Calculate_Duration(fMyTimeDelta))
 	{
 		//툴에서는 다시 시작하기
@@ -202,13 +202,18 @@ _int CParticle::Tick(_float _fTimeDelta)
 			m_pVIBufferCom->Revive();
 		}
 		else
+		{
 			m_bDead = true;
+		}
 	}
 
 	m_pVIBufferCom->Compute_AllLifeTime(fMyTimeDelta);
 
 	if (m_fDuration.second <= m_fDuration.first)
+	{
+		m_fDuration.first = m_fDuration.second;
 		return OBJ_NOEVENT;
+	}
 
 
 	VTXMATRIX* pVertices = m_pVIBufferCom->Map();

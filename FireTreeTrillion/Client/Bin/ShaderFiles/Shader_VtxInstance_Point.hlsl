@@ -52,23 +52,30 @@ VS_OUT VS_MAIN(VS_IN In)
     Out.vPosition = mul(vPosition, g_WorldMatrix);
     Out.vPSize = float2(In.TransformMatrix._11, In.TransformMatrix._22);
     Out.bAlive = In.bAlive;
+    
+  
+    matrix matWV, matWVP;
+    matWV = mul(g_WorldMatrix, g_ViewMatrix);
+    matWVP = mul(matWV, g_ProjMatrix);
+    Out.vProjPos = mul(Out.vPosition, matWVP);
 
+    
     return Out;
 }
 
-VS_OUT VS_MAIN_ALPHABLEND(VS_IN In)
-{
-    VS_OUT Out = (VS_OUT) 0;
+//VS_OUT VS_MAIN_ALPHABLEND(VS_IN In)
+//{
+//    VS_OUT Out = (VS_OUT) 0;
 
-    vector vPosition = mul(vector(In.vPosition, 1.f), In.TransformMatrix);
+//    vector vPosition = mul(vector(In.vPosition, 1.f), In.TransformMatrix);
 
-    Out.vPosition = mul(vPosition, g_WorldMatrix);
-    Out.vProjPos = Out.vPosition;
-    Out.vPSize = float2(In.TransformMatrix._11, In.TransformMatrix._22);
-    Out.bAlive = In.bAlive;
+//    Out.vPosition = mul(vPosition, g_WorldMatrix);
+//    Out.vProjPos = Out.vPosition;
+//    Out.vPSize = float2(In.TransformMatrix._11, In.TransformMatrix._22);
+//    Out.bAlive = In.bAlive;
 
-    return Out;
-}
+//    return Out;
+//}
 
 struct GS_IN
 {
@@ -193,7 +200,7 @@ PS_OUT PS_MAIN_BLEND_FX(PS_IN In)
     vTexcoord.y = (In.vProjPos.y / In.vProjPos.w) * -0.5f + 0.5f;
 
     float4 vDepthDesc = g_DepthTexture.Sample(PointSampler, vTexcoord);
-    float fOldViewZ = vDepthDesc.y * 1000.f;
+    float fOldViewZ = vDepthDesc.y * g_fFar;
 
     Out.vColor.a = Out.vColor.a * saturate(fOldViewZ - In.vProjPos.w);
     

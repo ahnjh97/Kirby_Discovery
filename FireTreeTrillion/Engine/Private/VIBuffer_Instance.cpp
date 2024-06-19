@@ -290,7 +290,7 @@ void CVIBuffer_Instance::Appear(_float fTimeDelta, VTXMATRIX* pVertices)
 
 		_float fTimeRatio = clamp((m_pLifeTimes[i].x / m_pLifeTimes[i].y) * 5.f, .01f, 1.f);
 		fTimeRatio = EASE_IN(fTimeRatio);
-		if (1.f < fTimeRatio)
+		if (1.f <= fTimeRatio)
 			continue;
 
 		_float4x4 InstanceMat = { _float4x4::Identity };
@@ -325,11 +325,11 @@ void CVIBuffer_Instance::Disappear(_float fTimeDelta, VTXMATRIX* pVertices)
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
 
-		if (m_pLifeTimes[i].x / m_pLifeTimes[i].y < .5f)
+		if ((m_pLifeTimes[i].x / m_pLifeTimes[i].y) < .5f)
 			continue;
 
 		_float fTimeRatio = 1.f - ((m_pLifeTimes[i].x / m_pLifeTimes[i].y) - .5f) * 2.f;
-		fTimeRatio = EASE_OUT(fTimeRatio);
+		fTimeRatio = clamp( EASE_OUT(fTimeRatio), 0.f, 1.f);
 
 		_float4x4 InstanceMat = { _float4x4::Identity };
 
@@ -459,7 +459,10 @@ void CVIBuffer_Instance::Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceI
 	{
 		//루프가 아니였다면 죽어!!
 		if (!m_InstanceDesc.bIsLoop)
+		{
 			pVertices[iInstanceIndex].bAlive = false;
+			m_pLifeTimes[iInstanceIndex].x = m_pLifeTimes[iInstanceIndex].y;
+		}
 		//아니라면 다시 초기화~
 		else
 		{
