@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "KirbyBomb.h"
 #include "MultiEffect.h"
+#include "HitBox.h"
 
 CKirbyBomb::CKirbyBomb(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CRigidObject{ pDevice, pContext }
@@ -53,6 +54,8 @@ HRESULT CKirbyBomb::Initialize(void* pArg)
     m_bRimLight = true;
     m_bMotionBlur = true;
 
+    m_fAttack = 10.f;
+
     return S_OK;
 }
 
@@ -90,7 +93,7 @@ _int CKirbyBomb::Tick(_float fTimeDelta)
         Kicking();
 
         // 근처에 몬스터 또는 폭탄이 있을 때 폭발한다.
-        SuddenBoom();
+        //SuddenBoom();
 
     }
 
@@ -210,64 +213,6 @@ void CKirbyBomb::Throwing(CKirby::KIRBY_INFODESC* desc)
     }
 }
 
-void CKirbyBomb::SuddenBoom()
-{
-
-    if (m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_Bomb")) != nullptr)
-    {
-        _float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-
-        for (auto& Bomb : *m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_Bomb")))
-        {
-            if (Bomb == this)
-                continue;
-
-            CTransform* pOtherBombTransformCom = Bomb->Get_TransformCom();
-            _float4 vOtherBombPos = pOtherBombTransformCom->Get_State(CTransform::STATE_POSITION);
-            _float4 vDir = vPos - vOtherBombPos;
-
-            _float fDistance = vDir.Length();
-
-            if (fDistance < 1.8f)
-            {
-                Bomb->Set_Dead();
-                this->Set_Dead();
-                return;
-            }
-        }
-    }
-
-    if (m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_Monster")) != nullptr)
-    {
-        _float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-
-        for (auto& Monster : *m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_Monster")))
-        {
-            CTransform* pMonsterTransformCom = Monster->Get_TransformCom();
-            _float4 vMonsterBombPos = pMonsterTransformCom->Get_State(CTransform::STATE_POSITION);
-            _float4 vDir = vPos - vMonsterBombPos;
-
-            _float fDistance = vDir.Length();
-
-            if (fDistance < 1.8f)
-            {
-                CPhysXObject* pMonster = static_cast<CPhysXObject*>(Monster);
-                pMonster->Set_PhyXState(PO_FLYDEADAWAY);
-                vDir.y = 0.f;
-                pMonster->Set_DamageMoving(-XMVector3Normalize(vDir) * 0.4f, 10.f);
-                this->Set_Dead();
-                return;
-            }
-        }
-
-
-
-    }
-
-
-
-}
-
 HRESULT CKirbyBomb::Add_Components()
 {
     HRESULT hr;
@@ -280,6 +225,14 @@ HRESULT CKirbyBomb::Add_Components()
     hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyBombDefault"),
         TEXT("Com_Model"), (CComponent**)&m_pModelCom);
     CHECK_FAILED(hr);
+
+    CHitBox::HITBOX_DESC HitBox{};
+    HitBox.pOwner = this;
+    HitBox.pDesc = &m_tColliderDesc[BODY];
+    HitBox.pCollisionType = PLAYERBULLET;
+    if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
+        return E_FAIL;
+    Set_BodyCollider(COLLIDER_SPHERE, 0.f, 0.f, 1.f);
 
     return S_OK;
 }
@@ -352,7 +305,7 @@ void CKirbyBomb::Compute_MotionBlur()
 
     m_vMotionVelocity.x = (m_vPreScreenPos - vCurScreenPos).x;
     m_vMotionVelocity.y = (m_vPreScreenPos - vCurScreenPos).y;
-    m_vMotionVelocity.z = m_ePhyXState != PO_NORMAL ? 1.f : 0.f;
+    m_vMotionVelocity.z = 1.f;//m_ePhyXState != PO_NORMAL ? 1.f : 0.f;
 
     m_vPreScreenPos = vCurScreenPos;
 }
@@ -393,9 +346,6 @@ _int CKirbyBomb::Boom_Dead()
     MultiFXDesc.vInitScale = {3.f, 3.f, 3.f };
     if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_ExplodeSmoke"), &MultiFXDesc)))
         return OBJ_DEAD;
-
-
-
 
     //MultiFXDesc.vInitRot = CUtils::Make_Degree_FromDir(CGameInstance::Get_Instance()->Get_CamLook());
     _float fScale = CUtils::Make_RandomFloat(0.95f, 2.5f);

@@ -39,7 +39,7 @@ HRESULT CHitBox::Initialize(void* pArg)
 
 _int CHitBox::Tick(_float fTimeDelta)
 {
-	if (m_pOwner->Get_Dead())
+	if (m_pOwner == nullptr || m_pOwner->Get_Dead() == true)
 		return OBJ_DEAD;
 
 

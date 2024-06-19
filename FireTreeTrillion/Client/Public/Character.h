@@ -31,6 +31,8 @@ public:
 #endif
 	virtual void	Add_AnimEvent(){}
 
+
+
 	void	Plus_Hp(_float fHp) {
 		m_fHp += fHp;
 		if (m_fMaxHp < m_fHp)
@@ -38,6 +40,9 @@ public:
 		else if (m_fHp < 0.f)
 			m_fHp = 0.f;
 	}
+
+
+
 	void	Minus_Hp(_float fHp) {
 		m_fHp -= fHp;
 		if (m_fMaxHp < m_fHp)
@@ -46,13 +51,16 @@ public:
 			m_fHp = 0.f;
 		m_fWhiteColorDiffuse = 1.f;
 	}
+
+
+
 	void	Set_Slope(_bool bSlope) {
 		m_bSlope = bSlope;
 	}
+
+
 	_float	Get_Hp() { return m_fHp; }
 	_float	Get_MaxHp() { return m_fMaxHp; }
-	_float	Get_Attack() { return m_fAttack; }
-
 	_uint Get_State();
 
 protected:
@@ -67,7 +75,6 @@ protected:
 
 	_float			m_fHp = { 0.f };
 	_float			m_fMaxHp = { 0.f };
-	_float			m_fAttack = { 0.f };
 
 	_bool			m_bSlope = { true };
 

@@ -257,64 +257,64 @@ void CGameObject::Set_BodyCollider(HITBOX eType, _float fOffSetY, _float fHeight
 
 _bool CGameObject::Compute_OptimizationAnimation(_float fTimeDelta)
 {
-	_vector	vPosition = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	//_vector	vPosition = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 
-	m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW);
-	vPosition = XMVector3TransformCoord(vPosition, m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW));
+	//m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW);
+	//vPosition = XMVector3TransformCoord(vPosition, m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW));
 
-	m_fViewZ = XMVectorGetZ(vPosition);
-	XMStoreFloat3(&m_vViewPos, vPosition);
+	//m_fViewZ = XMVectorGetZ(vPosition);
+	//XMStoreFloat3(&m_vViewPos, vPosition);
 
-	if (m_fViewZ > 40.f)
-	{
-		if (m_iLateTickCount == 0)
-		{
-			m_fAccTime = 0.f;
-			m_fAccTime += fTimeDelta;
-			m_iLateTickCount = 1;
-			return false;
-		}
-		else if (m_iLateTickCount == 3)
-		{
-			m_fAccTime += fTimeDelta;
-			m_iLateTickCount = 0;
-			return true;
-		}
-		else
-		{
-			m_fAccTime += fTimeDelta;
-			m_iLateTickCount++;
-			return false;
-		}
-	}
-	else if (m_fViewZ > 80.f)
-	{
-		if (m_iLateTickCount == 0)
-		{
-			m_fAccTime = 0.f;
-			m_fAccTime += fTimeDelta;
-			m_iLateTickCount = 1;
-			return false;
-		}
-		else if (m_iLateTickCount == 12)
-		{
-			m_fAccTime += fTimeDelta;
-			m_iLateTickCount = 0;
-			return true;
-		}
-		else
-		{
-			m_fAccTime += fTimeDelta;
-			m_iLateTickCount++;
-			return false;
-		}
-	}
-	else
-	{
+	//if (m_fViewZ > 40.f)
+	//{
+	//	if (m_iLateTickCount == 0)
+	//	{
+	//		m_fAccTime = 0.f;
+	//		m_fAccTime += fTimeDelta;
+	//		m_iLateTickCount = 1;
+	//		return false;
+	//	}
+	//	else if (m_iLateTickCount == 3)
+	//	{
+	//		m_fAccTime += fTimeDelta;
+	//		m_iLateTickCount = 0;
+	//		return true;
+	//	}
+	//	else
+	//	{
+	//		m_fAccTime += fTimeDelta;
+	//		m_iLateTickCount++;
+	//		return false;
+	//	}
+	//}
+	//else if (m_fViewZ > 80.f)
+	//{
+	//	if (m_iLateTickCount == 0)
+	//	{
+	//		m_fAccTime = 0.f;
+	//		m_fAccTime += fTimeDelta;
+	//		m_iLateTickCount = 1;
+	//		return false;
+	//	}
+	//	else if (m_iLateTickCount == 8)
+	//	{
+	//		m_fAccTime += fTimeDelta;
+	//		m_iLateTickCount = 0;
+	//		return true;
+	//	}
+	//	else
+	//	{
+	//		m_fAccTime += fTimeDelta;
+	//		m_iLateTickCount++;
+	//		return false;
+	//	}
+	//}
+	//else
+	//{
 		m_iLateTickCount = 0;
 		m_fAccTime = fTimeDelta;
 		return true;
-	}
+	//}
 }
 
 void CGameObject::Free()

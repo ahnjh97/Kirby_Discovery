@@ -215,13 +215,13 @@ HRESULT CKickableRock::Add_Components()
 	m_pRigidBodyCom->Activate(false);
 
 
-	CHitBox::HITBOX_DESC HitBox{};
-	HitBox.pOwner = this;
-	HitBox.pDesc = &m_tColliderDesc[BODY];
-	HitBox.pCollisionType = OBJECT;
-	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
-		return E_FAIL;
-	Set_BodyCollider(COLLIDER_SPHERE, 0.f, 0.f, 1.f);
+	//CHitBox::HITBOX_DESC HitBox{};
+	//HitBox.pOwner = this;
+	//HitBox.pDesc = &m_tColliderDesc[BODY];
+	//HitBox.pCollisionType = OBJECT;
+	//if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
+	//	return E_FAIL;
+	//Set_BodyCollider(COLLIDER_SPHERE, 0.f, 0.f, 1.f);
 
 
 	return S_OK;
@@ -273,8 +273,7 @@ CGameObject* CKickableRock::Clone(void* pArg)
 void CKickableRock::Free()
 {
 	__super::Free();
-
-	Safe_Release(m_pModelCom);
 	Safe_Release(m_pRigidBodyCom);
+	Safe_Release(m_pModelCom);
 } 
 

@@ -35,7 +35,7 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 
 
 
-	// 깔끔하게 완료되었음.
+	// 깔끔하게 완료되었음 : 플레이어 X 몬스터
 	Collision_Collider(m_GameObjects[PLAYER], m_GameObjects[MONSTER], this,
 		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
 		{
@@ -74,7 +74,7 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 			pMonster->Collision(CONTENT_BODY, pKirby);
 		});
 
-	// 깔끔하게 완료되었음.
+	// 깔끔하게 완료되었음 : 몬스터 X 몬스터 (커비가 날릴때의 충돌)
 	Collision_Collider(m_GameObjects[MONSTER], m_GameObjects[MONSTER], this,
 		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
 		{
@@ -166,6 +166,7 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 
 		});
 
+	// 미 구현
 	Collision_Collider(m_GameObjects[HITBOX_MONSTER], m_GameObjects[PLAYER], this,
 		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
 		{
@@ -176,7 +177,7 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 
 		});
 
-	// 깔끔하게 완료되었음
+	// 깔끔하게 완료되었음 : 플레이어 X 아이템
 	Collision_Collider(m_GameObjects[PLAYER], m_GameObjects[ITEM], this,
 		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
 		{
@@ -210,7 +211,7 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 			}
 		});
 
-	// 깔끔하게 완료되었음
+	// 깔끔하게 완료되었음 : 플레이어 X 오브젝트류 (발로 차기 및 흡수 로직)
 	Collision_Collider(m_GameObjects[PLAYER], m_GameObjects[OBJECT], this,
 		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
 		{
@@ -228,6 +229,55 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 			// 0.1초의 충돌 딜레이를 주기위함.
 			SrcHit->Set_Alive(false);
 		});
+
+
+	// 깔끔하게 완료되었음
+	Collision_Collider(m_GameObjects[PLAYERBULLET], m_GameObjects[PLAYERBULLET], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+
+
+			Dst->Set_Dead();
+			Src->Set_Dead();
+
+		});
+	Collision_Collider(m_GameObjects[PLAYERBULLET], m_GameObjects[MONSTER], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CPhysXObject* pDst = static_cast<CPhysXObject*>(Dst);
+			CMonster* pMonster = static_cast<CMonster*>(Src);
+
+			// 넉백방향을 정해주기 위한 과정이다.
+			CTransform* pBulletTransform = Dst->Get_TransformCom();
+			_vector vBulletPos = pBulletTransform->Get_State_Vector(CTransform::STATE_POSITION);
+			CTransform* pMonsterTransform = pMonster->Get_TransformCom();
+			_vector vMonsterPos = pMonsterTransform->Get_State_Vector(CTransform::STATE_POSITION);
+			_float4 vDistance = vMonsterPos - vBulletPos;
+			vDistance.y = 0.f;
+			vDistance.Normalize();
+			_vector vKnockbackDir = vDistance;
+
+			// 넉백의 2차원 방향 (y축없는) 과 뜨는 힘을 정해준다.
+			pthis->Knock_back(pMonster, vKnockbackDir * 1.3f, 5.f);
+			// 몬스터의 CONTENT_ATTACK타입의 Collision함수를 발동시킨다. 정말 세부적인건 이쪽에서 처리된다.
+			pMonster->Collision(CONTENT_ATTACK, pDst);
+
+			_float fAttack = pDst->Get_Attack();
+			pMonster->Minus_Hp(fAttack);
+
+			Dst->Set_Dead();
+		});
+
 
 
 
@@ -907,7 +957,6 @@ void CCollisionCenter::Free()
 			Safe_Release(pObject);
 		ObjectVector.clear();
 	}
-
 
 	__super::Free();
 

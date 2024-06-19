@@ -32,7 +32,8 @@ private:
 	HRESULT			Bind_ShaderResources();
 
 private:
-	CModel*			m_pModelCom = nullptr;
+	CModel*			m_pModelCom = { nullptr };
+
 	_float			m_fLifeTime = _float();
 
 	_float			m_fFlyTime = { 0.f };
