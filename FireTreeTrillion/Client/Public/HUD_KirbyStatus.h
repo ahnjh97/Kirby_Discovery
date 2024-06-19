@@ -37,7 +37,7 @@ private:
 	void						Update_UIState(_float _fTimeDelta);
 	void						Play_Animation(_float _fAccTime, HUD_KIRBYHP _eCurState);
 
-	void						Compute_Player_Hp(_float fTimeDelta);
+	void						Compute_Player_Hp(_float fTimeDelta, class CKirby* pKirby);
 
 private:
 	_bool						m_IsMovingUP = { TRUE };
@@ -75,9 +75,6 @@ private:
 
 	_float						m_fSaveMyY = { 0.f };
 	_float						m_fAmplitude = { 0.f };
-
-
-	class CKirby*				m_pKirby = nullptr;
 
 public:
 	static CHUD_KirbyStatus*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
