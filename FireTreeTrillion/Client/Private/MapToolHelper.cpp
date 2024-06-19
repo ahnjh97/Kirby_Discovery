@@ -1786,7 +1786,7 @@ void CMapToolHelper::Load_Monsters(const string& _strLevel)
 		for (_uint iRallyPointIdx = 0; iRallyPointIdx < iNumRallyPoints; iRallyPointIdx++)
 		{
 			fileInput.read(reinterpret_cast<char*>(&vRallyPointPos), sizeof(vRallyPointPos));
-			rallyPoints.emplace(iRallyPointIdx, vRallyPointPos);
+			//rallyPoints.emplace(iRallyPointIdx, vRallyPointPos);
 		}
 
 		CMapToolObject::MAPTOOLOBJECT_DESC tDesc{};
@@ -1795,7 +1795,7 @@ void CMapToolHelper::Load_Monsters(const string& _strLevel)
 		tDesc.iShaderVars = iShaderVars;
 		tDesc.fRimWidth = fRimWidth;
 		tDesc.iTriggerIndex = iTriggerIndex; // Monster Enum
-		tDesc.RallyPoints = rallyPoints;
+		//tDesc.RallyPoints = rallyPoints;
 
 		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
 		{

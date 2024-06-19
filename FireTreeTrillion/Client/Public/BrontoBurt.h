@@ -72,7 +72,7 @@ private:
 
 	// 와리가리 상태의 파리
 	_float4				m_vRally = {};
-	_uint				m_iCnt = { 0 };
+	_int				m_iCnt = { 0 };
 	_bool				m_bConvert = { false };
 
 	vector<_float4>		m_vecRallyPoint;
