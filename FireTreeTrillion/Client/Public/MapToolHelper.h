@@ -23,7 +23,9 @@ public:
 
 private:
 	void	SetUpTxtVectors();
-	void	ReadMapDecoTxts(TYPE eType);
+	void	ReadMapDecoTxts();
+	void	ReadMapObjTxts();
+	void	ReadMonsterTxts();
 	
 	// ImGui
 	void	Menu_Level();

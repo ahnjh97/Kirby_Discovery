@@ -580,12 +580,14 @@ HRESULT CLoader::Loading_For_Tool_Map()
 	CHECK_FAILED(hr);
 
 	m_strLoadingText = TEXT("모델(을) 로딩 중 입니다.");
-	if(FAILED(Add_AllModelTxts(eLevel, TYPE_NONANIM)))
-		return E_FAIL;
-	//if (FAILED(Add_AllModelTxts(eLevel, TYPE_ANIM, L"MapDeco/")))
-	//	return E_FAIL;
+
 	if (FAILED(Add_AllModelTxts(eLevel, TYPE_NONANIM, L"MapDeco/")))
 		return E_FAIL;
+	if (FAILED(Add_AllModelTxts(eLevel, TYPE_NONANIM, L"MapObjs/")))
+		return E_FAIL;
+	if (FAILED(Add_AllModelTxts(eLevel, TYPE_NONANIM, L"Monsters/")))
+		return E_FAIL;
+
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 
 	m_IsFinished = true;
@@ -758,11 +760,11 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
 
 
-		m_vecModelInfo.emplace_back("Level0Stage1Step01", TYPE_NONANIM, 1.f, 0.f, 0, true);
-		m_vecModelInfo.emplace_back("Level0Stage1Step01_Blend", TYPE_NONANIM);
-		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f);
-		m_vecModelInfo.emplace_back("BG0", TYPE_NONANIM);
-		m_vecModelInfo.emplace_back("Ladder", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("Level0Stage1Step01", TYPE_NONANIM, 1.f, 0.f, 0, true, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Level0Stage1Step01_Blend", TYPE_NONANIM, 1.f, 0.f, 0, true, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, false, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("BG0", TYPE_NONANIM, 1.f, 0.f, 0, true, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Ladder", TYPE_NONANIM, 1.f, 0.f, 0, true, string("MapObjs/"));
 
 		// For Monster
 		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.f, 180.f);
@@ -779,12 +781,12 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 
 		// For Mab Interactive Object
-		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM, 1.f, 0.f, 0, true, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("GsPebble", TYPE_NONANIM, 1.f, 0.f, 0, false, string("MapDeco/"));
 
 		// For Item
-		m_vecModelInfo.emplace_back("Item_EnergyDrink", TYPE_NONANIM, 3.f);
-		m_vecModelInfo.emplace_back("Item_Coin", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("Item_EnergyDrink", TYPE_NONANIM, 3.f, 0.f, 0, true, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Item_Coin", TYPE_NONANIM, 1.f, 0.f, 0, true, string("MapObjs/"));
 
 		// For Interaction Decor
 		m_vecModelInfo.emplace_back("BushM", TYPE_ANIM, 1.f, 0.f, 0, false, string("MapDeco/"));
@@ -819,11 +821,11 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		
 
 		m_vecModelInfo.emplace_back("GsBenchAL", TYPE_NONANIM, 1.f, 0.f, 0, false, string("MapDeco/"));
-		m_vecModelInfo.emplace_back("Level0Stage1Step01", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("Level0Stage1Step01", TYPE_NONANIM, 1.f, 0.f, 0, true, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("Level1Stage1Step01", TYPE_NONANIM, 1.f, 0.f, 0, true);
-		m_vecModelInfo.emplace_back("Level1Stage1Step01_Blend", TYPE_NONANIM);
-		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f);
-		m_vecModelInfo.emplace_back("BG1", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("Level1Stage1Step01_Blend", TYPE_NONANIM, 1.f, 0.f, 0, true, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, false, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("BG1", TYPE_NONANIM, 1.f, 0.f, 0, true, string("MapObjs/"));
 
 		// For Monster
 		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.f, 180.f);
@@ -839,8 +841,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("CappyHat", TYPE_ANIM, 1.2f, 180.f);
 
 		// For Mab Interactive Object
-		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM);
-		m_vecModelInfo.emplace_back("Ladder", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM, 1.f, 0.f, 0, true, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Ladder", TYPE_NONANIM, 1.f, 0.f, 0, true, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("GsPebble", TYPE_NONANIM, 1.f, 0.f, 0, false, string("MapDeco/"));
 		m_vecModelInfo.emplace_back("StarBlockL", TYPE_NONANIM, 1.f, 0.f, 0, false, string("MapDeco/"));
 		m_vecModelInfo.emplace_back("StarBlockM", TYPE_NONANIM, 1.f, 0.f, 0, false, string("MapDeco/"));
@@ -851,8 +853,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 
 		// For Item
-		m_vecModelInfo.emplace_back("Item_EnergyDrink", TYPE_NONANIM, 3.f);
-		m_vecModelInfo.emplace_back("Item_Coin", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("Item_EnergyDrink", TYPE_NONANIM, 3.f, 0.f, 0, true, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Item_Coin", TYPE_NONANIM, 1.f, 0.f, 0, true, string("MapObjs/"));
 	}
 	else if (eLevel == LEVEL_TOOL_MAP)
 	{
