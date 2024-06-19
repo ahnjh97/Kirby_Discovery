@@ -110,6 +110,9 @@ void CHUD_KirbyStatus::Late_Tick(_float fTimeDelta)
 
 HRESULT CHUD_KirbyStatus::Render()
 {
+	if (KIRBYHP_WAIT == m_eCurState && KIRBYHP_HIDE == m_ePreState)
+		return S_OK;
+
 	if (UI_TEXTURE == m_UIObjDesc.eUIType)
 		Render_BindSet(m_pShaderCom, m_pTransformCom);
 
@@ -123,9 +126,6 @@ HRESULT CHUD_KirbyStatus::Render()
 		_float2 vFontScale = { 1.2f, 1.2f };
 
 		wstring wstrFontTag = { TEXT("Font_HUDSub_KR15") };
-
-		if (KIRBYHP_WAIT == m_eCurState && KIRBYHP_HIDE == m_ePreState)
-			return S_OK;
 
 		m_pGameInstance->Render_Font(wstrFontTag, m_UIObjDesc.wstrText, vFontPos, vFontRGBA,
 			XMConvertToRadians(m_UIObjDesc.vDegree.z), vFontOrig, vFontScale);
@@ -157,9 +157,6 @@ HRESULT CHUD_KirbyStatus::Add_Components()
 
 HRESULT CHUD_KirbyStatus::Render_BindSet(CShader* _pShaderCom, CTransform* _pTransCom)
 {
-	if (KIRBYHP_WAIT == m_eCurState && KIRBYHP_HIDE == m_ePreState)
-		return S_OK;
-
 	CHECK_NULLPTR(_pShaderCom);
 
 	if (FAILED(_pTransCom->Bind_ShaderResource(_pShaderCom, "g_WorldMatrix")))

@@ -104,17 +104,13 @@ _int CHUD_StarPoint::Tick(_float fTimeDelta)
 	//이전 재화량 대비 현재 재화량 비교
 	_uint iCurCoin = m_pKirby->Get_Coin();
 	if (iCurCoin > m_iPreCoin)
-	//if (m_pGameInstance->Get_DIKeyState(DIK_1, KEY_DOWN)) //테스트용
 	{
-		//iCurCoin += 1; //테스트용
-
 		m_IsLootTrigger = TRUE;
 		m_iPreCoin = iCurCoin; 
 		m_pKirby->Set_Coin(m_iPreCoin);
 
 		if (m_IsLootTrigger) //== TRUE;
 		{
-			//m_fAccTime = 0.f;
 			m_eCurState = STARPOINT_LOOT;
 			m_IsLootTrigger = FALSE;
 		}
@@ -130,6 +126,10 @@ void CHUD_StarPoint::Late_Tick(_float fTimeDelta)
 
 HRESULT CHUD_StarPoint::Render()
 {
+	//해당 상태의 경우에는 렌더x
+	if (STARPOINT_WAIT == m_eCurState && STARPOINT_HIDE == m_ePreState)
+		return S_OK;
+
 	if (UI_TEXTURE == m_UIObjDesc.eUIType)
 		Render_BindSet(m_pShaderCom, m_pTransformCom);
 
@@ -142,53 +142,45 @@ HRESULT CHUD_StarPoint::Render()
 		_float2 vFontOrig = { 1.f, 1.f };
 		_float2 vFontScale = { m_UIObjDesc.vSize.x, m_UIObjDesc.vSize.y };
 
-		if (m_UIObjDesc.wstrUITag == TEXT("Font_Shadow"))
-			vFontScale = { 1.f, 1.f };
-
 		wstring wstrFontTag = { TEXT("Font_HUD_StarPoint_NUM30") };
-
-	
-		if (STARPOINT_WAIT == m_eCurState && STARPOINT_HIDE == m_ePreState)
-			return S_OK;
-
-		//if (m_UIObjDesc.wstrUITag == TEXT("Font100") || m_UIObjDesc.wstrUITag == TEXT("Font10")
-		//	|| m_UIObjDesc.wstrUITag == TEXT("Font100_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font10_Shadow"))
-		//{
-		//	if (m_bIsRender == FALSE)
-		//		return S_OK;
-
+		
 		_uint iCurCoin = m_pKirby->Get_Coin();
+		_uint iFont100 = iCurCoin / 100;
+		_uint iFont10 = (iCurCoin % 100) / 10;
+		_uint iFont1 = iCurCoin % 10;
+
 		if (TEXT("Font100") == m_UIObjDesc.wstrUITag || TEXT("Font100_Shadow") == m_UIObjDesc.wstrUITag)
-		{
-			_uint iFont100 = iCurCoin / 100;
+			return S_OK;
+			//m_UIObjDesc.wstrText = to_wstring(iFont100);
 
-			if (iFont100 > 0)
-				m_bIsRender = TRUE;
-
-			else
-				return S_OK; //m_bIsRender = FALSE;
-
-			m_UIObjDesc.wstrText = to_wstring(iFont100);
-		}
 		if (TEXT("Font10") == m_UIObjDesc.wstrUITag || TEXT("Font10_Shadow") == m_UIObjDesc.wstrUITag)
 		{
-			_uint iFont10 = (iCurCoin % 100) / 10;
-
 			if (iFont10 > 0)
-				m_bIsRender = TRUE;
+			{
+				m_UIObjDesc.wstrText = to_wstring(iFont10);
 
-			else
-				return S_OK; //m_bIsRender = FALSE;
-
-			m_UIObjDesc.wstrText = to_wstring(iFont10);
+				m_UIObjDesc.vPos.x = m_vInitPos.x + 12.f;
+				m_UIObjDesc.vPos.y = m_vInitPos.y;
+				m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_UIObjDesc.vPos);
+			}
+			
+			else			
+				return S_OK;
 		}
 
 		if (TEXT("Font1") == m_UIObjDesc.wstrUITag || TEXT("Font1_Shadow") == m_UIObjDesc.wstrUITag)
 		{
-			_uint iFont1 = iCurCoin % 10;
 			m_UIObjDesc.wstrText = to_wstring(iFont1);
+
+			if (iFont10 > 0)
+			{
+				m_UIObjDesc.vPos.x = m_vInitPos.x + 12.f;
+				m_UIObjDesc.vPos.y = m_vInitPos.y;
+				m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_UIObjDesc.vPos);
+			}
+			else
+				m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_UIObjDesc.vPos);
 		}
-	//}
 
 		m_pGameInstance->Render_Font(wstrFontTag, m_UIObjDesc.wstrText, vFontPos, vFontRGBA,
 			XMConvertToRadians(m_UIObjDesc.vDegree.z), vFontOrig, vFontScale);
@@ -216,14 +208,11 @@ HRESULT CHUD_StarPoint::Add_Components()
 
 HRESULT CHUD_StarPoint::Render_BindSet(CShader* _pShaderCom, CTransform* _pTransCom)
 {
-	if (STARPOINT_WAIT == m_eCurState && STARPOINT_HIDE == m_ePreState)
-		return S_OK;
-
 	//마스크도 어색해서 잠시 OFF 처리. 추후 디벨롭 필요
-	if (m_UIObjDesc.wstrUITag == TEXT("Effect_Mask"))
+	if (TEXT("Effect_Mask") == m_UIObjDesc.wstrUITag)
 		return S_OK;
 
-	if (m_UIObjDesc.wstrUITag == TEXT("Effect"))
+	if (TEXT("Effect") == m_UIObjDesc.wstrUITag && m_bIsRender == FALSE)
 		return S_OK;
 
 	CHECK_NULLPTR(_pShaderCom);
@@ -342,7 +331,12 @@ void CHUD_StarPoint::Update_UIState(_float _fTimeDelta)
 
 void CHUD_StarPoint::Play_Animation(_float _fAccTime, STARPOINT_STATE _eCurState)
 {
-	_float4 vCurPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	_float4 vCurPos{};
+	if (!m_pKirby) //==nullptr
+		return;
+
+	_uint iCurCoin = m_pKirby->Get_Coin();
+	_uint iFont10 = (iCurCoin % 100) / 10;
 
 	switch (_eCurState)
 	{
@@ -352,70 +346,60 @@ void CHUD_StarPoint::Play_Animation(_float _fAccTime, STARPOINT_STATE _eCurState
 	case CHUD::STARPOINT_WAIT:
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vInitPos);
 
-		/*
-		if (m_UIObjDesc.wstrUITag == TEXT("Effect"))
-		{
-			m_bIsRender = FALSE;
-			m_iTexIndex = 3;
-		}
-		*/
+		if (TEXT("Font10_Shadow") == m_UIObjDesc.wstrUITag || TEXT("Font10") == m_UIObjDesc.wstrUITag
+		|| TEXT("Font1_Shadow") == m_UIObjDesc.wstrUITag || TEXT("Font1") == m_UIObjDesc.wstrUITag)
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_UIObjDesc.vPos);
+
 		break;
 
-	case CHUD::STARPOINT_HIDE: //X값 우측 이동, 알파 값 죽이기
+	case CHUD::STARPOINT_HIDE: 
 		vCurPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-		vCurPos.x += 0.05f;
+		vCurPos.x += 0.05f;//vCurPos.x += 0.005f;
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vCurPos);
-		m_UIObjDesc.fAlpha -= 0.01f;
+
+		if (TEXT("Font100_Shadow") == m_UIObjDesc.wstrUITag || TEXT("Font10_Shadow") == m_UIObjDesc.wstrUITag || TEXT("Font1_Shadow") == m_UIObjDesc.wstrUITag
+			|| TEXT("Font100") == m_UIObjDesc.wstrUITag || TEXT("Font10") == m_UIObjDesc.wstrUITag || TEXT("Font1") == m_UIObjDesc.wstrUITag)
+		{
+			m_UIObjDesc.vPos.x = vCurPos.x;
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_UIObjDesc.vPos);
+		}
+
 		break;
 
 	case CHUD::STARPOINT_LOOT:
-		if (m_UIObjDesc.wstrUITag == TEXT("Effect"))
-		{
-			m_bIsRender = TRUE;
-
-			if (m_iTexIndex >= 8)
-			{
-				m_iTexIndex = 2;
-				m_bIsRender = FALSE;
-			}
-
-			++m_iTexIndex;
-		}
-		/*
-		if (m_UIObjDesc.wstrUITag == TEXT("Effect_Mask")) //스케일, 회전 및 알파 값 변화
-		{
-			m_bIsRender = TRUE;
-
-			m_UIObjDesc.vDegree.z += _fAccTime * 10.f;
-			m_pTransformCom->Rotation(XMVectorSet(AXIS_Z), XMConvertToRadians(m_UIObjDesc.vDegree.z));
-			m_pTransformCom->Set_Scaled(m_UIObjDesc.vSize.x, m_UIObjDesc.vSize.y, m_UIObjDesc.vSize.z);
-
-			m_UIObjDesc.fAlpha -= 1.f / 255.f * _fAccTime;
-		}
-		*/
 	
-		if (m_UIObjDesc.wstrUITag == TEXT("Font100_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font10_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font1_Shadow")
-			|| m_UIObjDesc.wstrUITag == TEXT("Font100") || m_UIObjDesc.wstrUITag == TEXT("Font10") || m_UIObjDesc.wstrUITag == TEXT("Font1"))
+		if (TEXT("Font100_Shadow") == m_UIObjDesc.wstrUITag || TEXT("Font10_Shadow") == m_UIObjDesc.wstrUITag || TEXT("Font1_Shadow") == m_UIObjDesc.wstrUITag
+			|| TEXT("Font100") == m_UIObjDesc.wstrUITag || TEXT("Font10") == m_UIObjDesc.wstrUITag || TEXT("Font1") == m_UIObjDesc.wstrUITag)
 		{
 			if (m_IsMovingUP)
 			{
-				_float4 vCurPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-				vCurPos.y += 50.0f;
-				m_pTransformCom->Set_State(CTransform::STATE_POSITION, vCurPos);
-				m_IsMovingUP = FALSE;
+				vCurPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+				vCurPos.y += 5.f;
+				m_UIObjDesc.vPos.y = vCurPos.y;
+				m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_UIObjDesc.vPos);
+				
+				if (_fAccTime > 0.03f)
+					m_IsMovingUP = FALSE;
 			}
-
 			else //m_IsMovingUP == FALSE;
 			{
-				_float4 vCurPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-				vCurPos.y -= 50.0f;
-				m_pTransformCom->Set_State(CTransform::STATE_POSITION, vCurPos);
+				vCurPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+				vCurPos.y -= 5.f;
+				m_UIObjDesc.vPos.y = vCurPos.y;
+				m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_UIObjDesc.vPos);
+
+				if (m_vInitPos.y >= m_UIObjDesc.vPos.y)
+					m_UIObjDesc.vPos.y = m_vInitPos.y;
+
 				m_IsMovingUP = TRUE;
+				_fAccTime = 0.f;
 			}
 		}
+
 	break;
+
 	}
-}
+ }
 
 CHUD_StarPoint* CHUD_StarPoint::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
