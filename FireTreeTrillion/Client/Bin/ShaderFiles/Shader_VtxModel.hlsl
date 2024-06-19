@@ -381,14 +381,14 @@ PS_OUT_EFFECT PS_MAIN_WHITE_FX(PS_IN In)
         discard;
     
 
-    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord + g_vUVOffset);
+    vector vDiffuse = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord + g_vUVOffset);
     
     //알파가 0일때, 혹은 검은색일때 자르기
     if (vDiffuse.a < .01f || (vDiffuse.r < 0.1f && vDiffuse.g < 0.1f && vDiffuse.b < 0.1f))
         discard;
 
     Out.vColor.rgb = g_vRColor;
-    Out.vColor.a = vDiffuse.a * g_fAlpha;
+    Out.vColor.a = vDiffuse.a * g_fAlpha * vMask.r;
 
     return Out;
 }

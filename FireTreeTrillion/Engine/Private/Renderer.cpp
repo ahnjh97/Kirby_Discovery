@@ -651,6 +651,8 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 	{
 		m_DestColorData = Find_ColorSet("Stage1");
 		m_fRimLightRatio.second = 1.f;
+
+		m_pGameInstance->StopSound(CHANNEL_BGM);
 		m_pGameInstance->PlayBGM(L"Running Through the New World.mp3");
 
 		CEffect::FX_DESC FXDesc{};
