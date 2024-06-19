@@ -144,6 +144,8 @@ float4 g_vLightSpecular;
 
 
 bool g_bRimTest;
+//전역 림 라이트 적용 배율
+float g_fRimLightRatio;
 
 float g_fBlackBackGround;
 
@@ -941,13 +943,13 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
     }
 
     //////// 림 라이트
-    vector vRimLightDesc = g_RimLightTexture.Sample(ClampSampler, In.vTexcoord);
+    vector vRimLightDesc = g_RimLightTexture.Sample(ClampSampler, In.vTexcoord) ;
     float4 vLook = g_vCamPosition - vWorldPos;
     vector vNormalDesc = g_NormalTexture.Sample(PointSampler, In.vTexcoord);
     float4 vNormal = float4(vNormalDesc.xyz * 2.f - 1.f, 0.f);
     
     if (vRimLightDesc.g > 0.01f && vRimLightDesc.b == 1.f)
-        Out.vColor += (1.f - (clamp(pow(dot(normalize(vLook), normalize(vNormal)), vRimLightDesc.g), 0.f, 1.f)));
+        Out.vColor += (1.f - (clamp(pow(dot(normalize(vLook), normalize(vNormal)), vRimLightDesc.g), 0.f, 1.f))) * g_fRimLightRatio;
     /////////
     
         
