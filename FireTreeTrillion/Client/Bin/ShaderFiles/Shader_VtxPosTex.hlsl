@@ -27,16 +27,17 @@ float g_fAlarmColor = { 0.f };
 // 회전된 UV를 계산
 float2 RotateUV(float2 vCoord, float fAngle)
 {
-    float2 vCenter = (0.5, 0.5);
-    
+    float2 vCenter = float2(0.5, 0.5); // 중점 좌표 설정
+
     float fSinAngle = sin(fAngle);
     float fCosAngle = cos(fAngle);
     float2x2 RotationMatrix = float2x2(fCosAngle, -fSinAngle, fSinAngle, fCosAngle);
 
+    // 텍스처 좌표를 중점을 기준으로 이동시키고 회전 변환 적용
     vCoord -= vCenter;
     vCoord = mul(vCoord, RotationMatrix);
     vCoord += vCenter;
-    
+
     return vCoord;
 }
 
@@ -225,10 +226,16 @@ PS_OUT PS_MAIN_WHITEFX(PS_IN_ALPHABLEND In)
 
     //마스크 값으로 자르기
     vector vMask = g_MaskTexture.Sample(ClampSampler, RotateUV(In.vTexcoord + g_vMaskUVOffset, g_fMaskUVAngle));
-    if (vMask.a < g_fMaskThreshold)
-        discard;
-    else if (vMask.r < g_fMaskThreshold)
-        discard;
+    
+    bool bMaskAlpha = false;
+    if (vMask.a < .1f)
+        bMaskAlpha = true;
+    
+    //if (vMask.a < g_fMaskThreshold)
+    //    discard;
+    //else if (vMask.r < g_fMaskThreshold)
+    //    discard;
+    
     
     //diffuse 알파 테스팅
     vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord + g_vUVOffset);
@@ -236,7 +243,8 @@ PS_OUT PS_MAIN_WHITEFX(PS_IN_ALPHABLEND In)
         discard;
     
     Out.vColor.rgb = g_vRColor;
-    Out.vColor.a = vDiffuse.a * g_fAlpha;
+    Out.vColor.a = vDiffuse.a * g_fAlpha
+    * (bMaskAlpha) ? clamp(vMask.a - g_fMaskThreshold, 0.f, vMask.a - g_fMaskThreshold) : clamp(vMask.r - g_fMaskThreshold, 0.f, vMask.r - g_fMaskThreshold);
 	
     return Out;
 }

@@ -643,13 +643,11 @@ static _bool Vacuum_Object(CKirby* pKirby, _float fTimeDelta)
 			else
 			{
 				_vector vLook = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
-				// 내적 ( 30도 )
 				_float fDot = XMVectorGetX(XMVector3Dot(XMVector3Normalize(vObjectDir), vLook));
-				// 각도 계산 (도 단위)
 				_float fDegrees = XMConvertToDegrees(acosf(fDot));
 
-				// 각도가 30도 이상이면 스킵한다.
-				if (fDegrees > 60.f)
+				// 각도가 내가 보는 기준 90도 이상이면 스킵한다.
+				if (fDegrees > 45.f)
 					continue;
 
 				// 작은 흡입일때 진정코 흡수를 시작한다.
@@ -675,7 +673,6 @@ static _bool Vacuum_Object(CKirby* pKirby, _float fTimeDelta)
 		// 참조하면서 애니메이션으로 끌고간다.
 		Safe_AddRef(DESC(m_pObject));
 		// 커비가 동일한 애니메이션으로 몬스터를 포착해서 꽤 긴 시간동안 서로 짝짝꿍하겠다는 것이다.
-		//pKirby->Set_PhyXState(PO_VACUUMING);
 		DESC(m_pObject)->Set_PhyXState(PO_VACUUMING);
 		pKirby->Change_State(CKirby::STATE_VACUUM, 50.f, true, true, CKirby::BODY_VACUUM);
 		return true;
@@ -685,7 +682,6 @@ static _bool Vacuum_Object(CKirby* pKirby, _float fTimeDelta)
 	// 1차로 우선순위인 몬스터들 순회를 돈다.
 	if (nullptr != GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), g_strLayerMonster))
 	{
-
 		for (auto& pObject : *GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), g_strLayerMonster))
 		{
 			if (static_cast<CPhysXObject*>(pObject)->Get_PhyXState() != PO_NORMAL)
@@ -703,13 +699,11 @@ static _bool Vacuum_Object(CKirby* pKirby, _float fTimeDelta)
 			else
 			{
 				_vector vLook = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
-				// 내적 ( 30도 )
 				_float fDot = XMVectorGetX(XMVector3Dot(XMVector3Normalize(vObjectDir), vLook));
-				// 각도 계산 (도 단위)
 				_float fDegrees = XMConvertToDegrees(acosf(fDot));
 
-				// 각도가 30도 이상이면 스킵한다.
-				if (fDegrees > 60.f)
+				// 각도가 내가 보는 기준 90도 이상이면 스킵한다.
+				if (fDegrees > 45.f)
 					continue;
 
 				// 사이즈가 작을 경우
@@ -752,8 +746,6 @@ static _bool Vacuum_Object(CKirby* pKirby, _float fTimeDelta)
 	{
 		// 참조하면서 애니메이션으로 끌고간다.
 		Safe_AddRef(DESC(m_pObject));
-		// 커비가 동일한 애니메이션으로 몬스터를 포착해서 꽤 긴 시간동안 서로 짝짝꿍하겠다는 것이다.
-		//pKirby->Set_PhyXState(PO_VACUUMING);
 		DESC(m_pObject)->Set_PhyXState(PO_VACUUMING);
 
 		if (DESC(m_pObject)->Get_VacuumSize() == SIZE_SMALL)
@@ -764,10 +756,119 @@ static _bool Vacuum_Object(CKirby* pKirby, _float fTimeDelta)
 		return true;
 	}
 
+	// 2차 순위인 아이템 순회를 돈다.
+	if (nullptr != GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), g_strLayerItem))
+	{
+		for (auto& pObject : *GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), g_strLayerItem))
+		{
+			if (static_cast<CPhysXObject*>(pObject)->Get_PhyXState() != PO_NORMAL)
+				continue;
 
-	// 이 이후로는 아이템, 돌멩이 등 진행하여야 한다.
+			CTransform* pObjectTransform = pObject->Get_TransformCom();
+			_vector vObjectPos = pObjectTransform->Get_State_Vector(CTransform::STATE_POSITION);
+			_vector vObjectDir = vObjectPos - vPos;
+			_float fObjectDistance = XMVectorGetX(XMVector3Length(vObjectDir));
+			// 만약, 목표 오브젝트가 거리보다 멀었을 경우
+			if (fObjectDistance > fDistance)
+				continue;
 
+			// 만약, 목표 오브젝트가 거리보다 가까웠을 경우
+			else
+			{
+				_vector vLook = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+				_float fDot = XMVectorGetX(XMVector3Dot(XMVector3Normalize(vObjectDir), vLook));
+				_float fDegrees = XMConvertToDegrees(acosf(fDot));
 
+				// 각도가 내가 보는 기준 90도 이상이면 스킵한다.
+				if (fDegrees > 45.f)
+					continue;
+
+				// 작은 흡입일때 진정코 흡수를 시작한다.
+				if (pKirby->Get_State() == CKirby::STATE_INHALE ||
+					pKirby->Get_State() == CKirby::STATE_INHALEFALL ||
+					pKirby->Get_State() == CKirby::STATE_INHALELANDING ||
+					pKirby->Get_State() == CKirby::STATE_INHALEWALK ||
+					pKirby->Get_State() == CKirby::STATE_SUPERINHALEWALK ||
+					pKirby->Get_State() == CKirby::STATE_SUPERINHALE ||
+					pKirby->Get_State() == CKirby::STATE_SUPERINHALESTART)
+				{
+					fDistance = fObjectDistance;
+					DESC(m_pObject) = static_cast<CPhysXObject*>(pObject);
+					DESC(m_vObjectScale) = pObjectTransform->Get_Scaled();
+					DESC(m_fObjectDistance) = fObjectDistance;
+				}
+			}
+		}
+
+	}
+
+	if (DESC(m_pObject) != nullptr)
+	{
+		// 참조하면서 애니메이션으로 끌고간다.
+		Safe_AddRef(DESC(m_pObject));
+		// 커비가 동일한 애니메이션으로 몬스터를 포착해서 꽤 긴 시간동안 서로 짝짝꿍하겠다는 것이다.
+		//pKirby->Set_PhyXState(PO_VACUUMING);
+		DESC(m_pObject)->Set_PhyXState(PO_VACUUMING);
+		pKirby->Change_State(CKirby::STATE_VACUUM, 50.f, true, true, CKirby::BODY_VACUUM);
+		return true;
+	}
+
+	// 3차 순위인 돌멩이 등 지형 사물을 흡수한다.
+	if (nullptr != GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), g_strLayerMapObject))
+	{
+		for (auto& pObject : *GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), g_strLayerMapObject))
+		{
+			if (static_cast<CPhysXObject*>(pObject)->Get_PhyXState() != PO_NORMAL)
+				continue;
+
+			CTransform* pObjectTransform = pObject->Get_TransformCom();
+			_vector vObjectPos = pObjectTransform->Get_State_Vector(CTransform::STATE_POSITION);
+			_vector vObjectDir = vObjectPos - vPos;
+			_float fObjectDistance = XMVectorGetX(XMVector3Length(vObjectDir));
+			// 만약, 목표 오브젝트가 거리보다 멀었을 경우
+			if (fObjectDistance > fDistance)
+				continue;
+
+			// 만약, 목표 오브젝트가 거리보다 가까웠을 경우
+			else
+			{
+				_vector vLook = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+				_float fDot = XMVectorGetX(XMVector3Dot(XMVector3Normalize(vObjectDir), vLook));
+				_float fDegrees = XMConvertToDegrees(acosf(fDot));
+
+				// 각도가 내가 보는 기준 90도 이상이면 스킵한다.
+				if (fDegrees > 45.f)
+					continue;
+
+				// 작은 흡입일때 진정코 흡수를 시작한다.
+				if (pKirby->Get_State() == CKirby::STATE_INHALE ||
+					pKirby->Get_State() == CKirby::STATE_INHALEFALL ||
+					pKirby->Get_State() == CKirby::STATE_INHALELANDING ||
+					pKirby->Get_State() == CKirby::STATE_INHALEWALK ||
+					pKirby->Get_State() == CKirby::STATE_SUPERINHALEWALK ||
+					pKirby->Get_State() == CKirby::STATE_SUPERINHALE ||
+					pKirby->Get_State() == CKirby::STATE_SUPERINHALESTART)
+				{
+					fDistance = fObjectDistance;
+					DESC(m_pObject) = static_cast<CPhysXObject*>(pObject);
+					DESC(m_vObjectScale) = pObjectTransform->Get_Scaled();
+					DESC(m_fObjectDistance) = fObjectDistance;
+				}
+			}
+		}
+
+	}
+
+	if (DESC(m_pObject) != nullptr)
+	{
+		// 참조하면서 애니메이션으로 끌고간다.
+		Safe_AddRef(DESC(m_pObject));
+		// 커비가 동일한 애니메이션으로 몬스터를 포착해서 꽤 긴 시간동안 서로 짝짝꿍하겠다는 것이다.
+		//pKirby->Set_PhyXState(PO_VACUUMING);
+		DESC(m_pObject)->Set_PhyXState(PO_VACUUMING);
+		pKirby->Change_State(CKirby::STATE_VACUUM, 50.f, true, true, CKirby::BODY_VACUUM);
+		return true;
+	}
 
 	return false;
 }
@@ -803,12 +904,12 @@ static _float4 Spit_Target_Object(CKirby* pKirby)
 			else
 			{
 				_vector vLook = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
-				// 내적 ( 30도 )
 				_float fDot = XMVectorGetX(XMVector3Dot(XMVector3Normalize(vObjectDir), vLook));
 				// 각도 계산 (도 단위)
 				_float fDegrees = XMConvertToDegrees(acosf(fDot));
 
-				if (fDegrees > 60.f)
+				// 60도
+				if (fDegrees > 30.f)
 					continue;
 
 				// 최고기록 갱신
@@ -1027,7 +1128,31 @@ static void SwordSlash_Final(CTransform* pTransformCom)
 	MultiFXDesc.vInitRot = _float3{ 0.f, CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK)).y, 0.f };
 	MultiFXDesc.vInitScale = { 5.f, 5.f, 5.f };
 	MultiFXDesc.fStartDelay = .1f;
-	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SwordTrail_One"), &MultiFXDesc)))
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SwordTrail_Last"), &MultiFXDesc)))
+		return;
+}
+
+static void SwordSlash_Up(CTransform* pTransformCom)
+{
+	CEffect::FX_DESC FXDesc{};
+
+	FXDesc.vInitPos = static_cast<_float3>(pTransformCom->Get_State(CTransform::STATE_POSITION) + _float4{ 0.f, .3f, 0.f, 0.f } + pTransformCom->Get_State(CTransform::STATE_LOOK) * 2.f);
+	FXDesc.vInitRot = _float3{ 0.f, CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK)).y, 0.f };
+	FXDesc.vInitScale = { 5.f, 5.f, 5.f };
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Sword Upward Slash A"), &FXDesc)))
+		return;
+}
+
+static void SwordDash(CTransform* pTransformCom)
+{
+	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+
+	MultiFXDesc.vInitPos = _float3{ 0.f, 0.f, 4.f };
+	//MultiFXDesc.vInitRot = _float3{ 0.f, CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK)).y, 0.f };
+	MultiFXDesc.vInitScale = { 3.f, 3.f, 3.f };
+	MultiFXDesc.fStartDelay = .1f;
+	MultiFXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Sword Dash Test A"), &MultiFXDesc)))
 		return;
 }
 

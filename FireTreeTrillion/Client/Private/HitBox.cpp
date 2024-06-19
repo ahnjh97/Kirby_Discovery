@@ -14,6 +14,7 @@ CHitBox::CHitBox(const CHitBox& rhs)
 
 HRESULT CHitBox::Initialize_Prototype()
 {
+
 	return S_OK;
 }
 
@@ -39,7 +40,7 @@ HRESULT CHitBox::Initialize(void* pArg)
 
 _int CHitBox::Tick(_float fTimeDelta)
 {
-	if (m_pOwner->Get_Dead())
+	if (m_pOwner == nullptr || m_pOwner->Get_Dead() == true)
 		return OBJ_DEAD;
 
 
@@ -222,6 +223,19 @@ void CHitBox::Render_IMGUI()
 
 void CHitBox::Restore_Logic(_float fTimeDelta)
 {
+	// true라면 검사를 하지않는것이다.
+	_bool bDontAddCollisionCenter = { false };
+
+	CGameObject* pPlayer = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"));
+	if (pPlayer == nullptr)
+		return;
+
+	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	_float4 vPlayerPos = pPlayer->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
+
+	if ((vPlayerPos - vPos).Length() > 40.f)
+		bDontAddCollisionCenter = true;
+
 	// 몸통 전용 콜라이더 일 경우. (내가 가지고 있는 구조체 벨류 값)
 	if (m_pOwnerCollisionDesc->eValue == BODY)
 	{
@@ -237,7 +251,8 @@ void CHitBox::Restore_Logic(_float fTimeDelta)
 
 		if (m_pOwnerCollisionDesc->bAlive == true)
 		{
-			CCollisionCenter::Get_Instance()->Add_Collision((COLLISION_TYPE)m_eCollisionGroup, this);
+			if (bDontAddCollisionCenter == false)
+				CCollisionCenter::Get_Instance()->Add_Collision((COLLISION_TYPE)m_eCollisionGroup, this);
 		}
 	}
 	// 공격 전용 콜라이더 일 경우. (내가 가지고 있는 구조체 벨류 값)
@@ -259,7 +274,8 @@ void CHitBox::Restore_Logic(_float fTimeDelta)
 			}
 			else
 			{
-				CCollisionCenter::Get_Instance()->Add_Collision((COLLISION_TYPE)m_eCollisionGroup, this);
+				if (bDontAddCollisionCenter == false)
+					CCollisionCenter::Get_Instance()->Add_Collision((COLLISION_TYPE)m_eCollisionGroup, this);
 			}
 		}
 	}
@@ -314,9 +330,8 @@ CGameObject* CHitBox::Clone(void* pArg)
 
 void CHitBox::Free()
 {
+	__super::Free();
 	Safe_Release(m_pOwner);
 	Safe_Release(m_pOwnerTransform);
-	__super::Free();
-
 }
 

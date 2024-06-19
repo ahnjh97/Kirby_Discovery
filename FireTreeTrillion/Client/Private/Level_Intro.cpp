@@ -43,9 +43,6 @@ HRESULT CLevel_Intro::Initialize()
 	hr = Ready_Layer_BackGround(TEXT("Layer_BackGround"));
 	CHECK_FAILED(hr);
 
-	//hr = Ready_Layer_Monsters(TEXT("Layer_Monster"));
-	//CHECK_FAILED(hr);
-
 	hr = Ready_Layer_UI(TEXT("Layer_UI"));
 	CHECK_FAILED(hr);
 

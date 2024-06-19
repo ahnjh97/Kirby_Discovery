@@ -61,6 +61,9 @@ public:
 	void	Delete_AllEffect();
 	void	Delete_Effect(string strTag);
 
+	// 어택만 Character에서 빼 왔다. 공격력은 총알에도 있을 수 있기 때문임.
+	_float	Get_Attack() { return m_fAttack; }
+	_float	m_fAttack = { 0.f };
 
 
 public:

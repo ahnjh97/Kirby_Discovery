@@ -54,6 +54,7 @@
 
 //어떤 범위 안의 값을 다른 범위로 매핑한다.
 #define MAPVALUE(x,  min1,  max1,  min2,  max2) (min2 + (x - min1) * (max2 - min2) / (max1 - min1))
+#define SATURATE(x) (clamp(x, 0.f, 1.f))
 
 //float 보간 매크로
 #define LERP(start, dest, curRatio) _float(start + curRatio * (dest - start))

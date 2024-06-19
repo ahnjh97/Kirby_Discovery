@@ -35,14 +35,17 @@ HRESULT CBrontoBurt::Initialize(void* pArg)
 		m_vecRallyPoint = pBrontoBurtDesc->vecRallyPoints;
 	}
 
-	for (_int i = 0; i < m_vecRallyPoint.size(); i++)
-		m_vecRallyPoint[i].y += 3.f;
-
 	if (FAILED(__super::Initialize(pBrontoBurtDesc)))
 		return E_FAIL;
 
+	//for (_int i = 0; i < m_vecRallyPoint.size(); i++)
+	//	m_vecRallyPoint[i].y += m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION).y;
+
 	if(MON_PATROL == m_eMonState)
+	{
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecRallyPoint[0]);
+		m_vRally = m_vecRallyPoint[1] - m_vecRallyPoint[0];
+	}
 	else
 	{
 		m_fDistance = XMVectorGetX(XMVector3Length(m_vecRallyPoint[0] - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
@@ -52,7 +55,7 @@ HRESULT CBrontoBurt::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	m_pModelCom->Set_Animation(BRONTOBURT_FLY, 50.f, true, true);
+	m_pModelCom->Set_Animation(BRONTOBURT_FLY, 40.f, true, true);
 
 
 	m_fMaxHp = 15.f;
@@ -62,10 +65,10 @@ HRESULT CBrontoBurt::Initialize(void* pArg)
 	m_eAbilityType = ABILITY_DEFAULT;
 	m_eEyeState = BRONTOBURTEYE_IDLE;
 
-	m_fSpeed = 5.f;
+	m_fSpeed = 4.f;
 	
 	if(MON_PATROL == m_eMonState)
-		m_pTransformCom->Look_At_Dir(m_vecRallyPoint[0] - m_vecRallyPoint[1]);
+		m_pTransformCom->Look_At_Dir(m_vecRallyPoint[1] - m_vecRallyPoint[0]);
 
 	Set_Slope(false);
 
@@ -129,42 +132,41 @@ _int CBrontoBurt::Tick(_float fTimeDelta)
 		}
 		else if (MON_PATROL == m_eMonState)
 		{
-			m_fMoveTime += m_fTimeDelta;
-			//if (1.f < m_fMoveTime)
-			//	m_fSpeed -= m_fTimeDelta * 10.f;
-			//else if (1.f >= m_fMoveTime)
-			//	m_fSpeed += m_fTimeDelta * 10.f;
+			_float fDistance = { 0.f };
 
-			if (2.f < m_fMoveTime)
+			fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), m_vecRallyPoint[m_iCnt + 1])));
+
+			if (0.1f < fDistance)
+				m_pControllerCom->Move_Dir(m_pTransformCom, XMVector3Normalize(m_vRally) * m_fTimeDelta * m_fSpeed, m_fTimeDelta);
+			else
 			{
-				m_fMoveTime = 0.f;
-				//m_fSpeed = 0.f;
-
-				if (m_iCnt == 0)
+				if (m_iCnt < m_vecRallyPoint.size() - 2)
 				{
-					m_bConvert = false;
-					m_vRally = m_vecRallyPoint[m_iCnt + 1] - m_vecRallyPoint[m_iCnt];
-					m_iCnt++;
-				}
-				else if (m_iCnt < m_vecRallyPoint.size() - 1)
-				{
-					if (false == m_bConvert)
+					if(false == m_bConvert)
 					{
-						m_vRally = m_vecRallyPoint[m_iCnt + 1] - m_vecRallyPoint[m_iCnt];
 						m_iCnt++;
+						m_vRally = m_vecRallyPoint[m_iCnt + 1] - m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 					}
 					else
 					{
 						m_iCnt--;
-						m_vRally = m_vecRallyPoint[m_iCnt] - m_vecRallyPoint[m_iCnt + 1];
+						m_vRally = m_vecRallyPoint[m_iCnt + 1] - m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 					}
 				}
 				else
 				{
-					//m_iCnt = 0;
-					m_bConvert = true;
-					m_iCnt--;
-					m_vRally = m_vecRallyPoint[m_iCnt] - m_vecRallyPoint[m_iCnt + 1];
+					if (false == m_bConvert)
+					{
+						m_iCnt--;
+						m_bConvert = true;
+						m_vRally = m_vecRallyPoint[m_iCnt + 1] - m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+					}
+					else
+					{
+						m_bConvert = false;
+						m_iCnt++;
+						m_vRally = m_vecRallyPoint[m_iCnt + 1] - m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+					}
 				}
 			}
 
@@ -175,8 +177,20 @@ _int CBrontoBurt::Tick(_float fTimeDelta)
 				fAngle = -fAngle;
 			if (abs(fAngle) >= XMConvertToRadians(3.f))
 				m_pTransformCom->Turn(::XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * fAngle * 5.f);
+			//_vector   vLook = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+			//_float fAngle = ::XMVectorGetX(::XMVector3AngleBetweenVectors(vLook, XMLoadFloat4(&m_vRally)));
+			//_float fY = ::XMVectorGetY(::XMVector3Cross(vLook, XMLoadFloat4(&m_vRally)));
+			//if (fY < 0)
+			//	fAngle = -fAngle;
+			//if (abs(fAngle) >= XMConvertToRadians(3.f))
+			//	m_pTransformCom->Turn(::XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * fAngle * 5.f);
 
-			m_pControllerCom->Move_Dir(m_pTransformCom, XMVector3Normalize(m_vRally) * m_fTimeDelta * m_fSpeed, m_fTimeDelta);
+			//m_pControllerCom->Move_Dir(m_pTransformCom, XMVector3Normalize(m_vRally) * m_fTimeDelta * m_fSpeed, m_fTimeDelta);
+			//_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), m_vecRallyPoint[m_iCnt])));
+
+			//if (0.1f < fDistance)
+			//	m_pControllerCom->Move_Dir(m_pTransformCom, XMVector3Normalize(m_vRally) * m_fTimeDelta * m_fSpeed, m_fTimeDelta);
+			//m_pControllerCom->Move_Dir(m_pTransformCom, XMVector3Normalize(m_vRally) * m_fTimeDelta * m_fSpeed, m_fTimeDelta);
 		}
 	}
 	
@@ -194,16 +208,15 @@ void CBrontoBurt::Late_Tick(_float fTimeDelta)
 	if (m_ePhyXState == PO_KIRBYMOUTH)
 		return;
 
-	// 날아갈 땐, 애니메이션 재생이 되지 않는다.
-	if (m_ePhyXState != PO_FLYAWAY)
-	{
-		m_ePhyXState == PO_FLYDEADAWAY ? m_pModelCom->Play_Animation(m_fTimeDelta * 0.3f) : m_pModelCom->Play_Animation(m_fTimeDelta);
-	}
-
-	m_pModelCom->Play_Animation(m_fTimeDelta);
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
+		// 날아갈 땐, 애니메이션 재생이 되지 않는다.
+		if (m_ePhyXState != PO_FLYAWAY)
+		{
+			if (Compute_OptimizationAnimation(m_fTimeDelta) == true)
+				m_ePhyXState == PO_FLYDEADAWAY ? m_pModelCom->Play_Animation(m_fAccTime * 0.3f) : m_pModelCom->Play_Animation(m_fAccTime);
+		}
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 	}
@@ -297,6 +310,9 @@ void CBrontoBurt::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObjec
 			m_vLastPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 			Change_State(BRONTOBURT_DAMAGE, 50.f, false, true);
 			m_eEyeState = BRONTOBURTEYE_HALF;
+
+			if (true == m_bReturn)
+				return;
 			m_bReturn = true;
 		}
 	}
@@ -332,13 +348,14 @@ HRESULT CBrontoBurt::Add_Components()
 
 	/* For.Com_CharacterController */
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+	vPos.y += 1.f;
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
 	desc.fOffset = 1.f;
 	desc.uCollisionType = m_eCollisionGroup;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
-	m_pControllerCom->Set_Object(this);
+	//m_pControllerCom->Set_Object(this);
 
 	//m_pControllerCom->Set_CollisionType(m_eCollisionGroup);
 

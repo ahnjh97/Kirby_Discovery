@@ -62,6 +62,9 @@ _int CPoppyBomb::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return OBJ_DEAD;
 
+	if (static_cast<CPoppyBrosJr*>(m_pGameObject)->Get_Dead())
+		m_bDead = true;
+
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
 	// 바닥에 닿았을 때 물리 영향을 받음
@@ -254,7 +257,7 @@ HRESULT CPoppyBomb::Add_Components()
 	desc.uCollisionType = m_eCollisionGroup;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
-	m_pControllerCom->Set_Object(this);
+	//m_pControllerCom->Set_Object(this);
 	//m_pControllerCom->Set_CollisionType(m_eCollisionGroup);
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vPosition);

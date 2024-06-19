@@ -354,6 +354,23 @@ CKirbySword_Guard_State::CKirbySword_Guard_State()
 void CKirbySword_Guard_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+
+	switch (_iAnimIndex)
+	{
+	case CKirby::SWORDSTATE_UPWARDSLASH:
+	{
+		SwordSlash_Up(pKirby->Get_TransformCom());
+	}
+	break;
+	case CKirby::SWORDSTATE_SWORDSLIDESTART:
+	{
+		SwordDash(pKirby->Get_TransformCom());
+	}
+	break;
+	default:
+		break;
+	}
 }
 
 void CKirbySword_Guard_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)

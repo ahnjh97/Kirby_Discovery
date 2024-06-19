@@ -217,6 +217,8 @@ private:
 	COLOR_DATA m_DestColorData{};
 	map<string, COLOR_DATA> m_ColorSets;
 
+	pair<_float, _float> m_fRimLightRatio = { 1.f, 1.f };
+
 #ifdef _DEBUG
 private:
 	HRESULT Render_Debug();
