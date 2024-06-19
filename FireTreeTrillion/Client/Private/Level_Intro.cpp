@@ -781,7 +781,7 @@ HRESULT CLevel_Intro::Ready_Items()
 
 		if ("Item_Coin" == strModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Item"), TEXT("Prototype_GameObject_Coin"), &tDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Item"), TEXT("Prototype_GameObject_Coin"), &tDesc)))
 				return E_FAIL;
 		}
 	}

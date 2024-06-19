@@ -101,7 +101,7 @@ HRESULT CMultiEffect::Initialize(void* pArg)
 
 				wstring wstrProtoName = L"Prototype_GameObject_" + CUtils::StrToWstr(FXName);
 
-				CSingleEffect* pFX = static_cast<CSingleEffect*>(m_pGameInstance->Clone_GameObject(wstrProtoName, &SingleFXDesc));
+				CEffect* pFX = static_cast<CEffect*>(m_pGameInstance->Clone_GameObject(wstrProtoName, &SingleFXDesc));
 				CHECK_NULLPTR(pFX);
 
 				m_FXs.push_back(pFX);

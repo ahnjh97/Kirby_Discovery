@@ -395,6 +395,17 @@ HRESULT CUtils::Load_Effect(path _FilePath, PARTICLE_DATA* _pData)
 	_pData->strMaskTexName.resize(_pData->iMaskTexStrLen);
 	InputFile.read(&_pData->strMaskTexName[0], _pData->iMaskTexStrLen);
 
+	InputFile.read(reinterpret_cast<char*>(&_pData->iPassIdx), sizeof(_int));
+	InputFile.read(reinterpret_cast<char*>(&_pData->iTexIdx), sizeof(_int));
+	InputFile.read(reinterpret_cast<char*>(&_pData->iMaskTexIdx), sizeof(_int));
+
+	InputFile.read(reinterpret_cast<char*>(&_pData->bIsLoop), sizeof(_bool));
+	InputFile.read(reinterpret_cast<char*>(&_pData->bIsBillboard), sizeof(_bool));
+	InputFile.read(reinterpret_cast<char*>(&_pData->bIsBloom), sizeof(_bool));
+
+
+
+	InputFile.read(reinterpret_cast<char*>(&_pData->iNumInstance), sizeof(_int));
 
 	InputFile.read(reinterpret_cast<char*>(&_pData->fDuration), sizeof(_float));
 
@@ -419,29 +430,29 @@ HRESULT CUtils::Load_Effect(path _FilePath, PARTICLE_DATA* _pData)
 	InputFile.read(reinterpret_cast<char*>(&_pData->fSpeed), sizeof(_float));
 	InputFile.read(reinterpret_cast<char*>(&_pData->fSpeedRandomOffset), sizeof(_float));
 
-	InputFile.read(reinterpret_cast<char*>(&_pData->fAlpha), sizeof(_float3));
-	InputFile.read(reinterpret_cast<char*>(&_pData->fAlphaRandomOffset), sizeof(_float3));
+	InputFile.read(reinterpret_cast<char*>(&_pData->vColor), sizeof(_float3));
+	InputFile.read(reinterpret_cast<char*>(&_pData->vColorRandomOffset), sizeof(_float3));
+
+	InputFile.read(reinterpret_cast<char*>(&_pData->fAlpha), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&_pData->fAlphaRandomOffset), sizeof(_float));
 
 
 	InputFile.read(reinterpret_cast<char*>(&_pData->vPivot), sizeof(_float3));
 
 
-	InputFile.read(reinterpret_cast<char*>(&_pData->bIsLoop), sizeof(_bool));
-	InputFile.read(reinterpret_cast<char*>(&_pData->bIsBillboard), sizeof(_bool));
-	//InputFile.read(reinterpret_cast<char*>(&_pData->bIsColorRender), sizeof(_bool));
-	InputFile.read(reinterpret_cast<char*>(&_pData->bIsBloom), sizeof(_bool));
+	InputFile.read(reinterpret_cast<char*>(&_pData->iMoveCommandsNum), sizeof(_int));
+	_pData->vecMoveCommands.clear();
+	_pData->vecMoveCommands.reserve(_pData->iMoveCommandsNum);
 
 
-	InputFile.read(reinterpret_cast<char*>(&_pData->iMoveCommandsNum), sizeof(_uint));
-
-	_pData->vecMoveCommands.resize(_pData->iMoveCommandsNum);
-
-	for (auto& KF : _pData->vecMoveCommands)
+	for (_int i = 0; i < _pData->iMoveCommandsNum; ++i)
 	{
-		InputFile.read(reinterpret_cast<char*>(&KF), sizeof(_bool));
+		_bool bTemp = { false };
+		InputFile.read(reinterpret_cast<char*>(&bTemp), sizeof(_bool));
+		_pData->vecMoveCommands.emplace_back(bTemp);
 	}
 
-	InputFile.read(reinterpret_cast<char*>(&_pData->eRenderGroup), sizeof(_uint));
+	InputFile.read(reinterpret_cast<char*>(&_pData->eRenderGroup), sizeof(_int));
 	InputFile.read(reinterpret_cast<char*>(&_pData->eTimer), sizeof(TIMER));
 
 	return S_OK;

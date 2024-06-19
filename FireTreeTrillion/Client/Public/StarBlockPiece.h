@@ -1,7 +1,6 @@
 #pragma once
 #include "Client_Defines.h"
 #include "RigidObject.h"
-#include "Trigger.h"
 
 BEGIN(Engine)
 class CModel;

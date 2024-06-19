@@ -33,8 +33,6 @@ HRESULT CStarBlock::Initialize(void* pArg)
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(-3.f, 7.f, -188.f, 1.f));
 	Add_Components();
 
-	m_pControllerCom->Register_Controller();
-
 	return S_OK;
 }
 

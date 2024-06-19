@@ -449,6 +449,7 @@ void CAwoofy_Damage_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _flo
 	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
 
 	m_vKirbyLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+	m_fDeadMaxTime = CUtils::Make_RandomFloat(0.35f, 0.7f);
 
 }
 
@@ -526,7 +527,7 @@ void CAwoofy_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 		pAwoofy->Set_DamageJumpPower(fDamageJumpPower);
 
-		if (m_fDeadTime > 0.4f || pController->Is_Terrain())
+		if (m_fDeadTime > m_fDeadMaxTime || pController->Is_Terrain())
 			pAwoofy->Set_Dead();
 
 	}

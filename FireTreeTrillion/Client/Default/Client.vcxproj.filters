@@ -286,6 +286,9 @@
     <Filter Include="02.GameObjects\PhysXObject\MapObject\StarBlock\Piece">
       <UniqueIdentifier>{d518caec-9d94-4f91-8c37-5ac238833664}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\HitBox">
+      <UniqueIdentifier>{dab839b6-6fe3-4095-b8f6-0e1587423131}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -572,6 +575,9 @@
     <ClInclude Include="..\Public\StarBlockPiece.h">
       <Filter>02.GameObjects\PhysXObject\MapObject\StarBlock\Piece</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\HitBox.h">
+      <Filter>02.GameObjects\HitBox</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -839,6 +845,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\StarBlockPiece.cpp">
       <Filter>02.GameObjects\PhysXObject\MapObject\StarBlock\Piece</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HitBox.cpp">
+      <Filter>02.GameObjects\HitBox</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

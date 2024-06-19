@@ -38,8 +38,9 @@ void CKirbyDamage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 
 		if (pController->Is_Terrain() || pKirby->isAnimFinish())
 		{
-			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_IDLE);
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_IDLE);
+			return;
 		}
 	}
 	else if (pKirby->Get_State() == CKirby::STATE_EATDAMAGE)
@@ -55,8 +56,9 @@ void CKirbyDamage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 
 		if (pController->Is_Terrain() || pKirby->isAnimFinish())
 		{
-			pKirby->Change_State(CKirby::STATE_EATWAIT, 60.f, true, true, CKirby::BODY_BALLOON);
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			pKirby->Change_State(CKirby::STATE_EATWAIT, 60.f, true, true, CKirby::BODY_BALLOON);
+			return;
 		}
 
 	}
@@ -72,8 +74,9 @@ void CKirbyDamage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 
 		if (pController->Is_Terrain() || pKirby->isAnimFinish())
 		{
-			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_IDLE);
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_IDLE);
+			return;
 		}
 
 	}

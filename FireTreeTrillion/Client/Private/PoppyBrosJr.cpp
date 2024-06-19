@@ -3,6 +3,7 @@
 #include "FSM.h"
 #include "PoppyBrosJr_State.h"
 #include "Bone.h"
+#include "HitBox.h"
 
 CPoppyBrosJr::CPoppyBrosJr(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -216,11 +217,18 @@ HRESULT CPoppyBrosJr::Add_Components()
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	m_pControllerCom->Set_Object(this);
-	m_pControllerCom->Register_Controller();
-
-	//m_pControllerCom->Set_CollisionType(m_eCollisionGroup);
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+
+
+	CHitBox::HITBOX_DESC HitBox{};
+	HitBox.pOwner = this;
+	HitBox.pDesc = &m_tColliderDesc[BODY];
+	HitBox.pCollisionType = MONSTER;
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
+		return E_FAIL;
+	Set_BodyCollider(COLLIDER_CYLINDER, 0.5f, 1.f, 0.85f);
+
 
 	SetUp_FSM();
 
