@@ -265,7 +265,7 @@ _bool CEditor_UI::Tab_LayerList()
 				if (strUITag.empty()) //wstrUITag 값에 대한 예외처리
 					strUITag = "##";
 
-#pragma region LISTBOX 다중선택
+#pragma region LISTBOX
 				const _bool IsSelected = find(g_SelectUIs.begin(), g_SelectUIs.end(), iUI) != g_SelectUIs.end();
 				if (ImGui::Selectable(strUITag.c_str(), IsSelected)) //리스트박스 항목 선택 여부 확인
 				{
@@ -370,6 +370,8 @@ _bool CEditor_UI::Tab_GroupList()
 		}
 #pragma endregion
 		
+#pragma region LISTBOX
+
 		if (ImGui::BeginListBox(u8"##", ImVec2(-FLT_MIN, 10 * ImGui::GetTextLineHeightWithSpacing())))
 		{
 			for (size_t iGroupIx = 0; iGroupIx < m_GroupUIs.size(); ++iGroupIx)
@@ -430,9 +432,12 @@ _bool CEditor_UI::Tab_GroupList()
 		ImGui::EndTabItem();
 	}
 
+#pragma endregion
+
 	return TRUE;
 }
 
+//아니 이거 왜이럼;;
 _bool CEditor_UI::Window_Textures()
 {
 	ImGuiWindowFlags TexWindow_Flags = {}; /* ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize;*/
@@ -441,7 +446,6 @@ _bool CEditor_UI::Window_Textures()
 	if (ImGui::Begin(u8"Texture 텍스처", 0, TexWindow_Flags))
 	{
 		ImGui::SeparatorText(u8"Texture List 텍스처 목록");
-#pragma region LISTBOX
 
 		//vecUI의 UIObj 순회하며 해당 오브젝트가 가진 텍스처 목록을 출력 
 		if (ImGui::BeginListBox(u8"##Texture List", ImVec2(-FLT_MIN, 10 * ImGui::GetTextLineHeightWithSpacing())))
@@ -455,47 +459,36 @@ _bool CEditor_UI::Window_Textures()
 
 				_uint iMaxTex = pUITex->Get_NumTexture();
 				for (size_t iTex = 0; iTex < iMaxTex; ++iTex)
+				{
+					_uint iTexIndex = m_LayerUIs[g_iSelectUI]->Get_UIObj_Desc().iTexIndex;
+					string strTexTag = CUtils::WstrToStr(m_LayerUIs[g_iSelectUI]->Get_UIObj_Desc().wstrUITag);
+					strTexTag += "_" + to_string(iTex);
+
+					if (strTexTag.empty()) //strTexTag 값에 대한 예외처리
+						strTexTag = "##";
+
+					const _bool IsSelected = (g_iSelectTex == iTex);
+					if (ImGui::Selectable(strTexTag.c_str(), IsSelected))
+						g_iSelectTex = iTex;
+
+					if (IsSelected)
+					{	ImGui::SetItemDefaultFocus();		}
+
+					if (ImGui::BeginPopupContextItem()) // 우클릭하면 컨텍스트 메뉴 표시
 					{
-						_uint iTexIndex = m_LayerUIs[g_iSelectUI]->Get_UIObj_Desc().iTexIndex;
-						string strTexTag = CUtils::WstrToStr(m_LayerUIs[g_iSelectUI]->Get_UIObj_Desc().wstrUITag);
-						strTexTag += "_" + to_string(iTex);
-
-						if (strTexTag.empty()) //strTexTag 값에 대한 예외처리
-							strTexTag = "##";
-
-						const _bool IsSelected = (g_iSelectTex == iTex);
-						if (ImGui::Selectable(strTexTag.c_str(), IsSelected))
-							g_iSelectTex = iTex;
-
-						if (IsSelected)
+						if (ImGui::MenuItem(u8"Modify 변경"))
 						{
-							ImGui::SetItemDefaultFocus();
-
-							//선택 오브젝트의 텍스처를 보여줌
-							//if (!m_LayerUIs.empty())
-							//	g_iSelectTex = m_LayerUIs[g_iSelectUI]->Get_TexIndex(); 
+							if (!m_LayerUIs.empty())
+								m_LayerUIs[g_iSelectUI]->Set_TexIndex(g_iSelectTex); //선택 텍스처로 변경
 						}
-
-						if (ImGui::BeginPopupContextItem()) // 우클릭하면 컨텍스트 메뉴 표시
-						{
-							if (ImGui::MenuItem(u8"Modify 변경"))
-							{
-								if (!m_LayerUIs.empty())
-									//m_LayerUIs[g_iSelectUI]->Set_UIObj_Desc();
-									m_LayerUIs[g_iSelectUI]->Set_TexIndex(g_iSelectTex); //선택 텍스처로 변경
-							}
-
-							ImGui::EndPopup();
-						}
+						ImGui::EndPopup();
 					}
+				}
 			}
 			ImGui::EndListBox();
 		}
-
-#pragma endregion
 	}
 	ImGui::End();
-
 	return TRUE;
 }
 
@@ -631,14 +624,16 @@ void CEditor_UI::Window_PopupAlert()
 	switch (g_eOpenPopup)
 	{
 	case POPUP_CREATE:	g_strPopupTag = { u8"Create" }; g_strUITag = { "LayerUI" }; //생성할 땐 태그를 기본값으로
-		switch (g_ePopupDetail)
-		{	default: g_strDetail = { u8" " };	break;	}
+		//switch (g_ePopupDetail)
+		//{	default: g_strDetail = { u8" " };	break;	}
+		g_strDetail = { u8"" };
 		ImGui::OpenPopup(g_strPopupTag.c_str());
 		break;
 
 	case POPUP_DELETE:	g_strPopupTag = { u8"Delete" };
-		switch (g_ePopupDetail)
-		{	default: g_strDetail = { u8" " };	break;	}
+		//switch (g_ePopupDetail)
+		//{	default: g_strDetail = { u8" " };	break;	}
+		g_strDetail = { u8"" };
 		ImGui::OpenPopup(g_strPopupTag.c_str());
 		break;
 
@@ -674,8 +669,9 @@ void CEditor_UI::Window_PopupAlert()
 		break;
 
 	case POPUP_MODIFY:	g_strPopupTag = { u8"Modify" };
-		switch (g_ePopupDetail)
-		{	default: g_strDetail = { u8" " };	break;	}
+		//switch (g_ePopupDetail)
+		//{	default: g_strDetail = { u8" " };	break;	}
+		g_strDetail = { u8"" };
 		ImGui::OpenPopup(g_strPopupTag.c_str());
 		break;
 	}

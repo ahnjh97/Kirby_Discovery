@@ -53,6 +53,8 @@ void CUIObject::Render_IMGUI()
 
 void CUIObject::Free()
 {
+	__super::Free();
+
 	if (!m_GroupUIs.empty())
 	{
 		for (auto& pGroupUI : m_GroupUIs)
@@ -60,7 +62,6 @@ void CUIObject::Free()
 			for (auto& pUIObj : pGroupUI)
 				Safe_Release(pUIObj);
 		}
-		m_GroupUIs.clear();
 	}
 
 	if (!m_LayerUIs.empty())
@@ -70,8 +71,6 @@ void CUIObject::Free()
 
 		m_LayerUIs.clear();
 	}
-
-	__super::Free();
 
 	Safe_Release(m_pTextureCom);
 	Safe_Release(m_pShaderCom);

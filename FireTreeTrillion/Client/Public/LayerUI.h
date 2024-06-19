@@ -1,6 +1,7 @@
 #pragma once
 #include "Client_Defines.h"
 #include "UIObject.h"
+#include "HUD.h"
 
 BEGIN(Engine)
 class CShader;
@@ -37,6 +38,10 @@ public:
 	static CLayerUI*			Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject*		Clone(void* pArg) override;
 	virtual void				Free() override;
+
+private:
+	CTexture*					m_pMultiTex[CHUD::TAG_NONE] = { nullptr };
+	CTexture*					m_pSingleTex = { nullptr };
 };
 
 

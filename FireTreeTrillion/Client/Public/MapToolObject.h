@@ -58,6 +58,9 @@ public:
 	virtual void Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
+#ifdef _DEBUG
+	virtual void Render_IMGUI() override;
+#endif
 public:
 	void Emplace_RallyPoint(_uint iIndex, _float3 vPos) { m_RallyPoints.emplace(iIndex, vPos); }
 

@@ -100,8 +100,8 @@ HRESULT CLayerUI::Render()
 		_float2 vFontOrig = {	1.f, 1.f  };
 		_float2 vFontScale = { m_UIObjDesc.vSize.x, m_UIObjDesc.vSize.y };
 
-		//wstring wstrFontTag = { TEXT("Font_HUD_StarPoint_NUM30") };
-		wstring wstrFontTag = { TEXT("Font_HUDSub_KR15") };
+		wstring wstrFontTag = { TEXT("Font_HUD_StarPoint_NUM30") };
+		//wstring wstrFontTag = { TEXT("Font_HUDSub_KR15") };
 
 		//추후 원근투영 폰트 작업 예정
 		/*
@@ -140,9 +140,19 @@ HRESULT CLayerUI::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-	//if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_StarPoint"),
+	/*
 	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_StatusBar_Kirby"),
-		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
+		TEXT("Com_Texture_KirbyHP"), (CComponent**)&m_pMultiTex[CHUD::HUD_KIRBYHP])))
+		return E_FAIL;
+
+	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_StarPoint"),
+		TEXT("Com_Texture_StarPoint"), (CComponent**)&m_pMultiTex[CHUD::HUD_STARPOINT])))
+		return E_FAIL;
+	*/
+
+	//if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_StatusBar_Kirby"),
+	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_StarPoint"),
+		TEXT("Com_Texture"), (CComponent**)&m_pSingleTex)))
 		return E_FAIL;
 
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),
@@ -173,11 +183,13 @@ HRESULT CLayerUI::Render_BindSet(CShader* _pShaderCom, CTransform* _pTransCom)
 	if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
-	SHADER_PS ePassIndex = { PS_ALPHABLEND }; //셰이더 패스 기본값
+	SHADER_PS ePassIndex = { PS_APBLEND_NOZTEST }; //셰이더 패스 기본값
 	if (TEXT("Icon") == m_UIObjDesc.wstrUITag) { ePassIndex = PS_DEFAULT; }
 	//if (TEXT("Effect_Mask") == m_UIObjDesc.wstrUITag) { ePassIndex = PS_MASK_HP; }
 
-	if (FAILED(Bind_ShaderResources(_pShaderCom, ePassIndex, m_pTextureCom, m_iTexIndex)))
+	//if (FAILED(Bind_ShaderResources(_pShaderCom, ePassIndex, m_pMultiTex[CHUD::HUD_KIRBYHP], m_iTexIndex)))
+	//	return E_FAIL;
+	if (FAILED(Bind_ShaderResources(_pShaderCom, ePassIndex, m_pSingleTex, m_iTexIndex)))
 		return E_FAIL;
 
 	return S_OK;
@@ -186,6 +198,7 @@ HRESULT CLayerUI::Render_BindSet(CShader* _pShaderCom, CTransform* _pTransCom)
 HRESULT CLayerUI::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTexture* _pTextureCom, _uint _iTexIndex)
 {
 	//셰이더 파일의 텍스처 정보를 가져와 바인딩
+	//_pTextureCom->Bind_ShaderResources(_pShaderCom, "g_DiffuseTexture");
 	_pTextureCom->Bind_ShaderResource(_pShaderCom, "g_DiffuseTexture", _iTexIndex);
 
 	//셰이더의 원시데이터 가져와 저장
@@ -241,7 +254,8 @@ CGameObject* CLayerUI::Clone(void* pArg)
 
 void CLayerUI::Free()
 {
-	Safe_Release(m_pTextureCom);
+	Safe_Release(m_pSingleTex);
+	//Safe_Release(m_pMultiTex[CHUD::TAG_NONE]);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pVIBufferCom);
 

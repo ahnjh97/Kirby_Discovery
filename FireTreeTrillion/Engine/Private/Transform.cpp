@@ -314,8 +314,9 @@ void CTransform::Rotation(_float _fRadianX, _float _fRadianY, _float _fRadianZ)
 	_matrix		RotationMatrixY = XMMatrixRotationY(_fRadianY);
 	_matrix		RotationMatrixZ = XMMatrixRotationZ(_fRadianZ);
 
-	//회전행렬 결합
-	_matrix RotationMatrix = RotationMatrixZ * RotationMatrixY * RotationMatrixX;
+	//회전행렬 결합 (X > Y > Z순 곱연산 순서 안맞추면 안됨)
+	//_matrix RotationMatrix = RotationMatrixZ * RotationMatrixY * RotationMatrixX;
+	_matrix RotationMatrix = RotationMatrixX * RotationMatrixY * RotationMatrixZ;
 
 	for (size_t i = 0; i < STATE_POSITION; i++)
 	{
