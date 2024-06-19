@@ -50,6 +50,7 @@ public:
 		{
 			// 바뀔 애니메이션을 대상으로 선형보간 ON
 			m_Animations[m_iCurrentAnimIndex]->Reset_Ratio();
+			m_Animations[m_iCurrentAnimIndex]->Reset_RatioTime();
 			m_Animations[m_iCurrentAnimIndex]->Set_LerpTime(fLerpTime);
 		}
 	}

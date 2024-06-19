@@ -17,9 +17,7 @@ private:
 public:
 	_bool IsFinished() const {	return m_IsFinished; }
 
-	void Reset_Finished(_bool isFinished = false) {
-		m_IsFinished = isFinished;
-	}
+	void Reset_Finished(_bool isFinished = false) {	m_IsFinished = isFinished; }
 
 	void Reset_TrackPosition() {
 		m_fTrackPosition = 0.f;
@@ -33,18 +31,9 @@ public:
 	void Reset_Ratio() { m_bRatio = true; }
 	void Remove_Ratio() { m_bRatio = false; }
 
-
-	_float Get_Duration() {
-		return m_fDuration;
-	}
-
-	_float Get_TrackPosition() {
-		return m_fTrackPosition;
-	}
-
-	_float Get_AnimRatio() {
-		return m_fTrackPosition / m_fDuration;
-	}
+	_float Get_Duration() {	return m_fDuration; }
+	_float Get_TrackPosition() { return m_fTrackPosition; }
+	_float Get_AnimRatio() { return m_fTrackPosition / m_fDuration;	}
 
 public:
 	_float		 Get_TickPerSecond() const { return m_fTickPerSecond; }
@@ -57,6 +46,7 @@ public:
 	_float		 Get_Duration() const { return m_fDuration; }
 
 	void		Set_LerpTime(_float fLerpTime) { m_fLerpTime = fLerpTime; }
+	void		Reset_RatioTime() { m_fRatioTime = 0; }
 
 	// 애님툴에서 작업한 데이터 가져오기
 	void		 Set_AnimEventData(ANIM_INFO tAnimInfo);
