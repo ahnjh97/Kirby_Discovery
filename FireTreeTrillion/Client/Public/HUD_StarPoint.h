@@ -36,7 +36,7 @@ private:
 	HRESULT						Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom);
 	
 	void						Update_UIState(_float _fTimeDelta);
-	void						Play_Animation(_float _fTimeDelta, HUD_STARPOINT _eSPstate);
+	void						Play_Animation(_float _fTimeDelta, STARPOINT_STATE _eSPstate);
 
 public:
 	static CHUD_StarPoint*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -50,10 +50,13 @@ private:
 	_bool						m_IsLootTrigger = { FALSE };
 	_bool						m_IsKirbyEX = { FALSE };
 
-	HUD_STARPOINT				m_ePreState = { STARPOINT_NONE };
-	HUD_STARPOINT				m_eCurState = { STARPOINT_NONE };
+	STARPOINT_STATE				m_ePreState = { STARPOINT_NONE };
+	STARPOINT_STATE				m_eCurState = { STARPOINT_NONE };
 	
 	_uint						m_iPreCoin = { 0 };
+
+	_float4						m_vInitPos = { 0.f, 0.f, 0.f, 1.f };
+	_float3						m_vInitSize = { 0.f, 0.f, 0.f };
 
 };
 

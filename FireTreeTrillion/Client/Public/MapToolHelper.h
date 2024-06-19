@@ -23,7 +23,9 @@ public:
 
 private:
 	void	SetUpTxtVectors();
-	void	ReadMapDecoTxts(TYPE eType);
+	void	ReadMapDecoTxts();
+	void	ReadMapObjTxts();
+	void	ReadMonsterTxts();
 	
 	// ImGui
 	void	Menu_Level();
@@ -84,6 +86,7 @@ private:
 	// Options
 	void HideTriggers(_bool bHideTriggers);
 	void HideGrid(_bool bHideGrid);
+	void HideMapDecos(_bool bHideMapDecos);
 	_bool ExcludeModel(string& _strModelName);
 
 private:

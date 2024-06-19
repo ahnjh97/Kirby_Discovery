@@ -39,18 +39,12 @@ private:
 	HRESULT Loading_For_Logo();
 	HRESULT Loading_For_GamePlay();
 
-	HRESULT Add_AnimPrototype(wstring& ModelName);
-	HRESULT Add_NonAnimPrototype(wstring& ModelName);
+	HRESULT Add_AnimPrototype(wstring& ModelName, wstring& wstrFolder = wstring(L""));
+	HRESULT Add_NonAnimPrototype(wstring& ModelName, wstring& wstrFolder = wstring(L""));
 
-	HRESULT Add_AnimMapDecoPrototype(wstring& ModelName);
-	HRESULT Add_NonAnimMapDecoPrototype(wstring& ModelName);
-
-	void TraverseAnimModels(const wstring& rootFolderPath); 
-	void TraverseNonAnimModels(const wstring& rootFolderPath);
+	void TraverseAnimModels(const wstring& rootFolderPath, wstring& newFolder = wstring(L""));
+	void TraverseNonAnimModels(const wstring& rootFolderPath, wstring& newFolder = wstring(L""));
 	void TraverseDirectory(const wstring& rootFolderPath, list<wstring>& fileList);
-
-	void TraverseAnimMapDecos(const wstring& rootFolderPath);
-	void TraverseNonAnimMapDecos(const wstring& rootFolderPath);
 
 public:
 	static CLoader* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID);

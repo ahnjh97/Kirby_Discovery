@@ -43,8 +43,11 @@ void CAwoofy_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 		_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(vPos, vKirbyPos)));
 
 		// 일정 거리 안으로 플레이어가 들어오면 상태 전환
-		if (6.f > fDistance)
+		if (10.f > fDistance)
+		{
+			pAwoofy->Set_AwoofyEye(CAwoofy::AWOOFYEYE_IDLE);
 			pAwoofy->Change_State(CAwoofy::AWOOFY_FIND, 40.f, false, true);
+		}
 
 		// 여러 상태의 IDLE로 전환
 		if (true == pAwoofy->IsAnimFinished())

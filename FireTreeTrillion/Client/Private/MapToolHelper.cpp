@@ -34,6 +34,7 @@ static _int iCamType = -1;
 
 static _bool bHideTriggers = { false };
 static _bool bHideGrid = { true };
+static _bool bHideMapDecos = { false };
 
 static _int iRallyPointIndex = -1;
 static _int iConnectedMonster = -1;
@@ -64,34 +65,33 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		"Intro", "Stage1", "Level_End" };
 
 	m_vecMapModelNames = { "Level0Stage1Step01", "Level1Stage1Step01" };
-
 	m_setMapNames = { "BG0", "BG1", "Level0Stage1Step01", "Level1Stage1Step01" };
-	m_setMonsterNames = { "NonAnim_Awoofy", "NonAnim_BladeKnight", "NonAnim_Buffahorn", "NonAnim_Rabbit"
-						, "NonAnim_Kabu", "NonAnim_BrontoBurt", "NonAnim_PoppyBrosJr", "NonAnim_CappyBody"};
 	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy" };
 	m_setRallyingMonsters = { "NonAnim_Kabu", "NonAnim_BrontoBurt" };
 
 	/*m_setNonColDecos = { "BushMCut" };*/
 	m_setAnimDecos = { "BushL", "BushM", "BushS", "PopFlower" };
 	m_setActorDecos = {  "CMBillBoardC", "CmBuilding1stRoof", "CMBuildingParts", "CMGuardrailAL", "CMGuardrailBL"
-		, "CMStreeLightLampA", "CMStreeLightLampE", "CMWaterTankL", "CMHighwayGuardrailACL", "CMHighwayGuardrailAL"
-		, "CMHighwayGuardrailALL", "CMHighwayGuardrailARL", "CMHighwayGuardrailBL", "CMHighwayGuardrailBLL"
+		,  "CMHighwayGuardrailACL", "CMHighwayGuardrailAL", "CMHighwayGuardrailALL", "CMHighwayGuardrailARL", "CMHighwayGuardrailBL", "CMHighwayGuardrailBLL"
 		, "CMHighwayGuardrailBRL", "CMHighwayGuardrailCCL", "CMHighwayGuardrailCL", "CMHighwayGuardrailCLL", "CMHighwayGuardrailCRL"
+		, "CMStreeLightLampA", "CMStreeLightLampE", "CMWaterTankL", "CvPipingDuctA05L"
 		, "GsBenchAL",  "GsCarShop", "GsCircleBench", "GsFlowerPotAL", "GsFlowerPotBL", "GsSteelFenceA"
 		, "GsSteelFenceB", "GsTreeA", "GsTreeB", "GsTreeC", "GsWallRockA", "GsWallRockB"
 		, "GsWoodBridgeA", "GsWoodBridgeB", "GsRockCL", "GsRockDL", "GsRockEL", "GsRockFL", "GsRockGL"
 		, "JgGrassB", "JgGrassL", "JgGrasslongB", "JgGrassN", "JgWoodD", "JgGrassO"
 		, "StarBlockL" , "StarBlockM", "StarBlockS", "SeDriftWoodAL", "SeDriftWoodBL", "SeDriftWoodCL"
-		, "VpFactoryParts", "VpFactoryPartsBlend", "WoodBox" };
+		, "VpFactoryPart", "VpFactoryParts", "VpFactoryPartsBlend", "WoodBox" };
 	m_setKickableDecos = { "GsPebble", "GsStone", "SeShell" };
 	m_setItemTxts = { "Item_Coin" };
 
 	vecPassIndices.resize(m_vecMapModelNames.size());
 	vecSamplingFactors.resize(m_vecMapModelNames.size());
 
-	SetUpTxtVectors();
-	//ReadMapDecoTxts(TYPE_ANIM);
-	ReadMapDecoTxts(TYPE_NONANIM);
+	//SetUpTxtVectors();
+
+	ReadMapDecoTxts();
+	ReadMapObjTxts();
+	ReadMonsterTxts();
 
 	HideGrid(bHideGrid);
 	HideTriggers(bHideTriggers);
@@ -189,13 +189,9 @@ void CMapToolHelper::SetUpTxtVectors()
 		m_setObjectTxts.insert(objTxt);
 }
 
-void CMapToolHelper::ReadMapDecoTxts(TYPE eType)
+void CMapToolHelper::ReadMapDecoTxts()
 {
-	string strPath;
-	if(eType == TYPE_ANIM)
-		strPath =  "../../../model_txt/MapDeco/Anim/";
-	else if(eType == TYPE_NONANIM)
-		strPath = "../../../model_txt/MapDeco/NonAnim/";
+	string strPath = "../../../model_txt/MapDeco/NonAnim/";
 
 	directory_iterator end_iter;  // 디렉토리 순회의 끝을 나타내는 iterator
 	directory_iterator dir_iter(strPath);  // 지정된 경로의 시작 iterator
@@ -211,6 +207,51 @@ void CMapToolHelper::ReadMapDecoTxts(TYPE eType)
 
 	for (auto& objTxt : m_vecMapDecoTxts)
 		m_setMapDecoTxts.insert(objTxt);
+}
+
+void CMapToolHelper::ReadMapObjTxts()
+{
+	string strPath = "../../../model_txt/MapObjs/NonAnim/";
+
+	directory_iterator end_iter;  // 디렉토리 순회의 끝을 나타내는 iterator
+	directory_iterator dir_iter(strPath);  // 지정된 경로의 시작 iterator
+
+	while (dir_iter != end_iter) {
+		if (is_regular_file(*dir_iter)) {
+			string strFilePath = dir_iter->path().filename().string();
+			string strModelName = strFilePath.substr(0, strFilePath.length() - 4);
+			if (true == IsMap(strModelName))
+				m_vecMapTxts.emplace_back(strModelName);
+			else if (true == IsTrigger(strModelName))
+				m_vecTriggerTxts.emplace_back(strModelName);
+			else
+				m_vecObjectTxts.emplace_back(strModelName);
+		}
+		++dir_iter;
+	}
+
+	for (auto& objTxt : m_vecObjectTxts)
+		m_setObjectTxts.insert(objTxt);
+}
+
+void CMapToolHelper::ReadMonsterTxts()
+{
+	string strPath = "../../../model_txt/Monsters/NonAnim/";
+
+	directory_iterator end_iter;  // 디렉토리 순회의 끝을 나타내는 iterator
+	directory_iterator dir_iter(strPath);  // 지정된 경로의 시작 iterator
+
+	while (dir_iter != end_iter) {
+		if (is_regular_file(*dir_iter)) {
+			string strFilePath = dir_iter->path().filename().string();
+			string strModelName = strFilePath.substr(0, strFilePath.length() - 4);
+			m_vecMonsterTxts.emplace_back(strModelName);
+		}
+		++dir_iter;
+	}
+
+	for (auto& objTxt : m_vecMonsterTxts)
+		m_setMonsterNames.insert(objTxt);
 }
 
 void CMapToolHelper::Menu_Level()
@@ -274,6 +315,10 @@ void CMapToolHelper::Menu_Level()
 		bHideGrid = !bHideGrid;
 		HideGrid(bHideGrid);
 	}
+	if (ImGui::RadioButton("Hide MapDecos", bHideMapDecos)) {
+		bHideMapDecos = !bHideMapDecos;
+		HideMapDecos(bHideMapDecos);
+	}
 }
 
 void CMapToolHelper::Menu_NonAnimModels()
@@ -285,7 +330,7 @@ void CMapToolHelper::Menu_NonAnimModels()
 		vector<const _char*> vecMapNames(m_vecMapTxts.size());
 		for (_int i = 0; i < m_vecMapTxts.size(); ++i)
 			vecMapNames[i] = m_vecMapTxts[i].c_str();
-		if (ImGui::ListBox("##Maps", &iMapTxtIdx, vecMapNames.data(), m_vecMapTxts.size(), 3)) {
+		if (ImGui::ListBox("##Maps", &iMapTxtIdx, vecMapNames.data(), m_vecMapTxts.size(), 5)) {
 			iTriggerTxtIdx = iMonsterTxtIdx = iNonAnimIdx = iObjectIdx = -1;
 			m_strSelectedTxt = m_vecMapTxts[iMapTxtIdx];
 		}
@@ -297,7 +342,7 @@ void CMapToolHelper::Menu_NonAnimModels()
 		vector<const _char*> vecTriggerNames(m_vecTriggerTxts.size());
 		for (_int i = 0; i < m_vecTriggerTxts.size(); ++i)
 			vecTriggerNames[i] = m_vecTriggerTxts[i].c_str();
-		if (ImGui::ListBox("##Triggers", &iTriggerTxtIdx, vecTriggerNames.data(), m_vecTriggerTxts.size(), 3)) {
+		if (ImGui::ListBox("##Triggers", &iTriggerTxtIdx, vecTriggerNames.data(), m_vecTriggerTxts.size(), 5)) {
 			iMapTxtIdx = iMonsterTxtIdx = iNonAnimIdx = iObjectIdx = -1;
 			m_strSelectedTxt = m_vecTriggerTxts[iTriggerTxtIdx];
 		}
@@ -309,7 +354,7 @@ void CMapToolHelper::Menu_NonAnimModels()
 		vector<const _char*> vecMonsterNames(m_vecMonsterTxts.size());
 		for (_int i = 0; i < m_vecMonsterTxts.size(); ++i)
 			vecMonsterNames[i] = m_vecMonsterTxts[i].c_str();
-		if (ImGui::ListBox("##Monsters", &iMonsterTxtIdx, vecMonsterNames.data(), m_vecMonsterTxts.size(), 4)) {
+		if (ImGui::ListBox("##Monsters", &iMonsterTxtIdx, vecMonsterNames.data(), m_vecMonsterTxts.size(), 5)) {
 			iMapTxtIdx = iTriggerTxtIdx = iNonAnimIdx = iObjectIdx = -1;
 			m_strSelectedTxt = m_vecMonsterTxts[iMonsterTxtIdx];
 		}
@@ -321,7 +366,7 @@ void CMapToolHelper::Menu_NonAnimModels()
 		vector<const _char*> vecObjectNames(m_vecObjectTxts.size());
 		for (_int i = 0; i < m_vecObjectTxts.size(); ++i)
 			vecObjectNames[i] = m_vecObjectTxts[i].c_str();
-		if (ImGui::ListBox("##Objects", &iObjectIdx, vecObjectNames.data(), m_vecObjectTxts.size(), 9)) {
+		if (ImGui::ListBox("##Objects", &iObjectIdx, vecObjectNames.data(), m_vecObjectTxts.size(), 16)) {
 			iMapTxtIdx = iTriggerTxtIdx = iMonsterTxtIdx = iNonAnimIdx = -1;
 			m_strSelectedTxt = m_vecObjectTxts[iObjectIdx];
 		}
@@ -333,7 +378,7 @@ void CMapToolHelper::Menu_NonAnimModels()
 		vector<const _char*> vecMapDecoNames(m_vecMapDecoTxts.size());
 		for (_int i = 0; i < m_vecMapDecoTxts.size(); ++i)
 			vecMapDecoNames[i] = m_vecMapDecoTxts[i].c_str();
-		if (ImGui::ListBox("##MapDecos", &iNonAnimIdx, vecMapDecoNames.data(), m_vecMapDecoTxts.size(), 15)) {
+		if (ImGui::ListBox("##MapDecos", &iNonAnimIdx, vecMapDecoNames.data(), m_vecMapDecoTxts.size(), 16)) {
 			iMapTxtIdx = iTriggerTxtIdx = iMonsterTxtIdx = iObjectIdx = -1;
 			m_strSelectedTxt = m_vecMapDecoTxts[iNonAnimIdx];
 		}
@@ -1221,6 +1266,30 @@ void CMapToolHelper::HideGrid(_bool bHideGrid)
 	pGrid->Set_Hide(bHideGrid);
 }
 
+void CMapToolHelper::HideMapDecos(_bool bHideMapDecos)
+{
+	list<CGameObject*>* pObjectList = m_pGameInstance->Get_List(LEVEL_TOOL_MAP, TEXT("Layer_Parse"));
+	if (pObjectList == nullptr)
+		return;
+
+	if (pObjectList->empty())
+		return;
+
+	for (auto& obj : *pObjectList)
+	{
+		if (nullptr == obj)
+			continue;
+
+		CModel* pModel = dynamic_cast<CModel*>(obj->Get_Component(TEXT("Com_Model")));
+		if (nullptr == pModel)
+			continue;
+
+		string strModelName = pModel->Get_ModelInfo().strModelName;
+		if(true == IsDeco(strModelName))
+			obj->Set_Hide(bHideMapDecos);
+	}
+}
+
 _bool CMapToolHelper::ExcludeModel(string& _strModelName)
 {
 	if (_strModelName.size() < 4)
@@ -1459,7 +1528,7 @@ _bool CMapToolHelper::Save_RallyPoints(const string& _strLevel, vector<CGameObje
 	{
 		wstring wstrErrorMsg = TEXT("Failed to Open: ") + CUtils::StrToWstr(tempFileName);
 		MSG_BOX(wstrErrorMsg.c_str());
-		return false;
+		return false;	
 	}
 
 	_uint iNumObjects = _vecRallyPoints.size();
@@ -1766,7 +1835,7 @@ void CMapToolHelper::Load_Monsters(const string& _strLevel)
 	_float fRimWidth{};
 	_int iTriggerIndex{};
 	_uint iNumRallyPoints{};
-	map<_uint, _float3> rallyPoints;
+	//map<_uint, _float3> rallyPoints;
 	wstring wstrGameObjectTag = TEXT("MapToolObject");
 
 	for (_uint i = 0; i < iNumObjects; i++)
@@ -1782,11 +1851,11 @@ void CMapToolHelper::Load_Monsters(const string& _strLevel)
 		fileInput.read(reinterpret_cast<char*>(&iNumRallyPoints), sizeof(iNumRallyPoints));
 
 		_float3 vRallyPointPos{};
-		rallyPoints.clear();
+		//rallyPoints.clear();
 		for (_uint iRallyPointIdx = 0; iRallyPointIdx < iNumRallyPoints; iRallyPointIdx++)
 		{
 			fileInput.read(reinterpret_cast<char*>(&vRallyPointPos), sizeof(vRallyPointPos));
-			rallyPoints.emplace(iRallyPointIdx, vRallyPointPos);
+			//rallyPoints.emplace(iRallyPointIdx, vRallyPointPos);
 		}
 
 		CMapToolObject::MAPTOOLOBJECT_DESC tDesc{};
@@ -1795,7 +1864,7 @@ void CMapToolHelper::Load_Monsters(const string& _strLevel)
 		tDesc.iShaderVars = iShaderVars;
 		tDesc.fRimWidth = fRimWidth;
 		tDesc.iTriggerIndex = iTriggerIndex; // Monster Enum
-		tDesc.RallyPoints = rallyPoints;
+		//tDesc.RallyPoints = rallyPoints;
 
 		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
 		{

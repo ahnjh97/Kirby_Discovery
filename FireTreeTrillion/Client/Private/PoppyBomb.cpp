@@ -62,6 +62,9 @@ _int CPoppyBomb::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return OBJ_DEAD;
 
+	if (static_cast<CPoppyBrosJr*>(m_pGameObject)->Get_Dead())
+		m_bDead = true;
+
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
 	// 바닥에 닿았을 때 물리 영향을 받음
