@@ -77,7 +77,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "CMStreeLightLampA", "CMStreeLightLampE", "CMWaterTankL", "CMHighwayGuardrailACL", "CMHighwayGuardrailAL"
 		, "CMHighwayGuardrailALL", "CMHighwayGuardrailARL", "CMHighwayGuardrailBL", "CMHighwayGuardrailBLL"
 		, "CMHighwayGuardrailBRL", "CMHighwayGuardrailCCL", "CMHighwayGuardrailCL", "CMHighwayGuardrailCLL", "CMHighwayGuardrailCRL"
-		, "GsBenchAL", "GsCircleBench", "GsFlowerPotAL", "GsFlowerPotBL", "GsSteelFenceA"
+		, "GsBenchAL",  "GsCarShop", "GsCircleBench", "GsFlowerPotAL", "GsFlowerPotBL", "GsSteelFenceA"
 		, "GsSteelFenceB", "GsTreeA", "GsTreeB", "GsTreeC", "GsWallRockA", "GsWallRockB"
 		, "GsWoodBridgeA", "GsWoodBridgeB", "GsRockCL", "GsRockDL", "GsRockEL", "GsRockFL", "GsRockGL"
 		, "JgGrassB", "JgGrassL", "JgGrasslongB", "JgGrassN", "JgWoodD", "JgGrassO"
@@ -1215,8 +1215,8 @@ _bool CMapToolHelper::ExcludeModel(string& _strModelName)
 	if (_strModelName.size() < 4)
 		return false;
 
-	if (_strModelName.substr(0, 5) == "Smoke" || _strModelName.substr(0, 4) == "Test"
-		|| _strModelName.substr(0, 9) == "SkySphere" || _strModelName.substr(_strModelName.size() - 5) == "Blend"
+	if (_strModelName.substr(0, 4) == "Test" || _strModelName.substr(0, 4) == "Dash" || _strModelName.substr(0, 5) == "Smoke" ||
+		_strModelName.substr(0, 9) == "SkySphere" || _strModelName.substr(_strModelName.size() - 5) == "Blend"
 		|| "Tornado" == _strModelName || _strModelName.substr(0, 6) == "Vacuum" || _strModelName.substr(0, 5) == "Sword"
 		|| _strModelName.substr(_strModelName.size() - 5) == "Sword" || _strModelName.substr(0, 5) == "Kirby")
 		return true;
