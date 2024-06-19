@@ -34,6 +34,7 @@ static _int iCamType = -1;
 
 static _bool bHideTriggers = { false };
 static _bool bHideGrid = { true };
+static _bool bHideMapDecos = { false };
 
 static _int iRallyPointIndex = -1;
 static _int iConnectedMonster = -1;
@@ -71,15 +72,15 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	/*m_setNonColDecos = { "BushMCut" };*/
 	m_setAnimDecos = { "BushL", "BushM", "BushS", "PopFlower" };
 	m_setActorDecos = {  "CMBillBoardC", "CmBuilding1stRoof", "CMBuildingParts", "CMGuardrailAL", "CMGuardrailBL"
-		, "CMStreeLightLampA", "CMStreeLightLampE", "CMWaterTankL", "CMHighwayGuardrailACL", "CMHighwayGuardrailAL"
-		, "CMHighwayGuardrailALL", "CMHighwayGuardrailARL", "CMHighwayGuardrailBL", "CMHighwayGuardrailBLL"
+		,  "CMHighwayGuardrailACL", "CMHighwayGuardrailAL", "CMHighwayGuardrailALL", "CMHighwayGuardrailARL", "CMHighwayGuardrailBL", "CMHighwayGuardrailBLL"
 		, "CMHighwayGuardrailBRL", "CMHighwayGuardrailCCL", "CMHighwayGuardrailCL", "CMHighwayGuardrailCLL", "CMHighwayGuardrailCRL"
+		, "CMStreeLightLampA", "CMStreeLightLampE", "CMWaterTankL", "CvPipingDuctA05L"
 		, "GsBenchAL",  "GsCarShop", "GsCircleBench", "GsFlowerPotAL", "GsFlowerPotBL", "GsSteelFenceA"
 		, "GsSteelFenceB", "GsTreeA", "GsTreeB", "GsTreeC", "GsWallRockA", "GsWallRockB"
 		, "GsWoodBridgeA", "GsWoodBridgeB", "GsRockCL", "GsRockDL", "GsRockEL", "GsRockFL", "GsRockGL"
 		, "JgGrassB", "JgGrassL", "JgGrasslongB", "JgGrassN", "JgWoodD", "JgGrassO"
 		, "StarBlockL" , "StarBlockM", "StarBlockS", "SeDriftWoodAL", "SeDriftWoodBL", "SeDriftWoodCL"
-		, "VpFactoryParts", "VpFactoryPartsBlend", "WoodBox" };
+		, "VpFactoryPart", "VpFactoryParts", "VpFactoryPartsBlend", "WoodBox" };
 	m_setKickableDecos = { "GsPebble", "GsStone", "SeShell" };
 	m_setItemTxts = { "Item_Coin" };
 
@@ -313,6 +314,10 @@ void CMapToolHelper::Menu_Level()
 	if (ImGui::RadioButton("Hide Grid", bHideGrid)) {
 		bHideGrid = !bHideGrid;
 		HideGrid(bHideGrid);
+	}
+	if (ImGui::RadioButton("Hide MapDecos", bHideMapDecos)) {
+		bHideMapDecos = !bHideMapDecos;
+		HideMapDecos(bHideMapDecos);
 	}
 }
 
@@ -1261,6 +1266,30 @@ void CMapToolHelper::HideGrid(_bool bHideGrid)
 	pGrid->Set_Hide(bHideGrid);
 }
 
+void CMapToolHelper::HideMapDecos(_bool bHideMapDecos)
+{
+	list<CGameObject*>* pObjectList = m_pGameInstance->Get_List(LEVEL_TOOL_MAP, TEXT("Layer_Parse"));
+	if (pObjectList == nullptr)
+		return;
+
+	if (pObjectList->empty())
+		return;
+
+	for (auto& obj : *pObjectList)
+	{
+		if (nullptr == obj)
+			continue;
+
+		CModel* pModel = dynamic_cast<CModel*>(obj->Get_Component(TEXT("Com_Model")));
+		if (nullptr == pModel)
+			continue;
+
+		string strModelName = pModel->Get_ModelInfo().strModelName;
+		if(true == IsDeco(strModelName))
+			obj->Set_Hide(bHideMapDecos);
+	}
+}
+
 _bool CMapToolHelper::ExcludeModel(string& _strModelName)
 {
 	if (_strModelName.size() < 4)
@@ -1806,7 +1835,7 @@ void CMapToolHelper::Load_Monsters(const string& _strLevel)
 	_float fRimWidth{};
 	_int iTriggerIndex{};
 	_uint iNumRallyPoints{};
-	map<_uint, _float3> rallyPoints;
+	//map<_uint, _float3> rallyPoints;
 	wstring wstrGameObjectTag = TEXT("MapToolObject");
 
 	for (_uint i = 0; i < iNumObjects; i++)
@@ -1822,11 +1851,11 @@ void CMapToolHelper::Load_Monsters(const string& _strLevel)
 		fileInput.read(reinterpret_cast<char*>(&iNumRallyPoints), sizeof(iNumRallyPoints));
 
 		_float3 vRallyPointPos{};
-		rallyPoints.clear();
+		//rallyPoints.clear();
 		for (_uint iRallyPointIdx = 0; iRallyPointIdx < iNumRallyPoints; iRallyPointIdx++)
 		{
 			fileInput.read(reinterpret_cast<char*>(&vRallyPointPos), sizeof(vRallyPointPos));
-			rallyPoints.emplace(iRallyPointIdx, vRallyPointPos);
+			//rallyPoints.emplace(iRallyPointIdx, vRallyPointPos);
 		}
 
 		CMapToolObject::MAPTOOLOBJECT_DESC tDesc{};
@@ -1835,7 +1864,7 @@ void CMapToolHelper::Load_Monsters(const string& _strLevel)
 		tDesc.iShaderVars = iShaderVars;
 		tDesc.fRimWidth = fRimWidth;
 		tDesc.iTriggerIndex = iTriggerIndex; // Monster Enum
-		tDesc.RallyPoints = rallyPoints;
+		//tDesc.RallyPoints = rallyPoints;
 
 		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
 		{

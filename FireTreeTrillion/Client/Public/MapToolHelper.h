@@ -86,6 +86,7 @@ private:
 	// Options
 	void HideTriggers(_bool bHideTriggers);
 	void HideGrid(_bool bHideGrid);
+	void HideMapDecos(_bool bHideMapDecos);
 	_bool ExcludeModel(string& _strModelName);
 
 private:

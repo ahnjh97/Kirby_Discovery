@@ -103,6 +103,19 @@ HRESULT CMapToolObject::Render()
 	return S_OK;
 }
 
+#ifdef _DEBUG
+void CMapToolObject::Render_IMGUI()
+{
+	if (nullptr == m_pModelCom)
+		return;
+	string strModelName = m_pModelCom->Get_ModelName();
+
+	ImGui::BeginChild(strModelName.c_str());
+
+	ImGui::EndChild();
+}
+#endif
+
 HRESULT CMapToolObject::Add_Components(const wstring& _wstrModelTag)
 {
 	/* For.Com_Shader */

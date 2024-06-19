@@ -60,7 +60,7 @@ HRESULT CBasicMap::Initialize(void* pArg)
         SetUpAnimDecoInfo("BushL", 1.5f, 2, 60.f, 0, 50.f);
         SetUpAnimDecoInfo("BushM", 1.1f, 2, 60.f, 0, 50.f);
         SetUpAnimDecoInfo("BushS", 0.8f, 2, 60.f, 0, 50.f);
-        SetUpAnimDecoInfo("PopFlower", 0.8f, 2, 100.f, 1, 100.f);
+        SetUpAnimDecoInfo("PopFlower", 0.8f, 2, 120.f, 1, 130.f);
 
         InsertMapDecos();
     }
