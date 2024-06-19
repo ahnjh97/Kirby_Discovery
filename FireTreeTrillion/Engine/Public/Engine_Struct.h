@@ -121,13 +121,15 @@ namespace Engine
 		_bool	bIsColorRender = { false };
 		_bool	bIsBloom = { false };
 
-		_float	fRimLightThreshold = { 0.f };
+		_float		fRimLightThreshold = { 0.f };
+		_float3		vContinuousRotation = {0.f, 0.f, 0.f};
 
 		_uint iPropertyMapNum;
 		vector<pair<KF_PROPERTY, _uint>> vecKeyframeInfo;
 		vector<vector<FX_KEYFRAME>> vecKeyframes;
 
 		_uint eRenderGroup = { 0 };
+		TIMER eTimer = { TIMER_END };
 
 	}SINGLE_FX_DATA;
 
@@ -199,7 +201,7 @@ namespace Engine
 		vector<_bool>	vecMoveCommands;
 
 		_int eRenderGroup = { 0 };
-
+		TIMER eTimer = { TIMER_END };
 
 	}PARTICLE_DATA;
 

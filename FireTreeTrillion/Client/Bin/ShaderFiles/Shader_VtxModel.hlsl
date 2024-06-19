@@ -347,8 +347,8 @@ PS_OUT_EFFECT PS_MAIN_BLEND_FX(PS_IN In)
     if (vDiffuse.a < .01f || (vDiffuse.r < 0.1f && vDiffuse.g < 0.1f && vDiffuse.b < 0.1f) )
         discard;
 
-    Out.vColor.rgb = vDiffuse.rgb * g_vRColor;
-    Out.vColor.a = vDiffuse.a * g_fAlpha;
+    Out.vColor.rgb = vDiffuse.rgb * g_vRColor ;
+    Out.vColor.a = vDiffuse.a * vMask.r * g_fAlpha;
 
     
     //소프트 이펙트 보정

@@ -70,6 +70,8 @@ protected:
 	_float2*					m_pLifeTimes = { nullptr };
 	_float*						m_pStartDelays = { nullptr };
 	_float3*					m_pDirections = { nullptr };
+	_float3*					m_pInitialScales = { nullptr };
+	_float*						m_pInitialSpeeds = { nullptr };
 	_float*						m_pSpeeds = { nullptr };
 	_float3*					m_pColors = { nullptr };
 	_float*						m_pAlphas = { nullptr };

@@ -52,10 +52,11 @@ _int CPhysXObject::Ready_Dead()
 		FXDesc.vInitPos = static_cast<_float3>(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(m_pGameInstance->Get_CamLook());
 		FXDesc.vInitScale = { 1.8f, 1.8f, 1.8f };
-
 		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_ObjDead"), &FXDesc)))
 			return OBJ_DEAD;
 	}
+
+	Delete_AllEffect();
 
 	return OBJ_DEAD;
 }
@@ -96,12 +97,11 @@ void CPhysXObject::Set_PhyXState(PHYXOBJECT_CURSTATE eState)
 	{
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
 
-		//m_pTransformCom->Get_Scaled();
-
-		FXDesc.vInitPos = { 0.f, 0.f, 0.5f };
-		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(m_pTransformCom->Get_State(CTransform::STATE_UP));
-		FXDesc.vInitScale = { 5.f, 5.f, 5.f };
-		FXDesc.pSocketMatrix = &m_EffectSocket;
+		//TODO: 버블 날라갈 때 스케일 맞춰야 함
+		FXDesc.vInitPos = { 0.f, 0.5f, 0.f };
+		FXDesc.vInitRot = {-90.f, 0.f, 0.f};
+		FXDesc.vInitScale = { 4.f, 4.f, 4.f };
+		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 
 		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_FlyingBubble_v1"), &FXDesc)))
 			return;
@@ -120,11 +120,6 @@ void CPhysXObject::Set_PhyXState(PHYXOBJECT_CURSTATE eState)
 
 		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
 			return;
-
-
-
-
-
 	}
 }
 
@@ -151,15 +146,28 @@ void CPhysXObject::Delete_AllEffect()
 
 void CPhysXObject::Delete_Effect(string strTag)
 {
+	if (m_FXList.empty())
+		return;
+
+
+	for (auto iter = m_FXList.begin(); iter != m_FXList.end();)
+	{
+		if ((*iter)->Get_Name() == strTag)
+		{
+			(*iter)->Set_Dead();
+			Safe_Release(*iter);
+			iter = m_FXList.erase(iter);
+			return;
+		}
+		else
+			++iter;
+	}
 }
 
 void CPhysXObject::Free()
 {
+	Delete_AllEffect();
 	__super::Free();
-
-	for (auto& fx : m_FXList)
-		Safe_Release(fx);
-	m_FXList.clear();
 }
 
 
