@@ -175,7 +175,11 @@ _int CBrontoBurt::Tick(_float fTimeDelta)
 			if (abs(fAngle) >= XMConvertToRadians(3.f))
 				m_pTransformCom->Turn(::XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * fAngle * 5.f);
 
-			m_pControllerCom->Move_Dir(m_pTransformCom, XMVector3Normalize(m_vRally) * m_fTimeDelta * m_fSpeed, m_fTimeDelta);
+			_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), m_vecRallyPoint[m_iCnt])));
+
+			if (0.1f < fDistance)
+				m_pControllerCom->Move_Dir(m_pTransformCom, XMVector3Normalize(m_vRally) * m_fTimeDelta * m_fSpeed, m_fTimeDelta);
+			//m_pControllerCom->Move_Dir(m_pTransformCom, XMVector3Normalize(m_vRally) * m_fTimeDelta * m_fSpeed, m_fTimeDelta);
 		}
 	}
 	
@@ -296,6 +300,9 @@ void CBrontoBurt::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObjec
 			m_vLastPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 			Change_State(BRONTOBURT_DAMAGE, 50.f, false, true);
 			m_eEyeState = BRONTOBURTEYE_HALF;
+
+			if (true == m_bReturn)
+				return;
 			m_bReturn = true;
 		}
 	}
