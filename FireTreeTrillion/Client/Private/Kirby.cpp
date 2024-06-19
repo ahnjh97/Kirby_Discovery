@@ -65,19 +65,17 @@ HRESULT CKirby::Initialize(void* pArg)
 			m_pCamera = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main"))) :
 
 		//나머지 레벨이라면 다른 카메라를 저장한다.
-			m_pCamera = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Free")));
+		m_pCamera = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Free")));
 
 		if (m_pCamera == nullptr)
 		{
 			ALARM_FAIL(TEXT("망했어 카메라 없다"));
 			return E_FAIL;
 		}
-
 		Safe_AddRef(m_pCamera);
 	}
 
 	m_pCamera->Set_Target(m_pTransformCom);
-
 
 	//게임 레벨에 free camera 있다면 그놈에게도 타겟 등록해 준다.
 	if ((*m_pCurrentLevelID == LEVEL_INTRO || *m_pCurrentLevelID == LEVEL_GAMEPLAY))

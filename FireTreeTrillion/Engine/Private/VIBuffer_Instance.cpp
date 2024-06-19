@@ -9,14 +9,7 @@ CVIBuffer_Instance::CVIBuffer_Instance(ID3D11Device* pDevice, ID3D11DeviceContex
 
 CVIBuffer_Instance::CVIBuffer_Instance(const CVIBuffer_Instance& rhs)
 	: CVIBuffer{ rhs }
-	/*, m_pVBInstance{ rhs.m_pVBInstance }*/
-	/*, m_iInstanceStride{ rhs.m_iInstanceStride }*/
-	, m_iNumInstance{ rhs.m_iNumInstance }
-	/*, m_iIndexCountPerInstance{rhs.m_iIndexCountPerInstance }
-	, m_pInstanceVertices{ rhs.m_pInstanceVertices }
-	, m_InstanceBufferDesc{ rhs.m_InstanceBufferDesc }
-	, m_InstanceSubResourceData { rhs.m_InstanceSubResourceData }
-	, m_InstanceDesc { rhs.m_InstanceDesc }*/
+		,m_iNumInstance{ rhs.m_iNumInstance }
 {
 
 }
@@ -150,6 +143,12 @@ HRESULT CVIBuffer_Instance::Initialize(void* pArg)
 	m_pSpeeds = new _float[m_iNumInstance];
 	ZeroMemory(m_pSpeeds, sizeof(_float) * m_iNumInstance);
 
+	m_pInitialSpeeds = new _float[m_iNumInstance];
+	ZeroMemory(m_pInitialSpeeds, sizeof(_float) * m_iNumInstance);
+
+	m_pInitialScales = new _float3[m_iNumInstance];
+	ZeroMemory(m_pInitialScales, sizeof(_float3) * m_iNumInstance);
+
 	m_pColors = new _float3[m_iNumInstance];
 	ZeroMemory(m_pColors, sizeof(_float3) * m_iNumInstance);
 
@@ -264,26 +263,23 @@ void CVIBuffer_Instance::Decelerate(_float fTimeDelta)
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
 
-		m_pSpeeds[i] -= fTimeDelta;
+		//m_pSpeeds[i] -= fTimeDelta;
+		//if (m_pSpeeds[i] < 0.f)
+		//	m_pSpeeds[i] = 0.f;
+
+		
+		//if (m_pLifeTimes[i].x / m_pLifeTimes[i].y < .5f)
+		//	continue;
+
+
+		_float fTimeRatio = 1.f - (m_pLifeTimes[i].x / m_pLifeTimes[i].y);
+
+
+		m_pSpeeds[i] = m_pInitialSpeeds[i] * fTimeRatio;
 		if (m_pSpeeds[i] < 0.f)
 			m_pSpeeds[i] = 0.f;
-
-		/*
-		if (m_pLifeTimes[i].x / m_pLifeTimes[i].y < .7f)
-			continue;
-
-
-		//m_pSpeeds[i] -= fTimeRatio;
-
-		m_pSpeeds[i] -= fTimeDelta;
-		if (m_pSpeeds[i] < 0.f)
-			m_pSpeeds[i] = 0.f;
-*/
-
-		_float fTimeRatio = (m_pLifeTimes[i].x / m_pLifeTimes[i].y < .7f) ? 1.f : ((m_pLifeTimes[i].x / m_pLifeTimes[i].y) - .7f) / .3f;
 
 		_float4x4 InstanceMat = { _float4x4::Identity };
-
 
 		InstanceMat.Right(*(_float3*)&pVertices[i].vRight);
 		InstanceMat.Up(*(_float3*)&pVertices[i].vUp);
@@ -292,9 +288,9 @@ void CVIBuffer_Instance::Decelerate(_float fTimeDelta)
 
 		_float3 vScale = CUtils::Get_Scaled_Matrix(InstanceMat);
 
-		vScale *= fTimeRatio;
+		vScale = m_pInitialScales[i] * fTimeRatio;
 
-		CUtils::Set_Scaled_Matrix(InstanceMat, vScale.x, vScale.y, vScale.z);
+		CUtils::Set_Scaled_Matrix(InstanceMat, vScale.x, vScale.x, vScale.x);
 
 		pVertices[i].vRight = Dir(InstanceMat.Right());
 		pVertices[i].vUp = Dir(InstanceMat.Up());
@@ -413,9 +409,9 @@ void CVIBuffer_Instance::Change_InstanceInfo(VTXMATRIX* pVertices, _uint iInstan
 	_float4x4 instanceMat = _float4x4::Identity;
 
 	_float3 vScale = Compute_RandScale();
-	instanceMat.Right() *= vScale.x;
-	instanceMat.Up() *= vScale.y;
-	instanceMat.Forward() *= vScale.z;
+	CUtils::Set_Scaled_Matrix(instanceMat, vScale.x, vScale.y, vScale.z);
+	m_pInitialScales[iInstanceIndex] = vScale;
+
 
 	_float3 vRot = Compute_RandRotation();
 	vRot = { vRot.x, vRot.y, vRot.z };
@@ -436,6 +432,7 @@ void CVIBuffer_Instance::Change_InstanceInfo(VTXMATRIX* pVertices, _uint iInstan
 	_float4 vDirection = Compute_RandDirection();
 	m_pDirections[iInstanceIndex] = _float3{ vDirection.x, vDirection.y, vDirection.z };
 	m_pSpeeds[iInstanceIndex] = vDirection.w;
+	m_pInitialSpeeds[iInstanceIndex] = vDirection.w;
 
 
 	_float4 vColor = Compute_RandColor();
@@ -452,9 +449,9 @@ void CVIBuffer_Instance::Free()
 {
 	__super::Free();
 
-
-
 	Safe_Delete_Array(m_pSpeeds);
+	Safe_Delete_Array(m_pInitialSpeeds);
+	Safe_Delete_Array(m_pInitialScales);
 	Safe_Delete_Array(m_pStartDelays);
 	Safe_Delete_Array(m_pDirections);
 	Safe_Delete_Array(m_pColors);

@@ -21,6 +21,10 @@ private:
 	HRESULT Ready_Layer_BackGround(const wstring& strLayerTag);
 	HRESULT Ready_Layer_UI(const wstring& strLayerTag);
 	HRESULT Ready_ParsedObjects();
+	HRESULT Ready_Map();
+	HRESULT Ready_Triggers();
+	HRESULT Ready_Monsters();
+	HRESULT Ready_Items();
 	HRESULT	Load_FileData(const string& _strFilePath, FILE_TYPE _eFileType, const wstring& _strLayerTag);
 
 

@@ -64,14 +64,15 @@ void CAnimation::Invalidate_TransformationMatrix(_float fTimeDelta, const vector
 			m_Channels[i]->Ratio_TransformationMatrix(Bones, m_fTrackPosition, &m_CurrentKeyFrameIndices[i]);
 		}
 
-		m_fTrackPosition += fTimeDelta;
-
-		if (m_fRatioTime > 0.1f)
+		if (m_fRatioTime > m_fLerpTime)
 		{
 			Reset_TrackPosition();
 			m_fRatioTime = 0.f;
 			m_bRatio = false;
 		}
+
+		m_fTrackPosition += fTimeDelta;
+
 		return;
 	}
 
@@ -116,10 +117,20 @@ void CAnimation::Invalidate_TransformationMatrix(_float fTimeDelta, const vector
 
 void CAnimation::Read_AnimationData(ifstream& fileStream)
 {
-	fileStream.read(reinterpret_cast<char*>(&m_szName), sizeof(m_szName));
+	//fileStream.read(reinterpret_cast<char*>(&m_szName), sizeof(m_szName));
+	//string strName = m_szName;
+	//size_t pos = strName.find('|');
+	//if (pos != string::npos)
+	//{
+	//	strName = strName.substr(pos + 1);
+	//	strcpy_s(m_szName, strName.c_str());
+	//}
+	
+	fileStream.read(reinterpret_cast<char*>(m_szName), sizeof(m_szName));
+	m_szName[sizeof(m_szName) - 1] = '\0';
 	string strName = m_szName;
-	size_t pos = strName.find('|');
-	if (pos != string::npos)
+	size_t pos = strName.find_last_of('|');
+	if (pos != string::npos) 
 	{
 		strName = strName.substr(pos + 1);
 		strcpy_s(m_szName, strName.c_str());

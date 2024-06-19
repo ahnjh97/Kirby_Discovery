@@ -15,7 +15,6 @@
 #include "Grid.h"
 #include "BG.h"
 
-
 //스카이 스피어
 #include "SkySphere.h"
 
@@ -40,7 +39,6 @@
 #include "AnimToolObject.h"
 
 // 클라이언트
-
 #pragma region 컴포넌트
 #include "RigidBody.h"
 #include "CharacterController.h"
@@ -660,6 +658,7 @@ HRESULT CLoader::Add_FXTexture()
 
 	//마스크
 	hr = Add_Texture(LEVEL_STATIC, "FX_Mask_Bubble", "Effects/Mask/noise_bubble.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Mask_Updown", "Effects/Mask/UpDownMask.png");	CHECK_FAILED(hr);
 
 	
 	// 주로 사용되는 텍스쳐들
@@ -688,7 +687,11 @@ HRESULT CLoader::Add_FXTexture()
 	hr = Add_Texture(LEVEL_STATIC, "FX_SwordTail", "Effects/Sword/sword_tail.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_SwordDecal", "Effects/Sword/sword_decal.dds");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_SwordLine", "Effects/Sword/line.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_SwordShockwave", "Effects/Sword/shockwave.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_SwordRingNoFrip", "Effects/Sword/ringnofrip.png");	CHECK_FAILED(hr);
 
+	//잎
+	hr = Add_Texture(LEVEL_STATIC, "FX_BushCut", "Effects/Basic/BushColor_%d.png", 4);	CHECK_FAILED(hr);
 
 	return E_NOTIMPL;
 }
@@ -703,6 +706,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		//sky sphere
 		m_vecModelInfo.emplace_back("SkySphere_Stage1_Day", TYPE_NONANIM );
 
+
+		//이펙트 친구들...
+
 		m_vecModelInfo.emplace_back("SmokeCenter", TYPE_NONANIM );
 		m_vecModelInfo.emplace_back("SmokeFadeLarge", TYPE_NONANIM );
 		m_vecModelInfo.emplace_back("SmokeOriginal", TYPE_NONANIM );
@@ -710,13 +716,28 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("SmokeTail", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("Tornado", TYPE_NONANIM );
 
+		//부쉬 쪼가리
+		m_vecModelInfo.emplace_back("BushCutS", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("BushCutM", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("BushCutL", TYPE_NONANIM);
+
+		//이펙트 입히는 원기둥
+		m_vecModelInfo.emplace_back("CylinderA", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("CylinderB", TYPE_NONANIM);
+
+		m_vecModelInfo.emplace_back("Dash", TYPE_NONANIM);
+
 		//커비 회오리
 		m_vecModelInfo.emplace_back("VacuumTornado", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("VacuumWind", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("VacuumDGB", TYPE_NONANIM);
 
+		//칼 관련
 		m_vecModelInfo.emplace_back("SwordTrail", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("SwordSlash_hrzt", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("UpwardSlash", TYPE_NONANIM);
+
+
 
 	}
 	else if (eLevel == LEVEL_LOGO)
@@ -1126,8 +1147,6 @@ void CLoader::Load_AnimToolInfo()
 				pAnimElement != nullptr;
 				pAnimElement = pAnimElement->NextSiblingElement("Animation"))
 			{
-				// string animName = Remove_BeforeLastPipe(anim.first);
-				// const char* animName = pAnimElement->GetText();
 				string animName = Remove_BeforeLastPipe(pAnimElement->GetText());
 				if (!animName.empty())
 				{
@@ -1161,6 +1180,8 @@ void CLoader::Load_AnimToolInfo()
 
 								// EventName, StartFrame, EndFrame 읽기
 								const char* eventName = pDataElement->Attribute("EventName");
+								if (eventName && strcmp(eventName, "Notify") == 0)
+									continue;
 								int startFrame, endFrame;
 								pDataElement->QueryIntAttribute("StartFrame", &startFrame);
 								pDataElement->QueryIntAttribute("EndFrame", &endFrame);

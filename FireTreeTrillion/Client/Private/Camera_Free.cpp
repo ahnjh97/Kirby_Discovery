@@ -349,10 +349,6 @@ void CCamera_Free::Track_Target(_float fTimeDelta)
 void CCamera_Free::Control(_float fTimeDelta)
 {
 
-	//tab으로 하는 track target 빠졌어요 imgui로 해주삼
-	//if (m_pGameInstance->Get_KeyState(DIK_TAB, KEY_DOWN))
-	//	m_bTrackTarget = !m_bTrackTarget;
-
 	if (m_bTrackTarget)
 		Track_Target(fTimeDelta);
 
@@ -360,11 +356,11 @@ void CCamera_Free::Control(_float fTimeDelta)
 	//내가 현재 카메라가 아니라면 컨트롤은 못하게 하기
 	if (m_pGameInstance->Get_CurCameraPtr() != this)
 	{
+		if (m_pFirstTarget == nullptr) return;
 		if (m_bWasMainCamera)
 			m_pTransformCom->Look_At(m_pFirstTarget->Get_State(CTransform::STATE_POSITION));
 		return;
 	}
-
 
 	if (/**m_pCurrentLevelID == LEVEL_TOOL_MAP ||*/ m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
 	{
@@ -413,7 +409,6 @@ void CCamera_Free::Control(_float fTimeDelta)
 			}
 		}
 	}
-
 }
 
 CCamera_Free* CCamera_Free::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

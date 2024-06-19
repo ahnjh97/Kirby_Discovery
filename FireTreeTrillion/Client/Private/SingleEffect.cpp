@@ -41,8 +41,6 @@ HRESULT CSingleEffect::Initialize(void* pArg)
 			FXDesc.vInitRot = (*(FX_DESC*)pArg).vInitRot;
 			FXDesc.vInitScale = (*(FX_DESC*)pArg).vInitScale;
 			FXDesc.pSocketMatrix = (*(FX_DESC*)pArg).pSocketMatrix;
-			//FXDesc.bIsColorRender = (*(FX_DESC*)pArg).bIsColorRender;
-			//m_iPassIdx = 1;
 		}
 	}
 	else if (pArg != nullptr)
@@ -93,9 +91,22 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 	if (m_bDead)
 		return OBJ_DEAD;
 
+	//현재 설정 값으로 적용할 타임델타 값을 바꾼다.
+	_float fMyTimeDelta = _fTimeDelta;
+	switch (m_eTimer)
+	{
+	case TIMER_FIRST:
+		fMyTimeDelta = m_pGameInstance->Get_FirstTimer();
+		break;
+	case TIMER_SECOND:
+		fMyTimeDelta = m_pGameInstance->Get_SecondTimer();
+		break;
+	default:
+		break;
+	}
 
 	//true 반환하면 duration 끝난 것.
-	if (Calculate_Duration(_fTimeDelta))
+	if (Calculate_Duration(fMyTimeDelta))
 	{
 		//툴에서는 다시 시작하기
 		if (*m_pCurrentLevelID != LEVEL_TOOL_FX)
@@ -106,39 +117,39 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 	}
 
 	//true 반환하면 lifetime 끝난 것.
-	if (Calculate_Lifetime(_fTimeDelta))
+	if (Calculate_Lifetime(fMyTimeDelta))
 	{
-		if(*m_pCurrentLevelID != LEVEL_TOOL_FX)
+		if (*m_pCurrentLevelID != LEVEL_TOOL_FX)
 			m_bNoRender = true;
 	}
 
 
-	m_vCurPos = Calculate_CurValue_Lerp(_fTimeDelta, KF_POS);
+	m_vCurPos = Calculate_CurValue_Lerp(fMyTimeDelta, KF_POS);
 
-	Quaternion vCurQuat = Calculate_CurValue_Slerp(_fTimeDelta, KF_ROT);
+	Quaternion vCurQuat = Calculate_CurValue_Slerp(fMyTimeDelta, KF_ROT);
 	_float3 vRadianEuler = vCurQuat.ToEuler();
 	m_vCurRot = { ToDegree(vRadianEuler.x), ToDegree(vRadianEuler.y), ToDegree(vRadianEuler.z) };
-	m_vCurScale = Calculate_CurValue_Lerp(_fTimeDelta, KF_SCALE);
+	m_vCurScale = Calculate_CurValue_Lerp(fMyTimeDelta, KF_SCALE);
 
-	m_vCurRColor = Calculate_CurValue_Lerp(_fTimeDelta, KF_RCOLOR);
-	m_vCurGColor = Calculate_CurValue_Lerp(_fTimeDelta, KF_GCOLOR);
-	m_vCurBColor = Calculate_CurValue_Lerp(_fTimeDelta, KF_BCOLOR);
-	m_fCurAlpha = Calculate_CurValue_Lerp(_fTimeDelta, KF_ALPHA).x;
-	m_fCurMaskThreshold = Calculate_CurValue_Lerp(_fTimeDelta, KF_MASK).x;
+	m_vCurRColor = Calculate_CurValue_Lerp(fMyTimeDelta, KF_RCOLOR);
+	m_vCurGColor = Calculate_CurValue_Lerp(fMyTimeDelta, KF_GCOLOR);
+	m_vCurBColor = Calculate_CurValue_Lerp(fMyTimeDelta, KF_BCOLOR);
+	m_fCurAlpha = Calculate_CurValue_Lerp(fMyTimeDelta, KF_ALPHA).x;
+	m_fCurMaskThreshold = Calculate_CurValue_Lerp(fMyTimeDelta, KF_MASK).x;
 
-	_float3 vUVOffset = Calculate_CurValue_Lerp(_fTimeDelta, KF_UVOFFSET);
+	_float3 vUVOffset = Calculate_CurValue_Lerp(fMyTimeDelta, KF_UVOFFSET);
 	m_vCurUVOffset = { vUVOffset.x, vUVOffset.y };
 
 
 	//뒤 세 변수는 이후 추가했으므로, vector 크기 기존과 달라 넘어가 버릴 수 있다.
 	if (KF_MASKUVOFFSET < m_Keyframes.size())
 	{
-		_float3 vMaskUVOffset = Calculate_CurValue_Lerp(_fTimeDelta, KF_MASKUVOFFSET);
+		_float3 vMaskUVOffset = Calculate_CurValue_Lerp(fMyTimeDelta, KF_MASKUVOFFSET);
 		m_vCurMaskUVOffset = { vMaskUVOffset.x, vMaskUVOffset.y };
 	}
 
 	if (KF_MASKUVANGLE < m_Keyframes.size())
-		m_vCurMaskUVAngle = Calculate_CurValue_Lerp(_fTimeDelta, KF_MASKUVANGLE).x;
+		m_vCurMaskUVAngle = Calculate_CurValue_Lerp(fMyTimeDelta, KF_MASKUVANGLE).x;
 
 	//초기 회전 세팅
 	_float3 vInitRadianRot = { ToRadian(m_vInitRot.x), ToRadian(m_vInitRot.y) , ToRadian(m_vInitRot.z) };

@@ -664,14 +664,12 @@ void COcTree::RenderAll(CGameInstance* pGameInstance, CShader* pMapShader, CShad
 
 		if (FAILED(colAnim->Play_Animation(pGameInstance->Get_SecondTimer())))
 			return;
-		if(FAILED(colAnim->Bind_StencilRimLightMotionBlur(pAnimShader, vecStrings)))
+		if (true == colAnim->IsFinished())
+			colAnim->ReturnToIdle();
+		if (FAILED(colAnim->Bind_StencilRimLightMotionBlur(pAnimShader, vecStrings)))
 			return;
 		if (FAILED(colAnim->Bind_WorldMatrixForOctree(pAnimShader)))
 			return;
-		/*if (FAILED(pAnimShader->Bind_Matrix("g_ViewMatrix", &pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
-			return;
-		if (FAILED(pAnimShader->Bind_Matrix("g_ProjMatrix", &pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
-			return;*/
 
 		for (_uint i = 0; i < iNumMeshes; i++) {
 			if (FAILED(colAnim->Bind_ShaderResource(pAnimShader, m_vecConstantNames[0].c_str(), i, TextureType_DIFFUSE)))
@@ -764,14 +762,12 @@ void COcTree::RenderMyMesh(CGameInstance* pGameInstance, CShader* pMapShader, CS
 
 		if (FAILED(myColAnim->Play_Animation(pGameInstance->Get_SecondTimer())))
 			return;
+		if (true == myColAnim->IsFinished())
+			myColAnim->ReturnToIdle();
 		if (FAILED(myColAnim->Bind_StencilRimLightMotionBlur(pAnimShader, vecStrings)))
 			return;
 		if (FAILED(myColAnim->Bind_WorldMatrixForOctree(pAnimShader)))
 			return;
-		/*if (FAILED(pAnimShader->Bind_Matrix("g_ViewMatrix", &pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
-			return;
-		if (FAILED(pAnimShader->Bind_Matrix("g_ProjMatrix", &pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
-			return;*/
 
 		for (_uint i = 0; i < iNumMeshes; i++) {
 			if (FAILED(myColAnim->Bind_ShaderResource(pAnimShader, m_vecConstantNames[0].c_str(), i, TextureType_DIFFUSE)))

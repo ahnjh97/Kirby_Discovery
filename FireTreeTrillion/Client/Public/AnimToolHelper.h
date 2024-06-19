@@ -11,19 +11,6 @@ BEGIN(Client)
 class CAnimToolHelper final : public CGameObject
 {
 public:
-	//struct EVENT_INFO
-	//{
-	//	string	strEventName;
-	//	_int	iStartFrame;
-	//	_int	iEndFrame;
-	//};
-
-	//struct ANIM_INFO
-	//{
-	//	_float				fAnimSpeed;
-	//	vector<EVENT_INFO>	vecEventInfo;
-	//};
-
 	using AnimToolMap = unordered_map< string, unordered_map< string, ANIM_INFO >>;
 
 private:
@@ -48,7 +35,8 @@ private:
 	void					Render_FrameLine(class CAnimation** pModel, const string& strAnimationTag);
 
 	void					Save();
-	void					Load(/*const string& FileName = ""*/);
+	void					Load();
+	string					Remove_BeforeLastPipe(const string& str);
 
 private:
 	vector<string>							m_vecAnimModels;
@@ -61,10 +49,8 @@ private:
 	_bool									m_bOnce = false;
 	_bool									m_bOnceAnim = false;
 
-	//vector<SEQUENCE_ITEM>					m_vecSequence;
 	AnimToolMap								m_mapSequence;
 
-	// 객체별 띄우는 로직으로 변경
 	// 현재 선택된 객체
 	class CCharacter*						m_pCharacter = nullptr;
 	vector<class CCharacter*>				m_vecCharacter;

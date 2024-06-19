@@ -159,6 +159,7 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 
 	HRESULT hr;
 
+	
 	path FXPath("../Bin/Resources/Effects/Single/");
 	if (!exists(FXPath) || !is_directory(FXPath))
 	{
@@ -255,7 +256,7 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 
 	}
 
-
+	
 
 	return	S_OK;
 }

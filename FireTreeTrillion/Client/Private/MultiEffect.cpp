@@ -95,8 +95,8 @@ HRESULT CMultiEffect::Initialize(void* pArg)
 				SingleFXDesc.vInitPos = FXDesc.vInitPos;
 				SingleFXDesc.vInitRot = FXDesc.vInitRot;
 				SingleFXDesc.vInitScale = FXDesc.vInitScale;
-				m_bIsColorRender = true;
-				SingleFXDesc.bIsColorRender = true;
+				//m_bIsColorRender = true;
+				//SingleFXDesc.bIsColorRender = true;
 				SingleFXDesc.pSocketMatrix = FXDesc.pSocketMatrix;
 
 				wstring wstrProtoName = L"Prototype_GameObject_" + CUtils::StrToWstr(FXName);
@@ -106,7 +106,6 @@ HRESULT CMultiEffect::Initialize(void* pArg)
 
 				m_FXs.push_back(pFX);
 				m_fDuration.second = pFX->Get_BiggerDuration(m_fDuration.second);
-
 			}
 		}
 	}
@@ -215,10 +214,12 @@ CGameObject* CMultiEffect::Clone(void* pArg)
 
 void CMultiEffect::Free()
 {
-	for (auto& pEffect : m_FXs)
-		Safe_Release(pEffect);
-
-	m_FXs.clear();
+	if (!m_FXs.empty())
+	{
+		for (auto& pEffect : m_FXs)
+			Safe_Release(pEffect);
+		m_FXs.clear();
+	}
 
 	__super::Free();
 }
