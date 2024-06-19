@@ -163,7 +163,10 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 
 	Quaternion vInitQuat = Quaternion::CreateFromYawPitchRoll(vInitRadianRot);
 
-	Quaternion vResultQuat = vCurQuat * vInitQuat;
+	_float3 vCurContinueRot = { ToRadian(m_vContinuousRotation.x), ToRadian(m_vContinuousRotation.y) , ToRadian(m_vContinuousRotation.z) };
+	vCurContinueRot *= m_fDuration.first;
+	Quaternion vContinuousQuat = Quaternion::CreateFromYawPitchRoll(vCurContinueRot);
+	Quaternion vResultQuat = vContinuousQuat * vCurQuat * vInitQuat;
 
 	m_pTransformCom->Turn_Absolute(vResultQuat);
 
@@ -189,8 +192,6 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 
 void CSingleEffect::Late_Tick(_float _fTimeDelta)
 {
-	//if (m_fLifeRatio >= 1.f)
-	//	return;
 
 	if ((CRenderer::RENDERGROUP)m_eRenderGroup != CRenderer::RENDER_END)
 		m_pGameInstance->Add_RenderGroup((CRenderer::RENDERGROUP)m_eRenderGroup, this);

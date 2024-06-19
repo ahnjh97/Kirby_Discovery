@@ -1,7 +1,6 @@
 #pragma once
 #include "Client_Defines.h"
 #include "RigidObject.h"
-#include "Trigger.h"
 
 BEGIN(Engine)
 class CModel;
@@ -34,8 +33,9 @@ private:
 
 private:
 	CModel*			m_pModelCom = nullptr;
-	CTrigger*		m_pTrigger = nullptr;
 	_float			m_fLifeTime = _float();
+
+	_bool			m_bLockCollision = { false };
 
 public:
 	static CKickableRock*	 Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

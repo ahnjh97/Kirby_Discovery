@@ -5,6 +5,8 @@
 #include "Bone.h"
 #include "CappyHat.h"
 
+#include "HitBox.h"
+
 CCappyBody::CCappyBody(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
 {
@@ -254,13 +256,22 @@ HRESULT CCappyBody::Add_Components()
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	CHECK_FAILED(hr);
 	m_pControllerCom->Set_Object(this);
-	m_pControllerCom->Register_Controller();
 
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 
 	// FOR ANIMTOOL
 	m_ppModelForAnimTool = &m_pModelCom;
+
+
+	CHitBox::HITBOX_DESC HitBox{};
+	HitBox.pOwner = this;
+	HitBox.pDesc = &m_tColliderDesc[BODY];
+	HitBox.pCollisionType = MONSTER;
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
+		return E_FAIL;
+	Set_BodyCollider(COLLIDER_CYLINDER, 0.5f, 1.f, 0.85f);
+
 
 	/* FSM */
 	SetUp_FSM();

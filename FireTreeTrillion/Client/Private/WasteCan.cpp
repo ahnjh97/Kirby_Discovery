@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "WasteCan.h"
-#include "Trigger.h"
 
 CWasteCan::CWasteCan(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CRigidObject{ pDevice, pContext }
@@ -14,7 +13,6 @@ CWasteCan::CWasteCan(const CWasteCan& rhs)
 
 HRESULT CWasteCan::Initialize_Prototype()
 {
-	m_eCollisionGroup = KICKABLE;
 
 	return S_OK;
 }
@@ -31,6 +29,7 @@ HRESULT CWasteCan::Initialize(void* pArg)
 	HRESULT  hr = __super::Initialize(pGameObjectDesc);
 	CHECK_FAILED(hr);
 
+	//m_pTransformCom->Set_State(CTransform::STATE_POSITION, CUtils::Get_State_Vector_Matrix(pGameObjectDesc->matWorld, CUtils::STATE_POSITION));
 	Add_Components();
 
 	return S_OK;
@@ -50,7 +49,6 @@ _int CWasteCan::Tick(_float fTimeDelta)
 		_float3 force = _float3{ 0.5f, 3.f , 0.5f };
 		m_pGameInstance->Kick_DynamicActor(force, 500.f);
 	}
-	m_pTrigger->Tick(m_fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
@@ -146,23 +144,6 @@ HRESULT CWasteCan::Add_Components()
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
-	/* For.Com_RigidMesh */
-	//hr = __super::Add_Component(TEXT("Prototype_Component_RigidMesh"),
-	//	TEXT("Com_RigidMesh"), (CComponent**)&m_pModelCom);
-	//CHECK_FAILED(hr);
-
-	/* For.Com_Trigger */
-	CTrigger::TRIGGER_DESC tTriggerDesc{};
-	tTriggerDesc.iTriggerType = CTrigger::TRIGGER_MAPOBJ;
-	tTriggerDesc.iTriggerIndex = 0;
-	tTriggerDesc.eCollisionGroup = m_eCollisionGroup;
-	tTriggerDesc.vTriggerSize = _float3(.3f, .3f, .3f);
-	tTriggerDesc.vInitialPos = m_pTransformCom->Get_WorldFloat4x4();
-	m_pTrigger = static_cast<CTrigger*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc));
-	CHECK_NULLPTR(m_pTrigger);
-	m_pTrigger->Set_Owner(this);
-	m_pTrigger->Check_Collision();
-
 	return S_OK;
 }
 
@@ -212,6 +193,5 @@ void CWasteCan::Free()
 	__super::Free();
 
 	Safe_Release(m_pModelCom);
-	Safe_Release(m_pTrigger);
 }
 

@@ -12,8 +12,10 @@
 #include "Kabu.h"
 #include "BrontoBurt.h"
 #include "PoppyBrosJr.h"
+
 #include "BG.h"
 #include "HUD.h"
+
 #include "Starblock.h"
 #include "StarblockPiece.h"
 
@@ -58,52 +60,21 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
 		return E_FAIL;
 
-	// ------------------------------------------------------------ FOR TEST ------------------------------------------------------------
-	CGameObject::GAMEOBJECT_DESC ObjDesc{};
-	ObjDesc.fSpeedPerSec = 5.f;
-	ObjDesc.fRotationPerSec = ToRadian(90.f);
-	_float4x4 InitMat = _float4x4::Identity;
-	InitMat.Translation({ 0.f, 7.f, -185.f });
-	ObjDesc.matWorld = InitMat;
-
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Ladder"), TEXT("Prototype_GameObject_Ladder"),	&ObjDesc)))
+	//// Ladder Test
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Ladder"), TEXT("Prototype_GameObject_Ladder"))))
+	//	return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Item"), TEXT("Prototype_GameObject_Coin"))))
+	//	return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Item"), TEXT("Prototype_GameObject_EnergyDrink"))))
 	//	return E_FAIL;
 
-	//InitMat.Translation({ 0.f, 7.f, -180.f });
-	//ObjDesc.matWorld = InitMat;
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Item"), TEXT("Prototype_GameObject_Coin"),		&ObjDesc)))
+	//CStarBlockPiece::PIECE_DESC desc{};
+	//desc.vInitialPos = _float4(1.f, 15.f, -179.f,1.f);
+	//HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_MapObject"), TEXT("Prototype_GameObject_StarBlockPiece"), &desc);
+	//CHECK_FAILED(hr);
+
+	//if (FAILED(Ready_Layer_MapObject(TEXT("Layer_MapObject"))))
 	//	return E_FAIL;
-	//
-	//InitMat.Translation({ 5.f, 7.f, -182.f });
-	//ObjDesc.matWorld = InitMat;
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Item"), TEXT("Prototype_GameObject_EnergyDrink"), &ObjDesc)))
-	//	return E_FAIL;
-
-	//InitMat.Translation({ 3.f, 7.f, -188.f });
-	//ObjDesc.matWorld = InitMat;
-	//HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_MapObject"), TEXT("Prototype_GameObject_WasteCan"), &ObjDesc);
-	//CHECK_FAILED(hr);
-
-	//InitMat.Translation({ -3.f, 7.f, -180.f });
-	//ObjDesc.matWorld = InitMat;
-	//hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_MapObject"), TEXT("Prototype_GameObject_KickableRock"),		&ObjDesc);
-	//CHECK_FAILED(hr);
-
-	// **** 맵 오브제
-	//CStarBlock::STARBLOCK_DESC StarBlockdesc{};
-	//StarBlockdesc.eSize = CStarBlock::MEDIUM;
-	//hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_MapObject"), TEXT("Prototype_GameObject_StarBlock"), &StarBlockdesc);
-	//CHECK_FAILED(hr);
-	
-	//CStarBlockPiece::PIECE_DESC StarBlockPieceDesc{};
-	//StarBlockPieceDesc.vInitialPos = _float4(1.f, 15.f, -179.f, 1.f);
-	//HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_MapObject"), TEXT("Prototype_GameObject_StarBlockPiece"), &StarBlockPieceDesc);
-	//CHECK_FAILED(hr);
-
-	// **** 테스트 모델
-	/*if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_TestModel"))))
-	return E_FAIL;*/
-	// ---------------------------------------------------------------------------------------------------------------------------------
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
@@ -209,14 +180,15 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& _wstrLayerTag)
 {
 	//모든 HUD를 준비
 	string strUITag = { "LayerUI" };
-	CHUD::HUD_STATUS eHUDType = CHUD::STAT_NONE;
+	CHUD::UI_TAG eHUDType = CHUD::TAG_NONE;
 
-	map<CHUD::HUD_STATUS, string> HUDmap = 
+	map<CHUD::UI_TAG, string> HUDmap =
 	{
-		{CHUD::STAT_KIRBY, "HUD_KirbyStatus"},
-		{CHUD::STAT_STARPOINT, "HUD_StarPoint"},
+		{CHUD::HUD_KIRBYHP, "HUD_KirbyStatus"},
+		{CHUD::HUD_STARPOINT, "HUD_StarPoint"},
 		//{CHUD::STAT_NONE, "LayerUI"},
 	};
+
 
 	//auto it = HUDmap.find(eHUDType);
 	//if (it != HUDmap.end()) { strUITag = it->second;	}

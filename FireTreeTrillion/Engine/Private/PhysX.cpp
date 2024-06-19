@@ -161,14 +161,6 @@ void CPhysX::Register_Player(PxActor* pPlayerActor)
     m_pEventCallBack->Register_Player(pPlayerActor);
 }
 
-void CPhysX::Register_Controller(PxActor* pActor, PxController* pController)
-{
-    if (nullptr == m_pEventCallBack)
-        return;
-
-    m_pEventCallBack->Register_Controller(pActor, pController);
-}
-
 void CPhysX::Register_Trigger(PxActor* pTriggerActor, _int iTriggerType, _int iTriggerIndex)
 {
     if (nullptr == m_pEventCallBack)
@@ -345,46 +337,6 @@ PxRigidStatic* CPhysX::CreateStaticActor(_float4x4& matWorld, _float3* pVertices
 }
 
 
-// 함수 내에 해당 코드를 포함한다고 가정
-//void CPhysX::Overlap_Hitbox(CGameObject* pGameObject, _float4 vPos, _float fRadius)
-//{
-//    // 겹침을 검사할 구체의 기하학적 모양 생성
-//    PxSphereGeometry overlapShape = PxSphereGeometry(fRadius);
-//    // 초기 위치와 회전을 설정하는 PxTransform 객체 생성
-//    PxTransform pxTransform(PxVec3(vPos.x, vPos.y, vPos.z));
-//
-//    // Overlap 결과를 저장할 배열 동적 할당
-//    PxOverlapHit* hitOverlap = new PxOverlapHit[OVERLAP_MAX]; 	//const int maxHits = 8; //= 4096;
-//    PxScene* myScene = CGameInstance::Get_Instance()->Get_Scene();
-//    _int howMany = PxSceneQueryExt::overlapMultiple(*myScene, overlapShape, pxTransform, hitOverlap, OVERLAP_MAX, PxQueryFilterData(PxQueryFlag::eDYNAMIC | PxQueryFlag::eSTATIC | PxQueryFlag::eNO_BLOCK));
-//
-//    CGameObject* pPlayer = nullptr;
-//    for (_int i = 0; i < howMany; ++i)
-//    {
-//        PxOverlapHit& hit = hitOverlap[i];
-//        PxRigidActor* actor = hit.actor;  // 충돌된 객체의 액터
-//        // FOR TEST
-//        if (howMany > 2)
-//            _int b = 3;
-//        if (actor->userData == "RigidMesh")
-//            continue;// _int a = 3;
-//
-//        const char* actorName = actor->getName();
-//        CComponent* pComponent = static_cast<CComponent*>(actor->userData);
-//        if (pComponent == nullptr) continue;
-//
-//        // ======================================== FOR TEST : 임시 ========================================
-//        CGameObject* pActorObject = pComponent->Get_Object();
-//        if (pActorObject == nullptr) continue;
-//        if (pActorObject->Get_PrototypeTag() != pPlayer->Get_PrototypeTag())
-//            pPlayer->Collision_Overlap(pActorObject); // actorObject가 플레이어가 아닐경우 collision_overlap 실행
-//        // =================================================================================================
-//    }
-//
-//    Safe_Delete_Array(hitOverlap);
-//}
-
-
 CPhysX* CPhysX::Create()
 {
     CPhysX* pInstance = new CPhysX();
@@ -441,7 +393,6 @@ void CPhysX::Free()
 
 }
 
-
 // ====================================================================================================================
 PxControllerBehaviorFlags CControllerBehaviorCallback::getBehaviorFlags(const PxController& controller)
 {
@@ -457,35 +408,5 @@ PxControllerBehaviorFlags CControllerBehaviorCallback::getBehaviorFlags(const Px
         }
     }
     return PxControllerBehaviorFlag::eCCT_SLIDE;
-}
-
-
-void CUserControllerHitReport::onShapeHit(const PxControllerShapeHit& hit)
-{
-}
-
-void CUserControllerHitReport::onControllerHit(const PxControllersHit& hit)
-{
-	PxController* MeController = hit.controller;
-	PxController* otherController = hit.other;
-    // physX에서 사라지게 한 Actor 예외처리
-    if (MeController->getActor() == nullptr || otherController->getActor() == nullptr)
-        return;
-
-	CComponent* pComponentSrc = static_cast<CComponent*>(MeController->getUserData());
-	CComponent* pComponentDst = static_cast<CComponent*>(otherController->getUserData());
-	if (pComponentSrc != nullptr && pComponentDst != nullptr)
-	{
-		CGameObject* pActorObjectSrc = pComponentSrc->Get_Object();
-		CGameObject* pActorObjectDst = pComponentDst->Get_Object();
-
-        CGameInstance::Get_Instance()->Add_CollisionObjects(pActorObjectSrc, pActorObjectDst);
-    }
-}
-
-/// <summary> 히트박스와 콜라이더의 충돌을 어떻게 처리할 것인지 정의하는 PhysX의 콜백함수입니다. </summary>
-_bool CControllerFilterCallback::filter(const PxController& pObj, const PxController& pOtherObj)
-{
-    return true;
 }
 

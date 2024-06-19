@@ -28,35 +28,16 @@ HRESULT CHUD::Initialize(void* _pArg)
 
 	m_UIObjDesc = (*HUDUI_Desc);
 
-	//CUIObject* pUIObj = { nullptr };
-
-	//pUIObj = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_HUD_KirbyStatus"), &m_UIObjDesc));
-	//m_HUDs.push_back(pUIObj);
-
 	return S_OK;
 }
 
 _int CHUD::Tick(_float _fTimeDelta)
 {
-	__super::Tick(_fTimeDelta);
-
-	if (!m_HUDs.empty())
-	{
-		for (auto& pUIObj : m_HUDs)
-			pUIObj->Tick(_fTimeDelta);
-	}
-
 	return OBJ_NOEVENT;
 }
 
 void CHUD::Late_Tick(_float _fTimeDelta)
 {
-	if (!m_HUDs.empty())
-	{
-		for (auto& pUIObj : m_HUDs)
-			pUIObj->Late_Tick(_fTimeDelta);
-	}
-
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_UI, this);
 }
 
@@ -99,14 +80,6 @@ CGameObject* CHUD::Clone(void* pArg)
 
 void CHUD::Free()
 {
-	if (!m_HUDs.empty())
-	{
-		for (auto& pHUD : m_HUDs)
-			Safe_Release(pHUD);
-
-		m_HUDs.clear();
-	}
-
 	__super::Free();	
 }
 

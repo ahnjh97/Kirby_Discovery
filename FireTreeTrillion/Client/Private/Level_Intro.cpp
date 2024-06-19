@@ -11,6 +11,7 @@
 #include "Kabu.h"
 #include "BrontoBurt.h"
 #include "PoppyBrosJr.h"
+
 #include "BG.h"
 #include "HUD.h"
 
@@ -175,12 +176,12 @@ HRESULT CLevel_Intro::Ready_Layer_UI(const wstring& _wstrLayerTag)
 {
 	//모든 HUD를 준비
 	string strUITag = { "LayerUI" };
-	CHUD::HUD_STATUS eHUDType = CHUD::STAT_NONE;
+	CHUD::UI_TAG eHUDType = CHUD::TAG_NONE;
 
-	map<CHUD::HUD_STATUS, string> HUDmap =
+	map<CHUD::UI_TAG, string> HUDmap =
 	{
-		{CHUD::STAT_KIRBY, "HUD_KirbyStatus"},
-		{CHUD::STAT_STARPOINT, "HUD_StarPoint"},
+		{CHUD::HUD_KIRBYHP, "HUD_KirbyStatus"},
+		{CHUD::HUD_STARPOINT, "HUD_StarPoint"},
 		//{CHUD::STAT_NONE, "LayerUI"},
 	};
 
@@ -781,7 +782,7 @@ HRESULT CLevel_Intro::Ready_Items()
 
 		if ("Item_Coin" == strModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Item"), TEXT("Prototype_GameObject_Coin"), &tDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Item"), TEXT("Prototype_GameObject_Coin"), &tDesc)))
 				return E_FAIL;
 		}
 	}

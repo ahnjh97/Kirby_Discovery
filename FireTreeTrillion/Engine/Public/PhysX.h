@@ -28,7 +28,6 @@ public:
 
     //EventCallBack 함수들
     void Register_Player(PxActor* pPlayerActor);
-    void Register_Controller(PxActor* pActor, PxController* pController);
     void Register_Trigger(PxActor* pTriggerActor, _int iTriggerType, _int iTriggerIndex);
     void Emplace_TriggerFunc(_int iTriggerType, function<void(_int)> func);
     void Emplace_ExitFunc(_int iTriggerType, function<void(void)> exitFunc);
@@ -106,9 +105,9 @@ class ENGINE_DLL CUserControllerHitReport : public physx::PxUserControllerHitRep
 {
 public:
     // 캐릭터 컨트롤러의 충돌 이벤트 처리
-    virtual void    onShapeHit(const physx::PxControllerShapeHit& hit) override;
+    virtual void    onShapeHit(const physx::PxControllerShapeHit& hit) override {}
     
-    virtual void    onControllerHit(const PxControllersHit& hit) override;
+    virtual void    onControllerHit(const PxControllersHit& hit) override {}
 
     // for 순수가상함수
     virtual void    onObstacleHit(const PxControllerObstacleHit& hit) override {}
@@ -117,7 +116,7 @@ public:
 class CControllerFilterCallback : public PxControllerFilterCallback
 {
 public:
-    virtual bool    filter(const PxController& pObj, const PxController& pOtherObj) override;
+    virtual bool    filter(const PxController& pObj, const PxController& pOtherObj) override { return true; }
 };
 
 END

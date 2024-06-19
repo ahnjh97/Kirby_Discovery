@@ -90,11 +90,13 @@ void CKirbyVacuum_Spit_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		if (pController->Is_Terrain() == true)
 		{
 			pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+			return;
 		}
 		// ¾Ö´Ô ³¡³µ´Âµ¥ ¶¥À» ¹âÁö¾Ê°í °øÁß¿¡ ÀÖ´Ù°í ÆÇ´Ü µÉ °æ¿ì
 		else
 		{
 			pKirby->Change_State(CKirby::STATE_FALL, 50.f, false, true, CKirby::BODY_DEFAULT);
+			return;
 		}
 	}
 }
@@ -168,6 +170,7 @@ void CKirbyVacuum_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float f
 		if (pKirby->isAnimFinish())
 		{
 			pKirby->Change_State(CKirby::STATE_INHALE, 50.f, true, true, CKirby::BODY_VACUUM);
+			return;
 		}
 
 		pController->FreeFall(pTransformCom, fTimeDelta, Kirbydesc->m_fGravityOffset);
@@ -182,6 +185,7 @@ void CKirbyVacuum_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float f
 			if (DESC(m_fVacuumTime) > 1.2f)
 			{
 				pKirby->Change_State(CKirby::STATE_SUPERINHALESTART, 60.f, false, true, CKirby::BODY_VACUUM);
+				return;
 			}
 		}
 		// ÃÖ¼Ò 0.2ÃÊ°£Àº ÈíÀÔÇÑ´Ù.
@@ -191,11 +195,13 @@ void CKirbyVacuum_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float f
 			DESC(m_fVacuumTime) = 0.f;
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			pKirby->Change_State(CKirby::STATE_INHALEEND, 100.f, false, false, CKirby::BODY_VACUUM);
+			return;
 		}
 
 		if (JoyStick_controller(Kirbydesc, pCamera) == true)
 		{
 			pKirby->Change_State(CKirby::STATE_INHALEWALK, 50.f, true, true, CKirby::BODY_VACUUM);
+			return;
 		}
 		pController->FreeFall(pTransformCom, fTimeDelta, Kirbydesc->m_fGravityOffset);
 	}
@@ -209,6 +215,7 @@ void CKirbyVacuum_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float f
 		{
 			Jump_Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
 			pKirby->Change_State(CKirby::STATE_SUPERINHALEWALK, 50.f, true, true, CKirby::BODY_VACUUM);
+			return;
 		}
 
 		// ¾Ö´ÔÀÌ ÀÚ¿¬½º·´°Ô ³¡³µÀ¸¸é ½´ÆÛ»¡±â
@@ -216,6 +223,7 @@ void CKirbyVacuum_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float f
 		{
 			DESC(m_eEyeState) = CKirby::EYE_CLOSE;
 			pKirby->Change_State(CKirby::STATE_SUPERINHALE, 50.f, true, true, CKirby::BODY_VACUUM);
+			return;
 		}
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == false)
@@ -223,6 +231,7 @@ void CKirbyVacuum_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float f
 			DESC(m_fVacuumTime) = 0.f;
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			pKirby->Change_State(CKirby::STATE_INHALEEND, 100.f, false, false, CKirby::BODY_VACUUM);
+			return;
 		}
 		pController->FreeFall(pTransformCom, fTimeDelta, Kirbydesc->m_fGravityOffset);
 	}
@@ -234,6 +243,7 @@ void CKirbyVacuum_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float f
 		if (JoyStick_controller(Kirbydesc, pCamera) == true)
 		{
 			pKirby->Change_State(CKirby::STATE_SUPERINHALEWALK, 50.f, true, true, CKirby::BODY_VACUUM);
+			return;
 		}
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == false)
@@ -241,6 +251,7 @@ void CKirbyVacuum_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float f
 			DESC(m_fVacuumTime) = 0.f;
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			pKirby->Change_State(CKirby::STATE_INHALEEND, 100.f, false, false, CKirby::BODY_VACUUM);
+			return;
 		}
 
 		pController->FreeFall(pTransformCom, fTimeDelta, Kirbydesc->m_fGravityOffset);
@@ -253,6 +264,7 @@ void CKirbyVacuum_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float f
 		{
 			pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			return;
 		}
 
 		pController->FreeFall(pTransformCom, fTimeDelta, Kirbydesc->m_fGravityOffset);
@@ -270,11 +282,14 @@ void CKirbyVacuum_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float f
 			Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
 
 		// ¹Ù´Ú¿¡ ´ê¾Ò´Ù¸é
-		pController->FreeFall(pTransformCom, fTimeDelta, Kirbydesc->m_fGravityOffset);
+		//pController->FreeFall(pTransformCom, fTimeDelta, Kirbydesc->m_fGravityOffset);
+		pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
+		DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
 
 		if (pController->Is_Terrain())
 		{
 			pKirby->Change_State(CKirby::STATE_INHALELANDING, 50.f, false, true, CKirby::BODY_VACUUM);
+			return;
 		}
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == false)
@@ -282,6 +297,7 @@ void CKirbyVacuum_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float f
 			DESC(m_fVacuumTime) = 0.f;
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			pKirby->Change_State(CKirby::STATE_INHALEEND, 100.f, false, false, CKirby::BODY_VACUUM);
+			return;
 		}
 
 	}
@@ -305,15 +321,20 @@ void CKirbyVacuum_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float f
 				if (DESC(m_fVacuumTime) > 1.2f)
 				{
 					pKirby->Change_State(CKirby::STATE_SUPERINHALESTART, 60.f, false, true, CKirby::BODY_VACUUM);
+					return;
 				}
 				else
+				{
 					pKirby->Change_State(CKirby::STATE_INHALE, 50.f, true, true, CKirby::BODY_VACUUM);
+					return;
+				}
 			}
 			else
 			{
 				DESC(m_fVacuumTime) = 0.f;
 				DESC(m_eEyeState) = CKirby::EYE_IDLE;
 				pKirby->Change_State(CKirby::STATE_INHALEEND, 100.f, false, false, CKirby::BODY_VACUUM);
+				return;
 			}
 		}
 	}
@@ -366,6 +387,7 @@ void CKirbyVacuum_VacuumWalk_State::OnStateUpdate(CGameObject* pGameObject, _flo
 	if (pController->Compute_Height() > 2.f)
 	{
 		pKirby->Change_State(CKirby::STATE_INHALEFALL, 50.f, true, true, CKirby::BODY_VACUUM);
+		return;
 	}
 
 	// »¡¾ÆµéÀÌ¸é¼­ °È±â
@@ -380,16 +402,19 @@ void CKirbyVacuum_VacuumWalk_State::OnStateUpdate(CGameObject* pGameObject, _flo
 			DESC(m_fVacuumTime) = 0.f;
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			pKirby->Change_State(CKirby::STATE_INHALEEND, 100.f, false, false, CKirby::BODY_VACUUM);
+			return;
 		}
 
 		if (DESC(m_fVacuumTime) > 1.2f)
 		{
 			pKirby->Change_State(CKirby::STATE_SUPERINHALEWALK, 50.f, true, true, CKirby::BODY_VACUUM);
+			return;
 		}
 
 		if (JoyStick_controller(Kirbydesc, pCamera) == false)
 		{
 			pKirby->Change_State(CKirby::STATE_INHALE, 50.f, true, true, CKirby::BODY_VACUUM);
+			return;
 		}
 		pController->FreeFall(pTransformCom, fTimeDelta, Kirbydesc->m_fGravityOffset);
 	}
@@ -406,11 +431,13 @@ void CKirbyVacuum_VacuumWalk_State::OnStateUpdate(CGameObject* pGameObject, _flo
 			DESC(m_fVacuumTime) = 0.f;
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			pKirby->Change_State(CKirby::STATE_INHALEEND, 100.f, false, false, CKirby::BODY_VACUUM);
+			return;
 		}
 
 		if (JoyStick_controller(Kirbydesc, pCamera) == false)
 		{
 			pKirby->Change_State(CKirby::STATE_SUPERINHALESTART, 60.f, false, true, CKirby::BODY_VACUUM);
+			return;
 		}
 		pController->FreeFall(pTransformCom, fTimeDelta, Kirbydesc->m_fGravityOffset);
 	}
@@ -463,6 +490,9 @@ void CKirbyVacuum_Vacuuming_State::OnStateUpdate(CGameObject* pGameObject, _floa
 	_vector vObjectPos = pObjectTransform->Get_State_Vector(CTransform::STATE_POSITION);
 	_float vCurDistance = XMVectorGetX(XMVector3Length(vPos - vObjectPos));
 	_float4 vObjectDir = XMVector3Normalize(vPos - vObjectPos);
+
+	if (DESC(m_fVacuumTime) < 1.2f)
+		DESC(m_fVacuumTime) += fTimeDelta;
 
 	CCharacterController* pObjectController = static_cast<CCharacterController*>(DESC(m_pObject)->Get_Component(TEXT("Com_Controller")));
 	if (pObjectController == nullptr)

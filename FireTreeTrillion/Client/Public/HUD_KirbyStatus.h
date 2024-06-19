@@ -35,7 +35,7 @@ private:
 	HRESULT						Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom);
 
 	void						Update_UIState(_float _fTimeDelta);
-	void						Play_Animation(_float _fAccTime, HUD_KIRBYHP _eCurState);
+	void						Play_Animation(_float _fAccTime, KIRBYHP_STATE _eCurState);
 
 	void						Compute_Player_Hp(_float fTimeDelta);
 
@@ -43,8 +43,8 @@ private:
 	_bool						m_IsMovingUP = { TRUE };
 	_bool						m_IsKirbyEX = { FALSE };
 
-	HUD_KIRBYHP					m_ePreState = { KIRBYHP_NONE };
-	HUD_KIRBYHP					m_eCurState = { KIRBYHP_NONE };
+	KIRBYHP_STATE					m_ePreState = { KIRBYHP_NONE };
+	KIRBYHP_STATE					m_eCurState = { KIRBYHP_NONE };
 
 	// 마스킹을 위한 텍스쳐
 	CTexture*					m_pTextureMask = { nullptr };

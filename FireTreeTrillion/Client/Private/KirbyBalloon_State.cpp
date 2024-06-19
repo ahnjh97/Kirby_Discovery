@@ -31,6 +31,7 @@ void CKirbyBalloon_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 		DESC(m_eEyeState) = CKirby::EYE_IDLE;
 		DESC(m_isEatFall) = true;
 		pKirby->Change_State(CKirby::STATE_EATJUMP, 50.f, false, true, CKirby::BODY_BALLOON);
+		return;
 	}
 
 	// 먹는 순간의 로직
@@ -41,14 +42,13 @@ void CKirbyBalloon_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 			if (DESC(m_eTemporaryEatType) == ABILITY_DEFAULT)
 			{
 				pKirby->Change_State(CKirby::STATE_EATWAIT, 60.f, true, true, CKirby::BODY_BALLOON);
+				return;
 			}
 			else
 			{
 				DESC(m_isEat) = false;
-				pKirby->Change_State(CKirby::STATE_SWALLOWSTART, 60.f, false, false, CKirby::BODY_BALLOON);
 
 				CMultiEffect::MULTI_FX_DESC FXDesc{};
-
 				_float4 vMyPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
 				vMyPos += pTransformCom->Get_State(CTransform::STATE_LOOK) * .2f;
 
@@ -61,6 +61,8 @@ void CKirbyBalloon_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 				Copy_Star(pTransformCom);
 
 				static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr())->Set_FOVY(20.f);
+				pKirby->Change_State(CKirby::STATE_SWALLOWSTART, 60.f, false, false, CKirby::BODY_BALLOON);
+				return;
 			}
 		}
 	}
@@ -72,6 +74,7 @@ void CKirbyBalloon_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 		{
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			pKirby->Change_State(CKirby::STATE_EATRUN, 100.f, true, true, CKirby::BODY_BALLOON);
+			return;
 		}
 
 		// Idle일 때, C를 누르면 점프를 한다.
@@ -80,8 +83,6 @@ void CKirbyBalloon_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 			// 점프의 초기 파워
 			DESC(m_fJumpVelocity) = 22.f;
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
-			pKirby->Change_State(CKirby::STATE_EATJUMP, 50.f, false, true, CKirby::BODY_BALLOON);
-
 			DESC(m_fChangeVelocityZeroTime) = 0.f;
 			// 공중에서 체공하는 시간 0.15초
 			DESC(m_fHoldAirTime) = 0.f;
@@ -89,6 +90,9 @@ void CKirbyBalloon_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 			DESC(m_fJumpHoldTime) = 0.f;
 			// 재입력 블락기능 초기화
 			DESC(m_bRePressBlock) = false;
+			pKirby->Change_State(CKirby::STATE_EATJUMP, 50.f, false, true, CKirby::BODY_BALLOON);
+			return;
+
 		}
 
 		// Eat 상태일 때 뱉는 모션을 취한다.
@@ -96,6 +100,7 @@ void CKirbyBalloon_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 		{
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			pKirby->Change_State(CKirby::STATE_SPIT, 70.f, false, false, CKirby::BODY_VACUUM);
+			return;
 		}
 	}
 
@@ -138,14 +143,17 @@ void CKirbyBalloon_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
+	Moving_Logic(Kirbydesc, pTransformCom, pController, fTimeDelta);
+	Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
+	Turn_Z_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
+	pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
+
 	// Idle일 때, C를 누르면 점프를 한다.
 	if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
 	{
 		// 점프의 초기 파워
 		DESC(m_fJumpVelocity) = 22.f;
 		DESC(m_eEyeState) = CKirby::EYE_IDLE;
-		pKirby->Change_State(CKirby::STATE_EATJUMP, 50.f, false, true, CKirby::BODY_BALLOON);
-
 		DESC(m_fChangeVelocityZeroTime) = 0.f;
 		// 공중에서 체공하는 시간 0.15초
 		DESC(m_fHoldAirTime) = 0.f;
@@ -153,16 +161,23 @@ void CKirbyBalloon_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		DESC(m_fJumpHoldTime) = 0.f;
 		// 재입력 블락기능 초기화
 		DESC(m_bRePressBlock) = false;
+		pKirby->Change_State(CKirby::STATE_EATJUMP, 50.f, false, true, CKirby::BODY_BALLOON);
+		return;
+
 	}
 
 	if (false == JoyStick_controller(Kirbydesc, pCamera))
+	{
 		pKirby->Change_State(CKirby::STATE_EATWAIT, 60.f, true, true, CKirby::BODY_BALLOON);
+		return;
+	}
 
 	if (pController->Compute_Height() > 2.f)
 	{
 		DESC(m_eEyeState) = CKirby::EYE_IDLE;
 		DESC(m_isEatFall) = true;
 		pKirby->Change_State(CKirby::STATE_EATJUMP, 50.f, false, true, CKirby::BODY_BALLOON);
+		return;
 	}
 
 	// Eat 상태일 때 뱉는 모션을 취한다.
@@ -170,13 +185,8 @@ void CKirbyBalloon_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	{
 		DESC(m_eEyeState) = CKirby::EYE_IDLE;
 		pKirby->Change_State(CKirby::STATE_SPIT, 70.f, false, false, CKirby::BODY_VACUUM);
+		return;
 	}
-
-	Moving_Logic(Kirbydesc, pTransformCom, pController, fTimeDelta);
-	Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
-	Turn_Z_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
-	pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
-
 }
 
 void CKirbyBalloon_Run_State::OnStateExit()
@@ -246,11 +256,12 @@ void CKirbyBalloon_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 	{
 		DESC(m_eEyeState) = CKirby::EYE_IDLE;
 		pKirby->Change_State(CKirby::STATE_SPIT, 70.f, false, false, CKirby::BODY_VACUUM);
+		return;
 	}
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN) && (pKirby->Get_State() == CKirby::STATE_EATJUMP))
 	{
-		if (pController->Compute_Height() < 3.f)
+		if (pController->Compute_Height() < 2.f)
 		{
 			DESC(m_bReserveJumpKey) = true;
 		}
@@ -264,10 +275,11 @@ void CKirbyBalloon_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 		if (pController->Is_Terrain())
 		{
 			DESC(m_isEatFall) = false;
-			pKirby->Change_State(CKirby::STATE_EATLANDING, 30.f, false, false, CKirby::BODY_BALLOON);
-
 			if (CUtils::Make_RandomInt(0, 1) > 0)
 				DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+
+			pKirby->Change_State(CKirby::STATE_EATLANDING, 30.f, false, false, CKirby::BODY_BALLOON);
+			return;
 		}
 	}
 	// 점프
@@ -277,7 +289,6 @@ void CKirbyBalloon_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 		if (DESC(m_bRePressBlock) == false && m_pGameInstance->Get_DIKeyState(DIK_C, KEY_PRESS) && DESC(m_fJumpHoldTime) < 0.3f)
 		{
 			DESC(m_fJumpHoldTime) += fTimeDelta;
-
 			DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
 			pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
 		}
@@ -328,9 +339,11 @@ void CKirbyBalloon_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 		// 만약, 땅에 안전하게 착지했을 경우, 홀딩 시간에 따라 뽀잉 애니메이션이 분기된다.
 		if (pController->Is_Terrain())
 		{
-			pKirby->Change_State(CKirby::STATE_EATLANDING, 50.f, false, false, CKirby::BODY_BALLOON);
 			if (CUtils::Make_RandomInt(0, 1) > 0)
 				DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+
+			pKirby->Change_State(CKirby::STATE_EATLANDING, 50.f, false, false, CKirby::BODY_BALLOON);
+			return;
 		}
 
 
@@ -343,8 +356,6 @@ void CKirbyBalloon_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 			// 점프의 초기 파워
 			DESC(m_fJumpVelocity) = 22.f;
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
-			pKirby->Change_State(CKirby::STATE_EATJUMP, 50.f, false, true, CKirby::BODY_BALLOON);
-
 			DESC(m_fChangeVelocityZeroTime) = 0.f;
 			// 공중에서 체공하는 시간 0.15초
 			DESC(m_fHoldAirTime) = 0.f;
@@ -354,6 +365,7 @@ void CKirbyBalloon_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 			DESC(m_bRePressBlock) = false;
 			// 예약 초기화
 			DESC(m_bReserveJumpKey) = false;
+			pKirby->Change_State(CKirby::STATE_EATJUMP, 50.f, false, true, CKirby::BODY_BALLOON);
 			return;
 		}
 
@@ -369,7 +381,6 @@ void CKirbyBalloon_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			// 점프의 초기 파워
 			DESC(m_fJumpVelocity) = 22.f;
-			pKirby->Change_State(CKirby::STATE_EATJUMP, 50.f, false, true, CKirby::BODY_BALLOON);
 
 			DESC(m_fChangeVelocityZeroTime) = 0.f;
 			// 공중에서 체공하는 시간 0.15초
@@ -378,7 +389,8 @@ void CKirbyBalloon_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 			DESC(m_fJumpHoldTime) = 0.f;
 			// 재입력 블락기능 초기화
 			DESC(m_bRePressBlock) = false;
-
+			pKirby->Change_State(CKirby::STATE_EATJUMP, 50.f, false, true, CKirby::BODY_BALLOON);
+			return;
 		}
 
 		// 바로 방향키를 갈겼다면
@@ -386,12 +398,14 @@ void CKirbyBalloon_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 		{
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			pKirby->Change_State(CKirby::STATE_EATRUN, 100.f, true, true, CKirby::BODY_BALLOON);
+			return;
 		}
 		// 자연스럽게 끝났다면
 		else if (pKirby->isAnimFinish())
 		{
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			pKirby->Change_State(CKirby::STATE_EATWAIT, 60.f, true, true, CKirby::BODY_BALLOON);
+			return;
 		}
 	}
 }
@@ -457,6 +471,7 @@ void CKirbyBalloon_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 			Kirbydesc->m_fJumpVelocity = 0.f;
 			pController->Reset_FallVelocity();
 			pKirby->Change_State(CKirby::STATE_FLIGHTLANDING, 70.f, false, false, CKirby::BODY_VACUUM);
+			return;
 		}
 	}
 
@@ -480,11 +495,13 @@ void CKirbyBalloon_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 				DESC(m_fJumpVelocity) = 4.f;
 
 			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_FLIGHT);
+			return;
 		}
 		// 비행 시작 애니메이션이 끝났을 경우
 		else if (pKirby->isAnimFinish())
 		{
 			pKirby->Change_State(CKirby::STATE_FLIGHTFALL, 60.f, true, true, CKirby::BODY_BALLOON);
+			return;
 		}
 
 	}
@@ -500,11 +517,13 @@ void CKirbyBalloon_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		if (pController->Is_Terrain())
 		{
 			pKirby->Change_State(CKirby::STATE_FLIGHTLANDING, 70.f, false, false, CKirby::BODY_VACUUM);
+			return;
 		}
 		// 끝나면 FALL로 돌아간다.
 		if (pKirby->isAnimFinish())
 		{
 			pKirby->Change_State(CKirby::STATE_FLIGHTFALL, 60.f, true, true, CKirby::BODY_BALLOON);
+			return;
 		}
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
@@ -514,6 +533,7 @@ void CKirbyBalloon_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 			else
 				DESC(m_fJumpVelocity) = 4.f;
 			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_FLIGHT);
+			return;
 		}
 
 	}
@@ -528,6 +548,7 @@ void CKirbyBalloon_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		if (pController->Is_Terrain())
 		{
 			pKirby->Change_State(CKirby::STATE_FLIGHTLANDING, 70.f, false, false, CKirby::BODY_VACUUM);
+			return;
 		}
 
 
@@ -539,11 +560,13 @@ void CKirbyBalloon_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 			else
 				DESC(m_fJumpVelocity) = 4.f;
 			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_FLIGHT);
+			return;
 		}
 		// 힘들경우 LIMITFALL 로 간다.
 		if (DESC(m_fFlyTime) > fFlyTime)
 		{
 			pKirby->Change_State(CKirby::STATE_FLIGHTLIMITFALL, 60.f, false, false, CKirby::BODY_BALLOON);
+			return;
 		}
 
 
@@ -559,16 +582,21 @@ void CKirbyBalloon_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		if (pController->Is_Terrain())
 		{
 			pKirby->Change_State(CKirby::STATE_FLIGHTLANDING, 70.f, false, false, CKirby::BODY_VACUUM);
+			return;
 		}
 
 		// 끝나면 FALL로 돌아간다.
 		if (pKirby->isAnimFinish())
 		{
 			pKirby->Change_State(CKirby::STATE_FLIGHTLIMITFALL, 60.f, true, true, CKirby::BODY_BALLOON);
+			return;
 		}
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
+		{
 			pKirby->Set_Animation(CKirby::STATE_FLIGHTLIMIT, 60.f, false, false);
+			return;
+		}
 
 
 	}
@@ -584,12 +612,14 @@ void CKirbyBalloon_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		if (pController->Is_Terrain())
 		{
 			pKirby->Change_State(CKirby::STATE_FLIGHTLANDING, 70.f, false, false, CKirby::BODY_VACUUM);
+			return;
 		}
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_PRESS))
 		{
 			// 힘들어 하기만 한다.
 			pKirby->Change_State(CKirby::STATE_FLIGHTLIMIT, 60.f, false, false, CKirby::BODY_BALLOON);
+			return;
 		}
 
 
@@ -609,18 +639,21 @@ void CKirbyBalloon_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 			// 땅에 있을 때
 			if (pController->Is_Terrain())
 			{
-				pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
 				Kirbydesc->m_eEyeState = CKirby::EYE_IDLE;
 				Kirbydesc->m_eMouthState = CKirby::MOUTH_IDLE;
 				DESC(m_fFlyTime) = 0.f;
+				//pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+				Kirby_AbilityType_Assist(pKirby, CKirby::STATE_IDLE);
+				return;
 			}
 			// 땅에 없을 때
 			else
 			{
-				pKirby->Change_State(CKirby::STATE_FALL, 50.f, false, true, CKirby::BODY_DEFAULT);
 				Kirbydesc->m_eEyeState = CKirby::EYE_IDLE;
 				Kirbydesc->m_eMouthState = CKirby::MOUTH_IDLE;
 				DESC(m_fFlyTime) = 0.f;
+				pKirby->Change_State(CKirby::STATE_FALL, 50.f, false, true, CKirby::BODY_DEFAULT);
+				return;
 			}
 		}
 	}
@@ -689,6 +722,7 @@ void CKirbyBalloon_Swallow_State::OnStateUpdate(CGameObject* pGameObject, _float
 		if (pKirby->isAnimFinish())
 		{
 			pKirby->Change_State(CKirby::STATE_SWALLOWEND, 70.f, false, false, CKirby::BODY_BALLOON);
+			return;
 		}
 
 	}
@@ -718,6 +752,7 @@ void CKirbyBalloon_Swallow_State::OnStateUpdate(CGameObject* pGameObject, _float
 			}
 
 			pKirby->Change_State(CKirby::STATE_GETABILITY, 70.f, false, false, CKirby::BODY_DEFAULT);
+			return;
 		}
 	}
 

@@ -14,6 +14,8 @@ CCappyBody_Idle_State::CCappyBody_Idle_State()
 void CCappyBody_Idle_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
+
+
 }
 
 void CCappyBody_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -261,6 +263,8 @@ CCappyBody_Damage_State::CCappyBody_Damage_State()
 void CCappyBody_Damage_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
+	m_fDeadMaxTime = CUtils::Make_RandomFloat(0.35f, 0.7f);
+
 }
 
 void CCappyBody_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -333,7 +337,7 @@ void CCappyBody_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 		pCappy->Set_DamageJumpPower(fDamageJumpPower);
 
-		if (m_fDeadTime > 0.4f || pController->Is_Terrain())
+		if (m_fDeadTime > m_fDeadMaxTime || pController->Is_Terrain())
 			pCappy->Set_Dead();
 
 	}

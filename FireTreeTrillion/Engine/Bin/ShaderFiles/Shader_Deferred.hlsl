@@ -237,7 +237,7 @@ float4 Blur_X(float2 vTexCoord)
 
     for (int i = -6; i < 7; ++i)
     {
-        vUV = vTexCoord + float2(1.f / g_fTexW * i, 0);
+        vUV = vTexCoord + float2(1.f / (g_fTexW / 2) * i, 0);
         if (1.f == g_BlendTexture.Sample(ClampSampler, vUV).g)
             continue;
 
@@ -282,7 +282,7 @@ float4 Blur_Y(float2 vTexCoord)
     
     for (int i = -6; i < 7; ++i)
     {
-        vUV = vTexCoord + float2(0, 1.f / (g_fTexH / 2.f) * i);
+        vUV = vTexCoord + float2(0, 1.f / (g_fTexH / 2) * i);
         if (1.f == g_BlendTexture.Sample(ClampSampler, vUV).g)
             continue;
 
@@ -936,7 +936,7 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
 	/* vLightDepthDesc.x * 2000.f : 현재 픽셀을 광원기준으로  그릴려고 했던 위치에 이미 그려져있떤 광원 기준의 깊이.  */
         if (vPosition.w > (vLightDepthDesc.x * 2000.f) && g_StencilTexture.Sample(LinearSampler, In.vTexcoord).x == 0.f)
         {
-            Out.vColor *= 0.6f;
+            Out.vColor *= 0.5f + clamp((vPosition.w - (vLightDepthDesc.x * 2000.f)) * 0.07f, 0.f, 0.5f);
         }
     }
 
@@ -971,7 +971,7 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
         Out.vColor *= (1.f - vEffect.a);
 
     // 기존 디퓨즈와 가산되어 그려진다.
-    Out.vColor += vEffect + (vBlur * 2);
+    Out.vColor += vEffect + vBlur;
     
     if (g_DeferredInfoTexture.Sample(LinearSampler, In.vTexcoord).g == 1.f && g_StencilTexture.Sample(LinearSampler, In.vTexcoord).r != 1.f)
     {
@@ -1049,7 +1049,7 @@ PS_OUT PS_MAIN_FINAL_FOR_TOOL(PS_IN In)
 	/* vLightDepthDesc.x * 2000.f : 현재 픽셀을 광원기준으로  그릴려고 했던 위치에 이미 그려져있떤 광원 기준의 깊이.  */
     if (vPosition.w > (vLightDepthDesc.x * 2000.f) && g_StencilTexture.Sample(LinearSampler, In.vTexcoord).x == 0.f)
     {
-        Out.vColor *= 0.6f;
+            Out.vColor *= 0.6f;
     }
         
     vector vNonLight = g_NonLightTexture.Sample(LinearSampler, In.vTexcoord);
@@ -1071,7 +1071,7 @@ PS_OUT PS_MAIN_FINAL_FOR_TOOL(PS_IN In)
         Out.vColor *= (1.f - vEffect.a);
 
     // 기존 디퓨즈와 가산되어 그려진다.
-    Out.vColor += vEffect + (vBlur * 2);
+    Out.vColor += vEffect + vBlur;
     Out.vColor = saturate(Out.vColor);
     
     return Out;

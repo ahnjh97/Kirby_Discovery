@@ -361,7 +361,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_DEFAULT_FX();
     }
 
-	// Z test 안함
+	// Z test 안함 (5)
     pass Blend_NOZTEST
     {
         SetRasterizerState(RS_Default);

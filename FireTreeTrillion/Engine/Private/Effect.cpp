@@ -60,8 +60,9 @@ HRESULT CEffect::Initialize(void* pArg)
     m_fDuration.second = effectDesc.fDuration;
     m_fLifetime = effectDesc.fLifetime;
     m_eRenderGroup = effectDesc.eRenderGroup;
-    m_eTimer = effectDesc.eTimer;
+    m_eTimer = effectDesc.eTimer == TIMER_END ? TIMER_NONE : effectDesc.eTimer;
     m_vContinuousRotation = effectDesc.vContinuousRotation;
+
     if (0.f < m_vContinuousRotation.Length())
         int a = 0;
     if (effectDesc.pSocketMatrix != nullptr)
@@ -126,7 +127,8 @@ void CEffect::Fill_SaveData(_Out_ SINGLE_FX_DATA* pFXData)
 
     pFXData->eRenderGroup = m_eRenderGroup;
     pFXData->eTimer = m_eTimer;
-
+    if (m_eTimer == TIMER_SECOND)
+        int a = 0;
 }
 
 void CEffect::Add_Keyframe(FX_KEYFRAME& newKeyframe, KF_PROPERTY eProperty)

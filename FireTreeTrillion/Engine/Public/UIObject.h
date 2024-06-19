@@ -20,10 +20,8 @@ protected:
 	
 	enum SHADER_PS //ºŒ¿Ã¥ı ø…º«
 	{
-		PS_DEFAULT, PS_ALPHABLEND,
+		PS_DEFAULT, PS_ALPHABLEND, PS_APBLEND_NOZTEST = 5,
 		PS_MASK_HP = 7, PS_MASK_HPDAMAGE = 8
-		//PS_WHITETOBLACK, PS_WHITETOBLACKALPHA,
-		//PS_WHITETOCYAN, PS_WHITETORED, PS_WHITETOMINT, PS_WHITETOPINK, PS_BLACKALPHA
 	};
 
 public:
@@ -122,10 +120,11 @@ protected:
 
 	_bool								m_bIsRender = false;
 
+	//vector<CUIObject*>					m_HUDs;
 	vector<CUIObject*>					m_LayerUIs;
 	vector <vector<CUIObject*>>			m_GroupUIs;
+	vector <CTexture*>					m_Textures;
 
-	vector<CUIObject*>					m_HUDs;
 	
 public:
 	virtual CGameObject* Clone(_uint iLevelIndex, void* pArg) { return nullptr; }

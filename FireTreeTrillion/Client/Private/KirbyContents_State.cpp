@@ -30,6 +30,7 @@ void CKirbyGet_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	// 능력을 획득 하였을 때 나오는 애니메이션이다.
 	if (pKirby->Get_State() == CKirby::STATE_GETABILITY)
 	{
+		DESC(m_eMouthState) = CKirby::MOUTH_HAPPY;
 		CTransform* pCameraTransform = pCamera->Get_TransformCom();
 		_float4 vCamRight = pCameraTransform->Get_State_Vector(CTransform::STATE_RIGHT);
 		_float4 vCamLook = XMVector3Cross(vCamRight, XMVectorSet(0.f, 1.f, 0.f, 1.f));
@@ -39,17 +40,17 @@ void CKirbyGet_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 
 		if (pKirby->isAnimFinish())
 		{
+			DESC(m_eMouthState) = CKirby::MOUTH_IDLE;
 			m_pGameInstance->Set_BlackBackGround(false);
 			m_pGameInstance->Set_SecondTimerRatio(1.f);
 
+			static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr())->Set_FOVY(30.f);
 
 			if (pKirby->Get_AbilityType() == ABILITY_SWORD)
 				pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 			if (pKirby->Get_AbilityType() == ABILITY_BOMB)
 				pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
-
-			static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr())->Set_FOVY(30.f);
-
+			return;
 		}
 
 	}
@@ -80,6 +81,8 @@ void CKirbyGet_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 				pKirby->Change_State(CKirby::STATE_RUNSTART, 120.f, true, true, CKirby::BODY_DEFAULT);
 			else
 				pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+
+			return;
 		}
 	}
 }
