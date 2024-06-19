@@ -204,6 +204,57 @@ HRESULT CGameObject::Compute_ViewZ()
 	return S_OK;
 }
 
+void CGameObject::Set_CylenderCollider(_float fOffSetY, _float fHeight, _float fRadius)
+{
+	m_tColliderDesc[ATTACK].bAlive = true;
+	m_tColliderDesc[ATTACK].eValue = ATTACK;
+	m_tColliderDesc[ATTACK].eHitbox = COLLIDER_CYLINDER;
+	m_tColliderDesc[ATTACK].fOffSetY = fOffSetY;
+	m_tColliderDesc[ATTACK].fHeight = fHeight;
+	m_tColliderDesc[ATTACK].fRadius = fRadius;
+}
+
+void CGameObject::Set_SphereCollider(_float fOffSetY, _float fRadius)
+{
+	m_tColliderDesc[ATTACK].bAlive = true;
+	m_tColliderDesc[ATTACK].eValue = ATTACK;
+	m_tColliderDesc[ATTACK].eHitbox = COLLIDER_SPHERE;
+	m_tColliderDesc[ATTACK].fOffSetY = fOffSetY;
+	m_tColliderDesc[ATTACK].fRadius = fRadius;
+}
+
+void CGameObject::Set_FrustumCollider(_float fOffSetY, _float fRadius, _float fAngle)
+{
+	m_tColliderDesc[ATTACK].bAlive = true;
+	m_tColliderDesc[ATTACK].eValue = ATTACK;
+	m_tColliderDesc[ATTACK].eHitbox = COLLIDER_FRUSTUM;
+	m_tColliderDesc[ATTACK].fOffSetY = fOffSetY;
+	m_tColliderDesc[ATTACK].fRadius = fRadius;
+	m_tColliderDesc[ATTACK].fAngle = fAngle;
+}
+
+void CGameObject::Set_TubeCollider(_float fOffSetY, _float fHeight, _float fMinRadius, _float fMaxRadius)
+{
+	m_tColliderDesc[ATTACK].bAlive = true;
+	m_tColliderDesc[ATTACK].eValue = ATTACK;
+	m_tColliderDesc[ATTACK].eHitbox = COLLIDER_CYLINDER;
+	m_tColliderDesc[ATTACK].fOffSetY = fOffSetY;
+	m_tColliderDesc[ATTACK].fHeight = fHeight;
+	m_tColliderDesc[ATTACK].fMinRadius = fMinRadius;
+	m_tColliderDesc[ATTACK].fMaxRadius = fMaxRadius;
+}
+
+void CGameObject::Set_BodyCollider(HITBOX eType, _float fOffSetY, _float fHeight, _float fRadius)
+{
+	m_tColliderDesc[BODY].bAlive = true;
+	m_tColliderDesc[BODY].eValue = BODY;
+	m_tColliderDesc[BODY].eHitbox = eType;
+	m_tColliderDesc[BODY].fOffSetY = fOffSetY;
+	m_tColliderDesc[BODY].fHeight = fHeight;
+	m_tColliderDesc[BODY].fRadius = fRadius;
+
+}
+
 void CGameObject::Free()
 {
 	__super::Free();

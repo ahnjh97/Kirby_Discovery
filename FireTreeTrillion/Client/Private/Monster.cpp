@@ -65,7 +65,7 @@ void CMonster::Damage_Delay(_float fTimeDelta)
 	{
 		m_fMonsterOverPowerTime += fTimeDelta;
 
-		if (m_fMonsterOverPowerTime > 0.1f)
+		if (m_fMonsterOverPowerTime > m_fMonsterOverPowerMaxTime)
 		{
 			m_bMonsterOverPower = false;
 			m_fMonsterOverPowerTime = 0.f;

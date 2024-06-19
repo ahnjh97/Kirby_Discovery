@@ -53,6 +53,7 @@ void CKirbyBoom_Fall_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			DESC(m_bBombOrbit) = false;
 			DESC(m_eEyeState) = CKirby::EYE_ANGER;
 			pKirby->Change_State(CKirby::BOOMSTATE_THROWAIR, 60.f, false, false, CKirby::BODY_BOOMDEFAULT, CKirby::OFFSET_BOOM);
+			return;
 		}
 		// X를 꾹 유지할 경우
 		else
@@ -76,6 +77,7 @@ void CKirbyBoom_Fall_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			if (pController->Is_Terrain())
 			{
 				pKirby->Change_State(CKirby::BOOMSTATE_THROWCHARGE, 60.f, true, true, CKirby::BODY_BOOMDEFAULT, CKirby::OFFSET_BOOM);
+				return;
 			}
 		}
 	}
@@ -116,6 +118,7 @@ void CKirbyBoom_Fall_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		{
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			pKirby->Change_State(CKirby::STATE_LANDINGEND, 30.f, false, false, CKirby::BODY_DEFAULT);
+			return;
 		}
 	}
 
@@ -215,6 +218,7 @@ void CKirbyBoom_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		{
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+			return;
 		}
 	}
 
@@ -246,6 +250,7 @@ void CKirbyBoom_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		{
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+			return;
 		}
 	}
 
@@ -306,6 +311,7 @@ void CKirbyBoom_ChargeAttack_State::OnStateUpdate(CGameObject* pGameObject, _flo
 		if (JoyStick_On() == true)
 		{
 			pKirby->Change_State(CKirby::BOOMSTATE_THROWROTATE, 60.f, true, false, CKirby::BODY_BOOMDEFAULT, CKirby::OFFSET_BOOM);
+			return;
 		}
 
 		// X 를 땠을 경우
@@ -313,6 +319,7 @@ void CKirbyBoom_ChargeAttack_State::OnStateUpdate(CGameObject* pGameObject, _flo
 		{
 			DESC(m_bBombOrbit) = false;
 			pKirby->Change_State(CKirby::BOOMSTATE_THROW, 60.f, false, false, CKirby::BODY_BOOMDEFAULT, CKirby::OFFSET_BOOM);
+			return;
 		}
 
 
@@ -339,6 +346,7 @@ void CKirbyBoom_ChargeAttack_State::OnStateUpdate(CGameObject* pGameObject, _flo
 		else
 		{
 			pKirby->Change_State(CKirby::BOOMSTATE_THROWCHARGE, 60.f, true, false, CKirby::BODY_BOOMDEFAULT, CKirby::OFFSET_BOOM);
+			return;
 		}
 
 
@@ -347,6 +355,7 @@ void CKirbyBoom_ChargeAttack_State::OnStateUpdate(CGameObject* pGameObject, _flo
 		{
 			DESC(m_bBombOrbit) = false;
 			pKirby->Change_State(CKirby::BOOMSTATE_THROW, 60.f, false, false, CKirby::BODY_BOOMDEFAULT, CKirby::OFFSET_BOOM);
+			return;
 		}
 
 

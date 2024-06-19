@@ -12,6 +12,23 @@ namespace Engine
 
 	typedef struct
 	{
+		HITBOX eHitbox = { COLLIDER_END };
+		_uint eValue = { 0 };
+		_float fOffSetY = { 0.f };
+		
+		_float fRadius = { 0.f };
+
+		_float fMinRadius = { 0.f };
+		_float fMaxRadius = { 0.f };
+		_float fHeight = { 0.f };
+
+		_float fAngle = { 0.f };
+
+		_bool  bAlive = { false };
+	}COLLISION_DESC;
+
+	typedef struct
+	{
 		enum TYPE { TYPE_DIRECTIONAL, TYPE_POINT, TYPE_FLASH, TYPE_SUPERFLASH, TYPE_END };
 		TYPE		eType;
 

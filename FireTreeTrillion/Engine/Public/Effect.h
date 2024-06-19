@@ -131,7 +131,7 @@ protected:
 	_bool			m_bIsBloom = { false };
 
 	_uint			m_eRenderGroup = { (_uint)CRenderer::RENDER_NONBLEND };
-	TIMER			m_eTimer = { TIMER_END };
+	TIMER			m_eTimer = { TIMER_NONE };
 
 	_float			m_fRimLightThreshold = { 0.f };
 

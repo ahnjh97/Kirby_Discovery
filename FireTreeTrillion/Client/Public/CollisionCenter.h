@@ -38,15 +38,19 @@ public:
 public:
     void Collision_Tick(_float fTimeDelta);
     void Add_Ladder(CLadder* pLadder);
+    void Add_Collision(COLLISION_TYPE eCollType, class CGameObject* pGameObject);
 
 private:
-    CONTENT_TYPE Find_ColliderType(class CPhysXObject* pSrc, class CPhysXObject* pDst);
     class CPhysXObject* Find_TypePtr(COLLISION_TYPE eType, CPhysXObject* pSrc, CPhysXObject* pDst);
-    void Collision_Collider(CONTENT_TYPE eType, class CPhysXObject* pSrc, class CPhysXObject* pDst);
+    //void Collision_Collider(CONTENT_TYPE eType, class CPhysXObject* pSrc, class CPhysXObject* pDst);
+    void Collision_Collider(vector<CGameObject*> Dsts, vector<CGameObject*> Srcs, CCollisionCenter* pthis, 
+        void(*func)(class CHitBox*, class CHitBox*, CCollisionCenter*));
+    _bool Intersect(class CHitBox* Dst, class CHitBox* Src);
+
     void Ladder_Collider();
 
-    set< pair<CGameObject*, CGameObject*> > m_WaitingList;
-    list<CLadder*>                          m_Ladders;
+    vector<CLadder*>                          m_Ladders;
+    vector<CGameObject*>                      m_GameObjects[COLLISION_END];
 
 
     // 히트박스 관련

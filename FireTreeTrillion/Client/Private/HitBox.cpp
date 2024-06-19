@@ -1,21 +1,19 @@
 #include "stdafx.h"
 #include "HitBox.h"
-#include "Kirby.h"
+#include "CollisionCenter.h"
 
 CHitBox::CHitBox(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CCharacter{ pDevice, pContext }
+	: CGameObject{ pDevice, pContext }
 {
 }
 
 CHitBox::CHitBox(const CHitBox& rhs)
-	: CCharacter( rhs )
+	: CGameObject( rhs )
 {
 }
 
 HRESULT CHitBox::Initialize_Prototype()
 {
-	m_eCollisionGroup = HITBOX;
-
 	return S_OK;
 }
 
@@ -29,62 +27,186 @@ HRESULT CHitBox::Initialize(void* pArg)
 
 	HITBOX_DESC* pDesc = (HITBOX_DESC*)pArg;
 	m_pOwner = pDesc->pOwner;
+	Safe_AddRef(m_pOwner);
 	m_pOwnerTransform = m_pOwner->Get_TransformCom();
+	Safe_AddRef(m_pOwnerTransform);
+	m_pOwnerCollisionDesc = pDesc->pDesc;
+
+	m_eCollisionGroup = pDesc->pCollisionType;
+
 	return S_OK;
 }
 
 _int CHitBox::Tick(_float fTimeDelta)
 {
-	//if (!m_bAlive) return OBJ_NOEVENT;
+	if (m_pOwner->Get_Dead())
+		return OBJ_DEAD;
 
-	_float4 vRight = XMVector3Normalize(m_pOwnerTransform->Get_State_Float4(CTransform::STATE_RIGHT)) * (-0.05f);
-	_float4 vLook  = XMVector3Normalize(m_pOwnerTransform->Get_State_Float4(CTransform::STATE_LOOK)) * 0.8f;
-	_float4 vPos   = m_pOwnerTransform->Get_State_Float4(CTransform::STATE_POSITION) + vRight;
 
-	_float4 vNewPos = vLook + _float4(vPos.x, vPos.y + 1.f, vPos.z, 1.f);
-	m_pControllerCom->Set_Position(m_pTransformCom, vNewPos);
+	_float4x4 pWorldMatrix = m_pOwnerTransform->Get_WorldFloat4x4();
+	pWorldMatrix._42 += m_pOwnerCollisionDesc->fOffSetY;
+	m_pTransformCom->Set_WorldMatrix(pWorldMatrix);
+
+
+	// 여기서 콜리전 센터에게 등록한다.
+	Restore_Logic(fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
 
 void CHitBox::Late_Tick(_float fTimeDelta)
 {
-	if (!m_bAlive) return;
 
-	//if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
-	//	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_UI, this);
 }
 
 HRESULT CHitBox::Render()
 {
-	if (!m_bAlive) return S_OK;
 
-	/*if (FAILED(Bind_ShaderResources()))
-		return E_FAIL;*/
+#ifdef _DEBUG
 
-	//_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
-	//for (size_t i = 0; i < iNumMeshes; i++)
-	//{
-	//	if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
-	//		return E_FAIL;
+	if (m_pGameInstance->Get_HitBoxRender() == false)
+		return S_OK;
 
-	//	if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
-	//		return E_FAIL;
+	ImDrawList* drawList = ImGui::GetForegroundDrawList();
+	_float4x4 ViewMatrix, ProjMatrix;
+	ViewMatrix = m_pGameInstance->Get_Transform(CPipeLine::D3DTS_VIEW);
+	ProjMatrix = m_pGameInstance->Get_Transform(CPipeLine::D3DTS_PROJ);
+	_float4x4 VPMatrix = ViewMatrix * ProjMatrix;
 
-	//	/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-	//	if (FAILED(m_pShaderCom->Begin(1)))
-	//		return E_FAIL;
+	auto TransformToScreen = [&](XMVECTOR worldPos)
+	{
+		XMVECTOR screenPos = XMVector3TransformCoord(worldPos, VPMatrix);
+		screenPos = XMVectorMultiplyAdd(screenPos, XMVectorSet(0.5f, -0.5f, 1.0f, 0.0f), XMVectorSet(0.5f, 0.5f, 0.0f, 0.0f));
+		screenPos = XMVectorMultiply(screenPos, XMVectorSet(g_iWinSizeX, g_iWinSizeY, 1.f, 0.f));
+		return ImVec2(XMVectorGetX(screenPos), XMVectorGetY(screenPos));
+	};
 
-	//	m_pModelCom->Render(i);
-	//}
+	ImVec4 color = m_pOwnerCollisionDesc->bAlive == true ? ImVec4(0.0f, 1.0f, 0.0f, 1.0f) : ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+
+
+	if (m_pOwnerCollisionDesc->eHitbox == COLLIDER_CYLINDER)
+	{
+		_float3 vCenter = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		ImVec2 center = TransformToScreen(XMLoadFloat3(&vCenter));
+
+		_float fBottomRadius = m_pOwnerCollisionDesc->fRadius;
+		_float fTopRadius = m_pOwnerCollisionDesc->fRadius;
+		_float fHeight = m_pOwnerCollisionDesc->fHeight;
+		_int iSliceCnt = 8;
+
+		std::vector<ImVec2> bottomCircle, topCircle;
+
+		// 원기둥의 하단과 상단 점 계산
+		for (int j = 0; j <= iSliceCnt; ++j)
+		{
+			float theta = j * 2.0f * DirectX::XM_PI / iSliceCnt;
+			float cosTheta = cosf(theta);
+			float sinTheta = sinf(theta);
+
+			_float3 bottomPoint = vCenter + _float3(fBottomRadius * cosTheta, -fHeight * 0.5f, fBottomRadius * sinTheta);
+			_float3 topPoint = vCenter + _float3(fTopRadius * cosTheta, fHeight * 0.5f, fTopRadius * sinTheta);
+
+			bottomCircle.push_back(TransformToScreen(XMLoadFloat3(&bottomPoint)));
+			topCircle.push_back(TransformToScreen(XMLoadFloat3(&topPoint)));
+		}
+
+		// 원기둥 그리기
+		for (int j = 0; j < iSliceCnt; ++j)
+		{
+			drawList->AddLine(bottomCircle[j], bottomCircle[j + 1], ImColor(color.x, color.y, color.z, color.w));
+			drawList->AddLine(topCircle[j], topCircle[j + 1], ImColor(color.x, color.y, color.z, color.w));
+			drawList->AddLine(bottomCircle[j], topCircle[j], ImColor(color.x, color.y, color.z, color.w));
+		}
+	}
+	else if (m_pOwnerCollisionDesc->eHitbox == COLLIDER_SPHERE)
+	{
+		_float3 vCenter = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		ImVec2 center = TransformToScreen(XMLoadFloat3(&vCenter));
+		_float fRadius = m_pOwnerCollisionDesc->fRadius;
+		_int iSliceCnt = 8;
+
+		vector<vector<ImVec2>> spherePoints;
+		// 구의 표면을 이루는 점 계산
+		for (int i = 0; i <= iSliceCnt; ++i)
+		{
+			float phi = DirectX::XM_PI * i / iSliceCnt;
+			std::vector<ImVec2> stackPoints;
+
+			for (int j = 0; j <= iSliceCnt; ++j)
+			{
+				float theta = 2.0f * DirectX::XM_PI * j / iSliceCnt;
+
+				float x = fRadius * sinf(phi) * cosf(theta);
+				float y = fRadius * cosf(phi);
+				float z = fRadius * sinf(phi) * sinf(theta);
+
+				_float3 point = vCenter + _float3(x, y, z);
+				stackPoints.push_back(TransformToScreen(XMLoadFloat3(&point)));
+			}
+			spherePoints.push_back(stackPoints);
+		}
+
+		// 구 그리기
+		for (int i = 0; i < iSliceCnt; ++i)
+		{
+			for (int j = 0; j < iSliceCnt; ++j)
+			{
+				drawList->AddLine(spherePoints[i][j], spherePoints[i][j + 1], ImColor(color.x, color.y, color.z, color.w));
+				drawList->AddLine(spherePoints[i][j], spherePoints[i + 1][j], ImColor(color.x, color.y, color.z, color.w));
+			}
+		}
+	}
+	else if (m_pOwnerCollisionDesc->eHitbox == COLLIDER_FRUSTUM)
+	{
+		_float3 vCenter = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		_float3 vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+		vCenter = vCenter + (vLook * m_pOwnerCollisionDesc->fRadius * 0.5f);
+		ImVec2 center = TransformToScreen(XMLoadFloat3(&vCenter));
+		_float fRadius = m_pOwnerCollisionDesc->fRadius * 0.5f;
+		_int iSliceCnt = 8;
+
+		vector<vector<ImVec2>> spherePoints;
+		// 구의 표면을 이루는 점 계산
+		for (int i = 0; i <= iSliceCnt; ++i)
+		{
+			float phi = DirectX::XM_PI * i / iSliceCnt;
+			std::vector<ImVec2> stackPoints;
+
+			for (int j = 0; j <= iSliceCnt; ++j)
+			{
+				float theta = 2.0f * DirectX::XM_PI * j / iSliceCnt;
+
+				float x = fRadius * sinf(phi) * cosf(theta);
+				float y = fRadius * cosf(phi);
+				float z = fRadius * sinf(phi) * sinf(theta);
+
+				_float3 point = vCenter + _float3(x, y, z);
+				stackPoints.push_back(TransformToScreen(XMLoadFloat3(&point)));
+			}
+			spherePoints.push_back(stackPoints);
+		}
+
+		// 구 그리기
+		for (int i = 0; i < iSliceCnt; ++i)
+		{
+			for (int j = 0; j < iSliceCnt; ++j)
+			{
+				drawList->AddLine(spherePoints[i][j], spherePoints[i][j + 1], ImColor(color.x, color.y, color.z, color.w));
+				drawList->AddLine(spherePoints[i][j], spherePoints[i + 1][j], ImColor(color.x, color.y, color.z, color.w));
+			}
+		}
+
+	}
+#endif
+
 
 	return S_OK;
 }
 
 HRESULT CHitBox::Render_LightDepth()
 {
-	/*if (FAILED(m_pGameInstance->Render_LightDepth_For_GameObject(m_pShaderCom, m_pTransformCom, m_pModelCom)))
-		return E_FAIL;*/
 
 	return S_OK;
 }
@@ -92,75 +214,76 @@ HRESULT CHitBox::Render_LightDepth()
 #ifdef _DEBUG
 void CHitBox::Render_IMGUI()
 {
-	ImGui::Separator(); ImGui::NewLine();
-	ImGui::Text("m_bAlive: %s", m_bAlive ? "true" : "false");
-	ImGui::Text("m_bAlive: %d", m_bAlive);
+
+
 }
 
 #endif
 
-void CHitBox::Collision_Overlap(CGameObject* pGameObject)
+void CHitBox::Restore_Logic(_float fTimeDelta)
 {
-	//pGameObject의 정보를 Kirby에게 넘긴다.
-	if (m_bAlive == false || m_pControllerCom->Is_Activated() == false)
-		return;
+	// 몸통 전용 콜라이더 일 경우. (내가 가지고 있는 구조체 벨류 값)
+	if (m_pOwnerCollisionDesc->eValue == BODY)
+	{
+		if (m_pOwnerCollisionDesc->bAlive == false)
+		{
+			m_fCollisionTime += fTimeDelta;
+			if (m_fCollisionTime > 0.1f)
+			{
+				m_pOwnerCollisionDesc->bAlive = true;
+				m_fCollisionTime = 0.f;
+			}
+		}
 
-	// HitBox 충돌 처리
-	m_pOwner->Collision_Overlap(pGameObject);
+		if (m_pOwnerCollisionDesc->bAlive == true)
+		{
+			CCollisionCenter::Get_Instance()->Add_Collision((COLLISION_TYPE)m_eCollisionGroup, this);
+		}
+	}
+	// 공격 전용 콜라이더 일 경우. (내가 가지고 있는 구조체 벨류 값)
+	else if (m_pOwnerCollisionDesc->eValue == ATTACK)
+	{
+		if (m_pOwnerCollisionDesc->bAlive == false)
+		{
+			m_fCollisionTime = 0.f;
+		}
 
-	m_bAlive = false;
-	m_pControllerCom->Activate(false);
-}
+		if (m_pOwnerCollisionDesc->bAlive == true)
+		{
+			m_fCollisionTime += fTimeDelta;
 
-void CHitBox::Check_Collision()
-{
-	m_bAlive = true;
-	m_pControllerCom->Activate(true);
+			if (m_fCollisionTime > 0.05f)
+			{
+				m_fCollisionTime = 0.f;
+				m_pOwnerCollisionDesc->bAlive = false;
+			}
+			else
+			{
+				CCollisionCenter::Get_Instance()->Add_Collision((COLLISION_TYPE)m_eCollisionGroup, this);
+			}
+		}
+	}
 }
 
 HRESULT CHitBox::Add_Components()
 {
-	HRESULT hr;
-
-	/* For.Com_Shader */
-	hr = __super::Add_Component(TEXT("Prototype_Component_Shader_VtxModel"),
-								TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
-	CHECK_FAILED(hr);
-
-	/* For.Com_Model */
-	//hr = __super::Add_Component(TEXT("Prototype_Component_Model_Kabu"),
-	//	TEXT("Com_Model"), (CComponent**)&m_pModelCom);
-	//CHECK_FAILED(hr);
-
-	/* For.Com_CharacterController */
-	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
-	CCharacterController::CONTROLLER_DESC desc{};
-	desc.vInitialPos = vPos;
-	desc.uCollisionType = m_eCollisionGroup;
-	desc.eType = CCharacterController::CAPSULE;
-	desc.tCapsuleShape = { 0.5f, 0.5f };
-	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
-								TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
-	m_pControllerCom->Set_Object(this);
-	m_pControllerCom->Activate(false);
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 
 	return S_OK;
 }
 
 HRESULT CHitBox::Bind_ShaderResources()
 {
-	if (nullptr == m_pShaderCom)
-		return E_FAIL;
+	//if (nullptr == m_pShaderCom)
+	//	return E_FAIL;
 
-	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
-		return E_FAIL;
+	//if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+	//	return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
-		return E_FAIL;
+	//if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
+	//	return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
-		return E_FAIL;
+	//if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
+	//	return E_FAIL;
 
 	return S_OK;
 }
@@ -191,6 +314,9 @@ CGameObject* CHitBox::Clone(void* pArg)
 
 void CHitBox::Free()
 {
+	Safe_Release(m_pOwner);
+	Safe_Release(m_pOwnerTransform);
 	__super::Free();
+
 }
 

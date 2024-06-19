@@ -167,7 +167,6 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 		return E_FAIL;
 	}
 
-	//���� ����Ʈ
 	for (auto& entry : directory_iterator(FXPath))
 	{
 		auto& filePath = entry.path();
@@ -202,6 +201,8 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 
 		FXDesc.fRimLightThreshold = FXData.fRimLightThreshold;
 		FXDesc.eRenderGroup = FXData.eRenderGroup;
+		FXDesc.eTimer = FXData.eTimer;
+		FXDesc.vContinuousRotation = FXData.vContinuousRotation;
 
 		for (_uint i = 0; i < FXData.iPropertyMapNum; ++i)
 		{
@@ -219,6 +220,82 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 	}
 
 
+	
+	FXPath = "../Bin/Resources/Effects/Particle/";
+	if (!exists(FXPath) || !is_directory(FXPath))
+	{
+		ALARM_FAIL(TEXT("���߾� ��� ����"));
+		return E_FAIL;
+	}
+
+
+	for (auto& entry : directory_iterator(FXPath))
+	{
+		auto& filePath = entry.path();
+		string strname = filePath.stem().string();
+
+		if (filePath.extension() != ".bin")
+			continue;
+
+		PARTICLE_DATA FXData = {};
+
+		CUtils::Load_Effect(filePath, &FXData);
+
+		CParticle::PARTICLE_DESC ParticleDesc{};
+		INSTANCE_DESC InstanceDesc{};
+
+		ParticleDesc.strFXName = FXData.strName;
+		ParticleDesc.strBufferTag = FXData.strBufferName;
+		ParticleDesc.strTexTag = FXData.strTexName;
+		ParticleDesc.strMaskTexTag = FXData.strMaskTexName;
+
+		ParticleDesc.iPassIdx = FXData.iPassIdx;
+		ParticleDesc.iTexIdx = FXData.iTexIdx;
+		ParticleDesc.iMaskTexIdx = FXData.iMaskTexIdx;
+
+		ParticleDesc.iNumInstance = FXData.iNumInstance;
+		ParticleDesc.eRenderGroup = FXData.eRenderGroup;
+		ParticleDesc.eTimer = FXData.eTimer;
+
+		ParticleDesc.bIsLoop = FXData.bIsLoop;
+		ParticleDesc.bIsBillboard = FXData.bIsBillboard;
+		ParticleDesc.bIsBloom = FXData.bIsBloom;
+
+		ParticleDesc.fDuration = FXData.fDuration;
+		ParticleDesc.fLifetime.second = FXData.fLifetime;
+
+		InstanceDesc.vecMoveCommands = FXData.vecMoveCommands;
+
+
+
+		InstanceDesc.fLifetime = FXData.fLifetime;
+		InstanceDesc.fLifetimeRandomOffset = FXData.fLifetimeRandomOffset;
+		InstanceDesc.fStartDelay = FXData.fStartDelay;
+		InstanceDesc.fStarDelayRandomOffset = FXData.fStarDelayRandomOffset;
+		InstanceDesc.vCenter = FXData.vCenter;
+		InstanceDesc.vRange = FXData.vRange;
+		InstanceDesc.vRotation = FXData.vRotation;
+		InstanceDesc.vRotationRandomOffset = FXData.vRotationRandomOffset;
+		InstanceDesc.vScale = FXData.vScale;
+		InstanceDesc.vScaleRandomOffset = FXData.vScaleRandomOffset;
+		InstanceDesc.vDir = FXData.vDir;
+		InstanceDesc.vDirRandomOffset = FXData.vDirRandomOffset;
+		InstanceDesc.fSpeed = FXData.fSpeed;
+		InstanceDesc.fSpeedRandomOffset = FXData.fSpeedRandomOffset;
+		InstanceDesc.vColor = FXData.vColor;
+		InstanceDesc.vColorRandomOffset = FXData.vColorRandomOffset;
+		InstanceDesc.fAlpha = FXData.fAlpha;
+		InstanceDesc.fAlphaRandomOffset = FXData.fAlpha;
+		InstanceDesc.vPivot = FXData.vPivot;
+
+
+		wstring wstrProtoName = { TEXT("Prototype_GameObject_") + CUtils::StrToWstr(strname) };
+
+		hr = m_pGameInstance->Add_Prototype(wstrProtoName, CParticle::Create(m_pDevice, m_pContext, ParticleDesc));
+		CHECK_FAILED(hr);
+		static_cast<CParticle*>(m_pGameInstance->Find_Prototype(wstrProtoName))->Update_InstanceInfo(&InstanceDesc);
+	}
+	
 
 	FXPath = "../Bin/Resources/Effects/Multi/";
 	if (!exists(FXPath) || !is_directory(FXPath))
@@ -248,8 +325,6 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 
 		wstring wstrProtoName = { TEXT("Prototype_GameObject_") + CUtils::StrToWstr(strname) };
 
-		if (wstrProtoName == TEXT("Prototype_GameObject_SwordTrail_One"))
-			_int a = 0;
 
 		hr = m_pGameInstance->Add_Prototype(wstrProtoName, CMultiEffect::Create(m_pDevice, m_pContext, FXDesc));
 		CHECK_FAILED(hr);

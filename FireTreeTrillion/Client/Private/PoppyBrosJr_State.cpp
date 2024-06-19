@@ -183,6 +183,8 @@ CPoppyBrosJr_Damage_State::CPoppyBrosJr_Damage_State()
 void CPoppyBrosJr_Damage_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
+
+	m_fDeadMaxTime = CUtils::Make_RandomFloat(0.35f, 0.7f);
 }
 
 void CPoppyBrosJr_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -256,7 +258,7 @@ void CPoppyBrosJr_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float f
 
 		pPoppyJr->Set_DamageJumpPower(fDamageJumpPower);
 
-		if (m_fDeadTime > 0.4f || pController->Is_Terrain())
+		if (m_fDeadTime > m_fDeadMaxTime || pController->Is_Terrain())
 			pPoppyJr->Set_Dead();
 	}
 }
