@@ -103,10 +103,10 @@ _int CHUD_StarPoint::Tick(_float fTimeDelta)
 
 	//이전 재화량 대비 현재 재화량 비교
 	_uint iCurCoin = m_pKirby->Get_Coin();
-	//if (iCurCoin > m_iPreCoin)
-	if (m_pGameInstance->Get_DIKeyState(DIK_1, KEY_DOWN)) //테스트용
+	if (iCurCoin > m_iPreCoin)
+	//if (m_pGameInstance->Get_DIKeyState(DIK_1, KEY_DOWN)) //테스트용
 	{
-		iCurCoin += 1; //테스트용
+		//iCurCoin += 1; //테스트용
 
 		m_IsLootTrigger = TRUE;
 		m_iPreCoin = iCurCoin; 
@@ -118,38 +118,6 @@ _int CHUD_StarPoint::Tick(_float fTimeDelta)
 			m_eCurState = STARPOINT_LOOT;
 			m_IsLootTrigger = FALSE;
 		}
-	}
-
-	/*
-	if (TEXT("Font100") == m_UIObjDesc.wstrUITag || TEXT("Font100_Shadow") == m_UIObjDesc.wstrUITag)
-	{
-		_uint iFont100 = iCurCoin % 100;
-
-		if (iFont100 > 0)	
-			m_bIsRender = TRUE;
-
-		else	
-			m_bIsRender = FALSE;
-
-		m_UIObjDesc.wstrText = to_wstring(iFont100);
-	}
-	if (TEXT("Font10") == m_UIObjDesc.wstrUITag || TEXT("Font10_Shadow") == m_UIObjDesc.wstrUITag)
-	{
-		_uint iFont10 = iCurCoin % 100;
-
-		if (iFont10 > 0)	
-			m_bIsRender = TRUE;
-
-		else	
-			m_bIsRender = FALSE;
-
-		m_UIObjDesc.wstrText = to_wstring(iFont10);
-	}
-	*/
-	if (TEXT("Font1") == m_UIObjDesc.wstrUITag || TEXT("Font1_Shadow") == m_UIObjDesc.wstrUITag)
-	{
-		_uint iFont1 = iCurCoin % 10;
-		m_UIObjDesc.wstrText = to_wstring(iFont1);
 	}
 
 	return OBJ_NOEVENT;
@@ -183,12 +151,44 @@ HRESULT CHUD_StarPoint::Render()
 		if (STARPOINT_WAIT == m_eCurState && STARPOINT_HIDE == m_ePreState)
 			return S_OK;
 
-		if (m_UIObjDesc.wstrUITag == TEXT("Font100") || m_UIObjDesc.wstrUITag == TEXT("Font10")
-			|| m_UIObjDesc.wstrUITag == TEXT("Font100_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font10_Shadow"))
+		//if (m_UIObjDesc.wstrUITag == TEXT("Font100") || m_UIObjDesc.wstrUITag == TEXT("Font10")
+		//	|| m_UIObjDesc.wstrUITag == TEXT("Font100_Shadow") || m_UIObjDesc.wstrUITag == TEXT("Font10_Shadow"))
+		//{
+		//	if (m_bIsRender == FALSE)
+		//		return S_OK;
+
+		_uint iCurCoin = m_pKirby->Get_Coin();
+		if (TEXT("Font100") == m_UIObjDesc.wstrUITag || TEXT("Font100_Shadow") == m_UIObjDesc.wstrUITag)
 		{
-			if (m_bIsRender == FALSE)
-				return S_OK;
+			_uint iFont100 = iCurCoin / 100;
+
+			if (iFont100 > 0)
+				m_bIsRender = TRUE;
+
+			else
+				return S_OK; //m_bIsRender = FALSE;
+
+			m_UIObjDesc.wstrText = to_wstring(iFont100);
 		}
+		if (TEXT("Font10") == m_UIObjDesc.wstrUITag || TEXT("Font10_Shadow") == m_UIObjDesc.wstrUITag)
+		{
+			_uint iFont10 = (iCurCoin % 100) / 10;
+
+			if (iFont10 > 0)
+				m_bIsRender = TRUE;
+
+			else
+				return S_OK; //m_bIsRender = FALSE;
+
+			m_UIObjDesc.wstrText = to_wstring(iFont10);
+		}
+
+		if (TEXT("Font1") == m_UIObjDesc.wstrUITag || TEXT("Font1_Shadow") == m_UIObjDesc.wstrUITag)
+		{
+			_uint iFont1 = iCurCoin % 10;
+			m_UIObjDesc.wstrText = to_wstring(iFont1);
+		}
+	//}
 
 		m_pGameInstance->Render_Font(wstrFontTag, m_UIObjDesc.wstrText, vFontPos, vFontRGBA,
 			XMConvertToRadians(m_UIObjDesc.vDegree.z), vFontOrig, vFontScale);
