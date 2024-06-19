@@ -432,6 +432,9 @@ void CMapToolHelper::Menu_MapShaderInfo()
 		vecMapMeshNames[i] = vecMeshNames[i].c_str();
 
 	CBasicMap* pBasicMap = dynamic_cast<CBasicMap*>(m_pPickedObject);
+	if (nullptr == pBasicMap)
+		return;
+
 	string strMapInfo = strModelName + "_ShaderInfo";
 	ImGui::Begin(strMapInfo.c_str());
 
@@ -491,6 +494,9 @@ void CMapToolHelper::Menu_MonsterInfo()
 		return;
 
 	CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(m_pPickedObject);
+	if (nullptr == pMapToolObject)
+		return;
+
 	iTriggerIdx = pMapToolObject->Get_TriggerIndex();
 
 	string strMonsterName = m_strCurModel.substr(8);
@@ -513,6 +519,8 @@ void CMapToolHelper::Menu_RallyPointInfo()
 	ImGui::Begin(strRallyInfo.c_str());
 
 	CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(m_pPickedObject);
+	if (nullptr == pMapToolObject)
+		return;
 
 	string strConnectedMonster = pMapToolObject->Get_ConnectedMonster();
 	iConnectedMonster = Compute_RallyingMonsterIndex(strConnectedMonster);
@@ -608,6 +616,9 @@ void CMapToolHelper::OnLeftClick()
 		return;
 
 	CBasicMap* pBasicMap = dynamic_cast<CBasicMap*>(m_pPickedObject);
+	if (nullptr == pBasicMap)
+		return;
+
 	pBasicMap->Reset_Time(iPickedMeshIndex);
 	iSelectedMeshIndex = iPickedMeshIndex;
 	iMapIndex = iIndex;
