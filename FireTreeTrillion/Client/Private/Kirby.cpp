@@ -98,7 +98,7 @@ HRESULT CKirby::Initialize(void* pArg)
 	m_fHp = 100.f;
 	m_fAttack = 5.f;
 	m_eAbilityType = ABILITY_DEFAULT;
-	//m_eAbilityType = ABILITY_SWORD;
+	m_eAbilityType = ABILITY_SWORD;
 
 	m_pControllerCom->RegisterAsPlayer();
 

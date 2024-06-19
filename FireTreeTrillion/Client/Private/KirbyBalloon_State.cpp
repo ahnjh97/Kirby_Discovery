@@ -642,7 +642,8 @@ void CKirbyBalloon_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 				Kirbydesc->m_eEyeState = CKirby::EYE_IDLE;
 				Kirbydesc->m_eMouthState = CKirby::MOUTH_IDLE;
 				DESC(m_fFlyTime) = 0.f;
-				pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+				//pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+				Kirby_AbilityType_Assist(pKirby, CKirby::STATE_IDLE);
 				return;
 			}
 			// 땅에 없을 때
