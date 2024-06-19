@@ -35,6 +35,9 @@ private:
 	CModel*			m_pModelCom = nullptr;
 	_float			m_fLifeTime = _float();
 
+	_float			m_fFlyTime = { 0.f };
+	_float			m_fDeadTime = { 0.f };
+
 	_bool			m_bLockCollision = { false };
 
 public:

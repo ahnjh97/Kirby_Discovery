@@ -106,6 +106,7 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 
 			});
 
+	// 덜 완료되었음. 다양한 분기 필요 80%
 	Collision_Collider(m_GameObjects[HITBOX_PLYAER], m_GameObjects[MONSTER], this,
 		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
 		{
@@ -226,6 +227,9 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 			// 0.1초의 충돌 딜레이를 주기위함.
 			SrcHit->Set_Alive(false);
 		});
+
+
+
 
 
 	for (auto& ObjectVector : m_GameObjects)
