@@ -2133,6 +2133,8 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 			vValueRange = { .001f, 50.f };
 		else if (m_eSelectedProperty == KF_UVOFFSET)
 			vValueRange = { -10.f, 10.f };
+		else if (m_eSelectedProperty == KF_MASKUVANGLE)
+			vValueRange = { -10.f, 10.f };
 
 		if (DragFloat3("Value", m_vKFPopupValue, .01f, vValueRange.x, vValueRange.y, "%.2f"))
 		{

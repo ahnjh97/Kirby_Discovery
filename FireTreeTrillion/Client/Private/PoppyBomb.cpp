@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "PoppyBomb.h"
+#include "MultiEffect.h"
 #include "PoppyBrosJr.h"
+#include "HitBox.h"
 
 CPoppyBomb::CPoppyBomb(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -14,8 +16,6 @@ CPoppyBomb::CPoppyBomb(const CPoppyBomb& rhs)
 
 HRESULT CPoppyBomb::Initialize_Prototype()
 {
-	m_eCollisionGroup = MONSTER;
-
 	return S_OK;
 }
 
@@ -44,9 +44,7 @@ HRESULT CPoppyBomb::Initialize(void* pArg)
 
 
 
-	m_fMaxHp = 15.f;
-	m_fHp = 15.f;
-	m_fAttack = 10.f;
+	m_fAttack = 15.f;
 	m_eVacuumSize = SIZE_SMALL;
 	m_eAbilityType = ABILITY_BOMB;
 
@@ -54,13 +52,22 @@ HRESULT CPoppyBomb::Initialize(void* pArg)
 	m_fMoveTime = 1.f;
 	m_vLookDir = m_vTargetPosition - m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 
+
+	CHitBox::HITBOX_DESC HitBox{};
+	HitBox.pOwner = this;
+	HitBox.pDesc = &m_tColliderDesc[BODY];
+	HitBox.pCollisionType = MONSTERBULLET;
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
+		return E_FAIL;
+	Set_BodyCollider(COLLIDER_SPHERE, 0.f, 0.f, 1.f);
+
 	return S_OK;
 }
 
 _int CPoppyBomb::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
-		return OBJ_DEAD;
+		return Ready_Dead();
 
 	if (static_cast<CPoppyBrosJr*>(m_pGameObject)->Get_Dead())
 		m_bDead = true;
@@ -177,6 +184,11 @@ _int CPoppyBomb::Tick(_float fTimeDelta)
 
 void CPoppyBomb::Late_Tick(_float fTimeDelta)
 {
+	// 커비 입 안에 있고, Fly가 아닐땐 입 안에 있는 상황이므로, Render되지않는다.
+	if (m_ePhyXState == PO_KIRBYMOUTH)
+		return;
+
+
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
@@ -235,7 +247,48 @@ void CPoppyBomb::Render_IMGUI()
 
 	__super::Render_IMGUI();
 }
+
+
 #endif
+
+_int CPoppyBomb::Ready_Dead(_float fDeadScale)
+{
+	if (m_ePhyXState == PO_KIRBYMOUTH || m_ePhyXState == PO_VACUUMING)
+		return OBJ_DEAD;
+
+	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+
+	MultiFXDesc.vInitPos = static_cast<_float3>(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+	MultiFXDesc.vInitRot = CUtils::Make_Degree_FromDir(CGameInstance::Get_Instance()->Get_CamLook());
+	MultiFXDesc.vInitScale = { 3.f, 3.f, 3.f };
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_ExplodeSmoke"), &MultiFXDesc)))
+		return OBJ_DEAD;
+
+	//MultiFXDesc.vInitRot = CUtils::Make_Degree_FromDir(CGameInstance::Get_Instance()->Get_CamLook());
+	_float fScale = CUtils::Make_RandomFloat(0.95f, 2.5f);
+	MultiFXDesc.vInitScale = { fScale, fScale, fScale };
+	MultiFXDesc.fStartDelay = .05f;
+
+	MultiFXDesc.vInitRot = CUtils::Make_Degree_FromDir(static_cast<_float3>(CUtils::Make_RandomAngle_Vector(60.f, _float4{ 0.f, 1.f, 0.f, 0.f })));
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BombParticle_v1"), &MultiFXDesc)))
+		return OBJ_DEAD;
+
+
+	fScale = CUtils::Make_RandomFloat(0.95f, 2.5f);
+	MultiFXDesc.vInitScale = { fScale, fScale, fScale };
+	MultiFXDesc.vInitRot = CUtils::Make_Degree_FromDir(static_cast<_float3>(CUtils::Make_RandomAngle_Vector(60.f, _float4{ 0.f, 1.f, 0.f, 0.f })));
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BombParticle_v1"), &MultiFXDesc)))
+		return OBJ_DEAD;
+
+	fScale = CUtils::Make_RandomFloat(0.95f, 2.5f);
+	MultiFXDesc.vInitScale = { fScale, fScale, fScale };
+
+	MultiFXDesc.vInitRot = CUtils::Make_Degree_FromDir(static_cast<_float3>(CUtils::Make_RandomAngle_Vector(60.f, _float4{ 0.f, 1.f, 0.f, 0.f })));
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BombParticle_v1"), &MultiFXDesc)))
+		return OBJ_DEAD;
+
+	return OBJ_DEAD;
+}
 
 HRESULT CPoppyBomb::Add_Components()
 {
@@ -257,7 +310,7 @@ HRESULT CPoppyBomb::Add_Components()
 	desc.uCollisionType = m_eCollisionGroup;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
-	m_pControllerCom->Set_Object(this);
+	//m_pControllerCom->Set_Object(this);
 	//m_pControllerCom->Set_CollisionType(m_eCollisionGroup);
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vPosition);

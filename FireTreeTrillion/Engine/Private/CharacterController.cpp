@@ -616,7 +616,6 @@ void CCharacterController::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_pObject);
 	Release_Controller();
 }
 

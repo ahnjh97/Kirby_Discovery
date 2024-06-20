@@ -35,18 +35,18 @@ float g_fOverPowerColor;
 // 회전된 UV를 계산
 float2 RotateUV(float2 vCoord, float fAngle)
 {
-    float2 vCenter = (0.5, 0.5);
-    
+    float2 vCenter = float2(0.5, 0.5); // 중점 좌표 설정
+
     float fSinAngle = sin(fAngle);
     float fCosAngle = cos(fAngle);
     float2x2 RotationMatrix = float2x2(fCosAngle, -fSinAngle, fSinAngle, fCosAngle);
 
-    //float2 vDir = vCoord - vCenter;
+    // 텍스처 좌표를 중점을 기준으로 이동시키고 회전 변환 적용
     vCoord -= vCenter;
     vCoord = mul(vCoord, RotationMatrix);
     vCoord += vCenter;
-    
-    return mul(vCoord, RotationMatrix);
+
+    return vCoord;
 }
 
 
@@ -381,14 +381,14 @@ PS_OUT_EFFECT PS_MAIN_WHITE_FX(PS_IN In)
         discard;
     
 
-    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord + g_vUVOffset);
+    vector vDiffuse = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord + g_vUVOffset);
     
     //알파가 0일때, 혹은 검은색일때 자르기
     if (vDiffuse.a < .01f || (vDiffuse.r < 0.1f && vDiffuse.g < 0.1f && vDiffuse.b < 0.1f))
         discard;
 
     Out.vColor.rgb = g_vRColor;
-    Out.vColor.a = vDiffuse.a * g_fAlpha;
+    Out.vColor.a = vDiffuse.a * g_fAlpha * vMask.r;
 
     return Out;
 }

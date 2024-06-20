@@ -289,10 +289,10 @@ void CVIBuffer_Instance::Appear(_float fTimeDelta, VTXMATRIX* pVertices)
 	{
 
 		_float fTimeRatio = clamp((m_pLifeTimes[i].x / m_pLifeTimes[i].y) * 5.f, .01f, 1.f);
-		fTimeRatio = EASE_IN(fTimeRatio);
-		if (1.f <= fTimeRatio)
+		fTimeRatio = SATURATE(EASE_IN(fTimeRatio));
+		if (1.f < fTimeRatio)
 			continue;
-
+		
 		_float4x4 InstanceMat = { _float4x4::Identity };
 
 		InstanceMat.Right(*(_float3*)&pVertices[i].vRight);
@@ -317,19 +317,13 @@ void CVIBuffer_Instance::Appear(_float fTimeDelta, VTXMATRIX* pVertices)
 void CVIBuffer_Instance::Disappear(_float fTimeDelta, VTXMATRIX* pVertices)
 {
 
-	/*D3D11_MAPPED_SUBRESOURCE		SubResource{};
-	m_pContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
-	VTXMATRIX* pVertices = ((VTXMATRIX*)SubResource.pData);*/
-
-
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
-
 		if ((m_pLifeTimes[i].x / m_pLifeTimes[i].y) < .5f)
 			continue;
 
 		_float fTimeRatio = 1.f - ((m_pLifeTimes[i].x / m_pLifeTimes[i].y) - .5f) * 2.f;
-		fTimeRatio = clamp( EASE_OUT(fTimeRatio), 0.f, 1.f);
+		fTimeRatio = SATURATE(EASE_OUT(fTimeRatio));
 
 		_float4x4 InstanceMat = { _float4x4::Identity };
 
@@ -348,29 +342,20 @@ void CVIBuffer_Instance::Disappear(_float fTimeDelta, VTXMATRIX* pVertices)
 		pVertices[i].vUp = Dir(InstanceMat.Up());
 		pVertices[i].vLook = Dir(InstanceMat.Forward());
 		pVertices[i].vPosition = Pos(InstanceMat.Translation());
-
 	}
 
-	//m_pContext->Unmap(m_pVBInstance, 0);
 }
 
 void CVIBuffer_Instance::Wiggle(_float fTimeDelta, VTXMATRIX* pVertices)
 {
-	/*D3D11_MAPPED_SUBRESOURCE		SubResource{};
-	m_pContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
-	VTXMATRIX* pVertices = ((VTXMATRIX*)SubResource.pData);*/
-
-
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
-
 		_matrix rotationMatrix = XMMatrixIdentity();
 		rotationMatrix = XMMatrixRotationY(XMConvertToRadians(120.f * fTimeDelta));
 		XMStoreFloat3(&m_pDirections[i], XMVector4Transform(XMLoadFloat3(&m_pDirections[i]), rotationMatrix));
 
 		pVertices[i].vPosition += Dir(m_pDirections[i]) * m_pSpeeds[i] * fTimeDelta;
 	}
-	//m_pContext->Unmap(m_pVBInstance, 0);
 }
 
 void CVIBuffer_Instance::Tail(_float fTimeDelta, VTXMATRIX* pVertices)

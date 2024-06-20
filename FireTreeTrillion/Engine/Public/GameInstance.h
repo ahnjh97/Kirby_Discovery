@@ -82,7 +82,7 @@ public: /* For.Object_Manager */
 	class CGameObject* Find_Prototype(const wstring& strPrototypeTag);
 
 	void				Set_CurrentLevel(_int CurrentLevel);
-	void	Clear_Layer(_uint iLevelIndex, const wstring& wstrLayerTag);
+	void				Clear_Layer(_uint iLevelIndex, const wstring& wstrLayerTag);
 	_uint				Get_GameObject_Num(_uint _iLevelIndex, const wstring& _strLayerTag);
 
 

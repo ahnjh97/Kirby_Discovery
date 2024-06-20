@@ -114,6 +114,10 @@ protected:
 	// 몸 콜라이더 전용
 	void		Set_BodyCollider(HITBOX eType, _float fOffSetY, _float fHeight, _float fRadius);
 
+	_uint									m_iLateTickCount = { 0 };
+	_float									m_fAccTime = { 0.f };
+	_bool									Compute_OptimizationAnimation(_float fTimeDelta);
+
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;
 	virtual void Free() override;

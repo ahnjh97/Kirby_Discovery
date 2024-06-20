@@ -376,7 +376,7 @@ HRESULT CRenderer::Initialize()
 	//// DEFERRED INFO 이 자리 god ray 확인용으로 좀 써주게여
 	//if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_DeferredInfo"), 900.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
 	//	return E_FAIL;
-	
+
 	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_UI"), ViewportDesc.Width * 0.1f / 2.f, ViewportDesc.Height * 0.1f / 2.f,
 		ViewportDesc.Width * 0.1f, ViewportDesc.Height * 0.1f)))
 		return E_FAIL;
@@ -414,10 +414,11 @@ void CRenderer::Color_Initialize()
 
 	Save_ColorSet("Forest",
 		COLOR_DATA{
-		0.749935f, 1.f, 0.950082f, 1.29995f, 0.940233f,
-		1.03741f, 1.04021f, 0.770378f, 0.6f, 0.6f, 0.680005f, 0.96f,
-		1.04f, 0.262838f, 0.0217608f, 0.115752f, 0.120319f, 0.917647f, 0.513726f, 0.145098f, 0.179724f, 1.f, 0.847059f,
-		0.254902f, 0.339907f, 0.130231f, 0.569551f
+		0.759866f, 1.f, 0.95f, 1.3f, 0.930407f,
+		1.03727f, 0.890097f, 1.00997f, 0.6f, 0.6f,
+		0.689825f, 0.96f, 1.04f, 0.252849f, 0.0147043f, 0.0610405f,
+		0.12f, 0.917647f, 0.513726f, 0.145098f, 0.170057f, 1.f,
+		0.847059f, 0.254902f, 0.34f, 0.13f, 0.559638f
 		});
 
 	Save_ColorSet("Night",
@@ -567,7 +568,7 @@ void CRenderer::Key_Input()
 	//		Update_Option((OPTION)i, m_bRenderOption[i]);
 	//	}
 	//}
-	
+
 	//리얼 초저사양모드
 	if (m_pGameInstance->Get_DIKeyState(DIK_E, KEY_DOWN))
 	{
@@ -585,14 +586,24 @@ void CRenderer::Key_Input()
 #endif
 
 	if (m_pGameInstance->Get_KeyState(DIK_F5, KEY_DOWN))
+	{
 		Set_ColorSet(Find_ColorSet("Tutorial"));
+		m_fRimLightRatio.second = .7f;
+	}
 	if (m_pGameInstance->Get_KeyState(DIK_F6, KEY_DOWN))
+	{
 		Set_ColorSet(Find_ColorSet("Forest"));
+		m_fRimLightRatio.second = .3f;
+	}
 	if (m_pGameInstance->Get_KeyState(DIK_F7, KEY_DOWN))
+	{
 		Set_ColorSet(Find_ColorSet("Night"));
+	}
+
 	if (m_pGameInstance->Get_KeyState(DIK_F8, KEY_DOWN))
 	{
 		Set_ColorSet(Find_ColorSet("Stage1"));
+		m_fRimLightRatio.second = 1.f;
 		m_pGameInstance->PlayBGM(L"Running Through the New World.mp3");
 	}
 }
@@ -627,9 +638,11 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 	{
 	case 0:
 		m_DestColorData = Find_ColorSet("Tutorial");
+		m_fRimLightRatio.second = .7f;
 		break;
 	case 1:
 		m_DestColorData = Find_ColorSet("Forest");
+		m_fRimLightRatio.second = .3f;
 		break;
 	case 2:
 		m_DestColorData = Find_ColorSet("Night");
@@ -637,71 +650,80 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 	case 3:
 	{
 		m_DestColorData = Find_ColorSet("Stage1");
-		m_pGameInstance->PlayBGM(L"Running Through the New World.mp3");
+		m_fRimLightRatio.second = 1.f;
 
-		CEffect::FX_DESC FXDesc{};
-
-		FXDesc.vInitPos = { -44.f, 17.f, 121.f };
-		FXDesc.vInitScale = { 1.f, 1.f, 1.f };
-		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Flower Particle"), &FXDesc)))
-			return;
-
-		FXDesc.vInitPos = { -44.f, 17.f, 100.f };
-		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Flower Particle"), &FXDesc)))
-			return;
-
-		for (_int i = 0; i < 40; ++i)
+		if (m_iCurColorIdx != iSetIdx)
 		{
-			_float3 vRandom = { CUtils::Make_Random_Vector(CUtils::Make_RandomFloat( 25.f, 35.f)) };
-			FXDesc.vInitPos =
-				_float3{ -44.f + CUtils::Make_RandomFloat(-20.f, 20.f),
-				30.f + CUtils::Make_RandomFloat(-10.f, 4.f),
-				131.f + CUtils::Make_RandomFloat(-20.f, 20.f) };
-			FXDesc.vInitRot = CUtils::Make_Degree_FromDir( (_float3)CUtils::Make_RandomAngle_Vector(50.f, _float3{0.f, 0.5f, 1.f}));
-			FXDesc.fStartDelay = CUtils::Make_RandomFloat(0.f, 3.f);
-			wstring strPrototypeTag = TEXT("Prototype_GameObject_FlowerLeaf ");
-			switch (CUtils::Make_RandomInt(1, 4))
-			{
-			case 1: strPrototypeTag += L"A"; break;
-			case 2: strPrototypeTag += L"B"; break;
-			case 3: strPrototypeTag += L"C"; break;
-			case 4: strPrototypeTag += L"D"; break;
-			default:
-				break;
-			}
-			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), strPrototypeTag, &FXDesc)))
-				return;
-		}
+			m_pGameInstance->StopSound(CHANNEL_BGM);
+			m_pGameInstance->PlayBGM(L"Running Through the New World.mp3");
 
-		for (_int i = 0; i < 25; ++i)
-		{
-			_float3 vRandom = { CUtils::Make_Random_Vector(CUtils::Make_RandomFloat(25.f, 35.f)) };
-			FXDesc.vInitPos =
-				_float3{ -44.f + CUtils::Make_RandomFloat(-20.f, 20.f),
-				30.f + CUtils::Make_RandomFloat(-10.f, 4.f),
-				171.f + CUtils::Make_RandomFloat(-20.f, 20.f) };
-			FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_RandomAngle_Vector(50.f, _float3{ 0.f, 0.5f, 1.f }));
-			FXDesc.fStartDelay = CUtils::Make_RandomFloat(5.f, 8.f);
-			wstring strPrototypeTag = TEXT("Prototype_GameObject_FlowerLeaf ");
-			switch (CUtils::Make_RandomInt(1, 4))
-			{
-			case 1: strPrototypeTag += L"A"; break;
-			case 2: strPrototypeTag += L"B"; break;
-			case 3: strPrototypeTag += L"C"; break;
-			case 4: strPrototypeTag += L"D"; break;
-			default:
-				break;
-			}
-			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), strPrototypeTag, &FXDesc)))
+			CEffect::FX_DESC FXDesc{};
+
+			FXDesc.vInitPos = { -44.f, 17.f, 121.f };
+			FXDesc.vInitScale = { 1.f, 1.f, 1.f };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Flower Particle"), &FXDesc)))
 				return;
+
+			FXDesc.vInitPos = { -44.f, 17.f, 100.f };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Flower Particle"), &FXDesc)))
+				return;
+
+			for (_int i = 0; i < 80; ++i)
+			{
+				_float3 vRandom = { CUtils::Make_Random_Vector(CUtils::Make_RandomFloat(25.f, 35.f)) };
+				FXDesc.vInitPos =
+					_float3{ -44.f + CUtils::Make_RandomFloat(-20.f, 20.f),
+					30.f + CUtils::Make_RandomFloat(-10.f, 4.f),
+					131.f + CUtils::Make_RandomFloat(-20.f, 20.f) };
+				FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_RandomAngle_Vector(50.f, _float3{ 0.f, 0.5f, 1.f }));
+				FXDesc.fStartDelay = CUtils::Make_RandomFloat(0.f, 3.f);
+				wstring strPrototypeTag = TEXT("Prototype_GameObject_FlowerLeaf ");
+				switch (CUtils::Make_RandomInt(1, 4))
+				{
+				case 1: strPrototypeTag += L"A"; break;
+				case 2: strPrototypeTag += L"B"; break;
+				case 3: strPrototypeTag += L"C"; break;
+				case 4: strPrototypeTag += L"D"; break;
+				default:
+					break;
+				}
+				if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), strPrototypeTag, &FXDesc)))
+					return;
+			}
+
+			for (_int i = 0; i < 50; ++i)
+			{
+				_float3 vRandom = { CUtils::Make_Random_Vector(CUtils::Make_RandomFloat(25.f, 35.f)) };
+				FXDesc.vInitPos =
+					_float3{ -44.f + CUtils::Make_RandomFloat(-20.f, 20.f),
+					30.f + CUtils::Make_RandomFloat(-10.f, 4.f),
+					171.f + CUtils::Make_RandomFloat(-20.f, 20.f) };
+				FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_RandomAngle_Vector(50.f, _float3{ 0.f, 0.5f, 1.f }));
+				FXDesc.fStartDelay = CUtils::Make_RandomFloat(5.f, 8.f);
+				wstring strPrototypeTag = TEXT("Prototype_GameObject_FlowerLeaf ");
+				switch (CUtils::Make_RandomInt(1, 4))
+				{
+				case 1: strPrototypeTag += L"A"; break;
+				case 2: strPrototypeTag += L"B"; break;
+				case 3: strPrototypeTag += L"C"; break;
+				case 4: strPrototypeTag += L"D"; break;
+				default:
+					break;
+				}
+				if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), strPrototypeTag, &FXDesc)))
+					return;
+			}
+
 		}
 
 	}
-		break;
+	break;
 	default:
 		m_DestColorData = Find_ColorSet("Tutorial");
 		break;
 	}
+
+	m_iCurColorIdx = iSetIdx;
 }
 
 void CRenderer::Save_ColorSet(string strTag, COLOR_DATA destColorData)
@@ -1199,6 +1221,10 @@ HRESULT CRenderer::Render_Result()
 	if (FAILED(m_pShader->Bind_RawValue("g_fBlackBackGround", &m_fBlackBackground, sizeof(_float))))
 		return E_FAIL;
 
+	// 검은 배경의 color 배율
+	if (FAILED(m_pShader->Bind_RawValue("g_fRimLightRatio", &m_fRimLightRatio.first, sizeof(_float))))
+		return E_FAIL;
+
 	// 섞을 스카이 박스
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Sky"), "g_SkyTexture")))
 		return E_FAIL;
@@ -1636,6 +1662,9 @@ void CRenderer::Render_IMGUI()
 	if (ImGui::Checkbox(u8"모샨블라", &m_bRenderOption[OPTION_MOTIONBLUR]))
 		Update_Option(OPTION_MOTIONBLUR, m_bRenderOption[OPTION_MOTIONBLUR]);
 
+
+	ImGui::DragFloat(u8"림 라이트 배율", &m_fRimLightRatio.second, .01f, 0.f, 1.f, "%.2f");
+
 	ImGui::SeparatorText(u8"컬러코렉션");
 
 	ImGui::DragFloat(u8"노출", &m_DestColorData.fExposure, .01f, 0.f, 3.f, "%.2f");
@@ -1697,6 +1726,15 @@ void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 		return;
 
 	_float fInterpolateSpeed = 2.f * _fTimeDelta;
+
+	if (.001f < abs(m_fRimLightRatio.second - m_fRimLightRatio.first))
+	{
+		m_fRimLightRatio.first += (m_fRimLightRatio.second - m_fRimLightRatio.first) * fInterpolateSpeed;
+		if (abs(m_fRimLightRatio.first - m_fRimLightRatio.second) < 0.001f)
+		{
+			m_fRimLightRatio.first = m_fRimLightRatio.second;
+		}
+	}
 
 	if (.01f < abs(m_fExposure - m_DestColorData.fExposure))
 	{

@@ -86,18 +86,12 @@ _int CHUD_KirbyStatus::Tick(_float fTimeDelta)
 {	
 	__super::Tick(fTimeDelta);
 
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
 
-	if (m_IsKirbyEX == FALSE)
-	{
-		m_pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
-		//CHECK_NULLPTR(m_pKirby);
-		if (m_pKirby)
-			Compute_Player_Hp(fTimeDelta);
-	}
-
-	if (m_pKirby == nullptr)
+	if (pKirby == nullptr)
 		return OBJ_NOEVENT;
 
+	Compute_Player_Hp(fTimeDelta, pKirby);
 	Update_UIState(fTimeDelta);
 
 	return OBJ_NOEVENT;
@@ -339,15 +333,12 @@ void CHUD_KirbyStatus::Play_Animation(_float _fAccTime, KIRBYHP_STATE _eCurState
 	}
 }
 
-void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta)
+void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta, CKirby* pKirby)
 {
-	if (m_pKirby == nullptr)
-		return;
-
 #pragma region 분홍색 게이지 공식
 	// 현재 커비의 HP 맥스치
-	_float fKirbyHpMax = m_pKirby->Get_MaxHp();
-	_float fKirbyHp = m_pKirby->Get_Hp();
+	_float fKirbyHpMax = pKirby->Get_MaxHp();
+	_float fKirbyHp = pKirby->Get_Hp();
 
 	// 이 비율은 0 ~ 1 사이에 있어야 한다.
 	m_fHpRatio = (fKirbyHp / fKirbyHpMax);
@@ -520,12 +511,7 @@ CGameObject* CHUD_KirbyStatus::Clone(void* pArg)
 
 void CHUD_KirbyStatus::Free()
 {
-	Safe_Release(m_pTextureCom);
-	Safe_Release(m_pShaderCom);
-	Safe_Release(m_pVIBufferCom);
 	Safe_Release(m_pTextureMask);
-
-
 	__super::Free();
 }
 

@@ -82,14 +82,14 @@ void CAwoofy::Late_Tick(_float fTimeDelta)
 	if (m_ePhyXState == PO_KIRBYMOUTH)
 		return;
 
-	// 날아갈 땐, 애니메이션 재생이 되지 않는다.
-	if (m_ePhyXState != PO_FLYAWAY)
-	{
-		m_ePhyXState == PO_FLYDEADAWAY ? m_pModelCom->Play_Animation(m_fTimeDelta * 0.3f) : m_pModelCom->Play_Animation(m_fTimeDelta);
-	}
-
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
+		// 날아갈 땐, 애니메이션 재생이 되지 않는다.
+		if (m_ePhyXState != PO_FLYAWAY)
+		{
+			if (Compute_OptimizationAnimation(m_fTimeDelta) == true)
+				m_ePhyXState == PO_FLYDEADAWAY ? m_pModelCom->Play_Animation(m_fAccTime * 0.3f) : m_pModelCom->Play_Animation(m_fAccTime);
+		}
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 	}
@@ -121,7 +121,7 @@ HRESULT CAwoofy::Render()
 		//몸통(1)은 normal O, 눈까리(0)는 normal x 패스
 		if (i == 0 && m_bRenderBody)
 		{
-			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
+			if (FAILED(m_pShaderCom->Begin(11)))
 				return E_FAIL;
 			if (FAILED(m_pModelCom->Render(i)))
 				return E_FAIL;
@@ -327,6 +327,10 @@ HRESULT CAwoofy::Add_Components()
 		TEXT("Com_Texture"), (CComponent**)&m_pEyeTextureCom);
 	CHECK_FAILED(hr);
 
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_FX_Mask_Bubble2"),
+		TEXT("Com_Texture2"), (CComponent**)&m_pTestTextureCom);
+	CHECK_FAILED(hr);
+
 	/* For.Com_CharacterController */
 	m_vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
@@ -335,7 +339,7 @@ HRESULT CAwoofy::Add_Components()
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	CHECK_FAILED(hr);
-	m_pControllerCom->Set_Object(this);
+	//m_pControllerCom->Set_Object(this);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vPos);
 
 	/* FSM */
@@ -378,6 +382,10 @@ HRESULT CAwoofy::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
+		return E_FAIL;
+
+
+	if (FAILED(m_pTestTextureCom->Bind_ShaderResource(m_pShaderCom, "g_ObjNearClipTexture", 1)))
 		return E_FAIL;
 
 	return S_OK;
@@ -446,5 +454,6 @@ void CAwoofy::Free()
 	__super::Free();
 
 	Safe_Release(m_pEyeTextureCom);
+	Safe_Release(m_pTestTextureCom);
 }
 

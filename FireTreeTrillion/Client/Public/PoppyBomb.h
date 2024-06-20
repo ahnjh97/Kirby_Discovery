@@ -44,10 +44,13 @@ public:
 	virtual	void CPoppyBomb::Render_IMGUI()			override;
 #endif
 
+	virtual _int Ready_Dead(_float fDeadScale = 1.8f) override;
+
 private:
 	//CModel*				m_pModelCom = { nullptr };
 	//CShader*				m_pShaderCom = { nullptr };
 	//CCharacterController*	m_pControllerCom = { nullptr };
+
 
 private:
 	CGameObject* m_pGameObject = { nullptr };

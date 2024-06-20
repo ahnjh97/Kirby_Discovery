@@ -19,9 +19,6 @@
     <Filter Include="01.Levels\Logo">
       <UniqueIdentifier>{7fa67ac9-2f2d-435f-bf35-849f5cbedd3c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Levels\GamePlay">
-      <UniqueIdentifier>{8b1d5579-1fb9-493c-96b9-62d618153e5d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Levels\Loading\Loader">
       <UniqueIdentifier>{17ab5a45-d880-40f6-b518-e747936c79d3}</UniqueIdentifier>
     </Filter>
@@ -291,6 +288,12 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Item\Ability">
       <UniqueIdentifier>{4ee32ea7-86a0-4289-a776-d1fce969bca4}</UniqueIdentifier>
+	</Filter>
+    <Filter Include="02.GameObjects\Map\TerrainFog">
+      <UniqueIdentifier>{631580d9-5ad3-41b9-b6d7-5fcc5394b093}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\Intro\GamePlay">
+      <UniqueIdentifier>{8b1d5579-1fb9-493c-96b9-62d618153e5d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -313,7 +316,7 @@
       <Filter>00.MainApp</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_GamePlay.h">
-      <Filter>01.Levels\GamePlay</Filter>
+      <Filter>01.Levels\Intro\GamePlay</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Loading.h">
       <Filter>01.Levels\Loading</Filter>
@@ -583,6 +586,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Ability.h">
       <Filter>02.GameObjects\PhysXObject\Item\Ability</Filter>
+	</ClInclude>
+    <ClInclude Include="..\Public\TerrainFog.h">
+      <Filter>02.GameObjects\Map\TerrainFog</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -596,7 +602,7 @@
       <Filter>00.MainApp</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_GamePlay.cpp">
-      <Filter>01.Levels\GamePlay</Filter>
+      <Filter>01.Levels\Intro\GamePlay</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Loading.cpp">
       <Filter>01.Levels\Loading</Filter>
@@ -857,6 +863,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Ability.cpp">
       <Filter>02.GameObjects\PhysXObject\Item\Ability</Filter>
+	</ClCompile>
+    <ClCompile Include="..\Private\TerrainFog.cpp">
+      <Filter>02.GameObjects\Map\TerrainFog</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

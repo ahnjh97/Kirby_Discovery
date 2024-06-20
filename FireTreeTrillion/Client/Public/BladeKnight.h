@@ -45,7 +45,6 @@ public:
 
 private:
 	map<const wstring, CPartObject*>	m_PartObjects;
-	class CBladeKnightSword*			m_pSword = { nullptr };
 
 	BLADEKNIGHT_ANIM					m_eCurrentState = { BLADEKNIGHT_END };
 
