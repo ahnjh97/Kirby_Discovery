@@ -289,6 +289,9 @@
     <Filter Include="02.GameObjects\HitBox">
       <UniqueIdentifier>{dab839b6-6fe3-4095-b8f6-0e1587423131}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\TerrainFog">
+      <UniqueIdentifier>{631580d9-5ad3-41b9-b6d7-5fcc5394b093}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -578,6 +581,9 @@
     <ClInclude Include="..\Public\HitBox.h">
       <Filter>02.GameObjects\HitBox</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\TerrainFog.h">
+      <Filter>02.GameObjects\Map\TerrainFog</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -848,6 +854,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\HitBox.cpp">
       <Filter>02.GameObjects\HitBox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TerrainFog.cpp">
+      <Filter>02.GameObjects\Map\TerrainFog</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
