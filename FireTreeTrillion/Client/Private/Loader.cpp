@@ -795,6 +795,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		// For Kirby Weapon
 		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("KirbyBombDefault", TYPE_ANIM, 1.3f, 180.f);
+		m_vecModelInfo.emplace_back("KirbyBombDefault", TYPE_ANIM, 1.3f, 180.f);
 		// For Kirby Armour
 		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
@@ -892,6 +893,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		// For Item
 		m_vecModelInfo.emplace_back("Item_EnergyDrink", TYPE_NONANIM, 3.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("Item_Coin", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Item_Sword", TYPE_NONANIM, 1.f, 0.f);
+
 	}
 	else if (eLevel == LEVEL_TOOL_MAP)
 	{
