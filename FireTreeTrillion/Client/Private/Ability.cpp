@@ -68,7 +68,7 @@ _int CAbility::Tick(_float fTimeDelta)
 	if (m_bDead == true)
 		return OBJ_DEAD;
 
-	if (m_eAbilityType == PO_KIRBYMOUTH)
+	if (m_ePhyXState == PO_KIRBYMOUTH)
 		Delete_AllEffect();
 
 
