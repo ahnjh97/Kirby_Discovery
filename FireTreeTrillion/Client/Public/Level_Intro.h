@@ -20,18 +20,18 @@ private:
 	HRESULT Ready_Layer_Camera(const wstring& strLayerTag);
 	HRESULT Ready_Layer_BackGround(const wstring& strLayerTag);
 	HRESULT Ready_Layer_UI(const wstring& strLayerTag);
-	HRESULT Ready_ParsedObjects();
+
 	HRESULT Ready_Map();
 	HRESULT Ready_Triggers();
 	HRESULT Ready_Monsters();
 	HRESULT Ready_Items();
-	HRESULT	Load_FileData(const string& _strFilePath, FILE_TYPE _eFileType, const wstring& _strLayerTag);
+	HRESULT Ready_Kickables();
 
+	HRESULT	Load_FileData(const string& _strFilePath, FILE_TYPE _eFileType, const wstring& _strLayerTag);
 
 	HRESULT Add_EnvMap();
 	enum TEXTURETYPE { TYPE_ENV, TYPE_LUT, TYPE_NORMAL, TYPE_END };
 	CTexture* m_pEnvTexture[TYPE_END] = { nullptr };
-
 
 public:
 	static CLevel_Intro* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

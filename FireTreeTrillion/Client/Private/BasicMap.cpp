@@ -361,7 +361,7 @@ void CBasicMap::InsertMapDecos()
             strFolder = string("MapDeco/");
         }
 
-        CModel* pModel = CModel::Create(m_pDevice, m_pContext, MODEL{ strModelName, eType, 1.f, 0.f, 0, false, strFolder });
+        CModel* pModel = CModel::Create(m_pDevice, m_pContext, MODEL{ strModelName, eType, 1.f, 0.f, 0, strFolder, false});
 
         if (nullptr == pModel) {
             fileInput.close();
