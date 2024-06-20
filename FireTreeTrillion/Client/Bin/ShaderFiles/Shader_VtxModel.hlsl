@@ -415,7 +415,7 @@ PS_OUT PS_MAIN_NEARCLIP(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
-    vector vMtrlDiffuse = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord);
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
     if (0.3f >= vMtrlDiffuse.a)
         discard;
 
@@ -434,19 +434,16 @@ PS_OUT PS_MAIN_NEARCLIP(PS_IN In)
     }
     
     vector vNormalDesc = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
-
     float3 vNormal = vNormalDesc.xyz * 2.f - 1.f;
-
     float3x3 WorldMatrix = float3x3(In.vTangent, In.vBinormal, In.vNormal);
-
     float3 vWorldNormal = mul(vNormal, WorldMatrix);
 
-    Out.vDiffuse = vMtrlDiffuse + g_fWhiteColorDiffuse;
+    
+    Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
     Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
-    if (Out.vMRA.z == 0)
-        Out.vMRA.z = 0.001f;
+    
     
     if (g_bStencil == true)
         Out.vStencil = vector(1.f, 0.f, 0.0f, 1.f);
@@ -456,6 +453,9 @@ PS_OUT PS_MAIN_NEARCLIP(PS_IN In)
 
     if (g_bMotionBlur == true)
         Out.vMotionBlur = g_vMotionVelocity;
+    
+    if (Out.vMRA.b < 0.001)
+        Out.vMRA.b = 1.f;
 
     return Out;
 }
@@ -621,7 +621,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 FOR_KIRBY_PARTOBJECT();
     }
 
-    // 가까이오면 잘리는 패스(11)
+    // 가까이오면 잘리는 패스(12)
     pass NearClip
     {
         SetRasterizerState(RS_Default);
