@@ -306,7 +306,10 @@ void CHUD_KirbyStatus::Play_Animation(_float _fAccTime, KIRBYHP_STATE _eCurState
 
 	case CHUD::KIRBYHP_HIDE: //X값 좌측 이동, 알파 값 죽이기
 		if (m_UIObjDesc.wstrUITag == TEXT("Name"))
+		{
 			m_UIObjDesc.vPos.x -= 40.f;
+			//m_UIObjDesc.vPos.x = m_vOriginalPos - (내가 이동하고 싶은 값) (50.f * _fAccTime * (1.f / 0.16f))
+		}
 
 		m_UIObjDesc.vPos.x -= 0.05f;
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION,
@@ -314,7 +317,8 @@ void CHUD_KirbyStatus::Play_Animation(_float _fAccTime, KIRBYHP_STATE _eCurState
 				m_UIObjDesc.vPos.y - m_UIObjDesc.vCenter.y + m_UIObjDesc.vCenter.y,
 				m_UIObjDesc.vPos.z, 1.f));
 
-		m_UIObjDesc.fAlpha -= 1.f / 255.f * _fAccTime;
+		// 1 ~ 0  -> 0.16초
+		m_UIObjDesc.fAlpha = 1.f - (_fAccTime * (1.f / 0.16f));
 
 		if (m_UIObjDesc.fAlpha < 1.f / 255.f)
 			m_UIObjDesc.fAlpha = 1.f / 255.f;
