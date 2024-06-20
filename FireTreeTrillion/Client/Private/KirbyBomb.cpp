@@ -304,7 +304,7 @@ void CKirbyBomb::Compute_MotionBlur()
 
     m_vMotionVelocity.x = (m_vPreScreenPos - vCurScreenPos).x;
     m_vMotionVelocity.y = (m_vPreScreenPos - vCurScreenPos).y;
-    m_vMotionVelocity.z = 1.f;//m_ePhyXState != PO_NORMAL ? 1.f : 0.f;
+    m_vMotionVelocity.z = m_ePhyXState != PO_NORMAL ? 1.f : 0.f;
 
     m_vPreScreenPos = vCurScreenPos;
 }

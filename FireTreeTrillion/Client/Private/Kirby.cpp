@@ -107,6 +107,9 @@ HRESULT CKirby::Initialize(void* pArg)
 
 	Add_AnimEvent();
 
+	// 확실하게...
+	m_bMotionBlur = true;
+
 	return S_OK;
 }
 
