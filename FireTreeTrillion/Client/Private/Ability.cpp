@@ -256,7 +256,7 @@ void CAbility::Sphere_Collision()
 
 		//pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(XMVectorAdd(vPlayerPos, vPushVector), 1.f));
 		//m_pControllerCom->Move(m_pTransformCom, XMVectorSetW(XMVectorAdd(vPlayerPos, vPushVector)), m_fTimeDelta);
-		m_pControllerCom->Move_Dir(m_pTransformCom, XMVector3Normalize(vPushVector) * m_fTimeDelta, m_fTimeDelta);
+		m_pControllerCom->Move_Dir(m_pTransformCom, XMVector3Normalize(vPushVector) * m_fTimeDelta * 2.f, m_fTimeDelta);
 	}
 }
 
