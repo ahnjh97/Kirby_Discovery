@@ -59,27 +59,6 @@ HRESULT CLevel_Intro::Initialize()
 	hr = Ready_Kickables();
 	CHECK_FAILED(hr);
 
-	CGameObject::GAMEOBJECT_DESC ObjDesc{};
-	ObjDesc.fSpeedPerSec = 5.f;
-	ObjDesc.fRotationPerSec = ToRadian(90.f);
-	_float4x4 InitMat = _float4x4::Identity;
-	InitMat.Translation({ -25.f, 17.f, 259.5f });
-	ObjDesc.matWorld = InitMat;
-
-	//// Ladder Test
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Ladder"), TEXT("Prototype_GameObject_Ladder"), &ObjDesc)))
-	//	return E_FAIL;
-
-	ObjDesc = {};
-	ObjDesc.fSpeedPerSec = 5.f;
-	ObjDesc.fRotationPerSec = ToRadian(90.f);
-	InitMat = _float4x4::Identity;
-	InitMat.Translation({ -40.f, 6.7f, -8.f});
-	ObjDesc.matWorld = InitMat;
-
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Item"), TEXT("Prototype_GameObject_EnergyDrink"), &ObjDesc)))
-		return E_FAIL;
-
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
 	return S_OK;
@@ -607,7 +586,12 @@ HRESULT CLevel_Intro::Ready_Items()
 
 		if ("Item_Coin" == strModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Item"), TEXT("Prototype_GameObject_Coin"), &tDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NoVacuumItem"), TEXT("Prototype_GameObject_Coin"), &tDesc)))
+				return E_FAIL;
+		}
+		else if ("Item_EnergyDrink" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NoVacuumItem"), TEXT("Prototype_GameObject_EnergyDrink"), &tDesc)))
 				return E_FAIL;
 		}
 	}
