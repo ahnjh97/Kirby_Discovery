@@ -18,6 +18,8 @@ public:
 
         CONTENT_ATTACK,         // 플레이어의 히트박스 X 몬스터
         CONTENT_DAMAGE,         // 몬스터와의 히트박스 X 플레이어
+        //CONTENT_DAMAGEBULLET,   // 몹 불릿 X 플레이어
+
         CONTENT_VACUUMOBJECT,   // 커비가 흡수 후 날리는 것들과의 충돌
 
         CONTENT_KICK,           // 플레이어 X 찰수있는 맵 오브젝트

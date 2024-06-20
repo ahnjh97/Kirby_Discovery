@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "MapToolObject.h"
+#include "MapToolHelper.h"
 
 CMapToolObject::CMapToolObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -46,6 +47,9 @@ HRESULT CMapToolObject::Initialize(void* pArg)
 
 		m_pOrbitingCamera->Set_OrbitingCameraPos(XMVectorSet(0, 0, -m_fRadius, 0));
 	}
+
+	m_pMapToolHelper = dynamic_cast<CMapToolHelper*>(m_pGameInstance->Get_GameObject(LEVEL_TOOL_MAP, TEXT("Layer_MapToolHelper")));
+	Safe_AddRef(m_pMapToolHelper);
 
 	return S_OK;
 }
@@ -108,11 +112,9 @@ void CMapToolObject::Render_IMGUI()
 {
 	if (nullptr == m_pModelCom)
 		return;
-	string strModelName = m_pModelCom->Get_ModelName();
-
-	ImGui::BeginChild(strModelName.c_str());
-
-	ImGui::EndChild();
+	_float fButtonWidth = 80;
+	if (ImGui::Button("Select", ImVec2(fButtonWidth, 30)))
+		m_pMapToolHelper->Set_PickedObject(this, m_pModelCom->Get_ModelName());
 }
 #endif
 
@@ -146,11 +148,14 @@ HRESULT CMapToolObject::Bind_ShaderResources()
 		if (FAILED(m_pShaderCom->Bind_RawValue("g_iTriggerType", &m_iTriggerType, sizeof(_uint))))
 			return E_FAIL;
 	}
-	m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
-	m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool))))
+		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
 		return E_FAIL;
-	m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool))))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -204,6 +209,7 @@ void CMapToolObject::Free()
 {
 	__super::Free();
 
+	Safe_Release(m_pMapToolHelper);
 	Safe_Release(m_pOrbitingCamera);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModelCom);

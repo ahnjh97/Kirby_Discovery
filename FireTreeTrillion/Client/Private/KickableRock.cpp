@@ -25,11 +25,11 @@ HRESULT CKickableRock::Initialize(void* pArg)
 	if (nullptr != pArg)
 		pGameObjectDesc = (GAMEOBJECT_DESC*)pArg;
 
-	HRESULT  hr = __super::Initialize(pGameObjectDesc);
+	HRESULT  hr = __super::Initialize(pArg);
 	CHECK_FAILED(hr);
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, CUtils::Get_State_Vector_Matrix(pGameObjectDesc->matWorld, CUtils::STATE_POSITION));
-	Add_Components();
+	if(pGameObjectDesc != nullptr)
+		Add_Components(pGameObjectDesc->wstrModelName);
 
 	return S_OK;
 }
@@ -185,7 +185,7 @@ void CKickableRock::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObj
 	}
 }
 
-HRESULT CKickableRock::Add_Components()
+HRESULT CKickableRock::Add_Components(const wstring& wstrModelName)
 {
 	HRESULT hr;
 	/* For.Com_Shader */
@@ -194,8 +194,8 @@ HRESULT CKickableRock::Add_Components()
 	CHECK_FAILED(hr);
 
 	/* For.Com_Model */
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_GsPebble"),
-		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+	wstring wstrModelTag = TEXT("Prototype_Component_Model_") + wstrModelName;
+	hr = __super::Add_Component(wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
 	/* For.Com_RigidBody */
