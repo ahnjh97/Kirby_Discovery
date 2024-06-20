@@ -61,7 +61,6 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 				pthis->Compute_Damage(pKirby, pMonster);
 				// 몬스터에게 부여되는 무적시간이다. (기본적으로 히트박스는 0.1초의 딜레이를 갖지만 몸통박치기는 2초의 딜레이가 필요할것이다)
 				pMonster->Set_Damage_Delay(1.f);
-
 				DstHit->Set_Alive(false);
 				SrcHit->Set_Alive(false);
 			}
@@ -161,7 +160,7 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 
 			// 데미지 공식과 이펙트, 쉐이킹, 히트스탑 등 시스템적인 요소들이 잔뜩 들어가있다.
 			pthis->Damage_And_Effect_For_Monster(pKirby, pMonster);
-
+			DstHit->Set_Alive(false);
 		});
 
 	// 미 구현
@@ -228,7 +227,6 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 			SrcHit->Set_Alive(false);
 		});
 
-
 	// 깔끔하게 완료되었음
 	Collision_Collider(m_GameObjects[PLAYERBULLET], m_GameObjects[PLAYERBULLET], this,
 		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
@@ -237,8 +235,6 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 			CGameObject* Src = SrcHit->Get_Owner();
 			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
 				return;
-
-
 
 			Dst->Set_Dead();
 			Src->Set_Dead();
@@ -274,6 +270,8 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 			_float fAttack = pDst->Get_Attack();
 			pMonster->Minus_Hp(fAttack);
 
+			DstHit->Set_Alive(false);
+			SrcHit->Set_Alive(false);
 			Dst->Set_Dead();
 		});
 

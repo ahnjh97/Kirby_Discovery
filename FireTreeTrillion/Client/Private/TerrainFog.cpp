@@ -28,13 +28,18 @@ HRESULT CTerrainFog::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-
+	m_fAlpha = 0.3f;
+	m_pTransformCom->Set_Scaled(3.f, 3.f, 1.f);
 
 	return S_OK;
 }
 
 _int CTerrainFog::Tick(_float fTimeDelta)
 {
+	if (m_bDead == true)
+		return OBJ_DEAD;
+
+
 
 
 
@@ -66,12 +71,37 @@ HRESULT CTerrainFog::Render()
 
 HRESULT CTerrainFog::Add_Components()
 {
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex"),
+		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
+		return E_FAIL;
+
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),
+		TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom)))
+		return E_FAIL;
+
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Terrain_Fog"),
+		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
+		return E_FAIL;
+
 	return S_OK;
 }
 
 HRESULT CTerrainFog::Bind_ShaderResources()
 {
+	if (nullptr == m_pShaderCom)
+		return E_FAIL;
 
+	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
+		return E_FAIL;
+
+	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0)))
+		return E_FAIL;
 
 	return S_OK;
 }

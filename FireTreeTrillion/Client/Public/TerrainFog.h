@@ -28,6 +28,8 @@ private:
 	CTexture* m_pTextureCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
 
+	_float	m_fAlpha = { 0.f };
+
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
