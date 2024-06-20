@@ -15,7 +15,6 @@ CKirbyBomb::CKirbyBomb(const CKirbyBomb& rhs)
 
 HRESULT CKirbyBomb::Initialize_Prototype()
 {
-    //m_eCollisionGroup = PLAYER;
 
     return S_OK;
 }
@@ -62,7 +61,7 @@ HRESULT CKirbyBomb::Initialize(void* pArg)
 _int CKirbyBomb::Tick(_float fTimeDelta)
 {
     if (true == m_bDead)
-        return Boom_Dead();
+        return Ready_Dead();
 
     m_fTimeDelta = m_pGameInstance->Get_FirstTimer();
     m_fDontKicking += m_fTimeDelta;
@@ -337,13 +336,13 @@ _bool CKirbyBomb::RayCast_Terrain()
     return false;
 }
 
-_int CKirbyBomb::Boom_Dead()
+_int CKirbyBomb::Ready_Dead(_float fDeadScale)
 {
     CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
 
     MultiFXDesc.vInitPos = static_cast<_float3>(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
     MultiFXDesc.vInitRot = CUtils::Make_Degree_FromDir(CGameInstance::Get_Instance()->Get_CamLook());
-    MultiFXDesc.vInitScale = {3.f, 3.f, 3.f };
+    MultiFXDesc.vInitScale = { 3.f, 3.f, 3.f };
     if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_ExplodeSmoke"), &MultiFXDesc)))
         return OBJ_DEAD;
 
@@ -357,21 +356,18 @@ _int CKirbyBomb::Boom_Dead()
         return OBJ_DEAD;
 
 
-     fScale = CUtils::Make_RandomFloat(0.95f, 2.5f);
+    fScale = CUtils::Make_RandomFloat(0.95f, 2.5f);
     MultiFXDesc.vInitScale = { fScale, fScale, fScale };
     MultiFXDesc.vInitRot = CUtils::Make_Degree_FromDir(static_cast<_float3>(CUtils::Make_RandomAngle_Vector(60.f, _float4{ 0.f, 1.f, 0.f, 0.f })));
     if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BombParticle_v1"), &MultiFXDesc)))
         return OBJ_DEAD;
 
-     fScale = CUtils::Make_RandomFloat(0.95f, 2.5f);
+    fScale = CUtils::Make_RandomFloat(0.95f, 2.5f);
     MultiFXDesc.vInitScale = { fScale, fScale, fScale };
 
     MultiFXDesc.vInitRot = CUtils::Make_Degree_FromDir(static_cast<_float3>(CUtils::Make_RandomAngle_Vector(60.f, _float4{ 0.f, 1.f, 0.f, 0.f })));
     if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BombParticle_v1"), &MultiFXDesc)))
         return OBJ_DEAD;
-
-
-
 
     return OBJ_DEAD;
 }

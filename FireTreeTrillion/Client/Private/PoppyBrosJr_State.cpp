@@ -127,7 +127,7 @@ void CPoppyBrosJr_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float f
 			PoppyBombDesc.vLook = vPoppyLook;
 			PoppyBombDesc.vTargetPosition = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 			PoppyBombDesc.pGameObject = pPoppyJr;
-			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Bomb"), TEXT("Prototype_GameObject_PoppyBomb"), &PoppyBombDesc);
+			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerMonster, TEXT("Prototype_GameObject_PoppyBomb"), &PoppyBombDesc);
 			CHECK_FAILED(hr);
 		}
 	}
@@ -145,7 +145,7 @@ void CPoppyBrosJr_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float f
 			PoppyBombDesc.vLook = vPoppyLook;
 			PoppyBombDesc.vTargetPosition = vPoppyPos + XMVector3Normalize(vPoppyLook) * 7.f;
 			PoppyBombDesc.pGameObject = pPoppyJr;
-			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Bomb"), TEXT("Prototype_GameObject_PoppyBomb"), &PoppyBombDesc);
+			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerMonster, TEXT("Prototype_GameObject_PoppyBomb"), &PoppyBombDesc);
 			CHECK_FAILED(hr);
 		}
 	}

@@ -114,7 +114,7 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 				return;
 
 			CKirby* pKirby = static_cast<CKirby*>(Dst);
-			CMonster* pMonster = static_cast<CMonster*>(Src);
+			CPhysXObject* pMonster = static_cast<CPhysXObject*>(Src);
 
 			// 혹시 몬스터가 무적상태인가?
 			if (static_cast<CMonster*>(pMonster)->Get_MonsterOverPower() == true)
@@ -244,6 +244,7 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 			Src->Set_Dead();
 
 		});
+
 	Collision_Collider(m_GameObjects[PLAYERBULLET], m_GameObjects[MONSTER], this,
 		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
 		{
@@ -276,7 +277,40 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 			Dst->Set_Dead();
 		});
 
+	Collision_Collider(m_GameObjects[MONSTERBULLET], m_GameObjects[PLAYER], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
 
+			CPhysXObject* pMonsterBullet = static_cast<CPhysXObject*>(Dst);
+			CKirby* pKirby = static_cast<CKirby*>(Src);
+
+			// 커비가 혹시 닷지를 하였는가? 만약 닷지를 했다면 충돌이 발생하지않는다.
+			if (pthis->Kirby_Dodge_SlowMotionSystem(pKirby) == true)
+			{
+				DstHit->Set_Alive(false);
+				SrcHit->Set_Alive(false);
+				return;
+			}
+
+			if (pMonsterBullet->Get_PhyXState() == PO_NORMAL)
+			{
+				// 불릿이 PO_NORMAL (평범한 상태) 였을땐, 커비가 넉백되며 다친다. 또한, 폭탄은 터진다.
+				pthis->Player_Monster_Knock_back(pKirby, pMonsterBullet);
+				_float fAttack = pMonsterBullet->Get_Attack();
+				pKirby->Minus_Hp(fAttack);
+				Dst->Set_Dead();
+				DstHit->Set_Alive(false);
+				SrcHit->Set_Alive(false);
+			}
+
+			// 커비의 충돌로직은 항상 발동한다. 만약, 폭탄이 PO_VACUUM일땐 서로 충돌은 나지만, 먹을 수 있는 상황이라면
+			// 별도의 충돌로직이 발생할 것이다.
+			pKirby->Collision(CONTENT_ATTACK, pMonsterBullet);
+		});
 
 
 
@@ -766,7 +800,7 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		Camera_Shaking();
 		SwordHit(pMonsterTransform);
 	}
-
+	// 공중제비 도는 공격
 	case CKirby::SWORDSTATE_SWORDSPIN:
 	{
 		fAttack = 5.f;
@@ -837,7 +871,8 @@ void CCollisionCenter::Player_Monster_Knock_back(CPhysXObject* pPlayer, CPhysXOb
 
 	_vector vMonsterKnockbackDir = -1.f * vPlayerKnockbackDir;
 
-	pPlayer->Set_DamageMoving(vPlayerKnockbackDir, 5.f);
+	if (static_cast<CCharacter*>(pPlayer)->Get_State() != CKirby::STATE_SLIDE)
+		pPlayer->Set_DamageMoving(vPlayerKnockbackDir, 5.f);
 
 	if (static_cast<CCharacter*>(pPlayer)->Get_State() == CKirby::STATE_SLIDE)
 		pMonster->Set_DamageMoving(vMonsterKnockbackDir, 10.f);
