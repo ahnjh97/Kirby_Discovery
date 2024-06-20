@@ -163,8 +163,47 @@ HRESULT CLevel_Intro::Ready_Layer_BackGround(const wstring& strLayerTag)
 	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_INTRO, strLayerTag, TEXT("Prototype_GameObject_SkySphere"));
 	CHECK_FAILED(hr);
 
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, strLayerTag, TEXT("Prototype_GameObject_TestMap"))))
-	//	return E_FAIL;
+
+	for (_int i = 0; i < 10; i++)
+	{
+		CGameObject::GAMEOBJECT_DESC ObjDesc{};
+		ObjDesc.fSpeedPerSec = 5.f;
+		ObjDesc.fRotationPerSec = ToRadian(90.f);
+		_float4x4 InitMat = _float4x4::Identity;
+		InitMat.Translation({ -94.5f - (i * 7.f), 1.45f, 2.25f });
+		ObjDesc.matWorld = InitMat;
+
+		// Ladder Test
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_TerrainFog"), &ObjDesc)))
+			return E_FAIL;
+	}
+	for (_int i = 0; i < 10; i++)
+	{
+		CGameObject::GAMEOBJECT_DESC ObjDesc{};
+		ObjDesc.fSpeedPerSec = 5.f;
+		ObjDesc.fRotationPerSec = ToRadian(90.f);
+		_float4x4 InitMat = _float4x4::Identity;
+		InitMat.Translation({ -91.5f - (i * 7.f), 1.45f, 5.25f });
+		ObjDesc.matWorld = InitMat;
+
+		// Ladder Test
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_TerrainFog"), &ObjDesc)))
+			return E_FAIL;
+	}
+
+	for (_int i = 0; i < 10; i++)
+	{
+		CGameObject::GAMEOBJECT_DESC ObjDesc{};
+		ObjDesc.fSpeedPerSec = 5.f;
+		ObjDesc.fRotationPerSec = ToRadian(90.f);
+		_float4x4 InitMat = _float4x4::Identity;
+		InitMat.Translation({ -94.5f - (i * 7.f), 1.45f, -1.25f });
+		ObjDesc.matWorld = InitMat;
+
+		// Ladder Test
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_TerrainFog"), &ObjDesc)))
+			return E_FAIL;
+	}
 
 	return S_OK;
 }
