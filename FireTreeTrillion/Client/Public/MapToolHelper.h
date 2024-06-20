@@ -91,6 +91,7 @@ private:
 	_bool IsItem(const string& _strModelName);
 	_bool IsRallyingMonster(const string& _strModelName);
 	_bool IsKickble(const string& _strModelName);
+	_bool IsTree(const string& _strModelName);
 
 	_bool RenameFile(const string& _strLevel, const string& _tempFileName, const string& _strCustom);
 
@@ -120,6 +121,7 @@ private:
 	unordered_set<string>	m_setAnimDecos;
 	unordered_set<string>	m_setActorDecos;
 	unordered_set<string>	m_setKickables;
+	unordered_set<string>	m_setTrees;
 
 	vector<string>	m_vecMapTxts;
 	vector<string>	m_vecTriggerTxts;

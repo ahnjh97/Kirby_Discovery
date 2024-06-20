@@ -175,9 +175,9 @@ HRESULT CLevel_Intro::Ready_Layer_BackGround(const wstring& strLayerTag)
 		InitMat.Translation({ -94.5f - (i * 7.f), 1.45f, 2.25f });
 		ObjDesc.matWorld = InitMat;
 
-		// Ladder Test
-		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_TerrainFog"), &ObjDesc)))
-			return E_FAIL;
+		//// Ladder Test
+		//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_TerrainFog"), &ObjDesc)))
+		//	return E_FAIL;
 	}
 	for (_int i = 0; i < 10; i++)
 	{
@@ -188,9 +188,9 @@ HRESULT CLevel_Intro::Ready_Layer_BackGround(const wstring& strLayerTag)
 		InitMat.Translation({ -91.5f - (i * 7.f), 1.45f, 5.25f });
 		ObjDesc.matWorld = InitMat;
 
-		// Ladder Test
-		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_TerrainFog"), &ObjDesc)))
-			return E_FAIL;
+		//// Ladder Test
+		//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_TerrainFog"), &ObjDesc)))
+		//	return E_FAIL;
 	}
 
 	for (_int i = 0; i < 10; i++)
@@ -202,9 +202,9 @@ HRESULT CLevel_Intro::Ready_Layer_BackGround(const wstring& strLayerTag)
 		InitMat.Translation({ -94.5f - (i * 7.f), 1.45f, -1.25f });
 		ObjDesc.matWorld = InitMat;
 
-		// Ladder Test
-		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_TerrainFog"), &ObjDesc)))
-			return E_FAIL;
+		//// Ladder Test
+		//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_TerrainFog"), &ObjDesc)))
+		//	return E_FAIL;
 	}
 
 	return S_OK;
@@ -387,6 +387,13 @@ HRESULT CLevel_Intro::Ready_Triggers()
 			tDesc.iShaderVars = iShaderVars;
 			tDesc.fRimWidth = fRimWidth;
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Ladder"), TEXT("Prototype_GameObject_Ladder"), &tDesc)))
+				return E_FAIL;
+		}
+		else if ("Fog" == strModelName)
+		{
+			CGameObject::GAMEOBJECT_DESC tDesc{};
+			tDesc.matWorld = matWorld;
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_TerrainFog"), &tDesc)))
 				return E_FAIL;
 		}
 	}

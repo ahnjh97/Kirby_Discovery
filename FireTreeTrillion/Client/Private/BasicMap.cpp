@@ -199,6 +199,11 @@ HRESULT CBasicMap::Add_Components(const wstring& _wstrModelTag)
         if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Shader_VtxAnimModel"),
             TEXT("Com_Shader_Anim"), (CComponent**)&m_pAnimShaderCom)))
             return E_FAIL;
+
+        ///* For.Com_Texture */
+        //HRESULT hr = __super::Add_Component(TEXT("Prototype_Component_Texture_馬馬馬馬"),
+        //    TEXT("Com_Texture"), (CComponent**)&m_pTextureCom);
+        //CHECK_FAILED(hr);
     }
 
     return S_OK;
@@ -339,6 +344,7 @@ void CBasicMap::InsertMapDecos()
     _float4x4 matWorld{};
     _uint iShaderVars{};
     _float fRimWidth{};
+    _uint iPassIndex{};
 
     _uint iNumObjects{};
     fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
@@ -352,6 +358,7 @@ void CBasicMap::InsertMapDecos()
         fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
         fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
         fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
+        fileInput.read(reinterpret_cast<char*>(&iPassIndex), sizeof(iPassIndex));
 
         TYPE eType = TYPE_NONANIM;
         string strFolder = string("MapDeco/");
@@ -559,9 +566,8 @@ void CBasicMap::Free()
         
     Safe_Release(m_pOcTree);
     Safe_Release(m_pBlendMap);
-    for(_uint i = 0; i < TEX_END; i++)
-        Safe_Release(m_pTextureCom[i]);
 
+    Safe_Release(m_pTextureCom);
     Safe_Release(m_pShaderCom);
     Safe_Release(m_pModelCom);
     Safe_Release(m_pNonAnimShaderCom);

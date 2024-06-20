@@ -75,7 +75,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 	m_vecMapModelNames = { "Level0Stage1Step01", "Level1Stage1Step01" };
 	m_setMapNames = { "BG0", "BG1", "Level0Stage1Step01", "Level1Stage1Step01" };
-	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy", "Fog", "Ladder", "RallyPoint" };
+	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy", "Fog", "Ladder" };
 	m_setRallyingMonsters = { "NonAnim_Kabu", "NonAnim_BrontoBurt" };
 
 	/*m_setNonColDecos = { "BushMCut" };*/
@@ -92,6 +92,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "VpFactoryPart", "VpFactoryParts", "VpFactoryPartsBlend", "WoodBox" };
 	m_setKickables = { "GsPebble", "SeShell", "WasteCanYellow" };
 	m_setItemTxts = { "Item_Coin", "Item_EnergyDrink" };
+	m_setTrees = { "GsTreeA", "GsTreeB", "GsTreeC" };
 
 	s_vecPassIndices.resize(m_vecMapModelNames.size());
 	s_vecSamplingFactors.resize(m_vecMapModelNames.size());
@@ -102,6 +103,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 	HideGrid(s_bHideGrid);
 	HideTriggers(s_bHideTriggers);
+	HideMapDecos(s_bHideMapDecos);
 
 	return S_OK;
 }
@@ -199,6 +201,8 @@ void CMapToolHelper::ReadMapObjTxts()
 				m_vecItemTxts.emplace_back(strModelName);
 			else if (true == IsKickble(strModelName))
 				m_vecKickableTxts.emplace_back(strModelName);
+			else if("RallyPoint" == strModelName)
+				m_vecTriggerTxts.emplace_back(strModelName);
 			else
 				m_vecObjectTxts.emplace_back(strModelName);
 		}
@@ -857,11 +861,10 @@ void CMapToolHelper::Save_Level()
 			vecKickables.push_back(object);
 			continue;
 		}
-		if("RallyPoint" == strModelName){
+		if ("RallyPoint" == strModelName) {
 			vecRallyPoints.push_back(object);
 			continue;
 		}
-
 		_float4x4 matWorld = pTransform->Get_WorldMatrix();
 		_uint iStrLength = strModelName.length();
 		_uint iShaderVars = object->Get_ShaderVars();
@@ -1231,6 +1234,14 @@ _bool CMapToolHelper::IsRallyingMonster(const string& _strModelName)
 _bool CMapToolHelper::IsKickble(const string& _strModelName)
 {
 	if (m_setKickables.end() != m_setKickables.find(_strModelName))
+		return true;
+
+	return false;
+}
+
+_bool CMapToolHelper::IsTree(const string& _strModelName)
+{
+	if (m_setTrees.end() != m_setTrees.find(_strModelName))
 		return true;
 
 	return false;
@@ -1710,17 +1721,18 @@ _bool CMapToolHelper::Save_Decos(const string& _strLevel, vector<CGameObject*>& 
 		_uint iStrLength = strModelName.length();
 		_uint iShaderVars = obj->Get_ShaderVars();
 		_float fRimWidth = obj->Get_RimWidth();
-
-		if (CMapToolObject::MAPOBJ_ANIM == iMapObjType)
-			vecAnimDecos.emplace_back(strModelName, matWorld);
+		_uint iPassIndex = static_cast<_uint>(pMapToolObj->Get_PassIndex());
+		if (true == IsTree(strModelName))
+			iPassIndex = 12;
 		else
-			vecNonAnimDecos.emplace_back(strModelName, matWorld);
+			iPassIndex = 0;
 
 		outputFile.write(reinterpret_cast<const char*>(&iStrLength), sizeof(iStrLength));
 		outputFile.write(strModelName.c_str(), iStrLength);
 		outputFile.write(reinterpret_cast<const char*>(&matWorld), sizeof(_float4x4));
 		outputFile.write(reinterpret_cast<const char*>(&iShaderVars), sizeof(iShaderVars));
 		outputFile.write(reinterpret_cast<const char*>(&fRimWidth), sizeof(fRimWidth));
+		outputFile.write(reinterpret_cast<const char*>(&iPassIndex), sizeof(iPassIndex));
 	}
 
 	outputFile.close();
@@ -1937,6 +1949,8 @@ void CMapToolHelper::Load_Triggers(const string& _strLevel)
 		CMapToolObject::MAPTOOLOBJECT_DESC tDesc{};
 		tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
 		tDesc.matWorld = matWorld;
+		tDesc.iShaderVars = iShaderVars;
+		tDesc.fRimWidth = fRimWidth;
 		tDesc.iTriggerIndex = iTriggerIndex;
 		tDesc.iTriggerType = triggerType;
 		tDesc.iCamType = iCamType;
@@ -2093,6 +2107,7 @@ void CMapToolHelper::Load_Decos(const string& _strLevel)
 	_uint iStrLength{};
 	_uint iShaderVars{};
 	_float fRimWidth{};
+	_uint iPassIndex{};
 	wstring wstrGameObjectTag = TEXT("MapToolObject");
 
 	for (_uint i = 0; i < iNumObjects; i++)
@@ -2104,6 +2119,7 @@ void CMapToolHelper::Load_Decos(const string& _strLevel)
 		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
 		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
 		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
+		fileInput.read(reinterpret_cast<char*>(&iPassIndex), sizeof(iPassIndex));
 
 		CMapToolObject::MAPTOOLOBJECT_DESC tDesc{};
 		tDesc.eMapObjType = CMapToolObject::TYPE_MAPOBJ(iMapObjType);
@@ -2111,6 +2127,7 @@ void CMapToolHelper::Load_Decos(const string& _strLevel)
 		tDesc.matWorld = matWorld;
 		tDesc.iShaderVars = iShaderVars;
 		tDesc.fRimWidth = fRimWidth;
+		tDesc.iPassIndex = iPassIndex;
 
 		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
 		{
