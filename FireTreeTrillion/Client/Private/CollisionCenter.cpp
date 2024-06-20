@@ -103,6 +103,36 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 
 			});
 
+	// 깔끔하게 완료되었음 : 오브젝트 X 몬스터 (커비가 날릴때의 충돌)
+	Collision_Collider(m_GameObjects[OBJECT], m_GameObjects[MONSTER], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CPhysXObject* pDstObject = static_cast<CMonster*>(Dst);
+			CMonster* pSrcMonster = static_cast<CMonster*>(Src);
+
+			// 반드시, 오브젝트가 날아가는 상황이여야 한다.
+			if (pDstObject->Get_PhyXState() == PO_FLYAWAY)
+			{
+				// 세부적인건 해당 CONTENT에서 한다.
+				pDstObject->Collision(CONTENT_VACUUMOBJECT, pSrcMonster);
+				pSrcMonster->Collision(CONTENT_VACUUMOBJECT, pDstObject);
+
+				// 각자의 상태를 PO_FLYDEADAWAY 로 바꿔줌과 동시에 죽는 방향과 힘을 정해준다.
+				pthis->Fly_DeadAway(pDstObject, pSrcMonster);
+				// 카메라 쉐이킹을 해준다.
+				pthis->Camera_Shaking(1.2f);
+
+				// 0.1초의 콜라이더 딜레이를 넣어준다.
+				DstHit->Set_Alive(false);
+				SrcHit->Set_Alive(false);
+			}
+		});
+
 	// 덜 완료되었음. 다양한 분기 필요 80%
 	Collision_Collider(m_GameObjects[HITBOX_PLYAER], m_GameObjects[MONSTER], this,
 		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
