@@ -398,15 +398,15 @@ PxControllerBehaviorFlags CControllerBehaviorCallback::getBehaviorFlags(const Px
 {
     // controller의 속성에 따라 행동을 커스터마이징
     // 예를 들어, 충돌 시 미끄러지도록 설정                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
-    CComponent* pComponent = static_cast<CComponent*>(controller.getUserData());
-    if (pComponent != nullptr)
-    {
-        CGameObject* pActorObject = pComponent->Get_Object();
-        if (pActorObject->Get_PrototypeTag() == L"Prototype_GameObject_StarBlock")
-        {
-            return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
-        }
-    }
+    //CComponent* pComponent = static_cast<CComponent*>(controller.getUserData());
+    //if (pComponent != nullptr)
+    //{
+    //    CGameObject* pActorObject = pComponent->Get_Object();
+    //    if (pActorObject->Get_PrototypeTag() == L"Prototype_GameObject_StarBlock")
+    //    {
+    //        return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
+    //    }
+    //}
     return PxControllerBehaviorFlag::eCCT_SLIDE;
 }
 

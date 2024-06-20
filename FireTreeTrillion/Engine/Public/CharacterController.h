@@ -43,6 +43,7 @@ public:
 	void			Set_Position(class CTransform* pTransform, const _float4& vPos);
 	// 발 위치값 지정
 	void			Set_FootPosition(const _float4& vPos);
+	void			Set_FallVelocity(_float fFallVelocity) { m_fFallVelocity = fFallVelocity; }
 
 	_float4			Get_Position();
 	_float4			Get_FootPosition();

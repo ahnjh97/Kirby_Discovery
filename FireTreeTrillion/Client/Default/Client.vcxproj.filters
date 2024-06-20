@@ -289,6 +289,9 @@
     <Filter Include="02.GameObjects\HitBox">
       <UniqueIdentifier>{dab839b6-6fe3-4095-b8f6-0e1587423131}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Item\Ability">
+      <UniqueIdentifier>{4ee32ea7-86a0-4289-a776-d1fce969bca4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -578,6 +581,9 @@
     <ClInclude Include="..\Public\HitBox.h">
       <Filter>02.GameObjects\HitBox</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Ability.h">
+      <Filter>02.GameObjects\PhysXObject\Item\Ability</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -848,6 +854,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\HitBox.cpp">
       <Filter>02.GameObjects\HitBox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Ability.cpp">
+      <Filter>02.GameObjects\PhysXObject\Item\Ability</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
