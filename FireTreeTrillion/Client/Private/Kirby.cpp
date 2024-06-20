@@ -107,6 +107,9 @@ HRESULT CKirby::Initialize(void* pArg)
 
 	Add_AnimEvent();
 
+	// 확실하게...
+	m_bMotionBlur = true;
+
 	return S_OK;
 }
 
@@ -406,7 +409,7 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 		}
 	}
 	// 맵 오브젝트들과의 충돌.
-	if (eContent == CCollisionCenter::CONTENT_KICK)
+	else if (eContent == CCollisionCenter::CONTENT_KICK)
 	{
 		// 내가 빨아들일때만 충돌반응함.
 		if (pObject->Get_PhyXState() == PO_VACUUMING)
@@ -427,6 +430,67 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 			Delete_AllEffect();
 		}
 	}
+	else if (eContent == CCollisionCenter::CONTENT_ATTACK)
+	{
+		// 흡수중인 몬스터일 경우 충돌은 되지 않고, 내 입속으로 들어간다.
+		if (pObject->Get_PhyXState() == PO_VACUUMING)
+		{
+			// 일단 EAT으로 넘기는건 같으나, EAT이 끝날 시점에 내가 삼켰던 것이 무엇이였는지 판단 후 애니메이션이 분기된다.
+			INFO(m_fVacuumTime) = 0.f;
+			INFO(m_isEat) = true;
+			INFO(m_eEyeState) = EYE_IDLE;
+			INFO(m_eMouthState) = MOUTH_ANGER;
+			Change_State(STATE_EAT, 100.f, false, false, BODY_BALLOON);
+			// 임시 보관소. 먹은게 끝났을 떄, 비로소 커비의 어빌리티 타입이 바뀐다.
+			INFO(m_eTemporaryEatType) = pObject->Get_AbilityType();
+
+			// 입 속에 있는 걸로 바꿔준다.
+			if (pObject != nullptr)
+				pObject->Set_PhyXState(PO_KIRBYMOUTH);
+
+			Delete_AllEffect();
+		}
+		// 입에 머금은 상태의 몬스터
+		else if (pObject->Get_PhyXState() == PO_KIRBYMOUTH)
+		{
+
+		}
+		// 발사중인 몬스터
+		else if (pObject->Get_PhyXState() == PO_FLYAWAY)
+		{
+
+		}
+		else if (pObject->Get_PhyXState() == PO_FLYDEADAWAY)
+		{
+
+		}
+		else
+		{
+			if (m_bOverPower == true)
+				return;
+
+			// 먹은 상태인 경우
+			if (INFO(m_isEat) == true)
+			{
+				Change_State(STATE_EATDAMAGE, 60.f, false, false, BODY_BALLOON);
+			}
+			// 나는 상태일 경우 . . .
+			else if (true == (Get_State() == STATE_FLIGHTSTART || Get_State() == STATE_FLIGHTFALL || Get_State() == STATE_FLIGHT ||
+				Get_State() == STATE_FLIGHTLANDING || Get_State() == STATE_FLIGHTLIMIT || Get_State() == STATE_FLIGHTLIMITFALL))
+			{
+				Change_State(STATE_FILGHTDAMAGE, 60.f, false, false, BODY_BALLOON);
+			}
+			// 평범한 상태에서...
+			else
+			{
+				Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
+			}
+
+			Delete_AllEffect();
+		}
+
+	}
+
 }
 
 _float3 CKirby::Make_RepulsiveDir(CPhysXObject* pObject)

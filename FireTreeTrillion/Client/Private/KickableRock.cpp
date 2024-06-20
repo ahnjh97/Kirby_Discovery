@@ -31,6 +31,9 @@ HRESULT CKickableRock::Initialize(void* pArg)
 	if(pGameObjectDesc != nullptr)
 		Add_Components(pGameObjectDesc->wstrModelName);
 
+	m_eAbilityType = ABILITY_DEFAULT;
+	m_bMotionBlur = true;
+
 	return S_OK;
 }
 
@@ -39,6 +42,7 @@ _int CKickableRock::Tick(_float fTimeDelta)
 	__super::Tick(fTimeDelta);
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+	Compute_MotionBlur();
 
 	if (true == m_bDead)
 		return Ready_Dead(0.9f);
@@ -241,8 +245,42 @@ HRESULT CKickableRock::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
+		return E_FAIL;
+
+	_float fWhiteColor = 0.f;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &fWhiteColor, sizeof(_float))))
+		return E_FAIL;
+
+
 	return S_OK;
 }
+
+void CKickableRock::Compute_MotionBlur()
+{
+	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	_matrix ViewProjectionMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW) * m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
+	_vector vScreenPos = XMVector3TransformCoord(vPos, ViewProjectionMatrix);
+	_float fScreenX = (XMVectorGetX(vScreenPos) + 1.f) * 0.5f;
+	_float fScreenY = (XMVectorGetY(vScreenPos) + 1.f) * 0.5f;
+
+	_float2 vCurScreenPos = _float2(fScreenX, 1.f - fScreenY);
+
+	m_vMotionVelocity.x = (m_vPreScreenPos - vCurScreenPos).x;
+	m_vMotionVelocity.y = (m_vPreScreenPos - vCurScreenPos).y;
+	m_vMotionVelocity.z = m_ePhyXState != PO_NORMAL ? 1.f : 0.f;
+
+	m_vPreScreenPos = vCurScreenPos;
+}
+
 
 CKickableRock* CKickableRock::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
