@@ -591,8 +591,7 @@ HRESULT CLevel_Intro::Ready_Kickables()
 		tDesc.fRimWidth = fRimWidth;
 
 		if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Item"), TEXT("Prototype_GameObject_KickableRock"), &tDesc)))
-			return E_FAIL;
-		
+			return E_FAIL;		
 	}
 
 	fileInput.close();

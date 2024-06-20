@@ -56,6 +56,8 @@ HRESULT CLevel_GamePlay::Initialize()
 	CHECK_FAILED(hr);
 	hr = Ready_Items();
 	CHECK_FAILED(hr);
+	hr = Ready_Kickables();
+	CHECK_FAILED(hr);
 
 	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
 		return E_FAIL;
@@ -555,6 +557,51 @@ HRESULT CLevel_GamePlay::Ready_Items()
 				return E_FAIL;
 		}
 	}
+	fileInput.close();
+
+	return S_OK;
+}
+
+HRESULT CLevel_GamePlay::Ready_Kickables()
+{
+	LEVEL eLevel = LEVEL_GAMEPLAY;
+	string strFileName = "../../../objects_txt/Stage1_Kickables.txt";
+
+	ifstream fileInput(strFileName, ios::binary);
+	if (fileInput.is_open() == false)
+	{
+		MSG_BOX(TEXT("Failed to open : Stage1_Kickables.txt"));
+		return E_FAIL;
+	}
+
+	_uint iNumObjects{};
+	fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
+
+	_uint iStrLength{};
+	string strModelName;
+	_float4x4 matWorld{};
+	_uint iShaderVars{};
+	_float fRimWidth{};
+
+	for (_uint i = 0; i < iNumObjects; i++)
+	{
+		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
+		strModelName.resize(iStrLength);
+		fileInput.read(&strModelName[0], iStrLength);
+		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
+		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
+		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
+
+		CGameObject::GAMEOBJECT_DESC tDesc{};
+		tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+		tDesc.matWorld = matWorld;
+		tDesc.iShaderVars = iShaderVars;
+		tDesc.fRimWidth = fRimWidth;
+
+		if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Item"), TEXT("Prototype_GameObject_KickableRock"), &tDesc)))
+			return E_FAIL;
+	}
+
 	fileInput.close();
 
 	return S_OK;
