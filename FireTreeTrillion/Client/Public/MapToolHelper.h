@@ -12,8 +12,13 @@ private:
 	virtual ~CMapToolHelper() = default;
 
 public:
-	void Set_PickedObject(CGameObject* pGameObject, const string& strModelName) 
-			{ m_pPickedObject = pGameObject; m_strCurModel = strModelName; }
+	void Set_PickedObject(CGameObject* pGameObject, const string& strModelName)
+	{
+		Safe_Release(m_pPickedObject);
+		m_pPickedObject = pGameObject;
+		m_strCurModel = strModelName;
+		Safe_AddRef(m_pPickedObject);
+	}
 
 public:
 	virtual HRESULT Initialize_Prototype()				override;

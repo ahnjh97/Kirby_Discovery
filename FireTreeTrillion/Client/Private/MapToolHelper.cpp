@@ -75,7 +75,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 	m_vecMapModelNames = { "Level0Stage1Step01", "Level1Stage1Step01" };
 	m_setMapNames = { "BG0", "BG1", "Level0Stage1Step01", "Level1Stage1Step01" };
-	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy" };
+	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy", "Fog", "Ladder", "RallyPoint" };
 	m_setRallyingMonsters = { "NonAnim_Kabu", "NonAnim_BrontoBurt" };
 
 	/*m_setNonColDecos = { "BushMCut" };*/
@@ -341,7 +341,7 @@ void CMapToolHelper::Menu_NonAnimModels()
 		vector<const _char*> vecObjectNames(m_vecObjectTxts.size());
 		for (_int i = 0; i < m_vecObjectTxts.size(); ++i)
 			vecObjectNames[i] = m_vecObjectTxts[i].c_str();
-		if (ImGui::ListBox("##Objects", &s_iObjectIdx, vecObjectNames.data(), m_vecObjectTxts.size(), 16)) {
+		if (ImGui::ListBox("##Objects", &s_iObjectIdx, vecObjectNames.data(), m_vecObjectTxts.size(), 10)) {
 			DisableOtherGroups(&s_iObjectIdx);
 			m_strSelectedTxt = m_vecObjectTxts[s_iObjectIdx];
 		}
@@ -365,7 +365,7 @@ void CMapToolHelper::Menu_NonAnimModels()
 		vector<const _char*> vecItemNames(m_vecItemTxts.size());
 		for (_int i = 0; i < m_vecItemTxts.size(); ++i)
 			vecItemNames[i] = m_vecItemTxts[i].c_str();
-		if (ImGui::ListBox("##Items", &s_iItemIdx, vecItemNames.data(), m_vecItemTxts.size(), 16)) {
+		if (ImGui::ListBox("##Items", &s_iItemIdx, vecItemNames.data(), m_vecItemTxts.size(), 5)) {
 			DisableOtherGroups(&s_iItemIdx);
 			m_strSelectedTxt = m_vecItemTxts[s_iItemIdx];
 		}
@@ -377,7 +377,7 @@ void CMapToolHelper::Menu_NonAnimModels()
 		vector<const _char*> vecKickableNames(m_vecKickableTxts.size());
 		for (_int i = 0; i < m_vecKickableTxts.size(); ++i)
 			vecKickableNames[i] = m_vecKickableTxts[i].c_str();
-		if (ImGui::ListBox("##Kickables", &s_iKickableIdx, vecKickableNames.data(), m_vecKickableTxts.size(), 16)) {
+		if (ImGui::ListBox("##Kickables", &s_iKickableIdx, vecKickableNames.data(), m_vecKickableTxts.size(), 5)) {
 			DisableOtherGroups(&s_iKickableIdx);
 			m_strSelectedTxt = m_vecKickableTxts[s_iKickableIdx];
 		}
@@ -598,8 +598,7 @@ void CMapToolHelper::Edit_Object()
 	CTransform* pTransform = dynamic_cast<CTransform*>(m_pPickedObject->Get_Component(g_strTransformTag));
 	if (nullptr == pTransform)
 		return;
-	
-	Safe_AddRef(pTransform);
+
 	ImGui::Begin(m_strCurModel.c_str());
 
 	_uint iShaderVars = m_pPickedObject->Get_ShaderVars();
@@ -632,14 +631,23 @@ void CMapToolHelper::Edit_Object()
 	if (ImGui::InputFloat("##fRimWidth", &fRimWidth, 0.01f, 1.0f, "%.3f"))
 		m_pPickedObject->Set_RimWidth(fRimWidth);
 
-	/*ImGui::SetNextItemWidth(150);
-	if (ImGui::Combo("##RallyPointIndex", &iTriggerIdx, triggerIndices, IM_ARRAYSIZE(triggerIndices)))
-		pMapToolObject->Set_TriggerIndex(iTriggerIdx);*/
-
+	//CModel* pModel = dynamic_cast<CModel*>(m_pPickedObject->Get_Component(TEXT("Com_Model")));
+	//if (nullptr == pModel)  // Shader_PosTex  패스 지정
+	//{
+	//	/*ImGui::SetNextItemWidth(150);
+	//if (ImGui::Combo("##RallyPointIndex", &iTriggerIdx, triggerIndices, IM_ARRAYSIZE(triggerIndices)))
+	//	pMapToolObject->Set_TriggerIndex(iTriggerIdx);*/
+	//}
+	//else  // Shader_Model 패스지정
+	//{
+	//	/*ImGui::SetNextItemWidth(150);
+	//if (ImGui::Combo("##RallyPointIndex", &iTriggerIdx, triggerIndices, IM_ARRAYSIZE(triggerIndices)))
+	//	pMapToolObject->Set_TriggerIndex(iTriggerIdx);*/
+	//}
+	
 	_float4x4 tempMatrix = pTransform->Get_WorldFloat4x4();
 	m_pGameInstance->EditTransform(tempMatrix); // 선택한 모델의 월드행렬을 수정 
 	pTransform->Set_WorldMatrix(tempMatrix);
-	Safe_Release(pTransform);
 	ImGui::End();
 }
 
@@ -652,7 +660,9 @@ void CMapToolHelper::OnLeftClick()
 	if (nullptr == pPickedObject)
 		return;
 
+	Safe_Release(m_pPickedObject);
 	m_pPickedObject = pPickedObject;
+	Safe_AddRef(m_pPickedObject);
 
 	CModel* pModel = dynamic_cast<CModel*>(m_pPickedObject->Get_Component(TEXT("Com_Model")));
 	m_strCurModel = pModel->Get_ModelInfo().strModelName;
@@ -740,7 +750,9 @@ void CMapToolHelper::OnRightClick()
 		}
 
 		list<CGameObject*>* pObjList = m_pGameInstance->Get_List(LEVEL_TOOL_MAP, TEXT("Layer_Parse"));
+		Safe_Release(m_pPickedObject);
 		m_pPickedObject = pObjList->back();
+		Safe_AddRef(m_pPickedObject);
 		m_strCurModel = m_strSelectedTxt;
 
 		if (m_setMapDecoTxts.end() != m_setMapDecoTxts.find(m_strCurModel))
@@ -755,13 +767,17 @@ void CMapToolHelper::On_DIK_Escape()
 {
 	_int i{};
 	DisableOtherGroups(&i);
+	Safe_Release(m_pPickedObject);
 	m_pPickedObject = nullptr;
 }
 
 void CMapToolHelper::On_DIK_Delete()
 {
-	if (m_pPickedObject != nullptr)
+	if (m_pPickedObject != nullptr) {
+		Safe_Release(m_pPickedObject);
 		m_pPickedObject->Set_Dead();
+	}
+		
 	m_pPickedObject = nullptr;
 }
 
@@ -817,13 +833,11 @@ void CMapToolHelper::Save_Level()
 			continue;
 
 		string strModelName = pModel->Get_ModelInfo().strModelName;
-		if (true == IsMap(strModelName))
-		{
+		if (true == IsMap(strModelName)){
 			vecMap.push_back(object);
 			continue;
 		}
-		if (true == IsTrigger(strModelName))
-		{
+		if (true == IsTrigger(strModelName)){
 			vecTriggers.push_back(object);
 			continue;
 		}

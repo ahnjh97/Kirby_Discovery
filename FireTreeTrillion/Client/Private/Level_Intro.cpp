@@ -66,9 +66,9 @@ HRESULT CLevel_Intro::Initialize()
 	InitMat.Translation({ -25.f, 17.f, 259.5f });
 	ObjDesc.matWorld = InitMat;
 
-	// Ladder Test
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Ladder"), TEXT("Prototype_GameObject_Ladder"), &ObjDesc)))
-		return E_FAIL;
+	//// Ladder Test
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Ladder"), TEXT("Prototype_GameObject_Ladder"), &ObjDesc)))
+	//	return E_FAIL;
 
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
@@ -300,20 +300,16 @@ HRESULT CLevel_Intro::Ready_Triggers()
 		fileInput.read(reinterpret_cast<char*>(&iCamType), sizeof(iCamType));
 		fileInput.read(reinterpret_cast<char*>(&fRadius), sizeof(fRadius));
 
-		if ("Camera" == strModelName) {
+		if ("Camera" == strModelName)
 			camMatrices.emplace(iTriggerIndex, matWorld);
-			continue;
-		}
-		if ("Dummy" == strModelName) {
+		else if ("Dummy" == strModelName) {
 			_vector vDir = XMVector3Normalize(XMVectorSet(matWorld._31, matWorld._32, matWorld._33, 0));
 			if (CAM_FRONT == iCamType)
 				frontDirRadii.emplace(iTriggerIndex, pair<_vector, _float>(vDir, fRadius));
 			else if (CAM_REAR == iCamType)
 				rearDirRadii.emplace(iTriggerIndex, pair<_vector, _float>(vDir, fRadius));
-			continue;
 		}
-
-		if ("Trigger" == strModelName)
+		else if ("Trigger" == strModelName)
 		{
 			_vector vDeterminant{};
 			_float4x4 matInverse{};
@@ -328,8 +324,9 @@ HRESULT CLevel_Intro::Ready_Triggers()
 
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Trigger"), TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc)))
 				return E_FAIL;
+			continue;
 		}
-		if ("NonAnim_Kirby" == strModelName)
+		else if ("NonAnim_Kirby" == strModelName)
 		{
 			CGameObject::GAMEOBJECT_DESC tempDesc = {};
 			tempDesc.matWorld = matWorld;
@@ -341,6 +338,16 @@ HRESULT CLevel_Intro::Ready_Triggers()
 					tempDesc.wstrModelName.erase(0, 8);
 			}
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby"), &tempDesc)))
+				return E_FAIL;
+		}
+		else if ("Ladder" == strModelName)
+		{
+			CGameObject::GAMEOBJECT_DESC tDesc{};
+			tDesc.matWorld = matWorld;
+			tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			tDesc.iShaderVars = iShaderVars;
+			tDesc.fRimWidth = fRimWidth;
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Ladder"), TEXT("Prototype_GameObject_Ladder"), &tDesc)))
 				return E_FAIL;
 		}
 	}
