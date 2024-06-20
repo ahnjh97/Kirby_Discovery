@@ -105,6 +105,9 @@ void CCappyBody_Find_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player")));
 	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
 
+	// ÀÚÀ¯ ³«ÇÏ
+	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
+
 	pCappyBody->Set_Render(false);
 
 	if (true == pCappyBody->IsAnimFinished())
@@ -290,7 +293,7 @@ void CCappyBody_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		pCappy->Set_DamageJumpPower(fDamageJumpPower);
 
 
-		if (true == pCappy->IsAnimFinished() || pController->Is_Terrain())
+		if (/*true == pCappy->IsAnimFinished() || */pController->Is_Terrain())
 		{
 			if (pCappy->Get_Hp() <= 0.f)
 				pCappy->Set_Dead();
