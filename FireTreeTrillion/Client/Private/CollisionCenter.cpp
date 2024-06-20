@@ -48,6 +48,9 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 			// 무적상태인가?
 			if (pMonster->Get_MonsterOverPower() == true)
 				return;
+			// 플레이어가 공격중인가? (공격중이라면 몸박치기하면 근거리 공격이 너무 고통스럽다.)
+			if (pKirby->Is_Attacking() == true)
+				return;
 			
 			// 몬스터가 일반적인 상황일때만, 서로 데미지가 계산된다.
 			if (pMonster->Get_PhyXState() == PO_NORMAL)
