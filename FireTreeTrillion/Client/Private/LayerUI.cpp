@@ -92,44 +92,7 @@ HRESULT CLayerUI::Render()
 		Render_BindSet(m_pShaderCom, m_pTransformCom);
 
 	if (UI_FONT == m_UIObjDesc.eUIType)
-	{
-		_float2 vFontPos = { m_UIObjDesc.vPos.x + m_UIObjDesc.vCenter.x, 
-							- m_UIObjDesc.vPos.y + m_UIObjDesc.vCenter.y};
-
-		_float4 vFontRGBA = { m_UIObjDesc.vColorRGB.x, m_UIObjDesc.vColorRGB.y, m_UIObjDesc.vColorRGB.z, m_UIObjDesc.fAlpha };
-		_float2 vFontOrig = {	1.f, 1.f  };
-		_float2 vFontScale = { m_UIObjDesc.vSize.x, m_UIObjDesc.vSize.y };
-
-		wstring wstrFontTag = { TEXT("Font_HUD_StarPoint_NUM30") };
-		//wstring wstrFontTag = { TEXT("Font_HUDSub_KR15") };
-
-		//추후 원근투영 폰트 작업 예정
-		/*
-		if (PROJ_PERSPEC == m_UIObjDesc.eUIProj)
-		{
-			//_float4x4 WorldMatrix = m_pTransformCom->Get_WorldFloat4x4();
-			m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix");
-
-			_float4x4 ViewMatrix{}; 
-			XMStoreFloat4x4(&ViewMatrix, XMMatrixIdentity());
-
-			_float4x4 ProjMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
-
-			if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
-				return E_FAIL;
-
-			if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
-				return E_FAIL;
-
-			_float4x4 WVPMatrix = WorldMatrix * ViewMatrix * ProjMatrix;
-			m_pGameInstance->Render_ProjFont(XMLoadFloat4x4(&WVPMatrix), wstrFontTag, m_UIObjDesc.wstrText, vFontPos, vFontRGBA,
-				XMConvertToRadians(m_UIObjDesc.vDegree.z), vFontOrig, vFontScale);
-		}
-		*/
-
-		m_pGameInstance->Render_Font(wstrFontTag, m_UIObjDesc.wstrText, vFontPos, vFontRGBA,
-			XMConvertToRadians(m_UIObjDesc.vDegree.z), vFontOrig, vFontScale);
-	}
+		Render_FontSet(m_pShaderCom, m_pTransformCom);
 
 	return S_OK;
 }
@@ -140,20 +103,15 @@ HRESULT CLayerUI::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-	/*
-	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_StatusBar_Kirby"),
-		TEXT("Com_Texture_KirbyHP"), (CComponent**)&m_pMultiTex[CHUD::HUD_KIRBYHP])))
-		return E_FAIL;
-
-	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_StarPoint"),
-		TEXT("Com_Texture_StarPoint"), (CComponent**)&m_pMultiTex[CHUD::HUD_STARPOINT])))
-		return E_FAIL;
-	*/
-
 	//if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_StatusBar_Kirby"),
-	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_StarPoint"),
-		TEXT("Com_Texture"), (CComponent**)&m_pSingleTex)))
+	//if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_StarPoint"),
+	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_AbilityDiscard"),
+		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
 		return E_FAIL;
+
+	//if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_AbilityDiscard_Mask"),
+	//	TEXT("Com_TexMask"), (CComponent**)&m_pTextures[TEX_MASK])))
+	//	return E_FAIL;
 
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),
 		TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom)))
@@ -189,8 +147,52 @@ HRESULT CLayerUI::Render_BindSet(CShader* _pShaderCom, CTransform* _pTransCom)
 
 	//if (FAILED(Bind_ShaderResources(_pShaderCom, ePassIndex, m_pMultiTex[CHUD::HUD_KIRBYHP], m_iTexIndex)))
 	//	return E_FAIL;
-	if (FAILED(Bind_ShaderResources(_pShaderCom, ePassIndex, m_pSingleTex, m_iTexIndex)))
+	if (FAILED(Bind_ShaderResources(_pShaderCom, ePassIndex, m_pTextureCom, m_iTexIndex)))
 		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLayerUI::Render_FontSet(CShader* _pShaderCom, CTransform* _pTransCom)
+{
+	CHECK_NULLPTR(_pShaderCom);
+
+	_float2 vFontPos = { m_UIObjDesc.vPos.x + m_UIObjDesc.vCenter.x,
+					-m_UIObjDesc.vPos.y + m_UIObjDesc.vCenter.y };
+
+	_float4 vFontRGBA = { m_UIObjDesc.vColorRGB.x, m_UIObjDesc.vColorRGB.y, m_UIObjDesc.vColorRGB.z, m_UIObjDesc.fAlpha };
+	_float2 vFontOrig = { 1.f, 1.f };
+	_float2 vFontScale = { m_UIObjDesc.vSize.x, m_UIObjDesc.vSize.y };
+	
+	//wstring wstrFontTag = { TEXT("Font_HUD_StarPoint_NUM30") };
+	wstring wstrFontTag = { TEXT("Font_HUDSub_KR15") };
+
+	if (FAILED(_pTransCom->Bind_ShaderResource(_pShaderCom, "g_WorldMatrix")))
+		return E_FAIL;
+	_float4x4 WorldMatrix = _pTransCom->Get_WorldFloat4x4();
+
+	if (PROJ_PERSPEC == m_UIObjDesc.eUIProj) //원근투영 적용은 되는데 세부조정 필요
+	{
+		XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
+		m_ProjMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
+
+		//셰이더 파일의 매트릭스 정보를 가져와 바인딩
+		if (FAILED(_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+			return E_FAIL;
+
+		if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+			return E_FAIL;
+
+		_float4x4 WVPMatrix = WorldMatrix * m_ViewMatrix * m_ProjMatrix;
+		m_pGameInstance->Render_ProjFont(XMLoadFloat4x4(&WVPMatrix), wstrFontTag, m_UIObjDesc.wstrText, vFontPos, vFontRGBA,
+			XMConvertToRadians(m_UIObjDesc.vDegree.z), vFontOrig, vFontScale);
+	}
+
+	else // PROJ_ORTHO == m_UIObjDesc.eUIProj
+	{
+		m_pGameInstance->Render_Font(wstrFontTag, m_UIObjDesc.wstrText, vFontPos, vFontRGBA,
+			XMConvertToRadians(m_UIObjDesc.vDegree.z), vFontOrig, vFontScale);
+	}
 
 	return S_OK;
 }
@@ -254,12 +256,13 @@ CGameObject* CLayerUI::Clone(void* pArg)
 
 void CLayerUI::Free()
 {
-	Safe_Release(m_pSingleTex);
-	//Safe_Release(m_pMultiTex[CHUD::TAG_NONE]);
-	Safe_Release(m_pShaderCom);
-	Safe_Release(m_pVIBufferCom);
-
 	__super::Free();
+
+	//Safe_Release(m_pTextureCom);
+	//Safe_Release(m_pShaderCom);
+	//Safe_Release(m_pVIBufferCom);
+
+	//Safe_Release(m_pTextures[TEX_NONE]);
 }
 
 

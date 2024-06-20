@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "KirbyContents_State.h"
 #include "Kirby_State_Function.h"
+#include "Ability.h"
 
 
 #pragma region GET_STATE
@@ -74,6 +75,12 @@ void CKirbyGet_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 		if (pKirby->isAnimFinish())
 		{
 			// 어빌리티 타입에 맞는 아이템 드랍. (미구현)
+			HRESULT hr = S_OK;
+
+			CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
+			AbilityItemDesc.vPosition = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Item"), TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+			CHECK_FAILED(hr);
 
 			pKirby->Set_AbilityType(ABILITY_DEFAULT);
 			

@@ -42,7 +42,7 @@ HRESULT CCappyBody::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	m_pModelCom->Set_Animation(CAPPYBODY_HIDINGWAITA, 55.f, false, true);
+	m_pModelCom->Set_Animation(CAPPYBODY_HIDINGWAITA, 60.f, false, true);
 
 
 	m_fMaxHp = 15.f;

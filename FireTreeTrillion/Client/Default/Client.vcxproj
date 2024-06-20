@@ -169,6 +169,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Public\Ability.h" />
     <ClInclude Include="..\Public\AnimToolHelper.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
@@ -211,6 +212,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\Public\HUD.h" />
+    <ClInclude Include="..\Public\HUD_AbilityDiscard.h" />
     <ClInclude Include="..\Public\HUD_KirbyStatus.h" />
     <ClInclude Include="..\Public\HUD_StarPoint.h" />
     <ClInclude Include="..\Public\ImSequencer.h">
@@ -289,6 +291,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Private\Ability.cpp" />
     <ClCompile Include="..\Private\AnimToolHelper.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -330,6 +333,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\Private\HUD.cpp" />
+    <ClCompile Include="..\Private\HUD_AbilityDiscard.cpp" />
     <ClCompile Include="..\Private\HUD_KirbyStatus.cpp" />
     <ClCompile Include="..\Private\HUD_StarPoint.cpp" />
     <ClCompile Include="..\Private\ImSequencer.cpp">

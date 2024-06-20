@@ -229,7 +229,7 @@ HRESULT CLevel_Intro::Ready_Layer_UI(const wstring& _wstrLayerTag)
 	{
 		{CHUD::HUD_KIRBYHP, "HUD_KirbyStatus"},
 		{CHUD::HUD_STARPOINT, "HUD_StarPoint"},
-		//{CHUD::STAT_NONE, "LayerUI"},
+		{CHUD::HUD_ABILITYDISCARD, "HUD_AbilityDiscard"},
 	};
 
 	//auto it = HUDmap.find(eHUDType);
@@ -531,7 +531,7 @@ HRESULT CLevel_Intro::Ready_Monsters()
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_CappyBody"), &tempDesc)))
 				return E_FAIL;
 		}
-		else if (L"NonAnim_Kabu" == tempDesc.wstrModelName)
+		else if (L"Kabu" == tempDesc.wstrModelName)
 		{
 			CKabu::KABU_DESC KabuDesc = {};
 			KabuDesc.matWorld = matWorld;
