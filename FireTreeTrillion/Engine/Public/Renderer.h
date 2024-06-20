@@ -105,6 +105,7 @@ public:
 public:
 	HRESULT Add_DebugComponents(class CComponent* pRenderObject);
 	_bool	Get_HitBoxRender() { return m_IsRenderHitBox; }
+	_bool	Get_IsRenderRTV() { return m_IsRenderRTV; }
 #endif
 
 private:
