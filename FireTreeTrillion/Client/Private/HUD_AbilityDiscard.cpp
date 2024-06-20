@@ -119,8 +119,8 @@ void CHUD_AbilityDiscard::Late_Tick(_float fTimeDelta)
 HRESULT CHUD_AbilityDiscard::Render()
 {
 	//대기 상태일 경우, 렌더x
-	if (DISCARD_IDLE == m_eCurState) //&& KIRBYHP_NONE == m_ePreState)
-		return S_OK;
+	//if (DISCARD_IDLE == m_eCurState) //&& KIRBYHP_NONE == m_ePreState)
+	//	return S_OK;
 
 	if (UI_TEXTURE == m_UIObjDesc.eUIType)
 		Render_BindSet(m_pShaderCom, m_pTransformCom);
