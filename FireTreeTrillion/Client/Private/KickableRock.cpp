@@ -31,6 +31,8 @@ HRESULT CKickableRock::Initialize(void* pArg)
 	if(pGameObjectDesc != nullptr)
 		Add_Components(pGameObjectDesc->wstrModelName);
 
+	m_eAbilityType = ABILITY_DEFAULT;
+
 	return S_OK;
 }
 

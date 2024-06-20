@@ -223,6 +223,7 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 			// 돌덩이에게 물리적인 힘을 주는 것이 구현되어있을 것이다.
 			// 또는 내가 흡수했을때도 먹는 로직이 되어있을듯 함.
 			pObject->Collision(CONTENT_KICK, pKirby);
+			pKirby->Collision(CONTENT_KICK, pObject);
 			// 0.1초의 충돌 딜레이를 주기위함.
 			SrcHit->Set_Alive(false);
 		});
