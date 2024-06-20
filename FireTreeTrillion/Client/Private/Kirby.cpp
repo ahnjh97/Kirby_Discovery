@@ -291,7 +291,8 @@ void CKirby::Add_AnimEvent()
 	// 2. 재생 기준은 애님툴에서 지정한 애니메이션인지 + 시작 프레임이 애니메이션 프레임안에 들어가는 지
 	// 3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
 	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("ApplyDamage", [this]() {
-		Set_FrustumCollider(0.5f, 4.f, 90.f);
+		// 커비의 히트박스를 실시간으로 변화시킨다.
+		HitBoxChanger(m_pFSM->Get_State());
 		});
 	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("StopDamage", [this]() {
 
@@ -1084,6 +1085,45 @@ void CKirby::SetUp_FSM()
 
 }
 
+void CKirby::HitBoxChanger(_uint eState)
+{
+	switch (eState)
+	{
+	// 덜 차징 스핀
+	case SWORDSTATE_GIGANTSPINSLASH:
+		Set_SphereCollider(0.5f, 4.f);
+		break;
+	// 슈퍼 차징 스핀
+	case SWORDSTATE_SUPERSPINSLASHLOOP:
+		Set_SphereCollider(0.5f, 4.f);
+		break;
+	// 칼 1타
+	case SWORDSTATE_SIDESLASH:
+		Set_FrustumCollider(0.5f, 4.f, 90.f);
+		break;
+	// 칼 2타
+	case SWORDSTATE_MULITSWORDATTACK:
+		Set_FrustumCollider(0.5f, 4.f, 90.f);
+		break;
+	// 칼 3타
+	case SWORDSTATE_DECISIVESLASH:
+		Set_FrustumCollider(0.5f, 5.f, 90.f);
+		break;
+	// 공중제비 도는 공격
+	case SWORDSTATE_SWORDSPIN:
+		Set_SphereCollider(0.5f, 5.f);
+		break;
+	// 공중어퍼컷 형식의 공격
+	case SWORDSTATE_UPWARDSLASH:
+		Set_FrustumCollider(0.5f, 5.f, 90.f);
+		break;
+	default:
+		break;
+	}
+
+	m_isKirbyAttacking = true;
+}
+
 void CKirby::Update_PartObjectMatrix()
 {
 	m_ArmourMatrix = *(m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("HatL")->Get_CombinedTransformationMatrix());
@@ -1252,6 +1292,21 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 
 	// 사다리 상태 초기화
 	INFO(m_bCanLadder) = false;
+
+
+	// 커비가 공격중일땐, 꽤나 오랜 시간동안 무적을 부여받는다.
+	if (m_isKirbyAttacking == true)
+	{
+		// 타임델타를 누적받고
+		m_fIsAttackTime += fTimeDelta;
+		if (m_fIsAttackTime > 0.3f)
+		{
+			m_fIsAttackTime = 0.f;
+			m_isKirbyAttacking = false;
+		}
+	}
+
+
 }
 
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
