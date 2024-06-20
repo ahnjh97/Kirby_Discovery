@@ -44,7 +44,7 @@ HRESULT CCappyHat::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	m_pModelCom->Set_Animation(CAPPYHAT_WAIT, 50.f, true, true);
+	m_pModelCom->Set_Animation(CAPPYHAT_WAIT, 60.f, true, true);
 	m_pTransformCom->Set_WorldMatrix(m_WorldMatrix);
 
 	m_fMaxHp = 15.f;
@@ -109,6 +109,7 @@ _int CCappyHat::Tick(_float fTimeDelta)
 			// ¹ö¼¸ ¸Ó¸® »À¿¡ ºÙÈû
 			_float4x4 WorldMatrix = static_cast<CCappyBody*>(m_pGameObject)->Compute_BoneWorldMatrix();
 			m_pTransformCom->Set_WorldMatrix(WorldMatrix);
+			m_pTransformCom->Set_Scaled(1.f, 1.15f, 1.f);
 			m_fHeightTime = 0.f;
 		}
 		else

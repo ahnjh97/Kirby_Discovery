@@ -12,17 +12,25 @@ private:
 	virtual ~CMapToolHelper() = default;
 
 public:
+	void Set_PickedObject(CGameObject* pGameObject, const string& strModelName)
+	{
+		Safe_Release(m_pPickedObject);
+		m_pPickedObject = pGameObject;
+		m_strCurModel = strModelName;
+		Safe_AddRef(m_pPickedObject);
+	}
+
+public:
 	virtual HRESULT Initialize_Prototype()				override;
 	virtual HRESULT Initialize(void* pArg = nullptr)	override;
 	virtual _int	Tick(_float fTimeDelta)				override;
 	virtual void	Late_Tick(_float fTimeDelta)		override;
 	virtual HRESULT Render()							override;
 #ifdef _DEBUG
-	virtual void	Render_IMGUI()						override;
+	virtual void	Render_IMGUI()						override {};
 #endif
 
 private:
-	void	SetUpTxtVectors();
 	void	ReadMapDecoTxts();
 	void	ReadMapObjTxts();
 	void	ReadMonsterTxts();
@@ -57,6 +65,7 @@ private:
 	_bool	Save_RallyPoints(const string& _strLevel, vector<CGameObject*>& _vecRallyPoints);
 	_bool	Save_Decos(const string& _strLevel, vector<CGameObject*>& _vecDecos);
 	_bool	Save_Items(const string& _strLevel, vector<CGameObject*>& _vecItems);
+	_bool	Save_Kickables(const string& _strLevel, vector<CGameObject*>& _vecItems);
 
 	void	Load_Map(const string& _strLevel);
 	void	Load_Triggers(const string& _strLevel);
@@ -64,6 +73,7 @@ private:
 	void	Load_RallyPoints(const string& _strLevel);
 	void	Load_Decos(const string& _strLevel);
 	void	Load_Items(const string& _strLevel);
+	void	Load_Kickables(const string& _strLevel);
 
 	void	RegisterRallyPoints(list<CGameObject*>* _pObjList);
 	void	WriteLocalizedAnimMapDecos(vector<pair<string, _float4x4>>& _vecAnimDecos);
@@ -80,6 +90,7 @@ private:
 	_bool IsDeco(const string& _strModelName);
 	_bool IsItem(const string& _strModelName);
 	_bool IsRallyingMonster(const string& _strModelName);
+	_bool IsKickble(const string& _strModelName);
 
 	_bool RenameFile(const string& _strLevel, const string& _tempFileName, const string& _strCustom);
 
@@ -88,6 +99,9 @@ private:
 	void HideGrid(_bool bHideGrid);
 	void HideMapDecos(_bool bHideMapDecos);
 	_bool ExcludeModel(string& _strModelName);
+	void MoveToCam();
+	void DisableOtherGroups(_int* _pCurTxtGroup);
+	_bool IsAnythingSelected();
 
 private:
 	vector<string>	m_vecLevelName; 
@@ -105,13 +119,17 @@ private:
 	unordered_set<string>	m_setNonColDecos;
 	unordered_set<string>	m_setAnimDecos;
 	unordered_set<string>	m_setActorDecos;
-	unordered_set<string>	m_setKickableDecos;
+	unordered_set<string>	m_setKickables;
 
 	vector<string>	m_vecMapTxts;
 	vector<string>	m_vecTriggerTxts;
 	vector<string>	m_vecMonsterTxts;
 	vector<string>	m_vecObjectTxts;
 	vector<string>	m_vecMapDecoTxts;
+	vector<string>	m_vecItemTxts;
+	vector<string>	m_vecKickableTxts;
+	
+	vector<_int*>	m_vecTxtIndices;
 
 	string m_strSelectedTxt;
 	string m_strCurModel;

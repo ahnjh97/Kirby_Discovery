@@ -14,7 +14,6 @@ void CEventCallBack::onTrigger(PxTriggerPair* pairs, PxU32 count)
 
         if (pairs[i].otherActor ==  m_pPlayerActor && IsActorInTriggerList(pairs[i].triggerActor))
         {
-            m_pPlayerActor->userData;
             if (m_iTriggerType == 1)
             {
                 auto functionIter = m_TriggerFuncs.find(m_iTriggerType);

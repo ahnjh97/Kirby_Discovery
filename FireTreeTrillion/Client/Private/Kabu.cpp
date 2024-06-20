@@ -40,7 +40,10 @@ HRESULT CKabu::Initialize(void* pArg)
 		return E_FAIL;
 
 	if (MON_PATROL == m_eMonState)
+	{
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecRallyPoint[0]);
+		m_vRally = m_vecRallyPoint[1] - m_vecRallyPoint[0];
+	}
 	else
 	{
 		m_fDistance = XMVectorGetX(XMVector3Length(m_vecRallyPoint[0] - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
@@ -59,10 +62,11 @@ HRESULT CKabu::Initialize(void* pArg)
 	m_eVacuumSize = SIZE_SMALL;
 	m_eAbilityType = ABILITY_DEFAULT;
 
-	m_fDistance = 5.f;
-	m_fSpeed = 0.f;
+	m_fSpeed = 5.f;
 
 	//m_vRally = m_vecRallyPoint[m_iCnt + 1] - m_vecRallyPoint[m_iCnt];
+
+	Set_Slope(false);
 
 	return S_OK;
 }
@@ -86,57 +90,93 @@ _int CKabu::Tick(_float fTimeDelta)
 
 		if (MON_CIRCLE == m_eMonState)
 		{
-			m_fAngle += m_fTimeDelta * 50.f;
+			m_fAngle += m_fTimeDelta * 80.f;
 
 			m_vRotatePos.x = m_vOriginPos.x + (m_fDistance * sin(XMConvertToRadians(m_fAngle)));
-			m_vRotatePos.y = m_vOriginPos.y;
 			m_vRotatePos.z = m_vOriginPos.z - (m_fDistance * cos(XMConvertToRadians(m_fAngle)));
 
 			m_pControllerCom->Move(m_pTransformCom, m_vRotatePos, m_fTimeDelta);
 		}
 		else if (MON_PATROL == m_eMonState)
 		{
-			m_fMoveTime += m_fTimeDelta;
+			_float fDistance = { 0.f };
 
-			if (1.f < m_fMoveTime)
-				m_fSpeed -= m_fTimeDelta * 5.f;
-			else if (1.f >= m_fMoveTime)
-				m_fSpeed += m_fTimeDelta * 5.f;
+			fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), m_vecRallyPoint[m_iCnt + 1])));
 
-			if (2.f < m_fMoveTime)
+			if (0.1f < fDistance)
+				m_pControllerCom->Move_Dir(m_pTransformCom, XMVector3Normalize(m_vRally) * m_fTimeDelta * m_fSpeed, m_fTimeDelta);
+			else
 			{
-				m_fMoveTime = 0.f;
-				m_fSpeed = 0.f;
-
-				if (m_iCnt == 0)
-				{
-					m_bConvert = false;
-					m_vRally = m_vecRallyPoint[m_iCnt + 1] - m_vecRallyPoint[m_iCnt];
-					m_iCnt++;
-				}
-				else if (m_iCnt < m_vecRallyPoint.size() - 1)
+				if (m_iCnt < m_vecRallyPoint.size() - 2)
 				{
 					if (false == m_bConvert)
 					{
-						m_vRally = m_vecRallyPoint[m_iCnt + 1] - m_vecRallyPoint[m_iCnt];
 						m_iCnt++;
+						m_vRally = m_vecRallyPoint[m_iCnt + 1] - m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 					}
 					else
 					{
 						m_iCnt--;
-						m_vRally = m_vecRallyPoint[m_iCnt] - m_vecRallyPoint[m_iCnt + 1];
+						m_vRally = m_vecRallyPoint[m_iCnt + 1] - m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 					}
 				}
 				else
 				{
-					//m_iCnt = 0;
-					m_bConvert = true;
-					m_iCnt--;
-					m_vRally = m_vecRallyPoint[m_iCnt] - m_vecRallyPoint[m_iCnt + 1];
+					if (false == m_bConvert)
+					{
+						m_iCnt--;
+						m_bConvert = true;
+						m_vRally = m_vecRallyPoint[m_iCnt + 1] - m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+					}
+					else
+					{
+						m_bConvert = false;
+						m_iCnt++;
+						m_vRally = m_vecRallyPoint[m_iCnt + 1] - m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+					}
 				}
 			}
+			//m_fMoveTime += m_fTimeDelta;
 
-			m_pControllerCom->Move_Dir(m_pTransformCom, XMVector3Normalize(m_vRally) * m_fTimeDelta * m_fSpeed, m_fTimeDelta);
+			//if (1.f < m_fMoveTime)
+			//	m_fSpeed -= m_fTimeDelta * 5.f;
+			//else if (1.f >= m_fMoveTime)
+			//	m_fSpeed += m_fTimeDelta * 5.f;
+
+			//if (2.f < m_fMoveTime)
+			//{
+			//	m_fMoveTime = 0.f;
+			//	m_fSpeed = 0.f;
+
+			//	if (m_iCnt == 0)
+			//	{
+			//		m_bConvert = false;
+			//		m_vRally = m_vecRallyPoint[m_iCnt + 1] - m_vecRallyPoint[m_iCnt];
+			//		m_iCnt++;
+			//	}
+			//	else if (m_iCnt < m_vecRallyPoint.size() - 1)
+			//	{
+			//		if (false == m_bConvert)
+			//		{
+			//			m_vRally = m_vecRallyPoint[m_iCnt + 1] - m_vecRallyPoint[m_iCnt];
+			//			m_iCnt++;
+			//		}
+			//		else
+			//		{
+			//			m_iCnt--;
+			//			m_vRally = m_vecRallyPoint[m_iCnt] - m_vecRallyPoint[m_iCnt + 1];
+			//		}
+			//	}
+			//	else
+			//	{
+			//		//m_iCnt = 0;
+			//		m_bConvert = true;
+			//		m_iCnt--;
+			//		m_vRally = m_vecRallyPoint[m_iCnt] - m_vecRallyPoint[m_iCnt + 1];
+			//	}
+			//}
+
+			//m_pControllerCom->Move_Dir(m_pTransformCom, XMVector3Normalize(m_vRally) * m_fTimeDelta * m_fSpeed, m_fTimeDelta);
 		}
 	}
 

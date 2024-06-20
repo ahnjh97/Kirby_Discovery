@@ -4,40 +4,46 @@
 #include "BasicMap.h"
 #include "Utils.h"
 
-static _int iMapTxtIdx = -1;
-static _int iTriggerTxtIdx = -1;
-static _int iMonsterTxtIdx = -1;
-static _int iObjectIdx = -1;
-static _int iNonAnimIdx = -1;
-static _int iLevelIndex = 0;
-static _int iTempLevelIdx = -1;
+static _int s_iMapTxtIdx = -1;
+static _int s_iTriggerTxtIdx = -1;
+static _int s_iMonsterTxtIdx = -1;
+static _int s_iObjectIdx = -1;
+static _int s_iMapDecoIdx = -1;
+static _int s_iItemIdx = -1;
+static _int s_iKickableIdx = -1;
 
-static const _char* triggerTypes[] = {"Camera", "Shader"};
-static _int iTriggerType = -1;
-static const _char* triggerIndices[] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
+static _int s_iLevelIndex = 0;
+static _int s_iTempLevelIdx = -1;
+
+static const _char* s_triggerTypes[] = {"Camera", "Shader"};
+static _int s_iTriggerType = -1;
+static const _char* s_triggerIndices[] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
 									"11", "12", "13", "14", "15", "16", "17", "18", "19", "20" };
-static _int iTriggerIdx = -1;
+static _int s_iTriggerIdx = -1;
 
-static _int iMapMeshIndex = -1;
-static _int iSelectedMeshIndex = -1; 
+static _int s_iMapMeshIndex = -1;
+static _int s_iSelectedMeshIndex = -1; 
 
-static const _char* ShaderPasses[] = { "Blend X, NormalO", "Blend X, Normal X", "LightDepth", "Blend O, Normal O", "Blend O, Normal X"};
-static vector<vector<_int>> vecPassIndices;
-static vector<vector<_float>> vecSamplingFactors;
-static _int iMapIndex = 0;
-static _int iPickedMeshIndex = 0;
+static const _char* s_ShaderPasses[] = { "Blend X, NormalO", "Blend X, Normal X", "LightDepth", "Blend O, Normal O", "Blend O, Normal X" };
+static vector<vector<_int>> s_vecPassIndices;
+static vector<vector<_float>> s_vecSamplingFactors;
+static _int s_iMapIndex = 0;
+static _int s_iPickedMeshIndex = 0;
 
-static _float fRadius = 0;
+static _float s_fRadius = 0;
 
-static const _char* camTypes[] = { "Front", "Rear"};
-static _int iCamType = -1;
+static const _char* s_camTypes[] = { "Front", "Rear"};
+static _int s_iCamType = -1;
 
-static _bool bHideTriggers = { false };
-static _bool bHideGrid = { true };
-static _bool bHideMapDecos = { false };
+static _bool s_bHideTriggers = { false };
+static _bool s_bHideGrid = { true };
+static _bool s_bHideMapDecos = { false };
 
-static _int iRallyPointIndex = -1;
-static _int iConnectedMonster = -1;
+static _int s_iConnectedMonster = -1;
+static const _char* s_ShaderFile[] = { "" };
+static const _char* s_ModelPass[] = { "" };
+static const _char* s_PosTexPass[] = { "" };
+static _int s_iPassIndex = -1;
 
 CMapToolHelper::CMapToolHelper(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -60,13 +66,16 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	hr = __super::Initialize(pArg);
 	CHECK_FAILED(hr);
 
+	m_vecTxtIndices = { &s_iMapTxtIdx, &s_iTriggerTxtIdx, &s_iMonsterTxtIdx, &s_iObjectIdx
+		, &s_iMapDecoIdx, &s_iItemIdx, &s_iKickableIdx };
+
 	m_vecLevelName = { "Level_Static", "Level_Loading", "Level_Logo", "GamePlay",
 			"Level_Tool_UI", "Level_Tool_FX", "Level_Tool_Anim", "Level_Tool_Map",
 		"Intro", "Stage1", "Level_End" };
 
 	m_vecMapModelNames = { "Level0Stage1Step01", "Level1Stage1Step01" };
 	m_setMapNames = { "BG0", "BG1", "Level0Stage1Step01", "Level1Stage1Step01" };
-	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy" };
+	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy", "Fog", "Ladder", "RallyPoint" };
 	m_setRallyingMonsters = { "NonAnim_Kabu", "NonAnim_BrontoBurt" };
 
 	/*m_setNonColDecos = { "BushMCut" };*/
@@ -76,25 +85,23 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "CMHighwayGuardrailBRL", "CMHighwayGuardrailCCL", "CMHighwayGuardrailCL", "CMHighwayGuardrailCLL", "CMHighwayGuardrailCRL"
 		, "CMStreeLightLampA", "CMStreeLightLampE", "CMWaterTankL", "CvPipingDuctA05L"
 		, "GsBenchAL",  "GsCarShop", "GsCircleBench", "GsFlowerPotAL", "GsFlowerPotBL", "GsSteelFenceA"
-		, "GsSteelFenceB", "GsTreeA", "GsTreeB", "GsTreeC", "GsWallRockA", "GsWallRockB"
+		, "GsSteelFenceB", "GsStone", "GsTreeA", "GsTreeB", "GsTreeC", "GsWallRockA", "GsWallRockB"
 		, "GsWoodBridgeA", "GsWoodBridgeB", "GsRockCL", "GsRockDL", "GsRockEL", "GsRockFL", "GsRockGL"
 		, "JgGrassB", "JgGrassL", "JgGrasslongB", "JgGrassN", "JgWoodD", "JgGrassO"
 		, "StarBlockL" , "StarBlockM", "StarBlockS", "SeDriftWoodAL", "SeDriftWoodBL", "SeDriftWoodCL"
 		, "VpFactoryPart", "VpFactoryParts", "VpFactoryPartsBlend", "WoodBox" };
-	m_setKickableDecos = { "GsPebble", "GsStone", "SeShell" };
-	m_setItemTxts = { "Item_Coin" };
+	m_setKickables = { "GsPebble", "SeShell", "WasteCanYellow" };
+	m_setItemTxts = { "Item_Coin", "Item_EnergyDrink" };
 
-	vecPassIndices.resize(m_vecMapModelNames.size());
-	vecSamplingFactors.resize(m_vecMapModelNames.size());
-
-	//SetUpTxtVectors();
+	s_vecPassIndices.resize(m_vecMapModelNames.size());
+	s_vecSamplingFactors.resize(m_vecMapModelNames.size());
 
 	ReadMapDecoTxts();
 	ReadMapObjTxts();
 	ReadMonsterTxts();
 
-	HideGrid(bHideGrid);
-	HideTriggers(bHideTriggers);
+	HideGrid(s_bHideGrid);
+	HideTriggers(s_bHideTriggers);
 
 	return S_OK;
 }
@@ -153,42 +160,6 @@ HRESULT CMapToolHelper::Render()
 	return S_OK;
 }
 
-void CMapToolHelper::Render_IMGUI()
-{
-
-}
-
-void CMapToolHelper::SetUpTxtVectors()
-{
-	string strPath = "../../../model_txt/NonAnim/";
-
-	directory_iterator end_iter;  // 디렉토리 순회의 끝을 나타내는 iterator
-	directory_iterator dir_iter(strPath);  // 지정된 경로의 시작 iterator
-
-	while (dir_iter != end_iter) {
-		if (is_regular_file(*dir_iter)) {
-			string strFilePath = dir_iter->path().filename().string();
-			string strModelName = strFilePath.substr(0, strFilePath.length() - 4);
-
-			if (false == ExcludeModel(strModelName))
-			{
-				if(true == IsMap(strModelName))
-					m_vecMapTxts.emplace_back(strModelName);
-				else if (true == IsMonster(strModelName))
-					m_vecMonsterTxts.emplace_back(strModelName);
-				else if (true == IsTrigger(strModelName))
-					m_vecTriggerTxts.emplace_back(strModelName);
-				else
-					m_vecObjectTxts.emplace_back(strModelName);
-			}
-		}
-		++dir_iter;
-	}
-
-	for (auto& objTxt : m_vecObjectTxts)
-		m_setObjectTxts.insert(objTxt);
-}
-
 void CMapToolHelper::ReadMapDecoTxts()
 {
 	string strPath = "../../../model_txt/MapDeco/NonAnim/";
@@ -224,6 +195,10 @@ void CMapToolHelper::ReadMapObjTxts()
 				m_vecMapTxts.emplace_back(strModelName);
 			else if (true == IsTrigger(strModelName))
 				m_vecTriggerTxts.emplace_back(strModelName);
+			else if (true == IsItem(strModelName))
+				m_vecItemTxts.emplace_back(strModelName);
+			else if (true == IsKickble(strModelName))
+				m_vecKickableTxts.emplace_back(strModelName);
 			else
 				m_vecObjectTxts.emplace_back(strModelName);
 		}
@@ -259,12 +234,12 @@ void CMapToolHelper::Menu_Level()
 	ImGui::SeparatorText("Level");
 	for (_int i = LEVEL_INTRO; i <= LEVEL_STAGE1; i++)
 	{
-		if (ImGui::RadioButton(m_vecLevelName[i].c_str(), iLevelIndex == i - LEVEL_INTRO)) {
+		if (ImGui::RadioButton(m_vecLevelName[i].c_str(), s_iLevelIndex == i - LEVEL_INTRO)) {
 			ImGui::OpenPopup("Level Change");
-			iTempLevelIdx = i - LEVEL_INTRO;
+			s_iTempLevelIdx = i - LEVEL_INTRO;
 		}
 
-		if (iTempLevelIdx == i - LEVEL_INTRO && ImGui::BeginPopup("Level Change"))
+		if (s_iTempLevelIdx == i - LEVEL_INTRO && ImGui::BeginPopup("Level Change"))
 		{
 			string strPopUp = "Switch to " + m_vecLevelName[i] + "?";
 
@@ -280,7 +255,7 @@ void CMapToolHelper::Menu_Level()
 
 			if (ImGui::Button("Yes", ImVec2(90, 35)))
 			{
-				iLevelIndex = iTempLevelIdx;
+				s_iLevelIndex = s_iTempLevelIdx;
 				ImGui::CloseCurrentPopup();
 			}
 			ImGui::SameLine();
@@ -306,18 +281,18 @@ void CMapToolHelper::Menu_Level()
 		Load_Level();
 
 	ImGui::SeparatorText("Options");
-	if (ImGui::RadioButton("Hide Triggers", bHideTriggers)) {
-		bHideTriggers = !bHideTriggers;
-		HideTriggers(bHideTriggers);
+	if (ImGui::RadioButton("Hide Triggers", s_bHideTriggers)) {
+		s_bHideTriggers = !s_bHideTriggers;
+		HideTriggers(s_bHideTriggers);
 	}
 	ImGui::SameLine();
-	if (ImGui::RadioButton("Hide Grid", bHideGrid)) {
-		bHideGrid = !bHideGrid;
-		HideGrid(bHideGrid);
+	if (ImGui::RadioButton("Hide Grid", s_bHideGrid)) {
+		s_bHideGrid = !s_bHideGrid;
+		HideGrid(s_bHideGrid);
 	}
-	if (ImGui::RadioButton("Hide MapDecos", bHideMapDecos)) {
-		bHideMapDecos = !bHideMapDecos;
-		HideMapDecos(bHideMapDecos);
+	if (ImGui::RadioButton("Hide MapDecos", s_bHideMapDecos)) {
+		s_bHideMapDecos = !s_bHideMapDecos;
+		HideMapDecos(s_bHideMapDecos);
 	}
 }
 
@@ -330,9 +305,9 @@ void CMapToolHelper::Menu_NonAnimModels()
 		vector<const _char*> vecMapNames(m_vecMapTxts.size());
 		for (_int i = 0; i < m_vecMapTxts.size(); ++i)
 			vecMapNames[i] = m_vecMapTxts[i].c_str();
-		if (ImGui::ListBox("##Maps", &iMapTxtIdx, vecMapNames.data(), m_vecMapTxts.size(), 5)) {
-			iTriggerTxtIdx = iMonsterTxtIdx = iNonAnimIdx = iObjectIdx = -1;
-			m_strSelectedTxt = m_vecMapTxts[iMapTxtIdx];
+		if (ImGui::ListBox("##Maps", &s_iMapTxtIdx, vecMapNames.data(), m_vecMapTxts.size(), 5)) {
+			DisableOtherGroups(&s_iMapTxtIdx);
+			m_strSelectedTxt = m_vecMapTxts[s_iMapTxtIdx];
 		}
 	}
 
@@ -342,9 +317,9 @@ void CMapToolHelper::Menu_NonAnimModels()
 		vector<const _char*> vecTriggerNames(m_vecTriggerTxts.size());
 		for (_int i = 0; i < m_vecTriggerTxts.size(); ++i)
 			vecTriggerNames[i] = m_vecTriggerTxts[i].c_str();
-		if (ImGui::ListBox("##Triggers", &iTriggerTxtIdx, vecTriggerNames.data(), m_vecTriggerTxts.size(), 5)) {
-			iMapTxtIdx = iMonsterTxtIdx = iNonAnimIdx = iObjectIdx = -1;
-			m_strSelectedTxt = m_vecTriggerTxts[iTriggerTxtIdx];
+		if (ImGui::ListBox("##Triggers", &s_iTriggerTxtIdx, vecTriggerNames.data(), m_vecTriggerTxts.size(), 5)) {
+			DisableOtherGroups(&s_iTriggerTxtIdx);
+			m_strSelectedTxt = m_vecTriggerTxts[s_iTriggerTxtIdx];
 		}
 	}
 
@@ -354,9 +329,9 @@ void CMapToolHelper::Menu_NonAnimModels()
 		vector<const _char*> vecMonsterNames(m_vecMonsterTxts.size());
 		for (_int i = 0; i < m_vecMonsterTxts.size(); ++i)
 			vecMonsterNames[i] = m_vecMonsterTxts[i].c_str();
-		if (ImGui::ListBox("##Monsters", &iMonsterTxtIdx, vecMonsterNames.data(), m_vecMonsterTxts.size(), 5)) {
-			iMapTxtIdx = iTriggerTxtIdx = iNonAnimIdx = iObjectIdx = -1;
-			m_strSelectedTxt = m_vecMonsterTxts[iMonsterTxtIdx];
+		if (ImGui::ListBox("##Monsters", &s_iMonsterTxtIdx, vecMonsterNames.data(), m_vecMonsterTxts.size(), 5)) {
+			DisableOtherGroups(&s_iMonsterTxtIdx);
+			m_strSelectedTxt = m_vecMonsterTxts[s_iMonsterTxtIdx];
 		}
 	}
 
@@ -366,9 +341,9 @@ void CMapToolHelper::Menu_NonAnimModels()
 		vector<const _char*> vecObjectNames(m_vecObjectTxts.size());
 		for (_int i = 0; i < m_vecObjectTxts.size(); ++i)
 			vecObjectNames[i] = m_vecObjectTxts[i].c_str();
-		if (ImGui::ListBox("##Objects", &iObjectIdx, vecObjectNames.data(), m_vecObjectTxts.size(), 16)) {
-			iMapTxtIdx = iTriggerTxtIdx = iMonsterTxtIdx = iNonAnimIdx = -1;
-			m_strSelectedTxt = m_vecObjectTxts[iObjectIdx];
+		if (ImGui::ListBox("##Objects", &s_iObjectIdx, vecObjectNames.data(), m_vecObjectTxts.size(), 10)) {
+			DisableOtherGroups(&s_iObjectIdx);
+			m_strSelectedTxt = m_vecObjectTxts[s_iObjectIdx];
 		}
 	}
 
@@ -378,9 +353,33 @@ void CMapToolHelper::Menu_NonAnimModels()
 		vector<const _char*> vecMapDecoNames(m_vecMapDecoTxts.size());
 		for (_int i = 0; i < m_vecMapDecoTxts.size(); ++i)
 			vecMapDecoNames[i] = m_vecMapDecoTxts[i].c_str();
-		if (ImGui::ListBox("##MapDecos", &iNonAnimIdx, vecMapDecoNames.data(), m_vecMapDecoTxts.size(), 16)) {
-			iMapTxtIdx = iTriggerTxtIdx = iMonsterTxtIdx = iObjectIdx = -1;
-			m_strSelectedTxt = m_vecMapDecoTxts[iNonAnimIdx];
+		if (ImGui::ListBox("##MapDecos", &s_iMapDecoIdx, vecMapDecoNames.data(), m_vecMapDecoTxts.size(), 16)) {
+			DisableOtherGroups(&s_iMapDecoIdx);
+			m_strSelectedTxt = m_vecMapDecoTxts[s_iMapDecoIdx];
+		}
+	}
+
+	if (ImGui::CollapsingHeader("Items"))
+	{
+		ImGui::SetNextItemWidth(200.0f);
+		vector<const _char*> vecItemNames(m_vecItemTxts.size());
+		for (_int i = 0; i < m_vecItemTxts.size(); ++i)
+			vecItemNames[i] = m_vecItemTxts[i].c_str();
+		if (ImGui::ListBox("##Items", &s_iItemIdx, vecItemNames.data(), m_vecItemTxts.size(), 5)) {
+			DisableOtherGroups(&s_iItemIdx);
+			m_strSelectedTxt = m_vecItemTxts[s_iItemIdx];
+		}
+	}
+
+	if (ImGui::CollapsingHeader("Kickables"))
+	{
+		ImGui::SetNextItemWidth(200.0f);
+		vector<const _char*> vecKickableNames(m_vecKickableTxts.size());
+		for (_int i = 0; i < m_vecKickableTxts.size(); ++i)
+			vecKickableNames[i] = m_vecKickableTxts[i].c_str();
+		if (ImGui::ListBox("##Kickables", &s_iKickableIdx, vecKickableNames.data(), m_vecKickableTxts.size(), 5)) {
+			DisableOtherGroups(&s_iKickableIdx);
+			m_strSelectedTxt = m_vecKickableTxts[s_iKickableIdx];
 		}
 	}
 }
@@ -390,8 +389,8 @@ void CMapToolHelper::Menu_TriggerInfo()
 	if (m_strCurModel == "Camera" || m_strCurModel == "Trigger" || m_strCurModel == "Dummy")
 	{
 		CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(m_pPickedObject);
-		iTriggerType = pMapToolObject->Get_TriggerType();
-		iTriggerIdx = pMapToolObject->Get_TriggerIndex();
+		s_iTriggerType = pMapToolObject->Get_TriggerType();
+		s_iTriggerIdx = pMapToolObject->Get_TriggerIndex();
 
 		string strTrigger = "[ " + m_strCurModel + " ]";
 		ImGui::Begin(strTrigger.c_str());
@@ -409,22 +408,22 @@ void CMapToolHelper::Menu_TriggerInfo()
 		if (m_strCurModel == "Trigger")
 		{
 			ImGui::SetNextItemWidth(80);
-			if (ImGui::Combo("##Type", &iTriggerType, triggerTypes, IM_ARRAYSIZE(triggerTypes)))
-				pMapToolObject->Set_TriggerType(iTriggerType);
+			if (ImGui::Combo("##Type", &s_iTriggerType, s_triggerTypes, IM_ARRAYSIZE(s_triggerTypes)))
+				pMapToolObject->Set_TriggerType(s_iTriggerType);
 			ImGui::SameLine();
 		}
 		else if (m_strCurModel == "Dummy")
 		{
 			ImGui::SetNextItemWidth(80);
-			if (ImGui::Combo("##Type", &iCamType, camTypes, IM_ARRAYSIZE(camTypes)))
-				pMapToolObject->Set_CamType(iCamType);
+			if (ImGui::Combo("##Type", &s_iCamType, s_camTypes, IM_ARRAYSIZE(s_camTypes)))
+				pMapToolObject->Set_CamType(s_iCamType);
 			ImGui::SameLine();
 		}
 		
 		//-------------------------------------------
 		ImGui::SetNextItemWidth(80);
-		if (ImGui::Combo("##Index", &iTriggerIdx, triggerIndices, IM_ARRAYSIZE(triggerIndices))) {
-			pMapToolObject->Set_TriggerIndex(iTriggerIdx);
+		if (ImGui::Combo("##Index", &s_iTriggerIdx, s_triggerIndices, IM_ARRAYSIZE(s_triggerIndices))) {
+			pMapToolObject->Set_TriggerIndex(s_iTriggerIdx);
 		}
 
 		if (m_strCurModel == "Dummy")
@@ -436,15 +435,15 @@ void CMapToolHelper::Menu_TriggerInfo()
 
 void CMapToolHelper::Menu_CamLerpInfo(CMapToolObject* _pMapToolObject)
 {
-	iCamType = _pMapToolObject->Get_CamType();
-	fRadius = _pMapToolObject->Get_Radius();
+	s_iCamType = _pMapToolObject->Get_CamType();
+	s_fRadius = _pMapToolObject->Get_Radius();
 
 	ImGui::Text("RADIUS");
 	ImGui::SameLine();
 	ImGui::SetCursorPosX(60);
 	ImGui::SetNextItemWidth(90);
-	if (ImGui::InputFloat("##Radius", &fRadius, 1.f, 1.f, "%.3f"))
-		_pMapToolObject->Set_Radius(fRadius);
+	if (ImGui::InputFloat("##Radius", &s_fRadius, 1.f, 1.f, "%.3f"))
+		_pMapToolObject->Set_Radius(s_fRadius);
 }
 
 void CMapToolHelper::Menu_MapShaderInfo()
@@ -461,11 +460,11 @@ void CMapToolHelper::Menu_MapShaderInfo()
 
 	_uint iNumMesh = pModel->Get_NumMeshes();
 
-	if (vecPassIndices[iMapIndex].empty())
-		vecPassIndices[iMapIndex].resize(iNumMesh);
-	if (vecSamplingFactors[iMapIndex].empty()) {
-		vecSamplingFactors[iMapIndex].resize(iNumMesh);
-		fill(vecSamplingFactors[iMapIndex].begin(), vecSamplingFactors[iMapIndex].end(), 1.f);
+	if (s_vecPassIndices[s_iMapIndex].empty())
+		s_vecPassIndices[s_iMapIndex].resize(iNumMesh);
+	if (s_vecSamplingFactors[s_iMapIndex].empty()) {
+		s_vecSamplingFactors[s_iMapIndex].resize(iNumMesh);
+		fill(s_vecSamplingFactors[s_iMapIndex].begin(), s_vecSamplingFactors[s_iMapIndex].end(), 1.f);
 	}
 
 	vector<string> vecMeshNames(iNumMesh);
@@ -509,24 +508,24 @@ void CMapToolHelper::Menu_MapShaderInfo()
 		ImGui::PushID(j);
 		ImGui::Text("%d", j);
 		ImGui::SameLine(25); // 다음 메뉴 위치를 25에서부터 시작하도록 지정
-		if (ImGui::Selectable(vecMapMeshNames[j], iSelectedMeshIndex == j, ImGuiSelectableFlags_AllowDoubleClick, ImVec2(320,0)))
+		if (ImGui::Selectable(vecMapMeshNames[j], s_iSelectedMeshIndex == j, ImGuiSelectableFlags_AllowDoubleClick, ImVec2(320,0)))
 		{
-			iSelectedMeshIndex = j;
+			s_iSelectedMeshIndex = j;
 			pBasicMap->Reset_Time(j);
 		}
 		ImGui::SameLine();
 		//------------------------------
 		ImGui::SetNextItemWidth(150);
-		if (ImGui::Combo("##PassIndex", &vecPassIndices[iMapIndex][j], ShaderPasses, IM_ARRAYSIZE(ShaderPasses)))
+		if (ImGui::Combo("##PassIndex", &s_vecPassIndices[s_iMapIndex][j], s_ShaderPasses, IM_ARRAYSIZE(s_ShaderPasses)))
 		{
-			pBasicMap->Set_PassIndex(j, vecPassIndices[iMapIndex][j]);
+			pBasicMap->Set_PassIndex(j, s_vecPassIndices[s_iMapIndex][j]);
 		}
 		ImGui::SameLine();
 		//------------------------------
 		ImGui::SetNextItemWidth(100);
-		if (ImGui::InputFloat("##SamplingFactor", &vecSamplingFactors[iMapIndex][j], 0.01f, 1.0f, "%.3f")) 
+		if (ImGui::InputFloat("##SamplingFactor", &s_vecSamplingFactors[s_iMapIndex][j], 0.01f, 1.0f, "%.3f")) 
 		{
-			pBasicMap->Set_SamplingFactor(j, vecSamplingFactors[iMapIndex][j]);
+			pBasicMap->Set_SamplingFactor(j, s_vecSamplingFactors[s_iMapIndex][j]);
 		}
 		ImGui::PopID();
 	}
@@ -542,15 +541,15 @@ void CMapToolHelper::Menu_MonsterInfo()
 	if (nullptr == pMapToolObject)
 		return;
 
-	iTriggerIdx = pMapToolObject->Get_TriggerIndex();
+	s_iTriggerIdx = pMapToolObject->Get_TriggerIndex();
 
 	string strMonsterName = m_strCurModel.substr(8);
 	ImGui::Begin(strMonsterName.c_str());
 	ImGui::SetCursorPosX(33);
 	ImGui::Text("INDEX");
 	ImGui::SetNextItemWidth(80);
-	if (ImGui::Combo("##Index", &iTriggerIdx, triggerIndices, IM_ARRAYSIZE(triggerIndices)))
-		pMapToolObject->Set_TriggerIndex(iTriggerIdx);
+	if (ImGui::Combo("##Index", &s_iTriggerIdx, s_triggerIndices, IM_ARRAYSIZE(s_triggerIndices)))
+		pMapToolObject->Set_TriggerIndex(s_iTriggerIdx);
 
 	ImGui::End();
 }
@@ -568,25 +567,25 @@ void CMapToolHelper::Menu_RallyPointInfo()
 		return;
 
 	string strConnectedMonster = pMapToolObject->Get_ConnectedMonster();
-	iConnectedMonster = Compute_RallyingMonsterIndex(strConnectedMonster);
+	s_iConnectedMonster = Compute_RallyingMonsterIndex(strConnectedMonster);
 
 	vector<const _char*> vecRallyingMonsterNames;
 	for (auto& monsterName : m_setRallyingMonsters)
 		vecRallyingMonsterNames.push_back(monsterName.c_str());
 
 	ImGui::SetNextItemWidth(150);
-	if (ImGui::Combo("##ConnectedMonster", &iConnectedMonster, vecRallyingMonsterNames.data(), vecRallyingMonsterNames.size())) {
-		string strMonsterName(vecRallyingMonsterNames[iConnectedMonster]);
+	if (ImGui::Combo("##ConnectedMonster", &s_iConnectedMonster, vecRallyingMonsterNames.data(), vecRallyingMonsterNames.size())) {
+		string strMonsterName(vecRallyingMonsterNames[s_iConnectedMonster]);
 		pMapToolObject->Set_ConnectedMonster(strMonsterName);
 	}
 		
-	iTriggerIdx = pMapToolObject->Get_TriggerIndex();
+	s_iTriggerIdx = pMapToolObject->Get_TriggerIndex();
 
 	ImGui::Text("INDEX");
 	ImGui::SameLine();
 	ImGui::SetNextItemWidth(80);
-	if (ImGui::Combo("##RallyPointIndex", &iTriggerIdx, triggerIndices, IM_ARRAYSIZE(triggerIndices)))
-		pMapToolObject->Set_TriggerIndex(iTriggerIdx);
+	if (ImGui::Combo("##RallyPointIndex", &s_iTriggerIdx, s_triggerIndices, IM_ARRAYSIZE(s_triggerIndices)))
+		pMapToolObject->Set_TriggerIndex(s_iTriggerIdx);
 
 	ImGui::End();
 }
@@ -599,8 +598,7 @@ void CMapToolHelper::Edit_Object()
 	CTransform* pTransform = dynamic_cast<CTransform*>(m_pPickedObject->Get_Component(g_strTransformTag));
 	if (nullptr == pTransform)
 		return;
-	
-	Safe_AddRef(pTransform);
+
 	ImGui::Begin(m_strCurModel.c_str());
 
 	_uint iShaderVars = m_pPickedObject->Get_ShaderVars();
@@ -619,11 +617,11 @@ void CMapToolHelper::Edit_Object()
 		iShaderVars ^= 1;
 	m_pPickedObject->Set_ShaderVars(iShaderVars);
 	
-	float windowWidth = ImGui::GetContentRegionAvail().x;
-	float inputFloatWidth = 100; // 설정된 너비
-	float thicknessTextWidth = ImGui::CalcTextSize("Thickness ").x;
-	float totalWidth = thicknessTextWidth + inputFloatWidth + ImGui::GetStyle().ItemSpacing.x;
-	float offset = (windowWidth - totalWidth) * 0.5f;
+	_float windowWidth = ImGui::GetContentRegionAvail().x;
+	_float inputFloatWidth = 100; // 설정된 너비
+	_float thicknessTextWidth = ImGui::CalcTextSize("Thickness ").x;
+	_float totalWidth = thicknessTextWidth + inputFloatWidth + ImGui::GetStyle().ItemSpacing.x;
+	_float offset = (windowWidth - totalWidth) * 0.5f;
 	if (offset > 0.0f)
 		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offset);
 
@@ -633,10 +631,23 @@ void CMapToolHelper::Edit_Object()
 	if (ImGui::InputFloat("##fRimWidth", &fRimWidth, 0.01f, 1.0f, "%.3f"))
 		m_pPickedObject->Set_RimWidth(fRimWidth);
 
+	//CModel* pModel = dynamic_cast<CModel*>(m_pPickedObject->Get_Component(TEXT("Com_Model")));
+	//if (nullptr == pModel)  // Shader_PosTex  패스 지정
+	//{
+	//	/*ImGui::SetNextItemWidth(150);
+	//if (ImGui::Combo("##RallyPointIndex", &iTriggerIdx, triggerIndices, IM_ARRAYSIZE(triggerIndices)))
+	//	pMapToolObject->Set_TriggerIndex(iTriggerIdx);*/
+	//}
+	//else  // Shader_Model 패스지정
+	//{
+	//	/*ImGui::SetNextItemWidth(150);
+	//if (ImGui::Combo("##RallyPointIndex", &iTriggerIdx, triggerIndices, IM_ARRAYSIZE(triggerIndices)))
+	//	pMapToolObject->Set_TriggerIndex(iTriggerIdx);*/
+	//}
+	
 	_float4x4 tempMatrix = pTransform->Get_WorldFloat4x4();
 	m_pGameInstance->EditTransform(tempMatrix); // 선택한 모델의 월드행렬을 수정 
 	pTransform->Set_WorldMatrix(tempMatrix);
-	Safe_Release(pTransform);
 	ImGui::End();
 }
 
@@ -649,7 +660,9 @@ void CMapToolHelper::OnLeftClick()
 	if (nullptr == pPickedObject)
 		return;
 
+	Safe_Release(m_pPickedObject);
 	m_pPickedObject = pPickedObject;
+	Safe_AddRef(m_pPickedObject);
 
 	CModel* pModel = dynamic_cast<CModel*>(m_pPickedObject->Get_Component(TEXT("Com_Model")));
 	m_strCurModel = pModel->Get_ModelInfo().strModelName;
@@ -664,14 +677,14 @@ void CMapToolHelper::OnLeftClick()
 	if (nullptr == pBasicMap)
 		return;
 
-	pBasicMap->Reset_Time(iPickedMeshIndex);
-	iSelectedMeshIndex = iPickedMeshIndex;
-	iMapIndex = iIndex;
+	pBasicMap->Reset_Time(s_iPickedMeshIndex);
+	s_iSelectedMeshIndex = s_iPickedMeshIndex;
+	s_iMapIndex = iIndex;
 
-	if (vecPassIndices[iIndex].empty() || vecSamplingFactors[iIndex].empty())
+	if (s_vecPassIndices[iIndex].empty() || s_vecSamplingFactors[iIndex].empty())
 	{
-		vecPassIndices[iIndex].resize(iNumMeshes);
-		vecSamplingFactors[iIndex].resize(iNumMeshes);
+		s_vecPassIndices[iIndex].resize(iNumMeshes);
+		s_vecSamplingFactors[iIndex].resize(iNumMeshes);
 
 		Load_MapShaderInfo();
 	}
@@ -679,7 +692,7 @@ void CMapToolHelper::OnLeftClick()
 
 void CMapToolHelper::OnRightClick()
 {
-	if (iMapTxtIdx == -1 && iTriggerTxtIdx == -1 && iMonsterTxtIdx == -1 && iObjectIdx == -1 && iNonAnimIdx == -1)
+	if (false == IsAnythingSelected())
 		return;
 
 	_float2 vMouseViewPortPos = m_pGameInstance->Get_MouseViewPortPos();
@@ -737,38 +750,44 @@ void CMapToolHelper::OnRightClick()
 		}
 
 		list<CGameObject*>* pObjList = m_pGameInstance->Get_List(LEVEL_TOOL_MAP, TEXT("Layer_Parse"));
+		Safe_Release(m_pPickedObject);
 		m_pPickedObject = pObjList->back();
+		Safe_AddRef(m_pPickedObject);
 		m_strCurModel = m_strSelectedTxt;
 
 		if (m_setMapDecoTxts.end() != m_setMapDecoTxts.find(m_strCurModel))
 			m_pPickedObject->Set_ShaderVars(2);
 
-		iMapTxtIdx = iTriggerTxtIdx = iMonsterTxtIdx = iNonAnimIdx = iObjectIdx = -1;
+		_int i{};
+		DisableOtherGroups(&i);
 	}
 }
 
 void CMapToolHelper::On_DIK_Escape()
 {
-	iMapTxtIdx = -1;
-	iTriggerTxtIdx = -1;
-	iMonsterTxtIdx = -1;
-	iNonAnimIdx = -1;
+	_int i{};
+	DisableOtherGroups(&i);
+	Safe_Release(m_pPickedObject);
 	m_pPickedObject = nullptr;
 }
 
 void CMapToolHelper::On_DIK_Delete()
 {
-	if (m_pPickedObject != nullptr)
+	if (m_pPickedObject != nullptr) {
+		Safe_Release(m_pPickedObject);
 		m_pPickedObject->Set_Dead();
+	}
+		
 	m_pPickedObject = nullptr;
 }
 
 void CMapToolHelper::Save_Level()
 {
-	if (iLevelIndex < 0)
+	if (s_iLevelIndex < 0)
 		return;
 
-	string strLevel = m_vecLevelName[iLevelIndex + LEVEL_INTRO];
+	On_DIK_Escape();
+	string strLevel = m_vecLevelName[s_iLevelIndex + LEVEL_INTRO];
 	string tempFileName = "temp_" + strLevel + ".txt";
 
 	ofstream outputFile(tempFileName, ios::out | ios::binary);
@@ -798,6 +817,7 @@ void CMapToolHelper::Save_Level()
 	vector<CGameObject*> vecRallyPoints;
 	vector<CGameObject*> vecDecos;
 	vector<CGameObject*> vecItems;
+	vector<CGameObject*> vecKickables;
 
 	for (auto& object : *pObjectsList)
 	{
@@ -813,13 +833,11 @@ void CMapToolHelper::Save_Level()
 			continue;
 
 		string strModelName = pModel->Get_ModelInfo().strModelName;
-		if (true == IsMap(strModelName))
-		{
+		if (true == IsMap(strModelName)){
 			vecMap.push_back(object);
 			continue;
 		}
-		if (true == IsTrigger(strModelName))
-		{
+		if (true == IsTrigger(strModelName)){
 			vecTriggers.push_back(object);
 			continue;
 		}
@@ -833,6 +851,10 @@ void CMapToolHelper::Save_Level()
 		}
 		if (true == IsItem(strModelName)) {
 			vecItems.push_back(object);
+			continue;
+		}
+		if (true == IsKickble(strModelName)) {
+			vecKickables.push_back(object);
 			continue;
 		}
 		if("RallyPoint" == strModelName){
@@ -895,6 +917,11 @@ void CMapToolHelper::Save_Level()
 	else
 		wstrSave += L"Items X\n";
 
+	if(true == Save_Kickables(strLevel, vecKickables))
+		wstrSave += L"Kickables O\n";
+	else
+		wstrSave += L"Kickables X\n";
+
 	MSG_BOX(wstrSave.c_str());
 }
 
@@ -904,7 +931,7 @@ void CMapToolHelper::Load_Level()
 	On_DIK_Delete();
 	m_pGameInstance->Clear_Layer(LEVEL_TOOL_MAP, TEXT("Layer_Parse"));
 
-	string strLevel = m_vecLevelName[iLevelIndex + LEVEL_INTRO];
+	string strLevel = m_vecLevelName[s_iLevelIndex + LEVEL_INTRO];
 	string strFileName = "../../../objects_txt/" + strLevel + ".txt";
 
 	fstream fileStream(strFileName, ios::in | ios::binary);
@@ -964,11 +991,14 @@ void CMapToolHelper::Load_Level()
 	Load_Monsters(strLevel);
 	Load_RallyPoints(strLevel);
 	Load_Items(strLevel);
+	Load_Kickables(strLevel);
+
+	MoveToCam();
 }
 
 void CMapToolHelper::Save_MapShaderInfo()
 {
-	string tempFileName = "temp_" + m_vecMapModelNames[iMapIndex] + "_ShaderInfo.txt";
+	string tempFileName = "temp_" + m_vecMapModelNames[s_iMapIndex] + "_ShaderInfo.txt";
 
 	ofstream outputFile(tempFileName, ios::out | ios::binary);
 	if (!outputFile.is_open()) // 임시파일 열렸는지 확인
@@ -978,13 +1008,13 @@ void CMapToolHelper::Save_MapShaderInfo()
 		return;
 	}
 
-	if (vecPassIndices[iMapIndex].empty() || vecSamplingFactors[iMapIndex].empty())
+	if (s_vecPassIndices[s_iMapIndex].empty() || s_vecSamplingFactors[s_iMapIndex].empty())
 		return;
 
-	for (_int i = 0; i < vecPassIndices[iMapIndex].size(); i++)
+	for (_int i = 0; i < s_vecPassIndices[s_iMapIndex].size(); i++)
 	{
-		outputFile.write(reinterpret_cast<const char*>(&vecPassIndices[iMapIndex][i]), sizeof(vecPassIndices[iMapIndex][i]));
-		outputFile.write(reinterpret_cast<const char*>(&vecSamplingFactors[iMapIndex][i]), sizeof(vecSamplingFactors[iMapIndex][i]));
+		outputFile.write(reinterpret_cast<const char*>(&s_vecPassIndices[s_iMapIndex][i]), sizeof(s_vecPassIndices[s_iMapIndex][i]));
+		outputFile.write(reinterpret_cast<const char*>(&s_vecSamplingFactors[s_iMapIndex][i]), sizeof(s_vecSamplingFactors[s_iMapIndex][i]));
 	}
 	outputFile.close();
 
@@ -1007,8 +1037,8 @@ void CMapToolHelper::Save_MapShaderInfo()
 	char buffer[80];
 	strftime(buffer, sizeof(buffer), "%H%M%S", &timeinfo);
 
-	string fileName_Time = "../../../objects_txt/" + string(buffer) + "_" + m_vecMapModelNames[iMapIndex] + "_ShaderInfo.txt";
-	string fileName = "../../../objects_txt/" + m_vecMapModelNames[iMapIndex] + "_ShaderInfo.txt";
+	string fileName_Time = "../../../objects_txt/" + string(buffer) + "_" + m_vecMapModelNames[s_iMapIndex] + "_ShaderInfo.txt";
+	string fileName = "../../../objects_txt/" + m_vecMapModelNames[s_iMapIndex] + "_ShaderInfo.txt";
 	if (rename(fileName.c_str(), fileName_Time.c_str()) != 0)
 	{
 		MSG_BOX(TEXT("Failed to rename original file."));
@@ -1023,21 +1053,21 @@ void CMapToolHelper::Save_MapShaderInfo()
 		return;
 	}
 
-	wstring wstrSaveMsg = CUtils::StrToWstr(string(m_vecMapModelNames[iMapIndex] + "_ShaderInfo")) + TEXT(" Saved.");
+	wstring wstrSaveMsg = CUtils::StrToWstr(string(m_vecMapModelNames[s_iMapIndex] + "_ShaderInfo")) + TEXT(" Saved.");
 	MSG_BOX(wstrSaveMsg.c_str());
 }
 
 void CMapToolHelper::Load_MapShaderInfo()
 {
-	if (vecPassIndices.empty() || vecSamplingFactors.empty())
+	if (s_vecPassIndices.empty() || s_vecSamplingFactors.empty())
 		return;
 
-	string strFileName = "../../../objects_txt/" + m_vecMapModelNames[iMapIndex] + "_ShaderInfo.txt";
+	string strFileName = "../../../objects_txt/" + m_vecMapModelNames[s_iMapIndex] + "_ShaderInfo.txt";
 
 	fstream fileStream(strFileName, ios::in | ios::binary);
 	if (fileStream.is_open() == false)
 	{
-		wstring wstrError = TEXT("Failed to open : ") + CUtils::StrToWstr(m_vecMapModelNames[iMapIndex]) + TEXT("_ShaderInfo.txt");
+		wstring wstrError = TEXT("Failed to open : ") + CUtils::StrToWstr(m_vecMapModelNames[s_iMapIndex]) + TEXT("_ShaderInfo.txt");
 		MSG_BOX(wstrError.c_str());
 		return;
 	}
@@ -1055,8 +1085,8 @@ void CMapToolHelper::Load_MapShaderInfo()
 		if (fileStream.eof())
 			break;
 
-		vecPassIndices[iMapIndex][iCount] = iPassIndex;
-		vecSamplingFactors[iMapIndex][iCount] = fSamplingFactor;
+		s_vecPassIndices[s_iMapIndex][iCount] = iPassIndex;
+		s_vecSamplingFactors[s_iMapIndex][iCount] = fSamplingFactor;
 		pBasicMap->Set_PassIndex(iCount, iPassIndex);
 		pBasicMap->Set_SamplingFactor(iCount, fSamplingFactor);
 		iCount++;
@@ -1120,7 +1150,7 @@ CGameObject* CMapToolHelper::Select_ModelByPicking(const wstring& wstrLayerTag)
 		if (vecPickPos[i].w < fShortest) {
 			fShortest = vecPickPos[i].w;
 			pResult = vecPickedObjects[i];
-			iPickedMeshIndex = vecMeshIndex[i];
+			s_iPickedMeshIndex = vecMeshIndex[i];
 		}
 	}
 
@@ -1193,6 +1223,14 @@ _bool CMapToolHelper::IsItem(const string& _strModelName)
 _bool CMapToolHelper::IsRallyingMonster(const string& _strModelName)
 {
 	if (m_setRallyingMonsters.end() != m_setRallyingMonsters.find(_strModelName))
+		return true;
+
+	return false;
+}
+
+_bool CMapToolHelper::IsKickble(const string& _strModelName)
+{
+	if (m_setKickables.end() != m_setKickables.find(_strModelName))
 		return true;
 
 	return false;
@@ -1304,6 +1342,77 @@ _bool CMapToolHelper::ExcludeModel(string& _strModelName)
 	return _bool();
 }
 
+void CMapToolHelper::MoveToCam()
+{
+	list<CGameObject*>* pObjList = m_pGameInstance->Get_List(LEVEL_TOOL_MAP, TEXT("Layer_Parse"));
+	if (nullptr == pObjList)
+		return;
+	if (pObjList->empty())
+		return;
+	CGameObject* pCamera = m_pGameInstance->Get_GameObject(LEVEL_TOOL_MAP, TEXT("Layer_Camera"));
+	if (nullptr == pCamera)
+		return;
+	CTransform* pCamTransform = pCamera->Get_TransformCom();
+	if (nullptr == pCamTransform)
+		return;
+	CMapToolObject* pMapToolObject = { nullptr };
+
+	for (auto& obj : *pObjList)
+	{
+		if (nullptr == obj)
+			continue;
+
+		CModel* pModel = dynamic_cast<CModel*>(obj->Get_Component(TEXT("Com_Model")));
+		if (nullptr == pModel)
+			continue;
+
+		string strModelName = pModel->Get_ModelName();
+		if (strModelName == "Camera")
+		{
+			pMapToolObject = dynamic_cast<CMapToolObject*>(obj);
+			break;
+		}
+	}
+
+	if (nullptr == pMapToolObject)
+		return;
+
+	CTransform* pTransform = pMapToolObject->Get_TransformCom();
+	if (nullptr == pTransform)
+		return;
+
+	_vector vPos = pTransform->Get_State(CTransform::STATE_POSITION);
+	_vector vLook = XMVector3Normalize(pTransform->Get_State(CTransform::STATE_LOOK));
+	_vector vUp = XMVector3Normalize(pTransform->Get_State(CTransform::STATE_UP));
+
+	_vector vNewPos = vPos - vLook * 35.f + vUp * 30.f;
+
+	pCamTransform->Set_State(CTransform::STATE_POSITION, vNewPos);
+	pCamTransform->Look_At(vPos + vUp * 15.f);
+}
+
+void CMapToolHelper::DisableOtherGroups(_int* _pCurTxtGroup)
+{
+	for (auto& txtIndex : m_vecTxtIndices)
+	{
+		if (_pCurTxtGroup == txtIndex)
+			continue;
+
+		*txtIndex = -1;
+	}
+}
+
+_bool CMapToolHelper::IsAnythingSelected()
+{
+	for (auto& txtIndex : m_vecTxtIndices)
+	{
+		if (*txtIndex != -1)
+			return true;
+	}
+
+	return _bool();
+}
+
 void CMapToolHelper::Reset_MapShaderInfo()
 {
 	if (nullptr == m_pPickedObject)
@@ -1314,22 +1423,19 @@ void CMapToolHelper::Reset_MapShaderInfo()
 		return;
 
 	_int iNumMesh = pModel->Get_NumMeshes();
-	vecPassIndices[iMapIndex].resize(iNumMesh);
-	vecSamplingFactors[iMapIndex].resize(iNumMesh);
-	fill(vecSamplingFactors[iMapIndex].begin(), vecSamplingFactors[iMapIndex].end(), 1.f);
+	s_vecPassIndices[s_iMapIndex].resize(iNumMesh);
+	s_vecSamplingFactors[s_iMapIndex].resize(iNumMesh);
+	fill(s_vecSamplingFactors[s_iMapIndex].begin(), s_vecSamplingFactors[s_iMapIndex].end(), 1.f);
 }
 
 void CMapToolHelper::Save_Octree()
 {
 	CBasicMap* pBasicMap = dynamic_cast<CBasicMap*>(m_pPickedObject);
-	pBasicMap->Save_OctreeData(m_vecLevelName[iLevelIndex + LEVEL_INTRO]);
+	pBasicMap->Save_OctreeData(m_vecLevelName[s_iLevelIndex + LEVEL_INTRO]);
 }
 
 _bool CMapToolHelper::Save_Map(const string& _strLevel, vector<CGameObject*>& _vecMap)
 {
-	if (_vecMap.empty())
-		return true;
-
 	string strCustom = "_Map";
 	string tempFileName = "temp_" + _strLevel + strCustom + ".txt";
 
@@ -1382,9 +1488,6 @@ _bool CMapToolHelper::Save_Map(const string& _strLevel, vector<CGameObject*>& _v
 
 _bool CMapToolHelper::Save_Triggers(const string& _strLevel, vector<CGameObject*>& _vecTriggers)
 {
-	if (_vecTriggers.empty())
-		return true;
-
 	string strCustom = "_Triggers";
 	string tempFileName = "temp_" + _strLevel + strCustom + ".txt";
 
@@ -1446,9 +1549,6 @@ _bool CMapToolHelper::Save_Triggers(const string& _strLevel, vector<CGameObject*
 
 _bool CMapToolHelper::Save_Monsters(const string& _strLevel, vector<CGameObject*>& _vecMonsters)
 {
-	if (_vecMonsters.empty())
-		return true;
-
 	string strCustom = "_Monsters";
 	string tempFileName = "temp_" + _strLevel + strCustom + ".txt";
 
@@ -1517,9 +1617,6 @@ _bool CMapToolHelper::Save_Monsters(const string& _strLevel, vector<CGameObject*
 
 _bool CMapToolHelper::Save_RallyPoints(const string& _strLevel, vector<CGameObject*>& _vecRallyPoints)
 {
-	if(_vecRallyPoints.empty())
-		return true;
-
 	string strCustom = "_RallyPoints";
 	string tempFileName = "temp_" + _strLevel + strCustom + ".txt";
 
@@ -1575,9 +1672,6 @@ _bool CMapToolHelper::Save_RallyPoints(const string& _strLevel, vector<CGameObje
 
 _bool CMapToolHelper::Save_Decos(const string& _strLevel, vector<CGameObject*>& _vecDecos)
 {
-	if (_vecDecos.empty())
-		return true;
-
 	string strCustom = "_DecoObjs";
 	string tempFileName = "temp_" + _strLevel + strCustom + ".txt";
 
@@ -1647,10 +1741,57 @@ _bool CMapToolHelper::Save_Decos(const string& _strLevel, vector<CGameObject*>& 
 
 _bool CMapToolHelper::Save_Items(const string& _strLevel, vector<CGameObject*>& _vecItems)
 {
-	if (_vecItems.empty())
-		return true;
-
 	string strCustom = "_Items";
+	string tempFileName = "temp_" + _strLevel + strCustom + ".txt";
+
+	ofstream outputFile(tempFileName, ios::out | ios::binary);
+	if (!outputFile.is_open()) // 임시파일 열렸는지 확인
+	{
+		wstring wstrErrorMsg = TEXT("Failed to Open: ") + CUtils::StrToWstr(tempFileName);
+		MSG_BOX(wstrErrorMsg.c_str());
+		return false;
+	}
+
+	_uint iNumObjects = _vecItems.size();
+	outputFile.write(reinterpret_cast<const char*>(&iNumObjects), sizeof(iNumObjects));
+
+	for (auto& item : _vecItems)
+	{
+		CModel* pModel = dynamic_cast<CModel*>(item->Get_Component(TEXT("Com_Model")));
+		CTransform* pTransform = dynamic_cast<CTransform*>(item->Get_Component(g_strTransformTag));
+
+		string strModelName = pModel->Get_ModelInfo().strModelName;
+		_float4x4 matWorld = pTransform->Get_WorldMatrix();
+		_uint iStrLength = strModelName.length();
+		_uint iShaderVars = item->Get_ShaderVars();
+		_float fRimWidth = item->Get_RimWidth();
+
+		outputFile.write(reinterpret_cast<const char*>(&iStrLength), sizeof(iStrLength));
+		outputFile.write(strModelName.c_str(), iStrLength);
+		outputFile.write(reinterpret_cast<const char*>(&matWorld), sizeof(_float4x4));
+		outputFile.write(reinterpret_cast<const char*>(&iShaderVars), sizeof(iShaderVars));
+		outputFile.write(reinterpret_cast<const char*>(&fRimWidth), sizeof(fRimWidth));
+	}
+
+	outputFile.close();
+
+	if (!outputFile)
+	{
+		wstring wstrError = TEXT("Failed to write data to ") + CUtils::StrToWstr(tempFileName);
+		MSG_BOX(wstrError.c_str());
+		remove(tempFileName.c_str()); // 임시파일 삭제
+		return false;
+	}
+
+	if (false == RenameFile(_strLevel, tempFileName, strCustom))
+		return false;
+
+	return true;
+}
+
+_bool CMapToolHelper::Save_Kickables(const string& _strLevel, vector<CGameObject*>& _vecItems)
+{
+	string strCustom = "_Kickables";
 	string tempFileName = "temp_" + _strLevel + strCustom + ".txt";
 
 	ofstream outputFile(tempFileName, ios::out | ios::binary);
@@ -1991,6 +2132,55 @@ void CMapToolHelper::Load_Items(const string& _strLevel)
 	if (fileInput.is_open() == false)
 	{
 		wstring wstrError = TEXT("Failed to open : ") + CUtils::StrToWstr(_strLevel) + TEXT("_Items.txt");
+		MSG_BOX(wstrError.c_str());
+		return;
+	}
+
+	_uint iNumObjects{};
+	fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
+
+	string strModelName;
+	_float4x4 matWorld{};
+	_uint iStrLength{};
+	_uint iShaderVars{};
+	_float fRimWidth{};
+	wstring wstrGameObjectTag = TEXT("MapToolObject");
+
+	for (_uint i = 0; i < iNumObjects; i++)
+	{
+		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
+		strModelName.resize(iStrLength);
+		fileInput.read(&strModelName[0], iStrLength);
+		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
+		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
+		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
+
+		CMapToolObject::MAPTOOLOBJECT_DESC tDesc{};
+		tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+		tDesc.matWorld = matWorld;
+		tDesc.iShaderVars = iShaderVars;
+		tDesc.fRimWidth = fRimWidth;
+
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
+		{
+			wstring wstrErrorMsg = TEXT("Failed to Clone: ") + wstrGameObjectTag;
+			MSG_BOX(wstrErrorMsg.c_str());
+			fileInput.close();
+			return;
+		}
+	}
+
+	fileInput.close();
+}
+
+void CMapToolHelper::Load_Kickables(const string& _strLevel)
+{
+	string strFileName = "../../../objects_txt/" + _strLevel + "_Kickables.txt";
+
+	ifstream fileInput(strFileName, ios::binary);
+	if (fileInput.is_open() == false)
+	{
+		wstring wstrError = TEXT("Failed to open : ") + CUtils::StrToWstr(_strLevel) + TEXT("_Kickables.txt");
 		MSG_BOX(wstrError.c_str());
 		return;
 	}

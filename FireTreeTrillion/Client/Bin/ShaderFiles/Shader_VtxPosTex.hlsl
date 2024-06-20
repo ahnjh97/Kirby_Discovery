@@ -198,6 +198,49 @@ PS_OUT PS_MAIN_BLEND_FX(PS_IN_ALPHABLEND In)
     return Out;
 }
 
+PS_OUT PS_MAIN_SOFTFX(PS_IN_ALPHABLEND In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+	
+    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+
+	 //소프트 이펙트 보정
+    float2 vTexcoord = (float2) 0.f;
+
+    vTexcoord.x = (In.vProjPos.x / In.vProjPos.w) * 0.5f + 0.5f;
+    vTexcoord.y = (In.vProjPos.y / In.vProjPos.w) * -0.5f + 0.5f;
+
+    float4 vDepthDesc = g_DepthTexture.Sample(PointSampler, vTexcoord);
+    float fOldViewZ = vDepthDesc.y * g_fFar;
+
+    Out.vColor.a = vDiffuse.a * saturate(fOldViewZ - In.vProjPos.w);
+    Out.vColor.rgb = vDiffuse.rgb;
+	
+    return Out;
+}
+
+PS_OUT PS_MAIN_ALPHA_SOFTFX(PS_IN_ALPHABLEND In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+	
+    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+
+	 //소프트 이펙트 보정
+    float2 vTexcoord = (float2) 0.f;
+
+    vTexcoord.x = (In.vProjPos.x / In.vProjPos.w) * 0.5f + 0.5f;
+    vTexcoord.y = (In.vProjPos.y / In.vProjPos.w) * -0.5f + 0.5f;
+
+    float4 vDepthDesc = g_DepthTexture.Sample(PointSampler, vTexcoord);
+    float fOldViewZ = vDepthDesc.y * g_fFar;
+
+    Out.vColor.a = vDiffuse.a * saturate(fOldViewZ - In.vProjPos.w) * g_fAlpha;
+    Out.vColor.rgb = vDiffuse.rgb;
+	
+    return Out;
+}
+
+
 PS_OUT PS_MAIN_DEFAULT_FX(PS_IN_ALPHABLEND In)
 {
     PS_OUT Out = (PS_OUT) 0;
@@ -286,7 +329,6 @@ PS_OUT PS_MAIN_FOR_HPDAMAGE(PS_IN_ALPHABLEND In)
         discard;
     
     //diffuse 알파 테스팅
-    //vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
     Out.vColor.rgb = g_vRColor + g_fAlarmColor;
     Out.vColor.a *= g_fAlpha;
     
@@ -425,4 +467,30 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_FOR_HPDAMAGE();
     }
 
+    // 기본 Soft Effect ( 9 )
+    pass SOFT_EFFECT
+    {
+        SetRasterizerState(RS_NonCull);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN_ALPHABLEND();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_SOFTFX();
+    }
+    // 기본 Soft Effect + 알파 ( 10 )
+    pass SOFT_ALPHA_EFFECT
+    {
+        SetRasterizerState(RS_NonCull);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN_ALPHABLEND();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_ALPHA_SOFTFX();
+    }
 }

@@ -358,14 +358,10 @@ void CKirbySword_Guard_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _
 
 	switch (_iAnimIndex)
 	{
-	case CKirby::SWORDSTATE_UPWARDSLASH:
-	{
-		SwordSlash_Up(pKirby->Get_TransformCom());
-	}
-	break;
 	case CKirby::SWORDSTATE_SWORDSLIDESTART:
 	{
 		SwordDash(pKirby->Get_TransformCom());
+		pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 	}
 	break;
 	default:
@@ -1318,6 +1314,26 @@ CKirbySword_JumpAttack_State::CKirbySword_JumpAttack_State()
 void CKirbySword_JumpAttack_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+
+
+	switch (_iAnimIndex)
+	{
+	case CKirby::SWORDSTATE_UPWARDSLASH:
+	{
+		pKirby->Delete_AllEffect();
+		SwordSlash_Up(pKirby->Get_TransformCom());
+	}
+	break;
+	case CKirby::SWORDSTATE_SWORDSPINSTART:
+	{
+		SwordSpin(pKirby->Get_TransformCom());
+	}
+	break;
+	default:
+		break;
+	}
+
 }
 
 void CKirbySword_JumpAttack_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)

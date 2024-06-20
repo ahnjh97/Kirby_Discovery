@@ -56,6 +56,8 @@ HRESULT CLevel_Intro::Initialize()
 	CHECK_FAILED(hr);
 	hr = Ready_Items();
 	CHECK_FAILED(hr);
+	hr = Ready_Kickables();
+	CHECK_FAILED(hr);
 
 	CGameObject::GAMEOBJECT_DESC ObjDesc{};
 	ObjDesc.fSpeedPerSec = 5.f;
@@ -64,10 +66,19 @@ HRESULT CLevel_Intro::Initialize()
 	InitMat.Translation({ -25.f, 17.f, 259.5f });
 	ObjDesc.matWorld = InitMat;
 
-	// Ladder Test
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Ladder"), TEXT("Prototype_GameObject_Ladder"), &ObjDesc)))
-		return E_FAIL;
+	//// Ladder Test
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Ladder"), TEXT("Prototype_GameObject_Ladder"), &ObjDesc)))
+	//	return E_FAIL;
 
+	ObjDesc = {};
+	ObjDesc.fSpeedPerSec = 5.f;
+	ObjDesc.fRotationPerSec = ToRadian(90.f);
+	InitMat = _float4x4::Identity;
+	InitMat.Translation({ -40.f, 6.7f, -8.f});
+	ObjDesc.matWorld = InitMat;
+
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Ladder"), TEXT("Prototype_GameObject_EnergyDrink"), &ObjDesc)))
+		return E_FAIL;
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
@@ -163,8 +174,47 @@ HRESULT CLevel_Intro::Ready_Layer_BackGround(const wstring& strLayerTag)
 	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_INTRO, strLayerTag, TEXT("Prototype_GameObject_SkySphere"));
 	CHECK_FAILED(hr);
 
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, strLayerTag, TEXT("Prototype_GameObject_TestMap"))))
-	//	return E_FAIL;
+
+	for (_int i = 0; i < 10; i++)
+	{
+		CGameObject::GAMEOBJECT_DESC ObjDesc{};
+		ObjDesc.fSpeedPerSec = 5.f;
+		ObjDesc.fRotationPerSec = ToRadian(90.f);
+		_float4x4 InitMat = _float4x4::Identity;
+		InitMat.Translation({ -94.5f - (i * 7.f), 1.45f, 2.25f });
+		ObjDesc.matWorld = InitMat;
+
+		// Ladder Test
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_TerrainFog"), &ObjDesc)))
+			return E_FAIL;
+	}
+	for (_int i = 0; i < 10; i++)
+	{
+		CGameObject::GAMEOBJECT_DESC ObjDesc{};
+		ObjDesc.fSpeedPerSec = 5.f;
+		ObjDesc.fRotationPerSec = ToRadian(90.f);
+		_float4x4 InitMat = _float4x4::Identity;
+		InitMat.Translation({ -91.5f - (i * 7.f), 1.45f, 5.25f });
+		ObjDesc.matWorld = InitMat;
+
+		// Ladder Test
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_TerrainFog"), &ObjDesc)))
+			return E_FAIL;
+	}
+
+	for (_int i = 0; i < 10; i++)
+	{
+		CGameObject::GAMEOBJECT_DESC ObjDesc{};
+		ObjDesc.fSpeedPerSec = 5.f;
+		ObjDesc.fRotationPerSec = ToRadian(90.f);
+		_float4x4 InitMat = _float4x4::Identity;
+		InitMat.Translation({ -94.5f - (i * 7.f), 1.45f, -1.25f });
+		ObjDesc.matWorld = InitMat;
+
+		// Ladder Test
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_TerrainFog"), &ObjDesc)))
+			return E_FAIL;
+	}
 
 	return S_OK;
 }
@@ -195,242 +245,6 @@ HRESULT CLevel_Intro::Ready_Layer_UI(const wstring& _wstrLayerTag)
 		if (FAILED(Load_FileData(strFilePath, FILE_UI, _wstrLayerTag)))
 			return E_FAIL;
 	}
-
-	return S_OK;
-}
-
-HRESULT CLevel_Intro::Ready_ParsedObjects()
-{
-	LEVEL eLevel = LEVEL_INTRO;
-
-	string strFileName = "../../../objects_txt/Intro.txt";
-	fstream fileStream(strFileName, ios::in | ios::binary);
-	if (fileStream.is_open() == false)
-	{
-		MSG_BOX(TEXT("Failed to open : Intro.txt"));
-		return E_FAIL;
-	}
-
-	string strModelName;
-	_float4x4 matWorld{};
-	_int iTriggerType{};
-	_int iTriggerIndex{};
-	_int iCamType{};
-	_float fRadius{};
-	_float4x4 matInverse{};
-	_uint iShaderVars{};
-	_float fRimWidth{};
-	map<_int, _float4x4> camMatrices;
-	map<_int, pair<_vector, _float>> frontDirRadii;
-	map<_int, pair<_vector, _float>> rearDirRadii;
-	map<_int, pair<_float4x4, _float>> triggerInfos;
-	_uint iNumRallyPoints{};
-	_float3 vRallyPointPos{};
-	vector<_float4> vecRallyPoints;
-
-	while (!fileStream.eof())
-	{
-		_uint iStrLength;
-		fileStream.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
-		strModelName.resize(iStrLength);
-		fileStream.read(&strModelName[0], iStrLength);
-		if (strModelName == "NonAnim_BrontoBurt")
-		{
-			int a = 0;
-		}
-		fileStream.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
-		fileStream.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
-		fileStream.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
-
-		if (string("Item_Coin") == strModelName)
-		{
-			_int a = 0;
-			_int b = 0;
-		}
-
-		if (fileStream.eof())
-			break;
-
-		if ("Camera" == strModelName)
-		{
-			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
-			if (fileStream.eof())
-				break;
-			camMatrices.emplace(iTriggerIndex, matWorld);
-		}
-		else if ("Trigger" == strModelName)
-		{
-			fileStream.read(reinterpret_cast<char*>(&iTriggerType), sizeof(iTriggerType));
-			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
-			if (fileStream.eof())
-				break;
-			_vector vDeterminant{};
-			matInverse = XMMatrixInverse(&vDeterminant, matWorld);
-			if (fileStream.eof())
-				break;
-			triggerInfos.emplace(iTriggerIndex, pair<_float4x4, _float>(matInverse, matWorld._33));
-		}
-		else if ("Dummy" == strModelName)
-		{
-			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
-			fileStream.read(reinterpret_cast<char*>(&iCamType), sizeof(iCamType));
-			fileStream.read(reinterpret_cast<char*>(&fRadius), sizeof(fRadius));
-			if (fileStream.eof())
-				break;
-			_vector vDir = XMVector3Normalize(XMVectorSet(matWorld._31, matWorld._32, matWorld._33, 0));
-
-			if (CAM_FRONT == iCamType)
-				frontDirRadii.emplace(iTriggerIndex, pair<_vector, _float>(vDir, fRadius));
-			else if (CAM_REAR == iCamType)
-				rearDirRadii.emplace(iTriggerIndex, pair<_vector, _float>(vDir, fRadius));
-		}
-		else if ("NonAnim" == strModelName.substr(0, 7) && strModelName.substr(strModelName.size() - 5) != "Kirby")
-		{
-			vecRallyPoints.clear();
-			fileStream.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex)); // Monster Enum
-			fileStream.read(reinterpret_cast<char*>(&iNumRallyPoints), sizeof(iNumRallyPoints));
-			for (_uint iRallyPointIdx = 0; iRallyPointIdx < iNumRallyPoints; iRallyPointIdx++) {
-				fileStream.read(reinterpret_cast<char*>(&vRallyPointPos), sizeof(vRallyPointPos));
-				if (fileStream.eof())
-					break;
-				vecRallyPoints.push_back(_float4(vRallyPointPos.x, vRallyPointPos.y, vRallyPointPos.z, 1));
-			}
-		}
-
-		if (fileStream.eof())
-			break;
-
-		CGameObject::GAMEOBJECT_DESC tempDesc = {};
-		tempDesc.matWorld = matWorld;
-		tempDesc.wstrModelName = CUtils::StrToWstr(strModelName);
-		tempDesc.iShaderVars = iShaderVars;
-		tempDesc.fRimWidth = fRimWidth;
-		if (strModelName.size() >= 8) { // NonAnim_ 부분 지우기
-			if ("NonAnim" == strModelName.substr(0, 7))
-				tempDesc.wstrModelName.erase(0, 8);
-		}
-
-		if ("NonAnim_Kirby" == strModelName)
-		{
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby"), &tempDesc)))
-				return E_FAIL;
-		}
-		else if (strModelName == "NonAnim_Awoofy")
-		{
-			CMonster::MONSTER_DESC MonsterDesc = {};
-			MonsterDesc.matWorld = matWorld;
-			MonsterDesc.wstrModelName = CUtils::StrToWstr(strModelName);
-			MonsterDesc.iShaderVars = iShaderVars;
-			MonsterDesc.fRimWidth = fRimWidth;
-			MonsterDesc.eMonState = CMonster::MONSTER_STATE(iTriggerIndex);
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Awoofy"), &MonsterDesc)))
-				return E_FAIL;
-		}
-		else if (strModelName == "NonAnim_Rabbit")
-		{
-			CRabbit::RABBIT_DESC RabbitDesc = {};
-			RabbitDesc.matWorld = matWorld;
-			RabbitDesc.wstrModelName = CUtils::StrToWstr(strModelName);
-			RabbitDesc.iShaderVars = iShaderVars;
-			RabbitDesc.fRimWidth = fRimWidth;
-			RabbitDesc.eRabbitState = CRabbit::RABBIT_STATE(iTriggerIndex);
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Rabbit"), &RabbitDesc)))
-				return E_FAIL;
-		}
-		else if (strModelName == "NonAnim_Buffahorn")
-		{
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Buffahorn"), &tempDesc)))
-				return E_FAIL;
-		}
-		else if (strModelName == "NonAnim_BladeKnight")
-		{
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BladeKnight"), &tempDesc)))
-				return E_FAIL;
-		}
-		else if (strModelName == "NonAnim_PoppyBrosJr")
-		{
-			CPoppyBrosJr::POPPY_DESC PoppyDesc = {};
-			PoppyDesc.matWorld = matWorld;
-			PoppyDesc.wstrModelName = CUtils::StrToWstr(strModelName);
-			PoppyDesc.iShaderVars = iShaderVars;
-			PoppyDesc.fRimWidth = fRimWidth;
-			PoppyDesc.ePoppyState = CPoppyBrosJr::POPPY_STATE(iTriggerIndex);
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_PoppyBrosJr"), &PoppyDesc)))
-				return E_FAIL;
-		}
-		else if (strModelName == "NonAnim_CappyBody")
-		{
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_CappyBody"), &tempDesc)))
-				return E_FAIL;
-		}
-		else if (strModelName == "NonAnim_Kabu")
-		{
-			CKabu::KABU_DESC KabuDesc = {};
-			KabuDesc.matWorld = matWorld;
-			KabuDesc.wstrModelName = CUtils::StrToWstr(strModelName);
-			KabuDesc.iShaderVars = iShaderVars;
-			KabuDesc.fRimWidth = fRimWidth;
-			KabuDesc.eMonState = CKabu::MONSTER_STATE(iTriggerIndex);
-			KabuDesc.vecRallyPoints = vecRallyPoints;
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Kabu"), &KabuDesc)))
-				return E_FAIL;
-		}
-		else if (strModelName == "NonAnim_BrontoBurt")
-		{
-			CBrontoBurt::BRONTOBURT_DESC BrontoBurtDesc = {};
-			matWorld._42 += 2.f;
-			BrontoBurtDesc.matWorld = matWorld;
-			BrontoBurtDesc.wstrModelName = CUtils::StrToWstr(strModelName);
-			BrontoBurtDesc.iShaderVars = iShaderVars;
-			BrontoBurtDesc.fRimWidth = fRimWidth;
-			BrontoBurtDesc.eMonState = CBrontoBurt::MONSTER_STATE(iTriggerIndex);
-			BrontoBurtDesc.vecRallyPoints = vecRallyPoints;
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BrontoBurt"), &BrontoBurtDesc)))
-				return E_FAIL;
-		}
-		else if (strModelName == "Level0Stage1Step01")
-		{
-			CBasicMap::MAP_DESC tMapDesc{};
-			tMapDesc.matWorld = tempDesc.matWorld;
-			tMapDesc.wstrModelName = tempDesc.wstrModelName;
-
-			_float3 vMin{}, vMax{};
-			fileStream.read(reinterpret_cast<char*>(&vMin), sizeof(vMin));
-			fileStream.read(reinterpret_cast<char*>(&vMax), sizeof(vMax));
-			if (fileStream.eof())
-				break;
-			tMapDesc.vMin = vMin;
-			tMapDesc.vMax = vMax;
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_BasicMap"), &tMapDesc)))
-				return E_FAIL;
-		}
-		else if (strModelName == "Level0Stage1Step01_Blend")
-		{
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_BasicMap"), &tempDesc)))
-				return E_FAIL;
-		}
-		else if ("Trigger" == strModelName)
-		{
-			CTrigger::TRIGGER_DESC tTriggerDesc{};
-			tTriggerDesc.matWorld = matWorld;
-			tTriggerDesc.wstrModelName = tempDesc.wstrModelName;
-			tTriggerDesc.iTriggerType = iTriggerType;
-			tTriggerDesc.iTriggerIndex = iTriggerIndex;
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Trigger"), TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc)))
-				return E_FAIL;
-		}
-		else if (strModelName == "BG0")
-		{
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_BG"), &tempDesc)))
-				return E_FAIL;
-		}
-		else if (strModelName == "Item_Coin")
-		{
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Item"), TEXT("Prototype_GameObject_Coin"), &tempDesc)))
-				return E_FAIL;
-		}
-	}
-	fileStream.close();
 
 	return S_OK;
 }
@@ -534,20 +348,16 @@ HRESULT CLevel_Intro::Ready_Triggers()
 		fileInput.read(reinterpret_cast<char*>(&iCamType), sizeof(iCamType));
 		fileInput.read(reinterpret_cast<char*>(&fRadius), sizeof(fRadius));
 
-		if ("Camera" == strModelName) {
+		if ("Camera" == strModelName)
 			camMatrices.emplace(iTriggerIndex, matWorld);
-			continue;
-		}
-		if ("Dummy" == strModelName) {
+		else if ("Dummy" == strModelName) {
 			_vector vDir = XMVector3Normalize(XMVectorSet(matWorld._31, matWorld._32, matWorld._33, 0));
 			if (CAM_FRONT == iCamType)
 				frontDirRadii.emplace(iTriggerIndex, pair<_vector, _float>(vDir, fRadius));
 			else if (CAM_REAR == iCamType)
 				rearDirRadii.emplace(iTriggerIndex, pair<_vector, _float>(vDir, fRadius));
-			continue;
 		}
-
-		if ("Trigger" == strModelName)
+		else if ("Trigger" == strModelName)
 		{
 			_vector vDeterminant{};
 			_float4x4 matInverse{};
@@ -562,8 +372,9 @@ HRESULT CLevel_Intro::Ready_Triggers()
 
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Trigger"), TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc)))
 				return E_FAIL;
+			continue;
 		}
-		if ("NonAnim_Kirby" == strModelName)
+		else if ("NonAnim_Kirby" == strModelName)
 		{
 			CGameObject::GAMEOBJECT_DESC tempDesc = {};
 			tempDesc.matWorld = matWorld;
@@ -575,6 +386,16 @@ HRESULT CLevel_Intro::Ready_Triggers()
 					tempDesc.wstrModelName.erase(0, 8);
 			}
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby"), &tempDesc)))
+				return E_FAIL;
+		}
+		else if ("Ladder" == strModelName)
+		{
+			CGameObject::GAMEOBJECT_DESC tDesc{};
+			tDesc.matWorld = matWorld;
+			tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			tDesc.iShaderVars = iShaderVars;
+			tDesc.fRimWidth = fRimWidth;
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Ladder"), TEXT("Prototype_GameObject_Ladder"), &tDesc)))
 				return E_FAIL;
 		}
 	}
@@ -710,7 +531,7 @@ HRESULT CLevel_Intro::Ready_Monsters()
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_CappyBody"), &tempDesc)))
 				return E_FAIL;
 		}
-		else if (L"NonAnim_Kabu" == tempDesc.wstrModelName)
+		else if (L"Kabu" == tempDesc.wstrModelName)
 		{
 			CKabu::KABU_DESC KabuDesc = {};
 			KabuDesc.matWorld = matWorld;
@@ -783,6 +604,51 @@ HRESULT CLevel_Intro::Ready_Items()
 				return E_FAIL;
 		}
 	}
+	fileInput.close();
+
+	return S_OK;
+}
+
+HRESULT CLevel_Intro::Ready_Kickables()
+{
+	LEVEL eLevel = LEVEL_INTRO;
+	string strFileName = "../../../objects_txt/Intro_Kickables.txt";
+
+	ifstream fileInput(strFileName, ios::binary);
+	if (fileInput.is_open() == false)
+	{
+		MSG_BOX(TEXT("Failed to open : Intro_Kickables.txt"));
+		return E_FAIL;
+	}
+
+	_uint iNumObjects{};
+	fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
+
+	_uint iStrLength{};
+	string strModelName;
+	_float4x4 matWorld{};
+	_uint iShaderVars{};
+	_float fRimWidth{};
+
+	for (_uint i = 0; i < iNumObjects; i++)
+	{
+		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
+		strModelName.resize(iStrLength);
+		fileInput.read(&strModelName[0], iStrLength);
+		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
+		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
+		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
+
+		CGameObject::GAMEOBJECT_DESC tDesc{};
+		tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+		tDesc.matWorld = matWorld;
+		tDesc.iShaderVars = iShaderVars;
+		tDesc.fRimWidth = fRimWidth;
+
+		if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Item"), TEXT("Prototype_GameObject_KickableRock"), &tDesc)))
+			return E_FAIL;		
+	}
+
 	fileInput.close();
 
 	return S_OK;

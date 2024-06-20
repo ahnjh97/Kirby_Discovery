@@ -28,7 +28,7 @@ public:
 	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
 private:
-	HRESULT			Add_Components();
+	HRESULT			Add_Components(const wstring& wstrModelName);
 	HRESULT			Bind_ShaderResources();
 
 private:
@@ -40,6 +40,11 @@ private:
 	_float			m_fDeadTime = { 0.f };
 
 	_bool			m_bLockCollision = { false };
+
+	void			Compute_MotionBlur();
+	_float2			m_vPreScreenPos = { 0.f, 0.f };
+	_float4			m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
+
 
 public:
 	static CKickableRock*	 Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
