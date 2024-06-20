@@ -99,8 +99,16 @@ _int CPoppyBomb::Tick(_float fTimeDelta)
 
 		// ÀÌµ¿
 		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-		vPos += (vVelocity + (XMVector3Normalize(m_vLookDir) * 0.2f * m_fMoveTime)) * m_fTimeDelta * 20.f;
-		m_pControllerCom->Move(m_pTransformCom, vPos, m_fTimeDelta);
+		if(XMVector3Equal(vAcceleration, XMVectorZero()))
+		{
+			vPos += (vVelocity + (XMVector3Normalize(m_vLookDir) * 0.2f)) * m_fTimeDelta * 30.f;
+			m_pControllerCom->Move(m_pTransformCom, vPos, m_fTimeDelta);
+		}
+		else
+		{
+			vPos += (vVelocity + (XMVector3Normalize(m_vLookDir) * 0.2f * m_fMoveTime)) * m_fTimeDelta * 30.f;
+			m_pControllerCom->Move(m_pTransformCom, vPos, m_fTimeDelta);
+		}
 
 		//_float fHeight = m_pControllerCom->Compute_Height();
 

@@ -288,7 +288,7 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Item\Ability">
       <UniqueIdentifier>{4ee32ea7-86a0-4289-a776-d1fce969bca4}</UniqueIdentifier>
-	</Filter>
+    </Filter>
     <Filter Include="02.GameObjects\Map\TerrainFog">
       <UniqueIdentifier>{631580d9-5ad3-41b9-b6d7-5fcc5394b093}</UniqueIdentifier>
     </Filter>
@@ -557,9 +557,6 @@
     <ClInclude Include="..\Public\CappyHat_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\Cappy\State</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\BladeKnightSword.h">
-      <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\State</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\KickableRock.h">
       <Filter>02.GameObjects\PhysXObject\RigidObject\Rock\Kickable</Filter>
     </ClInclude>
@@ -586,9 +583,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\Ability.h">
       <Filter>02.GameObjects\PhysXObject\Item\Ability</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\Public\TerrainFog.h">
       <Filter>02.GameObjects\Map\TerrainFog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BladeKnightSword.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -863,7 +863,7 @@
     </ClCompile>
     <ClCompile Include="..\Private\Ability.cpp">
       <Filter>02.GameObjects\PhysXObject\Item\Ability</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="..\Private\TerrainFog.cpp">
       <Filter>02.GameObjects\Map\TerrainFog</Filter>
     </ClCompile>
