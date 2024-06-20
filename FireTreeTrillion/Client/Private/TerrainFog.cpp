@@ -27,6 +27,8 @@ HRESULT CTerrainFog::Initialize(void* pArg)
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;
+
+	return S_OK;
 }
 
 _int CTerrainFog::Tick(_float fTimeDelta)

@@ -23,6 +23,7 @@ public:
 		_int iTriggerIndex = { -1 };
 		_float fRadius = { 0.f };
 		_int iCamType = { -1 };
+		_int iPassIndex = { 0 };
 		map<_uint, _float3> RallyPoints;
 		string strConnectedMonster;
 		TYPE_MAPOBJ eMapObjType = { MAPOBJ_END };
@@ -36,6 +37,7 @@ public:
 	string Get_ConnectedMonster() { return m_strConnectedMonster; }
 	map<_uint, _float3>& Get_RallyPoints() { return m_RallyPoints; }
 	TYPE_MAPOBJ Get_MapObjType() { return m_eMapObjType; }
+	_int Get_PassIndex() { return m_iPassIndex; }
 
 	virtual void Set_Hide(_bool bHide) { m_bHide = bHide; if (nullptr != m_pOrbitingCamera) m_pOrbitingCamera->Set_Hide(bHide); }
 
@@ -45,6 +47,7 @@ public:
 	void Set_Radius(_float fRadius) { m_fRadius = fRadius; }
 	void Set_ConnectedMonster(string& strConnectedMonster) { m_strConnectedMonster = strConnectedMonster; }
 	void Set_MapObjType(TYPE_MAPOBJ eMapObjType){}
+	void Set_PassIndex(_int iPassIndex) { m_iPassIndex = iPassIndex; }
 
 private:
 	CMapToolObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -69,6 +72,7 @@ private:
 	_int m_iTriggerIndex = { -1 };
 	_float m_fRadius = { 0.f };
 	_int m_iCamType = { -1 };
+	_int m_iPassIndex = { 0 };
 
 	string m_strConnectedMonster;
 	map<_uint, _float3> m_RallyPoints;
@@ -78,6 +82,7 @@ private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
 	COrbitingCamera* m_pOrbitingCamera = { nullptr };
+	class CMapToolHelper* m_pMapToolHelper = { nullptr };
 
 private:
 	HRESULT Add_Components(const wstring& _wstrModelTag);
