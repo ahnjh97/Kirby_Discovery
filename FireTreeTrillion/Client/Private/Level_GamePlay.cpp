@@ -188,13 +188,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& _wstrLayerTag)
 	{
 		{CHUD::HUD_KIRBYHP, "HUD_KirbyStatus"},
 		{CHUD::HUD_STARPOINT, "HUD_StarPoint"},
-		//{CHUD::STAT_NONE, "LayerUI"},
+		{CHUD::HUD_ABILITYDISCARD, "HUD_AbilityDiscard"},
 	};
-
-
-	//auto it = HUDmap.find(eHUDType);
-	//if (it != HUDmap.end()) { strUITag = it->second;	}
-	//else {	strUITag = "LayerUI"; }
 
 	for (const auto& [eHUDType, strUITag] : HUDmap)
 	{
@@ -308,20 +303,16 @@ HRESULT CLevel_GamePlay::Ready_Triggers()
 		fileInput.read(reinterpret_cast<char*>(&iCamType), sizeof(iCamType));
 		fileInput.read(reinterpret_cast<char*>(&fRadius), sizeof(fRadius));
 
-		if ("Camera" == strModelName) {
+		if ("Camera" == strModelName)
 			camMatrices.emplace(iTriggerIndex, matWorld);
-			continue;
-		}
-		if ("Dummy" == strModelName) {
+		else if ("Dummy" == strModelName) {
 			_vector vDir = XMVector3Normalize(XMVectorSet(matWorld._31, matWorld._32, matWorld._33, 0));
 			if (CAM_FRONT == iCamType)
 				frontDirRadii.emplace(iTriggerIndex, pair<_vector, _float>(vDir, fRadius));
 			else if (CAM_REAR == iCamType)
 				rearDirRadii.emplace(iTriggerIndex, pair<_vector, _float>(vDir, fRadius));
-			continue;
 		}
-
-		if ("Trigger" == strModelName)
+		else if ("Trigger" == strModelName)
 		{
 			_vector vDeterminant{};
 			_float4x4 matInverse{};
@@ -337,7 +328,7 @@ HRESULT CLevel_GamePlay::Ready_Triggers()
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Trigger"), TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc)))
 				return E_FAIL;
 		}
-		if ("NonAnim_Kirby" == strModelName)
+		else if ("NonAnim_Kirby" == strModelName)
 		{
 			CGameObject::GAMEOBJECT_DESC tempDesc = {};
 			tempDesc.matWorld = matWorld;
@@ -349,6 +340,23 @@ HRESULT CLevel_GamePlay::Ready_Triggers()
 					tempDesc.wstrModelName.erase(0, 8);
 			}
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby"), &tempDesc)))
+				return E_FAIL;
+		}
+		else if ("Ladder" == strModelName)
+		{
+			CGameObject::GAMEOBJECT_DESC tDesc{};
+			tDesc.matWorld = matWorld;
+			tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			tDesc.iShaderVars = iShaderVars;
+			tDesc.fRimWidth = fRimWidth;
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Ladder"), TEXT("Prototype_GameObject_Ladder"), &tDesc)))
+				return E_FAIL;
+		}
+		else if ("Fog" == strModelName)
+		{
+			CGameObject::GAMEOBJECT_DESC tDesc{};
+			tDesc.matWorld = matWorld;
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_TerrainFog"), &tDesc)))
 				return E_FAIL;
 		}
 	}
@@ -678,7 +686,7 @@ HRESULT CLevel_GamePlay::Load_FileData(const string& _strFilePath, FILE_TYPE _eF
 			strProtoTag += strUITag;
 		}
 
-		HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, _wstrLayerTag, CUtils::StrToWstr(strProtoTag), &LayerUIDesc);
+ 		HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, _wstrLayerTag, CUtils::StrToWstr(strProtoTag), &LayerUIDesc);
 		CHECK_FAILED(hr);
 	}
 

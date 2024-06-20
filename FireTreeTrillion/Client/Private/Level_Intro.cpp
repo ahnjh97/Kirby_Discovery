@@ -59,27 +59,6 @@ HRESULT CLevel_Intro::Initialize()
 	hr = Ready_Kickables();
 	CHECK_FAILED(hr);
 
-	CGameObject::GAMEOBJECT_DESC ObjDesc{};
-	ObjDesc.fSpeedPerSec = 5.f;
-	ObjDesc.fRotationPerSec = ToRadian(90.f);
-	_float4x4 InitMat = _float4x4::Identity;
-	InitMat.Translation({ -25.f, 17.f, 259.5f });
-	ObjDesc.matWorld = InitMat;
-
-	//// Ladder Test
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Ladder"), TEXT("Prototype_GameObject_Ladder"), &ObjDesc)))
-	//	return E_FAIL;
-
-	ObjDesc = {};
-	ObjDesc.fSpeedPerSec = 5.f;
-	ObjDesc.fRotationPerSec = ToRadian(90.f);
-	InitMat = _float4x4::Identity;
-	InitMat.Translation({ -40.f, 6.7f, -8.f});
-	ObjDesc.matWorld = InitMat;
-
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Ladder"), TEXT("Prototype_GameObject_EnergyDrink"), &ObjDesc)))
-		return E_FAIL;
-
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
 	return S_OK;
@@ -184,9 +163,9 @@ HRESULT CLevel_Intro::Ready_Layer_BackGround(const wstring& strLayerTag)
 		InitMat.Translation({ -94.5f - (i * 7.f), 1.45f, 2.25f });
 		ObjDesc.matWorld = InitMat;
 
-		// Ladder Test
-		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_TerrainFog"), &ObjDesc)))
-			return E_FAIL;
+		//// Ladder Test
+		//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_TerrainFog"), &ObjDesc)))
+		//	return E_FAIL;
 	}
 	for (_int i = 0; i < 10; i++)
 	{
@@ -197,9 +176,9 @@ HRESULT CLevel_Intro::Ready_Layer_BackGround(const wstring& strLayerTag)
 		InitMat.Translation({ -91.5f - (i * 7.f), 1.45f, 5.25f });
 		ObjDesc.matWorld = InitMat;
 
-		// Ladder Test
-		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_TerrainFog"), &ObjDesc)))
-			return E_FAIL;
+		//// Ladder Test
+		//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_TerrainFog"), &ObjDesc)))
+		//	return E_FAIL;
 	}
 
 	for (_int i = 0; i < 10; i++)
@@ -211,9 +190,9 @@ HRESULT CLevel_Intro::Ready_Layer_BackGround(const wstring& strLayerTag)
 		InitMat.Translation({ -94.5f - (i * 7.f), 1.45f, -1.25f });
 		ObjDesc.matWorld = InitMat;
 
-		// Ladder Test
-		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_TerrainFog"), &ObjDesc)))
-			return E_FAIL;
+		//// Ladder Test
+		//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_TerrainFog"), &ObjDesc)))
+		//	return E_FAIL;
 	}
 
 	return S_OK;
@@ -229,7 +208,7 @@ HRESULT CLevel_Intro::Ready_Layer_UI(const wstring& _wstrLayerTag)
 	{
 		{CHUD::HUD_KIRBYHP, "HUD_KirbyStatus"},
 		{CHUD::HUD_STARPOINT, "HUD_StarPoint"},
-		//{CHUD::STAT_NONE, "LayerUI"},
+		{CHUD::HUD_ABILITYDISCARD, "HUD_AbilityDiscard"},
 	};
 
 	//auto it = HUDmap.find(eHUDType);
@@ -396,6 +375,13 @@ HRESULT CLevel_Intro::Ready_Triggers()
 			tDesc.iShaderVars = iShaderVars;
 			tDesc.fRimWidth = fRimWidth;
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Ladder"), TEXT("Prototype_GameObject_Ladder"), &tDesc)))
+				return E_FAIL;
+		}
+		else if ("Fog" == strModelName)
+		{
+			CGameObject::GAMEOBJECT_DESC tDesc{};
+			tDesc.matWorld = matWorld;
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_TerrainFog"), &tDesc)))
 				return E_FAIL;
 		}
 	}
@@ -600,7 +586,12 @@ HRESULT CLevel_Intro::Ready_Items()
 
 		if ("Item_Coin" == strModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Item"), TEXT("Prototype_GameObject_Coin"), &tDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NoVacuumItem"), TEXT("Prototype_GameObject_Coin"), &tDesc)))
+				return E_FAIL;
+		}
+		else if ("Item_EnergyDrink" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NoVacuumItem"), TEXT("Prototype_GameObject_EnergyDrink"), &tDesc)))
 				return E_FAIL;
 		}
 	}

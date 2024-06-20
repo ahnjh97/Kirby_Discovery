@@ -212,6 +212,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\Public\HUD.h" />
+    <ClInclude Include="..\Public\HUD_AbilityDiscard.h" />
     <ClInclude Include="..\Public\HUD_KirbyStatus.h" />
     <ClInclude Include="..\Public\HUD_StarPoint.h" />
     <ClInclude Include="..\Public\ImSequencer.h">
@@ -332,6 +333,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\Private\HUD.cpp" />
+    <ClCompile Include="..\Private\HUD_AbilityDiscard.cpp" />
     <ClCompile Include="..\Private\HUD_KirbyStatus.cpp" />
     <ClCompile Include="..\Private\HUD_StarPoint.cpp" />
     <ClCompile Include="..\Private\ImSequencer.cpp">

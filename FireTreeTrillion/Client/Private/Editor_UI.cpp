@@ -965,7 +965,7 @@ wstring CEditor_UI::Edit_LayerUITag(string _strInput)
 	return wstring();
 }
 
-//완료) 직교/원근 투영 조정
+//완료) 직교/원근 투영 조정 > 현재 정보만 알면되는 상태
 _bool CEditor_UI::Edit_Projection(CUIObject* _pUIObj)
 {	
 	//뷰 행렬

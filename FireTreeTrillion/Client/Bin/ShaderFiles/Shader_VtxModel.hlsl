@@ -7,8 +7,10 @@ texture2D   g_MaskTexture;
 texture2D	g_NormalTexture;
 texture2D   g_DepthTexture;
 texture2D   g_MRATexture;
+
 uint        g_iTriggerType;
 
+texture2D g_ObjNearClipTexture;
 
 bool g_bStencil;
 bool g_bRimLight;
@@ -372,6 +374,9 @@ PS_OUT_EFFECT PS_MAIN_WHITE_FX(PS_IN In)
 {
     PS_OUT_EFFECT Out = (PS_OUT_EFFECT) 0;
 
+    if(g_fAlpha == 0)
+        discard;
+    
     vector vMask = g_MaskTexture.Sample(ClampSampler, RotateUV(In.vTexcoord + g_vMaskUVOffset, g_fMaskUVAngle));
     
     //마스크 자르기
@@ -407,6 +412,55 @@ PS_OUT_LIGHTDEPTH PS_MAIN_DEFERREDINFO(PS_IN In)
     return Out;
 }
 
+
+PS_OUT PS_MAIN_NEARCLIP(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    if (0.3f >= vMtrlDiffuse.a)
+        discard;
+
+    vector vViewPos = g_WorldMatrix._41_42_43_44;
+    vViewPos = mul(vViewPos, g_ViewMatrix);
+    
+    if (vViewPos.z < 8.0)
+    {
+        float2 vPixelTexcoord = (float2) 0.f;
+        vPixelTexcoord.x = (In.vProjPos.x / In.vProjPos.w) * 0.5f + 0.5f;
+        vPixelTexcoord.y = (In.vProjPos.y / In.vProjPos.w) * -0.5f + 0.5f;
+        
+        vector vNearClipDesc = g_ObjNearClipTexture.Sample(LinearSampler, vPixelTexcoord * 100);
+        if (pow(saturate((vViewPos.z / 8) - .1), 3) < vNearClipDesc.r)
+            discard;
+    }
+    
+    vector vNormalDesc = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
+    float3 vNormal = vNormalDesc.xyz * 2.f - 1.f;
+    float3x3 WorldMatrix = float3x3(In.vTangent, In.vBinormal, In.vNormal);
+    float3 vWorldNormal = mul(vNormal, WorldMatrix);
+
+    
+    Out.vDiffuse = vMtrlDiffuse;
+    Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
+    
+    
+    if (g_bStencil == true)
+        Out.vStencil = vector(1.f, 0.f, 0.0f, 1.f);
+    
+    if (g_bRimLight == true)
+        Out.vRimLight = vector(0.f, m_fRimWidth, 1.f, 1.f);
+
+    if (g_bMotionBlur == true)
+        Out.vMotionBlur = g_vMotionVelocity;
+    
+    if (Out.vMRA.b < 0.001)
+        Out.vMRA.b = 1.f;
+
+    return Out;
+}
 
 technique11 DefaultTechnique
 {
@@ -567,5 +621,19 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 FOR_KIRBY_PARTOBJECT();
+    }
+
+    // 가까이오면 잘리는 패스(12)
+    pass NearClip
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_NEARCLIP();
     }
 }

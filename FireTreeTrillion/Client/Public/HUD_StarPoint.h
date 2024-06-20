@@ -44,10 +44,11 @@ public:
 	virtual void				Free() override;
 
 private:
+	class CKirby*				m_pKirby = { nullptr };
 
 	_bool						m_IsMovingUP = { TRUE };
 	_bool						m_IsLootTrigger = { FALSE };
-	_bool						m_IsKirbyEX = { FALSE };
+	_bool						m_IsKirbyExist = { FALSE };
 
 	STARPOINT_STATE				m_ePreState = { STARPOINT_NONE };
 	STARPOINT_STATE				m_eCurState = { STARPOINT_NONE };
@@ -56,6 +57,7 @@ private:
 
 	_float4						m_vInitPos = { 0.f, 0.f, 0.f, 1.f };
 	_float3						m_vInitSize = { 0.f, 0.f, 0.f };
+	_float						m_fInitAlpha = { 0.f };
 
 };
 
