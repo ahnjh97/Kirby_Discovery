@@ -7,6 +7,7 @@ texture2D   g_MaskTexture;
 texture2D	g_NormalTexture;
 texture2D   g_DepthTexture;
 texture2D   g_MRATexture;
+
 uint        g_iTriggerType;
 
 texture2D g_ObjNearClipTexture;

@@ -12,8 +12,6 @@ BEGIN(Client)
 
 class CBasicMap final : public CGameObject
 {
-	enum TEX_MAP { TEX_NOISE, TEX_HEIGHT, TEX_END };
-
 public:
 	struct MAP_DESC : public GAMEOBJECT_DESC
 	{
@@ -49,7 +47,7 @@ private:
 	CShader* m_pShaderCom = { nullptr };
 	CShader* m_pNonAnimShaderCom = { nullptr };
 	CShader* m_pAnimShaderCom = { nullptr };
-	CTexture* m_pTextureCom[TEX_END] = {nullptr};
+	CTexture* m_pTextureCom = { nullptr };
 	CGameObject* m_pBlendMap = { nullptr }; 
 
 	vector<_uint> m_vecPassIndices;
