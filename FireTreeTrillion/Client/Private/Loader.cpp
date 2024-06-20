@@ -659,6 +659,7 @@ HRESULT CLoader::Loading_For_Tool_UI()
 
 HRESULT CLoader::Add_Models(LEVEL eLevel)
 {
+	HRESULT hr;
 	// SetUp_ModelScaleRotation 함수에서 모아놓은 Model들을 타입에 따라서 Component 생성한다.
 	for (auto& ModelInfo : m_vecModelInfo)
 	{
@@ -674,9 +675,13 @@ HRESULT CLoader::Add_Models(LEVEL eLevel)
 
 		wstring wstrModelName = CUtils::StrToWstr(ModelInfo.strModelName);
 		wstring wstrPrototypeTag = L"Prototype_Component_Model_" + wstrModelName;
-		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag,
-			CModel::Create(m_pDevice, m_pContext, ModelInfo))))
-			return E_FAIL;
+
+		hr = m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CModel::Create(m_pDevice, m_pContext, ModelInfo));
+		CHECK_FAILED(hr);
+
+		//if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag,
+		//	CModel::Create(m_pDevice, m_pContext, ModelInfo))))
+		//	return E_FAIL;
 	}
 
 	return S_OK;
@@ -795,7 +800,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		// For Kirby Weapon
 		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("KirbyBombDefault", TYPE_ANIM, 1.3f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyBombDefault", TYPE_ANIM, 1.3f, 180.f);
+
 		// For Kirby Armour
 		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
