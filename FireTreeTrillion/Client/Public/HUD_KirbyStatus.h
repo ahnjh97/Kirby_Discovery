@@ -40,14 +40,14 @@ private:
 	void						Compute_Player_Hp(_float fTimeDelta, class CKirby* pKirby);
 
 private:
-	_bool						m_IsMovingUP = { TRUE };
-	_bool						m_IsKirbyEX = { FALSE };
+	_bool							m_IsMovingUP = { TRUE };
+	_bool							m_IsKirbyExistence = { FALSE };
 
 	KIRBYHP_STATE					m_ePreState = { KIRBYHP_NONE };
 	KIRBYHP_STATE					m_eCurState = { KIRBYHP_NONE };
 
 	// 마스킹을 위한 텍스쳐
-	CTexture*					m_pTextureMask = { nullptr };
+	CTexture*					m_pTexMask = { nullptr };
 
 	// 분홍색 게이지에 대한 마스킹 비율
 	_float						m_fHpRatio = { 1.f };

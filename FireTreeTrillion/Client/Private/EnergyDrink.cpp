@@ -49,16 +49,8 @@ HRESULT CEnergyDrink::Initialize(void* pArg)
 	FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
 	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_ItemBubble1"), &FXDesc)))
 		return E_FAIL;
+
 	Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
-
-
-	/*CEffect::FX_DESC ParticleDesc{};
-	ParticleDesc.vInitPos = { 0.f, .3f, 0.f };
-	ParticleDesc.pSocketMatrix = &m_EffectSocket;
-	ParticleDesc.vInitScale = { 1.f, 1.f, 1.f };
-	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Item Sparkle A"), &ParticleDesc)))
-		return E_FAIL;
-	Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));*/
 
 
 	return S_OK;

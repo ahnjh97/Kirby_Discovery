@@ -7,6 +7,8 @@ BEGIN(Engine)
 class ENGINE_DLL CUIObject abstract : public CGameObject
 {
 protected:
+	enum TEX_TYPE { TEX_DIFFUSE, TEX_MASK, TEX_NONE };
+
 	enum UI_TYPE { UI_TEXTURE, UI_FONT, UI_NONE };
 	enum UI_STATE { UI_LAYER, UI_GROUP, UI_END };
 	enum FONT_TYPE { FONT_KIRBYFORM, FONT_STARPOINT, FONT_SCRIPT, FONT_NONE };
@@ -101,6 +103,7 @@ protected:
 	CShader*							m_pShaderCom = { nullptr };
 	CVIBuffer_Rect*						m_pVIBufferCom = { nullptr };
 	CTexture*							m_pTextureCom = { nullptr };
+	CTexture*							m_pTextures[TEX_NONE] = {nullptr};
 
 	ID3D11RenderTargetView*				m_pRTV = { nullptr };
 	ID3D11Texture2D*					m_pTexture2D = { nullptr };
@@ -120,10 +123,9 @@ protected:
 
 	_bool								m_bIsRender = false;
 
-	//vector<CUIObject*>					m_HUDs;
 	vector<CUIObject*>					m_LayerUIs;
 	vector <vector<CUIObject*>>			m_GroupUIs;
-	vector <CTexture*>					m_Textures;
+	//vector <CTexture*>					m_Textures;
 
 	
 public:

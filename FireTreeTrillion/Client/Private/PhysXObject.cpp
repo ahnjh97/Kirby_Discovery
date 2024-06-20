@@ -41,6 +41,26 @@ _int CPhysXObject::Tick(_float fTimeDelta)
 	m_EffectSocket = _float4x4::Identity;
 	CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
+
+	if (m_ePhyXState == PO_FLYAWAY)
+	{
+		static _float fFlyTime = { 0.f };
+		fFlyTime += fTimeDelta;
+
+		if (.1f < fFlyTime)
+		{
+			CMultiEffect::MULTI_FX_DESC FXDesc{};
+
+			FXDesc.vInitPos = static_cast<_float3>(m_pTransformCom->Get_State(CTransform::STATE_POSITION) - m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+			FXDesc.vInitPos += static_cast<_float3>(m_pTransformCom->Get_State(CTransform::STATE_RIGHT))* CUtils::Make_RandomFloat(-1.f, 1.f);
+
+			FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
+			if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_FlyingStarYellow"), &FXDesc)))
+				return OBJ_NOEVENT;
+
+			fFlyTime = 0.f;
+		}
+	}
 	return OBJ_NOEVENT;
 }
 

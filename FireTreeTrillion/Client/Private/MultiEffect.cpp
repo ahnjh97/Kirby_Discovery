@@ -101,7 +101,7 @@ HRESULT CMultiEffect::Initialize(void* pArg)
 				CEffect* pFX = static_cast<CEffect*>(m_pGameInstance->Clone_GameObject(wstrProtoName, &SingleFXDesc));
 				CHECK_NULLPTR(pFX);
 
-				m_FXs.push_back(pFX);
+				m_FXs.emplace_back(pFX);
 				m_fDuration.second = pFX->Get_BiggerDuration(m_fDuration.second);
 			}
 		}

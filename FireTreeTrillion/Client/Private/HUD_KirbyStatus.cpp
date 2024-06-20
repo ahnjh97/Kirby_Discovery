@@ -87,7 +87,6 @@ _int CHUD_KirbyStatus::Tick(_float fTimeDelta)
 	__super::Tick(fTimeDelta);
 
 	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
-
 	if (pKirby == nullptr)
 		return OBJ_NOEVENT;
 
@@ -139,7 +138,7 @@ HRESULT CHUD_KirbyStatus::Add_Components()
 		return E_FAIL;
 
 	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_StatusBar_Kirby_Mask"),
-		TEXT("Com_Texture_Mask"), (CComponent**)&m_pTextureMask)))
+		TEXT("Com_Texture_Mask"), (CComponent**)&m_pTexMask)))
 		return E_FAIL;
 
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),
@@ -184,13 +183,13 @@ HRESULT CHUD_KirbyStatus::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPas
 {
 	if (TEXT("Gauge") == m_UIObjDesc.wstrUITag)
 	{
-		m_pTextureMask->Bind_ShaderResource(_pShaderCom, "g_MaskTexture", 0);
+		m_pTexMask->Bind_ShaderResource(_pShaderCom, "g_MaskTexture", 0);
 		_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fHpRatio, sizeof(_float));
 		_pShaderCom->Bind_RawValue("g_fAlarmColor", &m_fAlarmColor, sizeof(_float));
 	}
 	if (TEXT("Gauge_Damage") == m_UIObjDesc.wstrUITag)
 	{
-		m_pTextureMask->Bind_ShaderResource(_pShaderCom, "g_MaskTexture", 0);
+		m_pTexMask->Bind_ShaderResource(_pShaderCom, "g_MaskTexture", 0);
 		_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fHpSlowRatio, sizeof(_float));
 		_pShaderCom->Bind_RawValue("g_fAlarmColor", &m_fAlarmColor, sizeof(_float));
 	}
@@ -227,12 +226,12 @@ void CHUD_KirbyStatus::Update_UIState(_float _fTimeDelta)
 {
 	switch (m_eCurState)
 	{
-	case CHUD::KIRBYHP_IDLE: // 1) 렌더x 기본 상태
+	case KIRBYHP_IDLE: // 1) 렌더x 기본 상태
 		if (KIRBYHP_HIDE == m_ePreState)	//이전 상태가 HIDE인 경우, 기본값으로 세팅
 			m_eCurState = KIRBYHP_WAIT;
 		break;
 
-	case CHUD::KIRBYHP_WAIT: // 3) 특정 이벤트 이후 대기 상태
+	case KIRBYHP_WAIT: // 3) 특정 이벤트 이후 대기 상태
 		if (KIRBYHP_DAMAGE == m_ePreState)	//이전 피격받았을 경우,
 		{
 			m_fAccTime += _fTimeDelta;
@@ -246,7 +245,7 @@ void CHUD_KirbyStatus::Update_UIState(_float _fTimeDelta)
 			Play_Animation(m_fAccTime, KIRBYHP_WAIT);
 		break;
 
-	case CHUD::KIRBYHP_HIDE: // 4) 숨김 상태
+	case KIRBYHP_HIDE: // 4) 숨김 상태
 		m_fAccTime += _fTimeDelta;
 		if (m_fAccTime > 0.16f)
 		{
@@ -259,7 +258,7 @@ void CHUD_KirbyStatus::Update_UIState(_float _fTimeDelta)
 		break;
 
 	//Frame 52 > 77
-	case CHUD::KIRBYHP_DAMAGE: // 2) 피격 상태
+	case KIRBYHP_DAMAGE: // 2) 피격 상태
 		m_fAccTime += _fTimeDelta;
 		if (m_fAccTime >= 25.f / 144.f)
 		{
@@ -271,17 +270,17 @@ void CHUD_KirbyStatus::Update_UIState(_float _fTimeDelta)
 			Play_Animation(m_fAccTime, KIRBYHP_DAMAGE);
 		break;
 
-	case CHUD::KIRBYHP_HEAL: //
+	case KIRBYHP_HEAL: 
 		break;
 
-	case CHUD::KIRBYHP_NONE:
+	case KIRBYHP_NONE:
 	default:	break;
 	}
 }
 
 void CHUD_KirbyStatus::Play_Animation(_float _fAccTime, KIRBYHP_STATE _eCurState)
 {
-	_float4 vWAITPos = { 0.f, 0.f, 0.f, 0.f };
+	_float4 vWAITPos = {};
 
 	switch (m_eCurState)
 	{
@@ -511,7 +510,7 @@ CGameObject* CHUD_KirbyStatus::Clone(void* pArg)
 
 void CHUD_KirbyStatus::Free()
 {
-	Safe_Release(m_pTextureMask);
+	Safe_Release(m_pTexMask);
 	__super::Free();
 }
 

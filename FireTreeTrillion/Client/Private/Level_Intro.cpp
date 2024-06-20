@@ -77,7 +77,7 @@ HRESULT CLevel_Intro::Initialize()
 	InitMat.Translation({ -40.f, 6.7f, -8.f});
 	ObjDesc.matWorld = InitMat;
 
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Ladder"), TEXT("Prototype_GameObject_EnergyDrink"), &ObjDesc)))
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Item"), TEXT("Prototype_GameObject_EnergyDrink"), &ObjDesc)))
 		return E_FAIL;
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
@@ -229,7 +229,7 @@ HRESULT CLevel_Intro::Ready_Layer_UI(const wstring& _wstrLayerTag)
 	{
 		{CHUD::HUD_KIRBYHP, "HUD_KirbyStatus"},
 		{CHUD::HUD_STARPOINT, "HUD_StarPoint"},
-		//{CHUD::STAT_NONE, "LayerUI"},
+		{CHUD::HUD_ABILITYDISCARD, "HUD_AbilityDiscard"},
 	};
 
 	//auto it = HUDmap.find(eHUDType);
