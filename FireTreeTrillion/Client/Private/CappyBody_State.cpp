@@ -178,7 +178,7 @@ void CCappyBody_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	if(2.f > m_fTimeDelta)
 	{
 		if (0.5f <= XMVector3Length(vLook).m128_f32[0])
-			vPos += XMVector3Normalize(vLook) * fTimeDelta;
+			vPos += XMVector3Normalize(vLook) * fTimeDelta * 2.f;
 
 		// 플레이어를 향해 바라본다
 		pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 2.f);
@@ -295,7 +295,7 @@ void CCappyBody_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 			if (pCappy->Get_Hp() <= 0.f)
 				pCappy->Set_Dead();
 			else
-				pCappy->Change_State(CCappyBody::CAPPYBODY_WAIT, 40.f, false, true);
+				pCappy->Change_State(CCappyBody::CAPPYBODY_WAIT, 40.f, true, true);
 		}
 	}
 	// 날아가는 도중이다.  1초에 360도 회전하며, 30의 거리로 날아간다.

@@ -72,7 +72,7 @@ _int CCappyBody::Tick(_float fTimeDelta)
 
 	if (m_ePhyXState == PO_VACUUMING || m_ePhyXState == PO_FLYDEADAWAY)
 	{
-		Change_State(CAPPYBODY_DAMAGE, 120.f, true, false);
+		Change_State(CAPPYBODY_DAMAGE, 120.f, false, false);
 	}
 
 	__super::Tick(m_fTimeDelta);

@@ -80,7 +80,7 @@ _int CPoppyBomb::Tick(_float fTimeDelta)
 		_vector vGravity = XMVectorSet(0.f, -GRAVITY, 0.f, 0.f);
 
 		// 경사면 법선 벡터
-		_vector vNormal = CUtils::To_Vector(m_pControllerCom->Compute_PureSlope());
+		_vector vNormal = CUtils::To_Vector(m_pControllerCom->Compute_Slope(m_pTransformCom));
 
 		// 중력 벡터를 경사면 법선에 투영하여 평면상에서의 중력 계산
 		_vector vGravityParallel = XMVector3Dot(vGravity, vNormal) * vNormal;
@@ -99,38 +99,20 @@ _int CPoppyBomb::Tick(_float fTimeDelta)
 
 		// 이동
 		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-		if(XMVector3Equal(vAcceleration, XMVectorZero()))
-		{
-			vPos += (vVelocity + (XMVector3Normalize(m_vLookDir) * 0.2f)) * m_fTimeDelta * 30.f;
-			m_pControllerCom->Move(m_pTransformCom, vPos, m_fTimeDelta);
-		}
-		else
-		{
-			vPos += (vVelocity + (XMVector3Normalize(m_vLookDir) * 0.2f * m_fMoveTime)) * m_fTimeDelta * 30.f;
-			m_pControllerCom->Move(m_pTransformCom, vPos, m_fTimeDelta);
-		}
 
-		//_float fHeight = m_pControllerCom->Compute_Height();
-
-		//if (2.f < fHeight)
-		//	m_bFall = true;
+		vPos += (vVelocity * m_fTimeDelta * 5.f + (XMVector3Normalize(m_vLookDir) * m_fTimeDelta * m_fMoveTime * 2.f));
+		m_pControllerCom->Move(m_pTransformCom, vPos, m_fTimeDelta);
 
 		if (0.f < m_fMoveTime)
-		{
 			m_fMoveTime -= m_fTimeDelta;
-		}
 		else
-		{
 			m_fMoveTime = 0.f;
-		}
 
 		if (0.f >= m_fMoveTime)
 			m_fLifeTime += m_fTimeDelta;
 
 		if (2.f < m_fLifeTime)
 			m_bDead = true;
-
-
 
 		_vector vLook = vPos - m_vBeforePos;
 		_float fDistance = XMVectorGetX(XMVector3Length(vLook)) / m_fTimeDelta;
