@@ -300,7 +300,6 @@ HRESULT CLoader::Loading_StaticComponentAll()
 
 
 	//이펙트 텍스쳐
-	
 	Add_FXTexture();
 
 
@@ -369,7 +368,10 @@ HRESULT CLoader::Loading_For_Intro()
 	if (FAILED(Add_Texture(eLevel, "Terrain_Fog", "Map/Fog/Sand_%d.png", 4)))
 		return E_FAIL;
 
+	hr = Add_Texture(eLevel, "FX_Mask_Bubble2", "Effects/Mask/noise_bubble.png");	CHECK_FAILED(hr);
+
 #pragma region UI
+
 
 	//hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 19);
 	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 23);
