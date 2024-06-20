@@ -200,10 +200,10 @@ HRESULT CBasicMap::Add_Components(const wstring& _wstrModelTag)
             TEXT("Com_Shader_Anim"), (CComponent**)&m_pAnimShaderCom)))
             return E_FAIL;
 
-        ///* For.Com_Texture */
-        //HRESULT hr = __super::Add_Component(TEXT("Prototype_Component_Texture_馬馬馬馬"),
-        //    TEXT("Com_Texture"), (CComponent**)&m_pTextureCom);
-        //CHECK_FAILED(hr);
+        /* For.Com_Texture */
+        HRESULT hr = __super::Add_Component(TEXT("Prototype_Component_Texture_FX_Mask_Bubble2"),
+            TEXT("Com_Texture"), (CComponent**)&m_pTextureCom);
+        CHECK_FAILED(hr);
     }
 
     return S_OK;
@@ -232,6 +232,8 @@ HRESULT CBasicMap::Bind_ShaderResources()
     if (FAILED(m_pNonAnimShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
         return E_FAIL;
     if (FAILED(m_pNonAnimShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
+        return E_FAIL;
+    if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pNonAnimShaderCom, "g_ObjNearClipTexture")))
         return E_FAIL;
 
     return S_OK;
