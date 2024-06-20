@@ -161,7 +161,7 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 
 			// 데미지 공식과 이펙트, 쉐이킹, 히트스탑 등 시스템적인 요소들이 잔뜩 들어가있다.
 			pthis->Damage_And_Effect_For_Monster(pKirby, pMonster);
-
+			DstHit->Set_Alive(false);
 		});
 
 	// 미 구현
