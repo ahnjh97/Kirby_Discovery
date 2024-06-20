@@ -348,7 +348,7 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 	// 능력을 땅에 버리는 로직이다.
 	if (m_pGameInstance->Get_DIKeyState(DIK_V, KEY_PRESS) &&
-		(pKirby->Get_AbilityType() != ABILITY_DEFAULT || pKirby->Get_AbilityType() != ABILITY_END))
+		(pKirby->Get_AbilityType() != ABILITY_DEFAULT))
 	{
 
 		DESC(m_fDumpAbilityTime) += fTimeDelta;

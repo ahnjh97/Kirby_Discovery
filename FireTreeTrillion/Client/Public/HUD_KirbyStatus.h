@@ -38,6 +38,7 @@ private:
 	void						Play_Animation(_float _fAccTime, KIRBYHP_STATE _eCurState);
 
 	void						Compute_Player_Hp(_float fTimeDelta, class CKirby* pKirby);
+	void						Disappear_HpBar(_float fTimeDelta);
 
 private:
 	_bool							m_IsMovingUP = { TRUE };
@@ -49,32 +50,63 @@ private:
 	// 마스킹을 위한 텍스쳐
 	CTexture*					m_pTexMask = { nullptr };
 
-	// 분홍색 게이지에 대한 마스킹 비율
-	_float						m_fHpRatio = { 1.f };
 
-	// 노란색 게이지에 대한 마스킹 비율
-	_float						m_fHpSlowRatio = { 1.f };
+#pragma region 피통이 까이거나, 회복되는 로직에 사용되는 변수
+	// 레벨이 넘어가거나 할때, true로 만든다.
+	_bool						m_bInitializeHp = { true };
+	// 진짜 실제 HP 비율
+	_float						m_fCurHpRatio = { 0.f };
+	// 전틱 진짜 실제 HP 비율
+	_float						m_fPreHpRatio = { 0.f };
+	// 분홍 피통
+	_float						m_fHpRatio = { 0.f };
+	// 노란 피통
+	_float						m_fSlowHpRatio = { 0.f };
+	// 피가 닳거나 또는 회복되었을 때 틱당 이동해야하는 비율을 계산한 값이다.
+	_float						m_fDeltaRatio = { 0.f };
+	_bool						m_bDeltaRatio = { true };
+
+	// 현재 피통의 상황을 정의하는 불 값
+	_bool						m_isHealing = { false };
+	_bool						m_isDamage = { false };
+
+	// 피가 닳거나, 회복되었을 때 대기하는 시간
+	_float						m_fDamageHoleTime = { 0.f };
+	_float						m_fHealHoleTime = { 0.f };
+#pragma endregion
+
+#pragma region 깜빡임을 나타내거나, 이동, 쉐이킹을 표현하는 변수들
 	// 깜빡임을 셰이더에 던져서 표현하는 변수
 	_float						m_fAlarmColor = { 0.f };
-
-	_float						m_fAccDamageTime = { 0.f };
-	_float						m_fAccHealTime = { 0.f };
-
-	//_bool						m_bInitializeRatio = { true };
-	_bool						m_bComputeDeltaGauge = { true };
-
-	_float						m_fDistanceGauge = { 0.f };
 
 	_float						m_fAlarmTime = { 0.f };
 	_bool						m_bAlarm = { false };
 
+	// 쉐이킹 담당 변수
 	_bool						m_bShakingTrigger = { true };
 	_bool						m_bShaking = { false };
 	_float						m_fShakingTime = { 0.f };
 	_float						m_fShakingAcc = { 0.f };
 
+	// 이동할 때, 다시 원래 자리로 돌아오기 위한 변수
+	_float						m_fSaveMyX = { 0.f };
 	_float						m_fSaveMyY = { 0.f };
 	_float						m_fAmplitude = { 0.f };
+#pragma endregion
+
+	// 아무 신호가 없을 경우, 돌아가는 타이머
+	_float						m_fIdleTime = { 0.f };
+	_bool						m_bCustomRenderHpbar = { false };
+
+	_bool						m_bRenderHpbar = { false };
+	_float						m_fAlpha = { 0.f };
+
+	_float2						m_vFontPos = { 0.f, 0.f };
+	_float						m_fFontSavePosX = { 0.f };
+	_float						m_fTimeDelta = { 0.f };
+
+
+
 
 public:
 	static CHUD_KirbyStatus*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

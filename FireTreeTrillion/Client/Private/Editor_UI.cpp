@@ -831,17 +831,17 @@ _bool CEditor_UI::Edit_Transform(CUIObject* _pUIObj)
 	ImGui::Text(u8"Translate 위치");
 	ImGui::SameLine(); HelpMarker(u8"Ctrl+T");
 	ImGui::SameLine(fTextWidth + 35);
-	ImGui::DragFloat3("##Translate", (_float*)&Translate, 1.f, (_float)-0.1 * g_iWinSizeX, (_float)g_iWinSizeX, "%.2f");
+	ImGui::DragFloat3("##Translate", (_float*)&Translate, 0.001f, (_float)-0.1 * g_iWinSizeX, (_float)g_iWinSizeX, "%.2f");
 
 	ImGui::Text(u8"Rotate 회전");
 	ImGui::SameLine(); HelpMarker(u8"Ctrl+R");
 	ImGui::SameLine(fTextWidth + 35);
-	ImGui::DragFloat3("##Rotate", (_float*)&Rotate, 0.1f, (_int)-360, (_int)360, "%.2f");
+	ImGui::DragFloat3("##Rotate", (_float*)&Rotate, 0.001f, (_int)-360, (_int)360, "%.2f");
 
 	ImGui::Text(u8"Size 크기");
 	ImGui::SameLine(); HelpMarker(u8"Ctrl+E");
 	ImGui::SameLine(fTextWidth + 35);
-	ImGui::DragFloat3("##Size", (_float*)&Scale, 1.f, 0.f, g_iWinSizeX, "%.2f");
+	ImGui::DragFloat3("##Size", (_float*)&Scale, 0.001f, 0.f, g_iWinSizeX, "%.2f");
 
 	LayerUIDesc.vPos = (_float3)Translate;
 	LayerUIDesc.vDegree = (_float3)Rotate;
