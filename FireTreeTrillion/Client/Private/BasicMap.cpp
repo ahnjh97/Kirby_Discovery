@@ -377,7 +377,7 @@ void CBasicMap::InsertMapDecos()
             return;
         }
 
-        pModel->SetUpStencilRimLightMotionBlurPassIndex(iShaderVars, fRimWidth, 0);
+        pModel->SetUpStencilRimLightMotionBlurPassIndex(iShaderVars, fRimWidth, iPassIndex);
 
         PxRigidStatic* pRigidStatic = { nullptr };
         pModel->Set_WorldMatrixForOctree(matWorld);
