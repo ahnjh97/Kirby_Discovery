@@ -31,6 +31,7 @@ public:
 private:
 	HRESULT						Add_Components();
 	HRESULT						Render_BindSet(CShader* _pShaderCom, CTransform* _pTransCom);
+	HRESULT						Render_FontSet(CShader* _pShaderCom, CTransform* _pTransCom);
 	HRESULT						Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTexture* _pTextureCom, _uint _iTexIndex);
 	HRESULT						Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom);
 
@@ -38,10 +39,6 @@ public:
 	static CLayerUI*			Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject*		Clone(void* pArg) override;
 	virtual void				Free() override;
-
-private:
-	CTexture*					m_pMultiTex[CHUD::TAG_NONE] = { nullptr };
-	CTexture*					m_pSingleTex = { nullptr };
 };
 
 

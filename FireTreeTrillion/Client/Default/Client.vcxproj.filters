@@ -292,6 +292,12 @@
     <Filter Include="02.GameObjects\Map\TerrainFog">
       <UniqueIdentifier>{631580d9-5ad3-41b9-b6d7-5fcc5394b093}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\UI\HUD\kirbyHP">
+      <UniqueIdentifier>{04e3199d-7d6c-4af4-a33d-70cd4bd68509}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\HUD\StarPoint">
+      <UniqueIdentifier>{3aabc030-21c4-42d9-b31a-7b69ff957777}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -507,8 +513,6 @@
     <ClInclude Include="..\Public\KirbyBoom_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyBoom_State</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\HUD_KirbyStatus.h" />
-    <ClInclude Include="..\Public\HUD_StarPoint.h" />
     <ClInclude Include="..\Public\BrontoBurt.h">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\BrontoBurt</Filter>
     </ClInclude>
@@ -583,6 +587,15 @@
     </ClInclude>
     <ClInclude Include="..\Public\TerrainFog.h">
       <Filter>02.GameObjects\Map\TerrainFog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\HUD_KirbyStatus.h">
+      <Filter>02.GameObjects\UI\HUD\kirbyHP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\HUD_StarPoint.h">
+      <Filter>02.GameObjects\UI\HUD\StarPoint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\HUD_AbilityDiscard.h">
+      <Filter>02.GameObjects\UI\HUD</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -784,8 +797,6 @@
     <ClCompile Include="..\Public\KirbyBoom_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyBoom_State</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\HUD_KirbyStatus.cpp" />
-    <ClCompile Include="..\Private\HUD_StarPoint.cpp" />
     <ClCompile Include="..\Private\BrontoBurt.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\BrontoBurt</Filter>
     </ClCompile>
@@ -857,6 +868,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\TerrainFog.cpp">
       <Filter>02.GameObjects\Map\TerrainFog</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HUD_KirbyStatus.cpp">
+      <Filter>02.GameObjects\UI\HUD\kirbyHP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HUD_StarPoint.cpp">
+      <Filter>02.GameObjects\UI\HUD\StarPoint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HUD_AbilityDiscard.cpp">
+      <Filter>02.GameObjects\UI\HUD</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

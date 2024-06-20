@@ -186,13 +186,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& _wstrLayerTag)
 	{
 		{CHUD::HUD_KIRBYHP, "HUD_KirbyStatus"},
 		{CHUD::HUD_STARPOINT, "HUD_StarPoint"},
-		//{CHUD::STAT_NONE, "LayerUI"},
+		{CHUD::HUD_ABILITYDISCARD, "HUD_AbilityDiscard"},
 	};
-
-
-	//auto it = HUDmap.find(eHUDType);
-	//if (it != HUDmap.end()) { strUITag = it->second;	}
-	//else {	strUITag = "LayerUI"; }
 
 	for (const auto& [eHUDType, strUITag] : HUDmap)
 	{
@@ -891,7 +886,7 @@ HRESULT CLevel_GamePlay::Load_FileData(const string& _strFilePath, FILE_TYPE _eF
 			strProtoTag += strUITag;
 		}
 
-		HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, _wstrLayerTag, CUtils::StrToWstr(strProtoTag), &LayerUIDesc);
+ 		HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, _wstrLayerTag, CUtils::StrToWstr(strProtoTag), &LayerUIDesc);
 		CHECK_FAILED(hr);
 	}
 
