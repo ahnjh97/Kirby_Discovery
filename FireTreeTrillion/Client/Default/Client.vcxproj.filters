@@ -286,6 +286,9 @@
     <Filter Include="02.GameObjects\HitBox">
       <UniqueIdentifier>{dab839b6-6fe3-4095-b8f6-0e1587423131}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Item\Ability">
+      <UniqueIdentifier>{4ee32ea7-86a0-4289-a776-d1fce969bca4}</UniqueIdentifier>
+	</Filter>
     <Filter Include="02.GameObjects\Map\TerrainFog">
       <UniqueIdentifier>{631580d9-5ad3-41b9-b6d7-5fcc5394b093}</UniqueIdentifier>
     </Filter>
@@ -581,6 +584,9 @@
     <ClInclude Include="..\Public\HitBox.h">
       <Filter>02.GameObjects\HitBox</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Ability.h">
+      <Filter>02.GameObjects\PhysXObject\Item\Ability</Filter>
+	</ClInclude>
     <ClInclude Include="..\Public\TerrainFog.h">
       <Filter>02.GameObjects\Map\TerrainFog</Filter>
     </ClInclude>
@@ -855,6 +861,9 @@
     <ClCompile Include="..\Private\HitBox.cpp">
       <Filter>02.GameObjects\HitBox</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Ability.cpp">
+      <Filter>02.GameObjects\PhysXObject\Item\Ability</Filter>
+	</ClCompile>
     <ClCompile Include="..\Private\TerrainFog.cpp">
       <Filter>02.GameObjects\Map\TerrainFog</Filter>
     </ClCompile>
