@@ -216,6 +216,9 @@ _int CParticle::Tick(_float _fTimeDelta)
 	}
 
 
+	if (m_pSoketMatrix != nullptr)
+		m_pTransformCom->Set_WorldMatrix(*m_pSoketMatrix);
+
 	VTXMATRIX* pVertices = m_pVIBufferCom->Map();
 
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_DROP])

@@ -1147,7 +1147,7 @@ static void SwordSlash_Up(CTransform* pTransformCom)
 {
 	CEffect::FX_DESC FXDesc{};
 	FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-	FXDesc.vInitPos = { 0.f, 1.4f, -.0f };
+	FXDesc.vInitPos = { 0.3f, 1.4f, -.0f };
 	FXDesc.vInitScale = { 2.f, 2.f, 2.f };
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Sword Upward Slash A"), &FXDesc)))
 		return;
@@ -1168,7 +1168,7 @@ static void SwordDash(CTransform* pTransformCom)
 	CMultiEffect::MULTI_FX_DESC FXDesc{};
 	FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
 
-	FXDesc.vInitPos = _float3{ 0.f, 0.3f, 4.f };
+	FXDesc.vInitPos = _float3{ 0.3f, 0.3f, 4.f };
 	FXDesc.vInitScale = { 3.f, 3.f, 3.f };
 	FXDesc.fStartDelay = .1f;
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Sword Dash Test A"), &FXDesc)))

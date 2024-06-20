@@ -68,6 +68,15 @@ HRESULT CLevel_Intro::Initialize()
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Ladder"), TEXT("Prototype_GameObject_Ladder"), &ObjDesc)))
 		return E_FAIL;
 
+	ObjDesc = {};
+	ObjDesc.fSpeedPerSec = 5.f;
+	ObjDesc.fRotationPerSec = ToRadian(90.f);
+	InitMat = _float4x4::Identity;
+	InitMat.Translation({ -40.f, 6.7f, -8.f});
+	ObjDesc.matWorld = InitMat;
+
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Ladder"), TEXT("Prototype_GameObject_EnergyDrink"), &ObjDesc)))
+		return E_FAIL;
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
