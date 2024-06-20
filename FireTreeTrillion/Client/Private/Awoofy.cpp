@@ -121,7 +121,7 @@ HRESULT CAwoofy::Render()
 		//¸öÅë(1)Àº normal O, ´«±î¸®(0)´Â normal x ÆÐ½º
 		if (i == 0 && m_bRenderBody)
 		{
-			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
+			if (FAILED(m_pShaderCom->Begin(11)))
 				return E_FAIL;
 			if (FAILED(m_pModelCom->Render(i)))
 				return E_FAIL;
@@ -327,6 +327,10 @@ HRESULT CAwoofy::Add_Components()
 		TEXT("Com_Texture"), (CComponent**)&m_pEyeTextureCom);
 	CHECK_FAILED(hr);
 
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_FX_Mask_Bubble2"),
+		TEXT("Com_Texture2"), (CComponent**)&m_pTestTextureCom);
+	CHECK_FAILED(hr);
+
 	/* For.Com_CharacterController */
 	m_vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
@@ -378,6 +382,10 @@ HRESULT CAwoofy::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
+		return E_FAIL;
+
+
+	if (FAILED(m_pTestTextureCom->Bind_ShaderResource(m_pShaderCom, "g_ObjNearClipTexture", 1)))
 		return E_FAIL;
 
 	return S_OK;
@@ -446,5 +454,6 @@ void CAwoofy::Free()
 	__super::Free();
 
 	Safe_Release(m_pEyeTextureCom);
+	Safe_Release(m_pTestTextureCom);
 }
 

@@ -63,8 +63,9 @@ HRESULT CEffect::Initialize(void* pArg)
     m_eTimer = effectDesc.eTimer == TIMER_END ? TIMER_NONE : effectDesc.eTimer;
     m_vContinuousRotation = effectDesc.vContinuousRotation;
 
-    if (0.f < m_vContinuousRotation.Length())
-        int a = 0;
+    //if (0.f < m_vContinuousRotation.Length())
+    //    int a = 0;
+
     if (effectDesc.pSocketMatrix != nullptr)
     {
         m_pSoketMatrix = effectDesc.pSocketMatrix;

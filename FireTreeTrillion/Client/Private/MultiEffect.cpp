@@ -88,7 +88,6 @@ HRESULT CMultiEffect::Initialize(void* pArg)
 		//정보 들어왔을 때 크자이를 같이 전달해 준다.
 		if (!m_FXDesc.FXs.empty())
 		{
-
 			for (auto& FXName : m_FXDesc.FXs)
 			{
 				FX_DESC SingleFXDesc{};

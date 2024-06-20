@@ -159,7 +159,7 @@ public:
 	_float4x4*		Get_HandsMatrix()  { return &m_ArmourMatrix; }
 
 	void			Set_HitStop() { m_bHitStop = true; }
-
+	_bool			Is_Attacking() { return m_isKirbyAttacking; }
 	
 
 	// 기타 세부적인 제어
@@ -179,6 +179,10 @@ private:
 	_bool			Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex);
 	// FSM
 	void			SetUp_FSM();
+	// 히트박스 체인저
+	void			HitBoxChanger(_uint eState);
+	_bool			m_isKirbyAttacking = { false };
+	_float			m_fIsAttackTime = { 0.f };
 
 private:
 	CModel*					m_pModelCom[BODY_END] = {nullptr};

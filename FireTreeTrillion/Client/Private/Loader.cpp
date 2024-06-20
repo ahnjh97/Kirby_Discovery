@@ -300,7 +300,6 @@ HRESULT CLoader::Loading_StaticComponentAll()
 
 
 	//이펙트 텍스쳐
-	
 	Add_FXTexture();
 
 
@@ -369,7 +368,10 @@ HRESULT CLoader::Loading_For_Intro()
 	if (FAILED(Add_Texture(eLevel, "Terrain_Fog", "Map/Fog/Sand_%d.png", 4)))
 		return E_FAIL;
 
+	hr = Add_Texture(eLevel, "FX_Mask_Bubble2", "Effects/Mask/noise_bubble_%d.png", 4);	CHECK_FAILED(hr);
+
 #pragma region UI
+
 
 	//hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 19);
 	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 23);
@@ -434,6 +436,7 @@ HRESULT CLoader::Loading_For_GamePlay()
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "RandomNormal", "Map/RandomNormal.png")))
 		return E_FAIL;
+	hr = Add_Texture(eLevel, "FX_Mask_Bubble2", "Effects/Mask/noise_bubble_%d.png", 4);	CHECK_FAILED(hr);
 
 #pragma region UI
 
@@ -664,7 +667,7 @@ HRESULT CLoader::Add_FXTexture()
 	hr = Add_Texture(LEVEL_STATIC, "FX_BombOrbit", "Effects/BombOrbitGlow.dds");	CHECK_FAILED(hr);
 
 	//마스크
-	hr = Add_Texture(LEVEL_STATIC, "FX_Mask_Bubble", "Effects/Mask/noise_bubble.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Mask_Bubble", "Effects/Mask/noise_bubble_%d.png", 4);	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Mask_Updown", "Effects/Mask/UpDownMask.png");	CHECK_FAILED(hr);
 
 	
