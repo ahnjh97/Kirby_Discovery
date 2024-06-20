@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Ability.h"
+#include "MultiEffect.h"
 #include "HitBox.h"
 #include "Kirby.h"
 
@@ -31,6 +32,7 @@ HRESULT CAbility::Initialize(void* pArg)
 		pAbilityItemDesc->fSpeedPerSec = 7.f;
 		pAbilityItemDesc->fRotationPerSec = XMConvertToRadians(90.0f);
 		m_vPosition = pAbilityItemDesc->vPosition;
+		m_eAbilityType = pAbilityItemDesc->eType;
 	}
 
 	if (FAILED(__super::Initialize(pAbilityItemDesc)))
@@ -45,14 +47,18 @@ HRESULT CAbility::Initialize(void* pArg)
 	m_fJumpPower = 7.f;
 	m_fPower = 2.f;
 
-	//CMultiEffect::MULTI_FX_DESC FXDesc{};
 
-	//FXDesc.vInitPos = { 0.f, .3f, 0.f };
-	//FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
-	//FXDesc.pSocketMatrix = &m_EffectSocket;
-	//if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_ItemBubble2"), &FXDesc)))
-	//	return E_FAIL;
-	//Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
+	CTransform* pTransform = pKirby->Get_TransformCom();
+	m_vLookDir = pTransform->Get_State_Vector(CTransform::STATE_LOOK);
+
+	CMultiEffect::MULTI_FX_DESC FXDesc{};
+	FXDesc.vInitPos = { 0.f, .3f, 0.f };
+	FXDesc.pSocketMatrix = &m_EffectSocket;
+	FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
+	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_ItemBubble1"), &FXDesc)))
+		return E_FAIL;
+	Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 
 	return S_OK;
 }
@@ -62,7 +68,11 @@ _int CAbility::Tick(_float fTimeDelta)
 	if (m_bDead == true)
 		return OBJ_DEAD;
 
-	m_fTimeDelta = m_pGameInstance->Get_FirstTimer();
+	if (m_ePhyXState == PO_KIRBYMOUTH)
+		Delete_AllEffect();
+
+
+	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
 	m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), m_fTimeDelta * 2.5f);
 
@@ -71,10 +81,8 @@ _int CAbility::Tick(_float fTimeDelta)
 		CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
 		CTransform* pTransform = pKirby->Get_TransformCom();
 
-		_float3 vLookDir = pTransform->Get_State_Vector(CTransform::STATE_LOOK);
-
 		// 이제 날아가는 것을 구현해보자.
-		m_pControllerCom->Move_Dir(m_pTransformCom, -vLookDir * m_fTimeDelta * 2.f, m_fTimeDelta);
+		m_pControllerCom->Move_Dir(m_pTransformCom, -m_vLookDir * m_fTimeDelta * 2.f, m_fTimeDelta);
 
 		// 점프되는 체공시간을 구현해보자.
 		m_pControllerCom->Jump(m_pTransformCom, m_fJumpPower, m_fTimeDelta);
@@ -104,6 +112,9 @@ _int CAbility::Tick(_float fTimeDelta)
 
 void CAbility::Late_Tick(_float fTimeDelta)
 {
+	if (m_ePhyXState == PO_KIRBYMOUTH)
+		return;
+
 	if (-2.6f > m_fJumpPower)
 		Sphere_Collision();
 
@@ -195,14 +206,13 @@ HRESULT CAbility::Add_Components()
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vPosition);
 
-	//CHitBox::HITBOX_DESC HitBox{};
-	//HitBox.pOwner = this;
-	//HitBox.pDesc = &m_tColliderDesc[BODY];
-	//HitBox.pCollisionType = ITEM;
-	//if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
-	//	return E_FAIL;
-	//Set_BodyCollider(COLLIDER_SPHERE, 0.5f, 0.f, 0.7f);
-
+	CHitBox::HITBOX_DESC HitBox{};
+	HitBox.pOwner = this;
+	HitBox.pDesc = &m_tColliderDesc[BODY];
+	HitBox.pCollisionType = ABILITYITEM;
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
+		return E_FAIL;
+	Set_BodyCollider(COLLIDER_SPHERE, 0.5f, 0.f, 0.7f);
 
 	return S_OK;
 }

@@ -37,9 +37,6 @@ private:
 public:	
 	static CMainApp* Create();
 	virtual void Free() override;
-
-private:
-	_bool m_IsRenderRTV = { TRUE };
 };
 
 END

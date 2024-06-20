@@ -105,6 +105,7 @@ public:
 public:
 	HRESULT Add_DebugComponents(class CComponent* pRenderObject);
 	_bool	Get_HitBoxRender() { return m_IsRenderHitBox; }
+	_bool	Get_IsRenderRTV() { return m_IsRenderRTV; }
 #endif
 
 private:
@@ -130,9 +131,9 @@ private:
 
 #ifdef _DEBUG
 	// 디버그 랜더타겟뷰 ON / OFF
-	_bool								m_IsRenderRTV = { TRUE };
+	_bool								m_IsRenderRTV = { FALSE };
 	// 디버그 히트박스 ON / OFF
-	_bool								m_IsRenderHitBox = { TRUE };
+	_bool								m_IsRenderHitBox = { FALSE };
 #endif
 
 	// 현재 게임 모드

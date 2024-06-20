@@ -104,9 +104,10 @@ _int CHUD_AbilityDiscard::Tick(_float fTimeDelta)
 
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_V, KEY_PRESS)) //키꾹 인식
-	{
 		m_eCurState = DISCARD_SHOW;
-	}	
+
+	else
+		m_eCurState = DISCARD_IDLE;
 
 	return OBJ_NOEVENT;
 }
@@ -119,8 +120,8 @@ void CHUD_AbilityDiscard::Late_Tick(_float fTimeDelta)
 HRESULT CHUD_AbilityDiscard::Render()
 {
 	//대기 상태일 경우, 렌더x
-	//if (DISCARD_IDLE == m_eCurState) //&& KIRBYHP_NONE == m_ePreState)
-	//	return S_OK;
+	if (DISCARD_IDLE == m_eCurState) //&& KIRBYHP_NONE == m_ePreState)
+		return S_OK;
 
 	if (UI_TEXTURE == m_UIObjDesc.eUIType)
 		Render_BindSet(m_pShaderCom, m_pTransformCom);
@@ -153,9 +154,9 @@ HRESULT CHUD_AbilityDiscard::Add_Components()
 		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
 		return E_FAIL;
 
-	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_AbilityDiscard_Mask"),
-		TEXT("Com_TexMask"), (CComponent**)&m_pTextures[TEX_MASK])))
-		return E_FAIL;
+	//if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_AbilityDiscard_Mask"),
+	//	TEXT("Com_TexMask"), (CComponent**)&m_pTextures[TEX_MASK])))
+	//	return E_FAIL;
 
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),
 		TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom)))
@@ -311,7 +312,7 @@ CGameObject* CHUD_AbilityDiscard::Clone(void* pArg)
 void CHUD_AbilityDiscard::Free()
 {
 	__super::Free();
-	Safe_Release(m_pTextures[TEX_NONE]);
+	//Safe_Release(m_pTextures[TEX_NONE]);
 }
 
 

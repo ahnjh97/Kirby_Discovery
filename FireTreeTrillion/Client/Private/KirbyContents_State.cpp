@@ -79,9 +79,9 @@ void CKirbyGet_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 
 			CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
 			AbilityItemDesc.vPosition = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Item"), TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+			AbilityItemDesc.eType = pKirby->Get_AbilityType();
+			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 			CHECK_FAILED(hr);
-
 			pKirby->Set_AbilityType(ABILITY_DEFAULT);
 			
 			if (JoyStick_controller(Kirbydesc, pCamera) == true)
