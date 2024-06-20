@@ -64,11 +64,7 @@ _int CEnergyDrink::Tick(_float fTimeDelta)
 	}
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
-
 	__super::Tick(m_fTimeDelta);
-
-	_float3 vMyScale = m_pTransformCom->Get_Scaled();
-	CUtils::Set_Scaled_Matrix(m_EffectSocket,vMyScale.x, vMyScale.y, vMyScale.z);
 
 
 	// 충돌이 아직 안 되었다면

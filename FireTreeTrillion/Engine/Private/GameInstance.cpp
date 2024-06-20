@@ -415,14 +415,6 @@ _bool CGameInstance::Get_HitBoxRender()
 	return m_pRenderer->Get_HitBoxRender();
 }
 
-_bool CGameInstance::Get_IsRenderRTV()
-{
-	if (nullptr == m_pRenderer)
-		return false;
-
-	return m_pRenderer->Get_IsRenderRTV();
-}
-
 #endif
 
 HRESULT CGameInstance::Open_Level(_uint iNewLevelID, CLevel* pNewLevel)

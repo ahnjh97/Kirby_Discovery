@@ -667,6 +667,7 @@ static _bool Vacuum_Object(CKirby* pKirby, _float fTimeDelta)
 			}
 		}
 	}
+
 	if (DESC(m_pObject) != nullptr)
 	{
 		// 참조하면서 애니메이션으로 끌고간다.
@@ -674,7 +675,6 @@ static _bool Vacuum_Object(CKirby* pKirby, _float fTimeDelta)
 		// 커비가 동일한 애니메이션으로 몬스터를 포착해서 꽤 긴 시간동안 서로 짝짝꿍하겠다는 것이다.
 		DESC(m_pObject)->Set_PhyXState(PO_VACUUMING);
 		pKirby->Change_State(CKirby::STATE_VACUUM, 50.f, true, true, CKirby::BODY_VACUUM);
-
 		return true;
 	}
 
@@ -741,11 +741,13 @@ static _bool Vacuum_Object(CKirby* pKirby, _float fTimeDelta)
 			}
 		}
 	}
+
 	if (DESC(m_pObject) != nullptr)
 	{
 		// 참조하면서 애니메이션으로 끌고간다.
 		Safe_AddRef(DESC(m_pObject));
 		DESC(m_pObject)->Set_PhyXState(PO_VACUUMING);
+
 		if (DESC(m_pObject)->Get_VacuumSize() == SIZE_SMALL)
 			pKirby->Change_State(CKirby::STATE_VACUUM, 50.f, true, true, CKirby::BODY_VACUUM);
 		else if (DESC(m_pObject)->Get_VacuumSize() == SIZE_BIG)
@@ -753,7 +755,6 @@ static _bool Vacuum_Object(CKirby* pKirby, _float fTimeDelta)
 
 		return true;
 	}
-
 
 	// 2차 순위인 아이템 순회를 돈다.
 	if (nullptr != GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), g_strLayerItem))
@@ -798,18 +799,19 @@ static _bool Vacuum_Object(CKirby* pKirby, _float fTimeDelta)
 				}
 			}
 		}
+
 	}
+
 	if (DESC(m_pObject) != nullptr)
 	{
 		// 참조하면서 애니메이션으로 끌고간다.
 		Safe_AddRef(DESC(m_pObject));
 		// 커비가 동일한 애니메이션으로 몬스터를 포착해서 꽤 긴 시간동안 서로 짝짝꿍하겠다는 것이다.
+		//pKirby->Set_PhyXState(PO_VACUUMING);
 		DESC(m_pObject)->Set_PhyXState(PO_VACUUMING);
 		pKirby->Change_State(CKirby::STATE_VACUUM, 50.f, true, true, CKirby::BODY_VACUUM);
 		return true;
 	}
-
-
 
 	// 3차 순위인 돌멩이 등 지형 사물을 흡수한다.
 	if (nullptr != GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), g_strLayerMapObject))
@@ -854,18 +856,19 @@ static _bool Vacuum_Object(CKirby* pKirby, _float fTimeDelta)
 				}
 			}
 		}
+
 	}
+
 	if (DESC(m_pObject) != nullptr)
 	{
 		// 참조하면서 애니메이션으로 끌고간다.
 		Safe_AddRef(DESC(m_pObject));
 		// 커비가 동일한 애니메이션으로 몬스터를 포착해서 꽤 긴 시간동안 서로 짝짝꿍하겠다는 것이다.
+		//pKirby->Set_PhyXState(PO_VACUUMING);
 		DESC(m_pObject)->Set_PhyXState(PO_VACUUMING);
 		pKirby->Change_State(CKirby::STATE_VACUUM, 50.f, true, true, CKirby::BODY_VACUUM);
 		return true;
 	}
-
-
 
 	return false;
 }

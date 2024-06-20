@@ -62,7 +62,6 @@ public: /* For.Renderer */
 public:
 	HRESULT Add_DebugComponents(class CComponent* pRenderComponent);
 	_bool	Get_HitBoxRender();
-	_bool	Get_IsRenderRTV();
 #endif
 
 public: /* For.Level_Manager */
