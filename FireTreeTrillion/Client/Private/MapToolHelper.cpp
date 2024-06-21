@@ -13,6 +13,7 @@ static _int s_iItemIdx = -1;
 static _int s_iKickableIdx = -1;
 
 static _int s_iTownDecoIdx = -1;
+static _int s_iLabDecoIdx = -1;
 
 static _int s_iLevelIndex = 0;
 static _int s_iTempLevelIdx = -1;
@@ -69,11 +70,11 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	CHECK_FAILED(hr);
 
 	m_vecTxtIndices = { &s_iMapTxtIdx, &s_iTriggerTxtIdx, &s_iMonsterTxtIdx, &s_iObjectIdx
-		, &s_iMapDecoIdx, &s_iItemIdx, &s_iKickableIdx };
+		, &s_iMapDecoIdx, &s_iItemIdx, &s_iKickableIdx, &s_iTownDecoIdx, &s_iLabDecoIdx };
 
 	m_vecLevelName = { "Level_Static", "Level_Loading", "Level_Logo", "GamePlay",
 			"Level_Tool_UI", "Level_Tool_FX", "Level_Tool_Anim", "Level_Tool_Map",
-		"Intro", "Stage1",  "Town", "Level_End" };
+		"Intro", "Racing",  "Town", "FinalBoss", "Level_End" };
 
 	m_vecMapModelNames = { "Level0Stage1Step01", "Level1Stage1Step01", "Town" };
 	m_setMapNames = { "BG0", "BG1", "Level0Stage1Step01", "Level1Stage1Step01", "Town" };
@@ -83,15 +84,20 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	/*m_setNonColDecos = { "BushMCut" };*/
 	m_setAnimDecos = { "BushL", "BushM", "BushS", "PopFlower" };
 	m_setActorDecos = {  "CMBillBoardC", "CmBuilding1stRoof", "CMBuildingParts", "CMGuardrailAL", "CMGuardrailBL"
-		,  "CMHighwayGuardrailACL", "CMHighwayGuardrailAL", "CMHighwayGuardrailALL", "CMHighwayGuardrailARL", "CMHighwayGuardrailBL", "CMHighwayGuardrailBLL"
+		, "CMFenceAL", "CMFenceA2L", "CMFenceA3L", "CMFenceB3L", "CMFenceCL", "CMFenceCornerCL"
+		, "CMHighwayGuardrailACL", "CMHighwayGuardrailAL", "CMHighwayGuardrailALL", "CMHighwayGuardrailARL", "CMHighwayGuardrailBL", "CMHighwayGuardrailBLL"
 		, "CMHighwayGuardrailBRL", "CMHighwayGuardrailCCL", "CMHighwayGuardrailCL", "CMHighwayGuardrailCLL", "CMHighwayGuardrailCRL"
-		, "CMStreeLightLampA", "CMStreeLightLampE", "CMWaterTankL", "CvPipingDuctA05L"
+		, "CMStreeLightLampA", "CMStreeLightLampE", "CMWaterTankL", "CvBarricadeBL", "CvPipingDuctA05L"
 		, "GsBenchAL",  "GsCarShop", "GsCircleBench", "GsFlowerPotAL", "GsFlowerPotBL", "GsSteelFenceA"
-		, "GsSteelFenceB", "GsStone", "GsTreeA", "GsTreeB", "GsTreeC", "GsWallRockA", "GsWallRockB"
+		, "GsSteelFenceB", "GsStone", "GsStreetWallA", "GsStreetWallB"
+		, "GsTelephonePoleA", "GsTelephonePoleB", "GsTireAL", "GsTireBL", "GsTireCL"
+		, "GsTrafficSignalAL", "GsTrafficSignalBL", "GsTreeA", "GsTreeB", "GsTreeC", "GsWallRockA", "GsWallRockB"
 		, "GsWoodBridgeA", "GsWoodBridgeB", "GsRockCL", "GsRockDL", "GsRockEL", "GsRockFL", "GsRockGL"
 		, "JgGrassB", "JgGrassL", "JgGrasslongB", "JgGrassN", "JgWoodD", "JgGrassO"
 		, "StarBlockL" , "StarBlockM", "StarBlockS", "SeDriftWoodAL", "SeDriftWoodBL", "SeDriftWoodCL"
-		, "VpFactoryPart", "VpFactoryParts", "VpFactoryPartsBlend", "WoodBox" };
+		, "VpFactoryPart", "VpFactoryParts", "VpFactoryPartsBlend", "WoodBox"
+		, "LbBossRoom", "LbLastBossStage"
+	};
 	m_setKickables = { "GsPebble", "SeShell", "WasteCanYellow" };
 	m_setItemTxts = { "Item_Coin", "Item_EnergyDrink" };
 	m_setTrees = { "GsTreeA", "GsTreeB", "GsTreeC" };
@@ -104,6 +110,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	ReadMonsterTxts();
 
 	ReadTownDecoTxts();
+	ReadLabDecoTxts();
 
 	HideGrid(s_bHideGrid);
 	HideTriggers(s_bHideTriggers);
@@ -257,10 +264,31 @@ void CMapToolHelper::ReadTownDecoTxts()
 		m_setTownDecoTxts.insert(objTxt);
 }
 
+void CMapToolHelper::ReadLabDecoTxts()
+{
+	string strPath = "../../../model_txt/LabDiscovera_Deco/NonAnim/";
+
+	directory_iterator end_iter;  // 디렉토리 순회의 끝을 나타내는 iterator
+	directory_iterator dir_iter(strPath);  // 지정된 경로의 시작 iterator
+
+	while (dir_iter != end_iter) {
+		if (is_regular_file(*dir_iter)) {
+			string strFilePath = dir_iter->path().filename().string();
+			string strModelName = strFilePath.substr(0, strFilePath.length() - 4);
+			m_vecLabDecoTxts.emplace_back(strModelName);
+		}
+		++dir_iter;
+	}
+
+	for (auto& objTxt : m_vecLabDecoTxts)
+		m_setLabDecoTxts.insert(objTxt);
+
+}
+
 void CMapToolHelper::Menu_Level()
 {
 	ImGui::SeparatorText("Level");
-	for (_int i = LEVEL_INTRO; i <= LEVEL_RACING; i++)
+	for (_int i = LEVEL_INTRO; i <= LEVEL_FINALBOSS; i++)
 	{
 		if (ImGui::RadioButton(m_vecLevelName[i].c_str(), s_iLevelIndex == i - LEVEL_INTRO)) {
 			ImGui::OpenPopup("Level Change");
@@ -420,6 +448,18 @@ void CMapToolHelper::Menu_NonAnimModels()
 		if (ImGui::ListBox("##TownDecos", &s_iTownDecoIdx, vecTownDecoNames.data(), m_vecTownDecoTxts.size(), 16)) {
 			DisableOtherGroups(&s_iTownDecoIdx);
 			m_strSelectedTxt = m_vecTownDecoTxts[s_iTownDecoIdx];
+		}
+	}
+
+	if (ImGui::CollapsingHeader("LabDecos"))
+	{
+		ImGui::SetNextItemWidth(200.0f);
+		vector<const _char*> vecLabDecoNames(m_vecLabDecoTxts.size());
+		for (_int i = 0; i < m_vecLabDecoTxts.size(); ++i)
+			vecLabDecoNames[i] = m_vecLabDecoTxts[i].c_str();
+		if (ImGui::ListBox("##LabDecos", &s_iLabDecoIdx, vecLabDecoNames.data(), m_vecLabDecoTxts.size(), 16)) {
+			DisableOtherGroups(&s_iLabDecoIdx);
+			m_strSelectedTxt = m_vecLabDecoTxts[s_iLabDecoIdx];
 		}
 	}
 }
@@ -946,11 +986,6 @@ void CMapToolHelper::Save_Level()
 	else
 		wstrSave += L"Monsters X\n";
 
-	if(true == Save_RallyPoints(strLevel, vecRallyPoints))
-		wstrSave += L"RallyPoints O\n";
-	else
-		wstrSave += L"RallyPoints X\n";
-
 	if (true == Save_Items(strLevel, vecItems))
 		wstrSave += L"Items O\n";
 	else
@@ -1028,7 +1063,7 @@ void CMapToolHelper::Load_Level()
 	Load_Decos(strLevel);
 	Load_Triggers(strLevel);
 	Load_Monsters(strLevel);
-	Load_RallyPoints(strLevel);
+	//Load_RallyPoints(strLevel);
 	Load_Items(strLevel);
 	Load_Kickables(strLevel);
 
@@ -1249,6 +1284,9 @@ _bool CMapToolHelper::IsDeco(const string& _strModelName)
 		return true;
 
 	if (m_setTownDecoTxts.end() != m_setTownDecoTxts.find(_strModelName))
+		return true;
+
+	if (m_setLabDecoTxts.end() != m_setLabDecoTxts.find(_strModelName))
 		return true;
 
 	return _bool();
@@ -1665,61 +1703,6 @@ _bool CMapToolHelper::Save_Monsters(const string& _strLevel, vector<CGameObject*
 	return true;
 }
 
-_bool CMapToolHelper::Save_RallyPoints(const string& _strLevel, vector<CGameObject*>& _vecRallyPoints)
-{
-	string strCustom = "_RallyPoints";
-	string tempFileName = "temp_" + _strLevel + strCustom + ".txt";
-
-	ofstream outputFile(tempFileName, ios::out | ios::binary);
-	if (!outputFile.is_open()) // 임시파일 열렸는지 확인
-	{
-		wstring wstrErrorMsg = TEXT("Failed to Open: ") + CUtils::StrToWstr(tempFileName);
-		MSG_BOX(wstrErrorMsg.c_str());
-		return false;	
-	}
-
-	_uint iNumObjects = _vecRallyPoints.size();
-	outputFile.write(reinterpret_cast<const char*>(&iNumObjects), sizeof(iNumObjects));
-
-	for (auto& rallyPoint : _vecRallyPoints)
-	{
-		CModel* pModel = dynamic_cast<CModel*>(rallyPoint->Get_Component(TEXT("Com_Model")));
-		CTransform* pTransform = dynamic_cast<CTransform*>(rallyPoint->Get_Component(g_strTransformTag));
-
-		string strModelName = pModel->Get_ModelInfo().strModelName;
-		_float4x4 matWorld = pTransform->Get_WorldMatrix();
-		_uint iStrLength = strModelName.length();
-
-		CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(rallyPoint);
-		_int iTriggerIndex = pMapToolObject->Get_TriggerIndex();
-		string strConnectedMonster = pMapToolObject->Get_ConnectedMonster();
-		_uint iMonsterStrLength = strConnectedMonster.length();
-
-		outputFile.write(reinterpret_cast<const char*>(&iStrLength), sizeof(iStrLength));
-		outputFile.write(strModelName.c_str(), iStrLength);
-		outputFile.write(reinterpret_cast<const char*>(&matWorld), sizeof(_float4x4));
-
-		outputFile.write(reinterpret_cast<const char*>(&iTriggerIndex), sizeof(iTriggerIndex));
-		outputFile.write(reinterpret_cast<const char*>(&iMonsterStrLength), sizeof(iMonsterStrLength));
-		outputFile.write(strConnectedMonster.c_str(), iMonsterStrLength);
-	}
-
-	outputFile.close();
-
-	if (!outputFile)
-	{
-		wstring wstrError = TEXT("Failed to write data to ") + CUtils::StrToWstr(tempFileName);
-		MSG_BOX(wstrError.c_str());
-		remove(tempFileName.c_str()); // 임시파일 삭제
-		return false;
-	}
-
-	if (false == RenameFile(_strLevel, tempFileName, strCustom))
-		return false;
-
-	return true;
-}
-
 _bool CMapToolHelper::Save_Decos(const string& _strLevel, vector<CGameObject*>& _vecDecos)
 {
 	string strCustom = "_DecoObjs";
@@ -2029,7 +2012,7 @@ void CMapToolHelper::Load_Monsters(const string& _strLevel)
 	_float fRimWidth{};
 	_int iTriggerIndex{};
 	_uint iNumRallyPoints{};
-	//map<_uint, _float3> rallyPoints;
+
 	wstring wstrGameObjectTag = TEXT("MapToolObject");
 
 	for (_uint i = 0; i < iNumObjects; i++)
@@ -2045,11 +2028,23 @@ void CMapToolHelper::Load_Monsters(const string& _strLevel)
 		fileInput.read(reinterpret_cast<char*>(&iNumRallyPoints), sizeof(iNumRallyPoints));
 
 		_float3 vRallyPointPos{};
-		//rallyPoints.clear();
+
 		for (_uint iRallyPointIdx = 0; iRallyPointIdx < iNumRallyPoints; iRallyPointIdx++)
 		{
 			fileInput.read(reinterpret_cast<char*>(&vRallyPointPos), sizeof(vRallyPointPos));
-			//rallyPoints.emplace(iRallyPointIdx, vRallyPointPos);
+			CMapToolObject::MAPTOOLOBJECT_DESC tRallyPointDesc{};
+			tRallyPointDesc.wstrModelName = TEXT("RallyPoint");
+			tRallyPointDesc.matWorld._41 = vRallyPointPos.x;
+			tRallyPointDesc.matWorld._42 = vRallyPointPos.y;
+			tRallyPointDesc.matWorld._43 = vRallyPointPos.z;
+			tRallyPointDesc.iTriggerIndex = iRallyPointIdx;
+			tRallyPointDesc.strConnectedMonster = strModelName;
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tRallyPointDesc)))
+			{
+				MSG_BOX(TEXT("Failed to Create : RallyPoint"));
+				fileInput.close();
+				return;
+			}
 		}
 
 		CMapToolObject::MAPTOOLOBJECT_DESC tDesc{};
@@ -2058,60 +2053,6 @@ void CMapToolHelper::Load_Monsters(const string& _strLevel)
 		tDesc.iShaderVars = iShaderVars;
 		tDesc.fRimWidth = fRimWidth;
 		tDesc.iTriggerIndex = iTriggerIndex; // Monster Enum
-		//tDesc.RallyPoints = rallyPoints;
-
-		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
-		{
-			wstring wstrErrorMsg = TEXT("Failed to Clone: ") + wstrGameObjectTag;
-			MSG_BOX(wstrErrorMsg.c_str());
-			fileInput.close();
-			return;
-		}
-	}
-
-	fileInput.close();
-}
-
-void CMapToolHelper::Load_RallyPoints(const string& _strLevel)
-{
-	string strFileName = "../../../objects_txt/" + _strLevel + "_RallyPoints.txt";
-
-	ifstream fileInput(strFileName, ios::binary);
-	if (fileInput.is_open() == false)
-	{
-		wstring wstrError = TEXT("Failed to open : ") + CUtils::StrToWstr(_strLevel) + TEXT("_RallyPoints.txt");
-		MSG_BOX(wstrError.c_str());
-		return;
-	}
-
-	_uint iNumObjects{};
-	fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
-
-	string strModelName;
-	_float4x4 matWorld{};
-	_uint iStrLength{};
-	_int iTriggerIndex{};
-	string strConnectedMonster;
-	_uint iMonsterStrLength{};
-	wstring wstrGameObjectTag = TEXT("MapToolObject");
-
-	for (_uint i = 0; i < iNumObjects; i++)
-	{
-		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
-		strModelName.resize(iStrLength);
-		fileInput.read(&strModelName[0], iStrLength);
-		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
-
-		fileInput.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
-		fileInput.read(reinterpret_cast<char*>(&iMonsterStrLength), sizeof(iMonsterStrLength));
-		strConnectedMonster.resize(iMonsterStrLength);
-		fileInput.read(&strConnectedMonster[0], iMonsterStrLength);
-
-		CMapToolObject::MAPTOOLOBJECT_DESC tDesc{};
-		tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
-		tDesc.matWorld = matWorld;
-		tDesc.iTriggerIndex = iTriggerIndex; // Monster Enum
-		tDesc.strConnectedMonster = strConnectedMonster;
 
 		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
 		{
