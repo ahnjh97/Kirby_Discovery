@@ -37,6 +37,7 @@ private:
 	
 	//마을 오브젝트를 로드함.
 	void	ReadTownDecoTxts();
+	void	ReadLabDecoTxts();
 
 	// ImGui
 	void	Menu_Level();
@@ -127,6 +128,7 @@ private:
 	unordered_set<string>	m_setTrees;
 
 	unordered_set<string>	m_setTownDecoTxts;
+	unordered_set<string>	m_setLabDecoTxts;
 
 	vector<string>	m_vecMapTxts;
 	vector<string>	m_vecTriggerTxts;
@@ -140,6 +142,7 @@ private:
 
 	//마을을 위한 txts
 	vector<string>	m_vecTownDecoTxts;
+	vector<string>	m_vecLabDecoTxts;
 
 	string m_strSelectedTxt;
 	string m_strCurModel;
