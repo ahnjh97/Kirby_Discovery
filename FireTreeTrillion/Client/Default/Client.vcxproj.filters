@@ -169,9 +169,6 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BladeKnight">
       <UniqueIdentifier>{4d206836-01dd-4e4b-ac5d-3ea486017876}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BladeKnight\State">
-      <UniqueIdentifier>{c3509440-bbe1-439c-b743-a205693e77b6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword">
       <UniqueIdentifier>{c3a1e0ee-a23e-4cfa-80f9-70d6a55eb2b8}</UniqueIdentifier>
     </Filter>
@@ -298,11 +295,19 @@
     <Filter Include="02.GameObjects\UI\HUD\StarPoint">
       <UniqueIdentifier>{3aabc030-21c4-42d9-b31a-7b69ff957777}</UniqueIdentifier>
     </Filter>
+<<<<<<< HEAD
     <Filter Include="01.Levels\GamePlay">
       <UniqueIdentifier>{4547c314-4c9e-474f-bf8e-dd8eb6143161}</UniqueIdentifier>
     </Filter>
     <Filter Include="01.Levels\Town">
       <UniqueIdentifier>{235eccae-385e-4844-8a46-caf8091cd645}</UniqueIdentifier>
+=======
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword\State">
+      <UniqueIdentifier>{c3509440-bbe1-439c-b743-a205693e77b6}</UniqueIdentifier>
+	</Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyCar_State">
+      <UniqueIdentifier>{67963c50-7e60-41a8-bf16-e2649eab3a93}</UniqueIdentifier>
+>>>>>>> main
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -469,7 +474,7 @@
       <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BladeKnight_State.h">
-      <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\State</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword\State</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\ImSequencer.h">
       <Filter>02.GameObjects\Anim</Filter>
@@ -603,11 +608,17 @@
     <ClInclude Include="..\Public\HUD_AbilityDiscard.h">
       <Filter>02.GameObjects\UI\HUD</Filter>
     </ClInclude>
+<<<<<<< HEAD
     <ClInclude Include="..\Public\Level_GamePlay.h">
       <Filter>01.Levels\GamePlay</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Level_Town.h">
       <Filter>01.Levels\Town</Filter>
+=======
+    <ClInclude Include="..\Public\Level_GamePlay.h" />
+    <ClInclude Include="..\Public\KirbyCar_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyCar_State</Filter>
+>>>>>>> main
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -747,7 +758,7 @@
       <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BladeKnight_State.cpp">
-      <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\State</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword\State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BladeKnightSword.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword</Filter>
@@ -890,11 +901,17 @@
     <ClCompile Include="..\Private\HUD_AbilityDiscard.cpp">
       <Filter>02.GameObjects\UI\HUD</Filter>
     </ClCompile>
+<<<<<<< HEAD
     <ClCompile Include="..\Private\Level_GamePlay.cpp">
       <Filter>01.Levels\GamePlay</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Level_Town.cpp">
       <Filter>01.Levels\Town</Filter>
+=======
+    <ClCompile Include="..\Private\Level_GamePlay.cpp" />
+    <ClCompile Include="..\Private\KirbyCar_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyCar_State</Filter>
+>>>>>>> main
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

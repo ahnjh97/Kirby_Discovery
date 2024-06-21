@@ -421,11 +421,11 @@ static _bool JoyStick_controller(CKirby::KIRBY_INFODESC* Kirbydesc, CGameObject*
 	if (GAMEINSTANCE Get_DIKeyState(DIK_UP, KEY_PRESS))
 	{
 		if (GAMEINSTANCE Get_DIKeyState(DIK_LEFT, KEY_PRESS))
-			DESC(m_vTargetDir) = Make_TargetDir(CKirby::DIR_LF, pCamera);
+			DESC(m_vTargetDir) = Make_TargetDir(CKirby::DIR_LF, pCamera) * 2.f;
 		else if (GAMEINSTANCE Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
-			DESC(m_vTargetDir) = Make_TargetDir(CKirby::DIR_RF, pCamera);
+			DESC(m_vTargetDir) = Make_TargetDir(CKirby::DIR_RF, pCamera) * 2.f;
 		else
-			DESC(m_vTargetDir) = Make_TargetDir(CKirby::DIR_FRONT, pCamera);
+			DESC(m_vTargetDir) = Make_TargetDir(CKirby::DIR_FRONT, pCamera) * 2.f;
 
 		return true;
 	}

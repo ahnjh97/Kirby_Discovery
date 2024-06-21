@@ -224,6 +224,7 @@
     <ClInclude Include="..\Public\KickableRock.h" />
     <ClInclude Include="..\Public\KirbyBomb.h" />
     <ClInclude Include="..\Public\KirbyBoom_State.h" />
+    <ClInclude Include="..\Public\KirbyCar_State.h" />
     <ClInclude Include="..\Public\Ladder.h" />
     <ClInclude Include="..\Public\Level_Intro.h" />
     <ClInclude Include="..\Public\LevelChanger.h" />
@@ -345,6 +346,7 @@
     <ClCompile Include="..\Private\Kabu_State.cpp" />
     <ClCompile Include="..\Private\KickableRock.cpp" />
     <ClCompile Include="..\Private\KirbyBomb.cpp" />
+    <ClCompile Include="..\Private\KirbyCar_State.cpp" />
     <ClCompile Include="..\Private\Ladder.cpp" />
     <ClCompile Include="..\Private\Level_Intro.cpp" />
     <ClCompile Include="..\Private\LevelChanger.cpp" />
