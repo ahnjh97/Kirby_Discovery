@@ -619,6 +619,9 @@ HRESULT CLoader::Loading_For_Tool_Map()
 	if (FAILED(Add_AllModelTxts(eLevel, TYPE_NONANIM, L"Monsters/")))
 		return E_FAIL;
 
+	if (FAILED(Add_AllModelTxts(eLevel, TYPE_NONANIM, L"LabDiscovera_Deco/")))
+		return E_FAIL;
+
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 
 	m_IsFinished = true;

@@ -412,7 +412,6 @@ _bool CMainApp::Render_RTVFonts()
 }
 #endif // _DEBUG
 
-
 CMainApp* CMainApp::Create()
 {
 	CMainApp* pInstance = new CMainApp();
