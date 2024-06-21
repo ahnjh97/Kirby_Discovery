@@ -12,6 +12,8 @@ static _int s_iMapDecoIdx = -1;
 static _int s_iItemIdx = -1;
 static _int s_iKickableIdx = -1;
 
+static _int s_iTownDecoIdx = -1;
+
 static _int s_iLevelIndex = 0;
 static _int s_iTempLevelIdx = -1;
 
@@ -71,10 +73,10 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 	m_vecLevelName = { "Level_Static", "Level_Loading", "Level_Logo", "GamePlay",
 			"Level_Tool_UI", "Level_Tool_FX", "Level_Tool_Anim", "Level_Tool_Map",
-		"Intro", "Stage1", "Level_End" };
+		"Intro", "Stage1",  "Town", "Level_End" };
 
-	m_vecMapModelNames = { "Level0Stage1Step01", "Level1Stage1Step01" };
-	m_setMapNames = { "BG0", "BG1", "Level0Stage1Step01", "Level1Stage1Step01" };
+	m_vecMapModelNames = { "Level0Stage1Step01", "Level1Stage1Step01", "Town" };
+	m_setMapNames = { "BG0", "BG1", "Level0Stage1Step01", "Level1Stage1Step01", "Town" };
 	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy", "Fog", "Ladder" };
 	m_setRallyingMonsters = { "NonAnim_Kabu", "NonAnim_BrontoBurt" };
 
@@ -100,6 +102,8 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	ReadMapDecoTxts();
 	ReadMapObjTxts();
 	ReadMonsterTxts();
+
+	ReadTownDecoTxts();
 
 	HideGrid(s_bHideGrid);
 	HideTriggers(s_bHideTriggers);
@@ -233,10 +237,30 @@ void CMapToolHelper::ReadMonsterTxts()
 		m_setMonsterNames.insert(objTxt);
 }
 
+void CMapToolHelper::ReadTownDecoTxts()
+{
+	string strPath = "../../../model_txt/TownDeco/NonAnim/";
+
+	directory_iterator end_iter;  // 디렉토리 순회의 끝을 나타내는 iterator
+	directory_iterator dir_iter(strPath);  // 지정된 경로의 시작 iterator
+
+	while (dir_iter != end_iter) {
+		if (is_regular_file(*dir_iter)) {
+			string strFilePath = dir_iter->path().filename().string();
+			string strModelName = strFilePath.substr(0, strFilePath.length() - 4);
+			m_vecTownDecoTxts.emplace_back(strModelName);
+		}
+		++dir_iter;
+	}
+
+	for (auto& objTxt : m_vecTownDecoTxts)
+		m_setTownDecoTxts.insert(objTxt);
+}
+
 void CMapToolHelper::Menu_Level()
 {
 	ImGui::SeparatorText("Level");
-	for (_int i = LEVEL_INTRO; i <= LEVEL_STAGE1; i++)
+	for (_int i = LEVEL_INTRO; i <= LEVEL_TOWN; i++)
 	{
 		if (ImGui::RadioButton(m_vecLevelName[i].c_str(), s_iLevelIndex == i - LEVEL_INTRO)) {
 			ImGui::OpenPopup("Level Change");
@@ -384,6 +408,18 @@ void CMapToolHelper::Menu_NonAnimModels()
 		if (ImGui::ListBox("##Kickables", &s_iKickableIdx, vecKickableNames.data(), m_vecKickableTxts.size(), 5)) {
 			DisableOtherGroups(&s_iKickableIdx);
 			m_strSelectedTxt = m_vecKickableTxts[s_iKickableIdx];
+		}
+	}
+
+	if (ImGui::CollapsingHeader("TownDecos"))
+	{
+		ImGui::SetNextItemWidth(200.0f);
+		vector<const _char*> vecTownDecoNames(m_vecTownDecoTxts.size());
+		for (_int i = 0; i < m_vecTownDecoTxts.size(); ++i)
+			vecTownDecoNames[i] = m_vecTownDecoTxts[i].c_str();
+		if (ImGui::ListBox("##TownDecos", &s_iTownDecoIdx, vecTownDecoNames.data(), m_vecTownDecoTxts.size(), 16)) {
+			DisableOtherGroups(&s_iTownDecoIdx);
+			m_strSelectedTxt = m_vecTownDecoTxts[s_iTownDecoIdx];
 		}
 	}
 }
@@ -1210,6 +1246,9 @@ _bool CMapToolHelper::IsMonster(const string& _strModelName)
 _bool CMapToolHelper::IsDeco(const string& _strModelName)
 {
 	if (m_setMapDecoTxts.end() != m_setMapDecoTxts.find(_strModelName))
+		return true;
+
+	if (m_setTownDecoTxts.end() != m_setTownDecoTxts.find(_strModelName))
 		return true;
 
 	return _bool();

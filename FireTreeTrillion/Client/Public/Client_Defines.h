@@ -16,7 +16,7 @@ namespace Client
                 // 여기에서 이어서 
                  LEVEL_INTRO,
                  LEVEL_STAGE1,
-
+                 LEVEL_TOWN,
                  LEVEL_END };
 
     enum TRIGGER_TYPE { TRIGGER_CAMERA, TRIGGER_SHADER, TRIGGER_END };
