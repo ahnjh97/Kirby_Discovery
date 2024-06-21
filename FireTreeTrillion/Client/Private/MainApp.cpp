@@ -96,11 +96,6 @@ void CMainApp::Tick(_float fTimeDelta)
 		}
 		if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_7, KEY_DOWN))
 		{
-			if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_TOWN))))
-				return;
-		}
-		if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_0, KEY_DOWN))
-		{
 			if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_FINALBOSS))))
 				return;
 		}
