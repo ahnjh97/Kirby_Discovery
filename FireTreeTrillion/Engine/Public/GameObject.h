@@ -104,13 +104,13 @@ protected:
 
 	COLLISION_DESC							m_tColliderDesc[VALUE_END] = {};
 	// 원기둥 (CYLINDER 전용)
-	void		Set_CylenderCollider(_float fOffSetY, _float fHeight, _float fRadius);
+	void		Activate_CylinderCollider(_float fOffSetY, _float fHeight, _float fRadius);
 	// 구 (SPHERE 전용)
-	void		Set_SphereCollider(_float fOffSetY, _float fRadius);
+	void		Activate_SphereCollider(_float fOffSetY, _float fRadius);
 	// 절두체 (FRUSTUM 전용)
-	void		Set_FrustumCollider(_float fOffSetY, _float fRadius, _float fAngle);
+	void		Activate_FrustumCollider(_float fOffSetY, _float fRadius, _float fAngle);
 	// 튜브 형태 전용
-	void		Set_TubeCollider(_float fOffSetY, _float fHeight, _float fMinRadius, _float fMaxRadius);
+	void		Activate_TubeCollider(_float fOffSetY, _float fHeight, _float fMinRadius, _float fMaxRadius);
 	// 몸 콜라이더 전용
 	void		Set_BodyCollider(HITBOX eType, _float fOffSetY, _float fHeight, _float fRadius);
 

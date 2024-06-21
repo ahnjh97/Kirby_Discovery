@@ -67,6 +67,17 @@ _int CCappyHat::Tick(_float fTimeDelta)
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
+	// 만약, 밟히면 그 순간 그냥 찐빵되고 죽는다.
+	if (m_ePhyXState == PO_PRESSED)
+	{
+		m_pTransformCom->Set_Scaled(1.f, 0.001f, 1.f);
+		m_fPressedTime += m_fTimeDelta;
+
+		if (m_fPressedTime > 1.5f)
+			m_bDead = true;
+		return OBJ_NOEVENT;
+	}
+
 	if (m_ePhyXState == PO_VACUUMING || m_ePhyXState == PO_FLYDEADAWAY)
 	{
 		if(false == m_bController)
@@ -158,7 +169,7 @@ void CCappyHat::Late_Tick(_float fTimeDelta)
 		// 날아갈 땐, 애니메이션 재생이 되지 않는다.
 		if (m_ePhyXState != PO_FLYAWAY)
 		{
-			if (Compute_OptimizationAnimation(m_fTimeDelta) == true)
+			if (Compute_OptimizationAnimation(m_fTimeDelta) == true && m_ePhyXState != PO_PRESSED)
 				m_ePhyXState == PO_FLYDEADAWAY ? m_pModelCom->Play_Animation(m_fAccTime * 0.3f) : m_pModelCom->Play_Animation(m_fAccTime);
 		}
 

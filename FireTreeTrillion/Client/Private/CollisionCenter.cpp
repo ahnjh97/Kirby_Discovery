@@ -48,13 +48,21 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 			// 무적상태인가?
 			if (pMonster->Get_MonsterOverPower() == true)
 				return;
-			// 플레이어가 공격중인가? (공격중이라면 몸박치기하면 근거리 공격이 너무 고통스럽다.)
+			// 플레이어가 공격중인가? (공격중이라면 몸박치기로 데미지가 닳을 시, 근거리 공격이 너무 고통스럽다.)
 			if (pKirby->Is_Attacking() == true)
 				return;
 			
 			// 몬스터가 일반적인 상황일때만, 서로 데미지가 계산된다.
 			if (pMonster->Get_PhyXState() == PO_NORMAL)
 			{
+				if (pKirby->Get_KirbyInfo()->m_bBooster == true)
+				{
+					pMonster->Set_PhyXState(PO_PRESSED);
+					SrcHit->Set_Alive(false);
+					pthis->Camera_Shaking(1.2f);
+					return;
+				}
+
 				// 커비가 혹시 닷지를 하였는가? 만약 닷지를 했다면 충돌이 발생하지않는다.
 				if (pthis->Kirby_Dodge_SlowMotionSystem(pKirby) == true)
 					return;

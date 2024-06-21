@@ -357,7 +357,7 @@ _float CCharacterController::Compute_Height(_fvector vAxis)
 _float CCharacterController::Compute_Wall(_fvector vLook)
 {
 	PxExtendedVec3 position = m_pController->getPosition();
-	PxVec3 rayOrigin = PxVec3((_float)position.x, (_float)position.y, (_float)position.z);
+	PxVec3 rayOrigin = PxVec3((_float)position.x, (_float)position.y + 1.f, (_float)position.z);
 
 	PxVec3 rayDirection = CUtils::To_PxVec3(vLook);
 	_float fMaxDistance = 10.f;
