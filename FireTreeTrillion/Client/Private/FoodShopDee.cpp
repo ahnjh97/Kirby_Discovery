@@ -113,6 +113,7 @@ void CFoodShopDee::Add_AnimEvent()
 
 void CFoodShopDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
+	if(m_pGameInstance->Get_KeyState(DIK_LCONTROL, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_1, KEY_DOWN))
 	m_pModelCom->Set_Animation(27, 50.f, true, true);
 }
 
