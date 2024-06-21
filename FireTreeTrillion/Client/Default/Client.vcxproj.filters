@@ -297,6 +297,9 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword\State">
       <UniqueIdentifier>{c3509440-bbe1-439c-b743-a205693e77b6}</UniqueIdentifier>
+	</Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyCar_State">
+      <UniqueIdentifier>{67963c50-7e60-41a8-bf16-e2649eab3a93}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -598,6 +601,9 @@
       <Filter>02.GameObjects\UI\HUD</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_GamePlay.h" />
+    <ClInclude Include="..\Public\KirbyCar_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyCar_State</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -880,6 +886,9 @@
       <Filter>02.GameObjects\UI\HUD</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />
+    <ClCompile Include="..\Private\KirbyCar_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyCar_State</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

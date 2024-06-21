@@ -3,6 +3,7 @@
 #include "MultiEffect.h"
 #include "HitBox.h"
 #include "Kirby.h"
+#include "MultiEffect.h"
 
 CAbility::CAbility(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CItemObject{ pDevice, pContext }
@@ -46,7 +47,6 @@ HRESULT CAbility::Initialize(void* pArg)
 	m_eItemType = ITEM_FOOD;
 	m_fJumpPower = 7.f;
 	m_fPower = 2.f;
-
 
 	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
 	CTransform* pTransform = pKirby->Get_TransformCom();
@@ -135,6 +135,9 @@ void CAbility::Late_Tick(_float fTimeDelta)
 
 	if (-2.6f > m_fJumpPower)
 		Sphere_Collision();
+
+	if (m_ePhyXState == PO_KIRBYMOUTH)
+		return;
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{

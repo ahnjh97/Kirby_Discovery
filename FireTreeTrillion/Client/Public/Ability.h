@@ -17,6 +17,7 @@ public:
 		ABILITYTYPE eAbilityType = {};
 	};
 
+
 private:
 	CAbility(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CAbility(const CAbility& rhs);

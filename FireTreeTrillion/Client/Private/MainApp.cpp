@@ -107,15 +107,9 @@ HRESULT CMainApp::Render(_float fTimeDelta)
 
 #ifdef _DEBUG
 
-	//���� Ÿ�� �� ON/OFF
-	if (m_pGameInstance->Get_DIKeyState(DIK_F1, KEY_DOWN))
-		m_IsRenderRTV = !m_IsRenderRTV;
-
 
 	// RTV_FONT �߰�
-#pragma region GAME_OBJ
-
-	if (m_IsRenderRTV)
+	if (m_pGameInstance->Get_IsRenderRTV())
 		Render_RTVFonts();
 
 #endif // _DEBUG
