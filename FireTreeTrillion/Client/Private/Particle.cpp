@@ -177,15 +177,16 @@ _int CParticle::Tick(_float _fTimeDelta)
 	if (m_bDead)
 		return OBJ_DEAD;
 
+
+
 	return OBJ_NOEVENT;
 }
 
-void CParticle::Late_Tick(_float fTimeDelta)
+void CParticle::Late_Tick(_float _fTimeDelta)
 {
 
-
 	//현재 설정 값으로 적용할 타임델타 값을 바꾼다.
-	_float fMyTimeDelta = fTimeDelta;
+	_float fMyTimeDelta = _fTimeDelta;
 	switch (m_eTimer)
 	{
 	case TIMER_FIRST:
@@ -249,8 +250,6 @@ void CParticle::Late_Tick(_float fTimeDelta)
 		m_pVIBufferCom->Tail(fMyTimeDelta, pVertices);
 
 	m_pVIBufferCom->Unmap();
-
-
 
 
 

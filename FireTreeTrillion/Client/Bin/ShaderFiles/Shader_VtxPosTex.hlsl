@@ -215,7 +215,6 @@ PS_OUT PS_MAIN_SOFTFX(PS_IN_ALPHABLEND In)
 
     Out.vColor.a = vDiffuse.a * saturate(fOldViewZ - In.vProjPos.w);
     Out.vColor.rgb = vDiffuse.rgb;
-    Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
 	
     return Out;
 }
@@ -237,8 +236,7 @@ PS_OUT PS_MAIN_ALPHA_SOFTFX(PS_IN_ALPHABLEND In)
 
     Out.vColor.a = vDiffuse.a * saturate(fOldViewZ - In.vProjPos.w) * g_fAlpha;
     Out.vColor.rgb = vDiffuse.rgb;
-    Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
-
+	
     return Out;
 }
 
@@ -336,6 +334,22 @@ PS_OUT PS_MAIN_FOR_HPDAMAGE(PS_IN_ALPHABLEND In)
     
     Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
     
+    return Out;
+}
+
+PS_OUT PS_MAIN_WHITEUI(PS_IN_ALPHABLEND In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    
+    if (Out.vColor.a < 0.1f)
+        discard;
+
+    Out.vColor.rgb += g_fAlarmColor;
+    Out.vColor.a *= g_fAlpha;
+
+    Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
     return Out;
 }
 
@@ -445,7 +459,7 @@ technique11 DefaultTechnique
     pass UI_MASK
     {
         SetRasterizerState(RS_Default);
-        SetDepthStencilState(DSS_Default, 0);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
         VertexShader = compile vs_5_0 VS_MAIN_ALPHABLEND();
@@ -459,7 +473,7 @@ technique11 DefaultTechnique
     pass UI_MASK2
     {
         SetRasterizerState(RS_Default);
-        SetDepthStencilState(DSS_Default, 0);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
         VertexShader = compile vs_5_0 VS_MAIN_ALPHABLEND();
@@ -494,5 +508,18 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_ALPHA_SOFTFX();
+    }
+    // UI 전용 디퓨즈 백색화 ( 11 )
+    pass UI_WHITE_AND_ALPHA
+    {
+        SetRasterizerState(RS_NonCull);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN_ALPHABLEND();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_WHITEUI();
     }
 }

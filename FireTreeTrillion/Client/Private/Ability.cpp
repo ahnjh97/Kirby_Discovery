@@ -47,6 +47,7 @@ HRESULT CAbility::Initialize(void* pArg)
 	m_fJumpPower = 7.f;
 	m_fPower = 2.f;
 
+
 	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
 	CTransform* pTransform = pKirby->Get_TransformCom();
 	m_vLookDir = pTransform->Get_State_Vector(CTransform::STATE_LOOK);
@@ -75,8 +76,6 @@ _int CAbility::Tick(_float fTimeDelta)
 		Delete_AllEffect();
 
 
-	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
-
 	m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), m_fTimeDelta * 2.5f);
 
 	if (-2.6f < m_fJumpPower)
@@ -85,7 +84,7 @@ _int CAbility::Tick(_float fTimeDelta)
 		CTransform* pTransform = pKirby->Get_TransformCom();
 
 		// 이제 날아가는 것을 구현해보자.
-		m_pControllerCom->Move_Dir(m_pTransformCom, -m_vLookDir * m_fTimeDelta * 2.f, m_fTimeDelta);
+		m_pControllerCom->Move_Dir(m_pTransformCom, -vLookDir * m_fTimeDelta * 2.f, m_fTimeDelta);
 
 		// 점프되는 체공시간을 구현해보자.
 		m_pControllerCom->Jump(m_pTransformCom, m_fJumpPower, m_fTimeDelta);

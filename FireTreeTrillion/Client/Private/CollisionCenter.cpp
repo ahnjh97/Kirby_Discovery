@@ -241,25 +241,6 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 			}
 		});
 
-	// 몬스터와 어빌리티 타입 충돌!
-	Collision_Collider(m_GameObjects[PLAYER], m_GameObjects[ABILITYITEM], this,
-		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
-		{
-			CGameObject* Dst = DstHit->Get_Owner();
-			CGameObject* Src = SrcHit->Get_Owner();
-			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
-				return;
-
-			CKirby* pKirby = static_cast<CKirby*>(Dst);
-			CPhysXObject* pAbility = static_cast<CPhysXObject*>(Src);
-
-			if (pAbility->Get_PhyXState() != PO_VACUUMING)
-				return;
-
-			// 흡수하게 된다면,
-			pKirby->Collision(CONTENT_BODY, pAbility);
-		});
-
 	// 깔끔하게 완료되었음 : 플레이어 X 오브젝트류 (발로 차기 및 흡수 로직)
 	Collision_Collider(m_GameObjects[PLAYER], m_GameObjects[OBJECT], this,
 		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
@@ -364,6 +345,8 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 		});
 
 
+
+
 	for (auto& ObjectVector : m_GameObjects)
 	{
 		for (auto& pObject : ObjectVector)
@@ -402,7 +385,7 @@ void CCollisionCenter::Collision_Collider(vector<CGameObject*> Dsts, vector<CGam
 		{
 			CHitBox* pHitSrc = static_cast<CHitBox*>(Src);
 
-			if (pHitDst == nullptr || pHitSrc == nullptr || pHitDst->Is_Alive() == false|| pHitSrc->Is_Alive() == false)
+			if (pHitDst == nullptr || pHitSrc == nullptr)
 				return;
 
 			if (pHitDst->Get_Owner() == pHitSrc->Get_Owner())
