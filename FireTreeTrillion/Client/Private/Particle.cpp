@@ -178,6 +178,13 @@ _int CParticle::Tick(_float _fTimeDelta)
 		return OBJ_DEAD;
 
 
+
+	return OBJ_NOEVENT;
+}
+
+void CParticle::Late_Tick(_float _fTimeDelta)
+{
+
 	//현재 설정 값으로 적용할 타임델타 값을 바꾼다.
 	_float fMyTimeDelta = _fTimeDelta;
 	switch (m_eTimer)
@@ -212,7 +219,7 @@ _int CParticle::Tick(_float _fTimeDelta)
 	if (m_fDuration.second <= m_fDuration.first)
 	{
 		m_fDuration.first = m_fDuration.second;
-		return OBJ_NOEVENT;
+		return;
 	}
 
 
@@ -244,11 +251,8 @@ _int CParticle::Tick(_float _fTimeDelta)
 
 	m_pVIBufferCom->Unmap();
 
-	return OBJ_NOEVENT;
-}
 
-void CParticle::Late_Tick(_float fTimeDelta)
-{
+
 	if ((CRenderer::RENDERGROUP)m_eRenderGroup != CRenderer::RENDER_END)
 		m_pGameInstance->Add_RenderGroup((CRenderer::RENDERGROUP)m_eRenderGroup, this);
 
