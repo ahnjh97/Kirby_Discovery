@@ -34,11 +34,11 @@ void CPoppyBrosJr_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	// 자유 낙하
 	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
 
+	// 플레이어와 몬스터의 거리 계산
+	_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(vPos, vKirbyPos)));
+
 	if(CPoppyBrosJr::PS_TARGET == pPoppyJr->Get_PoppyState())
 	{
-		// 플레이어와 몬스터의 거리 계산
-		_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(vPos, vKirbyPos)));
-
 		// 플레이어를 향해 바라본다
 		pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 2.f);
 
@@ -59,7 +59,9 @@ void CPoppyBrosJr_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 		if (3.f < m_fTimeDelta)
 		{
-			pPoppyJr->Change_State(CPoppyBrosJr::POPPY_THROW, 50.f, false, true);
+			// 일정 거리 안으로 플레이어가 들어오면 상태 전환
+			if (40.f > fDistance)
+				pPoppyJr->Change_State(CPoppyBrosJr::POPPY_THROW, 50.f, false, true);
 
 			m_fTimeDelta = 0.f;
 		}

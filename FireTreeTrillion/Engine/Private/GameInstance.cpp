@@ -422,7 +422,6 @@ _bool CGameInstance::Get_IsRenderRTV()
 
 	return m_pRenderer->Get_IsRenderRTV();
 }
-
 #endif
 
 HRESULT CGameInstance::Open_Level(_uint iNewLevelID, CLevel* pNewLevel)

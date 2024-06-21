@@ -66,7 +66,7 @@ void CMainApp::Tick(_float fTimeDelta)
 
 		if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_1, KEY_DOWN))
 		{
-			if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_GAMEPLAY))))
+			if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_TOWN))))
 				return;
 		}
 		if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_2, KEY_DOWN))
@@ -89,6 +89,16 @@ void CMainApp::Tick(_float fTimeDelta)
 			if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_TOOL_MAP))))
 				return;
 		}
+		if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_6, KEY_DOWN))
+		{
+			if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_RACING))))
+				return;
+		}
+		if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_7, KEY_DOWN))
+		{
+			if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_FINALBOSS))))
+				return;
+		}
 	}
 
 	CCollisionCenter::Get_Instance()->Collision_Tick(fTimeDelta);
@@ -106,6 +116,7 @@ HRESULT CMainApp::Render(_float fTimeDelta)
 	m_pGameInstance->Draw(fTimeDelta);
 
 #ifdef _DEBUG
+
 
 	// RTV_FONT �߰�
 	if (m_pGameInstance->Get_IsRenderRTV())
@@ -435,9 +446,9 @@ void CMainApp::Free()
 
 	Safe_Release(m_pGameInstance);
 
-	//CLevelChanger::Get_Instance()->Release_LevelChanger();
 	CGameInstance::Release_Engine();
 
-
+	CLevelChanger::Destroy_Instance();
 	CCollisionCenter::Destroy_Instance();
 }
+

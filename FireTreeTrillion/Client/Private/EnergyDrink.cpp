@@ -64,12 +64,9 @@ _int CEnergyDrink::Tick(_float fTimeDelta)
 	}
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
-
 	__super::Tick(m_fTimeDelta);
-
 	_float3 vMyScale = m_pTransformCom->Get_Scaled();
-	CUtils::Set_Scaled_Matrix(m_EffectSocket,vMyScale.x, vMyScale.y, vMyScale.z);
-
+	CUtils::Set_Scaled_Matrix(m_EffectSocket, vMyScale.x, vMyScale.y, vMyScale.z);
 
 	// 충돌이 아직 안 되었다면
 	m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), m_fTimeDelta, 270.f);
@@ -205,7 +202,7 @@ HRESULT CEnergyDrink::Add_Components()
 {
 	HRESULT hr;
 
-	hr = __super::Add_Component(TEXT("Prototype_Component_Shader_VtxModel"),
+	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"),
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 

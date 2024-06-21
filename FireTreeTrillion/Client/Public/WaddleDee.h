@@ -10,6 +10,8 @@ class CTexture;
 class CPartObject;
 END
 
+BEGIN(Client)
+
 class CWaddleDee final :  public CCharacter
 {
 	typedef struct
@@ -19,3 +21,4 @@ class CWaddleDee final :  public CCharacter
 
 };
 
+END

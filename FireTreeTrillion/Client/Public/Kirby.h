@@ -173,6 +173,7 @@ private:
 	_float3			Make_RepulsiveDir(CPhysXObject* pObject);
 
 private:
+	HRESULT			Make_TargetToCams();
 	HRESULT			Add_Components();
 	HRESULT			Add_PartObjects();
 	HRESULT			Bind_ShaderResources();
@@ -206,7 +207,7 @@ private:
 	_float				  m_fOverPowerTime = { 0.f };
 	_float				  m_fFlashOverPowerTime = { 0.f };
 	_float				  m_fPreHp = { 0.f };
-	_uint				  m_uCoin = { 0 };
+	_uint				  m_uCoin = { 123 };
 
 	void				  HitStop_System(_float fTimeDelta);
 	_bool				  m_bHitStop = { false };

@@ -132,14 +132,14 @@ HRESULT CLoader::Loading_For_GamePlay()
 		return E_FAIL;*/
 	
 	wstring wstrRootPath = TEXT("../../../Resources/Models/");
-	//TraverseAnimModels(wstrRootPath);
-	//TraverseNonAnimModels(wstrRootPath);
-	//TraverseAnimModels(wstrRootPath, wstring(L"MapDeco/"));
-	//TraverseNonAnimModels(wstrRootPath, wstring(L"MapDeco/"));
-	//TraverseAnimModels(wstrRootPath, wstring(L"MapObjs/"));
-	//TraverseNonAnimModels(wstrRootPath, wstring(L"MapObjs/"));
-	//TraverseAnimModels(wstrRootPath, wstring(L"Monsters/"));
-	//TraverseNonAnimModels(wstrRootPath, wstring(L"Monsters/"));
+	TraverseAnimModels(wstrRootPath);
+	TraverseNonAnimModels(wstrRootPath);
+	TraverseAnimModels(wstrRootPath, wstring(L"MapDeco/"));
+	TraverseNonAnimModels(wstrRootPath, wstring(L"MapDeco/"));
+
+	TraverseNonAnimModels(wstrRootPath, wstring(L"MapObjs/"));
+
+	TraverseNonAnimModels(wstrRootPath, wstring(L"Monsters/"));
 
 	TraverseNonAnimModels(wstrRootPath, wstring(L"LabDiscovera_Deco/"));
 
