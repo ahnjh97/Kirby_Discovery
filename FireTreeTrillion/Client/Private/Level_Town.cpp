@@ -6,18 +6,21 @@
 #include "BasicMap.h"
 #include "Trigger.h"
 #include "Kirby.h"
+
 #include "Awoofy.h"
 #include "Rabbit.h"
 #include "Kabu.h"
 #include "BrontoBurt.h"
 #include "PoppyBrosJr.h"
 
+#include "WaddleDee.h"
+
 #include "BG.h"
 #include "HUD.h"
 
 
 CLevel_Town::CLevel_Town(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CLevel{ pDevice, pContext }
+	: CLevel{ pDevice, pContext }
 {
 }
 
@@ -50,7 +53,7 @@ HRESULT CLevel_Town::Initialize()
 	CHECK_FAILED(hr);
 	hr = Ready_Triggers();
 	CHECK_FAILED(hr);
-	hr = Ready_Monsters();
+	hr = Ready_Dees();
 	CHECK_FAILED(hr);
 	hr = Ready_Items();
 	CHECK_FAILED(hr);
@@ -60,7 +63,7 @@ HRESULT CLevel_Town::Initialize()
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
 
-    return S_OK;
+	return S_OK;
 }
 
 void CLevel_Town::Tick(_float fTimeDelta)
@@ -87,7 +90,7 @@ HRESULT CLevel_Town::Render()
 		m_iFPS = 0;
 	}
 
-    return S_OK;
+	return S_OK;
 }
 
 HRESULT CLevel_Town::Ready_Lights()
@@ -145,7 +148,7 @@ HRESULT CLevel_Town::Ready_Layer_Camera(const wstring& strLayerTag)
 	if (FAILED(m_pGameInstance->Add_Clone(eLevel, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
 		return E_FAIL;
 
-    return S_OK;
+	return S_OK;
 }
 
 HRESULT CLevel_Town::Ready_Layer_BackGround(const wstring& strLayerTag)
@@ -154,7 +157,7 @@ HRESULT CLevel_Town::Ready_Layer_BackGround(const wstring& strLayerTag)
 	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_TOWN, strLayerTag, TEXT("Prototype_GameObject_SkySphere"));
 	CHECK_FAILED(hr);
 
-    return S_OK;
+	return S_OK;
 }
 
 HRESULT CLevel_Town::Ready_Layer_UI(const wstring& _wstrLayerTag)
@@ -229,7 +232,7 @@ HRESULT CLevel_Town::Ready_Map()
 		else
 			wstrGameObjectTag = TEXT("BasicMap");
 
-		if(wstrGameObjectTag == TEXT("BasicMap"))
+		if (wstrGameObjectTag == TEXT("BasicMap"))
 			int a = 0;
 		if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tMapDesc)))
 		{
@@ -242,7 +245,7 @@ HRESULT CLevel_Town::Ready_Map()
 
 	fileInput.close();
 
-    return S_OK;
+	return S_OK;
 }
 
 HRESULT CLevel_Town::Ready_Triggers()
@@ -374,12 +377,26 @@ HRESULT CLevel_Town::Ready_Triggers()
 		pCamera->EmplaceBackTriggerInfo(pair.second.first, pair.second.second);
 
 
-    return S_OK;
+	return S_OK;
 }
 
-HRESULT CLevel_Town::Ready_Monsters()
+HRESULT CLevel_Town::Ready_Dees()
 {
 	LEVEL eLevel = LEVEL_TOWN;
+
+
+	CWaddleDee::DEE_DESC ObjDesc{};
+	ObjDesc.fSpeedPerSec = 5.f;
+	ObjDesc.fRotationPerSec = ToRadian(90.f);
+	_float4x4 InitMat = _float4x4::Identity;
+	InitMat.Translation({ -10.2f, 24.7f, 20.f });
+	ObjDesc.matWorld = InitMat;
+
+	if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NPC"), TEXT("Prototype_GameObject_FoodShopDee"), &ObjDesc)))
+		return E_FAIL;
+
+
+	//일단 마을에는 몬스터가 없어요
 	string strFileName = "../../../objects_txt/Town_Monsters.txt";
 
 	ifstream fileInput(strFileName, ios::binary);
@@ -509,7 +526,7 @@ HRESULT CLevel_Town::Ready_Monsters()
 	fileInput.close();
 
 
-    return S_OK;
+	return S_OK;
 }
 
 HRESULT CLevel_Town::Ready_Items()
@@ -562,7 +579,7 @@ HRESULT CLevel_Town::Ready_Items()
 
 	fileInput.close();
 
-    return S_OK;
+	return S_OK;
 }
 
 HRESULT CLevel_Town::Ready_Kickables()
@@ -607,7 +624,7 @@ HRESULT CLevel_Town::Ready_Kickables()
 
 	fileInput.close();
 
-    return S_OK;
+	return S_OK;
 }
 
 HRESULT CLevel_Town::Load_FileData(const string& _strFilePath, FILE_TYPE _eFileType, const wstring& _wstrLayerTag)
@@ -685,7 +702,7 @@ HRESULT CLevel_Town::Load_FileData(const string& _strFilePath, FILE_TYPE _eFileT
 		CHECK_FAILED(hr);
 	}
 
-    return S_OK;
+	return S_OK;
 }
 
 HRESULT CLevel_Town::Add_EnvMap()
@@ -717,7 +734,7 @@ HRESULT CLevel_Town::Add_EnvMap()
 	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture[TYPE_NORMAL], "g_RandomNormalTexture")))
 		return E_FAIL;
 
-    return S_OK;
+	return S_OK;
 }
 
 CLevel_Town* CLevel_Town::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

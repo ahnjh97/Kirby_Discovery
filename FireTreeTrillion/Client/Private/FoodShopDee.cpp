@@ -38,6 +38,7 @@ HRESULT CFoodShopDee::Initialize(void* pArg)
 	hr = Add_Components();
 	CHECK_FAILED_MSG(hr, "와들디 생성 망했어");
 
+	m_pTransformCom->Rotation(_float3{ 0.f, 1.f, 0.f }, ToRadian(180.f));
 	m_pModelCom->Set_Animation(0, 50.f, true, true);
 
 	return S_OK;
@@ -51,7 +52,7 @@ _int CFoodShopDee::Tick(_float fTimeDelta)
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 	__super::Tick(m_fTimeDelta);
 
-
+	m_pControllerCom->FreeFall(m_pTransformCom, m_fTimeDelta);
 	return OBJ_NOEVENT;
 }
 
@@ -112,6 +113,7 @@ void CFoodShopDee::Add_AnimEvent()
 
 void CFoodShopDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
+	m_pModelCom->Set_Animation(27, 50.f, true, true);
 }
 
 void CFoodShopDee::Change_State(DEE_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
@@ -160,7 +162,8 @@ HRESULT CFoodShopDee::Add_Components()
 	HitBox.pCollisionType = NPC;
 	hr = m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox);
 	CHECK_FAILED(hr);
-	Set_BodyCollider(COLLIDER_CYLINDER, 0.5f, 1.f, 0.85f);
+
+	Set_BodyCollider(COLLIDER_CYLINDER, 0.6f, 1.2f, 5.f);
 
 	SetUp_FSM();
 

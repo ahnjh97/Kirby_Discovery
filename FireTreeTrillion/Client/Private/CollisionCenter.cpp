@@ -363,6 +363,20 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 			pKirby->Collision(CONTENT_BODY, pAbility);
 		});
 
+	Collision_Collider(m_GameObjects[PLAYER], m_GameObjects[NPC], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CKirby* pKirby = static_cast<CKirby*>(Dst);
+			CPhysXObject* pNPC = static_cast<CPhysXObject*>(Src);
+			pNPC->Collision(CONTENT_INTERACT, pKirby);
+
+		});
+
 
 	for (auto& ObjectVector : m_GameObjects)
 	{

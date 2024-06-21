@@ -1002,7 +1002,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("CappyHat", TYPE_ANIM, 1.f, 180.f);
 
 		//와들디
-		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
 
 		// For Mab Interactive Object
 		m_vecModelInfo.emplace_back("GsPebble", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
@@ -1047,7 +1047,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
 
 		// 와들디
-		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
 
 	}
 	else if (eLevel == LEVEL_GAMEPLAY)
@@ -1112,7 +1112,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Item_Sword", TYPE_NONANIM, 1.f, 0.f);
 
 		// 와들디
-		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
 
 	}
 	else if (eLevel == LEVEL_TOOL_MAP)
@@ -1157,7 +1157,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_ANIM, 1.3f, 180.f);
 
 		//와들디
-		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
 
 		}
 }

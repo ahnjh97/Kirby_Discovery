@@ -26,7 +26,7 @@ private:
 
 	HRESULT Ready_Map();
 	HRESULT Ready_Triggers();
-	HRESULT Ready_Monsters();
+	HRESULT Ready_Dees();
 	HRESULT Ready_Items();
 	HRESULT Ready_Kickables();
 
