@@ -12,15 +12,17 @@ namespace Client
                  LEVEL_TOOL_UI,
                  LEVEL_TOOL_ANIM = 6, // ANIM툴은 6으로 고정 ! 부탁드립니댜
                  LEVEL_TOOL_MAP,
+
                 //============ GAME
-                // 여기에서 이어서 
                  LEVEL_INTRO,
-                 LEVEL_STAGE1,
+                 LEVEL_RACING,
+                 LEVEL_TOWN,
+                 LEVEL_FINALBOSS, // 리소스명 LEVEL_LAB
 
                  LEVEL_END };
 
     enum TRIGGER_TYPE { TRIGGER_CAMERA, TRIGGER_SHADER, TRIGGER_END };
-    enum CAMERA_TYPE { CAM_FRONT, CAM_REAR, CAM_END };
+    enum CAMERA_TYPE  { CAM_FRONT, CAM_REAR, CAM_END };
 
     enum FILE_TYPE { FILE_UI, FILE_NONE };
     
