@@ -678,16 +678,6 @@ HRESULT CLoader::Loading_For_Town()
 #pragma endregion
 
 
-
-	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
-#pragma region 셰이더
-	// 모아놓은 Shaders 한번에 생성
-	hr = Add_Shaders(eLevel);
-	CHECK_FAILED(hr);
-#pragma endregion
-
-
-
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 	m_IsFinished = true;
 
