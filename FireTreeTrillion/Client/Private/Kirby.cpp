@@ -61,7 +61,7 @@ HRESULT CKirby::Initialize(void* pArg)
 	if (m_pCamera == nullptr)
 	{
 		//인트로, 게임플레이 스테이지라면 카메라로 main camera를 저장한다.
-		(*m_pCurrentLevelID == LEVEL_INTRO || *m_pCurrentLevelID == LEVEL_GAMEPLAY) ?
+		(LEVEL_INTRO <= *m_pCurrentLevelID && *m_pCurrentLevelID < LEVEL_END) ?
 			m_pCamera = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main"))) :
 
 		//나머지 레벨이라면 다른 카메라를 저장한다.

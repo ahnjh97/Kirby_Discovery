@@ -36,6 +36,7 @@ private:
 	HRESULT Loading_For_Logo();
 	HRESULT Loading_For_Intro();
 	HRESULT Loading_For_GamePlay();
+	HRESULT Loading_For_Town();
 	HRESULT Loading_For_Tool_UI();
 	HRESULT Loading_For_Tool_FX();
 	HRESULT Loading_For_Tool_Anim();

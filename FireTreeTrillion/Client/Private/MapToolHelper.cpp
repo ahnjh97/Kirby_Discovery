@@ -299,7 +299,7 @@ void CMapToolHelper::Menu_Level()
 			ImGui::EndPopup();
 		}
 
-		if (i % 2 == 0)
+		if (i % 3 == 0)
 			ImGui::SameLine();
 	}
 	if (ImGui::Button("Save", ImVec2(100, 40)))

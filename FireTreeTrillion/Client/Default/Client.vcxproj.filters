@@ -298,6 +298,12 @@
     <Filter Include="02.GameObjects\UI\HUD\StarPoint">
       <UniqueIdentifier>{3aabc030-21c4-42d9-b31a-7b69ff957777}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Levels\GamePlay">
+      <UniqueIdentifier>{4547c314-4c9e-474f-bf8e-dd8eb6143161}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\Town">
+      <UniqueIdentifier>{235eccae-385e-4844-8a46-caf8091cd645}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -317,9 +323,6 @@
     </ClInclude>
     <ClInclude Include="..\public\MainApp.h">
       <Filter>00.MainApp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Level_GamePlay.h">
-      <Filter>01.Levels\Intro\GamePlay</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Loading.h">
       <Filter>01.Levels\Loading</Filter>
@@ -590,7 +593,7 @@
     </ClInclude>
     <ClInclude Include="..\Public\BladeKnightSword.h">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\Public\HUD_KirbyStatus.h">
       <Filter>02.GameObjects\UI\HUD\kirbyHP</Filter>
     </ClInclude>
@@ -599,6 +602,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\HUD_AbilityDiscard.h">
       <Filter>02.GameObjects\UI\HUD</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_GamePlay.h">
+      <Filter>01.Levels\GamePlay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Level_Town.h">
+      <Filter>01.Levels\Town</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -610,9 +619,6 @@
     </ClCompile>
     <ClCompile Include="..\private\MainApp.cpp">
       <Filter>00.MainApp</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Level_GamePlay.cpp">
-      <Filter>01.Levels\Intro\GamePlay</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Loading.cpp">
       <Filter>01.Levels\Loading</Filter>
@@ -883,6 +889,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\HUD_AbilityDiscard.cpp">
       <Filter>02.GameObjects\UI\HUD</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_GamePlay.cpp">
+      <Filter>01.Levels\GamePlay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Level_Town.cpp">
+      <Filter>01.Levels\Town</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
