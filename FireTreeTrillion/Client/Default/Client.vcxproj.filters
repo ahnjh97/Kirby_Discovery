@@ -310,6 +310,12 @@
     <Filter Include="01.Levels\FinalBoss">
       <UniqueIdentifier>{d9e8fa8b-a4cb-4615-8a73-dca93c7a7460}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\WaddleDee\State">
+      <UniqueIdentifier>{2ed6ece7-973d-401a-9fec-badd5290f2ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop">
+      <UniqueIdentifier>{4c6be733-c7c6-40fb-ba47-92d5f18bf7f9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -621,6 +627,12 @@
     <ClInclude Include="..\Public\Level_FinalBoss.h">
       <Filter>01.Levels\FinalBoss</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Dee_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\FoodShopDee.h">
+      <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -913,6 +925,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Level_FinalBoss.cpp">
       <Filter>01.Levels\FinalBoss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Dee_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\FoodShopDee.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
