@@ -58,7 +58,8 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 				if (pKirby->Get_KirbyInfo()->m_bBooster == true)
 				{
 					pMonster->Set_PhyXState(PO_PRESSED);
-					SrcHit->Set_Alive(false);
+					pKirby->Set_HitStop();
+					pMonster->Set_Damage_Delay(10.f);
 					pthis->Camera_Shaking(1.2f);
 					return;
 				}

@@ -70,7 +70,7 @@ _int CCappyHat::Tick(_float fTimeDelta)
 	// ¸¸¾à, ¹âÈ÷¸é ±× ¼ø°£ ±×³É Âð»§µÇ°í Á×´Â´Ù.
 	if (m_ePhyXState == PO_PRESSED)
 	{
-		m_pTransformCom->Set_Scaled(1.f, 0.001f, 1.f);
+		m_pTransformCom->Set_Scaled(1.f, 0.1f, 1.f);
 		m_fPressedTime += m_fTimeDelta;
 
 		if (m_fPressedTime > 1.5f)

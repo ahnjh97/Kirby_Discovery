@@ -411,10 +411,6 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 					INFO(m_bCarJump) = true;
 					Change_State(CARSTATE_DAMAGE, 60.f, false, false, BODY_CARDEFAULT, OFFSET_CAR);
 				}
-				else
-				{
-					Set_HitStop();
-				}
 			}
 			else
 			{
