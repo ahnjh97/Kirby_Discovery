@@ -35,6 +35,9 @@ private:
 	void	ReadMapObjTxts();
 	void	ReadMonsterTxts();
 	
+	//마을 오브젝트를 로드함.
+	void	ReadTownDecoTxts();
+
 	// ImGui
 	void	Menu_Level();
 	void	Menu_NonAnimModels();
@@ -123,6 +126,8 @@ private:
 	unordered_set<string>	m_setKickables;
 	unordered_set<string>	m_setTrees;
 
+	unordered_set<string>	m_setTownDecoTxts;
+
 	vector<string>	m_vecMapTxts;
 	vector<string>	m_vecTriggerTxts;
 	vector<string>	m_vecMonsterTxts;
@@ -132,6 +137,9 @@ private:
 	vector<string>	m_vecKickableTxts;
 	
 	vector<_int*>	m_vecTxtIndices;
+
+	//마을을 위한 txts
+	vector<string>	m_vecTownDecoTxts;
 
 	string m_strSelectedTxt;
 	string m_strCurModel;

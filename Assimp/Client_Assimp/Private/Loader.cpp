@@ -136,9 +136,10 @@ HRESULT CLoader::Loading_For_GamePlay()
 	TraverseNonAnimModels(wstrRootPath);
 	TraverseAnimModels(wstrRootPath, wstring(L"MapDeco/"));
 	TraverseNonAnimModels(wstrRootPath, wstring(L"MapDeco/"));
-	TraverseAnimModels(wstrRootPath, wstring(L"MapObjs/"));
+	TraverseNonAnimModels(wstrRootPath, wstring(L"TownDeco/"));
+	//TraverseAnimModels(wstrRootPath, wstring(L"MapObjs/"));
 	TraverseNonAnimModels(wstrRootPath, wstring(L"MapObjs/"));
-	TraverseAnimModels(wstrRootPath, wstring(L"Monsters/"));
+	//TraverseAnimModels(wstrRootPath, wstring(L"Monsters/"));
 	TraverseNonAnimModels(wstrRootPath, wstring(L"Monsters/"));
 
 	//m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");

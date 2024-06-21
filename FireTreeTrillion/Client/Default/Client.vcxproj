@@ -250,6 +250,7 @@
     <ClInclude Include="..\Public\Level_Tool_FX.h" />
     <ClInclude Include="..\Public\Level_Tool_Map.h" />
     <ClInclude Include="..\Public\Level_Tool_UI.h" />
+    <ClInclude Include="..\public\Level_Town.h" />
     <ClInclude Include="..\Public\Loader.h" />
     <ClInclude Include="..\public\MainApp.h" />
     <ClInclude Include="..\Public\MapObject.h" />
@@ -370,6 +371,7 @@
     <ClCompile Include="..\Private\Level_Tool_FX.cpp" />
     <ClCompile Include="..\Private\Level_Tool_Map.cpp" />
     <ClCompile Include="..\Private\Level_Tool_UI.cpp" />
+    <ClCompile Include="..\private\Level_Town.cpp" />
     <ClCompile Include="..\Private\Loader.cpp" />
     <ClCompile Include="..\private\MainApp.cpp" />
     <ClCompile Include="..\Private\MapObject.cpp" />
