@@ -34,7 +34,7 @@ HRESULT CBasicMap::Initialize(void* pArg)
     wstring wstrModelTag = GameObjectDesc.wstrModelName;
 
 
-    if (wstrModelTag != TEXT("Town") && wstrModelTag.substr(wstrModelTag.length() - 5) == TEXT("Blend"))
+    if (wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("LbLastBossStage") && wstrModelTag.substr(wstrModelTag.length() - 5) == TEXT("Blend"))
     {
         m_bBlendMap = true;
         m_eRenderGroup = CRenderer::RENDER_BLEND;
@@ -45,7 +45,7 @@ HRESULT CBasicMap::Initialize(void* pArg)
 
     SetUpShaderInfo(wstrModelTag);
 
-    if(wstrModelTag != TEXT("Town") && false == m_bBlendMap)
+    if(wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("LbLastBossStage") && false == m_bBlendMap)
     {
         if (true == CheckIfBlendMapExists(GameObjectDesc.wstrModelName)) {
             if (FAILED(Add_BlendMap(wstrModelTag)))

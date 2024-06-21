@@ -76,8 +76,8 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 			"Level_Tool_UI", "Level_Tool_FX", "Level_Tool_Anim", "Level_Tool_Map",
 		"Intro", "Racing",  "Town", "FinalBoss", "Level_End" };
 
-	m_vecMapModelNames = { "Level0Stage1Step01", "Level1Stage1Step01", "Town" };
-	m_setMapNames = { "BG0", "BG1", "Level0Stage1Step01", "Level1Stage1Step01", "Town" };
+	m_vecMapModelNames = { "Level0Stage1Step01", "Level1Stage1Step01", "Town" , "LbLastBossStage"};
+	m_setMapNames = { "BG0", "BG1", "Level0Stage1Step01", "Level1Stage1Step01", "Town" , "LbLastBossStage"};
 	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy", "Fog", "Ladder" };
 	m_setRallyingMonsters = { "NonAnim_Kabu", "NonAnim_BrontoBurt" };
 
