@@ -122,7 +122,7 @@ HRESULT CMapToolObject::Add_Components(const wstring& _wstrModelTag)
 {
 	/* For.Com_Shader */
 	wstring wstrShaderTag = TEXT("Prototype_Component_Shader_VtxModel");
-	if (FAILED(__super::Add_Component(wstrShaderTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, wstrShaderTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
 	/* For.Com_Model */

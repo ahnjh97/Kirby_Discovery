@@ -302,7 +302,7 @@ HRESULT CParticle::Add_Components(PARTICLE_DESC& _FXDesc)
 		CHECK_FAILED(hr);
 
 
-		hr = __super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Shader_VtxInstance_Point"),
+		hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxInstance_Point"),
 			TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 		CHECK_FAILED(hr);
 
@@ -317,7 +317,7 @@ HRESULT CParticle::Add_Components(PARTICLE_DESC& _FXDesc)
 		CHECK_FAILED(hr);
 
 
-		hr = __super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Shader_FXModel"),
+		hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_FXModel"),
 			TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 
 		CHECK_FAILED(hr);

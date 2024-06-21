@@ -179,7 +179,7 @@ void CBasicMap::Render_IMGUI()
 HRESULT CBasicMap::Add_Components(const wstring& _wstrModelTag)
 {
     /* For.Com_Shader */
-    if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Shader_VtxModel_Map"),
+    if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel_Map"),
         TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
         return E_FAIL;
 
@@ -191,12 +191,12 @@ HRESULT CBasicMap::Add_Components(const wstring& _wstrModelTag)
     if (*m_pCurrentLevelID != LEVEL_TOOL_MAP)
     {
         /* For.Com_Shader */
-        if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Shader_VtxModel"),
+        if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"),
             TEXT("Com_Shader_NonAnim"), (CComponent**)&m_pNonAnimShaderCom)))
             return E_FAIL;
 
         /* For.Com_Shader */
-        if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Shader_VtxAnimModel"),
+        if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimModel"),
             TEXT("Com_Shader_Anim"), (CComponent**)&m_pAnimShaderCom)))
             return E_FAIL;
 
