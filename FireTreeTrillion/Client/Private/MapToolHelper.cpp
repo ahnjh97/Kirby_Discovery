@@ -84,11 +84,14 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	/*m_setNonColDecos = { "BushMCut" };*/
 	m_setAnimDecos = { "BushL", "BushM", "BushS", "PopFlower" };
 	m_setActorDecos = {  "CMBillBoardC", "CmBuilding1stRoof", "CMBuildingParts", "CMGuardrailAL", "CMGuardrailBL"
-		,  "CMHighwayGuardrailACL", "CMHighwayGuardrailAL", "CMHighwayGuardrailALL", "CMHighwayGuardrailARL", "CMHighwayGuardrailBL", "CMHighwayGuardrailBLL"
+		, "CMFenceAL", "CMFenceA2L", "CMFenceA3L", "CMFenceB3L", "CMFenceCL", "CMFenceCornerCL"
+		, "CMHighwayGuardrailACL", "CMHighwayGuardrailAL", "CMHighwayGuardrailALL", "CMHighwayGuardrailARL", "CMHighwayGuardrailBL", "CMHighwayGuardrailBLL"
 		, "CMHighwayGuardrailBRL", "CMHighwayGuardrailCCL", "CMHighwayGuardrailCL", "CMHighwayGuardrailCLL", "CMHighwayGuardrailCRL"
-		, "CMStreeLightLampA", "CMStreeLightLampE", "CMWaterTankL", "CvPipingDuctA05L"
+		, "CMStreeLightLampA", "CMStreeLightLampE", "CMWaterTankL", "CvBarricadeBL", "CvPipingDuctA05L"
 		, "GsBenchAL",  "GsCarShop", "GsCircleBench", "GsFlowerPotAL", "GsFlowerPotBL", "GsSteelFenceA"
-		, "GsSteelFenceB", "GsStone", "GsTreeA", "GsTreeB", "GsTreeC", "GsWallRockA", "GsWallRockB"
+		, "GsSteelFenceB", "GsStone", "GsStreetWallA", "GsStreetWallB"
+		, "GsTelephonePoleA", "GsTelephonePoleB", "GsTireAL", "GsTireBL", "GsTireCL"
+		, "GsTrafficSignalAL", "GsTrafficSignalBL", "GsTreeA", "GsTreeB", "GsTreeC", "GsWallRockA", "GsWallRockB"
 		, "GsWoodBridgeA", "GsWoodBridgeB", "GsRockCL", "GsRockDL", "GsRockEL", "GsRockFL", "GsRockGL"
 		, "JgGrassB", "JgGrassL", "JgGrasslongB", "JgGrassN", "JgWoodD", "JgGrassO"
 		, "StarBlockL" , "StarBlockM", "StarBlockS", "SeDriftWoodAL", "SeDriftWoodBL", "SeDriftWoodCL"
@@ -983,11 +986,6 @@ void CMapToolHelper::Save_Level()
 	else
 		wstrSave += L"Monsters X\n";
 
-	if(true == Save_RallyPoints(strLevel, vecRallyPoints))
-		wstrSave += L"RallyPoints O\n";
-	else
-		wstrSave += L"RallyPoints X\n";
-
 	if (true == Save_Items(strLevel, vecItems))
 		wstrSave += L"Items O\n";
 	else
@@ -1065,7 +1063,7 @@ void CMapToolHelper::Load_Level()
 	Load_Decos(strLevel);
 	Load_Triggers(strLevel);
 	Load_Monsters(strLevel);
-	Load_RallyPoints(strLevel);
+	//Load_RallyPoints(strLevel);
 	Load_Items(strLevel);
 	Load_Kickables(strLevel);
 
@@ -1705,61 +1703,6 @@ _bool CMapToolHelper::Save_Monsters(const string& _strLevel, vector<CGameObject*
 	return true;
 }
 
-_bool CMapToolHelper::Save_RallyPoints(const string& _strLevel, vector<CGameObject*>& _vecRallyPoints)
-{
-	string strCustom = "_RallyPoints";
-	string tempFileName = "temp_" + _strLevel + strCustom + ".txt";
-
-	ofstream outputFile(tempFileName, ios::out | ios::binary);
-	if (!outputFile.is_open()) // 임시파일 열렸는지 확인
-	{
-		wstring wstrErrorMsg = TEXT("Failed to Open: ") + CUtils::StrToWstr(tempFileName);
-		MSG_BOX(wstrErrorMsg.c_str());
-		return false;	
-	}
-
-	_uint iNumObjects = _vecRallyPoints.size();
-	outputFile.write(reinterpret_cast<const char*>(&iNumObjects), sizeof(iNumObjects));
-
-	for (auto& rallyPoint : _vecRallyPoints)
-	{
-		CModel* pModel = dynamic_cast<CModel*>(rallyPoint->Get_Component(TEXT("Com_Model")));
-		CTransform* pTransform = dynamic_cast<CTransform*>(rallyPoint->Get_Component(g_strTransformTag));
-
-		string strModelName = pModel->Get_ModelInfo().strModelName;
-		_float4x4 matWorld = pTransform->Get_WorldMatrix();
-		_uint iStrLength = strModelName.length();
-
-		CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(rallyPoint);
-		_int iTriggerIndex = pMapToolObject->Get_TriggerIndex();
-		string strConnectedMonster = pMapToolObject->Get_ConnectedMonster();
-		_uint iMonsterStrLength = strConnectedMonster.length();
-
-		outputFile.write(reinterpret_cast<const char*>(&iStrLength), sizeof(iStrLength));
-		outputFile.write(strModelName.c_str(), iStrLength);
-		outputFile.write(reinterpret_cast<const char*>(&matWorld), sizeof(_float4x4));
-
-		outputFile.write(reinterpret_cast<const char*>(&iTriggerIndex), sizeof(iTriggerIndex));
-		outputFile.write(reinterpret_cast<const char*>(&iMonsterStrLength), sizeof(iMonsterStrLength));
-		outputFile.write(strConnectedMonster.c_str(), iMonsterStrLength);
-	}
-
-	outputFile.close();
-
-	if (!outputFile)
-	{
-		wstring wstrError = TEXT("Failed to write data to ") + CUtils::StrToWstr(tempFileName);
-		MSG_BOX(wstrError.c_str());
-		remove(tempFileName.c_str()); // 임시파일 삭제
-		return false;
-	}
-
-	if (false == RenameFile(_strLevel, tempFileName, strCustom))
-		return false;
-
-	return true;
-}
-
 _bool CMapToolHelper::Save_Decos(const string& _strLevel, vector<CGameObject*>& _vecDecos)
 {
 	string strCustom = "_DecoObjs";
@@ -2069,7 +2012,7 @@ void CMapToolHelper::Load_Monsters(const string& _strLevel)
 	_float fRimWidth{};
 	_int iTriggerIndex{};
 	_uint iNumRallyPoints{};
-	//map<_uint, _float3> rallyPoints;
+
 	wstring wstrGameObjectTag = TEXT("MapToolObject");
 
 	for (_uint i = 0; i < iNumObjects; i++)
@@ -2085,11 +2028,23 @@ void CMapToolHelper::Load_Monsters(const string& _strLevel)
 		fileInput.read(reinterpret_cast<char*>(&iNumRallyPoints), sizeof(iNumRallyPoints));
 
 		_float3 vRallyPointPos{};
-		//rallyPoints.clear();
+
 		for (_uint iRallyPointIdx = 0; iRallyPointIdx < iNumRallyPoints; iRallyPointIdx++)
 		{
 			fileInput.read(reinterpret_cast<char*>(&vRallyPointPos), sizeof(vRallyPointPos));
-			//rallyPoints.emplace(iRallyPointIdx, vRallyPointPos);
+			CMapToolObject::MAPTOOLOBJECT_DESC tRallyPointDesc{};
+			tRallyPointDesc.wstrModelName = TEXT("RallyPoint");
+			tRallyPointDesc.matWorld._41 = vRallyPointPos.x;
+			tRallyPointDesc.matWorld._42 = vRallyPointPos.y;
+			tRallyPointDesc.matWorld._43 = vRallyPointPos.z;
+			tRallyPointDesc.iTriggerIndex = iRallyPointIdx;
+			tRallyPointDesc.strConnectedMonster = strModelName;
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tRallyPointDesc)))
+			{
+				MSG_BOX(TEXT("Failed to Create : RallyPoint"));
+				fileInput.close();
+				return;
+			}
 		}
 
 		CMapToolObject::MAPTOOLOBJECT_DESC tDesc{};
@@ -2098,60 +2053,6 @@ void CMapToolHelper::Load_Monsters(const string& _strLevel)
 		tDesc.iShaderVars = iShaderVars;
 		tDesc.fRimWidth = fRimWidth;
 		tDesc.iTriggerIndex = iTriggerIndex; // Monster Enum
-		//tDesc.RallyPoints = rallyPoints;
-
-		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
-		{
-			wstring wstrErrorMsg = TEXT("Failed to Clone: ") + wstrGameObjectTag;
-			MSG_BOX(wstrErrorMsg.c_str());
-			fileInput.close();
-			return;
-		}
-	}
-
-	fileInput.close();
-}
-
-void CMapToolHelper::Load_RallyPoints(const string& _strLevel)
-{
-	string strFileName = "../../../objects_txt/" + _strLevel + "_RallyPoints.txt";
-
-	ifstream fileInput(strFileName, ios::binary);
-	if (fileInput.is_open() == false)
-	{
-		wstring wstrError = TEXT("Failed to open : ") + CUtils::StrToWstr(_strLevel) + TEXT("_RallyPoints.txt");
-		MSG_BOX(wstrError.c_str());
-		return;
-	}
-
-	_uint iNumObjects{};
-	fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
-
-	string strModelName;
-	_float4x4 matWorld{};
-	_uint iStrLength{};
-	_int iTriggerIndex{};
-	string strConnectedMonster;
-	_uint iMonsterStrLength{};
-	wstring wstrGameObjectTag = TEXT("MapToolObject");
-
-	for (_uint i = 0; i < iNumObjects; i++)
-	{
-		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
-		strModelName.resize(iStrLength);
-		fileInput.read(&strModelName[0], iStrLength);
-		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
-
-		fileInput.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
-		fileInput.read(reinterpret_cast<char*>(&iMonsterStrLength), sizeof(iMonsterStrLength));
-		strConnectedMonster.resize(iMonsterStrLength);
-		fileInput.read(&strConnectedMonster[0], iMonsterStrLength);
-
-		CMapToolObject::MAPTOOLOBJECT_DESC tDesc{};
-		tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
-		tDesc.matWorld = matWorld;
-		tDesc.iTriggerIndex = iTriggerIndex; // Monster Enum
-		tDesc.strConnectedMonster = strConnectedMonster;
 
 		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
 		{
