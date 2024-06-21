@@ -1,6 +1,7 @@
 #include "stdafx.h"
-#include "FSM.h"
 #include "Kirby.h"
+#include "LevelChanger.h"
+#include "FSM.h"
 #include "Camera_Free.h"
 
 #include "KirbyDefault_State.h"
@@ -94,8 +95,13 @@ HRESULT CKirby::Initialize(void* pArg)
 
 	m_pModelCom[INFO(m_eBodyState)]->Set_Animation(STATE_IDLE, 60.f, true, true);
 
+	// 파싱으로 레벨전환될때 HP와 COIN개수를 이동시킵니다.
+	CLevelChanger::LEVEL_DATA tLevelData = CLevelChanger::Get_Instance()->Load();
+	m_fHp = tLevelData.fKirbyHP;
+	m_uCoin = tLevelData.fKirbyCoin;
+	//m_fHp = 100.f; // 기존 사용하던 HP입니다.
+
 	m_fMaxHp = 100.f;
-	m_fHp = 100.f;
 	m_fAttack = 5.f;
 	m_eAbilityType = ABILITY_DEFAULT;
 	m_eAbilityType = ABILITY_SWORD;
@@ -1335,6 +1341,11 @@ CGameObject* CKirby::Clone(void* pArg)
 
 void CKirby::Free()
 {
+	CLevelChanger::LEVEL_DATA tLevelData = {};
+	tLevelData.fKirbyCoin = m_uCoin;
+	tLevelData.fKirbyHP = m_fHp;
+	CLevelChanger::Get_Instance()->Save(tLevelData);
+
 	__super::Free();
 
 	for (auto& pModelCom : m_pModelCom)

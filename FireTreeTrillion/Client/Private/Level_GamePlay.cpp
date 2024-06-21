@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Level_GamePlay.h"
-#include "LevelChanger.h"
 #include "Camera_Main.h"
 #include "Camera_Free.h"
 #include "BasicMap.h"
@@ -29,7 +28,6 @@ HRESULT CLevel_GamePlay::Initialize()
 {
 	m_pGameInstance->Set_RenderMode(CRenderer::MODE_GAMEPLAY);
 
-	//CLevelChanger::Get_Instance()->Load();
 
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
@@ -749,5 +747,4 @@ void CLevel_GamePlay::Free()
 	for(auto& tex : m_pEnvTexture)
 		Safe_Release(tex);
 
-	//CLevelChanger::Get_Instance()->Save();
 }

@@ -436,9 +436,9 @@ void CMainApp::Free()
 
 	Safe_Release(m_pGameInstance);
 
-	//CLevelChanger::Get_Instance()->Release_LevelChanger();
 	CGameInstance::Release_Engine();
 
-
+	CLevelChanger::Destroy_Instance();
 	CCollisionCenter::Destroy_Instance();
 }
+
