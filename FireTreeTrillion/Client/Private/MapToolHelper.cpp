@@ -260,7 +260,7 @@ void CMapToolHelper::ReadTownDecoTxts()
 void CMapToolHelper::Menu_Level()
 {
 	ImGui::SeparatorText("Level");
-	for (_int i = LEVEL_INTRO; i <= LEVEL_TOWN; i++)
+	for (_int i = LEVEL_INTRO; i <= LEVEL_RACING; i++)
 	{
 		if (ImGui::RadioButton(m_vecLevelName[i].c_str(), s_iLevelIndex == i - LEVEL_INTRO)) {
 			ImGui::OpenPopup("Level Change");

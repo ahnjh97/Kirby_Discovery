@@ -304,10 +304,13 @@
 =======
     <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword\State">
       <UniqueIdentifier>{c3509440-bbe1-439c-b743-a205693e77b6}</UniqueIdentifier>
-	</Filter>
+    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyCar_State">
       <UniqueIdentifier>{67963c50-7e60-41a8-bf16-e2649eab3a93}</UniqueIdentifier>
 >>>>>>> main
+    </Filter>
+    <Filter Include="01.Levels\FinalBoss">
+      <UniqueIdentifier>{d9e8fa8b-a4cb-4615-8a73-dca93c7a7460}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -620,6 +623,9 @@
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyCar_State</Filter>
 >>>>>>> main
     </ClInclude>
+    <ClInclude Include="..\Public\Level_FinalBoss.h">
+      <Filter>01.Levels\FinalBoss</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -912,6 +918,9 @@
     <ClCompile Include="..\Private\KirbyCar_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyCar_State</Filter>
 >>>>>>> main
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_FinalBoss.cpp">
+      <Filter>01.Levels\FinalBoss</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

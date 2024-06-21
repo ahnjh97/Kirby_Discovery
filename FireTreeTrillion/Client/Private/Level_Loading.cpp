@@ -6,9 +6,11 @@
 
 #include "Level_Logo.h"
 #include "Level_Intro.h"
+#include "Level_FinalBoss.h"
 #include "Level_Town.h"
 
 #include "Level_GamePlay.h"
+
 #include "Level_Tool_UI.h"
 #include "Level_Tool_FX.h"
 #include "Level_Tool_Anim.h"
@@ -53,11 +55,15 @@ void CLevel_Loading::Tick(_float fTimeDelta)
 		case LEVEL_INTRO:
 			pLevel = CLevel_Intro::Create(m_pDevice, m_pContext);
 			break;
-		case LEVEL_GAMEPLAY:
-			pLevel = CLevel_GamePlay::Create(m_pDevice, m_pContext);
-			break;
 		case LEVEL_TOWN:
 			pLevel = CLevel_Town::Create(m_pDevice, m_pContext);
+			break;
+		case LEVEL_FINALBOSS:
+			pLevel = CLevel_FinalBoss::Create(m_pDevice, m_pContext);
+			break;
+		///////////////////////////////////////////////////////////////
+		case LEVEL_GAMEPLAY:
+			pLevel = CLevel_GamePlay::Create(m_pDevice, m_pContext);
 			break;
 		case LEVEL_TOOL_FX:
 			pLevel = CLevel_Tool_FX::Create(m_pDevice, m_pContext);

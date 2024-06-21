@@ -92,12 +92,6 @@ HRESULT CLevel_GamePlay::Render()
 	if (FAILED(__super::Render()))
 		return E_FAIL;
 
-	//CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject_ByTag(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby")));
-	//_float4 vPos = pKirby->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION);
-	//wstring wstrMsg = TEXT("게임플레이레벨입니다. 커비 위치 : ")
-	//	+ to_wstring(vPos.x) + TEXT(", ") + to_wstring(vPos.y) + TEXT(", ") + to_wstring(vPos.z);
-	//SetWindowText(g_hWnd, wstrMsg.c_str());
-
 	//윈도우 바 FPS 체크
 	++m_iFPS;
 

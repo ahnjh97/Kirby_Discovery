@@ -80,6 +80,8 @@ HRESULT CBackGround::Add_Components()
 		return E_FAIL;
 	return S_OK;
 }
+
+
 HRESULT CBackGround::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTransform* _pTransCom, CTexture* _pTextureCom, _uint _iTexIndex)
 {
 	CHECK_NULLPTR(_pShaderCom);

@@ -71,7 +71,7 @@ HRESULT CSkySphere::Add_Components()
 {
 	HRESULT hr;
 
-	hr = __super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Shader_VtxModel"), TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
+	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"), TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
 	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Model_SkySphere_Stage1_Day"), TEXT("Com_Model"), (CComponent**)&m_pModelCom);

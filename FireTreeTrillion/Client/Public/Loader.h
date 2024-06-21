@@ -33,8 +33,11 @@ private:
 	HRESULT Loading_ObjectAll();
 	HRESULT Loading_StaticComponentAll();
 
+
 	HRESULT Loading_For_Logo();
 	HRESULT Loading_For_Intro();
+	HRESULT Loading_For_FinalBoss();
+
 	HRESULT Loading_For_GamePlay();
 	HRESULT Loading_For_Town();
 	HRESULT Loading_For_Tool_UI();
@@ -44,13 +47,10 @@ private:
 
 	HRESULT Add_Models(LEVEL eLevel);
 	string  Remove_BeforeLastPipe(const string& str);
-
+	
+	HRESULT Add_Shaders();
 	HRESULT Add_FXTexture();
-	HRESULT Add_ModelsForAnimTool();
 	void SetUp_ModelScaleRotation(LEVEL eLevel);
-
-	// 셰이더 추가하고
-	HRESULT Add_Shaders(LEVEL eLevel);
 
 	HRESULT Add_Texture(LEVEL eLevel, string strPrototypeName, string strFolderAndFileName, _uint iNumTextures = 1);
 	HRESULT Add_KirbyFaceTexture(LEVEL eLevel);

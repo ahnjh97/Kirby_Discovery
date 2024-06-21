@@ -81,7 +81,7 @@ void CTestTerrain::Render_IMGUI()
 
 HRESULT CTestTerrain::Add_Components()
 {
-    if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Shader_VtxModel"),
+    if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"),
         TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
         return E_FAIL;
 

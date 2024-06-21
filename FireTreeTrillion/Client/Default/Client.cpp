@@ -216,20 +216,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 break;
 
             /* ============= LEVEL ÀÌµ¿ ============= */
-            case INTRO:
-            {
-                HRESULT hr;
-                hr = pMainApp->Open_Level(LEVEL_INTRO);
-                CHECK_FAILED(hr);
-                break;
-            }
             case GAMEPLAY: // LEVEL_GAMEPLAY
             {
                 HRESULT hr;
                 hr = pMainApp->Open_Level(LEVEL_GAMEPLAY);
                 CHECK_FAILED(hr);
             }
-            break;
             case TOOL_FX:
             {
                 HRESULT hr;
@@ -256,6 +248,38 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 HRESULT hr;
                 hr = pMainApp->Open_Level(LEVEL_TOOL_MAP);
                 CHECK_FAILED(hr);
+            }
+            break;
+            case INTRO:
+            {
+                HRESULT hr;
+                hr = pMainApp->Open_Level(LEVEL_INTRO);
+                CHECK_FAILED(hr);
+                break;
+            }
+            break;
+            case RACING:
+            {
+                HRESULT hr;
+                hr = pMainApp->Open_Level(LEVEL_RACING);
+                CHECK_FAILED(hr);
+                break;
+            }
+            break;
+            case TOWN:
+            {
+                HRESULT hr;
+                hr = pMainApp->Open_Level(LEVEL_TOWN);
+                CHECK_FAILED(hr);
+                break;
+            }
+            break;
+            case FINALBOSS:
+            {
+                HRESULT hr;
+                hr = pMainApp->Open_Level(LEVEL_FINALBOSS);
+                CHECK_FAILED(hr);
+                break;
             }
             break;
             default:
