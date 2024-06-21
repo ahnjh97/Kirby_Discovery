@@ -92,6 +92,7 @@ enum COLLISION_TYPE
     OBJECT, // 돌멩이 등 사물이다.
     ITEM, // 일반 먹는 아이템이다.
     ABILITYITEM, // 흡수해야 먹을 수 있는 능력 아이템이다.
+    NPC,
     HITBOX_PLYAER,
     HITBOX_MONSTER,
 
