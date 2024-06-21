@@ -344,7 +344,24 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 			pKirby->Collision(CONTENT_ATTACK, pMonsterBullet);
 		});
 
+	// 깔끔하게 완료되었음 : 플레이어 X 어빌리티아이템
+	Collision_Collider(m_GameObjects[PLAYER], m_GameObjects[ABILITYITEM], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
 
+			CKirby* pKirby = static_cast<CKirby*>(Dst);
+			CPhysXObject* pAbility = static_cast<CPhysXObject*>(Src);
+
+			if (pAbility->Get_PhyXState() != PO_VACUUMING)
+				return;
+
+			// 커비는 이 친구와 충돌하면 바로 능력을 먹을듯 하다.
+			pKirby->Collision(CONTENT_BODY, pAbility);
+		});
 
 
 	for (auto& ObjectVector : m_GameObjects)

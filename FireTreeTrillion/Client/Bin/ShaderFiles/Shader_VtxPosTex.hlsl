@@ -215,7 +215,8 @@ PS_OUT PS_MAIN_SOFTFX(PS_IN_ALPHABLEND In)
 
     Out.vColor.a = vDiffuse.a * saturate(fOldViewZ - In.vProjPos.w);
     Out.vColor.rgb = vDiffuse.rgb;
-	
+    Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
+    
     return Out;
 }
 
@@ -236,7 +237,8 @@ PS_OUT PS_MAIN_ALPHA_SOFTFX(PS_IN_ALPHABLEND In)
 
     Out.vColor.a = vDiffuse.a * saturate(fOldViewZ - In.vProjPos.w) * g_fAlpha;
     Out.vColor.rgb = vDiffuse.rgb;
-	
+    Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
+    
     return Out;
 }
 

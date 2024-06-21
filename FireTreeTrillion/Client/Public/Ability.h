@@ -14,7 +14,9 @@ class CAbility final : public CItemObject
 public:
 	struct ABILITYITEM_DESC : public CGameObject::GAMEOBJECT_DESC {
 		_float4 vPosition = {};
+		ABILITYTYPE eType = {};
 	};
+
 
 private:
 	CAbility(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -46,10 +48,10 @@ private:
 	CModel*					m_pModelCom = { nullptr };
 
 private:
-	_float4		m_vPosition = {};
-
-	_float		m_fJumpPower = { 0.f };
-	_float		m_fPower = { 0.f };
+	_float4					m_vPosition = {};
+	_float					m_fJumpPower = { 0.f };
+	_float					m_fPower = { 0.f };
+	_float4					m_vLookDir = { 0.f, 0.f, 0.f, 0.f };
 
 public:
 	static CAbility* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -298,6 +298,9 @@
     <Filter Include="02.GameObjects\UI\HUD\StarPoint">
       <UniqueIdentifier>{3aabc030-21c4-42d9-b31a-7b69ff957777}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyCar_State">
+      <UniqueIdentifier>{67963c50-7e60-41a8-bf16-e2649eab3a93}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -317,9 +320,6 @@
     </ClInclude>
     <ClInclude Include="..\public\MainApp.h">
       <Filter>00.MainApp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Level_GamePlay.h">
-      <Filter>01.Levels\Intro\GamePlay</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Loading.h">
       <Filter>01.Levels\Loading</Filter>
@@ -590,7 +590,7 @@
     </ClInclude>
     <ClInclude Include="..\Public\BladeKnightSword.h">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\Public\HUD_KirbyStatus.h">
       <Filter>02.GameObjects\UI\HUD\kirbyHP</Filter>
     </ClInclude>
@@ -599,6 +599,10 @@
     </ClInclude>
     <ClInclude Include="..\Public\HUD_AbilityDiscard.h">
       <Filter>02.GameObjects\UI\HUD</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_GamePlay.h" />
+    <ClInclude Include="..\Public\KirbyCar_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyCar_State</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -610,9 +614,6 @@
     </ClCompile>
     <ClCompile Include="..\private\MainApp.cpp">
       <Filter>00.MainApp</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Level_GamePlay.cpp">
-      <Filter>01.Levels\Intro\GamePlay</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Loading.cpp">
       <Filter>01.Levels\Loading</Filter>
@@ -883,6 +884,10 @@
     </ClCompile>
     <ClCompile Include="..\Private\HUD_AbilityDiscard.cpp">
       <Filter>02.GameObjects\UI\HUD</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_GamePlay.cpp" />
+    <ClCompile Include="..\Private\KirbyCar_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyCar_State</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
