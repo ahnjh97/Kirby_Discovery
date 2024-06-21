@@ -24,7 +24,6 @@ CLevel_Town::CLevel_Town(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 HRESULT CLevel_Town::Initialize()
 {
 	m_pGameInstance->Set_RenderMode(CRenderer::MODE_GAMEPLAY);
-	//CLevelChanger::Get_Instance()->Load();
 
 	HRESULT hr;
 	hr = __super::Initialize();
@@ -112,7 +111,6 @@ HRESULT CLevel_Town::Ready_Lights()
 
 HRESULT CLevel_Town::Ready_Layer_Camera(const wstring& strLayerTag)
 {
-
 	LEVEL eLevel = LEVEL_TOWN;
 
 	CCamera_Main::CAMERA_KIRBY_DESC		MainCamDesc{};

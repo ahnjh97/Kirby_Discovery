@@ -37,6 +37,8 @@ HRESULT CKirby::Initialize_Prototype()
 
 HRESULT CKirby::Initialize(void* pArg)
 {
+	CHECK_FAILED_MSG(S_FALSE, "»Ø");
+
 	GAMEOBJECT_DESC		GameObjectDesc{};
 	if (nullptr != pArg)
 		GameObjectDesc = *(GAMEOBJECT_DESC*)pArg;
