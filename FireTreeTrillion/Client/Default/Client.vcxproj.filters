@@ -295,19 +295,17 @@
     <Filter Include="02.GameObjects\UI\HUD\StarPoint">
       <UniqueIdentifier>{3aabc030-21c4-42d9-b31a-7b69ff957777}</UniqueIdentifier>
     </Filter>
-<<<<<<< HEAD
     <Filter Include="01.Levels\GamePlay">
       <UniqueIdentifier>{4547c314-4c9e-474f-bf8e-dd8eb6143161}</UniqueIdentifier>
     </Filter>
     <Filter Include="01.Levels\Town">
       <UniqueIdentifier>{235eccae-385e-4844-8a46-caf8091cd645}</UniqueIdentifier>
-=======
+    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword\State">
       <UniqueIdentifier>{c3509440-bbe1-439c-b743-a205693e77b6}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyCar_State">
       <UniqueIdentifier>{67963c50-7e60-41a8-bf16-e2649eab3a93}</UniqueIdentifier>
->>>>>>> main
     </Filter>
     <Filter Include="01.Levels\FinalBoss">
       <UniqueIdentifier>{d9e8fa8b-a4cb-4615-8a73-dca93c7a7460}</UniqueIdentifier>
@@ -611,17 +609,14 @@
     <ClInclude Include="..\Public\HUD_AbilityDiscard.h">
       <Filter>02.GameObjects\UI\HUD</Filter>
     </ClInclude>
-<<<<<<< HEAD
     <ClInclude Include="..\Public\Level_GamePlay.h">
       <Filter>01.Levels\GamePlay</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Level_Town.h">
       <Filter>01.Levels\Town</Filter>
-=======
-    <ClInclude Include="..\Public\Level_GamePlay.h" />
+    </ClInclude>
     <ClInclude Include="..\Public\KirbyCar_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyCar_State</Filter>
->>>>>>> main
     </ClInclude>
     <ClInclude Include="..\Public\Level_FinalBoss.h">
       <Filter>01.Levels\FinalBoss</Filter>
@@ -907,17 +902,14 @@
     <ClCompile Include="..\Private\HUD_AbilityDiscard.cpp">
       <Filter>02.GameObjects\UI\HUD</Filter>
     </ClCompile>
-<<<<<<< HEAD
     <ClCompile Include="..\Private\Level_GamePlay.cpp">
       <Filter>01.Levels\GamePlay</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Level_Town.cpp">
       <Filter>01.Levels\Town</Filter>
-=======
-    <ClCompile Include="..\Private\Level_GamePlay.cpp" />
+    </ClCompile>
     <ClCompile Include="..\Private\KirbyCar_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyCar_State</Filter>
->>>>>>> main
     </ClCompile>
     <ClCompile Include="..\Private\Level_FinalBoss.cpp">
       <Filter>01.Levels\FinalBoss</Filter>
