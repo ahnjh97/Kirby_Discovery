@@ -385,7 +385,7 @@ void CCollisionCenter::Collision_Collider(vector<CGameObject*> Dsts, vector<CGam
 		{
 			CHitBox* pHitSrc = static_cast<CHitBox*>(Src);
 
-			if (pHitDst == nullptr || pHitSrc == nullptr || pHitDst->Is_Alive() == false|| pHitSrc->Is_Alive() == false)
+			if (pHitDst == nullptr || pHitSrc == nullptr)
 				return;
 
 			if (pHitDst->Get_Owner() == pHitSrc->Get_Owner())
