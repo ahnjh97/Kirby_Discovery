@@ -34,6 +34,12 @@ private:
 	void	ReadMapDecoTxts();
 	void	ReadMapObjTxts();
 	void	ReadMonsterTxts();
+
+	void	ReadParkDecoTxts();
+	void	ReadDesertDecoTxts();
+	void	ReadTownDecoTxts();
+	void	ReadLabDecoTxts();
+	
 	
 	// ImGui
 	void	Menu_Level();
@@ -130,6 +136,11 @@ private:
 	vector<string>	m_vecKickableTxts;
 	
 	vector<_int*>	m_vecTxtIndices;
+
+	vector<string>	m_vecParkDecoTxts;
+	vector<string>	m_vecDesertDecoTxts;
+	vector<string>	m_vecTownDecoTxts;
+	vector<string>	m_vecLabDecoTxts;
 
 	string m_strSelectedTxt;
 	string m_strCurModel;

@@ -81,11 +81,14 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	/*m_setNonColDecos = { "BushMCut" };*/
 	m_setAnimDecos = { "BushL", "BushM", "BushS", "PopFlower" };
 	m_setActorDecos = {  "CMBillBoardC", "CmBuilding1stRoof", "CMBuildingParts", "CMGuardrailAL", "CMGuardrailBL"
-		,  "CMHighwayGuardrailACL", "CMHighwayGuardrailAL", "CMHighwayGuardrailALL", "CMHighwayGuardrailARL", "CMHighwayGuardrailBL", "CMHighwayGuardrailBLL"
+		, "CMFenceAL", "CMFenceA2L", "CMFenceA3L", "CMFenceB3L", "CMFenceCL", "CMFenceCornerCL"
+		, "CMHighwayGuardrailACL", "CMHighwayGuardrailAL", "CMHighwayGuardrailALL", "CMHighwayGuardrailARL", "CMHighwayGuardrailBL", "CMHighwayGuardrailBLL"
 		, "CMHighwayGuardrailBRL", "CMHighwayGuardrailCCL", "CMHighwayGuardrailCL", "CMHighwayGuardrailCLL", "CMHighwayGuardrailCRL"
-		, "CMStreeLightLampA", "CMStreeLightLampE", "CMWaterTankL", "CvPipingDuctA05L"
+		, "CMStreeLightLampA", "CMStreeLightLampE", "CMWaterTankL", "CvBarricadeBL", "CvPipingDuctA05L"
 		, "GsBenchAL",  "GsCarShop", "GsCircleBench", "GsFlowerPotAL", "GsFlowerPotBL", "GsSteelFenceA"
-		, "GsSteelFenceB", "GsStone", "GsTreeA", "GsTreeB", "GsTreeC", "GsWallRockA", "GsWallRockB"
+		, "GsSteelFenceB", "GsStone", "GsStreetWallA", "GsStreetWallB"
+		, "GsTelephonePoleA", "GsTelephonePoleB", "GsTireAL", "GsTireBL", "GsTireCL"
+		, "GsTrafficSignalAL", "GsTrafficSignalBL", "GsTreeA", "GsTreeB", "GsTreeC", "GsWallRockA", "GsWallRockB"
 		, "GsWoodBridgeA", "GsWoodBridgeB", "GsRockCL", "GsRockDL", "GsRockEL", "GsRockFL", "GsRockGL"
 		, "JgGrassB", "JgGrassL", "JgGrasslongB", "JgGrassN", "JgWoodD", "JgGrassO"
 		, "StarBlockL" , "StarBlockM", "StarBlockS", "SeDriftWoodAL", "SeDriftWoodBL", "SeDriftWoodCL"
