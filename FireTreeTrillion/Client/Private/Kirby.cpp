@@ -57,35 +57,8 @@ HRESULT CKirby::Initialize(void* pArg)
 	INFO(m_eMouthState) = MOUTH_IDLE;
 	INFO(m_eEyeState) = EYE_IDLE;
 
-
-	// 첫 카메라 기준으로 움직이기에 미리 받아둔다.
-	if (m_pCamera == nullptr)
-	{
-		//인트로, 게임플레이 스테이지라면 카메라로 main camera를 저장한다.
-		(LEVEL_INTRO <= *m_pCurrentLevelID && *m_pCurrentLevelID < LEVEL_END) ?
-			m_pCamera = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main"))) :
-
-		//나머지 레벨이라면 다른 카메라를 저장한다.
-		m_pCamera = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Free")));
-
-		if (m_pCamera == nullptr)
-		{
-			ALARM_FAIL(TEXT("망했어 카메라 없다"));
-			return E_FAIL;
-		}
-		Safe_AddRef(m_pCamera);
-	}
-
-	m_pCamera->Set_Target(m_pTransformCom);
-
-	//게임 레벨에 free camera 있다면 그놈에게도 타겟 등록해 준다.
-	if ((*m_pCurrentLevelID == LEVEL_INTRO || *m_pCurrentLevelID == LEVEL_GAMEPLAY))
-	{
-		CCamera* pCameraFree = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Free")));
-		if (pCameraFree != nullptr)
-			pCameraFree->Set_Target(m_pTransformCom);
-	}
-
+	if (FAILED(Make_TargetToCams()))
+		return E_FAIL;
 
 	_float4 m_pCameraLook = m_pCamera->Get_TransformCom()->Get_State_Vector(CTransform::STATE_LOOK);
 	m_pCameraLook.y = 0.f;
@@ -710,6 +683,38 @@ void CKirby::Key_Input(_float fTimeDelta)
 	}
 
 #pragma endregion
+}
+
+HRESULT CKirby::Make_TargetToCams()
+{
+
+	// 첫 카메라 기준으로 움직이기에 미리 받아둔다.
+	if (m_pCamera == nullptr)
+	{
+		//인트로, 게임플레이 스테이지라면 카메라로 main camera를 저장한다.
+		(LEVEL_INTRO <= *m_pCurrentLevelID && *m_pCurrentLevelID < LEVEL_END) ?
+			m_pCamera = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main"))) :
+
+			//나머지 레벨이라면 다른 카메라를 저장한다.
+			m_pCamera = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Free")));
+
+		if (m_pCamera == nullptr)
+		{
+			ALARM_FAIL(TEXT("망했어 카메라 없다"));
+			return E_FAIL;
+		}
+		Safe_AddRef(m_pCamera);
+	}
+
+	m_pCamera->Set_Target(m_pTransformCom);
+
+	//게임 레벨에 free camera 있다면 그놈에게도 타겟 등록해 준다.
+	if (LEVEL_INTRO <= *m_pCurrentLevelID && *m_pCurrentLevelID < LEVEL_END)
+	{
+		CCamera* pCameraFree = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Free")));
+		if (pCameraFree != nullptr)
+			pCameraFree->Set_Target(m_pTransformCom);
+	}
 }
 
 HRESULT CKirby::Add_Components()

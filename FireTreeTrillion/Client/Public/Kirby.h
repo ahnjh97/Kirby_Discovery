@@ -173,6 +173,7 @@ private:
 	_float3			Make_RepulsiveDir(CPhysXObject* pObject);
 
 private:
+	HRESULT			Make_TargetToCams();
 	HRESULT			Add_Components();
 	HRESULT			Add_PartObjects();
 	HRESULT			Bind_ShaderResources();
