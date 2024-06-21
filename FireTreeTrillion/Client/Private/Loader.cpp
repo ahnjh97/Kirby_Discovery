@@ -821,7 +821,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Kabu", TYPE_ANIM, 2.f, 180.f);
 		m_vecModelInfo.emplace_back("BrontoBurt", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("PoppyBrosJr", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_NONANIM, 1.3f, 180.f);
+		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_ANIM, 1.3f, 180.f);
 		m_vecModelInfo.emplace_back("CappyBody", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("CappyHat", TYPE_ANIM, 1.f, 180.f);
 
@@ -835,6 +835,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Item_EnergyDrink", TYPE_NONANIM, 3.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("Item_Coin", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("Item_Sword", TYPE_NONANIM, 1.f, 0.f);
+		m_vecModelInfo.emplace_back("Item_Bomb", TYPE_NONANIM, 1.f, 0.f);
 
 		// For Interaction Decor
 		m_vecModelInfo.emplace_back("GsWoodBridgeA", TYPE_NONANIM, 1.f, 0.f, 0, string("MapDeco/"));

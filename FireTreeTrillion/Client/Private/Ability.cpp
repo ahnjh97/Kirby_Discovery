@@ -32,21 +32,20 @@ HRESULT CAbility::Initialize(void* pArg)
 		pAbilityItemDesc->fSpeedPerSec = 7.f;
 		pAbilityItemDesc->fRotationPerSec = XMConvertToRadians(90.0f);
 		m_vPosition = pAbilityItemDesc->vPosition;
-		m_eAbilityType = pAbilityItemDesc->eType;
+		m_eAbilityType = pAbilityItemDesc->eAbilityType;
 	}
 
 	if (FAILED(__super::Initialize(pAbilityItemDesc)))
 		return E_FAIL;
 
+	AbilityType(m_eAbilityType);
+
 	if (FAILED(Add_Components()))
 		return E_FAIL;
-
-	m_pTransformCom->Turn(XMVectorSet(1.f, 0.f, 0.f, 0.f), 1.f);
 	
 	m_eItemType = ITEM_FOOD;
 	m_fJumpPower = 7.f;
 	m_fPower = 2.f;
-
 
 	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
 	CTransform* pTransform = pKirby->Get_TransformCom();
@@ -67,6 +66,10 @@ _int CAbility::Tick(_float fTimeDelta)
 {
 	if (m_bDead == true)
 		return OBJ_DEAD;
+
+	// 미친 데카
+	if (25 == m_iDeathCount)
+		m_bDead = true;
 
 	if (m_ePhyXState == PO_KIRBYMOUTH)
 		Delete_AllEffect();
@@ -103,6 +106,21 @@ _int CAbility::Tick(_float fTimeDelta)
 			m_fPower -= m_fTimeDelta * 3.f;
 		else
 			m_fPower = 0.1f;
+
+		// n초후 깜빡이면서 사라짐
+		m_fLifeTime += m_fTimeDelta;
+		if (4.f < m_fLifeTime)
+		{
+			m_fRenderTime += m_fTimeDelta;
+			if (0.1f > m_fRenderTime)
+				m_bRender = true;
+			else
+			{
+				m_fRenderTime = 0.f;
+				m_bRender = false;
+				++m_iDeathCount;
+			}
+		}
 	}
 
 	__super::Tick(m_fTimeDelta);
@@ -127,6 +145,9 @@ void CAbility::Late_Tick(_float fTimeDelta)
 
 HRESULT CAbility::Render()
 {
+	if (true == m_bRender)
+		return S_OK;
+
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
@@ -188,13 +209,12 @@ HRESULT CAbility::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Item_Sword"),
+	hr = __super::Add_Component(m_strComponentTag,
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
 	/* For.Com_CharacterController */
 	CCharacterController::CONTROLLER_DESC desc{};
-	m_vPosition.y += 1.f;
 	desc.vInitialPos = m_vPosition;
 	desc.fOffset = -0.5f;
 	desc.tCapsuleShape.fHeight = 1.f;
@@ -231,6 +251,26 @@ HRESULT CAbility::Bind_ShaderResources()
 		return E_FAIL;
 
 	return S_OK;
+}
+
+void CAbility::AbilityType(ABILITYTYPE eAbilityType)
+{
+	switch (eAbilityType)
+	{
+	case ABILITY_SWORD:
+		m_strComponentTag = TEXT("Prototype_Component_Model_Item_Sword");
+		m_pTransformCom->Turn(XMVectorSet(1.f, 0.f, 0.f, 0.f), 1.f);
+		break;
+	case ABILITY_CUTTER:
+		break;
+	case ABILITY_BOMB:
+		m_strComponentTag = TEXT("Prototype_Component_Model_Item_Bomb");
+		break;
+	case ABILITY_END:
+		break;
+	default:
+		break;
+	}
 }
 
 void CAbility::Sphere_Collision()

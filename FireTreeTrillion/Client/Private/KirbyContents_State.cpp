@@ -79,7 +79,7 @@ void CKirbyGet_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 
 			CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
 			AbilityItemDesc.vPosition = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-			AbilityItemDesc.eType = pKirby->Get_AbilityType();
+			AbilityItemDesc.eAbilityType = pKirby->Get_AbilityType();
 			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 			CHECK_FAILED(hr);
 			pKirby->Set_AbilityType(ABILITY_DEFAULT);
