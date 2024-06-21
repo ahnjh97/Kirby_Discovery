@@ -177,15 +177,16 @@ _int CParticle::Tick(_float _fTimeDelta)
 	if (m_bDead)
 		return OBJ_DEAD;
 
+
+
 	return OBJ_NOEVENT;
 }
 
-void CParticle::Late_Tick(_float fTimeDelta)
+void CParticle::Late_Tick(_float _fTimeDelta)
 {
 
-
 	//현재 설정 값으로 적용할 타임델타 값을 바꾼다.
-	_float fMyTimeDelta = fTimeDelta;
+	_float fMyTimeDelta = _fTimeDelta;
 	switch (m_eTimer)
 	{
 	case TIMER_FIRST:
@@ -252,8 +253,6 @@ void CParticle::Late_Tick(_float fTimeDelta)
 
 
 
-
-
 	if ((CRenderer::RENDERGROUP)m_eRenderGroup != CRenderer::RENDER_END)
 		m_pGameInstance->Add_RenderGroup((CRenderer::RENDERGROUP)m_eRenderGroup, this);
 
@@ -303,7 +302,7 @@ HRESULT CParticle::Add_Components(PARTICLE_DESC& _FXDesc)
 		CHECK_FAILED(hr);
 
 
-		hr = __super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Shader_VtxInstance_Point"),
+		hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxInstance_Point"),
 			TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 		CHECK_FAILED(hr);
 
@@ -318,7 +317,7 @@ HRESULT CParticle::Add_Components(PARTICLE_DESC& _FXDesc)
 		CHECK_FAILED(hr);
 
 
-		hr = __super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Shader_FXModel"),
+		hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_FXModel"),
 			TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 
 		CHECK_FAILED(hr);

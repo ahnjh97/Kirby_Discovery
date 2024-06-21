@@ -374,6 +374,9 @@ PS_OUT_EFFECT PS_MAIN_WHITE_FX(PS_IN In)
 {
     PS_OUT_EFFECT Out = (PS_OUT_EFFECT) 0;
 
+    if(g_fAlpha == 0)
+        discard;
+    
     vector vMask = g_MaskTexture.Sample(ClampSampler, RotateUV(In.vTexcoord + g_vMaskUVOffset, g_fMaskUVAngle));
     
     //마스크 자르기

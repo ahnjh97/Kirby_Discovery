@@ -73,7 +73,7 @@ HRESULT CGrid::Render()
 
 HRESULT CGrid::Add_Components()
 {
-	if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Shader_VtxNorTex"),
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxNorTex"),
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 

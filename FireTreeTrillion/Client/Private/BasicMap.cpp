@@ -33,7 +33,8 @@ HRESULT CBasicMap::Initialize(void* pArg)
 
     wstring wstrModelTag = GameObjectDesc.wstrModelName;
 
-    if (wstrModelTag.substr(wstrModelTag.length() - 5) == TEXT("Blend"))
+
+    if (wstrModelTag != TEXT("Town") && wstrModelTag.substr(wstrModelTag.length() - 5) == TEXT("Blend"))
     {
         m_bBlendMap = true;
         m_eRenderGroup = CRenderer::RENDER_BLEND;
@@ -44,7 +45,7 @@ HRESULT CBasicMap::Initialize(void* pArg)
 
     SetUpShaderInfo(wstrModelTag);
 
-    if(false == m_bBlendMap)
+    if(wstrModelTag != TEXT("Town") && false == m_bBlendMap)
     {
         if (true == CheckIfBlendMapExists(GameObjectDesc.wstrModelName)) {
             if (FAILED(Add_BlendMap(wstrModelTag)))
@@ -179,7 +180,7 @@ void CBasicMap::Render_IMGUI()
 HRESULT CBasicMap::Add_Components(const wstring& _wstrModelTag)
 {
     /* For.Com_Shader */
-    if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Shader_VtxModel_Map"),
+    if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel_Map"),
         TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
         return E_FAIL;
 
@@ -191,12 +192,12 @@ HRESULT CBasicMap::Add_Components(const wstring& _wstrModelTag)
     if (*m_pCurrentLevelID != LEVEL_TOOL_MAP)
     {
         /* For.Com_Shader */
-        if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Shader_VtxModel"),
+        if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"),
             TEXT("Com_Shader_NonAnim"), (CComponent**)&m_pNonAnimShaderCom)))
             return E_FAIL;
 
         /* For.Com_Shader */
-        if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Shader_VtxAnimModel"),
+        if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimModel"),
             TEXT("Com_Shader_Anim"), (CComponent**)&m_pAnimShaderCom)))
             return E_FAIL;
 

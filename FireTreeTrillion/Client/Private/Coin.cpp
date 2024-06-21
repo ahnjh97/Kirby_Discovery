@@ -154,7 +154,7 @@ HRESULT CCoin::Add_Components()
 {
 	HRESULT hr;
 
-	hr = __super::Add_Component(TEXT("Prototype_Component_Shader_VtxModel"),
+	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"),
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 

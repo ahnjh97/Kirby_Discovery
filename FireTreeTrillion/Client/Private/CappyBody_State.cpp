@@ -105,6 +105,9 @@ void CCappyBody_Find_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player")));
 	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
 
+	// 자유 낙하
+	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
+
 	pCappyBody->Set_Render(false);
 
 	if (true == pCappyBody->IsAnimFinished())
@@ -178,7 +181,7 @@ void CCappyBody_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	if(2.f > m_fTimeDelta)
 	{
 		if (0.5f <= XMVector3Length(vLook).m128_f32[0])
-			vPos += XMVector3Normalize(vLook) * fTimeDelta;
+			vPos += XMVector3Normalize(vLook) * fTimeDelta * 2.f;
 
 		// 플레이어를 향해 바라본다
 		pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 2.f);
@@ -290,12 +293,12 @@ void CCappyBody_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		pCappy->Set_DamageJumpPower(fDamageJumpPower);
 
 
-		if (true == pCappy->IsAnimFinished() || pController->Is_Terrain())
+		if (/*true == pCappy->IsAnimFinished() || */pController->Is_Terrain())
 		{
 			if (pCappy->Get_Hp() <= 0.f)
 				pCappy->Set_Dead();
 			else
-				pCappy->Change_State(CCappyBody::CAPPYBODY_WAIT, 40.f, false, true);
+				pCappy->Change_State(CCappyBody::CAPPYBODY_WAIT, 40.f, true, true);
 		}
 	}
 	// 날아가는 도중이다.  1초에 360도 회전하며, 30의 거리로 날아간다.

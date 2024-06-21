@@ -42,7 +42,7 @@ HRESULT CPoppyBomb::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-
+	//m_pModelCom->Set_Animation(0, 30.f, true, false);
 
 	m_fAttack = 15.f;
 	m_eVacuumSize = SIZE_SMALL;
@@ -69,7 +69,7 @@ _int CPoppyBomb::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return Ready_Dead();
 
-	if (static_cast<CPoppyBrosJr*>(m_pGameObject)->Get_Dead())
+	if (static_cast<CPoppyBrosJr*>(m_pGameObject)->Get_Dead() || CPoppyBrosJr::POPPY_DAMAGE == static_cast<CPoppyBrosJr*>(m_pGameObject)->Get_State())
 		m_bDead = true;
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
@@ -80,7 +80,7 @@ _int CPoppyBomb::Tick(_float fTimeDelta)
 		_vector vGravity = XMVectorSet(0.f, -GRAVITY, 0.f, 0.f);
 
 		// 경사면 법선 벡터
-		_vector vNormal = CUtils::To_Vector(m_pControllerCom->Compute_PureSlope());
+		_vector vNormal = CUtils::To_Vector(m_pControllerCom->Compute_Slope(m_pTransformCom));
 
 		// 중력 벡터를 경사면 법선에 투영하여 평면상에서의 중력 계산
 		_vector vGravityParallel = XMVector3Dot(vGravity, vNormal) * vNormal;
@@ -99,30 +99,20 @@ _int CPoppyBomb::Tick(_float fTimeDelta)
 
 		// 이동
 		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-		vPos += (vVelocity + (XMVector3Normalize(m_vLookDir) * 0.2f * m_fMoveTime)) * m_fTimeDelta * 20.f;
+
+		vPos += (vVelocity * m_fTimeDelta * 5.f + (XMVector3Normalize(m_vLookDir) * m_fTimeDelta * m_fMoveTime * 2.f));
 		m_pControllerCom->Move(m_pTransformCom, vPos, m_fTimeDelta);
 
-		//_float fHeight = m_pControllerCom->Compute_Height();
-
-		//if (2.f < fHeight)
-		//	m_bFall = true;
-
 		if (0.f < m_fMoveTime)
-		{
 			m_fMoveTime -= m_fTimeDelta;
-		}
 		else
-		{
 			m_fMoveTime = 0.f;
-		}
 
 		if (0.f >= m_fMoveTime)
 			m_fLifeTime += m_fTimeDelta;
 
 		if (2.f < m_fLifeTime)
 			m_bDead = true;
-
-
 
 		_vector vLook = vPos - m_vBeforePos;
 		_float fDistance = XMVectorGetX(XMVector3Length(vLook)) / m_fTimeDelta;
@@ -145,6 +135,7 @@ _int CPoppyBomb::Tick(_float fTimeDelta)
 		if (!m_bJump)
 		{
 			//m_pControllerCom->FreeFall(m_pTransformCom, m_fTimeDelta, 6.f, 0.5f);
+			m_pModelCom->Set_Animation(0, 30.f, true, false);
 			m_bPhysx = true;
 		}
 		// 폭탄이 포물선을 그리며 날아감
@@ -184,6 +175,8 @@ _int CPoppyBomb::Tick(_float fTimeDelta)
 
 void CPoppyBomb::Late_Tick(_float fTimeDelta)
 {
+	m_pModelCom->Play_Animation(m_fTimeDelta/* * (1.f + pow(m_fBombingTime, 4.f))*/);
+
 	// 커비 입 안에 있고, Fly가 아닐땐 입 안에 있는 상황이므로, Render되지않는다.
 	if (m_ePhyXState == PO_KIRBYMOUTH)
 		return;
@@ -207,15 +200,16 @@ HRESULT CPoppyBomb::Render()
 	{
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
 			return E_FAIL;
-
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
 			return E_FAIL;
-
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
 			return E_FAIL;
 
+		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+			return E_FAIL;
+
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom->Begin(MODEL_NORMAL_O)))
+		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
 			return E_FAIL;
 
 		m_pModelCom->Render(i);
@@ -294,7 +288,7 @@ HRESULT CPoppyBomb::Add_Components()
 {
 	HRESULT hr;
 	/* For.Com_Shader */
-	hr = __super::Add_Component(TEXT("Prototype_Component_Shader_VtxModel"),
+	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimModel"),
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 

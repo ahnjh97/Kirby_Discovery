@@ -10,27 +10,24 @@ class CLevelChanger final : public CBase
 public:
 	struct LEVEL_DATA
 	{
+		string	strObjectName;
 		_float	fKirbyHP;
 		_float	fKirbyCoin;
-		
-		// 추후 Kirby의 변신상태를 츄가한다.
-		//_uint	uKirbyState;
-		// 등등
+		//_uint	uKirbyState; // 커비 변신 상태
 	};
 
 private:
-	CLevelChanger(/*ID3D11Device* pDevice, ID3D11DeviceContext* pContext*/);
+	CLevelChanger();
 	virtual ~CLevelChanger() = default;
 
 public:
-	void		Save();
-	void		Load();
+	void			Save(LEVEL_DATA _tData);
+	LEVEL_DATA		Load();
 
 private:
 	LEVEL_DATA		m_tLevelData;
 
 public:
-	void Release_LevelChanger();
 	virtual void Free() override;
 
 };

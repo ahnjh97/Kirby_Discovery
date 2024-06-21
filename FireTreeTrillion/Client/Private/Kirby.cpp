@@ -1,6 +1,7 @@
 #include "stdafx.h"
-#include "FSM.h"
 #include "Kirby.h"
+#include "LevelChanger.h"
+#include "FSM.h"
 #include "Camera_Free.h"
 
 #include "KirbyDefault_State.h"
@@ -56,35 +57,8 @@ HRESULT CKirby::Initialize(void* pArg)
 	INFO(m_eMouthState) = MOUTH_IDLE;
 	INFO(m_eEyeState) = EYE_IDLE;
 
-
-	// 첫 카메라 기준으로 움직이기에 미리 받아둔다.
-	if (m_pCamera == nullptr)
-	{
-		//인트로, 게임플레이 스테이지라면 카메라로 main camera를 저장한다.
-		(*m_pCurrentLevelID == LEVEL_INTRO || *m_pCurrentLevelID == LEVEL_GAMEPLAY) ?
-			m_pCamera = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main"))) :
-
-		//나머지 레벨이라면 다른 카메라를 저장한다.
-		m_pCamera = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Free")));
-
-		if (m_pCamera == nullptr)
-		{
-			ALARM_FAIL(TEXT("망했어 카메라 없다"));
-			return E_FAIL;
-		}
-		Safe_AddRef(m_pCamera);
-	}
-
-	m_pCamera->Set_Target(m_pTransformCom);
-
-	//게임 레벨에 free camera 있다면 그놈에게도 타겟 등록해 준다.
-	if ((*m_pCurrentLevelID == LEVEL_INTRO || *m_pCurrentLevelID == LEVEL_GAMEPLAY))
-	{
-		CCamera* pCameraFree = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Free")));
-		if (pCameraFree != nullptr)
-			pCameraFree->Set_Target(m_pTransformCom);
-	}
-
+	if (FAILED(Make_TargetToCams()))
+		return E_FAIL;
 
 	_float4 m_pCameraLook = m_pCamera->Get_TransformCom()->Get_State_Vector(CTransform::STATE_LOOK);
 	m_pCameraLook.y = 0.f;
@@ -94,8 +68,13 @@ HRESULT CKirby::Initialize(void* pArg)
 
 	m_pModelCom[INFO(m_eBodyState)]->Set_Animation(STATE_IDLE, 60.f, true, true);
 
+	// 파싱으로 레벨전환될때 HP와 COIN개수를 이동시킵니다.
+	CLevelChanger::LEVEL_DATA tLevelData = CLevelChanger::Get_Instance()->Load();
+	m_fHp = tLevelData.fKirbyHP;
+	m_uCoin = tLevelData.fKirbyCoin;
+	//m_fHp = 100.f; // 기존 사용하던 HP입니다.
+
 	m_fMaxHp = 100.f;
-	m_fHp = 100.f;
 	m_fAttack = 5.f;
 	m_eAbilityType = ABILITY_DEFAULT;
 	m_eAbilityType = ABILITY_SWORD;
@@ -234,7 +213,7 @@ void CKirby::Render_IMGUI()
 
 	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	ImGui::Text("HP : %d", (_int)m_fHp);
-	ImGui::Text("m_fDumpAbilityTime : %.2f", INFO(m_fDumpAbilityTime));
+	ImGui::Text("m_fVacuumTime : %.2f", INFO(m_fVacuumTime));
 	ImGui::Text("m_bInitializeTargetPos : %d", m_bInitializeTargetPos);
 	ImGui::Text("m_vLadderPoint.x : %.2f, m_vLadderPoint.y : %.2f m_vLadderPoint.z : %.2f", INFO(m_vLadderPoint).x, INFO(m_vLadderPoint).y, INFO(m_vLadderPoint).z);
 	ImGui::Text("m_vLadderLook.x : %.2f, m_vLadderLook.y : %.2f m_vLadderLook.z : %.2f", INFO(m_vLadderLook).x, INFO(m_vLadderLook).y, INFO(m_vLadderLook).z);
@@ -706,11 +685,43 @@ void CKirby::Key_Input(_float fTimeDelta)
 #pragma endregion
 }
 
+HRESULT CKirby::Make_TargetToCams()
+{
+
+	// 첫 카메라 기준으로 움직이기에 미리 받아둔다.
+	if (m_pCamera == nullptr)
+	{
+		//인트로, 게임플레이 스테이지라면 카메라로 main camera를 저장한다.
+		(LEVEL_INTRO <= *m_pCurrentLevelID && *m_pCurrentLevelID < LEVEL_END) ?
+			m_pCamera = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main"))) :
+
+			//나머지 레벨이라면 다른 카메라를 저장한다.
+			m_pCamera = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Free")));
+
+		if (m_pCamera == nullptr)
+		{
+			ALARM_FAIL(TEXT("망했어 카메라 없다"));
+			return E_FAIL;
+		}
+		Safe_AddRef(m_pCamera);
+	}
+
+	m_pCamera->Set_Target(m_pTransformCom);
+
+	//게임 레벨에 free camera 있다면 그놈에게도 타겟 등록해 준다.
+	if (LEVEL_INTRO <= *m_pCurrentLevelID && *m_pCurrentLevelID < LEVEL_END)
+	{
+		CCamera* pCameraFree = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Free")));
+		if (pCameraFree != nullptr)
+			pCameraFree->Set_Target(m_pTransformCom);
+	}
+}
+
 HRESULT CKirby::Add_Components()
 {
 	HRESULT hr;
 	/* For.Com_Shader */
-	hr = __super::Add_Component(TEXT("Prototype_Component_Shader_VtxAnimModel"),
+	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimModel"),
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
@@ -1305,6 +1316,8 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 			m_isKirbyAttacking = false;
 		}
 	}
+
+
 }
 
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -1335,6 +1348,11 @@ CGameObject* CKirby::Clone(void* pArg)
 
 void CKirby::Free()
 {
+	CLevelChanger::LEVEL_DATA tLevelData = {};
+	tLevelData.fKirbyCoin = m_uCoin;
+	tLevelData.fKirbyHP = m_fHp;
+	CLevelChanger::Get_Instance()->Save(tLevelData);
+
 	__super::Free();
 
 	for (auto& pModelCom : m_pModelCom)
