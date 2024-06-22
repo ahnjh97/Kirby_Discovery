@@ -19,9 +19,6 @@
     <Filter Include="01.Levels\Logo">
       <UniqueIdentifier>{7fa67ac9-2f2d-435f-bf35-849f5cbedd3c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Levels\Loading\Loader">
-      <UniqueIdentifier>{17ab5a45-d880-40f6-b518-e747936c79d3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects">
       <UniqueIdentifier>{c4cae272-dd94-43ce-85e6-ecc0b24de4d0}</UniqueIdentifier>
     </Filter>
@@ -316,6 +313,12 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop">
       <UniqueIdentifier>{4c6be733-c7c6-40fb-ba47-92d5f18bf7f9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Levels\_Loader">
+      <UniqueIdentifier>{2433d7e5-8e5b-4e5a-9e6b-265a49b4604a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\Racing">
+      <UniqueIdentifier>{737fc96b-c550-4a4f-a027-697453f18b10}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -341,9 +344,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\Level_Logo.h">
       <Filter>01.Levels\Logo</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Loader.h">
-      <Filter>01.Levels\Loading\Loader</Filter>
     </ClInclude>
     <ClInclude Include="..\public\BackGround.h">
       <Filter>02.GameObjects\UI\BackGround</Filter>
@@ -633,6 +633,12 @@
     <ClInclude Include="..\public\FoodShopDee.h">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Loader.h">
+      <Filter>01.Levels\_Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_Racing.h">
+      <Filter>01.Levels\Racing</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -649,9 +655,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\Level_Logo.cpp">
       <Filter>01.Levels\Logo</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Loader.cpp">
-      <Filter>01.Levels\Loading\Loader</Filter>
     </ClCompile>
     <ClCompile Include="..\private\BackGround.cpp">
       <Filter>02.GameObjects\UI\BackGround</Filter>
@@ -931,6 +934,12 @@
     </ClCompile>
     <ClCompile Include="..\private\FoodShopDee.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Loader.cpp">
+      <Filter>01.Levels\_Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Racing.cpp">
+      <Filter>01.Levels\Racing</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

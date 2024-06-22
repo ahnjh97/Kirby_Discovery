@@ -767,7 +767,7 @@ HRESULT CLevel_Intro::Load_FileData(const string& _strFilePath, FILE_TYPE _eFile
 			strProtoTag += strUITag;
 		}
 
-		HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, _wstrLayerTag, CUtils::StrToWstr(strProtoTag), &LayerUIDesc);
+		HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_INTRO, _wstrLayerTag, CUtils::StrToWstr(strProtoTag), &LayerUIDesc);
 		CHECK_FAILED(hr);
 	}
 
