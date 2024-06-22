@@ -315,6 +315,12 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\PartTimerKirby\State">
       <UniqueIdentifier>{20102d47-32f7-4ef0-9080-ab3cfbdd2b28}</UniqueIdentifier>
+	</Filter>
+	<Filter Include="02.GameObjects\PhysXObject\Character\WaddleDee\State">
+      <UniqueIdentifier>{2ed6ece7-973d-401a-9fec-badd5290f2ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop">
+      <UniqueIdentifier>{4c6be733-c7c6-40fb-ba47-92d5f18bf7f9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -629,6 +635,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\PartTimerKirby.h">
       <Filter>02.GameObjects\PhysXObject\Character\PartTimerKirby</Filter>
+	</ClInclude>
+	<ClInclude Include="..\public\Dee_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\FoodShopDee.h">
+      <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -925,6 +937,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\PartTimerKirby.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\PartTimerKirby</Filter>
+	</ClCompile>
+	<ClCompile Include="..\private\Dee_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\FoodShopDee.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

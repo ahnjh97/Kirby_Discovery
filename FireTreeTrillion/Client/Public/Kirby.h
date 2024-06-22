@@ -113,6 +113,13 @@ public:
 		_float			m_fBombPower = { 0.f };
 		// 조준 했을 때 들어오는 bool 값
 		_bool			m_bBombAimming = { false };
+
+
+		// 자동차 전용 점퍼
+		_bool			m_bCarJump = { false };
+		// 자동차 부스터 타임
+		_bool			m_bBooster = { false };
+		_float			m_fBoosterTime = { 0.f };
 	}KIRBY_INFODESC;
 
 
@@ -169,6 +176,8 @@ private:
 	void			Setting_KirbyBalance();
 	void			Key_Input(_float fTimeDelta);
 	void			Kirby_SystemTick(_float fTimeDelta);
+	HRESULT			Kirby_SystemInitialize();
+	void			Kirby_LookInitialize();
 
 	_float3			Make_RepulsiveDir(CPhysXObject* pObject);
 

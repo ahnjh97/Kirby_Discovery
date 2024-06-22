@@ -27,12 +27,12 @@ void CKirbyDefault_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 	// 자유낙하
 	pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
 	// 낙하 높이
-	if (pController->Compute_Height() > 2.f)
+	/*if (pController->Compute_Height() > 2.f)
 	{
 		DESC(m_eEyeState) = CKirby::EYE_IDLE;
 		pKirby->Change_State(CKirby::STATE_FALL, 50.f, false, true, CKirby::BODY_DEFAULT);
 		return;
-	}
+	}*/
 
 	// Idle일 때, 방향키를 눌렀을 때 RUN 으로 간다.
 	if (JoyStick_controller(Kirbydesc, pCamera))

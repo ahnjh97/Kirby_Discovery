@@ -68,10 +68,23 @@ _int CAwoofy::Tick(_float fTimeDelta)
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
-	__super::Tick(m_fTimeDelta);
+	// 만약, 밟히면 그 순간 그냥 찐빵되고 죽는다.
+	if (m_ePhyXState == PO_PRESSED)
+	{
+		m_pTransformCom->Set_Scaled(1.f, 0.1f, 1.f);
+		m_fPressedTime += m_fTimeDelta;
+
+		if (m_fPressedTime > 1.5f)
+			m_bDead = true;
+		return OBJ_NOEVENT;
+	}
 
 	if (m_ePhyXState == PO_VACUUMING || m_ePhyXState == PO_FLYDEADAWAY)
 		Change_State(CAwoofy::AWOOFY_DAMAGE, 120.f, true, false);
+
+
+	__super::Tick(m_fTimeDelta);
+
 
 	return OBJ_NOEVENT;
 }
@@ -87,7 +100,7 @@ void CAwoofy::Late_Tick(_float fTimeDelta)
 		// 날아갈 땐, 애니메이션 재생이 되지 않는다.
 		if (m_ePhyXState != PO_FLYAWAY)
 		{
-			if (Compute_OptimizationAnimation(m_fTimeDelta) == true)
+			if (Compute_OptimizationAnimation(m_fTimeDelta) == true && m_ePhyXState != PO_PRESSED)
 				m_ePhyXState == PO_FLYDEADAWAY ? m_pModelCom->Play_Animation(m_fAccTime * 0.3f) : m_pModelCom->Play_Animation(m_fAccTime);
 		}
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
@@ -121,7 +134,7 @@ HRESULT CAwoofy::Render()
 		//몸통(1)은 normal O, 눈까리(0)는 normal x 패스
 		if (i == 0 && m_bRenderBody)
 		{
-			if (FAILED(m_pShaderCom->Begin(11)))
+			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
 				return E_FAIL;
 			if (FAILED(m_pModelCom->Render(i)))
 				return E_FAIL;
@@ -326,7 +339,6 @@ HRESULT CAwoofy::Add_Components()
 	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Awoofy_Eye"),
 		TEXT("Com_Texture"), (CComponent**)&m_pEyeTextureCom);
 	CHECK_FAILED(hr);
-
 
 	/* For.Com_CharacterController */
 	m_vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);

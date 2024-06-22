@@ -166,6 +166,7 @@ HRESULT CLayerUI::Render_FontSet(CShader* _pShaderCom, CTransform* _pTransCom)
 	
 	//wstring wstrFontTag = { TEXT("Font_HUD_StarPoint_NUM30") };
 	wstring wstrFontTag = { TEXT("Font_HUDSub_KR15") };
+	//wstring wstrFontTag = { TEXT("Font_HUDSub_EN10") };
 
 	if (FAILED(_pTransCom->Bind_ShaderResource(_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
