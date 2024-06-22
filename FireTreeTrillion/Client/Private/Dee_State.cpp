@@ -3,6 +3,34 @@
 #include "WaddleDee.h"
 #include "Kirby.h"
 
+
+CDee_State::CDee_State()
+{
+}
+
+void CDee_State::Free()
+{
+	__super::Free();
+}
+
+void CDee_State::Setup_BaseInfo(BASE_INFO& _baseInfo, CGameObject* pGameObject)
+{
+	_baseInfo.pDee = static_cast<CWaddleDee*>(pGameObject);
+	_baseInfo.pTransformCom = pGameObject->Get_TransformCom();
+	_baseInfo.pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+
+	_baseInfo.pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+	_baseInfo.pKirbyTransformCom = _baseInfo.pKirby->Get_TransformCom();
+
+	_baseInfo.vMyPos = (_float3)_baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION);
+	_baseInfo.vKirbyPos = (_float3)_baseInfo.pKirbyTransformCom->Get_State(CTransform::STATE_POSITION);
+
+	_baseInfo.fDistance = (_baseInfo.vMyPos - _baseInfo.vKirbyPos).Length();
+
+
+}
+
+
 #pragma region IDLE STATE
 //*********************************
 //			 IDLE STATE
@@ -18,11 +46,11 @@ void CDee_Idle_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _f
 
 void CDee_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
-	CWaddleDee* pDee = static_cast<CWaddleDee*>(pGameObject);
-	CTransform* pTransformCom = pGameObject->Get_TransformCom();
-	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+	BASE_INFO baseInfo{};
+	Setup_BaseInfo(baseInfo, pGameObject);
 
-	pController->FreeFall(pTransformCom, fTimeDelta);
+	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta);
+
 
 }
 
@@ -181,3 +209,4 @@ void CDee_Stun_State::Free()
 }
 
 #pragma endregion
+

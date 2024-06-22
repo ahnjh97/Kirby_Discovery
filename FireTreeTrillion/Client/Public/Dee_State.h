@@ -4,10 +4,40 @@
 
 BEGIN(Client)
 
+
+class CDee_State abstract : public CFSM_State
+{
+protected:
+	CDee_State();
+	virtual ~CDee_State() = default;
+
+	typedef struct
+	{
+		class CWaddleDee* pDee = {nullptr};
+		class CTransform* pTransformCom = { nullptr };
+		class CCharacterController* pController = { nullptr };
+
+		class CKirby* pKirby = { nullptr };
+		class CTransform* pKirbyTransformCom = { nullptr };
+
+		_float3 vMyPos;
+		_float3 vKirbyPos;
+
+		_float fDistance;
+
+	}BASE_INFO;
+
+	void Setup_BaseInfo(BASE_INFO& _baseInfo, CGameObject* pGameObject);
+
+public:
+	virtual void Free() override;
+};
+
+
 //*********************************
 //			IDLE STATE
 //*********************************
-class CDee_Idle_State final : public CFSM_State
+class CDee_Idle_State final : public CDee_State
 {
 private:
 	CDee_Idle_State();
@@ -20,7 +50,6 @@ public:
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
 	virtual void OnStateExit()														override;
 
-
 public:
 	static	CDee_Idle_State* Create();
 	virtual void Free() override;
@@ -29,7 +58,7 @@ public:
 //*********************************
 //			MOVE STATE
 //*********************************
-class CDee_Move_State final : public CFSM_State
+class CDee_Move_State final : public CDee_State
 {
 private:
 	CDee_Move_State();
@@ -51,7 +80,7 @@ public:
 //*********************************
 //			EMOTION STATE
 //*********************************
-class CDee_Emotion_State final : public CFSM_State
+class CDee_Emotion_State final : public CDee_State
 {
 private:
 	CDee_Emotion_State();
@@ -73,7 +102,7 @@ public:
 //*********************************
 //			HUNGRY STATE
 //*********************************
-class CDee_Hungry_State final : public CFSM_State
+class CDee_Hungry_State final : public CDee_State
 {
 private:
 	CDee_Hungry_State();
@@ -95,7 +124,7 @@ public:
 //*********************************
 //			STUN STATE
 //*********************************
-class CDee_Stun_State final : public CFSM_State
+class CDee_Stun_State final : public CDee_State
 {
 private:
 	CDee_Stun_State();

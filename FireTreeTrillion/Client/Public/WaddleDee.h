@@ -15,10 +15,10 @@ BEGIN(Client)
 class CWaddleDee abstract : public CCharacter
 {
 public:
-	enum DEE_EYESTATE
+	enum DEEEYESTATE
 	{
-		EYE_IDLE, EYE_ANGER, EYE_CLOSE, EYE_SADNESS,
-		EYE_PUPIL, EYE_BLINK, EYE_DOUBT, EYE_END
+		DEEEYE_IDLE, DEEEYE_ANGER, DEEEYE_CLOSE, DEEEYE_SADNESS,
+		DEEEYE_PUPIL, DEEEYE_BLINK, DEEEYE_DOUBT, DEEEYE_END
 	};
 
 	enum DEE_ANIM
@@ -29,6 +29,25 @@ public:
 		DEEANIM_CASEHELPME_END,
 		DEEANIM_CASEHELPME_START,
 
+		DEEANIM_CLERKTALK = 26,
+		DEEANIM_CLERKWAVEHAND,
+
+		DEEANIM_ENEMYSLEEP = 50,
+		DEEANIM_ENEMYWALK = 51,
+
+		DEEANIM_GREETING_ONEHAND = 56,
+		DEEANIM_GREETING_TWOHAND,
+		DEEANIM_GREETING_TWOHANDLOOP,
+		DEEANIM_SLIPYES = 119,
+		DEEANIM_SURPRISE,
+
+		DEEANIM_TALK1,
+		DEEANIM_TALK2,
+		DEEANIM_TALK3A,
+		DEEANIM_TALK3B,
+		DEEANIM_TALK3LISTEN,
+
+		DEEANIM_WAIT = 133,
 
 		DEEANIM_END
 	};
@@ -93,18 +112,14 @@ public:
 #endif
 
 	virtual void	Add_AnimEvent() override {}
-	//virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
-	//void			Change_State(DEE_STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
 
-
-	//_bool			m_bRenderEye = { true };
-	//_bool			m_bRenderBody = { true };
 
 protected:
 	CModel*			m_pModelCom = { nullptr };
+	CTexture*		m_pEyeTextureCom = { nullptr };
 
-	// FSM
-	//void			SetUp_FSM();
+	DEEEYESTATE		m_eEyeState = { DEEEYE_END };
+
 	_bool			Custom_Face(_uint iMeshIndex);
 
 public:
