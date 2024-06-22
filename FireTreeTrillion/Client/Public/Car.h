@@ -47,6 +47,12 @@ private:
 	CCharacterController*		m_pControllerCom = { nullptr };
 	CShader*					m_pShaderCom = { nullptr };
 
+	ANIMINDEX					m_eAnimIndex = { CAR_END };
+	ANIMINDEX					m_ePreAnimIndex = { CAR_END };
+	_float						m_fFallTime = { 0.f };
+
+	void						Set_Animation();
+
 public:
 	static CCar* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

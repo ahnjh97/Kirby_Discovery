@@ -264,6 +264,9 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BombOrbitGlow"), CBombOrbitGlow);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KirbyBomb"), CKirbyBomb);
 
+	// Deform
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Car"), CCar);
+
 	// Monster
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Awoofy"), CAwoofy);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Rabbit"), CRabbit);
@@ -990,6 +993,13 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("BG0", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("Ladder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+
+		// 자동차 관련 (자동차와 부수는 돌멩이들)
+		m_vecModelInfo.emplace_back("Car", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("RockA", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("RockB", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("RockPartical", TYPE_NONANIM, 1.f);
+
 
 		// For Monster
 		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.2f, 180.f);

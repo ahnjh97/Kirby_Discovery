@@ -30,7 +30,9 @@ HRESULT CCar::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	m_pModelCom->Set_Animation(CAR_WAIT, 60.f, true, true);
+
+	m_eAnimIndex = CAR_FALL;
+	m_pModelCom->Set_Animation(m_eAnimIndex, 60.f, true, false);
 
 	return S_OK;
 }
@@ -40,18 +42,61 @@ _int CCar::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return OBJ_DEAD;
 
+	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 	// ±¸ÇöºÎ
 	Compute_MotionBlur();
+	Set_Animation();
 
 
+	if (m_ePhyXState == PO_VACUUMING)
+	{
+		Set_BodyCollider(COLLIDER_SPHERE, 1.f, 2.f, 1.f);
+		m_eAnimIndex = CAR_SHAKE;
+	}
+
+
+	if (m_eAnimIndex == CAR_WAIT)
+	{
+		m_pControllerCom->FreeFall(m_pTransformCom, m_fTimeDelta, 3.f);
+
+		if (m_pControllerCom->Compute_Height() > 2.f)
+			m_eAnimIndex = CAR_FALL;
+	}
+	else if (m_eAnimIndex == CAR_FALL)
+	{
+		m_pControllerCom->FreeFall(m_pTransformCom, m_fTimeDelta, 3.f);
+		m_fFallTime += m_fTimeDelta;
+
+		if (m_pControllerCom->Is_Terrain() && m_fFallTime > 0.3f)
+		{
+			m_eAnimIndex = CAR_LANDING;
+			m_fFallTime = 0.f;
+		}
+	}
+	else if (m_eAnimIndex == CAR_LANDING)
+	{
+		m_pControllerCom->FreeFall(m_pTransformCom, m_fTimeDelta, 3.f);
+
+		if (m_pModelCom->IsFinished())
+			m_eAnimIndex = CAR_WAIT;
+	}
+	else if (m_eAnimIndex == CAR_SHAKE)
+	{
+
+
+	}
 
 	return OBJ_NOEVENT;
 }
 
 void CCar::Late_Tick(_float fTimeDelta)
 {
+
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 5.0f))
 	{
+		if (Compute_OptimizationAnimation(m_fTimeDelta) == true)
+			m_pModelCom->Play_Animation(m_fAccTime);
+
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 	}
@@ -132,7 +177,7 @@ HRESULT CCar::Add_Components()
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
-	desc.fOffset = 0.5f;
+	desc.fOffset = 1.0f;
 	desc.tCapsuleShape.fHeight = 1.f;// 1.f;
 	desc.tCapsuleShape.fRadius = 0.5f;// 0.5f;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
@@ -181,6 +226,31 @@ void CCar::Compute_MotionBlur()
 	m_vMotionVelocity.z = m_ePhyXState != PO_NORMAL ? 1.f : 0.f;
 
 	m_vPreScreenPos = vCurScreenPos;
+}
+
+void CCar::Set_Animation()
+{
+	if (m_ePreAnimIndex == m_eAnimIndex)
+		return;
+
+	switch (m_eAnimIndex)
+	{
+	case CAR_FALL:
+		m_pModelCom->Set_Animation(m_eAnimIndex, 60.f, true, false);
+		break;
+	case CAR_LANDING:
+		m_pModelCom->Set_Animation(m_eAnimIndex, 60.f, false, false);
+		break;
+	case CAR_SHAKE:
+		m_pModelCom->Set_Animation(m_eAnimIndex, 100.f, true, true);
+		break;
+	case CAR_WAIT:
+		m_pModelCom->Set_Animation(m_eAnimIndex, 60.f, true, true);
+		break;
+	default:
+		break;
+	}
+	m_ePreAnimIndex = m_eAnimIndex;
 }
 
 CCar* CCar::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
