@@ -44,8 +44,6 @@ HRESULT CLevel_Intro::Initialize()
 	hr = Ready_Layer_UI(TEXT("Layer_UI"));
 	CHECK_FAILED(hr);
 
-	/*hr = Ready_ParsedObjects();
-	CHECK_FAILED(hr);*/
 	hr = Ready_Map();
 	CHECK_FAILED(hr);
 	hr = Ready_Triggers();

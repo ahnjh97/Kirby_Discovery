@@ -29,76 +29,101 @@ void CKirbyVacuum_Spit_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	// 뱉는 시간을 측정한다.
 	m_fSpitTime += fTimeDelta;
 
-	if (m_fSpitTime > 0.05f && m_bSpitTrigger == true )
+	if (pKirby->Get_State() == CKirby::STATE_SPIT)
 	{
-		// 날려 보낸다. 날려보내는 순간 나의 관할이 아니기 때문에 그냥 보내버린다.
-		// 또한 보내기전에 마지막으로 Fly로 만들어준다. 또한 방향을 여기서 정해준다.
-		// 이곳에선 상대가 컨트롤러든 뭐시기든 아무런 상관이 없다. 내가 정해준 방향을 사용하여 객체의 움직임 구현대로 나가는것이기 때문이다. 
-		if (DESC(m_pObject) != nullptr)
+		if (m_fSpitTime > 0.05f && m_bSpitTrigger == true)
 		{
-			CTransform* pObjectTransform = DESC(m_pObject)->Get_TransformCom();
-			pObjectTransform->Set_Scaled(1.f, 1.f, 1.f);
-
-			_float4 vTargetPos = Spit_Target_Object(pKirby);
-
-			if (vTargetPos == _float4(0.f, 0.f, 0.f, 0.f))
+			// 날려 보낸다. 날려보내는 순간 나의 관할이 아니기 때문에 그냥 보내버린다.
+			// 또한 보내기전에 마지막으로 Fly로 만들어준다. 또한 방향을 여기서 정해준다.
+			// 이곳에선 상대가 컨트롤러든 뭐시기든 아무런 상관이 없다. 내가 정해준 방향을 사용하여 객체의 움직임 구현대로 나가는것이기 때문이다. 
+			if (DESC(m_pObject) != nullptr)
 			{
-				DESC(m_pObject)->Set_DamageMoving(pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), 1.f);
+				CTransform* pObjectTransform = DESC(m_pObject)->Get_TransformCom();
+				pObjectTransform->Set_Scaled(1.f, 1.f, 1.f);
 
-				_vector vNewUp = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
-				_vector vNewLook = XMVector3Cross(vNewUp, XMVectorSet(0.f, 1.f, 0.f, 0.f));
-				_vector vNewRight = XMVector3Cross(vNewUp, vNewLook);
-				pObjectTransform->Set_State(CTransform::STATE_UP, vNewUp);
-				pObjectTransform->Set_State(CTransform::STATE_RIGHT, vNewRight);
-				pObjectTransform->Set_State(CTransform::STATE_LOOK, vNewLook);
+				_float4 vTargetPos = Spit_Target_Object(pKirby);
 
+				if (vTargetPos == _float4(0.f, 0.f, 0.f, 0.f))
+				{
+					DESC(m_pObject)->Set_DamageMoving(pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), 1.f);
+
+					_vector vNewUp = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+					_vector vNewLook = XMVector3Cross(vNewUp, XMVectorSet(0.f, 1.f, 0.f, 0.f));
+					_vector vNewRight = XMVector3Cross(vNewUp, vNewLook);
+					pObjectTransform->Set_State(CTransform::STATE_UP, vNewUp);
+					pObjectTransform->Set_State(CTransform::STATE_RIGHT, vNewRight);
+					pObjectTransform->Set_State(CTransform::STATE_LOOK, vNewLook);
+
+				}
+				else
+				{
+					_float4 vObjectPos = pObjectTransform->Get_State(CTransform::STATE_POSITION);
+					_vector vObjectToTargetDir = XMVector3Normalize(vTargetPos - vObjectPos);
+					DESC(m_pObject)->Set_DamageMoving(vObjectToTargetDir, 1.f);
+
+					vObjectToTargetDir.m128_f32[1] = 0.f;
+					DESC(m_vTargetDir) = XMVector3Normalize(vObjectToTargetDir);
+
+					_vector vNewUp = vObjectToTargetDir;
+					_vector vNewLook = XMVector3Cross(vNewUp, XMVectorSet(0.f, 1.f, 0.f, 0.f));
+					_vector vNewRight = XMVector3Cross(vNewUp, vNewLook);
+					pObjectTransform->Set_State(CTransform::STATE_UP, vNewUp);
+					pObjectTransform->Set_State(CTransform::STATE_RIGHT, vNewRight);
+					pObjectTransform->Set_State(CTransform::STATE_LOOK, vNewLook);
+
+
+				}
+
+				DESC(m_pObject)->Set_PhyXState(PO_FLYAWAY);
+				Safe_Release(DESC(m_pObject));
+				DESC(m_pObject) = nullptr;
 			}
+			m_bSpitTrigger = false;
+		}
+
+
+		// 뱉는 모션의 마지막이다.
+		if (pKirby->isAnimFinish())
+		{
+			// 이제 먹은 상태가 아니며, 표정이 전부 원래대로 들어온다.
+			DESC(m_isEat) = false;
+			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			DESC(m_eMouthState) = CKirby::MOUTH_IDLE;
+			DESC(m_eTemporaryEatType) = ABILITY_END;
+
+			// 애님 끝났는데 땅을 밟았을 경우
+			if (pController->Is_Terrain() == true)
+			{
+				pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+				return;
+			}
+			// 애님 끝났는데 땅을 밟지않고 공중에 있다고 판단 될 경우
 			else
 			{
-				_float4 vObjectPos = pObjectTransform->Get_State(CTransform::STATE_POSITION);
-				_vector vObjectToTargetDir = XMVector3Normalize(vTargetPos - vObjectPos);
-				DESC(m_pObject)->Set_DamageMoving(vObjectToTargetDir, 1.f);
-
-				vObjectToTargetDir.m128_f32[1] = 0.f;
-				DESC(m_vTargetDir) = XMVector3Normalize(vObjectToTargetDir);
-
-				_vector vNewUp = vObjectToTargetDir;
-				_vector vNewLook = XMVector3Cross(vNewUp, XMVectorSet(0.f, 1.f, 0.f, 0.f));
-				_vector vNewRight = XMVector3Cross(vNewUp, vNewLook);
-				pObjectTransform->Set_State(CTransform::STATE_UP, vNewUp);
-				pObjectTransform->Set_State(CTransform::STATE_RIGHT, vNewRight);
-				pObjectTransform->Set_State(CTransform::STATE_LOOK, vNewLook);
-
-
+				pKirby->Change_State(CKirby::STATE_FALL, 50.f, false, true, CKirby::BODY_DEFAULT);
+				return;
 			}
-
-			DESC(m_pObject)->Set_PhyXState(PO_FLYAWAY);
-			Safe_Release(DESC(m_pObject));
-			DESC(m_pObject) = nullptr;
 		}
-		m_bSpitTrigger = false;
 	}
-
-
-	// 뱉는 모션의 마지막이다.
-	if (pKirby->isAnimFinish())
+	else if (pKirby->Get_State() == CKirby::STATE_SPITDEFORM)
 	{
-		// 이제 먹은 상태가 아니며, 표정이 전부 원래대로 들어온다.
-		DESC(m_isEat) = false;
-		DESC(m_eEyeState) = CKirby::EYE_IDLE;
-		DESC(m_eMouthState) = CKirby::MOUTH_IDLE;
-		DESC(m_eTemporaryEatType) = ABILITY_END;
+		_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+		if (m_bSpitTrigger == true)
+		{
+			// 자동차 등을 뱉는다. 이쪽에서.
+			_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
 
-		// 애님 끝났는데 땅을 밟았을 경우
-		if (pController->Is_Terrain() == true)
-		{
-			pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
-			return;
+			pController->Set_Position(pTransformCom, vPos + _float4(0.f, 2.f, 0.f, 0.f));
+			m_bSpitTrigger = false;
 		}
-		// 애님 끝났는데 땅을 밟지않고 공중에 있다고 판단 될 경우
-		else
+
+		DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
+		pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
+		pController->Move_Dir(pTransformCom, vLook * 4.f * fTimeDelta, fTimeDelta);
+
+		if (pKirby->isAnimFinish() == true)
 		{
-			pKirby->Change_State(CKirby::STATE_FALL, 50.f, false, true, CKirby::BODY_DEFAULT);
+			pKirby->Change_State(CKirby::STATE_FALL, 50.f, false, false, CKirby::BODY_DEFAULT);
 			return;
 		}
 	}
