@@ -441,6 +441,15 @@ void CRenderer::Color_Initialize()
 		0.79f, 1.f, 1.00999f, 1.44943f, 1.17964f, 1.14037f, 1.11018f, 0.720338f, 0.6f, 0.6f, 1.3f, 1.06f, 1.1f, 0.0649942f, 0.0378847f, 0.199115f, 0.00958735f, 0.466084f, 0.676991f, 0.218674f, 0.0796085f, 0.499961f, 0.912908f, 0.99115f, 0.209722f, 0.209559f, 0.340393f
 		});
 
+	Save_ColorSet("Town",
+		COLOR_DATA{
+		0.719726f, 1.f, 1.03994f, 1.43951f, 1.30029f, 1.24978f,
+		1.10968f, 0.730198f, 0.6f, 0.6f, 1.32995f, 1.08f, 1.1f,
+		0.0749753f, 0.0362015f, 0.188398f, 0.00991405f, 0.466084f,
+		0.676991f, 0.218674f, 0.00980014f, 0.499961f, 0.912908f,
+		0.99115f, 0.00976099f, 0.199837f, 0.350306f
+		});
+
 	//쉐이더 타입 트리거는 idx 1, 접촉하면 해당 함수를 호출!
 	function<void(_int)> TriggerFunc = bind(&CRenderer::Set_ColorSet_ByIndex, this, placeholders::_1);
 	m_pGameInstance->Emplace_TriggerFunc(1, TriggerFunc);

@@ -10,6 +10,7 @@ END
 
 BEGIN(Client)
 
+// 옥토트리와 셰이더 UV조절용 맵오브젝트
 class CBasicMap final : public CGameObject
 {
 public:

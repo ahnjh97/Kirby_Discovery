@@ -27,7 +27,6 @@ CLevel_Town::CLevel_Town(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 HRESULT CLevel_Town::Initialize()
 {
 	m_pGameInstance->Set_RenderMode(CRenderer::MODE_GAMEPLAY);
-	//CLevelChanger::Get_Instance()->Load();
 
 	HRESULT hr;
 	hr = __super::Initialize();
@@ -60,8 +59,11 @@ HRESULT CLevel_Town::Initialize()
 	hr = Ready_Kickables();
 	CHECK_FAILED(hr);
 
-	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
+	// Part-timer Kirby Test
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOWN, TEXT("Layer_Player"), TEXT("Prototype_GameObject_PartTimerKirby"))))
+	//	return E_FAIL;
 
+	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
 	return S_OK;
 }
@@ -115,7 +117,6 @@ HRESULT CLevel_Town::Ready_Lights()
 
 HRESULT CLevel_Town::Ready_Layer_Camera(const wstring& strLayerTag)
 {
-
 	LEVEL eLevel = LEVEL_TOWN;
 
 	CCamera_Main::CAMERA_KIRBY_DESC		MainCamDesc{};
@@ -397,6 +398,7 @@ HRESULT CLevel_Town::Ready_Dees()
 
 
 	//일단 마을에는 몬스터가 없어요
+	/*
 	string strFileName = "../../../objects_txt/Town_Monsters.txt";
 
 	ifstream fileInput(strFileName, ios::binary);
@@ -524,7 +526,7 @@ HRESULT CLevel_Town::Ready_Dees()
 	}
 
 	fileInput.close();
-
+	*/
 
 	return S_OK;
 }

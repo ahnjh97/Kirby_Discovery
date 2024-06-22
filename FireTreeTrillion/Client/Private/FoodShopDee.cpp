@@ -32,11 +32,10 @@ HRESULT CFoodShopDee::Initialize(void* pArg)
 		HRESULT hr;
 
 	hr = __super::Initialize(pArg);
-	CHECK_FAILED_MSG(hr, "와들디 생성 망했어");
-
+	CHECK_FAILED(hr);
 
 	hr = Add_Components();
-	CHECK_FAILED_MSG(hr, "와들디 생성 망했어");
+	CHECK_FAILED(hr);
 
 	m_pTransformCom->Rotation(_float3{ 0.f, 1.f, 0.f }, ToRadian(180.f));
 	m_pModelCom->Set_Animation(0, 50.f, true, true);
@@ -52,7 +51,6 @@ _int CFoodShopDee::Tick(_float fTimeDelta)
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 	__super::Tick(m_fTimeDelta);
 
-	m_pControllerCom->FreeFall(m_pTransformCom, m_fTimeDelta);
 	return OBJ_NOEVENT;
 }
 
@@ -113,6 +111,7 @@ void CFoodShopDee::Add_AnimEvent()
 
 void CFoodShopDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
+	if(m_pGameInstance->Get_KeyState(DIK_LCONTROL, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_1, KEY_DOWN))
 	m_pModelCom->Set_Animation(27, 50.f, true, true);
 }
 
@@ -183,25 +182,25 @@ HRESULT CFoodShopDee::Bind_ShaderResources()
 	HRESULT hr;
 
 	hr = m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix");
-	CHECK_FAILED_MSG(hr, "바인딩 망함");
+	CHECK_FAILED(hr);
 	hr = m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW));
-	CHECK_FAILED_MSG(hr, "바인딩 망함");
+	CHECK_FAILED(hr);
 	hr = m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ));
-	CHECK_FAILED_MSG(hr, "바인딩 망함");
+	CHECK_FAILED(hr);
 
 
 	hr = m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
-	CHECK_FAILED_MSG(hr, "바인딩 망함");
+	CHECK_FAILED(hr);
 	hr = m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
-	CHECK_FAILED_MSG(hr, "바인딩 망함");
+	CHECK_FAILED(hr);
 	hr = m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float));
-	CHECK_FAILED_MSG(hr, "바인딩 망함");
+	CHECK_FAILED(hr);
 	hr = m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
-	CHECK_FAILED_MSG(hr, "바인딩 망함");
+	CHECK_FAILED(hr);
 	hr = m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4));
-	CHECK_FAILED_MSG(hr, "바인딩 망함");
+	CHECK_FAILED(hr);
 	hr = m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
-	CHECK_FAILED_MSG(hr, "바인딩 망함");
+	CHECK_FAILED(hr);
 
 
 	return S_OK;
@@ -211,6 +210,13 @@ void CFoodShopDee::SetUp_FSM()
 {
 	m_pFSM = CFSM::Create();
 
+	m_pFSM->Add_State(DEEANIM_ANGER, CDee_Emotion_State::Create());
+
+	CFSM::FSM_INFO		FSM_Info_Desc = {};
+	//FSM_Info_Desc.iState = STATE_IDLE;
+	FSM_Info_Desc.pModel = &m_pModelCom;
+	//m_pFSM->Initialize();
+	//m_pFSM->Add_State(DEEANIM_ANGER, CDee_Emotion_State::Create());
 
 }
 

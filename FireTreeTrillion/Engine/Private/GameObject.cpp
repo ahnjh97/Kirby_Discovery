@@ -204,7 +204,7 @@ HRESULT CGameObject::Compute_ViewZ()
 	return S_OK;
 }
 
-void CGameObject::Set_CylenderCollider(_float fOffSetY, _float fHeight, _float fRadius)
+void CGameObject::Activate_CylinderCollider(_float fOffSetY, _float fHeight, _float fRadius)
 {
 	m_tColliderDesc[ATTACK].bAlive = true;
 	m_tColliderDesc[ATTACK].eValue = ATTACK;
@@ -214,7 +214,7 @@ void CGameObject::Set_CylenderCollider(_float fOffSetY, _float fHeight, _float f
 	m_tColliderDesc[ATTACK].fRadius = fRadius;
 }
 
-void CGameObject::Set_SphereCollider(_float fOffSetY, _float fRadius)
+void CGameObject::Activate_SphereCollider(_float fOffSetY, _float fRadius)
 {
 	m_tColliderDesc[ATTACK].bAlive = true;
 	m_tColliderDesc[ATTACK].eValue = ATTACK;
@@ -223,7 +223,7 @@ void CGameObject::Set_SphereCollider(_float fOffSetY, _float fRadius)
 	m_tColliderDesc[ATTACK].fRadius = fRadius;
 }
 
-void CGameObject::Set_FrustumCollider(_float fOffSetY, _float fRadius, _float fAngle)
+void CGameObject::Activate_FrustumCollider(_float fOffSetY, _float fRadius, _float fAngle)
 {
 	m_tColliderDesc[ATTACK].bAlive = true;
 	m_tColliderDesc[ATTACK].eValue = ATTACK;
@@ -233,7 +233,7 @@ void CGameObject::Set_FrustumCollider(_float fOffSetY, _float fRadius, _float fA
 	m_tColliderDesc[ATTACK].fAngle = fAngle;
 }
 
-void CGameObject::Set_TubeCollider(_float fOffSetY, _float fHeight, _float fMinRadius, _float fMaxRadius)
+void CGameObject::Activate_TubeCollider(_float fOffSetY, _float fHeight, _float fMinRadius, _float fMaxRadius)
 {
 	m_tColliderDesc[ATTACK].bAlive = true;
 	m_tColliderDesc[ATTACK].eValue = ATTACK;

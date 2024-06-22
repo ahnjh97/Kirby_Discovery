@@ -307,7 +307,13 @@
     <Filter Include="01.Levels\FinalBoss">
       <UniqueIdentifier>{d9e8fa8b-a4cb-4615-8a73-dca93c7a7460}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\PhysXObject\Character\WaddleDee\State">
+    <Filter Include="02.GameObjects\PhysXObject\Character\PartTimerKirby">
+      <UniqueIdentifier>{73951838-91bf-4a9d-8dda-922a665802ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\PartTimerKirby\State">
+      <UniqueIdentifier>{20102d47-32f7-4ef0-9080-ab3cfbdd2b28}</UniqueIdentifier>
+	</Filter>
+	<Filter Include="02.GameObjects\PhysXObject\Character\WaddleDee\State">
       <UniqueIdentifier>{2ed6ece7-973d-401a-9fec-badd5290f2ef}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop">
@@ -627,7 +633,10 @@
     <ClInclude Include="..\Public\Level_FinalBoss.h">
       <Filter>01.Levels\FinalBoss</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Dee_State.h">
+    <ClInclude Include="..\Public\PartTimerKirby.h">
+      <Filter>02.GameObjects\PhysXObject\Character\PartTimerKirby</Filter>
+	</ClInclude>
+	<ClInclude Include="..\public\Dee_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\State</Filter>
     </ClInclude>
     <ClInclude Include="..\public\FoodShopDee.h">
@@ -929,7 +938,10 @@
     <ClCompile Include="..\Private\Level_FinalBoss.cpp">
       <Filter>01.Levels\FinalBoss</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\Dee_State.cpp">
+    <ClCompile Include="..\Private\PartTimerKirby.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\PartTimerKirby</Filter>
+	</ClCompile>
+	<ClCompile Include="..\private\Dee_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\State</Filter>
     </ClCompile>
     <ClCompile Include="..\private\FoodShopDee.cpp">

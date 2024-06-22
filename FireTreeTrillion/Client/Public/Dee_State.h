@@ -27,13 +27,13 @@ public:
 };
 
 //*********************************
-//			WALK STATE
+//			MOVE STATE
 //*********************************
-class CDee_Walk_State final : public CFSM_State
+class CDee_Move_State final : public CFSM_State
 {
 private:
-	CDee_Walk_State();
-	virtual ~CDee_Walk_State() = default;
+	CDee_Move_State();
+	virtual ~CDee_Move_State() = default;
 
 public:
 	// 상태 진입했을 때 처음만 호출
@@ -44,7 +44,7 @@ public:
 
 
 public:
-	static	CDee_Walk_State* Create();
+	static	CDee_Move_State* Create();
 	virtual void Free() override;
 };
 
