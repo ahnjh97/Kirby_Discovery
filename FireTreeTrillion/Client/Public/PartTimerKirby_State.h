@@ -27,13 +27,13 @@ public:
 
 
 //*********************************
-//			DAMAGE STATE
+//			MOVE STATE
 //*********************************
-class CPartTimerKirby_Damage_State final : public CFSM_State
+class CPartTimerKirby_Move_State final : public CFSM_State
 {
 private:
-	CPartTimerKirby_Damage_State();
-	virtual ~CPartTimerKirby_Damage_State() = default;
+	CPartTimerKirby_Move_State();
+	virtual ~CPartTimerKirby_Move_State() = default;
 
 public:
 	// 상태 진입했을 때 처음만 호출
@@ -43,24 +43,19 @@ public:
 	virtual void OnStateExit()														override;
 
 public:
-	_float		m_fFlyTime = { 0.f };
-	_float		m_fDeadTime = { 0.f };
-	_float		m_fDeadMaxTime = { 0.f };
-
-
-	static	CPartTimerKirby_Damage_State* Create();
+	static	CPartTimerKirby_Move_State* Create();
 	virtual void Free() override;
 };
 
 
 //*********************************
-//			WARP STATE
+//			GRAB STATE
 //*********************************
-class CPartTimerKirby_Warp_State final : public CFSM_State
+class CPartTimerKirby_Grab_State final : public CFSM_State
 {
 private:
-	CPartTimerKirby_Warp_State();
-	virtual ~CPartTimerKirby_Warp_State() = default;
+	CPartTimerKirby_Grab_State();
+	virtual ~CPartTimerKirby_Grab_State() = default;
 
 public:
 	// 상태 진입했을 때 처음만 호출
@@ -70,9 +65,8 @@ public:
 	virtual void OnStateExit()														override;
 
 public:
-	static	CPartTimerKirby_Warp_State* Create();
+	static	CPartTimerKirby_Grab_State* Create();
 	virtual void Free() override;
 };
-
 END
 

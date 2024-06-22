@@ -171,10 +171,6 @@ HRESULT CLoader::Start()
 		hr = Loading_For_GamePlay();
 		break;
 
-	case LEVEL_TOWN:
-		hr = Loading_For_Town();
-		break;
-
 	// 05.20) UI Tool 레벨 추가
 	case LEVEL_TOOL_UI:
 		hr = Loading_For_Tool_UI();
@@ -195,6 +191,14 @@ HRESULT CLoader::Start()
 	//////////////////////////////////////// IN GAME
 	case LEVEL_INTRO:
 		hr = Loading_For_Intro();
+		break;
+
+	case LEVEL_TOWN:
+		hr = Loading_For_Town();
+		break;
+
+	case LEVEL_PARTTIME:
+		hr = Loading_For_Parttime();
 		break;
 
 	case LEVEL_FINALBOSS:
@@ -624,6 +628,57 @@ HRESULT CLoader::Loading_For_Town()
 	return S_OK;
 }
 
+HRESULT CLoader::Loading_For_Parttime()
+{
+	HRESULT hr = S_OK;
+	LEVEL eLevel = LEVEL_PARTTIME;
+
+	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
+#pragma region 텍스쳐
+	if (FAILED(Add_Texture(eLevel, "Level_Town_Env", "Map/Level_Town_Env.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "BRDF_LUT", "Map/BRDF_LUT.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "RandomNormal", "Map/RandomNormal.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Terrain_Fog", "Map/Fog/Sand_%d.png", 4)))
+		return E_FAIL;
+
+	//마스크용
+	hr = Add_Texture(eLevel, "FX_Mask_Bubble2", "Effects/Mask/noise_bubble_%d.png", 4);	CHECK_FAILED(hr);
+
+	// 얼굴, 눈 텍스쳐 로드
+	Add_KirbyFaceTexture(eLevel);
+
+#pragma endregion
+
+
+	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
+#pragma region 모델
+	Load_AnimToolInfo();
+	// 모아놓은 Model 한번에 생성.
+	hr = Add_Models(eLevel);
+	CHECK_FAILED(hr);
+#pragma endregion
+
+
+	m_strLoadingText = TEXT("물리 컴포넌트(을) 로딩 중 입니다.");
+#pragma region 물리 컴포넌트
+	/* 리지드바디 */
+	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_RigidBody"), CRigidBody::Create(m_pDevice, m_pContext));
+	CHECK_FAILED(hr);
+	/* 캐릭터 컨트롤러 */
+	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_CharacterController"), CCharacterController::Create(m_pDevice, m_pContext));
+	CHECK_FAILED(hr);
+#pragma endregion
+
+
+	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
+	m_IsFinished = true;
+
+	return S_OK;
+}
+
 HRESULT CLoader::Loading_For_FinalBoss()
 {
 	HRESULT hr = S_OK;
@@ -837,7 +892,8 @@ HRESULT CLoader::Loading_For_Tool_UI()
 
 HRESULT CLoader::Add_Models(LEVEL eLevel)
 {
-	HRESULT hr;
+	HRESULT hr = S_OK;
+
 	// SetUp_ModelScaleRotation 함수에서 모아놓은 Model들을 타입에 따라서 Component 생성한다.
 	for (auto& ModelInfo : m_vecModelInfo)
 	{
@@ -856,10 +912,6 @@ HRESULT CLoader::Add_Models(LEVEL eLevel)
 
 		hr = m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CModel::Create(m_pDevice, m_pContext, ModelInfo));
 		CHECK_FAILED(hr);
-
-		//if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag,
-		//	CModel::Create(m_pDevice, m_pContext, ModelInfo))))
-		//	return E_FAIL;
 	}
 
 	return S_OK;
@@ -1056,6 +1108,21 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		// 와들디
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
 
+	}
+	else if (eLevel == LEVEL_PARTTIME)
+	{
+		m_vecModelInfo.emplace_back("TownShop",	TYPE_NONANIM, 1.f,	 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Trigger",	TYPE_NONANIM, 0.01f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("BG1",		TYPE_NONANIM, 1.f,	 0.f, 0, string("MapObjs/"));
+
+		// For Kirby Body
+		m_vecModelInfo.emplace_back("KirbyPartTimer", TYPE_ANIM, 1.f, 180.f);
+
+		// 와들디
+		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
+
+		// 음식 나갑니다~
+		m_vecModelInfo.emplace_back("Item_EnergyDrink", TYPE_NONANIM, 3.f, 0.f, 0, string("MapObjs/"));
 	}
 	else if (eLevel == LEVEL_FINALBOSS)
 	{

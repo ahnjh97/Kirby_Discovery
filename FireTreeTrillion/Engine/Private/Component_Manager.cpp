@@ -18,7 +18,7 @@ HRESULT CComponent_Manager::Initialize(_uint iNumLevels)
 HRESULT CComponent_Manager::Add_Prototype(_uint iLevelIndex, const wstring & strPrototypeTag, CComponent * pPrototype)
 {
 	if (nullptr != Find_Prototype(iLevelIndex, strPrototypeTag))
-		return E_FAIL;
+		ALARM_FAIL("해당 프로토타입이 이미 존재합니다.");
 
 	m_pPrototypes[iLevelIndex].emplace(strPrototypeTag, pPrototype);
 
