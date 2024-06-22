@@ -324,6 +324,12 @@
     </Filter>
     <Filter Include="01.Levels\Racing">
       <UniqueIdentifier>{737fc96b-c550-4a4f-a027-697453f18b10}</UniqueIdentifier>
+	</Filter>
+	<Filter Include="02.GameObjects\Map\BreakableRock">
+      <UniqueIdentifier>{1804a8b8-0c68-4296-836c-c88b4878fba8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Car">
+      <UniqueIdentifier>{6a3a0e35-9a08-4f88-9aa3-377662595d38}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -647,6 +653,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\Level_Racing.h">
       <Filter>01.Levels\Racing</Filter>
+	</ClInclude>
+	<ClInclude Include="..\Public\BreakableRock.h">
+      <Filter>02.GameObjects\Map\BreakableRock</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Car.h">
+      <Filter>02.GameObjects\Map\Car</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -952,6 +964,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Level_Racing.cpp">
       <Filter>01.Levels\Racing</Filter>
+	</ClCompile>
+	<ClCompile Include="..\Private\Car.cpp">
+      <Filter>02.GameObjects\Map\Car</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BreakableRock.cpp">
+      <Filter>02.GameObjects\Map\BreakableRock</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
