@@ -48,31 +48,31 @@ void CDee_Idle_State::Free()
 //*********************************
 //			 WALK STATE
 //*********************************
-CDee_Walk_State::CDee_Walk_State()
+CDee_Move_State::CDee_Move_State()
 {
 }
 
-void CDee_Walk_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
+void CDee_Move_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
-void CDee_Walk_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+void CDee_Move_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
 	CWaddleDee* pDee = static_cast<CWaddleDee*>(pGameObject);
 }
 
-void CDee_Walk_State::OnStateExit()
+void CDee_Move_State::OnStateExit()
 {
 }
 
-CDee_Walk_State* CDee_Walk_State::Create()
+CDee_Move_State* CDee_Move_State::Create()
 {
-	CDee_Walk_State* pInstance = new CDee_Walk_State();
+	CDee_Move_State* pInstance = new CDee_Move_State();
 	return pInstance;
 }
 
-void CDee_Walk_State::Free()
+void CDee_Move_State::Free()
 {
 	__super::Free();
 }
