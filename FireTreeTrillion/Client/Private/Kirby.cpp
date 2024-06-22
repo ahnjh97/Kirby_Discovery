@@ -37,8 +37,6 @@ HRESULT CKirby::Initialize_Prototype()
 
 HRESULT CKirby::Initialize(void* pArg)
 {
-	CHECK_FAILED_MSG(S_FALSE, "쀼");
-
 	GAMEOBJECT_DESC		GameObjectDesc{};
 	if (nullptr != pArg)
 		GameObjectDesc = *(GAMEOBJECT_DESC*)pArg;
@@ -689,16 +687,13 @@ void CKirby::Key_Input(_float fTimeDelta)
 
 HRESULT CKirby::Make_TargetToCams()
 {
-
 	// 첫 카메라 기준으로 움직이기에 미리 받아둔다.
 	if (m_pCamera == nullptr)
 	{
 		//인트로, 게임플레이 스테이지라면 카메라로 main camera를 저장한다.
 		(LEVEL_INTRO <= *m_pCurrentLevelID && *m_pCurrentLevelID < LEVEL_END) ?
 			m_pCamera = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main"))) :
-
-			//나머지 레벨이라면 다른 카메라를 저장한다.
-			m_pCamera = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Free")));
+			m_pCamera = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Free"))); //나머지 레벨이라면 다른 카메라를 저장한다.
 
 		if (m_pCamera == nullptr)
 		{
@@ -717,6 +712,8 @@ HRESULT CKirby::Make_TargetToCams()
 		if (pCameraFree != nullptr)
 			pCameraFree->Set_Target(m_pTransformCom);
 	}
+
+	return S_OK;
 }
 
 HRESULT CKirby::Add_Components()
@@ -762,7 +759,7 @@ HRESULT CKirby::Add_Components()
 #pragma endregion
 
 #pragma region Kirby Eye
-	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_idle"),
+ 	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_idle"),
 		TEXT("Com_Texture_Eye_Idle"), (CComponent**)&m_pEyeTexture[EYE_IDLE]);
 	CHECK_FAILED(hr);
 	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_doubt"),
@@ -809,7 +806,7 @@ HRESULT CKirby::Add_Components()
 	desc.tCapsuleShape.fRadius = 0.4f;// 0.5f;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
-	//m_pControllerCom->Set_Object(this);
+	CHECK_FAILED(hr);
 
 	// FOR ANIMTOOL
 	m_ppModelForAnimTool = &m_pModelCom[BODY_DEFAULT];

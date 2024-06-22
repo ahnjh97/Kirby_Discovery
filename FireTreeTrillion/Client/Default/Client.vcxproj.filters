@@ -630,9 +630,6 @@
     <ClInclude Include="..\Public\PartTimerKirby.h">
       <Filter>02.GameObjects\PhysXObject\Character\PartTimerKirby</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\PartTimerKirby_State.h">
-      <Filter>02.GameObjects\PhysXObject\Character\PartTimerKirby\State</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -928,9 +925,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\PartTimerKirby.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\PartTimerKirby</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\PartTimerKirby_State.cpp">
-      <Filter>02.GameObjects\PhysXObject\Character\PartTimerKirby\State</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -55,6 +55,7 @@
 #include "BombOrbitGlow.h"
 #include "BombOrbit.h"
 #include "KirbyBomb.h"
+#include "PartTimerKirby.h"
 
 
 // 몬스터
@@ -258,6 +259,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BombOrbit"), CBombOrbit);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BombOrbitGlow"), CBombOrbitGlow);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KirbyBomb"), CKirbyBomb);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PartTimerKirby"), CPartTimerKirby);
 
 	// Monster
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Awoofy"), CAwoofy);
@@ -480,74 +482,6 @@ HRESULT CLoader::Loading_For_Intro()
 	return S_OK;
 }
 
-HRESULT CLoader::Loading_For_FinalBoss()
-{
-	HRESULT hr = S_OK;
-	LEVEL eLevel = LEVEL_FINALBOSS;
-
-	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
-#pragma region 텍스쳐
-	if (FAILED(Add_Texture(eLevel, "Logo", "Logo/Logo.png")))
-		return E_FAIL;
-	if (FAILED(Add_Texture(eLevel, "Moon", "Moon.png")))
-		return E_FAIL;
-	if (FAILED(Add_Texture(eLevel, "Level_0_Env", "Map/Level_0_Env.dds")))
-		return E_FAIL;
-	if (FAILED(Add_Texture(eLevel, "BRDF_LUT", "Map/BRDF_LUT.png")))
-		return E_FAIL;
-	if (FAILED(Add_Texture(eLevel, "RandomNormal", "Map/RandomNormal.png")))
-		return E_FAIL;
-	if (FAILED(Add_Texture(eLevel, "Terrain_Fog", "Map/Fog/Sand_%d.png", 4)))
-		return E_FAIL;
-
-	hr = Add_Texture(eLevel, "FX_Mask_Bubble2", "Effects/Mask/noise_bubble_%d.png", 4);	CHECK_FAILED(hr);
-
-#pragma region UI
-
-	//KirbyHP
-	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 23);
-	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby_Mask", "UI/HUD/Kirby/StatusBar/KirbyHPMask.png");
-
-	//StarPoint
-	hr = Add_Texture(eLevel, "HUD_StarPoint", "UI/HUD/Kirby/StarPoint/StarPoint_%d.dds", 10);
-
-	//Ability Discard
-	hr = Add_Texture(eLevel, "HUD_AbilityDiscard", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_%d.dds", 17);
-	hr = Add_Texture(eLevel, "HUD_AbilityDiscard_Mask", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_Mask.dds");
-	hr = Add_Texture(eLevel, "HUD_BtnIcon", "UI/HUD/Kirby/BtnIcon/BtnIcon_%d.dds", 4);
-
-	CHECK_FAILED(hr);
-
-#pragma endregion
-
-	// 커비 얼굴 텍스쳐 로드
-	Add_KirbyFaceTexture(eLevel);
-#pragma endregion
-
-	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
-#pragma region 모델
-	Load_AnimToolInfo();
-	// 모아놓은 Model 한번에 생성.
-	hr = Add_Models(eLevel);
-	CHECK_FAILED(hr);
-#pragma endregion
-
-	m_strLoadingText = TEXT("물리 컴포넌트(을) 로딩 중 입니다.");
-#pragma region 물리 컴포넌트
-	/* 리지드바디 */
-	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_RigidBody"), CRigidBody::Create(m_pDevice, m_pContext));
-	CHECK_FAILED(hr);
-	/* 캐릭터 컨트롤러 */
-	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_CharacterController"), CCharacterController::Create(m_pDevice, m_pContext));
-	CHECK_FAILED(hr);
-#pragma endregion
-
-	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
-	m_IsFinished = true;
-
-	return S_OK;
-}
-
 HRESULT CLoader::Loading_For_GamePlay()
 {
 	HRESULT hr = S_OK;
@@ -677,6 +611,74 @@ HRESULT CLoader::Loading_For_Town()
 	CHECK_FAILED(hr);
 #pragma endregion
 
+
+	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
+	m_IsFinished = true;
+
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_For_FinalBoss()
+{
+	HRESULT hr = S_OK;
+	LEVEL eLevel = LEVEL_FINALBOSS;
+
+	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
+#pragma region 텍스쳐
+	if (FAILED(Add_Texture(eLevel, "Logo", "Logo/Logo.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Moon", "Moon.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Level_0_Env", "Map/Level_0_Env.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "BRDF_LUT", "Map/BRDF_LUT.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "RandomNormal", "Map/RandomNormal.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Terrain_Fog", "Map/Fog/Sand_%d.png", 4)))
+		return E_FAIL;
+
+	hr = Add_Texture(eLevel, "FX_Mask_Bubble2", "Effects/Mask/noise_bubble_%d.png", 4);	CHECK_FAILED(hr);
+
+#pragma region UI
+
+	//KirbyHP
+	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 23);
+	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby_Mask", "UI/HUD/Kirby/StatusBar/KirbyHPMask.png");
+
+	//StarPoint
+	hr = Add_Texture(eLevel, "HUD_StarPoint", "UI/HUD/Kirby/StarPoint/StarPoint_%d.dds", 10);
+
+	//Ability Discard
+	hr = Add_Texture(eLevel, "HUD_AbilityDiscard", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_%d.dds", 17);
+	hr = Add_Texture(eLevel, "HUD_AbilityDiscard_Mask", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_Mask.dds");
+	hr = Add_Texture(eLevel, "HUD_BtnIcon", "UI/HUD/Kirby/BtnIcon/BtnIcon_%d.dds", 4);
+
+	CHECK_FAILED(hr);
+
+#pragma endregion
+
+	// 커비 얼굴 텍스쳐 로드
+	Add_KirbyFaceTexture(eLevel);
+#pragma endregion
+
+	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
+#pragma region 모델
+	Load_AnimToolInfo();
+	// 모아놓은 Model 한번에 생성.
+	hr = Add_Models(eLevel);
+	CHECK_FAILED(hr);
+#pragma endregion
+
+	m_strLoadingText = TEXT("물리 컴포넌트(을) 로딩 중 입니다.");
+#pragma region 물리 컴포넌트
+	/* 리지드바디 */
+	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_RigidBody"), CRigidBody::Create(m_pDevice, m_pContext));
+	CHECK_FAILED(hr);
+	/* 캐릭터 컨트롤러 */
+	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_CharacterController"), CCharacterController::Create(m_pDevice, m_pContext));
+	CHECK_FAILED(hr);
+#pragma endregion
 
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 	m_IsFinished = true;
@@ -1028,6 +1030,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("KirbySwordDefault", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("KirbySwordBalloon", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("KirbyBoomDefault", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbyPartTimer", TYPE_ANIM, 1.f, 180.f);
 
 		// For Kirby Weapon
 		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
@@ -1124,6 +1127,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("KirbySwordBalloon", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("KirbyBoomDefault", TYPE_ANIM, 1.f, 180.f);
 
+		m_vecModelInfo.emplace_back("KirbyPartTimer", TYPE_ANIM, 1.f, 0.f);
+		
 		// For Kirby Weapon
 		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
@@ -1140,7 +1145,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("BrontoBurt", TYPE_ANIM, 2.f, 180.f);
 		m_vecModelInfo.emplace_back("PoppyBrosJr", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_ANIM, 1.3f, 180.f);
-		}
+	}
 }
 
 HRESULT CLoader::Add_Texture(LEVEL eLevel, string strPrototypeName, string strFolderAndFileName, _uint iNumTextures)

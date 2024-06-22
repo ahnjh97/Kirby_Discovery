@@ -56,8 +56,11 @@ HRESULT CLevel_Town::Initialize()
 	hr = Ready_Kickables();
 	CHECK_FAILED(hr);
 
-	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
+	// Part-timer Kirby Test
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOWN, TEXT("Layer_Player"), TEXT("Prototype_GameObject_PartTimerKirby"))))
+		return E_FAIL;
 
+	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
     return S_OK;
 }
