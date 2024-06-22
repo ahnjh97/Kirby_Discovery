@@ -96,7 +96,11 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "JgGrassB", "JgGrassL", "JgGrasslongB", "JgGrassN", "JgWoodD", "JgGrassO"
 		, "StarBlockL" , "StarBlockM", "StarBlockS", "SeDriftWoodAL", "SeDriftWoodBL", "SeDriftWoodCL"
 		, "VpFactoryPart", "VpFactoryParts", "VpFactoryPartsBlend", "WoodBox"
-		, "LbBossRoom", "LbLastBossStage"
+
+#pragma region LAB_DISCOVERA OBJECT
+		, "LbBossRoom", "LbLastBossStage"		
+#pragma endregion
+
 	};
 	m_setKickables = { "GsPebble", "SeShell", "WasteCanYellow" };
 	m_setItemTxts = { "Item_Coin", "Item_EnergyDrink" };
