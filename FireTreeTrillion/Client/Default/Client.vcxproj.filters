@@ -336,7 +336,6 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop">
       <UniqueIdentifier>{4c6be733-c7c6-40fb-ba47-92d5f18bf7f9}</UniqueIdentifier>
->>>>>>> main
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -669,7 +668,6 @@
     </ClInclude>
     <ClInclude Include="..\public\FoodShopDee.h">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop</Filter>
->>>>>>> main
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -984,7 +982,6 @@
     </ClCompile>
     <ClCompile Include="..\private\FoodShopDee.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop</Filter>
->>>>>>> main
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
