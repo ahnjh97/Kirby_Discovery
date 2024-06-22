@@ -250,6 +250,7 @@
     <ClInclude Include="..\Public\Level_GamePlay.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
     <ClInclude Include="..\Public\Level_Logo.h" />
+    <ClInclude Include="..\Public\Level_PartTime.h" />
     <ClInclude Include="..\Public\Level_Racing.h" />
     <ClInclude Include="..\Public\Level_Tool_Anim.h" />
     <ClInclude Include="..\Public\Level_Tool_FX.h" />
@@ -271,6 +272,7 @@
     <ClInclude Include="..\Public\OrbitingCamera.h" />
     <ClInclude Include="..\Public\Particle.h" />
     <ClInclude Include="..\Public\PartTimerKirby.h" />
+    <ClInclude Include="..\Public\PartTimerKirby_State.h" />
     <ClInclude Include="..\Public\PhysXObject.h" />
     <ClInclude Include="..\Public\PoppyBomb.h" />
     <ClInclude Include="..\Public\PoppyBrosJr.h" />
@@ -377,6 +379,7 @@
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
     <ClCompile Include="..\Private\Level_Logo.cpp" />
+    <ClCompile Include="..\Private\Level_PartTime.cpp" />
     <ClCompile Include="..\Private\Level_Racing.cpp" />
     <ClCompile Include="..\Private\Level_Tool_Anim.cpp" />
     <ClCompile Include="..\Private\Level_Tool_FX.cpp" />
@@ -398,6 +401,7 @@
     <ClCompile Include="..\Private\OrbitingCamera.cpp" />
     <ClCompile Include="..\Private\Particle.cpp" />
     <ClCompile Include="..\Private\PartTimerKirby.cpp" />
+    <ClCompile Include="..\Private\PartTimerKirby_State.cpp" />
     <ClCompile Include="..\Private\PhysXObject.cpp" />
     <ClCompile Include="..\Private\PoppyBomb.cpp" />
     <ClCompile Include="..\Private\PoppyBrosJr.cpp" />

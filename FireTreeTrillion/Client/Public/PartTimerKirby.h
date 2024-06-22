@@ -12,7 +12,9 @@ BEGIN(Client)
 class CPartTimerKirby final : public CCharacter
 {
 public:
-	enum PARTTIMER_KIRBY_ANIM {		//FOODSHOP_CONFLICT,
+	enum STATE { 
+		STATE_IDLE, STATE_MOVE, STATE_GRAB, STATE_END};
+	enum ANIM {		//FOODSHOP_CONFLICT,
 		FOODSHOP_CORRECT = 1,		//FOODSHOP_ERROR,	FOODSHOP_FOOTSUBL, FOODSHOP_FOOTSUBR,
 		FOODSHOP_INCORRECT = 5,
 		FOODSHOP_INCORRECTSTART,
@@ -25,7 +27,7 @@ public:
 		FOODSHOP_SELECT,			//FOODSHOP_SELECTSERIOUS, HANDOVER,
 		HANDOVERSHORT = 18,
 		HANDOVERSHORTL,
-		PARTTIMER_KIRBY_END
+		ANIM_END
 	};
 	enum EYESTATE { EYE_IDLE, EYE_ANGER, EYE_CLOSE, EYE_SADNESS, EYE_PUPIL, EYE_BLINK, EYE_END };
 	enum MOUTHSTATE { MOUTH_IDLE, MOUTH_ANGER, MOUTH_HAPPY, MOUTH_SMILE, MOUTH_SURPRISE, MOUTH_END };
@@ -49,8 +51,9 @@ public:
 	virtual void	Collision_Hitbox(CPhysXObject* pGameObject) override;
 
 public:
-	void			Change_State(PARTTIMER_KIRBY_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
+	void			Change_State(ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
 	_bool			IsAnimFinished();
+	_float4			Compute_TerrainPosition();
 
 private:
 	HRESULT			Add_Components();
@@ -59,12 +62,16 @@ private:
 	// FSM
 	void			SetUp_FSM();
 
+	// set-up camera
+	HRESULT			Make_TargetToCams();
+
 private:
 	CModel*					m_pModelCom   = { nullptr };
 	CTexture*				m_pEyeTexture[EYE_END] = { nullptr };
 	CTexture*				m_pMouthTexture[MOUTH_END] = { nullptr };
+	class CCamera*			m_pCamera = { nullptr };
 
-	PARTTIMER_KIRBY_ANIM	m_eCurrentState = { PARTTIMER_KIRBY_END };
+	ANIM					m_eCurrentState = { ANIM_END };
 	EYESTATE				m_eEyeState = { EYE_END };
 	MOUTHSTATE				m_eMouthState = { MOUTH_END };
 
