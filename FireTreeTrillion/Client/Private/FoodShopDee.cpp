@@ -182,25 +182,25 @@ HRESULT CFoodShopDee::Bind_ShaderResources()
 	HRESULT hr;
 
 	hr = m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix");
-	CHECK_FAILED_MSG(hr, "바인딩 망함");
+	CHECK_FAILED(hr);
 	hr = m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW));
-	CHECK_FAILED_MSG(hr, "바인딩 망함");
+	CHECK_FAILED(hr);
 	hr = m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ));
-	CHECK_FAILED_MSG(hr, "바인딩 망함");
+	CHECK_FAILED(hr);
 
 
 	hr = m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
-	CHECK_FAILED_MSG(hr, "바인딩 망함");
+	CHECK_FAILED(hr);
 	hr = m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
-	CHECK_FAILED_MSG(hr, "바인딩 망함");
+	CHECK_FAILED(hr);
 	hr = m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float));
-	CHECK_FAILED_MSG(hr, "바인딩 망함");
+	CHECK_FAILED(hr);
 	hr = m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
-	CHECK_FAILED_MSG(hr, "바인딩 망함");
+	CHECK_FAILED(hr);
 	hr = m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4));
-	CHECK_FAILED_MSG(hr, "바인딩 망함");
+	CHECK_FAILED(hr);
 	hr = m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
-	CHECK_FAILED_MSG(hr, "바인딩 망함");
+	CHECK_FAILED(hr);
 
 
 	return S_OK;
