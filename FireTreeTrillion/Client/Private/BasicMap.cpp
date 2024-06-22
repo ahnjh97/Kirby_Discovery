@@ -45,6 +45,10 @@ HRESULT CBasicMap::Initialize(void* pArg)
 
     SetUpShaderInfo(wstrModelTag);
 
+    m_vecConstantNames = { "g_DiffuseTexture", "g_NormalTexture", "g_MRATexture", "g_fSamplingFactor"
+    , "g_bStencil", "g_bRimLight", "m_fRimWidth", "g_bMotionBlur", "g_BoneMatrices" };
+    m_vecStencilRimLightMotionBlurNames = { "g_bStencil", "g_bRimLight", "m_fRimWidth", "g_bMotionBlur" };
+
     if(wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("LbLastBossStage") && false == m_bBlendMap)
     {
         if (true == CheckIfBlendMapExists(GameObjectDesc.wstrModelName)) {
@@ -52,9 +56,6 @@ HRESULT CBasicMap::Initialize(void* pArg)
                 return E_FAIL;
         }
 
-        m_vecConstantNames = { "g_DiffuseTexture", "g_NormalTexture", "g_MRATexture", "g_fSamplingFactor"
-            , "g_bStencil", "g_bRimLight", "m_fRimWidth", "g_bMotionBlur", "g_BoneMatrices" };
-        m_vecStencilRimLightMotionBlurNames = { "g_bStencil", "g_bRimLight", "m_fRimWidth", "g_bMotionBlur" };
         m_pOcTree = m_pModelCom->Create_OcTree(GameObjectDesc.vMin, GameObjectDesc.vMax, m_vecPassIndices, m_vecSamplingFactors, m_vecConstantNames);
         
         // --- ModelName -- TriggerRadius -- IdleIndex & Speed -- ActionIndex & Speed ----------
@@ -65,6 +66,11 @@ HRESULT CBasicMap::Initialize(void* pArg)
 
         InsertMapDecos();
     }
+    if (wstrModelTag == TEXT("Town") || wstrModelTag == TEXT("LbLastBossStage")) {
+        if(LEVEL_TOOL_MAP != *m_pCurrentLevelID)
+            ReadDecos_ForSmallLevels();
+    }
+        
 
     if (FAILED(m_pModelCom->CreateStaticActor(GameObjectDesc.matWorld)))
         return E_FAIL;
@@ -470,9 +476,6 @@ void CBasicMap::ReadDecos_ForSmallLevels()
 {
     Release_MapDecos();
 
-    if (nullptr == m_pOcTree)
-        return;
-
     string strLevel;
     if (LEVEL_TOWN == *m_pCurrentLevelID)
         strLevel = "Town";
@@ -514,11 +517,15 @@ void CBasicMap::ReadDecos_ForSmallLevels()
         fileInput.read(reinterpret_cast<char*>(&iPassIndex), sizeof(iPassIndex));
 
         TYPE eType = TYPE_NONANIM;
-        string strFolder = string("MapDeco/");
+        string strFolder;
+        if (LEVEL_TOWN == *m_pCurrentLevelID)
+            strFolder = string("TownDeco/");
+        else if (LEVEL_FINALBOSS == *m_pCurrentLevelID)
+            strFolder = string("LabDiscovera_Deco/");
+
         if (CMapToolObject::MAPOBJ_ANIM == iMapObjType)
         {
             eType = TYPE_ANIM;
-            strFolder = string("MapDeco/");
         }
 
         CModel* pModel = CModel::Create(m_pDevice, m_pContext, MODEL{ strModelName, eType, 1.f, 0.f, 0, strFolder, false });

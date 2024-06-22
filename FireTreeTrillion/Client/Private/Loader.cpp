@@ -789,7 +789,8 @@ HRESULT CLoader::Loading_For_Tool_Map()
 		return E_FAIL;
 	if (FAILED(Add_AllModelTxts(eLevel, TYPE_NONANIM, L"Monsters/")))
 		return E_FAIL;
-
+	if (FAILED(Add_AllModelTxts(eLevel, TYPE_NONANIM, L"TownDeco/")))
+		return E_FAIL;
 	//LEVEL_FINALBOSS (LAB)
 	if (FAILED(Add_AllModelTxts(eLevel, TYPE_NONANIM, L"LabDiscovera_Deco/")))
 		return E_FAIL;
@@ -1152,6 +1153,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Level0Stage1Step01", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"), true);
 		m_vecModelInfo.emplace_back("Level1Stage1Step01", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"), true);
 		m_vecModelInfo.emplace_back("Fog", TYPE_NONANIM, 0.002f);
+		m_vecModelInfo.emplace_back("zBat", TYPE_NONANIM, 0.002f, 0.f, 0, string("TownDeco/"));
 	}
 	else if (eLevel == LEVEL_TOOL_ANIM)
 	{
