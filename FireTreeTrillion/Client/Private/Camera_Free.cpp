@@ -14,6 +14,18 @@ CCamera_Free::CCamera_Free(const CCamera_Free& rhs)
 
 }
 
+void CCamera_Free::Lock_Camera(_float3 vPos, _float3 vLook, _float fFOVY)
+{
+	m_bLockCamera = true;
+
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION,Pos(vPos));
+
+
+	vLook.Normalize();
+	m_pTransformCom->Look_At_Dir(Dir(vLook));
+	m_fFovy = ToRadian(fFOVY);
+}
+
 HRESULT CCamera_Free::Initialize_Prototype()
 {
 	return S_OK;
@@ -46,13 +58,30 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 	//	m_pGameInstance->Emplace_ExitFunc(TRIGGER_CAMERA, exitFunc);
 	//}
 
+
+
 	m_vDestCamDir = static_cast<_float3>(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+
+	if (*m_pCurrentLevelID == LEVEL_PARTTIME)
+	{
+		Lock_Camera({ 16.f, 26.f, 35.7f }, { .14f, -.2f, -1.f }, 43.f);
+	}
 
 	return S_OK;
 }
 
 _int CCamera_Free::Tick(_float fTimeDelta)
 {
+	if (m_pGameInstance->Get_KeyState(DIK_L, KEY_DOWN))
+	{
+		LockToggle();
+	}
+
+	if (m_bLockCamera)
+	{
+		return OBJ_NOEVENT;
+	}
+
 	//내가 현재 카메라가 아니라면 바쁘게 타겟 따라가기
 	if (m_pGameInstance->Get_CurCameraPtr() != this)
 		m_bTrackTarget = true;
