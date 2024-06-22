@@ -11,6 +11,7 @@
 #include "KirbyContents_State.h"
 #include "KirbySword_State.h"
 #include "KirbyBoom_State.h"
+#include "KirbyCar_State.h"
 
 #include "KirbyWeapons.h"
 #include "KirbyArmours.h"
@@ -126,7 +127,9 @@ void CKirby::Late_Tick(_float fTimeDelta)
 	if (INFO(m_eBodyState) != BODY_DEFAULT)
 		m_pModelCom[BODY_DEFAULT]->Play_Animation(m_fTimeDelta);
 
-	m_pWeapons->Late_Tick(m_fTimeDelta);
+	if ((INFO(m_eBodyState) == BODY_CARDEFAULT || INFO(m_eBodyState) == BODY_CARVACUUM) == false)
+		m_pWeapons->Late_Tick(m_fTimeDelta);
+
 	m_pArmours->Late_Tick(m_fTimeDelta);
 
 
@@ -213,7 +216,7 @@ void CKirby::Render_IMGUI()
 
 	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	ImGui::Text("HP : %d", (_int)m_fHp);
-	ImGui::Text("m_fVacuumTime : %.2f", INFO(m_fVacuumTime));
+	ImGui::Text("m_fMoveSpeed : %.2f", INFO(m_fMoveSpeed));
 	ImGui::Text("m_bInitializeTargetPos : %d", m_bInitializeTargetPos);
 	ImGui::Text("m_vLadderPoint.x : %.2f, m_vLadderPoint.y : %.2f m_vLadderPoint.z : %.2f", INFO(m_vLadderPoint).x, INFO(m_vLadderPoint).y, INFO(m_vLadderPoint).z);
 	ImGui::Text("m_vLadderLook.x : %.2f, m_vLadderLook.y : %.2f m_vLadderLook.z : %.2f", INFO(m_vLadderLook).x, INFO(m_vLadderLook).y, INFO(m_vLadderLook).z);
@@ -380,6 +383,14 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 				Change_State(STATE_FILGHTDAMAGE, 60.f, false, false, BODY_BALLOON);
 			}
 			// 평범한 상태에서...
+			else if (INFO(m_eBodyState) == BODY_CARDEFAULT)
+			{
+				if (INFO(m_bBooster) == false)
+				{
+					INFO(m_bCarJump) = true;
+					Change_State(CARSTATE_DAMAGE, 60.f, false, false, BODY_CARDEFAULT, OFFSET_CAR);
+				}
+			}
 			else
 			{
 				Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
@@ -678,9 +689,20 @@ void CKirby::Key_Input(_float fTimeDelta)
 	}
 	else if (m_pGameInstance->Get_DIKeyState(DIK_7, KEY_DOWN))
 	{
-		INFO(m_eBodyState) = BODY_BOOMDEFAULT;
+		INFO(m_eBodyState) = BODY_CARDEFAULT;
 		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
 	}
+	else if (m_pGameInstance->Get_DIKeyState(DIK_6, KEY_DOWN))
+	{
+		INFO(m_eBodyState) = BODY_CARVACUUM;
+		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
+	}
+
+	if (m_pGameInstance->Get_DIKeyState(DIK_B, KEY_DOWN))
+	{
+		Change_State(CARVACUUMSTATE_DEFORM, 60.f, false, false, BODY_CARVACUUM, OFFSET_CARVACUUM);
+	}
+
 
 #pragma endregion
 }
@@ -751,10 +773,21 @@ HRESULT CKirby::Add_Components()
 		TEXT("Com_Model_SwordBalloon"), (CComponent**)&m_pModelCom[BODY_SWORDBALLOON]);
 	CHECK_FAILED(hr);
 
-		// 커비의 Boom Body 상태 모델
-		hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyBoomDefault"),
-			TEXT("Com_Model_BoomDefault"), (CComponent**)&m_pModelCom[BODY_BOOMDEFAULT]);
-		CHECK_FAILED(hr);
+	// 커비의 Boom Body 상태 모델
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyBoomDefault"),
+		TEXT("Com_Model_BoomDefault"), (CComponent**)&m_pModelCom[BODY_BOOMDEFAULT]);
+	CHECK_FAILED(hr);
+
+	// 커비의 Car Body Default 상태 모델
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyCarDefault"),
+		TEXT("Com_Model_CarDefault"), (CComponent**)&m_pModelCom[BODY_CARDEFAULT]);
+	CHECK_FAILED(hr);
+
+	// 커비의 Car Body Vacuum 상태 모델
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyCarVacuum"),
+		TEXT("Com_Model_CarVacuum"), (CComponent**)&m_pModelCom[BODY_CARVACUUM]);
+	CHECK_FAILED(hr);
+
 
 
 #pragma endregion
@@ -849,11 +882,12 @@ HRESULT CKirby::Add_PartObjects()
 		return E_FAIL;
 	Set_BodyCollider(COLLIDER_SPHERE, 0.7f, 0.f, 0.6f);
 
+
 	HitBox.pDesc = &m_tColliderDesc[ATTACK];
 	HitBox.pCollisionType = HITBOX_PLYAER;
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
-	Set_FrustumCollider(0.5f, 4.f, 90.f);
+	Activate_FrustumCollider(0.5f, 4.f, 90.f);
 
 
 	return S_OK;
@@ -906,7 +940,8 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		(_eBodyState == BODY_BALLOON && _iMeshIndex == 3) ||
 		(_eBodyState == BODY_SWORDDEFAULT && _iMeshIndex == 3) ||
 		(_eBodyState == BODY_SWORDBALLOON && _iMeshIndex == 3) ||
-		(_eBodyState == BODY_BOOMDEFAULT && _iMeshIndex == 3))
+		(_eBodyState == BODY_BOOMDEFAULT && _iMeshIndex == 3) ||
+		(_eBodyState == BODY_CARDEFAULT && _iMeshIndex == 3))
 	{
 		m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
 		m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
@@ -1086,6 +1121,27 @@ void CKirby::SetUp_FSM()
 
 #pragma endregion
 
+	m_pFSM->Add_State(STATE_SPITDEFORM, CKirbyVacuum_Spit_State::Create());
+
+#pragma region 자동차 애니메이션
+	m_pFSM->Add_State(CARSTATE_IDLING, CKirbyCar_Idle_State::Create()); //
+
+	m_pFSM->Add_State(CARSTATE_MOVING, CKirbyCar_Run_State::Create()); //
+
+	m_pFSM->Add_State(CARSTATE_JUMPSTART, CKirbyCar_Jump_State::Create()); //
+	m_pFSM->Add_State(CARSTATE_JUMP, CKirbyCar_Jump_State::Create()); //
+	m_pFSM->Add_State(CARSTATE_FALL, CKirbyCar_Jump_State::Create()); //
+	m_pFSM->Add_State(CARSTATE_LANDING, CKirbyCar_Jump_State::Create()); //
+
+	m_pFSM->Add_State(CARVACUUMSTATE_DEFORM, CKirbyCar_Vacuum_State::Create()); //
+	m_pFSM->Add_State(CARSTATE_DEMOEND, CKirbyCar_Vacuum_State::Create()); //
+
+	m_pFSM->Add_State(CARSTATE_BOOST, CKirbyCar_Boost_State::Create());
+	m_pFSM->Add_State(CARSTATE_BOOSTEND, CKirbyCar_Boost_State::Create());
+	m_pFSM->Add_State(CARSTATE_CRASH, CKirbyCar_Boost_State::Create());
+
+	m_pFSM->Add_State(CARSTATE_DAMAGE, CKirbyCar_Damage_State::Create()); //
+#pragma endregion
 
 
 	CFSM::FSM_INFO		FSM_Info_Desc = {};
@@ -1102,31 +1158,31 @@ void CKirby::HitBoxChanger(_uint eState)
 	{
 	// 덜 차징 스핀
 	case SWORDSTATE_GIGANTSPINSLASH:
-		Set_SphereCollider(0.5f, 4.f);
+		Activate_SphereCollider(0.5f, 4.f);
 		break;
 	// 슈퍼 차징 스핀
 	case SWORDSTATE_SUPERSPINSLASHLOOP:
-		Set_SphereCollider(0.5f, 4.f);
+		Activate_SphereCollider(0.5f, 4.f);
 		break;
 	// 칼 1타
 	case SWORDSTATE_SIDESLASH:
-		Set_FrustumCollider(0.5f, 4.f, 90.f);
+		Activate_FrustumCollider(0.5f, 4.f, 90.f);
 		break;
 	// 칼 2타
 	case SWORDSTATE_MULITSWORDATTACK:
-		Set_FrustumCollider(0.5f, 4.f, 90.f);
+		Activate_FrustumCollider(0.5f, 4.f, 90.f);
 		break;
 	// 칼 3타
 	case SWORDSTATE_DECISIVESLASH:
-		Set_FrustumCollider(0.5f, 5.f, 90.f);
+		Activate_FrustumCollider(0.5f, 5.f, 90.f);
 		break;
 	// 공중제비 도는 공격
 	case SWORDSTATE_SWORDSPIN:
-		Set_SphereCollider(0.5f, 5.f);
+		Activate_SphereCollider(0.5f, 5.f);
 		break;
 	// 공중어퍼컷 형식의 공격
 	case SWORDSTATE_UPWARDSLASH:
-		Set_FrustumCollider(0.5f, 5.f, 90.f);
+		Activate_FrustumCollider(0.5f, 5.f, 90.f);
 		break;
 	default:
 		break;
@@ -1137,8 +1193,11 @@ void CKirby::HitBoxChanger(_uint eState)
 
 void CKirby::Update_PartObjectMatrix()
 {
+	if ((INFO(m_eBodyState) == BODY_CARDEFAULT || INFO(m_eBodyState) == BODY_CARVACUUM) 
+		== false)
+		m_WeaponMatrix = *(m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("RHaveL")->Get_CombinedTransformationMatrix());
+
 	m_ArmourMatrix = *(m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("HatL")->Get_CombinedTransformationMatrix());
-	m_WeaponMatrix = *(m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("RHaveL")->Get_CombinedTransformationMatrix());
 }
 
 void CKirby::OverPower()
@@ -1191,6 +1250,13 @@ void CKirby::HitStop_System(_float fTimeDelta)
 void CKirby::Change_State(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, BODYSTATE eBody, _uint iOffSet)
 {
 	INFO(m_eBodyState) = eBody;
+
+	if ( INFO(m_eBodyState) == BODY_CARDEFAULT )
+		Set_BodyCollider(COLLIDER_SPHERE, 1.f, 0.f, 2.f);
+	else
+		Set_BodyCollider(COLLIDER_SPHERE, 0.7f, 0.f, 0.6f);
+
+
 	m_pFSM->ChangeState((_uint)eState, _fAnimSpeed, _bLoop, _bInterpolation, INFO(m_eBodyState), iOffSet);
 }
 
