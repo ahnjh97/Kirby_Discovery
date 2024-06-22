@@ -17,8 +17,6 @@ CKabu::CKabu(const CKabu& rhs)
 
 HRESULT CKabu::Initialize_Prototype()
 {
-	m_eCollisionGroup = MONSTER;
-
 	return S_OK;
 }
 

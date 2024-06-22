@@ -82,6 +82,8 @@
 #include "StarBlock.h"
 #include "StarBlockPiece.h"
 #include "TerrainFog.h"
+#include "BreakableRock.h"
+#include "Car.h"
 
 //UI
 #include "BackGround.h"

@@ -316,6 +316,12 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop">
       <UniqueIdentifier>{4c6be733-c7c6-40fb-ba47-92d5f18bf7f9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\BreakableRock">
+      <UniqueIdentifier>{1804a8b8-0c68-4296-836c-c88b4878fba8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Car">
+      <UniqueIdentifier>{6a3a0e35-9a08-4f88-9aa3-377662595d38}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -633,6 +639,12 @@
     <ClInclude Include="..\public\FoodShopDee.h">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\BreakableRock.h">
+      <Filter>02.GameObjects\Map\BreakableRock</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Car.h">
+      <Filter>02.GameObjects\Map\Car</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -931,6 +943,12 @@
     </ClCompile>
     <ClCompile Include="..\private\FoodShopDee.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Car.cpp">
+      <Filter>02.GameObjects\Map\Car</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BreakableRock.cpp">
+      <Filter>02.GameObjects\Map\BreakableRock</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
