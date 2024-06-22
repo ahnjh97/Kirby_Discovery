@@ -73,7 +73,7 @@ HRESULT CKirby::Initialize(void* pArg)
 	CLevelChanger::LEVEL_DATA tLevelData = CLevelChanger::Get_Instance()->Load();
 	m_fHp = tLevelData.fKirbyHP;
 	m_uCoin = tLevelData.fKirbyCoin;
-	//m_fHp = 100.f; // 기존 사용하던 HP입니다.
+	m_fHp = 100.f; // 기존 사용하던 HP입니다.
 
 	m_fMaxHp = 100.f;
 	m_fAttack = 5.f;
