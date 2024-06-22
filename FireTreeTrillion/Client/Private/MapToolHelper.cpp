@@ -40,13 +40,22 @@ static _int s_iCamType = -1;
 
 static _bool s_bHideTriggers = { false };
 static _bool s_bHideGrid = { true };
-static _bool s_bHideMapDecos = { false };
+static _bool s_bHideDecos = { false };
 
 static _int s_iConnectedMonster = -1;
-static const _char* s_ShaderFile[] = { "" };
-static const _char* s_ModelPass[] = { "" };
-static const _char* s_PosTexPass[] = { "" };
+static const _char* s_ModelPassIndices[] = { "0. NORMAL_0", "1. NORMAL_X", "2. SHADOW", "3. SKY", "4. BLOOM", "5. BLEND"
+	,"6. TRIGGER", "7.DEFAULTFX", "8. BLENDFX", "9. DEFERREDINFO", "10. WHITEFX", "11. KIRBYPART" };
+static const _char* s_PosTexPassIndices[] = { "0. DEFAULT", "1. ALPHABLEND", "2. BLENDFX", "3. BLOOM", "4. DEFAULTFX", "5. BLEND_NOZTEXT"
+	,"6. WHITEFX", "7. UI_MASK", "8. UI_MASK2", "9. SOFTFX", "10. SOFTALPHAFX"};
 static _int s_iPassIndex = -1;
+static _char s_ObjectsFilter[MAX_PATH] = "";
+static _char s_MapDecoFilter[MAX_PATH] = "";
+static _char s_TownDecoFilter[MAX_PATH] = "";
+static _char s_LabDecoFilter[MAX_PATH] = "";
+static _bool s_bWasObjectsOpen = false;
+static _bool s_bWasMapDecosOpen = false;
+static _bool s_bWasTownDecosOpen = false;
+static _bool s_bWasLabDecosOpen = false;
 
 CMapToolHelper::CMapToolHelper(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -76,8 +85,8 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 			"Level_Tool_UI", "Level_Tool_FX", "Level_Tool_Anim", "Level_Tool_Map",
 		"Intro", "Racing",  "Town", "FinalBoss", "Level_End" };
 
-	m_vecMapModelNames = { "Level0Stage1Step01", "Level1Stage1Step01", "Town" , "LbLastBossStage"};
-	m_setMapNames = { "BG0", "BG1", "Level0Stage1Step01", "Level1Stage1Step01", "Town" , "LbLastBossStage"};
+	m_vecMapModelNames = { "Level0Stage1Step01","Level0Stage1Step02", "Level1Stage1Step01", "Town", "LbLastBossStage" };
+	m_setMapNames = { "BG0", "BG1", "Level0Stage1Step01", "Level1Stage1Step01","Level0Stage1Step02", "Town", "LbLastBossStage" };
 	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy", "Fog", "Ladder" };
 	m_setRallyingMonsters = { "NonAnim_Kabu", "NonAnim_BrontoBurt" };
 
@@ -88,7 +97,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "CMHighwayGuardrailACL", "CMHighwayGuardrailAL", "CMHighwayGuardrailALL", "CMHighwayGuardrailARL", "CMHighwayGuardrailBL", "CMHighwayGuardrailBLL"
 		, "CMHighwayGuardrailBRL", "CMHighwayGuardrailCCL", "CMHighwayGuardrailCL", "CMHighwayGuardrailCLL", "CMHighwayGuardrailCRL"
 		, "CMStreeLightLampA", "CMStreeLightLampE", "CMWaterTankL", "CvBarricadeBL", "CvPipingDuctA05L"
-		, "GsBenchAL",  "GsCarShop", "GsCircleBench", "GsFlowerPotAL", "GsFlowerPotBL", "GsSteelFenceA"
+		, "GsBenchAL", "GsCarFloor", "GsCarShop", "GsCircleBench", "GsFlowerPotAL", "GsFlowerPotBL", "GsSteelFenceA"
 		, "GsSteelFenceB", "GsStone", "GsStreetWallA", "GsStreetWallB"
 		, "GsTelephonePoleA", "GsTelephonePoleB", "GsTireAL", "GsTireBL", "GsTireCL"
 		, "GsTrafficSignalAL", "GsTrafficSignalBL", "GsTreeA", "GsTreeB", "GsTreeC", "GsWallRockA", "GsWallRockB"
@@ -118,7 +127,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 	HideGrid(s_bHideGrid);
 	HideTriggers(s_bHideTriggers);
-	HideMapDecos(s_bHideMapDecos);
+	HideDecos(s_bHideDecos);
 
 	return S_OK;
 }
@@ -286,7 +295,6 @@ void CMapToolHelper::ReadLabDecoTxts()
 
 	for (auto& objTxt : m_vecLabDecoTxts)
 		m_setLabDecoTxts.insert(objTxt);
-
 }
 
 void CMapToolHelper::Menu_Level()
@@ -331,9 +339,10 @@ void CMapToolHelper::Menu_Level()
 			ImGui::EndPopup();
 		}
 
-		if (i % 3 == 0)
+		if (i % 2 == 0 && i != LEVEL_FINALBOSS)
 			ImGui::SameLine();
 	}
+
 	if (ImGui::Button("Save", ImVec2(100, 40)))
 		Save_Level();
 	ImGui::SameLine();
@@ -350,9 +359,9 @@ void CMapToolHelper::Menu_Level()
 		s_bHideGrid = !s_bHideGrid;
 		HideGrid(s_bHideGrid);
 	}
-	if (ImGui::RadioButton("Hide MapDecos", s_bHideMapDecos)) {
-		s_bHideMapDecos = !s_bHideMapDecos;
-		HideMapDecos(s_bHideMapDecos);
+	if (ImGui::RadioButton("Hide Decos", s_bHideDecos)) {
+		s_bHideDecos = !s_bHideDecos;
+		HideDecos(s_bHideDecos);
 	}
 }
 
@@ -397,27 +406,35 @@ void CMapToolHelper::Menu_NonAnimModels()
 
 	if (ImGui::CollapsingHeader("Objects"))
 	{
+		ImGui::InputText("##ObjectsFilter", s_ObjectsFilter, IM_ARRAYSIZE(s_ObjectsFilter)); // 필터 입력받기
 		ImGui::SetNextItemWidth(200.0f);
-		vector<const _char*> vecObjectNames(m_vecObjectTxts.size());
-		for (_int i = 0; i < m_vecObjectTxts.size(); ++i)
-			vecObjectNames[i] = m_vecObjectTxts[i].c_str();
-		if (ImGui::ListBox("##Objects", &s_iObjectIdx, vecObjectNames.data(), m_vecObjectTxts.size(), 10)) {
-			DisableOtherGroups(&s_iObjectIdx);
-			m_strSelectedTxt = m_vecObjectTxts[s_iObjectIdx];
-		}
-	}
+		vector<const _char*> vecObjectNames;
+		FilterListBoxStrings(s_ObjectsFilter, vecObjectNames, m_vecObjectTxts);
 
+		if (ImGui::ListBox("##Objects", &s_iObjectIdx, vecObjectNames.data(), vecObjectNames.size(), 10)) {
+			DisableOtherGroups(&s_iObjectIdx);
+			m_strSelectedTxt = string(vecObjectNames[s_iObjectIdx]);
+		}
+		s_bWasObjectsOpen = true;
+	}
+	else
+		ClearSearchFilter(s_ObjectsFilter, s_bWasObjectsOpen);
+		
 	if (ImGui::CollapsingHeader("MapDecos"))
 	{
+		ImGui::InputText("##MapDecoFilter", s_MapDecoFilter, IM_ARRAYSIZE(s_MapDecoFilter)); // 필터 입력받기
 		ImGui::SetNextItemWidth(200.0f);
-		vector<const _char*> vecMapDecoNames(m_vecMapDecoTxts.size());
-		for (_int i = 0; i < m_vecMapDecoTxts.size(); ++i)
-			vecMapDecoNames[i] = m_vecMapDecoTxts[i].c_str();
-		if (ImGui::ListBox("##MapDecos", &s_iMapDecoIdx, vecMapDecoNames.data(), m_vecMapDecoTxts.size(), 16)) {
+		vector<const _char*> vecMapDecoNames;
+		FilterListBoxStrings(s_MapDecoFilter, vecMapDecoNames, m_vecMapDecoTxts);
+		
+		if (ImGui::ListBox("##MapDecos", &s_iMapDecoIdx, vecMapDecoNames.data(), vecMapDecoNames.size(), 16)) {
 			DisableOtherGroups(&s_iMapDecoIdx);
-			m_strSelectedTxt = m_vecMapDecoTxts[s_iMapDecoIdx];
+			m_strSelectedTxt = string(vecMapDecoNames[s_iMapDecoIdx]);
 		}
+		s_bWasMapDecosOpen = true;
 	}
+	else
+		ClearSearchFilter(s_MapDecoFilter, s_bWasMapDecosOpen);
 
 	if (ImGui::CollapsingHeader("Items"))
 	{
@@ -445,27 +462,35 @@ void CMapToolHelper::Menu_NonAnimModels()
 
 	if (ImGui::CollapsingHeader("TownDecos"))
 	{
+		ImGui::InputText("##TownDecoFilter", s_TownDecoFilter, IM_ARRAYSIZE(s_TownDecoFilter)); // 필터 입력받기
 		ImGui::SetNextItemWidth(200.0f);
-		vector<const _char*> vecTownDecoNames(m_vecTownDecoTxts.size());
-		for (_int i = 0; i < m_vecTownDecoTxts.size(); ++i)
-			vecTownDecoNames[i] = m_vecTownDecoTxts[i].c_str();
-		if (ImGui::ListBox("##TownDecos", &s_iTownDecoIdx, vecTownDecoNames.data(), m_vecTownDecoTxts.size(), 16)) {
+		vector<const _char*> vecTownDecoNames;
+		FilterListBoxStrings(s_TownDecoFilter, vecTownDecoNames, m_vecTownDecoTxts);
+		
+		if (ImGui::ListBox("##TownDecos", &s_iTownDecoIdx, vecTownDecoNames.data(), vecTownDecoNames.size(), 16)) {
 			DisableOtherGroups(&s_iTownDecoIdx);
-			m_strSelectedTxt = m_vecTownDecoTxts[s_iTownDecoIdx];
+			m_strSelectedTxt = string(vecTownDecoNames[s_iTownDecoIdx]);
 		}
+		s_bWasTownDecosOpen = true;
 	}
+	else
+		ClearSearchFilter(s_TownDecoFilter, s_bWasTownDecosOpen);
 
 	if (ImGui::CollapsingHeader("LabDecos"))
 	{
+		ImGui::InputText("##LabDecoFilter", s_LabDecoFilter, IM_ARRAYSIZE(s_LabDecoFilter)); // 필터 입력받기
 		ImGui::SetNextItemWidth(200.0f);
-		vector<const _char*> vecLabDecoNames(m_vecLabDecoTxts.size());
-		for (_int i = 0; i < m_vecLabDecoTxts.size(); ++i)
-			vecLabDecoNames[i] = m_vecLabDecoTxts[i].c_str();
-		if (ImGui::ListBox("##LabDecos", &s_iLabDecoIdx, vecLabDecoNames.data(), m_vecLabDecoTxts.size(), 16)) {
+		vector<const _char*> vecLabDecoNames;
+		FilterListBoxStrings(s_LabDecoFilter, vecLabDecoNames, m_vecLabDecoTxts);
+
+		if (ImGui::ListBox("##LabDecos", &s_iLabDecoIdx, vecLabDecoNames.data(), vecLabDecoNames.size(), 16)) {
 			DisableOtherGroups(&s_iLabDecoIdx);
-			m_strSelectedTxt = m_vecLabDecoTxts[s_iLabDecoIdx];
+			m_strSelectedTxt = string(vecLabDecoNames[s_iLabDecoIdx]);
 		}
+		s_bWasLabDecosOpen = true;
 	}
+	else
+		ClearSearchFilter(s_LabDecoFilter, s_bWasLabDecosOpen);
 }
 
 void CMapToolHelper::Menu_TriggerInfo()
@@ -715,19 +740,25 @@ void CMapToolHelper::Edit_Object()
 	if (ImGui::InputFloat("##fRimWidth", &fRimWidth, 0.01f, 1.0f, "%.3f"))
 		m_pPickedObject->Set_RimWidth(fRimWidth);
 
-	//CModel* pModel = dynamic_cast<CModel*>(m_pPickedObject->Get_Component(TEXT("Com_Model")));
-	//if (nullptr == pModel)  // Shader_PosTex  패스 지정
-	//{
-	//	/*ImGui::SetNextItemWidth(150);
-	//if (ImGui::Combo("##RallyPointIndex", &iTriggerIdx, triggerIndices, IM_ARRAYSIZE(triggerIndices)))
-	//	pMapToolObject->Set_TriggerIndex(iTriggerIdx);*/
-	//}
-	//else  // Shader_Model 패스지정
-	//{
-	//	/*ImGui::SetNextItemWidth(150);
-	//if (ImGui::Combo("##RallyPointIndex", &iTriggerIdx, triggerIndices, IM_ARRAYSIZE(triggerIndices)))
-	//	pMapToolObject->Set_TriggerIndex(iTriggerIdx);*/
-	//}
+	CModel* pModel = dynamic_cast<CModel*>(m_pPickedObject->Get_Component(TEXT("Com_Model")));
+	if (nullptr == pModel)  // Shader_PosTex  패스 지정
+	{
+		/*ImGui::SetNextItemWidth(150);
+		GetPassIndex();
+		if (ImGui::Combo("##PosTexPassIndex", &s_iPassIndex, s_PosTexPassIndices, IM_ARRAYSIZE(s_PosTexPassIndices)))
+			SetPassIndex(s_iPassIndex);
+		*/
+	}
+	else  // Shader_Model 패스지정
+	{
+		CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(m_pPickedObject);
+		if (pMapToolObject != nullptr) {
+			ImGui::SetNextItemWidth(150);
+			s_iPassIndex = pMapToolObject->Get_PassIndex();
+			if (ImGui::Combo("##ModelPassIndex", &s_iPassIndex, s_ModelPassIndices, IM_ARRAYSIZE(s_ModelPassIndices)))
+				pMapToolObject->Set_PassIndex(s_iPassIndex);
+		}
+	}
 	
 	_float4x4 tempMatrix = pTransform->Get_WorldFloat4x4();
 	m_pGameInstance->EditTransform(tempMatrix); // 선택한 모델의 월드행렬을 수정 
@@ -1396,7 +1427,7 @@ void CMapToolHelper::HideGrid(_bool bHideGrid)
 	pGrid->Set_Hide(bHideGrid);
 }
 
-void CMapToolHelper::HideMapDecos(_bool bHideMapDecos)
+void CMapToolHelper::HideDecos(_bool bHideDecos)
 {
 	list<CGameObject*>* pObjectList = m_pGameInstance->Get_List(LEVEL_TOOL_MAP, TEXT("Layer_Parse"));
 	if (pObjectList == nullptr)
@@ -1416,7 +1447,7 @@ void CMapToolHelper::HideMapDecos(_bool bHideMapDecos)
 
 		string strModelName = pModel->Get_ModelInfo().strModelName;
 		if(true == IsDeco(strModelName))
-			obj->Set_Hide(bHideMapDecos);
+			obj->Set_Hide(bHideDecos);
 	}
 }
 
@@ -1503,6 +1534,37 @@ _bool CMapToolHelper::IsAnythingSelected()
 	}
 
 	return _bool();
+}
+
+void CMapToolHelper::ClearSearchFilter(_char* _filterBuf, _bool& bWasOpen)
+{
+	if (false == bWasOpen)
+		return;
+
+	_filterBuf[0] = '\0';
+	bWasOpen = false;
+}
+
+void CMapToolHelper::FilterListBoxStrings(const _char* _filterBuf, vector<const _char*>& _vecNames, vector<string>& _vecTxts)
+{
+	if (_filterBuf[0] == '\0')
+	{
+		_vecNames.resize(_vecTxts.size());
+		for (_int i = 0; i < _vecTxts.size(); ++i)
+			_vecNames[i] = _vecTxts[i].c_str();
+	}
+	else
+	{
+		for (auto& objTxt : _vecTxts)
+		{
+			string strLower = string(objTxt);
+			transform(strLower.begin(), strLower.end(), strLower.begin(), ::tolower);
+			string strFilter = string(_filterBuf);
+			transform(strFilter.begin(), strFilter.end(), strFilter.begin(), ::tolower);
+			if (strLower.find(strFilter) != string::npos)
+				_vecNames.push_back(objTxt.c_str());
+		}
+	}
 }
 
 void CMapToolHelper::Reset_MapShaderInfo()
