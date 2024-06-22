@@ -290,7 +290,7 @@ void CCappyBody_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		pCappy->Set_DamageJumpPower(fDamageJumpPower);
 
 
-		if (true == pCappy->IsAnimFinished() || pController->Is_Terrain())
+		if (/*true == pCappy->IsAnimFinished() ||*/ pController->Is_Terrain())
 		{
 			if (pCappy->Get_Hp() <= 0.f)
 				pCappy->Set_Dead();

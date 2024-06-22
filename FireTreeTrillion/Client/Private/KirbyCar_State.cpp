@@ -47,6 +47,28 @@ void CKirbyCar_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		pController->FreeFall(pTransformCom, fTimeDelta);
 	}
 
+	// 차량을 땅에 버리는 로직이다.
+	if (m_pGameInstance->Get_DIKeyState(DIK_V, KEY_PRESS))
+	{
+		DESC(m_fDumpAbilityTime) += fTimeDelta;
+
+		if (DESC(m_fDumpAbilityTime) > 1.f)
+		{
+			DESC(m_fDumpAbilityTime) = 0.f;
+			DESC(m_fJumpVelocity) = 15.f;
+			pKirby->Change_State(CKirby::STATE_SPITDEFORM, 60.f, false, false, CKirby::BODY_VACUUM);
+			return;
+		}
+	}
+	else
+	{
+		if (DESC(m_fDumpAbilityTime) > 0.f)
+			DESC(m_fDumpAbilityTime) -= fTimeDelta * 2.f;
+
+		if (DESC(m_fDumpAbilityTime) < 0.f)
+			DESC(m_fDumpAbilityTime) = 0.f;
+	}
+
 
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))

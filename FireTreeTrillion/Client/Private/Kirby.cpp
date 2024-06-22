@@ -1110,6 +1110,8 @@ void CKirby::SetUp_FSM()
 
 #pragma endregion
 
+	m_pFSM->Add_State(STATE_SPITDEFORM, CKirbyVacuum_Spit_State::Create());
+
 #pragma region 자동차 애니메이션
 	m_pFSM->Add_State(CARSTATE_IDLING, CKirbyCar_Idle_State::Create()); //
 
