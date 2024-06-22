@@ -52,7 +52,6 @@ _int CFoodShopDee::Tick(_float fTimeDelta)
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 	__super::Tick(m_fTimeDelta);
 
-	m_pControllerCom->FreeFall(m_pTransformCom, m_fTimeDelta);
 	return OBJ_NOEVENT;
 }
 
