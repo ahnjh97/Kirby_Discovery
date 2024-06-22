@@ -176,6 +176,8 @@ private:
 	void			Setting_KirbyBalance();
 	void			Key_Input(_float fTimeDelta);
 	void			Kirby_SystemTick(_float fTimeDelta);
+	HRESULT			Kirby_SystemInitialize();
+	void			Kirby_LookInitialize();
 
 	_float3			Make_RepulsiveDir(CPhysXObject* pObject);
 
