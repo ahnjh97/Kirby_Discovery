@@ -31,8 +31,6 @@ public:
 	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
 
-
-
 #ifdef _DEBUG
 	virtual void	Render_IMGUI() override;
 #endif

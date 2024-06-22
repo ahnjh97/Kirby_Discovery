@@ -36,6 +36,7 @@ public:
 	//	DEE_END
 	//};
 
+
 	typedef struct : public CGameObject::GAMEOBJECT_DESC
 	{
 
