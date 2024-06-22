@@ -50,6 +50,8 @@ HRESULT CMapToolObject::Initialize(void* pArg)
 
 	m_pMapToolHelper = dynamic_cast<CMapToolHelper*>(m_pGameInstance->Get_GameObject(LEVEL_TOOL_MAP, TEXT("Layer_MapToolHelper")));
 	Safe_AddRef(m_pMapToolHelper);
+	if (L"Trigger" == GameObjectDesc.wstrModelName)
+		m_iPassIndex = MODEL_TRIGGER;
 
 	return S_OK;
 }
@@ -81,12 +83,6 @@ HRESULT CMapToolObject::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	string strModelName = m_pModelCom->Get_ModelInfo().strModelName;
-
-	_uint iPassIndex{};
-	if ("Trigger" == strModelName)
-		iPassIndex = MODEL_TRIGGER;
-
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 
 	for (size_t i = 0; i < iNumMeshes; i++)
@@ -97,7 +93,7 @@ HRESULT CMapToolObject::Render()
 			return E_FAIL;
 			/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
 
-		if (FAILED(m_pShaderCom->Begin(iPassIndex)))
+		if (FAILED(m_pShaderCom->Begin(m_iPassIndex)))
 			return E_FAIL;
 
 		if (FAILED(m_pModelCom->Render(i)))

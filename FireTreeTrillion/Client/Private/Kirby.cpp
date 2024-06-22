@@ -115,12 +115,13 @@ void CKirby::Late_Tick(_float fTimeDelta)
 			Glow->Late_Tick(fTimeDelta);
 	}
 
-	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
-	{
-		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND,	 this);
-		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW,		 this);
-		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_DEFERREDINFO, this);
-	}
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND,	 this);
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW,		 this);
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_DEFERREDINFO, this);
+
+	//if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
+	//{
+	//}
 }
 
 HRESULT CKirby::Render()
@@ -452,9 +453,61 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 
 			Delete_AllEffect();
 		}
+	}
+	// 일단, 넓은 범위일땐 무조건 충돌 할 것이다.
+	else if (eContent == CCollisionCenter::CONTENT_DEFORM)
+	{
+
+		if (pObject->Get_PhyXState() == PO_VACUUMING)
+		{
+			Change_State(CARVACUUMSTATE_DEFORM, 60.f, false, false, BODY_CARVACUUM, OFFSET_CARVACUUM);
+			INFO(m_pObject)->Set_Dead();
+			Safe_Release(INFO(m_pObject));
+			INFO(m_pObject) = nullptr;
+			INFO(m_bisDeforming) = false;
+			INFO(m_eEyeState) = EYE_IDLE;
+			CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
+			CTransform* pCameraTransform = pCamera->Get_TransformCom();
+			_float4 vCamRight = pCameraTransform->Get_State_Vector(CTransform::STATE_RIGHT);
+			_float4 vCamLook = XMVector3Cross(vCamRight, XMVectorSet(0.f, 1.f, 0.f, 1.f));
+			INFO(m_vTargetDir) = XMVector3Normalize(vCamLook + vCamRight) * -1.f;
+			Delete_AllEffect();
+		}
+		else if (pObject->Get_PhyXState() == PO_NORMAL)
+		{
+			// CollisionCenter 에서 흡수 가능을 판정을 내렸었다면, X키를 누르면 어떤 상태든 상관없이 흡수 할 수 있다.
+			if (INFO(m_bisDeforming) == false && m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
+			{
+				if (INFO(m_pObject) != nullptr)
+					return;
+
+				_float4 vDeformPos = pObject->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
+				_float4 vMyPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+				_float4 vMyLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+				_float4 vDistance = vDeformPos - vMyPos;
+				vDistance.y = 0.f;
+				vDistance.Normalize();
+
+				_float fDegree = ToDegree(acos(vDistance.Dot(vMyLook)));
+
+				// 전방 90도가 아닐 경우
+				if (fDegree > 45.f)
+					return;
+
+				// Deforming을 트루로 만든다. 길게 애니메이션이 재생될 준비를 한다. 이건 밖에서 예외처리 될 것이다.
+				INFO(m_bisDeforming) = true;
+				INFO(m_vObjectScale) = pObject->Get_TransformCom()->Get_Scaled();
+				INFO(m_fObjectDistance) = (vDeformPos - vMyPos).Length();
+				INFO(m_pObject) = pObject;
+				Safe_AddRef(INFO(m_pObject));
+				// 커비가 동일한 애니메이션으로 몬스터를 포착해서 꽤 긴 시간동안 서로 짝짝꿍하겠다는 것이다.
+				INFO(m_pObject)->Set_PhyXState(PO_VACUUMING);
+				Change_State(CKirby::STATE_VACUUMHUSTLELV2, 50.f, true, true, CKirby::BODY_VACUUM);
+			}
+		}
+
 
 	}
-
 }
 
 _float3 CKirby::Make_RepulsiveDir(CPhysXObject* pObject)
@@ -1342,7 +1395,6 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 	// 사다리 상태 초기화
 	INFO(m_bCanLadder) = false;
 
-
 	// 커비가 공격중일땐, 꽤나 오랜 시간동안 무적을 부여받는다.
 	if (m_isKirbyAttacking == true)
 	{
@@ -1375,7 +1427,7 @@ HRESULT CKirby::Kirby_SystemInitialize()
 	// 파싱으로 레벨전환될때 HP와 COIN개수를 이동시킵니다.
 	CLevelChanger::LEVEL_DATA tLevelData = CLevelChanger::Get_Instance()->Load();
 	m_fHp = tLevelData.fKirbyHP;
-	m_uCoin = tLevelData.fKirbyCoin;
+	m_uCoin = (_uint)tLevelData.fKirbyCoin;
 	// m_eAbilityType = ;
 	// m_uWaddleDeeCount = ;
 	m_fAttack = 5.f; // 고정
@@ -1395,6 +1447,9 @@ HRESULT CKirby::Kirby_SystemInitialize()
 	Add_AnimEvent();
 	// 혹여나, 버그가 발생할까봐 확실하게 블러 true화
 	m_bMotionBlur = true;
+
+
+	return S_OK;
 }
 
 void CKirby::Kirby_LookInitialize()
@@ -1445,7 +1500,7 @@ CGameObject* CKirby::Clone(void* pArg)
 void CKirby::Free()
 {
 	CLevelChanger::LEVEL_DATA tLevelData = {};
-	tLevelData.fKirbyCoin = m_uCoin;
+	tLevelData.fKirbyCoin = (_float)m_uCoin;
 	tLevelData.fKirbyHP = m_fHp;
 	CLevelChanger::Get_Instance()->Save(tLevelData);
 

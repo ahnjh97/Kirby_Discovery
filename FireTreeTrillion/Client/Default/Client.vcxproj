@@ -186,6 +186,7 @@
     <ClInclude Include="..\Public\BladeKnight_State.h" />
     <ClInclude Include="..\Public\BombOrbit.h" />
     <ClInclude Include="..\Public\BombOrbitGlow.h" />
+    <ClInclude Include="..\Public\BreakableRock.h" />
     <ClInclude Include="..\Public\BrontoBurt.h" />
     <ClInclude Include="..\Public\BrontoBurt_State.h" />
     <ClInclude Include="..\Public\Buffahorn.h" />
@@ -196,6 +197,7 @@
     <ClInclude Include="..\Public\CappyBody_State.h" />
     <ClInclude Include="..\Public\CappyHat.h" />
     <ClInclude Include="..\Public\CappyHat_State.h" />
+    <ClInclude Include="..\Public\Car.h" />
     <ClInclude Include="..\Public\Character.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\Coin.h" />
@@ -249,6 +251,7 @@
     <ClInclude Include="..\Public\Level_Loading.h" />
     <ClInclude Include="..\Public\Level_Logo.h" />
     <ClInclude Include="..\Public\Level_PartTime.h" />
+    <ClInclude Include="..\Public\Level_Racing.h" />
     <ClInclude Include="..\Public\Level_Tool_Anim.h" />
     <ClInclude Include="..\Public\Level_Tool_FX.h" />
     <ClInclude Include="..\Public\Level_Tool_Map.h" />
@@ -316,6 +319,7 @@
     <ClCompile Include="..\Private\BladeKnight_State.cpp" />
     <ClCompile Include="..\Private\BombOrbit.cpp" />
     <ClCompile Include="..\Private\BombOrbitGlow.cpp" />
+    <ClCompile Include="..\Private\BreakableRock.cpp" />
     <ClCompile Include="..\Private\BrontoBurt.cpp" />
     <ClCompile Include="..\Private\BrontoBurt_State.cpp" />
     <ClCompile Include="..\Private\Buffahorn.cpp" />
@@ -326,6 +330,7 @@
     <ClCompile Include="..\Private\CappyBody_State.cpp" />
     <ClCompile Include="..\Private\CappyHat.cpp" />
     <ClCompile Include="..\Private\CappyHat_State.cpp" />
+    <ClCompile Include="..\Private\Car.cpp" />
     <ClCompile Include="..\Private\Character.cpp" />
     <ClCompile Include="..\Private\Coin.cpp" />
     <ClCompile Include="..\Private\CollisionCenter.cpp" />
@@ -375,6 +380,7 @@
     <ClCompile Include="..\Private\Level_Loading.cpp" />
     <ClCompile Include="..\Private\Level_Logo.cpp" />
     <ClCompile Include="..\Private\Level_PartTime.cpp" />
+    <ClCompile Include="..\Private\Level_Racing.cpp" />
     <ClCompile Include="..\Private\Level_Tool_Anim.cpp" />
     <ClCompile Include="..\Private\Level_Tool_FX.cpp" />
     <ClCompile Include="..\Private\Level_Tool_Map.cpp" />
