@@ -23,6 +23,9 @@ public:
 
 	enum DEE_ANIM
 	{
+		DEEANIM_ANGER,
+		DEEANIM_BREAK = 3,
+		DEEANIM_CASEFIND,
 		DEEANIM_END
 	};
 
