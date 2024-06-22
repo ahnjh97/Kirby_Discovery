@@ -66,6 +66,11 @@ private:
 	unordered_map<string, pair<_uint, _float>> m_ModelIdleAnimMap;
 	vector<PxRigidStatic*> m_vecAnimDecoTriggersActors;
 	vector<PxShape*> m_vecShapes;
+	vector<string>	m_vecConstantNames;
+	vector<string>	m_vecStencilRimLightMotionBlurNames;
+
+	vector<CModel*>	m_vecNonAnimDecos;
+	vector<CModel*> m_vecAnimDecos;
 
 private:
 	HRESULT Add_Components(const wstring& _wstrModelTag);
@@ -79,6 +84,10 @@ private:
 	PxRigidStatic* AddTriggerActorForAnimDeco(const string& _strModelName, _float4x4& _matWorld);
 	void SetUpAnimDecoInfo(const string& _strModelName, _float _fTriggerRadius, _uint iIdleIndex, _float fIdleAnimSpeed
 		, _uint iActionIndex, _float fActionAnimSpeed);
+
+	void ReadDecos_ForSmallLevels();
+	void Release_MapDecos();
+	HRESULT Render_NonOctreeMapDecos();
 		
 public:
 	static CBasicMap* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
