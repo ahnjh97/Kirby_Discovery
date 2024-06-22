@@ -122,11 +122,11 @@ HRESULT CAnimToolObject::Add_Components()
 {
 	HRESULT hr;
 	/* For.Com_Shader */
-	hr = __super::Add_Component(TEXT("Prototype_Component_Shader_VtxAnimModel"),
+	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimModel"),
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
-	/* For.Com_Shader */
+	/* For.Com_Model */
 	hr = __super::Add_Component(m_wstrModelName,
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);

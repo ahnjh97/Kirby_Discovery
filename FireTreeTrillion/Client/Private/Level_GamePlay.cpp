@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Level_GamePlay.h"
-#include "LevelChanger.h"
 #include "Camera_Main.h"
 #include "Camera_Free.h"
 #include "BasicMap.h"
@@ -29,7 +28,6 @@ HRESULT CLevel_GamePlay::Initialize()
 {
 	m_pGameInstance->Set_RenderMode(CRenderer::MODE_TOOL);
 
-	//CLevelChanger::Get_Instance()->Load();
 
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
@@ -93,12 +91,6 @@ HRESULT CLevel_GamePlay::Render()
 {
 	if (FAILED(__super::Render()))
 		return E_FAIL;
-
-	//CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject_ByTag(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby")));
-	//_float4 vPos = pKirby->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION);
-	//wstring wstrMsg = TEXT("게임플레이레벨입니다. 커비 위치 : ")
-	//	+ to_wstring(vPos.x) + TEXT(", ") + to_wstring(vPos.y) + TEXT(", ") + to_wstring(vPos.z);
-	//SetWindowText(g_hWnd, wstrMsg.c_str());
 
 	//윈도우 바 FPS 체크
 	++m_iFPS;
@@ -754,5 +746,4 @@ void CLevel_GamePlay::Free()
 	for(auto& tex : m_pEnvTexture)
 		Safe_Release(tex);
 
-	//CLevelChanger::Get_Instance()->Save();
 }

@@ -281,7 +281,7 @@ HRESULT CSingleEffect::Add_Components(FX_DESC& FXDesc)
 		CHECK_FAILED(hr);
 
 
-		hr = __super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Shader_VtxModel"),
+		hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"),
 			TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 		CHECK_FAILED(hr);
 

@@ -65,6 +65,10 @@ protected:
 	_float					m_fMonsterOverPowerMaxTime = { 0.f };
 	_float					m_fPreHp = { 0.f };
 
+	// 납작해졌다가 죽을 시간
+	_float	m_fPressedTime = { 0.f };
+
+
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;
 	virtual void Free() override;

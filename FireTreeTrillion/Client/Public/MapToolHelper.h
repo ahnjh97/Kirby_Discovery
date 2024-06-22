@@ -35,6 +35,10 @@ private:
 	void	ReadMapObjTxts();
 	void	ReadMonsterTxts();
 	
+	//마을 오브젝트를 로드함.
+	void	ReadTownDecoTxts();
+	void	ReadLabDecoTxts();
+
 	// ImGui
 	void	Menu_Level();
 	void	Menu_NonAnimModels();
@@ -62,7 +66,6 @@ private:
 	_bool	Save_Map(const string& _strLevel, vector<CGameObject*>& _vecMap);
 	_bool	Save_Triggers(const string& _strLevel, vector<CGameObject*>& _vecTriggers);
 	_bool	Save_Monsters(const string& _strLevel, vector<CGameObject*>& _vecMonsters);
-	_bool	Save_RallyPoints(const string& _strLevel, vector<CGameObject*>& _vecRallyPoints);
 	_bool	Save_Decos(const string& _strLevel, vector<CGameObject*>& _vecDecos);
 	_bool	Save_Items(const string& _strLevel, vector<CGameObject*>& _vecItems);
 	_bool	Save_Kickables(const string& _strLevel, vector<CGameObject*>& _vecItems);
@@ -70,7 +73,6 @@ private:
 	void	Load_Map(const string& _strLevel);
 	void	Load_Triggers(const string& _strLevel);
 	void	Load_Monsters(const string& _strLevel);
-	void	Load_RallyPoints(const string& _strLevel);
 	void	Load_Decos(const string& _strLevel);
 	void	Load_Items(const string& _strLevel);
 	void	Load_Kickables(const string& _strLevel);
@@ -123,6 +125,9 @@ private:
 	unordered_set<string>	m_setKickables;
 	unordered_set<string>	m_setTrees;
 
+	unordered_set<string>	m_setTownDecoTxts;
+	unordered_set<string>	m_setLabDecoTxts;
+
 	vector<string>	m_vecMapTxts;
 	vector<string>	m_vecTriggerTxts;
 	vector<string>	m_vecMonsterTxts;
@@ -132,6 +137,10 @@ private:
 	vector<string>	m_vecKickableTxts;
 	
 	vector<_int*>	m_vecTxtIndices;
+
+	//마을을 위한 txts
+	vector<string>	m_vecTownDecoTxts;
+	vector<string>	m_vecLabDecoTxts;
 
 	string m_strSelectedTxt;
 	string m_strCurModel;

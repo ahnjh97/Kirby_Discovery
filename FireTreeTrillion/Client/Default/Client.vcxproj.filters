@@ -315,6 +315,28 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BladeKnight\State">
       <UniqueIdentifier>{c3509440-bbe1-439c-b743-a205693e77b6}</UniqueIdentifier>
+	</Filter>
+    <Filter Include="01.Levels\GamePlay">
+      <UniqueIdentifier>{4547c314-4c9e-474f-bf8e-dd8eb6143161}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\Town">
+      <UniqueIdentifier>{235eccae-385e-4844-8a46-caf8091cd645}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword\State">
+      <UniqueIdentifier>{c3509440-bbe1-439c-b743-a205693e77b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyCar_State">
+      <UniqueIdentifier>{67963c50-7e60-41a8-bf16-e2649eab3a93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\FinalBoss">
+      <UniqueIdentifier>{d9e8fa8b-a4cb-4615-8a73-dca93c7a7460}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\WaddleDee\State">
+      <UniqueIdentifier>{2ed6ece7-973d-401a-9fec-badd5290f2ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop">
+      <UniqueIdentifier>{4c6be733-c7c6-40fb-ba47-92d5f18bf7f9}</UniqueIdentifier>
+>>>>>>> main
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -629,6 +651,25 @@
     </ClInclude>
     <ClInclude Include="..\Public\FinalBossSpear.h">
       <Filter>02.GameObjects\PhysXObject\Character\BossMonster\PartObject_Spear</Filter>
+	</ClInclude>
+    <ClInclude Include="..\Public\Level_GamePlay.h">
+      <Filter>01.Levels\GamePlay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Level_Town.h">
+      <Filter>01.Levels\Town</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KirbyCar_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyCar_State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_FinalBoss.h">
+      <Filter>01.Levels\FinalBoss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Dee_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\FoodShopDee.h">
+      <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop</Filter>
+>>>>>>> main
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -925,6 +966,25 @@
     </ClCompile>
     <ClCompile Include="..\Private\FinalBossSpear.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\BossMonster\PartObject_Spear</Filter>
+	</ClCompile>
+    <ClCompile Include="..\Private\Level_GamePlay.cpp">
+      <Filter>01.Levels\GamePlay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Level_Town.cpp">
+      <Filter>01.Levels\Town</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KirbyCar_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyCar_State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_FinalBoss.cpp">
+      <Filter>01.Levels\FinalBoss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Dee_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\FoodShopDee.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop</Filter>
+>>>>>>> main
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

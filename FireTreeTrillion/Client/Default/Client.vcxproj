@@ -200,6 +200,7 @@
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\Coin.h" />
     <ClInclude Include="..\Public\CollisionCenter.h" />
+    <ClInclude Include="..\public\Dee_State.h" />
     <ClInclude Include="..\Public\EnergyDrink.h" />
     <ClInclude Include="..\Public\FinalBoss.h" />
     <ClInclude Include="..\Public\FinalBossSpear.h" />
@@ -229,6 +230,7 @@
     <ClInclude Include="..\Public\KirbyBoom_State.h" />
     <ClInclude Include="..\Public\KirbyCar_State.h" />
     <ClInclude Include="..\Public\Ladder.h" />
+    <ClInclude Include="..\Public\Level_FinalBoss.h" />
     <ClInclude Include="..\Public\Level_Intro.h" />
     <ClInclude Include="..\Public\LevelChanger.h" />
     <ClInclude Include="..\Public\KirbyArmours.h" />
@@ -252,6 +254,7 @@
     <ClInclude Include="..\Public\Level_Tool_FX.h" />
     <ClInclude Include="..\Public\Level_Tool_Map.h" />
     <ClInclude Include="..\Public\Level_Tool_UI.h" />
+    <ClInclude Include="..\public\Level_Town.h" />
     <ClInclude Include="..\Public\Loader.h" />
     <ClInclude Include="..\public\MainApp.h" />
     <ClInclude Include="..\Public\MapObject.h" />
@@ -325,6 +328,7 @@
     <ClCompile Include="..\Private\Character.cpp" />
     <ClCompile Include="..\Private\Coin.cpp" />
     <ClCompile Include="..\Private\CollisionCenter.cpp" />
+    <ClCompile Include="..\private\Dee_State.cpp" />
     <ClCompile Include="..\Private\EnergyDrink.cpp" />
     <ClCompile Include="..\Private\FinalBoss.cpp" />
     <ClCompile Include="..\Private\FinalBossSpear.cpp" />
@@ -353,6 +357,7 @@
     <ClCompile Include="..\Private\KirbyBomb.cpp" />
     <ClCompile Include="..\Private\KirbyCar_State.cpp" />
     <ClCompile Include="..\Private\Ladder.cpp" />
+    <ClCompile Include="..\Private\Level_FinalBoss.cpp" />
     <ClCompile Include="..\Private\Level_Intro.cpp" />
     <ClCompile Include="..\Private\LevelChanger.cpp" />
     <ClCompile Include="..\Private\KirbyArmours.cpp" />
@@ -374,6 +379,7 @@
     <ClCompile Include="..\Private\Level_Tool_FX.cpp" />
     <ClCompile Include="..\Private\Level_Tool_Map.cpp" />
     <ClCompile Include="..\Private\Level_Tool_UI.cpp" />
+    <ClCompile Include="..\private\Level_Town.cpp" />
     <ClCompile Include="..\Private\Loader.cpp" />
     <ClCompile Include="..\private\MainApp.cpp" />
     <ClCompile Include="..\Private\MapObject.cpp" />

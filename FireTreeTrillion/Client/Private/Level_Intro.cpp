@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "LevelChanger.h"
 #include "Level_Intro.h"
 #include "Camera_Free.h"
 #include "Camera_Main.h"
@@ -24,7 +23,6 @@ CLevel_Intro::CLevel_Intro(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 HRESULT CLevel_Intro::Initialize()
 {
 	m_pGameInstance->Set_RenderMode(CRenderer::MODE_GAMEPLAY);
-	//CLevelChanger::Get_Instance()->Load();
 
 	HRESULT hr;
 	hr = __super::Initialize();
@@ -46,8 +44,6 @@ HRESULT CLevel_Intro::Initialize()
 	hr = Ready_Layer_UI(TEXT("Layer_UI"));
 	CHECK_FAILED(hr);
 
-	/*hr = Ready_ParsedObjects();
-	CHECK_FAILED(hr);*/
 	hr = Ready_Map();
 	CHECK_FAILED(hr);
 	hr = Ready_Triggers();

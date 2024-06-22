@@ -12,15 +12,17 @@ namespace Client
                  LEVEL_TOOL_UI,
                  LEVEL_TOOL_ANIM = 6, // ANIM툴은 6으로 고정 ! 부탁드립니댜
                  LEVEL_TOOL_MAP,
+
                 //============ GAME
-                // 여기에서 이어서 
                  LEVEL_INTRO,
-                 LEVEL_STAGE1,
+                 LEVEL_RACING,
+                 LEVEL_TOWN,
+                 LEVEL_FINALBOSS, // 리소스명 LEVEL_LAB
 
                  LEVEL_END };
 
     enum TRIGGER_TYPE { TRIGGER_CAMERA, TRIGGER_SHADER, TRIGGER_END };
-    enum CAMERA_TYPE { CAM_FRONT, CAM_REAR, CAM_END };
+    enum CAMERA_TYPE  { CAM_FRONT, CAM_REAR, CAM_END };
 
     enum FILE_TYPE { FILE_UI, FILE_NONE };
     
@@ -78,7 +80,7 @@ enum VACUUMSIZE {
 };
 
 enum PHYXOBJECT_CURSTATE {
-    PO_NORMAL, PO_VACUUMING, PO_KIRBYMOUTH, PO_FLYAWAY, PO_FLYDEADAWAY, PO_END
+    PO_NORMAL, PO_VACUUMING, PO_KIRBYMOUTH, PO_FLYAWAY, PO_FLYDEADAWAY, PO_PRESSED, PO_END
 };
 
 enum COLLISION_TYPE
@@ -90,6 +92,7 @@ enum COLLISION_TYPE
     OBJECT, // 돌멩이 등 사물이다.
     ITEM, // 일반 먹는 아이템이다.
     ABILITYITEM, // 흡수해야 먹을 수 있는 능력 아이템이다.
+    NPC,
     HITBOX_PLYAER,
     HITBOX_MONSTER,
 

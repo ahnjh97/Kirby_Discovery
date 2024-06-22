@@ -39,9 +39,9 @@ HRESULT CKickableRock::Initialize(void* pArg)
 
 _int CKickableRock::Tick(_float fTimeDelta)
 {
-	__super::Tick(fTimeDelta);
-
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+	__super::Tick(m_fTimeDelta);
+
 	Compute_MotionBlur();
 
 	if (true == m_bDead)
@@ -62,14 +62,14 @@ _int CKickableRock::Tick(_float fTimeDelta)
 	}
 	else if (m_ePhyXState == PO_FLYDEADAWAY)
 	{
-		m_fDeadTime += fTimeDelta;
+		m_fDeadTime += m_fTimeDelta;
 
 		// 일단 그 방향으로 바라보게만 한다.
 		_float3 vDamegeDir = m_vDamegeDir;
 
 		// 이제 날아가는 것을 구현해보자.
 		_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vDamegeDir * fTimeDelta * 10.f);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vDamegeDir * m_fTimeDelta * 10.f);
 
 		// 점프되는 체공시간을 구현해보자.
 		vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
@@ -85,7 +85,7 @@ _int CKickableRock::Tick(_float fTimeDelta)
 
 void CKickableRock::Late_Tick(_float fTimeDelta)
 {
-	__super::Late_Tick(fTimeDelta);
+	__super::Late_Tick(m_fTimeDelta);
 
 	// 커비 입 안에 있고, Fly가 아닐땐 입 안에 있는 상황이므로, Render되지않는다.
 	if (m_ePhyXState == PO_KIRBYMOUTH)
@@ -193,7 +193,7 @@ HRESULT CKickableRock::Add_Components(const wstring& wstrModelName)
 {
 	HRESULT hr;
 	/* For.Com_Shader */
-	hr = __super::Add_Component(TEXT("Prototype_Component_Shader_VtxModel"),
+	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"),
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 

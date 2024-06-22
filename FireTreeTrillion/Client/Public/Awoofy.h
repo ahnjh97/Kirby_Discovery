@@ -53,7 +53,6 @@ public:
 
 private:
 	CTexture*			m_pEyeTextureCom = { nullptr };
-	CTexture*			m_pTestTextureCom = { nullptr };
 
 	AWOOFY_ANIM			m_eCurrentState = { AWOOFY_END };
 	AWOOFYEYE_STATE		m_eEyeState = { AWOOFYEYE_END };

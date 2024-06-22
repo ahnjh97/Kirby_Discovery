@@ -81,17 +81,21 @@ HRESULT CHUD_AbilityDiscard::Initialize(void* _pArg)
 	m_vInitSize = m_pTransformCom->Get_Scaled();
 	m_fInitAlpha = m_UIObjDesc.fAlpha;
 
+#pragma endregion
+
 	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
 	if (pKirby == nullptr)
 		return OBJ_NOEVENT;
-	
+
 	//커비 능력버리기 정보
-	_float fDumpAbilityTime =  pKirby->Get_KirbyInfo()->m_fDumpAbilityTime;
+	_float fDumpAbilityTime = pKirby->Get_KirbyInfo()->m_fDumpAbilityTime;
 
 	//커비 위치정보
 	CTransform* pKirbyTrans = static_cast<CTransform*>(pKirby->Get_Component(g_strTransformTag));
+	_float4 vKirbyPos = pKirbyTrans->Get_State(CTransform::STATE_POSITION);
 
-#pragma endregion
+	m_vInitPos.y = vKirbyPos.y;
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vInitPos);
 
 	return S_OK;
 }
@@ -102,12 +106,8 @@ _int CHUD_AbilityDiscard::Tick(_float fTimeDelta)
 
 	Update_UIState(fTimeDelta);
 
-
 	if (m_pGameInstance->Get_DIKeyState(DIK_V, KEY_PRESS)) //키꾹 인식
-		m_eCurState = DISCARD_SHOW;
-
-	else
-		m_eCurState = DISCARD_IDLE;
+	m_eCurState = DISCARD_SHOW;
 
 	return OBJ_NOEVENT;
 }
@@ -255,7 +255,15 @@ void CHUD_AbilityDiscard::Update_UIState(_float _fTimeDelta)
 		break;
 
 	case DISCARD_SHOW: //키입력
-		m_ePreState = DISCARD_SHOW;
+		m_fAccTime += _fTimeDelta;
+		if (m_fAccTime >= 2.f)
+		{
+			m_fAccTime = 0.f;
+			m_eCurState = DISCARD_HIDE;
+			m_ePreState = DISCARD_SHOW;
+		}
+		else
+			Play_Animation(m_fAccTime, DISCARD_SHOW);
 		break;
 
 	case DISCARD_NONE:
