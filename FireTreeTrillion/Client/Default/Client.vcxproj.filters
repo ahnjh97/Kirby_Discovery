@@ -295,11 +295,26 @@
     <Filter Include="02.GameObjects\UI\HUD\StarPoint">
       <UniqueIdentifier>{3aabc030-21c4-42d9-b31a-7b69ff957777}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword\State">
-      <UniqueIdentifier>{c3509440-bbe1-439c-b743-a205693e77b6}</UniqueIdentifier>
-	</Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyCar_State">
       <UniqueIdentifier>{67963c50-7e60-41a8-bf16-e2649eab3a93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\BossMonster">
+      <UniqueIdentifier>{86f6b105-8350-4321-8de4-131f6fd6dbcb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\BossMonster\FinalBoss">
+      <UniqueIdentifier>{fd728b3f-fd47-41c8-9494-e1b5e0112910}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\GamePlay">
+      <UniqueIdentifier>{dd50ce2d-1d5c-4b85-b72c-8e83d466312d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\BossMonster\State">
+      <UniqueIdentifier>{b88a2aa6-514a-4a22-bd29-90fec4ffcb2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\BossMonster\PartObject_Spear">
+      <UniqueIdentifier>{c05e98f7-51ba-41ed-84ca-1f085757e1a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BladeKnight\State">
+      <UniqueIdentifier>{c3509440-bbe1-439c-b743-a205693e77b6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -466,7 +481,7 @@
       <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BladeKnight_State.h">
-      <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword\State</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\State</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\ImSequencer.h">
       <Filter>02.GameObjects\Anim</Filter>
@@ -600,9 +615,20 @@
     <ClInclude Include="..\Public\HUD_AbilityDiscard.h">
       <Filter>02.GameObjects\UI\HUD</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Level_GamePlay.h" />
     <ClInclude Include="..\Public\KirbyCar_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyCar_State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\FinalBoss.h">
+      <Filter>02.GameObjects\PhysXObject\Character\BossMonster\FinalBoss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_GamePlay.h">
+      <Filter>01.Levels\GamePlay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\FinalBoss_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\BossMonster\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\FinalBossSpear.h">
+      <Filter>02.GameObjects\PhysXObject\Character\BossMonster\PartObject_Spear</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -742,7 +768,7 @@
       <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BladeKnight_State.cpp">
-      <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword\State</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BladeKnightSword.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword</Filter>
@@ -885,9 +911,20 @@
     <ClCompile Include="..\Private\HUD_AbilityDiscard.cpp">
       <Filter>02.GameObjects\UI\HUD</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Level_GamePlay.cpp" />
     <ClCompile Include="..\Private\KirbyCar_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyCar_State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FinalBoss.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\BossMonster\FinalBoss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_GamePlay.cpp">
+      <Filter>01.Levels\GamePlay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FinalBoss_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\BossMonster\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FinalBossSpear.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\BossMonster\PartObject_Spear</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

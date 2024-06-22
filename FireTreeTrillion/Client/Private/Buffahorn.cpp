@@ -49,9 +49,6 @@ HRESULT CBuffahorn::Initialize(void* pArg)
 	m_eAbilityType = ABILITY_DEFAULT;
 	m_eEyeState = BUFFAHORNEYE_IDLE;
 
-	//for test
-	//31 8 -102
-	//m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(31.f, 8.f, -102.f, 1.f));
 	return S_OK;
 }
 
