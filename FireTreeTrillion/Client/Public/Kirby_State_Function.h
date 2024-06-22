@@ -45,7 +45,7 @@ static void Turn_Interpolate(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTra
 		_float ftheta = acos(fcosTheta);
 		_float fAngleDegrees = XMConvertToDegrees(ftheta);
 
-		if (fAngleDegrees < 10.0f)
+		if (fAngleDegrees < 2.0f)
 		{
 			Kirbydesc->m_vMoveDir = Kirbydesc->m_vTargetDir;
 		}
@@ -68,7 +68,7 @@ static void Turn_Interpolate(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTra
 }
 
 // 방향키를 누르면 그쪽으로 2차원 원형 보간이 된다. (속도 조정가능)
-static void Turn_Interpolate(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTransformCom, _float fTimeDelta, _float fInterpolateSpeed)
+static void Turn_Interpolate(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTransformCom, _float fTimeDelta, _float fInterpolateSpeed, _bool bBigturn = true)
 {
 	if (Kirbydesc->m_vMoveDir == Kirbydesc->m_vTargetDir)
 		return;
@@ -84,7 +84,7 @@ static void Turn_Interpolate(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTra
 	vMoveDirXZ = XMVector3Normalize(vMoveDirXZ);
 	_float fcosTheta = XMVectorGetX(XMVector4Dot(vTargetDirXZ, vMoveDirXZ));
 
-	if (fcosTheta < -0.96f)
+	if (bBigturn == true && fcosTheta < -0.96f)
 	{
 		Kirbydesc->m_fMoveSpeed *= 0.3f;
 	}
@@ -103,7 +103,7 @@ static void Turn_Interpolate(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTra
 		_float ftheta = acos(fcosTheta);
 		_float fAngleDegrees = XMConvertToDegrees(ftheta);
 
-		if (fAngleDegrees < 10.0f)
+		if (fAngleDegrees < 2.0f)
 		{
 			Kirbydesc->m_vMoveDir = Kirbydesc->m_vTargetDir;
 		}
@@ -119,10 +119,6 @@ static void Turn_Interpolate(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTra
 		}
 	}
 	///////////
-
-
-
-
 }
 
 // 조이스틱의 방향이 꺾일 때, Dir방향으로 Z 회전하는 기능 (오토바이 무빙)
@@ -421,11 +417,11 @@ static _bool JoyStick_controller(CKirby::KIRBY_INFODESC* Kirbydesc, CGameObject*
 	if (GAMEINSTANCE Get_DIKeyState(DIK_UP, KEY_PRESS))
 	{
 		if (GAMEINSTANCE Get_DIKeyState(DIK_LEFT, KEY_PRESS))
-			DESC(m_vTargetDir) = Make_TargetDir(CKirby::DIR_LF, pCamera) * 2.f;
+			DESC(m_vTargetDir) = Make_TargetDir(CKirby::DIR_LF, pCamera);
 		else if (GAMEINSTANCE Get_DIKeyState(DIK_RIGHT, KEY_PRESS))
-			DESC(m_vTargetDir) = Make_TargetDir(CKirby::DIR_RF, pCamera) * 2.f;
+			DESC(m_vTargetDir) = Make_TargetDir(CKirby::DIR_RF, pCamera);
 		else
-			DESC(m_vTargetDir) = Make_TargetDir(CKirby::DIR_FRONT, pCamera) * 2.f;
+			DESC(m_vTargetDir) = Make_TargetDir(CKirby::DIR_FRONT, pCamera);
 
 		return true;
 	}
@@ -1033,6 +1029,16 @@ static _bool Kirby_JoyStickLadder_Logic(CKirby* pKirby, CKirby::KIRBY_INFODESC* 
 	return false;
 }
 
+static void Throw_Bomb(CKirby::KIRBY_INFODESC* Kirbydesc, _float4 vDir, _float fPower)
+{
+	DESC(m_bBombHold) = false;
+	DESC(m_vBombThrowDir) = vDir;
+	DESC(m_fBombPower) = fPower;
+}
+
+
+
+
 
 #pragma region Hyo Effect
 
@@ -1187,6 +1193,7 @@ static void SwordSpinCharge(CTransform* pTransformCom)
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Sword_Copy Bubble_One"), &FXDesc)))
 		return;
 }
+
 static void SwordSpinSlash_One(CTransform* pTransformCom)
 {
 	CMultiEffect::MULTI_FX_DESC FXDesc{};
@@ -1222,10 +1229,3 @@ static void SwordHit_Big(CTransform* pTransformCom)
 
 #pragma endregion 
 
-
-static void Throw_Bomb(CKirby::KIRBY_INFODESC* Kirbydesc, _float4 vDir, _float fPower)
-{
-	DESC(m_bBombHold) = false;
-	DESC(m_vBombThrowDir) = vDir;
-	DESC(m_fBombPower) = fPower;
-}
