@@ -15,7 +15,7 @@
 // assert로 확인하고자하는 코드 체크
 // ※ DEBUG용으로 RELEASE모드에서 동작하는 소스엔 사용하지 마십시오.
 #define CHECK_FAILED(p)					assert(SUCCEEDED(p))
-#define CHECK_FAILED_MSG(p, message)	assert(SUCCEEDED(p && message))
+#define CHECK_FAILED_MSG(p, message)	assert(SUCCEEDED(p) && message)
 #define CHECK_NULLPTR(p)				assert(p != nullptr && "This pointer" #p "is a nullptr.")
 #define ALARM_FAIL(message)				assert(0 && message)
 #define Assert(expression)				assert(expression)
