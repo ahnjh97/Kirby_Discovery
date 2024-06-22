@@ -206,7 +206,9 @@ private:
 	class CCamera*			m_pCamera = { nullptr };
 
 private:
-	void		   Update_PartObjectMatrix();
+	void			Update_PartObjectMatrix();
+	void			Bone_Rotation(_float fTimeDelta);
+	//_float			m_fAccMoveDelta = { 0.f };
 
 	class CKirbyWeapons*  m_pWeapons = { nullptr };
 	class CKirbyArmours*  m_pArmours = { nullptr };

@@ -15,6 +15,7 @@ private:
 
 public:
 	void Set_TransformationMatrix(_fmatrix TransformationMatrix) {	XMStoreFloat4x4(&m_TransformationMatrix, TransformationMatrix); }
+	_float4x4* Get_EditMatrixPtr() { return &m_EditMatrx; }
 
 public:
 	const _float4x4* Get_CombinedTransformationMatrix() const {	return &m_CombinedTransformationMatrix; }
@@ -40,6 +41,9 @@ private:
 	_float4x4			m_CombinedTransformationMatrix;
 
 	_int				m_iParentBoneIndex = { -1 };
+
+	// 뼈를 추가적으로 돌릴 행렬
+	_float4x4			m_EditMatrx = _float4x4::Identity;
 
 public:
 	static CBone* Create(ifstream& fileStream);

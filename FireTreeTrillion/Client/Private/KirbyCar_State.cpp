@@ -85,13 +85,13 @@ void CKirbyCar_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		pCamera->Make_Shake();
 		GAMEINSTANCE Setting_RadialBlur(20.f, 20.f);
 		DESC(m_bBooster) = true;
-		pKirby->Change_State(CKirby::CARSTATE_BOOST, 60.f, true, true, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
+		pKirby->Change_State(CKirby::CARSTATE_BOOST, 60.f, true, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 		return;
 	}
 
 	if (JoyStick_On() == true)
 	{
-		pKirby->Change_State(CKirby::CARSTATE_MOVING, 60.f, true, true, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
+		pKirby->Change_State(CKirby::CARSTATE_MOVING, 60.f, true, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 		return;
 	}
 
@@ -184,13 +184,13 @@ void CKirbyCar_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 			pCamera->Make_Shake();
 			GAMEINSTANCE Setting_RadialBlur(20.f, 20.f);
 			DESC(m_bBooster) = true;
-			pKirby->Change_State(CKirby::CARSTATE_BOOST, 60.f, true, true, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
+			pKirby->Change_State(CKirby::CARSTATE_BOOST, 60.f, true, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 			return;
 		}
 	}
 	else
 	{
-		pKirby->Change_State(CKirby::CARSTATE_IDLING, 60.f, true, true, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
+		pKirby->Change_State(CKirby::CARSTATE_IDLING, 60.f, true, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 		return;
 	}
 
@@ -299,7 +299,7 @@ void CKirbyCar_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			pCamera->Make_Shake();
 			GAMEINSTANCE Setting_RadialBlur(20.f, 20.f);
 			DESC(m_bBooster) = true;
-			pKirby->Change_State(CKirby::CARSTATE_BOOST, 60.f, true, true, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
+			pKirby->Change_State(CKirby::CARSTATE_BOOST, 60.f, true, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 			return;
 		}
 	}
@@ -350,12 +350,12 @@ void CKirbyCar_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		{
 			if ( DESC(m_bBooster) == true )
 			{
-				pKirby->Change_State(CKirby::CARSTATE_BOOST, 60.f, true, true, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
+				pKirby->Change_State(CKirby::CARSTATE_BOOST, 60.f, true, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 				return;
 			}
 			else
 			{
-				pKirby->Change_State(CKirby::CARSTATE_IDLING, 60.f, true, true, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
+				pKirby->Change_State(CKirby::CARSTATE_IDLING, 60.f, true, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 				return;
 			}
 		}
@@ -411,7 +411,7 @@ void CKirbyCar_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 		{
 			DESC(m_bCarJump) = false;
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
-			pKirby->Change_State(CKirby::CARSTATE_IDLING, 60.f, true, true, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
+			pKirby->Change_State(CKirby::CARSTATE_IDLING, 60.f, true, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 			return;
 		}
 	}
@@ -461,6 +461,8 @@ void CKirbyCar_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
+	Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
+
 	if (pKirby->Get_State() == CKirby::CARVACUUMSTATE_DEFORM)
 	{
 		if (pKirby->isAnimFinish())
@@ -479,7 +481,7 @@ void CKirbyCar_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 			m_pGameInstance->Set_SecondTimerRatio(1.f);
 			static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr())->Set_FOVY(30.f);
 
-			pKirby->Change_State(CKirby::CARSTATE_IDLING, 60.f, true, true, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
+			pKirby->Change_State(CKirby::CARSTATE_IDLING, 60.f, true, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 			return;
 		}
 	}
@@ -587,7 +589,7 @@ void CKirbyCar_Boost_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			}
 			else
 			{
-				pKirby->Change_State(CKirby::CARSTATE_MOVING, 60.f, true, true, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
+				pKirby->Change_State(CKirby::CARSTATE_MOVING, 60.f, true, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 				DESC(m_eEyeState) = CKirby::EYE_IDLE;
 				return;
 			}
@@ -615,14 +617,14 @@ void CKirbyCar_Boost_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 		if (JoyStick_On() == true)
 		{
-			pKirby->Change_State(CKirby::CARSTATE_MOVING, 60.f, true, true, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
+			pKirby->Change_State(CKirby::CARSTATE_MOVING, 60.f, true, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			return;
 		}
 
 		if (pKirby->isAnimFinish())
 		{
-			pKirby->Change_State(CKirby::CARSTATE_IDLING, 60.f, true, true, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
+			pKirby->Change_State(CKirby::CARSTATE_IDLING, 60.f, true, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			return;
 		}

@@ -1225,6 +1225,33 @@ void CKirby::Update_PartObjectMatrix()
 	m_ArmourMatrix = *(m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("HatL")->Get_CombinedTransformationMatrix());
 }
 
+void CKirby::Bone_Rotation(_float fTimeDelta)
+{
+	// 자동차일때,
+	if (INFO(m_eBodyState) == BODY_CARDEFAULT)
+	{
+		_float fTurnAngle = -INFO(m_fMoveSpeed) * 100.f;
+
+		CBone* pBone = m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("L_BTireJ");
+		_float4x4* BoneMatrix = pBone->Get_EditMatrixPtr();
+		CUtils::Turn_OtherMatrix(*BoneMatrix, _float4(1.f, 0.f, 0.f, 0.f), fTimeDelta, fTurnAngle);
+
+		pBone = m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("L_FTireJ");
+		BoneMatrix = pBone->Get_EditMatrixPtr();
+		CUtils::Turn_OtherMatrix(*BoneMatrix, _float4(1.f, 0.f, 0.f, 0.f), fTimeDelta, fTurnAngle);
+
+		pBone = m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("R_BTireJ");
+		BoneMatrix = pBone->Get_EditMatrixPtr();
+		CUtils::Turn_OtherMatrix(*BoneMatrix, _float4(1.f, 0.f, 0.f, 0.f), fTimeDelta, fTurnAngle);
+
+		pBone = m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("R_FTireJ");
+		BoneMatrix = pBone->Get_EditMatrixPtr();
+		CUtils::Turn_OtherMatrix(*BoneMatrix, _float4(1.f, 0.f, 0.f, 0.f), fTimeDelta, fTurnAngle);
+	}
+
+
+}
+
 void CKirby::OverPower()
 {
 	if (m_fPreHp > m_fHp)
@@ -1391,6 +1418,9 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 
 	// 커비의 폭탄 궤적을 생성한다.
 	Update_BombOrbit(fTimeDelta);
+
+	// 특정 상황에서 뼈를 돌려준다.
+	Bone_Rotation(fTimeDelta);
 
 	// 사다리 상태 초기화
 	INFO(m_bCanLadder) = false;
