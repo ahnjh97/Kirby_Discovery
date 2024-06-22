@@ -11,82 +11,82 @@ class CPartObject;
 END
 
 BEGIN(Client)
+BEGIN(WaddleDee)
+
+enum DEEEYESTATE
+{
+	DEEEYE_IDLE, DEEEYE_BLINK, DEEEYE_CLOSE,
+	DEEEYE_ANGER, DEEEYE_SADNESS, DEEEYE_DOUBT, DEEEYE_END
+};
+
+enum DEE_ANIM
+{
+	DEEANIM_ANGER,
+	DEEANIM_BREAK = 3,
+	DEEANIM_CASEFIND,
+	DEEANIM_CASEHELPME_END,
+	DEEANIM_CASEHELPME_START,
+
+	DEEANIM_CLERKTALK = 26,
+	DEEANIM_CLERKWAVEHAND,
+
+	DEEANIM_ENEMYSLEEP = 50,
+	DEEANIM_ENEMYWALK = 51,
+
+	DEEANIM_GREETING_ONEHAND = 56,
+	DEEANIM_GREETING_TWOHAND,
+	DEEANIM_GREETING_TWOHANDLOOP,
+	DEEANIM_SLIPYES = 119,
+	DEEANIM_SURPRISE,
+
+	DEEANIM_TALK1,
+	DEEANIM_TALK2,
+	DEEANIM_TALK3A,
+	DEEANIM_TALK3B,
+	DEEANIM_TALK3LISTEN,
+
+	DEEANIM_WAIT = 133,
+
+	DEEANIM_END
+};
+
+enum DEE_SHOPANIM
+{
+	DEESHOPANIM_CLERKCHOOSESTART = 2,
+
+	DEESHOPANIM_CLERKCORRECT = 4,
+	DEESHOPANIM_CLERKINCORRECT = 6,
+
+	DEESHOPANIM_CLERKRESULTSUCCESS,
+	DEESHOPANIM_CORRECTMOVE = 9,
+
+	DEESHOPANIM_RESULTWIN = 12,
+	DEESHOPANIM_RESULTWINSTART = 13,
+
+	DEESHOPANIM_GUESTANGER,
+	DEESHOPANIM_GUESTFIDGET,
+	DEESHOPANIM_GUESTNORMAL,
+	DEESHOPANIM_IMPATIENCE,
+	DEESHOPANIM_INCORRECT,
+	DEESHOPANIM_INCORRECTMOVE,
+
+	DEESHOPANIM_ORDERNORMAL = 21,
+
+	DEESHOPANIM_SADWAIT = 23,
+	DEESHOPANIM_ANGRYWAIT = 25,
+	DEESHOPANIM_WALK,
+
+	DEESHOPANIM_END
+};
+
+END
+
+using namespace WaddleDee;
 
 class CWaddleDee abstract : public CCharacter
 {
+
 public:
-	enum DEEEYESTATE
-	{
-		DEEEYE_IDLE, DEEEYE_ANGER, DEEEYE_CLOSE, DEEEYE_SADNESS,
-		DEEEYE_PUPIL, DEEEYE_BLINK, DEEEYE_DOUBT, DEEEYE_END
-	};
-
-	enum DEE_ANIM
-	{
-		DEEANIM_ANGER,
-		DEEANIM_BREAK = 3,
-		DEEANIM_CASEFIND,
-		DEEANIM_CASEHELPME_END,
-		DEEANIM_CASEHELPME_START,
-
-		DEEANIM_CLERKTALK = 26,
-		DEEANIM_CLERKWAVEHAND,
-
-		DEEANIM_ENEMYSLEEP = 50,
-		DEEANIM_ENEMYWALK = 51,
-
-		DEEANIM_GREETING_ONEHAND = 56,
-		DEEANIM_GREETING_TWOHAND,
-		DEEANIM_GREETING_TWOHANDLOOP,
-		DEEANIM_SLIPYES = 119,
-		DEEANIM_SURPRISE,
-
-		DEEANIM_TALK1,
-		DEEANIM_TALK2,
-		DEEANIM_TALK3A,
-		DEEANIM_TALK3B,
-		DEEANIM_TALK3LISTEN,
-
-		DEEANIM_WAIT = 133,
-
-		DEEANIM_END
-	};
-
-	enum DEE_SHOPANIM
-	{
-		DEESHOPANIM_CLERKCHOOSESTART = 2,
-
-		DEESHOPANIM_CLERKCORRECT = 4,
-		DEESHOPANIM_CLERKINCORRECT = 6,
-
-		DEESHOPANIM_CLERKRESULTSUCCESS,
-		DEESHOPANIM_CORRECTMOVE = 9,
-
-		DEESHOPANIM_RESULTWIN = 12,
-		DEESHOPANIM_RESULTWINSTART = 13,
-
-		DEESHOPANIM_GUESTANGER,
-		DEESHOPANIM_GUESTFIDGET,
-		DEESHOPANIM_GUESTNORMAL,
-		DEESHOPANIM_IMPATIENCE,
-		DEESHOPANIM_INCORRECT,
-		DEESHOPANIM_INCORRECTMOVE,
-
-		DEESHOPANIM_ORDERNORMAL = 21,
-
-		DEESHOPANIM_SADWAIT = 23,
-		DEESHOPANIM_ANGRYWAIT = 25,
-		DEESHOPANIM_WALK,
-
-		DEESHOPANIM_END
-	};
-
-	//enum DEE_STATE
-	//{
-	//	DEE_
-	//	DEE_END
-	//};
-
 
 	typedef struct : public CGameObject::GAMEOBJECT_DESC
 	{
@@ -100,12 +100,8 @@ protected:
 	virtual ~CWaddleDee() = default;
 
 public:
-	virtual HRESULT Initialize_Prototype()	override;
-	virtual HRESULT Initialize(void* pArg)	override;
-	virtual _int	Tick(_float fTimeDelta) override;
-	virtual void	Late_Tick(_float fTimeDelta) override;
-	virtual HRESULT Render()				override;
-	virtual HRESULT Render_LightDepth()		override;
+	void Set_DeeEyeState(DEEEYESTATE eState) { m_eEyeState = eState; }
+
 
 #ifdef _DEBUG
 	virtual void	Render_IMGUI() override;
@@ -113,14 +109,41 @@ public:
 
 	virtual void	Add_AnimEvent() override {}
 
+	void			Change_State(DEE_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
+
+	_bool			IsCloseToKirby() { return m_bIsKirbyInZone; }
+
+	//커비와의 인사 여부
+	void			SetHiToKirby(_bool bHi) { m_bHiToKirby = bHi; }
+	_bool			GetHiToKirby() { return m_bHiToKirby; }
+
+	_bool			IsAnimFinished(){	return m_pModelCom->IsFinished(); }
+
+
+	virtual HRESULT Initialize_Prototype()	override;
+	virtual HRESULT Initialize(void* pArg)	override;
+	virtual _int	Tick(_float fTimeDelta) override;
+	virtual void	Late_Tick(_float fTimeDelta) override;
+	virtual HRESULT Render()				override;
+	virtual HRESULT Render_LightDepth()		override;
 
 protected:
-	CModel*			m_pModelCom = { nullptr };
-	CTexture*		m_pEyeTextureCom = { nullptr };
+	//커비가 상호작용 버튼 누를 정도로 가까이 왔는가?
+	_bool			m_bIsKirbyInZone = { false };
+
+	//커비한테 인사했는가?
+	_bool			m_bHiToKirby = { false };
+	_float			m_fResetHiTime = { 0.f };
 
 	DEEEYESTATE		m_eEyeState = { DEEEYE_END };
 
+	map<const wstring, CPartObject*>	m_PartObjects;
+	CModel*			m_pModelCom = { nullptr };
+	CTexture*		m_pEyeTextureCom = { nullptr };
+
+
 	_bool			Custom_Face(_uint iMeshIndex);
+	void			Dee_SystemTick(_float fTimeDelta);
 
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;
@@ -128,6 +151,7 @@ public:
 
 
 };
+
 
 END
 

@@ -27,6 +27,8 @@ protected:
 
 	}BASE_INFO;
 
+	_float	m_fInteractActionTime = { 0.f };
+
 	void Setup_BaseInfo(BASE_INFO& _baseInfo, CGameObject* pGameObject);
 
 public:

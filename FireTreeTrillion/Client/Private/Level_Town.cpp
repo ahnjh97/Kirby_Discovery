@@ -142,7 +142,7 @@ HRESULT CLevel_Town::Ready_Layer_Camera(const wstring& strLayerTag)
 	CameraDesc.fNear = 0.1f;
 	CameraDesc.fFar = 1000.0f;
 	CameraDesc.vEye = _float4(0.f, 0.f, 0.f, 1.f);
-	CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
+	CameraDesc.vAt = _float4(0.f, -1.f, 1.f, 1.f);
 	CameraDesc.fSpeedPerSec = 10.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
@@ -390,7 +390,7 @@ HRESULT CLevel_Town::Ready_Dees()
 	ObjDesc.fSpeedPerSec = 5.f;
 	ObjDesc.fRotationPerSec = ToRadian(90.f);
 	_float4x4 InitMat = _float4x4::Identity;
-	InitMat.Translation({ -10.2f, 24.7f, 20.f });
+	InitMat.Translation({ 10.2f, 24.7f, 26.f });
 	ObjDesc.matWorld = InitMat;
 
 	if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NPC"), TEXT("Prototype_GameObject_FoodShopDee"), &ObjDesc)))
@@ -398,7 +398,7 @@ HRESULT CLevel_Town::Ready_Dees()
 
 
 	//일단 마을에는 몬스터가 없어요
-	/*
+	
 	string strFileName = "../../../objects_txt/Town_Monsters.txt";
 
 	ifstream fileInput(strFileName, ios::binary);
@@ -526,7 +526,7 @@ HRESULT CLevel_Town::Ready_Dees()
 	}
 
 	fileInput.close();
-	*/
+	
 
 	return S_OK;
 }

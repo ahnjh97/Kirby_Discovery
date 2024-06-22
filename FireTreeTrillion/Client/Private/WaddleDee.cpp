@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "WaddleDee.h"
+#include "FSM.h"
 
 CWaddleDee::CWaddleDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CCharacter{ pDevice, pContext }
@@ -18,24 +19,12 @@ HRESULT CWaddleDee::Initialize_Prototype()
 
 HRESULT CWaddleDee::Initialize(void* pArg)
 {
-	/*DEE_DESC pDeeDesc{};
-
-	if (nullptr != pArg)
-		pDeeDesc = *(DEE_DESC*)pArg;
-
-	pDeeDesc.fSpeedPerSec = 5.f;
-	pDeeDesc.fRotationPerSec = XMConvertToRadians(90.0f);*/
-
 	HRESULT hr;
 
 	hr = __super::Initialize(pArg);
 	CHECK_FAILED_MSG(hr, "와들디 생성 망했어");
 
-
-	/*hr = Add_Components();
-	CHECK_FAILED_MSG(hr, "와들디 생성 망했어");
-
-	m_pModelCom->Set_Animation(0, 50.f, true, true);*/
+	m_eEyeState = DEEEYE_IDLE;
 
 	return S_OK;
 }
@@ -64,6 +53,12 @@ HRESULT CWaddleDee::Render_LightDepth()
 }
 
 #ifdef _DEBUG
+
+void CWaddleDee::Change_State(DEE_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+{
+	m_pFSM->ChangeState((_uint)eState, _fAnimSpeed, _bLoop, _bInterpolation);
+}
+
 void CWaddleDee::Render_IMGUI()
 {
 	__super::Render_IMGUI();
@@ -106,6 +101,28 @@ HRESULT CWaddleDee::Bind_ShaderResources()
 _bool CWaddleDee::Custom_Face(_uint iMeshIndex)
 {
 	return _bool();
+}
+
+CGameObject* CWaddleDee::Clone(void* pArg)
+{
+	return nullptr;
+}
+
+void CWaddleDee::Dee_SystemTick(_float fTimeDelta)
+{
+	m_bIsKirbyInZone = false;
+
+	if (0.f != m_fResetHiTime)
+	{
+		m_fResetHiTime -= fTimeDelta;
+
+		if (m_fResetHiTime <= 0.f)
+		{
+			m_fResetHiTime = 0.f;
+			Set_DeeEyeState(DEEEYE_IDLE);
+			SetHiToKirby(false);
+		}
+	}
 }
 
 void CWaddleDee::Free()

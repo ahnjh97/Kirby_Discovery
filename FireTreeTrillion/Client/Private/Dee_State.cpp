@@ -4,6 +4,11 @@
 #include "Kirby.h"
 
 
+#pragma region DEE STATE
+/// <summary>
+/// 모든 이들의 기본이 되는 Dee_State
+/// </summary>
+
 CDee_State::CDee_State()
 {
 }
@@ -27,9 +32,8 @@ void CDee_State::Setup_BaseInfo(BASE_INFO& _baseInfo, CGameObject* pGameObject)
 
 	_baseInfo.fDistance = (_baseInfo.vMyPos - _baseInfo.vKirbyPos).Length();
 
-
 }
-
+#pragma endregion
 
 #pragma region IDLE STATE
 //*********************************
@@ -51,9 +55,25 @@ void CDee_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 
 	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta);
 
+	//가까이 있으면 반가워해준다~
+	//용건 있을 때 웃는 걸로 변경해야해
+	if (baseInfo.fDistance < 10.f && !baseInfo.pDee->GetHiToKirby())
+	{
+		baseInfo.pDee->Set_DeeEyeState(DEEEYE_BLINK);
+		baseInfo.pDee->SetHiToKirby(true);
+		baseInfo.pDee->Change_State(DEEANIM_CLERKWAVEHAND, 60.f, false, true);
+	}
+
+
+	//참 가까이 접근했고, 버튼 누르면 대화 시작
+	//이것도 용건 있을 때 웃는 걸로 변경해야해
+	if (baseInfo.pDee->IsCloseToKirby() && m_pGameInstance->Get_KeyState(DIK_C, KEY_DOWN))
+	{
+		baseInfo.pDee->Set_DeeEyeState(DEEEYE_BLINK);
+		baseInfo.pDee->Change_State(DEEANIM_TALK1, 60.f, false, true);
+	}
 
 }
-
 
 void CDee_Idle_State::OnStateExit()
 {
@@ -87,7 +107,11 @@ void CDee_Move_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _f
 
 void CDee_Move_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
-	CWaddleDee* pDee = static_cast<CWaddleDee*>(pGameObject);
+	BASE_INFO baseInfo{};
+	Setup_BaseInfo(baseInfo, pGameObject);
+
+	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta);
+
 }
 
 void CDee_Move_State::OnStateExit()
@@ -117,11 +141,27 @@ CDee_Emotion_State::CDee_Emotion_State()
 void CDee_Emotion_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+	m_fInteractActionTime = 4.f;
+
 }
 
 void CDee_Emotion_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
-	CWaddleDee* pDee = static_cast<CWaddleDee*>(pGameObject);
+	BASE_INFO baseInfo{};
+	Setup_BaseInfo(baseInfo, pGameObject);
+
+	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta);
+
+
+
+
+	if (baseInfo.pDee->IsAnimFinished())
+	{
+		//인사하는 거였으면 눈 바꾸고 다시 idle로 돌아가
+		baseInfo.pDee->Set_DeeEyeState(DEEEYE_IDLE);
+		baseInfo.pDee->Change_State(DEEANIM_WAIT, 60.f, true, true);
+	}
+
 }
 
 void CDee_Emotion_State::OnStateExit()

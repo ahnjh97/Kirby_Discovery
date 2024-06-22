@@ -11,12 +11,12 @@ END
 
 BEGIN(Client)
 
-class CFoodShopDee final : public CWaddleDee
+class CHungryDee final : public CWaddleDee
 {
 private:
-	CFoodShopDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CFoodShopDee(const CFoodShopDee& rhs);
-	virtual ~CFoodShopDee() = default;
+	CHungryDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CHungryDee(const CHungryDee& rhs);
+	virtual ~CHungryDee() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -37,7 +37,7 @@ public:
 
 
 private:
-	DEE_ANIM		m_eMyState = { DEEANIM_END };
+	DEE_SHOPANIM	m_eMyState = { DEESHOPANIM_END };
 
 	HRESULT Add_Components();
 	HRESULT Add_PartObjects();
@@ -47,7 +47,7 @@ private:
 	_bool	Custom_Face(_uint iMeshIndex);
 
 public:
-	static CFoodShopDee* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CHungryDee* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 };

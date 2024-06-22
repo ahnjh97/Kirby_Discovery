@@ -74,6 +74,7 @@
 #include "CappyHat.h"
 
 //와들디
+#include "Dee_Part.h"
 #include "FoodShopDee.h"
 
 // 맵 오브젝트
@@ -282,6 +283,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CappyHat"), CCappyHat);
 
 	//Dee
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeePart"), CDee_Part);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FoodShopDee"), CFoodShopDee);
 
 
@@ -1128,8 +1130,30 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
 
+		//와들디 파트오브젝트
+		m_vecModelInfo.emplace_back("DeePart_Arena", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("DeePart_Bass", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("DeePart_Delivery", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("DeePart_Drum", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("DeePart_DrumStick", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("DeePart_FoodShop", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("DeePart_Guitar", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("DeePart_Keyboard", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("DeePart_Knowledge", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("DeePart_Mike", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("DeePart_Pharmacy", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("DeePart_Plate", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("DeePart_RollingBall", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("DeePart_Theater", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("DeePart_WateringCan", TYPE_NONANIM, 1.f);
+
 		// 와들디
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
+		m_vecModelInfo.emplace_back("WaddleDeeHungry", TYPE_ANIM, 1.1f, 180.f);
+
+		m_vecModelInfo.emplace_back("PoppyBrosJr", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_ANIM, 1.3f, 180.f);
+
 
 	}
 	else if (eLevel == LEVEL_RACING)
