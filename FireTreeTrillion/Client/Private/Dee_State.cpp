@@ -19,7 +19,13 @@ void CDee_Idle_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _f
 void CDee_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
 	CWaddleDee* pDee = static_cast<CWaddleDee*>(pGameObject);
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+
+	pController->FreeFall(pTransformCom, fTimeDelta);
+
 }
+
 
 void CDee_Idle_State::OnStateExit()
 {

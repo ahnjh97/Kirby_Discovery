@@ -54,41 +54,14 @@ HRESULT CKirby::Initialize(void* pArg)
 	if (FAILED(Add_PartObjects()))
 		return E_FAIL;
 
-	INFO(m_eBodyState) = BODY_DEFAULT;
-	INFO(m_eMouthState) = MOUTH_IDLE;
-	INFO(m_eEyeState) = EYE_IDLE;
-
-	if (FAILED(Make_TargetToCams()))
+	if (FAILED(Kirby_SystemInitialize()))
 		return E_FAIL;
 
-	_float4 m_pCameraLook = m_pCamera->Get_TransformCom()->Get_State_Vector(CTransform::STATE_LOOK);
-	m_pCameraLook.y = 0.f;
-	m_pCameraLook = XMVector4Normalize(m_pCameraLook);
-	INFO(m_vMoveDir) = -1.f * m_pCameraLook;
-	INFO(m_vTargetDir) = INFO(m_vMoveDir);
+	// 디버깅 용
+	//m_eAbilityType = ABILITY_SWORD;
 
 	m_pModelCom[INFO(m_eBodyState)]->Set_Animation(STATE_IDLE, 60.f, true, true);
-
-	// 파싱으로 레벨전환될때 HP와 COIN개수를 이동시킵니다.
-	CLevelChanger::LEVEL_DATA tLevelData = CLevelChanger::Get_Instance()->Load();
-	m_fHp = tLevelData.fKirbyHP;
-	m_uCoin = tLevelData.fKirbyCoin;
-	m_fHp = 100.f; // 기존 사용하던 HP입니다.
-
-	m_fMaxHp = 100.f;
-	m_fAttack = 5.f;
-	m_eAbilityType = ABILITY_DEFAULT;
-	m_eAbilityType = ABILITY_SWORD;
-
 	m_pControllerCom->RegisterAsPlayer();
-
-	// 폭탄 궤적을 만들어 놓는다.
-	Ready_BombOrbit();
-
-	Add_AnimEvent();
-
-	// 확실하게...
-	m_bMotionBlur = true;
 
 	return S_OK;
 }
@@ -1384,6 +1357,64 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 	}
 
 
+}
+
+HRESULT CKirby::Kirby_SystemInitialize()
+{
+	// 타겟 카메라를 만들어준다.
+	if (FAILED(Make_TargetToCams()))
+		return E_FAIL;
+
+	// 커비의 기본 표정,
+	INFO(m_eBodyState) = BODY_DEFAULT;
+	INFO(m_eMouthState) = MOUTH_IDLE;
+	INFO(m_eEyeState) = EYE_IDLE;
+
+	// 커비가 레벨별로 시작할 때, 바라보는 방향을 정해준다.
+	Kirby_LookInitialize();
+
+	// 파싱으로 레벨전환될때 HP와 COIN개수를 이동시킵니다.
+	CLevelChanger::LEVEL_DATA tLevelData = CLevelChanger::Get_Instance()->Load();
+	m_fHp = tLevelData.fKirbyHP;
+	m_uCoin = tLevelData.fKirbyCoin;
+	// m_eAbilityType = ;
+	// m_uWaddleDeeCount = ;
+	m_fAttack = 5.f; // 고정
+
+	// 게임을 새롭게 시작했을 경우, 리셋시칸다.
+	if (*m_pCurrentLevelID == LEVEL_INTRO)
+	{
+		m_fHp = 100.f; // 기존 사용하던 HP입니다.
+		m_fMaxHp = 100.f;
+		m_eAbilityType = ABILITY_DEFAULT;
+		// m_uWaddleDeeCount = 0;
+	}
+
+	// 폭탄 궤적을 만들어 놓는다.
+	Ready_BombOrbit();
+	// 애니메이션 이벤트를 삽입한다.
+	Add_AnimEvent();
+	// 혹여나, 버그가 발생할까봐 확실하게 블러 true화
+	m_bMotionBlur = true;
+}
+
+void CKirby::Kirby_LookInitialize()
+{
+	_uint uLevel = *m_pCurrentLevelID;
+	_float4 m_pCameraLook = m_pCamera->Get_TransformCom()->Get_State_Vector(CTransform::STATE_LOOK);
+	m_pCameraLook.y = 0.f;
+	m_pCameraLook = XMVector4Normalize(m_pCameraLook);
+
+	// 카메라 기준 바라보는 방향을 설정한다.
+	if (uLevel == 999)		// 여기다가 따로 정의하면됨
+	{
+	}
+	else
+	{
+		// 카메라를 정면으로 바라봄
+		INFO(m_vMoveDir) = -1.f * m_pCameraLook;
+	}
+	INFO(m_vTargetDir) = INFO(m_vMoveDir);
 }
 
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
