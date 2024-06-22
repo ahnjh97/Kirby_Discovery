@@ -18,7 +18,12 @@ public:
 private:
 	HRESULT Ready_Lights();
 	HRESULT Ready_Layer_Camera(const wstring& strLayerTag);
+	HRESULT Ready_Layer_BackGround(const wstring& strLayerTag);
 	HRESULT Ready_Map();
+	HRESULT Ready_Triggers();
+	HRESULT Ready_Monsters();
+	HRESULT Ready_Items();
+	HRESULT Ready_Kickables();
 
 public:
 	static CLevel_FinalBoss* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
