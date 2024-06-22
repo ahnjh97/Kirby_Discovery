@@ -396,8 +396,8 @@ HRESULT CLevel_PartTime::Ready_Dees()
 	InitMat.Translation({ -10.2f, 24.7f, 20.f });
 	ObjDesc.matWorld = InitMat;
 
-	if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NPC"), TEXT("Prototype_GameObject_FoodShopDee"), &ObjDesc)))
-		return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NPC"), TEXT("Prototype_GameObject_FoodShopDee"), &ObjDesc)))
+	//	return E_FAIL;
 
 
 	//일단 파트타임하는 상점에는 몬스터가 없어요. 커비와 와들디 뿐이죠.

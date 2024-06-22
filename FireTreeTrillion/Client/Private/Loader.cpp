@@ -199,11 +199,6 @@ HRESULT CLoader::Start()
 	case LEVEL_TOWN:
 		hr = Loading_For_Town();
 		break;
-
-	case LEVEL_TOWN:
-		hr = Loading_For_Town();
-		break;
-
 	case LEVEL_PARTTIME:
 		hr = Loading_For_Parttime();
 		break;
