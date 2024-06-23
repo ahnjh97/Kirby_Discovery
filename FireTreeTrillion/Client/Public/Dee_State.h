@@ -117,6 +117,7 @@ public:
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
 	virtual void OnStateExit()														override;
 
+	_float	m_fStartMoveDelay = { 0.f };
 
 public:
 	static	CDee_Hungry_State* Create();

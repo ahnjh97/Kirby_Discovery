@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "Dee_State.h"
-#include "WaddleDee.h"
-#include "Kirby.h"
+#include "HungryDee.h"
 
+#include "Kirby.h"
 
 #pragma region DEE STATE
 /// <summary>
@@ -59,7 +59,7 @@ void CDee_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	//용건 있을 때 웃는 걸로 변경해야해
 	if (baseInfo.fDistance < 10.f && !baseInfo.pDee->GetHiToKirby())
 	{
-		baseInfo.pDee->Set_DeeEyeState(DEEEYE_BLINK);
+		baseInfo.pDee->Set_DeeEyeState(DEEEYE_SMILE);
 		baseInfo.pDee->SetHiToKirby(true);
 		baseInfo.pDee->Change_State(DEEANIM_CLERKWAVEHAND, 60.f, false, true);
 	}
@@ -69,7 +69,7 @@ void CDee_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	//이것도 용건 있을 때 웃는 걸로 변경해야해
 	if (baseInfo.pDee->IsCloseToKirby() && m_pGameInstance->Get_KeyState(DIK_C, KEY_DOWN))
 	{
-		baseInfo.pDee->Set_DeeEyeState(DEEEYE_BLINK);
+		baseInfo.pDee->Set_DeeEyeState(DEEEYE_SMILE);
 		baseInfo.pDee->Change_State(DEEANIM_TALK1, 60.f, false, true);
 	}
 
@@ -153,8 +153,6 @@ void CDee_Emotion_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta);
 
 
-
-
 	if (baseInfo.pDee->IsAnimFinished())
 	{
 		//인사하는 거였으면 눈 바꾸고 다시 idle로 돌아가
@@ -191,11 +189,64 @@ CDee_Hungry_State::CDee_Hungry_State()
 void CDee_Hungry_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+
+	m_fStartMoveDelay = CUtils::Make_RandomFloat(0.f, .5f);
+
 }
 
 void CDee_Hungry_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
-	CWaddleDee* pDee = static_cast<CWaddleDee*>(pGameObject);
+	BASE_INFO baseInfo{};
+	Setup_BaseInfo(baseInfo, pGameObject);
+	CHungryDee* pHungryDee = static_cast<CHungryDee*>(pGameObject);
+
+	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta);
+
+	switch (baseInfo.pDee->Get_State())
+	{
+	case DEESHOPANIM_GUESTNORMAL:
+	{
+		baseInfo.pTransformCom->Look_At_Interpolate( baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION) + _float4{0.f, 0.f, 1.f, 0.f}, fTimeDelta * 3.f);
+
+		//내가 기다려야 할 위치를 넘어서면 이동
+		if (.5f < _float3{ XZVec(pHungryDee->Get_DestWaitingPos()) - XZVec(baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION)) }.Length())
+		{
+			m_fStartMoveDelay -= fTimeDelta;
+
+			if (m_fStartMoveDelay < 0.f)
+			{
+				pHungryDee->Change_State((DEE_ANIM)DEESHOPANIM_WALK, 60.f, true, true);
+			}
+		}
+
+	}
+	break;
+	case DEESHOPANIM_WALK:
+	{
+		_float3 vDir = pHungryDee->Get_DestWaitingPos() - baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION);
+		vDir.Normalize();
+		baseInfo.pTransformCom->Look_At_Interpolate(pHungryDee->Get_DestWaitingPos(), fTimeDelta * 2.f);
+
+		_float fDist = (XZVec(pHungryDee->Get_DestWaitingPos()) - XZVec(baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION))).Length();
+		fDist = (fDist < 1.f) ? fDist * 3.f : 4.f;
+
+		baseInfo.pController->Move_Dir(baseInfo.pTransformCom, baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta * fDist, fTimeDelta);
+
+		//다다르면 다시 웨이팅
+		if (_float3{ XZVec(pHungryDee->Get_DestWaitingPos()) - XZVec(baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION)) }.Length() < .5f)
+		{
+			pHungryDee->Change_State((DEE_ANIM)DEESHOPANIM_GUESTNORMAL, 60.f, true, true);
+
+			CUtils::Make_RandomInt(0, 2) == 2 ?
+				baseInfo.pDee->Set_DeeEyeState(DEEEYE_SMILE) :
+				baseInfo.pDee->Set_DeeEyeState(DEEEYE_IDLE);
+		}
+	}
+	break;
+	default:
+		break;
+	}
+
 }
 
 void CDee_Hungry_State::OnStateExit()
@@ -230,7 +281,10 @@ void CDee_Stun_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _f
 
 void CDee_Stun_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
-	CWaddleDee* pDee = static_cast<CWaddleDee*>(pGameObject);
+	BASE_INFO baseInfo{};
+	Setup_BaseInfo(baseInfo, pGameObject);
+
+	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta);
 }
 
 void CDee_Stun_State::OnStateExit()

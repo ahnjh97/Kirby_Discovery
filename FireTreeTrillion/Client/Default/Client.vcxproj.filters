@@ -334,7 +334,6 @@
     <Filter Include="02.GameObjects\Map\Car">
       <UniqueIdentifier>{6a3a0e35-9a08-4f88-9aa3-377662595d38}</UniqueIdentifier>
     </Filter>
-    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\WaddleDee\DeePart">
       <UniqueIdentifier>{5f17fb16-cca2-4259-931d-1b811ea7faaf}</UniqueIdentifier>
     </Filter>
@@ -673,7 +672,6 @@
     <ClInclude Include="..\Public\Car.h">
       <Filter>02.GameObjects\Map\Car</Filter>
 	</ClInclude>
-    </ClInclude>
     <ClInclude Include="..\public\Dee_Part.h">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\DeePart</Filter>
     </ClInclude>
@@ -996,7 +994,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\BreakableRock.cpp">
       <Filter>02.GameObjects\Map\BreakableRock</Filter>
-    </ClCompile>
     </ClCompile>
     <ClCompile Include="..\private\Dee_Part.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\DeePart</Filter>

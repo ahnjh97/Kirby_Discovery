@@ -15,7 +15,7 @@ BEGIN(WaddleDee)
 
 enum DEEEYESTATE
 {
-	DEEEYE_IDLE, DEEEYE_BLINK, DEEEYE_CLOSE,
+	DEEEYE_IDLE, DEEEYE_SMILE, DEEEYE_CLOSE,
 	DEEEYE_ANGER, DEEEYE_SADNESS, DEEEYE_DOUBT, DEEEYE_END
 };
 
@@ -72,11 +72,17 @@ enum DEE_SHOPANIM
 
 	DEESHOPANIM_ORDERNORMAL = 21,
 
-	DEESHOPANIM_SADWAIT = 23,
+	DEESHOPANIM_WAIT = 23,
 	DEESHOPANIM_ANGRYWAIT = 25,
 	DEESHOPANIM_WALK,
 
 	DEESHOPANIM_END
+};
+
+struct WAITING_INFO
+{
+	_float3 vPos;
+	_float	fAnimOffset;
 };
 
 END
@@ -88,10 +94,10 @@ class CWaddleDee abstract : public CCharacter
 
 public:
 
-	typedef struct : public CGameObject::GAMEOBJECT_DESC
+	struct DEE_DESC : public CGameObject::GAMEOBJECT_DESC
 	{
 
-	}DEE_DESC;
+	};
 
 
 protected:
@@ -117,7 +123,7 @@ public:
 	void			SetHiToKirby(_bool bHi) { m_bHiToKirby = bHi; }
 	_bool			GetHiToKirby() { return m_bHiToKirby; }
 
-	_bool			IsAnimFinished(){	return m_pModelCom->IsFinished(); }
+	_bool			IsAnimFinished() { return m_pModelCom->IsFinished(); }
 
 
 	virtual HRESULT Initialize_Prototype()	override;

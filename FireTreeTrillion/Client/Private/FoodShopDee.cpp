@@ -38,6 +38,7 @@ HRESULT CFoodShopDee::Initialize(void* pArg)
 	hr = Add_Components();
 	CHECK_FAILED(hr);
 
+
 	hr = Add_PartObjects();
 	CHECK_FAILED(hr);
 
@@ -98,11 +99,15 @@ HRESULT CFoodShopDee::Render()
 
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
 			return E_FAIL;
+		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
+			return E_FAIL;
 		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
 
 
-		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_X)))
+		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
 			return E_FAIL;
 
 		m_pModelCom->Render(i);
@@ -193,6 +198,8 @@ HRESULT CFoodShopDee::Add_Components()
 
 HRESULT CFoodShopDee::Add_PartObjects()
 {
+	if (*m_pCurrentLevelID != LEVEL_TOWN)
+		return S_OK;
 
 	CPartObject* pPartObj = { nullptr };
 	CDee_Part::DEEPART_DESC	PartDesc{};

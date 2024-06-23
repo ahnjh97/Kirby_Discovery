@@ -3,12 +3,12 @@
 #include "Bone.h"
 
 CDee_Part::CDee_Part(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	:CPartObject{pDevice, pContext}
+	:CPartObject{ pDevice, pContext }
 {
 }
 
 CDee_Part::CDee_Part(const CDee_Part& rhs)
-	:CPartObject{rhs}
+	:CPartObject{ rhs }
 {
 }
 
@@ -75,7 +75,6 @@ HRESULT CDee_Part::Render()
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
 			return E_FAIL;
 
-		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
 		if (FAILED(m_pShaderCom->Begin(MODEL_NORMAL_O)))
 			return E_FAIL;
 
@@ -102,12 +101,16 @@ HRESULT CDee_Part::Add_Components(wstring wstrModelName)
 	CHECK_FAILED(hr);
 
 
-	wstring wstrTag = TEXT("Prototype_Component_Model_");
+	//마을에 있을 때만 파트 오브젝트 로드하기
+	if (*m_pCurrentLevelID == LEVEL_TOWN)
+	{
+		wstring wstrTag = TEXT("Prototype_Component_Model_");
 
-	wstrTag += wstrModelName;
-	/* For.Com_Model */
-	hr = __super::Add_Component(wstrTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom);
-	CHECK_FAILED(hr);
+		wstrTag += wstrModelName;
+		/* For.Com_Model */
+		hr = __super::Add_Component(wstrTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+		CHECK_FAILED(hr);
+	}
 
 	return S_OK;
 }
