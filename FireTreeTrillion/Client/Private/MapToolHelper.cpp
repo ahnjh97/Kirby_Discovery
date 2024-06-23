@@ -113,7 +113,6 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 #pragma endregion
 
 
-#pragma region LAB_DISCOVERA OBJECT
 #pragma region LEVEL_FINALBOSS (LAB_DISCOVERA) OBJECT
 		, "LbBossRoom", "LbLastBossStage", "LbLastBuilding", "LbLastOutFrame1", "LbLastOutFrame2", "LbLastStairs", "LbLastTank"
 #pragma endregion

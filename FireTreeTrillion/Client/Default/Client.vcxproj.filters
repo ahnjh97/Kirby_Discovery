@@ -687,7 +687,6 @@
     <ClInclude Include="..\public\HungryDee.h">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop</Filter>
     </ClInclude>
-    </ClInclude>
     <ClInclude Include="..\Public\PartTimeFood.h">
       <Filter>02.GameObjects\MiniGame\Food</Filter>
     </ClInclude>
