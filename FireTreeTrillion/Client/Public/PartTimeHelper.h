@@ -22,16 +22,13 @@ private:
 
 public: 
 	void	Register_FirstDee(class CHungryDee* pDee);
-	
-
 	void	Make_RandomItem();
 	_bool	Check_Item(PARTTIME_ITEM eITEM);
 
 private:
-	class CHungryDee* m_pHungryDee = nullptr;
-
-	PARTTIME_ITEM	m_eFood = PARTTIME_ITEM::ITEM_END;
-	_float			fTimeLimit = _float();
+	class CHungryDee*	m_pHungryDee = nullptr;
+	PARTTIME_ITEM		m_eFood = PARTTIME_ITEM::ITEM_END;
+	_float				m_fTimeLimit = _float();
 
 public:
 	virtual void Free() override;

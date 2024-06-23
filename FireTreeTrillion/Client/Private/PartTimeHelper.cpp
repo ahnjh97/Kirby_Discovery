@@ -42,6 +42,11 @@ _bool CPartTimeHelper::Check_Item(PARTTIME_ITEM eITEM)
 	return true;
 }
 
+//// 커비가 맞췄는지 틀렸는지에 대한 결과값을 와들디에게 송출한다.
+//void CPartTimeHelper::Notify_Result()
+//{
+//}
+
 void CPartTimeHelper::Free()
 {
 	__super::Free();
