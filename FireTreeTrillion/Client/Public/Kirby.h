@@ -115,6 +115,7 @@ public:
 		_bool			m_bBombAimming = { false };
 
 
+		_bool			m_bBlockOtherVacuum = { false };
 		// Deform 중일 때, true하여 Vacuuming 상태를 분기할 수 있게 만든다.
 		_bool			m_bisDeforming = { false };
 		// 자동차 전용 점퍼
