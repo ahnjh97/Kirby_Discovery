@@ -212,7 +212,7 @@ CBreakableRock* CBreakableRock::Create(ID3D11Device* pDevice, ID3D11DeviceContex
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CBreakableRock"));
+		MSG_BOX(TEXT("Failed To Create : CBreakableRock"));
 		Safe_Release(pInstance);
 	}
 
@@ -225,7 +225,7 @@ CGameObject* CBreakableRock::Clone(void* pArg)
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CBreakableRock"));
+		MSG_BOX(TEXT("Failed To Clone : CBreakableRock"));
 		Safe_Release(pInstance);
 	}
 
