@@ -21,12 +21,12 @@ private:
 	virtual ~CPartTimeHelper() = default;
 
 public: 
-	PARTTIME_ITEM	Make_RandomItem();
-	_bool			Check_Item();
-	void			Notify_Result();
+	//void	Make_RandomItem();
+	//_bool	Check_Item(PARTTIME_ITEM eITEM);
 
 private:
-	_float		fTimeLimit = _float();
+	PARTTIME_ITEM	m_eFood = ITEM_END;
+	_float			fTimeLimit = _float();
 
 public:
 	virtual void Free() override;
