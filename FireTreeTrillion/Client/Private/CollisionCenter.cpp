@@ -6,6 +6,7 @@
 #include "Camera_Main.h"
 #include "Kirby.h"
 #include "Monster.h"
+#include "AnimDeco.h"
 
 #include "HUD_StarPoint.h"
 #include "Kirby_State_Function.h"
@@ -404,6 +405,21 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 			pKirby->Get_KirbyInfo()->m_bBlockOtherVacuum = true;
 		});
 
+	Collision_Collider(m_GameObjects[HITBOX_PLYAER], m_GameObjects[ANIMDECO], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CKirby* pKirby = static_cast<CKirby*>(Dst);
+			CAnimDeco* pAnimDeco = static_cast<CAnimDeco*>(Src);
+			if (true == pAnimDeco->IsHidden())
+				return;
+
+			pAnimDeco->HideModel();
+		});
 
 	for (auto& ObjectVector : m_GameObjects)
 	{

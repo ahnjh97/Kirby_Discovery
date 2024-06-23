@@ -79,6 +79,7 @@ public:
 
 	HRESULT CreateDynamicActor(_float4x4& matWorld);
 	HRESULT CreateStaticActor(_float4x4& matWorld);
+	void DisableActor();
 
 	void	Update_ActorTransform(class CTransform* pTransform);
 
@@ -103,9 +104,12 @@ public:
 	void Set_ModelPassIndex(_uint iPassIndex) { m_iPassIndex = iPassIndex; }
 	_uint Get_ModelPassIndex() { return m_iPassIndex; }
 	void Set_WorldMatrixForOctree(_float4x4 _matWorld) { m_matWorld = _matWorld; }
+	_float4x4 Get_WorldMatrixForOctree() { return m_matWorld; }
 	HRESULT Bind_WorldMatrixForOctree(class CShader* pShader, string& strConstantName = string("g_WorldMatrix"));
 	void SetUp_ModelIdleAnimForOctree(_uint iAnimIndex, _float fTickPerSec) { m_iIdleAnimIndex = iAnimIndex; m_fIdleAnimTickPerSec = fTickPerSec; }
 	void ReturnToIdle() { Set_Animation(m_iIdleAnimIndex, m_fIdleAnimTickPerSec, true, true, 0.1f); }
+	void Set_Hide(_bool bHide) { m_bHide = bHide; }
+	_bool IsHidden() { return m_bHide; }
 
 private:
 	_uint						m_iNumMeshes = { 0 };
@@ -152,6 +156,7 @@ private:
 	_float4x4					m_matWorld = {};
 	_uint						m_iIdleAnimIndex = {};
 	_float						m_fIdleAnimTickPerSec = {};
+	_bool						m_bHide = { false };
 
 private:
 	HRESULT Ready_Meshes(_bool bOctree);

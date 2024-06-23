@@ -3,8 +3,10 @@
 #include "FSM.h"
 #include "Camera.h"
 
+#include "PartTimeFood.h"
 #include "PartTimerKirby_State.h"
 #include "HitBox.h"
+#include "Bone.h"
 
 CPartTimerKirby::CPartTimerKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CCharacter{ pDevice, pContext }
@@ -37,11 +39,16 @@ HRESULT CPartTimerKirby::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
+	if (FAILED(Add_PartObjects()))
+		return E_FAIL;
+
 	// FSM에서 첫 애니메이션 돌아가게 하는 구조
 	m_pModelCom->Set_Animation(FOODSHOP_SELECT, 50.f, true, true);
 
 	if(*m_pCurrentLevelID == LEVEL_TOWN)
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(2.f, 15.f, 3.f, 1.f));
+	else if (*m_pCurrentLevelID == LEVEL_PARTTIME)
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(18.7f, 23.8f, 29.3f, 1.f));
 
 	m_fScore = 10.f;
 
@@ -62,12 +69,12 @@ _int CPartTimerKirby::Tick(_float fTimeDelta)
 	m_fTimeDelta = m_pGameInstance->Get_FirstTimer();
 
 	//if (FOODSHOP_CORRECT == Get_State())
-	//{
 	//	m_pControllerCom->FreeFall(m_pTransformCom, m_fTimeDelta, 6.f);
-	//}
 
 	__super::Tick(m_fTimeDelta);
-
+	m_pPartTimeFood->Tick(fTimeDelta);
+	m_pPartTimeFood->Update_Position(Compute_BoneWorldMatrix());
+	
 	return OBJ_NOEVENT;
 }
 
@@ -81,6 +88,7 @@ void CPartTimerKirby::Late_Tick(_float fTimeDelta)
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_DEFERREDINFO, this);
 	}
+	m_pPartTimeFood->Late_Tick(fTimeDelta);
 }
 
 HRESULT CPartTimerKirby::Render()
@@ -104,7 +112,7 @@ HRESULT CPartTimerKirby::Render()
 
 		m_pModelCom->Render(i);
 	}
-
+	m_pPartTimeFood->Render();
 	return S_OK;
 }
 
@@ -119,6 +127,8 @@ HRESULT CPartTimerKirby::Render_LightDepth()
 #ifdef _DEBUG
 void CPartTimerKirby::Render_IMGUI()
 {
+	m_pPartTimeFood->Render_IMGUI();
+
 	if (ImGui::TreeNode("Guizmo"))
 	{
 		_float4x4 matWorld = m_pTransformCom->Get_WorldFloat4x4();
@@ -258,6 +268,34 @@ HRESULT CPartTimerKirby::Add_Components()
 	return S_OK;
 }
 
+HRESULT CPartTimerKirby::Add_PartObjects()
+{
+	CPartTimeFood::FOOD_DESC	FoodDesc{};
+	FoodDesc.pBoneMatrix = &m_matHand;
+	m_pPartTimeFood = static_cast<CPartTimeFood*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_PartTimeFood"), &FoodDesc));
+	CHECK_NULLPTR(m_pPartTimeFood);
+	m_pPartTimeFood->Set_Render(false);
+	return S_OK;
+}
+
+void CPartTimerKirby::Render_PartObjects(_bool _bRender, PARTTIME_ITEM _eItem)
+{
+	if(_eItem != PARTTIME_ITEM::ITEM_END)
+		m_pPartTimeFood->Set_Item(_eItem);
+	m_pPartTimeFood->Set_Render(_bRender);
+}
+
+_float4 CPartTimerKirby::Compute_BoneWorldMatrix()
+{
+	CBone* pBone = m_pModelCom->Get_BonePtr("RHaveL");
+
+	_float4x4 WorldMatrix = m_pTransformCom->Get_WorldFloat4x4();
+
+	XMStoreFloat4x4(&m_matHand, XMLoadFloat4x4(pBone->Get_CombinedTransformationMatrix()) * XMLoadFloat4x4(&WorldMatrix));
+
+	return _float4(m_matHand._41, m_matHand._42, m_matHand._43, m_matHand._44);
+}
+
 HRESULT CPartTimerKirby::Bind_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
@@ -292,10 +330,16 @@ void CPartTimerKirby::SetUp_FSM()
 	// FSM 상태 초기화
 	m_pFSM = CFSM::Create();
 	m_pFSM->Add_State(FOODSHOP_SELECT,	CPartTimerKirby_Idle_State::Create());
+
 	m_pFSM->Add_State(FOODSHOP_MOVEL,	CPartTimerKirby_Move_State::Create());
 	m_pFSM->Add_State(FOODSHOP_MOVER,	CPartTimerKirby_Move_State::Create());
+
 	m_pFSM->Add_State(FOODSHOP_CORRECT, CPartTimerKirby_Grab_State::Create());
+	m_pFSM->Add_State(HANDOVERSHORT,	CPartTimerKirby_Grab_State::Create());
+	m_pFSM->Add_State(HANDOVERSHORTL,	CPartTimerKirby_Grab_State::Create());
 	
+	//m_pFSM->Add_State(FOODSHOP_INCORRECTSTART, CPartTimerKirby_Push_State::Create());
+
 	//상태 Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};
 	FSM_Desc.iState = FOODSHOP_SELECT;
@@ -342,4 +386,5 @@ void CPartTimerKirby::Free()
 		Safe_Release(pMouthTexture);
 
 	Safe_Release(m_pCamera);
+	Safe_Release(m_pPartTimeFood);
 }

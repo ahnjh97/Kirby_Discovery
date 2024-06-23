@@ -437,7 +437,6 @@ _bool CEditor_UI::Tab_GroupList()
 	return TRUE;
 }
 
-//아니 이거 왜이럼;;
 _bool CEditor_UI::Window_Textures()
 {
 	ImGuiWindowFlags TexWindow_Flags = {}; /* ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize;*/

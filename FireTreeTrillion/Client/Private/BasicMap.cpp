@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "MapToolObject.h"
 #include "BasicMap.h"
+#include "AnimDeco.h"
+#include "HitBox.h"
 #include "OcTree.h"
 #include "Model.h"
 
@@ -34,7 +36,7 @@ HRESULT CBasicMap::Initialize(void* pArg)
     wstring wstrModelTag = GameObjectDesc.wstrModelName;
 
 
-    if (wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("LbLastBossStage") && wstrModelTag != TEXT("TownShop")
+    if (wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("Land_VcLabo") && wstrModelTag != TEXT("TownShop")
         && wstrModelTag.substr(wstrModelTag.length() - 5) == TEXT("Blend"))
     {
         m_bBlendMap = true;
@@ -50,7 +52,7 @@ HRESULT CBasicMap::Initialize(void* pArg)
     , "g_bStencil", "g_bRimLight", "m_fRimWidth", "g_bMotionBlur", "g_BoneMatrices" };
     m_vecStencilRimLightMotionBlurNames = { "g_bStencil", "g_bRimLight", "m_fRimWidth", "g_bMotionBlur" };
 
-    if(wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("LbLastBossStage") && wstrModelTag != TEXT("TownShop")
+    if(wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("Land_VcLabo") && wstrModelTag != TEXT("TownShop")
         && false == m_bBlendMap)
     {
         if (true == CheckIfBlendMapExists(GameObjectDesc.wstrModelName)) {
@@ -68,7 +70,7 @@ HRESULT CBasicMap::Initialize(void* pArg)
 
         InsertMapDecos();
     }
-    if (wstrModelTag == TEXT("Town") || wstrModelTag == TEXT("TownShop")|| wstrModelTag == TEXT("LbLastBossStage")) {
+    if (wstrModelTag == TEXT("Town") || wstrModelTag == TEXT("TownShop")|| wstrModelTag == TEXT("Land_VcLabo")) {
         if(LEVEL_TOOL_MAP != *m_pCurrentLevelID)
             ReadDecos_ForSmallLevels();
     }
@@ -417,6 +419,11 @@ void CBasicMap::InsertMapDecos()
                 continue;
 
             m_pGameInstance->Emplace_MapDecoTrigger(pRigidStatic, pModel, animIter->second.first, animIter->second.second);
+            CAnimDeco::ANIMDECO_DESC tAnimDeco{};
+            tAnimDeco.pAnimDecoModel = pModel;
+            CAnimDeco* pAnimDecoObj = dynamic_cast<CAnimDeco*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_AnimDeco"), &tAnimDeco));
+            m_vecAnimDecoGameObjs.push_back(pAnimDecoObj);
+            
             vecAnims.push_back(pModel);
         }
         else if (CMapToolObject::MAPOBJ_ACTOR == iMapObjType)
@@ -576,7 +583,6 @@ void CBasicMap::ReadDecos_ForSmallLevels()
             pModel->CreateStaticActor(matWorld);
             m_vecNonAnimDecos.push_back(pModel);
         }
-
     }
 
     fileInput.close();
@@ -736,7 +742,12 @@ void CBasicMap::Free()
 {
     __super::Free();
 
+    for (auto& animDecoObj : m_vecAnimDecoGameObjs)
+        Safe_Release(animDecoObj);
+    m_vecAnimDecoGameObjs.clear();
+
     Release_MapDecos();
+
     for (_uint iActorIdx = 0; iActorIdx < m_vecAnimDecoTriggersActors.size(); iActorIdx++)
     {
         PxRigidStatic* pActor = m_vecAnimDecoTriggersActors[iActorIdx];
