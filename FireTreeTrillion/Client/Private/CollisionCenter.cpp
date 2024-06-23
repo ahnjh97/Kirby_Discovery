@@ -401,6 +401,7 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 			CPhysXObject* pDeform = static_cast<CPhysXObject*>(Src);
 
 			pKirby->Collision(CONTENT_DEFORM, pDeform);
+			pKirby->Get_KirbyInfo()->m_bBlockOtherVacuum = true;
 		});
 
 

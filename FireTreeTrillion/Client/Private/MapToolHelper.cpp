@@ -106,7 +106,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "StarBlockL" , "StarBlockM", "StarBlockS", "SeDriftWoodAL", "SeDriftWoodBL", "SeDriftWoodCL"
 		, "VpFactoryPart", "VpFactoryParts", "VpFactoryPartsBlend", "WoodBox"
 
-#pragma region LAB_DISCOVERA OBJECT
+#pragma region LEVEL_FINALBOSS (LAB_DISCOVERA) OBJECT
 		, "LbBossRoom", "LbLastBossStage", "LbLastBuilding", "LbLastOutFrame1", "LbLastOutFrame2", "LbLastStairs", "LbLastTank"
 #pragma endregion
 	};

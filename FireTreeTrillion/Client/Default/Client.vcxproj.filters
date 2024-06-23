@@ -683,6 +683,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\PartTimeHelper.h">
       <Filter>02.GameObjects\MiniGame\_Helper</Filter>
+	</ClInclude>
+	<ClInclude Include="..\Public\BreakableRockPartical.h">
+      <Filter>02.GameObjects\Map\BreakableRock</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1006,6 +1009,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\PartTimeHelper.cpp">
       <Filter>02.GameObjects\MiniGame\_Helper</Filter>
+	</ClCompile>
+	<ClCompile Include="..\Private\BreakableRockPartical.cpp">
+      <Filter>02.GameObjects\Map\BreakableRock</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
