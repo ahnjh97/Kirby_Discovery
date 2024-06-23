@@ -1336,7 +1336,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 	else if (eLevel == LEVEL_FINALBOSS)
 	{
-		m_vecModelInfo.emplace_back("LbLastBossStage", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Land_VcLabo", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("BG1", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 

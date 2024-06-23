@@ -36,7 +36,7 @@ HRESULT CBasicMap::Initialize(void* pArg)
     wstring wstrModelTag = GameObjectDesc.wstrModelName;
 
 
-    if (wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("LbLastBossStage") && wstrModelTag != TEXT("TownShop")
+    if (wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("Land_VcLabo") && wstrModelTag != TEXT("TownShop")
         && wstrModelTag.substr(wstrModelTag.length() - 5) == TEXT("Blend"))
     {
         m_bBlendMap = true;
@@ -52,7 +52,7 @@ HRESULT CBasicMap::Initialize(void* pArg)
     , "g_bStencil", "g_bRimLight", "m_fRimWidth", "g_bMotionBlur", "g_BoneMatrices" };
     m_vecStencilRimLightMotionBlurNames = { "g_bStencil", "g_bRimLight", "m_fRimWidth", "g_bMotionBlur" };
 
-    if(wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("LbLastBossStage") && wstrModelTag != TEXT("TownShop")
+    if(wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("Land_VcLabo") && wstrModelTag != TEXT("TownShop")
         && false == m_bBlendMap)
     {
         if (true == CheckIfBlendMapExists(GameObjectDesc.wstrModelName)) {
@@ -70,7 +70,7 @@ HRESULT CBasicMap::Initialize(void* pArg)
 
         InsertMapDecos();
     }
-    if (wstrModelTag == TEXT("Town") || wstrModelTag == TEXT("TownShop")|| wstrModelTag == TEXT("LbLastBossStage")) {
+    if (wstrModelTag == TEXT("Town") || wstrModelTag == TEXT("TownShop")|| wstrModelTag == TEXT("Land_VcLabo")) {
         if(LEVEL_TOOL_MAP != *m_pCurrentLevelID)
             ReadDecos_ForSmallLevels();
     }
