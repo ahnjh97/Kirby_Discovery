@@ -35,6 +35,7 @@ private:
 	HRESULT			Bind_ShaderResources();
 
 	_int			Make_Partical();
+	_float			m_fHitPower = { 0.f };
 
 	CModel*						m_pModelCom = { nullptr };
 	CCharacterController*		m_pControllerCom = { nullptr };

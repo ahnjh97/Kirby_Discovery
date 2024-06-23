@@ -85,6 +85,8 @@
 #include "TerrainFog.h"
 #include "BreakableRock.h"
 #include "Car.h"
+#include "BreakableRock.h"
+#include "BreakableRockPartical.h"
 
 //UI
 #include "BackGround.h"
@@ -308,6 +310,9 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("StarBlock"), CStarBlock);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("StarBlockPiece"), CStarBlockPiece);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TerrainFog"), CTerrainFog);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BreakableRock"), CBreakableRock);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BreakableRockPartical"), CBreakableRockPartical);
+
 #pragma endregion
 
 	return S_OK;

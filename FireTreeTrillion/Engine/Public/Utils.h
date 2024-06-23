@@ -49,6 +49,7 @@ public:
 	static _vector	Get_State_Vector_Matrix(_Inout_ _float4x4& matrix, STATE eState);
 	static _float3	Get_Scaled_Matrix(_Inout_ _float4x4& matrix);
 	static void		Turn_OtherMatrix(_Inout_ _float4x4& matrix, _fvector vAxis, _float fTimeDelta, _float fAngle);
+	static void		Rotation(_Inout_ _float4x4& matrix, _fvector vAxis, _float fRadian);
 
 	//공간 이동
 	static void		Make_World_ToScreen(_Inout_ _float3& vPos);

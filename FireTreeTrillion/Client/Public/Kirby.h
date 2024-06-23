@@ -208,7 +208,6 @@ private:
 private:
 	void			Update_PartObjectMatrix();
 	void			Bone_Rotation(_float fTimeDelta);
-	//_float			m_fAccMoveDelta = { 0.f };
 
 	class CKirbyWeapons*  m_pWeapons = { nullptr };
 	class CKirbyArmours*  m_pArmours = { nullptr };
@@ -222,7 +221,7 @@ private:
 	_float				  m_fOverPowerTime = { 0.f };
 	_float				  m_fFlashOverPowerTime = { 0.f };
 	_float				  m_fPreHp = { 0.f };
-	_uint				  m_uCoin = { 123 };
+	_uint				  m_uCoin = { 0 };
 
 	void				  HitStop_System(_float fTimeDelta);
 	_bool				  m_bHitStop = { false };

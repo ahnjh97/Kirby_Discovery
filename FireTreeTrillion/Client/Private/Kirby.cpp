@@ -728,6 +728,20 @@ void CKirby::Key_Input(_float fTimeDelta)
 	{
 		Change_State(CARVACUUMSTATE_DEFORM, 60.f, false, false, BODY_CARVACUUM, OFFSET_CARVACUUM);
 	}
+	if (m_pGameInstance->Get_DIKeyState(DIK_N, KEY_DOWN))
+	{
+		CGameObject::GAMEOBJECT_DESC ObjDesc{};
+
+		ObjDesc.fSpeedPerSec = 5.f;
+		ObjDesc.fRotationPerSec = ToRadian(90.f);
+		_float4x4 InitMat = _float4x4::Identity;
+		InitMat.Translation({ -50.f, 5.f, -6.5f });
+		ObjDesc.matWorld = InitMat;
+		ObjDesc.wstrModelName = TEXT("RockA");
+		// Car Test
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Rock"), TEXT("Prototype_GameObject_BreakableRock"), &ObjDesc)))
+			return;
+	}
 
 
 #pragma endregion
