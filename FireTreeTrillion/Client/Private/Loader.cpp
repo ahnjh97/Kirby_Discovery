@@ -320,7 +320,6 @@ HRESULT CLoader::Loading_StaticComponentAll()
 	//이펙트 텍스쳐
 	Add_FXTexture();
 
-
 	wstring wstrPrototypeTag = L"Prototype_Component_Shader_";
 	hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + TEXT("VtxPosTex"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements));
@@ -341,6 +340,22 @@ HRESULT CLoader::Loading_StaticComponentAll()
 		CVIBuffer_Instance_Point::Create(m_pDevice, m_pContext));
 	CHECK_FAILED(hr);
 
+
+#pragma region LEVEL_SKYSPHERE
+
+	hr = Add_Texture(eLevel, "SkySphere_LabDiscovera_2Pase", "SkySphere/SkySphere_LabDiscovera_2Pase_Diffuse.dds");
+	CHECK_FAILED(hr);
+
+	hr = Add_Texture(eLevel, "SkySphere_LabDiscovera_2Pase_Normal", "SkySphere/SkySphere_LabDiscovera_2Pase_Normal.dds");
+		CHECK_FAILED(hr);
+
+	hr = Add_Texture(eLevel, "SkySphere_LabDiscovera_2Pase_Emissive", "SkySphere/SkySphere_LabDiscovera_2Pase_Emissive.dds");
+	CHECK_FAILED(hr);
+
+	hr = Add_Texture(eLevel, "SkySphere_LabDiscovera_2Pase_Height", "SkySphere/SkySphere_LabDiscovera_2Pase_Height.dds");
+	CHECK_FAILED(hr);
+
+#pragma endregion
 
 	return S_OK;
 }
@@ -1064,8 +1079,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("LbLastBossStage", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("BG1", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-
-
 
 
 		m_vecModelInfo.emplace_back("Kirby", TYPE_ANIM, 1.f, 180.f);

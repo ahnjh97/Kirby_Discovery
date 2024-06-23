@@ -17,7 +17,7 @@ namespace Client
                  LEVEL_INTRO,
                  LEVEL_RACING,
                  LEVEL_TOWN,
-                 LEVEL_FINALBOSS, // 府家胶疙 LEVEL_LAB
+                 LEVEL_FINALBOSS, // 府家胶疙 LEVEL_LAB (Lab_Discovera)
 
                  LEVEL_END };
 
