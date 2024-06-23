@@ -36,7 +36,8 @@ public:
 
 	HRESULT CreateDynamicActor(_float4x4& matWorld);
 	HRESULT CreateStaticActor(_float4x4& matWorld);
-	void		Update_ActorTransform(class CTransform* pTransform);
+	void	Update_ActorTransform(class CTransform* pTransform);
+	void	DisableActor(PxScene* pScene);
 	//void		Update_PhysX(class CTransform* pTransform);
 	//_float4x4	Get_PxWorldMatrix();
 

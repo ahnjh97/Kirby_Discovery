@@ -71,17 +71,18 @@ HRESULT CSkySphere::Render()
 
 		LEVEL eCurLevel = (LEVEL)*m_pGameInstance->Get_CurrentLevelID();
 
-		//1) 현재 해당 레벨 진입 시에 2PASE SKY TEX로 스왑. 추후 2PASE 시점에 스왑하는 방식으로 변경 필요
+		//1) 현재 해당 레벨 진입 시에 임시로 설정. 추후 FIELD/1PASE/2PASE 시점에 스왑하는 방식으로 변경 필요
+		//2) 추후 일렁일렁 움직이는 효과 셰이더로 세팅 필요
 		if (LEVEL_FINALBOSS == eCurLevel)
 		{
-			//2) 추후 일렁일렁 움직이는 효과 셰이더로 세팅 필요
-			hr = m_pLabSkyTex[TEX_DIFFUSE]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", SKY_LAB_2PASE);
+			// 변경이 필요할 경우, 조건에 따라 TexCom[Diffuse]의 TEX이넘 값을 변경하면 스왑 
+			hr = m_pLabSkyTex[TEX_DIFFUSE]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", SKY_LAB_1PASE);
 			CHECK_FAILED(hr);
 
 			hr = m_pLabSkyTex[TEX_NORMAL]->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", SKY_LAB_2PASE);
 			CHECK_FAILED(hr);
 
-			//TEX_EMISSIVE :: 방출. 임시로 MRA에 연결해봤음
+			//TEX_EMISSIVE :: 방출 옵션. 임시로 MRA에 연결
 			hr = m_pLabSkyTex[TEX_EMISSIVE]->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", SKY_LAB_2PASE);
 			CHECK_FAILED(hr);
 
@@ -113,20 +114,25 @@ HRESULT CSkySphere::Add_Components()
 
 #pragma region LAB_DISCOVERA
 	
-	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_SkySphere_LabDiscovera_2Pase"), 
-		TEXT("Com_TexDiffuse"), (CComponent**)&m_pLabSkyTex[TEX_DIFFUSE]);
+	//FIELD
+	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_SkySphere_Lab_CloudNoize"), 
+		TEXT("Com_Tex_Lab_CloudNoize"), (CComponent**)&m_pLabSkyTex[TEX_MRA]);
 	CHECK_FAILED(hr);
 
-	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_SkySphere_LabDiscovera_2Pase_Normal"), 
-		TEXT("Com_TexNormal"), (CComponent**)&m_pLabSkyTex[TEX_NORMAL]);
+	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_SkySphere_Lab_Diffuse"), 
+		TEXT("Com_Tex_Lab_Diffuse"), (CComponent**)&m_pLabSkyTex[TEX_DIFFUSE]);
 	CHECK_FAILED(hr);
 
-	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_SkySphere_LabDiscovera_2Pase_Emissive"), 
-		TEXT("Com_TexEmissive"), (CComponent**)&m_pLabSkyTex[TEX_EMISSIVE]);
+	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_SkySphere_LabBoss_2Pase_Normal"), 
+		TEXT("Com_Tex_LabBoss_Normal"), (CComponent**)&m_pLabSkyTex[TEX_NORMAL]);
 	CHECK_FAILED(hr);
 
-	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_SkySphere_LabDiscovera_2Pase_Height"), 
-		TEXT("Com_TexHeight"), (CComponent**)&m_pLabSkyTex[TEX_HEIGHT]);
+	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_SkySphere_LabBoss_2Pase_Emissive"), 
+		TEXT("Com_Tex_LabBoss_Emissive"), (CComponent**)&m_pLabSkyTex[TEX_EMISSIVE]);
+	CHECK_FAILED(hr);
+
+	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_SkySphere_LabBoss_2Pase_Height"), 
+		TEXT("Com_Tex_LabBoss_Height"), (CComponent**)&m_pLabSkyTex[TEX_HEIGHT]);
 	CHECK_FAILED(hr);
 
 #pragma endregion

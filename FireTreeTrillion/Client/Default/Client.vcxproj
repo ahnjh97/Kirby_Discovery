@@ -170,6 +170,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Ability.h" />
+    <ClInclude Include="..\Public\AnimDeco.h" />
     <ClInclude Include="..\Public\AnimToolHelper.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
@@ -272,6 +273,7 @@
     </ClInclude>
     <ClInclude Include="..\Public\Moon.h" />
     <ClInclude Include="..\Public\MultiEffect.h" />
+    <ClInclude Include="..\Public\NonAnimDeco.h" />
     <ClInclude Include="..\Public\OrbitingCamera.h" />
     <ClInclude Include="..\Public\Particle.h" />
     <ClInclude Include="..\Public\PartTimeFood.h" />
@@ -308,6 +310,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability.cpp" />
+    <ClCompile Include="..\Private\AnimDeco.cpp" />
     <ClCompile Include="..\Private\AnimToolHelper.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -406,6 +409,7 @@
     </ClCompile>
     <ClCompile Include="..\Private\Moon.cpp" />
     <ClCompile Include="..\Private\MultiEffect.cpp" />
+    <ClCompile Include="..\Private\NonAnimDeco.cpp" />
     <ClCompile Include="..\Private\OrbitingCamera.cpp" />
     <ClCompile Include="..\Private\Particle.cpp" />
     <ClCompile Include="..\Private\PartTimeFood.cpp" />
