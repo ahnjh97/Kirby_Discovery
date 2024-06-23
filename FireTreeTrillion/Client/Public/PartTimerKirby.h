@@ -71,6 +71,8 @@ private:
 	CTexture*				m_pMouthTexture[MOUTH_END] = { nullptr };
 	class CCamera*			m_pCamera = { nullptr };
 
+	// °í°´ ¿Íµéµð
+
 	ANIM					m_eCurrentState = { ANIM_END };
 	EYESTATE				m_eEyeState = { EYE_END };
 	MOUTHSTATE				m_eMouthState = { MOUTH_END };

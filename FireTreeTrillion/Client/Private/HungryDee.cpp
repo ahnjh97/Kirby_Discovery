@@ -1,33 +1,48 @@
 #include "stdafx.h"
 #include "HitBox.h"
 #include "FSM.h"
-#include "FoodShopDee.h"
+#include "HungryDee.h"
 #include "Dee_Part.h"
 #include "Dee_State.h"
+#include "PartTimeHelper.h"
 
-CFoodShopDee::CFoodShopDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+pair<_float3, vector<WAITING_INFO>> CHungryDee::m_WaitingList =
+{
+	_float3{0.f, 0.f, 0.f},
+	{
+		WAITING_INFO{ {15.f, 2.f, -3.f}, 0.f},
+		WAITING_INFO{ {0.f, 2.f, 0.f}, 0.f},
+		WAITING_INFO{ {-1.f, 2.f, -2.f}, 0.1f},
+		WAITING_INFO{ {-3.f, 2.f, -4.f}, 0.15f},
+		WAITING_INFO{ {-6.f, 2.f, -6.f}, 0.08f},
+		WAITING_INFO{ {-8.f, 2.f, -8.f}, 0.1f},
+		WAITING_INFO{ {-15.f, 2.f, -10.f}, 0.1f}
+	}
+};
+
+CHungryDee::CHungryDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CWaddleDee{ pDevice, pContext }
 {
 }
 
-CFoodShopDee::CFoodShopDee(const CFoodShopDee& rhs)
+CHungryDee::CHungryDee(const CHungryDee& rhs)
 	:CWaddleDee{ rhs }
 {
 }
 
-HRESULT CFoodShopDee::Initialize_Prototype()
+HRESULT CHungryDee::Initialize_Prototype()
 {
 	return S_OK;
 }
 
-HRESULT CFoodShopDee::Initialize(void* pArg)
+HRESULT CHungryDee::Initialize(void* pArg)
 {
-	DEE_DESC pDeeDesc{};
+	HUNGRYDEE_DESC pDeeDesc{};
 
 	if (nullptr != pArg)
-		pDeeDesc = *(DEE_DESC*)pArg;
+		pDeeDesc = *(HUNGRYDEE_DESC*)pArg;
 
-	pDeeDesc.fSpeedPerSec = 5.f;
+	pDeeDesc.fSpeedPerSec = 2.f;
 	pDeeDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
 	HRESULT hr;
@@ -35,28 +50,50 @@ HRESULT CFoodShopDee::Initialize(void* pArg)
 	hr = __super::Initialize(pArg);
 	CHECK_FAILED(hr);
 
+	m_WaitingList.first = pDeeDesc.matWorld.Translation();
+
+	m_iMyIdx = pDeeDesc.iIdx;
+	_float4 vDir = Dir( (m_WaitingList.second[m_iMyIdx].vPos
+		+ _float3{ CUtils::Make_RandomFloat(2.f, 10.f), 0.f, CUtils::Make_RandomFloat(2.f, 10.f) }));
+
+	m_pTransformCom->Move(vDir);
+
 	hr = Add_Components();
 	CHECK_FAILED(hr);
 
-
+	//마을에 있을 때만 파트 오브젝트 로드하기
 	hr = Add_PartObjects();
 	CHECK_FAILED(hr);
 
-	m_pTransformCom->Rotation(_float3{ 0.f, 1.f, 0.f }, ToRadian(180.f));
-	m_pModelCom->Set_Animation(DEEANIM_WAIT, 60.f, true, true);
+
+
+	m_pModelCom->Set_Animation(DEESHOPANIM_GUESTNORMAL, 60.f, true, true);
 
 	return S_OK;
 }
 
-_int CFoodShopDee::Tick(_float fTimeDelta)
+_int CHungryDee::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
 		return Ready_Dead();
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
-	__super::Tick(m_fTimeDelta);
 
+	if (m_pGameInstance->Get_KeyState(DIK_W, KEY_DOWN))
+	{
+		m_iMyIdx = (m_iMyIdx + 6) % 7;
+
+		if (m_iMyIdx == 6)
+		{
+			m_pControllerCom->Set_Position(m_pTransformCom, Pos(m_WaitingList.first + m_WaitingList.second[m_iMyIdx].vPos));
+		}
+	}
+
+
+
+	//나머지 슈퍼틱, 파트 틱 처리
+	__super::Tick(m_fTimeDelta);
 	for (auto& Pair : m_PartObjects)
 		Pair.second->Tick(m_fTimeDelta);
 
@@ -66,7 +103,7 @@ _int CFoodShopDee::Tick(_float fTimeDelta)
 	return OBJ_NOEVENT;
 }
 
-void CFoodShopDee::Late_Tick(_float fTimeDelta)
+void CHungryDee::Late_Tick(_float fTimeDelta)
 {
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 	m_pModelCom->Play_Animation(m_fTimeDelta);
@@ -81,10 +118,9 @@ void CFoodShopDee::Late_Tick(_float fTimeDelta)
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
-
 }
 
-HRESULT CFoodShopDee::Render()
+HRESULT CHungryDee::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
@@ -93,7 +129,6 @@ HRESULT CFoodShopDee::Render()
 
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
-
 		if (Custom_Face(i) == true)
 			continue;
 
@@ -116,7 +151,7 @@ HRESULT CFoodShopDee::Render()
 	return S_OK;
 }
 
-HRESULT CFoodShopDee::Render_LightDepth()
+HRESULT CHungryDee::Render_LightDepth()
 {
 	if (FAILED(m_pGameInstance->Render_LightDepth_For_GameObject(m_pShaderCom, m_pTransformCom, m_pModelCom)))
 		return E_FAIL;
@@ -124,31 +159,34 @@ HRESULT CFoodShopDee::Render_LightDepth()
 	return S_OK;
 }
 
-void CFoodShopDee::Render_IMGUI()
+void CHungryDee::Add_AnimEvent()
+{
+	__super::Add_AnimEvent();
+}
+
+void CHungryDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
+{
+}
+
+void CHungryDee::Render_IMGUI()
 {
 	__super::Render_IMGUI();
 
 	ImGui::Text(u8"현재 애님 인덱스 : %d", m_pFSM->Get_State());
+
+	ImGui::Spacing();
+	ImGui::Text(u8"대기 인덱스: %d", m_iMyIdx);
+	_float4x4 WorldMat = m_pTransformCom->Get_WorldMatrix();
+	ImGui::Text(u8"위치: %.2f\t%.2f\t%.2f\t%.2f", WorldMat._41, WorldMat._42, WorldMat._43, WorldMat._44);
 }
 
-void CFoodShopDee::Add_AnimEvent()
+void CHungryDee::Bring_Food(PARTTIME_ITEM eITEM)
 {
-	__super::Add_AnimEvent();
-
 }
 
-void CFoodShopDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
+HRESULT CHungryDee::Add_Components()
 {
-	m_bIsKirbyInZone = true;
-	m_fResetHiTime = 5.f;
 
-	//if(m_pGameInstance->Get_KeyState(DIK_LCONTROL, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_1, KEY_DOWN))
-	//m_pModelCom->Set_Animation(27, 50.f, true, true);
-}
-
-
-HRESULT CFoodShopDee::Add_Components()
-{
 	HRESULT hr;
 
 
@@ -159,7 +197,7 @@ HRESULT CFoodShopDee::Add_Components()
 
 
 	//모델
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_WaddleDeeBase"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_WaddleDeeHungry"),
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
@@ -182,21 +220,21 @@ HRESULT CFoodShopDee::Add_Components()
 	CHECK_FAILED(hr);
 
 
-	CHitBox::HITBOX_DESC HitBox{};
-	HitBox.pOwner = this;
-	HitBox.pDesc = &m_tColliderDesc[BODY];
-	HitBox.pCollisionType = NPC;
-	hr = m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox);
-	CHECK_FAILED(hr);
+	//CHitBox::HITBOX_DESC HitBox{};
+	//HitBox.pOwner = this;
+	//HitBox.pDesc = &m_tColliderDesc[BODY];
+	//HitBox.pCollisionType = NPC;
+	//hr = m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox);
+	//CHECK_FAILED(hr);
 
-	Set_BodyCollider(COLLIDER_CYLINDER, 0.6f, 1.2f, 5.f);
+	//Set_BodyCollider(COLLIDER_CYLINDER, 0.6f, 1.2f, 1.2f);
 
 	SetUp_FSM();
 
 	return S_OK;
 }
 
-HRESULT CFoodShopDee::Add_PartObjects()
+HRESULT CHungryDee::Add_PartObjects()
 {
 	if (*m_pCurrentLevelID != LEVEL_TOWN)
 		return S_OK;
@@ -208,8 +246,27 @@ HRESULT CFoodShopDee::Add_PartObjects()
 
 	PartDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 	PartDesc.pSocket = pModel->Get_BonePtr("HatL");
-	PartDesc.wstrModelName = TEXT("DeePart_FoodShop");
 
+	
+	switch (CUtils::Make_RandomInt(0, 4))
+	{
+	case 0:
+		PartDesc.wstrModelName = TEXT("DeePart_Delivery");
+		break;
+	case 1:
+		PartDesc.wstrModelName = TEXT("DeePart_Pharmacy");
+		break;
+	case 2:
+		PartDesc.wstrModelName = TEXT("DeePart_RollingBall");
+		break;
+	case 3:
+		PartDesc.wstrModelName = TEXT("DeePart_Theater");
+		break;
+	case 4:
+		PartDesc.wstrModelName = TEXT("DeePart_Knowledge");
+		break;
+	}
+	
 	pPartObj = static_cast<CPartObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_DeePart"), &PartDesc));
 	if (nullptr == pPartObj)
 		return E_FAIL;
@@ -219,7 +276,7 @@ HRESULT CFoodShopDee::Add_PartObjects()
 	return S_OK;
 }
 
-HRESULT CFoodShopDee::Bind_ShaderResources()
+HRESULT CHungryDee::Bind_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		ALARM_FAIL("쉐이더가 읍서");
@@ -251,33 +308,23 @@ HRESULT CFoodShopDee::Bind_ShaderResources()
 	return S_OK;
 }
 
-void CFoodShopDee::SetUp_FSM()
+void CHungryDee::SetUp_FSM()
 {
 	m_pFSM = CFSM::Create();
 
-	m_pFSM->Add_State(DEEANIM_WAIT, CDee_Idle_State::Create());
-
-	m_pFSM->Add_State(DEEANIM_CLERKWAVEHAND, CDee_Emotion_State::Create());
-	m_pFSM->Add_State(DEEANIM_CLERKTALK, CDee_Emotion_State::Create());
-
-	m_pFSM->Add_State(DEEANIM_TALK1, CDee_Emotion_State::Create());
-	m_pFSM->Add_State(DEEANIM_TALK2, CDee_Emotion_State::Create());
-	m_pFSM->Add_State(DEEANIM_TALK3A, CDee_Emotion_State::Create());
-	m_pFSM->Add_State(DEEANIM_TALK3B, CDee_Emotion_State::Create());
-
-	m_pFSM->Add_State(DEEANIM_ANGER, CDee_Emotion_State::Create());
-
+	m_pFSM->Add_State(DEESHOPANIM_GUESTNORMAL, CDee_Hungry_State::Create());
+	m_pFSM->Add_State(DEESHOPANIM_WALK, CDee_Hungry_State::Create());
 
 
 	CFSM::FSM_INFO	FSMDesc = {};
-	FSMDesc.iState = DEEANIM_WAIT;
+	FSMDesc.iState = DEESHOPANIM_GUESTNORMAL;
 	FSMDesc.pModel = &m_pModelCom;
 
 	m_pFSM->Initialize(&FSMDesc);
 
 }
 
-_bool CFoodShopDee::Custom_Face(_uint iMeshIndex)
+_bool CHungryDee::Custom_Face(_uint iMeshIndex)
 {
 	if (iMeshIndex == 2)
 	{
@@ -308,13 +355,13 @@ _bool CFoodShopDee::Custom_Face(_uint iMeshIndex)
 	return false;
 }
 
-CFoodShopDee* CFoodShopDee::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CHungryDee* CHungryDee::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	CFoodShopDee* pInstance = new CFoodShopDee(pDevice, pContext);
+	CHungryDee* pInstance = new CHungryDee(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		_ASSERT_EXPR(FALSE, TEXT("Failed To Create : CFoodShopDee"));
+		_ASSERT_EXPR(FALSE, TEXT("Failed To Create : CHungryDee"));
 
 		Safe_Release(pInstance);
 	}
@@ -322,20 +369,20 @@ CFoodShopDee* CFoodShopDee::Create(ID3D11Device* pDevice, ID3D11DeviceContext* p
 	return pInstance;
 }
 
-CGameObject* CFoodShopDee::Clone(void* pArg)
+CGameObject* CHungryDee::Clone(void* pArg)
 {
-	CFoodShopDee* pInstance = new CFoodShopDee(*this);
+	CHungryDee* pInstance = new CHungryDee(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		_ASSERT_EXPR(FALSE, TEXT("Failed To Clone : CFoodShopDee"));
+		_ASSERT_EXPR(FALSE, TEXT("Failed To Clone : CHungryDee"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CFoodShopDee::Free()
+void CHungryDee::Free()
 {
 	Safe_Release(m_pEyeTextureCom);
 

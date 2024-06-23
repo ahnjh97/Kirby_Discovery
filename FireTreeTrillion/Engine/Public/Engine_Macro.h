@@ -46,6 +46,8 @@
 #define Pos(vec3)					_float4{(vec3).x, (vec3).y, (vec3).z, 1.f}
 #define F4toF3(vec4)				_float3{vec4.x, vec4.y, vec4.z}
 
+#define XZVec(vec3)				_float3{vec3.x, 0.f, vec3.z}
+
 #define ZeroVecPos					_float4{0.f, 0.f, 0.f, 1.f}
 #define ZeroVecDir					_float4{0.f, 0.f, 0.f, 0.f}
 
