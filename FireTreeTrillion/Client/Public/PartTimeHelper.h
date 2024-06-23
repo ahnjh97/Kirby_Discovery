@@ -3,7 +3,7 @@
 
 BEGIN(Client)
 
-enum PARTTIME_ITEM { CAKE, TOMATO, DRINK, BURGER, ITEM_END };
+enum class PARTTIME_ITEM { CAKE, TOMATO, DRINK, BURGER, ITEM_END };
 
 /// PartTimeHelper가 하는 일
 ///1. 아이템 관할하는 곳입니다.
@@ -21,12 +21,14 @@ private:
 	virtual ~CPartTimeHelper() = default;
 
 public: 
-	PARTTIME_ITEM	Make_RandomItem();
-	_bool			Check_Item();
-	void			Notify_Result();
+	void	Register_FirstDee(class CHungryDee* pDee);
+	void	Make_RandomItem();
+	_bool	Check_Item(PARTTIME_ITEM eITEM);
 
 private:
-	_float		fTimeLimit = _float();
+	class CHungryDee*	m_pHungryDee = nullptr;
+	PARTTIME_ITEM		m_eFood = PARTTIME_ITEM::ITEM_END;
+	_float				m_fTimeLimit = _float();
 
 public:
 	virtual void Free() override;

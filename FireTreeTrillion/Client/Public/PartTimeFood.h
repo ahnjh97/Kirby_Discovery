@@ -36,7 +36,7 @@ private:
 private:
 	array<CModel*, 4>	m_arrModelCom = { nullptr };
 	//CGameObject*		m_pPlayer = { nullptr };
-	PARTTIME_ITEM		m_eItem = { DRINK };
+	PARTTIME_ITEM		m_eItem = { PARTTIME_ITEM::DRINK };
 
 public:
 	static CPartTimeFood*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

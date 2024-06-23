@@ -4,7 +4,7 @@
 #include "HungryDee.h"
 #include "Dee_Part.h"
 #include "Dee_State.h"
-
+#include "PartTimeHelper.h"
 
 pair<_float3, vector<WAITING_INFO>> CHungryDee::m_WaitingList =
 {
@@ -178,6 +178,10 @@ void CHungryDee::Render_IMGUI()
 	ImGui::Text(u8"대기 인덱스: %d", m_iMyIdx);
 	_float4x4 WorldMat = m_pTransformCom->Get_WorldMatrix();
 	ImGui::Text(u8"위치: %.2f\t%.2f\t%.2f\t%.2f", WorldMat._41, WorldMat._42, WorldMat._43, WorldMat._44);
+}
+
+void CHungryDee::Bring_Food(PARTTIME_ITEM eITEM)
+{
 }
 
 HRESULT CHungryDee::Add_Components()

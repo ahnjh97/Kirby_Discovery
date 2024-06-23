@@ -11,6 +11,7 @@ END
 
 BEGIN(Client)
 
+//enum class PARTTIME_ITEM;
 class CHungryDee final : public CWaddleDee
 {
 public:
@@ -29,7 +30,6 @@ public:
 	//현재 내가 기다려야 할 위치를 준다.
 	_float3		Get_DestWaitingPos() { return m_WaitingList.first + m_WaitingList.second[m_iMyIdx].vPos; }
 
-
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual _int	Tick(_float fTimeDelta) override;
@@ -44,6 +44,7 @@ public:
 	virtual void	Render_IMGUI() override;
 #endif
 
+	void			Bring_Food(enum class PARTTIME_ITEM eITEM);
 
 private:
 	DEE_SHOPANIM	m_eMyState = { DEESHOPANIM_END };
