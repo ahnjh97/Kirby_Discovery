@@ -13,7 +13,7 @@
 #include "BrontoBurt.h"
 #include "PoppyBrosJr.h"
 
-#include "WaddleDee.h"
+#include "HungryDee.h"
 #include "PartTimeFood.h"
 
 #include "BG.h"
@@ -396,14 +396,31 @@ HRESULT CLevel_PartTime::Ready_Dees()
 	ObjDesc.fSpeedPerSec = 5.f;
 	ObjDesc.fRotationPerSec = ToRadian(90.f);
 	_float4x4 InitMat = _float4x4::Identity;
-	InitMat.Translation({ -10.2f, 24.7f, 20.f });
+	InitMat.Translation({ -10.2f, 35.f, 25.f });
 	ObjDesc.matWorld = InitMat;
 
-	//if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NPC"), TEXT("Prototype_GameObject_FoodShopDee"), &ObjDesc)))
-	//	return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NPC"), TEXT("Prototype_GameObject_FoodShopDee"), &ObjDesc)))
+		return E_FAIL;
+
+
+	CHungryDee::HUNGRYDEE_DESC HungryDeeDesc{};
+	HungryDeeDesc.fSpeedPerSec = 5.f;
+	HungryDeeDesc.fRotationPerSec = ToRadian(90.f);
+	InitMat = _float4x4::Identity;
+	InitMat.Translation({ 13.2f, 24.7f, 24.f });
+	HungryDeeDesc.matWorld = InitMat;
+
+	for (_int i = 0; i < 7; ++i)
+	{
+		HungryDeeDesc.iIdx = i;
+
+		if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NPC"), TEXT("Prototype_GameObject_HungryDee"), &HungryDeeDesc)))
+			return E_FAIL;
+	}
 
 
 	//일단 파트타임하는 상점에는 몬스터가 없어요. 커비와 와들디 뿐이죠.
+	//맞아요
 	string strFileName = "../../../objects_txt/PartTime_Monsters.txt";
 
 	ifstream fileInput(strFileName, ios::binary);
