@@ -60,8 +60,8 @@ HRESULT CLevel_Town::Initialize()
 	CHECK_FAILED(hr);
 
 	// Part-timer Kirby Test
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOWN, TEXT("Layer_Player"), TEXT("Prototype_GameObject_PartTimerKirby"))))
-		return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOWN, TEXT("Layer_Player"), TEXT("Prototype_GameObject_PartTimerKirby"))))
+	//	return E_FAIL;
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
@@ -398,6 +398,7 @@ HRESULT CLevel_Town::Ready_Dees()
 
 
 	//일단 마을에는 몬스터가 없어요
+	/*
 	string strFileName = "../../../objects_txt/Town_Monsters.txt";
 
 	ifstream fileInput(strFileName, ios::binary);
@@ -525,7 +526,7 @@ HRESULT CLevel_Town::Ready_Dees()
 	}
 
 	fileInput.close();
-
+	*/
 
 	return S_OK;
 }

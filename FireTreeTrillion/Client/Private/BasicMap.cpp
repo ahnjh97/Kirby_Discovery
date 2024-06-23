@@ -34,7 +34,8 @@ HRESULT CBasicMap::Initialize(void* pArg)
     wstring wstrModelTag = GameObjectDesc.wstrModelName;
 
 
-    if (wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("LbLastBossStage") && wstrModelTag.substr(wstrModelTag.length() - 5) == TEXT("Blend"))
+    if (wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("LbLastBossStage") && wstrModelTag != TEXT("TownShop")
+        && wstrModelTag.substr(wstrModelTag.length() - 5) == TEXT("Blend"))
     {
         m_bBlendMap = true;
         m_eRenderGroup = CRenderer::RENDER_BLEND;
@@ -49,7 +50,8 @@ HRESULT CBasicMap::Initialize(void* pArg)
     , "g_bStencil", "g_bRimLight", "m_fRimWidth", "g_bMotionBlur", "g_BoneMatrices" };
     m_vecStencilRimLightMotionBlurNames = { "g_bStencil", "g_bRimLight", "m_fRimWidth", "g_bMotionBlur" };
 
-    if(wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("LbLastBossStage") && false == m_bBlendMap)
+    if(wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("LbLastBossStage") && wstrModelTag != TEXT("TownShop")
+        && false == m_bBlendMap)
     {
         if (true == CheckIfBlendMapExists(GameObjectDesc.wstrModelName)) {
             if (FAILED(Add_BlendMap(wstrModelTag)))
@@ -66,7 +68,7 @@ HRESULT CBasicMap::Initialize(void* pArg)
 
         InsertMapDecos();
     }
-    if (wstrModelTag == TEXT("Town") || wstrModelTag == TEXT("LbLastBossStage")) {
+    if (wstrModelTag == TEXT("Town") || wstrModelTag == TEXT("TownShop")|| wstrModelTag == TEXT("LbLastBossStage")) {
         if(LEVEL_TOOL_MAP != *m_pCurrentLevelID)
             ReadDecos_ForSmallLevels();
     }
@@ -108,9 +110,8 @@ HRESULT CBasicMap::Render()
 {
     if (FAILED(Bind_ShaderResources()))
         return E_FAIL;
-    if ((LEVEL_GAMEPLAY == *m_pGameInstance->Get_CurrentLevelID()
-        || LEVEL_INTRO == *m_pGameInstance->Get_CurrentLevelID())
-        && false == m_bBlendMap)
+    if ((LEVEL_GAMEPLAY == *m_pCurrentLevelID || LEVEL_INTRO == *m_pCurrentLevelID
+        || LEVEL_RACING == *m_pCurrentLevelID) && m_pOcTree != nullptr)
     {
         if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fNonMatchTime, sizeof(_float))))
             return E_FAIL;
@@ -165,7 +166,7 @@ HRESULT CBasicMap::Render()
 #ifdef _DEBUG
 void CBasicMap::Render_IMGUI()
 {
-    HRESULT hr;
+    /*HRESULT hr;
     static _bool bRabbit = false;
     static _bool bCow = false;
     if (ImGui::Checkbox("rabbit", &bRabbit))
@@ -178,7 +179,7 @@ void CBasicMap::Render_IMGUI()
         hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, L"Layer_Monster", TEXT("Prototype_GameObject_Buffahorn"));
 
         CHECK_FAILED(hr);
-    }
+    }*/
 
     ImGui::Text("Octrees: %d", m_pGameInstance->Get_NumOctree());
     ImGui::Text("RenderAll: %d", m_iRenderAll);
@@ -264,8 +265,9 @@ HRESULT CBasicMap::Add_BlendMap(const wstring& _wstrModelTag)
 
 void CBasicMap::SetUpShaderInfo(const wstring& _wstrModelTag)
 {
-    m_vecPassIndices.resize(m_pModelCom->Get_NumMeshes());
-    m_vecSamplingFactors.resize(m_pModelCom->Get_NumMeshes());
+    _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
+    m_vecPassIndices.resize(iNumMeshes);
+    m_vecSamplingFactors.resize(iNumMeshes);
     fill(m_vecSamplingFactors.begin(), m_vecSamplingFactors.end(), 1.f);
 
     if (true == m_bBlendMap) {
@@ -285,18 +287,17 @@ void CBasicMap::SetUpShaderInfo(const wstring& _wstrModelTag)
 
     _uint iPassIndex{};
     _float fSamplingFactor{};
-    _int iCount{};
-    while (!fileStream.eof()) 
+    for (_uint i = 0; i < iNumMeshes; i++)
     {
         fileStream.read(reinterpret_cast<char*>(&iPassIndex), sizeof(iPassIndex));
         fileStream.read(reinterpret_cast<char*>(&fSamplingFactor), sizeof(fSamplingFactor));
-
-        if (fileStream.eof())
-            break;
-        
-        m_vecPassIndices[iCount] = iPassIndex;
-        m_vecSamplingFactors[iCount] = fSamplingFactor;
-        iCount++;
+        if (fileStream.eof()) {
+            fileStream.close();
+            return;
+        }
+            
+        m_vecPassIndices[i] = iPassIndex;
+        m_vecSamplingFactors[i] = fSamplingFactor;
     }
 
     fileStream.close();
@@ -304,7 +305,7 @@ void CBasicMap::SetUpShaderInfo(const wstring& _wstrModelTag)
 
 _bool CBasicMap::CheckIfBlendMapExists(const wstring& _wstrModelTag)
 {
-    string strPath = "../../../model_txt/NonAnim/";
+    string strPath = "../../../model_txt/MapObjs/NonAnim/";
     string strBlendMapName = CUtils::WstrToStr(_wstrModelTag) + "_Blend";
 
     directory_iterator end_iter;  // 디렉토리 순회의 끝을 나타내는 iterator
@@ -333,6 +334,8 @@ void CBasicMap::InsertMapDecos()
         strLevel = "Intro";
     else if (LEVEL_GAMEPLAY == *m_pCurrentLevelID)
         strLevel = "Stage1";
+    else if (LEVEL_RACING == *m_pCurrentLevelID)
+        strLevel = "Racing";
     else
         return;
 
@@ -477,8 +480,10 @@ void CBasicMap::ReadDecos_ForSmallLevels()
     Release_MapDecos();
 
     string strLevel;
-    if (LEVEL_TOWN == *m_pCurrentLevelID)
+    if (LEVEL_TOWN == *m_pCurrentLevelID || LEVEL_PARTTIME == *m_pCurrentLevelID)
         strLevel = "Town";
+    //else if (LEVEL_PARTTIME == *m_pCurrentLevelID)
+    //    strLevel = "PartTime";
     else if (LEVEL_FINALBOSS == *m_pCurrentLevelID)
         strLevel = "FinalBoss";
     else
@@ -518,10 +523,12 @@ void CBasicMap::ReadDecos_ForSmallLevels()
 
         TYPE eType = TYPE_NONANIM;
         string strFolder;
-        if (LEVEL_TOWN == *m_pCurrentLevelID)
+        if (LEVEL_TOWN == *m_pCurrentLevelID || LEVEL_PARTTIME == *m_pCurrentLevelID)
             strFolder = string("TownDeco/");
         else if (LEVEL_FINALBOSS == *m_pCurrentLevelID)
             strFolder = string("LabDiscovera_Deco/");
+
+
 
         if (CMapToolObject::MAPOBJ_ANIM == iMapObjType)
         {
@@ -569,6 +576,7 @@ void CBasicMap::ReadDecos_ForSmallLevels()
             pModel->CreateStaticActor(matWorld);
             m_vecNonAnimDecos.push_back(pModel);
         }
+
     }
 
     fileInput.close();

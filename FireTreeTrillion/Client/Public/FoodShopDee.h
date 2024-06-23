@@ -37,8 +37,7 @@ public:
 	void			Change_State(DEE_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
 
 private:
-	CTexture* m_pEyeTextureCom = { nullptr };
-
+	DEE_ANIM		m_eMyState = { DEEANIM_END };
 
 
 	HRESULT Add_Components();
@@ -46,7 +45,7 @@ private:
 	HRESULT Bind_ShaderResources();
 
 	void	SetUp_FSM();
-
+	_bool	Custom_Face(_uint iMeshIndex);
 
 public:
 	static CFoodShopDee* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

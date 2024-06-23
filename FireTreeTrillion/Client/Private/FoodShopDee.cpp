@@ -72,6 +72,8 @@ HRESULT CFoodShopDee::Render()
 
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
+		if (i == 2)
+			continue;
 		//if (Custom_Face(i) == true)
 		//	continue;
 
@@ -101,6 +103,8 @@ HRESULT CFoodShopDee::Render_LightDepth()
 void CFoodShopDee::Render_IMGUI()
 {
 	__super::Render_IMGUI();
+
+	ImGui::Text(u8"ÇöÀç ¾Ö´Ô ÀÎµ¦½º : %d", m_pFSM->Get_State());
 }
 
 void CFoodShopDee::Add_AnimEvent()
@@ -182,25 +186,25 @@ HRESULT CFoodShopDee::Bind_ShaderResources()
 	HRESULT hr;
 
 	hr = m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix");
-	CHECK_FAILED_MSG(hr, "¹ÙÀÎµù ¸ÁÇÔ");
+	CHECK_FAILED(hr);
 	hr = m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW));
-	CHECK_FAILED_MSG(hr, "¹ÙÀÎµù ¸ÁÇÔ");
+	CHECK_FAILED(hr);
 	hr = m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ));
-	CHECK_FAILED_MSG(hr, "¹ÙÀÎµù ¸ÁÇÔ");
+	CHECK_FAILED(hr);
 
 
 	hr = m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
-	CHECK_FAILED_MSG(hr, "¹ÙÀÎµù ¸ÁÇÔ");
+	CHECK_FAILED(hr);
 	hr = m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
-	CHECK_FAILED_MSG(hr, "¹ÙÀÎµù ¸ÁÇÔ");
+	CHECK_FAILED(hr);
 	hr = m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float));
-	CHECK_FAILED_MSG(hr, "¹ÙÀÎµù ¸ÁÇÔ");
+	CHECK_FAILED(hr);
 	hr = m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
-	CHECK_FAILED_MSG(hr, "¹ÙÀÎµù ¸ÁÇÔ");
+	CHECK_FAILED(hr);
 	hr = m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4));
-	CHECK_FAILED_MSG(hr, "¹ÙÀÎµù ¸ÁÇÔ");
+	CHECK_FAILED(hr);
 	hr = m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
-	CHECK_FAILED_MSG(hr, "¹ÙÀÎµù ¸ÁÇÔ");
+	CHECK_FAILED(hr);
 
 
 	return S_OK;
@@ -210,14 +214,58 @@ void CFoodShopDee::SetUp_FSM()
 {
 	m_pFSM = CFSM::Create();
 
+	m_pFSM->Add_State(DEEANIM_WAIT, CDee_Idle_State::Create());
+
+	m_pFSM->Add_State(DEEANIM_CLERKWAVEHAND, CDee_Emotion_State::Create());
+	m_pFSM->Add_State(DEEANIM_CLERKTALK, CDee_Emotion_State::Create());
+
+	m_pFSM->Add_State(DEEANIM_TALK1, CDee_Emotion_State::Create());
+	m_pFSM->Add_State(DEEANIM_TALK2, CDee_Emotion_State::Create());
+	m_pFSM->Add_State(DEEANIM_TALK3A, CDee_Emotion_State::Create());
+	m_pFSM->Add_State(DEEANIM_TALK3B, CDee_Emotion_State::Create());
+
 	m_pFSM->Add_State(DEEANIM_ANGER, CDee_Emotion_State::Create());
 
-	CFSM::FSM_INFO		FSM_Info_Desc = {};
-	//FSM_Info_Desc.iState = STATE_IDLE;
-	FSM_Info_Desc.pModel = &m_pModelCom;
-	//m_pFSM->Initialize();
-	//m_pFSM->Add_State(DEEANIM_ANGER, CDee_Emotion_State::Create());
 
+
+	CFSM::FSM_INFO	FSMDesc = {};
+	FSMDesc.iState = DEEANIM_WAIT;
+	FSMDesc.pModel = &m_pModelCom;
+
+	m_pFSM->Initialize(&FSMDesc);
+
+}
+
+_bool CFoodShopDee::Custom_Face(_uint iMeshIndex)
+{
+	if (iMeshIndex == 2)
+	{
+		HRESULT hr;
+
+		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", iMeshIndex, TextureType_DIFFUSE);
+		CHECK_FAILED(hr);
+
+		hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", iMeshIndex);
+		CHECK_FAILED(hr);
+
+		//hr = m_pEyeTextureCom->Bind_ShaderResource(m_pShaderCom, "g_KirbyEyeTexture", (_uint)m_eEyeState);
+		//CHECK_FAILED(hr);
+
+		_bool bStencil = true;
+		_bool bRimLight = true;
+		_bool bMotionBlur = true;
+		m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
+
+		m_pShaderCom->Begin(ANIMMODEL_EYE);
+		m_pModelCom->Render(iMeshIndex);
+
+		return true;
+	}
+
+
+	return _bool();
 }
 
 CFoodShopDee* CFoodShopDee::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

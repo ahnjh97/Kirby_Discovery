@@ -17,7 +17,8 @@ namespace Client
                  LEVEL_INTRO,
                  LEVEL_RACING,
                  LEVEL_TOWN,
-                 LEVEL_FINALBOSS, // 리소스명 LEVEL_LAB (Lab_Discovera)
+                 LEVEL_PARTTIME,
+                 LEVEL_FINALBOSS, // 리소스명 LEVEL_LAB
 
                  LEVEL_END };
 
@@ -92,6 +93,7 @@ enum COLLISION_TYPE
     OBJECT, // 돌멩이 등 사물이다.
     ITEM, // 일반 먹는 아이템이다.
     ABILITYITEM, // 흡수해야 먹을 수 있는 능력 아이템이다.
+    DEFORMOBJECT, // 머금기 오브젝트들
     NPC,
     HITBOX_PLYAER,
     HITBOX_MONSTER,

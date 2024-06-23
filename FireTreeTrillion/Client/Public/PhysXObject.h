@@ -54,8 +54,6 @@ public:
 	PHYXOBJECT_CURSTATE Get_PhyXState() { return m_ePhyXState; }
 	_float	Get_ObjTimeDelta() const { return m_fTimeDelta; }
 
-
-
 	//이펙트를 자신의 리스트에 추가한다.
 	void	Add_Effect(CEffect* pEffect);
 	void	Delete_AllEffect();

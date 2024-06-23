@@ -1,7 +1,8 @@
 #include "stdafx.h"
 #include "PartTimerKirby.h"
-
 #include "FSM.h"
+#include "Camera.h"
+
 #include "PartTimerKirby_State.h"
 #include "HitBox.h"
 
@@ -37,12 +38,19 @@ HRESULT CPartTimerKirby::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
+	// FSM에서 첫 애니메이션 돌아가게 하는 구조
+	m_pModelCom->Set_Animation(FOODSHOP_SELECT, 50.f, true, true);
+
 	if(*m_pCurrentLevelID == LEVEL_TOWN)
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(2.f, 24.f, 3.f, 1.f));
-	m_pModelCom->Set_Animation(FOODSHOP_CORRECT, 50.f, true, true);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(2.f, 15.f, 3.f, 1.f));
+
 	m_fScore = 10.f;
 
 	Set_Slope(false);
+
+	// 타겟 카메라를 만들어준다.
+	if (FAILED(Make_TargetToCams()))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -87,10 +95,6 @@ HRESULT CPartTimerKirby::Render()
 	{
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
 			return E_FAIL;
-		//if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
-		//	return E_FAIL;
-		//if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
-		//	return E_FAIL;
 
 		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
@@ -160,7 +164,7 @@ void CPartTimerKirby::Collision_Hitbox(CPhysXObject* pGameObject)
 {
 }
 
-void CPartTimerKirby::Change_State(PARTTIMER_KIRBY_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CPartTimerKirby::Change_State(ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
 {
 	m_pFSM->ChangeState((_uint)eState, _fAnimSpeed, _bLoop, _bInterpolation);
 }
@@ -168,6 +172,45 @@ void CPartTimerKirby::Change_State(PARTTIMER_KIRBY_ANIM eState, _float _fAnimSpe
 _bool CPartTimerKirby::IsAnimFinished()
 {
 	return m_pModelCom->IsFinished();
+}
+
+_float4 CPartTimerKirby::Compute_TerrainPosition()
+{
+	if (m_pControllerCom == nullptr)
+		return _float4();
+
+	return m_pControllerCom->Compute_TerrainPosition_Vector();
+}
+
+HRESULT CPartTimerKirby::Make_TargetToCams()
+{
+	// 첫 카메라 기준으로 움직이기에 미리 받아둔다.
+	if (m_pCamera == nullptr)
+	{
+		//인트로, 게임플레이 스테이지라면 카메라로 main camera를 저장한다.
+		(LEVEL_INTRO <= *m_pCurrentLevelID && *m_pCurrentLevelID < LEVEL_END) ?
+			m_pCamera = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main"))) :
+			m_pCamera = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Free"))); //나머지 레벨이라면 다른 카메라를 저장한다.
+
+		if (m_pCamera == nullptr)
+		{
+			ALARM_FAIL(TEXT("망했어 카메라 없다"));
+			return E_FAIL;
+		}
+		Safe_AddRef(m_pCamera);
+	}
+
+	m_pCamera->Set_Target(m_pTransformCom);
+
+	//게임 레벨에 free camera 있다면 그놈에게도 타겟 등록해 준다.
+	if (LEVEL_INTRO <= *m_pCurrentLevelID && *m_pCurrentLevelID < LEVEL_END)
+	{
+		CCamera* pCameraFree = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Free")));
+		if (pCameraFree != nullptr)
+			pCameraFree->Set_Target(m_pTransformCom);
+	}
+
+	return S_OK;
 }
 
 HRESULT CPartTimerKirby::Add_Components()
@@ -192,18 +235,19 @@ HRESULT CPartTimerKirby::Add_Components()
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
-	desc.fOffset = 1.f;
-	desc.strProtoObjName = CUtils::WstrToStr(m_wstrPrototypeTag);
+	desc.fOffset = 0.5f;
+	desc.tCapsuleShape.fHeight = 0.4f;// 1.f;
+	desc.tCapsuleShape.fRadius = 0.4f;// 0.5f;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	CHECK_FAILED(hr);
-	//m_pControllerCom->Set_Object(this);
 
 
+	/* For.HitBox */
 	CHitBox::HITBOX_DESC HitBox{};
 	HitBox.pOwner = this;
 	HitBox.pDesc = &m_tColliderDesc[BODY];
-	HitBox.pCollisionType = MONSTER;
+	HitBox.pCollisionType = PLAYER;
 	hr = m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox);
 	CHECK_FAILED(hr);
 	Set_BodyCollider(COLLIDER_CYLINDER, 0.5f, 1.f, 0.85f);
@@ -248,13 +292,14 @@ void CPartTimerKirby::SetUp_FSM()
 {
 	// FSM 상태 초기화
 	m_pFSM = CFSM::Create();
-	//m_pFSM->Add_State(KABU_WAIT, CKabu_Idle_State::Create());
-	//m_pFSM->Add_State(KABU_DAMAGE, CKabu_Damage_State::Create());
-	//m_pFSM->Add_State(KABU_WARP1, CKabu_Warp_State::Create());
-
+	m_pFSM->Add_State(FOODSHOP_SELECT,	CPartTimerKirby_Idle_State::Create());
+	m_pFSM->Add_State(FOODSHOP_MOVEL,	CPartTimerKirby_Move_State::Create());
+	m_pFSM->Add_State(FOODSHOP_MOVER,	CPartTimerKirby_Move_State::Create());
+	m_pFSM->Add_State(FOODSHOP_CORRECT, CPartTimerKirby_Grab_State::Create());
+	
 	//상태 Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};
-	FSM_Desc.iState = 0;
+	FSM_Desc.iState = FOODSHOP_SELECT;
 	FSM_Desc.pModel = &m_pModelCom;
 	m_pFSM->Initialize(&FSM_Desc);
 }
@@ -290,4 +335,12 @@ void CPartTimerKirby::Free()
 {
 	__super::Free();
 
+	Safe_Release(m_pModelCom);
+
+	for (auto& pEyeTexture : m_pEyeTexture)
+		Safe_Release(pEyeTexture);
+	for (auto& pMouthTexture : m_pMouthTexture)
+		Safe_Release(pMouthTexture);
+
+	Safe_Release(m_pCamera);
 }
