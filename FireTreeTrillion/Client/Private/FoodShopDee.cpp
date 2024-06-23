@@ -1,8 +1,9 @@
 #include "stdafx.h"
-#include "FoodShopDee.h"
-#include "FSM.h"
-#include "Dee_State.h"
 #include "HitBox.h"
+#include "FSM.h"
+#include "FoodShopDee.h"
+#include "Dee_Part.h"
+#include "Dee_State.h"
 
 CFoodShopDee::CFoodShopDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CWaddleDee{ pDevice, pContext }
@@ -27,9 +28,9 @@ HRESULT CFoodShopDee::Initialize(void* pArg)
 		pDeeDesc = *(DEE_DESC*)pArg;
 
 	pDeeDesc.fSpeedPerSec = 5.f;
-	pDeeDesc.fRotationPerSec = XMConvertToRadians(90.0f); 
+	pDeeDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
-		HRESULT hr;
+	HRESULT hr;
 
 	hr = __super::Initialize(pArg);
 	CHECK_FAILED(hr);
@@ -37,8 +38,12 @@ HRESULT CFoodShopDee::Initialize(void* pArg)
 	hr = Add_Components();
 	CHECK_FAILED(hr);
 
+
+	hr = Add_PartObjects();
+	CHECK_FAILED(hr);
+
 	m_pTransformCom->Rotation(_float3{ 0.f, 1.f, 0.f }, ToRadian(180.f));
-	m_pModelCom->Set_Animation(0, 50.f, true, true);
+	m_pModelCom->Set_Animation(DEEANIM_WAIT, 60.f, true, true);
 
 	return S_OK;
 }
@@ -49,7 +54,14 @@ _int CFoodShopDee::Tick(_float fTimeDelta)
 		return Ready_Dead();
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+
 	__super::Tick(m_fTimeDelta);
+
+	for (auto& Pair : m_PartObjects)
+		Pair.second->Tick(m_fTimeDelta);
+
+	//공통된 디 관련 변수를 업데이트 - 초기화한다
+	Dee_SystemTick(m_fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
@@ -59,8 +71,17 @@ void CFoodShopDee::Late_Tick(_float fTimeDelta)
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 	m_pModelCom->Play_Animation(m_fTimeDelta);
 
+	for (auto& Pair : m_PartObjects)
+		Pair.second->Late_Tick(m_fTimeDelta);
+
+
+	//시야 벗어나면 컬링
+	if (!m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State(CTransform::STATE_POSITION), 2.0f))
+		return;
+
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
+
 }
 
 HRESULT CFoodShopDee::Render()
@@ -72,18 +93,21 @@ HRESULT CFoodShopDee::Render()
 
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
-		if (i == 2)
+
+		if (Custom_Face(i) == true)
 			continue;
-		//if (Custom_Face(i) == true)
-		//	continue;
 
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
 
 
-		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_X)))
+		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
 			return E_FAIL;
 
 		m_pModelCom->Render(i);
@@ -115,14 +139,13 @@ void CFoodShopDee::Add_AnimEvent()
 
 void CFoodShopDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
-	if(m_pGameInstance->Get_KeyState(DIK_LCONTROL, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_1, KEY_DOWN))
-	m_pModelCom->Set_Animation(27, 50.f, true, true);
+	m_bIsKirbyInZone = true;
+	m_fResetHiTime = 5.f;
+
+	//if(m_pGameInstance->Get_KeyState(DIK_LCONTROL, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_1, KEY_DOWN))
+	//m_pModelCom->Set_Animation(27, 50.f, true, true);
 }
 
-void CFoodShopDee::Change_State(DEE_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
-{
-	m_pFSM->ChangeState((_uint)eState, _fAnimSpeed, _bLoop, _bInterpolation);
-}
 
 HRESULT CFoodShopDee::Add_Components()
 {
@@ -175,6 +198,24 @@ HRESULT CFoodShopDee::Add_Components()
 
 HRESULT CFoodShopDee::Add_PartObjects()
 {
+	if (*m_pCurrentLevelID != LEVEL_TOWN)
+		return S_OK;
+
+	CPartObject* pPartObj = { nullptr };
+	CDee_Part::DEEPART_DESC	PartDesc{};
+
+	CModel* pModel = (CModel*)Get_Component(TEXT("Com_Model"));
+
+	PartDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	PartDesc.pSocket = pModel->Get_BonePtr("HatL");
+	PartDesc.wstrModelName = TEXT("DeePart_FoodShop");
+
+	pPartObj = static_cast<CPartObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_DeePart"), &PartDesc));
+	if (nullptr == pPartObj)
+		return E_FAIL;
+
+	m_PartObjects.emplace(TEXT("Part_Weapon"), pPartObj);
+
 	return S_OK;
 }
 
@@ -248,8 +289,8 @@ _bool CFoodShopDee::Custom_Face(_uint iMeshIndex)
 		hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", iMeshIndex);
 		CHECK_FAILED(hr);
 
-		//hr = m_pEyeTextureCom->Bind_ShaderResource(m_pShaderCom, "g_KirbyEyeTexture", (_uint)m_eEyeState);
-		//CHECK_FAILED(hr);
+		hr = m_pEyeTextureCom->Bind_ShaderResource(m_pShaderCom, "g_KirbyEyeTexture", (_uint)m_eEyeState);
+		CHECK_FAILED(hr);
 
 		_bool bStencil = true;
 		_bool bRimLight = true;
@@ -264,8 +305,7 @@ _bool CFoodShopDee::Custom_Face(_uint iMeshIndex)
 		return true;
 	}
 
-
-	return _bool();
+	return false;
 }
 
 CFoodShopDee* CFoodShopDee::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -298,5 +338,11 @@ CGameObject* CFoodShopDee::Clone(void* pArg)
 void CFoodShopDee::Free()
 {
 	Safe_Release(m_pEyeTextureCom);
+
+	for (auto& Pair : m_PartObjects)
+		Safe_Release(Pair.second);
+
+	m_PartObjects.clear();
+
 	__super::Free();
 }

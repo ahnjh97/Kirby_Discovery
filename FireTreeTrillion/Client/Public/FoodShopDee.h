@@ -34,11 +34,10 @@ public:
 #ifdef _DEBUG
 	virtual void	Render_IMGUI() override;
 #endif
-	void			Change_State(DEE_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
+
 
 private:
 	DEE_ANIM		m_eMyState = { DEEANIM_END };
-
 
 	HRESULT Add_Components();
 	HRESULT Add_PartObjects();

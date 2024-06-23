@@ -14,7 +14,6 @@ CKickableRock::CKickableRock(const CKickableRock& rhs)
 
 HRESULT CKickableRock::Initialize_Prototype()
 {
-
 	return S_OK;
 }
 
@@ -33,6 +32,8 @@ HRESULT CKickableRock::Initialize(void* pArg)
 
 	m_eAbilityType = ABILITY_DEFAULT;
 	m_bMotionBlur = true;
+	m_bRimLight = true;
+	m_bStencil = true;
 
 	return S_OK;
 }
@@ -106,7 +107,12 @@ void CKickableRock::Late_Tick(_float fTimeDelta)
 		}
 	}
 
-	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
+	{
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
+	}
+
 }
 
 HRESULT CKickableRock::Render()
@@ -122,6 +128,8 @@ HRESULT CKickableRock::Render()
 		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE);
 		CHECK_FAILED(hr);
 		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS);
+		CHECK_FAILED(hr);
+		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS);
 		CHECK_FAILED(hr);
 		hr = m_pShaderCom->Begin(MODEL_NORMAL_O);
 		CHECK_FAILED(hr);
@@ -215,7 +223,6 @@ HRESULT CKickableRock::Add_Components(const wstring& wstrModelName)
 	hr = __super::Add_Component(TEXT("Prototype_Component_RigidBody"),
 		TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &rigidDesc);
 	CHECK_FAILED(hr);
-	//m_pRigidBodyCom->Set_Object(this);
 	m_pRigidBodyCom->Activate(false);
 
 

@@ -402,6 +402,7 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 			CPhysXObject* pDeform = static_cast<CPhysXObject*>(Src);
 
 			pKirby->Collision(CONTENT_DEFORM, pDeform);
+			pKirby->Get_KirbyInfo()->m_bBlockOtherVacuum = true;
 		});
 
 	Collision_Collider(m_GameObjects[HITBOX_PLYAER], m_GameObjects[ANIMDECO], this,

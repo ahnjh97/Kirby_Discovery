@@ -623,6 +623,9 @@ static _bool Vacuum_Object(CKirby* pKirby, _float fTimeDelta)
 	if (DESC(m_pObject) != nullptr)
 		return false;
 
+	//if (DESC(m_bBlockOtherVacuum) == true)
+	//	return false;
+
 	// 0Â÷ ¸ñÇ¥ÀÎ ¹ö¼¸ÀÇ °«À» Å½»öÇÑ´Ù.
 	if (nullptr != GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_CappyHat")))
 	{

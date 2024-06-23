@@ -15,6 +15,7 @@
 
 #include "KirbyWeapons.h"
 #include "KirbyArmours.h"
+#include "MultiEffect.h"
 
 #include "Utils.h"
 #include "Bone.h"
@@ -476,10 +477,26 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 		else if (pObject->Get_PhyXState() == PO_NORMAL)
 		{
 			// CollisionCenter 에서 흡수 가능을 판정을 내렸었다면, X키를 누르면 어떤 상태든 상관없이 흡수 할 수 있다.
+			if ((Get_State() == STATE_IDLE || 
+				Get_State() == STATE_RUN || 
+				Get_State() == SWORDSTATE_RUN || 
+				Get_State() == SWORDSTATE_WAIT) 
+				== false
+				)
+				return;
+
 			if (INFO(m_bisDeforming) == false && m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
 			{
 				if (INFO(m_pObject) != nullptr)
 					return;
+
+				CMultiEffect::MULTI_FX_DESC FXDesc{};
+				FXDesc.vInitPos = { 0.f, .6f, .4f };
+				FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Vacuum_v1"), &FXDesc)))
+					return;
+				Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+
 
 				_float4 vDeformPos = pObject->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
 				_float4 vMyPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
@@ -727,6 +744,20 @@ void CKirby::Key_Input(_float fTimeDelta)
 	if (m_pGameInstance->Get_DIKeyState(DIK_B, KEY_DOWN))
 	{
 		Change_State(CARVACUUMSTATE_DEFORM, 60.f, false, false, BODY_CARVACUUM, OFFSET_CARVACUUM);
+	}
+	if (m_pGameInstance->Get_DIKeyState(DIK_N, KEY_DOWN))
+	{
+		CGameObject::GAMEOBJECT_DESC ObjDesc{};
+
+		ObjDesc.fSpeedPerSec = 5.f;
+		ObjDesc.fRotationPerSec = ToRadian(90.f);
+		_float4x4 InitMat = _float4x4::Identity;
+		InitMat.Translation({ -50.f, 5.f, -6.5f });
+		ObjDesc.matWorld = InitMat;
+		ObjDesc.wstrModelName = TEXT("RockA");
+		// Car Test
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Rock"), TEXT("Prototype_GameObject_BreakableRock"), &ObjDesc)))
+			return;
 	}
 
 
@@ -1424,6 +1455,9 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 
 	// 사다리 상태 초기화
 	INFO(m_bCanLadder) = false;
+
+	// 블락 상태 초기화
+	INFO(m_bBlockOtherVacuum) = false;
 
 	// 커비가 공격중일땐, 꽤나 오랜 시간동안 무적을 부여받는다.
 	if (m_isKirbyAttacking == true)

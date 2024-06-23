@@ -107,8 +107,8 @@ _vector CUtils::Make_RandomAngle_Vector(_float fDirAngle, _fvector vDir)
 	_float4x4 rotationMatrix;
 
 	XMStoreFloat4x4(&rotationMatrix, XMMatrixIdentity());
-	Turn_OtherMatrix(rotationMatrix, XMVectorSet(0.f, 0.f, 1.f, 0.f), 1.f, Make_RandomFloat(-fDirAngle, fDirAngle));
-	Turn_OtherMatrix(rotationMatrix, Get_State_Vector_Matrix(rotationMatrix, STATE_RIGHT), 1.f, Make_RandomFloat(-fDirAngle, fDirAngle));
+	Turn_OtherMatrix(rotationMatrix, XMVectorSet(0.f, 1.f, 0.f, 0.f), 1.f, Make_RandomFloat(-fDirAngle, fDirAngle));
+	Turn_OtherMatrix(rotationMatrix, XMVectorSet(1.f, 0.f, 0.f, 0.f), 1.f, Make_RandomFloat(-fDirAngle, fDirAngle));
 
 	return XMVector3Transform(vDir, XMLoadFloat4x4(&rotationMatrix));
 }
@@ -120,8 +120,8 @@ _vector CUtils::Make_RandomAngle_Vector(_float fDirAngle, _fvector vDir, _float 
 	_float4x4 rotationMatrix;
 
 	XMStoreFloat4x4(&rotationMatrix, XMMatrixIdentity());
-	Turn_OtherMatrix(rotationMatrix, XMVectorSet(0.f, 0.f, 1.f, 0.f), 1.f, Make_RandomFloat(-fDirAngle, fDirAngle));
-	Turn_OtherMatrix(rotationMatrix, Get_State_Vector_Matrix(rotationMatrix, STATE_RIGHT), 1.f, Make_RandomFloat(-fDirAngle, fDirAngle));
+	Turn_OtherMatrix(rotationMatrix, XMVectorSet(0.f, 1.f, 0.f, 0.f), 1.f, Make_RandomFloat(-fDirAngle, fDirAngle));
+	Turn_OtherMatrix(rotationMatrix, XMVectorSet(1.f, 0.f, 0.f, 0.f), 1.f, Make_RandomFloat(-fDirAngle, fDirAngle));
 
 	return XMVector3Transform(vNormalDir, XMLoadFloat4x4(&rotationMatrix)) * Make_RandomFloat(fminlength, fmaxlength);
 }
@@ -211,6 +211,27 @@ void CUtils::Turn_OtherMatrix(_Inout_ _float4x4& matrix, _fvector vAxis, _float 
 			XMVector4Transform(Get_State_Vector_Matrix(matrix, (STATE)i), RotationMatrix));
 	}
 }
+
+void CUtils::Rotation(_Inout_ _float4x4& matrix, _fvector vAxis, _float fRadian)
+{
+	_float3		vScaled = Get_Scaled_Matrix(matrix);
+
+	_vector		vState[] = {
+		XMVectorSet(1.f, 0.f, 0.f, 0.f) * vScaled.x,
+		XMVectorSet(0.f, 1.f, 0.f, 0.f) * vScaled.y,
+		XMVectorSet(0.f, 0.f, 1.f, 0.f) * vScaled.z,
+	};
+
+	// XMConvertToRadians(Degree);
+	_matrix			RotationMatrix = XMMatrixRotationAxis(vAxis, fRadian);
+
+	for (size_t i = 0; i < STATE_POSITION; i++)
+	{
+		Set_State_Matrix(matrix, STATE(i),
+			XMVector4Transform(vState[(STATE)i], RotationMatrix));
+	}
+}
+
 
 void CUtils::Make_World_ToScreen(_Inout_ _float3& vPos)
 {

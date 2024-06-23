@@ -487,10 +487,10 @@ void CBasicMap::ReadDecos_ForSmallLevels()
     Release_MapDecos();
 
     string strLevel;
-    if (LEVEL_TOWN == *m_pCurrentLevelID || LEVEL_PARTTIME == *m_pCurrentLevelID)
+    if (LEVEL_TOWN == *m_pCurrentLevelID)
         strLevel = "Town";
-    //else if (LEVEL_PARTTIME == *m_pCurrentLevelID)
-    //    strLevel = "PartTime";
+    else if (LEVEL_PARTTIME == *m_pCurrentLevelID)
+        strLevel = "PartTime";
     else if (LEVEL_FINALBOSS == *m_pCurrentLevelID)
         strLevel = "FinalBoss";
     else

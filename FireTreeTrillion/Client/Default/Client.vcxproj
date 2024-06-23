@@ -188,6 +188,7 @@
     <ClInclude Include="..\Public\BombOrbit.h" />
     <ClInclude Include="..\Public\BombOrbitGlow.h" />
     <ClInclude Include="..\Public\BreakableRock.h" />
+    <ClInclude Include="..\Public\BreakableRockPartical.h" />
     <ClInclude Include="..\Public\BrontoBurt.h" />
     <ClInclude Include="..\Public\BrontoBurt_State.h" />
     <ClInclude Include="..\Public\Buffahorn.h" />
@@ -203,6 +204,7 @@
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\Coin.h" />
     <ClInclude Include="..\Public\CollisionCenter.h" />
+    <ClInclude Include="..\public\Dee_Part.h" />
     <ClInclude Include="..\public\Dee_State.h" />
     <ClInclude Include="..\Public\EnergyDrink.h" />
     <ClInclude Include="..\public\FoodShopDee.h" />
@@ -220,6 +222,7 @@
     <ClInclude Include="..\Public\HUD_AbilityDiscard.h" />
     <ClInclude Include="..\Public\HUD_KirbyStatus.h" />
     <ClInclude Include="..\Public\HUD_StarPoint.h" />
+    <ClInclude Include="..\public\HungryDee.h" />
     <ClInclude Include="..\Public\ImSequencer.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
@@ -273,6 +276,8 @@
     <ClInclude Include="..\Public\NonAnimDeco.h" />
     <ClInclude Include="..\Public\OrbitingCamera.h" />
     <ClInclude Include="..\Public\Particle.h" />
+    <ClInclude Include="..\Public\PartTimeFood.h" />
+    <ClInclude Include="..\Public\PartTimeHelper.h" />
     <ClInclude Include="..\Public\PartTimerKirby.h" />
     <ClInclude Include="..\Public\PartTimerKirby_State.h" />
     <ClInclude Include="..\Public\PhysXObject.h" />
@@ -323,6 +328,7 @@
     <ClCompile Include="..\Private\BombOrbit.cpp" />
     <ClCompile Include="..\Private\BombOrbitGlow.cpp" />
     <ClCompile Include="..\Private\BreakableRock.cpp" />
+    <ClCompile Include="..\Private\BreakableRockPartical.cpp" />
     <ClCompile Include="..\Private\BrontoBurt.cpp" />
     <ClCompile Include="..\Private\BrontoBurt_State.cpp" />
     <ClCompile Include="..\Private\Buffahorn.cpp" />
@@ -337,6 +343,7 @@
     <ClCompile Include="..\Private\Character.cpp" />
     <ClCompile Include="..\Private\Coin.cpp" />
     <ClCompile Include="..\Private\CollisionCenter.cpp" />
+    <ClCompile Include="..\private\Dee_Part.cpp" />
     <ClCompile Include="..\private\Dee_State.cpp" />
     <ClCompile Include="..\Private\EnergyDrink.cpp" />
     <ClCompile Include="..\private\FoodShopDee.cpp" />
@@ -354,6 +361,7 @@
     <ClCompile Include="..\Private\HUD_AbilityDiscard.cpp" />
     <ClCompile Include="..\Private\HUD_KirbyStatus.cpp" />
     <ClCompile Include="..\Private\HUD_StarPoint.cpp" />
+    <ClCompile Include="..\private\HungryDee.cpp" />
     <ClCompile Include="..\Private\ImSequencer.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -404,6 +412,8 @@
     <ClCompile Include="..\Private\NonAnimDeco.cpp" />
     <ClCompile Include="..\Private\OrbitingCamera.cpp" />
     <ClCompile Include="..\Private\Particle.cpp" />
+    <ClCompile Include="..\Private\PartTimeFood.cpp" />
+    <ClCompile Include="..\Private\PartTimeHelper.cpp" />
     <ClCompile Include="..\Private\PartTimerKirby.cpp" />
     <ClCompile Include="..\Private\PartTimerKirby_State.cpp" />
     <ClCompile Include="..\Private\PhysXObject.cpp" />
