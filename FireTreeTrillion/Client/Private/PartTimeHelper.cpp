@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "PartTimeHelper.h"
-
-//#include "Kirby.h"
+#include "PartTimerKirby.h"
 
 IMPLEMENT_SINGLETON(CPartTimeHelper)
 
@@ -9,20 +8,26 @@ CPartTimeHelper::CPartTimeHelper()
 {
 }
 
-PARTTIME_ITEM CPartTimeHelper::Make_RandomItem()
+// 메뉴판 앞으로 온 와들디 OR UI 쪽에서 생성
+void CPartTimeHelper::Make_RandomItem()
 {
-	return DRINK;
+	m_eFood = DRINK;
 }
 
-//셀렉한 친구가 와들디가 달라고하는 친구가 맞는 지 확인한다.
-_bool CPartTimeHelper::Check_Item()
+// 셀렉한 친구가 와들디가 달라고하는 친구가 맞는 지 확인한다.
+// 매개변수는 커비가 주겠다고 선택한 아이템
+_bool CPartTimeHelper::Check_Item(PARTTIME_ITEM eITEM)
 {
-	return _bool();
-}
+	//if(m_eFoode == eITEM) 
+	{
+		return true;
+	}
+	m_eFood = DRINK;
 
-// 커비가 맞췄는지 틀렸는지에 대한 결과값을 와들디에게 송출한다.
-void CPartTimeHelper::Notify_Result()
-{
+	// 혹시모를 초기화
+	m_eFood = ITEM_END;
+	
+	return true;
 }
 
 void CPartTimeHelper::Free()
