@@ -63,15 +63,15 @@ HRESULT CPartTimeFood::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	_uint iNumMeshes = m_arrModelCom[m_eItem]->Get_NumMeshes();
+	_uint iNumMeshes = m_arrModelCom[(_int)m_eItem]->Get_NumMeshes();
 
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
-		if (FAILED(m_arrModelCom[m_eItem]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
+		if (FAILED(m_arrModelCom[(_int)m_eItem]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
 			return E_FAIL;
-		if (FAILED(m_arrModelCom[m_eItem]->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
+		if (FAILED(m_arrModelCom[(_int)m_eItem]->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
 			return E_FAIL;
-		if (FAILED(m_arrModelCom[m_eItem]->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
+		if (FAILED(m_arrModelCom[(_int)m_eItem]->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
 			return E_FAIL;
 
 		m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
@@ -83,7 +83,7 @@ HRESULT CPartTimeFood::Render()
 		if (FAILED(m_pShaderCom->Begin(MODEL_NORMAL_O)))
 			return E_FAIL;
 
-		m_arrModelCom[m_eItem]->Render(i);
+		m_arrModelCom[(_int)m_eItem]->Render(i);
 	}
 
 	return S_OK;
@@ -91,7 +91,7 @@ HRESULT CPartTimeFood::Render()
 
 HRESULT CPartTimeFood::Render_LightDepth()
 {
-	if (FAILED(m_pGameInstance->Render_LightDepth_For_GameObject(m_pShaderCom, m_pTransformCom, m_arrModelCom[m_eItem])))
+	if (FAILED(m_pGameInstance->Render_LightDepth_For_GameObject(m_pShaderCom, m_pTransformCom, m_arrModelCom[(_int)m_eItem])))
 		return E_FAIL;
 
 	return S_OK;
@@ -134,7 +134,7 @@ HRESULT CPartTimeFood::Add_Components()
 	//CHECK_FAILED(hr);
 
 	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Item_EnergyDrink"),
-		TEXT("Com_Model_Drink"), (CComponent**)&m_arrModelCom[DRINK]);
+		TEXT("Com_Model_Drink"), (CComponent**)&m_arrModelCom[(_int)PARTTIME_ITEM::DRINK]);
 	CHECK_FAILED(hr);
 
 	//hr = __super::Add_Component(TEXT("Prototype_Component_Model_Item_EnergyDrink"),
