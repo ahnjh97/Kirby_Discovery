@@ -427,7 +427,7 @@ void CMapToolHelper::Menu_NonAnimModels()
 		vector<const _char*> vecMapDecoNames;
 		FilterListBoxStrings(s_MapDecoFilter, vecMapDecoNames, m_vecMapDecoTxts);
 		
-		if (ImGui::ListBox("##MapDecos", &s_iMapDecoIdx, vecMapDecoNames.data(), vecMapDecoNames.size(), 16)) {
+		if (ImGui::ListBox("##MapDecos", &s_iMapDecoIdx, vecMapDecoNames.data(), vecMapDecoNames.size(), 13)) {
 			DisableOtherGroups(&s_iMapDecoIdx);
 			m_strSelectedTxt = string(vecMapDecoNames[s_iMapDecoIdx]);
 		}
@@ -467,7 +467,7 @@ void CMapToolHelper::Menu_NonAnimModels()
 		vector<const _char*> vecTownDecoNames;
 		FilterListBoxStrings(s_TownDecoFilter, vecTownDecoNames, m_vecTownDecoTxts);
 		
-		if (ImGui::ListBox("##TownDecos", &s_iTownDecoIdx, vecTownDecoNames.data(), vecTownDecoNames.size(), 16)) {
+		if (ImGui::ListBox("##TownDecos", &s_iTownDecoIdx, vecTownDecoNames.data(), vecTownDecoNames.size(), 13)) {
 			DisableOtherGroups(&s_iTownDecoIdx);
 			m_strSelectedTxt = string(vecTownDecoNames[s_iTownDecoIdx]);
 		}
@@ -483,7 +483,7 @@ void CMapToolHelper::Menu_NonAnimModels()
 		vector<const _char*> vecLabDecoNames;
 		FilterListBoxStrings(s_LabDecoFilter, vecLabDecoNames, m_vecLabDecoTxts);
 
-		if (ImGui::ListBox("##LabDecos", &s_iLabDecoIdx, vecLabDecoNames.data(), vecLabDecoNames.size(), 16)) {
+		if (ImGui::ListBox("##LabDecos", &s_iLabDecoIdx, vecLabDecoNames.data(), vecLabDecoNames.size(), 13)) {
 			DisableOtherGroups(&s_iLabDecoIdx);
 			m_strSelectedTxt = string(vecLabDecoNames[s_iLabDecoIdx]);
 		}

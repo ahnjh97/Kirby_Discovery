@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "MapToolObject.h"
 #include "BasicMap.h"
+#include "AnimDeco.h"
+#include "HitBox.h"
 #include "OcTree.h"
 #include "Model.h"
 
@@ -417,6 +419,11 @@ void CBasicMap::InsertMapDecos()
                 continue;
 
             m_pGameInstance->Emplace_MapDecoTrigger(pRigidStatic, pModel, animIter->second.first, animIter->second.second);
+            CAnimDeco::ANIMDECO_DESC tAnimDeco{};
+            tAnimDeco.pAnimDecoModel = pModel;
+            CAnimDeco* pAnimDecoObj = dynamic_cast<CAnimDeco*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_AnimDeco"), &tAnimDeco));
+            m_vecAnimDecoGameObjs.push_back(pAnimDecoObj);
+            
             vecAnims.push_back(pModel);
         }
         else if (CMapToolObject::MAPOBJ_ACTOR == iMapObjType)
@@ -576,7 +583,6 @@ void CBasicMap::ReadDecos_ForSmallLevels()
             pModel->CreateStaticActor(matWorld);
             m_vecNonAnimDecos.push_back(pModel);
         }
-
     }
 
     fileInput.close();
@@ -736,7 +742,12 @@ void CBasicMap::Free()
 {
     __super::Free();
 
+    for (auto& animDecoObj : m_vecAnimDecoGameObjs)
+        Safe_Release(animDecoObj);
+    m_vecAnimDecoGameObjs.clear();
+
     Release_MapDecos();
+
     for (_uint iActorIdx = 0; iActorIdx < m_vecAnimDecoTriggersActors.size(); iActorIdx++)
     {
         PxRigidStatic* pActor = m_vecAnimDecoTriggersActors[iActorIdx];

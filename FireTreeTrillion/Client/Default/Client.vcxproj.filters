@@ -321,18 +321,27 @@
     </Filter>
     <Filter Include="01.Levels\PartTime">
       <UniqueIdentifier>{ce0fcbcb-4978-4d71-b5ac-464c5d2c038d}</UniqueIdentifier>
-	</Filter>
-	<Filter Include="01.Levels\_Loader">
+    </Filter>
+    <Filter Include="01.Levels\_Loader">
       <UniqueIdentifier>{2433d7e5-8e5b-4e5a-9e6b-265a49b4604a}</UniqueIdentifier>
     </Filter>
     <Filter Include="01.Levels\Racing">
       <UniqueIdentifier>{737fc96b-c550-4a4f-a027-697453f18b10}</UniqueIdentifier>
-	</Filter>
-	<Filter Include="02.GameObjects\Map\BreakableRock">
+    </Filter>
+    <Filter Include="02.GameObjects\Map\BreakableRock">
       <UniqueIdentifier>{1804a8b8-0c68-4296-836c-c88b4878fba8}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Map\Car">
       <UniqueIdentifier>{6a3a0e35-9a08-4f88-9aa3-377662595d38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Deco">
+      <UniqueIdentifier>{419a0698-ebd3-4192-8896-8944a2337a90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Deco\AnimDeco">
+      <UniqueIdentifier>{c02dd9f8-d066-41e9-b2c3-7f7ebf95ff38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Deco\NonAnimDeco">
+      <UniqueIdentifier>{fade553b-2471-4643-8daf-c5bb3dcfdbd8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -656,19 +665,25 @@
     </ClInclude>
     <ClInclude Include="..\Public\PartTimerKirby_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\PartTimerKirby\State</Filter>
-	</ClInclude>
-	<ClInclude Include="..\Public\Loader.h">
+    </ClInclude>
+    <ClInclude Include="..\Public\Loader.h">
       <Filter>01.Levels\_Loader</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Racing.h">
       <Filter>01.Levels\Racing</Filter>
-	</ClInclude>
-	<ClInclude Include="..\Public\BreakableRock.h">
+    </ClInclude>
+    <ClInclude Include="..\Public\BreakableRock.h">
       <Filter>02.GameObjects\Map\BreakableRock</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Car.h">
       <Filter>02.GameObjects\Map\Car</Filter>
-	</ClInclude>
+    </ClInclude>
+    <ClInclude Include="..\Public\AnimDeco.h">
+      <Filter>02.GameObjects\Map\Deco\AnimDeco</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\NonAnimDeco.h">
+      <Filter>02.GameObjects\Map\Deco\NonAnimDeco</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -973,18 +988,24 @@
     </ClCompile>
     <ClCompile Include="..\Private\PartTimerKirby_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\PartTimerKirby\State</Filter>
-	</ClCompile>
-	<ClCompile Include="..\Private\Loader.cpp">
+    </ClCompile>
+    <ClCompile Include="..\Private\Loader.cpp">
       <Filter>01.Levels\_Loader</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Racing.cpp">
       <Filter>01.Levels\Racing</Filter>
-	</ClCompile>
-	<ClCompile Include="..\Private\Car.cpp">
+    </ClCompile>
+    <ClCompile Include="..\Private\Car.cpp">
       <Filter>02.GameObjects\Map\Car</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BreakableRock.cpp">
       <Filter>02.GameObjects\Map\BreakableRock</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\AnimDeco.cpp">
+      <Filter>02.GameObjects\Map\Deco\AnimDeco</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\NonAnimDeco.cpp">
+      <Filter>02.GameObjects\Map\Deco\NonAnimDeco</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
