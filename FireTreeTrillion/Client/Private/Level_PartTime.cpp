@@ -14,6 +14,7 @@
 #include "PoppyBrosJr.h"
 
 #include "WaddleDee.h"
+#include "PartTimeFood.h"
 
 #include "BG.h"
 #include "HUD.h"
@@ -63,7 +64,9 @@ HRESULT CLevel_PartTime::Initialize()
 	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Player"), TEXT("Prototype_GameObject_PartTimerKirby"))))
 	//	return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Item"), TEXT("Prototype_GameObject_EnergyDrink"))))
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Item"), TEXT("Prototype_GameObject_EnergyDrink"))))
+	//	return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Item"), TEXT("Prototype_GameObject_PartTimeFood"))))
 		return E_FAIL;
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
@@ -140,7 +143,7 @@ HRESULT CLevel_PartTime::Ready_Layer_Camera(const wstring& strLayerTag)
 
 	CCamera_Free::CAMERA_FREE_DESC		CameraDesc{};
 	CameraDesc.fMouseSensor = 0.1f;
-	CameraDesc.fFovy = XMConvertToRadians(30.0f);
+	CameraDesc.fFovy = XMConvertToRadians(43.0f);
 	CameraDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	CameraDesc.fNear = 0.1f;
 	CameraDesc.fFar = 1000.0f;
@@ -166,7 +169,7 @@ HRESULT CLevel_PartTime::Ready_Layer_BackGround(const wstring& strLayerTag)
 
 HRESULT CLevel_PartTime::Ready_Layer_UI(const wstring& _wstrLayerTag)
 {
-	HRESULT hr;
+	//HRESULT hr;
 
 
 	////모든 HUD를 준비
@@ -323,7 +326,7 @@ HRESULT CLevel_PartTime::Ready_Triggers()
 				return E_FAIL;
 			continue;
 		}
-		else if ("NonAnim_Kirby" == strModelName)
+		else if ("NonAnim_KirbyPartTimer" == strModelName)
 		{
 			CGameObject::GAMEOBJECT_DESC tempDesc = {};
 			tempDesc.matWorld = matWorld;
@@ -334,7 +337,7 @@ HRESULT CLevel_PartTime::Ready_Triggers()
 				if ("NonAnim" == strModelName.substr(0, 7))
 					tempDesc.wstrModelName.erase(0, 8);
 			}
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby"), &tempDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Player"), TEXT("Prototype_GameObject_PartTimerKirby"), &tempDesc)))
 				return E_FAIL;
 		}
 		else if ("Ladder" == strModelName)

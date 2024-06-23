@@ -187,6 +187,7 @@
     <ClInclude Include="..\Public\BombOrbit.h" />
     <ClInclude Include="..\Public\BombOrbitGlow.h" />
     <ClInclude Include="..\Public\BreakableRock.h" />
+    <ClInclude Include="..\Public\BreakableRockPartical.h" />
     <ClInclude Include="..\Public\BrontoBurt.h" />
     <ClInclude Include="..\Public\BrontoBurt_State.h" />
     <ClInclude Include="..\Public\Buffahorn.h" />
@@ -273,6 +274,8 @@
     <ClInclude Include="..\Public\MultiEffect.h" />
     <ClInclude Include="..\Public\OrbitingCamera.h" />
     <ClInclude Include="..\Public\Particle.h" />
+    <ClInclude Include="..\Public\PartTimeFood.h" />
+    <ClInclude Include="..\Public\PartTimeHelper.h" />
     <ClInclude Include="..\Public\PartTimerKirby.h" />
     <ClInclude Include="..\Public\PartTimerKirby_State.h" />
     <ClInclude Include="..\Public\PhysXObject.h" />
@@ -322,6 +325,7 @@
     <ClCompile Include="..\Private\BombOrbit.cpp" />
     <ClCompile Include="..\Private\BombOrbitGlow.cpp" />
     <ClCompile Include="..\Private\BreakableRock.cpp" />
+    <ClCompile Include="..\Private\BreakableRockPartical.cpp" />
     <ClCompile Include="..\Private\BrontoBurt.cpp" />
     <ClCompile Include="..\Private\BrontoBurt_State.cpp" />
     <ClCompile Include="..\Private\Buffahorn.cpp" />
@@ -404,6 +408,8 @@
     <ClCompile Include="..\Private\MultiEffect.cpp" />
     <ClCompile Include="..\Private\OrbitingCamera.cpp" />
     <ClCompile Include="..\Private\Particle.cpp" />
+    <ClCompile Include="..\Private\PartTimeFood.cpp" />
+    <ClCompile Include="..\Private\PartTimeHelper.cpp" />
     <ClCompile Include="..\Private\PartTimerKirby.cpp" />
     <ClCompile Include="..\Private\PartTimerKirby_State.cpp" />
     <ClCompile Include="..\Private\PhysXObject.cpp" />

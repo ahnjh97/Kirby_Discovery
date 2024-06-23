@@ -29,9 +29,8 @@ HRESULT CPartTimerKirby::Initialize(void* pArg)
 	if (nullptr != pArg)
 		GameObjectDesc = *(GAMEOBJECT_DESC*)pArg;
 
-	GameObjectDesc.fSpeedPerSec = 7.f;
+	GameObjectDesc.fSpeedPerSec = 3.f;
 	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
-
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 

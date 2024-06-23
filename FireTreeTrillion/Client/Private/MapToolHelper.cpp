@@ -87,7 +87,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 	m_vecMapModelNames = { "Level0Stage1Step01", "Level0Stage1Step02",  "Level1Stage1Step01", "Town", "TownShop", "LbLastBossStage"};
 	m_setMapNames = { "BG0", "BG1", "Level0Stage1Step01", "Level0Stage1Step02", "Level1Stage1Step01","Town",  "TownShop", "LbLastBossStage" };
-	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy", "Fog", "Ladder" };
+	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy", "Fog", "Ladder", "NonAnim_KirbyPartTimer" };
 	m_setRallyingMonsters = { "NonAnim_Kabu", "NonAnim_BrontoBurt" };
 
 	/*m_setNonColDecos = { "BushMCut" };*/
@@ -114,6 +114,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 
 #pragma region LAB_DISCOVERA OBJECT
+#pragma region LEVEL_FINALBOSS (LAB_DISCOVERA) OBJECT
 		, "LbBossRoom", "LbLastBossStage", "LbLastBuilding", "LbLastOutFrame1", "LbLastOutFrame2", "LbLastStairs", "LbLastTank"
 #pragma endregion
 	};

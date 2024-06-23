@@ -42,6 +42,10 @@ public:
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
 	virtual void OnStateExit()														override;
 
+private:
+	enum DIR { LEFT, RIGHT, DIR_END };
+	_uint	m_uDir = LEFT;
+
 public:
 	static	CPartTimerKirby_Move_State* Create();
 	virtual void Free() override;
