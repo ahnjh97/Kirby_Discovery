@@ -357,16 +357,20 @@ HRESULT CLoader::Loading_StaticComponentAll()
 
 #pragma region LEVEL_SKYSPHERE
 
-	hr = Add_Texture(eLevel, "SkySphere_LabDiscovera_2Pase", "SkySphere/SkySphere_LabDiscovera_2Pase_Diffuse.dds");
+	//FIELD
+	hr = Add_Texture(eLevel, "SkySphere_Lab_CloudNoize", "SkySphere/SkySphere_Lab_CloudNoizeC_MRA.dds");
 	CHECK_FAILED(hr);
 
-	hr = Add_Texture(eLevel, "SkySphere_LabDiscovera_2Pase_Normal", "SkySphere/SkySphere_LabDiscovera_2Pase_Normal.dds");
-		CHECK_FAILED(hr);
-
-	hr = Add_Texture(eLevel, "SkySphere_LabDiscovera_2Pase_Emissive", "SkySphere/SkySphere_LabDiscovera_2Pase_Emissive.dds");
+	hr = Add_Texture(eLevel, "SkySphere_Lab_Diffuse", "SkySphere/SkySphere_Lab_Diffuse_%d.dds", 3);
 	CHECK_FAILED(hr);
 
-	hr = Add_Texture(eLevel, "SkySphere_LabDiscovera_2Pase_Height", "SkySphere/SkySphere_LabDiscovera_2Pase_Height.dds");
+	hr = Add_Texture(eLevel, "SkySphere_LabBoss_2Pase_Normal", "SkySphere/SkySphere_LabBoss_2Pase_Normal.dds");
+	CHECK_FAILED(hr);
+
+	hr = Add_Texture(eLevel, "SkySphere_LabBoss_2Pase_Emissive", "SkySphere/SkySphere_LabBoss_2Pase_Emissive.dds");
+	CHECK_FAILED(hr);
+
+	hr = Add_Texture(eLevel, "SkySphere_LabBoss_2Pase_Height", "SkySphere/SkySphere_LabBoss_2Pase_Height.dds");
 	CHECK_FAILED(hr);
 
 #pragma endregion

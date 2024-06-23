@@ -57,6 +57,18 @@ static _bool s_bWasMapDecosOpen = false;
 static _bool s_bWasTownDecosOpen = false;
 static _bool s_bWasLabDecosOpen = false;
 
+static void HelpMarker(const char* desc)
+{
+	ImGui::TextDisabled("(?)");
+	if (ImGui::BeginItemTooltip())
+	{
+		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+		ImGui::TextUnformatted(desc);
+		ImGui::PopTextWrapPos();
+		ImGui::EndTooltip();
+	}
+}
+
 CMapToolHelper::CMapToolHelper(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
 {
@@ -177,6 +189,16 @@ void CMapToolHelper::Late_Tick(_float fTimeDelta)
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_DELETE, KEY_DOWN))
 		On_DIK_Delete();
+
+	//SAVE, LOAD 단축키 추가
+	if (m_pGameInstance->Get_DIKeyState(DIK_LCONTROL, KEY_PRESS))
+	{
+		if (m_pGameInstance->Get_DIKeyState(DIK_S, KEY_DOWN))
+			Save_Level();
+
+		if (m_pGameInstance->Get_DIKeyState(DIK_L, KEY_DOWN))
+			Load_Level();
+	}
 
 	Edit_Object();
 }
@@ -300,6 +322,7 @@ void CMapToolHelper::ReadLabDecoTxts()
 void CMapToolHelper::Menu_Level()
 {
 	ImGui::SeparatorText("Level");
+
 	for (_int i = LEVEL_INTRO; i <= LEVEL_FINALBOSS; i++)
 	{
 		if (ImGui::RadioButton(m_vecLevelName[i].c_str(), s_iLevelIndex == i - LEVEL_INTRO)) {
@@ -342,10 +365,12 @@ void CMapToolHelper::Menu_Level()
 		if (i % 2 == 0 && i != LEVEL_FINALBOSS)
 			ImGui::SameLine();
 	}
-	ImGui::NewLine();
+	ImGui::NewLine(); 
+	HelpMarker(u8"저장 : Ctrl+S / 로드 : Ctrl+D");
+
 	if (ImGui::Button("Save", ImVec2(100, 40)))
 		Save_Level();
-	ImGui::SameLine();
+	ImGui::SameLine(); 
 	if (ImGui::Button("Load", ImVec2(100, 40)))
 		Load_Level();
 
