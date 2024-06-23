@@ -98,7 +98,11 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		"Intro", "Racing",  "Town", "PartTime", "FinalBoss", "Level_End" };
 
 	m_vecMapModelNames = { "Level0Stage1Step01", "Level0Stage1Step02",  "Level1Stage1Step01", "Town", "TownShop", "LbLastBossStage"};
-	m_setMapNames = { "BG0", "BG1", "Level0Stage1Step01", "Level0Stage1Step02", "Level1Stage1Step01","Town",  "TownShop", "LbLastBossStage" };
+
+	vector<string> vecBGs = { "BG0", "BG1" };
+	m_setMapNames.insert(vecBGs.begin(), vecBGs.end());
+	m_setMapNames.insert(m_vecMapModelNames.begin(), m_vecMapModelNames.end());
+
 	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy", "Fog", "Ladder", "NonAnim_KirbyPartTimer" };
 	m_setRallyingMonsters = { "NonAnim_Kabu", "NonAnim_BrontoBurt" };
 
