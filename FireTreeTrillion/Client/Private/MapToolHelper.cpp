@@ -44,7 +44,7 @@ static _bool s_bHideDecos = { false };
 
 static _int s_iConnectedMonster = -1;
 static const _char* s_ModelPassIndices[] = { "0. NORMAL_0", "1. NORMAL_X", "2. SHADOW", "3. SKY", "4. BLOOM", "5. BLEND"
-	,"6. TRIGGER", "7.DEFAULTFX", "8. BLENDFX", "9. DEFERREDINFO", "10. WHITEFX", "11. KIRBYPART" };
+	,"6. TRIGGER", "7.DEFAULTFX", "8. BLENDFX", "9. DEFERREDINFO", "10. WHITEFX", "11. KIRBYPART", "12. NORMAL_O AND NONCULL"};
 static const _char* s_PosTexPassIndices[] = { "0. DEFAULT", "1. ALPHABLEND", "2. BLENDFX", "3. BLOOM", "4. DEFAULTFX", "5. BLEND_NOZTEXT"
 	,"6. WHITEFX", "7. UI_MASK", "8. UI_MASK2", "9. SOFTFX", "10. SOFTALPHAFX"};
 static _int s_iPassIndex = -1;

@@ -396,7 +396,7 @@ HRESULT CLevel_PartTime::Ready_Dees()
 	ObjDesc.fSpeedPerSec = 5.f;
 	ObjDesc.fRotationPerSec = ToRadian(90.f);
 	_float4x4 InitMat = _float4x4::Identity;
-	InitMat.Translation({ -10.2f, 35.f, 25.f });
+	InitMat.Translation({ 10.2f, 24.7f, 26.f });
 	ObjDesc.matWorld = InitMat;
 
 	if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NPC"), TEXT("Prototype_GameObject_FoodShopDee"), &ObjDesc)))
@@ -407,10 +407,10 @@ HRESULT CLevel_PartTime::Ready_Dees()
 	HungryDeeDesc.fSpeedPerSec = 5.f;
 	HungryDeeDesc.fRotationPerSec = ToRadian(90.f);
 	InitMat = _float4x4::Identity;
-	InitMat.Translation({ 13.2f, 24.7f, 24.f });
+	InitMat.Translation({ 18.2f, 24.7f, 27.1f });
 	HungryDeeDesc.matWorld = InitMat;
 
-	for (_int i = 0; i < 7; ++i)
+	for (_int i = 0; i < 12; ++i)
 	{
 		HungryDeeDesc.iIdx = i;
 

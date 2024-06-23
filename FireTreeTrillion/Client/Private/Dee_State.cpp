@@ -204,9 +204,12 @@ void CDee_Hungry_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 
 	switch (baseInfo.pDee->Get_State())
 	{
+
+#pragma region 대기
+	//기본 대기 상태
 	case DEESHOPANIM_GUESTNORMAL:
 	{
-		baseInfo.pTransformCom->Look_At_Interpolate( baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION) + _float4{0.f, 0.f, 1.f, 0.f}, fTimeDelta * 3.f);
+		baseInfo.pTransformCom->Look_At_Interpolate( baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION) + _float4{0.f, 0.f, 1.f, 0.f}, fTimeDelta * 4.f);
 
 		//내가 기다려야 할 위치를 넘어서면 이동
 		if (.5f < _float3{ XZVec(pHungryDee->Get_DestWaitingPos()) - XZVec(baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION)) }.Length())
@@ -219,8 +222,61 @@ void CDee_Hungry_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 			}
 		}
 
+		if (pHungryDee->Get_WaitingTime() < 20.f)
+		{
+			baseInfo.pDee->Set_DeeEyeState(DEEEYE_SADNESS);
+		}
+
+		if (pHungryDee->Get_WaitingTime() < 15.f)
+		{
+			baseInfo.pDee->Set_DeeEyeState(DEEEYE_ANGER);
+			pHungryDee->Change_State((DEE_ANIM)DEESHOPANIM_GUESTANGER, 60.f, true, true);
+		}
 	}
 	break;
+	case DEESHOPANIM_GUESTANGER:
+	{
+		baseInfo.pTransformCom->Look_At_Interpolate(baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION) + _float4{ 0.f, 0.f, 1.f, 0.f }, fTimeDelta * 4.f);
+
+		//내가 기다려야 할 위치를 넘어서면 이동
+		if (.5f < _float3{ XZVec(pHungryDee->Get_DestWaitingPos()) - XZVec(baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION)) }.Length())
+		{
+			m_fStartMoveDelay -= fTimeDelta;
+
+			if (m_fStartMoveDelay < 0.f)
+			{
+				pHungryDee->Change_State((DEE_ANIM)DEESHOPANIM_WALK, 60.f, true, true);
+			}
+		}
+
+		if (15.f < pHungryDee->Get_WaitingTime())
+		{
+			baseInfo.pDee->Set_DeeEyeState(DEEEYE_SADNESS);
+			pHungryDee->Change_State((DEE_ANIM)DEESHOPANIM_GUESTNORMAL, 60.f, true, true);
+		}
+
+	}
+	break;
+	case DEESHOPANIM_ORDERNORMAL:
+	{
+		baseInfo.pTransformCom->Look_At_Interpolate(baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION) + _float4{ 0.f, 0.f, 1.f, 0.f }, fTimeDelta * 4.f);
+
+		if (pHungryDee->Get_WaitingTime() < 20.f)
+		{
+			baseInfo.pDee->Set_DeeEyeState(DEEEYE_SADNESS);
+		}
+
+		if (pHungryDee->Get_WaitingTime() < 15.f)
+		{
+			baseInfo.pDee->Set_DeeEyeState(DEEEYE_ANGER);
+		}
+	}
+	break;
+
+#pragma endregion
+
+#pragma region 걷기
+	//기본 워킹 상태
 	case DEESHOPANIM_WALK:
 	{
 		_float3 vDir = pHungryDee->Get_DestWaitingPos() - baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION);
@@ -235,7 +291,7 @@ void CDee_Hungry_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 		//다다르면 다시 웨이팅
 		if (_float3{ XZVec(pHungryDee->Get_DestWaitingPos()) - XZVec(baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION)) }.Length() < .5f)
 		{
-			pHungryDee->Change_State((DEE_ANIM)DEESHOPANIM_GUESTNORMAL, 60.f, true, true);
+			pHungryDee->Change_State(pHungryDee->IsFrontWaiting() ? (DEE_ANIM)DEESHOPANIM_ORDERNORMAL : (DEE_ANIM)DEESHOPANIM_GUESTNORMAL, CUtils::Make_RandomFloat(50.f, 60.f), true, true);
 
 			CUtils::Make_RandomInt(0, 2) == 2 ?
 				baseInfo.pDee->Set_DeeEyeState(DEEEYE_SMILE) :
@@ -243,10 +299,55 @@ void CDee_Hungry_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 		}
 	}
 	break;
+#pragma endregion
+
+	case DEESHOPANIM_CLERKCORRECT:
+	{
+		if (baseInfo.pDee->IsAnimFinished())
+		{
+			//pHungryDee->Set_RenderPartObj(true);
+			pHungryDee->Change_State((DEE_ANIM)DEESHOPANIM_CORRECTMOVE, 60.f, true, true);
+		}
+	}
+	break;
+	case DEESHOPANIM_CORRECTMOVE:
+	{
+		m_fDuration += fTimeDelta;
+		if (.1f < m_fDuration)
+			pHungryDee->Set_RenderPartObj(true);
+
+		_float3 vDir = pHungryDee->Get_DestWaitingPos() - baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION);
+		vDir.Normalize();
+		baseInfo.pTransformCom->Look_At_Interpolate(pHungryDee->Get_DestWaitingPos(), fTimeDelta * 2.f);
+
+		_float fDist = (XZVec(pHungryDee->Get_DestWaitingPos()) - XZVec(baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION))).Length();
+		fDist = (fDist < 1.f) ? fDist * 3.f : 4.f;
+
+		baseInfo.pController->Move_Dir(baseInfo.pTransformCom, baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta * fDist, fTimeDelta);
+	}
+	break;
+	case DEESHOPANIM_INCORRECT:
+	{
+		if (baseInfo.pDee->IsAnimFinished())
+			pHungryDee->Change_State((DEE_ANIM)DEESHOPANIM_INCORRECTMOVE, 60.f, true, true);
+	}
+	break;
+	case DEESHOPANIM_INCORRECTMOVE:
+	{
+		_float3 vDir = pHungryDee->Get_DestWaitingPos() - baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION);
+		vDir.Normalize();
+		baseInfo.pTransformCom->Look_At_Interpolate(pHungryDee->Get_DestWaitingPos(), fTimeDelta * 2.f);
+
+		_float fDist = (XZVec(pHungryDee->Get_DestWaitingPos()) - XZVec(baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION))).Length();
+		fDist = (fDist < 1.f) ? fDist * 3.f : 4.f;
+
+		baseInfo.pController->Move_Dir(baseInfo.pTransformCom, baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta * fDist, fTimeDelta);
+	}
+	break;
+
 	default:
 		break;
 	}
-
 }
 
 void CDee_Hungry_State::OnStateExit()
