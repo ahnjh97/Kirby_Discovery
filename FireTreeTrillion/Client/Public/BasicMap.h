@@ -73,14 +73,16 @@ private:
 	vector<CModel*>	m_vecNonAnimDecos;
 	vector<CModel*> m_vecAnimDecos;
 
+	vector<CGameObject*> m_vecAnimDecoGameObjs;
+
 private:
 	HRESULT Add_Components(const wstring& _wstrModelTag);
 	HRESULT Bind_ShaderResources();
 	HRESULT Add_BlendMap(const wstring& _wstrModelTag);
 
 	void SetUpShaderInfo(const wstring& _wstrModelTag);
-
 	_bool CheckIfBlendMapExists(const wstring& _wstrModelTag);
+
 	void InsertMapDecos();
 	PxRigidStatic* AddTriggerActorForAnimDeco(const string& _strModelName, _float4x4& _matWorld);
 	void SetUpAnimDecoInfo(const string& _strModelName, _float _fTriggerRadius, _uint iIdleIndex, _float fIdleAnimSpeed

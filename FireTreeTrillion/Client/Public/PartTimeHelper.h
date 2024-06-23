@@ -25,9 +25,11 @@ public:
 	void	Make_RandomItem();
 	_bool	Check_Item(PARTTIME_ITEM eITEM);
 
+	PARTTIME_ITEM	Get_PartTimeItem() const { return m_eFood; }
+
 private:
 	class CHungryDee*	m_pHungryDee = nullptr;
-	PARTTIME_ITEM		m_eFood = PARTTIME_ITEM::ITEM_END;
+	PARTTIME_ITEM		m_eFood = PARTTIME_ITEM::DRINK;
 	_float				m_fTimeLimit = _float();
 
 public:

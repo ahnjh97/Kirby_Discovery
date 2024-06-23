@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "PartTimerKirby_State.h"
 #include "PartTimerKirby.h"
+#include "PartTimeHelper.h"
 
 //const _float fWalkDistance = 20.f;
 
@@ -25,7 +26,19 @@ void CPartTimerKirby_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float 
 	else if (m_pGameInstance->Get_DIKeyState(DIK_RIGHT, KEY_DOWN))
 		pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_MOVER, 50.f, false, true);
 	else if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
-		pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_CORRECT, 50.f, false, true);
+	{
+		// 아이템 위치에 따라 PARTTIME_ITEM를 다르게
+		if (CPartTimeHelper::Get_Instance()->Check_Item(PARTTIME_ITEM::DRINK))
+		{
+			pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_CORRECT, 50.f, false, true);
+			pAlbaKirby->Render_PartObjects(true);
+		}
+		else
+		{
+			pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_INCORRECTSTART, 50.f, false, true);
+		}
+		CPartTimeHelper::Get_Instance()->Make_RandomItem();
+	}
 }
 
 void CPartTimerKirby_Idle_State::OnStateExit()
@@ -108,9 +121,17 @@ void CPartTimerKirby_Grab_State::OnStateUpdate(CGameObject* pGameObject, _float 
 {
 	CPartTimerKirby* pAlbaKirby = static_cast<CPartTimerKirby*>(pGameObject);
 	if (pAlbaKirby->IsAnimFinished())
-		pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_SELECT, 50.f, true, true);
+	{
+		if (pAlbaKirby->Get_State() == CPartTimerKirby::HANDOVERSHORT)
+		{
+			pAlbaKirby->Render_PartObjects(false);
+			pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_SELECT, 50.f, true, true);
+		}
+		else if(CPartTimeHelper::Get_Instance()->Get_PartTimeItem() == PARTTIME_ITEM::DRINK)
+			pAlbaKirby->Change_State(CPartTimerKirby::HANDOVERSHORT, 50.f, false, true);
+	}
 }
-
+ 
 void CPartTimerKirby_Grab_State::OnStateExit()
 {
 }

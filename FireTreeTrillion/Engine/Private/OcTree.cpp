@@ -657,7 +657,7 @@ void COcTree::RenderAll(CGameInstance* pGameInstance, CShader* pMapShader, CShad
 
 	for (auto& colAnim : m_vecColAnims)
 	{
-		if (nullptr == colAnim)
+		if (nullptr == colAnim || true == colAnim->IsHidden())
 			continue;
 
 		_uint iNumMeshes = colAnim->Get_NumMeshes();
@@ -755,7 +755,7 @@ void COcTree::RenderMyMesh(CGameInstance* pGameInstance, CShader* pMapShader, CS
 
 	for (auto& myColAnim : m_vecMyColAnims)
 	{
-		if (nullptr == myColAnim)
+		if (nullptr == myColAnim || true == myColAnim->IsHidden())
 			continue;
 
 		_uint iNumMeshes = myColAnim->Get_NumMeshes();

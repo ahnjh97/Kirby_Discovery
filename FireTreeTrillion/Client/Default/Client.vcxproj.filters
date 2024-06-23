@@ -334,6 +334,15 @@
     <Filter Include="02.GameObjects\Map\Car">
       <UniqueIdentifier>{6a3a0e35-9a08-4f88-9aa3-377662595d38}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\Deco">
+      <UniqueIdentifier>{419a0698-ebd3-4192-8896-8944a2337a90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Deco\AnimDeco">
+      <UniqueIdentifier>{c02dd9f8-d066-41e9-b2c3-7f7ebf95ff38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Deco\NonAnimDeco">
+      <UniqueIdentifier>{fade553b-2471-4643-8daf-c5bb3dcfdbd8}</UniqueIdentifier>
+    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\WaddleDee\DeePart">
       <UniqueIdentifier>{5f17fb16-cca2-4259-931d-1b811ea7faaf}</UniqueIdentifier>
     </Filter>
@@ -680,7 +689,13 @@
     </ClInclude>
     <ClInclude Include="..\Public\Car.h">
       <Filter>02.GameObjects\Map\Car</Filter>
-	</ClInclude>
+    </ClInclude>
+    <ClInclude Include="..\Public\AnimDeco.h">
+      <Filter>02.GameObjects\Map\Deco\AnimDeco</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\NonAnimDeco.h">
+      <Filter>02.GameObjects\Map\Deco\NonAnimDeco</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\Dee_Part.h">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\DeePart</Filter>
     </ClInclude>
@@ -1012,6 +1027,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\BreakableRock.cpp">
       <Filter>02.GameObjects\Map\BreakableRock</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\AnimDeco.cpp">
+      <Filter>02.GameObjects\Map\Deco\AnimDeco</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\NonAnimDeco.cpp">
+      <Filter>02.GameObjects\Map\Deco\NonAnimDeco</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Dee_Part.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\DeePart</Filter>

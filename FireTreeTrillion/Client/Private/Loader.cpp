@@ -6,10 +6,12 @@
 #include "GameInstance.h"
 #include "tinyxml2.h"
 
-//¸ÊÅø
+//¸ÊÅø, ¸Ê
 #include "OrbitingCamera.h"
 #include "MapToolHelper.h"
 #include "MapToolObject.h"
+#include "NonAnimDeco.h"
+#include "AnimDeco.h"
 #include "BasicMap.h"
 #include "Trigger.h"
 #include "Grid.h"
@@ -251,6 +253,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Trigger"), CTrigger);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("OrbitingCamera"), COrbitingCamera);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BG"), CBG);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("AnimDeco"), CAnimDeco);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("NonAnimDeco"), CNonAnimDeco);
 
 	// For HitBox
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HitBox"), CHitBox);
@@ -1098,9 +1102,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Tornado", TYPE_NONANIM );
 
 		//ºÎ½¬ ÂÉ°¡¸®
-		m_vecModelInfo.emplace_back("BushCutS", TYPE_NONANIM);
-		m_vecModelInfo.emplace_back("BushCutM", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("BushCutL", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("BushCutM", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("BushCutS", TYPE_NONANIM);
 
 		//ÀÌÆåÆ® ÀÔÈ÷´Â ¿ø±âµÕ
 		m_vecModelInfo.emplace_back("CylinderA", TYPE_NONANIM);
@@ -1150,7 +1154,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Level0Stage1Step01_Blend", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("BG0", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("Ladder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+
 
 		// ÀÚµ¿Â÷ °ü·Ã (ÀÚµ¿Â÷¿Í ºÎ¼ö´Â µ¹¸æÀÌµé)
 		m_vecModelInfo.emplace_back("Car", TYPE_ANIM, 1.f, 180.f);
@@ -1187,11 +1191,11 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Item_Bomb", TYPE_NONANIM, 1.f, 0.f);
 
 		// For Interaction Decor
-		m_vecModelInfo.emplace_back("GsWoodBridgeA", TYPE_NONANIM, 1.f, 0.f, 0, string("MapDeco/"));
-		m_vecModelInfo.emplace_back("PopFlower", TYPE_ANIM, 1.f, 0.f, 0, string("MapDeco/"));
+		m_vecModelInfo.emplace_back("Ladder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("WoodParts", TYPE_ANIM, 1.f, 0.f, 0, string("MapDeco/"));
-
-
+		m_vecModelInfo.emplace_back("BushLRemainder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapDeco/"));
+		m_vecModelInfo.emplace_back("BushMRemainder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapDeco/"));
+		m_vecModelInfo.emplace_back("BushSRemainder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapDeco/"));
 	}
 	else if (eLevel == LEVEL_TOWN)
 	{
@@ -1307,8 +1311,10 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// For Interaction Decor
 		m_vecModelInfo.emplace_back("Ladder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("PopFlower", TYPE_ANIM, 1.f, 0.f, 0, string("MapDeco/"));
 		m_vecModelInfo.emplace_back("WoodParts", TYPE_ANIM, 1.f, 0.f, 0, string("MapDeco/"));
+		m_vecModelInfo.emplace_back("BushLRemainder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapDeco/"));
+		m_vecModelInfo.emplace_back("BushMRemainder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapDeco/"));
+		m_vecModelInfo.emplace_back("BushSRemainder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapDeco/"));
 	}
 
 	else if (eLevel == LEVEL_PARTTIME)
