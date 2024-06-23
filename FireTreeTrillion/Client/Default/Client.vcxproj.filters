@@ -696,7 +696,6 @@
     <ClInclude Include="..\Public\NonAnimDeco.h">
       <Filter>02.GameObjects\Map\Deco\NonAnimDeco</Filter>
     </ClInclude>
-	</ClInclude>
     <ClInclude Include="..\public\Dee_Part.h">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\DeePart</Filter>
     </ClInclude>
