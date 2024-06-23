@@ -51,6 +51,9 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 			// 플레이어가 공격중인가? (공격중이라면 몸박치기로 데미지가 닳을 시, 근거리 공격이 너무 고통스럽다.)
 			if (pKirby->Is_Attacking() == true)
 				return;
+
+			if (pMonster->Get_PhyXState() == PO_PRESSED)
+				return;
 			
 			// 몬스터가 일반적인 상황일때만, 서로 데미지가 계산된다.
 			if (pMonster->Get_PhyXState() == PO_NORMAL)
@@ -59,7 +62,6 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 				{
 					pMonster->Set_PhyXState(PO_PRESSED);
 					pKirby->Set_HitStop();
-					pMonster->Set_Damage_Delay(10.f);
 					pthis->Camera_Shaking(1.2f);
 					return;
 				}
@@ -384,6 +386,21 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 			CPhysXObject* pNPC = static_cast<CPhysXObject*>(Src);
 			pNPC->Collision(CONTENT_INTERACT, pKirby);
 
+		});
+
+	// 깔끔하게 완료되었음 : 플레이어 X 형 변환
+	Collision_Collider(m_GameObjects[PLAYER], m_GameObjects[DEFORMOBJECT], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CKirby* pKirby = static_cast<CKirby*>(Dst);
+			CPhysXObject* pDeform = static_cast<CPhysXObject*>(Src);
+
+			pKirby->Collision(CONTENT_DEFORM, pDeform);
 		});
 
 

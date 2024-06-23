@@ -66,6 +66,7 @@ string CModel::Get_MeshName(_uint iMeshIndex)
 
 HRESULT CModel::Initialize_Prototype(MODEL tModel)
 {
+	HRESULT hr = S_OK;
 	m_tModel = tModel;
 
 	string strFolderName = "Anim/";
@@ -83,7 +84,6 @@ HRESULT CModel::Initialize_Prototype(MODEL tModel)
 	{	// StrToWstr 필요
 		wstring tempstr = L"Failed To Open : " + CUtils::StrToWstr(m_strDirectory);
 		MSG_BOX(tempstr.c_str());
-		return E_FAIL;
 	}
 
 	_float4x4 TransformMatrix = XMMatrixIdentity();
@@ -94,22 +94,22 @@ HRESULT CModel::Initialize_Prototype(MODEL tModel)
 	/* 읽은 정보를 바탕으로해서 내가 사용하기 좋게 정리한다.  */
 	if (m_tModel.eType == TYPE_ANIM)
 	{
-		if (FAILED(Ready_Bones()))
-			return E_FAIL;
+		hr = Ready_Bones();
+		CHECK_FAILED(hr);
 	}
 
 	/* 모델을 구성하는 메시들을 생성한다. */
 	/* 모델 = 메시 + 메시 + ... */
-	if (FAILED(Ready_Meshes(tModel.bOctree)))
-		return E_FAIL;
+	hr = Ready_Meshes(tModel.bOctree);
+	CHECK_FAILED(hr);
 
- 	if (FAILED(Ready_Materials(m_tModel.strModelName.c_str(), tModel.bOctree)))
-		return E_FAIL;
+	hr = Ready_Materials(m_tModel.strModelName.c_str(), tModel.bOctree);
+	CHECK_FAILED(hr);
 
 	if (m_tModel.eType == TYPE_ANIM)
 	{
-		if (FAILED(Ready_Animations()))
-			return E_FAIL;
+		hr = Ready_Animations();
+		CHECK_FAILED(hr);
 	}
 
 	m_InputFile.close();
@@ -499,8 +499,7 @@ HRESULT CModel::Ready_Meshes(_bool bOctree)
 	for (size_t i = 0; i < m_iNumMeshes; i++)
 	{
 		CMesh* pMesh = CMesh::Create(m_pDevice, m_pContext, m_tModel.eType, m_strDirectory, m_InputFile, m_Bones, XMLoadFloat4x4(&m_TransformMatrix), bOctree);
-		if (nullptr == pMesh)
-			return E_FAIL;
+		CHECK_NULLPTR(pMesh);
 
 		m_Meshes.push_back(pMesh);
 	}

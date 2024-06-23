@@ -115,11 +115,15 @@ public:
 		_bool			m_bBombAimming = { false };
 
 
+		// Deform 중일 때, true하여 Vacuuming 상태를 분기할 수 있게 만든다.
+		_bool			m_bisDeforming = { false };
 		// 자동차 전용 점퍼
 		_bool			m_bCarJump = { false };
 		// 자동차 부스터 타임
 		_bool			m_bBooster = { false };
 		_float			m_fBoosterTime = { 0.f };
+
+
 	}KIRBY_INFODESC;
 
 
@@ -202,7 +206,9 @@ private:
 	class CCamera*			m_pCamera = { nullptr };
 
 private:
-	void		   Update_PartObjectMatrix();
+	void			Update_PartObjectMatrix();
+	void			Bone_Rotation(_float fTimeDelta);
+	//_float			m_fAccMoveDelta = { 0.f };
 
 	class CKirbyWeapons*  m_pWeapons = { nullptr };
 	class CKirbyArmours*  m_pArmours = { nullptr };

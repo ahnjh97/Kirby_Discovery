@@ -83,10 +83,10 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 	m_vecLevelName = { "Level_Static", "Level_Loading", "Level_Logo", "GamePlay",
 			"Level_Tool_UI", "Level_Tool_FX", "Level_Tool_Anim", "Level_Tool_Map",
-		"Intro", "Racing",  "Town", "FinalBoss", "Level_End" };
+		"Intro", "Racing",  "Town", "PartTime", "FinalBoss", "Level_End" };
 
-	m_vecMapModelNames = { "Level0Stage1Step01","Level0Stage1Step02", "Level1Stage1Step01", "Town", "LbLastBossStage" };
-	m_setMapNames = { "BG0", "BG1", "Level0Stage1Step01", "Level1Stage1Step01","Level0Stage1Step02", "Town", "LbLastBossStage" };
+	m_vecMapModelNames = { "Level0Stage1Step01", "Level0Stage1Step02",  "Level1Stage1Step01", "Town", "TownShop", "LbLastBossStage"};
+	m_setMapNames = { "BG0", "BG1", "Level0Stage1Step01", "Level0Stage1Step02", "Level1Stage1Step01","Town",  "TownShop", "LbLastBossStage" };
 	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy", "Fog", "Ladder" };
 	m_setRallyingMonsters = { "NonAnim_Kabu", "NonAnim_BrontoBurt" };
 
@@ -349,7 +349,7 @@ void CMapToolHelper::Menu_Level()
 		if (i % 2 == 0 && i != LEVEL_FINALBOSS)
 			ImGui::SameLine();
 	}
-
+	ImGui::NewLine();
 	if (ImGui::Button("Save", ImVec2(100, 40)))
 		Save_Level();
 	ImGui::SameLine();

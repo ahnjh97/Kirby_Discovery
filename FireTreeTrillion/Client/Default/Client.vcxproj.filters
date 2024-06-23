@@ -319,11 +319,21 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop">
       <UniqueIdentifier>{4c6be733-c7c6-40fb-ba47-92d5f18bf7f9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Levels\_Loader">
+    <Filter Include="01.Levels\PartTime">
+      <UniqueIdentifier>{ce0fcbcb-4978-4d71-b5ac-464c5d2c038d}</UniqueIdentifier>
+	</Filter>
+	<Filter Include="01.Levels\_Loader">
       <UniqueIdentifier>{2433d7e5-8e5b-4e5a-9e6b-265a49b4604a}</UniqueIdentifier>
     </Filter>
     <Filter Include="01.Levels\Racing">
       <UniqueIdentifier>{737fc96b-c550-4a4f-a027-697453f18b10}</UniqueIdentifier>
+	</Filter>
+	<Filter Include="02.GameObjects\Map\BreakableRock">
+      <UniqueIdentifier>{1804a8b8-0c68-4296-836c-c88b4878fba8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Car">
+      <UniqueIdentifier>{6a3a0e35-9a08-4f88-9aa3-377662595d38}</UniqueIdentifier>
+    </Filter>
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\WaddleDee\DeePart">
       <UniqueIdentifier>{5f17fb16-cca2-4259-931d-1b811ea7faaf}</UniqueIdentifier>
@@ -645,11 +655,24 @@
     <ClInclude Include="..\public\FoodShopDee.h">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Loader.h">
+    <ClInclude Include="..\Public\Level_PartTime.h">
+      <Filter>01.Levels\PartTime</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PartTimerKirby_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\PartTimerKirby\State</Filter>
+	</ClInclude>
+	<ClInclude Include="..\Public\Loader.h">
       <Filter>01.Levels\_Loader</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Racing.h">
       <Filter>01.Levels\Racing</Filter>
+	</ClInclude>
+	<ClInclude Include="..\Public\BreakableRock.h">
+      <Filter>02.GameObjects\Map\BreakableRock</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Car.h">
+      <Filter>02.GameObjects\Map\Car</Filter>
+	</ClInclude>
     </ClInclude>
     <ClInclude Include="..\public\Dee_Part.h">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\DeePart</Filter>
@@ -956,11 +979,24 @@
     <ClCompile Include="..\private\FoodShopDee.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Loader.cpp">
+    <ClCompile Include="..\Private\Level_PartTime.cpp">
+      <Filter>01.Levels\PartTime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PartTimerKirby_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\PartTimerKirby\State</Filter>
+	</ClCompile>
+	<ClCompile Include="..\Private\Loader.cpp">
       <Filter>01.Levels\_Loader</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Racing.cpp">
       <Filter>01.Levels\Racing</Filter>
+	</ClCompile>
+	<ClCompile Include="..\Private\Car.cpp">
+      <Filter>02.GameObjects\Map\Car</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BreakableRock.cpp">
+      <Filter>02.GameObjects\Map\BreakableRock</Filter>
+    </ClCompile>
     </ClCompile>
     <ClCompile Include="..\private\Dee_Part.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\DeePart</Filter>
