@@ -247,8 +247,8 @@ PS_OUT FOR_KIRBYMOUTH_PS_MAIN(PS_IN In)
     if (g_bRimLight == true)
         Out.vRimLight = vector(0.f, m_fRimWidth, 1.f, 1.f);
 
-    if (g_bMotionBlur == true)
-        Out.vMotionBlur = g_vMotionVelocity;
+    //if (g_bMotionBlur == true)
+    //    Out.vMotionBlur = g_vMotionVelocity;
 
     
     return Out;

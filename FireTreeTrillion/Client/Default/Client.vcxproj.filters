@@ -334,6 +334,9 @@
     <Filter Include="02.GameObjects\Map\Car">
       <UniqueIdentifier>{6a3a0e35-9a08-4f88-9aa3-377662595d38}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\WaddleDee\DeePart">
+      <UniqueIdentifier>{5f17fb16-cca2-4259-931d-1b811ea7faaf}</UniqueIdentifier>
+    </Filter>
     <Filter Include="02.GameObjects\MiniGame">
       <UniqueIdentifier>{9ec72d3e-9c3d-40df-8d17-069fc1a340eb}</UniqueIdentifier>
     </Filter>
@@ -677,6 +680,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\Car.h">
       <Filter>02.GameObjects\Map\Car</Filter>
+	</ClInclude>
+    <ClInclude Include="..\public\Dee_Part.h">
+      <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\DeePart</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\HungryDee.h">
+      <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\PartTimeFood.h">
       <Filter>02.GameObjects\MiniGame\Food</Filter>
@@ -1003,6 +1012,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\BreakableRock.cpp">
       <Filter>02.GameObjects\Map\BreakableRock</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Dee_Part.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\DeePart</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\HungryDee.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\PartTimeFood.cpp">
       <Filter>02.GameObjects\MiniGame\Food</Filter>
