@@ -70,7 +70,7 @@ _bool CKirbySword_Idle_State::Key_X(CGameObject* pGameObject, _float fTimeDelta)
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
 	// Idle일 때, X를 누르면 1타 공격을 시작한다.
-	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
+	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN) && DESC(m_bBlockOtherVacuum) == false)
 	{
 		DESC(m_eEyeState) = CKirby::EYE_ANGER;
 
@@ -253,7 +253,7 @@ void CKirbySword_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	}
 
 	// Run일 때, X를 누르면 1타 공격을 시작한다.
-	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
+	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN) && DESC(m_bBlockOtherVacuum) == false)
 	{
 		DESC(m_eEyeState) = CKirby::EYE_ANGER;
 
