@@ -127,21 +127,21 @@ HRESULT CPartTimeFood::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 	
-	//hr = __super::Add_Component(TEXT("Prototype_Component_Model_Item_EnergyDrink"),
-	//	TEXT("Com_Model_Cake"), (CComponent**)&m_arrModelCom[CAKE]);
-	//CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_FoodCake"),
+		TEXT("Com_Model_Cake"), (CComponent**)&m_arrModelCom[(_int)PARTTIME_ITEM::CAKE]);
+	CHECK_FAILED(hr);
 
-	//hr = __super::Add_Component(TEXT("Prototype_Component_Model_Item_EnergyDrink"),
-	//	TEXT("Com_Model_Tomato"), (CComponent**)&m_arrModelCom[TOMATO]);
-	//CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_FoodTomato"),
+		TEXT("Com_Model_Tomato"), (CComponent**)&m_arrModelCom[(_int)PARTTIME_ITEM::TOMATO]);
+	CHECK_FAILED(hr);
 
 	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Item_EnergyDrink"),
 		TEXT("Com_Model_Drink"), (CComponent**)&m_arrModelCom[(_int)PARTTIME_ITEM::DRINK]);
 	CHECK_FAILED(hr);
 
-	//hr = __super::Add_Component(TEXT("Prototype_Component_Model_Item_EnergyDrink"),
-	//	TEXT("Com_Model_Burger"), (CComponent**)&m_arrModelCom[BURGER]);
-	//CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_FoodBurger"),
+		TEXT("Com_Model_Burger"), (CComponent**)&m_arrModelCom[(_int)PARTTIME_ITEM::BURGER]);
+	CHECK_FAILED(hr);
 
 	/*CHitBox::HITBOX_DESC HitBox{};
 	HitBox.pOwner = this;

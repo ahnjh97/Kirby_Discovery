@@ -20,8 +20,7 @@ void CPartTimeHelper::Register_FirstDee(CHungryDee* pDee)
 void CPartTimeHelper::Make_RandomItem()
 {
 	_int iRandom = CUtils::Make_RandomInt(0,3);
-	//m_eFood = (PARTTIME_ITEM)iRandom; // 모델 4개 다 추출하고 나서
-	m_eFood = PARTTIME_ITEM::DRINK;
+	m_eFood = (PARTTIME_ITEM)iRandom;
 }
 
 // 셀렉한 친구가 와들디가 달라고하는 친구가 맞는 지 확인한다.

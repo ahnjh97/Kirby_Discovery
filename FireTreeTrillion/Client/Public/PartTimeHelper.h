@@ -29,7 +29,7 @@ public:
 
 private:
 	class CHungryDee*	m_pHungryDee = nullptr;
-	PARTTIME_ITEM		m_eFood = PARTTIME_ITEM::DRINK;
+	PARTTIME_ITEM		m_eFood = PARTTIME_ITEM::CAKE;
 	_float				m_fTimeLimit = _float();
 
 public:
