@@ -126,7 +126,8 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 
 #pragma region LEVEL_FINALBOSS (LAB_DISCOVERA) OBJECT
-		, "LbBossRoom", "LbLastBossStage", "LbLastBuilding", "LbLastOutFrame1", "LbLastOutFrame2", "LbLastStairs", "LbLastTank"
+		, "LbBossRoom", "LbLastBossStage", "LbLastBuilding", /*"LbLastOutFrame1", */"LbLastOutFrame2", "LbLastStairs"
+		, "LbLastTank"
 #pragma endregion
 	};
 	
@@ -203,8 +204,8 @@ void CMapToolHelper::Late_Tick(_float fTimeDelta)
 		if (m_pGameInstance->Get_DIKeyState(DIK_S, KEY_DOWN))
 			Save_Level();
 
-		if (m_pGameInstance->Get_DIKeyState(DIK_L, KEY_DOWN))
-			Load_Level();
+		//if (m_pGameInstance->Get_DIKeyState(DIK_L, KEY_DOWN))
+			//Load_Level();
 	}
 
 	Edit_Object();
@@ -372,8 +373,9 @@ void CMapToolHelper::Menu_Level()
 		if (i % 2 == 0 && i != LEVEL_FINALBOSS)
 			ImGui::SameLine();
 	}
-	ImGui::NewLine(); 
-	HelpMarker(u8"저장 : Ctrl+S / 로드 : Ctrl+D");
+	//ImGui::NewLine(); 
+	//HelpMarker(u8"저장 : Ctrl+S / 로드 : Ctrl+L");
+	HelpMarker(u8"저장 : Ctrl+S");
 
 	if (ImGui::Button("Save", ImVec2(100, 40)))
 		Save_Level();
