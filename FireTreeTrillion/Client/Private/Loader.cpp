@@ -1256,7 +1256,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Item_Bomb", TYPE_NONANIM, 1.f, 0.f);
 
 	}
-
 	else if (eLevel == LEVEL_RACING)
 	{
 		m_vecModelInfo.emplace_back("Level0Stage1Step02", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"), true);
@@ -1316,7 +1315,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("BushMRemainder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapDeco/"));
 		m_vecModelInfo.emplace_back("BushSRemainder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapDeco/"));
 	}
-
 	else if (eLevel == LEVEL_PARTTIME)
 	{
 		m_vecModelInfo.emplace_back("TownShop", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
@@ -1331,7 +1329,10 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("WaddleDeeHungry", TYPE_ANIM, 1.1f, 180.f);
 
 		// 음식 나갑니다~
-		m_vecModelInfo.emplace_back("Item_EnergyDrink", TYPE_NONANIM, 3.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Item_EnergyDrink", TYPE_NONANIM, 2.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("FoodBurger", TYPE_NONANIM, 0.9f);
+		m_vecModelInfo.emplace_back("FoodCake", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("FoodTomato", TYPE_NONANIM, 2.f);
 	}
 
 	else if (eLevel == LEVEL_FINALBOSS)

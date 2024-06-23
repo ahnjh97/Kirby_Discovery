@@ -47,6 +47,8 @@ HRESULT CPartTimerKirby::Initialize(void* pArg)
 
 	if(*m_pCurrentLevelID == LEVEL_TOWN)
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(2.f, 15.f, 3.f, 1.f));
+	else if (*m_pCurrentLevelID == LEVEL_PARTTIME)
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(18.7f, 23.8f, 29.3f, 1.f));
 
 	m_fScore = 10.f;
 
@@ -276,8 +278,10 @@ HRESULT CPartTimerKirby::Add_PartObjects()
 	return S_OK;
 }
 
-void CPartTimerKirby::Render_PartObjects(_bool _bRender)
+void CPartTimerKirby::Render_PartObjects(_bool _bRender, PARTTIME_ITEM _eItem)
 {
+	if(_eItem != PARTTIME_ITEM::ITEM_END)
+		m_pPartTimeFood->Set_Item(_eItem);
 	m_pPartTimeFood->Set_Render(_bRender);
 }
 

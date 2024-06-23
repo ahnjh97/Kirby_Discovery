@@ -61,9 +61,8 @@ HRESULT CLevel_PartTime::Initialize()
 	hr = Ready_Kickables();
 	CHECK_FAILED(hr);
 
-	// Part-timer Kirby Test
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Player"), TEXT("Prototype_GameObject_PartTimerKirby"))))
-	//	return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Player"), TEXT("Prototype_GameObject_PartTimerKirby"))))
+		return E_FAIL;
 
 	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Item"), TEXT("Prototype_GameObject_EnergyDrink"))))
 	//	return E_FAIL;

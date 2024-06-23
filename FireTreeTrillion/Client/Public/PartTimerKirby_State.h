@@ -20,6 +20,8 @@ public:
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
 	virtual void OnStateExit()														override;
 
+	enum class PARTTIME_ITEM Get_CurrentFood(_float4 vPos);
+
 public:
 	static	CPartTimerKirby_Idle_State* Create();
 	virtual void Free() override;

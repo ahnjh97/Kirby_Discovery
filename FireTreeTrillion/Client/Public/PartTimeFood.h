@@ -46,7 +46,7 @@ private:
 	CShader*			m_pShaderCom = { nullptr };
 	_float4x4*			m_pBoneMatrix = { nullptr };
 	array<CModel*, 4>	m_arrModelCom = { nullptr };
-	PARTTIME_ITEM		m_eItem = { PARTTIME_ITEM::DRINK };
+	PARTTIME_ITEM		m_eItem = { PARTTIME_ITEM::CAKE };
 	_bool				m_bRender = false;
 
 public:

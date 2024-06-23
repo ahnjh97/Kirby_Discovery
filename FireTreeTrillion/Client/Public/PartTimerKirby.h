@@ -54,7 +54,7 @@ public:
 	void			Change_State(ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
 	_bool			IsAnimFinished();
 	_float4			Compute_TerrainPosition();
-	void			Render_PartObjects(_bool _bRender);
+	void			Render_PartObjects(_bool _bRender, enum class PARTTIME_ITEM _eItem);
 
 private:
 	HRESULT			Add_Components();
