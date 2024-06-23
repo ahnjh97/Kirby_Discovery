@@ -334,6 +334,12 @@
     <Filter Include="02.GameObjects\Map\Car">
       <UniqueIdentifier>{6a3a0e35-9a08-4f88-9aa3-377662595d38}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee">
+      <UniqueIdentifier>{e785f913-87d7-41e1-bd17-d70a1c0e8458}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee\DeeDeeDee_State">
+      <UniqueIdentifier>{ed796e74-f987-4f90-874a-7e69a1af5872}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -672,6 +678,12 @@
     <ClInclude Include="..\Public\BreakableRockPartical.h">
       <Filter>02.GameObjects\Map\BreakableRock</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\DeeDeeDee.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\DeeDeeDee_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee\DeeDeeDee_State</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -991,6 +1003,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\BreakableRockPartical.cpp">
       <Filter>02.GameObjects\Map\BreakableRock</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\DeeDeeDee.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\DeeDeeDee_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee\DeeDeeDee_State</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

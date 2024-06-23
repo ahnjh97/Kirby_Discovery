@@ -73,6 +73,9 @@
 #include "CappyBody.h"
 #include "CappyHat.h"
 
+// 보스
+#include "DeeDeeDee.h"
+
 //와들디
 #include "FoodShopDee.h"
 
@@ -291,6 +294,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	//Dee
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FoodShopDee"), CFoodShopDee);
 
+	//Boss
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeeDeeDee"), CDeeDeeDee);
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BackGround"), CBackGround);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
@@ -1146,6 +1151,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		//와들디
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
+
+		// Boss
+		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 180.f);
 
 		// For Mab Interactive Object
 		m_vecModelInfo.emplace_back("GsPebble", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
