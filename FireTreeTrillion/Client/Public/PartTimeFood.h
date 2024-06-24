@@ -38,8 +38,12 @@ public:
 	void				Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
 	void				Update_Position(_float4 vPos);
+	PARTTIME_ITEM		Get_Item() const { return m_eItem; }
 	void				Set_Item(PARTTIME_ITEM _eItem) { m_eItem = _eItem; }
 	void				Set_Render(_bool _bRender) { m_bRender = _bRender; }
+
+	_float4				Get_OriginPosition() const { return m_vOriginPos; }
+
 private:
 	HRESULT				Add_Components();
 	HRESULT				Bind_ShaderResources();
@@ -50,6 +54,7 @@ private:
 	array<CModel*, 4>	m_arrModelCom = { nullptr };
 	PARTTIME_ITEM		m_eItem = { PARTTIME_ITEM::CAKE };
 	_bool				m_bRender = false;
+	_float4				m_vOriginPos = _float4();
 
 public:
 	static CPartTimeFood*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
