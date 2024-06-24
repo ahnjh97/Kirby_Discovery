@@ -97,9 +97,14 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 			"Level_Tool_UI", "Level_Tool_FX", "Level_Tool_Anim", "Level_Tool_Map",
 		"Intro", "Racing",  "Town", "PartTime", "FinalBoss", "Level_End" };
 
-	//UV 조절 가능한 BasicMap
-	m_vecMapModelNames = { "Level0Stage1Step01", "Level0Stage1Step02",  "Level1Stage1Step01", "Town", "TownShop", 
-		"Land_VcLabo"};
+	//BasicMap (UV 편집 가능)
+	m_vecMapModelNames = { "Level0Stage1Step01", "Level0Stage1Step02",  "Level1Stage1Step01", "Town", "TownShop"
+
+#pragma region LEVEL_FINALBOSS (LAB_DISCOVERA) 
+		//Field
+		/*,"Land_VcLabo"*/ ,"Land_LbLastBossBeforeStep" //LbLastBossBeforStep + VcLabo
+#pragma endregion
+	};
 
 	vector<string> vecBGs = { "BG0", "BG1" };
 	m_setMapNames.insert(vecBGs.begin(), vecBGs.end());
@@ -110,6 +115,8 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 	/*m_setNonColDecos = { "BushMCut" };*/
 	m_setAnimDecos = { "BushL", "BushM", "BushS", "PopFlower" };
+
+	//아래는 피직스 처리가 필요한 오브젝트들. (지형 충돌 필요)
 	m_setActorDecos = {  "CMBillBoardC", "CmBuilding1stRoof", "CMBuildingParts", "CMGuardrailAL", "CMGuardrailBL"
 		, "CMFenceAL", "CMFenceA2L", "CMFenceA3L", "CMFenceB3L", "CMFenceCL", "CMFenceCornerCL"
 		, "CMHighwayGuardrailACL", "CMHighwayGuardrailAL", "CMHighwayGuardrailALL", "CMHighwayGuardrailARL", "CMHighwayGuardrailBL", "CMHighwayGuardrailBLL"
@@ -132,7 +139,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 #pragma region LEVEL_FINALBOSS (LAB_DISCOVERA) OBJECT
 		//Field 
-		, "LbBossRoom", "LbLastBossStage", "LbLastBuilding", "LbLastBossBeforeStep"
+		, "LbBossRoom", "LbLastBossStage", "LbLastBuilding", "Land_LbLastBossBeforeStep"
 
 		//LbLastBuilding Object :: 보스전 필드의 오브젝트
 		,"LbLastOutFrame2", "LbLastStairs", "LbLastTank" //"LbLastOutFrame1", 준수 오더로 삭제
@@ -140,6 +147,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		//LbLastBossBeforeStep Object :: Rubble
 		, "LbRubble01L", "LbRubble02L", "LbRubble03L", "LbRubble04L", "LbRubble05L", "LbRubble06L", "LbRubble07L", "LbRubble08L"
 		, "LbRubbleTile01L", "LbRubbleTile02L", "LbRubbleTile03L"
+		
 #pragma endregion
 	};
 	
