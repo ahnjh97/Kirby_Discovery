@@ -59,6 +59,16 @@ HRESULT CLevel_Town::Initialize()
 	hr = Ready_Kickables();
 	CHECK_FAILED(hr);
 
+	CGameObject::GAMEOBJECT_DESC ObjDesc{};
+	ObjDesc.fSpeedPerSec = 5.f;
+	ObjDesc.fRotationPerSec = ToRadian(90.f);
+	_float4x4 InitMat = _float4x4::Identity;
+	InitMat.Translation({ 1.51f, 22.11f, 3.91f });
+	ObjDesc.matWorld = InitMat;
+	// Car Test
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_DeeDeeDee"), TEXT("Prototype_GameObject_DeeDeeDee"), &ObjDesc)))
+		return E_FAIL;
+
 	// Part-timer Kirby Test
 	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOWN, TEXT("Layer_Player"), TEXT("Prototype_GameObject_PartTimerKirby"))))
 	//	return E_FAIL;

@@ -3,6 +3,7 @@
 #include "HitBox.h"
 #include "Kirby.h"
 #include "BreakableRockPartical.h"
+#include "Camera_Main.h"
 
 CBreakableRock::CBreakableRock(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
@@ -108,6 +109,8 @@ void CBreakableRock::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXOb
 		return;
 
 	pKirby->Set_HitStop();
+	CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+	pCamera->Make_Shake(2.f);
 
 	// 바로 없어지는 식의 코드를 짠다.
 	m_bDead = true;
