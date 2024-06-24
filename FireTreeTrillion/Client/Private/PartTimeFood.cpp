@@ -24,6 +24,8 @@ HRESULT CPartTimeFood::Initialize(void* pArg)
 {
 	FOOD_DESC* pFoodDesc = (FOOD_DESC*)pArg;
 	m_pBoneMatrix =  pFoodDesc->pBoneMatrix;
+	m_bRender =  pFoodDesc->bRender;
+	m_eItem =  (PARTTIME_ITEM)pFoodDesc->uItem;
 
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;

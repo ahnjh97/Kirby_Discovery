@@ -101,8 +101,8 @@ HRESULT CDee_Part::Add_Components(wstring wstrModelName)
 	CHECK_FAILED(hr);
 
 
-	//마을에 있을 때만 파트 오브젝트 로드하기
-	if (*m_pCurrentLevelID == LEVEL_TOWN)
+	//마을(TOWN/PARTTIME)에 있을 때만 파트 오브젝트 로드하기
+	if (*m_pCurrentLevelID == LEVEL_TOWN || *m_pCurrentLevelID == LEVEL_PARTTIME)
 	{
 		wstring wstrTag = TEXT("Prototype_Component_Model_");
 

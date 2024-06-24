@@ -64,11 +64,62 @@ HRESULT CLevel_PartTime::Initialize()
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Player"), TEXT("Prototype_GameObject_PartTimerKirby"))))
 		return E_FAIL;
 
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Item"), TEXT("Prototype_GameObject_EnergyDrink"))))
-	//	return E_FAIL;
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Item"), TEXT("Prototype_GameObject_PartTimeFood"))))
-	//	return E_FAIL;
+	CPartTimeFood::FOOD_DESC desc{};
+	// 포지션 설정
+	_float3 position = _float3(18.6f, 23.7f, 31.3f);
+	_float4x4 matPos = Matrix::CreateTranslation(position);
+	_float rotationY = XMConvertToRadians(180.0f);
+	_float4x4 matRot = Matrix::CreateRotationY(rotationY);
+	_float4x4 matFinal = matRot * matPos;
 
+	desc.matWorld = matFinal;
+	desc.bRender = true;
+	desc.uItem = 0;
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Item"), TEXT("Prototype_GameObject_PartTimeFood"), &desc)))
+		return E_FAIL;
+
+	 position = _float3(17.56f, 23.7f, 31.3f);
+	 matPos = Matrix::CreateTranslation(position);
+	 rotationY = XMConvertToRadians(-7.0f);
+	 matRot = Matrix::CreateRotationY(rotationY);
+	 matFinal = matRot * matPos;
+
+	desc.matWorld = matFinal;
+	desc.bRender = true;
+	desc.uItem = 1;
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Item"), TEXT("Prototype_GameObject_PartTimeFood"), &desc)))
+		return E_FAIL;
+
+	position = _float3(16.66f, 23.64f, 31.f);
+	matPos = Matrix::CreateTranslation(position);
+	rotationY = XMConvertToRadians(-1.0f);
+	_float rotationZ = XMConvertToRadians(-6.0f);
+	matRot = Matrix::CreateRotationY(rotationY);
+	_float4x4 matRotZ = Matrix::CreateRotationZ(rotationZ);
+	matFinal = matRot * matRotZ * matPos;
+
+	desc.matWorld = matFinal;
+	desc.bRender = true;
+	desc.uItem = 2;
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Item"), TEXT("Prototype_GameObject_PartTimeFood"), &desc)))
+		return E_FAIL;	
+
+	position = _float3(15.7f, 23.58f, 30.77f);
+	matPos = Matrix::CreateTranslation(position);
+	_float rotationx = XMConvertToRadians(-170.9f);
+	rotationY = XMConvertToRadians(-8.4f);
+	rotationZ = XMConvertToRadians(-176.5f);
+	_float4x4 matRotX = Matrix::CreateRotationX(rotationx);
+	matRot = Matrix::CreateRotationY(rotationY);
+	matRotZ = Matrix::CreateRotationZ(rotationZ);
+	matFinal = matRotX * matRot * matRotZ * matPos;
+
+	desc.matWorld = matFinal;
+	desc.bRender = true;
+	desc.uItem = 3;
+
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Item"), TEXT("Prototype_GameObject_PartTimeFood"), &desc)))
+		return E_FAIL;
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 	           
 	return S_OK;

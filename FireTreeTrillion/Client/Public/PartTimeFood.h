@@ -15,7 +15,9 @@ class CPartTimeFood final : public CItemObject
 public:
 	struct FOOD_DESC : public GAMEOBJECT_DESC
 	{
-		_float4x4* pBoneMatrix = { nullptr };
+		_float4x4*	pBoneMatrix = { nullptr };
+		_bool		bRender;
+		_uint		uItem;
 	};
 
 private:

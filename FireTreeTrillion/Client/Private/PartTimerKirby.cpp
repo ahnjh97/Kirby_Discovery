@@ -7,6 +7,7 @@
 #include "PartTimerKirby_State.h"
 #include "HitBox.h"
 #include "Bone.h"
+#include "Dee_Part.h"
 
 CPartTimerKirby::CPartTimerKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CCharacter{ pDevice, pContext }
@@ -31,7 +32,7 @@ HRESULT CPartTimerKirby::Initialize(void* pArg)
 	if (nullptr != pArg)
 		GameObjectDesc = *(GAMEOBJECT_DESC*)pArg;
 
-	GameObjectDesc.fSpeedPerSec = 3.f;
+	GameObjectDesc.fSpeedPerSec = 4.f;
 	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
@@ -48,7 +49,7 @@ HRESULT CPartTimerKirby::Initialize(void* pArg)
 	if(*m_pCurrentLevelID == LEVEL_TOWN)
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(2.f, 15.f, 3.f, 1.f));
 	else if (*m_pCurrentLevelID == LEVEL_PARTTIME)
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(18.7f, 23.8f, 29.3f, 1.f));
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(15.7f, 23.8f, 29.3f, 1.f));
 
 	m_fScore = 10.f;
 
@@ -68,13 +69,11 @@ _int CPartTimerKirby::Tick(_float fTimeDelta)
 
 	m_fTimeDelta = m_pGameInstance->Get_FirstTimer();
 
-	//if (FOODSHOP_CORRECT == Get_State())
-	//	m_pControllerCom->FreeFall(m_pTransformCom, m_fTimeDelta, 6.f);
-
 	__super::Tick(m_fTimeDelta);
 	m_pPartTimeFood->Tick(fTimeDelta);
 	m_pPartTimeFood->Update_Position(Compute_BoneWorldMatrix());
-	
+	m_pHat->Tick(fTimeDelta);
+
 	return OBJ_NOEVENT;
 }
 
@@ -89,6 +88,7 @@ void CPartTimerKirby::Late_Tick(_float fTimeDelta)
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_DEFERREDINFO, this);
 	}
 	m_pPartTimeFood->Late_Tick(fTimeDelta);
+	m_pHat->Late_Tick(fTimeDelta);
 }
 
 HRESULT CPartTimerKirby::Render()
@@ -112,7 +112,6 @@ HRESULT CPartTimerKirby::Render()
 
 		m_pModelCom->Render(i);
 	}
-	m_pPartTimeFood->Render();
 	return S_OK;
 }
 
@@ -147,26 +146,6 @@ void CPartTimerKirby::Render_IMGUI()
 
 void CPartTimerKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
-	if (eContent == CCollisionCenter::CONTENT_BODY)
-	{
-		if (m_ePhyXState == PO_NORMAL)
-		{
-		/*	m_vLook = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
-			Change_State(KABU_DAMAGE, 50.f, false, true);*/
-		}
-	}
-	else if (eContent == CCollisionCenter::CONTENT_VACUUMOBJECT)
-	{
-
-	}
-	else if (eContent == CCollisionCenter::CONTENT_ATTACK)
-	{
-		if (m_ePhyXState == PO_NORMAL)
-		{
-			/*m_vLook = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
-			Change_State(KABU_DAMAGE, 50.f, false, true);*/
-		}
-	}
 }
 
 void CPartTimerKirby::Collision_Hitbox(CPhysXObject* pGameObject)
@@ -275,10 +254,19 @@ HRESULT CPartTimerKirby::Add_PartObjects()
 	m_pPartTimeFood = static_cast<CPartTimeFood*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_PartTimeFood"), &FoodDesc));
 	CHECK_NULLPTR(m_pPartTimeFood);
 	m_pPartTimeFood->Set_Render(false);
+
+	//m_pHat
+	CDee_Part::DEEPART_DESC	PartDesc{};
+	PartDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	PartDesc.pSocket = m_pModelCom->Get_BonePtr("HatL");
+	PartDesc.wstrModelName = TEXT("DeePart_FoodShop");
+	m_pHat = static_cast<CDee_Part*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_DeePart"), &PartDesc));
+	CHECK_NULLPTR(m_pHat);
+
 	return S_OK;
 }
 
-void CPartTimerKirby::Render_PartObjects(_bool _bRender, PARTTIME_ITEM _eItem)
+void CPartTimerKirby::Render_Food(_bool _bRender, PARTTIME_ITEM _eItem)
 {
 	if(_eItem != PARTTIME_ITEM::ITEM_END)
 		m_pPartTimeFood->Set_Item(_eItem);
@@ -308,20 +296,6 @@ HRESULT CPartTimerKirby::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
-
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool))))
-	//	return E_FAIL;
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool))))
-	//	return E_FAIL;
-	//if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
-	//	return E_FAIL;
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool))))
-	//	return E_FAIL;
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
-	//	return E_FAIL;
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
-	//	return E_FAIL;
-
 	return S_OK;
 }
 
@@ -329,17 +303,17 @@ void CPartTimerKirby::SetUp_FSM()
 {
 	// FSM 상태 초기화
 	m_pFSM = CFSM::Create();
-	m_pFSM->Add_State(FOODSHOP_SELECT,	CPartTimerKirby_Idle_State::Create());
+	m_pFSM->Add_State(FOODSHOP_SELECT,			CPartTimerKirby_Idle_State::Create());
 
-	m_pFSM->Add_State(FOODSHOP_MOVEL,	CPartTimerKirby_Move_State::Create());
-	m_pFSM->Add_State(FOODSHOP_MOVER,	CPartTimerKirby_Move_State::Create());
+	m_pFSM->Add_State(FOODSHOP_MOVEL,			CPartTimerKirby_Move_State::Create());
+	m_pFSM->Add_State(FOODSHOP_MOVER,			CPartTimerKirby_Move_State::Create());
 
-	m_pFSM->Add_State(FOODSHOP_CORRECT, CPartTimerKirby_Grab_State::Create());
-	m_pFSM->Add_State(HANDOVERSHORT,	CPartTimerKirby_Grab_State::Create());
-	m_pFSM->Add_State(HANDOVERSHORTL,	CPartTimerKirby_Grab_State::Create());
+	m_pFSM->Add_State(FOODSHOP_CORRECT,			CPartTimerKirby_Grab_State::Create());
+	m_pFSM->Add_State(HANDOVERSHORT,			CPartTimerKirby_Grab_State::Create());
+	m_pFSM->Add_State(HANDOVERSHORTL,			CPartTimerKirby_Grab_State::Create());
+	m_pFSM->Add_State(FOODSHOP_INCORRECTSTART,  CPartTimerKirby_Grab_State::Create());
+	m_pFSM->Add_State(FOODSHOP_INCORRECT,		CPartTimerKirby_Grab_State::Create());
 	
-	//m_pFSM->Add_State(FOODSHOP_INCORRECTSTART, CPartTimerKirby_Push_State::Create());
-
 	//상태 Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};
 	FSM_Desc.iState = FOODSHOP_SELECT;
@@ -387,4 +361,5 @@ void CPartTimerKirby::Free()
 
 	Safe_Release(m_pCamera);
 	Safe_Release(m_pPartTimeFood);
+	Safe_Release(m_pHat);
 }
