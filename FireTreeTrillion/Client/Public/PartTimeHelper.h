@@ -21,6 +21,7 @@ private:
 
 public: 
 	void				Register_FirstDee(class CHungryDee* pDee);
+	void				Register_PartTimerKirby(class CPartTimerKirby* pKirby);
 	void				Make_RandomItem();
 	_bool				Check_Item(PARTTIME_ITEM eITEM);
 
