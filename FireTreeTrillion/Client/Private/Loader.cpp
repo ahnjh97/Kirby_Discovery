@@ -1327,15 +1327,15 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		// 와들디
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
 		m_vecModelInfo.emplace_back("WaddleDeeHungry", TYPE_ANIM, 1.1f, 180.f);
-
-		//파트타임 모자
+		
+		// 커비 모자 뺏어 씁니다
 		m_vecModelInfo.emplace_back("DeePart_FoodShop", TYPE_NONANIM, 1.f);
 
 		// 음식 나갑니다~
-		m_vecModelInfo.emplace_back("Item_EnergyDrink", TYPE_NONANIM, 2.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("FoodBurger", TYPE_NONANIM, 0.9f);
-		m_vecModelInfo.emplace_back("FoodCake", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("FoodTomato", TYPE_NONANIM, 2.f);
+		m_vecModelInfo.emplace_back("Item_EnergyDrink", TYPE_NONANIM, 1.6f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("FoodBurger", TYPE_NONANIM, 0.6f);
+		m_vecModelInfo.emplace_back("FoodCake", TYPE_NONANIM, 0.6f);
+		m_vecModelInfo.emplace_back("FoodTomato", TYPE_NONANIM, 1.6f);
 	}
 
 	else if (eLevel == LEVEL_FINALBOSS)
