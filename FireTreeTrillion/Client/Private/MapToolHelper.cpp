@@ -142,12 +142,18 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "LbBossRoom", "LbLastBossStage", "LbLastBuilding", "Land_LbLastBossBeforeStep"
 
 		//LbLastBuilding Object :: 보스전 필드의 오브젝트
-		,"LbLastOutFrame2", "LbLastStairs", "LbLastTank" //"LbLastOutFrame1", 준수 오더로 삭제
-		
+		,"LbLastOutFrame2", "LbLastStairs"//, "LbLastTank" "LbLastOutFrame1", 준수 오더로 삭제
+		,"LbBossRoomDoorAL","LbBossRoomDoorBL"
+
 		//LbLastBossBeforeStep Object :: Rubble
 		, "LbRubble01L", "LbRubble02L", "LbRubble03L", "LbRubble04L", "LbRubble05L", "LbRubble06L", "LbRubble07L", "LbRubble08L"
 		, "LbRubbleTile01L", "LbRubbleTile02L", "LbRubbleTile03L"
+		, "GsRubbleA", 	"GsRubbleB", "GsRubbleC", "GsRubbleD", "GsRubbleE", "GsRubbleF", "GsRubbleG"
 		
+		//CmFillerObject :: 채우기용
+		, "CmFillerObjectAL", "CmFillerObjectA02L", "CmFillerObjectA03L", "CmFillerObjectBL", "CmFillerObjectCL", "CmFillerObjectEL"
+		, "CmFillerObjectFL"
+
 #pragma endregion
 	};
 	
