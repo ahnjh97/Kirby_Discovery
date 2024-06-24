@@ -117,14 +117,21 @@ _int CMultiEffect::Tick(_float fTimeDelta)
 	if (m_bDead)
 		return OBJ_DEAD;
 
+	for (auto& pEffect : m_FXs)
+		pEffect->Tick(fTimeDelta);
+
+	return OBJ_NOEVENT;
+}
+
+void CMultiEffect::Late_Tick(_float fTimeDelta)
+{
 	if (0.f < m_fStartDelay)
 	{
 		m_fStartDelay -= fTimeDelta;
 
 		if (m_fStartDelay <= 0.f)
 			m_fStartDelay = 0.f;
-
-		return OBJ_NOEVENT;
+		return;
 	}
 
 	m_fDuration.first += fTimeDelta;
@@ -140,31 +147,21 @@ _int CMultiEffect::Tick(_float fTimeDelta)
 			pEffect->Reset_Duration();
 	}
 
-	for (auto& pEffect : m_FXs)
-		pEffect->Tick(fTimeDelta);
 
-	return OBJ_NOEVENT;
-}
-
-void CMultiEffect::Late_Tick(_float fTimeDelta)
-{
-	if (0.f < m_fStartDelay || m_bDead ||
-		(m_fDuration.second - .05f <= m_fDuration.first && (*m_pCurrentLevelID) != LEVEL_TOOL_FX))
-		return;
+	//if (0.f < m_fStartDelay || m_bDead ||
+	//	(m_fDuration.second - .05f <= m_fDuration.first && (*m_pCurrentLevelID) != LEVEL_TOOL_FX))
+	//	return;
 
 	for (auto& pEffect : m_FXs)
 	{
 		pEffect->Late_Tick(fTimeDelta);
 	}
-
 }
 
 HRESULT CMultiEffect::Render()
 {
-	if (0.f < m_fStartDelay)
-		return S_OK;
-
-
+	//if (0.f < m_fStartDelay)
+	//	return S_OK;
 	return S_OK;
 }
 

@@ -125,7 +125,6 @@ void CSingleEffect::Late_Tick(_float _fTimeDelta)
 		if (*m_pCurrentLevelID != LEVEL_TOOL_FX)
 		{
 			m_bDead = true;
-			//m_fDuration.first = 0.f;
 		}
 	}
 
@@ -252,7 +251,7 @@ HRESULT CSingleEffect::Add_Components(FX_DESC& FXDesc)
 		TEXT("Com_DiffuseTexture"), (CComponent**)&m_pTextureCom[TEX_DIFFUSE]);
 	CHECK_FAILED(hr);
 
-	m_iMaxTexIdx = m_pTextureCom[TEX_DIFFUSE]->Get_TextureNum()-1;
+	m_iMaxTexIdx = m_pTextureCom[TEX_DIFFUSE]->Get_TextureNum() - 1;
 
 	hr = __super::Add_Component(LEVEL_STATIC, CUtils::StrToWstr(FXDesc.strMaskTexTag),
 		TEXT("Com_MaskTexture"), (CComponent**)&m_pTextureCom[TEX_MASK]);
@@ -316,9 +315,18 @@ HRESULT CSingleEffect::Bind_ShaderResources(_int iTexIdx, _int iMaskTexIdx)
 		hr = m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform(CPipeLine::D3DTS_PROJ));
 		CHECK_FAILED(hr);
 	}
+	else
+	{
+		_float4x4 ViewMatrix = _float4x4::Identity;
+		_float4x4 ProjMatrix = XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 10.f); 
 
+		if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
+			return E_FAIL;
+		if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
+			return E_FAIL;
+	}
 
- 	hr = m_pTextureCom[TEX_DIFFUSE]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", iTexIdx);
+	hr = m_pTextureCom[TEX_DIFFUSE]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", iTexIdx);
 	CHECK_FAILED(hr);
 
 	hr = m_pTextureCom[TEX_MASK]->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", iMaskTexIdx);

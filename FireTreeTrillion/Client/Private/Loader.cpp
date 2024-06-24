@@ -1078,7 +1078,16 @@ HRESULT CLoader::Add_FXTexture()
 	//잎
 	hr = Add_Texture(LEVEL_STATIC, "FX_BushCut", "Effects/Basic/BushColor_%d.png", 4);	CHECK_FAILED(hr);
 
-	return E_NOTIMPL;
+	//UI용
+	hr = Add_Texture(LEVEL_STATIC, "FX_Food_LunchTimeIcon", "Effects/UI/MGameFood/lunch time icon.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Food_LunchTimeBanner", "Effects/UI/MGameFood/lunch time banner.png");	CHECK_FAILED(hr);
+
+	hr = Add_Texture(LEVEL_STATIC, "FX_Food_ResultTop", "Effects/UI/MGameFood/result top.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Food_ResultBottom", "Effects/UI/MGameFood/result bottom.png");	CHECK_FAILED(hr);
+
+
+
+	return S_OK;
 }
 
 // 여기다가 모든 Model을 셋업한다.

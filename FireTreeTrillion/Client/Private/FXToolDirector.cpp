@@ -706,18 +706,6 @@ _int CFXToolDirector::Tick(_float _fTimeDelta)
 		}
 	}
 
-
-	//플레이 바 재생 중일 때 이펙트 틱 돌리기
-	if (m_bPlayingBar)
-	{
-		if (m_eSelected == SELECTED_SINGLE_FX)
-			m_FXs[m_iSelectedFXIdx]->Tick(_fTimeDelta);
-		else if (m_eSelected == SELECTED_PARTICLE_FX)
-			m_FXs[m_iSelectedFXIdx]->Tick(_fTimeDelta);
-		else if (m_eSelected == SELECTED_MULTI_FX)
-			m_MultiFXs[m_iSelectedMultiFXIdx]->Tick(_fTimeDelta);
-	}
-
 	return OBJ_NOEVENT;
 }
 
@@ -742,16 +730,28 @@ void CFXToolDirector::Late_Tick(_float _fTimeDelta)
 	//이펙트의 재생 바 설정
 	Render_FXPlayBar(_fTimeDelta);
 
-	//복합 이펙트 아니면 FX에 있는 이펙트 업데이트
-	if (m_eSelected == SELECTED_SINGLE_FX || m_eSelected == SELECTED_PARTICLE_FX)
-		m_FXs[m_iSelectedFXIdx]->Late_Tick(_fTimeDelta);
+	//플레이 바 재생 중일 때 이펙트 틱 돌리기
+	if (m_bPlayingBar)
+	{
+		//복합 이펙트 아니면 FX에 있는 이펙트 업데이트
+		if (m_eSelected == SELECTED_SINGLE_FX || m_eSelected == SELECTED_PARTICLE_FX)
+			m_FXs[m_iSelectedFXIdx]->Late_Tick(_fTimeDelta);
 
-	//아니면 복합 이펙트 업데이트
-	else if (m_eSelected == SELECTED_MULTI_FX)
-		m_MultiFXs[m_iSelectedMultiFXIdx]->Late_Tick(_fTimeDelta);
+		//아니면 복합 이펙트 업데이트
+		else if (m_eSelected == SELECTED_MULTI_FX)
+			m_MultiFXs[m_iSelectedMultiFXIdx]->Late_Tick(_fTimeDelta);
+	}
+	else
+	{
+		//복합 이펙트 아니면 FX에 있는 이펙트 업데이트
+		if (m_eSelected == SELECTED_SINGLE_FX || m_eSelected == SELECTED_PARTICLE_FX)
+			m_FXs[m_iSelectedFXIdx]->Add_RenderGroup();
 
+		//아니면 복합 이펙트 업데이트
+		else if (m_eSelected == SELECTED_MULTI_FX)
+			m_MultiFXs[m_iSelectedMultiFXIdx]->Add_RenderGroup();
+	}
 
-	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_UI, this);
 }
 
 void CFXToolDirector::Render_AxisLines()
@@ -773,7 +773,7 @@ void CFXToolDirector::Render_AxisLines()
 		};
 
 
-	
+
 	_float3 vCenter = { 0.f, 0.f, 0.f };
 	ImVec2 center = TransformToScreen(XMLoadFloat3(&vCenter));
 
@@ -1137,44 +1137,58 @@ void CFXToolDirector::Render_FXHierarchy()
 	//이펙트 초기 값과 키프레임 값을 편집한다.
 	Begin(u8"편집하기");
 
+	static ImGuiTextFilter filter;
+	string szName;
+	Text(u8"검색");
+	filter.Draw();
+
 	SeparatorText(u8"단일 이펙트 목록");
 	BeginChild(u8"목록", ImVec2(0, 200), true);
+
+	_int iFound = -1;
 	for (_int i = 0; i < m_FXs.size(); ++i)
 	{
-		//목록 중 하나 선택하면 해당 객체의 값을 ui에 매칭
-		if (Selectable(m_FXs[i]->m_strFXName.c_str(), m_iSelectedFXIdx == i))
-		{
-			m_iSelectedFXIdx = i;
-
-			m_eSelected = _bool{ dynamic_cast<CSingleEffect*>(m_FXs[i]) != nullptr } ? SELECTED_SINGLE_FX : SELECTED_PARTICLE_FX;
-			m_bPlayingBar = false;
-			m_bLooping = m_FXs[i]->m_bIsLoop;
-			m_iCurFXPassIdx = m_FXs[i]->m_iPassIdx;
-			m_iCurFXTexIdx = m_FXs[i]->m_iTexIdx;
-			m_iCurFXMaskTexIdx = m_FXs[i]->m_iMaskTexIdx;
-			m_iCurRenderGroup = m_FXs[i]->m_eRenderGroup;
-			m_iCurTimer = m_FXs[i]->m_eTimer;
-			m_fTotalPlayDuration = m_FXs[i]->m_fDuration.second;
-
-			memcpy(m_fLifetime, &m_FXs[i]->m_fLifetime, sizeof(_float2));
-			memcpy(m_vRotation, &m_FXs[i]->m_vContinuousRotation, sizeof(_float3));
-
-
-			//파티클이면 추가 변수 매칭
-			if (m_eSelected == SELECTED_PARTICLE_FX)
+		//if (/*iFound != -1 &&*/ filter.PassFilter(m_FXs[i]->m_strFXName.c_str()))
+		//{
+		//	m_iSelectedFXIdx = i;
+		//	//iFound = i;
+		//}
+		if (filter.PassFilter(m_FXs[i]->m_strFXName.c_str())) {
+			// 목록 중 하나 선택하면 해당 객체의 값을 ui에 매칭
+			if (ImGui::Selectable(m_FXs[i]->m_strFXName.c_str(), m_iSelectedFXIdx == i))
 			{
-				CParticle* pCurParticle = static_cast<CParticle*>(m_FXs[i]);
-				memcpy(m_vCenter, &pCurParticle->m_InstanceDesc.vCenter, sizeof(_float3));
-				memcpy(m_vRange, &pCurParticle->m_InstanceDesc.vRange, sizeof(_float3));
-				memcpy(m_vRotation, &pCurParticle->m_InstanceDesc.vRotation, sizeof(_float3));
-				memcpy(m_vRotationRandomOffset, &pCurParticle->m_InstanceDesc.vRotationRandomOffset, sizeof(_float3));
-				memcpy(m_vScale, &pCurParticle->m_InstanceDesc.vScale, sizeof(_float3));
-				memcpy(m_vScaleRandomOffset, &pCurParticle->m_InstanceDesc.vScaleRandomOffset, sizeof(_float3));
-				memcpy(m_vDir, &pCurParticle->m_InstanceDesc.vDir, sizeof(_float3));
-				memcpy(m_vDirRandomOffset, &pCurParticle->m_InstanceDesc.vDirRandomOffset, sizeof(_float3));
-				memcpy(m_vColor, &pCurParticle->m_InstanceDesc.vColor, sizeof(_float3));
-				memcpy(m_vColorRandomOffset, &pCurParticle->m_InstanceDesc.vColorRandomOffset, sizeof(_float3));
-				memcpy(m_vPivot, &pCurParticle->m_InstanceDesc.vPivot, sizeof(_float3));
+				m_iSelectedFXIdx = i;
+
+				m_eSelected = _bool{ dynamic_cast<CSingleEffect*>(m_FXs[i]) != nullptr } ? SELECTED_SINGLE_FX : SELECTED_PARTICLE_FX;
+				m_bPlayingBar = false;
+				m_bLooping = m_FXs[i]->m_bIsLoop;
+				m_iCurFXPassIdx = m_FXs[i]->m_iPassIdx;
+				m_iCurFXTexIdx = m_FXs[i]->m_iTexIdx;
+				m_iCurFXMaskTexIdx = m_FXs[i]->m_iMaskTexIdx;
+				m_iCurRenderGroup = m_FXs[i]->m_eRenderGroup;
+				m_iCurTimer = m_FXs[i]->m_eTimer;
+				m_fTotalPlayDuration = m_FXs[i]->m_fDuration.second;
+
+				memcpy(m_fLifetime, &m_FXs[i]->m_fLifetime, sizeof(_float2));
+				memcpy(m_vRotation, &m_FXs[i]->m_vContinuousRotation, sizeof(_float3));
+
+
+				//파티클이면 추가 변수 매칭
+				if (m_eSelected == SELECTED_PARTICLE_FX)
+				{
+					CParticle* pCurParticle = static_cast<CParticle*>(m_FXs[i]);
+					memcpy(m_vCenter, &pCurParticle->m_InstanceDesc.vCenter, sizeof(_float3));
+					memcpy(m_vRange, &pCurParticle->m_InstanceDesc.vRange, sizeof(_float3));
+					memcpy(m_vRotation, &pCurParticle->m_InstanceDesc.vRotation, sizeof(_float3));
+					memcpy(m_vRotationRandomOffset, &pCurParticle->m_InstanceDesc.vRotationRandomOffset, sizeof(_float3));
+					memcpy(m_vScale, &pCurParticle->m_InstanceDesc.vScale, sizeof(_float3));
+					memcpy(m_vScaleRandomOffset, &pCurParticle->m_InstanceDesc.vScaleRandomOffset, sizeof(_float3));
+					memcpy(m_vDir, &pCurParticle->m_InstanceDesc.vDir, sizeof(_float3));
+					memcpy(m_vDirRandomOffset, &pCurParticle->m_InstanceDesc.vDirRandomOffset, sizeof(_float3));
+					memcpy(m_vColor, &pCurParticle->m_InstanceDesc.vColor, sizeof(_float3));
+					memcpy(m_vColorRandomOffset, &pCurParticle->m_InstanceDesc.vColorRandomOffset, sizeof(_float3));
+					memcpy(m_vPivot, &pCurParticle->m_InstanceDesc.vPivot, sizeof(_float3));
+				}
 			}
 		}
 
@@ -1442,6 +1456,14 @@ void CFXToolDirector::Render_FXProperty()
 		{
 			m_iCurRenderGroup = CRenderer::RENDER_BLEND;
 			pCurFX->m_eRenderGroup = CRenderer::RENDER_BLEND;
+		}
+
+		SameLine();
+
+		if (RadioButton(u8"UI", m_iCurRenderGroup == CRenderer::RENDER_UI))
+		{
+			m_iCurRenderGroup = CRenderer::RENDER_UI;
+			pCurFX->m_eRenderGroup = CRenderer::RENDER_UI;
 		}
 
 		Spacing();
@@ -1952,9 +1974,7 @@ void CFXToolDirector::Render_FXPlayBar(_float _fTimeDelta)
 				{
 					m_MultiFXs[m_iSelectedMultiFXIdx]->Reset_Duration();
 				}
-
 			}
-
 		}
 
 		SameLine();
