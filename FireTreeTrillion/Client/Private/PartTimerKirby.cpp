@@ -52,7 +52,7 @@ HRESULT CPartTimerKirby::Initialize(void* pArg)
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(15.7f, 23.8f, 29.3f, 1.f));
 
 	m_fScore = 10.f;
-
+	m_bMotionBlur = true;
 	Set_Slope(false);
 
 	// 타겟 카메라를 만들어준다.
@@ -270,6 +270,7 @@ void CPartTimerKirby::Render_Food(_bool _bRender, PARTTIME_ITEM _eItem)
 {
 	if(_eItem != PARTTIME_ITEM::ITEM_END)
 		m_pPartTimeFood->Set_Item(_eItem);
+
 	m_pPartTimeFood->Set_Render(_bRender);
 }
 
@@ -296,6 +297,20 @@ HRESULT CPartTimerKirby::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
+		return E_FAIL;
+
 	return S_OK;
 }
 

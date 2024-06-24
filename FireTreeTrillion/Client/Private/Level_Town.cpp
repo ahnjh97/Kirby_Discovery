@@ -396,21 +396,22 @@ HRESULT CLevel_Town::Ready_Dees()
 	if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NPC"), TEXT("Prototype_GameObject_FoodShopDee"), &ObjDesc)))
 		return E_FAIL;
 
+	/*
 	CHungryDee::HUNGRYDEE_DESC HungryDeeDesc{};
 	HungryDeeDesc.fSpeedPerSec = 5.f;
 	HungryDeeDesc.fRotationPerSec = ToRadian(90.f);
 	InitMat = _float4x4::Identity;
-	InitMat.Translation({ 13.2f, 24.7f, 24.f });
+	InitMat.Translation({ 15.2f, 24.7f, 26.f });
 	HungryDeeDesc.matWorld = InitMat;
 
-	for (_int i = 0; i < 7; ++i)
+	for (_int i = 0; i < 12; ++i)
 	{
 		HungryDeeDesc.iIdx = i;
 
 		if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NPC"), TEXT("Prototype_GameObject_HungryDee"), &HungryDeeDesc)))
 			return E_FAIL;
 	}
-
+	*/
 
 	//일단 마을에는 몬스터가 없어요
 
