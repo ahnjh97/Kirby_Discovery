@@ -97,7 +97,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 			"Level_Tool_UI", "Level_Tool_FX", "Level_Tool_Anim", "Level_Tool_Map",
 		"Intro", "Racing",  "Town", "PartTime", "FinalBoss", "Level_End" };
 
-	//UV 조절 가능
+	//UV 조절 가능한 BasicMap
 	m_vecMapModelNames = { "Level0Stage1Step01", "Level0Stage1Step02",  "Level1Stage1Step01", "Town", "TownShop", 
 		"Land_VcLabo"};
 
@@ -132,8 +132,15 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 
 #pragma region LEVEL_FINALBOSS (LAB_DISCOVERA) OBJECT
-		, "LbBossRoom", "LbLastBossStage", "LbLastBuilding", /*"LbLastOutFrame1", */"LbLastOutFrame2", "LbLastStairs"
-		, "LbLastTank"
+		//Field 
+		, "LbBossRoom", "LbLastBossStage", "LbLastBuilding", "LbLastBossBeforeStep"
+
+		//LbLastBuilding Object :: 보스전 필드의 오브젝트
+		,"LbLastOutFrame2", "LbLastStairs", "LbLastTank" //"LbLastOutFrame1", 준수 오더로 삭제
+		
+		//LbLastBossBeforeStep Object :: Rubble
+		, "LbRubble01L", "LbRubble02L", "LbRubble03L", "LbRubble04L", "LbRubble05L", "LbRubble06L", "LbRubble07L", "LbRubble08L"
+		, "LbRubbleTile01L", "LbRubbleTile02L", "LbRubbleTile03L"
 #pragma endregion
 	};
 	

@@ -72,7 +72,7 @@ HRESULT CSkySphere::Render()
 		LEVEL eCurLevel = (LEVEL)*m_pGameInstance->Get_CurrentLevelID();
 
 		//1) 현재 해당 레벨 진입 시에 임시로 설정. 추후 FIELD/1PASE/2PASE 시점에 스왑하는 방식으로 변경 필요
-		// 에피리스 피 45% 일 경우, 2페이즈 이동
+		// 에피리스 HP 45% 일 경우, 2페이즈 시작
 		//2) 추후 일렁일렁 움직이는 효과 셰이더로 세팅 필요
 		if (LEVEL_FINALBOSS == eCurLevel)
 		{
