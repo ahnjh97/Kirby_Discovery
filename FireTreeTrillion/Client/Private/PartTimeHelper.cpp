@@ -17,6 +17,13 @@ void CPartTimeHelper::Register_FirstDee(CHungryDee* pDee)
 	Safe_AddRef(m_pHungryDee);
 }
 
+void CPartTimeHelper::Register_PartTimerKirby(CPartTimerKirby* pKirby)
+{
+	Safe_Release(m_pPartTimerKirby);
+	m_pPartTimerKirby = pKirby;
+	Safe_AddRef(m_pPartTimerKirby);
+}
+
 // 메뉴판 앞으로 온 와들디 OR UI 쪽에서 생성
 void CPartTimeHelper::Make_RandomItem()
 {
@@ -43,12 +50,16 @@ _bool CPartTimeHelper::Check_Item(PARTTIME_ITEM eITEM)
 
 void CPartTimeHelper::NotifyObserver()
 {
-	m_pHungryDee->OnNotify();
-	m_pPartTimerKirby->OnNotify();
+	if(m_pHungryDee != nullptr)
+		m_pHungryDee->OnNotify();
+	if(m_pPartTimerKirby != nullptr)
+		m_pPartTimerKirby->OnNotify();
 }
 
 void CPartTimeHelper::Free()
 {
 	__super::Free();
+	Safe_Release(m_pHungryDee);
+	Safe_Release(m_pPartTimerKirby);
 }
 

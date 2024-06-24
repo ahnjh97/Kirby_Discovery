@@ -13,6 +13,7 @@ CUI_PartTime::CUI_PartTime(const CUI_PartTime& _rhs)
 
 HRESULT CUI_PartTime::Initialize_Prototype()
 {
+	fill(m_arrTexures.begin(), m_arrTexures.end(), nullptr);
 	return S_OK;
 }
 
@@ -21,7 +22,6 @@ HRESULT CUI_PartTime::Initialize(void* _pArg)
 	HRESULT hr = __super::Initialize(_pArg);
 	CHECK_FAILED(hr);
 
-	fill(m_arrTexures.begin(), m_arrTexures.end(), nullptr);
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
@@ -339,6 +339,9 @@ CGameObject* CUI_PartTime::Clone(void* pArg)
 
 void CUI_PartTime::Free()
 {
+	for (auto& texure : m_arrTexures)
+		Safe_Release(texure);
+
 	Safe_Release(m_pTexMask);
 	__super::Free();
 }

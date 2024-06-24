@@ -30,9 +30,13 @@ public:
 private:
 	HRESULT						Add_Components();
 	HRESULT						Render_BindSet(CShader* _pShaderCom, CTransform* _pTransCom);
+	
 	HRESULT						Bind_ShaderResources(_int iTextureNum);
+	void						Move_Position(_int iTextureNum);
+
 	HRESULT						Bind_VIBuffer();
 	void						Compute_Timer(_float fTimeDelta);
+
 
 private:
 	_bool						m_IsMovingUP = { TRUE };
