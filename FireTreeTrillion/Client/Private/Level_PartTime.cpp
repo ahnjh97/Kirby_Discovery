@@ -121,7 +121,7 @@ HRESULT CLevel_PartTime::Initialize()
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Item"), TEXT("Prototype_GameObject_PartTimeFood"), &desc)))
 		return E_FAIL;
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
-	           
+	m_pGameInstance->Set_ColorSet_ByIndex(4);
 	return S_OK;
 }
 
