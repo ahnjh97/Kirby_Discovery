@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "PartTimerKirby_State.h"
 #include "PartTimerKirby.h"
+#include "PartTimeHelper.h"
 
-//const _float fWalkDistance = 20.f;
 
 #pragma region IDLE STATE
 //*********************************
@@ -25,11 +25,35 @@ void CPartTimerKirby_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float 
 	else if (m_pGameInstance->Get_DIKeyState(DIK_RIGHT, KEY_DOWN))
 		pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_MOVER, 50.f, false, true);
 	else if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
-		pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_CORRECT, 50.f, false, true);
+	{
+		// 아이템 위치에 따라 PARTTIME_ITEM를 다르게
+		PARTTIME_ITEM curItem = Get_CurrentFood(pAlbaKirby->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION));
+		if (CPartTimeHelper::Get_Instance()->Check_Item(curItem))
+		{
+			pAlbaKirby->Render_PartObjects(true, curItem);
+			pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_CORRECT, 50.f, false, true);
+		}
+		else
+		{
+			//pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_INCORRECTSTART, 50.f, false, true);
+		}
+	}
 }
 
 void CPartTimerKirby_Idle_State::OnStateExit()
 {
+}
+
+PARTTIME_ITEM CPartTimerKirby_Idle_State::Get_CurrentFood(_float4 vPos)
+{
+	if (vPos.x <= 19.f && vPos.x > 18.1f)
+		return PARTTIME_ITEM::CAKE;
+	else if(vPos.x <= 18.1f && vPos.x > 17.1f)
+		return PARTTIME_ITEM::TOMATO;
+	else if (vPos.x <= 17.1f && vPos.x > 16.5f)
+		return PARTTIME_ITEM::DRINK;
+	else if (vPos.x <= 16.5f && vPos.x > 16.1f)
+		return PARTTIME_ITEM::BURGER;
 }
 
 CPartTimerKirby_Idle_State* CPartTimerKirby_Idle_State::Create()
@@ -108,11 +132,22 @@ void CPartTimerKirby_Grab_State::OnStateUpdate(CGameObject* pGameObject, _float 
 {
 	CPartTimerKirby* pAlbaKirby = static_cast<CPartTimerKirby*>(pGameObject);
 	if (pAlbaKirby->IsAnimFinished())
-		pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_SELECT, 50.f, true, true);
+	{
+		if (pAlbaKirby->Get_State() == CPartTimerKirby::HANDOVERSHORT || pAlbaKirby->Get_State() == CPartTimerKirby::HANDOVERSHORTL)
+		{
+			pAlbaKirby->Render_PartObjects(false, PARTTIME_ITEM::ITEM_END);
+			pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_SELECT, 50.f, true, true);
+		}
+		else if(CPartTimeHelper::Get_Instance()->Get_PartTimeItem() == PARTTIME_ITEM::CAKE|| CPartTimeHelper::Get_Instance()->Get_PartTimeItem() == PARTTIME_ITEM::TOMATO)
+			pAlbaKirby->Change_State(CPartTimerKirby::HANDOVERSHORT, 70.f, false, true);
+		else if(CPartTimeHelper::Get_Instance()->Get_PartTimeItem() == PARTTIME_ITEM::DRINK|| CPartTimeHelper::Get_Instance()->Get_PartTimeItem() == PARTTIME_ITEM::BURGER)
+			pAlbaKirby->Change_State(CPartTimerKirby::HANDOVERSHORTL, 70.f, false, true);
+	}
 }
-
+ 
 void CPartTimerKirby_Grab_State::OnStateExit()
 {
+	CPartTimeHelper::Get_Instance()->Make_RandomItem();
 }
 
 CPartTimerKirby_Grab_State* CPartTimerKirby_Grab_State::Create()

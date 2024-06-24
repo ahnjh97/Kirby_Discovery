@@ -18,6 +18,7 @@
 
 #include "BG.h"
 #include "HUD.h"
+#include "PartTimeHelper.h"
 
 
 CLevel_PartTime::CLevel_PartTime(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -60,14 +61,13 @@ HRESULT CLevel_PartTime::Initialize()
 	hr = Ready_Kickables();
 	CHECK_FAILED(hr);
 
-	// Part-timer Kirby Test
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Player"), TEXT("Prototype_GameObject_PartTimerKirby"))))
-	//	return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Player"), TEXT("Prototype_GameObject_PartTimerKirby"))))
+		return E_FAIL;
 
 	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Item"), TEXT("Prototype_GameObject_EnergyDrink"))))
 	//	return E_FAIL;
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Item"), TEXT("Prototype_GameObject_PartTimeFood"))))
-		return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Item"), TEXT("Prototype_GameObject_PartTimeFood"))))
+	//	return E_FAIL;
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 	           
@@ -715,4 +715,6 @@ void CLevel_PartTime::Free()
 
 	for (auto& tex : m_pEnvTexture)
 		Safe_Release(tex);
+
+	CPartTimeHelper::Destroy_Instance();
 }
