@@ -172,7 +172,7 @@ void CObject_Manager::Clear_Layer(_uint iLevelIndex, const wstring& strLayerTag)
 	}
 }
 
-list<CGameObject*>*CObject_Manager::Get_List(_uint iLevelIndex, const wstring & strLayerTag)
+list<CGameObject*>*		CObject_Manager::Get_List(_uint iLevelIndex, const wstring & strLayerTag)
 {
 	CLayer* pLayer = Find_Layer(iLevelIndex, strLayerTag);
 

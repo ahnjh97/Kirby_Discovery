@@ -22,6 +22,8 @@ private:
 	HRESULT Ready_Lights();
 	HRESULT Ready_Layer_Camera(const wstring& strLayerTag);
 	HRESULT Ready_Layer_BackGround(const wstring& strLayerTag);
+	void	Ready_Layer_Player(const wstring& strLayerTag);
+	void	Ready_Layer_Food(const wstring& strLayerTag);
 	HRESULT Ready_Layer_UI(const wstring& strLayerTag);
 
 	HRESULT Ready_Map();

@@ -46,10 +46,8 @@ HRESULT CPartTimerKirby::Initialize(void* pArg)
 	// FSM에서 첫 애니메이션 돌아가게 하는 구조
 	m_pModelCom->Set_Animation(FOODSHOP_SELECT, 50.f, true, true);
 
-	if(*m_pCurrentLevelID == LEVEL_TOWN)
+	if (*m_pCurrentLevelID == LEVEL_TOWN)
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(2.f, 15.f, 3.f, 1.f));
-	else if (*m_pCurrentLevelID == LEVEL_PARTTIME)
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(15.7f, 23.8f, 29.3f, 1.f));
 
 	m_fScore = 10.f;
 	m_bMotionBlur = true;
@@ -66,7 +64,7 @@ _int CPartTimerKirby::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
 		return Ready_Dead();
-
+	 
 	m_fTimeDelta = m_pGameInstance->Get_FirstTimer();
 
 	__super::Tick(m_fTimeDelta);
