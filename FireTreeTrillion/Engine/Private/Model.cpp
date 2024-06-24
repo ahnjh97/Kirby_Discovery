@@ -185,6 +185,8 @@ HRESULT CModel::Play_Animation(_float fTimeDelta)
 	/* 현재 애니메이션에 맞는 뼈의 상태(m_TransformationMatrix)를 갱신해준다. */
 	m_Animations[m_iCurrentAnimIndex]->Invalidate_TransformationMatrix(fTimeDelta, m_Bones, m_isLoop, this);
 
+
+
 	for (auto& pBone : m_Bones)
 		pBone->Invalidate_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_TransformMatrix));
 	
@@ -497,6 +499,17 @@ HRESULT CModel::Bind_WorldMatrixForOctree(CShader* pShader, string& strConstantN
 		return E_FAIL;
 
 	return S_OK;
+}
+
+_uint CModel::Find_MeshIndex(const string& _strMeshName)
+{
+	for (_int i = 0; i < m_iNumMeshes; i++)
+	{
+		if (m_Meshes[i]->Get_Name() == _strMeshName)
+			return i;
+	}
+
+	return _uint();
 }
 
 HRESULT CModel::Ready_Meshes(_bool bOctree)

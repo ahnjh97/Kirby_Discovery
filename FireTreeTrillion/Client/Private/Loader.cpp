@@ -75,6 +75,9 @@
 #include "CappyBody.h"
 #include "CappyHat.h"
 
+// 보스
+#include "DeeDeeDee.h"
+
 //와들디
 #include "Dee_Part.h"
 #include "FoodShopDee.h"
@@ -88,9 +91,9 @@
 #include "StarBlockPiece.h"
 #include "TerrainFog.h"
 #include "BreakableRock.h"
-#include "Car.h"
-#include "BreakableRock.h"
 #include "BreakableRockPartical.h"
+#include "Car.h"
+#include "CarShopWall.h"
 
 //UI
 #include "BackGround.h"
@@ -303,6 +306,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FoodShopDee"), CFoodShopDee);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HungryDee"), CHungryDee);
 
+	//Boss
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeeDeeDee"), CDeeDeeDee);
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BackGround"), CBackGround);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
@@ -325,6 +330,7 @@ HRESULT CLoader::Loading_ObjectAll()
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BreakableRock"), CBreakableRock);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BreakableRockPartical"), CBreakableRockPartical);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CarShopWall"), CCarShopWall);
 
 	// 미니게임 in 와들디마을
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PartTimeFood"), CPartTimeFood);
@@ -1196,7 +1202,10 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		//와들디
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
 
-		// For Mab Interactive Object
+		// Boss
+		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 180.f);
+
+		// For Map Interactive Object
 		m_vecModelInfo.emplace_back("GsPebble", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("SeShell", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
@@ -1314,10 +1323,17 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("CappyBody", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("CappyHat", TYPE_ANIM, 1.f, 180.f);
 
-		// For Mab Interactive Object
+		// For Map Interactive Object
 		m_vecModelInfo.emplace_back("GsPebble", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("SeShell", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+
+		// 자동차 관련 (자동차와 부수는 돌멩이들)
+		m_vecModelInfo.emplace_back("Car", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("RockA", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("RockB", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("RockPartical", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("CarShopBreakableWall", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 		// For Item
 		m_vecModelInfo.emplace_back("Item_EnergyDrink", TYPE_NONANIM, 3.f, 0.f, 0, string("MapObjs/"));
@@ -1354,7 +1370,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("FoodCake", TYPE_NONANIM, 0.6f);
 		m_vecModelInfo.emplace_back("FoodTomato", TYPE_NONANIM, 1.6f);
 	}
-
 	else if (eLevel == LEVEL_FINALBOSS)
 	{
 		m_vecModelInfo.emplace_back("Land_VcLabo", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
@@ -1424,7 +1439,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("CappyBody", TYPE_ANIM, 1.2f, 180.f);
 		m_vecModelInfo.emplace_back("CappyHat", TYPE_ANIM, 1.2f, 180.f);
 
-		// For Mab Interactive Object
+		// For Map Interactive Object
 		m_vecModelInfo.emplace_back("Ladder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("GsPebble", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("SeShell", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
@@ -1483,17 +1498,22 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
 
 		// For Monster
-		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("Rabbit", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("Buffahorn", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("BladeKnight", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.f, 0.f);
+		m_vecModelInfo.emplace_back("Rabbit", TYPE_ANIM, 1.f, 0.f);
+		m_vecModelInfo.emplace_back("Buffahorn", TYPE_ANIM, 1.f, 0.f);
+		m_vecModelInfo.emplace_back("BladeKnight", TYPE_ANIM, 1.f, 0.f);
 		m_vecModelInfo.emplace_back("BladeKnightSword", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("Kabu", TYPE_ANIM, 2.f, 180.f);
-		m_vecModelInfo.emplace_back("BrontoBurt", TYPE_ANIM, 2.f, 180.f);
-		m_vecModelInfo.emplace_back("PoppyBrosJr", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_ANIM, 1.3f, 180.f);
+		m_vecModelInfo.emplace_back("Kabu", TYPE_ANIM, 2.f, 0.f);
+		m_vecModelInfo.emplace_back("BrontoBurt", TYPE_ANIM, 2.f, 0.f);
+		m_vecModelInfo.emplace_back("PoppyBrosJr", TYPE_ANIM, 1.f, 0.f);
+		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_ANIM, 1.3f, 0.f);
 
 		//와들디
+		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 0.f);
+
+		// Boss
+		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 0.f);
+
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
 		m_vecModelInfo.emplace_back("WaddleDeeHungry", TYPE_ANIM, 1.1f, 180.f);
 	}
@@ -1703,7 +1723,7 @@ void CLoader::Load_AnimToolInfo()
 					{
 						_float animSpeed;
 						pAnimSpeedElement->QueryFloatText(&animSpeed);
-						animInfo.fAnimSpeed = animSpeed;
+						animInfo.fAnimSpeed = 60.f;// animSpeed;
 					}
 
 					// Count 값 읽기

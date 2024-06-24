@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Client_Defines.h"
 #include "PhysXObject.h"
 
@@ -36,6 +35,7 @@ private:
 
 	_int			Make_Partical();
 	_float			m_fHitPower = { 0.f };
+	_float			m_fWhiteColorDiffuse = 0.f;
 
 	CModel*						m_pModelCom = { nullptr };
 	CCharacterController*		m_pControllerCom = { nullptr };
