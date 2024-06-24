@@ -130,7 +130,6 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "TwSignboardStreetLive", "TwSlope", "TwBenchA", "TwBenchB", "TwBenchC", "TwBenchD"
 #pragma endregion
 
-
 #pragma region LEVEL_FINALBOSS (LAB_DISCOVERA) OBJECT
 		//Field 
 		, "LbBossRoom", "LbLastBossStage", "LbLastBuilding", "LbLastBossBeforeStep"
@@ -217,8 +216,8 @@ void CMapToolHelper::Late_Tick(_float fTimeDelta)
 		if (m_pGameInstance->Get_DIKeyState(DIK_S, KEY_DOWN))
 			Save_Level();
 
-		//if (m_pGameInstance->Get_DIKeyState(DIK_L, KEY_DOWN))
-			//Load_Level();
+		if (m_pGameInstance->Get_DIKeyState(DIK_L, KEY_DOWN))
+			Load_Level();
 	}
 
 	Edit_Object();
@@ -387,8 +386,7 @@ void CMapToolHelper::Menu_Level()
 			ImGui::SameLine();
 	}
 	//ImGui::NewLine(); 
-	//HelpMarker(u8"저장 : Ctrl+S / 로드 : Ctrl+L");
-	HelpMarker(u8"저장 : Ctrl+S");
+	HelpMarker(u8"저장 : Ctrl+S / 로드 : Ctrl+L");
 
 	if (ImGui::Button("Save", ImVec2(100, 40)))
 		Save_Level();
