@@ -70,6 +70,8 @@ public:
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
 	virtual void OnStateExit()														override;
 
+private:
+	_float		m_fSpeed = _float();
 public:
 	static	CPartTimerKirby_Grab_State* Create();
 	virtual void Free() override;

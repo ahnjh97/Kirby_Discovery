@@ -100,8 +100,6 @@ HRESULT CDee_Part::Add_Components(wstring wstrModelName)
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
-
-
 	wstring wstrTag = TEXT("Prototype_Component_Model_");
 
 	wstrTag += wstrModelName;
