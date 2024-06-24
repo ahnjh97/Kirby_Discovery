@@ -71,11 +71,12 @@ HRESULT CBasicMap::Initialize(void* pArg)
         InsertMapDecos();
     }
     if (wstrModelTag == TEXT("Town") || wstrModelTag == TEXT("TownShop")|| wstrModelTag == TEXT("Land_VcLabo")) {
-        if(LEVEL_TOOL_MAP != *m_pCurrentLevelID)
+        if (LEVEL_TOOL_MAP != *m_pCurrentLevelID) {
+            ReadMapDecoTxts();
             ReadDecos_ForSmallLevels();
+        }
     }
         
-
     if (FAILED(m_pModelCom->CreateStaticActor(GameObjectDesc.matWorld)))
         return E_FAIL;
 
