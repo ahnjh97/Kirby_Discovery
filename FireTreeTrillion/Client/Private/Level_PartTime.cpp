@@ -47,8 +47,8 @@ HRESULT CLevel_PartTime::Initialize()
 	hr = Ready_Layer_BackGround(TEXT("Layer_BackGround"));
 	CHECK_FAILED(hr);
 
-	//hr = Ready_Layer_UI(TEXT("Layer_UI"));
-	//CHECK_FAILED(hr);
+	hr = Ready_Layer_UI(TEXT("Layer_UI"));
+	CHECK_FAILED(hr);
 
 	hr = Ready_Map();
 	CHECK_FAILED(hr);
@@ -211,7 +211,6 @@ HRESULT CLevel_PartTime::Ready_Layer_Camera(const wstring& strLayerTag)
 
 HRESULT CLevel_PartTime::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
-
 	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_PARTTIME, strLayerTag, TEXT("Prototype_GameObject_SkySphere"));
 	CHECK_FAILED(hr);
 
@@ -220,30 +219,8 @@ HRESULT CLevel_PartTime::Ready_Layer_BackGround(const wstring& strLayerTag)
 
 HRESULT CLevel_PartTime::Ready_Layer_UI(const wstring& _wstrLayerTag)
 {
-	//HRESULT hr;
-
-
-	////모든 HUD를 준비
-	//string strUITag = { "LayerUI" };
-	//CHUD::UI_TAG eHUDType = CHUD::TAG_NONE;
-
-	//map<CHUD::UI_TAG, string> HUDmap =
-	//{
-	//	{CHUD::HUD_KIRBYHP, "HUD_KirbyStatus"},
-	//	{CHUD::HUD_STARPOINT, "HUD_StarPoint"},
-	//	{CHUD::HUD_ABILITYDISCARD, "HUD_AbilityDiscard"},
-	//};
-
-
-	//for (const auto& [eHUDType, strUITag] : HUDmap)
-	//{
-	//	string strFilePath = { "../../../UI_txt/" };
-	//	string strFileExt = { "_Orig.txt" };
-
-	//	strFilePath += strUITag.c_str() + strFileExt;
-	//	hr = Load_FileData(strFilePath, FILE_UI, _wstrLayerTag);
-	//	CHECK_FAILED(hr);
-	//}
+	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_PARTTIME, _wstrLayerTag, TEXT("Prototype_GameObject_UI_PartTime"));
+	CHECK_FAILED(hr);
 
 	return S_OK;
 }
@@ -465,7 +442,7 @@ HRESULT CLevel_PartTime::Ready_Dees()
 	{
 		HungryDeeDesc.iIdx = i;
 
-		if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NPC"), TEXT("Prototype_GameObject_HungryDee"), &HungryDeeDesc)))
+		if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Dee"), TEXT("Prototype_GameObject_HungryDee"), &HungryDeeDesc)))
 			return E_FAIL;
 	}
 

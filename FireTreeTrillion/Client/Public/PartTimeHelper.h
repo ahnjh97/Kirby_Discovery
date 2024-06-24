@@ -26,9 +26,12 @@ public:
 
 	PARTTIME_ITEM		Get_PartTimeItem() const { return m_eFood; }
 
+	void				NotifyObserver();
+
 private:
-	class CHungryDee*	m_pHungryDee = nullptr;
-	PARTTIME_ITEM		m_eFood = PARTTIME_ITEM::CAKE;
+	class CHungryDee*		m_pHungryDee = nullptr;
+	class CPartTimerKirby*	m_pPartTimerKirby = nullptr;
+	PARTTIME_ITEM			m_eFood = PARTTIME_ITEM::CAKE;
 
 public:
 	virtual void Free() override;

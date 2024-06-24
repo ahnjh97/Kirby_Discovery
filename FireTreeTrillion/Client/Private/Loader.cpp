@@ -75,6 +75,9 @@
 #include "CappyBody.h"
 #include "CappyHat.h"
 
+// 보스
+#include "DeeDeeDee.h"
+
 //와들디
 #include "Dee_Part.h"
 #include "FoodShopDee.h"
@@ -100,7 +103,7 @@
 #include "BombOrbit.h"
 #include "BombOrbitGlow.h"
 #include "HUD_AbilityDiscard.h"
-
+#include "UI_PartTime.h"
 
 // 아이템
 #include "EnergyDrink.h"
@@ -265,9 +268,11 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_KirbyStatus"), CHUD_KirbyStatus);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_StarPoint"), CHUD_StarPoint);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_AbilityDiscard"), CHUD_AbilityDiscard);
-	// 
+
 	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_HPBoss"), CHUD_HPBoss);
 	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_Mission"), CHUD_Mission);
+	
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_PartTime"), CUI_PartTime);
 
 #pragma endregion
 	
@@ -301,6 +306,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FoodShopDee"), CFoodShopDee);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HungryDee"), CHungryDee);
 
+	//Boss
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeeDeeDee"), CDeeDeeDee);
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BackGround"), CBackGround);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
@@ -794,6 +801,21 @@ HRESULT CLoader::Loading_For_Parttime()
 #pragma endregion
 
 
+#pragma region UI
+
+	// 타임 바
+	hr = Add_Texture(eLevel, "GameFoodUI_BaseBar", "UI/MGameFoodUI/base bar.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_TimeBarBlank", "UI/MGameFoodUI/time bar blank.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_TimeBar", "UI/MGameFoodUI/time bar.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_TimeBarBW", "UI/MGameFoodUI/time bar_bw.png");
+
+	hr = Add_Texture(eLevel, "GameFoodUI_DeeBG",	"UI/MGameFoodUI/dee bg.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_DeeBGBW",	"UI/MGameFoodUI/dee bg_bw.png");
+
+	//hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 23);
+
+#pragma endregion
+
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
 #pragma region 모델
 	Load_AnimToolInfo();
@@ -1218,6 +1240,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		//와들디
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
 
+		// Boss
+		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 180.f);
+
 		// For Map Interactive Object
 		m_vecModelInfo.emplace_back("GsPebble", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("SeShell", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
@@ -1511,17 +1536,22 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
 
 		// For Monster
-		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("Rabbit", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("Buffahorn", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("BladeKnight", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.f, 0.f);
+		m_vecModelInfo.emplace_back("Rabbit", TYPE_ANIM, 1.f, 0.f);
+		m_vecModelInfo.emplace_back("Buffahorn", TYPE_ANIM, 1.f, 0.f);
+		m_vecModelInfo.emplace_back("BladeKnight", TYPE_ANIM, 1.f, 0.f);
 		m_vecModelInfo.emplace_back("BladeKnightSword", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("Kabu", TYPE_ANIM, 2.f, 180.f);
-		m_vecModelInfo.emplace_back("BrontoBurt", TYPE_ANIM, 2.f, 180.f);
-		m_vecModelInfo.emplace_back("PoppyBrosJr", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_ANIM, 1.3f, 180.f);
+		m_vecModelInfo.emplace_back("Kabu", TYPE_ANIM, 2.f, 0.f);
+		m_vecModelInfo.emplace_back("BrontoBurt", TYPE_ANIM, 2.f, 0.f);
+		m_vecModelInfo.emplace_back("PoppyBrosJr", TYPE_ANIM, 1.f, 0.f);
+		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_ANIM, 1.3f, 0.f);
 
 		//와들디
+		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 0.f);
+
+		// Boss
+		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 0.f);
+
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
 		m_vecModelInfo.emplace_back("WaddleDeeHungry", TYPE_ANIM, 1.1f, 180.f);
 	}
@@ -1731,7 +1761,7 @@ void CLoader::Load_AnimToolInfo()
 					{
 						_float animSpeed;
 						pAnimSpeedElement->QueryFloatText(&animSpeed);
-						animInfo.fAnimSpeed = animSpeed;
+						animInfo.fAnimSpeed = 60.f;// animSpeed;
 					}
 
 					// Count 값 읽기

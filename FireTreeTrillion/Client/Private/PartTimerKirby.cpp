@@ -314,6 +314,12 @@ HRESULT CPartTimerKirby::Bind_ShaderResources()
 	return S_OK;
 }
 
+void CPartTimerKirby::OnNotify()
+{
+	// 여기서 특정 시간이 되면 처리해야하는 사항을 넣기.
+	// 특정 시간이면 땀 뻘뻘
+}
+
 void CPartTimerKirby::SetUp_FSM()
 {
 	// FSM 상태 초기화

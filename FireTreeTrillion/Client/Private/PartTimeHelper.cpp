@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "PartTimeHelper.h"
 
+#include "PartTimerKirby.h"
 #include "HungryDee.h"
 
 IMPLEMENT_SINGLETON(CPartTimeHelper)
@@ -29,15 +30,21 @@ _bool CPartTimeHelper::Check_Item(PARTTIME_ITEM eITEM)
 {
 	if(m_eFood == eITEM) // 커비가 맞췄을 때
 	{
-		// m_pHungryDee->Bring_Food(eITEM);
+		m_pHungryDee->Bring_Food(eITEM);
 		// QZR : 점수 UI에서 숫자 UP // 틀렸을 때는 점수판 UI에 아무런 변화가 없음
 		return true;
 	}
 	else
 	{
-		//m_pHungryDee->Bring_Food(PARTTIME_ITEM::ITEM_END);
+		m_pHungryDee->Bring_Food(PARTTIME_ITEM::ITEM_END);
 		return false;
 	}
+}
+
+void CPartTimeHelper::NotifyObserver()
+{
+	m_pHungryDee->OnNotify();
+	m_pPartTimerKirby->OnNotify();
 }
 
 void CPartTimeHelper::Free()
