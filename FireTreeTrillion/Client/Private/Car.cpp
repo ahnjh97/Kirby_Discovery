@@ -263,7 +263,7 @@ CCar* CCar::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CCar"));
+		MSG_BOX(TEXT("Failed To Create : CCar"));
 		Safe_Release(pInstance);
 	}
 
@@ -276,7 +276,7 @@ CGameObject* CCar::Clone(void* pArg)
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CCar"));
+		MSG_BOX(TEXT("Failed To Clone : CCar"));
 		Safe_Release(pInstance);
 	}
 

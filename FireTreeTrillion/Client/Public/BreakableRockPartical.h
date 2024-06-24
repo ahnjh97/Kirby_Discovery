@@ -14,6 +14,7 @@ public:
 		_float4x4 matrix;
 		_float3 vMoveDir;
 		_float	fPower;
+		wstring wstrModelName;
 	};
 
 private:
@@ -33,7 +34,7 @@ public:
 #endif
 
 private:
-	HRESULT			Add_Components();
+	HRESULT			Add_Components(const wstring& _wstrModelName);
 	HRESULT			Bind_ShaderResources();
 
 

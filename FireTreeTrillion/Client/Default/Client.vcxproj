@@ -201,6 +201,7 @@
     <ClInclude Include="..\Public\CappyHat_State.h" />
     <ClInclude Include="..\Public\Car.h" />
     <ClInclude Include="..\Public\CarShopWall.h" />
+    <ClInclude Include="..\Public\CarShopWallFrame.h" />
     <ClInclude Include="..\Public\Character.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\Coin.h" />
@@ -301,6 +302,7 @@
     <ClInclude Include="..\Public\Editor_UI.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\Public\ToppleableBridge.h" />
     <ClInclude Include="..\Public\Trigger.h" />
     <ClInclude Include="..\public\WaddleDee.h" />
     <ClInclude Include="..\Public\WasteCan.h" />
@@ -342,6 +344,7 @@
     <ClCompile Include="..\Private\CappyHat_State.cpp" />
     <ClCompile Include="..\Private\Car.cpp" />
     <ClCompile Include="..\Private\CarShopWall.cpp" />
+    <ClCompile Include="..\Private\CarShopWallFrame.cpp" />
     <ClCompile Include="..\Private\Character.cpp" />
     <ClCompile Include="..\Private\Coin.cpp" />
     <ClCompile Include="..\Private\CollisionCenter.cpp" />
@@ -438,6 +441,7 @@
     <ClCompile Include="..\Private\Editor_UI.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\Private\ToppleableBridge.cpp" />
     <ClCompile Include="..\Private\Trigger.cpp" />
     <ClCompile Include="..\private\WaddleDee.cpp" />
     <ClCompile Include="..\Private\WasteCan.cpp" />

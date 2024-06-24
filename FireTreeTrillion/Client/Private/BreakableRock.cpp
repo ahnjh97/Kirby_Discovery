@@ -193,6 +193,7 @@ _int CBreakableRock::Make_Partical()
 		vDir.y += 0.5f;
 		desc.vMoveDir = (_float3)vDir;
 		desc.fPower = m_fHitPower * 70.f;
+		desc.wstrModelName = TEXT("RockPartical");
 		// Car Test
 		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_RockPartical"), TEXT("Prototype_GameObject_BreakableRockPartical"), &desc)))
 			return OBJ_DEAD;

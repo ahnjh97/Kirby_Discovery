@@ -358,9 +358,6 @@
     <Filter Include="02.GameObjects\Map\Bridge">
       <UniqueIdentifier>{d42d0265-2d39-46ae-8baa-4fdc448c5e73}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Map\Shutter">
-      <UniqueIdentifier>{1bb854fe-6e96-4704-8fc4-50ae4707b4db}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Map\CarShopWall">
       <UniqueIdentifier>{22f62060-413c-4957-94a1-99647cd7b478}</UniqueIdentifier>
     </Filter>
@@ -723,6 +720,12 @@
     <ClInclude Include="..\Public\CarShopWall.h">
       <Filter>02.GameObjects\Map\CarShopWall</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\CarShopWallFrame.h">
+      <Filter>02.GameObjects\Map\CarShopWall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ToppleableBridge.h">
+      <Filter>02.GameObjects\Map\Bridge</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1063,6 +1066,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\CarShopWall.cpp">
       <Filter>02.GameObjects\Map\CarShopWall</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CarShopWallFrame.cpp">
+      <Filter>02.GameObjects\Map\CarShopWall</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ToppleableBridge.cpp">
+      <Filter>02.GameObjects\Map\Bridge</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -392,7 +392,7 @@ HRESULT CAwoofy::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
 		return E_FAIL;
-
+	
 	return S_OK;
 }
 
