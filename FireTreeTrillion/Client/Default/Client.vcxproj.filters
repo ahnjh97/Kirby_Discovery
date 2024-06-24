@@ -357,6 +357,15 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\WaddleDee\Original">
       <UniqueIdentifier>{9b746fe2-af0b-4344-961d-2b0a3a62e7ff}</UniqueIdentifier>
+	</Filter>
+    <Filter Include="02.GameObjects\Map\Bridge">
+      <UniqueIdentifier>{d42d0265-2d39-46ae-8baa-4fdc448c5e73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Shutter">
+      <UniqueIdentifier>{1bb854fe-6e96-4704-8fc4-50ae4707b4db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\CarShopWall">
+      <UniqueIdentifier>{22f62060-413c-4957-94a1-99647cd7b478}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -716,6 +725,9 @@
     </ClInclude>
     <ClInclude Include="..\public\OriginalDee.h">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\Original</Filter>
+	</ClInclude>
+    <ClInclude Include="..\Public\CarShopWall.h">
+      <Filter>02.GameObjects\Map\CarShopWall</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1057,6 +1069,9 @@
     </ClCompile>
     <ClCompile Include="..\private\OriginalDee.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\Original</Filter>
+	</ClCompile>
+    <ClCompile Include="..\Private\CarShopWall.cpp">
+      <Filter>02.GameObjects\Map\CarShopWall</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

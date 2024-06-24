@@ -136,7 +136,7 @@ HRESULT CLoader::Loading_For_GamePlay()
 	TraverseNonAnimModels(wstrRootPath);
 	TraverseAnimModels(wstrRootPath, wstring(L"MapDeco/"));
 	TraverseNonAnimModels(wstrRootPath, wstring(L"MapDeco/"));
-
+	TraverseAnimModels(wstrRootPath, wstring(L"MapObjs/"));
 	TraverseNonAnimModels(wstrRootPath, wstring(L"MapObjs/"));
 	TraverseNonAnimModels(wstrRootPath, wstring(L"Monsters/"));
 	TraverseNonAnimModels(wstrRootPath, wstring(L"TownDeco/"));

@@ -499,6 +499,17 @@ HRESULT CModel::Bind_WorldMatrixForOctree(CShader* pShader, string& strConstantN
 	return S_OK;
 }
 
+_uint CModel::Find_MeshIndex(const string& _strMeshName)
+{
+	for (_int i = 0; i < m_iNumMeshes; i++)
+	{
+		if (m_Meshes[i]->Get_Name() == _strMeshName)
+			return i;
+	}
+
+	return _uint();
+}
+
 HRESULT CModel::Ready_Meshes(_bool bOctree)
 {
 	m_InputFile.read(reinterpret_cast<char*>(&m_iNumMeshes), sizeof(m_iNumMeshes));

@@ -75,6 +75,8 @@ private:
 
 	vector<CGameObject*> m_vecAnimDecoGameObjs;
 
+	unordered_set<string> m_setMapDecoNames;
+
 private:
 	HRESULT Add_Components(const wstring& _wstrModelTag);
 	HRESULT Bind_ShaderResources();
@@ -91,6 +93,9 @@ private:
 	void ReadDecos_ForSmallLevels();
 	void Release_MapDecos();
 	HRESULT Render_NonOctreeMapDecos();
+
+	void	ReadMapDecoTxts();
+	_bool	IsMapDeco(const string& _strModelName);
 		
 public:
 	static CBasicMap* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
