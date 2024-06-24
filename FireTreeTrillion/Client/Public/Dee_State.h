@@ -27,6 +27,9 @@ protected:
 
 	}BASE_INFO;
 
+	_float	m_fInteractActionTime = { 0.f };
+	_float	m_fDuration = { 0.f };
+
 	void Setup_BaseInfo(BASE_INFO& _baseInfo, CGameObject* pGameObject);
 
 public:
@@ -115,6 +118,7 @@ public:
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
 	virtual void OnStateExit()														override;
 
+	_float	m_fStartMoveDelay = { 0.f };
 
 public:
 	static	CDee_Hungry_State* Create();

@@ -97,6 +97,7 @@ enum COLLISION_TYPE
     NPC,
     HITBOX_PLYAER,
     HITBOX_MONSTER,
+    ANIMDECO, // 애니메이션 있는 풀, 상자 등등
 
     COLLISION_END
 };

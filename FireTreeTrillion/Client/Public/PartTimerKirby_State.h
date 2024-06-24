@@ -20,6 +20,8 @@ public:
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
 	virtual void OnStateExit()														override;
 
+	enum class PARTTIME_ITEM Get_CurrentFood(_float4 vPos);
+
 public:
 	static	CPartTimerKirby_Idle_State* Create();
 	virtual void Free() override;
@@ -41,6 +43,10 @@ public:
 	// 상태 진입되어 있는 상태에서 매 tick마다 호출
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
 	virtual void OnStateExit()														override;
+
+private:
+	enum DIR { LEFT, RIGHT, DIR_END };
+	_uint	m_uDir = LEFT;
 
 public:
 	static	CPartTimerKirby_Move_State* Create();
@@ -64,6 +70,8 @@ public:
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
 	virtual void OnStateExit()														override;
 
+private:
+	_float		m_fSpeed = _float();
 public:
 	static	CPartTimerKirby_Grab_State* Create();
 	virtual void Free() override;

@@ -234,6 +234,13 @@ HRESULT CModel::CreateStaticActor(_float4x4& matWorld)
 	return S_OK;
 }
 
+void CModel::DisableActor()
+{
+	PxScene* pScene = m_pGameInstance->Get_Scene();
+	for (auto& mesh : m_Meshes)
+		mesh->DisableActor(pScene);
+}
+
 _float4 CModel::Check_Meshes(const class CTransform* pTransform, _Out_ _int& iMeshIndex) const
 {
 	if (m_Meshes.empty())
@@ -492,6 +499,17 @@ HRESULT CModel::Bind_WorldMatrixForOctree(CShader* pShader, string& strConstantN
 		return E_FAIL;
 
 	return S_OK;
+}
+
+_uint CModel::Find_MeshIndex(const string& _strMeshName)
+{
+	for (_int i = 0; i < m_iNumMeshes; i++)
+	{
+		if (m_Meshes[i]->Get_Name() == _strMeshName)
+			return i;
+	}
+
+	return _uint();
 }
 
 HRESULT CModel::Ready_Meshes(_bool bOctree)

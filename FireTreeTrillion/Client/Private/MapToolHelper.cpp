@@ -44,7 +44,7 @@ static _bool s_bHideDecos = { false };
 
 static _int s_iConnectedMonster = -1;
 static const _char* s_ModelPassIndices[] = { "0. NORMAL_0", "1. NORMAL_X", "2. SHADOW", "3. SKY", "4. BLOOM", "5. BLEND"
-	,"6. TRIGGER", "7.DEFAULTFX", "8. BLENDFX", "9. DEFERREDINFO", "10. WHITEFX", "11. KIRBYPART" };
+	,"6. TRIGGER", "7.DEFAULTFX", "8. BLENDFX", "9. DEFERREDINFO", "10. WHITEFX", "11. KIRBYPART", "12. NORMAL_O AND NONCULL"};
 static const _char* s_PosTexPassIndices[] = { "0. DEFAULT", "1. ALPHABLEND", "2. BLENDFX", "3. BLOOM", "4. DEFAULTFX", "5. BLEND_NOZTEXT"
 	,"6. WHITEFX", "7. UI_MASK", "8. UI_MASK2", "9. SOFTFX", "10. SOFTALPHAFX"};
 static _int s_iPassIndex = -1;
@@ -56,6 +56,18 @@ static _bool s_bWasObjectsOpen = false;
 static _bool s_bWasMapDecosOpen = false;
 static _bool s_bWasTownDecosOpen = false;
 static _bool s_bWasLabDecosOpen = false;
+
+static void HelpMarker(const char* desc)
+{
+	ImGui::TextDisabled("(?)");
+	if (ImGui::BeginItemTooltip())
+	{
+		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+		ImGui::TextUnformatted(desc);
+		ImGui::PopTextWrapPos();
+		ImGui::EndTooltip();
+	}
+}
 
 CMapToolHelper::CMapToolHelper(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -85,9 +97,15 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 			"Level_Tool_UI", "Level_Tool_FX", "Level_Tool_Anim", "Level_Tool_Map",
 		"Intro", "Racing",  "Town", "PartTime", "FinalBoss", "Level_End" };
 
-	m_vecMapModelNames = { "Level0Stage1Step01", "Level0Stage1Step02",  "Level1Stage1Step01", "Town", "TownShop", "LbLastBossStage"};
-	m_setMapNames = { "BG0", "BG1", "Level0Stage1Step01", "Level0Stage1Step02", "Level1Stage1Step01","Town",  "TownShop", "LbLastBossStage" };
-	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy", "Fog", "Ladder" };
+	//UV 조절 가능
+	m_vecMapModelNames = { "Level0Stage1Step01", "Level0Stage1Step02",  "Level1Stage1Step01", "Town", "TownShop", 
+		"Land_VcLabo"};
+
+	vector<string> vecBGs = { "BG0", "BG1" };
+	m_setMapNames.insert(vecBGs.begin(), vecBGs.end());
+	m_setMapNames.insert(m_vecMapModelNames.begin(), m_vecMapModelNames.end());
+
+	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy", "Fog", "Ladder", "NonAnim_KirbyPartTimer" };
 	m_setRallyingMonsters = { "NonAnim_Kabu", "NonAnim_BrontoBurt" };
 
 	/*m_setNonColDecos = { "BushMCut" };*/
@@ -106,8 +124,16 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "StarBlockL" , "StarBlockM", "StarBlockS", "SeDriftWoodAL", "SeDriftWoodBL", "SeDriftWoodCL"
 		, "VpFactoryPart", "VpFactoryParts", "VpFactoryPartsBlend", "WoodBox"
 
-#pragma region LAB_DISCOVERA OBJECT
-		, "LbBossRoom", "LbLastBossStage", "LbLastBuilding", "LbLastOutFrame1", "LbLastOutFrame2", "LbLastStairs", "LbLastTank"
+#pragma region TOWN OBJECT
+		, "TwArena", "TwArenaA", "TwArenaB", "TwArenaClerk", "TwDeliveryService", "TwFoodStore", "TwFoodStoreChair", "TwFoodStoreTable"
+		, "TwKirbyHouse", "TwPharmacy", "TwPlanterA", "TwPlanterB", "TwRollingBallBooth", "TwSideHouseA", "TwSideHouseC", "TwSideHouseD"
+		, "TwSignboardStreetLive", "TwSlope", "TwBenchA", "TwBenchB", "TwBenchC", "TwBenchD"
+#pragma endregion
+
+
+#pragma region LEVEL_FINALBOSS (LAB_DISCOVERA) OBJECT
+		, "LbBossRoom", "LbLastBossStage", "LbLastBuilding", /*"LbLastOutFrame1", */"LbLastOutFrame2", "LbLastStairs"
+		, "LbLastTank"
 #pragma endregion
 	};
 	
@@ -177,6 +203,16 @@ void CMapToolHelper::Late_Tick(_float fTimeDelta)
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_DELETE, KEY_DOWN))
 		On_DIK_Delete();
+
+	//SAVE, LOAD 단축키 추가
+	if (m_pGameInstance->Get_DIKeyState(DIK_LCONTROL, KEY_PRESS))
+	{
+		if (m_pGameInstance->Get_DIKeyState(DIK_S, KEY_DOWN))
+			Save_Level();
+
+		//if (m_pGameInstance->Get_DIKeyState(DIK_L, KEY_DOWN))
+			//Load_Level();
+	}
 
 	Edit_Object();
 }
@@ -300,6 +336,7 @@ void CMapToolHelper::ReadLabDecoTxts()
 void CMapToolHelper::Menu_Level()
 {
 	ImGui::SeparatorText("Level");
+
 	for (_int i = LEVEL_INTRO; i <= LEVEL_FINALBOSS; i++)
 	{
 		if (ImGui::RadioButton(m_vecLevelName[i].c_str(), s_iLevelIndex == i - LEVEL_INTRO)) {
@@ -342,10 +379,13 @@ void CMapToolHelper::Menu_Level()
 		if (i % 2 == 0 && i != LEVEL_FINALBOSS)
 			ImGui::SameLine();
 	}
-	ImGui::NewLine();
+	//ImGui::NewLine(); 
+	//HelpMarker(u8"저장 : Ctrl+S / 로드 : Ctrl+L");
+	HelpMarker(u8"저장 : Ctrl+S");
+
 	if (ImGui::Button("Save", ImVec2(100, 40)))
 		Save_Level();
-	ImGui::SameLine();
+	ImGui::SameLine(); 
 	if (ImGui::Button("Load", ImVec2(100, 40)))
 		Load_Level();
 
@@ -427,7 +467,7 @@ void CMapToolHelper::Menu_NonAnimModels()
 		vector<const _char*> vecMapDecoNames;
 		FilterListBoxStrings(s_MapDecoFilter, vecMapDecoNames, m_vecMapDecoTxts);
 		
-		if (ImGui::ListBox("##MapDecos", &s_iMapDecoIdx, vecMapDecoNames.data(), vecMapDecoNames.size(), 16)) {
+		if (ImGui::ListBox("##MapDecos", &s_iMapDecoIdx, vecMapDecoNames.data(), vecMapDecoNames.size(), 13)) {
 			DisableOtherGroups(&s_iMapDecoIdx);
 			m_strSelectedTxt = string(vecMapDecoNames[s_iMapDecoIdx]);
 		}
@@ -467,7 +507,7 @@ void CMapToolHelper::Menu_NonAnimModels()
 		vector<const _char*> vecTownDecoNames;
 		FilterListBoxStrings(s_TownDecoFilter, vecTownDecoNames, m_vecTownDecoTxts);
 		
-		if (ImGui::ListBox("##TownDecos", &s_iTownDecoIdx, vecTownDecoNames.data(), vecTownDecoNames.size(), 16)) {
+		if (ImGui::ListBox("##TownDecos", &s_iTownDecoIdx, vecTownDecoNames.data(), vecTownDecoNames.size(), 13)) {
 			DisableOtherGroups(&s_iTownDecoIdx);
 			m_strSelectedTxt = string(vecTownDecoNames[s_iTownDecoIdx]);
 		}
@@ -483,7 +523,7 @@ void CMapToolHelper::Menu_NonAnimModels()
 		vector<const _char*> vecLabDecoNames;
 		FilterListBoxStrings(s_LabDecoFilter, vecLabDecoNames, m_vecLabDecoTxts);
 
-		if (ImGui::ListBox("##LabDecos", &s_iLabDecoIdx, vecLabDecoNames.data(), vecLabDecoNames.size(), 16)) {
+		if (ImGui::ListBox("##LabDecos", &s_iLabDecoIdx, vecLabDecoNames.data(), vecLabDecoNames.size(), 13)) {
 			DisableOtherGroups(&s_iLabDecoIdx);
 			m_strSelectedTxt = string(vecLabDecoNames[s_iLabDecoIdx]);
 		}

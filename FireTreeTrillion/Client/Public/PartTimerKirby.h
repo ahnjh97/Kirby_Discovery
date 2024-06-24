@@ -54,9 +54,15 @@ public:
 	void			Change_State(ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
 	_bool			IsAnimFinished();
 	_float4			Compute_TerrainPosition();
+	void			Render_Food(_bool _bRender, enum class PARTTIME_ITEM _eItem);
+	_float			Get_AnimRatio() { return m_pModelCom->Get_AnimRatio(); }
+
 
 private:
 	HRESULT			Add_Components();
+	HRESULT			Add_PartObjects();
+	_float4			Compute_BoneWorldMatrix();
+
 	HRESULT			Bind_ShaderResources();
 
 	// FSM
@@ -71,10 +77,16 @@ private:
 	CTexture*				m_pMouthTexture[MOUTH_END] = { nullptr };
 	class CCamera*			m_pCamera = { nullptr };
 
+	// 배송시키는 음식
+	class CPartTimeFood*	m_pPartTimeFood = { nullptr };
+	// 모자
+	class CDee_Part*		m_pHat = { nullptr };
+
 	ANIM					m_eCurrentState = { ANIM_END };
 	EYESTATE				m_eEyeState = { EYE_END };
 	MOUTHSTATE				m_eMouthState = { MOUTH_END };
 
+	_float4x4				m_matHand = _float4x4::Identity;
 	_float					m_fScore = _float();
 
 public:

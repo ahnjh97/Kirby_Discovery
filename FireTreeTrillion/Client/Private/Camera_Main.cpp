@@ -315,7 +315,7 @@ void CCamera_Main::UpdatePos_FromAnchor(_float fTimeDelta)
 	}
 	else
 	{
-		_float3 vTerrainPos = static_cast<CPartTimerKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Monster"), 0))->Compute_TerrainPosition();
+		_float3 vTerrainPos = static_cast<CPartTimerKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0))->Compute_TerrainPosition();
 		vTargetPos.y = (vTargetPos.y + vTerrainPos.y) * .5f;
 	}
 

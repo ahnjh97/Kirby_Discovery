@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "MapToolObject.h"
 #include "BasicMap.h"
+#include "AnimDeco.h"
+#include "HitBox.h"
 #include "OcTree.h"
 #include "Model.h"
 
@@ -34,7 +36,7 @@ HRESULT CBasicMap::Initialize(void* pArg)
     wstring wstrModelTag = GameObjectDesc.wstrModelName;
 
 
-    if (wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("LbLastBossStage") && wstrModelTag != TEXT("TownShop")
+    if (wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("Land_VcLabo") && wstrModelTag != TEXT("TownShop")
         && wstrModelTag.substr(wstrModelTag.length() - 5) == TEXT("Blend"))
     {
         m_bBlendMap = true;
@@ -50,7 +52,7 @@ HRESULT CBasicMap::Initialize(void* pArg)
     , "g_bStencil", "g_bRimLight", "m_fRimWidth", "g_bMotionBlur", "g_BoneMatrices" };
     m_vecStencilRimLightMotionBlurNames = { "g_bStencil", "g_bRimLight", "m_fRimWidth", "g_bMotionBlur" };
 
-    if(wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("LbLastBossStage") && wstrModelTag != TEXT("TownShop")
+    if(wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("Land_VcLabo") && wstrModelTag != TEXT("TownShop")
         && false == m_bBlendMap)
     {
         if (true == CheckIfBlendMapExists(GameObjectDesc.wstrModelName)) {
@@ -68,12 +70,13 @@ HRESULT CBasicMap::Initialize(void* pArg)
 
         InsertMapDecos();
     }
-    if (wstrModelTag == TEXT("Town") || wstrModelTag == TEXT("TownShop")|| wstrModelTag == TEXT("LbLastBossStage")) {
-        if(LEVEL_TOOL_MAP != *m_pCurrentLevelID)
+    if (wstrModelTag == TEXT("Town") || wstrModelTag == TEXT("TownShop")|| wstrModelTag == TEXT("Land_VcLabo")) {
+        if (LEVEL_TOOL_MAP != *m_pCurrentLevelID) {
+            ReadMapDecoTxts();
             ReadDecos_ForSmallLevels();
+        }
     }
         
-
     if (FAILED(m_pModelCom->CreateStaticActor(GameObjectDesc.matWorld)))
         return E_FAIL;
 
@@ -417,6 +420,11 @@ void CBasicMap::InsertMapDecos()
                 continue;
 
             m_pGameInstance->Emplace_MapDecoTrigger(pRigidStatic, pModel, animIter->second.first, animIter->second.second);
+            CAnimDeco::ANIMDECO_DESC tAnimDeco{};
+            tAnimDeco.pAnimDecoModel = pModel;
+            CAnimDeco* pAnimDecoObj = dynamic_cast<CAnimDeco*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_AnimDeco"), &tAnimDeco));
+            m_vecAnimDecoGameObjs.push_back(pAnimDecoObj);
+            
             vecAnims.push_back(pModel);
         }
         else if (CMapToolObject::MAPOBJ_ACTOR == iMapObjType)
@@ -480,10 +488,10 @@ void CBasicMap::ReadDecos_ForSmallLevels()
     Release_MapDecos();
 
     string strLevel;
-    if (LEVEL_TOWN == *m_pCurrentLevelID || LEVEL_PARTTIME == *m_pCurrentLevelID)
+    if (LEVEL_TOWN == *m_pCurrentLevelID)
         strLevel = "Town";
-    //else if (LEVEL_PARTTIME == *m_pCurrentLevelID)
-    //    strLevel = "PartTime";
+    else if (LEVEL_PARTTIME == *m_pCurrentLevelID)
+        strLevel = "PartTime";
     else if (LEVEL_FINALBOSS == *m_pCurrentLevelID)
         strLevel = "FinalBoss";
     else
@@ -528,12 +536,11 @@ void CBasicMap::ReadDecos_ForSmallLevels()
         else if (LEVEL_FINALBOSS == *m_pCurrentLevelID)
             strFolder = string("LabDiscovera_Deco/");
 
-
+        if (true == IsMapDeco(strModelName))
+            strFolder = string("MapDeco/");
 
         if (CMapToolObject::MAPOBJ_ANIM == iMapObjType)
-        {
             eType = TYPE_ANIM;
-        }
 
         CModel* pModel = CModel::Create(m_pDevice, m_pContext, MODEL{ strModelName, eType, 1.f, 0.f, 0, strFolder, false });
 
@@ -576,7 +583,6 @@ void CBasicMap::ReadDecos_ForSmallLevels()
             pModel->CreateStaticActor(matWorld);
             m_vecNonAnimDecos.push_back(pModel);
         }
-
     }
 
     fileInput.close();
@@ -650,6 +656,31 @@ HRESULT CBasicMap::Render_NonOctreeMapDecos()
     }
 
     return S_OK;
+}
+
+void CBasicMap::ReadMapDecoTxts()
+{
+    string strPath = "../../../model_txt/MapDeco/NonAnim/";
+
+    directory_iterator end_iter;  // 디렉토리 순회의 끝을 나타내는 iterator
+    directory_iterator dir_iter(strPath);  // 지정된 경로의 시작 iterator
+
+    while (dir_iter != end_iter) {
+        if (is_regular_file(*dir_iter)) {
+            string strFilePath = dir_iter->path().filename().string();
+            string strModelName = strFilePath.substr(0, strFilePath.length() - 4);
+            m_setMapDecoNames.insert(strModelName);
+        }
+        ++dir_iter;
+    }
+}
+
+_bool CBasicMap::IsMapDeco(const string& _strModelName)
+{
+    if (m_setMapDecoNames.end() != m_setMapDecoNames.find(_strModelName))
+        return true;
+
+    return _bool();
 }
 
 void CBasicMap::Save_OctreeData(const string& strLevel)
@@ -736,7 +767,12 @@ void CBasicMap::Free()
 {
     __super::Free();
 
+    for (auto& animDecoObj : m_vecAnimDecoGameObjs)
+        Safe_Release(animDecoObj);
+    m_vecAnimDecoGameObjs.clear();
+
     Release_MapDecos();
+
     for (_uint iActorIdx = 0; iActorIdx < m_vecAnimDecoTriggersActors.size(); iActorIdx++)
     {
         PxRigidStatic* pActor = m_vecAnimDecoTriggersActors[iActorIdx];

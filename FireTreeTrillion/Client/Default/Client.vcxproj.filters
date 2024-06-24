@@ -340,6 +340,36 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee\DeeDeeDee_State">
       <UniqueIdentifier>{ed796e74-f987-4f90-874a-7e69a1af5872}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\Deco">
+      <UniqueIdentifier>{419a0698-ebd3-4192-8896-8944a2337a90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Deco\AnimDeco">
+      <UniqueIdentifier>{c02dd9f8-d066-41e9-b2c3-7f7ebf95ff38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Deco\NonAnimDeco">
+      <UniqueIdentifier>{fade553b-2471-4643-8daf-c5bb3dcfdbd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\WaddleDee\DeePart">
+      <UniqueIdentifier>{5f17fb16-cca2-4259-931d-1b811ea7faaf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\MiniGame">
+      <UniqueIdentifier>{9ec72d3e-9c3d-40df-8d17-069fc1a340eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\MiniGame\Food">
+      <UniqueIdentifier>{1bcc9b3d-c67d-4988-9b06-3ff89f1bd703}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\MiniGame\_Helper">
+      <UniqueIdentifier>{77809e89-d720-4b42-8482-e5882bfe6970}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Bridge">
+      <UniqueIdentifier>{d42d0265-2d39-46ae-8baa-4fdc448c5e73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Shutter">
+      <UniqueIdentifier>{1bb854fe-6e96-4704-8fc4-50ae4707b4db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\CarShopWall">
+      <UniqueIdentifier>{22f62060-413c-4957-94a1-99647cd7b478}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -675,6 +705,24 @@
     <ClInclude Include="..\Public\Car.h">
       <Filter>02.GameObjects\Map\Car</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\AnimDeco.h">
+      <Filter>02.GameObjects\Map\Deco\AnimDeco</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\NonAnimDeco.h">
+      <Filter>02.GameObjects\Map\Deco\NonAnimDeco</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Dee_Part.h">
+      <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\DeePart</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\HungryDee.h">
+      <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PartTimeFood.h">
+      <Filter>02.GameObjects\MiniGame\Food</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PartTimeHelper.h">
+      <Filter>02.GameObjects\MiniGame\_Helper</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\BreakableRockPartical.h">
       <Filter>02.GameObjects\Map\BreakableRock</Filter>
     </ClInclude>
@@ -683,6 +731,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\DeeDeeDee_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee\DeeDeeDee_State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CarShopWall.h">
+      <Filter>02.GameObjects\Map\CarShopWall</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1001,6 +1052,24 @@
     <ClCompile Include="..\Private\BreakableRock.cpp">
       <Filter>02.GameObjects\Map\BreakableRock</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\AnimDeco.cpp">
+      <Filter>02.GameObjects\Map\Deco\AnimDeco</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\NonAnimDeco.cpp">
+      <Filter>02.GameObjects\Map\Deco\NonAnimDeco</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Dee_Part.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\DeePart</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\HungryDee.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PartTimeFood.cpp">
+      <Filter>02.GameObjects\MiniGame\Food</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PartTimeHelper.cpp">
+      <Filter>02.GameObjects\MiniGame\_Helper</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\BreakableRockPartical.cpp">
       <Filter>02.GameObjects\Map\BreakableRock</Filter>
     </ClCompile>
@@ -1009,6 +1078,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\DeeDeeDee_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee\DeeDeeDee_State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CarShopWall.cpp">
+      <Filter>02.GameObjects\Map\CarShopWall</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
