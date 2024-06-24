@@ -410,7 +410,7 @@ HRESULT CLevel_PartTime::Ready_Dees()
 	InitMat.Translation({ 18.2f, 24.7f, 27.1f });
 	HungryDeeDesc.matWorld = InitMat;
 
-	for (_int i = 0; i < 12; ++i)
+	for (_int i = 0; i < 10; ++i)
 	{
 		HungryDeeDesc.iIdx = i;
 

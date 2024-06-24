@@ -12,22 +12,30 @@ pair<_float3, vector<WAITING_INFO>> CHungryDee::m_WaitingList =
 	{
 		//앞으로 빠지는 자리
 		WAITING_INFO{ {15.f, 2.f, 0.f}, 0.f},
+		WAITING_INFO{ {14.f, 2.f, 0.f}, 0.f},
 
-		//맨 앞줄
+		//맨 앞자리
 		WAITING_INFO{ {0.f, 2.f, 0.f}, 0.f},
 
 		WAITING_INFO{ {-1.4f, 2.f, -2.f}, 0.1f},
-		WAITING_INFO{ {-3.f, 2.f, -4.f}, 0.15f},
-		WAITING_INFO{ {-5.f, 2.f, -6.f}, 0.08f},
-		WAITING_INFO{ {-6.f, 2.f, -8.f}, 0.1f},
-		WAITING_INFO{ {-2.f, 2.f, -10.f}, 0.1f},
-		WAITING_INFO{ {-3.f, 2.f, -12.f}, 0.1f},
-		WAITING_INFO{ {-5.f, 2.f, -14.f}, 0.1f},
-		WAITING_INFO{ {-4.f, 2.f, -16.f}, 0.1f},
-		WAITING_INFO{ {-2.f, 2.f, -18.f}, 0.1f},
-
-		//바깥에서 들어오는 대기자리
-		WAITING_INFO{ {15.f, 2.f, -25.f}, 0.1f}
+		WAITING_INFO{ {-2.f, 2.f, -4.f}, 0.15f},
+		WAITING_INFO{ {-3.5f, 2.f, -6.f}, 0.08f},
+		WAITING_INFO{ {-5.f, 2.f, -8.f}, 0.1f},
+		WAITING_INFO{ {-4.f, 2.f, -10.f}, 0.1f},
+		WAITING_INFO{ {-2.5f, 2.f, -12.f}, 0.1f},
+		WAITING_INFO{ {-3.f, 2.f, -14.f}, 0.1f},
+		WAITING_INFO{ {-4.5f, 2.f, -16.f}, 0.1f},
+		WAITING_INFO{ {-3.f, 2.f, -18.f}, 0.1f},
+		WAITING_INFO{ {-1.4f, 2.f, -20.f}, 0.1f},
+		WAITING_INFO{ {-2.f, 2.f, -22.f}, 0.15f},
+		WAITING_INFO{ {-3.5f, 2.f, -24.f}, 0.08f},
+		WAITING_INFO{ {-5.f, 2.f, -26.f}, 0.1f},
+		WAITING_INFO{ {-4.f, 2.f, -28.f}, 0.1f},
+		WAITING_INFO{ {-2.5f, 2.f, -30.f}, 0.1f},
+		WAITING_INFO{ {-3.f, 2.f, -32.f}, 0.1f},
+		WAITING_INFO{ {-4.5f, 2.f, -34.f}, 0.1f},
+		WAITING_INFO{ {-3.f, 2.f, -36.f}, 0.1f},
+		WAITING_INFO{ {-1.f, 2.f, -38.f}, 0.1f},
 	}
 };
 
@@ -68,7 +76,7 @@ HRESULT CHungryDee::Initialize(void* pArg)
 
 	m_iMyIdx = pDeeDesc.iIdx;
 	_float4 vDir = Dir(m_WaitingList.second[m_iMyIdx].vPos);
-
+	vDir += _float4{18.f, 0.f, -6.f, 0.f};
 	m_pTransformCom->Move(vDir);
 	++m_iWatingNum;
 
@@ -94,19 +102,39 @@ _int CHungryDee::Tick(_float fTimeDelta)
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
 	//디버깅용
-	if (m_iMyIdx == 1)
+	if (m_iMyIdx == 2)
 		m_fWaitingTime -= m_fTimeDelta;
+
+
+	if (m_pGameInstance->Get_KeyState(DIK_S, KEY_DOWN) && m_iMyIdx == 0)
+	{
+		CHungryDee::HUNGRYDEE_DESC HungryDeeDesc{};
+		HungryDeeDesc.fSpeedPerSec = 5.f;
+		HungryDeeDesc.fRotationPerSec = ToRadian(90.f);
+		_float4x4 InitMat = _float4x4::Identity;
+		InitMat.Translation(m_WaitingList.first);
+		HungryDeeDesc.matWorld = InitMat;
+
+		_int iStartIdx = m_iWatingNum;
+
+		for (_int i = 0; i < 10; ++i)
+		{
+			HungryDeeDesc.iIdx = iStartIdx + i;
+			m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_NPC"), TEXT("Prototype_GameObject_HungryDee"), &HungryDeeDesc);
+		}
+	}
 
 	if (m_pGameInstance->Get_KeyState(DIK_W, KEY_DOWN))
 	{
-		if (m_iMyIdx == 1)
+		if (m_iMyIdx == 2)
 			CUtils::Make_RandomInt(0, 1) == 1 ? Bring_Food(PARTTIME_ITEM::DRINK) : Bring_Food(PARTTIME_ITEM::ITEM_END);
 
 		m_iMyIdx = (m_iMyIdx + m_iWatingNum - 1) % m_iWatingNum;
 
 		if (m_iMyIdx == m_iWatingNum - 1)
 		{
-			m_pControllerCom->Set_Position(m_pTransformCom, Pos(m_WaitingList.first + m_WaitingList.second[m_iMyIdx].vPos));
+			_float3 vDestPos = m_WaitingList.first + m_WaitingList.second[m_iMyIdx].vPos + _float3{ -10.f, 0.f, 0.f };
+			m_pControllerCom->Set_Position(m_pTransformCom, Pos(vDestPos));
 			Set_DeeEyeState(DEEEYE_IDLE);
 
 			for (auto& partObj : m_PartObjects)
@@ -114,7 +142,7 @@ _int CHungryDee::Tick(_float fTimeDelta)
 			m_PartObjects.clear();
 			Set_RenderPartObj(false);
 
-			Change_State((DEE_ANIM)DEESHOPANIM_WALK, 60.f, false, true);
+			Change_State((DEE_ANIM)DEESHOPANIM_WALK, 60.f, true, true);
 		}
 	}
 
