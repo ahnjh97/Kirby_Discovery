@@ -31,6 +31,7 @@ protected:
 	_float	m_fDuration = { 0.f };
 
 	void Setup_BaseInfo(BASE_INFO& _baseInfo, CGameObject* pGameObject);
+	void System_Tick(_float fTimeDelta);
 
 public:
 	virtual void Free() override;
@@ -77,6 +78,27 @@ public:
 
 public:
 	static	CDee_Move_State* Create();
+	virtual void Free() override;
+};
+
+//*********************************
+//			NPC STATE
+//*********************************
+class CDee_NPC_State final : public CDee_State
+{
+private:
+	CDee_NPC_State();
+	virtual ~CDee_NPC_State() = default;
+
+public:
+	// 상태 진입했을 때 처음만 호출
+	virtual void OnStateEnter(class CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet) override;
+	// 상태 진입되어 있는 상태에서 매 tick마다 호출
+	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
+	virtual void OnStateExit()														override;
+
+public:
+	static	CDee_NPC_State* Create();
 	virtual void Free() override;
 };
 
@@ -147,5 +169,25 @@ public:
 	virtual void Free() override;
 };
 
+//*********************************
+//			SLEEP STATE
+//*********************************
+class CDee_Sleep_State final : public CDee_State
+{
+private:
+	CDee_Sleep_State();
+	virtual ~CDee_Sleep_State() = default;
 
+public:
+	// 상태 진입했을 때 처음만 호출
+	virtual void OnStateEnter(class CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet) override;
+	// 상태 진입되어 있는 상태에서 매 tick마다 호출
+	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
+	virtual void OnStateExit()														override;
+
+
+public:
+	static	CDee_Sleep_State* Create();
+	virtual void Free() override;
+};
 END
