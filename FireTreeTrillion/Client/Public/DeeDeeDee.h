@@ -21,6 +21,10 @@ public:
 		STATE_END
 	};
 
+	struct DDDDESC {
+		_bool	m_isBattle = { false };
+	};
+
 
 
 private:
@@ -47,12 +51,22 @@ public:
 	void Bone_Turn_Interpolate(_float4& vMoveDir, const _float4& vTargetDir, _float fTimeDelta);
 	_bool IsAnimFinished();
 
+	DDDDESC* Get_Info() { return &m_tInfo; }
+
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
 	// FSM
 	void SetUp_FSM();
-	_float4 m_vBoneLook = {};
+
+
+	_float4 m_vNeckLook = {};
+	_float4 m_vLEyeLook = {};
+	_float4 m_vREyeLook = {};
+
+	DDDDESC m_tInfo = {};
+
+
 
 public:
 	static CDeeDeeDee* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

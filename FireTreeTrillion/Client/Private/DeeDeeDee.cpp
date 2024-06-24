@@ -40,7 +40,10 @@ HRESULT CDeeDeeDee::Initialize(void* pArg)
 
 	m_pModelCom->Set_Animation(0, 60.f, true, true);
 
-	m_vBoneLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+	m_vNeckLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+	m_vLEyeLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+	m_vREyeLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+
 
 	return S_OK;
 }
@@ -67,6 +70,7 @@ void CDeeDeeDee::Late_Tick(_float fTimeDelta)
 		if (Compute_OptimizationAnimation(m_fTimeDelta) == true && m_ePhyXState != PO_PRESSED)
 			m_ePhyXState == PO_FLYDEADAWAY ? m_pModelCom->Play_Animation(m_fAccTime * 0.3f) : m_pModelCom->Play_Animation(m_fAccTime);
 	}
+
 	// 뼈를 꺾는다.
 	Look_Player(fTimeDelta);
 
@@ -91,8 +95,18 @@ HRESULT CDeeDeeDee::Render()
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
-		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
-			return E_FAIL;
+
+		if (i == 0 || i == 6)
+		{
+			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_X)))
+				return E_FAIL;
+		}
+		else
+		{
+			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
+				return E_FAIL;
+		}
+
 		if (FAILED(m_pModelCom->Render(i)))
 			return E_FAIL;
 	}
@@ -148,14 +162,14 @@ void CDeeDeeDee::Look_Player(_float fTimeDelta)
 	vTargetDir.y = 0.f;
 	vTargetDir.Normalize();
 
-	if (ToDegree(acos(vLook.Dot(vTargetDir))) > 40.f)
+	if (ToDegree(acos(vLook.Dot(vTargetDir))) > 40.f || m_tInfo.m_isBattle == false)
 	{
 		vTargetDir = vLook;
 	}
 	
-	Bone_Turn_Interpolate(m_vBoneLook, vTargetDir, fTimeDelta);
+	Bone_Turn_Interpolate(m_vNeckLook, vTargetDir, fTimeDelta);
 	Quaternion vStartQuat = CUtils::Make_Quat_FromDir(vLook);
-	Quaternion vDestQuat = CUtils::Make_Quat_FromDir(m_vBoneLook);
+	Quaternion vDestQuat = CUtils::Make_Quat_FromDir(m_vNeckLook);
 	vStartQuat.Inverse(vStartQuat);
 	Quaternion vResultQuat = vDestQuat * vStartQuat;
 	_float4x4::CreateFromQuaternion(vResultQuat);
@@ -165,6 +179,48 @@ void CDeeDeeDee::Look_Player(_float fTimeDelta)
 
 	////////
 
+	_float fOffSet = 3.f;
+	vPos.y += fOffSet;
+	vTargetDir = vTargetPos - vPos;
+	vTargetDir.Normalize();
+
+	_float4 vLTargetDir = vTargetDir;
+	_float4 vRTargetDir = vTargetDir;
+	vLTargetDir.y *= -1.f;
+	vRTargetDir.x *= -1.f; vRTargetDir.y *= -1.f;
+	vTargetDir.y = 0.f;
+	vTargetDir.Normalize();
+
+	
+	_float3 vAxis;
+	vAxis = static_cast<_float3>(vLook).Cross((_float3)vLTargetDir);
+	_float fDegree = acos(vLook.Dot(vLTargetDir));
+
+	if (vAxis == _float3(0.f, 0.f, 0.f))
+		return;
+	RotationMatrix = XMMatrixRotationAxis((_float4)vAxis, fDegree);
+	pBone = m_pModelCom->Get_BonePtr("L_EyeBallJ");
+	pEditMatrix = pBone->Get_EditMatrixPtr();
+	*pEditMatrix = RotationMatrix;
+
+	vAxis = static_cast<_float3>(vLook).Cross((_float3)vRTargetDir);
+	fDegree = acos(vLook.Dot(vRTargetDir));
+	RotationMatrix = XMMatrixRotationAxis((_float4)vAxis, fDegree);
+	pBone = m_pModelCom->Get_BonePtr("R_EyeBallJ");
+	pEditMatrix = pBone->Get_EditMatrixPtr();
+	*pEditMatrix = RotationMatrix;
+
+	if (ToDegree(acos(vLook.Dot(vTargetDir))) > 40.f || m_tInfo.m_isBattle == false)
+	{
+		pBone = m_pModelCom->Get_BonePtr("L_EyeBallJ");
+		pEditMatrix = pBone->Get_EditMatrixPtr();
+		*pEditMatrix = _float4x4::Identity;
+		pBone = m_pModelCom->Get_BonePtr("R_EyeBallJ");
+		pEditMatrix = pBone->Get_EditMatrixPtr();
+		*pEditMatrix = _float4x4::Identity;
+	}
+
+
 }
 
 void CDeeDeeDee::Bone_Turn_Interpolate(_float4& vMoveDir, const _float4& vTargetDir, _float fTimeDelta)
@@ -173,7 +229,7 @@ void CDeeDeeDee::Bone_Turn_Interpolate(_float4& vMoveDir, const _float4& vTarget
 		return;
 
 	///////// 보간 속도 조정임
-	_float fInterpolate = fTimeDelta * 12.f;
+	_float fInterpolate = fTimeDelta * 4.f;
 	_vector vTargetDirXZ = XMVectorSet(XMVectorGetX(vTargetDir), 0.0f, XMVectorGetZ(vTargetDir), 0.0f);
 	_vector vMoveDirXZ = XMVectorSet(XMVectorGetX(vMoveDir), 0.0f, XMVectorGetZ(vMoveDir), 0.0f);
 
@@ -183,19 +239,20 @@ void CDeeDeeDee::Bone_Turn_Interpolate(_float4& vMoveDir, const _float4& vTarget
 
 	if (fcosTheta < -0.9995f || fcosTheta > 0.9995f)
 	{
-		// 180도로 NaN 방지 랜덤으로 -1, 1도 틀어줌
-		_float4x4 rotationMatrix;
-		XMStoreFloat4x4(&rotationMatrix, XMMatrixIdentity());
-		CUtils::Turn_OtherMatrix(rotationMatrix, XMVectorSet(0.f, 1.f, 0.f, 0.f), 1.f, CUtils::Make_RandomInt(0, 1) == 1 ? 1.f : -1.f);
-		vMoveDir = XMVector3Transform(vMoveDir, XMLoadFloat4x4(&rotationMatrix));
-		vMoveDir = XMVectorSetW(vMoveDir, 0.0f);
+		//// 180도로 NaN 방지 랜덤으로 -1, 1도 틀어줌
+		//_float4x4 rotationMatrix;
+		//XMStoreFloat4x4(&rotationMatrix, XMMatrixIdentity());
+		//CUtils::Turn_OtherMatrix(rotationMatrix, XMVectorSet(0.f, 1.f, 0.f, 0.f), 1.f, CUtils::Make_RandomInt(0, 1) == 1 ? 1.f : -1.f);
+		//vMoveDir = XMVector3Transform(vMoveDir, XMLoadFloat4x4(&rotationMatrix));
+		//vMoveDir = XMVectorSetW(vMoveDir, 0.0f);
+		return;
 	}
 	else
 	{
 		_float ftheta = acos(fcosTheta);
 		_float fAngleDegrees = XMConvertToDegrees(ftheta);
 
-		if (fAngleDegrees < 3.0f)
+		if (fAngleDegrees < 1.0f)
 		{
 			vMoveDir = vTargetDir;
 		}
@@ -210,7 +267,6 @@ void CDeeDeeDee::Bone_Turn_Interpolate(_float4& vMoveDir, const _float4& vTarget
 		}
 	}
 }
-
 
 _bool CDeeDeeDee::IsAnimFinished()
 {
@@ -229,6 +285,8 @@ HRESULT CDeeDeeDee::Add_Components()
 	hr = __super::Add_Component(TEXT("Prototype_Component_Model_DeeDeeDee"),
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
+
+	m_ppModelForAnimTool = &m_pModelCom;
 
 	/* For.Com_CharacterController */
 	CCharacterController::CONTROLLER_DESC desc{};

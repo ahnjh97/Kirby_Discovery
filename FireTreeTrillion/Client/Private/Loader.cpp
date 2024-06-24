@@ -1410,18 +1410,22 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
 
 		// For Monster
-		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("Rabbit", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("Buffahorn", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("BladeKnight", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.f, 0.f);
+		m_vecModelInfo.emplace_back("Rabbit", TYPE_ANIM, 1.f, 0.f);
+		m_vecModelInfo.emplace_back("Buffahorn", TYPE_ANIM, 1.f, 0.f);
+		m_vecModelInfo.emplace_back("BladeKnight", TYPE_ANIM, 1.f, 0.f);
 		m_vecModelInfo.emplace_back("BladeKnightSword", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("Kabu", TYPE_ANIM, 2.f, 180.f);
-		m_vecModelInfo.emplace_back("BrontoBurt", TYPE_ANIM, 2.f, 180.f);
-		m_vecModelInfo.emplace_back("PoppyBrosJr", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_ANIM, 1.3f, 180.f);
+		m_vecModelInfo.emplace_back("Kabu", TYPE_ANIM, 2.f, 0.f);
+		m_vecModelInfo.emplace_back("BrontoBurt", TYPE_ANIM, 2.f, 0.f);
+		m_vecModelInfo.emplace_back("PoppyBrosJr", TYPE_ANIM, 1.f, 0.f);
+		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_ANIM, 1.3f, 0.f);
 
 		//와들디
-		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
+		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 0.f);
+
+		// Boss
+		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 0.f);
+
 	}
 }
 
@@ -1629,7 +1633,7 @@ void CLoader::Load_AnimToolInfo()
 					{
 						_float animSpeed;
 						pAnimSpeedElement->QueryFloatText(&animSpeed);
-						animInfo.fAnimSpeed = animSpeed;
+						animInfo.fAnimSpeed = 60.f;// animSpeed;
 					}
 
 					// Count 값 읽기
