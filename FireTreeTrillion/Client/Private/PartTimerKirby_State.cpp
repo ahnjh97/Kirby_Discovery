@@ -54,6 +54,8 @@ PARTTIME_ITEM CPartTimerKirby_Idle_State::Get_CurrentFood(_float4 vPos)
 		return PARTTIME_ITEM::DRINK;
 	else if (vPos.x <= 16.5f && vPos.x > 15.5f)
 		return PARTTIME_ITEM::BURGER;
+
+	return PARTTIME_ITEM::ITEM_END;
 }
 
 CPartTimerKirby_Idle_State* CPartTimerKirby_Idle_State::Create()
