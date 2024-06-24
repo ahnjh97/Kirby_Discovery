@@ -759,6 +759,35 @@ HRESULT CLoader::Loading_For_Parttime()
 	//마스크용
 	hr = Add_Texture(eLevel, "FX_Mask_Bubble2", "Effects/Mask/noise_bubble_%d.png", 4);	CHECK_FAILED(hr);
 
+
+#pragma region UI
+
+	// 와들디 주문 말풍선
+	hr = Add_Texture(eLevel, "OrderCloud",			"UI/MGameFood/OrderCloud.png");
+	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "ThinkingCloud",		"UI/MGameFood/ThinkingCloud.png");
+	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "tomato",				"UI/MGameFood/tomato.png");
+	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "burger",				"UI/MGameFood/burger.png");
+	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "cake",				"UI/MGameFood/cake.png");
+	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "energydrink",			"UI/MGameFood/energydrink.png");
+	CHECK_FAILED(hr);
+
+	// 타임 바
+	hr = Add_Texture(eLevel, "Clock_orig",			"UI/MGameFood/Clock_orig.png");
+	CHECK_FAILED(hr);
+
+	// 게임 마무리 UI
+	hr = Add_Texture(eLevel, "score_bar",			"UI/MGameFood/score bar.png");
+	CHECK_FAILED(hr);	
+	hr = Add_Texture(eLevel, "NewScoreBanner_bw",	"UI/MGameFood/new score banner_bw.png");
+	CHECK_FAILED(hr);
+
+#pragma endregion
+
 	// 얼굴, 눈 텍스쳐 로드
 	Add_KirbyFaceTexture(eLevel);
 

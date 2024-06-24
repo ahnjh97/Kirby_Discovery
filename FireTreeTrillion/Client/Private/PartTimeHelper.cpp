@@ -27,9 +27,10 @@ void CPartTimeHelper::Make_RandomItem()
 // 매개변수는 커비가 주겠다고 선택한 아이템
 _bool CPartTimeHelper::Check_Item(PARTTIME_ITEM eITEM)
 {
-	if(m_eFood == eITEM) 
+	if(m_eFood == eITEM) // 커비가 맞췄을 때
 	{
-		//m_pHungryDee->Bring_Food(eITEM);
+		// m_pHungryDee->Bring_Food(eITEM);
+		// QZR : 점수 UI에서 숫자 UP // 틀렸을 때는 점수판 UI에 아무런 변화가 없음
 		return true;
 	}
 	else
