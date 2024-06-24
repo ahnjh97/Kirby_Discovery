@@ -110,6 +110,7 @@ public:
 	void ReturnToIdle() { Set_Animation(m_iIdleAnimIndex, m_fIdleAnimTickPerSec, true, true, 0.1f); }
 	void Set_Hide(_bool bHide) { m_bHide = bHide; }
 	_bool IsHidden() { return m_bHide; }
+	_uint Find_MeshIndex(const string& _strMeshName);
 
 private:
 	_uint						m_iNumMeshes = { 0 };

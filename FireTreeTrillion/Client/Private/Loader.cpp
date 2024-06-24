@@ -88,9 +88,9 @@
 #include "StarBlockPiece.h"
 #include "TerrainFog.h"
 #include "BreakableRock.h"
-#include "Car.h"
-#include "BreakableRock.h"
 #include "BreakableRockPartical.h"
+#include "Car.h"
+#include "CarShopWall.h"
 
 //UI
 #include "BackGround.h"
@@ -323,6 +323,7 @@ HRESULT CLoader::Loading_ObjectAll()
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BreakableRock"), CBreakableRock);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BreakableRockPartical"), CBreakableRockPartical);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CarShopWall"), CCarShopWall);
 
 	// 미니게임 in 와들디마을
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PartTimeFood"), CPartTimeFood);
@@ -1179,7 +1180,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		//와들디
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
 
-		// For Mab Interactive Object
+		// For Map Interactive Object
 		m_vecModelInfo.emplace_back("GsPebble", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("SeShell", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
@@ -1297,15 +1298,17 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("CappyBody", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("CappyHat", TYPE_ANIM, 1.f, 180.f);
 
-		// For Mab Interactive Object
+		// For Map Interactive Object
 		m_vecModelInfo.emplace_back("GsPebble", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("SeShell", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+
 		// 자동차 관련 (자동차와 부수는 돌멩이들)
 		m_vecModelInfo.emplace_back("Car", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("RockA", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("RockB", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("RockPartical", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("CarShopBreakableWall", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 		// For Item
 		m_vecModelInfo.emplace_back("Item_EnergyDrink", TYPE_NONANIM, 3.f, 0.f, 0, string("MapObjs/"));
@@ -1339,7 +1342,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("FoodCake", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("FoodTomato", TYPE_NONANIM, 2.f);
 	}
-
 	else if (eLevel == LEVEL_FINALBOSS)
 	{
 		m_vecModelInfo.emplace_back("Land_VcLabo", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
@@ -1409,7 +1411,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("CappyBody", TYPE_ANIM, 1.2f, 180.f);
 		m_vecModelInfo.emplace_back("CappyHat", TYPE_ANIM, 1.2f, 180.f);
 
-		// For Mab Interactive Object
+		// For Map Interactive Object
 		m_vecModelInfo.emplace_back("Ladder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("GsPebble", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("SeShell", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));

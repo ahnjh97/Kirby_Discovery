@@ -200,6 +200,7 @@
     <ClInclude Include="..\Public\CappyHat.h" />
     <ClInclude Include="..\Public\CappyHat_State.h" />
     <ClInclude Include="..\Public\Car.h" />
+    <ClInclude Include="..\Public\CarShopWall.h" />
     <ClInclude Include="..\Public\Character.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\Coin.h" />
@@ -340,6 +341,7 @@
     <ClCompile Include="..\Private\CappyHat.cpp" />
     <ClCompile Include="..\Private\CappyHat_State.cpp" />
     <ClCompile Include="..\Private\Car.cpp" />
+    <ClCompile Include="..\Private\CarShopWall.cpp" />
     <ClCompile Include="..\Private\Character.cpp" />
     <ClCompile Include="..\Private\Coin.cpp" />
     <ClCompile Include="..\Private\CollisionCenter.cpp" />

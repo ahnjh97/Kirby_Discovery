@@ -1,5 +1,5 @@
 ## 이미지 노드 자동 연결 스크립트
-한 머티리얼에서 base color, mra, normal 키워드가 포함된 이미지 텍스쳐 노드를 자동으로 연결해 줌
+##한 머티리얼에서 base color, mra, normal 키워드가 포함된 이미지 텍스쳐 노드를 자동으로 연결해 줌
 
 import bpy
 

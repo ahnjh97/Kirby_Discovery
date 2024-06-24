@@ -628,15 +628,20 @@ HRESULT CLevel_Racing::Ready_Objects()
 		if (fileInput.eof())
 			break;
 
+		CGameObject::GAMEOBJECT_DESC tDesc{};
+		tDesc.matWorld = matWorld;
+		tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+		tDesc.iShaderVars = iShaderVars;
+		tDesc.fRimWidth = fRimWidth;
+
 		if ("RockA" == strModelName || "RockB" == strModelName)
 		{
-			CGameObject::GAMEOBJECT_DESC tDesc{};
-			tDesc.matWorld = matWorld;
-			tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
-			tDesc.iShaderVars = iShaderVars;
-			tDesc.fRimWidth = fRimWidth;
-
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Rock"), TEXT("Prototype_GameObject_BreakableRock"), &tDesc)))
+				continue;
+		}
+		else if ("CarShopBreakableWall" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_CarShopWall"), TEXT("Prototype_GameObject_CarShopWall"), &tDesc)))
 				continue;
 		}
 	}
