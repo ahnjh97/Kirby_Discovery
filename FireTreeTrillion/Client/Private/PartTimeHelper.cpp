@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "PartTimeHelper.h"
 
+#include "PartTimerKirby.h"
 #include "HungryDee.h"
 
 IMPLEMENT_SINGLETON(CPartTimeHelper)
@@ -29,14 +30,20 @@ _bool CPartTimeHelper::Check_Item(PARTTIME_ITEM eITEM)
 {
 	if(m_eFood == eITEM) 
 	{
-		//m_pHungryDee->Bring_Food(eITEM);
+		m_pHungryDee->Bring_Food(eITEM);
 		return true;
 	}
 	else
 	{
-		//m_pHungryDee->Bring_Food(PARTTIME_ITEM::ITEM_END);
+		m_pHungryDee->Bring_Food(PARTTIME_ITEM::ITEM_END);
 		return false;
 	}
+}
+
+void CPartTimeHelper::NotifyObserver()
+{
+	m_pHungryDee->OnNotify();
+	m_pPartTimerKirby->OnNotify();
 }
 
 void CPartTimeHelper::Free()

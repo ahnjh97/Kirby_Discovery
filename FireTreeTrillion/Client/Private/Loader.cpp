@@ -100,7 +100,7 @@
 #include "BombOrbit.h"
 #include "BombOrbitGlow.h"
 #include "HUD_AbilityDiscard.h"
-
+#include "UI_PartTime.h"
 
 // 아이템
 #include "EnergyDrink.h"
@@ -265,9 +265,11 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_KirbyStatus"), CHUD_KirbyStatus);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_StarPoint"), CHUD_StarPoint);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_AbilityDiscard"), CHUD_AbilityDiscard);
-	// 
+
 	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_HPBoss"), CHUD_HPBoss);
 	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_Mission"), CHUD_Mission);
+	
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_PartTime"), CUI_PartTime);
 
 #pragma endregion
 	
@@ -763,6 +765,21 @@ HRESULT CLoader::Loading_For_Parttime()
 
 #pragma endregion
 
+
+#pragma region UI
+
+	// 타임 바
+	hr = Add_Texture(eLevel, "GameFoodUI_BaseBar", "UI/MGameFoodUI/base bar.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_TimeBarBlank", "UI/MGameFoodUI/time bar blank.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_TimeBar", "UI/MGameFoodUI/time bar.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_TimeBarBW", "UI/MGameFoodUI/time bar_bw.png");
+
+	hr = Add_Texture(eLevel, "GameFoodUI_DeeBG",	"UI/MGameFoodUI/dee bg.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_DeeBGBW",	"UI/MGameFoodUI/dee bg_bw.png");
+
+	//hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 23);
+
+#pragma endregion
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
 #pragma region 모델

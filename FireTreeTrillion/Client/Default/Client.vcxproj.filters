@@ -355,6 +355,9 @@
     <Filter Include="02.GameObjects\MiniGame\_Helper">
       <UniqueIdentifier>{77809e89-d720-4b42-8482-e5882bfe6970}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\MiniGame\UI">
+      <UniqueIdentifier>{f66e1d54-657e-4ef4-b222-24f86e5cd5b8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -707,9 +710,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\PartTimeHelper.h">
       <Filter>02.GameObjects\MiniGame\_Helper</Filter>
-	</ClInclude>
-	<ClInclude Include="..\Public\BreakableRockPartical.h">
+    </ClInclude>
+    <ClInclude Include="..\Public\BreakableRockPartical.h">
       <Filter>02.GameObjects\Map\BreakableRock</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UI_PartTime.h">
+      <Filter>02.GameObjects\MiniGame\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1045,9 +1051,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\PartTimeHelper.cpp">
       <Filter>02.GameObjects\MiniGame\_Helper</Filter>
-	</ClCompile>
-	<ClCompile Include="..\Private\BreakableRockPartical.cpp">
+    </ClCompile>
+    <ClCompile Include="..\Private\BreakableRockPartical.cpp">
       <Filter>02.GameObjects\Map\BreakableRock</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UI_PartTime.cpp">
+      <Filter>02.GameObjects\MiniGame\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
