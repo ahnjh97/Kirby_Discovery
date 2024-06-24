@@ -71,11 +71,12 @@ HRESULT CBasicMap::Initialize(void* pArg)
         InsertMapDecos();
     }
     if (wstrModelTag == TEXT("Town") || wstrModelTag == TEXT("TownShop")|| wstrModelTag == TEXT("Land_VcLabo")) {
-        if(LEVEL_TOOL_MAP != *m_pCurrentLevelID)
+        if (LEVEL_TOOL_MAP != *m_pCurrentLevelID) {
+            ReadMapDecoTxts();
             ReadDecos_ForSmallLevels();
+        }
     }
         
-
     if (FAILED(m_pModelCom->CreateStaticActor(GameObjectDesc.matWorld)))
         return E_FAIL;
 
@@ -535,12 +536,11 @@ void CBasicMap::ReadDecos_ForSmallLevels()
         else if (LEVEL_FINALBOSS == *m_pCurrentLevelID)
             strFolder = string("LabDiscovera_Deco/");
 
-
+        if (true == IsMapDeco(strModelName))
+            strFolder = string("MapDeco/");
 
         if (CMapToolObject::MAPOBJ_ANIM == iMapObjType)
-        {
             eType = TYPE_ANIM;
-        }
 
         CModel* pModel = CModel::Create(m_pDevice, m_pContext, MODEL{ strModelName, eType, 1.f, 0.f, 0, strFolder, false });
 
@@ -656,6 +656,31 @@ HRESULT CBasicMap::Render_NonOctreeMapDecos()
     }
 
     return S_OK;
+}
+
+void CBasicMap::ReadMapDecoTxts()
+{
+    string strPath = "../../../model_txt/MapDeco/NonAnim/";
+
+    directory_iterator end_iter;  // 디렉토리 순회의 끝을 나타내는 iterator
+    directory_iterator dir_iter(strPath);  // 지정된 경로의 시작 iterator
+
+    while (dir_iter != end_iter) {
+        if (is_regular_file(*dir_iter)) {
+            string strFilePath = dir_iter->path().filename().string();
+            string strModelName = strFilePath.substr(0, strFilePath.length() - 4);
+            m_setMapDecoNames.insert(strModelName);
+        }
+        ++dir_iter;
+    }
+}
+
+_bool CBasicMap::IsMapDeco(const string& _strModelName)
+{
+    if (m_setMapDecoNames.end() != m_setMapDecoNames.find(_strModelName))
+        return true;
+
+    return _bool();
 }
 
 void CBasicMap::Save_OctreeData(const string& strLevel)

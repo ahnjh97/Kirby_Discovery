@@ -355,6 +355,15 @@
     <Filter Include="02.GameObjects\MiniGame\_Helper">
       <UniqueIdentifier>{77809e89-d720-4b42-8482-e5882bfe6970}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\Bridge">
+      <UniqueIdentifier>{d42d0265-2d39-46ae-8baa-4fdc448c5e73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Shutter">
+      <UniqueIdentifier>{1bb854fe-6e96-4704-8fc4-50ae4707b4db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\CarShopWall">
+      <UniqueIdentifier>{22f62060-413c-4957-94a1-99647cd7b478}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -707,9 +716,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\PartTimeHelper.h">
       <Filter>02.GameObjects\MiniGame\_Helper</Filter>
-	</ClInclude>
-	<ClInclude Include="..\Public\BreakableRockPartical.h">
+    </ClInclude>
+    <ClInclude Include="..\Public\BreakableRockPartical.h">
       <Filter>02.GameObjects\Map\BreakableRock</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CarShopWall.h">
+      <Filter>02.GameObjects\Map\CarShopWall</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1045,9 +1057,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\PartTimeHelper.cpp">
       <Filter>02.GameObjects\MiniGame\_Helper</Filter>
-	</ClCompile>
-	<ClCompile Include="..\Private\BreakableRockPartical.cpp">
+    </ClCompile>
+    <ClCompile Include="..\Private\BreakableRockPartical.cpp">
       <Filter>02.GameObjects\Map\BreakableRock</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CarShopWall.cpp">
+      <Filter>02.GameObjects\Map\CarShopWall</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

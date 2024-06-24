@@ -80,6 +80,8 @@ void CAnimDeco::HideModel()
 			GAMEOBJECT_DESC tDesc{};
 			tDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
 			tDesc.wstrModelName = m_wstrNonAnimDecoName;
+			tDesc.fRimWidth = 0.2f;
+			tDesc.iShaderVars = 6;
 			m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_MapDeco"), TEXT("Prototype_GameObject_NonAnimDeco"), &tDesc);
 		}
 
