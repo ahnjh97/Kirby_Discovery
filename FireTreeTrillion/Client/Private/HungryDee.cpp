@@ -10,15 +10,37 @@ pair<_float3, vector<WAITING_INFO>> CHungryDee::m_WaitingList =
 {
 	_float3{0.f, 0.f, 0.f},
 	{
-		WAITING_INFO{ {15.f, 2.f, -3.f}, 0.f},
+		//앞으로 빠지는 자리
+		WAITING_INFO{ {15.f, 2.f, 0.f}, 0.f},
+		WAITING_INFO{ {14.f, 2.f, 0.f}, 0.f},
+
+		//맨 앞자리
 		WAITING_INFO{ {0.f, 2.f, 0.f}, 0.f},
-		WAITING_INFO{ {-1.f, 2.f, -2.f}, 0.1f},
-		WAITING_INFO{ {-3.f, 2.f, -4.f}, 0.15f},
-		WAITING_INFO{ {-6.f, 2.f, -6.f}, 0.08f},
-		WAITING_INFO{ {-8.f, 2.f, -8.f}, 0.1f},
-		WAITING_INFO{ {-15.f, 2.f, -10.f}, 0.1f}
+
+		WAITING_INFO{ {-1.4f, 2.f, -2.f}, 0.1f},
+		WAITING_INFO{ {-2.f, 2.f, -4.f}, 0.15f},
+		WAITING_INFO{ {-3.5f, 2.f, -6.f}, 0.08f},
+		WAITING_INFO{ {-5.f, 2.f, -8.f}, 0.1f},
+		WAITING_INFO{ {-4.f, 2.f, -10.f}, 0.1f},
+		WAITING_INFO{ {-2.5f, 2.f, -12.f}, 0.1f},
+		WAITING_INFO{ {-3.f, 2.f, -14.f}, 0.1f},
+		WAITING_INFO{ {-4.5f, 2.f, -16.f}, 0.1f},
+		WAITING_INFO{ {-3.f, 2.f, -18.f}, 0.1f},
+		WAITING_INFO{ {-1.4f, 2.f, -20.f}, 0.1f},
+		WAITING_INFO{ {-2.f, 2.f, -22.f}, 0.15f},
+		WAITING_INFO{ {-3.5f, 2.f, -24.f}, 0.08f},
+		WAITING_INFO{ {-5.f, 2.f, -26.f}, 0.1f},
+		WAITING_INFO{ {-4.f, 2.f, -28.f}, 0.1f},
+		WAITING_INFO{ {-2.5f, 2.f, -30.f}, 0.1f},
+		WAITING_INFO{ {-3.f, 2.f, -32.f}, 0.1f},
+		WAITING_INFO{ {-4.5f, 2.f, -34.f}, 0.1f},
+		WAITING_INFO{ {-3.f, 2.f, -36.f}, 0.1f},
+		WAITING_INFO{ {-1.f, 2.f, -38.f}, 0.1f},
 	}
 };
+
+_int CHungryDee::m_iWatingNum = { 0 };
+_float CHungryDee::m_fWaitingTime = { 30.f };
 
 CHungryDee::CHungryDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CWaddleDee{ pDevice, pContext }
@@ -53,10 +75,10 @@ HRESULT CHungryDee::Initialize(void* pArg)
 	m_WaitingList.first = pDeeDesc.matWorld.Translation();
 
 	m_iMyIdx = pDeeDesc.iIdx;
-	_float4 vDir = Dir( (m_WaitingList.second[m_iMyIdx].vPos
-		+ _float3{ CUtils::Make_RandomFloat(2.f, 10.f), 0.f, CUtils::Make_RandomFloat(2.f, 10.f) }));
-
+	_float4 vDir = Dir(m_WaitingList.second[m_iMyIdx].vPos);
+	vDir += _float4{18.f, 0.f, -6.f, 0.f};
 	m_pTransformCom->Move(vDir);
+	++m_iWatingNum;
 
 	hr = Add_Components();
 	CHECK_FAILED(hr);
@@ -67,7 +89,7 @@ HRESULT CHungryDee::Initialize(void* pArg)
 
 
 
-	m_pModelCom->Set_Animation(DEESHOPANIM_GUESTNORMAL, 60.f, true, true);
+	m_pModelCom->Set_Animation(DEESHOPANIM_GUESTNORMAL, CUtils::Make_RandomFloat(45.f, 60.f), true, true);
 
 	return S_OK;
 }
@@ -79,17 +101,50 @@ _int CHungryDee::Tick(_float fTimeDelta)
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
+	//디버깅용
+	if (m_iMyIdx == 2)
+		m_fWaitingTime -= m_fTimeDelta;
 
-	if (m_pGameInstance->Get_KeyState(DIK_W, KEY_DOWN))
+
+	if (m_pGameInstance->Get_KeyState(DIK_S, KEY_DOWN) && m_iMyIdx == 0)
 	{
-		m_iMyIdx = (m_iMyIdx + 6) % 7;
+		CHungryDee::HUNGRYDEE_DESC HungryDeeDesc{};
+		HungryDeeDesc.fSpeedPerSec = 5.f;
+		HungryDeeDesc.fRotationPerSec = ToRadian(90.f);
+		_float4x4 InitMat = _float4x4::Identity;
+		InitMat.Translation(m_WaitingList.first);
+		HungryDeeDesc.matWorld = InitMat;
 
-		if (m_iMyIdx == 6)
+		_int iStartIdx = m_iWatingNum;
+
+		for (_int i = 0; i < 10; ++i)
 		{
-			m_pControllerCom->Set_Position(m_pTransformCom, Pos(m_WaitingList.first + m_WaitingList.second[m_iMyIdx].vPos));
+			HungryDeeDesc.iIdx = iStartIdx + i;
+			m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_NPC"), TEXT("Prototype_GameObject_HungryDee"), &HungryDeeDesc);
 		}
 	}
 
+	if (m_pGameInstance->Get_KeyState(DIK_W, KEY_DOWN))
+	{
+		if (m_iMyIdx == 2)
+			CUtils::Make_RandomInt(0, 1) == 1 ? Bring_Food(PARTTIME_ITEM::DRINK) : Bring_Food(PARTTIME_ITEM::ITEM_END);
+
+		m_iMyIdx = (m_iMyIdx + m_iWatingNum - 1) % m_iWatingNum;
+
+		if (m_iMyIdx == m_iWatingNum - 1)
+		{
+			_float3 vDestPos = m_WaitingList.first + m_WaitingList.second[m_iMyIdx].vPos + _float3{ -10.f, 0.f, 0.f };
+			m_pControllerCom->Set_Position(m_pTransformCom, Pos(vDestPos));
+			Set_DeeEyeState(DEEEYE_IDLE);
+
+			for (auto& partObj : m_PartObjects)
+				Safe_Release(partObj.second);
+			m_PartObjects.clear();
+			Set_RenderPartObj(false);
+
+			Change_State((DEE_ANIM)DEESHOPANIM_WALK, 60.f, true, true);
+		}
+	}
 
 
 	//나머지 슈퍼틱, 파트 틱 처리
@@ -108,13 +163,17 @@ void CHungryDee::Late_Tick(_float fTimeDelta)
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 	m_pModelCom->Play_Animation(m_fTimeDelta);
 
-	for (auto& Pair : m_PartObjects)
-		Pair.second->Late_Tick(m_fTimeDelta);
-
-
 	//시야 벗어나면 컬링
 	if (!m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State(CTransform::STATE_POSITION), 2.0f))
 		return;
+
+
+	if (m_bRenderPartObj)
+	{
+		for (auto& Pair : m_PartObjects)
+			Pair.second->Late_Tick(m_fTimeDelta);
+	}
+
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
@@ -182,6 +241,48 @@ void CHungryDee::Render_IMGUI()
 
 void CHungryDee::Bring_Food(PARTTIME_ITEM eITEM)
 {
+	if (eITEM == PARTTIME_ITEM::ITEM_END)
+	{
+		Change_State((DEE_ANIM)DEESHOPANIM_INCORRECT, 60.f, false, true);
+		Set_DeeEyeState(DEEEYE_ANGER);
+		return;
+	}
+
+	CPartObject* pPartObj = { nullptr };
+	CDee_Part::DEEPART_DESC	PartDesc{};
+
+	CModel* pModel = (CModel*)Get_Component(TEXT("Com_Model"));
+
+	PartDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	PartDesc.pSocket = pModel->Get_BonePtr("RHaveL");
+
+
+	switch (eITEM)
+	{
+	case PARTTIME_ITEM::CAKE:
+		PartDesc.wstrModelName = TEXT("Item_EnergyDrink");
+		break;
+	case PARTTIME_ITEM::BURGER:
+		PartDesc.wstrModelName = TEXT("Item_EnergyDrink");
+		break;
+	case PARTTIME_ITEM::TOMATO:
+		PartDesc.wstrModelName = TEXT("Item_EnergyDrink");
+		break;
+	case PARTTIME_ITEM::DRINK:
+		PartDesc.wstrModelName = TEXT("Item_EnergyDrink");
+		break;
+	default:
+		PartDesc.wstrModelName = TEXT("Item_EnergyDrink");
+		break;
+	}
+
+	pPartObj = static_cast<CPartObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_DeePart"), &PartDesc));
+	if (nullptr == pPartObj)
+		return;
+
+	m_PartObjects.emplace(TEXT("Part_Weapon"), pPartObj);
+	Change_State((DEE_ANIM)DEESHOPANIM_CLERKCORRECT, 60.f, false, true);
+	Set_DeeEyeState(DEEEYE_SMILE);
 }
 
 HRESULT CHungryDee::Add_Components()
@@ -247,7 +348,7 @@ HRESULT CHungryDee::Add_PartObjects()
 	PartDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 	PartDesc.pSocket = pModel->Get_BonePtr("HatL");
 
-	
+
 	switch (CUtils::Make_RandomInt(0, 4))
 	{
 	case 0:
@@ -266,7 +367,7 @@ HRESULT CHungryDee::Add_PartObjects()
 		PartDesc.wstrModelName = TEXT("DeePart_Knowledge");
 		break;
 	}
-	
+
 	pPartObj = static_cast<CPartObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_DeePart"), &PartDesc));
 	if (nullptr == pPartObj)
 		return E_FAIL;
@@ -312,9 +413,20 @@ void CHungryDee::SetUp_FSM()
 {
 	m_pFSM = CFSM::Create();
 
+	//그냥 서서 하는 스테이트
 	m_pFSM->Add_State(DEESHOPANIM_GUESTNORMAL, CDee_Hungry_State::Create());
+	m_pFSM->Add_State(DEESHOPANIM_GUESTANGER, CDee_Hungry_State::Create());
+	m_pFSM->Add_State(DEESHOPANIM_GUESTFIDGET, CDee_Hungry_State::Create());
+	m_pFSM->Add_State(DEESHOPANIM_ORDERNORMAL, CDee_Hungry_State::Create());
+
+
 	m_pFSM->Add_State(DEESHOPANIM_WALK, CDee_Hungry_State::Create());
 
+	m_pFSM->Add_State(DEESHOPANIM_CLERKCORRECT, CDee_Hungry_State::Create());
+	m_pFSM->Add_State(DEESHOPANIM_INCORRECT, CDee_Hungry_State::Create());
+
+	m_pFSM->Add_State(DEESHOPANIM_CORRECTMOVE, CDee_Hungry_State::Create());
+	m_pFSM->Add_State(DEESHOPANIM_INCORRECTMOVE, CDee_Hungry_State::Create());
 
 	CFSM::FSM_INFO	FSMDesc = {};
 	FSMDesc.iState = DEESHOPANIM_GUESTNORMAL;

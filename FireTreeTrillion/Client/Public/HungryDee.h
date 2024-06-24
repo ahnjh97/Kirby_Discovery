@@ -26,9 +26,14 @@ private:
 
 public:
 	static pair<_float3, vector<WAITING_INFO>> m_WaitingList;
+	static _int		m_iWatingNum;
+	static _float	m_fWaitingTime;
 
 	//현재 내가 기다려야 할 위치를 준다.
-	_float3		Get_DestWaitingPos() { return m_WaitingList.first + m_WaitingList.second[m_iMyIdx].vPos; }
+	_float3			Get_DestWaitingPos() { return m_WaitingList.first + m_WaitingList.second[m_iMyIdx].vPos; }
+	_float			Get_WaitingTime() {return m_fWaitingTime;}
+	_bool			IsFrontWaiting() { return m_iMyIdx == 1; }
+	void			Set_RenderPartObj(_bool bRender) { m_bRenderPartObj = bRender; }
 
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
@@ -49,6 +54,8 @@ public:
 private:
 	DEE_SHOPANIM	m_eMyState = { DEESHOPANIM_END };
 	_int			m_iMyIdx = { -1 };
+	_bool			m_bRenderPartObj = { false };
+
 
 	HRESULT Add_Components();
 	HRESULT Add_PartObjects();

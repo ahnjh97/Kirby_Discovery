@@ -198,7 +198,7 @@ HRESULT CFoodShopDee::Add_Components()
 
 HRESULT CFoodShopDee::Add_PartObjects()
 {
-	if (*m_pCurrentLevelID != LEVEL_TOWN)
+	if (*m_pCurrentLevelID != LEVEL_TOWN && *m_pCurrentLevelID != LEVEL_PARTTIME)
 		return S_OK;
 
 	CPartObject* pPartObj = { nullptr };
