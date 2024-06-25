@@ -943,7 +943,7 @@ HRESULT CKirby::Add_PartObjects()
 	HitBox.pCollisionType = HITBOX_PLYAER;
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
-	Activate_FrustumCollider(0.5f, 4.f, 90.f);
+	//Activate_FrustumCollider(0.5f, 4.f, 90.f);
 
 
 	return S_OK;
@@ -1497,13 +1497,14 @@ HRESULT CKirby::Kirby_SystemInitialize()
 	m_fAttack = 5.f; // 고정
 
 	// 게임을 새롭게 시작했을 경우, 리셋시칸다.
-	if (*m_pCurrentLevelID == LEVEL_INTRO)
-	{
+	//if (*m_pCurrentLevelID == LEVEL_INTRO)
+	//{
 		m_fHp = 100.f; // 기존 사용하던 HP입니다.
 		m_fMaxHp = 100.f;
 		m_eAbilityType = ABILITY_DEFAULT;
 		// m_uWaddleDeeCount = 0;
-	}
+	//}
+
 
 	// 폭탄 궤적을 만들어 놓는다.
 	Ready_BombOrbit();

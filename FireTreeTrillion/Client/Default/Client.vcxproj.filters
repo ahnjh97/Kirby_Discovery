@@ -342,6 +342,9 @@
     <Filter Include="02.GameObjects\Map\CarShopWall">
       <UniqueIdentifier>{22f62060-413c-4957-94a1-99647cd7b478}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee\DeeDeeDeeHammer">
+      <UniqueIdentifier>{77dee786-a789-451e-a6da-cdc4ac63cbd0}</UniqueIdentifier>
+    </Filter>
     <Filter Include="01.Levels\_Loading">
       <UniqueIdentifier>{783aa7d0-e4a9-47f3-b857-f5b824dad2b8}</UniqueIdentifier>
     </Filter>
@@ -752,6 +755,9 @@
     <ClInclude Include="..\Public\CarShopWall.h">
       <Filter>02.GameObjects\Map\CarShopWall</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\DeeDeeDeeHammer.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Level_DeeDeeDee.h">
       <Filter>01.Levels\3. DeeDeeDee</Filter>
     </ClInclude>
@@ -1107,6 +1113,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\CarShopWall.cpp">
       <Filter>02.GameObjects\Map\CarShopWall</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\DeeDeeDeeHammer.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_DeeDeeDee.cpp">
       <Filter>01.Levels\3. DeeDeeDee</Filter>

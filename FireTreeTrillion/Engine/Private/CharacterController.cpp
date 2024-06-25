@@ -252,11 +252,11 @@ _bool CCharacterController::Jump_Parabola(CTransform* pTransform, _fvector vGoPo
 }
 
 /// <summary> ÀÚ À¯ ³« ÇÏ </summary>
-void CCharacterController::FreeFall(CTransform* pTransform, _float fTimeDelta, _float fOffset)
+void CCharacterController::FreeFall(CTransform* pTransform, _float fTimeDelta, _float fGravityOffset, _float fHeightOffset)
 {
 
 	// ÀÚÀ¯³«ÇÏ¿ë velocity
-	m_fFallVelocity -= GRAVITY * fTimeDelta * fOffset;
+	m_fFallVelocity -= GRAVITY * fTimeDelta * fGravityOffset;
 
 	PxVec3 moveVector = PxVec3(0.f, m_fFallVelocity, 0.f) * fTimeDelta;
 
@@ -268,7 +268,7 @@ void CCharacterController::FreeFall(CTransform* pTransform, _float fTimeDelta, _
 	PxControllerState m_pPxState;
 	m_pController->getState(m_pPxState);
 
-	_vector xmPos = XMVectorSet(pos.x, pos.y - m_fHeightOffset, pos.z, 0.f);
+	_vector xmPos = XMVectorSet(pos.x, pos.y - (m_fHeightOffset + fHeightOffset), pos.z, 0.f);
 
 	if (m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_DOWN || m_pPxState.collisionFlags == PxControllerCollisionFlag::eCOLLISION_UP)
 	{
@@ -360,10 +360,10 @@ _float CCharacterController::Compute_Height(_fvector vAxis)
 	return fHeight;
 }
 
-_float CCharacterController::Compute_Wall(_fvector vLook)
+_float CCharacterController::Compute_Wall(_fvector vLook, _float fOffSet)
 {
 	PxExtendedVec3 position = m_pController->getPosition();
-	PxVec3 rayOrigin = PxVec3((_float)position.x, (_float)position.y + 1.f, (_float)position.z);
+	PxVec3 rayOrigin = PxVec3((_float)position.x, (_float)position.y + fOffSet, (_float)position.z);
 
 	PxVec3 rayDirection = CUtils::To_PxVec3(vLook);
 	_float fMaxDistance = 10.f;
