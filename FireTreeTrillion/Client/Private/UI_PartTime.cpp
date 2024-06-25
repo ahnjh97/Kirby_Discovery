@@ -331,9 +331,9 @@ _bool CUI_PartTime::Setup_DeeFace(_int iTextureNum)
 {
 	_int iCurFaceNum(8);
 	if (m_fRatioTimeBar < 0.2f)
-		iCurFaceNum = 9;
-	else if (m_fRatioTimeBar < 0.8f)
 		iCurFaceNum = 7;
+	else if (m_fRatioTimeBar < 0.8f)
+		iCurFaceNum = 9;
 
 	return (iTextureNum == iCurFaceNum) ? true : false;
 }

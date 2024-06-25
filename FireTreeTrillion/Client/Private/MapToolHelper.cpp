@@ -95,10 +95,10 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 	m_vecLevelName = { "Level_Static", "Level_Loading", "Level_Logo", "GamePlay",
 			"Level_Tool_UI", "Level_Tool_FX", "Level_Tool_Anim", "Level_Tool_Map",
-		"Intro", "Racing",  "Town", "PartTime", "FinalBoss", "Level_End" };
+		"Intro", "Racing", "DeeDeeDee", "Town", "PartTime", "FinalBoss", "Level_End" };
 
 	//UV 조절 가능
-	m_vecMapModelNames = { "Level0Stage1Step01", "Level0Stage1Step02",  "Level1Stage1Step01", "Town", "TownShop", 
+	m_vecMapModelNames = { "Level0Stage1Step01", "Level0Stage1Step02",  "Level1Stage1Step01", "DeeDeeDee", "Town", "TownShop",
 		"Land_VcLabo"};
 
 	vector<string> vecBGs = { "BG0", "BG1" };
@@ -123,6 +123,10 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "JgGrassB", "JgGrassL", "JgGrasslongB", "JgGrassN", "JgWoodD", "JgGrassO"
 		, "StarBlockL" , "StarBlockM", "StarBlockS", "SeDriftWoodAL", "SeDriftWoodBL", "SeDriftWoodCL"
 		, "VpFactoryPart", "VpFactoryParts", "VpFactoryPartsBlend", "WoodBox"
+
+#pragma region DEEDEEDEE OBJ
+		, "TwGougeGround01", "TwGougeGround02"
+#pragma endregion
 
 #pragma region TOWN OBJECT
 		, "TwArena", "TwArenaA", "TwArenaB", "TwArenaClerk", "TwDeliveryService", "TwFoodStore", "TwFoodStoreChair", "TwFoodStoreTable"
