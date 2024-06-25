@@ -77,6 +77,7 @@
 
 // 보스
 #include "DeeDeeDee.h"
+#include "DeeDeeDeeHammer.h"
 
 //와들디
 #include "Dee_Part.h"
@@ -306,6 +307,8 @@ HRESULT CLoader::Loading_ObjectAll()
 
 	//Boss
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeeDeeDee"), CDeeDeeDee);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeeDeeDeeHammer"), CDeeDeeDeeHammer);
+
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BackGround"), CBackGround);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
@@ -1187,6 +1190,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// Boss
 		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 180.f);
+		m_vecModelInfo.emplace_back("DeeDeeDeeHammer", TYPE_NONANIM, 1.0f);
 
 		// For Map Interactive Object
 		m_vecModelInfo.emplace_back("GsPebble", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
@@ -1257,6 +1261,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// Boss
 		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 180.f);
+		m_vecModelInfo.emplace_back("DeeDeeDeeHammer", TYPE_NONANIM, 1.3f);
+
 
 		m_vecModelInfo.emplace_back("PoppyBrosJr", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_ANIM, 1.3f, 180.f);
@@ -1496,6 +1502,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// Boss
 		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 180.f);
+		m_vecModelInfo.emplace_back("DeeDeeDeeHammer", TYPE_NONANIM, 1.0f);
 
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
 		m_vecModelInfo.emplace_back("WaddleDeeHungry", TYPE_ANIM, 1.1f, 180.f);

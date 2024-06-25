@@ -15,18 +15,25 @@ class CDeeDeeDee final : public CMonster
 {
 public:
 	enum STATE_TYPE {
-		STATE_CHANGEDIRECTION = 0,
-		STATE_COMMAND = 4,
+		STATE_COMMAND = 3, //
 		STATE_DEATH = 6, STATE_DEATHWAIT = 7, STATE_DEATHWAITEND = 8,
-		STATE_FALL = 22, STATE_JUMP = 45, STATE_JUMPEND = 46, STATE_JUMPSTART = 47, STATE_LANDING = 48,
-		STATE_SLIDINGSTART = 55, STATE_SLIDING = 53, STATE_SLIDINGEND = 54,
-		STATE_SHOUTSTART = 52, STATE_SHOUT = 50, STATE_SHOUTEND = 51,
 
-		STATE_HAMMERATTACK = 26, STATE_HAMMERATTACKCHARGE = 27, STATE_HAMMERATTACKHIT = 28,
-		STATE_HAMMERSIDE = 37, STATE_HAMMERSIDEATTACK = 38, STATE_HAMMERSIDECHARGE = 39, STATE_HAMMERSIDEWALK = 40,
+		STATE_FALL = 22, STATE_JUMP = 45, STATE_JUMPEND = 46, STATE_JUMPSTART = 47, STATE_LANDING = 48, //
+		STATE_SLIDINGSTART = 55, STATE_SLIDING = 53, STATE_SLIDINGEND = 54, //
+		STATE_SHOUTSTART = 52, STATE_SHOUT = 50, STATE_SHOUTEND = 51, //
 
-		STATE_WAIT = 91, STATE_WALK = 92, STATE_RUN = 49,
+		STATE_HAMMERATTACK = 27, STATE_HAMMERATTACKCHARGE = 26, STATE_HAMMERATTACKHIT = 28, //
+
+		STATE_HAMMERSIDE = 37, STATE_HAMMERSIDEATTACK = 38, STATE_HAMMERSIDECHARGE = 39, STATE_HAMMERSIDEWALK = 40, //
+
+		STATE_WAIT = 91, STATE_WALK = 92, STATE_RUN = 49, //
 		STATE_END = 999
+	};
+
+	enum MYPATTERN {
+		PATTERN_BATTLE,
+		PATTERN_CENTER,
+		PATTERN_END
 	};
 
 	struct DDDDESC {
@@ -38,7 +45,19 @@ public:
 		_float4			m_vTargetDir = { 0.f, 0.f, 0.f, 0.f };
 
 		_float			m_fJumpVelocity = { 0.f };
-		_float			m_fGravityOffset = { 6.f };
+		_float			m_fGravityOffset = { 15.f };
+
+		// 다시 돌아가야 한다면, 이것이 트루가된다.
+		_bool			m_bBackToOriginPos = { false };
+		// 플레이어가 범위 안에 있다면
+		_bool			m_bInRangePlayer = { false };
+
+
+
+		_float4			m_vOriginPos = { 0.f, 0.f, 0.f, 0.f };
+		_bool			m_bJumpTarget = { false };
+		_float4			m_vJumpTargetDir = { 0.f, 0.f, 0.f, 0.f };
+		MYPATTERN		m_ePattern = { PATTERN_END };
 	};
 
 
@@ -66,6 +85,7 @@ public:
 	void Look_Player(_float fTimeDelta);
 	void Bone_Turn_Interpolate(_float4& vMoveDir, const _float4& vTargetDir, _float fTimeDelta);
 	_bool IsAnimFinished();
+	_float IsAnimRatio();
 
 	DDDDESC* Get_Info() { return &m_tInfo; }
 
@@ -75,13 +95,21 @@ private:
 	// FSM
 	void SetUp_FSM();
 
-	void Set_Look_MoveDir();
-
+	// 디디디의 시스템적인 틱을 담당한다.
+	void DeeDeeDee_SystemTick(_float fTimeDelta);
+	MYPATTERN Now_Pattern();
+	void Hammer_BoneUpdate();
 
 	_float4 m_vNeckLook = {};
 	_float4 m_vLEyeLook = {};
 	_float4 m_vREyeLook = {};
 	DDDDESC m_tInfo = {};
+
+	_bool	m_bInitializeAnim = { true };
+	_float4x4			  m_WeaponMatrix;
+	class CDeeDeeDeeHammer* m_pWeapons = { nullptr };
+
+
 
 
 

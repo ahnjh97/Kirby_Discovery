@@ -370,6 +370,9 @@
     <Filter Include="02.GameObjects\Map\CarShopWall">
       <UniqueIdentifier>{22f62060-413c-4957-94a1-99647cd7b478}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee\DeeDeeDeeHammer">
+      <UniqueIdentifier>{77dee786-a789-451e-a6da-cdc4ac63cbd0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -735,6 +738,9 @@
     <ClInclude Include="..\Public\CarShopWall.h">
       <Filter>02.GameObjects\Map\CarShopWall</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\DeeDeeDeeHammer.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1081,6 +1087,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\CarShopWall.cpp">
       <Filter>02.GameObjects\Map\CarShopWall</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\DeeDeeDeeHammer.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

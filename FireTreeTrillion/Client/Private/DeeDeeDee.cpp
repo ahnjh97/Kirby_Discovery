@@ -5,6 +5,9 @@
 
 #include "HitBox.h"
 #include "Bone.h"
+#include "DeeDeeDeeHammer.h"
+
+#define INFO(Dst) m_tInfo.Dst
 
 CDeeDeeDee::CDeeDeeDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -31,6 +34,8 @@ HRESULT CDeeDeeDee::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
+	m_tInfo.m_vOriginPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+
 	m_fMaxHp = 300.f;
 	m_fHp = 300.f;
 	m_fAttack = 15.f;
@@ -39,7 +44,7 @@ HRESULT CDeeDeeDee::Initialize(void* pArg)
 
 	Add_AnimEvent();
 
-	m_pModelCom->Set_Animation(/*STATE_WAIT*/STATE_SLIDING, 60.f, true, false);
+	m_pModelCom->Set_Animation(STATE_WAIT, 60.f, true, false);
 
 	_float4 vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 	m_vNeckLook = m_vLEyeLook = m_vREyeLook = m_tInfo.m_vMoveDir = m_tInfo.m_vTargetDir = vLook;
@@ -53,26 +58,33 @@ _int CDeeDeeDee::Tick(_float fTimeDelta)
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
-	// 커비는 항상 m_vMoveDir)를 바라본다.
-	Set_Look_MoveDir();
+	// 망치 뼈 업데이트
+	Hammer_BoneUpdate();
 
+	// 디디디 시스템 틱
+	DeeDeeDee_SystemTick(m_fTimeDelta);
 
 	__super::Tick(m_fTimeDelta);
+
+
+	m_pWeapons->Tick(m_fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
 
 void CDeeDeeDee::Late_Tick(_float fTimeDelta)
 {
+	// 뼈를 꺾는다.
+	Look_Player(m_fTimeDelta);
 
-	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
+	m_pWeapons->Late_Tick(m_fTimeDelta);
+
+	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 6.0f))
 	{
 		if (Compute_OptimizationAnimation(m_fTimeDelta) == true && m_ePhyXState != PO_PRESSED)
 			m_ePhyXState == PO_FLYDEADAWAY ? m_pModelCom->Play_Animation(m_fAccTime * 0.3f) : m_pModelCom->Play_Animation(m_fAccTime);
 	}
 
-	// 뼈를 꺾는다.
-	Look_Player(fTimeDelta);
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
@@ -127,6 +139,9 @@ HRESULT CDeeDeeDee::Render_LightDepth()
 
 void CDeeDeeDee::Render_IMGUI()
 {
+	ImGui::Text("Pattern : %d", (_int)INFO(m_ePattern));
+	ImGui::Separator(); ImGui::NewLine();
+	__super::Render_IMGUI();
 }
 
 #endif
@@ -137,6 +152,8 @@ void CDeeDeeDee::Add_AnimEvent()
 
 void CDeeDeeDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
+
+
 }
 
 void CDeeDeeDee::Change_State(STATE_TYPE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
@@ -173,7 +190,7 @@ void CDeeDeeDee::Look_Player(_float fTimeDelta)
 		vTargetDir = vLook;
 		ONEye = false;
 	}
-	
+
 	Bone_Turn_Interpolate(m_vNeckLook, vTargetDir, fTimeDelta);
 	Quaternion vStartQuat = CUtils::Make_Quat_FromDir(vLook);
 	Quaternion vDestQuat = CUtils::Make_Quat_FromDir(m_vNeckLook);
@@ -183,6 +200,10 @@ void CDeeDeeDee::Look_Player(_float fTimeDelta)
 	_float4x4* pEditMatrix = pBone->Get_EditMatrixPtr();
 	*pEditMatrix = RotationMatrix;
 
+	if (m_tInfo.m_isBattle == false)
+	{
+		*pEditMatrix = _float4x4::Identity;
+	}
 	////////
 #pragma endregion
 
@@ -298,6 +319,11 @@ _bool CDeeDeeDee::IsAnimFinished()
 	return m_pModelCom->IsFinished();
 }
 
+_float CDeeDeeDee::IsAnimRatio()
+{
+	return m_pModelCom->Get_AnimRatio();
+}
+
 HRESULT CDeeDeeDee::Add_Components()
 {
 	HRESULT hr;
@@ -323,6 +349,30 @@ HRESULT CDeeDeeDee::Add_Components()
 
 	/* FSM */
 	SetUp_FSM();
+
+	CHitBox::HITBOX_DESC HitBox{};
+	HitBox.pOwner = this;
+	HitBox.pDesc = &m_tColliderDesc[BODY];
+	HitBox.pCollisionType = BOSS_DEEDEEDEE;
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
+		return E_FAIL;
+	Set_BodyCollider(COLLIDER_CYLINDER, 1.5f, 3.f, 1.f);
+
+
+	HitBox.pDesc = &m_tColliderDesc[ATTACK];
+	HitBox.pCollisionType = HITBOX_DEEDEEDEE;
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
+		return E_FAIL;
+	//Activate_FrustumCollider(0.5f, 4.f, 90.f);
+
+
+	CDeeDeeDeeHammer::DEEDEEDEEHAMMER_DESC WeaponDesc{};
+
+	WeaponDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	WeaponDesc.pBoneMatrix = &m_WeaponMatrix;
+	WeaponDesc.pWhite = &m_fWhiteColorDiffuse;
+	m_pWeapons = static_cast<CDeeDeeDeeHammer*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_DeeDeeDeeHammer"), &WeaponDesc));
+	CHECK_NULLPTR(m_pWeapons);
 
 	return S_OK;
 }
@@ -366,6 +416,35 @@ void CDeeDeeDee::SetUp_FSM()
 	m_pFSM->Add_State(STATE_RUN, CDeeDeeDee_Run_State::Create());
 	m_pFSM->Add_State(STATE_WALK, CDeeDeeDee_Run_State::Create());
 
+	m_pFSM->Add_State(STATE_SHOUTSTART, CDeeDeeDee_Shout_State::Create());
+	m_pFSM->Add_State(STATE_SHOUT, CDeeDeeDee_Shout_State::Create());
+	m_pFSM->Add_State(STATE_SHOUTEND, CDeeDeeDee_Shout_State::Create());
+
+	m_pFSM->Add_State(STATE_SLIDINGSTART, CDeeDeeDee_Slide_State::Create());
+	m_pFSM->Add_State(STATE_SLIDING, CDeeDeeDee_Slide_State::Create());
+	m_pFSM->Add_State(STATE_SLIDINGEND, CDeeDeeDee_Slide_State::Create());
+
+	m_pFSM->Add_State(STATE_JUMPSTART, CDeeDeeDee_Jump_State::Create());
+	m_pFSM->Add_State(STATE_JUMP, CDeeDeeDee_Jump_State::Create());
+	m_pFSM->Add_State(STATE_JUMPEND, CDeeDeeDee_Jump_State::Create());
+	m_pFSM->Add_State(STATE_FALL, CDeeDeeDee_Jump_State::Create());
+	m_pFSM->Add_State(STATE_LANDING, CDeeDeeDee_Jump_State::Create());
+
+	m_pFSM->Add_State(STATE_HAMMERSIDE, CDeeDeeDee_SideAttack_State::Create());
+	m_pFSM->Add_State(STATE_HAMMERSIDECHARGE, CDeeDeeDee_SideAttack_State::Create());
+	m_pFSM->Add_State(STATE_HAMMERSIDEWALK, CDeeDeeDee_SideAttack_State::Create());
+	m_pFSM->Add_State(STATE_HAMMERSIDEATTACK, CDeeDeeDee_SideAttack_State::Create());
+
+	m_pFSM->Add_State(STATE_HAMMERATTACK, CDeeDeeDee_HammerAttack_State::Create());
+	m_pFSM->Add_State(STATE_HAMMERATTACKCHARGE, CDeeDeeDee_HammerAttack_State::Create());
+	m_pFSM->Add_State(STATE_HAMMERATTACKHIT, CDeeDeeDee_HammerAttack_State::Create());
+
+	m_pFSM->Add_State(STATE_DEATH, CDeeDeeDee_Death_State::Create());
+	m_pFSM->Add_State(STATE_DEATHWAIT, CDeeDeeDee_Death_State::Create());
+	m_pFSM->Add_State(STATE_DEATHWAITEND, CDeeDeeDee_Death_State::Create());
+
+	m_pFSM->Add_State(STATE_COMMAND, CDeeDeeDee_Initialize_State::Create());
+
 
 	// 상태 Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};
@@ -374,12 +453,89 @@ void CDeeDeeDee::SetUp_FSM()
 	m_pFSM->Initialize(&FSM_Desc);
 }
 
-void CDeeDeeDee::Set_Look_MoveDir()
+void CDeeDeeDee::DeeDeeDee_SystemTick(_float fTimeDelta)
 {
+	if (*m_pCurrentLevelID == LEVEL_TOOL_ANIM)
+		return;
+
 	// 디디디는 항상 m_vMoveDir를 바라본다.
 	_float4 vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 	m_pTransformCom->Look_At_ForLandObject(vPos + m_tInfo.m_vMoveDir);
+
+	// 맨처음에만!! 발동하는 애니메이션!!
+	if (m_bInitializeAnim == true)
+	{
+		CGameObject* pPlayer = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"));
+		_float4 vPlayerPos = pPlayer->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
+
+		if ((INFO(m_vOriginPos) - vPlayerPos).Length() < 30.f)
+		{
+			if (Get_State() == STATE_WAIT)
+			{
+				Change_State(STATE_COMMAND, 60.f, false, true);
+			}
+		}
+		m_bInitializeAnim = false;
+	}
+
+
+
+	// 맨 처음 발동하는 애니메이션이 끝나고, 진정한 패턴들이 시작된다.
+	if (m_bInitializeAnim == false)
+	{
+		CGameObject* pPlayer = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"));
+		_float4 vPlayerPos = pPlayer->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
+
+		if ((INFO(m_vOriginPos) - vPlayerPos).Length() < 30.f)
+		{
+			INFO(m_bInRangePlayer) = true;
+		}
+		else
+		{
+			INFO(m_bInRangePlayer) = false;
+		}
+
+
+		// 내 근처에 있어도 플레이어가 범위 안에 들어있는 것으로 판단한다.
+		if ((vPos - vPlayerPos).Length() < 5.f)
+			INFO(m_bInRangePlayer) = true;
+	}
+
+	// 디디디는 멀리가면 돌아가고 싶어한다.
+	if ((vPos - INFO(m_vOriginPos)).Length() > 30.f)
+	{
+		INFO(m_bBackToOriginPos) = true;
+	}
+
+
+	INFO(m_ePattern) = Now_Pattern();
+
 }
+
+CDeeDeeDee::MYPATTERN CDeeDeeDee::Now_Pattern()
+{
+	if (INFO(m_bInRangePlayer) == true && INFO(m_bBackToOriginPos) == false) {
+		return PATTERN_BATTLE;
+	}
+	if (INFO(m_bInRangePlayer) == true && INFO(m_bBackToOriginPos) == true) {
+		INFO(m_bBackToOriginPos) = false;
+		return PATTERN_BATTLE;
+	}
+	if (INFO(m_bInRangePlayer) == false && INFO(m_bBackToOriginPos) == false) {
+		return PATTERN_CENTER;
+	}
+	if (INFO(m_bInRangePlayer) == false && INFO(m_bBackToOriginPos) == true) {
+		return PATTERN_CENTER;
+	}
+
+	return INFO(m_ePattern);
+}
+
+void CDeeDeeDee::Hammer_BoneUpdate()
+{
+	m_WeaponMatrix = *(m_pModelCom->Get_BonePtr("RHaveL")->Get_CombinedTransformationMatrix());
+}
+
 
 CDeeDeeDee* CDeeDeeDee::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
@@ -410,4 +566,6 @@ CGameObject* CDeeDeeDee::Clone(void* pArg)
 void CDeeDeeDee::Free()
 {
 	__super::Free();
+	Safe_Release(m_pWeapons);
+
 }

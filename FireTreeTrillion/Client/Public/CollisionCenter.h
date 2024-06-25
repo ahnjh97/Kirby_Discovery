@@ -49,8 +49,11 @@ private:
     void Collision_Collider(vector<CGameObject*> Dsts, vector<CGameObject*> Srcs, CCollisionCenter* pthis, 
         void(*func)(class CHitBox*, class CHitBox*, CCollisionCenter*));
     _bool Intersect(class CHitBox* Dst, class CHitBox* Src);
-
     void Ladder_Collider();
+
+    void DeeDeeDee_Battle();
+    void Body_To_Body_Collision();
+    void Hitbox_Collision();
 
     vector<CLadder*>                          m_Ladders;
     vector<CGameObject*>                      m_GameObjects[COLLISION_END];
