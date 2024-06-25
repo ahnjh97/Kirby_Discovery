@@ -37,7 +37,7 @@ public:
 	virtual void			Free() override;
 
 private:
-
+	LEVEL					m_eCurLevel = { LEVEL_END };
 };
 
 END
