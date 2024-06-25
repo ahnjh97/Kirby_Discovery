@@ -55,6 +55,7 @@ public: /* For.Renderer */
 	void Set_RenderMode(CRenderer::RENDER_MODE eMode);
 	void Update_Option(CRenderer::OPTION Option, _bool bOn);
 	void Bind_RendererFunc(_int iTriggerType);
+	void Set_ColorSet_ByIndex(_int iSetIdx);
 
 	void Setting_GodRay(_fvector vWorldPos);
 

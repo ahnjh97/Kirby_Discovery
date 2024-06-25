@@ -674,13 +674,25 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_NEARCLIP();
     }
 
-    // 몬스터의 파트 오브젝트 ( 13 )
+    //알파블렌드 적용 (13) ex) 유리
+    pass ALPHABLEND
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN();
+    }
+
+    // 몬스터의 파트 오브젝트 ( 14 )
     pass MONSTER_PARTOBJECT
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;

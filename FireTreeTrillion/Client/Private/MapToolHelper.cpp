@@ -43,8 +43,10 @@ static _bool s_bHideGrid = { true };
 static _bool s_bHideDecos = { false };
 
 static _int s_iConnectedMonster = -1;
-static const _char* s_ModelPassIndices[] = { "0. NORMAL_0", "1. NORMAL_X", "2. SHADOW", "3. SKY", "4. BLOOM", "5. BLEND"
-	,"6. TRIGGER", "7.DEFAULTFX", "8. BLENDFX", "9. DEFERREDINFO", "10. WHITEFX", "11. KIRBYPART", "12. NORMAL_O AND NONCULL"};
+static const _char* s_ModelPassIndices[] = { "0. NORMAL_0", "1. NORMAL_X", "2. SHADOW", "3. SKY", "4. BLOOM", "5. NON_BLUR"
+	,"6. TRIGGER", "7.DEFAULTFX", "8. BLENDFX", "9. DEFERREDINFO", "10. WHITEFX", "11. KIRBYPART", 
+	"12. NORMAL_O AND NONCULL", "13. ALPHABLEND"};
+
 static const _char* s_PosTexPassIndices[] = { "0. DEFAULT", "1. ALPHABLEND", "2. BLENDFX", "3. BLOOM", "4. DEFAULTFX", "5. BLEND_NOZTEXT"
 	,"6. WHITEFX", "7. UI_MASK", "8. UI_MASK2", "9. SOFTFX", "10. SOFTALPHAFX"};
 static _int s_iPassIndex = -1;
@@ -95,11 +97,11 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 	m_vecLevelName = { "Level_Static", "Level_Loading", "Level_Logo", "GamePlay",
 			"Level_Tool_UI", "Level_Tool_FX", "Level_Tool_Anim", "Level_Tool_Map",
-		"Intro", "Racing",  "Town", "PartTime", "FinalBoss", "Level_End" };
+		"Intro", "Racing", "DeeDeeDee", "Town", "PartTime", "FinalBoss", "Level_End" };
 
 	//UV 조절 가능
-	m_vecMapModelNames = { "Level0Stage1Step01", "Level0Stage1Step02",  "Level1Stage1Step01", "Town", "TownShop", 
-		"Land_VcLabo"};
+	//BasicMap (UV 편집 가능)
+	m_vecMapModelNames = { "Level0Stage1Step01", "Level0Stage1Step02",  "Level1Stage1Step01", "DeeDeeDee", "Town", "TownShop", "Land_VcLabo", "Land_LbLastBossBeforeStep"};
 
 	vector<string> vecBGs = { "BG0", "BG1" };
 	m_setMapNames.insert(vecBGs.begin(), vecBGs.end());
@@ -110,6 +112,8 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 	/*m_setNonColDecos = { "BushMCut" };*/
 	m_setAnimDecos = { "BushL", "BushM", "BushS", "PopFlower" };
+
+	//아래는 피직스 처리가 필요한 오브젝트들. (지형 충돌 필요)
 	m_setActorDecos = {  "CMBillBoardC", "CmBuilding1stRoof", "CMBuildingParts", "CMGuardrailAL", "CMGuardrailBL"
 		, "CMFenceAL", "CMFenceA2L", "CMFenceA3L", "CMFenceB3L", "CMFenceCL", "CMFenceCornerCL"
 		, "CMHighwayGuardrailACL", "CMHighwayGuardrailAL", "CMHighwayGuardrailALL", "CMHighwayGuardrailARL", "CMHighwayGuardrailBL", "CMHighwayGuardrailBLL"
@@ -124,6 +128,18 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "StarBlockL" , "StarBlockM", "StarBlockS", "SeDriftWoodAL", "SeDriftWoodBL", "SeDriftWoodCL"
 		, "VpFactoryPart", "VpFactoryParts", "VpFactoryPartsBlend", "WoodBox"
 
+
+#pragma region DEEDEEDEE OBJ
+		, "TwGougeGround01", "TwGougeGround02"
+#pragma endregion
+
+
+#pragma region LEVEL_RACING
+		, "GsRubbleAsphalt01L", "GsRubbleAsphalt02L", "GsRubbleAsphalt03L", "GsRubbleAsphalt04L", "GsRubbleAsphalt05L"
+		, "GsRubbleAsphalt06L", "GsRubbleAsphalt07L", "GsRubbleAsphalt08L", "GsRubbleAsphalt09L"
+#pragma endregion
+
+
 #pragma region TOWN OBJECT
 		, "TwArena", "TwArenaA", "TwArenaB", "TwArenaClerk", "TwDeliveryService", "TwFoodStore", "TwFoodStoreChair", "TwFoodStoreTable"
 		, "TwKirbyHouse", "TwPharmacy", "TwPlanterA", "TwPlanterB", "TwRollingBallBooth", "TwSideHouseA", "TwSideHouseC", "TwSideHouseD"
@@ -132,14 +148,30 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 
 #pragma region LEVEL_FINALBOSS (LAB_DISCOVERA) OBJECT
-		, "LbBossRoom", "LbLastBossStage", "LbLastBuilding", /*"LbLastOutFrame1", */"LbLastOutFrame2", "LbLastStairs"
-		, "LbLastTank"
+		//Field 
+		, "LbBossRoom", "LbLastBossStage", "LbLastBuilding", "Land_LbLastBossBeforeStep"
+
+		//LbLastBuilding Object :: 보스전 필드의 오브젝트
+		,"LbLastOutFrame2", "LbLastStairs"//, "LbLastTank", "LbLastOutFrame1", 준수 오더로 삭제
+		,"LbBossRoomDoorAL","LbBossRoomDoorBL", "LbOutBuildingWallL"
+
+		//LbLastBossBeforeStep Object :: Rubble 
+		, "LbRubble01L", "LbRubble02L", "LbRubble03L", "LbRubble04L", "LbRubble05L", "LbRubble06L", "LbRubble07L", "LbRubble08L"
+		, "LbRubbleTile01L", "LbRubbleTile02L", "LbRubbleTile03L"
+		, "GsRubbleA", 	"GsRubbleB", "GsRubbleC", "GsRubbleD", "GsRubbleE", "GsRubbleF", "GsRubbleG"
+		
+		//CmFillerObject, Ml~ :: 채우기용 잡오브젝트
+		, "CmFillerObjectAL", "CmFillerObjectA02L", "CmFillerObjectA03L", "CmFillerObjectBL", "CmFillerObjectCL", "CmFillerObjectEL"
+		, "CmFillerObjectFL", "MlBossBenchL", "MlBossChairL", "MlFlowerPot01L", "MlSofaFL"
 #pragma endregion
 	};
 	
 	m_setKickables = { "GsPebble", "SeShell", "WasteCanYellow" };
 	m_setItemTxts = { "Item_Coin", "Item_EnergyDrink" };
 	m_setTrees = { "GsTreeA", "GsTreeB", "GsTreeC" };
+
+	//투명도 적용이 필요한 데코오브젝트
+	m_setNeedBlendDecos = {"LbOutBuildingWallL", "LbOutBuildingFenceL"};
 
 	s_vecPassIndices.resize(m_vecMapModelNames.size());
 	s_vecSamplingFactors.resize(m_vecMapModelNames.size());
@@ -210,8 +242,8 @@ void CMapToolHelper::Late_Tick(_float fTimeDelta)
 		if (m_pGameInstance->Get_DIKeyState(DIK_S, KEY_DOWN))
 			Save_Level();
 
-		//if (m_pGameInstance->Get_DIKeyState(DIK_L, KEY_DOWN))
-			//Load_Level();
+		if (m_pGameInstance->Get_DIKeyState(DIK_L, KEY_DOWN))
+			Load_Level();
 	}
 
 	Edit_Object();
@@ -380,8 +412,7 @@ void CMapToolHelper::Menu_Level()
 			ImGui::SameLine();
 	}
 	//ImGui::NewLine(); 
-	//HelpMarker(u8"저장 : Ctrl+S / 로드 : Ctrl+L");
-	HelpMarker(u8"저장 : Ctrl+S");
+	HelpMarker(u8"저장 : Ctrl+S / 로드 : Ctrl+L");
 
 	if (ImGui::Button("Save", ImVec2(100, 40)))
 		Save_Level();

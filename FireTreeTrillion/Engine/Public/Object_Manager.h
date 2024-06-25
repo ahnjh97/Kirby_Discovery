@@ -20,6 +20,7 @@ public:
 	class CGameObject*		Get_GameObject(_uint iLevelIndex, const wstring& strLayerTag, _uint iIndex);
 	class CGameObject*		Get_GameObject(_uint iLevelIndex, const wstring& wstrLayerTag);
 	class CGameObject*		Get_GameObject_ByTag(_uint iLevelIndex, const wstring& strLayerTag, wstring _tag);
+	list<CGameObject*>*		Get_List(_uint iLevelIndex, const wstring& strLayerTag);
 
 	class CGameObject*		Find_Prototype(const wstring& strPrototypeTag);
 
@@ -40,7 +41,6 @@ public:
 	// IMGUI에 출력할 친구들
 	//HRESULT					Add_Clone(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strPrototypeTag, void* pArg);
 
-	list<CGameObject*>* CObject_Manager::Get_List(_uint iLevelIndex, const wstring& strLayerTag);
 
 
 private:	

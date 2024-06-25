@@ -54,7 +54,7 @@ HRESULT CBombOrbit::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Begin(POSTEX_ALPHABLEND)))
+	if (FAILED(m_pShaderCom->Begin(POSTEX_SOLIDBLEND)))
 		return E_FAIL;
 	if (FAILED(m_pVIBufferCom->Bind_Buffers()))
 		return E_FAIL;

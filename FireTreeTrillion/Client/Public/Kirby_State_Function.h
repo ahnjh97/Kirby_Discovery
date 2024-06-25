@@ -1110,11 +1110,11 @@ static void Bbong_FX(_float fTimeDelta, CTransform* pTransformCom)
 			return;
 
 		//CEffect::FX_DESC ParticleDesc{};
+		//ParticleDesc.vInitScale = { 1.f, 1.f, 1.f };
+		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Lunch TIme Banner"), &ParticleDesc)))
+		//	return;
 
-		//ParticleDesc.vInitPos = { vMyPos.x, vMyPos.y + .3f, vMyPos.z };
-		//ParticleDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK)).y, 0.f };
-		//ParticleDesc.vInitScale = { 1.3f, 1.3f, 1.3f };
-		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Particle C"), &ParticleDesc)))
+		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Lunch Time Icon"), &ParticleDesc)))
 		//	return;
 
 		fBbongTime = 0.f;

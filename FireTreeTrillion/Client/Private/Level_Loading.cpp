@@ -7,6 +7,7 @@
 #include "Level_Logo.h"
 #include "Level_Intro.h"
 #include "Level_PartTime.h"
+#include "Level_DeeDeeDee.h"
 #include "Level_Racing.h"
 #include "Level_FinalBoss.h"
 #include "Level_Town.h"
@@ -59,6 +60,9 @@ void CLevel_Loading::Tick(_float fTimeDelta)
 			break;
 		case LEVEL_RACING:
 			pLevel = CLevel_Racing::Create(m_pDevice, m_pContext);
+			break;
+		case LEVEL_DEEDEEDEE:
+			pLevel = CLevel_DeeDeeDee::Create(m_pDevice, m_pContext);
 			break;
 		case LEVEL_TOWN:
 			pLevel = CLevel_Town::Create(m_pDevice, m_pContext);

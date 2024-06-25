@@ -21,14 +21,19 @@ private:
 
 public: 
 	void				Register_FirstDee(class CHungryDee* pDee);
+	void				Register_PartTimerKirby(class CPartTimerKirby* pKirby);
 	void				Make_RandomItem();
 	_bool				Check_Item(PARTTIME_ITEM eITEM);
 
 	PARTTIME_ITEM		Get_PartTimeItem() const { return m_eFood; }
 
+	void				NotifyObserver();
+	void				HandleGame(_uint uContent);
+
 private:
-	class CHungryDee*	m_pHungryDee = nullptr;
-	PARTTIME_ITEM		m_eFood = PARTTIME_ITEM::CAKE;
+	class CHungryDee*		m_pHungryDee = nullptr;
+	class CPartTimerKirby*	m_pPartTimerKirby = nullptr;
+	PARTTIME_ITEM			m_eFood = PARTTIME_ITEM::CAKE;
 
 public:
 	virtual void Free() override;

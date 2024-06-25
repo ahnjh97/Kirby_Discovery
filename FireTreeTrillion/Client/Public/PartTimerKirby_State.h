@@ -4,6 +4,7 @@
 
 BEGIN(Client)
 
+
 //*********************************
 //			IDLE STATE
 //*********************************
@@ -70,8 +71,12 @@ public:
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
 	virtual void OnStateExit()														override;
 
+	enum class PARTTIME_ITEM Get_CurrentFood(_float4 vPos);
+
 private:
-	_float		m_fSpeed = _float();
+	class CPartTimeFood*	m_pFood = nullptr;
+	_float					m_fSpeed = _float();
+
 public:
 	static	CPartTimerKirby_Grab_State* Create();
 	virtual void Free() override;

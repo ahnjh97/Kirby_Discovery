@@ -238,6 +238,7 @@
     <ClInclude Include="..\Public\KirbyBoom_State.h" />
     <ClInclude Include="..\Public\KirbyCar_State.h" />
     <ClInclude Include="..\Public\Ladder.h" />
+    <ClInclude Include="..\Public\Level_DeeDeeDee.h" />
     <ClInclude Include="..\Public\Level_FinalBoss.h" />
     <ClInclude Include="..\Public\Level_Intro.h" />
     <ClInclude Include="..\Public\LevelChanger.h" />
@@ -279,6 +280,7 @@
     <ClInclude Include="..\Public\MultiEffect.h" />
     <ClInclude Include="..\Public\NonAnimDeco.h" />
     <ClInclude Include="..\Public\OrbitingCamera.h" />
+    <ClInclude Include="..\public\OriginalDee.h" />
     <ClInclude Include="..\Public\Particle.h" />
     <ClInclude Include="..\Public\PartTimeFood.h" />
     <ClInclude Include="..\Public\PartTimeHelper.h" />
@@ -305,6 +307,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\Public\Trigger.h" />
+    <ClInclude Include="..\Public\UI_PartTime.h" />
     <ClInclude Include="..\public\WaddleDee.h" />
     <ClInclude Include="..\Public\WasteCan.h" />
     <ClInclude Include="Client.h" />
@@ -380,6 +383,7 @@
     <ClCompile Include="..\Private\KirbyBomb.cpp" />
     <ClCompile Include="..\Private\KirbyCar_State.cpp" />
     <ClCompile Include="..\Private\Ladder.cpp" />
+    <ClCompile Include="..\Private\Level_DeeDeeDee.cpp" />
     <ClCompile Include="..\Private\Level_FinalBoss.cpp" />
     <ClCompile Include="..\Private\Level_Intro.cpp" />
     <ClCompile Include="..\Private\LevelChanger.cpp" />
@@ -419,6 +423,7 @@
     <ClCompile Include="..\Private\MultiEffect.cpp" />
     <ClCompile Include="..\Private\NonAnimDeco.cpp" />
     <ClCompile Include="..\Private\OrbitingCamera.cpp" />
+    <ClCompile Include="..\private\OriginalDee.cpp" />
     <ClCompile Include="..\Private\Particle.cpp" />
     <ClCompile Include="..\Private\PartTimeFood.cpp" />
     <ClCompile Include="..\Private\PartTimeHelper.cpp" />
@@ -445,6 +450,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\Private\Trigger.cpp" />
+    <ClCompile Include="..\Private\UI_PartTime.cpp" />
     <ClCompile Include="..\private\WaddleDee.cpp" />
     <ClCompile Include="..\Private\WasteCan.cpp" />
     <ClCompile Include="..\Public\KirbyBoom_State.cpp" />

@@ -349,6 +349,14 @@ void CGameInstance::Bind_RendererFunc(_int iTriggerType)
 	m_pRenderer->Bind_RendererFunc(iTriggerType);
 }
 
+void CGameInstance::Set_ColorSet_ByIndex(_int iSetIdx)
+{
+	if (nullptr == m_pRenderer)
+		return;
+
+	m_pRenderer->Set_ColorSet_ByIndex(iSetIdx);
+}
+
 void CGameInstance::Set_BlackBackGround(_bool bSet)
 {
 	if (nullptr == m_pRenderer)
