@@ -8,6 +8,8 @@ class CTexture;
 class CVIBuffer_Rect;
 END
 
+#define TEXTURECNT	10
+
 BEGIN(Client)
 class CUI_PartTime : public CUIObject
 {
@@ -30,28 +32,41 @@ public:
 
 private:
 	HRESULT						Add_Components();
-	HRESULT						Render_BindSet(CShader* _pShaderCom, CTransform* _pTransCom);
 	
 	HRESULT						Bind_ShaderResources();
-	void						Move_Position(_int iTextureNum);
-
-	HRESULT						Bind_VIBuffer();
+	void						Setup_PosSizeColor(_int iTextureNum);
+	_bool						Setup_DeeFace(_int iTextureNum);
 	void						Compute_Timer(_float fTimeDelta);
-
+	void						Compute_TimeScore(_float fTimeDelta);
+	void						Change_TimeTexures(_float _fTime);
 
 private:
-	_bool						m_IsMovingUP = { TRUE };
-	_bool						m_IsKirbyExistence = { FALSE };
+	array<CTexture*, TEXTURECNT>		m_arrTexures;
+	array<_float2,	 TEXTURECNT>		m_arrSize;
+	array<_float2,	 TEXTURECNT>		m_arrPosition;
 
-	// 마스킹을 위한 텍스쳐
-	array<CTexture*, 6>			m_arrTexures;
-	CTexture*					m_pTexMask = { nullptr };
+	// -------------- for IMGUI
+	array<_float2,	 TEXTURECNT>			m_arrOriginalSize;
+	array<_float,	 TEXTURECNT>			m_arrSizeRatio;
+	array<_float3,	 TEXTURECNT>			m_arrColor;
 
-	// 지영이거 시작
-	_float2			m_size2D, m_position2D, m_Initial2D, m_Dest2D, m_WindowSize2D, m_progress2D;
-	_float2			m_SizeBar2D = _float2(1024.f * 1.3f, 128.f * 1.3f);
-	_float2			m_SizeTimeBarBlank2D = _float2(1600 * .65f, 61.f * .65f);
+	CTexture*					m_pTexMask = { nullptr }; // 마스킹을 위한 텍스쳐
 
+	// UI 사이즈 픽싱 
+	_float2						m_SizeBar2D = _float2(1024.f * 1.3f, 128.f * 1.3f);
+	_float2						m_SizeTimeBarBlank2D = _float2(1600 * .65f, 61.f * .65f);
+	_float2						m_SizeScoreBar2D = _float2(438.f, 156.f);
+	_float2						m_SizeCategory2D = _float2(256.f, 256.f);
+	_float2						m_SizeDeeFace2D = _float2(200.f, 116.f);
+
+	// TimeBar Ratio
+	_float						m_fRatioTimeBar = 1.f;
+	_float						m_fRatioSubBar = _float();
+
+	// Mediate-Timer
+	_float						m_fStandardTime = 0.f;
+	_float						m_fBeforeTime = 0.f;  
+	_float						m_fCurTime = 0.f;  
 
 public:
 	static CUI_PartTime*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

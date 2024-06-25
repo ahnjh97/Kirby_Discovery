@@ -806,29 +806,39 @@ HRESULT CLoader::Loading_For_Parttime()
 #pragma region UI
 
 	// 타임 바
-	hr = Add_Texture(eLevel, "GameFoodUI_BaseBar", "UI/MGameFood/base bar.png");
-	hr = Add_Texture(eLevel, "GameFoodUI_TimeBarBlank", "UI/MGameFood/time bar blank.png");
-	hr = Add_Texture(eLevel, "GameFoodUI_TimeBar", "UI/MGameFood/time bar.png");
-	hr = Add_Texture(eLevel, "GameFoodUI_TimeBarBW", "UI/MGameFood/time bar_bw.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_BaseBar",			"UI/MGameFood/base bar.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_TimeBarBW",		"UI/MGameFood/time bar_bw.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_DeeBGBW",			"UI/MGameFood/dee bg_bw.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_Clock_Orig",		"UI/MGameFood/Clock_orig.png");
 
-	hr = Add_Texture(eLevel, "GameFoodUI_DeeBG",	"UI/MGameFood/dee bg.png");
-	hr = Add_Texture(eLevel, "GameFoodUI_DeeBGBW",	"UI/MGameFood/dee bg_bw.png");
+	// 왼쪽 아래 점수판
+	hr = Add_Texture(eLevel, "GameFoodUI_ScoreBar",			"UI/MGameFood/score bar.png");
+	
+	// 와들디 안내 표정 
+	hr = Add_Texture(eLevel, "GameFoodUI_AngryDee",			"UI/MGameFood/angrydee.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_IdleDee",			"UI/MGameFood/idledee.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_SadDee",			"UI/MGameFood/saddee.png");
 
-	//hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 23);
+	// 와들디 요구사항
+	hr = Add_Texture(eLevel, "GameFoodUI_OrderCloud",		"UI/MGameFood/OrderCloud.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_ThinkingCloud",	"UI/MGameFood/ThinkingCloud.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_cake",				"UI/MGameFood/cake.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_tomato",			"UI/MGameFood/tomato.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_energydrink",		"UI/MGameFood/energydrink.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_burger",			"UI/MGameFood/burger.png");
 
 #pragma endregion
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
-#pragma region 모델
+	#pragma region 모델
 	Load_AnimToolInfo();
 	// 모아놓은 Model 한번에 생성.
 	hr = Add_Models(eLevel);
 	CHECK_FAILED(hr);
 #pragma endregion
 
-
 	m_strLoadingText = TEXT("물리 컴포넌트(을) 로딩 중 입니다.");
-#pragma region 물리 컴포넌트
+	#pragma region 물리 컴포넌트
 	/* 리지드바디 */
 	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_RigidBody"), CRigidBody::Create(m_pDevice, m_pContext));
 	CHECK_FAILED(hr);
@@ -836,7 +846,6 @@ HRESULT CLoader::Loading_For_Parttime()
 	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_CharacterController"), CCharacterController::Create(m_pDevice, m_pContext));
 	CHECK_FAILED(hr);
 #pragma endregion
-
 
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 	m_IsFinished = true;

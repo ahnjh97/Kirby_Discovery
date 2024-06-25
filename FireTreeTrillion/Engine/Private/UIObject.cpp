@@ -31,20 +31,6 @@ _int CUIObject::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
-	// 추후 다른 UI 클래스로 이사할 소스입니다. JYWI
-	//_float fStandardTime(0.f); // 멤버변수로
-	//_float fBeforeTime(0.f);   //ㅁㅂㅄ
-	//fStandardTime += fTimeDelta;
-	//if (fStandardTime - fBeforeTime >= 1.f)
-	//{
-		// 타임 숫자 텍스쳐 변경 함수
-			// 타임이 20일 때, 점심시간 시작한다고 helper에게 알리기
-
-			// 타임이 0일 때, 게임이 종료되었다고 helper에게 알리기
-
-		//+) 타임바가 연두색에서 주황색으로 가는 조건은 bar 퍼센테이지가 60%이하일때이다. 그래서 타임이랑 상관 ㄴㄴ
-	//}
-
 	return OBJ_NOEVENT;
 }
 
