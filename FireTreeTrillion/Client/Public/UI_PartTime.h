@@ -8,9 +8,12 @@ class CTexture;
 class CVIBuffer_Rect;
 END
 
+#define TEXTURECNT	10
+
 BEGIN(Client)
 class CUI_PartTime : public CUIObject
 {
+	enum UI_NAME { TIME_BAR_BG, UI_END };
 private:
 	CUI_PartTime(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CUI_PartTime(const CUI_PartTime& rhs);
@@ -29,81 +32,41 @@ public:
 
 private:
 	HRESULT						Add_Components();
-	HRESULT						Render_BindSet(CShader* _pShaderCom, CTransform* _pTransCom);
 	
-	HRESULT						Bind_ShaderResources(_int iTextureNum);
-	void						Move_Position(_int iTextureNum);
-
-	HRESULT						Bind_VIBuffer();
+	HRESULT						Bind_ShaderResources();
+	void						Setup_PosSizeColor(_int iTextureNum);
+	_bool						Setup_DeeFace(_int iTextureNum);
 	void						Compute_Timer(_float fTimeDelta);
-
+	void						Compute_TimeScore(_float fTimeDelta);
+	void						Change_TimeTexures(_float _fTime);
 
 private:
-	_bool						m_IsMovingUP = { TRUE };
-	_bool						m_IsKirbyExistence = { FALSE };
+	array<CTexture*, TEXTURECNT>		m_arrTexures;
+	array<_float2,	 TEXTURECNT>		m_arrSize;
+	array<_float2,	 TEXTURECNT>		m_arrPosition;
 
-	// 마스킹을 위한 텍스쳐
-	array<CTexture*, 6>			m_arrTexures;
-	CTexture*					m_pTexMask = { nullptr };
+	// -------------- for IMGUI
+	array<_float2,	 TEXTURECNT>			m_arrOriginalSize;
+	array<_float,	 TEXTURECNT>			m_arrSizeRatio;
+	array<_float3,	 TEXTURECNT>			m_arrColor;
 
-#pragma region 피통이 까이거나, 회복되는 로직에 사용되는 변수
-	// 레벨이 넘어가거나 할때, true로 만든다.
-	_bool						m_bInitializeHp = { true };
-	// 진짜 실제 HP 비율
-	_float						m_fCurHpRatio = { 0.f };
-	// 전틱 진짜 실제 HP 비율
-	_float						m_fPreHpRatio = { 0.f };
-	// 분홍 피통
-	_float						m_fHpRatio = { 0.f };
-	// 노란 피통
-	_float						m_fSlowHpRatio = { 0.f };
-	// 피가 닳거나 또는 회복되었을 때 틱당 이동해야하는 비율을 계산한 값이다.
-	_float						m_fDeltaRatio = { 0.f };
-	_bool						m_bDeltaRatio = { true };
+	CTexture*					m_pTexMask = { nullptr }; // 마스킹을 위한 텍스쳐
 
-	// 현재 피통의 상황을 정의하는 불 값
-	_bool						m_isHealing = { false };
-	_bool						m_isDamage = { false };
+	// UI 사이즈 픽싱 
+	_float2						m_SizeBar2D = _float2(1024.f * 1.3f, 128.f * 1.3f);
+	_float2						m_SizeTimeBarBlank2D = _float2(1600 * .65f, 61.f * .65f);
+	_float2						m_SizeScoreBar2D = _float2(438.f, 156.f);
+	_float2						m_SizeCategory2D = _float2(256.f, 256.f);
+	_float2						m_SizeDeeFace2D = _float2(200.f, 116.f);
 
-	// 피가 닳거나, 회복되었을 때 대기하는 시간
-	_float						m_fDamageHoleTime = { 0.f };
-	_float						m_fHealHoleTime = { 0.f };
-#pragma endregion
+	// TimeBar Ratio
+	_float						m_fRatioTimeBar = 1.f;
+	_float						m_fRatioSubBar = _float();
 
-#pragma region 깜빡임을 나타내거나, 이동, 쉐이킹을 표현하는 변수들
-	// 깜빡임을 셰이더에 던져서 표현하는 변수
-	_float						m_fAlarmColor = { 0.f };
-
-	_float						m_fAlarmTime = { 0.f };
-	_bool						m_bAlarm = { false };
-
-	// 쉐이킹 담당 변수
-	_bool						m_bShakingTrigger = { true };
-	_bool						m_bShaking = { false };
-	_float						m_fShakingTime = { 0.f };
-	_float						m_fShakingAcc = { 0.f };
-
-	// 이동할 때, 다시 원래 자리로 돌아오기 위한 변수
-	_float						m_fSaveMyX = { 0.f };
-	_float						m_fSaveMyY = { 0.f };
-	_float						m_fAmplitude = { 0.f };
-#pragma endregion
-
-	// 아무 신호가 없을 경우, 돌아가는 타이머
-	_float						m_fIdleTime = { 0.f };
-	_bool						m_bCustomRenderHpbar = { false };
-
-	_bool						m_bRender = { false };
-	_float						m_fAlpha = { 0.f };
-
-	_float2						m_vFontPos = { 0.f, 0.f };
-	_float						m_fFontSavePosX = { 0.f };
-	_float						m_fTimeDelta = { 0.f };
-
-	// 지영이거 시작
-	_float2			m_size2D, m_position2D, m_Initial2D, m_Dest2D, m_WindowSize2D, m_progress2D;
-	_float2			m_SizeBar2D = _float2(1024.f * 1.3f, 128.f * 1.3f);
-
+	// Mediate-Timer
+	_float						m_fStandardTime = 0.f;
+	_float						m_fBeforeTime = 0.f;  
+	_float						m_fCurTime = 0.f;  
 
 public:
 	static CUI_PartTime*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

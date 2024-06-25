@@ -3,6 +3,7 @@
 
 #include "PartTimerKirby.h"
 #include "HungryDee.h"
+#include "UI_PartTime.h"
 
 IMPLEMENT_SINGLETON(CPartTimeHelper)
 
@@ -48,12 +49,22 @@ _bool CPartTimeHelper::Check_Item(PARTTIME_ITEM eITEM)
 	}
 }
 
+// 점심시간 알리는 용도로만 현재 사용하고 있습니다. 추후 추가될때 제게 말씀주세요 jywi
 void CPartTimeHelper::NotifyObserver()
 {
 	if(m_pHungryDee != nullptr)
 		m_pHungryDee->OnNotify();
 	if(m_pPartTimerKirby != nullptr)
 		m_pPartTimerKirby->OnNotify();
+}
+
+// 게임 흐름과 관련된 일을 처리하는 함수
+void CPartTimeHelper::HandleGame(_uint uContent)
+{
+	if (uContent == 0)
+	{
+		//게임 종료
+	}
 }
 
 void CPartTimeHelper::Free()

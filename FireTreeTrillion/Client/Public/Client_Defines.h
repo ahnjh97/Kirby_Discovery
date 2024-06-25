@@ -16,6 +16,7 @@ namespace Client
                 //============ GAME
                  LEVEL_INTRO,
                  LEVEL_RACING,
+                 LEVEL_DEEDEEDEE,
                  LEVEL_TOWN,
                  LEVEL_PARTTIME,
                  LEVEL_FINALBOSS, // 리소스명 LEVEL_LAB

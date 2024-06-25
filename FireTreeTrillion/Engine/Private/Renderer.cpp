@@ -579,9 +579,12 @@ void CRenderer::Key_Input()
 	//}
 
 	//리얼 초저사양모드
-	if (m_pGameInstance->Get_DIKeyState(DIK_E, KEY_DOWN))
+	if (m_pGameInstance->Get_DIKeyState(DIK_LSHIFT, KEY_PRESS))
 	{
-		m_eRenderMode == MODE_GAMEPLAY ? Set_RenderMode(MODE_TOOL) : Set_RenderMode(MODE_GAMEPLAY);
+		if (m_pGameInstance->Get_DIKeyState(DIK_E, KEY_DOWN))
+		{
+			m_eRenderMode == MODE_GAMEPLAY ? Set_RenderMode(MODE_TOOL) : Set_RenderMode(MODE_GAMEPLAY);
+		}
 	}
 
 
