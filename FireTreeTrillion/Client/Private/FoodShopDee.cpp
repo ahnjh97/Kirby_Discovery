@@ -254,10 +254,10 @@ void CFoodShopDee::SetUp_FSM()
 {
 	m_pFSM = CFSM::Create();
 
-	m_pFSM->Add_State(DEEANIM_WAIT, CDee_Idle_State::Create());
+	m_pFSM->Add_State(DEEANIM_LOOKAROUND, CDee_NPC_State::Create());
 
-	m_pFSM->Add_State(DEEANIM_CLERKWAVEHAND, CDee_Emotion_State::Create());
-	m_pFSM->Add_State(DEEANIM_CLERKTALK, CDee_Emotion_State::Create());
+	m_pFSM->Add_State(DEEANIM_CLERKWAVEHAND, CDee_NPC_State::Create());
+	m_pFSM->Add_State(DEEANIM_CLERKTALK, CDee_NPC_State::Create());
 
 	m_pFSM->Add_State(DEEANIM_TALK1, CDee_Emotion_State::Create());
 	m_pFSM->Add_State(DEEANIM_TALK2, CDee_Emotion_State::Create());
@@ -269,7 +269,7 @@ void CFoodShopDee::SetUp_FSM()
 
 
 	CFSM::FSM_INFO	FSMDesc = {};
-	FSMDesc.iState = DEEANIM_WAIT;
+	FSMDesc.iState = DEEANIM_LOOKAROUND;
 	FSMDesc.pModel = &m_pModelCom;
 
 	m_pFSM->Initialize(&FSMDesc);

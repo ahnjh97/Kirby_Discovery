@@ -23,6 +23,8 @@ HRESULT CWaddleDee::Initialize(void* pArg)
 {
 	HRESULT hr;
 
+
+
 	hr = __super::Initialize(pArg);
 	CHECK_FAILED_MSG(hr, "와들디 생성 망했어");
 
