@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "BlendMapObject.h"
 #include "MapToolObject.h"
 #include "BasicMap.h"
 #include "AnimDeco.h"
@@ -70,8 +71,11 @@ HRESULT CBasicMap::Initialize(void* pArg)
 
         InsertMapDecos();
     }
+
     if (wstrModelTag == TEXT("Town") || wstrModelTag == TEXT("TownShop")|| wstrModelTag == TEXT("Land_VcLabo")) {
         if (LEVEL_TOOL_MAP != *m_pCurrentLevelID) {
+            TraverseBlendDecoInfoTxts(m_BlendMeshesIndicesMap);
+
             ReadMapDecoTxts();
             ReadDecos_ForSmallLevels();
         }
@@ -118,10 +122,9 @@ HRESULT CBasicMap::Render()
     {
         if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fNonMatchTime, sizeof(_float))))
             return E_FAIL;
-        _float fWhiteColorDiffuse = 0;
-        if (FAILED(m_pNonAnimShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &fWhiteColorDiffuse, sizeof(_float))))
+        if (FAILED(m_pNonAnimShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
             return E_FAIL;
-        if (FAILED(m_pAnimShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &fWhiteColorDiffuse, sizeof(_float))))
+        if (FAILED(m_pAnimShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
             return E_FAIL;
 
         m_iRenderAll = m_iRenderMyMesh = 0;
@@ -143,6 +146,7 @@ HRESULT CBasicMap::Render()
 
             if (FAILED(m_pShaderCom->Bind_RawValue("g_fSamplingFactor", &m_vecSamplingFactors[i], sizeof(_float))))
                 return E_FAIL;
+
             if (i == m_iMeshIndex) {
                 if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fTime, sizeof(_float))))
                     return E_FAIL;
@@ -554,10 +558,22 @@ void CBasicMap::ReadDecos_ForSmallLevels()
         PxRigidStatic* pRigidStatic = { nullptr };
         pModel->Set_WorldMatrixForOctree(matWorld);
 
-        if (CMapToolObject::MAPOBJ_NONCOL == iMapObjType)
+        auto mapIter = m_BlendMeshesIndicesMap.find(strModelName);
+        if (mapIter != m_BlendMeshesIndicesMap.end())
         {
-            m_vecNonAnimDecos.push_back(pModel);
+            CBlendMapObject::BLENDMAPOBJ_DESC tBlendObjDesc{};
+            tBlendObjDesc.matWorld = matWorld;
+            tBlendObjDesc.tModel = MODEL{ strModelName, eType, 1.f, 0.f, 0, strFolder, false };
+            tBlendObjDesc.iShaderVars = iShaderVars;
+            tBlendObjDesc.fRimWidth = fRimWidth;
+            CGameObject* pBlendMapObj = m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_BlendMapObject"), &tBlendObjDesc);
+            if (nullptr != pBlendMapObj)
+                m_vecBlendObjects.push_back(pBlendMapObj);
         }
+
+        if (CMapToolObject::MAPOBJ_NONCOL == iMapObjType)
+            m_vecNonAnimDecos.push_back(pModel);
+
         else if (CMapToolObject::MAPOBJ_ANIM == iMapObjType)
         {
             auto idleIter = m_ModelIdleAnimMap.find(strModelName);
@@ -683,6 +699,61 @@ _bool CBasicMap::IsMapDeco(const string& _strModelName)
     return _bool();
 }
 
+_bool CBasicMap::IsBlendDeco(const string& _strModelName)
+{
+    if (m_BlendMeshesIndicesMap.end() != m_BlendMeshesIndicesMap.find(_strModelName))
+        return true;
+
+    return _bool();
+}
+
+void CBasicMap::TraverseBlendDecoInfoTxts(unordered_map<string, unordered_set<_uint>>& _passIndicesMap)
+{
+    string strPath = "../../../objects_txt/BlendDecoInfo/";
+
+    directory_iterator end_iter;  // 디렉토리 순회의 끝을 나타내는 iterator
+    directory_iterator dir_iter(strPath);  // 지정된 경로의 시작 iterator
+
+    while (dir_iter != end_iter) {
+        if (is_regular_file(*dir_iter)) {
+            string strFilePath = dir_iter->path().filename().string();
+            string strModelName = strFilePath.substr(0, strFilePath.length() - 4);
+
+            unordered_set<_uint> setBlendMeshesIndices;
+            _bool bRead = ReadBlendMeshesIndices(dir_iter->path().generic_string(), strModelName, setBlendMeshesIndices);
+
+            if(true == bRead)
+                _passIndicesMap.emplace(strModelName, setBlendMeshesIndices);
+        }
+        ++dir_iter;
+    }
+}
+
+_bool CBasicMap::ReadBlendMeshesIndices(const string& _strFullPath, const string& _strModelName, unordered_set<_uint>& _setMeshIndices)
+{
+    ifstream fileInput(_strFullPath, ios::binary);
+    if (fileInput.is_open() == false)
+    {
+        wstring wstrError = TEXT("Failed to open : ") + CUtils::StrToWstr(_strModelName) + TEXT("_BlendMeshes.txt");
+        MSG_BOX(wstrError.c_str());
+        return false;
+    }
+
+    _uint iNumBlendMeshes{};
+    fileInput.read(reinterpret_cast<char*>(&iNumBlendMeshes), sizeof(iNumBlendMeshes));
+
+    _uint iMeshIndex{};
+    for (_uint i = 0; i < iMeshIndex; i++)
+    {
+        fileInput.read(reinterpret_cast<char*>(&iMeshIndex), sizeof(iMeshIndex));
+        _setMeshIndices.insert(iMeshIndex);
+    }
+
+    fileInput.close();
+
+    return true;
+}
+
 void CBasicMap::Save_OctreeData(const string& strLevel)
 {
     string tempFileName = "temp_" + strLevel + "_Octree.txt";
@@ -767,6 +838,10 @@ void CBasicMap::Free()
 {
     __super::Free();
 
+    for (auto& blendObj : m_vecBlendObjects)
+        Safe_Release(blendObj);
+    m_vecBlendObjects.clear();
+
     for (auto& animDecoObj : m_vecAnimDecoGameObjs)
         Safe_Release(animDecoObj);
     m_vecAnimDecoGameObjs.clear();
@@ -798,7 +873,7 @@ void CBasicMap::Free()
 
     Safe_Release(m_pTextureCom);
     Safe_Release(m_pShaderCom);
-    Safe_Release(m_pModelCom);
     Safe_Release(m_pNonAnimShaderCom);
     Safe_Release(m_pAnimShaderCom);
+    Safe_Release(m_pModelCom);
 }

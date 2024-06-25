@@ -655,6 +655,11 @@ HRESULT CLevel_Racing::Ready_Objects()
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Deform"), TEXT("Prototype_GameObject_Car"), &tDesc)))
 				continue;
 		}
+		else if ("BoardA" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Bridge"), TEXT("Prototype_GameObject_ToppleableBridge"), &tDesc)))
+				continue;
+		}
 	}
 	fileInput.close();
 

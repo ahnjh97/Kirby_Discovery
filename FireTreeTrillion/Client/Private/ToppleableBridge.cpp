@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "BreakableRockPartical.h"
 #include "ToppleableBridge.h"
 #include "HitBox.h"
 #include "Kirby.h"
@@ -33,6 +34,9 @@ HRESULT CToppleableBridge::Initialize(void* pArg)
 
 	m_bMotionBlur = false;
 
+	if(FAILED(m_pModelCom->CreateStaticActor(m_pTransformCom->Get_WorldFloat4x4())))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -48,15 +52,12 @@ void CToppleableBridge::Late_Tick(_float fTimeDelta)
 {
 	if (m_bStartAnimation)
 		m_pModelCom->Play_Animation(m_pGameInstance->Get_SecondTimer());
-
+	
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 50.0f))
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 	}
-
-	if (true == m_pModelCom->IsFinished())
-		Set_Dead();
 }
 
 HRESULT CToppleableBridge::Render()
@@ -76,28 +77,8 @@ HRESULT CToppleableBridge::Render()
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
-
-		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		if (m_setNormalXMesh.end() != m_setNormalXMesh.find(i))
-		{
-			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_X)))
-				return E_FAIL;
-		}
-		else
-		{
-			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
-				return E_FAIL;
-		}
-
-		if (m_bStartAnimation)
-		{
-			if (m_setBeforeMeshIndices.end() != m_setBeforeMeshIndices.find(i))
-				continue;
-		}
-
-		if (m_setNonRenderMeshes.end() != m_setNonRenderMeshes.find(i))
-			continue;
-
+		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
+			return E_FAIL;
 		if (FAILED(m_pModelCom->Render(i)))
 			return E_FAIL;
 	}
@@ -129,9 +110,9 @@ void CToppleableBridge::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhys
 		return;
 
 	pKirby->Set_HitStop();
-	m_pModelCom->Set_Animation(0, 60.f, false, false);
+	m_pModelCom->Set_Animation(1	, 60.f, false, false);
 	m_bStartAnimation = true;
-	SwitchAfterBefore();
+	Make_Particles();
 
 	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	_float4 vPlayerPos = pObject->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
@@ -149,11 +130,9 @@ HRESULT CToppleableBridge::Add_Components()
 	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimModel"),
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
-	wstring wstrModelTag = TEXT("Prototype_Component_Model_CarShopBreakableWall");
+	wstring wstrModelTag = TEXT("Prototype_Component_Model_BoardA");
 	hr = __super::Add_Component(wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
-
-
 
 	CHitBox::HITBOX_DESC HitBox{};
 	HitBox.pOwner = this;
@@ -161,7 +140,7 @@ HRESULT CToppleableBridge::Add_Components()
 	HitBox.pCollisionType = OBJECT;
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
-	Set_BodyCollider(COLLIDER_SPHERE, 15.f, 0.f, 7.f);
+	Set_BodyCollider(COLLIDER_SPHERE, 0.f, 0.f, 5.f);
 
 	return S_OK;
 }
@@ -193,26 +172,34 @@ HRESULT CToppleableBridge::Bind_ShaderResources()
 	return S_OK;
 }
 
-void CToppleableBridge::SwitchAfterBefore()
+void CToppleableBridge::Make_Particles()
 {
-	list<CGameObject*>* pWallFrameList = m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_WallFrame"));
-	if (nullptr == pWallFrameList || pWallFrameList->empty())
-		return;
-
-	for (auto& wallFrame : *pWallFrameList)
+	for (_int i = 0; i < 9; ++i)
 	{
-		if (nullptr == wallFrame || true == wallFrame->Get_Dead())
-			continue;
+		_float4x4 matrix = m_pTransformCom->Get_WorldFloat4x4();
+		_float4 vDir = m_vDamegeDir;
 
-		CModel* pModel = dynamic_cast<CModel*>(wallFrame->Get_Component(TEXT("Com_Model")));
-		if (nullptr == pModel)
-			continue;
+		vDir = CUtils::Make_RandomAngle_Vector(120.f, vDir);
+		vDir.Normalize();
+		_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		vPos += vDir * 2.f;
 
-		string strModelName = pModel->Get_ModelName();
-		if ("CarShopWallFrame" == strModelName)
-			wallFrame->Set_Hide(false);
-		else
-			wallFrame->Set_Dead();
+		CUtils::Set_State_Matrix(matrix, CUtils::STATE_POSITION, vPos);
+		CUtils::Turn_OtherMatrix(matrix, _float4(0.f, 1.f, 0.f, 0.f), 1.f, CUtils::Make_RandomFloat(0.f, 360.f));
+		CUtils::Turn_OtherMatrix(matrix, _float4(1.f, 0.f, 0.f, 0.f), 1.f, CUtils::Make_RandomFloat(0.f, 360.f));
+		CUtils::Turn_OtherMatrix(matrix, _float4(0.f, 0.f, 1.f, 0.f), 1.f, CUtils::Make_RandomFloat(0.f, 360.f));
+		_float fRandomscale = CUtils::Make_RandomFloat(0.6f, 1.6f);
+		CUtils::Set_Scaled_Matrix(matrix, fRandomscale, fRandomscale, fRandomscale);
+
+		CBreakableRockPartical::BREAKABLEPARTICALDESC desc = {};
+		desc.matrix = matrix;
+		vDir.y += 0.5f;
+		desc.vMoveDir = (_float3)vDir;
+		desc.fPower = m_fHitPower * 70.f;
+		desc.wstrModelName = TEXT("RockPartical");
+
+		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_RockPartical"), TEXT("Prototype_GameObject_BreakableRockPartical"), &desc)))
+			return;
 	}
 }
 

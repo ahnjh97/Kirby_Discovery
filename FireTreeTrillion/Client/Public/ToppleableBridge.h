@@ -32,8 +32,7 @@ public:
 private:
 	HRESULT			Add_Components();
 	HRESULT			Bind_ShaderResources();
-
-	void			SwitchAfterBefore();
+	void			Make_Particles();
 
 	CModel*			m_pModelCom = { nullptr };
 	CShader*		m_pShaderCom = { nullptr };
@@ -43,10 +42,6 @@ private:
 
 	_bool			m_bStartAnimation = { false };
 	_float4			m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
-
-	unordered_set<_uint>	m_setNonRenderMeshes;
-	unordered_set<_uint>	m_setBeforeMeshIndices;
-	unordered_set<_uint>	m_setNormalXMesh;
 
 public:
 	static CToppleableBridge* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

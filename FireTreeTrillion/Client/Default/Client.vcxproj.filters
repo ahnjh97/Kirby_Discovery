@@ -363,17 +363,20 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\WaddleDee\Original">
       <UniqueIdentifier>{9b746fe2-af0b-4344-961d-2b0a3a62e7ff}</UniqueIdentifier>
-	</Filter>
+    </Filter>
     <Filter Include="02.GameObjects\Map\Bridge">
-	</Filter>
+    </Filter>
     <Filter Include="02.GameObjects\MiniGame\UI">
       <UniqueIdentifier>{f66e1d54-657e-4ef4-b222-24f86e5cd5b8}</UniqueIdentifier>
-	</Filter>
-	<Filter Include="02.GameObjects\Map\Bridge">
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Bridge">
       <UniqueIdentifier>{d42d0265-2d39-46ae-8baa-4fdc448c5e73}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Map\CarShopWall">
       <UniqueIdentifier>{22f62060-413c-4957-94a1-99647cd7b478}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\BlendMapObject">
+      <UniqueIdentifier>{725d6eba-2a30-4d32-bdc1-2b243823ba5f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -733,11 +736,11 @@
     </ClInclude>
     <ClInclude Include="..\public\OriginalDee.h">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\Original</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\Public\UI_PartTime.h">
       <Filter>02.GameObjects\MiniGame\UI</Filter>
-	</ClInclude>
-	<ClInclude Include="..\Public\DeeDeeDee.h">
+    </ClInclude>
+    <ClInclude Include="..\Public\DeeDeeDee.h">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\DeeDeeDee_State.h">
@@ -751,6 +754,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\ToppleableBridge.h">
       <Filter>02.GameObjects\Map\Bridge</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BlendMapObject.h">
+      <Filter>02.GameObjects\Map\BlendMapObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1092,11 +1098,11 @@
     </ClCompile>
     <ClCompile Include="..\private\OriginalDee.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\Original</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="..\Private\UI_PartTime.cpp">
       <Filter>02.GameObjects\MiniGame\UI</Filter>
-	</ClCompile>
-	<ClCompile Include="..\Private\DeeDeeDee.cpp">
+    </ClCompile>
+    <ClCompile Include="..\Private\DeeDeeDee.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\DeeDeeDee_State.cpp">
@@ -1110,6 +1116,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\ToppleableBridge.cpp">
       <Filter>02.GameObjects\Map\Bridge</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BlendMapObject.cpp">
+      <Filter>02.GameObjects\Map\BlendMapObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
