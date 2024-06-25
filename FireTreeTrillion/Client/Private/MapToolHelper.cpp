@@ -43,8 +43,10 @@ static _bool s_bHideGrid = { true };
 static _bool s_bHideDecos = { false };
 
 static _int s_iConnectedMonster = -1;
-static const _char* s_ModelPassIndices[] = { "0. NORMAL_0", "1. NORMAL_X", "2. SHADOW", "3. SKY", "4. BLOOM", "5. BLEND"
-	,"6. TRIGGER", "7.DEFAULTFX", "8. BLENDFX", "9. DEFERREDINFO", "10. WHITEFX", "11. KIRBYPART", "12. NORMAL_O AND NONCULL"};
+static const _char* s_ModelPassIndices[] = { "0. NORMAL_0", "1. NORMAL_X", "2. SHADOW", "3. SKY", "4. BLOOM", "5. NON_BLUR"
+	,"6. TRIGGER", "7.DEFAULTFX", "8. BLENDFX", "9. DEFERREDINFO", "10. WHITEFX", "11. KIRBYPART", 
+	"12. NORMAL_O AND NONCULL", "13. ALPHABLEND"};
+
 static const _char* s_PosTexPassIndices[] = { "0. DEFAULT", "1. ALPHABLEND", "2. BLENDFX", "3. BLOOM", "4. DEFAULTFX", "5. BLEND_NOZTEXT"
 	,"6. WHITEFX", "7. UI_MASK", "8. UI_MASK2", "9. SOFTFX", "10. SOFTALPHAFX"};
 static _int s_iPassIndex = -1;
@@ -102,7 +104,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 #pragma region LEVEL_FINALBOSS (LAB_DISCOVERA) 
 		//Field
-		/*,"Land_VcLabo"*/ ,"Land_LbLastBossBeforeStep" //LbLastBossBeforStep + VcLabo
+		,"Land_LbLastBossBeforeStep" //LbLastBossBeforStep + VcLabo
 #pragma endregion
 	};
 
@@ -142,17 +144,17 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "LbBossRoom", "LbLastBossStage", "LbLastBuilding", "Land_LbLastBossBeforeStep"
 
 		//LbLastBuilding Object :: 보스전 필드의 오브젝트
-		,"LbLastOutFrame2", "LbLastStairs"//, "LbLastTank" "LbLastOutFrame1", 준수 오더로 삭제
-		,"LbBossRoomDoorAL","LbBossRoomDoorBL"
+		,"LbLastOutFrame2", "LbLastStairs"//, "LbLastTank", "LbLastOutFrame1", 준수 오더로 삭제
+		,"LbBossRoomDoorAL","LbBossRoomDoorBL", "LbOutBuildingWallL"
 
-		//LbLastBossBeforeStep Object :: Rubble
+		//LbLastBossBeforeStep Object :: Rubble 
 		, "LbRubble01L", "LbRubble02L", "LbRubble03L", "LbRubble04L", "LbRubble05L", "LbRubble06L", "LbRubble07L", "LbRubble08L"
 		, "LbRubbleTile01L", "LbRubbleTile02L", "LbRubbleTile03L"
 		, "GsRubbleA", 	"GsRubbleB", "GsRubbleC", "GsRubbleD", "GsRubbleE", "GsRubbleF", "GsRubbleG"
 		
-		//CmFillerObject :: 채우기용
+		//CmFillerObject, Ml~ :: 채우기용 잡오브젝트
 		, "CmFillerObjectAL", "CmFillerObjectA02L", "CmFillerObjectA03L", "CmFillerObjectBL", "CmFillerObjectCL", "CmFillerObjectEL"
-		, "CmFillerObjectFL"
+		, "CmFillerObjectFL", "MlBossBenchL", "MlBossChairL", "MlFlowerPot01L", "MlSofaFL"
 
 #pragma endregion
 	};
@@ -160,6 +162,9 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	m_setKickables = { "GsPebble", "SeShell", "WasteCanYellow" };
 	m_setItemTxts = { "Item_Coin", "Item_EnergyDrink" };
 	m_setTrees = { "GsTreeA", "GsTreeB", "GsTreeC" };
+
+	//투명도 적용이 필요한 데코오브젝트
+	m_setNeedBlendDecos = {"LbOutBuildi ngWallL", "LbOutBuildingFenceL"};
 
 	s_vecPassIndices.resize(m_vecMapModelNames.size());
 	s_vecSamplingFactors.resize(m_vecMapModelNames.size());

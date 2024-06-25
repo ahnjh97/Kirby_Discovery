@@ -73,12 +73,12 @@ HRESULT CSkySphere::Render()
 #pragma region LEVEL 별 TEXTURE 스왑
 
 		//1) 현재 해당 레벨 진입 시에 임시로 설정. 추후 FIELD/1PASE/2PASE 시점에 스왑하는 방식으로 변경 필요
-		// 에피리스 HP 45% 일 경우, 2페이즈 시작
+		// ex) 에피리스 HP 45% 일 경우, 2페이즈 시작 (SKY_LAB_2PASE)
 		//2) 추후 일렁일렁 움직이는 효과 셰이더로 세팅 필요
 		if (LEVEL_FINALBOSS == m_eCurLevel)
 		{
 			// 변경이 필요할 경우, 조건에 따라 TexCom[Diffuse]의 TEX이넘 값을 변경하면 스왑 
-			hr = m_pLabSkyTex[TEX_DIFFUSE]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", SKY_LAB_1PASE);
+			hr = m_pLabSkyTex[TEX_DIFFUSE]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", SKY_LAB_FIELD/*SKY_LAB_1PASE*/);
 			CHECK_FAILED(hr);
 
 			hr = m_pLabSkyTex[TEX_NORMAL]->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", SKY_LAB_2PASE);
