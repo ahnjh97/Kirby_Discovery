@@ -37,7 +37,7 @@ HRESULT CBasicMap::Initialize(void* pArg)
     wstring wstrModelTag = GameObjectDesc.wstrModelName;
 
 
-    if (wstrModelTag != TEXT("Town")        && wstrModelTag != TEXT("DeeDeeDee") && wstrModelTag != TEXT("Land_LbLastBossBeforeStep") && 
+    if (wstrModelTag != TEXT("Town")        && wstrModelTag != TEXT("DeeDeeDeeMap") && wstrModelTag != TEXT("Land_LbLastBossBeforeStep") && 
         wstrModelTag != TEXT("Land_VcLabo") && wstrModelTag != TEXT("TownShop")  && wstrModelTag.substr(wstrModelTag.length() - 5) == TEXT("Blend"))
     {
         m_bBlendMap = true;
@@ -47,13 +47,15 @@ HRESULT CBasicMap::Initialize(void* pArg)
     if (FAILED(Add_Components(wstrModelTag)))
         return E_FAIL;
 
+    m_fTime = m_fNonMatchTime = 100.f;
+        
     SetUpShaderInfo(wstrModelTag);
 
     m_vecConstantNames = { "g_DiffuseTexture", "g_NormalTexture", "g_MRATexture", "g_fSamplingFactor"
     , "g_bStencil", "g_bRimLight", "m_fRimWidth", "g_bMotionBlur", "g_BoneMatrices" };
     m_vecStencilRimLightMotionBlurNames = { "g_bStencil", "g_bRimLight", "m_fRimWidth", "g_bMotionBlur" };
 
-    if(wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("DeeDeeDee") && wstrModelTag != TEXT("Land_VcLabo") &&
+    if(wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("DeeDeeDeeMap") && wstrModelTag != TEXT("Land_VcLabo") &&
        wstrModelTag != TEXT("Land_LbLastBossBeforeStep") && wstrModelTag != TEXT("TownShop") && false == m_bBlendMap)
     {
         if (true == CheckIfBlendMapExists(GameObjectDesc.wstrModelName)) {
@@ -72,19 +74,17 @@ HRESULT CBasicMap::Initialize(void* pArg)
         InsertMapDecos();
     }
 
-    if (wstrModelTag == TEXT("Town") || wstrModelTag == TEXT("TownShop")|| wstrModelTag == TEXT("Land_VcLabo")) {
+    if (wstrModelTag == TEXT("Town") || wstrModelTag == TEXT("TownShop")|| wstrModelTag == TEXT("DeeDeeDeeMap") || wstrModelTag == TEXT("Land_VcLabo")) {
         if (LEVEL_TOOL_MAP != *m_pCurrentLevelID) {
-            TraverseBlendDecoInfoTxts(m_mapBlendMeshesIndices, m_mapBlendObjStaticActor);
+            //TraverseBlendDecoInfoTxts(m_mapBlendMeshesIndices, m_mapBlendObjStaticActor);
 
             ReadMapDecoTxts();
             ReadDecos_ForSmallLevels();
         }
     }
-        
+ 
     if (FAILED(m_pModelCom->CreateStaticActor(GameObjectDesc.matWorld)))
         return E_FAIL;
-
-    m_fTime = m_fNonMatchTime = 100.f;
 
     return S_OK;
 }

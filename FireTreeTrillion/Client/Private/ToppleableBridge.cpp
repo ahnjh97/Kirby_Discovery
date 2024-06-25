@@ -34,8 +34,8 @@ HRESULT CToppleableBridge::Initialize(void* pArg)
 
 	m_bMotionBlur = false;
 
-	if(FAILED(m_pModelCom->CreateStaticActor(m_pTransformCom->Get_WorldFloat4x4())))
-		return E_FAIL;
+	/*if(FAILED(m_pModelCom->CreateStaticActor(m_pTransformCom->Get_WorldFloat4x4())))
+		return E_FAIL;*/
 
 	return S_OK;
 }
