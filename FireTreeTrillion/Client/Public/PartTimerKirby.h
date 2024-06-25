@@ -49,6 +49,7 @@ public:
 #endif
 	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 	virtual void	Collision_Hitbox(CPhysXObject* pGameObject) override;
+	void			OnNotify();
 
 public:
 	void			Change_State(ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
@@ -57,12 +58,13 @@ public:
 	void			Render_Food(_bool _bRender, enum class PARTTIME_ITEM _eItem);
 	_float			Get_AnimRatio() { return m_pModelCom->Get_AnimRatio(); }
 
+	_float4			Get_PrePosition() const { return m_prePosition; }
+	void			Set_PrePosition(_float4 _preposition) { m_prePosition = _preposition; }
 
 private:
 	HRESULT			Add_Components();
 	HRESULT			Add_PartObjects();
 	_float4			Compute_BoneWorldMatrix();
-
 	HRESULT			Bind_ShaderResources();
 
 	// FSM
@@ -88,6 +90,7 @@ private:
 
 	_float4x4				m_matHand = _float4x4::Identity;
 	_float					m_fScore = _float();
+	_float4					m_prePosition = _float4();
 
 public:
 	static CPartTimerKirby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

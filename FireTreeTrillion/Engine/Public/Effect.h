@@ -92,7 +92,7 @@ public:
 	void			Delete_Keyframe(KF_PROPERTY eProperty, _uint iKeyframeIdx);
 	//¿Ã∆Â∆Æ √ﬂ∞°(π≠¿Ω ¿Ã∆Â∆Æ øÎ)
 	virtual void	Add_Effect(CEffect* pEffect) {}
-
+	void			Add_RenderGroup();
 	virtual HRESULT Initialize(void* pArg) override;
 
 protected:

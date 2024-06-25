@@ -24,6 +24,7 @@ private:
 	CHungryDee(const CHungryDee& rhs);
 	virtual ~CHungryDee() = default;
 
+	enum WAITPOS{WAITPOS_FRONT = 2, WAITPOS_END};
 public:
 	static pair<_float3, vector<WAITING_INFO>> m_WaitingList;
 	static _int		m_iWatingNum;
@@ -32,8 +33,10 @@ public:
 	//현재 내가 기다려야 할 위치를 준다.
 	_float3			Get_DestWaitingPos() { return m_WaitingList.first + m_WaitingList.second[m_iMyIdx].vPos; }
 	_float			Get_WaitingTime() {return m_fWaitingTime;}
-	_bool			IsFrontWaiting() { return m_iMyIdx == 1; }
+	_bool			IsFrontWaiting() { return m_iMyIdx == WAITPOS_FRONT; }
 	void			Set_RenderPartObj(_bool bRender) { m_bRenderPartObj = bRender; }
+
+	void			Swap_WatingPosition();
 
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
@@ -49,6 +52,7 @@ public:
 	virtual void	Render_IMGUI() override;
 #endif
 
+	void			OnNotify();
 	void			Bring_Food(enum class PARTTIME_ITEM eITEM);
 
 private:

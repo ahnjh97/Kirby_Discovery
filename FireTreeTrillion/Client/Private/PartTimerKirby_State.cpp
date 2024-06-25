@@ -2,7 +2,7 @@
 #include "PartTimerKirby_State.h"
 #include "PartTimerKirby.h"
 #include "PartTimeHelper.h"
-
+#include "PartTimeFood.h"
 
 #pragma region IDLE STATE
 //*********************************
@@ -35,6 +35,8 @@ void CPartTimerKirby_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float 
 		}
 		else
 		{
+			CTransform* pTransform = pAlbaKirby->Get_TransformCom();
+			pAlbaKirby->Set_PrePosition(pTransform->Get_State(CTransform::STATE_POSITION));
 			pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_INCORRECTSTART, 50.f, false, true);
 		}
 	}
@@ -44,16 +46,19 @@ void CPartTimerKirby_Idle_State::OnStateExit()
 {
 }
 
+
 PARTTIME_ITEM CPartTimerKirby_Idle_State::Get_CurrentFood(_float4 vPos)
 {
 	if (vPos.x <= 19.5f && vPos.x > 18.5f)
 		return PARTTIME_ITEM::CAKE;
-	else if(vPos.x <= 18.5f && vPos.x > 17.5f)
+	else if (vPos.x <= 18.5f && vPos.x > 17.5f)
 		return PARTTIME_ITEM::TOMATO;
 	else if (vPos.x <= 17.5f && vPos.x > 16.5f)
 		return PARTTIME_ITEM::DRINK;
 	else if (vPos.x <= 16.5f && vPos.x > 15.5f)
 		return PARTTIME_ITEM::BURGER;
+
+	return PARTTIME_ITEM::ITEM_END;
 }
 
 CPartTimerKirby_Idle_State* CPartTimerKirby_Idle_State::Create()
@@ -68,7 +73,6 @@ void CPartTimerKirby_Idle_State::Free()
 }
 
 #pragma endregion
-
 
 #pragma region MOVE STATE
 //*********************************
@@ -126,7 +130,7 @@ CPartTimerKirby_Grab_State::CPartTimerKirby_Grab_State()
 void CPartTimerKirby_Grab_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
-	m_fSpeed = 2.f;
+	m_fSpeed = 5.f;
 }
 
 void CPartTimerKirby_Grab_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -139,17 +143,17 @@ void CPartTimerKirby_Grab_State::OnStateUpdate(CGameObject* pGameObject, _float 
 		{
 			if (pAlbaKirby->Get_State() == CPartTimerKirby::FOODSHOP_INCORRECT)
 			{
-				_float4 vPos = pTransform->Get_State(CTransform::STATE_POSITION);
-				pTransform->Set_State(CTransform::STATE_POSITION, _float4(vPos.x, vPos.y, 29.3f, 1.f));
+				_float4 vPrePos = pAlbaKirby->Get_PrePosition();
+				pTransform->Set_State(CTransform::STATE_POSITION, _float4(vPrePos.x, vPrePos.y, vPrePos.z, 1.f));
+				
+				_float4 vOriginPos = m_pFood->Get_OriginPosition();
+				m_pFood->Get_TransformCom()->Set_State(CTransform::STATE_POSITION, vOriginPos);
 			}
 			pAlbaKirby->Render_Food(false, PARTTIME_ITEM::ITEM_END);
 			pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_SELECT, 50.f, true, true);
 		}
 		else if (pAlbaKirby->Get_State() == CPartTimerKirby::FOODSHOP_INCORRECTSTART)
-		{
-			//+)QZR : 음식 날라가게
 			pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_INCORRECT, 2.f, false, true);
-		}
 		else if(CPartTimeHelper::Get_Instance()->Get_PartTimeItem() == PARTTIME_ITEM::CAKE || CPartTimeHelper::Get_Instance()->Get_PartTimeItem() == PARTTIME_ITEM::TOMATO)
 			pAlbaKirby->Change_State(CPartTimerKirby::HANDOVERSHORT, 70.f, false, true);
 		else if(CPartTimeHelper::Get_Instance()->Get_PartTimeItem() == PARTTIME_ITEM::DRINK || CPartTimeHelper::Get_Instance()->Get_PartTimeItem() == PARTTIME_ITEM::BURGER)
@@ -159,9 +163,31 @@ void CPartTimerKirby_Grab_State::OnStateUpdate(CGameObject* pGameObject, _float 
 	{
 		if (pAlbaKirby->Get_State() == CPartTimerKirby::FOODSHOP_INCORRECT)
 		{
+			// 현재 내가 밀어버린 아이템을 가져온다.
+			PARTTIME_ITEM curItem = Get_CurrentFood(pAlbaKirby->Get_PrePosition());//TransformCom()->Get_State_Float4(CTransform::STATE_POSITION));
+
+			// 아이템들을 갖고있는 레이어를 돌면서 밀어버린 아이템 객체를 찾는다.
+			_uint iLevel = *m_pGameInstance->Get_CurrentLevelID();
+			auto listFood = m_pGameInstance->Get_List(iLevel, TEXT("Layer_Food"));
+			for (auto& GameObj : *listFood)
+			{
+				CPartTimeFood* pFood = static_cast<CPartTimeFood*>(GameObj);
+				if (pFood->Get_Item() == curItem) // 해당 푸드일 경우, 푸드 날려버리기
+				{
+					m_pFood = pFood;
+					CTransform* pTransformFood = pFood->Get_TransformCom();
+					_float4		vPos = pTransformFood->Get_State(CTransform::STATE_POSITION);
+					_vector		vLook = pTransform->Get_State_Float4(CTransform::STATE_LOOK);
+
+					vPos += XMVector3Normalize(vLook) * 8.f * fTimeDelta;
+					pTransformFood->Set_State(CTransform::STATE_POSITION, vPos);
+					//pTransformFood->Set_State(CTransform::STATE_POSITION, _float4(vPos.x , vPos.y, vPos.z + fTimeDelta * 12.f, 1.f));
+				}
+			}
+
 			if (m_fSpeed < 0.f) m_fSpeed = 0.f;
 			pTransform->Go_Straight(fTimeDelta * m_fSpeed);
-			m_fSpeed -= fTimeDelta * 5.f;
+			m_fSpeed -= fTimeDelta * 20.f;
 		}
 	}
 }
@@ -169,6 +195,20 @@ void CPartTimerKirby_Grab_State::OnStateUpdate(CGameObject* pGameObject, _float 
 void CPartTimerKirby_Grab_State::OnStateExit()
 {
 	CPartTimeHelper::Get_Instance()->Make_RandomItem();
+}
+
+PARTTIME_ITEM CPartTimerKirby_Grab_State::Get_CurrentFood(_float4 vPos)
+{
+	if (vPos.x <= 19.5f && vPos.x > 18.5f)
+		return PARTTIME_ITEM::CAKE;
+	else if (vPos.x <= 18.5f && vPos.x > 17.5f)
+		return PARTTIME_ITEM::TOMATO;
+	else if (vPos.x <= 17.5f && vPos.x > 16.5f)
+		return PARTTIME_ITEM::DRINK;
+	else if (vPos.x <= 16.5f && vPos.x > 15.5f)
+		return PARTTIME_ITEM::BURGER;
+
+	return PARTTIME_ITEM::ITEM_END;
 }
 
 CPartTimerKirby_Grab_State* CPartTimerKirby_Grab_State::Create()
@@ -180,6 +220,8 @@ CPartTimerKirby_Grab_State* CPartTimerKirby_Grab_State::Create()
 void CPartTimerKirby_Grab_State::Free()
 {
 	__super::Free();
+
+	Safe_Release(m_pFood);
 }
 
 #pragma endregion

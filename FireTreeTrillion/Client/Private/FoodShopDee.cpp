@@ -146,7 +146,6 @@ void CFoodShopDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObje
 	//m_pModelCom->Set_Animation(27, 50.f, true, true);
 }
 
-
 HRESULT CFoodShopDee::Add_Components()
 {
 	HRESULT hr;

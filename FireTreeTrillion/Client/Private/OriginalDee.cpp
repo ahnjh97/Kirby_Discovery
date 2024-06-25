@@ -1,0 +1,325 @@
+#include "stdafx.h"
+#include "HitBox.h"
+#include "FSM.h"
+#include "OriginalDee.h"
+#include "Dee_Part.h"
+#include "Dee_State.h"
+
+COriginalDee::COriginalDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+	:CWaddleDee{ pDevice, pContext }
+{
+}
+
+COriginalDee::COriginalDee(const COriginalDee& rhs)
+	:CWaddleDee{ rhs }
+{
+}
+
+HRESULT COriginalDee::Initialize_Prototype()
+{
+	return S_OK;
+}
+
+HRESULT COriginalDee::Initialize(void* pArg)
+{
+	DEE_DESC pDeeDesc{};
+
+	if (nullptr != pArg)
+		pDeeDesc = *(DEE_DESC*)pArg;
+
+	pDeeDesc.fSpeedPerSec = 5.f;
+	pDeeDesc.fRotationPerSec = XMConvertToRadians(90.0f);
+
+	HRESULT hr;
+
+	hr = __super::Initialize(pArg);
+	CHECK_FAILED(hr);
+
+	hr = Add_Components();
+	CHECK_FAILED(hr);
+
+
+	hr = Add_PartObjects();
+	CHECK_FAILED(hr);
+
+	m_pTransformCom->Rotation(_float3{ 0.f, 1.f, 0.f }, ToRadian(180.f));
+	m_pModelCom->Set_Animation(DEEANIM_WAIT, 60.f, true, true);
+
+	return S_OK;
+}
+
+_int COriginalDee::Tick(_float fTimeDelta)
+{
+	if (true == m_bDead)
+		return Ready_Dead();
+
+	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+
+	__super::Tick(m_fTimeDelta);
+
+	for (auto& Pair : m_PartObjects)
+		Pair.second->Tick(m_fTimeDelta);
+
+	//공통된 디 관련 변수를 업데이트 - 초기화한다
+	Dee_SystemTick(m_fTimeDelta);
+
+	return OBJ_NOEVENT;
+}
+
+void COriginalDee::Late_Tick(_float fTimeDelta)
+{
+	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+	m_pModelCom->Play_Animation(m_fTimeDelta);
+
+	for (auto& Pair : m_PartObjects)
+		Pair.second->Late_Tick(m_fTimeDelta);
+
+
+	//시야 벗어나면 컬링
+	if (!m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State(CTransform::STATE_POSITION), 2.0f))
+		return;
+
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
+}
+
+HRESULT COriginalDee::Render()
+{
+	if (FAILED(Bind_ShaderResources()))
+		return E_FAIL;
+
+	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
+
+	for (size_t i = 0; i < iNumMeshes; i++)
+	{
+
+		if (Custom_Face(i) == true)
+			continue;
+
+		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+			return E_FAIL;
+
+
+		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
+			return E_FAIL;
+
+		m_pModelCom->Render(i);
+	}
+
+	return S_OK;
+}
+
+HRESULT COriginalDee::Render_LightDepth()
+{
+	if (FAILED(m_pGameInstance->Render_LightDepth_For_GameObject(m_pShaderCom, m_pTransformCom, m_pModelCom)))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+void COriginalDee::Add_AnimEvent()
+{
+	__super::Add_AnimEvent();
+}
+
+void COriginalDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
+{
+	m_bIsKirbyInZone = true;
+	m_fResetHiTime = 5.f;
+}
+
+void COriginalDee::Render_IMGUI()
+{
+	__super::Render_IMGUI();
+
+	ImGui::Text(u8"현재 애님 인덱스 : %d", m_pFSM->Get_State());
+}
+
+HRESULT COriginalDee::Add_Components()
+{
+	HRESULT hr;
+
+	//쉐이더
+	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimModel"),
+		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
+	CHECK_FAILED(hr);
+
+
+	//모델
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_WaddleDeeBase"),
+		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+	CHECK_FAILED(hr);
+
+	// FOR ANIMTOOL
+	m_ppModelForAnimTool = &m_pModelCom;
+
+	//눈 텍스쳐
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Dee_Eye"),
+		TEXT("Com_Texture"), (CComponent**)&m_pEyeTextureCom);
+	CHECK_FAILED(hr);
+
+
+	//컨트롤러
+	CCharacterController::CONTROLLER_DESC ControllerDesc{};
+	ControllerDesc.vInitialPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	ControllerDesc.fOffset = 1.f;
+	ControllerDesc.uCollisionType = m_eCollisionGroup;
+	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
+		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &ControllerDesc);
+	CHECK_FAILED(hr);
+
+
+	CHitBox::HITBOX_DESC HitBox{};
+	HitBox.pOwner = this;
+	HitBox.pDesc = &m_tColliderDesc[BODY];
+	HitBox.pCollisionType = NPC;
+	hr = m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox);
+	CHECK_FAILED(hr);
+
+	Set_BodyCollider(COLLIDER_CYLINDER, 0.6f, 1.2f, 5.f);
+
+	SetUp_FSM();
+
+	return S_OK;
+}
+
+HRESULT COriginalDee::Add_PartObjects()
+{
+	if (*m_pCurrentLevelID != LEVEL_TOWN && *m_pCurrentLevelID != LEVEL_PARTTIME)
+		return S_OK;
+
+	CPartObject* pPartObj = { nullptr };
+	CDee_Part::DEEPART_DESC	PartDesc{};
+
+	CModel* pModel = (CModel*)Get_Component(TEXT("Com_Model"));
+
+	PartDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	PartDesc.pSocket = pModel->Get_BonePtr("HatL");
+	PartDesc.wstrModelName = TEXT("DeePart_FoodShop");
+
+	pPartObj = static_cast<CPartObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_DeePart"), &PartDesc));
+	if (nullptr == pPartObj)
+		return E_FAIL;
+
+	m_PartObjects.emplace(TEXT("Part_Weapon"), pPartObj);
+
+	return S_OK;
+}
+
+HRESULT COriginalDee::Bind_ShaderResources()
+{
+	if (nullptr == m_pShaderCom)
+		ALARM_FAIL("쉐이더가 읍서");
+
+	HRESULT hr;
+
+	hr = m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix");
+	CHECK_FAILED(hr);
+	hr = m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW));
+	CHECK_FAILED(hr);
+	hr = m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ));
+	CHECK_FAILED(hr);
+
+
+	hr = m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
+	CHECK_FAILED(hr);
+	hr = m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
+	CHECK_FAILED(hr);
+	hr = m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float));
+	CHECK_FAILED(hr);
+	hr = m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
+	CHECK_FAILED(hr);
+	hr = m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4));
+	CHECK_FAILED(hr);
+	hr = m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
+	CHECK_FAILED(hr);
+
+	return S_OK;
+}
+
+void COriginalDee::SetUp_FSM()
+{
+	m_pFSM = CFSM::Create();
+
+	CFSM::FSM_INFO	FSMDesc = {};
+	FSMDesc.iState = DEEANIM_WAIT;
+	FSMDesc.pModel = &m_pModelCom;
+
+	m_pFSM->Initialize(&FSMDesc);
+}
+
+_bool COriginalDee::Custom_Face(_uint iMeshIndex)
+{
+	if (iMeshIndex == 2)
+	{
+		HRESULT hr;
+
+		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", iMeshIndex, TextureType_DIFFUSE);
+		CHECK_FAILED(hr);
+
+		hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", iMeshIndex);
+		CHECK_FAILED(hr);
+
+		hr = m_pEyeTextureCom->Bind_ShaderResource(m_pShaderCom, "g_KirbyEyeTexture", (_uint)m_eEyeState);
+		CHECK_FAILED(hr);
+
+		_bool bStencil = true;
+		_bool bRimLight = true;
+		_bool bMotionBlur = true;
+		m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
+
+		m_pShaderCom->Begin(ANIMMODEL_EYE);
+		m_pModelCom->Render(iMeshIndex);
+
+		return true;
+	}
+
+	return false;
+}
+
+COriginalDee* COriginalDee::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+{
+	COriginalDee* pInstance = new COriginalDee(pDevice, pContext);
+
+	if (FAILED(pInstance->Initialize_Prototype()))
+	{
+		_ASSERT_EXPR(FALSE, TEXT("Failed To Create : COriginalDee"));
+
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
+CGameObject* COriginalDee::Clone(void* pArg)
+{
+	COriginalDee* pInstance = new COriginalDee(*this);
+
+	if (FAILED(pInstance->Initialize(pArg)))
+	{
+		_ASSERT_EXPR(FALSE, TEXT("Failed To Clone : COriginalDee"));
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
+void COriginalDee::Free()
+{
+	Safe_Release(m_pEyeTextureCom);
+
+	for (auto& Pair : m_PartObjects)
+		Safe_Release(Pair.second);
+
+	m_PartObjects.clear();
+
+	__super::Free();
+}

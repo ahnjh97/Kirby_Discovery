@@ -47,8 +47,8 @@ HRESULT CLevel_PartTime::Initialize()
 	hr = Ready_Layer_BackGround(TEXT("Layer_BackGround"));
 	CHECK_FAILED(hr);
 
-	//hr = Ready_Layer_UI(TEXT("Layer_UI"));
-	//CHECK_FAILED(hr);
+	hr = Ready_Layer_UI(TEXT("Layer_UI"));
+	CHECK_FAILED(hr);
 
 	hr = Ready_Map();
 	CHECK_FAILED(hr);
@@ -61,67 +61,11 @@ HRESULT CLevel_PartTime::Initialize()
 	hr = Ready_Kickables();
 	CHECK_FAILED(hr);
 
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Player"), TEXT("Prototype_GameObject_PartTimerKirby"))))
-		return E_FAIL;
+	Ready_Layer_Player(TEXT("Layer_Player"));
+	Ready_Layer_Food(TEXT("Layer_Food"));
 
-	CPartTimeFood::FOOD_DESC desc{};
-	// 포지션 설정
-	_float3 position = _float3(18.6f, 23.7f, 31.3f);
-	_float4x4 matPos = Matrix::CreateTranslation(position);
-	_float rotationY = XMConvertToRadians(180.0f);
-	_float4x4 matRot = Matrix::CreateRotationY(rotationY);
-	_float4x4 matFinal = matRot * matPos;
-
-	desc.matWorld = matFinal;
-	desc.bRender = true;
-	desc.uItem = 0;
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Item"), TEXT("Prototype_GameObject_PartTimeFood"), &desc)))
-		return E_FAIL;
-
-	 position = _float3(17.56f, 23.7f, 31.3f);
-	 matPos = Matrix::CreateTranslation(position);
-	 rotationY = XMConvertToRadians(-7.0f);
-	 matRot = Matrix::CreateRotationY(rotationY);
-	 matFinal = matRot * matPos;
-
-	desc.matWorld = matFinal;
-	desc.bRender = true;
-	desc.uItem = 1;
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Item"), TEXT("Prototype_GameObject_PartTimeFood"), &desc)))
-		return E_FAIL;
-
-	position = _float3(16.66f, 23.64f, 31.f);
-	matPos = Matrix::CreateTranslation(position);
-	rotationY = XMConvertToRadians(-1.0f);
-	_float rotationZ = XMConvertToRadians(-6.0f);
-	matRot = Matrix::CreateRotationY(rotationY);
-	_float4x4 matRotZ = Matrix::CreateRotationZ(rotationZ);
-	matFinal = matRot * matRotZ * matPos;
-
-	desc.matWorld = matFinal;
-	desc.bRender = true;
-	desc.uItem = 2;
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Item"), TEXT("Prototype_GameObject_PartTimeFood"), &desc)))
-		return E_FAIL;	
-
-	position = _float3(15.7f, 23.58f, 30.77f);
-	matPos = Matrix::CreateTranslation(position);
-	_float rotationx = XMConvertToRadians(-170.9f);
-	rotationY = XMConvertToRadians(-8.4f);
-	rotationZ = XMConvertToRadians(-176.5f);
-	_float4x4 matRotX = Matrix::CreateRotationX(rotationx);
-	matRot = Matrix::CreateRotationY(rotationY);
-	matRotZ = Matrix::CreateRotationZ(rotationZ);
-	matFinal = matRotX * matRot * matRotZ * matPos;
-
-	desc.matWorld = matFinal;
-	desc.bRender = true;
-	desc.uItem = 3;
-
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Item"), TEXT("Prototype_GameObject_PartTimeFood"), &desc)))
-		return E_FAIL;
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
-	           
+	m_pGameInstance->Set_ColorSet_ByIndex(4);
 	return S_OK;
 }
 
@@ -211,39 +155,95 @@ HRESULT CLevel_PartTime::Ready_Layer_Camera(const wstring& strLayerTag)
 
 HRESULT CLevel_PartTime::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
-
 	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_PARTTIME, strLayerTag, TEXT("Prototype_GameObject_SkySphere"));
 	CHECK_FAILED(hr);
 
 	return S_OK;
 }
 
+void CLevel_PartTime::Ready_Layer_Player(const wstring& strLayerTag)
+{
+	// 알바생 커비입니다.
+	CGameObject::GAMEOBJECT_DESC KirbyDesc{};
+	_float3 position = _float3(15.8f, 23.8f, 28.9f);
+	_float4x4 matPos = Matrix::CreateTranslation(position);
+	_float rotationY = XMConvertToRadians(-10.f);
+	_float4x4 matRot = Matrix::CreateRotationY(rotationY);
+	_float4x4 matFinal = matRot * matPos;
+
+	KirbyDesc.matWorld = matFinal;
+	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Player"), TEXT("Prototype_GameObject_PartTimerKirby"), &KirbyDesc);
+	CHECK_FAILED(hr);
+}
+
+// 함께하는 음식들입니다.
+void CLevel_PartTime::Ready_Layer_Food(const wstring& strLayerTag)
+{
+	// 케이크
+	CPartTimeFood::FOOD_DESC FoodDesc{};
+	_float3 position = _float3(18.6f, 23.9f, 31.2f);
+	_float4x4 matPos = Matrix::CreateTranslation(position);
+	_float rotationY = XMConvertToRadians(180.0f + 14.f);
+	_float4x4 matRot = Matrix::CreateRotationY(rotationY);
+	_float4x4 matFinal = matRot * matPos;
+
+	FoodDesc.matWorld = matFinal;
+	FoodDesc.bRender = true;
+	FoodDesc.uItem = 0;
+	FoodDesc.fSpeedPerSec = 5;
+	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Food"), TEXT("Prototype_GameObject_PartTimeFood"), &FoodDesc);
+	CHECK_FAILED(hr);
+
+	// 돔마도
+	position = _float3(17.56f, 23.9f, 31.2f);
+	matPos = Matrix::CreateTranslation(position);
+	rotationY = XMConvertToRadians(-7.0f);
+	matRot = Matrix::CreateRotationY(rotationY);
+	matFinal = matRot * matPos;
+
+	FoodDesc.matWorld = matFinal;
+	FoodDesc.bRender = true;
+	FoodDesc.uItem = 1;
+	hr = m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Food"), TEXT("Prototype_GameObject_PartTimeFood"), &FoodDesc);
+	CHECK_FAILED(hr);
+
+	// 야구르트
+	position = _float3(16.66f, 23.9f, 31.f);
+	matPos = Matrix::CreateTranslation(position);
+	rotationY = XMConvertToRadians(-1.0f);
+	_float rotationZ = XMConvertToRadians(-6.0f);
+	matRot = Matrix::CreateRotationY(rotationY);
+	_float4x4 matRotZ = Matrix::CreateRotationZ(rotationZ);
+	matFinal = matRot * matRotZ * matPos;
+
+	FoodDesc.matWorld = matFinal;
+	FoodDesc.bRender = true;
+	FoodDesc.uItem = 2;
+	hr = m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Food"), TEXT("Prototype_GameObject_PartTimeFood"), &FoodDesc);
+	CHECK_FAILED(hr);
+
+	// 함바그
+	position = _float3(15.68f, 23.83f, 30.77f);
+	matPos = Matrix::CreateTranslation(position);
+	_float rotationx = XMConvertToRadians(-170.9f);
+	rotationY = XMConvertToRadians(-8.4f);
+	rotationZ = XMConvertToRadians(-176.5f);
+	_float4x4 matRotX = Matrix::CreateRotationX(rotationx);
+	matRot = Matrix::CreateRotationY(rotationY);
+	matRotZ = Matrix::CreateRotationZ(rotationZ);
+	matFinal = matRotX * matRot * matRotZ * matPos;
+
+	FoodDesc.matWorld = matFinal;
+	FoodDesc.bRender = true;
+	FoodDesc.uItem = 3;
+	hr = m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Food"), TEXT("Prototype_GameObject_PartTimeFood"), &FoodDesc);
+	CHECK_FAILED(hr);
+}
+
 HRESULT CLevel_PartTime::Ready_Layer_UI(const wstring& _wstrLayerTag)
 {
-	//HRESULT hr;
-
-
-	////모든 HUD를 준비
-	//string strUITag = { "LayerUI" };
-	//CHUD::UI_TAG eHUDType = CHUD::TAG_NONE;
-
-	//map<CHUD::UI_TAG, string> HUDmap =
-	//{
-	//	{CHUD::HUD_KIRBYHP, "HUD_KirbyStatus"},
-	//	{CHUD::HUD_STARPOINT, "HUD_StarPoint"},
-	//	{CHUD::HUD_ABILITYDISCARD, "HUD_AbilityDiscard"},
-	//};
-
-
-	//for (const auto& [eHUDType, strUITag] : HUDmap)
-	//{
-	//	string strFilePath = { "../../../UI_txt/" };
-	//	string strFileExt = { "_Orig.txt" };
-
-	//	strFilePath += strUITag.c_str() + strFileExt;
-	//	hr = Load_FileData(strFilePath, FILE_UI, _wstrLayerTag);
-	//	CHECK_FAILED(hr);
-	//}
+	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_PARTTIME, _wstrLayerTag, TEXT("Prototype_GameObject_UI_PartTime"));
+	CHECK_FAILED(hr);
 
 	return S_OK;
 }
@@ -465,7 +465,7 @@ HRESULT CLevel_PartTime::Ready_Dees()
 	{
 		HungryDeeDesc.iIdx = i;
 
-		if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NPC"), TEXT("Prototype_GameObject_HungryDee"), &HungryDeeDesc)))
+		if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Dee"), TEXT("Prototype_GameObject_HungryDee"), &HungryDeeDesc)))
 			return E_FAIL;
 	}
 

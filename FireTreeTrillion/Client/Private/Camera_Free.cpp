@@ -18,7 +18,7 @@ void CCamera_Free::Lock_Camera(_float3 vPos, _float3 vLook, _float fFOVY)
 {
 	m_bLockCamera = true;
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION,Pos(vPos));
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, Pos(vPos));
 
 
 	vLook.Normalize();
@@ -39,26 +39,11 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 	CAMERA_FREE_DESC* pCameraFree = (CAMERA_FREE_DESC*)pArg;
 	m_fMouseSensor = pCameraFree->fMouseSensor;
 
-	//pCameraFree->fRotationPerSec = ToRadian(45.f);
-
-
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
 
-
 	m_pGameInstance->Add_Camera(this);
-
-	//if (*m_pGameInstance->Get_CurrentLevelID() == LEVEL_INTRO || 
-	//	*m_pGameInstance->Get_CurrentLevelID() == LEVEL_GAMEPLAY) {
-	//	function<void(_int)> func = bind(&CCamera_Free::StartLerpByTriggerInfo, this, placeholders::_1);
-	//	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_CAMERA, func);
-
-	//	function<void(void)> exitFunc = bind(&CCamera_Free::EndLerpByTriggerInfo, this);
-	//	m_pGameInstance->Emplace_ExitFunc(TRIGGER_CAMERA, exitFunc);
-	//}
-
-
 
 	m_vDestCamDir = static_cast<_float3>(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
 
@@ -72,14 +57,9 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 
 _int CCamera_Free::Tick(_float fTimeDelta)
 {
-	if (m_pGameInstance->Get_KeyState(DIK_L, KEY_DOWN))
+	if ( m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_L, KEY_DOWN))
 	{
 		LockToggle();
-	}
-
-	if (m_bLockCamera)
-	{
-		return OBJ_NOEVENT;
 	}
 
 	//내가 현재 카메라가 아니라면 바쁘게 타겟 따라가기
@@ -88,11 +68,15 @@ _int CCamera_Free::Tick(_float fTimeDelta)
 	else
 		m_bTrackTarget = false;
 
-	Control(fTimeDelta);
 
-	//fov y 를 보간하여 갱신한다.
-	if (.01f < abs(m_fFovy - m_fDestFovy))
-		m_fFovy += (m_fDestFovy - m_fFovy) * fTimeDelta * 3.f;
+	if (!m_bLockCamera)
+	{
+		Control(fTimeDelta);
+
+		//fov y 를 보간하여 갱신한다.
+		if (.01f < abs(m_fFovy - m_fDestFovy))
+			m_fFovy += (m_fDestFovy - m_fFovy) * fTimeDelta * 3.f;
+	}
 
 	m_bWasMainCamera = (m_pGameInstance->Get_CurCameraPtr() != this);
 
@@ -347,7 +331,7 @@ void CCamera_Free::Track_Target(_float fTimeDelta)
 		}
 
 		m_pTransformCom->Look_At_Dir(vCamLook);
-		
+
 		///////////
 		*/
 #pragma endregion
