@@ -78,6 +78,7 @@
 
 // 보스
 #include "DeeDeeDee.h"
+#include "DeeDeeDeeHammer.h"
 
 //와들디
 #include "Dee_Part.h"
@@ -318,6 +319,8 @@ HRESULT CLoader::Loading_ObjectAll()
 
 	//Boss
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeeDeeDee"), CDeeDeeDee);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeeDeeDeeHammer"), CDeeDeeDeeHammer);
+
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BackGround"), CBackGround);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
@@ -1330,6 +1333,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// Boss
 		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 180.f);
+		m_vecModelInfo.emplace_back("DeeDeeDeeHammer", TYPE_NONANIM, 1.0f);
 
 		// For Map Interactive Object
 		m_vecModelInfo.emplace_back("GsPebble", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
@@ -1348,6 +1352,70 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("BushLRemainder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapDeco/"));
 		m_vecModelInfo.emplace_back("BushMRemainder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapDeco/"));
 		m_vecModelInfo.emplace_back("BushSRemainder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapDeco/"));
+	}
+	else if (eLevel == LEVEL_TOWN)
+	{
+		m_vecModelInfo.emplace_back("Town", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("BG1", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+
+
+		m_vecModelInfo.emplace_back("Kirby", TYPE_ANIM, 1.f, 180.f);
+		// For Kirby Body
+		m_vecModelInfo.emplace_back("KirbyBalloon", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbyDefault", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbyVacuum", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbySwordDefault", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbySwordBalloon", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbyBoomDefault", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbyCarDefault", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbyCarVacuum", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbyPartTimer", TYPE_ANIM, 1.f, 180.f);
+
+
+		// For Kirby Weapon
+		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("KirbyBombDefault", TYPE_ANIM, 1.3f, 180.f);
+
+		// For Kirby Armour
+		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
+
+		//와들디 파트오브젝트
+		m_vecModelInfo.emplace_back("DeePart_Arena", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("DeePart_Bass", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("DeePart_Delivery", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("DeePart_Drum", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("DeePart_DrumStick", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("DeePart_FoodShop", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("DeePart_Guitar", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("DeePart_Keyboard", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("DeePart_Knowledge", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("DeePart_Mike", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("DeePart_Pharmacy", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("DeePart_Plate", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("DeePart_RollingBall", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("DeePart_Theater", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("DeePart_WateringCan", TYPE_NONANIM, 1.f);
+
+		// 와들디
+		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
+		m_vecModelInfo.emplace_back("WaddleDeeHungry", TYPE_ANIM, 1.1f, 180.f);
+
+		// Boss
+		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 180.f);
+		m_vecModelInfo.emplace_back("DeeDeeDeeHammer", TYPE_NONANIM, 1.3f);
+
+
+		m_vecModelInfo.emplace_back("PoppyBrosJr", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_ANIM, 1.3f, 180.f);
+
+		// For Item
+		m_vecModelInfo.emplace_back("Item_EnergyDrink", TYPE_NONANIM, 3.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Item_Coin", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Item_Sword", TYPE_NONANIM, 1.f, 0.f);
+		m_vecModelInfo.emplace_back("Item_Bomb", TYPE_NONANIM, 1.f, 0.f);
+
 	}
 	else if (eLevel == LEVEL_RACING)
 	{
@@ -1423,7 +1491,10 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	}
 	else if (eLevel == LEVEL_DEEDEEDEE)
 	{
-		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		//m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 180.f);
+		m_vecModelInfo.emplace_back("DeeDeeDeeHammer", TYPE_NONANIM, 1.3f);
+
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("BG1", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("NonRenderWall", TYPE_NONANIM, 0.01f, 1.f, 0, string("MapObjs/"));
@@ -1685,7 +1756,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("KirbyCarVacuum", TYPE_ANIM, 1.f, 180.f);
 
 
-		m_vecModelInfo.emplace_back("KirbyPartTimer", TYPE_ANIM, 1.f, 0.f);
+		//m_vecModelInfo.emplace_back("KirbyPartTimer", TYPE_ANIM, 1.f, 0.f);
 		
 		// For Kirby Weapon
 		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
@@ -1708,7 +1779,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 0.f);
 
 		// Boss
-		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 0.f);
+		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 180.f);
+		m_vecModelInfo.emplace_back("DeeDeeDeeHammer", TYPE_NONANIM, 1.0f);
 
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
 		m_vecModelInfo.emplace_back("WaddleDeeHungry", TYPE_ANIM, 1.1f, 180.f);

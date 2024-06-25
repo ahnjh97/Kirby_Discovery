@@ -16,6 +16,10 @@ HRESULT CFSM::Initialize(void* pArg)
 	}
 
 	m_pCurrent_State = Find_State(m_iState);
+
+	if (m_pCurrent_State == nullptr)
+		return E_FAIL;
+
 	return S_OK;
 }
 

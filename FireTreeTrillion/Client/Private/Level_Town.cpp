@@ -59,6 +59,16 @@ HRESULT CLevel_Town::Initialize()
 	hr = Ready_Kickables();
 	CHECK_FAILED(hr);
 
+	CGameObject::GAMEOBJECT_DESC ObjDesc{};
+	ObjDesc.fSpeedPerSec = 5.f;
+	ObjDesc.fRotationPerSec = ToRadian(90.f);
+	_float4x4 InitMat = _float4x4::Identity;
+	InitMat.Translation({ 1.51f, 22.11f, 3.91f });
+	ObjDesc.matWorld = InitMat;
+	// Car Test
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_DeeDeeDee"), TEXT("Prototype_GameObject_DeeDeeDee"), &ObjDesc)))
+		return E_FAIL;
+
 	// Part-timer Kirby Test
 	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOWN, TEXT("Layer_Player"), TEXT("Prototype_GameObject_PartTimerKirby"))))
 	//	return E_FAIL;
@@ -111,7 +121,7 @@ HRESULT CLevel_Town::Ready_Lights()
 	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
 		return E_FAIL;
 
-	CGameInstance::Get_Instance()->Setting_GodRay({ -650.f, 300.f, 1200.f, 1.f });
+	CGameInstance::Get_Instance()->Setting_GodRay({ 450.f, 400.f, 1200.f, 1.f });
 
 	return S_OK;
 }
@@ -208,7 +218,7 @@ HRESULT CLevel_Town::Ready_Map()
 	fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
 
 	_uint iStrLength{};
-	string strModelName;
+	string strModelName;https://drive.google.com/drive/u/0/my-drive
 	_float4x4 matWorld{};
 	_float3 vMin{}, vMax{};
 	wstring wstrGameObjectTag;
@@ -396,22 +406,6 @@ HRESULT CLevel_Town::Ready_Dees()
 
 	if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NPC"), TEXT("Prototype_GameObject_FoodShopDee"), &ObjDesc)))
 		return E_FAIL;
-
-
-	CWaddleDee::DEE_DESC DeeDesc{};
-	DeeDesc.fSpeedPerSec = 5.f;
-	DeeDesc.fRotationPerSec = ToRadian(90.f);
-	InitMat = _float4x4::Identity;
-	//InitMat.Translation({ 15.2f + CUtils::Make_RandomFloat(-5.f, 5.f), 27.f, 26.f + CUtils::Make_RandomFloat(-5.f, 5.f) });
-	InitMat.Translation({ 15.2f , 27.f, 26.f });
-	DeeDesc.matWorld = InitMat;
-
-	//for (_int i = 0; i < 12; ++i)
-	//{
-	if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NPC"), TEXT("Prototype_GameObject_OriginalDee"), &DeeDesc)))
-		return E_FAIL;
-	//}
-
 
 
 	string strFileName = "../../../objects_txt/Town_Monsters.txt";

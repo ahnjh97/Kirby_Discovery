@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "AnimDeco.h"
 #include "HitBox.h"
+#include "MultiEffect.h"
 
 CAnimDeco::CAnimDeco(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -64,6 +65,7 @@ HRESULT CAnimDeco::Initialize(void* pArg)
 		return S_OK;
 	}
 
+
 	Set_BodyCollider(COLLIDER_SPHERE, fOffSetY, 0.f, fRadius);
 
 	return S_OK;
@@ -83,6 +85,13 @@ void CAnimDeco::HideModel()
 			tDesc.fRimWidth = 0.2f;
 			tDesc.iShaderVars = 6;
 			m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_MapDeco"), TEXT("Prototype_GameObject_NonAnimDeco"), &tDesc);
+
+			CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+
+			MultiFXDesc.vInitPos = static_cast<_float3>(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+			MultiFXDesc.vInitScale = { 1.f, 1.f, 1.f };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Bush Cut"), &MultiFXDesc)))
+				return;
 		}
 
 		Set_Dead();

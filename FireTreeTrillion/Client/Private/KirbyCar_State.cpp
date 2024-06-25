@@ -83,7 +83,7 @@ void CKirbyCar_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	{
 		CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 		pCamera->Make_Shake();
-		GAMEINSTANCE Setting_RadialBlur(20.f, 20.f);
+		GAMEINSTANCE Setting_RadialBlur(pTransformCom->Get_State(CTransform::STATE_POSITION), 20.f, 40.f);
 		DESC(m_bBooster) = true;
 		pKirby->Change_State(CKirby::CARSTATE_BOOST, 60.f, true, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 		return;
@@ -182,7 +182,7 @@ void CKirbyCar_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 		{
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 			pCamera->Make_Shake();
-			GAMEINSTANCE Setting_RadialBlur(20.f, 20.f);
+			GAMEINSTANCE Setting_RadialBlur(pTransformCom->Get_State(CTransform::STATE_POSITION), 20.f, 40.f);
 			DESC(m_bBooster) = true;
 			pKirby->Change_State(CKirby::CARSTATE_BOOST, 60.f, true, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 			return;
@@ -297,7 +297,7 @@ void CKirbyCar_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		{
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 			pCamera->Make_Shake();
-			GAMEINSTANCE Setting_RadialBlur(20.f, 20.f);
+			GAMEINSTANCE Setting_RadialBlur(pTransformCom->Get_State(CTransform::STATE_POSITION), 20.f, 40.f);
 			DESC(m_bBooster) = true;
 			pKirby->Change_State(CKirby::CARSTATE_BOOST, 60.f, true, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 			return;
@@ -607,7 +607,7 @@ void CKirbyCar_Boost_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			DESC(m_fJumpVelocity) = 20.f;
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 			pCamera->Make_Shake(1.6f, 0.5f);
-			GAMEINSTANCE Setting_RadialBlur(30.f, 150.f);
+			GAMEINSTANCE Setting_RadialBlur(pTransformCom->Get_State(CTransform::STATE_POSITION), 30.f, 150.f);
 			return;
 		}
 	}
