@@ -378,6 +378,12 @@
     <Filter Include="01.Levels\4-1. PartTime">
       <UniqueIdentifier>{ce0fcbcb-4978-4d71-b5ac-464c5d2c038d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\NonRenderWall">
+      <UniqueIdentifier>{d4881f40-d9f4-423b-bdbf-ef08184a3618}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\BlendMapObject">
+      <UniqueIdentifier>{65399ffe-175b-49c9-98d6-f92a04f307f7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -755,11 +761,14 @@
     <ClInclude Include="..\Public\ToppleableBridge.h">
       <Filter>02.GameObjects\Map\Bridge</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Level_DeeDeeDee.h">
+      <Filter>01.Levels\3. DeeDeeDee</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\BlendMapObject.h">
       <Filter>02.GameObjects\Map\BlendMapObject</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Level_DeeDeeDee.h">
-      <Filter>01.Levels\3. DeeDeeDee</Filter>
+    <ClInclude Include="..\Public\NonRenderWall.h">
+      <Filter>02.GameObjects\Map\NonRenderWall</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1120,11 +1129,14 @@
     <ClCompile Include="..\Private\ToppleableBridge.cpp">
       <Filter>02.GameObjects\Map\Bridge</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Level_DeeDeeDee.cpp">
+      <Filter>01.Levels\3. DeeDeeDee</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\BlendMapObject.cpp">
       <Filter>02.GameObjects\Map\BlendMapObject</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Level_DeeDeeDee.cpp">
-      <Filter>01.Levels\3. DeeDeeDee</Filter>
+    <ClCompile Include="..\Private\NonRenderWall.cpp">
+      <Filter>02.GameObjects\Map\NonRenderWall</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

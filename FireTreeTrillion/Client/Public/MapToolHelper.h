@@ -101,6 +101,8 @@ private:
 	void HideTriggers(_bool bHideTriggers);
 	void HideGrid(_bool bHideGrid);
 	void HideDecos(_bool bHideDecos);
+	void HideWalls(_bool bHideWalls);
+
 	_bool ExcludeModel(string& _strModelName);
 	void MoveToCam();
 	void DisableOtherGroups(_int* _pCurTxtGroup);

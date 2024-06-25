@@ -280,6 +280,7 @@
     <ClInclude Include="..\Public\Moon.h" />
     <ClInclude Include="..\Public\MultiEffect.h" />
     <ClInclude Include="..\Public\NonAnimDeco.h" />
+    <ClInclude Include="..\Public\NonRenderWall.h" />
     <ClInclude Include="..\Public\OrbitingCamera.h" />
     <ClInclude Include="..\public\OriginalDee.h" />
     <ClInclude Include="..\Public\Particle.h" />
@@ -425,6 +426,7 @@
     <ClCompile Include="..\Private\Moon.cpp" />
     <ClCompile Include="..\Private\MultiEffect.cpp" />
     <ClCompile Include="..\Private\NonAnimDeco.cpp" />
+    <ClCompile Include="..\Private\NonRenderWall.cpp" />
     <ClCompile Include="..\Private\OrbitingCamera.cpp" />
     <ClCompile Include="..\private\OriginalDee.cpp" />
     <ClCompile Include="..\Private\Particle.cpp" />
