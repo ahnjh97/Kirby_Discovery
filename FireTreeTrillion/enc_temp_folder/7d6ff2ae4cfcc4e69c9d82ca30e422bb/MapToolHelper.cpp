@@ -136,7 +136,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 #pragma region LEVEL_RACING
 
 		, "GsRubbleAsphalt01L", "GsRubbleAsphalt02L", "GsRubbleAsphalt03L", "GsRubbleAsphalt04L", "GsRubbleAsphalt05L"
-		, "GsRubbleAsphalt06L", "GsRubbleAsphalt07L", "GsRubbleAsphalt08L", "GsRubbleAsphalt09L"
+		, "GsRubbleAsphalt06L", "GsRubbleAsphalt07L", "GsRubbleAsphalt08L" /*"GsRubbleAsphalt09L"*/
 
 #pragma endregion
 
