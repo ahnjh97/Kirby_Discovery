@@ -112,10 +112,10 @@ PS_OUT PS_MAIN(PS_IN In)
 {
 	PS_OUT			Out = (PS_OUT)0;
 
-    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    Out.vColor = g_DiffuseTexture.Sample(PointSampler, In.vTexcoord);
 	
 	//알파 테스트
-	if(Out.vColor.a < .05f)
+	if(Out.vColor.a < .8f)
         discard;
     
     Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
@@ -130,8 +130,27 @@ struct PS_IN_ALPHABLEND
 	float4		vProjPos : TEXCOORD1;
 };
 
-
 PS_OUT PS_MAIN_ALPHABLEND(PS_IN_ALPHABLEND In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    
+    //알파 값 예외처리
+    if (Out.vColor.a < 0.01f)
+        discard;
+    
+    Out.vColor.rgb *= g_vRColor;
+    Out.vColor.a *= g_fAlpha;
+
+    if (0.01f <= Out.vColor.a)
+        Out.vNonBlur = vector(0.f, 1.f, 0.f, 0.f);
+	
+    return Out;
+}
+
+
+PS_OUT PS_MAIN_SOLIDALPHABLEND(PS_IN_ALPHABLEND In)
 {
 	PS_OUT			Out = (PS_OUT)0;
 
@@ -355,6 +374,42 @@ PS_OUT PS_MAIN_WHITEUI(PS_IN_ALPHABLEND In)
     return Out;
 }
 
+PS_OUT PS_MAIN_ALPHATEST_COLOR(PS_IN In)
+{
+	PS_OUT			Out = (PS_OUT)0;
+
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+	
+	//알파 테스트
+	if(Out.vColor.a < .6f)
+        discard;
+
+    Out.vColor.rgb *= g_vRColor;
+
+    Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
+	
+	return Out;
+}
+
+PS_OUT PS_MAIN_ALPHATEST_COLOR_HORIZONTALCUT(PS_IN In)
+{
+	PS_OUT			Out = (PS_OUT)0;
+
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+	
+	//알파 테스트
+	if(Out.vColor.a < .6f)
+        discard;
+
+    if( g_fMaskRatio < In.vTexcoord.x )
+        discard;
+
+    Out.vColor.rgb *= g_vRColor;
+
+    Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
+	
+	return Out;
+}
 
 
 technique11 DefaultTechnique
@@ -373,8 +428,8 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 PS_MAIN();
 	}
 
-	// 기본 알파 블렌딩 패스 ( 1 )
-	pass Blend
+	// 단색 알파 블렌딩 패스 ( 1 )
+	pass SolidBlend
 	{
 		SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -384,8 +439,8 @@ technique11 DefaultTechnique
 		GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
 		HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
 		DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-		PixelShader = compile ps_5_0 PS_MAIN_ALPHABLEND();
-	}
+        PixelShader = compile ps_5_0 PS_MAIN_SOLIDALPHABLEND();
+    }
 
     //블렌드되는 이펙트. 알파 블렌딩 + 마스크 + 소프트 이펙트 ( 2 )
     pass BlendFX
@@ -429,8 +484,8 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_DEFAULT_FX();
     }
 
-	// Z test 안함 (5)
-    pass Blend_NOZTEST
+	// 단색 Z test 안함 (5)
+    pass SolidBlend_NOZTEST
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
@@ -440,7 +495,7 @@ technique11 DefaultTechnique
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 PS_MAIN_ALPHABLEND();
+        PixelShader = compile ps_5_0 PS_MAIN_SOLIDALPHABLEND();
     }
 
 	// 화이트 이펙트 패스. 알파 테스팅 + 마스크 + no z text ( 6 )
@@ -523,5 +578,47 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_WHITEUI();
+    }
+
+	// 단순 알파블렌드. Z test 안함 ( 12 )
+    pass AlphaBlend_NOZTEST
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN_ALPHABLEND();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_ALPHABLEND();
+    }
+
+    // 알파 테스트 + 색 바인딩 곱셈 ( 13 )
+    pass AlphaTest_Color
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_ALPHATEST_COLOR();
+    }
+
+    // 알파 테스트 + 색 바인딩 곱셈 + 0 ~ 1 사이의 값으로 가로 자르기 ( 14 )
+    pass AlphaTest_Color_HorizontalCut
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_ALPHATEST_COLOR_HORIZONTALCUT();
     }
 }

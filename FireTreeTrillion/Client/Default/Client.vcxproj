@@ -205,6 +205,8 @@
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\Coin.h" />
     <ClInclude Include="..\Public\CollisionCenter.h" />
+    <ClInclude Include="..\Public\DeeDeeDee.h" />
+    <ClInclude Include="..\Public\DeeDeeDee_State.h" />
     <ClInclude Include="..\public\Dee_Part.h" />
     <ClInclude Include="..\public\Dee_State.h" />
     <ClInclude Include="..\Public\EnergyDrink.h" />
@@ -276,6 +278,7 @@
     <ClInclude Include="..\Public\MultiEffect.h" />
     <ClInclude Include="..\Public\NonAnimDeco.h" />
     <ClInclude Include="..\Public\OrbitingCamera.h" />
+    <ClInclude Include="..\public\OriginalDee.h" />
     <ClInclude Include="..\Public\Particle.h" />
     <ClInclude Include="..\Public\PartTimeFood.h" />
     <ClInclude Include="..\Public\PartTimeHelper.h" />
@@ -302,6 +305,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\Public\Trigger.h" />
+    <ClInclude Include="..\Public\UI_PartTime.h" />
     <ClInclude Include="..\public\WaddleDee.h" />
     <ClInclude Include="..\Public\WasteCan.h" />
     <ClInclude Include="Client.h" />
@@ -345,6 +349,8 @@
     <ClCompile Include="..\Private\Character.cpp" />
     <ClCompile Include="..\Private\Coin.cpp" />
     <ClCompile Include="..\Private\CollisionCenter.cpp" />
+    <ClCompile Include="..\Private\DeeDeeDee.cpp" />
+    <ClCompile Include="..\Private\DeeDeeDee_State.cpp" />
     <ClCompile Include="..\private\Dee_Part.cpp" />
     <ClCompile Include="..\private\Dee_State.cpp" />
     <ClCompile Include="..\Private\EnergyDrink.cpp" />
@@ -413,6 +419,7 @@
     <ClCompile Include="..\Private\MultiEffect.cpp" />
     <ClCompile Include="..\Private\NonAnimDeco.cpp" />
     <ClCompile Include="..\Private\OrbitingCamera.cpp" />
+    <ClCompile Include="..\private\OriginalDee.cpp" />
     <ClCompile Include="..\Private\Particle.cpp" />
     <ClCompile Include="..\Private\PartTimeFood.cpp" />
     <ClCompile Include="..\Private\PartTimeHelper.cpp" />
@@ -439,6 +446,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\Private\Trigger.cpp" />
+    <ClCompile Include="..\Private\UI_PartTime.cpp" />
     <ClCompile Include="..\private\WaddleDee.cpp" />
     <ClCompile Include="..\Private\WasteCan.cpp" />
     <ClCompile Include="..\Public\KirbyBoom_State.cpp" />

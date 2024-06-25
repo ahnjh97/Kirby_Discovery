@@ -727,6 +727,10 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 
 	}
 	break;
+	case 4:
+		m_DestColorData = Find_ColorSet("Town");
+		m_fRimLightRatio.second = .7f;
+		break;
 	default:
 		m_DestColorData = Find_ColorSet("Tutorial");
 		break;

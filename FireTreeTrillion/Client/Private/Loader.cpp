@@ -75,8 +75,12 @@
 #include "CappyBody.h"
 #include "CappyHat.h"
 
+// 보스
+#include "DeeDeeDee.h"
+
 //와들디
 #include "Dee_Part.h"
+#include "OriginalDee.h"
 #include "FoodShopDee.h"
 #include "HungryDee.h"
 
@@ -100,7 +104,7 @@
 #include "BombOrbit.h"
 #include "BombOrbitGlow.h"
 #include "HUD_AbilityDiscard.h"
-
+#include "UI_PartTime.h"
 
 // 아이템
 #include "EnergyDrink.h"
@@ -265,9 +269,11 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_KirbyStatus"), CHUD_KirbyStatus);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_StarPoint"), CHUD_StarPoint);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_AbilityDiscard"), CHUD_AbilityDiscard);
-	// 
+
 	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_HPBoss"), CHUD_HPBoss);
 	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_Mission"), CHUD_Mission);
+	
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_PartTime"), CUI_PartTime);
 
 #pragma endregion
 	
@@ -300,7 +306,10 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeePart"), CDee_Part);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FoodShopDee"), CFoodShopDee);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HungryDee"), CHungryDee);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("OriginalDee"), COriginalDee);
 
+	//Boss
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeeDeeDee"), CDeeDeeDee);
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BackGround"), CBackGround);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
@@ -759,23 +768,77 @@ HRESULT CLoader::Loading_For_Parttime()
 	//마스크용
 	hr = Add_Texture(eLevel, "FX_Mask_Bubble2", "Effects/Mask/noise_bubble_%d.png", 4);	CHECK_FAILED(hr);
 
+
+#pragma region UI
+
+	// 와들디 주문 말풍선
+	hr = Add_Texture(eLevel, "OrderCloud",			"UI/MGameFood/OrderCloud.png");
+	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "ThinkingCloud",		"UI/MGameFood/ThinkingCloud.png");
+	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "tomato",				"UI/MGameFood/tomato.png");
+	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "burger",				"UI/MGameFood/burger.png");
+	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "cake",				"UI/MGameFood/cake.png");
+	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "energydrink",			"UI/MGameFood/energydrink.png");
+	CHECK_FAILED(hr);
+
+	// 타임 바
+	hr = Add_Texture(eLevel, "Clock_orig",			"UI/MGameFood/Clock_orig.png");
+	CHECK_FAILED(hr);
+
+	// 게임 마무리 UI
+	hr = Add_Texture(eLevel, "score_bar",			"UI/MGameFood/score bar.png");
+	CHECK_FAILED(hr);	
+	hr = Add_Texture(eLevel, "NewScoreBanner_bw",	"UI/MGameFood/new score banner_bw.png");
+	CHECK_FAILED(hr);
+
+#pragma endregion
+
 	// 얼굴, 눈 텍스쳐 로드
 	Add_KirbyFaceTexture(eLevel);
 
 #pragma endregion
 
 
+#pragma region UI
+
+	// 타임 바
+	hr = Add_Texture(eLevel, "GameFoodUI_BaseBar",			"UI/MGameFood/base bar.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_TimeBarBW",		"UI/MGameFood/time bar_bw.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_DeeBGBW",			"UI/MGameFood/dee bg_bw.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_Clock_Orig",		"UI/MGameFood/Clock_orig.png");
+
+	// 왼쪽 아래 점수판
+	hr = Add_Texture(eLevel, "GameFoodUI_ScoreBar",			"UI/MGameFood/score bar.png");
+	
+	// 와들디 안내 표정 
+	hr = Add_Texture(eLevel, "GameFoodUI_AngryDee",			"UI/MGameFood/angrydee.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_IdleDee",			"UI/MGameFood/idledee.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_SadDee",			"UI/MGameFood/saddee.png");
+
+	// 와들디 요구사항
+	hr = Add_Texture(eLevel, "GameFoodUI_OrderCloud",		"UI/MGameFood/OrderCloud.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_ThinkingCloud",	"UI/MGameFood/ThinkingCloud.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_cake",				"UI/MGameFood/cake.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_tomato",			"UI/MGameFood/tomato.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_energydrink",		"UI/MGameFood/energydrink.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_burger",			"UI/MGameFood/burger.png");
+
+#pragma endregion
+
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
-#pragma region 모델
+	#pragma region 모델
 	Load_AnimToolInfo();
 	// 모아놓은 Model 한번에 생성.
 	hr = Add_Models(eLevel);
 	CHECK_FAILED(hr);
 #pragma endregion
 
-
 	m_strLoadingText = TEXT("물리 컴포넌트(을) 로딩 중 입니다.");
-#pragma region 물리 컴포넌트
+	#pragma region 물리 컴포넌트
 	/* 리지드바디 */
 	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_RigidBody"), CRigidBody::Create(m_pDevice, m_pContext));
 	CHECK_FAILED(hr);
@@ -783,7 +846,6 @@ HRESULT CLoader::Loading_For_Parttime()
 	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_CharacterController"), CCharacterController::Create(m_pDevice, m_pContext));
 	CHECK_FAILED(hr);
 #pragma endregion
-
 
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 	m_IsFinished = true;
@@ -1079,7 +1141,16 @@ HRESULT CLoader::Add_FXTexture()
 	//잎
 	hr = Add_Texture(LEVEL_STATIC, "FX_BushCut", "Effects/Basic/BushColor_%d.png", 4);	CHECK_FAILED(hr);
 
-	return E_NOTIMPL;
+	//UI용
+	hr = Add_Texture(LEVEL_STATIC, "FX_Food_LunchTimeIcon", "Effects/UI/MGameFood/lunch time icon.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Food_LunchTimeBanner", "Effects/UI/MGameFood/lunch time banner.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Food_LunchTimeTypo", "UI/MGameFood/LunchType_%d.png", 6);	CHECK_FAILED(hr);
+
+	hr = Add_Texture(LEVEL_STATIC, "FX_Food_ResultTop", "Effects/UI/MGameFood/result top.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Food_ResultBottom", "Effects/UI/MGameFood/result bottom.png");	CHECK_FAILED(hr);
+
+
+	return S_OK;
 }
 
 // 여기다가 모든 Model을 셋업한다.
@@ -1179,6 +1250,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		//와들디
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
+
+		// Boss
+		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 180.f);
 
 		// For Map Interactive Object
 		m_vecModelInfo.emplace_back("GsPebble", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
@@ -1474,17 +1548,22 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
 
 		// For Monster
-		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("Rabbit", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("Buffahorn", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("BladeKnight", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.f, 0.f);
+		m_vecModelInfo.emplace_back("Rabbit", TYPE_ANIM, 1.f, 0.f);
+		m_vecModelInfo.emplace_back("Buffahorn", TYPE_ANIM, 1.f, 0.f);
+		m_vecModelInfo.emplace_back("BladeKnight", TYPE_ANIM, 1.f, 0.f);
 		m_vecModelInfo.emplace_back("BladeKnightSword", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("Kabu", TYPE_ANIM, 2.f, 180.f);
-		m_vecModelInfo.emplace_back("BrontoBurt", TYPE_ANIM, 2.f, 180.f);
-		m_vecModelInfo.emplace_back("PoppyBrosJr", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_ANIM, 1.3f, 180.f);
+		m_vecModelInfo.emplace_back("Kabu", TYPE_ANIM, 2.f, 0.f);
+		m_vecModelInfo.emplace_back("BrontoBurt", TYPE_ANIM, 2.f, 0.f);
+		m_vecModelInfo.emplace_back("PoppyBrosJr", TYPE_ANIM, 1.f, 0.f);
+		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_ANIM, 1.3f, 0.f);
 
 		//와들디
+		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 0.f);
+
+		// Boss
+		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 0.f);
+
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
 		m_vecModelInfo.emplace_back("WaddleDeeHungry", TYPE_ANIM, 1.1f, 180.f);
 	}
@@ -1694,7 +1773,7 @@ void CLoader::Load_AnimToolInfo()
 					{
 						_float animSpeed;
 						pAnimSpeedElement->QueryFloatText(&animSpeed);
-						animInfo.fAnimSpeed = animSpeed;
+						animInfo.fAnimSpeed = 60.f;// animSpeed;
 					}
 
 					// Count 값 읽기

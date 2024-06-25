@@ -33,6 +33,11 @@ void CDee_State::Setup_BaseInfo(BASE_INFO& _baseInfo, CGameObject* pGameObject)
 	_baseInfo.fDistance = (_baseInfo.vMyPos - _baseInfo.vKirbyPos).Length();
 
 }
+void CDee_State::System_Tick(_float fTimeDelta)
+{
+	m_fDuration += fTimeDelta;
+}
+
 #pragma endregion
 
 #pragma region IDLE STATE
@@ -55,23 +60,6 @@ void CDee_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 
 	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta);
 
-	//가까이 있으면 반가워해준다~
-	//용건 있을 때 웃는 걸로 변경해야해
-	if (baseInfo.fDistance < 10.f && !baseInfo.pDee->GetHiToKirby())
-	{
-		baseInfo.pDee->Set_DeeEyeState(DEEEYE_SMILE);
-		baseInfo.pDee->SetHiToKirby(true);
-		baseInfo.pDee->Change_State(DEEANIM_CLERKWAVEHAND, 60.f, false, true);
-	}
-
-
-	//참 가까이 접근했고, 버튼 누르면 대화 시작
-	//이것도 용건 있을 때 웃는 걸로 변경해야해
-	if (baseInfo.pDee->IsCloseToKirby() && m_pGameInstance->Get_KeyState(DIK_C, KEY_DOWN))
-	{
-		baseInfo.pDee->Set_DeeEyeState(DEEEYE_SMILE);
-		baseInfo.pDee->Change_State(DEEANIM_TALK1, 60.f, false, true);
-	}
 
 }
 
@@ -92,7 +80,7 @@ void CDee_Idle_State::Free()
 
 #pragma endregion
 
-#pragma region WALK STATE
+#pragma region MOVE STATE
 //*********************************
 //			 WALK STATE
 //*********************************
@@ -111,7 +99,16 @@ void CDee_Move_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	Setup_BaseInfo(baseInfo, pGameObject);
 
 	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta);
+	baseInfo.pTransformCom->Turn({ 0.f, 1.f, 0.f, 1.f }, fTimeDelta * .3f);
 
+	//_float fDist = (XZVec(pHungryDee->Get_DestWaitingPos()) - XZVec(baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION))).Length();
+	//fDist = (fDist < 1.f) ? fDist * 3.f : 4.f;
+
+
+	_float fSpeed =
+		baseInfo.pDee->Get_State() == DEEANIM_WALK ? 3.f : 1.f;
+
+	baseInfo.pController->Move_Dir(baseInfo.pTransformCom, baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta * fSpeed, fTimeDelta);
 }
 
 void CDee_Move_State::OnStateExit()
@@ -157,7 +154,7 @@ void CDee_Emotion_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	{
 		//인사하는 거였으면 눈 바꾸고 다시 idle로 돌아가
 		baseInfo.pDee->Set_DeeEyeState(DEEEYE_IDLE);
-		baseInfo.pDee->Change_State(DEEANIM_WAIT, 60.f, true, true);
+		baseInfo.pDee->Change_State(DEEANIM_LOOKAROUND, 60.f, true, true);
 	}
 
 }
@@ -198,6 +195,8 @@ void CDee_Hungry_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 {
 	BASE_INFO baseInfo{};
 	Setup_BaseInfo(baseInfo, pGameObject);
+	System_Tick(fTimeDelta);
+
 	CHungryDee* pHungryDee = static_cast<CHungryDee*>(pGameObject);
 
 	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta);
@@ -301,6 +300,7 @@ void CDee_Hungry_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 	break;
 #pragma endregion
 
+#pragma region 맞춤
 	case DEESHOPANIM_CLERKCORRECT:
 	{
 		if (baseInfo.pDee->IsAnimFinished())
@@ -310,9 +310,12 @@ void CDee_Hungry_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 		}
 	}
 	break;
+#pragma endregion
+
+#pragma region 맞춘 뒤 움직임
 	case DEESHOPANIM_CORRECTMOVE:
 	{
-		m_fDuration += fTimeDelta;
+		
 		if (.1f < m_fDuration)
 			pHungryDee->Set_RenderPartObj(true);
 
@@ -326,12 +329,18 @@ void CDee_Hungry_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 		baseInfo.pController->Move_Dir(baseInfo.pTransformCom, baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta * fDist, fTimeDelta);
 	}
 	break;
+#pragma endregion
+
+#pragma region 틀림
 	case DEESHOPANIM_INCORRECT:
 	{
 		if (baseInfo.pDee->IsAnimFinished())
 			pHungryDee->Change_State((DEE_ANIM)DEESHOPANIM_INCORRECTMOVE, 60.f, true, true);
 	}
 	break;
+#pragma endregion
+
+#pragma region 틀린 후 움직임
 	case DEESHOPANIM_INCORRECTMOVE:
 	{
 		_float3 vDir = pHungryDee->Get_DestWaitingPos() - baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION);
@@ -344,6 +353,7 @@ void CDee_Hungry_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 		baseInfo.pController->Move_Dir(baseInfo.pTransformCom, baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta * fDist, fTimeDelta);
 	}
 	break;
+#pragma endregion
 
 	default:
 		break;
@@ -405,3 +415,96 @@ void CDee_Stun_State::Free()
 
 #pragma endregion
 
+#pragma region NPC STATE
+CDee_NPC_State::CDee_NPC_State()
+{
+}
+
+void CDee_NPC_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+}
+
+void CDee_NPC_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	BASE_INFO baseInfo{};
+	Setup_BaseInfo(baseInfo, pGameObject);
+
+	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta);
+
+	//가까이 있으면 반가워해준다~
+	//용건 있을 때 웃는 걸로 변경해야해
+	if (baseInfo.fDistance < 10.f && !baseInfo.pDee->GetHiToKirby())
+	{
+		baseInfo.pDee->Set_DeeEyeState(DEEEYE_SMILE);
+		baseInfo.pDee->SetHiToKirby(true);
+		baseInfo.pDee->Change_State(DEEANIM_CLERKWAVEHAND, 60.f, false, true);
+	}
+
+
+	//참 가까이 접근했고, 버튼 누르면 대화 시작
+	//이것도 용건 있을 때 웃는 걸로 변경해야해
+	if (baseInfo.pDee->IsCloseToKirby() && m_pGameInstance->Get_KeyState(DIK_C, KEY_DOWN))
+	{
+		baseInfo.pDee->Set_DeeEyeState(DEEEYE_SMILE);
+		baseInfo.pDee->Change_State(DEEANIM_CLERKTALK, 60.f, false, true);
+	}
+
+	if (baseInfo.pDee->IsAnimFinished())
+	{
+		//인사하는 거였으면 눈 바꾸고 다시 idle로 돌아가
+		baseInfo.pDee->Set_DeeEyeState(DEEEYE_IDLE);
+		baseInfo.pDee->Change_State(DEEANIM_LOOKAROUND, 60.f, true, true);
+	}
+}
+
+void CDee_NPC_State::OnStateExit()
+{
+}
+
+CDee_NPC_State* CDee_NPC_State::Create()
+{
+	CDee_NPC_State* pInstance = new CDee_NPC_State();
+	return pInstance;
+}
+
+void CDee_NPC_State::Free()
+{
+	__super::Free();
+}
+
+#pragma endregion
+
+#pragma region SLEEP STATE
+CDee_Sleep_State::CDee_Sleep_State()
+{
+}
+
+void CDee_Sleep_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+}
+
+void CDee_Sleep_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	BASE_INFO baseInfo{};
+	Setup_BaseInfo(baseInfo, pGameObject);
+
+	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta);
+}
+
+void CDee_Sleep_State::OnStateExit()
+{
+}
+
+CDee_Sleep_State* CDee_Sleep_State::Create()
+{
+	CDee_Sleep_State* pInstance = new CDee_Sleep_State();
+	return pInstance;
+}
+
+void CDee_Sleep_State::Free()
+{
+	__super::Free();
+}
+#pragma endregion

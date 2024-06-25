@@ -26,7 +26,6 @@ HRESULT CPartTimeFood::Initialize(void* pArg)
 	m_pBoneMatrix =  pFoodDesc->pBoneMatrix;
 	m_bRender =  pFoodDesc->bRender;
 	m_eItem =  (PARTTIME_ITEM)pFoodDesc->uItem;
-
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
@@ -34,6 +33,7 @@ HRESULT CPartTimeFood::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
+	m_vOriginPos = GET_POS;
 	return S_OK;
 }
 

@@ -10,6 +10,8 @@ CEffect::CEffect(const CEffect& rhs)
 {
 }
 
+
+
 HRESULT CEffect::Initialize(void* pArg)
 {
     FX_DESC effectDesc{};
@@ -148,6 +150,17 @@ void CEffect::Delete_Keyframe(KF_PROPERTY eProperty, _uint iKeyframeIdx)
     m_iCurKeyframeIdxs[eProperty] = 0;
 }
 
+void CEffect::Add_RenderGroup()
+{
+    if (m_bIsBillboard)
+        Billboard_Effect();
+
+    if ((CRenderer::RENDERGROUP)m_eRenderGroup != CRenderer::RENDER_END)
+        m_pGameInstance->Add_RenderGroup((CRenderer::RENDERGROUP)m_eRenderGroup, this);
+
+    if (m_bIsBloom)
+        m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
+}
 
 _bool CEffect::Update_Duration(_float fTimeDelta)
 {
