@@ -201,14 +201,18 @@ void CDee_Hungry_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 
 	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta);
 
+	//목표 지점과의 거리 차이를 구하여 속도 정하기
+	_float fSpeed = (XZVec(pHungryDee->Get_DestWaitingPos()) - XZVec(baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION))).Length();
+	fSpeed = (fSpeed < 1.f) ? fSpeed * 3.f : 4.f;
+
 	switch (baseInfo.pDee->Get_State())
 	{
 
 #pragma region 대기
-	//기본 대기 상태
+		//기본 대기 상태
 	case DEESHOPANIM_GUESTNORMAL:
 	{
-		baseInfo.pTransformCom->Look_At_Interpolate( baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION) + _float4{0.f, 0.f, 1.f, 0.f}, fTimeDelta * 4.f);
+		baseInfo.pTransformCom->Look_At_Interpolate(baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION) + _float4{ 0.f, 0.f, 1.f, 0.f }, fTimeDelta * 4.f);
 
 		//내가 기다려야 할 위치를 넘어서면 이동
 		if (.5f < _float3{ XZVec(pHungryDee->Get_DestWaitingPos()) - XZVec(baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION)) }.Length())
@@ -274,7 +278,7 @@ void CDee_Hungry_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 
 #pragma endregion
 
-#pragma region 걷기
+#pragma region 이동 처리
 	//기본 워킹 상태
 	case DEESHOPANIM_WALK:
 	{
@@ -282,10 +286,38 @@ void CDee_Hungry_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 		vDir.Normalize();
 		baseInfo.pTransformCom->Look_At_Interpolate(pHungryDee->Get_DestWaitingPos(), fTimeDelta * 2.f);
 
+
+		baseInfo.pController->Move_Dir(baseInfo.pTransformCom, baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta * fSpeed, fTimeDelta);
+
+		//다다르면 다시 웨이팅
+		if (_float3{ XZVec(pHungryDee->Get_DestWaitingPos()) - XZVec(baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION)) }.Length() < .5f)
+		{
+			pHungryDee->Change_State(pHungryDee->IsFrontWaiting() ? (DEE_ANIM)DEESHOPANIM_ORDERNORMAL : (DEE_ANIM)DEESHOPANIM_GUESTNORMAL, CUtils::Make_RandomFloat(50.f, 60.f), true, true);
+
+			CUtils::Make_RandomInt(0, 2) == 2 ?
+				baseInfo.pDee->Set_DeeEyeState(DEEEYE_SMILE) :
+				baseInfo.pDee->Set_DeeEyeState(DEEEYE_IDLE);
+		}
+	}
+	break;
+	case DEESHOPANIM_RUN:
+	{
+		if (0.f < m_fStartMoveDelay)
+		{
+			m_fStartMoveDelay -= fTimeDelta;
+			if (m_fStartMoveDelay < 0.f)
+				m_fStartMoveDelay = 0.f;
+			break;
+		}
+
+		_float3 vDir = pHungryDee->Get_DestWaitingPos() - baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION);
+		vDir.Normalize();
+		baseInfo.pTransformCom->Look_At_Interpolate(pHungryDee->Get_DestWaitingPos(), fTimeDelta * 2.f);
+
 		_float fDist = (XZVec(pHungryDee->Get_DestWaitingPos()) - XZVec(baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION))).Length();
 		fDist = (fDist < 1.f) ? fDist * 3.f : 4.f;
 
-		baseInfo.pController->Move_Dir(baseInfo.pTransformCom, baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta * fDist, fTimeDelta);
+		baseInfo.pController->Move_Dir(baseInfo.pTransformCom, baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta * fSpeed * 2.f, fTimeDelta);
 
 		//다다르면 다시 웨이팅
 		if (_float3{ XZVec(pHungryDee->Get_DestWaitingPos()) - XZVec(baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION)) }.Length() < .5f)
@@ -315,7 +347,7 @@ void CDee_Hungry_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 #pragma region 맞춘 뒤 움직임
 	case DEESHOPANIM_CORRECTMOVE:
 	{
-		
+
 		if (.1f < m_fDuration)
 			pHungryDee->Set_RenderPartObj(true);
 

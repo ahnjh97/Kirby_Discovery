@@ -49,7 +49,7 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 
 	if (*m_pCurrentLevelID == LEVEL_PARTTIME)
 	{
-		Lock_Camera({ 16.f, 26.f, 35.7f }, { .14f, -.2f, -1.f }, 43.f);
+		Lock_Camera({ 16.4f, 25.7f, 35.75f }, { .16f, -.08f, -1.f }, 38.f);
 	}
 
 	return S_OK;
