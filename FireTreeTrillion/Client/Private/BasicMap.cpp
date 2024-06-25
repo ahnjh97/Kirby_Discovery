@@ -37,8 +37,8 @@ HRESULT CBasicMap::Initialize(void* pArg)
     wstring wstrModelTag = GameObjectDesc.wstrModelName;
 
 
-    if (wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("Land_VcLabo") && wstrModelTag != TEXT("TownShop")
-        && wstrModelTag.substr(wstrModelTag.length() - 5) == TEXT("Blend"))
+    if (wstrModelTag != TEXT("Town")        && wstrModelTag != TEXT("DeeDeeDee") && wstrModelTag != TEXT("Land_LbLastBossBeforeStep") && 
+        wstrModelTag != TEXT("Land_VcLabo") && wstrModelTag != TEXT("TownShop")  && wstrModelTag.substr(wstrModelTag.length() - 5) == TEXT("Blend"))
     {
         m_bBlendMap = true;
         m_eRenderGroup = CRenderer::RENDER_BLEND;
@@ -53,8 +53,8 @@ HRESULT CBasicMap::Initialize(void* pArg)
     , "g_bStencil", "g_bRimLight", "m_fRimWidth", "g_bMotionBlur", "g_BoneMatrices" };
     m_vecStencilRimLightMotionBlurNames = { "g_bStencil", "g_bRimLight", "m_fRimWidth", "g_bMotionBlur" };
 
-    if(wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("Land_VcLabo") && wstrModelTag != TEXT("TownShop")
-        && false == m_bBlendMap)
+    if(wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("DeeDeeDee") && wstrModelTag != TEXT("Land_VcLabo") &&
+       wstrModelTag != TEXT("Land_LbLastBossBeforeStep") && wstrModelTag != TEXT("TownShop") && false == m_bBlendMap)
     {
         if (true == CheckIfBlendMapExists(GameObjectDesc.wstrModelName)) {
             if (FAILED(Add_BlendMap(wstrModelTag)))
@@ -494,6 +494,8 @@ void CBasicMap::ReadDecos_ForSmallLevels()
     string strLevel;
     if (LEVEL_TOWN == *m_pCurrentLevelID)
         strLevel = "Town";
+    else if(LEVEL_DEEDEEDEE == *m_pCurrentLevelID)
+        strLevel = "DeeDeeDee";
     else if (LEVEL_PARTTIME == *m_pCurrentLevelID)
         strLevel = "PartTime";
     else if (LEVEL_FINALBOSS == *m_pCurrentLevelID)
@@ -535,7 +537,7 @@ void CBasicMap::ReadDecos_ForSmallLevels()
 
         TYPE eType = TYPE_NONANIM;
         string strFolder;
-        if (LEVEL_TOWN == *m_pCurrentLevelID || LEVEL_PARTTIME == *m_pCurrentLevelID)
+        if (LEVEL_TOWN == *m_pCurrentLevelID || LEVEL_PARTTIME == *m_pCurrentLevelID || LEVEL_DEEDEEDEE == *m_pCurrentLevelID)
             strFolder = string("TownDeco/");
         else if (LEVEL_FINALBOSS == *m_pCurrentLevelID)
             strFolder = string("LabDiscovera_Deco/");

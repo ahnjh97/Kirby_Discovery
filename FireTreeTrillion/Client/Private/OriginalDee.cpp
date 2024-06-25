@@ -35,14 +35,16 @@ HRESULT COriginalDee::Initialize(void* pArg)
 	hr = __super::Initialize(pArg);
 	CHECK_FAILED(hr);
 
+
+	//m_pTransformCom->Rotation(_float3{ 0.f, 1.f, 0.f }, ToRadian(180.f));
+
 	hr = Add_Components();
 	CHECK_FAILED(hr);
-
 
 	hr = Add_PartObjects();
 	CHECK_FAILED(hr);
 
-	m_pTransformCom->Rotation(_float3{ 0.f, 1.f, 0.f }, ToRadian(180.f));
+	//m_pModelCom->Set_Animation(DEEANIM_ENEMYWALK, 70.f, true, true);
 	m_pModelCom->Set_Animation(DEEANIM_WAIT, 60.f, true, true);
 
 	return S_OK;
@@ -182,7 +184,7 @@ HRESULT COriginalDee::Add_Components()
 	hr = m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox);
 	CHECK_FAILED(hr);
 
-	Set_BodyCollider(COLLIDER_CYLINDER, 0.6f, 1.2f, 5.f);
+	Set_BodyCollider(COLLIDER_CYLINDER, 0.6f, 1.2f, 1.2f);
 
 	SetUp_FSM();
 
@@ -191,7 +193,7 @@ HRESULT COriginalDee::Add_Components()
 
 HRESULT COriginalDee::Add_PartObjects()
 {
-	if (*m_pCurrentLevelID != LEVEL_TOWN && *m_pCurrentLevelID != LEVEL_PARTTIME)
+	/*if (*m_pCurrentLevelID != LEVEL_TOWN && *m_pCurrentLevelID != LEVEL_PARTTIME)
 		return S_OK;
 
 	CPartObject* pPartObj = { nullptr };
@@ -207,7 +209,7 @@ HRESULT COriginalDee::Add_PartObjects()
 	if (nullptr == pPartObj)
 		return E_FAIL;
 
-	m_PartObjects.emplace(TEXT("Part_Weapon"), pPartObj);
+	m_PartObjects.emplace(TEXT("Part_Weapon"), pPartObj);*/
 
 	return S_OK;
 }
@@ -246,6 +248,19 @@ HRESULT COriginalDee::Bind_ShaderResources()
 void COriginalDee::SetUp_FSM()
 {
 	m_pFSM = CFSM::Create();
+
+	m_pFSM->Add_State(DEEANIM_WAIT, CDee_Idle_State::Create());
+
+	m_pFSM->Add_State(DEEANIM_WALK, CDee_Move_State::Create());
+	m_pFSM->Add_State(DEEANIM_ENEMYWALK, CDee_Move_State::Create());
+
+	m_pFSM->Add_State(DEEANIM_TALK1, CDee_Emotion_State::Create());
+	m_pFSM->Add_State(DEEANIM_TALK2, CDee_Emotion_State::Create());
+	m_pFSM->Add_State(DEEANIM_TALK3A, CDee_Emotion_State::Create());
+	m_pFSM->Add_State(DEEANIM_TALK3B, CDee_Emotion_State::Create());
+
+	m_pFSM->Add_State(DEEANIM_ANGER, CDee_Emotion_State::Create());
+
 
 	CFSM::FSM_INFO	FSMDesc = {};
 	FSMDesc.iState = DEEANIM_WAIT;

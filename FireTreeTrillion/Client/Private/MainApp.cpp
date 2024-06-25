@@ -104,6 +104,11 @@ void CMainApp::Tick(_float fTimeDelta)
 			if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_FINALBOSS))))
 				return;
 		}
+		if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_W, KEY_DOWN))
+		{
+			if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_DEEDEEDEE))))
+				return;
+		}
 	}
 
 	CCollisionCenter::Get_Instance()->Collision_Tick(fTimeDelta);

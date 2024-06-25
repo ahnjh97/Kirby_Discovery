@@ -64,6 +64,7 @@ HRESULT CLevel_Town::Initialize()
 	//	return E_FAIL;
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
+	m_pGameInstance->Set_ColorSet_ByIndex(4);
 
 	return S_OK;
 }
@@ -396,25 +397,107 @@ HRESULT CLevel_Town::Ready_Dees()
 	if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NPC"), TEXT("Prototype_GameObject_FoodShopDee"), &ObjDesc)))
 		return E_FAIL;
 
-	/*
-	CHungryDee::HUNGRYDEE_DESC HungryDeeDesc{};
-	HungryDeeDesc.fSpeedPerSec = 5.f;
-	HungryDeeDesc.fRotationPerSec = ToRadian(90.f);
+
+	CWaddleDee::DEE_DESC DeeDesc{};
+	DeeDesc.fSpeedPerSec = 5.f;
+	DeeDesc.fRotationPerSec = ToRadian(90.f);
 	InitMat = _float4x4::Identity;
-	InitMat.Translation({ 15.2f, 24.7f, 26.f });
-	HungryDeeDesc.matWorld = InitMat;
+	//InitMat.Translation({ 15.2f + CUtils::Make_RandomFloat(-5.f, 5.f), 27.f, 26.f + CUtils::Make_RandomFloat(-5.f, 5.f) });
+	InitMat.Translation({ 15.2f , 27.f, 26.f });
+	DeeDesc.matWorld = InitMat;
 
-	for (_int i = 0; i < 12; ++i)
+	//for (_int i = 0; i < 12; ++i)
+	//{
+	if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NPC"), TEXT("Prototype_GameObject_OriginalDee"), &DeeDesc)))
+		return E_FAIL;
+	//}
+
+
+
+	string strFileName = "../../../objects_txt/Town_Monsters.txt";
+
+	ifstream fileInput(strFileName, ios::binary);
+	if (fileInput.is_open() == false)
 	{
-		HungryDeeDesc.iIdx = i;
-
-		if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NPC"), TEXT("Prototype_GameObject_HungryDee"), &HungryDeeDesc)))
-			return E_FAIL;
+		MSG_BOX(TEXT("Failed to open : Town_Monsters.txt"));
+		return E_FAIL;
 	}
-	*/
+
+	_uint iNumObjects{};
+	fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
+
+	_uint iStrLength{};
+	string strModelName;
+	_float4x4 matWorld{};
+	_uint iShaderVars{};
+	_float fRimWidth{};
+	_int iTriggerIndex{};
+	_uint iNumRallyPoints{};
+	vector<_float4> vecRallyPoints;
+	wstring wstrGameObjectTag;
+
+
+	for (_uint i = 0; i < iNumObjects; i++)
+	{
+		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
+		strModelName.resize(iStrLength);
+		fileInput.read(&strModelName[0], iStrLength);
+		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
+		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
+		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
+
+		fileInput.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
+		fileInput.read(reinterpret_cast<char*>(&iNumRallyPoints), sizeof(iNumRallyPoints));
+
+		vecRallyPoints.clear();
+		_float3 vRallyPointPos{};
+		for (_uint iRallyPointIdx = 0; iRallyPointIdx < iNumRallyPoints; iRallyPointIdx++)
+		{
+			fileInput.read(reinterpret_cast<char*>(&vRallyPointPos), sizeof(vRallyPointPos));
+			vecRallyPoints.push_back(_float4(vRallyPointPos.x, vRallyPointPos.y, vRallyPointPos.z, 1));
+		}
+
+		CGameObject::GAMEOBJECT_DESC tempDesc = {};
+		tempDesc.matWorld = matWorld;
+		tempDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+		tempDesc.iShaderVars = iShaderVars;
+		tempDesc.fRimWidth = fRimWidth;
+		if (strModelName.size() >= 8) { // NonAnim_ 부분 지우기
+			if ("NonAnim" == strModelName.substr(0, 7))
+				tempDesc.wstrModelName.erase(0, 8);
+		}
+
+
+		if (L"WaddleDee" == tempDesc.wstrModelName)
+		{
+			CWaddleDee::DEE_DESC DeeDesc = {};
+			DeeDesc.matWorld = matWorld;
+			DeeDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			DeeDesc.iShaderVars = iShaderVars;
+			DeeDesc.fRimWidth = fRimWidth;
+
+			//원래 인덱스를 넘어가면 맨 마지막 놈으로다가 매치
+			DeeDesc.eCharacter =
+				(DEECHARACTER_END - 1) < (DEE_CHARACTER)iTriggerIndex ?
+				DEECHARACTER_SLEEPY : (DEE_CHARACTER)iTriggerIndex;
+
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Dee"), TEXT("Prototype_GameObject_OriginalDee"), &DeeDesc)))
+				return E_FAIL;
+		}
+	}
+
+
+
+	return S_OK;
+}
+
+HRESULT CLevel_Town::Ready_Monsters()
+{
+
+	LEVEL eLevel = LEVEL_TOWN;
 
 	//일단 마을에는 몬스터가 없어요
-
+	//하지만 넣어 봤어요
 	string strFileName = "../../../objects_txt/Town_Monsters.txt";
 
 	ifstream fileInput(strFileName, ios::binary);
@@ -542,7 +625,6 @@ HRESULT CLevel_Town::Ready_Dees()
 	}
 
 	fileInput.close();
-
 
 	return S_OK;
 }

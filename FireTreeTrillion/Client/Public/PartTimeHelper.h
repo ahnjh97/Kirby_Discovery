@@ -28,6 +28,7 @@ public:
 	PARTTIME_ITEM		Get_PartTimeItem() const { return m_eFood; }
 
 	void				NotifyObserver();
+	void				HandleGame(_uint uContent);
 
 private:
 	class CHungryDee*		m_pHungryDee = nullptr;

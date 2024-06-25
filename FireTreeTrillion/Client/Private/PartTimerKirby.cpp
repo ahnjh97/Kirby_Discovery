@@ -57,6 +57,8 @@ HRESULT CPartTimerKirby::Initialize(void* pArg)
 	if (FAILED(Make_TargetToCams()))
 		return E_FAIL;
 
+	CPartTimeHelper::Get_Instance()->Register_PartTimerKirby(this);
+
 	return S_OK;
 }
 

@@ -127,6 +127,7 @@ private:
 	unordered_set<string>	m_setActorDecos;
 	unordered_set<string>	m_setKickables;
 	unordered_set<string>	m_setTrees;
+	unordered_set<string>	m_setNeedBlendDecos; //투명도 적용이 필요한 데코오브젝트
 
 	unordered_set<string>	m_setTownDecoTxts;
 	unordered_set<string>	m_setLabDecoTxts;

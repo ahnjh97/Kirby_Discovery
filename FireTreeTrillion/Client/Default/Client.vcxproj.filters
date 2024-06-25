@@ -13,12 +13,6 @@
     <Filter Include="98.Default">
       <UniqueIdentifier>{00a0e8fc-8926-4877-aa3c-b6cc3ff3f072}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Levels\Loading">
-      <UniqueIdentifier>{783aa7d0-e4a9-47f3-b857-f5b824dad2b8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Levels\Logo">
-      <UniqueIdentifier>{7fa67ac9-2f2d-435f-bf35-849f5cbedd3c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects">
       <UniqueIdentifier>{c4cae272-dd94-43ce-85e6-ecc0b24de4d0}</UniqueIdentifier>
     </Filter>
@@ -55,20 +49,8 @@
     <Filter Include="02.GameObjects\Effect\Multi">
       <UniqueIdentifier>{f34649b7-f041-4be5-b519-7d313325d15a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Levels\Tool">
-      <UniqueIdentifier>{2fc1b856-3420-4c6b-b1c3-8a2ae73c0d25}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Levels\Tool\FX">
-      <UniqueIdentifier>{c638ed01-7d46-4dd2-914f-ebbb16bb731b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Levels\Tool\UI">
-      <UniqueIdentifier>{41f938d7-08df-4edb-8b73-7f075bf755d5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Map">
       <UniqueIdentifier>{310eaee8-bc9b-4061-8a3b-1befbaed5f82}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Levels\Tool\Animation">
-      <UniqueIdentifier>{a8ee8959-bf9d-4e0f-8c0f-ec7ddd715597}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Map\MapToolHelper">
       <UniqueIdentifier>{c90caebe-5408-4ed1-a218-a7692bde4a30}</UniqueIdentifier>
@@ -81,9 +63,6 @@
     </Filter>
     <Filter Include="02.GameObjects\Map\BasicMap">
       <UniqueIdentifier>{046c4db6-6d91-4eef-8c46-3e1b7fdc2bcc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Levels\Tool\Map">
-      <UniqueIdentifier>{d2b0c25b-ae5a-4a5a-ab39-0b70b268bcd1}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Effect\Particle">
       <UniqueIdentifier>{4be92289-d2a7-44f3-bc64-a36e82d6590f}</UniqueIdentifier>
@@ -202,9 +181,6 @@
     <Filter Include="02.GameObjects\Map\BG">
       <UniqueIdentifier>{28a5f192-89d1-46d7-bf46-1aafeee88d03}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Levels\Intro">
-      <UniqueIdentifier>{892828e4-f620-440a-8c8b-727c32537a71}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Levels\Logo">
       <UniqueIdentifier>{7fa67ac9-2f2d-435f-bf35-849f5cbedd3c}</UniqueIdentifier>
     </Filter>
@@ -292,12 +268,6 @@
     <Filter Include="02.GameObjects\UI\HUD\StarPoint">
       <UniqueIdentifier>{3aabc030-21c4-42d9-b31a-7b69ff957777}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Levels\GamePlay">
-      <UniqueIdentifier>{4547c314-4c9e-474f-bf8e-dd8eb6143161}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Levels\Town">
-      <UniqueIdentifier>{235eccae-385e-4844-8a46-caf8091cd645}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword\State">
       <UniqueIdentifier>{c3509440-bbe1-439c-b743-a205693e77b6}</UniqueIdentifier>
     </Filter>
@@ -319,14 +289,8 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop">
       <UniqueIdentifier>{4c6be733-c7c6-40fb-ba47-92d5f18bf7f9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Levels\PartTime">
-      <UniqueIdentifier>{ce0fcbcb-4978-4d71-b5ac-464c5d2c038d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Levels\_Loader">
       <UniqueIdentifier>{2433d7e5-8e5b-4e5a-9e6b-265a49b4604a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Levels\Racing">
-      <UniqueIdentifier>{737fc96b-c550-4a4f-a027-697453f18b10}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Map\BreakableRock">
       <UniqueIdentifier>{1804a8b8-0c68-4296-836c-c88b4878fba8}</UniqueIdentifier>
@@ -375,8 +339,44 @@
     <Filter Include="02.GameObjects\Map\CarShopWall">
       <UniqueIdentifier>{22f62060-413c-4957-94a1-99647cd7b478}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Map\BlendMapObject">
-      <UniqueIdentifier>{725d6eba-2a30-4d32-bdc1-2b243823ba5f}</UniqueIdentifier>
+    <Filter Include="01.Levels\_Loading">
+      <UniqueIdentifier>{783aa7d0-e4a9-47f3-b857-f5b824dad2b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\99. GamePlay">
+      <UniqueIdentifier>{4547c314-4c9e-474f-bf8e-dd8eb6143161}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\99. Tool">
+      <UniqueIdentifier>{2fc1b856-3420-4c6b-b1c3-8a2ae73c0d25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\99. Tool\FX">
+      <UniqueIdentifier>{c638ed01-7d46-4dd2-914f-ebbb16bb731b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\99. Tool\UI">
+      <UniqueIdentifier>{41f938d7-08df-4edb-8b73-7f075bf755d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\99. Tool\Animation">
+      <UniqueIdentifier>{a8ee8959-bf9d-4e0f-8c0f-ec7ddd715597}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\99. Tool\Map">
+      <UniqueIdentifier>{d2b0c25b-ae5a-4a5a-ab39-0b70b268bcd1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\0. Logo">
+      <UniqueIdentifier>{7fa67ac9-2f2d-435f-bf35-849f5cbedd3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\1. Intro">
+      <UniqueIdentifier>{892828e4-f620-440a-8c8b-727c32537a71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\3. DeeDeeDee">
+      <UniqueIdentifier>{7f69ed25-3d3a-41b0-b80b-4f378170660c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\2. Racing">
+      <UniqueIdentifier>{737fc96b-c550-4a4f-a027-697453f18b10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\4. Town">
+      <UniqueIdentifier>{235eccae-385e-4844-8a46-caf8091cd645}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\4-1. PartTime">
+      <UniqueIdentifier>{ce0fcbcb-4978-4d71-b5ac-464c5d2c038d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -399,10 +399,10 @@
       <Filter>00.MainApp</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Loading.h">
-      <Filter>01.Levels\Loading</Filter>
+      <Filter>01.Levels\_Loading</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Logo.h">
-      <Filter>01.Levels\Logo</Filter>
+      <Filter>01.Levels\0. Logo</Filter>
     </ClInclude>
     <ClInclude Include="..\public\BackGround.h">
       <Filter>02.GameObjects\UI\BackGround</Filter>
@@ -423,10 +423,10 @@
       <Filter>02.GameObjects\Map\Terrain</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Tool_UI.h">
-      <Filter>01.Levels\Tool\UI</Filter>
+      <Filter>01.Levels\99. Tool\UI</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Tool_FX.h">
-      <Filter>01.Levels\Tool\FX</Filter>
+      <Filter>01.Levels\99. Tool\FX</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Editor_UI.h">
       <Filter>02.GameObjects\UI\Editor</Filter>
@@ -471,10 +471,10 @@
       <Filter>02.GameObjects\Map\BasicMap</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Tool_Map.h">
-      <Filter>01.Levels\Tool\Map</Filter>
+      <Filter>01.Levels\99. Tool\Map</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Tool_Anim.h">
-      <Filter>01.Levels\Tool\Animation</Filter>
+      <Filter>01.Levels\99. Tool\Animation</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Awoofy_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\Awoofy\State</Filter>
@@ -582,7 +582,7 @@
       <Filter>02.GameObjects\Map\BG</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Intro.h">
-      <Filter>01.Levels\Intro</Filter>
+      <Filter>01.Levels\1. Intro</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\KirbyBoom_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyBoom_State</Filter>
@@ -675,10 +675,10 @@
       <Filter>02.GameObjects\UI\HUD</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_GamePlay.h">
-      <Filter>01.Levels\GamePlay</Filter>
+      <Filter>01.Levels\99. GamePlay</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Level_Town.h">
-      <Filter>01.Levels\Town</Filter>
+      <Filter>01.Levels\4. Town</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\KirbyCar_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyCar_State</Filter>
@@ -696,7 +696,7 @@
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_PartTime.h">
-      <Filter>01.Levels\PartTime</Filter>
+      <Filter>01.Levels\4-1. PartTime</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\PartTimerKirby_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\PartTimerKirby\State</Filter>
@@ -705,7 +705,7 @@
       <Filter>01.Levels\_Loader</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Racing.h">
-      <Filter>01.Levels\Racing</Filter>
+      <Filter>01.Levels\2. Racing</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BreakableRock.h">
       <Filter>02.GameObjects\Map\BreakableRock</Filter>
@@ -758,6 +758,9 @@
     <ClInclude Include="..\Public\BlendMapObject.h">
       <Filter>02.GameObjects\Map\BlendMapObject</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Level_DeeDeeDee.h">
+      <Filter>01.Levels\3. DeeDeeDee</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -770,10 +773,10 @@
       <Filter>00.MainApp</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Loading.cpp">
-      <Filter>01.Levels\Loading</Filter>
+      <Filter>01.Levels\_Loading</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Logo.cpp">
-      <Filter>01.Levels\Logo</Filter>
+      <Filter>01.Levels\0. Logo</Filter>
     </ClCompile>
     <ClCompile Include="..\private\BackGround.cpp">
       <Filter>02.GameObjects\UI\BackGround</Filter>
@@ -794,10 +797,10 @@
       <Filter>02.GameObjects\Effect\FXToolDirector</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Tool_FX.cpp">
-      <Filter>01.Levels\Tool\FX</Filter>
+      <Filter>01.Levels\99. Tool\FX</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Tool_UI.cpp">
-      <Filter>01.Levels\Tool\UI</Filter>
+      <Filter>01.Levels\99. Tool\UI</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Editor_UI.cpp">
       <Filter>02.GameObjects\UI\Editor</Filter>
@@ -839,7 +842,7 @@
       <Filter>02.GameObjects\Map\BasicMap</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Tool_Map.cpp">
-      <Filter>01.Levels\Tool\Map</Filter>
+      <Filter>01.Levels\99. Tool\Map</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Awoofy_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\Awoofy\State</Filter>
@@ -854,7 +857,7 @@
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyVacuum_State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Tool_Anim.cpp">
-      <Filter>01.Levels\Tool\Animation</Filter>
+      <Filter>01.Levels\99. Tool\Animation</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Particle.cpp">
       <Filter>02.GameObjects\Effect\Particle</Filter>
@@ -947,7 +950,7 @@
       <Filter>02.GameObjects\Map\BG</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Intro.cpp">
-      <Filter>01.Levels\Intro</Filter>
+      <Filter>01.Levels\1. Intro</Filter>
     </ClCompile>
     <ClCompile Include="..\Public\KirbyBoom_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyBoom_State</Filter>
@@ -1037,10 +1040,10 @@
       <Filter>02.GameObjects\UI\HUD</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_GamePlay.cpp">
-      <Filter>01.Levels\GamePlay</Filter>
+      <Filter>01.Levels\99. GamePlay</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Level_Town.cpp">
-      <Filter>01.Levels\Town</Filter>
+      <Filter>01.Levels\4. Town</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\KirbyCar_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyCar_State</Filter>
@@ -1058,7 +1061,7 @@
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_PartTime.cpp">
-      <Filter>01.Levels\PartTime</Filter>
+      <Filter>01.Levels\4-1. PartTime</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\PartTimerKirby_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\PartTimerKirby\State</Filter>
@@ -1067,7 +1070,7 @@
       <Filter>01.Levels\_Loader</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Racing.cpp">
-      <Filter>01.Levels\Racing</Filter>
+      <Filter>01.Levels\2. Racing</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Car.cpp">
       <Filter>02.GameObjects\Map\Car</Filter>
@@ -1119,6 +1122,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\BlendMapObject.cpp">
       <Filter>02.GameObjects\Map\BlendMapObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_DeeDeeDee.cpp">
+      <Filter>01.Levels\3. DeeDeeDee</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

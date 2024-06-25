@@ -267,6 +267,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 break;
             }
             break;
+            case DEEDEEDEE:
+            {
+                HRESULT hr;
+                hr = pMainApp->Open_Level(LEVEL_DEEDEEDEE);
+                CHECK_FAILED(hr);
+                break;
+            }
+            break;
             case TOWN:
             {
                 HRESULT hr;
