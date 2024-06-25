@@ -504,7 +504,7 @@ HRESULT CModel::Bind_WorldMatrixForOctree(CShader* pShader, string& strConstantN
 
 _uint CModel::Find_MeshIndex(const string& _strMeshName)
 {
-	for (_int i = 0; i < m_iNumMeshes; i++)
+	for (_uint i = 0; i < m_iNumMeshes; i++)
 	{
 		if (m_Meshes[i]->Get_Name() == _strMeshName)
 			return i;
@@ -523,6 +523,26 @@ void CModel::RemoveNonBlendMeshes(const unordered_set<_uint>& _vecBlendingMeshIn
 	{
 		if (_vecBlendingMeshIndices.end() == _vecBlendingMeshIndices.find(i))
 			Safe_Release(m_Meshes[i]);
+		else
+			vecMeshes.push_back(m_Meshes[i]);
+	}
+
+	m_Meshes = vecMeshes;
+	m_iNumMeshes = vecMeshes.size();
+}
+
+void CModel::RemoveBlendMeshes(const unordered_set<_uint>& _vecBlendingMeshIndices)
+{
+	if (_vecBlendingMeshIndices.empty())
+		return;
+
+	vector<CMesh*> vecMeshes;
+	for (_uint i = 0; i < m_iNumMeshes; i++)
+	{
+		if (_vecBlendingMeshIndices.end() != _vecBlendingMeshIndices.find(i))
+			Safe_Release(m_Meshes[i]);
+		else
+			vecMeshes.push_back(m_Meshes[i]);
 	}
 
 	m_Meshes = vecMeshes;
@@ -554,6 +574,14 @@ void CModel::DeterminePassIndices(vector<_uint>& _vecPassIndices)
 		else
 			_vecPassIndices.push_back(14); // AlphaBlend Normal X
 	}
+}
+
+void CModel::AddBlendObjectToRenderGroup()
+{
+	if (nullptr == m_pBlendObject)
+		return;
+
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, m_pBlendObject);
 }
 
 HRESULT CModel::Ready_Meshes(_bool bOctree)

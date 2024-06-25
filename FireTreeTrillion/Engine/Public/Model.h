@@ -112,8 +112,11 @@ public:
 	_bool IsHidden() { return m_bHide; }
 	_uint Find_MeshIndex(const string& _strMeshName);
 	void RemoveNonBlendMeshes(const unordered_set<_uint>& _vecBlendingMeshIndices);
+	void RemoveBlendMeshes(const unordered_set<_uint>& _vecBlendingMeshIndices);
 	_bool DoesNormalTextureExist(_uint iMeshIndex);
 	void DeterminePassIndices(vector<_uint>& _vecPassIndices);
+	void Set_BlendObject(class CGameObject* pBlendObject) { m_pBlendObject = pBlendObject; }
+	void AddBlendObjectToRenderGroup();
 
 private:
 	_uint						m_iNumMeshes = { 0 };

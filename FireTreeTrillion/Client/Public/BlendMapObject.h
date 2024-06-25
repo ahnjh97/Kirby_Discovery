@@ -22,7 +22,7 @@ private:
 	virtual ~CBlendMapObject() = default;
 
 public:
-	void SetUp_NonBlendMeshes(unordered_set<_uint>& _setBlendMeshIndices) { m_setBlendMeshIndices = _setBlendMeshIndices; }
+	void SetUp_BlendMeshes(unordered_set<_uint>& _setBlendMeshIndices) { m_setBlendMeshIndices = _setBlendMeshIndices; }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;

@@ -30,8 +30,8 @@ HRESULT CBlendMapObject::Initialize(void* pArg)
 	if (FAILED(Add_Components(tDesc.tModel)))
 		return E_FAIL;
 
-	// 모델 메쉬 쳐내는 작업
-	m_pModelCom->RemoveNonBlendMeshes(m_setBlendMeshIndices);
+	//// 모델 메쉬 쳐내는 작업
+	//m_pModelCom->RemoveNonBlendMeshes(m_setBlendMeshIndices);
 
 	// Normal 유무 검사해서 PassIndex 지정하는 작업
 	m_pModelCom->DeterminePassIndices(m_vecPassIndices);
@@ -48,6 +48,9 @@ HRESULT CBlendMapObject::Render()
 
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
+		if (m_setBlendMeshIndices.end() == m_setBlendMeshIndices.find(i))
+			continue;
+
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))

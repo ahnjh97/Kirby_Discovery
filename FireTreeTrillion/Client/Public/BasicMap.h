@@ -73,12 +73,14 @@ private:
 
 	vector<CModel*>	m_vecNonAnimDecos;
 	vector<CModel*> m_vecAnimDecos;
+	vector<CModel*> m_vecBlendDecos;
 
 	vector<CGameObject*> m_vecAnimDecoGameObjs;
 
 	unordered_set<string> m_setMapDecoNames;
 
-	unordered_map<string, unordered_set<_uint>> m_BlendMeshesIndicesMap;
+	unordered_map<string, unordered_set<_uint>> m_mapBlendMeshesIndices;
+	unordered_map<string, _bool> m_mapBlendObjStaticActor;
 	vector<CGameObject*> m_vecBlendObjects;
 	
 private:
@@ -102,8 +104,10 @@ private:
 	_bool	IsMapDeco(const string& _strModelName);
 
 	_bool	IsBlendDeco(const string& _strModelName);
-	void	TraverseBlendDecoInfoTxts(unordered_map<string, unordered_set<_uint>>& _passIndicesMap);
-	_bool	ReadBlendMeshesIndices(const string& _strFullPath, const string& _strModelName, unordered_set<_uint>& _setMeshIndices);
+	void	TraverseBlendDecoInfoTxts(unordered_map<string, unordered_set<_uint>>& _mapBlendMeshIndices
+			, unordered_map<string, _bool>& _mapBlendObjStaticActor);
+	_bool	ReadBlendMeshesIndices(const string& _strFullPath, const string& _strModelName
+			, unordered_set<_uint>& _setMeshIndices, _bool& _bStaticActor);
 		
 public:
 	static CBasicMap* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
