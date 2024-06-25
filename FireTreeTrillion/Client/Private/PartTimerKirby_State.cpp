@@ -155,9 +155,9 @@ void CPartTimerKirby_Grab_State::OnStateUpdate(CGameObject* pGameObject, _float 
 		else if (pAlbaKirby->Get_State() == CPartTimerKirby::FOODSHOP_INCORRECTSTART)
 			pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_INCORRECT, 2.f, false, true);
 		else if(CPartTimeHelper::Get_Instance()->Get_PartTimeItem() == PARTTIME_ITEM::CAKE || CPartTimeHelper::Get_Instance()->Get_PartTimeItem() == PARTTIME_ITEM::TOMATO)
-			pAlbaKirby->Change_State(CPartTimerKirby::HANDOVERSHORT, 70.f, false, true);
+			pAlbaKirby->Change_State(CPartTimerKirby::HANDOVERSHORT, 80.f, false, true);
 		else if(CPartTimeHelper::Get_Instance()->Get_PartTimeItem() == PARTTIME_ITEM::DRINK || CPartTimeHelper::Get_Instance()->Get_PartTimeItem() == PARTTIME_ITEM::BURGER)
-			pAlbaKirby->Change_State(CPartTimerKirby::HANDOVERSHORTL, 70.f, false, true);
+			pAlbaKirby->Change_State(CPartTimerKirby::HANDOVERSHORTL, 80.f, false, true);
 	}
 	else
 	{

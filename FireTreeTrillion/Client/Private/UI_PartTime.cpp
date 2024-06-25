@@ -25,17 +25,8 @@ HRESULT CUI_PartTime::Initialize(void* _pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	m_position2D = _float2(50.f, 50.f);
-	m_WindowSize2D = _float2(g_iWinSizeX, g_iWinSizeY);
-	m_pTransformCom->Set_Scaled(m_SizeBar2D.x, m_SizeBar2D.y, 1.f);
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
-		XMVectorSet(m_position2D.x	 - m_WindowSize2D.x * 0.5f,
-					- m_position2D.y + m_WindowSize2D.y * 0.5f,
-					0.f,
-					1.f));
-
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
-	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(m_WindowSize2D.x, m_WindowSize2D.y, 0.f, 1.f));
+	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 
 	m_bRender = true;
 
@@ -43,7 +34,7 @@ HRESULT CUI_PartTime::Initialize(void* _pArg)
 }
 
 _int CUI_PartTime::Tick(_float fTimeDelta)
-{	
+{
 	__super::Tick(fTimeDelta);
 
 	//Compute_Timer(fTimeDelta);
@@ -60,14 +51,40 @@ HRESULT CUI_PartTime::Render()
 {
 	if (m_bRender == false) return S_OK;
 
-	//for (_int i = 0; i < m_arrTexures.size();++i)
-	//{
-		_int i = 0;
-		HRESULT hr;
-		hr = Bind_ShaderResources(i);
+	HRESULT hr;
+	hr = Bind_ShaderResources();
+	CHECK_FAILED(hr);
+
+	for (_int i = 0; i < 2/*m_arrTexures.size()*/;++i)
+	{
+		if (i == 1)
+			i = 3;
+
+		Move_Position(i);
+
+
+		if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+			return E_FAIL;
+
+		hr = m_arrTexures[i]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
 		CHECK_FAILED(hr);
 
-		hr = m_pShaderCom->Begin(7);
+		if (i == 3)
+		{
+			_float3 vColor = { .9f, .4f, .4f };
+			_float fRatio = { .5f };
+			m_pShaderCom->Bind_RawValue("g_vRColor", &vColor, sizeof(_float3));
+			m_pShaderCom->Bind_RawValue("g_fMaskRatio", &fRatio, sizeof(_float));
+			hr = m_pShaderCom->Begin(14);
+		}
+		else
+		{
+			_float3 vColor = {1.f, 1.f, 1.f };
+
+			m_pShaderCom->Bind_RawValue("g_vRColor", &vColor, sizeof(_float3));
+			hr = m_pShaderCom->Begin(13);
+		}
+
 		CHECK_FAILED(hr);
 
 		hr = m_pVIBufferCom->Bind_Buffers();
@@ -75,7 +92,7 @@ HRESULT CUI_PartTime::Render()
 
 		hr = m_pVIBufferCom->Render();
 		CHECK_FAILED(hr);
-	//}
+	}
 
 	return S_OK;
 }
@@ -94,12 +111,12 @@ void CUI_PartTime::Render_IMGUI()
 	//sprintf_s(name4, "rotate");
 	//ImGui::DragFloat(name4, &m_fRotate);
 
-	m_pTransformCom->Set_Scaled(m_SizeBar2D.x, m_SizeBar2D.y, 1.f);
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
-		XMVectorSet(m_position2D.x - m_WindowSize2D.x * 0.5f,
-			-m_position2D.y + m_WindowSize2D.y * 0.5f,
-			0.f,
-			1.f));
+	//m_pTransformCom->Set_Scaled(m_size2D.x, m_size2D.y, 1.f);
+	//m_pTransformCom->Set_State(CTransform::STATE_POSITION,
+	//	XMVectorSet(m_position2D.x - m_WindowSize2D.x * 0.5f,
+	//		-m_position2D.y + m_WindowSize2D.y * 0.5f,
+	//		0.f,
+	//		1.f));
 	//m_pTransformCom->Set_Speed(fSpeed);
 	//m_pTransformCom->Rotate(XMVectorSet(0.f, 0.f, 1.f, 0.f), m_fRotate);
 }
@@ -130,7 +147,7 @@ HRESULT CUI_PartTime::Add_Components()
 	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_GameFoodUI_DeeBG"),
 		TEXT("Com_Texture_DeeBG"), (CComponent**)&m_arrTexures[4])))
 		return E_FAIL;
-	
+
 	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_GameFoodUI_DeeBGBW"),
 		TEXT("Com_Texture_DeeBGBW"), (CComponent**)&m_arrTexures[5])))
 		return E_FAIL;
@@ -146,13 +163,11 @@ HRESULT CUI_PartTime::Add_Components()
 	return S_OK;
 }
 
-HRESULT CUI_PartTime::Bind_ShaderResources(_int _iTextureNum)
+HRESULT CUI_PartTime::Bind_ShaderResources()
 {
 	HRESULT hr;
 	CHECK_NULLPTR(m_pShaderCom);
 
-	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
-		return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
 		return E_FAIL;
@@ -160,15 +175,42 @@ HRESULT CUI_PartTime::Bind_ShaderResources(_int _iTextureNum)
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
-	hr = m_arrTexures[_iTextureNum]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
-	CHECK_FAILED(hr);
-
 	return S_OK;
+}
+
+void CUI_PartTime::Move_Position(_int iTextureNum)
+{
+	switch (iTextureNum)
+	{
+	case 0:
+	{
+		m_size2D = m_SizeBar2D;
+		m_position2D = _float2(785.f, 120.f);
+
+	}
+	break;
+	case 1:
+	{
+		m_size2D = m_SizeTimeBarBlank2D;
+		m_position2D = _float2(835.f, 83.f);
+	}
+	break;
+	default:
+		m_size2D = m_SizeTimeBarBlank2D;
+		m_position2D = _float2(835.f, 83.f);
+		break;
+	}
+
+	m_pTransformCom->Set_Scaled(m_size2D.x, m_size2D.y, 1.f);
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
+		XMVectorSet(m_position2D.x - g_iWinSizeX * 0.5f,
+			-m_position2D.y + g_iWinSizeY * 0.5f,
+			0.f,
+			1.f));
 }
 
 void CUI_PartTime::Compute_Timer(_float fTimeDelta)
 {
-
 #pragma region 분홍색 게이지 공식
 
 	// 현재 커비의 HP 맥스치

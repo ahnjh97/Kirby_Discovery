@@ -804,13 +804,13 @@ HRESULT CLoader::Loading_For_Parttime()
 #pragma region UI
 
 	// ≈∏¿” πŸ
-	hr = Add_Texture(eLevel, "GameFoodUI_BaseBar", "UI/MGameFoodUI/base bar.png");
-	hr = Add_Texture(eLevel, "GameFoodUI_TimeBarBlank", "UI/MGameFoodUI/time bar blank.png");
-	hr = Add_Texture(eLevel, "GameFoodUI_TimeBar", "UI/MGameFoodUI/time bar.png");
-	hr = Add_Texture(eLevel, "GameFoodUI_TimeBarBW", "UI/MGameFoodUI/time bar_bw.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_BaseBar", "UI/MGameFood/base bar.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_TimeBarBlank", "UI/MGameFood/time bar blank.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_TimeBar", "UI/MGameFood/time bar.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_TimeBarBW", "UI/MGameFood/time bar_bw.png");
 
-	hr = Add_Texture(eLevel, "GameFoodUI_DeeBG",	"UI/MGameFoodUI/dee bg.png");
-	hr = Add_Texture(eLevel, "GameFoodUI_DeeBGBW",	"UI/MGameFoodUI/dee bg_bw.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_DeeBG",	"UI/MGameFood/dee bg.png");
+	hr = Add_Texture(eLevel, "GameFoodUI_DeeBGBW",	"UI/MGameFood/dee bg_bw.png");
 
 	//hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 23);
 
