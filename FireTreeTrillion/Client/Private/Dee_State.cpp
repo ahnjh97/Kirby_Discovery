@@ -664,7 +664,17 @@ void CDee_Interact_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 			baseInfo.pDee->Set_DeeEyeState(DEEEYE_SMILE);
 	}
 	break;
-
+	case DEEANIM_CHOOSE_START:
+	{
+		if (baseInfo.pDee->IsAnimFinished())
+		{
+			//인사하는 거였으면 눈 바꾸고 다시 idle로 돌아가
+			baseInfo.pDee->Set_DeeEyeState(DEEEYE_IDLE);
+			baseInfo.pDee->Change_State(DEEANIM_CHOOSE_WAIT, 60.f, false, true);
+			return;
+		}
+	}
+	break;
 	default:
 		break;
 	}

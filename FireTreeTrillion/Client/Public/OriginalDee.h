@@ -51,7 +51,7 @@ private:
 	TOWN_POINT		m_ePrePoint = { TOWNPOINT_END };
 
 	HRESULT Add_Components();
-	HRESULT Add_PartObjects();
+	HRESULT Add_PartObjects(DEE_CHARACTER eCharacter);
 	HRESULT Bind_ShaderResources();
 
 	void	SetUp_FSM();

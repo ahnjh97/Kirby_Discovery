@@ -14,176 +14,204 @@ pair<_float3, vector<TOWN_POINT_INFO>> COriginalDee::m_TownPoints =
 		{
 			TOWNPOINT_0,
 			{0.f, 0.f, 10.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL, DEEANIM_WATERING},
+			{DEEANIM_WALK, DEEANIM_MOVEFALL},
 			{TOWNPOINT_1, TOWNPOINT_7, TOWNPOINT_8}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_1,
 			{1.6f - 1.7f, 0.f, 18.3f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL, DEEANIM_WATERING},
+			{DEEANIM_WALK, DEEANIM_MOVEFALL},
 			{TOWNPOINT_0, TOWNPOINT_2, TOWNPOINT_12}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_2,
 			{-8.8f - 1.7f, 0.f, 19.f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL, DEEANIM_WATERING},
-			{TOWNPOINT_1, TOWNPOINT_3}
+			{DEEANIM_WALK, DEEANIM_MOVEFALL},
+			{TOWNPOINT_1, TOWNPOINT_3, TOWNPOINT_FLOWERUPLEFT}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_3,
 			{-11.9f - 1.7f, 0.f, 7.6f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL, DEEANIM_WATERING},
-			{TOWNPOINT_2, TOWNPOINT_4, TOWNPOINT_5}
+			{DEEANIM_WALK, DEEANIM_MOVEFALL},
+			{TOWNPOINT_2, TOWNPOINT_4, TOWNPOINT_5, TOWNPOINT_FLOWERDOWNLEFT}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_4,
 			{-17.2f - 1.7f, 0.f, 2.f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL, DEEANIM_WATERING},
+			{DEEANIM_WALK},
 			{TOWNPOINT_3}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_5,
 			{-10.1f - 1.7f, 0.f, -8.f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL, DEEANIM_WATERING},
-			{TOWNPOINT_3, TOWNPOINT_6}
+			{DEEANIM_WALK, DEEANIM_MOVEFALL},
+			{TOWNPOINT_3, TOWNPOINT_6, TOWNPOINT_FLOWERDOWNLEFT}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_6,
 			{2.8f - 1.7f, 0.f, -12.f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL, DEEANIM_WATERING},
+			{DEEANIM_WALK, DEEANIM_MOVEFALL},
 			{TOWNPOINT_5, TOWNPOINT_7, TOWNPOINT_8, TOWNPOINT_9}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_7,
 			{-1.2f - 1.7f, 0.f, 1.6f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL, DEEANIM_WATERING},
+			{DEEANIM_WALK},
 			{TOWNPOINT_0, TOWNPOINT_6, TOWNPOINT_8}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_8,
 			{5.7f - 1.7f, 0.f, 2.8f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL, DEEANIM_WATERING},
+			{DEEANIM_WALK, DEEANIM_MOVEFALL},
 			{TOWNPOINT_0, TOWNPOINT_6, TOWNPOINT_7}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_9,
 			{15.f - 1.7f, 0.f, -10.5f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL, DEEANIM_WATERING},
+			{DEEANIM_WALK, DEEANIM_MOVEFALL},
 			{TOWNPOINT_6, TOWNPOINT_10, TOWNPOINT_14}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_10,
 			{20.7f - 1.7f, 0.f, 1.2f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL, DEEANIM_WATERING},
-			{TOWNPOINT_9, TOWNPOINT_11}
+			{DEEANIM_WALK, DEEANIM_MOVEFALL},
+			{TOWNPOINT_9, TOWNPOINT_11, TOWNPOINT_FLOWERDOWNRIGHT}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_11,
 			{20.1f - 1.7f, 0.f, 16.1f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL, DEEANIM_WATERING},
-			{TOWNPOINT_10, TOWNPOINT_12, TOWNPOINT_1FLOOR}
+			{DEEANIM_WALK, DEEANIM_MOVEFALL},
+			{TOWNPOINT_10, TOWNPOINT_12, TOWNPOINT_1FLOOR, TOWNPOINT_FLOWERDOWNRIGHT}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_12,
 			{12.7f - 1.7f, 0.f, 19.6f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL, DEEANIM_WATERING},
-			{TOWNPOINT_1, TOWNPOINT_11, TOWNPOINT_FOODSHOP}
+			{DEEANIM_WALK, DEEANIM_MOVEFALL},
+			{TOWNPOINT_1, TOWNPOINT_11, TOWNPOINT_FOODSHOP, TOWNPOINT_FLOWERUPRIGHT}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_FOODSHOP,
 			{13.8f - 1.7f, 0.f, 24.1f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL, DEEANIM_WATERING},
+			{DEEANIM_CHOOSE_START},
 			{TOWNPOINT_12}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_14,
 			{33.f - 1.7f, 0.f, -3.f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL, DEEANIM_WATERING},
+			{DEEANIM_WALK, DEEANIM_MOVEFALL},
 			{TOWNPOINT_9, TOWNPOINT_FISHING}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_FISHING,
 			{44.f - 1.7f, 0.f, 8.5f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL, DEEANIM_WATERING},
+			{DEEANIM_WALK, DEEANIM_MOVEFALL},
 			{TOWNPOINT_14, TOWNPOINT_16}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_16,
 			{41.4f - 1.7f, 0.f, 17.5f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL, DEEANIM_WATERING},
+			{DEEANIM_WALK, DEEANIM_MOVEFALL},
 			{TOWNPOINT_FISHING, TOWNPOINT_1FLOOR}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_1FLOOR,
 			{31.8f - 1.7f, 0.f, 22.8f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL, DEEANIM_WATERING},
+			{DEEANIM_WALK, DEEANIM_MOVEFALL},
 			{TOWNPOINT_11, TOWNPOINT_16, TOWNPOINT_UNDERSTAIRA, TOWNPOINT_UNDERSTAIRB}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_UNDERSTAIRA,
 			{35.4f - 1.7f, 0.f, 37.2f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL, DEEANIM_WATERING},
+			{DEEANIM_WALK},
 			{TOWNPOINT_1FLOOR, TOWNPOINT_MIDSTAIRA}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_MIDSTAIRA,
 			{42.f - 1.7f, 0.f, 53.5f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL, DEEANIM_WATERING},
+			{DEEANIM_WALK},
 			{TOWNPOINT_UNDERSTAIRA, TOWNPOINT_UPSTAIRA}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_UPSTAIRA,
 			{45.7f - 1.7f, 0.f, 70.9f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL, DEEANIM_WATERING},
+			{DEEANIM_WALK},
 			{TOWNPOINT_MIDSTAIRA, TOWNPOINT_2FLOOR}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_2FLOOR,
 			{48.2f - 1.7f, 0.f, 76.8f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL, DEEANIM_WATERING},
+			{DEEANIM_WALK},
 			{TOWNPOINT_UPSTAIRA,TOWNPOINT_UPSTAIRB }
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_UPSTAIRB,
 			{50.8f - 1.7f, 0.f, 71.f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL, DEEANIM_WATERING},
+			{DEEANIM_WALK},
 			{TOWNPOINT_2FLOOR, TOWNPOINT_MIDSTAIRB}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_MIDSTAIRB,
 			{47.5f - 1.7f, 0.f, 51.f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL, DEEANIM_WATERING},
+			{DEEANIM_WALK},
 			{TOWNPOINT_UPSTAIRB, TOWNPOINT_UNDERSTAIRB}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_UNDERSTAIRB,
 			{40.7f - 1.7f, 0.f, 34.2f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL, DEEANIM_WATERING},
+			{DEEANIM_WALK},
 			{TOWNPOINT_MIDSTAIRB, TOWNPOINT_1FLOOR}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_FLOWERUPRIGHT,
+			{13.4f - 1.7f, 0.f, 12.f - 4.f},
+			{DEEANIM_WATERING},
+			{TOWNPOINT_12}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_FLOWERDOWNRIGHT,
+			{14.9f - 1.7f, 0.f, -1.f - 4.f},
+			{DEEANIM_WATERING},
+			{TOWNPOINT_10, TOWNPOINT_11}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_FLOWERUPLEFT,
+			{-10.f - 1.7f, 0.f, 10.6f - 4.f},
+			{DEEANIM_WATERING},
+			{TOWNPOINT_2}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_FLOWERDOWNLEFT,
+			{-10.f - 1.7f, 0.f, -1.f - 4.f},
+			{DEEANIM_WATERING},
+			{TOWNPOINT_3, TOWNPOINT_5}
 		},
 	}
 };
@@ -211,6 +239,8 @@ DEE_ANIM COriginalDee::Make_WhatToDo()
 
 	_int iPointSize = m_TownPoints.second[m_eDestPoint].NearPoint.size();
 
+	if(m_ePrePoint != TOWNPOINT_END)
+		m_TownPoints.second[m_ePrePoint].bIsUsing = false;
 
 	TOWN_POINT eArrivedPoint = m_eDestPoint;
 	TOWN_POINT eDestPoint = TOWNPOINT_END;
@@ -248,7 +278,7 @@ DEE_ANIM COriginalDee::Make_WhatToDo()
 	}
 
 	m_eDestPoint = eDestPoint;
-	m_TownPoints.second[eDestPoint].bIsUsing = true;
+	m_TownPoints.second[eArrivedPoint].bIsUsing = true;
 	m_ePrePoint = eArrivedPoint;
 
 	return eDeeState;
@@ -277,10 +307,11 @@ HRESULT COriginalDee::Initialize(void* pArg)
 	hr = Add_Components();
 	CHECK_FAILED(hr);
 
-	hr = Add_PartObjects();
+	Make_InitialState(pDeeDesc.eCharacter);
+
+	hr = Add_PartObjects(pDeeDesc.eCharacter);
 	CHECK_FAILED(hr);
 
-	Make_InitialState(pDeeDesc.eCharacter);
 
 	return S_OK;
 }
@@ -433,8 +464,66 @@ HRESULT COriginalDee::Add_Components()
 	return S_OK;
 }
 
-HRESULT COriginalDee::Add_PartObjects()
+HRESULT COriginalDee::Add_PartObjects(DEE_CHARACTER eCharacter)
 {
+
+	CPartObject* pPartObj = { nullptr };
+	CDee_Part::DEEPART_DESC	PartDesc{};
+
+	CModel* pModel = (CModel*)Get_Component(TEXT("Com_Model"));
+	PartDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	PartDesc.pSocket = pModel->Get_BonePtr("RHaveL");
+	PartDesc.pCurAnimState = &m_eMyState;
+	
+	if (eCharacter == DEECHARACTER_FRONTMAN)
+	{
+		PartDesc.wstrModelName = TEXT("DeePart_Guitar");
+
+		pPartObj = static_cast<CPartObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_DeePart"), &PartDesc));
+		if (nullptr == pPartObj)
+			return E_FAIL;
+
+		m_PartObjects.emplace(TEXT("Part_Instrument"), pPartObj);
+	}
+	else if (eCharacter == DEECHARACTER_GUITAR)
+	{
+		PartDesc.wstrModelName = TEXT("DeePart_Bass");
+
+		pPartObj = static_cast<CPartObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_DeePart"), &PartDesc));
+		if (nullptr == pPartObj)
+			return E_FAIL;
+
+		m_PartObjects.emplace(TEXT("Part_Instrument"), pPartObj);
+	}
+	else if (eCharacter == DEECHARACTER_DRUM)
+	{
+		PartDesc.wstrModelName = TEXT("DeePart_DrumStick");
+
+		pPartObj = static_cast<CPartObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_DeePart"), &PartDesc));
+		if (nullptr == pPartObj)
+			return E_FAIL;
+
+		m_PartObjects.emplace(TEXT("Part_InstrumentR"), pPartObj);
+
+		PartDesc.pSocket = pModel->Get_BonePtr("RHaveL");
+
+		pPartObj = static_cast<CPartObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_DeePart"), &PartDesc));
+		if (nullptr == pPartObj)
+			return E_FAIL;
+		m_PartObjects.emplace(TEXT("Part_InstrumentL"), pPartObj);
+
+	}
+	else
+	{
+		PartDesc.wstrModelName = TEXT("DeePart_WateringCan");
+
+		pPartObj = static_cast<CPartObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_DeePart"), &PartDesc));
+		if (nullptr == pPartObj)
+			return E_FAIL;
+
+		m_PartObjects.emplace(TEXT("Part_Instrument"), pPartObj);
+
+	}
 	/*if (*m_pCurrentLevelID != LEVEL_TOWN && *m_pCurrentLevelID != LEVEL_PARTTIME)
 		return S_OK;
 
@@ -443,8 +532,6 @@ HRESULT COriginalDee::Add_PartObjects()
 
 	CModel* pModel = (CModel*)Get_Component(TEXT("Com_Model"));
 
-	PartDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-	PartDesc.pSocket = pModel->Get_BonePtr("HatL");
 	PartDesc.wstrModelName = TEXT("DeePart_FoodShop");
 
 	pPartObj = static_cast<CPartObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_DeePart"), &PartDesc));
@@ -515,6 +602,8 @@ void COriginalDee::SetUp_FSM()
 	m_pFSM->Add_State(DEEANIM_MOVEFALL, CDee_Interact_State::Create());
 	m_pFSM->Add_State(DEEANIM_LOOKAROUND, CDee_Interact_State::Create());
 
+	m_pFSM->Add_State(DEEANIM_CHOOSE_START, CDee_Interact_State::Create());
+	m_pFSM->Add_State(DEEANIM_CHOOSE_WAIT, CDee_Interact_State::Create());
 
 
 }
@@ -548,7 +637,7 @@ void COriginalDee::Make_InitialState(DEE_CHARACTER eCharacter)
 		eAnim = DEEANIM_SITSLEEP;
 		break;
 	default:
-		eAnim = DEEANIM_SITSLEEP;
+		eAnim = DEEANIM_WAIT;
 		break;
 	}
 

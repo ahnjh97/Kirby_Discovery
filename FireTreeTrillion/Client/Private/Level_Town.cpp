@@ -111,7 +111,7 @@ HRESULT CLevel_Town::Ready_Lights()
 	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
 		return E_FAIL;
 
-	CGameInstance::Get_Instance()->Setting_GodRay({ -650.f, 300.f, 1200.f, 1.f });
+	CGameInstance::Get_Instance()->Setting_GodRay({ 450.f, 400.f, 1200.f, 1.f });
 
 	return S_OK;
 }
@@ -208,7 +208,7 @@ HRESULT CLevel_Town::Ready_Map()
 	fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
 
 	_uint iStrLength{};
-	string strModelName;
+	string strModelName;https://drive.google.com/drive/u/0/my-drive
 	_float4x4 matWorld{};
 	_float3 vMin{}, vMax{};
 	wstring wstrGameObjectTag;
