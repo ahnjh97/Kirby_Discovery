@@ -164,7 +164,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	m_setTrees = { "GsTreeA", "GsTreeB", "GsTreeC" };
 
 	//투명도 적용이 필요한 데코오브젝트
-	m_setNeedBlendDecos = {"LbOutBuildi ngWallL", "LbOutBuildingFenceL"};
+	m_setNeedBlendDecos = {"LbOutBuildingWallL", "LbOutBuildingFenceL"};
 
 	s_vecPassIndices.resize(m_vecMapModelNames.size());
 	s_vecSamplingFactors.resize(m_vecMapModelNames.size());
