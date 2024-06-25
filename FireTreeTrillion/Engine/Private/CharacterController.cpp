@@ -32,9 +32,9 @@ HRESULT CCharacterController::Initialize(void* pArg)
 	else
 	{
 		m_tControllerBoxDesc.position = PxExtendedVec3(vInitialPos.x, vInitialPos.y, vInitialPos.z);
-		m_tControllerBoxDesc.halfForwardExtent	= pDes->tBoxShape.fHalfForwardExtent;
-		m_tControllerBoxDesc.halfHeight			= pDes->tBoxShape.fHalfHeight;
-		m_tControllerBoxDesc.halfSideExtent		= pDes->tBoxShape.fHalfSideExtent;
+		m_tControllerBoxDesc.halfForwardExtent = pDes->tBoxShape.fHalfForwardExtent;
+		m_tControllerBoxDesc.halfHeight = pDes->tBoxShape.fHalfHeight;
+		m_tControllerBoxDesc.halfSideExtent = pDes->tBoxShape.fHalfSideExtent;
 	}
 
 	__super::Initialize(pArg);
@@ -108,7 +108,7 @@ void CCharacterController::Render_IMGUI()
 void CCharacterController::Set_Position(CTransform* pTransform, const _float4& vPos)
 {
 	// 내가 원하는 곳에 physX 위치 이동
-	m_pController->setPosition({(_double)vPos.x, (_double)vPos.y, (_double)vPos.z});
+	m_pController->setPosition({ (_double)vPos.x, (_double)vPos.y, (_double)vPos.z });
 
 	//PxExtendedVec3 pxPos = m_pController->getPosition();
 	//PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
@@ -118,19 +118,19 @@ void CCharacterController::Set_Position(CTransform* pTransform, const _float4& v
 
 void CCharacterController::Set_FootPosition(const _float4& vPos)
 {
-	m_pController->setFootPosition({(_double)vPos.x, (_double)vPos.y, (_double)vPos.z});
+	m_pController->setFootPosition({ (_double)vPos.x, (_double)vPos.y, (_double)vPos.z });
 }
 
 _float4 CCharacterController::Get_Position()
 {
 	const auto vPos = m_pController->getPosition();
-	return _float4{(_float)vPos.x, (_float)vPos.y, (_float)vPos.z, 1.f};
+	return _float4{ (_float)vPos.x, (_float)vPos.y, (_float)vPos.z, 1.f };
 }
 
 _float4 CCharacterController::Get_FootPosition()
 {
 	const auto vPos = m_pController->getFootPosition();
-	return _float4{(_float)vPos.x, (_float)vPos.y, (_float)vPos.z, 1.f};
+	return _float4{ (_float)vPos.x, (_float)vPos.y, (_float)vPos.z, 1.f };
 }
 
 // 강제로 원하는 위치로 이동시키는 함수
@@ -162,14 +162,20 @@ void CCharacterController::Move_Dir(CTransform* pTransform, _fvector fDelta, _fl
 	movement += CUtils::To_PxVec3(fDelta);
 
 	PxControllerFilters filter;
-	PxControllerCollisionFlags collisionFlags = m_pController->move(movement, 0.001f, fTimeDelta, m_ControllerFilters);
+	PxControllerCollisionFlags collisionFlags = m_pController->move(movement, 0.001f, fTimeDelta, filter);
 
-	PxExtendedVec3 pxPos = m_pController->getPosition();
-	PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
+	if (collisionFlags == PxControllerCollisionFlag::eCOLLISION_SIDES ||
+		collisionFlags == PxControllerCollisionFlag::eCOLLISION_UP ||
+		collisionFlags == PxControllerCollisionFlag::eCOLLISION_DOWN ||
+		collisionFlags == (PxControllerCollisionFlags)0)
+	{
+		PxExtendedVec3 pxPos = m_pController->getPosition();
+		PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
 
-	_vector xmPos = XMVectorSet(pos.x, pos.y - m_fHeightOffset, pos.z, 0.f);
+		_vector xmPos = XMVectorSet(pos.x, pos.y - m_fHeightOffset, pos.z, 0.f);
 
-	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
+		pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
+	}
 }
 
 /// <summary> 짬푸 </summary>
@@ -254,7 +260,7 @@ void CCharacterController::FreeFall(CTransform* pTransform, _float fTimeDelta, _
 
 	PxVec3 moveVector = PxVec3(0.f, m_fFallVelocity, 0.f) * fTimeDelta;
 
-	PxControllerCollisionFlags collisionFlags = m_pController->move(moveVector, 0.001f, fTimeDelta,  m_ControllerFilters);//PxControllerFilters()); //
+	PxControllerCollisionFlags collisionFlags = m_pController->move(moveVector, 0.001f, fTimeDelta, m_ControllerFilters);//PxControllerFilters()); //
 
 	PxExtendedVec3 pxPos = m_pController->getPosition();
 	PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
@@ -292,19 +298,19 @@ PxVec3 CCharacterController::Compute_Slope(CTransform* pTransform)
 
 	// 객체 중심 위치에서 동서남북방향으로 살짝 움직인 position을 지정
 	PxVec3 rayOriginRight = rayOrigin + right;	// 오른쪽, 왼쪽 레이캐스트
-	PxVec3 rayOriginLeft  = rayOrigin - right;
+	PxVec3 rayOriginLeft = rayOrigin - right;
 	PxVec3 rayOriginFront = rayOrigin + look;	// 앞, 뒤 레이캐스트
-	PxVec3 rayOriginBack  = rayOrigin - look;
+	PxVec3 rayOriginBack = rayOrigin - look;
 
 	PxVec3 rayDirection = PxVec3(0.f, -1.f, 0.f);
 	_float fMaxDistance = 5.f;
-	
+
 	PxVec3	normal(0.f);
 	normal += TerrainRayCast_Collision(rayOriginRight, rayDirection, fMaxDistance);
-	normal += TerrainRayCast_Collision(rayOriginLeft,  rayDirection, fMaxDistance);
+	normal += TerrainRayCast_Collision(rayOriginLeft, rayDirection, fMaxDistance);
 	normal += TerrainRayCast_Collision(rayOriginFront, rayDirection, fMaxDistance);
-	normal += TerrainRayCast_Collision(rayOriginBack,  rayDirection, fMaxDistance);
-	
+	normal += TerrainRayCast_Collision(rayOriginBack, rayDirection, fMaxDistance);
+
 	normal.normalize();
 
 	return normal;
@@ -480,20 +486,20 @@ void CCharacterController::RegisterAsPlayer()
 void CCharacterController::Create_Controller()
 {
 	Release_Controller();
-	
-	m_pControllerCallBack  = new CControllerBehaviorCallback();
+
+	m_pControllerCallBack = new CControllerBehaviorCallback();
 	m_pControllerHitReport = new CUserControllerHitReport();
-	m_ControllerMaterial   = m_pGameInstance->Get_Physics()->createMaterial(m_vMaterialOptions.x, m_vMaterialOptions.y, m_vMaterialOptions.z);
-	
+	m_ControllerMaterial = m_pGameInstance->Get_Physics()->createMaterial(m_vMaterialOptions.x, m_vMaterialOptions.y, m_vMaterialOptions.z);
+
 	if (m_eType == CAPSULE)
 	{
 		m_tControllerCapsuleDesc.behaviorCallback = m_pControllerCallBack;
-		m_tControllerCapsuleDesc.reportCallback   = m_pControllerHitReport;
-		m_tControllerCapsuleDesc.material		  = m_ControllerMaterial;
+		m_tControllerCapsuleDesc.reportCallback = m_pControllerHitReport;
+		m_tControllerCapsuleDesc.material = m_ControllerMaterial;
 		m_pController = m_pGameInstance->Get_ControllerManager()->createController(m_tControllerCapsuleDesc);
 	}
 	else // BOX
-	{ 
+	{
 		m_tControllerBoxDesc.behaviorCallback = m_pControllerCallBack;
 		m_tControllerBoxDesc.reportCallback = m_pControllerHitReport;
 		m_tControllerBoxDesc.material = m_ControllerMaterial;
@@ -515,10 +521,10 @@ void CCharacterController::Release_Controller()
 		Safe_Delete(m_pControllerCallBack);
 		Safe_Delete(m_pControllerFilterCallback);
 		Safe_Delete(m_pControllerHitReport);
-		
+
 		if (m_pController->getActor()->getScene())
 			m_pGameInstance->RemoveActor(*m_pController->getActor());
-		
+
 		m_pController->release();
 		m_ControllerMaterial->release();
 	}
@@ -533,7 +539,7 @@ void CCharacterController::Set_DefaultValue()
 
 	if (m_eType == CAPSULE)
 	{
-		#pragma region 변하지 않을 값들 (건드릴 경우 피쌤과 논의 요망)
+#pragma region 변하지 않을 값들 (건드릴 경우 피쌤과 논의 요망)
 		// 컨트롤러 볼륨 크기 
 		m_tControllerCapsuleDesc.volumeGrowth = 1.0f;
 		// 컨트롤러의 UP-VECTOR
@@ -542,7 +548,7 @@ void CCharacterController::Set_DefaultValue()
 		m_tControllerCapsuleDesc.contactOffset = 0.01f;
 		// 사용자 정의 데이터
 		m_tControllerCapsuleDesc.userData = this;
-		#pragma endregion
+#pragma endregion
 
 		// 컨트롤러의 질량(밀도)
 		m_tControllerCapsuleDesc.density = 100.f;
@@ -555,7 +561,7 @@ void CCharacterController::Set_DefaultValue()
 		m_tControllerCapsuleDesc.material = m_ControllerMaterial;
 
 		// 캐릭터가 오를 수 있는 최대 경사도
-		m_fSlopeLimitDegree = 45.f;     
+		m_fSlopeLimitDegree = 45.f;
 		m_tControllerCapsuleDesc.slopeLimit = cosf(XMConvertToRadians(m_fSlopeLimitDegree));
 	}
 	else
@@ -589,7 +595,7 @@ void CCharacterController::Set_DefaultValue()
 
 CCharacterController* CCharacterController::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	CCharacterController*		pInstance = new CCharacterController(pDevice, pContext);
+	CCharacterController* pInstance = new CCharacterController(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
@@ -601,7 +607,7 @@ CCharacterController* CCharacterController::Create(ID3D11Device* pDevice, ID3D11
 
 CComponent* CCharacterController::Clone(void* pArg)
 {
-	CCharacterController*		pInstance = new CCharacterController(*this);
+	CCharacterController* pInstance = new CCharacterController(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{

@@ -398,22 +398,6 @@ HRESULT CLevel_Town::Ready_Dees()
 		return E_FAIL;
 
 
-	CWaddleDee::DEE_DESC DeeDesc{};
-	DeeDesc.fSpeedPerSec = 5.f;
-	DeeDesc.fRotationPerSec = ToRadian(90.f);
-	InitMat = _float4x4::Identity;
-	//InitMat.Translation({ 15.2f + CUtils::Make_RandomFloat(-5.f, 5.f), 27.f, 26.f + CUtils::Make_RandomFloat(-5.f, 5.f) });
-	InitMat.Translation({ 15.2f , 27.f, 26.f });
-	DeeDesc.matWorld = InitMat;
-
-	//for (_int i = 0; i < 12; ++i)
-	//{
-	if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NPC"), TEXT("Prototype_GameObject_OriginalDee"), &DeeDesc)))
-		return E_FAIL;
-	//}
-
-
-
 	string strFileName = "../../../objects_txt/Town_Monsters.txt";
 
 	ifstream fileInput(strFileName, ios::binary);

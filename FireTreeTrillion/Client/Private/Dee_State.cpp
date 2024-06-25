@@ -80,6 +80,42 @@ void CDee_Idle_State::Free()
 
 #pragma endregion
 
+#pragma region SIT STATE
+CDee_Sit_State::CDee_Sit_State()
+{
+}
+
+void CDee_Sit_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+}
+
+void CDee_Sit_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	BASE_INFO baseInfo{};
+	Setup_BaseInfo(baseInfo, pGameObject);
+
+	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta);
+
+}
+
+void CDee_Sit_State::OnStateExit()
+{
+	m_fDuration = 0.f;
+}
+
+CDee_Sit_State* CDee_Sit_State::Create()
+{
+	CDee_Sit_State* pInstance = new CDee_Sit_State();
+	return pInstance;
+}
+
+void CDee_Sit_State::Free()
+{
+	__super::Free();
+}
+#pragma endregion
+
 #pragma region MOVE STATE
 //*********************************
 //			 WALK STATE
@@ -97,22 +133,51 @@ void CDee_Move_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
 	BASE_INFO baseInfo{};
 	Setup_BaseInfo(baseInfo, pGameObject);
+	System_Tick(fTimeDelta);
 
 	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta);
-	baseInfo.pTransformCom->Turn({ 0.f, 1.f, 0.f, 1.f }, fTimeDelta * .3f);
-
-	//_float fDist = (XZVec(pHungryDee->Get_DestWaitingPos()) - XZVec(baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION))).Length();
-	//fDist = (fDist < 1.f) ? fDist * 3.f : 4.f;
 
 
-	_float fSpeed =
-		baseInfo.pDee->Get_State() == DEEANIM_WALK ? 3.f : 1.f;
+	_float3 vMyPos = baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION);
+	_float3 vDestPos = baseInfo.pDee->Make_DestPos();
+	vDestPos.y = vMyPos.y;
+	_float3 vMyLook = baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK);
+
+
+	//목표 지점과의 거리 차이를 구하여 속도 정하기
+	_float fSpeed = (vDestPos - vMyPos).Length();
+	fSpeed = (fSpeed < 3.f) ? fSpeed * 3.f : 3.f;
+	fSpeed = clamp(fSpeed, .1f, 3.f);
+
+	//fSpeed = 3.f;
+
+	//목표 방향을 향해 회전한다.
+
+	_float3 vDir = (vDestPos - vMyPos);
+
+	//baseInfo.pTransformCom->Look_At(vDestPos);
+	baseInfo.pTransformCom->Look_At_Interpolate(vDestPos, fTimeDelta);
+	//baseInfo.pTransformCom->Look_At_Rotate(vDestPos, fTimeDelta * 8.f);
+
 
 	baseInfo.pController->Move_Dir(baseInfo.pTransformCom, baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta * fSpeed, fTimeDelta);
+
+	if ((vDestPos - vMyPos).Length() < 1.f)
+	{
+		DEE_ANIM eNextState = baseInfo.pDee->Make_WhatToDo();
+
+		if (eNextState != DEEANIM_WALK)
+			baseInfo.pDee->Change_State(eNextState, 60.f, false, true);
+		else
+			baseInfo.pDee->Change_State(eNextState, 60.f, true, true);
+
+	}
+
 }
 
 void CDee_Move_State::OnStateExit()
 {
+	m_fDuration = 0.f;
 }
 
 CDee_Move_State* CDee_Move_State::Create()
@@ -150,12 +215,21 @@ void CDee_Emotion_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta);
 
 
-	if (baseInfo.pDee->IsAnimFinished())
+	if (baseInfo.pDee->Get_State() == DEEANIM_ANGER)
 	{
-		//인사하는 거였으면 눈 바꾸고 다시 idle로 돌아가
-		baseInfo.pDee->Set_DeeEyeState(DEEEYE_IDLE);
-		baseInfo.pDee->Change_State(DEEANIM_LOOKAROUND, 60.f, true, true);
+		baseInfo.pDee->Set_DeeEyeState(DEEEYE_ANGER);
 	}
+	else if (baseInfo.pDee->Get_State() == DEEANIM_TALK2)
+	{
+		baseInfo.pDee->Set_DeeEyeState(DEEEYE_SMILE);
+	}
+
+	//일회용 이모트였다면, 다시 디폴트 상태로 돌아가도록
+	//if (baseInfo.pDee->IsAnimFinished())
+	//{
+	//	baseInfo.pDee->Set_DeeEyeState(DEEEYE_IDLE);
+	//	baseInfo.pDee->Change_State(DEEANIM_TOWNWAIT, 60.f, true, true);
+	//}
 
 }
 
@@ -394,6 +468,7 @@ void CDee_Hungry_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 
 void CDee_Hungry_State::OnStateExit()
 {
+	m_fDuration = 0.f;
 }
 
 CDee_Hungry_State* CDee_Hungry_State::Create()
@@ -492,6 +567,7 @@ void CDee_NPC_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 
 void CDee_NPC_State::OnStateExit()
 {
+	m_fDuration = 0.f;
 }
 
 CDee_NPC_State* CDee_NPC_State::Create()
@@ -523,10 +599,13 @@ void CDee_Sleep_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 	Setup_BaseInfo(baseInfo, pGameObject);
 
 	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta);
+	baseInfo.pDee->Set_DeeEyeState(DEEEYE_CLOSE);
+
 }
 
 void CDee_Sleep_State::OnStateExit()
 {
+	m_fDuration = 0.f;
 }
 
 CDee_Sleep_State* CDee_Sleep_State::Create()
@@ -539,4 +618,81 @@ void CDee_Sleep_State::Free()
 {
 	__super::Free();
 }
+#pragma endregion
+
+#pragma region INTERACT STATE
+
+CDee_Interact_State::CDee_Interact_State()
+{
+}
+
+void CDee_Interact_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+}
+
+void CDee_Interact_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	BASE_INFO baseInfo{};
+	Setup_BaseInfo(baseInfo, pGameObject);
+	System_Tick(fTimeDelta);
+
+	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta);
+
+	//상호작용 스테이트마다 조금식 다르게 하자~
+	switch (baseInfo.pDee->Get_State())
+	{
+	case DEEANIM_MOVEFALL:
+	{
+		if (m_fDuration < .5f)
+		{
+			_float fSpeed = 15.f * (.5f - m_fDuration);
+			baseInfo.pDee->Set_DeeEyeState(DEEEYE_SMILE);
+			baseInfo.pController->Move_Dir(baseInfo.pTransformCom, baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta * fSpeed, fTimeDelta);
+		}
+
+		if(abs(m_fDuration - .6f) < fTimeDelta * 2.f)
+			baseInfo.pDee->Set_DeeEyeState(DEEEYE_CLOSE);
+
+		if (abs(m_fDuration - 1.f) < fTimeDelta * 2.f)
+			baseInfo.pDee->Set_DeeEyeState(DEEEYE_SADNESS);
+	}
+	break;
+	case DEEANIM_WATERING:
+	{
+		if (abs(m_fDuration - 1.f) < fTimeDelta * 2.f)
+			baseInfo.pDee->Set_DeeEyeState(DEEEYE_SMILE);
+	}
+	break;
+
+	default:
+		break;
+	}
+
+
+	if (baseInfo.pDee->IsAnimFinished())
+	{
+		//인사하는 거였으면 눈 바꾸고 다시 idle로 돌아가
+		baseInfo.pDee->Set_DeeEyeState(DEEEYE_IDLE);
+		baseInfo.pDee->Change_State(DEEANIM_WALK, 60.f, true, true);
+	}
+
+}
+
+void CDee_Interact_State::OnStateExit()
+{
+	m_fDuration = 0.f;
+}
+
+CDee_Interact_State* CDee_Interact_State::Create()
+{
+	CDee_Interact_State* pInstance = new CDee_Interact_State();
+	return pInstance;
+}
+
+void CDee_Interact_State::Free()
+{
+	__super::Free();
+}
+
 #pragma endregion

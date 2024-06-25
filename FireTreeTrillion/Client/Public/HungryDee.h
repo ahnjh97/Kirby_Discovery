@@ -19,6 +19,7 @@ public:
 	{
 		_int iIdx;
 	};
+
 private:
 	CHungryDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CHungryDee(const CHungryDee& rhs);
@@ -27,6 +28,8 @@ private:
 	enum WAITPOS{WAITPOS_FRONT = 2, WAITPOS_END};
 public:
 	static pair<_float3, vector<WAITING_INFO>> m_WaitingList;
+
+	//이 두 변수는 싱글톤으로 뺄 거여요~
 	static _int		m_iWatingNum;
 	static _float	m_fWaitingTime;
 
