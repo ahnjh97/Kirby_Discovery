@@ -2,6 +2,19 @@
 #include "MapToolObject.h"
 #include "MapToolHelper.h"
 
+void CMapToolObject::Set_PassIndices(unordered_set<_uint>& _setBlendMeshIndices)
+{
+	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
+	m_vecPassIndices.resize(m_pModelCom->Get_NumMeshes());
+	for (_uint i = 0; i < iNumMeshes; i++)
+	{
+		if (_setBlendMeshIndices.end() != _setBlendMeshIndices.find(i))
+			m_vecPassIndices[i] = MODEL_ALPHABLEND_NORMAL_O;
+		else
+			m_vecPassIndices[i] = MODEL_NORMAL_O;
+	}
+}
+
 CMapToolObject::CMapToolObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
 {
@@ -61,6 +74,8 @@ _int CMapToolObject::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return OBJ_DEAD;
 
+	m_fTime += fTimeDelta;
+
 	if (nullptr != m_pOrbitingCamera) {
 		m_pOrbitingCamera->Set_Radius(m_fRadius);
 		m_pOrbitingCamera->Tick(fTimeDelta);
@@ -85,19 +100,48 @@ HRESULT CMapToolObject::Render()
 
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 
-	for (size_t i = 0; i < iNumMeshes; i++)
+	if (m_vecPassIndices.empty())
 	{
-		if(FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
-			return E_FAIL;
-		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
-			return E_FAIL;
-			/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-
-		if (FAILED(m_pShaderCom->Begin(m_iPassIndex)))
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
 			return E_FAIL;
 
-		if (FAILED(m_pModelCom->Render(i)))
-			return E_FAIL;
+		for (size_t i = 0; i < iNumMeshes; i++)
+		{
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Begin(m_iPassIndex)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Render(i)))
+				return E_FAIL;
+		}
+	}
+	else
+	{
+		for (size_t i = 0; i < iNumMeshes; i++)
+		{
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
+				return E_FAIL;
+			if (m_iMeshIndex == i && m_fTime < 0.5f)
+			{
+				if (FAILED(m_pShaderCom->Begin(MODEL_TRIGGER)))
+					return E_FAIL;
+			}
+			else
+			{
+				if (FAILED(m_pShaderCom->Begin(m_vecPassIndices[i])))
+					return E_FAIL;
+			}
+			if (FAILED(m_pModelCom->Render(i)))
+				return E_FAIL;
+		}
 	}
 
 	return S_OK;
