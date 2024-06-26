@@ -59,6 +59,8 @@ HRESULT CBattleDee::Initialize(void* pArg)
 
 	m_pTransformCom->Rotation({ 0.f, 1.f, 0.f, 0.f }, ToRadian(180.f));
 
+	m_eAbilityType = ABILITY_DEFAULT;
+
 	return S_OK;
 }
 
@@ -70,6 +72,9 @@ _int CBattleDee::Tick(_float fTimeDelta)
 		return Ready_Dead();
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+
+	if (m_ePhyXState == PO_VACUUMING || m_ePhyXState == PO_FLYDEADAWAY)
+		Change_State(DEEANIM_DAMAGE, 120.f, true, false);
 
 	__super::Tick(m_fTimeDelta);
 
@@ -84,7 +89,8 @@ _int CBattleDee::Tick(_float fTimeDelta)
 
 void CBattleDee::Late_Tick(_float fTimeDelta)
 {
-	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+	if (m_ePhyXState == PO_KIRBYMOUTH)
+		return;
 
 	for (auto& Pair : m_PartObjects)
 		Pair.second->Late_Tick(m_fTimeDelta);

@@ -433,23 +433,24 @@ void CCollisionCenter::Ladder_Collider()
 void CCollisionCenter::DeeDeeDee_Battle()
 {
 
-	//// 플레이어와 보스몬스터 몸박 (특정 상황일때만, 디디디로부터 피해를 받는다.)
-	//Collision_Collider(m_GameObjects[PLAYER], m_GameObjects[BOSS_DEEDEEDEE], this,
-	//	[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
-	//	{
-	//		CGameObject* Dst = DstHit->Get_Owner();
-	//		CGameObject* Src = SrcHit->Get_Owner();
-	//		if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
-	//			return;
-	//	});
-	//Collision_Collider(m_GameObjects[NPC], m_GameObjects[BOSS_DEEDEEDEE], this,
-	//	[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
-	//	{
-	//		CGameObject* Dst = DstHit->Get_Owner();
-	//		CGameObject* Src = SrcHit->Get_Owner();
-	//		if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
-	//			return;
-	//	});
+	// 플레이어와 와들 디의 몸 충돌. 흡수 할때만 작동할 것이다.
+	Collision_Collider(m_GameObjects[PLAYER], m_GameObjects[BATTLEDEE], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CPhysXObject* pPlayer = static_cast<CKirby*>(Dst);
+			CPhysXObject* pDee = static_cast<CMonster*>(Src);
+
+			// 디가 흡수 상태일 경우에만 작동하라.
+			if (pDee->Get_PhyXState() != PO_VACUUMING)
+				return;
+
+			pPlayer->Collision(CONTENT_BODY, pDee);
+		});
 
 	// 플레이어 공격에 대한 처리.
 	Collision_Collider(m_GameObjects[HITBOX_PLYAER], m_GameObjects[BOSS_DEEDEEDEE], this,
