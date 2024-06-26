@@ -180,7 +180,6 @@ void CDee_Walk_State::Free()
 }
 #pragma endregion
 
-
 #pragma region RUN STATE
 CDee_Run_State::CDee_Run_State()
 {
@@ -241,7 +240,6 @@ void CDee_Run_State::Free()
 	__super::Free();
 }
 #pragma endregion
-
 
 #pragma region EMOTION STATE
 CDee_Emotion_State::CDee_Emotion_State()
@@ -835,6 +833,67 @@ CDee_Interact_State* CDee_Interact_State::Create()
 }
 
 void CDee_Interact_State::Free()
+{
+	__super::Free();
+}
+
+#pragma endregion
+
+#pragma region PANIC STATE
+CDee_Panic_State::CDee_Panic_State()
+{
+}
+
+void CDee_Panic_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+}
+
+void CDee_Panic_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	BASE_INFO baseInfo{};
+	Setup_BaseInfo(baseInfo, pGameObject);
+	System_Tick(fTimeDelta);
+
+	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta);
+
+
+	_float3 vMyPos = baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION);
+	_float3 vDestPos = baseInfo.pDee->Make_DestPos();
+	vDestPos.y = vMyPos.y;
+
+
+
+	m_fSwitchDirTime -= fTimeDelta;
+
+	if (m_fSwitchDirTime <= 0.f)
+	{
+		m_fSwitchDirTime = CUtils::Make_RandomFloat(1.f, 2.f);
+		m_vDir = CUtils::Make_Random_Vector(1.f);
+		m_vDir.y = 0.f;
+		m_vDir.Normalize();
+	}
+
+
+	//목표 지점과의 거리 차이를 구하여 속도 정하기
+	_float fSpeed = 3.5f;
+
+	//목표 방향을 향해 회전한, 이동한다.
+	baseInfo.pTransformCom->Look_At_Interpolate(vMyPos + m_vDir, fTimeDelta);
+	baseInfo.pController->Move_Dir(baseInfo.pTransformCom, baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta * fSpeed, fTimeDelta);
+}
+
+void CDee_Panic_State::OnStateExit()
+{
+}
+
+CDee_Panic_State* CDee_Panic_State::Create()
+{
+	CDee_Panic_State* pInstance = new CDee_Panic_State();
+	return pInstance;
+}
+
+void CDee_Panic_State::Free()
 {
 	__super::Free();
 }

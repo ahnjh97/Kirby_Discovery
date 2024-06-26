@@ -74,7 +74,7 @@ float g_scale = 0.5f;
 // 콘모양 제어
 float g_bias = 0.f;
 // 탐색 반경
-float g_sample_radius = 3.f;
+float g_sample_radius = 1.f;
 // 음영의 강함
 float g_intensity = 3.f;
 

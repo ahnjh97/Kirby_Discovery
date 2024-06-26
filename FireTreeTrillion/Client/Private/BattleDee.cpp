@@ -21,7 +21,7 @@ pair<DEE_ANIM, _bool> CBattleDee::Make_WhatToDo()
 	switch (CUtils::Make_RandomInt(0, 2))
 	{
 	case 0:
-		eDeeState = DEEANIM_ANGERRUN;
+		eDeeState = DEEANIM_ENEMYRUN;
 		break;
 	case 1:
 		eDeeState = DEEANIM_ANGERRUN;
@@ -34,6 +34,7 @@ pair<DEE_ANIM, _bool> CBattleDee::Make_WhatToDo()
 		break;
 	};
 
+	Set_DeeEyeState(DEEEYE_SADNESS);
 	return { eDeeState, true };
 }
 
@@ -286,6 +287,7 @@ void CBattleDee::SetUp_FSM()
 
 	m_pFSM->Add_State(DEEANIM_TROUBLE, CDee_Emotion_State::Create());
 	m_pFSM->Add_State(DEEANIM_ANGERRUN, CDee_Run_State::Create());
+	m_pFSM->Add_State(DEEANIM_ENEMYRUN, CDee_Panic_State::Create());
 	m_pFSM->Add_State(DEEANIM_CHEERINGA, CDee_Emotion_State::Create());
 
 	m_pFSM->Add_State(DEEANIM_DAMAGE, CDee_FlyStun_State::Create());

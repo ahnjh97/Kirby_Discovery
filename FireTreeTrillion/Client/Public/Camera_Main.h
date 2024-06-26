@@ -66,7 +66,7 @@ public:
 			m_eCamFocus = eFocus;
 		}
 	}
-
+	
 
 	void Set_MatrixIndex(_int iMatrixIndex);
 	void EmplaceBackCamMatrix(const _float4x4& matWorld);
