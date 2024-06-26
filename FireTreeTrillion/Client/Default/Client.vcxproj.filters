@@ -315,7 +315,7 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BladeKnight\State">
       <UniqueIdentifier>{c3509440-bbe1-439c-b743-a205693e77b6}</UniqueIdentifier>
-	</Filter>
+    </Filter>
     <Filter Include="01.Levels\GamePlay">
       <UniqueIdentifier>{4547c314-4c9e-474f-bf8e-dd8eb6143161}</UniqueIdentifier>
     </Filter>
@@ -336,6 +336,9 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop">
       <UniqueIdentifier>{4c6be733-c7c6-40fb-ba47-92d5f18bf7f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\BossMonster\RayArrow">
+      <UniqueIdentifier>{f9898ce1-9a1d-4fb0-b5de-96feac78a5bb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -650,7 +653,7 @@
     </ClInclude>
     <ClInclude Include="..\Public\FinalBossSpear.h">
       <Filter>02.GameObjects\PhysXObject\Character\BossMonster\PartObject_Spear</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\Public\Level_GamePlay.h">
       <Filter>01.Levels\GamePlay</Filter>
     </ClInclude>
@@ -666,8 +669,11 @@
     <ClInclude Include="..\public\Dee_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\State</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\FoodShopDee.h">
+    <ClInclude Include="..\Public\FoodShopDee.h">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\RayArrow.h">
+      <Filter>02.GameObjects\PhysXObject\Character\BossMonster\RayArrow</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -964,7 +970,7 @@
     </ClCompile>
     <ClCompile Include="..\Private\FinalBossSpear.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\BossMonster\PartObject_Spear</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="..\Private\Level_GamePlay.cpp">
       <Filter>01.Levels\GamePlay</Filter>
     </ClCompile>
@@ -980,8 +986,11 @@
     <ClCompile Include="..\private\Dee_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\State</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\FoodShopDee.cpp">
+    <ClCompile Include="..\Private\FoodShopDee.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\FoodShop</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RayArrow.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\BossMonster\RayArrow</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

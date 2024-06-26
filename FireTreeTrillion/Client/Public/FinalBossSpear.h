@@ -41,11 +41,21 @@ private:
 	_float2			m_vPreScreenPos = { 0.f, 0.f };
 	_float4			m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
 
+	_float			m_fDelayTime = { 0.f };
+	_float			m_fCreateTime = { 0.f };
+	_float			m_fFirstFireTime = { 4.2f };
+	_float			m_fSecondFireTime = { 4.f };
+
+	_float			m_fAngle = { 0.f };
+	_float			m_fSide = { 0.f };
+	_uint			m_iCnt = { 0 };
+
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
 
 	void	Compute_MotionBlur();
+	_float4 Compute_BoneWorldMatrix();
 
 public:
 	static CFinalBossSpear* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

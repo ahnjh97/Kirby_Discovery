@@ -3,6 +3,7 @@
 #include "FSM.h"
 #include "FinalBoss_State.h"
 #include "FinalBossSpear.h"
+#include "RayArrow.h"
 
 CFinalBoss::CFinalBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -23,17 +24,18 @@ HRESULT CFinalBoss::Initialize_Prototype()
 
 HRESULT CFinalBoss::Initialize(void* pArg)
 {
-	GAMEOBJECT_DESC* pGameObjectDesc = nullptr;
+	FINALBOSS_DESC* pBossDesc = nullptr;
 
 	if (nullptr != pArg)
 	{
-		pGameObjectDesc = (GAMEOBJECT_DESC*)pArg;
+		pBossDesc = (FINALBOSS_DESC*)pArg;
 
-		pGameObjectDesc->fSpeedPerSec = 7.f;
-		pGameObjectDesc->fRotationPerSec = XMConvertToRadians(90.0f);
+		pBossDesc->fSpeedPerSec = 7.f;
+		pBossDesc->fRotationPerSec = XMConvertToRadians(90.0f);
+		m_vecRallyPoint = pBossDesc->vecRallyPoints;
 	}
 
-	if (FAILED(__super::Initialize(pGameObjectDesc)))
+	if (FAILED(__super::Initialize(pBossDesc)))
 		return E_FAIL;
 
 	if (FAILED(Add_Components()))
@@ -42,12 +44,13 @@ HRESULT CFinalBoss::Initialize(void* pArg)
 	if (FAILED(Add_PartObjects()))
 		return E_FAIL;
 
-	m_pModelCom->Set_Animation(FINALBOSS_DEMOAPPEARCUT5, 40.f, false, true);
+	m_pModelCom->Set_Animation(FINALBOSS_DEMOAPPEARCUT5, 70.f, false, true);
 
 	m_fMaxHp = 15.f;
 	m_fHp = 15.f;
 	m_fAttack = 10.f;
 	m_eVacuumSize = SIZE_BIG;
+	m_eBossState = STATE_FLYING;
 
 	return S_OK;
 }
@@ -58,6 +61,26 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 		return Ready_Dead();
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+
+
+	if (true == m_bGlide)
+	{
+		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+		_float fAmplitude = 1.f;	// 진폭
+		_float fFrequency = 1.5f;   // 주기
+
+		_vector vGlidePos;
+		// 애니메이션에 따라 속도 가중치 ?!
+		m_fGlideTime += m_fTimeDelta * 0.095f;
+		vGlidePos = vPos + m_fGlideTime * (m_vDir - vPos);
+
+		// 사인 곡선을 따라 y 조정
+		vGlidePos.m128_f32[1] += fAmplitude * sin(fFrequency * m_fGlideTime * 2.f * 3.14f);
+
+		m_pControllerCom->Move(m_pTransformCom, vGlidePos, m_fTimeDelta);
+	}
+	else
+		m_fGlideTime = 0.f;
 
 	__super::Tick(m_fTimeDelta);
 
@@ -165,7 +188,7 @@ HRESULT CFinalBoss::Add_Components()
 {
 	HRESULT hr;
 	/* For.Com_Shader */
-	hr = __super::Add_Component(TEXT("Prototype_Component_Shader_VtxAnimModel"),
+	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimModel"),
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
@@ -261,8 +284,67 @@ void CFinalBoss::SetUp_FSM()
 	m_pFSM->Add_State(FINALBOSS_DEMOAPPEARCUT5, CFinalBoss_Appear_State::Create());
 
 	m_pFSM->Add_State(FINALBOSS_WAITAIR, CFinalBoss_Idle_State::Create());
+	m_pFSM->Add_State(FINALBOSS_WAIT, CFinalBoss_Idle_State::Create());
 
-	//m_pFSM->Add_State(FINALBOSS_WAITAIR, CFinalBoss_Thrust_State::Create());
+	// 찌르기 패턴
+	m_pFSM->Add_State(FINALBOSS_STABREADY, CFinalBoss_Stab_State::Create());
+	m_pFSM->Add_State(FINALBOSS_STABSTART, CFinalBoss_Stab_State::Create());
+	m_pFSM->Add_State(FINALBOSS_STABWAIT, CFinalBoss_Stab_State::Create());
+	m_pFSM->Add_State(FINALBOSS_STAB, CFinalBoss_Stab_State::Create());
+	m_pFSM->Add_State(FINALBOSS_STABEND, CFinalBoss_Stab_State::Create());
+	m_pFSM->Add_State(FINALBOSS_SLASHCHAINSTABREADY, CFinalBoss_Stab_State::Create());
+
+	// 백스텝 활공
+	m_pFSM->Add_State(FINALBOSS_AWAYFASTREADY, CFinalBoss_GlideBack_State::Create());
+	m_pFSM->Add_State(FINALBOSS_AWAYFASTSTART, CFinalBoss_GlideBack_State::Create());
+	m_pFSM->Add_State(FINALBOSS_AWAYFAST, CFinalBoss_GlideBack_State::Create());
+	m_pFSM->Add_State(FINALBOSS_AWAYFASTENDAIR, CFinalBoss_GlideBack_State::Create());
+	//m_pFSM->Add_State(FINALBOSS_AWAYFASTEND, CFinalBoss_GlideBack_State::Create());
+
+	// 왼쪽 횡 활공
+	m_pFSM->Add_State(FINALBOSS_TURNLEFTAIRSTART, CFinalBoss_Glide_State::Create());
+	m_pFSM->Add_State(FINALBOSS_TURNLEFTAIR, CFinalBoss_Glide_State::Create());
+	m_pFSM->Add_State(FINALBOSS_TURNLEFTAIREND, CFinalBoss_Glide_State::Create());
+	// 오른쪽 횡 활공
+	m_pFSM->Add_State(FINALBOSS_TURNRIGHTAIRSTART, CFinalBoss_Glide_State::Create());
+	m_pFSM->Add_State(FINALBOSS_TURNRIGHTAIR, CFinalBoss_Glide_State::Create());
+	m_pFSM->Add_State(FINALBOSS_TURNRIGHTAIREND, CFinalBoss_Glide_State::Create());
+
+	// 슬래시 패턴
+	m_pFSM->Add_State(FINALBOSS_SLASHREADY, CFinalBoss_Slash_State::Create());
+	m_pFSM->Add_State(FINALBOSS_SLASHSTART, CFinalBoss_Slash_State::Create());
+	m_pFSM->Add_State(FINALBOSS_SLASH, CFinalBoss_Slash_State::Create());
+	m_pFSM->Add_State(FINALBOSS_SLASHCHAINREADY, CFinalBoss_Slash_State::Create());
+	// 2차 슬래시 패턴
+	m_pFSM->Add_State(FINALBOSS_SLASHEND, CFinalBoss_SlashEnd_State::Create());
+
+	// 스윙 패턴
+	m_pFSM->Add_State(FINALBOSS_SWINGRIGHTSTART, CFinalBoss_Swing_State::Create());
+	m_pFSM->Add_State(FINALBOSS_SWINGRIGHT, CFinalBoss_Swing_State::Create());
+	m_pFSM->Add_State(FINALBOSS_SWINGRIGHTEND, CFinalBoss_Swing_State::Create());
+	// 강스윙
+	m_pFSM->Add_State(FINALBOSS_SWINGFINISHLEFT, CFinalBoss_Swing_State::Create());
+	m_pFSM->Add_State(FINALBOSS_SWINGFINISHLEFTEND, CFinalBoss_Swing_State::Create());
+	// 일반 스윙
+	m_pFSM->Add_State(FINALBOSS_SWINGLEFTSTART, CFinalBoss_Swing_State::Create());
+	m_pFSM->Add_State(FINALBOSS_SWINGLEFT, CFinalBoss_Swing_State::Create());
+	m_pFSM->Add_State(FINALBOSS_SWINGLEFTEND, CFinalBoss_Swing_State::Create());
+
+	// 화살 쏘는 패턴
+	// 지상
+	m_pFSM->Add_State(FINALBOSS_RAYARROWREADY, CFinalBoss_Arrow_State::Create());
+	m_pFSM->Add_State(FINALBOSS_RAYARROWSTART, CFinalBoss_Arrow_State::Create());
+	m_pFSM->Add_State(FINALBOSS_RAYARROWEND, CFinalBoss_Arrow_State::Create());
+	// 공중
+	m_pFSM->Add_State(FINALBOSS_RAYARROWREADYAIR, CFinalBoss_Arrow_State::Create());
+	m_pFSM->Add_State(FINALBOSS_RAYARROWSTARTAIR, CFinalBoss_Arrow_State::Create());
+	m_pFSM->Add_State(FINALBOSS_RAYARROWENDAIR, CFinalBoss_Arrow_State::Create());
+
+	// 땅에서 찌르기 패턴
+	m_pFSM->Add_State(FINALBOSS_FLASHTHRUSTREADY, CFinalBoss_Thrust_State::Create());
+	m_pFSM->Add_State(FINALBOSS_FLASHTHRUSTSTART, CFinalBoss_Thrust_State::Create());
+	m_pFSM->Add_State(FINALBOSS_FLASHTHRUST, CFinalBoss_Thrust_State::Create());
+	m_pFSM->Add_State(FINALBOSS_FLASHTHRUSTEND, CFinalBoss_Thrust_State::Create());
 
 	//상태 Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};

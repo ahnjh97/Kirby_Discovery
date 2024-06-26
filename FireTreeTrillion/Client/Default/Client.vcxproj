@@ -205,6 +205,7 @@
     <ClInclude Include="..\Public\FinalBoss.h" />
     <ClInclude Include="..\Public\FinalBossSpear.h" />
     <ClInclude Include="..\Public\FinalBoss_State.h" />
+    <ClInclude Include="..\Public\FoodShopDee.h" />
     <ClInclude Include="..\Public\FXToolDirector.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
@@ -275,6 +276,7 @@
     <ClInclude Include="..\Public\PoppyBrosJr_State.h" />
     <ClInclude Include="..\Public\Rabbit.h" />
     <ClInclude Include="..\Public\Rabbit_State.h" />
+    <ClInclude Include="..\Public\RayArrow.h" />
     <ClInclude Include="..\Public\RigidObject.h" />
     <ClInclude Include="..\Public\SingleEffect.h" />
     <ClInclude Include="..\public\SkySphere.h" />
@@ -333,6 +335,7 @@
     <ClCompile Include="..\Private\FinalBoss.cpp" />
     <ClCompile Include="..\Private\FinalBossSpear.cpp" />
     <ClCompile Include="..\Private\FinalBoss_State.cpp" />
+    <ClCompile Include="..\Private\FoodShopDee.cpp" />
     <ClCompile Include="..\Private\FXToolDirector.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -400,6 +403,7 @@
     <ClCompile Include="..\Private\PoppyBrosJr_State.cpp" />
     <ClCompile Include="..\Private\Rabbit.cpp" />
     <ClCompile Include="..\Private\Rabbit_State.cpp" />
+    <ClCompile Include="..\Private\RayArrow.cpp" />
     <ClCompile Include="..\Private\RigidObject.cpp" />
     <ClCompile Include="..\Private\SingleEffect.cpp" />
     <ClCompile Include="..\private\SkySphere.cpp" />

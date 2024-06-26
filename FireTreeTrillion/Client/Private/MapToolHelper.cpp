@@ -79,7 +79,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	m_vecMapModelNames = { "Level0Stage1Step01", "Level1Stage1Step01", "Town" , "LbLastBossStage"};
 	m_setMapNames = { "BG0", "BG1", "Level0Stage1Step01", "Level1Stage1Step01", "Town" , "LbLastBossStage"};
 	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy", "Fog", "Ladder" };
-	m_setRallyingMonsters = { "NonAnim_Kabu", "NonAnim_BrontoBurt" };
+	m_setRallyingMonsters = { "NonAnim_Kabu", "NonAnim_BrontoBurt", "NonAnim_FinalBoss" };
 
 	/*m_setNonColDecos = { "BushMCut" };*/
 	m_setAnimDecos = { "BushL", "BushM", "BushS", "PopFlower" };

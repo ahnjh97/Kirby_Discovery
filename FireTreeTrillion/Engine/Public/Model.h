@@ -26,6 +26,7 @@ public:
 	_float Get_Duration() { return m_Animations[m_iCurrentAnimIndex]->Get_Duration(); }
 	_float Get_Trackposition() { return m_Animations[m_iCurrentAnimIndex]->Get_TrackPosition(); }
 	_float Get_AnimRatio() { return m_Animations[m_iCurrentAnimIndex]->Get_AnimRatio(); }
+	
 
 public:
 	void Set_TickPerSecond(_float _fTickPerSecond) { m_Animations[m_iCurrentAnimIndex]->Set_TickPerSecond(_fTickPerSecond); }
@@ -106,6 +107,7 @@ public:
 	HRESULT Bind_WorldMatrixForOctree(class CShader* pShader, string& strConstantName = string("g_WorldMatrix"));
 	void SetUp_ModelIdleAnimForOctree(_uint iAnimIndex, _float fTickPerSec) { m_iIdleAnimIndex = iAnimIndex; m_fIdleAnimTickPerSec = fTickPerSec; }
 	void ReturnToIdle() { Set_Animation(m_iIdleAnimIndex, m_fIdleAnimTickPerSec, true, true, 0.1f); }
+	void Invalidate_Bones();
 
 private:
 	_uint						m_iNumMeshes = { 0 };

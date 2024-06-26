@@ -492,6 +492,12 @@ HRESULT CModel::Bind_WorldMatrixForOctree(CShader* pShader, string& strConstantN
 	return S_OK;
 }
 
+void CModel::Invalidate_Bones()
+{
+	for (auto& pBone : m_Bones)
+		pBone->Invalidate_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_TransformMatrix));
+}
+
 HRESULT CModel::Ready_Meshes(_bool bOctree)
 {
 	m_InputFile.read(reinterpret_cast<char*>(&m_iNumMeshes), sizeof(m_iNumMeshes));

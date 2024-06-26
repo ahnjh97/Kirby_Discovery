@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "FinalBossSpear.h"
 #include "Bone.h"
+#include "RayArrow.h"
+#include "FinalBoss.h"
 
 CFinalBossSpear::CFinalBossSpear(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPartObject{ pDevice, pContext }
@@ -32,6 +34,11 @@ HRESULT CFinalBossSpear::Initialize(void* pArg)
 
 	//m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(0.f, 0.1f, 0.01f, 1.f));
 
+	//m_pModelCom->Invalidate_Bones();
+
+	m_fDelayTime = 0.1f;
+	m_fCreateTime = 0.1f;
+
 	return S_OK;
 }
 
@@ -43,6 +50,98 @@ _int CFinalBossSpear::Tick(_float fTimeDelta)
 	//Compute_MotionBlur();
 
 	XMStoreFloat4x4(&m_WorldMatrix, m_pTransformCom->Get_WorldMatrix() * XMLoadFloat4x4(m_pSocket->Get_CombinedTransformationMatrix()) * XMLoadFloat4x4(m_pParentMatrix));
+
+	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Monster")));
+	if (CFinalBoss::FINALBOSS_RAYARROWSTART == pFinalBoss->Get_State() || CFinalBoss::FINALBOSS_RAYARROWSTARTAIR == pFinalBoss->Get_State())
+	{
+		if (0.0f < pFinalBoss->Get_AnimRatio() && 0.25f > pFinalBoss->Get_AnimRatio())
+		{
+			m_fDelayTime += fTimeDelta;
+			if (m_fCreateTime < m_fDelayTime)
+			{
+				++m_iCnt;
+				m_fDelayTime = 0.f;
+				CRayArrow::RAYARROW_DESC RayArrow = {};
+				_float4x4 WorldMatrix = m_WorldMatrix;
+				WorldMatrix._41 -= m_WorldMatrix._31 * 4.5f;
+				WorldMatrix._42 -= m_WorldMatrix._32 * 4.5f;
+				WorldMatrix._43 -= m_WorldMatrix._33 * 4.5f;
+				RayArrow.vPosition = _float4(WorldMatrix._41, WorldMatrix._42, WorldMatrix._43, 1.f);
+				RayArrow.fAngle = m_fAngle;
+				if(CFinalBoss::FINALBOSS_RAYARROWSTART == pFinalBoss->Get_State())
+					RayArrow.fHeight = 30.f;
+				else
+					RayArrow.fHeight = 70.f;
+				RayArrow.vSide = pFinalBoss->Get_TransformCom()->Get_State_Vector(CTransform::STATE_RIGHT) * m_fSide;
+				RayArrow.fDelayTime = m_fFirstFireTime;
+				//RayArrow.vLook = _float3(m_pParentMatrix->_31, m_pParentMatrix->_32, m_pParentMatrix->_33);
+				if (FAILED(m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Arrow"), TEXT("Prototype_GameObject_RayArrow"), &RayArrow)))
+				{
+					MSG_BOX(TEXT("Failed to Clone : CRayArrow"));
+					return E_FAIL;
+				}
+
+				m_fAngle += 13.f;
+				m_fSide -= 10.f;
+				m_fFirstFireTime -= 0.4f;
+
+				if (1 == m_iCnt)
+					m_fCreateTime = 0.16f;
+				else if (2 == m_iCnt)
+					m_fCreateTime = 0.08f;
+				else
+					m_fCreateTime = 0.11f;
+			}
+		}
+		else if (0.47f < pFinalBoss->Get_AnimRatio() && 0.65f > pFinalBoss->Get_AnimRatio())
+		{
+			m_fDelayTime += fTimeDelta;
+			if (m_fCreateTime < m_fDelayTime)
+			{
+				m_fAngle -= 13.f;
+				m_fSide += 10.f;
+				m_fSecondFireTime -= 0.4f;
+				++m_iCnt;
+				m_fDelayTime = 0.f;
+				CRayArrow::RAYARROW_DESC RayArrow = {};
+				_float4x4 WorldMatrix = m_WorldMatrix;
+				WorldMatrix._41 -= m_WorldMatrix._31 * 4.5f;
+				WorldMatrix._42 -= m_WorldMatrix._32 * 4.5f;
+				WorldMatrix._43 -= m_WorldMatrix._33 * 4.5f;
+				RayArrow.vPosition = _float4(WorldMatrix._41, WorldMatrix._42, WorldMatrix._43, 1.f);
+				RayArrow.fAngle = m_fAngle;
+				if (CFinalBoss::FINALBOSS_RAYARROWSTART == pFinalBoss->Get_State())
+					RayArrow.fHeight = 30.f;
+				else
+					RayArrow.fHeight = 70.f;
+				RayArrow.vSide = pFinalBoss->Get_TransformCom()->Get_State_Vector(CTransform::STATE_RIGHT) * m_fSide;
+				RayArrow.fDelayTime = m_fSecondFireTime;
+				//RayArrow.vLook = _float3(m_pParentMatrix->_21, m_pParentMatrix->_22, m_pParentMatrix->_23);
+				if (FAILED(m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Arrow"), TEXT("Prototype_GameObject_RayArrow"), &RayArrow)))
+				{
+					MSG_BOX(TEXT("Failed to Clone : CRayArrow"));
+					return E_FAIL;
+				}
+
+				if (6 == m_iCnt)
+					m_fCreateTime = 0.08f;
+				else
+					m_fCreateTime = 0.1f;
+			}
+		}
+		else
+		{
+			m_fAngle = 0.f;
+			m_fSide = 0.f;
+			m_fFirstFireTime = 4.2f;
+			m_fSecondFireTime = 4.f;
+		}
+	}
+	else
+	{
+		m_iCnt = 0;
+		m_fDelayTime = 0.f;
+	}
 
 	return OBJ_NOEVENT;
 }
@@ -96,7 +195,7 @@ HRESULT CFinalBossSpear::Add_Components()
 {
 	HRESULT hr;
 	/* For.Com_Shader */
-	hr = __super::Add_Component(TEXT("Prototype_Component_Shader_VtxModel"),
+	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"),
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
@@ -152,6 +251,18 @@ void CFinalBossSpear::Compute_MotionBlur()
 	m_vMotionVelocity.x = (m_vPreScreenPos - vCurScreenPos).x;
 	m_vMotionVelocity.y = (m_vPreScreenPos - vCurScreenPos).y;
 	m_vPreScreenPos = vCurScreenPos;
+}
+
+_float4 CFinalBossSpear::Compute_BoneWorldMatrix()
+{
+	_float4x4 WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+	WorldMatrix._41 -= m_pTransformCom->Get_State_Float4(CTransform::STATE_RIGHT).x * 5.f;
+	WorldMatrix._42 -= m_pTransformCom->Get_State_Float4(CTransform::STATE_RIGHT).y * 5.f;
+	WorldMatrix._43 -= m_pTransformCom->Get_State_Float4(CTransform::STATE_RIGHT).z * 5.f;
+
+	XMStoreFloat4x4(&WorldMatrix, WorldMatrix * XMLoadFloat4x4(m_pSocket->Get_CombinedTransformationMatrix()) * XMLoadFloat4x4(m_pParentMatrix));
+
+	return _float4(WorldMatrix._41, WorldMatrix._42, WorldMatrix._43, WorldMatrix._44);
 }
 
 CFinalBossSpear* CFinalBossSpear::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

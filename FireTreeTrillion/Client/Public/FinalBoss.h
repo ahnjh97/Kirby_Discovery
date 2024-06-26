@@ -42,10 +42,28 @@ public:
 		FINALBOSS_END
 	};
 
+	enum FINALBOSS_STATE { STATE_FLYING, STATE_GROUND, STATE_END };
+
+	struct FINALBOSS_DESC : public CMonster::MONSTER_DESC {
+		vector<_float4> vecRallyPoints;
+	};
+
 private:
 	CFinalBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CFinalBoss(const CFinalBoss& rhs);
 	virtual ~CFinalBoss() = default;
+
+public:
+	void Set_Direction(_vector vDir) { m_vDir = vDir; }
+	void Set_BossState(FINALBOSS_STATE eBossState) { m_eBossState = eBossState; }
+	void Set_Glide(_bool bGlide) { m_bGlide = bGlide; }
+	void Set_Chain(_bool bChain) { m_bChain = bChain; }
+	void Set_TickPerSecond(_float TickPerSecond) { m_pModelCom->Set_TickPerSecond(TickPerSecond); }
+
+	_vector Get_Direction() { return m_vDir; }
+	vector<_float4> Get_RallyPoint() { return m_vecRallyPoint; }
+	FINALBOSS_STATE Get_BossState() { return m_eBossState; }
+	_bool Get_Chain() { return m_bChain; }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -67,6 +85,15 @@ private:
 	map<const wstring, CPartObject*>	m_PartObjects;
 
 	FINALBOSS_ANIM		m_eCurrentState = { FINALBOSS_END };
+	FINALBOSS_STATE		m_eBossState = { STATE_END };
+
+	vector<_float4>		m_vecRallyPoint;
+
+	_vector				m_vDir = {};
+
+	_bool				m_bGlide = { false };
+	_bool				m_bChain = { false };
+	_float				m_fGlideTime = { 0.f };
 
 private:
 	HRESULT Add_Components();

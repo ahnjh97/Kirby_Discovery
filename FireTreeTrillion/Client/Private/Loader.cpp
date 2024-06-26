@@ -75,6 +75,7 @@
 // 보스 몬스터
 #include "FinalBoss.h"
 #include "FinalBossSpear.h"
+#include "RayArrow.h"
 
 //와들디
 #include "FoodShopDee.h"
@@ -280,6 +281,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CappyHat"), CCappyHat);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalBoss"), CFinalBoss);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalBossSpear"), CFinalBossSpear);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("RayArrow"), CRayArrow);
 
 	//Dee
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FoodShopDee"), CFoodShopDee);
@@ -1087,6 +1089,11 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		// For Kirby Armour
 		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
+
+		// For Boss 옮겨야함
+		m_vecModelInfo.emplace_back("FinalBoss", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("FinalBossSpear", TYPE_ANIM, 1.f);
+		m_vecModelInfo.emplace_back("RayArrow", TYPE_NONANIM, 1.f);
 	}
 	else if (eLevel == LEVEL_GAMEPLAY)
 	{
