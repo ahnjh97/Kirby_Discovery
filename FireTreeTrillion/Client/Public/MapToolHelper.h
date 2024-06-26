@@ -47,6 +47,7 @@ private:
 	void	Menu_MapShaderInfo();
 	void	Menu_MonsterInfo();
 	void	Menu_RallyPointInfo();
+	void	Menu_BlendDecoInfo();
 	void	Edit_Object();
 
 	// On Key/Mouse Input 
@@ -94,6 +95,7 @@ private:
 	_bool IsRallyingMonster(const string& _strModelName);
 	_bool IsKickble(const string& _strModelName);
 	_bool IsTree(const string& _strModelName);
+	_bool IsBlendDeco(const string& _strModelName);
 
 	_bool RenameFile(const string& _strLevel, const string& _tempFileName, const string& _strCustom);
 
@@ -147,6 +149,8 @@ private:
 	//마을을 위한 txts
 	vector<string>	m_vecTownDecoTxts;
 	vector<string>	m_vecLabDecoTxts;
+
+	unordered_map<string, unordered_set<_uint>> m_mapBlendDecoInfos;
 
 	string m_strSelectedTxt;
 	string m_strCurModel;
