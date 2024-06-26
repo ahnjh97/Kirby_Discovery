@@ -1,63 +1,88 @@
 <Root>
-    <Version>240602</Version>
+    <Version>240618</Version>
     <ModelName>BladeKnight
         <Animation>Attack</Animation>
-        <AnimSpeed>30</AnimSpeed>
+        <AnimSpeed>60</AnimSpeed>
         <Count>3</Count>
         <Data0 EventName="ApplyDamage" StartFrame="8" EndFrame="9"/>
         <Data1 EventName="StopDamage" StartFrame="11" EndFrame="12"/>
-		<Data2 EventName="StopDamage" StartFrame="12" EndFrame="13"/>
+        <Data2 EventName="StopDamage" StartFrame="12" EndFrame="13"/>
         <Animation>TornadoAttack</Animation>
-        <AnimSpeed>30</AnimSpeed>
+        <AnimSpeed>60</AnimSpeed>
         <Count>3</Count>
         <Data0 EventName="ApplyDamage" StartFrame="3" EndFrame="4"/>
-		<Data1 EventName="StopDamage" StartFrame="6" EndFrame="7"/>
-		<Data2 EventName="StopDamage" StartFrame="7" EndFrame="8"/>
+        <Data1 EventName="StopDamage" StartFrame="6" EndFrame="7"/>
+        <Data2 EventName="StopDamage" StartFrame="7" EndFrame="8"/>
     </ModelName>
-	 <ModelName>Awoofy
+    <ModelName>Awoofy
         <Animation>Run</Animation>
-        <AnimSpeed>30</AnimSpeed>
-        <Count>3</Count>
-        <Data0 EventName="Notify" StartFrame="2" EndFrame="3"/>
-        <Data1 EventName="Bboong" StartFrame="2" EndFrame="3"/>
-        <Data2 EventName="PlaySound" StartFrame="19" EndFrame="40"/>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>2</Count>
+        <Data0 EventName="Bboong" StartFrame="2" EndFrame="3"/>
+        <Data1 EventName="PlaySound" StartFrame="19" EndFrame="40"/>
     </ModelName>
-	<ModelName>KirbySwordDefault
+    <ModelName>KirbySwordDefault
+        <Animation>SwordDive</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="1" EndFrame="2"/>
+        <Animation>DecisiveSlash</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="4" EndFrame="5"/>
         <Animation>GigantSpinSlash</Animation>
         <AnimSpeed>60</AnimSpeed>
         <Count>1</Count>
         <Data0 EventName="ApplyDamage" StartFrame="4" EndFrame="5"/>
-        <Animation>DecisiveSlash</Animation>
-        <AnimSpeed>30</AnimSpeed>
-        <Count>1</Count>
-        <Data0 EventName="ApplyDamage" StartFrame="4" EndFrame="5"/>
         <Animation>MultiswordAttack</Animation>
-        <AnimSpeed>30</AnimSpeed>
-        <Count>1</Count>
-        <Data0 EventName="ApplyDamage" StartFrame="4" EndFrame="5"/>
-        <Animation>SideSlash</Animation>
-        <AnimSpeed>30</AnimSpeed>
-        <Count>1</Count>
-        <Data0 EventName="ApplyDamage" StartFrame="4" EndFrame="5"/>
-        <Animation>SpinSlash</Animation>
-        <AnimSpeed>30</AnimSpeed>
+        <AnimSpeed>60</AnimSpeed>
         <Count>1</Count>
         <Data0 EventName="ApplyDamage" StartFrame="4" EndFrame="5"/>
         <Animation>SuperSpinSlashLoop</Animation>
-        <AnimSpeed>30</AnimSpeed>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="4" EndFrame="5"/>
+        <Animation>SideSlash</Animation>
+        <AnimSpeed>60</AnimSpeed>
         <Count>1</Count>
         <Data0 EventName="ApplyDamage" StartFrame="4" EndFrame="5"/>
         <Animation>SwordSpin</Animation>
-        <AnimSpeed>30</AnimSpeed>
+        <AnimSpeed>60</AnimSpeed>
         <Count>1</Count>
         <Data0 EventName="ApplyDamage" StartFrame="4" EndFrame="5"/>
-        <Animation>SwordDive</Animation>
-        <AnimSpeed>30</AnimSpeed>
+        <Animation>SpinSlash</Animation>
+        <AnimSpeed>60</AnimSpeed>
         <Count>1</Count>
-        <Data0 EventName="ApplyDamage" StartFrame="1" EndFrame="2"/>
+        <Data0 EventName="ApplyDamage" StartFrame="4" EndFrame="5"/>
         <Animation>UpwardSlash</Animation>
-        <AnimSpeed>30</AnimSpeed>
+        <AnimSpeed>60</AnimSpeed>
         <Count>1</Count>
         <Data0 EventName="ApplyDamage" StartFrame="1" EndFrame="2"/>
+    </ModelName>
+    <ModelName>DeeDeeDee
+        <Animation>HammerAttackHit</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="1" EndFrame="2"/>
+        <Animation>HammerSideAttack</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="6" EndFrame="7"/>
+        <Animation>Landing</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="1" EndFrame="2"/>
+        <Animation>Sliding</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>5</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="1" EndFrame="2"/>
+        <Data1 EventName="ApplyDamage" StartFrame="19" EndFrame="20"/>
+        <Data2 EventName="ApplyDamage" StartFrame="40" EndFrame="41"/>
+        <Data3 EventName="ApplyDamage" StartFrame="60" EndFrame="61"/>
+        <Data4 EventName="ApplyDamage" StartFrame="80" EndFrame="81"/>
+        <Animation>ShoutStart</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="48" EndFrame="50"/>
     </ModelName>
 </Root>

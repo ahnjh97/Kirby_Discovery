@@ -85,10 +85,12 @@ _int CBattleDee::Tick(_float fTimeDelta)
 void CBattleDee::Late_Tick(_float fTimeDelta)
 {
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
-	m_pModelCom->Play_Animation(m_fTimeDelta);
 
 	for (auto& Pair : m_PartObjects)
 		Pair.second->Late_Tick(m_fTimeDelta);
+
+	if (Compute_OptimizationAnimation(m_fTimeDelta) == true)
+		m_pModelCom->Play_Animation(m_fAccTime);
 
 
 	//시야 벗어나면 컬링
@@ -184,7 +186,9 @@ HRESULT CBattleDee::Add_Components()
 	//컨트롤러
 	CCharacterController::CONTROLLER_DESC ControllerDesc{};
 	ControllerDesc.vInitialPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-	ControllerDesc.fOffset = 1.f;
+	ControllerDesc.tCapsuleShape.fRadius = 0.1f;
+	ControllerDesc.tCapsuleShape.fHeight = 0.2f;
+	ControllerDesc.fOffset = 0.2f;
 	ControllerDesc.uCollisionType = m_eCollisionGroup;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &ControllerDesc);

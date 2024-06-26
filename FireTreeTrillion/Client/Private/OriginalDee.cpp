@@ -338,9 +338,6 @@ void COriginalDee::Late_Tick(_float fTimeDelta)
 {
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
-	if (Compute_OptimizationAnimation(m_fTimeDelta) == true)
-		m_pModelCom->Play_Animation(m_fAccTime);
-
 	for (auto& Pair : m_PartObjects)
 		Pair.second->Late_Tick(m_fTimeDelta);
 
@@ -348,6 +345,9 @@ void COriginalDee::Late_Tick(_float fTimeDelta)
 	//시야 벗어나면 컬링
 	if (!m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State(CTransform::STATE_POSITION), 2.0f))
 		return;
+
+	if (Compute_OptimizationAnimation(m_fTimeDelta) == true)
+		m_pModelCom->Play_Animation(m_fAccTime);
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);

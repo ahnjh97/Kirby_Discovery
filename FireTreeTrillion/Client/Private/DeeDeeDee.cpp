@@ -66,7 +66,6 @@ _int CDeeDeeDee::Tick(_float fTimeDelta)
 
 	__super::Tick(m_fTimeDelta);
 
-
 	m_pWeapons->Tick(m_fTimeDelta);
 
 	return OBJ_NOEVENT;
@@ -79,15 +78,16 @@ void CDeeDeeDee::Late_Tick(_float fTimeDelta)
 
 	m_pWeapons->Late_Tick(m_fTimeDelta);
 
-	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 6.0f))
-	{
 		if (Compute_OptimizationAnimation(m_fTimeDelta) == true)
 			m_ePhyXState == PO_FLYDEADAWAY ? m_pModelCom->Play_Animation(m_fAccTime * 0.3f) : m_pModelCom->Play_Animation(m_fAccTime);
+
+	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 6.0f))
+	{
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 	}
 
 
-	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
-	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 }
 
 HRESULT CDeeDeeDee::Render()
@@ -148,6 +148,16 @@ void CDeeDeeDee::Render_IMGUI()
 
 void CDeeDeeDee::Add_AnimEvent()
 {
+	__super::Add_AnimEvent();
+
+	// 1. 한 애니메이션에서 같은 이름의 이벤트 가능
+	// 2. 재생 기준은 애님툴에서 지정한 애니메이션인지 + 시작 프레임이 애니메이션 프레임안에 들어가는 지
+	// 3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
+	m_pModelCom->Add_Event("ApplyDamage", [this]() {
+		// 커비의 히트박스를 실시간으로 변화시킨다.
+		HitBoxChanger(m_pFSM->Get_State());
+		});
+	// 사운드 처리
 }
 
 void CDeeDeeDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
@@ -365,11 +375,9 @@ HRESULT CDeeDeeDee::Add_Components()
 	HitBox.pCollisionType = HITBOX_DEEDEEDEE;
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
-	//Activate_FrustumCollider(0.5f, 4.f, 90.f);
 
 
 	CDeeDeeDeeHammer::DEEDEEDEEHAMMER_DESC WeaponDesc{};
-
 	WeaponDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 	WeaponDesc.pBoneMatrix = &m_WeaponMatrix;
 	WeaponDesc.pWhite = &m_fWhiteColorDiffuse;
@@ -455,6 +463,31 @@ void CDeeDeeDee::SetUp_FSM()
 	m_pFSM->Initialize(&FSM_Desc);
 }
 
+void CDeeDeeDee::HitBoxChanger(_uint eState)
+{
+	switch (eState)
+	{
+	case STATE_SLIDING:
+		Activate_SphereCollider(0.5f, 5.f);
+		break;
+	case STATE_LANDING:
+		Activate_SphereCollider(0.5f, 7.f);
+		break;
+	case STATE_HAMMERSIDEATTACK:
+		Activate_SphereCollider(0.5f, 10.f);
+		break;
+	case STATE_HAMMERATTACKHIT:
+		Activate_FrustumCollider(0.5f, 10.f, 90.f);
+		break;
+	case STATE_SHOUTSTART:
+		Activate_FrustumCollider(0.5f, 12.f, 90.f);
+		break;
+
+	default:
+		break;
+	}
+}
+
 void CDeeDeeDee::DeeDeeDee_SystemTick(_float fTimeDelta)
 {
 	if (*m_pCurrentLevelID == LEVEL_TOOL_ANIM)
@@ -475,9 +508,9 @@ void CDeeDeeDee::DeeDeeDee_SystemTick(_float fTimeDelta)
 			if (Get_State() == STATE_WAIT)
 			{
 				Change_State(STATE_COMMAND, 60.f, false, true);
+				m_bInitializeAnim = false;
 			}
 		}
-		m_bInitializeAnim = false;
 	}
 
 
@@ -512,6 +545,18 @@ void CDeeDeeDee::DeeDeeDee_SystemTick(_float fTimeDelta)
 
 	INFO(m_ePattern) = Now_Pattern();
 
+
+	if (m_bHitStop == true)
+	{
+		m_fTimeDelta = 0.f;
+		m_fHitStopTime += fTimeDelta;
+
+		if (m_fHitStopTime > 0.12f)
+		{
+			m_fHitStopTime = 0.f;
+			m_bHitStop = false;
+		}
+	}
 }
 
 CDeeDeeDee::MYPATTERN CDeeDeeDee::Now_Pattern()
