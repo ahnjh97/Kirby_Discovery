@@ -30,13 +30,23 @@ HRESULT CBlendMapObject::Initialize(void* pArg)
 	if (FAILED(Add_Components(tDesc.tModel)))
 		return E_FAIL;
 
-	//// 모델 메쉬 쳐내는 작업
-	//m_pModelCom->RemoveNonBlendMeshes(m_setBlendMeshIndices);
+	m_bRimLight = false;
+
+	// 모델 메쉬 쳐내는 작업
+	m_setBlendMeshIndices = tDesc.setBlendMeshIndices;
+	m_pModelCom->RemoveNonBlendMeshes(m_setBlendMeshIndices);
 
 	// Normal 유무 검사해서 PassIndex 지정하는 작업
-	m_pModelCom->DeterminePassIndices(m_vecPassIndices);
+	//m_pModelCom->DeterminePassIndices(m_vecPassIndices);
 
 	return S_OK;
+}
+
+void CBlendMapObject::Late_Tick(_float fTimeDelta)
+{
+	Compute_ViewZ();
+
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, this);
 }
 
 HRESULT CBlendMapObject::Render()
@@ -48,9 +58,6 @@ HRESULT CBlendMapObject::Render()
 
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
-		if (m_setBlendMeshIndices.end() == m_setBlendMeshIndices.find(i))
-			continue;
-
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
@@ -59,7 +66,7 @@ HRESULT CBlendMapObject::Render()
 			return E_FAIL;
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
 
-		if (FAILED(m_pShaderCom->Begin(m_vecPassIndices[i])))
+		if (FAILED(m_pShaderCom->Begin(4)))
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Render(i)))
 			return E_FAIL;
@@ -71,7 +78,7 @@ HRESULT CBlendMapObject::Render()
 HRESULT CBlendMapObject::Add_Components(MODEL tModel)
 {
 	/* For.Com_Shader */
-	wstring wstrShaderTag = TEXT("Prototype_Component_Shader_VtxModel");
+	wstring wstrShaderTag = TEXT("Prototype_Component_Shader_VtxModel_Map");
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, wstrShaderTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
@@ -95,17 +102,22 @@ HRESULT CBlendMapObject::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool))))
+	/*if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool))))
+		return E_FAIL;*/	
+	/*if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
+		return E_FAIL;*/
+	_float m_fNonMatchTime = 0;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fNonMatchTime, sizeof(_float))))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
+	_float m_fSamplingFactor = 1;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fSamplingFactor", &m_fSamplingFactor, sizeof(_float))))
 		return E_FAIL;
-
 	return S_OK;
 }
 

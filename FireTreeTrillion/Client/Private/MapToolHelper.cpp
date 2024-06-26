@@ -47,7 +47,7 @@ static _bool s_bHideWalls = { false };
 static _int s_iConnectedMonster = -1;
 static const _char* s_ModelPassIndices[] = { "0. NORMAL_0", "1. NORMAL_X", "2. SHADOW", "3. SKY", "4. BLOOM", "5. NON_BLUR"
 	,"6. TRIGGER", "7.DEFAULTFX", "8. BLENDFX", "9. DEFERREDINFO", "10. WHITEFX", "11. KIRBYPART", "12. NEARCLIP",
-	/*"12. NORMAL_O AND NONCULL", */"13. BLEND O, NORMAL O", "14. BLEND O, NORMAL X", "15. MONSTERPARTOBJECT" };
+	/*"12. NORMAL_O AND NONCULL", */"13. BLEND O, NORMAL O", "14. MONSTERPARTOBJECT" };
 
 static const _char* s_PosTexPassIndices[] = { "0. DEFAULT", "1. ALPHABLEND", "2. BLENDFX", "3. BLOOM", "4. DEFAULTFX", "5. BLEND_NOZTEXT"
 	,"6. WHITEFX", "7. UI_MASK", "8. UI_MASK2", "9. SOFTFX", "10. SOFTALPHAFX"};
@@ -2364,7 +2364,7 @@ void CMapToolHelper::Load_Decos(const string& _strLevel)
 		auto mapIter = m_mapBlendDecoInfos.find(strModelName);
 		if (mapIter != m_mapBlendDecoInfos.end())
 		{
-			tDesc.vecPassIndices = 
+			tDesc.setBlendMeshIndices = mapIter->second;
 		}
 
 		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
