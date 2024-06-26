@@ -299,6 +299,7 @@
     <ClInclude Include="..\Public\RigidObject.h" />
     <ClInclude Include="..\Public\SingleEffect.h" />
     <ClInclude Include="..\public\SkySphere.h" />
+    <ClInclude Include="..\Public\SkySphereSub.h" />
     <ClInclude Include="..\Public\StarBlock.h" />
     <ClInclude Include="..\Public\StarBlockPiece.h" />
     <ClInclude Include="..\Public\TerrainFog.h" />
@@ -447,6 +448,7 @@
     <ClCompile Include="..\Private\RigidObject.cpp" />
     <ClCompile Include="..\Private\SingleEffect.cpp" />
     <ClCompile Include="..\private\SkySphere.cpp" />
+    <ClCompile Include="..\Private\SkySphereSub.cpp" />
     <ClCompile Include="..\Private\StarBlock.cpp" />
     <ClCompile Include="..\Private\StarBlockPiece.cpp" />
     <ClCompile Include="..\Private\TerrainFog.cpp" />

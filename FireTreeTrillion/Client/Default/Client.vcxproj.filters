@@ -383,7 +383,7 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\WaddleDee\Battle">
       <UniqueIdentifier>{c3474c33-3205-448e-897a-c737e2235109}</UniqueIdentifier>
-	</Filter>
+    </Filter>
     <Filter Include="02.GameObjects\Map\NonRenderWall">
       <UniqueIdentifier>{d4881f40-d9f4-423b-bdbf-ef08184a3618}</UniqueIdentifier>
     </Filter>
@@ -761,12 +761,6 @@
     <ClInclude Include="..\Public\CarShopWall.h">
       <Filter>02.GameObjects\Map\CarShopWall</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Level_DeeDeeDee.h">
-      <Filter>01.Levels\3. DeeDeeDee</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\DeeDeeDeeHammer.h">
-      <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee\DeeDeeDeeHammer</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\DeeDeeDeeHammer.h">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee</Filter>
     </ClInclude>
@@ -781,12 +775,15 @@
     </ClInclude>
     <ClInclude Include="..\public\BattleDee.h">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\Battle</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\Public\BlendMapObject.h">
       <Filter>02.GameObjects\Map\BlendMapObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\NonRenderWall.h">
       <Filter>02.GameObjects\Map\NonRenderWall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SkySphereSub.h">
+      <Filter>02.GameObjects\Map\SkySphere</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1141,12 +1138,6 @@
     <ClCompile Include="..\Private\CarShopWall.cpp">
       <Filter>02.GameObjects\Map\CarShopWall</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Level_DeeDeeDee.cpp">
-      <Filter>01.Levels\3. DeeDeeDee</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\DeeDeeDeeHammer.cpp">
-      <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee\DeeDeeDeeHammer</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\DeeDeeDeeHammer.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee</Filter>
     </ClCompile>
@@ -1161,12 +1152,15 @@
     </ClCompile>
     <ClCompile Include="..\private\BattleDee.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\Battle</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="..\Private\BlendMapObject.cpp">
       <Filter>02.GameObjects\Map\BlendMapObject</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\NonRenderWall.cpp">
       <Filter>02.GameObjects\Map\NonRenderWall</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SkySphereSub.cpp">
+      <Filter>02.GameObjects\Map\SkySphere</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
