@@ -19,7 +19,7 @@ namespace Client
                  LEVEL_DEEDEEDEE,
                  LEVEL_TOWN,
                  LEVEL_PARTTIME,
-                 LEVEL_FINALBOSS, // 리소스명 LEVEL_LAB
+                 LEVEL_FINALBOSS, // 리소스명 LAB_DISCOVERA
 
                  LEVEL_END };
 
@@ -98,7 +98,9 @@ enum COLLISION_TYPE
     ITEM, // 일반 먹는 아이템이다.
     ABILITYITEM, // 흡수해야 먹을 수 있는 능력 아이템이다.
     DEFORMOBJECT, // 머금기 오브젝트들
-    NPC,
+    NPC, // 마을에 있는 NPC
+    DEE, // 마을에 있는 일반 디
+    BATTLEDEE, //디디디랑싸우는디
     HITBOX_PLYAER,
     HITBOX_MONSTER,
     HITBOX_DEEDEEDEE,

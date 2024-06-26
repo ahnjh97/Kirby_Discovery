@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Level_Racing.h"
-#include "stdafx.h"
 #include "Camera_Free.h"
 #include "Camera_Main.h"
 #include "BasicMap.h"

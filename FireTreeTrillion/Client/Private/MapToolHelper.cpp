@@ -27,7 +27,8 @@ static _int s_iTriggerIdx = -1;
 static _int s_iMapMeshIndex = -1;
 static _int s_iSelectedMeshIndex = -1; 
 
-static const _char* s_ShaderPasses[] = { "Blend X, NormalO", "Blend X, Normal X", "LightDepth", "Blend O, Normal O", "Blend O, Normal X" };
+static const _char* s_ShaderPasses[] = { "0. Blend X, NormalO", "1. Blend X, Normal X", "2. LightDepth", "3. Blend O, Normal O", "4. Blend O, Normal X"
+		, "5. BLEND X, DISCARD X", "6. BLEND O, DISCARD X" };
 static vector<vector<_int>> s_vecPassIndices;
 static vector<vector<_float>> s_vecSamplingFactors;
 static _int s_iMapIndex = 0;
@@ -135,7 +136,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 #pragma endregion
 
 
-#pragma region LEVEL_RACING
+#pragma region LEVEL_RACING OBJECT
 		, "GsRubbleAsphalt01L", "GsRubbleAsphalt02L", "GsRubbleAsphalt03L", "GsRubbleAsphalt04L", "GsRubbleAsphalt05L"
 		, "GsRubbleAsphalt06L", "GsRubbleAsphalt07L", "GsRubbleAsphalt08L", "GsRubbleAsphalt09L"
 #pragma endregion
@@ -158,13 +159,13 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		,"LbBossRoomDoorAL","LbBossRoomDoorBL", "LbOutBuildingWallL"
 
 		//LbLastBossBeforeStep Object :: Rubble 
-		, "LbRubble01L", "LbRubble02L", "LbRubble03L", "LbRubble04L", "LbRubble05L", "LbRubble06L", "LbRubble07L", "LbRubble08L"
-		, "LbRubbleTile01L", "LbRubbleTile02L", "LbRubbleTile03L"
+		, "LbRubble01L", "LbRubble02L", "LbRubble03L", "LbRubble04L", "LbRubble05L", "LbRubble06L", "LbRubble07L", "LbRubble08L", "LbRubbleTile01L", "LbRubbleTile02L", "LbRubbleTile03L"
 		, "GsRubbleA", 	"GsRubbleB", "GsRubbleC", "GsRubbleD", "GsRubbleE", "GsRubbleF", "GsRubbleG"
 		
 		//CmFillerObject, Ml~ :: 채우기용 잡오브젝트
-		, "CmFillerObjectAL", "CmFillerObjectA02L", "CmFillerObjectA03L", "CmFillerObjectBL", "CmFillerObjectCL", "CmFillerObjectEL"
-		, "CmFillerObjectFL", "MlBossBenchL", "MlBossChairL", "MlFlowerPot01L", "MlSofaFL"
+		, "CmFillerObjectAL", "CmFillerObjectA02L", "CmFillerObjectA03L", "CmFillerObjectBL", "CmFillerObjectCL", "CmFillerObjectEL", "CmFillerObjectFL"
+		, "MlBossBenchL", "MlBossChairL", "MlFlowerPot01L", "MlSofaFL"
+
 #pragma endregion
 	};
 	
@@ -218,6 +219,7 @@ void CMapToolHelper::Late_Tick(_float fTimeDelta)
 		Menu_MapShaderInfo();
 		Menu_MonsterInfo();
 		Menu_RallyPointInfo();
+		Menu_BlendDecoInfo();
 	}
 
 	// 스타일 복원
@@ -778,6 +780,72 @@ void CMapToolHelper::Menu_RallyPointInfo()
 	ImGui::End();
 }
 
+void CMapToolHelper::Menu_BlendDecoInfo()
+{
+	if (false == IsBlendDeco(m_strCurModel))
+		return;
+
+	string strBlendDecoInfo = m_strCurModel + "_Info";
+	ImGui::Begin(strBlendDecoInfo.c_str());
+
+	CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(m_pPickedObject);
+	if (nullptr == pMapToolObject)
+		return;
+
+	CModel* pModel = dynamic_cast<CModel*>(pMapToolObject->Get_Component(TEXT("Com_Model")));
+	_uint iNumMeshes = pModel->Get_NumMeshes();
+
+	_bool* bBlendDecoInfo = new _bool[iNumMeshes];
+	for (_uint i = 0; i < iNumMeshes; i++)
+		bBlendDecoInfo[i] = false;
+
+	auto mapIter = m_mapBlendDecoInfos.find(m_strCurModel);
+	if (m_mapBlendDecoInfos.end() != mapIter) {
+		for (auto& blendMeshIndex : mapIter->second)
+		{
+			if (blendMeshIndex < iNumMeshes) // 배열 범위 검사
+				bBlendDecoInfo[blendMeshIndex] = true;
+		}
+	}
+
+	vector<string> vecMeshNames(iNumMeshes);
+	for (_uint i = 0; i < iNumMeshes; ++i)
+		vecMeshNames[i] = pModel->Get_MeshName(i);
+
+	vector<const _char*> vecBlendDecoMeshNames(iNumMeshes);
+	for (_uint i = 0; i < iNumMeshes; ++i)
+		vecBlendDecoMeshNames[i] = vecMeshNames[i].c_str();
+	
+	for (_uint i = 0; i < iNumMeshes; i++) {
+		ImGui::Text("%d", i);
+		ImGui::SameLine(25); // 다음 메뉴 위치를 25에서부터 시작하도록 지정
+		if (ImGui::Selectable(vecBlendDecoMeshNames[i], s_iSelectedMeshIndex == i, ImGuiSelectableFlags_AllowDoubleClick, ImVec2(240, 0)))
+		{
+			s_iSelectedMeshIndex = i;
+			pMapToolObject->Reset_Time(i);
+		}
+		ImGui::SameLine();
+
+		string strLabel = "##BlendMeshIndex" + to_string(i);
+		if (ImGui::Checkbox(strLabel.c_str(), &bBlendDecoInfo[i])) {
+
+			unordered_set<_uint> setBlendMeshIndices;
+			for (_uint j = 0; j < iNumMeshes; j++)
+			{
+				if (true == bBlendDecoInfo[j])
+					setBlendMeshIndices.insert(j);
+			}
+			
+			m_mapBlendDecoInfos.insert_or_assign(m_strCurModel, setBlendMeshIndices);
+			pMapToolObject->Set_PassIndices(setBlendMeshIndices);
+		}
+	}
+		
+	Safe_Delete_Array(bBlendDecoInfo);
+
+	ImGui::End();
+}
+
 void CMapToolHelper::Edit_Object()
 {
 	if (nullptr == m_pPickedObject)
@@ -825,8 +893,8 @@ void CMapToolHelper::Edit_Object()
 		/*ImGui::SetNextItemWidth(150);
 		GetPassIndex();
 		if (ImGui::Combo("##PosTexPassIndex", &s_iPassIndex, s_PosTexPassIndices, IM_ARRAYSIZE(s_PosTexPassIndices)))
-			SetPassIndex(s_iPassIndex);
-		*/
+			SetPassIndex(s_iPassIndex);*/
+		
 	}
 	else  // Shader_Model 패스지정
 	{
@@ -1433,6 +1501,14 @@ _bool CMapToolHelper::IsKickble(const string& _strModelName)
 _bool CMapToolHelper::IsTree(const string& _strModelName)
 {
 	if (m_setTrees.end() != m_setTrees.find(_strModelName))
+		return true;
+
+	return false;
+}
+
+_bool CMapToolHelper::IsBlendDeco(const string& _strModelName)
+{
+	if (m_setBlendDecos.end() != m_setBlendDecos.find(_strModelName))
 		return true;
 
 	return false;
@@ -2277,6 +2353,10 @@ void CMapToolHelper::Load_Decos(const string& _strLevel)
 		tDesc.iShaderVars = iShaderVars;
 		tDesc.fRimWidth = fRimWidth;
 		tDesc.iPassIndex = iPassIndex;
+
+		//임시 처리
+		if (strModelName == "LbFarPiller" || strModelName == "LbBuildingFrame")
+			continue;
 
 		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
 		{

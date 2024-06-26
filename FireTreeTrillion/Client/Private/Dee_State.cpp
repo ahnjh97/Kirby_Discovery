@@ -116,20 +116,17 @@ void CDee_Sit_State::Free()
 }
 #pragma endregion
 
-#pragma region MOVE STATE
-//*********************************
-//			 WALK STATE
-//*********************************
-CDee_Move_State::CDee_Move_State()
+#pragma region WALK STATE
+CDee_Walk_State::CDee_Walk_State()
 {
 }
 
-void CDee_Move_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
+void CDee_Walk_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
-void CDee_Move_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+void CDee_Walk_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
 	BASE_INFO baseInfo{};
 	Setup_BaseInfo(baseInfo, pGameObject);
@@ -149,53 +146,104 @@ void CDee_Move_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	fSpeed = (fSpeed < 3.f) ? fSpeed * 3.f : 3.f;
 	fSpeed = clamp(fSpeed, .1f, 3.f);
 
-	//fSpeed = 3.f;
 
 	//목표 방향을 향해 회전한다.
-
 	_float3 vDir = (vDestPos - vMyPos);
-
-	//baseInfo.pTransformCom->Look_At(vDestPos);
 	baseInfo.pTransformCom->Look_At_Interpolate(vDestPos, fTimeDelta);
-	//baseInfo.pTransformCom->Look_At_Rotate(vDestPos, fTimeDelta * 8.f);
 
 
 	baseInfo.pController->Move_Dir(baseInfo.pTransformCom, baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta * fSpeed, fTimeDelta);
 
 	if ((vDestPos - vMyPos).Length() < 1.f)
 	{
-		DEE_ANIM eNextState = baseInfo.pDee->Make_WhatToDo();
-
-		if (eNextState != DEEANIM_WALK)
-			baseInfo.pDee->Change_State(eNextState, 60.f, false, true);
-		else
-			baseInfo.pDee->Change_State(eNextState, 60.f, true, true);
-
+		pair<DEE_ANIM, _bool> ToDo = baseInfo.pDee->Make_WhatToDo();
+		DEE_ANIM eNextState = ToDo.first;
+		baseInfo.pDee->Change_State(eNextState, 60.f, ToDo.second, true);
 	}
 
 }
 
-void CDee_Move_State::OnStateExit()
+void CDee_Walk_State::OnStateExit()
 {
 	m_fDuration = 0.f;
 }
 
-CDee_Move_State* CDee_Move_State::Create()
+CDee_Walk_State* CDee_Walk_State::Create()
 {
-	CDee_Move_State* pInstance = new CDee_Move_State();
+	CDee_Walk_State* pInstance = new CDee_Walk_State();
 	return pInstance;
 }
 
-void CDee_Move_State::Free()
+void CDee_Walk_State::Free()
 {
 	__super::Free();
 }
 #pragma endregion
 
+
+#pragma region RUN STATE
+CDee_Run_State::CDee_Run_State()
+{
+}
+
+void CDee_Run_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+}
+
+void CDee_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	BASE_INFO baseInfo{};
+	Setup_BaseInfo(baseInfo, pGameObject);
+	System_Tick(fTimeDelta);
+
+	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta);
+
+
+	_float3 vMyPos = baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION);
+	_float3 vDestPos = baseInfo.pDee->Make_DestPos();
+	vDestPos.y = vMyPos.y;
+
+
+	//목표 지점과의 거리 차이를 구하여 속도 정하기
+	_float fSpeed = (vDestPos - vMyPos).Length();
+	fSpeed = (fSpeed < 2.f) ? fSpeed * 2.5f : 5.f;
+	fSpeed = clamp(fSpeed, .1f, 5.f);
+
+	//목표 방향을 향해 회전한, 이동한다.
+	_float3 vDir = (vDestPos - vMyPos);
+	baseInfo.pTransformCom->Look_At_Interpolate(vDestPos, fTimeDelta);
+	baseInfo.pController->Move_Dir(baseInfo.pTransformCom, baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta * fSpeed, fTimeDelta);
+
+	//목표 지점에 도달하면 뭐 할 지 정한다!!
+	if ((vDestPos - vMyPos).Length() < 1.f)
+	{
+		pair<DEE_ANIM, _bool> ToDo = baseInfo.pDee->Make_WhatToDo();
+		DEE_ANIM eNextState = ToDo.first;
+		baseInfo.pDee->Change_State(eNextState, 60.f, ToDo.second, true);
+	}
+
+}
+
+void CDee_Run_State::OnStateExit()
+{
+	m_fDuration = 0.f;
+}
+
+CDee_Run_State* CDee_Run_State::Create()
+{
+	CDee_Run_State* pInstance = new CDee_Run_State();
+	return pInstance;
+}
+
+void CDee_Run_State::Free()
+{
+	__super::Free();
+}
+#pragma endregion
+
+
 #pragma region EMOTION STATE
-//*********************************
-//			 EMOTION STATE
-//*********************************
 CDee_Emotion_State::CDee_Emotion_State()
 {
 }
@@ -204,7 +252,6 @@ void CDee_Emotion_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 	m_fInteractActionTime = 4.f;
-
 }
 
 void CDee_Emotion_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -224,17 +271,11 @@ void CDee_Emotion_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 		baseInfo.pDee->Set_DeeEyeState(DEEEYE_SMILE);
 	}
 
-	//일회용 이모트였다면, 다시 디폴트 상태로 돌아가도록
-	//if (baseInfo.pDee->IsAnimFinished())
-	//{
-	//	baseInfo.pDee->Set_DeeEyeState(DEEEYE_IDLE);
-	//	baseInfo.pDee->Change_State(DEEANIM_TOWNWAIT, 60.f, true, true);
-	//}
-
 }
 
 void CDee_Emotion_State::OnStateExit()
 {
+	m_fDuration = 0.f;
 }
 
 CDee_Emotion_State* CDee_Emotion_State::Create()

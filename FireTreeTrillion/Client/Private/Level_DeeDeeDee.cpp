@@ -64,6 +64,17 @@ HRESULT CLevel_DeeDeeDee::Initialize()
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 	m_pGameInstance->Set_ColorSet_ByIndex(4);
 
+
+	// DeeTest
+	CGameObject::GAMEOBJECT_DESC ObjDesc{};
+	ObjDesc.fSpeedPerSec = 5.f;
+	ObjDesc.fRotationPerSec = ToRadian(90.f);
+	_float4x4 InitMat = _float4x4::Identity;
+	InitMat.Translation({ 1.51f, 22.11f, 3.91f });
+	ObjDesc.matWorld = InitMat;
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_DEEDEEDEE, TEXT("Layer_DeeDeeDee"), TEXT("Prototype_GameObject_DeeDeeDee"), &ObjDesc)))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -384,30 +395,15 @@ HRESULT CLevel_DeeDeeDee::Ready_Dees()
 	LEVEL eLevel = LEVEL_DEEDEEDEE;
 
 
-	CWaddleDee::DEE_DESC ObjDesc{};
-	ObjDesc.fSpeedPerSec = 5.f;
-	ObjDesc.fRotationPerSec = ToRadian(90.f);
-	_float4x4 InitMat = _float4x4::Identity;
-	InitMat.Translation({ 10.2f, 24.7f, 26.f });
-	ObjDesc.matWorld = InitMat;
+	//CWaddleDee::DEE_DESC ObjDesc{};
+	//ObjDesc.fSpeedPerSec = 5.f;
+	//ObjDesc.fRotationPerSec = ToRadian(90.f);
+	//_float4x4 InitMat = _float4x4::Identity;
+	//InitMat.Translation({ 10.2f, 24.7f, 26.f });
+	//ObjDesc.matWorld = InitMat;
 
-	if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NPC"), TEXT("Prototype_GameObject_FoodShopDee"), &ObjDesc)))
-		return E_FAIL;
-
-
-	CWaddleDee::DEE_DESC DeeDesc{};
-	DeeDesc.fSpeedPerSec = 5.f;
-	DeeDesc.fRotationPerSec = ToRadian(90.f);
-	InitMat = _float4x4::Identity;
-	//InitMat.Translation({ 15.2f + CUtils::Make_RandomFloat(-5.f, 5.f), 27.f, 26.f + CUtils::Make_RandomFloat(-5.f, 5.f) });
-	InitMat.Translation({ 15.2f , 27.f, 26.f });
-	DeeDesc.matWorld = InitMat;
-
-	//for (_int i = 0; i < 12; ++i)
-	//{
-	if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NPC"), TEXT("Prototype_GameObject_OriginalDee"), &DeeDesc)))
-		return E_FAIL;
-	//}
+	//if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Dee"), TEXT("Prototype_GameObject_BattleDee"), &ObjDesc)))
+	//	return E_FAIL;
 
 
 
@@ -478,7 +474,7 @@ HRESULT CLevel_DeeDeeDee::Ready_Dees()
 				(DEECHARACTER_END - 1) < (DEE_CHARACTER)iTriggerIndex ?
 				DEECHARACTER_SLEEPY : (DEE_CHARACTER)iTriggerIndex;
 
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Dee"), TEXT("Prototype_GameObject_OriginalDee"), &DeeDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Dee"), TEXT("Prototype_GameObject_BattleDee"), &DeeDesc)))
 				return E_FAIL;
 		}
 	}

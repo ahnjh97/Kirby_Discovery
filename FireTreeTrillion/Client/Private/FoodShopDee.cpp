@@ -68,8 +68,9 @@ _int CFoodShopDee::Tick(_float fTimeDelta)
 
 void CFoodShopDee::Late_Tick(_float fTimeDelta)
 {
-	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
-	m_pModelCom->Play_Animation(m_fTimeDelta);
+
+	if (Compute_OptimizationAnimation(m_fTimeDelta) == true)
+		m_pModelCom->Play_Animation(m_fAccTime);
 
 	for (auto& Pair : m_PartObjects)
 		Pair.second->Late_Tick(m_fTimeDelta);
@@ -124,12 +125,16 @@ HRESULT CFoodShopDee::Render_LightDepth()
 	return S_OK;
 }
 
+#ifdef _DEBUG
+
 void CFoodShopDee::Render_IMGUI()
 {
 	__super::Render_IMGUI();
 
 	ImGui::Text(u8"ÇöÀç ¾Ö´Ô ÀÎµ¦½º : %d", m_pFSM->Get_State());
 }
+
+#endif
 
 void CFoodShopDee::Add_AnimEvent()
 {

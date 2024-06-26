@@ -108,9 +108,13 @@ HRESULT CBreakableRockPartical::Render_LightDepth()
 	return S_OK;
 }
 
+#ifdef _DEBUG
+
 void CBreakableRockPartical::Render_IMGUI()
 {
 }
+
+#endif
 
 HRESULT CBreakableRockPartical::Add_Components(const wstring& _wstrModelName)
 {

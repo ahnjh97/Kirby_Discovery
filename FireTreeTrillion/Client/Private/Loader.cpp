@@ -85,6 +85,7 @@
 #include "OriginalDee.h"
 #include "FoodShopDee.h"
 #include "HungryDee.h"
+#include "BattleDee.h"
 
 // 맵 오브젝트
 #include "Moon.h"
@@ -318,6 +319,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FoodShopDee"), CFoodShopDee);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HungryDee"), CHungryDee);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("OriginalDee"), COriginalDee);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BattleDee"), CBattleDee);
 
 	//Boss
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeeDeeDee"), CDeeDeeDee);
@@ -394,7 +396,7 @@ HRESULT CLoader::Loading_StaticComponentAll()
 	CHECK_FAILED(hr);
 
 
-#pragma region LEVEL_SKYSPHERE
+#pragma region SKYSPHERE::LEVEL_FINALBOSS
 
 	//FIELD
 	hr = Add_Texture(eLevel, "SkySphere_Lab_CloudNoize", "SkySphere/SkySphere_Lab_CloudNoizeC_MRA.dds");
@@ -1251,8 +1253,12 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	// MODEL 구조체 생성자 기본 값  : ""			  / TYPE_END /  1.f  /    0.f     / 4
 	if (eLevel == LEVEL_STATIC)
 	{
-		//sky sphere
+		//DEFAULT_SKYSPHERE
 		m_vecModelInfo.emplace_back("SkySphere_Stage1_Day", TYPE_NONANIM );
+
+		//보스전 필드에서만 생성하는 SUB_SKYSPHERE (BackGround 요소)
+		m_vecModelInfo.emplace_back("LbBuildingFrame", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("LbFarPiller", TYPE_NONANIM);
 
 
 		//이펙트 친구들...
@@ -1648,7 +1654,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	}
 	else if (eLevel == LEVEL_FINALBOSS)
 	{
+		//보스전 진입 전 필드
 		m_vecModelInfo.emplace_back("Land_LbLastBossBeforeStep", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Land_LbLastBossBeforeStep_Blend", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("BG1", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
@@ -1785,9 +1793,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("BrontoBurt", TYPE_ANIM, 2.f, 0.f);
 		m_vecModelInfo.emplace_back("PoppyBrosJr", TYPE_ANIM, 1.f, 0.f);
 		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_ANIM, 1.3f, 0.f);
-
-		//와들디
-		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 0.f);
 
 		// Boss
 		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 180.f);
