@@ -116,6 +116,8 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 	if (nullptr == m_pTimeController)
 		return E_FAIL;
 
+	m_fWinSize = { (_float)EngineDesc.iWinSizeX, (_float)EngineDesc.iWinSizeY };
+
 	return S_OK;
 }
 

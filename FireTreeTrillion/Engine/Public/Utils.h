@@ -36,6 +36,7 @@ public:
 	static Quaternion Make_Quat_FromDir(const _float4& _dir);
 	static Quaternion Make_Quat_FromDir(const _float3& _dir);
 
+	// Dir 던져 오일러 각도를 받는다.
 	static _float3 Make_Degree_FromDir(const _float4& _dir);
 	static _float3 Make_Degree_FromDir(const _float3& _dir);
 
@@ -51,9 +52,13 @@ public:
 	static void		Turn_OtherMatrix(_Inout_ _float4x4& matrix, _fvector vAxis, _float fTimeDelta, _float fAngle);
 	static void		Rotation(_Inout_ _float4x4& matrix, _fvector vAxis, _float fRadian);
 
-	//공간 이동
+
+	//월드 포지션을 투영 포지션로 변환시킨다.
 	static void		Make_World_ToScreen(_Inout_ _float3& vPos);
+	//투영 포지션을 월드 포지션로 변환시킨다.
 	static void		Make_Screen_ToWorld(_Inout_ _float3& vPos);
+	//월드 포지션을 imgui 투영 포지션으로 변환시킨다.
+	static ImVec2	WorldPosTo_ImguiProjPos(_float3 vWorldPos);
 
 
 	// physX 관련 함수
