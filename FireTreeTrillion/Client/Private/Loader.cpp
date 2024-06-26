@@ -1240,8 +1240,12 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	// MODEL 구조체 생성자 기본 값  : ""			  / TYPE_END /  1.f  /    0.f     / 4
 	if (eLevel == LEVEL_STATIC)
 	{
-		//sky sphere
+		//DEFAULT_SKYSPHERE
 		m_vecModelInfo.emplace_back("SkySphere_Stage1_Day", TYPE_NONANIM );
+
+		//보스전 필드에서만 생성하는 SUB_SKYSPHERE (BackGround 요소)
+		m_vecModelInfo.emplace_back("LbBuildingFrame", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("LbFarPiller", TYPE_NONANIM);
 
 
 		//이펙트 친구들...
@@ -1637,6 +1641,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	}
 	else if (eLevel == LEVEL_FINALBOSS)
 	{
+		//보스전 진입 전 필드
 		m_vecModelInfo.emplace_back("Land_LbLastBossBeforeStep", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("Land_LbLastBossBeforeStep_Blend", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
