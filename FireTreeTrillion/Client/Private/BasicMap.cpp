@@ -730,7 +730,14 @@ void CBasicMap::TraverseBlendDecoInfoTxts(unordered_map<string, unordered_set<_u
     while (dir_iter != end_iter) {
         if (is_regular_file(*dir_iter)) {
             string strFilePath = dir_iter->path().filename().string();
-            string strModelName = strFilePath.substr(0, strFilePath.length() - 4);
+            string strFileName = strFilePath.substr(0, strFilePath.length() - 4);
+
+            string strModelName;
+            string::size_type pos = strFileName.find('_');
+            if (pos != string::npos)
+                strModelName = strFileName.substr(0, pos);
+            else
+                continue;
 
             unordered_set<_uint> setBlendMeshesIndices;
             _bool bStaticActor = false;
@@ -740,7 +747,6 @@ void CBasicMap::TraverseBlendDecoInfoTxts(unordered_map<string, unordered_set<_u
                 _mapBlendMeshIndices.emplace(strModelName, setBlendMeshesIndices);
                 _mapBlendObjStaticActor.emplace(strModelName, bStaticActor);
             }
-               
         }
         ++dir_iter;
     }

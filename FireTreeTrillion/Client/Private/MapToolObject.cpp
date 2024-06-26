@@ -4,6 +4,9 @@
 
 void CMapToolObject::Set_PassIndices(unordered_set<_uint>& _setBlendMeshIndices)
 {
+	if (true == _setBlendMeshIndices.empty())
+		return;
+
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 	m_vecPassIndices.resize(m_pModelCom->Get_NumMeshes());
 	for (_uint i = 0; i < iNumMeshes; i++)
@@ -49,6 +52,9 @@ HRESULT CMapToolObject::Initialize(void* pArg)
 	m_fRadius = GameObjectDesc.fRadius;
 	m_RallyPoints = GameObjectDesc.RallyPoints;
 	m_strConnectedMonster = GameObjectDesc.strConnectedMonster;
+	setBlendMeshIndices
+	if (false == GameObjectDesc.vecPassIndices.empty())
+		m_vecPassIndices = GameObjectDesc.vecPassIndices;
 
 	if (FAILED(Add_Components(GameObjectDesc.wstrModelName)))
 		return E_FAIL;

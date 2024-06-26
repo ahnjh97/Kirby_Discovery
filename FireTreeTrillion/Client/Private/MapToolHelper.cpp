@@ -45,8 +45,8 @@ static _bool s_bHideWalls = { false };
 
 static _int s_iConnectedMonster = -1;
 static const _char* s_ModelPassIndices[] = { "0. NORMAL_0", "1. NORMAL_X", "2. SHADOW", "3. SKY", "4. BLOOM", "5. NON_BLUR"
-	,"6. TRIGGER", "7.DEFAULTFX", "8. BLENDFX", "9. DEFERREDINFO", "10. WHITEFX", "11. KIRBYPART",
-	"12. NORMAL_O AND NONCULL", "13. BLEND O, NORMAL O", "14. BLEND O, NORMAL X" };
+	,"6. TRIGGER", "7.DEFAULTFX", "8. BLENDFX", "9. DEFERREDINFO", "10. WHITEFX", "11. KIRBYPART", "12. NEARCLIP",
+	/*"12. NORMAL_O AND NONCULL", */"13. BLEND O, NORMAL O", "14. BLEND O, NORMAL X", "15. MONSTERPARTOBJECT" };
 
 static const _char* s_PosTexPassIndices[] = { "0. DEFAULT", "1. ALPHABLEND", "2. BLENDFX", "3. BLOOM", "4. DEFAULTFX", "5. BLEND_NOZTEXT"
 	,"6. WHITEFX", "7. UI_MASK", "8. UI_MASK2", "9. SOFTFX", "10. SOFTALPHAFX"};
@@ -184,6 +184,8 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 	ReadTownDecoTxts();
 	ReadLabDecoTxts();
+
+	TraverseBlendDecoInfoTxts();
 
 	HideGrid(s_bHideGrid);
 	HideTriggers(s_bHideTriggers);
@@ -1176,6 +1178,11 @@ void CMapToolHelper::Save_Level()
 		wstrSave += L"Kickables O\n";
 	else
 		wstrSave += L"Kickables X\n";
+
+	if(true == Save_BlendDecoInfos())
+		wstrSave += L"BlendDecoInfos O\n";
+	else
+		wstrSave += L"BlendDecoInfos X\n";
 
 	MSG_BOX(wstrSave.c_str());
 }
@@ -2353,6 +2360,12 @@ void CMapToolHelper::Load_Decos(const string& _strLevel)
 		tDesc.fRimWidth = fRimWidth;
 		tDesc.iPassIndex = iPassIndex;
 
+		auto mapIter = m_mapBlendDecoInfos.find(strModelName);
+		if (mapIter != m_mapBlendDecoInfos.end())
+		{
+			tDesc.vecPassIndices = 
+		}
+
 		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
 		{
 			wstring wstrErrorMsg = TEXT("Failed to Clone: ") + wstrGameObjectTag;
@@ -2707,6 +2720,95 @@ void CMapToolHelper::WriteLocalizedNonAnimMapDecos(vector<pair<string, _float4x4
 		inputFile.close();
 		outputFile.close();
 	}
+}
+
+_bool CMapToolHelper::Save_BlendDecoInfos()
+{
+	for (auto& blendDecoInfoPair : m_mapBlendDecoInfos)
+	{
+		string strModelName = blendDecoInfoPair.first;
+		string strPath = "../../../objects_txt/BlendDecoInfo/" + strModelName + "_BlendMeshes.txt";
+		ofstream outputFile(strPath, ios::binary | ios::trunc);
+		if (!outputFile.is_open()) {
+			MSG_BOX(TEXT("Failed to Open : BlendMeshes.txt"));
+			return false;
+		}
+
+		_bool bStaticActor = false;
+		if (m_setActorDecos.end() != m_setActorDecos.find(strModelName))
+			bStaticActor = true;
+
+		outputFile.write(reinterpret_cast<const char*>(&bStaticActor), sizeof(bStaticActor));
+
+		_uint iNumBlendMeshes = blendDecoInfoPair.second.size();
+		outputFile.write(reinterpret_cast<const char*>(&iNumBlendMeshes), sizeof(iNumBlendMeshes));
+
+		for (auto& blendMeshIndex : blendDecoInfoPair.second)
+		{
+			_uint iBlendMeshIndex = blendMeshIndex;
+			outputFile.write(reinterpret_cast<const char*>(&iBlendMeshIndex), sizeof(iBlendMeshIndex));
+		}
+		outputFile.close();
+	}
+	
+	return true;
+}
+
+void CMapToolHelper::TraverseBlendDecoInfoTxts()
+{
+	string strPath = "../../../objects_txt/BlendDecoInfo/";
+
+	directory_iterator end_iter;  // 디렉토리 순회의 끝을 나타내는 iterator
+	directory_iterator dir_iter(strPath);  // 지정된 경로의 시작 iterator
+
+	while (dir_iter != end_iter) {
+		if (is_regular_file(*dir_iter)) {
+			string strFilePath = dir_iter->path().filename().string();
+			string strFileName = strFilePath.substr(0, strFilePath.length() - 4);
+
+			Load_BlendDecoInfo(strPath, strFileName);
+		}
+		++dir_iter;
+	}
+}
+
+void CMapToolHelper::Load_BlendDecoInfo(const string& _strFolderPath, const string& _strFileName)
+{
+	string strPath = _strFolderPath + _strFileName;
+
+	string strModelName;
+	string::size_type pos = _strFileName.find('_');
+	if (pos != string::npos)
+		strModelName = _strFileName.substr(0, pos);
+	else
+		return;
+
+	strPath += ".txt";
+
+	ifstream inputFile(strPath, ios::binary);
+	if (inputFile.is_open() == false)
+	{
+		wstring wstrError = TEXT("Failed to open : ") + CUtils::StrToWstr(_strFileName) + TEXT(".txt");
+		MSG_BOX(wstrError.c_str());
+		return;
+	}
+
+	_bool bStaticActor{};
+	_uint iNumBlendMeshes{}, iBlendMeshIndex{};
+	unordered_set<_uint> setBlendMeshIndices;
+
+	inputFile.read(reinterpret_cast<char*>(&bStaticActor), sizeof(bStaticActor));
+	inputFile.read(reinterpret_cast<char*>(&iNumBlendMeshes), sizeof(iNumBlendMeshes));
+
+	for (_uint i = 0; i < iNumBlendMeshes; i++)
+	{
+		inputFile.read(reinterpret_cast<char*>(&iBlendMeshIndex), sizeof(iBlendMeshIndex));
+		setBlendMeshIndices.insert(iBlendMeshIndex);
+	}
+
+	inputFile.close();
+
+	m_mapBlendDecoInfos.insert_or_assign(strModelName, setBlendMeshIndices);
 }
 
 CMapToolHelper* CMapToolHelper::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
