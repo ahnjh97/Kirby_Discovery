@@ -404,6 +404,8 @@ void COriginalDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObje
 	m_fResetHiTime = 5.f;
 }
 
+#ifdef _DEBUG
+
 void COriginalDee::Render_IMGUI()
 {
 	__super::Render_IMGUI();
@@ -413,6 +415,8 @@ void COriginalDee::Render_IMGUI()
 	//Draw_TownPoints();
 
 }
+
+#endif
 
 HRESULT COriginalDee::Add_Components()
 {
@@ -707,6 +711,8 @@ _bool COriginalDee::Custom_Face(_uint iMeshIndex)
 	return false;
 }
 
+#ifdef _DEBUG
+
 void COriginalDee::Draw_TownPoints()
 {
 	ImDrawList* drawList = ImGui::GetWindowDrawList();
@@ -729,6 +735,8 @@ void COriginalDee::Draw_TownPoints()
 		}
 	}
 }
+
+#endif
 
 COriginalDee* COriginalDee::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

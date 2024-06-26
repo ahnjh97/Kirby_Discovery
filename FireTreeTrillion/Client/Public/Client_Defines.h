@@ -19,7 +19,7 @@ namespace Client
                  LEVEL_DEEDEEDEE,
                  LEVEL_TOWN,
                  LEVEL_PARTTIME,
-                 LEVEL_FINALBOSS, // 府家胶疙 LEVEL_LAB
+                 LEVEL_FINALBOSS, // 府家胶疙 LAB_DISCOVERA
 
                  LEVEL_END };
 

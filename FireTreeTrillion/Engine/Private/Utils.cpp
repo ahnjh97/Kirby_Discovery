@@ -245,6 +245,8 @@ void CUtils::Make_Screen_ToWorld(_Inout_ _float3& vPos)
 	vPos = _float3::Transform(vPos, CGameInstance::Get_Instance()->Get_Transform_Inv(CPipeLine::D3DTS_VIEW));
 }
 
+#ifdef _DEBUG
+
 ImVec2 CUtils::WorldPosTo_ImguiProjPos(_float3 vWorldPos)
 {
 	CGameInstance* pGameInstance = CGameInstance::Get_Instance();
@@ -260,6 +262,8 @@ ImVec2 CUtils::WorldPosTo_ImguiProjPos(_float3 vWorldPos)
 	vScreenPos = vScreenPos * _float4(vWinSize.x, vWinSize.y, 1.f, 0.f);
 	return ImVec2(vScreenPos.x, vScreenPos.y);
 }
+
+#endif
 
 physx::PxMat44 CUtils::To_Float4x4(const _float4x4& mat)
 {
