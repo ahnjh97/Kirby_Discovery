@@ -135,7 +135,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 #pragma endregion
 
 
-#pragma region LEVEL_RACING
+#pragma region LEVEL_RACING OBJECT
 		, "GsRubbleAsphalt01L", "GsRubbleAsphalt02L", "GsRubbleAsphalt03L", "GsRubbleAsphalt04L", "GsRubbleAsphalt05L"
 		, "GsRubbleAsphalt06L", "GsRubbleAsphalt07L", "GsRubbleAsphalt08L", "GsRubbleAsphalt09L"
 #pragma endregion
@@ -158,13 +158,13 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		,"LbBossRoomDoorAL","LbBossRoomDoorBL", "LbOutBuildingWallL"
 
 		//LbLastBossBeforeStep Object :: Rubble 
-		, "LbRubble01L", "LbRubble02L", "LbRubble03L", "LbRubble04L", "LbRubble05L", "LbRubble06L", "LbRubble07L", "LbRubble08L"
-		, "LbRubbleTile01L", "LbRubbleTile02L", "LbRubbleTile03L"
+		, "LbRubble01L", "LbRubble02L", "LbRubble03L", "LbRubble04L", "LbRubble05L", "LbRubble06L", "LbRubble07L", "LbRubble08L", "LbRubbleTile01L", "LbRubbleTile02L", "LbRubbleTile03L"
 		, "GsRubbleA", 	"GsRubbleB", "GsRubbleC", "GsRubbleD", "GsRubbleE", "GsRubbleF", "GsRubbleG"
 		
 		//CmFillerObject, Ml~ :: 채우기용 잡오브젝트
-		, "CmFillerObjectAL", "CmFillerObjectA02L", "CmFillerObjectA03L", "CmFillerObjectBL", "CmFillerObjectCL", "CmFillerObjectEL"
-		, "CmFillerObjectFL", "MlBossBenchL", "MlBossChairL", "MlFlowerPot01L", "MlSofaFL"
+		, "CmFillerObjectAL", "CmFillerObjectA02L", "CmFillerObjectA03L", "CmFillerObjectBL", "CmFillerObjectCL", "CmFillerObjectEL", "CmFillerObjectFL"
+		, "MlBossBenchL", "MlBossChairL", "MlFlowerPot01L", "MlSofaFL"
+
 #pragma endregion
 	};
 	
