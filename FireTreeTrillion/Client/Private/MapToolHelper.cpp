@@ -218,6 +218,7 @@ void CMapToolHelper::Late_Tick(_float fTimeDelta)
 		Menu_MapShaderInfo();
 		Menu_MonsterInfo();
 		Menu_RallyPointInfo();
+		Menu_BlendDecoInfo();
 	}
 
 	// 스타일 복원
@@ -778,6 +779,72 @@ void CMapToolHelper::Menu_RallyPointInfo()
 	ImGui::End();
 }
 
+void CMapToolHelper::Menu_BlendDecoInfo()
+{
+	if (false == IsBlendDeco(m_strCurModel))
+		return;
+
+	string strBlendDecoInfo = m_strCurModel + "_Info";
+	ImGui::Begin(strBlendDecoInfo.c_str());
+
+	CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(m_pPickedObject);
+	if (nullptr == pMapToolObject)
+		return;
+
+	CModel* pModel = dynamic_cast<CModel*>(pMapToolObject->Get_Component(TEXT("Com_Model")));
+	_uint iNumMeshes = pModel->Get_NumMeshes();
+
+	_bool* bBlendDecoInfo = new _bool[iNumMeshes];
+	for (_uint i = 0; i < iNumMeshes; i++)
+		bBlendDecoInfo[i] = false;
+
+	auto mapIter = m_mapBlendDecoInfos.find(m_strCurModel);
+	if (m_mapBlendDecoInfos.end() != mapIter) {
+		for (auto& blendMeshIndex : mapIter->second)
+		{
+			if (blendMeshIndex < iNumMeshes) // 배열 범위 검사
+				bBlendDecoInfo[blendMeshIndex] = true;
+		}
+	}
+
+	vector<string> vecMeshNames(iNumMeshes);
+	for (_uint i = 0; i < iNumMeshes; ++i)
+		vecMeshNames[i] = pModel->Get_MeshName(i);
+
+	vector<const _char*> vecBlendDecoMeshNames(iNumMeshes);
+	for (_uint i = 0; i < iNumMeshes; ++i)
+		vecBlendDecoMeshNames[i] = vecMeshNames[i].c_str();
+	
+	for (_uint i = 0; i < iNumMeshes; i++) {
+		ImGui::Text("%d", i);
+		ImGui::SameLine(25); // 다음 메뉴 위치를 25에서부터 시작하도록 지정
+		if (ImGui::Selectable(vecBlendDecoMeshNames[i], s_iSelectedMeshIndex == i, ImGuiSelectableFlags_AllowDoubleClick, ImVec2(240, 0)))
+		{
+			s_iSelectedMeshIndex = i;
+			pMapToolObject->Reset_Time(i);
+		}
+		ImGui::SameLine();
+
+		string strLabel = "##BlendMeshIndex" + to_string(i);
+		if (ImGui::Checkbox(strLabel.c_str(), &bBlendDecoInfo[i])) {
+
+			unordered_set<_uint> setBlendMeshIndices;
+			for (_uint j = 0; j < iNumMeshes; j++)
+			{
+				if (true == bBlendDecoInfo[j])
+					setBlendMeshIndices.insert(j);
+			}
+			
+			m_mapBlendDecoInfos.insert_or_assign(m_strCurModel, setBlendMeshIndices);
+			pMapToolObject->Set_PassIndices(setBlendMeshIndices);
+		}
+	}
+		
+	Safe_Delete_Array(bBlendDecoInfo);
+
+	ImGui::End();
+}
+
 void CMapToolHelper::Edit_Object()
 {
 	if (nullptr == m_pPickedObject)
@@ -825,8 +892,8 @@ void CMapToolHelper::Edit_Object()
 		/*ImGui::SetNextItemWidth(150);
 		GetPassIndex();
 		if (ImGui::Combo("##PosTexPassIndex", &s_iPassIndex, s_PosTexPassIndices, IM_ARRAYSIZE(s_PosTexPassIndices)))
-			SetPassIndex(s_iPassIndex);
-		*/
+			SetPassIndex(s_iPassIndex);*/
+		
 	}
 	else  // Shader_Model 패스지정
 	{
@@ -1433,6 +1500,14 @@ _bool CMapToolHelper::IsKickble(const string& _strModelName)
 _bool CMapToolHelper::IsTree(const string& _strModelName)
 {
 	if (m_setTrees.end() != m_setTrees.find(_strModelName))
+		return true;
+
+	return false;
+}
+
+_bool CMapToolHelper::IsBlendDeco(const string& _strModelName)
+{
+	if (m_setBlendDecos.end() != m_setBlendDecos.find(_strModelName))
 		return true;
 
 	return false;
