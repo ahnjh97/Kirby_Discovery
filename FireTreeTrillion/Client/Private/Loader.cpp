@@ -84,6 +84,7 @@
 #include "OriginalDee.h"
 #include "FoodShopDee.h"
 #include "HungryDee.h"
+#include "BattleDee.h"
 
 // ∏  ø¿∫Í¡ß∆Æ
 #include "Moon.h"
@@ -311,6 +312,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FoodShopDee"), CFoodShopDee);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HungryDee"), CHungryDee);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("OriginalDee"), COriginalDee);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BattleDee"), CBattleDee);
 
 	//Boss
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeeDeeDee"), CDeeDeeDee);

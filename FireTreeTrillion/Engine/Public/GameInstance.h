@@ -27,7 +27,7 @@ public:
 
 	_uint* Get_CurrentLevelID() { return &m_iCurrentLevelID; }
 	void Set_CurrentLevelID(_uint iLevelIndex) { m_iCurrentLevelID = iLevelIndex; }
-
+	_float2	Get_WinSize() { return m_fWinSize; }
 
 public: /* For.Input_Device */
 	//키 확인 함수 오버로딩
@@ -248,6 +248,7 @@ private:
 
 	_uint	m_iCurrentLevelID		= { 0 };
 	_uint	g_iNumOctree			= {};
+	_float2 m_fWinSize				= { 0.f , 0.f };
 
 public:		
 	static void Release_Engine();
