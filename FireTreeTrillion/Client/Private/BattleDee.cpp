@@ -8,14 +8,33 @@
 
 _float3 CBattleDee::Make_DestPos()
 {
-	CTransform* pKirbyTransform = m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0)->Get_TransformCom();
+	CTransform* pDeeDeeDeeTransform = m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_DeeDeeDee"), 0)->Get_TransformCom();
+	_float3 vDestPos = pDeeDeeDeeTransform->Get_State(CTransform::STATE_POSITION) - m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 2.f;
 
-	return static_cast<_float3>(pKirbyTransform->Get_State(CTransform::STATE_POSITION));
+	return vDestPos;
 }
 
 pair<DEE_ANIM, _bool> CBattleDee::Make_WhatToDo()
 {
-	return { DEEANIM_TROUBLE, false };
+	DEE_ANIM eDeeState = DEEANIM_END;
+
+	switch (CUtils::Make_RandomInt(0, 2))
+	{
+	case 0:
+		eDeeState = DEEANIM_TROUBLE;
+		break;
+	case 1:
+		eDeeState = DEEANIM_ANGERRUN;
+		break;
+	case 2:
+		eDeeState = DEEANIM_CHEERINGA;
+		break;
+	default:
+		eDeeState = DEEANIM_ANGERRUN;
+		break;
+	};
+
+	return { DEEANIM_ANGERRUN, true };
 }
 
 CBattleDee::CBattleDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -156,6 +175,11 @@ void CBattleDee::Add_AnimEvent()
 
 void CBattleDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
+	if (eContent == CCollisionCenter::CONTENT_ATTACK)
+	{
+		Change_State(DEEANIM_DAMAGE, 60.f, true, true);
+		Set_DeeEyeState(DEEEYE_SMILE);
+	}
 }
 
 void CBattleDee::Render_IMGUI()
@@ -260,7 +284,7 @@ void CBattleDee::SetUp_FSM()
 	m_pFSM->Add_State(DEEANIM_ANGERRUN, CDee_Run_State::Create());
 	m_pFSM->Add_State(DEEANIM_CHEERINGA, CDee_Emotion_State::Create());
 
-	m_pFSM->Add_State(DEEANIM_DAMAGE, CDee_Stun_State::Create());
+	m_pFSM->Add_State(DEEANIM_DAMAGE, CDee_FlyStun_State::Create());
 	m_pFSM->Add_State(DEEANIM_MOVEFALL, CDee_Interact_State::Create());
 
 }

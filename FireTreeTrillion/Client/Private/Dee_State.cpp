@@ -529,34 +529,71 @@ void CDee_Hungry_State::Free()
 //*********************************
 //			 STUN STATE
 //*********************************
-CDee_Stun_State::CDee_Stun_State()
+CDee_FlyStun_State::CDee_FlyStun_State()
 {
 }
 
-void CDee_Stun_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
+void CDee_FlyStun_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
-void CDee_Stun_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+void CDee_FlyStun_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
 	BASE_INFO baseInfo{};
 	Setup_BaseInfo(baseInfo, pGameObject);
 
-	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta);
+
+	// 일단 그 방향으로 바라보게만 한다.
+	_float3 vDamegeDir = baseInfo.pDee->Get_DamegeDir();
+	if (vDamegeDir != XMVectorZero())
+		baseInfo.pTransformCom->Look_At_Axis(-vDamegeDir);
+
+	// 이제 날아가는 것을 구현해보자.
+	baseInfo.pController->Move_Dir(baseInfo.pTransformCom, vDamegeDir * fTimeDelta * 3.f, fTimeDelta);
+
+	//baseInfo.pTransformCom->Turn(_float4{baseInfo.pTransformCom->Get_State(CTransform::STATE_RIGHT)}, fTimeDelta);
+
+	// 점프되는 체공시간을 구현해보자.
+	_float fDamageJumpPower = baseInfo.pDee->Get_DamageJumpPower();
+	baseInfo.pController->Jump(baseInfo.pTransformCom, fDamageJumpPower, fTimeDelta);
+	fDamageJumpPower -= GRAVITY * fTimeDelta * 4.f;
+	baseInfo.pDee->Set_DamageJumpPower(fDamageJumpPower);
+
+
+	if (baseInfo.pController->Is_Terrain())
+	{
+		if (m_iBounceCnt != 0)
+		{
+			m_iBounceCnt--;
+			//위로 한번 더 튕긴다.
+			fDamageJumpPower *= -.6f;
+
+			_float fDamageDirLength = vDamegeDir.Length() * .6f;
+			_float3 vNewDamageDir = CUtils::Make_Random_Vector(fDamageDirLength);
+			baseInfo.pDee->Set_DamageMoving(vNewDamageDir, fDamageJumpPower);
+		}
+		else
+		{
+			pair<DEE_ANIM, _bool> ToDo = baseInfo.pDee->Make_WhatToDo();
+			baseInfo.pDee->Change_State(ToDo.first, 60.f, ToDo.second, true);
+		}
+	}
+
 }
 
-void CDee_Stun_State::OnStateExit()
+void CDee_FlyStun_State::OnStateExit()
 {
+	m_iBounceCnt = 1;
 }
 
-CDee_Stun_State* CDee_Stun_State::Create()
+CDee_FlyStun_State* CDee_FlyStun_State::Create()
 {
-	CDee_Stun_State* pInstance = new CDee_Stun_State();
+	CDee_FlyStun_State* pInstance = new CDee_FlyStun_State();
 	return pInstance;
 }
 
-void CDee_Stun_State::Free()
+void CDee_FlyStun_State::Free()
 {
 	__super::Free();
 }
@@ -692,7 +729,7 @@ void CDee_Interact_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 			baseInfo.pController->Move_Dir(baseInfo.pTransformCom, baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta * fSpeed, fTimeDelta);
 		}
 
-		if(abs(m_fDuration - .6f) < fTimeDelta * 2.f)
+		if (abs(m_fDuration - .6f) < fTimeDelta * 2.f)
 			baseInfo.pDee->Set_DeeEyeState(DEEEYE_CLOSE);
 
 		if (abs(m_fDuration - 1.f) < fTimeDelta * 2.f)

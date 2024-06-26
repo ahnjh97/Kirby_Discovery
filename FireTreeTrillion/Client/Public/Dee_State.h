@@ -188,11 +188,11 @@ public:
 	virtual void Free() override;
 };
 
-class CDee_Stun_State final : public CDee_State
+class CDee_FlyStun_State final : public CDee_State
 {
 private:
-	CDee_Stun_State();
-	virtual ~CDee_Stun_State() = default;
+	CDee_FlyStun_State();
+	virtual ~CDee_FlyStun_State() = default;
 
 public:
 	// 상태 진입했을 때 처음만 호출
@@ -201,9 +201,10 @@ public:
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
 	virtual void OnStateExit()														override;
 
+	_uint m_iBounceCnt = { 1 };
 
 public:
-	static	CDee_Stun_State* Create();
+	static	CDee_FlyStun_State* Create();
 	virtual void Free() override;
 };
 

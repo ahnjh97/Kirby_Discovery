@@ -474,7 +474,7 @@ HRESULT CLevel_DeeDeeDee::Ready_Dees()
 				(DEECHARACTER_END - 1) < (DEE_CHARACTER)iTriggerIndex ?
 				DEECHARACTER_SLEEPY : (DEE_CHARACTER)iTriggerIndex;
 
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Dee"), TEXT("Prototype_GameObject_BattleDee"), &DeeDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_BattleDee"), TEXT("Prototype_GameObject_BattleDee"), &DeeDesc)))
 				return E_FAIL;
 		}
 	}
