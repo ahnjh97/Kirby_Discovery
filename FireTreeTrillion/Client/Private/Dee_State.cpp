@@ -543,39 +543,87 @@ void CDee_FlyStun_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	BASE_INFO baseInfo{};
 	Setup_BaseInfo(baseInfo, pGameObject);
 
-
-	// 일단 그 방향으로 바라보게만 한다.
 	_float3 vDamegeDir = baseInfo.pDee->Get_DamegeDir();
-	if (vDamegeDir != XMVectorZero())
-		baseInfo.pTransformCom->Look_At_Axis(-vDamegeDir);
 
-	// 이제 날아가는 것을 구현해보자.
-	baseInfo.pController->Move_Dir(baseInfo.pTransformCom, vDamegeDir * fTimeDelta * 3.f, fTimeDelta);
-	baseInfo.pTransformCom->Turn(_float4{baseInfo.pTransformCom->Get_State(CTransform::STATE_RIGHT)}, fTimeDelta);
-
-	// 점프되는 체공시간을 구현해보자.
-	_float fDamageJumpPower = baseInfo.pDee->Get_DamageJumpPower();
-	baseInfo.pController->Jump(baseInfo.pTransformCom, fDamageJumpPower, fTimeDelta);
-	fDamageJumpPower -= GRAVITY * fTimeDelta * 4.f;
-	baseInfo.pDee->Set_DamageJumpPower(fDamageJumpPower);
-
-
-	if (baseInfo.pController->Is_Terrain())
+	if (baseInfo.pDee->Get_PhyXState() == PO_NORMAL)
 	{
-		if (m_iBounceCnt != 0)
-		{
-			m_iBounceCnt--;
-			//위로 한번 더 튕긴다.
-			fDamageJumpPower *= -.6f;
+		// 이제 날아가는 것을 구현해보자.
+		baseInfo.pController->Move_Dir(baseInfo.pTransformCom, vDamegeDir * fTimeDelta * 3.f, fTimeDelta);
+		baseInfo.pTransformCom->Turn(_float4{ baseInfo.pTransformCom->Get_State(CTransform::STATE_RIGHT) }, fTimeDelta);
 
-			_float fDamageDirLength = vDamegeDir.Length() * .6f;
-			_float3 vNewDamageDir = CUtils::Make_Random_Vector(fDamageDirLength);
-			baseInfo.pDee->Set_DamageMoving(vNewDamageDir, fDamageJumpPower);
-		}
-		else
+		// 점프되는 체공시간을 구현해보자.
+		_float fDamageJumpPower = baseInfo.pDee->Get_DamageJumpPower();
+		baseInfo.pController->Jump(baseInfo.pTransformCom, fDamageJumpPower, fTimeDelta);
+		fDamageJumpPower -= GRAVITY * fTimeDelta * 4.f;
+		baseInfo.pDee->Set_DamageJumpPower(fDamageJumpPower);
+
+
+		if (baseInfo.pController->Is_Terrain())
 		{
-			pair<DEE_ANIM, _bool> ToDo = baseInfo.pDee->Make_WhatToDo();
-			baseInfo.pDee->Change_State(ToDo.first, 60.f, ToDo.second, true);
+			if (m_iBounceCnt != 0)
+			{
+				m_iBounceCnt--;
+
+				//위로 한번 더 튕긴다.
+				fDamageJumpPower *= -.6f;
+
+				_float fDamageDirLength = vDamegeDir.Length() * .6f;
+				_float3 vNewDamageDir = CUtils::Make_Random_Vector(fDamageDirLength);
+				baseInfo.pDee->Set_DamageMoving(vNewDamageDir, fDamageJumpPower);
+			}
+			else
+			{
+				pair<DEE_ANIM, _bool> ToDo = baseInfo.pDee->Make_WhatToDo();
+				baseInfo.pDee->Change_State(ToDo.first, 60.f, ToDo.second, true);
+				m_iBounceCnt = 1;
+			}
+		}
+	}
+	// 날아가는 도중이다.  1초에 360도 회전하며, 30의 거리로 날아간다.
+	else if (baseInfo.pDee->Get_PhyXState() == PO_FLYAWAY)
+	{
+		baseInfo.pController->Move_Dir(baseInfo.pTransformCom, vDamegeDir * fTimeDelta * 30.f, fTimeDelta);
+		baseInfo.pTransformCom->Turn(baseInfo.pTransformCom->Get_State_Vector(CTransform::STATE_UP), fTimeDelta, 360.f);
+
+		if (1.f > baseInfo.pController->Compute_Wall(vDamegeDir))
+		{
+			baseInfo.pDee->Set_PhyXState(PO_FLYDEADAWAY);
+			baseInfo.pDee->Set_DamageMoving(-1.f * vDamegeDir, 10.f);
+		}
+	}
+	else if (baseInfo.pDee->Get_PhyXState() == PO_FLYDEADAWAY)
+	{
+
+		baseInfo.pController->Move_Dir(baseInfo.pTransformCom, vDamegeDir * fTimeDelta * 3.f, fTimeDelta);
+		//baseInfo.pTransformCom->Turn(_float4{ baseInfo.pTransformCom->Get_State(CTransform::STATE_RIGHT) }, fTimeDelta);
+
+
+		_float fDamageJumpPower = baseInfo.pDee->Get_DamageJumpPower();
+		baseInfo.pController->Jump(baseInfo.pTransformCom, fDamageJumpPower, fTimeDelta);
+		fDamageJumpPower -= GRAVITY * fTimeDelta * 4.f;
+		baseInfo.pDee->Set_DamageJumpPower(fDamageJumpPower);
+
+
+		if (baseInfo.pController->Is_Terrain())
+		{
+			if (m_iBounceCnt != 0)
+			{
+				m_iBounceCnt--;
+
+				//위로 한번 더 튕긴다.
+				fDamageJumpPower *= -.6f;
+
+				_float fDamageDirLength = vDamegeDir.Length() * .6f;
+				_float3 vNewDamageDir = CUtils::Make_Random_Vector(fDamageDirLength);
+				baseInfo.pDee->Set_DamageMoving(vNewDamageDir, fDamageJumpPower);
+			}
+			else
+			{
+				pair<DEE_ANIM, _bool> ToDo = baseInfo.pDee->Make_WhatToDo();
+				baseInfo.pDee->Change_State(ToDo.first, 60.f, ToDo.second, true);
+				baseInfo.pTransformCom->Look_At_ForLandObject(baseInfo.pDee->Make_DestPos());
+				m_iBounceCnt = 1;
+			}
 		}
 	}
 

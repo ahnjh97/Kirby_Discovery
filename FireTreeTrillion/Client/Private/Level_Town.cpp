@@ -398,17 +398,6 @@ HRESULT CLevel_Town::Ready_Dees()
 		return E_FAIL;
 
 
-	ObjDesc = {};
-	ObjDesc.fSpeedPerSec = 5.f;
-	ObjDesc.fRotationPerSec = ToRadian(90.f);
-	 InitMat = _float4x4::Identity;
-	InitMat.Translation({ 12.2f, 24.7f, 26.f });
-	ObjDesc.matWorld = InitMat;
-
-	if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NPC"), TEXT("Prototype_GameObject_BattleDee"), &ObjDesc)))
-		return E_FAIL;
-
-
 	string strFileName = "../../../objects_txt/Town_Monsters.txt";
 
 	ifstream fileInput(strFileName, ios::binary);
