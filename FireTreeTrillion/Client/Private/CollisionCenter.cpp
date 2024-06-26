@@ -433,30 +433,23 @@ void CCollisionCenter::Ladder_Collider()
 void CCollisionCenter::DeeDeeDee_Battle()
 {
 
-	// 플레이어와 보스몬스터 몸박 (특정 상황일때만, 디디디로부터 피해를 받는다.)
-	Collision_Collider(m_GameObjects[PLAYER], m_GameObjects[BOSS_DEEDEEDEE], this,
-		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
-		{
-			CGameObject* Dst = DstHit->Get_Owner();
-			CGameObject* Src = SrcHit->Get_Owner();
-			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
-				return;
-
-		});
-
-	Collision_Collider(m_GameObjects[NPC], m_GameObjects[BOSS_DEEDEEDEE], this,
-		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
-		{
-			CGameObject* Dst = DstHit->Get_Owner();
-			CGameObject* Src = SrcHit->Get_Owner();
-			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
-				return;
-
-
-
-		});
-
-
+	//// 플레이어와 보스몬스터 몸박 (특정 상황일때만, 디디디로부터 피해를 받는다.)
+	//Collision_Collider(m_GameObjects[PLAYER], m_GameObjects[BOSS_DEEDEEDEE], this,
+	//	[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+	//	{
+	//		CGameObject* Dst = DstHit->Get_Owner();
+	//		CGameObject* Src = SrcHit->Get_Owner();
+	//		if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+	//			return;
+	//	});
+	//Collision_Collider(m_GameObjects[NPC], m_GameObjects[BOSS_DEEDEEDEE], this,
+	//	[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+	//	{
+	//		CGameObject* Dst = DstHit->Get_Owner();
+	//		CGameObject* Src = SrcHit->Get_Owner();
+	//		if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+	//			return;
+	//	});
 
 	// 플레이어 공격에 대한 처리.
 	Collision_Collider(m_GameObjects[HITBOX_PLYAER], m_GameObjects[BOSS_DEEDEEDEE], this,
@@ -467,9 +460,17 @@ void CCollisionCenter::DeeDeeDee_Battle()
 			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
 				return;
 
+			CKirby* pKirby = static_cast<CKirby*>(Dst);
+			CDeeDeeDee* pMonster = static_cast<CDeeDeeDee*>(Src);
+
+			// 데미지 공식과 이펙트, 쉐이킹, 히트스탑 등 시스템적인 요소들이 잔뜩 들어가있다.
+			pthis->Damage_And_Effect_For_Monster(pKirby, pMonster, 1.2f);
+			DstHit->Set_Alive(false);
 		});
 
-	Collision_Collider(m_GameObjects[HITBOX_MONSTER], m_GameObjects[NPC], this,
+
+	// 플레이어 공격에 대한 처리.
+	Collision_Collider(m_GameObjects[PLAYER], m_GameObjects[HITBOX_DEEDEEDEE], this,
 		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
 		{
 			CGameObject* Dst = DstHit->Get_Owner();
@@ -477,8 +478,52 @@ void CCollisionCenter::DeeDeeDee_Battle()
 			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
 				return;
 
+			CKirby* pKirby = static_cast<CKirby*>(Dst);
+			CDeeDeeDee* pMonster = static_cast<CDeeDeeDee*>(Src);
+
+
+			// 커비가 혹시 닷지를 하였는가? 만약 닷지를 했다면 충돌이 발생하지않는다.
+			if (pthis->Kirby_Dodge_SlowMotionSystem(pKirby) == true)
+			{
+				DstHit->Set_Alive(false);
+				SrcHit->Set_Alive(false);
+				return;
+			}
+
+			// 플레이어와 보스 양쪽에 넉백을 만든다.
+			pthis->Player_Monster_Knock_back(pKirby, pMonster);
+			_float fAttack = pMonster->Get_Attack();
+			pKirby->Minus_Hp(fAttack);
+			DstHit->Set_Alive(false);
+			SrcHit->Set_Alive(false);
+
+			// 별도의 충돌로직이 발생할 것이다.
+			pKirby->Collision(CONTENT_ATTACK, pMonster);
 		});
 
+
+	Collision_Collider(m_GameObjects[BATTLEDEE], m_GameObjects[HITBOX_DEEDEEDEE], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CPhysXObject* pNpc = static_cast<CPhysXObject*>(Dst);
+			CDeeDeeDee* pMonster = static_cast<CDeeDeeDee*>(Src);
+
+			_float4 vNpcPos = pNpc->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
+			_float4 vDeeDeeDeePos = pMonster->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
+
+			_float3 vKnockDir = XMVector3Normalize(vNpcPos - vDeeDeeDeePos);
+
+			pthis->Knock_back(pNpc, vKnockDir * 5.f, 25.f);
+			DstHit->Set_Alive(false);
+			SrcHit->Set_Alive(false);
+
+			pNpc->Collision(CONTENT_ATTACK, pMonster);
+		});
 
 
 }
@@ -909,7 +954,7 @@ void CCollisionCenter::HitStop_Rogic(CKirby* pKirby)
 	pKirby->Set_HitStop();
 }
 
-void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObject* pMonster)
+void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObject* pMonster, _float fEffectOffSet)
 {
 	CCharacter* pCMonster = static_cast<CCharacter*>(pMonster);
 	_float fAttack = { 0.f };
@@ -921,7 +966,7 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 	_float4 vKirbyPos = pKirbyTransform->Get_State(CTransform::STATE_POSITION);
 
 	_float4 vEffectLook = XMVector3Normalize(vKirbyPos - vMonsterPos);
-	_float4 vEffectRandomPos = vMonsterPos + (vEffectLook * 0.5f) + (_float4)CUtils::Make_Random_Vector(0.5f);
+	_float4 vEffectRandomPos = vMonsterPos + (vEffectLook * fEffectOffSet) + (_float4)CUtils::Make_Random_Vector(0.5f);
 
 	switch (uKirbyState)
 	{

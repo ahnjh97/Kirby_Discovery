@@ -81,7 +81,7 @@ void CDeeDeeDee::Late_Tick(_float fTimeDelta)
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 6.0f))
 	{
-		if (Compute_OptimizationAnimation(m_fTimeDelta) == true && m_ePhyXState != PO_PRESSED)
+		if (Compute_OptimizationAnimation(m_fTimeDelta) == true)
 			m_ePhyXState == PO_FLYDEADAWAY ? m_pModelCom->Play_Animation(m_fAccTime * 0.3f) : m_pModelCom->Play_Animation(m_fAccTime);
 	}
 
@@ -342,7 +342,9 @@ HRESULT CDeeDeeDee::Add_Components()
 	/* For.Com_CharacterController */
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
-	desc.fOffset = 1.f;
+	desc.tCapsuleShape.fRadius = 3.f;
+	desc.fOffset = 3.5f;
+	//desc.fOffset = 1.f;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	CHECK_FAILED(hr);
@@ -356,7 +358,7 @@ HRESULT CDeeDeeDee::Add_Components()
 	HitBox.pCollisionType = BOSS_DEEDEEDEE;
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
-	Set_BodyCollider(COLLIDER_CYLINDER, 1.5f, 3.f, 1.f);
+	Set_BodyCollider(COLLIDER_CYLINDER, 1.5f, 3.f, 3.f);
 
 
 	HitBox.pDesc = &m_tColliderDesc[ATTACK];

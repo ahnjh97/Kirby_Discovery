@@ -99,6 +99,8 @@ enum COLLISION_TYPE
     ABILITYITEM, // 흡수해야 먹을 수 있는 능력 아이템이다.
     DEFORMOBJECT, // 머금기 오브젝트들
     NPC,
+    DEE,
+    BATTLEDEE,
     HITBOX_PLYAER,
     HITBOX_MONSTER,
     HITBOX_DEEDEEDEE,

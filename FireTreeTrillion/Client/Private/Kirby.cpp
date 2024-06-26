@@ -59,7 +59,7 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// µð¹ö±ë ¿ë
-	//m_eAbilityType = ABILITY_SWORD;
+	m_eAbilityType = ABILITY_SWORD;
 
 	m_pModelCom[INFO(m_eBodyState)]->Set_Animation(STATE_IDLE, 60.f, true, true);
 	m_pControllerCom->RegisterAsPlayer();
@@ -1222,15 +1222,15 @@ void CKirby::HitBoxChanger(_uint eState)
 		break;
 	// Ä® 1Å¸
 	case SWORDSTATE_SIDESLASH:
-		Activate_FrustumCollider(0.5f, 4.f, 90.f);
+		Activate_FrustumCollider(0.5f, 4.f, 180.f);
 		break;
 	// Ä® 2Å¸
 	case SWORDSTATE_MULITSWORDATTACK:
-		Activate_FrustumCollider(0.5f, 4.f, 90.f);
+		Activate_FrustumCollider(0.5f, 4.f, 180.f);
 		break;
 	// Ä® 3Å¸
 	case SWORDSTATE_DECISIVESLASH:
-		Activate_FrustumCollider(0.5f, 5.f, 90.f);
+		Activate_FrustumCollider(0.5f, 5.f, 180.f);
 		break;
 	// °øÁßÁ¦ºñ µµ´Â °ø°Ý
 	case SWORDSTATE_SWORDSPIN:

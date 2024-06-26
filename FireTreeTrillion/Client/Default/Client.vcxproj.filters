@@ -755,11 +755,11 @@
     <ClInclude Include="..\Public\CarShopWall.h">
       <Filter>02.GameObjects\Map\CarShopWall</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\DeeDeeDeeHammer.h">
-      <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Level_DeeDeeDee.h">
       <Filter>01.Levels\3. DeeDeeDee</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\DeeDeeDeeHammer.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee\DeeDeeDeeHammer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1114,11 +1114,11 @@
     <ClCompile Include="..\Private\CarShopWall.cpp">
       <Filter>02.GameObjects\Map\CarShopWall</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\DeeDeeDeeHammer.cpp">
-      <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Level_DeeDeeDee.cpp">
       <Filter>01.Levels\3. DeeDeeDee</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\DeeDeeDeeHammer.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee\DeeDeeDeeHammer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

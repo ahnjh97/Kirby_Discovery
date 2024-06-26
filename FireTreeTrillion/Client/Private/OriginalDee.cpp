@@ -341,7 +341,9 @@ _int COriginalDee::Tick(_float fTimeDelta)
 void COriginalDee::Late_Tick(_float fTimeDelta)
 {
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
-	m_pModelCom->Play_Animation(m_fTimeDelta);
+
+	if (Compute_OptimizationAnimation(m_fTimeDelta) == true)
+		m_pModelCom->Play_Animation(m_fAccTime);
 
 	for (auto& Pair : m_PartObjects)
 		Pair.second->Late_Tick(m_fTimeDelta);
