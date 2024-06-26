@@ -101,6 +101,8 @@ private:
 	void HideTriggers(_bool bHideTriggers);
 	void HideGrid(_bool bHideGrid);
 	void HideDecos(_bool bHideDecos);
+	void HideWalls(_bool bHideWalls);
+
 	_bool ExcludeModel(string& _strModelName);
 	void MoveToCam();
 	void DisableOtherGroups(_int* _pCurTxtGroup);
@@ -127,7 +129,7 @@ private:
 	unordered_set<string>	m_setActorDecos;
 	unordered_set<string>	m_setKickables;
 	unordered_set<string>	m_setTrees;
-	unordered_set<string>	m_setNeedBlendDecos; //투명도 적용이 필요한 데코오브젝트
+	unordered_set<string>	m_setBlendDecos; //투명도 적용이 필요한 데코오브젝트
 
 	unordered_set<string>	m_setTownDecoTxts;
 	unordered_set<string>	m_setLabDecoTxts;

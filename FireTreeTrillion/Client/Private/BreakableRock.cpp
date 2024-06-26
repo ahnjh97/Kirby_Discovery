@@ -166,9 +166,9 @@ HRESULT CBreakableRock::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool))))
 		return E_FAIL;
-
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
 		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -196,6 +196,7 @@ _int CBreakableRock::Make_Partical()
 		vDir.y += 0.5f;
 		desc.vMoveDir = (_float3)vDir;
 		desc.fPower = m_fHitPower * 70.f;
+		desc.wstrModelName = TEXT("RockPartical");
 		// Car Test
 		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_RockPartical"), TEXT("Prototype_GameObject_BreakableRockPartical"), &desc)))
 			return OBJ_DEAD;

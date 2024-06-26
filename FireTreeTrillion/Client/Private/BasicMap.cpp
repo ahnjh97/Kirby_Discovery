@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "BlendMapObject.h"
 #include "MapToolObject.h"
 #include "BasicMap.h"
 #include "AnimDeco.h"
@@ -37,7 +38,7 @@ HRESULT CBasicMap::Initialize(void* pArg)
 
 
     if (wstrModelTag != TEXT("Town")        && wstrModelTag != TEXT("DeeDeeDee") && wstrModelTag != TEXT("Land_LbLastBossBeforeStep") && 
-        wstrModelTag != TEXT("Land_VcLabo") && wstrModelTag != TEXT("TownShop")  && wstrModelTag.substr(wstrModelTag.length() - 5) == TEXT("Blend"))
+        /*wstrModelTag != TEXT("Land_VcLabo") && */wstrModelTag != TEXT("TownShop")  && wstrModelTag.substr(wstrModelTag.length() - 5) == TEXT("Blend"))
     {
         m_bBlendMap = true;
         m_eRenderGroup = CRenderer::RENDER_BLEND;
@@ -46,19 +47,23 @@ HRESULT CBasicMap::Initialize(void* pArg)
     if (FAILED(Add_Components(wstrModelTag)))
         return E_FAIL;
 
+    m_fTime = m_fNonMatchTime = 100.f;
+        
     SetUpShaderInfo(wstrModelTag);
 
     m_vecConstantNames = { "g_DiffuseTexture", "g_NormalTexture", "g_MRATexture", "g_fSamplingFactor"
     , "g_bStencil", "g_bRimLight", "m_fRimWidth", "g_bMotionBlur", "g_BoneMatrices" };
     m_vecStencilRimLightMotionBlurNames = { "g_bStencil", "g_bRimLight", "m_fRimWidth", "g_bMotionBlur" };
 
-    if(wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("DeeDeeDee") && wstrModelTag != TEXT("Land_VcLabo") &&
+    if (true == CheckIfBlendMapExists(GameObjectDesc.wstrModelName)) 
+    {
+        if (FAILED(Add_BlendMap(wstrModelTag)))
+            return E_FAIL;
+    }
+
+    if(wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("DeeDeeDee") && /*wstrModelTag != TEXT("Land_VcLabo") &&*/
        wstrModelTag != TEXT("Land_LbLastBossBeforeStep") && wstrModelTag != TEXT("TownShop") && false == m_bBlendMap)
     {
-        if (true == CheckIfBlendMapExists(GameObjectDesc.wstrModelName)) {
-            if (FAILED(Add_BlendMap(wstrModelTag)))
-                return E_FAIL;
-        }
 
         m_pOcTree = m_pModelCom->Create_OcTree(GameObjectDesc.vMin, GameObjectDesc.vMax, m_vecPassIndices, m_vecSamplingFactors, m_vecConstantNames);
         
@@ -71,7 +76,8 @@ HRESULT CBasicMap::Initialize(void* pArg)
         InsertMapDecos();
     }
 
-    if (wstrModelTag == TEXT("Town") ||  wstrModelTag == TEXT("DeeDeeDee") || wstrModelTag == TEXT("TownShop")|| wstrModelTag == TEXT("Land_VcLabo") || wstrModelTag == TEXT("Land_LbLastBossBeforeStep")) 
+    if (wstrModelTag == TEXT("Town") ||  wstrModelTag == TEXT("DeeDeeDee") || wstrModelTag == TEXT("TownShop")|| 
+        /*wstrModelTag == TEXT("Land_VcLabo") || */wstrModelTag == TEXT("Land_LbLastBossBeforeStep")) 
     {
         if (LEVEL_TOOL_MAP != *m_pCurrentLevelID) 
         {
@@ -79,11 +85,9 @@ HRESULT CBasicMap::Initialize(void* pArg)
             ReadDecos_ForSmallLevels();
         }
     }
-        
+ 
     if (FAILED(m_pModelCom->CreateStaticActor(GameObjectDesc.matWorld)))
         return E_FAIL;
-
-    m_fTime = m_fNonMatchTime = 100.f;
 
     return S_OK;
 }
@@ -121,10 +125,9 @@ HRESULT CBasicMap::Render()
     {
         if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fNonMatchTime, sizeof(_float))))
             return E_FAIL;
-        _float fWhiteColorDiffuse = 0;
-        if (FAILED(m_pNonAnimShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &fWhiteColorDiffuse, sizeof(_float))))
+        if (FAILED(m_pNonAnimShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
             return E_FAIL;
-        if (FAILED(m_pAnimShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &fWhiteColorDiffuse, sizeof(_float))))
+        if (FAILED(m_pAnimShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
             return E_FAIL;
 
         m_iRenderAll = m_iRenderMyMesh = 0;
@@ -146,6 +149,7 @@ HRESULT CBasicMap::Render()
 
             if (FAILED(m_pShaderCom->Bind_RawValue("g_fSamplingFactor", &m_vecSamplingFactors[i], sizeof(_float))))
                 return E_FAIL;
+
             if (i == m_iMeshIndex) {
                 if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fTime, sizeof(_float))))
                     return E_FAIL;
@@ -559,10 +563,27 @@ void CBasicMap::ReadDecos_ForSmallLevels()
         PxRigidStatic* pRigidStatic = { nullptr };
         pModel->Set_WorldMatrixForOctree(matWorld);
 
-        if (CMapToolObject::MAPOBJ_NONCOL == iMapObjType)
+        auto mapIter = m_mapBlendMeshesIndices.find(strModelName);
+        if (mapIter != m_mapBlendMeshesIndices.end())
         {
-            m_vecNonAnimDecos.push_back(pModel);
+            CBlendMapObject::BLENDMAPOBJ_DESC tBlendObjDesc{};
+            tBlendObjDesc.matWorld = matWorld;
+            tBlendObjDesc.tModel = MODEL{ strModelName, eType, 1.f, 0.f, 0, strFolder, false };
+            tBlendObjDesc.iShaderVars = iShaderVars;
+            tBlendObjDesc.fRimWidth = fRimWidth;
+            CBlendMapObject* pBlendMapObj =  dynamic_cast<CBlendMapObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_BlendMapObject"), &tBlendObjDesc));
+
+            if (nullptr != pBlendMapObj) {
+                pBlendMapObj->SetUp_BlendMeshes(mapIter->second);
+                m_vecBlendObjects.push_back(pBlendMapObj);
+                pModel->Set_BlendObject(pBlendMapObj);
+            }
+            pModel->RemoveBlendMeshes(mapIter->second);
         }
+
+        if (CMapToolObject::MAPOBJ_NONCOL == iMapObjType)
+            m_vecNonAnimDecos.push_back(pModel);
+
         else if (CMapToolObject::MAPOBJ_ANIM == iMapObjType)
         {
             auto idleIter = m_ModelIdleAnimMap.find(strModelName);
@@ -614,6 +635,7 @@ HRESULT CBasicMap::Render_NonOctreeMapDecos()
         if (FAILED(nonAnim->Bind_WorldMatrixForOctree(m_pNonAnimShaderCom)))
             return E_FAIL;
 
+        _uint iModelPassIndex = nonAnim->Get_ModelPassIndex();
         for (_uint i = 0; i < iNumMeshes; i++) {
             if (FAILED(nonAnim->Bind_ShaderResource(m_pNonAnimShaderCom, m_vecConstantNames[0].c_str(), i, TextureType_DIFFUSE)))
                 return E_FAIL;
@@ -621,7 +643,7 @@ HRESULT CBasicMap::Render_NonOctreeMapDecos()
                 return E_FAIL;
             if (FAILED(nonAnim->Bind_ShaderResource(m_pNonAnimShaderCom, m_vecConstantNames[2].c_str(), i, TextureType_METALNESS)))
                 return E_FAIL;
-            if (FAILED(m_pNonAnimShaderCom->Begin(nonAnim->Get_ModelPassIndex())))
+            if (FAILED(m_pNonAnimShaderCom->Begin(iModelPassIndex)))
                 return E_FAIL;
             if (FAILED(nonAnim->Render(i)))
                 return E_FAIL;
@@ -644,6 +666,7 @@ HRESULT CBasicMap::Render_NonOctreeMapDecos()
         if (FAILED(animDeco->Bind_WorldMatrixForOctree(m_pAnimShaderCom)))
             return E_FAIL;
 
+        _uint iModelPassIndex = animDeco->Get_ModelPassIndex();
         for (_uint i = 0; i < iNumMeshes; i++) {
             if (FAILED(animDeco->Bind_ShaderResource(m_pAnimShaderCom, m_vecConstantNames[0].c_str(), i, TextureType_DIFFUSE)))
                 return E_FAIL;
@@ -653,7 +676,7 @@ HRESULT CBasicMap::Render_NonOctreeMapDecos()
                 return E_FAIL;
             if (FAILED(animDeco->Bind_BoneMatrices(m_pAnimShaderCom, m_vecConstantNames[8].c_str(), i)))
                 return E_FAIL;
-            if (FAILED(m_pAnimShaderCom->Begin(animDeco->Get_ModelPassIndex())))
+            if (FAILED(m_pAnimShaderCom->Begin(iModelPassIndex)))
                 return E_FAIL;
             if (FAILED(animDeco->Render(i)))
                 return E_FAIL;
@@ -686,6 +709,71 @@ _bool CBasicMap::IsMapDeco(const string& _strModelName)
         return true;
 
     return _bool();
+}
+
+_bool CBasicMap::IsBlendDeco(const string& _strModelName)
+{
+    if (m_mapBlendMeshesIndices.end() != m_mapBlendMeshesIndices.find(_strModelName))
+        return true;
+
+    return _bool();
+}
+
+void CBasicMap::TraverseBlendDecoInfoTxts(unordered_map<string, unordered_set<_uint>>& _mapBlendMeshIndices
+        , unordered_map<string, _bool>& _mapBlendObjStaticActor)
+{
+    string strPath = "../../../objects_txt/BlendDecoInfo/";
+
+    directory_iterator end_iter;  // 디렉토리 순회의 끝을 나타내는 iterator
+    directory_iterator dir_iter(strPath);  // 지정된 경로의 시작 iterator
+
+    while (dir_iter != end_iter) {
+        if (is_regular_file(*dir_iter)) {
+            string strFilePath = dir_iter->path().filename().string();
+            string strModelName = strFilePath.substr(0, strFilePath.length() - 4);
+
+            unordered_set<_uint> setBlendMeshesIndices;
+            _bool bStaticActor = false;
+            _bool bRead = ReadBlendMeshesIndices(dir_iter->path().generic_string(), strModelName, setBlendMeshesIndices, bStaticActor);
+
+            if (true == bRead) {
+                _mapBlendMeshIndices.emplace(strModelName, setBlendMeshesIndices);
+                _mapBlendObjStaticActor.emplace(strModelName, bStaticActor);
+            }
+               
+        }
+        ++dir_iter;
+    }
+}
+
+_bool CBasicMap::ReadBlendMeshesIndices(const string& _strFullPath, const string& _strModelName
+        , unordered_set<_uint>& _setMeshIndices, _bool& _bStaticActor)
+{
+    ifstream fileInput(_strFullPath, ios::binary);
+    if (fileInput.is_open() == false)
+    {
+        wstring wstrError = TEXT("Failed to open : ") + CUtils::StrToWstr(_strModelName) + TEXT("_BlendMeshes.txt");
+        MSG_BOX(wstrError.c_str());
+        return false;
+    }
+
+    _bool bStaticActor{};
+    fileInput.read(reinterpret_cast<char*>(&bStaticActor), sizeof(bStaticActor));
+    _bStaticActor = bStaticActor;
+
+    _uint iNumBlendMeshes{};
+    fileInput.read(reinterpret_cast<char*>(&iNumBlendMeshes), sizeof(iNumBlendMeshes));
+
+    _uint iMeshIndex{};
+    for (_uint i = 0; i < iMeshIndex; i++)
+    {
+        fileInput.read(reinterpret_cast<char*>(&iMeshIndex), sizeof(iMeshIndex));
+        _setMeshIndices.insert(iMeshIndex);
+    }
+
+    fileInput.close();
+
+    return true;
 }
 
 void CBasicMap::Save_OctreeData(const string& strLevel)
@@ -772,6 +860,10 @@ void CBasicMap::Free()
 {
     __super::Free();
 
+    for (auto& blendObj : m_vecBlendObjects)
+        Safe_Release(blendObj);
+    m_vecBlendObjects.clear();
+
     for (auto& animDecoObj : m_vecAnimDecoGameObjs)
         Safe_Release(animDecoObj);
     m_vecAnimDecoGameObjs.clear();
@@ -803,7 +895,7 @@ void CBasicMap::Free()
 
     Safe_Release(m_pTextureCom);
     Safe_Release(m_pShaderCom);
-    Safe_Release(m_pModelCom);
     Safe_Release(m_pNonAnimShaderCom);
     Safe_Release(m_pAnimShaderCom);
+    Safe_Release(m_pModelCom);
 }

@@ -34,13 +34,20 @@ private:
 	HRESULT			Bind_ShaderResources();
 
 	_int			Make_Partical();
-	_float			m_fHitPower = { 0.f };
-	_float			m_fWhiteColorDiffuse = { 0.f };
-	_uint			m_iNoNormalNoMRAMesh = {};
+	void			SwitchAfterBefore();
 
-	CModel* m_pModelCom = { nullptr };
-	CCharacterController* m_pControllerCom = { nullptr };
-	CShader* m_pShaderCom = { nullptr };
+	CModel*			m_pModelCom = { nullptr };
+	CShader*		m_pShaderCom = { nullptr };
+
+	_float			m_fHitPower = {};
+	_float			m_fWhiteColorDiffuse = {};
+	
+	_bool			m_bStartAnimation = { false };
+	_float4			m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
+
+	unordered_set<_uint>	m_setNonRenderMeshes;
+	unordered_set<_uint>	m_setBeforeMeshIndices;
+	unordered_set<_uint>	m_setNormalXMesh;
 
 public:
 	static CCarShopWall* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
