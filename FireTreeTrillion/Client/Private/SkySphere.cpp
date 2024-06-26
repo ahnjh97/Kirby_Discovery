@@ -78,7 +78,7 @@ HRESULT CSkySphere::Render()
 		if (LEVEL_FINALBOSS == m_eCurLevel)
 		{
 			// 변경이 필요할 경우, 조건에 따라 TexCom[Diffuse]의 TEX이넘 값을 변경하면 스왑 
-			hr = m_pLabSkyTex[TEX_DIFFUSE]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", SKY_LAB_FIELD/*SKY_LAB_1PASE*/);
+			hr = m_pLabSkyTex[TEX_DIFFUSE]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", SKY_LAB_1PASE);
 			CHECK_FAILED(hr);
 
 			hr = m_pLabSkyTex[TEX_NORMAL]->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", SKY_LAB_2PASE);

@@ -468,6 +468,17 @@ HRESULT CRenderer::Add_RenderGroup(RENDERGROUP eRenderGroup, CGameObject* pRende
 	return S_OK;
 }
 
+HRESULT CRenderer::Add_BlendModel(CModel* pBlendModel)
+{
+	if (nullptr == pBlendModel)
+		return E_FAIL;
+
+	m_BlendModelsList.push_back(pBlendModel);
+	Safe_AddRef(pBlendModel);
+
+	return S_OK;
+}
+
 HRESULT CRenderer::Render(_float fTimeDelta)
 {
 	// 랜더러 기본 수치 세팅

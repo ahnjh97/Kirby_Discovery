@@ -336,9 +336,6 @@
     <Filter Include="02.GameObjects\Map\Bridge">
       <UniqueIdentifier>{d42d0265-2d39-46ae-8baa-4fdc448c5e73}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Map\Shutter">
-      <UniqueIdentifier>{1bb854fe-6e96-4704-8fc4-50ae4707b4db}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Map\CarShopWall">
       <UniqueIdentifier>{22f62060-413c-4957-94a1-99647cd7b478}</UniqueIdentifier>
     </Filter>
@@ -386,6 +383,12 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\WaddleDee\Battle">
       <UniqueIdentifier>{c3474c33-3205-448e-897a-c737e2235109}</UniqueIdentifier>
+	</Filter>
+    <Filter Include="02.GameObjects\Map\NonRenderWall">
+      <UniqueIdentifier>{d4881f40-d9f4-423b-bdbf-ef08184a3618}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\BlendMapObject">
+      <UniqueIdentifier>{65399ffe-175b-49c9-98d6-f92a04f307f7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -761,11 +764,23 @@
     <ClInclude Include="..\Public\DeeDeeDeeHammer.h">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\CarShopWallFrame.h">
+      <Filter>02.GameObjects\Map\CarShopWall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ToppleableBridge.h">
+      <Filter>02.GameObjects\Map\Bridge</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Level_DeeDeeDee.h">
       <Filter>01.Levels\3. DeeDeeDee</Filter>
     </ClInclude>
     <ClInclude Include="..\public\BattleDee.h">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\Battle</Filter>
+	</ClInclude>
+    <ClInclude Include="..\Public\BlendMapObject.h">
+      <Filter>02.GameObjects\Map\BlendMapObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\NonRenderWall.h">
+      <Filter>02.GameObjects\Map\NonRenderWall</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1123,11 +1138,23 @@
     <ClCompile Include="..\Private\DeeDeeDeeHammer.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\CarShopWallFrame.cpp">
+      <Filter>02.GameObjects\Map\CarShopWall</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ToppleableBridge.cpp">
+      <Filter>02.GameObjects\Map\Bridge</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Level_DeeDeeDee.cpp">
       <Filter>01.Levels\3. DeeDeeDee</Filter>
     </ClCompile>
     <ClCompile Include="..\private\BattleDee.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\Battle</Filter>
+	</ClCompile>
+    <ClCompile Include="..\Private\BlendMapObject.cpp">
+      <Filter>02.GameObjects\Map\BlendMapObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\NonRenderWall.cpp">
+      <Filter>02.GameObjects\Map\NonRenderWall</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

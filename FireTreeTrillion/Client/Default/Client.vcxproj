@@ -186,6 +186,7 @@
     <ClInclude Include="..\Public\BladeKnight.h" />
     <ClInclude Include="..\Public\BladeKnightSword.h" />
     <ClInclude Include="..\Public\BladeKnight_State.h" />
+    <ClInclude Include="..\Public\BlendMapObject.h" />
     <ClInclude Include="..\Public\BombOrbit.h" />
     <ClInclude Include="..\Public\BombOrbitGlow.h" />
     <ClInclude Include="..\Public\BreakableRock.h" />
@@ -202,6 +203,7 @@
     <ClInclude Include="..\Public\CappyHat_State.h" />
     <ClInclude Include="..\Public\Car.h" />
     <ClInclude Include="..\Public\CarShopWall.h" />
+    <ClInclude Include="..\Public\CarShopWallFrame.h" />
     <ClInclude Include="..\Public\Character.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\Coin.h" />
@@ -280,6 +282,7 @@
     <ClInclude Include="..\Public\Moon.h" />
     <ClInclude Include="..\Public\MultiEffect.h" />
     <ClInclude Include="..\Public\NonAnimDeco.h" />
+    <ClInclude Include="..\Public\NonRenderWall.h" />
     <ClInclude Include="..\Public\OrbitingCamera.h" />
     <ClInclude Include="..\public\OriginalDee.h" />
     <ClInclude Include="..\Public\Particle.h" />
@@ -307,6 +310,7 @@
     <ClInclude Include="..\Public\Editor_UI.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\Public\ToppleableBridge.h" />
     <ClInclude Include="..\Public\Trigger.h" />
     <ClInclude Include="..\Public\UI_PartTime.h" />
     <ClInclude Include="..\public\WaddleDee.h" />
@@ -334,6 +338,7 @@
     <ClCompile Include="..\Private\BladeKnight.cpp" />
     <ClCompile Include="..\Private\BladeKnightSword.cpp" />
     <ClCompile Include="..\Private\BladeKnight_State.cpp" />
+    <ClCompile Include="..\Private\BlendMapObject.cpp" />
     <ClCompile Include="..\Private\BombOrbit.cpp" />
     <ClCompile Include="..\Private\BombOrbitGlow.cpp" />
     <ClCompile Include="..\Private\BreakableRock.cpp" />
@@ -350,6 +355,7 @@
     <ClCompile Include="..\Private\CappyHat_State.cpp" />
     <ClCompile Include="..\Private\Car.cpp" />
     <ClCompile Include="..\Private\CarShopWall.cpp" />
+    <ClCompile Include="..\Private\CarShopWallFrame.cpp" />
     <ClCompile Include="..\Private\Character.cpp" />
     <ClCompile Include="..\Private\Coin.cpp" />
     <ClCompile Include="..\Private\CollisionCenter.cpp" />
@@ -424,6 +430,7 @@
     <ClCompile Include="..\Private\Moon.cpp" />
     <ClCompile Include="..\Private\MultiEffect.cpp" />
     <ClCompile Include="..\Private\NonAnimDeco.cpp" />
+    <ClCompile Include="..\Private\NonRenderWall.cpp" />
     <ClCompile Include="..\Private\OrbitingCamera.cpp" />
     <ClCompile Include="..\private\OriginalDee.cpp" />
     <ClCompile Include="..\Private\Particle.cpp" />
@@ -451,6 +458,7 @@
     <ClCompile Include="..\Private\Editor_UI.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\Private\ToppleableBridge.cpp" />
     <ClCompile Include="..\Private\Trigger.cpp" />
     <ClCompile Include="..\Private\UI_PartTime.cpp" />
     <ClCompile Include="..\private\WaddleDee.cpp" />
