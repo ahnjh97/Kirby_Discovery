@@ -101,8 +101,8 @@ PS_OUT PS_MAIN(PS_IN In)
 	PS_OUT			Out = (PS_OUT)0;
     
 	vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
-	if (0.3f >= vMtrlDiffuse.a)
-		discard;
+	//if (0.3f >= vMtrlDiffuse.a)
+	//	discard;
 
     vector vNormalTex = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
 
@@ -163,6 +163,37 @@ PS_OUT_EFFECT NONBLUR(PS_IN In)
     
     Out.vColor = vMtrlDiffuse;
     Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
+    return Out;
+}
+
+PS_OUT PS_NORMAL_O_DISCARD_X(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    if (0.3f >= vMtrlDiffuse.a)
+        discard;
+
+    vector vNormalTex = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
+
+    float3 vNormal = vNormalTex.xyz * 2.f - 1.f;
+    float3x3 WorldMatrix = float3x3(In.vTangent, In.vBinormal, In.vNormal);
+
+    float3 vWorldNormal = mul(vNormal, WorldMatrix);
+
+    Out.vDiffuse = vMtrlDiffuse;
+    Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vFieldDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 0.0f);
+    Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
+    if (Out.vMRA.z == 0)
+        Out.vMRA.z = 0.001f;
+    
+    if (g_fTime < 0.5f)
+        Out.vDiffuse.rgb += vDamageColor * smoothstep(0.0f, 1.0f, g_fTime);
+    else if (g_fTime < 1.f)
+        Out.vDiffuse.rgb += vDamageColor * smoothstep(0.0f, 1.0f, (1 - g_fTime));
+    
     return Out;
 }
 
@@ -232,5 +263,31 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 NONBLUR();
+    }
+
+    pass BLEND_X_NORMAL_O_NONDISCARD
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_NORMAL_O_DISCARD_X();
+    }
+
+    pass BLEND_O_NORMAL_O_NONDISCARD
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_NORMAL_O_DISCARD_X();
     }
 }
