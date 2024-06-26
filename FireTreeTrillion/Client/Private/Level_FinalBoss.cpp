@@ -14,6 +14,7 @@
 
 #include "BG.h"
 #include "HUD.h"
+#include "SkySphere.h"
 //#include "Kirby.h"
 
 CLevel_FinalBoss::CLevel_FinalBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -141,7 +142,16 @@ HRESULT CLevel_FinalBoss::Ready_Layer_Camera(const wstring& strLayerTag)
 
 HRESULT CLevel_FinalBoss::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
-	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_FINALBOSS, strLayerTag, TEXT("Prototype_GameObject_SkySphere"));
+
+	CSkySphere::SKYSPHERE_DESC LabSkyDesc{};
+	//LabSkyDesc.strModelTag =
+	LabSkyDesc.strTextureTag = "SkySphere_Lab_Diffuse";
+
+	_float4x4 InitMat = _float4x4::Identity;
+	InitMat.Translation({ 0.f, -50.f, 0.f });
+	LabSkyDesc.matWorld = InitMat;
+
+	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_FINALBOSS, strLayerTag, TEXT("Prototype_GameObject_SkySphere", &LabSkyDesc));
 	CHECK_FAILED(hr);
 
 	return S_OK;

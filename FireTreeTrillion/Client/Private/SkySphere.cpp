@@ -22,6 +22,11 @@ HRESULT CSkySphere::Initialize(void* pArg)
 {
 	HRESULT hr = __super::Initialize(pArg);
 	CHECK_FAILED(hr);
+	
+	SKYSPHERE_DESC SkySphereDesc = (SKYSPHERE_DESC&)pArg;
+	m_strModelTag = SkySphereDesc.strModelTag;
+	m_strTextureTag = SkySphereDesc.strTextureTag;
+	m_pTransformCom->Set_WorldMatrix(SkySphereDesc.matWorld);
 
 	hr = Add_Components();
 	CHECK_FAILED(hr);
@@ -173,21 +178,22 @@ HRESULT CSkySphere::Add_Components()
 		TEXT("Com_Tex_Lab_CloudNoize"), (CComponent**)&m_pLabSkyTex[TEX_MRA]);
 	CHECK_FAILED(hr);
 
-	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_SkySphere_Lab_Diffuse"), 
-		TEXT("Com_Tex_Lab_Diffuse"), (CComponent**)&m_pLabSkyTex[TEX_DIFFUSE]);
+	wstring strProtoTagTex = TEXT("Prototype_Component_Texture_") + CUtils::StrToWstr(m_strTextureTag);
+
+	hr = __super::Add_Component(LEVEL_STATIC, strProtoTagTex, TEXT("Com_Tex_Lab_Diffuse"), (CComponent**)&m_pLabSkyTex[TEX_DIFFUSE]);
 	CHECK_FAILED(hr);
 
-	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_SkySphere_LabBoss_2Pase_Normal"), 
-		TEXT("Com_Tex_LabBoss_Normal"), (CComponent**)&m_pLabSkyTex[TEX_NORMAL]);
-	CHECK_FAILED(hr);
+	//hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_SkySphere_LabBoss_2Pase_Normal"), 
+	//	TEXT("Com_Tex_LabBoss_Normal"), (CComponent**)&m_pLabSkyTex[TEX_NORMAL]);
+	//CHECK_FAILED(hr);
 
-	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_SkySphere_LabBoss_2Pase_Emissive"), 
-		TEXT("Com_Tex_LabBoss_Emissive"), (CComponent**)&m_pLabSkyTex[TEX_EMISSIVE]);
-	CHECK_FAILED(hr);
+	//hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_SkySphere_LabBoss_2Pase_Emissive"), 
+	//	TEXT("Com_Tex_LabBoss_Emissive"), (CComponent**)&m_pLabSkyTex[TEX_EMISSIVE]);
+	//CHECK_FAILED(hr);
 
-	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_SkySphere_LabBoss_2Pase_Height"), 
-		TEXT("Com_Tex_LabBoss_Height"), (CComponent**)&m_pLabSkyTex[TEX_HEIGHT]);
-	CHECK_FAILED(hr);
+	//hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_SkySphere_LabBoss_2Pase_Height"), 
+	//	TEXT("Com_Tex_LabBoss_Height"), (CComponent**)&m_pLabSkyTex[TEX_HEIGHT]);
+	//CHECK_FAILED(hr);
 
 #pragma endregion
 

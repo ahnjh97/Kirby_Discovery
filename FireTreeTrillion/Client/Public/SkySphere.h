@@ -6,6 +6,12 @@ BEGIN(Client)
 class CSkySphere final : public CGameObject
 {
 public:
+	typedef struct : public CGameObject::GAMEOBJECT_DESC
+	{
+		string strModelTag = { "" };
+		string strTextureTag = { "" };
+	}SKYSPHERE_DESC;
+
 	enum MOD_TYPE { MOD_FRAME, MOD_PILLER, MOD_NONE };
 	enum TEX_TYPE { TEX_DIFFUSE, TEX_NORMAL, TEX_EMISSIVE, TEX_HEIGHT, TEX_MRA, TEX_NONE };
 	enum SKY_TYPE { 
@@ -40,6 +46,8 @@ public:
 
 private:
 	LEVEL					m_eCurLevel = { LEVEL_END };
+	string					m_strModelTag = { "" };
+	string					m_strTextureTag = { "" };
 };
 
 END
