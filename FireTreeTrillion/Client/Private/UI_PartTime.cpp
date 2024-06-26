@@ -32,7 +32,8 @@ CUI_PartTime::CUI_PartTime(const CUI_PartTime& rhs)
 HRESULT CUI_PartTime::Initialize_Prototype()
 {
 	fill(m_arrTexures.begin(), m_arrTexures.end(), nullptr);
-	fill(m_arrSizeRatio.begin(), m_arrSizeRatio.end(), 1);
+	_int iRatio(1);
+	fill(m_arrSizeRatio.begin(), m_arrSizeRatio.end(), iRatio);
 
 	m_arrSize[0] = m_arrSize[4] = m_SizeBar2D;
 	m_arrSize[1] = m_arrSize[2] = m_arrSize[3] = m_SizeTimeBarBlank2D;
@@ -42,10 +43,13 @@ HRESULT CUI_PartTime::Initialize_Prototype()
 	m_arrSize[10] = m_arrSize[11] = m_arrSize[12] = m_arrSize[13] = m_arrSize[14] = m_SizeDigits2D;
 	m_arrOriginalSize = m_arrSize;
 
-	fill(m_arrPosition.begin(), m_arrPosition.end(), _float2());
-	fill(m_arrColor.begin(), m_arrColor.end(), _float3(1.f, 1.f, 1.f));
-	fill(m_arrScoreDigits.begin(), m_arrScoreDigits.end(), 0);
-	fill(m_arrTimerDigits.begin(), m_arrTimerDigits.end(), 0);
+	_float2 temp2D = _float2();
+	fill(m_arrPosition.begin(), m_arrPosition.end(), temp2D);
+	_float3 temp3D = _float3(1.f, 1.f, 1.f);
+	fill(m_arrColor.begin(), m_arrColor.end(), temp3D);
+	_int iZero(0);
+	fill(m_arrScoreDigits.begin(), m_arrScoreDigits.end(), iZero);
+	fill(m_arrTimerDigits.begin(), m_arrTimerDigits.end(), iZero);
 
 	return S_OK;
 }
