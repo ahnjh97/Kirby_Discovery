@@ -101,7 +101,7 @@ private:
 	_bool				  m_bHitStop = { false };
 	_float				  m_fHitStopTime = { 0.f };
 
-
+	HRESULT	Make_TargetToCams();
 
 	// 디디디의 시스템적인 틱을 담당한다.
 	void DeeDeeDee_SystemTick(_float fTimeDelta);

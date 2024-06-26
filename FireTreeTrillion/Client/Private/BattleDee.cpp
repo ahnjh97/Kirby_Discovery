@@ -21,20 +21,20 @@ pair<DEE_ANIM, _bool> CBattleDee::Make_WhatToDo()
 	switch (CUtils::Make_RandomInt(0, 2))
 	{
 	case 0:
-		eDeeState = DEEANIM_TROUBLE;
+		eDeeState = DEEANIM_ANGERRUN;
 		break;
 	case 1:
 		eDeeState = DEEANIM_ANGERRUN;
 		break;
 	case 2:
-		eDeeState = DEEANIM_CHEERINGA;
+		eDeeState = DEEANIM_ANGERRUN;
 		break;
 	default:
 		eDeeState = DEEANIM_ANGERRUN;
 		break;
 	};
 
-	return { DEEANIM_ANGERRUN, true };
+	return { eDeeState, true };
 }
 
 CBattleDee::CBattleDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

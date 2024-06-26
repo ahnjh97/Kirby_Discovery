@@ -549,6 +549,10 @@ void CDee_FlyStun_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	{
 		// 이제 날아가는 것을 구현해보자.
 		baseInfo.pController->Move_Dir(baseInfo.pTransformCom, vDamegeDir * fTimeDelta * 3.f, fTimeDelta);
+
+		if (baseInfo.pTransformCom->Get_State(CTransform::STATE_RIGHT) == _float4::Zero)
+			baseInfo.pTransformCom->Set_Scaled({ 1.f, 1.f, 1.f });
+
 		baseInfo.pTransformCom->Turn(_float4{ baseInfo.pTransformCom->Get_State(CTransform::STATE_RIGHT) }, fTimeDelta);
 
 		// 점프되는 체공시간을 구현해보자.
@@ -620,10 +624,14 @@ void CDee_FlyStun_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 			else
 			{
 				pair<DEE_ANIM, _bool> ToDo = baseInfo.pDee->Make_WhatToDo();
-				baseInfo.pDee->Set_PhyXState(PO_NORMAL);
 				baseInfo.pDee->Change_State(ToDo.first, 60.f, ToDo.second, true);
-				baseInfo.pTransformCom->Look_At_ForLandObject(baseInfo.pDee->Make_DestPos());
+
+				_float3 vLook = baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK);
+				vLook.y = 0.f;
+				vLook.Normalize();
+				baseInfo.pTransformCom->Look_At_Axis(vLook);
 				m_iBounceCnt = 1;
+				baseInfo.pDee->Set_PhyXState(PO_NORMAL);
 			}
 		}
 	}

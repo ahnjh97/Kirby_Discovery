@@ -6,6 +6,7 @@
 #include "HitBox.h"
 #include "Bone.h"
 #include "DeeDeeDeeHammer.h"
+#include "Camera_Main.h"
 
 #define INFO(Dst) m_tInfo.Dst
 
@@ -48,6 +49,9 @@ HRESULT CDeeDeeDee::Initialize(void* pArg)
 
 	_float4 vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 	m_vNeckLook = m_vLEyeLook = m_vREyeLook = m_tInfo.m_vMoveDir = m_tInfo.m_vTargetDir = vLook;
+
+	Make_TargetToCams();
+
 	return S_OK;
 }
 
@@ -94,8 +98,8 @@ void CDeeDeeDee::Late_Tick(_float fTimeDelta)
 
 	m_pWeapons->Late_Tick(m_fTimeDelta);
 
-		if (Compute_OptimizationAnimation(m_fTimeDelta) == true)
-			m_ePhyXState == PO_FLYDEADAWAY ? m_pModelCom->Play_Animation(m_fAccTime * 0.3f) : m_pModelCom->Play_Animation(m_fAccTime);
+	if (Compute_OptimizationAnimation(m_fTimeDelta) == true)
+		m_ePhyXState == PO_FLYDEADAWAY ? m_pModelCom->Play_Animation(m_fAccTime * 0.3f) : m_pModelCom->Play_Animation(m_fAccTime);
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 6.0f))
 	{
@@ -502,6 +506,17 @@ void CDeeDeeDee::HitBoxChanger(_uint eState)
 	default:
 		break;
 	}
+}
+
+//카메라 메인에 자기 자신을 두 번째 타겟으로 등록한다.
+HRESULT CDeeDeeDee::Make_TargetToCams()
+{
+	CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+	CHECK_NULLPTR(pCameraMain);
+	pCameraMain->Set_Target(m_pTransformCom, CCamera::FOCUS_SECOND);
+	pCameraMain->Set_CamFocus(CCamera::FOCUS_BOTH);
+
+	return S_OK;
 }
 
 void CDeeDeeDee::DeeDeeDee_SystemTick(_float fTimeDelta)

@@ -14,7 +14,7 @@ CCamera_Main::CCamera_Main(const CCamera_Main& rhs)
 }
 
 HRESULT CCamera_Main::Initialize_Prototype()
-{ 
+{
 	return S_OK;
 }
 
@@ -55,9 +55,9 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 	m_pTransformCom->Look_At(pCamDesc.vAt);
 
 	_float4 vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-	m_vDestCamDir = _float3( vLook );
+	m_vDestCamDir = _float3(vLook);
 	m_vDestCamDir.Normalize();
-	m_vCurCamDir = m_vDestCamDir;
+	m_vCurCamDir = m_vOrigCamDir = m_vDestCamDir;
 
 	//m_vDestCamDir = _float3{ vLook.x, vLook.y, vLook.z };
 	//m_vDestCamDir.Normalize();
@@ -282,7 +282,7 @@ void CCamera_Main::Control(_float fTimeDelta)
 //타겟 위치로부터 카메라 위치를 갱신, 보간한다.
 void CCamera_Main::UpdatePos_FromAnchor(_float fTimeDelta)
 {
-	
+
 	if (nullptr == m_pFirstTarget)
 		return;
 
@@ -324,8 +324,6 @@ void CCamera_Main::UpdatePos_FromAnchor(_float fTimeDelta)
 
 	//기준점 저장
 	_float fYOffset = 2.f * (m_fCurDistance / 30.f) + m_fCurUpOffset;
-
-
 	m_vAnchor = F4toF3(vTargetPos) + _float3(0.f, fYOffset, 0.f);
 
 
@@ -333,34 +331,26 @@ void CCamera_Main::UpdatePos_FromAnchor(_float fTimeDelta)
 	CUtils::Make_World_ToScreen(vTargetProjPos);
 
 
-	//타겟 포지션을 조절
-	//if (.3f < static_cast<_float2>(vTargetProjPos).Length())
-
-		// 타겟 포즈를 중심으로 조절
-	//	_float2 vDir = static_cast<_float2>(vTargetProjPos);
-	//vDir.Normalize();  // 방향 벡터를 정규화
-
-	//// 임계값 범위 내로 조정
-	//vTargetProjPos = _float3((vDir * .3f).x, (vDir * .3f).y, vTargetProjPos.z);
-
-	//// 스크린 좌표를 다시 월드 좌표로 변환
-	//CUtils::Make_Screen_ToWorld(vTargetProjPos);
-
-
-	//m_vAnchor = vTargetProjPos;
-	//타겟 포즈가 중심점에 가까운 거리라면 카메라 이동 하지 않고 유지
-	//if (static_cast<_float2>(vTargetProjPos).Length() < .2f)
-	//{
-	//	m_vAnchor = static_cast<_float3>(m_pTransformCom->Get_State(CTransform::STATE_POSITION) + m_pTransformCom->Get_State(CTransform::STATE_LOOK));
-	//}
-
-
-
 	//**** 설정 값 보간 ****//
 
 	//트리거 안에 들어가 있을 경우 트리거 사이에서의 목표 카메라 설정을 맞춘다.
 	if (m_bLerpByTriggerInfo)
 		LerpByTriggerInfo(m_iMatrixIndex);
+
+
+	//
+	if (m_eCamFocus == FOCUS_BOTH)
+	{
+		_float3 vDir = _float3(m_pSecondTarget->Get_State(CTransform::STATE_POSITION) - m_pFirstTarget->Get_State(CTransform::STATE_POSITION));
+
+		m_vDestCamDir = vDir;
+		m_vDestCamDir.y = m_vOrigCamDir.y;
+
+		_float fDist = vDir.Length();
+		fDist = clamp(fDist, 12.f, 40.f);
+		m_vDestCamDir.y += MAPVALUE(vDir.Length(), 12.f, 40.f, -4.5f, -3.f);
+		m_vDestCamDir.Normalize();
+	}
 
 
 	if (.1f < fRealTimeDelta)
@@ -379,7 +369,8 @@ void CCamera_Main::UpdatePos_FromAnchor(_float fTimeDelta)
 	//	LERP(m_fCurUpOffset, m_fDestUpOffset, fRealTimeDelta * 5.f);
 
 	//각도 보간
-	m_vCurCamDir = SlerpDirVec(m_vCurCamDir, m_vDestCamDir, fRealTimeDelta * 4.f);
+	_float fSlerpSpeed = (m_eCamFocus == FOCUS_BOTH) ? 12.f : 4.f;
+	m_vCurCamDir = SlerpDirVec(m_vCurCamDir, m_vDestCamDir,  clamp( fRealTimeDelta * fSlerpSpeed, 0.f, 1.f ) );
 
 
 
@@ -390,8 +381,21 @@ void CCamera_Main::UpdatePos_FromAnchor(_float fTimeDelta)
 	vBackDir.Normalize();
 
 	//실제 카메라 목표 위치를 저장한다.
-	m_vDestCamPos = m_vAnchor - (m_vCurCamDir * m_fCurDistance);
+	if(m_eCamFocus == FOCUS_BOTH)
+		m_vDestCamPos = m_pFirstTarget->Get_State(CTransform::STATE_POSITION) - (m_vCurCamDir * m_fCurDistance);
+	else
+		m_vDestCamPos = m_vAnchor - (m_vDestCamDir * m_fCurDistance);
 
+
+	//if (m_eCamFocus == FOCUS_BOTH)
+	//{
+
+
+	//	m_vDestCamDir = static_cast<_float3>(m_pFirstTarget->Get_State(CTransform::STATE_LOOK));
+
+	//		m_vDestCamPos = _float3(m_pFirstTarget->Get_State(CTransform::STATE_POSITION) - m_pFirstTarget->Get_State(CTransform::STATE_LOOK) * m_fCurDistance);
+	//	
+	//}
 
 	//**** 카메라 쉐이킹 오프셋 ****//
 
@@ -425,7 +429,7 @@ void CCamera_Main::UpdatePos_FromAnchor(_float fTimeDelta)
 
 	//x 가기
 	if (.1f <= vDestXZDir.Length() /*&& .2f < static_cast<_float2>(vTargetProjPos).Length()*/)
-		m_pTransformCom->Move(vDestXZDir * fRealTimeDelta * 4.f);
+		m_pTransformCom->Move(vDestXZDir * fRealTimeDelta * ( (m_eCamFocus == FOCUS_BOTH) ? 12.f : 4.f ) );
 
 	//y로 가기
 	if (.1f <= vDestYDir.Length())
@@ -434,15 +438,15 @@ void CCamera_Main::UpdatePos_FromAnchor(_float fTimeDelta)
 			m_pTransformCom->Move(vDestYDir * fRealTimeDelta * 2.5f);
 		else
 		{
-			m_pTransformCom->Move((1.f < vDestYDir.Length()) ? _float4{ 0.f, -1.f, 0.f, 0.f } *fRealTimeDelta * 3.f : vDestYDir * fRealTimeDelta * 2.5f);
+			m_pTransformCom->Move((1.f < vDestYDir.Length()) ? _float4{ 0.f, -1.f, 0.f, 0.f } * fRealTimeDelta * 3.f : vDestYDir * fRealTimeDelta * 2.5f);
 
 		}
 
 	}
 
 
-	m_pTransformCom->Look_At_Interpolate(m_pTransformCom->Get_State(CTransform::STATE_POSITION) + Dir(m_vCurCamDir) + _float4{ 0.f, m_fCurUpOffset, 0.f, 0.f }, fRealTimeDelta);
-
+		m_pTransformCom->Look_At_Interpolate(m_pTransformCom->Get_State(CTransform::STATE_POSITION) + Dir(m_vCurCamDir) + _float4{ 0.f, m_fCurUpOffset, 0.f, 0.f },
+			fRealTimeDelta * (m_eCamFocus != FOCUS_BOTH ? 1.f : 10.f) );
 }
 
 void CCamera_Main::Orbit_Target(_float fTimeDelta)
