@@ -393,6 +393,9 @@
     <Filter Include="02.GameObjects\UI\PartTimeDee">
       <UniqueIdentifier>{324b2e98-324d-4f5b-b2c0-71610d22ab87}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\UI\HUD\BossHp">
+      <UniqueIdentifier>{d5a13d88-c8da-47f6-ab92-a8b19f3b623e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -794,6 +797,9 @@
     <ClInclude Include="..\Public\UI_PartTimeDee.h">
       <Filter>02.GameObjects\UI\PartTimeDee</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\HUD_BossHpBar.h">
+      <Filter>02.GameObjects\UI\HUD\BossHp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1176,6 +1182,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\UI_PartTimeDee.cpp">
       <Filter>02.GameObjects\UI\PartTimeDee</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HUD_BossHpBar.cpp">
+      <Filter>02.GameObjects\UI\HUD\BossHp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

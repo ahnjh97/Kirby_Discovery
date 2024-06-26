@@ -227,6 +227,7 @@
     </ClInclude>
     <ClInclude Include="..\Public\HUD.h" />
     <ClInclude Include="..\Public\HUD_AbilityDiscard.h" />
+    <ClInclude Include="..\Public\HUD_BossHpBar.h" />
     <ClInclude Include="..\Public\HUD_KirbyStatus.h" />
     <ClInclude Include="..\Public\HUD_StarPoint.h" />
     <ClInclude Include="..\public\HungryDee.h" />
@@ -379,6 +380,7 @@
     </ClCompile>
     <ClCompile Include="..\Private\HUD.cpp" />
     <ClCompile Include="..\Private\HUD_AbilityDiscard.cpp" />
+    <ClCompile Include="..\Private\HUD_BossHpBar.cpp" />
     <ClCompile Include="..\Private\HUD_KirbyStatus.cpp" />
     <ClCompile Include="..\Private\HUD_StarPoint.cpp" />
     <ClCompile Include="..\private\HungryDee.cpp" />
