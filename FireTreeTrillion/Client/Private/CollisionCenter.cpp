@@ -551,6 +551,7 @@ void CCollisionCenter::DeeDeeDee_Battle()
 			DstHit->Set_Alive(false);
 			SrcHit->Set_Alive(false);
 			pNpc->Set_PhyXState(PO_FLYDEADAWAY);
+			pMonster->Minus_Hp(10.f);
 		});
 
 }
