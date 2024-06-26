@@ -94,6 +94,14 @@ private:
 	HRESULT Bind_ShaderResources();
 	// FSM
 	void SetUp_FSM();
+	// 히트박스 체인저
+	void HitBoxChanger(_uint eState);
+
+	void Set_HitStop() { m_bHitStop = true; }
+	_bool				  m_bHitStop = { false };
+	_float				  m_fHitStopTime = { 0.f };
+
+
 
 	// 디디디의 시스템적인 틱을 담당한다.
 	void DeeDeeDee_SystemTick(_float fTimeDelta);

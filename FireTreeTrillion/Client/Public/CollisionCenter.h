@@ -44,8 +44,6 @@ public:
     void Add_Collision(COLLISION_TYPE eCollType, class CGameObject* pGameObject);
 
 private:
-    class CPhysXObject* Find_TypePtr(COLLISION_TYPE eType, CPhysXObject* pSrc, CPhysXObject* pDst);
-    //void Collision_Collider(CONTENT_TYPE eType, class CPhysXObject* pSrc, class CPhysXObject* pDst);
     void Collision_Collider(vector<CGameObject*> Dsts, vector<CGameObject*> Srcs, CCollisionCenter* pthis, 
         void(*func)(class CHitBox*, class CHitBox*, CCollisionCenter*));
     _bool Intersect(class CHitBox* Dst, class CHitBox* Src);
@@ -68,7 +66,7 @@ private:
 
     void HitStop_Rogic(class CKirby* pKirby);
 
-    void Damage_And_Effect_For_Monster(class CKirby* pKirby, CPhysXObject* pMonster);
+    void Damage_And_Effect_For_Monster(class CKirby* pKirby, class CPhysXObject* pMonster, _float fEffectOffSet = 0.5f);
 #pragma endregion
 
 
