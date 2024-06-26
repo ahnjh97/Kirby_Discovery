@@ -183,7 +183,20 @@ void CAnimToolHelper::Ready_AnimObjects(const wstring& strLayerTag)
 	CHECK_NULLPTR(pCharacter);
 	m_vecCharacter.push_back(pCharacter);
 
+	/*
+	pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_PartTimerKirby")));
+	CHECK_NULLPTR(pCharacter);
+	m_vecCharacter.push_back(pCharacter);
+	*/
 	pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_FoodShopDee")));
+	CHECK_NULLPTR(pCharacter);
+	m_vecCharacter.push_back(pCharacter);
+
+	pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_DeeDeeDee")));
+	CHECK_NULLPTR(pCharacter);
+	m_vecCharacter.push_back(pCharacter);
+
+	pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_HungryDee")));
 	CHECK_NULLPTR(pCharacter);
 	m_vecCharacter.push_back(pCharacter);
 }
@@ -297,7 +310,8 @@ void CAnimToolHelper::Render_AnimationList(const wstring& wstrObjectTag)
 							for (_uint n = 0; n < uAnimCnt; n++)
 							{
 								const _bool is_selected = (item_current_idx == n);
-								const _char* animName = (*pVecAnims)[n]->Get_AnimationName();
+								string strAnimIndex = "[" + to_string(n) + "] " + (*pVecAnims)[n]->Get_AnimationName();
+								const _char* animName = strAnimIndex.c_str();
 								m_strAnimationName = animName;
 								if (animName == nullptr) continue;
 
@@ -384,9 +398,9 @@ void CAnimToolHelper::Render_FrameLine(CAnimation** ppAnimation, const string& s
 	ImGui::SameLine();
 	
 	// 애니메이션 스피드
-	m_fAnimationSpeed = (*ppAnimation)->Get_TickPerSecond();
+	m_fAnimationSpeed = 60.f;// (*ppAnimation)->Get_TickPerSecond();
 	if (previousAnimation != (*ppAnimation)->Get_AnimationName())
-		m_fAnimationSpeed = (*ppAnimation)->Get_TickPerSecond();
+		m_fAnimationSpeed = 60.f;//(*ppAnimation)->Get_TickPerSecond();
 	ImGui::Text("Animation Speed"); ImGui::SameLine();
 	ImGui::InputFloat("    ", &m_fAnimationSpeed); ImGui::SameLine();
 	(*ppAnimation)->Set_TickPerSecond(m_fAnimationSpeed);
@@ -645,7 +659,7 @@ void CAnimToolHelper::Load()
 					{
 						_float animSpeed;
 						pAnimSpeedElement->QueryFloatText(&animSpeed);
-						animInfo.fAnimSpeed = animSpeed;
+						animInfo.fAnimSpeed = 60.f;//animSpeed;
 					}
 
 					// Count 값 읽기

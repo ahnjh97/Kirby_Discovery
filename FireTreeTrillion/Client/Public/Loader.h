@@ -36,10 +36,13 @@ private:
 
 	HRESULT Loading_For_Logo();
 	HRESULT Loading_For_Intro();
+	HRESULT Loading_For_Racing();
+	HRESULT Loading_For_DeeDeeDee();
+	HRESULT Loading_For_Town();
+	HRESULT Loading_For_Parttime();
 	HRESULT Loading_For_FinalBoss();
 
 	HRESULT Loading_For_GamePlay();
-	HRESULT Loading_For_Town();
 	HRESULT Loading_For_Tool_UI();
 	HRESULT Loading_For_Tool_FX();
 	HRESULT Loading_For_Tool_Anim();
@@ -50,6 +53,7 @@ private:
 	
 	HRESULT Add_Shaders();
 	HRESULT Add_FXTexture();
+
 	void SetUp_ModelScaleRotation(LEVEL eLevel);
 
 	HRESULT Add_Texture(LEVEL eLevel, string strPrototypeName, string strFolderAndFileName, _uint iNumTextures = 1);

@@ -1,6 +1,9 @@
 #include "stdafx.h"
+#include "BlendMapObject.h"
 #include "MapToolObject.h"
 #include "BasicMap.h"
+#include "AnimDeco.h"
+#include "HitBox.h"
 #include "OcTree.h"
 #include "Model.h"
 
@@ -34,7 +37,8 @@ HRESULT CBasicMap::Initialize(void* pArg)
     wstring wstrModelTag = GameObjectDesc.wstrModelName;
 
 
-    if (wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("LbLastBossStage") && wstrModelTag.substr(wstrModelTag.length() - 5) == TEXT("Blend"))
+    if (wstrModelTag != TEXT("Town")        && wstrModelTag != TEXT("DeeDeeDee") && wstrModelTag != TEXT("Land_LbLastBossBeforeStep") && 
+        /*wstrModelTag != TEXT("Land_VcLabo") && */wstrModelTag != TEXT("TownShop")  && wstrModelTag.substr(wstrModelTag.length() - 5) == TEXT("Blend"))
     {
         m_bBlendMap = true;
         m_eRenderGroup = CRenderer::RENDER_BLEND;
@@ -43,18 +47,23 @@ HRESULT CBasicMap::Initialize(void* pArg)
     if (FAILED(Add_Components(wstrModelTag)))
         return E_FAIL;
 
+    m_fTime = m_fNonMatchTime = 100.f;
+        
     SetUpShaderInfo(wstrModelTag);
 
     m_vecConstantNames = { "g_DiffuseTexture", "g_NormalTexture", "g_MRATexture", "g_fSamplingFactor"
     , "g_bStencil", "g_bRimLight", "m_fRimWidth", "g_bMotionBlur", "g_BoneMatrices" };
     m_vecStencilRimLightMotionBlurNames = { "g_bStencil", "g_bRimLight", "m_fRimWidth", "g_bMotionBlur" };
 
-    if(wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("LbLastBossStage") && false == m_bBlendMap)
+    if (true == CheckIfBlendMapExists(GameObjectDesc.wstrModelName)) 
     {
-        if (true == CheckIfBlendMapExists(GameObjectDesc.wstrModelName)) {
-            if (FAILED(Add_BlendMap(wstrModelTag)))
-                return E_FAIL;
-        }
+        if (FAILED(Add_BlendMap(wstrModelTag)))
+            return E_FAIL;
+    }
+
+    if(wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("DeeDeeDee") && /*wstrModelTag != TEXT("Land_VcLabo") &&*/
+       wstrModelTag != TEXT("Land_LbLastBossBeforeStep") && wstrModelTag != TEXT("TownShop") && false == m_bBlendMap)
+    {
 
         m_pOcTree = m_pModelCom->Create_OcTree(GameObjectDesc.vMin, GameObjectDesc.vMax, m_vecPassIndices, m_vecSamplingFactors, m_vecConstantNames);
         
@@ -66,16 +75,19 @@ HRESULT CBasicMap::Initialize(void* pArg)
 
         InsertMapDecos();
     }
-    if (wstrModelTag == TEXT("Town") || wstrModelTag == TEXT("LbLastBossStage")) {
-        if(LEVEL_TOOL_MAP != *m_pCurrentLevelID)
-            ReadDecos_ForSmallLevels();
-    }
-        
 
+    if (wstrModelTag == TEXT("Town") ||  wstrModelTag == TEXT("DeeDeeDee") || wstrModelTag == TEXT("TownShop")|| 
+        /*wstrModelTag == TEXT("Land_VcLabo") || */wstrModelTag == TEXT("Land_LbLastBossBeforeStep")) 
+    {
+        if (LEVEL_TOOL_MAP != *m_pCurrentLevelID) 
+        {
+            ReadMapDecoTxts();
+            ReadDecos_ForSmallLevels();
+        }
+    }
+ 
     if (FAILED(m_pModelCom->CreateStaticActor(GameObjectDesc.matWorld)))
         return E_FAIL;
-
-    m_fTime = m_fNonMatchTime = 100.f;
 
     return S_OK;
 }
@@ -108,16 +120,14 @@ HRESULT CBasicMap::Render()
 {
     if (FAILED(Bind_ShaderResources()))
         return E_FAIL;
-    if ((LEVEL_GAMEPLAY == *m_pGameInstance->Get_CurrentLevelID()
-        || LEVEL_INTRO == *m_pGameInstance->Get_CurrentLevelID())
-        && false == m_bBlendMap)
+    if ((LEVEL_GAMEPLAY == *m_pCurrentLevelID || LEVEL_INTRO == *m_pCurrentLevelID
+        || LEVEL_RACING == *m_pCurrentLevelID) && m_pOcTree != nullptr)
     {
         if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fNonMatchTime, sizeof(_float))))
             return E_FAIL;
-        _float fWhiteColorDiffuse = 0;
-        if (FAILED(m_pNonAnimShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &fWhiteColorDiffuse, sizeof(_float))))
+        if (FAILED(m_pNonAnimShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
             return E_FAIL;
-        if (FAILED(m_pAnimShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &fWhiteColorDiffuse, sizeof(_float))))
+        if (FAILED(m_pAnimShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
             return E_FAIL;
 
         m_iRenderAll = m_iRenderMyMesh = 0;
@@ -139,6 +149,7 @@ HRESULT CBasicMap::Render()
 
             if (FAILED(m_pShaderCom->Bind_RawValue("g_fSamplingFactor", &m_vecSamplingFactors[i], sizeof(_float))))
                 return E_FAIL;
+
             if (i == m_iMeshIndex) {
                 if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fTime, sizeof(_float))))
                     return E_FAIL;
@@ -165,7 +176,7 @@ HRESULT CBasicMap::Render()
 #ifdef _DEBUG
 void CBasicMap::Render_IMGUI()
 {
-    HRESULT hr;
+    /*HRESULT hr;
     static _bool bRabbit = false;
     static _bool bCow = false;
     if (ImGui::Checkbox("rabbit", &bRabbit))
@@ -178,7 +189,7 @@ void CBasicMap::Render_IMGUI()
         hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, L"Layer_Monster", TEXT("Prototype_GameObject_Buffahorn"));
 
         CHECK_FAILED(hr);
-    }
+    }*/
 
     ImGui::Text("Octrees: %d", m_pGameInstance->Get_NumOctree());
     ImGui::Text("RenderAll: %d", m_iRenderAll);
@@ -264,8 +275,9 @@ HRESULT CBasicMap::Add_BlendMap(const wstring& _wstrModelTag)
 
 void CBasicMap::SetUpShaderInfo(const wstring& _wstrModelTag)
 {
-    m_vecPassIndices.resize(m_pModelCom->Get_NumMeshes());
-    m_vecSamplingFactors.resize(m_pModelCom->Get_NumMeshes());
+    _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
+    m_vecPassIndices.resize(iNumMeshes);
+    m_vecSamplingFactors.resize(iNumMeshes);
     fill(m_vecSamplingFactors.begin(), m_vecSamplingFactors.end(), 1.f);
 
     if (true == m_bBlendMap) {
@@ -285,18 +297,17 @@ void CBasicMap::SetUpShaderInfo(const wstring& _wstrModelTag)
 
     _uint iPassIndex{};
     _float fSamplingFactor{};
-    _int iCount{};
-    while (!fileStream.eof()) 
+    for (_uint i = 0; i < iNumMeshes; i++)
     {
         fileStream.read(reinterpret_cast<char*>(&iPassIndex), sizeof(iPassIndex));
         fileStream.read(reinterpret_cast<char*>(&fSamplingFactor), sizeof(fSamplingFactor));
-
-        if (fileStream.eof())
-            break;
-        
-        m_vecPassIndices[iCount] = iPassIndex;
-        m_vecSamplingFactors[iCount] = fSamplingFactor;
-        iCount++;
+        if (fileStream.eof()) {
+            fileStream.close();
+            return;
+        }
+            
+        m_vecPassIndices[i] = iPassIndex;
+        m_vecSamplingFactors[i] = fSamplingFactor;
     }
 
     fileStream.close();
@@ -304,7 +315,7 @@ void CBasicMap::SetUpShaderInfo(const wstring& _wstrModelTag)
 
 _bool CBasicMap::CheckIfBlendMapExists(const wstring& _wstrModelTag)
 {
-    string strPath = "../../../model_txt/NonAnim/";
+    string strPath = "../../../model_txt/MapObjs/NonAnim/";
     string strBlendMapName = CUtils::WstrToStr(_wstrModelTag) + "_Blend";
 
     directory_iterator end_iter;  // 디렉토리 순회의 끝을 나타내는 iterator
@@ -333,6 +344,8 @@ void CBasicMap::InsertMapDecos()
         strLevel = "Intro";
     else if (LEVEL_GAMEPLAY == *m_pCurrentLevelID)
         strLevel = "Stage1";
+    else if (LEVEL_RACING == *m_pCurrentLevelID)
+        strLevel = "Racing";
     else
         return;
 
@@ -414,6 +427,11 @@ void CBasicMap::InsertMapDecos()
                 continue;
 
             m_pGameInstance->Emplace_MapDecoTrigger(pRigidStatic, pModel, animIter->second.first, animIter->second.second);
+            CAnimDeco::ANIMDECO_DESC tAnimDeco{};
+            tAnimDeco.pAnimDecoModel = pModel;
+            CAnimDeco* pAnimDecoObj = dynamic_cast<CAnimDeco*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_AnimDeco"), &tAnimDeco));
+            m_vecAnimDecoGameObjs.push_back(pAnimDecoObj);
+            
             vecAnims.push_back(pModel);
         }
         else if (CMapToolObject::MAPOBJ_ACTOR == iMapObjType)
@@ -479,6 +497,10 @@ void CBasicMap::ReadDecos_ForSmallLevels()
     string strLevel;
     if (LEVEL_TOWN == *m_pCurrentLevelID)
         strLevel = "Town";
+    else if(LEVEL_DEEDEEDEE == *m_pCurrentLevelID)
+        strLevel = "DeeDeeDee";
+    else if (LEVEL_PARTTIME == *m_pCurrentLevelID)
+        strLevel = "PartTime";
     else if (LEVEL_FINALBOSS == *m_pCurrentLevelID)
         strLevel = "FinalBoss";
     else
@@ -518,15 +540,16 @@ void CBasicMap::ReadDecos_ForSmallLevels()
 
         TYPE eType = TYPE_NONANIM;
         string strFolder;
-        if (LEVEL_TOWN == *m_pCurrentLevelID)
+        if (LEVEL_TOWN == *m_pCurrentLevelID || LEVEL_PARTTIME == *m_pCurrentLevelID || LEVEL_DEEDEEDEE == *m_pCurrentLevelID)
             strFolder = string("TownDeco/");
         else if (LEVEL_FINALBOSS == *m_pCurrentLevelID)
             strFolder = string("LabDiscovera_Deco/");
 
+        if (true == IsMapDeco(strModelName))
+            strFolder = string("MapDeco/");
+
         if (CMapToolObject::MAPOBJ_ANIM == iMapObjType)
-        {
             eType = TYPE_ANIM;
-        }
 
         CModel* pModel = CModel::Create(m_pDevice, m_pContext, MODEL{ strModelName, eType, 1.f, 0.f, 0, strFolder, false });
 
@@ -540,10 +563,27 @@ void CBasicMap::ReadDecos_ForSmallLevels()
         PxRigidStatic* pRigidStatic = { nullptr };
         pModel->Set_WorldMatrixForOctree(matWorld);
 
-        if (CMapToolObject::MAPOBJ_NONCOL == iMapObjType)
+        auto mapIter = m_mapBlendMeshesIndices.find(strModelName);
+        if (mapIter != m_mapBlendMeshesIndices.end())
         {
-            m_vecNonAnimDecos.push_back(pModel);
+            CBlendMapObject::BLENDMAPOBJ_DESC tBlendObjDesc{};
+            tBlendObjDesc.matWorld = matWorld;
+            tBlendObjDesc.tModel = MODEL{ strModelName, eType, 1.f, 0.f, 0, strFolder, false };
+            tBlendObjDesc.iShaderVars = iShaderVars;
+            tBlendObjDesc.fRimWidth = fRimWidth;
+            CBlendMapObject* pBlendMapObj =  dynamic_cast<CBlendMapObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_BlendMapObject"), &tBlendObjDesc));
+
+            if (nullptr != pBlendMapObj) {
+                pBlendMapObj->SetUp_BlendMeshes(mapIter->second);
+                m_vecBlendObjects.push_back(pBlendMapObj);
+                pModel->Set_BlendObject(pBlendMapObj);
+            }
+            pModel->RemoveBlendMeshes(mapIter->second);
         }
+
+        if (CMapToolObject::MAPOBJ_NONCOL == iMapObjType)
+            m_vecNonAnimDecos.push_back(pModel);
+
         else if (CMapToolObject::MAPOBJ_ANIM == iMapObjType)
         {
             auto idleIter = m_ModelIdleAnimMap.find(strModelName);
@@ -595,6 +635,7 @@ HRESULT CBasicMap::Render_NonOctreeMapDecos()
         if (FAILED(nonAnim->Bind_WorldMatrixForOctree(m_pNonAnimShaderCom)))
             return E_FAIL;
 
+        _uint iModelPassIndex = nonAnim->Get_ModelPassIndex();
         for (_uint i = 0; i < iNumMeshes; i++) {
             if (FAILED(nonAnim->Bind_ShaderResource(m_pNonAnimShaderCom, m_vecConstantNames[0].c_str(), i, TextureType_DIFFUSE)))
                 return E_FAIL;
@@ -602,7 +643,7 @@ HRESULT CBasicMap::Render_NonOctreeMapDecos()
                 return E_FAIL;
             if (FAILED(nonAnim->Bind_ShaderResource(m_pNonAnimShaderCom, m_vecConstantNames[2].c_str(), i, TextureType_METALNESS)))
                 return E_FAIL;
-            if (FAILED(m_pNonAnimShaderCom->Begin(nonAnim->Get_ModelPassIndex())))
+            if (FAILED(m_pNonAnimShaderCom->Begin(iModelPassIndex)))
                 return E_FAIL;
             if (FAILED(nonAnim->Render(i)))
                 return E_FAIL;
@@ -625,6 +666,7 @@ HRESULT CBasicMap::Render_NonOctreeMapDecos()
         if (FAILED(animDeco->Bind_WorldMatrixForOctree(m_pAnimShaderCom)))
             return E_FAIL;
 
+        _uint iModelPassIndex = animDeco->Get_ModelPassIndex();
         for (_uint i = 0; i < iNumMeshes; i++) {
             if (FAILED(animDeco->Bind_ShaderResource(m_pAnimShaderCom, m_vecConstantNames[0].c_str(), i, TextureType_DIFFUSE)))
                 return E_FAIL;
@@ -634,7 +676,7 @@ HRESULT CBasicMap::Render_NonOctreeMapDecos()
                 return E_FAIL;
             if (FAILED(animDeco->Bind_BoneMatrices(m_pAnimShaderCom, m_vecConstantNames[8].c_str(), i)))
                 return E_FAIL;
-            if (FAILED(m_pAnimShaderCom->Begin(animDeco->Get_ModelPassIndex())))
+            if (FAILED(m_pAnimShaderCom->Begin(iModelPassIndex)))
                 return E_FAIL;
             if (FAILED(animDeco->Render(i)))
                 return E_FAIL;
@@ -642,6 +684,96 @@ HRESULT CBasicMap::Render_NonOctreeMapDecos()
     }
 
     return S_OK;
+}
+
+void CBasicMap::ReadMapDecoTxts()
+{
+    string strPath = "../../../model_txt/MapDeco/NonAnim/";
+
+    directory_iterator end_iter;  // 디렉토리 순회의 끝을 나타내는 iterator
+    directory_iterator dir_iter(strPath);  // 지정된 경로의 시작 iterator
+
+    while (dir_iter != end_iter) {
+        if (is_regular_file(*dir_iter)) {
+            string strFilePath = dir_iter->path().filename().string();
+            string strModelName = strFilePath.substr(0, strFilePath.length() - 4);
+            m_setMapDecoNames.insert(strModelName);
+        }
+        ++dir_iter;
+    }
+}
+
+_bool CBasicMap::IsMapDeco(const string& _strModelName)
+{
+    if (m_setMapDecoNames.end() != m_setMapDecoNames.find(_strModelName))
+        return true;
+
+    return _bool();
+}
+
+_bool CBasicMap::IsBlendDeco(const string& _strModelName)
+{
+    if (m_mapBlendMeshesIndices.end() != m_mapBlendMeshesIndices.find(_strModelName))
+        return true;
+
+    return _bool();
+}
+
+void CBasicMap::TraverseBlendDecoInfoTxts(unordered_map<string, unordered_set<_uint>>& _mapBlendMeshIndices
+        , unordered_map<string, _bool>& _mapBlendObjStaticActor)
+{
+    string strPath = "../../../objects_txt/BlendDecoInfo/";
+
+    directory_iterator end_iter;  // 디렉토리 순회의 끝을 나타내는 iterator
+    directory_iterator dir_iter(strPath);  // 지정된 경로의 시작 iterator
+
+    while (dir_iter != end_iter) {
+        if (is_regular_file(*dir_iter)) {
+            string strFilePath = dir_iter->path().filename().string();
+            string strModelName = strFilePath.substr(0, strFilePath.length() - 4);
+
+            unordered_set<_uint> setBlendMeshesIndices;
+            _bool bStaticActor = false;
+            _bool bRead = ReadBlendMeshesIndices(dir_iter->path().generic_string(), strModelName, setBlendMeshesIndices, bStaticActor);
+
+            if (true == bRead) {
+                _mapBlendMeshIndices.emplace(strModelName, setBlendMeshesIndices);
+                _mapBlendObjStaticActor.emplace(strModelName, bStaticActor);
+            }
+               
+        }
+        ++dir_iter;
+    }
+}
+
+_bool CBasicMap::ReadBlendMeshesIndices(const string& _strFullPath, const string& _strModelName
+        , unordered_set<_uint>& _setMeshIndices, _bool& _bStaticActor)
+{
+    ifstream fileInput(_strFullPath, ios::binary);
+    if (fileInput.is_open() == false)
+    {
+        wstring wstrError = TEXT("Failed to open : ") + CUtils::StrToWstr(_strModelName) + TEXT("_BlendMeshes.txt");
+        MSG_BOX(wstrError.c_str());
+        return false;
+    }
+
+    _bool bStaticActor{};
+    fileInput.read(reinterpret_cast<char*>(&bStaticActor), sizeof(bStaticActor));
+    _bStaticActor = bStaticActor;
+
+    _uint iNumBlendMeshes{};
+    fileInput.read(reinterpret_cast<char*>(&iNumBlendMeshes), sizeof(iNumBlendMeshes));
+
+    _uint iMeshIndex{};
+    for (_uint i = 0; i < iMeshIndex; i++)
+    {
+        fileInput.read(reinterpret_cast<char*>(&iMeshIndex), sizeof(iMeshIndex));
+        _setMeshIndices.insert(iMeshIndex);
+    }
+
+    fileInput.close();
+
+    return true;
 }
 
 void CBasicMap::Save_OctreeData(const string& strLevel)
@@ -728,7 +860,16 @@ void CBasicMap::Free()
 {
     __super::Free();
 
+    for (auto& blendObj : m_vecBlendObjects)
+        Safe_Release(blendObj);
+    m_vecBlendObjects.clear();
+
+    for (auto& animDecoObj : m_vecAnimDecoGameObjs)
+        Safe_Release(animDecoObj);
+    m_vecAnimDecoGameObjs.clear();
+
     Release_MapDecos();
+
     for (_uint iActorIdx = 0; iActorIdx < m_vecAnimDecoTriggersActors.size(); iActorIdx++)
     {
         PxRigidStatic* pActor = m_vecAnimDecoTriggersActors[iActorIdx];
@@ -754,7 +895,7 @@ void CBasicMap::Free()
 
     Safe_Release(m_pTextureCom);
     Safe_Release(m_pShaderCom);
-    Safe_Release(m_pModelCom);
     Safe_Release(m_pNonAnimShaderCom);
     Safe_Release(m_pAnimShaderCom);
+    Safe_Release(m_pModelCom);
 }

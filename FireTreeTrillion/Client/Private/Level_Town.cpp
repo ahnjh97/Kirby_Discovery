@@ -13,7 +13,7 @@
 #include "BrontoBurt.h"
 #include "PoppyBrosJr.h"
 
-#include "WaddleDee.h"
+#include "HungryDee.h"
 
 #include "BG.h"
 #include "HUD.h"
@@ -27,7 +27,6 @@ CLevel_Town::CLevel_Town(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 HRESULT CLevel_Town::Initialize()
 {
 	m_pGameInstance->Set_RenderMode(CRenderer::MODE_GAMEPLAY);
-	//CLevelChanger::Get_Instance()->Load();
 
 	HRESULT hr;
 	hr = __super::Initialize();
@@ -60,8 +59,22 @@ HRESULT CLevel_Town::Initialize()
 	hr = Ready_Kickables();
 	CHECK_FAILED(hr);
 
-	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
+	CGameObject::GAMEOBJECT_DESC ObjDesc{};
+	ObjDesc.fSpeedPerSec = 5.f;
+	ObjDesc.fRotationPerSec = ToRadian(90.f);
+	_float4x4 InitMat = _float4x4::Identity;
+	InitMat.Translation({ 1.51f, 22.11f, 3.91f });
+	ObjDesc.matWorld = InitMat;
+	// Car Test
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_DeeDeeDee"), TEXT("Prototype_GameObject_DeeDeeDee"), &ObjDesc)))
+		return E_FAIL;
 
+	// Part-timer Kirby Test
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOWN, TEXT("Layer_Player"), TEXT("Prototype_GameObject_PartTimerKirby"))))
+	//	return E_FAIL;
+
+	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
+	m_pGameInstance->Set_ColorSet_ByIndex(4);
 
 	return S_OK;
 }
@@ -108,14 +121,13 @@ HRESULT CLevel_Town::Ready_Lights()
 	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
 		return E_FAIL;
 
-	CGameInstance::Get_Instance()->Setting_GodRay({ -650.f, 300.f, 1200.f, 1.f });
+	CGameInstance::Get_Instance()->Setting_GodRay({ 450.f, 400.f, 1200.f, 1.f });
 
 	return S_OK;
 }
 
 HRESULT CLevel_Town::Ready_Layer_Camera(const wstring& strLayerTag)
 {
-
 	LEVEL eLevel = LEVEL_TOWN;
 
 	CCamera_Main::CAMERA_KIRBY_DESC		MainCamDesc{};
@@ -141,7 +153,7 @@ HRESULT CLevel_Town::Ready_Layer_Camera(const wstring& strLayerTag)
 	CameraDesc.fNear = 0.1f;
 	CameraDesc.fFar = 1000.0f;
 	CameraDesc.vEye = _float4(0.f, 0.f, 0.f, 1.f);
-	CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
+	CameraDesc.vAt = _float4(0.f, -1.f, 1.f, 1.f);
 	CameraDesc.fSpeedPerSec = 10.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
@@ -206,7 +218,7 @@ HRESULT CLevel_Town::Ready_Map()
 	fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
 
 	_uint iStrLength{};
-	string strModelName;
+	string strModelName;https://drive.google.com/drive/u/0/my-drive
 	_float4x4 matWorld{};
 	_float3 vMin{}, vMax{};
 	wstring wstrGameObjectTag;
@@ -389,14 +401,97 @@ HRESULT CLevel_Town::Ready_Dees()
 	ObjDesc.fSpeedPerSec = 5.f;
 	ObjDesc.fRotationPerSec = ToRadian(90.f);
 	_float4x4 InitMat = _float4x4::Identity;
-	InitMat.Translation({ -10.2f, 24.7f, 20.f });
+	InitMat.Translation({ 10.2f, 24.7f, 26.f });
 	ObjDesc.matWorld = InitMat;
 
 	if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NPC"), TEXT("Prototype_GameObject_FoodShopDee"), &ObjDesc)))
 		return E_FAIL;
 
 
+	string strFileName = "../../../objects_txt/Town_Monsters.txt";
+
+	ifstream fileInput(strFileName, ios::binary);
+	if (fileInput.is_open() == false)
+	{
+		MSG_BOX(TEXT("Failed to open : Town_Monsters.txt"));
+		return E_FAIL;
+	}
+
+	_uint iNumObjects{};
+	fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
+
+	_uint iStrLength{};
+	string strModelName;
+	_float4x4 matWorld{};
+	_uint iShaderVars{};
+	_float fRimWidth{};
+	_int iTriggerIndex{};
+	_uint iNumRallyPoints{};
+	vector<_float4> vecRallyPoints;
+	wstring wstrGameObjectTag;
+
+
+	for (_uint i = 0; i < iNumObjects; i++)
+	{
+		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
+		strModelName.resize(iStrLength);
+		fileInput.read(&strModelName[0], iStrLength);
+		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
+		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
+		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
+
+		fileInput.read(reinterpret_cast<char*>(&iTriggerIndex), sizeof(iTriggerIndex));
+		fileInput.read(reinterpret_cast<char*>(&iNumRallyPoints), sizeof(iNumRallyPoints));
+
+		vecRallyPoints.clear();
+		_float3 vRallyPointPos{};
+		for (_uint iRallyPointIdx = 0; iRallyPointIdx < iNumRallyPoints; iRallyPointIdx++)
+		{
+			fileInput.read(reinterpret_cast<char*>(&vRallyPointPos), sizeof(vRallyPointPos));
+			vecRallyPoints.push_back(_float4(vRallyPointPos.x, vRallyPointPos.y, vRallyPointPos.z, 1));
+		}
+
+		CGameObject::GAMEOBJECT_DESC tempDesc = {};
+		tempDesc.matWorld = matWorld;
+		tempDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+		tempDesc.iShaderVars = iShaderVars;
+		tempDesc.fRimWidth = fRimWidth;
+		if (strModelName.size() >= 8) { // NonAnim_ 부분 지우기
+			if ("NonAnim" == strModelName.substr(0, 7))
+				tempDesc.wstrModelName.erase(0, 8);
+		}
+
+
+		if (L"WaddleDee" == tempDesc.wstrModelName)
+		{
+			CWaddleDee::DEE_DESC DeeDesc = {};
+			DeeDesc.matWorld = matWorld;
+			DeeDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			DeeDesc.iShaderVars = iShaderVars;
+			DeeDesc.fRimWidth = fRimWidth;
+
+			//원래 인덱스를 넘어가면 맨 마지막 놈으로다가 매치
+			DeeDesc.eCharacter =
+				(DEECHARACTER_END - 1) < (DEE_CHARACTER)iTriggerIndex ?
+				DEECHARACTER_SLEEPY : (DEE_CHARACTER)iTriggerIndex;
+
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Dee"), TEXT("Prototype_GameObject_OriginalDee"), &DeeDesc)))
+				return E_FAIL;
+		}
+	}
+
+
+
+	return S_OK;
+}
+
+HRESULT CLevel_Town::Ready_Monsters()
+{
+
+	LEVEL eLevel = LEVEL_TOWN;
+
 	//일단 마을에는 몬스터가 없어요
+	//하지만 넣어 봤어요
 	string strFileName = "../../../objects_txt/Town_Monsters.txt";
 
 	ifstream fileInput(strFileName, ios::binary);
@@ -524,7 +619,6 @@ HRESULT CLevel_Town::Ready_Dees()
 	}
 
 	fileInput.close();
-
 
 	return S_OK;
 }

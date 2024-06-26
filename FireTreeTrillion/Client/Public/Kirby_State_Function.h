@@ -45,7 +45,7 @@ static void Turn_Interpolate(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTra
 		_float ftheta = acos(fcosTheta);
 		_float fAngleDegrees = XMConvertToDegrees(ftheta);
 
-		if (fAngleDegrees < 2.0f)
+		if (fAngleDegrees < 3.0f)
 		{
 			Kirbydesc->m_vMoveDir = Kirbydesc->m_vTargetDir;
 		}
@@ -103,7 +103,7 @@ static void Turn_Interpolate(CKirby::KIRBY_INFODESC* Kirbydesc, CTransform* pTra
 		_float ftheta = acos(fcosTheta);
 		_float fAngleDegrees = XMConvertToDegrees(ftheta);
 
-		if (fAngleDegrees < 2.0f)
+		if (fAngleDegrees < 3.0f)
 		{
 			Kirbydesc->m_vMoveDir = Kirbydesc->m_vTargetDir;
 		}
@@ -614,11 +614,17 @@ static _bool Is_BigTurn(CKirby::KIRBY_INFODESC* Kirbydesc)
 // 주변에서 가장 가까운 Object를 흡수한다. 몬스터 -> 아이템 -> 오브젝트 우선순위
 static _bool Vacuum_Object(CKirby* pKirby, _float fTimeDelta)
 {
+
 	CTransform* pTransformCom = pKirby->Get_TransformCom();
 	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
 	_float fDistance = 9.f;
 	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 
+	if (DESC(m_pObject) != nullptr)
+		return false;
+
+	//if (DESC(m_bBlockOtherVacuum) == true)
+	//	return false;
 
 	// 0차 목표인 버섯의 갓을 탐색한다.
 	if (nullptr != GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_CappyHat")))
@@ -1104,11 +1110,11 @@ static void Bbong_FX(_float fTimeDelta, CTransform* pTransformCom)
 			return;
 
 		//CEffect::FX_DESC ParticleDesc{};
+		//ParticleDesc.vInitScale = { 1.f, 1.f, 1.f };
+		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Lunch TIme Banner"), &ParticleDesc)))
+		//	return;
 
-		//ParticleDesc.vInitPos = { vMyPos.x, vMyPos.y + .3f, vMyPos.z };
-		//ParticleDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK)).y, 0.f };
-		//ParticleDesc.vInitScale = { 1.3f, 1.3f, 1.3f };
-		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Particle C"), &ParticleDesc)))
+		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Lunch Time Icon"), &ParticleDesc)))
 		//	return;
 
 		fBbongTime = 0.f;

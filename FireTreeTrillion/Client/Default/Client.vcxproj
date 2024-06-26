@@ -170,6 +170,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Ability.h" />
+    <ClInclude Include="..\Public\AnimDeco.h" />
     <ClInclude Include="..\Public\AnimToolHelper.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
@@ -184,8 +185,11 @@
     <ClInclude Include="..\Public\BladeKnight.h" />
     <ClInclude Include="..\Public\BladeKnightSword.h" />
     <ClInclude Include="..\Public\BladeKnight_State.h" />
+    <ClInclude Include="..\Public\BlendMapObject.h" />
     <ClInclude Include="..\Public\BombOrbit.h" />
     <ClInclude Include="..\Public\BombOrbitGlow.h" />
+    <ClInclude Include="..\Public\BreakableRock.h" />
+    <ClInclude Include="..\Public\BreakableRockPartical.h" />
     <ClInclude Include="..\Public\BrontoBurt.h" />
     <ClInclude Include="..\Public\BrontoBurt_State.h" />
     <ClInclude Include="..\Public\Buffahorn.h" />
@@ -196,10 +200,17 @@
     <ClInclude Include="..\Public\CappyBody_State.h" />
     <ClInclude Include="..\Public\CappyHat.h" />
     <ClInclude Include="..\Public\CappyHat_State.h" />
+    <ClInclude Include="..\Public\Car.h" />
+    <ClInclude Include="..\Public\CarShopWall.h" />
+    <ClInclude Include="..\Public\CarShopWallFrame.h" />
     <ClInclude Include="..\Public\Character.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\Coin.h" />
     <ClInclude Include="..\Public\CollisionCenter.h" />
+    <ClInclude Include="..\Public\DeeDeeDee.h" />
+    <ClInclude Include="..\Public\DeeDeeDeeHammer.h" />
+    <ClInclude Include="..\Public\DeeDeeDee_State.h" />
+    <ClInclude Include="..\public\Dee_Part.h" />
     <ClInclude Include="..\public\Dee_State.h" />
     <ClInclude Include="..\Public\EnergyDrink.h" />
     <ClInclude Include="..\Public\FinalBoss.h" />
@@ -220,6 +231,7 @@
     <ClInclude Include="..\Public\HUD_AbilityDiscard.h" />
     <ClInclude Include="..\Public\HUD_KirbyStatus.h" />
     <ClInclude Include="..\Public\HUD_StarPoint.h" />
+    <ClInclude Include="..\public\HungryDee.h" />
     <ClInclude Include="..\Public\ImSequencer.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
@@ -231,6 +243,7 @@
     <ClInclude Include="..\Public\KirbyBoom_State.h" />
     <ClInclude Include="..\Public\KirbyCar_State.h" />
     <ClInclude Include="..\Public\Ladder.h" />
+    <ClInclude Include="..\Public\Level_DeeDeeDee.h" />
     <ClInclude Include="..\Public\Level_FinalBoss.h" />
     <ClInclude Include="..\Public\Level_Intro.h" />
     <ClInclude Include="..\Public\LevelChanger.h" />
@@ -251,6 +264,8 @@
     <ClInclude Include="..\Public\Level_GamePlay.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
     <ClInclude Include="..\Public\Level_Logo.h" />
+    <ClInclude Include="..\Public\Level_PartTime.h" />
+    <ClInclude Include="..\Public\Level_Racing.h" />
     <ClInclude Include="..\Public\Level_Tool_Anim.h" />
     <ClInclude Include="..\Public\Level_Tool_FX.h" />
     <ClInclude Include="..\Public\Level_Tool_Map.h" />
@@ -268,8 +283,15 @@
     </ClInclude>
     <ClInclude Include="..\Public\Moon.h" />
     <ClInclude Include="..\Public\MultiEffect.h" />
+    <ClInclude Include="..\Public\NonAnimDeco.h" />
+    <ClInclude Include="..\Public\NonRenderWall.h" />
     <ClInclude Include="..\Public\OrbitingCamera.h" />
+    <ClInclude Include="..\public\OriginalDee.h" />
     <ClInclude Include="..\Public\Particle.h" />
+    <ClInclude Include="..\Public\PartTimeFood.h" />
+    <ClInclude Include="..\Public\PartTimeHelper.h" />
+    <ClInclude Include="..\Public\PartTimerKirby.h" />
+    <ClInclude Include="..\Public\PartTimerKirby_State.h" />
     <ClInclude Include="..\Public\PhysXObject.h" />
     <ClInclude Include="..\Public\PoppyBomb.h" />
     <ClInclude Include="..\Public\PoppyBrosJr.h" />
@@ -291,7 +313,9 @@
     <ClInclude Include="..\Public\Editor_UI.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\Public\ToppleableBridge.h" />
     <ClInclude Include="..\Public\Trigger.h" />
+    <ClInclude Include="..\Public\UI_PartTime.h" />
     <ClInclude Include="..\public\WaddleDee.h" />
     <ClInclude Include="..\Public\WasteCan.h" />
     <ClInclude Include="Client.h" />
@@ -301,6 +325,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability.cpp" />
+    <ClCompile Include="..\Private\AnimDeco.cpp" />
     <ClCompile Include="..\Private\AnimToolHelper.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -315,8 +340,11 @@
     <ClCompile Include="..\Private\BladeKnight.cpp" />
     <ClCompile Include="..\Private\BladeKnightSword.cpp" />
     <ClCompile Include="..\Private\BladeKnight_State.cpp" />
+    <ClCompile Include="..\Private\BlendMapObject.cpp" />
     <ClCompile Include="..\Private\BombOrbit.cpp" />
     <ClCompile Include="..\Private\BombOrbitGlow.cpp" />
+    <ClCompile Include="..\Private\BreakableRock.cpp" />
+    <ClCompile Include="..\Private\BreakableRockPartical.cpp" />
     <ClCompile Include="..\Private\BrontoBurt.cpp" />
     <ClCompile Include="..\Private\BrontoBurt_State.cpp" />
     <ClCompile Include="..\Private\Buffahorn.cpp" />
@@ -327,9 +355,16 @@
     <ClCompile Include="..\Private\CappyBody_State.cpp" />
     <ClCompile Include="..\Private\CappyHat.cpp" />
     <ClCompile Include="..\Private\CappyHat_State.cpp" />
+    <ClCompile Include="..\Private\Car.cpp" />
+    <ClCompile Include="..\Private\CarShopWall.cpp" />
+    <ClCompile Include="..\Private\CarShopWallFrame.cpp" />
     <ClCompile Include="..\Private\Character.cpp" />
     <ClCompile Include="..\Private\Coin.cpp" />
     <ClCompile Include="..\Private\CollisionCenter.cpp" />
+    <ClCompile Include="..\Private\DeeDeeDee.cpp" />
+    <ClCompile Include="..\Private\DeeDeeDeeHammer.cpp" />
+    <ClCompile Include="..\Private\DeeDeeDee_State.cpp" />
+    <ClCompile Include="..\private\Dee_Part.cpp" />
     <ClCompile Include="..\private\Dee_State.cpp" />
     <ClCompile Include="..\Private\EnergyDrink.cpp" />
     <ClCompile Include="..\Private\FinalBoss.cpp" />
@@ -350,6 +385,7 @@
     <ClCompile Include="..\Private\HUD_AbilityDiscard.cpp" />
     <ClCompile Include="..\Private\HUD_KirbyStatus.cpp" />
     <ClCompile Include="..\Private\HUD_StarPoint.cpp" />
+    <ClCompile Include="..\private\HungryDee.cpp" />
     <ClCompile Include="..\Private\ImSequencer.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -360,6 +396,7 @@
     <ClCompile Include="..\Private\KirbyBomb.cpp" />
     <ClCompile Include="..\Private\KirbyCar_State.cpp" />
     <ClCompile Include="..\Private\Ladder.cpp" />
+    <ClCompile Include="..\Private\Level_DeeDeeDee.cpp" />
     <ClCompile Include="..\Private\Level_FinalBoss.cpp" />
     <ClCompile Include="..\Private\Level_Intro.cpp" />
     <ClCompile Include="..\Private\LevelChanger.cpp" />
@@ -378,6 +415,8 @@
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
     <ClCompile Include="..\Private\Level_Logo.cpp" />
+    <ClCompile Include="..\Private\Level_PartTime.cpp" />
+    <ClCompile Include="..\Private\Level_Racing.cpp" />
     <ClCompile Include="..\Private\Level_Tool_Anim.cpp" />
     <ClCompile Include="..\Private\Level_Tool_FX.cpp" />
     <ClCompile Include="..\Private\Level_Tool_Map.cpp" />
@@ -395,8 +434,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\Moon.cpp" />
     <ClCompile Include="..\Private\MultiEffect.cpp" />
+    <ClCompile Include="..\Private\NonAnimDeco.cpp" />
+    <ClCompile Include="..\Private\NonRenderWall.cpp" />
     <ClCompile Include="..\Private\OrbitingCamera.cpp" />
+    <ClCompile Include="..\private\OriginalDee.cpp" />
     <ClCompile Include="..\Private\Particle.cpp" />
+    <ClCompile Include="..\Private\PartTimeFood.cpp" />
+    <ClCompile Include="..\Private\PartTimeHelper.cpp" />
+    <ClCompile Include="..\Private\PartTimerKirby.cpp" />
+    <ClCompile Include="..\Private\PartTimerKirby_State.cpp" />
     <ClCompile Include="..\Private\PhysXObject.cpp" />
     <ClCompile Include="..\Private\PoppyBomb.cpp" />
     <ClCompile Include="..\Private\PoppyBrosJr.cpp" />
@@ -418,7 +464,9 @@
     <ClCompile Include="..\Private\Editor_UI.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\Private\ToppleableBridge.cpp" />
     <ClCompile Include="..\Private\Trigger.cpp" />
+    <ClCompile Include="..\Private\UI_PartTime.cpp" />
     <ClCompile Include="..\private\WaddleDee.cpp" />
     <ClCompile Include="..\Private\WasteCan.cpp" />
     <ClCompile Include="..\Public\KirbyBoom_State.cpp" />

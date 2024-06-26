@@ -100,11 +100,16 @@ private:
 	// Options
 	void HideTriggers(_bool bHideTriggers);
 	void HideGrid(_bool bHideGrid);
-	void HideMapDecos(_bool bHideMapDecos);
+	void HideDecos(_bool bHideDecos);
+	void HideWalls(_bool bHideWalls);
+
 	_bool ExcludeModel(string& _strModelName);
 	void MoveToCam();
 	void DisableOtherGroups(_int* _pCurTxtGroup);
 	_bool IsAnythingSelected();
+
+	void ClearSearchFilter(_char* _filterBuf, _bool& bWasOpen);
+	void FilterListBoxStrings(const _char* _filterBuf, vector<const _char*>& _vecNames, vector<string>& _vecTxts);
 
 private:
 	vector<string>	m_vecLevelName; 
@@ -124,6 +129,7 @@ private:
 	unordered_set<string>	m_setActorDecos;
 	unordered_set<string>	m_setKickables;
 	unordered_set<string>	m_setTrees;
+	unordered_set<string>	m_setBlendDecos; //투명도 적용이 필요한 데코오브젝트
 
 	unordered_set<string>	m_setTownDecoTxts;
 	unordered_set<string>	m_setLabDecoTxts;

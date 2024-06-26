@@ -23,7 +23,7 @@ public:
 public:
 	void Set_PassIndex(_uint iIndex, _uint iPassIndex) { m_vecPassIndices[iIndex] = iPassIndex; }
 	void Set_SamplingFactor(_uint iIndex, _float fSamplingFactor) { m_vecSamplingFactors[iIndex] = fSamplingFactor; }
-	void Reset_Time(_uint iIndex) { m_iMeshIndex = iIndex; m_fTime = 0;  }
+	void Reset_Time(_uint iIndex) { m_iMeshIndex = iIndex; m_fTime = 0; }
 
 private:
 	CBasicMap(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -49,7 +49,7 @@ private:
 	CShader* m_pNonAnimShaderCom = { nullptr };
 	CShader* m_pAnimShaderCom = { nullptr };
 	CTexture* m_pTextureCom = { nullptr };
-	CGameObject* m_pBlendMap = { nullptr }; 
+	CGameObject* m_pBlendMap = { nullptr };
 
 	vector<_uint> m_vecPassIndices;
 	vector<_float> m_vecSamplingFactors;
@@ -59,6 +59,7 @@ private:
 	_float m_fNonMatchTime = {};
 	_bool m_bCull = { false };
 	_bool m_bBlendMap = { false };
+	_float m_fWhiteColorDiffuse = {};
 
 	class COcTree* m_pOcTree = { nullptr };
 	_uint m_iRenderAll{}, m_iRenderMyMesh{};
@@ -72,15 +73,24 @@ private:
 
 	vector<CModel*>	m_vecNonAnimDecos;
 	vector<CModel*> m_vecAnimDecos;
+	vector<CModel*> m_vecBlendDecos;
 
+	vector<CGameObject*> m_vecAnimDecoGameObjs;
+
+	unordered_set<string> m_setMapDecoNames;
+
+	unordered_map<string, unordered_set<_uint>> m_mapBlendMeshesIndices;
+	unordered_map<string, _bool> m_mapBlendObjStaticActor;
+	vector<CGameObject*> m_vecBlendObjects;
+	
 private:
 	HRESULT Add_Components(const wstring& _wstrModelTag);
 	HRESULT Bind_ShaderResources();
 	HRESULT Add_BlendMap(const wstring& _wstrModelTag);
 
 	void SetUpShaderInfo(const wstring& _wstrModelTag);
-
 	_bool CheckIfBlendMapExists(const wstring& _wstrModelTag);
+
 	void InsertMapDecos();
 	PxRigidStatic* AddTriggerActorForAnimDeco(const string& _strModelName, _float4x4& _matWorld);
 	void SetUpAnimDecoInfo(const string& _strModelName, _float _fTriggerRadius, _uint iIdleIndex, _float fIdleAnimSpeed
@@ -89,6 +99,15 @@ private:
 	void ReadDecos_ForSmallLevels();
 	void Release_MapDecos();
 	HRESULT Render_NonOctreeMapDecos();
+
+	void	ReadMapDecoTxts();
+	_bool	IsMapDeco(const string& _strModelName);
+
+	_bool	IsBlendDeco(const string& _strModelName);
+	void	TraverseBlendDecoInfoTxts(unordered_map<string, unordered_set<_uint>>& _mapBlendMeshIndices
+			, unordered_map<string, _bool>& _mapBlendObjStaticActor);
+	_bool	ReadBlendMeshesIndices(const string& _strFullPath, const string& _strModelName
+			, unordered_set<_uint>& _setMeshIndices, _bool& _bStaticActor);
 		
 public:
 	static CBasicMap* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -40,13 +40,37 @@ static _int s_iCamType = -1;
 
 static _bool s_bHideTriggers = { false };
 static _bool s_bHideGrid = { true };
-static _bool s_bHideMapDecos = { false };
+static _bool s_bHideDecos = { false };
+static _bool s_bHideWalls = { false };
 
 static _int s_iConnectedMonster = -1;
-static const _char* s_ShaderFile[] = { "" };
-static const _char* s_ModelPass[] = { "" };
-static const _char* s_PosTexPass[] = { "" };
+static const _char* s_ModelPassIndices[] = { "0. NORMAL_0", "1. NORMAL_X", "2. SHADOW", "3. SKY", "4. BLOOM", "5. NON_BLUR"
+	,"6. TRIGGER", "7.DEFAULTFX", "8. BLENDFX", "9. DEFERREDINFO", "10. WHITEFX", "11. KIRBYPART",
+	"12. NORMAL_O AND NONCULL", "13. BLEND O, NORMAL O", "14. BLEND O, NORMAL X" };
+
+static const _char* s_PosTexPassIndices[] = { "0. DEFAULT", "1. ALPHABLEND", "2. BLENDFX", "3. BLOOM", "4. DEFAULTFX", "5. BLEND_NOZTEXT"
+	,"6. WHITEFX", "7. UI_MASK", "8. UI_MASK2", "9. SOFTFX", "10. SOFTALPHAFX"};
 static _int s_iPassIndex = -1;
+static _char s_ObjectsFilter[MAX_PATH] = "";
+static _char s_MapDecoFilter[MAX_PATH] = "";
+static _char s_TownDecoFilter[MAX_PATH] = "";
+static _char s_LabDecoFilter[MAX_PATH] = "";
+static _bool s_bWasObjectsOpen = false;
+static _bool s_bWasMapDecosOpen = false;
+static _bool s_bWasTownDecosOpen = false;
+static _bool s_bWasLabDecosOpen = false;
+
+static void HelpMarker(const char* desc)
+{
+	ImGui::TextDisabled("(?)");
+	if (ImGui::BeginItemTooltip())
+	{
+		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+		ImGui::TextUnformatted(desc);
+		ImGui::PopTextWrapPos();
+		ImGui::EndTooltip();
+	}
+}
 
 CMapToolHelper::CMapToolHelper(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -74,21 +98,29 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 	m_vecLevelName = { "Level_Static", "Level_Loading", "Level_Logo", "GamePlay",
 			"Level_Tool_UI", "Level_Tool_FX", "Level_Tool_Anim", "Level_Tool_Map",
-		"Intro", "Racing",  "Town", "FinalBoss", "Level_End" };
+		"Intro", "Racing", "DeeDeeDee", "Town", "PartTime", "FinalBoss", "Level_End" };
 
-	m_vecMapModelNames = { "Level0Stage1Step01", "Level1Stage1Step01", "Town" , "LbLastBossStage"};
-	m_setMapNames = { "BG0", "BG1", "Level0Stage1Step01", "Level1Stage1Step01", "Town" , "LbLastBossStage"};
-	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy", "Fog", "Ladder" };
+	//UV 조절 가능
+	//BasicMap (UV 편집 가능)
+	m_vecMapModelNames = { "Level0Stage1Step01", "Level0Stage1Step02",  "Level1Stage1Step01", "DeeDeeDeeMap", "Town", "TownShop", "Land_VcLabo", "Land_LbLastBossBeforeStep"};
+
+	vector<string> vecBGs = { "BG0", "BG1" };
+	m_setMapNames.insert(vecBGs.begin(), vecBGs.end());
+	m_setMapNames.insert(m_vecMapModelNames.begin(), m_vecMapModelNames.end());
+
+	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy", "Fog", "Ladder", "NonAnim_KirbyPartTimer" };
 	m_setRallyingMonsters = { "NonAnim_Kabu", "NonAnim_BrontoBurt", "NonAnim_FinalBoss" };
 
 	/*m_setNonColDecos = { "BushMCut" };*/
 	m_setAnimDecos = { "BushL", "BushM", "BushS", "PopFlower" };
+
+	//아래는 피직스 처리가 필요한 오브젝트들. (지형 충돌 필요)
 	m_setActorDecos = {  "CMBillBoardC", "CmBuilding1stRoof", "CMBuildingParts", "CMGuardrailAL", "CMGuardrailBL"
 		, "CMFenceAL", "CMFenceA2L", "CMFenceA3L", "CMFenceB3L", "CMFenceCL", "CMFenceCornerCL"
 		, "CMHighwayGuardrailACL", "CMHighwayGuardrailAL", "CMHighwayGuardrailALL", "CMHighwayGuardrailARL", "CMHighwayGuardrailBL", "CMHighwayGuardrailBLL"
 		, "CMHighwayGuardrailBRL", "CMHighwayGuardrailCCL", "CMHighwayGuardrailCL", "CMHighwayGuardrailCLL", "CMHighwayGuardrailCRL"
 		, "CMStreeLightLampA", "CMStreeLightLampE", "CMWaterTankL", "CvBarricadeBL", "CvPipingDuctA05L"
-		, "GsBenchAL",  "GsCarShop", "GsCircleBench", "GsFlowerPotAL", "GsFlowerPotBL", "GsSteelFenceA"
+		, "GsBenchAL", "GsCarFloor", "GsCarShop", "GsCircleBench", "GsFlowerPotAL", "GsFlowerPotBL", "GsSteelFenceA"
 		, "GsSteelFenceB", "GsStone", "GsStreetWallA", "GsStreetWallB"
 		, "GsTelephonePoleA", "GsTelephonePoleB", "GsTireAL", "GsTireBL", "GsTireCL"
 		, "GsTrafficSignalAL", "GsTrafficSignalBL", "GsTreeA", "GsTreeB", "GsTreeC", "GsWallRockA", "GsWallRockB"
@@ -97,11 +129,51 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "StarBlockL" , "StarBlockM", "StarBlockS", "SeDriftWoodAL", "SeDriftWoodBL", "SeDriftWoodCL"
 		, "VpFactoryPart", "VpFactoryParts", "VpFactoryPartsBlend", "WoodBox"
 
-		, "LbBossRoom", "LbLastBossStage", "LbLastBuilding", "LbLastOutFrame1", "LbLastOutFrame2", "LbLastStairs", "LbLastTank"
+
+#pragma region DEEDEEDEE OBJ
+		, "TwGougeGround01", "TwGougeGround02"
+#pragma endregion
+
+
+#pragma region LEVEL_RACING OBJECT
+		, "GsRubbleAsphalt01L", "GsRubbleAsphalt02L", "GsRubbleAsphalt03L", "GsRubbleAsphalt04L", "GsRubbleAsphalt05L"
+		, "GsRubbleAsphalt06L", "GsRubbleAsphalt07L", "GsRubbleAsphalt08L", "GsRubbleAsphalt09L"
+#pragma endregion
+
+
+#pragma region TOWN OBJECT
+		, "TwArena", "TwArenaA", "TwArenaB", "TwArenaClerk", "TwDeliveryService", "TwFoodStore", "TwFoodStoreChair", "TwFoodStoreTable"
+		, "TwKirbyHouse", "TwPharmacy", "TwPlanterA", "TwPlanterB", "TwRollingBallBooth", "TwSideHouseA", "TwSideHouseC", "TwSideHouseD"
+		, "TwSignboardStreetLive", "TwSlope", "TwBenchA", "TwBenchB", "TwBenchC", "TwBenchD", "TwFishingPartsA", "TwFishingPartsB", "TwFishingPartsC"
+		,"TwCentralSquare","TwStreetLiveSetC", "TwSideBridge", "TwConstructionAreaStepway", "TwConstructionAreaPond"
+#pragma endregion
+
+
+#pragma region LEVEL_FINALBOSS (LAB_DISCOVERA) OBJECT
+		//Field 
+		, "LbBossRoom", "LbLastBossStage", "LbLastBuilding", "Land_LbLastBossBeforeStep"
+
+		//LbLastBuilding Object :: 보스전 필드의 오브젝트
+		,"LbLastOutFrame2", "LbLastStairs"//, "LbLastTank", "LbLastOutFrame1", 준수 오더로 삭제
+		,"LbBossRoomDoorAL","LbBossRoomDoorBL", "LbOutBuildingWallL"
+
+		//LbLastBossBeforeStep Object :: Rubble 
+		, "LbRubble01L", "LbRubble02L", "LbRubble03L", "LbRubble04L", "LbRubble05L", "LbRubble06L", "LbRubble07L", "LbRubble08L", "LbRubbleTile01L", "LbRubbleTile02L", "LbRubbleTile03L"
+		, "GsRubbleA", 	"GsRubbleB", "GsRubbleC", "GsRubbleD", "GsRubbleE", "GsRubbleF", "GsRubbleG"
+		
+		//CmFillerObject, Ml~ :: 채우기용 잡오브젝트
+		, "CmFillerObjectAL", "CmFillerObjectA02L", "CmFillerObjectA03L", "CmFillerObjectBL", "CmFillerObjectCL", "CmFillerObjectEL", "CmFillerObjectFL"
+		, "MlBossBenchL", "MlBossChairL", "MlFlowerPot01L", "MlSofaFL"
+
+#pragma endregion
 	};
+	
 	m_setKickables = { "GsPebble", "SeShell", "WasteCanYellow" };
 	m_setItemTxts = { "Item_Coin", "Item_EnergyDrink" };
 	m_setTrees = { "GsTreeA", "GsTreeB", "GsTreeC" };
+
+	//투명도 적용이 필요한 데코오브젝트
+	m_setBlendDecos = {"LbOutBuildingWallL", "LbOutBuildingFenceL"};
 
 	s_vecPassIndices.resize(m_vecMapModelNames.size());
 	s_vecSamplingFactors.resize(m_vecMapModelNames.size());
@@ -115,7 +187,8 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 	HideGrid(s_bHideGrid);
 	HideTriggers(s_bHideTriggers);
-	HideMapDecos(s_bHideMapDecos);
+	HideDecos(s_bHideDecos);
+	HideWalls(s_bHideWalls);
 
 	return S_OK;
 }
@@ -165,6 +238,16 @@ void CMapToolHelper::Late_Tick(_float fTimeDelta)
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_DELETE, KEY_DOWN))
 		On_DIK_Delete();
+
+	//SAVE, LOAD 단축키 추가
+	if (m_pGameInstance->Get_DIKeyState(DIK_LCONTROL, KEY_PRESS))
+	{
+		if (m_pGameInstance->Get_DIKeyState(DIK_S, KEY_DOWN))
+			Save_Level();
+
+		if (m_pGameInstance->Get_DIKeyState(DIK_L, KEY_DOWN))
+			Load_Level();
+	}
 
 	Edit_Object();
 }
@@ -283,12 +366,12 @@ void CMapToolHelper::ReadLabDecoTxts()
 
 	for (auto& objTxt : m_vecLabDecoTxts)
 		m_setLabDecoTxts.insert(objTxt);
-
 }
 
 void CMapToolHelper::Menu_Level()
 {
 	ImGui::SeparatorText("Level");
+
 	for (_int i = LEVEL_INTRO; i <= LEVEL_FINALBOSS; i++)
 	{
 		if (ImGui::RadioButton(m_vecLevelName[i].c_str(), s_iLevelIndex == i - LEVEL_INTRO)) {
@@ -328,12 +411,15 @@ void CMapToolHelper::Menu_Level()
 			ImGui::EndPopup();
 		}
 
-		if (i % 3 == 0)
+		if (i % 2 == 0 && i != LEVEL_FINALBOSS)
 			ImGui::SameLine();
 	}
+	//ImGui::NewLine(); 
+	HelpMarker(u8"저장 : Ctrl+S / 로드 : Ctrl+L");
+
 	if (ImGui::Button("Save", ImVec2(100, 40)))
 		Save_Level();
-	ImGui::SameLine();
+	ImGui::SameLine(); 
 	if (ImGui::Button("Load", ImVec2(100, 40)))
 		Load_Level();
 
@@ -347,9 +433,14 @@ void CMapToolHelper::Menu_Level()
 		s_bHideGrid = !s_bHideGrid;
 		HideGrid(s_bHideGrid);
 	}
-	if (ImGui::RadioButton("Hide MapDecos", s_bHideMapDecos)) {
-		s_bHideMapDecos = !s_bHideMapDecos;
-		HideMapDecos(s_bHideMapDecos);
+	if (ImGui::RadioButton("Hide Decos", s_bHideDecos)) {
+		s_bHideDecos = !s_bHideDecos;
+		HideDecos(s_bHideDecos);
+	}
+	ImGui::SameLine();
+	if (ImGui::RadioButton("Hide Walls", s_bHideWalls)) {
+		s_bHideWalls = !s_bHideWalls;
+		HideWalls(s_bHideWalls);
 	}
 }
 
@@ -394,27 +485,35 @@ void CMapToolHelper::Menu_NonAnimModels()
 
 	if (ImGui::CollapsingHeader("Objects"))
 	{
+		ImGui::InputText("##ObjectsFilter", s_ObjectsFilter, IM_ARRAYSIZE(s_ObjectsFilter)); // 필터 입력받기
 		ImGui::SetNextItemWidth(200.0f);
-		vector<const _char*> vecObjectNames(m_vecObjectTxts.size());
-		for (_int i = 0; i < m_vecObjectTxts.size(); ++i)
-			vecObjectNames[i] = m_vecObjectTxts[i].c_str();
-		if (ImGui::ListBox("##Objects", &s_iObjectIdx, vecObjectNames.data(), m_vecObjectTxts.size(), 10)) {
-			DisableOtherGroups(&s_iObjectIdx);
-			m_strSelectedTxt = m_vecObjectTxts[s_iObjectIdx];
-		}
-	}
+		vector<const _char*> vecObjectNames;
+		FilterListBoxStrings(s_ObjectsFilter, vecObjectNames, m_vecObjectTxts);
 
+		if (ImGui::ListBox("##Objects", &s_iObjectIdx, vecObjectNames.data(), vecObjectNames.size(), 10)) {
+			DisableOtherGroups(&s_iObjectIdx);
+			m_strSelectedTxt = string(vecObjectNames[s_iObjectIdx]);
+		}
+		s_bWasObjectsOpen = true;
+	}
+	else
+		ClearSearchFilter(s_ObjectsFilter, s_bWasObjectsOpen);
+		
 	if (ImGui::CollapsingHeader("MapDecos"))
 	{
+		ImGui::InputText("##MapDecoFilter", s_MapDecoFilter, IM_ARRAYSIZE(s_MapDecoFilter)); // 필터 입력받기
 		ImGui::SetNextItemWidth(200.0f);
-		vector<const _char*> vecMapDecoNames(m_vecMapDecoTxts.size());
-		for (_int i = 0; i < m_vecMapDecoTxts.size(); ++i)
-			vecMapDecoNames[i] = m_vecMapDecoTxts[i].c_str();
-		if (ImGui::ListBox("##MapDecos", &s_iMapDecoIdx, vecMapDecoNames.data(), m_vecMapDecoTxts.size(), 16)) {
+		vector<const _char*> vecMapDecoNames;
+		FilterListBoxStrings(s_MapDecoFilter, vecMapDecoNames, m_vecMapDecoTxts);
+		
+		if (ImGui::ListBox("##MapDecos", &s_iMapDecoIdx, vecMapDecoNames.data(), vecMapDecoNames.size(), 13)) {
 			DisableOtherGroups(&s_iMapDecoIdx);
-			m_strSelectedTxt = m_vecMapDecoTxts[s_iMapDecoIdx];
+			m_strSelectedTxt = string(vecMapDecoNames[s_iMapDecoIdx]);
 		}
+		s_bWasMapDecosOpen = true;
 	}
+	else
+		ClearSearchFilter(s_MapDecoFilter, s_bWasMapDecosOpen);
 
 	if (ImGui::CollapsingHeader("Items"))
 	{
@@ -442,27 +541,35 @@ void CMapToolHelper::Menu_NonAnimModels()
 
 	if (ImGui::CollapsingHeader("TownDecos"))
 	{
+		ImGui::InputText("##TownDecoFilter", s_TownDecoFilter, IM_ARRAYSIZE(s_TownDecoFilter)); // 필터 입력받기
 		ImGui::SetNextItemWidth(200.0f);
-		vector<const _char*> vecTownDecoNames(m_vecTownDecoTxts.size());
-		for (_int i = 0; i < m_vecTownDecoTxts.size(); ++i)
-			vecTownDecoNames[i] = m_vecTownDecoTxts[i].c_str();
-		if (ImGui::ListBox("##TownDecos", &s_iTownDecoIdx, vecTownDecoNames.data(), m_vecTownDecoTxts.size(), 16)) {
+		vector<const _char*> vecTownDecoNames;
+		FilterListBoxStrings(s_TownDecoFilter, vecTownDecoNames, m_vecTownDecoTxts);
+		
+		if (ImGui::ListBox("##TownDecos", &s_iTownDecoIdx, vecTownDecoNames.data(), vecTownDecoNames.size(), 13)) {
 			DisableOtherGroups(&s_iTownDecoIdx);
-			m_strSelectedTxt = m_vecTownDecoTxts[s_iTownDecoIdx];
+			m_strSelectedTxt = string(vecTownDecoNames[s_iTownDecoIdx]);
 		}
+		s_bWasTownDecosOpen = true;
 	}
+	else
+		ClearSearchFilter(s_TownDecoFilter, s_bWasTownDecosOpen);
 
 	if (ImGui::CollapsingHeader("LabDecos"))
 	{
+		ImGui::InputText("##LabDecoFilter", s_LabDecoFilter, IM_ARRAYSIZE(s_LabDecoFilter)); // 필터 입력받기
 		ImGui::SetNextItemWidth(200.0f);
-		vector<const _char*> vecLabDecoNames(m_vecLabDecoTxts.size());
-		for (_int i = 0; i < m_vecLabDecoTxts.size(); ++i)
-			vecLabDecoNames[i] = m_vecLabDecoTxts[i].c_str();
-		if (ImGui::ListBox("##LabDecos", &s_iLabDecoIdx, vecLabDecoNames.data(), m_vecLabDecoTxts.size(), 16)) {
+		vector<const _char*> vecLabDecoNames;
+		FilterListBoxStrings(s_LabDecoFilter, vecLabDecoNames, m_vecLabDecoTxts);
+
+		if (ImGui::ListBox("##LabDecos", &s_iLabDecoIdx, vecLabDecoNames.data(), vecLabDecoNames.size(), 13)) {
 			DisableOtherGroups(&s_iLabDecoIdx);
-			m_strSelectedTxt = m_vecLabDecoTxts[s_iLabDecoIdx];
+			m_strSelectedTxt = string(vecLabDecoNames[s_iLabDecoIdx]);
 		}
+		s_bWasLabDecosOpen = true;
 	}
+	else
+		ClearSearchFilter(s_LabDecoFilter, s_bWasLabDecosOpen);
 }
 
 void CMapToolHelper::Menu_TriggerInfo()
@@ -712,19 +819,25 @@ void CMapToolHelper::Edit_Object()
 	if (ImGui::InputFloat("##fRimWidth", &fRimWidth, 0.01f, 1.0f, "%.3f"))
 		m_pPickedObject->Set_RimWidth(fRimWidth);
 
-	//CModel* pModel = dynamic_cast<CModel*>(m_pPickedObject->Get_Component(TEXT("Com_Model")));
-	//if (nullptr == pModel)  // Shader_PosTex  패스 지정
-	//{
-	//	/*ImGui::SetNextItemWidth(150);
-	//if (ImGui::Combo("##RallyPointIndex", &iTriggerIdx, triggerIndices, IM_ARRAYSIZE(triggerIndices)))
-	//	pMapToolObject->Set_TriggerIndex(iTriggerIdx);*/
-	//}
-	//else  // Shader_Model 패스지정
-	//{
-	//	/*ImGui::SetNextItemWidth(150);
-	//if (ImGui::Combo("##RallyPointIndex", &iTriggerIdx, triggerIndices, IM_ARRAYSIZE(triggerIndices)))
-	//	pMapToolObject->Set_TriggerIndex(iTriggerIdx);*/
-	//}
+	CModel* pModel = dynamic_cast<CModel*>(m_pPickedObject->Get_Component(TEXT("Com_Model")));
+	if (nullptr == pModel)  // Shader_PosTex  패스 지정
+	{
+		/*ImGui::SetNextItemWidth(150);
+		GetPassIndex();
+		if (ImGui::Combo("##PosTexPassIndex", &s_iPassIndex, s_PosTexPassIndices, IM_ARRAYSIZE(s_PosTexPassIndices)))
+			SetPassIndex(s_iPassIndex);
+		*/
+	}
+	else  // Shader_Model 패스지정
+	{
+		CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(m_pPickedObject);
+		if (pMapToolObject != nullptr) {
+			ImGui::SetNextItemWidth(150);
+			s_iPassIndex = pMapToolObject->Get_PassIndex();
+			if (ImGui::Combo("##ModelPassIndex", &s_iPassIndex, s_ModelPassIndices, IM_ARRAYSIZE(s_ModelPassIndices)))
+				pMapToolObject->Set_PassIndex(s_iPassIndex);
+		}
+	}
 	
 	_float4x4 tempMatrix = pTransform->Get_WorldFloat4x4();
 	m_pGameInstance->EditTransform(tempMatrix); // 선택한 모델의 월드행렬을 수정 
@@ -1393,7 +1506,7 @@ void CMapToolHelper::HideGrid(_bool bHideGrid)
 	pGrid->Set_Hide(bHideGrid);
 }
 
-void CMapToolHelper::HideMapDecos(_bool bHideMapDecos)
+void CMapToolHelper::HideDecos(_bool bHideDecos)
 {
 	list<CGameObject*>* pObjectList = m_pGameInstance->Get_List(LEVEL_TOOL_MAP, TEXT("Layer_Parse"));
 	if (pObjectList == nullptr)
@@ -1413,7 +1526,31 @@ void CMapToolHelper::HideMapDecos(_bool bHideMapDecos)
 
 		string strModelName = pModel->Get_ModelInfo().strModelName;
 		if(true == IsDeco(strModelName))
-			obj->Set_Hide(bHideMapDecos);
+			obj->Set_Hide(bHideDecos);
+	}
+}
+
+void CMapToolHelper::HideWalls(_bool bHideWalls)
+{
+	list<CGameObject*>* pObjectList = m_pGameInstance->Get_List(LEVEL_TOOL_MAP, TEXT("Layer_Parse"));
+	if (pObjectList == nullptr)
+		return;
+
+	if (pObjectList->empty())
+		return;
+
+	for (auto& obj : *pObjectList)
+	{
+		if (nullptr == obj)
+			continue;
+
+		CModel* pModel = dynamic_cast<CModel*>(obj->Get_Component(TEXT("Com_Model")));
+		if (nullptr == pModel)
+			continue;
+
+		string strModelName = pModel->Get_ModelInfo().strModelName;
+		if ("NonRenderWall" == strModelName)
+			obj->Set_Hide(bHideWalls);
 	}
 }
 
@@ -1500,6 +1637,37 @@ _bool CMapToolHelper::IsAnythingSelected()
 	}
 
 	return _bool();
+}
+
+void CMapToolHelper::ClearSearchFilter(_char* _filterBuf, _bool& bWasOpen)
+{
+	if (false == bWasOpen)
+		return;
+
+	_filterBuf[0] = '\0';
+	bWasOpen = false;
+}
+
+void CMapToolHelper::FilterListBoxStrings(const _char* _filterBuf, vector<const _char*>& _vecNames, vector<string>& _vecTxts)
+{
+	if (_filterBuf[0] == '\0')
+	{
+		_vecNames.resize(_vecTxts.size());
+		for (_int i = 0; i < _vecTxts.size(); ++i)
+			_vecNames[i] = _vecTxts[i].c_str();
+	}
+	else
+	{
+		for (auto& objTxt : _vecTxts)
+		{
+			string strLower = string(objTxt);
+			transform(strLower.begin(), strLower.end(), strLower.begin(), ::tolower);
+			string strFilter = string(_filterBuf);
+			transform(strFilter.begin(), strFilter.end(), strFilter.begin(), ::tolower);
+			if (strLower.find(strFilter) != string::npos)
+				_vecNames.push_back(objTxt.c_str());
+		}
+	}
 }
 
 void CMapToolHelper::Reset_MapShaderInfo()

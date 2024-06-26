@@ -1,5 +1,6 @@
 #include "Model.h"
 #include "GameInstance.h"
+#include "GameObject.h"
 #include "MergedMesh.h"
 #include "OcTree.h"
 //#include "Channel.h"
@@ -66,6 +67,7 @@ string CModel::Get_MeshName(_uint iMeshIndex)
 
 HRESULT CModel::Initialize_Prototype(MODEL tModel)
 {
+	HRESULT hr = S_OK;
 	m_tModel = tModel;
 
 	string strFolderName = "Anim/";
@@ -83,7 +85,6 @@ HRESULT CModel::Initialize_Prototype(MODEL tModel)
 	{	// StrToWstr 필요
 		wstring tempstr = L"Failed To Open : " + CUtils::StrToWstr(m_strDirectory);
 		MSG_BOX(tempstr.c_str());
-		return E_FAIL;
 	}
 
 	_float4x4 TransformMatrix = XMMatrixIdentity();
@@ -94,22 +95,22 @@ HRESULT CModel::Initialize_Prototype(MODEL tModel)
 	/* 읽은 정보를 바탕으로해서 내가 사용하기 좋게 정리한다.  */
 	if (m_tModel.eType == TYPE_ANIM)
 	{
-		if (FAILED(Ready_Bones()))
-			return E_FAIL;
+		hr = Ready_Bones();
+		CHECK_FAILED(hr);
 	}
 
 	/* 모델을 구성하는 메시들을 생성한다. */
 	/* 모델 = 메시 + 메시 + ... */
-	if (FAILED(Ready_Meshes(tModel.bOctree)))
-		return E_FAIL;
+	hr = Ready_Meshes(tModel.bOctree);
+	CHECK_FAILED(hr);
 
- 	if (FAILED(Ready_Materials(m_tModel.strModelName.c_str(), tModel.bOctree)))
-		return E_FAIL;
+	hr = Ready_Materials(m_tModel.strModelName.c_str(), tModel.bOctree);
+	CHECK_FAILED(hr);
 
 	if (m_tModel.eType == TYPE_ANIM)
 	{
-		if (FAILED(Ready_Animations()))
-			return E_FAIL;
+		hr = Ready_Animations();
+		CHECK_FAILED(hr);
 	}
 
 	m_InputFile.close();
@@ -185,6 +186,8 @@ HRESULT CModel::Play_Animation(_float fTimeDelta)
 	/* 현재 애니메이션에 맞는 뼈의 상태(m_TransformationMatrix)를 갱신해준다. */
 	m_Animations[m_iCurrentAnimIndex]->Invalidate_TransformationMatrix(fTimeDelta, m_Bones, m_isLoop, this);
 
+
+
 	for (auto& pBone : m_Bones)
 		pBone->Invalidate_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_TransformMatrix));
 	
@@ -230,6 +233,13 @@ HRESULT CModel::CreateStaticActor(_float4x4& matWorld)
 		mesh->CreateStaticActor(matWorld);
 
 	return S_OK;
+}
+
+void CModel::DisableActor()
+{
+	PxScene* pScene = m_pGameInstance->Get_Scene();
+	for (auto& mesh : m_Meshes)
+		mesh->DisableActor(pScene);
 }
 
 _float4 CModel::Check_Meshes(const class CTransform* pTransform, _Out_ _int& iMeshIndex) const
@@ -492,10 +502,94 @@ HRESULT CModel::Bind_WorldMatrixForOctree(CShader* pShader, string& strConstantN
 	return S_OK;
 }
 
+
 void CModel::Invalidate_Bones()
 {
 	for (auto& pBone : m_Bones)
 		pBone->Invalidate_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_TransformMatrix));
+}
+
+_uint CModel::Find_MeshIndex(const string& _strMeshName)
+{
+	for (_uint i = 0; i < m_iNumMeshes; i++)
+	{
+		if (m_Meshes[i]->Get_Name() == _strMeshName)
+			return i;
+	}
+
+	return _uint();
+}
+
+void CModel::RemoveNonBlendMeshes(const unordered_set<_uint>& _vecBlendingMeshIndices)
+{
+	if (_vecBlendingMeshIndices.empty())
+		return;
+
+	vector<CMesh*> vecMeshes;
+	for (_uint i = 0; i < m_iNumMeshes; i++)
+	{
+		if (_vecBlendingMeshIndices.end() == _vecBlendingMeshIndices.find(i))
+			Safe_Release(m_Meshes[i]);
+		else
+			vecMeshes.push_back(m_Meshes[i]);
+	}
+
+	m_Meshes = vecMeshes;
+	m_iNumMeshes = vecMeshes.size();
+}
+
+void CModel::RemoveBlendMeshes(const unordered_set<_uint>& _vecBlendingMeshIndices)
+{
+	if (_vecBlendingMeshIndices.empty())
+		return;
+
+	vector<CMesh*> vecMeshes;
+	for (_uint i = 0; i < m_iNumMeshes; i++)
+	{
+		if (_vecBlendingMeshIndices.end() != _vecBlendingMeshIndices.find(i))
+			Safe_Release(m_Meshes[i]);
+		else
+			vecMeshes.push_back(m_Meshes[i]);
+	}
+
+	m_Meshes = vecMeshes;
+	m_iNumMeshes = vecMeshes.size();
+}
+
+_bool CModel::DoesNormalTextureExist(_uint iMeshIndex)
+{
+	if (iMeshIndex >= m_iNumMeshes)
+		return false;
+
+	_uint	iMeshMaterialIndex = { m_Meshes[iMeshIndex]->Get_MaterialIndex() };
+
+	if (iMeshMaterialIndex >= m_iNumMaterials)
+		return false;
+
+	if (nullptr != m_Materials[iMeshMaterialIndex].MaterialTextures[TextureType_NORMALS])
+		return true;
+	else
+		return false;
+}
+
+void CModel::DeterminePassIndices(vector<_uint>& _vecPassIndices)
+{
+	for (_uint i = 0; i < m_iNumMeshes; i++)
+	{
+		if (true == DoesNormalTextureExist(i))
+			_vecPassIndices.push_back(13); // AlphaBlend Normal O
+		else
+			_vecPassIndices.push_back(14); // AlphaBlend Normal X
+	}
+}
+
+void CModel::AddBlendObjectToRenderGroup()
+{
+	if (nullptr == m_pBlendObject)
+		return;
+
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, m_pBlendObject);
+>>>>>>> main
 }
 
 HRESULT CModel::Ready_Meshes(_bool bOctree)
@@ -505,8 +599,7 @@ HRESULT CModel::Ready_Meshes(_bool bOctree)
 	for (size_t i = 0; i < m_iNumMeshes; i++)
 	{
 		CMesh* pMesh = CMesh::Create(m_pDevice, m_pContext, m_tModel.eType, m_strDirectory, m_InputFile, m_Bones, XMLoadFloat4x4(&m_TransformMatrix), bOctree);
-		if (nullptr == pMesh)
-			return E_FAIL;
+		CHECK_NULLPTR(pMesh);
 
 		m_Meshes.push_back(pMesh);
 	}
@@ -661,6 +754,8 @@ CComponent * CModel::Clone(void * pArg)
 void CModel::Free()
 {
 	__super::Free();
+
+	Safe_Release(m_pBlendObject);
 
 	for (auto& pAnimation : m_Animations)
 		Safe_Release(pAnimation);

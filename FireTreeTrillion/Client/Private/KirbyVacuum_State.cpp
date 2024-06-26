@@ -113,17 +113,30 @@ void CKirbyVacuum_Spit_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 			// 자동차 등을 뱉는다. 이쪽에서.
 			_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
 
-			pController->Set_Position(pTransformCom, vPos + _float4(0.f, 2.f, 0.f, 0.f));
+			pController->Set_Position(pTransformCom, vPos + _float4(0.f, 4.f, 0.f, 0.f));
+
+			// Car Spit
+			// 추후, 전 상태를 받고 있다가 뱉을 것 정해주면 될것같다.
+			CGameObject::GAMEOBJECT_DESC ObjDesc{};
+			ObjDesc.fSpeedPerSec = 5.f;
+			ObjDesc.fRotationPerSec = ToRadian(90.f);
+			_float4x4 InitMat = _float4x4::Identity;
+			InitMat = pTransformCom->Get_WorldFloat4x4();
+			CUtils::Set_State_Matrix(InitMat, CUtils::STATE_POSITION, vPos + _float4(0.f, 3.f, 0.f, 0.f));
+			//InitMat.Translation((_float3)vPos + (_float3)(0.f, 3.f, 0.f));
+			ObjDesc.matWorld = InitMat;
+			if (FAILED(m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Deform"), TEXT("Prototype_GameObject_Car"), &ObjDesc)))
+				return;
+
 			m_bSpitTrigger = false;
 		}
 
 		DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
+		pController->Move_Dir(pTransformCom, vLook * 10.f * fTimeDelta, fTimeDelta);
 		pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
-		pController->Move_Dir(pTransformCom, vLook * 4.f * fTimeDelta, fTimeDelta);
-
-		if (pKirby->isAnimFinish() == true)
+		if (pController->Is_Terrain() == true)
 		{
-			pKirby->Change_State(CKirby::STATE_FALL, 50.f, false, false, CKirby::BODY_DEFAULT);
+			pKirby->Change_State(CKirby::STATE_LANDINGSMALL, 50.f, false, false, CKirby::BODY_DEFAULT);
 			return;
 		}
 	}
@@ -516,39 +529,138 @@ void CKirbyVacuum_Vacuuming_State::OnStateUpdate(CGameObject* pGameObject, _floa
 	DESC(m_eEyeState) = CKirby::EYE_CLOSE;
 	CTransform* pObjectTransform = DESC(m_pObject)->Get_TransformCom();
 	_vector vObjectPos = pObjectTransform->Get_State_Vector(CTransform::STATE_POSITION);
-	_float vCurDistance = XMVectorGetX(XMVector3Length(vPos - vObjectPos));
-	_float4 vObjectDir = XMVector3Normalize(vPos - vObjectPos);
+	_float4 vDistance = vPos - vObjectPos;
+	_float vCurDistance = XMVectorGetX(XMVector3Length(vDistance));
+	_float4 vObjectDir = XMVector3Normalize(vDistance);
 
-	//if (DESC(m_fVacuumTime) < 1.2f)
-	//	DESC(m_fVacuumTime) += fTimeDelta;
-
-	// 상대의 컨트롤러를 탐색한다.
-	CCharacterController* pObjectController = static_cast<CCharacterController*>(DESC(m_pObject)->Get_Component(TEXT("Com_Controller")));
-
-	// 만약 이 과정에서, Controller 가 nullptr 일 경우 그것은 컨트롤러가 아닌것이다. 트랜스폼을 직접 움직여주어야 한다.
-	if (pObjectController == nullptr)
+	if (m_bKirbyTurnDirTrigger == true)
 	{
-		_float4 vPos = pObjectTransform->Get_State(CTransform::STATE_POSITION);
-		pObjectTransform->Set_State(CTransform::STATE_POSITION, vPos + vObjectDir * fVacuumObjectSpeed * fTimeDelta);
+		_float4 vLookDir = vObjectDir;
+		vLookDir.y = 0.f;
+		m_vLookDir = -1.f * vLookDir;
+		DESC(m_vTargetDir) = m_vLookDir;
+		m_bKirbyTurnDirTrigger = false;
 	}
-	// 만약 이 과정에서, Controller 가 nullptr이 아닐 경우 그것은 컨트롤러가 맞고, Move_Dir로 나에게 당겨준다.
+
+	Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
+
+	// 머금기 흡수
+	if (DESC(m_bisDeforming) == true)
+	{
+		_float4 vDeformLook = pObjectTransform->Get_State(CTransform::STATE_LOOK);
+		_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+
+		if (Turn_Deform(vDeformLook, vLook, pObjectTransform, fTimeDelta) == false)
+		{
+			pObjectTransform->Look_At_Axis(vDeformLook);
+		}
+		else
+		{
+			pObjectTransform->Look_At_Axis(vDeformLook);
+			// 상대의 컨트롤러를 탐색한다.
+			CCharacterController* pObjectController = static_cast<CCharacterController*>(DESC(m_pObject)->Get_Component(TEXT("Com_Controller")));
+
+			pObjectController->Move_Dir(pObjectTransform, vObjectDir * pow(m_fDeformObjectSpeed, 3.f) * fTimeDelta, fTimeDelta);
+
+			// 그 외, 스케일 변화를 준다.
+			_float fScaleinverse = 1.f - ((DESC(m_fObjectDistance) - vCurDistance) / DESC(m_fObjectDistance) * 0.3f);
+			_float3 vObjectScale = pObjectTransform->Get_Scaled();
+			pObjectTransform->Set_Scaled(DESC(m_vObjectScale).x * fScaleinverse, DESC(m_vObjectScale).y * fScaleinverse, DESC(m_vObjectScale).z * fScaleinverse);
+
+			// 물체가 나에게 오는 시간을 타임델타 기반으로 가산시켜준다.
+			m_fDeformObjectSpeed += fTimeDelta * 20.f;
+		}
+	}
+	// 일반 오브젝트 흡수
 	else
 	{
-		pObjectController->Move_Dir(pObjectTransform, vObjectDir * fVacuumObjectSpeed * fTimeDelta, fTimeDelta);
+		// 상대의 컨트롤러를 탐색한다.
+		CCharacterController* pObjectController = static_cast<CCharacterController*>(DESC(m_pObject)->Get_Component(TEXT("Com_Controller")));
+
+		// 만약 이 과정에서, Controller 가 nullptr 일 경우 그것은 컨트롤러가 아닌것이다. 트랜스폼을 직접 움직여주어야 한다.
+		if (pObjectController == nullptr)
+		{
+			_float4 vPos = pObjectTransform->Get_State(CTransform::STATE_POSITION);
+			pObjectTransform->Set_State(CTransform::STATE_POSITION, vPos + vObjectDir * m_fVacuumObjectSpeed * fTimeDelta);
+		}
+		// 만약 이 과정에서, Controller 가 nullptr이 아닐 경우 그것은 컨트롤러가 맞고, Move_Dir로 나에게 당겨준다.
+		else
+		{
+			pObjectController->Move_Dir(pObjectTransform, vObjectDir * m_fVacuumObjectSpeed * fTimeDelta, fTimeDelta);
+		}
+
+		// 그 외, 스케일 변화를 준다.
+		_float fScaleinverse = 1.f - ((DESC(m_fObjectDistance) - vCurDistance) / DESC(m_fObjectDistance) * 0.3f);
+		_float3 vObjectScale = pObjectTransform->Get_Scaled();
+		pObjectTransform->Set_Scaled(DESC(m_vObjectScale).x * fScaleinverse, DESC(m_vObjectScale).y * fScaleinverse, DESC(m_vObjectScale).z * fScaleinverse);
+
+		// 물체가 나에게 오는 시간을 타임델타 기반으로 가산시켜준다.
+		m_fVacuumObjectSpeed += fTimeDelta * 150.f;
 	}
 
-	// 그 외, 스케일 변화를 준다.
-	_float fScaleinverse = 1.f - ((DESC(m_fObjectDistance) - vCurDistance) / DESC(m_fObjectDistance) * 0.3f);
-	_float3 vObjectScale = pObjectTransform->Get_Scaled();
-	pObjectTransform->Set_Scaled(DESC(m_vObjectScale).x * fScaleinverse, DESC(m_vObjectScale).y * fScaleinverse, DESC(m_vObjectScale).z * fScaleinverse);
 
-	// 물체가 나에게 오는 시간을 타임델타 기반으로 가산시켜준다.
-	fVacuumObjectSpeed += fTimeDelta * 150.f;
 }
 
 void CKirbyVacuum_Vacuuming_State::OnStateExit()
 {
-	fVacuumObjectSpeed = 2.f;
+	m_fVacuumObjectSpeed = 2.f;
+	m_fDeformObjectSpeed = 0.f;
+	m_bDeformVacuumStart = false;
+
+	m_bKirbyTurnDirTrigger = true;
+	m_vLookDir = { 0.f, 0.f, 0.f, 0.f };
+}
+
+_bool CKirbyVacuum_Vacuuming_State::Turn_Deform(_float4& InterpolateDir, const _float4& TargetDir, CTransform* pDeformTransformCom, _float fTimeDelta)
+{
+	if (InterpolateDir == TargetDir)
+		return true;
+
+	_float fInterpolate = fTimeDelta * 6.f;
+	_vector vTargetDir = TargetDir;
+	_vector vMoveDir = InterpolateDir;
+
+	_vector vTargetDirXZ = XMVectorSet(XMVectorGetX(vTargetDir), 0.0f, XMVectorGetZ(vTargetDir), 0.0f);
+	_vector vMoveDirXZ = XMVectorSet(XMVectorGetX(vMoveDir), 0.0f, XMVectorGetZ(vMoveDir), 0.0f);
+
+	vTargetDirXZ = XMVector3Normalize(vTargetDirXZ);
+	vMoveDirXZ = XMVector3Normalize(vMoveDirXZ);
+	_float fcosTheta = XMVectorGetX(XMVector4Dot(vTargetDirXZ, vMoveDirXZ));
+
+	if (fcosTheta < -0.9995f || fcosTheta > 0.9995f)
+	{
+		// 180도로 NaN 방지 랜덤으로 -1, 1도 틀어줌
+		_float4x4 rotationMatrix;
+		XMStoreFloat4x4(&rotationMatrix, XMMatrixIdentity());
+		CUtils::Turn_OtherMatrix(rotationMatrix, XMVectorSet(0.f, 1.f, 0.f, 0.f), 1.f, CUtils::Make_RandomInt(0, 1) == 1 ? 1.f : -1.f);
+		InterpolateDir = XMVector3Transform(vMoveDir, XMLoadFloat4x4(&rotationMatrix));
+		InterpolateDir = XMVectorSetW(InterpolateDir, 0.0f);
+
+		return true;
+	}
+	else
+	{
+		_float ftheta = acos(fcosTheta);
+		_float fAngleDegrees = XMConvertToDegrees(ftheta);
+
+		if (fAngleDegrees < 5.0f)
+		{
+			InterpolateDir = vTargetDir;
+			return true;
+		}
+		else
+		{
+			_float fsinTheta = sqrt(1.0f - fcosTheta * fcosTheta);
+			_float fAlpha = sin((1 - fInterpolate) * ftheta) / fsinTheta;
+			_float fBeta = sin(fInterpolate * ftheta) / fsinTheta;
+			_float4 vResult = vMoveDirXZ * fAlpha + vTargetDirXZ * fBeta;
+			InterpolateDir = XMVector4Normalize(vResult);
+			InterpolateDir = XMVector3Normalize(InterpolateDir);
+			return false;
+		}
+	}
+
+	return false;
 }
 
 CKirbyVacuum_Vacuuming_State* CKirbyVacuum_Vacuuming_State::Create()

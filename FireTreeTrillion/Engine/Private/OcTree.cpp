@@ -612,6 +612,8 @@ void COcTree::RenderAll(CGameInstance* pGameInstance, CShader* pMapShader, CShad
 		if (nullptr == nonCol)
 			continue;
 
+		//nonCol->AddBlendObjectToRenderGroup();
+
 		_uint iNumMeshes = nonCol->Get_NumMeshes();
 		nonCol->Bind_StencilRimLightMotionBlur(pNonAnimShader, vecStrings);
 		if (FAILED(nonCol->Bind_WorldMatrixForOctree(pNonAnimShader)))
@@ -636,6 +638,8 @@ void COcTree::RenderAll(CGameInstance* pGameInstance, CShader* pMapShader, CShad
 		if (nullptr == colNonAnim)
 			continue;
 
+		//colNonAnim->AddBlendObjectToRenderGroup();
+
 		_uint iNumMeshes = colNonAnim->Get_NumMeshes();
 		colNonAnim->Bind_StencilRimLightMotionBlur(pNonAnimShader, vecStrings);
 		if (FAILED(colNonAnim->Bind_WorldMatrixForOctree(pNonAnimShader)))
@@ -657,7 +661,7 @@ void COcTree::RenderAll(CGameInstance* pGameInstance, CShader* pMapShader, CShad
 
 	for (auto& colAnim : m_vecColAnims)
 	{
-		if (nullptr == colAnim)
+		if (nullptr == colAnim || true == colAnim->IsHidden())
 			continue;
 
 		_uint iNumMeshes = colAnim->Get_NumMeshes();
@@ -710,6 +714,8 @@ void COcTree::RenderMyMesh(CGameInstance* pGameInstance, CShader* pMapShader, CS
 		if (nullptr == myNonCol)
 			continue;
 
+		//myNonCol->AddBlendObjectToRenderGroup();
+
 		_uint iNumMeshes = myNonCol->Get_NumMeshes();
 		myNonCol->Bind_StencilRimLightMotionBlur(pNonAnimShader, vecStrings);
 		if (FAILED(myNonCol->Bind_WorldMatrixForOctree(pNonAnimShader)))
@@ -734,6 +740,8 @@ void COcTree::RenderMyMesh(CGameInstance* pGameInstance, CShader* pMapShader, CS
 		if (nullptr == myColNonAnim)
 			continue;
 
+		//myColNonAnim->AddBlendObjectToRenderGroup();
+
 		_uint iNumMeshes = myColNonAnim->Get_NumMeshes();
 		myColNonAnim->Bind_StencilRimLightMotionBlur(pNonAnimShader, vecStrings);
 		if (FAILED(myColNonAnim->Bind_WorldMatrixForOctree(pNonAnimShader)))
@@ -755,7 +763,7 @@ void COcTree::RenderMyMesh(CGameInstance* pGameInstance, CShader* pMapShader, CS
 
 	for (auto& myColAnim : m_vecMyColAnims)
 	{
-		if (nullptr == myColAnim)
+		if (nullptr == myColAnim || true == myColAnim->IsHidden())
 			continue;
 
 		_uint iNumMeshes = myColAnim->Get_NumMeshes();

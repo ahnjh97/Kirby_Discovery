@@ -33,7 +33,9 @@ HRESULT CEnergyDrink::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
-	//m_pTransformCom->Set_State(CTransform::STATE_POSITION, CUtils::Get_State_Vector_Matrix(GameObjectDesc.matWorld, CUtils::STATE_POSITION));
+	// FOR TEST. JYWI 240623
+	if (*m_pCurrentLevelID == LEVEL_PARTTIME)
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(0.f, 20.f, 5.f, 1.f));//CUtils::Get_State_Vector_Matrix(GameObjectDesc.matWorld, CUtils::STATE_POSITION));
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;
@@ -179,7 +181,16 @@ HRESULT CEnergyDrink::Render_LightDepth()
 #ifdef _DEBUG
 void CEnergyDrink::Render_IMGUI()
 {
-
+	if (ImGui::TreeNode("Guizmo"))
+	{
+		_float4x4 matWorld = m_pTransformCom->Get_WorldFloat4x4();
+		m_pGameInstance->EditTransform(matWorld);
+		m_pTransformCom->Set_WorldMatrix(matWorld);
+		ImGui::Separator(); ImGui::NewLine();
+		ImGui::TreePop();
+	}
+	ImGui::Separator(); ImGui::NewLine();
+	__super::Render_IMGUI();
 }
 #endif
 

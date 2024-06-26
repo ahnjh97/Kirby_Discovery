@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Camera_Main.h"
 #include "Kirby.h"
+#include "PartTimerKirby.h"
 
 CCamera_Main::CCamera_Main(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CCamera{ pDevice, pContext }
@@ -13,7 +14,7 @@ CCamera_Main::CCamera_Main(const CCamera_Main& rhs)
 }
 
 HRESULT CCamera_Main::Initialize_Prototype()
-{
+{ 
 	return S_OK;
 }
 
@@ -54,7 +55,7 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 	m_pTransformCom->Look_At(pCamDesc.vAt);
 
 	_float4 vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-	m_vDestCamDir = _float3{ 0.f, -.15f, 1.f };
+	m_vDestCamDir = _float3( vLook );
 	m_vDestCamDir.Normalize();
 	m_vCurCamDir = m_vDestCamDir;
 
@@ -307,8 +308,16 @@ void CCamera_Main::UpdatePos_FromAnchor(_float fTimeDelta)
 			+ m_pSecondTarget->Get_State(CTransform::STATE_POSITION)) * .5f;
 
 	//y 위치 보정
-	_float3 vTerrainPos = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0))->Compute_TerrainPosition();
-	vTargetPos.y = (vTargetPos.y + vTerrainPos.y) * .5f;
+	if (*m_pCurrentLevelID != LEVEL_PARTTIME)
+	{
+		_float3 vTerrainPos = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0))->Compute_TerrainPosition();
+		vTargetPos.y = (vTargetPos.y + vTerrainPos.y) * .5f;
+	}
+	else
+	{
+		_float3 vTerrainPos = static_cast<CPartTimerKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0))->Compute_TerrainPosition();
+		vTargetPos.y = (vTargetPos.y + vTerrainPos.y) * .5f;
+	}
 
 
 	//실제 타겟 위치에서 조금 위로 기준점 정하기

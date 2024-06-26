@@ -40,6 +40,7 @@ public:
 	void Color_Initialize();
 
 	HRESULT Add_RenderGroup(RENDERGROUP eRenderGroup, class CGameObject* pRenderObject);
+	HRESULT Add_BlendModel(class CModel* pBlendModel);
 	HRESULT Render(_float fTimeDelta);
 
 	void Set_RenderMode(RENDER_MODE eMode) {
@@ -93,9 +94,7 @@ public:
 		m_vShadowFocusPos = vFocusPos;
 	}
 
-	void Set_BlackBackGround(_bool bSet) {
-		m_bBlackBackground = bSet;
-	}
+	void Set_BlackBackGround(_bool bSet) {	m_bBlackBackground = bSet; }
 
 	// 환경설정 업데이트
 	void Update_Option(OPTION Option, _bool bOn);
@@ -113,7 +112,7 @@ private:
 	ID3D11DeviceContext* m_pContext = { nullptr };
 	class CGameInstance* m_pGameInstance = { nullptr };
 	list<class CGameObject*>			m_RenderObjects[RENDER_END];
-
+	list<class CModel*>					m_BlendModelsList;
 
 
 private:

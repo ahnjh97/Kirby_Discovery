@@ -222,6 +222,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 hr = pMainApp->Open_Level(LEVEL_GAMEPLAY);
                 CHECK_FAILED(hr);
             }
+            break;
             case TOOL_FX:
             {
                 HRESULT hr;
@@ -266,10 +267,26 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 break;
             }
             break;
+            case DEEDEEDEE:
+            {
+                HRESULT hr;
+                hr = pMainApp->Open_Level(LEVEL_DEEDEEDEE);
+                CHECK_FAILED(hr);
+                break;
+            }
+            break;
             case TOWN:
             {
                 HRESULT hr;
                 hr = pMainApp->Open_Level(LEVEL_TOWN);
+                CHECK_FAILED(hr);
+                break;
+            }
+            break;
+            case PARTTIME:
+            {
+                HRESULT hr;
+                hr = pMainApp->Open_Level(LEVEL_PARTTIME);
                 CHECK_FAILED(hr);
                 break;
             }

@@ -6,6 +6,8 @@
 #include "Camera_Main.h"
 #include "Kirby.h"
 #include "Monster.h"
+#include "AnimDeco.h"
+#include "DeeDeeDee.h"
 
 #include "HUD_StarPoint.h"
 #include "Kirby_State_Function.h"
@@ -29,362 +31,22 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 	// 게임 흐름에 있어서 필요한 슬로우 모션을 충돌에 따라 이곳에서 관리한다.
 	Timer_System(fTimeDelta);
 
+
 	// 게임 흐름에 있어서 필요한 사다리 등 충돌에 따라 Kirby가 작동하도록 이곳에서 관리한다.
 	Ladder_Collider();
 
 
-	// 깔끔하게 완료되었음 : 플레이어 X 몬스터
-	Collision_Collider(m_GameObjects[PLAYER], m_GameObjects[MONSTER], this,
-		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
-		{
-			CGameObject* Dst = DstHit->Get_Owner();
-			CGameObject* Src = SrcHit->Get_Owner();
-			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
-				return;
+	// 몸통 박치기 및 몸끼리으로 상호작용하는 콜리전 검사 진행. (보스 제외)
+	Body_To_Body_Collision();
 
-			CKirby* pKirby = static_cast<CKirby*>(Dst);
-			CMonster* pMonster = static_cast<CMonster*>(Src);
 
-			// 무적상태인가?
-			if (pMonster->Get_MonsterOverPower() == true)
-				return;
-			// 플레이어가 공격중인가? (공격중이라면 몸박치기로 데미지가 닳을 시, 근거리 공격이 너무 고통스럽다.)
-			if (pKirby->Is_Attacking() == true)
-				return;
-			
-			// 몬스터가 일반적인 상황일때만, 서로 데미지가 계산된다.
-			if (pMonster->Get_PhyXState() == PO_NORMAL)
-			{
-				if (pKirby->Get_KirbyInfo()->m_bBooster == true)
-				{
-					pMonster->Set_PhyXState(PO_PRESSED);
-					pKirby->Set_HitStop();
-					pMonster->Set_Damage_Delay(10.f);
-					pthis->Camera_Shaking(1.2f);
-					return;
-				}
+	// 히트박스 또는 불릿(투사체) 관련 상호작용 콜리전 검사 진행. (보스 제외)
+	Hitbox_Collision();
 
-				// 커비가 혹시 닷지를 하였는가? 만약 닷지를 했다면 충돌이 발생하지않는다.
-				if (pthis->Kirby_Dodge_SlowMotionSystem(pKirby) == true)
-					return;
-			
-				// 몬스터의 상태가 평범하며, 닷지를 안 했을 때, 서로 넉백과 데미지가 발생한다.
-				pthis->Player_Monster_Knock_back(pKirby, pMonster);
-				pthis->Compute_Damage(pKirby, pMonster);
-				// 몬스터에게 부여되는 무적시간이다. (기본적으로 히트박스는 0.1초의 딜레이를 갖지만 몸통박치기는 2초의 딜레이가 필요할것이다)
-				pMonster->Set_Damage_Delay(1.f);
-				DstHit->Set_Alive(false);
-				SrcHit->Set_Alive(false);
-			}
-			
-			// 몸끼리 충돌했을 때, 세부적인건 각 객체에서 정의된다.
-			// 커비는 흡수했을때도 몸 충돌, 들고 있을때도 몸 충돌이다. 즉, 내부에서 예외처리가 잘 되어있는 것이다.
-			pKirby->Collision(CONTENT_BODY, pMonster);
-			pMonster->Collision(CONTENT_BODY, pKirby);
-		});
 
-	// 깔끔하게 완료되었음 : 몬스터 X 몬스터 (커비가 날릴때의 충돌)
-	Collision_Collider(m_GameObjects[MONSTER], m_GameObjects[MONSTER], this,
-		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
-		{
-			CGameObject* Dst = DstHit->Get_Owner();
-			CGameObject* Src = SrcHit->Get_Owner();
-			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
-				return;
+	// 디디디와 싸우는 특수한 충돌로직들 모아두었습니다.
+	DeeDeeDee_Battle();
 
-			CMonster* pDstMonster = static_cast<CMonster*>(Dst);
-			CMonster* pSrcMonster = static_cast<CMonster*>(Src);
-
-			// 몬스터 둘 중 하나라도 날아가는 놈이였다면???
-			if (pDstMonster->Get_PhyXState() == PO_FLYAWAY ||
-				pSrcMonster->Get_PhyXState() == PO_FLYAWAY)
-			{
-				// 세부적인건 해당 CONTENT에서 한다.
-				pDstMonster->Collision(CONTENT_VACUUMOBJECT, pSrcMonster);
-				pSrcMonster->Collision(CONTENT_VACUUMOBJECT, pDstMonster);
-
-				// 각자의 상태를 PO_FLYDEADAWAY 로 바꿔줌과 동시에 죽는 방향과 힘을 정해준다.
-				pthis->Fly_DeadAway(pDstMonster, pSrcMonster);
-				// 카메라 쉐이킹을 해준다.
-				pthis->Camera_Shaking(1.2f);
-
-				// 0.1초의 콜라이더 딜레이를 넣어준다.
-				DstHit->Set_Alive(false);
-				SrcHit->Set_Alive(false);
-			}
-
-			});
-
-	// 깔끔하게 완료되었음 : 오브젝트 X 몬스터 (커비가 날릴때의 충돌)
-	Collision_Collider(m_GameObjects[OBJECT], m_GameObjects[MONSTER], this,
-		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
-		{
-			CGameObject* Dst = DstHit->Get_Owner();
-			CGameObject* Src = SrcHit->Get_Owner();
-			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
-				return;
-
-			CPhysXObject* pDstObject = static_cast<CMonster*>(Dst);
-			CMonster* pSrcMonster = static_cast<CMonster*>(Src);
-
-			// 반드시, 오브젝트가 날아가는 상황이여야 한다.
-			if (pDstObject->Get_PhyXState() == PO_FLYAWAY)
-			{
-				// 세부적인건 해당 CONTENT에서 한다.
-				pDstObject->Collision(CONTENT_VACUUMOBJECT, pSrcMonster);
-				pSrcMonster->Collision(CONTENT_VACUUMOBJECT, pDstObject);
-
-				// 각자의 상태를 PO_FLYDEADAWAY 로 바꿔줌과 동시에 죽는 방향과 힘을 정해준다.
-				pthis->Fly_DeadAway(pDstObject, pSrcMonster);
-				// 카메라 쉐이킹을 해준다.
-				pthis->Camera_Shaking(1.2f);
-
-				// 0.1초의 콜라이더 딜레이를 넣어준다.
-				DstHit->Set_Alive(false);
-				SrcHit->Set_Alive(false);
-			}
-		});
-
-	// 덜 완료되었음. 다양한 분기 필요 80%
-	Collision_Collider(m_GameObjects[HITBOX_PLYAER], m_GameObjects[MONSTER], this,
-		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
-		{
-			CGameObject* Dst = DstHit->Get_Owner();
-			CGameObject* Src = SrcHit->Get_Owner();
-			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
-				return;
-
-			CKirby* pKirby = static_cast<CKirby*>(Dst);
-			CPhysXObject* pMonster = static_cast<CPhysXObject*>(Src);
-
-			// 혹시 몬스터가 무적상태인가?
-			if (static_cast<CMonster*>(pMonster)->Get_MonsterOverPower() == true)
-				return;
-									
-			// 넉백방향을 정해주기 위한 과정이다.
-			CTransform* pPlayerTransform = pKirby->Get_TransformCom();
-			_vector vPos = pPlayerTransform->Get_State_Vector(CTransform::STATE_POSITION);
-			CTransform* pMonsterTransform = pMonster->Get_TransformCom();
-			_vector vMonsterPos = pMonsterTransform->Get_State_Vector(CTransform::STATE_POSITION);
-			_float4 vDistance = vMonsterPos - vPos;
-			vDistance.y = 0.f;
-			vDistance.Normalize();
-			_vector vPlayerKnockbackDir = vDistance;
-			
-
-			// 만약, 작은 넉백이였을 경우
-			if (pthis->Small_KnockBack(pKirby->Get_State()))
-			{
-				// 넉백의 2차원 방향 (y축없는) 과 뜨는 힘을 정해준다.
-				pthis->Knock_back(pMonster, vPlayerKnockbackDir * 1.3f, 5.f);
-			}
-			// 만약, 적당한 넉백이였을 경우
-			else if (pthis->Normal_KnockBack(pKirby->Get_State()))
-			{
-				// 넉백의 2차원 방향 (y축없는) 과 뜨는 힘을 정해준다.
-				pthis->Knock_back(pMonster, vPlayerKnockbackDir * 1.5f, 8.f);
-			}
-			// 위로 뜨는 공격이였을 경우.
-			else if (pthis->Up_KnockBack(pKirby->Get_State()))
-			{
-				// 넉백의 2차원 방향 (y축없는) 과 뜨는 힘을 정해준다.
-				pthis->Knock_back(pMonster, vPlayerKnockbackDir * 0.5f, 13.f);
-			}
-			// 아예 날아가는 공격이였을 경우.
-			else if (pthis->FlyAway_KnockBack(pKirby->Get_State()))
-			{
-				// 넉백의 2차원 방향 (y축없는) 과 뜨는 힘을 정해준다.
-				pthis->Knock_back(pMonster, vPlayerKnockbackDir * 4.f, 20.f);
-			}
-			
-			// 몬스터의 CONTENT_ATTACK타입의 Collision함수를 발동시킨다. 정말 세부적인건 이쪽에서 처리된다.
-			pMonster->Collision(CONTENT_ATTACK, pKirby);
-
-			// 데미지 공식과 이펙트, 쉐이킹, 히트스탑 등 시스템적인 요소들이 잔뜩 들어가있다.
-			pthis->Damage_And_Effect_For_Monster(pKirby, pMonster);
-			DstHit->Set_Alive(false);
-		});
-
-	// 미 구현
-	Collision_Collider(m_GameObjects[HITBOX_MONSTER], m_GameObjects[PLAYER], this,
-		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
-		{
-			CGameObject* Dst = DstHit->Get_Owner();
-			CGameObject* Src = SrcHit->Get_Owner();
-			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
-				return;
-
-		});
-
-	// 깔끔하게 완료되었음 : 플레이어 X 아이템
-	Collision_Collider(m_GameObjects[PLAYER], m_GameObjects[ITEM], this,
-		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
-		{
-			CGameObject* Dst = DstHit->Get_Owner();
-			CGameObject* Src = SrcHit->Get_Owner();
-			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
-				return;
-
-			CKirby* pKirby = static_cast<CKirby*>(Dst);
-			CItemObject* pItem = static_cast<CItemObject*>(Src);
-			
-			// 아이템이 이미 충돌이 완료된 상태라면?
-			if (pItem->Get_ItemCollisionComplete() == true)
-				return;
-			
-			// 이곳에서 ItemCollisionComplete 라는 불 변수가 작동할 것이다. 세부적인거 포함해서 각자 아이템에서 구현중.
-			pItem->Collision(CONTENT_ITEM, pKirby);
-			
-			// 아이템 타입에 따라, 플레이어와 상호작용한다.
-			switch(pItem->Get_ItemType())
-			{
-			case CItemObject::ITEM_FOOD:
-				pthis->Compute_Heal(pKirby, pItem);
-				break;
-			case CItemObject::ITEM_COIN:
-				pthis->Compute_Coin(pKirby, pItem);
-				break;
-			case CItemObject::ITEM_SUPERPOWER:
-				pthis->Compute_SuperPower(pKirby, pItem);
-				break;
-			}
-		});
-
-	// 깔끔하게 완료되었음 : 플레이어 X 오브젝트류 (발로 차기 및 흡수 로직)
-	Collision_Collider(m_GameObjects[PLAYER], m_GameObjects[OBJECT], this,
-		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
-		{
-			CGameObject* Dst = DstHit->Get_Owner();
-			CGameObject* Src = SrcHit->Get_Owner();
-			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
-				return;
-
-			CKirby* pKirby = static_cast<CKirby*>(Dst);
-			CPhysXObject* pObject = static_cast<CPhysXObject*>(Src);
-
-			// 돌덩이에게 물리적인 힘을 주는 것이 구현되어있을 것이다.
-			// 또는 내가 흡수했을때도 먹는 로직이 되어있을듯 함.
-			pObject->Collision(CONTENT_KICK, pKirby);
-			pKirby->Collision(CONTENT_KICK, pObject);
-			// 0.1초의 충돌 딜레이를 주기위함.
-			SrcHit->Set_Alive(false);
-		});
-
-	// 깔끔하게 완료되었음
-	Collision_Collider(m_GameObjects[PLAYERBULLET], m_GameObjects[PLAYERBULLET], this,
-		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
-		{
-			CGameObject* Dst = DstHit->Get_Owner();
-			CGameObject* Src = SrcHit->Get_Owner();
-			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
-				return;
-
-			Dst->Set_Dead();
-			Src->Set_Dead();
-
-		});
-
-	Collision_Collider(m_GameObjects[PLAYERBULLET], m_GameObjects[MONSTER], this,
-		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
-		{
-			CGameObject* Dst = DstHit->Get_Owner();
-			CGameObject* Src = SrcHit->Get_Owner();
-			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
-				return;
-
-			CPhysXObject* pDst = static_cast<CPhysXObject*>(Dst);
-			CMonster* pMonster = static_cast<CMonster*>(Src);
-
-			// 넉백방향을 정해주기 위한 과정이다.
-			CTransform* pBulletTransform = Dst->Get_TransformCom();
-			_vector vBulletPos = pBulletTransform->Get_State_Vector(CTransform::STATE_POSITION);
-			CTransform* pMonsterTransform = pMonster->Get_TransformCom();
-			_vector vMonsterPos = pMonsterTransform->Get_State_Vector(CTransform::STATE_POSITION);
-			_float4 vDistance = vMonsterPos - vBulletPos;
-			vDistance.y = 0.f;
-			vDistance.Normalize();
-			_vector vKnockbackDir = vDistance;
-
-			// 넉백의 2차원 방향 (y축없는) 과 뜨는 힘을 정해준다.
-			pthis->Knock_back(pMonster, vKnockbackDir * 1.3f, 5.f);
-			// 몬스터의 CONTENT_ATTACK타입의 Collision함수를 발동시킨다. 정말 세부적인건 이쪽에서 처리된다.
-			pMonster->Collision(CONTENT_ATTACK, pDst);
-
-			_float fAttack = pDst->Get_Attack();
-			pMonster->Minus_Hp(fAttack);
-
-			DstHit->Set_Alive(false);
-			SrcHit->Set_Alive(false);
-			Dst->Set_Dead();
-		});
-
-	Collision_Collider(m_GameObjects[MONSTERBULLET], m_GameObjects[PLAYER], this,
-		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
-		{
-			CGameObject* Dst = DstHit->Get_Owner();
-			CGameObject* Src = SrcHit->Get_Owner();
-			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
-				return;
-
-			CPhysXObject* pMonsterBullet = static_cast<CPhysXObject*>(Dst);
-			CKirby* pKirby = static_cast<CKirby*>(Src);
-
-			// 커비가 혹시 닷지를 하였는가? 만약 닷지를 했다면 충돌이 발생하지않는다.
-			if (pthis->Kirby_Dodge_SlowMotionSystem(pKirby) == true)
-			{
-				DstHit->Set_Alive(false);
-				SrcHit->Set_Alive(false);
-				return;
-			}
-
-			if (pMonsterBullet->Get_PhyXState() == PO_NORMAL)
-			{
-				// 불릿이 PO_NORMAL (평범한 상태) 였을땐, 커비가 넉백되며 다친다. 또한, 폭탄은 터진다.
-				pthis->Player_Monster_Knock_back(pKirby, pMonsterBullet);
-				_float fAttack = pMonsterBullet->Get_Attack();
-				pKirby->Minus_Hp(fAttack);
-				Dst->Set_Dead();
-				DstHit->Set_Alive(false);
-				SrcHit->Set_Alive(false);
-			}
-
-			// 커비의 충돌로직은 항상 발동한다. 만약, 폭탄이 PO_VACUUM일땐 서로 충돌은 나지만, 먹을 수 있는 상황이라면
-			// 별도의 충돌로직이 발생할 것이다.
-			pKirby->Collision(CONTENT_ATTACK, pMonsterBullet);
-		});
-
-	// 깔끔하게 완료되었음 : 플레이어 X 어빌리티아이템
-	Collision_Collider(m_GameObjects[PLAYER], m_GameObjects[ABILITYITEM], this,
-		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
-		{
-			CGameObject* Dst = DstHit->Get_Owner();
-			CGameObject* Src = SrcHit->Get_Owner();
-			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
-				return;
-
-			CKirby* pKirby = static_cast<CKirby*>(Dst);
-			CPhysXObject* pAbility = static_cast<CPhysXObject*>(Src);
-
-			if (pAbility->Get_PhyXState() != PO_VACUUMING)
-				return;
-
-			// 커비는 이 친구와 충돌하면 바로 능력을 먹을듯 하다.
-			pKirby->Collision(CONTENT_BODY, pAbility);
-		});
-
-	Collision_Collider(m_GameObjects[PLAYER], m_GameObjects[NPC], this,
-		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
-		{
-			CGameObject* Dst = DstHit->Get_Owner();
-			CGameObject* Src = SrcHit->Get_Owner();
-			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
-				return;
-
-			CKirby* pKirby = static_cast<CKirby*>(Dst);
-			CPhysXObject* pNPC = static_cast<CPhysXObject*>(Src);
-			pNPC->Collision(CONTENT_INTERACT, pKirby);
-
-		});
 
 
 	for (auto& ObjectVector : m_GameObjects)
@@ -768,6 +430,457 @@ void CCollisionCenter::Ladder_Collider()
 	m_Ladders.clear();
 }
 
+void CCollisionCenter::DeeDeeDee_Battle()
+{
+
+	// 플레이어와 보스몬스터 몸박 (특정 상황일때만, 디디디로부터 피해를 받는다.)
+	Collision_Collider(m_GameObjects[PLAYER], m_GameObjects[BOSS_DEEDEEDEE], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+		});
+
+	Collision_Collider(m_GameObjects[NPC], m_GameObjects[BOSS_DEEDEEDEE], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+
+
+		});
+
+
+
+	// 플레이어 공격에 대한 처리.
+	Collision_Collider(m_GameObjects[HITBOX_PLYAER], m_GameObjects[BOSS_DEEDEEDEE], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+		});
+
+	Collision_Collider(m_GameObjects[HITBOX_MONSTER], m_GameObjects[NPC], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+		});
+
+
+
+}
+
+void CCollisionCenter::Body_To_Body_Collision()
+{
+	// 깔끔하게 완료되었음 : 플레이어 X 몬스터
+	Collision_Collider(m_GameObjects[PLAYER], m_GameObjects[MONSTER], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CKirby* pKirby = static_cast<CKirby*>(Dst);
+			CMonster* pMonster = static_cast<CMonster*>(Src);
+
+			// 무적상태인가?
+			if (pMonster->Get_MonsterOverPower() == true)
+				return;
+			// 플레이어가 공격중인가? (공격중이라면 몸박치기로 데미지가 닳을 시, 근거리 공격이 너무 고통스럽다.)
+			if (pKirby->Is_Attacking() == true)
+				return;
+
+			if (pMonster->Get_PhyXState() == PO_PRESSED)
+				return;
+
+			// 몬스터가 일반적인 상황일때만, 서로 데미지가 계산된다.
+			if (pMonster->Get_PhyXState() == PO_NORMAL)
+			{
+				if (pKirby->Get_KirbyInfo()->m_bBooster == true)
+				{
+					pMonster->Set_PhyXState(PO_PRESSED);
+					pKirby->Set_HitStop();
+					pthis->Camera_Shaking(1.2f);
+					return;
+				}
+
+				// 커비가 혹시 닷지를 하였는가? 만약 닷지를 했다면 충돌이 발생하지않는다.
+				if (pthis->Kirby_Dodge_SlowMotionSystem(pKirby) == true)
+					return;
+
+				// 몬스터의 상태가 평범하며, 닷지를 안 했을 때, 서로 넉백과 데미지가 발생한다.
+				pthis->Player_Monster_Knock_back(pKirby, pMonster);
+				pthis->Compute_Damage(pKirby, pMonster);
+				// 몬스터에게 부여되는 무적시간이다. (기본적으로 히트박스는 0.1초의 딜레이를 갖지만 몸통박치기는 2초의 딜레이가 필요할것이다)
+				pMonster->Set_Damage_Delay(1.f);
+				DstHit->Set_Alive(false);
+				SrcHit->Set_Alive(false);
+			}
+
+			// 몸끼리 충돌했을 때, 세부적인건 각 객체에서 정의된다.
+			// 커비는 흡수했을때도 몸 충돌, 들고 있을때도 몸 충돌이다. 즉, 내부에서 예외처리가 잘 되어있는 것이다.
+			pKirby->Collision(CONTENT_BODY, pMonster);
+			pMonster->Collision(CONTENT_BODY, pKirby);
+		});
+
+	// 깔끔하게 완료되었음 : 몬스터 X 몬스터 (커비가 날릴때의 충돌)
+	Collision_Collider(m_GameObjects[MONSTER], m_GameObjects[MONSTER], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CMonster* pDstMonster = static_cast<CMonster*>(Dst);
+			CMonster* pSrcMonster = static_cast<CMonster*>(Src);
+
+			// 몬스터 둘 중 하나라도 날아가는 놈이였다면???
+			if (pDstMonster->Get_PhyXState() == PO_FLYAWAY ||
+				pSrcMonster->Get_PhyXState() == PO_FLYAWAY)
+			{
+				// 세부적인건 해당 CONTENT에서 한다.
+				pDstMonster->Collision(CONTENT_VACUUMOBJECT, pSrcMonster);
+				pSrcMonster->Collision(CONTENT_VACUUMOBJECT, pDstMonster);
+
+				// 각자의 상태를 PO_FLYDEADAWAY 로 바꿔줌과 동시에 죽는 방향과 힘을 정해준다.
+				pthis->Fly_DeadAway(pDstMonster, pSrcMonster);
+				// 카메라 쉐이킹을 해준다.
+				pthis->Camera_Shaking(1.2f);
+
+				// 0.1초의 콜라이더 딜레이를 넣어준다.
+				DstHit->Set_Alive(false);
+				SrcHit->Set_Alive(false);
+			}
+
+		});
+
+	// 깔끔하게 완료되었음 : 오브젝트 X 몬스터 (커비가 날릴때의 충돌)
+	Collision_Collider(m_GameObjects[OBJECT], m_GameObjects[MONSTER], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CPhysXObject* pDstObject = static_cast<CMonster*>(Dst);
+			CMonster* pSrcMonster = static_cast<CMonster*>(Src);
+
+			// 반드시, 오브젝트가 날아가는 상황이여야 한다.
+			if (pDstObject->Get_PhyXState() == PO_FLYAWAY)
+			{
+				// 세부적인건 해당 CONTENT에서 한다.
+				pDstObject->Collision(CONTENT_VACUUMOBJECT, pSrcMonster);
+				pSrcMonster->Collision(CONTENT_VACUUMOBJECT, pDstObject);
+
+				// 각자의 상태를 PO_FLYDEADAWAY 로 바꿔줌과 동시에 죽는 방향과 힘을 정해준다.
+				pthis->Fly_DeadAway(pDstObject, pSrcMonster);
+				// 카메라 쉐이킹을 해준다.
+				pthis->Camera_Shaking(1.2f);
+
+				// 0.1초의 콜라이더 딜레이를 넣어준다.
+				DstHit->Set_Alive(false);
+				SrcHit->Set_Alive(false);
+			}
+		});
+
+	// 깔끔하게 완료되었음 : 플레이어 X 아이템
+	Collision_Collider(m_GameObjects[PLAYER], m_GameObjects[ITEM], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CKirby* pKirby = static_cast<CKirby*>(Dst);
+			CItemObject* pItem = static_cast<CItemObject*>(Src);
+
+			// 아이템이 이미 충돌이 완료된 상태라면?
+			if (pItem->Get_ItemCollisionComplete() == true)
+				return;
+
+			// 이곳에서 ItemCollisionComplete 라는 불 변수가 작동할 것이다. 세부적인거 포함해서 각자 아이템에서 구현중.
+			pItem->Collision(CONTENT_ITEM, pKirby);
+
+			// 아이템 타입에 따라, 플레이어와 상호작용한다.
+			switch (pItem->Get_ItemType())
+			{
+			case CItemObject::ITEM_FOOD:
+				pthis->Compute_Heal(pKirby, pItem);
+				break;
+			case CItemObject::ITEM_COIN:
+				pthis->Compute_Coin(pKirby, pItem);
+				break;
+			case CItemObject::ITEM_SUPERPOWER:
+				pthis->Compute_SuperPower(pKirby, pItem);
+				break;
+			}
+		});
+
+	// 깔끔하게 완료되었음 : 플레이어 X 오브젝트류 (발로 차기 및 흡수 로직)
+	Collision_Collider(m_GameObjects[PLAYER], m_GameObjects[OBJECT], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CKirby* pKirby = static_cast<CKirby*>(Dst);
+			CPhysXObject* pObject = static_cast<CPhysXObject*>(Src);
+
+			// 돌덩이에게 물리적인 힘을 주는 것이 구현되어있을 것이다.
+			// 또는 내가 흡수했을때도 먹는 로직이 되어있을듯 함.
+			pObject->Collision(CONTENT_KICK, pKirby);
+			pKirby->Collision(CONTENT_KICK, pObject);
+			// 0.1초의 충돌 딜레이를 주기위함.
+			SrcHit->Set_Alive(false);
+		});
+
+	// 깔끔하게 완료되었음 : 플레이어 X 어빌리티아이템
+	Collision_Collider(m_GameObjects[PLAYER], m_GameObjects[ABILITYITEM], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CKirby* pKirby = static_cast<CKirby*>(Dst);
+			CPhysXObject* pAbility = static_cast<CPhysXObject*>(Src);
+
+			if (pAbility->Get_PhyXState() != PO_VACUUMING)
+				return;
+
+			// 커비는 이 친구와 충돌하면 바로 능력을 먹을듯 하다.
+			pKirby->Collision(CONTENT_BODY, pAbility);
+		});
+
+	// 깔끔하게 완료되었음 : 플레이어 X 형 변환
+	Collision_Collider(m_GameObjects[PLAYER], m_GameObjects[DEFORMOBJECT], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CKirby* pKirby = static_cast<CKirby*>(Dst);
+			CPhysXObject* pDeform = static_cast<CPhysXObject*>(Src);
+
+			pKirby->Collision(CONTENT_DEFORM, pDeform);
+			pKirby->Get_KirbyInfo()->m_bBlockOtherVacuum = true;
+		});
+
+
+	Collision_Collider(m_GameObjects[PLAYER], m_GameObjects[NPC], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CKirby* pKirby = static_cast<CKirby*>(Dst);
+			CPhysXObject* pNPC = static_cast<CPhysXObject*>(Src);
+			pNPC->Collision(CONTENT_INTERACT, pKirby);
+
+		});
+}
+
+void CCollisionCenter::Hitbox_Collision()
+{
+	// 덜 완료되었음. 다양한 분기 필요 80%
+	Collision_Collider(m_GameObjects[HITBOX_PLYAER], m_GameObjects[MONSTER], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CKirby* pKirby = static_cast<CKirby*>(Dst);
+			CPhysXObject* pMonster = static_cast<CPhysXObject*>(Src);
+
+			// 혹시 몬스터가 무적상태인가?
+			if (static_cast<CMonster*>(pMonster)->Get_MonsterOverPower() == true)
+				return;
+
+			// 넉백방향을 정해주기 위한 과정이다.
+			CTransform* pPlayerTransform = pKirby->Get_TransformCom();
+			_vector vPos = pPlayerTransform->Get_State_Vector(CTransform::STATE_POSITION);
+			CTransform* pMonsterTransform = pMonster->Get_TransformCom();
+			_vector vMonsterPos = pMonsterTransform->Get_State_Vector(CTransform::STATE_POSITION);
+			_float4 vDistance = vMonsterPos - vPos;
+			vDistance.y = 0.f;
+			vDistance.Normalize();
+			_vector vPlayerKnockbackDir = vDistance;
+
+
+			// 만약, 작은 넉백이였을 경우
+			if (pthis->Small_KnockBack(pKirby->Get_State()))
+			{
+				// 넉백의 2차원 방향 (y축없는) 과 뜨는 힘을 정해준다.
+				pthis->Knock_back(pMonster, vPlayerKnockbackDir * 1.3f, 5.f);
+			}
+			// 만약, 적당한 넉백이였을 경우
+			else if (pthis->Normal_KnockBack(pKirby->Get_State()))
+			{
+				// 넉백의 2차원 방향 (y축없는) 과 뜨는 힘을 정해준다.
+				pthis->Knock_back(pMonster, vPlayerKnockbackDir * 1.5f, 8.f);
+			}
+			// 위로 뜨는 공격이였을 경우.
+			else if (pthis->Up_KnockBack(pKirby->Get_State()))
+			{
+				// 넉백의 2차원 방향 (y축없는) 과 뜨는 힘을 정해준다.
+				pthis->Knock_back(pMonster, vPlayerKnockbackDir * 0.5f, 13.f);
+			}
+			// 아예 날아가는 공격이였을 경우.
+			else if (pthis->FlyAway_KnockBack(pKirby->Get_State()))
+			{
+				// 넉백의 2차원 방향 (y축없는) 과 뜨는 힘을 정해준다.
+				pthis->Knock_back(pMonster, vPlayerKnockbackDir * 4.f, 20.f);
+			}
+
+			// 몬스터의 CONTENT_ATTACK타입의 Collision함수를 발동시킨다. 정말 세부적인건 이쪽에서 처리된다.
+			pMonster->Collision(CONTENT_ATTACK, pKirby);
+
+			// 데미지 공식과 이펙트, 쉐이킹, 히트스탑 등 시스템적인 요소들이 잔뜩 들어가있다.
+			pthis->Damage_And_Effect_For_Monster(pKirby, pMonster);
+			DstHit->Set_Alive(false);
+		});
+
+	// 미 구현
+	Collision_Collider(m_GameObjects[HITBOX_MONSTER], m_GameObjects[PLAYER], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+		});
+
+	// 깔끔하게 완료되었음
+	Collision_Collider(m_GameObjects[PLAYERBULLET], m_GameObjects[PLAYERBULLET], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			Dst->Set_Dead();
+			Src->Set_Dead();
+
+		});
+
+
+	Collision_Collider(m_GameObjects[PLAYERBULLET], m_GameObjects[MONSTER], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CPhysXObject* pDst = static_cast<CPhysXObject*>(Dst);
+			CMonster* pMonster = static_cast<CMonster*>(Src);
+
+			// 넉백방향을 정해주기 위한 과정이다.
+			CTransform* pBulletTransform = Dst->Get_TransformCom();
+			_vector vBulletPos = pBulletTransform->Get_State_Vector(CTransform::STATE_POSITION);
+			CTransform* pMonsterTransform = pMonster->Get_TransformCom();
+			_vector vMonsterPos = pMonsterTransform->Get_State_Vector(CTransform::STATE_POSITION);
+			_float4 vDistance = vMonsterPos - vBulletPos;
+			vDistance.y = 0.f;
+			vDistance.Normalize();
+			_vector vKnockbackDir = vDistance;
+
+			// 넉백의 2차원 방향 (y축없는) 과 뜨는 힘을 정해준다.
+			pthis->Knock_back(pMonster, vKnockbackDir * 1.3f, 5.f);
+			// 몬스터의 CONTENT_ATTACK타입의 Collision함수를 발동시킨다. 정말 세부적인건 이쪽에서 처리된다.
+			pMonster->Collision(CONTENT_ATTACK, pDst);
+
+			_float fAttack = pDst->Get_Attack();
+			pMonster->Minus_Hp(fAttack);
+
+			DstHit->Set_Alive(false);
+			SrcHit->Set_Alive(false);
+			Dst->Set_Dead();
+		});
+
+
+	Collision_Collider(m_GameObjects[MONSTERBULLET], m_GameObjects[PLAYER], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CPhysXObject* pMonsterBullet = static_cast<CPhysXObject*>(Dst);
+			CKirby* pKirby = static_cast<CKirby*>(Src);
+
+			// 커비가 혹시 닷지를 하였는가? 만약 닷지를 했다면 충돌이 발생하지않는다.
+			if (pthis->Kirby_Dodge_SlowMotionSystem(pKirby) == true)
+			{
+				DstHit->Set_Alive(false);
+				SrcHit->Set_Alive(false);
+				return;
+			}
+
+			if (pMonsterBullet->Get_PhyXState() == PO_NORMAL)
+			{
+				// 불릿이 PO_NORMAL (평범한 상태) 였을땐, 커비가 넉백되며 다친다. 또한, 폭탄은 터진다.
+				pthis->Player_Monster_Knock_back(pKirby, pMonsterBullet);
+				_float fAttack = pMonsterBullet->Get_Attack();
+				pKirby->Minus_Hp(fAttack);
+				Dst->Set_Dead();
+				DstHit->Set_Alive(false);
+				SrcHit->Set_Alive(false);
+			}
+
+			// 커비의 충돌로직은 항상 발동한다. 만약, 폭탄이 PO_VACUUM일땐 서로 충돌은 나지만, 먹을 수 있는 상황이라면
+			// 별도의 충돌로직이 발생할 것이다.
+			pKirby->Collision(CONTENT_ATTACK, pMonsterBullet);
+		});
+
+	// 풀 등과 플레이어
+	Collision_Collider(m_GameObjects[HITBOX_PLYAER], m_GameObjects[ANIMDECO], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CKirby* pKirby = static_cast<CKirby*>(Dst);
+			CAnimDeco* pAnimDeco = static_cast<CAnimDeco*>(Src);
+			if (true == pAnimDeco->IsHidden())
+				return;
+
+			pAnimDeco->HideModel();
+		});
+
+}
+
 _bool CCollisionCenter::Small_KnockBack(_uint uKirbyState)
 {
 	return uKirbyState == CKirby::SWORDSTATE_SIDESLASH ||
@@ -790,7 +903,6 @@ _bool CCollisionCenter::FlyAway_KnockBack(_uint uKirbyState)
 {
 	return false;
 }
-
 
 void CCollisionCenter::HitStop_Rogic(CKirby* pKirby)
 {

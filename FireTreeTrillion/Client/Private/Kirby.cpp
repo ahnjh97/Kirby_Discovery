@@ -15,6 +15,7 @@
 
 #include "KirbyWeapons.h"
 #include "KirbyArmours.h"
+#include "MultiEffect.h"
 
 #include "Utils.h"
 #include "Bone.h"
@@ -115,12 +116,13 @@ void CKirby::Late_Tick(_float fTimeDelta)
 			Glow->Late_Tick(fTimeDelta);
 	}
 
-	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
-	{
-		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND,	 this);
-		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW,		 this);
-		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_DEFERREDINFO, this);
-	}
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND,	 this);
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW,		 this);
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_DEFERREDINFO, this);
+
+	//if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
+	//{
+	//}
 }
 
 HRESULT CKirby::Render()
@@ -452,9 +454,77 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 
 			Delete_AllEffect();
 		}
+	}
+	// 일단, 넓은 범위일땐 무조건 충돌 할 것이다.
+	else if (eContent == CCollisionCenter::CONTENT_DEFORM)
+	{
+
+		if (pObject->Get_PhyXState() == PO_VACUUMING)
+		{
+			Change_State(CARVACUUMSTATE_DEFORM, 60.f, false, false, BODY_CARVACUUM, OFFSET_CARVACUUM);
+			INFO(m_pObject)->Set_Dead();
+			Safe_Release(INFO(m_pObject));
+			INFO(m_pObject) = nullptr;
+			INFO(m_bisDeforming) = false;
+			INFO(m_eEyeState) = EYE_IDLE;
+			CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
+			CTransform* pCameraTransform = pCamera->Get_TransformCom();
+			_float4 vCamRight = pCameraTransform->Get_State_Vector(CTransform::STATE_RIGHT);
+			_float4 vCamLook = XMVector3Cross(vCamRight, XMVectorSet(0.f, 1.f, 0.f, 1.f));
+			INFO(m_vTargetDir) = XMVector3Normalize(vCamLook + vCamRight) * -1.f;
+			Delete_AllEffect();
+		}
+		else if (pObject->Get_PhyXState() == PO_NORMAL)
+		{
+			// CollisionCenter 에서 흡수 가능을 판정을 내렸었다면, X키를 누르면 어떤 상태든 상관없이 흡수 할 수 있다.
+			if ((Get_State() == STATE_IDLE || 
+				Get_State() == STATE_RUN || 
+				Get_State() == SWORDSTATE_RUN || 
+				Get_State() == SWORDSTATE_WAIT) 
+				== false
+				)
+				return;
+
+			if (INFO(m_bisDeforming) == false && m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
+			{
+				if (INFO(m_pObject) != nullptr)
+					return;
+
+				CMultiEffect::MULTI_FX_DESC FXDesc{};
+				FXDesc.vInitPos = { 0.f, .6f, .4f };
+				FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Vacuum_v1"), &FXDesc)))
+					return;
+				Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+
+
+				_float4 vDeformPos = pObject->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
+				_float4 vMyPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+				_float4 vMyLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+				_float4 vDistance = vDeformPos - vMyPos;
+				vDistance.y = 0.f;
+				vDistance.Normalize();
+
+				_float fDegree = ToDegree(acos(vDistance.Dot(vMyLook)));
+
+				// 전방 90도가 아닐 경우
+				if (fDegree > 45.f)
+					return;
+
+				// Deforming을 트루로 만든다. 길게 애니메이션이 재생될 준비를 한다. 이건 밖에서 예외처리 될 것이다.
+				INFO(m_bisDeforming) = true;
+				INFO(m_vObjectScale) = pObject->Get_TransformCom()->Get_Scaled();
+				INFO(m_fObjectDistance) = (vDeformPos - vMyPos).Length();
+				INFO(m_pObject) = pObject;
+				Safe_AddRef(INFO(m_pObject));
+				// 커비가 동일한 애니메이션으로 몬스터를 포착해서 꽤 긴 시간동안 서로 짝짝꿍하겠다는 것이다.
+				INFO(m_pObject)->Set_PhyXState(PO_VACUUMING);
+				Change_State(CKirby::STATE_VACUUMHUSTLELV2, 50.f, true, true, CKirby::BODY_VACUUM);
+			}
+		}
+
 
 	}
-
 }
 
 _float3 CKirby::Make_RepulsiveDir(CPhysXObject* pObject)
@@ -675,6 +745,20 @@ void CKirby::Key_Input(_float fTimeDelta)
 	{
 		Change_State(CARVACUUMSTATE_DEFORM, 60.f, false, false, BODY_CARVACUUM, OFFSET_CARVACUUM);
 	}
+	if (m_pGameInstance->Get_DIKeyState(DIK_N, KEY_DOWN))
+	{
+		CGameObject::GAMEOBJECT_DESC ObjDesc{};
+
+		ObjDesc.fSpeedPerSec = 5.f;
+		ObjDesc.fRotationPerSec = ToRadian(90.f);
+		_float4x4 InitMat = _float4x4::Identity;
+		InitMat.Translation({ -50.f, 5.f, -6.5f });
+		ObjDesc.matWorld = InitMat;
+		ObjDesc.wstrModelName = TEXT("RockA");
+		// Car Test
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Rock"), TEXT("Prototype_GameObject_BreakableRock"), &ObjDesc)))
+			return;
+	}
 
 
 #pragma endregion
@@ -682,16 +766,13 @@ void CKirby::Key_Input(_float fTimeDelta)
 
 HRESULT CKirby::Make_TargetToCams()
 {
-
 	// 첫 카메라 기준으로 움직이기에 미리 받아둔다.
 	if (m_pCamera == nullptr)
 	{
 		//인트로, 게임플레이 스테이지라면 카메라로 main camera를 저장한다.
 		(LEVEL_INTRO <= *m_pCurrentLevelID && *m_pCurrentLevelID < LEVEL_END) ?
 			m_pCamera = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main"))) :
-
-			//나머지 레벨이라면 다른 카메라를 저장한다.
-			m_pCamera = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Free")));
+			m_pCamera = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Free"))); //나머지 레벨이라면 다른 카메라를 저장한다.
 
 		if (m_pCamera == nullptr)
 		{
@@ -710,6 +791,8 @@ HRESULT CKirby::Make_TargetToCams()
 		if (pCameraFree != nullptr)
 			pCameraFree->Set_Target(m_pTransformCom);
 	}
+
+	return S_OK;
 }
 
 HRESULT CKirby::Add_Components()
@@ -766,7 +849,7 @@ HRESULT CKirby::Add_Components()
 #pragma endregion
 
 #pragma region Kirby Eye
-	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_idle"),
+ 	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_idle"),
 		TEXT("Com_Texture_Eye_Idle"), (CComponent**)&m_pEyeTexture[EYE_IDLE]);
 	CHECK_FAILED(hr);
 	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_doubt"),
@@ -813,7 +896,7 @@ HRESULT CKirby::Add_Components()
 	desc.tCapsuleShape.fRadius = 0.4f;// 0.5f;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
-	//m_pControllerCom->Set_Object(this);
+	CHECK_FAILED(hr);
 
 	// FOR ANIMTOOL
 	m_ppModelForAnimTool = &m_pModelCom[BODY_DEFAULT];
@@ -860,7 +943,7 @@ HRESULT CKirby::Add_PartObjects()
 	HitBox.pCollisionType = HITBOX_PLYAER;
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
-	Activate_FrustumCollider(0.5f, 4.f, 90.f);
+	//Activate_FrustumCollider(0.5f, 4.f, 90.f);
 
 
 	return S_OK;
@@ -1173,6 +1256,33 @@ void CKirby::Update_PartObjectMatrix()
 	m_ArmourMatrix = *(m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("HatL")->Get_CombinedTransformationMatrix());
 }
 
+void CKirby::Bone_Rotation(_float fTimeDelta)
+{
+	// 자동차일때,
+	if (INFO(m_eBodyState) == BODY_CARDEFAULT)
+	{
+		_float fTurnAngle = -INFO(m_fMoveSpeed) * 100.f;
+
+		CBone* pBone = m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("L_BTireJ");
+		_float4x4* BoneMatrix = pBone->Get_EditMatrixPtr();
+		CUtils::Turn_OtherMatrix(*BoneMatrix, _float4(1.f, 0.f, 0.f, 0.f), fTimeDelta, fTurnAngle);
+
+		pBone = m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("L_FTireJ");
+		BoneMatrix = pBone->Get_EditMatrixPtr();
+		CUtils::Turn_OtherMatrix(*BoneMatrix, _float4(1.f, 0.f, 0.f, 0.f), fTimeDelta, fTurnAngle);
+
+		pBone = m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("R_BTireJ");
+		BoneMatrix = pBone->Get_EditMatrixPtr();
+		CUtils::Turn_OtherMatrix(*BoneMatrix, _float4(1.f, 0.f, 0.f, 0.f), fTimeDelta, fTurnAngle);
+
+		pBone = m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("R_FTireJ");
+		BoneMatrix = pBone->Get_EditMatrixPtr();
+		CUtils::Turn_OtherMatrix(*BoneMatrix, _float4(1.f, 0.f, 0.f, 0.f), fTimeDelta, fTurnAngle);
+	}
+
+
+}
+
 void CKirby::OverPower()
 {
 	if (m_fPreHp > m_fHp)
@@ -1340,9 +1450,14 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 	// 커비의 폭탄 궤적을 생성한다.
 	Update_BombOrbit(fTimeDelta);
 
+	// 특정 상황에서 뼈를 돌려준다.
+	Bone_Rotation(fTimeDelta);
+
 	// 사다리 상태 초기화
 	INFO(m_bCanLadder) = false;
 
+	// 블락 상태 초기화
+	INFO(m_bBlockOtherVacuum) = false;
 
 	// 커비가 공격중일땐, 꽤나 오랜 시간동안 무적을 부여받는다.
 	if (m_isKirbyAttacking == true)
@@ -1376,19 +1491,20 @@ HRESULT CKirby::Kirby_SystemInitialize()
 	// 파싱으로 레벨전환될때 HP와 COIN개수를 이동시킵니다.
 	CLevelChanger::LEVEL_DATA tLevelData = CLevelChanger::Get_Instance()->Load();
 	m_fHp = tLevelData.fKirbyHP;
-	m_uCoin = tLevelData.fKirbyCoin;
+	m_uCoin = (_uint)tLevelData.fKirbyCoin;
 	// m_eAbilityType = ;
 	// m_uWaddleDeeCount = ;
 	m_fAttack = 5.f; // 고정
 
 	// 게임을 새롭게 시작했을 경우, 리셋시칸다.
-	if (*m_pCurrentLevelID == LEVEL_INTRO)
-	{
+	//if (*m_pCurrentLevelID == LEVEL_INTRO)
+	//{
 		m_fHp = 100.f; // 기존 사용하던 HP입니다.
 		m_fMaxHp = 100.f;
 		m_eAbilityType = ABILITY_DEFAULT;
 		// m_uWaddleDeeCount = 0;
-	}
+	//}
+
 
 	// 폭탄 궤적을 만들어 놓는다.
 	Ready_BombOrbit();
@@ -1396,6 +1512,9 @@ HRESULT CKirby::Kirby_SystemInitialize()
 	Add_AnimEvent();
 	// 혹여나, 버그가 발생할까봐 확실하게 블러 true화
 	m_bMotionBlur = true;
+
+
+	return S_OK;
 }
 
 void CKirby::Kirby_LookInitialize()
@@ -1446,7 +1565,7 @@ CGameObject* CKirby::Clone(void* pArg)
 void CKirby::Free()
 {
 	CLevelChanger::LEVEL_DATA tLevelData = {};
-	tLevelData.fKirbyCoin = m_uCoin;
+	tLevelData.fKirbyCoin = (_float)m_uCoin;
 	tLevelData.fKirbyHP = m_fHp;
 	CLevelChanger::Get_Instance()->Save(tLevelData);
 

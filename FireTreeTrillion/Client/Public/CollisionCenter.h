@@ -19,6 +19,7 @@ public:
         CONTENT_ATTACK,         // 플레이어의 히트박스 X 몬스터
         CONTENT_DAMAGE,         // 몬스터와의 히트박스 X 플레이어
         //CONTENT_DAMAGEBULLET,   // 몹 불릿 X 플레이어
+        CONTENT_DEFORM,
 
         CONTENT_VACUUMOBJECT,   // 커비가 흡수 후 날리는 것들과의 충돌
 
@@ -48,8 +49,11 @@ private:
     void Collision_Collider(vector<CGameObject*> Dsts, vector<CGameObject*> Srcs, CCollisionCenter* pthis, 
         void(*func)(class CHitBox*, class CHitBox*, CCollisionCenter*));
     _bool Intersect(class CHitBox* Dst, class CHitBox* Src);
-
     void Ladder_Collider();
+
+    void DeeDeeDee_Battle();
+    void Body_To_Body_Collision();
+    void Hitbox_Collision();
 
     vector<CLadder*>                          m_Ladders;
     vector<CGameObject*>                      m_GameObjects[COLLISION_END];

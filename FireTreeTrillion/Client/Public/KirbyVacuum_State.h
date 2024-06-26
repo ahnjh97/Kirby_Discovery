@@ -80,7 +80,14 @@ public:
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
 	virtual void OnStateExit()		override;
 
-	_float fVacuumObjectSpeed = { 2.f };
+	_bool Turn_Deform(_float4& InterpolateDir, const _float4& TargetDir, CTransform* pDeformTransformCom, _float fTimeDelta);
+
+	_float m_fDeformObjectSpeed = { 0.f };
+	_float m_fVacuumObjectSpeed = { 2.f };
+	_bool  m_bDeformVacuumStart = { false };
+
+	_bool  m_bKirbyTurnDirTrigger = { true };
+	_float4 m_vLookDir = { 0.f, 0.f, 0.f, 0.f };
 public:
 	static	CKirbyVacuum_Vacuuming_State* Create();
 	virtual void						Free() override;

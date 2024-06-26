@@ -4,10 +4,44 @@
 
 BEGIN(Client)
 
+
+class CDee_State abstract : public CFSM_State
+{
+protected:
+	CDee_State();
+	virtual ~CDee_State() = default;
+
+	typedef struct
+	{
+		class CWaddleDee* pDee = {nullptr};
+		class CTransform* pTransformCom = { nullptr };
+		class CCharacterController* pController = { nullptr };
+
+		class CKirby* pKirby = { nullptr };
+		class CTransform* pKirbyTransformCom = { nullptr };
+
+		_float3 vMyPos;
+		_float3 vKirbyPos;
+
+		_float fDistance;
+
+	}BASE_INFO;
+
+	_float	m_fInteractActionTime = { 0.f };
+	_float	m_fDuration = { 0.f };
+
+	void Setup_BaseInfo(BASE_INFO& _baseInfo, CGameObject* pGameObject);
+	void System_Tick(_float fTimeDelta);
+
+public:
+	virtual void Free() override;
+};
+
+
 //*********************************
 //			IDLE STATE
 //*********************************
-class CDee_Idle_State final : public CFSM_State
+class CDee_Idle_State final : public CDee_State
 {
 private:
 	CDee_Idle_State();
@@ -20,20 +54,40 @@ public:
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
 	virtual void OnStateExit()														override;
 
-
 public:
 	static	CDee_Idle_State* Create();
 	virtual void Free() override;
 };
 
 //*********************************
-//			WALK STATE
+//			SIT STATE
 //*********************************
-class CDee_Walk_State final : public CFSM_State
+class CDee_Sit_State final : public CDee_State
 {
 private:
-	CDee_Walk_State();
-	virtual ~CDee_Walk_State() = default;
+	CDee_Sit_State();
+	virtual ~CDee_Sit_State() = default;
+
+public:
+	// 상태 진입했을 때 처음만 호출
+	virtual void OnStateEnter(class CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet) override;
+	// 상태 진입되어 있는 상태에서 매 tick마다 호출
+	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
+	virtual void OnStateExit()														override;
+
+public:
+	static	CDee_Sit_State* Create();
+	virtual void Free() override;
+};
+
+//*********************************
+//			MOVE STATE
+//*********************************
+class CDee_Move_State final : public CDee_State
+{
+private:
+	CDee_Move_State();
+	virtual ~CDee_Move_State() = default;
 
 public:
 	// 상태 진입했을 때 처음만 호출
@@ -44,14 +98,35 @@ public:
 
 
 public:
-	static	CDee_Walk_State* Create();
+	static	CDee_Move_State* Create();
+	virtual void Free() override;
+};
+
+//*********************************
+//			NPC STATE
+//*********************************
+class CDee_NPC_State final : public CDee_State
+{
+private:
+	CDee_NPC_State();
+	virtual ~CDee_NPC_State() = default;
+
+public:
+	// 상태 진입했을 때 처음만 호출
+	virtual void OnStateEnter(class CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet) override;
+	// 상태 진입되어 있는 상태에서 매 tick마다 호출
+	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
+	virtual void OnStateExit()														override;
+
+public:
+	static	CDee_NPC_State* Create();
 	virtual void Free() override;
 };
 
 //*********************************
 //			EMOTION STATE
 //*********************************
-class CDee_Emotion_State final : public CFSM_State
+class CDee_Emotion_State final : public CDee_State
 {
 private:
 	CDee_Emotion_State();
@@ -71,9 +146,31 @@ public:
 };
 
 //*********************************
+//			INTERACT STATE
+//*********************************
+class CDee_Interact_State final : public CDee_State
+{
+private:
+	CDee_Interact_State();
+	virtual ~CDee_Interact_State() = default;
+
+public:
+	// 상태 진입했을 때 처음만 호출
+	virtual void OnStateEnter(class CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet) override;
+	// 상태 진입되어 있는 상태에서 매 tick마다 호출
+	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
+	virtual void OnStateExit()														override;
+
+
+public:
+	static	CDee_Interact_State* Create();
+	virtual void Free() override;
+};
+
+//*********************************
 //			HUNGRY STATE
 //*********************************
-class CDee_Hungry_State final : public CFSM_State
+class CDee_Hungry_State final : public CDee_State
 {
 private:
 	CDee_Hungry_State();
@@ -86,6 +183,7 @@ public:
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
 	virtual void OnStateExit()														override;
 
+	_float	m_fStartMoveDelay = { 0.f };
 
 public:
 	static	CDee_Hungry_State* Create();
@@ -95,7 +193,7 @@ public:
 //*********************************
 //			STUN STATE
 //*********************************
-class CDee_Stun_State final : public CFSM_State
+class CDee_Stun_State final : public CDee_State
 {
 private:
 	CDee_Stun_State();
@@ -114,5 +212,25 @@ public:
 	virtual void Free() override;
 };
 
+//*********************************
+//			SLEEP STATE
+//*********************************
+class CDee_Sleep_State final : public CDee_State
+{
+private:
+	CDee_Sleep_State();
+	virtual ~CDee_Sleep_State() = default;
 
+public:
+	// 상태 진입했을 때 처음만 호출
+	virtual void OnStateEnter(class CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet) override;
+	// 상태 진입되어 있는 상태에서 매 tick마다 호출
+	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
+	virtual void OnStateExit()														override;
+
+
+public:
+	static	CDee_Sleep_State* Create();
+	virtual void Free() override;
+};
 END
