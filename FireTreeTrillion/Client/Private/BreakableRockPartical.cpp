@@ -29,7 +29,7 @@ HRESULT CBreakableRockPartical::Initialize(void* pArg)
 
 	m_pTransformCom->Set_WorldMatrix(desc.matrix);
 
-	if (FAILED(Add_Components()))
+	if (FAILED(Add_Components(desc.wstrModelName)))
 		return E_FAIL;
 
 	desc.vMoveDir.Normalize();
@@ -112,7 +112,7 @@ void CBreakableRockPartical::Render_IMGUI()
 {
 }
 
-HRESULT CBreakableRockPartical::Add_Components()
+HRESULT CBreakableRockPartical::Add_Components(const wstring& _wstrModelName)
 {
 	HRESULT hr;
 	/* For.Com_Shader */
@@ -120,7 +120,7 @@ HRESULT CBreakableRockPartical::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_RockPartical"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_") + _wstrModelName, 
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 

@@ -11,31 +11,31 @@ pair<_float3, vector<WAITING_INFO>> CHungryDee::m_WaitingList =
 	_float3{0.f, 0.f, 0.f},
 	{
 		//앞으로 빠지는 자리
-		WAITING_INFO{ {15.f, 2.f, 0.f}, 0.f},
-		WAITING_INFO{ {14.f, 2.f, 0.f}, 0.f},
+		WAITING_INFO{ {15.f, 1.5f, 0.f}, 0.f},
+		WAITING_INFO{ {14.f, 1.5f, 0.f}, 0.f},
 
 		//맨 앞자리
-		WAITING_INFO{ {0.f, 2.f, 0.f}, 0.f},
+		WAITING_INFO{ {0.f, 1.5f, 0.f}, 0.f},
 
-		WAITING_INFO{ {-1.4f, 2.f, -2.f}, 0.1f},
-		WAITING_INFO{ {-2.f, 2.f, -4.f}, 0.15f},
-		WAITING_INFO{ {-3.5f, 2.f, -6.f}, 0.08f},
-		WAITING_INFO{ {-5.f, 2.f, -8.f}, 0.1f},
-		WAITING_INFO{ {-4.f, 2.f, -10.f}, 0.1f},
-		WAITING_INFO{ {-2.5f, 2.f, -12.f}, 0.1f},
-		WAITING_INFO{ {-3.f, 2.f, -14.f}, 0.1f},
-		WAITING_INFO{ {-4.5f, 2.f, -16.f}, 0.1f},
-		WAITING_INFO{ {-3.f, 2.f, -18.f}, 0.1f},
-		WAITING_INFO{ {-1.4f, 2.f, -20.f}, 0.1f},
-		WAITING_INFO{ {-2.f, 2.f, -22.f}, 0.15f},
-		WAITING_INFO{ {-3.5f, 2.f, -24.f}, 0.08f},
-		WAITING_INFO{ {-5.f, 2.f, -26.f}, 0.1f},
-		WAITING_INFO{ {-4.f, 2.f, -28.f}, 0.1f},
-		WAITING_INFO{ {-2.5f, 2.f, -30.f}, 0.1f},
-		WAITING_INFO{ {-3.f, 2.f, -32.f}, 0.1f},
-		WAITING_INFO{ {-4.5f, 2.f, -34.f}, 0.1f},
-		WAITING_INFO{ {-3.f, 2.f, -36.f}, 0.1f},
-		WAITING_INFO{ {-1.f, 2.f, -38.f}, 0.1f},
+		WAITING_INFO{ {-1.4f, 1.5f, -2.f}, 0.1f},
+		WAITING_INFO{ {-2.f, 1.5f, -4.f}, 0.15f},
+		WAITING_INFO{ {-3.5f, 1.5f, -6.f}, 0.08f},
+		WAITING_INFO{ {-2.8f, 1.5f, -8.f}, 0.1f},
+		WAITING_INFO{ {-2.f, 1.5f, -10.f}, 0.1f},
+		WAITING_INFO{ {-1.f, 1.5f, -11.5f}, 0.1f},
+		WAITING_INFO{ {0.3f, 1.5f, -13.f}, 0.1f},
+		WAITING_INFO{ {0.6f, 1.5f, -14.5f}, 0.1f},
+		WAITING_INFO{ {1.2f, 1.5f, -16.f}, 0.1f},
+		WAITING_INFO{ {.8f, 1.5f, -17.5f}, 0.1f},
+		WAITING_INFO{ {0.f, 1.5f, -19.f}, 0.15f},
+		WAITING_INFO{ {-1.5f, 1.5f, -20.5f}, 0.08f},
+		WAITING_INFO{ {-2.0f, 1.5f, -22.f}, 0.1f},
+		WAITING_INFO{ {-3.2f, 1.5f, -23.5f}, 0.1f},
+		WAITING_INFO{ {-1.9f, 1.5f, -25.f}, 0.1f},
+		WAITING_INFO{ {-.8f, 1.5f, -26.5f}, 0.1f},
+		WAITING_INFO{ {.4f, 1.5f, -28.f}, 0.1f},
+		WAITING_INFO{ {1.4f, 1.5f, -29.5f}, 0.1f},
+		WAITING_INFO{ {2.4f, 1.5f, -31.f}, 0.1f},
 	}
 };
 
@@ -74,16 +74,19 @@ HRESULT CHungryDee::Initialize(void* pArg)
 	hr = __super::Initialize(pArg);
 	CHECK_FAILED(hr);
 
-	m_WaitingList.first = pDeeDesc.matWorld.Translation();
+	if (*m_pCurrentLevelID == LEVEL_PARTTIME)
+	{
+		m_WaitingList.first = pDeeDesc.matWorld.Translation();
 
-	m_iMyIdx = pDeeDesc.iIdx;
-	_float4 vDir = Dir(m_WaitingList.second[m_iMyIdx].vPos);
-	vDir += _float4{ 18.f, 0.f, -6.f, 0.f };
-	m_pTransformCom->Move(vDir);
-	++m_iWatingNum;
+		m_iMyIdx = pDeeDesc.iIdx;
+		_float4 vDir = Dir(m_WaitingList.second[m_iMyIdx].vPos);
+		vDir += _float4{ 18.f, 0.f, -6.f, 0.f };
+		m_pTransformCom->Move(vDir);
+		++m_iWatingNum;
 
-	if (m_iMyIdx == WAITPOS_FRONT)
-		CPartTimeHelper::Get_Instance()->Register_FirstDee(this);
+		if (m_iMyIdx == WAITPOS_FRONT)
+			CPartTimeHelper::Get_Instance()->Register_FirstDee(this);
+	}
 
 
 	hr = Add_Components();
@@ -95,7 +98,7 @@ HRESULT CHungryDee::Initialize(void* pArg)
 
 
 
-	m_pModelCom->Set_Animation(DEESHOPANIM_GUESTNORMAL, CUtils::Make_RandomFloat(45.f, 60.f), true, true);
+	m_pModelCom->Set_Animation(DEESHOPANIM_RUN, CUtils::Make_RandomFloat(45.f, 60.f), true, true);
 
 	return S_OK;
 }
@@ -176,7 +179,7 @@ void CHungryDee::Swap_WatingPosition()
 	//내가 뒤에서 들어오는 자리라면 순간이동 + 파트오브젝트 삭제 + 걸어오는 스테이트 세팅
 	if (m_iMyIdx == m_iWatingNum - 1)
 	{
-		_float3 vDestPos = m_WaitingList.first + m_WaitingList.second[m_iMyIdx].vPos + _float3{ -10.f, 0.f, 0.f };
+		_float3 vDestPos = m_WaitingList.first + m_WaitingList.second[m_iMyIdx].vPos + _float3{ 18.f, 0.f, -2.f };
 		m_pControllerCom->Set_Position(m_pTransformCom, Pos(vDestPos));
 		Set_DeeEyeState(DEEEYE_IDLE);
 
@@ -185,7 +188,7 @@ void CHungryDee::Swap_WatingPosition()
 		m_PartObjects.clear();
 		Set_RenderPartObj(false);
 
-		Change_State((DEE_ANIM)DEESHOPANIM_WALK, 60.f, true, true);
+		Change_State((DEE_ANIM)DEESHOPANIM_RUN, 60.f, true, true);
 	}
 }
 
@@ -520,6 +523,7 @@ void CHungryDee::SetUp_FSM()
 
 
 	m_pFSM->Add_State(DEESHOPANIM_WALK, CDee_Hungry_State::Create());
+	m_pFSM->Add_State(DEESHOPANIM_RUN, CDee_Hungry_State::Create());
 
 	m_pFSM->Add_State(DEESHOPANIM_CLERKCORRECT, CDee_Hungry_State::Create());
 	m_pFSM->Add_State(DEESHOPANIM_INCORRECT, CDee_Hungry_State::Create());
@@ -528,7 +532,7 @@ void CHungryDee::SetUp_FSM()
 	m_pFSM->Add_State(DEESHOPANIM_INCORRECTMOVE, CDee_Hungry_State::Create());
 
 	CFSM::FSM_INFO	FSMDesc = {};
-	FSMDesc.iState = DEESHOPANIM_GUESTNORMAL;
+	FSMDesc.iState = DEESHOPANIM_RUN;
 	FSMDesc.pModel = &m_pModelCom;
 
 	m_pFSM->Initialize(&FSMDesc);

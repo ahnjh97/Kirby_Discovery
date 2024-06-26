@@ -11,6 +11,7 @@
 #include "Kabu.h"
 #include "BrontoBurt.h"
 #include "PoppyBrosJr.h"
+#include "Car.h"
 
 #include "BG.h"
 #include "HUD.h"
@@ -642,6 +643,21 @@ HRESULT CLevel_Racing::Ready_Objects()
 		else if ("CarShopBreakableWall" == strModelName)
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_CarShopWall"), TEXT("Prototype_GameObject_CarShopWall"), &tDesc)))
+				continue;
+		}
+		else if ("CarShopWallFrame" == strModelName || "CarShopFrameBefore" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_WallFrame"), TEXT("Prototype_GameObject_CarShopWallFrame"), &tDesc)))
+				continue;
+		}
+		else if ("Car" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Deform"), TEXT("Prototype_GameObject_Car"), &tDesc)))
+				continue;
+		}
+		else if ("BoardA" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Bridge"), TEXT("Prototype_GameObject_ToppleableBridge"), &tDesc)))
 				continue;
 		}
 	}

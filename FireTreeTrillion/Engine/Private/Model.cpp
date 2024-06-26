@@ -1,5 +1,6 @@
 #include "Model.h"
 #include "GameInstance.h"
+#include "GameObject.h"
 #include "MergedMesh.h"
 #include "OcTree.h"
 //#include "Channel.h"
@@ -503,13 +504,84 @@ HRESULT CModel::Bind_WorldMatrixForOctree(CShader* pShader, string& strConstantN
 
 _uint CModel::Find_MeshIndex(const string& _strMeshName)
 {
-	for (_int i = 0; i < m_iNumMeshes; i++)
+	for (_uint i = 0; i < m_iNumMeshes; i++)
 	{
 		if (m_Meshes[i]->Get_Name() == _strMeshName)
 			return i;
 	}
 
 	return _uint();
+}
+
+void CModel::RemoveNonBlendMeshes(const unordered_set<_uint>& _vecBlendingMeshIndices)
+{
+	if (_vecBlendingMeshIndices.empty())
+		return;
+
+	vector<CMesh*> vecMeshes;
+	for (_uint i = 0; i < m_iNumMeshes; i++)
+	{
+		if (_vecBlendingMeshIndices.end() == _vecBlendingMeshIndices.find(i))
+			Safe_Release(m_Meshes[i]);
+		else
+			vecMeshes.push_back(m_Meshes[i]);
+	}
+
+	m_Meshes = vecMeshes;
+	m_iNumMeshes = vecMeshes.size();
+}
+
+void CModel::RemoveBlendMeshes(const unordered_set<_uint>& _vecBlendingMeshIndices)
+{
+	if (_vecBlendingMeshIndices.empty())
+		return;
+
+	vector<CMesh*> vecMeshes;
+	for (_uint i = 0; i < m_iNumMeshes; i++)
+	{
+		if (_vecBlendingMeshIndices.end() != _vecBlendingMeshIndices.find(i))
+			Safe_Release(m_Meshes[i]);
+		else
+			vecMeshes.push_back(m_Meshes[i]);
+	}
+
+	m_Meshes = vecMeshes;
+	m_iNumMeshes = vecMeshes.size();
+}
+
+_bool CModel::DoesNormalTextureExist(_uint iMeshIndex)
+{
+	if (iMeshIndex >= m_iNumMeshes)
+		return false;
+
+	_uint	iMeshMaterialIndex = { m_Meshes[iMeshIndex]->Get_MaterialIndex() };
+
+	if (iMeshMaterialIndex >= m_iNumMaterials)
+		return false;
+
+	if (nullptr != m_Materials[iMeshMaterialIndex].MaterialTextures[TextureType_NORMALS])
+		return true;
+	else
+		return false;
+}
+
+void CModel::DeterminePassIndices(vector<_uint>& _vecPassIndices)
+{
+	for (_uint i = 0; i < m_iNumMeshes; i++)
+	{
+		if (true == DoesNormalTextureExist(i))
+			_vecPassIndices.push_back(13); // AlphaBlend Normal O
+		else
+			_vecPassIndices.push_back(14); // AlphaBlend Normal X
+	}
+}
+
+void CModel::AddBlendObjectToRenderGroup()
+{
+	if (nullptr == m_pBlendObject)
+		return;
+
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, m_pBlendObject);
 }
 
 HRESULT CModel::Ready_Meshes(_bool bOctree)
@@ -674,6 +746,8 @@ CComponent * CModel::Clone(void * pArg)
 void CModel::Free()
 {
 	__super::Free();
+
+	Safe_Release(m_pBlendObject);
 
 	for (auto& pAnimation : m_Animations)
 		Safe_Release(pAnimation);

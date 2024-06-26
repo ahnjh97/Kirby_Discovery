@@ -265,7 +265,7 @@ _bool CGameObject::Compute_OptimizationAnimation(_float fTimeDelta)
 	m_fViewZ = XMVectorGetZ(vPosition);
 	XMStoreFloat3(&m_vViewPos, vPosition);
 
-	if (m_fViewZ > 40.f)
+	if (m_fViewZ > 70.f)
 	{
 		if (m_iLateTickCount == 0)
 		{
@@ -287,7 +287,7 @@ _bool CGameObject::Compute_OptimizationAnimation(_float fTimeDelta)
 			return false;
 		}
 	}
-	else if (m_fViewZ > 80.f)
+	else if (m_fViewZ > 120.f)
 	{
 		if (m_iLateTickCount == 0)
 		{

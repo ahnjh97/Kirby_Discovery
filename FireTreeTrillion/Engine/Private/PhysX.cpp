@@ -217,8 +217,8 @@ PxRigidDynamic* CPhysX::CreateDynamicActor(_float4x4& matWorld, _float3* pVertic
     meshDesc.points.count = iNumVertices;
     meshDesc.points.stride = sizeof(PxVec3);
     meshDesc.points.data = pVerticesPos;
-    meshDesc.flags = PxConvexFlag::eCOMPUTE_CONVEX;
-
+    meshDesc.flags = PxConvexFlag::eCOMPUTE_CONVEX | PxConvexFlag::eSHIFT_VERTICES;
+       
     PxConvexMesh* pMesh = PxCreateConvexMesh(tParams, meshDesc);
     if (nullptr == pMesh) {
         MSG_BOX(TEXT("Failed to Create ConvexMesh."));
@@ -255,11 +255,11 @@ PxRigidDynamic* CPhysX::CreateDynamicActor(_float4x4& matWorld, _float3* pVertic
         pDynamicActor->release();
         return nullptr;
     }
-    pShape->setSimulationFilterData(PxFilterData(0, 0, 0, 0));
+    //pShape->setSimulationFilterData(PxFilterData(0, 0, 0, 0));
 
     pDynamicActor->attachShape(*pShape);
     m_pScene->addActor(*pDynamicActor);
-    physx::PxRigidBodyExt::updateMassAndInertia(*pDynamicActor, 0.1f);
+    //physx::PxRigidBodyExt::updateMassAndInertia(*pDynamicActor, 0.1f);
 
     pMesh->release();
     pShape->release(); 

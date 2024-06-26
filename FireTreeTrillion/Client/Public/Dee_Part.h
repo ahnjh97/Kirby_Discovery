@@ -1,6 +1,7 @@
 #pragma once
 #include "Client_Defines.h"
 #include "PartObject.h"
+#include "WaddleDee.h"
 
 BEGIN(Engine)
 class CBone;
@@ -17,6 +18,7 @@ public:
 	{
 		CBone* pSocket = { nullptr };
 		wstring wstrModelName = TEXT("NONE");
+		DEE_ANIM* pCurAnimState = { nullptr };
 	};
 
 private:
@@ -38,9 +40,11 @@ private:
 	CBone* m_pSocket = { nullptr };
 
 private:
+	string			m_strModelName = { "NONE" };
+	DEE_ANIM*		m_pCurAnimState = { nullptr };
+
 	_float2			m_vPreScreenPos = { 0.f, 0.f };
 	_float4			m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
-
 private:
 	HRESULT Add_Components(wstring wstrModelName);
 	HRESULT Bind_ShaderResources();

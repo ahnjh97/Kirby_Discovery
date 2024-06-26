@@ -70,6 +70,13 @@ _int CPartTimerKirby::Tick(_float fTimeDelta)
 	m_fTimeDelta = m_pGameInstance->Get_FirstTimer();
 
 	__super::Tick(m_fTimeDelta);
+
+	// Dof ÃÊÁ¡À» Ä¿ºñ¿¡°Ô ¸ÂÃá´Ù.
+	// Ä¿ºñ ½Ã½ºÅÛ Æ½¿¡ ÀÖ´ø ³ð ³©°ÜÁá½¿´Ù
+	_vector vDOFPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	vDOFPos.m128_f32[1] += 0.5f;
+	m_pGameInstance->Update_DofFocus(vDOFPos);
+
 	m_pPartTimeFood->Tick(fTimeDelta);
 	m_pPartTimeFood->Update_Position(Compute_BoneWorldMatrix());
 	m_pHat->Tick(fTimeDelta);

@@ -30,6 +30,8 @@ HRESULT CDee_Part::Initialize(void* pArg)
 	if (FAILED(Add_Components(pPartDesc->wstrModelName)))
 		return E_FAIL;
 
+	m_strModelName = CUtils::WstrToStr(pPartDesc->wstrModelName);
+	m_pCurAnimState = pPartDesc->pCurAnimState;
 	//m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(0.f, 0.1f, 0.01f, 1.f));
 
 
@@ -50,6 +52,9 @@ _int CDee_Part::Tick(_float fTimeDelta)
 
 void CDee_Part::Late_Tick(_float fTimeDelta)
 {
+	//if (m_strModelName == "DeePart_WateringCan" && *m_pCurAnimState != DEEANIM_WATERING)
+	//	return;
+
 	if (m_pGameInstance->isInFrustum_WorldSpace(Pos(m_WorldMatrix.Translation()), 2.0f))
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);

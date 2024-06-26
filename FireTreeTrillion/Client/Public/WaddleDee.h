@@ -28,6 +28,9 @@ enum DEE_ANIM
 	DEEANIM_CASEHELPME_END,
 	DEEANIM_CASEHELPME_START,
 
+	DEEANIM_CHOOSE_START = 17,
+	DEEANIM_CHOOSE_WAIT,
+
 	//가게 앞 직원
 	DEEANIM_CLERKTALK = 26,
 	DEEANIM_CLERKWAVEHAND,
@@ -57,7 +60,7 @@ enum DEE_ANIM
 	DEEANIM_LAUGH,
 
 	DEEANIM_LOOKAROUND = 88,
-
+	DEEANIM_MOVEFALL = 91,
 	DEEANIM_SITTALKA = 105,
 	DEEANIM_SITTALKB = 107,
 	DEEANIM_SITTALKLISTEN = 109,
@@ -107,7 +110,7 @@ enum DEE_SHOPANIM
 	DEESHOPANIM_INCORRECTMOVE,
 
 	DEESHOPANIM_ORDERNORMAL = 21,
-
+	DEESHOPANIM_RUN,
 	DEESHOPANIM_WAIT = 23,
 	DEESHOPANIM_ANGRYWAIT = 25,
 	DEESHOPANIM_WALK,
@@ -115,12 +118,7 @@ enum DEE_SHOPANIM
 	DEESHOPANIM_END
 };
 
-struct WAITING_INFO
-{
-	_float3 vPos;
-	_float	fAnimOffset;
-};
-
+//마을에 있는 디들에게 세팅해줄 처음 행동(성격)
 enum DEE_CHARACTER
 {
 	DEECHARACTER_IDLE,
@@ -130,7 +128,67 @@ enum DEE_CHARACTER
 	DEECHARACTER_TROUBLE,
 	DEECHARACTER_ANGRY,
 	DEECHARACTER_SLEEPY,
+	DEECHARACTER_FRONTMAN = 7,
+	DEECHARACTER_KEYBOARD,
+	DEECHARACTER_GUITAR,
+	DEECHARACTER_DRUM,
+	DEECHARACTER_LISTENER,
+	DEECHARACTER_READBOOK = 12,
 	DEECHARACTER_END,
+};
+
+enum TOWN_POINT
+{
+	TOWNPOINT_0,
+	TOWNPOINT_1,
+	TOWNPOINT_2,
+	TOWNPOINT_3,
+	TOWNPOINT_4,
+	TOWNPOINT_5,
+	TOWNPOINT_6,
+	TOWNPOINT_7,
+	TOWNPOINT_8,
+	TOWNPOINT_9,
+	TOWNPOINT_10,
+	TOWNPOINT_11,
+	TOWNPOINT_12,
+	TOWNPOINT_FOODSHOP,
+	TOWNPOINT_14,
+	TOWNPOINT_FISHING,
+	TOWNPOINT_16,
+	TOWNPOINT_1FLOOR,
+	TOWNPOINT_UNDERSTAIRA,
+	TOWNPOINT_MIDSTAIRA,
+	TOWNPOINT_UPSTAIRA,
+	TOWNPOINT_2FLOOR,
+	TOWNPOINT_UPSTAIRB,
+	TOWNPOINT_MIDSTAIRB,
+	TOWNPOINT_UNDERSTAIRB,
+	TOWNPOINT_FLOWERUPRIGHT,
+	TOWNPOINT_FLOWERDOWNRIGHT,
+	TOWNPOINT_FLOWERUPLEFT,
+	TOWNPOINT_FLOWERDOWNLEFT,
+	TOWNPOINT_29,
+	TOWNPOINT_END
+};
+struct WAITING_INFO
+{
+	_float3 vPos;
+	_float	fAnimOffset;
+};
+
+struct TOWN_POINT_INFO
+{
+	//자신의 인덱스(사실 그냥 바로 벡터 인덱스 써도 되는데 나중에 구별할 일 있을까봐 넣음)
+	TOWN_POINT			MyPoint;
+	//타운 랠리포인트 기준으로부터의 상대값
+	_float3				vPosOffset;
+	//거기서 디가 할 행동 패턴들
+	vector<DEE_ANIM>	StateOffset;
+	//인접하여 갈 수 있는 지점들
+	vector<TOWN_POINT>	NearPoint;
+	//사용 중인가? (그곳에 디가 있는가?)
+	_bool				bIsUsing = { false };
 };
 
 END
@@ -141,7 +199,6 @@ class CWaddleDee abstract : public CCharacter
 {
 
 public:
-
 	struct DEE_DESC : public CGameObject::GAMEOBJECT_DESC
 	{
 		DEE_CHARACTER eCharacter;
@@ -158,14 +215,18 @@ public:
 
 
 #ifdef _DEBUG
-	virtual void	Render_IMGUI() override;
+	virtual void		Render_IMGUI() override;
 #endif
 
-	virtual void	Add_AnimEvent() override {}
+	virtual void		Add_AnimEvent() override {}
 
-	void			Change_State(DEE_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
+	//목적지의 위치를 만든다
+	virtual _float3		Make_DestPos() { return _float3::Zero; }
+	virtual DEE_ANIM	Make_WhatToDo() { return DEEANIM_END; }
 
-	_bool			IsCloseToKirby() { return m_bIsKirbyInZone; }
+	void				Change_State(DEE_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
+
+	_bool				IsCloseToKirby() { return m_bIsKirbyInZone; }
 
 	//커비와의 인사 여부
 	void			SetHiToKirby(_bool bHi) { m_bHiToKirby = bHi; }

@@ -60,6 +60,27 @@ public:
 };
 
 //*********************************
+//			SIT STATE
+//*********************************
+class CDee_Sit_State final : public CDee_State
+{
+private:
+	CDee_Sit_State();
+	virtual ~CDee_Sit_State() = default;
+
+public:
+	// 상태 진입했을 때 처음만 호출
+	virtual void OnStateEnter(class CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet) override;
+	// 상태 진입되어 있는 상태에서 매 tick마다 호출
+	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
+	virtual void OnStateExit()														override;
+
+public:
+	static	CDee_Sit_State* Create();
+	virtual void Free() override;
+};
+
+//*********************************
 //			MOVE STATE
 //*********************************
 class CDee_Move_State final : public CDee_State
@@ -121,6 +142,28 @@ public:
 
 public:
 	static	CDee_Emotion_State* Create();
+	virtual void Free() override;
+};
+
+//*********************************
+//			INTERACT STATE
+//*********************************
+class CDee_Interact_State final : public CDee_State
+{
+private:
+	CDee_Interact_State();
+	virtual ~CDee_Interact_State() = default;
+
+public:
+	// 상태 진입했을 때 처음만 호출
+	virtual void OnStateEnter(class CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet) override;
+	// 상태 진입되어 있는 상태에서 매 tick마다 호출
+	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
+	virtual void OnStateExit()														override;
+
+
+public:
+	static	CDee_Interact_State* Create();
 	virtual void Free() override;
 };
 

@@ -41,11 +41,12 @@ static _int s_iCamType = -1;
 static _bool s_bHideTriggers = { false };
 static _bool s_bHideGrid = { true };
 static _bool s_bHideDecos = { false };
+static _bool s_bHideWalls = { false };
 
 static _int s_iConnectedMonster = -1;
 static const _char* s_ModelPassIndices[] = { "0. NORMAL_0", "1. NORMAL_X", "2. SHADOW", "3. SKY", "4. BLOOM", "5. NON_BLUR"
-	,"6. TRIGGER", "7.DEFAULTFX", "8. BLENDFX", "9. DEFERREDINFO", "10. WHITEFX", "11. KIRBYPART", 
-	"12. NORMAL_O AND NONCULL", "13. ALPHABLEND"};
+	,"6. TRIGGER", "7.DEFAULTFX", "8. BLENDFX", "9. DEFERREDINFO", "10. WHITEFX", "11. KIRBYPART",
+	"12. NORMAL_O AND NONCULL", "13. BLEND O, NORMAL O", "14. BLEND O, NORMAL X" };
 
 static const _char* s_PosTexPassIndices[] = { "0. DEFAULT", "1. ALPHABLEND", "2. BLENDFX", "3. BLOOM", "4. DEFAULTFX", "5. BLEND_NOZTEXT"
 	,"6. WHITEFX", "7. UI_MASK", "8. UI_MASK2", "9. SOFTFX", "10. SOFTALPHAFX"};
@@ -101,7 +102,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 	//UV 조절 가능
 	//BasicMap (UV 편집 가능)
-	m_vecMapModelNames = { "Level0Stage1Step01", "Level0Stage1Step02",  "Level1Stage1Step01", "DeeDeeDee", "Town", "TownShop", "Land_VcLabo", "Land_LbLastBossBeforeStep"};
+	m_vecMapModelNames = { "Level0Stage1Step01", "Level0Stage1Step02",  "Level1Stage1Step01", "DeeDeeDeeMap", "Town", "TownShop", "Land_VcLabo", "Land_LbLastBossBeforeStep"};
 
 	vector<string> vecBGs = { "BG0", "BG1" };
 	m_setMapNames.insert(vecBGs.begin(), vecBGs.end());
@@ -143,7 +144,8 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 #pragma region TOWN OBJECT
 		, "TwArena", "TwArenaA", "TwArenaB", "TwArenaClerk", "TwDeliveryService", "TwFoodStore", "TwFoodStoreChair", "TwFoodStoreTable"
 		, "TwKirbyHouse", "TwPharmacy", "TwPlanterA", "TwPlanterB", "TwRollingBallBooth", "TwSideHouseA", "TwSideHouseC", "TwSideHouseD"
-		, "TwSignboardStreetLive", "TwSlope", "TwBenchA", "TwBenchB", "TwBenchC", "TwBenchD"
+		, "TwSignboardStreetLive", "TwSlope", "TwBenchA", "TwBenchB", "TwBenchC", "TwBenchD", "TwFishingPartsA", "TwFishingPartsB", "TwFishingPartsC"
+		,"TwCentralSquare","TwStreetLiveSetC", "TwSideBridge", "TwConstructionAreaStepway", "TwConstructionAreaPond"
 #pragma endregion
 
 
@@ -171,7 +173,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	m_setTrees = { "GsTreeA", "GsTreeB", "GsTreeC" };
 
 	//투명도 적용이 필요한 데코오브젝트
-	m_setNeedBlendDecos = {"LbOutBuildingWallL", "LbOutBuildingFenceL"};
+	m_setBlendDecos = {"LbOutBuildingWallL", "LbOutBuildingFenceL"};
 
 	s_vecPassIndices.resize(m_vecMapModelNames.size());
 	s_vecSamplingFactors.resize(m_vecMapModelNames.size());
@@ -186,6 +188,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	HideGrid(s_bHideGrid);
 	HideTriggers(s_bHideTriggers);
 	HideDecos(s_bHideDecos);
+	HideWalls(s_bHideWalls);
 
 	return S_OK;
 }
@@ -433,6 +436,11 @@ void CMapToolHelper::Menu_Level()
 	if (ImGui::RadioButton("Hide Decos", s_bHideDecos)) {
 		s_bHideDecos = !s_bHideDecos;
 		HideDecos(s_bHideDecos);
+	}
+	ImGui::SameLine();
+	if (ImGui::RadioButton("Hide Walls", s_bHideWalls)) {
+		s_bHideWalls = !s_bHideWalls;
+		HideWalls(s_bHideWalls);
 	}
 }
 
@@ -1519,6 +1527,30 @@ void CMapToolHelper::HideDecos(_bool bHideDecos)
 		string strModelName = pModel->Get_ModelInfo().strModelName;
 		if(true == IsDeco(strModelName))
 			obj->Set_Hide(bHideDecos);
+	}
+}
+
+void CMapToolHelper::HideWalls(_bool bHideWalls)
+{
+	list<CGameObject*>* pObjectList = m_pGameInstance->Get_List(LEVEL_TOOL_MAP, TEXT("Layer_Parse"));
+	if (pObjectList == nullptr)
+		return;
+
+	if (pObjectList->empty())
+		return;
+
+	for (auto& obj : *pObjectList)
+	{
+		if (nullptr == obj)
+			continue;
+
+		CModel* pModel = dynamic_cast<CModel*>(obj->Get_Component(TEXT("Com_Model")));
+		if (nullptr == pModel)
+			continue;
+
+		string strModelName = pModel->Get_ModelInfo().strModelName;
+		if ("NonRenderWall" == strModelName)
+			obj->Set_Hide(bHideWalls);
 	}
 }
 

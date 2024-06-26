@@ -17,6 +17,9 @@ private:
 	virtual ~CNonAnimDeco() = default;
 
 public:
+	void Set_PassIndex(_uint iPassIndex) { m_iPassIndex = iPassIndex; }
+
+public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual _int Tick(_float fTimeDelta) override;
@@ -28,6 +31,7 @@ private:
 	CShader* m_pShaderCom = { nullptr };
 
 	_float m_fWhiteColorDiffuse = {};
+	_uint m_iPassIndex = {};
 
 private:
 	HRESULT Add_Components(const wstring& _wstrModelTag);

@@ -111,6 +111,12 @@ public:
 	void Set_Hide(_bool bHide) { m_bHide = bHide; }
 	_bool IsHidden() { return m_bHide; }
 	_uint Find_MeshIndex(const string& _strMeshName);
+	void RemoveNonBlendMeshes(const unordered_set<_uint>& _vecBlendingMeshIndices);
+	void RemoveBlendMeshes(const unordered_set<_uint>& _vecBlendingMeshIndices);
+	_bool DoesNormalTextureExist(_uint iMeshIndex);
+	void DeterminePassIndices(vector<_uint>& _vecPassIndices);
+	void Set_BlendObject(class CGameObject* pBlendObject) { m_pBlendObject = pBlendObject; }
+	void AddBlendObjectToRenderGroup();
 
 private:
 	_uint						m_iNumMeshes = { 0 };
@@ -158,6 +164,7 @@ private:
 	_uint						m_iIdleAnimIndex = {};
 	_float						m_fIdleAnimTickPerSec = {};
 	_bool						m_bHide = { false };
+	class CGameObject*			m_pBlendObject = { nullptr };
 
 private:
 	HRESULT Ready_Meshes(_bool bOctree);

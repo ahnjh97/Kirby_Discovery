@@ -14,7 +14,7 @@ BEGIN(Client)
 class CMapToolObject : public CGameObject
 {
 public:
-	enum TYPE_MAPOBJ { MAPOBJ_NONCOL, MAPOBJ_ANIM , MAPOBJ_ACTOR , MAPOBJ_END };
+	enum TYPE_MAPOBJ { MAPOBJ_NONCOL, MAPOBJ_ANIM , MAPOBJ_ACTOR, MAPOBJ_END };
 
 public:
 	struct MAPTOOLOBJECT_DESC : public GAMEOBJECT_DESC
