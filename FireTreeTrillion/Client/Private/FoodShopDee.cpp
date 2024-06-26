@@ -125,12 +125,16 @@ HRESULT CFoodShopDee::Render_LightDepth()
 	return S_OK;
 }
 
+#ifdef _DEBUG
+
 void CFoodShopDee::Render_IMGUI()
 {
 	__super::Render_IMGUI();
 
 	ImGui::Text(u8"ÇöÀç ¾Ö´Ô ÀÎµ¦½º : %d", m_pFSM->Get_State());
 }
+
+#endif
 
 void CFoodShopDee::Add_AnimEvent()
 {

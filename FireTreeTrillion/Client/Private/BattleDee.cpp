@@ -158,12 +158,16 @@ void CBattleDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject
 {
 }
 
+#ifdef _DEBUG
+
 void CBattleDee::Render_IMGUI()
 {
 	__super::Render_IMGUI();
 
 	ImGui::Text(u8"ÇöÀç ¾Ö´Ô ÀÎµ¦½º : %d", m_pFSM->Get_State());
 }
+
+#endif
 
 HRESULT CBattleDee::Add_Components()
 {

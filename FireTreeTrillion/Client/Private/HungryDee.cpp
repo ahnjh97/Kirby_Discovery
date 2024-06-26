@@ -261,6 +261,8 @@ void CHungryDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject
 {
 }
 
+#ifdef _DEBUG
+
 void CHungryDee::Render_IMGUI()
 {
 	__super::Render_IMGUI();
@@ -272,6 +274,8 @@ void CHungryDee::Render_IMGUI()
 	_float4x4 WorldMat = m_pTransformCom->Get_WorldMatrix();
 	ImGui::Text(u8"À§Ä¡: %.2f\t%.2f\t%.2f\t%.2f", WorldMat._41, WorldMat._42, WorldMat._43, WorldMat._44);
 }
+
+#endif
 
 void CHungryDee::OnNotify()
 {

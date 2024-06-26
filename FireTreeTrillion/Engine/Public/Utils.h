@@ -58,8 +58,9 @@ public:
 	//투영 포지션을 월드 포지션로 변환시킨다.
 	static void		Make_Screen_ToWorld(_Inout_ _float3& vPos);
 	//월드 포지션을 imgui 투영 포지션으로 변환시킨다.
+#ifdef _DEBUG
 	static ImVec2	WorldPosTo_ImguiProjPos(_float3 vWorldPos);
-
+#endif
 
 	// physX 관련 함수
 	static PxMat44			To_Float4x4(const _float4x4& mat);
