@@ -620,6 +620,7 @@ void CDee_FlyStun_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 			else
 			{
 				pair<DEE_ANIM, _bool> ToDo = baseInfo.pDee->Make_WhatToDo();
+				baseInfo.pDee->Set_PhyXState(PO_NORMAL);
 				baseInfo.pDee->Change_State(ToDo.first, 60.f, ToDo.second, true);
 				baseInfo.pTransformCom->Look_At_ForLandObject(baseInfo.pDee->Make_DestPos());
 				m_iBounceCnt = 1;
