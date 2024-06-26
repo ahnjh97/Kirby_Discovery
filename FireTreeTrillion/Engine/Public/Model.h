@@ -79,7 +79,8 @@ public:
 
 	HRESULT CreateDynamicActor(_float4x4& matWorld);
 	HRESULT CreateStaticActor(_float4x4& matWorld);
-	void DisableActor();
+	void	DisableActors();
+	void	ReAddActors();
 
 	void	Update_ActorTransform(class CTransform* pTransform);
 
@@ -117,6 +118,8 @@ public:
 	void DeterminePassIndices(vector<_uint>& _vecPassIndices);
 	void Set_BlendObject(class CGameObject* pBlendObject) { m_pBlendObject = pBlendObject; }
 	void AddBlendObjectToRenderGroup();
+	unordered_set<PxRigidActor*> Get_ActorsSet();
+	vector<PxRigidActor*> Get_Actors();
 
 private:
 	_uint						m_iNumMeshes = { 0 };

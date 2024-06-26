@@ -235,11 +235,18 @@ HRESULT CModel::CreateStaticActor(_float4x4& matWorld)
 	return S_OK;
 }
 
-void CModel::DisableActor()
+void CModel::DisableActors()
 {
 	PxScene* pScene = m_pGameInstance->Get_Scene();
 	for (auto& mesh : m_Meshes)
 		mesh->DisableActor(pScene);
+}
+
+void CModel::ReAddActors()
+{
+	PxScene* pScene = m_pGameInstance->Get_Scene();
+	for (auto& mesh : m_Meshes)
+		mesh->ReAddActor(pScene);
 }
 
 _float4 CModel::Check_Meshes(const class CTransform* pTransform, _Out_ _int& iMeshIndex) const
@@ -582,6 +589,24 @@ void CModel::AddBlendObjectToRenderGroup()
 		return;
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, m_pBlendObject);
+}
+
+unordered_set<PxRigidActor*> CModel::Get_ActorsSet()
+{
+	unordered_set<PxRigidActor*> setActors;
+	for (auto& mesh : m_Meshes)
+		setActors.insert(mesh->Get_Actor());
+
+	return setActors;
+}
+
+vector<PxRigidActor*> CModel::Get_Actors()
+{
+	vector<PxRigidActor*> vecActors;
+	for (auto& mesh : m_Meshes)
+		vecActors.push_back(mesh->Get_Actor());
+
+	return vecActors;
 }
 
 HRESULT CModel::Ready_Meshes(_bool bOctree)

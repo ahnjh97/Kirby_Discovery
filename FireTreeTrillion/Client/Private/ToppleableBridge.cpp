@@ -14,6 +14,22 @@ CToppleableBridge::CToppleableBridge(const CToppleableBridge& rhs)
 {
 }
 
+void CToppleableBridge::OnCollision()
+{
+	//if (true == m_bCollision)
+	//	return;
+
+	if (m_wstrModelName == TEXT("BoardA")) {
+		m_fHitTime = 0.f;
+		m_bCollision = true;
+		m_pModelCom->DisableActors();
+	}
+		
+	else
+		;
+	return;
+}
+
 HRESULT CToppleableBridge::Initialize_Prototype()
 {
 	return S_OK;
@@ -29,13 +45,20 @@ HRESULT CToppleableBridge::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(Desc)))
 		return E_FAIL;
 
-	if (FAILED(Add_Components()))
+	if (FAILED(Add_Components(Desc->wstrModelName)))
 		return E_FAIL;
 
 	m_bMotionBlur = false;
+	m_wstrModelName = Desc->wstrModelName;
 
-	/*if(FAILED(m_pModelCom->CreateStaticActor(m_pTransformCom->Get_WorldFloat4x4())))
-		return E_FAIL;*/
+	if(FAILED(m_pModelCom->CreateStaticActor(m_pTransformCom->Get_WorldFloat4x4())))
+		return E_FAIL;
+
+	vector<PxRigidActor*> vecActors = m_pModelCom->Get_Actors();
+
+	CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
+	for (auto& actor : vecActors)
+		pKirby->RegisterActorsToPlayer(actor, this);
 
 	return S_OK;
 }
@@ -45,15 +68,27 @@ _int CToppleableBridge::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return OBJ_DEAD;
 
+	if (m_fHitTime > 0.f && m_fHitTime < 1.f)
+		m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), m_pGameInstance->Get_SecondTimer());
+
 	return OBJ_NOEVENT;
 }
 
 void CToppleableBridge::Late_Tick(_float fTimeDelta)
 {
-	if (m_bStartAnimation)
-		m_pModelCom->Play_Animation(m_pGameInstance->Get_SecondTimer());
-	
-	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 50.0f))
+	/*if (m_bStartAnimation)
+		m_pModelCom->Play_Animation(m_pGameInstance->Get_SecondTimer());*/
+	if(m_bCollision)
+		m_fHitTime += fTimeDelta;
+
+	if (m_fHitTime > 5.f) {
+		//m_pModelCom->ReAddActors();
+		m_pModelCom->CreateStaticActor(m_pTransformCom->Get_WorldFloat4x4());
+		m_fHitTime = 0.f;
+		m_bCollision = false;
+	}
+
+	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 150.0f))
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
@@ -75,9 +110,9 @@ HRESULT CToppleableBridge::Render()
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
 			return E_FAIL;
-		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
-			return E_FAIL;
-		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
+		/*if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+			return E_FAIL;*/
+		if (FAILED(m_pShaderCom->Begin(/*ANIM*/MODEL_NORMAL_O)))
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Render(i)))
 			return E_FAIL;
@@ -109,10 +144,12 @@ void CToppleableBridge::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhys
 	if (pKirby->Get_KirbyInfo()->m_bBooster == false)
 		return;
 
-	pKirby->Set_HitStop();
-	m_pModelCom->Set_Animation(1	, 60.f, false, false);
 	m_bStartAnimation = true;
-	Make_Particles();
+
+	pKirby->Set_HitStop();
+
+	//m_pModelCom->Set_Animation(1, 60.f, false, false);
+	//Make_Particles();
 
 	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	_float4 vPlayerPos = pObject->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
@@ -122,15 +159,15 @@ void CToppleableBridge::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhys
 	m_fHitPower = pKirby->Get_KirbyInfo()->m_fMoveSpeed;
 }
 
-HRESULT CToppleableBridge::Add_Components()
+HRESULT CToppleableBridge::Add_Components(const wstring& _wstrModelName)
 {
 	HRESULT hr;
 
 	/* For.Com_Shader */
-	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimModel"),
+	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"),
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
-	wstring wstrModelTag = TEXT("Prototype_Component_Model_BoardA");
+	wstring wstrModelTag = TEXT("Prototype_Component_Model_") + _wstrModelName;
 	hr = __super::Add_Component(wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
@@ -164,8 +201,8 @@ HRESULT CToppleableBridge::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool))))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
-		return E_FAIL;
+	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
+	//	return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
 		return E_FAIL;
 

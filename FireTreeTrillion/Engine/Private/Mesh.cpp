@@ -286,6 +286,11 @@ void CMesh::DisableActor(PxScene* pScene)
 	pScene->removeActor(*m_pActor);
 }
 
+void CMesh::ReAddActor(PxScene* pScene)
+{
+	pScene->addActor(*m_pActor);
+}
+
 HRESULT CMesh::CreateStaticActor(_float4x4& matWorld)
 {
 	m_pActor = m_pGameInstance->CreateStaticActor(matWorld, m_pVerticesPos, m_iNumVertices, m_pIndices, m_iNumIndices);
