@@ -551,8 +551,7 @@ void CDee_FlyStun_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 
 	// 이제 날아가는 것을 구현해보자.
 	baseInfo.pController->Move_Dir(baseInfo.pTransformCom, vDamegeDir * fTimeDelta * 3.f, fTimeDelta);
-
-	//baseInfo.pTransformCom->Turn(_float4{baseInfo.pTransformCom->Get_State(CTransform::STATE_RIGHT)}, fTimeDelta);
+	baseInfo.pTransformCom->Turn(_float4{baseInfo.pTransformCom->Get_State(CTransform::STATE_RIGHT)}, fTimeDelta);
 
 	// 점프되는 체공시간을 구현해보자.
 	_float fDamageJumpPower = baseInfo.pDee->Get_DamageJumpPower();
