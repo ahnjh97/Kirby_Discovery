@@ -27,7 +27,8 @@ static _int s_iTriggerIdx = -1;
 static _int s_iMapMeshIndex = -1;
 static _int s_iSelectedMeshIndex = -1; 
 
-static const _char* s_ShaderPasses[] = { "Blend X, NormalO", "Blend X, Normal X", "LightDepth", "Blend O, Normal O", "Blend O, Normal X" };
+static const _char* s_ShaderPasses[] = { "0. Blend X, NormalO", "1. Blend X, Normal X", "2. LightDepth", "3. Blend O, Normal O", "4. Blend O, Normal X"
+		, "5. BLEND X, DISCARD X", "6. BLEND O, DISCARD X" };
 static vector<vector<_int>> s_vecPassIndices;
 static vector<vector<_float>> s_vecSamplingFactors;
 static _int s_iMapIndex = 0;

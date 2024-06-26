@@ -28,8 +28,17 @@ HRESULT CSkySphere::Initialize(void* pArg)
 
 	m_pTransformCom->Set_Scaled(_float3{ .6f, .6f, .6f });
 
-	//레벨 별 스카이 변경을 위한 값 저장
+#pragma region SUB_SKYSPHERE
+
+	//레벨 별 상태 변경을 위한 값 저장
 	m_eCurLevel = (LEVEL)*m_pGameInstance->Get_CurrentLevelID();
+	if (LEVEL_FINALBOSS != m_eCurLevel)
+	{
+		for (auto& iMod : m_pLabSkyMod)
+			iMod->Set_Hide(TRUE); //default FALSE
+	}
+
+#pragma endregion
 
 	return S_OK;
 }
@@ -43,6 +52,14 @@ void CSkySphere::Late_Tick(_float fTimeDelta)
 {
 	_float4 vCamPos = m_pGameInstance->Get_CamPosition();
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vCamPos);
+
+	//보스전 필드 진입 트리거에 해당 조건을 체크. 해당 레벨과 트리거 조건이 일치할 때, 서브 스피어 렌더ON
+	//현재는 레벨만 체크 중인 상태
+	if (LEVEL_FINALBOSS == m_eCurLevel)
+	{
+		for (auto& iMod : m_pLabSkyMod)
+			iMod->Set_Hide(FALSE); //default FALSE
+	}
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this);
 }
@@ -69,8 +86,7 @@ HRESULT CSkySphere::Render()
 		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DepthTexture", i, TextureType_HEIGHT);
 		CHECK_FAILED(hr);
 
-
-#pragma region LEVEL 별 TEXTURE 스왑
+#pragma region LEVEL_FINALBOSS::TEXTURE SWAP 
 
 		//1) 현재 해당 레벨 진입 시에 임시로 설정. 추후 FIELD/1PASE/2PASE 시점에 스왑하는 방식으로 변경 필요
 		// ex) 에피리스 HP 45% 일 경우, 2페이즈 시작 (SKY_LAB_2PASE)
@@ -101,6 +117,30 @@ HRESULT CSkySphere::Render()
 		CHECK_FAILED(hr);
 	}
 
+#pragma region SUB_SKYSPHERE
+	
+	for (auto& iMod : m_pLabSkyMod)
+	{
+		_bool IsHidden = iMod->IsHidden();
+		if (TRUE == IsHidden)
+			return S_OK;
+	}
+	
+	//서브 스피어는 메쉬 하나밖에없음
+	for (_uint iMod = 0; iMod < MOD_NONE; ++iMod)
+	{
+		hr = m_pLabSkyMod[iMod]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0, TextureType_DIFFUSE);
+		CHECK_FAILED(hr);
+
+		hr = m_pShaderCom->Begin(MODEL_NORMAL_O);
+		CHECK_FAILED(hr);
+
+		hr = m_pLabSkyMod[iMod]->Render(0);
+		CHECK_FAILED(hr);
+	}
+
+#pragma endregion
+
 	return S_OK;
 }
 
@@ -108,13 +148,25 @@ HRESULT CSkySphere::Add_Components()
 {
 	HRESULT hr;
 
-	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"), TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
+	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"), 
+		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
-	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Model_SkySphere_Stage1_Day"), TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Model_SkySphere_Stage1_Day"), 
+		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
 #pragma region LAB_DISCOVERA
+
+	#pragma region SUB_SKYSPHERE
+	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Model_LbBuildingFrame"),
+		TEXT("Com_Mod_SkyFrame"), (CComponent**)&m_pLabSkyMod[MOD_FRAME]);
+	CHECK_FAILED(hr);
+
+	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Model_LbFarPiller"), 
+		TEXT("Com_Mod_SkyPiller"), (CComponent**)&m_pLabSkyMod[MOD_PILLER]);
+	CHECK_FAILED(hr);
+	#pragma endregion
 	
 	//FIELD
 	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_SkySphere_Lab_CloudNoize"), 
@@ -138,7 +190,6 @@ HRESULT CSkySphere::Add_Components()
 	CHECK_FAILED(hr);
 
 #pragma endregion
-
 
 	return S_OK;
 }
@@ -191,9 +242,12 @@ CGameObject* CSkySphere::Clone(void* pArg)
 void CSkySphere::Free()
 {
 	Safe_Release(m_pShaderCom);
-	Safe_Release(m_pModelCom);
 
-	for(auto& iTex: m_pLabSkyTex)
+	Safe_Release(m_pModelCom);
+	for(auto& iMod : m_pLabSkyMod)
+		Safe_Release(iMod);
+
+	for(auto& iTex : m_pLabSkyTex)
 		Safe_Release(iTex);
 
 	__super::Free();
