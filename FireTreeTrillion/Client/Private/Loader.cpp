@@ -111,6 +111,7 @@
 #include "BombOrbitGlow.h"
 #include "HUD_AbilityDiscard.h"
 #include "UI_PartTime.h"
+#include "UI_PartTimeDee.h"
 
 // 아이템
 #include "EnergyDrink.h"
@@ -284,6 +285,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_Mission"), CHUD_Mission);
 	
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_PartTime"), CUI_PartTime);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_PartTimeDee"), CUI_PartTimeDee);
 
 #pragma endregion
 	
@@ -781,9 +783,12 @@ HRESULT CLoader::Loading_For_Parttime()
 		return E_FAIL;
 
 	//마스크용
-	hr = Add_Texture(eLevel, "FX_Mask_Bubble2", "Effects/Mask/noise_bubble_%d.png", 4);	CHECK_FAILED(hr);
-
-
+	hr = Add_Texture(eLevel, "FX_Mask_Bubble2", "Effects/Mask/noise_bubble_%d.png", 4);
+	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby_Mask", "UI/HUD/Kirby/StatusBar/KirbyHPMask.png");
+	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "FoodShape", "UI/MGameFood/FoodShape.png");
+	CHECK_FAILED(hr);
 #pragma region UI
 
 	// 와들디 주문 말풍선
@@ -808,6 +813,12 @@ HRESULT CLoader::Loading_For_Parttime()
 	hr = Add_Texture(eLevel, "score_bar",			"UI/MGameFood/score bar.png");
 	CHECK_FAILED(hr);	
 	hr = Add_Texture(eLevel, "NewScoreBanner_bw",	"UI/MGameFood/new score banner_bw.png");
+	CHECK_FAILED(hr);
+
+	// 게임 DIGITS
+	hr = Add_Texture(eLevel, "TempWhiteDigits", "UI/TempDigits/timer_num_%d.png", 10);
+	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "TempRedDigits", "UI/TempDigits/red_num_%d.png", 10);
 	CHECK_FAILED(hr);
 
 #pragma endregion

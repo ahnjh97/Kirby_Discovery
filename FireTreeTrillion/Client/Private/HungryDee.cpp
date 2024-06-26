@@ -6,6 +6,14 @@
 #include "Dee_State.h"
 #include "PartTimeHelper.h"
 
+#include "UI_PartTimeDee.h"
+
+#define FRONT_WAITPOS 2
+#define SECOND_WAITPOS 3
+#define LAST_WAITPOS (m_iWatingNum - 1)
+
+const _float fOffsetInteract = 2.f;
+
 pair<_float3, vector<WAITING_INFO>> CHungryDee::m_WaitingList =
 {
 	_float3{0.f, 0.f, 0.f},
@@ -96,8 +104,10 @@ HRESULT CHungryDee::Initialize(void* pArg)
 	hr = Add_PartObjects();
 	CHECK_FAILED(hr);
 
-
-
+	// 배고픈 Dee는 언제든지 음식을 요구할 준비가 되어있읍니다. JYWI
+	m_pDialogUI = static_cast<CUI_PartTimeDee*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_UI_PartTimeDee")));
+	m_pDialogUI->Set_IsRender(false);
+	
 	m_pModelCom->Set_Animation(DEESHOPANIM_RUN, CUtils::Make_RandomFloat(45.f, 60.f), true, true);
 
 	return S_OK;
@@ -111,7 +121,7 @@ _int CHungryDee::Tick(_float fTimeDelta)
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
 	//디버깅용
-	if (m_iMyIdx == 2)
+	if (m_iMyIdx == FRONT_WAITPOS)
 		m_fWaitingTime -= m_fTimeDelta;
 
 
@@ -134,33 +144,14 @@ _int CHungryDee::Tick(_float fTimeDelta)
 	}
 
 
-	/*if (m_pGameInstance->Get_KeyState(DIK_C, KEY_DOWN))
-	{
-		m_iMyIdx = (m_iMyIdx + m_iWatingNum - 1) % m_iWatingNum;
-
-		if(m_iMyIdx == 2)
-			CPartTimeHelper::Get_Instance()->Register_FirstDee(this);
-
-		if (m_iMyIdx == m_iWatingNum - 1)
-		{
-			_float3 vDestPos = m_WaitingList.first + m_WaitingList.second[m_iMyIdx].vPos + _float3{ -10.f, 0.f, 0.f };
-			m_pControllerCom->Set_Position(m_pTransformCom, Pos(vDestPos));
-			Set_DeeEyeState(DEEEYE_IDLE);
-
-			for (auto& partObj : m_PartObjects)
-				Safe_Release(partObj.second);
-			m_PartObjects.clear();
-			Set_RenderPartObj(false);
-
-			Change_State((DEE_ANIM)DEESHOPANIM_WALK, 60.f, true, true);
-		}
-	}*/
-
-
 	//나머지 슈퍼틱, 파트 틱 처리
 	__super::Tick(m_fTimeDelta);
 	for (auto& Pair : m_PartObjects)
 		Pair.second->Tick(m_fTimeDelta);
+
+	//(주문 중인 디 == 앞자리에 도착한 디)
+	if(m_pFSM->Get_State() == DEESHOPANIM_ORDERNORMAL)
+		m_pDialogUI->Tick(m_fTimeDelta);
 
 	//공통된 디 관련 변수를 업데이트 - 초기화한다
 	Dee_SystemTick(m_fTimeDelta);
@@ -170,14 +161,17 @@ _int CHungryDee::Tick(_float fTimeDelta)
 
 void CHungryDee::Swap_WatingPosition()
 {
-	m_iMyIdx = (m_iMyIdx + m_iWatingNum - 1) % m_iWatingNum;
+	m_iMyIdx = (m_iMyIdx + LAST_WAITPOS) % m_iWatingNum;
 
 	//바뀐 자리가 앞자리라면, 나를 등록
-	if (m_iMyIdx == 2)
+	if (m_iMyIdx == FRONT_WAITPOS)
+	{
 		CPartTimeHelper::Get_Instance()->Register_FirstDee(this);
+	}
 
-	//내가 뒤에서 들어오는 자리라면 순간이동 + 파트오브젝트 삭제 + 걸어오는 스테이트 세팅
-	if (m_iMyIdx == m_iWatingNum - 1)
+	//내가 뒤에서 들어오는 자리라면 순간이동 + 파트오브젝트 삭제 + 걸어오는 스테이트를 세팅해줍니다.
+	//이 때 리셋해야 될 값들도 다 초기화해줍니다.
+	if (m_iMyIdx == LAST_WAITPOS)
 	{
 		_float3 vDestPos = m_WaitingList.first + m_WaitingList.second[m_iMyIdx].vPos + _float3{ 18.f, 0.f, -2.f };
 		m_pControllerCom->Set_Position(m_pTransformCom, Pos(vDestPos));
@@ -187,9 +181,17 @@ void CHungryDee::Swap_WatingPosition()
 			Safe_Release(partObj.second);
 		m_PartObjects.clear();
 		Set_RenderPartObj(false);
-
 		Change_State((DEE_ANIM)DEESHOPANIM_RUN, 60.f, true, true);
 	}
+}
+
+void CHungryDee::Ready_OrderUI()
+{
+	m_pDialogUI->Set_IsRender(true);
+
+	_float4 vRevisedPos = GET_POS;
+	vRevisedPos.y += fOffsetInteract;
+	m_pDialogUI->Update_Pos(_float3{ vRevisedPos.x, vRevisedPos.y, vRevisedPos.z });
 }
 
 void CHungryDee::Late_Tick(_float fTimeDelta)
@@ -207,7 +209,11 @@ void CHungryDee::Late_Tick(_float fTimeDelta)
 		for (auto& Pair : m_PartObjects)
 			Pair.second->Late_Tick(m_fTimeDelta);
 	}
+	m_pDialogUI->Late_Tick(m_fTimeDelta);
 
+	//_float4 vRevisedPos = GET_POS;
+	//vRevisedPos.y += fOffsetInteract;
+	//m_pDialogUI->Update_Pos(_float3{ vRevisedPos.x, vRevisedPos.y, vRevisedPos.z });
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
@@ -262,9 +268,10 @@ void CHungryDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject
 }
 
 #ifdef _DEBUG
-
 void CHungryDee::Render_IMGUI()
 {
+	m_pDialogUI->Render_IMGUI();
+
 	__super::Render_IMGUI();
 
 	ImGui::Text(u8"현재 애님 인덱스 : %d", m_pFSM->Get_State());
@@ -274,8 +281,12 @@ void CHungryDee::Render_IMGUI()
 	_float4x4 WorldMat = m_pTransformCom->Get_WorldMatrix();
 	ImGui::Text(u8"위치: %.2f\t%.2f\t%.2f\t%.2f", WorldMat._41, WorldMat._42, WorldMat._43, WorldMat._44);
 }
-
 #endif
+
+void CHungryDee::Change_Dialog(PARTTIME_ITEM eItem)
+{
+	m_pDialogUI->Change_Dialog(eItem);
+}
 
 void CHungryDee::OnNotify()
 {
@@ -285,6 +296,8 @@ void CHungryDee::OnNotify()
 //맨 앞자리 디
 void CHungryDee::Bring_Food(PARTTIME_ITEM eITEM)
 {
+	m_pDialogUI->Set_IsRender(false);
+
 	if (eITEM == PARTTIME_ITEM::ITEM_END)
 	{
 		Change_State((DEE_ANIM)DEESHOPANIM_INCORRECT, 60.f, false, true);
@@ -480,6 +493,7 @@ HRESULT CHungryDee::Add_PartObjects()
 
 	m_PartObjects.emplace(TEXT("Part_Weapon"), pPartObj);
 
+
 	return S_OK;
 }
 
@@ -604,6 +618,7 @@ CGameObject* CHungryDee::Clone(void* pArg)
 void CHungryDee::Free()
 {
 	Safe_Release(m_pEyeTextureCom);
+	Safe_Release(m_pDialogUI);
 
 	for (auto& Pair : m_PartObjects)
 		Safe_Release(Pair.second);
