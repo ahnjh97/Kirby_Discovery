@@ -383,7 +383,7 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\WaddleDee\Battle">
       <UniqueIdentifier>{c3474c33-3205-448e-897a-c737e2235109}</UniqueIdentifier>
-	</Filter>
+    </Filter>
     <Filter Include="02.GameObjects\Map\NonRenderWall">
       <UniqueIdentifier>{d4881f40-d9f4-423b-bdbf-ef08184a3618}</UniqueIdentifier>
     </Filter>
@@ -743,7 +743,7 @@
     <ClInclude Include="..\Public\PartTimeHelper.h">
       <Filter>02.GameObjects\MiniGame\_Helper</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\BreakableRockPartical.h">
+    <ClInclude Include="..\Public\BreakableRockParticle.h">
       <Filter>02.GameObjects\Map\BreakableRock</Filter>
     </ClInclude>
     <ClInclude Include="..\public\OriginalDee.h">
@@ -781,7 +781,7 @@
     </ClInclude>
     <ClInclude Include="..\public\BattleDee.h">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\Battle</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\Public\BlendMapObject.h">
       <Filter>02.GameObjects\Map\BlendMapObject</Filter>
     </ClInclude>
@@ -1123,7 +1123,7 @@
     <ClCompile Include="..\Private\PartTimeHelper.cpp">
       <Filter>02.GameObjects\MiniGame\_Helper</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\BreakableRockPartical.cpp">
+    <ClCompile Include="..\Private\BreakableRockParticle.cpp">
       <Filter>02.GameObjects\Map\BreakableRock</Filter>
     </ClCompile>
     <ClCompile Include="..\private\OriginalDee.cpp">
@@ -1161,7 +1161,7 @@
     </ClCompile>
     <ClCompile Include="..\private\BattleDee.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\Battle</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="..\Private\BlendMapObject.cpp">
       <Filter>02.GameObjects\Map\BlendMapObject</Filter>
     </ClCompile>

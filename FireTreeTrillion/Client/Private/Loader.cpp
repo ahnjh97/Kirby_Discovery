@@ -95,7 +95,7 @@
 #include "StarBlockPiece.h"
 #include "TerrainFog.h"
 #include "BreakableRock.h"
-#include "BreakableRockPartical.h"
+#include "BreakableRockParticle.h"
 #include "Car.h"
 #include "CarShopWall.h"
 #include "CarShopWallFrame.h"
@@ -344,7 +344,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TerrainFog"), CTerrainFog);
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BreakableRock"), CBreakableRock);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BreakableRockPartical"), CBreakableRockPartical);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BreakableRockPartical"), CBreakableRockParticle);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CarShopWall"), CCarShopWall);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CarShopWallFrame"), CCarShopWallFrame);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ToppleableBridge"), CToppleableBridge);

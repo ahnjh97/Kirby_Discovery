@@ -2,7 +2,7 @@
 #include "CarShopWall.h"
 #include "HitBox.h"
 #include "Kirby.h"
-#include "BreakableRockPartical.h"
+#include "BreakableRockParticle.h"
 
 CCarShopWall::CCarShopWall(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
@@ -225,7 +225,7 @@ _int CCarShopWall::Make_Partical()
 	//	_float fRandomscale = CUtils::Make_RandomFloat(0.6f, 1.6f);
 	//	CUtils::Set_Scaled_Matrix(matrix, fRandomscale, fRandomscale, fRandomscale);
 
-	//	CBreakableRockPartical::BREAKABLEPARTICALDESC desc = {};
+	//	CBreakableRockParticle::BREAKABLEPARTICALDESC desc = {};
 	//	desc.matrix = matrix;
 	//	vDir.y += 0.5f;
 	//	desc.vMoveDir = (_float3)vDir;

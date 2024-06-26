@@ -2,7 +2,7 @@
 #include "BreakableRock.h"
 #include "HitBox.h"
 #include "Kirby.h"
-#include "BreakableRockPartical.h"
+#include "BreakableRockParticle.h"
 #include "Camera_Main.h"
 
 CBreakableRock::CBreakableRock(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -191,7 +191,7 @@ _int CBreakableRock::Make_Partical()
 		_float fRandomscale = CUtils::Make_RandomFloat(0.6f, 1.6f);
 		CUtils::Set_Scaled_Matrix(matrix, fRandomscale, fRandomscale, fRandomscale);
 
-		CBreakableRockPartical::BREAKABLEPARTICALDESC desc = {};
+		CBreakableRockParticle::BREAKABLEPARTICALDESC desc = {};
 		desc.matrix = matrix;
 		vDir.y += 0.5f;
 		desc.vMoveDir = (_float3)vDir;

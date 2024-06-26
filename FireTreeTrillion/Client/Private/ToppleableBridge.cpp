@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "BreakableRockPartical.h"
+#include "BreakableRockParticle.h"
 #include "ToppleableBridge.h"
 #include "HitBox.h"
 #include "Kirby.h"
@@ -191,7 +191,7 @@ void CToppleableBridge::Make_Particles()
 		_float fRandomscale = CUtils::Make_RandomFloat(0.6f, 1.6f);
 		CUtils::Set_Scaled_Matrix(matrix, fRandomscale, fRandomscale, fRandomscale);
 
-		CBreakableRockPartical::BREAKABLEPARTICALDESC desc = {};
+		CBreakableRockParticle::BREAKABLEPARTICALDESC desc = {};
 		desc.matrix = matrix;
 		vDir.y += 0.5f;
 		desc.vMoveDir = (_float3)vDir;
