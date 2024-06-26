@@ -946,7 +946,7 @@ static _float4 Spit_Target_Object(CKirby* pKirby)
 	{
 		if (nullptr != GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_DeeDeeDee")))
 		{
-			for (auto& pObject : *GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), g_strLayerMonster))
+			for (auto& pObject : *GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_DeeDeeDee")))
 			{
 				CTransform* pObjectTransform = pObject->Get_TransformCom();
 				_float4 vObjectPos = pObjectTransform->Get_State_Vector(CTransform::STATE_POSITION);
