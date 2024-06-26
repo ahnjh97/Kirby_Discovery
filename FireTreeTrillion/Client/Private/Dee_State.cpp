@@ -366,7 +366,17 @@ void CDee_Hungry_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 		//다다르면 다시 웨이팅
 		if (_float3{ XZVec(pHungryDee->Get_DestWaitingPos()) - XZVec(baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION)) }.Length() < .5f)
 		{
-			pHungryDee->Change_State(pHungryDee->IsFrontWaiting() ? (DEE_ANIM)DEESHOPANIM_ORDERNORMAL : (DEE_ANIM)DEESHOPANIM_GUESTNORMAL, CUtils::Make_RandomFloat(50.f, 60.f), true, true);
+
+			//앞 자리에 도착한 와들디면 UI를 준비하고, 주문 state로 넘어간다.
+			if (pHungryDee->IsFrontWaiting())
+			{
+				pHungryDee->Ready_OrderUI();
+				pHungryDee->Change_State((DEE_ANIM)DEESHOPANIM_ORDERNORMAL, CUtils::Make_RandomFloat(50.f, 60.f), true, true);
+			}
+			//아니라면 그냥 기다린다.
+			else
+				pHungryDee->Change_State((DEE_ANIM)DEESHOPANIM_GUESTNORMAL, CUtils::Make_RandomFloat(50.f, 60.f), true, true);
+
 
 			CUtils::Make_RandomInt(0, 2) == 2 ?
 				baseInfo.pDee->Set_DeeEyeState(DEEEYE_SMILE) :
@@ -396,7 +406,16 @@ void CDee_Hungry_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 		//다다르면 다시 웨이팅
 		if (_float3{ XZVec(pHungryDee->Get_DestWaitingPos()) - XZVec(baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION)) }.Length() < .5f)
 		{
-			pHungryDee->Change_State(pHungryDee->IsFrontWaiting() ? (DEE_ANIM)DEESHOPANIM_ORDERNORMAL : (DEE_ANIM)DEESHOPANIM_GUESTNORMAL, CUtils::Make_RandomFloat(50.f, 60.f), true, true);
+			//앞 자리에 도착한 와들디면 UI를 준비하고, 주문 state로 넘어간다.
+			if (pHungryDee->IsFrontWaiting())
+			{
+				pHungryDee->Ready_OrderUI();
+				pHungryDee->Change_State((DEE_ANIM)DEESHOPANIM_ORDERNORMAL, CUtils::Make_RandomFloat(50.f, 60.f), true, true);
+			}
+			//아니라면 그냥 기다린다.
+			else
+				pHungryDee->Change_State((DEE_ANIM)DEESHOPANIM_GUESTNORMAL, CUtils::Make_RandomFloat(50.f, 60.f), true, true);
+
 
 			CUtils::Make_RandomInt(0, 2) == 2 ?
 				baseInfo.pDee->Set_DeeEyeState(DEEEYE_SMILE) :

@@ -218,7 +218,7 @@ HRESULT CLevel_Town::Ready_Map()
 	fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
 
 	_uint iStrLength{};
-	string strModelName;https://drive.google.com/drive/u/0/my-drive
+	string strModelName;
 	_float4x4 matWorld{};
 	_float3 vMin{}, vMax{};
 	wstring wstrGameObjectTag;

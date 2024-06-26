@@ -67,7 +67,7 @@ _int CPartTimerKirby::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return Ready_Dead();
 	 
-	m_fTimeDelta = m_pGameInstance->Get_FirstTimer();
+	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
 	__super::Tick(m_fTimeDelta);
 
@@ -86,16 +86,17 @@ _int CPartTimerKirby::Tick(_float fTimeDelta)
 
 void CPartTimerKirby::Late_Tick(_float fTimeDelta)
 {
+	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
-		m_pModelCom->Play_Animation(fTimeDelta);
+		m_pModelCom->Play_Animation(m_fTimeDelta);
 
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_DEFERREDINFO, this);
 	}
-	m_pPartTimeFood->Late_Tick(fTimeDelta);
-	m_pHat->Late_Tick(fTimeDelta);
+	m_pPartTimeFood->Late_Tick(m_fTimeDelta);
+	m_pHat->Late_Tick(m_fTimeDelta);
 }
 
 HRESULT CPartTimerKirby::Render()

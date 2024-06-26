@@ -23,6 +23,9 @@ float g_fMaskRatio = { 1.f };
 
 float g_fAlarmColor = { 0.f };
 
+// UI 함수에서 마스킹유무
+int g_iMasking = 0;
+
 
 // 회전된 UV를 계산
 float2 RotateUV(float2 vCoord, float fAngle)
@@ -153,19 +156,31 @@ PS_OUT PS_MAIN_ALPHABLEND(PS_IN_ALPHABLEND In)
 PS_OUT PS_MAIN_SOLIDALPHABLEND(PS_IN_ALPHABLEND In)
 {
 	PS_OUT			Out = (PS_OUT)0;
-
+    vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord);
     Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
     
-    //알파 값 예외처리
-    if (Out.vColor.a < 0.1f)
-        discard;
-    
-    Out.vColor.rgb = g_vRColor;
+    if(g_iMasking == 2)
+    {
+        if (Out.vColor.a < 0.8f)
+            discard;
+
+        if( g_fMaskRatio < vMask.r )
+             discard;
+    }
+    else
+    {
+        //알파 값 예외처리
+        if (Out.vColor.a < 0.1f)
+            discard;
+    }
+
+    if(g_vRColor.r == 0.45)
+        Out.vColor.rgb = g_vRColor;
     Out.vColor.a *= g_fAlpha;
 
     if (0.01f <= Out.vColor.a)
         Out.vNonBlur = vector(0.f, 1.f, 0.f, 0.f);
-	
+
 	return Out;
 }
 
@@ -394,20 +409,30 @@ PS_OUT PS_MAIN_ALPHATEST_COLOR(PS_IN In)
 PS_OUT PS_MAIN_ALPHATEST_COLOR_HORIZONTALCUT(PS_IN In)
 {
 	PS_OUT			Out = (PS_OUT)0;
-
+    vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord);
     Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
-	
+
 	//알파 테스트
 	if(Out.vColor.a < .6f)
         discard;
 
-    if( g_fMaskRatio < In.vTexcoord.x )
-        discard;
+    if(g_iMasking == 1)
+    {
+        if( g_fMaskRatio < In.vTexcoord.x )
+            discard;
+    }
 
     Out.vColor.rgb *= g_vRColor;
-
     Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
-	
+	//Out.vColor.rgb = g_vRColor;
+    //Out.vColor.a *= g_fAlpha;
+    
+    if(g_iMasking == 1)
+    {
+        if (vMask.r > g_fMaskRatio)
+            discard;
+    }
+
 	return Out;
 }
 

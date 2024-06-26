@@ -312,6 +312,7 @@
     <ClInclude Include="..\Public\ToppleableBridge.h" />
     <ClInclude Include="..\Public\Trigger.h" />
     <ClInclude Include="..\Public\UI_PartTime.h" />
+    <ClInclude Include="..\Public\UI_PartTimeDee.h" />
     <ClInclude Include="..\public\WaddleDee.h" />
     <ClInclude Include="..\Public\WasteCan.h" />
     <ClInclude Include="Client.h" />
@@ -459,6 +460,7 @@
     <ClCompile Include="..\Private\ToppleableBridge.cpp" />
     <ClCompile Include="..\Private\Trigger.cpp" />
     <ClCompile Include="..\Private\UI_PartTime.cpp" />
+    <ClCompile Include="..\Private\UI_PartTimeDee.cpp" />
     <ClCompile Include="..\private\WaddleDee.cpp" />
     <ClCompile Include="..\Private\WasteCan.cpp" />
     <ClCompile Include="..\Public\KirbyBoom_State.cpp" />
