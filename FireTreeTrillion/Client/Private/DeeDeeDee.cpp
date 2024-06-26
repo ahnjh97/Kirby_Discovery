@@ -64,7 +64,23 @@ _int CDeeDeeDee::Tick(_float fTimeDelta)
 	// 디디디 시스템 틱
 	DeeDeeDee_SystemTick(m_fTimeDelta);
 
-	__super::Tick(m_fTimeDelta);
+	// 모션블러 계산
+	Compute_MotionBlur();
+
+	// FSM 제어
+	if (m_pFSM != nullptr)
+		m_pFSM->Update(this, m_fTimeDelta);
+
+	if (m_fWhiteColorDiffuse > 0.f)
+	{
+		// 0.2초만에 다시 원래 색상으로 복귀한다.
+		m_fWhiteColorDiffuse -= fTimeDelta * 5.f;
+
+		if (m_fWhiteColorDiffuse < 0.f)
+			m_fWhiteColorDiffuse = 0.f;
+	}
+
+	Damage_Delay(m_fTimeDelta);
 
 	m_pWeapons->Tick(m_fTimeDelta);
 

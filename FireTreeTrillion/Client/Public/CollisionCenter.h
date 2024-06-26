@@ -81,6 +81,7 @@ private:
     void Knock_back(CPhysXObject* pObject, _float3 vKnockbackDir, _float fPower);
 
     void Compute_Damage(CPhysXObject* pPlayer, CPhysXObject* pMonster);
+    void Compute_HitBoxDamage(CPhysXObject* pPlayer, CPhysXObject* pMonster);
     void Compute_Heal(CPhysXObject* pPlayer, CPhysXObject* pItem);
     void Compute_Coin(CPhysXObject* pPlayer, CPhysXObject* pItem);
     void Compute_SuperPower(CPhysXObject* pPlayer, CPhysXObject* pItem);

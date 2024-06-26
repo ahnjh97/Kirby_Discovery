@@ -493,8 +493,7 @@ void CCollisionCenter::DeeDeeDee_Battle()
 
 			// 플레이어와 보스 양쪽에 넉백을 만든다.
 			pthis->Player_Monster_Knock_back(pKirby, pMonster);
-			_float fAttack = pMonster->Get_Attack();
-			pKirby->Minus_Hp(fAttack);
+			pthis->Compute_HitBoxDamage(pKirby, pMonster);
 			DstHit->Set_Alive(false);
 			SrcHit->Set_Alive(false);
 
@@ -1184,6 +1183,19 @@ void CCollisionCenter::Compute_Damage(CPhysXObject* pPlayer, CPhysXObject* pMons
 	_float fPlayerAttack = pKirby->Get_Attack();
 	pCMonster->Minus_Hp(fPlayerAttack);
 
+}
+
+void CCollisionCenter::Compute_HitBoxDamage(CPhysXObject* pPlayer, CPhysXObject* pMonster)
+{
+	CKirby* pKirby = static_cast<CKirby*>(pPlayer);
+
+	// 무적이 아닐 경우
+	if (pKirby->isOverPower() == false)
+	{
+		_float fMonsterAttack = pMonster->Get_Attack();
+		pKirby->Minus_Hp(fMonsterAttack);
+		Camera_Shaking(1.2f);
+	}
 }
 
 void CCollisionCenter::Compute_Heal(CPhysXObject* pPlayer, CPhysXObject* pItem)
