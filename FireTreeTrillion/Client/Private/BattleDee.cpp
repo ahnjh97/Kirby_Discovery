@@ -76,7 +76,7 @@ HRESULT CBattleDee::Initialize(void* pArg)
 	hr = Add_PartObjects();
 	CHECK_FAILED(hr);
 
-	m_pTransformCom->Rotation({ 0.f, 1.f, 0.f, 0.f }, ToRadian(180.f));
+	//m_pTransformCom->Rotation({ 0.f, 1.f, 0.f, 0.f }, ToRadian(180.f));
 
 	m_eAbilityType = ABILITY_DEFAULT;
 
@@ -290,6 +290,8 @@ void CBattleDee::SetUp_FSM()
 
 	m_pFSM->Add_State(DEEANIM_DAMAGE, CDee_FlyStun_State::Create());
 	m_pFSM->Add_State(DEEANIM_MOVEFALL, CDee_Interact_State::Create());
+
+
 
 }
 

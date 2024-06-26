@@ -43,9 +43,9 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 	// 히트박스 또는 불릿(투사체) 관련 상호작용 콜리전 검사 진행. (보스 제외)
 	Hitbox_Collision();
 
-
-	// 디디디와 싸우는 특수한 충돌로직들 모아두었습니다.
-	DeeDeeDee_Battle();
+	if (*GAMEINSTANCE Get_CurrentLevelID() == LEVEL_DEEDEEDEE)
+		// 디디디와 싸우는 특수한 충돌로직들 모아두었습니다.
+		DeeDeeDee_Battle();
 
 
 
@@ -524,8 +524,34 @@ void CCollisionCenter::DeeDeeDee_Battle()
 			SrcHit->Set_Alive(false);
 
 			pNpc->Collision(CONTENT_ATTACK, pMonster);
+
 		});
 
+
+	Collision_Collider(m_GameObjects[BATTLEDEE], m_GameObjects[BOSS_DEEDEEDEE], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CPhysXObject* pNpc = static_cast<CPhysXObject*>(Dst);
+			CDeeDeeDee* pMonster = static_cast<CDeeDeeDee*>(Src);
+
+			if (pNpc->Get_PhyXState() != PO_FLYAWAY)
+				return;
+
+			_float4 vNpcPos = pNpc->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
+			_float4 vDeeDeeDeePos = pMonster->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
+
+			_float3 vKnockDir = XMVector3Normalize(vNpcPos - vDeeDeeDeePos);
+
+			pthis->Knock_back(pNpc, vKnockDir * 5.f, 10.f);
+			DstHit->Set_Alive(false);
+			SrcHit->Set_Alive(false);
+			pNpc->Set_PhyXState(PO_FLYDEADAWAY);
+		});
 
 }
 
