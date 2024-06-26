@@ -37,7 +37,7 @@ HRESULT CBasicMap::Initialize(void* pArg)
 
 
     if (wstrModelTag != TEXT("Town")        && wstrModelTag != TEXT("DeeDeeDee") && wstrModelTag != TEXT("Land_LbLastBossBeforeStep") && 
-        wstrModelTag != TEXT("Land_VcLabo") && wstrModelTag != TEXT("TownShop")  && wstrModelTag.substr(wstrModelTag.length() - 5) == TEXT("Blend"))
+        /*wstrModelTag != TEXT("Land_VcLabo") && */wstrModelTag != TEXT("TownShop")  && wstrModelTag.substr(wstrModelTag.length() - 5) == TEXT("Blend"))
     {
         m_bBlendMap = true;
         m_eRenderGroup = CRenderer::RENDER_BLEND;
@@ -52,13 +52,15 @@ HRESULT CBasicMap::Initialize(void* pArg)
     , "g_bStencil", "g_bRimLight", "m_fRimWidth", "g_bMotionBlur", "g_BoneMatrices" };
     m_vecStencilRimLightMotionBlurNames = { "g_bStencil", "g_bRimLight", "m_fRimWidth", "g_bMotionBlur" };
 
-    if(wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("DeeDeeDee") && wstrModelTag != TEXT("Land_VcLabo") &&
+    if (true == CheckIfBlendMapExists(GameObjectDesc.wstrModelName)) 
+    {
+        if (FAILED(Add_BlendMap(wstrModelTag)))
+            return E_FAIL;
+    }
+
+    if(wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("DeeDeeDee") && /*wstrModelTag != TEXT("Land_VcLabo") &&*/
        wstrModelTag != TEXT("Land_LbLastBossBeforeStep") && wstrModelTag != TEXT("TownShop") && false == m_bBlendMap)
     {
-        if (true == CheckIfBlendMapExists(GameObjectDesc.wstrModelName)) {
-            if (FAILED(Add_BlendMap(wstrModelTag)))
-                return E_FAIL;
-        }
 
         m_pOcTree = m_pModelCom->Create_OcTree(GameObjectDesc.vMin, GameObjectDesc.vMax, m_vecPassIndices, m_vecSamplingFactors, m_vecConstantNames);
         
@@ -71,7 +73,8 @@ HRESULT CBasicMap::Initialize(void* pArg)
         InsertMapDecos();
     }
 
-    if (wstrModelTag == TEXT("Town") ||  wstrModelTag == TEXT("DeeDeeDee") || wstrModelTag == TEXT("TownShop")|| wstrModelTag == TEXT("Land_VcLabo") || wstrModelTag == TEXT("Land_LbLastBossBeforeStep")) 
+    if (wstrModelTag == TEXT("Town") ||  wstrModelTag == TEXT("DeeDeeDee") || wstrModelTag == TEXT("TownShop")|| 
+        /*wstrModelTag == TEXT("Land_VcLabo") || */wstrModelTag == TEXT("Land_LbLastBossBeforeStep")) 
     {
         if (LEVEL_TOOL_MAP != *m_pCurrentLevelID) 
         {

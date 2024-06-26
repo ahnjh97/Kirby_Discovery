@@ -381,7 +381,7 @@ HRESULT CLoader::Loading_StaticComponentAll()
 	CHECK_FAILED(hr);
 
 
-#pragma region LEVEL_SKYSPHERE
+#pragma region SKYSPHERE::LEVEL_FINALBOSS
 
 	//FIELD
 	hr = Add_Texture(eLevel, "SkySphere_Lab_CloudNoize", "SkySphere/SkySphere_Lab_CloudNoizeC_MRA.dds");
@@ -1552,6 +1552,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	else if (eLevel == LEVEL_FINALBOSS)
 	{
 		m_vecModelInfo.emplace_back("Land_LbLastBossBeforeStep", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Land_LbLastBossBeforeStep_Blend", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("BG1", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
