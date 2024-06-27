@@ -12,6 +12,7 @@
 #include "Kabu.h"
 #include "BrontoBurt.h"
 #include "PoppyBrosJr.h"
+#include "SkySphere.h"
 
 #include "HungryDee.h"
 
@@ -58,8 +59,8 @@ HRESULT CLevel_DeeDeeDee::Initialize()
 	//CHECK_FAILED(hr);
 	//hr = Ready_Kickables();
 	//CHECK_FAILED(hr);
-	//hr = Ready_Objects();
-	//CHECK_FAILED(hr);
+	hr = Ready_Objects();
+	CHECK_FAILED(hr);
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 	m_pGameInstance->Set_ColorSet_ByIndex(4);
@@ -163,8 +164,10 @@ HRESULT CLevel_DeeDeeDee::Ready_Layer_Camera(const wstring& strLayerTag)
 
 HRESULT CLevel_DeeDeeDee::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
+	CSkySphere::SKYSPHERE_DESC DDDSkyDesc{};
+	DDDSkyDesc.strModelTag = { "SkySphere_Stage1_Day" };
 
-	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_DEEDEEDEE, strLayerTag, TEXT("Prototype_GameObject_SkySphere"));
+	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_DEEDEEDEE, strLayerTag, TEXT("Prototype_GameObject_SkySphere"), &DDDSkyDesc);
 	CHECK_FAILED(hr);
 
 	return S_OK;

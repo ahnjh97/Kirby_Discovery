@@ -379,7 +379,9 @@ _float CCharacterController::Compute_Wall(_fvector vLook, _float fOffSet)
 	{
 		// 첫 번째 히트 결과
 		hit = hitBuffer.block;
-
+		
+		m_pMostRecentActor = hit.actor;
+		
 		fDistance = (rayOrigin - hit.position).magnitude();
 	}
 	else

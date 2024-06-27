@@ -37,8 +37,8 @@ HRESULT CDeeDeeDee::Initialize(void* pArg)
 
 	m_tInfo.m_vOriginPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
-	m_fMaxHp = 300.f;
-	m_fHp = 300.f;
+	m_fMaxHp = 200.f;
+	m_fHp = 200.f;
 	m_fAttack = 15.f;
 	m_eVacuumSize = SIZE_BIG;
 	m_eAbilityType = ABILITY_DEFAULT;
@@ -511,6 +511,9 @@ void CDeeDeeDee::HitBoxChanger(_uint eState)
 //카메라 메인에 자기 자신을 두 번째 타겟으로 등록한다.
 HRESULT CDeeDeeDee::Make_TargetToCams()
 {
+	if (*m_pCurrentLevelID == LEVEL_TOOL_ANIM)
+		return S_OK;
+
 	CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
 	CHECK_NULLPTR(pCameraMain);
 	pCameraMain->Set_Target(m_pTransformCom, CCamera::FOCUS_SECOND);
@@ -538,6 +541,8 @@ void CDeeDeeDee::DeeDeeDee_SystemTick(_float fTimeDelta)
 		{
 			if (Get_State() == STATE_WAIT)
 			{
+				if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_BossUI"), TEXT("Prototype_GameObject_HUD_BossHpBar"), this)))
+					return;
 				Change_State(STATE_COMMAND, 60.f, false, true);
 				m_bInitializeAnim = false;
 			}

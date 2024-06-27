@@ -393,6 +393,12 @@
     <Filter Include="02.GameObjects\UI\PartTimeDee">
       <UniqueIdentifier>{324b2e98-324d-4f5b-b2c0-71610d22ab87}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\UI\HUD\BossHp">
+      <UniqueIdentifier>{d5a13d88-c8da-47f6-ab92-a8b19f3b623e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\PortalSoftEffect">
+      <UniqueIdentifier>{412e7813-8f9a-4c83-ba98-f76991e1bfc5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -794,6 +800,15 @@
     <ClInclude Include="..\Public\UI_PartTimeDee.h">
       <Filter>02.GameObjects\UI\PartTimeDee</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\HUD_BossHpBar.h">
+      <Filter>02.GameObjects\UI\HUD\BossHp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PortalSoftEffect.h">
+      <Filter>02.GameObjects\Map\PortalSoftEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\AnimBridge.h">
+      <Filter>02.GameObjects\Map\Bridge</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1176,6 +1191,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\UI_PartTimeDee.cpp">
       <Filter>02.GameObjects\UI\PartTimeDee</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HUD_BossHpBar.cpp">
+      <Filter>02.GameObjects\UI\HUD\BossHp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PortalSoftEffect.cpp">
+      <Filter>02.GameObjects\Map\PortalSoftEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\AnimBridge.cpp">
+      <Filter>02.GameObjects\Map\Bridge</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

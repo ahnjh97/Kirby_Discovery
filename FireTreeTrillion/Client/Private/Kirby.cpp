@@ -493,7 +493,7 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 				CMultiEffect::MULTI_FX_DESC FXDesc{};
 				FXDesc.vInitPos = { 0.f, .6f, .4f };
 				FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Vacuum_v1"), &FXDesc)))
+				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Vacuum_Vacuum_v3"), &FXDesc)))
 					return;
 				Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 
@@ -1372,14 +1372,6 @@ void CKirby::DefaultIdle()
 	m_pModelCom[BODY_DEFAULT]->Set_Animation(STATE_IDLE, 60.f, true, false);
 }
 
-_float4 CKirby::Compute_TerrainPosition()
-{
-	if (m_pControllerCom == nullptr)
-		return _float4();
-
-	return m_pControllerCom->Compute_TerrainPosition_Vector();
-}
-
 void CKirby::Kirby_SystemTick(_float fTimeDelta)
 {
 	// 그림자는 무조건 커비를 따라간다.
@@ -1536,6 +1528,15 @@ void CKirby::Kirby_LookInitialize()
 	INFO(m_vTargetDir) = INFO(m_vMoveDir);
 }
 
+CGameObject* CKirby::FindToppleableBridge(PxRigidActor* pActor)
+{
+	auto mapIter = m_mapToppleableBridges.find(pActor);
+	if (mapIter != m_mapToppleableBridges.end())
+		return mapIter->second;
+
+	return nullptr;
+}
+
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CKirby* pInstance = new CKirby(pDevice, pContext);
@@ -1570,6 +1571,9 @@ void CKirby::Free()
 	CLevelChanger::Get_Instance()->Save(tLevelData);
 
 	__super::Free();
+
+	for (auto& pair : m_mapToppleableBridges)
+		Safe_Release(pair.second);
 
 	for (auto& pModelCom : m_pModelCom)
 		Safe_Release(pModelCom);

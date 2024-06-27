@@ -186,8 +186,6 @@ HRESULT CModel::Play_Animation(_float fTimeDelta)
 	/* 현재 애니메이션에 맞는 뼈의 상태(m_TransformationMatrix)를 갱신해준다. */
 	m_Animations[m_iCurrentAnimIndex]->Invalidate_TransformationMatrix(fTimeDelta, m_Bones, m_isLoop, this);
 
-
-
 	for (auto& pBone : m_Bones)
 		pBone->Invalidate_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_TransformMatrix));
 	
@@ -235,11 +233,42 @@ HRESULT CModel::CreateStaticActor(_float4x4& matWorld)
 	return S_OK;
 }
 
-void CModel::DisableActor()
+HRESULT CModel::CreateStaticActors_Exclude(unordered_set<string> _setNonColMesh, _float4x4& matWorld)
+{
+	for (auto& mesh : m_Meshes)
+	{
+		string strMeshName = mesh->Get_Name();
+		if (_setNonColMesh.end() == _setNonColMesh.find(strMeshName))
+			mesh->CreateStaticActor(matWorld);
+	}
+
+	return S_OK;
+}
+
+HRESULT CModel::CreateStaticActors_Include(unordered_set<string> _setColMesh, _float4x4& matWorld)
+{
+	for (auto& mesh : m_Meshes)
+	{
+		string strMeshName = mesh->Get_Name();
+		if (_setColMesh.end() != _setColMesh.find(strMeshName))
+			mesh->CreateStaticActor(matWorld);
+	}
+
+	return S_OK;
+}
+
+void CModel::DisableActors()
 {
 	PxScene* pScene = m_pGameInstance->Get_Scene();
 	for (auto& mesh : m_Meshes)
 		mesh->DisableActor(pScene);
+}
+
+void CModel::ReAddActors()
+{
+	PxScene* pScene = m_pGameInstance->Get_Scene();
+	for (auto& mesh : m_Meshes)
+		mesh->ReAddActor(pScene);
 }
 
 _float4 CModel::Check_Meshes(const class CTransform* pTransform, _Out_ _int& iMeshIndex) const
@@ -582,6 +611,27 @@ void CModel::AddBlendObjectToRenderGroup()
 		return;
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, m_pBlendObject);
+}
+
+unordered_set<PxRigidActor*> CModel::Get_ActorsSet()
+{
+	unordered_set<PxRigidActor*> setActors;
+	for (auto& mesh : m_Meshes)
+		setActors.insert(mesh->Get_Actor());
+
+	return setActors;
+}
+
+vector<PxRigidActor*> CModel::Get_Actors()
+{
+	vector<PxRigidActor*> vecActors;
+	for (auto& mesh : m_Meshes) {
+		PxRigidActor* pActor = mesh->Get_Actor();
+		if(nullptr != pActor)
+			vecActors.push_back(pActor);
+	}
+		
+	return vecActors;
 }
 
 HRESULT CModel::Ready_Meshes(_bool bOctree)

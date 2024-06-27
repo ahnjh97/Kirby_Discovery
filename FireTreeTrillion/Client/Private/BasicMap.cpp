@@ -80,6 +80,8 @@ HRESULT CBasicMap::Initialize(void* pArg)
     {
         if (LEVEL_TOOL_MAP != *m_pCurrentLevelID) 
         {
+            TraverseBlendDecoInfoTxts(m_mapBlendMeshesIndices, m_mapBlendObjStaticActor);
+
             ReadMapDecoTxts();
             ReadDecos_ForSmallLevels();
         }
@@ -570,10 +572,10 @@ void CBasicMap::ReadDecos_ForSmallLevels()
             tBlendObjDesc.tModel = MODEL{ strModelName, eType, 1.f, 0.f, 0, strFolder, false };
             tBlendObjDesc.iShaderVars = iShaderVars;
             tBlendObjDesc.fRimWidth = fRimWidth;
+            tBlendObjDesc.setBlendMeshIndices = mapIter->second;
             CBlendMapObject* pBlendMapObj =  dynamic_cast<CBlendMapObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_BlendMapObject"), &tBlendObjDesc));
 
             if (nullptr != pBlendMapObj) {
-                pBlendMapObj->SetUp_BlendMeshes(mapIter->second);
                 m_vecBlendObjects.push_back(pBlendMapObj);
                 pModel->Set_BlendObject(pBlendMapObj);
             }
@@ -682,6 +684,9 @@ HRESULT CBasicMap::Render_NonOctreeMapDecos()
         }
     }
 
+    for (auto& blendDeco : m_vecBlendObjects)
+        blendDeco->Late_Tick(m_pGameInstance->Get_FirstTimer());
+
     return S_OK;
 }
 
@@ -729,7 +734,14 @@ void CBasicMap::TraverseBlendDecoInfoTxts(unordered_map<string, unordered_set<_u
     while (dir_iter != end_iter) {
         if (is_regular_file(*dir_iter)) {
             string strFilePath = dir_iter->path().filename().string();
-            string strModelName = strFilePath.substr(0, strFilePath.length() - 4);
+            string strFileName = strFilePath.substr(0, strFilePath.length() - 4);
+
+            string strModelName;
+            string::size_type pos = strFileName.find('_');
+            if (pos != string::npos)
+                strModelName = strFileName.substr(0, pos);
+            else
+                continue;
 
             unordered_set<_uint> setBlendMeshesIndices;
             _bool bStaticActor = false;
@@ -739,7 +751,6 @@ void CBasicMap::TraverseBlendDecoInfoTxts(unordered_map<string, unordered_set<_u
                 _mapBlendMeshIndices.emplace(strModelName, setBlendMeshesIndices);
                 _mapBlendObjStaticActor.emplace(strModelName, bStaticActor);
             }
-               
         }
         ++dir_iter;
     }
@@ -764,7 +775,7 @@ _bool CBasicMap::ReadBlendMeshesIndices(const string& _strFullPath, const string
     fileInput.read(reinterpret_cast<char*>(&iNumBlendMeshes), sizeof(iNumBlendMeshes));
 
     _uint iMeshIndex{};
-    for (_uint i = 0; i < iMeshIndex; i++)
+    for (_uint i = 0; i < iNumBlendMeshes; i++)
     {
         fileInput.read(reinterpret_cast<char*>(&iMeshIndex), sizeof(iMeshIndex));
         _setMeshIndices.insert(iMeshIndex);
