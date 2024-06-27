@@ -8,20 +8,54 @@ BEGIN(Client)
 class CCamera_Main final : public CCamera
 {
 public:
-	enum CAMSEQ { SEQ_ZOOMINOUT, SEQ_END };
+	//정의한 카메라 시퀀스들.
+	enum CAMSEQ
+	{
+		SEQ_ZOOMINOUT,
+		SEQ_HARDCUT_TEST,
+		SEQ_SOFTCUT_TEST,
+		SEQ_END
+	};
+
+	enum CAMCUT { CUT_HARD, CUT_INTERPOLATE, CUT_END };
+
+	enum CAMPOS { POS_ABSOLUTE, POS_RELATIVE, POS_END };
+	enum CAMDIR	{ DIR_ABSOLUTE, DIR_RELATIVE, DIR_END };
 
 	//카메라 시퀀스 구조체
 	typedef struct
 	{
-		//easing 플래그
-		EASING eEase = { EASE_LINEAR };
-		//지속 시간
-		_float fDuration = { .3f };
-		//거리
-		_float fDist = { -1.f };
-		//볼 방향과 피치(x) 앵글
-		_float3 fDir = { 0.f, 0.f, 0.f };
-		_float fPitchAngle = { -1.f };
+
+		//시퀀스 시작부터 어느 시간에 재생할지?
+		_float	fTime = { 0.f };
+
+		//시퀀스를 어떻게 컷 할것인가? (하드 컷 / 보간)
+		CAMCUT	eCamCut = { CUT_HARD };
+
+		//하드 컷 모드라면, 필요없는 변수
+		//easing 플래그. 보간 그래프를 정의.
+		EASING eEase = { EASE_END };
+		//보간 속도.
+		_float fInterpolateSpeed = { -1.f };
+
+		//카메라 위치가 (커비)타겟 기준인가, 월드 기준인가?
+		CAMPOS eCamPos = { POS_END };
+
+		//카메라 방향이 (커비)타겟 기준인가, 월드 기준인가?
+		CAMDIR eCamDir = { DIR_END };
+
+		//볼 방향과 위치. -1 이라면, 기존 값을 유지.
+		_float3 vPos = { -1.f, -1.f, -1.f };
+		//Dir이 -1이라면 타겟을 보도록 한다.
+		_float3 vDir = { -1.f, -1.f, -1.f };
+
+		//fov y 값. degree로 기입. -1 이라면, 기존 값을 유지.
+		_float fFOVY = { -1.f };
+
+		//z 앵글. -1이라면 기존 값을 유지.
+		_float fZAngle = { -1.f };
+
+		_float fZoomOffset = { -1.f };
 
 	}CAMACTION;
 
@@ -91,7 +125,7 @@ public:
 	//FOV를 세팅한다.
 	void Set_FOVY(_float fFOVYDegree) { m_fDestFovy = XMConvertToRadians(fFOVYDegree); }
 
-	void Zoom(_float fZoom)	{ m_fZoomOffset = fZoom; }
+	void Zoom(_float fZoom)	{ m_fCurZoomOffset = fZoom; }
 
 	//카메라에게 특정 동작들을 시퀀스로 선예약한다.
 	//인덱스 대신, enum으로 구별하게 하기
@@ -110,7 +144,7 @@ public:
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual _int Tick(_float fTimeDelta) override;
 	//virtual _int Tick(_float fTimeDelta) override;
-	virtual void Late_Tick(_float fTimeDelta) override;
+	virtual void Late_Tick(_float fTimeDelta) override {}
 	virtual HRESULT Render() override;
 #ifdef _DEBUG
 	virtual void Render_IMGUI() override;
@@ -126,9 +160,11 @@ private:
 	vector<pair<_vector, _float>>	m_vecRearDirRadius;
 	vector<pair<_float4x4, _float>>	m_vecTriggerInfo; // Trigger InverseMatrix and Scale
 
+
 	_float m_fTriggerRatio = {};
 	_bool m_bLerpByTriggerInfo = { false };
 	_bool m_bPreLerpByTriggerInfo = { false };
+
 
 	_vector m_vSlerpedDir = {};
 	_float m_fLerpedRadius = {};
@@ -146,9 +182,12 @@ private:
 
 	//카메라가 포커징할 기준점 
 	_float3 m_vAnchor = { 0.f, 0.f, 0.f };
+
 	//카메라의 실제 목표 위치
 	_float3 m_vDestCamPos = { 0.f, 0.f, 0.f };
-
+	//카메라의 시작 위치.(시퀀스 용)
+	_float3 m_vStartCamPos = { 0.f, 0.f, 0.f };
+	_float3 m_vCurCamPos = { 0.f, 0.f, 0.f };
 
 	//기준점으로부터 현재 거리
 	_float m_fCurDistance = { 0.f };
@@ -156,17 +195,27 @@ private:
 	_float m_fOrigDistance = { 0.f };
 
 
-	_float m_fZoomOffset = { 0.f };
-	//_float m_fAbsoluteZoomOffset = { 0.f };
+	_float m_fCurZoomOffset = { 0.f };
+	_float m_fStartZoomOffset = { 0.f };
+	_float m_fDestZoomOffset = { 0.f };
 
 	//(시퀀스 시)시작, 목표 거리
 	_float m_fStartDistance = { 0.f };
 	_float m_fDestDistance = { 0.f };
 
-	_float3 m_vCurCamDir = {0.f, 0.f, 0.f};
-	_float3 m_vDestCamDir = { 0.f, 0.f, 0.f };
 	_float3 m_vOrigCamDir = { 0.f, 0.f, 0.f };
+	_float3 m_vCurCamDir = {0.f, 0.f, 0.f};
 
+	//(시퀀스) 카메라 방향이 타겟을 향하지 않는가?
+	_bool	m_bSeqDestDirIsAbsolute = { false };
+
+	//시작 dir과 목표 dir. 시퀀스 용과 상시 보간 용 둘 다 사용된다.
+	_float3 m_vDestCamDir = { 0.f, 0.f, 0.f };
+	_float3 m_vStartCamDir = { 0.f, 0.f, 0.f };
+
+	_float m_fCurZAngle = { 0.f };
+	_float m_fStartZAngle = { 0.f };
+	_float m_fDestZAngle = { 0.f };
 
 	//카메라 움직임 감도
 	_float	m_fCamSensor = { 0.f };
@@ -177,7 +226,8 @@ private:
 /*FOV 조작*/
 
 	_float		m_fDestFovy = { 0.f };
-
+	//(시퀀스) 시작 fov 저장
+	_float		m_fStartFovy = { 0.f };
 
 /*카메라 쉐이킹*/
 
@@ -200,14 +250,31 @@ private:
 
 	//현재 시퀀스 모드
 	CAMSEQ m_eSpecialSeq = { SEQ_END };
+
 	//시퀀스 웨이팅 목록
-	list<pair<_float, CAMACTION>> m_SeqList;
+	list<CAMACTION> m_CamSeq;
+
+	CAMCUT m_eCamCut = { CUT_END };
+
 	//보간 시간
-	pair<_float, _float> m_fSeqTime = { 0.f, 0.f };
+	EASING m_eCurSeqEase = { EASE_END };
+	pair<_float, _float> m_fSeqInterpolateTime = { 0.f, 0.f };
 
 private:
+	void Play_Sequence(_float fTimeDelta);
 	void Control(_float fTimeDelta);
+
 	void UpdatePos_FromAnchor(_float fTimeDelta);
+
+	//포커징 기준점을 업데이트한다.
+	void Update_Anchor(_float fTimeDelta);
+
+	void Interpolate_CamSet(_float fTimeDelta);
+	void Update_CurCamPos(_float fTimeDelta);
+
+	_float3 Make_ShakeDir(_float fTimeDelta);
+	void MoveTo_CurCamPos(_float fTimeDelta);
+
 	void Orbit_Target(_float fTimeDelta);
 
 

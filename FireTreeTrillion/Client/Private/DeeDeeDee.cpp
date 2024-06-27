@@ -511,6 +511,9 @@ void CDeeDeeDee::HitBoxChanger(_uint eState)
 //카메라 메인에 자기 자신을 두 번째 타겟으로 등록한다.
 HRESULT CDeeDeeDee::Make_TargetToCams()
 {
+	if (*m_pCurrentLevelID == LEVEL_TOOL_ANIM)
+		return S_OK;
+
 	CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
 	CHECK_NULLPTR(pCameraMain);
 	pCameraMain->Set_Target(m_pTransformCom, CCamera::FOCUS_SECOND);

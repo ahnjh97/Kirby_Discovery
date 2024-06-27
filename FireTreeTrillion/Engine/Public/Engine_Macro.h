@@ -27,39 +27,57 @@
 # define NODEFAULT   __assume(0)
 #endif
 
-//빠름 - 느림
+
+//빠름 - 느림 ease
 #define EASE_OUT(t) (_float)(1 - pow(1 - t, 3))
+//빠름 - 느림 ease(빠름)
 #define EASE_OUT_FAST(t) (_float)(1 - pow(1 - t, 6))
-//느림 - 빠름
+
+//느림 - 빠름 ease
 #define EASE_IN(t)	(_float)pow(t, 4)
+//느림 - 빠름 ease(빠름)
 #define EASE_IN_FAST(t)	(_float)pow(t, 6)
 
-//느림 - 빠름 - 느림
+//느림 - 빠름 - 느림 ease
 #define EASE_INOUT(t) (_float)(-(cos(3.14159f * t) - 1) / 2)
+//느림 - 빠름 - 느림 ease(빠름)
 #define EASE_INOUT_FAST(t) (_float)((t < 0.5) ? (4 * t * t * t) : 1 - pow(-2 * t + 2, 3) / 2)
 
-//각도 변환 매크로
+//일반 각도를 라디안 각도로 변환한다.
 #define ToRadian(degree)			(XMConvertToRadians(degree))
+//라디안 각도를 일반 각도로 변환한다.
 #define ToDegree(radian)			(XMConvertToDegrees(radian))
 
+//float3를 주면 w에 0이 박힌 float4로 반환한다.
 #define Dir(vec3)					_float4{(vec3).x,( vec3).y, (vec3).z, 0.f}
+//float3를 주면 w에 1이 박힌 float4로 반환한다.
 #define Pos(vec3)					_float4{(vec3).x, (vec3).y, (vec3).z, 1.f}
-#define F4toF3(vec4)				_float3{vec4.x, vec4.y, vec4.z}
-
+//float3에서 y값을 0으로 만들고 반환한다.
 #define XZVec(vec3)				_float3{vec3.x, 0.f, vec3.z}
 
+//float4를 float3로 만듭니다.
+#define F4toF3(vec4)				_float3{vec4.x, vec4.y, vec4.z}
+
+//w가 1인 제로 벡터를 반환한다.
 #define ZeroVecPos					_float4{0.f, 0.f, 0.f, 1.f}
+//w가 0인 제로 벡터를 반환한다.
 #define ZeroVecDir					_float4{0.f, 0.f, 0.f, 0.f}
 
 #define GET_POS				m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION)
 #define SET_POS(pos)		m_pTransformCom->Set_State(CTransform::STATE_POSITION, pos)
 
-//어떤 범위 안의 값을 다른 범위로 매핑한다.
-#define MAPVALUE(x,  min1,  max1,  min2,  max2) (min2 + (x - min1) * (max2 - min2) / (max1 - min1))
-#define SATURATE(x) (clamp(x, 0.f, 1.f))
-
-//float 보간 매크로
+//float ratio를 기준으로, start 값과 dest 값 사이의 보간 값을 제공한다. 
 #define LERP(start, dest, curRatio) _float(start + curRatio * (dest - start))
+//어떤 범위 안의 값을 다른 범위로 매핑한다.
+#define MAPVALUE(floatValue,  minfloat1,  maxfloat1,  minfloat2,  maxfloat2) (minfloat2 + (floatValue - minfloat1) * (maxfloat2 - minfloat2) / (maxfloat1 - minfloat1))
+//어떤 범위 안의 값을 0에서 1 사이의 값으로 매핑한다.
+#define SATURATE(floatValue) (clamp(floatValue, 0.f, 1.f))
+
+//해당 float 값이 -1인지를 판단한다.
+#define ISDEFAULTFLOAT(floatValue) _bool(floatValue == -1.f)
+#define ISDEFAULTFLOAT3(float3Value) _bool(float3Value.x == -1.f && float3Value.y == -1.f && float3Value.z == -1.f)
+
+
 
 #define BEGIN(NAMESPACE)	namespace NAMESPACE {
 #define END					}

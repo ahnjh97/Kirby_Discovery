@@ -164,7 +164,6 @@ public:
 	_bool			isAnimFinish();
 	void			DefaultIdle();
 
-	_float4			Compute_TerrainPosition();
 	// 현재 커비가 무적상태인지 아닌지 판별하는 부울 값
 	_bool			isOverPower() { return m_bOverPower; }
 	// 손에 쥐고있어야 할 때, 필요한 행렬 포인터

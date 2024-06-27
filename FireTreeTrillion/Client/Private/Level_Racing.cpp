@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "Level_Racing.h"
+#include "Level_Loading.h"
+
 #include "Camera_Free.h"
 #include "Camera_Main.h"
 #include "BasicMap.h"
@@ -60,8 +62,18 @@ HRESULT CLevel_Racing::Initialize()
 	CHECK_FAILED(hr);
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
+	// 레벨전환 트리거
+	function<void(_int)> func = bind(&CLevel_Racing::Change_Levels, this);
+	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_LEVELCHANGER, func);
 
 	return S_OK;
+}
+
+void CLevel_Racing::Change_Levels()
+{
+	HRESULT hr(S_OK);
+	hr = m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_DEEDEEDEE));
+	CHECK_FAILED(hr);
 }
 
 void CLevel_Racing::Tick(_float fTimeDelta)
@@ -106,7 +118,7 @@ HRESULT CLevel_Racing::Ready_Lights()
 	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
 		return E_FAIL;
 
-	CGameInstance::Get_Instance()->Setting_GodRay({ -650.f, 500.f, 1200.f, 1.f });
+	CGameInstance::Get_Instance()->Setting_GodRay({ -350.f, 700.f, 1200.f, 1.f });
 
 	return S_OK;
 }
@@ -120,7 +132,7 @@ HRESULT CLevel_Racing::Ready_Layer_Camera(const wstring& strLayerTag)
 	MainCamDesc.fNear = 0.1f;
 	MainCamDesc.fFar = 1000.0f;
 	MainCamDesc.vEye = _float4(-129.f, 10.f, -120.f, 1.f);
-	MainCamDesc.vAt = MainCamDesc.vEye + _float4(0.f, -.15f, 1.f, 1.f);
+	MainCamDesc.vAt = MainCamDesc.vEye + _float4(0.f, -.15f, -1.f, 1.f);
 	MainCamDesc.fSpeedPerSec = 10.f;
 	MainCamDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	MainCamDesc.fOrigDistance = 28.f;

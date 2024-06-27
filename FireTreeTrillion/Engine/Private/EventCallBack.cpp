@@ -14,7 +14,7 @@ void CEventCallBack::onTrigger(PxTriggerPair* pairs, PxU32 count)
 
         if (pairs[i].otherActor ==  m_pPlayerActor && IsActorInTriggerList(pairs[i].triggerActor))
         {
-            if (m_iTriggerType == 1)
+            if (m_iTriggerType == 1 || m_iTriggerType == 3) // 3 : LevelChanger
             {
                 auto functionIter = m_TriggerFuncs.find(m_iTriggerType);
                 if (functionIter != m_TriggerFuncs.end())
@@ -25,7 +25,7 @@ void CEventCallBack::onTrigger(PxTriggerPair* pairs, PxU32 count)
                 if (pairs[i].status == PxPairFlag::eNOTIFY_TOUCH_FOUND)
                 {
                     auto functionIter = m_TriggerFuncs.find(m_iTriggerType);
-                    if (functionIter != m_TriggerFuncs.end())
+                    if (functionIter != m_TriggerFuncs.end())             
                         functionIter->second(m_iTriggerIndex);
                 }
                 else if (pairs[i].status == PxPairFlag::eNOTIFY_TOUCH_LOST)
@@ -36,8 +36,9 @@ void CEventCallBack::onTrigger(PxTriggerPair* pairs, PxU32 count)
                 }
             }
         }
-        else if (pairs[i].status & PxPairFlag::eNOTIFY_TOUCH_FOUND) // For Map Deco Anim
+        else if (pairs[i].status & PxPairFlag::eNOTIFY_TOUCH_FOUND) 
         {
+            // For Map Deco Anim
             if (pairs[i].otherActor == m_pPlayerActor && IsMapDecoAnimTrigger(pairs[i].triggerActor))
             {
                 auto iter = m_TriggerToMapDecoAnimMap.find(pairs[i].triggerActor);
@@ -47,6 +48,21 @@ void CEventCallBack::onTrigger(PxTriggerPair* pairs, PxU32 count)
                     pMapDeco->Set_Animation(get<1>(iter->second), get<2>(iter->second), false, true);
                 }
             }
+
+            //// For Level Trigger
+            //if (pairs[i].otherActor == m_pPlayerActor && IsLevelTrigger(pairs[i].triggerActor))
+            //{
+            //    auto iter = m_umapTrigger.find(pairs[i].triggerActor);
+            //    if (iter != m_umapTrigger.end())
+            //    {
+            //        CModel* pMapDeco = get<0>(iter->second);
+            //        pMapDeco->Set_Animation(get<1>(iter->second), get<2>(iter->second), false, true);
+            //    }
+
+            //    auto functionIter = m_TriggerFuncs.find(m_iTriggerType);
+            //    if (functionIter != m_TriggerFuncs.end())
+            //        functionIter->second(m_iTriggerIndex);
+            //}
         }
     }
 }

@@ -120,6 +120,14 @@ void CCharacter::Compute_MotionBlur()
 	m_vPreScreenPos = vCurScreenPos;
 }
 
+_float4 CCharacter::Compute_TerrainPosition()
+{
+	if (m_pControllerCom == nullptr)
+		return _float4();
+
+	return m_pControllerCom->Compute_TerrainPosition_Vector();
+}
+
 void CCharacter::Character_SystemTick(_float fTimeDelta)
 {
 	// 모션블러 계산

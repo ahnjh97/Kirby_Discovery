@@ -116,6 +116,7 @@ HRESULT CTrigger::Add_Components()
 	case TRIGGER_CAM:
 	case TRIGGER_SHADER:
 	case TRIGGER_STAR:
+	case TRIGGER_LEVELCHANGER:
 	{
 		CRigidBody::RIGIDBODY_DESC tRigidDesc(RIGID_BOX, m_pTransformCom->Get_WorldMatrix(), true, false);
 		if (FAILED(__super::Add_Component(TEXT("Prototype_Component_RigidBody"),

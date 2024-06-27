@@ -170,14 +170,6 @@ _bool CPartTimerKirby::IsAnimFinished()
 	return m_pModelCom->IsFinished();
 }
 
-_float4 CPartTimerKirby::Compute_TerrainPosition()
-{
-	if (m_pControllerCom == nullptr)
-		return _float4();
-
-	return m_pControllerCom->Compute_TerrainPosition_Vector();
-}
-
 HRESULT CPartTimerKirby::Make_TargetToCams()
 {
 	// 첫 카메라 기준으로 움직이기에 미리 받아둔다.

@@ -328,6 +328,8 @@ PS_OUT TRIGGER(PS_IN In)
         Out.vDiffuse = vector(1, 0.75f, 0.8f, 1);
     else if (g_iTriggerType == 1)
         Out.vDiffuse = vector(0, 0, 1, 1);
+    else if (g_iTriggerType == 3)
+        Out.vDiffuse = vector(0, 0.45f, 0.45f, 1);
     else
         Out.vDiffuse = vector(1, 1, 1, 1);
     
@@ -422,7 +424,7 @@ PS_OUT_EFFECT PS_MAIN_WHITE_FX(PS_IN In)
         discard;
     
 
-    vector vDiffuse = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord + g_vUVOffset);
+    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord + g_vUVOffset);
     
     //알파가 0일때, 혹은 검은색일때 자르기
     if (vDiffuse.a < .01f || (vDiffuse.r < 0.1f && vDiffuse.g < 0.1f && vDiffuse.b < 0.1f))
@@ -431,6 +433,18 @@ PS_OUT_EFFECT PS_MAIN_WHITE_FX(PS_IN In)
     Out.vColor.rgb = g_vRColor;
     Out.vColor.a = vDiffuse.a * g_fAlpha * vMask.r;
 
+    
+        //소프트 이펙트 보정
+    float2 vTexcoord = (float2) 0.f;
+
+    vTexcoord.x = (In.vProjPos.x / In.vProjPos.w) * 0.5f + 0.5f;
+    vTexcoord.y = (In.vProjPos.y / In.vProjPos.w) * -0.5f + 0.5f;
+
+    float4 vDepthDesc = g_DepthTexture.Sample(PointSampler, vTexcoord);
+    float fOldViewZ = vDepthDesc.y * 1000.f;
+
+    Out.vColor.a = Out.vColor.a * saturate(fOldViewZ - In.vProjPos.w);
+    
     return Out;
 }
 

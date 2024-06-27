@@ -380,6 +380,15 @@ HRESULT CFXToolDirector::Save_MultiEffect(CEffect* pEffect, const wstring& strFi
 //¿Ã∆Â∆Æ Ωœ ∑ŒµÂ
 HRESULT CFXToolDirector::Load_AllEffect()
 {
+	for (auto& fxs : m_FXs)
+		Safe_Release(fxs);
+	m_FXs.clear();
+
+	for (auto& fxs : m_MultiFXs)
+		Safe_Release(fxs);
+	m_MultiFXs.clear();
+
+
 	path FXPath("../Bin/Resources/Effects/Single/");
 	if (!exists(FXPath) || !is_directory(FXPath))
 	{
