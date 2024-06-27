@@ -45,11 +45,16 @@ HRESULT CDeeDeeDee::Initialize(void* pArg)
 
 	Add_AnimEvent();
 
-	*m_pCurrentLevelID == LEVEL_TOWN ? m_pModelCom->Set_Animation(STATE_WAIT, 20.f, true, false) :
+	if (*m_pCurrentLevelID == LEVEL_TOWN)
+	{
+		m_pModelCom->Set_Animation(STATE_WAIT, 20.f, true, false);
+		m_pTransformCom->Turn(_float4(0.f, 1.f, 0.f, 0.f), 1.f, 160.f);
+	}
+	else
+	{
 		m_pModelCom->Set_Animation(STATE_WAIT, 60.f, true, false);
+	}
 
-
-	m_pTransformCom->Turn(_float4(0.f, 1.f, 0.f, 0.f), 1.f, 180.f);
 	_float4 vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 	m_vNeckLook = m_vLEyeLook = m_vREyeLook = m_tInfo.m_vMoveDir = m_tInfo.m_vTargetDir = vLook;
 
