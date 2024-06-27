@@ -34,9 +34,13 @@ private:
 	HRESULT			Add_Components(const wstring& _wstrModelName);
 	HRESULT			Bind_ShaderResources();
 
-	CModel* m_pModelCom = { nullptr };
-	CShader* m_pShaderCom = { nullptr };
+private:
+	CModel*			m_pModelCom = { nullptr };
+	CShader*		m_pShaderCom = { nullptr };
+	class CBone*	m_pBone = { nullptr };
+	_float4x4*		m_pEditMatrix = { nullptr };
 
+private:
 	wstring			m_wstrModelName;
 
 	_float			m_fHitPower = {};
