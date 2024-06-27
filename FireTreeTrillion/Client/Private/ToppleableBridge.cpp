@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "BreakableRockPartical.h"
 #include "ToppleableBridge.h"
+#include "AnimBridge.h"
 #include "HitBox.h"
 #include "Kirby.h"
 
@@ -16,17 +17,15 @@ CToppleableBridge::CToppleableBridge(const CToppleableBridge& rhs)
 
 void CToppleableBridge::OnCollision()
 {
-	//if (true == m_bCollision)
-	//	return;
+	if (true == m_bCollision)
+		return;
 
-	if (m_wstrModelName == TEXT("BoardA")) {
-		m_fHitTime = 0.f;
-		m_bCollision = true;
-		m_pModelCom->DisableActors();
-	}
-		
-	else
-		;
+	m_fHitTime = 0.f;
+	m_bCollision = true;
+	m_pModelCom->DisableActors();
+	CAnimBridge* pAnimBridge = dynamic_cast<CAnimBridge*>(m_pAnimBridge);
+	pAnimBridge->OnCollision();
+
 	return;
 }
 
@@ -42,6 +41,9 @@ HRESULT CToppleableBridge::Initialize(void* pArg)
 	if (pArg != nullptr)
 		Desc = (GAMEOBJECT_DESC*)pArg;
 
+	Desc->fSpeedPerSec = 7.f;
+	Desc->fRotationPerSec = XMConvertToRadians(90.0f);
+
 	if (FAILED(__super::Initialize(Desc)))
 		return E_FAIL;
 
@@ -51,14 +53,27 @@ HRESULT CToppleableBridge::Initialize(void* pArg)
 	m_bMotionBlur = false;
 	m_wstrModelName = Desc->wstrModelName;
 
-	if(FAILED(m_pModelCom->CreateStaticActor(m_pTransformCom->Get_WorldFloat4x4())))
-		return E_FAIL;
+	if (TEXT("BoardA") == m_wstrModelName || TEXT("BoardB") == m_wstrModelName) {
+		if (FAILED(m_pModelCom->CreateStaticActor(m_pTransformCom->Get_WorldFloat4x4())))
+			return E_FAIL;
+	}
+	else if (TEXT("BoardC") == m_wstrModelName) {
+		unordered_set<string> setIncludeMesh = { "FakeCollider" };
+		if (FAILED(m_pModelCom->CreateStaticActors_Include(setIncludeMesh, m_pTransformCom->Get_WorldFloat4x4())))
+			return E_FAIL;
+	}
 
 	vector<PxRigidActor*> vecActors = m_pModelCom->Get_Actors();
 
 	CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
 	for (auto& actor : vecActors)
 		pKirby->RegisterActorsToPlayer(actor, this);
+
+	GAMEOBJECT_DESC tDesc{};
+	tDesc.wstrModelName = Desc->wstrModelName + TEXT("_Anim");
+	tDesc.matWorld = Desc->matWorld;
+	
+	m_pAnimBridge = m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_AnimBridge"), &tDesc);
 
 	return S_OK;
 }
@@ -68,30 +83,38 @@ _int CToppleableBridge::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return OBJ_DEAD;
 
-	if (m_fHitTime > 0.f && m_fHitTime < 1.f)
-		m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), m_pGameInstance->Get_SecondTimer());
+	if(nullptr != m_pAnimBridge)
+		m_pAnimBridge->Tick(fTimeDelta);
 
+	if (m_bCollision)
+		m_fHitTime += fTimeDelta;
+
+	if (m_fHitTime > 0.f && m_fHitTime < 0.75f)
+	{
+		if(TEXT("BoardA") == m_wstrModelName || TEXT("BoardB") == m_wstrModelName)
+			m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), m_pGameInstance->Get_SecondTimer());
+	}
+		
 	return OBJ_NOEVENT;
 }
 
 void CToppleableBridge::Late_Tick(_float fTimeDelta)
 {
-	/*if (m_bStartAnimation)
-		m_pModelCom->Play_Animation(m_pGameInstance->Get_SecondTimer());*/
-	if(m_bCollision)
-		m_fHitTime += fTimeDelta;
+	if (nullptr != m_pAnimBridge)
+		m_pAnimBridge->Late_Tick(fTimeDelta);
 
-	if (m_fHitTime > 5.f) {
-		//m_pModelCom->ReAddActors();
-		m_pModelCom->CreateStaticActor(m_pTransformCom->Get_WorldFloat4x4());
-		m_fHitTime = 0.f;
-		m_bCollision = false;
-	}
-
-	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 150.0f))
-	{
-		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
-		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
+	if (m_fHitTime > 0.75f && m_bActorCreated == false) {
+		if (TEXT("BoardA") == m_wstrModelName || TEXT("BoardB") == m_wstrModelName) {
+			if (FAILED(m_pModelCom->CreateStaticActor(m_pTransformCom->Get_WorldFloat4x4())))
+				return;
+			m_bActorCreated = true;
+		}
+		else if (TEXT("BoardC") == m_wstrModelName) {
+			unordered_set<string> setExcludeMesh = { "FakeCollider" };
+			if (FAILED(m_pModelCom->CreateStaticActors_Exclude(setExcludeMesh, m_pTransformCom->Get_WorldFloat4x4())))
+				return;
+			m_bActorCreated = true;
+		}
 	}
 }
 
@@ -110,9 +133,7 @@ HRESULT CToppleableBridge::Render()
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
 			return E_FAIL;
-		/*if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
-			return E_FAIL;*/
-		if (FAILED(m_pShaderCom->Begin(/*ANIM*/MODEL_NORMAL_O)))
+		if (FAILED(m_pShaderCom->Begin(MODEL_NORMAL_O)))
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Render(i)))
 			return E_FAIL;
@@ -135,30 +156,6 @@ void CToppleableBridge::Render_IMGUI()
 }
 #endif
 
-void CToppleableBridge::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
-{
-	if (true == m_bStartAnimation)
-		return;
-
-	CKirby* pKirby = static_cast<CKirby*>(pObject);
-	if (pKirby->Get_KirbyInfo()->m_bBooster == false)
-		return;
-
-	m_bStartAnimation = true;
-
-	pKirby->Set_HitStop();
-
-	//m_pModelCom->Set_Animation(1, 60.f, false, false);
-	//Make_Particles();
-
-	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-	_float4 vPlayerPos = pObject->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
-	_float4 vDir = vPos - vPlayerPos;
-	vDir.Normalize();
-	m_vDamegeDir = (_float3)vDir;
-	m_fHitPower = pKirby->Get_KirbyInfo()->m_fMoveSpeed;
-}
-
 HRESULT CToppleableBridge::Add_Components(const wstring& _wstrModelName)
 {
 	HRESULT hr;
@@ -170,14 +167,6 @@ HRESULT CToppleableBridge::Add_Components(const wstring& _wstrModelName)
 	wstring wstrModelTag = TEXT("Prototype_Component_Model_") + _wstrModelName;
 	hr = __super::Add_Component(wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
-
-	CHitBox::HITBOX_DESC HitBox{};
-	HitBox.pOwner = this;
-	HitBox.pDesc = &m_tColliderDesc[BODY];
-	HitBox.pCollisionType = OBJECT;
-	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
-		return E_FAIL;
-	Set_BodyCollider(COLLIDER_SPHERE, 0.f, 0.f, 5.f);
 
 	return S_OK;
 }
@@ -270,6 +259,7 @@ void CToppleableBridge::Free()
 {
 	__super::Free();
 
+	Safe_Release(m_pAnimBridge);
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 }

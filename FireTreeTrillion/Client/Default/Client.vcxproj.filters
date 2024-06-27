@@ -383,7 +383,7 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\WaddleDee\Battle">
       <UniqueIdentifier>{c3474c33-3205-448e-897a-c737e2235109}</UniqueIdentifier>
-	</Filter>
+    </Filter>
     <Filter Include="02.GameObjects\Map\NonRenderWall">
       <UniqueIdentifier>{d4881f40-d9f4-423b-bdbf-ef08184a3618}</UniqueIdentifier>
     </Filter>
@@ -775,12 +775,15 @@
     </ClInclude>
     <ClInclude Include="..\public\BattleDee.h">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\Battle</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\Public\BlendMapObject.h">
       <Filter>02.GameObjects\Map\BlendMapObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\NonRenderWall.h">
       <Filter>02.GameObjects\Map\NonRenderWall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\AnimBridge.h">
+      <Filter>02.GameObjects\Map\Bridge</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1149,12 +1152,15 @@
     </ClCompile>
     <ClCompile Include="..\private\BattleDee.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\Battle</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="..\Private\BlendMapObject.cpp">
       <Filter>02.GameObjects\Map\BlendMapObject</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\NonRenderWall.cpp">
       <Filter>02.GameObjects\Map\NonRenderWall</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\AnimBridge.cpp">
+      <Filter>02.GameObjects\Map\Bridge</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

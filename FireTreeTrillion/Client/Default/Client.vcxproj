@@ -170,6 +170,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Ability.h" />
+    <ClInclude Include="..\Public\AnimBridge.h" />
     <ClInclude Include="..\Public\AnimDeco.h" />
     <ClInclude Include="..\Public\AnimToolHelper.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -322,6 +323,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability.cpp" />
+    <ClCompile Include="..\Private\AnimBridge.cpp" />
     <ClCompile Include="..\Private\AnimDeco.cpp" />
     <ClCompile Include="..\Private\AnimToolHelper.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
