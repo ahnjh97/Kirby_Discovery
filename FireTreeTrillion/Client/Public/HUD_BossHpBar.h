@@ -29,10 +29,11 @@ private:
 
 
 	void						InitializeBar(_float fTimeDelta);
-	_bool						m_bInitializeBar = { true };
+	_uint						m_uInitializeBar = { 0 };
 
 	void						Compute_MyBossHp(_float fTimeDelta);
-	void						Bar_Animation(_float fTimeDelta);
+
+	void						ReleaseBar(_float fTimeDelta);
 
 
 private:
@@ -54,7 +55,7 @@ private:
 
 	_bool					m_bDamage = { false };
 	_float					m_fSlowMovingTime = { 0.f };
-	_bool					m_bComputeRatioDelta = { false };
+	_bool					m_bComputeRatioDelta = { true };
 	_float					m_fRatioDelta = { 0.f };
 
 	_float					m_fBossHpBar = { 0.f };
@@ -64,7 +65,8 @@ private:
 	_float					m_fShakingTime = { 0.f };
 	_float					m_fShakingAcc = { 0.f };
 	_float					m_fAmplitude = { 0.f };
-	_float					m_fY = { 0.f };
+	_float					m_fOriginY[UI_END] = { 0.f, 0.f, 0.f, 0.f, 0.f };
+	_float					m_fMoveY = { 0.f };
 
 
 public:

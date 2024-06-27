@@ -38,30 +38,71 @@ HRESULT CHUD_BossHpBar::Initialize(void* pArg)
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(m_fSizeX, m_fSizeY, 0.f, 1.f));
 
 	for (_int i = UI_BARPLATE; i < UI_END; ++i)
+	{
 		XMStoreFloat4x4(&m_BarMatrix[i], XMMatrixIdentity());
+		CUtils::Set_Scaled_Matrix(m_BarMatrix[i], 900.f, 55.f, 1.f);
+		CUtils::Turn_OtherMatrix(m_BarMatrix[i], _float4(0.f, 0.f, 1.f, 0.f), 1.f, 3.5f);
 
+	}
+
+	CUtils::Set_State_Matrix(m_BarMatrix[UI_BARPLATE], CUtils::STATE_POSITION,
+		_float4(m_fX - (m_fSizeX * 0.3f),
+			-m_fY + (m_fSizeY * 0.1f), 
+			1.f, 
+			1.f));
+	m_fOriginY[UI_BARPLATE] = m_BarMatrix[UI_BARPLATE]._42;
+
+	CUtils::Set_State_Matrix(m_BarMatrix[UI_BARLOW], CUtils::STATE_POSITION,
+		_float4(m_fX - (m_fSizeX * 0.3f),
+			-m_fY + (m_fSizeY * 0.1f),
+			1.f,
+			1.f));
+	m_fOriginY[UI_BARLOW] = m_BarMatrix[UI_BARLOW]._42;
+
+	CUtils::Set_State_Matrix(m_BarMatrix[UI_BARMIDDLE], CUtils::STATE_POSITION,
+		_float4(m_fX - (m_fSizeX * 0.3f),
+			-m_fY + (m_fSizeY * 0.1f),
+			1.f,
+			1.f));
+	m_fOriginY[UI_BARMIDDLE] = m_BarMatrix[UI_BARMIDDLE]._42;
+
+	CUtils::Set_State_Matrix(m_BarMatrix[UI_BARHIGH], CUtils::STATE_POSITION,
+		_float4(m_fX - (m_fSizeX * 0.3f),
+			-m_fY + (m_fSizeY * 0.1f),
+			1.f,
+			1.f));
+	m_fOriginY[UI_BARHIGH] = m_BarMatrix[UI_BARHIGH]._42;
+
+	m_vColor[UI_BARPLATE] = { 1.f, 1.f, 1.f };
 	m_vColor[UI_BARLOW] = { 0.f, 0.f, 0.f };
-	m_vColor[UI_BARMIDDLE] = { 183.f / 255.f, 106.f / 255.f, 16.f / 255.f };
+	m_vColor[UI_BARMIDDLE] = { 255.f / 255.f, 128.f / 255.f, 64.f / 255.f };
 	m_vColor[UI_BARHIGH] = { 138.f / 255.f, 20.f / 255.f, 174.f / 255.f };
 
-	m_fAmplitude = 30.f;
+	m_fAmplitude = 5.f;
 
 	return S_OK;
 }
 
 _int CHUD_BossHpBar::Tick(_float fTimeDelta)
 {
-	if (m_pMyMonster == nullptr || m_pMyMonster->Get_Dead())
+	if (m_pMyMonster == nullptr || m_pMyMonster->Get_Dead() || m_bDead == true)
 		return OBJ_DEAD;
 
-	// 보스의 움직임을 실시간으로 받아옴.
-	Compute_MyBossHp(fTimeDelta);
 
-	// 처음 등장하는 등장 바 애니메이션. 알파값이 전부 차면서, 시작된다. 그 이후로 절대 발동안함.
-	InitializeBar(fTimeDelta);
-
-	// 바의 움직임을 제어한다.
-	Bar_Animation(fTimeDelta);
+	if (m_uInitializeBar == 0)
+	{
+		// 처음 등장하는 등장 바 애니메이션. 알파값이 전부 차면서, 시작된다. 그 이후로 절대 발동안함.
+		InitializeBar(fTimeDelta);
+	}
+	else if (m_uInitializeBar == 1)
+	{
+		// 보스의 움직임을 실시간으로 받아오고, 움직임이 구현되어있다.
+		Compute_MyBossHp(fTimeDelta);
+	}
+	else if (m_uInitializeBar == 2)
+	{
+		ReleaseBar(fTimeDelta);
+	}
 
 	return OBJ_NOEVENT;
 }
@@ -79,6 +120,8 @@ HRESULT CHUD_BossHpBar::Render()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
+	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", UI_MASK)))
+		return E_FAIL;
 
 	// 바의 밑 바닥부터 상위 바 까지 그린다.
 	for (_int i = UI_BARPLATE; i <= UI_BARHIGH; ++i)
@@ -87,10 +130,37 @@ HRESULT CHUD_BossHpBar::Render()
 			return E_FAIL;
 		if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
 			return E_FAIL;
-		if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", i)))
+		if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i)))
 			return E_FAIL;
-		if (FAILED(m_pShaderCom->Begin(9)))
+
+		if (i == UI_BARPLATE)
+		{
+			const _float BlackRatio = 1.f;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_fMaskRatio", &BlackRatio, sizeof(_float))))
+				return E_FAIL;
+		}
+		else if (i == UI_BARLOW)
+		{
+			const _float BlackRatio = 1.f;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_fMaskRatio", &BlackRatio, sizeof(_float))))
+				return E_FAIL;
+		}
+		else if (i == UI_BARMIDDLE)
+		{
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fBossSlowHpBar, sizeof(_float))))
+				return E_FAIL;
+		}
+		else if (i == UI_BARHIGH)
+		{
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fBossHpBar, sizeof(_float))))
+				return E_FAIL;
+		}
+
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_vRColor", &m_vColor[i], sizeof(_float3))))
 			return E_FAIL;
+		if (FAILED(m_pShaderCom->Begin(15)))
+			return E_FAIL;
+	
 		if (FAILED(m_pVIBufferCom->Bind_Buffers()))
 			return E_FAIL;
 		if (FAILED(m_pVIBufferCom->Render()))
@@ -112,7 +182,8 @@ HRESULT CHUD_BossHpBar::Add_Components()
 		TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom)))
 		return E_FAIL;
 
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_HUD_BossBar"),
+
+	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_BossBar"),
 		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
 		return E_FAIL;
 
@@ -121,12 +192,29 @@ HRESULT CHUD_BossHpBar::Add_Components()
 
 void CHUD_BossHpBar::InitializeBar(_float fTimeDelta)
 {
+	// 0.5초만에 알파가 1이 된다.
+	if (m_fAlpha < 1.f)
+		m_fAlpha += fTimeDelta * 2.f;
+	else if (m_fAlpha > 1.f)
+		m_fAlpha = 1.f;
+
+	m_fCurBossHpRatio = m_pMyMonster->Get_Hp() / m_pMyMonster->Get_MaxHp();
+
+	// 1초만에 피가 찬다.
+	m_fBossHpBar += fTimeDelta;
+
+	
+	if (m_fBossHpBar >= m_fCurBossHpRatio)
+	{
+		m_fBossSlowHpBar = m_fBossHpBar = m_fCurBossHpRatio;
+		m_uInitializeBar = 1;
+		m_fAlpha = 1.f;
+	}
 }
 
 void CHUD_BossHpBar::Compute_MyBossHp(_float fTimeDelta)
 {
 	m_fCurBossHpRatio = m_pMyMonster->Get_Hp() / m_pMyMonster->Get_MaxHp();
-
 
 	if (m_bInitializeRatioSet == true)
 	{
@@ -141,10 +229,16 @@ void CHUD_BossHpBar::Compute_MyBossHp(_float fTimeDelta)
 		m_bDamage = true;
 		m_fSlowMovingTime = 0.f;
 		m_fRatioDelta = 0.f;
+		m_bComputeRatioDelta = true;
 
 		m_bShaking = true;
 		m_fShakingTime = 0.f;
-		m_fAmplitude = 30.f;
+		m_fAmplitude = 5.f;
+
+		m_fBossHpBar = m_fCurBossHpRatio;
+
+		if (m_fBossHpBar <= 0.f)
+			m_uInitializeBar = 2;
 	}
 
 	
@@ -179,31 +273,56 @@ void CHUD_BossHpBar::Compute_MyBossHp(_float fTimeDelta)
 	if (m_bShaking == true)
 	{
 		// 진동 주기
-		_float fCycle = 50.f;
+		_float fCycle = 75.f;
 
 		m_fShakingTime += fTimeDelta;
 		m_fShakingAcc += fTimeDelta * fCycle;
-		m_fY = sin(m_fShakingAcc) * m_fAmplitude;
+		m_fMoveY = sin(m_fShakingAcc) * m_fAmplitude;
 
-		m_fAmplitude -= fTimeDelta * 60.f;
+		for (_int i = UI_BARPLATE; i <= UI_BARHIGH; ++i)
+		{
+			_float4 vUIPos = CUtils::Get_State_Vector_Matrix(m_BarMatrix[i], CUtils::STATE_POSITION);
+			vUIPos.y = m_fOriginY[i] + m_fMoveY;
+			CUtils::Set_State_Matrix(m_BarMatrix[i], CUtils::STATE_POSITION, vUIPos);
+		}
 
-		if (m_fShakingTime > 0.5f)
+		m_fAmplitude -= fTimeDelta * 20.f;
+
+		if (m_fShakingTime > 0.25f)
 		{
 			m_fShakingTime = 0.f;
 			m_bShaking = false;
-			m_fAmplitude = 30.f;
-			m_fY = 0.f;
+			m_fAmplitude = 5.f;
+			m_fMoveY = 0.f;
+			for (_int i = UI_BARPLATE; i <= UI_BARHIGH; ++i)
+			{
+				_float4 vUIPos = CUtils::Get_State_Vector_Matrix(m_BarMatrix[i], CUtils::STATE_POSITION);
+				vUIPos.y = m_fOriginY[i];
+				CUtils::Set_State_Matrix(m_BarMatrix[i], CUtils::STATE_POSITION, vUIPos);
+			}
 		}
 	}
 
 	m_fPreBossHpRatio = m_fCurBossHpRatio;
 
+
+
 	// 미리 자리 잡아두고 흔들어 보자.
 	// 구조 조금 바꿔볼 것.
 }
 
-void CHUD_BossHpBar::Bar_Animation(_float fTimeDelta)
+void CHUD_BossHpBar::ReleaseBar(_float fTimeDelta)
 {
+	m_fBossSlowHpBar -= fTimeDelta;
+
+	if (m_fBossSlowHpBar < 0.f)
+		m_fBossSlowHpBar = 0.f;
+
+	m_fAlpha -= fTimeDelta * 2.f;
+
+
+	if (m_fAlpha <= 0.f)
+		m_bDead = true;
 }
 
 CHUD_BossHpBar* CHUD_BossHpBar::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

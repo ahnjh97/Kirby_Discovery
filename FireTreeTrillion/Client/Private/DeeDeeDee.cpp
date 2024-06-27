@@ -538,6 +538,8 @@ void CDeeDeeDee::DeeDeeDee_SystemTick(_float fTimeDelta)
 		{
 			if (Get_State() == STATE_WAIT)
 			{
+				if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_BossUI"), TEXT("Prototype_GameObject_HUD_BossHpBar"), this)))
+					return;
 				Change_State(STATE_COMMAND, 60.f, false, true);
 				m_bInitializeAnim = false;
 			}
