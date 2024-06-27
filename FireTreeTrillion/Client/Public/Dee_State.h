@@ -202,6 +202,7 @@ public:
 	virtual void OnStateExit()														override;
 
 	_uint m_iBounceCnt = { 1 };
+	_float4 m_vRandomAxis = { 0.f, 0.f, 0.f, 0.f };
 
 public:
 	static	CDee_FlyStun_State* Create();
