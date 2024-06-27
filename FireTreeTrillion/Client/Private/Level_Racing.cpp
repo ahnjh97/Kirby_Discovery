@@ -262,7 +262,6 @@ HRESULT CLevel_Racing::Ready_Triggers()
 	_int triggerType{};
 	_int iCamType{};
 	_float fRadius{};
-	wstring wstrGameObjectTag = TEXT("MapToolObject");
 
 	map<_int, _float4x4> camMatrices;
 	map<_int, pair<_vector, _float>> frontDirRadii;
