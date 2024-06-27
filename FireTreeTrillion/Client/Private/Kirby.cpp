@@ -59,7 +59,7 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// µð¹ö±ë ¿ë
-	//m_eAbilityType = ABILITY_SWORD;
+	m_eAbilityType = ABILITY_BOMB;
 
 	m_pModelCom[INFO(m_eBodyState)]->Set_Animation(STATE_IDLE, 60.f, true, true);
 	m_pControllerCom->RegisterAsPlayer();
