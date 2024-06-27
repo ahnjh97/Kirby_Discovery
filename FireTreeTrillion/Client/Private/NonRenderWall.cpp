@@ -28,7 +28,8 @@ HRESULT CNonRenderWall::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	m_pModelCom->CreateStaticActor(m_pTransformCom->Get_WorldFloat4x4());
+	if(FAILED(m_pModelCom->CreateStaticActor(m_pTransformCom->Get_WorldFloat4x4())))
+		return E_FAIL;
 
 	return S_OK;
 }

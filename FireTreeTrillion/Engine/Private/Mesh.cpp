@@ -295,8 +295,8 @@ void CMesh::ReAddActor(PxScene* pScene)
 
 HRESULT CMesh::CreateStaticActor(_float4x4& matWorld)
 {
-	if (nullptr != m_pActor)
-		m_pActor->release();
+	//if (nullptr != m_pActor)
+	//	m_pActor->release();
 
 	m_pActor = m_pGameInstance->CreateStaticActor(matWorld, m_pVerticesPos, m_iNumVertices, m_pIndices, m_iNumIndices);
 	if (m_pActor == nullptr)
