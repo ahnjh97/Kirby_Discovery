@@ -738,6 +738,35 @@ void CCamera_Main::MoveTo_CurCamPos_Interpolate(_float fTimeDelta)
 
 void CCamera_Main::MoveTo_CurCamPos_Absolute(_float fTimeDelta)
 {
+	//**** 목표 위치를 따라간다 ****//
+	_float4 vCurPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+
+	_float4 vDestDir = Dir(Pos(m_vCurCamPos + Make_ShakeDir(fTimeDelta)) - Pos(vCurPos));
+	_float4 vDestXZDir = { vDestDir.x, 0.f, vDestDir.z , 0.f };
+	_float4 vDestYDir = { 0.f, vDestDir.y, 0.f , 0.f };
+
+
+	//x 가기
+	if (.1f <= vDestXZDir.Length())
+		m_pTransformCom->Move(vDestXZDir * fTimeDelta * ((m_eCamFocus == FOCUS_BOTH) ? 12.f : 2.f));
+
+
+	SET_POS(m_vCurCamPos);
+	m_pTransformCom->
+	//y로 가기
+	if (.1f <= vDestYDir.Length())
+	{
+		if (0.f < vDestYDir.y)
+			m_pTransformCom->Move(vDestYDir * fTimeDelta * 2.5f);
+		else
+		{
+			m_pTransformCom->Move((1.f < vDestYDir.Length()) ? _float4{ 0.f, -1.f, 0.f, 0.f } *fTimeDelta * 3.f : vDestYDir * fTimeDelta * 2.5f);
+		}
+	}
+
+	//보간하여 바라보기
+	m_pTransformCom->Look_At_Interpolate(m_pTransformCom->Get_State(CTransform::STATE_POSITION) + Dir(m_vCurCamDir) + _float4{ 0.f, m_fCurUpOffset, 0.f, 0.f },
+		fTimeDelta * (m_eCamFocus != FOCUS_BOTH ? 1.f : 10.f));
 }
 
 void CCamera_Main::Orbit_Target(_float fTimeDelta)

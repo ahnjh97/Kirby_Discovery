@@ -273,7 +273,7 @@ private:
 	void Update_CurCamPos(_float fTimeDelta);
 
 	_float3 Make_ShakeDir(_float fTimeDelta);
-	void MoveTo_CurCamPos(_float fTimeDelta);
+	void MoveTo_CurCamPos_Interpolate(_float fTimeDelta);
 	void MoveTo_CurCamPos_Absolute(_float fTimeDelta);
 
 	void Orbit_Target(_float fTimeDelta);
