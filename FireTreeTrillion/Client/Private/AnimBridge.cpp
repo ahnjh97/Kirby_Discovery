@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "AnimBridge.h"
+#include "Bone.h"
 
 CAnimBridge::CAnimBridge(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
@@ -44,9 +45,14 @@ HRESULT CAnimBridge::Initialize(void* pArg)
 	m_bMotionBlur = false;
 	m_wstrModelName = Desc->wstrModelName;
 
-	if (TEXT("BoardC_Anim") == m_wstrModelName)
+	if (TEXT("BoardC_Anim") == m_wstrModelName) {
 		m_pModelCom->Set_Animation(1, 60.f, true, false);
-
+		m_pBone = m_pModelCom->Get_BonePtr("joint2");
+		if (nullptr == m_pBone)
+			return E_FAIL;
+		m_pEditMatrix = m_pBone->Get_EditMatrixPtr();
+	}
+		
 	return S_OK;
 }
 
@@ -60,28 +66,37 @@ _int CAnimBridge::Tick(_float fTimeDelta)
 	if (m_bCollision)
 		m_fHitTime += fTimeDelta;
 
-	if (m_fHitTime > 0.f && m_fHitTime < 0.75f) {
-		if (TEXT("BoardA_Anim") == m_wstrModelName || TEXT("BoardB_Anim") == m_wstrModelName) {
+	if (TEXT("BoardA_Anim") == m_wstrModelName || TEXT("BoardB_Anim") == m_wstrModelName)
+	{
+		if (m_fHitTime > 0.f && m_fHitTime < 0.75f)
 			m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), m_pGameInstance->Get_SecondTimer());
-		}
-		else if (TEXT("BoardC_Anim") == m_wstrModelName) {
-			m_pModelCom->Set_Animation(0, 60.f, true, true, 2.f);
+
+		if (m_fHitTime > 0.72f && true == m_bSecondAnim)
+		{
+			m_pModelCom->Set_Animation(1, 60.f, false, false);
 			m_bSecondAnim = false;
 		}
 	}
 
-	//if (m_fHitTime > 0.72f && true == m_bSecondAnim)
-	//{
-	//	m_pModelCom->Set_Animation(1, 60.f, false, false);
-	//	m_bSecondAnim = false;
-	//}
-	
+	if (TEXT("BoardC_Anim") == m_wstrModelName)
+	{
+		if(m_fHitTime > 0.f && m_fHitTime < 2.f)
+			 CUtils::Turn_OtherMatrix(*m_pEditMatrix, _float4(1, 0, 0, 0), -fTimeDelta, 0.62f);
+
+		if (m_fHitTime >= 2.f && true == m_bSecondAnim)
+		{
+			*m_pEditMatrix = _float4x4::Identity;
+			m_pModelCom->Set_Animation(0, 60.f, true, true);
+			m_bSecondAnim = false;
+		}
+	}
+
 	return OBJ_NOEVENT;
 }
 
 void CAnimBridge::Late_Tick(_float fTimeDelta)
 {
-	if (true == m_bCollision || m_wstrModelName == TEXT("BoardC_Anim"))
+	if (true == m_bCollision || TEXT("BoardC_Anim") == m_wstrModelName)
 		m_pModelCom->Play_Animation(fTimeDelta);
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 150.0f))
@@ -203,6 +218,7 @@ void CAnimBridge::Free()
 {
 	__super::Free();
 
+	Safe_Release(m_pBone);
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 }
