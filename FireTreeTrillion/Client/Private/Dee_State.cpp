@@ -553,6 +553,7 @@ CDee_FlyStun_State::CDee_FlyStun_State()
 void CDee_FlyStun_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+	m_vRandomAxis = CUtils::Make_Random_Vector(1.f);
 }
 
 void CDee_FlyStun_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -570,7 +571,7 @@ void CDee_FlyStun_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 		if (baseInfo.pTransformCom->Get_State(CTransform::STATE_RIGHT) == _float4::Zero)
 			baseInfo.pTransformCom->Set_Scaled({ 1.f, 1.f, 1.f });
 
-		baseInfo.pTransformCom->Turn(_float4{ baseInfo.pTransformCom->Get_State(CTransform::STATE_RIGHT) }, fTimeDelta);
+		baseInfo.pTransformCom->Turn(m_vRandomAxis, fTimeDelta);
 
 		// 점프되는 체공시간을 구현해보자.
 		_float fDamageJumpPower = baseInfo.pDee->Get_DamageJumpPower();
@@ -594,8 +595,7 @@ void CDee_FlyStun_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 			}
 			else
 			{
-				pair<DEE_ANIM, _bool> ToDo = baseInfo.pDee->Make_WhatToDo();
-				baseInfo.pDee->Change_State(ToDo.first, 60.f, ToDo.second, true);
+				baseInfo.pDee->Change_State(DEEANIM_MOVEFALL, 180.f, false, false);
 				m_iBounceCnt = 1;
 			}
 		}
@@ -640,13 +640,14 @@ void CDee_FlyStun_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 			}
 			else
 			{
-				pair<DEE_ANIM, _bool> ToDo = baseInfo.pDee->Make_WhatToDo();
-				baseInfo.pDee->Change_State(ToDo.first, 60.f, ToDo.second, true);
+				//pair<DEE_ANIM, _bool> ToDo = baseInfo.pDee->Make_WhatToDo();
+				//baseInfo.pDee->Change_State(ToDo.first, 60.f, ToDo.second, true);
 
 				_float3 vLook = baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK);
 				vLook.y = 0.f;
 				vLook.Normalize();
 				baseInfo.pTransformCom->Look_At_Axis(vLook);
+				baseInfo.pDee->Change_State(DEEANIM_MOVEFALL, 180.f, false, false);
 				m_iBounceCnt = 1;
 				baseInfo.pDee->Set_PhyXState(PO_NORMAL);
 			}
@@ -787,9 +788,6 @@ void CDee_Interact_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 	BASE_INFO baseInfo{};
 	Setup_BaseInfo(baseInfo, pGameObject);
 	System_Tick(fTimeDelta);
-
-	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta);
-
 	//상호작용 스테이트마다 조금식 다르게 하자~
 	switch (baseInfo.pDee->Get_State())
 	{
@@ -830,12 +828,21 @@ void CDee_Interact_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 		break;
 	}
 
+	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta, 6.f, 0.25f);
 
 	if (baseInfo.pDee->IsAnimFinished())
 	{
 		//인사하는 거였으면 눈 바꾸고 다시 idle로 돌아가
 		baseInfo.pDee->Set_DeeEyeState(DEEEYE_IDLE);
-		baseInfo.pDee->Change_State(DEEANIM_WALK, 60.f, true, true);
+		if (*m_pGameInstance->Get_CurrentLevelID() == LEVEL_DEEDEEDEE)
+		{
+			pair<DEE_ANIM, _bool> ToDo = baseInfo.pDee->Make_WhatToDo();
+			baseInfo.pDee->Change_State(ToDo.first, 60.f, ToDo.second, true);
+		}
+		else
+		{
+			baseInfo.pDee->Change_State(DEEANIM_WALK, 60.f, true, true);
+		}
 	}
 
 }

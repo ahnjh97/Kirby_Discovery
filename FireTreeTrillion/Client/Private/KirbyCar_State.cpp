@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "KirbyCar_State.h"
 #include "Kirby_State_Function.h"
-
+#include "ToppleableBridge.h"
 
 #pragma region 차량 아이들 상태
 
@@ -608,6 +608,13 @@ void CKirbyCar_Boost_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 			pCamera->Make_Shake(1.6f, 0.5f);
 			GAMEINSTANCE Setting_RadialBlur(pTransformCom->Get_State(CTransform::STATE_POSITION), 30.f, 150.f);
+
+			CGameObject* pObj = pKirby->FindToppleableBridge(pController->Get_MostRecentActor());
+			if (nullptr != pObj) {
+				CToppleableBridge* pToppleableBridge = dynamic_cast<CToppleableBridge*>(pObj);
+				pToppleableBridge->OnCollision();
+			}
+				
 			return;
 		}
 	}

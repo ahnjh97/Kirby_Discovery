@@ -248,7 +248,7 @@ PS_OUT PS_MAIN_SOFTFX(PS_IN_ALPHABLEND In)
     float4 vDepthDesc = g_DepthTexture.Sample(PointSampler, vTexcoord);
     float fOldViewZ = vDepthDesc.y * g_fFar;
 
-    Out.vColor.a = vDiffuse.a * saturate(fOldViewZ - In.vProjPos.w);
+    Out.vColor.a = vDiffuse.a * saturate((fOldViewZ - In.vProjPos.w) * 0.3f);
     Out.vColor.rgb = vDiffuse.rgb;
     Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
     
@@ -436,6 +436,29 @@ PS_OUT PS_MAIN_ALPHATEST_COLOR_HORIZONTALCUT(PS_IN In)
 
 	return Out;
 }
+
+PS_OUT PS_MAIN_FOR_BOSSBAR(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    //마스크 값으로 자르기
+    vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord);
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    if (Out.vColor.a < 0.05f)
+        discard;
+
+    if (vMask.r > g_fMaskRatio)
+        discard;
+    
+    //diffuse 알파 테스팅
+    Out.vColor.rgb *= g_vRColor;
+    Out.vColor.a *= g_fAlpha;
+    
+    Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
+    
+    return Out;
+}
+
 
 
 technique11 DefaultTechnique
@@ -646,5 +669,19 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_ALPHATEST_COLOR_HORIZONTALCUT();
+    }
+
+	// 보스 Bar 전용. 마스크와 색상 ( 15 )
+    pass BOSS_BARPASS_DEFAULT
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_FOR_BOSSBAR();
     }
 }

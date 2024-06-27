@@ -18,6 +18,7 @@ public:
 	_float3* Get_NormalsPtr() { return m_pNormals; }
 	_float2* Get_TexCoordsPtr() { return m_pTexCoords; }
 	_float3* Get_TangentsPtr() { return m_pTangents; }
+	PxRigidActor* Get_Actor() { return m_pActor; }
 
 public:
 	virtual HRESULT Initialize_Prototype(TYPE eModelType, string strDirectory, const vector<CBone*>& Bones
@@ -38,6 +39,7 @@ public:
 	HRESULT CreateStaticActor(_float4x4& matWorld);
 	void	Update_ActorTransform(class CTransform* pTransform);
 	void	DisableActor(PxScene* pScene);
+	void	ReAddActor(PxScene* pScene);
 	//void		Update_PhysX(class CTransform* pTransform);
 	//_float4x4	Get_PxWorldMatrix();
 

@@ -37,8 +37,8 @@ HRESULT CDeeDeeDee::Initialize(void* pArg)
 
 	m_tInfo.m_vOriginPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
-	m_fMaxHp = 300.f;
-	m_fHp = 300.f;
+	m_fMaxHp = 200.f;
+	m_fHp = 200.f;
 	m_fAttack = 15.f;
 	m_eVacuumSize = SIZE_BIG;
 	m_eAbilityType = ABILITY_DEFAULT;
@@ -541,6 +541,8 @@ void CDeeDeeDee::DeeDeeDee_SystemTick(_float fTimeDelta)
 		{
 			if (Get_State() == STATE_WAIT)
 			{
+				if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_BossUI"), TEXT("Prototype_GameObject_HUD_BossHpBar"), this)))
+					return;
 				Change_State(STATE_COMMAND, 60.f, false, true);
 				m_bInitializeAnim = false;
 			}

@@ -592,7 +592,7 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
         {
             Out.vSSAO.rgb = 1.0;
 
-            float2 rand = getRandom(In.vTexcoord);
+            float2 rand = getRandom(float2(0.5, 0.5));
             float radius = g_sample_radius / fViewZ;
         
             // SSAO Calculation

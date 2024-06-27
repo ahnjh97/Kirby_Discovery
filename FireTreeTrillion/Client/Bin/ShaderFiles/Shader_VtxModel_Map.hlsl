@@ -101,7 +101,7 @@ PS_OUT PS_MAIN(PS_IN In)
 	PS_OUT			Out = (PS_OUT)0;
     
 	vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
-    if (0.1f >= vMtrlDiffuse.a)
+    if (0.3f >= vMtrlDiffuse.a)
         discard;
 
     vector vNormalTex = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);

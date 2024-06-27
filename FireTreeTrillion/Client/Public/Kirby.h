@@ -171,7 +171,11 @@ public:
 
 	void			Set_HitStop() { m_bHitStop = true; }
 	_bool			Is_Attacking() { return m_isKirbyAttacking; }
-	
+	void			RegisterActorsToPlayer(PxRigidActor* pActor, CGameObject* pGameObject) { 
+		m_mapToppleableBridges.insert_or_assign(pActor, pGameObject);
+		Safe_AddRef(pGameObject);
+	}
+	CGameObject*	FindToppleableBridge(PxRigidActor* pActor);
 
 	// 기타 세부적인 제어
 private:
@@ -239,9 +243,9 @@ private:
 	// 폭탄 조준시간. 0.5초가 넘어가면 그제서야 진짜 찐 조준을 한것이다.
 	_float				  m_fOrbitRenderDelay = { 0.f };
 
-
 	_int				  m_iTestAnim = { 0 };
 
+	unordered_map<PxRigidActor*, CGameObject*> m_mapToppleableBridges;
 
 public:
 	static CKirby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

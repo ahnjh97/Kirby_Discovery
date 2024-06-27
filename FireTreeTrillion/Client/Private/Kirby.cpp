@@ -1528,6 +1528,15 @@ void CKirby::Kirby_LookInitialize()
 	INFO(m_vTargetDir) = INFO(m_vMoveDir);
 }
 
+CGameObject* CKirby::FindToppleableBridge(PxRigidActor* pActor)
+{
+	auto mapIter = m_mapToppleableBridges.find(pActor);
+	if (mapIter != m_mapToppleableBridges.end())
+		return mapIter->second;
+
+	return nullptr;
+}
+
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CKirby* pInstance = new CKirby(pDevice, pContext);
@@ -1562,6 +1571,9 @@ void CKirby::Free()
 	CLevelChanger::Get_Instance()->Save(tLevelData);
 
 	__super::Free();
+
+	for (auto& pair : m_mapToppleableBridges)
+		Safe_Release(pair.second);
 
 	for (auto& pModelCom : m_pModelCom)
 		Safe_Release(pModelCom);

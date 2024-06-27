@@ -11,6 +11,7 @@
 #include "Kabu.h"
 #include "BrontoBurt.h"
 #include "PoppyBrosJr.h"
+#include "SkySphere.h"
 
 #include "BG.h"
 #include "HUD.h"
@@ -164,7 +165,10 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
 
 HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
-	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_SkySphere"));
+	CSkySphere::SKYSPHERE_DESC GPSkyDesc{};
+	GPSkyDesc.strModelTag = { "SkySphere_Stage1_Day" };
+
+	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_SkySphere"), &GPSkyDesc);
 	CHECK_FAILED(hr);
 
 	return S_OK;

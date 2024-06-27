@@ -15,6 +15,7 @@ public:
 	struct BLENDMAPOBJ_DESC : public CGameObject::GAMEOBJECT_DESC
 	{
 		MODEL tModel = {};
+		unordered_set<_uint> setBlendMeshIndices;
 	};
 private:
 	CBlendMapObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -28,7 +29,7 @@ public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual _int Tick(_float fTimeDelta) override { return OBJ_NOEVENT; }
-	virtual void Late_Tick(_float fTimeDelta) override {};
+	virtual void Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
 private:
