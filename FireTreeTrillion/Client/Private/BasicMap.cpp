@@ -64,8 +64,17 @@ HRESULT CBasicMap::Initialize(void* pArg)
     if(wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("DeeDeeDeeMap") &&
        wstrModelTag != TEXT("Land_LbLastBossBeforeStep") && wstrModelTag != TEXT("TownShop") && false == m_bBlendMap)
     {
+        _vector vMin = XMLoadFloat3(&GameObjectDesc.vMin);
+        _vector vMax = XMLoadFloat3(&GameObjectDesc.vMax);
+        _matrix matWorld = m_pTransformCom->Get_WorldMatrix();
+        vMin = XMVector3TransformCoord(vMin, matWorld);
+        vMax = XMVector3TransformCoord(vMax, matWorld);
 
-        m_pOcTree = m_pModelCom->Create_OcTree(GameObjectDesc.vMin, GameObjectDesc.vMax, m_vecPassIndices, m_vecSamplingFactors, m_vecConstantNames);
+        _float3 vMinFloat3{}, vMaxFloat3{};
+        XMStoreFloat3(&vMinFloat3, vMin);
+        XMStoreFloat3(&vMaxFloat3, vMax);
+
+        m_pOcTree = m_pModelCom->Create_OcTree(vMinFloat3, vMaxFloat3, m_vecPassIndices, m_vecSamplingFactors, m_vecConstantNames);
         
         // --- ModelName -- TriggerRadius -- IdleIndex & Speed -- ActionIndex & Speed ----------
         SetUpAnimDecoInfo("BushL", 1.5f, 2, 60.f, 0, 50.f);
@@ -350,6 +359,10 @@ void CBasicMap::InsertMapDecos()
     else
         return;
 
+    _float fZOffset{};
+    if (LEVEL_RACING == *m_pCurrentLevelID)
+        fZOffset = 1500.f;
+
     string strPath = "../../../objects_txt/" + strLevel + "_DecoObjs.txt";
 
     ifstream fileInput(strPath, ios::binary);
@@ -382,6 +395,7 @@ void CBasicMap::InsertMapDecos()
         strModelName.resize(iStrLength);
         fileInput.read(&strModelName[0], iStrLength);
         fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
+        matWorld._43 = matWorld._43 + fZOffset;
         fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
         fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
         fileInput.read(reinterpret_cast<char*>(&iPassIndex), sizeof(iPassIndex));
