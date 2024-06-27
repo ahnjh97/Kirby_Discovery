@@ -20,6 +20,8 @@ protected:
 	virtual ~CCharacter() = default;
 
 public:
+	_float4			Compute_TerrainPosition();
+
 	virtual HRESULT Initialize_Prototype()			override;
 	virtual HRESULT Initialize(void* pArg)			override;
 	virtual _int	Tick(_float fTimeDelta)			override;
@@ -83,6 +85,7 @@ protected:
 	void			SetOn_Slope(_float fTimeDelta);
 	void			Lerp_UpVector(_fvector _vTargetUp, _float _maxAngle, _float fTimeDelta);
 	void			Compute_MotionBlur();
+
 	_float2			m_vPreScreenPos = { 0.f, 0.f };
 	_float4			m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
 

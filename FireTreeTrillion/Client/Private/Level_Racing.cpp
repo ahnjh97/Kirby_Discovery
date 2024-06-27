@@ -105,7 +105,7 @@ HRESULT CLevel_Racing::Ready_Lights()
 	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
 		return E_FAIL;
 
-	CGameInstance::Get_Instance()->Setting_GodRay({ -650.f, 500.f, 1200.f, 1.f });
+	CGameInstance::Get_Instance()->Setting_GodRay({ -350.f, 700.f, 1200.f, 1.f });
 
 	return S_OK;
 }
@@ -119,7 +119,7 @@ HRESULT CLevel_Racing::Ready_Layer_Camera(const wstring& strLayerTag)
 	MainCamDesc.fNear = 0.1f;
 	MainCamDesc.fFar = 1000.0f;
 	MainCamDesc.vEye = _float4(-129.f, 10.f, -120.f, 1.f);
-	MainCamDesc.vAt = MainCamDesc.vEye + _float4(0.f, -.15f, 1.f, 1.f);
+	MainCamDesc.vAt = MainCamDesc.vEye + _float4(0.f, -.15f, -1.f, 1.f);
 	MainCamDesc.fSpeedPerSec = 10.f;
 	MainCamDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	MainCamDesc.fOrigDistance = 28.f;
