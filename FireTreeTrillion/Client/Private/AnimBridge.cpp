@@ -50,6 +50,7 @@ HRESULT CAnimBridge::Initialize(void* pArg)
 		m_pBone = m_pModelCom->Get_BonePtr("joint2");
 		if (nullptr == m_pBone)
 			return E_FAIL;
+		Safe_AddRef(m_pBone);
 		m_pEditMatrix = m_pBone->Get_EditMatrixPtr();
 	}
 		
