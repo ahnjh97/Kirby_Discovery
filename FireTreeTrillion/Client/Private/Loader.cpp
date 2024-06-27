@@ -1641,8 +1641,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	else if (eLevel == LEVEL_FINALBOSS)
 	{
 		//보스전 필드에서만 생성하는 SUB_SKYSPHERE (BackGround 요소)
-		m_vecModelInfo.emplace_back("LbBuildingFrame", TYPE_NONANIM);
-		m_vecModelInfo.emplace_back("LbFarPiller", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("LbBuildingFrame", TYPE_NONANIM, 1.f, 0.f);
+		m_vecModelInfo.emplace_back("LbFarPiller", TYPE_NONANIM, 1.f, 76.117f);
 
 		//보스전 진입 전 필드
 		m_vecModelInfo.emplace_back("Land_LbLastBossBeforeStep", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
@@ -1650,7 +1650,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("BG1", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-
 
 		m_vecModelInfo.emplace_back("Kirby", TYPE_ANIM, 1.f, 180.f);
 		// For Kirby Body

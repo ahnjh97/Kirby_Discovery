@@ -10,6 +10,7 @@
 #include "Kabu.h"
 #include "BrontoBurt.h"
 #include "PoppyBrosJr.h"
+#include "SkySphere.h"
 
 #include "BG.h"
 #include "HUD.h"
@@ -147,10 +148,11 @@ HRESULT CLevel_Intro::Ready_Layer_Camera(const wstring& strLayerTag)
 
 HRESULT CLevel_Intro::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
+	CSkySphere::SKYSPHERE_DESC IntroSkyDesc{};
+	IntroSkyDesc.strModelTag = { "SkySphere_Stage1_Day" };
 
-	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_INTRO, strLayerTag, TEXT("Prototype_GameObject_SkySphere"));
+	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_INTRO, strLayerTag, TEXT("Prototype_GameObject_SkySphere"), &IntroSkyDesc);
 	CHECK_FAILED(hr);
-
 
 	//for (_int i = 0; i < 10; i++)
 	//{
@@ -192,7 +194,6 @@ HRESULT CLevel_Intro::Ready_Layer_BackGround(const wstring& strLayerTag)
 	//	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_TerrainFog"), &ObjDesc)))
 	//	//	return E_FAIL;
 	//}
-
 
 	CGameObject::GAMEOBJECT_DESC ObjDesc{};
 	ObjDesc.fSpeedPerSec = 5.f;

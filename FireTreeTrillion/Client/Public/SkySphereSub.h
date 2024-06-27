@@ -33,10 +33,10 @@ public:
 	virtual CGameObject*	Clone(void* pArg) override;
 	virtual void			Free() override;
 
-private:
-	LEVEL					m_eCurLevel = { LEVEL_END };
-	string					m_strModelTag = { "" };
-	string					m_strTextureTag = { "" };
+//private:
+//	LEVEL					m_eCurLevel = { LEVEL_END };
+//	string					m_strModelTag = { "" };
+//	string					m_strTextureTag = { "" };
 };
 
 END

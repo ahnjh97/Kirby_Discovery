@@ -32,7 +32,7 @@ public:
 private:
 	CShader*				m_pShaderCom = { nullptr };
 	CModel*					m_pModelCom = { nullptr };
-	CTexture*				m_pLabSkyTex[TEX_NONE] = { nullptr };
+	CTexture*				m_pTextureCom[TEX_NONE] = { nullptr };
 
 	HRESULT					Add_Components();
 	HRESULT					Bind_ShaderResources();

@@ -145,12 +145,16 @@ HRESULT CLevel_FinalBoss::Ready_Layer_BackGround(const wstring& strLayerTag)
 	CSkySphere::SKYSPHERE_DESC LabSkyDesc{};
 	LabSkyDesc.strModelTag = { "SkySphere_Stage1_Day" };
 	LabSkyDesc.strTextureTag = { "SkySphere_Lab_Diffuse" };
-
 	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_FINALBOSS, strLayerTag, TEXT("Prototype_GameObject_SkySphere"), &LabSkyDesc);
 	CHECK_FAILED(hr);
 
 	//SUB_SKYSPHERE
-	hr = m_pGameInstance->Add_Clone(LEVEL_FINALBOSS, strLayerTag, TEXT("Prototype_GameObject_SkySphereSub"));
+	CSkySphere::SKYSPHERE_DESC LabSkySubDesc{};
+	_float4x4 InitMat = _float4x4::Identity;
+	InitMat.Translation({ 0.f, -50.f, -0.f });
+	LabSkySubDesc.matWorld = InitMat;
+
+	hr = m_pGameInstance->Add_Clone(LEVEL_FINALBOSS, strLayerTag, TEXT("Prototype_GameObject_SkySphereSub"), &LabSkySubDesc);
 	CHECK_FAILED(hr);
 
 	return S_OK;

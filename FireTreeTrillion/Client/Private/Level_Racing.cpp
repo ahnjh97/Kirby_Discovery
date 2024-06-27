@@ -10,6 +10,7 @@
 #include "Kabu.h"
 #include "BrontoBurt.h"
 #include "PoppyBrosJr.h"
+#include "SkySphere.h"
 #include "Car.h"
 
 #include "BG.h"
@@ -148,8 +149,10 @@ HRESULT CLevel_Racing::Ready_Layer_Camera(const wstring& strLayerTag)
 
 HRESULT CLevel_Racing::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
+	CSkySphere::SKYSPHERE_DESC RacingSkyDesc{};
+	RacingSkyDesc.strModelTag = { "SkySphere_Stage1_Day" };
 
-	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_RACING, strLayerTag, TEXT("Prototype_GameObject_SkySphere"));
+	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_RACING, strLayerTag, TEXT("Prototype_GameObject_SkySphere"), &RacingSkyDesc);
 	CHECK_FAILED(hr);
 
 	return S_OK;

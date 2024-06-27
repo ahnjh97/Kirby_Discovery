@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "GameInstance.h"
 #include "SkySphereSub.h"
-
+#include "SkySphere.h"
 
 CSkySphereSub::CSkySphereSub(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CGameObject{ pDevice, pContext }
@@ -20,12 +20,21 @@ HRESULT CSkySphereSub::Initialize_Prototype()
 
 HRESULT CSkySphereSub::Initialize(void* pArg)
 {
-	HRESULT hr = __super::Initialize(pArg);
-	CHECK_FAILED(hr);
-	
-	hr = Add_Components();
-	CHECK_FAILED(hr);
-	
+	GAMEOBJECT_DESC* Desc = nullptr;
+
+	if (pArg != nullptr)
+		Desc = (GAMEOBJECT_DESC*)pArg;
+
+	if (FAILED(__super::Initialize(Desc)))
+		return E_FAIL;
+
+	CSkySphere::SKYSPHERE_DESC SkySphereDesc{};
+	if (nullptr != pArg)
+		SkySphereDesc = *(CSkySphere::SKYSPHERE_DESC*)pArg;
+
+	if (FAILED(Add_Components()))
+		return E_FAIL;
+
 	//레벨 별 상태 변경을 위한 값 저장 (현재는 무의미한데, 트리거 정보 받아올 경우에 조건 처리 필요)
 	/*
 	m_eCurLevel = (LEVEL)*m_pGameInstance->Get_CurrentLevelID();
@@ -35,13 +44,8 @@ HRESULT CSkySphereSub::Initialize(void* pArg)
 			iMod->Set_Hide(TRUE); //default FALSE
 	}
 	*/
-
-	m_pTransformCom->Set_Scaled(_float3{ 1.f, 1.f, 1.f });
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(0.f, -50.f, 0.f, 1.f));
-	m_pTransformCom->Rotation(XMVectorSet(AXIS_Y), XMConvertToRadians(76.117f));
-
 	return S_OK;
-}
+}	
 
 _int CSkySphereSub::Tick(_float fTimeDelta)
 {
@@ -50,9 +54,6 @@ _int CSkySphereSub::Tick(_float fTimeDelta)
 
 void CSkySphereSub::Late_Tick(_float fTimeDelta)
 {
-	_float4 vCamPos = m_pGameInstance->Get_CamPosition();
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vCamPos);
-
 	//보스전 필드 진입 트리거에 해당 조건을 체크. 해당 레벨과 트리거 조건이 일치할 때, 서브 스피어 렌더ON
 	//현재는 레벨만 체크 중인 상태
 	/*
@@ -62,7 +63,6 @@ void CSkySphereSub::Late_Tick(_float fTimeDelta)
 			iMod->Set_Hide(FALSE); //default FALSE
 	}
 	*/
-
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this);
 }
 
