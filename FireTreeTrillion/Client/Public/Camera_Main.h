@@ -274,6 +274,7 @@ private:
 
 	_float3 Make_ShakeDir(_float fTimeDelta);
 	void MoveTo_CurCamPos(_float fTimeDelta);
+	void MoveTo_CurCamPos_Absolute(_float fTimeDelta);
 
 	void Orbit_Target(_float fTimeDelta);
 
