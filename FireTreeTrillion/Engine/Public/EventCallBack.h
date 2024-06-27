@@ -15,7 +15,7 @@ public:
     void Emplace_ExitFunc(_int iType, function<void(void)> func) { m_ExitFuncs.emplace(iType, func); }
     void Emplace_MapDecoTrigger(PxActor* pTriggerActor, class CModel* pMapDecoModel, _uint iAnimIdx, _float fTickPerSec) 
             { m_TriggerToMapDecoAnimMap.emplace(pTriggerActor, tuple<class CModel*, _uint, _float>(pMapDecoModel, iAnimIdx, fTickPerSec)); }
-
+   
 public:
     virtual void onTrigger(PxTriggerPair* pairs, PxU32 count) override;
 

@@ -28,6 +28,8 @@ private:
 	HRESULT Ready_Kickables();
 	HRESULT Ready_Objects();
 
+	void	Change_Levels();
+
 	HRESULT	Load_FileData(const string& _strFilePath, FILE_TYPE _eFileType, const wstring& _strLayerTag);
 
 	HRESULT Add_EnvMap();
