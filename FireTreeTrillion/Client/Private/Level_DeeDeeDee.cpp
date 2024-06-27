@@ -54,12 +54,12 @@ HRESULT CLevel_DeeDeeDee::Initialize()
 	CHECK_FAILED(hr);
 	hr = Ready_Dees();
 	CHECK_FAILED(hr);
-	//hr = Ready_Items();
-	//CHECK_FAILED(hr);
-	//hr = Ready_Kickables();
-	//CHECK_FAILED(hr);
-	//hr = Ready_Objects();
-	//CHECK_FAILED(hr);
+	hr = Ready_Items();
+	CHECK_FAILED(hr);
+	hr = Ready_Kickables();
+	CHECK_FAILED(hr);
+	hr = Ready_Objects();
+	CHECK_FAILED(hr);
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 	m_pGameInstance->Set_ColorSet_ByIndex(4);
