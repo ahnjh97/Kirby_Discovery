@@ -89,12 +89,12 @@ _int CToppleableBridge::Tick(_float fTimeDelta)
 	if (m_bCollision)
 		m_fHitTime += fTimeDelta;
 
-	if (m_fHitTime > 0.f && m_fHitTime < 0.75f)
+	if (TEXT("BoardA") == m_wstrModelName || TEXT("BoardB") == m_wstrModelName)
 	{
-		if(TEXT("BoardA") == m_wstrModelName || TEXT("BoardB") == m_wstrModelName)
+		if (m_fHitTime > 0.f && m_fHitTime < 0.75f)
 			m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), m_pGameInstance->Get_SecondTimer());
 	}
-		
+
 	return OBJ_NOEVENT;
 }
 
@@ -103,13 +103,16 @@ void CToppleableBridge::Late_Tick(_float fTimeDelta)
 	if (nullptr != m_pAnimBridge)
 		m_pAnimBridge->Late_Tick(fTimeDelta);
 
-	if (m_fHitTime > 0.75f && m_bActorCreated == false) {
-		if (TEXT("BoardA") == m_wstrModelName || TEXT("BoardB") == m_wstrModelName) {
+	if (TEXT("BoardA") == m_wstrModelName || TEXT("BoardB") == m_wstrModelName) {
+		if (m_fHitTime >= 0.75f && m_bActorCreated == false) {
 			if (FAILED(m_pModelCom->CreateStaticActor(m_pTransformCom->Get_WorldFloat4x4())))
 				return;
 			m_bActorCreated = true;
 		}
-		else if (TEXT("BoardC") == m_wstrModelName) {
+	}
+
+	if (TEXT("BoardC") == m_wstrModelName) {
+		if (m_fHitTime >= 2.f && m_bActorCreated == false) {
 			unordered_set<string> setExcludeMesh = { "FakeCollider" };
 			if (FAILED(m_pModelCom->CreateStaticActors_Exclude(setExcludeMesh, m_pTransformCom->Get_WorldFloat4x4())))
 				return;
