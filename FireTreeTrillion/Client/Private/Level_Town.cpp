@@ -12,7 +12,7 @@
 #include "Kabu.h"
 #include "BrontoBurt.h"
 #include "PoppyBrosJr.h"
-
+#include "SkySphere.h"
 #include "HungryDee.h"
 
 #include "BG.h"
@@ -155,8 +155,10 @@ HRESULT CLevel_Town::Ready_Layer_Camera(const wstring& strLayerTag)
 
 HRESULT CLevel_Town::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
+	CSkySphere::SKYSPHERE_DESC TownSkyDesc{};
+	TownSkyDesc.strModelTag = { "SkySphere_Stage1_Day" };
 
-	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_TOWN, strLayerTag, TEXT("Prototype_GameObject_SkySphere"));
+	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_TOWN, strLayerTag, TEXT("Prototype_GameObject_SkySphere"), &TownSkyDesc);
 	CHECK_FAILED(hr);
 
 	return S_OK;

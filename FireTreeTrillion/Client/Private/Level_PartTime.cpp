@@ -12,6 +12,7 @@
 #include "Kabu.h"
 #include "BrontoBurt.h"
 #include "PoppyBrosJr.h"
+#include "SkySphere.h"
 
 #include "HungryDee.h"
 #include "PartTimeFood.h"
@@ -156,7 +157,10 @@ HRESULT CLevel_PartTime::Ready_Layer_Camera(const wstring& strLayerTag)
 
 HRESULT CLevel_PartTime::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
-	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_PARTTIME, strLayerTag, TEXT("Prototype_GameObject_SkySphere"));
+	CSkySphere::SKYSPHERE_DESC PartTimeSkyDesc{};
+	PartTimeSkyDesc.strModelTag = { "SkySphere_Stage1_Day" };
+
+	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_PARTTIME, strLayerTag, TEXT("Prototype_GameObject_SkySphere"), &PartTimeSkyDesc);
 	CHECK_FAILED(hr);
 
 	return S_OK;
