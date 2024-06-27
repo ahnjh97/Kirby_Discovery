@@ -4,12 +4,15 @@
 
 void CMapToolObject::Set_PassIndices(unordered_set<_uint>& _setBlendMeshIndices)
 {
+	if (true == _setBlendMeshIndices.empty())
+		return;
+
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 	m_vecPassIndices.resize(m_pModelCom->Get_NumMeshes());
 	for (_uint i = 0; i < iNumMeshes; i++)
 	{
 		if (_setBlendMeshIndices.end() != _setBlendMeshIndices.find(i))
-			m_vecPassIndices[i] = MODEL_ALPHABLEND_NORMAL_O;
+			m_vecPassIndices[i] = MODEL_ALPHABLEND;
 		else
 			m_vecPassIndices[i] = MODEL_NORMAL_O;
 	}
@@ -49,7 +52,7 @@ HRESULT CMapToolObject::Initialize(void* pArg)
 	m_fRadius = GameObjectDesc.fRadius;
 	m_RallyPoints = GameObjectDesc.RallyPoints;
 	m_strConnectedMonster = GameObjectDesc.strConnectedMonster;
-
+	
 	if (FAILED(Add_Components(GameObjectDesc.wstrModelName)))
 		return E_FAIL;
 	
@@ -65,6 +68,9 @@ HRESULT CMapToolObject::Initialize(void* pArg)
 	Safe_AddRef(m_pMapToolHelper);
 	if (L"Trigger" == GameObjectDesc.wstrModelName)
 		m_iPassIndex = MODEL_TRIGGER;
+
+	if (false == GameObjectDesc.setBlendMeshIndices.empty())
+		Set_PassIndices(GameObjectDesc.setBlendMeshIndices);
 
 	return S_OK;
 }

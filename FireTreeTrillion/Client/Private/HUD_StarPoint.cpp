@@ -535,6 +535,7 @@ void CHUD_StarPoint::Compute_Coin(_float _fTimeDelta)
 		m_fIdleTime = 0.f;
 		m_fUpNumY = 1.f;
 		m_fWhiteColor = 1.f;
+		m_fFrame = 3.f;
 	}
 	// 만약, 아무 상황도 아니라면?
 	else

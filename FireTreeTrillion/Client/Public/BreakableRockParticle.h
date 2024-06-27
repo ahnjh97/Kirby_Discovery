@@ -6,7 +6,7 @@ BEGIN(Engine)
 class CModel;
 END
 
-class CBreakableRockPartical final : public CRigidObject
+class CBreakableRockParticle final : public CRigidObject
 {
 public:
 	struct BREAKABLEPARTICALDESC
@@ -18,9 +18,9 @@ public:
 	};
 
 private:
-	CBreakableRockPartical(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CBreakableRockPartical(const CBreakableRockPartical& rhs);
-	virtual ~CBreakableRockPartical() = default;
+	CBreakableRockParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CBreakableRockParticle(const CBreakableRockParticle& rhs);
+	virtual ~CBreakableRockParticle() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype()						override;
@@ -50,7 +50,7 @@ private:
 
 
 public:
-	static CBreakableRockPartical* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CBreakableRockParticle* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg);
 	virtual void		 Free() override;
 

@@ -273,7 +273,7 @@ namespace ImSequencer
          size_t customHeight = 0;
          for (int i = 0; i < sequenceCount; i++)
          {
-            int type;
+            int type(0);
             char* strName = nullptr;
             sequence->Get(i, NULL, NULL, &strName, NULL);
             ImVec2 tpos(contentMin.x + 3, contentMin.y + i * ItemHeight + 2 + customHeight);

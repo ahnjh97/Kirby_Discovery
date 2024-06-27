@@ -332,7 +332,9 @@ HRESULT CRenderer::Initialize()
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_GodRay"), 900.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_SSAO"), 1000.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
+	//if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_SSAO"), 1000.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
+	//	return E_FAIL;
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_SSAO"), 1000.f, ViewportDesc.Height - 300.f, 300.f, 300.f)))
 		return E_FAIL;
 
 	// ShadowObject
@@ -1007,6 +1009,19 @@ HRESULT CRenderer::Render_Lights()
 	if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrixInv", &m_pGameInstance->Get_Transform_Float4x4_Inverse(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
 	if (FAILED(m_pShader->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+		return E_FAIL;
+
+	if (FAILED(m_pShader->Bind_RawValue("g_scale", &m_fSSAOScale, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_bias", &m_fSSAOBias, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_sample_radius", &m_fSSAOSampleRadius, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_intensity", &m_fSSAOIntensity, sizeof(_float))))
+		return E_FAIL;
+
+	_float fFar = 1000.f;
+	if (FAILED(m_pShader->Bind_RawValue("g_fFar", &fFar, sizeof(_float))))
 		return E_FAIL;
 
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Normal"), "g_NormalTexture")))
@@ -1689,6 +1704,16 @@ void CRenderer::Render_IMGUI()
 	if (ImGui::Checkbox(u8"모샨블라", &m_bRenderOption[OPTION_MOTIONBLUR]))
 		Update_Option(OPTION_MOTIONBLUR, m_bRenderOption[OPTION_MOTIONBLUR]);
 
+
+	ImGui::SeparatorText(u8"SSAO");
+
+
+	ImGui::DragFloat(u8"원근 허용", &m_fSSAOScale, .01f, 0.f, 2.f, "%.2f");
+	ImGui::DragFloat(u8"차폐 확인 각도", &m_fSSAOBias, .01f, 0.f, 1.f, "%.2f");
+	ImGui::DragFloat(u8"탐색 반경", &m_fSSAOSampleRadius, .01f, 0.1f, 10.f, "%.2f");
+	ImGui::DragFloat(u8"음영 강도", &m_fSSAOIntensity, .01f, 0.01f, 5.f, "%.2f");
+
+	ImGui::SeparatorText(u8"림 라이트");
 
 	ImGui::DragFloat(u8"림 라이트 배율", &m_fRimLightRatio.second, .01f, 0.f, 1.f, "%.2f");
 

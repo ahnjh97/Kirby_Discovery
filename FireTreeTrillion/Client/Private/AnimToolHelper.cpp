@@ -297,7 +297,7 @@ void CAnimToolHelper::Render_AnimationList(const wstring& wstrObjectTag)
 								item_current_idx--;
 								m_bOnceAnim = true;
 							}
-							if (ImGui::IsKeyPressed(ImGuiKey_DownArrow) && item_current_idx < uAnimCnt - 1)
+							if (ImGui::IsKeyPressed(ImGuiKey_DownArrow) && item_current_idx < (_int)(uAnimCnt - 1))
 							{
 								item_current_idx++;
 								m_bOnceAnim = true;

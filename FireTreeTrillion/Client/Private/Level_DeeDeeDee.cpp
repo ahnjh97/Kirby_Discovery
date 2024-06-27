@@ -135,10 +135,10 @@ HRESULT CLevel_DeeDeeDee::Ready_Layer_Camera(const wstring& strLayerTag)
 	MainCamDesc.fNear = 0.1f;
 	MainCamDesc.fFar = 1000.0f;
 	MainCamDesc.vEye = _float4(0.f, 0.f, 0.f, 1.f);
-	MainCamDesc.vAt = MainCamDesc.vEye + _float4(0.f, -.15f, 1.f, 1.f);
+	MainCamDesc.vAt = MainCamDesc.vEye + _float4(0.f, -.3f, 1.f, 1.f);
 	MainCamDesc.fSpeedPerSec = 10.f;
 	MainCamDesc.fRotationPerSec = XMConvertToRadians(90.0f);
-	MainCamDesc.fOrigDistance = 28.f;
+	MainCamDesc.fOrigDistance = 32.f;
 	MainCamDesc.fCamSensor = .3f;
 
 	if (FAILED(m_pGameInstance->Add_Clone(eLevel, strLayerTag, TEXT("Prototype_GameObject_Camera_Main"), &MainCamDesc)))
@@ -477,7 +477,7 @@ HRESULT CLevel_DeeDeeDee::Ready_Dees()
 				(DEECHARACTER_END - 1) < (DEE_CHARACTER)iTriggerIndex ?
 				DEECHARACTER_SLEEPY : (DEE_CHARACTER)iTriggerIndex;
 
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Dee"), TEXT("Prototype_GameObject_BattleDee"), &DeeDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_BattleDee"), TEXT("Prototype_GameObject_BattleDee"), &DeeDesc)))
 				return E_FAIL;
 		}
 	}

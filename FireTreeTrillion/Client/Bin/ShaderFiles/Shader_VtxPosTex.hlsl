@@ -23,6 +23,9 @@ float g_fMaskRatio = { 1.f };
 
 float g_fAlarmColor = { 0.f };
 
+// UI 함수에서 마스킹유무
+int g_iMasking = 0;
+
 
 // 회전된 UV를 계산
 float2 RotateUV(float2 vCoord, float fAngle)
@@ -153,19 +156,31 @@ PS_OUT PS_MAIN_ALPHABLEND(PS_IN_ALPHABLEND In)
 PS_OUT PS_MAIN_SOLIDALPHABLEND(PS_IN_ALPHABLEND In)
 {
 	PS_OUT			Out = (PS_OUT)0;
-
+    vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord);
     Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
     
-    //알파 값 예외처리
-    if (Out.vColor.a < 0.1f)
-        discard;
-    
-    Out.vColor.rgb = g_vRColor;
+    if(g_iMasking == 2)
+    {
+        if (Out.vColor.a < 0.8f)
+            discard;
+
+        if( g_fMaskRatio < vMask.r )
+             discard;
+    }
+    else
+    {
+        //알파 값 예외처리
+        if (Out.vColor.a < 0.1f)
+            discard;
+    }
+
+    if(g_vRColor.r == 0.45)
+        Out.vColor.rgb = g_vRColor;
     Out.vColor.a *= g_fAlpha;
 
     if (0.01f <= Out.vColor.a)
         Out.vNonBlur = vector(0.f, 1.f, 0.f, 0.f);
-	
+
 	return Out;
 }
 
@@ -232,7 +247,7 @@ PS_OUT PS_MAIN_SOFTFX(PS_IN_ALPHABLEND In)
     float4 vDepthDesc = g_DepthTexture.Sample(PointSampler, vTexcoord);
     float fOldViewZ = vDepthDesc.y * g_fFar;
 
-    Out.vColor.a = vDiffuse.a * saturate(fOldViewZ - In.vProjPos.w);
+    Out.vColor.a = vDiffuse.a * saturate((fOldViewZ - In.vProjPos.w) * 0.3f);
     Out.vColor.rgb = vDiffuse.rgb;
     Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
     
@@ -394,22 +409,55 @@ PS_OUT PS_MAIN_ALPHATEST_COLOR(PS_IN In)
 PS_OUT PS_MAIN_ALPHATEST_COLOR_HORIZONTALCUT(PS_IN In)
 {
 	PS_OUT			Out = (PS_OUT)0;
-
+    vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord);
     Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
-	
+
 	//알파 테스트
 	if(Out.vColor.a < .6f)
         discard;
 
-    if( g_fMaskRatio < In.vTexcoord.x )
-        discard;
+    if(g_iMasking == 1)
+    {
+        if( g_fMaskRatio < In.vTexcoord.x )
+            discard;
+    }
 
     Out.vColor.rgb *= g_vRColor;
-
     Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
-	
+	//Out.vColor.rgb = g_vRColor;
+    //Out.vColor.a *= g_fAlpha;
+    
+    if(g_iMasking == 1)
+    {
+        if (vMask.r > g_fMaskRatio)
+            discard;
+    }
+
 	return Out;
 }
+
+PS_OUT PS_MAIN_FOR_BOSSBAR(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    //마스크 값으로 자르기
+    vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord);
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    if (Out.vColor.a < 0.05f)
+        discard;
+
+    if (vMask.r > g_fMaskRatio)
+        discard;
+    
+    //diffuse 알파 테스팅
+    Out.vColor.rgb *= g_vRColor;
+    Out.vColor.a *= g_fAlpha;
+    
+    Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
+    
+    return Out;
+}
+
 
 
 technique11 DefaultTechnique
@@ -620,5 +668,19 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_ALPHATEST_COLOR_HORIZONTALCUT();
+    }
+
+	// 보스 Bar 전용. 마스크와 색상 ( 15 )
+    pass BOSS_BARPASS_DEFAULT
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_FOR_BOSSBAR();
     }
 }

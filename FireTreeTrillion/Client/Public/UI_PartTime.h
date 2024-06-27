@@ -8,7 +8,7 @@ class CTexture;
 class CVIBuffer_Rect;
 END
 
-#define TEXTURECNT	10
+#define TEXTURECNT	15
 
 BEGIN(Client)
 class CUI_PartTime : public CUIObject
@@ -30,6 +30,11 @@ public:
 	virtual void				Render_IMGUI()								override;
 #endif
 
+	void						Add_TimeBar(_float _fTimeBar);
+	void						Add_Score(_int _fPlusScore);
+
+	void						Set_PreRatioBar() { m_fRatioBarSub = m_fRatioTimeBar; }
+
 private:
 	HRESULT						Add_Components();
 	
@@ -37,6 +42,7 @@ private:
 	void						Setup_PosSizeColor(_int iTextureNum);
 	_bool						Setup_DeeFace(_int iTextureNum);
 	void						Compute_Timer(_float fTimeDelta);
+	void						Compute_TimerBar(_float fTimeDelta);
 	void						Compute_TimeScore(_float fTimeDelta);
 	void						Change_TimeTexures(_float _fTime);
 
@@ -58,15 +64,23 @@ private:
 	_float2						m_SizeScoreBar2D = _float2(438.f, 156.f);
 	_float2						m_SizeCategory2D = _float2(256.f, 256.f);
 	_float2						m_SizeDeeFace2D = _float2(200.f, 116.f);
+	_float2						m_SizeDigits2D = _float2(50.f, 60.f);
 
 	// TimeBar Ratio
 	_float						m_fRatioTimeBar = 1.f;
-	_float						m_fRatioSubBar = _float();
+	_float						m_fGoalTimeBar = 0.f;
+	_float						m_fRatioBarSub = 1.f;
 
 	// Mediate-Timer
 	_float						m_fStandardTime = 0.f;
 	_float						m_fBeforeTime = 0.f;  
-	_float						m_fCurTime = 0.f;  
+	_float						m_fCurTime = 0.f;
+	_bool						m_bGoing = false;
+
+	// Timer-Digits
+	array<_int, 2>				m_arrTimerDigits;
+	// Score-Digits
+	array<_int, 3>				m_arrScoreDigits;
 
 public:
 	static CUI_PartTime*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

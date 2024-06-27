@@ -106,7 +106,7 @@ HRESULT CLevel_Racing::Ready_Lights()
 	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
 		return E_FAIL;
 
-	CGameInstance::Get_Instance()->Setting_GodRay({ -650.f, 300.f, 1200.f, 1.f });
+	CGameInstance::Get_Instance()->Setting_GodRay({ -650.f, 500.f, 1200.f, 1.f });
 
 	return S_OK;
 }
@@ -212,7 +212,7 @@ HRESULT CLevel_Racing::Ready_Map()
 		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
 		fileInput.read(reinterpret_cast<char*>(&vMin), sizeof(vMin));
 		fileInput.read(reinterpret_cast<char*>(&vMax), sizeof(vMax));
-
+		//matWorld._43 = matWorld._43 + 1500.f;
 		CBasicMap::MAP_DESC tMapDesc{};
 		tMapDesc.wstrModelName = CUtils::StrToWstr(strModelName);
 		tMapDesc.matWorld = matWorld;
@@ -275,6 +275,7 @@ HRESULT CLevel_Racing::Ready_Triggers()
 		strModelName.resize(iStrLength);
 		fileInput.read(&strModelName[0], iStrLength);
 		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
+		//matWorld._43 = matWorld._43 + 1500.f;
 		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
 		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
 
@@ -657,7 +658,7 @@ HRESULT CLevel_Racing::Ready_Objects()
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Deform"), TEXT("Prototype_GameObject_Car"), &tDesc)))
 				continue;
 		}
-		else if ("BoardA" == strModelName)
+		else if ("BoardA" == strModelName || "BoardB" == strModelName || "BoardC" == strModelName)
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Bridge"), TEXT("Prototype_GameObject_ToppleableBridge"), &tDesc)))
 				continue;

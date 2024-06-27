@@ -180,7 +180,6 @@ void CDee_Walk_State::Free()
 }
 #pragma endregion
 
-
 #pragma region RUN STATE
 CDee_Run_State::CDee_Run_State()
 {
@@ -241,7 +240,6 @@ void CDee_Run_State::Free()
 	__super::Free();
 }
 #pragma endregion
-
 
 #pragma region EMOTION STATE
 CDee_Emotion_State::CDee_Emotion_State()
@@ -407,7 +405,17 @@ void CDee_Hungry_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 		//다다르면 다시 웨이팅
 		if (_float3{ XZVec(pHungryDee->Get_DestWaitingPos()) - XZVec(baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION)) }.Length() < .5f)
 		{
-			pHungryDee->Change_State(pHungryDee->IsFrontWaiting() ? (DEE_ANIM)DEESHOPANIM_ORDERNORMAL : (DEE_ANIM)DEESHOPANIM_GUESTNORMAL, CUtils::Make_RandomFloat(50.f, 60.f), true, true);
+
+			//앞 자리에 도착한 와들디면 UI를 준비하고, 주문 state로 넘어간다.
+			if (pHungryDee->IsFrontWaiting())
+			{
+				pHungryDee->Ready_OrderUI();
+				pHungryDee->Change_State((DEE_ANIM)DEESHOPANIM_ORDERNORMAL, CUtils::Make_RandomFloat(50.f, 60.f), true, true);
+			}
+			//아니라면 그냥 기다린다.
+			else
+				pHungryDee->Change_State((DEE_ANIM)DEESHOPANIM_GUESTNORMAL, CUtils::Make_RandomFloat(50.f, 60.f), true, true);
+
 
 			CUtils::Make_RandomInt(0, 2) == 2 ?
 				baseInfo.pDee->Set_DeeEyeState(DEEEYE_SMILE) :
@@ -437,7 +445,16 @@ void CDee_Hungry_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 		//다다르면 다시 웨이팅
 		if (_float3{ XZVec(pHungryDee->Get_DestWaitingPos()) - XZVec(baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION)) }.Length() < .5f)
 		{
-			pHungryDee->Change_State(pHungryDee->IsFrontWaiting() ? (DEE_ANIM)DEESHOPANIM_ORDERNORMAL : (DEE_ANIM)DEESHOPANIM_GUESTNORMAL, CUtils::Make_RandomFloat(50.f, 60.f), true, true);
+			//앞 자리에 도착한 와들디면 UI를 준비하고, 주문 state로 넘어간다.
+			if (pHungryDee->IsFrontWaiting())
+			{
+				pHungryDee->Ready_OrderUI();
+				pHungryDee->Change_State((DEE_ANIM)DEESHOPANIM_ORDERNORMAL, CUtils::Make_RandomFloat(50.f, 60.f), true, true);
+			}
+			//아니라면 그냥 기다린다.
+			else
+				pHungryDee->Change_State((DEE_ANIM)DEESHOPANIM_GUESTNORMAL, CUtils::Make_RandomFloat(50.f, 60.f), true, true);
+
 
 			CUtils::Make_RandomInt(0, 2) == 2 ?
 				baseInfo.pDee->Set_DeeEyeState(DEEEYE_SMILE) :
@@ -529,34 +546,128 @@ void CDee_Hungry_State::Free()
 //*********************************
 //			 STUN STATE
 //*********************************
-CDee_Stun_State::CDee_Stun_State()
+CDee_FlyStun_State::CDee_FlyStun_State()
 {
 }
 
-void CDee_Stun_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
+void CDee_FlyStun_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+	m_vRandomAxis = CUtils::Make_Random_Vector(1.f);
 }
 
-void CDee_Stun_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+void CDee_FlyStun_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
 	BASE_INFO baseInfo{};
 	Setup_BaseInfo(baseInfo, pGameObject);
 
-	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta);
+	_float3 vDamegeDir = baseInfo.pDee->Get_DamegeDir();
+
+	if (baseInfo.pDee->Get_PhyXState() == PO_NORMAL)
+	{
+		// 이제 날아가는 것을 구현해보자.
+		baseInfo.pController->Move_Dir(baseInfo.pTransformCom, vDamegeDir * fTimeDelta * 3.f, fTimeDelta);
+
+		if (baseInfo.pTransformCom->Get_State(CTransform::STATE_RIGHT) == _float4::Zero)
+			baseInfo.pTransformCom->Set_Scaled({ 1.f, 1.f, 1.f });
+
+		baseInfo.pTransformCom->Turn(m_vRandomAxis, fTimeDelta);
+
+		// 점프되는 체공시간을 구현해보자.
+		_float fDamageJumpPower = baseInfo.pDee->Get_DamageJumpPower();
+		baseInfo.pController->Jump(baseInfo.pTransformCom, fDamageJumpPower, fTimeDelta);
+		fDamageJumpPower -= GRAVITY * fTimeDelta * 4.f;
+		baseInfo.pDee->Set_DamageJumpPower(fDamageJumpPower);
+
+
+		if (baseInfo.pController->Is_Terrain())
+		{
+			if (m_iBounceCnt != 0)
+			{
+				m_iBounceCnt--;
+
+				//위로 한번 더 튕긴다.
+				fDamageJumpPower *= -.6f;
+
+				_float fDamageDirLength = vDamegeDir.Length() * .6f;
+				_float3 vNewDamageDir = CUtils::Make_Random_Vector(fDamageDirLength);
+				baseInfo.pDee->Set_DamageMoving(vNewDamageDir, fDamageJumpPower);
+			}
+			else
+			{
+				baseInfo.pDee->Change_State(DEEANIM_MOVEFALL, 180.f, false, false);
+				m_iBounceCnt = 1;
+			}
+		}
+	}
+	// 날아가는 도중이다.  1초에 360도 회전하며, 30의 거리로 날아간다.
+	else if (baseInfo.pDee->Get_PhyXState() == PO_FLYAWAY)
+	{
+		baseInfo.pController->Move_Dir(baseInfo.pTransformCom, vDamegeDir * fTimeDelta * 30.f, fTimeDelta);
+		baseInfo.pTransformCom->Turn(baseInfo.pTransformCom->Get_State_Vector(CTransform::STATE_UP), fTimeDelta, 360.f);
+
+		if (1.f > baseInfo.pController->Compute_Wall(vDamegeDir))
+		{
+			baseInfo.pDee->Set_PhyXState(PO_FLYDEADAWAY);
+			baseInfo.pDee->Set_DamageMoving(-1.f * vDamegeDir, 10.f);
+		}
+	}
+	else if (baseInfo.pDee->Get_PhyXState() == PO_FLYDEADAWAY)
+	{
+
+		baseInfo.pController->Move_Dir(baseInfo.pTransformCom, vDamegeDir * fTimeDelta * 3.f, fTimeDelta);
+		//baseInfo.pTransformCom->Turn(_float4{ baseInfo.pTransformCom->Get_State(CTransform::STATE_RIGHT) }, fTimeDelta);
+
+
+		_float fDamageJumpPower = baseInfo.pDee->Get_DamageJumpPower();
+		baseInfo.pController->Jump(baseInfo.pTransformCom, fDamageJumpPower, fTimeDelta);
+		fDamageJumpPower -= GRAVITY * fTimeDelta * 4.f;
+		baseInfo.pDee->Set_DamageJumpPower(fDamageJumpPower);
+
+
+		if (baseInfo.pController->Is_Terrain())
+		{
+			if (m_iBounceCnt != 0)
+			{
+				m_iBounceCnt--;
+
+				//위로 한번 더 튕긴다.
+				fDamageJumpPower *= -.6f;
+
+				_float fDamageDirLength = vDamegeDir.Length() * .6f;
+				_float3 vNewDamageDir = CUtils::Make_Random_Vector(fDamageDirLength);
+				baseInfo.pDee->Set_DamageMoving(vNewDamageDir, fDamageJumpPower);
+			}
+			else
+			{
+				//pair<DEE_ANIM, _bool> ToDo = baseInfo.pDee->Make_WhatToDo();
+				//baseInfo.pDee->Change_State(ToDo.first, 60.f, ToDo.second, true);
+
+				_float3 vLook = baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK);
+				vLook.y = 0.f;
+				vLook.Normalize();
+				baseInfo.pTransformCom->Look_At_Axis(vLook);
+				baseInfo.pDee->Change_State(DEEANIM_MOVEFALL, 180.f, false, false);
+				m_iBounceCnt = 1;
+				baseInfo.pDee->Set_PhyXState(PO_NORMAL);
+			}
+		}
+	}
+
 }
 
-void CDee_Stun_State::OnStateExit()
+void CDee_FlyStun_State::OnStateExit()
 {
+	m_iBounceCnt = 1;
 }
 
-CDee_Stun_State* CDee_Stun_State::Create()
+CDee_FlyStun_State* CDee_FlyStun_State::Create()
 {
-	CDee_Stun_State* pInstance = new CDee_Stun_State();
+	CDee_FlyStun_State* pInstance = new CDee_FlyStun_State();
 	return pInstance;
 }
 
-void CDee_Stun_State::Free()
+void CDee_FlyStun_State::Free()
 {
 	__super::Free();
 }
@@ -677,9 +788,6 @@ void CDee_Interact_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 	BASE_INFO baseInfo{};
 	Setup_BaseInfo(baseInfo, pGameObject);
 	System_Tick(fTimeDelta);
-
-	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta);
-
 	//상호작용 스테이트마다 조금식 다르게 하자~
 	switch (baseInfo.pDee->Get_State())
 	{
@@ -692,7 +800,7 @@ void CDee_Interact_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 			baseInfo.pController->Move_Dir(baseInfo.pTransformCom, baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta * fSpeed, fTimeDelta);
 		}
 
-		if(abs(m_fDuration - .6f) < fTimeDelta * 2.f)
+		if (abs(m_fDuration - .6f) < fTimeDelta * 2.f)
 			baseInfo.pDee->Set_DeeEyeState(DEEEYE_CLOSE);
 
 		if (abs(m_fDuration - 1.f) < fTimeDelta * 2.f)
@@ -720,12 +828,21 @@ void CDee_Interact_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 		break;
 	}
 
+	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta, 6.f, 0.25f);
 
 	if (baseInfo.pDee->IsAnimFinished())
 	{
 		//인사하는 거였으면 눈 바꾸고 다시 idle로 돌아가
 		baseInfo.pDee->Set_DeeEyeState(DEEEYE_IDLE);
-		baseInfo.pDee->Change_State(DEEANIM_WALK, 60.f, true, true);
+		if (*m_pGameInstance->Get_CurrentLevelID() == LEVEL_DEEDEEDEE)
+		{
+			pair<DEE_ANIM, _bool> ToDo = baseInfo.pDee->Make_WhatToDo();
+			baseInfo.pDee->Change_State(ToDo.first, 60.f, ToDo.second, true);
+		}
+		else
+		{
+			baseInfo.pDee->Change_State(DEEANIM_WALK, 60.f, true, true);
+		}
 	}
 
 }
@@ -742,6 +859,67 @@ CDee_Interact_State* CDee_Interact_State::Create()
 }
 
 void CDee_Interact_State::Free()
+{
+	__super::Free();
+}
+
+#pragma endregion
+
+#pragma region PANIC STATE
+CDee_Panic_State::CDee_Panic_State()
+{
+}
+
+void CDee_Panic_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+}
+
+void CDee_Panic_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	BASE_INFO baseInfo{};
+	Setup_BaseInfo(baseInfo, pGameObject);
+	System_Tick(fTimeDelta);
+
+	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta);
+
+
+	_float3 vMyPos = baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION);
+	_float3 vDestPos = baseInfo.pDee->Make_DestPos();
+	vDestPos.y = vMyPos.y;
+
+
+
+	m_fSwitchDirTime -= fTimeDelta;
+
+	if (m_fSwitchDirTime <= 0.f)
+	{
+		m_fSwitchDirTime = CUtils::Make_RandomFloat(1.f, 2.f);
+		m_vDir = CUtils::Make_Random_Vector(1.f);
+		m_vDir.y = 0.f;
+		m_vDir.Normalize();
+	}
+
+
+	//목표 지점과의 거리 차이를 구하여 속도 정하기
+	_float fSpeed = 3.5f;
+
+	//목표 방향을 향해 회전한, 이동한다.
+	baseInfo.pTransformCom->Look_At_Interpolate(vMyPos + m_vDir, fTimeDelta);
+	baseInfo.pController->Move_Dir(baseInfo.pTransformCom, baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta * fSpeed, fTimeDelta);
+}
+
+void CDee_Panic_State::OnStateExit()
+{
+}
+
+CDee_Panic_State* CDee_Panic_State::Create()
+{
+	CDee_Panic_State* pInstance = new CDee_Panic_State();
+	return pInstance;
+}
+
+void CDee_Panic_State::Free()
 {
 	__super::Free();
 }

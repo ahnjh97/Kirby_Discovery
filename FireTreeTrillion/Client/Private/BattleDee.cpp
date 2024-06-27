@@ -8,14 +8,34 @@
 
 _float3 CBattleDee::Make_DestPos()
 {
-	CTransform* pKirbyTransform = m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0)->Get_TransformCom();
+	CTransform* pDeeDeeDeeTransform = m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_DeeDeeDee"), 0)->Get_TransformCom();
+	_float3 vDestPos = pDeeDeeDeeTransform->Get_State(CTransform::STATE_POSITION) - m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 2.f;
 
-	return static_cast<_float3>(pKirbyTransform->Get_State(CTransform::STATE_POSITION));
+	return vDestPos;
 }
 
 pair<DEE_ANIM, _bool> CBattleDee::Make_WhatToDo()
 {
-	return { DEEANIM_TROUBLE, false };
+	DEE_ANIM eDeeState = DEEANIM_END;
+
+	switch (CUtils::Make_RandomInt(0, 2))
+	{
+	case 0:
+		eDeeState = DEEANIM_ENEMYRUN;
+		break;
+	case 1:
+		eDeeState = DEEANIM_ANGERRUN;
+		break;
+	case 2:
+		eDeeState = DEEANIM_ANGERRUN;
+		break;
+	default:
+		eDeeState = DEEANIM_ANGERRUN;
+		break;
+	};
+
+	Set_DeeEyeState(DEEEYE_SADNESS);
+	return { eDeeState, true };
 }
 
 CBattleDee::CBattleDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -57,7 +77,7 @@ HRESULT CBattleDee::Initialize(void* pArg)
 	hr = Add_PartObjects();
 	CHECK_FAILED(hr);
 
-	m_pTransformCom->Rotation({ 0.f, 1.f, 0.f, 0.f }, ToRadian(180.f));
+	//m_pTransformCom->Rotation({ 0.f, 1.f, 0.f, 0.f }, ToRadian(180.f));
 
 	m_eAbilityType = ABILITY_DEFAULT;
 
@@ -76,7 +96,19 @@ _int CBattleDee::Tick(_float fTimeDelta)
 	if (m_ePhyXState == PO_VACUUMING || m_ePhyXState == PO_FLYDEADAWAY)
 		Change_State(DEEANIM_DAMAGE, 120.f, true, false);
 
-	__super::Tick(m_fTimeDelta);
+	//__super::Tick(m_fTimeDelta);
+	// 모션블러 계산
+	Compute_MotionBlur();
+
+	// FSM 제어
+	if (m_pFSM != nullptr)
+		m_pFSM->Update(this, fTimeDelta);
+
+	// 날아가는 도중엔 경사면 보간 제어가 필요없다.
+	if (Get_State() != DEEANIM_DAMAGE)
+	{
+		SetOn_Slope(fTimeDelta);
+	}
 
 	for (auto& Pair : m_PartObjects)
 		Pair.second->Tick(m_fTimeDelta);
@@ -156,6 +188,11 @@ void CBattleDee::Add_AnimEvent()
 
 void CBattleDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
+	if (eContent == CCollisionCenter::CONTENT_ATTACK)
+	{
+		Change_State(DEEANIM_DAMAGE, 60.f, true, true);
+		Set_DeeEyeState(DEEEYE_SMILE);
+	}
 }
 
 #ifdef _DEBUG
@@ -262,10 +299,13 @@ void CBattleDee::SetUp_FSM()
 
 	m_pFSM->Add_State(DEEANIM_TROUBLE, CDee_Emotion_State::Create());
 	m_pFSM->Add_State(DEEANIM_ANGERRUN, CDee_Run_State::Create());
+	m_pFSM->Add_State(DEEANIM_ENEMYRUN, CDee_Panic_State::Create());
 	m_pFSM->Add_State(DEEANIM_CHEERINGA, CDee_Emotion_State::Create());
 
-	m_pFSM->Add_State(DEEANIM_DAMAGE, CDee_Stun_State::Create());
+	m_pFSM->Add_State(DEEANIM_DAMAGE, CDee_FlyStun_State::Create());
 	m_pFSM->Add_State(DEEANIM_MOVEFALL, CDee_Interact_State::Create());
+
+
 
 }
 

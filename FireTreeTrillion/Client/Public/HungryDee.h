@@ -40,6 +40,7 @@ public:
 	void			Set_RenderPartObj(_bool bRender) { m_bRenderPartObj = bRender; }
 
 	void			Swap_WatingPosition();
+	void			Ready_OrderUI();
 
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
@@ -55,6 +56,8 @@ public:
 	virtual void	Render_IMGUI() override;
 #endif
 
+	void			Change_Dialog(enum class PARTTIME_ITEM eItem);
+
 	void			OnNotify();
 	void			Bring_Food(enum class PARTTIME_ITEM eITEM);
 
@@ -63,7 +66,9 @@ private:
 	_int			m_iMyIdx = { -1 };
 	_bool			m_bRenderPartObj = { false };
 
+	class CUI_PartTimeDee* m_pDialogUI = { nullptr };
 
+private:
 	HRESULT Add_Components();
 	HRESULT Add_PartObjects();
 	HRESULT Bind_ShaderResources();

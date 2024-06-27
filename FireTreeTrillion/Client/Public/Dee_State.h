@@ -188,11 +188,11 @@ public:
 	virtual void Free() override;
 };
 
-class CDee_Stun_State final : public CDee_State
+class CDee_FlyStun_State final : public CDee_State
 {
 private:
-	CDee_Stun_State();
-	virtual ~CDee_Stun_State() = default;
+	CDee_FlyStun_State();
+	virtual ~CDee_FlyStun_State() = default;
 
 public:
 	// 상태 진입했을 때 처음만 호출
@@ -201,9 +201,34 @@ public:
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
 	virtual void OnStateExit()														override;
 
+	_uint m_iBounceCnt = { 1 };
+	_float4 m_vRandomAxis = { 0.f, 0.f, 0.f, 0.f };
 
 public:
-	static	CDee_Stun_State* Create();
+	static	CDee_FlyStun_State* Create();
+	virtual void Free() override;
+};
+
+
+class CDee_Panic_State final : public CDee_State
+{
+private:
+	CDee_Panic_State();
+	virtual ~CDee_Panic_State() = default;
+
+public:
+	// 상태 진입했을 때 처음만 호출
+	virtual void OnStateEnter(class CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet) override;
+	// 상태 진입되어 있는 상태에서 매 tick마다 호출
+	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
+	virtual void OnStateExit()														override;
+
+private:
+	_float		m_fSwitchDirTime = { 0.f };
+	_float3		m_vDir = { 0.f, 0.f, 0.f };
+
+public:
+	static	CDee_Panic_State* Create();
 	virtual void Free() override;
 };
 

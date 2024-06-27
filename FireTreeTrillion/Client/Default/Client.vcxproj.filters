@@ -330,9 +330,6 @@
     </Filter>
     <Filter Include="02.GameObjects\Map\Bridge">
     </Filter>
-    <Filter Include="02.GameObjects\MiniGame\UI">
-      <UniqueIdentifier>{f66e1d54-657e-4ef4-b222-24f86e5cd5b8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Map\Bridge">
       <UniqueIdentifier>{d42d0265-2d39-46ae-8baa-4fdc448c5e73}</UniqueIdentifier>
     </Filter>
@@ -389,6 +386,18 @@
     </Filter>
     <Filter Include="02.GameObjects\Map\BlendMapObject">
       <UniqueIdentifier>{65399ffe-175b-49c9-98d6-f92a04f307f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\PartTime">
+      <UniqueIdentifier>{f66e1d54-657e-4ef4-b222-24f86e5cd5b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\PartTimeDee">
+      <UniqueIdentifier>{324b2e98-324d-4f5b-b2c0-71610d22ab87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\HUD\BossHp">
+      <UniqueIdentifier>{d5a13d88-c8da-47f6-ab92-a8b19f3b623e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\PortalSoftEffect">
+      <UniqueIdentifier>{412e7813-8f9a-4c83-ba98-f76991e1bfc5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -743,14 +752,14 @@
     <ClInclude Include="..\Public\PartTimeHelper.h">
       <Filter>02.GameObjects\MiniGame\_Helper</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\BreakableRockPartical.h">
+    <ClInclude Include="..\Public\BreakableRockParticle.h">
       <Filter>02.GameObjects\Map\BreakableRock</Filter>
     </ClInclude>
     <ClInclude Include="..\public\OriginalDee.h">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\Original</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\UI_PartTime.h">
-      <Filter>02.GameObjects\MiniGame\UI</Filter>
+      <Filter>02.GameObjects\UI\PartTime</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\DeeDeeDee.h">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee</Filter>
@@ -760,6 +769,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\CarShopWall.h">
       <Filter>02.GameObjects\Map\CarShopWall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_DeeDeeDee.h">
+      <Filter>01.Levels\3. DeeDeeDee</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\DeeDeeDeeHammer.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee\DeeDeeDeeHammer</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\DeeDeeDeeHammer.h">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee</Filter>
@@ -782,8 +797,17 @@
     <ClInclude Include="..\Public\NonRenderWall.h">
       <Filter>02.GameObjects\Map\NonRenderWall</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\SkySphereSub.h">
-      <Filter>02.GameObjects\Map\SkySphere</Filter>
+    <ClInclude Include="..\Public\UI_PartTimeDee.h">
+      <Filter>02.GameObjects\UI\PartTimeDee</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\HUD_BossHpBar.h">
+      <Filter>02.GameObjects\UI\HUD\BossHp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PortalSoftEffect.h">
+      <Filter>02.GameObjects\Map\PortalSoftEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\AnimBridge.h">
+      <Filter>02.GameObjects\Map\Bridge</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1120,14 +1144,14 @@
     <ClCompile Include="..\Private\PartTimeHelper.cpp">
       <Filter>02.GameObjects\MiniGame\_Helper</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\BreakableRockPartical.cpp">
+    <ClCompile Include="..\Private\BreakableRockParticle.cpp">
       <Filter>02.GameObjects\Map\BreakableRock</Filter>
     </ClCompile>
     <ClCompile Include="..\private\OriginalDee.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\Original</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\UI_PartTime.cpp">
-      <Filter>02.GameObjects\MiniGame\UI</Filter>
+      <Filter>02.GameObjects\UI\PartTime</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\DeeDeeDee.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee</Filter>
@@ -1137,6 +1161,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\CarShopWall.cpp">
       <Filter>02.GameObjects\Map\CarShopWall</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_DeeDeeDee.cpp">
+      <Filter>01.Levels\3. DeeDeeDee</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\DeeDeeDeeHammer.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee\DeeDeeDeeHammer</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\DeeDeeDeeHammer.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee</Filter>
@@ -1159,8 +1189,17 @@
     <ClCompile Include="..\Private\NonRenderWall.cpp">
       <Filter>02.GameObjects\Map\NonRenderWall</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\SkySphereSub.cpp">
-      <Filter>02.GameObjects\Map\SkySphere</Filter>
+    <ClCompile Include="..\Private\UI_PartTimeDee.cpp">
+      <Filter>02.GameObjects\UI\PartTimeDee</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HUD_BossHpBar.cpp">
+      <Filter>02.GameObjects\UI\HUD\BossHp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PortalSoftEffect.cpp">
+      <Filter>02.GameObjects\Map\PortalSoftEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\AnimBridge.cpp">
+      <Filter>02.GameObjects\Map\Bridge</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

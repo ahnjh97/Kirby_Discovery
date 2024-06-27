@@ -248,8 +248,6 @@ PS_OUT FOR_BOSS_OBJECT(PS_IN In)
     return Out;
 }
 
-
-
 PS_OUT NO_NORMALMAP_PS_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
@@ -435,7 +433,6 @@ PS_OUT_EFFECT PS_MAIN_WHITE_FX(PS_IN In)
     return Out;
 }
 
-
 PS_OUT_LIGHTDEPTH PS_MAIN_DEFERREDINFO(PS_IN In)
 {
     PS_OUT_LIGHTDEPTH Out = (PS_OUT_LIGHTDEPTH) 0;
@@ -448,7 +445,6 @@ PS_OUT_LIGHTDEPTH PS_MAIN_DEFERREDINFO(PS_IN In)
     
     return Out;
 }
-
 
 PS_OUT PS_MAIN_NEARCLIP(PS_IN In)
 {
@@ -496,6 +492,42 @@ PS_OUT PS_MAIN_NEARCLIP(PS_IN In)
     if (Out.vMRA.b < 0.001)
         Out.vMRA.b = 1.f;
 
+    return Out;
+}
+
+PS_OUT_EFFECT PS_ALPHABLEND(PS_IN In)
+{
+    PS_OUT_EFFECT Out = (PS_OUT_EFFECT) 0;
+
+    //vector vMask = g_MaskTexture.Sample(ClampSampler, RotateUV(In.vTexcoord + g_vMaskUVOffset, g_fMaskUVAngle));
+    
+    //if (vMask.a < g_fMaskThreshold)
+    //    discard;
+    //else if (vMask.r < g_fMaskThreshold)
+    //    discard;
+    
+    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    if (vDiffuse.a < .01f || (vDiffuse.r < 0.1f && vDiffuse.g < 0.1f && vDiffuse.b < 0.1f))
+        discard;
+
+    Out.vColor.rgb = vDiffuse.rgb/* * g_vRColor*/;
+    Out.vColor.a = vDiffuse.a /** vMask.r * g_fAlpha*/;
+
+    
+    ////소프트 이펙트 보정
+    //float2 vTexcoord = (float2) 0.f;
+
+    //vTexcoord.x = (In.vProjPos.x / In.vProjPos.w) * 0.5f + 0.5f;
+    //vTexcoord.y = (In.vProjPos.y / In.vProjPos.w) * -0.5f + 0.5f;
+
+    //float4 vDepthDesc = g_DepthTexture.Sample(PointSampler, vTexcoord);
+    //float fOldViewZ = vDepthDesc.y * 1000.f;
+
+    //Out.vColor.a = Out.vColor.a * saturate(fOldViewZ - In.vProjPos.w);
+
+    if (.01 < Out.vColor.a)
+        Out.vNonBlur = vector(0.f, 1.f, 0.f, 0.f);
+    
     return Out;
 }
 
@@ -674,8 +706,8 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_NEARCLIP();
     }
 
-    //알파블렌드, 노말 O (13) ex) 유리,
-    pass ALPHABLEND_NORMAL_O
+    // 알파블렌드, 노말 X (13)
+    pass ALPHABLEND
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -684,23 +716,10 @@ technique11 DefaultTechnique
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 PS_MAIN();
+        PixelShader = compile ps_5_0 PS_ALPHABLEND();
     }
 
-    // 알파블렌드, 노말 X (14)
-    pass ALPHABLEND_NORMAL_X
-    {
-        SetRasterizerState(RS_Default);
-        SetDepthStencilState(DSS_Default, 0);
-        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-        VertexShader = compile vs_5_0 VS_MAIN();
-        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
-        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
-        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 NO_NORMALMAP_PS_MAIN();
-    }
-
-    // 몬스터의 파트 오브젝트 ( 15 )
+    // 몬스터의 파트 오브젝트 ( 14 )
     pass MONSTER_PARTOBJECT
     {
         SetRasterizerState(RS_Default);

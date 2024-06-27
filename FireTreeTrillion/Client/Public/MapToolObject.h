@@ -26,6 +26,7 @@ public:
 		_int iPassIndex = { 0 };
 		map<_uint, _float3> RallyPoints;
 		string strConnectedMonster;
+		unordered_set<_uint> setBlendMeshIndices;
 		TYPE_MAPOBJ eMapObjType = { MAPOBJ_END };
 	};
 

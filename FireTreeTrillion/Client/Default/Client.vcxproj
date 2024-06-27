@@ -170,6 +170,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Ability.h" />
+    <ClInclude Include="..\Public\AnimBridge.h" />
     <ClInclude Include="..\Public\AnimDeco.h" />
     <ClInclude Include="..\Public\AnimToolHelper.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -190,7 +191,7 @@
     <ClInclude Include="..\Public\BombOrbit.h" />
     <ClInclude Include="..\Public\BombOrbitGlow.h" />
     <ClInclude Include="..\Public\BreakableRock.h" />
-    <ClInclude Include="..\Public\BreakableRockPartical.h" />
+    <ClInclude Include="..\Public\BreakableRockParticle.h" />
     <ClInclude Include="..\Public\BrontoBurt.h" />
     <ClInclude Include="..\Public\BrontoBurt_State.h" />
     <ClInclude Include="..\Public\Buffahorn.h" />
@@ -227,6 +228,7 @@
     </ClInclude>
     <ClInclude Include="..\Public\HUD.h" />
     <ClInclude Include="..\Public\HUD_AbilityDiscard.h" />
+    <ClInclude Include="..\Public\HUD_BossHpBar.h" />
     <ClInclude Include="..\Public\HUD_KirbyStatus.h" />
     <ClInclude Include="..\Public\HUD_StarPoint.h" />
     <ClInclude Include="..\public\HungryDee.h" />
@@ -294,6 +296,7 @@
     <ClInclude Include="..\Public\PoppyBomb.h" />
     <ClInclude Include="..\Public\PoppyBrosJr.h" />
     <ClInclude Include="..\Public\PoppyBrosJr_State.h" />
+    <ClInclude Include="..\Public\PortalSoftEffect.h" />
     <ClInclude Include="..\Public\Rabbit.h" />
     <ClInclude Include="..\Public\Rabbit_State.h" />
     <ClInclude Include="..\Public\RigidObject.h" />
@@ -314,6 +317,7 @@
     <ClInclude Include="..\Public\ToppleableBridge.h" />
     <ClInclude Include="..\Public\Trigger.h" />
     <ClInclude Include="..\Public\UI_PartTime.h" />
+    <ClInclude Include="..\Public\UI_PartTimeDee.h" />
     <ClInclude Include="..\public\WaddleDee.h" />
     <ClInclude Include="..\Public\WasteCan.h" />
     <ClInclude Include="Client.h" />
@@ -323,6 +327,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability.cpp" />
+    <ClCompile Include="..\Private\AnimBridge.cpp" />
     <ClCompile Include="..\Private\AnimDeco.cpp" />
     <ClCompile Include="..\Private\AnimToolHelper.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -343,7 +348,7 @@
     <ClCompile Include="..\Private\BombOrbit.cpp" />
     <ClCompile Include="..\Private\BombOrbitGlow.cpp" />
     <ClCompile Include="..\Private\BreakableRock.cpp" />
-    <ClCompile Include="..\Private\BreakableRockPartical.cpp" />
+    <ClCompile Include="..\Private\BreakableRockParticle.cpp" />
     <ClCompile Include="..\Private\BrontoBurt.cpp" />
     <ClCompile Include="..\Private\BrontoBurt_State.cpp" />
     <ClCompile Include="..\Private\Buffahorn.cpp" />
@@ -379,6 +384,7 @@
     </ClCompile>
     <ClCompile Include="..\Private\HUD.cpp" />
     <ClCompile Include="..\Private\HUD_AbilityDiscard.cpp" />
+    <ClCompile Include="..\Private\HUD_BossHpBar.cpp" />
     <ClCompile Include="..\Private\HUD_KirbyStatus.cpp" />
     <ClCompile Include="..\Private\HUD_StarPoint.cpp" />
     <ClCompile Include="..\private\HungryDee.cpp" />
@@ -443,6 +449,7 @@
     <ClCompile Include="..\Private\PoppyBomb.cpp" />
     <ClCompile Include="..\Private\PoppyBrosJr.cpp" />
     <ClCompile Include="..\Private\PoppyBrosJr_State.cpp" />
+    <ClCompile Include="..\Private\PortalSoftEffect.cpp" />
     <ClCompile Include="..\Private\Rabbit.cpp" />
     <ClCompile Include="..\Private\Rabbit_State.cpp" />
     <ClCompile Include="..\Private\RigidObject.cpp" />
@@ -463,6 +470,7 @@
     <ClCompile Include="..\Private\ToppleableBridge.cpp" />
     <ClCompile Include="..\Private\Trigger.cpp" />
     <ClCompile Include="..\Private\UI_PartTime.cpp" />
+    <ClCompile Include="..\Private\UI_PartTimeDee.cpp" />
     <ClCompile Include="..\private\WaddleDee.cpp" />
     <ClCompile Include="..\Private\WasteCan.cpp" />
     <ClCompile Include="..\Public\KirbyBoom_State.cpp" />
