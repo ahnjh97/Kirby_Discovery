@@ -1,22 +1,22 @@
 #include "stdafx.h"
-#include "BreakableRockPartical.h"
+#include "BreakableRockParticle.h"
 
-CBreakableRockPartical::CBreakableRockPartical(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CBreakableRockParticle::CBreakableRockParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CRigidObject{ pDevice, pContext }
 {
 }
 
-CBreakableRockPartical::CBreakableRockPartical(const CBreakableRockPartical& rhs)
+CBreakableRockParticle::CBreakableRockParticle(const CBreakableRockParticle& rhs)
 	: CRigidObject(rhs)
 {
 }
 
-HRESULT CBreakableRockPartical::Initialize_Prototype()
+HRESULT CBreakableRockParticle::Initialize_Prototype()
 {
 	return S_OK;
 }
 
-HRESULT CBreakableRockPartical::Initialize(void* pArg)
+HRESULT CBreakableRockParticle::Initialize(void* pArg)
 {
 	BREAKABLEPARTICALDESC desc = *(BREAKABLEPARTICALDESC*)pArg;
 
@@ -45,7 +45,7 @@ HRESULT CBreakableRockPartical::Initialize(void* pArg)
 	return S_OK;
 }
 
-_int CBreakableRockPartical::Tick(_float fTimeDelta)
+_int CBreakableRockParticle::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
 		return Ready_Dead(0.9f);
@@ -61,7 +61,7 @@ _int CBreakableRockPartical::Tick(_float fTimeDelta)
 	return OBJ_NOEVENT;
 }
 
-void CBreakableRockPartical::Late_Tick(_float fTimeDelta)
+void CBreakableRockParticle::Late_Tick(_float fTimeDelta)
 {
 
 	m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
@@ -75,7 +75,7 @@ void CBreakableRockPartical::Late_Tick(_float fTimeDelta)
 
 }
 
-HRESULT CBreakableRockPartical::Render()
+HRESULT CBreakableRockParticle::Render()
 {
 	HRESULT hr;
 	if (FAILED(Bind_ShaderResources()))
@@ -100,7 +100,7 @@ HRESULT CBreakableRockPartical::Render()
 	return S_OK;
 }
 
-HRESULT CBreakableRockPartical::Render_LightDepth()
+HRESULT CBreakableRockParticle::Render_LightDepth()
 {
 	if (FAILED(m_pGameInstance->Render_LightDepth_For_GameObject(m_pShaderCom, m_pTransformCom, m_pModelCom)))
 		return E_FAIL;
@@ -108,11 +108,15 @@ HRESULT CBreakableRockPartical::Render_LightDepth()
 	return S_OK;
 }
 
-void CBreakableRockPartical::Render_IMGUI()
+#ifdef _DEBUG
+
+void CBreakableRockParticle::Render_IMGUI()
 {
 }
 
-HRESULT CBreakableRockPartical::Add_Components(const wstring& _wstrModelName)
+#endif
+
+HRESULT CBreakableRockParticle::Add_Components(const wstring& _wstrModelName)
 {
 	HRESULT hr;
 	/* For.Com_Shader */
@@ -142,7 +146,7 @@ HRESULT CBreakableRockPartical::Add_Components(const wstring& _wstrModelName)
 	return S_OK;
 }
 
-HRESULT CBreakableRockPartical::Bind_ShaderResources()
+HRESULT CBreakableRockParticle::Bind_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
@@ -174,7 +178,7 @@ HRESULT CBreakableRockPartical::Bind_ShaderResources()
 	return S_OK;
 }
 
-void CBreakableRockPartical::Compute_MotionBlur()
+void CBreakableRockParticle::Compute_MotionBlur()
 {
 	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 	_matrix ViewProjectionMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW) * m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
@@ -191,33 +195,33 @@ void CBreakableRockPartical::Compute_MotionBlur()
 	m_vPreScreenPos = vCurScreenPos;
 }
 
-CBreakableRockPartical* CBreakableRockPartical::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CBreakableRockParticle* CBreakableRockParticle::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	CBreakableRockPartical* pInstance = new CBreakableRockPartical(pDevice, pContext);
+	CBreakableRockParticle* pInstance = new CBreakableRockParticle(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Create : CBreakableRockPartical"));
+		MSG_BOX(TEXT("Failed To Create : CBreakableRockParticle"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CGameObject* CBreakableRockPartical::Clone(void* pArg)
+CGameObject* CBreakableRockParticle::Clone(void* pArg)
 {
-	CBreakableRockPartical* pInstance = new CBreakableRockPartical(*this);
+	CBreakableRockParticle* pInstance = new CBreakableRockParticle(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Clone : CBreakableRockPartical"));
+		MSG_BOX(TEXT("Failed To Clone : CBreakableRockParticle"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CBreakableRockPartical::Free()
+void CBreakableRockParticle::Free()
 {
 	__super::Free();
 	Safe_Release(m_pRigidBodyCom);

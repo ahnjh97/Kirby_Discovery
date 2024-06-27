@@ -66,7 +66,7 @@ public:
 			m_eCamFocus = eFocus;
 		}
 	}
-
+	
 
 	void Set_MatrixIndex(_int iMatrixIndex);
 	void EmplaceBackCamMatrix(const _float4x4& matWorld);
@@ -142,7 +142,7 @@ private:
 
 	//현재 트래킹 설정
 	CAMFOCUS m_eCamFocus = { FOCUS_END };
-
+	
 
 	//카메라가 포커징할 기준점 
 	_float3 m_vAnchor = { 0.f, 0.f, 0.f };
@@ -165,6 +165,7 @@ private:
 
 	_float3 m_vCurCamDir = {0.f, 0.f, 0.f};
 	_float3 m_vDestCamDir = { 0.f, 0.f, 0.f };
+	_float3 m_vOrigCamDir = { 0.f, 0.f, 0.f };
 
 
 	//카메라 움직임 감도

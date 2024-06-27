@@ -217,7 +217,14 @@ private:
 	COLOR_DATA m_DestColorData{};
 	map<string, COLOR_DATA> m_ColorSets;
 	_int					m_iCurColorIdx = { -1 };
+
 	pair<_float, _float> m_fRimLightRatio = { 1.f, 1.f };
+
+	_float m_fSSAOScale = { 0.5f };
+	_float m_fSSAOBias = { 0.f };
+	_float m_fSSAOSampleRadius = { 2.85f };
+	_float m_fSSAOIntensity = { 2.5f };
+
 
 #ifdef _DEBUG
 private:

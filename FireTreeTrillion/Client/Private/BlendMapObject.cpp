@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "BlendMapObject.h"
-#include "stdafx.h"
 #include "NonAnimDeco.h"
 
 CBlendMapObject::CBlendMapObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

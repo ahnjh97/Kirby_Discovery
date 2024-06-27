@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Level_Racing.h"
-#include "stdafx.h"
 #include "Camera_Free.h"
 #include "Camera_Main.h"
 #include "BasicMap.h"
@@ -106,7 +105,7 @@ HRESULT CLevel_Racing::Ready_Lights()
 	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
 		return E_FAIL;
 
-	CGameInstance::Get_Instance()->Setting_GodRay({ -650.f, 300.f, 1200.f, 1.f });
+	CGameInstance::Get_Instance()->Setting_GodRay({ -650.f, 500.f, 1200.f, 1.f });
 
 	return S_OK;
 }

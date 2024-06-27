@@ -337,7 +337,6 @@ _int COriginalDee::Tick(_float fTimeDelta)
 void COriginalDee::Late_Tick(_float fTimeDelta)
 {
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
-	m_pModelCom->Play_Animation(m_fTimeDelta);
 
 	for (auto& Pair : m_PartObjects)
 		Pair.second->Late_Tick(m_fTimeDelta);
@@ -346,6 +345,9 @@ void COriginalDee::Late_Tick(_float fTimeDelta)
 	//시야 벗어나면 컬링
 	if (!m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State(CTransform::STATE_POSITION), 2.0f))
 		return;
+
+	if (Compute_OptimizationAnimation(m_fTimeDelta) == true)
+		m_pModelCom->Play_Animation(m_fAccTime);
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
@@ -402,6 +404,8 @@ void COriginalDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObje
 	m_fResetHiTime = 5.f;
 }
 
+#ifdef _DEBUG
+
 void COriginalDee::Render_IMGUI()
 {
 	__super::Render_IMGUI();
@@ -411,6 +415,8 @@ void COriginalDee::Render_IMGUI()
 	//Draw_TownPoints();
 
 }
+
+#endif
 
 HRESULT COriginalDee::Add_Components()
 {
@@ -705,6 +711,8 @@ _bool COriginalDee::Custom_Face(_uint iMeshIndex)
 	return false;
 }
 
+#ifdef _DEBUG
+
 void COriginalDee::Draw_TownPoints()
 {
 	ImDrawList* drawList = ImGui::GetWindowDrawList();
@@ -727,6 +735,8 @@ void COriginalDee::Draw_TownPoints()
 		}
 	}
 }
+
+#endif
 
 COriginalDee* COriginalDee::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

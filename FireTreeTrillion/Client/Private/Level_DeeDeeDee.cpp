@@ -54,15 +54,26 @@ HRESULT CLevel_DeeDeeDee::Initialize()
 	CHECK_FAILED(hr);
 	hr = Ready_Dees();
 	CHECK_FAILED(hr);
-	hr = Ready_Items();
-	CHECK_FAILED(hr);
-	hr = Ready_Kickables();
-	CHECK_FAILED(hr);
-	hr = Ready_Objects();
-	CHECK_FAILED(hr);
+	//hr = Ready_Items();
+	//CHECK_FAILED(hr);
+	//hr = Ready_Kickables();
+	//CHECK_FAILED(hr);
+	//hr = Ready_Objects();
+	//CHECK_FAILED(hr);
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 	m_pGameInstance->Set_ColorSet_ByIndex(4);
+
+
+	// DeeTest
+	CGameObject::GAMEOBJECT_DESC ObjDesc{};
+	ObjDesc.fSpeedPerSec = 5.f;
+	ObjDesc.fRotationPerSec = ToRadian(90.f);
+	_float4x4 InitMat = _float4x4::Identity;
+	InitMat.Translation({ 1.51f, 22.11f, 3.91f });
+	ObjDesc.matWorld = InitMat;
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_DEEDEEDEE, TEXT("Layer_DeeDeeDee"), TEXT("Prototype_GameObject_DeeDeeDee"), &ObjDesc)))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -123,10 +134,10 @@ HRESULT CLevel_DeeDeeDee::Ready_Layer_Camera(const wstring& strLayerTag)
 	MainCamDesc.fNear = 0.1f;
 	MainCamDesc.fFar = 1000.0f;
 	MainCamDesc.vEye = _float4(0.f, 0.f, 0.f, 1.f);
-	MainCamDesc.vAt = MainCamDesc.vEye + _float4(0.f, -.15f, 1.f, 1.f);
+	MainCamDesc.vAt = MainCamDesc.vEye + _float4(0.f, -.3f, 1.f, 1.f);
 	MainCamDesc.fSpeedPerSec = 10.f;
 	MainCamDesc.fRotationPerSec = XMConvertToRadians(90.0f);
-	MainCamDesc.fOrigDistance = 28.f;
+	MainCamDesc.fOrigDistance = 32.f;
 	MainCamDesc.fCamSensor = .3f;
 
 	if (FAILED(m_pGameInstance->Add_Clone(eLevel, strLayerTag, TEXT("Prototype_GameObject_Camera_Main"), &MainCamDesc)))
@@ -463,7 +474,7 @@ HRESULT CLevel_DeeDeeDee::Ready_Dees()
 				(DEECHARACTER_END - 1) < (DEE_CHARACTER)iTriggerIndex ?
 				DEECHARACTER_SLEEPY : (DEE_CHARACTER)iTriggerIndex;
 
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Dee"), TEXT("Prototype_GameObject_BattleDee"), &DeeDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_BattleDee"), TEXT("Prototype_GameObject_BattleDee"), &DeeDesc)))
 				return E_FAIL;
 		}
 	}

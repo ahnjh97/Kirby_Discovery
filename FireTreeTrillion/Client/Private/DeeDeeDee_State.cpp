@@ -754,7 +754,7 @@ void CDeeDeeDee_SideAttack_State::OnStateUpdate(CGameObject* pGameObject, _float
 
 		if ((vKirbyPos - vPos).Length() < 8.f)
 		{
-			pDee->Change_State(CDeeDeeDee::STATE_HAMMERSIDEATTACK, 60.f, false, false);
+			pDee->Change_State(CDeeDeeDee::STATE_HAMMERSIDECHARGE, 60.f, false, false);
 			return;
 		}
 		else if (DESC(m_ePattern) == CDeeDeeDee::PATTERN_CENTER)

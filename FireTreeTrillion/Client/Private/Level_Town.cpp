@@ -59,16 +59,6 @@ HRESULT CLevel_Town::Initialize()
 	hr = Ready_Kickables();
 	CHECK_FAILED(hr);
 
-	CGameObject::GAMEOBJECT_DESC ObjDesc{};
-	ObjDesc.fSpeedPerSec = 5.f;
-	ObjDesc.fRotationPerSec = ToRadian(90.f);
-	_float4x4 InitMat = _float4x4::Identity;
-	InitMat.Translation({ 1.51f, 22.11f, 3.91f });
-	ObjDesc.matWorld = InitMat;
-	// Car Test
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_DeeDeeDee"), TEXT("Prototype_GameObject_DeeDeeDee"), &ObjDesc)))
-		return E_FAIL;
-
 	// Part-timer Kirby Test
 	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOWN, TEXT("Layer_Player"), TEXT("Prototype_GameObject_PartTimerKirby"))))
 	//	return E_FAIL;
@@ -218,7 +208,7 @@ HRESULT CLevel_Town::Ready_Map()
 	fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
 
 	_uint iStrLength{};
-	string strModelName;https://drive.google.com/drive/u/0/my-drive
+	string strModelName;
 	_float4x4 matWorld{};
 	_float3 vMin{}, vMax{};
 	wstring wstrGameObjectTag;
@@ -405,17 +395,6 @@ HRESULT CLevel_Town::Ready_Dees()
 	ObjDesc.matWorld = InitMat;
 
 	if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NPC"), TEXT("Prototype_GameObject_FoodShopDee"), &ObjDesc)))
-		return E_FAIL;
-
-
-	ObjDesc = {};
-	ObjDesc.fSpeedPerSec = 5.f;
-	ObjDesc.fRotationPerSec = ToRadian(90.f);
-	 InitMat = _float4x4::Identity;
-	InitMat.Translation({ 12.2f, 24.7f, 26.f });
-	ObjDesc.matWorld = InitMat;
-
-	if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NPC"), TEXT("Prototype_GameObject_BattleDee"), &ObjDesc)))
 		return E_FAIL;
 
 
