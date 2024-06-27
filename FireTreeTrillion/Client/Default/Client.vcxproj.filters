@@ -396,6 +396,9 @@
     <Filter Include="02.GameObjects\UI\HUD\BossHp">
       <UniqueIdentifier>{d5a13d88-c8da-47f6-ab92-a8b19f3b623e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\PortalSoftEffect">
+      <UniqueIdentifier>{412e7813-8f9a-4c83-ba98-f76991e1bfc5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -800,6 +803,9 @@
     <ClInclude Include="..\Public\HUD_BossHpBar.h">
       <Filter>02.GameObjects\UI\HUD\BossHp</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\PortalSoftEffect.h">
+      <Filter>02.GameObjects\Map\PortalSoftEffect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1185,6 +1191,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\HUD_BossHpBar.cpp">
       <Filter>02.GameObjects\UI\HUD\BossHp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PortalSoftEffect.cpp">
+      <Filter>02.GameObjects\Map\PortalSoftEffect</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

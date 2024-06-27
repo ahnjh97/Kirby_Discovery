@@ -216,6 +216,17 @@ HRESULT CLevel_Intro::Ready_Layer_BackGround(const wstring& strLayerTag)
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Breakable"), TEXT("Prototype_GameObject_BreakableRock"), &ObjDesc)))
 		return E_FAIL;
 
+
+	ObjDesc.fSpeedPerSec = 5.f;
+	ObjDesc.fRotationPerSec = ToRadian(90.f);
+	InitMat = _float4x4::Identity;
+	InitMat.Translation({ 53.38f, 22.19f, 348.12f });
+	ObjDesc.matWorld = InitMat;
+	// Car Test
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Breakable"), TEXT("Prototype_GameObject_PortalSoftEffect"), &ObjDesc)))
+		return E_FAIL;
+
+
 	return S_OK;
 }
 

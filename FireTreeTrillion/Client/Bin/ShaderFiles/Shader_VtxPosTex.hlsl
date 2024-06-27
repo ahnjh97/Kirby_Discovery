@@ -247,7 +247,7 @@ PS_OUT PS_MAIN_SOFTFX(PS_IN_ALPHABLEND In)
     float4 vDepthDesc = g_DepthTexture.Sample(PointSampler, vTexcoord);
     float fOldViewZ = vDepthDesc.y * g_fFar;
 
-    Out.vColor.a = vDiffuse.a * saturate(fOldViewZ - In.vProjPos.w);
+    Out.vColor.a = vDiffuse.a * saturate((fOldViewZ - In.vProjPos.w) * 0.3f);
     Out.vColor.rgb = vDiffuse.rgb;
     Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
     

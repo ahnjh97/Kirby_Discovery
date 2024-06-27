@@ -295,6 +295,7 @@
     <ClInclude Include="..\Public\PoppyBomb.h" />
     <ClInclude Include="..\Public\PoppyBrosJr.h" />
     <ClInclude Include="..\Public\PoppyBrosJr_State.h" />
+    <ClInclude Include="..\Public\PortalSoftEffect.h" />
     <ClInclude Include="..\Public\Rabbit.h" />
     <ClInclude Include="..\Public\Rabbit_State.h" />
     <ClInclude Include="..\Public\RigidObject.h" />
@@ -445,6 +446,7 @@
     <ClCompile Include="..\Private\PoppyBomb.cpp" />
     <ClCompile Include="..\Private\PoppyBrosJr.cpp" />
     <ClCompile Include="..\Private\PoppyBrosJr_State.cpp" />
+    <ClCompile Include="..\Private\PortalSoftEffect.cpp" />
     <ClCompile Include="..\Private\Rabbit.cpp" />
     <ClCompile Include="..\Private\Rabbit_State.cpp" />
     <ClCompile Include="..\Private\RigidObject.cpp" />

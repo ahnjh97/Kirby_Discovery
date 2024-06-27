@@ -101,6 +101,7 @@
 #include "CarShopWallFrame.h"
 #include "ToppleableBridge.h"
 #include "BlendMapObject.h"
+#include "PortalSoftEffect.h"
 
 //UI
 #include "BackGround.h"
@@ -271,6 +272,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("AnimDeco"), CAnimDeco);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("NonAnimDeco"), CNonAnimDeco);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("NonRenderWall"), CNonRenderWall);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PortalSoftEffect"), CPortalSoftEffect);
 
 	// For HitBox
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HitBox"), CHitBox);
@@ -414,7 +416,17 @@ HRESULT CLoader::Loading_StaticComponentAll()
 	hr = Add_Texture(eLevel, "SkySphere_LabBoss_2Pase_Height", "SkySphere/SkySphere_LabBoss_2Pase_Height.dds");
 	CHECK_FAILED(hr);
 
+
 #pragma endregion
+
+
+#pragma region MAP_PORTAL::YW
+
+	hr = Add_Texture(eLevel, "Portal_Soft_Black", "Map/Portal_Soft/Portal_Soft_Black.png");
+	CHECK_FAILED(hr);
+
+#pragma endregion
+
 
 	return S_OK;
 }
