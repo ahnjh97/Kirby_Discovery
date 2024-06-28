@@ -29,7 +29,8 @@ namespace Client
     enum KIRBY_EVENT
     {
         KEVENT_DDD_DEAD,
-        KEVENT_DDD_TEST,
+        KEVENT_BREAK_CARSHOP,
+        KEVENT_BREAK_RACINGMAP,
         KEVENT_END
     };
 
