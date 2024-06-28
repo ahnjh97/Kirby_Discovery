@@ -124,7 +124,7 @@ HRESULT CUI_PartTimeDee::Render()
 				m_pTexMask->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", 0);
 			}
 			
-			hr = m_pShaderCom->Begin(5);
+			hr = m_pShaderCom->Begin(16);
 			CHECK_FAILED(hr);
 		}
 		else
