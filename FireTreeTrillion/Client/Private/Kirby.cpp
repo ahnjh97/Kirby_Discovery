@@ -63,9 +63,8 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// 디버깅 용
-	m_eAbilityType = ABILITY_SWORD;
+	//m_eAbilityType = ABILITY_SWORD;
 
-	m_pModelCom[INFO(m_eBodyState)]->Set_Animation(STATE_IDLE, 60.f, true, true);
 	m_pControllerCom->RegisterAsPlayer();
 
 	return S_OK;
@@ -1516,10 +1515,12 @@ HRESULT CKirby::Kirby_SystemInitialize()
 	if (FAILED(Make_TargetToCams()))
 		return E_FAIL;
 
-	// 커비의 기본 표정,
+	// 완전히 기본상태로 먼저 세팅한다.
 	INFO(m_eBodyState) = BODY_DEFAULT;
 	INFO(m_eMouthState) = MOUTH_IDLE;
 	INFO(m_eEyeState) = EYE_IDLE;
+	m_pModelCom[INFO(m_eBodyState)]->Set_Animation(STATE_IDLE, 60.f, true, true);
+
 
 	// 커비가 레벨별로 시작할 때, 바라보는 방향을 정해준다.
 	Kirby_LookInitialize();
@@ -1529,17 +1530,29 @@ HRESULT CKirby::Kirby_SystemInitialize()
 	m_fHp = tLevelData.fKirbyHP;
 	m_uCoin = (_uint)tLevelData.fKirbyCoin;
 	// m_eAbilityType = ;
-	// m_uWaddleDeeCount = ;
 	m_fAttack = 5.f; // 고정
 
-	// 게임을 새롭게 시작했을 경우, 리셋시칸다.
-	//if (*m_pCurrentLevelID == LEVEL_INTRO)
-	//{
+
+	// 임시 // 
+	if (*m_pCurrentLevelID == LEVEL_INTRO)
+	{
 		m_fHp = 100.f; // 기존 사용하던 HP입니다.
 		m_fMaxHp = 100.f;
 		m_eAbilityType = ABILITY_DEFAULT;
-		// m_uWaddleDeeCount = 0;
-	//}
+		Change_State(STATE_IDLE, 60.f, true, false, BODY_DEFAULT);
+	}
+	if (*m_pCurrentLevelID == LEVEL_RACING)
+	{
+		m_eAbilityType = ABILITY_DEFAULT;
+		Change_State(CARSTATE_IDLING, 60.f, true, false, BODY_CARDEFAULT, OFFSET_CAR);
+	}
+	else
+	{
+		m_fHp = 100.f; // 기존 사용하던 HP입니다.
+		m_fMaxHp = 100.f;
+		m_eAbilityType = ABILITY_DEFAULT;
+	}
+
 
 
 	// 폭탄 궤적을 만들어 놓는다.
@@ -1549,27 +1562,31 @@ HRESULT CKirby::Kirby_SystemInitialize()
 	// 혹여나, 버그가 발생할까봐 확실하게 블러 true화
 	m_bMotionBlur = true;
 
-
 	return S_OK;
 }
 
 void CKirby::Kirby_LookInitialize()
 {
 	_uint uLevel = *m_pCurrentLevelID;
-	_float4 m_pCameraLook = m_pCamera->Get_TransformCom()->Get_State_Vector(CTransform::STATE_LOOK);
-	m_pCameraLook.y = 0.f;
-	m_pCameraLook = XMVector4Normalize(m_pCameraLook);
+	_float4 fCameraLook = m_pCamera->Get_TransformCom()->Get_State_Vector(CTransform::STATE_LOOK);
+	_float4 fCameraRight = m_pCamera->Get_TransformCom()->Get_State_Vector(CTransform::STATE_RIGHT);
+
+	fCameraLook.y = 0.f;
+	fCameraLook = XMVector4Normalize(fCameraLook);
+	fCameraRight = XMVector4Normalize(fCameraRight);
 
 	// 카메라 기준 바라보는 방향을 설정한다.
-	if (uLevel == 999)		// 여기다가 따로 정의하면됨
+	if (uLevel == LEVEL_RACING)
 	{
+		// 오른쪽을 보고 시작함.
+		INFO(m_vTargetDir) = INFO(m_vMoveDir) = fCameraRight;
+		INFO(m_eBodyState) = BODY_CARDEFAULT;
 	}
 	else
 	{
 		// 카메라를 정면으로 바라봄
-		INFO(m_vMoveDir) = -1.f * m_pCameraLook;
+		INFO(m_vTargetDir) = INFO(m_vMoveDir) = -1.f * fCameraLook;
 	}
-	INFO(m_vTargetDir) = INFO(m_vMoveDir);
 }
 
 CGameObject* CKirby::FindToppleableBridge(PxRigidActor* pActor)
