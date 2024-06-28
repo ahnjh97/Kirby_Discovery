@@ -117,6 +117,7 @@ void CGm_LabAntenna::Render_IMGUI()
 
 void CGm_LabAntenna::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
+	/*
 	if (true == m_bStartAnimation)
 		return;
 
@@ -135,6 +136,7 @@ void CGm_LabAntenna::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXOb
 	vDir.Normalize();
 	m_vDamegeDir = (_float3)vDir;
 	m_fHitPower = pKirby->Get_KirbyInfo()->m_fMoveSpeed;
+	*/
 }
 
 HRESULT CGm_LabAntenna::Add_Components()
