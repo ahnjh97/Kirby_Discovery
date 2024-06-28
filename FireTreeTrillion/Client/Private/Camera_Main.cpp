@@ -333,10 +333,10 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		m_CamSeq.push_back(newAction);
 
 		newAction = {};
-		newAction.fTime = 0.f;
+		newAction.fTime = 0.1f;
 		newAction.eCamCut = CUT_INTERPOLATE;
-		newAction.eEase = EASE_OUT;
-		newAction.fInterpolateSpeed = 3.f;
+		newAction.eEase = EASE_INOUT;
+		newAction.fInterpolateSpeed = 2.8f;
 		newAction.eCamPos = POS_RELATIVE;
 		newAction.vPos = _float3{ 5.f, -8.f, 40.f };
 		m_CamSeq.push_back(newAction);
@@ -344,16 +344,16 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction = {};
 		newAction.fTime = 3.f;
 		newAction.eCamCut = CUT_INTERPOLATE;
-		newAction.eEase = EASE_OUT;
+		newAction.eEase = EASE_INOUT;
 		newAction.fInterpolateSpeed = 1.5f;
 		newAction.eCamPos = POS_RELATIVE;
-		newAction.vPos = _float3{ 2.f, 2.f, 15.f };
+		newAction.vPos = _float3{ 2.f, 1.f, 14.f };
 		m_CamSeq.push_back(newAction);
 
 		newAction = {};
 		newAction.fTime = 4.5f;
 		newAction.eCamCut = CUT_INTERPOLATE;
-		newAction.eEase = EASE_OUT;
+		newAction.eEase = EASE_INOUT;
 		newAction.fInterpolateSpeed = 1.f;
 		newAction.eCamPos = POS_RELATIVE;
 
@@ -374,11 +374,10 @@ void CCamera_Main::Make_Shake(_float fPower, _float fTime, _float2 vDir)
 {
 	m_bIsShaking = true;
 	m_fShakePower = fPower;
-	m_fShakeTime = fTime;
+	m_fInitialShakeTime = m_fCurShakeTime = fTime;
 
 	vDir.Normalize();
 	m_vShakeDir = vDir;
-	//m_iShakeCnt = iShakeCnt;
 }
 
 void CCamera_Main::Make_Sequence_FromAngle(EASING eEaseFlag, _float fDuration, _float3 fDestAngle, _float fDestZoom)
@@ -406,13 +405,19 @@ _int CCamera_Main::Tick(_float fTimeDelta)
 
 	Control(fTimeDelta);
 
-	//특정 시퀀스가 세팅되어 있는 경우 업데이트한다.
-	Play_Sequence(fTimeDelta);
+	//후보정 카메라 설정 값을 초기화한다.
+	Reset_DeferredCamSet();
 
-	if (m_eSpecialSeq != SEQ_END)
-		return OBJ_NOEVENT;
-
+	m_eSpecialSeq != SEQ_END ?
+		//특정 시퀀스가 세팅되어 있는 경우
+	Play_Sequence(fTimeDelta) :
+		//실제 타겟을 기준으로 업데이트하는 경우
 	UpdatePos_FromAnchor(fTimeDelta);
+
+
+
+	//후보정
+	m_pTransformCom->Move(Dir(Make_ShakeDir(fTimeDelta)));
 
 	return OBJ_NOEVENT;
 }
@@ -422,9 +427,14 @@ HRESULT CCamera_Main::Render()
 	return S_OK;
 }
 
+void CCamera_Main::Reset_DeferredCamSet()
+{
+	//후보정 값을 초기화한다.
+	m_pTransformCom->Move(static_cast<_float4>(-m_vPreShakeDir));
+}
+
 void CCamera_Main::Play_Sequence(_float fTimeDelta)
 {
-
 
 	if (m_eSpecialSeq == SEQ_END)
 		return;
@@ -654,11 +664,11 @@ void CCamera_Main::Control(_float fTimeDelta)
 			Make_Sequence(SEQ_HARDCUT_TEST);
 			//Make_Sequence(SEQ_SOFTCUT_TEST);
 		}
-	}
 
-	if (m_pGameInstance->Get_KeyState(DIK_9, KEY_DOWN))
-	{
-		CEventCenter::Get_Instance()->Notify(KEVENT_DDD_DEAD, this);
+		if (m_pGameInstance->Get_KeyState(DIK_8, KEY_DOWN))
+		{
+			Make_Shake(1.f, .8f);
+		}
 	}
 }
 
@@ -767,6 +777,9 @@ void CCamera_Main::UpdatePos_FromAnchor(_float fTimeDelta)
 	//CUtils::Make_World_ToScreen(vTargetProjPos);
 
 
+
+
+
 	//**** 설정 값 보간 ****//
 
 	//트리거 안에 들어가 있을 경우 트리거 사이에서의 목표 카메라 설정을 맞춘다.
@@ -809,23 +822,35 @@ void CCamera_Main::UpdatePos_FromAnchor(_float fTimeDelta)
 _float3 CCamera_Main::Make_ShakeDir(_float fTimeDelta)
 {
 	//**** 카메라 쉐이킹 오프셋 ****//
-	_float3 vShakeDir = XMVectorZero();
+	_float3 vShakeDir = _float3();
 
 	//쉐이크 세팅 존재 시, 그만큼 팅궈준다.
 	if (m_bIsShaking)
 	{
-		_float fSinOffset = sinf(m_fShakeTime * m_fShakeFrequency) * m_fShakePower * m_fShakeAmplitude * m_fShakeTime;
+		_float fSinOffset = sinf(m_fCurShakeTime * m_fShakeFrequency) * m_fShakeAmplitude * (m_fCurShakeTime / m_fInitialShakeTime) * m_fShakePower;
 
 		vShakeDir = static_cast<_float3>(m_vShakeDir * fSinOffset);
 
-		if (m_fShakeTime <= 0.f)
+		if (m_fCurShakeTime <= 0.f)
 		{
 			m_bIsShaking = false;
-			m_fShakeTime = 0.f;
+			m_fCurShakeTime = m_fInitialShakeTime = 0.f;
+			vShakeDir = _float3();
 		}
-		m_fShakeTime -= fTimeDelta;
+		m_fCurShakeTime -= fTimeDelta;
 	}
+
+	m_vPreShakeDir = static_cast<_float2>(vShakeDir);
+
 	return vShakeDir;
+}
+
+void CCamera_Main::MoveTo_CurCamPos_Absolute(_float fTimeDelta)
+{
+	SET_POS(Pos(m_vCurCamPos));
+	m_pTransformCom->Look_At_Axis(Dir(m_vCurCamDir));
+
+	//m_pTransformCom->Move(Dir(Make_ShakeDir(fTimeDelta)));
 }
 
 void CCamera_Main::MoveTo_CurCamPos_Interpolate(_float fTimeDelta)
@@ -834,7 +859,7 @@ void CCamera_Main::MoveTo_CurCamPos_Interpolate(_float fTimeDelta)
 	//**** 목표 위치를 따라간다 ****//
 	_float4 vCurPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
-	_float4 vDestDir = Dir(Pos(m_vCurCamPos + Make_ShakeDir(fTimeDelta)) - Pos(vCurPos));
+	_float4 vDestDir = Dir(Pos(m_vCurCamPos) - Pos(vCurPos));
 	_float4 vDestXZDir = { vDestDir.x, 0.f, vDestDir.z , 0.f };
 	_float4 vDestYDir = { 0.f, vDestDir.y, 0.f , 0.f };
 
@@ -865,15 +890,10 @@ void CCamera_Main::MoveTo_CurCamPos_Interpolate(_float fTimeDelta)
 	m_pTransformCom->Look_At_Interpolate(m_pTransformCom->Get_State(CTransform::STATE_POSITION) + Dir(m_vCurCamDir) + _float4{ 0.f, m_fCurUpOffset, 0.f, 0.f },
 		fTimeDelta * (m_eCamFocus != FOCUS_BOTH ? 1.f : 10.f));
 
+	//m_pTransformCom->Move(Dir(Make_ShakeDir(fTimeDelta)));
 }
 
-void CCamera_Main::MoveTo_CurCamPos_Absolute(_float fTimeDelta)
-{
-	SET_POS(Pos(m_vCurCamPos));
-	m_pTransformCom->Look_At_Axis(Dir(m_vCurCamDir));
-	//m_pTransformCom->Look_At_Interpolate(m_pTransformCom->Get_State(CTransform::STATE_POSITION) + Dir(m_vCurCamDir), fTimeDelta);
 
-}
 
 /*
 void CCamera_Main::Orbit_Target(_float fTimeDelta)

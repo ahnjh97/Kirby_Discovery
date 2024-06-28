@@ -223,13 +223,16 @@ private:
 	_int m_iShakeCnt = { 0 };
 	//얼마나 세게 흔들 것인가?
 	_float m_fShakePower = { 0.f };
+
 	//카메라 쉐이크 방향
 	_float2 m_vShakeDir = { 0.f, 0.f };
+	_float2 m_vPreShakeDir = { 0.f, 0.f };
 
 	//카메라 움직임 관련 변수들
-	_float m_fShakeAmplitude = { 5.f };
-	_float m_fShakeFrequency = { 50.f };
-	_float m_fShakeTime = { 0.f };
+	_float m_fShakeAmplitude = { .5f };
+	_float m_fShakeFrequency = { 20.f };
+	_float m_fInitialShakeTime = { 0.f };
+	_float m_fCurShakeTime = { 0.f };
 
 
 /*카메라 시퀀스*/
@@ -247,6 +250,8 @@ private:
 	pair<_float, _float> m_fSeqInterpolateTime = { 0.f, 0.f };
 
 private:
+	void Reset_DeferredCamSet();
+
 	void Play_Sequence(_float fTimeDelta);
 	void Control(_float fTimeDelta);
 

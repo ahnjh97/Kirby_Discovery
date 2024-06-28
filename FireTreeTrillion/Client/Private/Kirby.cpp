@@ -1225,10 +1225,11 @@ void CKirby::SetUp_Event()
 // ·¹ÀÌ½Ì¸Ê ÄÆ¾À 1.
 void CKirby::Event_Racing_Cut1(CGameObject* pObj)
 {
+	Delete_Effect("Come On Dash");
+
 	INFO(m_bBooster) = false;
 	INFO(m_bCarJump) = false;
 	CKirby::Change_State(CKirby::CARSTATE_CUT1, 60.f, false, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
-
 	m_pGameInstance->Set_FirstTimerRatio(0.2f);
 	m_pGameInstance->Set_SecondTimerRatio(0.2f);
 	m_pGameInstance->Setting_RadialBlur(20.f, 10.f);
@@ -1239,6 +1240,8 @@ void CKirby::Event_Racing_Cut1(CGameObject* pObj)
 
 void CKirby::Event_Racing_Cut2(CGameObject* pObj)
 {
+	Delete_Effect("Come On Dash");
+
 	INFO(m_bBooster) = false;
 	INFO(m_bCarJump) = false;
 	CKirby::Change_State(CKirby::CARSTATE_CUT2, 60.f, false, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);

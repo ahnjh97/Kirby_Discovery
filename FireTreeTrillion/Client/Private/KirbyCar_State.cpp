@@ -299,6 +299,7 @@ void CKirbyCar_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		{
 			DESC(m_fBoosterTime) = 0.f;
 			DESC(m_bBooster) = false;
+			pKirby->Delete_Effect("Come On Dash");
 		}
 	}
 	else if (DESC(m_bBooster) == false)
@@ -494,8 +495,13 @@ void CKirbyCar_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 		{
 			m_pGameInstance->Set_BlackBackGround(false);
 			m_pGameInstance->Set_SecondTimerRatio(1.f);
-			static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr())->Set_FOVY(30.f);
 
+			CCamera_Main* pCamMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+			if (pCamMain == nullptr)
+				ALARM_FAIL("망했다 카메라 없다");
+
+			pCamMain->Set_FOVY(30.f);
+			pCamMain->Set_Target(pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FIRST, {0.f, 0.f, 2.f}, 5.f);
 			pKirby->Change_State(CKirby::CARSTATE_IDLING, 60.f, true, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 			return;
 		}
@@ -595,7 +601,7 @@ void CKirbyCar_Boost_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		{
 			DESC(m_fBoosterTime) = 0.f;
 			DESC(m_bBooster) = false;
-
+			pKirby->Delete_Effect("Come On Dash");
 			if (JoyStick_On() == false)
 			{
 				pKirby->Change_State(CKirby::CARSTATE_BOOSTEND, 60.f, false, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
@@ -617,6 +623,7 @@ void CKirbyCar_Boost_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			pKirby->Change_State(CKirby::CARSTATE_CRASH, 60.f, false, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 			DESC(m_fBoosterTime) = 0.f;
 			DESC(m_bBooster) = false;
+			pKirby->Delete_Effect("Come On Dash");
 			Kirbydesc->m_fMoveSpeed = 0.f;
 			DESC(m_bCarJump) = true;
 			DESC(m_fJumpVelocity) = 20.f;
