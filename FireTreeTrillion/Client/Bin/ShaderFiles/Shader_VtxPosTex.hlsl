@@ -177,6 +177,7 @@ PS_OUT PS_MAIN_SOLIDALPHABLEND(PS_IN_ALPHABLEND In)
 
     //if(g_vRColor.r == 0.45)
         Out.vColor.rgb = g_vRColor;
+    
     Out.vColor.a *= g_fAlpha;
 
     if (0.01f <= Out.vColor.a)

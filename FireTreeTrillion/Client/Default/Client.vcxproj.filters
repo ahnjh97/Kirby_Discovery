@@ -399,6 +399,9 @@
     <Filter Include="02.GameObjects\Map\PortalSoftEffect">
       <UniqueIdentifier>{412e7813-8f9a-4c83-ba98-f76991e1bfc5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Gimmick">
+      <UniqueIdentifier>{2dd2dc4c-1f46-4c88-83b2-ccef5d1f2f4d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -809,6 +812,12 @@
     <ClInclude Include="..\Public\AnimBridge.h">
       <Filter>02.GameObjects\Map\Bridge</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\SkySphereSub.h">
+      <Filter>02.GameObjects\Map\SkySphere</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Gm_LabAntenna.h">
+      <Filter>02.GameObjects\Gimmick</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1200,6 +1209,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\AnimBridge.cpp">
       <Filter>02.GameObjects\Map\Bridge</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SkySphereSub.cpp">
+      <Filter>02.GameObjects\Map\SkySphere</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Gm_LabAntenna.cpp">
+      <Filter>02.GameObjects\Gimmick</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

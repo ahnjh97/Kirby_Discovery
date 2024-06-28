@@ -50,6 +50,9 @@ HRESULT CLevel_FinalBoss::Initialize()
 	CHECK_FAILED(hr);
 	hr = Ready_Kickables();
 	CHECK_FAILED(hr);
+
+	hr = Ready_Objects();
+	CHECK_FAILED(hr);
 	
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
@@ -578,6 +581,59 @@ HRESULT CLevel_FinalBoss::Ready_Kickables()
 			return E_FAIL;
 	}
 
+	fileInput.close();
+
+	return S_OK;
+}
+
+HRESULT CLevel_FinalBoss::Ready_Objects()
+{
+	//Map, Triggers, Kickables.. 분류 제외 잔존 오브젝트들
+	LEVEL eLevel = LEVEL_FINALBOSS;
+	string strFileName = "../../../objects_txt/FinalBoss.txt";
+
+	ifstream fileInput(strFileName, ios::binary);
+	if (fileInput.is_open() == false)
+	{
+		MSG_BOX(TEXT("Failed to open : FinalBoss.txt"));
+		return E_FAIL;
+	}
+
+	_uint iStrLength{};
+	string strModelName;
+	_float4x4 matWorld{};
+	_uint iShaderVars{};
+	_float fRimWidth{};
+
+	while (!fileInput.eof())
+	{
+		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
+		strModelName.resize(iStrLength);
+		fileInput.read(&strModelName[0], iStrLength);
+		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
+		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
+		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
+
+		if (fileInput.eof())
+			break;
+
+		CGameObject::GAMEOBJECT_DESC tDesc{};
+		tDesc.matWorld = matWorld;
+		tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+		tDesc.iShaderVars = iShaderVars;
+		tDesc.fRimWidth = fRimWidth;
+
+#pragma region GIMMICK_OBJECT
+
+		//안테나 필드 설치물 기믹
+		if ("LbAntenna_NonAnim" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_LabAntenna"), &tDesc)))
+				continue;
+		}
+
+#pragma endregion
+	}
 	fileInput.close();
 
 	return S_OK;
