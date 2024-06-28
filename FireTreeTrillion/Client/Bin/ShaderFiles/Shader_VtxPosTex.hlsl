@@ -277,7 +277,6 @@ PS_OUT PS_MAIN_ALPHA_SOFTFX(PS_IN_ALPHABLEND In)
     return Out;
 }
 
-
 PS_OUT PS_MAIN_DEFAULT_FX(PS_IN_ALPHABLEND In)
 {
     PS_OUT Out = (PS_OUT) 0;
@@ -459,6 +458,20 @@ PS_OUT PS_MAIN_FOR_BOSSBAR(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_FOCUSING_UI(PS_IN_ALPHABLEND In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    //diffuse 알파 테스팅
+    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord); // + g_vUVOffset);
+    Out.vColor = vDiffuse;
+    if (vDiffuse.r >= .9f)
+    {
+        Out.vColor.a = 0.f;
+    }
+        
+    return Out;
+}
 
 
 technique11 DefaultTechnique
@@ -684,4 +697,21 @@ technique11 DefaultTechnique
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_FOR_BOSSBAR();
     }
+
+    // 16이 있습니다.
+
+	// UI_LEVEL_CHANGER 전용. 마스크와 색상 ( 17 )
+    pass FOCUSING_POSITION_UI
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN_ALPHABLEND();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader     = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader   = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_FOCUSING_UI();
+    }
+
 }
