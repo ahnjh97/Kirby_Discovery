@@ -402,6 +402,12 @@
     <Filter Include="04.Event">
       <UniqueIdentifier>{1d0d493c-fa22-44f3-9d8e-a63cfb62354a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\Gimmick">
+      <UniqueIdentifier>{4586f931-a594-43f9-8928-a1a036ef84f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Gimmick\Lab_Discovera">
+      <UniqueIdentifier>{aa726fb0-48a0-4fa6-b019-463b20c8b50d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -812,9 +818,17 @@
     <ClInclude Include="..\Public\AnimBridge.h">
       <Filter>02.GameObjects\Map\Bridge</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\SkySphereSub.h" />
     <ClInclude Include="..\public\EventCenter.h">
       <Filter>04.Event</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SkySphereSub.h">
+      <Filter>02.GameObjects\Map\SkySphere</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Gm_LabAntenna.h">
+      <Filter>02.GameObjects\Map\Gimmick\Lab_Discovera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Gm_LabBossRoomDoor.h">
+      <Filter>02.GameObjects\Map\Gimmick\Lab_Discovera</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1208,9 +1222,17 @@
     <ClCompile Include="..\Private\AnimBridge.cpp">
       <Filter>02.GameObjects\Map\Bridge</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\SkySphereSub.cpp" />
     <ClCompile Include="..\private\EventCenter.cpp">
       <Filter>04.Event</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SkySphereSub.cpp">
+      <Filter>02.GameObjects\Map\SkySphere</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Gm_LabAntenna.cpp">
+      <Filter>02.GameObjects\Map\Gimmick\Lab_Discovera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Gm_LabBossRoomDoor.cpp">
+      <Filter>02.GameObjects\Map\Gimmick\Lab_Discovera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

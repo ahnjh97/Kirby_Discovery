@@ -624,11 +624,16 @@ HRESULT CLevel_FinalBoss::Ready_Objects()
 		tDesc.fRimWidth = fRimWidth;
 
 #pragma region GIMMICK_OBJECT
-
-		//안테나 필드 설치물 기믹
+		
 		if ("LbAntenna_NonAnim" == strModelName)
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_LabAntenna"), &tDesc)))
+				continue;
+		}
+
+		if ("LbBossRoomDoor_NonAnim" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_LabBossRoomDoor"), &tDesc)))
 				continue;
 		}
 
