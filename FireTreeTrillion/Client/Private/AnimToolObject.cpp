@@ -42,7 +42,7 @@ HRESULT CAnimToolObject::Initialize(void* pArg)
 		Safe_AddRef(m_pCamera);
 	}
 
-	m_pCamera->Set_Target(m_pTransformCom);
+	m_pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FIRST);
 	m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(180.f));
 	m_pModelCom->Set_Animation(0);
 
@@ -84,7 +84,7 @@ HRESULT CAnimToolObject::Render()
 		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
 
-		if (FAILED(m_pShaderCom->Begin(1)))
+		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_X)))
 			return E_FAIL;
 
 		m_pModelCom->Render(i);

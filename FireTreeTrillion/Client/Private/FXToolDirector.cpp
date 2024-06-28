@@ -17,6 +17,13 @@
 #define COLOR_PINK				ImVec4(0.8f, 0.18f, 0.37f, 1.0f)
 #define COLOR_LIGHTPINK			ImVec4(1.0f, 0.18f, 0.37f, 1.0f)
 
+static const vector<char*> s_ModelPasses = { "0 | NORMAL_0", "1 | NORMAL_X", "2 | SHADOW", "3 | SKY", "4 | BLOOM", "5 | NONBLUR"
+	,"6 | TRIGGER", "7 | ALPHABLEND", "8 | DEFERREDINFO", "9 | NEARCLIP", "10 | KIRBYPART WHITEFX", "11 | MONSTERPART",
+	"12 | DEFAULTFX", "13 | BLENDFX", "14 | WHITEFX_LINEARDIFFUSE", "15 | WHITEFX_CLAMPDIFFUSE" };
+
+static const vector<char*> s_PosTexPasses = { "0 | DEFAULT", "1 | SOLIDBLEND", "2 | BLENDFX", "3 | BLOOM", "4 | DEFAULTFX",
+	"5 | BLEND_NOZTEST" ,"6 | WHITEFX", "7 | UI_MASK", "8 | UI_MASK2", "9 | SOFTFX", "10 | SOFTALPHAFX" };
+
 CFXToolDirector::CFXToolDirector(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CGameObject{ pDevice, pContext }
 {
@@ -1537,16 +1544,51 @@ void CFXToolDirector::Render_FXProperty()
 		}
 	}
 
-	if (InputInt(u8"·»´õ ÆÐ½º", &m_iCurFXPassIdx, 1, pCurFX->m_iMaxPassIdx))
+	if (m_eSelected == SELECTED_SINGLE_FX)
 	{
-		if (m_iCurFXPassIdx < 0)
-			m_iCurFXPassIdx = 0;
+		if (static_cast<CSingleEffect*>(pCurFX)->IsModelBuffer())
+		{
+			if (Combo(u8"·»´õ ÆÐ½º", &m_iCurFXPassIdx, s_ModelPasses.data(), (_int)s_ModelPasses.size()))
+			{
+				if (m_iCurFXPassIdx < 0)
+					m_iCurFXPassIdx = 0;
 
-		if (pCurFX->m_iMaxPassIdx < m_iCurFXPassIdx)
-			m_iCurFXPassIdx = pCurFX->m_iMaxPassIdx;
+				if (pCurFX->m_iMaxPassIdx < m_iCurFXPassIdx)
+					m_iCurFXPassIdx = pCurFX->m_iMaxPassIdx;
 
-		pCurFX->m_iPassIdx = m_iCurFXPassIdx;
+				pCurFX->m_iPassIdx = m_iCurFXPassIdx;
+			}
+		}
+		else
+		{
+			if (Combo(u8"·»´õ ÆÐ½º", &m_iCurFXPassIdx, s_PosTexPasses.data(), (_int)s_PosTexPasses.size()))
+			{
+				if (m_iCurFXPassIdx < 0)
+					m_iCurFXPassIdx = 0;
+
+				if (pCurFX->m_iMaxPassIdx < m_iCurFXPassIdx)
+					m_iCurFXPassIdx = pCurFX->m_iMaxPassIdx;
+
+				pCurFX->m_iPassIdx = m_iCurFXPassIdx;
+			}
+		}
 	}
+	else
+	{
+		if (InputInt(u8"·»´õ ÆÐ½º", &m_iCurFXPassIdx, 1, pCurFX->m_iMaxPassIdx))
+		{
+			if (m_iCurFXPassIdx < 0)
+				m_iCurFXPassIdx = 0;
+
+			if (pCurFX->m_iMaxPassIdx < m_iCurFXPassIdx)
+				m_iCurFXPassIdx = pCurFX->m_iMaxPassIdx;
+
+			pCurFX->m_iPassIdx = m_iCurFXPassIdx;
+		}
+	}
+
+
+
 
 	if (InputInt(u8"µðÇ»Áî ÀÎµ¦½º", &m_iCurFXTexIdx, 1, pCurFX->m_iMaxTexIdx))
 	{

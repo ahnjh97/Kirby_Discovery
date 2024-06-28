@@ -149,7 +149,7 @@ HRESULT CUI_PartTime::Render()
 			m_pShaderCom->Bind_RawValue("g_iMasking", &iMask, sizeof(_int));
 		}
 		
-		hr = m_pShaderCom->Begin(14);
+		hr = m_pShaderCom->Begin(POSTEX_ALPHATEST_COLOR_HORIZONTALCUT);
 		CHECK_FAILED(hr);
 
 		hr = m_pVIBufferCom->Bind_Buffers();

@@ -20,6 +20,42 @@ void CCamera_Main::EventFunc(CGameObject* pObj)
 	_int a = 0;
 }
 
+void CCamera_Main::Set_Target(CTransform* pTarget, CAMTARGET eTarget, CAMFOCUS eFocus, _float3 vAnchorOffset , _float fInterpolateSpeed)
+{
+
+	if (nullptr == pTarget)
+		return;
+
+	if (eFocus == FOCUS_FIRST)
+	{
+		if (nullptr != m_pFirstTarget)
+			Safe_Release(m_pFirstTarget);
+
+		m_pFirstTarget = pTarget;
+		Safe_AddRef(pTarget);
+
+	}
+	else if (eFocus == FOCUS_SECOND)
+	{
+		if (nullptr != m_pSecondTarget)
+			Safe_Release(m_pSecondTarget);
+
+		m_pSecondTarget = pTarget;
+		Safe_AddRef(pTarget);
+	}
+
+	m_vAnchorOffset = vAnchorOffset;
+
+	if (0.f < fInterpolateSpeed)
+		m_fInterpolateSpeed = fInterpolateSpeed;
+
+	m_eCamFocus = eFocus;
+
+	if ((eFocus == FOCUS_SECOND || eFocus == FOCUS_BOTH) && m_pSecondTarget == nullptr)
+		m_eCamFocus = FOCUS_FIRST;
+
+}
+
 HRESULT CCamera_Main::Initialize_Prototype()
 {
 	return S_OK;
@@ -400,11 +436,11 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 		m_eCurSeqEase = EASE_END;
 		m_fSeqInterpolateTime = { 0.f, 0.f };
 
-		 m_vDestCamPos = m_vCurCamPos;
-		 m_vDestCamDir = m_vCurCamDir;
-		 m_fDestFovy = m_fFovy;
-		 m_fDestZAngle = m_fCurZAngle;
-		 m_fDestZoomOffset = m_fCurZoomOffset;
+		m_vDestCamPos = m_vCurCamPos;
+		m_vDestCamDir = m_vCurCamDir;
+		m_fDestFovy = m_fFovy;
+		m_fDestZAngle = m_fCurZAngle;
+		m_fDestZoomOffset = m_fCurZoomOffset;
 
 		return;
 	}
@@ -805,16 +841,23 @@ void CCamera_Main::MoveTo_CurCamPos_Interpolate(_float fTimeDelta)
 
 	//x 가기
 	if (.1f <= vDestXZDir.Length())
-		m_pTransformCom->Move(vDestXZDir * fTimeDelta * ((m_eCamFocus == FOCUS_BOTH) ? 12.f : 2.f));
+		m_pTransformCom->Move(vDestXZDir * fTimeDelta * ((m_eCamFocus == FOCUS_BOTH) ? 12.f : m_fInterpolateSpeed));
 
 	//y로 가기
 	if (.1f <= vDestYDir.Length())
 	{
+		//위쪽으로 이동하는 거라면 일단 절대값으로.
 		if (0.f < vDestYDir.y)
-			m_pTransformCom->Move(vDestYDir * fTimeDelta * 2.5f);
+			m_pTransformCom->Move( vDestYDir * fTimeDelta * (m_fInterpolateSpeed * 1.2f) );
 		else
 		{
-			m_pTransformCom->Move((1.f < vDestYDir.Length()) ? vDestYDir * fTimeDelta * 3.f : vDestYDir * fTimeDelta * 2.f);
+			_float4 vDir = _float4();
+			//if (vDestYDir.Length() < 1.f)
+			//	vDir = F4toF3(vDestYDir) * m_fInterpolateSpeed;
+			//else
+				vDir = vDestYDir * m_fInterpolateSpeed;
+
+			m_pTransformCom->Move( vDir * fTimeDelta );
 		}
 	}
 

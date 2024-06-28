@@ -80,31 +80,9 @@ public:
 	//이벤트를 받기 위해 만든 함수입니다. 인자는 CGameObject* 로 한정
 	void EventFunc(CGameObject* pObj);
 
-	//타겟을 세팅한다.
-	virtual void Set_Target(CTransform* pTarget, CAMFOCUS eFocus = FOCUS_FIRST) override
-	{
-		if (nullptr == pTarget)
-			return;
 
-		if (eFocus == FOCUS_FIRST)
-		{
-			if (nullptr != m_pFirstTarget)
-				Safe_Release(m_pFirstTarget);
+	virtual void Set_Target(CTransform* pTarget, CAMTARGET eTarget, CAMFOCUS eFocus, _float3 vAnchorOffset = _float3{ 0.f, 0.f, 0.f }, _float fInterpolateSpeed = -1.f) override;
 
-			m_pFirstTarget = pTarget;
-			Safe_AddRef(pTarget);
-			m_eCamFocus = eFocus;
-		}
-		else if(eFocus == FOCUS_SECOND)
-		{
-			if (nullptr != m_pSecondTarget)
-				Safe_Release(m_pSecondTarget);
-
-			m_pSecondTarget = pTarget;
-			Safe_AddRef(pTarget);
-			m_eCamFocus = eFocus;
-		}
-	}
 	
 
 	void Set_MatrixIndex(_int iMatrixIndex);
