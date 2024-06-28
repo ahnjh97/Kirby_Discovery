@@ -724,6 +724,7 @@ void CKirbyCar_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 
 	if (pKirby->Get_State() == CKirby::CARSTATE_CUT1)
 	{
+		Cut1_EyeState(pGameObject);
 
 		// 42프레임에 떨어짐.
 		// 60프레임 기준 약 0.66초만에 떨어지는 것임.
@@ -764,6 +765,8 @@ void CKirbyCar_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 			m_fSpeed -= fTimeDelta * 13.f;
 			if (m_fSpeed < 0.f)
 				m_fSpeed = 0.f;
+			DESC(m_fMoveSpeed) = m_fSpeed;
+
 
 			if (pKirby->isAnimFinish())
 			{
@@ -777,6 +780,8 @@ void CKirbyCar_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 
 	else if (pKirby->Get_State() == CKirby::CARSTATE_CUT2)
 	{
+		Cut2_EyeState(pGameObject);
+
 		DESC(m_vTargetDir) = _float4(0.f, 0.f, 1.f, 0.f);
 		Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta, 3.f);
 	}
@@ -787,6 +792,61 @@ void CKirbyCar_Cut_State::OnStateExit()
 	m_iTurnCount = 0;
 	m_fCutAnimTime = 0.f;
 	m_fSpeed = 21.f;
+}
+
+void CKirbyCar_Cut_State::Cut1_EyeState(CGameObject* pGameObject)
+{
+	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+
+	_float fKeyFrame = pKirby->Get_AnimTrackPosition();
+
+	if (fKeyFrame < 170.f)
+		DESC(m_eEyeState) = CKirby::EYE_ANGER;
+	else if (fKeyFrame >= 170.f && fKeyFrame < 176.f)
+		DESC(m_eEyeState) = CKirby::EYE_BLINK;
+	else if (fKeyFrame >= 176.f)
+		DESC(m_eEyeState) = CKirby::EYE_IDLE;
+}
+
+void CKirbyCar_Cut_State::Cut2_EyeState(CGameObject* pGameObject)
+{
+	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+
+	_float fKeyFrame = pKirby->Get_AnimTrackPosition();
+
+	if (fKeyFrame < 48.f)
+		DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+	else if (fKeyFrame >= 48.f && fKeyFrame < 350.f)
+		DESC(m_eEyeState) = CKirby::EYE_IDLE;
+	else if (fKeyFrame >= 350.f && fKeyFrame < 377.f)
+		DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+	else if (fKeyFrame >= 377.f && fKeyFrame < 426.f)
+		DESC(m_eEyeState) = CKirby::EYE_IDLE;
+	else if (fKeyFrame >= 426.f && fKeyFrame < 435.f)
+		DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+	else if (fKeyFrame >= 435.f && fKeyFrame < 450.f)
+		DESC(m_eEyeState) = CKirby::EYE_IDLE;
+	else if (fKeyFrame >= 450.f && fKeyFrame < 455.f)
+		DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+	else if (fKeyFrame >= 455.f && fKeyFrame < 570.f)
+		DESC(m_eEyeState) = CKirby::EYE_IDLE;
+	else if (fKeyFrame >= 570.f && fKeyFrame < 575.f)
+		DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+	else if (fKeyFrame >= 575.f && fKeyFrame < 903.f)
+		DESC(m_eEyeState) = CKirby::EYE_IDLE;
+	else if (fKeyFrame >= 903.f && fKeyFrame < 910.f)
+		DESC(m_eEyeState) = CKirby::EYE_BLINK;
+	else if (fKeyFrame >= 910.f && fKeyFrame < 974.f)
+		DESC(m_eEyeState) = CKirby::EYE_IDLE;
+	else if (fKeyFrame >= 974.f && fKeyFrame < 1120.f)
+		DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+	else if (fKeyFrame >= 1120.f && fKeyFrame < 1210.f)
+		DESC(m_eEyeState) = CKirby::EYE_IDLE;
+	else if (fKeyFrame >= 1210.f)
+		DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+
 }
 
 CKirbyCar_Cut_State* CKirbyCar_Cut_State::Create()
