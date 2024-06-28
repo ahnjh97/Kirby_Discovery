@@ -31,9 +31,9 @@ HRESULT CTunnelRock::Initialize(void* pArg)
     if (FAILED(Add_Components(GameObjectDesc.wstrModelName)))
         return E_FAIL;
 
-    m_pModelCom = GameObjectDesc.pModel;
-    if (nullptr == m_pModelCom)
-        MSG_BOX(TEXT("정현아 모델 분리생성 실패했다 이 멍청아"));
+    //m_pModelCom = GameObjectDesc.pModel;
+    //if (nullptr == m_pModelCom)
+    //    MSG_BOX(TEXT("정현아 모델 분리생성 실패했다 이 멍청아"));
 
     m_bHide = true;
 
@@ -110,10 +110,10 @@ HRESULT CTunnelRock::Add_Components(const wstring& _wstrModelTag)
         TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
         return E_FAIL;
 
-    ///* For.Com_Model */
-    //if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Model_") + _wstrModelTag,
-    //    TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
-    //    return E_FAIL;
+    /* For.Com_Model */
+    if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Model_") + _wstrModelTag,
+        TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
+        return E_FAIL;
 
     return S_OK;
 }
