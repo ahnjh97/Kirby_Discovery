@@ -2,6 +2,7 @@
 #include "Camera_Main.h"
 #include "Kirby.h"
 #include "PartTimerKirby.h"
+#include "EventCenter.h"
 
 CCamera_Main::CCamera_Main(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CCamera{ pDevice, pContext }
@@ -11,6 +12,12 @@ CCamera_Main::CCamera_Main(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 CCamera_Main::CCamera_Main(const CCamera_Main& rhs)
 	: CCamera{ rhs }
 {
+}
+
+void CCamera_Main::EventFunc(CGameObject* pObj)
+{
+	//Make_Sequence(SEQ_SOFTCUT_TEST);
+	_int a = 0;
 }
 
 HRESULT CCamera_Main::Initialize_Prototype()
@@ -37,9 +44,8 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 
 	m_pGameInstance->Add_Camera(this);
 
-
-	if (*m_pGameInstance->Get_CurrentLevelID() == LEVEL_INTRO ||
-		*m_pGameInstance->Get_CurrentLevelID() == LEVEL_GAMEPLAY) {
+	_uint iLevel = *m_pGameInstance->Get_CurrentLevelID();
+	if (iLevel >= LEVEL_INTRO && iLevel <= LEVEL_FINALBOSS) {
 		function<void(_int)> func = bind(&CCamera_Main::StartLerpByTriggerInfo, this, placeholders::_1);
 		m_pGameInstance->Emplace_TriggerFunc(TRIGGER_CAMERA, func);
 
@@ -58,8 +64,9 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 	m_vDestCamDir.Normalize();
 	m_vCurCamDir = m_vOrigCamDir = m_vDestCamDir;
 
-	//m_vDestCamDir = _float3{ vLook.x, vLook.y, vLook.z };
-	//m_vDestCamDir.Normalize();
+
+	function< void(CGameObject*) > func = bind(&CCamera_Main::EventFunc, this, placeholders::_1);
+	CEventCenter::Get_Instance()->Subscribe(KEVENT_DDD_DEAD, this, func, 0);
 
 	return S_OK;
 }
@@ -223,8 +230,8 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		CAMACTION newAction{};
 		newAction.fTime = 0.f;
 		newAction.eCamCut = CUT_INTERPOLATE;
-		newAction.eEase = EASE_OUT_FAST;
-		newAction.fInterpolateSpeed = .2f;
+		newAction.eEase = EASE_OUT;
+		newAction.fInterpolateSpeed = .5f;
 		newAction.eCamPos = POS_RELATIVE;
 		newAction.vPos = _float3{ 8.f, 6.f, -8.f };
 		m_CamSeq.push_back(newAction);
@@ -233,35 +240,35 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction = {};
 		newAction.fTime = .5f;
 		newAction.eCamCut = CUT_INTERPOLATE;
-		newAction.eEase = EASE_OUT_FAST;
-		newAction.fInterpolateSpeed =.2f;
+		newAction.eEase = EASE_OUT;
+		newAction.fInterpolateSpeed =.5f;
 		newAction.eCamPos = POS_RELATIVE;
 		newAction.vPos = _float3{ -8.f, 6.f, -8.f };
 		m_CamSeq.push_back(newAction);
 
 		newAction = {};
 		newAction.fTime = 1.f;
-		newAction.eCamCut = CUT_INTERPOLATE;
-		newAction.eEase = EASE_OUT_FAST;
-		newAction.fInterpolateSpeed =.2f;
-		newAction.eCamPos = POS_RELATIVE;
-		newAction.vPos = _float3{ 0.5f, 15.f, 0.5f };
+		newAction.eCamCut = CUT_HARD;
+		//newAction.eEase = EASE_OUT;
+		//newAction.fInterpolateSpeed =.5f;
+		newAction.eCamPos = POS_ABSOLUTE;
+		newAction.vPos = _float3{ 10.5f, 55.f,10.5f };
 		m_CamSeq.push_back(newAction);
 
 		newAction = {};
 		newAction.fTime = 1.5f;
-		newAction.eCamCut = CUT_INTERPOLATE;
-		newAction.eEase = EASE_OUT_FAST;
-		newAction.fInterpolateSpeed =.2f;
-		newAction.eCamPos = POS_RELATIVE;
+		newAction.eCamCut = CUT_HARD;
+		newAction.eEase = EASE_OUT;
+		newAction.fInterpolateSpeed =.5f;
+		newAction.eCamPos = POS_ABSOLUTE;
 		newAction.vPos = _float3{ 40.f, 60.f, 10.f };
 		m_CamSeq.push_back(newAction);
 
 		newAction = {};
 		newAction.fTime = 2.f;
 		newAction.eCamCut = CUT_INTERPOLATE;
-		newAction.eEase = EASE_OUT_FAST;
-		newAction.fInterpolateSpeed =.2f;
+		newAction.eEase = EASE_OUT;
+		newAction.fInterpolateSpeed =.5f;
 		newAction.eCamPos = POS_RELATIVE;
 		newAction.vPos = _float3{ 0.f, 3.f, 15.f };
 		m_CamSeq.push_back(newAction);
@@ -303,15 +310,6 @@ void CCamera_Main::Make_Sequence_FromQuat(EASING eEaseFlag, _float fDuration, _v
 _int CCamera_Main::Tick(_float fTimeDelta)
 {
 
-	if (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
-	{
-		if (m_pGameInstance->Get_KeyState(DIK_T, KEY_DOWN))
-		{
-			Make_Sequence(SEQ_HARDCUT_TEST);
-			//Make_Sequence(SEQ_SOFTCUT_TEST);
-		}
-	}
-
 	Control(fTimeDelta);
 
 	//특정 시퀀스가 세팅되어 있는 경우 업데이트한다.
@@ -332,6 +330,8 @@ HRESULT CCamera_Main::Render()
 
 void CCamera_Main::Play_Sequence(_float fTimeDelta)
 {
+
+
 	if (m_eSpecialSeq == SEQ_END)
 		return;
 
@@ -344,14 +344,13 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 		return;
 	}
 
-	if (m_CamSeq.empty())
-		return;
-
-	//예약 리스트의 잔여 시간을 모두 깎는다.
-	for (auto& seqKey : m_CamSeq)
+	if (!m_CamSeq.empty())
 	{
-		seqKey.fTime -= fTimeDelta;
-	}
+		//예약 리스트의 잔여 시간을 모두 깎는다.
+		for (auto& seqKey : m_CamSeq)
+		{
+			seqKey.fTime -= fTimeDelta;
+		}
 
 	//시간이 다 되면, 맨 앞쪽에 있는 동작 정보를 읽는다.
 	if (m_CamSeq.front().fTime <= 0.f)
@@ -472,6 +471,8 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 
 		m_CamSeq.pop_front();
 	}
+	}
+
 
 	if (m_eCamCut != CUT_INTERPOLATE)
 		return;
@@ -516,9 +517,9 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 	_float3 vCamPos = _float3::Lerp(m_vStartCamPos, m_vDestCamPos, fInterpolateRatio);
 
 	_float3 vCamDir = m_pFirstTarget->Get_State(CTransform::STATE_POSITION) - (_float4)GET_POS;
-
 	if(m_bSeqDestDirIsAbsolute)
 		vCamDir = _float3::Lerp(m_vStartCamDir, m_vDestCamDir, fInterpolateRatio);
+
 	vCamDir.Normalize();
 
 
@@ -533,7 +534,8 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 	m_fCurZAngle = fZAngle;
 	m_fCurZoomOffset = fZoomOffset;
 
-	MoveTo_CurCamPos(fTimeDelta);
+	MoveTo_CurCamPos_Absolute(fTimeDelta);
+
 
 	//SET_POS(Pos(m_vCurCamPos));
 	//m_pTransformCom->Look_At_Axis(m_vCurCamDir);
@@ -543,11 +545,19 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 void CCamera_Main::Control(_float fTimeDelta)
 {
 
-	//if (m_pGameInstance->Get_KeyState(DIK_F9, KEY_DOWN))
-	//{
-	//	Make_Shake();
-	//}
+	if (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
+	{
+		if (m_pGameInstance->Get_KeyState(DIK_T, KEY_DOWN))
+		{
+			//Make_Sequence(SEQ_HARDCUT_TEST);
+			Make_Sequence(SEQ_SOFTCUT_TEST);
+		}
+	}
 
+	if (m_pGameInstance->Get_KeyState(DIK_9, KEY_DOWN))
+	{
+		CEventCenter::Get_Instance()->Notify(KEVENT_DDD_DEAD, this);
+	}
 }
 
 
@@ -676,7 +686,7 @@ void CCamera_Main::UpdatePos_FromAnchor(_float fTimeDelta)
 
 
 	//**** 목표 위치로 이동 ****//
-	MoveTo_CurCamPos(fRealTimeDelta);
+	MoveTo_CurCamPos_Interpolate(fRealTimeDelta);
 
 }
 
@@ -702,7 +712,7 @@ _float3 CCamera_Main::Make_ShakeDir(_float fTimeDelta)
 	return vShakeDir;
 }
 
-void CCamera_Main::MoveTo_CurCamPos(_float fTimeDelta)
+void CCamera_Main::MoveTo_CurCamPos_Interpolate(_float fTimeDelta)
 {
 
 	//**** 목표 위치를 따라간다 ****//
@@ -734,6 +744,15 @@ void CCamera_Main::MoveTo_CurCamPos(_float fTimeDelta)
 
 }
 
+void CCamera_Main::MoveTo_CurCamPos_Absolute(_float fTimeDelta)
+{
+	SET_POS(Pos(m_vCurCamPos));
+	m_pTransformCom->Look_At_Axis(Dir(m_vCurCamDir));
+	//m_pTransformCom->Look_At_Interpolate(m_pTransformCom->Get_State(CTransform::STATE_POSITION) + Dir(m_vCurCamDir), fTimeDelta);
+
+}
+
+/*
 void CCamera_Main::Orbit_Target(_float fTimeDelta)
 {
 	if (nullptr == m_pFirstTarget)
@@ -771,8 +790,8 @@ void CCamera_Main::Orbit_Target(_float fTimeDelta)
 
 	if (fLen <= 5.f)
 		m_fCamOrbitDelta = { 0.f, 0.f };
-*/
 }
+*/
 
 #ifdef _DEBUG
 void CCamera_Main::Render_IMGUI()
@@ -802,25 +821,24 @@ void CCamera_Main::Render_IMGUI()
 	ImGui::Text(u8"현재 up offset: %.2f", m_fCurUpOffset);
 
 
+	ImGui::Text(u8"현재 FOV: %.2f", ToDegree(m_fFovy));
 	static _float fFOVY = ToDegree(m_fDestFovy);
-
-	if (ImGui::DragFloat(u8"FOV", &fFOVY, .1f, 10.f, 50.f, "%.1f"))
-	{
+	if (ImGui::DragFloat(u8"목표 FOV", &fFOVY, .1f, 10.f, 50.f, "%.1f"))
 		m_fDestFovy = ToRadian(fFOVY);
-	}
 
 
+	ImGui::DragFloat(u8"현재 줌 오프셋", &m_fCurZoomOffset, .05f, -20.f, 20.f, "%.1f");
 
 
+	ImGui::Text(u8"현재 거리 : %.2f", m_fCurDistance);
 	ImGui::DragFloat(u8"타겟까지의 목표 거리", &m_fDestDistance, .05f, 1.f, 50.f, "%.1f");
-	ImGui::DragFloat(u8"줌 오프셋", &m_fCurZoomOffset, .05f, -20.f, 20.f, "%.1f");
 
-	ImGui::Text(u8"현재 거리: %.2f", m_fCurDistance);
+
 
 	ImGui::Dummy(ImVec2(0, 20));
 
-	ImGui::Text(u8" 목표 Dir %.2f\t%.2f\t%.2f", m_vDestCamDir.x, m_vDestCamDir.y, m_vDestCamDir.z);
 	ImGui::Text(u8" 현재 Dir %.2f\t%.2f\t%.2f", m_vCurCamDir.x, m_vCurCamDir.y, m_vCurCamDir.z);
+	ImGui::Text(u8" 목표 Dir %.2f\t%.2f\t%.2f", m_vDestCamDir.x, m_vDestCamDir.y, m_vDestCamDir.z);
 
 }
 #endif
@@ -853,5 +871,7 @@ CGameObject* CCamera_Main::Clone(void* pArg)
 
 void CCamera_Main::Free()
 {
+	CEventCenter::Get_Instance()->Unsubscribe(this);
+
 	__super::Free();
 }

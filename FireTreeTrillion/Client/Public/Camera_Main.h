@@ -76,6 +76,10 @@ private:
 
 //카메라 트리거 관련 함수
 public:
+	//이벤트를 받기 위해 만든 함수입니다. 인자는 CGameObject* 로 한정
+	void EventFunc(CGameObject* pObj);
+
+	//타겟을 세팅한다.
 	virtual void Set_Target(CTransform* pTarget, CAMFOCUS eFocus = FOCUS_FIRST) override
 	{
 		if (nullptr == pTarget)
@@ -120,6 +124,8 @@ public:
 
 //카메라 세팅(타겟, 기타 카메라 값) 관련 함수
 public:
+
+
 	void Set_CamFocus(CAMFOCUS eFocus) { m_eCamFocus = eFocus; }
 
 	//FOV를 세팅한다.
@@ -136,8 +142,6 @@ public:
 	void Make_Sequence_FromAngle(EASING eEaseFlag, _float fDuration, _float3 fDestAngle, _float fDestZoom = -1.f);
 	void Make_Sequence_FromDir(EASING eEaseFlag, _float fDuration, _float3 fDestDir, _float fDestZoom = -1.f);
 	void Make_Sequence_FromQuat(EASING eEaseFlag, _float fDuration, _vector vDestQuat, _float fDestZoom = -1.f);
-
-
 
 
 	virtual HRESULT Initialize_Prototype() override;
@@ -273,9 +277,10 @@ private:
 	void Update_CurCamPos(_float fTimeDelta);
 
 	_float3 Make_ShakeDir(_float fTimeDelta);
-	void MoveTo_CurCamPos(_float fTimeDelta);
+	void MoveTo_CurCamPos_Interpolate(_float fTimeDelta);
+	void MoveTo_CurCamPos_Absolute(_float fTimeDelta);
 
-	void Orbit_Target(_float fTimeDelta);
+	//void Orbit_Target(_float fTimeDelta);
 
 
 public:

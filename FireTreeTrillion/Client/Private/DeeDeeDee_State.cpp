@@ -106,6 +106,11 @@ void CDeeDeeDee_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
 	Turn_Interpolate(DDDDesc, pTransformCom, fTimeDelta);
+	DESC(m_isBattle) = true;
+
+	if (*m_pGameInstance->Get_CurrentLevelID() == LEVEL_TOWN)
+		return;
+
 
 	// 배틀 상태의 딜레이일 경우, 방향대로 보간하게 만든다.
 	if (DESC(m_ePattern) == CDeeDeeDee::PATTERN_BATTLE)
@@ -114,8 +119,6 @@ void CDeeDeeDee_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	}
 
 	m_fIdleDelay += fTimeDelta;
-
-	DESC(m_isBattle) = true;
 
 	// 아이들 딜레이 1.5초
 	if (m_fIdleDelay < 0.5f)
@@ -908,9 +911,37 @@ void CDeeDeeDee_Death_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _f
 
 void CDeeDeeDee_Death_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
+	CDeeDeeDee* pDee = static_cast<CDeeDeeDee*>(pGameObject);
+	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CDeeDeeDee::DDDDESC* DDDDesc = pDee->Get_Info();
+
+
+	pController->FreeFall(pTransformCom, fTimeDelta);
+	DESC(m_isBattle) = false;
+
+	// 죽는 모션이다.
+
+	if (pDee->Get_State() == CDeeDeeDee::STATE_DEATH)
+	{
+
+
+		if (pDee->IsAnimFinished())
+		{
+			pDee->Change_State(CDeeDeeDee::STATE_DEATHWAIT, 60.f, true, false);
+			return;
+		}
+	}
+	else if (pDee->Get_State() == CDeeDeeDee::STATE_DEATHWAIT)
+	{
 
 
 
+	}
+	else if (pDee->Get_State() == CDeeDeeDee::STATE_DEATHWAITEND)
+	{
+
+	}
 
 }
 

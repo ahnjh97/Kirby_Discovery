@@ -161,7 +161,7 @@ PS_OUT PS_MAIN_SOLIDALPHABLEND(PS_IN_ALPHABLEND In)
     
     if(g_iMasking == 2)
     {
-        if (Out.vColor.a < 0.8f)
+        if (Out.vColor.a < 0.1f)
             discard;
 
         if( g_fMaskRatio < vMask.r )
@@ -174,10 +174,7 @@ PS_OUT PS_MAIN_SOLIDALPHABLEND(PS_IN_ALPHABLEND In)
             discard;
     }
 
-
-    //if(g_vRColor.r == 0.45)
-        Out.vColor.rgb = g_vRColor;
-    
+    Out.vColor.rgb = g_vRColor;
     Out.vColor.a *= g_fAlpha;
 
     if (0.01f <= Out.vColor.a)
@@ -277,7 +274,6 @@ PS_OUT PS_MAIN_ALPHA_SOFTFX(PS_IN_ALPHABLEND In)
     
     return Out;
 }
-
 
 PS_OUT PS_MAIN_DEFAULT_FX(PS_IN_ALPHABLEND In)
 {
@@ -460,7 +456,35 @@ PS_OUT PS_MAIN_FOR_BOSSBAR(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_MAIN_ALPHATEST_COLOR_VERTICALCUT(PS_IN_ALPHABLEND In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord);
+    Out.vColor   = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    
+    if (g_iMasking == 2)
+    {
+        if (Out.vColor.a < 0.6f)
+            discard;
 
+        if (g_fMaskRatio < vMask.r)
+            discard;
+    }
+    else //알파 값 예외처리
+    {
+        if (Out.vColor.a < 0.1f)
+            discard;
+    }
+
+    if(g_vRColor.r == 0.45)
+        Out.vColor.rgb = g_vRColor;
+    Out.vColor.a *= g_fAlpha;
+
+    if (0.01f <= Out.vColor.a)
+        Out.vNonBlur = vector(0.f, 1.f, 0.f, 0.f);
+
+    return Out;
+}
 
 technique11 DefaultTechnique
 {
@@ -684,5 +708,19 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_FOR_BOSSBAR();
+    }
+
+    // 알파 테스트 + 색 바인딩 곱셈 + 0 ~ 1 사이의 값으로 세로 자르기 ( 16 )
+    pass AlphaTest_Color_VerticalCut
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader   = compile vs_5_0 VS_MAIN_ALPHABLEND();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader     = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader   = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_ALPHATEST_COLOR_VERTICALCUT();
     }
 }
