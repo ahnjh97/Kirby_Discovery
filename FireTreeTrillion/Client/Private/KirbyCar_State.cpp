@@ -794,11 +794,11 @@ void CKirbyCar_Cut_State::Cut1_EyeState(CGameObject* pGameObject)
 
 	_float fKeyFrame = pKirby->Get_AnimTrackPosition();
 
-	if (fKeyFrame < 44.f)
+	if (fKeyFrame < 170.f)
 		DESC(m_eEyeState) = CKirby::EYE_ANGER;
-	else if (fKeyFrame >= 44.f && fKeyFrame < 54.f)
-		DESC(m_eEyeState) = CKirby::EYE_CLOSE;
-	else if (fKeyFrame >= 54.f)
+	else if (fKeyFrame >= 170.f && fKeyFrame < 176.f)
+		DESC(m_eEyeState) = CKirby::EYE_BLINK;
+	else if (fKeyFrame >= 176.f)
 		DESC(m_eEyeState) = CKirby::EYE_IDLE;
 }
 
