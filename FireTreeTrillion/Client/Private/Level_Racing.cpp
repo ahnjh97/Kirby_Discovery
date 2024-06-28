@@ -562,7 +562,7 @@ HRESULT CLevel_Racing::Ready_Items(_float fZOffset)
 		}
 		else if ("Item_EnergyDrink" == strModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NoVacuumItem"), TEXT("Prototype_GameObject_EnergyDrink"), &tDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NoVacuumItem"), TEXT("Prototype_GameObject_Food"), &tDesc)))
 				return E_FAIL;
 		}
 	}
