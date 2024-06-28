@@ -174,7 +174,6 @@ HRESULT CCarShopWall::Add_Components()
 	CHECK_FAILED(hr);
 
 
-
 	CHitBox::HITBOX_DESC HitBox{};
 	HitBox.pOwner = this;
 	HitBox.pDesc = &m_tColliderDesc[BODY];

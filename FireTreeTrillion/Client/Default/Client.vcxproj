@@ -243,6 +243,7 @@
     <ClInclude Include="..\Public\KirbyBomb.h" />
     <ClInclude Include="..\Public\KirbyBoom_State.h" />
     <ClInclude Include="..\Public\KirbyCar_State.h" />
+    <ClInclude Include="..\Public\Gm_LabAntenna.h" />
     <ClInclude Include="..\Public\Ladder.h" />
     <ClInclude Include="..\Public\Level_DeeDeeDee.h" />
     <ClInclude Include="..\Public\Level_FinalBoss.h" />
@@ -399,6 +400,7 @@
     <ClCompile Include="..\Private\KickableRock.cpp" />
     <ClCompile Include="..\Private\KirbyBomb.cpp" />
     <ClCompile Include="..\Private\KirbyCar_State.cpp" />
+    <ClCompile Include="..\Private\Gm_LabAntenna.cpp" />
     <ClCompile Include="..\Private\Ladder.cpp" />
     <ClCompile Include="..\Private\Level_DeeDeeDee.cpp" />
     <ClCompile Include="..\Private\Level_FinalBoss.cpp" />

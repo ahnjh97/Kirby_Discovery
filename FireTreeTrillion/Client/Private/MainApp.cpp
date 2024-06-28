@@ -11,6 +11,7 @@
 #include "Particle.h"
 #include "MultiEffect.h"
 
+#include "PartTimeHelper.h"
 #include "CollisionCenter.h"
 #include "EventCenter.h"
 
@@ -18,8 +19,6 @@ CMainApp::CMainApp()
 	: m_pGameInstance(CGameInstance::Get_Instance())
 {
 	Safe_AddRef(m_pGameInstance);
-
-
 }
 
 
@@ -460,6 +459,7 @@ void CMainApp::Free()
 	CGameInstance::Release_Engine();
 
 	CLevelChanger::Destroy_Instance();
+	CPartTimeHelper::Destroy_Instance();
 	CCollisionCenter::Destroy_Instance();
 	CEventCenter::Destroy_Instance();
 }
