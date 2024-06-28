@@ -667,3 +667,115 @@ void CKirbyCar_Boost_State::Free()
 }
 
 #pragma endregion
+
+
+
+#pragma region 차량 컷씬 상태
+
+CKirbyCar_Cut_State::CKirbyCar_Cut_State()
+{
+}
+
+void CKirbyCar_Cut_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+	m_fSpeed = 21.f;
+}
+
+void CKirbyCar_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
+	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
+
+
+	m_fCutAnimTime += fTimeDelta;
+
+	if (m_fCutAnimTime > 0.2f)
+	{
+		m_pGameInstance->Restore_FirstTimer();
+		m_pGameInstance->Restore_SecondTimer();
+
+	}
+
+	if (pKirby->Get_State() == CKirby::CARSTATE_CUT1)
+	{
+
+		// 42프레임에 떨어짐.
+		// 60프레임 기준 약 0.66초만에 떨어지는 것임.
+		if (m_iTurnCount == 0) 
+		{
+			DESC(m_vTargetDir) = _float4(0.f, 0.f, -1.f, 0.f);
+			Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta, 3.f);
+			pController->Move_Dir(pTransformCom, DESC(m_vMoveDir) * fTimeDelta * 21.f, fTimeDelta);
+			pController->FreeFall(pTransformCom, fTimeDelta, 10.f);
+
+			if (m_fCutAnimTime > 0.5f && pController->Is_Terrain())
+			{
+				m_iTurnCount = 1;
+			}
+		}
+		else if (m_iTurnCount == 1) 
+		{
+
+			DESC(m_vTargetDir) = _float4(-0.5f, 0.f, -0.5f, 0.f);
+			Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta, 3.f);
+			pController->Move_Dir(pTransformCom, DESC(m_vMoveDir) * fTimeDelta * m_fSpeed, fTimeDelta);
+			pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
+
+			m_fSpeed -= fTimeDelta * 13.f;
+			DESC(m_fMoveSpeed) = m_fSpeed;
+
+			if (m_fCutAnimTime > 1.2f)
+			{
+				m_iTurnCount = 2;
+			}
+		}
+		else if (m_iTurnCount == 2) {
+			DESC(m_vTargetDir) = _float4(1.f, 0.f, 0.f, 0.f);
+			Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta, 3.f);
+			pController->Move_Dir(pTransformCom, DESC(m_vMoveDir) * fTimeDelta * m_fSpeed, fTimeDelta);
+			pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
+
+			m_fSpeed -= fTimeDelta * 13.f;
+			if (m_fSpeed < 0.f)
+				m_fSpeed = 0.f;
+
+			if (pKirby->isAnimFinish())
+			{
+				DESC(m_fMoveSpeed) = 0.f;
+				DESC(m_eEyeState) = CKirby::EYE_IDLE;
+				pKirby->Change_State(CKirby::CARSTATE_IDLING, 60.f, true, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
+				return;
+			}
+		}
+	}
+
+	else if (pKirby->Get_State() == CKirby::CARSTATE_CUT2)
+	{
+		DESC(m_vTargetDir) = _float4(0.f, 0.f, 1.f, 0.f);
+		Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta, 3.f);
+	}
+}
+
+void CKirbyCar_Cut_State::OnStateExit()
+{
+	m_iTurnCount = 0;
+	m_fCutAnimTime = 0.f;
+	m_fSpeed = 21.f;
+}
+
+CKirbyCar_Cut_State* CKirbyCar_Cut_State::Create()
+{
+	CKirbyCar_Cut_State* pInstance = new CKirbyCar_Cut_State();
+	return pInstance;
+}
+
+void CKirbyCar_Cut_State::Free()
+{
+	__super::Free();
+}
+
+#pragma endregion

@@ -154,6 +154,9 @@ void CCarShopWall::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObje
 	m_vDamegeDir = (_float3)vDir;
 	m_fHitPower = pKirby->Get_KirbyInfo()->m_fMoveSpeed;
 
+
+	m_pTransformCom->Move(_float4{ 0.f, -10.f, 0.f, 0.f });
+
 	//이벤트 호출
 	CEventCenter::Get_Instance()->Notify(KEVENT_BREAK_CARSHOP, this);
 	//m_pGameInstance->Set_FirstTimerRatio(.2f);
