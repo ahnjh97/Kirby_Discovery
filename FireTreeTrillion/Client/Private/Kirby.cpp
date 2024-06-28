@@ -20,6 +20,10 @@
 #include "Utils.h"
 #include "Bone.h"
 #include "HitBox.h"
+#include "Camera_Main.h"
+
+#include "EventCenter.h"
+
 
 
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -493,7 +497,7 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 				CMultiEffect::MULTI_FX_DESC FXDesc{};
 				FXDesc.vInitPos = { 0.f, .6f, .4f };
 				FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Vacuum_Vacuum_v3"), &FXDesc)))
+				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Vacuum_v3"), &FXDesc)))
 					return;
 				Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 
@@ -527,15 +531,6 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 	}
 }
 
-_float3 CKirby::Make_RepulsiveDir(CPhysXObject* pObject)
-{
-	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-	_vector vObjectPos = pObject->Get_TransformCom()->Get_State_Vector(CTransform::STATE_POSITION);
-
-	m_vDamegeDir = XMVector3Normalize(vPos - vObjectPos);
-
-	return XMVector3Normalize(vObjectPos - vPos);
-}
 
 void CKirby::Ready_BombOrbit()
 {
@@ -905,6 +900,9 @@ HRESULT CKirby::Add_Components()
 	/* FSM */
 	SetUp_FSM();
 
+	/* ±¸µ¶ ½Ã½ºÅÛ */
+	SetUp_Event();
+
 	return S_OK;
 }
 
@@ -1197,6 +1195,10 @@ void CKirby::SetUp_FSM()
 	m_pFSM->Add_State(CARSTATE_CRASH, CKirbyCar_Boost_State::Create());
 
 	m_pFSM->Add_State(CARSTATE_DAMAGE, CKirbyCar_Damage_State::Create()); //
+
+	m_pFSM->Add_State(CARSTATE_CUT1, CKirbyCar_Cut_State::Create()); //
+	m_pFSM->Add_State(CARSTATE_CUT2, CKirbyCar_Cut_State::Create()); //
+
 #pragma endregion
 
 
@@ -1206,6 +1208,40 @@ void CKirby::SetUp_FSM()
 	FSM_Info_Desc.pModel = &m_pModelCom[BODY_DEFAULT];
 	m_pFSM->Initialize(&FSM_Info_Desc);
 
+}
+
+void CKirby::SetUp_Event()
+{
+	//¼ÅÅÍ »Ñ¼ö±â
+	function<void(CGameObject*)> func = bind(&CKirby::Event_Racing_Cut1, this, placeholders::_1);
+	CEventCenter::Get_Instance()->Subscribe(KEVENT_BREAK_CARSHOP, this, func, 1);
+
+	//´Ù¸® »Ñ¼ö±â
+	func = bind(&CKirby::Event_Racing_Cut2, this, placeholders::_1);
+	CEventCenter::Get_Instance()->Subscribe(KEVENT_BREAK_RACINGMAP, this, func, 1);
+
+
+}
+// ·¹ÀÌ½Ì¸Ê ÄÆ¾À 1.
+void CKirby::Event_Racing_Cut1(CGameObject* pObj)
+{
+	INFO(m_bBooster) = false;
+	INFO(m_bCarJump) = false;
+	CKirby::Change_State(CKirby::CARSTATE_CUT1, 60.f, false, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
+
+	m_pGameInstance->Set_FirstTimerRatio(0.2f);
+	m_pGameInstance->Set_SecondTimerRatio(0.2f);
+	m_pGameInstance->Setting_RadialBlur(20.f, 10.f);
+
+	CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+	pCamera->Make_Shake(2.f);
+}
+
+void CKirby::Event_Racing_Cut2(CGameObject* pObj)
+{
+	INFO(m_bBooster) = false;
+	INFO(m_bCarJump) = false;
+	CKirby::Change_State(CKirby::CARSTATE_CUT2, 60.f, false, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 }
 
 void CKirby::HitBoxChanger(_uint eState)
@@ -1569,6 +1605,9 @@ void CKirby::Free()
 	tLevelData.fKirbyCoin = (_float)m_uCoin;
 	tLevelData.fKirbyHP = m_fHp;
 	CLevelChanger::Get_Instance()->Save(tLevelData);
+
+
+	CEventCenter::Get_Instance()->Unsubscribe(this);
 
 	__super::Free();
 

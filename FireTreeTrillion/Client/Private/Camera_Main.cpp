@@ -338,26 +338,26 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction.eEase = EASE_OUT;
 		newAction.fInterpolateSpeed = 3.f;
 		newAction.eCamPos = POS_RELATIVE;
-		newAction.vPos = _float3{ 3.f, -8.f, 40.f };
+		newAction.vPos = _float3{ 5.f, -8.f, 40.f };
 		m_CamSeq.push_back(newAction);
 
 		newAction = {};
 		newAction.fTime = 3.f;
 		newAction.eCamCut = CUT_INTERPOLATE;
 		newAction.eEase = EASE_OUT;
-		newAction.fInterpolateSpeed = 2.f;
+		newAction.fInterpolateSpeed = 1.5f;
 		newAction.eCamPos = POS_RELATIVE;
-		newAction.vPos = _float3{ 2.f, 15.f, 15.f };
+		newAction.vPos = _float3{ 2.f, 2.f, 15.f };
 		m_CamSeq.push_back(newAction);
 
 		newAction = {};
-		newAction.fTime = 5.f;
+		newAction.fTime = 4.5f;
 		newAction.eCamCut = CUT_INTERPOLATE;
 		newAction.eEase = EASE_OUT;
 		newAction.fInterpolateSpeed = 1.f;
 		newAction.eCamPos = POS_RELATIVE;
 
-		newAction.vPos = _float3{ 0.f, 6.f, 30.f };
+		newAction.vPos = _float3{ 20.f, 6.f, 0.f };
 		newAction.eCamDir = DIR_ABSOLUTE;
 		newAction.vDir = _float3{ 0.f, -.2f, 1.f };
 
