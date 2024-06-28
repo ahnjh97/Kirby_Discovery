@@ -359,10 +359,12 @@ void CBasicMap::InsertMapDecos()
     else
         return;
 
-    _float fZOffset{};
-    if (LEVEL_RACING == *m_pCurrentLevelID)
-        fZOffset = 1500.f;
-
+    //_float fXOffset{}, fZOffset{};
+    //if (LEVEL_RACING == *m_pCurrentLevelID) {
+    //    /*fXOffset = -200.f;
+    //    fZOffset = 1200.f;*/
+    //}
+        
     string strPath = "../../../objects_txt/" + strLevel + "_DecoObjs.txt";
 
     ifstream fileInput(strPath, ios::binary);
@@ -395,7 +397,8 @@ void CBasicMap::InsertMapDecos()
         strModelName.resize(iStrLength);
         fileInput.read(&strModelName[0], iStrLength);
         fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
-        matWorld._43 = matWorld._43 + fZOffset;
+        //matWorld._41 = matWorld._41 + fXOffset;
+        //matWorld._43 = matWorld._43 + fZOffset;
         fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
         fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
         fileInput.read(reinterpret_cast<char*>(&iPassIndex), sizeof(iPassIndex));

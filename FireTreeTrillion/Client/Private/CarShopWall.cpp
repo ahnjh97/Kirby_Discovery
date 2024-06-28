@@ -99,7 +99,7 @@ HRESULT CCarShopWall::Render()
 		}
 		else
 		{
-			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
+			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_LINEAR_NORMAL_O)))
 				return E_FAIL;
 		}
 		

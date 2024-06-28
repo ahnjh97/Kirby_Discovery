@@ -2284,6 +2284,7 @@ void CMapToolHelper::Load_Monsters(const string& _strLevel)
 		for (_uint iRallyPointIdx = 0; iRallyPointIdx < iNumRallyPoints; iRallyPointIdx++)
 		{
 			fileInput.read(reinterpret_cast<char*>(&vRallyPointPos), sizeof(vRallyPointPos));
+
 			CMapToolObject::MAPTOOLOBJECT_DESC tRallyPointDesc{};
 			tRallyPointDesc.wstrModelName = TEXT("RallyPoint");
 			tRallyPointDesc.matWorld._41 = vRallyPointPos.x;

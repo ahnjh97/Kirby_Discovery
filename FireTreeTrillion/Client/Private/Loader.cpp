@@ -104,6 +104,8 @@
 #include "BlendMapObject.h"
 #include "PortalSoftEffect.h"
 #include "AnimBridge.h"
+#include "Tunnel.h"
+#include "TunnelRock.h"
 
 //UI
 #include "BackGround.h"
@@ -357,6 +359,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ToppleableBridge"), CToppleableBridge);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BlendMapObject"), CBlendMapObject);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("AnimBridge"), CAnimBridge);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Tunnel"), CTunnel);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TunnelRock"), CTunnelRock);
 
 	// 미니게임 in 와들디마을
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PartTimeFood"), CPartTimeFood);
@@ -615,6 +619,10 @@ HRESULT CLoader::Loading_For_Racing()
 	hr = Add_Texture(eLevel, "HUD_AbilityDiscard", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_%d.dds", 17);
 	hr = Add_Texture(eLevel, "HUD_AbilityDiscard_Mask", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_Mask.dds");
 	hr = Add_Texture(eLevel, "HUD_BtnIcon", "UI/HUD/Kirby/BtnIcon/BtnIcon_%d.dds", 4);
+
+	hr = Add_Texture(eLevel, "TunnelMask_BaseColor", "Map/Tunnel/TunnelMask_BaseColor.dds");
+	hr = Add_Texture(eLevel, "TunnelMask_Normal", "Map/Tunnel/TunnelMask_Normal.dds");
+	hr = Add_Texture(eLevel, "TunnelMask_MRA", "Map/Tunnel/TunnelMask_MRA.dds");
 
 	CHECK_FAILED(hr);
 
@@ -1523,6 +1531,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("BoardA_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("BoardB_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("BoardC_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("TunnelRocks", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"), true);
 	}
 	else if (eLevel == LEVEL_DEEDEEDEE)
 	{

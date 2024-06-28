@@ -316,6 +316,8 @@
     </ClInclude>
     <ClInclude Include="..\Public\ToppleableBridge.h" />
     <ClInclude Include="..\Public\Trigger.h" />
+    <ClInclude Include="..\Public\Tunnel.h" />
+    <ClInclude Include="..\Public\TunnelRock.h" />
     <ClInclude Include="..\Public\UI_PartTime.h" />
     <ClInclude Include="..\Public\UI_PartTimeDee.h" />
     <ClInclude Include="..\public\WaddleDee.h" />
@@ -469,6 +471,8 @@
     </ClCompile>
     <ClCompile Include="..\Private\ToppleableBridge.cpp" />
     <ClCompile Include="..\Private\Trigger.cpp" />
+    <ClCompile Include="..\Private\Tunnel.cpp" />
+    <ClCompile Include="..\Private\TunnelRock.cpp" />
     <ClCompile Include="..\Private\UI_PartTime.cpp" />
     <ClCompile Include="..\Private\UI_PartTimeDee.cpp" />
     <ClCompile Include="..\private\WaddleDee.cpp" />

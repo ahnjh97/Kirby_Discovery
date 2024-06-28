@@ -399,6 +399,9 @@
     <Filter Include="02.GameObjects\Map\PortalSoftEffect">
       <UniqueIdentifier>{412e7813-8f9a-4c83-ba98-f76991e1bfc5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\Tunnel">
+      <UniqueIdentifier>{42e34d56-7ed5-4af0-a996-17f77516f335}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -809,6 +812,13 @@
     <ClInclude Include="..\Public\AnimBridge.h">
       <Filter>02.GameObjects\Map\Bridge</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\SkySphereSub.h" />
+    <ClInclude Include="..\Public\Tunnel.h">
+      <Filter>02.GameObjects\Map\Tunnel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TunnelRock.h">
+      <Filter>02.GameObjects\Map\Tunnel</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1200,6 +1210,13 @@
     </ClCompile>
     <ClCompile Include="..\Private\AnimBridge.cpp">
       <Filter>02.GameObjects\Map\Bridge</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SkySphereSub.cpp" />
+    <ClCompile Include="..\Private\Tunnel.cpp">
+      <Filter>02.GameObjects\Map\Tunnel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TunnelRock.cpp">
+      <Filter>02.GameObjects\Map\Tunnel</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

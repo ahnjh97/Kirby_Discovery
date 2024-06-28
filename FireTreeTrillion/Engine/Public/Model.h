@@ -26,6 +26,8 @@ public:
 	_float Get_Duration() { return m_Animations[m_iCurrentAnimIndex]->Get_Duration(); }
 	_float Get_Trackposition() { return m_Animations[m_iCurrentAnimIndex]->Get_TrackPosition(); }
 	_float Get_AnimRatio() { return m_Animations[m_iCurrentAnimIndex]->Get_AnimRatio(); }
+	CModel* CreateModelFromMesh(_uint iMeshIndex, _float3& vOffset
+		, unordered_set<string>& _setCheckedStrings, unordered_set<string>& _setExcludedMesh);
 
 public:
 	void Set_TickPerSecond(_float _fTickPerSecond) { m_Animations[m_iCurrentAnimIndex]->Set_TickPerSecond(_fTickPerSecond); }
@@ -62,6 +64,7 @@ public:
 	
 public:
 	virtual HRESULT Initialize_Prototype(MODEL tModel);
+	virtual HRESULT Initialize_Prototype(vector<class CMesh*>& _vecMeshes, const vector<MESH_MATERIAL>& _vecMaterials);
 	virtual HRESULT Initialize(void* pArg)  override;
 #ifdef _DEBUG
 	virtual void	Render_IMGUI()			override;
@@ -125,6 +128,9 @@ public:
 	unordered_set<PxRigidActor*> Get_ActorsSet();
 	vector<PxRigidActor*> Get_Actors();
 
+	void AlignMeshMaterialIndicesWithMeshIndices();
+	string ExtractDigitsAfterUnderScore(_uint iMeshIndex);
+
 private:
 	_uint						m_iNumMeshes = { 0 };
 	vector<class CMesh*>		m_Meshes;
@@ -181,6 +187,8 @@ private:
 
 public:
 	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODEL tModel);
+	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext
+		, vector<class CMesh*>& _vecMeshes, const vector<MESH_MATERIAL>& _vecMaterials);
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Free() override;
 };
