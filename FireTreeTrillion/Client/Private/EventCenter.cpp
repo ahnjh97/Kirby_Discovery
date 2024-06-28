@@ -14,7 +14,7 @@ HRESULT CEventCenter::Subscribe(KIRBY_EVENT eEvent, CGameObject* pObj, function<
 		return E_FAIL;
 
 	m_pListeners[eEvent].emplace(LISTENER{ iPriority, func, pObj });
-	Safe_AddRef(pObj);
+	//Safe_AddRef(pObj);
 
 	return S_OK;
 }
@@ -91,6 +91,9 @@ void CEventCenter::Free()
 
 	for (size_t i = (KIRBY_EVENT)0; i < KEVENT_END; ++i)
 	{
+		if (m_pListeners[i].empty())
+			continue;
+
 		while (!m_pListeners[i].empty())
 		{
 			LISTENER curListener = m_pListeners[i].top();

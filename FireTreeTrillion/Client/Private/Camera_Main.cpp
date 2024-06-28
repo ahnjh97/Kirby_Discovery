@@ -752,6 +752,7 @@ void CCamera_Main::MoveTo_CurCamPos_Absolute(_float fTimeDelta)
 
 }
 
+/*
 void CCamera_Main::Orbit_Target(_float fTimeDelta)
 {
 	if (nullptr == m_pFirstTarget)
@@ -789,8 +790,8 @@ void CCamera_Main::Orbit_Target(_float fTimeDelta)
 
 	if (fLen <= 5.f)
 		m_fCamOrbitDelta = { 0.f, 0.f };
-*/
 }
+*/
 
 #ifdef _DEBUG
 void CCamera_Main::Render_IMGUI()

@@ -8,8 +8,6 @@ class CEventCenter : public CBase
 
 
 public:
-
-
 	struct LISTENER
 	{
 		_uint iPriority;

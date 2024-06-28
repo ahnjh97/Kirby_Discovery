@@ -280,7 +280,7 @@ private:
 	void MoveTo_CurCamPos_Interpolate(_float fTimeDelta);
 	void MoveTo_CurCamPos_Absolute(_float fTimeDelta);
 
-	void Orbit_Target(_float fTimeDelta);
+	//void Orbit_Target(_float fTimeDelta);
 
 
 public:
