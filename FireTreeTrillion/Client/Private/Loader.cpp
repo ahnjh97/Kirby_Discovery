@@ -104,6 +104,8 @@
 #include "BlendMapObject.h"
 #include "PortalSoftEffect.h"
 #include "AnimBridge.h"
+//기믹
+#include "Gm_LabAntenna.h"
 
 //UI
 #include "BackGround.h"
@@ -357,6 +359,10 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ToppleableBridge"), CToppleableBridge);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BlendMapObject"), CBlendMapObject);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("AnimBridge"), CAnimBridge);
+
+	#pragma region GIMMICK::LEVEL_FINALBOSS
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_LabAntenna"), CGm_LabAntenna);
+	#pragma endregion
 
 	// 미니게임 in 와들디마을
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PartTimeFood"), CPartTimeFood);
@@ -1291,7 +1297,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("SkySphere_Stage1_Day", TYPE_NONANIM );
 
 		//이펙트 친구들...
-
 		m_vecModelInfo.emplace_back("SmokeCenter", TYPE_NONANIM );
 		m_vecModelInfo.emplace_back("SmokeFadeLarge", TYPE_NONANIM );
 		m_vecModelInfo.emplace_back("SmokeOriginal", TYPE_NONANIM );
@@ -1634,6 +1639,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		//보스전 진입 전 필드
 		m_vecModelInfo.emplace_back("Land_LbLastBossBeforeStep", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("Land_LbLastBossBeforeStep_Blend", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		
+		//기믹 오브젝트
+		m_vecModelInfo.emplace_back("LbAntenna_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("BG1", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));

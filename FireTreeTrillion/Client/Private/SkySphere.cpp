@@ -121,8 +121,8 @@ HRESULT CSkySphere::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
-	wstring strProtoTagMod = TEXT("Prototype_Component_Model_") + CUtils::StrToWstr(m_strModelTag);
-	hr = __super::Add_Component(LEVEL_STATIC, strProtoTagMod, TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+	wstring wstrProtoTagMod = TEXT("Prototype_Component_Model_") + CUtils::StrToWstr(m_strModelTag);
+	hr = __super::Add_Component(LEVEL_STATIC, wstrProtoTagMod, TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
 #pragma region LAB_DISCOVERA
@@ -130,8 +130,9 @@ HRESULT CSkySphere::Add_Components()
 	//FINALBOSS일 경우, 텍스처 별도 처리. 추후 레벨 별 세부 디자인이 필요할 경우 코드 수정 예정
 	if (LEVEL_FINALBOSS == m_eCurLevel)
 	{
-		wstring strProtoTagTex = TEXT("Prototype_Component_Texture_") + CUtils::StrToWstr(m_strTextureTag);
-		hr = __super::Add_Component(LEVEL_STATIC, strProtoTagTex, TEXT("Com_Tex_Lab_Diffuse"), (CComponent**)&m_pTextureCom[TEX_DIFFUSE]);
+		wstring wstrProtoTagTex = TEXT("Prototype_Component_Texture_") + CUtils::StrToWstr(m_strTextureTag);
+		hr = __super::Add_Component(LEVEL_STATIC, wstrProtoTagTex, 
+			TEXT("Com_Tex_Lab_Diffuse"), (CComponent**)&m_pTextureCom[TEX_DIFFUSE]);
 		CHECK_FAILED(hr);
 
 		hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_SkySphere_Lab_CloudNoize"), 

@@ -399,6 +399,9 @@
     <Filter Include="02.GameObjects\Map\PortalSoftEffect">
       <UniqueIdentifier>{412e7813-8f9a-4c83-ba98-f76991e1bfc5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Gimmick">
+      <UniqueIdentifier>{2dd2dc4c-1f46-4c88-83b2-ccef5d1f2f4d}</UniqueIdentifier>
+    </Filter>
     <Filter Include="04.Event">
       <UniqueIdentifier>{1d0d493c-fa22-44f3-9d8e-a63cfb62354a}</UniqueIdentifier>
     </Filter>
@@ -406,6 +409,7 @@
   <ItemGroup>
     <Text Include="ReadMe.txt" />
   </ItemGroup>
+<Filter>98.Default</Filter>
   <ItemGroup>
     <ClInclude Include="Client.h">
       <Filter>98.Default</Filter>
@@ -812,7 +816,12 @@
     <ClInclude Include="..\Public\AnimBridge.h">
       <Filter>02.GameObjects\Map\Bridge</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\SkySphereSub.h" />
+    <ClInclude Include="..\Public\SkySphereSub.h">
+      <Filter>02.GameObjects\Map\SkySphere</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Gm_LabAntenna.h">
+      <Filter>02.GameObjects\Gimmick</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\EventCenter.h">
       <Filter>04.Event</Filter>
     </ClInclude>
@@ -1208,7 +1217,12 @@
     <ClCompile Include="..\Private\AnimBridge.cpp">
       <Filter>02.GameObjects\Map\Bridge</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\SkySphereSub.cpp" />
+    <ClCompile Include="..\Private\SkySphereSub.cpp">
+      <Filter>02.GameObjects\Map\SkySphere</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Gm_LabAntenna.cpp">
+      <Filter>02.GameObjects\Gimmick</Filter>
+    </ClCompile>
     <ClCompile Include="..\private\EventCenter.cpp">
       <Filter>04.Event</Filter>
     </ClCompile>
