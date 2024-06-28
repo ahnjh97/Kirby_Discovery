@@ -380,13 +380,14 @@ HRESULT CFXToolDirector::Save_MultiEffect(CEffect* pEffect, const wstring& strFi
 //ÀÌÆåÆ® ½Ï ·Îµå
 HRESULT CFXToolDirector::Load_AllEffect()
 {
+	for (auto& fxs : m_MultiFXs)
+		Safe_Release(fxs);
+	m_MultiFXs.clear();
+
 	for (auto& fxs : m_FXs)
 		Safe_Release(fxs);
 	m_FXs.clear();
 
-	for (auto& fxs : m_MultiFXs)
-		Safe_Release(fxs);
-	m_MultiFXs.clear();
 
 
 	path FXPath("../Bin/Resources/Effects/Single/");
@@ -2047,7 +2048,7 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 		m_FXs[m_iSelectedFXIdx]->m_fDuration.first = m_fCurPlayDuration;
 
 		if (!m_bPlayingBar)
-			m_FXs[m_iSelectedFXIdx]->Tick(_fTimeDelta);
+			m_FXs[m_iSelectedFXIdx]->Late_Tick(_fTimeDelta);
 	}
 
 	//Å°ÇÁ·¹ÀÓ ÆË¾÷ »çÀÌÁî
@@ -2168,14 +2169,14 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 		if (DragFloat3("Value", m_vKFPopupValue, .01f, vValueRange.x, vValueRange.y, "%.2f"))
 		{
 			m_FXs[m_iSelectedFXIdx]->m_Keyframes[m_eSelectedProperty][m_iSelectedKFIdx].vValue = _float3{ m_vKFPopupValue[0], m_vKFPopupValue[1], m_vKFPopupValue[2] };
-			m_FXs[m_iSelectedFXIdx]->Tick(_fTimeDelta);
+			m_FXs[m_iSelectedFXIdx]->Late_Tick(_fTimeDelta);
 			m_FXs[m_iSelectedFXIdx]->m_fDuration.first = m_fCurPlayDuration;
 
 		}
 		if (Combo(u8"Easing", &m_eKFPopupEasing, m_Easing.data(), (_int)m_Easing.size()))
 		{
 			m_FXs[m_iSelectedFXIdx]->m_Keyframes[m_eSelectedProperty][m_iSelectedKFIdx].eEasing = (EASING)m_eKFPopupEasing;
-			m_FXs[m_iSelectedFXIdx]->Tick(_fTimeDelta);
+			m_FXs[m_iSelectedFXIdx]->Late_Tick(_fTimeDelta);
 			m_FXs[m_iSelectedFXIdx]->m_fDuration.first = m_fCurPlayDuration;
 		}
 
@@ -2256,7 +2257,7 @@ void CFXToolDirector::MakeBar_ParticleFXProperty(_float _fTimeDelta, _float _fWi
 
 	if (SliderFloat("##", &m_fCurPlayDuration, 0.f, m_fTotalPlayDuration, "%.2f"))
 	{
-		m_FXs[m_iSelectedFXIdx]->Tick(_fTimeDelta);
+		m_FXs[m_iSelectedFXIdx]->Late_Tick(_fTimeDelta);
 		m_FXs[m_iSelectedFXIdx]->m_fDuration.first = m_fCurPlayDuration;
 	}
 }
@@ -2272,7 +2273,7 @@ void CFXToolDirector::MakeBar_MultiFXProperty(_float _fTimeDelta, _float _fWidth
 
 	if (SliderFloat("##", &m_fCurPlayDuration, 0.f, m_fTotalPlayDuration, "%.2f"))
 	{
-		m_MultiFXs[m_iSelectedMultiFXIdx]->Tick(_fTimeDelta);
+		m_MultiFXs[m_iSelectedMultiFXIdx]->Late_Tick(_fTimeDelta);
 		m_MultiFXs[m_iSelectedMultiFXIdx]->m_fDuration.first = m_fCurPlayDuration;
 	}
 }
