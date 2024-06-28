@@ -196,7 +196,7 @@ void CKirby::Render_IMGUI()
 	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	ImGui::Text("HP : %d", (_int)m_fHp);
 	ImGui::Text("m_fMoveSpeed : %.2f", INFO(m_fMoveSpeed));
-	ImGui::Text("m_bInitializeTargetPos : %d", m_bInitializeTargetPos);
+	ImGui::Text("TrackPosition : %.2f", Get_AnimTrackPosition());
 	ImGui::Text("m_vLadderPoint.x : %.2f, m_vLadderPoint.y : %.2f m_vLadderPoint.z : %.2f", INFO(m_vLadderPoint).x, INFO(m_vLadderPoint).y, INFO(m_vLadderPoint).z);
 	ImGui::Text("m_vLadderLook.x : %.2f, m_vLadderLook.y : %.2f m_vLadderLook.z : %.2f", INFO(m_vLadderLook).x, INFO(m_vLadderLook).y, INFO(m_vLadderLook).z);
 	ImGui::Text("m_vPos.x : %.2f, m_vPos.y : %.2f m_vPos.z : %.2f", vPos.x, vPos.y, vPos.z);
@@ -1235,6 +1235,9 @@ void CKirby::Event_Racing_Cut1(CGameObject* pObj)
 
 	CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 	pCamera->Make_Shake(2.f);
+
+	_float4 vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 6.f;
+	m_pControllerCom->Move_Dir(m_pTransformCom, vLook + _float4(0.f, 2.f, 0.f, 0.f), m_fTimeDelta);
 }
 
 void CKirby::Event_Racing_Cut2(CGameObject* pObj)
@@ -1398,6 +1401,11 @@ _bool CKirby::isAnimFinish()
 		return false;
 
 	return m_pModelCom[INFO(m_eBodyState)]->IsFinished();
+}
+
+_float CKirby::Get_AnimTrackPosition()
+{
+	return m_pModelCom[m_tKirbyInfo.m_eBodyState]->Get_AnimTrackPosition();
 }
 
 void CKirby::DefaultIdle()

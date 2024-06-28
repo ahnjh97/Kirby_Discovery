@@ -143,6 +143,9 @@ public:
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
 	virtual void OnStateExit()														override;
 
+	void	Cut1_EyeState(CGameObject* pGameObject);
+	void	Cut2_EyeState(CGameObject* pGameObject);
+
 public:
 	_uint	m_iTurnCount = { 0 };
 	_float	m_fCutAnimTime = { 0.f };

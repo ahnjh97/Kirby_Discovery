@@ -162,6 +162,7 @@ public:
 	void			Plus_Coin(_uint uCoin) { m_uCoin += uCoin;	}
 
 	_bool			isAnimFinish();
+	_float			Get_AnimTrackPosition();
 	void			DefaultIdle();
 
 	// 현재 커비가 무적상태인지 아닌지 판별하는 부울 값
