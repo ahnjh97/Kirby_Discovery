@@ -44,9 +44,8 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 
 	m_pGameInstance->Add_Camera(this);
 
-
-	if (*m_pGameInstance->Get_CurrentLevelID() == LEVEL_INTRO ||
-		*m_pGameInstance->Get_CurrentLevelID() == LEVEL_GAMEPLAY) {
+	_uint iLevel = *m_pGameInstance->Get_CurrentLevelID();
+	if (iLevel >= LEVEL_INTRO && iLevel <= LEVEL_FINALBOSS) {
 		function<void(_int)> func = bind(&CCamera_Main::StartLerpByTriggerInfo, this, placeholders::_1);
 		m_pGameInstance->Emplace_TriggerFunc(TRIGGER_CAMERA, func);
 

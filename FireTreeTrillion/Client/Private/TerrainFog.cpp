@@ -32,8 +32,8 @@ HRESULT CTerrainFog::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 	
-	m_fAlpha = 0.2f;
-	m_pTransformCom->Set_Scaled(100.f * pGameObjectDesc->matWorld._11, 100.f * pGameObjectDesc->matWorld._22, 1.f * pGameObjectDesc->matWorld._33);
+	m_fAlpha = 0.5f;
+	m_pTransformCom->Set_Scaled(30.f * pGameObjectDesc->matWorld._11, 30.f * pGameObjectDesc->matWorld._22, 1.f * pGameObjectDesc->matWorld._33);
 
 	m_iRandomFog = 2/*CUtils::Make_RandomInt(1, 2)*/;
 

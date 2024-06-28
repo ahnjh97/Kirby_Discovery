@@ -233,7 +233,7 @@ HRESULT CModel::CreateStaticActor(_float4x4& matWorld)
 	return S_OK;
 }
 
-HRESULT CModel::CreateStaticActors_Exclude(unordered_set<string> _setNonColMesh, _float4x4& matWorld)
+HRESULT CModel::CreateStaticActors_Exclude(unordered_set<string>& _setNonColMesh, _float4x4& matWorld)
 {
 	for (auto& mesh : m_Meshes)
 	{
@@ -245,7 +245,7 @@ HRESULT CModel::CreateStaticActors_Exclude(unordered_set<string> _setNonColMesh,
 	return S_OK;
 }
 
-HRESULT CModel::CreateStaticActors_Include(unordered_set<string> _setColMesh, _float4x4& matWorld)
+HRESULT CModel::CreateStaticActors_Include(unordered_set<string>& _setColMesh, _float4x4& matWorld)
 {
 	for (auto& mesh : m_Meshes)
 	{
@@ -264,11 +264,39 @@ void CModel::DisableActors()
 		mesh->DisableActor(pScene);
 }
 
+void CModel::DisableActors(unordered_set<string>& _setMeshNames)
+{
+	PxScene* pScene = m_pGameInstance->Get_Scene();
+	for (auto& mesh : m_Meshes)
+	{
+		if (nullptr == mesh)
+			continue;
+
+		string strMeshName = mesh->Get_Name();
+		if(_setMeshNames.end() != _setMeshNames.find(strMeshName))
+			mesh->DisableActor(pScene);
+	}
+}
+
 void CModel::ReAddActors()
 {
 	PxScene* pScene = m_pGameInstance->Get_Scene();
 	for (auto& mesh : m_Meshes)
 		mesh->ReAddActor(pScene);
+}
+
+void CModel::ReAddActors(unordered_set<string>& _setMeshNames)
+{
+	PxScene* pScene = m_pGameInstance->Get_Scene();
+	for (auto& mesh : m_Meshes)
+	{
+		if (nullptr == mesh)
+			continue;
+
+		string strMeshName = mesh->Get_Name();
+		if (_setMeshNames.end() != _setMeshNames.find(strMeshName))
+			mesh->ReAddActor(pScene);
+	}
 }
 
 _float4 CModel::Check_Meshes(const class CTransform* pTransform, _Out_ _int& iMeshIndex) const

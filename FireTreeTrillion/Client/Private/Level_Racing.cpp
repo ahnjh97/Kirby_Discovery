@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "Level_Racing.h"
+#include "Level_Loading.h"
+
 #include "Camera_Free.h"
 #include "Camera_Main.h"
 #include "BasicMap.h"
@@ -46,22 +48,33 @@ HRESULT CLevel_Racing::Initialize()
 	hr = Ready_Layer_UI(TEXT("Layer_UI"));
 	CHECK_FAILED(hr);
 
-	hr = Ready_Map();
+	_float fZOffset = 1500.f;
+	hr = Ready_Map(fZOffset);
 	CHECK_FAILED(hr);
-	hr = Ready_Triggers();
+	hr = Ready_Triggers(fZOffset);
 	CHECK_FAILED(hr);
-	hr = Ready_Monsters();
+	hr = Ready_Monsters(fZOffset);
 	CHECK_FAILED(hr);
-	hr = Ready_Items();
+	hr = Ready_Items(fZOffset);
 	CHECK_FAILED(hr);
-	hr = Ready_Kickables();
+	hr = Ready_Kickables(fZOffset);
 	CHECK_FAILED(hr);
-	hr = Ready_Objects();
+	hr = Ready_Objects(fZOffset);
 	CHECK_FAILED(hr);
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
+	// 레벨전환 트리거
+	function<void(_int)> func = bind(&CLevel_Racing::Change_Levels, this);
+	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_LEVELCHANGER, func);
 
 	return S_OK;
+}
+
+void CLevel_Racing::Change_Levels()
+{
+	HRESULT hr(S_OK);
+	hr = m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_DEEDEEDEE));
+	CHECK_FAILED(hr);
 }
 
 void CLevel_Racing::Tick(_float fTimeDelta)
@@ -120,10 +133,10 @@ HRESULT CLevel_Racing::Ready_Layer_Camera(const wstring& strLayerTag)
 	MainCamDesc.fNear = 0.1f;
 	MainCamDesc.fFar = 1000.0f;
 	MainCamDesc.vEye = _float4(-129.f, 10.f, -120.f, 1.f);
-	MainCamDesc.vAt = MainCamDesc.vEye + _float4(0.f, -.15f, -1.f, 1.f);
+	MainCamDesc.vAt = MainCamDesc.vEye + _float4(0.f, -.3f, 1.f, 1.f);
 	MainCamDesc.fSpeedPerSec = 10.f;
 	MainCamDesc.fRotationPerSec = XMConvertToRadians(90.0f);
-	MainCamDesc.fOrigDistance = 28.f;
+	MainCamDesc.fOrigDistance = 55.f;
 	MainCamDesc.fCamSensor = .3f;
 
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_RACING, strLayerTag, TEXT("Prototype_GameObject_Camera_Main"), &MainCamDesc)))
@@ -184,7 +197,7 @@ HRESULT CLevel_Racing::Ready_Layer_UI(const wstring& _wstrLayerTag)
 	return S_OK;
 }
 
-HRESULT CLevel_Racing::Ready_Map()
+HRESULT CLevel_Racing::Ready_Map(_float fZOffset)
 {
 	LEVEL eLevel = LEVEL_RACING;
 	string strFileName = "../../../objects_txt/Racing_Map.txt";
@@ -212,7 +225,7 @@ HRESULT CLevel_Racing::Ready_Map()
 		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
 		fileInput.read(reinterpret_cast<char*>(&vMin), sizeof(vMin));
 		fileInput.read(reinterpret_cast<char*>(&vMax), sizeof(vMax));
-		//matWorld._43 = matWorld._43 + 1500.f;
+		matWorld._43 = matWorld._43 + fZOffset;
 		CBasicMap::MAP_DESC tMapDesc{};
 		tMapDesc.wstrModelName = CUtils::StrToWstr(strModelName);
 		tMapDesc.matWorld = matWorld;
@@ -238,7 +251,7 @@ HRESULT CLevel_Racing::Ready_Map()
 	return S_OK;
 }
 
-HRESULT CLevel_Racing::Ready_Triggers()
+HRESULT CLevel_Racing::Ready_Triggers(_float fZOffset)
 {
 	LEVEL eLevel = LEVEL_RACING;
 	string strFileName = "../../../objects_txt/Racing_Triggers.txt";
@@ -262,7 +275,6 @@ HRESULT CLevel_Racing::Ready_Triggers()
 	_int triggerType{};
 	_int iCamType{};
 	_float fRadius{};
-	wstring wstrGameObjectTag = TEXT("MapToolObject");
 
 	map<_int, _float4x4> camMatrices;
 	map<_int, pair<_vector, _float>> frontDirRadii;
@@ -275,7 +287,7 @@ HRESULT CLevel_Racing::Ready_Triggers()
 		strModelName.resize(iStrLength);
 		fileInput.read(&strModelName[0], iStrLength);
 		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
-		//matWorld._43 = matWorld._43 + 1500.f;
+		matWorld._43 = matWorld._43 + fZOffset;
 		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
 		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
 
@@ -371,7 +383,7 @@ HRESULT CLevel_Racing::Ready_Triggers()
 	return S_OK;
 }
 
-HRESULT CLevel_Racing::Ready_Monsters()
+HRESULT CLevel_Racing::Ready_Monsters(_float fZOffset)
 {
 	LEVEL eLevel = LEVEL_RACING;
 	string strFileName = "../../../objects_txt/Racing_Monsters.txt";
@@ -402,6 +414,7 @@ HRESULT CLevel_Racing::Ready_Monsters()
 		strModelName.resize(iStrLength);
 		fileInput.read(&strModelName[0], iStrLength);
 		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
+		matWorld._43 = matWorld._43 + fZOffset;
 		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
 		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
 
@@ -505,7 +518,7 @@ HRESULT CLevel_Racing::Ready_Monsters()
 	return S_OK;
 }
 
-HRESULT CLevel_Racing::Ready_Items()
+HRESULT CLevel_Racing::Ready_Items(_float fZOffset)
 {
 	LEVEL eLevel = LEVEL_RACING;
 	string strFileName = "../../../objects_txt/Racing_Items.txt";
@@ -532,6 +545,7 @@ HRESULT CLevel_Racing::Ready_Items()
 		strModelName.resize(iStrLength);
 		fileInput.read(&strModelName[0], iStrLength);
 		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
+		matWorld._43 = matWorld._43 + fZOffset;
 		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
 		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
 
@@ -557,7 +571,7 @@ HRESULT CLevel_Racing::Ready_Items()
 	return S_OK;
 }
 
-HRESULT CLevel_Racing::Ready_Kickables()
+HRESULT CLevel_Racing::Ready_Kickables(_float fZOffset)
 {
 	LEVEL eLevel = LEVEL_RACING;
 	string strFileName = "../../../objects_txt/Racing_Kickables.txt";
@@ -584,6 +598,7 @@ HRESULT CLevel_Racing::Ready_Kickables()
 		strModelName.resize(iStrLength);
 		fileInput.read(&strModelName[0], iStrLength);
 		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
+		matWorld._43 = matWorld._43 + fZOffset;
 		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
 		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
 
@@ -602,7 +617,7 @@ HRESULT CLevel_Racing::Ready_Kickables()
 	return S_OK;
 }
 
-HRESULT CLevel_Racing::Ready_Objects()
+HRESULT CLevel_Racing::Ready_Objects(_float fZOffset)
 {
 	LEVEL eLevel = LEVEL_RACING;
 	string strFileName = "../../../objects_txt/Racing.txt";
@@ -626,6 +641,7 @@ HRESULT CLevel_Racing::Ready_Objects()
 		strModelName.resize(iStrLength);
 		fileInput.read(&strModelName[0], iStrLength);
 		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
+		matWorld._43 = matWorld._43 + fZOffset;
 		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
 		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
 

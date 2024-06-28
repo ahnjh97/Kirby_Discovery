@@ -79,10 +79,12 @@ public:
 
 	HRESULT CreateDynamicActor(_float4x4& matWorld);
 	HRESULT CreateStaticActor(_float4x4& matWorld);
-	HRESULT	CreateStaticActors_Exclude(unordered_set<string> _setNonColMesh, _float4x4& matWorld);
-	HRESULT CreateStaticActors_Include(unordered_set<string> _setColMesh, _float4x4& matWorld);
+	HRESULT	CreateStaticActors_Exclude(unordered_set<string>& _setNonColMesh, _float4x4& matWorld);
+	HRESULT CreateStaticActors_Include(unordered_set<string>& _setColMesh, _float4x4& matWorld);
 	void	DisableActors();
+	void	DisableActors(unordered_set<string>& _setMeshNames);
 	void	ReAddActors();
+	void	ReAddActors(unordered_set<string>& _setMeshNames);
 
 	void	Update_ActorTransform(class CTransform* pTransform);
 

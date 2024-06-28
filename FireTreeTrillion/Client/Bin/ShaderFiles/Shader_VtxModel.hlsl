@@ -159,6 +159,7 @@ PS_OUT PS_MAIN(PS_IN In)
 	Out.vDiffuse = vMtrlDiffuse;
 	Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vFieldDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 0.0f);
     Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
     
     if (g_bStencil == true)
@@ -327,6 +328,8 @@ PS_OUT TRIGGER(PS_IN In)
         Out.vDiffuse = vector(1, 0.75f, 0.8f, 1);
     else if (g_iTriggerType == 1)
         Out.vDiffuse = vector(0, 0, 1, 1);
+    else if (g_iTriggerType == 3)
+        Out.vDiffuse = vector(0, 0.45f, 0.45f, 1);
     else
         Out.vDiffuse = vector(1, 1, 1, 1);
     
