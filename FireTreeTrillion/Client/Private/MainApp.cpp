@@ -12,7 +12,7 @@
 #include "MultiEffect.h"
 
 #include "CollisionCenter.h"
-
+#include "EventCenter.h"
 
 CMainApp::CMainApp()
 	: m_pGameInstance(CGameInstance::Get_Instance())
@@ -48,6 +48,7 @@ HRESULT CMainApp::Initialize()
 
 
 	CCollisionCenter::Get_Instance()->Initialize();
+	CEventCenter::Get_Instance()->Initialize();
 
 	return S_OK;
 }
@@ -460,5 +461,6 @@ void CMainApp::Free()
 
 	CLevelChanger::Destroy_Instance();
 	CCollisionCenter::Destroy_Instance();
+	CEventCenter::Destroy_Instance();
 }
 

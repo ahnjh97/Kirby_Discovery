@@ -215,6 +215,7 @@
     <ClInclude Include="..\public\Dee_Part.h" />
     <ClInclude Include="..\public\Dee_State.h" />
     <ClInclude Include="..\Public\EnergyDrink.h" />
+    <ClInclude Include="..\public\EventCenter.h" />
     <ClInclude Include="..\public\FoodShopDee.h" />
     <ClInclude Include="..\Public\FXToolDirector.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -371,6 +372,7 @@
     <ClCompile Include="..\private\Dee_Part.cpp" />
     <ClCompile Include="..\private\Dee_State.cpp" />
     <ClCompile Include="..\Private\EnergyDrink.cpp" />
+    <ClCompile Include="..\private\EventCenter.cpp" />
     <ClCompile Include="..\private\FoodShopDee.cpp" />
     <ClCompile Include="..\Private\FXToolDirector.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>

@@ -399,6 +399,9 @@
     <Filter Include="02.GameObjects\Map\PortalSoftEffect">
       <UniqueIdentifier>{412e7813-8f9a-4c83-ba98-f76991e1bfc5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="04.Event">
+      <UniqueIdentifier>{1d0d493c-fa22-44f3-9d8e-a63cfb62354a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -809,6 +812,10 @@
     <ClInclude Include="..\Public\AnimBridge.h">
       <Filter>02.GameObjects\Map\Bridge</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\SkySphereSub.h" />
+    <ClInclude Include="..\public\EventCenter.h">
+      <Filter>04.Event</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1200,6 +1207,10 @@
     </ClCompile>
     <ClCompile Include="..\Private\AnimBridge.cpp">
       <Filter>02.GameObjects\Map\Bridge</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SkySphereSub.cpp" />
+    <ClCompile Include="..\private\EventCenter.cpp">
+      <Filter>04.Event</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
