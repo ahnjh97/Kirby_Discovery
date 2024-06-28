@@ -629,7 +629,7 @@
     <ClInclude Include="..\Public\ItemObject.h">
       <Filter>02.GameObjects\PhysXObject\Item</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\EnergyDrink.h">
+    <ClInclude Include="..\Public\Food.h">
       <Filter>02.GameObjects\PhysXObject\Item\EnergyDrink</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Coin.h">
@@ -809,6 +809,7 @@
     <ClInclude Include="..\Public\AnimBridge.h">
       <Filter>02.GameObjects\Map\Bridge</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\SkySphereSub.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1024,7 +1025,7 @@
     <ClCompile Include="..\Private\ItemObject.cpp">
       <Filter>02.GameObjects\PhysXObject\Item</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\EnergyDrink.cpp">
+    <ClCompile Include="..\Private\Food.cpp">
       <Filter>02.GameObjects\PhysXObject\Item\EnergyDrink</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Coin.cpp">
@@ -1201,6 +1202,7 @@
     <ClCompile Include="..\Private\AnimBridge.cpp">
       <Filter>02.GameObjects\Map\Bridge</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\SkySphereSub.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
