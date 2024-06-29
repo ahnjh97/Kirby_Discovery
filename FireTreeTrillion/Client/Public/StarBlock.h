@@ -5,21 +5,12 @@
 BEGIN(Engine)
 class CModel;
 class CShader;
-class CCharacterController;
 END
 
 BEGIN(Client)
 
-class CStarBlock final : public CMapObject
+class CStarBlock final : public CPhysXObject
 {
-public:
-	enum SIZE_TYPE { SMALL, MEDIUM, LARGE, SIZE_END };
-	
-	struct STARBLOCK_DESC : public CGameObject::GAMEOBJECT_DESC 
-	{
-		SIZE_TYPE	eSize;
-	};
-
 private:
 	CStarBlock(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CStarBlock(const CStarBlock& rhs);
@@ -37,16 +28,24 @@ public:
 #endif
 	virtual void		Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
+
 private:
-	HRESULT				Add_Components();
+	HRESULT				Add_Components(wstring wstrModelProtoTag);
 	HRESULT				Bind_ShaderResources();
 
-private:
-	CModel*					m_pModelCom = nullptr;
-	CCharacterController*	m_pControllerCom = { nullptr };
+	void				Compute_MotionBlur();
+	_float2				m_vPreScreenPos = { 0.f, 0.f };
+	_float4				m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
 
-	SIZE_TYPE				m_eSize = SIZE_END;
-	_int	m_iHP = 10;
+
+private:
+	CShader*				m_pShaderCom = { nullptr };
+	CModel*					m_pModelCom = { nullptr };
+
+	_float					m_fFlyTime = { 0.f };
+
+	_bool					m_bStaticOffTrigger = { true };
+
 	
 public:
 	static CStarBlock*	 Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
