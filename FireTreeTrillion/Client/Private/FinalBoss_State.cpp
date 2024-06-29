@@ -2,6 +2,11 @@
 #include "FinalBoss_State.h"
 #include "FinalBoss.h"
 #include "Kirby.h"
+#include "Laser.h"
+#include "DimensionGate.h"
+#include "Meteor.h"
+#include "BossClone.h"
+//#include "SpikeSpear.h"
 
 #pragma region APPEAR STATE
 //*********************************
@@ -69,101 +74,164 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	// 플레이어를 향해 바라본다
 	pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 3.f, false);
 
-	if (CFinalBoss::FINALBOSS_WAITAIR == pFinalBoss->Get_State())
+	if (CFinalBoss::STATE_2PAZE == pFinalBoss->Get_BossState())
+	{
+		//pFinalBoss->Set_BossState(CFinalBoss::STATE_FLYING);
+		if (CFinalBoss::FINALBOSS_WAITAIR == pFinalBoss->Get_State())
+		{
+			if (pFinalBoss->IsAnimFinished())
+			{
+				if(0 == m_iCnt)
+				{
+					++m_iCnt;
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_ROAR, 50.f, false, true);
+				}
+				else if(1 == m_iCnt)
+				{
+					++m_iCnt;
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SUMMONSTART, 50.f, false, true);
+				}
+				else
+				{
+					pFinalBoss->Set_Chain(true);
+					pFinalBoss->Set_BossState(CFinalBoss::STATE_FLYING);
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SUMMONSTART, 50.f, false, true);
+				}
+			}
+		}
+	}
+	else if (CFinalBoss::FINALBOSS_WAITAIR == pFinalBoss->Get_State())
 	{
 		// ㄹㅇ랜덤으로 가면 딱일듯
-		if (/*pFinalBoss->IsAnimFinished()*/0.2f < pFinalBoss->Get_AnimRatio())
+		if (/*pFinalBoss->IsAnimFinished()*/0.5f < pFinalBoss->Get_AnimRatio())
 		{
-			//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHREADY, 50.f, false, true);
-		//	if (rand() % 4 == 0)
-		//	{
-		//		// Stab 패턴
-		//		m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-		//		pFinalBoss->Set_Direction(m_vLook);
-		//		pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
-		//	}
-		//	else if (rand() % 4 == 1)
-		//	{
-		//		// Slash 패턴
-		//		pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHREADY, 50.f, false, true);
-		//	}
-		//	else if (rand() % 4 == 2)
-		//	{
-		//		// 화살 패턴
-		//		pFinalBoss->Change_State(CFinalBoss::FINALBOSS_RAYARROWREADYAIR, 50.f, false, true);
-		//	}
-		//	else
-		//	{
-		//		// 좌우 활공 패턴
-		//		_vector vBossPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-		//		_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+			// 메테오 패턴
+			//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SUMMONSTART, 50.f, false, true);
+			// 레이져 패턴
+			//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONLASEREADY, 50.f, false, true);
+			//if (m_iCnt == 0 || m_iCnt == 7)
+			//{
+			//	++m_iCnt;
+				// Stab 패턴
+				m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+				pFinalBoss->Set_Direction(m_vLook);
+				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
+			//}
+			//else if (m_iCnt == 4)
+			//{
+			//	++m_iCnt;
+			//	// Slash 패턴
+			//	pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHREADY, 50.f, false, true);
+			//}
+			//else if (m_iCnt == 6)
+			//{
+			//	++m_iCnt;
 
-		//		if (rand() % 2 == 0)
-		//		{
-		//			pFinalBoss->Set_Direction(RotateGlide(vKirbyPos, vBossPos, -45.f));
-		//			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_TURNLEFTAIRSTART, 50.f, false, true);
-		//		}
-		//		else
-		//		{
-		//			pFinalBoss->Set_Direction(RotateGlide(vKirbyPos, vBossPos, 45.f));
-		//			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_TURNRIGHTAIRSTART, 50.f, false, true);
-		//		}
-		//	}
+			//	// 좌우 활공 패턴
+			//	_vector vBossPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+			//	_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+
+			//	if (rand() % 2 == 0)
+			//	{
+			//		pFinalBoss->Set_Direction(RotateGlide(vKirbyPos, vBossPos, -45.f));
+			//		pFinalBoss->Change_State(CFinalBoss::FINALBOSS_TURNLEFTAIRSTART, 50.f, false, true);
+			//	}
+			//	else
+			//	{
+			//		pFinalBoss->Set_Direction(RotateGlide(vKirbyPos, vBossPos, 45.f));
+			//		pFinalBoss->Change_State(CFinalBoss::FINALBOSS_TURNRIGHTAIRSTART, 50.f, false, true);
+			//	}
+			//}
+			//else if (m_iCnt == 13)
+			//{
+			//	++m_iCnt;
+			//	// 화살 패턴
+			//	pFinalBoss->Change_State(CFinalBoss::FINALBOSS_RAYARROWREADYAIR, 50.f, false, true);
+			//}
+			//else if (m_iCnt == 14)
+			//{
+			//	pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONLASEREADY, 50.f, false, true);
+			//}
+			//	else if (rand() % 4 == 1)
+			//	{
+			//		// Slash 패턴
+			//		pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHREADY, 50.f, false, true);
+			//	}
+			//	else if (rand() % 4 == 2)
+			//	{
+			//		// 화살 패턴
+			//		pFinalBoss->Change_State(CFinalBoss::FINALBOSS_RAYARROWREADYAIR, 50.f, false, true);
+			//	}
+			//	else
+			//	{
+			//		// 좌우 활공 패턴
+			//		_vector vBossPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+			//		_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+
+			//		if (rand() % 2 == 0)
+			//		{
+			//			pFinalBoss->Set_Direction(RotateGlide(vKirbyPos, vBossPos, -45.f));
+			//			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_TURNLEFTAIRSTART, 50.f, false, true);
+			//		}
+			//		else
+			//		{
+			//			pFinalBoss->Set_Direction(RotateGlide(vKirbyPos, vBossPos, 45.f));
+			//			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_TURNRIGHTAIRSTART, 50.f, false, true);
+			//		}
+			//	}
 		}
 	}
 	else
 	{
-		// 백스텝 활공 패턴
-		//pFinalBoss->Set_Direction(-pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) + XMVectorSet(0.f, 0.3f, 0.f, 0.f));
-		//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_AWAYFASTREADY, 50.f, false, true);
+		// 회복 패턴
+		pFinalBoss->Change_State(CFinalBoss::FINALBOSS_JUMPSTART, 50.f, false, true);
 
-		// 스윙 패턴
-		//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SWINGRIGHTSTART, 40.f, false, true);
+		//// 백스텝 활공 패턴
+		//if (m_iCnt == 3 || m_iCnt == 5 || m_iCnt == 12)
+		//{
+		//	++m_iCnt;
+		//	pFinalBoss->Set_Direction(-pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) + XMVectorSet(0.f, 0.3f, 0.f, 0.f));
+		//	pFinalBoss->Change_State(CFinalBoss::FINALBOSS_AWAYFASTREADY, 50.f, false, true);
+		//}
 
-		// 화살 패턴
-		//if(pFinalBoss->IsAnimFinished())
+		//// 스윙 패턴
+		////pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SWINGRIGHTSTART, 40.f, false, true);
+
+		//// 화살 패턴
+		////if(pFinalBoss->IsAnimFinished())
+		////	pFinalBoss->Change_State(CFinalBoss::FINALBOSS_RAYARROWREADY, 50.f, false, true);
+
+		//// 땅에서 돌진 패턴
+		//else if (m_iCnt == 1)
+		//{
+		//	++m_iCnt;
+		//	pFinalBoss->Change_State(CFinalBoss::FINALBOSS_FLASHTHRUSTREADY, 50.f, false, true);
+		//}
+
+		//// 대못박기 패턴
+		//else if (m_iCnt == 2)
+		//{
+		//	++m_iCnt;
+		//	pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONSPIKEREADY, 50.f, false, true);
+		//}
+		//else if (m_iCnt == 8 || m_iCnt == 9 || m_iCnt == 10)
+		//{
+		//	++m_iCnt;
+		//	// 스윙 패턴
+		//	pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SWINGRIGHTSTART, 40.f, false, true);
+		//}
+		//else if (m_iCnt == 11)
+		//{
+		//	++m_iCnt;
+		//	// 화살 패턴
 		//	pFinalBoss->Change_State(CFinalBoss::FINALBOSS_RAYARROWREADY, 50.f, false, true);
-
-		// 땅에서 찌르기 패턴
-		if(pFinalBoss->IsAnimFinished())
-			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_FLASHTHRUSTREADY, 50.f, false, true);
+		//}
 	}
 }
 
 void CFinalBoss_Idle_State::OnStateExit()
 {
 }
-
-//void CFinalBoss_Idle_State::GlideToRallyPoint(CFinalBoss* pFinalBoss, CTransform* pTransformCom)
-//{
-//	_float shortestDistance = FLT_MAX;
-//	_bool bFindMonster = { false };
-//
-//	for (size_t i = 0; i < pFinalBoss->Get_RallyPoint().size(); i++)
-//	{
-		//_vector vBossPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-		//_vector vRallyPoint = pFinalBoss->Get_RallyPoint()[i];
-
-		//_vector vDistance = XMVectorSubtract(vBossPos, vRallyPoint);
-
-		//_float fDistance = XMVectorGetX(XMVector3Length(vDistance));
-//
-//		// 가장 짧은 거리 업데이트
-//		if (fDistance < shortestDistance)
-//		{
-//			shortestDistance = fDistance;
-//			m_ShortestPos = vRallyPoint;
-//			bFindMonster = true;
-//		}
-//	}
-//
-//	// 가장 가까운 몬스터를 찾았다면, 플레이어가 그 몬스터를 바라보도록 함
-//	if (bFindMonster)
-//	{
-//		m_vLook = m_ShortestPos - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-//		pFinalBoss->Set_Look(m_vLook);
-//	}
-//}
 
 _vector CFinalBoss_Idle_State::RotateGlide(_fvector vPivotPos, _fvector _vRotatePos, _float fAngle)
 {
@@ -299,30 +367,11 @@ void CFinalBoss_GlideBack_State::OnStateUpdate(CGameObject* pGameObject, _float 
 	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
 	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
 
-	if (true == pFinalBoss->IsAnimFinished())
-	{
-		switch (pFinalBoss->Get_State())
-		{
-		case CFinalBoss::FINALBOSS_AWAYFASTREADY:
-			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_AWAYFASTSTART, 50.f, false, true);
-			break;
-		case CFinalBoss::FINALBOSS_AWAYFASTSTART:
-			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_AWAYFAST, 30.f, false, true);
-			break;
-		case CFinalBoss::FINALBOSS_AWAYFAST:
-			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_AWAYFASTENDAIR, 50.f, false, true);
-			break;
-		//case CFinalBoss::FINALBOSS_AWAYFASTENDAIR:
-		//	pFinalBoss->Change_State(CFinalBoss::FINALBOSS_AWAYFASTENDAIR, 50.f, false, true);
-		//	break;
-		}
-	}
-
 	if (CFinalBoss::FINALBOSS_AWAYFASTSTART == pFinalBoss->Get_State() || CFinalBoss::FINALBOSS_AWAYFAST == pFinalBoss->Get_State() || CFinalBoss::FINALBOSS_AWAYFASTENDAIR == pFinalBoss->Get_State())
 	{
-		if(CFinalBoss::FINALBOSS_AWAYFASTENDAIR == pFinalBoss->Get_State())
+		if (CFinalBoss::FINALBOSS_AWAYFASTENDAIR == pFinalBoss->Get_State())
 		{
-			if(0.3f < pFinalBoss->Get_AnimRatio())
+			if (0.3f < pFinalBoss->Get_AnimRatio())
 			{
 				if (0.f < m_fSpeed)
 					m_fSpeed -= fTimeDelta * 2.f;
@@ -342,6 +391,24 @@ void CFinalBoss_GlideBack_State::OnStateUpdate(CGameObject* pGameObject, _float 
 	{
 		if (pFinalBoss->IsAnimFinished())
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_WAITAIR, 50.f, false, true);
+	}
+	if (true == pFinalBoss->IsAnimFinished())
+	{
+		switch (pFinalBoss->Get_State())
+		{
+		case CFinalBoss::FINALBOSS_AWAYFASTREADY:
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_AWAYFASTSTART, 50.f, false, true);
+			break;
+		case CFinalBoss::FINALBOSS_AWAYFASTSTART:
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_AWAYFAST, 30.f, false, true);
+			break;
+		case CFinalBoss::FINALBOSS_AWAYFAST:
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_AWAYFASTENDAIR, 50.f, false, true);
+			break;
+		//case CFinalBoss::FINALBOSS_AWAYFASTENDAIR:
+		//	pFinalBoss->Change_State(CFinalBoss::FINALBOSS_AWAYFASTENDAIR, 50.f, false, true);
+		//	break;
+		}
 	}
 }
 
@@ -817,6 +884,8 @@ CFinalBoss_Thrust_State::CFinalBoss_Thrust_State()
 void CFinalBoss_Thrust_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
+
+	m_fSpeed = 40.f;
 }
 
 void CFinalBoss_Thrust_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -824,6 +893,25 @@ void CFinalBoss_Thrust_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(pGameObject);
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player")));
+	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
+
+	if (CFinalBoss::FINALBOSS_FLASHTHRUSTREADY == pFinalBoss->Get_State() || CFinalBoss::FINALBOSS_FLASHTHRUSTSWINGFINISHLEFT == pFinalBoss->Get_State())
+	{
+		pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 3.f);
+	}
+	else if(CFinalBoss::FINALBOSS_FLASHTHRUSTSTART == pFinalBoss->Get_State() || CFinalBoss::FINALBOSS_FLASHTHRUST == pFinalBoss->Get_State())
+	{
+		_float fHeight = pController->Compute_Height(pTransformCom->Get_State_Vector(CTransform::STATE_LOOK));
+
+		if (2.f < fHeight)
+			m_fSpeed = 0.f;
+		else
+			m_fSpeed = 40.f;
+
+		pController->Move_Dir(pTransformCom, XMVector3Normalize(pTransformCom->Get_State_Vector(CTransform::STATE_LOOK)) * fTimeDelta * m_fSpeed, fTimeDelta);
+	}
 
 	if (true == pFinalBoss->IsAnimFinished())
 	{
@@ -836,10 +924,19 @@ void CFinalBoss_Thrust_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_FLASHTHRUST, 50.f, false, true);
 			break;
 		case CFinalBoss::FINALBOSS_FLASHTHRUST:
-			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_FLASHTHRUSTEND, 50.f, false, true);
+			if(rand() % 2 == 1)
+				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_FLASHTHRUSTEND, 50.f, false, true);
+			else
+				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_FLASHTHRUSTSWINGFINISHLEFT, 50.f, false, true);
+			break;
+		case CFinalBoss::FINALBOSS_FLASHTHRUSTSWINGFINISHLEFT:
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SWINGFINISHLEFT, 30.f, false, true);
 			break;
 		case CFinalBoss::FINALBOSS_FLASHTHRUSTEND:
-			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_WAIT, 50.f, false, true);
+			if(rand() % 2 == 0)
+				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_WAIT, 50.f, false, true);
+			else
+				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_FLASHTHRUSTREADY, 50.f, false, true);
 			break;
 		}
 	}
@@ -856,6 +953,573 @@ CFinalBoss_Thrust_State* CFinalBoss_Thrust_State::Create()
 }
 
 void CFinalBoss_Thrust_State::Free()
+{
+	__super::Free();
+}
+#pragma endregion
+
+
+#pragma region LASER STATE
+//*********************************
+//			 LASER STATE
+//*********************************
+CFinalBoss_Laser_State::CFinalBoss_Laser_State()
+{
+}
+
+void CFinalBoss_Laser_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
+}
+
+void CFinalBoss_Laser_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(pGameObject);
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player")));
+	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
+
+	CLaser* pLaser = static_cast<CLaser*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Laser")));
+
+	if (CFinalBoss::FINALBOSS_DIMENSIONLASERSTART == pFinalBoss->Get_State())
+	{
+		if (pFinalBoss->IsAnimFinished())
+		{
+			HRESULT hr;
+
+			CLaser::LASER_DESC LaserDesc = {};
+			LaserDesc.vPosition = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Laser"), TEXT("Prototype_GameObject_Laser"), &LaserDesc);
+			CHECK_FAILED(hr);
+		}
+
+		pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta);
+	}
+	else if (CFinalBoss::FINALBOSS_DIMENSIONLASER == pFinalBoss->Get_State())
+	{
+		m_fTimeDelta += fTimeDelta;
+		if (7.f < m_fTimeDelta)
+		{
+			pLaser->Set_EndLaser(true);
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONLASEREND, 50.f, false, true);
+		}
+	}
+
+	if (true == pFinalBoss->IsAnimFinished())
+	{
+		switch (pFinalBoss->Get_State())
+		{
+		case CFinalBoss::FINALBOSS_DIMENSIONLASEREADY:
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONLASERCHARGE, 50.f, false, true);
+			break;
+		case CFinalBoss::FINALBOSS_DIMENSIONLASERCHARGE:
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONLASERSTART, 50.f, false, true);
+			break;
+		case CFinalBoss::FINALBOSS_DIMENSIONLASERSTART:
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONLASER, 50.f, true, true);
+			break;
+		case CFinalBoss::FINALBOSS_DIMENSIONLASEREND:
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_WAITAIR, 50.f, false, true);
+			break;
+		}
+	}
+}
+
+void CFinalBoss_Laser_State::OnStateExit()
+{
+}
+
+CFinalBoss_Laser_State* CFinalBoss_Laser_State::Create()
+{
+	CFinalBoss_Laser_State* pInstance = new CFinalBoss_Laser_State();
+	return pInstance;
+}
+
+void CFinalBoss_Laser_State::Free()
+{
+	__super::Free();
+}
+#pragma endregion
+
+
+#pragma region SPIKE STATE
+//*********************************
+//			 SPIKE STATE
+//*********************************
+CFinalBoss_Spike_State::CFinalBoss_Spike_State()
+{
+}
+
+void CFinalBoss_Spike_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
+	
+	m_iCnt = 0;
+	m_fTimeDelta = 0.f;
+}
+
+void CFinalBoss_Spike_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(pGameObject);
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+
+	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	_vector vRight = pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT);
+	_vector vLook = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+
+	if (CFinalBoss::FINALBOSS_DIMENSIONSPIKEREADYWAIT == pFinalBoss->Get_State())
+	{
+		m_fTimeDelta += fTimeDelta;
+		m_fLifeTime += fTimeDelta;
+		if(m_iCnt < 5)
+		{
+			if (0.2f < m_fTimeDelta)
+			{
+				m_fTimeDelta = 0.f;
+
+				HRESULT hr;
+
+				CDimensionGate::DIMENSIONGATE_DESC DimensionGateDesc = {};
+				DimensionGateDesc.vPosition = vPos + (vLook * m_arrLook[m_iCnt] * 1.5f) + (vRight * m_arrRight[m_iCnt] * 1.5f);
+				DimensionGateDesc.fScale = 0.05f;
+				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Gate"), TEXT("Prototype_GameObject_DimensionGate"), &DimensionGateDesc);
+				CHECK_FAILED(hr);
+
+				++m_iCnt;
+			}
+		}
+
+		m_fLifeTime += fTimeDelta;
+		if (3.f < m_fTimeDelta)
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONSPIKEEND, 50.f, false, true);
+	}
+	//else if (CFinalBoss::FINALBOSS_DIMENSIONSPIKEREADYWAIT == pFinalBoss->Get_State())
+	//{
+	//	m_fTimeDelta += fTimeDelta;
+	//	if(3.f < m_fTimeDelta)
+	//		pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONSPIKEEND, 50.f, true, true);
+	//}
+	//else
+
+	if (true == pFinalBoss->IsAnimFinished())
+	{
+		switch (pFinalBoss->Get_State())
+		{
+		case CFinalBoss::FINALBOSS_DIMENSIONSPIKEREADY:
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONSPIKEREADYWAIT, 50.f, false, true);
+			break;
+		case CFinalBoss::FINALBOSS_DIMENSIONSPIKEREADYWAIT:
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONSPIKESTART, 50.f, false, true);
+			break;
+		case CFinalBoss::FINALBOSS_DIMENSIONSPIKESTART:
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONSPIKE, 50.f, false, true);
+			break;
+		case CFinalBoss::FINALBOSS_DIMENSIONSPIKE:
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONSPIKEEND, 50.f, false, true);
+			break;
+		case CFinalBoss::FINALBOSS_DIMENSIONSPIKEEND:
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_WAIT, 50.f, false, true);
+			break;
+		}
+	}
+}
+
+void CFinalBoss_Spike_State::OnStateExit()
+{
+}
+
+CFinalBoss_Spike_State* CFinalBoss_Spike_State::Create()
+{
+	CFinalBoss_Spike_State* pInstance = new CFinalBoss_Spike_State();
+	return pInstance;
+}
+
+void CFinalBoss_Spike_State::Free()
+{
+	__super::Free();
+}
+#pragma endregion
+
+
+#pragma region JUMP STATE
+//*********************************
+//			 JUMP STATE
+//*********************************
+CFinalBoss_Jump_State::CFinalBoss_Jump_State()
+{
+}
+
+void CFinalBoss_Jump_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
+}
+
+void CFinalBoss_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(pGameObject);
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+
+	if (CFinalBoss::FINALBOSS_JUMPREADY != pFinalBoss->Get_State())
+	{
+		_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+		pController->Move_Dir(pTransformCom, XMVector3Normalize(pTransformCom->Get_State_Vector(CTransform::STATE_UP)) * fTimeDelta * 30.f, fTimeDelta);
+	}
+
+	if (true == pFinalBoss->IsAnimFinished())
+	{
+		switch (pFinalBoss->Get_State())
+		{
+		case CFinalBoss::FINALBOSS_JUMPREADY:
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_JUMPSTART, 50.f, false, true);
+			break;
+		case CFinalBoss::FINALBOSS_JUMPSTART:
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_JUMPEND, 50.f, false, true);
+			break;
+		case CFinalBoss::FINALBOSS_JUMPEND:
+			if(CFinalBoss::STATE_2PAZE == pFinalBoss->Get_BossState())
+			{
+				pController->Set_Position(pTransformCom, pFinalBoss->Get_RallyPoint()[2]);
+				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_WAITAIR, 50.f, false, true);
+			}
+			else
+			{
+				pController->Set_Position(pTransformCom, XMVectorSet(-0.115f, 40.f, -0.218f, 1.f));
+				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_RECOVERYSTART, 50.f, false, true);
+			}
+			break;
+		}
+	}
+}
+
+void CFinalBoss_Jump_State::OnStateExit()
+{
+}
+
+CFinalBoss_Jump_State* CFinalBoss_Jump_State::Create()
+{
+	CFinalBoss_Jump_State* pInstance = new CFinalBoss_Jump_State();
+	return pInstance;
+}
+
+void CFinalBoss_Jump_State::Free()
+{
+	__super::Free();
+}
+#pragma endregion
+
+
+#pragma region METEOR STATE
+//*********************************
+//			 METEOR STATE
+//*********************************
+CFinalBoss_Meteor_State::CFinalBoss_Meteor_State()
+{
+}
+
+void CFinalBoss_Meteor_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
+}
+
+void CFinalBoss_Meteor_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(pGameObject);
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+
+	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	_vector vRight = pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT);
+	_vector vUp = pTransformCom->Get_State_Vector(CTransform::STATE_UP);
+	_vector vLook = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+
+	if (true == pFinalBoss->IsAnimFinished())
+	{
+		CMeteor::METEOR_DESC MeteorDesc = {};
+
+		switch (pFinalBoss->Get_State())
+		{
+		case CFinalBoss::FINALBOSS_SUMMONSTART:
+			HRESULT hr;
+			if (true == pFinalBoss->Get_Chain())
+			{
+				pFinalBoss->Set_Chain(false);
+				MeteorDesc.vPosition = vPos + (vLook * (_float)CUtils::Make_RandomInt(-80, -70)) + (vRight * (_float)CUtils::Make_RandomInt(-5, 5)) + (vUp * (_float)CUtils::Make_RandomInt(30, 45));
+				MeteorDesc.fDelayTime = 2.f;
+				MeteorDesc.strTag = TEXT("Prototype_Component_Model_BigDebris");
+				MeteorDesc.bBig = true;
+				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Meteor"), TEXT("Prototype_GameObject_Meteor"), &MeteorDesc);
+				CHECK_FAILED(hr);
+			}
+			else
+			{
+				MeteorDesc.vPosition = vPos + (vLook * (_float)CUtils::Make_RandomInt(-70, -50)) + (vRight * (_float)CUtils::Make_RandomInt(-25, -15)) + (vUp * (_float)CUtils::Make_RandomInt(25, 40));
+				MeteorDesc.fDelayTime = 1.5f;
+				MeteorDesc.strTag = TEXT("Prototype_Component_Model_SmallDebris");
+				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Meteor"), TEXT("Prototype_GameObject_Meteor"), &MeteorDesc);
+				CHECK_FAILED(hr);
+				MeteorDesc.vPosition = vPos + (vLook * (_float)CUtils::Make_RandomInt(-70, -60)) + (vRight * (_float)CUtils::Make_RandomInt(-5, 5)) + (vUp * (_float)CUtils::Make_RandomInt(30, 45));
+				MeteorDesc.fDelayTime = 2.f;
+				MeteorDesc.strTag = TEXT("Prototype_Component_Model_SmallDebris");
+				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Meteor"), TEXT("Prototype_GameObject_Meteor"), &MeteorDesc);
+				CHECK_FAILED(hr);
+				MeteorDesc.vPosition = vPos + (vLook * (_float)CUtils::Make_RandomInt(-70, -50)) + (vRight * (_float)CUtils::Make_RandomInt(15, 25)) + (vUp * (_float)CUtils::Make_RandomInt(20, 40));
+				MeteorDesc.fDelayTime = 2.5f;
+				MeteorDesc.strTag = TEXT("Prototype_Component_Model_SmallDebris");
+				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Meteor"), TEXT("Prototype_GameObject_Meteor"), &MeteorDesc);
+				CHECK_FAILED(hr);
+			}
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SUMMONWAIT, 30.f, false, true);
+			break;
+		case CFinalBoss::FINALBOSS_SUMMONWAIT:
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SUMMON, 50.f, false, true);
+			break;
+		case CFinalBoss::FINALBOSS_SUMMON:
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SUMMONEND, 50.f, false, true);
+			break;
+		case CFinalBoss::FINALBOSS_SUMMONEND:
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_WAITAIR, 50.f, false, true);
+			break;
+		}
+	}
+}
+
+void CFinalBoss_Meteor_State::OnStateExit()
+{
+}
+
+CFinalBoss_Meteor_State* CFinalBoss_Meteor_State::Create()
+{
+	CFinalBoss_Meteor_State* pInstance = new CFinalBoss_Meteor_State();
+	return pInstance;
+}
+
+void CFinalBoss_Meteor_State::Free()
+{
+	__super::Free();
+}
+#pragma endregion
+
+
+#pragma region ROAR STATE
+//*********************************
+//			 ROAR STATE
+//*********************************
+CFinalBoss_Roar_State::CFinalBoss_Roar_State()
+{
+}
+
+void CFinalBoss_Roar_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
+}
+
+void CFinalBoss_Roar_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(pGameObject);
+
+	if (true == pFinalBoss->IsAnimFinished())
+	{
+		switch (pFinalBoss->Get_State())
+		{
+		case CFinalBoss::FINALBOSS_ROAR:
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SUMMONSTART, 50.f, false, true);
+			break;
+		}
+	}
+}
+
+void CFinalBoss_Roar_State::OnStateExit()
+{
+}
+
+CFinalBoss_Roar_State* CFinalBoss_Roar_State::Create()
+{
+	CFinalBoss_Roar_State* pInstance = new CFinalBoss_Roar_State();
+	return pInstance;
+}
+
+void CFinalBoss_Roar_State::Free()
+{
+	__super::Free();
+}
+#pragma endregion
+
+
+#pragma region DAMAGE STATE
+//*********************************
+//			 DAMAGE STATE
+//*********************************
+CFinalBoss_Damage_State::CFinalBoss_Damage_State()
+{
+}
+
+void CFinalBoss_Damage_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
+
+	m_fSpeed = 5.f;
+}
+
+void CFinalBoss_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(pGameObject);
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+
+	if (0.f < m_fSpeed)
+	{
+		m_fSpeed -= fTimeDelta * 3.f;
+		pController->Move_Dir(pTransformCom, -XMVector3Normalize(pTransformCom->Get_State_Vector(CTransform::STATE_LOOK)) * fTimeDelta * m_fSpeed, fTimeDelta);
+	}
+	else
+		m_fSpeed = 0.f;
+
+	if (pFinalBoss->IsAnimFinished())
+	{
+		pFinalBoss->Change_State(CFinalBoss::FINALBOSS_JUMPREADY, 50.f, false, true);
+	}
+}
+
+void CFinalBoss_Damage_State::OnStateExit()
+{
+}
+
+CFinalBoss_Damage_State* CFinalBoss_Damage_State::Create()
+{
+	CFinalBoss_Damage_State* pInstance = new CFinalBoss_Damage_State();
+	return pInstance;
+}
+
+void CFinalBoss_Damage_State::Free()
+{
+	__super::Free();
+}
+#pragma endregion
+
+
+#pragma region RECOVERY STATE
+//*********************************
+//			 RECOVERY STATE
+//*********************************
+CFinalBoss_Recovery_State::CFinalBoss_Recovery_State()
+{
+}
+
+void CFinalBoss_Recovery_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
+
+	m_bMove = false;
+	m_fSpeed = 1.f;
+	m_fSecondSpeed = 1.f;
+}
+
+void CFinalBoss_Recovery_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(pGameObject);
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+
+	if (CFinalBoss::FINALBOSS_RECOVERYSTART == pFinalBoss->Get_State())
+	{
+		_float fDeceleration = m_fSpeed * m_fSpeed;
+
+		if(0.45f < pFinalBoss->Get_AnimRatio())
+		{
+			if (0.f < m_fSpeed)
+				m_fSpeed -= fTimeDelta;
+			else
+				m_fSpeed = 0.f;
+		}
+
+		_vector vUp = pTransformCom->Get_State_Vector(CTransform::STATE_UP);
+		pController->Move_Dir(pTransformCom, XMVector3Normalize(-vUp) * fTimeDelta * fDeceleration * 20.f, fTimeDelta);
+	}
+	else if (CFinalBoss::FINALBOSS_RECOVERYWAIT == pFinalBoss->Get_State())
+	{
+		_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+		_vector vTargetPos = pFinalBoss->Get_RallyPoint()[5];
+
+		_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(vPos, vTargetPos)));
+		if (false == m_bMove)
+		{
+			if (15.f < fDistance)
+			{
+				if (0.f < m_fSpeed)
+					m_fSpeed -= fTimeDelta * 1.2f;
+				else
+					m_fSpeed = 0.f;
+
+				vPos += XMVector3Normalize(vTargetPos - vPos) * fTimeDelta * 22.f * m_fSpeed;
+				vPos.m128_f32[1] = pFinalBoss->Get_Position().m128_f32[1];
+				pController->Move(pTransformCom, vPos, fTimeDelta);
+			}
+			else
+			{
+				m_fDelayTime += fTimeDelta;
+				if (0.1f < m_fDelayTime)
+					m_bMove = true;
+			}
+		}
+		else if (true == m_bMove)
+		{
+			if (0.5f < fDistance)
+			{
+				if (0.f < m_fSecondSpeed)
+					m_fSecondSpeed -= fTimeDelta * 0.8f;
+				else
+					m_fSecondSpeed = 0.f;
+
+				vPos += XMVector3Normalize(vTargetPos - vPos) * fTimeDelta * 22.f * m_fSecondSpeed;
+				vPos.m128_f32[1] += 1.f;
+				pController->Move(pTransformCom, vPos, fTimeDelta);
+			}
+		}
+	}
+
+	if (true == pFinalBoss->IsAnimFinished())
+	{
+		CBossClone::BOSSCLONE_DESC BossCloneDesc = {};
+
+		switch (pFinalBoss->Get_State())
+		{
+		case CFinalBoss::FINALBOSS_RECOVERYSTART:
+			HRESULT hr;
+			pFinalBoss->Set_Position(pTransformCom->Get_State(CTransform::STATE_POSITION));
+			BossCloneDesc.vPosition = pTransformCom->Get_State(CTransform::STATE_POSITION);
+			BossCloneDesc.vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+			BossCloneDesc.vTargetPos = pFinalBoss->Get_RallyPoint()[3];
+			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Clone"), TEXT("Prototype_GameObject_BossClone"), &BossCloneDesc);
+			CHECK_FAILED(hr);
+			BossCloneDesc.vTargetPos = pFinalBoss->Get_RallyPoint()[4];
+			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Clone"), TEXT("Prototype_GameObject_BossClone"), &BossCloneDesc);
+			CHECK_FAILED(hr);
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_RECOVERYWAIT, 50.f, true, true);
+			break;
+		case CFinalBoss::FINALBOSS_RECOVERYWAIT:
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_RECOVERYEND, 50.f, false, true);
+			break;
+		case CFinalBoss::FINALBOSS_RECOVERYEND:
+			//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SUMMONSTART, 50.f, false, true);
+			break;
+		}
+	}
+}
+
+void CFinalBoss_Recovery_State::OnStateExit()
+{
+}
+
+CFinalBoss_Recovery_State* CFinalBoss_Recovery_State::Create()
+{
+	CFinalBoss_Recovery_State* pInstance = new CFinalBoss_Recovery_State();
+	return pInstance;
+}
+
+void CFinalBoss_Recovery_State::Free()
 {
 	__super::Free();
 }

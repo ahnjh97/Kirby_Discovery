@@ -16,7 +16,6 @@ public:
 	struct RAYARROW_DESC : public CGameObject::GAMEOBJECT_DESC {
 		_float fAngle = { 0.f };
 		_float fHeight = { 0.f };
-		//_float fSide = { 0.f };
 		_float fDelayTime = { 0.f };
 		_vector vPosition = {};
 		_vector vSide = {};
@@ -39,7 +38,7 @@ public:
 	virtual HRESULT Render()						override;
 	virtual HRESULT Render_LightDepth()				override;
 #ifdef _DEBUG
-	virtual	void CRayArrow::Render_IMGUI()			override;
+	virtual	void Render_IMGUI()			override;
 #endif
 
 private:
@@ -54,9 +53,7 @@ private:
 	_float			m_fDeadTime = { 0.f };
 
 	_float			m_fAngle = { 0.f };
-
 	_float			m_fHeight = { 0.f };
-	//_float			m_fSide = { 0.f };
 
 	_vector			m_vPosition = {};
 	_vector			m_vKirbyPos = {};

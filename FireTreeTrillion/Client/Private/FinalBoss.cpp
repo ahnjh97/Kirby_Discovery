@@ -44,13 +44,13 @@ HRESULT CFinalBoss::Initialize(void* pArg)
 	if (FAILED(Add_PartObjects()))
 		return E_FAIL;
 
-	m_pModelCom->Set_Animation(FINALBOSS_DEMOAPPEARCUT5, 70.f, false, true);
-
 	m_fMaxHp = 15.f;
 	m_fHp = 15.f;
 	m_fAttack = 10.f;
 	m_eVacuumSize = SIZE_BIG;
 	m_eBossState = STATE_FLYING;
+
+	m_pModelCom->Set_Animation(FINALBOSS_DEMOAPPEARCUT5, 70.f, false, true);
 
 	return S_OK;
 }
@@ -62,6 +62,17 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
+	if (m_pGameInstance->Get_KeyState(DIK_K, KEY_DOWN))
+	{
+		Set_BossState(STATE_2PAZE);
+		m_pControllerCom->Set_Position(m_pTransformCom, m_vecRallyPoint[1]);
+		m_pTransformCom->Look_At(m_vecRallyPoint[0]);
+		Change_State(FINALBOSS_DAMAGE, 50.f, false, true);
+	}
+	else if (m_pGameInstance->Get_KeyState(DIK_L, KEY_DOWN))
+	{
+		Change_State(FINALBOSS_DAMAGE, 50.f, false, true);
+	}
 
 	if (true == m_bGlide)
 	{
@@ -69,7 +80,7 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 		_float fAmplitude = 1.f;	// 진폭
 		_float fFrequency = 1.5f;   // 주기
 
-		_vector vGlidePos;
+		_vector vGlidePos = {};
 		// 애니메이션에 따라 속도 가중치 ?!
 		m_fGlideTime += m_fTimeDelta * 0.095f;
 		vGlidePos = vPos + m_fGlideTime * (m_vDir - vPos);
@@ -95,7 +106,7 @@ void CFinalBoss::Late_Tick(_float fTimeDelta)
 	for (auto& Pair : m_PartObjects)
 		Pair.second->Late_Tick(m_fTimeDelta);
 
-	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 12.0f))
+	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 100.0f))
 	{
 		m_pModelCom->Play_Animation(m_fTimeDelta);
 
@@ -172,6 +183,7 @@ void CFinalBoss::Render_IMGUI()
 
 void CFinalBoss::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
+
 }
 
 void CFinalBoss::Change_State(FINALBOSS_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
@@ -204,7 +216,7 @@ HRESULT CFinalBoss::Add_Components()
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
-	desc.fOffset = 0.5f;
+	desc.fOffset = 1.f;
 	desc.tCapsuleShape.fHeight = 1.f;
 	desc.tCapsuleShape.fRadius = 1.f;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
@@ -345,6 +357,44 @@ void CFinalBoss::SetUp_FSM()
 	m_pFSM->Add_State(FINALBOSS_FLASHTHRUSTSTART, CFinalBoss_Thrust_State::Create());
 	m_pFSM->Add_State(FINALBOSS_FLASHTHRUST, CFinalBoss_Thrust_State::Create());
 	m_pFSM->Add_State(FINALBOSS_FLASHTHRUSTEND, CFinalBoss_Thrust_State::Create());
+	m_pFSM->Add_State(FINALBOSS_FLASHTHRUSTSWINGFINISHLEFT, CFinalBoss_Thrust_State::Create());
+
+	// 레이져 패턴
+	m_pFSM->Add_State(FINALBOSS_DIMENSIONLASEREADY, CFinalBoss_Laser_State::Create());
+	m_pFSM->Add_State(FINALBOSS_DIMENSIONLASERCHARGE, CFinalBoss_Laser_State::Create());
+	m_pFSM->Add_State(FINALBOSS_DIMENSIONLASERSTART, CFinalBoss_Laser_State::Create());
+	m_pFSM->Add_State(FINALBOSS_DIMENSIONLASER, CFinalBoss_Laser_State::Create());
+	m_pFSM->Add_State(FINALBOSS_DIMENSIONLASEREND, CFinalBoss_Laser_State::Create());
+
+	// 대못박기 패턴
+	m_pFSM->Add_State(FINALBOSS_DIMENSIONSPIKEREADY, CFinalBoss_Spike_State::Create());
+	m_pFSM->Add_State(FINALBOSS_DIMENSIONSPIKEREADYWAIT, CFinalBoss_Spike_State::Create());
+	m_pFSM->Add_State(FINALBOSS_DIMENSIONSPIKESTART, CFinalBoss_Spike_State::Create());
+	m_pFSM->Add_State(FINALBOSS_DIMENSIONSPIKE, CFinalBoss_Spike_State::Create());
+	m_pFSM->Add_State(FINALBOSS_DIMENSIONSPIKEWAIT, CFinalBoss_Spike_State::Create());
+	m_pFSM->Add_State(FINALBOSS_DIMENSIONSPIKEEND, CFinalBoss_Spike_State::Create());
+
+	// 점프
+	m_pFSM->Add_State(FINALBOSS_JUMPREADY, CFinalBoss_Jump_State::Create());
+	m_pFSM->Add_State(FINALBOSS_JUMPSTART, CFinalBoss_Jump_State::Create());
+	m_pFSM->Add_State(FINALBOSS_JUMPEND, CFinalBoss_Jump_State::Create());
+
+	// 데미지 
+	m_pFSM->Add_State(FINALBOSS_DAMAGE, CFinalBoss_Damage_State::Create());
+
+	// 2페이즈 시작
+	m_pFSM->Add_State(FINALBOSS_ROAR, CFinalBoss_Roar_State::Create());
+
+	// 메테오 패턴
+	m_pFSM->Add_State(FINALBOSS_SUMMONSTART, CFinalBoss_Meteor_State::Create());
+	m_pFSM->Add_State(FINALBOSS_SUMMONWAIT, CFinalBoss_Meteor_State::Create());
+	m_pFSM->Add_State(FINALBOSS_SUMMON, CFinalBoss_Meteor_State::Create());
+	m_pFSM->Add_State(FINALBOSS_SUMMONEND, CFinalBoss_Meteor_State::Create());
+
+	// 진짜를 찾아라 회복 패턴
+	m_pFSM->Add_State(FINALBOSS_RECOVERYSTART, CFinalBoss_Recovery_State::Create());
+	m_pFSM->Add_State(FINALBOSS_RECOVERYWAIT, CFinalBoss_Recovery_State::Create());
+	m_pFSM->Add_State(FINALBOSS_RECOVERYEND, CFinalBoss_Recovery_State::Create());
 
 	//상태 Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};

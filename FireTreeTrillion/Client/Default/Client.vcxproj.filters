@@ -318,7 +318,7 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\BossMonster\RayArrow">
       <UniqueIdentifier>{f9898ce1-9a1d-4fb0-b5de-96feac78a5bb}</UniqueIdentifier>
-	</Filter>
+    </Filter>
     <Filter Include="01.Levels\_Loader">
       <UniqueIdentifier>{2433d7e5-8e5b-4e5a-9e6b-265a49b4604a}</UniqueIdentifier>
     </Filter>
@@ -416,6 +416,21 @@
     </Filter>
     <Filter Include="02.GameObjects\Map\BlendMapObject">
       <UniqueIdentifier>{65399ffe-175b-49c9-98d6-f92a04f307f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\BossMonster\Laser">
+      <UniqueIdentifier>{57eab38f-6d3a-4ab5-9a19-25ca35cc8f16}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\BossMonster\SpikeSpear">
+      <UniqueIdentifier>{41cd11dc-759d-4a57-9f63-c053df6343e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\BossMonster\DimensionGate">
+      <UniqueIdentifier>{428bc716-cf9c-46dc-b08e-4b9fad21ec3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\BossMonster\Meteor">
+      <UniqueIdentifier>{484316be-b2ce-4ed3-82c9-ee37bc232958}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\BossMonster\BossClone">
+      <UniqueIdentifier>{e8be6b82-b8ef-4544-82ef-46b8cfb26a7a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -751,7 +766,7 @@
     </ClInclude>
     <ClInclude Include="..\Public\RayArrow.h">
       <Filter>02.GameObjects\PhysXObject\Character\BossMonster\RayArrow</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\Public\Level_PartTime.h">
       <Filter>01.Levels\4-1. PartTime</Filter>
     </ClInclude>
@@ -823,7 +838,21 @@
     </ClInclude>
     <ClInclude Include="..\Public\NonRenderWall.h">
       <Filter>02.GameObjects\Map\NonRenderWall</Filter>
->>>>>>> main
+    </ClInclude>
+    <ClInclude Include="..\Public\Laser.h">
+      <Filter>02.GameObjects\PhysXObject\Character\BossMonster\Laser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SpikeSpear.h">
+      <Filter>02.GameObjects\PhysXObject\Character\BossMonster\SpikeSpear</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\DimensionGate.h">
+      <Filter>02.GameObjects\PhysXObject\Character\BossMonster\DimensionGate</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Meteor.h">
+      <Filter>02.GameObjects\PhysXObject\Character\BossMonster\Meteor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BossClone.h">
+      <Filter>02.GameObjects\PhysXObject\Character\BossMonster\BossClone</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1141,7 +1170,7 @@
     </ClCompile>
     <ClCompile Include="..\Private\RayArrow.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\BossMonster\RayArrow</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="..\Private\Level_PartTime.cpp">
       <Filter>01.Levels\4-1. PartTime</Filter>
     </ClCompile>
@@ -1213,6 +1242,21 @@
     </ClCompile>
     <ClCompile Include="..\Private\NonRenderWall.cpp">
       <Filter>02.GameObjects\Map\NonRenderWall</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Laser.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\BossMonster\Laser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SpikeSpear.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\BossMonster\SpikeSpear</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\DimensionGate.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\BossMonster\DimensionGate</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Meteor.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\BossMonster\Meteor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BossClone.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\BossMonster\BossClone</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -188,6 +188,7 @@
     <ClInclude Include="..\Public\BlendMapObject.h" />
     <ClInclude Include="..\Public\BombOrbit.h" />
     <ClInclude Include="..\Public\BombOrbitGlow.h" />
+    <ClInclude Include="..\Public\BossClone.h" />
     <ClInclude Include="..\Public\BreakableRock.h" />
     <ClInclude Include="..\Public\BreakableRockPartical.h" />
     <ClInclude Include="..\Public\BrontoBurt.h" />
@@ -212,6 +213,7 @@
     <ClInclude Include="..\Public\DeeDeeDee_State.h" />
     <ClInclude Include="..\public\Dee_Part.h" />
     <ClInclude Include="..\public\Dee_State.h" />
+    <ClInclude Include="..\Public\DimensionGate.h" />
     <ClInclude Include="..\Public\EnergyDrink.h" />
     <ClInclude Include="..\Public\FinalBoss.h" />
     <ClInclude Include="..\Public\FinalBossSpear.h" />
@@ -243,6 +245,7 @@
     <ClInclude Include="..\Public\KirbyBoom_State.h" />
     <ClInclude Include="..\Public\KirbyCar_State.h" />
     <ClInclude Include="..\Public\Ladder.h" />
+    <ClInclude Include="..\Public\Laser.h" />
     <ClInclude Include="..\Public\Level_DeeDeeDee.h" />
     <ClInclude Include="..\Public\Level_FinalBoss.h" />
     <ClInclude Include="..\Public\Level_Intro.h" />
@@ -274,6 +277,7 @@
     <ClInclude Include="..\Public\Loader.h" />
     <ClInclude Include="..\public\MainApp.h" />
     <ClInclude Include="..\Public\MapObject.h" />
+    <ClInclude Include="..\Public\Meteor.h" />
     <ClInclude Include="..\Public\Monster.h" />
     <ClInclude Include="..\Public\MapToolHelper.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -302,6 +306,7 @@
     <ClInclude Include="..\Public\RigidObject.h" />
     <ClInclude Include="..\Public\SingleEffect.h" />
     <ClInclude Include="..\public\SkySphere.h" />
+    <ClInclude Include="..\Public\SpikeSpear.h" />
     <ClInclude Include="..\Public\StarBlock.h" />
     <ClInclude Include="..\Public\StarBlockPiece.h" />
     <ClInclude Include="..\Public\TerrainFog.h" />
@@ -343,6 +348,7 @@
     <ClCompile Include="..\Private\BlendMapObject.cpp" />
     <ClCompile Include="..\Private\BombOrbit.cpp" />
     <ClCompile Include="..\Private\BombOrbitGlow.cpp" />
+    <ClCompile Include="..\Private\BossClone.cpp" />
     <ClCompile Include="..\Private\BreakableRock.cpp" />
     <ClCompile Include="..\Private\BreakableRockPartical.cpp" />
     <ClCompile Include="..\Private\BrontoBurt.cpp" />
@@ -366,6 +372,7 @@
     <ClCompile Include="..\Private\DeeDeeDee_State.cpp" />
     <ClCompile Include="..\private\Dee_Part.cpp" />
     <ClCompile Include="..\private\Dee_State.cpp" />
+    <ClCompile Include="..\Private\DimensionGate.cpp" />
     <ClCompile Include="..\Private\EnergyDrink.cpp" />
     <ClCompile Include="..\Private\FinalBoss.cpp" />
     <ClCompile Include="..\Private\FinalBossSpear.cpp" />
@@ -396,6 +403,7 @@
     <ClCompile Include="..\Private\KirbyBomb.cpp" />
     <ClCompile Include="..\Private\KirbyCar_State.cpp" />
     <ClCompile Include="..\Private\Ladder.cpp" />
+    <ClCompile Include="..\Private\Laser.cpp" />
     <ClCompile Include="..\Private\Level_DeeDeeDee.cpp" />
     <ClCompile Include="..\Private\Level_FinalBoss.cpp" />
     <ClCompile Include="..\Private\Level_Intro.cpp" />
@@ -425,6 +433,7 @@
     <ClCompile Include="..\Private\Loader.cpp" />
     <ClCompile Include="..\private\MainApp.cpp" />
     <ClCompile Include="..\Private\MapObject.cpp" />
+    <ClCompile Include="..\Private\Meteor.cpp" />
     <ClCompile Include="..\Private\Monster.cpp" />
     <ClCompile Include="..\Private\MapToolHelper.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -453,6 +462,7 @@
     <ClCompile Include="..\Private\RigidObject.cpp" />
     <ClCompile Include="..\Private\SingleEffect.cpp" />
     <ClCompile Include="..\private\SkySphere.cpp" />
+    <ClCompile Include="..\Private\SpikeSpear.cpp" />
     <ClCompile Include="..\Private\StarBlock.cpp" />
     <ClCompile Include="..\Private\StarBlockPiece.cpp" />
     <ClCompile Include="..\Private\TerrainFog.cpp" />

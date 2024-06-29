@@ -83,6 +83,7 @@ _int CRayArrow::Tick(_float fTimeDelta)
 	if(true == m_bFireActive)
 		m_fFireTime += fTimeDelta;
 
+	// 화살 발사
 	if (true == m_bFire)
 	{
 		if(m_fDelayTime < m_fFireTime)
@@ -100,6 +101,7 @@ _int CRayArrow::Tick(_float fTimeDelta)
 			}
 			else
 			{
+				// 땅에 박히고 n초 후 dead처리
 				m_fDeadTime += m_fTimeDelta;
 				if (1.f < m_fDeadTime)
 					m_bDead = true;
@@ -112,6 +114,7 @@ _int CRayArrow::Tick(_float fTimeDelta)
 			m_vKirbyPos = pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION);
 		}
 	}
+	// 화살 활성화
 	else if(true == m_bActive)
 	{
 		m_fTurnTime += m_fTimeDelta;
@@ -143,7 +146,7 @@ _int CRayArrow::Tick(_float fTimeDelta)
 
 void CRayArrow::Late_Tick(_float fTimeDelta)
 {
-	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 12.0f))
+	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 100.0f))
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);

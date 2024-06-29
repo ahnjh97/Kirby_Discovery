@@ -589,7 +589,6 @@ void CModel::AddBlendObjectToRenderGroup()
 		return;
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, m_pBlendObject);
->>>>>>> main
 }
 
 HRESULT CModel::Ready_Meshes(_bool bOctree)

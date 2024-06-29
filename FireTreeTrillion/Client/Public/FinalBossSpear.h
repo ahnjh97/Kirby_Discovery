@@ -41,6 +41,8 @@ private:
 	_float2			m_vPreScreenPos = { 0.f, 0.f };
 	_float4			m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
 
+	_bool			m_bGate = { false };
+
 	_float			m_fDelayTime = { 0.f };
 	_float			m_fCreateTime = { 0.f };
 	_float			m_fFirstFireTime = { 4.2f };
@@ -48,6 +50,7 @@ private:
 
 	_float			m_fAngle = { 0.f };
 	_float			m_fSide = { 0.f };
+
 	_uint			m_iCnt = { 0 };
 
 private:

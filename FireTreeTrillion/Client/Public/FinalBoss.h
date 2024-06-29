@@ -42,7 +42,7 @@ public:
 		FINALBOSS_END
 	};
 
-	enum FINALBOSS_STATE { STATE_FLYING, STATE_GROUND, STATE_END };
+	enum FINALBOSS_STATE { STATE_FLYING, STATE_GROUND, STATE_2PAZE, STATE_END };
 
 	struct FINALBOSS_DESC : public CMonster::MONSTER_DESC {
 		vector<_float4> vecRallyPoints;
@@ -59,8 +59,10 @@ public:
 	void Set_Glide(_bool bGlide) { m_bGlide = bGlide; }
 	void Set_Chain(_bool bChain) { m_bChain = bChain; }
 	void Set_TickPerSecond(_float TickPerSecond) { m_pModelCom->Set_TickPerSecond(TickPerSecond); }
+	void Set_Position(_vector vPosition) { m_vPosition = vPosition; }
 
 	_vector Get_Direction() { return m_vDir; }
+	_vector Get_Position() { return m_vPosition; }
 	vector<_float4> Get_RallyPoint() { return m_vecRallyPoint; }
 	FINALBOSS_STATE Get_BossState() { return m_eBossState; }
 	_bool Get_Chain() { return m_bChain; }
@@ -90,9 +92,11 @@ private:
 	vector<_float4>		m_vecRallyPoint;
 
 	_vector				m_vDir = {};
+	_vector				m_vPosition = {};
 
 	_bool				m_bGlide = { false };
 	_bool				m_bChain = { false };
+
 	_float				m_fGlideTime = { 0.f };
 
 private:
