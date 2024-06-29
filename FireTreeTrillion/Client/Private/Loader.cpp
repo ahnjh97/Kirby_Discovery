@@ -108,6 +108,7 @@
 #include "TunnelRock.h"
 //기믹
 #include "Gm_LabAntenna.h"
+#include "Gm_LabBossRoomDoor.h"
 
 //UI
 #include "BackGround.h"
@@ -365,7 +366,10 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TunnelRock"), CTunnelRock);
 
 	#pragma region GIMMICK::LEVEL_FINALBOSS
+
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_LabAntenna"), CGm_LabAntenna);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_LabBossRoomDoor"), CGm_LabBossRoomDoor);
+
 	#pragma endregion
 
 	// 미니게임 in 와들디마을
@@ -1711,6 +1715,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		
 		//기믹 오브젝트
 		m_vecModelInfo.emplace_back("LbAntenna_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("LbBossRoomDoor_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("BG1", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
