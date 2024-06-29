@@ -188,7 +188,7 @@ HRESULT CLevel_Town::Ready_Layer_UI(const wstring& _wstrLayerTag)
 	{
 		{CHUD::HUD_KIRBYHP, "HUD_KirbyStatus"},
 		{CHUD::HUD_STARPOINT, "HUD_StarPoint"},
-		{CHUD::HUD_ABILITYDISCARD, "HUD_AbilityDiscard"},
+		//{CHUD::HUD_ABILITYDISCARD, "HUD_AbilityDiscard"},
 	};
 
 

@@ -912,7 +912,9 @@
     <ClInclude Include="..\Public\Gm_LabAntenna.h">
       <Filter>02.GameObjects\Map\Gimmick</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Gm_LabBossRoomDoor.h" />
+    <ClInclude Include="..\Public\Gm_LabBossRoomDoor.h">
+      <Filter>02.GameObjects\Map\Gimmick</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1353,7 +1355,9 @@
     <ClCompile Include="..\Private\Gm_LabAntenna.cpp">
       <Filter>02.GameObjects\Map\Gimmick</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Gm_LabBossRoomDoor.cpp" />
+    <ClCompile Include="..\Private\Gm_LabBossRoomDoor.cpp">
+      <Filter>02.GameObjects\Map\Gimmick</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

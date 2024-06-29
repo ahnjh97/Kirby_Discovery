@@ -51,8 +51,9 @@ HRESULT CLevel_FinalBoss::Initialize()
 	CHECK_FAILED(hr);
 	hr = Ready_Kickables();
 	CHECK_FAILED(hr);
-
 	hr = Ready_Objects();
+	CHECK_FAILED(hr);
+	hr = Ready_UI();
 	CHECK_FAILED(hr);
 	
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
@@ -652,6 +653,19 @@ HRESULT CLevel_FinalBoss::Ready_Objects()
 #pragma endregion
 	}
 	fileInput.close();
+
+	return S_OK;
+}
+
+HRESULT CLevel_FinalBoss::Ready_UI()
+{
+	LEVEL eLevel = LEVEL_FINALBOSS;
+
+	CUIObject::UIOBJ_DESC DiscardUIDesc{};
+	DiscardUIDesc.vPos = { DiscardUIDesc.vCenter.x, DiscardUIDesc.vCenter.y, 0.f };
+	DiscardUIDesc.vSize = { 260.f, 120.f, 1.f };
+
+	HRESULT hr = m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_UI_HUD"), TEXT("Prototype_GameObject_HUD_AbilityDiscard"), &DiscardUIDesc);
 
 	return S_OK;
 }

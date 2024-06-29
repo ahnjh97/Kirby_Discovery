@@ -413,6 +413,9 @@ HRESULT CLoader::Loading_StaticComponentAll()
 	//이펙트 텍스쳐
 	Add_FXTexture();
 
+	//UI 텍스처
+	Add_StaticUITexture();
+
 	wstring wstrPrototypeTag = L"Prototype_Component_Shader_";
 	hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + TEXT("VtxPosTex"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements));
@@ -565,24 +568,6 @@ HRESULT CLoader::Loading_For_Intro()
 
 	hr = Add_Texture(eLevel, "FX_Mask_Bubble2", "Effects/Mask/noise_bubble_%d.png", 4);	CHECK_FAILED(hr);
 
-#pragma region UI
-
-	//KirbyHP
-	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 23);
-	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby_Mask", "UI/HUD/Kirby/StatusBar/KirbyHPMask.png");
-
-	//StarPoint
-	hr = Add_Texture(eLevel, "HUD_StarPoint", "UI/HUD/Kirby/StarPoint/StarPoint_%d.dds", 10);
-
-	//Ability Discard
-	hr = Add_Texture(eLevel, "HUD_AbilityDiscard", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_%d.dds", 17);
-	hr = Add_Texture(eLevel, "HUD_AbilityDiscard_Mask", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_Mask.dds");
-	hr = Add_Texture(eLevel, "HUD_BtnIcon", "UI/HUD/Kirby/BtnIcon/BtnIcon_%d.dds", 4);
-
-	CHECK_FAILED(hr);
-
-#pragma endregion
-
 	// 커비 얼굴 텍스쳐 로드
 	Add_KirbyFaceTexture(eLevel);
 #pragma endregion
@@ -634,30 +619,18 @@ HRESULT CLoader::Loading_For_Racing()
 
 	hr = Add_Texture(eLevel, "FX_Mask_Bubble2", "Effects/Mask/noise_bubble_%d.png", 4);	CHECK_FAILED(hr);
 
-#pragma region UI
+	// 커비 얼굴 텍스쳐 로드
+	Add_KirbyFaceTexture(eLevel);
 
-	//KirbyHP
-	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 23);
-	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby_Mask", "UI/HUD/Kirby/StatusBar/KirbyHPMask.png");
-
-	//StarPoint
-	hr = Add_Texture(eLevel, "HUD_StarPoint", "UI/HUD/Kirby/StarPoint/StarPoint_%d.dds", 10);
-
-	//Ability Discard
-	hr = Add_Texture(eLevel, "HUD_AbilityDiscard", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_%d.dds", 17);
-	hr = Add_Texture(eLevel, "HUD_AbilityDiscard_Mask", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_Mask.dds");
-	hr = Add_Texture(eLevel, "HUD_BtnIcon", "UI/HUD/Kirby/BtnIcon/BtnIcon_%d.dds", 4);
+	#pragma region TUNNEL_TEXTURE
 
 	hr = Add_Texture(eLevel, "TunnelMask_BaseColor", "Map/Tunnel/TunnelMask_BaseColor.dds");
 	hr = Add_Texture(eLevel, "TunnelMask_Normal", "Map/Tunnel/TunnelMask_Normal.dds");
 	hr = Add_Texture(eLevel, "TunnelMask_MRA", "Map/Tunnel/TunnelMask_MRA.dds");
-
 	CHECK_FAILED(hr);
 
-#pragma endregion
+	#pragma endregion
 
-	// 커비 얼굴 텍스쳐 로드
-	Add_KirbyFaceTexture(eLevel);
 #pragma endregion
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
@@ -703,25 +676,8 @@ HRESULT CLoader::Loading_For_DeeDeeDee()
 	//마스크용
 	hr = Add_Texture(eLevel, "FX_Mask_Bubble2", "Effects/Mask/noise_bubble_%d.png", 4);	CHECK_FAILED(hr);
 
-#pragma region UI
-
-	//KirbyHP
-	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 23);
-	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby_Mask", "UI/HUD/Kirby/StatusBar/KirbyHPMask.png");
-
-	//StarPoint
-	hr = Add_Texture(eLevel, "HUD_StarPoint", "UI/HUD/Kirby/StarPoint/StarPoint_%d.dds", 10);
-
-	//Ability Discard
-	hr = Add_Texture(eLevel, "HUD_AbilityDiscard", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_%d.dds", 17);
-	hr = Add_Texture(eLevel, "HUD_AbilityDiscard_Mask", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_Mask.dds");
-	hr = Add_Texture(eLevel, "HUD_BtnIcon", "UI/HUD/Kirby/BtnIcon/BtnIcon_%d.dds", 4);
-
+	//HUD_BOSSHPBAR
 	hr = Add_Texture(eLevel, "HUD_BossBar", "UI/HUD/Boss/BossBar_%d.png", 5);
-
-
-	CHECK_FAILED(hr);
-#pragma endregion
 
 	// 얼굴, 눈 텍스쳐 로드
 	Add_KirbyFaceTexture(eLevel);
@@ -772,23 +728,6 @@ HRESULT CLoader::Loading_For_Town()
 
 	//마스크용
 	hr = Add_Texture(eLevel, "FX_Mask_Bubble2", "Effects/Mask/noise_bubble_%d.png", 4);	CHECK_FAILED(hr);
-
-#pragma region UI
-
-	//KirbyHP
-	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 23);
-	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby_Mask", "UI/HUD/Kirby/StatusBar/KirbyHPMask.png");
-
-	//StarPoint
-	hr = Add_Texture(eLevel, "HUD_StarPoint", "UI/HUD/Kirby/StarPoint/StarPoint_%d.dds", 10);
-
-	//Ability Discard
-	hr = Add_Texture(eLevel, "HUD_AbilityDiscard", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_%d.dds", 17);
-	hr = Add_Texture(eLevel, "HUD_AbilityDiscard_Mask", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_Mask.dds");
-	hr = Add_Texture(eLevel, "HUD_BtnIcon", "UI/HUD/Kirby/BtnIcon/BtnIcon_%d.dds", 4);
-
-	CHECK_FAILED(hr);
-#pragma endregion
 
 	// 얼굴, 눈 텍스쳐 로드
 	Add_KirbyFaceTexture(eLevel);
@@ -956,23 +895,8 @@ HRESULT CLoader::Loading_For_FinalBoss()
 
 	hr = Add_Texture(eLevel, "FX_Mask_Bubble2", "Effects/Mask/noise_bubble_%d.png", 4);	CHECK_FAILED(hr);
 
-#pragma region UI
-
-	//KirbyHP
-	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 23);
-	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby_Mask", "UI/HUD/Kirby/StatusBar/KirbyHPMask.png");
-
-	//StarPoint
-	hr = Add_Texture(eLevel, "HUD_StarPoint", "UI/HUD/Kirby/StarPoint/StarPoint_%d.dds", 10);
-
-	//Ability Discard
-	hr = Add_Texture(eLevel, "HUD_AbilityDiscard", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_%d.dds", 17);
-	hr = Add_Texture(eLevel, "HUD_AbilityDiscard_Mask", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_Mask.dds");
-	hr = Add_Texture(eLevel, "HUD_BtnIcon", "UI/HUD/Kirby/BtnIcon/BtnIcon_%d.dds", 4);
-
-	CHECK_FAILED(hr);
-
-#pragma endregion
+	//HUD_BOSSHPBAR
+	hr = Add_Texture(eLevel, "HUD_BossBar", "UI/HUD/Boss/BossBar_%d.png", 5);
 
 	// 커비 얼굴 텍스쳐 로드
 	Add_KirbyFaceTexture(eLevel);
@@ -1146,9 +1070,9 @@ HRESULT CLoader::Loading_For_Tool_UI()
 	hr = Add_Texture(eLevel, "HUD_StarPoint", "UI/HUD/Kirby/StarPoint/StarPoint_%d.dds", 10);
 
 	//Ability Discard
-	hr = Add_Texture(eLevel, "HUD_AbilityDiscard", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_%d.dds", 17);
-	hr = Add_Texture(eLevel, "HUD_AbilityDiscard_Mask", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_Mask.dds");
-	hr = Add_Texture(eLevel, "HUD_BtnIcon", "UI/HUD/Kirby/BtnIcon/BtnIcon_%d.dds", 4);
+	hr = Add_Texture(eLevel, "HUD_AbilityDiscard", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_%d.dds", 3);
+	//hr = Add_Texture(eLevel, "HUD_AbilityDiscard_Mask", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_Mask.dds");
+	//hr = Add_Texture(eLevel, "HUD_BtnIcon", "UI/HUD/Kirby/BtnIcon/BtnIcon_%d.dds", 4);
 	
 	CHECK_FAILED(hr);
 
@@ -1182,25 +1106,7 @@ HRESULT CLoader::Loading_For_GamePlay()
 	if (FAILED(Add_Texture(eLevel, "RandomNormal", "Map/RandomNormal.png")))
 		return E_FAIL;
 	hr = Add_Texture(eLevel, "FX_Mask_Bubble2", "Effects/Mask/noise_bubble_%d.png", 4);	CHECK_FAILED(hr);
-
-#pragma region UI
-
-	//KirbyHP
-	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 23);
-	hr = Add_Texture(eLevel, "HUD_StatusBar_Kirby_Mask", "UI/HUD/Kirby/StatusBar/KirbyHPMask.png");
-
-	//StarPoint
-	hr = Add_Texture(eLevel, "HUD_StarPoint", "UI/HUD/Kirby/StarPoint/StarPoint_%d.dds", 10);
-
-	//Ability Discard
-	hr = Add_Texture(eLevel, "HUD_AbilityDiscard", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_%d.dds", 17);
-	hr = Add_Texture(eLevel, "HUD_AbilityDiscard_Mask", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_Mask.dds");
-	hr = Add_Texture(eLevel, "HUD_BtnIcon", "UI/HUD/Kirby/BtnIcon/BtnIcon_%d.dds", 4);
-
-	CHECK_FAILED(hr);
-
-#pragma endregion
-
+	
 	// 커비 얼굴 텍스쳐 로드
 	Add_KirbyFaceTexture(eLevel);
 	#pragma endregion
@@ -1311,6 +1217,26 @@ HRESULT CLoader::Add_FXTexture()
 
 	hr = Add_Texture(LEVEL_STATIC, "FX_Food_ResultTop", "Effects/UI/MGameFood/result top.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Food_ResultBottom", "Effects/UI/MGameFood/result bottom.png");	CHECK_FAILED(hr);
+
+
+	return S_OK;
+}
+
+HRESULT CLoader::Add_StaticUITexture()
+{
+	HRESULT hr;
+
+	//KirbyHP
+	hr = Add_Texture(LEVEL_STATIC, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 23);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "HUD_StatusBar_Kirby_Mask", "UI/HUD/Kirby/StatusBar/KirbyHPMask.png");	CHECK_FAILED(hr);
+
+	//StarPoint
+	hr = Add_Texture(LEVEL_STATIC, "HUD_StarPoint", "UI/HUD/Kirby/StarPoint/StarPoint_%d.dds", 10);	CHECK_FAILED(hr);
+
+	//Ability Discard
+	hr = Add_Texture(LEVEL_STATIC, "HUD_AbilityDiscard", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "HUD_AbilityDiscard_Mask", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_Mask.dds");	CHECK_FAILED(hr);
+	//hr = Add_Texture(LEVEL_STATIC, "HUD_AbilityDiscard_Gauge", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_Gauge.dds");	CHECK_FAILED(hr);
 
 
 	return S_OK;
@@ -1432,7 +1358,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("BushMRemainder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapDeco/"));
 		m_vecModelInfo.emplace_back("BushSRemainder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapDeco/"));
 	}
-
 	else if (eLevel == LEVEL_TOWN)
 	{
 		m_vecModelInfo.emplace_back("Town", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
@@ -1495,8 +1420,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 
 	}
-
-
 	else if (eLevel == LEVEL_RACING)
 	{
 		m_vecModelInfo.emplace_back("Level0Stage1Step02", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"), true);

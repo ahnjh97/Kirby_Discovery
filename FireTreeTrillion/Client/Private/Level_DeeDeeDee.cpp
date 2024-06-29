@@ -177,7 +177,6 @@ HRESULT CLevel_DeeDeeDee::Ready_Layer_UI(const wstring& _wstrLayerTag)
 {
 	HRESULT hr;
 
-
 	//모든 HUD를 준비
 	string strUITag = { "LayerUI" };
 	CHUD::UI_TAG eHUDType = CHUD::TAG_NONE;
@@ -186,7 +185,7 @@ HRESULT CLevel_DeeDeeDee::Ready_Layer_UI(const wstring& _wstrLayerTag)
 	{
 		{CHUD::HUD_KIRBYHP, "HUD_KirbyStatus"},
 		{CHUD::HUD_STARPOINT, "HUD_StarPoint"},
-		{CHUD::HUD_ABILITYDISCARD, "HUD_AbilityDiscard"},
+		//{CHUD::HUD_ABILITYDISCARD, "HUD_AbilityDiscard"},
 	};
 
 
