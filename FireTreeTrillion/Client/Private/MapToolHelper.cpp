@@ -139,6 +139,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 #pragma region LEVEL_RACING OBJECT
 		, "GsRubbleAsphalt01L", "GsRubbleAsphalt02L", "GsRubbleAsphalt03L", "GsRubbleAsphalt04L", "GsRubbleAsphalt05L"
 		, "GsRubbleAsphalt06L", "GsRubbleAsphalt07L", "GsRubbleAsphalt08L", "GsRubbleAsphalt09L"
+		, "FarBuildingAM1L"
 #pragma endregion
 
 
@@ -170,11 +171,12 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	};
 	
 	m_setKickables = { "GsPebble", "SeShell", "WasteCanYellow" };
-	m_setItemTxts = { "Item_Coin", "Item_EnergyDrink" };
+	m_setItemTxts = { "Item_BlueCoin", "Item_Bread", "Item_Cake", "Item_Cocktail", "Item_Coin", "Item_EnergyDrink", "Item_Makaron",
+		"Item_Meat", "Item_Omelet", "Item_Onigiri", "Item_RedCoin", "Item_Steak", "Item_Sushi" };
 	m_setTrees = { "GsTreeA", "GsTreeB", "GsTreeC" };
 
 	//블렌드 적용이 필요한 데코오브젝트
-	m_setBlendDecos = {"LbOutBuildingWallL", "LbOutBuildingFenceL"};
+	m_setBlendDecos = {"LbOutBuildingWallL", "LbOutBuildingFenceL", "GsCarFloor" };
 
 	s_vecPassIndices.resize(m_vecMapModelNames.size());
 	s_vecSamplingFactors.resize(m_vecMapModelNames.size());
