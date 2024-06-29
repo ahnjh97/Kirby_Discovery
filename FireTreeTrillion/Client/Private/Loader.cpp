@@ -61,7 +61,6 @@
 #include "KirbyBomb.h"
 #include "PartTimerKirby.h"
 
-
 // 몬스터
 #include "KirbyWeapons.h"
 #include "KirbyArmours.h"
@@ -76,6 +75,16 @@
 #include "PoppyBomb.h"
 #include "CappyBody.h"
 #include "CappyHat.h"
+
+// 보스 몬스터
+#include "FinalBoss.h"
+#include "FinalBossSpear.h"
+#include "RayArrow.h"
+#include "Laser.h"
+#include "SpikeSpear.h"
+#include "DimensionGate.h"
+#include "Meteor.h"
+#include "BossClone.h"
 
 // 보스
 #include "DeeDeeDee.h"
@@ -108,6 +117,7 @@
 #include "TunnelRock.h"
 //기믹
 #include "Gm_LabAntenna.h"
+#include "Gm_LabBossRoomDoor.h"
 
 //UI
 #include "BackGround.h"
@@ -322,6 +332,15 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PoppyBomb"), CPoppyBomb);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CappyBody"), CCappyBody);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CappyHat"), CCappyHat);
+	// FinalBoss
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalBoss"), CFinalBoss);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalBossSpear"), CFinalBossSpear);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("RayArrow"), CRayArrow);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Laser"), CLaser);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SpikeSpear"), CSpikeSpear);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DimensionGate"), CDimensionGate);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Meteor"), CMeteor);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BossClone"), CBossClone);
 
 	//Dee
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeePart"), CDee_Part);
@@ -365,7 +384,10 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TunnelRock"), CTunnelRock);
 
 	#pragma region GIMMICK::LEVEL_FINALBOSS
+
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_LabAntenna"), CGm_LabAntenna);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_LabBossRoomDoor"), CGm_LabBossRoomDoor);
+
 	#pragma endregion
 
 	// 미니게임 in 와들디마을
@@ -1711,6 +1733,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		
 		//기믹 오브젝트
 		m_vecModelInfo.emplace_back("LbAntenna_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("LbBossRoomDoor_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("BG1", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
@@ -1733,6 +1756,15 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		// For Kirby Armour
 		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
+
+		// For Boss 
+		m_vecModelInfo.emplace_back("FinalBoss", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("FinalBossSpear", TYPE_ANIM, 1.f);
+		m_vecModelInfo.emplace_back("RayArrow", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("DimensionLaser", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("DimensionGateL", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("BigDebris", TYPE_NONANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("SmallDebris", TYPE_NONANIM, 1.f, 180.f);
 	}
 	else if (eLevel == LEVEL_GAMEPLAY)
 	{
@@ -1777,6 +1809,11 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("CappyBody", TYPE_ANIM, 1.2f, 180.f);
 		m_vecModelInfo.emplace_back("CappyHat", TYPE_ANIM, 1.2f, 180.f);
 
+		// For Boss 옮겨야함
+		m_vecModelInfo.emplace_back("FinalBoss", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("FinalBossSpear", TYPE_NONANIM, 1.f);
+
+		// For Mab Interactive Object
 		// For Map Interactive Object
 		m_vecModelInfo.emplace_back("Ladder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("GsPebble", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
@@ -1842,12 +1879,13 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("BrontoBurt", TYPE_ANIM, 2.f, 0.f);
 		m_vecModelInfo.emplace_back("PoppyBrosJr", TYPE_ANIM, 1.f, 0.f);
 		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_ANIM, 1.3f, 0.f);
+		m_vecModelInfo.emplace_back("FinalBoss", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("FinalBossSpear", TYPE_NONANIM, 1.f);
 
 		// Boss
 		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 180.f);
 		m_vecModelInfo.emplace_back("DeeDeeDeeHammer", TYPE_NONANIM, 1.0f);
 
-		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
 		m_vecModelInfo.emplace_back("WaddleDeeHungry", TYPE_ANIM, 1.1f, 180.f);
 	}
 }

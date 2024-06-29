@@ -15,6 +15,7 @@ public:
 		SEQ_HARDCUT_TEST,
 		SEQ_SOFTCUT_TEST,
 		SEQ_BREAKCARSHOP,
+		SEQ_BREAKRACINGMAP,
 		SEQ_END
 	};
 
@@ -124,7 +125,7 @@ public:
 
 	//카메라의 이벤트 함수들
 	void Start_ShutterSeq(CGameObject* pNotifier);
-
+	void Start_BridgeSeq(CGameObject* pNotifier);
 
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;

@@ -783,7 +783,7 @@ HRESULT CKirby::Make_TargetToCams()
 	{
 		CCamera* pCameraFree = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Free")));
 		if (pCameraFree != nullptr)
-			m_pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FIRST);
+			pCameraFree->Set_Target(m_pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FIRST);
 	}
 
 	return S_OK;
@@ -1236,8 +1236,9 @@ void CKirby::Event_Racing_Cut1(CGameObject* pObj)
 	CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 	pCamera->Make_Shake(2.f);
 
-	_float4 vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 6.f;
-	m_pControllerCom->Move_Dir(m_pTransformCom, vLook + _float4(0.f, 2.f, 0.f, 0.f), m_fTimeDelta);
+	m_pControllerCom->Set_Position(m_pTransformCom, { -179.f, 41.f, -117.f, 1.f });
+	//_float4 vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 6.f;
+	//m_pControllerCom->Move_Dir(m_pTransformCom, vLook + _float4(0.f, 2.f, 0.f, 0.f), m_fTimeDelta);
 }
 
 void CKirby::Event_Racing_Cut2(CGameObject* pObj)
@@ -1246,6 +1247,9 @@ void CKirby::Event_Racing_Cut2(CGameObject* pObj)
 
 	INFO(m_bBooster) = false;
 	INFO(m_bCarJump) = false;
+
+	m_pControllerCom->Set_Position(m_pTransformCom, { 57.82f, 23.11f, 80.33f, 1.f });
+
 	CKirby::Change_State(CKirby::CARSTATE_CUT2, 60.f, false, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 }
 
@@ -1548,6 +1552,8 @@ HRESULT CKirby::Kirby_SystemInitialize()
 	{
 		m_eAbilityType = ABILITY_DEFAULT;
 		Change_State(CARSTATE_IDLING, 60.f, true, false, BODY_CARDEFAULT, OFFSET_CAR);
+		m_pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FIRST, _float3{0.f, 0.f, 1.f}, 5.f);
+
 	}
 	else
 	{

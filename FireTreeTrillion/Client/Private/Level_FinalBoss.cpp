@@ -11,6 +11,7 @@
 #include "Kabu.h"
 #include "BrontoBurt.h"
 #include "PoppyBrosJr.h"
+#include "FinalBoss.h"
 
 #include "BG.h"
 #include "HUD.h"
@@ -25,7 +26,7 @@ CLevel_FinalBoss::CLevel_FinalBoss(ID3D11Device* pDevice, ID3D11DeviceContext* p
 
 HRESULT CLevel_FinalBoss::Initialize()
 {
-	m_pGameInstance->Set_RenderMode(CRenderer::MODE_GAMEPLAY);
+	m_pGameInstance->Set_RenderMode(CRenderer::MODE_TOOL);
 
 	HRESULT hr;
 	hr = __super::Initialize();
@@ -456,6 +457,17 @@ HRESULT CLevel_FinalBoss::Ready_Monsters()
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_CappyBody"), &tempDesc)))
 				return E_FAIL;
 		}
+		else if (L"FinalBoss" == tempDesc.wstrModelName)
+		{
+			CFinalBoss::FINALBOSS_DESC FinalBossDesc = {};
+			FinalBossDesc.matWorld = matWorld;
+			FinalBossDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			FinalBossDesc.iShaderVars = iShaderVars;
+			FinalBossDesc.fRimWidth = fRimWidth;
+			FinalBossDesc.vecRallyPoints = vecRallyPoints;
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_FinalBoss"), &FinalBossDesc)))
+				return E_FAIL;
+		}
 		else if (L"Kabu" == tempDesc.wstrModelName)
 		{
 			CKabu::KABU_DESC KabuDesc = {};
@@ -624,11 +636,16 @@ HRESULT CLevel_FinalBoss::Ready_Objects()
 		tDesc.fRimWidth = fRimWidth;
 
 #pragma region GIMMICK_OBJECT
-
-		//안테나 필드 설치물 기믹
+		
 		if ("LbAntenna_NonAnim" == strModelName)
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_LabAntenna"), &tDesc)))
+				continue;
+		}
+
+		if ("LbBossRoomDoor_NonAnim" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_LabBossRoomDoor"), &tDesc)))
 				continue;
 		}
 
