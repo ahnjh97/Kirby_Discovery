@@ -9,12 +9,10 @@ END
 class CBreakableRockParticle final : public CRigidObject
 {
 public:
-	struct BREAKABLEPARTICALDESC
+	struct BREAKABLEPARTICALDESC : public GAMEOBJECT_DESC
 	{
-		_float4x4 matrix;
 		_float3 vMoveDir;
 		_float	fPower;
-		wstring wstrModelName;
 	};
 
 private:

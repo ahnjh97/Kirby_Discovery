@@ -3,6 +3,7 @@
 #include "HitBox.h"
 #include "Tunnel.h"
 #include "Kirby.h"
+#include "Camera_Main.h"
 
 CTunnel::CTunnel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPhysXObject{ pDevice, pContext }
@@ -77,22 +78,16 @@ HRESULT CTunnel::Initialize(void* pArg)
         }
     }
 
-    for (_uint i = 0; i <= 16; i++)
+    for (_uint j = 0; j < 4; j++)
     {
-        GAMEOBJECT_DESC tDesc{};
-        tDesc.matWorld = GameObjectDesc.matWorld;
-        tDesc.wstrModelName = TEXT("TunnelRock") + to_wstring(i);
-        CGameObject* pTunnelRock = m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_TunnelRock"), &tDesc);
-        m_vecTunnelRocks.push_back(pTunnelRock);
-    }
-
-    for (_uint i = 0; i <= 16; i++)
-    {
-        GAMEOBJECT_DESC tDesc{};
-        tDesc.matWorld = GameObjectDesc.matWorld;
-        tDesc.wstrModelName = TEXT("TunnelRock") + to_wstring(i);
-        CGameObject* pTunnelRock = m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_TunnelRock"), &tDesc);
-        m_vecTunnelRocks.push_back(pTunnelRock);
+        for (_uint i = 0; i <= 16; i++)
+        {
+            GAMEOBJECT_DESC tDesc{};
+            tDesc.matWorld = GameObjectDesc.matWorld;
+            tDesc.wstrModelName = TEXT("TunnelRock") + to_wstring(i);
+            CGameObject* pTunnelRock = m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_TunnelRock"), &tDesc);
+            m_vecTunnelRocks.push_back(pTunnelRock);
+        }
     }
 
     m_fSamplingFactor = 0.1f;
@@ -176,6 +171,8 @@ void CTunnel::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* p
         return;
 
     pKirby->Set_HitStop();
+    CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+    pCamera->Make_Shake(2.f);
 
     m_bCollsion = true;
     m_bHide = true;

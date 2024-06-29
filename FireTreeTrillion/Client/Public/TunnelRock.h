@@ -33,7 +33,7 @@ private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
 
-	_bool m_bDirectionDetermined = { false };
+	//_bool m_bDirectionDetermined = { false };
 
 	_float m_fSamplingFactor = { 1.f };
 	_float m_fZero = {};
