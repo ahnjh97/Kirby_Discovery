@@ -166,6 +166,7 @@ HRESULT CToppleableBridge::Render_LightDepth()
 #ifdef _DEBUG
 void CToppleableBridge::Render_IMGUI()
 {
+	m_pAnimBridge->Render_IMGUI();
 }
 #endif
 
