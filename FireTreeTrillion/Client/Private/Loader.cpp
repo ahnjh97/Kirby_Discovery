@@ -104,8 +104,11 @@
 #include "BlendMapObject.h"
 #include "PortalSoftEffect.h"
 #include "AnimBridge.h"
+#include "Tunnel.h"
+#include "TunnelRock.h"
 //기믹
 #include "Gm_LabAntenna.h"
+#include "Gm_LabBossRoomDoor.h"
 
 //UI
 #include "BackGround.h"
@@ -359,9 +362,14 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ToppleableBridge"), CToppleableBridge);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BlendMapObject"), CBlendMapObject);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("AnimBridge"), CAnimBridge);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Tunnel"), CTunnel);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TunnelRock"), CTunnelRock);
 
 	#pragma region GIMMICK::LEVEL_FINALBOSS
+
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_LabAntenna"), CGm_LabAntenna);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_LabBossRoomDoor"), CGm_LabBossRoomDoor);
+
 	#pragma endregion
 
 	// 미니게임 in 와들디마을
@@ -621,6 +629,10 @@ HRESULT CLoader::Loading_For_Racing()
 	hr = Add_Texture(eLevel, "HUD_AbilityDiscard", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_%d.dds", 17);
 	hr = Add_Texture(eLevel, "HUD_AbilityDiscard_Mask", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_Mask.dds");
 	hr = Add_Texture(eLevel, "HUD_BtnIcon", "UI/HUD/Kirby/BtnIcon/BtnIcon_%d.dds", 4);
+
+	hr = Add_Texture(eLevel, "TunnelMask_BaseColor", "Map/Tunnel/TunnelMask_BaseColor.dds");
+	hr = Add_Texture(eLevel, "TunnelMask_Normal", "Map/Tunnel/TunnelMask_Normal.dds");
+	hr = Add_Texture(eLevel, "TunnelMask_MRA", "Map/Tunnel/TunnelMask_MRA.dds");
 
 	CHECK_FAILED(hr);
 
@@ -1540,6 +1552,11 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("BoardA_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("BoardB_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("BoardC_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("TunnelRocks", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"), true);
+		for (_uint i = 0; i <= 16; i++) {
+			string strTunnelRock = "TunnelRock" + to_string(i);
+			m_vecModelInfo.emplace_back(strTunnelRock, TYPE_NONANIM);
+		}
 	}
 	else if (eLevel == LEVEL_DEEDEEDEE)
 	{
@@ -1698,6 +1715,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		
 		//기믹 오브젝트
 		m_vecModelInfo.emplace_back("LbAntenna_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("LbBossRoomDoor_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("BG1", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));

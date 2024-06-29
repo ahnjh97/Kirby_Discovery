@@ -48,18 +48,21 @@ HRESULT CLevel_Racing::Initialize()
 	hr = Ready_Layer_UI(TEXT("Layer_UI"));
 	CHECK_FAILED(hr);
 
-	_float fZOffset = 1500.f;
-	hr = Ready_Map(fZOffset);
+	_float fXOffset = -200.f;
+	_float fZOffset = 1200.f;
+	fXOffset = fZOffset = 0;
+
+	hr = Ready_Map(0, 0);
 	CHECK_FAILED(hr);
-	hr = Ready_Triggers(fZOffset);
+	hr = Ready_Triggers(fXOffset, fZOffset);
 	CHECK_FAILED(hr);
-	hr = Ready_Monsters(fZOffset);
+	hr = Ready_Monsters(fXOffset, fZOffset);
 	CHECK_FAILED(hr);
-	hr = Ready_Items(fZOffset);
+	hr = Ready_Items(fXOffset, fZOffset);
 	CHECK_FAILED(hr);
-	hr = Ready_Kickables(fZOffset);
+	hr = Ready_Kickables(fXOffset, fZOffset);
 	CHECK_FAILED(hr);
-	hr = Ready_Objects(fZOffset);
+	hr = Ready_Objects(fXOffset, fZOffset);
 	CHECK_FAILED(hr);
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
@@ -197,7 +200,7 @@ HRESULT CLevel_Racing::Ready_Layer_UI(const wstring& _wstrLayerTag)
 	return S_OK;
 }
 
-HRESULT CLevel_Racing::Ready_Map(_float fZOffset)
+HRESULT CLevel_Racing::Ready_Map(_float fXOffset, _float fZOffset)
 {
 	LEVEL eLevel = LEVEL_RACING;
 	string strFileName = "../../../objects_txt/Racing_Map.txt";
@@ -225,6 +228,7 @@ HRESULT CLevel_Racing::Ready_Map(_float fZOffset)
 		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
 		fileInput.read(reinterpret_cast<char*>(&vMin), sizeof(vMin));
 		fileInput.read(reinterpret_cast<char*>(&vMax), sizeof(vMax));
+		matWorld._41 = matWorld._41 + fXOffset;
 		matWorld._43 = matWorld._43 + fZOffset;
 		CBasicMap::MAP_DESC tMapDesc{};
 		tMapDesc.wstrModelName = CUtils::StrToWstr(strModelName);
@@ -251,7 +255,7 @@ HRESULT CLevel_Racing::Ready_Map(_float fZOffset)
 	return S_OK;
 }
 
-HRESULT CLevel_Racing::Ready_Triggers(_float fZOffset)
+HRESULT CLevel_Racing::Ready_Triggers(_float fXOffset, _float fZOffset)
 {
 	LEVEL eLevel = LEVEL_RACING;
 	string strFileName = "../../../objects_txt/Racing_Triggers.txt";
@@ -287,6 +291,7 @@ HRESULT CLevel_Racing::Ready_Triggers(_float fZOffset)
 		strModelName.resize(iStrLength);
 		fileInput.read(&strModelName[0], iStrLength);
 		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
+		matWorld._41 = matWorld._41 + fXOffset;
 		matWorld._43 = matWorld._43 + fZOffset;
 		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
 		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
@@ -383,7 +388,7 @@ HRESULT CLevel_Racing::Ready_Triggers(_float fZOffset)
 	return S_OK;
 }
 
-HRESULT CLevel_Racing::Ready_Monsters(_float fZOffset)
+HRESULT CLevel_Racing::Ready_Monsters(_float fXOffset, _float fZOffset)
 {
 	LEVEL eLevel = LEVEL_RACING;
 	string strFileName = "../../../objects_txt/Racing_Monsters.txt";
@@ -414,6 +419,7 @@ HRESULT CLevel_Racing::Ready_Monsters(_float fZOffset)
 		strModelName.resize(iStrLength);
 		fileInput.read(&strModelName[0], iStrLength);
 		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
+		matWorld._41 = matWorld._41 + fXOffset;
 		matWorld._43 = matWorld._43 + fZOffset;
 		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
 		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
@@ -518,7 +524,7 @@ HRESULT CLevel_Racing::Ready_Monsters(_float fZOffset)
 	return S_OK;
 }
 
-HRESULT CLevel_Racing::Ready_Items(_float fZOffset)
+HRESULT CLevel_Racing::Ready_Items(_float fXOffset, _float fZOffset)
 {
 	LEVEL eLevel = LEVEL_RACING;
 	string strFileName = "../../../objects_txt/Racing_Items.txt";
@@ -545,6 +551,7 @@ HRESULT CLevel_Racing::Ready_Items(_float fZOffset)
 		strModelName.resize(iStrLength);
 		fileInput.read(&strModelName[0], iStrLength);
 		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
+		matWorld._41 = matWorld._41 + fXOffset;
 		matWorld._43 = matWorld._43 + fZOffset;
 		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
 		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
@@ -571,7 +578,7 @@ HRESULT CLevel_Racing::Ready_Items(_float fZOffset)
 	return S_OK;
 }
 
-HRESULT CLevel_Racing::Ready_Kickables(_float fZOffset)
+HRESULT CLevel_Racing::Ready_Kickables(_float fXOffset, _float fZOffset)
 {
 	LEVEL eLevel = LEVEL_RACING;
 	string strFileName = "../../../objects_txt/Racing_Kickables.txt";
@@ -598,6 +605,7 @@ HRESULT CLevel_Racing::Ready_Kickables(_float fZOffset)
 		strModelName.resize(iStrLength);
 		fileInput.read(&strModelName[0], iStrLength);
 		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
+		matWorld._41 = matWorld._41 + fXOffset;
 		matWorld._43 = matWorld._43 + fZOffset;
 		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
 		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
@@ -617,7 +625,7 @@ HRESULT CLevel_Racing::Ready_Kickables(_float fZOffset)
 	return S_OK;
 }
 
-HRESULT CLevel_Racing::Ready_Objects(_float fZOffset)
+HRESULT CLevel_Racing::Ready_Objects(_float fXOffset, _float fZOffset)
 {
 	LEVEL eLevel = LEVEL_RACING;
 	string strFileName = "../../../objects_txt/Racing.txt";
@@ -641,6 +649,7 @@ HRESULT CLevel_Racing::Ready_Objects(_float fZOffset)
 		strModelName.resize(iStrLength);
 		fileInput.read(&strModelName[0], iStrLength);
 		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
+		matWorld._41 = matWorld._41 + fXOffset;
 		matWorld._43 = matWorld._43 + fZOffset;
 		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
 		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
@@ -677,6 +686,11 @@ HRESULT CLevel_Racing::Ready_Objects(_float fZOffset)
 		else if ("BoardA" == strModelName || "BoardB" == strModelName || "BoardC" == strModelName)
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Bridge"), TEXT("Prototype_GameObject_ToppleableBridge"), &tDesc)))
+				continue;
+		}
+		else if ("TunnelRocks" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Tunnel"), TEXT("Prototype_GameObject_Tunnel"), &tDesc)))
 				continue;
 		}
 	}

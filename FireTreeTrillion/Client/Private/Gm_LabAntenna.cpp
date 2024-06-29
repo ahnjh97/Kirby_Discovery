@@ -56,7 +56,7 @@ void CGm_LabAntenna::Late_Tick(_float fTimeDelta)
 #pragma region FRUSTUM_CULLING
 
 	//절두체 컬링 처리
-	if (TRUE == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 200.0f))
+	if (TRUE == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 50.0f))
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
@@ -201,29 +201,6 @@ HRESULT CGm_LabAntenna::Bind_ShaderResources()
 		return E_FAIL;
 
 	return S_OK;
-}
-
-void CGm_LabAntenna::SwitchAfterBefore()
-{
-	list<CGameObject*>* pWallFrameList = m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_WallFrame"));
-	if (nullptr == pWallFrameList || pWallFrameList->empty())
-		return;
-
-	for (auto& wallFrame : *pWallFrameList)
-	{
-		if (nullptr == wallFrame || true == wallFrame->Get_Dead())
-			continue;
-
-		CModel* pModel = dynamic_cast<CModel*>(wallFrame->Get_Component(TEXT("Com_Model")));
-		if (nullptr == pModel)
-			continue;
-
-		string strModelName = pModel->Get_ModelName();
-		if ("CarShopWallFrame" == strModelName)
-			wallFrame->Set_Hide(false);
-		else
-			wallFrame->Set_Dead();
-	}
 }
 
 CGm_LabAntenna* CGm_LabAntenna::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
