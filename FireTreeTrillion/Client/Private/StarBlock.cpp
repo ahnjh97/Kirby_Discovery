@@ -2,6 +2,8 @@
 #include "StarBlock.h"
 #include "StarBlockPiece.h"
 #include "HitBox.h"
+#include "Kirby.h"
+#include "Camera_Main.h"
 
 CStarBlock::CStarBlock(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
@@ -15,7 +17,6 @@ CStarBlock::CStarBlock(const CStarBlock& rhs)
 
 HRESULT CStarBlock::Initialize_Prototype()
 {
-	m_eCollisionGroup = OBJECT;
 	return S_OK;
 }
 
@@ -24,17 +25,33 @@ HRESULT CStarBlock::Initialize(void* pArg)
 	GAMEOBJECT_DESC* desc = {};
 
 	if (pArg != nullptr)
-		GAMEOBJECT_DESC* desc = (GAMEOBJECT_DESC*)pArg;
+		desc = (GAMEOBJECT_DESC*)pArg;
 
 
 	HRESULT hr;
 	hr = __super::Initialize(desc);
 	CHECK_FAILED(hr);
 
-	Add_Components(desc->wstrModelName);
+	if (desc != nullptr)
+		Add_Components(desc->wstrModelName);
+
+	m_eAbilityType = ABILITY_DEFAULT;
+	m_bMotionBlur = true;
+	m_bRimLight = true;
+	m_bStencil = true;
+
+
+	CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
 
 	if (FAILED(m_pModelCom->CreateStaticActor(m_pTransformCom->Get_WorldFloat4x4())))
 		return E_FAIL;
+
+	vector<PxRigidActor*> vecActors = m_pModelCom->Get_Actors();
+	if (pKirby != nullptr)
+	{
+		for (auto& actor : vecActors)
+			pKirby->RegisterActorsToPlayer_ForStarBox(actor, this);
+	}
 
 	return S_OK;
 }
@@ -45,6 +62,7 @@ _int CStarBlock::Tick(_float fTimeDelta)
 		return Ready_Dead();
 
 	__super::Tick(fTimeDelta);
+	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
 	Compute_MotionBlur();
 
@@ -63,6 +81,10 @@ _int CStarBlock::Tick(_float fTimeDelta)
 		m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), m_fTimeDelta, 360.f);
 		m_fFlyTime += m_fTimeDelta;
 
+
+		if (RayCast_Terrain(XMVector3Normalize(vDamegeDir)) == true)
+			m_bDead = true;
+
 		if (m_fFlyTime > 2.f)
 			m_bDead = true;
 	}
@@ -78,7 +100,15 @@ void CStarBlock::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
 
-	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+	// 커비 입 안에 있고, Fly가 아닐땐 입 안에 있는 상황이므로, Render되지않는다.
+	if (m_ePhyXState == PO_KIRBYMOUTH)
+		return;
+
+	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
+	{
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
+	}
 }
 
 HRESULT CStarBlock::Render()
@@ -143,6 +173,19 @@ void CStarBlock::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject
 	//hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_MapObject"), TEXT("Prototype_GameObject_StarBlockPiece"), &desc);
 	//CHECK_FAILED(hr);
 	//m_bDead = true;
+}
+
+void CStarBlock::Break_From_Car()
+{
+	CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+	pCamera->Make_Shake(1.6f, 0.5f);
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
+	if (pKirby != nullptr)
+		pKirby->Set_HitStop();
+	m_pGameInstance->Setting_RadialBlur(10.f, 10.f);
+	m_pModelCom->DisableActors();
+
+	m_bDead = true;
 }
 
 HRESULT CStarBlock::Add_Components(wstring wstrModelProtoTag)
@@ -225,6 +268,27 @@ void CStarBlock::Compute_MotionBlur()
 
 	m_vPreScreenPos = vCurScreenPos;
 }
+
+_bool CStarBlock::RayCast_Terrain(const _float3 vMoveDir)
+{
+	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	PxVec3 rayOrigin = PxVec3((_float)vPos.x, (_float)vPos.y, (_float)vPos.z);
+	PxVec3 rayDirection = PxVec3(vMoveDir.x, vMoveDir.y, vMoveDir.z);
+	_float fMaxDistance = 1.f;
+
+	PxRaycastHit hit;
+	PxRaycastBuffer hitBuffer;
+	PxQueryFilterData filterData(PxQueryFlag::eSTATIC);
+
+	_bool isRayCast = m_pGameInstance->Get_Scene()->raycast(rayOrigin, rayDirection, fMaxDistance, hitBuffer, PxHitFlag::eNORMAL, filterData);
+
+	if (isRayCast == true)
+		return true;
+
+	// 레이 쐈는데 터레인이 없었다.
+	return false;
+}
+
 
 
 CStarBlock* CStarBlock::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

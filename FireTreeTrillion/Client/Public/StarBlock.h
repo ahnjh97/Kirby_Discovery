@@ -28,11 +28,13 @@ public:
 #endif
 	virtual void		Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
+	void				Break_From_Car();
 
 private:
 	HRESULT				Add_Components(wstring wstrModelProtoTag);
 	HRESULT				Bind_ShaderResources();
 
+	_bool				RayCast_Terrain(const _float3 vMoveDir);
 	void				Compute_MotionBlur();
 	_float2				m_vPreScreenPos = { 0.f, 0.f };
 	_float4				m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
