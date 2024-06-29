@@ -9,12 +9,12 @@ END
 
 BEGIN(Client)
 
-class CEnergyDrink final : public CItemObject
+class CFood final : public CItemObject
 {
 private:
-	CEnergyDrink(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CEnergyDrink(const CEnergyDrink& rhs);
-	virtual ~CEnergyDrink() = default;
+	CFood(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CFood(const CFood& rhs);
+	virtual ~CFood() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype()	override;
@@ -30,7 +30,7 @@ public:
 
 
 private:
-	HRESULT Add_Components();
+	HRESULT Add_Components(wstring strPrototag);
 	HRESULT Bind_ShaderResources();
 
 	CGameObject*	 m_pPlayer = { nullptr };
@@ -39,7 +39,7 @@ private:
 	_float		 m_fDrinkTime = { 0.f };
 
 public:
-	static CEnergyDrink* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CFood* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 };

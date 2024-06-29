@@ -14,6 +14,7 @@ public:
 		SEQ_ZOOMINOUT,
 		SEQ_HARDCUT_TEST,
 		SEQ_SOFTCUT_TEST,
+		SEQ_BREAKCARSHOP,
 		SEQ_END
 	};
 
@@ -76,30 +77,12 @@ private:
 
 //카메라 트리거 관련 함수
 public:
-	virtual void Set_Target(CTransform* pTarget, CAMFOCUS eFocus = FOCUS_FIRST) override
-	{
-		if (nullptr == pTarget)
-			return;
+	//이벤트를 받기 위해 만든 함수입니다. 인자는 CGameObject* 로 한정
+	void EventFunc(CGameObject* pObj);
 
-		if (eFocus == FOCUS_FIRST)
-		{
-			if (nullptr != m_pFirstTarget)
-				Safe_Release(m_pFirstTarget);
 
-			m_pFirstTarget = pTarget;
-			Safe_AddRef(pTarget);
-			m_eCamFocus = eFocus;
-		}
-		else if(eFocus == FOCUS_SECOND)
-		{
-			if (nullptr != m_pSecondTarget)
-				Safe_Release(m_pSecondTarget);
+	virtual void Set_Target(CTransform* pTarget, CAMTARGET eTarget, CAMFOCUS eFocus, _float3 vAnchorOffset = _float3{ 0.f, 0.f, 0.f }, _float fInterpolateSpeed = -1.f) override;
 
-			m_pSecondTarget = pTarget;
-			Safe_AddRef(pTarget);
-			m_eCamFocus = eFocus;
-		}
-	}
 	
 
 	void Set_MatrixIndex(_int iMatrixIndex);
@@ -120,6 +103,7 @@ public:
 
 //카메라 세팅(타겟, 기타 카메라 값) 관련 함수
 public:
+
 	void Set_CamFocus(CAMFOCUS eFocus) { m_eCamFocus = eFocus; }
 
 	//FOV를 세팅한다.
@@ -129,6 +113,7 @@ public:
 
 	//카메라에게 특정 동작들을 시퀀스로 선예약한다.
 	//인덱스 대신, enum으로 구별하게 하기
+	
 	void Make_Sequence(CAMSEQ eSeq);
 	void Make_Shake(_float fPower = 1.f, _float fTime = .5f, _float2 vDir = _float2(0.f, -1.f));
 
@@ -137,7 +122,8 @@ public:
 	void Make_Sequence_FromDir(EASING eEaseFlag, _float fDuration, _float3 fDestDir, _float fDestZoom = -1.f);
 	void Make_Sequence_FromQuat(EASING eEaseFlag, _float fDuration, _vector vDestQuat, _float fDestZoom = -1.f);
 
-
+	//카메라의 이벤트 함수들
+	void Start_ShutterSeq(CGameObject* pNotifier);
 
 
 	virtual HRESULT Initialize_Prototype() override;
@@ -237,13 +223,16 @@ private:
 	_int m_iShakeCnt = { 0 };
 	//얼마나 세게 흔들 것인가?
 	_float m_fShakePower = { 0.f };
+
 	//카메라 쉐이크 방향
 	_float2 m_vShakeDir = { 0.f, 0.f };
+	_float2 m_vPreShakeDir = { 0.f, 0.f };
 
 	//카메라 움직임 관련 변수들
-	_float m_fShakeAmplitude = { 5.f };
-	_float m_fShakeFrequency = { 50.f };
-	_float m_fShakeTime = { 0.f };
+	_float m_fShakeAmplitude = { .5f };
+	_float m_fShakeFrequency = { 20.f };
+	_float m_fInitialShakeTime = { 0.f };
+	_float m_fCurShakeTime = { 0.f };
 
 
 /*카메라 시퀀스*/
@@ -261,8 +250,13 @@ private:
 	pair<_float, _float> m_fSeqInterpolateTime = { 0.f, 0.f };
 
 private:
+	void Reset_DeferredCamSet();
+
 	void Play_Sequence(_float fTimeDelta);
 	void Control(_float fTimeDelta);
+
+
+	void Subscribe_Events();
 
 	void UpdatePos_FromAnchor(_float fTimeDelta);
 
@@ -273,9 +267,10 @@ private:
 	void Update_CurCamPos(_float fTimeDelta);
 
 	_float3 Make_ShakeDir(_float fTimeDelta);
-	void MoveTo_CurCamPos(_float fTimeDelta);
+	void MoveTo_CurCamPos_Interpolate(_float fTimeDelta);
+	void MoveTo_CurCamPos_Absolute(_float fTimeDelta);
 
-	void Orbit_Target(_float fTimeDelta);
+	//void Orbit_Target(_float fTimeDelta);
 
 
 public:

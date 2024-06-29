@@ -49,7 +49,7 @@ static const _char* s_ModelPassIndices[] = { "0. NORMAL_0", "1. NORMAL_X", "2. S
 	,"6. TRIGGER", "7.DEFAULTFX", "8. BLENDFX", "9. DEFERREDINFO", "10. WHITEFX", "11. KIRBYPART", "12. NEARCLIP",
 	/*"12. NORMAL_O AND NONCULL", */"13. BLEND O, NORMAL O", "14. MONSTERPARTOBJECT" };
 
-static const _char* s_PosTexPassIndices[] = { "0. DEFAULT", "1. ALPHABLEND", "2. BLENDFX", "3. BLOOM", "4. DEFAULTFX", "5. BLEND_NOZTEXT"
+static const _char* s_PosTexPasses[] = { "0. DEFAULT", "1. ALPHABLEND", "2. BLENDFX", "3. BLOOM", "4. DEFAULTFX", "5. BLEND_NOZTEXT"
 	,"6. WHITEFX", "7. UI_MASK", "8. UI_MASK2", "9. SOFTFX", "10. SOFTALPHAFX"};
 static _int s_iPassIndex = -1;
 static _char s_ObjectsFilter[MAX_PATH] = "";
@@ -155,7 +155,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "LbBossRoom", "LbLastBossStage", "LbLastBuilding", "Land_LbLastBossBeforeStep"
 
 		//LbLastBuilding Object :: 보스전 필드의 오브젝트
-		,"LbLastOutFrame2", "LbLastStairs"//, "LbLastTank", "LbLastOutFrame1", 준수 오더로 삭제
+		,"LbLastStairs"//, "LbLastTank", "LbLastOutFrame1", "LbLastOutFrame2", :: 준수 오더로 삭제. 이제 Anim으로 대체되어 사용안함
 		,"LbBossRoomDoorAL","LbBossRoomDoorBL", "LbOutBuildingWallL"
 
 		//LbLastBossBeforeStep Object :: Rubble 
@@ -173,7 +173,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	m_setItemTxts = { "Item_Coin", "Item_EnergyDrink" };
 	m_setTrees = { "GsTreeA", "GsTreeB", "GsTreeC" };
 
-	//투명도 적용이 필요한 데코오브젝트
+	//블렌드 적용이 필요한 데코오브젝트
 	m_setBlendDecos = {"LbOutBuildingWallL", "LbOutBuildingFenceL"};
 
 	s_vecPassIndices.resize(m_vecMapModelNames.size());
@@ -896,7 +896,7 @@ void CMapToolHelper::Edit_Object()
 	{
 		/*ImGui::SetNextItemWidth(150);
 		GetPassIndex();
-		if (ImGui::Combo("##PosTexPassIndex", &s_iPassIndex, s_PosTexPassIndices, IM_ARRAYSIZE(s_PosTexPassIndices)))
+		if (ImGui::Combo("##PosTexPassIndex", &s_iPassIndex, s_PosTexPasses, IM_ARRAYSIZE(s_PosTexPasses)))
 			SetPassIndex(s_iPassIndex);*/
 		
 	}

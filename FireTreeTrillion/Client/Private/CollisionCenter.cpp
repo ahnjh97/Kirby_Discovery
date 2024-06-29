@@ -469,8 +469,28 @@ void CCollisionCenter::DeeDeeDee_Battle()
 			DstHit->Set_Alive(false);
 		});
 
+	// 플레이어 공격에 대한 처리
+	Collision_Collider(m_GameObjects[PLAYERBULLET], m_GameObjects[BOSS_DEEDEEDEE], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
 
-	// 플레이어 공격에 대한 처리.
+			CKirby* pKirby = static_cast<CKirby*>(Dst);
+			CDeeDeeDee* pMonster = static_cast<CDeeDeeDee*>(Src);
+
+
+			_float fAttack = pKirby->Get_Attack();
+			pMonster->Minus_Hp(fAttack);
+			pthis->Camera_Shaking(1.2f);
+			DstHit->Set_Alive(false);
+			SrcHit->Set_Alive(false);
+			Dst->Set_Dead();
+		});
+
+	// 플레이어가 공격당하는 로직
 	Collision_Collider(m_GameObjects[PLAYER], m_GameObjects[HITBOX_DEEDEEDEE], this,
 		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
 		{
@@ -550,6 +570,7 @@ void CCollisionCenter::DeeDeeDee_Battle()
 			_float3 vKnockDir = XMVector3Normalize(vNpcPos - vDeeDeeDeePos);
 
 			pthis->Knock_back(pNpc, vKnockDir * 5.f, 10.f);
+			pthis->Camera_Shaking(1.2f);
 			DstHit->Set_Alive(false);
 			SrcHit->Set_Alive(false);
 			pNpc->Set_PhyXState(PO_FLYDEADAWAY);
@@ -898,6 +919,7 @@ void CCollisionCenter::Hitbox_Collision()
 
 			DstHit->Set_Alive(false);
 			SrcHit->Set_Alive(false);
+			pthis->Camera_Shaking(1.2f);
 			Dst->Set_Dead();
 		});
 

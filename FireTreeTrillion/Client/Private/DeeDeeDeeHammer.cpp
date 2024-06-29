@@ -70,7 +70,7 @@ HRESULT CDeeDeeDeeHammer::Render()
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
 			return E_FAIL;
-		if (FAILED(m_pShaderCom->Begin(MODEL_MONSTERPARTOBJECT)))
+		if (FAILED(m_pShaderCom->Begin(MODEL_MONSTERPART)))
 			return E_FAIL;
 
 		m_pModelCom->Render(i);

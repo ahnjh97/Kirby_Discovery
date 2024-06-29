@@ -162,6 +162,7 @@ public:
 	void			Plus_Coin(_uint uCoin) { m_uCoin += uCoin;	}
 
 	_bool			isAnimFinish();
+	_float			Get_AnimTrackPosition();
 	void			DefaultIdle();
 
 	// 현재 커비가 무적상태인지 아닌지 판별하는 부울 값
@@ -187,8 +188,6 @@ private:
 	HRESULT			Kirby_SystemInitialize();
 	void			Kirby_LookInitialize();
 
-	_float3			Make_RepulsiveDir(CPhysXObject* pObject);
-
 private:
 	HRESULT			Make_TargetToCams();
 	HRESULT			Add_Components();
@@ -197,6 +196,11 @@ private:
 	_bool			Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex);
 	// FSM
 	void			SetUp_FSM();
+	// 구독서비스
+	void			SetUp_Event();
+	void			Event_Racing_Cut1(CGameObject* pObj);
+	void			Event_Racing_Cut2(CGameObject* pObj);
+
 	// 히트박스 체인저
 	void			HitBoxChanger(_uint eState);
 	_bool			m_isKirbyAttacking = { false };

@@ -5,6 +5,9 @@
 #include "HitBox.h"
 #include "Kirby.h"
 
+#include "EventCenter.h"
+
+
 CToppleableBridge::CToppleableBridge(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
 {
@@ -24,6 +27,9 @@ void CToppleableBridge::OnCollision()
 	m_bCollision = true;
 	CAnimBridge* pAnimBridge = dynamic_cast<CAnimBridge*>(m_pAnimBridge);
 	pAnimBridge->OnCollision();
+
+	if (TEXT("BoardC") == m_wstrModelName)
+		CEventCenter::Get_Instance()->Notify(KEVENT_BREAK_RACINGMAP, this);
 
 	return;
 }

@@ -20,6 +20,10 @@
 #include "Utils.h"
 #include "Bone.h"
 #include "HitBox.h"
+#include "Camera_Main.h"
+
+#include "EventCenter.h"
+
 
 
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -61,7 +65,6 @@ HRESULT CKirby::Initialize(void* pArg)
 	// 디버깅 용
 	//m_eAbilityType = ABILITY_SWORD;
 
-	m_pModelCom[INFO(m_eBodyState)]->Set_Animation(STATE_IDLE, 60.f, true, true);
 	m_pControllerCom->RegisterAsPlayer();
 
 	return S_OK;
@@ -192,7 +195,7 @@ void CKirby::Render_IMGUI()
 	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	ImGui::Text("HP : %d", (_int)m_fHp);
 	ImGui::Text("m_fMoveSpeed : %.2f", INFO(m_fMoveSpeed));
-	ImGui::Text("m_bInitializeTargetPos : %d", m_bInitializeTargetPos);
+	ImGui::Text("TrackPosition : %.2f", Get_AnimTrackPosition());
 	ImGui::Text("m_vLadderPoint.x : %.2f, m_vLadderPoint.y : %.2f m_vLadderPoint.z : %.2f", INFO(m_vLadderPoint).x, INFO(m_vLadderPoint).y, INFO(m_vLadderPoint).z);
 	ImGui::Text("m_vLadderLook.x : %.2f, m_vLadderLook.y : %.2f m_vLadderLook.z : %.2f", INFO(m_vLadderLook).x, INFO(m_vLadderLook).y, INFO(m_vLadderLook).z);
 	ImGui::Text("m_vPos.x : %.2f, m_vPos.y : %.2f m_vPos.z : %.2f", vPos.x, vPos.y, vPos.z);
@@ -493,7 +496,7 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 				CMultiEffect::MULTI_FX_DESC FXDesc{};
 				FXDesc.vInitPos = { 0.f, .6f, .4f };
 				FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Vacuum_v1"), &FXDesc)))
+				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Vacuum_v3"), &FXDesc)))
 					return;
 				Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 
@@ -527,15 +530,6 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 	}
 }
 
-_float3 CKirby::Make_RepulsiveDir(CPhysXObject* pObject)
-{
-	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-	_vector vObjectPos = pObject->Get_TransformCom()->Get_State_Vector(CTransform::STATE_POSITION);
-
-	m_vDamegeDir = XMVector3Normalize(vPos - vObjectPos);
-
-	return XMVector3Normalize(vObjectPos - vPos);
-}
 
 void CKirby::Ready_BombOrbit()
 {
@@ -782,14 +776,14 @@ HRESULT CKirby::Make_TargetToCams()
 		Safe_AddRef(m_pCamera);
 	}
 
-	m_pCamera->Set_Target(m_pTransformCom);
+	m_pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FIRST);
 
 	//게임 레벨에 free camera 있다면 그놈에게도 타겟 등록해 준다.
 	if (LEVEL_INTRO <= *m_pCurrentLevelID && *m_pCurrentLevelID < LEVEL_END)
 	{
 		CCamera* pCameraFree = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Free")));
 		if (pCameraFree != nullptr)
-			pCameraFree->Set_Target(m_pTransformCom);
+			m_pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FIRST);
 	}
 
 	return S_OK;
@@ -904,6 +898,9 @@ HRESULT CKirby::Add_Components()
 
 	/* FSM */
 	SetUp_FSM();
+
+	/* 구독 시스템 */
+	SetUp_Event();
 
 	return S_OK;
 }
@@ -1197,6 +1194,10 @@ void CKirby::SetUp_FSM()
 	m_pFSM->Add_State(CARSTATE_CRASH, CKirbyCar_Boost_State::Create());
 
 	m_pFSM->Add_State(CARSTATE_DAMAGE, CKirbyCar_Damage_State::Create()); //
+
+	m_pFSM->Add_State(CARSTATE_CUT1, CKirbyCar_Cut_State::Create()); //
+	m_pFSM->Add_State(CARSTATE_CUT2, CKirbyCar_Cut_State::Create()); //
+
 #pragma endregion
 
 
@@ -1206,6 +1207,46 @@ void CKirby::SetUp_FSM()
 	FSM_Info_Desc.pModel = &m_pModelCom[BODY_DEFAULT];
 	m_pFSM->Initialize(&FSM_Info_Desc);
 
+}
+
+void CKirby::SetUp_Event()
+{
+	//셔터 뿌수기
+	function<void(CGameObject*)> func = bind(&CKirby::Event_Racing_Cut1, this, placeholders::_1);
+	CEventCenter::Get_Instance()->Subscribe(KEVENT_BREAK_CARSHOP, this, func, 1);
+
+	//다리 뿌수기
+	func = bind(&CKirby::Event_Racing_Cut2, this, placeholders::_1);
+	CEventCenter::Get_Instance()->Subscribe(KEVENT_BREAK_RACINGMAP, this, func, 1);
+
+
+}
+// 레이싱맵 컷씬 1.
+void CKirby::Event_Racing_Cut1(CGameObject* pObj)
+{
+	Delete_Effect("Come On Dash");
+
+	INFO(m_bBooster) = false;
+	INFO(m_bCarJump) = false;
+	CKirby::Change_State(CKirby::CARSTATE_CUT1, 60.f, false, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
+	m_pGameInstance->Set_FirstTimerRatio(0.2f);
+	m_pGameInstance->Set_SecondTimerRatio(0.2f);
+	m_pGameInstance->Setting_RadialBlur(20.f, 10.f);
+
+	CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+	pCamera->Make_Shake(2.f);
+
+	_float4 vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 6.f;
+	m_pControllerCom->Move_Dir(m_pTransformCom, vLook + _float4(0.f, 2.f, 0.f, 0.f), m_fTimeDelta);
+}
+
+void CKirby::Event_Racing_Cut2(CGameObject* pObj)
+{
+	Delete_Effect("Come On Dash");
+
+	INFO(m_bBooster) = false;
+	INFO(m_bCarJump) = false;
+	CKirby::Change_State(CKirby::CARSTATE_CUT2, 60.f, false, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 }
 
 void CKirby::HitBoxChanger(_uint eState)
@@ -1364,6 +1405,11 @@ _bool CKirby::isAnimFinish()
 	return m_pModelCom[INFO(m_eBodyState)]->IsFinished();
 }
 
+_float CKirby::Get_AnimTrackPosition()
+{
+	return m_pModelCom[m_tKirbyInfo.m_eBodyState]->Get_AnimTrackPosition();
+}
+
 void CKirby::DefaultIdle()
 {
 	if (m_pModelCom[BODY_DEFAULT] == nullptr)
@@ -1472,10 +1518,12 @@ HRESULT CKirby::Kirby_SystemInitialize()
 	if (FAILED(Make_TargetToCams()))
 		return E_FAIL;
 
-	// 커비의 기본 표정,
+	// 완전히 기본상태로 먼저 세팅한다.
 	INFO(m_eBodyState) = BODY_DEFAULT;
 	INFO(m_eMouthState) = MOUTH_IDLE;
 	INFO(m_eEyeState) = EYE_IDLE;
+	m_pModelCom[INFO(m_eBodyState)]->Set_Animation(STATE_IDLE, 60.f, true, true);
+
 
 	// 커비가 레벨별로 시작할 때, 바라보는 방향을 정해준다.
 	Kirby_LookInitialize();
@@ -1485,17 +1533,29 @@ HRESULT CKirby::Kirby_SystemInitialize()
 	m_fHp = tLevelData.fKirbyHP;
 	m_uCoin = (_uint)tLevelData.fKirbyCoin;
 	// m_eAbilityType = ;
-	// m_uWaddleDeeCount = ;
 	m_fAttack = 5.f; // 고정
 
-	// 게임을 새롭게 시작했을 경우, 리셋시칸다.
-	//if (*m_pCurrentLevelID == LEVEL_INTRO)
-	//{
+
+	// 임시 // 
+	if (*m_pCurrentLevelID == LEVEL_INTRO)
+	{
 		m_fHp = 100.f; // 기존 사용하던 HP입니다.
 		m_fMaxHp = 100.f;
 		m_eAbilityType = ABILITY_DEFAULT;
-		// m_uWaddleDeeCount = 0;
-	//}
+		Change_State(STATE_IDLE, 60.f, true, false, BODY_DEFAULT);
+	}
+	if (*m_pCurrentLevelID == LEVEL_RACING)
+	{
+		m_eAbilityType = ABILITY_DEFAULT;
+		Change_State(CARSTATE_IDLING, 60.f, true, false, BODY_CARDEFAULT, OFFSET_CAR);
+	}
+	else
+	{
+		m_fHp = 100.f; // 기존 사용하던 HP입니다.
+		m_fMaxHp = 100.f;
+		m_eAbilityType = ABILITY_DEFAULT;
+	}
+
 
 
 	// 폭탄 궤적을 만들어 놓는다.
@@ -1505,27 +1565,31 @@ HRESULT CKirby::Kirby_SystemInitialize()
 	// 혹여나, 버그가 발생할까봐 확실하게 블러 true화
 	m_bMotionBlur = true;
 
-
 	return S_OK;
 }
 
 void CKirby::Kirby_LookInitialize()
 {
 	_uint uLevel = *m_pCurrentLevelID;
-	_float4 m_pCameraLook = m_pCamera->Get_TransformCom()->Get_State_Vector(CTransform::STATE_LOOK);
-	m_pCameraLook.y = 0.f;
-	m_pCameraLook = XMVector4Normalize(m_pCameraLook);
+	_float4 fCameraLook = m_pCamera->Get_TransformCom()->Get_State_Vector(CTransform::STATE_LOOK);
+	_float4 fCameraRight = m_pCamera->Get_TransformCom()->Get_State_Vector(CTransform::STATE_RIGHT);
+
+	fCameraLook.y = 0.f;
+	fCameraLook = XMVector4Normalize(fCameraLook);
+	fCameraRight = XMVector4Normalize(fCameraRight);
 
 	// 카메라 기준 바라보는 방향을 설정한다.
-	if (uLevel == 999)		// 여기다가 따로 정의하면됨
+	if (uLevel == LEVEL_RACING)
 	{
+		// 오른쪽을 보고 시작함.
+		INFO(m_vTargetDir) = INFO(m_vMoveDir) = fCameraRight;
+		INFO(m_eBodyState) = BODY_CARDEFAULT;
 	}
 	else
 	{
 		// 카메라를 정면으로 바라봄
-		INFO(m_vMoveDir) = -1.f * m_pCameraLook;
+		INFO(m_vTargetDir) = INFO(m_vMoveDir) = -1.f * fCameraLook;
 	}
-	INFO(m_vTargetDir) = INFO(m_vMoveDir);
 }
 
 CGameObject* CKirby::FindToppleableBridge(PxRigidActor* pActor)
@@ -1569,6 +1633,9 @@ void CKirby::Free()
 	tLevelData.fKirbyCoin = (_float)m_uCoin;
 	tLevelData.fKirbyHP = m_fHp;
 	CLevelChanger::Get_Instance()->Save(tLevelData);
+
+
+	CEventCenter::Get_Instance()->Unsubscribe(this);
 
 	__super::Free();
 

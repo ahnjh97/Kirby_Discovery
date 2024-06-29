@@ -208,9 +208,6 @@
     <Filter Include="02.GameObjects\PhysXObject\Item">
       <UniqueIdentifier>{dcd6e3c0-cd2f-4f4e-8add-51eb6748dc29}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\PhysXObject\Item\EnergyDrink">
-      <UniqueIdentifier>{e5a44464-aceb-4ed8-97a0-0e8e21890bb7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Item\Coin">
       <UniqueIdentifier>{fec82fe1-9a7e-4145-957f-e7c4662e02ff}</UniqueIdentifier>
     </Filter>
@@ -398,6 +395,12 @@
     </Filter>
     <Filter Include="02.GameObjects\Map\PortalSoftEffect">
       <UniqueIdentifier>{412e7813-8f9a-4c83-ba98-f76991e1bfc5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="04.Event">
+      <UniqueIdentifier>{1d0d493c-fa22-44f3-9d8e-a63cfb62354a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Item\Food">
+      <UniqueIdentifier>{e5a44464-aceb-4ed8-97a0-0e8e21890bb7}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Map\Tunnel">
       <UniqueIdentifier>{42e34d56-7ed5-4af0-a996-17f77516f335}</UniqueIdentifier>
@@ -632,9 +635,6 @@
     <ClInclude Include="..\Public\ItemObject.h">
       <Filter>02.GameObjects\PhysXObject\Item</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\EnergyDrink.h">
-      <Filter>02.GameObjects\PhysXObject\Item\EnergyDrink</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Coin.h">
       <Filter>02.GameObjects\PhysXObject\Item\Coin</Filter>
     </ClInclude>
@@ -811,6 +811,14 @@
     </ClInclude>
     <ClInclude Include="..\Public\AnimBridge.h">
       <Filter>02.GameObjects\Map\Bridge</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SkySphereSub.h" />
+    <ClInclude Include="..\public\EventCenter.h">
+      <Filter>04.Event</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Gm_LabAntenna.h" />
+    <ClInclude Include="..\Public\Food.h">
+      <Filter>02.GameObjects\PhysXObject\Item\Food</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SkySphereSub.h" />
     <ClInclude Include="..\Public\Tunnel.h">
@@ -1034,9 +1042,6 @@
     <ClCompile Include="..\Private\ItemObject.cpp">
       <Filter>02.GameObjects\PhysXObject\Item</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\EnergyDrink.cpp">
-      <Filter>02.GameObjects\PhysXObject\Item\EnergyDrink</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Coin.cpp">
       <Filter>02.GameObjects\PhysXObject\Item\Coin</Filter>
     </ClCompile>
@@ -1212,6 +1217,14 @@
       <Filter>02.GameObjects\Map\Bridge</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SkySphereSub.cpp" />
+    <ClCompile Include="..\private\EventCenter.cpp">
+      <Filter>04.Event</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Gm_LabAntenna.cpp" />
+    <ClCompile Include="..\Private\Food.cpp">
+      <Filter>02.GameObjects\PhysXObject\Item\Food</Filter>
+    </ClCompile>
+
     <ClCompile Include="..\Private\Tunnel.cpp">
       <Filter>02.GameObjects\Map\Tunnel</Filter>
     </ClCompile>

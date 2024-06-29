@@ -158,7 +158,7 @@ HRESULT CHUD_BossHpBar::Render()
 
 		if (FAILED(m_pShaderCom->Bind_RawValue("g_vRColor", &m_vColor[i], sizeof(_float3))))
 			return E_FAIL;
-		if (FAILED(m_pShaderCom->Begin(15)))
+		if (FAILED(m_pShaderCom->Begin(POSTEX_BOSS_BARPASS_DEFAULT)))
 			return E_FAIL;
 	
 		if (FAILED(m_pVIBufferCom->Bind_Buffers()))

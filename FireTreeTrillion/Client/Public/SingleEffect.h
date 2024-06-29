@@ -22,6 +22,7 @@ private:
 	virtual ~CSingleEffect() = default;
 
 public:
+	_bool	IsModelBuffer() {	return m_pModelCom != nullptr;	}
 	virtual void	Reset_Duration() override
 	{
 		m_fDuration.first = 0.f;

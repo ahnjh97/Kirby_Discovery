@@ -105,8 +105,11 @@ HRESULT CHungryDee::Initialize(void* pArg)
 	CHECK_FAILED(hr);
 
 	// 배고픈 Dee는 언제든지 음식을 요구할 준비가 되어있읍니다. JYWI
-	m_pDialogUI = static_cast<CUI_PartTimeDee*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_UI_PartTimeDee")));
-	m_pDialogUI->Set_IsRender(false);
+	if (*m_pCurrentLevelID != LEVEL_TOOL_ANIM)
+	{
+		m_pDialogUI = static_cast<CUI_PartTimeDee*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_UI_PartTimeDee")));
+		m_pDialogUI->Set_IsRender(false);
+	}
 	
 	m_pModelCom->Set_Animation(DEESHOPANIM_RUN, CUtils::Make_RandomFloat(45.f, 60.f), true, true);
 
@@ -150,8 +153,11 @@ _int CHungryDee::Tick(_float fTimeDelta)
 		Pair.second->Tick(m_fTimeDelta);
 
 	//(주문 중인 디 == 앞자리에 도착한 디)
-	if(m_pFSM->Get_State() == DEESHOPANIM_ORDERNORMAL)
-		m_pDialogUI->Tick(m_fTimeDelta);
+	if (m_pFSM->Get_State() == DEESHOPANIM_ORDERNORMAL)
+	{
+		if (m_pDialogUI != nullptr)
+			m_pDialogUI->Tick(m_fTimeDelta);
+	}
 
 	//공통된 디 관련 변수를 업데이트 - 초기화한다
 	Dee_SystemTick(m_fTimeDelta);
@@ -187,6 +193,7 @@ void CHungryDee::Swap_WatingPosition()
 
 void CHungryDee::Ready_OrderUI()
 {
+	if (m_pDialogUI == nullptr) return;
 	m_pDialogUI->Set_IsRender(true);
 
 	_float4 vRevisedPos = GET_POS;
@@ -209,7 +216,8 @@ void CHungryDee::Late_Tick(_float fTimeDelta)
 		for (auto& Pair : m_PartObjects)
 			Pair.second->Late_Tick(m_fTimeDelta);
 	}
-	m_pDialogUI->Late_Tick(m_fTimeDelta);
+	if(m_pDialogUI != nullptr)
+		m_pDialogUI->Late_Tick(m_fTimeDelta);
 
 	//_float4 vRevisedPos = GET_POS;
 	//vRevisedPos.y += fOffsetInteract;
@@ -270,7 +278,8 @@ void CHungryDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject
 #ifdef _DEBUG
 void CHungryDee::Render_IMGUI()
 {
-	m_pDialogUI->Render_IMGUI();
+	if (m_pDialogUI != nullptr)
+		m_pDialogUI->Render_IMGUI();
 
 	__super::Render_IMGUI();
 
@@ -285,7 +294,8 @@ void CHungryDee::Render_IMGUI()
 
 void CHungryDee::Change_Dialog(PARTTIME_ITEM eItem)
 {
-	m_pDialogUI->Change_Dialog(eItem);
+	if (m_pDialogUI != nullptr)
+		m_pDialogUI->Change_Dialog(eItem);
 }
 
 void CHungryDee::OnNotify()
@@ -296,7 +306,8 @@ void CHungryDee::OnNotify()
 //맨 앞자리 디
 void CHungryDee::Bring_Food(PARTTIME_ITEM eITEM)
 {
-	m_pDialogUI->Set_IsRender(false);
+	if (m_pDialogUI != nullptr)
+		m_pDialogUI->Set_IsRender(false);
 
 	if (eITEM == PARTTIME_ITEM::ITEM_END)
 	{

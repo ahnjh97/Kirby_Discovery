@@ -2,6 +2,7 @@
 #include "KirbyBomb.h"
 #include "MultiEffect.h"
 #include "HitBox.h"
+#include "EventCenter.h"
 
 CKirbyBomb::CKirbyBomb(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CRigidObject{ pDevice, pContext }

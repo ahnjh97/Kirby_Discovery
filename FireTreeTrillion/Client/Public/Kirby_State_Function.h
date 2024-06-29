@@ -1144,6 +1144,26 @@ static void Throw_Bomb(CKirby::KIRBY_INFODESC* Kirbydesc, _float4 vDir, _float f
 
 #pragma region Hyo Effect
 
+static void BombSmoke(CTransform* pTransformCom, _float3 vPos, _float3 vScale)
+{
+	CEffect::FX_DESC FXDesc{};
+	FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+	FXDesc.vInitPos = { 0.f, 1.4f, -1.0f };
+	FXDesc.vInitScale = { 8.f, 8.f, 8.f };
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Come On Dash"), &FXDesc)))
+		return;
+}
+
+static void ComeOn_Dash(CTransform* pTransformCom)
+{
+	CEffect::FX_DESC FXDesc{};
+	FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+	FXDesc.vInitPos = { 0.f, 1.4f, -1.0f };
+	FXDesc.vInitScale = { 8.f, 8.f, 8.f };
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Come On Dash"), &FXDesc)))
+		return;
+}
+
 static void LadderStart_FX(CTransform* pTransformCom)
 {
 	CMultiEffect::MULTI_FX_DESC FXDesc{};
@@ -1283,7 +1303,6 @@ static void SwordDash(CTransform* pTransformCom)
 		return;
 
 }
-
 
 static void SwordSpinCharge(CTransform* pTransformCom)
 {
