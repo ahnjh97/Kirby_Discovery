@@ -405,6 +405,9 @@
     <Filter Include="02.GameObjects\Map\Tunnel">
       <UniqueIdentifier>{42e34d56-7ed5-4af0-a996-17f77516f335}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\Gimmick">
+      <UniqueIdentifier>{ddac2830-2ec7-4594-9f3e-261ff54f93e0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -812,11 +815,9 @@
     <ClInclude Include="..\Public\AnimBridge.h">
       <Filter>02.GameObjects\Map\Bridge</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\SkySphereSub.h" />
     <ClInclude Include="..\public\EventCenter.h">
       <Filter>04.Event</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Gm_LabAntenna.h" />
     <ClInclude Include="..\Public\Food.h">
       <Filter>02.GameObjects\PhysXObject\Item\Food</Filter>
     </ClInclude>
@@ -826,6 +827,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\TunnelRock.h">
       <Filter>02.GameObjects\Map\Tunnel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SkySphereSub.h">
+      <Filter>02.GameObjects\Map\SkySphere</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Gm_LabAntenna.h">
+      <Filter>02.GameObjects\Map\Gimmick</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1216,20 +1223,23 @@
     <ClCompile Include="..\Private\AnimBridge.cpp">
       <Filter>02.GameObjects\Map\Bridge</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\SkySphereSub.cpp" />
     <ClCompile Include="..\private\EventCenter.cpp">
       <Filter>04.Event</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Gm_LabAntenna.cpp" />
     <ClCompile Include="..\Private\Food.cpp">
       <Filter>02.GameObjects\PhysXObject\Item\Food</Filter>
     </ClCompile>
-
     <ClCompile Include="..\Private\Tunnel.cpp">
       <Filter>02.GameObjects\Map\Tunnel</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\TunnelRock.cpp">
       <Filter>02.GameObjects\Map\Tunnel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SkySphereSub.cpp">
+      <Filter>02.GameObjects\Map\SkySphere</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Gm_LabAntenna.cpp">
+      <Filter>02.GameObjects\Map\Gimmick</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
