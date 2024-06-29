@@ -2004,7 +2004,7 @@ _bool CMapToolHelper::Save_Decos(const string& _strLevel, vector<CGameObject*>& 
 		_float fRimWidth = obj->Get_RimWidth();
 		_uint iPassIndex = static_cast<_uint>(pMapToolObj->Get_PassIndex());
 		if (true == IsTree(strModelName))
-			iPassIndex = 12;
+			iPassIndex = MODEL_NEARCLIP;
 		else
 			iPassIndex = 0;
 
@@ -2219,6 +2219,8 @@ void CMapToolHelper::Load_Triggers(const string& _strLevel)
 		strModelName.resize(iStrLength);
 		fileInput.read(&strModelName[0], iStrLength);
 		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
+		//matWorld._41 = matWorld._41 - 200.f;
+		//matWorld._43 = matWorld._43 + 1200.f;
 		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
 		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
 
