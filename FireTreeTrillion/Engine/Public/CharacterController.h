@@ -50,6 +50,7 @@ public:
 
 	_float			Get_Radius() const { return m_tControllerCapsuleDesc.radius; }
 	void			RegisterAsPlayer();
+	PxRigidActor*	Get_MostRecentActor() { return m_pMostRecentActor; }
 
 public:
 	virtual HRESULT Initialize(void* pArg)	override;
@@ -136,6 +137,10 @@ protected:
 
 	_bool								m_isCollision = { false };
 	string								m_strObjectName = "";
+
+	PxRigidActor*						m_pMostRecentActor = { nullptr };
+
+
 public:
 	static	CCharacterController*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CComponent*				Clone(void* pArg = nullptr) override;

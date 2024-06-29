@@ -233,7 +233,7 @@ void CHitBox::Restore_Logic(_float fTimeDelta)
 	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	_float4 vPlayerPos = pPlayer->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
 
-	if ((vPlayerPos - vPos).Length() > 40.f)
+	if ((vPlayerPos - vPos).Length() > 70.f)
 		bDontAddCollisionCenter = true;
 
 	// 몸통 전용 콜라이더 일 경우. (내가 가지고 있는 구조체 벨류 값)

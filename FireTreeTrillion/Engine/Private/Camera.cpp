@@ -8,9 +8,38 @@ CCamera::CCamera(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 }
 
-CCamera::CCamera(const CCamera & rhs)
+CCamera::CCamera(const CCamera& rhs)
 	: CGameObject(rhs)
 {
+}
+
+void CCamera::Set_Target(CTransform* pTarget, CAMTARGET eTarget, CAMFOCUS eFocus, _float3 _vAnchorOffset, _float _fInterpolateSpeed)
+{
+	if (nullptr == pTarget)
+		return;
+
+	if (eFocus == FOCUS_FIRST)
+	{
+		if (nullptr != m_pFirstTarget)
+			Safe_Release(m_pFirstTarget);
+
+		m_pFirstTarget = pTarget;
+		Safe_AddRef(pTarget);
+
+	}
+	else if (eFocus == FOCUS_SECOND)
+	{
+		if (nullptr != m_pSecondTarget)
+			Safe_Release(m_pSecondTarget);
+
+		m_pSecondTarget = pTarget;
+		Safe_AddRef(pTarget);
+	}
+
+	m_vAnchorOffset = _vAnchorOffset;
+
+	if (0.f < _fInterpolateSpeed)
+		m_fInterpolateSpeed = _fInterpolateSpeed;
 }
 
 HRESULT CCamera::Initialize_Prototype()
@@ -18,9 +47,9 @@ HRESULT CCamera::Initialize_Prototype()
 	return S_OK;
 }
 
-HRESULT CCamera::Initialize(void * pArg)
+HRESULT CCamera::Initialize(void* pArg)
 {
-	CAMERA_DESC*		pCameraDesc = (CAMERA_DESC*)pArg;
+	CAMERA_DESC* pCameraDesc = (CAMERA_DESC*)pArg;
 
 	m_fFovy = pCameraDesc->fFovy;
 	m_fAspect = pCameraDesc->fAspect;
@@ -48,11 +77,11 @@ void CCamera::Late_Tick(_float fTimeDelta)
 
 
 HRESULT CCamera::Bind_PipeLines()
-{	
+{
 	/* dx9 : 고정기능렌더링파이프라인. 현재 카메라에서 설정할 수 있는 행렬들을 장치에 바인딩하여 추후 렌더릴ㅇ되는 정점들에게 알아서 곱할 수 있도록 한다. */
 	/* dx11 : 사용자 정의 렌더링 파이프라인(ㅅㅖ이더). */
 	m_pGameInstance->Set_Transform(CPipeLine::D3DTS_VIEW, m_pTransformCom->Get_WorldMatrix_Inv());
-	m_pGameInstance->Set_Transform(CPipeLine::D3DTS_PROJ, XMMatrixPerspectiveFovLH(m_fFovy, m_fAspect, m_fNear, m_fFar));	
+	m_pGameInstance->Set_Transform(CPipeLine::D3DTS_PROJ, XMMatrixPerspectiveFovLH(m_fFovy, m_fAspect, m_fNear, m_fFar));
 
 	return S_OK;
 }

@@ -208,9 +208,6 @@
     <Filter Include="02.GameObjects\PhysXObject\Item">
       <UniqueIdentifier>{dcd6e3c0-cd2f-4f4e-8add-51eb6748dc29}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\PhysXObject\Item\EnergyDrink">
-      <UniqueIdentifier>{e5a44464-aceb-4ed8-97a0-0e8e21890bb7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Item\Coin">
       <UniqueIdentifier>{fec82fe1-9a7e-4145-957f-e7c4662e02ff}</UniqueIdentifier>
     </Filter>
@@ -360,9 +357,6 @@
     </Filter>
     <Filter Include="02.GameObjects\Map\Bridge">
     </Filter>
-    <Filter Include="02.GameObjects\MiniGame\UI">
-      <UniqueIdentifier>{f66e1d54-657e-4ef4-b222-24f86e5cd5b8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Map\Bridge">
       <UniqueIdentifier>{d42d0265-2d39-46ae-8baa-4fdc448c5e73}</UniqueIdentifier>
     </Filter>
@@ -411,6 +405,9 @@
     <Filter Include="01.Levels\4-1. PartTime">
       <UniqueIdentifier>{ce0fcbcb-4978-4d71-b5ac-464c5d2c038d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\WaddleDee\Battle">
+      <UniqueIdentifier>{c3474c33-3205-448e-897a-c737e2235109}</UniqueIdentifier>
+    </Filter>
     <Filter Include="02.GameObjects\Map\NonRenderWall">
       <UniqueIdentifier>{d4881f40-d9f4-423b-bdbf-ef08184a3618}</UniqueIdentifier>
     </Filter>
@@ -431,6 +428,30 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\BossMonster\BossClone">
       <UniqueIdentifier>{e8be6b82-b8ef-4544-82ef-46b8cfb26a7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\PartTime">
+      <UniqueIdentifier>{f66e1d54-657e-4ef4-b222-24f86e5cd5b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\PartTimeDee">
+      <UniqueIdentifier>{324b2e98-324d-4f5b-b2c0-71610d22ab87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\HUD\BossHp">
+      <UniqueIdentifier>{d5a13d88-c8da-47f6-ab92-a8b19f3b623e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\PortalSoftEffect">
+      <UniqueIdentifier>{412e7813-8f9a-4c83-ba98-f76991e1bfc5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="04.Event">
+      <UniqueIdentifier>{1d0d493c-fa22-44f3-9d8e-a63cfb62354a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Item\Food">
+      <UniqueIdentifier>{e5a44464-aceb-4ed8-97a0-0e8e21890bb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Tunnel">
+      <UniqueIdentifier>{42e34d56-7ed5-4af0-a996-17f77516f335}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Gimmick">
+      <UniqueIdentifier>{ddac2830-2ec7-4594-9f3e-261ff54f93e0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -662,9 +683,6 @@
     <ClInclude Include="..\Public\ItemObject.h">
       <Filter>02.GameObjects\PhysXObject\Item</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\EnergyDrink.h">
-      <Filter>02.GameObjects\PhysXObject\Item\EnergyDrink</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Coin.h">
       <Filter>02.GameObjects\PhysXObject\Item\Coin</Filter>
     </ClInclude>
@@ -803,14 +821,14 @@
     <ClInclude Include="..\Public\PartTimeHelper.h">
       <Filter>02.GameObjects\MiniGame\_Helper</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\BreakableRockPartical.h">
+    <ClInclude Include="..\Public\BreakableRockParticle.h">
       <Filter>02.GameObjects\Map\BreakableRock</Filter>
     </ClInclude>
     <ClInclude Include="..\public\OriginalDee.h">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\Original</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\UI_PartTime.h">
-      <Filter>02.GameObjects\MiniGame\UI</Filter>
+      <Filter>02.GameObjects\UI\PartTime</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\DeeDeeDee.h">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee</Filter>
@@ -820,6 +838,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\CarShopWall.h">
       <Filter>02.GameObjects\Map\CarShopWall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_DeeDeeDee.h">
+      <Filter>01.Levels\3. DeeDeeDee</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\DeeDeeDeeHammer.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee\DeeDeeDeeHammer</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\DeeDeeDeeHammer.h">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee</Filter>
@@ -832,6 +856,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Level_DeeDeeDee.h">
       <Filter>01.Levels\3. DeeDeeDee</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\BattleDee.h">
+      <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\Battle</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BlendMapObject.h">
       <Filter>02.GameObjects\Map\BlendMapObject</Filter>
@@ -853,6 +880,38 @@
     </ClInclude>
     <ClInclude Include="..\Public\BossClone.h">
       <Filter>02.GameObjects\PhysXObject\Character\BossMonster\BossClone</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UI_PartTimeDee.h">
+      <Filter>02.GameObjects\UI\PartTimeDee</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\HUD_BossHpBar.h">
+      <Filter>02.GameObjects\UI\HUD\BossHp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PortalSoftEffect.h">
+      <Filter>02.GameObjects\Map\PortalSoftEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\AnimBridge.h">
+      <Filter>02.GameObjects\Map\Bridge</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\EventCenter.h">
+      <Filter>04.Event</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Food.h">
+      <Filter>02.GameObjects\PhysXObject\Item\Food</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SkySphereSub.h" />
+    <ClInclude Include="..\Public\Tunnel.h">
+      <Filter>02.GameObjects\Map\Tunnel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TunnelRock.h">
+      <Filter>02.GameObjects\Map\Tunnel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SkySphereSub.h">
+      <Filter>02.GameObjects\Map\SkySphere</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Gm_LabAntenna.h">
+      <Filter>02.GameObjects\Map\Gimmick</Filter>
+>>>>>>> main
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1069,9 +1128,6 @@
     <ClCompile Include="..\Private\ItemObject.cpp">
       <Filter>02.GameObjects\PhysXObject\Item</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\EnergyDrink.cpp">
-      <Filter>02.GameObjects\PhysXObject\Item\EnergyDrink</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Coin.cpp">
       <Filter>02.GameObjects\PhysXObject\Item\Coin</Filter>
     </ClCompile>
@@ -1207,14 +1263,14 @@
     <ClCompile Include="..\Private\PartTimeHelper.cpp">
       <Filter>02.GameObjects\MiniGame\_Helper</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\BreakableRockPartical.cpp">
+    <ClCompile Include="..\Private\BreakableRockParticle.cpp">
       <Filter>02.GameObjects\Map\BreakableRock</Filter>
     </ClCompile>
     <ClCompile Include="..\private\OriginalDee.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\Original</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\UI_PartTime.cpp">
-      <Filter>02.GameObjects\MiniGame\UI</Filter>
+      <Filter>02.GameObjects\UI\PartTime</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\DeeDeeDee.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee</Filter>
@@ -1224,6 +1280,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\CarShopWall.cpp">
       <Filter>02.GameObjects\Map\CarShopWall</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_DeeDeeDee.cpp">
+      <Filter>01.Levels\3. DeeDeeDee</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\DeeDeeDeeHammer.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee\DeeDeeDeeHammer</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\DeeDeeDeeHammer.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee</Filter>
@@ -1236,6 +1298,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Level_DeeDeeDee.cpp">
       <Filter>01.Levels\3. DeeDeeDee</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\BattleDee.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\Battle</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BlendMapObject.cpp">
       <Filter>02.GameObjects\Map\BlendMapObject</Filter>
@@ -1257,6 +1322,36 @@
     </ClCompile>
     <ClCompile Include="..\Private\BossClone.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\BossMonster\BossClone</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UI_PartTimeDee.cpp">
+      <Filter>02.GameObjects\UI\PartTimeDee</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HUD_BossHpBar.cpp">
+      <Filter>02.GameObjects\UI\HUD\BossHp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PortalSoftEffect.cpp">
+      <Filter>02.GameObjects\Map\PortalSoftEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\AnimBridge.cpp">
+      <Filter>02.GameObjects\Map\Bridge</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\EventCenter.cpp">
+      <Filter>04.Event</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Food.cpp">
+      <Filter>02.GameObjects\PhysXObject\Item\Food</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Tunnel.cpp">
+      <Filter>02.GameObjects\Map\Tunnel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TunnelRock.cpp">
+      <Filter>02.GameObjects\Map\Tunnel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SkySphereSub.cpp">
+      <Filter>02.GameObjects\Map\SkySphere</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Gm_LabAntenna.cpp">
+      <Filter>02.GameObjects\Map\Gimmick</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

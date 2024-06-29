@@ -34,6 +34,7 @@ public:
 	_float Get_Duration() {	return m_fDuration; }
 	_float Get_TrackPosition() { return m_fTrackPosition; }
 	_float Get_AnimRatio() { return m_fTrackPosition / m_fDuration;	}
+	_float Get_AnimTrackPosition() { return m_fTrackPosition; }
 
 public:
 	_float		 Get_TickPerSecond() const { return m_fTickPerSecond; }

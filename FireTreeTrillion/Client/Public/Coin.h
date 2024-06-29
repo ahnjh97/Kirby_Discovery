@@ -27,7 +27,7 @@ public:
 	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
 private:
-	HRESULT Add_Components();
+	HRESULT Add_Components(wstring strPrototag);
 	HRESULT Bind_ShaderResources();
 
 private:

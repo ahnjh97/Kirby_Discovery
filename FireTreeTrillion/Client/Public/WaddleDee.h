@@ -28,6 +28,11 @@ enum DEE_ANIM
 	DEEANIM_CASEHELPME_END,
 	DEEANIM_CASEHELPME_START,
 
+	DEEANIM_CHEERINGA = 13,
+	DEEANIM_CHEERINGB,
+	DEEANIM_CHEERINGC,
+	DEEANIM_CHEERINGD,
+
 	DEEANIM_CHOOSE_START = 17,
 	DEEANIM_CHOOSE_WAIT,
 
@@ -36,6 +41,8 @@ enum DEE_ANIM
 	DEEANIM_CLERKWAVEHAND,
 
 	DEEANIM_DAMAGE,
+
+	DEEANIM_ENEMYRUN = 48,
 
 	//원래 와들디의 행동들
 	DEEANIM_ENEMYSLEEP = 50,
@@ -125,8 +132,8 @@ enum DEE_CHARACTER
 	DEECHARACTER_WALK,
 	DEECHARACTER_SIT,
 	DEECHARACTER_SITTALK,
-	DEECHARACTER_TROUBLE,
-	DEECHARACTER_ANGRY,
+	DEECHARACTER_TROUBLE = 4,
+	DEECHARACTER_ANGRY = 5,
 	DEECHARACTER_SLEEPY,
 	DEECHARACTER_FRONTMAN = 7,
 	DEECHARACTER_KEYBOARD,
@@ -134,6 +141,7 @@ enum DEE_CHARACTER
 	DEECHARACTER_DRUM,
 	DEECHARACTER_LISTENER,
 	DEECHARACTER_READBOOK = 12,
+	DEECHARACTER_RUN = 13,
 	DEECHARACTER_END,
 };
 
@@ -171,6 +179,7 @@ enum TOWN_POINT
 	TOWNPOINT_29,
 	TOWNPOINT_END
 };
+
 struct WAITING_INFO
 {
 	_float3 vPos;
@@ -197,7 +206,6 @@ using namespace WaddleDee;
 
 class CWaddleDee abstract : public CCharacter
 {
-
 public:
 	struct DEE_DESC : public CGameObject::GAMEOBJECT_DESC
 	{
@@ -222,7 +230,7 @@ public:
 
 	//목적지의 위치를 만든다
 	virtual _float3		Make_DestPos() { return _float3::Zero; }
-	virtual DEE_ANIM	Make_WhatToDo() { return DEEANIM_END; }
+	virtual pair<DEE_ANIM, _bool >	Make_WhatToDo() { return { DEEANIM_END, true }; }
 
 	void				Change_State(DEE_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
 

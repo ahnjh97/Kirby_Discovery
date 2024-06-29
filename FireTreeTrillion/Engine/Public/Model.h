@@ -27,6 +27,8 @@ public:
 	_float Get_Trackposition() { return m_Animations[m_iCurrentAnimIndex]->Get_TrackPosition(); }
 	_float Get_AnimRatio() { return m_Animations[m_iCurrentAnimIndex]->Get_AnimRatio(); }
 	
+	CModel* CreateModelFromMesh(_uint iMeshIndex, _float3& vOffset
+		, unordered_set<string>& _setCheckedStrings, unordered_set<string>& _setExcludedMesh);
 
 public:
 	void Set_TickPerSecond(_float _fTickPerSecond) { m_Animations[m_iCurrentAnimIndex]->Set_TickPerSecond(_fTickPerSecond); }
@@ -58,11 +60,13 @@ public:
 	void Set_TrackPosition(_float fTrackPosition) { m_Animations[m_iCurrentAnimIndex]->Set_TrackPosition(fTrackPosition); }
 
 	const _char* Get_AnimationName() const { return m_Animations[m_iCurrentAnimIndex]->Get_AnimationName(); }
+	_float Get_AnimTrackPosition() { return m_Animations[m_iCurrentAnimIndex]->Get_AnimTrackPosition(); }
 	_uint Get_AnimCnt() const { return m_Animations.size(); }
 	vector<class CAnimation*>* const Get_Animations() { return &m_Animations; }
 	
 public:
 	virtual HRESULT Initialize_Prototype(MODEL tModel);
+	virtual HRESULT Initialize_Prototype(vector<class CMesh*>& _vecMeshes, const vector<MESH_MATERIAL>& _vecMaterials);
 	virtual HRESULT Initialize(void* pArg)  override;
 #ifdef _DEBUG
 	virtual void	Render_IMGUI()			override;
@@ -80,7 +84,12 @@ public:
 
 	HRESULT CreateDynamicActor(_float4x4& matWorld);
 	HRESULT CreateStaticActor(_float4x4& matWorld);
-	void DisableActor();
+	HRESULT	CreateStaticActors_Exclude(unordered_set<string>& _setNonColMesh, _float4x4& matWorld);
+	HRESULT CreateStaticActors_Include(unordered_set<string>& _setColMesh, _float4x4& matWorld);
+	void	DisableActors();
+	void	DisableActors(unordered_set<string>& _setMeshNames);
+	void	ReAddActors();
+	void	ReAddActors(unordered_set<string>& _setMeshNames);
 
 	void	Update_ActorTransform(class CTransform* pTransform);
 
@@ -119,6 +128,11 @@ public:
 	void DeterminePassIndices(vector<_uint>& _vecPassIndices);
 	void Set_BlendObject(class CGameObject* pBlendObject) { m_pBlendObject = pBlendObject; }
 	void AddBlendObjectToRenderGroup();
+	unordered_set<PxRigidActor*> Get_ActorsSet();
+	vector<PxRigidActor*> Get_Actors();
+
+	void AlignMeshMaterialIndicesWithMeshIndices();
+	string ExtractDigitsAfterUnderScore(_uint iMeshIndex);
 
 private:
 	_uint						m_iNumMeshes = { 0 };
@@ -176,6 +190,8 @@ private:
 
 public:
 	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODEL tModel);
+	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext
+		, vector<class CMesh*>& _vecMeshes, const vector<MESH_MATERIAL>& _vecMaterials);
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Free() override;
 };

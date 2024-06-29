@@ -47,6 +47,7 @@ private:
 	void	Menu_MapShaderInfo();
 	void	Menu_MonsterInfo();
 	void	Menu_RallyPointInfo();
+	void	Menu_BlendDecoInfo();
 	void	Edit_Object();
 
 	// On Key/Mouse Input 
@@ -69,18 +70,22 @@ private:
 	_bool	Save_Decos(const string& _strLevel, vector<CGameObject*>& _vecDecos);
 	_bool	Save_Items(const string& _strLevel, vector<CGameObject*>& _vecItems);
 	_bool	Save_Kickables(const string& _strLevel, vector<CGameObject*>& _vecItems);
-
+	
 	void	Load_Map(const string& _strLevel);
 	void	Load_Triggers(const string& _strLevel);
 	void	Load_Monsters(const string& _strLevel);
 	void	Load_Decos(const string& _strLevel);
 	void	Load_Items(const string& _strLevel);
 	void	Load_Kickables(const string& _strLevel);
-
+	
 	void	RegisterRallyPoints(list<CGameObject*>* _pObjList);
 	void	WriteLocalizedAnimMapDecos(vector<pair<string, _float4x4>>& _vecAnimDecos);
 	void	WriteLocalizedNonAnimMapDecos(vector<pair<string, _float4x4>>& _vecNonAnimDecos);
 
+	_bool	Save_BlendDecoInfos();
+	void	TraverseBlendDecoInfoTxts();
+	void	Load_BlendDecoInfo(const string& _strFolderPath, const string& _strFileName);
+	
 	// Picking
 	CGameObject* Select_ModelByPicking(const wstring& wstrLayerTag = TEXT("Layer_Parse"));
 	_int Compute_MapIndex(const string& _strModelName);
@@ -94,6 +99,7 @@ private:
 	_bool IsRallyingMonster(const string& _strModelName);
 	_bool IsKickble(const string& _strModelName);
 	_bool IsTree(const string& _strModelName);
+	_bool IsBlendDeco(const string& _strModelName);
 
 	_bool RenameFile(const string& _strLevel, const string& _tempFileName, const string& _strCustom);
 
@@ -147,6 +153,8 @@ private:
 	//마을을 위한 txts
 	vector<string>	m_vecTownDecoTxts;
 	vector<string>	m_vecLabDecoTxts;
+
+	unordered_map<string, unordered_set<_uint>> m_mapBlendDecoInfos;
 
 	string m_strSelectedTxt;
 	string m_strCurModel;

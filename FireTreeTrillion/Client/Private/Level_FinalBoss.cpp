@@ -15,6 +15,7 @@
 
 #include "BG.h"
 #include "HUD.h"
+#include "SkySphere.h"
 //#include "Kirby.h"
 
 CLevel_FinalBoss::CLevel_FinalBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -49,6 +50,9 @@ HRESULT CLevel_FinalBoss::Initialize()
 	hr = Ready_Items();
 	CHECK_FAILED(hr);
 	hr = Ready_Kickables();
+	CHECK_FAILED(hr);
+
+	hr = Ready_Objects();
 	CHECK_FAILED(hr);
 	
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
@@ -142,7 +146,19 @@ HRESULT CLevel_FinalBoss::Ready_Layer_Camera(const wstring& strLayerTag)
 
 HRESULT CLevel_FinalBoss::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
-	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_FINALBOSS, strLayerTag, TEXT("Prototype_GameObject_SkySphere"));
+	CSkySphere::SKYSPHERE_DESC LabSkyDesc{};
+	LabSkyDesc.strModelTag = { "SkySphere_Stage1_Day" };
+	LabSkyDesc.strTextureTag = { "SkySphere_Lab_Diffuse" };
+	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_FINALBOSS, strLayerTag, TEXT("Prototype_GameObject_SkySphere"), &LabSkyDesc);
+	CHECK_FAILED(hr);
+
+	//SUB_SKYSPHERE
+	CSkySphere::SKYSPHERE_DESC LabSkySubDesc{};
+	_float4x4 InitMat = _float4x4::Identity;
+	InitMat.Translation({ 0.f, -50.f, -0.f });
+	LabSkySubDesc.matWorld = InitMat;
+
+	hr = m_pGameInstance->Add_Clone(LEVEL_FINALBOSS, strLayerTag, TEXT("Prototype_GameObject_SkySphereSub"), &LabSkySubDesc);
 	CHECK_FAILED(hr);
 
 	return S_OK;
@@ -577,6 +593,64 @@ HRESULT CLevel_FinalBoss::Ready_Kickables()
 			return E_FAIL;
 	}
 
+	fileInput.close();
+
+	return S_OK;
+}
+
+HRESULT CLevel_FinalBoss::Ready_Objects()
+{
+	//Map, Triggers, Kickables.. 분류 제외 잔존 오브젝트들
+	LEVEL eLevel = LEVEL_FINALBOSS;
+	string strFileName = "../../../objects_txt/FinalBoss.txt";
+
+	ifstream fileInput(strFileName, ios::binary);
+	if (fileInput.is_open() == false)
+	{
+		MSG_BOX(TEXT("Failed to open : FinalBoss.txt"));
+		return E_FAIL;
+	}
+
+	_uint iStrLength{};
+	string strModelName;
+	_float4x4 matWorld{};
+	_uint iShaderVars{};
+	_float fRimWidth{};
+
+	while (!fileInput.eof())
+	{
+		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
+		strModelName.resize(iStrLength);
+		fileInput.read(&strModelName[0], iStrLength);
+		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
+		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
+		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
+
+		if (fileInput.eof())
+			break;
+
+		CGameObject::GAMEOBJECT_DESC tDesc{};
+		tDesc.matWorld = matWorld;
+		tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+		tDesc.iShaderVars = iShaderVars;
+		tDesc.fRimWidth = fRimWidth;
+
+#pragma region GIMMICK_OBJECT
+		
+		if ("LbAntenna_NonAnim" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_LabAntenna"), &tDesc)))
+				continue;
+		}
+
+		if ("LbBossRoomDoor_NonAnim" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_LabBossRoomDoor"), &tDesc)))
+				continue;
+		}
+
+#pragma endregion
+	}
 	fileInput.close();
 
 	return S_OK;

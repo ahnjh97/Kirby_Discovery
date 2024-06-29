@@ -21,9 +21,9 @@ public:
 	static pair<_float3, vector<TOWN_POINT_INFO>> m_TownPoints;
 
 	//목적지의 위치를 가져온다
-	virtual _float3			Make_DestPos() override;
+	virtual _float3					Make_DestPos() override;
 	//목적지에 도착하면 뭐 할 지 만들어준다~
-	virtual DEE_ANIM		Make_WhatToDo() override;
+	virtual pair<DEE_ANIM, _bool>	Make_WhatToDo() override;
 
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;

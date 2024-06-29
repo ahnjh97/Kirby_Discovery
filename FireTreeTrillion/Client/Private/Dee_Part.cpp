@@ -34,7 +34,6 @@ HRESULT CDee_Part::Initialize(void* pArg)
 	m_pCurAnimState = pPartDesc->pCurAnimState;
 	//m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(0.f, 0.1f, 0.01f, 1.f));
 
-
 	return S_OK;
 }
 

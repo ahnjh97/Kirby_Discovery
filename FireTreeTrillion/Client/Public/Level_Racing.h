@@ -21,12 +21,14 @@ private:
 	HRESULT Ready_Layer_BackGround(const wstring& strLayerTag);
 	HRESULT Ready_Layer_UI(const wstring& strLayerTag);
 
-	HRESULT Ready_Map();
-	HRESULT Ready_Triggers();
-	HRESULT Ready_Monsters();
-	HRESULT Ready_Items();
-	HRESULT Ready_Kickables();
-	HRESULT Ready_Objects();
+	HRESULT Ready_Map(_float fXOffset, _float fZOffset);
+	HRESULT Ready_Triggers(_float fXOffset, _float fZOffset);
+	HRESULT Ready_Monsters(_float fXOffset, _float fZOffset);
+	HRESULT Ready_Items(_float fXOffset, _float fZOffset);
+	HRESULT Ready_Kickables(_float fXOffset, _float fZOffset);
+	HRESULT Ready_Objects(_float fXOffset, _float fZOffset);
+
+	void	Change_Levels();
 
 	HRESULT	Load_FileData(const string& _strFilePath, FILE_TYPE _eFileType, const wstring& _strLayerTag);
 

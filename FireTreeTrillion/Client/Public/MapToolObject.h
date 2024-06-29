@@ -14,7 +14,7 @@ BEGIN(Client)
 class CMapToolObject : public CGameObject
 {
 public:
-	enum TYPE_MAPOBJ { MAPOBJ_NONCOL, MAPOBJ_ANIM , MAPOBJ_ACTOR, MAPOBJ_END };
+	enum TYPE_MAPOBJ { MAPOBJ_NONCOL, MAPOBJ_ANIM, MAPOBJ_ACTOR, MAPOBJ_END };
 
 public:
 	struct MAPTOOLOBJECT_DESC : public GAMEOBJECT_DESC
@@ -26,6 +26,7 @@ public:
 		_int iPassIndex = { 0 };
 		map<_uint, _float3> RallyPoints;
 		string strConnectedMonster;
+		unordered_set<_uint> setBlendMeshIndices;
 		TYPE_MAPOBJ eMapObjType = { MAPOBJ_END };
 	};
 
@@ -46,8 +47,10 @@ public:
 	void Set_CamType(_int iCamType) { m_iCamType = iCamType; }
 	void Set_Radius(_float fRadius) { m_fRadius = fRadius; }
 	void Set_ConnectedMonster(string& strConnectedMonster) { m_strConnectedMonster = strConnectedMonster; }
-	void Set_MapObjType(TYPE_MAPOBJ eMapObjType){}
+	void Set_MapObjType(TYPE_MAPOBJ eMapObjType) {}
 	void Set_PassIndex(_int iPassIndex) { m_iPassIndex = iPassIndex; }
+	void Set_PassIndices(unordered_set<_uint>& _setBlendMeshIndices);
+	void Reset_Time(_uint iIndex) { m_iMeshIndex = iIndex; m_fTime = 0; }
 
 private:
 	CMapToolObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -73,10 +76,16 @@ private:
 	_float m_fRadius = { 0.f };
 	_int m_iCamType = { -1 };
 	_int m_iPassIndex = { 0 };
-
+	_float m_fWhiteColorDiffuse = {};
+	_float m_fZero = {};
+	_uint m_iMeshIndex = {};
+	_float m_fTime = { 100.f };
+	
 	string m_strConnectedMonster;
 	map<_uint, _float3> m_RallyPoints;
 	TYPE_MAPOBJ m_eMapObjType = { MAPOBJ_ACTOR };
+
+	vector<_uint> m_vecPassIndices;
 
 private:
 	CModel* m_pModelCom = { nullptr };

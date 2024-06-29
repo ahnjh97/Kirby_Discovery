@@ -12,6 +12,7 @@
 #include "Kabu.h"
 #include "BrontoBurt.h"
 #include "PoppyBrosJr.h"
+#include "SkySphere.h"
 
 #include "HungryDee.h"
 #include "PartTimeFood.h"
@@ -156,7 +157,10 @@ HRESULT CLevel_PartTime::Ready_Layer_Camera(const wstring& strLayerTag)
 
 HRESULT CLevel_PartTime::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
-	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_PARTTIME, strLayerTag, TEXT("Prototype_GameObject_SkySphere"));
+	CSkySphere::SKYSPHERE_DESC PartTimeSkyDesc{};
+	PartTimeSkyDesc.strModelTag = { "SkySphere_Stage1_Day" };
+
+	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_PARTTIME, strLayerTag, TEXT("Prototype_GameObject_SkySphere"), &PartTimeSkyDesc);
 	CHECK_FAILED(hr);
 
 	return S_OK;
@@ -245,7 +249,8 @@ HRESULT CLevel_PartTime::Ready_Layer_UI(const wstring& _wstrLayerTag)
 {
 	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_PARTTIME, _wstrLayerTag, TEXT("Prototype_GameObject_UI_PartTime"));
 	CHECK_FAILED(hr);
-
+	//hr = m_pGameInstance->Add_Clone(LEVEL_PARTTIME, _wstrLayerTag, TEXT("Prototype_GameObject_UI_PartTimeDee"));
+	//CHECK_FAILED(hr);
 	return S_OK;
 }
 
@@ -598,7 +603,7 @@ HRESULT CLevel_PartTime::Ready_Items()
 		}
 		else if ("Item_EnergyDrink" == strModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NoVacuumItem"), TEXT("Prototype_GameObject_EnergyDrink"), &tDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NoVacuumItem"), TEXT("Prototype_GameObject_Food"), &tDesc)))
 				return E_FAIL;
 		}
 	}

@@ -38,9 +38,6 @@ public:
 };
 
 
-//*********************************
-//			IDLE STATE
-//*********************************
 class CDee_Idle_State final : public CDee_State
 {
 private:
@@ -59,9 +56,6 @@ public:
 	virtual void Free() override;
 };
 
-//*********************************
-//			SIT STATE
-//*********************************
 class CDee_Sit_State final : public CDee_State
 {
 private:
@@ -80,14 +74,11 @@ public:
 	virtual void Free() override;
 };
 
-//*********************************
-//			MOVE STATE
-//*********************************
-class CDee_Move_State final : public CDee_State
+class CDee_Walk_State final : public CDee_State
 {
 private:
-	CDee_Move_State();
-	virtual ~CDee_Move_State() = default;
+	CDee_Walk_State();
+	virtual ~CDee_Walk_State() = default;
 
 public:
 	// 상태 진입했을 때 처음만 호출
@@ -98,13 +89,29 @@ public:
 
 
 public:
-	static	CDee_Move_State* Create();
+	static	CDee_Walk_State* Create();
 	virtual void Free() override;
 };
 
-//*********************************
-//			NPC STATE
-//*********************************
+class CDee_Run_State final : public CDee_State
+{
+private:
+	CDee_Run_State();
+	virtual ~CDee_Run_State() = default;
+
+public:
+	// 상태 진입했을 때 처음만 호출
+	virtual void OnStateEnter(class CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet) override;
+	// 상태 진입되어 있는 상태에서 매 tick마다 호출
+	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
+	virtual void OnStateExit()														override;
+
+
+public:
+	static	CDee_Run_State* Create();
+	virtual void Free() override;
+};
+
 class CDee_NPC_State final : public CDee_State
 {
 private:
@@ -123,9 +130,6 @@ public:
 	virtual void Free() override;
 };
 
-//*********************************
-//			EMOTION STATE
-//*********************************
 class CDee_Emotion_State final : public CDee_State
 {
 private:
@@ -145,9 +149,6 @@ public:
 	virtual void Free() override;
 };
 
-//*********************************
-//			INTERACT STATE
-//*********************************
 class CDee_Interact_State final : public CDee_State
 {
 private:
@@ -167,9 +168,6 @@ public:
 	virtual void Free() override;
 };
 
-//*********************************
-//			HUNGRY STATE
-//*********************************
 class CDee_Hungry_State final : public CDee_State
 {
 private:
@@ -190,14 +188,11 @@ public:
 	virtual void Free() override;
 };
 
-//*********************************
-//			STUN STATE
-//*********************************
-class CDee_Stun_State final : public CDee_State
+class CDee_FlyStun_State final : public CDee_State
 {
 private:
-	CDee_Stun_State();
-	virtual ~CDee_Stun_State() = default;
+	CDee_FlyStun_State();
+	virtual ~CDee_FlyStun_State() = default;
 
 public:
 	// 상태 진입했을 때 처음만 호출
@@ -206,15 +201,37 @@ public:
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
 	virtual void OnStateExit()														override;
 
+	_uint m_iBounceCnt = { 1 };
+	_float4 m_vRandomAxis = { 0.f, 0.f, 0.f, 0.f };
 
 public:
-	static	CDee_Stun_State* Create();
+	static	CDee_FlyStun_State* Create();
 	virtual void Free() override;
 };
 
-//*********************************
-//			SLEEP STATE
-//*********************************
+
+class CDee_Panic_State final : public CDee_State
+{
+private:
+	CDee_Panic_State();
+	virtual ~CDee_Panic_State() = default;
+
+public:
+	// 상태 진입했을 때 처음만 호출
+	virtual void OnStateEnter(class CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet) override;
+	// 상태 진입되어 있는 상태에서 매 tick마다 호출
+	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
+	virtual void OnStateExit()														override;
+
+private:
+	_float		m_fSwitchDirTime = { 0.f };
+	_float3		m_vDir = { 0.f, 0.f, 0.f };
+
+public:
+	static	CDee_Panic_State* Create();
+	virtual void Free() override;
+};
+
 class CDee_Sleep_State final : public CDee_State
 {
 private:
@@ -233,4 +250,5 @@ public:
 	static	CDee_Sleep_State* Create();
 	virtual void Free() override;
 };
+
 END

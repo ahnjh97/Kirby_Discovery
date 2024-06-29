@@ -2,13 +2,13 @@
 
 /* 전역변수 : 쉐이더 외부에 있는 데이터를 쉐이더 안으로 받아온다. */
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
-texture2D	g_DiffuseTexture;
-texture2D   g_MaskTexture;
-texture2D	g_NormalTexture;
-texture2D   g_DepthTexture;
-texture2D   g_MRATexture;
+texture2D g_DiffuseTexture;
+texture2D g_MaskTexture;
+texture2D g_NormalTexture;
+texture2D g_DepthTexture;
+texture2D g_MRATexture;
 
-uint        g_iTriggerType;
+uint g_iTriggerType;
 
 texture2D g_ObjNearClipTexture;
 
@@ -28,7 +28,7 @@ float g_fMaskThreshold = { 0.f };
 
 float2 g_vUVOffset = { 0.f, 0.f };
 float2 g_vMaskUVOffset = { 0.f, 0.f };
-float g_fMaskUVAngle = { 0.f};
+float g_fMaskUVAngle = { 0.f };
 
 float g_fWhiteColorDiffuse;
 float g_fOverPowerColor;
@@ -51,25 +51,54 @@ float2 RotateUV(float2 vCoord, float fAngle)
     return vCoord;
 }
 
+void MaskTest(vector vMaskValue)
+{
+     //마스크 자르기
+    if (vMaskValue.a < g_fMaskThreshold)
+        discard;
+    else if (vMaskValue.r < g_fMaskThreshold)
+        discard;
+}
+
+void AlphaTest(vector vDiffuseValue, float fDiscardValue = .01)
+{
+    if (vDiffuseValue.a < fDiscardValue ||
+        (vDiffuseValue.r < fDiscardValue && vDiffuseValue.g < fDiscardValue && vDiffuseValue.b < fDiscardValue))
+        discard;
+}
+
+float SoftEffect(float fAlpha, vector vProjPos)
+{
+    //소프트 이펙트 보정
+    float2 vTexcoord = (float2) 0.f;
+
+    vTexcoord.x = (vProjPos.x / vProjPos.w) * 0.5f + 0.5f;
+    vTexcoord.y = (vProjPos.y / vProjPos.w) * -0.5f + 0.5f;
+
+    float4 vDepthDesc = g_DepthTexture.Sample(PointSampler, vTexcoord);
+    float fOldViewZ = vDepthDesc.y * g_fFar;
+
+    return fAlpha * saturate(fOldViewZ - vProjPos.w);
+}
 
 struct VS_IN
 {
-	float3		vPosition : POSITION;
-	float3		vNormal : NORMAL;
-	float2		vTexcoord : TEXCOORD0;
-	float3		vTangent : TANGENT;
+    float3 vPosition : POSITION;
+    float3 vNormal : NORMAL;
+    float2 vTexcoord : TEXCOORD0;
+    float3 vTangent : TANGENT;
 };
 
 struct VS_OUT
 {
-	float4		vPosition : SV_POSITION;
-	float3		vNormal : NORMAL;
-	float2		vTexcoord : TEXCOORD0;
-	float4		vWorldPos : TEXCOORD1;
-	float4		vProjPos : TEXCOORD2;
+    float4 vPosition : SV_POSITION;
+    float3 vNormal : NORMAL;
+    float2 vTexcoord : TEXCOORD0;
+    float4 vWorldPos : TEXCOORD1;
+    float4 vProjPos : TEXCOORD2;
 
-	float3		vTangent : TANGENT;
-	float3		vBinormal : BINORMAL;
+    float3 vTangent : TANGENT;
+    float3 vBinormal : BINORMAL;
 
 
 };
@@ -77,34 +106,34 @@ struct VS_OUT
 /* 정점 쉐이더 */
 VS_OUT VS_MAIN(VS_IN In)
 {
-	VS_OUT		Out = (VS_OUT)0;
+    VS_OUT Out = (VS_OUT) 0;
 
-	matrix		matWV, matWVP;
+    matrix matWV, matWVP;
 
-	matWV = mul(g_WorldMatrix, g_ViewMatrix);
-	matWVP = mul(matWV, g_ProjMatrix);
+    matWV = mul(g_WorldMatrix, g_ViewMatrix);
+    matWVP = mul(matWV, g_ProjMatrix);
 
-	Out.vPosition = mul(vector(In.vPosition, 1.f), matWVP);
-	Out.vNormal = normalize(mul(float4(In.vNormal, 0.f), g_WorldMatrix)).xyz;
-	Out.vTangent = normalize(mul(float4(In.vTangent, 0.f), g_WorldMatrix)).xyz;
-	Out.vBinormal = normalize(cross(Out.vNormal, Out.vTangent));
-	Out.vTexcoord = In.vTexcoord;
-	Out.vWorldPos = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
-	Out.vProjPos = Out.vPosition;
+    Out.vPosition = mul(vector(In.vPosition, 1.f), matWVP);
+    Out.vNormal = normalize(mul(float4(In.vNormal, 0.f), g_WorldMatrix)).xyz;
+    Out.vTangent = normalize(mul(float4(In.vTangent, 0.f), g_WorldMatrix)).xyz;
+    Out.vBinormal = normalize(cross(Out.vNormal, Out.vTangent));
+    Out.vTexcoord = In.vTexcoord;
+    Out.vWorldPos = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
+    Out.vProjPos = Out.vPosition;
 
-	return Out;
+    return Out;
 }
 
 struct PS_IN
 {
-	float4		vPosition : SV_POSITION;
-	float3		vNormal : NORMAL;
-	float2		vTexcoord : TEXCOORD0;
-	float4		vWorldPos : TEXCOORD1;
-	float4		vProjPos : TEXCOORD2;
+    float4 vPosition : SV_POSITION;
+    float3 vNormal : NORMAL;
+    float2 vTexcoord : TEXCOORD0;
+    float4 vWorldPos : TEXCOORD1;
+    float4 vProjPos : TEXCOORD2;
 
-	float3		vTangent : TANGENT;
-	float3		vBinormal : BINORMAL;
+    float3 vTangent : TANGENT;
+    float3 vBinormal : BINORMAL;
 };
 
 struct PS_OUT
@@ -142,23 +171,24 @@ PS_OUT_LIGHTDEPTH PS_MAIN_LIGHTDEPTH(PS_IN In)
 
 PS_OUT PS_MAIN(PS_IN In)
 {
-	PS_OUT			Out = (PS_OUT)0;
+    PS_OUT Out = (PS_OUT) 0;
 
-	vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
-	if (0.3f >= vMtrlDiffuse.a)
-		discard;
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    if (0.3f >= vMtrlDiffuse.a)
+        discard;
 
     vector vNormalDesc = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
 
-	float3 vNormal = vNormalDesc.xyz * 2.f - 1.f;
+    float3 vNormal = vNormalDesc.xyz * 2.f - 1.f;
 
-	float3x3 WorldMatrix = float3x3(In.vTangent, In.vBinormal, In.vNormal);
+    float3x3 WorldMatrix = float3x3(In.vTangent, In.vBinormal, In.vNormal);
 
-	float3 vWorldNormal = mul(vNormal, WorldMatrix);	
+    float3 vWorldNormal = mul(vNormal, WorldMatrix);
 
-	Out.vDiffuse = vMtrlDiffuse;
-	Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
-	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vDiffuse = vMtrlDiffuse;
+    Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vFieldDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 0.0f);
     Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
     
     if (g_bStencil == true)
@@ -173,7 +203,7 @@ PS_OUT PS_MAIN(PS_IN In)
     if (Out.vMRA.b < 0.001)
         Out.vMRA.b = 1.f;
     
-	return Out;
+    return Out;
 }
 
 PS_OUT FOR_KIRBY_PARTOBJECT(PS_IN In)
@@ -247,8 +277,6 @@ PS_OUT FOR_BOSS_OBJECT(PS_IN In)
     
     return Out;
 }
-
-
 
 PS_OUT NO_NORMALMAP_PS_MAIN(PS_IN In)
 {
@@ -329,6 +357,8 @@ PS_OUT TRIGGER(PS_IN In)
         Out.vDiffuse = vector(1, 0.75f, 0.8f, 1);
     else if (g_iTriggerType == 1)
         Out.vDiffuse = vector(0, 0, 1, 1);
+    else if (g_iTriggerType == 3)
+        Out.vDiffuse = vector(0, 0.45f, 0.45f, 1);
     else
         Out.vDiffuse = vector(1, 1, 1, 1);
     
@@ -340,7 +370,6 @@ PS_OUT TRIGGER(PS_IN In)
 
 PS_OUT PS_MAIN_DEFAULT_FX(PS_IN In)
 {
-    
     PS_OUT Out = (PS_OUT) 0;
 
     //마스크 값으로 자르기
@@ -351,14 +380,11 @@ PS_OUT PS_MAIN_DEFAULT_FX(PS_IN In)
         discard;
     
     //diffuse 알파 테스팅
-    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord + g_vUVOffset);
-    if (vDiffuse.a < .2f)
-        discard;
-    
-
+    vector vDiffuse = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord + g_vUVOffset);
+    AlphaTest(vDiffuse, .2);
 
     Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
     
     Out.vMRA = float4(0.f, .8f, 0.f, 1.f);
     Out.vDiffuse.rgb = vDiffuse.rgb * g_vRColor;
@@ -375,66 +401,67 @@ PS_OUT_EFFECT PS_MAIN_BLEND_FX(PS_IN In)
     PS_OUT_EFFECT Out = (PS_OUT_EFFECT) 0;
 
     vector vMask = g_MaskTexture.Sample(ClampSampler, RotateUV(In.vTexcoord + g_vMaskUVOffset, g_fMaskUVAngle));
-    
-    if(vMask.a < g_fMaskThreshold)
-        discard;
-    else if (vMask.r < g_fMaskThreshold)
-        discard;
-    
-
-    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord + g_vUVOffset);
-    if (vDiffuse.a < .01f || (vDiffuse.r < 0.1f && vDiffuse.g < 0.1f && vDiffuse.b < 0.1f) )
-        discard;
-
-    Out.vColor.rgb = vDiffuse.rgb * g_vRColor ;
-    Out.vColor.a = vDiffuse.a * vMask.r * g_fAlpha;
-
-    
-    //소프트 이펙트 보정
-    float2 vTexcoord = (float2) 0.f;
-
-    vTexcoord.x = (In.vProjPos.x / In.vProjPos.w) * 0.5f + 0.5f;
-    vTexcoord.y = (In.vProjPos.y / In.vProjPos.w) * -0.5f + 0.5f;
-
-    float4 vDepthDesc = g_DepthTexture.Sample(PointSampler, vTexcoord);
-    float fOldViewZ = vDepthDesc.y * 1000.f;
-
-    Out.vColor.a = Out.vColor.a * saturate(fOldViewZ - In.vProjPos.w);
-
-    //if(.01 < Out.vColor.a)
-    //    Out.vNonBlur = vector(0.f, 1.f, 0.f, 0.f);
-    
-    return Out;
-}
-
-PS_OUT_EFFECT PS_MAIN_WHITE_FX(PS_IN In)
-{
-    PS_OUT_EFFECT Out = (PS_OUT_EFFECT) 0;
-
-    if(g_fAlpha == 0)
-        discard;
-    
-    vector vMask = g_MaskTexture.Sample(ClampSampler, RotateUV(In.vTexcoord + g_vMaskUVOffset, g_fMaskUVAngle));
-    
-    //마스크 자르기
-    if (vMask.a < g_fMaskThreshold)
-        discard;
-    else if (vMask.r < g_fMaskThreshold)
-        discard;
+    MaskTest(vMask);
     
 
     vector vDiffuse = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord + g_vUVOffset);
-    
-    //알파가 0일때, 혹은 검은색일때 자르기
-    if (vDiffuse.a < .01f || (vDiffuse.r < 0.1f && vDiffuse.g < 0.1f && vDiffuse.b < 0.1f))
-        discard;
+    AlphaTest(vDiffuse);
 
-    Out.vColor.rgb = g_vRColor;
-    Out.vColor.a = vDiffuse.a * g_fAlpha * vMask.r;
+    Out.vColor.rgb = vDiffuse.rgb * g_vRColor;
+    Out.vColor.a = vDiffuse.a * vMask.r * g_fAlpha;
+
+    //소프트 이펙트 보정
+    Out.vColor.a = SoftEffect(Out.vColor.a, In.vProjPos);
 
     return Out;
 }
 
+PS_OUT_EFFECT PS_MAIN_WHITE_FX_LINEARDIFFUSE(PS_IN In)
+{
+    PS_OUT_EFFECT Out = (PS_OUT_EFFECT) 0;
+
+    if (g_fAlpha == 0)
+        discard;
+    
+    vector vMask = g_MaskTexture.Sample(ClampSampler, RotateUV(In.vTexcoord + g_vMaskUVOffset, g_fMaskUVAngle));
+    //마스크 자르기
+    MaskTest(vMask);
+    
+    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord + g_vUVOffset);
+    
+    //알파가 0일때, 혹은 검은색일때 자르기
+    AlphaTest(vDiffuse);
+    
+    Out.vColor.rgb = g_vRColor;
+    Out.vColor.a = vDiffuse.a * vMask.r * g_fAlpha;
+
+    //소프트 이펙트 보정
+    Out.vColor.a = SoftEffect(Out.vColor.a, In.vProjPos);
+    
+    return Out;
+}
+
+PS_OUT_EFFECT PS_MAIN_WHITE_FX_CLAMPDIFFUSE(PS_IN In)
+{
+    PS_OUT_EFFECT Out = (PS_OUT_EFFECT) 0;
+
+    if (g_fAlpha == 0)
+        discard;
+    
+    vector vMask = g_MaskTexture.Sample(ClampSampler, RotateUV(In.vTexcoord + g_vMaskUVOffset, g_fMaskUVAngle));
+    MaskTest(vMask);
+    
+    vector vDiffuse = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord + g_vUVOffset);
+    AlphaTest(vDiffuse);
+    
+    Out.vColor.rgb = g_vRColor;
+    Out.vColor.a = vDiffuse.a * g_fAlpha * vMask.r;
+
+    //소프트 이펙트 보정
+    Out.vColor.a = SoftEffect(Out.vColor.a, In.vProjPos);
+    
+    return Out;
+}
 
 PS_OUT_LIGHTDEPTH PS_MAIN_DEFERREDINFO(PS_IN In)
 {
@@ -448,7 +475,6 @@ PS_OUT_LIGHTDEPTH PS_MAIN_DEFERREDINFO(PS_IN In)
     
     return Out;
 }
-
 
 PS_OUT PS_MAIN_NEARCLIP(PS_IN In)
 {
@@ -499,21 +525,37 @@ PS_OUT PS_MAIN_NEARCLIP(PS_IN In)
     return Out;
 }
 
+PS_OUT_EFFECT PS_ALPHABLEND(PS_IN In)
+{
+    PS_OUT_EFFECT Out = (PS_OUT_EFFECT) 0;
+
+    vector vDiffuse = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord + g_vUVOffset);
+    AlphaTest(vDiffuse);
+
+    Out.vColor.rgb = vDiffuse.rgb;
+    Out.vColor.a = vDiffuse.a;
+
+    if (.01 < Out.vColor.a)
+        Out.vNonBlur = vector(0.f, 1.f, 0.f, 0.f);
+    
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
 	// 노말이 있는 일반 논 애님 모델 ( 0 )
-	pass Default
-	{
-		SetRasterizerState(RS_Default);
-		SetDepthStencilState(DSS_Default, 0);
+    pass Default
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
-		VertexShader = compile vs_5_0 VS_MAIN();
-		GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
-		HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
-		DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-		PixelShader = compile ps_5_0 PS_MAIN();
-	}
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN();
+    }
 	// 노말이 없는 일반 논 애님 모델 ( 1 )
     pass NonNormal_Default
     {
@@ -568,7 +610,7 @@ technique11 DefaultTechnique
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_BLUR();
     }
-    // 블랜드 할 모델 ( 5 )
+    // 블렌드 할 모델 ( 5 )
     pass NonBlur_Default
     {
         SetRasterizerState(RS_Default);
@@ -581,6 +623,7 @@ technique11 DefaultTechnique
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_NONBLUR();
     }
+
     // 트리거 ( 6 )
     pass Trigger
     {
@@ -591,35 +634,20 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 TRIGGER();
     }
 
-	// 기본 이펙트 패스. 알파 테스팅 + 마스크 ( 7 )
-    pass DefaultFX
+    // 알파블렌드, 노말 X (13 -> 7)
+    pass ALPHABLEND
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
-        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-
-        VertexShader = compile vs_5_0 VS_MAIN();
-        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
-        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
-        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 PS_MAIN_DEFAULT_FX();
-    }
-
-    //블렌드되는 이펙트. 알파 블렌딩 + 마스크 + 소프트 이펙트 ( 8 )
-    pass BlendFX
-    {
-        SetRasterizerState(RS_NonCull);
-        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 PS_MAIN_BLEND_FX();
+        PixelShader = compile ps_5_0 PS_ALPHABLEND();
     }
 
-    // 디퍼드 인포 ( 9 )
+    // 디퍼드 인포 ( 9 -> 8 )
     pass DeferredInfo_Depth
     {
         SetRasterizerState(RS_Default);
@@ -633,34 +661,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_DEFERREDINFO();
     }
 
-    //화이트 이펙트. 알파 블렌딩 + 마스크 ( 10 )
-    pass WhiteFX
-    {
-        SetRasterizerState(RS_NonCull);
-        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
-        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-
-        VertexShader = compile vs_5_0 VS_MAIN();
-        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
-        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
-        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 PS_MAIN_WHITE_FX();
-    }
-    // 커비 파츠 ( 11 )
-    pass KIRBY_PARTOBJECT
-    {
-        SetRasterizerState(RS_Default);
-        SetDepthStencilState(DSS_Default, 0);
-        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-
-        VertexShader = compile vs_5_0 VS_MAIN();
-        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
-        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
-        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 FOR_KIRBY_PARTOBJECT();
-    }
-
-    // 가까이오면 잘리는 패스(12)
+    // 가까이오면 잘리는 패스(12 -> 9 )
     pass NearClip
     {
         SetRasterizerState(RS_Default);
@@ -674,20 +675,21 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_NEARCLIP();
     }
 
-    //알파블렌드 적용 (13) ex) 유리
-    pass ALPHABLEND
+    // 커비 파츠 ( 11 -> 10 )
+    pass KIRBY_PARTOBJECT
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
-        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 PS_MAIN();
+        PixelShader = compile ps_5_0 FOR_KIRBY_PARTOBJECT();
     }
 
-    // 몬스터의 파트 오브젝트 ( 14 )
+    // 몬스터의 파트 오브젝트 ( 14 -> 11 )
     pass MONSTER_PARTOBJECT
     {
         SetRasterizerState(RS_Default);
@@ -699,5 +701,65 @@ technique11 DefaultTechnique
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 FOR_BOSS_OBJECT();
     }
+
+
+	// 기본 이펙트 패스. 알파 테스팅 + 마스크 ( 7 -> 12 )
+    pass DefaultFX
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_DEFAULT_FX();
+    }
+
+    //블렌드되는 이펙트. 알파 블렌딩 + 마스크 + 소프트 이펙트 ( 8 -> 13 )
+    pass BlendFX
+    {
+        SetRasterizerState(RS_NonCull);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_BLEND_FX();
+    }
+
+
+    //화이트 이펙트. 알파 블렌딩 + 마스크 + 디퓨즈 리니어샘플( 10 -> 14 )
+    pass WhiteFX_LinearDiffuse
+    {
+        SetRasterizerState(RS_NonCull);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_WHITE_FX_LINEARDIFFUSE();
+    }
+
+    ////화이트 이펙트. 알파 블렌딩 + 마스크 + 디퓨즈 클램프샘플 ( 10 -> 15 )
+    pass WhiteFX_ClampDiffuse
+    {
+        SetRasterizerState(RS_NonCull);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_WHITE_FX_CLAMPDIFFUSE();
+    }
+
+
 
 }

@@ -146,7 +146,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../../EngineSDK/Inc/physx/;../Public/;../../EngineSDK/Inc/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Public/;../../EngineSDK/Inc/;../../EngineSDK/Inc/ImGui/;../Default/;../../EngineSDK/Inc/physx/;../Bin/core/inc/</AdditionalIncludeDirectories>
       <AdditionalOptions>/MP /Zm200 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -170,6 +170,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Ability.h" />
+    <ClInclude Include="..\Public\AnimBridge.h" />
     <ClInclude Include="..\Public\AnimDeco.h" />
     <ClInclude Include="..\Public\AnimToolHelper.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -181,6 +182,7 @@
     <ClInclude Include="..\Public\Awoofy_State.h" />
     <ClInclude Include="..\public\BackGround.h" />
     <ClInclude Include="..\Public\BasicMap.h" />
+    <ClInclude Include="..\public\BattleDee.h" />
     <ClInclude Include="..\Public\BG.h" />
     <ClInclude Include="..\Public\BladeKnight.h" />
     <ClInclude Include="..\Public\BladeKnightSword.h" />
@@ -190,7 +192,7 @@
     <ClInclude Include="..\Public\BombOrbitGlow.h" />
     <ClInclude Include="..\Public\BossClone.h" />
     <ClInclude Include="..\Public\BreakableRock.h" />
-    <ClInclude Include="..\Public\BreakableRockPartical.h" />
+    <ClInclude Include="..\Public\BreakableRockParticle.h" />
     <ClInclude Include="..\Public\BrontoBurt.h" />
     <ClInclude Include="..\Public\BrontoBurt_State.h" />
     <ClInclude Include="..\Public\Buffahorn.h" />
@@ -218,10 +220,13 @@
     <ClInclude Include="..\Public\FinalBoss.h" />
     <ClInclude Include="..\Public\FinalBossSpear.h" />
     <ClInclude Include="..\Public\FinalBoss_State.h" />
-    <ClInclude Include="..\Public\FoodShopDee.h" />
+    <ClInclude Include="..\Public\Food.h" />
+    <ClInclude Include="..\public\EventCenter.h" />
+    <ClInclude Include="..\public\FoodShopDee.h" />
     <ClInclude Include="..\Public\FXToolDirector.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\Public\Gm_LabBossRoomDoor.h" />
     <ClInclude Include="..\Public\Grid.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
@@ -231,6 +236,7 @@
     </ClInclude>
     <ClInclude Include="..\Public\HUD.h" />
     <ClInclude Include="..\Public\HUD_AbilityDiscard.h" />
+    <ClInclude Include="..\Public\HUD_BossHpBar.h" />
     <ClInclude Include="..\Public\HUD_KirbyStatus.h" />
     <ClInclude Include="..\Public\HUD_StarPoint.h" />
     <ClInclude Include="..\public\HungryDee.h" />
@@ -244,6 +250,7 @@
     <ClInclude Include="..\Public\KirbyBomb.h" />
     <ClInclude Include="..\Public\KirbyBoom_State.h" />
     <ClInclude Include="..\Public\KirbyCar_State.h" />
+    <ClInclude Include="..\Public\Gm_LabAntenna.h" />
     <ClInclude Include="..\Public\Ladder.h" />
     <ClInclude Include="..\Public\Laser.h" />
     <ClInclude Include="..\Public\Level_DeeDeeDee.h" />
@@ -300,6 +307,7 @@
     <ClInclude Include="..\Public\PoppyBomb.h" />
     <ClInclude Include="..\Public\PoppyBrosJr.h" />
     <ClInclude Include="..\Public\PoppyBrosJr_State.h" />
+    <ClInclude Include="..\Public\PortalSoftEffect.h" />
     <ClInclude Include="..\Public\Rabbit.h" />
     <ClInclude Include="..\Public\Rabbit_State.h" />
     <ClInclude Include="..\Public\RayArrow.h" />
@@ -307,6 +315,7 @@
     <ClInclude Include="..\Public\SingleEffect.h" />
     <ClInclude Include="..\public\SkySphere.h" />
     <ClInclude Include="..\Public\SpikeSpear.h" />
+    <ClInclude Include="..\Public\SkySphereSub.h" />
     <ClInclude Include="..\Public\StarBlock.h" />
     <ClInclude Include="..\Public\StarBlockPiece.h" />
     <ClInclude Include="..\Public\TerrainFog.h" />
@@ -320,7 +329,10 @@
     </ClInclude>
     <ClInclude Include="..\Public\ToppleableBridge.h" />
     <ClInclude Include="..\Public\Trigger.h" />
+    <ClInclude Include="..\Public\Tunnel.h" />
+    <ClInclude Include="..\Public\TunnelRock.h" />
     <ClInclude Include="..\Public\UI_PartTime.h" />
+    <ClInclude Include="..\Public\UI_PartTimeDee.h" />
     <ClInclude Include="..\public\WaddleDee.h" />
     <ClInclude Include="..\Public\WasteCan.h" />
     <ClInclude Include="Client.h" />
@@ -330,6 +342,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability.cpp" />
+    <ClCompile Include="..\Private\AnimBridge.cpp" />
     <ClCompile Include="..\Private\AnimDeco.cpp" />
     <ClCompile Include="..\Private\AnimToolHelper.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -341,6 +354,7 @@
     <ClCompile Include="..\Private\Awoofy_State.cpp" />
     <ClCompile Include="..\private\BackGround.cpp" />
     <ClCompile Include="..\Private\BasicMap.cpp" />
+    <ClCompile Include="..\private\BattleDee.cpp" />
     <ClCompile Include="..\Private\BG.cpp" />
     <ClCompile Include="..\Private\BladeKnight.cpp" />
     <ClCompile Include="..\Private\BladeKnightSword.cpp" />
@@ -350,7 +364,7 @@
     <ClCompile Include="..\Private\BombOrbitGlow.cpp" />
     <ClCompile Include="..\Private\BossClone.cpp" />
     <ClCompile Include="..\Private\BreakableRock.cpp" />
-    <ClCompile Include="..\Private\BreakableRockPartical.cpp" />
+    <ClCompile Include="..\Private\BreakableRockParticle.cpp" />
     <ClCompile Include="..\Private\BrontoBurt.cpp" />
     <ClCompile Include="..\Private\BrontoBurt_State.cpp" />
     <ClCompile Include="..\Private\Buffahorn.cpp" />
@@ -377,10 +391,13 @@
     <ClCompile Include="..\Private\FinalBoss.cpp" />
     <ClCompile Include="..\Private\FinalBossSpear.cpp" />
     <ClCompile Include="..\Private\FinalBoss_State.cpp" />
-    <ClCompile Include="..\Private\FoodShopDee.cpp" />
+    <ClCompile Include="..\Private\Food.cpp" />
+    <ClCompile Include="..\private\EventCenter.cpp" />
+    <ClCompile Include="..\private\FoodShopDee.cpp" />
     <ClCompile Include="..\Private\FXToolDirector.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\Private\Gm_LabBossRoomDoor.cpp" />
     <ClCompile Include="..\Private\Grid.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -390,6 +407,7 @@
     </ClCompile>
     <ClCompile Include="..\Private\HUD.cpp" />
     <ClCompile Include="..\Private\HUD_AbilityDiscard.cpp" />
+    <ClCompile Include="..\Private\HUD_BossHpBar.cpp" />
     <ClCompile Include="..\Private\HUD_KirbyStatus.cpp" />
     <ClCompile Include="..\Private\HUD_StarPoint.cpp" />
     <ClCompile Include="..\private\HungryDee.cpp" />
@@ -402,6 +420,7 @@
     <ClCompile Include="..\Private\KickableRock.cpp" />
     <ClCompile Include="..\Private\KirbyBomb.cpp" />
     <ClCompile Include="..\Private\KirbyCar_State.cpp" />
+    <ClCompile Include="..\Private\Gm_LabAntenna.cpp" />
     <ClCompile Include="..\Private\Ladder.cpp" />
     <ClCompile Include="..\Private\Laser.cpp" />
     <ClCompile Include="..\Private\Level_DeeDeeDee.cpp" />
@@ -456,6 +475,7 @@
     <ClCompile Include="..\Private\PoppyBomb.cpp" />
     <ClCompile Include="..\Private\PoppyBrosJr.cpp" />
     <ClCompile Include="..\Private\PoppyBrosJr_State.cpp" />
+    <ClCompile Include="..\Private\PortalSoftEffect.cpp" />
     <ClCompile Include="..\Private\Rabbit.cpp" />
     <ClCompile Include="..\Private\Rabbit_State.cpp" />
     <ClCompile Include="..\Private\RayArrow.cpp" />
@@ -463,6 +483,7 @@
     <ClCompile Include="..\Private\SingleEffect.cpp" />
     <ClCompile Include="..\private\SkySphere.cpp" />
     <ClCompile Include="..\Private\SpikeSpear.cpp" />
+    <ClCompile Include="..\Private\SkySphereSub.cpp" />
     <ClCompile Include="..\Private\StarBlock.cpp" />
     <ClCompile Include="..\Private\StarBlockPiece.cpp" />
     <ClCompile Include="..\Private\TerrainFog.cpp" />
@@ -476,7 +497,10 @@
     </ClCompile>
     <ClCompile Include="..\Private\ToppleableBridge.cpp" />
     <ClCompile Include="..\Private\Trigger.cpp" />
+    <ClCompile Include="..\Private\Tunnel.cpp" />
+    <ClCompile Include="..\Private\TunnelRock.cpp" />
     <ClCompile Include="..\Private\UI_PartTime.cpp" />
+    <ClCompile Include="..\Private\UI_PartTimeDee.cpp" />
     <ClCompile Include="..\private\WaddleDee.cpp" />
     <ClCompile Include="..\Private\WasteCan.cpp" />
     <ClCompile Include="..\Public\KirbyBoom_State.cpp" />

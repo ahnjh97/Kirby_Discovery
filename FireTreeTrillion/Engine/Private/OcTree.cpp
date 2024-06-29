@@ -215,7 +215,7 @@ void COcTree::Culling(CGameInstance* pGameInstance, CShader* pMapShader, CShader
 
 	_uint iInFrustum{};
 	for (_uint iEdgeIdx = 0; iEdgeIdx < OC_END; iEdgeIdx++) {
-		if (true == pGameInstance->isInFrustum_WorldSpace(m_vecEdges[iEdgeIdx], fRadius))
+		if (true == pGameInstance->isInFrustum_WorldSpace(m_vecEdges[iEdgeIdx], fRadius * 1.5f))
 			iInFrustum++;
 	}
 

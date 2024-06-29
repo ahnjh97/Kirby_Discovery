@@ -73,7 +73,6 @@ private:
 
 	vector<CModel*>	m_vecNonAnimDecos;
 	vector<CModel*> m_vecAnimDecos;
-	vector<CModel*> m_vecBlendDecos;
 
 	vector<CGameObject*> m_vecAnimDecoGameObjs;
 

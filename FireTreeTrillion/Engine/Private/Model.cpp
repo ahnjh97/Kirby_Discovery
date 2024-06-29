@@ -65,6 +65,74 @@ string CModel::Get_MeshName(_uint iMeshIndex)
 	return str;
 }
 
+CModel* CModel::CreateModelFromMesh(_uint iMeshIndex, _float3& vOffset, 
+	unordered_set<string>& _setCheckedStrings, unordered_set<string>& _setExcludedMesh)
+{
+	if (iMeshIndex >= m_iNumMeshes)
+		return nullptr;
+
+	string strCommon = ExtractDigitsAfterUnderScore(iMeshIndex);
+
+	if (_setCheckedStrings.end() != _setCheckedStrings.find(strCommon))
+		return nullptr;
+	else
+		_setCheckedStrings.insert(strCommon);
+
+	vector<_uint> vecConnectedMesh;
+
+	for (_uint i = 0; i < m_iNumMeshes; i++)
+	{
+		string strMeshName = m_Meshes[i]->Get_Name();
+		if (_setExcludedMesh.end() != _setExcludedMesh.find(strMeshName))
+			continue;
+
+		string strCommonPart = ExtractDigitsAfterUnderScore(i);
+		if (strCommonPart == strCommon)
+			vecConnectedMesh.push_back(i);
+	}
+
+	vector<CMesh*> vecMeshes;
+	vector<MESH_MATERIAL> _vecMaterials;
+
+	_float3 vMin{ FLT_MAX }, vMax{ -FLT_MAX };
+	for (auto& meshIndex : vecConnectedMesh)
+		m_Meshes[meshIndex]->Find_MinMax(vMin, vMax);
+	
+	_float3 vCenter = _float3((vMin.x + vMax.x) * 0.5f, (vMin.y + vMax.y) * 0.5f, (vMin.z + vMax.z) * 0.5f);
+	vOffset = vCenter;
+
+	for (auto& meshIndex : vecConnectedMesh)
+	{
+		_float3* pVerticesPos = m_Meshes[meshIndex]->Get_VerticesPtr();
+		_uint iNumVertices = m_Meshes[meshIndex]->Get_NumVertices();
+		_float3* pNormals = m_Meshes[meshIndex]->Get_NormalsPtr();
+		_float2* pTexCoords = m_Meshes[meshIndex]->Get_TexCoordsPtr();
+		_float3* pTangents = m_Meshes[meshIndex]->Get_TangentsPtr();
+		_uint* pIndices = m_Meshes[meshIndex]->Get_IndicesPtr();
+		_uint iNumIndices = m_Meshes[meshIndex]->Get_NumIndices();
+
+		for (_uint i = 0; i < iNumVertices; i++)
+		{
+			pVerticesPos[i].x -= vCenter.x;
+			pVerticesPos[i].y -= vCenter.y;
+			pVerticesPos[i].z -= vCenter.z;
+		}
+
+		CMesh* pMesh = CMesh::Create(m_pDevice, m_pContext, pVerticesPos, iNumVertices, pNormals, pTexCoords, pTangents, pIndices, iNumIndices);
+		if (nullptr == pMesh)
+			return nullptr;
+
+		vecMeshes.push_back(pMesh);
+		_uint iMaterialIndex = m_Meshes[meshIndex]->Get_MaterialIndex();
+ 		_vecMaterials.push_back(m_Materials[iMaterialIndex]);
+	}
+	
+	CModel* pModel = CModel::Create(m_pDevice, m_pContext, vecMeshes, _vecMaterials);
+	pModel->AlignMeshMaterialIndicesWithMeshIndices();
+
+	return pModel;
+}
+
 HRESULT CModel::Initialize_Prototype(MODEL tModel)
 {
 	HRESULT hr = S_OK;
@@ -115,6 +183,26 @@ HRESULT CModel::Initialize_Prototype(MODEL tModel)
 
 	m_InputFile.close();
 		
+	return S_OK;
+}
+
+HRESULT CModel::Initialize_Prototype(vector<class CMesh*>& _vecMeshes, const vector<MESH_MATERIAL>& _vecMaterials)
+{
+	m_iNumMeshes = _vecMeshes.size();
+	m_Meshes = _vecMeshes;
+
+	for (auto& mesh : _vecMeshes)
+		Safe_AddRef(mesh);
+
+	m_iNumMaterials = _vecMaterials.size();
+	m_Materials = _vecMaterials;
+
+	for (auto& material : _vecMaterials)
+	{
+		for (_uint i = 0; i < AI_TEXTURE_TYPE_MAX; i++)
+			Safe_AddRef(material.MaterialTextures[i]);
+	}
+
 	return S_OK;
 }
 
@@ -186,8 +274,6 @@ HRESULT CModel::Play_Animation(_float fTimeDelta)
 	/* 현재 애니메이션에 맞는 뼈의 상태(m_TransformationMatrix)를 갱신해준다. */
 	m_Animations[m_iCurrentAnimIndex]->Invalidate_TransformationMatrix(fTimeDelta, m_Bones, m_isLoop, this);
 
-
-
 	for (auto& pBone : m_Bones)
 		pBone->Invalidate_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_TransformMatrix));
 	
@@ -235,11 +321,70 @@ HRESULT CModel::CreateStaticActor(_float4x4& matWorld)
 	return S_OK;
 }
 
-void CModel::DisableActor()
+HRESULT CModel::CreateStaticActors_Exclude(unordered_set<string>& _setNonColMesh, _float4x4& matWorld)
+{
+	for (auto& mesh : m_Meshes)
+	{
+		string strMeshName = mesh->Get_Name();
+		if (_setNonColMesh.end() == _setNonColMesh.find(strMeshName))
+			mesh->CreateStaticActor(matWorld);
+	}
+
+	return S_OK;
+}
+
+HRESULT CModel::CreateStaticActors_Include(unordered_set<string>& _setColMesh, _float4x4& matWorld)
+{
+	for (auto& mesh : m_Meshes)
+	{
+		string strMeshName = mesh->Get_Name();
+		if (_setColMesh.end() != _setColMesh.find(strMeshName))
+			mesh->CreateStaticActor(matWorld);
+	}
+
+	return S_OK;
+}
+
+void CModel::DisableActors()
 {
 	PxScene* pScene = m_pGameInstance->Get_Scene();
 	for (auto& mesh : m_Meshes)
 		mesh->DisableActor(pScene);
+}
+
+void CModel::DisableActors(unordered_set<string>& _setMeshNames)
+{
+	PxScene* pScene = m_pGameInstance->Get_Scene();
+	for (auto& mesh : m_Meshes)
+	{
+		if (nullptr == mesh)
+			continue;
+
+		string strMeshName = mesh->Get_Name();
+		if(_setMeshNames.end() != _setMeshNames.find(strMeshName))
+			mesh->DisableActor(pScene);
+	}
+}
+
+void CModel::ReAddActors()
+{
+	PxScene* pScene = m_pGameInstance->Get_Scene();
+	for (auto& mesh : m_Meshes)
+		mesh->ReAddActor(pScene);
+}
+
+void CModel::ReAddActors(unordered_set<string>& _setMeshNames)
+{
+	PxScene* pScene = m_pGameInstance->Get_Scene();
+	for (auto& mesh : m_Meshes)
+	{
+		if (nullptr == mesh)
+			continue;
+
+		string strMeshName = mesh->Get_Name();
+		if (_setMeshNames.end() != _setMeshNames.find(strMeshName))
+			mesh->ReAddActor(pScene);
+	}
 }
 
 _float4 CModel::Check_Meshes(const class CTransform* pTransform, _Out_ _int& iMeshIndex) const
@@ -591,6 +736,52 @@ void CModel::AddBlendObjectToRenderGroup()
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, m_pBlendObject);
 }
 
+unordered_set<PxRigidActor*> CModel::Get_ActorsSet()
+{
+	unordered_set<PxRigidActor*> setActors;
+	for (auto& mesh : m_Meshes)
+		setActors.insert(mesh->Get_Actor());
+
+	return setActors;
+}
+
+vector<PxRigidActor*> CModel::Get_Actors()
+{
+	vector<PxRigidActor*> vecActors;
+	for (auto& mesh : m_Meshes) {
+		PxRigidActor* pActor = mesh->Get_Actor();
+		if(nullptr != pActor)
+			vecActors.push_back(pActor);
+	}
+		
+	return vecActors;
+}
+
+void CModel::AlignMeshMaterialIndicesWithMeshIndices()
+{
+	for (_uint i = 0; i < m_iNumMeshes; i++)
+		m_Meshes[i]->Set_MaterialIndex(i);
+}
+
+string CModel::ExtractDigitsAfterUnderScore(_uint iMeshIndex)
+{
+	string strMeshName = m_Meshes[iMeshIndex]->Get_Name();
+	size_t underscorePos = strMeshName.find('_');
+	if (underscorePos == string::npos)
+		return string();
+
+	size_t numStartPos = underscorePos + 1;
+	if (numStartPos >= strMeshName.length() || !isdigit(strMeshName[numStartPos]))
+		return string();
+
+	size_t numEndPos = numStartPos;
+
+	while (numEndPos < strMeshName.length() && isdigit(strMeshName[numEndPos]) && (numEndPos - numStartPos) < 2)
+		++numEndPos;
+
+	return strMeshName.substr(numStartPos, numEndPos - numStartPos);
+}
+
 HRESULT CModel::Ready_Meshes(_bool bOctree)
 {
 	m_InputFile.read(reinterpret_cast<char*>(&m_iNumMeshes), sizeof(m_iNumMeshes));
@@ -734,6 +925,21 @@ CModel * CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MO
 	}
 
 	return pInstance;
+}
+
+CModel* CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext
+	, vector<class CMesh*>& _vecMeshes, const vector<MESH_MATERIAL>& _vecMaterials)
+{
+	CModel* pInstance = new CModel(pDevice, pContext);
+
+	if (FAILED(pInstance->Initialize_Prototype(_vecMeshes, _vecMaterials)))
+	{
+		MSG_BOX(TEXT("Failed To Create : CModel"));
+
+		Safe_Release(pInstance);
+	}
+
+	return pInstance; return nullptr;
 }
 
 CComponent * CModel::Clone(void * pArg)

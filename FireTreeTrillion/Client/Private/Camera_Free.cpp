@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Camera_Free.h"
 #include "Kirby.h"
+#include "EventCenter.h"
 
 CCamera_Free::CCamera_Free(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CCamera{ pDevice, pContext }
@@ -28,6 +29,8 @@ void CCamera_Free::Lock_Camera(_float3 vPos, _float3 vLook, _float fFOVY)
 
 HRESULT CCamera_Free::Initialize_Prototype()
 {
+
+
 	return S_OK;
 }
 
@@ -369,13 +372,16 @@ void CCamera_Free::Control(_float fTimeDelta)
 	//내가 현재 카메라가 아니라면 컨트롤은 못하게 하기
 	if (m_pGameInstance->Get_CurCameraPtr() != this)
 	{
-		if (m_pFirstTarget == nullptr) return;
+		if (m_pFirstTarget == nullptr)
+			return;
+
 		if (m_bWasMainCamera)
 			m_pTransformCom->Look_At(m_pFirstTarget->Get_State(CTransform::STATE_POSITION));
+
 		return;
 	}
 
-	if (/**m_pCurrentLevelID == LEVEL_TOOL_MAP ||*/ m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
+	if (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
 	{
 		_long	MouseMove = { 0 };
 

@@ -232,7 +232,7 @@ _float3 COriginalDee::Make_DestPos()
 	return m_TownPoints.first + m_TownPoints.second[m_eDestPoint].vPosOffset;
 }
 
-DEE_ANIM COriginalDee::Make_WhatToDo()
+pair<DEE_ANIM, _bool> COriginalDee::Make_WhatToDo()
 {
 	_int iStateSize = m_TownPoints.second[m_eDestPoint].StateOffset.size();
 	DEE_ANIM eDeeState = m_TownPoints.second[m_eDestPoint].StateOffset[CUtils::Make_RandomInt(0, iStateSize - 1)];
@@ -281,7 +281,7 @@ DEE_ANIM COriginalDee::Make_WhatToDo()
 	m_TownPoints.second[eArrivedPoint].bIsUsing = true;
 	m_ePrePoint = eArrivedPoint;
 
-	return eDeeState;
+	return { eDeeState, (eDeeState == DEEANIM_WALK) };
 }
 
 HRESULT COriginalDee::Initialize_Prototype()
@@ -330,18 +330,13 @@ _int COriginalDee::Tick(_float fTimeDelta)
 
 	//공통된 디 관련 변수를 업데이트 - 초기화한다
 	Dee_SystemTick(m_fTimeDelta);
-	ImGui::NewFrame();
-	ImGui::Begin("Test");
-	Draw_TownPoints();
-	ImGui::End();
-	ImGui::EndFrame();
+
 	return OBJ_NOEVENT;
 }
 
 void COriginalDee::Late_Tick(_float fTimeDelta)
 {
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
-	m_pModelCom->Play_Animation(m_fTimeDelta);
 
 	for (auto& Pair : m_PartObjects)
 		Pair.second->Late_Tick(m_fTimeDelta);
@@ -350,6 +345,9 @@ void COriginalDee::Late_Tick(_float fTimeDelta)
 	//시야 벗어나면 컬링
 	if (!m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State(CTransform::STATE_POSITION), 2.0f))
 		return;
+
+	if (Compute_OptimizationAnimation(m_fTimeDelta) == true)
+		m_pModelCom->Play_Animation(m_fAccTime);
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
@@ -406,6 +404,8 @@ void COriginalDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObje
 	m_fResetHiTime = 5.f;
 }
 
+#ifdef _DEBUG
+
 void COriginalDee::Render_IMGUI()
 {
 	__super::Render_IMGUI();
@@ -415,6 +415,8 @@ void COriginalDee::Render_IMGUI()
 	//Draw_TownPoints();
 
 }
+
+#endif
 
 HRESULT COriginalDee::Add_Components()
 {
@@ -581,8 +583,8 @@ void COriginalDee::SetUp_FSM()
 	m_pFSM->Add_State(DEEANIM_WAIT, CDee_Idle_State::Create());
 	m_pFSM->Add_State(DEEANIM_TOWNWAIT, CDee_Idle_State::Create());
 
-	m_pFSM->Add_State(DEEANIM_WALK, CDee_Move_State::Create());
-	m_pFSM->Add_State(DEEANIM_ENEMYWALK, CDee_Move_State::Create());
+	m_pFSM->Add_State(DEEANIM_WALK, CDee_Walk_State::Create());
+	m_pFSM->Add_State(DEEANIM_ENEMYWALK, CDee_Walk_State::Create());
 
 	m_pFSM->Add_State(DEEANIM_SITWAIT, CDee_Sit_State::Create());
 	m_pFSM->Add_State(DEEANIM_SITTALKA, CDee_Emotion_State::Create());
@@ -709,6 +711,8 @@ _bool COriginalDee::Custom_Face(_uint iMeshIndex)
 	return false;
 }
 
+#ifdef _DEBUG
+
 void COriginalDee::Draw_TownPoints()
 {
 	ImDrawList* drawList = ImGui::GetWindowDrawList();
@@ -731,6 +735,8 @@ void COriginalDee::Draw_TownPoints()
 		}
 	}
 }
+
+#endif
 
 COriginalDee* COriginalDee::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

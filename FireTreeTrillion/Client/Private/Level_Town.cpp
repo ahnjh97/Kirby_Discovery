@@ -12,7 +12,7 @@
 #include "Kabu.h"
 #include "BrontoBurt.h"
 #include "PoppyBrosJr.h"
-
+#include "SkySphere.h"
 #include "HungryDee.h"
 
 #include "BG.h"
@@ -59,19 +59,20 @@ HRESULT CLevel_Town::Initialize()
 	hr = Ready_Kickables();
 	CHECK_FAILED(hr);
 
+	// Part-timer Kirby Test
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOWN, TEXT("Layer_Player"), TEXT("Prototype_GameObject_PartTimerKirby"))))
+	//	return E_FAIL;
+
+	// DeeTest
 	CGameObject::GAMEOBJECT_DESC ObjDesc{};
 	ObjDesc.fSpeedPerSec = 5.f;
 	ObjDesc.fRotationPerSec = ToRadian(90.f);
 	_float4x4 InitMat = _float4x4::Identity;
-	InitMat.Translation({ 1.51f, 22.11f, 3.91f });
+	InitMat.Translation({ -14.63f, 33.11f, 51.96f });
 	ObjDesc.matWorld = InitMat;
-	// Car Test
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_DeeDeeDee"), TEXT("Prototype_GameObject_DeeDeeDee"), &ObjDesc)))
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOWN, TEXT("Layer_DeeDeeDee"), TEXT("Prototype_GameObject_DeeDeeDee"), &ObjDesc)))
 		return E_FAIL;
 
-	// Part-timer Kirby Test
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOWN, TEXT("Layer_Player"), TEXT("Prototype_GameObject_PartTimerKirby"))))
-	//	return E_FAIL;
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 	m_pGameInstance->Set_ColorSet_ByIndex(4);
@@ -165,8 +166,10 @@ HRESULT CLevel_Town::Ready_Layer_Camera(const wstring& strLayerTag)
 
 HRESULT CLevel_Town::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
+	CSkySphere::SKYSPHERE_DESC TownSkyDesc{};
+	TownSkyDesc.strModelTag = { "SkySphere_Stage1_Day" };
 
-	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_TOWN, strLayerTag, TEXT("Prototype_GameObject_SkySphere"));
+	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_TOWN, strLayerTag, TEXT("Prototype_GameObject_SkySphere"), &TownSkyDesc);
 	CHECK_FAILED(hr);
 
 	return S_OK;
@@ -218,7 +221,7 @@ HRESULT CLevel_Town::Ready_Map()
 	fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
 
 	_uint iStrLength{};
-	string strModelName;https://drive.google.com/drive/u/0/my-drive
+	string strModelName;
 	_float4x4 matWorld{};
 	_float3 vMin{}, vMax{};
 	wstring wstrGameObjectTag;
@@ -480,8 +483,6 @@ HRESULT CLevel_Town::Ready_Dees()
 		}
 	}
 
-
-
 	return S_OK;
 }
 
@@ -666,7 +667,7 @@ HRESULT CLevel_Town::Ready_Items()
 		}
 		else if ("Item_EnergyDrink" == strModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NoVacuumItem"), TEXT("Prototype_GameObject_EnergyDrink"), &tDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NoVacuumItem"), TEXT("Prototype_GameObject_Food"), &tDesc)))
 				return E_FAIL;
 		}
 	}

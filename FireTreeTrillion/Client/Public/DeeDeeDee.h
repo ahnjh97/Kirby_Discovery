@@ -94,19 +94,32 @@ private:
 	HRESULT Bind_ShaderResources();
 	// FSM
 	void SetUp_FSM();
+	// 히트박스 체인저
+	void HitBoxChanger(_uint eState);
+
+	void Set_HitStop() { m_bHitStop = true; }
+	_bool				  m_bHitStop = { false };
+	_float				  m_fHitStopTime = { 0.f };
+	_bool				  m_isDead = { false };
+	_float				  m_fDeadTime = { 0.f };
+	_bool				  m_bRestoreTrigger = { true };
+
+
+	HRESULT	Make_TargetToCams();
 
 	// 디디디의 시스템적인 틱을 담당한다.
 	void DeeDeeDee_SystemTick(_float fTimeDelta);
 	MYPATTERN Now_Pattern();
 	void Hammer_BoneUpdate();
+	void Dead_Animation(_float fTimeDelta);
 
 	_float4 m_vNeckLook = {};
 	_float4 m_vLEyeLook = {};
 	_float4 m_vREyeLook = {};
 	DDDDESC m_tInfo = {};
 
-	_bool	m_bInitializeAnim = { true };
-	_float4x4			  m_WeaponMatrix;
+	_bool					m_bInitializeAnim = { true };
+	_float4x4				m_WeaponMatrix;
 	class CDeeDeeDeeHammer* m_pWeapons = { nullptr };
 
 

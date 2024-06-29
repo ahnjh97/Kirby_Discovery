@@ -235,15 +235,35 @@ void CUtils::Rotation(_Inout_ _float4x4& matrix, _fvector vAxis, _float fRadian)
 
 void CUtils::Make_World_ToScreen(_Inout_ _float3& vPos)
 {
-	vPos = XMVector3TransformCoord(vPos, CGameInstance::Get_Instance()->Get_Transform(CPipeLine::D3DTS_VIEW));
-	vPos = XMVector3TransformCoord(vPos, CGameInstance::Get_Instance()->Get_Transform(CPipeLine::D3DTS_PROJ));
+	vPos = _float3::Transform(vPos, CGameInstance::Get_Instance()->Get_Transform(CPipeLine::D3DTS_VIEW));
+	vPos = _float3::Transform(vPos, CGameInstance::Get_Instance()->Get_Transform(CPipeLine::D3DTS_PROJ));
 }
  
 void CUtils::Make_Screen_ToWorld(_Inout_ _float3& vPos)
 {
-	vPos = XMVector3TransformCoord(vPos, CGameInstance::Get_Instance()->Get_Transform_Inv(CPipeLine::D3DTS_PROJ));
-	vPos = XMVector3TransformCoord(vPos, CGameInstance::Get_Instance()->Get_Transform_Inv(CPipeLine::D3DTS_VIEW));
+	vPos = _float3::Transform(vPos, CGameInstance::Get_Instance()->Get_Transform_Inv(CPipeLine::D3DTS_PROJ));
+	vPos = _float3::Transform(vPos, CGameInstance::Get_Instance()->Get_Transform_Inv(CPipeLine::D3DTS_VIEW));
 }
+
+#ifdef _DEBUG
+
+ImVec2 CUtils::WorldPosTo_ImguiProjPos(_float3 vWorldPos)
+{
+	CGameInstance* pGameInstance = CGameInstance::Get_Instance();
+
+	_float4x4 VPMatrix = pGameInstance->Get_Transform(CPipeLine::D3DTS_VIEW) *
+						 pGameInstance->Get_Transform(CPipeLine::D3DTS_PROJ);
+
+
+	_float2 vWinSize = pGameInstance->Get_WinSize();
+	_float4 vScreenPos = _float3::Transform(vWorldPos, VPMatrix);
+
+	vScreenPos = XMVectorMultiplyAdd(vScreenPos, _float4(.5f, -.5f, 1.f, 0.f), _float4(.5f, .5f, 0.f, 0.f));
+	vScreenPos = vScreenPos * _float4(vWinSize.x, vWinSize.y, 1.f, 0.f);
+	return ImVec2(vScreenPos.x, vScreenPos.y);
+}
+
+#endif
 
 physx::PxMat44 CUtils::To_Float4x4(const _float4x4& mat)
 {

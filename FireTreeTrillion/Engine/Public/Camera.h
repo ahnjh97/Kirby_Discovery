@@ -11,6 +11,7 @@ BEGIN(Engine)
 class ENGINE_DLL CCamera abstract : public CGameObject
 {
 public:
+	enum CAMTARGET { TARGET_FIRST, TARGET_SECOND, TARGET_END };
 	enum CAMFOCUS { FOCUS_FIRST, FOCUS_SECOND, FOCUS_BOTH, FOCUS_END };
 
 	typedef struct : public CGameObject::GAMEOBJECT_DESC
@@ -29,30 +30,8 @@ protected:
 	virtual ~CCamera() = default;
 
 public:
-	//트래킹할 타겟을 세팅한다. (둘째 인수: 첫 번째 타겟? 두 번째 타겟?)
-	virtual void Set_Target(CTransform* pTarget, CAMFOCUS eFocus = FOCUS_FIRST)
-	{
-		if (nullptr == pTarget)
-			return;
-
-		if (eFocus == FOCUS_FIRST)
-		{
-			if (nullptr != m_pFirstTarget)
-				Safe_Release(m_pFirstTarget);
-
-			m_pFirstTarget = pTarget;
-			Safe_AddRef(pTarget);
-			
-		}
-		else if (eFocus == FOCUS_SECOND)
-		{
-			if (nullptr != m_pSecondTarget)
-				Safe_Release(m_pSecondTarget);
-
-			m_pSecondTarget = pTarget;
-			Safe_AddRef(pTarget);
-		}
-	}
+	//트래킹할 타겟을 세팅한다. (트랜스폼, 몇 번째 타겟 슬롯에 넣을 건지, 어디에 focus할 건지, 기준점에 얼마나 오프셋 줄 건지, 보간 속도 어떻게 할 건지)
+	virtual void Set_Target(CTransform* pTarget, CAMTARGET eTarget, CAMFOCUS eFocus, _float3 vAnchorOffset = _float3{ 0.f, 0.f, 0.f }, _float fInterpolateSpeed = -1.f);
 
 
 public:
@@ -77,8 +56,11 @@ protected:
 
 protected:
 	_float4x4		m_ProjMatrix;
+	//기준 값을 만들 때 같이 사용할 오프셋(로컬 기준)
+	_float3			m_vAnchorOffset = { 0.f, 0.f, 0.f };
+	//카메라 보간 속도
+	_float			m_fInterpolateSpeed = { 2.f };
 
-protected:
 
 
 

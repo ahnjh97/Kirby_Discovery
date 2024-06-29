@@ -48,8 +48,8 @@ CLevelChanger::LEVEL_DATA CLevelChanger::Load()
     json data;
     input_file >> data;
     tLevelData.strObjectName = data["name"];
-    tLevelData.fKirbyHP = stoi(to_string(data["HP"]));
-    tLevelData.fKirbyCoin = stoi(to_string(data["Coin"]));
+    tLevelData.fKirbyHP = stof(to_string(data["HP"]));
+    tLevelData.fKirbyCoin = stof(to_string(data["Coin"]));
 
     input_file.close();
     return tLevelData;

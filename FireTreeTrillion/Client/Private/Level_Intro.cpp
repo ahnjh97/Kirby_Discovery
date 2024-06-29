@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "Level_Intro.h"
+#include "Level_Loading.h"
+
 #include "Camera_Free.h"
 #include "Camera_Main.h"
 #include "BasicMap.h"
@@ -10,6 +12,7 @@
 #include "Kabu.h"
 #include "BrontoBurt.h"
 #include "PoppyBrosJr.h"
+#include "SkySphere.h"
 
 #include "BG.h"
 #include "HUD.h"
@@ -55,11 +58,20 @@ HRESULT CLevel_Intro::Initialize()
 	hr = Ready_Kickables();
 	CHECK_FAILED(hr);
 
-
-
+	// 셰이더 트리거
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
+	// 레벨전환 트리거
+	function<void(_int)> func = bind(&CLevel_Intro::Change_Levels, this);
+	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_LEVELCHANGER, func);
 
 	return S_OK;
+}
+
+void CLevel_Intro::Change_Levels()
+{
+	HRESULT hr(S_OK);
+	hr = m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_RACING));
+	CHECK_FAILED(hr);
 }
 
 void CLevel_Intro::Tick(_float fTimeDelta)
@@ -147,10 +159,11 @@ HRESULT CLevel_Intro::Ready_Layer_Camera(const wstring& strLayerTag)
 
 HRESULT CLevel_Intro::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
+	CSkySphere::SKYSPHERE_DESC IntroSkyDesc{};
+	IntroSkyDesc.strModelTag = { "SkySphere_Stage1_Day" };
 
-	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_INTRO, strLayerTag, TEXT("Prototype_GameObject_SkySphere"));
+	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_INTRO, strLayerTag, TEXT("Prototype_GameObject_SkySphere"), &IntroSkyDesc);
 	CHECK_FAILED(hr);
-
 
 	//for (_int i = 0; i < 10; i++)
 	//{
@@ -193,7 +206,6 @@ HRESULT CLevel_Intro::Ready_Layer_BackGround(const wstring& strLayerTag)
 	//	//	return E_FAIL;
 	//}
 
-
 	CGameObject::GAMEOBJECT_DESC ObjDesc{};
 	ObjDesc.fSpeedPerSec = 5.f;
 	ObjDesc.fRotationPerSec = ToRadian(90.f);
@@ -215,6 +227,17 @@ HRESULT CLevel_Intro::Ready_Layer_BackGround(const wstring& strLayerTag)
 	// Car Test
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Breakable"), TEXT("Prototype_GameObject_BreakableRock"), &ObjDesc)))
 		return E_FAIL;
+
+
+	ObjDesc.fSpeedPerSec = 5.f;
+	ObjDesc.fRotationPerSec = ToRadian(90.f);
+	InitMat = _float4x4::Identity;
+	InitMat.Translation({ 53.38f, 22.19f, 348.12f });
+	ObjDesc.matWorld = InitMat;
+	// Car Test
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Breakable"), TEXT("Prototype_GameObject_PortalSoftEffect"), &ObjDesc)))
+		return E_FAIL;
+
 
 	return S_OK;
 }
@@ -612,7 +635,7 @@ HRESULT CLevel_Intro::Ready_Items()
 		}
 		else if ("Item_EnergyDrink" == strModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NoVacuumItem"), TEXT("Prototype_GameObject_EnergyDrink"), &tDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NoVacuumItem"), TEXT("Prototype_GameObject_Food"), &tDesc)))
 				return E_FAIL;
 		}
 	}

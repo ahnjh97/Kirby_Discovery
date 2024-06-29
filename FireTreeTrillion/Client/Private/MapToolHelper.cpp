@@ -18,7 +18,7 @@ static _int s_iLabDecoIdx = -1;
 static _int s_iLevelIndex = 0;
 static _int s_iTempLevelIdx = -1;
 
-static const _char* s_triggerTypes[] = {"Camera", "Shader"};
+static const _char* s_triggerTypes[] = {"Camera", "Shader", "Star", "LevelChanger"};
 static _int s_iTriggerType = -1;
 static const _char* s_triggerIndices[] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
 									"11", "12", "13", "14", "15", "16", "17", "18", "19", "20" };
@@ -27,7 +27,8 @@ static _int s_iTriggerIdx = -1;
 static _int s_iMapMeshIndex = -1;
 static _int s_iSelectedMeshIndex = -1; 
 
-static const _char* s_ShaderPasses[] = { "Blend X, NormalO", "Blend X, Normal X", "LightDepth", "Blend O, Normal O", "Blend O, Normal X" };
+static const _char* s_ShaderPasses[] = { "0. Blend X, NormalO", "1. Blend X, Normal X", "2. LightDepth", "3. Blend O, Normal O", "4. Blend O, Normal X"
+		, "5. BLEND X, DISCARD X", "6. BLEND O, DISCARD X" };
 static vector<vector<_int>> s_vecPassIndices;
 static vector<vector<_float>> s_vecSamplingFactors;
 static _int s_iMapIndex = 0;
@@ -45,10 +46,10 @@ static _bool s_bHideWalls = { false };
 
 static _int s_iConnectedMonster = -1;
 static const _char* s_ModelPassIndices[] = { "0. NORMAL_0", "1. NORMAL_X", "2. SHADOW", "3. SKY", "4. BLOOM", "5. NON_BLUR"
-	,"6. TRIGGER", "7.DEFAULTFX", "8. BLENDFX", "9. DEFERREDINFO", "10. WHITEFX", "11. KIRBYPART",
-	"12. NORMAL_O AND NONCULL", "13. BLEND O, NORMAL O", "14. BLEND O, NORMAL X" };
+	,"6. TRIGGER", "7.DEFAULTFX", "8. BLENDFX", "9. DEFERREDINFO", "10. WHITEFX", "11. KIRBYPART", "12. NEARCLIP",
+	/*"12. NORMAL_O AND NONCULL", */"13. BLEND O, NORMAL O", "14. MONSTERPARTOBJECT" };
 
-static const _char* s_PosTexPassIndices[] = { "0. DEFAULT", "1. ALPHABLEND", "2. BLENDFX", "3. BLOOM", "4. DEFAULTFX", "5. BLEND_NOZTEXT"
+static const _char* s_PosTexPasses[] = { "0. DEFAULT", "1. ALPHABLEND", "2. BLENDFX", "3. BLOOM", "4. DEFAULTFX", "5. BLEND_NOZTEXT"
 	,"6. WHITEFX", "7. UI_MASK", "8. UI_MASK2", "9. SOFTFX", "10. SOFTALPHAFX"};
 static _int s_iPassIndex = -1;
 static _char s_ObjectsFilter[MAX_PATH] = "";
@@ -154,7 +155,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "LbBossRoom", "LbLastBossStage", "LbLastBuilding", "Land_LbLastBossBeforeStep"
 
 		//LbLastBuilding Object :: 보스전 필드의 오브젝트
-		,"LbLastOutFrame2", "LbLastStairs"//, "LbLastTank", "LbLastOutFrame1", 준수 오더로 삭제
+		,"LbLastStairs"//, "LbLastTank", "LbLastOutFrame1", "LbLastOutFrame2", :: 준수 오더로 삭제. 이제 Anim으로 대체되어 사용안함
 		,"LbBossRoomDoorAL","LbBossRoomDoorBL", "LbOutBuildingWallL"
 
 		//LbLastBossBeforeStep Object :: Rubble 
@@ -172,7 +173,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	m_setItemTxts = { "Item_Coin", "Item_EnergyDrink" };
 	m_setTrees = { "GsTreeA", "GsTreeB", "GsTreeC" };
 
-	//투명도 적용이 필요한 데코오브젝트
+	//블렌드 적용이 필요한 데코오브젝트
 	m_setBlendDecos = {"LbOutBuildingWallL", "LbOutBuildingFenceL"};
 
 	s_vecPassIndices.resize(m_vecMapModelNames.size());
@@ -184,6 +185,8 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 	ReadTownDecoTxts();
 	ReadLabDecoTxts();
+
+	TraverseBlendDecoInfoTxts();
 
 	HideGrid(s_bHideGrid);
 	HideTriggers(s_bHideTriggers);
@@ -218,6 +221,7 @@ void CMapToolHelper::Late_Tick(_float fTimeDelta)
 		Menu_MapShaderInfo();
 		Menu_MonsterInfo();
 		Menu_RallyPointInfo();
+		Menu_BlendDecoInfo();
 	}
 
 	// 스타일 복원
@@ -778,6 +782,72 @@ void CMapToolHelper::Menu_RallyPointInfo()
 	ImGui::End();
 }
 
+void CMapToolHelper::Menu_BlendDecoInfo()
+{
+	if (false == IsBlendDeco(m_strCurModel))
+		return;
+
+	string strBlendDecoInfo = m_strCurModel + "_Info";
+	ImGui::Begin(strBlendDecoInfo.c_str());
+
+	CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(m_pPickedObject);
+	if (nullptr == pMapToolObject)
+		return;
+
+	CModel* pModel = dynamic_cast<CModel*>(pMapToolObject->Get_Component(TEXT("Com_Model")));
+	_uint iNumMeshes = pModel->Get_NumMeshes();
+
+	_bool* bBlendDecoInfo = new _bool[iNumMeshes];
+	for (_uint i = 0; i < iNumMeshes; i++)
+		bBlendDecoInfo[i] = false;
+
+	auto mapIter = m_mapBlendDecoInfos.find(m_strCurModel);
+	if (m_mapBlendDecoInfos.end() != mapIter) {
+		for (auto& blendMeshIndex : mapIter->second)
+		{
+			if (blendMeshIndex < iNumMeshes) // 배열 범위 검사
+				bBlendDecoInfo[blendMeshIndex] = true;
+		}
+	}
+
+	vector<string> vecMeshNames(iNumMeshes);
+	for (_uint i = 0; i < iNumMeshes; ++i)
+		vecMeshNames[i] = pModel->Get_MeshName(i);
+
+	vector<const _char*> vecBlendDecoMeshNames(iNumMeshes);
+	for (_uint i = 0; i < iNumMeshes; ++i)
+		vecBlendDecoMeshNames[i] = vecMeshNames[i].c_str();
+	
+	for (_uint i = 0; i < iNumMeshes; i++) {
+		ImGui::Text("%d", i);
+		ImGui::SameLine(25); // 다음 메뉴 위치를 25에서부터 시작하도록 지정
+		if (ImGui::Selectable(vecBlendDecoMeshNames[i], s_iSelectedMeshIndex == i, ImGuiSelectableFlags_AllowDoubleClick, ImVec2(240, 0)))
+		{
+			s_iSelectedMeshIndex = i;
+			pMapToolObject->Reset_Time(i);
+		}
+		ImGui::SameLine();
+
+		string strLabel = "##BlendMeshIndex" + to_string(i);
+		if (ImGui::Checkbox(strLabel.c_str(), &bBlendDecoInfo[i])) {
+
+			unordered_set<_uint> setBlendMeshIndices;
+			for (_uint j = 0; j < iNumMeshes; j++)
+			{
+				if (true == bBlendDecoInfo[j])
+					setBlendMeshIndices.insert(j);
+			}
+			
+			m_mapBlendDecoInfos.insert_or_assign(m_strCurModel, setBlendMeshIndices);
+			pMapToolObject->Set_PassIndices(setBlendMeshIndices);
+		}
+	}
+		
+	Safe_Delete_Array(bBlendDecoInfo);
+
+	ImGui::End();
+}
+
 void CMapToolHelper::Edit_Object()
 {
 	if (nullptr == m_pPickedObject)
@@ -786,6 +856,8 @@ void CMapToolHelper::Edit_Object()
 	CTransform* pTransform = dynamic_cast<CTransform*>(m_pPickedObject->Get_Component(g_strTransformTag));
 	if (nullptr == pTransform)
 		return;
+
+	Safe_AddRef(pTransform);
 
 	ImGui::Begin(m_strCurModel.c_str());
 
@@ -824,9 +896,9 @@ void CMapToolHelper::Edit_Object()
 	{
 		/*ImGui::SetNextItemWidth(150);
 		GetPassIndex();
-		if (ImGui::Combo("##PosTexPassIndex", &s_iPassIndex, s_PosTexPassIndices, IM_ARRAYSIZE(s_PosTexPassIndices)))
-			SetPassIndex(s_iPassIndex);
-		*/
+		if (ImGui::Combo("##PosTexPassIndex", &s_iPassIndex, s_PosTexPasses, IM_ARRAYSIZE(s_PosTexPasses)))
+			SetPassIndex(s_iPassIndex);*/
+		
 	}
 	else  // Shader_Model 패스지정
 	{
@@ -842,6 +914,9 @@ void CMapToolHelper::Edit_Object()
 	_float4x4 tempMatrix = pTransform->Get_WorldFloat4x4();
 	m_pGameInstance->EditTransform(tempMatrix); // 선택한 모델의 월드행렬을 수정 
 	pTransform->Set_WorldMatrix(tempMatrix);
+
+	Safe_Release(pTransform);
+
 	ImGui::End();
 }
 
@@ -855,6 +930,7 @@ void CMapToolHelper::OnLeftClick()
 		return;
 
 	Safe_Release(m_pPickedObject);
+	m_pPickedObject = nullptr;
 	m_pPickedObject = pPickedObject;
 	Safe_AddRef(m_pPickedObject);
 
@@ -920,7 +996,7 @@ void CMapToolHelper::OnRightClick()
 
 		if (Compute_MapIndex(m_strSelectedTxt) == -1) // 맵이 아닐때
 		{
-			if (tMapToolDesc.wstrModelName == TEXT("BG1")) {
+			if (true == IsMap(m_strSelectedTxt)) { // BG0, BG1 
 				if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"),
 					TEXT("Prototype_GameObject_BG"), &tMapToolDesc)))
 					return;
@@ -945,6 +1021,7 @@ void CMapToolHelper::OnRightClick()
 
 		list<CGameObject*>* pObjList = m_pGameInstance->Get_List(LEVEL_TOOL_MAP, TEXT("Layer_Parse"));
 		Safe_Release(m_pPickedObject);
+		m_pPickedObject = nullptr;
 		m_pPickedObject = pObjList->back();
 		Safe_AddRef(m_pPickedObject);
 		m_strCurModel = m_strSelectedTxt;
@@ -1109,6 +1186,11 @@ void CMapToolHelper::Save_Level()
 		wstrSave += L"Kickables O\n";
 	else
 		wstrSave += L"Kickables X\n";
+
+	if(true == Save_BlendDecoInfos())
+		wstrSave += L"BlendDecoInfos O\n";
+	else
+		wstrSave += L"BlendDecoInfos X\n";
 
 	MSG_BOX(wstrSave.c_str());
 }
@@ -1433,6 +1515,14 @@ _bool CMapToolHelper::IsKickble(const string& _strModelName)
 _bool CMapToolHelper::IsTree(const string& _strModelName)
 {
 	if (m_setTrees.end() != m_setTrees.find(_strModelName))
+		return true;
+
+	return false;
+}
+
+_bool CMapToolHelper::IsBlendDeco(const string& _strModelName)
+{
+	if (m_setBlendDecos.end() != m_setBlendDecos.find(_strModelName))
 		return true;
 
 	return false;
@@ -1914,7 +2004,7 @@ _bool CMapToolHelper::Save_Decos(const string& _strLevel, vector<CGameObject*>& 
 		_float fRimWidth = obj->Get_RimWidth();
 		_uint iPassIndex = static_cast<_uint>(pMapToolObj->Get_PassIndex());
 		if (true == IsTree(strModelName))
-			iPassIndex = 12;
+			iPassIndex = MODEL_NEARCLIP;
 		else
 			iPassIndex = 0;
 
@@ -2129,6 +2219,8 @@ void CMapToolHelper::Load_Triggers(const string& _strLevel)
 		strModelName.resize(iStrLength);
 		fileInput.read(&strModelName[0], iStrLength);
 		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
+		//matWorld._41 = matWorld._41 - 200.f;
+		//matWorld._43 = matWorld._43 + 1200.f;
 		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
 		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
 
@@ -2201,6 +2293,7 @@ void CMapToolHelper::Load_Monsters(const string& _strLevel)
 		for (_uint iRallyPointIdx = 0; iRallyPointIdx < iNumRallyPoints; iRallyPointIdx++)
 		{
 			fileInput.read(reinterpret_cast<char*>(&vRallyPointPos), sizeof(vRallyPointPos));
+
 			CMapToolObject::MAPTOOLOBJECT_DESC tRallyPointDesc{};
 			tRallyPointDesc.wstrModelName = TEXT("RallyPoint");
 			tRallyPointDesc.matWorld._41 = vRallyPointPos.x;
@@ -2277,6 +2370,12 @@ void CMapToolHelper::Load_Decos(const string& _strLevel)
 		tDesc.iShaderVars = iShaderVars;
 		tDesc.fRimWidth = fRimWidth;
 		tDesc.iPassIndex = iPassIndex;
+
+		auto mapIter = m_mapBlendDecoInfos.find(strModelName);
+		if (mapIter != m_mapBlendDecoInfos.end())
+		{
+			tDesc.setBlendMeshIndices = mapIter->second;
+		}
 
 		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
 		{
@@ -2632,6 +2731,95 @@ void CMapToolHelper::WriteLocalizedNonAnimMapDecos(vector<pair<string, _float4x4
 		inputFile.close();
 		outputFile.close();
 	}
+}
+
+_bool CMapToolHelper::Save_BlendDecoInfos()
+{
+	for (auto& blendDecoInfoPair : m_mapBlendDecoInfos)
+	{
+		string strModelName = blendDecoInfoPair.first;
+		string strPath = "../../../objects_txt/BlendDecoInfo/" + strModelName + "_BlendMeshes.txt";
+		ofstream outputFile(strPath, ios::binary | ios::trunc);
+		if (!outputFile.is_open()) {
+			MSG_BOX(TEXT("Failed to Open : BlendMeshes.txt"));
+			return false;
+		}
+
+		_bool bStaticActor = false;
+		if (m_setActorDecos.end() != m_setActorDecos.find(strModelName))
+			bStaticActor = true;
+
+		outputFile.write(reinterpret_cast<const char*>(&bStaticActor), sizeof(bStaticActor));
+
+		_uint iNumBlendMeshes = blendDecoInfoPair.second.size();
+		outputFile.write(reinterpret_cast<const char*>(&iNumBlendMeshes), sizeof(iNumBlendMeshes));
+
+		for (auto& blendMeshIndex : blendDecoInfoPair.second)
+		{
+			_uint iBlendMeshIndex = blendMeshIndex;
+			outputFile.write(reinterpret_cast<const char*>(&iBlendMeshIndex), sizeof(iBlendMeshIndex));
+		}
+		outputFile.close();
+	}
+	
+	return true;
+}
+
+void CMapToolHelper::TraverseBlendDecoInfoTxts()
+{
+	string strPath = "../../../objects_txt/BlendDecoInfo/";
+
+	directory_iterator end_iter;  // 디렉토리 순회의 끝을 나타내는 iterator
+	directory_iterator dir_iter(strPath);  // 지정된 경로의 시작 iterator
+
+	while (dir_iter != end_iter) {
+		if (is_regular_file(*dir_iter)) {
+			string strFilePath = dir_iter->path().filename().string();
+			string strFileName = strFilePath.substr(0, strFilePath.length() - 4);
+
+			Load_BlendDecoInfo(strPath, strFileName);
+		}
+		++dir_iter;
+	}
+}
+
+void CMapToolHelper::Load_BlendDecoInfo(const string& _strFolderPath, const string& _strFileName)
+{
+	string strPath = _strFolderPath + _strFileName;
+
+	string strModelName;
+	string::size_type pos = _strFileName.find('_');
+	if (pos != string::npos)
+		strModelName = _strFileName.substr(0, pos);
+	else
+		return;
+
+	strPath += ".txt";
+
+	ifstream inputFile(strPath, ios::binary);
+	if (inputFile.is_open() == false)
+	{
+		wstring wstrError = TEXT("Failed to open : ") + CUtils::StrToWstr(_strFileName) + TEXT(".txt");
+		MSG_BOX(wstrError.c_str());
+		return;
+	}
+
+	_bool bStaticActor{};
+	_uint iNumBlendMeshes{}, iBlendMeshIndex{};
+	unordered_set<_uint> setBlendMeshIndices;
+
+	inputFile.read(reinterpret_cast<char*>(&bStaticActor), sizeof(bStaticActor));
+	inputFile.read(reinterpret_cast<char*>(&iNumBlendMeshes), sizeof(iNumBlendMeshes));
+
+	for (_uint i = 0; i < iNumBlendMeshes; i++)
+	{
+		inputFile.read(reinterpret_cast<char*>(&iBlendMeshIndex), sizeof(iBlendMeshIndex));
+		setBlendMeshIndices.insert(iBlendMeshIndex);
+	}
+
+	inputFile.close();
+
+	m_mapBlendDecoInfos.insert_or_assign(strModelName, setBlendMeshIndices);
 }
 
 CMapToolHelper* CMapToolHelper::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
