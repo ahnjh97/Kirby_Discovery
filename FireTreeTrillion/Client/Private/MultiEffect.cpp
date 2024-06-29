@@ -81,6 +81,7 @@ HRESULT CMultiEffect::Initialize(void* pArg)
 #endif
 
 
+	m_strFXName = m_FXDesc.strFXName;
 
 	//클라에서는 정보를 받아 prototype name으로 clone
 	if (m_FXDesc.strFXName != "NONE")

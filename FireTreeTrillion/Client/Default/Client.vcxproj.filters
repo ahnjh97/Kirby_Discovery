@@ -208,9 +208,6 @@
     <Filter Include="02.GameObjects\PhysXObject\Item">
       <UniqueIdentifier>{dcd6e3c0-cd2f-4f4e-8add-51eb6748dc29}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\PhysXObject\Item\EnergyDrink">
-      <UniqueIdentifier>{e5a44464-aceb-4ed8-97a0-0e8e21890bb7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Item\Coin">
       <UniqueIdentifier>{fec82fe1-9a7e-4145-957f-e7c4662e02ff}</UniqueIdentifier>
     </Filter>
@@ -407,6 +404,9 @@
     </Filter>
     <Filter Include="02.GameObjects\Map\Gimmick\Lab_Discovera">
       <UniqueIdentifier>{aa726fb0-48a0-4fa6-b019-463b20c8b50d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Item\Food">
+      <UniqueIdentifier>{e5a44464-aceb-4ed8-97a0-0e8e21890bb7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -638,9 +638,6 @@
     <ClInclude Include="..\Public\ItemObject.h">
       <Filter>02.GameObjects\PhysXObject\Item</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\EnergyDrink.h">
-      <Filter>02.GameObjects\PhysXObject\Item\EnergyDrink</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Coin.h">
       <Filter>02.GameObjects\PhysXObject\Item\Coin</Filter>
     </ClInclude>
@@ -829,6 +826,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Gm_LabBossRoomDoor.h">
       <Filter>02.GameObjects\Map\Gimmick\Lab_Discovera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Food.h">
+      <Filter>02.GameObjects\PhysXObject\Item\Food</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1045,9 +1045,6 @@
     <ClCompile Include="..\Private\ItemObject.cpp">
       <Filter>02.GameObjects\PhysXObject\Item</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\EnergyDrink.cpp">
-      <Filter>02.GameObjects\PhysXObject\Item\EnergyDrink</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Coin.cpp">
       <Filter>02.GameObjects\PhysXObject\Item\Coin</Filter>
     </ClCompile>
@@ -1233,6 +1230,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Gm_LabBossRoomDoor.cpp">
       <Filter>02.GameObjects\Map\Gimmick\Lab_Discovera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Food.cpp">
+      <Filter>02.GameObjects\PhysXObject\Item\Food</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

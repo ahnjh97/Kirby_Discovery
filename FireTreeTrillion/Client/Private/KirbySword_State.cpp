@@ -1321,7 +1321,8 @@ void CKirbySword_JumpAttack_State::OnStateEnter(CModel* _pModel, _uint _iAnimInd
 	{
 	case CKirby::SWORDSTATE_UPWARDSLASH:
 	{
-		pKirby->Delete_AllEffect();
+		pKirby->Delete_Effect("Sword Dash Test A");
+		//pKirby->Delete_AllEffect();
 		SwordSlash_Up(pKirby->Get_TransformCom());
 	}
 	break;

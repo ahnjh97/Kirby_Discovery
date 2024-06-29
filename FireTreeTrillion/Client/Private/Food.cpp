@@ -1,27 +1,27 @@
 #include "stdafx.h"
-#include "EnergyDrink.h"
+#include "Food.h"
 #include "MultiEffect.h"
 
 #include "Hitbox.h"
 
-CEnergyDrink::CEnergyDrink(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CFood::CFood(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CItemObject{ pDevice, pContext }
 {
 }
 
-CEnergyDrink::CEnergyDrink(const CEnergyDrink& rhs)
+CFood::CFood(const CFood& rhs)
 	: CItemObject{ rhs }
 {
 }
 
-HRESULT CEnergyDrink::Initialize_Prototype()
+HRESULT CFood::Initialize_Prototype()
 {
 	m_eCollisionGroup = ITEM;
 
 	return S_OK;
 }
 
-HRESULT CEnergyDrink::Initialize(void* pArg)
+HRESULT CFood::Initialize(void* pArg)
 {
 	GAMEOBJECT_DESC		GameObjectDesc{};
 	if (nullptr != pArg)
@@ -33,32 +33,28 @@ HRESULT CEnergyDrink::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
-	// FOR TEST. JYWI 240623
-	if (*m_pCurrentLevelID == LEVEL_PARTTIME)
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(0.f, 20.f, 5.f, 1.f));//CUtils::Get_State_Vector_Matrix(GameObjectDesc.matWorld, CUtils::STATE_POSITION));
 
-	if (FAILED(Add_Components()))
+	if (FAILED(Add_Components(GameObjectDesc.wstrModelName)))
 		return E_FAIL;
-
 
 	m_eItemType = ITEM_FOOD;
 	m_iItemPoint = 30;
 
-	CMultiEffect::MULTI_FX_DESC FXDesc{};
+	//CMultiEffect::MULTI_FX_DESC FXDesc{};
 
-	FXDesc.vInitPos = { 0.f, .3f, 0.f };
-	FXDesc.pSocketMatrix = &m_EffectSocket;
-	FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
-	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_ItemBubble1"), &FXDesc)))
-		return E_FAIL;
+	//FXDesc.vInitPos = { 0.f, .3f, 0.f };
+	//FXDesc.pSocketMatrix = &m_EffectSocket;
+	//FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
+	//if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_ItemBubble1"), &FXDesc)))
+	//	return E_FAIL;
 
-	Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+	//Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 
 
 	return S_OK;
 }
 
-_int CEnergyDrink::Tick(_float fTimeDelta)
+_int CFood::Tick(_float fTimeDelta)
 {
 	if (m_bDead == true)
 	{
@@ -130,7 +126,7 @@ _int CEnergyDrink::Tick(_float fTimeDelta)
 	return OBJ_NOEVENT;
 }
 
-void CEnergyDrink::Late_Tick(_float fTimeDelta)
+void CFood::Late_Tick(_float fTimeDelta)
 {
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
@@ -139,7 +135,7 @@ void CEnergyDrink::Late_Tick(_float fTimeDelta)
 	}
 }
 
-HRESULT CEnergyDrink::Render()
+HRESULT CFood::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
@@ -170,7 +166,7 @@ HRESULT CEnergyDrink::Render()
 	return S_OK;
 }
 
-HRESULT CEnergyDrink::Render_LightDepth()
+HRESULT CFood::Render_LightDepth()
 {
 	if (FAILED(m_pGameInstance->Render_LightDepth_For_GameObject(m_pShaderCom, m_pTransformCom, m_pModelCom)))
 		return E_FAIL;
@@ -179,7 +175,7 @@ HRESULT CEnergyDrink::Render_LightDepth()
 }
 
 #ifdef _DEBUG
-void CEnergyDrink::Render_IMGUI()
+void CFood::Render_IMGUI()
 {
 	if (ImGui::TreeNode("Guizmo"))
 	{
@@ -194,7 +190,7 @@ void CEnergyDrink::Render_IMGUI()
 }
 #endif
 
-void CEnergyDrink::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
+void CFood::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
 	if (eContent == CCollisionCenter::CONTENT_ITEM)
 	{
@@ -209,7 +205,7 @@ void CEnergyDrink::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObje
 	}
 }
 
-HRESULT CEnergyDrink::Add_Components()
+HRESULT CFood::Add_Components(wstring strPrototag)
 {
 	HRESULT hr;
 
@@ -217,8 +213,8 @@ HRESULT CEnergyDrink::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
-	// 커비의 기본 상태 모델
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Item_EnergyDrink"),
+	wstring strModelName = TEXT("Prototype_Component_Model_") + strPrototag;
+	hr = __super::Add_Component(strModelName,
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
@@ -234,7 +230,7 @@ HRESULT CEnergyDrink::Add_Components()
 	return S_OK;
 }
 
-HRESULT CEnergyDrink::Bind_ShaderResources()
+HRESULT CFood::Bind_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
@@ -250,33 +246,33 @@ HRESULT CEnergyDrink::Bind_ShaderResources()
 	return S_OK;
 }
 
-CEnergyDrink* CEnergyDrink::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CFood* CFood::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	CEnergyDrink* pInstance = new CEnergyDrink(pDevice, pContext);
+	CFood* pInstance = new CFood(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CEnergyDrink"));
+		MSG_BOX(TEXT("Failed To Created : CFood"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CGameObject* CEnergyDrink::Clone(void* pArg)
+CGameObject* CFood::Clone(void* pArg)
 {
-	CEnergyDrink* pInstance = new CEnergyDrink(*this);
+	CFood* pInstance = new CFood(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CEnergyDrink"));
+		MSG_BOX(TEXT("Failed To Created : CFood"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CEnergyDrink::Free()
+void CFood::Free()
 {
 	__super::Free();
 

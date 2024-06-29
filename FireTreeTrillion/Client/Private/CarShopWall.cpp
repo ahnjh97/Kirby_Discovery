@@ -3,6 +3,7 @@
 #include "HitBox.h"
 #include "Kirby.h"
 #include "BreakableRockParticle.h"
+#include "EventCenter.h"
 
 CCarShopWall::CCarShopWall(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
@@ -152,6 +153,15 @@ void CCarShopWall::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObje
 	vDir.Normalize();
 	m_vDamegeDir = (_float3)vDir;
 	m_fHitPower = pKirby->Get_KirbyInfo()->m_fMoveSpeed;
+
+
+	m_pTransformCom->Move(_float4{ 0.f, -10.f, 0.f, 0.f });
+
+	//이벤트 호출
+	CEventCenter::Get_Instance()->Notify(KEVENT_BREAK_CARSHOP, this);
+	//m_pGameInstance->Set_FirstTimerRatio(.2f);
+	//m_pGameInstance->Set_SecondTimerRatio(.2f);
+
 }
 
 HRESULT CCarShopWall::Add_Components()

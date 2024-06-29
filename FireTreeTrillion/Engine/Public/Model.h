@@ -57,6 +57,7 @@ public:
 	void Set_TrackPosition(_float fTrackPosition) { m_Animations[m_iCurrentAnimIndex]->Set_TrackPosition(fTrackPosition); }
 
 	const _char* Get_AnimationName() const { return m_Animations[m_iCurrentAnimIndex]->Get_AnimationName(); }
+	_float Get_AnimTrackPosition() { return m_Animations[m_iCurrentAnimIndex]->Get_AnimTrackPosition(); }
 	_uint Get_AnimCnt() const { return m_Animations.size(); }
 	vector<class CAnimation*>* const Get_Animations() { return &m_Animations; }
 	
