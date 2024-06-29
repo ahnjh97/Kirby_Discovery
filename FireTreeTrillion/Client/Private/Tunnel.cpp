@@ -1,14 +1,16 @@
 #include "stdafx.h"
-#include "Tunnel.h"
 #include "TunnelRock.h"
+#include "HitBox.h"
+#include "Tunnel.h"
+#include "Kirby.h"
 
 CTunnel::CTunnel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CGameObject{ pDevice, pContext }
+    : CPhysXObject{ pDevice, pContext }
 {
 }
 
 CTunnel::CTunnel(const CTunnel& rhs)
-    : CGameObject{ rhs }
+    : CPhysXObject{ rhs }
 {
 }
 
@@ -84,6 +86,15 @@ HRESULT CTunnel::Initialize(void* pArg)
         m_vecTunnelRocks.push_back(pTunnelRock);
     }
 
+    for (_uint i = 0; i <= 16; i++)
+    {
+        GAMEOBJECT_DESC tDesc{};
+        tDesc.matWorld = GameObjectDesc.matWorld;
+        tDesc.wstrModelName = TEXT("TunnelRock") + to_wstring(i);
+        CGameObject* pTunnelRock = m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_TunnelRock"), &tDesc);
+        m_vecTunnelRocks.push_back(pTunnelRock);
+    }
+
     m_fSamplingFactor = 0.1f;
 
     return S_OK;
@@ -94,11 +105,15 @@ _int CTunnel::Tick(_float fTimeDelta)
     if (true == m_bDead)
         return OBJ_DEAD;
 
-    if (m_pGameInstance->Get_KeyState(DIK_SPACE, KEY_DOWN))
-        m_bCollsion = true;
+    //if (m_pGameInstance->Get_KeyState(DIK_SPACE, KEY_DOWN))
+    //    m_bCollsion = true;
 
     if (true == m_bCollsion)
     {
+        m_fTime += fTimeDelta;
+        if(m_fTime > 3.f)
+            return OBJ_DEAD;
+
         for (auto& tunnelRock : m_vecTunnelRocks)
         {
             if (nullptr == tunnelRock)
@@ -119,7 +134,8 @@ void CTunnel::Late_Tick(_float fTimeDelta)
         tunnelRock->Late_Tick(fTimeDelta);
     }
 
-    m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+    if(false == m_bHide)
+        m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
 
 HRESULT CTunnel::Render()
@@ -150,6 +166,21 @@ HRESULT CTunnel::Render()
     return S_OK;
 }
 
+void CTunnel::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
+{
+    if (true == m_bCollsion)
+        return;
+
+    CKirby* pKirby = static_cast<CKirby*>(pObject);
+    if (pKirby->Get_KirbyInfo()->m_bBooster == false)
+        return;
+
+    pKirby->Set_HitStop();
+
+    m_bCollsion = true;
+    m_bHide = true;
+}
+
 HRESULT CTunnel::Add_Components(const wstring& _wstrModelTag)
 {
     /* For.Com_Shader */
@@ -176,6 +207,14 @@ HRESULT CTunnel::Add_Components(const wstring& _wstrModelTag)
     hr = __super::Add_Component(TEXT("Prototype_Component_Texture_TunnelMask_MRA"),
         TEXT("Com_Mask_MRA"), (CComponent**)&m_pTextureCom[TEX_MRA]);
     CHECK_FAILED(hr);
+
+    CHitBox::HITBOX_DESC HitBox{};
+    HitBox.pOwner = this;
+    HitBox.pDesc = &m_tColliderDesc[BODY];
+    HitBox.pCollisionType = OBJECT;
+    if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
+        return E_FAIL;
+    Set_BodyCollider(COLLIDER_SPHERE, 1.5f, 0.f, 5.5f);
 
     return S_OK;
 }
