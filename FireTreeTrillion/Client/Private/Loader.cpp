@@ -1363,24 +1363,13 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	else if (eLevel == LEVEL_INTRO)
 	{
 		m_vecModelInfo.emplace_back("Kirby", TYPE_ANIM, 1.f, 180.f);
+
 		// For Kirby Body
-		m_vecModelInfo.emplace_back("KirbyBalloon", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyVacuum", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbySwordDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbySwordBalloon", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyBoomDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyCarDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyCarVacuum", TYPE_ANIM, 1.f, 180.f);
-
-
+		Load_KirbyBodyModels();
 		// For Kirby Weapon
-		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("KirbyBombDefault", TYPE_ANIM, 1.3f, 180.f);
-
+		Load_KirbyWeaponModels();
 		// For Kirby Armour
-		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
+		Load_KirbyArmourModels();
 
 
 		m_vecModelInfo.emplace_back("Level0Stage1Step01", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"), true);
@@ -1441,25 +1430,13 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 
 		m_vecModelInfo.emplace_back("Kirby", TYPE_ANIM, 1.f, 180.f);
+
 		// For Kirby Body
-		m_vecModelInfo.emplace_back("KirbyBalloon", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyVacuum", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbySwordDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbySwordBalloon", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyBoomDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyCarDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyCarVacuum", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyPartTimer", TYPE_ANIM, 1.f, 180.f);
-
-
+		Load_KirbyBodyModels();
 		// For Kirby Weapon
-		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("KirbyBombDefault", TYPE_ANIM, 1.3f, 180.f);
-
+		Load_KirbyWeaponModels();
 		// For Kirby Armour
-		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
+		Load_KirbyArmourModels();
 
 		//와들디 파트오브젝트
 		m_vecModelInfo.emplace_back("DeePart_Arena", TYPE_NONANIM, 1.f);
@@ -1511,24 +1488,13 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 
 		m_vecModelInfo.emplace_back("Kirby", TYPE_ANIM, 1.f, 180.f);
+
 		// For Kirby Body
-		m_vecModelInfo.emplace_back("KirbyBalloon", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyVacuum", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbySwordDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbySwordBalloon", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyBoomDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyCarDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyCarVacuum", TYPE_ANIM, 1.f, 180.f);
-
+		Load_KirbyBodyModels();
 		// For Kirby Weapon
-		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("KirbyBombDefault", TYPE_ANIM, 1.3f, 180.f);
-
+		Load_KirbyWeaponModels();
 		// For Kirby Armour
-		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
-
+		Load_KirbyArmourModels();
 
 		// For Monster
 		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.2f, 180.f);
@@ -1592,25 +1558,13 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 
 		m_vecModelInfo.emplace_back("Kirby", TYPE_ANIM, 1.f, 180.f);
+
 		// For Kirby Body
-		m_vecModelInfo.emplace_back("KirbyBalloon", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyVacuum", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbySwordDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbySwordBalloon", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyBoomDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyCarDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyCarVacuum", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyPartTimer", TYPE_ANIM, 1.f, 180.f);
-
-
+		Load_KirbyBodyModels();
 		// For Kirby Weapon
-		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("KirbyBombDefault", TYPE_ANIM, 1.3f, 180.f);
-
+		Load_KirbyWeaponModels();
 		// For Kirby Armour
-		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
+		Load_KirbyArmourModels();
 
 		//와들디 파트오브젝트
 		m_vecModelInfo.emplace_back("DeePart_Arena", TYPE_NONANIM, 1.f);
@@ -1641,66 +1595,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 
 		m_vecModelInfo.emplace_back("Ladder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-
-	}
-	else if (eLevel == LEVEL_TOWN)
-	{
-		m_vecModelInfo.emplace_back("Town", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("BG1", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-
-
-		m_vecModelInfo.emplace_back("Kirby", TYPE_ANIM, 1.f, 180.f);
-		// For Kirby Body
-		m_vecModelInfo.emplace_back("KirbyBalloon", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyVacuum", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbySwordDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbySwordBalloon", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyBoomDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyCarDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyCarVacuum", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyPartTimer", TYPE_ANIM, 1.f, 180.f);
-
-
-		// For Kirby Weapon
-		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("KirbyBombDefault", TYPE_ANIM, 1.3f, 180.f);
-
-		// For Kirby Armour
-		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
-
-		//와들디 파트오브젝트
-		m_vecModelInfo.emplace_back("DeePart_Arena", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("DeePart_Bass", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("DeePart_Delivery", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("DeePart_Drum", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("DeePart_DrumStick", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("DeePart_FoodShop", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("DeePart_Guitar", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("DeePart_Keyboard", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("DeePart_Knowledge", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("DeePart_Mike", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("DeePart_Pharmacy", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("DeePart_Plate", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("DeePart_RollingBall", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("DeePart_Theater", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("DeePart_WateringCan", TYPE_NONANIM, 1.f);
-
-		// 와들디
-		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
-		m_vecModelInfo.emplace_back("WaddleDeeHungry", TYPE_ANIM, 1.1f, 180.f);
-
-		// Boss
-		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 180.f);
-		m_vecModelInfo.emplace_back("DeeDeeDeeHammer", TYPE_NONANIM, 1.3f);
-
-		m_vecModelInfo.emplace_back("PoppyBrosJr", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_ANIM, 1.3f, 180.f);
-
-		// For Item
-		Load_ItemModels();
 
 	}
 	else if (eLevel == LEVEL_PARTTIME)
@@ -1743,23 +1637,14 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("BG1", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 		m_vecModelInfo.emplace_back("Kirby", TYPE_ANIM, 1.f, 180.f);
+
+
 		// For Kirby Body
-		m_vecModelInfo.emplace_back("KirbyBalloon", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyVacuum", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbySwordDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbySwordBalloon", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyBoomDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyCarDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyCarVacuum", TYPE_ANIM, 1.f, 180.f);
-
+		Load_KirbyBodyModels();
 		// For Kirby Weapon
-		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("KirbyBombDefault", TYPE_ANIM, 1.3f, 180.f);
-
+		Load_KirbyWeaponModels();
 		// For Kirby Armour
-		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
+		Load_KirbyArmourModels();
 
 		// For Boss 
 		m_vecModelInfo.emplace_back("FinalBoss", TYPE_ANIM, 1.f, 180.f);
@@ -1777,23 +1662,12 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Kirby", TYPE_ANIM, 1.f, 180.f);
 
 		// For Kirby Body
-		m_vecModelInfo.emplace_back("KirbyBalloon", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyVacuum", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbySwordDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbySwordBalloon", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyBoomDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyCarDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyCarVacuum", TYPE_ANIM, 1.f, 180.f);
-
+		Load_KirbyBodyModels();
 		// For Kirby Weapon
-		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("KirbyBombDefault", TYPE_ANIM, 1.3f, 180.f);
-
+		Load_KirbyWeaponModels();
 		// For Kirby Armour
-		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
-		
+		Load_KirbyArmourModels();
+
 		m_vecModelInfo.emplace_back("GsBenchAL", TYPE_NONANIM, 1.f, 0.f, 0, string("MapDeco/"));
 		m_vecModelInfo.emplace_back("Level1Stage1Step01", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"), true);
 		m_vecModelInfo.emplace_back("Level1Stage1Step01_Blend", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
@@ -1857,21 +1731,13 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Kirby", TYPE_ANIM, 1.f, 180.f);
 
 		// For Kirby Body
-		m_vecModelInfo.emplace_back("KirbyBalloon", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyVacuum", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbySwordDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbySwordBalloon", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyBoomDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyCarDefault", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("KirbyCarVacuum", TYPE_ANIM, 1.f, 180.f);
+		Load_KirbyBodyModels();
 		m_vecModelInfo.emplace_back("KirbyPartTimer", TYPE_ANIM, 1.f, 0.f);
 		
 		// For Kirby Weapon
-		m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
+		Load_KirbyWeaponModels();
 		// For Kirby Armour
-		m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
+		Load_KirbyArmourModels();
 
 		// For Monster
 		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.f, 0.f);
@@ -2164,6 +2030,36 @@ void CLoader::Load_ItemModels()
 	// For AbilityItemModels
 	m_vecModelInfo.emplace_back("Item_Sword", TYPE_NONANIM, 1.f, 0.f);
 	m_vecModelInfo.emplace_back("Item_Bomb", TYPE_NONANIM, 1.f, 0.f);
+}
+
+void CLoader::Load_KirbyBodyModels()
+{
+	// For Kirby Body
+	m_vecModelInfo.emplace_back("KirbyBalloon", TYPE_ANIM, 1.f, 180.f);
+	m_vecModelInfo.emplace_back("KirbyDefault", TYPE_ANIM, 1.f, 180.f);
+	m_vecModelInfo.emplace_back("KirbyVacuum", TYPE_ANIM, 1.f, 180.f);
+	m_vecModelInfo.emplace_back("KirbySwordDefault", TYPE_ANIM, 1.f, 180.f);
+	m_vecModelInfo.emplace_back("KirbySwordBalloon", TYPE_ANIM, 1.f, 180.f);
+	m_vecModelInfo.emplace_back("KirbyBoomDefault", TYPE_ANIM, 1.f, 180.f);
+	m_vecModelInfo.emplace_back("KirbyCarDefault", TYPE_ANIM, 1.f, 180.f);
+	m_vecModelInfo.emplace_back("KirbyCarVacuum", TYPE_ANIM, 1.f, 180.f);
+	m_vecModelInfo.emplace_back("KirbyHammerDefault", TYPE_ANIM, 1.f, 180.f);
+}
+
+void CLoader::Load_KirbyWeaponModels()
+{
+	// For Kirby Weapon
+	m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
+	m_vecModelInfo.emplace_back("KirbyWeapon_Hammer", TYPE_ANIM, 1.f);
+	m_vecModelInfo.emplace_back("KirbyBombDefault", TYPE_ANIM, 1.3f, 180.f);
+}
+
+void CLoader::Load_KirbyArmourModels()
+{
+	// For Kirby Armour
+	m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
+	m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
+	m_vecModelInfo.emplace_back("KirbyArmour_Hammer", TYPE_NONANIM, 1.f);
 }
 
 string CLoader::Remove_BeforeLastPipe(const string& str)

@@ -63,7 +63,7 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// 디버깅 용
-	//m_eAbilityType = ABILITY_SWORD;
+	m_eAbilityType = ABILITY_HAMMER;
 
 	m_pControllerCom->RegisterAsPlayer();
 
@@ -838,7 +838,10 @@ HRESULT CKirby::Add_Components()
 		TEXT("Com_Model_CarVacuum"), (CComponent**)&m_pModelCom[BODY_CARVACUUM]);
 	CHECK_FAILED(hr);
 
-
+	// 커비의 Hammer Default 상태 모델
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyHammerDefault"),
+		TEXT("Com_Model_HammerDefault"), (CComponent**)&m_pModelCom[BODY_HAMMER]);
+	CHECK_FAILED(hr);
 
 #pragma endregion
 
