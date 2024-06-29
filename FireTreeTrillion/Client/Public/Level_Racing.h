@@ -21,12 +21,12 @@ private:
 	HRESULT Ready_Layer_BackGround(const wstring& strLayerTag);
 	HRESULT Ready_Layer_UI(const wstring& strLayerTag);
 
-	HRESULT Ready_Map(_float fZOffset);
-	HRESULT Ready_Triggers(_float fZOffset);
-	HRESULT Ready_Monsters(_float fZOffset);
-	HRESULT Ready_Items(_float fZOffset);
-	HRESULT Ready_Kickables(_float fZOffset);
-	HRESULT Ready_Objects(_float fZOffset);
+	HRESULT Ready_Map(_float fXOffset, _float fZOffset);
+	HRESULT Ready_Triggers(_float fXOffset, _float fZOffset);
+	HRESULT Ready_Monsters(_float fXOffset, _float fZOffset);
+	HRESULT Ready_Items(_float fXOffset, _float fZOffset);
+	HRESULT Ready_Kickables(_float fXOffset, _float fZOffset);
+	HRESULT Ready_Objects(_float fXOffset, _float fZOffset);
 
 	void	Change_Levels();
 

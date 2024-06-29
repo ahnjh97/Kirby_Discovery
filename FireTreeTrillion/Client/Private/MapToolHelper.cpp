@@ -857,6 +857,8 @@ void CMapToolHelper::Edit_Object()
 	if (nullptr == pTransform)
 		return;
 
+	Safe_AddRef(pTransform);
+
 	ImGui::Begin(m_strCurModel.c_str());
 
 	_uint iShaderVars = m_pPickedObject->Get_ShaderVars();
@@ -912,6 +914,9 @@ void CMapToolHelper::Edit_Object()
 	_float4x4 tempMatrix = pTransform->Get_WorldFloat4x4();
 	m_pGameInstance->EditTransform(tempMatrix); // 선택한 모델의 월드행렬을 수정 
 	pTransform->Set_WorldMatrix(tempMatrix);
+
+	Safe_Release(pTransform);
+
 	ImGui::End();
 }
 
@@ -925,6 +930,7 @@ void CMapToolHelper::OnLeftClick()
 		return;
 
 	Safe_Release(m_pPickedObject);
+	m_pPickedObject = nullptr;
 	m_pPickedObject = pPickedObject;
 	Safe_AddRef(m_pPickedObject);
 
@@ -990,7 +996,7 @@ void CMapToolHelper::OnRightClick()
 
 		if (Compute_MapIndex(m_strSelectedTxt) == -1) // 맵이 아닐때
 		{
-			if (tMapToolDesc.wstrModelName == TEXT("BG1")) {
+			if (true == IsMap(m_strSelectedTxt)) { // BG0, BG1 
 				if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"),
 					TEXT("Prototype_GameObject_BG"), &tMapToolDesc)))
 					return;
@@ -1015,6 +1021,7 @@ void CMapToolHelper::OnRightClick()
 
 		list<CGameObject*>* pObjList = m_pGameInstance->Get_List(LEVEL_TOOL_MAP, TEXT("Layer_Parse"));
 		Safe_Release(m_pPickedObject);
+		m_pPickedObject = nullptr;
 		m_pPickedObject = pObjList->back();
 		Safe_AddRef(m_pPickedObject);
 		m_strCurModel = m_strSelectedTxt;
@@ -1997,7 +2004,7 @@ _bool CMapToolHelper::Save_Decos(const string& _strLevel, vector<CGameObject*>& 
 		_float fRimWidth = obj->Get_RimWidth();
 		_uint iPassIndex = static_cast<_uint>(pMapToolObj->Get_PassIndex());
 		if (true == IsTree(strModelName))
-			iPassIndex = 12;
+			iPassIndex = MODEL_NEARCLIP;
 		else
 			iPassIndex = 0;
 
@@ -2212,6 +2219,8 @@ void CMapToolHelper::Load_Triggers(const string& _strLevel)
 		strModelName.resize(iStrLength);
 		fileInput.read(&strModelName[0], iStrLength);
 		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
+		//matWorld._41 = matWorld._41 - 200.f;
+		//matWorld._43 = matWorld._43 + 1200.f;
 		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
 		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
 
@@ -2284,6 +2293,7 @@ void CMapToolHelper::Load_Monsters(const string& _strLevel)
 		for (_uint iRallyPointIdx = 0; iRallyPointIdx < iNumRallyPoints; iRallyPointIdx++)
 		{
 			fileInput.read(reinterpret_cast<char*>(&vRallyPointPos), sizeof(vRallyPointPos));
+
 			CMapToolObject::MAPTOOLOBJECT_DESC tRallyPointDesc{};
 			tRallyPointDesc.wstrModelName = TEXT("RallyPoint");
 			tRallyPointDesc.matWorld._41 = vRallyPointPos.x;

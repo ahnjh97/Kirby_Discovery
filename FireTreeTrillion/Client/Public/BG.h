@@ -35,9 +35,10 @@ private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
 
-	class CQuadTree* m_pQuadTree = { nullptr };
+	/*class CQuadTree* m_pQuadTree = { nullptr };*/
 	_uint m_iRenderAll{}, m_iRenderMyMesh{};
 	_float m_fSamplingFactor = { 1.f };
+	_float m_fZero = {};
 
 private:
 	HRESULT Add_Components(const wstring& _wstrModelTag);
@@ -51,4 +52,3 @@ public:
 };
 
 END
-

@@ -105,6 +105,8 @@ HRESULT CBG::Bind_ShaderResources()
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fSamplingFactor", &m_fSamplingFactor, sizeof(m_fSamplingFactor))))
         return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fZero, sizeof(_float))))
+        return E_FAIL;
 
     return S_OK;
 }

@@ -220,6 +220,7 @@
     <ClInclude Include="..\Public\FXToolDirector.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\Public\Gm_LabBossRoomDoor.h" />
     <ClInclude Include="..\Public\Grid.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
@@ -318,6 +319,8 @@
     </ClInclude>
     <ClInclude Include="..\Public\ToppleableBridge.h" />
     <ClInclude Include="..\Public\Trigger.h" />
+    <ClInclude Include="..\Public\Tunnel.h" />
+    <ClInclude Include="..\Public\TunnelRock.h" />
     <ClInclude Include="..\Public\UI_PartTime.h" />
     <ClInclude Include="..\Public\UI_PartTimeDee.h" />
     <ClInclude Include="..\public\WaddleDee.h" />
@@ -378,6 +381,7 @@
     <ClCompile Include="..\Private\FXToolDirector.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\Private\Gm_LabBossRoomDoor.cpp" />
     <ClCompile Include="..\Private\Grid.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -473,6 +477,8 @@
     </ClCompile>
     <ClCompile Include="..\Private\ToppleableBridge.cpp" />
     <ClCompile Include="..\Private\Trigger.cpp" />
+    <ClCompile Include="..\Private\Tunnel.cpp" />
+    <ClCompile Include="..\Private\TunnelRock.cpp" />
     <ClCompile Include="..\Private\UI_PartTime.cpp" />
     <ClCompile Include="..\Private\UI_PartTimeDee.cpp" />
     <ClCompile Include="..\private\WaddleDee.cpp" />

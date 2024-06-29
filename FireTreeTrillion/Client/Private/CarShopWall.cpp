@@ -34,6 +34,8 @@ HRESULT CCarShopWall::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_bMotionBlur = false;
+	m_bRimLight = true;
+	m_fRimWidth = 0.15f;
 
 	m_setNonRenderMeshes.insert(m_pModelCom->Find_MeshIndex(string("Cruck2M__CruckLightC")));
 	m_setNonRenderMeshes.insert(m_pModelCom->Find_MeshIndex(string("Cruck3M__CruckShadeC")));
@@ -100,7 +102,7 @@ HRESULT CCarShopWall::Render()
 		}
 		else
 		{
-			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
+			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_LINEAR_NORMAL_O)))
 				return E_FAIL;
 		}
 		

@@ -661,7 +661,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_DEFERREDINFO();
     }
 
-    // 가까이오면 잘리는 패스(12 -> 9)
+    // 가까이오면 잘리는 패스(12 -> 9 )
     pass NearClip
     {
         SetRasterizerState(RS_Default);
@@ -689,7 +689,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 FOR_KIRBY_PARTOBJECT();
     }
 
-    // 몬스터의 파트 오브젝트 ( 14 -> 11)
+    // 몬스터의 파트 오브젝트 ( 14 -> 11 )
     pass MONSTER_PARTOBJECT
     {
         SetRasterizerState(RS_Default);
@@ -703,7 +703,7 @@ technique11 DefaultTechnique
     }
 
 
-	// 기본 이펙트 패스. 알파 테스팅 + 마스크 ( 7 -> 12)
+	// 기본 이펙트 패스. 알파 테스팅 + 마스크 ( 7 -> 12 )
     pass DefaultFX
     {
         SetRasterizerState(RS_Default);
@@ -717,7 +717,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_DEFAULT_FX();
     }
 
-    //블렌드되는 이펙트. 알파 블렌딩 + 마스크 + 소프트 이펙트 ( 8 -> 13)
+    //블렌드되는 이펙트. 알파 블렌딩 + 마스크 + 소프트 이펙트 ( 8 -> 13 )
     pass BlendFX
     {
         SetRasterizerState(RS_NonCull);

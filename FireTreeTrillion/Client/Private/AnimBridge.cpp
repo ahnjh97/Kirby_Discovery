@@ -76,6 +76,7 @@ HRESULT CAnimBridge::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_bMotionBlur = false;
+	m_bRimLight = false;
 	m_wstrModelName = Desc->wstrModelName;
 
 	if (TEXT("BoardC_Anim") == m_wstrModelName) {
@@ -144,7 +145,7 @@ void CAnimBridge::Late_Tick(_float fTimeDelta)
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 150.0f))
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
-		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
+		//m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 	}
 }
 
