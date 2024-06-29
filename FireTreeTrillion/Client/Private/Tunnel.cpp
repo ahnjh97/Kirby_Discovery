@@ -75,6 +75,15 @@ HRESULT CTunnel::Initialize(void* pArg)
         }
     }
 
+    for (_uint i = 0; i <= 16; i++)
+    {
+        GAMEOBJECT_DESC tDesc{};
+        tDesc.matWorld = GameObjectDesc.matWorld;
+        tDesc.wstrModelName = TEXT("TunnelRock") + to_wstring(i);
+        CGameObject* pTunnelRock = m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_TunnelRock"), &tDesc);
+        m_vecTunnelRocks.push_back(pTunnelRock);
+    }
+
     m_fSamplingFactor = 0.1f;
 
     return S_OK;
@@ -110,7 +119,7 @@ void CTunnel::Late_Tick(_float fTimeDelta)
         tunnelRock->Late_Tick(fTimeDelta);
     }
 
-   // m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+    m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
 
 HRESULT CTunnel::Render()
@@ -122,8 +131,8 @@ HRESULT CTunnel::Render()
 
     for (size_t i = 0; i < iNumMeshes; i++)
     {
-        if (-1 == m_vecPassIndices[i])
-            continue;
+        /*if (-1 == m_vecPassIndices[i])
+            continue;*/
 
         if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
             return E_FAIL;

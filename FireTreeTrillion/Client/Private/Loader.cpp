@@ -1532,6 +1532,10 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("BoardB_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("BoardC_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("TunnelRocks", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"), true);
+		for (_uint i = 0; i <= 16; i++) {
+			string strTunnelRock = "TunnelRock" + to_string(i);
+			m_vecModelInfo.emplace_back(strTunnelRock, TYPE_NONANIM);
+		}
 	}
 	else if (eLevel == LEVEL_DEEDEEDEE)
 	{

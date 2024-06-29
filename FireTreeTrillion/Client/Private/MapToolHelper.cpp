@@ -857,6 +857,8 @@ void CMapToolHelper::Edit_Object()
 	if (nullptr == pTransform)
 		return;
 
+	Safe_AddRef(pTransform);
+
 	ImGui::Begin(m_strCurModel.c_str());
 
 	_uint iShaderVars = m_pPickedObject->Get_ShaderVars();
@@ -912,6 +914,9 @@ void CMapToolHelper::Edit_Object()
 	_float4x4 tempMatrix = pTransform->Get_WorldFloat4x4();
 	m_pGameInstance->EditTransform(tempMatrix); // 선택한 모델의 월드행렬을 수정 
 	pTransform->Set_WorldMatrix(tempMatrix);
+
+	Safe_Release(pTransform);
+
 	ImGui::End();
 }
 
@@ -925,6 +930,7 @@ void CMapToolHelper::OnLeftClick()
 		return;
 
 	Safe_Release(m_pPickedObject);
+	m_pPickedObject = nullptr;
 	m_pPickedObject = pPickedObject;
 	Safe_AddRef(m_pPickedObject);
 
@@ -990,7 +996,7 @@ void CMapToolHelper::OnRightClick()
 
 		if (Compute_MapIndex(m_strSelectedTxt) == -1) // 맵이 아닐때
 		{
-			if (tMapToolDesc.wstrModelName == TEXT("BG1")) {
+			if (true == IsMap(m_strSelectedTxt)) { // BG0, BG1 
 				if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"),
 					TEXT("Prototype_GameObject_BG"), &tMapToolDesc)))
 					return;
@@ -1015,6 +1021,7 @@ void CMapToolHelper::OnRightClick()
 
 		list<CGameObject*>* pObjList = m_pGameInstance->Get_List(LEVEL_TOOL_MAP, TEXT("Layer_Parse"));
 		Safe_Release(m_pPickedObject);
+		m_pPickedObject = nullptr;
 		m_pPickedObject = pObjList->back();
 		Safe_AddRef(m_pPickedObject);
 		m_strCurModel = m_strSelectedTxt;

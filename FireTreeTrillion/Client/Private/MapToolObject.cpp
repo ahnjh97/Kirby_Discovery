@@ -208,7 +208,6 @@ HRESULT CMapToolObject::Bind_ShaderResources()
 
 HRESULT CMapToolObject::Add_PartObject()
 {
-	CPartObject* pOrbitingCamera = { nullptr };
 	CPartObject::PARTOBJECT_DESC tPartObjectDesc{};
 
 	tPartObjectDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
@@ -255,8 +254,8 @@ void CMapToolObject::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_pMapToolHelper);
 	Safe_Release(m_pOrbitingCamera);
+	Safe_Release(m_pMapToolHelper);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModelCom);
 }

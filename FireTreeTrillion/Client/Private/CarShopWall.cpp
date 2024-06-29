@@ -33,6 +33,7 @@ HRESULT CCarShopWall::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_bMotionBlur = false;
+	m_bRimLight = false;
 
 	m_setNonRenderMeshes.insert(m_pModelCom->Find_MeshIndex(string("Cruck2M__CruckLightC")));
 	m_setNonRenderMeshes.insert(m_pModelCom->Find_MeshIndex(string("Cruck3M__CruckShadeC")));
