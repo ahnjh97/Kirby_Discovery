@@ -26,6 +26,7 @@ public:
 	_float Get_Duration() { return m_Animations[m_iCurrentAnimIndex]->Get_Duration(); }
 	_float Get_Trackposition() { return m_Animations[m_iCurrentAnimIndex]->Get_TrackPosition(); }
 	_float Get_AnimRatio() { return m_Animations[m_iCurrentAnimIndex]->Get_AnimRatio(); }
+	
 	CModel* CreateModelFromMesh(_uint iMeshIndex, _float3& vOffset
 		, unordered_set<string>& _setCheckedStrings, unordered_set<string>& _setExcludedMesh);
 
@@ -117,6 +118,7 @@ public:
 	HRESULT Bind_WorldMatrixForOctree(class CShader* pShader, string& strConstantName = string("g_WorldMatrix"));
 	void SetUp_ModelIdleAnimForOctree(_uint iAnimIndex, _float fTickPerSec) { m_iIdleAnimIndex = iAnimIndex; m_fIdleAnimTickPerSec = fTickPerSec; }
 	void ReturnToIdle() { Set_Animation(m_iIdleAnimIndex, m_fIdleAnimTickPerSec, true, true, 0.1f); }
+	void Invalidate_Bones();
 	void Set_Hide(_bool bHide) { m_bHide = bHide; }
 	_bool IsHidden() { return m_bHide; }
 	_uint Find_MeshIndex(const string& _strMeshName);
