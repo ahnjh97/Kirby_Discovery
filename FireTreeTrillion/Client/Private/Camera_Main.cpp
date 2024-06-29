@@ -378,12 +378,22 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		m_CamSeq.push_back(newAction);
 
 		newAction = {};
-		newAction.fTime = 0.1f;
+		newAction.fTime = 1.f;
 		newAction.eCamCut = CUT_INTERPOLATE;
 		newAction.eEase = EASE_INOUT;
-		newAction.fInterpolateSpeed = 2.f;
+		newAction.fInterpolateSpeed = 1.5f;
+		newAction.fFOVY = 20.f;
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ 0.f, 1.f, .6f };
+		m_CamSeq.push_back(newAction);
+
+		newAction = {};
+		newAction.fTime = 4.f;
+		newAction.eCamCut = CUT_HARD;
 		newAction.eCamPos = POS_RELATIVE;
-		newAction.vPos = _float3{ 5.f, -12.f, 40.f };
+		newAction.vPos = _float3{ 5.f, 2.f, 30.f };
+		//newAction.eCamDir = DIR_ABSOLUTE;
+		//newAction.vDir = _float3{ 0.f, 1.f, .6f };
 		m_CamSeq.push_back(newAction);
 	}
 	break;
@@ -777,9 +787,14 @@ void CCamera_Main::Subscribe_Events()
 	function<void(CGameObject*)> func = bind(&CCamera_Main::Start_ShutterSeq, this, placeholders::_1);
 	CEventCenter::Get_Instance()->Subscribe(KEVENT_BREAK_CARSHOP, this, func, 0);
 
-	//디디디 사망
+	//다리 
 	func = bind(&CCamera_Main::EventFunc, this, placeholders::_1);
 	CEventCenter::Get_Instance()->Subscribe(KEVENT_DDD_DEAD, this, func, 0);
+
+	//디디디 산송장
+	//func = bind(&CCamera_Main::EventFunc, this, placeholders::_1);
+	//CEventCenter::Get_Instance()->Subscribe(KEVENT_DDD_DEAD, this, func, 0);
+
 }
 
 //타겟 위치로부터 카메라 위치를 갱신, 보간한다.
