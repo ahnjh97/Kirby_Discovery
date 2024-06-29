@@ -1236,7 +1236,7 @@ void CKirby::Event_Racing_Cut1(CGameObject* pObj)
 	CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 	pCamera->Make_Shake(2.f);
 
-	m_pControllerCom->Set_Position(m_pTransformCom, { 20.3f, 41.f, 183.f, 1.f });
+	m_pControllerCom->Set_Position(m_pTransformCom, { -179.f, 41.f, -117.f, 1.f });
 	//_float4 vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 6.f;
 	//m_pControllerCom->Move_Dir(m_pTransformCom, vLook + _float4(0.f, 2.f, 0.f, 0.f), m_fTimeDelta);
 }
