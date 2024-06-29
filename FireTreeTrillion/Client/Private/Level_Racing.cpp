@@ -545,6 +545,10 @@ HRESULT CLevel_Racing::Ready_Items(_float fXOffset, _float fZOffset)
 	_uint iShaderVars{};
 	_float fRimWidth{};
 
+	unordered_set<string> vecCoins = { "Item_Coin", "Item_BlueCoin", "Item_RedCoin" };
+	unordered_set<string> vecFood = { "Item_Bread", "Item_Cake", "Item_Cocktail", "Item_EnergyDrink"
+		, "Item_Makaron", "Item_Meat", "Item_Omelet", "Item_Onigiri", "Item_Steak", "Item_Sushi" };
+
 	for (_uint i = 0; i < iNumObjects; i++)
 	{
 		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
@@ -562,17 +566,18 @@ HRESULT CLevel_Racing::Ready_Items(_float fXOffset, _float fZOffset)
 		tDesc.iShaderVars = iShaderVars;
 		tDesc.fRimWidth = fRimWidth;
 
-		if ("Item_Coin" == strModelName)
+		if (vecCoins.end() != vecCoins.find(strModelName))
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NoVacuumItem"), TEXT("Prototype_GameObject_Coin"), &tDesc)))
 				return E_FAIL;
 		}
-		else if ("Item_EnergyDrink" == strModelName)
+		else if (vecFood.end() != vecFood.find(strModelName))
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NoVacuumItem"), TEXT("Prototype_GameObject_Food"), &tDesc)))
 				return E_FAIL;
 		}
 	}
+
 	fileInput.close();
 
 	return S_OK;
@@ -616,7 +621,7 @@ HRESULT CLevel_Racing::Ready_Kickables(_float fXOffset, _float fZOffset)
 		tDesc.iShaderVars = iShaderVars;
 		tDesc.fRimWidth = fRimWidth;
 
-		if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Item"), TEXT("Prototype_GameObject_KickableRock"), &tDesc)))
+		if (FAILED(m_pGameInstance->Add_Clone(eLevel, g_strLayerMapObject, TEXT("Prototype_GameObject_KickableRock"), &tDesc)))
 			return E_FAIL;
 	}
 
@@ -693,6 +698,12 @@ HRESULT CLevel_Racing::Ready_Objects(_float fXOffset, _float fZOffset)
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Tunnel"), TEXT("Prototype_GameObject_Tunnel"), &tDesc)))
 				continue;
 		}
+		else if ("StarBlockS" == strModelName || "StarBlockM" == strModelName || "StarBlockL" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, g_strLayerMapObject, TEXT("Prototype_GameObject_StarBlock"), &tDesc)))
+				continue;
+		}
+
 	}
 	fileInput.close();
 

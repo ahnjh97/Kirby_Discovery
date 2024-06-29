@@ -1428,6 +1428,10 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("BG0", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("Town", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
+		m_vecModelInfo.emplace_back("StarBlockS", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("StarBlockM", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("StarBlockL", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+
 
 		m_vecModelInfo.emplace_back("Kirby", TYPE_ANIM, 1.f, 180.f);
 		// For Kirby Body

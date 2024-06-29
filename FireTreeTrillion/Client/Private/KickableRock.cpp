@@ -58,6 +58,11 @@ _int CKickableRock::Tick(_float fTimeDelta)
 		m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), m_fTimeDelta, 360.f);
 		m_fFlyTime += m_fTimeDelta;
 
+		if (RayCast_Terrain(XMVector3Normalize(vDamegeDir)) == true)
+		{
+			m_ePhyXState = PO_FLYDEADAWAY;
+			Set_DamageMoving(-1.f * vDamegeDir, 10.f);
+		}
 		if (m_fFlyTime > 2.f)
 			m_bDead = true;
 	}
@@ -287,6 +292,27 @@ void CKickableRock::Compute_MotionBlur()
 
 	m_vPreScreenPos = vCurScreenPos;
 }
+
+_bool CKickableRock::RayCast_Terrain(const _float3 vMoveDir)
+{
+	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	PxVec3 rayOrigin = PxVec3((_float)vPos.x, (_float)vPos.y, (_float)vPos.z);
+	PxVec3 rayDirection = PxVec3(vMoveDir.x, vMoveDir.y, vMoveDir.z);
+	_float fMaxDistance = 1.f;
+
+	PxRaycastHit hit;
+	PxRaycastBuffer hitBuffer;
+	PxQueryFilterData filterData(PxQueryFlag::eSTATIC);
+
+	_bool isRayCast = m_pGameInstance->Get_Scene()->raycast(rayOrigin, rayDirection, fMaxDistance, hitBuffer, PxHitFlag::eNORMAL, filterData);
+
+	if (isRayCast == true)
+		return true;
+
+	// 레이 쐈는데 터레인이 없었다.
+	return false;
+}
+
 
 
 CKickableRock* CKickableRock::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
