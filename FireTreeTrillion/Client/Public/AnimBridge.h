@@ -56,6 +56,9 @@ private:
 	_float			m_fHitTime = {};
 	_float			m_fTime = {};
 
+	_bool			m_bBound = { false };
+	_float			m_fAngle = { 0.f };
+
 public:
 	static CAnimBridge* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

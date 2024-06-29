@@ -348,7 +348,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction.fInterpolateSpeed = 1.5f;
 
 		newAction.eCamPos = POS_ABSOLUTE;
-		newAction.vPos = _float3{30.f, 23.17f, 147.f };
+		newAction.vPos = _float3{-170.f, 23.17f, -153.f };
 
 		newAction.eCamDir = DIR_ABSOLUTE;
 		newAction.vDir = _float3{ -0.73f, .2f, .67f };
