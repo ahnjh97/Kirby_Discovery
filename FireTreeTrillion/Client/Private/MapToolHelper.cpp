@@ -140,7 +140,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "GsCarBaseAL", "GsCarCounterAL", "GsCarDirtyRack01L", "GsCarHoistCrane01L"
 		, "GsRubbleAsphalt01L", "GsRubbleAsphalt02L", "GsRubbleAsphalt03L", "GsRubbleAsphalt04L"
 		, "GsRubbleAsphalt05L", "GsRubbleAsphalt06L", "GsRubbleAsphalt07L", "GsRubbleAsphalt08L", "GsRubbleAsphalt09L"
-		, "GsScrappedCar", "FarBuildingAM1L", "FarBuildingC01"
+		, "GsScrappedCar", "FarBuildingAM1L", "FarBuildingAM6L", "FarBuildingC01"
 #pragma endregion
 
 
