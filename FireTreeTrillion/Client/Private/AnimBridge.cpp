@@ -2,6 +2,39 @@
 #include "AnimBridge.h"
 #include "Bone.h"
 
+//_float CalculateAngle(_float time) {
+//
+//
+//	_float displacement = 0.5f * GRAVITY * time * time;
+//	_float angle = (displacement / (0.5f * GRAVITY * 5.5f * 5.5f)) * (3.141592f / 2.f);
+//
+//	// 최대 각도는 90도를 넘지 않도록 제한
+//	if (angle > 3.141592f / 2.f) {
+//		angle = 3.141592f / 2.f;
+//	}
+//
+//	return angle;
+//}
+
+// 최대 회전 시간과 최대 회전 각도
+#define M_PI 3.14159265358979323846f
+const _float MAX_TIME = 5.5f;
+const _float MAX_ANGLE = M_PI / 2.f;  // 90도 (라디안)
+
+float CalculateAngle(float time) {
+	// 시간에 따른 각도 변화 계산 (시간의 제곱에 비례)
+	_float normalizedTime = time / MAX_TIME; // 0에서 1까지의 값
+	_float angle = normalizedTime * normalizedTime * MAX_ANGLE;
+
+	// 최대 각도는 90도를 넘지 않도록 제한
+	if (angle > MAX_ANGLE) {
+		angle = MAX_ANGLE;
+	}
+
+	return angle;
+}
+
+
 CAnimBridge::CAnimBridge(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
 {
@@ -81,13 +114,21 @@ _int CAnimBridge::Tick(_float fTimeDelta)
 
 	if (TEXT("BoardC_Anim") == m_wstrModelName)
 	{
-		if(m_fHitTime > 0.f && m_fHitTime < 2.f)
-			 CUtils::Turn_OtherMatrix(*m_pEditMatrix, _float4(1, 0, 0, 0), -fTimeDelta, 0.62f);
+		if(m_fHitTime >= 0.f && m_fHitTime < 5.5f)
+		{
+			_float4x4 RotationMatrix = _float4x4::Identity;
+			m_fAngle = CalculateAngle(m_fHitTime);
+			CUtils::Turn_OtherMatrix(RotationMatrix, _float4(1, 0, 0, 0), -1.f, m_fAngle);
+			*m_pEditMatrix = RotationMatrix;
+		}
+		
+		//m_bBound;
+		//_float4x4 RotationMatrix = _float4x4::Identity;
 
-		if (m_fHitTime >= 2.f && true == m_bSecondAnim)
+		if (m_fHitTime >= 5.5f && true == m_bSecondAnim)
 		{
 			*m_pEditMatrix = _float4x4::Identity;
-			m_pModelCom->Set_Animation(0, 60.f, true, true);
+			m_pModelCom->Set_Animation(0, 60.f, true, false);
 			m_bSecondAnim = false;
 		}
 	}
