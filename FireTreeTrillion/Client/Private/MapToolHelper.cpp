@@ -137,9 +137,10 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 
 #pragma region LEVEL_RACING OBJECT
-		, "GsRubbleAsphalt01L", "GsRubbleAsphalt02L", "GsRubbleAsphalt03L", "GsRubbleAsphalt04L", "GsRubbleAsphalt05L"
-		, "GsRubbleAsphalt06L", "GsRubbleAsphalt07L", "GsRubbleAsphalt08L", "GsRubbleAsphalt09L"
-		, "FarBuildingAM1L"
+		, "GsCarBaseAL", "GsCarCounterAL", "GsCarDirtyRack01L", "GsCarHoistCrane01L"
+		, "GsRubbleAsphalt01L", "GsRubbleAsphalt02L", "GsRubbleAsphalt03L", "GsRubbleAsphalt04L"
+		, "GsRubbleAsphalt05L", "GsRubbleAsphalt06L", "GsRubbleAsphalt07L", "GsRubbleAsphalt08L", "GsRubbleAsphalt09L"
+		, "GsScrappedCar", "FarBuildingAM1L", "FarBuildingC01"
 #pragma endregion
 
 

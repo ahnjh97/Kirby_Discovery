@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "TunnelRock.h"
+#include "Kirby.h"
 
 CTunnelRock::CTunnelRock(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject{ pDevice, pContext }
@@ -41,7 +42,7 @@ HRESULT CTunnelRock::Initialize(void* pArg)
 
     m_fSamplingFactor = 0.1f;
     m_vRotationAxis = CUtils::Make_Random_Vector(1);
-    
+
     m_fX = CUtils::Make_RandomFloat(0, 40);
     _int iRand = CUtils::Make_RandomInt(0, 1);
     if (0 == iRand)
@@ -60,6 +61,21 @@ _int CTunnelRock::Tick(_float fTimeDelta)
 {
     if (true == m_bDead)
         return OBJ_DEAD;
+
+    if (false == m_bDirectionDetermined)
+    {
+        CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
+        if (nullptr == pKirby)
+            return OBJ_NOEVENT;
+
+        CTransform* pTransform = pKirby->Get_TransformCom();
+        if (nullptr == pTransform)
+            return OBJ_NOEVENT;
+
+
+
+        m_bDirectionDetermined = true;
+    }
 
     m_fTime += fTimeDelta;
 
