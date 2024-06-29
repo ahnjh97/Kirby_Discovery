@@ -366,34 +366,130 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		m_CamSeq.push_back(newAction);
 	}
 	break;
+
 	case SEQ_BREAKRACINGMAP:
 	{
 		CAMACTION newAction{};
 		newAction.fTime = 0.f;
 		newAction.eCamCut = CUT_HARD;
-		newAction.eCamPos = POS_RELATIVE;
-		newAction.vPos = _float3{ 3.f, 5.f, -25.f };
+		newAction.eCamPos = POS_ABSOLUTE;
+		newAction.vPos = _float3{ 66.8f, 26.3f, 46.3f };
 		newAction.eCamDir = DIR_ABSOLUTE;
-		newAction.vDir = _float3{ 0.f, -.2f, 1.f };
+		newAction.vDir = _float3{ -.26f, 0.f, 1.f };
 		m_CamSeq.push_back(newAction);
 
 		newAction = {};
-		newAction.fTime = 1.f;
+		newAction.fTime = 1.3f;
 		newAction.eCamCut = CUT_INTERPOLATE;
 		newAction.eEase = EASE_INOUT;
-		newAction.fInterpolateSpeed = 1.5f;
+		newAction.fInterpolateSpeed = 2.5f;
 		newAction.fFOVY = 20.f;
 		newAction.eCamDir = DIR_ABSOLUTE;
-		newAction.vDir = _float3{ 0.f, 1.f, .6f };
+		newAction.vDir = _float3{ -.15f, .4f, .8f };
 		m_CamSeq.push_back(newAction);
 
 		newAction = {};
 		newAction.fTime = 4.f;
 		newAction.eCamCut = CUT_HARD;
-		newAction.eCamPos = POS_RELATIVE;
-		newAction.vPos = _float3{ 5.f, 2.f, 30.f };
-		//newAction.eCamDir = DIR_ABSOLUTE;
-		//newAction.vDir = _float3{ 0.f, 1.f, .6f };
+		newAction.eCamPos = POS_ABSOLUTE;
+		newAction.vPos = _float3{ 65.5f, 25.4f, 181.8f };
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.23f, .1f, -1.f };
+		m_CamSeq.push_back(newAction);
+
+		//다리 입구 뷰
+		newAction = {};
+		newAction.fTime = 8.f;
+		newAction.eCamCut = CUT_HARD;
+		newAction.fFOVY = 25.f;
+
+		newAction.eCamPos = POS_ABSOLUTE;
+		newAction.vPos = _float3{ 65.6f, 25.1f, 80.f };
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.45f, 0.f, -.9f };
+		m_CamSeq.push_back(newAction);
+
+		//라디오 보기
+		newAction = {};
+		newAction.fTime = 10.f;
+		newAction.eCamCut = CUT_INTERPOLATE;
+		newAction.eEase = EASE_INOUT;
+		newAction.fInterpolateSpeed = .8f;
+
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.8f, 0.f, -.6f };
+		newAction.fFOVY = 20.f;
+		m_CamSeq.push_back(newAction);
+
+		newAction = {};
+		newAction.fTime = 11.f;
+		newAction.eCamCut = CUT_HARD;
+		newAction.eCamPos = POS_ABSOLUTE;
+		newAction.vPos = _float3{ 59.7f, 26.8f, 71.6f };
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.93f, -0.07f, -.37f };
+		m_CamSeq.push_back(newAction);
+
+		newAction = {};
+		newAction.fTime = 11.f;
+		newAction.eCamCut = CUT_INTERPOLATE;
+		newAction.eEase = EASE_LINEAR;
+		newAction.fInterpolateSpeed = 3.f;
+		newAction.eCamPos = POS_ABSOLUTE;
+		newAction.vPos = _float3{ 55.1f, 26.4f, 69.8f };
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.93f, -0.07f, -.37f };
+		m_CamSeq.push_back(newAction);
+
+		//다리 입구 뷰 복귀
+		newAction = {};
+		newAction.fTime = 14.f;
+		newAction.eCamCut = CUT_HARD;
+		newAction.eCamPos = POS_ABSOLUTE;
+		newAction.vPos = _float3{ 65.6f, 25.1f, 80.f };
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.8f, 0.f, -.6f };
+		m_CamSeq.push_back(newAction);
+
+		//커비 뷰
+		newAction = {};
+		newAction.fTime = 15.f;
+		newAction.eCamCut = CUT_INTERPOLATE;
+		newAction.eEase = EASE_INOUT;
+		newAction.fInterpolateSpeed = 1.5f;
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.45f, 0.f, -.9f };
+		m_CamSeq.push_back(newAction);
+
+		//시동
+		newAction = {};
+		newAction.fTime = 19.f;
+		newAction.eCamCut = CUT_INTERPOLATE;
+		newAction.eEase = EASE_INOUT;
+		newAction.fInterpolateSpeed = 1.f;
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.3f, 0.f, -.95f };
+		m_CamSeq.push_back(newAction);
+
+		//다리 너머
+		newAction = {};
+		newAction.fTime = 20.1f;
+		newAction.eCamCut = CUT_INTERPOLATE;
+		newAction.eEase = EASE_OUT;
+		newAction.fInterpolateSpeed = 4.f;
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.24f, 0.f, 1.f };
+		m_CamSeq.push_back(newAction);
+
+		newAction = {};
+		newAction.fTime = 26.f;
+		newAction.eCamCut = CUT_INTERPOLATE;
+		newAction.eEase = EASE_INOUT;
+		newAction.fInterpolateSpeed = 10.f;
+		newAction.eCamPos = POS_ABSOLUTE;
+		newAction.vPos = _float3{ 65.6f, 95.1f, 80.f };
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.24f, 0.5f, 1.f };
 		m_CamSeq.push_back(newAction);
 	}
 	break;
@@ -431,6 +527,11 @@ void CCamera_Main::Make_Sequence_FromQuat(EASING eEaseFlag, _float fDuration, _v
 void CCamera_Main::Start_ShutterSeq(CGameObject* pNotifier)
 {
 	Make_Sequence(SEQ_BREAKCARSHOP);
+}
+
+void CCamera_Main::Start_BridgeSeq(CGameObject* pNotifier)
+{
+	Make_Sequence(SEQ_BREAKRACINGMAP);
 }
 
 _int CCamera_Main::Tick(_float fTimeDelta)
@@ -558,6 +659,7 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 				//보간 시간을 계산할 친구를 초기화해준다.
 				m_fSeqInterpolateTime = { 0.f, curAction.fInterpolateSpeed };
 
+				//position O
 				if (!ISDEFAULTFLOAT3(curAction.vPos))
 				{
 					if (curAction.eCamPos == POS_RELATIVE)
@@ -582,6 +684,10 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 						m_vDestCamPos = curAction.vPos;
 
 					m_vStartCamPos = GET_POS;
+				}
+				else
+				{
+					m_vDestCamPos = m_vStartCamPos = GET_POS;
 				}
 
 				// 카메라 목표 방향 값이 default일 경우와 아닐 경우를 구별한다.
@@ -661,6 +767,7 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 	_float3 vCamPos = _float3::Lerp(m_vStartCamPos, m_vDestCamPos, fInterpolateRatio);
 
 	_float3 vCamDir = m_pFirstTarget->Get_State(CTransform::STATE_POSITION) - (_float4)GET_POS;
+
 	if (m_bSeqDestDirIsAbsolute)
 		vCamDir = _float3::Lerp(m_vStartCamDir, m_vDestCamDir, fInterpolateRatio);
 
@@ -788,8 +895,8 @@ void CCamera_Main::Subscribe_Events()
 	CEventCenter::Get_Instance()->Subscribe(KEVENT_BREAK_CARSHOP, this, func, 0);
 
 	//다리 
-	func = bind(&CCamera_Main::EventFunc, this, placeholders::_1);
-	CEventCenter::Get_Instance()->Subscribe(KEVENT_DDD_DEAD, this, func, 0);
+	func = bind(&CCamera_Main::Start_BridgeSeq, this, placeholders::_1);
+	CEventCenter::Get_Instance()->Subscribe(KEVENT_BREAK_RACINGMAP, this, func, 0);
 
 	//디디디 산송장
 	//func = bind(&CCamera_Main::EventFunc, this, placeholders::_1);
