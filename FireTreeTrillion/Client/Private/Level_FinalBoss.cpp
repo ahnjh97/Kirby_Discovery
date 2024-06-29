@@ -11,6 +11,7 @@
 #include "Kabu.h"
 #include "BrontoBurt.h"
 #include "PoppyBrosJr.h"
+#include "FinalBoss.h"
 
 #include "BG.h"
 #include "HUD.h"
@@ -25,7 +26,7 @@ CLevel_FinalBoss::CLevel_FinalBoss(ID3D11Device* pDevice, ID3D11DeviceContext* p
 
 HRESULT CLevel_FinalBoss::Initialize()
 {
-	m_pGameInstance->Set_RenderMode(CRenderer::MODE_GAMEPLAY);
+	m_pGameInstance->Set_RenderMode(CRenderer::MODE_TOOL);
 
 	HRESULT hr;
 	hr = __super::Initialize();
@@ -454,6 +455,17 @@ HRESULT CLevel_FinalBoss::Ready_Monsters()
 		else if (L"CappyBody" == tempDesc.wstrModelName)
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_CappyBody"), &tempDesc)))
+				return E_FAIL;
+		}
+		else if (L"FinalBoss" == tempDesc.wstrModelName)
+		{
+			CFinalBoss::FINALBOSS_DESC FinalBossDesc = {};
+			FinalBossDesc.matWorld = matWorld;
+			FinalBossDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			FinalBossDesc.iShaderVars = iShaderVars;
+			FinalBossDesc.fRimWidth = fRimWidth;
+			FinalBossDesc.vecRallyPoints = vecRallyPoints;
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_FinalBoss"), &FinalBossDesc)))
 				return E_FAIL;
 		}
 		else if (L"Kabu" == tempDesc.wstrModelName)

@@ -110,7 +110,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	m_setMapNames.insert(m_vecMapModelNames.begin(), m_vecMapModelNames.end());
 
 	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy", "Fog", "Ladder", "NonAnim_KirbyPartTimer" };
-	m_setRallyingMonsters = { "NonAnim_Kabu", "NonAnim_BrontoBurt" };
+	m_setRallyingMonsters = { "NonAnim_Kabu", "NonAnim_BrontoBurt", "NonAnim_FinalBoss" };
 
 	/*m_setNonColDecos = { "BushMCut" };*/
 	m_setAnimDecos = { "BushL", "BushM", "BushS", "PopFlower" };

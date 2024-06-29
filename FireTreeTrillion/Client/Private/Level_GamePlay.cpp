@@ -27,7 +27,7 @@ CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 
 HRESULT CLevel_GamePlay::Initialize()
 {
-	m_pGameInstance->Set_RenderMode(CRenderer::MODE_GAMEPLAY);
+	m_pGameInstance->Set_RenderMode(CRenderer::MODE_TOOL);
 
 
 	if (FAILED(__super::Initialize()))
@@ -486,6 +486,11 @@ HRESULT CLevel_GamePlay::Ready_Monsters()
 		else if (L"CappyBody" == tempDesc.wstrModelName)
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_CappyBody"), &tempDesc)))
+				return E_FAIL;
+		}
+		else if (L"FinalBoss" == tempDesc.wstrModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_FinalBoss"), &tempDesc)))
 				return E_FAIL;
 		}
 		else if (L"Kabu" == tempDesc.wstrModelName)

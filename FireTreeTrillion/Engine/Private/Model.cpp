@@ -647,6 +647,13 @@ HRESULT CModel::Bind_WorldMatrixForOctree(CShader* pShader, string& strConstantN
 	return S_OK;
 }
 
+
+void CModel::Invalidate_Bones()
+{
+	for (auto& pBone : m_Bones)
+		pBone->Invalidate_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_TransformMatrix));
+}
+
 _uint CModel::Find_MeshIndex(const string& _strMeshName)
 {
 	for (_uint i = 0; i < m_iNumMeshes; i++)
