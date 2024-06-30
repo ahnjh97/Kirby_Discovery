@@ -918,10 +918,14 @@
     <ClInclude Include="..\Public\Gm_LabAntenna.h">
       <Filter>02.GameObjects\Map\Gimmick</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Gm_LabBossRoomDoor.h" />
-    <ClInclude Include="..\Public\Radio.h" />
     <ClInclude Include="..\Public\KirbyHammer_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyHammer_State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Radio.h">
+      <Filter>02.GameObjects\Map\Radio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Gm_LabBossRoomDoor.h">
+      <Filter>02.GameObjects\Map\Gimmick</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1363,10 +1367,14 @@
     <ClCompile Include="..\Private\Gm_LabAntenna.cpp">
       <Filter>02.GameObjects\Map\Gimmick</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Gm_LabBossRoomDoor.cpp" />
-    <ClCompile Include="..\Private\Radio.cpp" />
     <ClCompile Include="..\Private\KirbyHammer_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyHammer_State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Radio.cpp">
+      <Filter>02.GameObjects\Map\Radio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Gm_LabBossRoomDoor.cpp">
+      <Filter>02.GameObjects\Map\Gimmick</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -57,6 +57,8 @@ HRESULT CLevel_Intro::Initialize()
 	CHECK_FAILED(hr);
 	hr = Ready_Kickables();
 	CHECK_FAILED(hr);
+	hr = Ready_Objects();
+	CHECK_FAILED(hr);
 
 	// 셰이더 트리거
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
@@ -684,6 +686,84 @@ HRESULT CLevel_Intro::Ready_Kickables()
 			return E_FAIL;		
 	}
 
+	fileInput.close();
+
+	return S_OK;
+}
+
+HRESULT CLevel_Intro::Ready_Objects()
+{
+	LEVEL eLevel = LEVEL_INTRO;
+	string strFileName = "../../../objects_txt/Intro.txt";
+
+	ifstream fileInput(strFileName, ios::binary);
+	if (fileInput.is_open() == false)
+	{
+		MSG_BOX(TEXT("Failed to open : Intro.txt"));
+		return E_FAIL;
+	}
+
+	_uint iStrLength{};
+	string strModelName;
+	_float4x4 matWorld{};
+	_uint iShaderVars{};
+	_float fRimWidth{};
+
+	while (!fileInput.eof())
+	{
+		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
+		strModelName.resize(iStrLength);
+		fileInput.read(&strModelName[0], iStrLength);
+		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
+		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
+		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
+
+		if (fileInput.eof())
+			break;
+
+		CGameObject::GAMEOBJECT_DESC tDesc{};
+		tDesc.matWorld = matWorld;
+		tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+		tDesc.iShaderVars = iShaderVars;
+		tDesc.fRimWidth = fRimWidth;
+
+		if ("RockA" == strModelName || "RockB" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Rock"), TEXT("Prototype_GameObject_BreakableRock"), &tDesc)))
+				continue;
+		}
+		else if ("CarShopBreakableWall" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_CarShopWall"), TEXT("Prototype_GameObject_CarShopWall"), &tDesc)))
+				continue;
+		}
+		else if ("CarShopWallFrame" == strModelName || "CarShopFrameBefore" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_WallFrame"), TEXT("Prototype_GameObject_CarShopWallFrame"), &tDesc)))
+				continue;
+		}
+		else if ("Car" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Deform"), TEXT("Prototype_GameObject_Car"), &tDesc)))
+				continue;
+		}
+		else if ("BoardA" == strModelName || "BoardB" == strModelName || "BoardC" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Bridge"), TEXT("Prototype_GameObject_ToppleableBridge"), &tDesc)))
+				continue;
+		}
+		else if ("TunnelRocks" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Tunnel"), TEXT("Prototype_GameObject_Tunnel"), &tDesc)))
+				continue;
+		}
+		else if ("StarBlockS" == strModelName || "StarBlockM" == strModelName || "StarBlockL" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, g_strLayerMapObject, TEXT("Prototype_GameObject_StarBlock"), &tDesc)))
+				continue;
+		}
+
+	}
 	fileInput.close();
 
 	return S_OK;
