@@ -131,37 +131,29 @@ HRESULT CHUD_AbilityDiscard::Render()
 	if (DISCARD_IDLE == m_eTexState)
 		return S_OK;
 
+	//For.Mask
+	if (FAILED(m_pTextureCom[TEX_MASK]->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", 0)))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fGaugeRatio, sizeof(_float))))
+		return E_FAIL;
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
-
 	//셰이더 파일의 매트릭스 정보를 가져와 바인딩
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
 		return E_FAIL;
-
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
-	for (_uint iTexType = 0; iTexType < TEX_NONE; ++iTexType)
+
+	PASS_POSTEX ePassType = { POSTEX_ALPHABLEND_NOTEST };
+
+	for (_uint iTexIndex = 0; iTexIndex < TEXDC_NONE; ++iTexIndex)
 	{
-		PASS_POSTEX ePassType = { POSTEX_ALPHABLEND_NOTEST };
-		if (TEX_MASK == iTexType) //마스크 텍스처 설정
-		{
-			ePassType = POSTEX_UI_MASK; //PS_MAIN_FOR_HP
-			m_pTextureCom[TEX_MASK]->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", 0);
-			m_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fGaugeRatio, sizeof(_float));
-			continue; //마스크는 바인딩X
-		}
-
-		for (_uint iTexIndex = 0; iTexIndex < TEXDC_NONE; ++iTexIndex)
-		{
-			if (TEXDC_GAUGE == iTexIndex)
-				ePassType = POSTEX_BOSS_BARPASS_DEFAULT;
-
-			if (TEXDC_BTN == iTexIndex)
-				ePassType = POSTEX_UIWHITEALPHA;
-				
-			hr = Bind_ShaderResources(m_pShaderCom, ePassType, m_pTextureCom[iTexType], iTexIndex); CHECK_FAILED(hr);
-		}
+		if (TEXDC_GAUGE == iTexIndex)
+			ePassType = POSTEX_BOSS_BARPASS_DEFAULT;
+		if (TEXDC_BTN == iTexIndex)
+			ePassType = POSTEX_UIWHITEALPHA;
+		hr = Bind_ShaderResources(m_pShaderCom, ePassType, m_pTextureCom[TEX_DIFFUSE], iTexIndex); CHECK_FAILED(hr);
 	}
 
 	return S_OK;
@@ -195,6 +187,7 @@ HRESULT CHUD_AbilityDiscard::Bind_ShaderResources(CShader* _pShaderCom, _uint _i
 
 	//셰이더의 원시데이터 가져와 저장
 	_pShaderCom->Bind_RawValue("g_vRColor", &m_UIObjDesc.vColorRGB, sizeof(_float3));
+
 	_pShaderCom->Bind_RawValue("g_fAlpha", &m_UIObjDesc.fAlpha, sizeof(_float));
 
 	//Begin() > Apply() 함수 호출 전 셰이더 전역 데이터를 저장해야함
