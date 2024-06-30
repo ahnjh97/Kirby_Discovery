@@ -116,8 +116,8 @@ HRESULT CLevel_FinalBoss::Ready_Layer_Camera(const wstring& strLayerTag)
 	MainCamDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	MainCamDesc.fNear = 0.1f;
 	MainCamDesc.fFar = 1000.0f;
-	MainCamDesc.vEye = _float4(-129.f, 10.f, -120.f, 1.f);
-	MainCamDesc.vAt = MainCamDesc.vEye + _float4(0.f, -.15f, 1.f, 1.f);
+	MainCamDesc.vEye = _float4(0.f, 0.f, 0.f, 1.f);
+	MainCamDesc.vAt = _float4(0.f, -.2f, 1.f, 1.f);
 	MainCamDesc.fSpeedPerSec = 10.f;
 	MainCamDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	MainCamDesc.fOrigDistance = 28.f;
