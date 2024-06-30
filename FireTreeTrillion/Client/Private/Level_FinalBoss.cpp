@@ -663,7 +663,7 @@ HRESULT CLevel_FinalBoss::Ready_UI()
 
 	CUIObject::UIOBJ_DESC DiscardUIDesc{};
 	DiscardUIDesc.vPos = { DiscardUIDesc.vCenter.x, DiscardUIDesc.vCenter.y, 0.f };
-	DiscardUIDesc.vSize = { 260.f, 120.f, 1.f };
+	DiscardUIDesc.vSize = { 260.f * 0.8f, 120.f * 0.8f, 1.f };
 
 	HRESULT hr = m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_UI_HUD"), TEXT("Prototype_GameObject_HUD_AbilityDiscard"), &DiscardUIDesc);
 

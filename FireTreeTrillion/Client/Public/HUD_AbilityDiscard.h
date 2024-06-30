@@ -51,8 +51,9 @@ private:
 	_bool						m_IsGaugeUP = { FALSE };
 	_bool						m_IsKirbyExist = { FALSE };
 	
-	_float						m_GaugeRatio = { 0.f };
+	_float						m_fGaugeRatio = { 0.f };
 	_float						m_fDumpAbilityTime = { 0.f };
+	_float						m_fHideAnimTime = { 0.f };
 	
 	_float4						m_vInitPos = { 0.f, 0.f, 0.f, 1.f };
 	_float3						m_vInitSize = { 0.f, 0.f, 0.f };

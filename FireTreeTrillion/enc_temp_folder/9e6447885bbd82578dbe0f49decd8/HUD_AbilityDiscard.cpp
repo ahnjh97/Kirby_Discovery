@@ -67,6 +67,7 @@ _int CHUD_AbilityDiscard::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
+	/*
 	if (m_pGameInstance->Get_DIKeyState(DIK_V, KEY_PRESS))
 		m_IsGaugeUP = TRUE;
 	
@@ -92,6 +93,7 @@ _int CHUD_AbilityDiscard::Tick(_float fTimeDelta)
 		if (m_fHideAnimTime > 1.f) //하이드 시간이 모두 경과할 경우 idle 상태로 변경
 			m_eTexState = DISCARD_IDLE;
 	}
+	*/
 	
 	return OBJ_NOEVENT;
 }
@@ -106,8 +108,8 @@ HRESULT CHUD_AbilityDiscard::Render()
 	HRESULT hr;
 
 	//숨김 상태에는 렌더x
-	if (DISCARD_IDLE == m_eTexState)
-		return S_OK;
+	//if (DISCARD_IDLE == m_eTexState)
+	//	return S_OK;
 
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
