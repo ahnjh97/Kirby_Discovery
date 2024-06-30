@@ -196,7 +196,6 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& _wstrLayerTag)
 		if (FAILED(Load_FileData(strFilePath, FILE_UI, _wstrLayerTag)))
 			return E_FAIL;
 	}
-
 	return S_OK;
 }
 

@@ -199,6 +199,15 @@ HRESULT CLevel_DeeDeeDee::Ready_Layer_UI(const wstring& _wstrLayerTag)
 		CHECK_FAILED(hr);
 	}
 
+	LEVEL eLevel = LEVEL_FINALBOSS;
+
+	CUIObject::UIOBJ_DESC DiscardUIDesc{};
+	DiscardUIDesc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f, 0.f };
+	DiscardUIDesc.vPos = { DiscardUIDesc.vCenter.x, DiscardUIDesc.vCenter.y, 0.f };
+	DiscardUIDesc.vSize = { 260.f * 0.8f, 120.f * 0.8f, 1.f };
+
+	hr = m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_UI_HUD"), TEXT("Prototype_GameObject_HUD_AbilityDiscard"), &DiscardUIDesc);
+
 	return S_OK;
 }
 

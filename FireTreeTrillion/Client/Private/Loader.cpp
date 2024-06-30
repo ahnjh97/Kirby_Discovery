@@ -436,29 +436,6 @@ HRESULT CLoader::Loading_StaticComponentAll()
 		CVIBuffer_Instance_Point::Create(m_pDevice, m_pContext));
 	CHECK_FAILED(hr);
 
-
-#pragma region SKYSPHERE::LEVEL_FINALBOSS
-
-	//FIELD
-	hr = Add_Texture(eLevel, "SkySphere_Lab_CloudNoize", "SkySphere/SkySphere_Lab_CloudNoizeC_MRA.dds");
-	CHECK_FAILED(hr);
-
-	hr = Add_Texture(eLevel, "SkySphere_Lab_Diffuse", "SkySphere/SkySphere_Lab_Diffuse_%d.dds", 3);
-	CHECK_FAILED(hr);
-
-	hr = Add_Texture(eLevel, "SkySphere_LabBoss_2Pase_Normal", "SkySphere/SkySphere_LabBoss_2Pase_Normal.dds");
-	CHECK_FAILED(hr);
-
-	hr = Add_Texture(eLevel, "SkySphere_LabBoss_2Pase_Emissive", "SkySphere/SkySphere_LabBoss_2Pase_Emissive.dds");
-	CHECK_FAILED(hr);
-
-	hr = Add_Texture(eLevel, "SkySphere_LabBoss_2Pase_Height", "SkySphere/SkySphere_LabBoss_2Pase_Height.dds");
-	CHECK_FAILED(hr);
-
-
-#pragma endregion
-
-
 #pragma region MAP_PORTAL::YW
 
 	hr = Add_Texture(eLevel, "Portal_Soft_Black", "Map/Portal_Soft/Portal_Soft_Black.png");
@@ -879,6 +856,7 @@ HRESULT CLoader::Loading_For_FinalBoss()
 	LEVEL eLevel = LEVEL_FINALBOSS;
 
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
+
 #pragma region 텍스쳐
 	if (FAILED(Add_Texture(eLevel, "Logo", "Logo/Logo.png")))
 		return E_FAIL;
@@ -898,6 +876,17 @@ HRESULT CLoader::Loading_For_FinalBoss()
 	//HUD_BOSSHPBAR
 	hr = Add_Texture(eLevel, "HUD_BossBar", "UI/HUD/Boss/BossBar_%d.png", 5);
 
+#pragma region SKYSPHERE::LEVEL_FINALBOSS
+
+	//FIELD
+	hr = Add_Texture(eLevel, "SkySphere_Lab_CloudNoize", "SkySphere/SkySphere_Lab_CloudNoizeC_MRA.dds"); CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "SkySphere_Lab_Diffuse", "SkySphere/SkySphere_Lab_Diffuse_%d.dds", 3);	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "SkySphere_LabBoss_2Pase_Normal", "SkySphere/SkySphere_LabBoss_2Pase_Normal.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "SkySphere_LabBoss_2Pase_Emissive", "SkySphere/SkySphere_LabBoss_2Pase_Emissive.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "SkySphere_LabBoss_2Pase_Height", "SkySphere/SkySphere_LabBoss_2Pase_Height.dds");	CHECK_FAILED(hr);
+
+#pragma endregion
+
 	// 커비 얼굴 텍스쳐 로드
 	Add_KirbyFaceTexture(eLevel);
 #pragma endregion
@@ -911,6 +900,7 @@ HRESULT CLoader::Loading_For_FinalBoss()
 #pragma endregion
 
 	m_strLoadingText = TEXT("물리 컴포넌트(을) 로딩 중 입니다.");
+
 #pragma region 물리 컴포넌트
 	/* 리지드바디 */
 	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_RigidBody"), CRigidBody::Create(m_pDevice, m_pContext));
@@ -1234,10 +1224,8 @@ HRESULT CLoader::Add_StaticUITexture()
 	hr = Add_Texture(LEVEL_STATIC, "HUD_StarPoint", "UI/HUD/Kirby/StarPoint/StarPoint_%d.dds", 10);	CHECK_FAILED(hr);
 
 	//Ability Discard
-	hr = Add_Texture(LEVEL_STATIC, "HUD_AbilityDiscard", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "HUD_AbilityDiscard", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_%d.dds", 3);	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "HUD_AbilityDiscard_Mask", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_Mask.dds");	CHECK_FAILED(hr);
-	//hr = Add_Texture(LEVEL_STATIC, "HUD_AbilityDiscard_Gauge", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_Gauge.dds");	CHECK_FAILED(hr);
-
 
 	return S_OK;
 }
@@ -1741,14 +1729,16 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("FinalBossSpear", TYPE_NONANIM, 1.f);
 
 		// For Mab Interactive Object
-		// For Map Interactive Object
 		m_vecModelInfo.emplace_back("Ladder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("GsPebble", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("SeShell", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("StarBlockL", TYPE_NONANIM, 1.f, 0.f, 0, string("MapDeco/"));
-		m_vecModelInfo.emplace_back("StarBlockM", TYPE_NONANIM, 1.f, 0.f, 0, string("MapDeco/"));
-		m_vecModelInfo.emplace_back("StarBlockS", TYPE_NONANIM, 1.f, 0.f, 0, string("MapDeco/"));
+
+		//GAMEPLAY 크래시로 인한 임시 처리 MapDeco > MapObj
+		m_vecModelInfo.emplace_back("StarBlockL", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("StarBlockM", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("StarBlockS", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+
 		m_vecModelInfo.emplace_back("WoodParts", TYPE_ANIM, 1.f, 0.f, 0, string("MapDeco/"));
 		m_vecModelInfo.emplace_back("StarBlockPiece", TYPE_NONANIM, 0.5f, 180.f);
 		m_vecModelInfo.emplace_back("StarBlockPieceStar", TYPE_NONANIM, 0.5f, 180.f);

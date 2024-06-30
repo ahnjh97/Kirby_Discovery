@@ -25,13 +25,15 @@ HRESULT CHUD_AbilityDiscard::Initialize(void* _pArg)
 	UIOBJ_DESC* DiscardUIDesc{};
 	if (_pArg != nullptr)
 		DiscardUIDesc = (UIOBJ_DESC*)_pArg;
-
-	m_UIObjDesc = *DiscardUIDesc;
 	
+	m_UIObjDesc = *DiscardUIDesc;
+
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 	
 	m_pTransformCom->Set_Scaled(m_UIObjDesc.vSize.x, m_UIObjDesc.vSize.y, m_UIObjDesc.vSize.z);
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
+		XMVectorSet(m_UIObjDesc.vPos.x, m_UIObjDesc.vPos.y, m_UIObjDesc.vPos.z, 1.f));
 
 	//m_pTransformCom->Rotation(XMVectorSet(AXIS_Z), XMConvertToRadians(m_UIObjDesc.vDegree.z));
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
@@ -51,8 +53,22 @@ _int CHUD_AbilityDiscard::Tick(_float fTimeDelta)
 	__super::Tick(fTimeDelta);
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_V, KEY_PRESS))
-		m_IsGaugeUP = TRUE;
-	
+	{
+		//매 틱마다 정보를 갱신할 필요는 없으므로, 해당 상태일 때 커비 정보를 체크
+		CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+		if (pKirby == nullptr)
+			return OBJ_NOEVENT;
+
+		//커비 능력버리기 시간
+		m_fDumpAbilityTime = pKirby->Get_KirbyInfo()->m_fDumpAbilityTime;
+
+		if (m_fDumpAbilityTime <= 0) //사전에 능력이 없을 경우를 덤프시간으로 체크
+			m_eTexState = DISCARD_IDLE;
+
+		else
+			m_IsGaugeUP = TRUE;
+	}
+
 	//게이지 인디케이터 시작
 	if (m_IsGaugeUP)
 	{
@@ -74,33 +90,38 @@ _int CHUD_AbilityDiscard::Tick(_float fTimeDelta)
 		_float fViewY = XMVectorGetY(vViewportPos);
 		fViewY -= 0.1f;
 
+		//뷰포트 기준 위치 재설정
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION,
 			XMVectorSet(m_UIObjDesc.vPos.x * fViewX, m_UIObjDesc.vPos.y * fViewY, m_UIObjDesc.vPos.z, 1.f));
-
-		//커비 능력버리기 정보
-		m_fDumpAbilityTime = pKirby->Get_KirbyInfo()->m_fDumpAbilityTime;
-
+		
 #pragma endregion
 
 		m_eTexState = DISCARD_SHOW;
 
-		m_fDumpAbilityTime += fTimeDelta;
+		//m_fDumpAbilityTime += fTimeDelta;
+		m_fGaugeRatio = m_fDumpAbilityTime; //게이지 비율 :: 
 		m_UIObjDesc.fAlpha = 1.f;
 
-		if (m_fDumpAbilityTime > 3.f)
+		if (m_fDumpAbilityTime <= 1.f) //현재 게이지 대비 버리는시간 값 비교
+		{
 			m_IsGaugeUP = FALSE;
+			m_fDumpAbilityTime = 0.f;
+		}
 	}
 	else //FALSE == m_IsGaugeUP
-	{
+	{ 
 		m_eTexState = DISCARD_HIDE;
 		m_fHideAnimTime += fTimeDelta;
-		m_UIObjDesc.fAlpha -= 0.01f * fTimeDelta;
+		m_UIObjDesc.fAlpha -= fTimeDelta * 5.f;
 
-		if (m_UIObjDesc.fAlpha <= 0)
+		if (m_UIObjDesc.fAlpha <= 0) //알파 값 보정
 			m_UIObjDesc.fAlpha = 0.f;
 
-		if (m_fHideAnimTime > 3.f) //하이드 시간이 모두 경과할 경우 idle 상태로 변경
+		if (m_fHideAnimTime > 3.f) //시간 경과할 경우 idle 상태로 변경
+		{
 			m_eTexState = DISCARD_IDLE;
+			m_fHideAnimTime = 0.f;
+		}
 	}
 	
 	return OBJ_NOEVENT;
@@ -129,10 +150,10 @@ HRESULT CHUD_AbilityDiscard::Render()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
-	for (_uint iTex = 0; iTex < TEX_NONE; ++iTex)
+	for (_uint iTexType = 0; iTexType < TEX_NONE; ++iTexType)
 	{
 		PASS_POSTEX ePassType = { POSTEX_ALPHABLEND_NOTEST };
-		if (TEX_MASK == iTex) //마스크 텍스처에 대한 설정
+		if (TEX_MASK == iTexType) //마스크 텍스처에 대한 설정
 		{
 			ePassType = POSTEX_UI_MASK;
 			m_pTextureCom[TEX_MASK]->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", 0);
@@ -140,8 +161,11 @@ HRESULT CHUD_AbilityDiscard::Render()
 		}
 		else
 		{
-			hr = Bind_ShaderResources(m_pShaderCom, ePassType, m_pTextureCom[iTex], 0);
-			CHECK_FAILED(hr);
+			for (_uint iTexIndex = 0; iTexIndex < 3; ++iTexIndex)
+			{
+				hr = Bind_ShaderResources(m_pShaderCom, ePassType, m_pTextureCom[iTexType], iTexIndex);
+				CHECK_FAILED(hr);
+			}
 		}
 	}
 
