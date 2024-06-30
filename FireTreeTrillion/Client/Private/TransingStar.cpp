@@ -44,20 +44,36 @@ _int CTransingStar::Tick(_float fTimeDelta)
 {
     // FOR TEST
     if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD1, KEY_DOWN))
-        Activate();
+        Activate(CTransingStar::CLOSE);
     if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD2, KEY_DOWN))
         Deactivate();
+    if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD3, KEY_DOWN))
+        Activate(CTransingStar::OPEN);
 
-    if (false == m_bActivate) return OBJ_NOEVENT;
-    
-    // activate상태일 경우만 별들이 움직임니다.
-    if (CUtils::Get_Scaled_Matrix(m_arrayStarMatrix[0]).x != 0.f)
-        Tick_AlphaStar(fTimeDelta);
+	//if (false == m_bActivate) return OBJ_NOEVENT;
+	//if (m_eActivateType == TYPE_END) return OBJ_NOEVENT;
+    switch (m_eActivateType)
+    {
+    case CLOSE:
+    {
+        // activate상태일 경우만 별들이 움직임니다.
+        if (CUtils::Get_Scaled_Matrix(m_arrayStarMatrix[0]).x != 0.f)
+            Tick_AlphaStar(fTimeDelta);
 
-    if (CUtils::Get_Scaled_Matrix(m_arrayStarMatrix[1]).x != 0.f)
-        Tick_YeonDooStar(fTimeDelta);
+        if (CUtils::Get_Scaled_Matrix(m_arrayStarMatrix[1]).x != 0.f)
+            Tick_YeonDooStar(fTimeDelta);
 
-    Tick_GreenStar(fTimeDelta);
+        Tick_GreenStar(fTimeDelta);
+    }
+    break;
+    case OPEN:
+    {
+        Tick_OpenAlphaStar(fTimeDelta);
+    }
+    break;
+    default:
+    break;
+    }
 
     return OBJ_NOEVENT;
 }
@@ -69,7 +85,9 @@ void CTransingStar::Late_Tick(_float fTimeDelta)
 
 HRESULT CTransingStar::Render()
 {
-    if (false == m_bActivate) return OBJ_NOEVENT;
+    //if (false == m_bActivate) return OBJ_NOEVENT;
+    if (m_eActivateType == TYPE_END) return OBJ_NOEVENT;
+
     HRESULT hr(S_OK);
 
     // 고정 값들 >> 3D에서 가져온 것을 직교투영으로 바꾸
@@ -79,32 +97,10 @@ HRESULT CTransingStar::Render()
     hr = m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix);
     CHECK_FAILED(hr);
 
-    // 텍스트들 돌면서 각자 다르게 값 주기
-    for (_uint i = 0; i < m_arrTextures.size(); ++i)
-    {
-        // 색 다르게 주는 곳
-        if (m_bDeadYeonDoo && i == 1)
-        {
-            _int iTemp = 0;
-            m_pShaderCom->Bind_RawValue("g_iMasking", &iTemp, sizeof(_int));
-        }
-        else
-            m_pShaderCom->Bind_RawValue("g_iMasking", &i, sizeof(_int));
-        // 사이즈, 위치 다르게 주는 곳
-        hr = m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_arrayStarMatrix[i]);
-        CHECK_FAILED(hr);
-        // 텍스쳐는 같지만 다르게 붙여줍니다. >> >텍스쳐 같아도 될 것 같은데?
-        hr = m_arrTextures[i]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
-        CHECK_FAILED(hr);
-
-        // 실질적 render
-        hr = m_pShaderCom->Begin(17);
-        CHECK_FAILED(hr);
-        hr = m_pVIBufferCom->Bind_Buffers();
-        CHECK_FAILED(hr);
-        hr = m_pVIBufferCom->Render();
-        CHECK_FAILED(hr);
-    }
+    if (m_eActivateType == CLOSE)
+        RenderClose();
+    else if (m_eActivateType == OPEN)
+        RenderOpen();
 
     return S_OK;
 }
@@ -119,10 +115,11 @@ void CTransingStar::Render_IMGUI()
 #endif
 
 /// <summary> 텍스쳐들의 위치를 초기화 시킨다. </summary>
-void CTransingStar::Activate()
+void CTransingStar::Activate(TYPE _eActivateType)
 {
     // 활성화 시키는 부울값 ON
     m_bActivate = true;
+    m_eActivateType = _eActivateType;
 
     // Activate한 순간의 Player의 위치를 받아온다.
     CGameObject* pObj = m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, L"Layer_Player", L"Prototype_GameObject_Kirby");
@@ -140,16 +137,22 @@ void CTransingStar::Activate()
                                 0.f, 1.f);
 
     fill(m_arrayStarMatrix.begin(), m_arrayStarMatrix.end(), _float4x4());
+    if(_eActivateType == OPEN)
+        CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[2], m_InitialSize.x, m_InitialSize.y, 1.f);
+    
     for (_int i = 0; i < 3; ++i)
     {
         _float4 vFinalPoswithZ = _float4(vFinalPos.x, vFinalPos.y, vFinalPos.z + i * 0.1f, 1.f);
         CUtils::Set_State_Matrix(m_arrayStarMatrix[i], CUtils::STATE_POSITION, vFinalPoswithZ);
+        CUtils::Rotation(m_arrayStarMatrix[i], _float4(0.f, 0.f, 1.f, 0.f), 0.f);
     }
 }
 
 void CTransingStar::Deactivate()
 {
     m_bActivate = false;
+    m_eActivateType = TYPE_END;
+
     m_fYeonDooTime = 1.f;
     m_fAlphaTimeRemains = 1.f;
 
@@ -207,6 +210,81 @@ void CTransingStar::Tick_YeonDooStar(_float fTimeDelta)
 void CTransingStar::Tick_GreenStar(_float fTimeDelta)
 {
     CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[2], m_InitialSize.x, m_InitialSize.y, 1.f);
+}
+
+void CTransingStar::RenderClose()
+{
+    HRESULT hr(S_OK);
+    // 텍스트들 돌면서 각자 다르게 값 주기
+    for (_uint i = 0; i < m_arrTextures.size(); ++i)
+    {
+        // 색 다르게 주는 곳
+        if (m_bDeadYeonDoo && i == 1)
+        {
+            _int iTemp = 0;
+            m_pShaderCom->Bind_RawValue("g_iMasking", &iTemp, sizeof(_int));
+        }
+        else
+            m_pShaderCom->Bind_RawValue("g_iMasking", &i, sizeof(_int));
+        // 사이즈, 위치 다르게 주는 곳
+        hr = m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_arrayStarMatrix[i]);
+        CHECK_FAILED(hr);
+        // 텍스쳐는 같지만 다르게 붙여줍니다. >> >텍스쳐 같아도 될 것 같은데?
+        hr = m_arrTextures[i]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
+        CHECK_FAILED(hr);
+
+        // 실질적 render
+        hr = m_pShaderCom->Begin(17);
+        CHECK_FAILED(hr);
+        hr = m_pVIBufferCom->Bind_Buffers();
+        CHECK_FAILED(hr);
+        hr = m_pVIBufferCom->Render();
+        CHECK_FAILED(hr);
+    }
+
+}
+
+void CTransingStar::Tick_OpenAlphaStar(_float fTimeDelta)
+{
+    CUtils::Set_State_Matrix(m_arrayStarMatrix[0], CUtils::STATE_POSITION, _float4(0.f, 0.f, 0.f, 1.f));
+    if(m_fAlphaTimeRemains > 1.f)
+        CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], m_InitialSize.x * 1.5f, m_InitialSize.y * 1.5f, 1.f);
+    else
+    {
+        m_fAlphaTimeRemains += fTimeDelta * TIMEDELTA_OFFSET * 1.5f;
+        CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], m_InitialSize.x * m_fAlphaTimeRemains, m_InitialSize.y * m_fAlphaTimeRemains, 1.f);
+        CUtils::Turn_OtherMatrix(m_arrayStarMatrix[0], _float4(0.f, 0.f, 1.f, 0.f), fTimeDelta, 135.f);
+    }
+
+    CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[2], m_InitialSize.x, m_InitialSize.y, 1.f);
+}
+
+void CTransingStar::RenderOpen()
+{
+    if (m_fAlphaTimeRemains <= 0.f) return;
+
+    HRESULT hr(S_OK);
+    // 텍스트들 돌면서 각자 다르게 값 주기
+    for (_uint i = 0; i < m_arrTextures.size(); ++i)
+    {
+        if (i == 1) continue;
+
+        m_pShaderCom->Bind_RawValue("g_iMasking", &i, sizeof(_int));
+        // 사이즈, 위치 다르게 주는 곳
+        hr = m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_arrayStarMatrix[i]);
+        CHECK_FAILED(hr);
+
+        hr = m_arrTextures[i]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
+        CHECK_FAILED(hr);
+
+        // 실질적 render
+        hr = m_pShaderCom->Begin(17);
+        CHECK_FAILED(hr);
+        hr = m_pVIBufferCom->Bind_Buffers();
+        CHECK_FAILED(hr);
+        hr = m_pVIBufferCom->Render();
+        CHECK_FAILED(hr);
+    }
 }
 
 HRESULT CTransingStar::Add_Components()

@@ -11,6 +11,9 @@ END
 BEGIN(Client)
 class CTransingStar : public CUIObject
 {
+public:
+	enum TYPE { OPEN, CLOSE, TYPE_END };
+
 private:
 	CTransingStar(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CTransingStar(const CTransingStar& rhs);
@@ -28,12 +31,18 @@ public:
 #endif
 
 public:
-	void						Activate();
+	void						Activate(TYPE _eActivateType);
 	void						Deactivate();
 
+	// ----------------- CLOSE
 	void						Tick_AlphaStar(_float fTimeDelta);
 	void						Tick_YeonDooStar(_float fTimeDelta);
 	void						Tick_GreenStar(_float fTimeDelta);
+	void						RenderClose();
+
+	// ----------------- OPEN
+	void						Tick_OpenAlphaStar(_float fTimeDelta);
+	void						RenderOpen();
 
 	void						Set_NextLevel(LEVEL eNextLevel) { m_eNextLevel = eNextLevel; }
 
@@ -50,6 +59,8 @@ private:
 	
 	// 
 	_bool						m_bActivate = false;
+	TYPE						m_eActivateType = TYPE_END;
+
 	_float						m_fYeonDooTime = 1.f;
 	_float						m_fAlphaTimeRemains = 1.f;
 
