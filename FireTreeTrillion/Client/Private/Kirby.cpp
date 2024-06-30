@@ -12,6 +12,7 @@
 #include "KirbySword_State.h"
 #include "KirbyBoom_State.h"
 #include "KirbyCar_State.h"
+#include "KirbyHammer_State.h"
 
 #include "KirbyWeapons.h"
 #include "KirbyArmours.h"
@@ -66,6 +67,7 @@ HRESULT CKirby::Initialize(void* pArg)
 	//m_eAbilityType = ABILITY_HAMMER;
 
 	m_pControllerCom->RegisterAsPlayer();
+	Set_WeaponAnim(3);
 
 	return S_OK;
 }
@@ -530,7 +532,6 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 	}
 }
 
-
 void CKirby::Ready_BombOrbit()
 {
 	m_OrbitGlows.reserve(15);
@@ -973,7 +974,8 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		(_eBodyState == BODY_BALLOON && _iMeshIndex == 4) ||
 		(_eBodyState == BODY_SWORDDEFAULT && _iMeshIndex == 0) ||
 		(_eBodyState == BODY_SWORDBALLOON && _iMeshIndex == 4) ||
-		(_eBodyState == BODY_BOOMDEFAULT && _iMeshIndex == 0))
+		(_eBodyState == BODY_BOOMDEFAULT && _iMeshIndex == 0) ||
+		(_eBodyState == BODY_HAMMER && _iMeshIndex == 0))
 	{
 		m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
 		m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
@@ -997,7 +999,8 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		(_eBodyState == BODY_SWORDDEFAULT && _iMeshIndex == 3) ||
 		(_eBodyState == BODY_SWORDBALLOON && _iMeshIndex == 3) ||
 		(_eBodyState == BODY_BOOMDEFAULT && _iMeshIndex == 3) ||
-		(_eBodyState == BODY_CARDEFAULT && _iMeshIndex == 3))
+		(_eBodyState == BODY_CARDEFAULT && _iMeshIndex == 3) ||
+		(_eBodyState == BODY_HAMMER && _iMeshIndex == 3))
 	{
 		m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
 		m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
@@ -1174,7 +1177,6 @@ void CKirby::SetUp_FSM()
 	m_pFSM->Add_State(STATE_LADDERUP, CKirbyDefault_Ladder_State::Create());
 	m_pFSM->Add_State(STATE_LADDERWAIT, CKirbyDefault_Ladder_State::Create());
 	m_pFSM->Add_State(STATE_LADDERWAITSTART, CKirbyDefault_Ladder_State::Create());
-
 #pragma endregion
 
 	m_pFSM->Add_State(STATE_SPITDEFORM, CKirbyVacuum_Spit_State::Create());
@@ -1200,8 +1202,13 @@ void CKirby::SetUp_FSM()
 
 	m_pFSM->Add_State(CARSTATE_CUT1, CKirbyCar_Cut_State::Create()); //
 	m_pFSM->Add_State(CARSTATE_CUT2, CKirbyCar_Cut_State::Create()); //
+#pragma endregion
+
+#pragma region 해머 애니메이션
+	m_pFSM->Add_State(HAMMERSTATE_HAMMERATTACKFINALTOY, CKirbyHammer_Attack_State::Create()); //
 
 #pragma endregion
+
 
 
 	CFSM::FSM_INFO		FSM_Info_Desc = {};
@@ -1331,6 +1338,11 @@ void CKirby::Bone_Rotation(_float fTimeDelta)
 
 }
 
+void CKirby::Set_WeaponAnim(_uint index)
+{
+	m_pWeapons->Change_My_WeaponAnim((CKirbyWeapons::ANIM_TYPE)index);
+}
+
 void CKirby::OverPower()
 {
 	if (m_fPreHp > m_fHp)
@@ -1370,7 +1382,7 @@ void CKirby::HitStop_System(_float fTimeDelta)
 		m_fTimeDelta = 0.f;
 		m_fHitStopTime += fTimeDelta;
 
-		if (m_fHitStopTime > 0.12f)
+		if (m_fHitStopTime > m_fHitStopMaxTime)
 		{
 			m_fHitStopTime = 0.f;
 			m_bHitStop = false;

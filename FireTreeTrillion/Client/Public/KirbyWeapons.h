@@ -43,9 +43,10 @@ public:
 	HRESULT Render_NonAnimWeapon();
 	HRESULT Render_AnimWeapon();
 
-	void	Change_Animation(class CKirby* pKirby);
+	void	Change_My_WeaponAnim(ANIM_TYPE eType);
 
 private:
+	void	Change_Animation(class CKirby* pKirby);
 	// 랜더가 되지 않아야 하는 것들
 	_bool Block_Render() {
 		return *m_pAbilityType == ABILITY_END || *m_pAbilityType == ABILITY_DEFAULT || *m_pAbilityType == ABILITY_BOMB;

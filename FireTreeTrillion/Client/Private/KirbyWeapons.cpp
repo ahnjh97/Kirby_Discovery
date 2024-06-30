@@ -179,30 +179,22 @@ HRESULT CKirbyWeapons::Render_AnimWeapon()
     return S_OK;
 }
 
+void CKirbyWeapons::Change_My_WeaponAnim(ANIM_TYPE eType)
+{
+    m_eAnimType = eType;
+    m_pModelCom[*m_pAbilityType]->Set_Animation(m_eAnimType, 60.f, false, false);
+}
+
 void CKirbyWeapons::Change_Animation(CKirby* pKirby)
 {
-    switch (pKirby->Get_State())
-    {
-    case 0:
-        break;
-
-
-    }
-
-
-
-    if (m_eAnimType == m_ePreAnimType)
-        return;
-
-    m_pModelCom[*m_pAbilityType]->Set_Animation(m_eAnimType, 60.f, false, false);
-
     if (m_eAnimType != GIANTSWING)
     {
         if (m_pModelCom[*m_pAbilityType]->IsFinished())
+        {
             m_eAnimType = GIANTSWING;
+            m_pModelCom[*m_pAbilityType]->Set_Animation(m_eAnimType, 60.f, false, false);
+        }
     }
-
-    m_ePreAnimType = m_eAnimType;
 }
 
 HRESULT CKirbyWeapons::Add_Components()

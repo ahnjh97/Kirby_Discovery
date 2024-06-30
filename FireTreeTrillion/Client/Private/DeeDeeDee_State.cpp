@@ -772,7 +772,7 @@ void CDeeDeeDee_SideAttack_State::OnStateUpdate(CGameObject* pGameObject, _float
 
 		if (pDee->IsAnimFinished())
 		{
-			pDee->Change_State(CDeeDeeDee::STATE_WAIT, 60.f, true, true);
+			pDee->Change_State(CDeeDeeDee::STATE_WAIT, 60.f, true, false);
 			return;
 		}
 
