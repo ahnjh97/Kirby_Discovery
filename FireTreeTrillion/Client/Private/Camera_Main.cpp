@@ -811,11 +811,13 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction.fFOVY = 20.f;
 		m_CamSeq.push_back(newAction);
 
+
+		//¶óµð¿À ÁÜ ÀÎ
 		newAction = {};
 		newAction.fTime = 11.f;
 		newAction.eCamCut = CUT_HARD;
 		newAction.eCamPos = POS_ABSOLUTE;
-		newAction.vPos = _float3{ 59.7f, 26.8f, 71.6f };
+		newAction.vPos = _float3{ 59.7f, 26.8f, 70.6f };
 		newAction.eCamDir = DIR_ABSOLUTE;
 		newAction.vDir = _float3{ -.93f, -0.07f, -.37f };
 		m_CamSeq.push_back(newAction);
