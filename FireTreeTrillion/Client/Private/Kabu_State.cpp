@@ -67,7 +67,7 @@ void CKabu_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 			pTransformCom->Look_At_Axis(pKabu->Get_Look());
 
 		// 이제 날아가는 것을 구현해보자.
-		pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 6.f, fTimeDelta);
+		pController->Move_Dir(pTransformCom, vDamegeDir * fTimeDelta * 20.f, fTimeDelta);
 
 		// 점프되는 체공시간을 구현해보자.
 		_float fDamageJumpPower = pKabu->Get_DamageJumpPower();
@@ -77,7 +77,7 @@ void CKabu_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 
 		if (true == pKabu->IsAnimFinished())
 		{
-			if (pKabu->Get_Hp() <= 0.f)
+			if(true == pKabu->Get_RealDead())
 				pKabu->Set_Dead();
 			else
 				pKabu->Change_State(CKabu::KABU_WARP1, 40.f, false, true);
@@ -99,9 +99,7 @@ void CKabu_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 		}
 
 		if (m_fFlyTime > 2.f)
-		{
 			pKabu->Set_Dead();
-		}
 	}
 	// 죽는 도중이다.	 (날아가다 터질예정임)
 	else if (pKabu->Get_PhyXState() == PO_FLYDEADAWAY)
@@ -164,10 +162,33 @@ void CKabu_Warp_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 
-	pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * 9.f);
+	pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * 10.f);
 
 	if (true == pKabu->IsAnimFinished())
-		pKabu->Change_State(CKabu::KABU_WAIT, 50.f, false, true);
+	{
+		if (pKabu->Get_Hp() <= 0.f)
+		{
+			pKabu->Set_Dead();
+
+			HRESULT hr;
+			CKabu::KABU_DESC KabuDesc = {};
+			_float4x4 WorldMatrix = pTransformCom->Get_WorldMatrix();
+			WorldMatrix.m[3][0] = pKabu->Get_Position().x;
+			WorldMatrix.m[3][1] = pKabu->Get_Position().y;
+			WorldMatrix.m[3][2] = pKabu->Get_Position().z;
+			WorldMatrix.m[3][3] = pKabu->Get_Position().w;
+			KabuDesc.matWorld = WorldMatrix;
+			KabuDesc.wstrModelName = TEXT("Kabu");
+			KabuDesc.iShaderVars = 6;
+			KabuDesc.fRimWidth = 0.2f;
+			KabuDesc.eMonState = pKabu->Get_MonState();
+			KabuDesc.vecRallyPoints = pKabu->Get_RallyPoint();
+			KabuDesc.bRealDead = true;
+			KabuDesc.fAngle = pKabu->Get_Angle();
+			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Kabu"), &KabuDesc);
+			CHECK_FAILED(hr);
+		}
+	}
 }
 
 void CKabu_Warp_State::OnStateExit()

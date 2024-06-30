@@ -233,7 +233,7 @@ void CAwoofy_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 
 				m_fAngle = fAngle;
 
-				pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 2.f);
+				pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 4.f);
 				pController->Move_Dir(pTransformCom, pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * fTimeDelta * 6.f, fTimeDelta);
 			}
 			else
@@ -302,7 +302,7 @@ void CAwoofy_Find_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
 
 	// 플레이어를 향해 바라본다
-	pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 2.f);
+	pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 4.f);
 
 	if (true == pAwoofy->IsAnimFinished())
 	{

@@ -870,6 +870,8 @@ void CCollisionCenter::Hitbox_Collision()
 			CGameObject* Src = SrcHit->Get_Owner();
 			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
 				return;
+			DstHit->Set_Alive(false);
+			SrcHit->Set_Alive(false);
 
 		});
 
