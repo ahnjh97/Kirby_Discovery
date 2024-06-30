@@ -135,8 +135,8 @@ HRESULT CLevel_Racing::Ready_Layer_Camera(const wstring& strLayerTag)
 	MainCamDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	MainCamDesc.fNear = 0.1f;
 	MainCamDesc.fFar = 1000.0f;
-	MainCamDesc.vEye = _float4(-129.f, 10.f, -120.f, 1.f);
-	MainCamDesc.vAt = MainCamDesc.vEye + _float4(0.f, -.2f, -1.f, 1.f);
+	MainCamDesc.vEye = _float4(0.f, 0.f, 0.f, 1.f);
+	MainCamDesc.vAt = _float4(0.f, -.2f, -1.f, 1.f);
 	MainCamDesc.fSpeedPerSec = 10.f;
 	MainCamDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	MainCamDesc.fOrigDistance = 25.f;
@@ -170,6 +170,19 @@ HRESULT CLevel_Racing::Ready_Layer_BackGround(const wstring& strLayerTag)
 
 	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_RACING, strLayerTag, TEXT("Prototype_GameObject_SkySphere"), &RacingSkyDesc);
 	CHECK_FAILED(hr);
+
+
+	CGameObject::GAMEOBJECT_DESC ObjDesc{};
+	ObjDesc.fSpeedPerSec = 5.f;
+	ObjDesc.fRotationPerSec = ToRadian(90.f);
+	_float4x4 InitMat = _float4x4::Identity;
+	InitMat.Translation({ 48.f, 24.75f, 65.5f });
+	ObjDesc.matWorld = InitMat;
+
+	// Car Test
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_RACING, TEXT("Layer_Radio"), TEXT("Prototype_GameObject_Radio"), &ObjDesc)))
+		return E_FAIL;
+
 
 	return S_OK;
 }

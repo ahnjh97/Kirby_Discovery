@@ -27,7 +27,6 @@ public:
 private:
 	HRESULT						Add_Components();
 
-
 	void						InitializeBar(_float fTimeDelta);
 	_uint						m_uInitializeBar = { 0 };
 

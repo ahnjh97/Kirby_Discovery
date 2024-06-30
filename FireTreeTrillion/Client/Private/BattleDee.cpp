@@ -102,12 +102,12 @@ _int CBattleDee::Tick(_float fTimeDelta)
 
 	// FSM 제어
 	if (m_pFSM != nullptr)
-		m_pFSM->Update(this, fTimeDelta);
+		m_pFSM->Update(this, m_fTimeDelta);
 
 	// 날아가는 도중엔 경사면 보간 제어가 필요없다.
 	if (Get_State() != DEEANIM_DAMAGE)
 	{
-		SetOn_Slope(fTimeDelta);
+		SetOn_Slope(m_fTimeDelta);
 	}
 
 	for (auto& Pair : m_PartObjects)

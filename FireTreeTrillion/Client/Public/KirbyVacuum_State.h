@@ -88,6 +88,8 @@ public:
 
 	_bool  m_bKirbyTurnDirTrigger = { true };
 	_float4 m_vLookDir = { 0.f, 0.f, 0.f, 0.f };
+
+	_float	m_fVacuumTime = { 0.f };
 public:
 	static	CKirbyVacuum_Vacuuming_State* Create();
 	virtual void						Free() override;

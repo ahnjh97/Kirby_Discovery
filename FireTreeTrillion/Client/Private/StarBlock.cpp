@@ -212,9 +212,9 @@ HRESULT CStarBlock::Add_Components(wstring wstrModelProtoTag)
 	if (wstrModelProtoTag == TEXT("StarBlockS"))
 		Set_BodyCollider(COLLIDER_SPHERE, 0.5f, 0.f, 1.f);
 	else if (wstrModelProtoTag == TEXT("StarBlockM"))
-		Set_BodyCollider(COLLIDER_SPHERE, 0.5f, 0.f, 1.5f);
+		Set_BodyCollider(COLLIDER_SPHERE, 1.f, 0.f, 2.f);
 	else if (wstrModelProtoTag == TEXT("StarBlockL"))
-		Set_BodyCollider(COLLIDER_SPHERE, 0.5f, 0.f, 2.f);
+		Set_BodyCollider(COLLIDER_SPHERE, 1.25f, 0.f, 2.5f);
 
 	return S_OK;
 }
