@@ -98,7 +98,7 @@ HRESULT CTransingStar::Render()
         CHECK_FAILED(hr);
 
         // 실질적 render
-        hr = m_pShaderCom->Begin(16); //머지할때 17로 바꾸시오.
+        hr = m_pShaderCom->Begin(17);
         CHECK_FAILED(hr);
         hr = m_pVIBufferCom->Bind_Buffers();
         CHECK_FAILED(hr);
@@ -196,7 +196,7 @@ void CTransingStar::Tick_YeonDooStar(_float fTimeDelta)
         if (m_InitialSize.x < m_fDecreaseValue)
         {
             CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[1], 0.f, 0.f, 1.f);
-            HRESULT hr = m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_RACING));
+            HRESULT hr = m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, m_eNextLevel));
             CHECK_FAILED(hr);
         }
     }

@@ -253,7 +253,6 @@
     <ClInclude Include="..\Public\Gm_LabAntenna.h" />
     <ClInclude Include="..\Public\KirbyHammer_State.h" />
     <ClInclude Include="..\Public\Ladder.h" />
-    <ClInclude Include="..\Public\LevelChangeStar.h" />
     <ClInclude Include="..\Public\Laser.h" />
     <ClInclude Include="..\Public\Level_DeeDeeDee.h" />
     <ClInclude Include="..\Public\Level_FinalBoss.h" />
@@ -427,7 +426,6 @@
     <ClCompile Include="..\Private\Gm_LabAntenna.cpp" />
     <ClCompile Include="..\Private\KirbyHammer_State.cpp" />
     <ClCompile Include="..\Private\Ladder.cpp" />
-    <ClCompile Include="..\Private\LevelChangeStar.cpp" />
     <ClCompile Include="..\Private\Laser.cpp" />
     <ClCompile Include="..\Private\Level_DeeDeeDee.cpp" />
     <ClCompile Include="..\Private\Level_FinalBoss.cpp" />

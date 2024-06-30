@@ -392,8 +392,8 @@
       <UniqueIdentifier>{65399ffe-175b-49c9-98d6-f92a04f307f7}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Map\PortalSoftEffect">
-	   <UniqueIdentifier>{412e7813-8f9a-4c83-ba98-f76991e1bfc5}</UniqueIdentifier>
-	</Filter>
+      <UniqueIdentifier>{412e7813-8f9a-4c83-ba98-f76991e1bfc5}</UniqueIdentifier>
+    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\BossMonster\Laser">
       <UniqueIdentifier>{57eab38f-6d3a-4ab5-9a19-25ca35cc8f16}</UniqueIdentifier>
     </Filter>
@@ -442,9 +442,6 @@
     <Filter Include="02.GameObjects\UI\PartTime\PartTimeDee%28Dialog%29">
       <UniqueIdentifier>{324b2e98-324d-4f5b-b2c0-71610d22ab87}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\UI\LevelChangeStar">
-      <UniqueIdentifier>{23655e50-4461-4a3b-b57a-cf1225dda7db}</UniqueIdentifier>
-    </Filter>
     <Filter Include="04.Event">
       <UniqueIdentifier>{1d0d493c-fa22-44f3-9d8e-a63cfb62354a}</UniqueIdentifier>
     </Filter>
@@ -462,6 +459,9 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyHammer_State">
       <UniqueIdentifier>{e73c008c-90b4-46de-a9bc-1a38382ea4cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\TransingStar">
+      <UniqueIdentifier>{5d5b209e-634e-4099-a2ae-a86fa9e7139c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -903,9 +903,6 @@
     <ClInclude Include="..\Public\UI_PartTime.h">
       <Filter>02.GameObjects\UI\PartTime\_Main</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\LevelChangeStar.h">
-      <Filter>02.GameObjects\UI\LevelChangeStar</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\EventCenter.h">
       <Filter>04.Event</Filter>
     </ClInclude>
@@ -936,6 +933,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Fog_Instance.h">
       <Filter>02.GameObjects\Map\TerrainFog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TransingStar.h">
+      <Filter>02.GameObjects\UI\TransingStar</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1356,13 +1356,10 @@
     <ClCompile Include="..\Private\AnimBridge.cpp">
       <Filter>02.GameObjects\Map\Bridge</Filter>
     </ClCompile>
-	<ClCompile Include="..\Private\UI_PartTime.cpp">
+    <ClCompile Include="..\Private\UI_PartTime.cpp">
       <Filter>02.GameObjects\UI\PartTime\_Main</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\LevelChangeStar.cpp">
-      <Filter>02.GameObjects\UI\LevelChangeStar</Filter>
-    </ClCompile>
-	<ClCompile Include="..\private\EventCenter.cpp">
+    <ClCompile Include="..\private\EventCenter.cpp">
       <Filter>04.Event</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Food.cpp">
@@ -1391,6 +1388,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Fog_Instance.cpp">
       <Filter>02.GameObjects\Map\TerrainFog</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TransingStar.cpp">
+      <Filter>02.GameObjects\UI\TransingStar</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

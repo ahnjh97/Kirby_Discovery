@@ -35,6 +35,8 @@ public:
 	void						Tick_YeonDooStar(_float fTimeDelta);
 	void						Tick_GreenStar(_float fTimeDelta);
 
+	void						Set_NextLevel(LEVEL eNextLevel) { m_eNextLevel = eNextLevel; }
+
 private:
 	HRESULT						Add_Components();
 
@@ -54,6 +56,8 @@ private:
 	_bool						m_bDeadYeonDoo = false;
 	_float						m_fDecreaseValue = 0.f;
 	_float						m_fDecreaseOffset = 2500.f;
+
+	LEVEL						m_eNextLevel = LEVEL_END;
 
 public:
 	static CTransingStar* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
