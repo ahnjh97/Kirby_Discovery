@@ -736,25 +736,30 @@ void CKirby::Key_Input(_float fTimeDelta)
 		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
 	}
 
-	if (m_pGameInstance->Get_DIKeyState(DIK_B, KEY_DOWN))
+	//특정 레벨에서 덤프할 경우 크래시 발생으로 예외 처리
+	//디버깅이 필요할 경우 레벨 별 조건 처리하면 됨
+	LEVEL eCurLevel = (LEVEL)*m_pGameInstance->Get_CurrentLevelID();
+	if (LEVEL_RACING == eCurLevel)
 	{
-		Change_State(CARVACUUMSTATE_DEFORM, 60.f, false, false, BODY_CARVACUUM, OFFSET_CARVACUUM);
-	}
-	if (m_pGameInstance->Get_DIKeyState(DIK_N, KEY_DOWN))
-	{
-		CGameObject::GAMEOBJECT_DESC ObjDesc{};
+		if (m_pGameInstance->Get_DIKeyState(DIK_B, KEY_DOWN))
+		{
+			Change_State(CARVACUUMSTATE_DEFORM, 60.f, false, false, BODY_CARVACUUM, OFFSET_CARVACUUM);
+		}
+		if (m_pGameInstance->Get_DIKeyState(DIK_N, KEY_DOWN))
+		{
+			CGameObject::GAMEOBJECT_DESC ObjDesc{};
 
-		ObjDesc.fSpeedPerSec = 5.f;
-		ObjDesc.fRotationPerSec = ToRadian(90.f);
-		_float4x4 InitMat = _float4x4::Identity;
-		InitMat.Translation({ -50.f, 5.f, -6.5f });
-		ObjDesc.matWorld = InitMat;
-		ObjDesc.wstrModelName = TEXT("RockA");
-		// Car Test
-		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Rock"), TEXT("Prototype_GameObject_BreakableRock"), &ObjDesc)))
-			return;
+			ObjDesc.fSpeedPerSec = 5.f;
+			ObjDesc.fRotationPerSec = ToRadian(90.f);
+			_float4x4 InitMat = _float4x4::Identity;
+			InitMat.Translation({ -50.f, 5.f, -6.5f });
+			ObjDesc.matWorld = InitMat;
+			ObjDesc.wstrModelName = TEXT("RockA");
+			// Car Test
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Rock"), TEXT("Prototype_GameObject_BreakableRock"), &ObjDesc)))
+				return;
+		}
 	}
-
 
 #pragma endregion
 }
@@ -1205,8 +1210,29 @@ void CKirby::SetUp_FSM()
 #pragma endregion
 
 #pragma region 해머 애니메이션
+	m_pFSM->Add_State(HAMMERSTATE_IDLE, CKirbyHammer_Idle_State::Create()); //
+	m_pFSM->Add_State(HAMMERSTATE_RUN, CKirbyHammer_Idle_State::Create()); //
+
+	m_pFSM->Add_State(HAMMERSTATE_JUMPL, CKirbyHammer_Jump_State::Create()); //
+	m_pFSM->Add_State(HAMMERSTATE_JUMPR, CKirbyHammer_Jump_State::Create()); //
+	m_pFSM->Add_State(HAMMERSTATE_JUMPEND, CKirbyHammer_Jump_State::Create()); //
+	m_pFSM->Add_State(HAMMERSTATE_LANDINGEND, CKirbyHammer_Jump_State::Create()); //
+	m_pFSM->Add_State(HAMMERSTATE_LANDINGSMALL, CKirbyHammer_Jump_State::Create()); //
+
+
+	m_pFSM->Add_State(HAMMERSTATE_HAMMERATTACKSTARTTOY, CKirbyHammer_Attack_State::Create()); //
+	m_pFSM->Add_State(HAMMERSTATE_HAMMERATTACKTOY, CKirbyHammer_Attack_State::Create()); //
+	m_pFSM->Add_State(HAMMERSTATE_HAMMERATTACKHITTOY, CKirbyHammer_Attack_State::Create()); //
 	m_pFSM->Add_State(HAMMERSTATE_HAMMERATTACKFINALTOY, CKirbyHammer_Attack_State::Create()); //
 
+	m_pFSM->Add_State(HAMMERSTATE_ONIGOROSIHAMMERSTART, CKirbyHammer_Onigorosi_State::Create()); //
+	m_pFSM->Add_State(HAMMERSTATE_ONIGOROSIHAMMERCHARGE, CKirbyHammer_Onigorosi_State::Create()); //
+	m_pFSM->Add_State(HAMMERSTATE_ONIGOROSIHAMMERMOVE, CKirbyHammer_Onigorosi_State::Create()); //
+	m_pFSM->Add_State(HAMMERSTATE_ONIGOROSIHAMMERFIRST, CKirbyHammer_Onigorosi_State::Create()); //
+	m_pFSM->Add_State(HAMMERSTATE_ONIGOROSIHAMMEREND, CKirbyHammer_Onigorosi_State::Create()); //
+
+	m_pFSM->Add_State(HAMMERSTATE_WHEELHAMMER, CKirbyHammer_JumpAttack_State::Create()); //
+	m_pFSM->Add_State(HAMMERSTATE_WHEELHAMMEREND, CKirbyHammer_JumpAttack_State::Create()); //
 #pragma endregion
 
 
@@ -1336,6 +1362,11 @@ void CKirby::Bone_Rotation(_float fTimeDelta)
 	}
 
 
+}
+
+void CKirby::Set_WeaponAnim(_uint index)
+{
+	m_pWeapons->Change_My_WeaponAnim((CKirbyWeapons::ANIM_TYPE)index);
 }
 
 void CKirby::Set_WeaponAnim(_uint index)
@@ -1534,6 +1565,24 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 		m_bMotionBlur = false;
 	else
 		m_bMotionBlur = true;
+
+
+
+
+	if (INFO(m_bDumpAbilityPress) == true &&
+		(m_pFSM->Get_State() != CKirby::STATE_IDLE || m_pFSM->Get_State() != CKirby::STATE_RUN ||
+			m_pFSM->Get_State() != CKirby::STATE_RUNSTART || m_pFSM->Get_State() != CKirby::SWORDSTATE_RUN ||
+			m_pFSM->Get_State() != CKirby::SWORDSTATE_WAIT || m_pFSM->Get_State() != CKirby::CARSTATE_IDLING))
+		INFO(m_bDumpAbilityPress) = false;
+
+	if (INFO(m_bDumpAbilityPress) == false)
+	{
+		if (INFO(m_fDumpAbilityTime) > 0.f)
+			INFO(m_fDumpAbilityTime) -= fTimeDelta * 2.f;
+
+		if (INFO(m_fDumpAbilityTime) < 0.f)
+			INFO(m_fDumpAbilityTime) = 0.f;
+	}
 }
 
 HRESULT CKirby::Kirby_SystemInitialize()

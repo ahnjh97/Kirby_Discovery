@@ -137,10 +137,21 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 
 #pragma region LEVEL_RACING OBJECT
-		, "GsCarBaseAL", "GsCarCounterAL", "GsCarDirtyRack01L", "GsCarHoistCrane01L"
+		, "CMBuildingFenceA01","CMBuildingFenceA02", "CmFillerObjectD", "CmFillerObjectG", "CmFillerObjectH"
+		, "CmFillerObjectH02", "CmFillerObjectI"
+
+		, "CvBarricadeA", "CvGasCylinderAL", "CvGasCylinderBL"
+		, "CvGasCylinderCL", "CvGasCylinderDL", "CvGasCylinderEL", "CvGasCylinderHoseA", "CvGasCylinderHoseD"
+
+		, "GsCarBaseAL", "GsCarCounterAL", "GsCarDirtyRack01L", "GsCarHoistCrane01L", "GsCarMachineAL"
+		, "GsCarStop"
 		, "GsRubbleAsphalt01L", "GsRubbleAsphalt02L", "GsRubbleAsphalt03L", "GsRubbleAsphalt04L"
-		, "GsRubbleAsphalt05L", "GsRubbleAsphalt06L", "GsRubbleAsphalt07L", "GsRubbleAsphalt08L", "GsRubbleAsphalt09L"
-		, "GsScrappedCar", "FarBuildingAM1L", "FarBuildingAM6L", "FarBuildingC01"
+		, "GsRubbleAsphalt05L", "GsRubbleAsphalt06L", "GsRubbleAsphalt07L", "GsRubbleAsphalt08L"
+		, "GsRubbleAsphalt09L", "GsScrappedCar"
+
+		, "FarBuildingABL", "FarBuildingAM1L", "FarBuildingAM6L", "FarBuildingC01", "FarBuildingC02"
+
+		, "MlFlowerPot01L"
 #pragma endregion
 
 

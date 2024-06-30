@@ -50,7 +50,7 @@ void CGm_LabAntenna::Late_Tick(_float fTimeDelta)
 	//에피리스 공격패턴에 해당 오브젝트가 피격당할 경우, Break 애님 재생
 	m_pModelCom->Play_Animation(m_pGameInstance->Get_SecondTimer());
 
-	if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD1, KEY_DOWN)) //테스트용
+	if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD1, KEY_DOWN)) //테스트용. 현재는 키입력으로 확인 가능
 		m_pModelCom->Set_Animation(STATE_BREAK, 100.f, FALSE);
 
 #pragma region FRUSTUM_CULLING
@@ -65,6 +65,7 @@ void CGm_LabAntenna::Late_Tick(_float fTimeDelta)
 #pragma endregion
 
 	//애니메이션 재생종료 시 Set_Dead
+	// 현재는 동일한 위치의 NONANIM 으로 떼우고있지만 추후 렌더할 메쉬만 남기고 나머지 렌더x
 	if (TRUE == m_pModelCom->IsFinished())
 		Set_Dead();
 }
@@ -147,8 +148,8 @@ HRESULT CGm_LabAntenna::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
-	wstring wstrProtoTagMod = TEXT("Prototype_Component_Model_LbAntenna_Anim");
-	hr = __super::Add_Component(wstrProtoTagMod, TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_LbAntenna_Anim"), 
+		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
 #pragma region HITBOX

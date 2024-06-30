@@ -1050,6 +1050,8 @@ static void Kirby_AbilityType_Assist(CKirby* pKirby, CKirby::STATE eState)
 	{
 		if (pKirby->Get_AbilityType() == ABILITY_SWORD)
 			pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		else if (pKirby->Get_AbilityType() == ABILITY_HAMMER)
+			pKirby->Change_State(CKirby::HAMMERSTATE_IDLE, 60.f, true, true, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
 		else
 			pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
 	}
@@ -1057,6 +1059,8 @@ static void Kirby_AbilityType_Assist(CKirby* pKirby, CKirby::STATE eState)
 	{
 		if (pKirby->Get_AbilityType() == ABILITY_SWORD)
 			pKirby->Change_State(CKirby::SWORDSTATE_RUN, 120.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		else if (pKirby->Get_AbilityType() == ABILITY_HAMMER)
+			pKirby->Change_State(CKirby::HAMMERSTATE_RUN, 120.f, true, true, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
 		else
 			pKirby->Change_State(CKirby::STATE_RUNSTART, 120.f, true, true, CKirby::BODY_DEFAULT);
 	}
@@ -1081,6 +1085,46 @@ static void Kirby_AbilityType_Assist(CKirby* pKirby, CKirby::STATE eState)
 		else
 			pKirby->Change_State(CKirby::STATE_FLIGHT, 60.f, false, false, CKirby::BODY_BALLOON);
 	}
+	else if (eState == CKirby::STATE_JUMPEND)
+	{
+		if (pKirby->Get_AbilityType() == ABILITY_HAMMER)
+			pKirby->Change_State(CKirby::HAMMERSTATE_JUMPEND, 60.f, false, true, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+		else
+			pKirby->Change_State(CKirby::STATE_JUMPEND, 60.f, false, true, CKirby::BODY_DEFAULT);
+	}
+	else if (eState == CKirby::STATE_JUMPL)
+	{
+		if (pKirby->Get_AbilityType() == ABILITY_HAMMER)
+			pKirby->Change_State(CKirby::HAMMERSTATE_JUMPL, 50.f, false, true, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+		else
+			pKirby->Change_State(CKirby::STATE_JUMPL, 50.f, false, true, CKirby::BODY_DEFAULT);
+
+	}
+	else if (eState == CKirby::STATE_JUMPR)
+	{
+		if (pKirby->Get_AbilityType() == ABILITY_HAMMER)
+			pKirby->Change_State(CKirby::HAMMERSTATE_JUMPR, 50.f, false, true, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+		else
+			pKirby->Change_State(CKirby::STATE_JUMPR, 50.f, false, true, CKirby::BODY_BALLOON);
+
+	}
+	else if (eState == CKirby::STATE_LANDINGEND)
+	{
+		if (pKirby->Get_AbilityType() == ABILITY_HAMMER)
+			pKirby->Change_State(CKirby::HAMMERSTATE_LANDINGEND, 30.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+		else
+			pKirby->Change_State(CKirby::STATE_LANDINGEND, 30.f, false, false, CKirby::BODY_DEFAULT);
+
+	}
+	else if (eState == CKirby::STATE_LANDINGSMALL)
+	{
+		if (pKirby->Get_AbilityType() == ABILITY_HAMMER)
+			pKirby->Change_State(CKirby::HAMMERSTATE_LANDINGSMALL, 50.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+		else
+			pKirby->Change_State(CKirby::STATE_LANDINGSMALL, 50.f, false, false, CKirby::BODY_DEFAULT);
+
+	}
+
 
 }
 

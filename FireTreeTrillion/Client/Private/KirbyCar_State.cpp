@@ -51,6 +51,7 @@ void CKirbyCar_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	// 차량을 땅에 버리는 로직이다.
 	if (m_pGameInstance->Get_DIKeyState(DIK_V, KEY_PRESS))
 	{
+		DESC(m_bDumpAbilityPress) = true;
 		DESC(m_fDumpAbilityTime) += fTimeDelta;
 
 		if (DESC(m_fDumpAbilityTime) > 1.f)
@@ -66,11 +67,7 @@ void CKirbyCar_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	}
 	else
 	{
-		if (DESC(m_fDumpAbilityTime) > 0.f)
-			DESC(m_fDumpAbilityTime) -= fTimeDelta * 2.f;
-
-		if (DESC(m_fDumpAbilityTime) < 0.f)
-			DESC(m_fDumpAbilityTime) = 0.f;
+		DESC(m_bDumpAbilityPress) = false;
 	}
 
 
@@ -625,6 +622,17 @@ void CKirbyCar_Boost_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 		if (pController->Compute_Wall(vLook) < 3.f)
 		{
+			pKirby->Change_State(CKirby::CARSTATE_CRASH, 60.f, false, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
+			DESC(m_fBoosterTime) = 0.f;
+			DESC(m_bBooster) = false;
+			pKirby->Delete_Effect("Come On Dash");
+			Kirbydesc->m_fMoveSpeed = 0.f;
+			DESC(m_bCarJump) = true;
+			DESC(m_fJumpVelocity) = 20.f;
+			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
+			pCamera->Make_Shake(1.6f, 0.5f);
+			GAMEINSTANCE Setting_RadialBlur(pTransformCom->Get_State(CTransform::STATE_POSITION), 30.f, 150.f);
+
 			CGameObject* pObj = pKirby->FindToppleableBridge(pController->Get_MostRecentActor());
 			if (nullptr != pObj) {
 				CToppleableBridge* pToppleableBridge = static_cast<CToppleableBridge*>(pObj);
@@ -639,16 +647,6 @@ void CKirbyCar_Boost_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 				return;
 			}
 
-			pKirby->Change_State(CKirby::CARSTATE_CRASH, 60.f, false, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
-			DESC(m_fBoosterTime) = 0.f;
-			DESC(m_bBooster) = false;
-			pKirby->Delete_Effect("Come On Dash");
-			Kirbydesc->m_fMoveSpeed = 0.f;
-			DESC(m_bCarJump) = true;
-			DESC(m_fJumpVelocity) = 20.f;
-			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
-			pCamera->Make_Shake(1.6f, 0.5f);
-			GAMEINSTANCE Setting_RadialBlur(pTransformCom->Get_State(CTransform::STATE_POSITION), 30.f, 150.f);
 			return;
 		}
 	}

@@ -51,7 +51,7 @@ _int CGm_LabBossRoomDoor::Tick(_float fTimeDelta)
 	//	return OBJ_DEAD;
 
 	//컷씬에서 특정 시간 경과할 경우 애님 변경
-	if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD1, KEY_DOWN)) //테스트용
+	if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD1, KEY_DOWN)) //테스트용. 현재는 키입력으로 확인 가능
 		m_bStartAnim = TRUE;
 
 	if (m_bStartAnim)
@@ -183,8 +183,8 @@ HRESULT CGm_LabBossRoomDoor::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
-	wstring wstrProtoTagMod = TEXT("Prototype_Component_Model_LbBossRoomDoor_Anim");
-	hr = __super::Add_Component(wstrProtoTagMod, TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_LbBossRoomDoor_Anim"), 
+		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
 	return S_OK;

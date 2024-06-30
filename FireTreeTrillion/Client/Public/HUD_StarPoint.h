@@ -35,9 +35,6 @@ private:
 	HRESULT						Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTexture* _pTextureCom, _uint _iTexIndex);
 	HRESULT						Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom);
 	
-	void						Update_UIState(_float _fTimeDelta);
-	void						Play_Animation(_float _fTimeDelta, STARPOINT_STATE _eSPstate);
-
 	// 코인의 정보를 받고 어떤 숫자가 나와야 하는지, 현재 상황이 어떤지만 채킹한다.
 	void						Compute_Coin(_float _fTimeDelta);
 	void						Movement_CoinUI(_float _fTimeDelta);

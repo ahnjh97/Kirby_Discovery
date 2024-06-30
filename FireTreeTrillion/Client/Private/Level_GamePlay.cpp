@@ -184,7 +184,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& _wstrLayerTag)
 	{
 		{CHUD::HUD_KIRBYHP, "HUD_KirbyStatus"},
 		{CHUD::HUD_STARPOINT, "HUD_StarPoint"},
-		{CHUD::HUD_ABILITYDISCARD, "HUD_AbilityDiscard"},
+		//{CHUD::HUD_ABILITYDISCARD, "HUD_AbilityDiscard"},
 	};
 
 	for (const auto& [eHUDType, strUITag] : HUDmap)
@@ -196,7 +196,6 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& _wstrLayerTag)
 		if (FAILED(Load_FileData(strFilePath, FILE_UI, _wstrLayerTag)))
 			return E_FAIL;
 	}
-
 	return S_OK;
 }
 

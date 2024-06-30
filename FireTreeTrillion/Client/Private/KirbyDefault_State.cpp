@@ -195,6 +195,7 @@ _bool CKirbyDefault_Idle_State::Key_V(CGameObject* pGameObject, _float fTimeDelt
 	// 능력을 땅에 버리는 로직이다.
 	if (m_pGameInstance->Get_DIKeyState(DIK_V, KEY_PRESS))
 	{
+		DESC(m_bDumpAbilityPress) = true;
 		DESC(m_fDumpAbilityTime) += fTimeDelta;
 
 		if (DESC(m_fDumpAbilityTime) > 1.f)
@@ -206,11 +207,7 @@ _bool CKirbyDefault_Idle_State::Key_V(CGameObject* pGameObject, _float fTimeDelt
 	}
 	else
 	{
-		if (DESC(m_fDumpAbilityTime) > 0.f)
-			DESC(m_fDumpAbilityTime) -= fTimeDelta * 2.f;
-
-		if (DESC(m_fDumpAbilityTime) < 0.f)
-			DESC(m_fDumpAbilityTime) = 0.f;
+		DESC(m_bDumpAbilityPress) = false;
 	}
 
 	return false;
@@ -357,7 +354,7 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	if (m_pGameInstance->Get_DIKeyState(DIK_V, KEY_PRESS) &&
 		(pKirby->Get_AbilityType() != ABILITY_DEFAULT))
 	{
-
+		DESC(m_bDumpAbilityPress) = true;
 		DESC(m_fDumpAbilityTime) += fTimeDelta;
 
 		if (DESC(m_fDumpAbilityTime) > 1.f)
@@ -369,11 +366,7 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	}
 	else
 	{
-		if (DESC(m_fDumpAbilityTime) > 0.f)
-			DESC(m_fDumpAbilityTime) -= fTimeDelta * 2.f;
-
-		if (DESC(m_fDumpAbilityTime) < 0.f)
-			DESC(m_fDumpAbilityTime) = 0.f;
+		DESC(m_bDumpAbilityPress) = false;
 	}
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_Z, KEY_DOWN))
@@ -510,14 +503,16 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 				if (CUtils::Make_RandomInt(0, 1) > 0)
 					DESC(m_eEyeState) = CKirby::EYE_CLOSE;
 				m_fFallTime = 0.f;
-				pKirby->Change_State(CKirby::STATE_LANDINGEND, 30.f, false, false, CKirby::BODY_DEFAULT);
+				//pKirby->Change_State(CKirby::STATE_LANDINGEND, 30.f, false, false, CKirby::BODY_DEFAULT);
+				Kirby_AbilityType_Assist(pKirby, CKirby::STATE_LANDINGEND);
 			}
 			else
 			{
 				if (CUtils::Make_RandomInt(0, 1) > 0)
 					DESC(m_eEyeState) = CKirby::EYE_CLOSE;
 				m_fFallTime = 0.f;
-				pKirby->Change_State(CKirby::STATE_LANDINGSMALL, 50.f, false, false, CKirby::BODY_DEFAULT);
+				//pKirby->Change_State(CKirby::STATE_LANDINGSMALL, 50.f, false, false, CKirby::BODY_DEFAULT);
+				Kirby_AbilityType_Assist(pKirby, CKirby::STATE_LANDINGSMALL);
 			}
 		}
 	}
@@ -703,7 +698,7 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 		}
 
 		// Idle일 때, X를 누르면 1타 공격을 시작한다.
-		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
+		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN) && pKirby->Get_AbilityType() == ABILITY_SWORD)
 		{
 			DESC(m_eEyeState) = CKirby::EYE_ANGER;
 

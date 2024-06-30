@@ -36,6 +36,7 @@ HRESULT CSkySphereSub::Initialize(void* pArg)
 		return E_FAIL;
 
 	//레벨 별 상태 변경을 위한 값 저장 (현재는 무의미한데, 트리거 정보 받아올 경우에 조건 처리 필요)
+	//보스전 필드 가기 전의 이동 필드는 해당 서브스피어 렌더가 필요없기 떄문.
 	/*
 	m_eCurLevel = (LEVEL)*m_pGameInstance->Get_CurrentLevelID();
 	if (LEVEL_FINALBOSS != m_eCurLevel)

@@ -10,8 +10,12 @@ class CVIBuffer_Rect;
 END
 
 BEGIN(Client)
-class CHUD_AbilityDiscard : public CHUD
+class CHUD_AbilityDiscard : public CUIObject
 {
+public:
+	enum TEX_STATE { DISCARD_IDLE, DISCARD_HIDE, DISCARD_SHOW, DISCARD_NONE	};
+	enum TEX_DISCARD { TEXDC_BASE, TEXDC_GAUGE, TEXDC_BTN, TEXDC_NONE };
+
 private:
 	CHUD_AbilityDiscard(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CHUD_AbilityDiscard(const CHUD_AbilityDiscard& rhs);
@@ -30,12 +34,8 @@ public:
 
 private:
 	HRESULT						Add_Components();
-	HRESULT						Render_BindSet(CShader* _pShaderCom, CTransform* _pTransCom);
 	HRESULT						Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTexture* _pTextureCom, _uint _iTexIndex);
 	HRESULT						Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom);
-	
-	void						Update_UIState(_float _fTimeDelta);
-	void						Play_Animation(_float _fTimeDelta, ABILITYDISCARD_STATE _eSPstate);
 
 public:
 	static CHUD_AbilityDiscard*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -43,17 +43,19 @@ public:
 	virtual void					Free() override;
 
 private:
-	_bool						m_IsMovingUP = { TRUE };
+	CShader*					m_pShaderCom = { nullptr };
+	CTexture*					m_pTextureCom[TEX_NONE] = { nullptr };
+	CVIBuffer_Rect*				m_pVIBufferCom = { nullptr };
+
+	TEX_STATE					m_eTexState = { DISCARD_NONE };
+
+	class CKirby*						m_pKirby = { nullptr };
+	_bool						m_IsGaugeUP = { FALSE };
 	_bool						m_IsKirbyExist = { FALSE };
 	
-	_float						m_GaugeRatio = { 0.f };
-
-	ABILITYDISCARD_STATE		m_ePreState = { DISCARD_NONE };
-	ABILITYDISCARD_STATE		m_eCurState = { DISCARD_NONE };
-	
-	_float4						m_vInitPos = { 0.f, 0.f, 0.f, 1.f };
-	_float3						m_vInitSize = { 0.f, 0.f, 0.f };
-	_float						m_fInitAlpha = { 0.f };
+	_float						m_fGaugeRatio = { 0.f };
+	_float						m_fDumpAbilityTime = { 0.f };
+	_float						m_fHideAnimTime = { 0.f };
 
 };
 

@@ -131,22 +131,6 @@ _int CBattleDee::Tick(_float fTimeDelta)
 	if (m_pFSM != nullptr)
 		m_pFSM->Update(this, m_fTimeDelta);
 
-
-	//3초마다 x, z로 움직인 누적 이동 값을 체크한다. 대신, 가만히 있는 스테이트라면 누적 안 한다.
-	if (Get_State() != DEEANIM_TROUBLE)
-	{
-		m_fNonMoveTime += m_fTimeDelta;
-
-		_float3 vCurPos = GET_POS;
-
-		_float fDistance = _float3::Distance(XZVec(vCurPos), XZVec(m_vPrePos));
-
-		if (fDistance < 1.f)
-			m_fMovedDistance += fDistance;
-	}
-
-
-
 	// 날아가는 도중엔 경사면 보간 제어가 필요없다.
 	if (Get_State() != DEEANIM_DAMAGE)
 	{
