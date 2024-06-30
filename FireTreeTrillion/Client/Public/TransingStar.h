@@ -37,18 +37,17 @@ private:
 	array<CTexture*, 3>			m_arrTextures;
 	array<_float4x4, 3>			m_arrayStarMatrix;
 
+	// 사이즈 이동값에 대한 기준치들
+	_float2						m_InitialSize = _float2(4000.f, 4000.f);
+	_float2						m_MediumSize = _float2(500.f, 500.f);
+	
+	// 
 	_bool						m_bActivate = false;
 	_float						m_fTurningTimeRemains = 1.f;
 	_float						m_fAlphaTimeRemains = 1.f;
-	_float						m_fAlphaFinTimeRemains = 1.f;
-
-
-	// 사이즈 이동값에 대한 기준치들
-	_float2						m_InitialSize = _float2(2500.f, 2500.f);
-	//_float2						m_YeonDooInitialSize = _float2(4800.f, 4800.f);
-	_float2						m_MediumSize = _float2(400.f, 400.f);
 
 	_bool						m_bDeadYeonDoo = false;
+	_float						m_fDecreaseValue = 0.f;
 
 public:
 	static CTransingStar* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

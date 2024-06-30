@@ -33,8 +33,6 @@ HRESULT CTransingStar::Initialize(void* pArg)
     XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
     XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
    
-    //m_bIsRender = false;
-
     return S_OK;
 }
 
@@ -48,62 +46,44 @@ _int CTransingStar::Tick(_float fTimeDelta)
         m_bActivate = false;
         m_fTurningTimeRemains = 1.f;
         m_fAlphaTimeRemains = 1.f;
-        m_fAlphaFinTimeRemains = 1.f;
         m_bDeadYeonDoo = false;
+        m_fDecreaseValue = 0.f;
     }
 
     if (false == m_bActivate) return OBJ_NOEVENT;
     
-    // ============================== 투명별 =============================
-    // 투명별 작아지고 멈췄다가 연두색이랑 만나면 다시 작아지기
-	if (m_fAlphaTimeRemains > 0.f)
-        m_fAlphaTimeRemains -= fTimeDelta * 2.f;
+    // ============================== 투명 ==============================
+    if (m_fAlphaTimeRemains > 0.f)
+        m_fAlphaTimeRemains -= fTimeDelta * 1.5f;
 	else
 		m_fAlphaTimeRemains = 0.f;
 
-   
-    if (m_fAlphaTimeRemains <= 0.6f)
-    {
-        // ============================== 연두 ==============================
-        // 돌리면서 사이즈 줄이기
-        if (m_fTurningTimeRemains > 0.f) // 1초 동안 별 돕니다.
-        {
-            m_fTurningTimeRemains -= fTimeDelta * 2.f;
-            CUtils::Turn_OtherMatrix(m_arrayStarMatrix[1], _float4(0.f, 0.f, 1.f, 0.f), fTimeDelta, 360.f);
-        }
-        else
-        {
-            m_fTurningTimeRemains = 0.f;
-            CUtils::Rotation(m_arrayStarMatrix[1], _float4(0.f, 0.f, 1.f, 0.f), 0.f);
-        }
+	// 투명별 사이즈 조절
+	if (m_bDeadYeonDoo)
+		CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], 0.f, 0.f, 1.f);
+	//else if (m_InitialSize.x * m_fAlphaTimeRemains <= m_MediumSize.x)
+	//	CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], m_MediumSize.x, m_MediumSize.y, 1.f);
+	else
+		CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], m_InitialSize.x * m_fAlphaTimeRemains, m_InitialSize.y * m_fAlphaTimeRemains, 1.f);
 
-        // 특정 사이즈에 도달하면 사이즈 줄어드는 것 멈추기
-        if (m_InitialSize.x * m_fTurningTimeRemains > m_MediumSize.x)
-            CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[1], m_InitialSize.x * m_fTurningTimeRemains, m_InitialSize.y * m_fTurningTimeRemains, 1.f);
+
+	// ============================== 연두 ==============================
+	if (m_fAlphaTimeRemains <= 0.6f) // 투명별이 60% 진행되었을 때 연두별 시작
+	{
+        if (m_InitialSize.x >= m_fDecreaseValue)
+		{
+			CUtils::Turn_OtherMatrix(m_arrayStarMatrix[1], _float4(0.f, 0.f, 1.f, 0.f), fTimeDelta, 72.f);
+            m_fDecreaseValue += fTimeDelta * 2000.f * 1.7f;
+			CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[1], m_InitialSize.x - m_fDecreaseValue, m_InitialSize.y - m_fDecreaseValue, 1.f);
+			if (m_fTurningTimeRemains <= 0.f)
+				m_bDeadYeonDoo = true;
+			m_fTurningTimeRemains -= fTimeDelta;
+		}
         else
-        {
-            CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[1], 0.f, 0.f, 1.f);
-            m_bDeadYeonDoo = true;
-        }
-    }
+        	CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[1], 0.f, 0.f, 1.f);
+	}
     else
-        CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[1], m_InitialSize.x * m_fTurningTimeRemains, m_InitialSize.y * m_fTurningTimeRemains, 1.f);
-
-
-    //연두색이 줄어든 신호를 받으면 그때부터 다시 줄어들기
-    if (m_bDeadYeonDoo)
-    {
-        if (m_fAlphaFinTimeRemains > 0.f)
-            m_fAlphaFinTimeRemains -= fTimeDelta * 2.f;
-        else
-            m_fAlphaFinTimeRemains = 0.f;
-        CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], m_MediumSize.x * m_fAlphaFinTimeRemains, m_MediumSize.y * m_fAlphaFinTimeRemains, 1.f);
-    }
-    // 특정 위치에서 사이즈 줄어드는 것 멈추기
-    else if (m_InitialSize.x * m_fAlphaTimeRemains <= m_MediumSize.x)
-        CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], m_MediumSize.x, m_MediumSize.y, 1.f);
-    else
-        CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], m_InitialSize.x * m_fAlphaTimeRemains, m_InitialSize.y * m_fAlphaTimeRemains, 1.f);
+        CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[1], m_InitialSize.x, m_InitialSize.y, 1.f);
 
 
     // ============================== 초록 ==============================
@@ -132,10 +112,14 @@ HRESULT CTransingStar::Render()
     // 텍스트들 돌면서 각자 다르게 값 주기
     for (_uint i = 0; i < m_arrTextures.size(); ++i)
     {
-        //if (i != 1) continue;
-        
         // 색 다르게 주는 곳
-        m_pShaderCom->Bind_RawValue("g_iMasking", &i, sizeof(_int));
+        if (m_bDeadYeonDoo && i == 1)
+        {
+            _int iTemp = 0;
+            m_pShaderCom->Bind_RawValue("g_iMasking", &iTemp, sizeof(_int));
+        }
+        else
+            m_pShaderCom->Bind_RawValue("g_iMasking", &i, sizeof(_int));
         // 사이즈, 위치 다르게 주는 곳
         hr = m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_arrayStarMatrix[i]);
         CHECK_FAILED(hr);
@@ -253,8 +237,3 @@ void CTransingStar::Free()
 
 }
 
-
-// 활성화 시키는 함수 
-// 활성화 되었을 때 첫번재 시퀀스
-// 두번째 시퀀스 >> 첫번재 시퀀스에서 특정 신호를 받으면 시작
-// 비활성화는 자동 혹은 디버깅용으로 만들것
