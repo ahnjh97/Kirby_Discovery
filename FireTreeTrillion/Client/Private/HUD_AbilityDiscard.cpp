@@ -45,8 +45,6 @@ HRESULT CHUD_AbilityDiscard::Initialize(void* _pArg)
 	m_vInitPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	m_vInitSize = m_pTransformCom->Get_Scaled();
 
-#pragma endregion
-
 	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
 	if (pKirby == nullptr)
 		return OBJ_NOEVENT;
@@ -123,22 +121,16 @@ HRESULT CHUD_AbilityDiscard::Render()
 	{
 		PASS_POSTEX ePassType = { POSTEX_ALPHABLEND_NOTEST };
 		if (TEX_MASK == iTex) //마스크 텍스처에 대한 설정
-			continue;
-		//{
-		//	ePassType = POSTEX_UI_MASK;
-		//	m_pTextureCom[iTex]->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", 0);
-		//	m_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fGaugeRatio, sizeof(_float3));
-		//	if (FAILED(m_pShaderCom->Begin(ePassType)))
-		//		return E_FAIL;
-
-		//	if (FAILED(Bind_VIBuffer(m_pVIBufferCom)))
-		//		return E_FAIL;
-		//}
-		//else
-		//{
+		{
+			ePassType = POSTEX_UI_MASK;
+			m_pTextureCom[iTex]->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", 0);
+			m_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fGaugeRatio, sizeof(_float3));
+		}
+		else
+		{
 			hr = Bind_ShaderResources(m_pShaderCom, ePassType, m_pTextureCom[iTex], 0);
 			CHECK_FAILED(hr);
-		//}
+		}
 	}
 
 	return S_OK;
@@ -224,7 +216,12 @@ CGameObject* CHUD_AbilityDiscard::Clone(void* pArg)
 void CHUD_AbilityDiscard::Free()
 {
 	__super::Free();
-	//Safe_Release(m_pTextures[TEX_NONE]);
+	for (auto& iTex : m_pTextureCom)
+		Safe_Release(iTex);
+
+	Safe_Release(m_pVIBufferCom);
+	Safe_Release(m_pShaderCom);
+
 }
 
 
