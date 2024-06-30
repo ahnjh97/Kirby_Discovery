@@ -1369,11 +1369,6 @@ void CKirby::Set_WeaponAnim(_uint index)
 	m_pWeapons->Change_My_WeaponAnim((CKirbyWeapons::ANIM_TYPE)index);
 }
 
-void CKirby::Set_WeaponAnim(_uint index)
-{
-	m_pWeapons->Change_My_WeaponAnim((CKirbyWeapons::ANIM_TYPE)index);
-}
-
 void CKirby::OverPower()
 {
 	if (m_fPreHp > m_fHp)
