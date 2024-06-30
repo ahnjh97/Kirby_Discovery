@@ -182,7 +182,7 @@ HRESULT CKirbyWeapons::Render_AnimWeapon()
 void CKirbyWeapons::Change_My_WeaponAnim(ANIM_TYPE eType)
 {
     m_eAnimType = eType;
-    m_pModelCom[*m_pAbilityType]->Set_Animation(m_eAnimType, 60.f, false, false);
+    m_pModelCom[ABILITY_HAMMER]->Set_Animation(m_eAnimType, 60.f, false, false);
 }
 
 void CKirbyWeapons::Change_Animation(CKirby* pKirby)
