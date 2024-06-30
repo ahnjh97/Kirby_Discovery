@@ -117,6 +117,7 @@
 #include "UI_PartTimeDee.h"
 #include "HUD_BossHpBar.h"
 #include "LevelChangeStar.h"
+#include "TransingStar.h"
 
 // æ∆¿Ã≈€
 #include "EnergyDrink.h"
@@ -294,6 +295,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_PartTimeDee"), CUI_PartTimeDee);
 	
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_LevelChangeStar"), CLevelChangeStar);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_TransingStar"), CTransingStar);
 
 #pragma endregion
 	

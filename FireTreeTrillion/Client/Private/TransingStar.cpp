@@ -1,0 +1,260 @@
+#include "stdafx.h"
+#include "TransingStar.h"
+#include "Utils.h"
+
+const _float	g_fPosOffset = 18.f;
+
+CTransingStar::CTransingStar(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+    : CUIObject{ pDevice, pContext }
+{
+}
+
+CTransingStar::CTransingStar(const CTransingStar& rhs)
+    : CUIObject{ rhs }
+    , m_arrTextures(rhs.m_arrTextures)
+    , m_arrayStarMatrix(rhs.m_arrayStarMatrix)
+{
+}
+
+HRESULT CTransingStar::Initialize_Prototype()
+{
+    fill(m_arrTextures.begin(), m_arrTextures.end(), nullptr);
+    fill(m_arrayStarMatrix.begin(), m_arrayStarMatrix.end(), _float4x4());
+    return S_OK;
+}
+
+HRESULT CTransingStar::Initialize(void* pArg)
+{
+    HRESULT hr = __super::Initialize(pArg);
+    CHECK_FAILED(hr);
+    hr = Add_Components();
+    CHECK_FAILED(hr);
+
+    XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
+    XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
+   
+    //m_bIsRender = false;
+
+    return S_OK;
+}
+
+_int CTransingStar::Tick(_float fTimeDelta)
+{
+    // FOR TEST
+    if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD1, KEY_DOWN))
+        Set_Activate(true);
+    if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD2, KEY_DOWN))
+    {
+        m_bActivate = false;
+        m_fTurningTimeRemains = 1.f;
+        m_fAlphaTimeRemains = 1.f;
+        m_fAlphaFinTimeRemains = 1.f;
+        m_bDeadYeonDoo = false;
+    }
+
+    if (false == m_bActivate) return OBJ_NOEVENT;
+    
+    // ============================== 투명별 =============================
+    // 투명별 작아지고 멈췄다가 연두색이랑 만나면 다시 작아지기
+	if (m_fAlphaTimeRemains > 0.f)
+        m_fAlphaTimeRemains -= fTimeDelta * 2.f;
+	else
+		m_fAlphaTimeRemains = 0.f;
+
+   
+    if (m_fAlphaTimeRemains <= 0.6f)
+    {
+        // ============================== 연두 ==============================
+        // 돌리면서 사이즈 줄이기
+        if (m_fTurningTimeRemains > 0.f) // 1초 동안 별 돕니다.
+        {
+            m_fTurningTimeRemains -= fTimeDelta * 2.f;
+            CUtils::Turn_OtherMatrix(m_arrayStarMatrix[1], _float4(0.f, 0.f, 1.f, 0.f), fTimeDelta, 360.f);
+        }
+        else
+        {
+            m_fTurningTimeRemains = 0.f;
+            CUtils::Rotation(m_arrayStarMatrix[1], _float4(0.f, 0.f, 1.f, 0.f), 0.f);
+        }
+
+        // 특정 사이즈에 도달하면 사이즈 줄어드는 것 멈추기
+        if (m_InitialSize.x * m_fTurningTimeRemains > m_MediumSize.x)
+            CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[1], m_InitialSize.x * m_fTurningTimeRemains, m_InitialSize.y * m_fTurningTimeRemains, 1.f);
+        else
+        {
+            CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[1], 0.f, 0.f, 1.f);
+            m_bDeadYeonDoo = true;
+        }
+    }
+    else
+        CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[1], m_InitialSize.x * m_fTurningTimeRemains, m_InitialSize.y * m_fTurningTimeRemains, 1.f);
+
+
+    //연두색이 줄어든 신호를 받으면 그때부터 다시 줄어들기
+    if (m_bDeadYeonDoo)
+    {
+        if (m_fAlphaFinTimeRemains > 0.f)
+            m_fAlphaFinTimeRemains -= fTimeDelta * 2.f;
+        else
+            m_fAlphaFinTimeRemains = 0.f;
+        CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], m_MediumSize.x * m_fAlphaFinTimeRemains, m_MediumSize.y * m_fAlphaFinTimeRemains, 1.f);
+    }
+    // 특정 위치에서 사이즈 줄어드는 것 멈추기
+    else if (m_InitialSize.x * m_fAlphaTimeRemains <= m_MediumSize.x)
+        CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], m_MediumSize.x, m_MediumSize.y, 1.f);
+    else
+        CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], m_InitialSize.x * m_fAlphaTimeRemains, m_InitialSize.y * m_fAlphaTimeRemains, 1.f);
+
+
+    // ============================== 초록 ==============================
+    CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[2], m_InitialSize.x, m_InitialSize.y, 1.f);
+
+    return OBJ_NOEVENT;
+}
+
+void CTransingStar::Late_Tick(_float fTimeDelta)
+{
+    m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SUPERUI, this);
+}
+
+HRESULT CTransingStar::Render()
+{
+    if (false == m_bActivate) return OBJ_NOEVENT;
+    HRESULT hr(S_OK);
+
+    // 고정 값들 >> 3D에서 가져온 것을 직교투영으로 바꾸
+    CHECK_NULLPTR(m_pShaderCom);
+    hr = m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix);
+    CHECK_FAILED(hr);
+    hr = m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix);
+    CHECK_FAILED(hr);
+
+    // 텍스트들 돌면서 각자 다르게 값 주기
+    for (_uint i = 0; i < m_arrTextures.size(); ++i)
+    {
+        //if (i != 1) continue;
+        
+        // 색 다르게 주는 곳
+        m_pShaderCom->Bind_RawValue("g_iMasking", &i, sizeof(_int));
+        // 사이즈, 위치 다르게 주는 곳
+        hr = m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_arrayStarMatrix[i]);
+        CHECK_FAILED(hr);
+        // 텍스쳐는 같지만 다르게 붙여줍니다. >> >텍스쳐 같아도 될 것 같은데?
+        hr = m_arrTextures[i]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
+        CHECK_FAILED(hr);
+
+        // 실질적 render
+        hr = m_pShaderCom->Begin(16); //머지할때 17로 바꾸시오.
+        CHECK_FAILED(hr);
+        hr = m_pVIBufferCom->Bind_Buffers();
+        CHECK_FAILED(hr);
+        hr = m_pVIBufferCom->Render();
+        CHECK_FAILED(hr);
+    }
+
+    return S_OK;
+}
+
+#ifdef _DEBUG
+void CTransingStar::Render_IMGUI()
+{
+}
+#endif
+
+/// <summary> 텍스쳐들의 위치를 초기화 시킨다. </summary>
+void CTransingStar::Set_Activate(_bool _bActivate)
+{
+    // 활성화 시키는 부울값 ON
+    m_bActivate = _bActivate;
+
+    // Activate한 순간의 Player의 위치를 받아온다.
+    CGameObject* pObj = m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, L"Layer_Player", L"Prototype_GameObject_Kirby");
+    _float4 vPlayerPos = pObj->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION);
+
+    // 뷰-투영 변환 행렬
+    _matrix ViewMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW);
+    _matrix ProjMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
+    _matrix ComMatrix = ViewMatrix * ProjMatrix;
+    
+    // 3D 위치를 다시 2D 위치로 바꾸는 과정
+    _float4 vPlayerNewPos = XMVector3TransformCoord(XMLoadFloat4(&vPlayerPos), ComMatrix);
+    _float4 vFinalPos = _float4((vPlayerNewPos.x * g_iWinSizeX) * 0.5f,
+                                (vPlayerNewPos.y * g_iWinSizeY) * 0.5f + g_fPosOffset,
+                                0.f, 1.f);
+
+    fill(m_arrayStarMatrix.begin(), m_arrayStarMatrix.end(), _float4x4());
+    for (_int i = 0; i < 3; ++i)
+    {
+        _float4 vFinalPoswithZ = _float4(vFinalPos.x, vFinalPos.y, vFinalPos.z + i * 0.1f, 1.f);
+        CUtils::Set_State_Matrix(m_arrayStarMatrix[i], CUtils::STATE_POSITION, vFinalPoswithZ);
+    }
+}
+
+HRESULT CTransingStar::Add_Components()
+{
+    HRESULT hr(S_OK);
+
+    hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex"),
+        TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
+    CHECK_FAILED(hr);
+
+#pragma region 텍스쳐 컴포넌트
+    hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_FX_Star"),
+        TEXT("Com_Texture_AlphaStar"), (CComponent**)&m_arrTextures[0]);
+    CHECK_FAILED(hr);
+    hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_FX_Star"),
+        TEXT("Com_Texture_SubStar"), (CComponent**)&m_arrTextures[1]);
+    CHECK_FAILED(hr);
+    hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_FX_Star"),
+        TEXT("Com_Texture_LastStar"), (CComponent**)&m_arrTextures[2]);
+    CHECK_FAILED(hr);
+#pragma endregion
+
+    hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),
+        TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom);
+    CHECK_FAILED(hr);
+
+    return S_OK;
+}
+
+CTransingStar* CTransingStar::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+{
+    CTransingStar* pInstance = new CTransingStar(pDevice, pContext);
+
+    if (FAILED(pInstance->Initialize_Prototype()))
+    {
+        MSG_BOX(TEXT("Failed To Created : CTransingStar"));
+        Safe_Release(pInstance);
+    }
+
+    return pInstance;
+}
+
+CGameObject* CTransingStar::Clone(void* pArg)
+{
+    CTransingStar* pInstance = new CTransingStar(*this);
+
+    if (FAILED(pInstance->Initialize(pArg)))
+    {
+        MSG_BOX(TEXT("Failed To Clone : CTransingStar"));
+        Safe_Release(pInstance);
+    }
+
+    return pInstance;
+}
+
+void CTransingStar::Free()
+{
+
+    for (auto& texure : m_arrTextures)
+        Safe_Release(texure);
+    
+    __super::Free();
+
+}
+
+
+// 활성화 시키는 함수 
+// 활성화 되었을 때 첫번재 시퀀스
+// 두번째 시퀀스 >> 첫번재 시퀀스에서 특정 신호를 받으면 시작
+// 비활성화는 자동 혹은 디버깅용으로 만들것

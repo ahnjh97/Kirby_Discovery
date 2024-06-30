@@ -816,6 +816,7 @@
     <ClInclude Include="..\Public\LevelChangeStar.h">
       <Filter>02.GameObjects\UI\LevelChangeStar</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\TransingStar.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1212,6 +1213,7 @@
     <ClCompile Include="..\Private\LevelChangeStar.cpp">
       <Filter>02.GameObjects\UI\LevelChangeStar</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\TransingStar.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

@@ -123,7 +123,7 @@ public:
 private:
 	_float4x4				m_WorldMatrix;
 	_float					m_fSpeedPerSec = { 0.0f };
-	_float					m_fRotationPerSec = { 0.0f };
+	_float					m_fRotationPerSec = { 90.0f };
 
 public:
 	static CTransform* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

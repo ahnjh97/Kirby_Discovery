@@ -26,18 +26,43 @@ public:
 #ifdef _DEBUG
 	virtual void				Render_IMGUI()								override;
 #endif
-	void						Set_Position(_float3 vPos) { m_vPlayerPos = vPos; }
+	
+	void						Activate(_float fTimeDelta);
+	void						Deactivate();
+
+	void						Set_FocusingPosition(_float4 vPos) { m_vFocusingPos = vPos; }
 
 private:
 	HRESULT						Add_Components();
 	HRESULT						Bind_ShaderResources();
-	void						Update_Pos(_float3 _vPosition);
+	HRESULT						Change_Size(_uint iNum);
+
+	void						Update_Pos(_float4 _vPosition);
 
 private:
 	array<CTexture*, 3>			m_arrTextures;
 	class CKirby*				m_pPlayer = nullptr;
-	_float3						m_vPlayerPos = _float3();
+
+	_float4						m_vFocusingPos = _float4();
+
+	// 이미지 이동
+	_float4						m_vStartPos = _float4();
 	_float4						m_vFinPos = _float4();
+
+	_float						m_fRatio = 1.f;
+	_float						m_fRatioRemove = 1.f;
+	_float2						m_InitialSize = _float2(2500.f, 2500.f);
+	_float2						m_FinalSize = _float2(400.f, 400.f);
+	_float2						m_DecSize = _float2(0.f, 0.f);
+	_float2						m_DecGreenSize = _float2(0.f, 0.f);
+
+	_float						m_fTimeDelta = _float();
+
+	// 회전값 저장
+	array<_float4x4, 3>			m_arrayStarMatrix;
+	_float						m_fTurningTime = 0.f;
+
+	_bool						m_bRemove = false;
 
 public:
 	static CLevelChangeStar*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
