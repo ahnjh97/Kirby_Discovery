@@ -88,6 +88,7 @@ public:
 
 		// 땅에 능력 버리는 시간
 		_float			m_fDumpAbilityTime = { 0.f };
+		_bool			m_bDumpAbilityPress = { false };
 
 		// Ability Sword
 		// PRESS 시, 차지시간을 정해주는 변수
