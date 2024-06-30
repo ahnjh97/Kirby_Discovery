@@ -53,6 +53,7 @@ private:
 	
 	HRESULT Add_Shaders();
 	HRESULT Add_FXTexture();
+	HRESULT Add_StaticUITexture();
 
 	void SetUp_ModelScaleRotation(LEVEL eLevel);
 

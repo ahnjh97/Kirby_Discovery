@@ -98,8 +98,6 @@ _int CHUD_StarPoint::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
-	//Update_UIState(fTimeDelta);
-
 	// 코인의 정보를 받고 어떤 숫자가 나와야 하는지, 현재 상황이 어떤지 체킹하는 기능의 함수
 	Compute_Coin(fTimeDelta);
 
@@ -277,7 +275,7 @@ HRESULT CHUD_StarPoint::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_StarPoint"),
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_HUD_StarPoint"),
 		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
 		return E_FAIL;
 
@@ -384,133 +382,6 @@ HRESULT CHUD_StarPoint::Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom)
 
 	return S_OK;
 }
-
-void CHUD_StarPoint::Update_UIState(_float _fTimeDelta)
-{
-	//switch (m_eCurState)
-	//{
-	//case CHUD::STARPOINT_IDLE: // 1) 렌더X 기본 상태
-	//	if (STARPOINT_HIDE == m_ePreState)	//이전 상태가 HIDE인 경우, 기본값으로 세팅
-	//		m_eCurState = STARPOINT_WAIT;
-	//	break;
-
-	//case CHUD::STARPOINT_WAIT: //3) 특정 이벤트 이후 대기 상태
-	//	if (STARPOINT_LOOT == m_ePreState)
-	//	{
-	//		m_fAccTime += _fTimeDelta;
-	//		if (m_fAccTime >= 5.f)
-	//		{
-	//			m_eCurState = STARPOINT_HIDE; //3-A) 시간 경과 후 숨김 상태로 변경
-	//			m_fAccTime = 0.f;
-	//		}
-	//	}
-	//	else
-	//		Play_Animation(m_fAccTime, STARPOINT_WAIT);
-	//	break;
-
-	////Frame 344 > 354
-	//case CHUD::STARPOINT_HIDE: // 4) 숨김 상태
-	//	m_fAccTime += _fTimeDelta;
-	//	if (m_fAccTime >= 0.16f)
-	//	{
-	//		m_fAccTime = 0.f;
-	//		m_eCurState = STARPOINT_IDLE; //4-A) 시간 경과 후 대기 상태로 변경 (렌더X)
-	//		m_ePreState = STARPOINT_HIDE;
-	//	}
-	//	else
-	//		Play_Animation(m_fAccTime, STARPOINT_HIDE);
-	//	break;
-
-	////Frame 50 > 64 
-	//case CHUD::STARPOINT_LOOT: // 2) 획득 상태
-	//	m_fAccTime += _fTimeDelta;
-	//	if (m_fAccTime >= 0.125f)
-	//	{
-	//		m_fAccTime = 0.f;
-	//		m_eCurState = STARPOINT_WAIT;
-	//		m_ePreState = STARPOINT_LOOT;
-	//		m_IsLootTrigger = FALSE;
-	//	}
-	//	else
-	//		Play_Animation(m_fAccTime, STARPOINT_LOOT);
-	//	break;
-
-	//case CHUD::STARPOINT_NONE:
-	//default:	break;
-	//}
-}
-
-void CHUD_StarPoint::Play_Animation(_float _fAccTime, STARPOINT_STATE _eCurState)
-{
-	//_float4 vCurPos{};
-	////if (!m_pKirby) //==nullptr
-	////	return;
-
-	////_uint iCurCoin = m_pKirby->Get_Coin();
-	////_uint iFont10 = (iCurCoin % 100) / 10;
-
-	//switch (_eCurState)
-	//{
-	//case CHUD::STARPOINT_IDLE:
-	//break;
-	//
-	//case CHUD::STARPOINT_WAIT:
-	//	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vInitPos);
-
-	//	if (TEXT("Font10_Shadow") == m_UIObjDesc.wstrUITag || TEXT("Font10") == m_UIObjDesc.wstrUITag
-	//	|| TEXT("Font1_Shadow") == m_UIObjDesc.wstrUITag || TEXT("Font1") == m_UIObjDesc.wstrUITag)
-	//		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_UIObjDesc.vPos);
-
-	//	break;
-
-	//case CHUD::STARPOINT_HIDE: 
-	//	vCurPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-	//	vCurPos.x += 0.05f;//vCurPos.x += 0.005f;
-	//	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vCurPos);
-
-	//	if (TEXT("Font100_Shadow") == m_UIObjDesc.wstrUITag || TEXT("Font10_Shadow") == m_UIObjDesc.wstrUITag || TEXT("Font1_Shadow") == m_UIObjDesc.wstrUITag
-	//		|| TEXT("Font100") == m_UIObjDesc.wstrUITag || TEXT("Font10") == m_UIObjDesc.wstrUITag || TEXT("Font1") == m_UIObjDesc.wstrUITag)
-	//	{
-	//		m_UIObjDesc.vPos.x = vCurPos.x;
-	//		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_UIObjDesc.vPos);
-	//	}
-
-	//	break;
-
-	//case CHUD::STARPOINT_LOOT:
-	//
-	//	if (TEXT("Font100_Shadow") == m_UIObjDesc.wstrUITag || TEXT("Font10_Shadow") == m_UIObjDesc.wstrUITag || TEXT("Font1_Shadow") == m_UIObjDesc.wstrUITag
-	//		|| TEXT("Font100") == m_UIObjDesc.wstrUITag || TEXT("Font10") == m_UIObjDesc.wstrUITag || TEXT("Font1") == m_UIObjDesc.wstrUITag)
-	//	{
-	//		if (m_IsMovingUP)
-	//		{
-	//			vCurPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-	//			vCurPos.y += 5.f;
-	//			m_UIObjDesc.vPos.y = vCurPos.y;
-	//			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_UIObjDesc.vPos);
-	//			
-	//			if (_fAccTime > 0.03f)
-	//				m_IsMovingUP = FALSE;
-	//		}
-	//		else //m_IsMovingUP == FALSE;
-	//		{
-	//			vCurPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-	//			vCurPos.y -= 5.f;
-	//			m_UIObjDesc.vPos.y = vCurPos.y;
-	//			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_UIObjDesc.vPos);
-
-	//			if (m_vInitPos.y >= m_UIObjDesc.vPos.y)
-	//				m_UIObjDesc.vPos.y = m_vInitPos.y;
-
-	//			m_IsMovingUP = TRUE;
-	//			_fAccTime = 0.f;
-	//		}
-	//	}
-
-	//break;
-
-	//}
- }
 
 void CHUD_StarPoint::Compute_Coin(_float _fTimeDelta)
 {
