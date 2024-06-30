@@ -26,7 +26,7 @@ void CCamera_Main::Set_Target(CTransform* pTarget, CAMTARGET eTarget, CAMFOCUS e
 	if (nullptr == pTarget)
 		return;
 
-	if (eFocus == FOCUS_FIRST)
+	if (eTarget == TARGET_FIRST)
 	{
 		if (nullptr != m_pFirstTarget)
 			Safe_Release(m_pFirstTarget);
@@ -35,7 +35,7 @@ void CCamera_Main::Set_Target(CTransform* pTarget, CAMTARGET eTarget, CAMFOCUS e
 		Safe_AddRef(pTarget);
 
 	}
-	else if (eFocus == FOCUS_SECOND)
+	else if (eTarget == TARGET_SECOND)
 	{
 		if (nullptr != m_pSecondTarget)
 			Safe_Release(m_pSecondTarget);
