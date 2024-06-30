@@ -28,7 +28,12 @@ public:
 #endif
 
 public:
-	void						Set_Activate(_bool _bActivate);// { m_bActivate = _bActivate; }
+	void						Activate();
+	void						Deactivate();
+
+	void						Tick_AlphaStar(_float fTimeDelta);
+	void						Tick_YeonDooStar(_float fTimeDelta);
+	void						Tick_GreenStar(_float fTimeDelta);
 
 private:
 	HRESULT						Add_Components();

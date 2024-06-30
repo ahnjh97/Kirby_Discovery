@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "TransingStar.h"
+
+#include "Level_Loading.h"
 #include "Utils.h"
 
 const _float	g_fPosOffset        = 18.f;
@@ -42,64 +44,20 @@ _int CTransingStar::Tick(_float fTimeDelta)
 {
     // FOR TEST
     if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD1, KEY_DOWN))
-        Set_Activate(true);
+        Activate();
     if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD2, KEY_DOWN))
-    {
-        m_bActivate = false;
-        m_fYeonDooTime = 1.f;
-        m_fAlphaTimeRemains = 1.f;
-
-        m_bDeadYeonDoo = false;
-        m_fDecreaseValue = 0.f;
-    }
+        Deactivate();
 
     if (false == m_bActivate) return OBJ_NOEVENT;
     
-    //-------------------------------- 투명 --------------------------------
-    if (m_fAlphaTimeRemains > 0.f)
-        m_fAlphaTimeRemains -= fTimeDelta * TIMEDELTA_OFFSET;
-	else
-		m_fAlphaTimeRemains = 0.f;
+    // activate상태일 경우만 별들이 움직임니다.
+    if (CUtils::Get_Scaled_Matrix(m_arrayStarMatrix[0]).x != 0.f)
+        Tick_AlphaStar(fTimeDelta);
 
-	// 투명별 사이즈 조절
-	if (m_bDeadYeonDoo)
-		CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], 0.f, 0.f, 1.f);
-	else if (m_InitialSize.x * m_fAlphaTimeRemains <= m_MediumSize.x)
-		CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], m_MediumSize.x, m_MediumSize.y, 1.f);
-	else
-		CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], m_InitialSize.x * m_fAlphaTimeRemains, m_InitialSize.y * m_fAlphaTimeRemains, 1.f);
+    if (CUtils::Get_Scaled_Matrix(m_arrayStarMatrix[1]).x != 0.f)
+        Tick_YeonDooStar(fTimeDelta);
 
-
-    //-------------------------------- 연두 --------------------------------
-	if (m_fAlphaTimeRemains <= 0.6f) // 투명별이 10% 진행되었을 때, 연두별 시작
-	{
-        // 연두 돌아가유
-        if(m_bDeadYeonDoo)
-		    CUtils::Turn_OtherMatrix(m_arrayStarMatrix[1], _float4(0.f, 0.f, 1.f, 0.f), fTimeDelta, 720.f);
-        else
-		    CUtils::Turn_OtherMatrix(m_arrayStarMatrix[1], _float4(0.f, 0.f, 1.f, 0.f), fTimeDelta * TIMEDELTA_OFFSET, g_fTurnOffset);
-        
-        // 연두 사이즈 감소
-        m_fDecreaseValue += fTimeDelta* m_fDecreaseOffset * TIMEDELTA_OFFSET;
-		CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[1], m_InitialSize.x - m_fDecreaseValue, m_InitialSize.y - m_fDecreaseValue, 1.f);
-        
-        // 연두가 투명해지는 조건 == m_fYeonDooTime(1초)가 되었을때
-        if (m_fYeonDooTime <= 0.f)
-             m_bDeadYeonDoo = true;
-        m_fYeonDooTime -= fTimeDelta * TIMEDELTA_OFFSET;
-        
-        // 사이즈가 다시 커지는 것에 대한 예외처리
-        if (m_InitialSize.x < m_fDecreaseValue)
-			CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[1], 0.f, 0.f, 1.f);
-	}
-    else // 연두별 배경 대기
-        CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[1], m_InitialSize.x * 1.5f, m_InitialSize.y * 1.5f, 1.f);
-
-
-    //-------------------------------- 초록 --------------------------------
-    CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[2], m_InitialSize.x, m_InitialSize.y, 1.f);
-
-
+    Tick_GreenStar(fTimeDelta);
 
     return OBJ_NOEVENT;
 }
@@ -161,10 +119,10 @@ void CTransingStar::Render_IMGUI()
 #endif
 
 /// <summary> 텍스쳐들의 위치를 초기화 시킨다. </summary>
-void CTransingStar::Set_Activate(_bool _bActivate)
+void CTransingStar::Activate()
 {
     // 활성화 시키는 부울값 ON
-    m_bActivate = _bActivate;
+    m_bActivate = true;
 
     // Activate한 순간의 Player의 위치를 받아온다.
     CGameObject* pObj = m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, L"Layer_Player", L"Prototype_GameObject_Kirby");
@@ -187,6 +145,68 @@ void CTransingStar::Set_Activate(_bool _bActivate)
         _float4 vFinalPoswithZ = _float4(vFinalPos.x, vFinalPos.y, vFinalPos.z + i * 0.1f, 1.f);
         CUtils::Set_State_Matrix(m_arrayStarMatrix[i], CUtils::STATE_POSITION, vFinalPoswithZ);
     }
+}
+
+void CTransingStar::Deactivate()
+{
+    m_bActivate = false;
+    m_fYeonDooTime = 1.f;
+    m_fAlphaTimeRemains = 1.f;
+
+    m_bDeadYeonDoo = false;
+    m_fDecreaseValue = 0.f;
+}
+
+void CTransingStar::Tick_AlphaStar(_float fTimeDelta)
+{
+    if (m_fAlphaTimeRemains > 0.f)
+        m_fAlphaTimeRemains -= fTimeDelta * TIMEDELTA_OFFSET;
+    else
+        m_fAlphaTimeRemains = 0.f;
+
+    // 투명별 사이즈 조절
+    if (m_bDeadYeonDoo)
+        CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], 0.f, 0.f, 1.f);
+    else if (m_InitialSize.x * m_fAlphaTimeRemains <= m_MediumSize.x)
+        CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], m_MediumSize.x, m_MediumSize.y, 1.f);
+    else
+        CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], m_InitialSize.x * m_fAlphaTimeRemains, m_InitialSize.y * m_fAlphaTimeRemains, 1.f);
+}
+
+void CTransingStar::Tick_YeonDooStar(_float fTimeDelta)
+{
+    if (m_fAlphaTimeRemains <= 0.6f) // 투명별이 10% 진행되었을 때, 연두별 시작
+    {
+        // 연두 돌아가유
+        if (m_bDeadYeonDoo)
+            CUtils::Turn_OtherMatrix(m_arrayStarMatrix[1], _float4(0.f, 0.f, 1.f, 0.f), fTimeDelta, 720.f);
+        else
+            CUtils::Turn_OtherMatrix(m_arrayStarMatrix[1], _float4(0.f, 0.f, 1.f, 0.f), fTimeDelta * TIMEDELTA_OFFSET, g_fTurnOffset);
+
+        // 연두 사이즈 감소
+        m_fDecreaseValue += fTimeDelta * m_fDecreaseOffset * TIMEDELTA_OFFSET;
+        CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[1], m_InitialSize.x - m_fDecreaseValue, m_InitialSize.y - m_fDecreaseValue, 1.f);
+
+        // 연두가 투명해지는 조건 == m_fYeonDooTime(1초)가 되었을때
+        if (m_fYeonDooTime <= 0.f)
+            m_bDeadYeonDoo = true;
+        m_fYeonDooTime -= fTimeDelta * TIMEDELTA_OFFSET;
+
+        // 사이즈가 다시 커지는 것에 대한 예외처리
+        if (m_InitialSize.x < m_fDecreaseValue)
+        {
+            CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[1], 0.f, 0.f, 1.f);
+            HRESULT hr = m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_RACING));
+            CHECK_FAILED(hr);
+        }
+    }
+    else // 연두별 배경 대기
+        CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[1], m_InitialSize.x * 1.5f, m_InitialSize.y * 1.5f, 1.f);
+}
+
+void CTransingStar::Tick_GreenStar(_float fTimeDelta)
+{
+    CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[2], m_InitialSize.x, m_InitialSize.y, 1.f);
 }
 
 HRESULT CTransingStar::Add_Components()

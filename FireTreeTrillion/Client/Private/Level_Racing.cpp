@@ -63,18 +63,8 @@ HRESULT CLevel_Racing::Initialize()
 	CHECK_FAILED(hr);
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
-	// 레벨전환 트리거
-	function<void(_int)> func = bind(&CLevel_Racing::Change_Levels, this);
-	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_LEVELCHANGER, func);
 
 	return S_OK;
-}
-
-void CLevel_Racing::Change_Levels()
-{
-	HRESULT hr(S_OK);
-	hr = m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_DEEDEEDEE));
-	CHECK_FAILED(hr);
 }
 
 void CLevel_Racing::Tick(_float fTimeDelta)

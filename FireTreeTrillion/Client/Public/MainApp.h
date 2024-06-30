@@ -28,6 +28,7 @@ private:
 
 private:	
 	HRESULT Ready_Fonts();
+	HRESULT Ready_Object_For_Static();
 	HRESULT Ready_Prototype_Component_For_Static();
 
 #ifdef _DEBUG

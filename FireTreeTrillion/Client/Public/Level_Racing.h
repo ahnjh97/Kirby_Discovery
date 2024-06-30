@@ -28,8 +28,6 @@ private:
 	HRESULT Ready_Kickables(_float fZOffset);
 	HRESULT Ready_Objects(_float fZOffset);
 
-	void	Change_Levels();
-
 	HRESULT	Load_FileData(const string& _strFilePath, FILE_TYPE _eFileType, const wstring& _strLayerTag);
 
 	HRESULT Add_EnvMap();
