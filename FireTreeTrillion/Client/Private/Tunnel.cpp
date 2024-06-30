@@ -211,7 +211,7 @@ HRESULT CTunnel::Add_Components(const wstring& _wstrModelTag)
     HitBox.pCollisionType = OBJECT;
     if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
         return E_FAIL;
-    Set_BodyCollider(COLLIDER_SPHERE, 1.5f, 0.f, 5.5f);
+    Set_BodyCollider(COLLIDER_SPHERE, 0, 0.f, 5.5f);
 
     return S_OK;
 }
