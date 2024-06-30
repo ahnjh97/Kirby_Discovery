@@ -1212,6 +1212,7 @@ HRESULT CLoader::Add_FXTexture()
 
 	hr = Add_Texture(LEVEL_STATIC, "FX_Food_ResultTop", "Effects/UI/MGameFood/result top.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Food_ResultBottom", "Effects/UI/MGameFood/result bottom.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_TitleLogo", "Effects/UI/TitleLogo.png");	CHECK_FAILED(hr);
 
 
 	return S_OK;

@@ -258,7 +258,7 @@ private:
 
 	//현재 시퀀스 모드
 	CAMSEQ m_eSpecialSeq = { SEQ_END };
-
+	_float m_fStartAudioTime = { 0.f };
 	//시퀀스 웨이팅 목록
 	list<CAMACTION> m_CamSeq;
 
