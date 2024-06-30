@@ -436,8 +436,8 @@ HRESULT CLevel_Intro::Ready_Triggers()
 		{
 			CGameObject::GAMEOBJECT_DESC tDesc{};
 			tDesc.matWorld = matWorld;
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_Fog_Instance"), &tDesc)))
-				return E_FAIL;
+			/*if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_Fog_Instance"), &tDesc)))
+				return E_FAIL;*/
 		}
 	}
 
