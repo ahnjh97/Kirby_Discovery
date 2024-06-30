@@ -258,6 +258,9 @@ protected:
 	_bool			m_bHiToKirby = { false };
 	_float			m_fResetHiTime = { 0.f };
 
+	//이전 틱의 위치
+	_float3			m_vPrePos = { 0.f, 0.f, 0.f };
+
 	DEEEYESTATE		m_eEyeState = { DEEEYE_END };
 
 	map<const wstring, CPartObject*>	m_PartObjects;

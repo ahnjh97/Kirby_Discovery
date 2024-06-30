@@ -82,6 +82,7 @@ void CWaddleDee::Dee_SystemTick(_float fTimeDelta)
 {
 	m_bIsKirbyInZone = false;
 
+
 	if (0.f != m_fResetHiTime)
 	{
 		m_fResetHiTime -= fTimeDelta;

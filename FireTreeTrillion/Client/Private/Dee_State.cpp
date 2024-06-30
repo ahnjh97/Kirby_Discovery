@@ -157,6 +157,9 @@ void CDee_Walk_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	if ((vDestPos - vMyPos).Length() < 1.f)
 	{
 		pair<DEE_ANIM, _bool> ToDo = baseInfo.pDee->Make_WhatToDo();
+		//아무것도 못 받은 상태라면 return
+		if (ToDo.first == DEEANIM_END)
+			return;
 		DEE_ANIM eNextState = ToDo.first;
 		baseInfo.pDee->Change_State(eNextState, 60.f, ToDo.second, true);
 	}
@@ -218,6 +221,10 @@ void CDee_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	if ((vDestPos - vMyPos).Length() < 1.f)
 	{
 		pair<DEE_ANIM, _bool> ToDo = baseInfo.pDee->Make_WhatToDo();
+		//아무것도 못 받은 상태라면 return
+		if (ToDo.first == DEEANIM_END)
+			return;
+
 		DEE_ANIM eNextState = ToDo.first;
 		baseInfo.pDee->Change_State(eNextState, 60.f, ToDo.second, true);
 	}
@@ -837,6 +844,9 @@ void CDee_Interact_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 		if (*m_pGameInstance->Get_CurrentLevelID() == LEVEL_DEEDEEDEE)
 		{
 			pair<DEE_ANIM, _bool> ToDo = baseInfo.pDee->Make_WhatToDo();
+			//아무것도 못 받은 상태라면 return
+			if (ToDo.first == DEEANIM_END)
+				return;
 			baseInfo.pDee->Change_State(ToDo.first, 60.f, ToDo.second, true);
 		}
 		else
@@ -902,7 +912,7 @@ void CDee_Panic_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 
 
 	//목표 지점과의 거리 차이를 구하여 속도 정하기
-	_float fSpeed = 3.5f;
+	_float fSpeed = 6.5f;
 
 	//목표 방향을 향해 회전한, 이동한다.
 	baseInfo.pTransformCom->Look_At_Interpolate(vMyPos + m_vDir, fTimeDelta);
