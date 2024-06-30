@@ -32,6 +32,8 @@ HRESULT CHUD_AbilityDiscard::Initialize(void* _pArg)
 		return E_FAIL;
 	
 	m_pTransformCom->Set_Scaled(m_UIObjDesc.vSize.x, m_UIObjDesc.vSize.y, m_UIObjDesc.vSize.z);
+	//m_pTransformCom->Set_State(CTransform::STATE_POSITION,
+	//	XMVectorSet(m_UIObjDesc.vPos.x,	m_UIObjDesc.vPos.y,	m_UIObjDesc.vPos.z, 1.f));
 
 	//m_pTransformCom->Rotation(XMVectorSet(AXIS_Z), XMConvertToRadians(m_UIObjDesc.vDegree.z));
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
@@ -40,8 +42,8 @@ HRESULT CHUD_AbilityDiscard::Initialize(void* _pArg)
 	m_eTexState = DISCARD_IDLE;
 
 	//Init 초기 값 사전 저장
-	//m_vInitPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-	//m_vInitSize = m_pTransformCom->Get_Scaled();
+	m_vInitPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	m_vInitSize = m_pTransformCom->Get_Scaled();
 
 	return S_OK;
 }
@@ -50,38 +52,45 @@ _int CHUD_AbilityDiscard::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
+#pragma region SET VIEWPORT MATRIX
+
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+	if (pKirby == nullptr)
+		return OBJ_NOEVENT;
+
+	//커비 위치정보
+	CTransform* pKirbyTrans = static_cast<CTransform*>(pKirby->Get_Component(g_strTransformTag));
+	_float4 vKirbyPos = pKirbyTrans->Get_State(CTransform::STATE_POSITION);
+
+	//뷰포트 공간 상의 X, Y를 정보를 구함
+	_matrix VPMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW) * m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
+	_vector vViewportPos = XMVector3TransformCoord(vKirbyPos, VPMatrix);
+	_float fViewX = XMVectorGetX(vViewportPos);
+	_float fViewY = XMVectorGetY(vViewportPos);
+	fViewY -= 0.2f;
+
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
+		XMVectorSet(m_UIObjDesc.vPos.x * fViewX,
+			m_UIObjDesc.vPos.y * fViewY,
+			m_UIObjDesc.vPos.z, 1.f));
+
+	//m_pTransformCom->Set_State_OtherMatrix(m_BarMatrix[UI_BARPLATE],
+	//	CTransform::STATE_POSITION, XMVectorSet(m_fX * X, m_fY * Y, Z, 1.f);
+	//));
+	//m_fX = g_iWinSizeX * 0.5f;
+	//m_fY = g_iWinSizeY * 0.5f;
+
+#pragma endregion
+
+	//커비 능력버리기 정보
+	m_fDumpAbilityTime = pKirby->Get_KirbyInfo()->m_fDumpAbilityTime;
+
 	if (m_pGameInstance->Get_DIKeyState(DIK_V, KEY_PRESS))
 		m_IsGaugeUP = TRUE;
 	
 	//게이지 인디케이터 시작
 	if (m_IsGaugeUP)
 	{
-#pragma region SET VIEWPORT MATRIX
-
-		//매 틱마다 정보를 갱신할 필요는 없으므로, 해당 상태일 때 커비 정보를 체크
-		CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
-		if (pKirby == nullptr)
-			return OBJ_NOEVENT;
-
-		//커비 위치정보
-		CTransform* pKirbyTrans = static_cast<CTransform*>(pKirby->Get_Component(g_strTransformTag));
-		_float4 vKirbyPos = pKirbyTrans->Get_State(CTransform::STATE_POSITION);
-
-		//뷰포트 공간 상의 X, Y를 정보를 구함
-		_matrix VPMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW) * m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
-		_vector vViewportPos = XMVector3TransformCoord(vKirbyPos, VPMatrix);
-		_float fViewX = XMVectorGetX(vViewportPos);
-		_float fViewY = XMVectorGetY(vViewportPos);
-		fViewY -= 0.1f;
-
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION,
-			XMVectorSet(m_UIObjDesc.vPos.x * fViewX, m_UIObjDesc.vPos.y * fViewY, m_UIObjDesc.vPos.z, 1.f));
-
-		//커비 능력버리기 정보
-		m_fDumpAbilityTime = pKirby->Get_KirbyInfo()->m_fDumpAbilityTime;
-
-#pragma endregion
-
 		m_eTexState = DISCARD_SHOW;
 
 		m_fDumpAbilityTime += fTimeDelta;

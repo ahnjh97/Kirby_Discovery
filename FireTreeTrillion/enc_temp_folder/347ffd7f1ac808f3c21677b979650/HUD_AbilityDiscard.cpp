@@ -32,6 +32,8 @@ HRESULT CHUD_AbilityDiscard::Initialize(void* _pArg)
 		return E_FAIL;
 	
 	m_pTransformCom->Set_Scaled(m_UIObjDesc.vSize.x, m_UIObjDesc.vSize.y, m_UIObjDesc.vSize.z);
+	//m_pTransformCom->Set_State(CTransform::STATE_POSITION,
+	//	XMVectorSet(m_UIObjDesc.vPos.x,	m_UIObjDesc.vPos.y,	m_UIObjDesc.vPos.z, 1.f));
 
 	//m_pTransformCom->Rotation(XMVectorSet(AXIS_Z), XMConvertToRadians(m_UIObjDesc.vDegree.z));
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
@@ -40,8 +42,8 @@ HRESULT CHUD_AbilityDiscard::Initialize(void* _pArg)
 	m_eTexState = DISCARD_IDLE;
 
 	//Init 초기 값 사전 저장
-	//m_vInitPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-	//m_vInitSize = m_pTransformCom->Get_Scaled();
+	m_vInitPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	m_vInitSize = m_pTransformCom->Get_Scaled();
 
 	return S_OK;
 }
