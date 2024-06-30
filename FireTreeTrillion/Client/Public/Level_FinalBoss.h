@@ -24,6 +24,8 @@ private:
 	HRESULT Ready_Monsters();
 	HRESULT Ready_Items();
 	HRESULT Ready_Kickables();
+	HRESULT Ready_Objects();
+	HRESULT Ready_UI();
 
 public:
 	static CLevel_FinalBoss* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

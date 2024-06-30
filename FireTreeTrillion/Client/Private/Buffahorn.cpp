@@ -49,9 +49,6 @@ HRESULT CBuffahorn::Initialize(void* pArg)
 	m_eAbilityType = ABILITY_DEFAULT;
 	m_eEyeState = BUFFAHORNEYE_IDLE;
 
-	//for test
-	//31 8 -102
-	//m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(31.f, 8.f, -102.f, 1.f));
 	return S_OK;
 }
 
@@ -237,8 +234,8 @@ HRESULT CBuffahorn::Add_Components()
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
 	desc.fOffset = 1.f;
-	desc.tCapsuleShape.fHeight = 1.f;
-	desc.tCapsuleShape.fRadius = 1.f;
+	desc.tCapsuleShape.fHeight = 1.5f;
+	desc.tCapsuleShape.fRadius = 1.5f;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	//m_pControllerCom->Set_Object(this);

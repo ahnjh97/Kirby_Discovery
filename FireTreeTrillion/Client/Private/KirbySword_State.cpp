@@ -158,6 +158,7 @@ _bool CKirbySword_Idle_State::Key_V(CGameObject* pGameObject, _float fTimeDelta)
 	// 능력을 땅에 버리는 로직이다.
 	if (m_pGameInstance->Get_DIKeyState(DIK_V, KEY_PRESS))
 	{
+		DESC(m_bDumpAbilityPress) = true;
 		DESC(m_fDumpAbilityTime) += fTimeDelta;
 
 		if (DESC(m_fDumpAbilityTime) > 1.f)
@@ -169,11 +170,7 @@ _bool CKirbySword_Idle_State::Key_V(CGameObject* pGameObject, _float fTimeDelta)
 	}
 	else
 	{
-		if (DESC(m_fDumpAbilityTime) > 0.f)
-			DESC(m_fDumpAbilityTime) -= fTimeDelta * 2.f;
-
-		if (DESC(m_fDumpAbilityTime) < 0.f)
-			DESC(m_fDumpAbilityTime) = 0.f;
+		DESC(m_bDumpAbilityPress) = false;
 	}
 
 	return false;
@@ -290,10 +287,12 @@ void CKirbySword_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_V, KEY_PRESS))
 	{
+		DESC(m_bDumpAbilityPress) = true;
 		DESC(m_fDumpAbilityTime) += fTimeDelta;
 
 		if (DESC(m_fDumpAbilityTime) > 1.f)
 		{
+
 			DESC(m_fDumpAbilityTime) = 0.f;
 			pKirby->Change_State(CKirby::STATE_ABILITYDUMP, 60.f, false, false, CKirby::BODY_DEFAULT);
 			return;
@@ -301,11 +300,7 @@ void CKirbySword_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	}
 	else
 	{
-		if (DESC(m_fDumpAbilityTime) > 0.f)
-			DESC(m_fDumpAbilityTime) -= fTimeDelta * 2.f;
-
-		if (DESC(m_fDumpAbilityTime) < 0.f)
-			DESC(m_fDumpAbilityTime) = 0.f;
+		DESC(m_bDumpAbilityPress) = false;
 	}
 
 
@@ -1321,7 +1316,8 @@ void CKirbySword_JumpAttack_State::OnStateEnter(CModel* _pModel, _uint _iAnimInd
 	{
 	case CKirby::SWORDSTATE_UPWARDSLASH:
 	{
-		pKirby->Delete_AllEffect();
+		pKirby->Delete_Effect("Sword Dash Test A");
+		//pKirby->Delete_AllEffect();
 		SwordSlash_Up(pKirby->Get_TransformCom());
 	}
 	break;

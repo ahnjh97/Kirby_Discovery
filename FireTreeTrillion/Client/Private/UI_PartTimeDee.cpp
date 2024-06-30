@@ -125,13 +125,13 @@ HRESULT CUI_PartTimeDee::Render()
 				m_pTexMask->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", 0);
 			}
 			
-			hr = m_pShaderCom->Begin(5);
+			hr = m_pShaderCom->Begin(POSTEX_ALPHATEST_COLOR_VERTICALCUT);
 			CHECK_FAILED(hr);
 		}
 		else
 		{
 			hr = m_arrTexures[i]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
-			hr = m_pShaderCom->Begin(14);
+			hr = m_pShaderCom->Begin(POSTEX_ALPHATEST_COLOR_HORIZONTALCUT);
 			CHECK_FAILED(hr);
 		}
 

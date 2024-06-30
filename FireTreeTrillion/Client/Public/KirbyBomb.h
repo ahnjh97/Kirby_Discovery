@@ -29,6 +29,7 @@ private:
 	virtual ~CKirbyBomb() = default;
 
 public:
+
 	virtual HRESULT Initialize_Prototype()						override;
 	virtual HRESULT Initialize(void* pArg)						override;
 	virtual _int	Tick(_float fTimeDelta)						override;

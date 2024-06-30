@@ -160,7 +160,7 @@ PS_OUT PS_MAIN_SOLIDALPHABLEND(PS_IN_ALPHABLEND In)
     
     if(g_iMasking == 2)
     {
-        if (Out.vColor.a < 0.8f)
+        if (Out.vColor.a < 0.1f)
             discard;
 
         if( g_fMaskRatio < vMask.r )
@@ -173,9 +173,7 @@ PS_OUT PS_MAIN_SOLIDALPHABLEND(PS_IN_ALPHABLEND In)
             discard;
     }
 
-
-    //if(g_vRColor.r == 0.45)
-        Out.vColor.rgb = g_vRColor;
+    Out.vColor.rgb = g_vRColor;
     Out.vColor.a *= g_fAlpha;
 
     if (0.01f <= Out.vColor.a)
@@ -457,6 +455,36 @@ PS_OUT PS_MAIN_FOR_BOSSBAR(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_MAIN_ALPHATEST_COLOR_VERTICALCUT(PS_IN_ALPHABLEND In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord);
+    Out.vColor   = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    
+    if (g_iMasking == 2)
+    {
+        if (Out.vColor.a < 0.6f)
+            discard;
+
+        if (g_fMaskRatio < vMask.r)
+            discard;
+    }
+    else //알파 값 예외처리
+    {
+        if (Out.vColor.a < 0.1f)
+            discard;
+    }
+
+    if(g_vRColor.r == 0.45)
+        Out.vColor.rgb = g_vRColor;
+    Out.vColor.a *= g_fAlpha;
+
+    if (0.01f <= Out.vColor.a)
+        Out.vNonBlur = vector(0.f, 1.f, 0.f, 0.f);
+
+    return Out;
+}
+
 PS_OUT PS_FOCUSING_UI(PS_IN_ALPHABLEND In)
 {
     PS_OUT Out = (PS_OUT) 0;
@@ -467,36 +495,35 @@ PS_OUT PS_FOCUSING_UI(PS_IN_ALPHABLEND In)
     {
         case 0: // 첫 번째 포커싱 별
         {
-            if (vDiffuse.r >= .6f) // 1은 하양
-                Out.vColor.a = 0.f;
-            else
-                discard;
-        }
-        break;
+                if (vDiffuse.r >= .6f) // 1은 하양
+                    Out.vColor.a = 0.f;
+                else
+                    discard;
+       }
+       break;
         case 1: // 연두
         {
-            if (vDiffuse.r >= .9f) // 하양별부분 연두
-            {
-               Out.vColor.r = 160.f / 255.f;
-               Out.vColor.g = 212.f / 255.f;
-               Out.vColor.b = 104.f / 255.f;
+                if (vDiffuse.r >= .9f) // 하양별부분 연두
+                {
+                    Out.vColor.r = 160.f / 255.f;
+                    Out.vColor.g = 212.f / 255.f;
+                    Out.vColor.b = 104.f / 255.f;
+                }
+                else // 검정배경부분 찐연두
+                    discard;
             }
-            else // 검정배경부분 찐연두
-               discard;
-        }
-        break;
+            break;
         case 2: // 찐연두
         {
-            Out.vColor.r = 91.f  / 255.f;
-            Out.vColor.g = 121.f / 255.f;
-            Out.vColor.b = 59.f  / 255.f;
-        }
-        break;
+                Out.vColor.r = 91.f / 255.f;
+                Out.vColor.g = 121.f / 255.f;
+                Out.vColor.b = 59.f / 255.f;
+            }
+            break;
     }
     
     return Out;
 }
-
 
 technique11 DefaultTechnique
 {
@@ -722,7 +749,19 @@ technique11 DefaultTechnique
         PixelShader     = compile ps_5_0 PS_MAIN_FOR_BOSSBAR();
     }
 
-    // 16이 있습니다.
+    // 알파 테스트 + 색 바인딩 곱셈 + 0 ~ 1 사이의 값으로 세로 자르기 ( 16 )
+    pass AlphaTest_Color_VerticalCut
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN_ALPHABLEND();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_ALPHATEST_COLOR_VERTICALCUT();
+    }
 
 	// UI_LEVEL_CHANGER 전용. 마스크와 색상 ( 17 )
     pass FOCUSING_POSITION_UI

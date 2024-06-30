@@ -33,8 +33,7 @@ public:
 	//}
 	void Track_Target(_bool _bTrackTarget) { m_bTrackTarget = _bTrackTarget; }
 
-	void Lock_Camera(_float3 vPos, _float3 vLook, _float fFOVY);
-	void LockToggle() { m_bLockCamera = !m_bLockCamera; }
+
 
 private:
 	virtual HRESULT Initialize_Prototype() override;
@@ -47,6 +46,7 @@ private:
 #endif
 
 public:
+
 	void Set_MatrixIndex(_int iMatrixIndex);
 	void EmplaceBackCamMatrix(const _float4x4& matWorld) { m_vecCamMatrices.emplace_back(matWorld); }
 
@@ -65,7 +65,6 @@ public:
 
 private:
 	_bool			m_bWasMainCamera = { false };
-	_bool			m_bLockCamera = { false };
 	_float			m_fMouseSensor = { 0.0f };
 
 	CTransform*		m_pTarget = { nullptr };

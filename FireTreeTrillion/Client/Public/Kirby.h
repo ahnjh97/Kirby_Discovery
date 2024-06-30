@@ -88,6 +88,7 @@ public:
 
 		// 땅에 능력 버리는 시간
 		_float			m_fDumpAbilityTime = { 0.f };
+		_bool			m_bDumpAbilityPress = { false };
 
 		// Ability Sword
 		// PRESS 시, 차지시간을 정해주는 변수
@@ -162,6 +163,7 @@ public:
 	void			Plus_Coin(_uint uCoin) { m_uCoin += uCoin;	}
 
 	_bool			isAnimFinish();
+	_float			Get_AnimTrackPosition();
 	void			DefaultIdle();
 
 	// 현재 커비가 무적상태인지 아닌지 판별하는 부울 값
@@ -169,13 +171,20 @@ public:
 	// 손에 쥐고있어야 할 때, 필요한 행렬 포인터
 	_float4x4*		Get_HandsMatrix()  { return &m_ArmourMatrix; }
 
-	void			Set_HitStop() { m_bHitStop = true; }
+	void			Set_HitStop(_float fHitStopMaxTime = 0.12f) { m_bHitStop = true; m_fHitStopMaxTime = fHitStopMaxTime; }
 	_bool			Is_Attacking() { return m_isKirbyAttacking; }
 	void			RegisterActorsToPlayer(PxRigidActor* pActor, CGameObject* pGameObject) { 
 		m_mapToppleableBridges.insert_or_assign(pActor, pGameObject);
 		Safe_AddRef(pGameObject);
 	}
+	void			RegisterActorsToPlayer_ForStarBox(PxRigidActor* pActor, CGameObject* pGameObject) {
+		m_mapStarBoxs.insert_or_assign(pActor, pGameObject);
+		Safe_AddRef(pGameObject);
+	}
 	CGameObject*	FindToppleableBridge(PxRigidActor* pActor);
+	CGameObject*	FindStarBox(PxRigidActor* pActor);
+	void			Set_WeaponAnim(_uint index);
+
 
 	// 기타 세부적인 제어
 private:
@@ -187,8 +196,6 @@ private:
 	HRESULT			Kirby_SystemInitialize();
 	void			Kirby_LookInitialize();
 
-	_float3			Make_RepulsiveDir(CPhysXObject* pObject);
-
 private:
 	HRESULT			Make_TargetToCams();
 	HRESULT			Add_Components();
@@ -197,6 +204,11 @@ private:
 	_bool			Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex);
 	// FSM
 	void			SetUp_FSM();
+	// 구독서비스
+	void			SetUp_Event();
+	void			Event_Racing_Cut1(CGameObject* pObj);
+	void			Event_Racing_Cut2(CGameObject* pObj);
+
 	// 히트박스 체인저
 	void			HitBoxChanger(_uint eState);
 	_bool			m_isKirbyAttacking = { false };
@@ -230,6 +242,7 @@ private:
 	void				  HitStop_System(_float fTimeDelta);
 	_bool				  m_bHitStop = { false };
 	_float				  m_fHitStopTime = { 0.f };
+	_float				  m_fHitStopMaxTime = { 0.f };
 
 
 	// For Bomb
@@ -246,14 +259,12 @@ private:
 	_int				  m_iTestAnim = { 0 };
 
 	unordered_map<PxRigidActor*, CGameObject*> m_mapToppleableBridges;
+	unordered_map<PxRigidActor*, CGameObject*> m_mapStarBoxs;
 
 public:
 	static CKirby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
-
-	//test
-	_bool		m_bOnce = false;
 };
 
 END

@@ -54,8 +54,6 @@ public:
 	virtual void	Render_IMGUI() override;
 	void			Draw_Cylinder(const ImVec2& center, float bottomRadius, float topRadius, float height, int sliceCount, const ImVec4& color);
 
-
-
 #endif
 
 private:

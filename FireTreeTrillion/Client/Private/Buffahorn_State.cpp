@@ -88,7 +88,7 @@ void CBuffahorn_Find_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
 
 	// 플레이어를 향해 바라본다
-	pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 1.5f);
+	pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 3.f);
 
 	if (true == pBuffahorn->IsAnimFinished())
 	{

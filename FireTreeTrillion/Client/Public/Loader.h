@@ -53,6 +53,7 @@ private:
 	
 	HRESULT Add_Shaders();
 	HRESULT Add_FXTexture();
+	HRESULT Add_StaticUITexture();
 
 	void SetUp_ModelScaleRotation(LEVEL eLevel);
 
@@ -63,6 +64,11 @@ private:
 	void	TraverseModelTxts(const wstring& rootFolderPath, list<wstring>& fileList);
 	// animation 정보를 로드하여 모델을 추가할때 넘겨주는 데이터에 넣는다.
 	void	Load_AnimToolInfo();
+
+	void	Load_ItemModels();
+	void	Load_KirbyBodyModels();
+	void	Load_KirbyWeaponModels();
+	void	Load_KirbyArmourModels();
 
 private:
 	ID3D11Device*				m_pDevice = { nullptr };

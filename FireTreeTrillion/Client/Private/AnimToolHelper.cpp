@@ -163,9 +163,9 @@ void CAnimToolHelper::Ready_AnimObjects(const wstring& strLayerTag)
 	CHECK_NULLPTR(pCharacter);
 	m_vecCharacter.push_back(pCharacter);
 
-	pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Awoofy")));
-	CHECK_NULLPTR(pCharacter);
-	m_vecCharacter.push_back(pCharacter);
+	//pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Awoofy")));
+	//CHECK_NULLPTR(pCharacter);
+	//m_vecCharacter.push_back(pCharacter);
 
 	pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_BladeKnight")));
 	CHECK_NULLPTR(pCharacter);
@@ -179,11 +179,14 @@ void CAnimToolHelper::Ready_AnimObjects(const wstring& strLayerTag)
 	CHECK_NULLPTR(pCharacter);
 	m_vecCharacter.push_back(pCharacter);
 
-	/*
-	pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_PartTimerKirby")));
-	CHECK_NULLPTR(pCharacter);
-	m_vecCharacter.push_back(pCharacter);
-	*/
+	//pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_FinalBoss")));
+	//CHECK_NULLPTR(pCharacter);
+	//m_vecCharacter.push_back(pCharacter);
+
+	//pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_PartTimerKirby")));
+	//CHECK_NULLPTR(pCharacter);
+	//m_vecCharacter.push_back(pCharacter);
+	
 	pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_FoodShopDee")));
 	CHECK_NULLPTR(pCharacter);
 	m_vecCharacter.push_back(pCharacter);
@@ -195,6 +198,10 @@ void CAnimToolHelper::Ready_AnimObjects(const wstring& strLayerTag)
 	//pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_HungryDee")));
 	//CHECK_NULLPTR(pCharacter);
 	//m_vecCharacter.push_back(pCharacter);
+
+	pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_TestModel")));
+	CHECK_NULLPTR(pCharacter);
+	m_vecCharacter.push_back(pCharacter);
 }
 
 void CAnimToolHelper::Render_ObjectList()
@@ -528,7 +535,7 @@ void CAnimToolHelper::Save()
 
 	// 버전 요소 생성 및 추가
 	tinyxml2::XMLElement* m_pElement = m_xmlDocument.NewElement("Version");
-	m_pElement->SetText(240618); // 애니메이션 툴 찐마지막 수정 날짜 for developer
+	m_pElement->SetText(240628); // 애니메이션 툴 찐마지막 수정 날짜 for developer
 	m_pRootNode->InsertEndChild(m_pElement);
 
 	// 맵 시퀀스를 순회
@@ -547,7 +554,18 @@ void CAnimToolHelper::Save()
 		{
 			// ModelName 하위에 Animation 요소 생성 및 추가
 			tinyxml2::XMLElement* m_pAnimElement = m_xmlDocument.NewElement("Animation");
-			m_pAnimElement->SetText(AnimName.c_str());
+			
+			string strRealAnimName = string();
+			size_t pos = AnimName.find(" "); // 공백의 위치 찾기
+			if (pos != string::npos) 
+			{
+				strRealAnimName = AnimName.substr(pos + 1); // 공백 다음 문자부터 끝까지 자르기
+				m_pAnimElement->SetText(strRealAnimName.c_str());
+			}
+			else
+			{
+				m_pAnimElement->SetText(AnimName.c_str());
+			}
 			m_pModelElement->InsertEndChild(m_pAnimElement);
 
 			// ModelName 하위에 AnimSpeed 요소 생성 및 추가
@@ -580,9 +598,9 @@ void CAnimToolHelper::Save()
 				m_pElement = m_xmlDocument.NewElement(strData.c_str());
 
 				// Data 요소에 속성 추가
-				string strTemp = AnimInfo.vecEventInfo[i].strEventName;
-				m_pElement->SetAttribute("EventName", strTemp.c_str());
-
+				string strEventName = AnimInfo.vecEventInfo[i].strEventName;
+				m_pElement->SetAttribute("EventName", strEventName.c_str());
+				
 				string strStartFrame = to_string(AnimInfo.vecEventInfo[i].iStartFrame);
 				m_pElement->SetAttribute("StartFrame", strStartFrame.c_str());
 
@@ -742,7 +760,7 @@ void CAnimToolHelper::Free()
 	m_vecCharacter.clear();
 
 	Safe_Release(m_pCharacter);
-	Safe_Release(m_pAnimToolObj);
+	//Safe_Release(m_pAnimToolObj);
 	Safe_Release(m_pModel);
 }
 

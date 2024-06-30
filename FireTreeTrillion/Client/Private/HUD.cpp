@@ -18,7 +18,6 @@ HRESULT CHUD::Initialize_Prototype()
 
 HRESULT CHUD::Initialize(void* _pArg)
 {
-	//현재는 level에서 map으로 담아 객체를 추가하고 있으므로 해당 클래스는 사용하지 않음
 	HRESULT hr = __super::Initialize(_pArg);
 	CHECK_FAILED(hr);
 

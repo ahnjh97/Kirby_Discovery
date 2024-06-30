@@ -11,6 +11,7 @@
 #include "Kabu.h"
 #include "BrontoBurt.h"
 #include "PoppyBrosJr.h"
+#include "FinalBoss.h"
 
 #include "BG.h"
 #include "HUD.h"
@@ -25,7 +26,7 @@ CLevel_FinalBoss::CLevel_FinalBoss(ID3D11Device* pDevice, ID3D11DeviceContext* p
 
 HRESULT CLevel_FinalBoss::Initialize()
 {
-	m_pGameInstance->Set_RenderMode(CRenderer::MODE_GAMEPLAY);
+	m_pGameInstance->Set_RenderMode(CRenderer::MODE_TOOL);
 
 	HRESULT hr;
 	hr = __super::Initialize();
@@ -49,6 +50,10 @@ HRESULT CLevel_FinalBoss::Initialize()
 	hr = Ready_Items();
 	CHECK_FAILED(hr);
 	hr = Ready_Kickables();
+	CHECK_FAILED(hr);
+	hr = Ready_Objects();
+	CHECK_FAILED(hr);
+	hr = Ready_UI();
 	CHECK_FAILED(hr);
 	
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
@@ -112,8 +117,8 @@ HRESULT CLevel_FinalBoss::Ready_Layer_Camera(const wstring& strLayerTag)
 	MainCamDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	MainCamDesc.fNear = 0.1f;
 	MainCamDesc.fFar = 1000.0f;
-	MainCamDesc.vEye = _float4(-129.f, 10.f, -120.f, 1.f);
-	MainCamDesc.vAt = MainCamDesc.vEye + _float4(0.f, -.15f, 1.f, 1.f);
+	MainCamDesc.vEye = _float4(0.f, 0.f, 0.f, 1.f);
+	MainCamDesc.vAt = _float4(0.f, -.2f, 1.f, 1.f);
 	MainCamDesc.fSpeedPerSec = 10.f;
 	MainCamDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	MainCamDesc.fOrigDistance = 28.f;
@@ -453,6 +458,17 @@ HRESULT CLevel_FinalBoss::Ready_Monsters()
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_CappyBody"), &tempDesc)))
 				return E_FAIL;
 		}
+		else if (L"FinalBoss" == tempDesc.wstrModelName)
+		{
+			CFinalBoss::FINALBOSS_DESC FinalBossDesc = {};
+			FinalBossDesc.matWorld = matWorld;
+			FinalBossDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			FinalBossDesc.iShaderVars = iShaderVars;
+			FinalBossDesc.fRimWidth = fRimWidth;
+			FinalBossDesc.vecRallyPoints = vecRallyPoints;
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_FinalBoss"), &FinalBossDesc)))
+				return E_FAIL;
+		}
 		else if (L"Kabu" == tempDesc.wstrModelName)
 		{
 			CKabu::KABU_DESC KabuDesc = {};
@@ -579,6 +595,78 @@ HRESULT CLevel_FinalBoss::Ready_Kickables()
 	}
 
 	fileInput.close();
+
+	return S_OK;
+}
+
+HRESULT CLevel_FinalBoss::Ready_Objects()
+{
+	//Map, Triggers, Kickables.. 분류 제외 잔존 오브젝트들
+	LEVEL eLevel = LEVEL_FINALBOSS;
+	string strFileName = "../../../objects_txt/FinalBoss.txt";
+
+	ifstream fileInput(strFileName, ios::binary);
+	if (fileInput.is_open() == false)
+	{
+		MSG_BOX(TEXT("Failed to open : FinalBoss.txt"));
+		return E_FAIL;
+	}
+
+	_uint iStrLength{};
+	string strModelName;
+	_float4x4 matWorld{};
+	_uint iShaderVars{};
+	_float fRimWidth{};
+
+	while (!fileInput.eof())
+	{
+		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
+		strModelName.resize(iStrLength);
+		fileInput.read(&strModelName[0], iStrLength);
+		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
+		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
+		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
+
+		if (fileInput.eof())
+			break;
+
+		CGameObject::GAMEOBJECT_DESC tDesc{};
+		tDesc.matWorld = matWorld;
+		tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+		tDesc.iShaderVars = iShaderVars;
+		tDesc.fRimWidth = fRimWidth;
+
+#pragma region GIMMICK_OBJECT
+		
+		if ("LbAntenna_NonAnim" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_LabAntenna"), &tDesc)))
+				continue;
+		}
+
+		if ("LbBossRoomDoor_NonAnim" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_LabBossRoomDoor"), &tDesc)))
+				continue;
+		}
+
+#pragma endregion
+	}
+	fileInput.close();
+
+	return S_OK;
+}
+
+HRESULT CLevel_FinalBoss::Ready_UI()
+{
+	LEVEL eLevel = LEVEL_FINALBOSS;
+
+	CUIObject::UIOBJ_DESC DiscardUIDesc{};
+	DiscardUIDesc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f, 0.f };
+	DiscardUIDesc.vPos = { DiscardUIDesc.vCenter.x, DiscardUIDesc.vCenter.y, 0.f };
+	DiscardUIDesc.vSize = { 260.f * 0.8f, 120.f * 0.8f, 1.f };
+
+	HRESULT hr = m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_UI_HUD"), TEXT("Prototype_GameObject_HUD_AbilityDiscard"), &DiscardUIDesc);
 
 	return S_OK;
 }

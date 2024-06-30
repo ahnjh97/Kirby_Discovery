@@ -77,9 +77,13 @@ _int CPartTimerKirby::Tick(_float fTimeDelta)
 	vDOFPos.m128_f32[1] += 0.5f;
 	m_pGameInstance->Update_DofFocus(vDOFPos);
 
-	m_pPartTimeFood->Tick(fTimeDelta);
-	m_pPartTimeFood->Update_Position(Compute_BoneWorldMatrix());
-	m_pHat->Tick(fTimeDelta);
+	if (m_pPartTimeFood != nullptr)
+	{
+		m_pPartTimeFood->Tick(fTimeDelta);
+		m_pPartTimeFood->Update_Position(Compute_BoneWorldMatrix());
+	}
+	if (m_pHat != nullptr)
+		m_pHat->Tick(fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
@@ -95,8 +99,11 @@ void CPartTimerKirby::Late_Tick(_float fTimeDelta)
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_DEFERREDINFO, this);
 	}
-	m_pPartTimeFood->Late_Tick(m_fTimeDelta);
-	m_pHat->Late_Tick(m_fTimeDelta);
+
+	if (m_pPartTimeFood != nullptr)
+		m_pPartTimeFood->Late_Tick(m_fTimeDelta);
+	if (m_pHat != nullptr)
+		m_pHat->Late_Tick(m_fTimeDelta);
 }
 
 HRESULT CPartTimerKirby::Render()
@@ -134,7 +141,8 @@ HRESULT CPartTimerKirby::Render_LightDepth()
 #ifdef _DEBUG
 void CPartTimerKirby::Render_IMGUI()
 {
-	m_pPartTimeFood->Render_IMGUI();
+	if (m_pPartTimeFood != nullptr)
+		m_pPartTimeFood->Render_IMGUI();
 
 	if (ImGui::TreeNode("Guizmo"))
 	{
@@ -188,14 +196,14 @@ HRESULT CPartTimerKirby::Make_TargetToCams()
 		Safe_AddRef(m_pCamera);
 	}
 
-	m_pCamera->Set_Target(m_pTransformCom);
+	m_pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FIRST);
 
 	//게임 레벨에 free camera 있다면 그놈에게도 타겟 등록해 준다.
 	if (LEVEL_INTRO <= *m_pCurrentLevelID && *m_pCurrentLevelID < LEVEL_END)
 	{
 		CCamera* pCameraFree = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Free")));
 		if (pCameraFree != nullptr)
-			pCameraFree->Set_Target(m_pTransformCom);
+			m_pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FIRST);
 	}
 
 	return S_OK;
@@ -220,15 +228,15 @@ HRESULT CPartTimerKirby::Add_Components()
 
 
 	/* For.Com_CharacterController */
-	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
-	CCharacterController::CONTROLLER_DESC desc{};
-	desc.vInitialPos = vPos;
-	desc.fOffset = 0.5f;
-	desc.tCapsuleShape.fHeight = 0.4f;// 1.f;
-	desc.tCapsuleShape.fRadius = 0.4f;// 0.5f;
-	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
-		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
-	CHECK_FAILED(hr);
+	//_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+	//CCharacterController::CONTROLLER_DESC desc{};
+	//desc.vInitialPos = vPos;
+	//desc.fOffset = 0.5f;
+	//desc.tCapsuleShape.fHeight = 0.4f;// 1.f;
+	//desc.tCapsuleShape.fRadius = 0.4f;// 0.5f;
+	//hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
+	//	TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
+	//CHECK_FAILED(hr);
 
 
 	/* For.HitBox */
@@ -249,6 +257,8 @@ HRESULT CPartTimerKirby::Add_Components()
 
 HRESULT CPartTimerKirby::Add_PartObjects()
 {
+	if (*m_pCurrentLevelID != LEVEL_PARTTIME) return S_OK;
+
 	CPartTimeFood::FOOD_DESC	FoodDesc{};
 	FoodDesc.pBoneMatrix = &m_matHand;
 	m_pPartTimeFood = static_cast<CPartTimeFood*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_PartTimeFood"), &FoodDesc));

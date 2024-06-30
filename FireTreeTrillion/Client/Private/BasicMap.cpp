@@ -64,6 +64,8 @@ HRESULT CBasicMap::Initialize(void* pArg)
     if(wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("DeeDeeDeeMap") &&
        wstrModelTag != TEXT("Land_LbLastBossBeforeStep") && wstrModelTag != TEXT("TownShop") && false == m_bBlendMap)
     {
+        TraverseBlendDecoInfoTxts(m_mapBlendMeshesIndices, m_mapBlendObjStaticActor);
+
         _vector vMin = XMLoadFloat3(&GameObjectDesc.vMin);
         _vector vMax = XMLoadFloat3(&GameObjectDesc.vMax);
         _matrix matWorld = m_pTransformCom->Get_WorldMatrix();
@@ -143,6 +145,9 @@ HRESULT CBasicMap::Render()
         m_iRenderAll = m_iRenderMyMesh = 0;
         m_pOcTree->Culling(m_pGameInstance, m_pShaderCom, m_pNonAnimShaderCom, m_pAnimShaderCom
             , m_iRenderAll, m_iRenderMyMesh);
+
+        for (auto& blendDeco : m_vecBlendObjects)
+            blendDeco->Late_Tick(m_pGameInstance->Get_FirstTimer());
     }
     else
     {
@@ -359,10 +364,12 @@ void CBasicMap::InsertMapDecos()
     else
         return;
 
-    _float fZOffset{};
-    if (LEVEL_RACING == *m_pCurrentLevelID)
-        fZOffset = 1500.f;
-
+    //_float fXOffset{}, fZOffset{};
+    //if (LEVEL_RACING == *m_pCurrentLevelID) {
+    //    /*fXOffset = -200.f;
+    //    fZOffset = 1200.f;*/
+    //}
+        
     string strPath = "../../../objects_txt/" + strLevel + "_DecoObjs.txt";
 
     ifstream fileInput(strPath, ios::binary);
@@ -395,7 +402,8 @@ void CBasicMap::InsertMapDecos()
         strModelName.resize(iStrLength);
         fileInput.read(&strModelName[0], iStrLength);
         fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
-        matWorld._43 = matWorld._43 + fZOffset;
+        //matWorld._41 = matWorld._41 + fXOffset;
+        //matWorld._43 = matWorld._43 + fZOffset;
         fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
         fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
         fileInput.read(reinterpret_cast<char*>(&iPassIndex), sizeof(iPassIndex));
@@ -420,6 +428,24 @@ void CBasicMap::InsertMapDecos()
         PxRigidStatic* pRigidStatic = { nullptr };
         pModel->Set_WorldMatrixForOctree(matWorld);
  
+        auto mapIter = m_mapBlendMeshesIndices.find(strModelName);
+        if (mapIter != m_mapBlendMeshesIndices.end())
+        {
+            CBlendMapObject::BLENDMAPOBJ_DESC tBlendObjDesc{};
+            tBlendObjDesc.matWorld = matWorld;
+            tBlendObjDesc.tModel = MODEL{ strModelName, eType, 1.f, 0.f, 0, strFolder, false };
+            tBlendObjDesc.iShaderVars = iShaderVars;
+            tBlendObjDesc.fRimWidth = fRimWidth;
+            tBlendObjDesc.setBlendMeshIndices = mapIter->second;
+            CBlendMapObject* pBlendMapObj = dynamic_cast<CBlendMapObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_BlendMapObject"), &tBlendObjDesc));
+
+            if (nullptr != pBlendMapObj) {
+                m_vecBlendObjects.push_back(pBlendMapObj);
+                pModel->Set_BlendObject(pBlendMapObj);
+            }
+            pModel->RemoveBlendMeshes(mapIter->second);
+        }
+
         if (CMapToolObject::MAPOBJ_NONCOL == iMapObjType)
         {
             vecNonCols.push_back(pModel);

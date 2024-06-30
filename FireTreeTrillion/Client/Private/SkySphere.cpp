@@ -121,8 +121,8 @@ HRESULT CSkySphere::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
-	wstring strProtoTagMod = TEXT("Prototype_Component_Model_") + CUtils::StrToWstr(m_strModelTag);
-	hr = __super::Add_Component(LEVEL_STATIC, strProtoTagMod, TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+	wstring wstrProtoTagMod = TEXT("Prototype_Component_Model_") + CUtils::StrToWstr(m_strModelTag);
+	hr = __super::Add_Component(LEVEL_STATIC, wstrProtoTagMod, TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
 #pragma region LAB_DISCOVERA
@@ -130,23 +130,24 @@ HRESULT CSkySphere::Add_Components()
 	//FINALBOSS일 경우, 텍스처 별도 처리. 추후 레벨 별 세부 디자인이 필요할 경우 코드 수정 예정
 	if (LEVEL_FINALBOSS == m_eCurLevel)
 	{
-		wstring strProtoTagTex = TEXT("Prototype_Component_Texture_") + CUtils::StrToWstr(m_strTextureTag);
-		hr = __super::Add_Component(LEVEL_STATIC, strProtoTagTex, TEXT("Com_Tex_Lab_Diffuse"), (CComponent**)&m_pTextureCom[TEX_DIFFUSE]);
+		wstring wstrProtoTagTex = TEXT("Prototype_Component_Texture_") + CUtils::StrToWstr(m_strTextureTag);
+		hr = __super::Add_Component(LEVEL_FINALBOSS, wstrProtoTagTex,
+			TEXT("Com_Tex_Lab_Diffuse"), (CComponent**)&m_pTextureCom[TEX_DIFFUSE]);
 		CHECK_FAILED(hr);
 
-		hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_SkySphere_Lab_CloudNoize"), 
+		hr = __super::Add_Component(LEVEL_FINALBOSS, TEXT("Prototype_Component_Texture_SkySphere_Lab_CloudNoize"),
 			TEXT("Com_Tex_Lab_CloudNoize"), (CComponent**)&m_pTextureCom[TEX_MRA]);
 		CHECK_FAILED(hr);
 
-		hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_SkySphere_LabBoss_2Pase_Normal"), 
+		hr = __super::Add_Component(LEVEL_FINALBOSS, TEXT("Prototype_Component_Texture_SkySphere_LabBoss_2Pase_Normal"),
 			TEXT("Com_Tex_LabBoss_Normal"), (CComponent**)&m_pTextureCom[TEX_NORMAL]);
 		CHECK_FAILED(hr);
 
-		hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_SkySphere_LabBoss_2Pase_Emissive"), 
+		hr = __super::Add_Component(LEVEL_FINALBOSS, TEXT("Prototype_Component_Texture_SkySphere_LabBoss_2Pase_Emissive"),
 			TEXT("Com_Tex_LabBoss_Emissive"), (CComponent**)&m_pTextureCom[TEX_EMISSIVE]);
 		CHECK_FAILED(hr);
 
-		hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_SkySphere_LabBoss_2Pase_Height"), 
+		hr = __super::Add_Component(LEVEL_FINALBOSS, TEXT("Prototype_Component_Texture_SkySphere_LabBoss_2Pase_Height"),
 			TEXT("Com_Tex_LabBoss_Height"), (CComponent**)&m_pTextureCom[TEX_HEIGHT]);
 		CHECK_FAILED(hr);
 	}
@@ -204,7 +205,6 @@ CGameObject* CSkySphere::Clone(void* pArg)
 void CSkySphere::Free()
 {
 	Safe_Release(m_pShaderCom);
-
 	Safe_Release(m_pModelCom);
 
 	for(auto& iTex : m_pTextureCom)

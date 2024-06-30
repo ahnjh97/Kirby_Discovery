@@ -50,6 +50,7 @@ HRESULT CBrontoBurt::Initialize(void* pArg)
 	{
 		m_fDistance = XMVectorGetX(XMVector3Length(m_vecRallyPoint[0] - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
 		m_vOriginPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+		m_vOriginPos.y += 3.f;
 	}
 
 	if (FAILED(Add_Components()))
@@ -124,7 +125,7 @@ _int CBrontoBurt::Tick(_float fTimeDelta)
 		}
 		else if (MON_CIRCLE == m_eMonState)
 		{
-			m_fAngle += m_fTimeDelta * 70.f;
+			m_fAngle += m_fTimeDelta * 80.f;
 
 			m_vRotatePos.x = m_vOriginPos.x + (m_fDistance * sin(XMConvertToRadians(m_fAngle)));
 			m_vRotatePos.y = m_vOriginPos.y;
@@ -358,7 +359,7 @@ HRESULT CBrontoBurt::Add_Components()
 	HitBox.pCollisionType = MONSTER;
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
-	Set_BodyCollider(COLLIDER_CYLINDER, 0.5f, 1.f, 0.85f);
+	Set_BodyCollider(COLLIDER_CYLINDER, 1.f, 1.5f, 0.85f);
 
 
 	SetUp_FSM();

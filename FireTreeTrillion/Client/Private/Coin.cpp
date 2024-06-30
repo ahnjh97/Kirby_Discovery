@@ -32,13 +32,19 @@ HRESULT CCoin::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
-	//m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(5.f, 10.f, -175.f, 1.f));
 
-	if (FAILED(Add_Components()))
+	if (FAILED(Add_Components(GameObjectDesc.wstrModelName)))
 		return E_FAIL;
 
 	m_eItemType = ITEM_COIN;
-	m_iItemPoint = 1;
+
+
+	if (GameObjectDesc.wstrModelName == TEXT("Item_Coin"))
+		m_iItemPoint = 1;
+	else if (GameObjectDesc.wstrModelName == TEXT("Item_RedCoin"))
+		m_iItemPoint = 5;
+	else if (GameObjectDesc.wstrModelName == TEXT("Item_BlueCoin"))
+		m_iItemPoint = 10;
 
 	m_vTargetPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 	m_vTargetPos.y += 4.f;
@@ -150,7 +156,7 @@ void CCoin::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pOb
 	}
 }
 
-HRESULT CCoin::Add_Components()
+HRESULT CCoin::Add_Components(wstring strPrototag)
 {
 	HRESULT hr;
 
@@ -158,8 +164,8 @@ HRESULT CCoin::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
-	// 커비의 기본 상태 모델
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Item_Coin"),
+	wstring strModelName = TEXT("Prototype_Component_Model_") + strPrototag;
+	hr = __super::Add_Component(strModelName,
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 

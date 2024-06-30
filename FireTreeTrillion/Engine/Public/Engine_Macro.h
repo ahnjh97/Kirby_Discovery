@@ -63,7 +63,9 @@
 //w가 0인 제로 벡터를 반환한다.
 #define ZeroVecDir					_float4{0.f, 0.f, 0.f, 0.f}
 
-#define GET_POS				m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION)
+#define GET_POS							m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION)
+#define GET_ANOTHER_POS(transformCom)	(transformCom->Get_State_Vector(CTransform::STATE_POSITION))
+
 #define SET_POS(pos)		m_pTransformCom->Set_State(CTransform::STATE_POSITION, pos)
 
 //float ratio를 기준으로, start 값과 dest 값 사이의 보간 값을 제공한다. 

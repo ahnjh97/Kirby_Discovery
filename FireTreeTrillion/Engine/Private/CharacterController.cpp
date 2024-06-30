@@ -133,7 +133,7 @@ _float4 CCharacterController::Get_FootPosition()
 	return _float4{ (_float)vPos.x, (_float)vPos.y, (_float)vPos.z, 1.f };
 }
 
-// 강제로 원하는 위치로 이동시키는 함수
+// 트랜스폼의 변화량을 인자로 넘김
 // 예) 점프같은 내가 이동해야하는 position이 정해져 있을때의 움직임
 void CCharacterController::Move(CTransform* pTransform, _fvector vPosition, _float fTimeDelta)
 {
@@ -143,15 +143,31 @@ void CCharacterController::Move(CTransform* pTransform, _fvector vPosition, _flo
 
 	PxVec3 displacement = CUtils::To_PxVec3(vPosition) - moveVector;
 
-	PxControllerFilters filter;
-	PxControllerCollisionFlags collisionFlags = m_pController->move(displacement, 0.001f, fTimeDelta, m_ControllerFilters);
+	PxControllerCollisionFlags collisionFlags = m_pController->move(displacement, 0.001f, fTimeDelta, PxControllerFilters());
 
 	PxExtendedVec3 pxPos = m_pController->getPosition();
 	PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
 
-	_vector xmPos = XMVectorSet(pos.x, pos.y - m_fHeightOffset, pos.z, 0.f);
+	_vector xmPos = XMVectorSet(pos.x, pos.y - m_fHeightOffset, pos.z, 1.f);
 
-	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
+	pTransform->Set_State(CTransform::STATE_POSITION, xmPos);
+}
+
+void CCharacterController::MoveUpAndDown(CTransform* pTransform, _fvector vPosition, _float fTimeDelta)
+{
+	PxExtendedVec3 pxCurrentPos = m_pController->getPosition();
+	PxVec3 moveVector((_float)pxCurrentPos.x, (_float)pxCurrentPos.y, (_float)pxCurrentPos.z);
+	//// 이동
+
+	PxVec3 displacement = CUtils::To_PxVec3(vPosition) - moveVector;
+
+	PxControllerCollisionFlags collisionFlags = m_pController->move(displacement, 0.001f, fTimeDelta, PxControllerFilters());
+
+	PxExtendedVec3 pxPos = m_pController->getPosition();
+	PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
+
+	_vector xmPos = XMVectorSet(pos.x, pos.y - m_fHeightOffset, pos.z, 1.f);
+	pTransform->Set_State(CTransform::STATE_POSITION, xmPos);
 }
 
 // 현재 위치에서 순수 델타량만큼의 변화량을 더해주며 이동시키는 함수

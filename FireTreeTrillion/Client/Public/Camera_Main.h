@@ -14,6 +14,8 @@ public:
 		SEQ_ZOOMINOUT,
 		SEQ_HARDCUT_TEST,
 		SEQ_SOFTCUT_TEST,
+		SEQ_BREAKCARSHOP,
+		SEQ_BREAKRACINGMAP,
 		SEQ_END
 	};
 
@@ -74,38 +76,59 @@ private:
 	virtual ~CCamera_Main() = default;
 
 
+
+
+
+//카메라 세팅(타겟, 기타 카메라 값) 관련 함수
+public:
+	virtual void Set_Target(CTransform* pTarget, CAMTARGET eTarget, CAMFOCUS eFocus, _float3 vAnchorOffset = _float3{ 0.f, 0.f, 0.f }, _float fInterpolateSpeed = -1.f) override;
+
+	void Set_CamFocus(CAMFOCUS eFocus) { m_eCamFocus = eFocus; }
+
+	//FOV를 세팅한다.
+	void Set_FOVY(_float fFOVYDegree) { m_fDestFovy = XMConvertToRadians(fFOVYDegree); }
+
+	//줌 수치를 설정한다.
+	void Zoom(_float fZoom)	{ m_fCurZoomOffset = fZoom; }
+
+	//카메라에게 특정 동작들을 시퀀스로 선예약한다.
+	void Make_Sequence(CAMSEQ eSeq);
+
+	//카메라 쉐이크 주기
+	void Make_Shake(_float fPower = 1.f, _float fTime = .5f, _float2 vDir = _float2(0.f, -1.f));
+
+	//카메라에게 동작을 수행시킨다.
+	void Make_Sequence_FromAngle(EASING eEaseFlag, _float fDuration, _float3 fDestAngle, _float fDestZoom = -1.f);
+	void Make_Sequence_FromDir(EASING eEaseFlag, _float fDuration, _float3 fDestDir, _float fDestZoom = -1.f);
+	void Make_Sequence_FromQuat(EASING eEaseFlag, _float fDuration, _vector vDestQuat, _float fDestZoom = -1.f);
+
+	//카메라의 이벤트 함수들
+	void Ready_Cam_DeeDeeDee(CGameObject* pNotifier);
+	void Start_ShutterSeq(CGameObject* pNotifier);
+	void Start_BridgeSeq(CGameObject* pNotifier);
+
+	//이벤트를 받기 위해 만든 테스트 함수입니다. 인자는 CGameObject* 로 한정
+	void EventFunc(CGameObject* pObj);
+
+
+
+	virtual void Lock_Position(_float3 vPos = { -1.f, -1.f, -1.f }, _bool bInterpolate = false) override;
+	virtual void Lock_Direction(_float3 vLook = { -1.f, -1.f, -1.f }, _bool bInterpolate = false) override;
+	virtual void Lock_All(_float3 vPos = { -1.f, -1.f, -1.f }, _float3 vLook = { -1.f, -1.f, -1.f }, _bool bInterpolate = false) override;
+
+
+
+	//카메라 목표 수치 계산
+	void Compute_Set_BothFocus(_float fTimeDelta);
+	void Compute_Set_CamLock(_float fTimeDelta);
+	void Compute_Set_Trigger(_int iTriggerIndex);
+
+
 //카메라 트리거 관련 함수
 public:
-	virtual void Set_Target(CTransform* pTarget, CAMFOCUS eFocus = FOCUS_FIRST) override
-	{
-		if (nullptr == pTarget)
-			return;
-
-		if (eFocus == FOCUS_FIRST)
-		{
-			if (nullptr != m_pFirstTarget)
-				Safe_Release(m_pFirstTarget);
-
-			m_pFirstTarget = pTarget;
-			Safe_AddRef(pTarget);
-			m_eCamFocus = eFocus;
-		}
-		else if(eFocus == FOCUS_SECOND)
-		{
-			if (nullptr != m_pSecondTarget)
-				Safe_Release(m_pSecondTarget);
-
-			m_pSecondTarget = pTarget;
-			Safe_AddRef(pTarget);
-			m_eCamFocus = eFocus;
-		}
-	}
-	
-
 	void Set_MatrixIndex(_int iMatrixIndex);
 	void EmplaceBackCamMatrix(const _float4x4& matWorld);
 	void EmplaceBackDirRadius(_int iCamType, _fvector vDir, _float fRadius);
-	void LerpByTriggerInfo(_int iTriggerIndex);
 
 	void EmplaceBackTriggerInfo(const _float4x4& matWorld, _float fScale);
 
@@ -115,27 +138,6 @@ public:
 	void EndLerpByTriggerInfo() { m_bLerpByTriggerInfo = false; };
 
 	_vector SlerpDirVec(_fvector vStart, _fvector vEnd, _float fRatio);
-
-
-
-//카메라 세팅(타겟, 기타 카메라 값) 관련 함수
-public:
-	void Set_CamFocus(CAMFOCUS eFocus) { m_eCamFocus = eFocus; }
-
-	//FOV를 세팅한다.
-	void Set_FOVY(_float fFOVYDegree) { m_fDestFovy = XMConvertToRadians(fFOVYDegree); }
-
-	void Zoom(_float fZoom)	{ m_fCurZoomOffset = fZoom; }
-
-	//카메라에게 특정 동작들을 시퀀스로 선예약한다.
-	//인덱스 대신, enum으로 구별하게 하기
-	void Make_Sequence(CAMSEQ eSeq);
-	void Make_Shake(_float fPower = 1.f, _float fTime = .5f, _float2 vDir = _float2(0.f, -1.f));
-
-	//카메라에게 동작을 수행시킨다.
-	void Make_Sequence_FromAngle(EASING eEaseFlag, _float fDuration, _float3 fDestAngle, _float fDestZoom = -1.f);
-	void Make_Sequence_FromDir(EASING eEaseFlag, _float fDuration, _float3 fDestDir, _float fDestZoom = -1.f);
-	void Make_Sequence_FromQuat(EASING eEaseFlag, _float fDuration, _vector vDestQuat, _float fDestZoom = -1.f);
 
 
 
@@ -149,6 +151,9 @@ public:
 #ifdef _DEBUG
 	virtual void Render_IMGUI() override;
 #endif
+
+
+
 private:
 /*카메라 트리거*/
 	vector<_float4x4>	m_vecCamMatrices;
@@ -237,20 +242,23 @@ private:
 	_int m_iShakeCnt = { 0 };
 	//얼마나 세게 흔들 것인가?
 	_float m_fShakePower = { 0.f };
+
 	//카메라 쉐이크 방향
 	_float2 m_vShakeDir = { 0.f, 0.f };
+	_float2 m_vPreShakeDir = { 0.f, 0.f };
 
 	//카메라 움직임 관련 변수들
-	_float m_fShakeAmplitude = { 5.f };
-	_float m_fShakeFrequency = { 50.f };
-	_float m_fShakeTime = { 0.f };
+	_float m_fShakeAmplitude = { .5f };
+	_float m_fShakeFrequency = { 20.f };
+	_float m_fInitialShakeTime = { 0.f };
+	_float m_fCurShakeTime = { 0.f };
 
 
 /*카메라 시퀀스*/
 
 	//현재 시퀀스 모드
 	CAMSEQ m_eSpecialSeq = { SEQ_END };
-
+	_float m_fStartAudioTime = { 0.f };
 	//시퀀스 웨이팅 목록
 	list<CAMACTION> m_CamSeq;
 
@@ -261,10 +269,15 @@ private:
 	pair<_float, _float> m_fSeqInterpolateTime = { 0.f, 0.f };
 
 private:
+	void Reset_DeferredCamSet();
+
 	void Play_Sequence(_float fTimeDelta);
 	void Control(_float fTimeDelta);
 
-	void UpdatePos_FromAnchor(_float fTimeDelta);
+
+	void Subscribe_Events();
+
+	void Track_Anchor(_float fTimeDelta);
 
 	//포커징 기준점을 업데이트한다.
 	void Update_Anchor(_float fTimeDelta);
@@ -273,9 +286,10 @@ private:
 	void Update_CurCamPos(_float fTimeDelta);
 
 	_float3 Make_ShakeDir(_float fTimeDelta);
-	void MoveTo_CurCamPos(_float fTimeDelta);
+	void MoveTo_CurCamPos_Interpolate(_float fTimeDelta);
+	void MoveTo_CurCamPos_Absolute(_float fTimeDelta);
 
-	void Orbit_Target(_float fTimeDelta);
+	//void Orbit_Target(_float fTimeDelta);
 
 
 public:

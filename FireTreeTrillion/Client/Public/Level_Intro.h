@@ -26,6 +26,7 @@ private:
 	HRESULT Ready_Monsters();
 	HRESULT Ready_Items();
 	HRESULT Ready_Kickables();
+	HRESULT Ready_Objects();
 
 	void	Change_Levels();
 

@@ -192,7 +192,7 @@ _int CBreakableRock::Make_Partical()
 		CUtils::Set_Scaled_Matrix(matrix, fRandomscale, fRandomscale, fRandomscale);
 
 		CBreakableRockParticle::BREAKABLEPARTICALDESC desc = {};
-		desc.matrix = matrix;
+		desc.matWorld = matrix;
 		vDir.y += 0.5f;
 		desc.vMoveDir = (_float3)vDir;
 		desc.fPower = m_fHitPower * 70.f;

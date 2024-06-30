@@ -20,14 +20,8 @@ HRESULT CBreakableRockParticle::Initialize(void* pArg)
 {
 	BREAKABLEPARTICALDESC desc = *(BREAKABLEPARTICALDESC*)pArg;
 
-	GAMEOBJECT_DESC		GameObjectDesc{};
-	GameObjectDesc.fSpeedPerSec = 7.f;
-	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
-
-	if (FAILED(__super::Initialize(&GameObjectDesc)))
+	if (FAILED(__super::Initialize(&desc)))
 		return E_FAIL;
-
-	m_pTransformCom->Set_WorldMatrix(desc.matrix);
 
 	if (FAILED(Add_Components(desc.wstrModelName)))
 		return E_FAIL;

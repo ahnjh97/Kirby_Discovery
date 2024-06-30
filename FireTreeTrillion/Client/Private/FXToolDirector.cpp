@@ -17,6 +17,13 @@
 #define COLOR_PINK				ImVec4(0.8f, 0.18f, 0.37f, 1.0f)
 #define COLOR_LIGHTPINK			ImVec4(1.0f, 0.18f, 0.37f, 1.0f)
 
+static const vector<char*> s_ModelPasses = { "0 | NORMAL_0", "1 | NORMAL_X", "2 | SHADOW", "3 | SKY", "4 | BLOOM", "5 | NONBLUR"
+	,"6 | TRIGGER", "7 | ALPHABLEND", "8 | DEFERREDINFO", "9 | NEARCLIP", "10 | KIRBYPART WHITEFX", "11 | MONSTERPART",
+	"12 | DEFAULTFX", "13 | BLENDFX", "14 | WHITEFX_LINEARDIFFUSE", "15 | WHITEFX_CLAMPDIFFUSE" };
+
+static const vector<char*> s_PosTexPasses = { "0 | DEFAULT", "1 | SOLIDBLEND", "2 | BLENDFX", "3 | BLOOM", "4 | DEFAULTFX",
+	"5 | BLEND_NOZTEST" ,"6 | WHITEFX", "7 | UI_MASK", "8 | UI_MASK2", "9 | SOFTFX", "10 | SOFTALPHAFX" };
+
 CFXToolDirector::CFXToolDirector(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CGameObject{ pDevice, pContext }
 {
@@ -380,13 +387,14 @@ HRESULT CFXToolDirector::Save_MultiEffect(CEffect* pEffect, const wstring& strFi
 //이펙트 싹 로드
 HRESULT CFXToolDirector::Load_AllEffect()
 {
+	for (auto& fxs : m_MultiFXs)
+		Safe_Release(fxs);
+	m_MultiFXs.clear();
+
 	for (auto& fxs : m_FXs)
 		Safe_Release(fxs);
 	m_FXs.clear();
 
-	for (auto& fxs : m_MultiFXs)
-		Safe_Release(fxs);
-	m_MultiFXs.clear();
 
 
 	path FXPath("../Bin/Resources/Effects/Single/");
@@ -797,63 +805,6 @@ void CFXToolDirector::Render_AxisLines()
 
 	std::vector<ImVec2> bottomCircle, topCircle;
 
-
-	/*
-	// 원기둥의 하단과 상단 점 계산
-	for (int j = 0; j <= iSliceCnt; ++j)
-	{
-		float theta = j * 2.0f * DirectX::XM_PI / iSliceCnt;
-		float cosTheta = cosf(theta);
-		float sinTheta = sinf(theta);
-
-		_float3 bottomPoint = vCenter + _float3(fBottomRadius * cosTheta, 0.0f, fBottomRadius * sinTheta);
-		_float3 topPoint = vCenter + _float3(fTopRadius * cosTheta, fHeight, fTopRadius * sinTheta);
-
-		bottomCircle.push_back(TransformToScreen(XMLoadFloat3(&bottomPoint)));
-		topCircle.push_back(TransformToScreen(XMLoadFloat3(&topPoint)));
-	}
-
-	// 원기둥 그리기
-	for (int j = 0; j < iSliceCnt; ++j)
-	{
-		drawList->AddLine(bottomCircle[j], bottomCircle[j + 1], ImColor(color.x, color.y, color.z, color.w));
-		drawList->AddLine(topCircle[j], topCircle[j + 1], ImColor(color.x, color.y, color.z, color.w));
-		drawList->AddLine(bottomCircle[j], topCircle[j], ImColor(color.x, color.y, color.z, color.w));
-	}
-	*/
-
-	/*
-	vector<vector<ImVec2>> spherePoints;
-	// 구의 표면을 이루는 점 계산
-	for (int i = 0; i <= iSliceCnt; ++i)
-	{
-		float phi = DirectX::XM_PI * i / iSliceCnt;
-		std::vector<ImVec2> stackPoints;
-
-		for (int j = 0; j <= iSliceCnt; ++j)
-		{
-			float theta = 2.0f * DirectX::XM_PI * j / iSliceCnt;
-
-			float x = fRadius * sinf(phi) * cosf(theta);
-			float y = fRadius * cosf(phi);
-			float z = fRadius * sinf(phi) * sinf(theta);
-
-			_float3 point = vCenter + _float3(x, y, z);
-			stackPoints.push_back(TransformToScreen(XMLoadFloat3(&point)));
-		}
-		spherePoints.push_back(stackPoints);
-	}
-
-	// 구 그리기
-	for (int i = 0; i < iSliceCnt; ++i)
-	{
-		for (int j = 0; j < iSliceCnt; ++j)
-		{
-			drawList->AddLine(spherePoints[i][j], spherePoints[i][j + 1], ImColor(color.x, color.y, color.z, color.w));
-			drawList->AddLine(spherePoints[i][j], spherePoints[i + 1][j], ImColor(color.x, color.y, color.z, color.w));
-		}
-	}
-	*/
 
 	// Define points in world space
 	XMVECTOR origin = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
@@ -1536,16 +1487,51 @@ void CFXToolDirector::Render_FXProperty()
 		}
 	}
 
-	if (InputInt(u8"렌더 패스", &m_iCurFXPassIdx, 1, pCurFX->m_iMaxPassIdx))
+	if (m_eSelected == SELECTED_SINGLE_FX)
 	{
-		if (m_iCurFXPassIdx < 0)
-			m_iCurFXPassIdx = 0;
+		if (static_cast<CSingleEffect*>(pCurFX)->IsModelBuffer())
+		{
+			if (Combo(u8"렌더 패스", &m_iCurFXPassIdx, s_ModelPasses.data(), (_int)s_ModelPasses.size()))
+			{
+				if (m_iCurFXPassIdx < 0)
+					m_iCurFXPassIdx = 0;
 
-		if (pCurFX->m_iMaxPassIdx < m_iCurFXPassIdx)
-			m_iCurFXPassIdx = pCurFX->m_iMaxPassIdx;
+				if (pCurFX->m_iMaxPassIdx < m_iCurFXPassIdx)
+					m_iCurFXPassIdx = pCurFX->m_iMaxPassIdx;
 
-		pCurFX->m_iPassIdx = m_iCurFXPassIdx;
+				pCurFX->m_iPassIdx = m_iCurFXPassIdx;
+			}
+		}
+		else
+		{
+			if (Combo(u8"렌더 패스", &m_iCurFXPassIdx, s_PosTexPasses.data(), (_int)s_PosTexPasses.size()))
+			{
+				if (m_iCurFXPassIdx < 0)
+					m_iCurFXPassIdx = 0;
+
+				if (pCurFX->m_iMaxPassIdx < m_iCurFXPassIdx)
+					m_iCurFXPassIdx = pCurFX->m_iMaxPassIdx;
+
+				pCurFX->m_iPassIdx = m_iCurFXPassIdx;
+			}
+		}
 	}
+	else
+	{
+		if (InputInt(u8"렌더 패스", &m_iCurFXPassIdx, 1, pCurFX->m_iMaxPassIdx))
+		{
+			if (m_iCurFXPassIdx < 0)
+				m_iCurFXPassIdx = 0;
+
+			if (pCurFX->m_iMaxPassIdx < m_iCurFXPassIdx)
+				m_iCurFXPassIdx = pCurFX->m_iMaxPassIdx;
+
+			pCurFX->m_iPassIdx = m_iCurFXPassIdx;
+		}
+	}
+
+
+
 
 	if (InputInt(u8"디퓨즈 인덱스", &m_iCurFXTexIdx, 1, pCurFX->m_iMaxTexIdx))
 	{
@@ -2047,7 +2033,7 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 		m_FXs[m_iSelectedFXIdx]->m_fDuration.first = m_fCurPlayDuration;
 
 		if (!m_bPlayingBar)
-			m_FXs[m_iSelectedFXIdx]->Tick(_fTimeDelta);
+			m_FXs[m_iSelectedFXIdx]->Late_Tick(_fTimeDelta);
 	}
 
 	//키프레임 팝업 사이즈
@@ -2168,14 +2154,14 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 		if (DragFloat3("Value", m_vKFPopupValue, .01f, vValueRange.x, vValueRange.y, "%.2f"))
 		{
 			m_FXs[m_iSelectedFXIdx]->m_Keyframes[m_eSelectedProperty][m_iSelectedKFIdx].vValue = _float3{ m_vKFPopupValue[0], m_vKFPopupValue[1], m_vKFPopupValue[2] };
-			m_FXs[m_iSelectedFXIdx]->Tick(_fTimeDelta);
+			m_FXs[m_iSelectedFXIdx]->Late_Tick(_fTimeDelta);
 			m_FXs[m_iSelectedFXIdx]->m_fDuration.first = m_fCurPlayDuration;
 
 		}
 		if (Combo(u8"Easing", &m_eKFPopupEasing, m_Easing.data(), (_int)m_Easing.size()))
 		{
 			m_FXs[m_iSelectedFXIdx]->m_Keyframes[m_eSelectedProperty][m_iSelectedKFIdx].eEasing = (EASING)m_eKFPopupEasing;
-			m_FXs[m_iSelectedFXIdx]->Tick(_fTimeDelta);
+			m_FXs[m_iSelectedFXIdx]->Late_Tick(_fTimeDelta);
 			m_FXs[m_iSelectedFXIdx]->m_fDuration.first = m_fCurPlayDuration;
 		}
 
@@ -2256,7 +2242,7 @@ void CFXToolDirector::MakeBar_ParticleFXProperty(_float _fTimeDelta, _float _fWi
 
 	if (SliderFloat("##", &m_fCurPlayDuration, 0.f, m_fTotalPlayDuration, "%.2f"))
 	{
-		m_FXs[m_iSelectedFXIdx]->Tick(_fTimeDelta);
+		m_FXs[m_iSelectedFXIdx]->Late_Tick(_fTimeDelta);
 		m_FXs[m_iSelectedFXIdx]->m_fDuration.first = m_fCurPlayDuration;
 	}
 }
@@ -2272,7 +2258,7 @@ void CFXToolDirector::MakeBar_MultiFXProperty(_float _fTimeDelta, _float _fWidth
 
 	if (SliderFloat("##", &m_fCurPlayDuration, 0.f, m_fTotalPlayDuration, "%.2f"))
 	{
-		m_MultiFXs[m_iSelectedMultiFXIdx]->Tick(_fTimeDelta);
+		m_MultiFXs[m_iSelectedMultiFXIdx]->Late_Tick(_fTimeDelta);
 		m_MultiFXs[m_iSelectedMultiFXIdx]->m_fDuration.first = m_fCurPlayDuration;
 	}
 }

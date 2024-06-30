@@ -30,6 +30,7 @@ HRESULT CCarShopWallFrame::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_bMotionBlur = false;
+	m_bRimLight = false;
 
 	if (Desc->wstrModelName == TEXT("CarShopWallFrame"))
 		m_bHide = true;

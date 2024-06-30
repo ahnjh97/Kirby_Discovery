@@ -97,7 +97,7 @@ public:
 	void Look_At_Axis(_fvector vAxis);
 	void Look_At_Dir(_float4 vDir);
 	void Look_At_ForLandObject(_fvector vPosition);
-	void Look_At_Rotate(_vector vAt, _float fTimeDelta);
+	void Look_At_Rotate(_vector vAt, _float fTimeDelta, _bool bXZ = true);
 	void Look_At_Interpolate(_vector vAt, _float fTimeDelta);
 	void Look_At_Angle(_fvector vAt, _fvector vAxis, _float fRadian);
 	void Move_toTarget(_fvector vTargetPos, _float fTimeDelta, _float fMinDistance = 0.f);	

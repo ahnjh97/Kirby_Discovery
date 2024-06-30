@@ -2,6 +2,7 @@
 #include "KirbyCar_State.h"
 #include "Kirby_State_Function.h"
 #include "ToppleableBridge.h"
+#include "StarBlock.h"
 
 #pragma region 차량 아이들 상태
 
@@ -50,6 +51,7 @@ void CKirbyCar_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	// 차량을 땅에 버리는 로직이다.
 	if (m_pGameInstance->Get_DIKeyState(DIK_V, KEY_PRESS))
 	{
+		DESC(m_bDumpAbilityPress) = true;
 		DESC(m_fDumpAbilityTime) += fTimeDelta;
 
 		if (DESC(m_fDumpAbilityTime) > 1.f)
@@ -57,16 +59,15 @@ void CKirbyCar_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			DESC(m_fDumpAbilityTime) = 0.f;
 			DESC(m_fJumpVelocity) = 15.f;
 			pKirby->Change_State(CKirby::STATE_SPITDEFORM, 60.f, false, false, CKirby::BODY_VACUUM);
+
+			DESC(m_bBooster) = false;
+			pKirby->Delete_Effect("Come On Dash");
 			return;
 		}
 	}
 	else
 	{
-		if (DESC(m_fDumpAbilityTime) > 0.f)
-			DESC(m_fDumpAbilityTime) -= fTimeDelta * 2.f;
-
-		if (DESC(m_fDumpAbilityTime) < 0.f)
-			DESC(m_fDumpAbilityTime) = 0.f;
+		DESC(m_bDumpAbilityPress) = false;
 	}
 
 
@@ -79,12 +80,17 @@ void CKirbyCar_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		return;
 	}
 
-	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN) == DESC(m_bBooster) == false)
+	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN) && DESC(m_bBooster) == false)
 	{
 		CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 		pCamera->Make_Shake();
 		GAMEINSTANCE Setting_RadialBlur(pTransformCom->Get_State(CTransform::STATE_POSITION), 20.f, 40.f);
 		DESC(m_bBooster) = true;
+
+		//부슽 이펙트
+		ComeOn_Dash(pTransformCom);
+		pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+
 		pKirby->Change_State(CKirby::CARSTATE_BOOST, 60.f, true, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 		return;
 	}
@@ -178,12 +184,17 @@ void CKirbyCar_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 			return;
 		}
 
-		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN) == DESC(m_bBooster) == false)
+		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN) && DESC(m_bBooster) == false)
 		{
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 			pCamera->Make_Shake();
 			GAMEINSTANCE Setting_RadialBlur(pTransformCom->Get_State(CTransform::STATE_POSITION), 20.f, 40.f);
 			DESC(m_bBooster) = true;
+
+			//부슽 이펙트
+			ComeOn_Dash(pTransformCom);
+			pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+
 			pKirby->Change_State(CKirby::CARSTATE_BOOST, 60.f, true, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 			return;
 		}
@@ -289,6 +300,7 @@ void CKirbyCar_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		{
 			DESC(m_fBoosterTime) = 0.f;
 			DESC(m_bBooster) = false;
+			pKirby->Delete_Effect("Come On Dash");
 		}
 	}
 	else if (DESC(m_bBooster) == false)
@@ -299,6 +311,11 @@ void CKirbyCar_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			pCamera->Make_Shake();
 			GAMEINSTANCE Setting_RadialBlur(pTransformCom->Get_State(CTransform::STATE_POSITION), 20.f, 40.f);
 			DESC(m_bBooster) = true;
+
+			//부슽 이펙트
+			ComeOn_Dash(pTransformCom);
+			pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+
 			pKirby->Change_State(CKirby::CARSTATE_BOOST, 60.f, true, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 			return;
 		}
@@ -479,8 +496,13 @@ void CKirbyCar_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 		{
 			m_pGameInstance->Set_BlackBackGround(false);
 			m_pGameInstance->Set_SecondTimerRatio(1.f);
-			static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr())->Set_FOVY(30.f);
 
+			CCamera_Main* pCamMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+			if (pCamMain == nullptr)
+				ALARM_FAIL("망했다 카메라 없다");
+
+			pCamMain->Set_FOVY(30.f);
+			pCamMain->Set_Target(pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FIRST, {0.f, 0.f, 2.f}, 5.f);
 			pKirby->Change_State(CKirby::CARSTATE_IDLING, 60.f, true, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 			return;
 		}
@@ -580,7 +602,7 @@ void CKirbyCar_Boost_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		{
 			DESC(m_fBoosterTime) = 0.f;
 			DESC(m_bBooster) = false;
-
+			pKirby->Delete_Effect("Come On Dash");
 			if (JoyStick_On() == false)
 			{
 				pKirby->Change_State(CKirby::CARSTATE_BOOSTEND, 60.f, false, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
@@ -597,11 +619,13 @@ void CKirbyCar_Boost_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 		// 충돌하는지 지속적인 검사.
 		_vector vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+
 		if (pController->Compute_Wall(vLook) < 3.f)
 		{
 			pKirby->Change_State(CKirby::CARSTATE_CRASH, 60.f, false, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 			DESC(m_fBoosterTime) = 0.f;
 			DESC(m_bBooster) = false;
+			pKirby->Delete_Effect("Come On Dash");
 			Kirbydesc->m_fMoveSpeed = 0.f;
 			DESC(m_bCarJump) = true;
 			DESC(m_fJumpVelocity) = 20.f;
@@ -611,10 +635,18 @@ void CKirbyCar_Boost_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 			CGameObject* pObj = pKirby->FindToppleableBridge(pController->Get_MostRecentActor());
 			if (nullptr != pObj) {
-				CToppleableBridge* pToppleableBridge = dynamic_cast<CToppleableBridge*>(pObj);
+				CToppleableBridge* pToppleableBridge = static_cast<CToppleableBridge*>(pObj);
 				pToppleableBridge->OnCollision();
+				return;
 			}
-				
+
+			pObj = pKirby->FindStarBox(pController->Get_MostRecentActor());
+			if (nullptr != pObj) {
+				CStarBlock* pStarBlock = static_cast<CStarBlock*>(pObj);
+				pStarBlock->Break_From_Car();
+				return;
+			}
+
 			return;
 		}
 	}
@@ -662,6 +694,178 @@ CKirbyCar_Boost_State* CKirbyCar_Boost_State::Create()
 }
 
 void CKirbyCar_Boost_State::Free()
+{
+	__super::Free();
+}
+
+#pragma endregion
+
+
+
+#pragma region 차량 컷씬 상태
+
+CKirbyCar_Cut_State::CKirbyCar_Cut_State()
+{
+}
+
+void CKirbyCar_Cut_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+	m_fSpeed = 21.f;
+}
+
+void CKirbyCar_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
+	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
+
+
+	m_fCutAnimTime += fTimeDelta;
+
+	if (m_fCutAnimTime > 0.2f)
+	{
+		m_pGameInstance->Restore_FirstTimer();
+		m_pGameInstance->Restore_SecondTimer();
+
+	}
+
+	if (pKirby->Get_State() == CKirby::CARSTATE_CUT1)
+	{
+		Cut1_EyeState(pGameObject);
+
+		// 42프레임에 떨어짐.
+		// 60프레임 기준 약 0.66초만에 떨어지는 것임.
+		if (m_iTurnCount == 0) 
+		{
+			DESC(m_vTargetDir) = _float4(0.f, 0.f, -1.f, 0.f);
+			Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta, 3.f);
+			pController->Move_Dir(pTransformCom, DESC(m_vMoveDir) * fTimeDelta * 21.f, fTimeDelta);
+			pController->FreeFall(pTransformCom, fTimeDelta, 10.f);
+
+			if (m_fCutAnimTime > 0.5f && pController->Is_Terrain())
+			{
+				m_iTurnCount = 1;
+			}
+		}
+		else if (m_iTurnCount == 1) 
+		{
+
+			DESC(m_vTargetDir) = _float4(-0.5f, 0.f, -0.5f, 0.f);
+			Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta, 3.f);
+			pController->Move_Dir(pTransformCom, DESC(m_vMoveDir) * fTimeDelta * m_fSpeed, fTimeDelta);
+			pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
+
+			m_fSpeed -= fTimeDelta * 13.f;
+			DESC(m_fMoveSpeed) = m_fSpeed;
+
+			if (m_fCutAnimTime > 1.2f)
+			{
+				m_iTurnCount = 2;
+			}
+		}
+		else if (m_iTurnCount == 2) {
+			DESC(m_vTargetDir) = _float4(1.f, 0.f, 0.f, 0.f);
+			Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta, 3.f);
+			pController->Move_Dir(pTransformCom, DESC(m_vMoveDir) * fTimeDelta * m_fSpeed, fTimeDelta);
+			pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
+
+			m_fSpeed -= fTimeDelta * 13.f;
+			if (m_fSpeed < 0.f)
+				m_fSpeed = 0.f;
+			DESC(m_fMoveSpeed) = m_fSpeed;
+
+
+			if (pKirby->isAnimFinish())
+			{
+				DESC(m_fMoveSpeed) = 0.f;
+				DESC(m_eEyeState) = CKirby::EYE_IDLE;
+				pKirby->Change_State(CKirby::CARSTATE_IDLING, 60.f, true, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
+				return;
+			}
+		}
+	}
+
+	else if (pKirby->Get_State() == CKirby::CARSTATE_CUT2)
+	{
+		Cut2_EyeState(pGameObject);
+
+		DESC(m_vTargetDir) = _float4(0.f, 0.f, 1.f, 0.f);
+		Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta, 3.f);
+	}
+}
+
+void CKirbyCar_Cut_State::OnStateExit()
+{
+	m_iTurnCount = 0;
+	m_fCutAnimTime = 0.f;
+	m_fSpeed = 21.f;
+}
+
+void CKirbyCar_Cut_State::Cut1_EyeState(CGameObject* pGameObject)
+{
+	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+
+	_float fKeyFrame = pKirby->Get_AnimTrackPosition();
+
+	if (fKeyFrame < 170.f)
+		DESC(m_eEyeState) = CKirby::EYE_ANGER;
+	else if (fKeyFrame >= 170.f && fKeyFrame < 176.f)
+		DESC(m_eEyeState) = CKirby::EYE_BLINK;
+	else if (fKeyFrame >= 176.f)
+		DESC(m_eEyeState) = CKirby::EYE_IDLE;
+}
+
+void CKirbyCar_Cut_State::Cut2_EyeState(CGameObject* pGameObject)
+{
+	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+
+	_float fKeyFrame = pKirby->Get_AnimTrackPosition();
+
+	if (fKeyFrame < 48.f)
+		DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+	else if (fKeyFrame >= 48.f && fKeyFrame < 350.f)
+		DESC(m_eEyeState) = CKirby::EYE_IDLE;
+	else if (fKeyFrame >= 350.f && fKeyFrame < 377.f)
+		DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+	else if (fKeyFrame >= 377.f && fKeyFrame < 426.f)
+		DESC(m_eEyeState) = CKirby::EYE_IDLE;
+	else if (fKeyFrame >= 426.f && fKeyFrame < 435.f)
+		DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+	else if (fKeyFrame >= 435.f && fKeyFrame < 450.f)
+		DESC(m_eEyeState) = CKirby::EYE_IDLE;
+	else if (fKeyFrame >= 450.f && fKeyFrame < 455.f)
+		DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+	else if (fKeyFrame >= 455.f && fKeyFrame < 570.f)
+		DESC(m_eEyeState) = CKirby::EYE_IDLE;
+	else if (fKeyFrame >= 570.f && fKeyFrame < 575.f)
+		DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+	else if (fKeyFrame >= 575.f && fKeyFrame < 903.f)
+		DESC(m_eEyeState) = CKirby::EYE_IDLE;
+	else if (fKeyFrame >= 903.f && fKeyFrame < 910.f)
+		DESC(m_eEyeState) = CKirby::EYE_BLINK;
+	else if (fKeyFrame >= 910.f && fKeyFrame < 974.f)
+		DESC(m_eEyeState) = CKirby::EYE_IDLE;
+	else if (fKeyFrame >= 974.f && fKeyFrame < 1120.f)
+		DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+	else if (fKeyFrame >= 1120.f && fKeyFrame < 1210.f)
+		DESC(m_eEyeState) = CKirby::EYE_IDLE;
+	else if (fKeyFrame >= 1210.f)
+		DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+
+}
+
+CKirbyCar_Cut_State* CKirbyCar_Cut_State::Create()
+{
+	CKirbyCar_Cut_State* pInstance = new CKirbyCar_Cut_State();
+	return pInstance;
+}
+
+void CKirbyCar_Cut_State::Free()
 {
 	__super::Free();
 }

@@ -64,7 +64,7 @@ HRESULT CTestTerrain::Render()
             return E_FAIL;
         if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
             return E_FAIL;
-        if (FAILED(m_pShaderCom->Begin(0)))
+        if (FAILED(m_pShaderCom->Begin(MODEL_NORMAL_O)))
             return E_FAIL;
         m_pModelCom->Render(i);
     }

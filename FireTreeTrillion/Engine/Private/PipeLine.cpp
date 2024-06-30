@@ -53,7 +53,7 @@ void CPipeLine::Bind_Pipeline()
 
 	m_vCamPosition = Pos(m_TransformInverseMatrices->Translation());
 	//m_vCamLook = CUtils::Get_State_Vector_Matrix(m_TransformInverseMatrices[D3DTS_VIEW], CUtils::STATE_LOOK);
-	m_vCamLook = static_cast<_float4>(m_TransformInverseMatrices[D3DTS_VIEW].Backward());
+	m_vCamLook = CUtils::Get_State_Vector_Matrix(m_TransformInverseMatrices[D3DTS_VIEW], CUtils::STATE_LOOK);
 }
 
 HRESULT CPipeLine::Initialize()

@@ -49,7 +49,7 @@ static const _char* s_ModelPassIndices[] = { "0. NORMAL_0", "1. NORMAL_X", "2. S
 	,"6. TRIGGER", "7.DEFAULTFX", "8. BLENDFX", "9. DEFERREDINFO", "10. WHITEFX", "11. KIRBYPART", "12. NEARCLIP",
 	/*"12. NORMAL_O AND NONCULL", */"13. BLEND O, NORMAL O", "14. MONSTERPARTOBJECT" };
 
-static const _char* s_PosTexPassIndices[] = { "0. DEFAULT", "1. ALPHABLEND", "2. BLENDFX", "3. BLOOM", "4. DEFAULTFX", "5. BLEND_NOZTEXT"
+static const _char* s_PosTexPasses[] = { "0. DEFAULT", "1. ALPHABLEND", "2. BLENDFX", "3. BLOOM", "4. DEFAULTFX", "5. BLEND_NOZTEXT"
 	,"6. WHITEFX", "7. UI_MASK", "8. UI_MASK2", "9. SOFTFX", "10. SOFTALPHAFX"};
 static _int s_iPassIndex = -1;
 static _char s_ObjectsFilter[MAX_PATH] = "";
@@ -110,7 +110,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	m_setMapNames.insert(m_vecMapModelNames.begin(), m_vecMapModelNames.end());
 
 	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy", "Fog", "Ladder", "NonAnim_KirbyPartTimer" };
-	m_setRallyingMonsters = { "NonAnim_Kabu", "NonAnim_BrontoBurt" };
+	m_setRallyingMonsters = { "NonAnim_Kabu", "NonAnim_BrontoBurt", "NonAnim_FinalBoss" };
 
 	/*m_setNonColDecos = { "BushMCut" };*/
 	m_setAnimDecos = { "BushL", "BushM", "BushS", "PopFlower" };
@@ -137,8 +137,21 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 
 #pragma region LEVEL_RACING OBJECT
-		, "GsRubbleAsphalt01L", "GsRubbleAsphalt02L", "GsRubbleAsphalt03L", "GsRubbleAsphalt04L", "GsRubbleAsphalt05L"
-		, "GsRubbleAsphalt06L", "GsRubbleAsphalt07L", "GsRubbleAsphalt08L", "GsRubbleAsphalt09L"
+		, "CMBuildingFenceA01","CMBuildingFenceA02", "CmFillerObjectD", "CmFillerObjectG", "CmFillerObjectH"
+		, "CmFillerObjectH02", "CmFillerObjectI"
+
+		, "CvBarricadeA", "CvGasCylinderAL", "CvGasCylinderBL"
+		, "CvGasCylinderCL", "CvGasCylinderDL", "CvGasCylinderEL", "CvGasCylinderHoseA", "CvGasCylinderHoseD"
+
+		, "GsCarBaseAL", "GsCarCounterAL", "GsCarDirtyRack01L", "GsCarHoistCrane01L", "GsCarMachineAL"
+		, "GsCarStop"
+		, "GsRubbleAsphalt01L", "GsRubbleAsphalt02L", "GsRubbleAsphalt03L", "GsRubbleAsphalt04L"
+		, "GsRubbleAsphalt05L", "GsRubbleAsphalt06L", "GsRubbleAsphalt07L", "GsRubbleAsphalt08L"
+		, "GsRubbleAsphalt09L", "GsScrappedCar"
+
+		, "FarBuildingABL", "FarBuildingAM1L", "FarBuildingAM6L", "FarBuildingC01", "FarBuildingC02"
+
+		, "MlFlowerPot01L"
 #pragma endregion
 
 
@@ -155,7 +168,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "LbBossRoom", "LbLastBossStage", "LbLastBuilding", "Land_LbLastBossBeforeStep"
 
 		//LbLastBuilding Object :: 보스전 필드의 오브젝트
-		,"LbLastOutFrame2", "LbLastStairs"//, "LbLastTank", "LbLastOutFrame1", 준수 오더로 삭제
+		,"LbLastStairs"//, "LbLastTank", "LbLastOutFrame1", "LbLastOutFrame2", :: 준수 오더로 삭제. 이제 Anim으로 대체되어 사용안함
 		,"LbBossRoomDoorAL","LbBossRoomDoorBL", "LbOutBuildingWallL"
 
 		//LbLastBossBeforeStep Object :: Rubble 
@@ -170,11 +183,12 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	};
 	
 	m_setKickables = { "GsPebble", "SeShell", "WasteCanYellow" };
-	m_setItemTxts = { "Item_Coin", "Item_EnergyDrink" };
+	m_setItemTxts = { "Item_BlueCoin", "Item_Bread", "Item_Cake", "Item_Cocktail", "Item_Coin", "Item_EnergyDrink", "Item_Makaron",
+		"Item_Meat", "Item_Omelet", "Item_Onigiri", "Item_RedCoin", "Item_Steak", "Item_Sushi" };
 	m_setTrees = { "GsTreeA", "GsTreeB", "GsTreeC" };
 
-	//투명도 적용이 필요한 데코오브젝트
-	m_setBlendDecos = {"LbOutBuildingWallL", "LbOutBuildingFenceL"};
+	//블렌드 적용이 필요한 데코오브젝트
+	m_setBlendDecos = {"LbOutBuildingWallL", "LbOutBuildingFenceL", "GsCarFloor" };
 
 	s_vecPassIndices.resize(m_vecMapModelNames.size());
 	s_vecSamplingFactors.resize(m_vecMapModelNames.size());
@@ -857,6 +871,8 @@ void CMapToolHelper::Edit_Object()
 	if (nullptr == pTransform)
 		return;
 
+	Safe_AddRef(pTransform);
+
 	ImGui::Begin(m_strCurModel.c_str());
 
 	_uint iShaderVars = m_pPickedObject->Get_ShaderVars();
@@ -894,7 +910,7 @@ void CMapToolHelper::Edit_Object()
 	{
 		/*ImGui::SetNextItemWidth(150);
 		GetPassIndex();
-		if (ImGui::Combo("##PosTexPassIndex", &s_iPassIndex, s_PosTexPassIndices, IM_ARRAYSIZE(s_PosTexPassIndices)))
+		if (ImGui::Combo("##PosTexPassIndex", &s_iPassIndex, s_PosTexPasses, IM_ARRAYSIZE(s_PosTexPasses)))
 			SetPassIndex(s_iPassIndex);*/
 		
 	}
@@ -912,6 +928,9 @@ void CMapToolHelper::Edit_Object()
 	_float4x4 tempMatrix = pTransform->Get_WorldFloat4x4();
 	m_pGameInstance->EditTransform(tempMatrix); // 선택한 모델의 월드행렬을 수정 
 	pTransform->Set_WorldMatrix(tempMatrix);
+
+	Safe_Release(pTransform);
+
 	ImGui::End();
 }
 
@@ -925,6 +944,7 @@ void CMapToolHelper::OnLeftClick()
 		return;
 
 	Safe_Release(m_pPickedObject);
+	m_pPickedObject = nullptr;
 	m_pPickedObject = pPickedObject;
 	Safe_AddRef(m_pPickedObject);
 
@@ -990,7 +1010,7 @@ void CMapToolHelper::OnRightClick()
 
 		if (Compute_MapIndex(m_strSelectedTxt) == -1) // 맵이 아닐때
 		{
-			if (tMapToolDesc.wstrModelName == TEXT("BG1")) {
+			if (true == IsMap(m_strSelectedTxt)) { // BG0, BG1 
 				if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"),
 					TEXT("Prototype_GameObject_BG"), &tMapToolDesc)))
 					return;
@@ -1015,6 +1035,7 @@ void CMapToolHelper::OnRightClick()
 
 		list<CGameObject*>* pObjList = m_pGameInstance->Get_List(LEVEL_TOOL_MAP, TEXT("Layer_Parse"));
 		Safe_Release(m_pPickedObject);
+		m_pPickedObject = nullptr;
 		m_pPickedObject = pObjList->back();
 		Safe_AddRef(m_pPickedObject);
 		m_strCurModel = m_strSelectedTxt;
@@ -1997,7 +2018,7 @@ _bool CMapToolHelper::Save_Decos(const string& _strLevel, vector<CGameObject*>& 
 		_float fRimWidth = obj->Get_RimWidth();
 		_uint iPassIndex = static_cast<_uint>(pMapToolObj->Get_PassIndex());
 		if (true == IsTree(strModelName))
-			iPassIndex = 12;
+			iPassIndex = MODEL_NEARCLIP;
 		else
 			iPassIndex = 0;
 
@@ -2212,6 +2233,8 @@ void CMapToolHelper::Load_Triggers(const string& _strLevel)
 		strModelName.resize(iStrLength);
 		fileInput.read(&strModelName[0], iStrLength);
 		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
+		//matWorld._41 = matWorld._41 - 200.f;
+		//matWorld._43 = matWorld._43 + 1200.f;
 		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
 		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
 
@@ -2284,6 +2307,7 @@ void CMapToolHelper::Load_Monsters(const string& _strLevel)
 		for (_uint iRallyPointIdx = 0; iRallyPointIdx < iNumRallyPoints; iRallyPointIdx++)
 		{
 			fileInput.read(reinterpret_cast<char*>(&vRallyPointPos), sizeof(vRallyPointPos));
+
 			CMapToolObject::MAPTOOLOBJECT_DESC tRallyPointDesc{};
 			tRallyPointDesc.wstrModelName = TEXT("RallyPoint");
 			tRallyPointDesc.matWorld._41 = vRallyPointPos.x;

@@ -176,11 +176,9 @@ void CBladeKnight::Add_AnimEvent()
 {
 	__super::Add_AnimEvent();
 
-	// 1. 한 애니메이션에서 같은 이름의 이벤트 가능
-	// 2. 재생 기준은 애님툴에서 지정한 애니메이션인지 + 시작 프레임이 애니메이션 프레임안에 들어가는 지
-	// 3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
-	m_pModelCom->Add_Event("ApplyDamage", [this]() {
-
+	m_pModelCom->Add_Event("Attack", [this]() {
+		// 커비의 히트박스를 실시간으로 변화시킨다.
+		HitBoxChanger(m_pFSM->Get_State());
 		});
 }
 
@@ -235,7 +233,9 @@ HRESULT CBladeKnight::Add_Components()
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
-	desc.fOffset = 1.f;
+	desc.fOffset = 0.8f;
+	desc.tCapsuleShape.fHeight = 0.4f;
+	desc.tCapsuleShape.fHeight = 0.4f;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	CHECK_FAILED(hr);
@@ -253,8 +253,12 @@ HRESULT CBladeKnight::Add_Components()
 	HitBox.pCollisionType = MONSTER;
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
-	Set_BodyCollider(COLLIDER_CYLINDER, 0.5f, 1.f, 0.85f);
+	Set_BodyCollider(COLLIDER_CYLINDER, 1.f, 1.5f, 0.85f);
 
+	HitBox.pDesc = &m_tColliderDesc[ATTACK];
+	HitBox.pCollisionType = HITBOX_MONSTER;
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -336,6 +340,24 @@ void CBladeKnight::SetUp_FSM()
 	FSM_Desc.iState = BLADEKNIGHT_WAIT;
 	FSM_Desc.pModel = &m_pModelCom;
 	m_pFSM->Initialize(&FSM_Desc);
+}
+
+void CBladeKnight::HitBoxChanger(_uint eState)
+{
+	switch (eState)
+	{
+	case BLADEKNIGHT_ATTACK:
+		Activate_FrustumCollider(0.5f, 4.f, 180.f);
+		break;
+	case BLADEKNIGHT_DOUBLEATTACK:
+		Activate_FrustumCollider(0.5f, 4.f, 180.f);
+		break;
+	case BLADEKNIGHT_TORNADOATTACK:
+		Activate_SphereCollider(0.5f, 3.5f);
+		break;
+	default:
+		break;
+	}
 }
 
 CBladeKnight* CBladeKnight::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

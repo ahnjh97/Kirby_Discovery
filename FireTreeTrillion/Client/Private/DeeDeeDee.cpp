@@ -7,6 +7,7 @@
 #include "Bone.h"
 #include "DeeDeeDeeHammer.h"
 #include "Camera_Main.h"
+#include "EventCenter.h"
 
 #define INFO(Dst) m_tInfo.Dst
 
@@ -38,7 +39,7 @@ HRESULT CDeeDeeDee::Initialize(void* pArg)
 	m_tInfo.m_vOriginPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
 	m_fMaxHp = 200.f;
-	m_fHp = 200.f;
+	m_fHp = 10.f;
 	m_fAttack = 15.f;
 	m_eVacuumSize = SIZE_BIG;
 	m_eAbilityType = ABILITY_DEFAULT;
@@ -58,8 +59,8 @@ HRESULT CDeeDeeDee::Initialize(void* pArg)
 	_float4 vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 	m_vNeckLook = m_vLEyeLook = m_vREyeLook = m_tInfo.m_vMoveDir = m_tInfo.m_vTargetDir = vLook;
 
-	
-	if (*m_pCurrentLevelID != LEVEL_TOWN) Make_TargetToCams();
+
+	//if (*m_pCurrentLevelID != LEVEL_TOWN) Make_TargetToCams();
 
 	return S_OK;
 }
@@ -536,8 +537,8 @@ HRESULT CDeeDeeDee::Make_TargetToCams()
 
 	CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
 	CHECK_NULLPTR(pCameraMain);
-	pCameraMain->Set_Target(m_pTransformCom, CCamera::FOCUS_SECOND);
-	pCameraMain->Set_CamFocus(CCamera::FOCUS_BOTH);
+
+	pCameraMain->Set_Target(m_pTransformCom, CCamera::TARGET_SECOND, CCamera::FOCUS_BOTH);
 
 	return S_OK;
 }
@@ -565,10 +566,12 @@ void CDeeDeeDee::DeeDeeDee_SystemTick(_float fTimeDelta)
 					return;
 				Change_State(STATE_COMMAND, 60.f, false, true);
 				m_bInitializeAnim = false;
+
+				//전투 시작 이벤트 호출
+				CEventCenter::Get_Instance()->Notify(KEVENT_DDD_BATTLESTART, this);
 			}
 		}
 	}
-
 
 
 	// 맨 처음 발동하는 애니메이션이 끝나고, 진정한 패턴들이 시작된다.

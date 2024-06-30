@@ -20,6 +20,8 @@ public:
 	_float3* Get_TangentsPtr() { return m_pTangents; }
 	PxRigidActor* Get_Actor() { return m_pActor; }
 
+	void Set_MaterialIndex(_uint iMaterialIndex) { m_iMaterialIndex = iMaterialIndex; }
+
 public:
 	virtual HRESULT Initialize_Prototype(TYPE eModelType, string strDirectory, const vector<CBone*>& Bones
 		, _fmatrix TransformMatrix, _bool bOctree);

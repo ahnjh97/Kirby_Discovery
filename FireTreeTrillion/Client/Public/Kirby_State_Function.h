@@ -1050,6 +1050,8 @@ static void Kirby_AbilityType_Assist(CKirby* pKirby, CKirby::STATE eState)
 	{
 		if (pKirby->Get_AbilityType() == ABILITY_SWORD)
 			pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		else if (pKirby->Get_AbilityType() == ABILITY_HAMMER)
+			pKirby->Change_State(CKirby::HAMMERSTATE_IDLE, 60.f, true, true, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
 		else
 			pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
 	}
@@ -1057,6 +1059,8 @@ static void Kirby_AbilityType_Assist(CKirby* pKirby, CKirby::STATE eState)
 	{
 		if (pKirby->Get_AbilityType() == ABILITY_SWORD)
 			pKirby->Change_State(CKirby::SWORDSTATE_RUN, 120.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+		else if (pKirby->Get_AbilityType() == ABILITY_HAMMER)
+			pKirby->Change_State(CKirby::HAMMERSTATE_RUN, 120.f, true, true, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
 		else
 			pKirby->Change_State(CKirby::STATE_RUNSTART, 120.f, true, true, CKirby::BODY_DEFAULT);
 	}
@@ -1081,6 +1085,46 @@ static void Kirby_AbilityType_Assist(CKirby* pKirby, CKirby::STATE eState)
 		else
 			pKirby->Change_State(CKirby::STATE_FLIGHT, 60.f, false, false, CKirby::BODY_BALLOON);
 	}
+	else if (eState == CKirby::STATE_JUMPEND)
+	{
+		if (pKirby->Get_AbilityType() == ABILITY_HAMMER)
+			pKirby->Change_State(CKirby::HAMMERSTATE_JUMPEND, 60.f, false, true, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+		else
+			pKirby->Change_State(CKirby::STATE_JUMPEND, 60.f, false, true, CKirby::BODY_DEFAULT);
+	}
+	else if (eState == CKirby::STATE_JUMPL)
+	{
+		if (pKirby->Get_AbilityType() == ABILITY_HAMMER)
+			pKirby->Change_State(CKirby::HAMMERSTATE_JUMPL, 50.f, false, true, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+		else
+			pKirby->Change_State(CKirby::STATE_JUMPL, 50.f, false, true, CKirby::BODY_DEFAULT);
+
+	}
+	else if (eState == CKirby::STATE_JUMPR)
+	{
+		if (pKirby->Get_AbilityType() == ABILITY_HAMMER)
+			pKirby->Change_State(CKirby::HAMMERSTATE_JUMPR, 50.f, false, true, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+		else
+			pKirby->Change_State(CKirby::STATE_JUMPR, 50.f, false, true, CKirby::BODY_BALLOON);
+
+	}
+	else if (eState == CKirby::STATE_LANDINGEND)
+	{
+		if (pKirby->Get_AbilityType() == ABILITY_HAMMER)
+			pKirby->Change_State(CKirby::HAMMERSTATE_LANDINGEND, 30.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+		else
+			pKirby->Change_State(CKirby::STATE_LANDINGEND, 30.f, false, false, CKirby::BODY_DEFAULT);
+
+	}
+	else if (eState == CKirby::STATE_LANDINGSMALL)
+	{
+		if (pKirby->Get_AbilityType() == ABILITY_HAMMER)
+			pKirby->Change_State(CKirby::HAMMERSTATE_LANDINGSMALL, 50.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+		else
+			pKirby->Change_State(CKirby::STATE_LANDINGSMALL, 50.f, false, false, CKirby::BODY_DEFAULT);
+
+	}
+
 
 }
 
@@ -1143,6 +1187,26 @@ static void Throw_Bomb(CKirby::KIRBY_INFODESC* Kirbydesc, _float4 vDir, _float f
 
 
 #pragma region Hyo Effect
+
+static void BombSmoke(CTransform* pTransformCom, _float3 vPos, _float3 vScale)
+{
+	CEffect::FX_DESC FXDesc{};
+	FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+	FXDesc.vInitPos = { 0.f, 1.4f, -1.0f };
+	FXDesc.vInitScale = { 8.f, 8.f, 8.f };
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Come On Dash"), &FXDesc)))
+		return;
+}
+
+static void ComeOn_Dash(CTransform* pTransformCom)
+{
+	CEffect::FX_DESC FXDesc{};
+	FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+	FXDesc.vInitPos = { 0.f, 1.4f, -1.0f };
+	FXDesc.vInitScale = { 8.f, 8.f, 8.f };
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Come On Dash"), &FXDesc)))
+		return;
+}
 
 static void LadderStart_FX(CTransform* pTransformCom)
 {
@@ -1283,7 +1347,6 @@ static void SwordDash(CTransform* pTransformCom)
 		return;
 
 }
-
 
 static void SwordSpinCharge(CTransform* pTransformCom)
 {

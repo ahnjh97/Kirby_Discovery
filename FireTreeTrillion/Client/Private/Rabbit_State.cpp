@@ -52,7 +52,7 @@ void CRabbit_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 			if (15.f > fDistance)
 			{
 				// 플레이어를 향해 회전
-				pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 2.f);
+				pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 4.f);
 
 				if (true == pRabbit->IsAnimFinished())
 				{
@@ -115,7 +115,7 @@ void CRabbit_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	else if (CRabbit::RS_NONTARGET == pRabbit->Get_RabbitState())
 	{
 		// 플레이어를 향해 회전
-		pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 2.f);
+		pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 4.f);
 
 		if (true == pRabbit->IsAnimFinished())
 		{
@@ -191,7 +191,7 @@ void CRabbit_Find_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
 
 	// 플레이어를 향해 바라본다
-	pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 2.f);
+	pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 4.f);
 
 	if (true == pRabbit->IsAnimFinished())
 	{

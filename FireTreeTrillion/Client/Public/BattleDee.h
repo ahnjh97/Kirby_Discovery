@@ -17,10 +17,17 @@ private:
 	CBattleDee(const CBattleDee& rhs);
 	virtual ~CBattleDee() = default;
 
+public:
+	static vector<_float3> m_RespawnPoints;
+
+
 	//목적지의 위치를 가져온다
 	virtual _float3					Make_DestPos() override;
 	//다음 상태를 뭘로 할 지 정의한다
 	virtual pair<DEE_ANIM, _bool>	Make_WhatToDo() override;
+
+
+	void			Start_Battle(CGameObject* pNotifier) { m_bStartBattle = true; }
 
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
@@ -39,6 +46,13 @@ private:
 
 private:
 	DEE_ANIM		m_eMyState = { DEEANIM_END };
+
+	_float			m_fMoveCheckTimePerSec = { 0.f };
+	_float			m_fNonMoveTime = { 0.f };
+	_float			m_fMovedDistance = { 0.f };
+
+	_bool			m_bStartBattle = { false };
+	_bool			m_bTrackKirby = { false };
 
 	HRESULT Add_Components();
 	HRESULT Add_PartObjects();

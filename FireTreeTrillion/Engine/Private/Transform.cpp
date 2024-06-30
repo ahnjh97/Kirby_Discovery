@@ -165,14 +165,17 @@ void CTransform::Look_At_ForLandObject(_fvector vAt)
 	Set_State(STATE_LOOK, XMVector3Normalize(vLook) * vScaled.z);
 }
 
-void CTransform::Look_At_Rotate(_vector vAt, _float fTimeDelta)
+void CTransform::Look_At_Rotate(_vector vAt, _float fTimeDelta, _bool bXZ)
 {
 	_vector vLook = Get_State_Vector(CTransform::STATE_LOOK);
-	vLook.m128_f32[1] = 0.f;
 	_vector vTargetLook = vAt - Get_State_Vector(CTransform::STATE_POSITION);
-	vTargetLook.m128_f32[1] = 0.f;
+	if(true == bXZ)
+	{
+		vLook.m128_f32[1] = 0.f;
+		vTargetLook.m128_f32[1] = 0.f;
+	}
 
-	_vector vLerpLook = XMVectorLerp(vLook, vTargetLook, m_fRotationPerSec * fTimeDelta);
+	_vector vLerpLook = XMVectorLerp(XMVector3Normalize(vLook), XMVector3Normalize(vTargetLook), m_fRotationPerSec * fTimeDelta);
 
 	_vector vLerpRight = XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 0.f), vLerpLook);
 	_vector vLerpUp = XMVector3Cross(vLerpLook, vLerpRight);
