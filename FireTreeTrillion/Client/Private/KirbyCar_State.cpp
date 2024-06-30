@@ -51,6 +51,7 @@ void CKirbyCar_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	// 차량을 땅에 버리는 로직이다.
 	if (m_pGameInstance->Get_DIKeyState(DIK_V, KEY_PRESS))
 	{
+		DESC(m_bDumpAbilityPress) = true;
 		DESC(m_fDumpAbilityTime) += fTimeDelta;
 
 		if (DESC(m_fDumpAbilityTime) > 1.f)
@@ -66,11 +67,7 @@ void CKirbyCar_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	}
 	else
 	{
-		if (DESC(m_fDumpAbilityTime) > 0.f)
-			DESC(m_fDumpAbilityTime) -= fTimeDelta * 2.f;
-
-		if (DESC(m_fDumpAbilityTime) < 0.f)
-			DESC(m_fDumpAbilityTime) = 0.f;
+		DESC(m_bDumpAbilityPress) = false;
 	}
 
 

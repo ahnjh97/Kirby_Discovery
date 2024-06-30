@@ -64,7 +64,7 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// 디버깅 용
-	//m_eAbilityType = ABILITY_HAMMER;
+	m_eAbilityType = ABILITY_HAMMER;
 
 	m_pControllerCom->RegisterAsPlayer();
 	Set_WeaponAnim(3);
@@ -1205,8 +1205,29 @@ void CKirby::SetUp_FSM()
 #pragma endregion
 
 #pragma region 해머 애니메이션
+	m_pFSM->Add_State(HAMMERSTATE_IDLE, CKirbyHammer_Idle_State::Create()); //
+	m_pFSM->Add_State(HAMMERSTATE_RUN, CKirbyHammer_Idle_State::Create()); //
+
+	m_pFSM->Add_State(HAMMERSTATE_JUMPL, CKirbyHammer_Jump_State::Create()); //
+	m_pFSM->Add_State(HAMMERSTATE_JUMPR, CKirbyHammer_Jump_State::Create()); //
+	m_pFSM->Add_State(HAMMERSTATE_JUMPEND, CKirbyHammer_Jump_State::Create()); //
+	m_pFSM->Add_State(HAMMERSTATE_LANDINGEND, CKirbyHammer_Jump_State::Create()); //
+	m_pFSM->Add_State(HAMMERSTATE_LANDINGSMALL, CKirbyHammer_Jump_State::Create()); //
+
+
+	m_pFSM->Add_State(HAMMERSTATE_HAMMERATTACKSTARTTOY, CKirbyHammer_Attack_State::Create()); //
+	m_pFSM->Add_State(HAMMERSTATE_HAMMERATTACKTOY, CKirbyHammer_Attack_State::Create()); //
+	m_pFSM->Add_State(HAMMERSTATE_HAMMERATTACKHITTOY, CKirbyHammer_Attack_State::Create()); //
 	m_pFSM->Add_State(HAMMERSTATE_HAMMERATTACKFINALTOY, CKirbyHammer_Attack_State::Create()); //
 
+	m_pFSM->Add_State(HAMMERSTATE_ONIGOROSIHAMMERSTART, CKirbyHammer_Onigorosi_State::Create()); //
+	m_pFSM->Add_State(HAMMERSTATE_ONIGOROSIHAMMERCHARGE, CKirbyHammer_Onigorosi_State::Create()); //
+	m_pFSM->Add_State(HAMMERSTATE_ONIGOROSIHAMMERMOVE, CKirbyHammer_Onigorosi_State::Create()); //
+	m_pFSM->Add_State(HAMMERSTATE_ONIGOROSIHAMMERFIRST, CKirbyHammer_Onigorosi_State::Create()); //
+	m_pFSM->Add_State(HAMMERSTATE_ONIGOROSIHAMMEREND, CKirbyHammer_Onigorosi_State::Create()); //
+
+	m_pFSM->Add_State(HAMMERSTATE_WHEELHAMMER, CKirbyHammer_JumpAttack_State::Create()); //
+	m_pFSM->Add_State(HAMMERSTATE_WHEELHAMMEREND, CKirbyHammer_JumpAttack_State::Create()); //
 #pragma endregion
 
 
@@ -1534,6 +1555,16 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 		m_bMotionBlur = false;
 	else
 		m_bMotionBlur = true;
+
+
+	if (INFO(m_bDumpAbilityPress) == false)
+	{
+		if (INFO(m_fDumpAbilityTime) > 0.f)
+			INFO(m_fDumpAbilityTime) -= fTimeDelta * 2.f;
+
+		if (INFO(m_fDumpAbilityTime) < 0.f)
+			INFO(m_fDumpAbilityTime) = 0.f;
+	}
 }
 
 HRESULT CKirby::Kirby_SystemInitialize()
