@@ -64,7 +64,7 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// µð¹ö±ë ¿ë
-	m_eAbilityType = ABILITY_HAMMER;
+	//m_eAbilityType = ABILITY_HAMMER;
 
 	m_pControllerCom->RegisterAsPlayer();
 	Set_WeaponAnim(3);
