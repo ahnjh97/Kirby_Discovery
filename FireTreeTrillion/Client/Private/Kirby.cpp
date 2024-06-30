@@ -64,7 +64,7 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// µð¹ö±ë ¿ë
-	//m_eAbilityType = ABILITY_HAMMER;
+	m_eAbilityType = ABILITY_HAMMER;
 
 	m_pControllerCom->RegisterAsPlayer();
 	Set_WeaponAnim(3);
@@ -124,10 +124,6 @@ void CKirby::Late_Tick(_float fTimeDelta)
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND,	 this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW,		 this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_DEFERREDINFO, this);
-
-	//if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
-	//{
-	//}
 }
 
 HRESULT CKirby::Render()

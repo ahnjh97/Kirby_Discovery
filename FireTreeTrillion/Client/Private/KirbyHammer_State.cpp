@@ -45,9 +45,11 @@ void CKirbyHammer_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		}
 		else if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
 		{
-			DESC(m_eEyeState) = CKirby::EYE_CLOSE;
-			pKirby->Change_State(CKirby::HAMMERSTATE_HAMMERATTACKFINALTOY, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
-			pKirby->Set_WeaponAnim(5);
+			//DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+			//pKirby->Change_State(CKirby::HAMMERSTATE_HAMMERATTACKFINALTOY, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+			//pKirby->Set_WeaponAnim(5);
+			DESC(m_eEyeState) = CKirby::EYE_ANGER;
+			pKirby->Change_State(CKirby::HAMMERSTATE_ONIGOROSIHAMMERSTART, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
 			return;
 		}
 		else if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
@@ -161,7 +163,7 @@ void CKirbyHammer_Idle_State::Free()
 
 #pragma endregion
 
-#pragma region HAMMER STATE
+#pragma region HAMMERATTACK STATE
 
 CKirbyHammer_Attack_State::CKirbyHammer_Attack_State()
 {
@@ -185,16 +187,57 @@ void CKirbyHammer_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float f
 	if (pKirby->Get_State() == CKirby::HAMMERSTATE_HAMMERATTACKSTARTTOY)
 	{
 
+		if (pKirby->isAnimFinish())
+		{
+			pKirby->Change_State(CKirby::HAMMERSTATE_HAMMERATTACKTOY, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+			return;
+		}
 	}
 	// 중간
 	else if (pKirby->Get_State() == CKirby::HAMMERSTATE_HAMMERATTACKTOY)
 	{
+		m_fAttackJumpTime += fTimeDelta;
 
+		if (m_fAttackJumpTime > 0.05f && m_bAttackJumpTrigger == true)
+		{
+			DESC(m_fJumpVelocity) = 15.f;
+			m_bAttackJumpTrigger = false;
+		}
+		else if (m_bAttackJumpTrigger == false)
+		{
+			DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
+			pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
+
+			if (m_fAttackJumpTime >= 0.15f)
+			{
+				_float fStopVelocityPower = GRAVITY * fTimeDelta * 6.f;
+				DESC(m_fJumpVelocity) = fStopVelocityPower;
+			}
+		}
+
+		if (pKirby->isAnimFinish())
+		{
+			pKirby->Change_State(CKirby::HAMMERSTATE_HAMMERATTACKHITTOY, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+			pKirby->Set_WeaponAnim(6);
+			return;
+		}
 	}
 	// 타격
 	else if (pKirby->Get_State() == CKirby::HAMMERSTATE_HAMMERATTACKHITTOY)
 	{
+		m_fAttackJumpTime += fTimeDelta;
+		//DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
+		//pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
+		if (m_fAttackJumpTime > 0.1f)
+		{
+			pController->FreeFall(pTransformCom, fTimeDelta);
+		}
 
+		if (pKirby->isAnimFinish())
+		{
+			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_IDLE);
+		}
 	}
 	// 막타 통 애님
 	else if (pKirby->Get_State() == CKirby::HAMMERSTATE_HAMMERATTACKFINALTOY)
@@ -271,11 +314,31 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 	// 모든 공격의 시작이라고 볼 수 있다.
 	if (pKirby->Get_State() == CKirby::HAMMERSTATE_ONIGOROSIHAMMERSTART)
 	{
+		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == false)
+		{
+			pKirby->Change_State(CKirby::HAMMERSTATE_HAMMERATTACKSTARTTOY, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+			DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+			return;
+		}
 
+
+		if (pKirby->isAnimFinish())
+		{
+			pKirby->Change_State(CKirby::HAMMERSTATE_ONIGOROSIHAMMERCHARGE, 60.f, true, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+			pKirby->Set_WeaponAnim(9);
+			return;
+		}
 	}
 	// 차지 모션
 	else if (pKirby->Get_State() == CKirby::HAMMERSTATE_ONIGOROSIHAMMERCHARGE)
 	{
+		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == false)
+		{
+			pKirby->Change_State(CKirby::HAMMERSTATE_ONIGOROSIHAMMERFIRST, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+			DESC(m_eEyeState) = CKirby::EYE_ANGER;
+			return;
+		}
+
 
 	}
 	// 차지 중 이동하는 모션
@@ -287,6 +350,12 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 	else if (pKirby->Get_State() == CKirby::HAMMERSTATE_ONIGOROSIHAMMERFIRST)
 	{
 
+		if (pKirby->isAnimFinish())
+		{
+			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_IDLE);
+			return;
+		}
 	}
 	// 강한 차징 애니메이션
 	else if (pKirby->Get_State() == CKirby::HAMMERSTATE_ONIGOROSIHAMMEREND)

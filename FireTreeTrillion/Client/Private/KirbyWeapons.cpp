@@ -182,7 +182,15 @@ HRESULT CKirbyWeapons::Render_AnimWeapon()
 void CKirbyWeapons::Change_My_WeaponAnim(ANIM_TYPE eType)
 {
     m_eAnimType = eType;
-    m_pModelCom[ABILITY_HAMMER]->Set_Animation(m_eAnimType, 60.f, false, false);
+
+    if (m_eAnimType == ONIGOROSIHAMMERCHARGE)
+    {
+        m_pModelCom[ABILITY_HAMMER]->Set_Animation(m_eAnimType, 60.f, true, false);
+    }
+    else
+    {
+        m_pModelCom[ABILITY_HAMMER]->Set_Animation(m_eAnimType, 60.f, false, false);
+    }
 }
 
 void CKirbyWeapons::Change_Animation(CKirby* pKirby)
