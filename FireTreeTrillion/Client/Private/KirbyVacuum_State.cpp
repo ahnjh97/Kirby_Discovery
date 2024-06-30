@@ -581,6 +581,8 @@ void CKirbyVacuum_Vacuuming_State::OnStateUpdate(CGameObject* pGameObject, _floa
 	// 일반 오브젝트 흡수
 	else
 	{
+		m_fVacuumTime += fTimeDelta;
+
 		// 상대의 컨트롤러를 탐색한다.
 		CCharacterController* pObjectController = static_cast<CCharacterController*>(DESC(m_pObject)->Get_Component(TEXT("Com_Controller")));
 
@@ -589,11 +591,22 @@ void CKirbyVacuum_Vacuuming_State::OnStateUpdate(CGameObject* pGameObject, _floa
 		{
 			_float4 vPos = pObjectTransform->Get_State(CTransform::STATE_POSITION);
 			pObjectTransform->Set_State(CTransform::STATE_POSITION, vPos + vObjectDir * m_fVacuumObjectSpeed * fTimeDelta);
+
+			if (m_fVacuumTime > 0.5f)
+			{
+				pObjectTransform->Set_State(CTransform::STATE_POSITION, vPos);
+			}
+
 		}
 		// 만약 이 과정에서, Controller 가 nullptr이 아닐 경우 그것은 컨트롤러가 맞고, Move_Dir로 나에게 당겨준다.
 		else
 		{
 			pObjectController->Move_Dir(pObjectTransform, vObjectDir * m_fVacuumObjectSpeed * fTimeDelta, fTimeDelta);
+
+			if (m_fVacuumTime > 0.5f)
+			{
+				pObjectController->Set_Position(pObjectTransform, vPos);
+			}
 		}
 
 		// 그 외, 스케일 변화를 준다.
@@ -603,6 +616,7 @@ void CKirbyVacuum_Vacuuming_State::OnStateUpdate(CGameObject* pGameObject, _floa
 
 		// 물체가 나에게 오는 시간을 타임델타 기반으로 가산시켜준다.
 		m_fVacuumObjectSpeed += fTimeDelta * 150.f;
+
 	}
 
 
@@ -616,6 +630,8 @@ void CKirbyVacuum_Vacuuming_State::OnStateExit()
 
 	m_bKirbyTurnDirTrigger = true;
 	m_vLookDir = { 0.f, 0.f, 0.f, 0.f };
+
+	m_fVacuumTime = 0.f;
 }
 
 _bool CKirbyVacuum_Vacuuming_State::Turn_Deform(_float4& InterpolateDir, const _float4& TargetDir, CTransform* pDeformTransformCom, _float fTimeDelta)

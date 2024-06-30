@@ -453,6 +453,12 @@
     <Filter Include="02.GameObjects\Map\Gimmick">
       <UniqueIdentifier>{ddac2830-2ec7-4594-9f3e-261ff54f93e0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\Radio">
+      <UniqueIdentifier>{476fcfdd-2ddf-4526-a65c-6b4431ac8d7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyHammer_State">
+      <UniqueIdentifier>{e73c008c-90b4-46de-a9bc-1a38382ea4cd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -913,6 +919,10 @@
       <Filter>02.GameObjects\Map\Gimmick</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Gm_LabBossRoomDoor.h" />
+    <ClInclude Include="..\Public\Radio.h" />
+    <ClInclude Include="..\Public\KirbyHammer_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyHammer_State</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1354,6 +1364,10 @@
       <Filter>02.GameObjects\Map\Gimmick</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Gm_LabBossRoomDoor.cpp" />
+    <ClCompile Include="..\Private\Radio.cpp" />
+    <ClCompile Include="..\Private\KirbyHammer_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyHammer_State</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

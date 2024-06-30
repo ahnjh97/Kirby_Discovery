@@ -264,7 +264,7 @@ void CAbility::AbilityType(ABILITYTYPE eAbilityType)
 		m_strComponentTag = TEXT("Prototype_Component_Model_Item_Sword");
 		m_pTransformCom->Turn(XMVectorSet(1.f, 0.f, 0.f, 0.f), 1.f);
 		break;
-	case ABILITY_CUTTER:
+	case ABILITY_HAMMER:
 		break;
 	case ABILITY_BOMB:
 		m_strComponentTag = TEXT("Prototype_Component_Model_Item_Bomb");
