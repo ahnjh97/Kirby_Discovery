@@ -256,10 +256,19 @@ CDee_Jump_State::CDee_Jump_State()
 
 void CDee_Jump_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+
+
 }
 
 void CDee_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
+	BASE_INFO baseInfo{};
+	Setup_BaseInfo(baseInfo, pGameObject);
+	System_Tick(fTimeDelta);
+
+	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta);
+	baseInfo.pController->Move_Dir(baseInfo.pTransformCom, baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta * 5.f, fTimeDelta);
 }
 
 void CDee_Jump_State::OnStateExit()
@@ -269,11 +278,13 @@ void CDee_Jump_State::OnStateExit()
 
 CDee_Jump_State* CDee_Jump_State::Create()
 {
-	return nullptr;
+	CDee_Jump_State* pInstance = new CDee_Jump_State();
+	return pInstance;
 }
 
 void CDee_Jump_State::Free()
 {
+	__super::Free();
 }
 
 #pragma endregion
