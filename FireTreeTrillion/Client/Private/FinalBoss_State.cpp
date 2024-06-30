@@ -72,7 +72,7 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
 
 	// 플레이어를 향해 바라본다
-	pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 3.f, false);
+	pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 4.f, false);
 
 	if (CFinalBoss::STATE_2PAZE == pFinalBoss->Get_BossState())
 	{
@@ -113,15 +113,15 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			//{
 			//	++m_iCnt;
 				// Stab 패턴
-				m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-				pFinalBoss->Set_Direction(m_vLook);
-				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
+				//m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
+				//pFinalBoss->Set_Direction(m_vLook);
+				//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
 			//}
 			//else if (m_iCnt == 4)
 			//{
 			//	++m_iCnt;
 			//	// Slash 패턴
-			//	pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHREADY, 50.f, false, true);
+				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHREADY, 50.f, false, true);
 			//}
 			//else if (m_iCnt == 6)
 			//{
@@ -146,7 +146,7 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			//{
 			//	++m_iCnt;
 			//	// 화살 패턴
-			//	pFinalBoss->Change_State(CFinalBoss::FINALBOSS_RAYARROWREADYAIR, 50.f, false, true);
+				//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_RAYARROWREADYAIR, 50.f, false, true);
 			//}
 			//else if (m_iCnt == 14)
 			//{
@@ -184,14 +184,14 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	else
 	{
 		// 회복 패턴
-		pFinalBoss->Change_State(CFinalBoss::FINALBOSS_JUMPSTART, 50.f, false, true);
+		//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_JUMPSTART, 50.f, false, true);
 
 		//// 백스텝 활공 패턴
 		//if (m_iCnt == 3 || m_iCnt == 5 || m_iCnt == 12)
 		//{
 		//	++m_iCnt;
-		//	pFinalBoss->Set_Direction(-pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) + XMVectorSet(0.f, 0.3f, 0.f, 0.f));
-		//	pFinalBoss->Change_State(CFinalBoss::FINALBOSS_AWAYFASTREADY, 50.f, false, true);
+			pFinalBoss->Set_Direction(-pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) + XMVectorSet(0.f, 0.3f, 0.f, 0.f));
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_AWAYFASTREADY, 50.f, false, true);
 		//}
 
 		//// 스윙 패턴
@@ -275,6 +275,8 @@ CFinalBoss_Stab_State::CFinalBoss_Stab_State()
 void CFinalBoss_Stab_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
+	
+	m_fSpeed = 100.f;
 }
 
 void CFinalBoss_Stab_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -312,7 +314,8 @@ void CFinalBoss_Stab_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 	if (CFinalBoss::FINALBOSS_STABSTART == pFinalBoss->Get_State() || CFinalBoss::FINALBOSS_STABWAIT == pFinalBoss->Get_State())
 	{
-		pController->Move_Dir(pTransformCom, XMVector3Normalize(pFinalBoss->Get_Direction()) * fTimeDelta * 90.f, fTimeDelta);
+		m_fSpeed += fTimeDelta * 30.f;
+		pController->Move_Dir(pTransformCom, XMVector3Normalize(pFinalBoss->Get_Direction()) * fTimeDelta * m_fSpeed, fTimeDelta);
 
 		if(CFinalBoss::FINALBOSS_STABWAIT == pFinalBoss->Get_State())
 		{
@@ -569,7 +572,7 @@ void CFinalBoss_Slash_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 		if(1.f > m_fTimeDelta)
 		{
 			vPos.m128_f32[0] += m_fTimeDelta;
-			vPos.m128_f32[1] += 0.3f * -tan(m_fTimeDelta);
+			vPos.m128_f32[1] += -tan(m_fTimeDelta) * 1.5f;
 		}
 
 		if(5.f > vPos.m128_f32[1])
@@ -579,7 +582,7 @@ void CFinalBoss_Slash_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 			pFinalBoss->Set_Direction(vLook);
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASH, 60.f, true, true);
 		}
-
+		vPos.m128_f32[1] += 1.f;
 		pController->Move(pTransformCom, vPos, fTimeDelta);
 	}
 	else if (CFinalBoss::FINALBOSS_SLASH == pFinalBoss->Get_State())
@@ -640,7 +643,7 @@ void CFinalBoss_SlashEnd_State::OnStateUpdate(CGameObject* pGameObject, _float f
 
 	if (1.f > m_fTimeDelta)
 	{
-		vPos.m128_f32[1] += m_fTimeDelta * 2.f;
+		vPos.m128_f32[1] += m_fTimeDelta + 1.f;
 		pController->Move(pTransformCom, vPos, fTimeDelta);
 	}
 
@@ -662,7 +665,7 @@ void CFinalBoss_SlashEnd_State::OnStateUpdate(CGameObject* pGameObject, _float f
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHCHAINREADY, 50.f, false, true);
 		else
 		{
-			pFinalBoss->Set_Direction(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
+			pFinalBoss->Set_Direction(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f);
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHCHAINSTABREADY, 50.f, false, true);
 		}
 	}
@@ -718,7 +721,7 @@ void CFinalBoss_Swing_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 
 	if (CFinalBoss::FINALBOSS_SWINGRIGHTSTART == pFinalBoss->Get_State())
 	{
-		pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 2.f);
+		pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 3.f);
 
 	}
 	else if (CFinalBoss::FINALBOSS_SWINGRIGHT == pFinalBoss->Get_State())
@@ -748,7 +751,7 @@ void CFinalBoss_Swing_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 			pController->Move_Dir(pTransformCom, XMVector3Normalize(pTransformCom->Get_State_Vector(CTransform::STATE_LOOK)) * fTimeDelta * 30.f * fDeceleration, fTimeDelta);
 		}
 		else
-			pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 2.f);
+			pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 3.f);
 	}
 	else if (CFinalBoss::FINALBOSS_SWINGLEFT == pFinalBoss->Get_State())
 	{
@@ -899,7 +902,7 @@ void CFinalBoss_Thrust_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 	if (CFinalBoss::FINALBOSS_FLASHTHRUSTREADY == pFinalBoss->Get_State() || CFinalBoss::FINALBOSS_FLASHTHRUSTSWINGFINISHLEFT == pFinalBoss->Get_State())
 	{
-		pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 3.f);
+		pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 4.f);
 	}
 	else if(CFinalBoss::FINALBOSS_FLASHTHRUSTSTART == pFinalBoss->Get_State() || CFinalBoss::FINALBOSS_FLASHTHRUST == pFinalBoss->Get_State())
 	{

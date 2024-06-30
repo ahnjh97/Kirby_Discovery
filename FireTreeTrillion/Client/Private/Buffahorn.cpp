@@ -234,8 +234,8 @@ HRESULT CBuffahorn::Add_Components()
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
 	desc.fOffset = 1.f;
-	desc.tCapsuleShape.fHeight = 1.f;
-	desc.tCapsuleShape.fRadius = 1.f;
+	desc.tCapsuleShape.fHeight = 1.5f;
+	desc.tCapsuleShape.fRadius = 1.5f;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	//m_pControllerCom->Set_Object(this);

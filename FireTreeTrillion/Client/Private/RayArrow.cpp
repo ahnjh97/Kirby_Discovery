@@ -32,9 +32,8 @@ HRESULT CRayArrow::Initialize(void* pArg)
 		m_fAngle = pRayArrowDesc->fAngle;
 		m_fHeight = pRayArrowDesc->fHeight;
 		m_vSide = pRayArrowDesc->vSide;
-		//m_fSide = pRayArrowDesc->fSide;
 		m_fDelayTime = pRayArrowDesc->fDelayTime;
-		//m_vLook = pRayArrowDesc->vLook;
+		m_fSpeedWeight = pRayArrowDesc->fSpeedWeight;
 	}
 
 	if (FAILED(__super::Initialize(pRayArrowDesc)))
@@ -63,6 +62,8 @@ HRESULT CRayArrow::Initialize(void* pArg)
 	m_vUp = m_pTransformCom->Get_State_Vector(CTransform::STATE_UP);
 	m_vLook = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
 
+	m_fRotateSpeed = 10.f;
+
 	return S_OK;
 }
 
@@ -88,23 +89,33 @@ _int CRayArrow::Tick(_float fTimeDelta)
 	{
 		if(m_fDelayTime < m_fFireTime)
 		{
-			// 베지에 곡선 계산
-			_vector vNewPosition = {};
-			m_fElapsedTime += m_fTimeDelta;
-			if (1.f > m_fElapsedTime)
+			m_fRotateTime += m_fTimeDelta;
+			if (0.5f > m_fRotateTime)
 			{
-				vNewPosition.m128_f32[0] = (1 - m_fElapsedTime) * (1 - m_fElapsedTime) * m_vPosition.m128_f32[0] + 2 * (1 - m_fElapsedTime) * m_fElapsedTime * m_vControllPos.m128_f32[0] + m_fElapsedTime * m_fElapsedTime * m_vKirbyPos.m128_f32[0];
-				vNewPosition.m128_f32[1] = (1 - m_fElapsedTime) * (1 - m_fElapsedTime) * m_vPosition.m128_f32[1] + 2 * (1 - m_fElapsedTime) * m_fElapsedTime * m_vControllPos.m128_f32[1] + m_fElapsedTime * m_fElapsedTime * m_vKirbyPos.m128_f32[1];
-				vNewPosition.m128_f32[2] = (1 - m_fElapsedTime) * (1 - m_fElapsedTime) * m_vPosition.m128_f32[2] + 2 * (1 - m_fElapsedTime) * m_fElapsedTime * m_vControllPos.m128_f32[2] + m_fElapsedTime * m_fElapsedTime * m_vKirbyPos.m128_f32[2];
-				m_pTransformCom->Look_At_Axis(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - XMVectorSetW(vNewPosition, 1.f));
-				m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSetW(vNewPosition, 1.f));
+				m_fRotateSpeed += m_fTimeDelta * 20.f;
+				m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), m_fTimeDelta * m_fRotateSpeed);
 			}
 			else
 			{
-				// 땅에 박히고 n초 후 dead처리
-				m_fDeadTime += m_fTimeDelta;
-				if (1.f < m_fDeadTime)
-					m_bDead = true;
+				// 베지에 곡선 계산
+				_vector vNewPosition = {};
+				m_fElapsedTime += m_fTimeDelta * m_fSpeedWeight;
+				if (1.f > m_fElapsedTime)
+				{
+					vNewPosition.m128_f32[0] = (1.f - m_fElapsedTime) * (1.f - m_fElapsedTime) * m_vPosition.m128_f32[0] + 2.f * (1.f - m_fElapsedTime) * m_fElapsedTime * m_vControllPos.m128_f32[0] + m_fElapsedTime * m_fElapsedTime * m_vKirbyPos.m128_f32[0];
+					vNewPosition.m128_f32[1] = (1.f - m_fElapsedTime) * (1.f - m_fElapsedTime) * m_vPosition.m128_f32[1] + 2.f * (1.f - m_fElapsedTime) * m_fElapsedTime * m_vControllPos.m128_f32[1] + m_fElapsedTime * m_fElapsedTime * m_vKirbyPos.m128_f32[1];
+					vNewPosition.m128_f32[2] = (1.f - m_fElapsedTime) * (1.f - m_fElapsedTime) * m_vPosition.m128_f32[2] + 2.f * (1.f - m_fElapsedTime) * m_fElapsedTime * m_vControllPos.m128_f32[2] + m_fElapsedTime * m_fElapsedTime * m_vKirbyPos.m128_f32[2];
+					m_pTransformCom->Look_At_Axis(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - XMVectorSetW(vNewPosition, 1.f));
+					m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSetW(vNewPosition, 1.f));
+					m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), ToRadian(-m_fAngle));
+				}
+				else
+				{
+					// 땅에 박히고 n초 후 dead처리
+					m_fDeadTime += m_fTimeDelta;
+					if (1.f < m_fDeadTime)
+						m_bDead = true;
+				}
 			}
 		}
 		else
@@ -119,10 +130,10 @@ _int CRayArrow::Tick(_float fTimeDelta)
 	{
 		m_fTurnTime += m_fTimeDelta;
 		{
-			if (0.5f > m_fTurnTime)
+			if (0.25f > m_fTurnTime)
 			{
-				m_pTransformCom->Turn(m_vRight, m_fTimeDelta * 8.f);
-				m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), ToRadian(m_fAngle) * m_fTimeDelta * 2.f);
+				m_pTransformCom->Turn(m_vRight, m_fTimeDelta * 16.f);
+				m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), ToRadian(m_fAngle) * m_fTimeDelta * 4.f);
 				_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 				vPos.m128_f32[1] += m_fTimeDelta * 2.f;
 				m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);

@@ -179,9 +179,9 @@ void CAnimToolHelper::Ready_AnimObjects(const wstring& strLayerTag)
 	CHECK_NULLPTR(pCharacter);
 	m_vecCharacter.push_back(pCharacter);
 
-	pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_FinalBoss")));
-	CHECK_NULLPTR(pCharacter);
-	m_vecCharacter.push_back(pCharacter);
+	//pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_FinalBoss")));
+	//CHECK_NULLPTR(pCharacter);
+	//m_vecCharacter.push_back(pCharacter);
 
 	//pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_PartTimerKirby")));
 	//CHECK_NULLPTR(pCharacter);
@@ -195,16 +195,13 @@ void CAnimToolHelper::Ready_AnimObjects(const wstring& strLayerTag)
 	CHECK_NULLPTR(pCharacter);
 	m_vecCharacter.push_back(pCharacter);
 
-	pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_TestModel")));
-	CHECK_NULLPTR(pCharacter);
-	m_vecCharacter.push_back(pCharacter);
-
-
 	//pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_HungryDee")));
 	//CHECK_NULLPTR(pCharacter);
 	//m_vecCharacter.push_back(pCharacter);
 
-
+	pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_TestModel")));
+	CHECK_NULLPTR(pCharacter);
+	m_vecCharacter.push_back(pCharacter);
 }
 
 void CAnimToolHelper::Render_ObjectList()

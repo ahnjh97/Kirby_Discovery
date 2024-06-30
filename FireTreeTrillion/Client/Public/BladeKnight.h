@@ -55,6 +55,7 @@ private:
 
 	// FSM
 	void SetUp_FSM();
+	void HitBoxChanger(_uint eState);
 
 public:
 	static CBladeKnight* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

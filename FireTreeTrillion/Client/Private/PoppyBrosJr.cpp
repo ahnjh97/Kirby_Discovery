@@ -223,7 +223,9 @@ HRESULT CPoppyBrosJr::Add_Components()
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
-	desc.fOffset = 1.f;
+	desc.fOffset = 0.8f;
+	desc.tCapsuleShape.fHeight = 0.4f;
+	desc.tCapsuleShape.fHeight = 0.4f;
 	desc.uCollisionType = m_eCollisionGroup;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
@@ -238,7 +240,7 @@ HRESULT CPoppyBrosJr::Add_Components()
 	HitBox.pCollisionType = MONSTER;
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
-	Set_BodyCollider(COLLIDER_CYLINDER, 0.5f, 1.f, 0.85f);
+	Set_BodyCollider(COLLIDER_CYLINDER, 1.f, 2.f, 0.85f);
 
 
 	SetUp_FSM();

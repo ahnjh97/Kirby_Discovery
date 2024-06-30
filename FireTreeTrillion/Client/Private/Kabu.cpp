@@ -32,6 +32,8 @@ HRESULT CKabu::Initialize(void* pArg)
 		pKabuDesc->fRotationPerSec = XMConvertToRadians(90.0f);
 		m_eMonState = pKabuDesc->eMonState;
 		m_vecRallyPoint = pKabuDesc->vecRallyPoints;
+		m_bRealDead = pKabuDesc->bRealDead;
+		m_fAngle = pKabuDesc->fAngle;
 	}
 
 	if (FAILED(__super::Initialize(pKabuDesc)))
@@ -93,9 +95,9 @@ _int CKabu::Tick(_float fTimeDelta)
 
 	if (KABU_WAIT == Get_State())
 	{
-		m_pControllerCom->FreeFall(m_pTransformCom, m_fTimeDelta, 6.f);
+		//m_pControllerCom->FreeFall(m_pTransformCom, m_fTimeDelta, 6.f);
 
-		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), m_fTimeDelta * 5.f);
+		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), m_fTimeDelta * 10.f);
 
 		if (MON_CIRCLE == m_eMonState)
 		{
@@ -333,9 +335,11 @@ HRESULT CKabu::Add_Components()
 
 	/* For.Com_CharacterController */
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+	Set_Position(vPos);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
 	desc.fOffset = 1.f;
+	//desc.tCapsuleShape.fRadius = 1.f;
 	desc.strProtoObjName = CUtils::WstrToStr(m_wstrPrototypeTag);
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
@@ -348,7 +352,7 @@ HRESULT CKabu::Add_Components()
 	HitBox.pCollisionType = MONSTER;
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
-	Set_BodyCollider(COLLIDER_CYLINDER, 0.5f, 1.f, 0.85f);
+	Set_BodyCollider(COLLIDER_CYLINDER, 1.f, 1.5f, 0.85f);
 
 	SetUp_FSM();
 
