@@ -621,7 +621,7 @@ HRESULT CLevel_Racing::Ready_Kickables(_float fXOffset, _float fZOffset)
 		tDesc.iShaderVars = iShaderVars;
 		tDesc.fRimWidth = fRimWidth;
 
-		if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Item"), TEXT("Prototype_GameObject_KickableRock"), &tDesc)))
+		if (FAILED(m_pGameInstance->Add_Clone(eLevel, g_strLayerMapObject, TEXT("Prototype_GameObject_KickableRock"), &tDesc)))
 			return E_FAIL;
 	}
 
@@ -698,6 +698,12 @@ HRESULT CLevel_Racing::Ready_Objects(_float fXOffset, _float fZOffset)
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Tunnel"), TEXT("Prototype_GameObject_Tunnel"), &tDesc)))
 				continue;
 		}
+		else if ("StarBlockS" == strModelName || "StarBlockM" == strModelName || "StarBlockL" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, g_strLayerMapObject, TEXT("Prototype_GameObject_StarBlock"), &tDesc)))
+				continue;
+		}
+
 	}
 	fileInput.close();
 

@@ -176,7 +176,12 @@ public:
 		m_mapToppleableBridges.insert_or_assign(pActor, pGameObject);
 		Safe_AddRef(pGameObject);
 	}
+	void			RegisterActorsToPlayer_ForStarBox(PxRigidActor* pActor, CGameObject* pGameObject) {
+		m_mapStarBoxs.insert_or_assign(pActor, pGameObject);
+		Safe_AddRef(pGameObject);
+	}
 	CGameObject*	FindToppleableBridge(PxRigidActor* pActor);
+	CGameObject*	FindStarBox(PxRigidActor* pActor);
 
 	// 扁鸥 技何利牢 力绢
 private:
@@ -250,6 +255,7 @@ private:
 	_int				  m_iTestAnim = { 0 };
 
 	unordered_map<PxRigidActor*, CGameObject*> m_mapToppleableBridges;
+	unordered_map<PxRigidActor*, CGameObject*> m_mapStarBoxs;
 
 public:
 	static CKirby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

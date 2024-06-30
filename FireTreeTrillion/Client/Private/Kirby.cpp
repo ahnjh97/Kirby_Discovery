@@ -1514,6 +1514,11 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 	}
 
 
+	// 모션블러가 들어가면 어색한 곳을 해소한다.
+	if (m_pFSM->Get_State() == CARSTATE_CUT2)
+		m_bMotionBlur = false;
+	else
+		m_bMotionBlur = true;
 }
 
 HRESULT CKirby::Kirby_SystemInitialize()
@@ -1607,6 +1612,15 @@ CGameObject* CKirby::FindToppleableBridge(PxRigidActor* pActor)
 	return nullptr;
 }
 
+CGameObject* CKirby::FindStarBox(PxRigidActor* pActor)
+{
+	auto mapIter = m_mapStarBoxs.find(pActor);
+	if (mapIter != m_mapStarBoxs.end())
+		return mapIter->second;
+
+	return nullptr;
+}
+
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CKirby* pInstance = new CKirby(pDevice, pContext);
@@ -1647,6 +1661,10 @@ void CKirby::Free()
 
 	for (auto& pair : m_mapToppleableBridges)
 		Safe_Release(pair.second);
+
+	for (auto& pair : m_mapStarBoxs)
+		Safe_Release(pair.second);
+
 
 	for (auto& pModelCom : m_pModelCom)
 		Safe_Release(pModelCom);

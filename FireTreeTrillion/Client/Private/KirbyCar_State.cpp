@@ -2,6 +2,7 @@
 #include "KirbyCar_State.h"
 #include "Kirby_State_Function.h"
 #include "ToppleableBridge.h"
+#include "StarBlock.h"
 
 #pragma region 차량 아이들 상태
 
@@ -618,8 +619,23 @@ void CKirbyCar_Boost_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 		// 충돌하는지 지속적인 검사.
 		_vector vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+
 		if (pController->Compute_Wall(vLook) < 3.f)
 		{
+			CGameObject* pObj = pKirby->FindToppleableBridge(pController->Get_MostRecentActor());
+			if (nullptr != pObj) {
+				CToppleableBridge* pToppleableBridge = static_cast<CToppleableBridge*>(pObj);
+				pToppleableBridge->OnCollision();
+				return;
+			}
+
+			pObj = pKirby->FindStarBox(pController->Get_MostRecentActor());
+			if (nullptr != pObj) {
+				CStarBlock* pStarBlock = static_cast<CStarBlock*>(pObj);
+				pStarBlock->Break_From_Car();
+				return;
+			}
+
 			pKirby->Change_State(CKirby::CARSTATE_CRASH, 60.f, false, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 			DESC(m_fBoosterTime) = 0.f;
 			DESC(m_bBooster) = false;
@@ -630,13 +646,6 @@ void CKirbyCar_Boost_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 			pCamera->Make_Shake(1.6f, 0.5f);
 			GAMEINSTANCE Setting_RadialBlur(pTransformCom->Get_State(CTransform::STATE_POSITION), 30.f, 150.f);
-
-			CGameObject* pObj = pKirby->FindToppleableBridge(pController->Get_MostRecentActor());
-			if (nullptr != pObj) {
-				CToppleableBridge* pToppleableBridge = dynamic_cast<CToppleableBridge*>(pObj);
-				pToppleableBridge->OnCollision();
-			}
-				
 			return;
 		}
 	}
