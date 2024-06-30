@@ -29,7 +29,18 @@ HRESULT CFog_Instance::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pGameObjectDesc)))
 		return E_FAIL;
 
-	if (FAILED(Add_Components()))
+	INSTANCE_DESC tInstanceDesc{};
+	tInstanceDesc.vCenter = _float3(0, 0, 0);
+	tInstanceDesc.vPivot = _float3(0, 0, 0);
+	tInstanceDesc.iNumInstance = 50.f;
+	tInstanceDesc.eInstanceShape = INSTANCE_SHAPE_SPHERE;
+	tInstanceDesc.vRange = _float3(3.f, 3.f, 3.f);
+	tInstanceDesc.bIsLoop = true;
+	tInstanceDesc.fLifetime = FLT_MAX;
+	tInstanceDesc.vScale = _float3(30.f, 30.f, 1.f);
+	tInstanceDesc.bRandPos = true;
+
+	if (FAILED(Add_Components(tInstanceDesc)))
 		return E_FAIL;
 
 	m_fAlpha = 0.5f;
@@ -60,7 +71,7 @@ HRESULT CFog_Instance::Render()
 		return E_FAIL;
 	/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
 
-	if (FAILED(m_pShaderCom->Begin(POSTEX_SOFTALPHAFX)))
+	if (FAILED(m_pShaderCom->Begin(INSTANCEPOINT_BLENDFX)))
 		return E_FAIL;
 	if (FAILED(m_pVIBufferCom->Bind_Buffers()))
 		return E_FAIL;
@@ -70,14 +81,14 @@ HRESULT CFog_Instance::Render()
 	return S_OK;
 }
 
-HRESULT CFog_Instance::Add_Components()
+HRESULT CFog_Instance::Add_Components(INSTANCE_DESC& _tInstanceDesc)
 {
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex"),
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxInstance_Point"),
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Instance_Point"),
-		TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom)))
+		TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom, &_tInstanceDesc)))
 		return E_FAIL;
 
 	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_Terrain_Fog"),
@@ -101,6 +112,13 @@ HRESULT CFog_Instance::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
+	HRESULT hr = m_pShaderCom->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition(), sizeof(_float4));
+	CHECK_FAILED(hr);
+
+	_float4 vLook = m_pGameInstance->Get_CamLook();
+	hr = m_pShaderCom->Bind_RawValue("g_vCamLook", &vLook, sizeof(_float4));
+	CHECK_FAILED(hr);
+
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShaderCom, TEXT("Target_Depth"), "g_DepthTexture")))
 		return E_FAIL;
 
@@ -109,6 +127,8 @@ HRESULT CFog_Instance::Bind_ShaderResources()
 
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
 		return E_FAIL;
+	hr = m_pShaderCom->Bind_RawValue("g_vRColor", &m_vColor, sizeof(_float3));
+	CHECK_FAILED(hr);
 
 	return S_OK;
 }

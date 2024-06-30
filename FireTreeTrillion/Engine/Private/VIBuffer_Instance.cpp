@@ -31,6 +31,10 @@ HRESULT CVIBuffer_Instance::Initialize_Prototype(_uint _iNumInstance)
 
 HRESULT CVIBuffer_Instance::Initialize(void* pArg)
 {
+	INSTANCE_DESC tInstanceDesc{};
+	if (nullptr != pArg)
+		tInstanceDesc = *(INSTANCE_DESC*)(pArg);
+
 	m_iInstanceStride = sizeof(VTXMATRIX);
 	m_iIndexCountPerInstance = 1;
 
@@ -112,13 +116,27 @@ HRESULT CVIBuffer_Instance::Initialize(void* pArg)
 	m_pInstanceVertices = new VTXMATRIX[m_iNumInstance];
 	ZeroMemory(m_pInstanceVertices, sizeof(VTXMATRIX) * m_iNumInstance);
 
-	for (size_t i = 0; i < m_iNumInstance; i++)
+	if (tInstanceDesc.bRandPos == false)
 	{
-		m_pInstanceVertices[i].vRight = _float4{ 1.f, 0.f, 0.f, 0.f };
-		m_pInstanceVertices[i].vUp = _float4{ 0.f, 1.f, 0.f, 0.f };
-		m_pInstanceVertices[i].vLook = _float4{ 0.f, 0.f, 1.f, 0.f };
-		m_pInstanceVertices[i].vPosition = _float4{ 0.f, 0.f, 0.f, 1.f };
-		m_pInstanceVertices[i].bAlive = false;
+		for (size_t i = 0; i < m_iNumInstance; i++)
+		{
+			m_pInstanceVertices[i].vRight = _float4{ 1.f, 0.f, 0.f, 0.f };
+			m_pInstanceVertices[i].vUp = _float4{ 0.f, 1.f, 0.f, 0.f };
+			m_pInstanceVertices[i].vLook = _float4{ 0.f, 0.f, 1.f, 0.f };
+			m_pInstanceVertices[i].vPosition = _float4{ 0.f, 0.f, 0.f, 1.f };
+			m_pInstanceVertices[i].bAlive = false;
+		}
+	}
+	else
+	{
+		for (size_t i = 0; i < m_iNumInstance; i++)
+		{
+			m_pInstanceVertices[i].vRight = _float4{ 1.f, 0.f, 0.f, 0.f };
+			m_pInstanceVertices[i].vUp = _float4{ 0.f, 1.f, 0.f, 0.f };
+			m_pInstanceVertices[i].vLook = _float4{ 0.f, 0.f, 1.f, 0.f };
+			m_pInstanceVertices[i].vPosition = Compute_RandPosition();
+			m_pInstanceVertices[i].bAlive = true;
+		}
 	}
 
 	ZeroMemory(&m_InstanceSubResourceData, sizeof m_InstanceSubResourceData);

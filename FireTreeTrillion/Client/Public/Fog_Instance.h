@@ -29,9 +29,10 @@ private:
 
 	_float	m_fAlpha = { 0.f };
 	_uint	m_iRandomFog = { 0 };
+	_float3 m_vColor = _float3{ 1.f, 1.f , 1.f };
 
 private:
-	HRESULT Add_Components();
+	HRESULT Add_Components(INSTANCE_DESC& _tInstanceDesc);
 	HRESULT Bind_ShaderResources();
 	//void	Effect_Billboard(_float fTimeDelta);
 
