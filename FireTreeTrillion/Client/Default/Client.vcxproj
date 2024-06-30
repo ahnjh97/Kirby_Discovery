@@ -219,6 +219,7 @@
     <ClInclude Include="..\Public\FinalBoss.h" />
     <ClInclude Include="..\Public\FinalBossSpear.h" />
     <ClInclude Include="..\Public\FinalBoss_State.h" />
+    <ClInclude Include="..\Public\Fog_Instance.h" />
     <ClInclude Include="..\Public\Food.h" />
     <ClInclude Include="..\public\EventCenter.h" />
     <ClInclude Include="..\public\FoodShopDee.h" />
@@ -391,6 +392,7 @@
     <ClCompile Include="..\Private\FinalBoss.cpp" />
     <ClCompile Include="..\Private\FinalBossSpear.cpp" />
     <ClCompile Include="..\Private\FinalBoss_State.cpp" />
+    <ClCompile Include="..\Private\Fog_Instance.cpp" />
     <ClCompile Include="..\Private\Food.cpp" />
     <ClCompile Include="..\private\EventCenter.cpp" />
     <ClCompile Include="..\private\FoodShopDee.cpp" />

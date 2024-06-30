@@ -116,6 +116,8 @@
 #include "Tunnel.h"
 #include "TunnelRock.h"
 #include "Radio.h"
+#include "Fog_Instance.h"
+
 //±â¹Í
 #include "Gm_LabAntenna.h"
 #include "Gm_LabBossRoomDoor.h"
@@ -384,6 +386,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("AnimBridge"), CAnimBridge);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Tunnel"), CTunnel);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TunnelRock"), CTunnelRock);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Fog_Instance"), CFog_Instance);
 
 	#pragma region GIMMICK::LEVEL_FINALBOSS
 

@@ -427,7 +427,7 @@ HRESULT CLevel_Intro::Ready_Triggers()
 		{
 			CGameObject::GAMEOBJECT_DESC tDesc{};
 			tDesc.matWorld = matWorld;
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_TerrainFog"), &tDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_Fog_Instance"), &tDesc)))
 				return E_FAIL;
 		}
 	}
@@ -615,6 +615,10 @@ HRESULT CLevel_Intro::Ready_Items()
 	_uint iShaderVars{};
 	_float fRimWidth{};
 
+	unordered_set<string> vecCoins = { "Item_Coin", "Item_BlueCoin", "Item_RedCoin" };
+	unordered_set<string> vecFood = { "Item_Bread", "Item_Cake", "Item_Cocktail", "Item_EnergyDrink"
+		, "Item_Makaron", "Item_Meat", "Item_Omelet", "Item_Onigiri", "Item_Steak", "Item_Sushi" };
+
 	for (_uint i = 0; i < iNumObjects; i++)
 	{
 		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
@@ -630,17 +634,18 @@ HRESULT CLevel_Intro::Ready_Items()
 		tDesc.iShaderVars = iShaderVars;
 		tDesc.fRimWidth = fRimWidth;
 
-		if ("Item_Coin" == strModelName)
+		if (vecCoins.end() != vecCoins.find(strModelName))
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NoVacuumItem"), TEXT("Prototype_GameObject_Coin"), &tDesc)))
 				return E_FAIL;
 		}
-		else if ("Item_EnergyDrink" == strModelName)
+		else if (vecFood.end() != vecFood.find(strModelName))
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NoVacuumItem"), TEXT("Prototype_GameObject_Food"), &tDesc)))
 				return E_FAIL;
 		}
 	}
+
 	fileInput.close();
 
 	return S_OK;

@@ -927,6 +927,9 @@
     <ClInclude Include="..\Public\Gm_LabBossRoomDoor.h">
       <Filter>02.GameObjects\Map\Gimmick</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Fog_Instance.h">
+      <Filter>02.GameObjects\Map\TerrainFog</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1375,6 +1378,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Gm_LabBossRoomDoor.cpp">
       <Filter>02.GameObjects\Map\Gimmick</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Fog_Instance.cpp">
+      <Filter>02.GameObjects\Map\TerrainFog</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
