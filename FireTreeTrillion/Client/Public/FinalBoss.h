@@ -100,6 +100,8 @@ private:
 	_float				m_fGlideTime = { 0.f };
 
 private:
+	HRESULT	Make_TargetToCams();
+
 	HRESULT Add_Components();
 	HRESULT Add_PartObjects();
 	HRESULT Bind_ShaderResources();

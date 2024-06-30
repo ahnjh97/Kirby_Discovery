@@ -2,36 +2,20 @@
 #include "AnimBridge.h"
 #include "Bone.h"
 
-//_float CalculateAngle(_float time) {
-//
-//
-//	_float displacement = 0.5f * GRAVITY * time * time;
-//	_float angle = (displacement / (0.5f * GRAVITY * 5.5f * 5.5f)) * (3.141592f / 2.f);
-//
-//	// 최대 각도는 90도를 넘지 않도록 제한
-//	if (angle > 3.141592f / 2.f) {
-//		angle = 3.141592f / 2.f;
-//	}
-//
-//	return angle;
-//}
+#include "Camera_Main.h"
 
 // 최대 회전 시간과 최대 회전 각도
 #define M_PI 3.14159265358979323846f
-const _float MAX_TIME = 5.5f;
+const _float MAX_TIME = 3.3f;
 const _float MAX_ANGLE = M_PI / 2.f;  // 90도 (라디안)
 
-float CalculateAngle(float time) {
-	// 시간에 따른 각도 변화 계산 (시간의 제곱에 비례)
-	_float normalizedTime = time / MAX_TIME; // 0에서 1까지의 값
-	_float angle = normalizedTime * normalizedTime * MAX_ANGLE;
+_float CalculateAngle(_float fTime) {
 
-	// 최대 각도는 90도를 넘지 않도록 제한
-	if (angle > MAX_ANGLE) {
-		angle = MAX_ANGLE;
-	}
+	// 0.f ~ 4.5f 의 타임값이 들어간다.
+	// 0.f ~ 80.f 의 각도값이 출력되어야 한다.
+	_float fAccTime = fTime / 3.8f;  // 0 ~ 1
 
-	return angle;
+	return pow(fAccTime, 5.f) * 80.f;
 }
 
 
@@ -47,7 +31,6 @@ CAnimBridge::CAnimBridge(const CAnimBridge& rhs)
 
 void CAnimBridge::OnCollision()
 {
-	m_pModelCom->Set_Animation(0, 60.f, false, false);
 	m_bCollision = true;
 	m_bSecondAnim = true;
 
@@ -115,18 +98,45 @@ _int CAnimBridge::Tick(_float fTimeDelta)
 
 	if (TEXT("BoardC_Anim") == m_wstrModelName)
 	{
-		if(m_fHitTime >= 0.f && m_fHitTime < 5.5f)
+		if (m_pGameInstance->Get_DIKeyState(DIK_N, KEY_DOWN))
+			m_fAngle += 1.f;
+		else if (m_pGameInstance->Get_DIKeyState(DIK_M, KEY_DOWN))
+			m_fAngle -= 1.f;
+
+		if(m_bBoundTrigger == true && m_fHitTime >= 2.f)
 		{
 			_float4x4 RotationMatrix = _float4x4::Identity;
-			m_fAngle = CalculateAngle(m_fHitTime);
+			m_fAngle = CalculateAngle(m_fHitTime - 2.f);
+			if (m_fHitTime > 5.75f)
+				m_fAngle = 80.f;
+
 			CUtils::Turn_OtherMatrix(RotationMatrix, _float4(1, 0, 0, 0), -1.f, m_fAngle);
 			*m_pEditMatrix = RotationMatrix;
-		}
-		
-		//m_bBound;
-		//_float4x4 RotationMatrix = _float4x4::Identity;
 
-		if (m_fHitTime >= 5.5f && true == m_bSecondAnim)
+			if (m_fHitTime > 5.8f)
+			{
+				m_bBoundTrigger = false;
+				m_bBound = true;
+				CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+				pCamera->Make_Shake(2.f);
+			}
+		}
+		else if (m_bBound == true)
+		{
+			_float4x4 RotationMatrix = _float4x4::Identity;
+			m_fBoundTime += fTimeDelta;
+			m_fAngle = 80.f - (1.5f - (m_fBoundTime * 9.8f));
+
+			CUtils::Turn_OtherMatrix(RotationMatrix, _float4(1, 0, 0, 0), -1.f, m_fAngle);
+			*m_pEditMatrix = RotationMatrix;
+
+			if (m_fAngle > 80.f)
+			{
+				m_bBound = false;
+				m_fAngle = 80.f;
+			}
+		}
+		else if (m_bBound == false && m_bBoundTrigger  == false && true == m_bSecondAnim)
 		{
 			*m_pEditMatrix = _float4x4::Identity;
 			m_pModelCom->Set_Animation(0, 60.f, true, false);
@@ -186,6 +196,11 @@ HRESULT CAnimBridge::Render_LightDepth()
 #ifdef _DEBUG
 void CAnimBridge::Render_IMGUI()
 {
+	ImGui::Begin("debug");
+	__super::Render_IMGUI();
+
+	ImGui::Text("m_fAngle : %.2f", (_float)m_fAngle);
+	ImGui::End();
 }
 #endif
 

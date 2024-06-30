@@ -2,6 +2,7 @@
 #include "KirbyCar_State.h"
 #include "Kirby_State_Function.h"
 #include "ToppleableBridge.h"
+#include "StarBlock.h"
 
 #pragma region 차량 아이들 상태
 
@@ -50,6 +51,7 @@ void CKirbyCar_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	// 차량을 땅에 버리는 로직이다.
 	if (m_pGameInstance->Get_DIKeyState(DIK_V, KEY_PRESS))
 	{
+		DESC(m_bDumpAbilityPress) = true;
 		DESC(m_fDumpAbilityTime) += fTimeDelta;
 
 		if (DESC(m_fDumpAbilityTime) > 1.f)
@@ -57,16 +59,15 @@ void CKirbyCar_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			DESC(m_fDumpAbilityTime) = 0.f;
 			DESC(m_fJumpVelocity) = 15.f;
 			pKirby->Change_State(CKirby::STATE_SPITDEFORM, 60.f, false, false, CKirby::BODY_VACUUM);
+
+			DESC(m_bBooster) = false;
+			pKirby->Delete_Effect("Come On Dash");
 			return;
 		}
 	}
 	else
 	{
-		if (DESC(m_fDumpAbilityTime) > 0.f)
-			DESC(m_fDumpAbilityTime) -= fTimeDelta * 2.f;
-
-		if (DESC(m_fDumpAbilityTime) < 0.f)
-			DESC(m_fDumpAbilityTime) = 0.f;
+		DESC(m_bDumpAbilityPress) = false;
 	}
 
 
@@ -618,6 +619,7 @@ void CKirbyCar_Boost_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 		// 충돌하는지 지속적인 검사.
 		_vector vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+
 		if (pController->Compute_Wall(vLook) < 3.f)
 		{
 			pKirby->Change_State(CKirby::CARSTATE_CRASH, 60.f, false, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
@@ -633,10 +635,18 @@ void CKirbyCar_Boost_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 			CGameObject* pObj = pKirby->FindToppleableBridge(pController->Get_MostRecentActor());
 			if (nullptr != pObj) {
-				CToppleableBridge* pToppleableBridge = dynamic_cast<CToppleableBridge*>(pObj);
+				CToppleableBridge* pToppleableBridge = static_cast<CToppleableBridge*>(pObj);
 				pToppleableBridge->OnCollision();
+				return;
 			}
-				
+
+			pObj = pKirby->FindStarBox(pController->Get_MostRecentActor());
+			if (nullptr != pObj) {
+				CStarBlock* pStarBlock = static_cast<CStarBlock*>(pObj);
+				pStarBlock->Break_From_Car();
+				return;
+			}
+
 			return;
 		}
 	}

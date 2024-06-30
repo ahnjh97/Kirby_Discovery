@@ -51,8 +51,9 @@ HRESULT CLevel_FinalBoss::Initialize()
 	CHECK_FAILED(hr);
 	hr = Ready_Kickables();
 	CHECK_FAILED(hr);
-
 	hr = Ready_Objects();
+	CHECK_FAILED(hr);
+	hr = Ready_UI();
 	CHECK_FAILED(hr);
 	
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
@@ -116,8 +117,8 @@ HRESULT CLevel_FinalBoss::Ready_Layer_Camera(const wstring& strLayerTag)
 	MainCamDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	MainCamDesc.fNear = 0.1f;
 	MainCamDesc.fFar = 1000.0f;
-	MainCamDesc.vEye = _float4(-129.f, 10.f, -120.f, 1.f);
-	MainCamDesc.vAt = MainCamDesc.vEye + _float4(0.f, -.15f, 1.f, 1.f);
+	MainCamDesc.vEye = _float4(0.f, 0.f, 0.f, 1.f);
+	MainCamDesc.vAt = _float4(0.f, -.2f, 1.f, 1.f);
 	MainCamDesc.fSpeedPerSec = 10.f;
 	MainCamDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	MainCamDesc.fOrigDistance = 28.f;
@@ -652,6 +653,20 @@ HRESULT CLevel_FinalBoss::Ready_Objects()
 #pragma endregion
 	}
 	fileInput.close();
+
+	return S_OK;
+}
+
+HRESULT CLevel_FinalBoss::Ready_UI()
+{
+	LEVEL eLevel = LEVEL_FINALBOSS;
+
+	CUIObject::UIOBJ_DESC DiscardUIDesc{};
+	DiscardUIDesc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f, 0.f };
+	DiscardUIDesc.vPos = { DiscardUIDesc.vCenter.x, DiscardUIDesc.vCenter.y, 0.f };
+	DiscardUIDesc.vSize = { 260.f * 0.8f, 120.f * 0.8f, 1.f };
+
+	HRESULT hr = m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_UI_HUD"), TEXT("Prototype_GameObject_HUD_AbilityDiscard"), &DiscardUIDesc);
 
 	return S_OK;
 }

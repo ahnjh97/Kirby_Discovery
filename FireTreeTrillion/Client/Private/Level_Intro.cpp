@@ -57,6 +57,8 @@ HRESULT CLevel_Intro::Initialize()
 	CHECK_FAILED(hr);
 	hr = Ready_Kickables();
 	CHECK_FAILED(hr);
+	hr = Ready_Objects();
+	CHECK_FAILED(hr);
 
 	// 셰이더 트리거
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
@@ -116,7 +118,7 @@ HRESULT CLevel_Intro::Ready_Lights()
 	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
 		return E_FAIL;
 
-	CGameInstance::Get_Instance()->Setting_GodRay({-650.f, 300.f, 1200.f, 1.f});
+	CGameInstance::Get_Instance()->Setting_GodRay({-650.f, 500.f, 1200.f, 1.f});
 
 	return S_OK;
 }
@@ -252,7 +254,7 @@ HRESULT CLevel_Intro::Ready_Layer_UI(const wstring& _wstrLayerTag)
 	{
 		{CHUD::HUD_KIRBYHP, "HUD_KirbyStatus"},
 		{CHUD::HUD_STARPOINT, "HUD_StarPoint"},
-		{CHUD::HUD_ABILITYDISCARD, "HUD_AbilityDiscard"},
+		//{CHUD::HUD_ABILITYDISCARD, "HUD_AbilityDiscard"},
 	};
 
 	//auto it = HUDmap.find(eHUDType);
@@ -268,6 +270,15 @@ HRESULT CLevel_Intro::Ready_Layer_UI(const wstring& _wstrLayerTag)
 		if (FAILED(Load_FileData(strFilePath, FILE_UI, _wstrLayerTag)))
 			return E_FAIL;
 	}
+
+	LEVEL eLevel = LEVEL_FINALBOSS;
+
+	CUIObject::UIOBJ_DESC DiscardUIDesc{};
+	DiscardUIDesc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f, 0.f };
+	DiscardUIDesc.vPos = { DiscardUIDesc.vCenter.x, DiscardUIDesc.vCenter.y, 0.f };
+	DiscardUIDesc.vSize = { 260.f * 0.8f, 120.f * 0.8f, 1.f };
+
+	HRESULT hr = m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_UI_HUD"), TEXT("Prototype_GameObject_HUD_AbilityDiscard"), &DiscardUIDesc);
 
 	return S_OK;
 }
@@ -425,8 +436,8 @@ HRESULT CLevel_Intro::Ready_Triggers()
 		{
 			CGameObject::GAMEOBJECT_DESC tDesc{};
 			tDesc.matWorld = matWorld;
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_TerrainFog"), &tDesc)))
-				return E_FAIL;
+			/*if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_Fog_Instance"), &tDesc)))
+				return E_FAIL;*/
 		}
 	}
 
@@ -613,6 +624,10 @@ HRESULT CLevel_Intro::Ready_Items()
 	_uint iShaderVars{};
 	_float fRimWidth{};
 
+	unordered_set<string> vecCoins = { "Item_Coin", "Item_BlueCoin", "Item_RedCoin" };
+	unordered_set<string> vecFood = { "Item_Bread", "Item_Cake", "Item_Cocktail", "Item_EnergyDrink"
+		, "Item_Makaron", "Item_Meat", "Item_Omelet", "Item_Onigiri", "Item_Steak", "Item_Sushi" };
+
 	for (_uint i = 0; i < iNumObjects; i++)
 	{
 		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
@@ -628,17 +643,18 @@ HRESULT CLevel_Intro::Ready_Items()
 		tDesc.iShaderVars = iShaderVars;
 		tDesc.fRimWidth = fRimWidth;
 
-		if ("Item_Coin" == strModelName)
+		if (vecCoins.end() != vecCoins.find(strModelName))
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NoVacuumItem"), TEXT("Prototype_GameObject_Coin"), &tDesc)))
 				return E_FAIL;
 		}
-		else if ("Item_EnergyDrink" == strModelName)
+		else if (vecFood.end() != vecFood.find(strModelName))
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NoVacuumItem"), TEXT("Prototype_GameObject_Food"), &tDesc)))
 				return E_FAIL;
 		}
 	}
+
 	fileInput.close();
 
 	return S_OK;
@@ -684,6 +700,84 @@ HRESULT CLevel_Intro::Ready_Kickables()
 			return E_FAIL;		
 	}
 
+	fileInput.close();
+
+	return S_OK;
+}
+
+HRESULT CLevel_Intro::Ready_Objects()
+{
+	LEVEL eLevel = LEVEL_INTRO;
+	string strFileName = "../../../objects_txt/Intro.txt";
+
+	ifstream fileInput(strFileName, ios::binary);
+	if (fileInput.is_open() == false)
+	{
+		MSG_BOX(TEXT("Failed to open : Intro.txt"));
+		return E_FAIL;
+	}
+
+	_uint iStrLength{};
+	string strModelName;
+	_float4x4 matWorld{};
+	_uint iShaderVars{};
+	_float fRimWidth{};
+
+	while (!fileInput.eof())
+	{
+		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
+		strModelName.resize(iStrLength);
+		fileInput.read(&strModelName[0], iStrLength);
+		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
+		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
+		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
+
+		if (fileInput.eof())
+			break;
+
+		CGameObject::GAMEOBJECT_DESC tDesc{};
+		tDesc.matWorld = matWorld;
+		tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+		tDesc.iShaderVars = iShaderVars;
+		tDesc.fRimWidth = fRimWidth;
+
+		if ("RockA" == strModelName || "RockB" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Rock"), TEXT("Prototype_GameObject_BreakableRock"), &tDesc)))
+				continue;
+		}
+		else if ("CarShopBreakableWall" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_CarShopWall"), TEXT("Prototype_GameObject_CarShopWall"), &tDesc)))
+				continue;
+		}
+		else if ("CarShopWallFrame" == strModelName || "CarShopFrameBefore" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_WallFrame"), TEXT("Prototype_GameObject_CarShopWallFrame"), &tDesc)))
+				continue;
+		}
+		else if ("Car" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Deform"), TEXT("Prototype_GameObject_Car"), &tDesc)))
+				continue;
+		}
+		else if ("BoardA" == strModelName || "BoardB" == strModelName || "BoardC" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Bridge"), TEXT("Prototype_GameObject_ToppleableBridge"), &tDesc)))
+				continue;
+		}
+		else if ("TunnelRocks" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Tunnel"), TEXT("Prototype_GameObject_Tunnel"), &tDesc)))
+				continue;
+		}
+		else if ("StarBlockS" == strModelName || "StarBlockM" == strModelName || "StarBlockL" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, g_strLayerMapObject, TEXT("Prototype_GameObject_StarBlock"), &tDesc)))
+				continue;
+		}
+
+	}
 	fileInput.close();
 
 	return S_OK;

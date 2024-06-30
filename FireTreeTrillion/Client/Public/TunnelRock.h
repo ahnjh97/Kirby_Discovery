@@ -33,11 +33,14 @@ private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
 
+	//_bool m_bDirectionDetermined = { false };
+
 	_float m_fSamplingFactor = { 1.f };
 	_float m_fZero = {};
 
 	_vector m_vRotationAxis = {};
-	_float fTime = {};
+	_float m_fTotalTime = {};
+	_float m_fTime = {};
 	_float m_fX{}, m_fY{}, m_fZ{};
 
 private:

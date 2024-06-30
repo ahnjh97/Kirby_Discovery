@@ -88,6 +88,7 @@ public:
 
 		// 땅에 능력 버리는 시간
 		_float			m_fDumpAbilityTime = { 0.f };
+		_bool			m_bDumpAbilityPress = { false };
 
 		// Ability Sword
 		// PRESS 시, 차지시간을 정해주는 변수
@@ -170,13 +171,20 @@ public:
 	// 손에 쥐고있어야 할 때, 필요한 행렬 포인터
 	_float4x4*		Get_HandsMatrix()  { return &m_ArmourMatrix; }
 
-	void			Set_HitStop() { m_bHitStop = true; }
+	void			Set_HitStop(_float fHitStopMaxTime = 0.12f) { m_bHitStop = true; m_fHitStopMaxTime = fHitStopMaxTime; }
 	_bool			Is_Attacking() { return m_isKirbyAttacking; }
 	void			RegisterActorsToPlayer(PxRigidActor* pActor, CGameObject* pGameObject) { 
 		m_mapToppleableBridges.insert_or_assign(pActor, pGameObject);
 		Safe_AddRef(pGameObject);
 	}
+	void			RegisterActorsToPlayer_ForStarBox(PxRigidActor* pActor, CGameObject* pGameObject) {
+		m_mapStarBoxs.insert_or_assign(pActor, pGameObject);
+		Safe_AddRef(pGameObject);
+	}
 	CGameObject*	FindToppleableBridge(PxRigidActor* pActor);
+	CGameObject*	FindStarBox(PxRigidActor* pActor);
+	void			Set_WeaponAnim(_uint index);
+
 
 	// 기타 세부적인 제어
 private:
@@ -234,6 +242,7 @@ private:
 	void				  HitStop_System(_float fTimeDelta);
 	_bool				  m_bHitStop = { false };
 	_float				  m_fHitStopTime = { 0.f };
+	_float				  m_fHitStopMaxTime = { 0.f };
 
 
 	// For Bomb
@@ -250,14 +259,12 @@ private:
 	_int				  m_iTestAnim = { 0 };
 
 	unordered_map<PxRigidActor*, CGameObject*> m_mapToppleableBridges;
+	unordered_map<PxRigidActor*, CGameObject*> m_mapStarBoxs;
 
 public:
 	static CKirby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
-
-	//test
-	_bool		m_bOnce = false;
 };
 
 END

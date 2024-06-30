@@ -219,6 +219,7 @@
     <ClInclude Include="..\Public\FinalBoss.h" />
     <ClInclude Include="..\Public\FinalBossSpear.h" />
     <ClInclude Include="..\Public\FinalBoss_State.h" />
+    <ClInclude Include="..\Public\Fog_Instance.h" />
     <ClInclude Include="..\Public\Food.h" />
     <ClInclude Include="..\public\EventCenter.h" />
     <ClInclude Include="..\public\FoodShopDee.h" />
@@ -250,6 +251,7 @@
     <ClInclude Include="..\Public\KirbyBoom_State.h" />
     <ClInclude Include="..\Public\KirbyCar_State.h" />
     <ClInclude Include="..\Public\Gm_LabAntenna.h" />
+    <ClInclude Include="..\Public\KirbyHammer_State.h" />
     <ClInclude Include="..\Public\Ladder.h" />
     <ClInclude Include="..\Public\Laser.h" />
     <ClInclude Include="..\Public\Level_DeeDeeDee.h" />
@@ -309,6 +311,7 @@
     <ClInclude Include="..\Public\PortalSoftEffect.h" />
     <ClInclude Include="..\Public\Rabbit.h" />
     <ClInclude Include="..\Public\Rabbit_State.h" />
+    <ClInclude Include="..\Public\Radio.h" />
     <ClInclude Include="..\Public\RayArrow.h" />
     <ClInclude Include="..\Public\RigidObject.h" />
     <ClInclude Include="..\Public\SingleEffect.h" />
@@ -389,6 +392,7 @@
     <ClCompile Include="..\Private\FinalBoss.cpp" />
     <ClCompile Include="..\Private\FinalBossSpear.cpp" />
     <ClCompile Include="..\Private\FinalBoss_State.cpp" />
+    <ClCompile Include="..\Private\Fog_Instance.cpp" />
     <ClCompile Include="..\Private\Food.cpp" />
     <ClCompile Include="..\private\EventCenter.cpp" />
     <ClCompile Include="..\private\FoodShopDee.cpp" />
@@ -419,6 +423,7 @@
     <ClCompile Include="..\Private\KirbyBomb.cpp" />
     <ClCompile Include="..\Private\KirbyCar_State.cpp" />
     <ClCompile Include="..\Private\Gm_LabAntenna.cpp" />
+    <ClCompile Include="..\Private\KirbyHammer_State.cpp" />
     <ClCompile Include="..\Private\Ladder.cpp" />
     <ClCompile Include="..\Private\Laser.cpp" />
     <ClCompile Include="..\Private\Level_DeeDeeDee.cpp" />
@@ -476,6 +481,7 @@
     <ClCompile Include="..\Private\PortalSoftEffect.cpp" />
     <ClCompile Include="..\Private\Rabbit.cpp" />
     <ClCompile Include="..\Private\Rabbit_State.cpp" />
+    <ClCompile Include="..\Private\Radio.cpp" />
     <ClCompile Include="..\Private\RayArrow.cpp" />
     <ClCompile Include="..\Private\RigidObject.cpp" />
     <ClCompile Include="..\Private\SingleEffect.cpp" />

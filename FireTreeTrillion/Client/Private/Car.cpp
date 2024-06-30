@@ -34,6 +34,8 @@ HRESULT CCar::Initialize(void* pArg)
 	m_eAnimIndex = CAR_FALL;
 	m_pModelCom->Set_Animation(m_eAnimIndex, 60.f, true, false);
 
+	m_bMotionBlur = true;
+
 	return S_OK;
 }
 

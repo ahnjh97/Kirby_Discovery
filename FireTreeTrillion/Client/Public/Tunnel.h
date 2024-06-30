@@ -1,6 +1,6 @@
 #pragma once
 #include "Client_Defines.h"
-#include "GameObject.h"
+#include "PhysXObject.h"
 
 BEGIN(Engine)
 class CShader;
@@ -9,7 +9,7 @@ END
 
 BEGIN(Client)
 
-class CTunnel final : public CGameObject
+class CTunnel final : public CPhysXObject
 {
 public:
 	enum TEX_TUNNEL { TEX_BASECOLOR, TEX_NORMAL, TEX_MRA, TEX_END };
@@ -26,6 +26,8 @@ public:
 	virtual void Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
+	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
+
 private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
@@ -38,6 +40,7 @@ private:
 
 	_float m_fSamplingFactor = { 1.f };
 	_float m_fZero = {};
+	_float m_fTime = {};
 
 private:
 	HRESULT Add_Components(const wstring& _wstrModelTag);

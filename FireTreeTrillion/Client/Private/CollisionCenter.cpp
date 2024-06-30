@@ -798,6 +798,33 @@ void CCollisionCenter::Body_To_Body_Collision()
 			pNPC->Collision(CONTENT_INTERACT, pKirby);
 
 		});
+
+	// 깔끔하게 완료되었음 : 플레이어 X 오브젝트류 (발로 차기 및 흡수 로직)
+	Collision_Collider(m_GameObjects[OBJECT], m_GameObjects[OBJECT], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CPhysXObject* pDst = static_cast<CPhysXObject*>(Dst);
+			CPhysXObject* pSrc = static_cast<CPhysXObject*>(Src);
+
+			if (pDst->Get_PhyXState() == PO_FLYAWAY ||
+				pSrc->Get_PhyXState() == PO_FLYAWAY)
+			{
+				// 각자의 상태를 PO_FLYDEADAWAY 로 바꿔줌과 동시에 죽는 방향과 힘을 정해준다.
+				pthis->Fly_DeadAway(pDst, pSrc);
+				// 카메라 쉐이킹을 해준다.
+				pthis->Camera_Shaking(1.2f);
+
+				// 0.1초의 콜라이더 딜레이를 넣어준다.
+				DstHit->Set_Alive(false);
+				SrcHit->Set_Alive(false);
+			}
+		});
+
 }
 
 void CCollisionCenter::Hitbox_Collision()

@@ -20,13 +20,13 @@ void CCamera_Main::EventFunc(CGameObject* pObj)
 	_int a = 0;
 }
 
-void CCamera_Main::Set_Target(CTransform* pTarget, CAMTARGET eTarget, CAMFOCUS eFocus, _float3 vAnchorOffset , _float fInterpolateSpeed)
+void CCamera_Main::Set_Target(CTransform* pTarget, CAMTARGET eTarget, CAMFOCUS eFocus, _float3 vAnchorOffset, _float fInterpolateSpeed)
 {
 
 	if (nullptr == pTarget)
 		return;
 
-	if (eFocus == FOCUS_FIRST)
+	if (eTarget == TARGET_FIRST)
 	{
 		if (nullptr != m_pFirstTarget)
 			Safe_Release(m_pFirstTarget);
@@ -35,7 +35,7 @@ void CCamera_Main::Set_Target(CTransform* pTarget, CAMTARGET eTarget, CAMFOCUS e
 		Safe_AddRef(pTarget);
 
 	}
-	else if (eFocus == FOCUS_SECOND)
+	else if (eTarget == TARGET_SECOND)
 	{
 		if (nullptr != m_pSecondTarget)
 			Safe_Release(m_pSecondTarget);
@@ -348,7 +348,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction.fInterpolateSpeed = 1.5f;
 
 		newAction.eCamPos = POS_ABSOLUTE;
-		newAction.vPos = _float3{-170.f, 23.17f, -153.f };
+		newAction.vPos = _float3{ -170.f, 23.17f, -153.f };
 
 		newAction.eCamDir = DIR_ABSOLUTE;
 		newAction.vDir = _float3{ -0.73f, .2f, .67f };
@@ -366,24 +366,131 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		m_CamSeq.push_back(newAction);
 	}
 	break;
+
 	case SEQ_BREAKRACINGMAP:
 	{
 		CAMACTION newAction{};
 		newAction.fTime = 0.f;
 		newAction.eCamCut = CUT_HARD;
-		newAction.eCamPos = POS_RELATIVE;
-		newAction.vPos = _float3{ 3.f, 5.f, -25.f };
+		newAction.eCamPos = POS_ABSOLUTE;
+		newAction.vPos = _float3{ 66.8f, 26.3f, 46.3f };
 		newAction.eCamDir = DIR_ABSOLUTE;
-		newAction.vDir = _float3{ 0.f, -.2f, 1.f };
+		newAction.vDir = _float3{ -.26f, 0.f, 1.f };
 		m_CamSeq.push_back(newAction);
 
 		newAction = {};
-		newAction.fTime = 0.1f;
+		newAction.fTime = 1.3f;
 		newAction.eCamCut = CUT_INTERPOLATE;
 		newAction.eEase = EASE_INOUT;
-		newAction.fInterpolateSpeed = 2.f;
-		newAction.eCamPos = POS_RELATIVE;
-		newAction.vPos = _float3{ 5.f, -12.f, 40.f };
+		newAction.fInterpolateSpeed = 2.5f;
+		newAction.fFOVY = 20.f;
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.15f, .6f, .8f };
+		m_CamSeq.push_back(newAction);
+
+		newAction = {};
+		newAction.fTime = 4.f;
+		newAction.eCamCut = CUT_HARD;
+		newAction.eCamPos = POS_ABSOLUTE;
+		newAction.vPos = _float3{ 65.5f, 25.4f, 181.8f };
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.23f, .1f, -1.f };
+		m_CamSeq.push_back(newAction);
+
+		//다리 입구 뷰
+		newAction = {};
+		newAction.fTime = 8.f;
+		newAction.eCamCut = CUT_HARD;
+		newAction.fFOVY = 25.f;
+
+		newAction.eCamPos = POS_ABSOLUTE;
+		newAction.vPos = _float3{ 65.6f, 25.6f, 80.f };
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.45f, 0.f, -.9f };
+		m_CamSeq.push_back(newAction);
+
+		//라디오 보기
+		newAction = {};
+		newAction.fTime = 10.f;
+		newAction.eCamCut = CUT_INTERPOLATE;
+		newAction.eEase = EASE_INOUT;
+		newAction.fInterpolateSpeed = .8f;
+
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.8f, 0.f, -.6f };
+		newAction.fFOVY = 20.f;
+		m_CamSeq.push_back(newAction);
+
+		newAction = {};
+		newAction.fTime = 11.f;
+		newAction.eCamCut = CUT_HARD;
+		newAction.eCamPos = POS_ABSOLUTE;
+		newAction.vPos = _float3{ 59.7f, 26.8f, 71.6f };
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.93f, -0.07f, -.37f };
+		m_CamSeq.push_back(newAction);
+
+		newAction = {};
+		newAction.fTime = 11.f;
+		newAction.eCamCut = CUT_INTERPOLATE;
+		newAction.eEase = EASE_LINEAR;
+		newAction.fInterpolateSpeed = 3.f;
+		newAction.eCamPos = POS_ABSOLUTE;
+		newAction.vPos = _float3{ 55.1f, 26.4f, 69.8f };
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.93f, -0.07f, -.37f };
+		m_CamSeq.push_back(newAction);
+
+		//다리 입구 뷰 복귀
+		newAction = {};
+		newAction.fTime = 14.f;
+		newAction.eCamCut = CUT_HARD;
+		newAction.fFOVY = 25.f;
+		newAction.eCamPos = POS_ABSOLUTE;
+		newAction.vPos = _float3{ 65.6f, 25.6f, 80.f };
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.8f, 0.f, -.6f };
+		m_CamSeq.push_back(newAction);
+
+		//커비 뷰
+		newAction = {};
+		newAction.fTime = 15.f;
+		newAction.eCamCut = CUT_INTERPOLATE;
+		newAction.eEase = EASE_INOUT;
+		newAction.fInterpolateSpeed = 1.5f;
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.45f, 0.f, -.9f };
+		m_CamSeq.push_back(newAction);
+
+		//시동
+		newAction = {};
+		newAction.fTime = 19.f;
+		newAction.eCamCut = CUT_INTERPOLATE;
+		newAction.eEase = EASE_INOUT;
+		newAction.fInterpolateSpeed = 1.f;
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.3f, 0.f, -.95f };
+		m_CamSeq.push_back(newAction);
+
+		//다리 너머
+		newAction = {};
+		newAction.fTime = 20.1f;
+		newAction.eCamCut = CUT_INTERPOLATE;
+		newAction.eEase = EASE_OUT;
+		newAction.fInterpolateSpeed = 4.f;
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.24f, 0.f, 1.2f };
+		m_CamSeq.push_back(newAction);
+
+		newAction = {};
+		newAction.fTime = 26.f;
+		newAction.eCamCut = CUT_INTERPOLATE;
+		newAction.eEase = EASE_INOUT;
+		newAction.fInterpolateSpeed = 10.f;
+		newAction.eCamPos = POS_ABSOLUTE;
+		newAction.vPos = _float3{ 65.6f, 95.1f, 80.f };
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.24f, 0.5f, 1.f };
 		m_CamSeq.push_back(newAction);
 	}
 	break;
@@ -423,6 +530,11 @@ void CCamera_Main::Start_ShutterSeq(CGameObject* pNotifier)
 	Make_Sequence(SEQ_BREAKCARSHOP);
 }
 
+void CCamera_Main::Start_BridgeSeq(CGameObject* pNotifier)
+{
+	Make_Sequence(SEQ_BREAKRACINGMAP);
+}
+
 _int CCamera_Main::Tick(_float fTimeDelta)
 {
 
@@ -433,9 +545,9 @@ _int CCamera_Main::Tick(_float fTimeDelta)
 
 	m_eSpecialSeq != SEQ_END ?
 		//특정 시퀀스가 세팅되어 있는 경우
-	Play_Sequence(fTimeDelta) :
+		Play_Sequence(fTimeDelta) :
 		//실제 타겟을 기준으로 업데이트하는 경우
-	UpdatePos_FromAnchor(fTimeDelta);
+		UpdatePos_FromAnchor(fTimeDelta);
 
 
 
@@ -548,6 +660,7 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 				//보간 시간을 계산할 친구를 초기화해준다.
 				m_fSeqInterpolateTime = { 0.f, curAction.fInterpolateSpeed };
 
+				//position O
 				if (!ISDEFAULTFLOAT3(curAction.vPos))
 				{
 					if (curAction.eCamPos == POS_RELATIVE)
@@ -572,6 +685,10 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 						m_vDestCamPos = curAction.vPos;
 
 					m_vStartCamPos = GET_POS;
+				}
+				else
+				{
+					m_vDestCamPos = m_vStartCamPos = GET_POS;
 				}
 
 				// 카메라 목표 방향 값이 default일 경우와 아닐 경우를 구별한다.
@@ -651,6 +768,7 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 	_float3 vCamPos = _float3::Lerp(m_vStartCamPos, m_vDestCamPos, fInterpolateRatio);
 
 	_float3 vCamDir = m_pFirstTarget->Get_State(CTransform::STATE_POSITION) - (_float4)GET_POS;
+
 	if (m_bSeqDestDirIsAbsolute)
 		vCamDir = _float3::Lerp(m_vStartCamDir, m_vDestCamDir, fInterpolateRatio);
 
@@ -711,48 +829,39 @@ void CCamera_Main::Update_Anchor(_float fTimeDelta)
 
 	//첫번째 타겟 포커스
 	if (m_eCamFocus == FOCUS_FIRST)
+	{
 		vTargetPos = m_pFirstTarget->Get_State(CTransform::STATE_POSITION);
+		//지형 위치를 구하여 같이 쓰기
+		_float4 vTerrainPos = static_cast<CCharacter*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0))->Compute_TerrainPosition();
 
+		if (vTerrainPos.y != 0.f && m_eCamFocus != FOCUS_BOTH)
+			vTargetPos.y = (vTargetPos.y + vTerrainPos.y) * .5f;
+	}
 	//두번째 타겟 포커스
 	else if (m_eCamFocus == FOCUS_SECOND)
 		vTargetPos = m_pSecondTarget->Get_State(CTransform::STATE_POSITION);
-
 	//두 타겟 사이의 중심점.
 	else if (m_eCamFocus == FOCUS_BOTH)
 		vTargetPos =
-		(m_pFirstTarget->Get_State(CTransform::STATE_POSITION)
-			+ m_pSecondTarget->Get_State(CTransform::STATE_POSITION)) * .5f;
-
-
-	//지형 위치를 구하여 같이 쓰기
-	_float4 vTerrainPos = static_cast<CCharacter*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0))->Compute_TerrainPosition();
-
-	if (vTerrainPos.y != 0.f)
-		vTargetPos.y = (vTargetPos.y + vTerrainPos.y) * .5f;
+		m_pFirstTarget->Get_State(CTransform::STATE_POSITION)
+		+ (m_pSecondTarget->Get_State(CTransform::STATE_POSITION) - m_pFirstTarget->Get_State(CTransform::STATE_POSITION)) * .4f;
 
 
 	//실제 타겟 위치에서 조금 위로 기준점 정하기
-	_float fYOffset = 2.f * (m_fCurDistance / 30.f) + m_fCurUpOffset;
+	_float fYOffset = m_fCurUpOffset + (m_fCurDistance / 40.f);
 
 	//기준점 저장
 	m_vAnchor = F4toF3(vTargetPos) + _float3(0.f, fYOffset, 0.f);
 }
 
-void CCamera_Main::Update_CurCamPos(_float fTimeDelta)
-{
-
-	//실제 카메라 목표 위치를 저장한다.
-	if (m_eCamFocus == FOCUS_BOTH)
-		m_vCurCamPos = m_pFirstTarget->Get_State(CTransform::STATE_POSITION) - (m_vCurCamDir * m_fCurDistance);
-	else
-		m_vCurCamPos = m_vAnchor - (m_vCurCamDir * m_fCurDistance);
-}
 
 void CCamera_Main::Interpolate_CamSet(_float fTimeDelta)
 {
+	_float fSlerpSpeed = (m_eCamFocus == FOCUS_BOTH) ? 7.f : 5.f;
+
 	//떨어진 거리 보간
 	if (abs((m_fDestDistance + m_fCurZoomOffset) - m_fCurDistance) > .1f)
-		m_fCurDistance += ((m_fDestDistance + m_fCurZoomOffset) - m_fCurDistance) * fTimeDelta * 5.f;
+		m_fCurDistance += ((m_fDestDistance + m_fCurZoomOffset) - m_fCurDistance) * clamp(fTimeDelta * fSlerpSpeed, 0.f, 1.f);
 
 	//y 오프셋 보간
 	if (abs(m_fDestUpOffset - m_fCurUpOffset) > .001f)
@@ -763,10 +872,14 @@ void CCamera_Main::Interpolate_CamSet(_float fTimeDelta)
 		m_fFovy += (m_fDestFovy - m_fFovy) * fTimeDelta * 3.f;
 
 	//각도 보간
-	_float fSlerpSpeed = (m_eCamFocus == FOCUS_BOTH) ? 12.f : 4.f;
+	 fSlerpSpeed = (m_eCamFocus == FOCUS_BOTH) ? 12.f : 4.f;
 	m_vCurCamDir = SlerpDirVec(m_vCurCamDir, m_vDestCamDir, clamp(fTimeDelta * fSlerpSpeed, 0.f, 1.f));
 }
 
+void CCamera_Main::Update_CurCamPos(_float fTimeDelta)
+{
+	m_vCurCamPos = m_vAnchor - (m_vCurCamDir * m_fCurDistance);
+}
 
 void CCamera_Main::Subscribe_Events()
 {
@@ -777,9 +890,14 @@ void CCamera_Main::Subscribe_Events()
 	function<void(CGameObject*)> func = bind(&CCamera_Main::Start_ShutterSeq, this, placeholders::_1);
 	CEventCenter::Get_Instance()->Subscribe(KEVENT_BREAK_CARSHOP, this, func, 0);
 
-	//디디디 사망
-	func = bind(&CCamera_Main::EventFunc, this, placeholders::_1);
-	CEventCenter::Get_Instance()->Subscribe(KEVENT_DDD_DEAD, this, func, 0);
+	//다리 
+	func = bind(&CCamera_Main::Start_BridgeSeq, this, placeholders::_1);
+	CEventCenter::Get_Instance()->Subscribe(KEVENT_BREAK_RACINGMAP, this, func, 0);
+
+	//디디디 산송장
+	//func = bind(&CCamera_Main::EventFunc, this, placeholders::_1);
+	//CEventCenter::Get_Instance()->Subscribe(KEVENT_DDD_DEAD, this, func, 0);
+
 }
 
 //타겟 위치로부터 카메라 위치를 갱신, 보간한다.
@@ -796,38 +914,49 @@ void CCamera_Main::UpdatePos_FromAnchor(_float fTimeDelta)
 	Update_Anchor(fTimeDelta);
 
 
-	//_float3 vTargetProjPos = F4toF3(m_vAnchor);
-	//CUtils::Make_World_ToScreen(vTargetProjPos);
+	//**** 카메라 방향 설정 ****//
 
-
-
-
-
-	//**** 설정 값 보간 ****//
-
-	//트리거 안에 들어가 있을 경우 트리거 사이에서의 목표 카메라 설정을 맞춘다.
+	//트리거 안에 들어가 있을 경우 트리거 사이에서의 카메라 설정
 	if (m_bLerpByTriggerInfo)
 		LerpByTriggerInfo(m_iMatrixIndex);
 
-
-	// 두 타겟을 잡을 때, 조정
+	// 두 타겟을 잡을 때의 설정
 	if (m_eCamFocus == FOCUS_BOTH)
 	{
 		_float3 vDir = _float3(m_pSecondTarget->Get_State(CTransform::STATE_POSITION) - m_pFirstTarget->Get_State(CTransform::STATE_POSITION));
-
 		m_vDestCamDir = vDir;
+		m_vDestCamDir.Normalize();
+
 		m_vDestCamDir.y = m_vOrigCamDir.y;
+		m_vDestCamDir.Normalize();
 
 		_float fDist = vDir.Length();
-		fDist = clamp(fDist, 12.f, 40.f);
-		m_vDestCamDir.y += MAPVALUE(vDir.Length(), 12.f, 40.f, -4.5f, -3.f);
+		fDist = clamp(fDist, 20.f, 50.f);
+		fDist = MAPVALUE(fDist, 20.f, 50.f, 0.f, 1.f);
+		fDist = EASE_OUT(fDist);
+
+		m_vDestCamDir.y += MAPVALUE(fDist, 0.f, 1.f, -.1f, .2f);
 		m_vDestCamDir.Normalize();
+
+
+		//fDist = vDir.Length();
+		//fDist = clamp(fDist, 0.f, 80.f);
+		//fDist = MAPVALUE(fDist, 0.f, 80.f, 0.f, 1.f);
+		//fDist = EASE_INOUT(fDist);
+
+		//m_fDestDistance = 15.f + (80.f * fDist) /** .7f*/;
+
+		m_fDestDistance = 15.f + (m_pFirstTarget->Get_State(CTransform::STATE_POSITION) - m_pSecondTarget->Get_State(CTransform::STATE_POSITION)).Length() * 1.2f /** .7f*/;
 	}
+
+
+
+	/////Dest 값 설정 끝
+
 
 
 	if (.1f < fRealTimeDelta)
 		fRealTimeDelta = 1.f / 30.f;
-
 
 	//**** 카메라 세팅 값 보간 ****//
 	Interpolate_CamSet(fRealTimeDelta);
@@ -887,31 +1016,35 @@ void CCamera_Main::MoveTo_CurCamPos_Interpolate(_float fTimeDelta)
 	_float4 vDestYDir = { 0.f, vDestDir.y, 0.f , 0.f };
 
 
+	_float fInterpolateSpeed = (m_eCamFocus == FOCUS_BOTH) ? 12.f : m_fInterpolateSpeed;
+
 	//x 가기
 	if (.1f <= vDestXZDir.Length())
-		m_pTransformCom->Move(vDestXZDir * fTimeDelta * ((m_eCamFocus == FOCUS_BOTH) ? 12.f : m_fInterpolateSpeed));
+		m_pTransformCom->Move(vDestXZDir * fTimeDelta * fInterpolateSpeed);
 
 	//y로 가기
 	if (.1f <= vDestYDir.Length())
 	{
 		//위쪽으로 이동하는 거라면 일단 절대값으로.
 		if (0.f < vDestYDir.y)
-			m_pTransformCom->Move( vDestYDir * fTimeDelta * (m_fInterpolateSpeed * 1.2f) );
+			m_pTransformCom->Move(vDestYDir * fTimeDelta * (fInterpolateSpeed * 1.2f));
 		else
 		{
 			_float4 vDir = _float4();
 			//if (vDestYDir.Length() < 1.f)
 			//	vDir = F4toF3(vDestYDir) * m_fInterpolateSpeed;
 			//else
-				vDir = vDestYDir * m_fInterpolateSpeed;
+			vDir = vDestYDir * fInterpolateSpeed;
 
-			m_pTransformCom->Move( vDir * fTimeDelta );
+			m_pTransformCom->Move(vDir * fTimeDelta);
 		}
 	}
 
+	fInterpolateSpeed = (m_eCamFocus == FOCUS_BOTH) ? 10.f : 1.f;
+
 	//보간하여 바라보기
 	m_pTransformCom->Look_At_Interpolate(m_pTransformCom->Get_State(CTransform::STATE_POSITION) + Dir(m_vCurCamDir) + _float4{ 0.f, m_fCurUpOffset, 0.f, 0.f },
-		fTimeDelta * (m_eCamFocus != FOCUS_BOTH ? 1.f : 10.f));
+		fTimeDelta * fInterpolateSpeed);
 
 	//m_pTransformCom->Move(Dir(Make_ShakeDir(fTimeDelta)));
 }

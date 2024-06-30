@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "TunnelRock.h"
+#include "Kirby.h"
 
 CTunnelRock::CTunnelRock(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject{ pDevice, pContext }
@@ -37,16 +38,18 @@ HRESULT CTunnelRock::Initialize(void* pArg)
 
     m_bHide = true;
 
+    m_fTotalTime = 2.5f;
+
     m_fSamplingFactor = 0.1f;
     m_vRotationAxis = CUtils::Make_Random_Vector(1);
-    
-    m_fX = CUtils::Make_RandomFloat(15, 30);
+
+    m_fX = CUtils::Make_RandomFloat(0, 40);
     _int iRand = CUtils::Make_RandomInt(0, 1);
     if (0 == iRand)
         m_fX *= -1;
 
-    m_fY = CUtils::Make_RandomFloat(30, 50);
-    m_fZ = CUtils::Make_RandomFloat(15, 20);
+    m_fY = CUtils::Make_RandomFloat(20, 30);
+    m_fZ = CUtils::Make_RandomFloat(0, 40);
     _int iRand2 = CUtils::Make_RandomInt(0, 1);
     if (0 == iRand2)
         m_fZ *= -1;
@@ -59,14 +62,29 @@ _int CTunnelRock::Tick(_float fTimeDelta)
     if (true == m_bDead)
         return OBJ_DEAD;
 
-    fTime += fTimeDelta;
+    //if (false == m_bDirectionDetermined)
+    //{
+    //    CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
+    //    if (nullptr == pKirby)
+    //        return OBJ_NOEVENT;
 
-    if (fTime > 5.f)
+    //    CTransform* pTransform = pKirby->Get_TransformCom();
+    //    if (nullptr == pTransform)
+    //        return OBJ_NOEVENT;
+
+
+
+    //    m_bDirectionDetermined = true;
+    //}
+
+    m_fTime += fTimeDelta;
+
+    if (m_fTime > m_fTotalTime)
         Set_Dead();
+    
+    m_pTransformCom->Turn(m_vRotationAxis, fTimeDelta * 8.f);
 
-    m_pTransformCom->Turn(m_vRotationAxis, fTimeDelta * 5.f);
-
-    _float4 vDir = _float4(m_fX * fTimeDelta, m_fY * sin(0.2f * fTime) * fTimeDelta, m_fZ * fTimeDelta, 0);
+    _float4 vDir = _float4(m_fX * fTimeDelta, m_fY * cos(m_fTime * XM_PI / (m_fTotalTime * 2.f) ) * fTimeDelta, m_fZ * fTimeDelta, 0);
     m_pTransformCom->Move(vDir);
 
     return OBJ_NOEVENT;

@@ -8,12 +8,12 @@
 #include "TestModel_State.h"
 
 CTestModel::CTestModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CGameObject{ pDevice, pContext }
+    : CCharacter{ pDevice, pContext }
 {
 }
 
 CTestModel::CTestModel(const CTestModel& rhs)
-    : CGameObject{ rhs }
+    : CCharacter{ rhs }
 {
 }
 
@@ -35,9 +35,9 @@ HRESULT CTestModel::Initialize(void* pArg)
     //CGameInstance::Get_Instance()->Test();
     
     // position 세팅은 항상 Add_Components() 앞에 둘것
-    _vector vPos = XMVectorSet(0.f, 8.f, -180.f, 1.f);
-    m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
-    m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(-16.f));
+    //_vector vPos = XMVectorSet(0.f, 8.f, -180.f, 1.f);
+    //m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+    //m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(-16.f));
 
     if (FAILED(Add_Components()))
         return E_FAIL;
@@ -80,9 +80,9 @@ _int CTestModel::Tick(_float fTimeDelta)
         return OBJ_DEAD;
 
 
-    // 예시코드 4 : 광원 따라다니게 하는 코드
-    if (m_pLight != nullptr)
-        m_pLight->Update_LightPos(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
+    //// 예시코드 4 : 광원 따라다니게 하는 코드
+    //if (m_pLight != nullptr)
+    //    m_pLight->Update_LightPos(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
 
     // 점프용 velocity(속도)
     //m_fJumpVelocity -= GRAVITY * fTimeDelta;
@@ -214,9 +214,9 @@ void CTestModel::Late_Tick(_float fTimeDelta)
         m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
     }
 
-    CGameObject* pCamera = m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Camera"), 0);
-    _float4 vForce = static_cast<CTransform*>(pCamera->Get_Component(g_strTransformTag))->Get_State_Float4(CTransform::STATE_LOOK);
-    _float3 force = _float3{ vForce.x * 10000.f, vForce.y * 10000.f, vForce.z * 10000.f };
+    //CGameObject* pCamera = m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Camera"), 0);
+    //_float4 vForce = static_cast<CTransform*>(pCamera->Get_Component(g_strTransformTag))->Get_State_Float4(CTransform::STATE_LOOK);
+    //_float3 force = _float3{ vForce.x * 10000.f, vForce.y * 10000.f, vForce.z * 10000.f };
     //if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD7, KEY_DOWN))
     //    m_pRigidBodyCom->Add_Force(force);
     //if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD8, KEY_DOWN))
@@ -225,7 +225,7 @@ void CTestModel::Late_Tick(_float fTimeDelta)
     //    m_pRigidBodyCom->Add_Velocity(force);
 
     //m_pRigidBodyCom->Update(m_pTransformCom);
-    m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
+    //m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
 
     //m_pRigidBodyCom->Overlap_Hitbox();
 
@@ -320,24 +320,24 @@ HRESULT CTestModel::Add_Components()
     CHECK_FAILED(hr);
 
     /* For.Com_Model */
-    hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyVacuum"),
+    hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyWeapon_Hammer"),
         TEXT("Com_Model"), (CComponent**)&m_pModelCom);
     CHECK_FAILED(hr);
     // for animTool
     m_ppModelForAnimTool = &m_pModelCom;
 
     /* For.Com_RigidBody */
-    CRigidBody::RIGIDBODY_DESC rigidDesc {};
-    rigidDesc.bTrigger = false;
-    rigidDesc.bDynamic = true;
-    rigidDesc.bKinematic = false;
-    rigidDesc.eShapeType = RIGID_CAPSULE;
-    rigidDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
-    hr = __super::Add_Component(TEXT("Prototype_Component_RigidBody"),
-        TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &rigidDesc);
-    CHECK_FAILED(hr);
-    //m_pRigidBodyCom->Set_Object(this);
-    m_pRigidBodyCom->Activate(true);
+    //CRigidBody::RIGIDBODY_DESC rigidDesc {};
+    //rigidDesc.bTrigger = false;
+    //rigidDesc.bDynamic = true;
+    //rigidDesc.bKinematic = false;
+    //rigidDesc.eShapeType = RIGID_CAPSULE;
+    //rigidDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
+    //hr = __super::Add_Component(TEXT("Prototype_Component_RigidBody"),
+    //    TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &rigidDesc);
+    //CHECK_FAILED(hr);
+    ////m_pRigidBodyCom->Set_Object(this);
+    //m_pRigidBodyCom->Activate(true);
 
     ///* For.Com_CharacterController */
     //_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
@@ -355,12 +355,12 @@ HRESULT CTestModel::Add_Components()
 // not yet [JYWI]
 void CTestModel::Add_RigidBody(const wstring& KeyName, void* pArg)
 {
-    HRESULT hr;
+    //HRESULT hr;
 
-    CRigidBody* pRigidBody = nullptr;
-    hr = Add_Component(TEXT("Prototype_Component_RigidBody"), KeyName,
-                       (CComponent**)&pRigidBody, pArg);
-    CHECK_FAILED(hr);
+    //CRigidBody* pRigidBody = nullptr;
+    //hr = Add_Component(TEXT("Prototype_Component_RigidBody"), KeyName,
+    //                   (CComponent**)&pRigidBody, pArg);
+    //CHECK_FAILED(hr);
 
     // not yet
     //m_mapRigidBodies.emplace(KeyName, pRigidBody);
@@ -368,17 +368,17 @@ void CTestModel::Add_RigidBody(const wstring& KeyName, void* pArg)
 
 void CTestModel::SetUp_FSM()
 {
-    // FSM 상태 초기화
-    m_pFSM = CFSM::Create();
-    m_pFSM->Add_State(ATTACK,   CTestModel_Attack_State::Create());
-    m_pFSM->Add_State(IDLE,     CTestModel_Idle_State::Create());
-    m_pFSM->Add_State(RUN,      CTestModel_Run_State::Create());
+    //// FSM 상태 초기화
+    //m_pFSM = CFSM::Create();
+    //m_pFSM->Add_State(ATTACK,   CTestModel_Attack_State::Create());
+    //m_pFSM->Add_State(IDLE,     CTestModel_Idle_State::Create());
+    //m_pFSM->Add_State(RUN,      CTestModel_Run_State::Create());
 
-    // 상태 Initialize
-    CFSM::FSM_INFO		FSM_Desc = {};
-    FSM_Desc.iState = m_eCurrentState = IDLE;
-    FSM_Desc.pModel = &m_pModelCom;
-    m_pFSM->Initialize(&FSM_Desc);
+    //// 상태 Initialize
+    //CFSM::FSM_INFO		FSM_Desc = {};
+    //FSM_Desc.iState = m_eCurrentState = IDLE;
+    //FSM_Desc.pModel = &m_pModelCom;
+    //m_pFSM->Initialize(&FSM_Desc);
 }
 
 void CTestModel::Update_FSMState(_float fTimeDelta)
@@ -479,12 +479,12 @@ void CTestModel::Free()
 {
     __super::Free();
 
-    Safe_Release(m_pShaderCom);
+   // Safe_Release(m_pShaderCom);
     Safe_Release(m_pModelCom);
-    Safe_Release(m_pRigidBodyCom);
+    //Safe_Release(m_pRigidBodyCom);
     //Safe_Release(m_pControllerCom);
     
-    Safe_Release(m_pLight);
+    //Safe_Release(m_pLight);
     //Safe_Release(m_pFSM);
     
     // not yet [240520]

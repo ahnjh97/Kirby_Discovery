@@ -122,7 +122,7 @@ HRESULT CLevel_Racing::Ready_Lights()
 	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
 		return E_FAIL;
 
-	CGameInstance::Get_Instance()->Setting_GodRay({ -350.f, 700.f, 1200.f, 1.f });
+	CGameInstance::Get_Instance()->Setting_GodRay({ -450.f, 900.f, 1200.f, 1.f });
 
 	return S_OK;
 }
@@ -135,8 +135,8 @@ HRESULT CLevel_Racing::Ready_Layer_Camera(const wstring& strLayerTag)
 	MainCamDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	MainCamDesc.fNear = 0.1f;
 	MainCamDesc.fFar = 1000.0f;
-	MainCamDesc.vEye = _float4(-129.f, 10.f, -120.f, 1.f);
-	MainCamDesc.vAt = MainCamDesc.vEye + _float4(0.f, -.2f, -1.f, 1.f);
+	MainCamDesc.vEye = _float4(0.f, 0.f, 0.f, 1.f);
+	MainCamDesc.vAt = _float4(0.f, -.2f, -1.f, 1.f);
 	MainCamDesc.fSpeedPerSec = 10.f;
 	MainCamDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	MainCamDesc.fOrigDistance = 25.f;
@@ -171,6 +171,19 @@ HRESULT CLevel_Racing::Ready_Layer_BackGround(const wstring& strLayerTag)
 	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_RACING, strLayerTag, TEXT("Prototype_GameObject_SkySphere"), &RacingSkyDesc);
 	CHECK_FAILED(hr);
 
+
+	CGameObject::GAMEOBJECT_DESC ObjDesc{};
+	ObjDesc.fSpeedPerSec = 5.f;
+	ObjDesc.fRotationPerSec = ToRadian(90.f);
+	_float4x4 InitMat = _float4x4::Identity;
+	InitMat.Translation({ 48.f, 24.75f, 65.5f });
+	ObjDesc.matWorld = InitMat;
+
+	// Car Test
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_RACING, TEXT("Layer_Radio"), TEXT("Prototype_GameObject_Radio"), &ObjDesc)))
+		return E_FAIL;
+
+
 	return S_OK;
 }
 
@@ -184,7 +197,7 @@ HRESULT CLevel_Racing::Ready_Layer_UI(const wstring& _wstrLayerTag)
 	{
 		{CHUD::HUD_KIRBYHP, "HUD_KirbyStatus"},
 		{CHUD::HUD_STARPOINT, "HUD_StarPoint"},
-		{CHUD::HUD_ABILITYDISCARD, "HUD_AbilityDiscard"},
+		//{CHUD::HUD_ABILITYDISCARD, "HUD_AbilityDiscard"},
 	};
 
 	for (const auto& [eHUDType, strUITag] : HUDmap)
@@ -196,6 +209,15 @@ HRESULT CLevel_Racing::Ready_Layer_UI(const wstring& _wstrLayerTag)
 		if (FAILED(Load_FileData(strFilePath, FILE_UI, _wstrLayerTag)))
 			return E_FAIL;
 	}
+
+	LEVEL eLevel = LEVEL_FINALBOSS;
+
+	CUIObject::UIOBJ_DESC DiscardUIDesc{};
+	DiscardUIDesc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f, 0.f };
+	DiscardUIDesc.vPos = { DiscardUIDesc.vCenter.x, DiscardUIDesc.vCenter.y, 0.f };
+	DiscardUIDesc.vSize = { 260.f * 0.8f, 120.f * 0.8f, 1.f };
+
+	HRESULT hr = m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_UI_HUD"), TEXT("Prototype_GameObject_HUD_AbilityDiscard"), &DiscardUIDesc);
 
 	return S_OK;
 }
@@ -545,6 +567,10 @@ HRESULT CLevel_Racing::Ready_Items(_float fXOffset, _float fZOffset)
 	_uint iShaderVars{};
 	_float fRimWidth{};
 
+	unordered_set<string> vecCoins = { "Item_Coin", "Item_BlueCoin", "Item_RedCoin" };
+	unordered_set<string> vecFood = { "Item_Bread", "Item_Cake", "Item_Cocktail", "Item_EnergyDrink"
+		, "Item_Makaron", "Item_Meat", "Item_Omelet", "Item_Onigiri", "Item_Steak", "Item_Sushi" };
+
 	for (_uint i = 0; i < iNumObjects; i++)
 	{
 		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
@@ -562,17 +588,18 @@ HRESULT CLevel_Racing::Ready_Items(_float fXOffset, _float fZOffset)
 		tDesc.iShaderVars = iShaderVars;
 		tDesc.fRimWidth = fRimWidth;
 
-		if ("Item_Coin" == strModelName)
+		if (vecCoins.end() != vecCoins.find(strModelName))
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NoVacuumItem"), TEXT("Prototype_GameObject_Coin"), &tDesc)))
 				return E_FAIL;
 		}
-		else if ("Item_EnergyDrink" == strModelName)
+		else if (vecFood.end() != vecFood.find(strModelName))
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NoVacuumItem"), TEXT("Prototype_GameObject_Food"), &tDesc)))
 				return E_FAIL;
 		}
 	}
+
 	fileInput.close();
 
 	return S_OK;
@@ -616,7 +643,7 @@ HRESULT CLevel_Racing::Ready_Kickables(_float fXOffset, _float fZOffset)
 		tDesc.iShaderVars = iShaderVars;
 		tDesc.fRimWidth = fRimWidth;
 
-		if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Item"), TEXT("Prototype_GameObject_KickableRock"), &tDesc)))
+		if (FAILED(m_pGameInstance->Add_Clone(eLevel, g_strLayerMapObject, TEXT("Prototype_GameObject_KickableRock"), &tDesc)))
 			return E_FAIL;
 	}
 
@@ -693,6 +720,12 @@ HRESULT CLevel_Racing::Ready_Objects(_float fXOffset, _float fZOffset)
 			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Tunnel"), TEXT("Prototype_GameObject_Tunnel"), &tDesc)))
 				continue;
 		}
+		else if ("StarBlockS" == strModelName || "StarBlockM" == strModelName || "StarBlockL" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, g_strLayerMapObject, TEXT("Prototype_GameObject_StarBlock"), &tDesc)))
+				continue;
+		}
+
 	}
 	fileInput.close();
 

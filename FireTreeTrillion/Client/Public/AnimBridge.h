@@ -57,6 +57,8 @@ private:
 	_float			m_fTime = {};
 
 	_bool			m_bBound = { false };
+	_bool			m_bBoundTrigger = { true };
+	_float			m_fBoundTime = { 0.f };
 	_float			m_fAngle = { 0.f };
 
 public:

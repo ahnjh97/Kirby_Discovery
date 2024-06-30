@@ -53,6 +53,7 @@ private:
 	
 	HRESULT Add_Shaders();
 	HRESULT Add_FXTexture();
+	HRESULT Add_StaticUITexture();
 
 	void SetUp_ModelScaleRotation(LEVEL eLevel);
 
@@ -65,6 +66,9 @@ private:
 	void	Load_AnimToolInfo();
 
 	void	Load_ItemModels();
+	void	Load_KirbyBodyModels();
+	void	Load_KirbyWeaponModels();
+	void	Load_KirbyArmourModels();
 
 private:
 	ID3D11Device*				m_pDevice = { nullptr };
