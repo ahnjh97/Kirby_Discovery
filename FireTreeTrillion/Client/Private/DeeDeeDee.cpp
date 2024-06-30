@@ -7,6 +7,7 @@
 #include "Bone.h"
 #include "DeeDeeDeeHammer.h"
 #include "Camera_Main.h"
+#include "EventCenter.h"
 
 #define INFO(Dst) m_tInfo.Dst
 
@@ -58,8 +59,8 @@ HRESULT CDeeDeeDee::Initialize(void* pArg)
 	_float4 vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 	m_vNeckLook = m_vLEyeLook = m_vREyeLook = m_tInfo.m_vMoveDir = m_tInfo.m_vTargetDir = vLook;
 
-	
-	if (*m_pCurrentLevelID != LEVEL_TOWN) Make_TargetToCams();
+
+	//if (*m_pCurrentLevelID != LEVEL_TOWN) Make_TargetToCams();
 
 	return S_OK;
 }
@@ -565,10 +566,12 @@ void CDeeDeeDee::DeeDeeDee_SystemTick(_float fTimeDelta)
 					return;
 				Change_State(STATE_COMMAND, 60.f, false, true);
 				m_bInitializeAnim = false;
+
+				//전투 시작 이벤트 호출
+				CEventCenter::Get_Instance()->Notify(KEVENT_DDD_BATTLESTART, this);
 			}
 		}
 	}
-
 
 
 	// 맨 처음 발동하는 애니메이션이 끝나고, 진정한 패턴들이 시작된다.

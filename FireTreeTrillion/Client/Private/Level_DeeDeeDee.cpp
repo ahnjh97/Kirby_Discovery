@@ -135,10 +135,10 @@ HRESULT CLevel_DeeDeeDee::Ready_Layer_Camera(const wstring& strLayerTag)
 	MainCamDesc.fNear = 0.1f;
 	MainCamDesc.fFar = 1000.0f;
 	MainCamDesc.vEye = _float4(0.f, 0.f, 0.f, 1.f);
-	MainCamDesc.vAt = MainCamDesc.vEye + _float4(0.f, -.3f, 1.f, 1.f);
+	MainCamDesc.vAt = _float4(0.f, -.15f, 1.f, 1.f);
 	MainCamDesc.fSpeedPerSec = 10.f;
 	MainCamDesc.fRotationPerSec = XMConvertToRadians(90.0f);
-	MainCamDesc.fOrigDistance = 32.f;
+	MainCamDesc.fOrigDistance = 40.f;
 	MainCamDesc.fCamSensor = .3f;
 
 	if (FAILED(m_pGameInstance->Add_Clone(eLevel, strLayerTag, TEXT("Prototype_GameObject_Camera_Main"), &MainCamDesc)))

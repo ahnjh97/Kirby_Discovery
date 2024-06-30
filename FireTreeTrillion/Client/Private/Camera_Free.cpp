@@ -15,17 +15,7 @@ CCamera_Free::CCamera_Free(const CCamera_Free& rhs)
 
 }
 
-void CCamera_Free::Lock_Camera(_float3 vPos, _float3 vLook, _float fFOVY)
-{
-	m_bLockCamera = true;
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, Pos(vPos));
-
-
-	vLook.Normalize();
-	m_pTransformCom->Look_At_Dir(Dir(vLook));
-	m_fFovy = ToRadian(fFOVY);
-}
 
 HRESULT CCamera_Free::Initialize_Prototype()
 {
