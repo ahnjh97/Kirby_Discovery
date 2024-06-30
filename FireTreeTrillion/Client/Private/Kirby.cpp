@@ -1231,7 +1231,6 @@ void CKirby::SetUp_FSM()
 #pragma endregion
 
 
-
 	CFSM::FSM_INFO		FSM_Info_Desc = {};
 	FSM_Info_Desc.iState = STATE_IDLE;
 	FSM_Info_Desc.uNumModel = BODY_END;
@@ -1556,6 +1555,14 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 	else
 		m_bMotionBlur = true;
 
+
+
+
+	if (INFO(m_bDumpAbilityPress) == true &&
+		(m_pFSM->Get_State() != CKirby::STATE_IDLE || m_pFSM->Get_State() != CKirby::STATE_RUN ||
+			m_pFSM->Get_State() != CKirby::STATE_RUNSTART || m_pFSM->Get_State() != CKirby::SWORDSTATE_RUN ||
+			m_pFSM->Get_State() != CKirby::SWORDSTATE_WAIT || m_pFSM->Get_State() != CKirby::CARSTATE_IDLING))
+		INFO(m_bDumpAbilityPress) = false;
 
 	if (INFO(m_bDumpAbilityPress) == false)
 	{

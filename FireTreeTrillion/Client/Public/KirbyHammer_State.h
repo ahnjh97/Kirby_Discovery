@@ -20,6 +20,7 @@ public:
 	virtual void OnStateExit()														override;
 
 public:
+
 	static	CKirbyHammer_Idle_State* Create();
 	virtual void						Free() override;
 };
