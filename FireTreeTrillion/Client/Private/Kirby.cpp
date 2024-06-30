@@ -63,7 +63,7 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// µð¹ö±ë ¿ë
-	m_eAbilityType = ABILITY_HAMMER;
+	//m_eAbilityType = ABILITY_HAMMER;
 
 	m_pControllerCom->RegisterAsPlayer();
 
@@ -1250,7 +1250,7 @@ void CKirby::Event_Racing_Cut2(CGameObject* pObj)
 
 	INFO(m_bBooster) = false;
 	INFO(m_bCarJump) = false;
-
+	INFO(m_fMoveSpeed) = 0.f;
 	m_pControllerCom->Set_Position(m_pTransformCom, { 57.82f, 23.11f, 80.33f, 1.f });
 
 	CKirby::Change_State(CKirby::CARSTATE_CUT2, 60.f, false, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);

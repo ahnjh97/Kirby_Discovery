@@ -115,6 +115,7 @@
 #include "AnimBridge.h"
 #include "Tunnel.h"
 #include "TunnelRock.h"
+#include "Radio.h"
 //기믹
 #include "Gm_LabAntenna.h"
 #include "Gm_LabBossRoomDoor.h"
@@ -372,6 +373,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("StarBlock"), CStarBlock);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("StarBlockPiece"), CStarBlockPiece);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TerrainFog"), CTerrainFog);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Radio"), CRadio);
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BreakableRock"), CBreakableRock);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BreakableRockPartical"), CBreakableRockParticle);
@@ -1514,6 +1516,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("SeShell", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
+
+
 		// 자동차 관련 (자동차와 부수는 돌멩이들)
 		m_vecModelInfo.emplace_back("Car", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("RockA", TYPE_NONANIM, 1.f);
@@ -1523,6 +1527,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("CarShopWallFrame", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("CarShopFrameBefore", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("CarShopWallParticle", TYPE_NONANIM);
+
+		m_vecModelInfo.emplace_back("Radio", TYPE_ANIM, 1.f, 180.f);
+
 
 		// For Item
 		Load_ItemModels();

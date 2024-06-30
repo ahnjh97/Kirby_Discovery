@@ -171,6 +171,19 @@ HRESULT CLevel_Racing::Ready_Layer_BackGround(const wstring& strLayerTag)
 	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_RACING, strLayerTag, TEXT("Prototype_GameObject_SkySphere"), &RacingSkyDesc);
 	CHECK_FAILED(hr);
 
+
+	CGameObject::GAMEOBJECT_DESC ObjDesc{};
+	ObjDesc.fSpeedPerSec = 5.f;
+	ObjDesc.fRotationPerSec = ToRadian(90.f);
+	_float4x4 InitMat = _float4x4::Identity;
+	InitMat.Translation({ 48.f, 24.75f, 65.5f });
+	ObjDesc.matWorld = InitMat;
+
+	// Car Test
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_RACING, TEXT("Layer_Radio"), TEXT("Prototype_GameObject_Radio"), &ObjDesc)))
+		return E_FAIL;
+
+
 	return S_OK;
 }
 

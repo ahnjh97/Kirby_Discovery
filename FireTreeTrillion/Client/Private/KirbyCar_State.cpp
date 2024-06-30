@@ -58,6 +58,9 @@ void CKirbyCar_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			DESC(m_fDumpAbilityTime) = 0.f;
 			DESC(m_fJumpVelocity) = 15.f;
 			pKirby->Change_State(CKirby::STATE_SPITDEFORM, 60.f, false, false, CKirby::BODY_VACUUM);
+
+			DESC(m_bBooster) = false;
+			pKirby->Delete_Effect("Come On Dash");
 			return;
 		}
 	}
