@@ -248,6 +248,36 @@ void CDee_Run_State::Free()
 }
 #pragma endregion
 
+#pragma region JUMP STATE
+
+CDee_Jump_State::CDee_Jump_State()
+{
+}
+
+void CDee_Jump_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
+{
+}
+
+void CDee_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+}
+
+void CDee_Jump_State::OnStateExit()
+{
+	m_fDuration = 0.f;
+}
+
+CDee_Jump_State* CDee_Jump_State::Create()
+{
+	return nullptr;
+}
+
+void CDee_Jump_State::Free()
+{
+}
+
+#pragma endregion
+
 #pragma region EMOTION STATE
 CDee_Emotion_State::CDee_Emotion_State()
 {
@@ -982,3 +1012,5 @@ void CBattleDee_NearDeeDeeDee_State::Free()
 {
 	__super::Free();
 }
+
+
