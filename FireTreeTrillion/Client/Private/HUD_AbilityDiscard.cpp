@@ -41,10 +41,6 @@ HRESULT CHUD_AbilityDiscard::Initialize(void* _pArg)
 
 	m_eTexState = DISCARD_IDLE;
 
-	//Init 초기 값 사전 저장
-	//m_vInitPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-	//m_vInitSize = m_pTransformCom->Get_Scaled();
-
 	return S_OK;
 }
 
@@ -54,12 +50,12 @@ _int CHUD_AbilityDiscard::Tick(_float fTimeDelta)
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_V, KEY_PRESS))
 	{
-		//매 틱마다 정보를 갱신할 필요는 없으므로, 해당 상태일 때 커비 정보를 체크
 		m_pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
 		if (m_pKirby == nullptr)
 			return OBJ_NOEVENT;
 
 		//커비 능력버리기 시간
+		//간헐적으로 특정 시점에서 덤프타임 초기화되지 않음. 특정 상태 (키 입력 등)일 경우에 대한 예외 처리 필요
 		m_fDumpAbilityTime = m_pKirby->Get_KirbyInfo()->m_fDumpAbilityTime;
 
 		if (m_fDumpAbilityTime <= 0) //사전에 능력이 없을 경우를 덤프시간으로 체크
@@ -148,23 +144,23 @@ HRESULT CHUD_AbilityDiscard::Render()
 	for (_uint iTexType = 0; iTexType < TEX_NONE; ++iTexType)
 	{
 		PASS_POSTEX ePassType = { POSTEX_ALPHABLEND_NOTEST };
-		if (TEX_MASK == iTexType) //마스크 텍스처에 대한 설정
+		if (TEX_MASK == iTexType) //마스크 텍스처 설정
 		{
 			ePassType = POSTEX_UI_MASK; //PS_MAIN_FOR_HP
 			m_pTextureCom[TEX_MASK]->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", 0);
 			m_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fGaugeRatio, sizeof(_float));
+			continue; //마스크는 바인딩X
 		}
 
 		for (_uint iTexIndex = 0; iTexIndex < TEXDC_NONE; ++iTexIndex)
 		{
-			if (1 == TEXDC_GAUGE)
-				ePassType = POSTEX_UI_MASK2; //PS_MVCBBAIN_FOR_HPDAMAGE
+			if (TEXDC_GAUGE == iTexIndex)
+				ePassType = POSTEX_BOSS_BARPASS_DEFAULT;
 
-			else
-				ePassType = POSTEX_ALPHABLEND_NOTEST;
-
-			hr = Bind_ShaderResources(m_pShaderCom, ePassType, m_pTextureCom[iTexType], iTexIndex);
-			CHECK_FAILED(hr);
+			if (TEXDC_BTN == iTexIndex)
+				ePassType = POSTEX_UIWHITEALPHA;
+				
+			hr = Bind_ShaderResources(m_pShaderCom, ePassType, m_pTextureCom[iTexType], iTexIndex); CHECK_FAILED(hr);
 		}
 	}
 
