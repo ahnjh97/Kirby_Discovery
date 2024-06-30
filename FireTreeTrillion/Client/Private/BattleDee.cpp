@@ -18,21 +18,19 @@ pair<DEE_ANIM, _bool> CBattleDee::Make_WhatToDo()
 {
 	DEE_ANIM eDeeState = DEEANIM_END;
 
-	switch (CUtils::Make_RandomInt(0, 2))
+	//목표 지점과의 거리가 가깝다면 디디디 주변
+	if (_float3::Distance(GET_POS, Make_DestPos()) < 6.f)
+		eDeeState = DEEANIM_TROUBLE;
+	//아니라면, 다시 달리기
+	else
 	{
-	case 0:
-		eDeeState = DEEANIM_ENEMYRUN;
-		break;
-	case 1:
-		eDeeState = DEEANIM_ANGERRUN;
-		break;
-	case 2:
-		eDeeState = DEEANIM_ANGERRUN;
-		break;
-	default:
-		eDeeState = DEEANIM_ANGERRUN;
-		break;
-	};
+		_float fPercentage = CUtils::Make_RandomFloat(1.f, 100.f);
+
+		eDeeState = fPercentage < 20.f ?
+			DEEANIM_ENEMYRUN :
+			DEEANIM_ANGERRUN;
+	}
+
 
 	Set_DeeEyeState(DEEEYE_SADNESS);
 	return { eDeeState, true };
@@ -297,7 +295,7 @@ void CBattleDee::SetUp_FSM()
 {
 	m_pFSM = CFSM::Create();
 
-	m_pFSM->Add_State(DEEANIM_TROUBLE, CDee_Emotion_State::Create());
+	m_pFSM->Add_State(DEEANIM_TROUBLE, CBattleDee_NearDeeDeeDee_State::Create());
 	m_pFSM->Add_State(DEEANIM_ANGERRUN, CDee_Run_State::Create());
 	m_pFSM->Add_State(DEEANIM_ENEMYRUN, CDee_Panic_State::Create());
 	m_pFSM->Add_State(DEEANIM_CHEERINGA, CDee_Emotion_State::Create());

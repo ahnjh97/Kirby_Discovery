@@ -925,3 +925,50 @@ void CDee_Panic_State::Free()
 }
 
 #pragma endregion
+
+CBattleDee_NearDeeDeeDee_State::CBattleDee_NearDeeDeeDee_State()
+{
+}
+
+void CBattleDee_NearDeeDeeDee_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+}
+
+void CBattleDee_NearDeeDeeDee_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	BASE_INFO baseInfo{};
+	Setup_BaseInfo(baseInfo, pGameObject);
+	System_Tick(fTimeDelta);
+
+	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta);
+
+	_float3 vMyPos = baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION);
+	_float3 vDestPos = baseInfo.pDee->Make_DestPos();
+	vDestPos.y = vMyPos.y;
+
+	baseInfo.pTransformCom->Look_At_Interpolate(vDestPos, fTimeDelta);
+
+	//목표 지점에 도달하면 다시 달려간다
+	if ( 4.f < (vDestPos - vMyPos).Length())
+	{
+		DEE_ANIM eNextState = DEEANIM_ANGERRUN;
+		baseInfo.pDee->Change_State(eNextState, 60.f, true, true);
+	}
+}
+
+void CBattleDee_NearDeeDeeDee_State::OnStateExit()
+{
+	m_fDuration = 0.f;
+}
+
+CBattleDee_NearDeeDeeDee_State* CBattleDee_NearDeeDeeDee_State::Create()
+{
+	CBattleDee_NearDeeDeeDee_State* pInstance = new CBattleDee_NearDeeDeeDee_State();
+	return pInstance;
+}
+
+void CBattleDee_NearDeeDeeDee_State::Free()
+{
+	__super::Free();
+}
