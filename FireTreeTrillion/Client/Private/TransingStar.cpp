@@ -2,7 +2,9 @@
 #include "TransingStar.h"
 #include "Utils.h"
 
-const _float	g_fPosOffset = 18.f;
+const _float	g_fPosOffset        = 18.f;
+const _float	g_fTurnOffset       = 72.f;
+#define         TIMEDELTA_OFFSET    1.5f
 
 CTransingStar::CTransingStar(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CUIObject{ pDevice, pContext }
@@ -44,50 +46,60 @@ _int CTransingStar::Tick(_float fTimeDelta)
     if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD2, KEY_DOWN))
     {
         m_bActivate = false;
-        m_fTurningTimeRemains = 1.f;
+        m_fYeonDooTime = 1.f;
         m_fAlphaTimeRemains = 1.f;
+
         m_bDeadYeonDoo = false;
         m_fDecreaseValue = 0.f;
     }
 
     if (false == m_bActivate) return OBJ_NOEVENT;
     
-    // ============================== 투명 ==============================
+    //-------------------------------- 투명 --------------------------------
     if (m_fAlphaTimeRemains > 0.f)
-        m_fAlphaTimeRemains -= fTimeDelta * 1.5f;
+        m_fAlphaTimeRemains -= fTimeDelta * TIMEDELTA_OFFSET;
 	else
 		m_fAlphaTimeRemains = 0.f;
 
 	// 투명별 사이즈 조절
 	if (m_bDeadYeonDoo)
 		CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], 0.f, 0.f, 1.f);
-	//else if (m_InitialSize.x * m_fAlphaTimeRemains <= m_MediumSize.x)
-	//	CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], m_MediumSize.x, m_MediumSize.y, 1.f);
+	else if (m_InitialSize.x * m_fAlphaTimeRemains <= m_MediumSize.x)
+		CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], m_MediumSize.x, m_MediumSize.y, 1.f);
 	else
 		CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], m_InitialSize.x * m_fAlphaTimeRemains, m_InitialSize.y * m_fAlphaTimeRemains, 1.f);
 
 
-	// ============================== 연두 ==============================
-	if (m_fAlphaTimeRemains <= 0.6f) // 투명별이 60% 진행되었을 때 연두별 시작
+    //-------------------------------- 연두 --------------------------------
+	if (m_fAlphaTimeRemains <= 0.6f) // 투명별이 10% 진행되었을 때, 연두별 시작
 	{
-        if (m_InitialSize.x >= m_fDecreaseValue)
-		{
-			CUtils::Turn_OtherMatrix(m_arrayStarMatrix[1], _float4(0.f, 0.f, 1.f, 0.f), fTimeDelta, 72.f);
-            m_fDecreaseValue += fTimeDelta * 2000.f * 1.7f;
-			CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[1], m_InitialSize.x - m_fDecreaseValue, m_InitialSize.y - m_fDecreaseValue, 1.f);
-			if (m_fTurningTimeRemains <= 0.f)
-				m_bDeadYeonDoo = true;
-			m_fTurningTimeRemains -= fTimeDelta;
-		}
+        // 연두 돌아가유
+        if(m_bDeadYeonDoo)
+		    CUtils::Turn_OtherMatrix(m_arrayStarMatrix[1], _float4(0.f, 0.f, 1.f, 0.f), fTimeDelta, 720.f);
         else
-        	CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[1], 0.f, 0.f, 1.f);
+		    CUtils::Turn_OtherMatrix(m_arrayStarMatrix[1], _float4(0.f, 0.f, 1.f, 0.f), fTimeDelta * TIMEDELTA_OFFSET, g_fTurnOffset);
+        
+        // 연두 사이즈 감소
+        m_fDecreaseValue += fTimeDelta* m_fDecreaseOffset * TIMEDELTA_OFFSET;
+		CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[1], m_InitialSize.x - m_fDecreaseValue, m_InitialSize.y - m_fDecreaseValue, 1.f);
+        
+        // 연두가 투명해지는 조건 == m_fYeonDooTime(1초)가 되었을때
+        if (m_fYeonDooTime <= 0.f)
+             m_bDeadYeonDoo = true;
+        m_fYeonDooTime -= fTimeDelta * TIMEDELTA_OFFSET;
+        
+        // 사이즈가 다시 커지는 것에 대한 예외처리
+        if (m_InitialSize.x < m_fDecreaseValue)
+			CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[1], 0.f, 0.f, 1.f);
 	}
-    else
-        CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[1], m_InitialSize.x, m_InitialSize.y, 1.f);
+    else // 연두별 배경 대기
+        CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[1], m_InitialSize.x * 1.5f, m_InitialSize.y * 1.5f, 1.f);
 
 
-    // ============================== 초록 ==============================
+    //-------------------------------- 초록 --------------------------------
     CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[2], m_InitialSize.x, m_InitialSize.y, 1.f);
+
+
 
     return OBJ_NOEVENT;
 }
@@ -142,6 +154,9 @@ HRESULT CTransingStar::Render()
 #ifdef _DEBUG
 void CTransingStar::Render_IMGUI()
 {
+    //char ratio[16];
+    //ImGui::DragFloat(ratio, (_float*)&m_fDecreaseOffset, 0.100f, 3000.f, 5000.f);
+    //ImGui::Separator(); ImGui::NewLine();
 }
 #endif
 
