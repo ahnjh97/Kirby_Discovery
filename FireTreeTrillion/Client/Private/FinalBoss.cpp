@@ -4,6 +4,7 @@
 #include "FinalBoss_State.h"
 #include "FinalBossSpear.h"
 #include "RayArrow.h"
+#include "Camera_Main.h"
 
 CFinalBoss::CFinalBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -51,6 +52,8 @@ HRESULT CFinalBoss::Initialize(void* pArg)
 	m_eBossState = STATE_FLYING;
 
 	m_pModelCom->Set_Animation(FINALBOSS_DEMOAPPEARCUT5, 70.f, false, true);
+
+	Make_TargetToCams();
 
 	return S_OK;
 }
@@ -194,6 +197,19 @@ void CFinalBoss::Change_State(FINALBOSS_ANIM eState, _float _fAnimSpeed, _bool _
 _bool CFinalBoss::IsAnimFinished()
 {
 	return m_pModelCom->IsFinished();
+}
+
+HRESULT CFinalBoss::Make_TargetToCams()
+{
+	if (*m_pCurrentLevelID == LEVEL_TOOL_ANIM)
+		return S_OK;
+
+	CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+	CHECK_NULLPTR(pCameraMain);
+
+	pCameraMain->Set_Target(m_pTransformCom, CCamera::TARGET_SECOND, CCamera::FOCUS_BOTH);
+
+	return S_OK;
 }
 
 HRESULT CFinalBoss::Add_Components()
