@@ -816,7 +816,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction.vDir = _float3{ -.45f, 0.f, -.9f };
 		m_CamSeq.push_back(newAction);
 
-		m_fStartAudioTime = 8.08f;
+		m_fStartAudioTime = 8.2f;
 
 		//라디오 보기
 		newAction = {};
