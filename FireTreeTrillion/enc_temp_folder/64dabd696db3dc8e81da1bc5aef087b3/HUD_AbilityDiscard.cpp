@@ -157,11 +157,11 @@ HRESULT CHUD_AbilityDiscard::Render()
 
 		for (_uint iTexIndex = 0; iTexIndex < TEXDC_NONE; ++iTexIndex)
 		{
-			if (1 == TEXDC_GAUGE)
-				ePassType = POSTEX_UI_MASK2; //PS_MVCBBAIN_FOR_HPDAMAGE
+			//if (1 == TEXDC_GAUGE)
+			//	ePassType = POSTEX_UI_MASK2; //PS_MVCBBAIN_FOR_HPDAMAGE
 
-			else
-				ePassType = POSTEX_ALPHABLEND_NOTEST;
+			//else
+			//	ePassType = POSTEX_ALPHABLEND_NOTEST;
 
 			hr = Bind_ShaderResources(m_pShaderCom, ePassType, m_pTextureCom[iTexType], iTexIndex);
 			CHECK_FAILED(hr);

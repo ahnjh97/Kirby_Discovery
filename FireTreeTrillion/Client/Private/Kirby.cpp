@@ -736,25 +736,30 @@ void CKirby::Key_Input(_float fTimeDelta)
 		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
 	}
 
-	if (m_pGameInstance->Get_DIKeyState(DIK_B, KEY_DOWN))
+	//특정 레벨에서 덤프할 경우 크래시 발생으로 예외 처리
+	//디버깅이 필요할 경우 레벨 별 조건 처리하면 됨
+	LEVEL eCurLevel = (LEVEL)*m_pGameInstance->Get_CurrentLevelID();
+	if (LEVEL_RACING == eCurLevel)
 	{
-		Change_State(CARVACUUMSTATE_DEFORM, 60.f, false, false, BODY_CARVACUUM, OFFSET_CARVACUUM);
-	}
-	if (m_pGameInstance->Get_DIKeyState(DIK_N, KEY_DOWN))
-	{
-		CGameObject::GAMEOBJECT_DESC ObjDesc{};
+		if (m_pGameInstance->Get_DIKeyState(DIK_B, KEY_DOWN))
+		{
+			Change_State(CARVACUUMSTATE_DEFORM, 60.f, false, false, BODY_CARVACUUM, OFFSET_CARVACUUM);
+		}
+		if (m_pGameInstance->Get_DIKeyState(DIK_N, KEY_DOWN))
+		{
+			CGameObject::GAMEOBJECT_DESC ObjDesc{};
 
-		ObjDesc.fSpeedPerSec = 5.f;
-		ObjDesc.fRotationPerSec = ToRadian(90.f);
-		_float4x4 InitMat = _float4x4::Identity;
-		InitMat.Translation({ -50.f, 5.f, -6.5f });
-		ObjDesc.matWorld = InitMat;
-		ObjDesc.wstrModelName = TEXT("RockA");
-		// Car Test
-		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Rock"), TEXT("Prototype_GameObject_BreakableRock"), &ObjDesc)))
-			return;
+			ObjDesc.fSpeedPerSec = 5.f;
+			ObjDesc.fRotationPerSec = ToRadian(90.f);
+			_float4x4 InitMat = _float4x4::Identity;
+			InitMat.Translation({ -50.f, 5.f, -6.5f });
+			ObjDesc.matWorld = InitMat;
+			ObjDesc.wstrModelName = TEXT("RockA");
+			// Car Test
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Rock"), TEXT("Prototype_GameObject_BreakableRock"), &ObjDesc)))
+				return;
+		}
 	}
-
 
 #pragma endregion
 }
