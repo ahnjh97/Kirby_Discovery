@@ -208,6 +208,8 @@ HRESULT CFinalBoss::Make_TargetToCams()
 	CHECK_NULLPTR(pCameraMain);
 
 	pCameraMain->Set_Target(m_pTransformCom, CCamera::TARGET_SECOND, CCamera::FOCUS_BOTH);
+
+	return S_OK;
 }
 
 HRESULT CFinalBoss::Add_Components()
