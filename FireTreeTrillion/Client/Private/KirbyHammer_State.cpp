@@ -218,6 +218,8 @@ void CKirbyHammer_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float f
 		if (pKirby->isAnimFinish())
 		{
 			pKirby->Change_State(CKirby::HAMMERSTATE_HAMMERATTACKHITTOY, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
+			pCamera->Make_Shake();
 			pKirby->Set_WeaponAnim(6);
 			return;
 		}
@@ -314,14 +316,19 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 	// 모든 공격의 시작이라고 볼 수 있다.
 	if (pKirby->Get_State() == CKirby::HAMMERSTATE_ONIGOROSIHAMMERSTART)
 	{
+		//if (JoyStick_controller() == true)
+		//{
+
+		//}
+
+		//Turn_Interpolate(pKirbydesc)
+
 		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == false)
 		{
 			pKirby->Change_State(CKirby::HAMMERSTATE_HAMMERATTACKSTARTTOY, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
 			DESC(m_eEyeState) = CKirby::EYE_CLOSE;
 			return;
 		}
-
-
 		if (pKirby->isAnimFinish())
 		{
 			pKirby->Change_State(CKirby::HAMMERSTATE_ONIGOROSIHAMMERCHARGE, 60.f, true, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
@@ -338,8 +345,6 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 			DESC(m_eEyeState) = CKirby::EYE_ANGER;
 			return;
 		}
-
-
 	}
 	// 차지 중 이동하는 모션
 	else if (pKirby->Get_State() == CKirby::HAMMERSTATE_ONIGOROSIHAMMERMOVE)
@@ -354,6 +359,7 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 		{
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_IDLE);
+			pKirby->Set_WeaponAnim(3);
 			return;
 		}
 	}
