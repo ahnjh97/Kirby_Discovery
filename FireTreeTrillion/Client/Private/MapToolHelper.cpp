@@ -143,8 +143,12 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "CvBarricadeA", "CvGasCylinderAL", "CvGasCylinderBL"
 		, "CvGasCylinderCL", "CvGasCylinderDL", "CvGasCylinderEL", "CvGasCylinderHoseA", "CvGasCylinderHoseD"
 
-		, "GsCarBaseAL", "GsCarCounterAL", "GsCarDirtyRack01L", "GsCarHoistCrane01L", "GsCarMachineAL"
-		, "GsCarStop"
+		, "DsBuildingFenceAL", "DsBuildingFenceBL", "DsBuildingFenceCL", "DsBuildingFenceDL", "DsBuildingFenceEL"
+		, "DsBuildingFenceFL", "DsBuildingFenceGL", "DsBuildingFenceHL", "DsBuildingFenceIL"
+		, "DsPalmABottomL", "DsPalmAMiddleL", "DsPalmATopL", "DsPalmBL", "DsPalmCL"
+
+		, "GsCarBaseAL", "GsCarCounterAL", "GsCarDirtyRack01L", "GsCarDisplayRack", "GsCarHoistCrane01L"
+		, "GsCarMachineAL", "GsCarMeshRack", "GsCarStop"
 		, "GsRubbleAsphalt01L", "GsRubbleAsphalt02L", "GsRubbleAsphalt03L", "GsRubbleAsphalt04L"
 		, "GsRubbleAsphalt05L", "GsRubbleAsphalt06L", "GsRubbleAsphalt07L", "GsRubbleAsphalt08L"
 		, "GsRubbleAsphalt09L", "GsScrappedCar"
@@ -185,7 +189,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	m_setKickables = { "GsPebble", "SeShell", "WasteCanYellow" };
 	m_setItemTxts = { "Item_BlueCoin", "Item_Bread", "Item_Cake", "Item_Cocktail", "Item_Coin", "Item_EnergyDrink", "Item_Makaron",
 		"Item_Meat", "Item_Omelet", "Item_Onigiri", "Item_RedCoin", "Item_Steak", "Item_Sushi" };
-	m_setTrees = { "GsTreeA", "GsTreeB", "GsTreeC" };
+	m_setTrees = { "GsTreeA", "GsTreeB", "GsTreeC", "DsPalmABottomL", "DsPalmAMiddleL", "DsPalmATopL", "DsPalmBL", "DsPalmCL" };
 
 	//블렌드 적용이 필요한 데코오브젝트
 	m_setBlendDecos = {"LbOutBuildingWallL", "LbOutBuildingFenceL", "GsCarFloor" };
@@ -592,6 +596,9 @@ void CMapToolHelper::Menu_NonAnimModels()
 
 void CMapToolHelper::Menu_TriggerInfo()
 {
+	if (false == IsTrigger(m_strCurModel))
+		return;
+
 	if (m_strCurModel == "Camera" || m_strCurModel == "Trigger" || m_strCurModel == "Dummy")
 	{
 		CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(m_pPickedObject);
@@ -634,6 +641,32 @@ void CMapToolHelper::Menu_TriggerInfo()
 
 		if (m_strCurModel == "Dummy")
 			Menu_CamLerpInfo(pMapToolObject);
+
+		ImGui::End();
+	}
+	else if ("Fog" == m_strCurModel)
+	{
+		CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(m_pPickedObject);
+		s_iTriggerIdx = pMapToolObject->Get_TriggerIndex(); // Rows
+		s_fRadius = pMapToolObject->Get_Radius(); // NumInstances
+		string strTrigger = "[ " + m_strCurModel + " ]";
+
+		ImGui::Begin(strTrigger.c_str());
+		ImGui::SetCursorPosX(17);
+		ImGui::Text("ROWS");
+		ImGui::SameLine();
+		ImGui::SetCursorPosX(77);
+
+		ImGui::SetNextItemWidth(80);
+		if (ImGui::Combo("##InstanceRows", &s_iTriggerIdx, s_triggerIndices, IM_ARRAYSIZE(s_triggerIndices)))
+			pMapToolObject->Set_TriggerIndex(s_iTriggerIdx);
+
+		ImGui::Text("INSTANCES");
+		ImGui::SameLine();
+		ImGui::SetCursorPosX(76);
+		ImGui::SetNextItemWidth(90);
+		if (ImGui::InputFloat("##NumInstances", &s_fRadius, 1.f, 1.f, "%.0f"))
+			pMapToolObject->Set_Radius(s_fRadius);
 
 		ImGui::End();
 	}

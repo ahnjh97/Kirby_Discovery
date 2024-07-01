@@ -72,6 +72,8 @@ void CEventCallBack::Clear_EventCallBack()
     m_Triggers.clear();
     m_TriggerFuncs.clear();
     m_ExitFuncs.clear();
+    for (auto& pair : m_TriggerToMapDecoAnimMap)
+        Safe_Release(get<0>(pair.second));
 }
 
 _bool CEventCallBack::IsActorInTriggerList(PxActor* pRigidActor)

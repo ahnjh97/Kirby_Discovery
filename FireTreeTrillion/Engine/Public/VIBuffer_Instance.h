@@ -27,6 +27,8 @@ public:
 	//Color + Alpha °è»ê
 	virtual _float4 Compute_RandColor() = 0;
 
+	_float4 Compute_RectanglePos(_uint iIndex);
+
 	virtual VTXMATRIX* Map();
 	virtual void Unmap();
 

@@ -199,6 +199,16 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& _wstrLayerTag)
 		if (FAILED(Load_FileData(strFilePath, FILE_UI, _wstrLayerTag)))
 			return E_FAIL;
 	}
+
+	LEVEL eLevel = LEVEL_GAMEPLAY;
+
+	CUIObject::UIOBJ_DESC DiscardUIDesc{};
+	DiscardUIDesc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f, 0.f };
+	DiscardUIDesc.vPos = { DiscardUIDesc.vCenter.x, DiscardUIDesc.vCenter.y, 0.f };
+	DiscardUIDesc.vSize = { 260.f * 0.8f, 120.f * 0.8f, 1.f };
+
+	HRESULT hr = m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_UI_HUD"), TEXT("Prototype_GameObject_HUD_AbilityDiscard"), &DiscardUIDesc);
+
 	return S_OK;
 }
 

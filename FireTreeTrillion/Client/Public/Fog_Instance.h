@@ -10,6 +10,13 @@ END
 
 class CFog_Instance final : public CGameObject
 {
+public:
+	struct FOG_INSTANCE_DESC : public GAMEOBJECT_DESC
+	{
+		_uint iRows = { 1 };
+		_uint iNumInstances = { 1 };
+	};
+
 private:
 	CFog_Instance(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CFog_Instance(const CFog_Instance& rhs);
@@ -29,9 +36,10 @@ private:
 
 	_float	m_fAlpha = { 0.f };
 	_uint	m_iRandomFog = { 0 };
+	_float3 m_vColor = _float3{ 1.f, 1.f , 1.f };
 
 private:
-	HRESULT Add_Components();
+	HRESULT Add_Components(INSTANCE_DESC& _tInstanceDesc);
 	HRESULT Bind_ShaderResources();
 	//void	Effect_Billboard(_float fTimeDelta);
 

@@ -88,6 +88,10 @@ namespace Engine
 
 		vector<_bool> vecMoveCommands;
 
+		_uint		iNumInstance = {1};
+		INSTANCE_SHAPE eInstanceShape = { INSTANCE_SHAPE_END };
+		_uint		iRows = { 1 };
+		_bool		bRandPos = { false };
 	}INSTANCE_DESC;
 
 	typedef struct 

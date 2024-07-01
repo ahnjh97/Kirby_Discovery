@@ -64,7 +64,7 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// 디버깅 용
-	//m_eAbilityType = ABILITY_HAMMER;
+	m_eAbilityType = ABILITY_HAMMER;
 
 	m_pControllerCom->RegisterAsPlayer();
 	Set_WeaponAnim(3);
@@ -124,10 +124,6 @@ void CKirby::Late_Tick(_float fTimeDelta)
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND,	 this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW,		 this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_DEFERREDINFO, this);
-
-	//if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
-	//{
-	//}
 }
 
 HRESULT CKirby::Render()
@@ -485,7 +481,9 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 			if ((Get_State() == STATE_IDLE || 
 				Get_State() == STATE_RUN || 
 				Get_State() == SWORDSTATE_RUN || 
-				Get_State() == SWORDSTATE_WAIT) 
+				Get_State() == SWORDSTATE_WAIT ||
+				Get_State() == HAMMERSTATE_IDLE ||
+				Get_State() == HAMMERSTATE_RUN)
 				== false
 				)
 				return;
@@ -739,7 +737,7 @@ void CKirby::Key_Input(_float fTimeDelta)
 	//특정 레벨에서 덤프할 경우 크래시 발생으로 예외 처리
 	//디버깅이 필요할 경우 레벨 별 조건 처리하면 됨
 	LEVEL eCurLevel = (LEVEL)*m_pGameInstance->Get_CurrentLevelID();
-	if (LEVEL_RACING == eCurLevel)
+	if (LEVEL_RACING == eCurLevel || LEVEL_GAMEPLAY == eCurLevel)
 	{
 		if (m_pGameInstance->Get_DIKeyState(DIK_B, KEY_DOWN))
 		{

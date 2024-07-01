@@ -42,7 +42,11 @@ public:
 
 public:
 	_float	m_fAttackJumpTime = { 0.f };
+	_float	m_fPreAttackJumpTime = { 0.f };
+
 	_bool	m_bAttackJumpTrigger = { true };
+
+	_bool	m_bCountTrigger = { true };
 
 	static	CKirbyHammer_Attack_State* Create();
 	virtual void						Free() override;
@@ -64,6 +68,8 @@ public:
 	virtual void OnStateExit()														override;
 
 public:
+	_float	m_fMoveTime = { 0.f };
+	_float	m_fPreMoveTime = { 0.f };
 	static	CKirbyHammer_Onigorosi_State* Create();
 	virtual void						Free() override;
 
@@ -104,11 +110,10 @@ public:
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
 	virtual void OnStateExit()														override;
 
+	_bool Key_X(class CGameObject* pGameObject, _float fTimeDelta);
 	_bool Key_C(class CGameObject* pGameObject, _float fTimeDelta);
 
 	_float	m_fChangeRunTime = { 0.f };
-	_float	m_fFallTime = { 0.f };
-
 
 public:
 	static	CKirbyHammer_Jump_State* Create();

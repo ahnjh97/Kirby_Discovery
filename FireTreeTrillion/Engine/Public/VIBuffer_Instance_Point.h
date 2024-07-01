@@ -7,9 +7,9 @@ BEGIN(Engine)
 class ENGINE_DLL CVIBuffer_Instance_Point final : public CVIBuffer_Instance
 {
 public:
-	typedef struct
+	typedef struct : public INSTANCE_DESC
 	{
-		_uint iNumInstance = { 1 };
+		//_uint iNumInstance = { 1 };
 
 	}INSTANCE_POINT_DESC;
 
