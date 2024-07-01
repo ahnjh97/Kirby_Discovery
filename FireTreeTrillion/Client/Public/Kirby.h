@@ -126,6 +126,11 @@ public:
 		_float			m_fBoosterTime = { 0.f };
 
 
+		// ÇØ¸Ó Æû
+		_int			m_iHammerHit = { 0 };
+		_float			m_fHammerChargeTime = { 0.f };
+
+
 	}KIRBY_INFODESC;
 
 
