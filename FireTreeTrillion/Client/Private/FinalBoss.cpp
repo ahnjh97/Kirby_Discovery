@@ -5,6 +5,7 @@
 #include "FinalBossSpear.h"
 #include "RayArrow.h"
 #include "Camera_Main.h"
+#include "Gully.h"
 
 CFinalBoss::CFinalBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -55,6 +56,26 @@ HRESULT CFinalBoss::Initialize(void* pArg)
 
 	Make_TargetToCams();
 
+	// µµ¶û Ç®¸µ
+	for (size_t i = 0; i < 80; i++)
+	{
+		HRESULT hr;
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Gully"), TEXT("Prototype_GameObject_Gully"));
+		CHECK_FAILED(hr);
+
+		list<CGameObject*>* pList = m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_Gully")); // Get_Layer(LEVEL_STATIC, TEXT("Layer_Gully"))->Get_List();
+
+		if (nullptr != pList)
+		{
+			auto iter = pList->end();
+			--iter;
+
+			CGully* pGully = dynamic_cast<CGully*>((*iter));
+			m_vecGully.emplace_back(pGully);
+			Safe_AddRef(pGully);
+		}
+	}
+
 	return S_OK;
 }
 
@@ -95,6 +116,38 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 	}
 	else
 		m_fGlideTime = 0.f;
+
+	m_fLifeTime += m_fTimeDelta;
+	if (true == m_bGully)
+	{
+		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT);
+		vPos.m128_f32[1] = 0.f;
+		m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 5.f);
+		++m_iGullyCnt;
+		vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT);
+		vPos.m128_f32[1] = 0.f;
+		m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 5.f);
+		++m_iGullyCnt;
+		if (m_vecGully.size() <= m_iGullyCnt)
+		{
+			m_iGullyCnt = 0;
+		}
+
+		m_fLifeTime = 0.f;
+		//_float fGullyTime = { 0.05f };
+		//if (fGullyTime < m_fLifeTime)
+		//{
+		//	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+		//	m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 1.f);
+		//	++m_iGullyCnt;
+		//	if (m_vecGully.size() <= m_iGullyCnt)
+		//	{
+		//		m_iGullyCnt = 0;
+		//	}
+
+		//	m_fLifeTime = 0.f;
+		//}
+	}
 
 	__super::Tick(m_fTimeDelta);
 
@@ -320,14 +373,12 @@ void CFinalBoss::SetUp_FSM()
 	m_pFSM->Add_State(FINALBOSS_STABWAIT, CFinalBoss_Stab_State::Create());
 	m_pFSM->Add_State(FINALBOSS_STAB, CFinalBoss_Stab_State::Create());
 	m_pFSM->Add_State(FINALBOSS_STABEND, CFinalBoss_Stab_State::Create());
-	m_pFSM->Add_State(FINALBOSS_SLASHCHAINSTABREADY, CFinalBoss_Stab_State::Create());
 
 	// ¹é½ºÅÜ È°°ø
 	m_pFSM->Add_State(FINALBOSS_AWAYFASTREADY, CFinalBoss_GlideBack_State::Create());
 	m_pFSM->Add_State(FINALBOSS_AWAYFASTSTART, CFinalBoss_GlideBack_State::Create());
 	m_pFSM->Add_State(FINALBOSS_AWAYFAST, CFinalBoss_GlideBack_State::Create());
 	m_pFSM->Add_State(FINALBOSS_AWAYFASTENDAIR, CFinalBoss_GlideBack_State::Create());
-	//m_pFSM->Add_State(FINALBOSS_AWAYFASTEND, CFinalBoss_GlideBack_State::Create());
 
 	// ¿ÞÂÊ È¾ È°°ø
 	m_pFSM->Add_State(FINALBOSS_TURNLEFTAIRSTART, CFinalBoss_Glide_State::Create());
@@ -342,9 +393,9 @@ void CFinalBoss::SetUp_FSM()
 	m_pFSM->Add_State(FINALBOSS_SLASHREADY, CFinalBoss_Slash_State::Create());
 	m_pFSM->Add_State(FINALBOSS_SLASHSTART, CFinalBoss_Slash_State::Create());
 	m_pFSM->Add_State(FINALBOSS_SLASH, CFinalBoss_Slash_State::Create());
-	m_pFSM->Add_State(FINALBOSS_SLASHCHAINREADY, CFinalBoss_Slash_State::Create());
 	// 2Â÷ ½½·¡½Ã ÆÐÅÏ
-	m_pFSM->Add_State(FINALBOSS_SLASHEND, CFinalBoss_SlashEnd_State::Create());
+	m_pFSM->Add_State(FINALBOSS_SLASHCHAINREADY, CFinalBoss_Chain_State::Create());
+	m_pFSM->Add_State(FINALBOSS_SLASHCHAINSTABREADY, CFinalBoss_Chain_State::Create());
 
 	// ½ºÀ® ÆÐÅÏ
 	m_pFSM->Add_State(FINALBOSS_SWINGRIGHTSTART, CFinalBoss_Swing_State::Create());
@@ -452,6 +503,9 @@ void CFinalBoss::Free()
 
 	for (auto& Pair : m_PartObjects)
 		Safe_Release(Pair.second);
-
 	m_PartObjects.clear();
+
+	for (auto iter : m_vecGully)
+		Safe_Release(iter);
+	m_vecGully.clear();
 }

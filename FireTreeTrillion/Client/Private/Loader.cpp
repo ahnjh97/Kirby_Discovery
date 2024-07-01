@@ -85,6 +85,7 @@
 #include "DimensionGate.h"
 #include "Meteor.h"
 #include "BossClone.h"
+#include "Gully.h"
 
 // º¸½º
 #include "DeeDeeDee.h"
@@ -347,6 +348,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DimensionGate"), CDimensionGate);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Meteor"), CMeteor);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BossClone"), CBossClone);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gully"), CGully);
 
 	//Dee
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeePart"), CDee_Part);
@@ -1580,8 +1582,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("RayArrow", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("DimensionLaser", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("DimensionGateL", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("BigDebris", TYPE_NONANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("BigDebris", TYPE_NONANIM, 0.8f, 180.f);
 		m_vecModelInfo.emplace_back("SmallDebris", TYPE_NONANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("MoundPiece", TYPE_NONANIM, 0.1f, 180.f);
 	}
 	else if (eLevel == LEVEL_GAMEPLAY)
 	{
@@ -1960,6 +1963,7 @@ void CLoader::Load_ItemModels()
 	// For AbilityItemModels
 	m_vecModelInfo.emplace_back("Item_Sword", TYPE_NONANIM, 1.f, 0.f);
 	m_vecModelInfo.emplace_back("Item_Bomb", TYPE_NONANIM, 1.f, 0.f);
+	m_vecModelInfo.emplace_back("Item_Hammer", TYPE_NONANIM, 1.f, 0.f);
 }
 
 void CLoader::Load_KirbyBodyModels()
