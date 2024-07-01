@@ -1300,8 +1300,8 @@ HRESULT CRenderer::Render_Result()
 
 HRESULT CRenderer::Render_Result_For_Tool()
 {
-	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_SuperFinal"))))
-		return E_FAIL;
+	//if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_SuperFinal"))))
+	//	return E_FAIL;
 
 	if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
 		return E_FAIL;
@@ -1361,8 +1361,8 @@ HRESULT CRenderer::Render_Result_For_Tool()
 	if (FAILED(m_pVIBuffer->Render()))
 		return  E_FAIL;
 
-	if (FAILED(m_pGameInstance->End_MRT()))
-		return E_FAIL;
+	//if (FAILED(m_pGameInstance->End_MRT()))
+	//	return E_FAIL;
 
 	return S_OK;
 }

@@ -110,11 +110,10 @@ public:
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
 	virtual void OnStateExit()														override;
 
+	_bool Key_X(class CGameObject* pGameObject, _float fTimeDelta);
 	_bool Key_C(class CGameObject* pGameObject, _float fTimeDelta);
 
 	_float	m_fChangeRunTime = { 0.f };
-	_float	m_fFallTime = { 0.f };
-
 
 public:
 	static	CKirbyHammer_Jump_State* Create();

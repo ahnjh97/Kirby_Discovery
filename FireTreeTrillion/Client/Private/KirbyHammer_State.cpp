@@ -43,11 +43,8 @@ void CKirbyHammer_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_GUARD);
 			return;
 		}
-		else if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
+		else if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN) && DESC(m_bBlockOtherVacuum) == false)
 		{
-			//DESC(m_eEyeState) = CKirby::EYE_CLOSE;
-			//pKirby->Change_State(CKirby::HAMMERSTATE_HAMMERATTACKFINALTOY, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
-			//pKirby->Set_WeaponAnim(5);
 			DESC(m_eEyeState) = CKirby::EYE_ANGER;
 			pKirby->Change_State(CKirby::HAMMERSTATE_ONIGOROSIHAMMERSTART, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
 			return;
@@ -75,7 +72,19 @@ void CKirbyHammer_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		
 		if (m_pGameInstance->Get_DIKeyState(DIK_V, KEY_PRESS))
 		{
+			DESC(m_bDumpAbilityPress) = true;
+			DESC(m_fDumpAbilityTime) += fTimeDelta;
 
+			if (DESC(m_fDumpAbilityTime) > 1.f)
+			{
+				DESC(m_fDumpAbilityTime) = 0.f;
+				pKirby->Change_State(CKirby::STATE_ABILITYDUMP, 60.f, false, false, CKirby::BODY_DEFAULT);
+				return;
+			}
+		}
+		else
+		{
+			DESC(m_bDumpAbilityPress) = false;
 		}
 	}
 
@@ -95,7 +104,7 @@ void CKirbyHammer_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 			return;
 		}
 
-		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
+		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN) && DESC(m_bBlockOtherVacuum) == false)
 		{
 			DESC(m_eEyeState) = CKirby::EYE_ANGER;
 			pKirby->Change_State(CKirby::HAMMERSTATE_ONIGOROSIHAMMERSTART, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
@@ -121,13 +130,6 @@ void CKirbyHammer_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 			return;
 		}
 
-
-		// Run일 때, X를 누르면 1타 공격을 시작한다.
-		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN) && DESC(m_bBlockOtherVacuum) == false)
-		{
-			return;
-		}
-
 		if (m_pGameInstance->Get_DIKeyState(DIK_Z, KEY_DOWN))
 		{
 			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_GUARD);
@@ -136,7 +138,19 @@ void CKirbyHammer_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_V, KEY_PRESS))
 		{
+			DESC(m_bDumpAbilityPress) = true;
+			DESC(m_fDumpAbilityTime) += fTimeDelta;
 
+			if (DESC(m_fDumpAbilityTime) > 1.f)
+			{
+				DESC(m_fDumpAbilityTime) = 0.f;
+				pKirby->Change_State(CKirby::STATE_ABILITYDUMP, 60.f, false, false, CKirby::BODY_DEFAULT);
+				return;
+			}
+		}
+		else
+		{
+			DESC(m_bDumpAbilityPress) = false;
 		}
 
 		if (false == JoyStick_controller(Kirbydesc, pCamera))
@@ -611,12 +625,73 @@ void CKirbyHammer_JumpAttack_State::OnStateUpdate(CGameObject* pGameObject, _flo
 	// 공중에서 공격하는 애니메이션이다.
 	if (pKirby->Get_State() == CKirby::HAMMERSTATE_WHEELHAMMER)
 	{
+		if (JoyStick_controller_Attack(Kirbydesc, pCamera) == true)
+		{
+			Kirbydesc->m_fMoveSpeed += fTimeDelta * 40.f;
+			if (Kirbydesc->m_fMoveSpeed > 10.f)
+				Kirbydesc->m_fMoveSpeed = 10.f;
 
+			_vector vMoveDelta = DESC(m_vAttackDir) * fTimeDelta * Kirbydesc->m_fMoveSpeed;
+			pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+		}
+		else
+		{
+			// 0.1초간 풀 감속 (최대 속도 8이라 가정)
+			if (Kirbydesc->m_fMoveSpeed > 0.f)
+				Kirbydesc->m_fMoveSpeed -= 100.f * fTimeDelta;
+			if (Kirbydesc->m_fMoveSpeed < 0.f)
+				Kirbydesc->m_fMoveSpeed = 0.f;
+
+			_vector vMoveDelta = DESC(m_vAttackDir) * fTimeDelta * Kirbydesc->m_fMoveSpeed;
+			pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+		}
+
+		DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
+		pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
+
+		if (pKirby->isAnimFinish())
+		{
+			pKirby->Change_State(CKirby::HAMMERSTATE_WHEELHAMMEREND, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+			return;
+		}
 	}
 	// 공중에서 공격하는 애니메이션의 끝이라고 볼 수 있다.
 	else if (pKirby->Get_State() == CKirby::HAMMERSTATE_WHEELHAMMEREND)
 	{
+		if (JoyStick_controller_Attack(Kirbydesc, pCamera) == true)
+		{
+			Kirbydesc->m_fMoveSpeed += fTimeDelta * 40.f;
+			if (Kirbydesc->m_fMoveSpeed > 10.f)
+				Kirbydesc->m_fMoveSpeed = 10.f;
 
+			_vector vMoveDelta = DESC(m_vAttackDir) * fTimeDelta * Kirbydesc->m_fMoveSpeed;
+			pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+		}
+		else
+		{
+			// 0.1초간 풀 감속 (최대 속도 8이라 가정)
+			if (Kirbydesc->m_fMoveSpeed > 0.f)
+				Kirbydesc->m_fMoveSpeed -= 100.f * fTimeDelta;
+			if (Kirbydesc->m_fMoveSpeed < 0.f)
+				Kirbydesc->m_fMoveSpeed = 0.f;
+
+			_vector vMoveDelta = DESC(m_vAttackDir) * fTimeDelta * Kirbydesc->m_fMoveSpeed;
+			pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+		}
+		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
+		{
+			DESC(m_fJumpVelocity) = 10.f;
+			pKirby->Change_State(CKirby::HAMMERSTATE_WHEELHAMMER, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+			return;
+		}
+		DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
+		pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
+		if (pController->Is_Terrain())
+		{
+			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_LANDINGSMALL);
+			return;
+		}
 	}
 }
 
@@ -675,7 +750,8 @@ void CKirbyHammer_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 			Jump_Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
 	}
 
-
+	if (Key_X(pGameObject, fTimeDelta) == true)
+		return;
 	Key_C(pGameObject, fTimeDelta);
 
 	// 처음에 범위에 바로 들어갔을 때, 사다리에 스냅한다. 단, block이 켜져있을 땐, 절대 못붙음
@@ -887,12 +963,12 @@ void CKirbyHammer_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 		}
 
-		// Idle일 때, X를 누르면 1타 공격을 시작한다.
-		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
-		{
+		//// Idle일 때, X를 누르면 1타 공격을 시작한다.
+		//if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
+		//{
 
 
-		}
+		//}
 
 	}
 
@@ -901,6 +977,22 @@ void CKirbyHammer_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 void CKirbyHammer_Jump_State::OnStateExit()
 {
 	m_fChangeRunTime = 0.f;
+}
+
+_bool CKirbyHammer_Jump_State::Key_X(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+
+	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
+	{
+		DESC(m_fJumpVelocity) = 10.f;
+		pKirby->Change_State(CKirby::HAMMERSTATE_WHEELHAMMER, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+		return true;
+	}
+	return false;
 }
 
 _bool CKirbyHammer_Jump_State::Key_C(CGameObject* pGameObject, _float fTimeDelta)
