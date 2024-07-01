@@ -163,6 +163,7 @@ HRESULT CVIBuffer_Instance_Point::Initialize(void * pArg)
 		return E_FAIL;
 
 	m_iNumInstance = instanceDesc.iNumInstance;
+	m_InstanceDesc = instanceDesc;
 
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;

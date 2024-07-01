@@ -10,6 +10,13 @@ END
 
 class CFog_Instance final : public CGameObject
 {
+public:
+	struct FOG_INSTANCE_DESC : public GAMEOBJECT_DESC
+	{
+		_uint iRows = { 1 };
+		_uint iNumInstances = { 1 };
+	};
+
 private:
 	CFog_Instance(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CFog_Instance(const CFog_Instance& rhs);

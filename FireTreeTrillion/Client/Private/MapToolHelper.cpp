@@ -592,6 +592,9 @@ void CMapToolHelper::Menu_NonAnimModels()
 
 void CMapToolHelper::Menu_TriggerInfo()
 {
+	if (false == IsTrigger(m_strCurModel))
+		return;
+
 	if (m_strCurModel == "Camera" || m_strCurModel == "Trigger" || m_strCurModel == "Dummy")
 	{
 		CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(m_pPickedObject);
@@ -634,6 +637,32 @@ void CMapToolHelper::Menu_TriggerInfo()
 
 		if (m_strCurModel == "Dummy")
 			Menu_CamLerpInfo(pMapToolObject);
+
+		ImGui::End();
+	}
+	else if ("Fog" == m_strCurModel)
+	{
+		CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(m_pPickedObject);
+		s_iTriggerIdx = pMapToolObject->Get_TriggerIndex(); // Rows
+		s_fRadius = pMapToolObject->Get_Radius(); // NumInstances
+		string strTrigger = "[ " + m_strCurModel + " ]";
+
+		ImGui::Begin(strTrigger.c_str());
+		ImGui::SetCursorPosX(17);
+		ImGui::Text("ROWS");
+		ImGui::SameLine();
+		ImGui::SetCursorPosX(77);
+
+		ImGui::SetNextItemWidth(80);
+		if (ImGui::Combo("##InstanceRows", &s_iTriggerIdx, s_triggerIndices, IM_ARRAYSIZE(s_triggerIndices)))
+			pMapToolObject->Set_TriggerIndex(s_iTriggerIdx);
+
+		ImGui::Text("INSTANCES");
+		ImGui::SameLine();
+		ImGui::SetCursorPosX(76);
+		ImGui::SetNextItemWidth(90);
+		if (ImGui::InputFloat("##NumInstances", &s_fRadius, 1.f, 1.f, "%.0f"))
+			pMapToolObject->Set_Radius(s_fRadius);
 
 		ImGui::End();
 	}

@@ -89,8 +89,8 @@ namespace Engine
 		vector<_bool> vecMoveCommands;
 
 		_uint		iNumInstance;
-		INSTANCE_SHAPE eInstanceShape;
-		_float		fRadius;
+		INSTANCE_SHAPE eInstanceShape = { INSTANCE_SHAPE_END };
+		_uint		iRows = { 1 };
 		_bool		bRandPos = { false };
 	}INSTANCE_DESC;
 

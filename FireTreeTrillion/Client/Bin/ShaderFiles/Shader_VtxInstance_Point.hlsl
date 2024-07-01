@@ -224,6 +224,28 @@ PS_OUT PS_MAIN_WHITE_FX(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_FOG(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+	
+    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+
+	 //소프트 이펙트 보정
+    float2 vTexcoord = (float2) 0.f;
+
+    vTexcoord.x = (In.vProjPos.x / In.vProjPos.w) * 0.5f + 0.5f;
+    vTexcoord.y = (In.vProjPos.y / In.vProjPos.w) * -0.5f + 0.5f;
+
+    float4 vDepthDesc = g_DepthTexture.Sample(PointSampler, vTexcoord);
+    float fOldViewZ = vDepthDesc.y * g_fFar;
+
+    Out.vColor.a = vDiffuse.a * saturate(fOldViewZ - In.vProjPos.w) * g_fAlpha;
+    Out.vColor.rgb = vDiffuse.rgb;
+    Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
+    
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
     pass Default
@@ -280,5 +302,19 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_BLEND_FX();
+    }
+
+    // Alive 상관없이 계속 그림. 알파 블렌딩 + 마스크 + 소프트 이펙트 ( 4 )
+    pass Fog
+    {
+        SetRasterizerState(RS_NonCull);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = compile gs_5_0 GS_MAIN();
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_FOG();
     }
 }

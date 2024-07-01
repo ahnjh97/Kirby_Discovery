@@ -19,33 +19,32 @@ HRESULT CFog_Instance::Initialize_Prototype()
 
 HRESULT CFog_Instance::Initialize(void* pArg)
 {
-	GAMEOBJECT_DESC* pGameObjectDesc = nullptr;
+	FOG_INSTANCE_DESC* pFogDesc = nullptr;
 
 	if (nullptr != pArg)
-	{
-		pGameObjectDesc = (GAMEOBJECT_DESC*)pArg;
-	}
+		pFogDesc = (FOG_INSTANCE_DESC*)pArg;
 
-	if (FAILED(__super::Initialize(pGameObjectDesc)))
+	if (FAILED(__super::Initialize(pFogDesc)))
 		return E_FAIL;
 
 	INSTANCE_DESC tInstanceDesc{};
 	tInstanceDesc.vCenter = _float3(0, 0, 0);
 	tInstanceDesc.vPivot = _float3(0, 0, 0);
-	tInstanceDesc.iNumInstance = 50.f;
-	tInstanceDesc.eInstanceShape = INSTANCE_SHAPE_SPHERE;
-	tInstanceDesc.vRange = _float3(3.f, 3.f, 3.f);
+	tInstanceDesc.iNumInstance = pFogDesc->iNumInstances;
+	tInstanceDesc.eInstanceShape = INSTANCE_SHAPE_RECTANGLE;
+	tInstanceDesc.vRange = _float3(pFogDesc->matWorld._11 , pFogDesc->matWorld._22, pFogDesc->matWorld._33);
 	tInstanceDesc.bIsLoop = true;
 	tInstanceDesc.fLifetime = FLT_MAX;
-	tInstanceDesc.vScale = _float3(30.f, 30.f, 1.f);
+	tInstanceDesc.vScale = _float3(20, 20, 1.f);
 	tInstanceDesc.bRandPos = true;
+
+	m_pTransformCom->Set_Scaled(1.f, 1.f, 1.f);
 
 	if (FAILED(Add_Components(tInstanceDesc)))
 		return E_FAIL;
 
 	m_fAlpha = 0.5f;
-	m_pTransformCom->Set_Scaled(30.f * pGameObjectDesc->matWorld._11, 30.f * pGameObjectDesc->matWorld._22, 1.f * pGameObjectDesc->matWorld._33);
-
+	
 	m_iRandomFog = 2;
 
 	return S_OK;
@@ -55,6 +54,8 @@ _int CFog_Instance::Tick(_float fTimeDelta)
 {
 	if (m_bDead == true)
 		return OBJ_DEAD;
+
+	//m_pVIBufferCom->Compute_AllLifeTime(fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
@@ -71,7 +72,7 @@ HRESULT CFog_Instance::Render()
 		return E_FAIL;
 	/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
 
-	if (FAILED(m_pShaderCom->Begin(INSTANCEPOINT_BLENDFX)))
+	if (FAILED(m_pShaderCom->Begin(INSTANCEPOINT_FOG)))
 		return E_FAIL;
 	if (FAILED(m_pVIBufferCom->Bind_Buffers()))
 		return E_FAIL;

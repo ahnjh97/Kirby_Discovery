@@ -116,7 +116,7 @@ HRESULT CVIBuffer_Instance::Initialize(void* pArg)
 	m_pInstanceVertices = new VTXMATRIX[m_iNumInstance];
 	ZeroMemory(m_pInstanceVertices, sizeof(VTXMATRIX) * m_iNumInstance);
 
-	if (tInstanceDesc.bRandPos == false)
+	if (INSTANCE_SHAPE_END == tInstanceDesc.eInstanceShape)
 	{
 		for (size_t i = 0; i < m_iNumInstance; i++)
 		{
@@ -127,13 +127,24 @@ HRESULT CVIBuffer_Instance::Initialize(void* pArg)
 			m_pInstanceVertices[i].bAlive = false;
 		}
 	}
-	else
+	else if(INSTANCE_SHAPE_RECTANGLE == tInstanceDesc.eInstanceShape)
 	{
 		for (size_t i = 0; i < m_iNumInstance; i++)
 		{
-			m_pInstanceVertices[i].vRight = _float4{ 1.f, 0.f, 0.f, 0.f };
-			m_pInstanceVertices[i].vUp = _float4{ 0.f, 1.f, 0.f, 0.f };
-			m_pInstanceVertices[i].vLook = _float4{ 0.f, 0.f, 1.f, 0.f };
+			m_pInstanceVertices[i].vRight = _float4{ tInstanceDesc.vScale.x, 0.f, 0.f, 0.f };
+			m_pInstanceVertices[i].vUp = _float4{ 0.f, tInstanceDesc.vScale.y, 0.f, 0.f };
+			m_pInstanceVertices[i].vLook = _float4{ 0.f, 0.f, tInstanceDesc.vScale.z, 0.f };
+			m_pInstanceVertices[i].vPosition = Compute_RectanglePos(i);
+			m_pInstanceVertices[i].bAlive = true;
+		}
+	}
+	else if (INSTANCE_SHAPE_SPHERE == tInstanceDesc.eInstanceShape)
+	{
+		for (size_t i = 0; i < m_iNumInstance; i++)
+		{
+			m_pInstanceVertices[i].vRight = _float4{ tInstanceDesc.vScale.x, 0.f, 0.f, 0.f };
+			m_pInstanceVertices[i].vUp = _float4{ 0.f, tInstanceDesc.vScale.y, 0.f, 0.f };
+			m_pInstanceVertices[i].vLook = _float4{ 0.f, 0.f, tInstanceDesc.vScale.z, 0.f };
 			m_pInstanceVertices[i].vPosition = Compute_RandPosition();
 			m_pInstanceVertices[i].bAlive = true;
 		}
@@ -217,6 +228,26 @@ HRESULT CVIBuffer_Instance::Render()
 	m_pContext->DrawIndexedInstanced(m_iIndexCountPerInstance, m_iNumInstance, 0, 0, 0);
 
 	return S_OK;
+}
+
+_float4 CVIBuffer_Instance::Compute_RectanglePos(_uint iIndex)
+{
+	_uint iInstancePerRow = m_InstanceDesc.iNumInstance / m_InstanceDesc.iRows;
+	_float fWidth = m_InstanceDesc.vRange.x * 2.f;
+	_float fHeight = m_InstanceDesc.vRange.z * 2.f;
+
+	_float fSpacingX = fWidth / (iInstancePerRow + 1);
+	_float fSpacingZ = fHeight / (m_InstanceDesc.iRows + 1);
+
+	_uint iRow = iIndex / iInstancePerRow;
+	_uint iCol = iIndex % iInstancePerRow;
+	
+	_float fX = -m_InstanceDesc.vRange.x + (iCol + 1) * fSpacingX;
+	if (iRow % 2 == 1)
+		fX += fSpacingX * 0.5f;
+	_float fZ = -m_InstanceDesc.vRange.z + (iRow + 1) * fSpacingZ;
+
+	return _float4(fX, 0, fZ, 1);
 }
 
 VTXMATRIX* CVIBuffer_Instance::Map()
