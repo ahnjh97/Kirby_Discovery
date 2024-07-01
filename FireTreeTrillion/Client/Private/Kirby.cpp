@@ -1565,7 +1565,8 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 	if (INFO(m_bDumpAbilityPress) == true &&
 		(m_pFSM->Get_State() == CKirby::STATE_IDLE || m_pFSM->Get_State() == CKirby::STATE_RUN ||
 			m_pFSM->Get_State() == CKirby::STATE_RUNSTART || m_pFSM->Get_State() == CKirby::SWORDSTATE_RUN ||
-			m_pFSM->Get_State() == CKirby::SWORDSTATE_WAIT || m_pFSM->Get_State() == CKirby::CARSTATE_IDLING) == false)
+			m_pFSM->Get_State() == CKirby::SWORDSTATE_WAIT || m_pFSM->Get_State() == CKirby::CARSTATE_IDLING ||
+			m_pFSM->Get_State() == CKirby::HAMMERSTATE_IDLE || m_pFSM->Get_State() == CKirby::HAMMERSTATE_RUN) == false)
 		INFO(m_bDumpAbilityPress) = false;
 
 
