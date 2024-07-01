@@ -155,6 +155,8 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 		, "FarBuildingABL", "FarBuildingAM1L", "FarBuildingAM6L", "FarBuildingC01", "FarBuildingC02"
 
+		, "JgGuardrailAL", "JgGuardrailBL"
+
 		, "MlFlowerPot01L"
 #pragma endregion
 
