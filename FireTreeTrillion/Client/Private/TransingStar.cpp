@@ -82,7 +82,7 @@ void CTransingStar::Late_Tick(_float fTimeDelta)
 
 HRESULT CTransingStar::Render()
 {
-    if (m_eActivateType == TYPE_END) return OBJ_NOEVENT;
+    if (m_eActivateType == TYPE_END) return S_OK;
 
     HRESULT hr(S_OK);
 
