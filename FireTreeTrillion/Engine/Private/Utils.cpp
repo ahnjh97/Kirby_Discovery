@@ -184,8 +184,8 @@ void CUtils::Set_State_Matrix(_Inout_ _float4x4& matrix, STATE eState, const _fl
 void CUtils::Set_Scaled_Matrix(_Inout_ _float4x4& matrix, _float fScaleX, _float fScaleY, _float fScaleZ)
 {
 	Set_State_Matrix(matrix, STATE_RIGHT, XMVector3Normalize(Get_State_Vector_Matrix(matrix, STATE_RIGHT)) * fScaleX);
-	Set_State_Matrix(matrix, STATE_UP, XMVector3Normalize(Get_State_Vector_Matrix(matrix, STATE_UP)) * fScaleY);
-	Set_State_Matrix(matrix, STATE_LOOK, XMVector3Normalize(Get_State_Vector_Matrix(matrix, STATE_LOOK)) * fScaleZ);
+	Set_State_Matrix(matrix, STATE_UP,    XMVector3Normalize(Get_State_Vector_Matrix(matrix, STATE_UP))    * fScaleY);
+	Set_State_Matrix(matrix, STATE_LOOK,  XMVector3Normalize(Get_State_Vector_Matrix(matrix, STATE_LOOK))  * fScaleZ);
 }
 
 _vector CUtils::Get_State_Vector_Matrix(_Inout_ _float4x4& matrix, STATE eState)

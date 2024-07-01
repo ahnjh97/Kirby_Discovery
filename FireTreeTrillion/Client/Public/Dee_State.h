@@ -126,6 +126,8 @@ public:
 	virtual void OnStateExit()														override;
 
 
+	_float m_fJumpPower = { 0.f };
+
 public:
 	static	CDee_Jump_State* Create();
 	virtual void Free() override;

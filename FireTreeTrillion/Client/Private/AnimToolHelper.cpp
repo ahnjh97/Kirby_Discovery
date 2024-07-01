@@ -187,9 +187,9 @@ void CAnimToolHelper::Ready_AnimObjects(const wstring& strLayerTag)
 	//CHECK_NULLPTR(pCharacter);
 	//m_vecCharacter.push_back(pCharacter);
 	
-	//pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_FoodShopDee")));
-	//CHECK_NULLPTR(pCharacter);
-	//m_vecCharacter.push_back(pCharacter);
+	pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_FoodShopDee")));
+	CHECK_NULLPTR(pCharacter);
+	m_vecCharacter.push_back(pCharacter);
 
 	pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_DeeDeeDee")));
 	CHECK_NULLPTR(pCharacter);
@@ -273,7 +273,6 @@ void CAnimToolHelper::Render_AnimationList(const wstring& wstrObjectTag)
 				{
 					MODEL tModelInfo = pModel[w]->Get_ModelInfo();
 					if (ImGui::BeginTabItem(tModelInfo.strModelName.c_str())) // 모델이름으로 Tab Name 형성
-					{
 						if (m_pCharacter->Get_PrototypeTag() == L"Prototype_GameObject_Kirby")
 						{
 							CKirby::KIRBY_INFODESC* pKirbyDesc = static_cast<CKirby*>(m_pCharacter)->Get_KirbyInfo();
@@ -350,7 +349,6 @@ void CAnimToolHelper::Render_AnimationList(const wstring& wstrObjectTag)
 						ImGui::EndTabItem();
 					}
 					ImGui::EndTabBar();
-				}
 			}
 		}
 	}

@@ -133,6 +133,7 @@
 #include "UI_PartTime.h"
 #include "UI_PartTimeDee.h"
 #include "HUD_BossHpBar.h"
+#include "TransingStar.h"
 
 // æ∆¿Ã≈€
 #include "Food.h"
@@ -308,6 +309,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_PartTime"), CUI_PartTime);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_PartTimeDee"), CUI_PartTimeDee);
+	
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_TransingStar"), CTransingStar);
 
 #pragma endregion
 	
@@ -1212,6 +1215,7 @@ HRESULT CLoader::Add_FXTexture()
 
 	hr = Add_Texture(LEVEL_STATIC, "FX_Food_ResultTop", "Effects/UI/MGameFood/result top.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Food_ResultBottom", "Effects/UI/MGameFood/result bottom.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_TitleLogo", "Effects/UI/TitleLogo.png");	CHECK_FAILED(hr);
 
 
 	return S_OK;
@@ -1682,7 +1686,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 180.f);
 		m_vecModelInfo.emplace_back("DeeDeeDeeHammer", TYPE_NONANIM, 1.0f);
 
-		m_vecModelInfo.emplace_back("WaddleDeeHungry", TYPE_ANIM, 1.1f, 180.f);
+		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
 	}
 }
 

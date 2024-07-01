@@ -33,6 +33,8 @@ pair<DEE_ANIM, _bool> CBattleDee::Make_WhatToDo()
 	if (Get_State() == DEEANIM_DAMAGE)
 		return { eDeeState , false };
 
+	else if (Get_State() == DEEANIM_ENEMYJUMPSTART)
+		return  { DEEANIM_FIND, false };
 
 	//목표 지점과의 거리가 가깝다면 디디디 주변
 	if (_float3::Distance(GET_POS, Make_DestPos()) < 6.f)
@@ -379,6 +381,11 @@ void CBattleDee::SetUp_FSM()
 	m_pFSM->Add_State(DEEANIM_DAMAGE, CDee_FlyStun_State::Create());
 	m_pFSM->Add_State(DEEANIM_MOVEFALL, CDee_Interact_State::Create());
 
+	//점프
+	m_pFSM->Add_State(DEEANIM_FIND, CDee_Jump_State::Create());
+	//착지
+	m_pFSM->Add_State(DEEANIM_ENEMYJUMPSTART, CDee_Interact_State::Create());
+	m_pFSM->Add_State(DEEANIM_LANDING, CDee_Interact_State::Create());
 
 
 }

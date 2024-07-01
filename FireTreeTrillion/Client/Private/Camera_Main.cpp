@@ -242,6 +242,23 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 	if (m_eSpecialSeq == SEQ_END)
 		return;
 
+	if (0.f < m_fStartAudioTime)
+	{
+		m_fStartAudioTime -= fTimeDelta;
+
+		if (m_fStartAudioTime < 0.f)
+		{
+			m_fStartAudioTime = 0.f;
+			
+			if (m_eSpecialSeq == SEQ_BREAKRACINGMAP)
+			{
+				m_pGameInstance->StopSound(CHANNEL_BGM);
+				m_pGameInstance->PlayBGM(L"Welcome to the New World!.mp3");
+			}
+
+		}
+	}
+
 	//예약 동작이 모두 끝나면 다시 기본 상태로 만든다.
 	if (m_CamSeq.empty() && m_fSeqInterpolateTime.first == m_fSeqInterpolateTime.second)
 	{
@@ -799,6 +816,8 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction.vDir = _float3{ -.45f, 0.f, -.9f };
 		m_CamSeq.push_back(newAction);
 
+		m_fStartAudioTime = 8.08f;
+
 		//라디오 보기
 		newAction = {};
 		newAction.fTime = 10.f;
@@ -811,13 +830,16 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction.fFOVY = 20.f;
 		m_CamSeq.push_back(newAction);
 
+
+		//라디오 줌 인
+
 		newAction = {};
 		newAction.fTime = 11.f;
 		newAction.eCamCut = CUT_HARD;
 		newAction.eCamPos = POS_ABSOLUTE;
-		newAction.vPos = _float3{ 59.7f, 26.8f, 71.6f };
+		newAction.vPos = _float3{ 57.f, 26.8f, 71.5f };
 		newAction.eCamDir = DIR_ABSOLUTE;
-		newAction.vDir = _float3{ -.93f, -0.07f, -.37f };
+		newAction.vDir = _float3{ -.84f, -.14f, -.53f };
 		m_CamSeq.push_back(newAction);
 
 		newAction = {};
@@ -826,9 +848,9 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction.eEase = EASE_LINEAR;
 		newAction.fInterpolateSpeed = 3.f;
 		newAction.eCamPos = POS_ABSOLUTE;
-		newAction.vPos = _float3{ 55.1f, 26.4f, 69.8f };
+		newAction.vPos = _float3{ 54.64f, 26.45f, 70.f };
 		newAction.eCamDir = DIR_ABSOLUTE;
-		newAction.vDir = _float3{ -.93f, -0.07f, -.37f };
+		newAction.vDir = _float3{ -.84f, -.14f, -.53f };
 		m_CamSeq.push_back(newAction);
 
 		//다리 입구 뷰 복귀
@@ -882,6 +904,19 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction.eCamDir = DIR_ABSOLUTE;
 		newAction.vDir = _float3{ -.24f, 0.5f, 1.f };
 		m_CamSeq.push_back(newAction);
+
+
+		newAction = {};
+		newAction.fTime = 60.f;
+		newAction.eCamCut = CUT_HARD;
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.24f, 0.5f, 1.f };
+		m_CamSeq.push_back(newAction);
+
+		CEffect::FX_DESC FXDesc{};
+		FXDesc.fStartDelay = { 28.f };
+		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Kirby Title Logo"), &FXDesc)))
+			return;
 	}
 	break;
 	default:
