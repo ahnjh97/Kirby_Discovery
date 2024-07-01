@@ -56,7 +56,7 @@ void Turn_Interpolate(CDeeDeeDee::DDDDESC* DDDDesc, CTransform* pTransformCom, _
 
 		}
 	}
-	
+
 	///////////
 }
 
@@ -79,7 +79,29 @@ void Make_TargetDir(CDeeDeeDee::DDDDESC* DDDDesc, const _float4& vMyPos, const _
 	DDDDesc->m_vTargetDir = vDir;
 }
 
+static void Hammer_Slash(_float fTimeDelta, CTransform* pTransformCom, _bool bIsVertical = false)
+{
+	CEffect::FX_DESC FXDesc{};
+	_float4 vMyPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+	/*vMyPos += pTransformCom->Get_State(CTransform::STATE_LOOK) * .4f;*/
 
+	FXDesc.vInitPos = { vMyPos.x, vMyPos.y + .3f, vMyPos.z };
+
+	if (!bIsVertical)
+	{
+		FXDesc.vInitPos.y += 2.7f;
+		FXDesc.vInitPos.z -= .5f;
+		FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK)).y - 30.f, -100.f };
+		FXDesc.fStartDelay = 0.05f;
+	}
+	else
+		FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK)).y, 0.f };
+	FXDesc.vInitScale = { 4.f, 4.f, 4.f };
+
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Hammer Hit A"), &FXDesc)))
+		return;
+
+}
 #pragma region IDLE STATE
 
 CDeeDeeDee_Idle_State::CDeeDeeDee_Idle_State()
@@ -127,12 +149,12 @@ void CDeeDeeDee_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	// 패턴에 따라 [사이드 어택], [점프 공격], [슬라이딩 공격], [망치 공격] 을 하는데, 와들디한테는 슬라이딩공격만 안한다.
 	if (DESC(m_ePattern) == CDeeDeeDee::PATTERN_CENTER)
 	{
-	
+
 		// 내가 원점에서 와들디들을 팰 목록들
 		if ((vPos - DESC(m_vOriginPos)).Length() < 3.f)
 		{
 			// 와들디 들을 존나 팬다.
-			switch (CUtils::Make_RandomInt(0, 3))
+			switch (CUtils::Make_RandomInt(2, 2))
 			{
 			case 0:
 				pDee->Change_State(CDeeDeeDee::STATE_SHOUTSTART, 60.f, false, true);
@@ -262,7 +284,7 @@ void CDeeDeeDee_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 				return;
 			case 3:
 				pDee->Change_State(CDeeDeeDee::STATE_SLIDINGSTART, 60.f, false, true);
-				DESC(m_fJumpVelocity) = 35.f;				
+				DESC(m_fJumpVelocity) = 35.f;
 				return;
 			}
 			return;
@@ -745,6 +767,8 @@ void CDeeDeeDee_SideAttack_State::OnStateUpdate(CGameObject* pGameObject, _float
 		if (pDee->IsAnimFinished())
 		{
 			pDee->Change_State(CDeeDeeDee::STATE_HAMMERSIDEATTACK, 60.f, false, false);
+
+			Hammer_Slash(fTimeDelta, pTransformCom );
 			return;
 		}
 	}
@@ -863,6 +887,9 @@ void CDeeDeeDee_HammerAttack_State::OnStateUpdate(CGameObject* pGameObject, _flo
 			m_pGameInstance->Setting_RadialBlur(vPos, 20.f, 80.f);
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 			pCamera->Make_Shake(1.5f);
+
+			Hammer_Slash(fTimeDelta, pTransformCom, true);
+
 			return;
 		}
 	}

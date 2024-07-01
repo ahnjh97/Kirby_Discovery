@@ -1195,7 +1195,10 @@ HRESULT CLoader::Add_FXTexture()
 	hr = Add_Texture(LEVEL_STATIC, "FX_VacuumDGB", "Effects/Basic/twinkle02.png");	CHECK_FAILED(hr);
 
 	hr = Add_Texture(LEVEL_STATIC, "FX_Wind", "Effects/Basic/wind_%d.png", 2);	CHECK_FAILED(hr);
-	hr = Add_Texture(LEVEL_STATIC, "FX_Shockwave", "Effects/Basic/shockwave_%d.png", 1);	CHECK_FAILED(hr);
+
+	hr = Add_Texture(LEVEL_STATIC, "FX_Scroll", "Effects/Basic/scroll_%d.png", 3);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Shockwave", "Effects/Basic/shockwave_%d.png", 5);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Swing", "Effects/Basic/swing_%d.png", 1);	CHECK_FAILED(hr);
 
 	//Ä®
 	hr = Add_Texture(LEVEL_STATIC, "FX_SwordSlash", "Effects/Sword/slash_%d.png", 6);	CHECK_FAILED(hr);
@@ -1277,6 +1280,11 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("SwordTrail", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("SwordSlash_hrzt", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("UpwardSlash", TYPE_NONANIM);
+
+		//Åä·ç½º
+		m_vecModelInfo.emplace_back("Torus", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("TorusHalf", TYPE_NONANIM);
+
 
 	}
 	else if (eLevel == LEVEL_LOGO)
