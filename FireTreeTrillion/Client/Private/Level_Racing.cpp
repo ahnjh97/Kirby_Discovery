@@ -70,7 +70,7 @@ HRESULT CLevel_Racing::Initialize()
 
 	CGameObject* pGameObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar"));
 	CTransingStar* pTransingStar = static_cast<CTransingStar*>(pGameObj);
-	pTransingStar->Activate(CTransingStar::OPEN);
+	//pTransingStar->Activate(CTransingStar::OPEN);
 
 	return S_OK;
 }

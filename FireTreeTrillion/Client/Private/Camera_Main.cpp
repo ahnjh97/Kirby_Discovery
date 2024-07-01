@@ -906,6 +906,11 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		m_CamSeq.push_back(newAction);
 
 
+		CEffect::FX_DESC FXDesc{};
+		FXDesc.fStartDelay = { 28.f };
+		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Kirby Title Logo"), &FXDesc)))
+			return;
+
 		newAction = {};
 		newAction.fTime = 60.f;
 		newAction.eCamCut = CUT_HARD;
@@ -913,10 +918,6 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction.vDir = _float3{ -.24f, 0.5f, 1.f };
 		m_CamSeq.push_back(newAction);
 
-		CEffect::FX_DESC FXDesc{};
-		FXDesc.fStartDelay = { 28.f };
-		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Kirby Title Logo"), &FXDesc)))
-			return;
 	}
 	break;
 	default:
@@ -995,6 +996,15 @@ void CCamera_Main::Control(_float fTimeDelta)
 		if (m_pGameInstance->Get_KeyState(DIK_8, KEY_DOWN))
 		{
 			Make_Shake(1.f, .8f);
+		}
+
+
+		if (m_pGameInstance->Get_KeyState(DIK_U, KEY_DOWN))
+		{
+			CEffect::FX_DESC FXDesc{};
+
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Kirby Title Logo"), &FXDesc)))
+				return;
 		}
 	}
 }
