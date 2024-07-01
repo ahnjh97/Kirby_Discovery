@@ -49,13 +49,15 @@ private:
 
 	TEX_STATE					m_eTexState = { DISCARD_NONE };
 
-	class CKirby*						m_pKirby = { nullptr };
-	_bool						m_IsGaugeUP = { FALSE };
-	_bool						m_IsKirbyExist = { FALSE };
+	class CKirby*				m_pKirby = { nullptr };
+	//_bool						m_IsKirbyExist = { FALSE };
 	
+	_bool						m_IsGaugeBLINK = { FALSE };
+
 	_float						m_fGaugeRatio = { 0.f };
 	_float						m_fDumpAbilityTime = { 0.f };
-	_float						m_fHideAnimTime = { 0.f };
+	_float						m_fHIDEAnimTime = { 0.f };
+	_float						m_fBLINKAnimTime = { 0.f };
 
 };
 
