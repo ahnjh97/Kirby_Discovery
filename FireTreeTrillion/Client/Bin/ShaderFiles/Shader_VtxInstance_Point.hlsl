@@ -229,9 +229,11 @@ PS_OUT PS_FOG(PS_IN In)
     PS_OUT Out = (PS_OUT) 0;
 	
     vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
-
+    if (vDiffuse.a < .01f || ((vDiffuse.r + vDiffuse.g + vDiffuse.b) / 3 < 0.1f))
+        discard;
+    
 	 //소프트 이펙트 보정
-    float2 vTexcoord = (float2) 0.f;
+        float2 vTexcoord = (float2) 0.f;
 
     vTexcoord.x = (In.vProjPos.x / In.vProjPos.w) * 0.5f + 0.5f;
     vTexcoord.y = (In.vProjPos.y / In.vProjPos.w) * -0.5f + 0.5f;
