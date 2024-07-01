@@ -239,7 +239,7 @@ pair<DEE_ANIM, _bool> COriginalDee::Make_WhatToDo()
 
 	_int iPointSize = m_TownPoints.second[m_eDestPoint].NearPoint.size();
 
-	if(m_ePrePoint != TOWNPOINT_END)
+	if (m_ePrePoint != TOWNPOINT_END)
 		m_TownPoints.second[m_ePrePoint].bIsUsing = false;
 
 	TOWN_POINT eArrivedPoint = m_eDestPoint;
@@ -338,8 +338,11 @@ void COriginalDee::Late_Tick(_float fTimeDelta)
 {
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
-	for (auto& Pair : m_PartObjects)
-		Pair.second->Late_Tick(m_fTimeDelta);
+	if (Get_State() == DEEANIM_WATERING)
+	{
+		for (auto& Pair : m_PartObjects)
+			Pair.second->Late_Tick(m_fTimeDelta);
+	}
 
 
 	//시야 벗어나면 컬링
@@ -476,7 +479,7 @@ HRESULT COriginalDee::Add_PartObjects(DEE_CHARACTER eCharacter)
 	PartDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 	PartDesc.pSocket = pModel->Get_BonePtr("RHaveL");
 	PartDesc.pCurAnimState = &m_eMyState;
-	
+
 	if (eCharacter == DEECHARACTER_FRONTMAN)
 	{
 		PartDesc.wstrModelName = TEXT("DeePart_Guitar");
@@ -657,7 +660,7 @@ void COriginalDee::Make_InitialState(DEE_CHARACTER eCharacter)
 	if (eAnim == DEEANIM_WALK)
 	{
 		TOWN_POINT	iMinPoint;
-		_float		fMinDist{999.f};
+		_float		fMinDist{ 999.f };
 
 		_float3 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 		for (auto& tPoint : m_TownPoints.second)
