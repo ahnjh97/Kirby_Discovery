@@ -123,6 +123,13 @@ _bool CKirbyDefault_Idle_State::Key_X(CGameObject* pGameObject, _float fTimeDelt
 			
 			return true;
 		}
+		else if (pKirby->Get_AbilityType() == ABILITY_HAMMER)
+		{
+			DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+			pKirby->Change_State(CKirby::HAMMERSTATE_HAMMERATTACKFINALTOY, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+			pKirby->Set_WeaponAnim(5);
+			return true;
+		}
 		else
 		{
 			DESC(m_fVacuumTime) = 0.f;

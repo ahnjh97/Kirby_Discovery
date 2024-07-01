@@ -17,6 +17,7 @@
 
 #include "BG.h"
 #include "HUD.h"
+#include "TransingStar.h"
 
 CLevel_Racing::CLevel_Racing(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -66,18 +67,12 @@ HRESULT CLevel_Racing::Initialize()
 	CHECK_FAILED(hr);
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
-	// 레벨전환 트리거
-	function<void(_int)> func = bind(&CLevel_Racing::Change_Levels, this);
-	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_LEVELCHANGER, func);
+
+	CGameObject* pGameObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar"));
+	CTransingStar* pTransingStar = static_cast<CTransingStar*>(pGameObj);
+	//pTransingStar->Activate(CTransingStar::OPEN);
 
 	return S_OK;
-}
-
-void CLevel_Racing::Change_Levels()
-{
-	HRESULT hr(S_OK);
-	hr = m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_DEEDEEDEE));
-	CHECK_FAILED(hr);
 }
 
 void CLevel_Racing::Tick(_float fTimeDelta)

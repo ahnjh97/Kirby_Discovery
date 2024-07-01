@@ -157,6 +157,9 @@ void CDee_Walk_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	if ((vDestPos - vMyPos).Length() < 1.f)
 	{
 		pair<DEE_ANIM, _bool> ToDo = baseInfo.pDee->Make_WhatToDo();
+		//아무것도 못 받은 상태라면 return
+		if (ToDo.first == DEEANIM_END)
+			return;
 		DEE_ANIM eNextState = ToDo.first;
 		baseInfo.pDee->Change_State(eNextState, 60.f, ToDo.second, true);
 	}
@@ -214,12 +217,22 @@ void CDee_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	baseInfo.pTransformCom->Look_At_Interpolate(vDestPos, fTimeDelta);
 	baseInfo.pController->Move_Dir(baseInfo.pTransformCom, baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta * fSpeed, fTimeDelta);
 
+
 	//목표 지점에 도달하면 뭐 할 지 정한다!!
 	if ((vDestPos - vMyPos).Length() < 1.f)
 	{
 		pair<DEE_ANIM, _bool> ToDo = baseInfo.pDee->Make_WhatToDo();
+		//아무것도 못 받은 상태라면 return
+		if (ToDo.first == DEEANIM_END)
+			return;
+
 		DEE_ANIM eNextState = ToDo.first;
 		baseInfo.pDee->Change_State(eNextState, 60.f, ToDo.second, true);
+	}
+	else if (baseInfo.pController->Compute_Wall(baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK), 0.f) < 1.f)
+	{
+		if (1.f <= baseInfo.pController->Compute_Wall(baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK), 2.f))
+			baseInfo.pDee->Change_State(DEEANIM_ENEMYJUMPSTART, 40.f, false, false);
 	}
 
 }
@@ -239,6 +252,61 @@ void CDee_Run_State::Free()
 {
 	__super::Free();
 }
+#pragma endregion
+
+#pragma region JUMP STATE
+
+CDee_Jump_State::CDee_Jump_State()
+{
+}
+
+void CDee_Jump_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+
+	m_fJumpPower = 10.f;
+}
+
+void CDee_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	BASE_INFO baseInfo{};
+	Setup_BaseInfo(baseInfo, pGameObject);
+	System_Tick(fTimeDelta);
+
+
+	baseInfo.pController->Move_Dir(baseInfo.pTransformCom, baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta * 5.f, fTimeDelta);
+	
+	baseInfo.pController->Jump(baseInfo.pTransformCom, m_fJumpPower, fTimeDelta);
+	m_fJumpPower -= GRAVITY * fTimeDelta * 3.f;
+
+	//착지 시 뭐 할지 정함
+	if (baseInfo.pController->Is_Terrain() /*&& .3f < m_fDuration*/)
+	{
+		//baseInfo.pController->Compute_TerrainPosition_Vector();
+		//_float4 vPos = baseInfo.vMyPos;
+		//vPos.y = baseInfo.pController->Compute_TerrainPosition().y + .5f;
+		//baseInfo.pController->Set_Position(baseInfo.pTransformCom, vPos);
+		baseInfo.pDee->Change_State(DEEANIM_LANDING, 60.f, false, true);
+	}
+
+}
+
+void CDee_Jump_State::OnStateExit()
+{
+	m_fDuration = 0.f;
+}
+
+CDee_Jump_State* CDee_Jump_State::Create()
+{
+	CDee_Jump_State* pInstance = new CDee_Jump_State();
+	return pInstance;
+}
+
+void CDee_Jump_State::Free()
+{
+	__super::Free();
+}
+
 #pragma endregion
 
 #pragma region EMOTION STATE
@@ -543,9 +611,6 @@ void CDee_Hungry_State::Free()
 #pragma endregion
 
 #pragma region STUN STATE
-//*********************************
-//			 STUN STATE
-//*********************************
 CDee_FlyStun_State::CDee_FlyStun_State()
 {
 }
@@ -824,11 +889,15 @@ void CDee_Interact_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 		}
 	}
 	break;
+	case DEEANIM_LANDING:
+		baseInfo.pController->Move_Dir(baseInfo.pTransformCom, baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta, fTimeDelta);
+		//baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta, 6.f, -0.25f);
+		break;
 	default:
+	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta, 6.f, 0.25f);
 		break;
 	}
 
-	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta, 6.f, 0.25f);
 
 	if (baseInfo.pDee->IsAnimFinished())
 	{
@@ -837,6 +906,12 @@ void CDee_Interact_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 		if (*m_pGameInstance->Get_CurrentLevelID() == LEVEL_DEEDEEDEE)
 		{
 			pair<DEE_ANIM, _bool> ToDo = baseInfo.pDee->Make_WhatToDo();
+			//아무것도 못 받은 상태라면 return
+			if (ToDo.first == DEEANIM_END)
+				return;
+
+			_bool bInterpolate = true;
+
 			baseInfo.pDee->Change_State(ToDo.first, 60.f, ToDo.second, true);
 		}
 		else
@@ -902,11 +977,17 @@ void CDee_Panic_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 
 
 	//목표 지점과의 거리 차이를 구하여 속도 정하기
-	_float fSpeed = 3.5f;
+	_float fSpeed = 6.5f;
 
 	//목표 방향을 향해 회전한, 이동한다.
 	baseInfo.pTransformCom->Look_At_Interpolate(vMyPos + m_vDir, fTimeDelta);
 	baseInfo.pController->Move_Dir(baseInfo.pTransformCom, baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta * fSpeed, fTimeDelta);
+
+	if (baseInfo.pController->Compute_Wall(baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK), 0.f) < 1.f)
+	{
+		if (1.f <= baseInfo.pController->Compute_Wall(baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK), 2.f))
+			baseInfo.pDee->Change_State(DEEANIM_ENEMYJUMPSTART, 40.f, false, false);
+	}
 }
 
 void CDee_Panic_State::OnStateExit()
@@ -925,3 +1006,52 @@ void CDee_Panic_State::Free()
 }
 
 #pragma endregion
+
+CBattleDee_NearDeeDeeDee_State::CBattleDee_NearDeeDeeDee_State()
+{
+}
+
+void CBattleDee_NearDeeDeeDee_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+}
+
+void CBattleDee_NearDeeDeeDee_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	BASE_INFO baseInfo{};
+	Setup_BaseInfo(baseInfo, pGameObject);
+	System_Tick(fTimeDelta);
+
+	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta);
+
+	_float3 vMyPos = baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION);
+	_float3 vDestPos = baseInfo.pDee->Make_DestPos();
+	vDestPos.y = vMyPos.y;
+
+	baseInfo.pTransformCom->Look_At_Interpolate(vDestPos, fTimeDelta);
+
+	//목표 지점에 도달하면 다시 달려간다
+	if (4.f < (vDestPos - vMyPos).Length())
+	{
+		DEE_ANIM eNextState = DEEANIM_ANGERRUN;
+		baseInfo.pDee->Change_State(eNextState, 60.f, true, true);
+	}
+}
+
+void CBattleDee_NearDeeDeeDee_State::OnStateExit()
+{
+	m_fDuration = 0.f;
+}
+
+CBattleDee_NearDeeDeeDee_State* CBattleDee_NearDeeDeeDee_State::Create()
+{
+	CBattleDee_NearDeeDeeDee_State* pInstance = new CBattleDee_NearDeeDeeDee_State();
+	return pInstance;
+}
+
+void CBattleDee_NearDeeDeeDee_State::Free()
+{
+	__super::Free();
+}
+
+

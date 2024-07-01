@@ -806,63 +806,6 @@ void CFXToolDirector::Render_AxisLines()
 	std::vector<ImVec2> bottomCircle, topCircle;
 
 
-	/*
-	// 원기둥의 하단과 상단 점 계산
-	for (int j = 0; j <= iSliceCnt; ++j)
-	{
-		float theta = j * 2.0f * DirectX::XM_PI / iSliceCnt;
-		float cosTheta = cosf(theta);
-		float sinTheta = sinf(theta);
-
-		_float3 bottomPoint = vCenter + _float3(fBottomRadius * cosTheta, 0.0f, fBottomRadius * sinTheta);
-		_float3 topPoint = vCenter + _float3(fTopRadius * cosTheta, fHeight, fTopRadius * sinTheta);
-
-		bottomCircle.push_back(TransformToScreen(XMLoadFloat3(&bottomPoint)));
-		topCircle.push_back(TransformToScreen(XMLoadFloat3(&topPoint)));
-	}
-
-	// 원기둥 그리기
-	for (int j = 0; j < iSliceCnt; ++j)
-	{
-		drawList->AddLine(bottomCircle[j], bottomCircle[j + 1], ImColor(color.x, color.y, color.z, color.w));
-		drawList->AddLine(topCircle[j], topCircle[j + 1], ImColor(color.x, color.y, color.z, color.w));
-		drawList->AddLine(bottomCircle[j], topCircle[j], ImColor(color.x, color.y, color.z, color.w));
-	}
-	*/
-
-	/*
-	vector<vector<ImVec2>> spherePoints;
-	// 구의 표면을 이루는 점 계산
-	for (int i = 0; i <= iSliceCnt; ++i)
-	{
-		float phi = DirectX::XM_PI * i / iSliceCnt;
-		std::vector<ImVec2> stackPoints;
-
-		for (int j = 0; j <= iSliceCnt; ++j)
-		{
-			float theta = 2.0f * DirectX::XM_PI * j / iSliceCnt;
-
-			float x = fRadius * sinf(phi) * cosf(theta);
-			float y = fRadius * cosf(phi);
-			float z = fRadius * sinf(phi) * sinf(theta);
-
-			_float3 point = vCenter + _float3(x, y, z);
-			stackPoints.push_back(TransformToScreen(XMLoadFloat3(&point)));
-		}
-		spherePoints.push_back(stackPoints);
-	}
-
-	// 구 그리기
-	for (int i = 0; i < iSliceCnt; ++i)
-	{
-		for (int j = 0; j < iSliceCnt; ++j)
-		{
-			drawList->AddLine(spherePoints[i][j], spherePoints[i][j + 1], ImColor(color.x, color.y, color.z, color.w));
-			drawList->AddLine(spherePoints[i][j], spherePoints[i + 1][j], ImColor(color.x, color.y, color.z, color.w));
-		}
-	}
-	*/
-
 	// Define points in world space
 	XMVECTOR origin = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
 	XMVECTOR xAxisStart = XMVectorSet(-2.0f, 0.0f, 0.0f, 1.0f);

@@ -17,6 +17,7 @@ public:
 		_float fAngle = { 0.f };
 		_float fHeight = { 0.f };
 		_float fDelayTime = { 0.f };
+		_float fSpeedWeight = { 0.f };
 		_vector vPosition = {};
 		_vector vSide = {};
 		_float4x4 WorldMatrix = {};
@@ -49,11 +50,14 @@ private:
 	_float			m_fTurnTime = { 0.f };
 	_float			m_fElapsedTime = { 0.f };
 	_float			m_fFireTime = { 0.f };
+	_float			m_fRotateTime = { 0.f };
 	_float			m_fDelayTime = { 0.f };
 	_float			m_fDeadTime = { 0.f };
 
 	_float			m_fAngle = { 0.f };
 	_float			m_fHeight = { 0.f };
+	_float			m_fSpeedWeight = { 0.f };
+	_float			m_fRotateSpeed = { 0.f };
 
 	_vector			m_vPosition = {};
 	_vector			m_vKirbyPos = {};

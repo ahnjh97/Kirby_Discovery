@@ -103,6 +103,7 @@ public:
 	void Make_Sequence_FromQuat(EASING eEaseFlag, _float fDuration, _vector vDestQuat, _float fDestZoom = -1.f);
 
 	//카메라의 이벤트 함수들
+	void Ready_Cam_DeeDeeDee(CGameObject* pNotifier);
 	void Start_ShutterSeq(CGameObject* pNotifier);
 	void Start_BridgeSeq(CGameObject* pNotifier);
 
@@ -111,12 +112,23 @@ public:
 
 
 
+	virtual void Lock_Position(_float3 vPos = { -1.f, -1.f, -1.f }, _bool bInterpolate = false) override;
+	virtual void Lock_Direction(_float3 vLook = { -1.f, -1.f, -1.f }, _bool bInterpolate = false) override;
+	virtual void Lock_All(_float3 vPos = { -1.f, -1.f, -1.f }, _float3 vLook = { -1.f, -1.f, -1.f }, _bool bInterpolate = false) override;
+
+
+
+	//카메라 목표 수치 계산
+	void Compute_Set_BothFocus(_float fTimeDelta);
+	void Compute_Set_CamLock(_float fTimeDelta);
+	void Compute_Set_Trigger(_int iTriggerIndex);
+
+
 //카메라 트리거 관련 함수
 public:
 	void Set_MatrixIndex(_int iMatrixIndex);
 	void EmplaceBackCamMatrix(const _float4x4& matWorld);
 	void EmplaceBackDirRadius(_int iCamType, _fvector vDir, _float fRadius);
-	void LerpByTriggerInfo(_int iTriggerIndex);
 
 	void EmplaceBackTriggerInfo(const _float4x4& matWorld, _float fScale);
 
@@ -246,7 +258,7 @@ private:
 
 	//현재 시퀀스 모드
 	CAMSEQ m_eSpecialSeq = { SEQ_END };
-
+	_float m_fStartAudioTime = { 0.f };
 	//시퀀스 웨이팅 목록
 	list<CAMACTION> m_CamSeq;
 
@@ -265,7 +277,7 @@ private:
 
 	void Subscribe_Events();
 
-	void UpdatePos_FromAnchor(_float fTimeDelta);
+	void Track_Anchor(_float fTimeDelta);
 
 	//포커징 기준점을 업데이트한다.
 	void Update_Anchor(_float fTimeDelta);

@@ -134,6 +134,9 @@ HRESULT CHUD_StarPoint::Render()
 //	if (STARPOINT_WAIT == m_eCurState && STARPOINT_HIDE == m_ePreState)
 //		return S_OK;
 
+	if (m_bRender == false)
+		return E_FAIL;
+
 	if (UI_TEXTURE == m_UIObjDesc.eUIType)
 		Render_BindSet(m_pShaderCom, m_pTransformCom);
 
@@ -511,6 +514,7 @@ void CHUD_StarPoint::Disappear_CoinUI(_float fTimeDelta)
 	}
 	else if (m_fIdleTime <= 5.f)
 	{
+		m_bRender = true;
 		m_fAlpha = 1.f;
 		if (UI_FONT == m_UIObjDesc.eUIType)
 		{

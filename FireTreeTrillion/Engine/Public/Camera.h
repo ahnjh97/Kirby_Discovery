@@ -11,8 +11,9 @@ BEGIN(Engine)
 class ENGINE_DLL CCamera abstract : public CGameObject
 {
 public:
-	enum CAMTARGET { TARGET_FIRST, TARGET_SECOND, TARGET_END };
-	enum CAMFOCUS { FOCUS_FIRST, FOCUS_SECOND, FOCUS_BOTH, FOCUS_END };
+	enum CAMTARGET	{ TARGET_FIRST, TARGET_SECOND, TARGET_END };
+	enum CAMFOCUS	{ FOCUS_FIRST, FOCUS_SECOND, FOCUS_BOTH, FOCUS_END };
+	enum CAMLOCK	{ LOCK_POS, LOCK_DIR, LOCK_ALL, LOCK_END};
 
 	typedef struct : public CGameObject::GAMEOBJECT_DESC
 	{
@@ -33,6 +34,14 @@ public:
 	//트래킹할 타겟을 세팅한다. (트랜스폼, 몇 번째 타겟 슬롯에 넣을 건지, 어디에 focus할 건지, 기준점에 얼마나 오프셋 줄 건지, 보간 속도 어떻게 할 건지)
 	virtual void Set_Target(CTransform* pTarget, CAMTARGET eTarget, CAMFOCUS eFocus, _float3 vAnchorOffset = _float3{ 0.f, 0.f, 0.f }, _float fInterpolateSpeed = -1.f);
 
+	virtual void Lock_Position(_float3 vPos = {-1.f, -1.f, -1.f}, _bool bInterpolate = false);
+	virtual void Lock_Direction(_float3 vLook = { -1.f, -1.f, -1.f }, _bool bInterpolate = false);
+	virtual void Lock_All(_float3 vPos = { -1.f, -1.f, -1.f }, _float3 vLook = { -1.f, -1.f, -1.f }, _bool bInterpolate = false);
+	void Set_FOVY(_float fFOVY) { m_fFovy = ToRadian(m_fFovy); }
+	void Unlock() { m_eCamLockMode = LOCK_END; }
+
+	void LockToggle() { m_bLockCamera = !m_bLockCamera; }
+	void Lock_Camera(_float3 vPos, _float3 vLook, _float fFOVY);
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -48,6 +57,10 @@ protected:
 	CTransform* m_pFirstTarget = { nullptr };
 	//카메라가 트래킹할 보조 타겟
 	CTransform* m_pSecondTarget = { nullptr };
+
+	//카메라 잠금
+	_bool			m_bLockCamera = { false };
+	CAMLOCK			m_eCamLockMode = { LOCK_END };
 
 	_float			m_fFovy = { 0.0f };
 	_float			m_fAspect = { 0.0f };

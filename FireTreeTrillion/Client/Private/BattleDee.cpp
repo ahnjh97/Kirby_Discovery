@@ -4,12 +4,24 @@
 #include "BattleDee.h"
 #include "Dee_Part.h"
 #include "Dee_State.h"
+#include "EventCenter.h"
 
+vector<_float3> CBattleDee::m_RespawnPoints =
+{
+	{-16.f, 24.f, 23.f},
+	{20.f, 24.f, 23.f},
+	{-16.f, 24.f, -10.f},
+	{20.f, 24.f, -10.f}
+};
 
 _float3 CBattleDee::Make_DestPos()
 {
-	CTransform* pDeeDeeDeeTransform = m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_DeeDeeDee"), 0)->Get_TransformCom();
-	_float3 vDestPos = pDeeDeeDeeTransform->Get_State(CTransform::STATE_POSITION) - m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 2.f;
+	wstring strLayerTag =
+		m_bTrackKirby ? TEXT("Layer_Player") : TEXT("Layer_DeeDeeDee");
+
+	CTransform* pDestTransform = m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), strLayerTag, 0)->Get_TransformCom();
+
+	_float3 vDestPos = pDestTransform->Get_State(CTransform::STATE_POSITION) - m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 2.f;
 
 	return vDestPos;
 }
@@ -18,21 +30,31 @@ pair<DEE_ANIM, _bool> CBattleDee::Make_WhatToDo()
 {
 	DEE_ANIM eDeeState = DEEANIM_END;
 
-	switch (CUtils::Make_RandomInt(0, 2))
+	if (Get_State() == DEEANIM_DAMAGE)
+		return { eDeeState , false };
+
+	else if (Get_State() == DEEANIM_ENEMYJUMPSTART)
+		return  { DEEANIM_FIND, false };
+
+	//목표 지점과의 거리가 가깝다면 디디디 주변
+	if (_float3::Distance(GET_POS, Make_DestPos()) < 6.f)
+		eDeeState = DEEANIM_TROUBLE;
+
+	//아니라면, 다시 달리기
+	else
 	{
-	case 0:
-		eDeeState = DEEANIM_ENEMYRUN;
-		break;
-	case 1:
-		eDeeState = DEEANIM_ANGERRUN;
-		break;
-	case 2:
-		eDeeState = DEEANIM_ANGERRUN;
-		break;
-	default:
-		eDeeState = DEEANIM_ANGERRUN;
-		break;
-	};
+		_float fPercentage = CUtils::Make_RandomFloat(1.f, 100.f);
+
+		eDeeState = fPercentage < 20.f ?
+			DEEANIM_ENEMYRUN :
+			DEEANIM_ANGERRUN;
+
+		if (m_bStartBattle && eDeeState == DEEANIM_ANGERRUN)
+		{
+			m_bTrackKirby = (_bool)CUtils::Make_RandomInt(0, 1);
+		}
+	}
+
 
 	Set_DeeEyeState(DEEEYE_SADNESS);
 	return { eDeeState, true };
@@ -79,26 +101,33 @@ HRESULT CBattleDee::Initialize(void* pArg)
 
 	//m_pTransformCom->Rotation({ 0.f, 1.f, 0.f, 0.f }, ToRadian(180.f));
 
+		//디디디 전투 시작
+	function<void(CGameObject*)> func = bind(&CBattleDee::Start_Battle, this, placeholders::_1);
+	CEventCenter::Get_Instance()->Subscribe(KEVENT_DDD_BATTLESTART, this, func);
+
 	m_eAbilityType = ABILITY_DEFAULT;
 
 	return S_OK;
 }
-
-
 
 _int CBattleDee::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
 		return Ready_Dead();
 
+
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
-	if (m_ePhyXState == PO_VACUUMING || m_ePhyXState == PO_FLYDEADAWAY)
+	if (m_ePhyXState == PO_VACUUMING || m_ePhyXState == PO_FLYDEADAWAY || m_ePhyXState == PO_KIRBYMOUTH)
+	{
 		Change_State(DEEANIM_DAMAGE, 120.f, true, false);
+		Set_DeeEyeState(DEEEYE_SMILE);
+	}
 
-	//__super::Tick(m_fTimeDelta);
+
 	// 모션블러 계산
 	Compute_MotionBlur();
+
 
 	// FSM 제어
 	if (m_pFSM != nullptr)
@@ -116,6 +145,7 @@ _int CBattleDee::Tick(_float fTimeDelta)
 	//공통된 디 관련 변수를 업데이트 - 초기화한다
 	Dee_SystemTick(m_fTimeDelta);
 
+
 	return OBJ_NOEVENT;
 }
 
@@ -130,6 +160,44 @@ void CBattleDee::Late_Tick(_float fTimeDelta)
 	if (Compute_OptimizationAnimation(m_fTimeDelta) == true)
 		m_pModelCom->Play_Animation(m_fAccTime);
 
+
+	//움직임 체크 시간이 3초 이상 지났을 때, 움직임이 없거나 벼랑 끝으로 떨어짐
+	if (3.f < m_fNonMoveTime && (m_fMovedDistance < .5f || _float3(GET_POS).y < -50.f)
+		//절두체 밖으로 컬링되었다면,
+		&& !m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State(CTransform::STATE_POSITION), 2.0f))
+	{
+
+
+		vector<_float3> respawnPoints = m_RespawnPoints;
+		_uint iPointIdx = CUtils::Make_RandomInt(0, respawnPoints.size() - 1);
+
+		//리스폰 포인트 중 절두체 밖으로 나간 포인트를 찾는다.
+		while (!respawnPoints.empty())
+		{
+			if (!m_pGameInstance->isInFrustum_WorldSpace(respawnPoints[iPointIdx], 2.0f))
+				break;
+
+			auto iter = respawnPoints.begin() + iPointIdx;
+			respawnPoints.erase(iter);
+
+			if (respawnPoints.empty())
+				break;
+			iPointIdx = CUtils::Make_RandomInt(0, respawnPoints.size() - 1);
+		}
+
+		//빌 때까지 돌았다면 아무런 리스폰 지점도 남지 않았다. return
+		if (respawnPoints.size() <= 0)
+			return;
+
+		_float3 vRespawnPos = Make_DestPos() + _float3{ 0.f, 10.f, 0.f };
+		m_pControllerCom->Set_Position(m_pTransformCom, Pos(vRespawnPos));
+		Change_State(DEEANIM_ANGERRUN, 60.f, true, true);
+
+		m_fNonMoveTime = m_fMovedDistance = 0.f;
+
+	}
+
+	m_vPrePos = GET_POS;
 
 	//시야 벗어나면 컬링
 	if (!m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State(CTransform::STATE_POSITION), 2.0f))
@@ -202,6 +270,14 @@ void CBattleDee::Render_IMGUI()
 	__super::Render_IMGUI();
 
 	ImGui::Text(u8"현재 애님 인덱스 : %d", m_pFSM->Get_State());
+
+	ImDrawList* drawList = ImGui::GetForegroundDrawList();
+
+	ImVec2 vProjPos = CUtils::WorldPosTo_ImguiProjPos(GET_POS);
+	drawList->AddCircleFilled(vProjPos, 5.f, IM_COL32(255, 50, 255, 255));
+
+	string strText = to_string(m_fMovedDistance).substr(0, 4);
+	drawList->AddText(vProjPos + ImVec2{ 0.f, -30.f }, IM_COL32(255, 255, 255, 255), strText.c_str());
 }
 
 #endif
@@ -297,7 +373,7 @@ void CBattleDee::SetUp_FSM()
 {
 	m_pFSM = CFSM::Create();
 
-	m_pFSM->Add_State(DEEANIM_TROUBLE, CDee_Emotion_State::Create());
+	m_pFSM->Add_State(DEEANIM_TROUBLE, CBattleDee_NearDeeDeeDee_State::Create());
 	m_pFSM->Add_State(DEEANIM_ANGERRUN, CDee_Run_State::Create());
 	m_pFSM->Add_State(DEEANIM_ENEMYRUN, CDee_Panic_State::Create());
 	m_pFSM->Add_State(DEEANIM_CHEERINGA, CDee_Emotion_State::Create());
@@ -305,6 +381,11 @@ void CBattleDee::SetUp_FSM()
 	m_pFSM->Add_State(DEEANIM_DAMAGE, CDee_FlyStun_State::Create());
 	m_pFSM->Add_State(DEEANIM_MOVEFALL, CDee_Interact_State::Create());
 
+	//점프
+	m_pFSM->Add_State(DEEANIM_FIND, CDee_Jump_State::Create());
+	//착지
+	m_pFSM->Add_State(DEEANIM_ENEMYJUMPSTART, CDee_Interact_State::Create());
+	m_pFSM->Add_State(DEEANIM_LANDING, CDee_Interact_State::Create());
 
 
 }

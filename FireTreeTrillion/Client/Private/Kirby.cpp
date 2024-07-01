@@ -64,7 +64,7 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// 디버깅 용
-	//m_eAbilityType = ABILITY_HAMMER;
+	m_eAbilityType = ABILITY_HAMMER;
 
 	m_pControllerCom->RegisterAsPlayer();
 	Set_WeaponAnim(3);
@@ -124,10 +124,6 @@ void CKirby::Late_Tick(_float fTimeDelta)
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND,	 this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW,		 this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_DEFERREDINFO, this);
-
-	//if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
-	//{
-	//}
 }
 
 HRESULT CKirby::Render()
@@ -195,9 +191,9 @@ void CKirby::Render_IMGUI()
 	}
 
 	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-	ImGui::Text("HP : %d", (_int)m_fHp);
-	ImGui::Text("m_fMoveSpeed : %.2f", INFO(m_fMoveSpeed));
-	ImGui::Text("TrackPosition : %.2f", Get_AnimTrackPosition());
+	ImGui::Text("m_fDumpAbilityTime : %.2f", INFO(m_fDumpAbilityTime));
+	ImGui::Text("m_bisDeforming : %d", INFO(m_bisDeforming));
+	ImGui::Text("m_bBlockOtherVacuum : %d", INFO(m_bBlockOtherVacuum));
 	ImGui::Text("m_vLadderPoint.x : %.2f, m_vLadderPoint.y : %.2f m_vLadderPoint.z : %.2f", INFO(m_vLadderPoint).x, INFO(m_vLadderPoint).y, INFO(m_vLadderPoint).z);
 	ImGui::Text("m_vLadderLook.x : %.2f, m_vLadderLook.y : %.2f m_vLadderLook.z : %.2f", INFO(m_vLadderLook).x, INFO(m_vLadderLook).y, INFO(m_vLadderLook).z);
 	ImGui::Text("m_vPos.x : %.2f, m_vPos.y : %.2f m_vPos.z : %.2f", vPos.x, vPos.y, vPos.z);
@@ -490,7 +486,7 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 				)
 				return;
 
-			if (INFO(m_bisDeforming) == false && m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
+			if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN) && INFO(m_bisDeforming) == false)
 			{
 				if (INFO(m_pObject) != nullptr)
 					return;
@@ -739,7 +735,7 @@ void CKirby::Key_Input(_float fTimeDelta)
 	//특정 레벨에서 덤프할 경우 크래시 발생으로 예외 처리
 	//디버깅이 필요할 경우 레벨 별 조건 처리하면 됨
 	LEVEL eCurLevel = (LEVEL)*m_pGameInstance->Get_CurrentLevelID();
-	if (LEVEL_RACING == eCurLevel)
+	if (LEVEL_RACING == eCurLevel || LEVEL_GAMEPLAY == eCurLevel)
 	{
 		if (m_pGameInstance->Get_DIKeyState(DIK_B, KEY_DOWN))
 		{
@@ -1236,6 +1232,7 @@ void CKirby::SetUp_FSM()
 #pragma endregion
 
 
+
 	CFSM::FSM_INFO		FSM_Info_Desc = {};
 	FSM_Info_Desc.iState = STATE_IDLE;
 	FSM_Info_Desc.uNumModel = BODY_END;
@@ -1564,10 +1561,11 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 
 
 	if (INFO(m_bDumpAbilityPress) == true &&
-		(m_pFSM->Get_State() != CKirby::STATE_IDLE || m_pFSM->Get_State() != CKirby::STATE_RUN ||
-			m_pFSM->Get_State() != CKirby::STATE_RUNSTART || m_pFSM->Get_State() != CKirby::SWORDSTATE_RUN ||
-			m_pFSM->Get_State() != CKirby::SWORDSTATE_WAIT || m_pFSM->Get_State() != CKirby::CARSTATE_IDLING))
+		(m_pFSM->Get_State() == CKirby::STATE_IDLE || m_pFSM->Get_State() == CKirby::STATE_RUN ||
+			m_pFSM->Get_State() == CKirby::STATE_RUNSTART || m_pFSM->Get_State() == CKirby::SWORDSTATE_RUN ||
+			m_pFSM->Get_State() == CKirby::SWORDSTATE_WAIT || m_pFSM->Get_State() == CKirby::CARSTATE_IDLING) == false)
 		INFO(m_bDumpAbilityPress) = false;
+
 
 	if (INFO(m_bDumpAbilityPress) == false)
 	{

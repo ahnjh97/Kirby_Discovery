@@ -1,18 +1,48 @@
 <Root>
-    <Version>240618</Version>
+    <Version>240628</Version>
     <ModelName>BladeKnight
         <Animation>Attack</Animation>
         <AnimSpeed>60</AnimSpeed>
-        <Count>3</Count>
-        <Data0 EventName="ApplyDamage" StartFrame="8" EndFrame="9"/>
-        <Data1 EventName="StopDamage" StartFrame="11" EndFrame="12"/>
-        <Data2 EventName="StopDamage" StartFrame="12" EndFrame="13"/>
+        <Count>1</Count>
+        <Data0 EventName="Attack" StartFrame="9" EndFrame="11"/>
+        <Animation>TornadoAttackCharge</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
         <Animation>TornadoAttack</Animation>
         <AnimSpeed>60</AnimSpeed>
         <Count>3</Count>
-        <Data0 EventName="ApplyDamage" StartFrame="3" EndFrame="4"/>
-        <Data1 EventName="StopDamage" StartFrame="6" EndFrame="7"/>
-        <Data2 EventName="StopDamage" StartFrame="7" EndFrame="8"/>
+        <Data0 EventName="Attack" StartFrame="1" EndFrame="2"/>
+        <Data1 EventName="Attack" StartFrame="28" EndFrame="29"/>
+        <Data2 EventName="Attack" StartFrame="60" EndFrame="60"/>
+        <Animation>ThrustWait</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>ThrustLoop</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>DoubleAttack</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>2</Count>
+        <Data0 EventName="Attack" StartFrame="3" EndFrame="4"/>
+        <Data1 EventName="Attack" StartFrame="23" EndFrame="24"/>
+        <Animation>TornadoAttackCharge2</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>TornadoAttackChargeMax</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>AttackStart</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>TornadoAttack</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>3</Count>
+        <Data0 EventName="Attack" StartFrame="1" EndFrame="2"/>
+        <Data1 EventName="Attack" StartFrame="12" EndFrame="12"/>
+        <Data2 EventName="Attack" StartFrame="27" EndFrame="27"/>
+        <Animation>TornadoAttackCharge</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
     </ModelName>
     <ModelName>Awoofy
         <Animation>Run</Animation>

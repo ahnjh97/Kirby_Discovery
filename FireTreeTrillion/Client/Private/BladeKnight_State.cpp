@@ -176,7 +176,7 @@ void CBladeKnight_Find_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	}
 
 	// 플레이어를 향해 바라본다
-	pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 2.f);
+	pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 4.f);
 
 	if(CBladeKnight::BLADEKNIGHT_FINDWAIT == pBladeKnight->Get_State())
 	{

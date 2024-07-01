@@ -97,7 +97,7 @@ void CEventCenter::Free()
 		while (!m_pListeners[i].empty())
 		{
 			LISTENER curListener = m_pListeners[i].top();
-			Safe_Release(curListener.pObj);
+			//Safe_Release(curListener.pObj);
 			m_pListeners[i].pop();
 		}
 	}

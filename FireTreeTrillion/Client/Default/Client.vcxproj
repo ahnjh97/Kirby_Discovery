@@ -330,6 +330,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\Public\ToppleableBridge.h" />
+    <ClInclude Include="..\Public\TransingStar.h" />
     <ClInclude Include="..\Public\Trigger.h" />
     <ClInclude Include="..\Public\Tunnel.h" />
     <ClInclude Include="..\Public\TunnelRock.h" />
@@ -500,6 +501,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\Private\ToppleableBridge.cpp" />
+    <ClCompile Include="..\Private\TransingStar.cpp" />
     <ClCompile Include="..\Private\Trigger.cpp" />
     <ClCompile Include="..\Private\Tunnel.cpp" />
     <ClCompile Include="..\Private\TunnelRock.cpp" />

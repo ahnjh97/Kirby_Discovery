@@ -45,9 +45,11 @@ HRESULT CMainApp::Initialize()
 	if (FAILED(Open_Level(LEVEL_LOGO)))
 		return E_FAIL;
 
-
 	CCollisionCenter::Get_Instance()->Initialize();
 	CEventCenter::Get_Instance()->Initialize();
+
+	if (FAILED(Ready_Object_For_Static()))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -109,6 +111,11 @@ void CMainApp::Tick(_float fTimeDelta)
 			if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_DEEDEEDEE))))
 				return;
 		}
+		if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_A, KEY_DOWN))
+		{
+			if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_GAMEPLAY))))
+				return;
+		}
 	}
 
 	CCollisionCenter::Get_Instance()->Collision_Tick(fTimeDelta);
@@ -127,8 +134,6 @@ HRESULT CMainApp::Render(_float fTimeDelta)
 
 #ifdef _DEBUG
 
-
-	// RTV_FONT �߰�
 	if (m_pGameInstance->Get_IsRenderRTV())
 		Render_RTVFonts();
 
@@ -154,6 +159,16 @@ HRESULT CMainApp::Ready_Fonts()
 	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUD_StarPoint_NUM30"),
 		TEXT("../Bin/Resources/Fonts/HUD_StarPoint_NUM30.spritefont"))))
 		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CMainApp::Ready_Object_For_Static()
+{
+	HRESULT hr(S_OK);
+
+	//hr = m_pGameInstance->Add_Clone(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar"));
+	//CHECK_FAILED(hr);
 
 	return S_OK;
 }

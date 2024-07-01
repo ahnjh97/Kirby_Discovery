@@ -19,6 +19,8 @@ public:
 	};
 
 	struct KABU_DESC : public CMonster::MONSTER_DESC {
+		_bool bRealDead = { false };
+		_float fAngle = { 0.f };
 		vector<_float4> vecRallyPoints;
 	};
 
@@ -28,8 +30,24 @@ private:
 	virtual ~CKabu() = default;
 
 public:
+	void Set_Position(_float4 vPosition) {
+		m_vPosition = vPosition;
+	}
+
+	_float4 Get_Position() {
+		return m_vPosition;
+	}
+	vector<_float4> Get_RallyPoint() {
+		return m_vecRallyPoint;
+	}
 	_float4 Get_Look() {
 		return m_vLook;
+	}
+	_bool Get_RealDead() {
+		return m_bRealDead;
+	}
+	_float Get_Angle() {
+		return m_fAngle;
 	}
 
 public:
@@ -52,7 +70,9 @@ public:
 private:
 	KABU_ANIM			m_eCurrentState = { KABU_END };
 
+	_float4				m_vPosition = {};
 	_float4				m_vLook = {};
+	_bool				m_bRealDead = { false };
 
 	// 회전 상태의 카부
 	_float				m_fDistance = { 0.f };

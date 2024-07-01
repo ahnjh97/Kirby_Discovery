@@ -41,12 +41,16 @@ enum DEE_ANIM
 	DEEANIM_CLERKWAVEHAND,
 
 	DEEANIM_DAMAGE,
+	DEEANIM_ENEMYJUMPSTART = 43,
+	DEEANIM_ENEMYJUMPSTARTLONG,
 
 	DEEANIM_ENEMYRUN = 48,
 
 	//원래 와들디의 행동들
 	DEEANIM_ENEMYSLEEP = 50,
 	DEEANIM_ENEMYWALK = 51,
+
+	DEEANIM_FIND = 53,
 
 	//인사 받아주기
 	DEEANIM_GREETING_ONEHAND = 56,
@@ -257,6 +261,9 @@ protected:
 	//커비한테 인사했는가?
 	_bool			m_bHiToKirby = { false };
 	_float			m_fResetHiTime = { 0.f };
+
+	//이전 틱의 위치
+	_float3			m_vPrePos = { 0.f, 0.f, 0.f };
 
 	DEEEYESTATE		m_eEyeState = { DEEEYE_END };
 

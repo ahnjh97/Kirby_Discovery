@@ -112,6 +112,27 @@ public:
 	virtual void Free() override;
 };
 
+class CDee_Jump_State final : public CDee_State
+{
+private:
+	CDee_Jump_State();
+	virtual ~CDee_Jump_State() = default;
+
+public:
+	// 상태 진입했을 때 처음만 호출
+	virtual void OnStateEnter(class CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet) override;
+	// 상태 진입되어 있는 상태에서 매 tick마다 호출
+	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
+	virtual void OnStateExit()														override;
+
+
+	_float m_fJumpPower = { 0.f };
+
+public:
+	static	CDee_Jump_State* Create();
+	virtual void Free() override;
+};
+
 class CDee_NPC_State final : public CDee_State
 {
 private:
@@ -168,6 +189,27 @@ public:
 	virtual void Free() override;
 };
 
+class CDee_Sleep_State final : public CDee_State
+{
+private:
+	CDee_Sleep_State();
+	virtual ~CDee_Sleep_State() = default;
+
+public:
+	// 상태 진입했을 때 처음만 호출
+	virtual void OnStateEnter(class CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet) override;
+	// 상태 진입되어 있는 상태에서 매 tick마다 호출
+	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
+	virtual void OnStateExit()														override;
+
+
+public:
+	static	CDee_Sleep_State* Create();
+	virtual void Free() override;
+};
+
+#pragma region HUNGRY DEE
+
 class CDee_Hungry_State final : public CDee_State
 {
 private:
@@ -187,6 +229,10 @@ public:
 	static	CDee_Hungry_State* Create();
 	virtual void Free() override;
 };
+
+#pragma endregion
+
+#pragma region BATTLE DEE
 
 class CDee_FlyStun_State final : public CDee_State
 {
@@ -208,7 +254,6 @@ public:
 	static	CDee_FlyStun_State* Create();
 	virtual void Free() override;
 };
-
 
 class CDee_Panic_State final : public CDee_State
 {
@@ -232,11 +277,11 @@ public:
 	virtual void Free() override;
 };
 
-class CDee_Sleep_State final : public CDee_State
+class CBattleDee_NearDeeDeeDee_State final : public CDee_State
 {
 private:
-	CDee_Sleep_State();
-	virtual ~CDee_Sleep_State() = default;
+	CBattleDee_NearDeeDeeDee_State();
+	virtual ~CBattleDee_NearDeeDeeDee_State() = default;
 
 public:
 	// 상태 진입했을 때 처음만 호출
@@ -245,10 +290,15 @@ public:
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
 	virtual void OnStateExit()														override;
 
+private:
+	//_float3		m_vDir = { 0.f, 0.f, 0.f };
 
 public:
-	static	CDee_Sleep_State* Create();
+	static	CBattleDee_NearDeeDeeDee_State* Create();
 	virtual void Free() override;
 };
+
+#pragma endregion
+
 
 END

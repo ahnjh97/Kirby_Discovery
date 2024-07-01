@@ -40,7 +40,7 @@ void CPoppyBrosJr_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	if(CPoppyBrosJr::PS_TARGET == pPoppyJr->Get_PoppyState())
 	{
 		// 플레이어를 향해 바라본다
-		pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 2.f);
+		pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 4.f);
 
 		m_fTimeDelta += fTimeDelta;
 

@@ -45,9 +45,11 @@ void CKirbyHammer_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		}
 		else if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
 		{
-			DESC(m_eEyeState) = CKirby::EYE_CLOSE;
-			pKirby->Change_State(CKirby::HAMMERSTATE_HAMMERATTACKFINALTOY, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
-			pKirby->Set_WeaponAnim(5);
+			//DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+			//pKirby->Change_State(CKirby::HAMMERSTATE_HAMMERATTACKFINALTOY, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+			//pKirby->Set_WeaponAnim(5);
+			DESC(m_eEyeState) = CKirby::EYE_ANGER;
+			pKirby->Change_State(CKirby::HAMMERSTATE_ONIGOROSIHAMMERSTART, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
 			return;
 		}
 		else if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
@@ -90,6 +92,13 @@ void CKirbyHammer_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 			pController->Set_Position(pTransformCom, DESC(m_vLadderPoint));
 			DESC(m_vMoveDir) = DESC(m_vTargetDir) = DESC(m_vLadderLook);
 			pKirby->Change_State(CKirby::STATE_LADDERWAITSTART, 200.f, false, false, CKirby::BODY_DEFAULT);
+			return;
+		}
+
+		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
+		{
+			DESC(m_eEyeState) = CKirby::EYE_ANGER;
+			pKirby->Change_State(CKirby::HAMMERSTATE_ONIGOROSIHAMMERSTART, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
 			return;
 		}
 
@@ -161,7 +170,7 @@ void CKirbyHammer_Idle_State::Free()
 
 #pragma endregion
 
-#pragma region HAMMER STATE
+#pragma region HAMMERATTACK STATE
 
 CKirbyHammer_Attack_State::CKirbyHammer_Attack_State()
 {
@@ -174,6 +183,7 @@ void CKirbyHammer_Attack_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex,
 
 void CKirbyHammer_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
+	// 뱉는 로직이다.
 	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
 	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
@@ -183,25 +193,156 @@ void CKirbyHammer_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float f
 	// 시작 2틱
 	if (pKirby->Get_State() == CKirby::HAMMERSTATE_HAMMERATTACKSTARTTOY)
 	{
+		if (JoyStick_controller(Kirbydesc, pCamera) == true)
+		{
+			Kirbydesc->m_fMoveSpeed += fTimeDelta * 30.f;
+			if (Kirbydesc->m_fMoveSpeed > 4.f)
+				Kirbydesc->m_fMoveSpeed = 4.f;
+			// 타겟기준
+			_vector vMoveDelta = Kirbydesc->m_vTargetDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
+			pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
 
+			Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta, 3.f);
+		}
+		else
+			Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
+
+
+		if (pKirby->isAnimFinish())
+		{
+			pKirby->Change_State(CKirby::HAMMERSTATE_HAMMERATTACKTOY, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+			return;
+		}
 	}
 	// 중간
 	else if (pKirby->Get_State() == CKirby::HAMMERSTATE_HAMMERATTACKTOY)
 	{
+		m_fAttackJumpTime += fTimeDelta;
+		if (m_bCountTrigger == true) 
+		{
+			DESC(m_iHammerHit)++;
+			m_bCountTrigger = false;
+		}
 
+		if (m_fAttackJumpTime > 0.05f && m_bAttackJumpTrigger == true)
+		{
+			DESC(m_fJumpVelocity) = 15.f;
+			m_bAttackJumpTrigger = false;
+		}
+		else if (m_bAttackJumpTrigger == false)
+		{
+			DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
+			pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
+
+			if (m_fAttackJumpTime >= 0.15f)
+			{
+				_float fStopVelocityPower = GRAVITY * fTimeDelta * 6.f;
+				DESC(m_fJumpVelocity) = fStopVelocityPower;
+			}
+		}
+
+
+		if (JoyStick_controller(Kirbydesc, pCamera) == true)
+		{
+			Kirbydesc->m_fMoveSpeed += fTimeDelta * 30.f;
+			if (Kirbydesc->m_fMoveSpeed > 4.f)
+				Kirbydesc->m_fMoveSpeed = 4.f;
+			// 타겟기준
+			_vector vMoveDelta = Kirbydesc->m_vTargetDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
+			pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+
+			Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta, 3.f);
+		}
+		else
+			Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
+
+
+		if (pKirby->isAnimFinish())
+		{
+			pKirby->Change_State(CKirby::HAMMERSTATE_HAMMERATTACKHITTOY, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
+			pCamera->Make_Shake();
+			pKirby->Set_WeaponAnim(6);
+			return;
+		}
 	}
 	// 타격
 	else if (pKirby->Get_State() == CKirby::HAMMERSTATE_HAMMERATTACKHITTOY)
 	{
+		m_fAttackJumpTime += fTimeDelta;
 
+		if (JoyStick_controller(Kirbydesc, pCamera) == true)
+		{
+			Kirbydesc->m_fMoveSpeed += fTimeDelta * 30.f;
+			if (Kirbydesc->m_fMoveSpeed > 4.f)
+				Kirbydesc->m_fMoveSpeed = 4.f;
+			// 타겟기준
+			_vector vMoveDelta = Kirbydesc->m_vTargetDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
+			pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+
+			Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta, 3.f);
+		}
+		else
+			Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
+
+		if (m_fAttackJumpTime > 0.1f)
+		{
+			pController->FreeFall(pTransformCom, fTimeDelta);
+
+			if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
+			{
+				pController->FreeFall(pTransformCom, fTimeDelta, 100.f);
+
+				if (DESC(m_iHammerHit) < 4)
+				{
+					pKirby->Change_State(CKirby::HAMMERSTATE_HAMMERATTACKTOY, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+					DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+					return;
+				}
+				else if (DESC(m_iHammerHit) >= 4)
+				{
+					DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+					pKirby->Change_State(CKirby::HAMMERSTATE_HAMMERATTACKFINALTOY, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+					pKirby->Set_WeaponAnim(5);
+					return;
+				}
+			}
+
+		}
+
+		if (pKirby->isAnimFinish())
+		{
+			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_IDLE);
+			DESC(m_iHammerHit) = 0;
+		}
 	}
 	// 막타 통 애님
 	else if (pKirby->Get_State() == CKirby::HAMMERSTATE_HAMMERATTACKFINALTOY)
 	{
 		m_fAttackJumpTime += fTimeDelta;
 
+		// 0.7초 이하일때, 이동이 자유롭다.
+		if (m_fAttackJumpTime < 0.5f)
+		{
+			pController->FreeFall(pTransformCom, fTimeDelta);
+			_float fDelta = EASE_INOUT(m_fAttackJumpTime * 2.f) - EASE_INOUT(m_fPreAttackJumpTime * 2.f);
+			_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+			pController->Move_Dir(pTransformCom, vLook * fDelta * 2.2f, fTimeDelta);
+
+			Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta, 3.f);
+		}
+		else
+			Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
+
 		if (m_fAttackJumpTime > 0.4f && m_bAttackJumpTrigger == true)
 		{
+			if (m_bCountTrigger == true)
+			{
+				CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
+				pCamera->Make_Shake();
+				m_bCountTrigger = false;
+			}
 			DESC(m_fJumpVelocity) = 30.f;
 			m_bAttackJumpTrigger = false;
 		}
@@ -216,11 +357,16 @@ void CKirbyHammer_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float f
 				DESC(m_fJumpVelocity) = fStopVelocityPower;
 			}
 		}
+
 		if (pKirby->isAnimFinish())
 		{
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_IDLE);
+			DESC(m_iHammerHit) = 0;
 		}
+
+
+		m_fPreAttackJumpTime = m_fAttackJumpTime;
 	}
 }
 
@@ -228,6 +374,8 @@ void CKirbyHammer_Attack_State::OnStateExit()
 {
 	m_bAttackJumpTrigger = true;
 	m_fAttackJumpTime = 0.f;
+	m_fPreAttackJumpTime = 0.f;
+	m_bCountTrigger = true;
 }
 
 CKirbyHammer_Attack_State* CKirbyHammer_Attack_State::Create()
@@ -265,32 +413,167 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 	// 모든 공격의 시작이라고 볼 수 있다.
 	if (pKirby->Get_State() == CKirby::HAMMERSTATE_ONIGOROSIHAMMERSTART)
 	{
+		// 기를 모으는 시간.
+		DESC(m_fHammerChargeTime) += fTimeDelta;
 
+		if (JoyStick_On() == true)
+		{
+			DESC(m_eEyeState) = CKirby::EYE_ANGER;
+			pKirby->Change_State(CKirby::HAMMERSTATE_ONIGOROSIHAMMERMOVE, 60.f, true, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+			pKirby->Set_WeaponAnim(9);
+			return;
+		}
+
+		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == false)
+		{
+			pKirby->Change_State(CKirby::HAMMERSTATE_HAMMERATTACKSTARTTOY, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+			DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+			DESC(m_fHammerChargeTime) = 0.f;
+			return;
+		}
+		if (pKirby->isAnimFinish())
+		{
+			pKirby->Change_State(CKirby::HAMMERSTATE_ONIGOROSIHAMMERCHARGE, 60.f, true, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+			pKirby->Set_WeaponAnim(9);
+			return;
+		}
 	}
 	// 차지 모션
 	else if (pKirby->Get_State() == CKirby::HAMMERSTATE_ONIGOROSIHAMMERCHARGE)
 	{
+		DESC(m_fHammerChargeTime) += fTimeDelta;
 
+		if (JoyStick_On() == true)
+		{
+			DESC(m_eEyeState) = CKirby::EYE_ANGER;
+			pKirby->Change_State(CKirby::HAMMERSTATE_ONIGOROSIHAMMERMOVE, 60.f, true, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+			pKirby->Set_WeaponAnim(9);
+			return;
+		}
+
+
+		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == false)
+		{
+			if (DESC(m_fHammerChargeTime) < 2.f && DESC(m_fHammerChargeTime) > 0.5f)
+			{
+				pKirby->Change_State(CKirby::HAMMERSTATE_ONIGOROSIHAMMERFIRST, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+				DESC(m_eEyeState) = CKirby::EYE_ANGER;
+				DESC(m_fHammerChargeTime) = 0.f;
+				return;
+			}
+			else if (DESC(m_fHammerChargeTime) >= 2.f)
+			{
+				CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
+				pCamera->Zoom(-5.f);
+				pKirby->Change_State(CKirby::HAMMERSTATE_ONIGOROSIHAMMEREND, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+				DESC(m_eEyeState) = CKirby::EYE_ANGER;
+				DESC(m_fHammerChargeTime) = 0.f;
+				pKirby->Set_WeaponAnim(10);
+				return;
+			}
+			else
+			{
+				pKirby->Change_State(CKirby::HAMMERSTATE_HAMMERATTACKSTARTTOY, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+				DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+				DESC(m_fHammerChargeTime) = 0.f;
+				return;
+			}
+		}
 	}
 	// 차지 중 이동하는 모션
 	else if (pKirby->Get_State() == CKirby::HAMMERSTATE_ONIGOROSIHAMMERMOVE)
 	{
+		DESC(m_fHammerChargeTime) += fTimeDelta;
 
+		if (JoyStick_controller(Kirbydesc, pCamera) == true)
+		{
+			Kirbydesc->m_fMoveSpeed += fTimeDelta * 50.f;
+			if (Kirbydesc->m_fMoveSpeed > 3.f)
+				Kirbydesc->m_fMoveSpeed = 3.f;
+			// 타겟기준
+			_vector vMoveDelta = Kirbydesc->m_vTargetDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
+			pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+
+			Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta, 3.f);
+		}
+		else
+		{
+			DESC(m_eEyeState) = CKirby::EYE_ANGER;
+			pKirby->Change_State(CKirby::HAMMERSTATE_ONIGOROSIHAMMERCHARGE, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+			pKirby->Set_WeaponAnim(9);
+			return;
+		}
+
+		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == false)
+		{
+			if (DESC(m_fHammerChargeTime) < 2.f && DESC(m_fHammerChargeTime) > 0.5f)
+			{
+				pKirby->Change_State(CKirby::HAMMERSTATE_ONIGOROSIHAMMERFIRST, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+				DESC(m_eEyeState) = CKirby::EYE_ANGER;
+				DESC(m_fHammerChargeTime) = 0.f;
+				return;
+			}
+			else if (DESC(m_fHammerChargeTime) >= 2.f)
+			{
+				CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
+				pCamera->Zoom(-5.f);
+				pKirby->Change_State(CKirby::HAMMERSTATE_ONIGOROSIHAMMEREND, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+				DESC(m_eEyeState) = CKirby::EYE_ANGER;
+				pKirby->Set_WeaponAnim(10);
+				DESC(m_fHammerChargeTime) = 0.f;
+				return;
+			}
+			else
+			{
+				pKirby->Change_State(CKirby::HAMMERSTATE_HAMMERATTACKSTARTTOY, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+				DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+				DESC(m_fHammerChargeTime) = 0.f;
+				return;
+			}
+		}
 	}
 	// 덜 차징 애니메이션
 	else if (pKirby->Get_State() == CKirby::HAMMERSTATE_ONIGOROSIHAMMERFIRST)
 	{
 
+		if (pKirby->isAnimFinish())
+		{
+			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_IDLE);
+			pKirby->Set_WeaponAnim(3);
+			return;
+		}
 	}
 	// 강한 차징 애니메이션
 	else if (pKirby->Get_State() == CKirby::HAMMERSTATE_ONIGOROSIHAMMEREND)
 	{
+		m_fMoveTime += fTimeDelta;
 
+		if (0.4f < m_fMoveTime && m_fMoveTime < 0.6f)
+		{
+			_float fDelta = EASE_INOUT((m_fMoveTime - 0.4f) * 5.f) - EASE_INOUT((m_fPreMoveTime - 0.4f) * 5.f);
+			_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+			pController->Move_Dir(pTransformCom, vLook * fDelta * 3.f, fTimeDelta);
+		}
+
+		if (pKirby->isAnimFinish())
+		{
+			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
+			pCamera->Zoom(0.f);
+			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_IDLE);
+			pKirby->Set_WeaponAnim(3);
+			return;
+		}
+
+		m_fPreMoveTime = m_fMoveTime;
 	}
 }
 
 void CKirbyHammer_Onigorosi_State::OnStateExit()
 {
+	m_fMoveTime = 0.f;
+	m_fPreMoveTime = 0.f;
 }
 
 CKirbyHammer_Onigorosi_State* CKirbyHammer_Onigorosi_State::Create()
@@ -353,7 +636,6 @@ void CKirbyHammer_JumpAttack_State::Free()
 }
 
 #pragma endregion
-
 
 #pragma region JUMP STATE
 

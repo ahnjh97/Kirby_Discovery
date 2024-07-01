@@ -42,6 +42,41 @@ void CCamera::Set_Target(CTransform* pTarget, CAMTARGET eTarget, CAMFOCUS eFocus
 		m_fInterpolateSpeed = _fInterpolateSpeed;
 }
 
+void CCamera::Lock_Position(_float3 vPos, _bool bInterpolate)
+{
+	m_eCamLockMode = LOCK_POS;
+
+	if (bInterpolate == false)
+	{
+		if(ISDEFAULTFLOAT3(vPos))
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, Pos(vPos));
+
+	}
+
+}
+
+void CCamera::Lock_Direction(_float3 vLook, _bool bInterpolate)
+{
+	m_eCamLockMode = LOCK_DIR;
+
+}
+
+void CCamera::Lock_All(_float3 vPos, _float3 vLook, _bool bInterpolate)
+{
+	m_eCamLockMode = LOCK_ALL;
+}
+
+void CCamera::Lock_Camera(_float3 vPos, _float3 vLook, _float fFOVY)
+{
+	m_bLockCamera = true;
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, Pos(vPos));
+
+	vLook.Normalize();
+	m_pTransformCom->Look_At_Dir(Dir(vLook));
+	m_fFovy = ToRadian(fFOVY);
+
+}
+
 HRESULT CCamera::Initialize_Prototype()
 {
 	return S_OK;
