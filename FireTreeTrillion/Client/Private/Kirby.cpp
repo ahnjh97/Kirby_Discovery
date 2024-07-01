@@ -481,7 +481,9 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 			if ((Get_State() == STATE_IDLE || 
 				Get_State() == STATE_RUN || 
 				Get_State() == SWORDSTATE_RUN || 
-				Get_State() == SWORDSTATE_WAIT) 
+				Get_State() == SWORDSTATE_WAIT ||
+				Get_State() == HAMMERSTATE_IDLE ||
+				Get_State() == HAMMERSTATE_RUN)
 				== false
 				)
 				return;
