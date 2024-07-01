@@ -735,7 +735,7 @@ void CKirby::Key_Input(_float fTimeDelta)
 	//특정 레벨에서 덤프할 경우 크래시 발생으로 예외 처리
 	//디버깅이 필요할 경우 레벨 별 조건 처리하면 됨
 	LEVEL eCurLevel = (LEVEL)*m_pGameInstance->Get_CurrentLevelID();
-	if (LEVEL_RACING == eCurLevel)
+	if (LEVEL_RACING == eCurLevel || LEVEL_GAMEPLAY == eCurLevel)
 	{
 		if (m_pGameInstance->Get_DIKeyState(DIK_B, KEY_DOWN))
 		{
