@@ -133,6 +133,7 @@
 #include "UI_PartTime.h"
 #include "UI_PartTimeDee.h"
 #include "HUD_BossHpBar.h"
+#include "TransingStar.h"
 
 // æ∆¿Ã≈€
 #include "Food.h"
@@ -308,6 +309,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_PartTime"), CUI_PartTime);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_PartTimeDee"), CUI_PartTimeDee);
+	
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_TransingStar"), CTransingStar);
 
 #pragma endregion
 	

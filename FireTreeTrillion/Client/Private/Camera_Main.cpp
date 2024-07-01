@@ -816,6 +816,8 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction.vDir = _float3{ -.45f, 0.f, -.9f };
 		m_CamSeq.push_back(newAction);
 
+		m_fStartAudioTime = 8.08f;
+
 		//라디오 보기
 		newAction = {};
 		newAction.fTime = 10.f;
@@ -830,7 +832,6 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 
 		//라디오 줌 인
-		m_fStartAudioTime = 11.f;
 
 		newAction = {};
 		newAction.fTime = 11.f;
@@ -900,6 +901,14 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction.fInterpolateSpeed = 10.f;
 		newAction.eCamPos = POS_ABSOLUTE;
 		newAction.vPos = _float3{ 65.6f, 95.1f, 80.f };
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.24f, 0.5f, 1.f };
+		m_CamSeq.push_back(newAction);
+
+
+		newAction = {};
+		newAction.fTime = 60.f;
+		newAction.eCamCut = CUT_HARD;
 		newAction.eCamDir = DIR_ABSOLUTE;
 		newAction.vDir = _float3{ -.24f, 0.5f, 1.f };
 		m_CamSeq.push_back(newAction);

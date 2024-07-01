@@ -114,7 +114,8 @@ HRESULT CUI_PartTimeDee::Render()
 			
 			// Binding DIFFUSE
 			hr = m_arrTexures[i]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
-			
+			CHECK_FAILED(hr);
+
 			// Binding MASK
 			if (m_bRandomMask)
 			{

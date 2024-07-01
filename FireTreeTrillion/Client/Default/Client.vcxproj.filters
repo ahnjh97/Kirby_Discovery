@@ -31,15 +31,6 @@
     <Filter Include="90.Utils\[Sample] ToolHelper">
       <UniqueIdentifier>{00fc3552-6b11-480d-a4c6-8313d824b770}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\UI">
-      <UniqueIdentifier>{5686561c-9ae3-4451-b1a7-680ef919cde4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\UI\BackGround">
-      <UniqueIdentifier>{ef3d146c-47a4-4cea-8ab8-0d3efb6a9884}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\UI\Editor">
-      <UniqueIdentifier>{197bd320-0690-4bf3-9f5f-40f57c555e4d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Effect">
       <UniqueIdentifier>{8da63451-b1d5-46f5-a7cd-b8c224b47c48}</UniqueIdentifier>
     </Filter>
@@ -163,26 +154,17 @@
     <Filter Include="02.GameObjects\Moon">
       <UniqueIdentifier>{5ab1e19d-21b8-43ee-8401-53c0cd09ead2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\UI\HUD">
-      <UniqueIdentifier>{22a35dfd-b59c-4d3b-9206-374c1ec77e1a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Kabu">
       <UniqueIdentifier>{585adf8d-8437-4502-8737-2b4dc975b783}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Kabu\State">
       <UniqueIdentifier>{900bcf63-7231-4f8a-961b-9064113c9e34}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\UI\Editor\Layer">
-      <UniqueIdentifier>{a3260a15-cebf-4a5f-b682-fa24015a992a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\RigidObject\WasteCan">
       <UniqueIdentifier>{f175b95e-a1d4-47cd-9d10-49f323d1f526}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Map\BG">
       <UniqueIdentifier>{28a5f192-89d1-46d7-bf46-1aafeee88d03}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Levels\Logo">
-      <UniqueIdentifier>{7fa67ac9-2f2d-435f-bf35-849f5cbedd3c}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyBoom_State">
       <UniqueIdentifier>{df88d3db-f381-4d13-8ca4-1ddc4df3cb3d}</UniqueIdentifier>
@@ -298,9 +280,6 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyCar_State">
       <UniqueIdentifier>{67963c50-7e60-41a8-bf16-e2649eab3a93}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Levels\FinalBoss">
-      <UniqueIdentifier>{d9e8fa8b-a4cb-4615-8a73-dca93c7a7460}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\PartTimerKirby">
       <UniqueIdentifier>{73951838-91bf-4a9d-8dda-922a665802ec}</UniqueIdentifier>
     </Filter>
@@ -354,8 +333,6 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\WaddleDee\Original">
       <UniqueIdentifier>{9b746fe2-af0b-4344-961d-2b0a3a62e7ff}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Map\Bridge">
     </Filter>
     <Filter Include="02.GameObjects\Map\Bridge">
       <UniqueIdentifier>{d42d0265-2d39-46ae-8baa-4fdc448c5e73}</UniqueIdentifier>
@@ -414,6 +391,9 @@
     <Filter Include="02.GameObjects\Map\BlendMapObject">
       <UniqueIdentifier>{65399ffe-175b-49c9-98d6-f92a04f307f7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\PortalSoftEffect">
+      <UniqueIdentifier>{412e7813-8f9a-4c83-ba98-f76991e1bfc5}</UniqueIdentifier>
+    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\BossMonster\Laser">
       <UniqueIdentifier>{57eab38f-6d3a-4ab5-9a19-25ca35cc8f16}</UniqueIdentifier>
     </Filter>
@@ -432,14 +412,35 @@
     <Filter Include="02.GameObjects\UI\PartTime">
       <UniqueIdentifier>{f66e1d54-657e-4ef4-b222-24f86e5cd5b8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\UI\PartTimeDee">
-      <UniqueIdentifier>{324b2e98-324d-4f5b-b2c0-71610d22ab87}</UniqueIdentifier>
+    <Filter Include="01.Levels\11. FinalBoss">
+      <UniqueIdentifier>{d9e8fa8b-a4cb-4615-8a73-dca93c7a7460}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI">
+      <UniqueIdentifier>{5686561c-9ae3-4451-b1a7-680ef919cde4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\BackGround">
+      <UniqueIdentifier>{ef3d146c-47a4-4cea-8ab8-0d3efb6a9884}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\Editor">
+      <UniqueIdentifier>{197bd320-0690-4bf3-9f5f-40f57c555e4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\Editor\Layer">
+      <UniqueIdentifier>{a3260a15-cebf-4a5f-b682-fa24015a992a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\HUD">
+      <UniqueIdentifier>{22a35dfd-b59c-4d3b-9206-374c1ec77e1a}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\UI\HUD\BossHp">
       <UniqueIdentifier>{d5a13d88-c8da-47f6-ab92-a8b19f3b623e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Map\PortalSoftEffect">
-      <UniqueIdentifier>{412e7813-8f9a-4c83-ba98-f76991e1bfc5}</UniqueIdentifier>
+    <Filter Include="02.GameObjects\UI\PartTime">
+      <UniqueIdentifier>{f66e1d54-657e-4ef4-b222-24f86e5cd5b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\PartTime\_Main">
+      <UniqueIdentifier>{63904787-22a9-44f5-846f-d1227ee0e813}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\PartTime\PartTimeDee%28Dialog%29">
+      <UniqueIdentifier>{324b2e98-324d-4f5b-b2c0-71610d22ab87}</UniqueIdentifier>
     </Filter>
     <Filter Include="04.Event">
       <UniqueIdentifier>{1d0d493c-fa22-44f3-9d8e-a63cfb62354a}</UniqueIdentifier>
@@ -458,6 +459,9 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyHammer_State">
       <UniqueIdentifier>{e73c008c-90b4-46de-a9bc-1a38382ea4cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\TransingStar">
+      <UniqueIdentifier>{5d5b209e-634e-4099-a2ae-a86fa9e7139c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -777,7 +781,7 @@
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyCar_State</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_FinalBoss.h">
-      <Filter>01.Levels\FinalBoss</Filter>
+      <Filter>01.Levels\11. FinalBoss</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\PartTimerKirby.h">
       <Filter>02.GameObjects\PhysXObject\Character\PartTimerKirby</Filter>
@@ -833,9 +837,6 @@
     <ClInclude Include="..\public\OriginalDee.h">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\Original</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\UI_PartTime.h">
-      <Filter>02.GameObjects\UI\PartTime</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\DeeDeeDee.h">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee</Filter>
     </ClInclude>
@@ -888,7 +889,7 @@
       <Filter>02.GameObjects\PhysXObject\Character\BossMonster\BossClone</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\UI_PartTimeDee.h">
-      <Filter>02.GameObjects\UI\PartTimeDee</Filter>
+      <Filter>02.GameObjects\UI\PartTime\PartTimeDee%28Dialog%29</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\HUD_BossHpBar.h">
       <Filter>02.GameObjects\UI\HUD\BossHp</Filter>
@@ -898,6 +899,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\AnimBridge.h">
       <Filter>02.GameObjects\Map\Bridge</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UI_PartTime.h">
+      <Filter>02.GameObjects\UI\PartTime\_Main</Filter>
     </ClInclude>
     <ClInclude Include="..\public\EventCenter.h">
       <Filter>04.Event</Filter>
@@ -929,6 +933,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Fog_Instance.h">
       <Filter>02.GameObjects\Map\TerrainFog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TransingStar.h">
+      <Filter>02.GameObjects\UI\TransingStar</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1230,7 +1237,7 @@
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyCar_State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_FinalBoss.cpp">
-      <Filter>01.Levels\FinalBoss</Filter>
+      <Filter>01.Levels\11. FinalBoss</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\PartTimerKirby.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\PartTimerKirby</Filter>
@@ -1286,9 +1293,6 @@
     <ClCompile Include="..\private\OriginalDee.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\Original</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\UI_PartTime.cpp">
-      <Filter>02.GameObjects\UI\PartTime</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\DeeDeeDee.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee</Filter>
     </ClCompile>
@@ -1341,7 +1345,7 @@
       <Filter>02.GameObjects\PhysXObject\Character\BossMonster\BossClone</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\UI_PartTimeDee.cpp">
-      <Filter>02.GameObjects\UI\PartTimeDee</Filter>
+      <Filter>02.GameObjects\UI\PartTime\PartTimeDee%28Dialog%29</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\HUD_BossHpBar.cpp">
       <Filter>02.GameObjects\UI\HUD\BossHp</Filter>
@@ -1351,6 +1355,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\AnimBridge.cpp">
       <Filter>02.GameObjects\Map\Bridge</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UI_PartTime.cpp">
+      <Filter>02.GameObjects\UI\PartTime\_Main</Filter>
     </ClCompile>
     <ClCompile Include="..\private\EventCenter.cpp">
       <Filter>04.Event</Filter>
@@ -1381,6 +1388,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Fog_Instance.cpp">
       <Filter>02.GameObjects\Map\TerrainFog</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TransingStar.cpp">
+      <Filter>02.GameObjects\UI\TransingStar</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

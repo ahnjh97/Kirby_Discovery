@@ -73,10 +73,9 @@ HRESULT CPipeLine::Initialize()
 
 void CPipeLine::Tick()
 {
-	if (CGameInstance::Get_Instance()->Get_KeyState(DIK_TAB, KEY_DOWN))
-	{
-		m_iCurCameraIdx = (m_iCurCameraIdx + 1) % m_pCameras.size();
-	}
+	if (*CGameInstance::Get_Instance()->Get_CurrentLevelID() > 2)
+		if (CGameInstance::Get_Instance()->Get_KeyState(DIK_TAB, KEY_DOWN))
+			m_iCurCameraIdx = (m_iCurCameraIdx + 1) % m_pCameras.size();
 
 	Bind_Pipeline();
 }
