@@ -915,7 +915,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 		CEffect::FX_DESC FXDesc{};
 		FXDesc.fStartDelay = { 28.f };
-		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_TItle Logo"), &FXDesc)))
+		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Kirby Title Logo"), &FXDesc)))
 			return;
 	}
 	break;
