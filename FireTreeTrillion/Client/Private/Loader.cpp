@@ -832,6 +832,9 @@ HRESULT CLoader::Loading_For_Parttime()
 	hr = Add_Texture(eLevel, "GameFoodUI_energydrink",		"UI/MGameFood/energydrink.png");
 	hr = Add_Texture(eLevel, "GameFoodUI_burger",			"UI/MGameFood/burger.png");
 
+	// 결과창
+	hr = Add_Texture(eLevel, "GameFoodUI_ResultBar",		"UI/MGameFood/result bar.png");
+	
 #pragma endregion
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
@@ -926,7 +929,7 @@ HRESULT CLoader::Loading_For_FinalBoss()
 
 HRESULT CLoader::Loading_For_Tool_FX()
 {
-	HRESULT hr = S_OK;
+	HRESULT  hr = S_OK;
 	LEVEL eLevel = LEVEL_TOOL_FX;
 
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
