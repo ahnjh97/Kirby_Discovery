@@ -143,8 +143,12 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "CvBarricadeA", "CvGasCylinderAL", "CvGasCylinderBL"
 		, "CvGasCylinderCL", "CvGasCylinderDL", "CvGasCylinderEL", "CvGasCylinderHoseA", "CvGasCylinderHoseD"
 
-		, "GsCarBaseAL", "GsCarCounterAL", "GsCarDirtyRack01L", "GsCarHoistCrane01L", "GsCarMachineAL"
-		, "GsCarStop"
+		, "DsBuildingFenceAL", "DsBuildingFenceBL", "DsBuildingFenceCL", "DsBuildingFenceDL", "DsBuildingFenceEL"
+		, "DsBuildingFenceFL", "DsBuildingFenceGL", "DsBuildingFenceHL", "DsBuildingFenceIL"
+		, "DsPalmABottomL", "DsPalmAMiddleL", "DsPalmATopL", "DsPalmBL", "DsPalmCL"
+
+		, "GsCarBaseAL", "GsCarCounterAL", "GsCarDirtyRack01L", "GsCarDisplayRack", "GsCarHoistCrane01L"
+		, "GsCarMachineAL", "GsCarMeshRack", "GsCarStop"
 		, "GsRubbleAsphalt01L", "GsRubbleAsphalt02L", "GsRubbleAsphalt03L", "GsRubbleAsphalt04L"
 		, "GsRubbleAsphalt05L", "GsRubbleAsphalt06L", "GsRubbleAsphalt07L", "GsRubbleAsphalt08L"
 		, "GsRubbleAsphalt09L", "GsScrappedCar"
@@ -185,7 +189,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	m_setKickables = { "GsPebble", "SeShell", "WasteCanYellow" };
 	m_setItemTxts = { "Item_BlueCoin", "Item_Bread", "Item_Cake", "Item_Cocktail", "Item_Coin", "Item_EnergyDrink", "Item_Makaron",
 		"Item_Meat", "Item_Omelet", "Item_Onigiri", "Item_RedCoin", "Item_Steak", "Item_Sushi" };
-	m_setTrees = { "GsTreeA", "GsTreeB", "GsTreeC" };
+	m_setTrees = { "GsTreeA", "GsTreeB", "GsTreeC", "DsPalmABottomL", "DsPalmAMiddleL", "DsPalmATopL", "DsPalmBL", "DsPalmCL" };
 
 	//블렌드 적용이 필요한 데코오브젝트
 	m_setBlendDecos = {"LbOutBuildingWallL", "LbOutBuildingFenceL", "GsCarFloor" };

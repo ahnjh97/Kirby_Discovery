@@ -100,6 +100,7 @@ public:
 	void Look_At_Rotate(_vector vAt, _float fTimeDelta, _bool bXZ = true);
 	void Look_At_Interpolate(_vector vAt, _float fTimeDelta);
 	void Look_At_Angle(_fvector vAt, _fvector vAxis, _float fRadian);
+	void Look_At_RightFixed(_fvector vPosition);
 	void Move_toTarget(_fvector vTargetPos, _float fTimeDelta, _float fMinDistance = 0.f);	
 	void Move(_float4 vDir);
 	void Turn(_fvector vAxis, _float fTimeDelta);

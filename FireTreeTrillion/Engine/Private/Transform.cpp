@@ -225,6 +225,18 @@ void CTransform::Look_At_Angle(_fvector vAt, _fvector vAxis, _float fRadian)
 	Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLook) * vScaled.z);
 }
 
+void CTransform::Look_At_RightFixed(_fvector vPosition)
+{
+	_vector		vRight = Get_State_Vector(STATE_RIGHT);
+	_vector		vLook = vPosition - Get_State_Vector(STATE_POSITION);
+	_vector		vUp = XMVector3Cross(vLook, vRight);
+
+	_float3		vScaled = Get_Scaled();
+
+	Set_State(STATE_UP, XMVector3Normalize(vUp) * vScaled.y);
+	Set_State(STATE_LOOK, XMVector3Normalize(vLook) * vScaled.z);
+}
+
 void CTransform::Move_toTarget(_fvector vTargetPos, _float fTimeDelta, _float fMinDistance)
 {
 	_vector		vPosition = Get_State_Vector(STATE_POSITION);

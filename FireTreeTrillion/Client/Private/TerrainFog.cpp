@@ -32,8 +32,9 @@ HRESULT CTerrainFog::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 	
-	m_fAlpha = 0.5f;
-	m_pTransformCom->Set_Scaled(30.f * pGameObjectDesc->matWorld._11, 30.f * pGameObjectDesc->matWorld._22, 1.f * pGameObjectDesc->matWorld._33);
+	m_fAlpha = 0.65f;
+	_float fScale = 40.f;
+	m_pTransformCom->Set_Scaled(fScale * pGameObjectDesc->matWorld._11, fScale * pGameObjectDesc->matWorld._22, 1.f * pGameObjectDesc->matWorld._33);
 
 	m_iRandomFog = 2/*CUtils::Make_RandomInt(1, 2)*/;
 
@@ -50,7 +51,8 @@ _int CTerrainFog::Tick(_float fTimeDelta)
 
 void CTerrainFog::Late_Tick(_float fTimeDelta)
 {
-	Effect_Billboard(fTimeDelta);
+	//Effect_Billboard(fTimeDelta);
+	m_pTransformCom->Look_At_RightFixed(m_pGameInstance->Get_CamPosition());
 	Compute_ViewZ();
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, this);
 }

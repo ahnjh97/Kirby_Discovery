@@ -435,11 +435,13 @@ HRESULT CLevel_Intro::Ready_Triggers()
 		}
 		else if ("Fog" == strModelName)
 		{
-			CFog_Instance::FOG_INSTANCE_DESC tFogInstanceDesc{};
+			/*CFog_Instance::FOG_INSTANCE_DESC tFogInstanceDesc{};
 			tFogInstanceDesc.matWorld = matWorld;
 			tFogInstanceDesc.iRows = iTriggerIndex;
-			tFogInstanceDesc.iNumInstances = static_cast<_uint>(fRadius);
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_Fog_Instance"), &tFogInstanceDesc)))
+			tFogInstanceDesc.iNumInstances = static_cast<_uint>(fRadius);*/
+			CGameObject::GAMEOBJECT_DESC tDesc{};
+			tDesc.matWorld = matWorld;
+			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_TerrainFog"), &tDesc)))
 				return E_FAIL;
 		}
 	}
