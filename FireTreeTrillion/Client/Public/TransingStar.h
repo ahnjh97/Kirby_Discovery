@@ -34,17 +34,17 @@ public:
 	void						Activate(TYPE _eActivateType);
 	void						Deactivate();
 
-	// ----------------- CLOSE
+	// CLOSE //////////////////////////////////////////
 	void						Tick_AlphaStar(_float fTimeDelta);
 	void						Tick_YeonDooStar(_float fTimeDelta);
 	void						Tick_GreenStar(_float fTimeDelta);
 	void						RenderClose();
+	void						Set_NextLevel(LEVEL eNextLevel) { m_eNextLevel = eNextLevel; }
 
-	// ----------------- OPEN
+	// OPEN  ////////////////////////////////////////// 
 	void						Tick_OpenAlphaStar(_float fTimeDelta);
 	void						RenderOpen();
 
-	void						Set_NextLevel(LEVEL eNextLevel) { m_eNextLevel = eNextLevel; }
 
 private:
 	HRESULT						Add_Components();
@@ -54,21 +54,25 @@ private:
 	array<_float4x4, 3>			m_arrayStarMatrix;
 
 	// 사이즈 이동값에 대한 기준치들
-	_float2						m_InitialSize = _float2(3000.f, 3000.f);//4400
+	_float2						m_InitialSize = _float2(3000.f, 3000.f);
 	_float2						m_MediumSize = _float2(400.f,400.f);
 	
-	// 
-	_bool						m_bActivate = false;
+	// TransingStar의 쓸모
 	TYPE						m_eActivateType = TYPE_END;
+	// CLOSE TYPE일 경우, 이동될 LEVEL
+	LEVEL						m_eNextLevel = LEVEL_END;
 
+	// 알파 별 기준값
+	_float						m_fAlphaTime = 1.f;
+
+	// 연두 별 기준값
 	_float						m_fYeonDooTime = 1.f;
-	_float						m_fAlphaTimeRemains = 1.f;
-
-	_bool						m_bDeadYeonDoo = false;
 	_float						m_fDecreaseValue = 0.f;
 	_float						m_fDecreaseOffset = 2500.f;
 
-	LEVEL						m_eNextLevel = LEVEL_END;
+	// 연두별 셰이더 처리
+	_bool						m_bDeadYeonDoo = false;
+
 
 public:
 	static CTransingStar* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

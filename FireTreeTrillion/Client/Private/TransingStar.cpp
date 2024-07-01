@@ -50,8 +50,7 @@ _int CTransingStar::Tick(_float fTimeDelta)
     if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD3, KEY_DOWN))
         Activate(CTransingStar::OPEN);
 
-	//if (false == m_bActivate) return OBJ_NOEVENT;
-	//if (m_eActivateType == TYPE_END) return OBJ_NOEVENT;
+	if (m_eActivateType == TYPE_END) return OBJ_NOEVENT;
     switch (m_eActivateType)
     {
     case CLOSE:
@@ -71,8 +70,6 @@ _int CTransingStar::Tick(_float fTimeDelta)
         Tick_OpenAlphaStar(fTimeDelta);
     }
     break;
-    default:
-    break;
     }
 
     return OBJ_NOEVENT;
@@ -85,7 +82,6 @@ void CTransingStar::Late_Tick(_float fTimeDelta)
 
 HRESULT CTransingStar::Render()
 {
-    //if (false == m_bActivate) return OBJ_NOEVENT;
     if (m_eActivateType == TYPE_END) return OBJ_NOEVENT;
 
     HRESULT hr(S_OK);
@@ -108,9 +104,6 @@ HRESULT CTransingStar::Render()
 #ifdef _DEBUG
 void CTransingStar::Render_IMGUI()
 {
-    //char ratio[16];
-    //ImGui::DragFloat(ratio, (_float*)&m_fDecreaseOffset, 0.100f, 3000.f, 5000.f);
-    //ImGui::Separator(); ImGui::NewLine();
 }
 #endif
 
@@ -118,7 +111,6 @@ void CTransingStar::Render_IMGUI()
 void CTransingStar::Activate(TYPE _eActivateType)
 {
     // 활성화 시키는 부울값 ON
-    m_bActivate = true;
     m_eActivateType = _eActivateType;
 
     // Activate한 순간의 Player의 위치를 받아온다.
@@ -150,35 +142,37 @@ void CTransingStar::Activate(TYPE _eActivateType)
 
 void CTransingStar::Deactivate()
 {
-    m_bActivate = false;
+    // TransingStar 종류 초기화
     m_eActivateType = TYPE_END;
 
+    // 움직임에 대한 시간 초기화
+    m_fAlphaTime = 1.f;
     m_fYeonDooTime = 1.f;
-    m_fAlphaTimeRemains = 1.f;
-
-    m_bDeadYeonDoo = false;
     m_fDecreaseValue = 0.f;
+
+    // 연두별의 셰이더처리에 대한 초기화
+    m_bDeadYeonDoo = false;
 }
 
 void CTransingStar::Tick_AlphaStar(_float fTimeDelta)
 {
-    if (m_fAlphaTimeRemains > 0.f)
-        m_fAlphaTimeRemains -= fTimeDelta * TIMEDELTA_OFFSET;
+    if (m_fAlphaTime > 0.f)
+        m_fAlphaTime -= fTimeDelta * TIMEDELTA_OFFSET;
     else
-        m_fAlphaTimeRemains = 0.f;
+        m_fAlphaTime = 0.f;
 
     // 투명별 사이즈 조절
     if (m_bDeadYeonDoo)
         CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], 0.f, 0.f, 1.f);
-    else if (m_InitialSize.x * m_fAlphaTimeRemains <= m_MediumSize.x)
+    else if (m_InitialSize.x * m_fAlphaTime <= m_MediumSize.x)
         CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], m_MediumSize.x, m_MediumSize.y, 1.f);
     else
-        CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], m_InitialSize.x * m_fAlphaTimeRemains, m_InitialSize.y * m_fAlphaTimeRemains, 1.f);
+        CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], m_InitialSize.x * m_fAlphaTime, m_InitialSize.y * m_fAlphaTime, 1.f);
 }
 
 void CTransingStar::Tick_YeonDooStar(_float fTimeDelta)
 {
-    if (m_fAlphaTimeRemains <= 0.6f) // 투명별이 10% 진행되었을 때, 연두별 시작
+    if (m_fAlphaTime <= 0.6f) // 투명별이 10% 진행되었을 때, 연두별 시작
     {
         // 연두 돌아가유
         if (m_bDeadYeonDoo)
@@ -215,7 +209,7 @@ void CTransingStar::Tick_GreenStar(_float fTimeDelta)
 void CTransingStar::RenderClose()
 {
     HRESULT hr(S_OK);
-    // 텍스트들 돌면서 각자 다르게 값 주기
+
     for (_uint i = 0; i < m_arrTextures.size(); ++i)
     {
         // 색 다르게 주는 곳
@@ -246,23 +240,26 @@ void CTransingStar::RenderClose()
 
 void CTransingStar::Tick_OpenAlphaStar(_float fTimeDelta)
 {
+    // ---- 투명한 알파 별에 대한 처리 ----------------------------
+    // 위치 고정
     CUtils::Set_State_Matrix(m_arrayStarMatrix[0], CUtils::STATE_POSITION, _float4(0.f, 0.f, 0.f, 1.f));
-    if(m_fAlphaTimeRemains > 1.f)
+    
+    // 한바퀴 다 돌았으면 사이즈 고정
+    if(m_fAlphaTime > 1.f)
         CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], m_InitialSize.x * 1.5f, m_InitialSize.y * 1.5f, 1.f);
-    else
+    else // 커지면서 돌리기
     {
-        m_fAlphaTimeRemains += fTimeDelta * TIMEDELTA_OFFSET * 1.5f;
-        CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], m_InitialSize.x * m_fAlphaTimeRemains, m_InitialSize.y * m_fAlphaTimeRemains, 1.f);
+        m_fAlphaTime += fTimeDelta * TIMEDELTA_OFFSET * 1.5f;
+        CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], m_InitialSize.x * m_fAlphaTime, m_InitialSize.y * m_fAlphaTime, 1.f);
         CUtils::Turn_OtherMatrix(m_arrayStarMatrix[0], _float4(0.f, 0.f, 1.f, 0.f), fTimeDelta, 135.f);
     }
 
+    // ---- 초록 별에 대한 처리 ----------------------------
     CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[2], m_InitialSize.x, m_InitialSize.y, 1.f);
 }
 
 void CTransingStar::RenderOpen()
 {
-    if (m_fAlphaTimeRemains <= 0.f) return;
-
     HRESULT hr(S_OK);
     // 텍스트들 돌면서 각자 다르게 값 주기
     for (_uint i = 0; i < m_arrTextures.size(); ++i)
