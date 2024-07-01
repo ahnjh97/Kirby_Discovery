@@ -32,6 +32,10 @@ public:
 	//virtual void				Render_IMGUI()								override;
 #endif
 
+	void						ChaseUI_To_Player();
+	void						Compute_PlayerDumpAbiliyTime();
+	_bool						Key_InputSystem(_float fTimeDelta);
+
 private:
 	HRESULT						Add_Components();
 	HRESULT						Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTexture* _pTextureCom, _uint _iTexIndex);
