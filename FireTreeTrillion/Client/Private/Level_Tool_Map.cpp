@@ -21,10 +21,10 @@ HRESULT CLevel_Tool_Map::Initialize()
 	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
 		return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Grid"), TEXT("Prototype_GameObject_Grid"))))
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Grid"), TEXT("Prototype_GameObject_Grid"))))
 		return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_MapToolHelper"), TEXT("Prototype_GameObject_MapToolHelper"))))
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_MapToolHelper"), TEXT("Prototype_GameObject_MapToolHelper"))))
 		return E_FAIL;
 
 	return S_OK;
@@ -72,10 +72,10 @@ HRESULT CLevel_Tool_Map::Ready_Layer_Camera(const wstring& strLayerTag)
 	CameraDesc.fFar = 1000.0f;
 	CameraDesc.vEye = _float4(0.f, 2.f, -1.f, 1.f);
 	CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
-	CameraDesc.fSpeedPerSec = 60.f; 
+	CameraDesc.fSpeedPerSec = 60.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
 		return E_FAIL;
 
 	return S_OK;

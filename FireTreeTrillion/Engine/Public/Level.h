@@ -26,6 +26,8 @@ protected:
 	_uint						m_iFPS = { 0 };
 	_float						m_fAccDelta = { 0.f };
 
+	_uint						m_iLevel = { 0 };
+
 public:
 	virtual void Free() override;
 };
