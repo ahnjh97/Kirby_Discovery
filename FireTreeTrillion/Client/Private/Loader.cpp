@@ -135,6 +135,8 @@
 #include "UI_PartTimeDee.h"
 #include "HUD_BossHpBar.h"
 #include "TransingStar.h"
+#include "UI_MessageWindow.h"
+#include "UI_BtnIcon.h"
 
 // 아이템
 #include "Food.h"
@@ -310,8 +312,11 @@ HRESULT CLoader::Loading_ObjectAll()
 	
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_PartTime"), CUI_PartTime);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_PartTimeDee"), CUI_PartTimeDee);
-	
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_TransingStar"), CTransingStar);
+
+	//LEVEL_DEEDEEDEE
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_MessageWindow"), CUI_MessageWindow);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_BtnIcon"), CUI_BtnIcon);
 
 #pragma endregion
 	
@@ -666,8 +671,14 @@ HRESULT CLoader::Loading_For_DeeDeeDee()
 	//HUD_BOSSHPBAR
 	hr = Add_Texture(eLevel, "HUD_BossBar", "UI/HUD/Boss/BossBar_%d.png", 5);
 
+	//UI_MessageWindow, Button
+	hr = Add_Texture(eLevel, "UI_MessageWindow", "UI/MessageWindow/MessageWindow_Base_%d.dds", 2);
+	hr = Add_Texture(eLevel, "UI_BtnIconBase", "UI/BtnIcon/BtnIcon_Base.dds");
+	hr = Add_Texture(eLevel, "UI_BtnIconBright", "UI/BtnIcon/BtnIcon_Bright.dds");
+
 	// 얼굴, 눈 텍스쳐 로드
 	Add_KirbyFaceTexture(eLevel);
+
 #pragma endregion
 
 

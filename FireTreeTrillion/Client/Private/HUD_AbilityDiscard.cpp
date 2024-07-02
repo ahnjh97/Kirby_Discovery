@@ -98,6 +98,7 @@ _int CHUD_AbilityDiscard::Tick(_float fTimeDelta)
 	}
 	*/
 #pragma endregion
+	
 	//버튼 입력X
 	//m_IsGaugeBLINK = FALSE;
 	//m_fHIDEAnimTime += fTimeDelta;

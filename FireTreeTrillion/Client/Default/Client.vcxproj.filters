@@ -466,6 +466,9 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\BossMonster\Gully">
       <UniqueIdentifier>{3e784411-9f95-46ab-b0a1-aa64e4492765}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\UI\MessageWindow">
+      <UniqueIdentifier>{bcd8d01b-4475-4a52-aafd-de2aee6510c4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -943,6 +946,12 @@
     <ClInclude Include="..\Public\Gully.h">
       <Filter>02.GameObjects\PhysXObject\Character\BossMonster\Gully</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\UI_MessageWindow.h">
+      <Filter>02.GameObjects\UI\MessageWindow</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UI_BtnIcon.h">
+      <Filter>02.GameObjects\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1400,6 +1409,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Gully.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\BossMonster\Gully</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UI_MessageWindow.cpp">
+      <Filter>02.GameObjects\UI\MessageWindow</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UI_BtnIcon.cpp">
+      <Filter>02.GameObjects\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
