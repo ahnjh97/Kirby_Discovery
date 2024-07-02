@@ -26,6 +26,10 @@ CUI_PartTime::CUI_PartTime(const CUI_PartTime& rhs)
 	, m_SizeScoreBar2D(rhs.m_SizeScoreBar2D)
 	, m_SizeCategory2D(rhs.m_SizeCategory2D)
 	, m_SizeDeeFace2D(rhs.m_SizeDeeFace2D)
+
+	, m_fSizeRatio(rhs.m_fSizeRatio)
+	, m_fRealTimeSize2D(rhs.m_fRealTimeSize2D)
+	, m_fStandardSize2D(rhs.m_fStandardSize2D)
 {
 }
 
@@ -38,19 +42,22 @@ HRESULT CUI_PartTime::Initialize_Prototype()
 	m_arrSize[0] = m_arrSize[4] = m_SizeBar2D;
 	m_arrSize[1] = m_arrSize[2] = m_arrSize[3] = m_SizeTimeBarBlank2D;
 	m_arrSize[5] = m_SizeCategory2D;
-	m_arrSize[6] = m_SizeScoreBar2D;
+	m_arrSize[6] = m_arrSize[15] = m_SizeScoreBar2D;
 	m_arrSize[7] = m_SizeDeeFace2D;
 	m_arrSize[10] = m_arrSize[11] = m_arrSize[12] = m_arrSize[13] = m_arrSize[14] = m_SizeDigits2D;
+	m_arrSize[16] = _float2(g_iWinSizeX, g_iWinSizeY * 2.f);
 	m_arrOriginalSize = m_arrSize;
 
+	m_fStandardSize2D = m_fRealTimeSize2D = _float2(m_SizeScoreBar2D.x * 2.f, m_SizeScoreBar2D.y * 2.f);
+	
 	_float2 temp2D = _float2();
 	fill(m_arrPosition.begin(), m_arrPosition.end(), temp2D);
 	_float3 temp3D = _float3(1.f, 1.f, 1.f);
 	fill(m_arrColor.begin(), m_arrColor.end(), temp3D);
 	_int iZero(0);
 	fill(m_arrScoreDigits.begin(), m_arrScoreDigits.end(), iZero);
-	fill(m_arrTimerDigits.begin(), m_arrTimerDigits.end(), iZero);
-
+	m_arrTimerDigits[0] = 5;
+	m_arrTimerDigits[1] = 0;
 	return S_OK;
 }
 
@@ -74,13 +81,15 @@ HRESULT CUI_PartTime::Initialize(void* _pArg)
 
 _int CUI_PartTime::Tick(_float fTimeDelta)
 {
+	if (m_bIsRender == false) return S_OK;
+	m_fTimeDelta = fTimeDelta;
 	__super::Tick(fTimeDelta);
 
 	// 점수를 받는 여부상관없이 시간을 관리합니다.
 	Compute_Timer(fTimeDelta);
 
 	if (m_bGoing)
-		Compute_TimerBar(fTimeDelta);// 타임바 이동되는 시간을 조정합니다.
+		Compute_TimerBar(fTimeDelta); // 타임바 이동되는 시간을 조정합니다.
 
 	// 점수를 받음으로써 변화되는 time-bar와 관련된 것을 관리합니다.
 	Compute_TimeScore(fTimeDelta);
@@ -101,7 +110,7 @@ HRESULT CUI_PartTime::Render()
 	hr = Bind_ShaderResources();
 	CHECK_FAILED(hr);
 
-	for (_int i = 0; i < m_arrTexures.size(); ++i)
+	for (_int i = 0; i < m_arrTexures.size() - 2; ++i)
 	{
 		// Time-Bar에 따른 디 표정 맞추기
 		if(i>=7 && i<=9)
@@ -131,7 +140,6 @@ HRESULT CUI_PartTime::Render()
 		}
 		if (i == 3) // 실질적인 Time-Bar
 		{
-			
 			if(false == m_bGoing)
 				m_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fRatioTimeBar, sizeof(_float));
 			else
@@ -146,7 +154,7 @@ HRESULT CUI_PartTime::Render()
 			_float fRatio = { 1.f }; 
 			m_pShaderCom->Bind_RawValue("g_fMaskRatio", &fRatio, sizeof(_float));
 			_int iMask = 0;
-			m_pShaderCom->Bind_RawValue("g_iMasking", &iMask, sizeof(_int));
+			m_pShaderCom->Bind_RawValue("g_iMasking",   &iMask, sizeof(_int));
 		}
 		
 		hr = m_pShaderCom->Begin(POSTEX_ALPHATEST_COLOR_HORIZONTALCUT);
@@ -158,6 +166,9 @@ HRESULT CUI_PartTime::Render()
 		hr = m_pVIBufferCom->Render();
 		CHECK_FAILED(hr);
 	}
+	
+	if(m_bRenderGameOver)
+		Render_GameOver();
 
 	return S_OK;
 }
@@ -171,6 +182,7 @@ void CUI_PartTime::Render_IMGUI()
 
 	//for (_int i = 10; i < m_arrPosition.size(); ++i)
 	//{
+	//	_int i = 15;
 	//	char name[16], size[16], color[16];
 	//	sprintf_s(name, "pos%d", i);
 	//	sprintf_s(size, "size%d", i);
@@ -273,10 +285,19 @@ HRESULT CUI_PartTime::Add_Components()
 		TEXT("Com_Texture_ScoreDigits_0"), (CComponent**)&m_arrTexures[14]);
 	CHECK_FAILED(hr);
 
+	// GAME-OVER 텍스쳐
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_GameFoodUI_FoodGameTextMask"),
+		TEXT("Com_Texture_Gameover"), (CComponent**)&m_arrTexures[15]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Fade"),
+		TEXT("Com_Texture_Fade"), (CComponent**)&m_arrTexures[16]);
+	CHECK_FAILED(hr);
+
+	
 	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_StatusBar_Kirby_Mask"),
 		TEXT("Com_Texture_Mask"), (CComponent**)&m_pTexMask)))
 		return E_FAIL;
-#pragma endregion
+	#pragma endregion
 
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),
 		TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom)))
@@ -397,6 +418,9 @@ void CUI_PartTime::Setup_PosSizeColor(_int iTextureNum)
 	case 14: // 점수판 digits 0
 		m_arrPosition[iTextureNum] = _float2(230.f, 810.f);
 	break;
+	case 15: // GAME OVER
+		//m_arrPosition[iTextureNum] = _float2(830.f, 200.f);
+		break;
 	}
 
 	m_pTransformCom->Set_Scaled(m_arrSize[iTextureNum].x, m_arrSize[iTextureNum].y, 1.f);
@@ -429,17 +453,18 @@ void CUI_PartTime::Compute_Timer(_float fTimeDelta)
 		if(CPartTimeHelper::Get_Instance()->HandleCamera())
 			m_pGameInstance->Set_SecondTimerRatio(1.f);
 	}
-	_float fLunchTime(20.9f), fGameoverTime(0.9f);
+	_float fLunchTime(20.9f), fGameoverTime(0.5f);
 	m_fStandardTime += fTimeDelta;
 	if (m_fStandardTime - m_fBeforeTime >= 1.f)
 	{
-		m_fCurTime = 50.f - m_fStandardTime;
+		m_fCurTime = 3.f - m_fStandardTime;
+		//m_fCurTime = 50.f - m_fStandardTime;
 		if (m_fCurTime <= 0.f) m_fCurTime = 0.f;
 		Change_TimeTexures(m_fCurTime);
 		
-		if (m_fCurTime <= fGameoverTime) //게임이 종료되었다고 helper에게 알리기
+		if (m_fCurTime <= fGameoverTime) // GAME OVER 텍스쳐 띄우기
 		{
-			CPartTimeHelper::Get_Instance()->HandleGame(0);
+			CPartTimeHelper::Get_Instance()->HandleGame(CPartTimeHelper::GAMEOVER);
 		}
 		else if (m_fCurTime <= fLunchTime) // 타임이 20일 때, 점심시간 시작.
 		{
@@ -477,7 +502,8 @@ void CUI_PartTime::Compute_TimeScore(_float fTimeDelta)
 // 타임 숫자 텍스쳐 변경
 void CUI_PartTime::Change_TimeTexures(_float _fTime)
 {
-	_int iTime = static_cast<_int>(_fTime);
+	// _fTime값을 올림하여 _int값으로 변환
+	_int iTime = static_cast<_int>(ceil(_fTime));
 
 	// 몫 == 십의 자리수
 	_int iShare = (iTime / 10);
@@ -491,7 +517,6 @@ void CUI_PartTime::Change_TimeTexures(_float _fTime)
 	// 두번째 텍스쳐 iRest와 대응되는 숫자 텍스쳐로 변경
 	m_arrTimerDigits[1] = iRest;
 }
-
 
 // 맞추면 먼저가는 옅은 타임바를 올려줍니다. 파라미터 수치만큼 올립니다.
 void CUI_PartTime::Add_TimeBar(_float _fTimeBar)
@@ -515,6 +540,123 @@ void CUI_PartTime::Add_Score(_int _fPlusScore)
 		m_arrScoreDigits[1] = iShareTen;
 	_int iRest = (iScore % 10);
 	m_arrScoreDigits[2] = iRest;
+}
+
+void CUI_PartTime::Render_GameOver()
+{
+	static _float fTimeAcc = 0.f;
+	_int iNum = 15; // GAMEOVER TEXTURE NUM == 15
+
+	m_fSizeRatio += m_fTimeDelta;
+	if (m_fSizeRatio >= 1.f)
+	{
+		m_fSizeRatio = 1.f;
+		fTimeAcc += m_fTimeDelta;
+		if (fTimeAcc >= 1.f)
+		{
+			Render_Fade();
+			return;
+		}
+	}
+
+	_float fSizeRatio = 1.f - EaseOutBounce(m_fSizeRatio); // m_fRealTimeSize2D
+	m_fRealTimeSize2D = _float2(m_fStandardSize2D.x * fSizeRatio + m_SizeScoreBar2D.x, m_fStandardSize2D.y * fSizeRatio + m_SizeScoreBar2D.y);
+	m_arrSize[iNum] = m_fRealTimeSize2D;
+	m_pTransformCom->Set_Scaled(m_arrSize[iNum].x, m_arrSize[iNum].y, 1.f);
+	m_arrPosition[iNum] = _float2(830.f, 200.f);
+	
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
+							   XMVectorSet(m_arrPosition[iNum].x - g_iWinSizeX * 0.5f,
+							   	-m_arrPosition[iNum].y + g_iWinSizeY * 0.5f,
+							   	0.f,
+							   	1.f));
+
+	// UI별 포지션, 사이즈, 컬러 조정
+	HRESULT hr = m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix");
+	CHECK_FAILED(hr);
+
+	// 디퓨즈 바인딩
+	hr = m_arrTexures[iNum]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
+	CHECK_FAILED(hr);
+
+	hr = m_pShaderCom->Begin(POSTEX_ALPHATEST_COLOR_HORIZONTALCUT);
+	CHECK_FAILED(hr);
+
+	hr = m_pVIBufferCom->Bind_Buffers();
+	CHECK_FAILED(hr);
+
+	hr = m_pVIBufferCom->Render();
+	CHECK_FAILED(hr);
+}
+
+void CUI_PartTime::Render_Fade()
+{
+	Reset_ShaderValue();
+
+	_int iNum = 16;
+	static _float fFadeOutRatio = 1.f;
+
+	/*_int iFade = 2;
+	m_pShaderCom->Bind_RawValue("g_iFade", &iFade, sizeof(_int));*/
+	
+	fFadeOutRatio -= m_fTimeDelta * 0.1f;
+	_float fRatio = EASE_IN_SINE(fFadeOutRatio);
+	m_pShaderCom->Bind_RawValue("g_fFadeRatio", &fRatio, sizeof(_float));
+
+	if (fRatio <= 0)
+		CPartTimeHelper::Get_Instance()->HandleGame(CPartTimeHelper::OVER);
+
+	m_pTransformCom->Set_Scaled(m_arrSize[iNum].x, m_arrSize[iNum].y, 1.f);
+	m_arrPosition[iNum] = _float2(800.f, 400.f);
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
+		XMVectorSet(m_arrPosition[iNum].x - g_iWinSizeX * 0.5f,
+					-m_arrPosition[iNum].y + g_iWinSizeY * 0.5f,
+					0.f,
+					1.f));
+
+	// UI별 포지션, 사이즈, 컬러 조정
+	HRESULT hr = m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix");
+	CHECK_FAILED(hr);
+
+	// 디퓨즈 바인딩
+	hr = m_arrTexures[iNum]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
+	CHECK_FAILED(hr);
+
+	hr = m_pShaderCom->Begin(POSTEX_FADEINOUT);
+	CHECK_FAILED(hr);
+
+	hr = m_pVIBufferCom->Bind_Buffers();
+	CHECK_FAILED(hr);
+
+	hr = m_pVIBufferCom->Render();
+	CHECK_FAILED(hr);
+}
+
+void CUI_PartTime::Reset_ShaderValue()
+{
+	m_fRatioBarSub = 1.f;
+	m_fRatioTimeBar = 1.f;
+	m_fGoalTimeBar = 1.f;
+}
+
+// 탕탕타라라라...
+_float CUI_PartTime::EaseOutBounce(_float _value)
+{
+	const _float n1 = 7.5625;
+	const _float d1 = 2.75;
+
+	if (_value < 1 / d1) {
+		return n1 * _value * _value;
+	}
+	else if (_value < 2 / d1) {
+		return n1 * (_value -= 1.5 / d1) * _value + 0.75;
+	}
+	else if (_value < 2.5 / d1) {
+		return n1 * (_value -= 2.25 / d1) * _value + 0.9375;
+	}
+	else {
+		return n1 * (_value -= 2.625 / d1) * _value + 0.984375;
+	}
 }
 
 CUI_PartTime* CUI_PartTime::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

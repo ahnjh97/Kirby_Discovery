@@ -165,6 +165,11 @@ _int CHungryDee::Tick(_float fTimeDelta)
 	return OBJ_NOEVENT;
 }
 
+void CHungryDee::Erase_DialogUI()
+{
+	Safe_Release(m_pDialogUI);
+}
+
 void CHungryDee::Swap_WatingPosition()
 {
 	m_iMyIdx = (m_iMyIdx + LAST_WAITPOS) % m_iWatingNum;

@@ -43,12 +43,12 @@ HRESULT CTransingStar::Initialize(void* pArg)
 _int CTransingStar::Tick(_float fTimeDelta)
 {
     // FOR TEST
-    if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD1, KEY_DOWN))
-        Activate(CTransingStar::CLOSE);
-    if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD2, KEY_DOWN))
-        Deactivate();
-    if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD3, KEY_DOWN))
-        Activate(CTransingStar::OPEN);
+    //if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD1, KEY_DOWN))
+    //    Activate(CTransingStar::CLOSE);
+    //if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD2, KEY_DOWN))
+    //    Deactivate();
+    //if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD3, KEY_DOWN))
+    //    Activate(CTransingStar::OPEN);
 
 	if (m_eActivateType == TYPE_END) return OBJ_NOEVENT;
     switch (m_eActivateType)

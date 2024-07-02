@@ -249,8 +249,9 @@ HRESULT CLevel_PartTime::Ready_Layer_UI(const wstring& _wstrLayerTag)
 {
 	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_PARTTIME, _wstrLayerTag, TEXT("Prototype_GameObject_UI_PartTime"));
 	CHECK_FAILED(hr);
-	//hr = m_pGameInstance->Add_Clone(LEVEL_PARTTIME, _wstrLayerTag, TEXT("Prototype_GameObject_UI_PartTimeDee"));
-	//CHECK_FAILED(hr);
+	hr = m_pGameInstance->Add_Clone(LEVEL_PARTTIME, _wstrLayerTag, TEXT("Prototype_GameObject_UI_PartTimeResult"));
+	CHECK_FAILED(hr);
+
 	return S_OK;
 }
 

@@ -132,6 +132,7 @@
 #include "HUD_AbilityDiscard.h"
 #include "UI_PartTime.h"
 #include "UI_PartTimeDee.h"
+#include "UI_PartTimeResult.h"
 #include "HUD_BossHpBar.h"
 #include "TransingStar.h"
 
@@ -309,6 +310,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_PartTime"), CUI_PartTime);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_PartTimeDee"), CUI_PartTimeDee);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_PartTimeResult"), CUI_PartTimeResult);
 	
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_TransingStar"), CTransingStar);
 
@@ -832,8 +834,13 @@ HRESULT CLoader::Loading_For_Parttime()
 	hr = Add_Texture(eLevel, "GameFoodUI_energydrink",		"UI/MGameFood/energydrink.png");
 	hr = Add_Texture(eLevel, "GameFoodUI_burger",			"UI/MGameFood/burger.png");
 
+	// 결과 안내
+	hr = Add_Texture(eLevel, "GameFoodUI_FoodGameTextMask",	"UI/MGameFood/FoodGameTextMask.png");
+	hr = Add_Texture(eLevel, "Fade",						"UI/Fade.png");
+
 	// 결과창
 	hr = Add_Texture(eLevel, "GameFoodUI_ResultBar",		"UI/MGameFood/result bar.png");
+	//hr = Add_Texture(eLevel, "GameFoodUI_ResultBar",		"UI/MGameFood/ClearText.png");
 	
 #pragma endregion
 

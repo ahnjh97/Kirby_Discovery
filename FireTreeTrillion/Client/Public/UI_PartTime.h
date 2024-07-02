@@ -8,7 +8,7 @@ class CTexture;
 class CVIBuffer_Rect;
 END
 
-#define TEXTURECNT	15
+#define TEXTURECNT	17
 
 BEGIN(Client)
 class CUI_PartTime : public CUIObject
@@ -34,6 +34,7 @@ public:
 	void						Add_Score(_int _fPlusScore);
 
 	void						Set_PreRatioBar() { m_fRatioBarSub = m_fRatioTimeBar; }
+	void						Set_RenderGameOver(_bool _Gameover) { m_bRenderGameOver = _Gameover; }
 
 private:
 	HRESULT						Add_Components();
@@ -45,6 +46,11 @@ private:
 	void						Compute_TimerBar(_float fTimeDelta);
 	void						Compute_TimeScore(_float fTimeDelta);
 	void						Change_TimeTexures(_float _fTime);
+
+	void						Render_GameOver();
+	void						Render_Fade();
+	void						Reset_ShaderValue();
+	_float						EaseOutBounce(_float _value);
 
 private:
 	array<CTexture*, TEXTURECNT>		m_arrTexures;
@@ -74,13 +80,20 @@ private:
 	// Mediate-Timer
 	_float						m_fStandardTime = 0.f;
 	_float						m_fBeforeTime = 0.f;  
-	_float						m_fCurTime = 0.f;
+	_float						m_fCurTime = 50.f;
 	_bool						m_bGoing = false;
 
 	// Timer-Digits
 	array<_int, 2>				m_arrTimerDigits;
 	// Score-Digits
 	array<_int, 3>				m_arrScoreDigits;
+
+	// GAME-OVER ≈ÿΩ∫∆Æ
+	_float						m_fTimeDelta = 0.f;
+	_float						m_fSizeRatio = 0.f;
+	_float2						m_fStandardSize2D = _float2();
+	_float2						m_fRealTimeSize2D = _float2();
+	_bool						m_bRenderGameOver = false;
 
 public:
 	static CUI_PartTime*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

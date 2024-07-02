@@ -5,6 +5,7 @@
 #include "HungryDee.h"
 #include "UI_PartTime.h"
 #include "UI_PartTimeDee.h"
+#include "UI_PartTimeResult.h"
 
 IMPLEMENT_SINGLETON(CPartTimeHelper)
 
@@ -31,6 +32,13 @@ void CPartTimeHelper::Register_UI(CUI_PartTime* pUI)
 	Safe_Release(m_pUI_PartTime);
 	m_pUI_PartTime = pUI;
 	Safe_AddRef(m_pUI_PartTime);
+}
+
+void CPartTimeHelper::Register_PartTimeResult(CUI_PartTimeResult* pResult)
+{
+	Safe_Release(m_pUI_PartTimeResult);
+	m_pUI_PartTimeResult = pResult;
+	Safe_AddRef(m_pUI_PartTimeResult);
 }
 
 // PartTimer Kirby state에서 맞추거나 틀리고 나서 불리우는 함수.
@@ -73,11 +81,21 @@ void CPartTimeHelper::NotifyObserver()
 }
 
 // 게임 흐름과 관련된 일을 처리하는 함수
-void CPartTimeHelper::HandleGame(_uint uContent)
+void CPartTimeHelper::HandleGame(TYPE eContent)
 {
-	if (uContent == 0)
+	if (eContent == GAMEOVER)		// 게임 종료 : GAME OVER 띄우기
 	{
-		//게임 종료
+		m_pUI_PartTime->Set_RenderGameOver(true);
+	}
+	else if (eContent == OVER) // 게임 종료
+	{
+		m_pUI_PartTime->Set_IsRender(false);
+		m_pHungryDee->Erase_DialogUI();
+		m_pUI_PartTimeResult->Set_IsRender(true);
+	}
+	else if (eContent == ETC) // ??
+	{
+		//m_pUI_PartTime->Set_IsRender(false);
 	}
 }
 
@@ -93,6 +111,7 @@ void CPartTimeHelper::Free()
 	__super::Free();
 	Safe_Release(m_pHungryDee);
 	Safe_Release(m_pUI_PartTime);
+	Safe_Release(m_pUI_PartTimeResult);
 	Safe_Release(m_pPartTimerKirby);
 }
 

@@ -463,6 +463,9 @@
     <Filter Include="02.GameObjects\UI\TransingStar">
       <UniqueIdentifier>{5d5b209e-634e-4099-a2ae-a86fa9e7139c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\UI\PartTime\Result">
+      <UniqueIdentifier>{6bfb944e-4c8c-4592-88d2-10aed3c5b9f4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -937,6 +940,9 @@
     <ClInclude Include="..\Public\TransingStar.h">
       <Filter>02.GameObjects\UI\TransingStar</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\UI_PartTimeResult.h">
+      <Filter>02.GameObjects\UI\PartTime\Result</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1391,6 +1397,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\TransingStar.cpp">
       <Filter>02.GameObjects\UI\TransingStar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UI_PartTimeResult.cpp">
+      <Filter>02.GameObjects\UI\PartTime\Result</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

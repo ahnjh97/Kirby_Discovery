@@ -19,12 +19,13 @@ float2 g_vUVOffset = { 0.f, 0.f };
 float2 g_vMaskUVOffset = { 0.f, 0.f };
 float g_fMaskUVAngle = { 0.f};
 
+int   g_iMasking = 0;
 float g_fMaskRatio = { 1.f };
 
 float g_fAlarmColor = { 0.f };
 
-// UI 함수에서 마스킹유무
-int g_iMasking = 0;
+int g_iFade = 0;
+float g_fFadeRatio = { 1.f };
 
 // 회전된 UV를 계산
 float2 RotateUV(float2 vCoord, float fAngle)
@@ -421,8 +422,6 @@ PS_OUT PS_MAIN_ALPHATEST_COLOR_HORIZONTALCUT(PS_IN In)
 
     Out.vColor.rgb *= g_vRColor;
     Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
-	//Out.vColor.rgb = g_vRColor;
-    //Out.vColor.a *= g_fAlpha;
     
     if(g_iMasking == 1)
     {
@@ -525,6 +524,22 @@ PS_OUT PS_FOCUSING_UI(PS_IN_ALPHABLEND In)
     return Out;
 }
 
+
+PS_OUT PS_FADE_INOUT(PS_IN_ALPHABLEND In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord);
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+
+    //Out.vColor.rgb = g_vRColor;
+    Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
+    
+    //if (g_iFade == 2)
+    //    Out.vColor.a *= 1 - g_fFadeRatio;
+    Out.vColor.a *= 1 - g_fFadeRatio;
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
 	// 기본 패스. 알파 테스팅 ( 0 )
@@ -590,11 +605,11 @@ technique11 DefaultTechnique
         SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
-        VertexShader = compile vs_5_0 VS_MAIN_ALPHABLEND();
-        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
-        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
-        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 PS_MAIN_DEFAULT_FX();
+        VertexShader    = compile vs_5_0 VS_MAIN_ALPHABLEND();
+        GeometryShader  = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader      = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader    = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader     = compile ps_5_0 PS_MAIN_DEFAULT_FX();
     }
 
 	// 단색 Z test 안함 (5)
@@ -604,11 +619,11 @@ technique11 DefaultTechnique
         SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
-        VertexShader = compile vs_5_0 VS_MAIN_ALPHABLEND();
-        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
-        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
-        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 PS_MAIN_SOLIDALPHABLEND();
+        VertexShader    = compile vs_5_0 VS_MAIN_ALPHABLEND();
+        GeometryShader  = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader      = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader    = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader     = compile ps_5_0 PS_MAIN_SOLIDALPHABLEND();
     }
 
 	// 화이트 이펙트 패스. 알파 테스팅 + 마스크 + no z text ( 6 )
@@ -618,11 +633,11 @@ technique11 DefaultTechnique
         SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
-        VertexShader = compile vs_5_0 VS_MAIN_ALPHABLEND();
-        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
-        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
-        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 PS_MAIN_WHITEFX();
+        VertexShader    = compile vs_5_0 VS_MAIN_ALPHABLEND();
+        GeometryShader  = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader      = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader    = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader     = compile ps_5_0 PS_MAIN_WHITEFX();
     }
 
     // Mask를 이용한 UI ( 7 )
@@ -777,4 +792,17 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_FOCUSING_UI();
     }
 
+    // FADE-IN-OUT ( 18 )
+    pass FADE_INOUT
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN_ALPHABLEND();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_FADE_INOUT();
+    }
 }

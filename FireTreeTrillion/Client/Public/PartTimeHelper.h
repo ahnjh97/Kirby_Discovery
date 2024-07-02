@@ -15,6 +15,9 @@ enum class PARTTIME_ITEM { CAKE, TOMATO, DRINK, BURGER, ITEM_END };
 class CPartTimeHelper final : public CBase
 {
 	DECLARE_SINGLETON(CPartTimeHelper)
+
+public:
+	enum TYPE { GAMEOVER, OVER, ETC, TYPE_END };
 private:
 	CPartTimeHelper();
 	virtual ~ CPartTimeHelper() = default;
@@ -22,26 +25,28 @@ private:
 public: 
 	void				Register_FirstDee(class CHungryDee* pDee);
 	void				Register_PartTimerKirby(class CPartTimerKirby* pKirby);
+	void				Register_UI(class CUI_PartTime* pUI);
+	void				Register_PartTimeResult(class CUI_PartTimeResult* pUI);
 	void				NotifyObserver();
+
 	// 문제 냅니다.
 	void				Make_RandomItem();
 	// 문제 잘 풀었는지 검사합니다.
 	_bool				Check_Item(PARTTIME_ITEM eITEM);
-	// UI를 관할합니다.
-	void				Register_UI(class CUI_PartTime* pUI);
 	// 현 문제의 답안지를 공개합니다.
 	PARTTIME_ITEM		Get_PartTimeItem() const { return m_eFood; }
-	// 게임 시작과 종료를 관할합니다.
-	void				HandleGame(_uint uContent);
-
 	// 점심시간에 따른 새로운 이벤트입니다. 카메라를 이동시킵니다.
 	_bool				HandleCamera();
+	// 게임 시작과 종료를 관할합니다.
+	void				HandleGame(TYPE eContent);
 
 private:
-	class CHungryDee*		m_pHungryDee = nullptr;
-	class CPartTimerKirby*	m_pPartTimerKirby = nullptr;
-	class CUI_PartTime*		m_pUI_PartTime = nullptr;
-	PARTTIME_ITEM			m_eFood = PARTTIME_ITEM::CAKE;
+	class CHungryDee*			m_pHungryDee		 = nullptr;
+	class CPartTimerKirby*		m_pPartTimerKirby	 = nullptr;
+	class CUI_PartTime*			m_pUI_PartTime		 = nullptr;
+	class CUI_PartTimeResult*	m_pUI_PartTimeResult = nullptr;
+
+	PARTTIME_ITEM				m_eFood	= PARTTIME_ITEM::CAKE;
 
 public:
 	virtual void Free() override;
