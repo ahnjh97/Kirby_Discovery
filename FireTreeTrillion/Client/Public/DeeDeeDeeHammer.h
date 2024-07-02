@@ -47,6 +47,8 @@ private:
 	_float4x4* m_pBoneMatrix = { nullptr };
 	_float* m_pWhiteColorDiffuse = { nullptr };
 
+	_bool	m_bItemTrigger = { true };
+
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();

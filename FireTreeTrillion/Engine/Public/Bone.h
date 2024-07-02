@@ -22,7 +22,7 @@ public:
 
 public:
 	HRESULT Initialize(ifstream& fileStream);
-	void Invalidate_CombinedTransformationMatrix(const vector<CBone*>& Bones, _fmatrix TransformatrixMatrix);	
+	void Invalidate_CombinedTransformationMatrix(const vector<CBone*>& Bones, _fmatrix TransformatrixMatrix, _bool isRatio);
 	
 	_bool Compare_Name(const _char* pBoneName) { return !strcmp(m_szName, pBoneName); }
 
