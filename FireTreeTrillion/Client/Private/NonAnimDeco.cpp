@@ -72,6 +72,11 @@ HRESULT CNonAnimDeco::Render()
 
 HRESULT CNonAnimDeco::Add_Components(const wstring& _wstrModelTag)
 {
+	/* For.Com_Shader */
+	wstring wstrShaderTag = TEXT("Prototype_Component_Shader_VtxModel");
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, wstrShaderTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
+		return E_FAIL;
+
 	/* For.Com_Model */
 	wstring wstrModelTag = TEXT("Prototype_Component_Model_") + _wstrModelTag;
 	if (FAILED(__super::Add_Component(wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
