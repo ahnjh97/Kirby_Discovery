@@ -191,7 +191,7 @@ void CKirby::Render_IMGUI()
 	}
 
 	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-	ImGui::Text("m_fDumpAbilityTime : %.2f", INFO(m_fDumpAbilityTime));
+	ImGui::Text("m_isKirbyAttacking(overpower) : %d", m_isKirbyAttacking);
 	ImGui::Text("m_bisDeforming : %d", INFO(m_bisDeforming));
 	ImGui::Text("m_bBlockOtherVacuum : %d", INFO(m_bBlockOtherVacuum));
 	ImGui::Text("m_vLadderPoint.x : %.2f, m_vLadderPoint.y : %.2f m_vLadderPoint.z : %.2f", INFO(m_vLadderPoint).x, INFO(m_vLadderPoint).y, INFO(m_vLadderPoint).z);
@@ -252,9 +252,13 @@ void CKirby::Add_AnimEvent()
 		// 커비의 히트박스를 실시간으로 변화시킨다.
 		HitBoxChanger(m_pFSM->Get_State());
 		});
-	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("StopDamage", [this]() {
 
+	m_pModelCom[BODY_HAMMER]->Add_Event("ApplyDamage", [this]() {
+		// 커비의 히트박스를 실시간으로 변화시킨다.
+		HitBoxChanger(m_pFSM->Get_State());
 		});
+
+
 
 	// 사운드 처리
 
@@ -285,7 +289,6 @@ void CKirby::Add_AnimEvent()
 		});
 
 #pragma endregion
-
 
 #pragma region CHARGE
 
@@ -1319,10 +1322,29 @@ void CKirby::HitBoxChanger(_uint eState)
 	case SWORDSTATE_UPWARDSLASH:
 		Activate_FrustumCollider(0.5f, 5.f, 90.f);
 		break;
+	// 해머 5타 통 애님 (막타)
+	case HAMMERSTATE_HAMMERATTACKFINALTOY:
+		Activate_FrustumCollider(0.5f, 5.f, 180.f);
+		break;
+	// 평타
+	case HAMMERSTATE_HAMMERATTACKHITTOY:
+		Activate_FrustumCollider(0.5f, 5.f, 180.f);
+		break;
+	// 해머 풀 차징 공격
+	case HAMMERSTATE_ONIGOROSIHAMMEREND:
+		Activate_FrustumCollider(0.5f, 6.f, 180.f);
+		break;
+	// 해머 덜 차징 공격
+	case HAMMERSTATE_ONIGOROSIHAMMERFIRST:
+		Activate_FrustumCollider(0.5f, 6.f, 180.f);
+		break;
+	// 해머 공중 회전 공격
+	case HAMMERSTATE_WHEELHAMMER:
+		Activate_SphereCollider(0.5f, 5.f);
+		break;
 	default:
 		break;
 	}
-
 	m_isKirbyAttacking = true;
 }
 
@@ -1545,7 +1567,7 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 	{
 		// 타임델타를 누적받고
 		m_fIsAttackTime += fTimeDelta;
-		if (m_fIsAttackTime > 0.3f)
+		if (m_fIsAttackTime > 0.5f)
 		{
 			m_fIsAttackTime = 0.f;
 			m_isKirbyAttacking = false;

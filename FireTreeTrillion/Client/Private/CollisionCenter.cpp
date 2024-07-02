@@ -897,9 +897,37 @@ void CCollisionCenter::Hitbox_Collision()
 			CGameObject* Src = SrcHit->Get_Owner();
 			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
 				return;
+
+
+			CKirby* pKirby = static_cast<CKirby*>(Dst);
+			CMonster* pMonster = static_cast<CMonster*>(Src);
+
+			// 커비가 혹시 닷지를 하였는가? 만약 닷지를 했다면 충돌이 발생하지않는다.
+			if (pthis->Kirby_Dodge_SlowMotionSystem(pKirby) == true)
+			{
+				DstHit->Set_Alive(false);
+				SrcHit->Set_Alive(false);
+				return;
+			}
+
+			// 넉백방향을 정해주기 위한 과정이다.
+			CTransform* pMonsterTransformCom = pMonster->Get_TransformCom();
+			_vector vMonsterPos = pMonsterTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+			CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
+			_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+			_float4 vDistance = vKirbyPos - vMonsterPos;
+			vDistance.y = 0.f;
+			vDistance.Normalize();
+			_vector vKnockbackDir = vDistance;
+
+			pthis->Knock_back(pKirby, vKnockbackDir * 1.5f, 7.f);
+			pthis->Compute_HitBoxDamage(pKirby, pMonster);
+
 			DstHit->Set_Alive(false);
 			SrcHit->Set_Alive(false);
 
+			// 별도의 충돌로직이 발생할 것이다.
+			pKirby->Collision(CONTENT_ATTACK, pMonster);
 		});
 
 	// 깔끔하게 완료되었음
