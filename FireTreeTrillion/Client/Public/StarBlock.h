@@ -43,6 +43,7 @@ private:
 private:
 	CShader*				m_pShaderCom = { nullptr };
 	CModel*					m_pModelCom = { nullptr };
+	vector<PxRigidActor*>	m_vecStaticActors;
 
 	_float					m_fFlyTime = { 0.f };
 

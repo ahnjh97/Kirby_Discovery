@@ -11,11 +11,11 @@ class CEventCallBack : public PxSimulationEventCallback
 public:
     void Register_Player(PxActor* pPlayerActor) { m_pPlayerActor = pPlayerActor; }
     void Register_Trigger(PxActor* pTriggerActor, _int iType, _int iIndex) { m_Triggers.emplace_back(pTriggerActor, iType, iIndex); }
-    void Emplace_TriggerFunc(_int iType, function<void(_int)> func) { m_TriggerFuncs.emplace(iType, func); }
-    void Emplace_ExitFunc(_int iType, function<void(void)> func) { m_ExitFuncs.emplace(iType, func); }
+    void Emplace_TriggerFunc(_int iType, function<void(_int)> func) { m_TriggerFuncs.insert_or_assign(iType, func); }
+    void Emplace_ExitFunc(_int iType, function<void(void)> func) { m_ExitFuncs.insert_or_assign(iType, func); }
     void Emplace_MapDecoTrigger(PxActor* pTriggerActor, class CModel* pMapDecoModel, _uint iAnimIdx, _float fTickPerSec)
     {
-        m_TriggerToMapDecoAnimMap.emplace(pTriggerActor, tuple<class CModel*, _uint, _float>(pMapDecoModel, iAnimIdx, fTickPerSec));
+        m_TriggerToMapDecoAnimMap.insert_or_assign(pTriggerActor, tuple<class CModel*, _uint, _float>(pMapDecoModel, iAnimIdx, fTickPerSec));
         Safe_AddRef(pMapDecoModel);
     }
    

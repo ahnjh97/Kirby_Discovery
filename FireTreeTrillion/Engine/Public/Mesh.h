@@ -39,6 +39,7 @@ public:
 
 	HRESULT CreateDynamicActor(_float4x4& matWorld);
 	HRESULT CreateStaticActor(_float4x4& matWorld);
+	PxRigidActor* ReturnStaticActor(_float4x4& matWorld);
 	void	Update_ActorTransform(class CTransform* pTransform);
 	void	DisableActor(PxScene* pScene);
 	void	ReAddActor(PxScene* pScene);

@@ -1326,9 +1326,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("DeeDeeDeeHammer", TYPE_NONANIM, 1.0f);
 
 		// For Map Interactive Object
-		m_vecModelInfo.emplace_back("GsPebble", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("SeShell", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("StarBlockS", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("StarBlockM", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("StarBlockL", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
@@ -1336,6 +1333,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// For Item
 		Load_ItemModels();
+
+		// For Kickables
+		Load_KickableModels();
 
 		// For Interaction Decor
 		m_vecModelInfo.emplace_back("WoodParts", TYPE_ANIM, 1.f, 0.f, 0, string("MapDeco/"));
@@ -1428,13 +1428,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("CappyBody", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("CappyHat", TYPE_ANIM, 1.f, 180.f);
 
-		// For Map Interactive Object
-		m_vecModelInfo.emplace_back("GsPebble", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("SeShell", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-
-
-
 		// 자동차 관련 (자동차와 부수는 돌멩이들)
 		m_vecModelInfo.emplace_back("Car", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("RockA", TYPE_NONANIM, 1.f);
@@ -1451,6 +1444,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		// For Item
 		Load_ItemModels();
 
+		// For Kickables
+		Load_KickableModels();
 
 		// For Interaction Decor
 		m_vecModelInfo.emplace_back("Ladder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
@@ -1569,6 +1564,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		// For Kirby Armour
 		Load_KirbyArmourModels();
 
+		Load_ItemModels();
+		Load_KickableModels();
+
 		// For Boss 
 		m_vecModelInfo.emplace_back("FinalBoss", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("FinalBossSpear", TYPE_ANIM, 1.f);
@@ -1638,6 +1636,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// For Item
 		Load_ItemModels();
+		Load_KickableModels();
 
 		// 와들디
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
@@ -1961,6 +1960,19 @@ void CLoader::Load_ItemModels()
 	// For AbilityItemModels
 	m_vecModelInfo.emplace_back("Item_Sword", TYPE_NONANIM, 1.f, 0.f);
 	m_vecModelInfo.emplace_back("Item_Bomb", TYPE_NONANIM, 1.f, 0.f);
+}
+
+void CLoader::Load_KickableModels()
+{
+	m_vecModelInfo.emplace_back("GsPebble", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+	m_vecModelInfo.emplace_back("GsRubbleA", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+	m_vecModelInfo.emplace_back("GsRubbleB", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+	m_vecModelInfo.emplace_back("GsRubbleC", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+	m_vecModelInfo.emplace_back("GsTireAL", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+	m_vecModelInfo.emplace_back("GsTireBL", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+	m_vecModelInfo.emplace_back("GsTireCL", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+	m_vecModelInfo.emplace_back("SeShell", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+	m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 }
 
 void CLoader::Load_KirbyBodyModels()

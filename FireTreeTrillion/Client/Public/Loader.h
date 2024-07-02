@@ -66,6 +66,7 @@ private:
 	void	Load_AnimToolInfo();
 
 	void	Load_ItemModels();
+	void	Load_KickableModels();
 	void	Load_KirbyBodyModels();
 	void	Load_KirbyWeaponModels();
 	void	Load_KirbyArmourModels();

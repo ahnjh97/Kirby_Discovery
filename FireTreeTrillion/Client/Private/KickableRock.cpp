@@ -35,6 +35,10 @@ HRESULT CKickableRock::Initialize(void* pArg)
 	m_bRimLight = true;
 	m_bStencil = true;
 
+
+
+	m_pModelCom->CreateDynamicActor(m_pTransformCom->Get_WorldFloat4x4());
+
 	return S_OK;
 }
 
@@ -101,8 +105,8 @@ void CKickableRock::Late_Tick(_float fTimeDelta)
 	{
 		// 커비에게 빨려들어가지 않게 END로 한다.
 		m_ePhyXState = PO_END;
-		m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
-		m_pRigidBodyCom->Add_Force(_float3(0.f, -0.5f, 0.f));
+		/*m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
+		m_pRigidBodyCom->Add_Force(_float3(0.f, -0.5f, 0.f));*/
 
 		m_fLifeTime += m_fTimeDelta;
 		if (m_fLifeTime >= 1.5f)
@@ -179,7 +183,7 @@ void CKickableRock::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObj
 		// 노말 상태일 경우에만 톡 쳤을때 반응하게 하고, 나머진 서로 충돌이 되면 안 된다.
 		if (m_ePhyXState == PO_NORMAL && m_bLockCollision == false)
 		{
-			m_pRigidBodyCom->Activate(true);
+			//m_pRigidBodyCom->Activate(true);
 			CGameObject* pPlayer = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"));
 			_float4 vPlayerPos = static_cast<CTransform*>(pPlayer->Get_TransformCom())->Get_State(CTransform::STATE_POSITION);
 			_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
@@ -190,7 +194,7 @@ void CKickableRock::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObj
 			vDir.y += 1.f;
 			vDir.Normalize();
 			_float3 force = vDir;
-			m_pRigidBodyCom->Kick_RigidBody(XMVector3Normalize(force), 480.f);
+			//m_pRigidBodyCom->Kick_RigidBody(XMVector3Normalize(force), 480.f);
 
 			// 힘이 한번만 작용되게 한다.
 			m_bLockCollision = true;
@@ -215,20 +219,20 @@ HRESULT CKickableRock::Add_Components(const wstring& wstrModelName)
 	hr = __super::Add_Component(wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
-	/* For.Com_RigidBody */
-	CRigidBody::RIGIDBODY_DESC rigidDesc {};
-	rigidDesc.bTrigger = false;
-	rigidDesc.bDynamic = true;
-	rigidDesc.bKinematic = false;
-	rigidDesc.eShapeType = RIGID_SPHERE;
-	rigidDesc.fOffsetSize = { 0.5f, 0.5f, 0.5f };
-	rigidDesc.vMaterial = _float3(10.f, 1.f, 0.85f);
-	rigidDesc.fDensity = 800.f;
-	rigidDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
-	hr = __super::Add_Component(TEXT("Prototype_Component_RigidBody"),
-		TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &rigidDesc);
-	CHECK_FAILED(hr);
-	m_pRigidBodyCom->Activate(false);
+	///* For.Com_RigidBody */
+	//CRigidBody::RIGIDBODY_DESC rigidDesc {};
+	//rigidDesc.bTrigger = false;
+	//rigidDesc.bDynamic = true;
+	//rigidDesc.bKinematic = false;
+	//rigidDesc.eShapeType = RIGID_SPHERE;
+	//rigidDesc.fOffsetSize = { 0.5f, 0.5f, 0.5f };
+	//rigidDesc.vMaterial = _float3(10.f, 1.f, 0.85f);
+	//rigidDesc.fDensity = 800.f;
+	//rigidDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
+	//hr = __super::Add_Component(TEXT("Prototype_Component_RigidBody"),
+	//	TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &rigidDesc);
+	//CHECK_FAILED(hr);
+	//m_pRigidBodyCom->Activate(false);
 
 
 	CHitBox::HITBOX_DESC HitBox{};

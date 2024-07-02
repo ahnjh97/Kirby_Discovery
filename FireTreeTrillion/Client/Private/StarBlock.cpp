@@ -43,15 +43,24 @@ HRESULT CStarBlock::Initialize(void* pArg)
 
 	CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
 
-	if (FAILED(m_pModelCom->CreateStaticActor(m_pTransformCom->Get_WorldFloat4x4())))
-		return E_FAIL;
+	/*if (FAILED(m_pModelCom->CreateStaticActor(m_pTransformCom->Get_WorldFloat4x4())))
+		return E_FAIL;*/
 
-	vector<PxRigidActor*> vecActors = m_pModelCom->Get_Actors();
+	m_vecStaticActors = m_pModelCom->ReturnStaticActors(m_pTransformCom->Get_WorldFloat4x4());
+
 	if (pKirby != nullptr)
 	{
-		for (auto& actor : vecActors)
+		for (auto& actor : m_vecStaticActors)
 			pKirby->RegisterActorsToPlayer_ForStarBox(actor, this);
 	}
+
+
+	//vector<PxRigidActor*> vecActors = m_pModelCom->Get_Actors();
+	//if (pKirby != nullptr)
+	//{
+	//	for (auto& actor : vecActors)
+	//		pKirby->RegisterActorsToPlayer_ForStarBox(actor, this);
+	//}
 
 	return S_OK;
 }
@@ -183,6 +192,15 @@ void CStarBlock::Break_From_Car()
 	if (pKirby != nullptr)
 		pKirby->Set_HitStop();
 	m_pGameInstance->Setting_RadialBlur(10.f, 10.f);
+
+	for (auto& actor : m_vecStaticActors)
+	{
+		if (nullptr == actor)
+			continue;
+
+		actor->getScene()->removeActor(*actor);
+	}
+		
 	m_pModelCom->DisableActors();
 
 	m_bDead = true;
@@ -321,6 +339,15 @@ void CStarBlock::Free()
 {
 	__super::Free();
 
+	for (auto& actor : m_vecStaticActors)
+	{
+		if (nullptr == actor)
+			continue;
+
+		if (actor->isReleasable())
+			actor->release();
+	}
+		
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 }

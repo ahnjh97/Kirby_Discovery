@@ -321,6 +321,25 @@ HRESULT CModel::CreateStaticActor(_float4x4& matWorld)
 	return S_OK;
 }
 
+vector<PxRigidActor*> CModel::ReturnStaticActors(_float4x4& matWorld)
+{
+	vector<PxRigidActor*> vecStaticActors;
+
+	for (auto& mesh : m_Meshes)
+	{
+		if (nullptr == mesh)
+			continue;
+
+		PxRigidActor* pStaticActor = mesh->ReturnStaticActor(matWorld);
+		if (nullptr == pStaticActor)
+			continue;
+
+		vecStaticActors.push_back(pStaticActor);
+	}
+		
+	return vecStaticActors;
+}
+
 HRESULT CModel::CreateStaticActors_Exclude(unordered_set<string>& _setNonColMesh, _float4x4& matWorld)
 {
 	for (auto& mesh : m_Meshes)

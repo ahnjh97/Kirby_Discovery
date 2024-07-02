@@ -305,6 +305,11 @@ HRESULT CMesh::CreateStaticActor(_float4x4& matWorld)
 	return S_OK;
 }
 
+PxRigidActor* CMesh::ReturnStaticActor(_float4x4& matWorld)
+{
+	return m_pGameInstance->CreateStaticActor(matWorld, m_pVerticesPos, m_iNumVertices, m_pIndices, m_iNumIndices);
+}
+
 _float4 CMesh::Get_PickPos(const CTransform* pTransform) const
 {
 	vector<_float4> vecPickPos;

@@ -103,7 +103,8 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 	//UV 조절 가능
 	//BasicMap (UV 편집 가능)
-	m_vecMapModelNames = { "Level0Stage1Step01", "Level0Stage1Step02",  "Level1Stage1Step01", "DeeDeeDeeMap", "Town", "TownShop", "Land_VcLabo", "Land_LbLastBossBeforeStep"};
+	m_vecMapModelNames = { "Level0Stage1Step01", "Level0Stage1Step02",  "Level1Stage1Step01", "DeeDeeDeeMap", "Town"
+			, "TownShop", "Land_VcLabo", "Land_LbLastBossBeforeStep" };
 
 	vector<string> vecBGs = { "BG0", "BG1" };
 	m_setMapNames.insert(vecBGs.begin(), vecBGs.end());
@@ -118,16 +119,16 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	//아래는 피직스 처리가 필요한 오브젝트들. (지형 충돌 필요)
 	m_setActorDecos = {  "CMBillBoardC", "CmBuilding1stRoof", "CMBuildingParts", "CMGuardrailAL", "CMGuardrailBL"
 		, "CMFenceAL", "CMFenceA2L", "CMFenceA3L", "CMFenceB3L", "CMFenceCL", "CMFenceCornerCL"
-		, "CMHighwayGuardrailACL", "CMHighwayGuardrailAL", "CMHighwayGuardrailALL", "CMHighwayGuardrailARL", "CMHighwayGuardrailBL", "CMHighwayGuardrailBLL"
-		, "CMHighwayGuardrailBRL", "CMHighwayGuardrailCCL", "CMHighwayGuardrailCL", "CMHighwayGuardrailCLL", "CMHighwayGuardrailCRL"
+		, "CMHighwayGuardrailACL", "CMHighwayGuardrailAL", "CMHighwayGuardrailALL", "CMHighwayGuardrailARL"
+		, "CMHighwayGuardrailBL", "CMHighwayGuardrailBLL", "CMHighwayGuardrailBRL", "CMHighwayGuardrailCCL"
+		, "CMHighwayGuardrailCL", "CMHighwayGuardrailCLL", "CMHighwayGuardrailCRL"
 		, "CMStreeLightLampA", "CMStreeLightLampE", "CMWaterTankL", "CvBarricadeBL", "CvPipingDuctA05L"
-		, "GsBenchAL", "GsCarFloor", "GsCarShop", "GsCircleBench", "GsFlowerPotAL", "GsFlowerPotBL", "GsSteelFenceA"
-		, "GsSteelFenceB", "GsStone", "GsStreetWallA", "GsStreetWallB"
-		, "GsTelephonePoleA", "GsTelephonePoleB", "GsTireAL", "GsTireBL", "GsTireCL"
+		, "GsBenchAL", "GsCarFloor", "GsCarShop", "GsCircleBench", "GsClock", "GsFlowerPotAL", "GsFlowerPotBL", "GsSteelFenceA"
+		, "GsSteelFenceB", "GsStone", "GsStreetWallA", "GsStreetWallB", "GsTelephonePoleA", "GsTelephonePoleB"
 		, "GsTrafficSignalAL", "GsTrafficSignalBL", "GsTreeA", "GsTreeB", "GsTreeC", "GsWallRockA", "GsWallRockB"
 		, "GsWoodBridgeA", "GsWoodBridgeB", "GsRockCL", "GsRockDL", "GsRockEL", "GsRockFL", "GsRockGL"
 		, "JgGrassB", "JgGrassL", "JgGrasslongB", "JgGrassN", "JgWoodD", "JgGrassO"
-		, "StarBlockL" , "StarBlockM", "StarBlockS", "SeDriftWoodAL", "SeDriftWoodBL", "SeDriftWoodCL"
+		, "SeDriftWoodAL", "SeDriftWoodBL", "SeDriftWoodCL"
 		, "VpFactoryPart", "VpFactoryParts", "VpFactoryPartsBlend", "WoodBox"
 
 
@@ -178,8 +179,9 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		,"LbBossRoomDoorAL","LbBossRoomDoorBL", "LbOutBuildingWallL"
 
 		//LbLastBossBeforeStep Object :: Rubble 
-		, "LbRubble01L", "LbRubble02L", "LbRubble03L", "LbRubble04L", "LbRubble05L", "LbRubble06L", "LbRubble07L", "LbRubble08L", "LbRubbleTile01L", "LbRubbleTile02L", "LbRubbleTile03L"
-		, "GsRubbleA", 	"GsRubbleB", "GsRubbleC", "GsRubbleD", "GsRubbleE", "GsRubbleF", "GsRubbleG"
+		, "LbRubble01L", "LbRubble02L", "LbRubble03L", "LbRubble04L", "LbRubble05L", "LbRubble06L", "LbRubble07L", "LbRubble08L"
+		, "LbRubbleTile01L", "LbRubbleTile02L", "LbRubbleTile03L"
+		, "GsRubbleD", "GsRubbleE", "GsRubbleF", "GsRubbleG"
 		
 		//CmFillerObject, Ml~ :: 채우기용 잡오브젝트
 		, "CmFillerObjectAL", "CmFillerObjectA02L", "CmFillerObjectA03L", "CmFillerObjectBL", "CmFillerObjectCL", "CmFillerObjectEL", "CmFillerObjectFL"
@@ -188,10 +190,13 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 #pragma endregion
 	};
 	
-	m_setKickables = { "GsPebble", "SeShell", "WasteCanYellow" };
+	m_setKickables = { "GsRubbleA", "GsRubbleB", "GsRubbleC", "GsPebble", "GsTireAL", "GsTireBL", "GsTireCL",  "SeShell", "WasteCanYellow" };
+
 	m_setItemTxts = { "Item_BlueCoin", "Item_Bread", "Item_Cake", "Item_Cocktail", "Item_Coin", "Item_EnergyDrink", "Item_Makaron",
 		"Item_Meat", "Item_Omelet", "Item_Onigiri", "Item_RedCoin", "Item_Steak", "Item_Sushi" };
-	m_setTrees = { "GsTreeA", "GsTreeB", "GsTreeC", "DsPalmABottomL", "DsPalmAMiddleL", "DsPalmATopL", "DsPalmBL", "DsPalmCL" };
+
+	m_setTrees = { "GsTreeA", "GsTreeB", "GsTreeC", "DsPalmABottomL", "DsPalmAMiddleL", "DsPalmATopL", "DsPalmBL", "DsPalmCL"
+		, "GsFlowerBedTreeAL", "GsFlowerBedTreeBL", "GsIvyGroundMiddlePlus", "GsIvyB", "JgGrasslongB" };
 
 	//블렌드 적용이 필요한 데코오브젝트
 	m_setBlendDecos = {"LbOutBuildingWallL", "LbOutBuildingFenceL", "GsCarFloor" };
@@ -318,7 +323,7 @@ void CMapToolHelper::ReadMapObjTxts()
 				m_vecTriggerTxts.emplace_back(strModelName);
 			else if (true == IsItem(strModelName))
 				m_vecItemTxts.emplace_back(strModelName);
-			else if (true == IsKickble(strModelName))
+			else if (true == IsKickable(strModelName))
 				m_vecKickableTxts.emplace_back(strModelName);
 			else if("RallyPoint" == strModelName)
 				m_vecTriggerTxts.emplace_back(strModelName);
@@ -1157,12 +1162,9 @@ void CMapToolHelper::Save_Level()
 			vecMap.push_back(object);
 			continue;
 		}
-		if (true == IsTrigger(strModelName)){
+		if (true == IsTrigger(strModelName))
+		{
 			vecTriggers.push_back(object);
-			continue;
-		}
-		if (true == IsDeco(strModelName)) {
-			vecDecos.push_back(object);
 			continue;
 		}
 		if (true == IsMonster(strModelName)) {
@@ -1173,8 +1175,12 @@ void CMapToolHelper::Save_Level()
 			vecItems.push_back(object);
 			continue;
 		}
-		if (true == IsKickble(strModelName)) {
+		if (true == IsKickable(strModelName)) {
 			vecKickables.push_back(object);
+			continue;
+		}
+		if (true == IsDeco(strModelName)) {
+			vecDecos.push_back(object);
 			continue;
 		}
 		if ("RallyPoint" == strModelName) {
@@ -1553,7 +1559,7 @@ _bool CMapToolHelper::IsRallyingMonster(const string& _strModelName)
 	return false;
 }
 
-_bool CMapToolHelper::IsKickble(const string& _strModelName)
+_bool CMapToolHelper::IsKickable(const string& _strModelName)
 {
 	if (m_setKickables.end() != m_setKickables.find(_strModelName))
 		return true;
@@ -2411,6 +2417,10 @@ void CMapToolHelper::Load_Decos(const string& _strLevel)
 		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
 		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
 		fileInput.read(reinterpret_cast<char*>(&iPassIndex), sizeof(iPassIndex));
+
+		/*if ("GsRubbleA" == strModelName || "GsRubbleB" == strModelName || "GsRubbleC" == strModelName ||
+			"GsTireAL" == strModelName || "GsTireBL" == strModelName || "GsTireCL" == strModelName)
+			continue;*/
 
 		CMapToolObject::MAPTOOLOBJECT_DESC tDesc{};
 		tDesc.eMapObjType = CMapToolObject::TYPE_MAPOBJ(iMapObjType);
