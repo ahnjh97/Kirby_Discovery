@@ -15,10 +15,11 @@ void CTimeController::Update_TimeController(_float fTimeDelta)
 
 	if (m_bFirstTimerRestore == true)
 	{
-		m_fFirstTimerRatio += fTimeDelta;
+		m_fFirstTimerRatio += fTimeDelta * m_fFirstTimerRestoreMaxTime;
 		if (m_fFirstTimerRatio > 1.f)
 		{
 			m_fFirstTimerRatio = 1.f;
+			m_fFirstTimerRestoreMaxTime = 1.f;
 			m_bFirstTimerRestore = false;
 		}
 	}
@@ -26,10 +27,11 @@ void CTimeController::Update_TimeController(_float fTimeDelta)
 
 	if (m_bSecondTimerRestore == true)
 	{
-		m_fSecondTimerRatio += fTimeDelta;
+		m_fSecondTimerRatio += fTimeDelta * m_fSecondTimerRestoreMaxTime;
 		if (m_fSecondTimerRatio > 1.f)
 		{
 			m_fSecondTimerRatio = 1.f;
+			m_fSecondTimerRestoreMaxTime = 1.f;
 			m_bSecondTimerRestore = false;
 		}
 	}

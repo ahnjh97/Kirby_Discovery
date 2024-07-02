@@ -59,7 +59,10 @@ HRESULT CStarBlock::Initialize(void* pArg)
 _int CStarBlock::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
+	{
+		m_pModelCom->DisableActors();
 		return Ready_Dead();
+	}
 
 	__super::Tick(fTimeDelta);
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
@@ -165,14 +168,13 @@ void CStarBlock::Render_IMGUI()
 void CStarBlock::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
 	//// 여기서 StarBlockPiece 뿌리기
-	//HRESULT hr = S_OK;
-	//CStarBlockPiece::PIECE_DESC desc{};
-	//_float4 vInitialpos = GET_POS;
-	//desc.vInitialPos = _float4(vInitialpos.x + 1.f, vInitialpos.y + 1.5f, vInitialpos.z + 1.f, 1.f);
-	////desc.vDir =k
-	//hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_MapObject"), TEXT("Prototype_GameObject_StarBlockPiece"), &desc);
-	//CHECK_FAILED(hr);
-	//m_bDead = true;
+
+	if (eContent == CCollisionCenter::CONTENT_ATTACK)
+	{
+
+
+		m_bDead = true;
+	}
 }
 
 void CStarBlock::Break_From_Car()

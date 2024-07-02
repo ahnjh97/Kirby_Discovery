@@ -29,11 +29,13 @@ public:
 		m_fSecondTimerRatio = fRatio;
 	}
 
-	void	Restore_FirstTimer() {
+	void	Restore_FirstTimer(_float fRestoreMaxTime = 1.f) {
 		m_bFirstTimerRestore = true;
+		m_fFirstTimerRestoreMaxTime = fRestoreMaxTime;
 	}
-	void	Restore_SecondTimer() {
+	void	Restore_SecondTimer(_float fRestoreMaxTime = 1.f) {
 		m_bSecondTimerRestore = true;
+		m_fSecondTimerRestoreMaxTime = fRestoreMaxTime;
 	}
 
 private:
@@ -44,6 +46,9 @@ private:
 
 	_bool	m_bFirstTimerRestore = { false };
 	_bool	m_bSecondTimerRestore = { false };
+
+	_float	m_fFirstTimerRestoreMaxTime = { 1.f };
+	_float	m_fSecondTimerRestoreMaxTime = { 1.f };
 
 public:
 	static CTimeController* Create();
