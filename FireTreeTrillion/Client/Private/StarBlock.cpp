@@ -5,6 +5,7 @@
 #include "Kirby.h"
 #include "Camera_Main.h"
 
+
 CStarBlock::CStarBlock(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
 {
@@ -61,7 +62,7 @@ _int CStarBlock::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 	{
 		m_pModelCom->DisableActors();
-		return Ready_Dead();
+		return Make_Partical();
 	}
 
 	__super::Tick(fTimeDelta);
@@ -171,8 +172,21 @@ void CStarBlock::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject
 
 	if (eContent == CCollisionCenter::CONTENT_ATTACK)
 	{
+		CKirby* pKirby = static_cast<CKirby*>(pObject);
+		if (pKirby == nullptr)
+			return;
 
+		pKirby->Set_HitStop();
+		CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+		if (pCamera != nullptr)
+			pCamera->Make_Shake(0.5f);
 
+		_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		_float4 vPlayerPos = pObject->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
+		_float4 vDir = vPos - vPlayerPos;
+		vDir.Normalize();
+		m_vDamegeDir = (_float3)vDir;
+		m_fHitPower = 9.f;
 		m_bDead = true;
 	}
 }
@@ -212,11 +226,20 @@ HRESULT CStarBlock::Add_Components(wstring wstrModelProtoTag)
 	CHECK_FAILED(hr);
 
 	if (wstrModelProtoTag == TEXT("StarBlockS"))
+	{
 		Set_BodyCollider(COLLIDER_SPHERE, 0.5f, 0.f, 1.f);
+		m_fSize = 1.f;
+	}
 	else if (wstrModelProtoTag == TEXT("StarBlockM"))
+	{
 		Set_BodyCollider(COLLIDER_SPHERE, 1.f, 0.f, 2.f);
+		m_fSize = 2.f;
+	}
 	else if (wstrModelProtoTag == TEXT("StarBlockL"))
+	{
 		Set_BodyCollider(COLLIDER_SPHERE, 1.25f, 0.f, 2.5f);
+		m_fSize = 2.5f;
+	}
 
 	return S_OK;
 }
@@ -252,6 +275,41 @@ HRESULT CStarBlock::Bind_ShaderResources()
 
 
 	return S_OK;
+}
+
+_int CStarBlock::Make_Partical()
+{
+	for (_int i = 0; i < 9; ++i)
+	{
+		_float4x4 matrix = m_pTransformCom->Get_WorldFloat4x4();
+		_float4 vDir = m_vDamegeDir;
+
+		vDir = CUtils::Make_RandomAngle_Vector(120.f, vDir);
+		vDir.Normalize();
+		_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		vPos += vDir * 2.f;
+
+		CUtils::Set_State_Matrix(matrix, CUtils::STATE_POSITION, vPos);
+		CUtils::Turn_OtherMatrix(matrix, _float4(0.f, 1.f, 0.f, 0.f), 1.f, CUtils::Make_RandomFloat(0.f, 360.f));
+		CUtils::Turn_OtherMatrix(matrix, _float4(1.f, 0.f, 0.f, 0.f), 1.f, CUtils::Make_RandomFloat(0.f, 360.f));
+		CUtils::Turn_OtherMatrix(matrix, _float4(0.f, 0.f, 1.f, 0.f), 1.f, CUtils::Make_RandomFloat(0.f, 360.f));
+		_float fRandomscale = CUtils::Make_RandomFloat(0.6f, 1.6f);
+		CUtils::Set_Scaled_Matrix(matrix, fRandomscale, fRandomscale, fRandomscale);
+
+		CStarBlockPiece::PIECE_DESC desc = {};
+		desc.matWorld = matrix;
+		vDir.y += 0.5f;
+		desc.vMoveDir = (_float3)vDir;
+		desc.fPower = m_fHitPower * 5.f;
+		desc.fSize = m_fSize;
+		// Car Test
+		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_StarBlockPartical"), TEXT("Prototype_GameObject_StarBlockPiece"), &desc)))
+			return OBJ_DEAD;
+	}
+
+	Ready_Dead(3.f);
+
+	return OBJ_DEAD;
 }
 
 void CStarBlock::Compute_MotionBlur()
