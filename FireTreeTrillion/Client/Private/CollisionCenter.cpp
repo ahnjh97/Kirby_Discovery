@@ -194,6 +194,7 @@ _bool CCollisionCenter::Intersect(CHitBox* Dst, CHitBox* Src)
 
 			CTransform* pConeTransform = Src->Get_TransformCom();
 			_float4 vConeLookDir = pConeTransform->Get_State(CTransform::STATE_LOOK);
+			vConeLookDir.Normalize();
 			_float4 vDir = XMVector3Normalize(vDstPos - vSrcPos);
 
 			// 중점간의 각도를 구하였다.
@@ -274,6 +275,7 @@ _bool CCollisionCenter::Intersect(CHitBox* Dst, CHitBox* Src)
 
 			CTransform* pConeTransform = Src->Get_TransformCom();
 			_float4 vConeLookDir = pConeTransform->Get_State(CTransform::STATE_LOOK);
+			vConeLookDir.Normalize();
 			_float4 vDir = XMVector3Normalize(vDstPos - vSrcPos);
 
 			// 중점간의 각도를 구하였다.
@@ -312,6 +314,7 @@ _bool CCollisionCenter::Intersect(CHitBox* Dst, CHitBox* Src)
 
 			CTransform* pConeTransform = Dst->Get_TransformCom();
 			_float4 vConeLookDir = pConeTransform->Get_State(CTransform::STATE_LOOK);
+			vConeLookDir.Normalize();
 			_float4 vDir = XMVector3Normalize(vSrcPos - vDstPos);
 
 			// 중점간의 각도를 구하였다.
@@ -343,6 +346,7 @@ _bool CCollisionCenter::Intersect(CHitBox* Dst, CHitBox* Src)
 
 			CTransform* pConeTransform = Dst->Get_TransformCom();
 			_float4 vConeLookDir = pConeTransform->Get_State(CTransform::STATE_LOOK);
+			vConeLookDir.Normalize();
 			_float4 vDir = XMVector3Normalize(vSrcPos - vDstPos);
 
 			// 중점간의 각도를 구하였다.
@@ -920,8 +924,8 @@ void CCollisionCenter::Hitbox_Collision()
 				return;
 
 
-			CKirby* pKirby = static_cast<CKirby*>(Dst);
-			CMonster* pMonster = static_cast<CMonster*>(Src);
+			CKirby* pKirby = static_cast<CKirby*>(Src);
+			CMonster* pMonster = static_cast<CMonster*>(Dst);
 
 			// 커비가 혹시 닷지를 하였는가? 만약 닷지를 했다면 충돌이 발생하지않는다.
 			if (pthis->Kirby_Dodge_SlowMotionSystem(pKirby) == true)
@@ -931,24 +935,23 @@ void CCollisionCenter::Hitbox_Collision()
 				return;
 			}
 
-			// 넉백방향을 정해주기 위한 과정이다.
-			CTransform* pMonsterTransformCom = pMonster->Get_TransformCom();
-			_vector vMonsterPos = pMonsterTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-			CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
-			_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-			_float4 vDistance = vKirbyPos - vMonsterPos;
-			vDistance.y = 0.f;
-			vDistance.Normalize();
-			_vector vKnockbackDir = vDistance;
-
-			pthis->Knock_back(pKirby, vKnockbackDir * 1.5f, 7.f);
-			pthis->Compute_HitBoxDamage(pKirby, pMonster);
-
-			DstHit->Set_Alive(false);
-			SrcHit->Set_Alive(false);
-
-			// 별도의 충돌로직이 발생할 것이다.
-			pKirby->Collision(CONTENT_ATTACK, pMonster);
+			if (pKirby->isOverPower() == false)
+			{
+				// 넉백방향을 정해주기 위한 과정이다.
+				CTransform* pMonsterTransformCom = pMonster->Get_TransformCom();
+				_vector vMonsterPos = pMonsterTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+				CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
+				_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+				_float4 vDistance = vKirbyPos - vMonsterPos;
+				vDistance.y = 0.f;
+				vDistance.Normalize();
+				_vector vKnockbackDir = vDistance;
+				pthis->Knock_back(pKirby, vKnockbackDir * 1.5f, 7.f);
+				pthis->Compute_HitBoxDamage(pKirby, pMonster);
+				DstHit->Set_Alive(false);
+				SrcHit->Set_Alive(false);
+				pKirby->Collision(CONTENT_ATTACK, pMonster);
+			}
 		});
 
 	// 깔끔하게 완료되었음

@@ -1019,6 +1019,8 @@ static _float4 Spit_Target_Object(CKirby* pKirby)
 
 
 
+
+
 	return vTargetPos;
 }
 
@@ -1181,10 +1183,6 @@ static void Throw_Bomb(CKirby::KIRBY_INFODESC* Kirbydesc, _float4 vDir, _float f
 	DESC(m_vBombThrowDir) = vDir;
 	DESC(m_fBombPower) = fPower;
 }
-
-
-
-
 
 #pragma region Hyo Effect
 

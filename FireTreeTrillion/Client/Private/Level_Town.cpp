@@ -200,7 +200,7 @@ HRESULT CLevel_Town::Ready_Layer_UI(const wstring& _wstrLayerTag)
 		CHECK_FAILED(hr);
 	}
 
-	LEVEL eLevel = LEVEL_FINALBOSS;
+	LEVEL eLevel = LEVEL_TOWN;
 
 	CUIObject::UIOBJ_DESC DiscardUIDesc{};
 	DiscardUIDesc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f, 0.f };

@@ -853,6 +853,17 @@ HRESULT CKirby::Add_Components()
 		TEXT("Com_Model_HammerDefault"), (CComponent**)&m_pModelCom[BODY_HAMMER]);
 	CHECK_FAILED(hr);
 
+	// 커비의 Dump Default 상태 모델
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyDumpDefault"),
+		TEXT("Com_Model_DumpDefault"), (CComponent**)&m_pModelCom[BODY_DUMPDEFAULT]);
+	CHECK_FAILED(hr);
+
+	// 커비의 Dump Vacuum 상태 모델
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyDumpVacuum"),
+		TEXT("Com_Model_DumpVacuum"), (CComponent**)&m_pModelCom[BODY_DUMPVACUUM]);
+	CHECK_FAILED(hr);
+
+
 #pragma endregion
 
 #pragma region Kirby Eye

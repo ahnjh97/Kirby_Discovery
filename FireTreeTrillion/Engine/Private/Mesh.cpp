@@ -565,6 +565,7 @@ void CMesh::Free()
 		Safe_Delete_Array(m_pNormals);
 		Safe_Delete_Array(m_pTexCoords);
 		Safe_Delete_Array(m_pTangents);
+	}
 
 		if (nullptr != m_pActor) {
 			PxScene* scene = m_pGameInstance->Get_Scene();
@@ -575,9 +576,8 @@ void CMesh::Free()
 			}
 		}
 
-		if (nullptr != m_pTriangleMesh) {
-			m_pTriangleMesh->release();
-			m_pActor = nullptr;
-		}
+	if (nullptr != m_pTriangleMesh) {
+		m_pTriangleMesh->release();
+		m_pActor = nullptr;
 	}
 }
