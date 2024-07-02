@@ -424,6 +424,8 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
+	pController->FreeFall(pTransformCom, fTimeDelta);
+
 	// 모든 공격의 시작이라고 볼 수 있다.
 	if (pKirby->Get_State() == CKirby::HAMMERSTATE_ONIGOROSIHAMMERSTART)
 	{
@@ -433,7 +435,7 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 		if (JoyStick_On() == true)
 		{
 			DESC(m_eEyeState) = CKirby::EYE_ANGER;
-			pKirby->Change_State(CKirby::HAMMERSTATE_ONIGOROSIHAMMERMOVE, 60.f, true, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+			pKirby->Change_State(CKirby::HAMMERSTATE_ONIGOROSIHAMMERMOVE, 60.f, true, true, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
 			pKirby->Set_WeaponAnim(9);
 			return;
 		}
@@ -460,7 +462,7 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 		if (JoyStick_On() == true)
 		{
 			DESC(m_eEyeState) = CKirby::EYE_ANGER;
-			pKirby->Change_State(CKirby::HAMMERSTATE_ONIGOROSIHAMMERMOVE, 60.f, true, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+			pKirby->Change_State(CKirby::HAMMERSTATE_ONIGOROSIHAMMERMOVE, 60.f, true, true, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
 			pKirby->Set_WeaponAnim(9);
 			return;
 		}
@@ -513,7 +515,7 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 		else
 		{
 			DESC(m_eEyeState) = CKirby::EYE_ANGER;
-			pKirby->Change_State(CKirby::HAMMERSTATE_ONIGOROSIHAMMERCHARGE, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+			pKirby->Change_State(CKirby::HAMMERSTATE_ONIGOROSIHAMMERCHARGE, 60.f, true, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
 			pKirby->Set_WeaponAnim(9);
 			return;
 		}
@@ -530,7 +532,7 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 			else if (DESC(m_fHammerChargeTime) >= 2.f)
 			{
 				CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
-				pCamera->Zoom(-5.f);
+				pCamera->Zoom(-10.f);
 				pKirby->Change_State(CKirby::HAMMERSTATE_ONIGOROSIHAMMEREND, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
 				DESC(m_eEyeState) = CKirby::EYE_ANGER;
 				pKirby->Set_WeaponAnim(10);

@@ -213,8 +213,8 @@ public: /* For. TimeController */
 	_float	Get_SecondTimer();
 	void	Set_FirstTimerRatio(_float fRatio);
 	void	Set_SecondTimerRatio(_float fRatio);
-	void	Restore_FirstTimer();
-	void	Restore_SecondTimer();
+	void	Restore_FirstTimer(_float fRestoreRatio = 1.f);
+	void	Restore_SecondTimer(_float fRestoreRatio = 1.f);
 
 
 	_uint Get_NumOctree() { return g_iNumOctree; }
