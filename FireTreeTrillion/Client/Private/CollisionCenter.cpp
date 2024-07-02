@@ -924,8 +924,8 @@ void CCollisionCenter::Hitbox_Collision()
 				return;
 
 
-			CKirby* pKirby = static_cast<CKirby*>(Dst);
-			CMonster* pMonster = static_cast<CMonster*>(Src);
+			CKirby* pKirby = static_cast<CKirby*>(Src);
+			CMonster* pMonster = static_cast<CMonster*>(Dst);
 
 			// 커비가 혹시 닷지를 하였는가? 만약 닷지를 했다면 충돌이 발생하지않는다.
 			if (pthis->Kirby_Dodge_SlowMotionSystem(pKirby) == true)

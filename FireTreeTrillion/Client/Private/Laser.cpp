@@ -64,7 +64,7 @@ _int CLaser::Tick(_float fTimeDelta)
 
 	m_pTransformCom->Look_At_Interpolate(vKirbyPos, m_fTimeDelta * 0.2f);
 	//m_pTransformCom->Look_At(-pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
-	Activate_FrustumCollider(0.f, 200.f, 10.f);
+	Activate_FrustumCollider(0.f, 200.f, 5.f);
 
 	if (true == m_bEnd)
 	{
