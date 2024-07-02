@@ -31,6 +31,9 @@ public:
 	_bool				Get_Dead() { return m_bDead; }
 	void				Set_Dead() { m_bDead = true; }
 
+	_bool				Get_PoolingDead() { return m_bPoolingDead; }
+	void				Set_PooilingDead() { m_bPoolingDead = true; }
+
 	_bool				Get_Hide() { return m_bHide; }
 	virtual void		Set_Hide(_bool bHide) { m_bHide = bHide; }
 
@@ -83,6 +86,7 @@ protected:
 	_uint*									m_pCurrentLevelID = { nullptr };
 	// 객체 상태처리를 위해
 	_bool									m_bDead = { false };
+	_bool									m_bPoolingDead = { false };
 	// prototypeName을 들고 있는다.
 	wstring									m_wstrPrototypeTag = wstring();
 	

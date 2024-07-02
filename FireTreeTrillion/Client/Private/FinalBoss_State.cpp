@@ -108,7 +108,7 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			// 메테오 패턴
 			//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SUMMONSTART, 50.f, false, true);
 			// 레이져 패턴
-			//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONLASEREADY, 50.f, false, true);
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONLASEREADY, 50.f, false, true);
 			//if (m_iCnt == 0 || m_iCnt == 7)
 			//{
 			//	++m_iCnt;
@@ -121,7 +121,7 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			//{
 			//	++m_iCnt;
 			//	// Slash 패턴
-				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHREADY, 50.f, false, true);
+				//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHREADY, 50.f, false, true);
 			//}
 			//else if (m_iCnt == 6)
 			//{
@@ -212,7 +212,7 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		//else if (m_iCnt == 2)
 		//{
 		//	++m_iCnt;
-		//	pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONSPIKEREADY, 50.f, false, true);
+			//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONSPIKEREADY, 50.f, false, true);
 		//}
 		//else if (m_iCnt == 8 || m_iCnt == 9 || m_iCnt == 10)
 		//{
@@ -585,10 +585,8 @@ void CFinalBoss_Slash_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 	{
 		pController->Move_Dir(pTransformCom, XMVector3Normalize(pFinalBoss->Get_Direction()) * fTimeDelta * 70.f, fTimeDelta);
 
-		if (10.f > pController->Compute_Height(XMVectorSet(0.f, -1.f, 0.f, 0.f)))
-		{
+		if (5.f > pController->Compute_Height(XMVectorSet(0.f, -1.f, 0.f, 0.f)))
 			pFinalBoss->Set_Gully(true);
-		}
 		else
 			pFinalBoss->Set_Gully(false);
 
@@ -991,6 +989,7 @@ CFinalBoss_Laser_State::CFinalBoss_Laser_State()
 void CFinalBoss_Laser_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
+	m_fTimeDelta = 0.f;
 }
 
 void CFinalBoss_Laser_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)

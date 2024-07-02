@@ -57,7 +57,7 @@ HRESULT CFinalBoss::Initialize(void* pArg)
 	Make_TargetToCams();
 
 	// 도랑 풀링
-	for (size_t i = 0; i < 80; i++)
+	for (size_t i = 0; i < 120; i++)
 	{
 		HRESULT hr;
 		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Gully"), TEXT("Prototype_GameObject_Gully"));
@@ -117,36 +117,20 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 	else
 		m_fGlideTime = 0.f;
 
-	m_fLifeTime += m_fTimeDelta;
+	// 풀링임
 	if (true == m_bGully)
 	{
-		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT);
+		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 0.8f;
 		vPos.m128_f32[1] = 0.f;
-		m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 5.f);
+		m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f);
 		++m_iGullyCnt;
-		vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT);
+		vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 0.8f;
+
 		vPos.m128_f32[1] = 0.f;
-		m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 5.f);
+		m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f);
 		++m_iGullyCnt;
 		if (m_vecGully.size() <= m_iGullyCnt)
-		{
 			m_iGullyCnt = 0;
-		}
-
-		m_fLifeTime = 0.f;
-		//_float fGullyTime = { 0.05f };
-		//if (fGullyTime < m_fLifeTime)
-		//{
-		//	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-		//	m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 1.f);
-		//	++m_iGullyCnt;
-		//	if (m_vecGully.size() <= m_iGullyCnt)
-		//	{
-		//		m_iGullyCnt = 0;
-		//	}
-
-		//	m_fLifeTime = 0.f;
-		//}
 	}
 
 	__super::Tick(m_fTimeDelta);

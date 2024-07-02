@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Client_Defines.h"
-#include "GameObject.h"
+#include "PhysXObject.h"
 
 BEGIN(Engine)
 class CModel;
@@ -10,7 +10,7 @@ END
 
 BEGIN(Client)
 
-class CBossClone final : public CGameObject
+class CBossClone final : public CPhysXObject
 {
 public:
 	struct BOSSCLONE_DESC : public CGameObject::GAMEOBJECT_DESC {
@@ -34,6 +34,7 @@ public:
 #ifdef _DEBUG
 	virtual void	Render_IMGUI() override;
 #endif
+	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
 private:
 	CModel*		m_pModelCom = { nullptr };

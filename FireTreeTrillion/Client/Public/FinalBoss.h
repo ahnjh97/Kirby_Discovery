@@ -102,7 +102,6 @@ private:
 	_bool				m_bGully = { false };
 
 	_float				m_fGlideTime = { 0.f };
-	_float				m_fLifeTime = { 0.f };
 
 	_uint				m_iGullyCnt = { 0 };
 

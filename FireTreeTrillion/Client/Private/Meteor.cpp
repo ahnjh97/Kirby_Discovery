@@ -1,14 +1,15 @@
 #include "stdafx.h"
 #include "Meteor.h"
 #include "Kirby.h"
+#include "HitBox.h"
 
 CMeteor::CMeteor(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CGameObject{ pDevice, pContext }
+	: CPhysXObject{ pDevice, pContext }
 {
 }
 
 CMeteor::CMeteor(const CMeteor& rhs)
-	: CGameObject{ rhs }
+	: CPhysXObject{ rhs }
 {
 }
 
@@ -45,11 +46,13 @@ HRESULT CMeteor::Initialize(void* pArg)
 
 	if(true == m_bBig)
 	{
+		Set_BodyCollider(COLLIDER_SPHERE, 0.f, 1.5f, 18.f);
 		m_fTurnSpeed = 0.1f;
 		m_fMeteorSpeed = 130.f;
 	}
 	else
 	{
+		Set_BodyCollider(COLLIDER_SPHERE, 0.f, 1.5f, 5.f);
 		m_fTurnSpeed = 0.5f;
 		m_fMeteorSpeed = 150.f;
 	}
@@ -100,7 +103,7 @@ _int CMeteor::Tick(_float fTimeDelta)
 				_float fAngleVelocity = EaseOutCubic(m_fDecreSpeed) / m_fTimeDelta;
 				_vector vRight = XMVector3Cross(XMVector3Normalize(m_vTargetPos - vPos), XMVectorSet(0.f, 1.f, 0.f, 0.f));
 				if (!XMVector3Equal(vRight, XMVectorZero()))
-					m_pTransformCom->Turn(-vRight, m_fTimeDelta * fDeceleration * 0.9f);
+					m_pTransformCom->Turn(-vRight, m_fTimeDelta * fDeceleration * 0.8f);
 			}
 			else
 			{
@@ -222,8 +225,11 @@ void CMeteor::Render_IMGUI()
 	//	ImGui::Text("TargetDir X : %.2f \tTargetDir Y : %.2f \tTargetDir Z : %.2f ", INFO(m_vTargetDir).x, INFO(m_vTargetDir).y, INFO(m_vTargetDir).z);
 	__super::Render_IMGUI();
 }
-
 #endif
+
+void CMeteor::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
+{
+}
 
 HRESULT CMeteor::Add_Components()
 {
@@ -237,6 +243,13 @@ HRESULT CMeteor::Add_Components()
 	hr = __super::Add_Component(m_strTag,
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
+
+	CHitBox::HITBOX_DESC HitBox{};
+	HitBox.pOwner = this;
+	HitBox.pDesc = &m_tColliderDesc[BODY];
+	HitBox.pCollisionType = MONSTER;
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
+		return E_FAIL;
 
 	return S_OK;
 }
