@@ -35,9 +35,13 @@ HRESULT CKickableRock::Initialize(void* pArg)
 	m_bRimLight = true;
 	m_bStencil = true;
 
-
-
-	m_pModelCom->CreateDynamicActor(m_pTransformCom->Get_WorldFloat4x4());
+	m_pDynamicActor = m_pModelCom->ReturnDynamicActor(m_pTransformCom->Get_WorldFloat4x4());
+	
+	//PxRigidActor* pActor;
+	//const PxU32 bufferSize = 128;  // Shape를 저장할 버퍼 크기
+	//PxShape* shapeBuffer[bufferSize];  // Shape 포인터 배열
+	//pActor->getShapes(shapeBuffer, bufferSize);
+	//m_pModelCom->CreateDynamicActor(m_pTransformCom->Get_WorldFloat4x4());
 
 	return S_OK;
 }
@@ -348,6 +352,17 @@ CGameObject* CKickableRock::Clone(void* pArg)
 void CKickableRock::Free()
 {
 	__super::Free();
+
+	if (nullptr != m_pDynamicActor)
+	{
+		PxScene* pScene = m_pGameInstance->Get_Scene();
+		if (nullptr != pScene) {
+			pScene->removeActor(*m_pDynamicActor);
+			m_pDynamicActor->release();
+			m_pDynamicActor = nullptr;
+		}
+	}
+
 	Safe_Release(m_pRigidBodyCom);
 	Safe_Release(m_pModelCom);
 } 

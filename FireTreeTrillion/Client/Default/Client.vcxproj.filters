@@ -256,9 +256,6 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\BossMonster\FinalBoss">
       <UniqueIdentifier>{fd728b3f-fd47-41c8-9494-e1b5e0112910}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Levels\GamePlay">
-      <UniqueIdentifier>{dd50ce2d-1d5c-4b85-b72c-8e83d466312d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\BossMonster\State">
       <UniqueIdentifier>{b88a2aa6-514a-4a22-bd29-90fec4ffcb2e}</UniqueIdentifier>
     </Filter>
@@ -270,9 +267,6 @@
     </Filter>
     <Filter Include="01.Levels\GamePlay">
       <UniqueIdentifier>{4547c314-4c9e-474f-bf8e-dd8eb6143161}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Levels\Town">
-      <UniqueIdentifier>{235eccae-385e-4844-8a46-caf8091cd645}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword\State">
       <UniqueIdentifier>{c3509440-bbe1-439c-b743-a205693e77b6}</UniqueIdentifier>
@@ -765,9 +759,6 @@
     <ClInclude Include="..\Public\FinalBoss.h">
       <Filter>02.GameObjects\PhysXObject\Character\BossMonster\FinalBoss</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Level_GamePlay.h">
-      <Filter>01.Levels\GamePlay</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\FinalBoss_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\BossMonster\State</Filter>
     </ClInclude>
@@ -942,6 +933,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Gully.h">
       <Filter>02.GameObjects\PhysXObject\Character\BossMonster\Gully</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_GamePlay.h">
+      <Filter>01.Levels\99. GamePlay</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1224,9 +1218,6 @@
     <ClCompile Include="..\Private\FinalBoss.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\BossMonster\FinalBoss</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Level_GamePlay.cpp">
-      <Filter>01.Levels\GamePlay</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\FinalBoss_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\BossMonster\State</Filter>
     </ClCompile>
@@ -1400,6 +1391,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Gully.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\BossMonster\Gully</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_GamePlay.cpp">
+      <Filter>01.Levels\99. GamePlay</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

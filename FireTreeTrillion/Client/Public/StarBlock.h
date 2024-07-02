@@ -42,6 +42,7 @@ private:
 	_float2				m_vPreScreenPos = { 0.f, 0.f };
 	_float4				m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
 	void				DisableActors();
+	void				ReleaseActors();
 
 
 private:

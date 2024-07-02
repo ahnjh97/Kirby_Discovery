@@ -340,6 +340,45 @@ vector<PxRigidActor*> CModel::ReturnStaticActors(_float4x4& matWorld)
 	return vecStaticActors;
 }
 
+PxRigidDynamic* CModel::ReturnDynamicActor(_float4x4& matWorld)
+{
+	PxPhysics* pPhysics = m_pGameInstance->Get_Physics();
+	if (nullptr == pPhysics)
+		return nullptr;
+
+	_float3 vScale{};
+	_float4 vQuaternion{};
+	_vector vScaleVector, vRotQuat, vTrans;
+	::XMMatrixDecompose(&vScaleVector, &vRotQuat, &vTrans, XMLoadFloat4x4(&matWorld));
+	XMStoreFloat3(&vScale, vScaleVector);
+	XMStoreFloat4(&vQuaternion, vRotQuat);
+
+	PxMeshScale meshScale(PxVec3(vScale.x, vScale.y, vScale.z));
+	PxConvexMeshGeometryFlags meshFlags = PxConvexMeshGeometryFlags();
+
+	PxTransform pxTransform(PxVec3(matWorld._41, matWorld._42, matWorld._43), PxQuat(vQuaternion.x, vQuaternion.y, vQuaternion.z, vQuaternion.w));
+
+	PxRigidDynamic* pDynamicActor = pPhysics->createRigidDynamic(pxTransform);
+	PxMaterial* pMaterial = pPhysics->createMaterial(0.5f, 0.5f, 0.6f);
+
+	for (auto& mesh : m_Meshes)
+	{
+		PxConvexMesh* pConvexMesh = mesh->CreateConvexMesh();
+		if (nullptr == pConvexMesh)
+			continue;
+		PxConvexMeshGeometry meshGeometry(pConvexMesh, meshScale, meshFlags);
+		PxShape* pShape = pPhysics->createShape(meshGeometry, *pMaterial);
+		pDynamicActor->attachShape(*pShape);
+		pShape->release();
+		pConvexMesh->release();
+	}
+	
+	PxScene* pScene = m_pGameInstance->Get_Scene();
+	pScene->addActor(*pDynamicActor);
+	pMaterial->release();
+	return pDynamicActor;
+}
+
 HRESULT CModel::CreateStaticActors_Exclude(unordered_set<string>& _setNonColMesh, _float4x4& matWorld)
 {
 	for (auto& mesh : m_Meshes)

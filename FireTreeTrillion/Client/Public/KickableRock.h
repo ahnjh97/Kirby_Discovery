@@ -33,6 +33,7 @@ private:
 
 private:
 	CModel*			m_pModelCom = { nullptr };
+	PxRigidDynamic* m_pDynamicActor = { nullptr };
 
 	_float			m_fLifeTime = _float();
 

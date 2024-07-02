@@ -70,8 +70,6 @@ _int CStarBlock::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
 	{
-		//m_pModelCom->DisableActors();
-		DisableActors();
 		return Make_Partical();
 	}
 
@@ -354,6 +352,22 @@ void CStarBlock::DisableActors()
 	}
 }
 
+void CStarBlock::ReleaseActors()
+{
+	PxScene* pScene = m_pGameInstance->Get_Scene();
+	for (auto& actor : m_vecStaticActors)
+	{
+		if (nullptr == actor)
+			continue;
+
+		if (nullptr != pScene) {
+			pScene->removeActor(*actor);
+			actor->release();
+			actor = nullptr;
+		}
+	}
+}
+
 _bool CStarBlock::RayCast_Terrain(const _float3 vMoveDir)
 {
 	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
@@ -406,14 +420,7 @@ void CStarBlock::Free()
 {
 	__super::Free();
 
-	for (auto& actor : m_vecStaticActors)
-	{
-		if (nullptr == actor)
-			continue;
-
-		if (actor->isReleasable())
-			actor->release();
-	}
+	//ReleaseActors();
 		
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);

@@ -257,6 +257,7 @@
     <ClInclude Include="..\Public\Laser.h" />
     <ClInclude Include="..\Public\Level_DeeDeeDee.h" />
     <ClInclude Include="..\Public\Level_FinalBoss.h" />
+    <ClInclude Include="..\Public\Level_GamePlay.h" />
     <ClInclude Include="..\Public\Level_Intro.h" />
     <ClInclude Include="..\Public\LevelChanger.h" />
     <ClInclude Include="..\Public\KirbyArmours.h" />
@@ -273,7 +274,6 @@
     <ClInclude Include="..\Public\Kirby_Enums.h" />
     <ClInclude Include="..\Public\Kirby_State_Function.h" />
     <ClInclude Include="..\Public\LayerUI.h" />
-    <ClInclude Include="..\Public\Level_GamePlay.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
     <ClInclude Include="..\Public\Level_Logo.h" />
     <ClInclude Include="..\Public\Level_PartTime.h" />
@@ -431,6 +431,7 @@
     <ClCompile Include="..\Private\Laser.cpp" />
     <ClCompile Include="..\Private\Level_DeeDeeDee.cpp" />
     <ClCompile Include="..\Private\Level_FinalBoss.cpp" />
+    <ClCompile Include="..\Private\Level_GamePlay.cpp" />
     <ClCompile Include="..\Private\Level_Intro.cpp" />
     <ClCompile Include="..\Private\LevelChanger.cpp" />
     <ClCompile Include="..\Private\KirbyArmours.cpp" />
@@ -445,7 +446,6 @@
     <ClCompile Include="..\Private\KirbyDefault_State.cpp" />
     <ClCompile Include="..\Private\KirbyVacuum_State.cpp" />
     <ClCompile Include="..\Private\LayerUI.cpp" />
-    <ClCompile Include="..\Private\Level_GamePlay.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
     <ClCompile Include="..\Private\Level_Logo.cpp" />
     <ClCompile Include="..\Private\Level_PartTime.cpp" />

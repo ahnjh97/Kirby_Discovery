@@ -1767,12 +1767,18 @@ void CKirby::Free()
 
 	__super::Free();
 
-	for (auto& pair : m_mapToppleableBridges)
+	for (auto& pair : m_mapToppleableBridges) {
+		//pair.first->release();
 		Safe_Release(pair.second);
+	}
+	m_mapToppleableBridges.clear();
 
 	for (auto& pair : m_mapStarBoxs)
+	{
+		//pair.first->release();
 		Safe_Release(pair.second);
-
+	}
+	m_mapStarBoxs.clear();
 
 	for (auto& pModelCom : m_pModelCom)
 		Safe_Release(pModelCom);

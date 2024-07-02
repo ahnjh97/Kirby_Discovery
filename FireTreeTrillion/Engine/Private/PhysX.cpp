@@ -201,6 +201,31 @@ void CPhysX::Clear_EventCallBack()
     m_pEventCallBack->Clear_EventCallBack();
 }
 
+void CPhysX::ResetScene()
+{
+    //// 기존 Scene의 모든 Actor를 제거
+    //PxU32 actorCount = m_pScene->getNbActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC);
+    //PxActor** actors = new PxActor * [actorCount];
+    //m_pScene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC, actors, actorCount);
+    //for (PxU32 i = 0; i < actorCount; ++i) {
+    //    m_pScene->removeActor(*actors[i]);
+    //    actors[i]->release();
+    //}
+    //delete[] actors;
+    //Safe_Delete(m_pEventCallBack);
+
+    //// 새로운 Scene 생성
+    //m_pScene->release();
+    //PxSceneDesc sceneDesc(mToleranceScale);
+    //sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
+    //sceneDesc.cpuDispatcher = m_pDispatcher;
+    //sceneDesc.filterShader = PxDefaultSimulationFilterShader;
+    //sceneDesc.broadPhaseType = PxBroadPhaseType::eSAP; // 또는 eMBP
+    //m_pEventCallBack = new CEventCallBack();
+    //sceneDesc.simulationEventCallback = m_pEventCallBack;
+    //m_pScene = m_pPhysics->createScene(sceneDesc);
+}
+
 //physx::PxMaterial* CPhysX::FindMaterial(const string& strMtrlTag)
 //{
 //    //auto itr = m_pMaterials.find(strMtrlTag);
@@ -275,6 +300,12 @@ void CPhysX::Add_Force(_float3 vForce)
     m_pRigidDynamic->addForce(PxForce, physx::PxForceMode::eFORCE);
 }
 
+void CPhysX::Add_Force(PxRigidDynamic* pDynamicActor, _float3 vForce)
+{
+    PxVec3 PxForce = physx::PxVec3(vForce.x, vForce.y, vForce.z);
+    pDynamicActor->addForce(PxForce, physx::PxForceMode::eFORCE);
+}
+
 void CPhysX::Kick_DynamicActor(_float3 _kickDirection, _float impulseMagnitude)
 {
     PxVec3 kickDirection(_kickDirection.x, _kickDirection.y, _kickDirection.z);
@@ -336,6 +367,19 @@ PxRigidStatic* CPhysX::CreateStaticActor(_float4x4& matWorld, _float3* pVertices
     return pStaticActor;
 }
 
+PxConvexMesh* CPhysX::CreateConvexMesh(_float3* pVerticesPos, _uint iNumVertices, PxMaterial* pMaterial)
+{
+    PxCookingParams tParams(mToleranceScale);
+
+    PxConvexMeshDesc meshDesc;
+    meshDesc.points.count = iNumVertices;
+    meshDesc.points.stride = sizeof(PxVec3);
+    meshDesc.points.data = pVerticesPos;
+    meshDesc.flags = PxConvexFlag::eCOMPUTE_CONVEX | PxConvexFlag::eSHIFT_VERTICES;
+
+    return PxCreateConvexMesh(tParams, meshDesc);;
+}
+
 
 CPhysX* CPhysX::Create()
 {
@@ -359,7 +403,8 @@ void CPhysX::Free()
     if(nullptr != m_pShape)
         m_pShape->release();
 
-    m_pControllerManager->release();
+    if(m_pControllerManager != nullptr)
+        m_pControllerManager->release();
 
     Safe_Delete(m_pEventCallBack);
 

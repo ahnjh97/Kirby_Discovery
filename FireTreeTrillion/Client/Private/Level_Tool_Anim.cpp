@@ -120,7 +120,7 @@ CLevel_Tool_Anim * CLevel_Tool_Anim::Create(ID3D11Device* pDevice, ID3D11DeviceC
 
 void CLevel_Tool_Anim::Free()
 {
+	m_pGameInstance->Clear_EventCallBack();
 	__super::Free();
-
 }
 

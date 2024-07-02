@@ -686,6 +686,7 @@ CLevel_FinalBoss* CLevel_FinalBoss::Create(ID3D11Device* pDevice, ID3D11DeviceCo
 
 void CLevel_FinalBoss::Free()
 {
+	m_pGameInstance->Clear_EventCallBack();
 	__super::Free();
 
 }
