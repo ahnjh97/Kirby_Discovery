@@ -12,8 +12,8 @@
         <AnimSpeed>60</AnimSpeed>
         <Count>3</Count>
         <Data0 EventName="Attack" StartFrame="1" EndFrame="2"/>
-        <Data1 EventName="Attack" StartFrame="28" EndFrame="29"/>
-        <Data2 EventName="Attack" StartFrame="60" EndFrame="60"/>
+        <Data1 EventName="Attack" StartFrame="12" EndFrame="12"/>
+        <Data2 EventName="Attack" StartFrame="27" EndFrame="27"/>
         <Animation>ThrustWait</Animation>
         <AnimSpeed>60</AnimSpeed>
         <Count>0</Count>
@@ -32,15 +32,6 @@
         <AnimSpeed>60</AnimSpeed>
         <Count>0</Count>
         <Animation>AttackStart</Animation>
-        <AnimSpeed>60</AnimSpeed>
-        <Count>0</Count>
-        <Animation>TornadoAttack</Animation>
-        <AnimSpeed>60</AnimSpeed>
-        <Count>3</Count>
-        <Data0 EventName="Attack" StartFrame="1" EndFrame="2"/>
-        <Data1 EventName="Attack" StartFrame="12" EndFrame="12"/>
-        <Data2 EventName="Attack" StartFrame="27" EndFrame="27"/>
-        <Animation>TornadoAttackCharge</Animation>
         <AnimSpeed>60</AnimSpeed>
         <Count>0</Count>
     </ModelName>
@@ -114,5 +105,41 @@
         <AnimSpeed>60</AnimSpeed>
         <Count>1</Count>
         <Data0 EventName="ApplyDamage" StartFrame="48" EndFrame="50"/>
+    </ModelName>
+    <ModelName>KirbyHammerDefault
+        <Animation>WheelHammer</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="1" EndFrame="2"/>
+        <Animation>WheelHammer</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="6" EndFrame="7"/>
+        <Animation>HammerAttackFinalRock</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>HammerAttackHitToy</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="1" EndFrame="2"/>
+        <Animation>HammerAttackHit</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>HammerAttackFinalToy</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="30" EndFrame="32"/>
+        <Animation>OnigorosiHammerFirst</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="12" EndFrame="13"/>
+        <Animation>OnigorosiHammerEnd</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="27" EndFrame="28"/>
+        <Animation>OnigorosiHammerFirst</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="10" EndFrame="11"/>
     </ModelName>
 </Root>

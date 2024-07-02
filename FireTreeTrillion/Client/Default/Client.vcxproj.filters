@@ -465,6 +465,9 @@
     </Filter>
     <Filter Include="02.GameObjects\UI\PartTime\Result">
       <UniqueIdentifier>{6bfb944e-4c8c-4592-88d2-10aed3c5b9f4}</UniqueIdentifier>
+	</Filter>
+	<Filter Include="02.GameObjects\PhysXObject\Character\BossMonster\Gully">
+      <UniqueIdentifier>{3e784411-9f95-46ab-b0a1-aa64e4492765}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -942,6 +945,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\UI_PartTimeResult.h">
       <Filter>02.GameObjects\UI\PartTime\Result</Filter>
+	</ClInclude>
+	<ClInclude Include="..\Public\Gully.h">
+      <Filter>02.GameObjects\PhysXObject\Character\BossMonster\Gully</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1400,6 +1406,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\UI_PartTimeResult.cpp">
       <Filter>02.GameObjects\UI\PartTime\Result</Filter>
+	</ClCompile>
+	<ClCompile Include="..\Private\Gully.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\BossMonster\Gully</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

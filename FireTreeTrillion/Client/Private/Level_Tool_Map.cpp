@@ -97,6 +97,7 @@ CLevel_Tool_Map* CLevel_Tool_Map::Create(ID3D11Device* pDevice, ID3D11DeviceCont
 
 void CLevel_Tool_Map::Free()
 {
+	m_pGameInstance->Clear_EventCallBack();
 	__super::Free();
 }
 

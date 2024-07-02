@@ -29,7 +29,10 @@ void CCollisionCenter::Initialize()
 void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 {
 	// 게임 흐름에 있어서 필요한 슬로우 모션을 충돌에 따라 이곳에서 관리한다.
-	Timer_System(fTimeDelta);
+	Dodge_Timer_System(fTimeDelta);
+
+	// 게임 흐름에 있어서 필요한 슬로우 모션을 충돌에 따라 이곳에서 관리한다.
+	Hit_Timer_System(fTimeDelta);
 
 
 	// 게임 흐름에 있어서 필요한 사다리 등 충돌에 따라 Kirby가 작동하도록 이곳에서 관리한다.
@@ -191,6 +194,7 @@ _bool CCollisionCenter::Intersect(CHitBox* Dst, CHitBox* Src)
 
 			CTransform* pConeTransform = Src->Get_TransformCom();
 			_float4 vConeLookDir = pConeTransform->Get_State(CTransform::STATE_LOOK);
+			vConeLookDir.Normalize();
 			_float4 vDir = XMVector3Normalize(vDstPos - vSrcPos);
 
 			// 중점간의 각도를 구하였다.
@@ -271,6 +275,7 @@ _bool CCollisionCenter::Intersect(CHitBox* Dst, CHitBox* Src)
 
 			CTransform* pConeTransform = Src->Get_TransformCom();
 			_float4 vConeLookDir = pConeTransform->Get_State(CTransform::STATE_LOOK);
+			vConeLookDir.Normalize();
 			_float4 vDir = XMVector3Normalize(vDstPos - vSrcPos);
 
 			// 중점간의 각도를 구하였다.
@@ -309,6 +314,7 @@ _bool CCollisionCenter::Intersect(CHitBox* Dst, CHitBox* Src)
 
 			CTransform* pConeTransform = Dst->Get_TransformCom();
 			_float4 vConeLookDir = pConeTransform->Get_State(CTransform::STATE_LOOK);
+			vConeLookDir.Normalize();
 			_float4 vDir = XMVector3Normalize(vSrcPos - vDstPos);
 
 			// 중점간의 각도를 구하였다.
@@ -340,6 +346,7 @@ _bool CCollisionCenter::Intersect(CHitBox* Dst, CHitBox* Src)
 
 			CTransform* pConeTransform = Dst->Get_TransformCom();
 			_float4 vConeLookDir = pConeTransform->Get_State(CTransform::STATE_LOOK);
+			vConeLookDir.Normalize();
 			_float4 vDir = XMVector3Normalize(vSrcPos - vDstPos);
 
 			// 중점간의 각도를 구하였다.
@@ -889,7 +896,25 @@ void CCollisionCenter::Hitbox_Collision()
 			DstHit->Set_Alive(false);
 		});
 
-	// 미 구현
+	// 덜 완료되었음. 다양한 분기 필요 80%
+	Collision_Collider(m_GameObjects[HITBOX_PLYAER], m_GameObjects[OBJECT], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CKirby* pKirby = static_cast<CKirby*>(Dst);
+			CPhysXObject* pObject = static_cast<CPhysXObject*>(Src);
+
+
+			// 몬스터의 CONTENT_ATTACK타입의 Collision함수를 발동시킨다. 정말 세부적인건 이쪽에서 처리된다.
+			pObject->Collision(CONTENT_ATTACK, pKirby);
+			DstHit->Set_Alive(false);
+		});
+
+	// 완벽하게 구현하였음.
 	Collision_Collider(m_GameObjects[HITBOX_MONSTER], m_GameObjects[PLAYER], this,
 		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
 		{
@@ -897,9 +922,36 @@ void CCollisionCenter::Hitbox_Collision()
 			CGameObject* Src = SrcHit->Get_Owner();
 			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
 				return;
-			DstHit->Set_Alive(false);
-			SrcHit->Set_Alive(false);
 
+
+			CKirby* pKirby = static_cast<CKirby*>(Dst);
+			CMonster* pMonster = static_cast<CMonster*>(Src);
+
+			// 커비가 혹시 닷지를 하였는가? 만약 닷지를 했다면 충돌이 발생하지않는다.
+			if (pthis->Kirby_Dodge_SlowMotionSystem(pKirby) == true)
+			{
+				DstHit->Set_Alive(false);
+				SrcHit->Set_Alive(false);
+				return;
+			}
+
+			if (pKirby->isOverPower() == false)
+			{
+				// 넉백방향을 정해주기 위한 과정이다.
+				CTransform* pMonsterTransformCom = pMonster->Get_TransformCom();
+				_vector vMonsterPos = pMonsterTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+				CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
+				_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+				_float4 vDistance = vKirbyPos - vMonsterPos;
+				vDistance.y = 0.f;
+				vDistance.Normalize();
+				_vector vKnockbackDir = vDistance;
+				pthis->Knock_back(pKirby, vKnockbackDir * 1.5f, 7.f);
+				pthis->Compute_HitBoxDamage(pKirby, pMonster);
+				DstHit->Set_Alive(false);
+				SrcHit->Set_Alive(false);
+				pKirby->Collision(CONTENT_ATTACK, pMonster);
+			}
 		});
 
 	// 깔끔하게 완료되었음
@@ -1012,12 +1064,15 @@ _bool CCollisionCenter::Small_KnockBack(_uint uKirbyState)
 	return uKirbyState == CKirby::SWORDSTATE_SIDESLASH ||
 		uKirbyState == CKirby::SWORDSTATE_MULITSWORDATTACK ||
 		uKirbyState == CKirby::SWORDSTATE_GIGANTSPINSLASH ||
-		uKirbyState == CKirby::SWORDSTATE_SUPERSPINSLASHLOOP;
+		uKirbyState == CKirby::SWORDSTATE_SUPERSPINSLASHLOOP ||
+		uKirbyState == CKirby::HAMMERSTATE_HAMMERATTACKHITTOY;
 }
 
 _bool CCollisionCenter::Normal_KnockBack(_uint uKirbyState)
 {
-	return uKirbyState == CKirby::SWORDSTATE_DECISIVESLASH || uKirbyState == CKirby::SWORDSTATE_SWORDSPIN;
+	return uKirbyState == CKirby::SWORDSTATE_DECISIVESLASH || uKirbyState == CKirby::SWORDSTATE_SWORDSPIN ||
+		uKirbyState == CKirby::HAMMERSTATE_HAMMERATTACKFINALTOY || uKirbyState == CKirby::HAMMERSTATE_ONIGOROSIHAMMERFIRST ||
+		uKirbyState == CKirby::HAMMERSTATE_WHEELHAMMER;
 }
 
 _bool CCollisionCenter::Up_KnockBack(_uint uKirbyState)
@@ -1027,12 +1082,12 @@ _bool CCollisionCenter::Up_KnockBack(_uint uKirbyState)
 
 _bool CCollisionCenter::FlyAway_KnockBack(_uint uKirbyState)
 {
-	return false;
+	return uKirbyState == CKirby::HAMMERSTATE_ONIGOROSIHAMMEREND;
 }
 
-void CCollisionCenter::HitStop_Rogic(CKirby* pKirby)
+void CCollisionCenter::HitStop_Rogic(CKirby* pKirby, _float fStopTime)
 {
-	pKirby->Set_HitStop();
+	pKirby->Set_HitStop(fStopTime);
 }
 
 void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObject* pMonster, _float fEffectOffSet)
@@ -1058,7 +1113,6 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		HitStop_Rogic(pKirby);
 		Camera_Shaking(0.7f, 0.5f);
 		SwordHit(pMonsterTransform);
-
 	}
 	break;
 	// SWORD 연속기 2타
@@ -1068,8 +1122,6 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		HitStop_Rogic(pKirby);
 		Camera_Shaking(0.7f, 0.5f);
 		SwordHit(pMonsterTransform);
-
-
 	}
 	break;
 	// SWORD 연속기 3타
@@ -1117,6 +1169,46 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		HitStop_Rogic(pKirby);
 		Camera_Shaking();
 		SwordHit(pMonsterTransform);
+	}
+	break;
+	// 해머 5타 통 애님 (막타)
+	case CKirby::HAMMERSTATE_HAMMERATTACKFINALTOY:
+	{
+		fAttack = 10.f;
+		HitStop_Rogic(pKirby, 0.2f);
+	}
+	break;
+	// 해머 평타
+	case CKirby::HAMMERSTATE_HAMMERATTACKHITTOY:
+	{
+		fAttack = 5.f;
+		HitStop_Rogic(pKirby, 0.06f);
+	}
+	break;
+	// 해머 풀 차징 공격
+	case CKirby::HAMMERSTATE_ONIGOROSIHAMMEREND:
+	{
+		fAttack = 50.f;
+		Hit_TimeStop(0.01f, 0.5f);
+		Camera_Shaking(2.f);
+		CGameInstance::Get_Instance()->Setting_RadialBlur(vKirbyPos, 20.f, 100.f);
+	}
+	break;
+	// 해머 덜 차징 공격
+	case CKirby::HAMMERSTATE_ONIGOROSIHAMMERFIRST:
+	{
+		fAttack = 20.f;
+		Hit_TimeStop(0.01f, 0.3f);
+		Camera_Shaking(1.f);
+		CGameInstance::Get_Instance()->Setting_RadialBlur(vKirbyPos, 20.f, 150.f);
+	}
+	break;
+	// 해머 공중 회전 공격
+	case CKirby::HAMMERSTATE_WHEELHAMMER:
+	{
+		fAttack = 7.f;
+		HitStop_Rogic(pKirby);
+		Camera_Shaking();
 	}
 	break;
 	default:
@@ -1276,7 +1368,7 @@ void CCollisionCenter::Compute_SuperPower(CPhysXObject* pPlayer, CPhysXObject* p
 	// 무적시간을 커비에게 넣어주면 됨.
 }
 
-void CCollisionCenter::Timer_System(_float fTimeDelta)
+void CCollisionCenter::Dodge_Timer_System(_float fTimeDelta)
 {
 	if (m_bCheckTimer == true)
 	{
@@ -1298,6 +1390,30 @@ void CCollisionCenter::Timer_System(_float fTimeDelta)
 			m_fTimeDeltaResetTime = 0.f;
 		}
 
+	}
+}
+
+void CCollisionCenter::Hit_TimeStop(_float fTimeRatio, _float fTime)
+{
+	m_bHitTimeStop = true;
+	m_fHitTimeDeltaMaxResetTime = fTime;
+	GAMEINSTANCE Set_FirstTimerRatio(fTimeRatio);
+	GAMEINSTANCE Set_SecondTimerRatio(fTimeRatio);
+}
+
+void CCollisionCenter::Hit_Timer_System(_float fTimeDelta)
+{
+	if (m_bHitTimeStop == true)
+	{
+		m_fHitTimeDeltaResetTime += fTimeDelta;
+
+		if (m_fHitTimeDeltaResetTime > m_fHitTimeDeltaMaxResetTime)
+		{
+			GAMEINSTANCE Restore_FirstTimer(3.f);
+			GAMEINSTANCE Restore_SecondTimer(3.f);
+			m_fHitTimeDeltaResetTime = 0.f;
+			m_bHitTimeStop = false;
+		}
 	}
 }
 

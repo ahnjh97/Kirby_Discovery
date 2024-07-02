@@ -38,18 +38,18 @@ HRESULT CTunnelRock::Initialize(void* pArg)
 
     m_bHide = true;
 
-    m_fTotalTime = 2.5f;
+    m_fTotalTime = 1.5f;
 
     m_fSamplingFactor = 0.1f;
     m_vRotationAxis = CUtils::Make_Random_Vector(1);
 
-    m_fX = CUtils::Make_RandomFloat(0, 40);
+    m_fX = CUtils::Make_RandomFloat(0, 30);
     _int iRand = CUtils::Make_RandomInt(0, 1);
     if (0 == iRand)
         m_fX *= -1;
 
-    m_fY = CUtils::Make_RandomFloat(20, 30);
-    m_fZ = CUtils::Make_RandomFloat(0, 40);
+    m_fY = CUtils::Make_RandomFloat(15, 40);
+    m_fZ = CUtils::Make_RandomFloat(0, 30);
     _int iRand2 = CUtils::Make_RandomInt(0, 1);
     if (0 == iRand2)
         m_fZ *= -1;
@@ -84,8 +84,14 @@ _int CTunnelRock::Tick(_float fTimeDelta)
     
     m_pTransformCom->Turn(m_vRotationAxis, fTimeDelta * 8.f);
 
-    _float4 vDir = _float4(m_fX * fTimeDelta, m_fY * cos(m_fTime * XM_PI / (m_fTotalTime * 2.f) ) * fTimeDelta, m_fZ * fTimeDelta, 0);
+    //m_fY = m_fY * cos(m_fTime * XM_PI / (m_fTotalTime * 2.f)) * fTimeDelta
+    m_fY -= m_fTime * GRAVITY * 0.3;
+
+    _float4 vDir = _float4(m_fX * fTimeDelta, m_fY * fTimeDelta, m_fZ * fTimeDelta, 0);
     m_pTransformCom->Move(vDir);
+
+    _float fScale = 1.f - (m_fTime / m_fTotalTime);
+    m_pTransformCom->Set_Scaled(fScale, fScale, fScale);
 
     return OBJ_NOEVENT;
 }

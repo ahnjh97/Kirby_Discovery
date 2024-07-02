@@ -64,7 +64,10 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// 디버깅 용
-	//m_eAbilityType = ABILITY_HAMMER;
+	m_eAbilityType = ABILITY_HAMMER;
+
+	// 커비의 상태에 따라, 애니메이션이 시작된다.
+	Kirby_StateInitialize();
 
 	m_pControllerCom->RegisterAsPlayer();
 	Set_WeaponAnim(3);
@@ -124,10 +127,6 @@ void CKirby::Late_Tick(_float fTimeDelta)
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND,	 this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW,		 this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_DEFERREDINFO, this);
-
-	//if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
-	//{
-	//}
 }
 
 HRESULT CKirby::Render()
@@ -195,7 +194,7 @@ void CKirby::Render_IMGUI()
 	}
 
 	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-	ImGui::Text("m_fDumpAbilityTime : %.2f", INFO(m_fDumpAbilityTime));
+	ImGui::Text("m_isKirbyAttacking(overpower) : %d", m_isKirbyAttacking);
 	ImGui::Text("m_bisDeforming : %d", INFO(m_bisDeforming));
 	ImGui::Text("m_bBlockOtherVacuum : %d", INFO(m_bBlockOtherVacuum));
 	ImGui::Text("m_vLadderPoint.x : %.2f, m_vLadderPoint.y : %.2f m_vLadderPoint.z : %.2f", INFO(m_vLadderPoint).x, INFO(m_vLadderPoint).y, INFO(m_vLadderPoint).z);
@@ -256,9 +255,13 @@ void CKirby::Add_AnimEvent()
 		// 커비의 히트박스를 실시간으로 변화시킨다.
 		HitBoxChanger(m_pFSM->Get_State());
 		});
-	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("StopDamage", [this]() {
 
+	m_pModelCom[BODY_HAMMER]->Add_Event("ApplyDamage", [this]() {
+		// 커비의 히트박스를 실시간으로 변화시킨다.
+		HitBoxChanger(m_pFSM->Get_State());
 		});
+
+
 
 	// 사운드 처리
 
@@ -289,7 +292,6 @@ void CKirby::Add_AnimEvent()
 		});
 
 #pragma endregion
-
 
 #pragma region CHARGE
 
@@ -485,7 +487,9 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 			if ((Get_State() == STATE_IDLE || 
 				Get_State() == STATE_RUN || 
 				Get_State() == SWORDSTATE_RUN || 
-				Get_State() == SWORDSTATE_WAIT) 
+				Get_State() == SWORDSTATE_WAIT ||
+				Get_State() == HAMMERSTATE_IDLE ||
+				Get_State() == HAMMERSTATE_RUN)
 				== false
 				)
 				return;
@@ -739,7 +743,7 @@ void CKirby::Key_Input(_float fTimeDelta)
 	//특정 레벨에서 덤프할 경우 크래시 발생으로 예외 처리
 	//디버깅이 필요할 경우 레벨 별 조건 처리하면 됨
 	LEVEL eCurLevel = (LEVEL)*m_pGameInstance->Get_CurrentLevelID();
-	if (LEVEL_RACING == eCurLevel)
+	if (LEVEL_RACING == eCurLevel || LEVEL_GAMEPLAY == eCurLevel)
 	{
 		if (m_pGameInstance->Get_DIKeyState(DIK_B, KEY_DOWN))
 		{
@@ -1321,10 +1325,29 @@ void CKirby::HitBoxChanger(_uint eState)
 	case SWORDSTATE_UPWARDSLASH:
 		Activate_FrustumCollider(0.5f, 5.f, 90.f);
 		break;
+	// 해머 5타 통 애님 (막타)
+	case HAMMERSTATE_HAMMERATTACKFINALTOY:
+		Activate_FrustumCollider(0.5f, 5.f, 180.f);
+		break;
+	// 평타
+	case HAMMERSTATE_HAMMERATTACKHITTOY:
+		Activate_FrustumCollider(0.5f, 5.f, 180.f);
+		break;
+	// 해머 풀 차징 공격
+	case HAMMERSTATE_ONIGOROSIHAMMEREND:
+		Activate_FrustumCollider(0.5f, 6.f, 180.f);
+		break;
+	// 해머 덜 차징 공격
+	case HAMMERSTATE_ONIGOROSIHAMMERFIRST:
+		Activate_FrustumCollider(0.5f, 6.f, 180.f);
+		break;
+	// 해머 공중 회전 공격
+	case HAMMERSTATE_WHEELHAMMER:
+		Activate_SphereCollider(0.5f, 5.f);
+		break;
 	default:
 		break;
 	}
-
 	m_isKirbyAttacking = true;
 }
 
@@ -1547,7 +1570,7 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 	{
 		// 타임델타를 누적받고
 		m_fIsAttackTime += fTimeDelta;
-		if (m_fIsAttackTime > 0.3f)
+		if (m_fIsAttackTime > 0.5f)
 		{
 			m_fIsAttackTime = 0.f;
 			m_isKirbyAttacking = false;
@@ -1567,7 +1590,8 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 	if (INFO(m_bDumpAbilityPress) == true &&
 		(m_pFSM->Get_State() == CKirby::STATE_IDLE || m_pFSM->Get_State() == CKirby::STATE_RUN ||
 			m_pFSM->Get_State() == CKirby::STATE_RUNSTART || m_pFSM->Get_State() == CKirby::SWORDSTATE_RUN ||
-			m_pFSM->Get_State() == CKirby::SWORDSTATE_WAIT || m_pFSM->Get_State() == CKirby::CARSTATE_IDLING) == false)
+			m_pFSM->Get_State() == CKirby::SWORDSTATE_WAIT || m_pFSM->Get_State() == CKirby::CARSTATE_IDLING ||
+			m_pFSM->Get_State() == CKirby::HAMMERSTATE_IDLE || m_pFSM->Get_State() == CKirby::HAMMERSTATE_RUN) == false)
 		INFO(m_bDumpAbilityPress) = false;
 
 
@@ -1591,8 +1615,6 @@ HRESULT CKirby::Kirby_SystemInitialize()
 	INFO(m_eBodyState) = BODY_DEFAULT;
 	INFO(m_eMouthState) = MOUTH_IDLE;
 	INFO(m_eEyeState) = EYE_IDLE;
-	m_pModelCom[INFO(m_eBodyState)]->Set_Animation(STATE_IDLE, 60.f, true, true);
-
 
 	// 커비가 레벨별로 시작할 때, 바라보는 방향을 정해준다.
 	Kirby_LookInitialize();
@@ -1605,20 +1627,17 @@ HRESULT CKirby::Kirby_SystemInitialize()
 	m_fAttack = 5.f; // 고정
 
 
-	// 임시 // 
+	// 임시로 능력 디폴트 화
 	if (*m_pCurrentLevelID == LEVEL_INTRO)
 	{
 		m_fHp = 100.f; // 기존 사용하던 HP입니다.
 		m_fMaxHp = 100.f;
 		m_eAbilityType = ABILITY_DEFAULT;
-		Change_State(STATE_IDLE, 60.f, true, false, BODY_DEFAULT);
 	}
 	if (*m_pCurrentLevelID == LEVEL_RACING)
 	{
 		m_eAbilityType = ABILITY_DEFAULT;
-		Change_State(CARSTATE_IDLING, 60.f, true, false, BODY_CARDEFAULT, OFFSET_CAR);
 		m_pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FIRST, _float3{0.f, 0.f, 1.f}, 5.f);
-
 	}
 	else
 	{
@@ -1626,8 +1645,6 @@ HRESULT CKirby::Kirby_SystemInitialize()
 		m_fMaxHp = 100.f;
 		m_eAbilityType = ABILITY_DEFAULT;
 	}
-
-
 
 	// 폭탄 궤적을 만들어 놓는다.
 	Ready_BombOrbit();
@@ -1661,6 +1678,37 @@ void CKirby::Kirby_LookInitialize()
 		// 카메라를 정면으로 바라봄
 		INFO(m_vTargetDir) = INFO(m_vMoveDir) = -1.f * fCameraLook;
 	}
+}
+
+void CKirby::Kirby_StateInitialize()
+{
+	// 차 폼일 경우
+	if (INFO(m_eBodyState) == BODY_CARDEFAULT)
+	{
+		Change_State(CARSTATE_IDLING, 60.f, true, true, BODY_CARDEFAULT, OFFSET_CAR);
+		m_pModelCom[BODY_CARDEFAULT]->Set_Animation(14, 60.f, true, true);
+	}
+	else if (m_eAbilityType == ABILITY_SWORD)
+	{
+		Change_State(SWORDSTATE_WAIT, 60.f, true, true, BODY_SWORDDEFAULT, OFFSET_SWORD);
+		m_pModelCom[BODY_SWORDDEFAULT]->Set_Animation(29, 60.f, true, true);
+	}
+	else if (m_eAbilityType == ABILITY_BOMB)
+	{
+		Change_State(STATE_IDLE, 60.f, true, true, BODY_DEFAULT);
+		m_pModelCom[BODY_DEFAULT]->Set_Animation(STATE_IDLE, 60.f, true, true);
+	}
+	else if (m_eAbilityType == ABILITY_HAMMER)
+	{
+		Change_State(HAMMERSTATE_IDLE, 60.f, true, true, BODY_HAMMER, OFFSET_HAMMER);
+		m_pModelCom[BODY_HAMMER]->Set_Animation(42, 60.f, true, true);
+	}
+	else if (m_eAbilityType == ABILITY_DEFAULT)
+	{
+		Change_State(STATE_IDLE, 60.f, true, true, BODY_DEFAULT);
+		m_pModelCom[BODY_DEFAULT]->Set_Animation(STATE_IDLE, 60.f, true, true);
+	}
+
 }
 
 CGameObject* CKirby::FindToppleableBridge(PxRigidActor* pActor)

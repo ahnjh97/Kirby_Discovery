@@ -85,6 +85,7 @@
 #include "DimensionGate.h"
 #include "Meteor.h"
 #include "BossClone.h"
+#include "Gully.h"
 
 // 보스
 #include "DeeDeeDee.h"
@@ -349,6 +350,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DimensionGate"), CDimensionGate);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Meteor"), CMeteor);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BossClone"), CBossClone);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gully"), CGully);
 
 	//Dee
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeePart"), CDee_Part);
@@ -1205,7 +1207,10 @@ HRESULT CLoader::Add_FXTexture()
 	hr = Add_Texture(LEVEL_STATIC, "FX_VacuumDGB", "Effects/Basic/twinkle02.png");	CHECK_FAILED(hr);
 
 	hr = Add_Texture(LEVEL_STATIC, "FX_Wind", "Effects/Basic/wind_%d.png", 2);	CHECK_FAILED(hr);
-	hr = Add_Texture(LEVEL_STATIC, "FX_Shockwave", "Effects/Basic/shockwave_%d.png", 1);	CHECK_FAILED(hr);
+
+	hr = Add_Texture(LEVEL_STATIC, "FX_Scroll", "Effects/Basic/scroll_%d.png", 3);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Shockwave", "Effects/Basic/shockwave_%d.png", 5);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Swing", "Effects/Basic/swing_%d.png", 1);	CHECK_FAILED(hr);
 
 	//칼
 	hr = Add_Texture(LEVEL_STATIC, "FX_SwordSlash", "Effects/Sword/slash_%d.png", 6);	CHECK_FAILED(hr);
@@ -1288,6 +1293,11 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("SwordSlash_hrzt", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("UpwardSlash", TYPE_NONANIM);
 
+		//토루스
+		m_vecModelInfo.emplace_back("Torus", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("TorusHalf", TYPE_NONANIM);
+
+
 	}
 	else if (eLevel == LEVEL_LOGO)
 	{
@@ -1304,19 +1314,16 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		// For Kirby Armour
 		Load_KirbyArmourModels();
 
-
 		m_vecModelInfo.emplace_back("Level0Stage1Step01", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"), true);
 		m_vecModelInfo.emplace_back("Level0Stage1Step01_Blend", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("BG0", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-
 
 		// 자동차 관련 (자동차와 부수는 돌멩이들)
 		m_vecModelInfo.emplace_back("Car", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("RockA", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("RockB", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("RockPartical", TYPE_NONANIM, 1.f);
-
 
 		// For Monster
 		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.2f, 180.f);
@@ -1345,11 +1352,12 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("StarBlockS", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("StarBlockM", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("StarBlockL", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("StarBlockPiece", TYPE_NONANIM, 0.5f, 180.f);
+		m_vecModelInfo.emplace_back("StarBlockPieceStar", TYPE_NONANIM, 0.5f, 180.f);
 		m_vecModelInfo.emplace_back("Ladder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 		// For Item
 		Load_ItemModels();
-
 
 		// For Interaction Decor
 		m_vecModelInfo.emplace_back("WoodParts", TYPE_ANIM, 1.f, 0.f, 0, string("MapDeco/"));
@@ -1576,7 +1584,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		m_vecModelInfo.emplace_back("Kirby", TYPE_ANIM, 1.f, 180.f);
 
-
 		// For Kirby Body
 		Load_KirbyBodyModels();
 		// For Kirby Weapon
@@ -1590,8 +1597,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("RayArrow", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("DimensionLaser", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("DimensionGateL", TYPE_ANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("BigDebris", TYPE_NONANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("BigDebris", TYPE_NONANIM, 0.8f, 180.f);
 		m_vecModelInfo.emplace_back("SmallDebris", TYPE_NONANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("MoundPiece", TYPE_NONANIM, 0.1f, 180.f);
 	}
 	else if (eLevel == LEVEL_GAMEPLAY)
 	{
@@ -1605,6 +1613,12 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		Load_KirbyWeaponModels();
 		// For Kirby Armour
 		Load_KirbyArmourModels();
+
+		// 자동차 관련 (자동차와 부수는 돌멩이들) :: 디버깅용으로 추가
+		m_vecModelInfo.emplace_back("Car", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("RockA", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("RockB", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("RockPartical", TYPE_NONANIM, 1.f);
 
 		m_vecModelInfo.emplace_back("GsBenchAL", TYPE_NONANIM, 1.f, 0.f, 0, string("MapDeco/"));
 		m_vecModelInfo.emplace_back("Level1Stage1Step01", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"), true);
@@ -1970,6 +1984,7 @@ void CLoader::Load_ItemModels()
 	// For AbilityItemModels
 	m_vecModelInfo.emplace_back("Item_Sword", TYPE_NONANIM, 1.f, 0.f);
 	m_vecModelInfo.emplace_back("Item_Bomb", TYPE_NONANIM, 1.f, 0.f);
+	m_vecModelInfo.emplace_back("Item_Hammer", TYPE_NONANIM, 1.f, 0.f);
 }
 
 void CLoader::Load_KirbyBodyModels()
