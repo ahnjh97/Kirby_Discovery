@@ -53,7 +53,7 @@ HRESULT CStarBlock::Initialize(void* pArg)
 	{
 		for (auto& actor : m_vecStaticActors)
 			pKirby->RegisterActorsToPlayer_ForStarBox(actor, this);
-	}*/
+	}
 
 
 	//vector<PxRigidActor*> vecActors = m_pModelCom->Get_Actors();
@@ -420,8 +420,9 @@ void CStarBlock::Free()
 {
 	__super::Free();
 
-	//ReleaseActors();
-		
+
+	ReleaseActors();
+
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 }
