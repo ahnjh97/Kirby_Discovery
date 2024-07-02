@@ -1060,6 +1060,65 @@ void CGameInstance::ResetScene()
 		m_pPhysx->ResetScene();
 }
 
+_float4x4 CGameInstance::GetActorAverageMatrix(PxRigidActor* pActor)
+{
+	_vector vTotalTranslation = XMVectorZero();
+	_vector vTotalRotation = XMVectorZero();
+	_vector vTotalScale = XMVectorZero();
+
+	PxU32 numShapes = pActor->getNbShapes();
+	vector<PxShape*> vecShapes(numShapes);
+	pActor->getShapes(vecShapes.data(), numShapes);
+
+	for (PxShape* shape : vecShapes) {
+		PxMat44 pos(PxShapeExt::getGlobalPose(*shape, *pActor));
+		_matrix matWorld = CUtils::To_Float4x4(pos);
+		_vector translation, rotation, scale;
+		XMMatrixDecompose(&scale, &rotation, &translation, matWorld);
+
+		vTotalTranslation += translation;
+		vTotalRotation += rotation;
+		vTotalScale += scale;
+	}
+
+	_int iCount = vecShapes.size();
+	_vector avgTranslation = vTotalTranslation / static_cast<float>(iCount);
+	_vector avgRotation = vTotalRotation / static_cast<float>(iCount);
+	_vector avgScale = vTotalScale / static_cast<float>(iCount);
+
+	_matrix matAverage = XMMatrixAffineTransformation(avgScale, XMVectorZero(), avgRotation, avgTranslation);
+	_float4x4 matResult{};
+	XMStoreFloat4x4(&matResult, matAverage);
+
+	return matResult;
+}
+
+void CGameInstance::DisableActor(PxActor* pActor)
+{
+	if (nullptr == pActor)
+		return;
+
+	PxScene* pScene = Get_Scene();
+	if (nullptr == pScene)
+		return;
+
+	pScene->removeActor(*pActor);
+}
+
+void CGameInstance::ReleaseActor(PxActor* pActor)
+{
+	if (nullptr == pActor)
+		return;
+
+	PxScene* pScene = Get_Scene();
+	if (nullptr == pScene)
+		return;
+
+	pScene->removeActor(*pActor);
+	pActor->release();
+	pActor = nullptr;
+}
+
 void CGameInstance::Transform_PickingToLocalSpace(const CTransform* pTransform, _float3* pRayDir, _float3* pRayPos)
 {
 	if (nullptr == m_pPicking)

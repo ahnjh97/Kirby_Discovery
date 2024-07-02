@@ -70,6 +70,9 @@ _int CStarBlock::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
 	{
+		for (auto& actor : m_vecStaticActors)
+			m_pGameInstance->DisableActor(actor);
+
 		return Make_Partical();
 	}
 
@@ -80,8 +83,9 @@ _int CStarBlock::Tick(_float fTimeDelta)
 
 	if (m_ePhyXState == PO_VACUUMING && m_bStaticOffTrigger == true)
 	{
-		//m_pModelCom->DisableActors();
-		DisableActors();
+		for (auto& actor : m_vecStaticActors)
+			m_pGameInstance->DisableActor(actor);
+
 		m_bStaticOffTrigger = false;
 	}
 
@@ -209,7 +213,8 @@ void CStarBlock::Break_From_Car()
 		pKirby->Set_HitStop();
 	m_pGameInstance->Setting_RadialBlur(10.f, 10.f);
 
-	DisableActors();
+	for (auto& actor : m_vecStaticActors)
+		m_pGameInstance->DisableActor(actor);
 
 	m_bDead = true;
 }
@@ -339,35 +344,6 @@ void CStarBlock::Compute_MotionBlur()
 	m_vPreScreenPos = vCurScreenPos;
 }
 
-void CStarBlock::DisableActors()
-{
-	PxScene* pScene = m_pGameInstance->Get_Scene();
-
-	for (auto& actor : m_vecStaticActors)
-	{
-		if (nullptr == actor)
-			continue;
-
-		pScene->removeActor(*actor);
-	}
-}
-
-void CStarBlock::ReleaseActors()
-{
-	PxScene* pScene = m_pGameInstance->Get_Scene();
-	for (auto& actor : m_vecStaticActors)
-	{
-		if (nullptr == actor)
-			continue;
-
-		if (nullptr != pScene) {
-			pScene->removeActor(*actor);
-			actor->release();
-			actor = nullptr;
-		}
-	}
-}
-
 _bool CStarBlock::RayCast_Terrain(const _float3 vMoveDir)
 {
 	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
@@ -420,8 +396,9 @@ void CStarBlock::Free()
 {
 	__super::Free();
 
-
-	ReleaseActors();
+	for (auto& actor : m_vecStaticActors)
+		m_pGameInstance->ReleaseActor(actor);
+	m_vecStaticActors.clear();
 
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);

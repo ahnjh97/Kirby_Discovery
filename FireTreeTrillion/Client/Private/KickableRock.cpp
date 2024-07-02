@@ -31,17 +31,33 @@ HRESULT CKickableRock::Initialize(void* pArg)
 		Add_Components(pGameObjectDesc->wstrModelName);
 
 	m_eAbilityType = ABILITY_DEFAULT;
-	m_bMotionBlur = true;
+	m_bMotionBlur = false;
 	m_bRimLight = true;
 	m_bStencil = true;
 
 	m_pDynamicActor = m_pModelCom->ReturnDynamicActor(m_pTransformCom->Get_WorldFloat4x4());
-	
-	//PxRigidActor* pActor;
-	//const PxU32 bufferSize = 128;  // Shape를 저장할 버퍼 크기
-	//PxShape* shapeBuffer[bufferSize];  // Shape 포인터 배열
-	//pActor->getShapes(shapeBuffer, bufferSize);
-	//m_pModelCom->CreateDynamicActor(m_pTransformCom->Get_WorldFloat4x4());
+	m_pDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+
+	string strModelName = CUtils::WstrToStr(pGameObjectDesc->wstrModelName);
+
+	m_mapPowers = {
+		{"SeShell", 10.f},
+		{"GsPebble", 25.f},
+		{"WasteCanYellow", 80.f},
+		{"GsRubbleA", 20.f},
+		{"GsRubbleB", 60.f},
+		{"GsRubbleC", 60.f},
+		{"GsRubbleC", 60.f},
+		{"GsTireAL", 140.f},
+		{"GsTireBL", 140.f},
+		{"GsTireCL", 90.f}
+	};
+
+	auto mapIter = m_mapPowers.find(strModelName);
+	if (m_mapPowers.end() != mapIter)
+		m_fPower = mapIter->second;
+	else
+		m_fPower = 50.f;
 
 	return S_OK;
 }
@@ -109,6 +125,13 @@ void CKickableRock::Late_Tick(_float fTimeDelta)
 	{
 		// 커비에게 빨려들어가지 않게 END로 한다.
 		m_ePhyXState = PO_END;
+		if (nullptr != m_pDynamicActor) {
+			m_pTransformCom->Set_WorldMatrix(m_pGameInstance->GetActorAverageMatrix(m_pDynamicActor));
+
+			PxVec3 PxForce = PxVec3(0.f, -0.5f, 0.f);
+			m_pDynamicActor->addForce(PxForce, PxForceMode::eFORCE);
+		}
+		
 		/*m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
 		m_pRigidBodyCom->Add_Force(_float3(0.f, -0.5f, 0.f));*/
 
@@ -198,6 +221,19 @@ void CKickableRock::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObj
 			vDir.y += 1.f;
 			vDir.Normalize();
 			_float3 force = vDir;
+			force = XMVector3Normalize(force);
+			PxVec3 kickDirection(force.x, force.y, force.z);
+
+			PxVec3 impulse = kickDirection * m_fPower;
+
+			m_pDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, false);
+			m_pDynamicActor->addForce(impulse, PxForceMode::eIMPULSE);
+
+			_float fMin = 0.2f;
+			_float fMax = 0.8f;
+			PxVec3 PxTorque = PxVec3(CUtils::Make_RandomFloat(fMin, fMax), CUtils::Make_RandomFloat(fMin, fMax)
+				, CUtils::Make_RandomFloat(fMin, fMax));
+			m_pDynamicActor->addTorque(PxTorque, PxForceMode::eIMPULSE);
 			//m_pRigidBodyCom->Kick_RigidBody(XMVector3Normalize(force), 480.f);
 
 			// 힘이 한번만 작용되게 한다.
@@ -353,15 +389,7 @@ void CKickableRock::Free()
 {
 	__super::Free();
 
-	if (nullptr != m_pDynamicActor)
-	{
-		PxScene* pScene = m_pGameInstance->Get_Scene();
-		if (nullptr != pScene) {
-			pScene->removeActor(*m_pDynamicActor);
-			m_pDynamicActor->release();
-			m_pDynamicActor = nullptr;
-		}
-	}
+	m_pGameInstance->ReleaseActor(m_pDynamicActor);
 
 	Safe_Release(m_pRigidBodyCom);
 	Safe_Release(m_pModelCom);

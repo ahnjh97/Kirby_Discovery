@@ -196,7 +196,8 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		"Item_Meat", "Item_Omelet", "Item_Onigiri", "Item_RedCoin", "Item_Steak", "Item_Sushi" };
 
 	m_setTrees = { "GsTreeA", "GsTreeB", "GsTreeC", "DsPalmABottomL", "DsPalmAMiddleL", "DsPalmATopL", "DsPalmBL", "DsPalmCL"
-		, "GsFlowerBedTreeAL", "GsFlowerBedTreeBL", "GsIvyGroundMiddlePlus", "GsIvyB", "JgGrasslongB" };
+		, "GsFlowerBedTreeAL", "GsFlowerBedTreeBL", "GsIvyGroundMiddlePlus", "GsIvyB", "JgGrasslongB"
+		, "GsCarSteelPartsAL", "GsScrappedCar", "GsCarHoistCrane01L", "CvSteelPartsDL" };
 
 	//블렌드 적용이 필요한 데코오브젝트
 	m_setBlendDecos = {"LbOutBuildingWallL", "LbOutBuildingFenceL", "GsCarFloor" };

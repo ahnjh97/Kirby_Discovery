@@ -207,6 +207,10 @@ public: /* For.PhysX */
 	void Clear_EventCallBack();
 	void ResetScene();
 
+	_float4x4 GetActorAverageMatrix(PxRigidActor* pActor);
+	void DisableActor(PxActor* pActor);
+	void ReleaseActor(PxActor* pActor);
+
 public: /* For. Picking */
 	void Transform_PickingToLocalSpace(const class CTransform* pTransform, _Out_ _float3* pRayDir, _Out_ _float3* pRayPos);
 	_float2 Get_MouseViewPortPos();

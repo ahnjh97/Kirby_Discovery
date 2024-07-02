@@ -361,6 +361,8 @@ PxRigidDynamic* CModel::ReturnDynamicActor(_float4x4& matWorld)
 	PxRigidDynamic* pDynamicActor = pPhysics->createRigidDynamic(pxTransform);
 	PxMaterial* pMaterial = pPhysics->createMaterial(0.5f, 0.5f, 0.6f);
 
+	_float fDensity = 10.f;
+
 	for (auto& mesh : m_Meshes)
 	{
 		PxConvexMesh* pConvexMesh = mesh->CreateConvexMesh();
@@ -368,13 +370,20 @@ PxRigidDynamic* CModel::ReturnDynamicActor(_float4x4& matWorld)
 			continue;
 		PxConvexMeshGeometry meshGeometry(pConvexMesh, meshScale, meshFlags);
 		PxShape* pShape = pPhysics->createShape(meshGeometry, *pMaterial);
+		pShape->setSimulationFilterData(PxFilterData{ 10, 0, 0, 0 });
+		pShape->setQueryFilterData(PxFilterData{ 10, 0, 0, 0 });
+		pShape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);
+		pShape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, true);
+		pShape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, false);
 		pDynamicActor->attachShape(*pShape);
+		pDynamicActor->setAngularDamping(0.2f); // °¨¼è ¼³Á¤
 		pShape->release();
 		pConvexMesh->release();
 	}
 	
 	PxScene* pScene = m_pGameInstance->Get_Scene();
 	pScene->addActor(*pDynamicActor);
+	PxRigidBodyExt::updateMassAndInertia(*pDynamicActor, fDensity);
 	pMaterial->release();
 	return pDynamicActor;
 }
