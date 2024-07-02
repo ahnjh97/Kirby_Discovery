@@ -194,6 +194,7 @@ _bool CCollisionCenter::Intersect(CHitBox* Dst, CHitBox* Src)
 
 			CTransform* pConeTransform = Src->Get_TransformCom();
 			_float4 vConeLookDir = pConeTransform->Get_State(CTransform::STATE_LOOK);
+			vConeLookDir.Normalize();
 			_float4 vDir = XMVector3Normalize(vDstPos - vSrcPos);
 
 			// 중점간의 각도를 구하였다.
@@ -274,6 +275,7 @@ _bool CCollisionCenter::Intersect(CHitBox* Dst, CHitBox* Src)
 
 			CTransform* pConeTransform = Src->Get_TransformCom();
 			_float4 vConeLookDir = pConeTransform->Get_State(CTransform::STATE_LOOK);
+			vConeLookDir.Normalize();
 			_float4 vDir = XMVector3Normalize(vDstPos - vSrcPos);
 
 			// 중점간의 각도를 구하였다.
@@ -312,6 +314,7 @@ _bool CCollisionCenter::Intersect(CHitBox* Dst, CHitBox* Src)
 
 			CTransform* pConeTransform = Dst->Get_TransformCom();
 			_float4 vConeLookDir = pConeTransform->Get_State(CTransform::STATE_LOOK);
+			vConeLookDir.Normalize();
 			_float4 vDir = XMVector3Normalize(vSrcPos - vDstPos);
 
 			// 중점간의 각도를 구하였다.
@@ -343,6 +346,7 @@ _bool CCollisionCenter::Intersect(CHitBox* Dst, CHitBox* Src)
 
 			CTransform* pConeTransform = Dst->Get_TransformCom();
 			_float4 vConeLookDir = pConeTransform->Get_State(CTransform::STATE_LOOK);
+			vConeLookDir.Normalize();
 			_float4 vDir = XMVector3Normalize(vSrcPos - vDstPos);
 
 			// 중점간의 각도를 구하였다.
