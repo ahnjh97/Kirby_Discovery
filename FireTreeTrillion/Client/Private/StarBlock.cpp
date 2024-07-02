@@ -47,12 +47,12 @@ HRESULT CStarBlock::Initialize(void* pArg)
 	if (FAILED(m_pModelCom->CreateStaticActor(m_pTransformCom->Get_WorldFloat4x4())))
 		return E_FAIL;
 
-	vector<PxRigidActor*> vecActors = m_pModelCom->Get_Actors();
+	/*vector<PxRigidActor*> vecActors = m_pModelCom->Get_Actors();
 	if (pKirby != nullptr)
 	{
 		for (auto& actor : vecActors)
 			pKirby->RegisterActorsToPlayer_ForStarBox(actor, this);
-	}
+	}*/
 
 	return S_OK;
 }
@@ -381,6 +381,7 @@ void CStarBlock::Free()
 {
 	__super::Free();
 
+	//m_pModelCom->DisableActors();
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 }
