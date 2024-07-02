@@ -2407,8 +2407,29 @@ HRESULT CFXToolDirector::Ready_FXPrototypeVector()
 	Ready_Ingredient(TEXT("Texture_FX"), &m_FXTexList, pStaticProtoMap);
 	Ready_Ingredient(TEXT("Texture_FX"), &m_FXMaskTexList, pStaticProtoMap);
 
+
+
 	Ready_Ingredient(TEXT("VIBuffer_Rect"), &m_FXBufferList, pStaticProtoMap);
-	Ready_Ingredient(TEXT("Model"), &m_FXBufferList, pStaticProtoMap);
+
+	wstring strModelTag = TEXT("Model_");
+
+	Ready_Ingredient(strModelTag + L"BushCutM", &m_FXBufferList, pStaticProtoMap);
+
+	Ready_Ingredient(strModelTag + L"Cylinder", &m_FXBufferList, pStaticProtoMap);
+
+	Ready_Ingredient(strModelTag + L"Dash", &m_FXBufferList, pStaticProtoMap);
+	Ready_Ingredient(strModelTag + L"Torus", &m_FXBufferList, pStaticProtoMap);
+
+	Ready_Ingredient(strModelTag + L"Smoke", &m_FXBufferList, pStaticProtoMap);
+
+	Ready_Ingredient(strModelTag + L"Sword", &m_FXBufferList, pStaticProtoMap);
+	Ready_Ingredient(strModelTag + L"UpwardSlash", &m_FXBufferList, pStaticProtoMap);
+
+	Ready_Ingredient(strModelTag + L"Tornado", &m_FXBufferList, pStaticProtoMap);
+	Ready_Ingredient(strModelTag + L"Vacuum", &m_FXBufferList, pStaticProtoMap);
+
+	Ready_Ingredient(strModelTag + L"FX", &m_FXBufferList, pStaticProtoMap);
+
 
 	return S_OK;
 }

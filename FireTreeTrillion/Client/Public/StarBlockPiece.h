@@ -11,10 +11,11 @@ BEGIN(Client)
 class CStarBlockPiece final : public CRigidObject
 {
 public:
-	struct PIECE_DESC
+	struct PIECE_DESC : public GAMEOBJECT_DESC
 	{
-		_float4		vInitialPos;
-		_float3		vDir;
+		_float3		vMoveDir;
+		_float		fPower;
+		_float		fSize;
 	};
 
 private:
@@ -32,17 +33,21 @@ public:
 #ifdef _DEBUG
 	virtual void	Render_IMGUI()								override;
 #endif
-	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
 private:
-	HRESULT			Add_Components();
+	HRESULT			Add_Components(_float fSize);
 	HRESULT			Bind_ShaderResources();
 
 private:
-	CModel*			m_pModelCom = nullptr;
+	CModel* m_pModelCom = { nullptr };
 	_float			m_fLifeTime = _float();
-	_float			m_fLifeTimeMax = _float();
-	_float			m_fTurnSpeed = _float();
+	_float			m_fLifeMaxTime = { 0.f };
+
+	_float			m_fScale = { 0.f };
+
+	void			Compute_MotionBlur();
+	_float2			m_vPreScreenPos = { 0.f, 0.f };
+	_float4			m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
 
 public:
 	static CStarBlockPiece*	 Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

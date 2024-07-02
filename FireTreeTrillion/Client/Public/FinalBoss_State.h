@@ -155,7 +155,7 @@ public:
 
 private:
 	_float	m_fTimeDelta = { 0.f };
-
+	_bool	m_bChain = { false };
 public:
 	static	CFinalBoss_Slash_State* Create();
 	virtual void Free() override;
@@ -163,13 +163,13 @@ public:
 
 
 //*********************************
-//			SLASHEND STATE
+//			Chain STATE
 //*********************************
-class CFinalBoss_SlashEnd_State final : public CFSM_State
+class CFinalBoss_Chain_State final : public CFSM_State
 {
 private:
-	CFinalBoss_SlashEnd_State();
-	virtual ~CFinalBoss_SlashEnd_State() = default;
+	CFinalBoss_Chain_State();
+	virtual ~CFinalBoss_Chain_State() = default;
 
 public:
 	// 상태 진입했을 때 처음만 호출
@@ -182,7 +182,7 @@ private:
 	_float	m_fTimeDelta = { 0.f };
 
 public:
-	static	CFinalBoss_SlashEnd_State* Create();
+	static	CFinalBoss_Chain_State* Create();
 	virtual void Free() override;
 };
 

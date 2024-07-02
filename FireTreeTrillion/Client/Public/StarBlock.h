@@ -34,6 +34,9 @@ private:
 	HRESULT				Add_Components(wstring wstrModelProtoTag);
 	HRESULT				Bind_ShaderResources();
 
+	_int				Make_Partical();
+
+
 	_bool				RayCast_Terrain(const _float3 vMoveDir);
 	void				Compute_MotionBlur();
 	_float2				m_vPreScreenPos = { 0.f, 0.f };
@@ -46,9 +49,11 @@ private:
 	vector<PxRigidActor*>	m_vecStaticActors;
 
 	_float					m_fFlyTime = { 0.f };
+	_float					m_fHitPower = { 0.f };
 
 	_bool					m_bStaticOffTrigger = { true };
 
+	_float					m_fSize = { 0.f };
 	
 public:
 	static CStarBlock*	 Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

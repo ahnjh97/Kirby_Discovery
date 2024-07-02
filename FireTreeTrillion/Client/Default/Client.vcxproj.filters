@@ -463,6 +463,9 @@
     <Filter Include="02.GameObjects\UI\TransingStar">
       <UniqueIdentifier>{5d5b209e-634e-4099-a2ae-a86fa9e7139c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\BossMonster\Gully">
+      <UniqueIdentifier>{3e784411-9f95-46ab-b0a1-aa64e4492765}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -937,6 +940,9 @@
     <ClInclude Include="..\Public\TransingStar.h">
       <Filter>02.GameObjects\UI\TransingStar</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Gully.h">
+      <Filter>02.GameObjects\PhysXObject\Character\BossMonster\Gully</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1391,6 +1397,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\TransingStar.cpp">
       <Filter>02.GameObjects\UI\TransingStar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Gully.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\BossMonster\Gully</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
