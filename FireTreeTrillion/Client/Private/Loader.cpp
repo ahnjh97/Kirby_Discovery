@@ -2000,6 +2000,9 @@ void CLoader::Load_KirbyBodyModels()
 	m_vecModelInfo.emplace_back("KirbyCarDefault", TYPE_ANIM, 1.f, 180.f);
 	m_vecModelInfo.emplace_back("KirbyCarVacuum", TYPE_ANIM, 1.f, 180.f);
 	m_vecModelInfo.emplace_back("KirbyHammerDefault", TYPE_ANIM, 1.f, 180.f);
+	m_vecModelInfo.emplace_back("KirbyDumpDefault", TYPE_ANIM, 1.f, 180.f);
+	m_vecModelInfo.emplace_back("KirbyDumpVacuum", TYPE_ANIM, 1.f, 180.f);
+
 }
 
 void CLoader::Load_KirbyWeaponModels()
