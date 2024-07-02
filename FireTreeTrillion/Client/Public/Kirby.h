@@ -200,6 +200,7 @@ private:
 	void			Kirby_SystemTick(_float fTimeDelta);
 	HRESULT			Kirby_SystemInitialize();
 	void			Kirby_LookInitialize();
+	void			Kirby_StateInitialize();
 
 private:
 	HRESULT			Make_TargetToCams();

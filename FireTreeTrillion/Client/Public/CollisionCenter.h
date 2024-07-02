@@ -64,7 +64,7 @@ private:
     _bool Up_KnockBack(_uint uKirbyState);
     _bool FlyAway_KnockBack(_uint uKirbyState);
 
-    void HitStop_Rogic(class CKirby* pKirby);
+    void HitStop_Rogic(class CKirby* pKirby, _float fStopTime = 0.12f);
 
     void Damage_And_Effect_For_Monster(class CKirby* pKirby, class CPhysXObject* pMonster, _float fEffectOffSet = 0.5f);
 #pragma endregion
@@ -92,9 +92,16 @@ private:
     void Compute_Coin(CPhysXObject* pPlayer, CPhysXObject* pItem);
     void Compute_SuperPower(CPhysXObject* pPlayer, CPhysXObject* pItem);
 
-    void Timer_System(_float fTimeDelta);
+    // 회피 무적 시간정지 전용
+    void Dodge_Timer_System(_float fTimeDelta);
     _bool  m_bCheckTimer = { false };
     _float m_fTimeDeltaResetTime = { 0.f };
+
+    void Hit_TimeStop(_float fTimeRatio, _float fTime);
+    void Hit_Timer_System(_float fTimeDelta);
+    _bool  m_bHitTimeStop = { false };
+    _float m_fHitTimeDeltaResetTime = { 0.f };
+    _float m_fHitTimeDeltaMaxResetTime = { 0.f };
 
 
 private:
