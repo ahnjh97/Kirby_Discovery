@@ -47,6 +47,8 @@ HRESULT CLaser::Initialize(void* pArg)
 
 	//m_pTransformCom->Look_At(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
 
+	m_fAttack = 20.f;
+
 	return S_OK;
 }
 
@@ -172,12 +174,12 @@ HRESULT CLaser::Add_Components()
 	CHECK_FAILED(hr);
 
 	CHitBox::HITBOX_DESC HitBox{};
-	HitBox.pOwner = this;
-	HitBox.pDesc = &m_tColliderDesc[BODY];
-	HitBox.pCollisionType = MONSTER;
-	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
-		return E_FAIL;
-	Set_BodyCollider(COLLIDER_CYLINDER, 0.5f, 1.f, 0.85f);
+	//HitBox.pOwner = this;
+	//HitBox.pDesc = &m_tColliderDesc[BODY];
+	//HitBox.pCollisionType = MONSTER;
+	//if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
+	//	return E_FAIL;
+	//Set_BodyCollider(COLLIDER_CYLINDER, 0.5f, 1.f, 0.85f);
 
 	HitBox.pOwner = this;
 	HitBox.pDesc = &m_tColliderDesc[ATTACK];

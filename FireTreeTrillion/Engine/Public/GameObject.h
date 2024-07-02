@@ -65,6 +65,18 @@ public:
 #endif
 	virtual HRESULT		Render_DeferredInfo() { return S_OK; }
 
+public:
+	// 원기둥 (CYLINDER 전용)
+	void		Activate_CylinderCollider(_float fOffSetY, _float fHeight, _float fRadius);
+	// 구 (SPHERE 전용)
+	void		Activate_SphereCollider(_float fOffSetY, _float fRadius);
+	// 절두체 (FRUSTUM 전용)
+	void		Activate_FrustumCollider(_float fOffSetY, _float fRadius, _float fAngle);
+	// 튜브 형태 전용
+	void		Activate_TubeCollider(_float fOffSetY, _float fHeight, _float fMinRadius, _float fMaxRadius);
+	// 몸 콜라이더 전용
+	void		Set_BodyCollider(HITBOX eType, _float fOffSetY, _float fHeight, _float fRadius);
+
 
 protected:
 	HRESULT				Add_Component(_uint iLevelIndex, const wstring& strPrototypeTag, const wstring& strComponentTag, class CComponent** ppOut, void* pArg = nullptr);
@@ -107,16 +119,6 @@ protected:
 	_uint									m_eCollisionGroup = { INT_MAX };
 
 	COLLISION_DESC							m_tColliderDesc[VALUE_END] = {};
-	// 원기둥 (CYLINDER 전용)
-	void		Activate_CylinderCollider(_float fOffSetY, _float fHeight, _float fRadius);
-	// 구 (SPHERE 전용)
-	void		Activate_SphereCollider(_float fOffSetY, _float fRadius);
-	// 절두체 (FRUSTUM 전용)
-	void		Activate_FrustumCollider(_float fOffSetY, _float fRadius, _float fAngle);
-	// 튜브 형태 전용
-	void		Activate_TubeCollider(_float fOffSetY, _float fHeight, _float fMinRadius, _float fMaxRadius);
-	// 몸 콜라이더 전용
-	void		Set_BodyCollider(HITBOX eType, _float fOffSetY, _float fHeight, _float fRadius);
 
 	_uint									m_iLateTickCount = { 0 };
 	_float									m_fAccTime = { 0.f };

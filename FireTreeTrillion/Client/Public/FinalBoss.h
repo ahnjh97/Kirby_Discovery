@@ -79,6 +79,7 @@ public:
 #ifdef _DEBUG
 	virtual void	Render_IMGUI() override;
 #endif
+	virtual void	Add_AnimEvent()						override;
 	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
 public:
@@ -114,6 +115,7 @@ private:
 
 	// FSM
 	void SetUp_FSM();
+	void HitBoxChanger(_uint eState);
 
 public:
 	static CFinalBoss* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
