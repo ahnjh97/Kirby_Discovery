@@ -14,7 +14,7 @@ BEGIN(Client)
 class CUI_PartTime : public CUIObject
 {
 public:
-	enum STATE { START, BASIC, FADE, STATE_END };
+	enum STATE { BASIC, START, FADE, STATE_END };
 
 private:
 	CUI_PartTime(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -36,7 +36,6 @@ public:
 	void						Add_Score(_int _fPlusScore);
 
 	void						Set_PreRatioBar() { m_fRatioBarSub = m_fRatioTimeBar; }
-	void						Set_RenderGameOver(_bool _Gameover) { m_bRenderGameOver = _Gameover; }
 	void						Set_RenderState(STATE _eState, _bool _bState);
 	
 private:
@@ -61,9 +60,9 @@ private:
 	array<_float2,	 TEXTURECNT>		m_arrPosition;
 
 	// -------------- for IMGUI
-	array<_float2,	 TEXTURECNT>			m_arrOriginalSize;
-	array<_float,	 TEXTURECNT>			m_arrSizeRatio;
-	array<_float3,	 TEXTURECNT>			m_arrColor;
+	array<_float2,	 TEXTURECNT>		m_arrOriginalSize;
+	array<_float,	 TEXTURECNT>		m_arrSizeRatio;
+	array<_float3,	 TEXTURECNT>		m_arrColor;
 
 	CTexture*					m_pTexMask = { nullptr }; // 마스킹을 위한 텍스쳐
 
@@ -96,7 +95,6 @@ private:
 	_float						m_fSizeRatio = 0.f;
 	_float2						m_fStandardSize2D = _float2();
 	_float2						m_fRealTimeSize2D = _float2();
-	_bool						m_bRenderGameOver = false;
 
 	_bool						m_bOnce = false;
 	array<_bool, STATE_END>		m_arrRenderState;
