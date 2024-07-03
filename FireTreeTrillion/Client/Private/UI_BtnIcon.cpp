@@ -184,11 +184,11 @@ HRESULT CUI_BtnIcon::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-  	if (FAILED(__super::Add_Component(LEVEL_DEEDEEDEE, TEXT("Prototype_Component_Texture_UI_BtnIconBase"),
+  	if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Texture_UI_BtnIconBase"),
 		TEXT("Com_TextBase"), (CComponent**)&m_pTextureCom[TEXBTN_BASE])))
 		return E_FAIL;
 
-	if (FAILED(__super::Add_Component(LEVEL_DEEDEEDEE, TEXT("Prototype_Component_Texture_UI_BtnIconBright"),
+	if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Texture_UI_BtnIconBright"),
 		TEXT("Com_TexBright"), (CComponent**)&m_pTextureCom[TEXBTN_BRIGHT])))
 		return E_FAIL;
 

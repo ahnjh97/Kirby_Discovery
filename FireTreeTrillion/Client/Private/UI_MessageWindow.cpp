@@ -167,7 +167,7 @@ HRESULT CUI_MessageWindow::Add_Components()
 		return E_FAIL;
 
 	//대화하는 대상에 따라 텍스처를 변경하여 출력 (현재는 한 장)
-	if (FAILED(__super::Add_Component(LEVEL_DEEDEEDEE, TEXT("Prototype_Component_Texture_UI_MessageWindow"),
+	if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Texture_UI_MessageWindow"),
 		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
 		return E_FAIL;
 
