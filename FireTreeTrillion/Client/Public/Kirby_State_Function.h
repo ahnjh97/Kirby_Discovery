@@ -1186,6 +1186,7 @@ static void Throw_Bomb(CKirby::KIRBY_INFODESC* Kirbydesc, _float4 vDir, _float f
 
 #pragma region Hyo Effect
 
+//¾ÆÁ÷ ¾È¸¸µë
 static void BombSmoke(CTransform* pTransformCom, _float3 vPos, _float3 vScale)
 {
 	CEffect::FX_DESC FXDesc{};
