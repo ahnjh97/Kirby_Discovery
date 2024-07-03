@@ -33,6 +33,10 @@
 #define PARTTIME                        32793
 #define ID_32794                        32794
 #define DEEDEEDEE                       32795
+#define ID_32796                        32796
+#define FINALE                          32797
+#define ID_32798                        32798
+#define SIMBA                           32799
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -41,7 +45,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        129
-#define _APS_NEXT_COMMAND_VALUE         32796
+#define _APS_NEXT_COMMAND_VALUE         32800
 #define _APS_NEXT_CONTROL_VALUE         1000
 #define _APS_NEXT_SYMED_VALUE           110
 #endif

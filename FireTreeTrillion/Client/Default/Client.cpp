@@ -192,6 +192,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
         return true;
 #endif
+    HRESULT hr(S_OK);
 
     switch (message)
     {
@@ -218,85 +219,80 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             /* ============= LEVEL ÀÌµ¿ ============= */
             case GAMEPLAY: // LEVEL_GAMEPLAY
             {
-                HRESULT hr;
                 hr = pMainApp->Open_Level(LEVEL_GAMEPLAY);
                 CHECK_FAILED(hr);
             }
             break;
             case TOOL_FX:
             {
-                HRESULT hr;
                 hr = pMainApp->Open_Level(LEVEL_TOOL_FX);
                 CHECK_FAILED(hr);
             }
             break;
             case TOOL_UI: // LEVEL_TOOL_UI
             {
-                HRESULT hr;
                 hr = pMainApp->Open_Level(LEVEL_TOOL_UI);
                 CHECK_FAILED(hr);
             }
             break;
             case TOOL_ANIM: // LEVEL_TOOL_ANIM
             {
-                HRESULT hr;
                 hr = pMainApp->Open_Level(LEVEL_TOOL_ANIM);
                 CHECK_FAILED(hr);
             }
             break;
             case TOOL_MAP:
             {
-                HRESULT hr;
                 hr = pMainApp->Open_Level(LEVEL_TOOL_MAP);
                 CHECK_FAILED(hr);
             }
             break;
             case INTRO:
             {
-                HRESULT hr;
                 hr = pMainApp->Open_Level(LEVEL_INTRO);
                 CHECK_FAILED(hr);
-                break;
             }
             break;
             case RACING:
             {
-                HRESULT hr;
                 hr = pMainApp->Open_Level(LEVEL_RACING);
                 CHECK_FAILED(hr);
-                break;
             }
             break;
             case DEEDEEDEE:
             {
-                HRESULT hr;
                 hr = pMainApp->Open_Level(LEVEL_DEEDEEDEE);
                 CHECK_FAILED(hr);
-                break;
             }
             break;
             case TOWN:
             {
-                HRESULT hr;
                 hr = pMainApp->Open_Level(LEVEL_TOWN);
                 CHECK_FAILED(hr);
-                break;
             }
             break;
             case PARTTIME:
             {
-                HRESULT hr;
                 hr = pMainApp->Open_Level(LEVEL_PARTTIME);
                 CHECK_FAILED(hr);
-                break;
+            }
+            break;
+            case SIMBA:
+            {
+                hr = pMainApp->Open_Level(LEVEL_SIMBA);
+                CHECK_FAILED(hr);
             }
             break;
             case FINALBOSS:
             {
-                HRESULT hr;
                 hr = pMainApp->Open_Level(LEVEL_FINALBOSS);
                 CHECK_FAILED(hr);
-                break;
+            }
+            break;
+            case FINALE:
+            {
+                hr = pMainApp->Open_Level(LEVEL_FINALE);
+                CHECK_FAILED(hr);
             }
             break;
             default:

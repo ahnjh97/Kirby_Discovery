@@ -169,7 +169,7 @@ _int CCamera_Main::Tick(_float fTimeDelta)
 	//타임 델타를 보정한다.
 	_float fRealTimeDelta = fTimeDelta;
 	if (.1f < fRealTimeDelta)
-		fRealTimeDelta = 1.f / 30.f;
+		fRealTimeDelta = 1.f / 60.f;
 
 
 	Control(fRealTimeDelta);
@@ -192,7 +192,8 @@ _int CCamera_Main::Tick(_float fTimeDelta)
 	}
 
 	//후보정
-	m_pTransformCom->Move(Dir(Make_ShakeDir(fRealTimeDelta)));
+	_float4 vDir = Make_ShakeDir(fRealTimeDelta);
+	m_pTransformCom->Move(vDir);
 
 
 	return OBJ_NOEVENT;
@@ -996,7 +997,7 @@ void CCamera_Main::Control(_float fTimeDelta)
 
 		if (m_pGameInstance->Get_KeyState(DIK_8, KEY_DOWN))
 		{
-			Make_Shake(1.f, .8f);
+			Make_Shake(1.f, 2.f);
 		}
 
 
@@ -1242,6 +1243,7 @@ void CCamera_Main::Render_IMGUI()
 	//ImGui::Text("LerpedRadius: %.2f", m_fLerpedRadius);
 	ImGui::Dummy(ImVec2(0, 20));
 
+	ImGui::Text(u8"쉐이크 시간: %.2f", m_fCurShakeTime);
 
 	ImGui::Text(u8"보간 시간: %.2f", m_fSeqInterpolateTime.first);
 	ImGui::Text(u8"목표 보간 시간: %.2f", m_fSeqInterpolateTime.second);

@@ -106,11 +106,11 @@ HRESULT CSkySphereSub::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
-	hr = __super::Add_Component(LEVEL_FINALBOSS, TEXT("Prototype_Component_Model_LbBuildingFrame"), 
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_LbBuildingFrame"), 
 		TEXT("Com_ModelFrame"), (CComponent**)&m_pModelCom[MOD_FRAME]);
 	CHECK_FAILED(hr);
 
-	hr = __super::Add_Component(LEVEL_FINALBOSS, TEXT("Prototype_Component_Model_LbFarPiller"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_LbFarPiller"),
 		TEXT("Com_ModelPiller"), (CComponent**)&m_pModelCom[MOD_PILLER]);
 	CHECK_FAILED(hr);
 

@@ -15,8 +15,7 @@
 #include "CollisionCenter.h"
 #include "EventCenter.h"
 
-CMainApp::CMainApp()
-	: m_pGameInstance(CGameInstance::Get_Instance())
+CMainApp::CMainApp() : m_pGameInstance(CGameInstance::Get_Instance())
 {
 	Safe_AddRef(m_pGameInstance);
 }
@@ -114,6 +113,16 @@ void CMainApp::Tick(_float fTimeDelta)
 		if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_A, KEY_DOWN))
 		{
 			if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_GAMEPLAY))))
+				return;
+		}
+		if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_8, KEY_DOWN))
+		{
+			if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_FINALE))))
+				return;
+		}
+		if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_S, KEY_DOWN))
+		{
+			if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_SIMBA))))
 				return;
 		}
 	}

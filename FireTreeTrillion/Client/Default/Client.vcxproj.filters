@@ -465,8 +465,8 @@
     </Filter>
     <Filter Include="02.GameObjects\UI\PartTime\Result">
       <UniqueIdentifier>{6bfb944e-4c8c-4592-88d2-10aed3c5b9f4}</UniqueIdentifier>
-	</Filter>
-	<Filter Include="02.GameObjects\PhysXObject\Character\BossMonster\Gully">
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\BossMonster\Gully">
       <UniqueIdentifier>{3e784411-9f95-46ab-b0a1-aa64e4492765}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyDump_State">
@@ -477,6 +477,18 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyCrash_State">
       <UniqueIdentifier>{2b564633-9ff1-4590-9555-1e64d92e3ea2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\12. Finale">
+      <UniqueIdentifier>{48c88699-1c49-4542-a934-ae4b16595516}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\10. Simba">
+      <UniqueIdentifier>{54872277-bc89-4a13-9bfa-6cf99310be0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PopStar">
+      <UniqueIdentifier>{4879bc6f-b75f-44bf-8f7d-c2d226a8cc11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\DecoObject">
+      <UniqueIdentifier>{aae835b0-4a08-4f27-88da-102e823f0326}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -954,12 +966,24 @@
     </ClInclude>
     <ClInclude Include="..\Public\UI_PartTimeResult.h">
       <Filter>02.GameObjects\UI\PartTime\Result</Filter>
-	</ClInclude>
-	<ClInclude Include="..\Public\Gully.h">
+    </ClInclude>
+    <ClInclude Include="..\Public\Gully.h">
       <Filter>02.GameObjects\PhysXObject\Character\BossMonster\Gully</Filter>
     </ClInclude>
     <ClInclude Include="CKirbyDump_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyDump_State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_Finale.h">
+      <Filter>01.Levels\12. Finale</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_Simba.h">
+      <Filter>01.Levels\10. Simba</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PopStar.h">
+      <Filter>02.GameObjects\PopStar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\DecoObject.h">
+      <Filter>02.GameObjects\DecoObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1418,12 +1442,24 @@
     </ClCompile>
     <ClCompile Include="..\Private\UI_PartTimeResult.cpp">
       <Filter>02.GameObjects\UI\PartTime\Result</Filter>
-	</ClCompile>
-	<ClCompile Include="..\Private\Gully.cpp">
+    </ClCompile>
+    <ClCompile Include="..\Private\Gully.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\BossMonster\Gully</Filter>
     </ClCompile>
     <ClCompile Include="CKirbyDump_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyDump_State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Finale.cpp">
+      <Filter>01.Levels\12. Finale</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Simba.cpp">
+      <Filter>01.Levels\10. Simba</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PopStar.cpp">
+      <Filter>02.GameObjects\PopStar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\DecoObject.cpp">
+      <Filter>02.GameObjects\DecoObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
