@@ -49,13 +49,17 @@ _int CUI_BtnIcon::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
-	//if (m_UIObjDesc.fAlpha <= 0)
-	//	return OBJ_DEAD;
+	if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD7, KEY_PRESS)) //테스트용
+		m_UIObjDesc.fAlpha = 1.f;
 
-	//스크립트가 모두 출력되었을 경우, 해당 버튼 UI의 애니메이션을 활성화
-	
+	else
+		m_UIObjDesc.fAlpha -= fTimeDelta * 10.f;
 
-	return OBJ_NOEVENT;
+	if (m_UIObjDesc.fAlpha <= 0.f) //다이얼로그 출력이 끝날경우, 알파 값 조절
+	{
+		m_UIObjDesc.fAlpha = 0.f;
+		return OBJ_NOEVENT;
+	}
 }
 
 void CUI_BtnIcon::Late_Tick(_float fTimeDelta)
@@ -75,11 +79,11 @@ HRESULT CUI_BtnIcon::Render()
 		if (TEXBTN_BASE == iTEXIx)
 		{
 			ePassType = POSTEX_UIWHITEALPHA;
-			m_UIObjDesc.fAlpha = 1.f;
+			//m_UIObjDesc.fAlpha = 1.f;
 		}
 
-		if (TEXBTN_BRIGHT == iTEXIx)
-			m_UIObjDesc.fAlpha = 0.5f;
+		//if (TEXBTN_BRIGHT == iTEXIx)
+		//	m_UIObjDesc.fAlpha = 0.5f;
 
 		if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 			return E_FAIL;

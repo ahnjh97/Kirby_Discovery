@@ -64,10 +64,17 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
-	if (m_UIObjDesc.fAlpha <= 0)
-		return OBJ_DEAD;
+	if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD7, KEY_PRESS)) //테스트용
+		m_UIObjDesc.fAlpha = 1.f;
+	
+	else
+		m_UIObjDesc.fAlpha -= fTimeDelta * 10.f;
 
-	return OBJ_NOEVENT;
+	if (m_UIObjDesc.fAlpha <= 0.f) //다이얼로그 출력이 끝날경우, 알파 값 조절
+	{
+		m_UIObjDesc.fAlpha = 0.f;
+		return OBJ_NOEVENT;
+	}
 }
 
 void CUI_MessageWindow::Late_Tick(_float fTimeDelta)
@@ -128,7 +135,6 @@ HRESULT CUI_MessageWindow::Add_Transform(void* _pArg)
 			return E_FAIL;
 
 		//m_Components.emplace(g_strTransformTag, m_pTransformCom);
-
 		Safe_AddRef(m_pTransCom[iTrans]);
 	}
 
