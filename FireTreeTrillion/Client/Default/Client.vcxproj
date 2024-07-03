@@ -257,6 +257,7 @@
     <ClInclude Include="..\Public\Laser.h" />
     <ClInclude Include="..\Public\Level_DeeDeeDee.h" />
     <ClInclude Include="..\Public\Level_FinalBoss.h" />
+    <ClInclude Include="..\Public\Level_Finale.h" />
     <ClInclude Include="..\Public\Level_Intro.h" />
     <ClInclude Include="..\Public\LevelChanger.h" />
     <ClInclude Include="..\Public\KirbyArmours.h" />
@@ -433,6 +434,7 @@
     <ClCompile Include="..\Private\Laser.cpp" />
     <ClCompile Include="..\Private\Level_DeeDeeDee.cpp" />
     <ClCompile Include="..\Private\Level_FinalBoss.cpp" />
+    <ClCompile Include="..\Private\Level_Finale.cpp" />
     <ClCompile Include="..\Private\Level_Intro.cpp" />
     <ClCompile Include="..\Private\LevelChanger.cpp" />
     <ClCompile Include="..\Private\KirbyArmours.cpp" />

@@ -90,11 +90,11 @@ void CPartTimeHelper::NotifyObserver()
 
 void CPartTimeHelper::Initialize_GameStart()
 {
-	m_pCamera->Lock_Camera({ 21.44f, 28.98f, 8.84f }, { -0.13f, -0.29f, 0.95f }, 33.f);
+	//m_pCamera->Lock_Camera({ 21.44f, 28.98f, 8.84f }, { -0.13f, -0.29f, 0.95f }, 33.f);
 
 	// Player ¼¼ÆÃ
-	CTransform* pTransform = m_pPartTimerKirby->Get_TransformCom();
-	pTransform->Rotation(_float3{ 0.f, 1.f, 0.f }, ToRadian(170.f));
+	//CTransform* pTransform = m_pPartTimerKirby->Get_TransformCom();
+	//pTransform->Rotation(_float3{ 0.f, 1.f, 0.f }, ToRadian(170.f));
 
 }
 

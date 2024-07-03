@@ -20,6 +20,7 @@ namespace Client
                  LEVEL_TOWN,
                  LEVEL_PARTTIME,
                  LEVEL_FINALBOSS, // 리소스명 LAB_DISCOVERA
+                 LEVEL_FINALE,
 
                  LEVEL_END };
 
