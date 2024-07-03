@@ -210,6 +210,7 @@
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\Coin.h" />
     <ClInclude Include="..\Public\CollisionCenter.h" />
+    <ClInclude Include="..\public\DecoObject.h" />
     <ClInclude Include="..\Public\DeeDeeDee.h" />
     <ClInclude Include="..\Public\DeeDeeDeeHammer.h" />
     <ClInclude Include="..\Public\DeeDeeDee_State.h" />
@@ -310,6 +311,7 @@
     <ClInclude Include="..\Public\PoppyBomb.h" />
     <ClInclude Include="..\Public\PoppyBrosJr.h" />
     <ClInclude Include="..\Public\PoppyBrosJr_State.h" />
+    <ClInclude Include="..\Public\PopStar.h" />
     <ClInclude Include="..\Public\PortalSoftEffect.h" />
     <ClInclude Include="..\Public\Rabbit.h" />
     <ClInclude Include="..\Public\Rabbit_State.h" />
@@ -388,6 +390,7 @@
     <ClCompile Include="..\Private\Character.cpp" />
     <ClCompile Include="..\Private\Coin.cpp" />
     <ClCompile Include="..\Private\CollisionCenter.cpp" />
+    <ClCompile Include="..\private\DecoObject.cpp" />
     <ClCompile Include="..\Private\DeeDeeDee.cpp" />
     <ClCompile Include="..\Private\DeeDeeDeeHammer.cpp" />
     <ClCompile Include="..\Private\DeeDeeDee_State.cpp" />
@@ -485,6 +488,7 @@
     <ClCompile Include="..\Private\PoppyBomb.cpp" />
     <ClCompile Include="..\Private\PoppyBrosJr.cpp" />
     <ClCompile Include="..\Private\PoppyBrosJr_State.cpp" />
+    <ClCompile Include="..\Private\PopStar.cpp" />
     <ClCompile Include="..\Private\PortalSoftEffect.cpp" />
     <ClCompile Include="..\Private\Rabbit.cpp" />
     <ClCompile Include="..\Private\Rabbit_State.cpp" />

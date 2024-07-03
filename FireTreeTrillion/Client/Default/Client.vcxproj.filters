@@ -481,6 +481,12 @@
     <Filter Include="01.Levels\12. Finale">
       <UniqueIdentifier>{48c88699-1c49-4542-a934-ae4b16595516}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PopStar">
+      <UniqueIdentifier>{4879bc6f-b75f-44bf-8f7d-c2d226a8cc11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\DecoObject">
+      <UniqueIdentifier>{aae835b0-4a08-4f27-88da-102e823f0326}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -967,6 +973,10 @@
     <ClInclude Include="..\Public\Level_Finale.h">
       <Filter>01.Levels\12. Finale</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\PopStar.h">
+      <Filter>02.GameObjects\PopStar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\DecoObject.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1434,6 +1444,10 @@
     <ClCompile Include="..\Private\Level_Finale.cpp">
       <Filter>01.Levels\12. Finale</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\PopStar.cpp">
+      <Filter>02.GameObjects\PopStar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\DecoObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
