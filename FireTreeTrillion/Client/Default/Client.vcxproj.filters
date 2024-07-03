@@ -982,7 +982,9 @@
     <ClInclude Include="..\Public\PopStar.h">
       <Filter>02.GameObjects\PopStar</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\DecoObject.h" />
+    <ClInclude Include="..\public\DecoObject.h">
+      <Filter>02.GameObjects\DecoObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1456,7 +1458,9 @@
     <ClCompile Include="..\Private\PopStar.cpp">
       <Filter>02.GameObjects\PopStar</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\DecoObject.cpp" />
+    <ClCompile Include="..\private\DecoObject.cpp">
+      <Filter>02.GameObjects\DecoObject</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
