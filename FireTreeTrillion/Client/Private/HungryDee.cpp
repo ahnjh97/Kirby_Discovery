@@ -129,6 +129,7 @@ _int CHungryDee::Tick(_float fTimeDelta)
 		m_fWaitingTime -= m_fTimeDelta;
 
 
+	//지영아 여기야
 	/* 점심시간이다ㅏ~~
 	if (m_pGameInstance->Get_KeyState(DIK_S, KEY_DOWN) && m_iMyIdx == 0)
 	{
@@ -165,7 +166,6 @@ _int CHungryDee::Tick(_float fTimeDelta)
 	{
 		if (m_pDialogUI != nullptr)
 		{
-
 			m_pDialogUI->Tick(m_fTimeDelta);
 		}
 	}
@@ -188,7 +188,9 @@ void CHungryDee::Swap_WatingPosition()
 	//바뀐 자리가 앞자리라면, 나를 등록
 	if (m_iMyIdx == FRONT_WAITPOS)
 	{
-		m_pDialogUI->Set_Type(CUI_PartTimeDee::ORDER);
+		Set_MaskValueUI(0.f);
+		m_pDialogUI->Set_IsRender(false);
+
 		CPartTimeHelper::Get_Instance()->Register_FirstDee(this);
 	}
 
@@ -196,7 +198,7 @@ void CHungryDee::Swap_WatingPosition()
 	//이 때 리셋해야 될 값들도 다 초기화해줍니다.
 	if (m_iMyIdx == LAST_WAITPOS)
 	{
-		m_pDialogUI->Set_Type(CUI_PartTimeDee::THINKING);
+
 		_float3 vDestPos = m_WaitingList.first + m_WaitingList.second[m_iMyIdx].vPos + _float3{ 18.f, 0.f, -2.f };
 		m_pControllerCom->Set_Position(m_pTransformCom, Pos(vDestPos));
 		Set_DeeEyeState(DEEEYE_IDLE);
@@ -209,15 +211,18 @@ void CHungryDee::Swap_WatingPosition()
 	}
 }
 
-void CHungryDee::Ready_OrderUI()
+void CHungryDee::Ready_OrderUI(CUI_PartTimeDee::TYPE eType)
 {
 	if (m_pDialogUI == nullptr) return;
 	m_pDialogUI->Set_IsRender(true);
+
+	m_pDialogUI->Set_Type(eType);
 
 	_float4 vRevisedPos = GET_POS;
 	vRevisedPos.y += fOffsetInteract;
 	m_pDialogUI->Update_Pos(_float3{ vRevisedPos.x, vRevisedPos.y, vRevisedPos.z });
 }
+
 
 void CHungryDee::Late_Tick(_float fTimeDelta)
 {
@@ -318,6 +323,7 @@ void CHungryDee::Change_Dialog(PARTTIME_ITEM eItem)
 
 void CHungryDee::OnNotify()
 {
+
 	// 특정 시간일때 와들디 처리 >> 점심시간에 화내기 시작하는걸 여기서 처리해주면 될것같유
 	// 효선아 여기야
 }

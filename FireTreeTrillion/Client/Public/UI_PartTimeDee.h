@@ -68,7 +68,7 @@ private:
 	_float2			 m_SizeFood2D   = _float2(292.f * 0.5f, 292.f * 0.5f);
 	_float4			 m_vFinPos = _float4();
 
-	TYPE			 m_eDialogTheme = ORDER;
+	TYPE			 m_eDialogTheme = THINKING;
 
 public:
 	static CUI_PartTimeDee*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

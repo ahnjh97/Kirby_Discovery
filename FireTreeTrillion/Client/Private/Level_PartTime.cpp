@@ -120,7 +120,20 @@ HRESULT CLevel_PartTime::Ready_Lights()
 HRESULT CLevel_PartTime::Ready_Layer_Camera(const wstring& strLayerTag)
 {
 	
+	CCamera_Main::CAMERA_KIRBY_DESC		MainCamDesc{};
+	MainCamDesc.fFovy = XMConvertToRadians(43.0f);
+	MainCamDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
+	MainCamDesc.fNear = 0.1f;
+	MainCamDesc.fFar = 1000.0f;
+	MainCamDesc.vEye = _float4(0.f, 0.f, 0.f, 1.f);
+	MainCamDesc.vAt = _float4(0.f, -1.f, -1.f, 1.f);
+	MainCamDesc.fSpeedPerSec = 10.f;
+	MainCamDesc.fRotationPerSec = XMConvertToRadians(90.0f);
+	MainCamDesc.fOrigDistance = 28.f;
+	MainCamDesc.fCamSensor = .3f;
 
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_Camera_Main"), &MainCamDesc)))
+		return E_FAIL;
 
 
 	CCamera_Free::CAMERA_FREE_DESC		CameraDesc{};
@@ -137,20 +150,7 @@ HRESULT CLevel_PartTime::Ready_Layer_Camera(const wstring& strLayerTag)
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
 		return E_FAIL;
 
-	CCamera_Main::CAMERA_KIRBY_DESC		MainCamDesc{};
-	MainCamDesc.fFovy = XMConvertToRadians(30.0f);
-	MainCamDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
-	MainCamDesc.fNear = 0.1f;
-	MainCamDesc.fFar = 1000.0f;
-	MainCamDesc.vEye = _float4(0.f, 0.f, 0.f, 1.f);
-	MainCamDesc.vAt = MainCamDesc.vEye + _float4(0.f, -.15f, -1.f, 1.f);
-	MainCamDesc.fSpeedPerSec = 10.f;
-	MainCamDesc.fRotationPerSec = XMConvertToRadians(90.0f);
-	MainCamDesc.fOrigDistance = 28.f;
-	MainCamDesc.fCamSensor = .3f;
 
-	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_Camera_Main"), &MainCamDesc)))
-		return E_FAIL;
 
 	return S_OK;
 }

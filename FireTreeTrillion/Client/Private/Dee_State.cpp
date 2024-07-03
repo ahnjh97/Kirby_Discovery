@@ -482,7 +482,12 @@ void CDee_Hungry_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 			}
 			//아니라면 그냥 기다린다.
 			else
+			{
+				if (pHungryDee->IsSecondWaiting())
+					pHungryDee->Ready_OrderUI(CUI_PartTimeDee::THINKING);
+
 				pHungryDee->Change_State((DEE_ANIM)DEESHOPANIM_GUESTNORMAL, CUtils::Make_RandomFloat(50.f, 60.f), true, true);
+			}
 
 
 			CUtils::Make_RandomInt(0, 2) == 2 ?
@@ -521,7 +526,14 @@ void CDee_Hungry_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 			}
 			//아니라면 그냥 기다린다.
 			else
+			{
+
+				if(pHungryDee->IsSecondWaiting())
+					pHungryDee->Ready_OrderUI(CUI_PartTimeDee::THINKING);
+
+
 				pHungryDee->Change_State((DEE_ANIM)DEESHOPANIM_GUESTNORMAL, CUtils::Make_RandomFloat(50.f, 60.f), true, true);
+			}
 
 
 			CUtils::Make_RandomInt(0, 2) == 2 ?
