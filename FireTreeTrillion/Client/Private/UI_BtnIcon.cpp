@@ -44,8 +44,6 @@ HRESULT CUI_BtnIcon::Initialize(void* _pArg)
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 
-	m_fBlinkAlpha = 0.f;
-	m_fBtnAlpha = 1.f;
 	m_eCurState = BTN_IDLE;
 
 	LEVEL eLevel = (LEVEL)*m_pGameInstance->Get_CurrentLevelID();
@@ -59,20 +57,21 @@ _int CUI_BtnIcon::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
-	//if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN)) //테스트용
-	//	m_fBrightAlpha = 1.f;
-	//else
-	//	m_fBrightAlpha -= fTimeDelta * 2.f;
 	if (nullptr == m_pMWindow)
 		return OBJ_NOEVENT;
 
 	//MessageWindow 상태와 동기화
 	CUI_MessageWindow::MESSAGEWINDOW_STATE eMWState = m_pMWindow->Get_MWindowState();
-	if (CUI_MessageWindow::WINDOW_SHOW == eMWState)
-		m_eCurState = BTN_BLINK;
+	switch (eMWState)
+	{
+	case CUI_MessageWindow::WINDOW_IDLE: break;
+	case CUI_MessageWindow::WINDOW_HIDE: m_eCurState = BTN_IDLE;	break;
+	case CUI_MessageWindow::WINDOW_SHOW: m_eCurState = BTN_BLINK;	break;
+	case CUI_MessageWindow::WINDOW_NONE: default:	break;
+	}
 
 	//버튼 선택 시 다음 스크립트를 출력. Button UI 스케일 증감
-	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN)) //테스트용
+	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN) && BTN_BLINK == m_eCurState) //테스트용
 		m_eCurState = BTN_SELECT;
 
 	_float3 vOrigScale = m_pTransformCom->Get_Scaled();
@@ -80,27 +79,43 @@ _int CUI_BtnIcon::Tick(_float fTimeDelta)
 	switch (m_eCurState)
 	{
 	case BTN_IDLE:
+		m_fBlinkAlpha -= fTimeDelta * 5.f;
+		m_fBtnAlpha -= fTimeDelta * 5.f;
 		break;
 
 	case BTN_BLINK:
-		m_fBlinkAlpha = 1.f;
-		
-		//if ()
-		//	m_fBlinkAlpha -= fTimeDelta * 2.f;
+		m_fBlinkAlpha = 0.5f;
+		m_fBtnAlpha = 1.f;
+
+		m_fBlinkTime += fTimeDelta;
+		if (m_fBlinkTime > 0.5f)
+		{
+			m_fBlinkAlpha = 0.f;
+			m_fBlinkTime = 0.f;
+		}
 		break;
 		
 	case BTN_SELECT:
+		m_fBlinkAlpha = 0.f;
+		
+		m_fSelectTime += fTimeDelta;
+		m_pTransformCom->Set_Scaled(vOrigScale * vOffset);
 		//vOrigScale.x += EASE_OUT(fTimeDelta * 2.f); //그래프 MAX값은 1이어야하며, 범위는 0 ~ 1로 설정되어야함
 		//vOrigScale.y += EASE_OUT(fTimeDelta * 2.f);
-		m_pTransformCom->Set_Scaled(vOrigScale * vOffset);
+		if (m_fSelectTime > 0.5f)
+		{
+			m_fSelectTime = 0.f;
+			m_eCurState = BTN_BLINK;
+		}
 		break;
 
 	case BTN_NONE:	default:	break;
 	}
 
-	if (m_fBlinkAlpha <= 0.f) //알파 값 보정 및 업데이트 중지
+	if (m_fBlinkAlpha <= 0.f && m_fBtnAlpha <= 0.f) //알파 값 보정 및 업데이트 중지
 	{
 		m_fBlinkAlpha = 0.f;
+		m_fBtnAlpha = 0.f;
 		return OBJ_NOEVENT;
 	}
 }
@@ -148,6 +163,20 @@ HRESULT CUI_BtnIcon::Render()
 
 	return S_OK;
 }
+
+#ifdef _DEBUG
+void CUI_BtnIcon::Render_IMGUI()
+{
+	switch (m_eCurState)
+	{
+	case BTN_IDLE:	break;
+	case BTN_BLINK:	break;
+	case BTN_SELECT:break;
+	case BTN_NONE:	break;
+	default:	break;
+	}
+}
+#endif
 
 HRESULT CUI_BtnIcon::Add_Components()
 {

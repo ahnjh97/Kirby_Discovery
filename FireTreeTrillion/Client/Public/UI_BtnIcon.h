@@ -29,7 +29,7 @@ public:
 	virtual HRESULT				Render()									override;
 
 #ifdef _DEBUG
-	//virtual void				Render_IMGUI()								override;
+	virtual void				Render_IMGUI()								override;
 #endif
 
 private:
@@ -51,8 +51,11 @@ private:
 	CUI_MessageWindow*			m_pMWindow = { nullptr };
 	
 	_float						m_fBtnAlpha = { 0.f };
+
 	_float						m_fBlinkAlpha = { 0.f };
-	
+	_float						m_fBlinkTime = { 0.f };
+	_float						m_fSelectTime = { 0.f };
+
 	BTN_STATE					m_eCurState = { BTN_NONE };
 		
 };
