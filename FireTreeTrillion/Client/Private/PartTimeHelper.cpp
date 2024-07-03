@@ -80,19 +80,21 @@ _bool CPartTimeHelper::Check_Item(PARTTIME_ITEM eITEM)
 }
 
 // 점심시간 알리는 용도로만 현재 사용하고 있습니다. 추후 추가될때 제게 말씀주세요 jywi
-//void CPartTimeHelper::NotifyObserver()
-//{
-//	if(m_pHungryDee != nullptr)
-//		m_pHungryDee->OnNotify();
-//	if(m_pPartTimerKirby != nullptr)
-//		m_pPartTimerKirby->OnNotify();
-//}
+void CPartTimeHelper::NotifyObserver()
+{
+	if(m_pHungryDee != nullptr)
+		m_pHungryDee->OnNotify();
+	if(m_pPartTimerKirby != nullptr)
+		m_pPartTimerKirby->OnNotify();
+}
 
 /// <summary> 점심시간 안내에 대한 이벤트 처리 </summary>
 /// <returns> true : 얼음 땡, false : 얼음 중 </returns>
 _bool CPartTimeHelper::Handle_LunchTime()
 {
-
+	// 효선아 여기야
+	// 카메라이동하고 ui띄우고 다시 카메라 돌아오면 true반환해주시면 됩니다.
+	// true를 받으면 secondTimer로 돌아가고 있던 커비와 디가 다시 움직이기 시작합니다~
 	return true;
 }
 
@@ -110,6 +112,7 @@ _bool CPartTimeHelper::Handle_GameOver()
 
 	// UI 세팅
 	m_pHungryDee->Erase_DialogUI();
+	m_pUI_PartTime->Set_RenderState(CUI_PartTime::BASIC, false);
 
 	return true;
 }
@@ -118,12 +121,10 @@ _bool CPartTimeHelper::Handle_GameOver()
 void CPartTimeHelper::Handle_UI(TYPE eContent)
 {
 	if (eContent == GAMEOVER)  // 게임 종료 : GAME OVER 띄우기
-	{
 		m_pUI_PartTime->Set_RenderGameOver(true);
-	}
 	else if (eContent == OVER) // 게임 종료 : 카메라 전환된 상태에서 UI
 	{
-		m_pUI_PartTime->Set_IsRender(false);
+		m_pUI_PartTime->Set_RenderState(CUI_PartTime::FADE, false);
 		m_pUI_PartTimeResult->Set_IsRender(true);
 	}
 }

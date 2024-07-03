@@ -432,6 +432,9 @@ void CPartTimerKirby::SetUp_FSM()
 	m_pFSM->Add_State(HANDOVERSHORTL,			CPartTimerKirby_Grab_State::Create());
 	m_pFSM->Add_State(FOODSHOP_INCORRECTSTART,  CPartTimerKirby_Grab_State::Create());
 	m_pFSM->Add_State(FOODSHOP_INCORRECT,		CPartTimerKirby_Grab_State::Create());
+
+	m_pFSM->Add_State(FOODSHOP_RESULTWINSTART,	CPartTimerKirby_Win_State::Create());
+	m_pFSM->Add_State(FOODSHOP_RESULTWIN,		CPartTimerKirby_Win_State::Create());
 	
 	//ป๓ลย Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};

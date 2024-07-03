@@ -30,6 +30,7 @@ CUI_PartTime::CUI_PartTime(const CUI_PartTime& rhs)
 	, m_fSizeRatio(rhs.m_fSizeRatio)
 	, m_fRealTimeSize2D(rhs.m_fRealTimeSize2D)
 	, m_fStandardSize2D(rhs.m_fStandardSize2D)
+	, m_arrRenderState(rhs.m_arrRenderState)
 {
 }
 
@@ -56,6 +57,9 @@ HRESULT CUI_PartTime::Initialize_Prototype()
 	fill(m_arrColor.begin(), m_arrColor.end(), temp3D);
 	_int iZero(0);
 	fill(m_arrScoreDigits.begin(), m_arrScoreDigits.end(), iZero);
+	
+	fill(m_arrRenderState.begin(), m_arrRenderState.end(), true);
+
 	m_arrTimerDigits[0] = 5;
 	m_arrTimerDigits[1] = 0;
 	return S_OK;
@@ -81,7 +85,9 @@ HRESULT CUI_PartTime::Initialize(void* _pArg)
 
 _int CUI_PartTime::Tick(_float fTimeDelta)
 {
-	if (m_bIsRender == false) return S_OK;
+	if (m_arrRenderState[BASIC] == false && m_arrRenderState[FADE] == false)
+		return S_OK;
+	
 	m_fTimeDelta = fTimeDelta;
 	__super::Tick(fTimeDelta);
 
@@ -104,72 +110,75 @@ void CUI_PartTime::Late_Tick(_float fTimeDelta)
 
 HRESULT CUI_PartTime::Render()
 {
-	if (m_bIsRender == false) return S_OK;
-
-	HRESULT hr;
-	hr = Bind_ShaderResources();
-	CHECK_FAILED(hr);
-
-	for (_int i = 0; i < m_arrTexures.size() - 2; ++i)
+	if (m_arrRenderState[BASIC] == true)
 	{
-		// Time-Bar에 따른 디 표정 맞추기
-		if(i>=7 && i<=9)
-			if (false == Setup_DeeFace(i)) continue;
-
-		// UI별 포지션, 사이즈, 컬러 조정
-		Setup_PosSizeColor(i);
-		if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
-			return E_FAIL;
-
-		// 디퓨즈 바인딩
-		if (i == 10 || i == 11)
-			hr = m_arrTexures[i]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", m_arrTimerDigits[i - 10]); // 0,1
-		else if ((i >= 12) && (i <= 14))
-			hr = m_arrTexures[i]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", m_arrScoreDigits[i - 12]); // 0,1,2
-		else
-			hr = m_arrTexures[i]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
+		HRESULT hr;
+		hr = Bind_ShaderResources();
 		CHECK_FAILED(hr);
 
-		// 셰이더 수치 조정
-		m_pShaderCom->Bind_RawValue("g_vRColor", &m_arrColor[i], sizeof(_float3));
-		if (i == 2) // 먼저 움직이는 이동 목표 Time-Bar
+		for (_int i = 0; i < m_arrTexures.size() - 2; ++i)
 		{
-			_int iMask = 1;
-			m_pShaderCom->Bind_RawValue("g_iMasking", &iMask, sizeof(_int));
-			m_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fGoalTimeBar, sizeof(_float));
-		}
-		if (i == 3) // 실질적인 Time-Bar
-		{
-			if(false == m_bGoing)
-				m_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fRatioTimeBar, sizeof(_float));
+			// Time-Bar에 따른 디 표정 맞추기
+			if (i >= 7 && i <= 9)
+				if (false == Setup_DeeFace(i)) continue;
+
+			// UI별 포지션, 사이즈, 컬러 조정
+			Setup_PosSizeColor(i);
+			if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+				return E_FAIL;
+
+			// 디퓨즈 바인딩
+			if (i == 10 || i == 11)
+				hr = m_arrTexures[i]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", m_arrTimerDigits[i - 10]); // 0,1
+			else if ((i >= 12) && (i <= 14))
+				hr = m_arrTexures[i]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", m_arrScoreDigits[i - 12]); // 0,1,2
 			else
-				m_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fRatioBarSub, sizeof(_float));
-			
-			// masking
-			m_pTexMask->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", 0);
-		}
-		if (i == 4) 
-		{
-			// 셰이더 변수들을 리셋시킵니다.
-			_float fRatio = { 1.f }; 
-			m_pShaderCom->Bind_RawValue("g_fMaskRatio", &fRatio, sizeof(_float));
-			_int iMask = 0;
-			m_pShaderCom->Bind_RawValue("g_iMasking",   &iMask, sizeof(_int));
-		}
-		
-		hr = m_pShaderCom->Begin(POSTEX_ALPHATEST_COLOR_HORIZONTALCUT);
-		CHECK_FAILED(hr);
+				hr = m_arrTexures[i]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
+			CHECK_FAILED(hr);
 
-		hr = m_pVIBufferCom->Bind_Buffers();
-		CHECK_FAILED(hr);
+			// 셰이더 수치 조정
+			m_pShaderCom->Bind_RawValue("g_vRColor", &m_arrColor[i], sizeof(_float3));
+			if (i == 2) // 먼저 움직이는 이동 목표 Time-Bar
+			{
+				_int iMask = 1;
+				m_pShaderCom->Bind_RawValue("g_iMasking", &iMask, sizeof(_int));
+				m_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fGoalTimeBar, sizeof(_float));
+			}
+			if (i == 3) // 실질적인 Time-Bar
+			{
+				if (false == m_bGoing)
+					m_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fRatioTimeBar, sizeof(_float));
+				else
+					m_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fRatioBarSub, sizeof(_float));
 
-		hr = m_pVIBufferCom->Render();
-		CHECK_FAILED(hr);
+				// masking
+				m_pTexMask->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", 0);
+			}
+			if (i == 4)
+			{
+				// 셰이더 변수들을 리셋시킵니다.
+				_float fRatio = { 1.f };
+				m_pShaderCom->Bind_RawValue("g_fMaskRatio", &fRatio, sizeof(_float));
+				_int iMask = 0;
+				m_pShaderCom->Bind_RawValue("g_iMasking", &iMask, sizeof(_int));
+			}
+
+			hr = m_pShaderCom->Begin(POSTEX_ALPHATEST_COLOR_HORIZONTALCUT);
+			CHECK_FAILED(hr);
+
+			hr = m_pVIBufferCom->Bind_Buffers();
+			CHECK_FAILED(hr);
+
+			hr = m_pVIBufferCom->Render();
+			CHECK_FAILED(hr);
+		}
 	}
-	
-	if(m_bRenderGameOver)
-		Render_GameOver();
 
+	if (m_arrRenderState[FADE] == true)
+	{
+		if (m_bRenderGameOver)
+			Render_GameOver();
+	}
 	return S_OK;
 }
 
@@ -210,6 +219,11 @@ void CUI_PartTime::Render_IMGUI()
 	//ImGui::DragFloat3(test2, (_float*)&m_vTESTCOLOR2, 0.01f, 0.f, 1.f);
 }
 #endif
+
+void CUI_PartTime::Set_RenderState(STATE _eState, _bool _bState)
+{
+	 m_arrRenderState[_eState] = _bState;
+}
 
 HRESULT CUI_PartTime::Add_Components()
 {
@@ -450,7 +464,7 @@ void CUI_PartTime::Compute_Timer(_float fTimeDelta)
 {
 	if (m_pGameInstance->Get_SecondTimer() == 0.f)
 	{
-		if(CPartTimeHelper::Get_Instance()->Handle_LunchTimeCamera())
+		if(CPartTimeHelper::Get_Instance()->Handle_LunchTime())
 			m_pGameInstance->Set_SecondTimerRatio(1.f);
 	}
 	_float fLunchTime(20.9f), fGameoverTime(0.5f);
@@ -464,7 +478,7 @@ void CUI_PartTime::Compute_Timer(_float fTimeDelta)
 		
 		if (m_fCurTime <= fGameoverTime) // GAME OVER 텍스쳐 띄우기
 		{
-			CPartTimeHelper::Get_Instance()->HandleGame(CPartTimeHelper::GAMEOVER);
+			CPartTimeHelper::Get_Instance()->Handle_UI(CPartTimeHelper::GAMEOVER);
 			
 		}
 		else if (m_fCurTime <= fLunchTime) // 타임이 20일 때, 점심시간 시작.
@@ -605,12 +619,12 @@ void CUI_PartTime::Render_Fade()
 	m_pShaderCom->Bind_RawValue("g_fFadeRatio", &fRatio, sizeof(_float));
 
 	if (fFadeOutRatio < -0.99f)
-		CPartTimeHelper::Get_Instance()->HandleGame(CPartTimeHelper::OVER);
+		CPartTimeHelper::Get_Instance()->Handle_UI(CPartTimeHelper::OVER);
 	if (fFadeOutRatio < -0.f)
 	{
 		if (!m_bOnce)
 		{
-			CPartTimeHelper::Get_Instance()->Handle_GameOverCamera();
+			CPartTimeHelper::Get_Instance()->Handle_GameOver();
 			m_bOnce = true;
 		}
 	}

@@ -13,7 +13,9 @@ END
 BEGIN(Client)
 class CUI_PartTime : public CUIObject
 {
-	enum UI_NAME { TIME_BAR_BG, UI_END };
+public:
+	enum STATE { BASIC, FADE, STATE_END };
+
 private:
 	CUI_PartTime(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CUI_PartTime(const CUI_PartTime& rhs);
@@ -35,7 +37,8 @@ public:
 
 	void						Set_PreRatioBar() { m_fRatioBarSub = m_fRatioTimeBar; }
 	void						Set_RenderGameOver(_bool _Gameover) { m_bRenderGameOver = _Gameover; }
-
+	void						Set_RenderState(STATE _eState, _bool _bState);
+	
 private:
 	HRESULT						Add_Components();
 	
@@ -96,6 +99,7 @@ private:
 	_bool						m_bRenderGameOver = false;
 
 	_bool						m_bOnce = false;
+	array<_bool, STATE_END>		m_arrRenderState;
 
 public:
 	static CUI_PartTime*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -226,3 +226,40 @@ void CPartTimerKirby_Grab_State::Free()
 
 #pragma endregion
 
+
+#pragma region WIN STATE
+//*********************************
+//			WIN STATE
+//*********************************
+CPartTimerKirby_Win_State::CPartTimerKirby_Win_State()
+{
+}
+
+void CPartTimerKirby_Win_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
+}
+
+void CPartTimerKirby_Win_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CPartTimerKirby* pAlbaKirby = static_cast<CPartTimerKirby*>(pGameObject);
+	CTransform* pTransform = pAlbaKirby->Get_TransformCom();
+}
+
+void CPartTimerKirby_Win_State::OnStateExit()
+{
+
+}
+
+CPartTimerKirby_Win_State* CPartTimerKirby_Win_State::Create()
+{
+	CPartTimerKirby_Win_State* pInstance = new CPartTimerKirby_Win_State();
+	return pInstance;
+}
+
+void CPartTimerKirby_Win_State::Free()
+{
+	__super::Free();
+}
+#pragma endregion
+

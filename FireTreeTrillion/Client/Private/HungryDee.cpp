@@ -305,7 +305,8 @@ void CHungryDee::Change_Dialog(PARTTIME_ITEM eItem)
 
 void CHungryDee::OnNotify()
 {
-	// 특정 시간일때 와들디 처리
+	// 특정 시간일때 와들디 처리 >> 점심시간에 화내기 시작하는걸 여기서 처리해주면 될것같유
+	// 효선아 여기야
 }
 
 //맨 앞자리 디

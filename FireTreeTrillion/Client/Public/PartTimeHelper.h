@@ -28,7 +28,7 @@ public:
 	void				Register_UI(class CUI_PartTime* pUI);
 	void				Register_PartTimeResult(class CUI_PartTimeResult* pUI);
 	void				Register_Camera(class CCamera* pCamera);
-	//void				NotifyObserver();
+	void				NotifyObserver();
 
 	// ¹®Á¦ ³À´Ï´Ù.
 	void				Make_RandomItem();
