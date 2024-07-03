@@ -56,6 +56,7 @@ void CPartTimeHelper::Make_RandomItem()
 	_int iRandom = CUtils::Make_RandomInt(0,3);
 	m_eFood = (PARTTIME_ITEM)iRandom;
 	m_pHungryDee->Change_Dialog(m_eFood);
+	m_pHungryDee->Set_MaskValueUI(0.f);
 }
 
 // 셀렉한 친구가 와들디가 달라고하는 친구가 맞는 지 확인한다.

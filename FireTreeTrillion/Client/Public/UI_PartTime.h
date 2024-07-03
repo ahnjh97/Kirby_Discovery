@@ -14,7 +14,7 @@ BEGIN(Client)
 class CUI_PartTime : public CUIObject
 {
 public:
-	enum STATE { START, BASIC, FADE, STATE_END };
+	enum STATE { BASIC, START, FADE, STATE_END };
 
 private:
 	CUI_PartTime(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

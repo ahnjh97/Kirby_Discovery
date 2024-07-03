@@ -59,7 +59,7 @@ HRESULT CUI_PartTime::Initialize_Prototype()
 	fill(m_arrScoreDigits.begin(), m_arrScoreDigits.end(), iZero);
 	
 	m_arrRenderState[START] = true;
-	m_arrRenderState[BASIC] = false;
+	m_arrRenderState[BASIC] = true;
 	m_arrRenderState[FADE] = false;
 
 	m_arrTimerDigits[0] = 5;

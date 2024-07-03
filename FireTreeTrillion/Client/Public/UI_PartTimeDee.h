@@ -37,7 +37,8 @@ public:
 	void						Update_Pos(_float3 _vPosition);
 
 	void						Set_Type(TYPE _eType) { m_eDialogTheme = _eType; }
-
+	void						Set_Mask(_float _fMask) { m_fMask = _fMask; }
+	
 private:
 	HRESULT						Add_Components();
 	HRESULT						Bind_ShaderResources();

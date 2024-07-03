@@ -109,8 +109,11 @@ HRESULT CUI_PartTimeDee::Render()
 		{
 			_float fAlpha = 1.f;
 			m_pShaderCom->Bind_RawValue("g_fAlpha", &fAlpha, sizeof(_float));
-			if(m_bRandomColor)
+			if (m_bRandomColor)
+			{
+				m_vFoodColor = _float3(0.45f, 0.45f, 0.45f);
 				m_pShaderCom->Bind_RawValue("g_vRColor", &m_vFoodColor, sizeof(_float3));
+			}
 			
 			// Binding DIFFUSE
 			hr = m_arrTexures[i]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
@@ -124,12 +127,21 @@ HRESULT CUI_PartTimeDee::Render()
 				m_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fMask, sizeof(_float));
 				m_pTexMask->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", 0);
 			}
+			//else
+			//{
+			//	m_fMask = 1.f;
+			//	m_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fMask, sizeof(_float));
+			//	m_pTexMask->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", 0);
+			//}
 			
 			hr = m_pShaderCom->Begin(POSTEX_ALPHATEST_COLOR_VERTICALCUT);
 			CHECK_FAILED(hr);
 		}
 		else
 		{
+			m_vFoodColor = _float3(1.f, 1.f, 1.f);
+			m_pShaderCom->Bind_RawValue("g_vRColor", &m_vFoodColor, sizeof(_float3));
+
 			hr = m_arrTexures[i]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
 			hr = m_pShaderCom->Begin(POSTEX_ALPHATEST_COLOR_HORIZONTALCUT);
 			CHECK_FAILED(hr);

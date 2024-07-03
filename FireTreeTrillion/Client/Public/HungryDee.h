@@ -62,6 +62,7 @@ public:
 
 	void			OnNotify();
 	void			Bring_Food(enum class PARTTIME_ITEM eITEM);
+	void			Set_MaskValueUI(_float _fMaskValue);
 
 private:
 	DEE_SHOPANIM	m_eMyState = { DEESHOPANIM_END };
