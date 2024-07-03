@@ -17,8 +17,14 @@ namespace Client
                  LEVEL_INTRO,
                  LEVEL_RACING,
                  LEVEL_DEEDEEDEE,
+
                  LEVEL_TOWN,
                  LEVEL_PARTTIME,
+
+                 //LEVEL_GAMBLE,
+                 //LEVEL_PARK,
+
+                 LEVEL_SIMBA,
                  LEVEL_FINALBOSS, // 리소스명 LAB_DISCOVERA
                  LEVEL_FINALE,
 
