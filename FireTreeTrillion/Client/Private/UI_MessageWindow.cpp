@@ -19,8 +19,8 @@ HRESULT CUI_MessageWindow::Initialize_Prototype()
 
 HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 {
-	//HRESULT hr = __super::Initialize(_pArg);
-	//CHECK_FAILED(hr);
+	HRESULT hr = __super::Initialize(_pArg);
+	CHECK_FAILED(hr);
 
 	UIOBJ_DESC* MessageWindowDesc{};
 	if (_pArg != nullptr)
@@ -78,7 +78,7 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 
 	switch (m_eCurState)
 	{
-	case WINDOW_HIDE: m_UIObjDesc.fAlpha -= fTimeDelta * 2.f;	break;
+	case WINDOW_HIDE: m_UIObjDesc.fAlpha -= fTimeDelta * 5.f;	break;
 	case WINDOW_SHOW: m_UIObjDesc.fAlpha = 1.f;	break;
 	case WINDOW_IDLE: default:	break;
 	}

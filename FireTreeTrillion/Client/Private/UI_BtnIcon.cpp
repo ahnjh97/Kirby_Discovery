@@ -26,8 +26,6 @@ HRESULT CUI_BtnIcon::Initialize(void* _pArg)
 
 	if (_pArg != nullptr)
 		BtnIconDesc = (UIOBJ_DESC*)_pArg;
-	
-	//m_UIObjDesc = *BtnIconDesc;
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;
@@ -40,7 +38,6 @@ HRESULT CUI_BtnIcon::Initialize(void* _pArg)
 	_float4 vTrans = { 478.f, -388.f, 1.f, 1.f };
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vTrans);
 
-	//m_pTransformCom->Rotation(XMVectorSet(AXIS_Z), XMConvertToRadians(m_UIObjDesc.vDegree.z));
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 
@@ -88,7 +85,7 @@ _int CUI_BtnIcon::Tick(_float fTimeDelta)
 		m_fBtnAlpha = 1.f;
 
 		m_fBlinkTime += fTimeDelta;
-		if (m_fBlinkTime > 0.5f)
+		if (m_fBlinkTime > 1.f)
 		{
 			m_fBlinkAlpha = 0.f;
 			m_fBlinkTime = 0.f;
@@ -169,11 +166,10 @@ void CUI_BtnIcon::Render_IMGUI()
 {
 	switch (m_eCurState)
 	{
-	case BTN_IDLE:	break;
-	case BTN_BLINK:	break;
-	case BTN_SELECT:break;
-	case BTN_NONE:	break;
-	default:	break;
+	case BTN_IDLE:	ImGui::Text(u8"BTN_IDLE");	break;
+	case BTN_BLINK:	ImGui::Text(u8"BTN_BLINK"); break;
+	case BTN_SELECT:ImGui::Text(u8"BTN_SELECT"); break;
+	case BTN_NONE:default: ImGui::Text(u8"BTN_NONE"); break;
 	}
 }
 #endif
