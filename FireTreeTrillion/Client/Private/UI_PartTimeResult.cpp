@@ -53,7 +53,8 @@ HRESULT CUI_PartTimeResult::Initialize(void* _pArg)
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 
 	CPartTimeHelper::Get_Instance()->Register_PartTimeResult(this);
-
+	
+	Initialize_TexturePos();
 	m_bIsRender = false;
 
 	return S_OK;
@@ -62,18 +63,6 @@ HRESULT CUI_PartTimeResult::Initialize(void* _pArg)
 _int CUI_PartTimeResult::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
-
-	// ½ºÄÚ¾î
-	/*
-	m_arrPosition[0] = _float2(230.f, 810.f);
-	m_arrPosition[0] = _float2(230.f, 810.f);
-	m_arrPosition[0] = _float2(230.f, 810.f);
-	m_arrPosition[0] = _float2(230.f, 810.f);
-	m_arrPosition[0] = _float2(230.f, 810.f);
-	m_arrPosition[0] = _float2(230.f, 810.f);
-	m_arrPosition[0] = _float2(230.f, 810.f);
-	m_arrPosition[0] = _float2(230.f, 810.f);
-	*/
 
 	return OBJ_NOEVENT;
 }
@@ -93,8 +82,7 @@ HRESULT CUI_PartTimeResult::Render()
 
 	for (_int i = 0; i < m_arrTexures.size(); ++i)
 	{
-		m_arrPosition[0] = _float2(800.f, 222.f);
-		m_arrPosition[4] = _float2(800.f, 490.f);
+
 		m_pTransformCom->Set_Scaled(m_arrSize[i].x, m_arrSize[i].y, 1.f);
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION,
 			XMVectorSet(m_arrPosition[i].x - g_iWinSizeX * 0.5f,
@@ -155,6 +143,21 @@ void CUI_PartTimeResult::Render_IMGUI()
 	//ImGui::DragFloat3(test2, (_float*)&m_vTESTCOLOR2, 0.01f, 0.f, 1.f);
 }
 #endif
+
+void CUI_PartTimeResult::Initialize_TexturePos()
+{
+	m_arrPosition[0] = _float2(800.f,  222.f);
+									   
+	m_arrPosition[1] = _float2(740.f,  212.f);
+	m_arrPosition[2] = _float2(800.f,  212.f);
+	m_arrPosition[3] = _float2(860.f,  212.f);
+									   
+	m_arrPosition[4] = _float2(800.f,  490.f);
+									   
+	m_arrPosition[5] = _float2(960.f,  482.f);
+	m_arrPosition[6] = _float2(1010.f, 482.f);
+	m_arrPosition[7] = _float2(1060.f, 482.f);
+}
 
 HRESULT CUI_PartTimeResult::Add_Components()
 {

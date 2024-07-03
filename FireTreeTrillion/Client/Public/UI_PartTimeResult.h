@@ -28,6 +28,8 @@ public:
 	virtual void					Render_IMGUI()								override;
 #endif
 
+	void							Initialize_TexturePos();
+
 private:
 	HRESULT							Add_Components();
 	HRESULT							Bind_ShaderResources();

@@ -71,6 +71,7 @@ private:
 
 	// set-up camera
 	HRESULT			Make_TargetToCams();
+	_bool			Custom_Face(_uint iMeshIndex);
 
 private:
 	CModel*					m_pModelCom   = { nullptr };

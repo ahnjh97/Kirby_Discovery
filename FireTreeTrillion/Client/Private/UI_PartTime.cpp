@@ -450,7 +450,7 @@ void CUI_PartTime::Compute_Timer(_float fTimeDelta)
 {
 	if (m_pGameInstance->Get_SecondTimer() == 0.f)
 	{
-		if(CPartTimeHelper::Get_Instance()->HandleCamera())
+		if(CPartTimeHelper::Get_Instance()->Handle_LunchTimeCamera())
 			m_pGameInstance->Set_SecondTimerRatio(1.f);
 	}
 	_float fLunchTime(20.9f), fGameoverTime(0.5f);
@@ -465,6 +465,7 @@ void CUI_PartTime::Compute_Timer(_float fTimeDelta)
 		if (m_fCurTime <= fGameoverTime) // GAME OVER 텍스쳐 띄우기
 		{
 			CPartTimeHelper::Get_Instance()->HandleGame(CPartTimeHelper::GAMEOVER);
+			
 		}
 		else if (m_fCurTime <= fLunchTime) // 타임이 20일 때, 점심시간 시작.
 		{
@@ -596,16 +597,23 @@ void CUI_PartTime::Render_Fade()
 	_int iNum = 16;
 	static _float fFadeOutRatio = 1.f;
 
-	/*_int iFade = 2;
-	m_pShaderCom->Bind_RawValue("g_iFade", &iFade, sizeof(_int));*/
+	_int iFade = 1;
+	m_pShaderCom->Bind_RawValue("g_iFade", &iFade, sizeof(_int));
 	
-	fFadeOutRatio -= m_fTimeDelta * 0.1f;
+	fFadeOutRatio -= m_fTimeDelta * 0.9f;
 	_float fRatio = EASE_IN_SINE(fFadeOutRatio);
 	m_pShaderCom->Bind_RawValue("g_fFadeRatio", &fRatio, sizeof(_float));
 
-	if (fRatio <= 0)
+	if (fFadeOutRatio < -0.99f)
 		CPartTimeHelper::Get_Instance()->HandleGame(CPartTimeHelper::OVER);
-
+	if (fFadeOutRatio < -0.f)
+	{
+		if (!m_bOnce)
+		{
+			CPartTimeHelper::Get_Instance()->Handle_GameOverCamera();
+			m_bOnce = true;
+		}
+	}
 	m_pTransformCom->Set_Scaled(m_arrSize[iNum].x, m_arrSize[iNum].y, 1.f);
 	m_arrPosition[iNum] = _float2(800.f, 400.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION,

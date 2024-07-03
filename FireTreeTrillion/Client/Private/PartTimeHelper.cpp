@@ -6,6 +6,7 @@
 #include "UI_PartTime.h"
 #include "UI_PartTimeDee.h"
 #include "UI_PartTimeResult.h"
+#include "Camera_Free.h"
 
 IMPLEMENT_SINGLETON(CPartTimeHelper)
 
@@ -41,6 +42,13 @@ void CPartTimeHelper::Register_PartTimeResult(CUI_PartTimeResult* pResult)
 	Safe_AddRef(m_pUI_PartTimeResult);
 }
 
+void CPartTimeHelper::Register_Camera(CCamera* pCamera)
+{
+	Safe_Release(m_pCamera);
+	m_pCamera = pCamera;
+	Safe_AddRef(m_pCamera);
+}
+
 // PartTimer Kirby state에서 맞추거나 틀리고 나서 불리우는 함수.
 // 실질적 문제내는 함수
 void CPartTimeHelper::Make_RandomItem()
@@ -72,38 +80,52 @@ _bool CPartTimeHelper::Check_Item(PARTTIME_ITEM eITEM)
 }
 
 // 점심시간 알리는 용도로만 현재 사용하고 있습니다. 추후 추가될때 제게 말씀주세요 jywi
-void CPartTimeHelper::NotifyObserver()
+//void CPartTimeHelper::NotifyObserver()
+//{
+//	if(m_pHungryDee != nullptr)
+//		m_pHungryDee->OnNotify();
+//	if(m_pPartTimerKirby != nullptr)
+//		m_pPartTimerKirby->OnNotify();
+//}
+
+/// <summary> 점심시간 안내에 대한 이벤트 처리 </summary>
+/// <returns> true : 얼음 땡, false : 얼음 중 </returns>
+_bool CPartTimeHelper::Handle_LunchTime()
 {
-	if(m_pHungryDee != nullptr)
-		m_pHungryDee->OnNotify();
-	if(m_pPartTimerKirby != nullptr)
-		m_pPartTimerKirby->OnNotify();
+
+	return true;
+}
+
+_bool CPartTimeHelper::Handle_GameOver()
+{
+	m_pCamera->Lock_Camera({ 21.44f, 28.98f, 8.84f }, { -0.13f, -0.29f, 0.95f }, 33.f);
+	
+	// Player 세팅
+	CTransform* pTransform = m_pPartTimerKirby->Get_TransformCom();
+	pTransform->Set_State(CTransform::STATE_POSITION, _float4(17.85f, 23.8f, 27.f, 1.f));
+	pTransform->Rotation(_float3{ 0.f, 1.f, 0.f }, ToRadian(170.f));
+
+	// Dee들 세팅
+	// 효선아 여기야
+
+	// UI 세팅
+	m_pHungryDee->Erase_DialogUI();
+
+	return true;
 }
 
 // 게임 흐름과 관련된 일을 처리하는 함수
-void CPartTimeHelper::HandleGame(TYPE eContent)
+void CPartTimeHelper::Handle_UI(TYPE eContent)
 {
-	if (eContent == GAMEOVER)		// 게임 종료 : GAME OVER 띄우기
+	if (eContent == GAMEOVER)  // 게임 종료 : GAME OVER 띄우기
 	{
 		m_pUI_PartTime->Set_RenderGameOver(true);
 	}
-	else if (eContent == OVER) // 게임 종료
+	else if (eContent == OVER) // 게임 종료 : 카메라 전환된 상태에서 UI
 	{
 		m_pUI_PartTime->Set_IsRender(false);
-		m_pHungryDee->Erase_DialogUI();
 		m_pUI_PartTimeResult->Set_IsRender(true);
 	}
-	else if (eContent == ETC) // ??
-	{
-		//m_pUI_PartTime->Set_IsRender(false);
-	}
-}
-
-/// <summary> 카메라 등 점심시간 안내에 대한 이벤트 처리 </summary>
-/// <returns> true : 얼음 땡, false : 얼음 중 </returns>
-_bool CPartTimeHelper::HandleCamera()
-{
-	return true;
 }
 
 void CPartTimeHelper::Free()
@@ -113,5 +135,6 @@ void CPartTimeHelper::Free()
 	Safe_Release(m_pUI_PartTime);
 	Safe_Release(m_pUI_PartTimeResult);
 	Safe_Release(m_pPartTimerKirby);
+	Safe_Release(m_pCamera);
 }
 

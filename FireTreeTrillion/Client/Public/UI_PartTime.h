@@ -95,6 +95,8 @@ private:
 	_float2						m_fRealTimeSize2D = _float2();
 	_bool						m_bRenderGameOver = false;
 
+	_bool						m_bOnce = false;
+
 public:
 	static CUI_PartTime*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject*		Clone(void* pArg) override;

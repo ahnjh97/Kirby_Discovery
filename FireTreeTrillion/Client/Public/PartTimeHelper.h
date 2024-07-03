@@ -27,7 +27,8 @@ public:
 	void				Register_PartTimerKirby(class CPartTimerKirby* pKirby);
 	void				Register_UI(class CUI_PartTime* pUI);
 	void				Register_PartTimeResult(class CUI_PartTimeResult* pUI);
-	void				NotifyObserver();
+	void				Register_Camera(class CCamera* pCamera);
+	//void				NotifyObserver();
 
 	// 문제 냅니다.
 	void				Make_RandomItem();
@@ -35,12 +36,14 @@ public:
 	_bool				Check_Item(PARTTIME_ITEM eITEM);
 	// 현 문제의 답안지를 공개합니다.
 	PARTTIME_ITEM		Get_PartTimeItem() const { return m_eFood; }
-	// 점심시간에 따른 새로운 이벤트입니다. 카메라를 이동시킵니다.
-	_bool				HandleCamera();
-	// 게임 시작과 종료를 관할합니다.
-	void				HandleGame(TYPE eContent);
+
+	// 게임 흐름에 따른 이벤트들을 관할합니다.
+	_bool				Handle_LunchTime();
+	_bool				Handle_GameOver();
+	void				Handle_UI(TYPE eContent);
 
 private:
+	class CCamera*				m_pCamera			 = nullptr;
 	class CHungryDee*			m_pHungryDee		 = nullptr;
 	class CPartTimerKirby*		m_pPartTimerKirby	 = nullptr;
 	class CUI_PartTime*			m_pUI_PartTime		 = nullptr;

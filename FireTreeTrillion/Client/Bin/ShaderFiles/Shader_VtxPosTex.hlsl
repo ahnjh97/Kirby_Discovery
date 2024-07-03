@@ -534,9 +534,9 @@ PS_OUT PS_FADE_INOUT(PS_IN_ALPHABLEND In)
     //Out.vColor.rgb = g_vRColor;
     Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
     
-    //if (g_iFade == 2)
-    //    Out.vColor.a *= 1 - g_fFadeRatio;
-    Out.vColor.a *= 1 - g_fFadeRatio;
+    if (g_iFade == 1)
+        Out.vColor.a *= g_fFadeRatio;
+    
     return Out;
 }
 
