@@ -91,42 +91,75 @@ _int CAbility::Tick(_float fTimeDelta)
 		CTransform* pCameraTransform = pCameraMain->Get_TransformCom();
 		_vector vCameraLook = pCameraTransform->Get_State_Vector(CTransform::STATE_LOOK);
 		vCameraLook.m128_f32[1] = 0.f;
-		//m_pTransformCom->Look_At_Axis(pCameraTransform->Get_State_Vector(CTransform::STATE_LOOK));
-		_vector		vLook = vCameraLook;
-		_vector		vRight = XMVector3Cross(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), vLook);
-		_vector		vUp = XMVector3Cross(vLook, vRight);
 
-		_float3		vScaled = m_pTransformCom->Get_Scaled();
-
-		m_pTransformCom->Set_State(CTransform::STATE_RIGHT, XMVector3Normalize(vRight) * vScaled.x);
-		m_pTransformCom->Set_State(CTransform::STATE_UP, XMVector3Normalize(vUp) * vScaled.y);
-		m_pTransformCom->Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLook) * vScaled.z);
-
-		m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * m_fRotateDir, m_fTimeDelta * 3.f);
-
-		if(0.f < m_fSpeed)
+		// 날아가는 도중이다.  1초에 360도 회전하며, 30의 거리로 날아간다.
+		if (m_ePhyXState == PO_FLYAWAY)
 		{
-			m_fSpeed -= m_fTimeDelta;
-			m_pControllerCom->Move_Dir(m_pTransformCom, m_vDir * m_fTimeDelta * m_fSpeed, m_fTimeDelta);
+			_vector		vLook = vCameraLook;
+			_vector		vRight = XMVector3Cross(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), vLook);
+			_vector		vUp = XMVector3Cross(vLook, vRight);
+
+			_float3		vScaled = m_pTransformCom->Get_Scaled();
+
+			m_pTransformCom->Set_State(CTransform::STATE_RIGHT, XMVector3Normalize(vRight) * vScaled.x);
+			m_pTransformCom->Set_State(CTransform::STATE_UP, XMVector3Normalize(vUp) * vScaled.y);
+			m_pTransformCom->Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLook) * vScaled.z);
+
+			_float3 vDamegeDir = m_vDamegeDir;
+			_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vDamegeDir * m_fTimeDelta * 30.f);
+			m_pTransformCom->Turn(vCameraLook, m_fTimeDelta, 360.f);
+			m_fFlyTime += m_fTimeDelta;
+
+
+			if (RayCast_Terrain(XMVector3Normalize(vDamegeDir)) == true)
+				m_bDead = true;
+
+			if (m_fFlyTime > 2.f)
+				m_bDead = true;
 		}
+		else if (m_ePhyXState == PO_FLYDEADAWAY)
+			m_bDead = true;
+		else if (m_ePhyXState == PO_KIRBYMOUTH)
+			Delete_AllEffect();
 		else
-			m_fSpeed = 0.f;
-
-		if (false == m_pControllerCom->Jump(m_pTransformCom, m_fJumpPower, m_fTimeDelta))
 		{
-			if(0 < m_fJumpPowerTemp)
+			_vector		vLook = vCameraLook;
+			_vector		vRight = XMVector3Cross(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), vLook);
+			_vector		vUp = XMVector3Cross(vLook, vRight);
+
+			_float3		vScaled = m_pTransformCom->Get_Scaled();
+
+			m_pTransformCom->Set_State(CTransform::STATE_RIGHT, XMVector3Normalize(vRight) * vScaled.x);
+			m_pTransformCom->Set_State(CTransform::STATE_UP, XMVector3Normalize(vUp) * vScaled.y);
+			m_pTransformCom->Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLook) * vScaled.z);
+
+			m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * m_fRotateDir, m_fTimeDelta * 3.f);
+
+			if (0.f < m_fSpeed)
 			{
-				--m_fJumpPowerTemp;
-				m_fJumpPower = m_fJumpPowerTemp;
+				m_fSpeed -= m_fTimeDelta;
+				m_pControllerCom->Move_Dir(m_pTransformCom, m_vDir * m_fTimeDelta * m_fSpeed, m_fTimeDelta);
 			}
 			else
+				m_fSpeed = 0.f;
+
+			if (false == m_pControllerCom->Jump(m_pTransformCom, m_fJumpPower, m_fTimeDelta))
 			{
-				m_fLifeTime += m_fTimeDelta;
-				if (0.2f < m_fLifeTime)
-					m_bDead = true;
+				if (0 < m_fJumpPowerTemp)
+				{
+					--m_fJumpPowerTemp;
+					m_fJumpPower = m_fJumpPowerTemp;
+				}
+				else
+				{
+					m_fLifeTime += m_fTimeDelta;
+					if (0.2f < m_fLifeTime)
+						m_bDead = true;
+				}
 			}
+			m_fJumpPower -= GRAVITY * m_fTimeDelta * m_fPower;
 		}
-		m_fJumpPower -= GRAVITY * m_fTimeDelta * m_fPower;
 	}
 	else
 	{
@@ -338,6 +371,26 @@ void CAbility::AbilityType(ABILITYTYPE eAbilityType)
 	default:
 		break;
 	}
+}
+
+_bool CAbility::RayCast_Terrain(const _float3 vMoveDir)
+{
+	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	PxVec3 rayOrigin = PxVec3((_float)vPos.x, (_float)vPos.y, (_float)vPos.z);
+	PxVec3 rayDirection = PxVec3(vMoveDir.x, vMoveDir.y, vMoveDir.z);
+	_float fMaxDistance = 1.f;
+
+	PxRaycastHit hit;
+	PxRaycastBuffer hitBuffer;
+	PxQueryFilterData filterData(PxQueryFlag::eSTATIC);
+
+	_bool isRayCast = m_pGameInstance->Get_Scene()->raycast(rayOrigin, rayDirection, fMaxDistance, hitBuffer, PxHitFlag::eNORMAL, filterData);
+
+	if (isRayCast == true)
+		return true;
+
+	// 레이 쐈는데 터레인이 없었다.
+	return false;
 }
 
 void CAbility::Sphere_Collision()

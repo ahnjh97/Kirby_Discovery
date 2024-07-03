@@ -51,7 +51,7 @@ public:
 			m_fHp = m_fMaxHp;
 		else if (m_fHp < 0.f)
 			m_fHp = 0.f;
-		m_fWhiteColorDiffuse = 1.f;
+		m_fWhiteColorDiffuse = 0.8f;
 	}
 
 

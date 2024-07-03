@@ -53,6 +53,7 @@ private:
 	_bool					m_bStaticOffTrigger = { true };
 
 	_float					m_fSize = { 0.f };
+
 	
 public:
 	static CStarBlock*	 Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -290,7 +290,7 @@ _float CMeteor::EaseInQuart(_float fNumber)
 
 _float CMeteor::EaseOutCubic(_float fNumber)
 {
-	return fNumber == 1 ? 1 : 1 - pow(2, -10 * fNumber);
+	return fNumber == 1 ? 1 : 1 - (_float)pow(2, -10 * fNumber);
 }
 
 CMeteor* CMeteor::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

@@ -47,8 +47,8 @@ HRESULT CFinalBoss::Initialize(void* pArg)
 	if (FAILED(Add_PartObjects()))
 		return E_FAIL;
 
-	m_fMaxHp = 15.f;
-	m_fHp = 15.f;
+	m_fMaxHp = 500.f;
+	m_fHp = 500.f;
 	m_fAttack = 10.f;
 	m_eVacuumSize = SIZE_BIG;
 	m_eBossState = STATE_FLYING;
@@ -291,6 +291,13 @@ HRESULT CFinalBoss::Add_Components()
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 
 	CHitBox::HITBOX_DESC HitBox{};
+	HitBox.pOwner = this;
+	HitBox.pDesc = &m_tColliderDesc[BODY];
+	HitBox.pCollisionType = BOSS_FINALBOSS;
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
+		return E_FAIL;
+	Set_BodyCollider(COLLIDER_CYLINDER, 1.5f, 3.f, 3.f);
+
 	HitBox.pOwner = this;
 	HitBox.pDesc = &m_tColliderDesc[ATTACK];
 	HitBox.pCollisionType = HITBOX_MONSTER;

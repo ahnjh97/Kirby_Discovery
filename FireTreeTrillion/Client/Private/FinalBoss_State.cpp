@@ -7,6 +7,7 @@
 #include "Meteor.h"
 #include "BossClone.h"
 #include "Ability.h"
+#include "Camera_Main.h"
 //#include "SpikeSpear.h"
 
 #pragma region APPEAR STATE
@@ -29,7 +30,13 @@ void CFinalBoss_Appear_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 
 	if(pFinalBoss->IsAnimFinished())
+	{
+		HRESULT hr;
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_BossUI"), TEXT("Prototype_GameObject_HUD_BossHpBar"), pFinalBoss);
+		CHECK_FAILED(hr);
+
 		pFinalBoss->Change_State(CFinalBoss::FINALBOSS_WAITAIR, 50.f, false, true);
+	}
 }
 
 void CFinalBoss_Appear_State::OnStateExit()
@@ -332,7 +339,11 @@ void CFinalBoss_Stab_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 				CHECK_FAILED(hr);
 
-				pFinalBoss->Activate_FrustumCollider(0.5f, 10.f, 180.f);
+				CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+				if (pCamera != nullptr)
+					pCamera->Make_Shake(1.f, 2.5f);
+
+				pFinalBoss->Activate_FrustumCollider(0.5f, 8.f, 120.f);
 				pFinalBoss->Set_BossState(CFinalBoss::STATE_GROUND);
 				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STAB, 50.f, false, true);
 			}
