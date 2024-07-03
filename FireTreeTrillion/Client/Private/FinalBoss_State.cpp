@@ -6,6 +6,7 @@
 #include "DimensionGate.h"
 #include "Meteor.h"
 #include "BossClone.h"
+#include "Ability.h"
 //#include "SpikeSpear.h"
 
 #pragma region APPEAR STATE
@@ -321,6 +322,16 @@ void CFinalBoss_Stab_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		{
 			if(pController->Is_Terrain())
 			{
+				HRESULT hr = S_OK;
+
+				CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
+				AbilityItemDesc.fRotateDir = 1.f;
+				AbilityItemDesc.vDir = pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT);
+				AbilityItemDesc.vPosition = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+				AbilityItemDesc.eAbilityType = ABILITY_DEFAULT;
+				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+				CHECK_FAILED(hr);
+
 				pFinalBoss->Activate_FrustumCollider(0.5f, 10.f, 180.f);
 				pFinalBoss->Set_BossState(CFinalBoss::STATE_GROUND);
 				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STAB, 50.f, false, true);
