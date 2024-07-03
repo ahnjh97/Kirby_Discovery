@@ -44,7 +44,7 @@ HRESULT CVIBuffer::Render()
 
 	return S_OK;
 }
-
+	
 HRESULT CVIBuffer::Bind_Buffers()
 {
 	ID3D11Buffer*		pVertexBuffers[] = {
