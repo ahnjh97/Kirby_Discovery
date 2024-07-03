@@ -91,6 +91,9 @@
 #include "DeeDeeDee.h"
 #include "DeeDeeDeeHammer.h"
 
+// 피날레
+#include "FinaleRoad.h"
+
 //와들디
 #include "Dee_Part.h"
 #include "OriginalDee.h"
@@ -348,6 +351,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PoppyBomb"), CPoppyBomb);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CappyBody"), CCappyBody);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CappyHat"), CCappyHat);
+
 	// FinalBoss
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalBoss"), CFinalBoss);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalBossSpear"), CFinalBossSpear);
@@ -358,6 +362,9 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Meteor"), CMeteor);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BossClone"), CBossClone);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gully"), CGully);
+
+	// Finale
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleRoad"), CFinaleRoad);
 
 	//Dee
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeePart"), CDee_Part);
@@ -1778,10 +1785,39 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Land_LbLastBossBeforeStep", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("Land_LbLastBossBeforeStep_Blend", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("LevelFinale_LbLastBuilding", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("FinaleCave", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 		//기믹 오브젝트
 		m_vecModelInfo.emplace_back("LbAntenna_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("LbBossRoomDoor_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+
+		//피날레 오브젝트들
+		m_vecModelInfo.emplace_back("PopStar", TYPE_ANIM, 1.f, 0.f, 0);
+
+
+		m_vecModelInfo.emplace_back("Baum", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("BaumPieceA", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("BaumPieceB", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("BaumPieceC", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("BaumPieceD", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("BaumPieceE", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("BaumPieceF", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("BuildingPiece", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("StarPiece", TYPE_NONANIM, 1.f, 0.f, 0);
+
+		m_vecModelInfo.emplace_back("MovableBuildingA", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("MovableBuildingB", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("MovableBuildingC", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("MovableBuildingD", TYPE_NONANIM, 1.f, 0.f, 0);
+
+
+		m_vecModelInfo.emplace_back("Road", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("RoadEnd", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("RoadParticle", TYPE_NONANIM, 1.f, 0.f, 0);
+
+		m_vecModelInfo.emplace_back("RoadBreak", TYPE_ANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("RoadLBreak", TYPE_ANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("RoadLongBreak", TYPE_ANIM, 1.f, 0.f, 0);
 
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("BG1", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));

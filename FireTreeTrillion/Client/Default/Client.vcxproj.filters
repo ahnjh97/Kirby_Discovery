@@ -490,6 +490,9 @@
     <Filter Include="02.GameObjects\DecoObject">
       <UniqueIdentifier>{aae835b0-4a08-4f27-88da-102e823f0326}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\FinaleRoad">
+      <UniqueIdentifier>{4b701e1c-0a8a-4c87-9d85-34140b695c97}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -985,6 +988,7 @@
     <ClInclude Include="..\public\DecoObject.h">
       <Filter>02.GameObjects\DecoObject</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\FinaleRoad.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1461,6 +1465,7 @@
     <ClCompile Include="..\private\DecoObject.cpp">
       <Filter>02.GameObjects\DecoObject</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\FinaleRoad.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
