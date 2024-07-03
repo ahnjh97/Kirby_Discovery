@@ -86,12 +86,16 @@ HRESULT CUI_PartTimeDee::Render()
 	hr = Bind_ShaderResources();
 	CHECK_FAILED(hr);
 
+	// 해당 클래스에서 Thinking 말풍선이 테마일 경우
+	if (m_eDialogTheme == THINKING)
+	{
+		Render_Thinking();
+		return S_OK;
+	}
+
 	for (_int i = 0; i < m_arrTexures.size(); ++i)
 	{
-		if (m_eDialogTheme == THINKING) // dirty
-			if (i != 1) continue;
-		else
-			if (i == 1) continue;
+		if (i == 1) continue;
 
 		if (i >= 2) // 4개의 음식중 true처리가 되어있는 음식만 렌더합니다.
 		{
@@ -127,12 +131,6 @@ HRESULT CUI_PartTimeDee::Render()
 				m_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fMask, sizeof(_float));
 				m_pTexMask->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", 0);
 			}
-			//else
-			//{
-			//	m_fMask = 1.f;
-			//	m_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fMask, sizeof(_float));
-			//	m_pTexMask->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", 0);
-			//}
 			
 			hr = m_pShaderCom->Begin(POSTEX_ALPHATEST_COLOR_VERTICALCUT);
 			CHECK_FAILED(hr);
@@ -156,6 +154,32 @@ HRESULT CUI_PartTimeDee::Render()
 
 	return S_OK;
 }
+
+void CUI_PartTimeDee::Render_Thinking()
+{
+	HRESULT hr(S_OK);
+	_int iTextureNum = 1;
+
+	// UI별 포지션, 사이즈, 컬러 조정
+	Setup_PosSizeColor(iTextureNum);
+
+	hr = m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix");
+	CHECK_FAILED(hr);
+
+	m_vFoodColor = _float3(1.f, 1.f, 1.f);
+	m_pShaderCom->Bind_RawValue("g_vRColor", &m_vFoodColor, sizeof(_float3));
+
+	hr = m_arrTexures[iTextureNum]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
+	hr = m_pShaderCom->Begin(POSTEX_ALPHATEST_COLOR_HORIZONTALCUT);
+	CHECK_FAILED(hr);
+
+	hr = m_pVIBufferCom->Bind_Buffers();
+	CHECK_FAILED(hr);
+
+	hr = m_pVIBufferCom->Render();
+	CHECK_FAILED(hr);
+}
+
 
 #ifdef _DEBUG
 void CUI_PartTimeDee::Render_IMGUI()

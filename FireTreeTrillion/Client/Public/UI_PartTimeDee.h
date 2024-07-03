@@ -28,10 +28,12 @@ public:
 	virtual void				Late_Tick(_float fTimeDelta)				override;
 	virtual HRESULT				Render()									override;
 
-
 #ifdef _DEBUG
 	virtual void				Render_IMGUI()								override;
 #endif
+	
+	void						Render_Thinking();
+
 	void						Change_Dialog(enum class PARTTIME_ITEM eItem);
 	void						Make_RandomImg();
 	void						Update_Pos(_float3 _vPosition);

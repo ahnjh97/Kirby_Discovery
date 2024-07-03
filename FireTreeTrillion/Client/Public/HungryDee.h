@@ -25,7 +25,8 @@ private:
 	CHungryDee(const CHungryDee& rhs);
 	virtual ~CHungryDee() = default;
 
-	enum WAITPOS{WAITPOS_FRONT = 2, WAITPOS_END};
+	enum WAITPOS { WAITPOS_FRONT = 2, WAITPOS_END };
+
 public:
 	static pair<_float3, vector<WAITING_INFO>> m_WaitingList;
 
