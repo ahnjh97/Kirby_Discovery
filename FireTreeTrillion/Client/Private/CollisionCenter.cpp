@@ -50,6 +50,9 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 		// 디디디와 싸우는 특수한 충돌로직들 모아두었습니다.
 		DeeDeeDee_Battle();
 
+	if (*GAMEINSTANCE Get_CurrentLevelID() == LEVEL_FINALBOSS)
+		FinalStage_Battle();
+
 
 
 	for (auto& ObjectVector : m_GameObjects)
@@ -582,6 +585,27 @@ void CCollisionCenter::DeeDeeDee_Battle()
 			SrcHit->Set_Alive(false);
 			pNpc->Set_PhyXState(PO_FLYDEADAWAY);
 			pMonster->Minus_Hp(10.f);
+		});
+
+}
+
+void CCollisionCenter::FinalStage_Battle()
+{
+	// 플레이어 공격에 대한 처리.
+	Collision_Collider(m_GameObjects[HITBOX_PLYAER], m_GameObjects[BOSS_FINALBOSS], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CKirby* pKirby = static_cast<CKirby*>(Dst);
+			CPhysXObject* pMonster = static_cast<CPhysXObject*>(Src);
+
+			// 데미지 공식과 이펙트, 쉐이킹, 히트스탑 등 시스템적인 요소들이 잔뜩 들어가있다.
+			pthis->Damage_And_Effect_For_Monster(pKirby, pMonster, 1.2f);
+			DstHit->Set_Alive(false);
 		});
 
 }
