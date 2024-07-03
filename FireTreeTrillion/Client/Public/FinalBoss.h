@@ -60,12 +60,14 @@ public:
 	void Set_Chain(_bool bChain) { m_bChain = bChain; }
 	void Set_TickPerSecond(_float TickPerSecond) { m_pModelCom->Set_TickPerSecond(TickPerSecond); }
 	void Set_Position(_vector vPosition) { m_vPosition = vPosition; }
+	void Set_Gully(_bool bGully) { m_bGully = bGully; }
 
 	_vector Get_Direction() { return m_vDir; }
 	_vector Get_Position() { return m_vPosition; }
 	vector<_float4> Get_RallyPoint() { return m_vecRallyPoint; }
 	FINALBOSS_STATE Get_BossState() { return m_eBossState; }
 	_bool Get_Chain() { return m_bChain; }
+
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -77,6 +79,7 @@ public:
 #ifdef _DEBUG
 	virtual void	Render_IMGUI() override;
 #endif
+	virtual void	Add_AnimEvent()						override;
 	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
 public:
@@ -84,7 +87,8 @@ public:
 	_bool IsAnimFinished();
 
 private:
-	map<const wstring, CPartObject*>	m_PartObjects;
+	map<const wstring, CPartObject*>	m_PartObjects = {};
+	vector<class CGully*>				m_vecGully = {};
 
 	FINALBOSS_ANIM		m_eCurrentState = { FINALBOSS_END };
 	FINALBOSS_STATE		m_eBossState = { STATE_END };
@@ -96,8 +100,11 @@ private:
 
 	_bool				m_bGlide = { false };
 	_bool				m_bChain = { false };
+	_bool				m_bGully = { false };
 
 	_float				m_fGlideTime = { 0.f };
+
+	_uint				m_iGullyCnt = { 0 };
 
 private:
 	HRESULT	Make_TargetToCams();
@@ -108,6 +115,7 @@ private:
 
 	// FSM
 	void SetUp_FSM();
+	void HitBoxChanger(_uint eState);
 
 public:
 	static CFinalBoss* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -2,6 +2,8 @@
 #include "DeeDeeDeeHammer.h"
 #include "Bone.h"
 
+#include "Ability.h"
+
 
 CDeeDeeDeeHammer::CDeeDeeDeeHammer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPartObject{ pDevice, pContext }
@@ -42,6 +44,18 @@ _int CDeeDeeDeeHammer::Tick(_float fTimeDelta)
 	Compute_MotionBlur();
 
 	m_WorldMatrix = m_pTransformCom->Get_WorldMatrix() * *m_pBoneMatrix * *m_pParentMatrix;
+
+
+	if (m_bItemTrigger == true && CUtils::Get_Scaled_Matrix(m_WorldMatrix).x < 0.1f)
+	{
+		HRESULT hr = S_OK;
+		CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
+		AbilityItemDesc.vPosition = CUtils::Get_State_Vector_Matrix(m_WorldMatrix, CUtils::STATE_POSITION);
+		AbilityItemDesc.eAbilityType = ABILITY_HAMMER;
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+		CHECK_FAILED(hr);
+		m_bItemTrigger = false;
+	}
 
 	return OBJ_NOEVENT;
 }

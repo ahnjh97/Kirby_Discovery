@@ -64,7 +64,7 @@ private:
     _bool Up_KnockBack(_uint uKirbyState);
     _bool FlyAway_KnockBack(_uint uKirbyState);
 
-    void HitStop_Rogic(class CKirby* pKirby);
+    void HitStop_Rogic(class CKirby* pKirby, _float fStopTime = 0.12f);
 
     void Damage_And_Effect_For_Monster(class CKirby* pKirby, class CPhysXObject* pMonster, _float fEffectOffSet = 0.5f);
 #pragma endregion
@@ -76,19 +76,32 @@ private:
     void Camera_Zooming(_float fZoom);
     _bool Kirby_Dodge_SlowMotionSystem(CPhysXObject* pPlayer);
 
+    // 플레이어와 몬스터의 충돌로, 서로 가볍게넉백된다.
     void Player_Monster_Knock_back(CPhysXObject* pPlayer, CPhysXObject* pMonster);
+    // 두개의 객체가 PO_FLYDEADAWAY 화 되어 날아간다. 서로 벡터를 계산하여 넉백까지 계산해준다.
     void Fly_DeadAway(CPhysXObject* pSrc, CPhysXObject* pDst);
+    // 매개변수로 받는 개체가 해당방향과 파워로 날아간다.
     void Knock_back(CPhysXObject* pObject, _float3 vKnockbackDir, _float fPower);
-
+    // 양쪽에 몸박했을 때, 서로 데미지를 받는다. 또한 데미지를 받는 적절한 상태라면 카메라 쉐이킹 포함이다.
     void Compute_Damage(CPhysXObject* pPlayer, CPhysXObject* pMonster);
+    // 커비쪽이 데미지를 받는 로직. 또한 데미지를 받는 적절한 상태라면 카메라 쉐이킹 포함이다.
     void Compute_HitBoxDamage(CPhysXObject* pPlayer, CPhysXObject* pMonster);
+
+    // 아이템 관련 로직들.
     void Compute_Heal(CPhysXObject* pPlayer, CPhysXObject* pItem);
     void Compute_Coin(CPhysXObject* pPlayer, CPhysXObject* pItem);
     void Compute_SuperPower(CPhysXObject* pPlayer, CPhysXObject* pItem);
 
-    void Timer_System(_float fTimeDelta);
+    // 회피 무적 시간정지 전용
+    void Dodge_Timer_System(_float fTimeDelta);
     _bool  m_bCheckTimer = { false };
     _float m_fTimeDeltaResetTime = { 0.f };
+
+    void Hit_TimeStop(_float fTimeRatio, _float fTime);
+    void Hit_Timer_System(_float fTimeDelta);
+    _bool  m_bHitTimeStop = { false };
+    _float m_fHitTimeDeltaResetTime = { 0.f };
+    _float m_fHitTimeDeltaMaxResetTime = { 0.f };
 
 
 private:

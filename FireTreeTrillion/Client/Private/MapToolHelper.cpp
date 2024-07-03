@@ -189,7 +189,8 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	m_setKickables = { "GsPebble", "SeShell", "WasteCanYellow" };
 	m_setItemTxts = { "Item_BlueCoin", "Item_Bread", "Item_Cake", "Item_Cocktail", "Item_Coin", "Item_EnergyDrink", "Item_Makaron",
 		"Item_Meat", "Item_Omelet", "Item_Onigiri", "Item_RedCoin", "Item_Steak", "Item_Sushi" };
-	m_setTrees = { "GsTreeA", "GsTreeB", "GsTreeC", "DsPalmABottomL", "DsPalmAMiddleL", "DsPalmATopL", "DsPalmBL", "DsPalmCL" };
+	m_setTrees = { "GsTreeA", "GsTreeB", "GsTreeC", "DsPalmABottomL", "DsPalmAMiddleL", "DsPalmATopL", "DsPalmBL", "DsPalmCL"
+				, "GsFlowerBedTreeAL", "GsFlowerBedTreeBL"};
 
 	//블렌드 적용이 필요한 데코오브젝트
 	m_setBlendDecos = {"LbOutBuildingWallL", "LbOutBuildingFenceL", "GsCarFloor" };

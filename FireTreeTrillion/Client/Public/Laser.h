@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Client_Defines.h"
-#include "GameObject.h"
+#include "PhysXObject.h"
 
 BEGIN(Engine)
 class CModel;
@@ -10,7 +10,7 @@ END
 
 BEGIN(Client)
 
-class CLaser final : public CGameObject
+class CLaser final : public CPhysXObject
 {
 public:
 	struct LASER_DESC : public CGameObject::GAMEOBJECT_DESC {
@@ -33,8 +33,9 @@ public:
 	virtual HRESULT Render()						override;
 	virtual HRESULT Render_LightDepth()				override;
 #ifdef _DEBUG
-	virtual	void Render_IMGUI()			override;
+	virtual	void	Render_IMGUI()			override;
 #endif
+	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
 private:
 	CModel*		m_pModelCom = { nullptr };

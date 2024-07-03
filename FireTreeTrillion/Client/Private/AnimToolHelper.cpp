@@ -179,9 +179,9 @@ void CAnimToolHelper::Ready_AnimObjects(const wstring& strLayerTag)
 	CHECK_NULLPTR(pCharacter);
 	m_vecCharacter.push_back(pCharacter);
 
-	//pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_FinalBoss")));
-	//CHECK_NULLPTR(pCharacter);
-	//m_vecCharacter.push_back(pCharacter);
+	pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_FinalBoss")));
+	CHECK_NULLPTR(pCharacter);
+	m_vecCharacter.push_back(pCharacter);
 
 	//pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_PartTimerKirby")));
 	//CHECK_NULLPTR(pCharacter);
@@ -273,18 +273,19 @@ void CAnimToolHelper::Render_AnimationList(const wstring& wstrObjectTag)
 				{
 					MODEL tModelInfo = pModel[w]->Get_ModelInfo();
 					if (ImGui::BeginTabItem(tModelInfo.strModelName.c_str())) // 모델이름으로 Tab Name 형성
+					{
 						if (m_pCharacter->Get_PrototypeTag() == L"Prototype_GameObject_Kirby")
 						{
 							CKirby::KIRBY_INFODESC* pKirbyDesc = static_cast<CKirby*>(m_pCharacter)->Get_KirbyInfo();
 							pKirbyDesc->m_eBodyState = (CKirby::BODYSTATE)w;
 							static_cast<CKirby*>(m_pCharacter)->Set_KirbyInfo(*pKirbyDesc);
-						
+
 							if (tModelInfo.strModelName.find("Sword") != string::npos)
 								m_pCharacter->Set_AbilityType(ABILITY_SWORD);
 							else
 								m_pCharacter->Set_AbilityType(ABILITY_DEFAULT);
 						}
-						
+
 						g_iActiveModelNum = w;
 						_float childwindowHeight = ImGui::GetWindowHeight();
 						_float childlistBoxHeight = windowHeight - 110;
@@ -296,7 +297,7 @@ void CAnimToolHelper::Render_AnimationList(const wstring& wstrObjectTag)
 							// 해당 모델이 가지고 있는 애니메이션 개수
 							_uint uAnimCnt = pModel[w]->Get_AnimCnt();
 							vector<CAnimation*>* pVecAnims = pModel[w]->Get_Animations();
-							
+
 							// 키보드 입력을 통해 현재 선택된 항목 변경
 							if (ImGui::IsKeyPressed(ImGuiKey_UpArrow) && item_current_idx > 0)
 							{
@@ -348,7 +349,8 @@ void CAnimToolHelper::Render_AnimationList(const wstring& wstrObjectTag)
 						}
 						ImGui::EndTabItem();
 					}
-					ImGui::EndTabBar();
+				}
+				ImGui::EndTabBar();
 			}
 		}
 	}

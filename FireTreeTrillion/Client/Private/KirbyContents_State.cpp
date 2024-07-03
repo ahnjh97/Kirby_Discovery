@@ -49,8 +49,11 @@ void CKirbyGet_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 
 			if (pKirby->Get_AbilityType() == ABILITY_SWORD)
 				pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
-			if (pKirby->Get_AbilityType() == ABILITY_BOMB)
+			else if (pKirby->Get_AbilityType() == ABILITY_BOMB)
 				pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+			else if (pKirby->Get_AbilityType() == ABILITY_HAMMER)
+				pKirby->Change_State(CKirby::HAMMERSTATE_IDLE, 60.f, true, true, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+
 			return;
 		}
 
@@ -74,7 +77,6 @@ void CKirbyGet_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 
 		if (pKirby->isAnimFinish())
 		{
-			// 어빌리티 타입에 맞는 아이템 드랍. (미구현)
 			HRESULT hr = S_OK;
 
 			CAbility::ABILITYITEM_DESC AbilityItemDesc = {};

@@ -1,14 +1,15 @@
 #include "stdafx.h"
 #include "SpikeSpear.h"
 #include "FinalBoss.h"
+#include "HitBox.h"
 
 CSpikeSpear::CSpikeSpear(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CGameObject{ pDevice, pContext }
+	: CPhysXObject{ pDevice, pContext }
 {
 }
 
 CSpikeSpear::CSpikeSpear(const CSpikeSpear& rhs)
-	: CGameObject{ rhs }
+	: CPhysXObject{ rhs }
 {
 }
 
@@ -169,8 +170,11 @@ void CSpikeSpear::Render_IMGUI()
 	//	ImGui::Text("TargetDir X : %.2f \tTargetDir Y : %.2f \tTargetDir Z : %.2f ", INFO(m_vTargetDir).x, INFO(m_vTargetDir).y, INFO(m_vTargetDir).z);
 	__super::Render_IMGUI();
 }
-
 #endif
+
+void CSpikeSpear::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
+{
+}
 
 HRESULT CSpikeSpear::Add_Components()
 {
@@ -185,6 +189,14 @@ HRESULT CSpikeSpear::Add_Components()
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
+	CHitBox::HITBOX_DESC HitBox{};
+	HitBox.pOwner = this;
+	HitBox.pDesc = &m_tColliderDesc[BODY];
+	HitBox.pCollisionType = MONSTER;
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
+		return E_FAIL;
+	Set_BodyCollider(COLLIDER_SPHERE, -11.f, 1.f, 2.f);
+
 	return S_OK;
 }
 
@@ -192,7 +204,6 @@ HRESULT CSpikeSpear::Bind_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
-
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
 

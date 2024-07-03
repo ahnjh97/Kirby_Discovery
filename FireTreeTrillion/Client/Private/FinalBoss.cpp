@@ -5,6 +5,8 @@
 #include "FinalBossSpear.h"
 #include "RayArrow.h"
 #include "Camera_Main.h"
+#include "Gully.h"
+#include "HitBox.h"
 
 CFinalBoss::CFinalBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -54,6 +56,27 @@ HRESULT CFinalBoss::Initialize(void* pArg)
 	m_pModelCom->Set_Animation(FINALBOSS_DEMOAPPEARCUT5, 70.f, false, true);
 
 	Make_TargetToCams();
+	Add_AnimEvent();
+
+	//// 도랑 풀링
+	//for (size_t i = 0; i < 120; i++)
+	//{
+	//	HRESULT hr;
+	//	hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Gully"), TEXT("Prototype_GameObject_Gully"));
+	//	CHECK_FAILED(hr);
+
+	//	list<CGameObject*>* pList = m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_Gully")); // Get_Layer(LEVEL_STATIC, TEXT("Layer_Gully"))->Get_List();
+
+	//	if (nullptr != pList)
+	//	{
+	//		auto iter = pList->end();
+	//		--iter;
+
+	//		CGully* pGully = dynamic_cast<CGully*>((*iter));
+	//		m_vecGully.emplace_back(pGully);
+	//		Safe_AddRef(pGully);
+	//	}
+	//}
 
 	return S_OK;
 }
@@ -65,17 +88,17 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
-	if (m_pGameInstance->Get_KeyState(DIK_K, KEY_DOWN))
-	{
-		Set_BossState(STATE_2PAZE);
-		m_pControllerCom->Set_Position(m_pTransformCom, m_vecRallyPoint[1]);
-		m_pTransformCom->Look_At(m_vecRallyPoint[0]);
-		Change_State(FINALBOSS_DAMAGE, 50.f, false, true);
-	}
-	else if (m_pGameInstance->Get_KeyState(DIK_L, KEY_DOWN))
-	{
-		Change_State(FINALBOSS_DAMAGE, 50.f, false, true);
-	}
+	//if (m_pGameInstance->Get_KeyState(DIK_K, KEY_DOWN))
+	//{
+	//	Set_BossState(STATE_2PAZE);
+	//	m_pControllerCom->Set_Position(m_pTransformCom, m_vecRallyPoint[1]);
+	//	m_pTransformCom->Look_At(m_vecRallyPoint[0]);
+	//	Change_State(FINALBOSS_DAMAGE, 50.f, false, true);
+	//}
+	//else if (m_pGameInstance->Get_KeyState(DIK_L, KEY_DOWN))
+	//{
+	//	Change_State(FINALBOSS_DAMAGE, 50.f, false, true);
+	//}
 
 	if (true == m_bGlide)
 	{
@@ -95,6 +118,22 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 	}
 	else
 		m_fGlideTime = 0.f;
+
+	// 풀링임
+	//if (true == m_bGully)
+	//{
+	//	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 0.8f;
+	//	vPos.m128_f32[1] = 0.f;
+	//	m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f);
+	//	++m_iGullyCnt;
+	//	vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 0.8f;
+
+	//	vPos.m128_f32[1] = 0.f;
+	//	m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f);
+	//	++m_iGullyCnt;
+	//	if (m_vecGully.size() <= m_iGullyCnt)
+	//		m_iGullyCnt = 0;
+	//}
 
 	__super::Tick(m_fTimeDelta);
 
@@ -184,6 +223,16 @@ void CFinalBoss::Render_IMGUI()
 
 #endif
 
+void CFinalBoss::Add_AnimEvent()
+{
+	__super::Add_AnimEvent();
+
+	m_pModelCom->Add_Event("Attack", [this]() {
+		// 커비의 히트박스를 실시간으로 변화시킨다.
+		HitBoxChanger(m_pFSM->Get_State());
+		});
+}
+
 void CFinalBoss::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
 
@@ -241,14 +290,12 @@ HRESULT CFinalBoss::Add_Components()
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 
-
-	//CHitBox::HITBOX_DESC HitBox{};
-	//HitBox.pOwner = this;
-	//HitBox.pDesc = &m_tColliderDesc[BODY];
-	//HitBox.pCollisionType = MONSTER;
-	//if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
-	//	return E_FAIL;
-	//Set_BodyCollider(COLLIDER_CYLINDER, 0.5f, 1.f, 0.85f);
+	CHitBox::HITBOX_DESC HitBox{};
+	HitBox.pOwner = this;
+	HitBox.pDesc = &m_tColliderDesc[ATTACK];
+	HitBox.pCollisionType = HITBOX_MONSTER;
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
+		return E_FAIL;
 
 	SetUp_FSM();
 
@@ -320,14 +367,12 @@ void CFinalBoss::SetUp_FSM()
 	m_pFSM->Add_State(FINALBOSS_STABWAIT, CFinalBoss_Stab_State::Create());
 	m_pFSM->Add_State(FINALBOSS_STAB, CFinalBoss_Stab_State::Create());
 	m_pFSM->Add_State(FINALBOSS_STABEND, CFinalBoss_Stab_State::Create());
-	m_pFSM->Add_State(FINALBOSS_SLASHCHAINSTABREADY, CFinalBoss_Stab_State::Create());
 
 	// 백스텝 활공
 	m_pFSM->Add_State(FINALBOSS_AWAYFASTREADY, CFinalBoss_GlideBack_State::Create());
 	m_pFSM->Add_State(FINALBOSS_AWAYFASTSTART, CFinalBoss_GlideBack_State::Create());
 	m_pFSM->Add_State(FINALBOSS_AWAYFAST, CFinalBoss_GlideBack_State::Create());
 	m_pFSM->Add_State(FINALBOSS_AWAYFASTENDAIR, CFinalBoss_GlideBack_State::Create());
-	//m_pFSM->Add_State(FINALBOSS_AWAYFASTEND, CFinalBoss_GlideBack_State::Create());
 
 	// 왼쪽 횡 활공
 	m_pFSM->Add_State(FINALBOSS_TURNLEFTAIRSTART, CFinalBoss_Glide_State::Create());
@@ -342,9 +387,9 @@ void CFinalBoss::SetUp_FSM()
 	m_pFSM->Add_State(FINALBOSS_SLASHREADY, CFinalBoss_Slash_State::Create());
 	m_pFSM->Add_State(FINALBOSS_SLASHSTART, CFinalBoss_Slash_State::Create());
 	m_pFSM->Add_State(FINALBOSS_SLASH, CFinalBoss_Slash_State::Create());
-	m_pFSM->Add_State(FINALBOSS_SLASHCHAINREADY, CFinalBoss_Slash_State::Create());
 	// 2차 슬래시 패턴
-	m_pFSM->Add_State(FINALBOSS_SLASHEND, CFinalBoss_SlashEnd_State::Create());
+	m_pFSM->Add_State(FINALBOSS_SLASHCHAINREADY, CFinalBoss_Chain_State::Create());
+	m_pFSM->Add_State(FINALBOSS_SLASHCHAINSTABREADY, CFinalBoss_Chain_State::Create());
 
 	// 스윙 패턴
 	m_pFSM->Add_State(FINALBOSS_SWINGRIGHTSTART, CFinalBoss_Swing_State::Create());
@@ -419,6 +464,24 @@ void CFinalBoss::SetUp_FSM()
 	m_pFSM->Initialize(&FSM_Desc);
 }
 
+void CFinalBoss::HitBoxChanger(_uint eState)
+{
+	switch (eState)
+	{
+	case FINALBOSS_SWINGRIGHT:
+		Activate_FrustumCollider(0.5f, 10.f, 180.f);
+		break;
+	case FINALBOSS_SWINGLEFT:
+		Activate_FrustumCollider(0.5f, 10.f, 180.f);
+		break;
+	case FINALBOSS_SWINGFINISHLEFT:
+		Activate_FrustumCollider(0.5f, 10.f, 180.f);
+		break;
+	default:
+		break;
+	}
+}
+
 CFinalBoss* CFinalBoss::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CFinalBoss* pInstance = new CFinalBoss(pDevice, pContext);
@@ -452,6 +515,9 @@ void CFinalBoss::Free()
 
 	for (auto& Pair : m_PartObjects)
 		Safe_Release(Pair.second);
-
 	m_PartObjects.clear();
+
+	for (auto iter : m_vecGully)
+		Safe_Release(iter);
+	m_vecGully.clear();
 }

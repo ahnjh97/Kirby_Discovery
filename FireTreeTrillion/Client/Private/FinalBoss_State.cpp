@@ -113,15 +113,15 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			//{
 			//	++m_iCnt;
 				// Stab 패턴
-				//m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
-				//pFinalBoss->Set_Direction(m_vLook);
-				//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
+				m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
+				pFinalBoss->Set_Direction(m_vLook);
+				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
 			//}
 			//else if (m_iCnt == 4)
 			//{
 			//	++m_iCnt;
 			//	// Slash 패턴
-				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHREADY, 50.f, false, true);
+				//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHREADY, 50.f, false, true);
 			//}
 			//else if (m_iCnt == 6)
 			//{
@@ -190,8 +190,8 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		//if (m_iCnt == 3 || m_iCnt == 5 || m_iCnt == 12)
 		//{
 		//	++m_iCnt;
-			pFinalBoss->Set_Direction(-pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) + XMVectorSet(0.f, 0.3f, 0.f, 0.f));
-			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_AWAYFASTREADY, 50.f, false, true);
+			//pFinalBoss->Set_Direction(-pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) + XMVectorSet(0.f, 0.3f, 0.f, 0.f));
+			//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_AWAYFASTREADY, 50.f, false, true);
 		//}
 
 		//// 스윙 패턴
@@ -212,13 +212,13 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		//else if (m_iCnt == 2)
 		//{
 		//	++m_iCnt;
-		//	pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONSPIKEREADY, 50.f, false, true);
+			//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONSPIKEREADY, 50.f, false, true);
 		//}
 		//else if (m_iCnt == 8 || m_iCnt == 9 || m_iCnt == 10)
 		//{
 		//	++m_iCnt;
 		//	// 스윙 패턴
-		//	pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SWINGRIGHTSTART, 40.f, false, true);
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SWINGRIGHTSTART, 40.f, false, true);
 		//}
 		//else if (m_iCnt == 11)
 		//{
@@ -321,6 +321,7 @@ void CFinalBoss_Stab_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		{
 			if(pController->Is_Terrain())
 			{
+				pFinalBoss->Activate_FrustumCollider(0.5f, 10.f, 180.f);
 				pFinalBoss->Set_BossState(CFinalBoss::STATE_GROUND);
 				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STAB, 50.f, false, true);
 			}
@@ -520,6 +521,7 @@ void CFinalBoss_Slash_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _f
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 
 	m_fTimeDelta = 0.f;
+	m_bChain = false;
 }
 
 void CFinalBoss_Slash_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -540,11 +542,6 @@ void CFinalBoss_Slash_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 		switch (pFinalBoss->Get_State())
 		{
 		case CFinalBoss::FINALBOSS_SLASHREADY:
-			pFinalBoss->Set_Chain(true);
-			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHSTART, 50.f, false, true);
-			break;
-		case CFinalBoss::FINALBOSS_SLASHCHAINREADY:
-			pFinalBoss->Set_Chain(false);
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHSTART, 50.f, false, true);
 			break;
 		case CFinalBoss::FINALBOSS_SLASHSTART:
@@ -587,11 +584,35 @@ void CFinalBoss_Slash_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 	}
 	else if (CFinalBoss::FINALBOSS_SLASH == pFinalBoss->Get_State())
 	{
-		pController->Move_Dir(pTransformCom, XMVector3Normalize(pFinalBoss->Get_Direction()) * fTimeDelta * 60.f, fTimeDelta);
+		pController->Move_Dir(pTransformCom, XMVector3Normalize(pFinalBoss->Get_Direction()) * fTimeDelta * 70.f, fTimeDelta);
+
+		if (5.f > pController->Compute_Height(XMVectorSet(0.f, -1.f, 0.f, 0.f)))
+			pFinalBoss->Set_Gully(true);
+		else
+			pFinalBoss->Set_Gully(false);
 
 		m_fTimeDelta += fTimeDelta;
 		if (4.f < m_fTimeDelta)
-			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHEND, 50.f, false, true);
+		{
+			if (false == pFinalBoss->Get_Chain())
+			{
+				pFinalBoss->Set_Chain(true);
+				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHCHAINREADY, 50.f, false, true);
+			}
+			else
+			{
+				pFinalBoss->Set_Chain(false);
+				pFinalBoss->Set_Direction(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f);
+				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHCHAINSTABREADY, 50.f, false, true);
+			}
+			//if (true == pFinalBoss->Get_Chain())
+			//	pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHCHAINREADY, 50.f, false, true);
+			//else
+			//{
+			//	pFinalBoss->Set_Direction(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f);
+			//	pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHCHAINSTABREADY, 50.f, false, true);
+			//}
+		}
 	}
 }
 
@@ -612,21 +633,21 @@ void CFinalBoss_Slash_State::Free()
 #pragma endregion
 
 
-#pragma region SLASHEND STATE
+#pragma region CHAIN STATE
 //*********************************
-//			 SLASHEND STATE
+//			 CHAIN STATE
 //*********************************
-CFinalBoss_SlashEnd_State::CFinalBoss_SlashEnd_State()
+CFinalBoss_Chain_State::CFinalBoss_Chain_State()
 {
 }
 
-void CFinalBoss_SlashEnd_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
+void CFinalBoss_Chain_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 	m_fTimeDelta = 0.f;
 }
 
-void CFinalBoss_SlashEnd_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+void CFinalBoss_Chain_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
 	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(pGameObject);
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
@@ -659,36 +680,32 @@ void CFinalBoss_SlashEnd_State::OnStateUpdate(CGameObject* pGameObject, _float f
 	if (abs(fAngle) >= XMConvertToRadians(3.f))
 		pTransformCom->Turn(::XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * fAngle * 5.f);
 
-	if(pFinalBoss->IsAnimFinished())
+	if (pFinalBoss->IsAnimFinished())
 	{
-		if(true == pFinalBoss->Get_Chain())
-			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHCHAINREADY, 50.f, false, true);
-		else
+		switch (pFinalBoss->Get_State())
 		{
+		case CFinalBoss::FINALBOSS_SLASHCHAINREADY:
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHSTART, 50.f, false, true);
+			break;
+		case CFinalBoss::FINALBOSS_SLASHCHAINSTABREADY:
 			pFinalBoss->Set_Direction(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f);
-			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHCHAINSTABREADY, 50.f, false, true);
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABSTART, 50.f, false, true);
+			break;
 		}
 	}
-	//if (5.f > vPos.m128_f32[1])
-	//{
-	//	_vector vLook = vKirbyPos - vPos;
-	//	vLook.m128_f32[1] = 0.f;
-	//	pFinalBoss->Set_Direction(vLook);
-	//	//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASH, 60.f, true, true);
-	//}
 }
 
-void CFinalBoss_SlashEnd_State::OnStateExit()
+void CFinalBoss_Chain_State::OnStateExit()
 {
 }
 
-CFinalBoss_SlashEnd_State* CFinalBoss_SlashEnd_State::Create()
+CFinalBoss_Chain_State* CFinalBoss_Chain_State::Create()
 {
-	CFinalBoss_SlashEnd_State* pInstance = new CFinalBoss_SlashEnd_State();
+	CFinalBoss_Chain_State* pInstance = new CFinalBoss_Chain_State();
 	return pInstance;
 }
 
-void CFinalBoss_SlashEnd_State::Free()
+void CFinalBoss_Chain_State::Free()
 {
 	__super::Free();
 }
@@ -973,6 +990,7 @@ CFinalBoss_Laser_State::CFinalBoss_Laser_State()
 void CFinalBoss_Laser_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
+	m_fTimeDelta = 0.f;
 }
 
 void CFinalBoss_Laser_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
