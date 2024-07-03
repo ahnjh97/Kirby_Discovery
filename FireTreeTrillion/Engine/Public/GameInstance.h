@@ -198,6 +198,7 @@ public: /* For.ImGui_Manager */
 public: /* For.PhysX */
 	PxRigidDynamic* CreateDynamicActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial = nullptr);
 	PxRigidStatic* CreateStaticActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial = nullptr);
+	PxTriangleMesh* CreateTriangleMesh(_float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial = nullptr);
 	PxConvexMesh* CreateConvexMesh(_float3* pVerticesPos, _uint iNumVertices, PxMaterial* pMaterial = nullptr);
 	void Register_Player(PxActor* pPlayerActor);
 	void Register_Trigger(PxActor* pTriggerActor, _int iTriggerType, _int iTriggerIndex);

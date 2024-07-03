@@ -67,6 +67,7 @@ private:
 
 	void	Load_ItemModels();
 	void	Load_KickableModels();
+	void	Load_StarBlockModels();
 	void	Load_KirbyBodyModels();
 	void	Load_KirbyWeaponModels();
 	void	Load_KirbyArmourModels();

@@ -339,6 +339,7 @@
     <ClInclude Include="..\Public\UI_PartTimeDee.h" />
     <ClInclude Include="..\public\WaddleDee.h" />
     <ClInclude Include="..\Public\WasteCan.h" />
+    <ClInclude Include="Box.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -367,6 +368,7 @@
     <ClCompile Include="..\Private\BombOrbit.cpp" />
     <ClCompile Include="..\Private\BombOrbitGlow.cpp" />
     <ClCompile Include="..\Private\BossClone.cpp" />
+    <ClCompile Include="..\Private\Box.cpp" />
     <ClCompile Include="..\Private\BreakableRock.cpp" />
     <ClCompile Include="..\Private\BreakableRockParticle.cpp" />
     <ClCompile Include="..\Private\BrontoBurt.cpp" />

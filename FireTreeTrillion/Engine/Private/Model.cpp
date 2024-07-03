@@ -340,6 +340,119 @@ vector<PxRigidActor*> CModel::ReturnStaticActors(_float4x4& matWorld)
 	return vecStaticActors;
 }
 
+vector<PxRigidActor*> CModel::ReturnStaticActors_ExcludeByKeyword(_float4x4& matWorld, vector<string>& _vecKeyWords)
+{
+	vector<PxRigidActor*> vecStaticActors;
+
+	for (auto& mesh : m_Meshes)
+	{
+		if (nullptr == mesh)
+			continue;
+
+		string strMeshName = mesh->Get_Name();
+		_bool bSkip = false;
+
+		for (auto& keyword : _vecKeyWords)
+		{
+			if (strMeshName.find(keyword) != string::npos) {
+				bSkip = true;
+				break;
+			}
+		}
+
+		if (true == bSkip)
+			continue;
+		
+		PxRigidActor* pStaticActor = mesh->ReturnStaticActor(matWorld);
+		if (nullptr == pStaticActor)
+			continue;
+
+		vecStaticActors.push_back(pStaticActor);
+	}
+
+	return vecStaticActors;
+}
+
+PxRigidStatic* CModel::ReturnStaticActor(_float4x4& matWorld)
+{
+	PxPhysics* pPhysics = m_pGameInstance->Get_Physics();
+	if (nullptr == pPhysics)
+		return nullptr;
+	
+	_float3 vScale{};
+	_float4 vQuaternion{};
+	_vector vScaleVector, vRotQuat, vTrans;
+	::XMMatrixDecompose(&vScaleVector, &vRotQuat, &vTrans, XMLoadFloat4x4(&matWorld));
+	XMStoreFloat3(&vScale, vScaleVector);
+	XMStoreFloat4(&vQuaternion, vRotQuat);
+
+	PxMeshScale meshScale(PxVec3(vScale.x, vScale.y, vScale.z));
+	PxMeshGeometryFlags meshFlags = PxMeshGeometryFlags();
+
+	PxTransform pxTransform(PxVec3(matWorld._41, matWorld._42, matWorld._43), PxQuat(vQuaternion.x, vQuaternion.y, vQuaternion.z, vQuaternion.w));
+	
+	PxRigidStatic* pStaticActor = pPhysics->createRigidStatic(pxTransform);
+	PxMaterial* pMaterial = pPhysics->createMaterial(0.5f, 0.5f, 0.6f);
+
+	for (auto& mesh : m_Meshes)
+	{
+		if (nullptr == mesh)
+			continue;
+
+		PxTriangleMesh* pTriMesh = mesh->CreateTriangleMesh();
+		PxTriangleMeshGeometry triGeom(pTriMesh, meshScale, meshFlags);
+		PxShape* pShape = pPhysics->createShape(triGeom, *pMaterial);
+		pStaticActor->attachShape(*pShape);
+		pShape->release();
+		pTriMesh->release();
+	}
+
+	PxScene* pScene = m_pGameInstance->Get_Scene();
+	pScene->addActor(*pStaticActor);
+	pMaterial->release();
+	return pStaticActor;
+}
+
+PxRigidStatic* CModel::ReturnStaticActor_ExcludeByIndex(_float4x4& matWorld, unordered_set<_uint>& _setExcludedMesh)
+{
+	PxPhysics* pPhysics = m_pGameInstance->Get_Physics();
+	if (nullptr == pPhysics)
+		return nullptr;
+
+	_float3 vScale{};
+	_float4 vQuaternion{};
+	_vector vScaleVector, vRotQuat, vTrans;
+	::XMMatrixDecompose(&vScaleVector, &vRotQuat, &vTrans, XMLoadFloat4x4(&matWorld));
+	XMStoreFloat3(&vScale, vScaleVector);
+	XMStoreFloat4(&vQuaternion, vRotQuat);
+
+	PxMeshScale meshScale(PxVec3(vScale.x, vScale.y, vScale.z));
+	PxMeshGeometryFlags meshFlags = PxMeshGeometryFlags();
+
+	PxTransform pxTransform(PxVec3(matWorld._41, matWorld._42, matWorld._43), PxQuat(vQuaternion.x, vQuaternion.y, vQuaternion.z, vQuaternion.w));
+
+	PxRigidStatic* pStaticActor = pPhysics->createRigidStatic(pxTransform);
+	PxMaterial* pMaterial = pPhysics->createMaterial(0.5f, 0.5f, 0.6f);
+
+	for (_uint i = 0; i < m_iNumMeshes; i++)
+	{
+		if (nullptr == m_Meshes[i] || _setExcludedMesh.end() != _setExcludedMesh.find(i))
+			continue;
+
+		PxTriangleMesh* pTriMesh = m_Meshes[i]->CreateTriangleMesh();
+		PxTriangleMeshGeometry triGeom(pTriMesh, meshScale, meshFlags);
+		PxShape* pShape = pPhysics->createShape(triGeom, *pMaterial);
+		pStaticActor->attachShape(*pShape);
+		pShape->release();
+		pTriMesh->release();
+	}
+
+	PxScene* pScene = m_pGameInstance->Get_Scene();
+	pScene->addActor(*pStaticActor);
+	pMaterial->release();
+	return pStaticActor;
+}
+
 PxRigidDynamic* CModel::ReturnDynamicActor(_float4x4& matWorld)
 {
 	PxPhysics* pPhysics = m_pGameInstance->Get_Physics();
@@ -370,17 +483,66 @@ PxRigidDynamic* CModel::ReturnDynamicActor(_float4x4& matWorld)
 			continue;
 		PxConvexMeshGeometry meshGeometry(pConvexMesh, meshScale, meshFlags);
 		PxShape* pShape = pPhysics->createShape(meshGeometry, *pMaterial);
-		pShape->setSimulationFilterData(PxFilterData{ 10, 0, 0, 0 });
-		pShape->setQueryFilterData(PxFilterData{ 10, 0, 0, 0 });
-		pShape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);
+
+	/*	pShape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);
 		pShape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, true);
-		pShape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, false);
+		pShape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, false);*/
 		pDynamicActor->attachShape(*pShape);
 		pDynamicActor->setAngularDamping(0.2f); // °¨¼è ¼³Á¤
 		pShape->release();
 		pConvexMesh->release();
 	}
 	
+	PxScene* pScene = m_pGameInstance->Get_Scene();
+	pScene->addActor(*pDynamicActor);
+	PxRigidBodyExt::updateMassAndInertia(*pDynamicActor, fDensity);
+	pMaterial->release();
+	return pDynamicActor;
+}
+
+PxRigidDynamic* CModel::ReturnDynamicActor_ExcludeByIndex(_float4x4& matWorld, unordered_set<_uint>& _setExcludedMesh)
+{
+	PxPhysics* pPhysics = m_pGameInstance->Get_Physics();
+	if (nullptr == pPhysics)
+		return nullptr;
+
+	_float3 vScale{};
+	_float4 vQuaternion{};
+	_vector vScaleVector, vRotQuat, vTrans;
+	::XMMatrixDecompose(&vScaleVector, &vRotQuat, &vTrans, XMLoadFloat4x4(&matWorld));
+	XMStoreFloat3(&vScale, vScaleVector);
+	XMStoreFloat4(&vQuaternion, vRotQuat);
+
+	PxMeshScale meshScale(PxVec3(vScale.x, vScale.y, vScale.z));
+	PxConvexMeshGeometryFlags meshFlags = PxConvexMeshGeometryFlags();
+
+	PxTransform pxTransform(PxVec3(matWorld._41, matWorld._42, matWorld._43), PxQuat(vQuaternion.x, vQuaternion.y, vQuaternion.z, vQuaternion.w));
+
+	PxRigidDynamic* pDynamicActor = pPhysics->createRigidDynamic(pxTransform);
+	PxMaterial* pMaterial = pPhysics->createMaterial(0.5f, 0.5f, 0.6f);
+
+	_float fDensity = 10.f;
+
+	for (_uint i = 0; i < m_iNumMeshes; i++)
+	{
+		if (_setExcludedMesh.end() != _setExcludedMesh.find(i))
+			continue;
+
+		PxConvexMesh* pConvexMesh = m_Meshes[i]->CreateConvexMesh();
+		if (nullptr == pConvexMesh)
+			continue;
+		PxConvexMeshGeometry meshGeometry(pConvexMesh, meshScale, meshFlags);
+		PxShape* pShape = pPhysics->createShape(meshGeometry, *pMaterial);
+
+		/*pShape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);
+		pShape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, true);
+		pShape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, false);*/
+		pDynamicActor->attachShape(*pShape);
+		pDynamicActor->setAngularDamping(0.2f); // °¨¼è ¼³Á¤
+		pShape->release();
+		pConvexMesh->release();
+	}
+
 	PxScene* pScene = m_pGameInstance->Get_Scene();
 	pScene->addActor(*pDynamicActor);
 	PxRigidBodyExt::updateMassAndInertia(*pDynamicActor, fDensity);

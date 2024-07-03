@@ -367,6 +367,22 @@ PxRigidStatic* CPhysX::CreateStaticActor(_float4x4& matWorld, _float3* pVertices
     return pStaticActor;
 }
 
+PxTriangleMesh* CPhysX::CreateTriangleMesh(_float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)
+{
+    PxCookingParams tParams(mToleranceScale);
+    tParams.buildTriangleAdjacencies = true;
+
+    PxTriangleMeshDesc triDesc;
+    triDesc.points.count = iNumVertices;
+    triDesc.points.stride = sizeof(PxVec3);
+    triDesc.points.data = pVerticesPos;
+    triDesc.triangles.count = iNumIndices / 3;  // »ï°¢Çü °³¼ö
+    triDesc.triangles.stride = 3 * sizeof(PxU32);
+    triDesc.triangles.data = pIndices;
+
+    return PxCreateTriangleMesh(tParams, triDesc);;
+}
+
 PxConvexMesh* CPhysX::CreateConvexMesh(_float3* pVerticesPos, _uint iNumVertices, PxMaterial* pMaterial)
 {
     PxCookingParams tParams(mToleranceScale);

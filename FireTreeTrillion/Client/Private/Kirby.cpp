@@ -1733,11 +1733,27 @@ CGameObject* CKirby::FindToppleableBridge(PxRigidActor* pActor)
 
 CGameObject* CKirby::FindStarBox(PxRigidActor* pActor)
 {
-	auto mapIter = m_mapStarBoxs.find(pActor);
-	if (mapIter != m_mapStarBoxs.end())
+	auto mapIter = m_mapStarBoxes.find(pActor);
+	if (mapIter != m_mapStarBoxes.end())
 		return mapIter->second;
 
 	return nullptr;
+}
+
+CGameObject* CKirby::FindBox(PxRigidActor* pActor)
+{
+	auto mapIter = m_mapBoxes.find(pActor);
+	if (mapIter != m_mapBoxes.end())
+		return mapIter->second;
+
+	return nullptr;
+}
+
+void CKirby::ReleaseAndClearMap(unordered_map<PxRigidActor*, CGameObject*> _map)
+{
+	for (auto& pair : _map)
+		Safe_Release(pair.second);
+	_map.clear();
 }
 
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -1778,18 +1794,9 @@ void CKirby::Free()
 
 	__super::Free();
 
-	for (auto& pair : m_mapToppleableBridges) {
-		//pair.first->release();
-		Safe_Release(pair.second);
-	}
-	m_mapToppleableBridges.clear();
-
-	for (auto& pair : m_mapStarBoxs)
-	{
-		//pair.first->release();
-		Safe_Release(pair.second);
-	}
-	m_mapStarBoxs.clear();
+	ReleaseAndClearMap(m_mapToppleableBridges);
+	ReleaseAndClearMap(m_mapStarBoxes);
+	ReleaseAndClearMap(m_mapBoxes);
 
 	for (auto& pModelCom : m_pModelCom)
 		Safe_Release(pModelCom);

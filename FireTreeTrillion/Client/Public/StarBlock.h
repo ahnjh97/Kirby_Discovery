@@ -1,6 +1,6 @@
 #pragma once
 #include "Client_Defines.h"
-#include "MapObject.h"
+#include "PhysXObject.h"
 
 BEGIN(Engine)
 class CModel;
@@ -31,7 +31,7 @@ public:
 	void				Break_From_Car();
 
 private:
-	HRESULT				Add_Components(wstring wstrModelProtoTag);
+	HRESULT				Add_Components(wstring& wstrModelName);
 	HRESULT				Bind_ShaderResources();
 
 	_int				Make_Partical();

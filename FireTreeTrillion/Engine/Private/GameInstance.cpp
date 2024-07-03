@@ -1010,6 +1010,14 @@ PxRigidStatic* CGameInstance::CreateStaticActor(_float4x4& matWorld, _float3* pV
 	return m_pPhysx->CreateStaticActor(matWorld, pVerticesPos, iNumVertices, pIndices, iNumIndices, pMaterial);
 }
 
+PxTriangleMesh* CGameInstance::CreateTriangleMesh(_float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)
+{
+	if (nullptr == m_pPhysx)
+		return nullptr;
+
+	return m_pPhysx->CreateTriangleMesh(pVerticesPos, iNumVertices, pIndices, iNumIndices, pMaterial);
+}
+
 PxConvexMesh* CGameInstance::CreateConvexMesh(_float3* pVerticesPos, _uint iNumVertices, PxMaterial* pMaterial)
 {
 	if (nullptr == m_pPhysx)

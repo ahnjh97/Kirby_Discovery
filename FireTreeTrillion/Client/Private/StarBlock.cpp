@@ -44,9 +44,6 @@ HRESULT CStarBlock::Initialize(void* pArg)
 
 	CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
 
-	/*if (FAILED(m_pModelCom->CreateStaticActor(m_pTransformCom->Get_WorldFloat4x4())))
-		return E_FAIL;*/
-
 	m_vecStaticActors = m_pModelCom->ReturnStaticActors(m_pTransformCom->Get_WorldFloat4x4());
 
 	if (pKirby != nullptr)
@@ -54,14 +51,6 @@ HRESULT CStarBlock::Initialize(void* pArg)
 		for (auto& actor : m_vecStaticActors)
 			pKirby->RegisterActorsToPlayer_ForStarBox(actor, this);
 	}
-
-
-	//vector<PxRigidActor*> vecActors = m_pModelCom->Get_Actors();
-	//if (pKirby != nullptr)
-	//{
-	//	for (auto& actor : vecActors)
-	//		pKirby->RegisterActorsToPlayer_ForStarBox(actor, this);
-	//}
 
 	return S_OK;
 }
@@ -219,7 +208,7 @@ void CStarBlock::Break_From_Car()
 	m_bDead = true;
 }
 
-HRESULT CStarBlock::Add_Components(wstring wstrModelProtoTag)
+HRESULT CStarBlock::Add_Components(wstring& wstrModelName)
 {
 	HRESULT hr;
 	/* For.Com_Shader */
@@ -235,22 +224,22 @@ HRESULT CStarBlock::Add_Components(wstring wstrModelProtoTag)
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
 
-	wstring wstrModeltag = TEXT("Prototype_Component_Model_") + wstrModelProtoTag;
+	wstring wstrModeltag = TEXT("Prototype_Component_Model_") + wstrModelName;
 	hr = __super::Add_Component(wstrModeltag,
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
-	if (wstrModelProtoTag == TEXT("StarBlockS"))
+	if (wstrModelName == TEXT("StarBlockS"))
 	{
 		Set_BodyCollider(COLLIDER_SPHERE, 0.5f, 0.f, 1.f);
 		m_fSize = 1.f;
 	}
-	else if (wstrModelProtoTag == TEXT("StarBlockM"))
+	else if (wstrModelName == TEXT("StarBlockM"))
 	{
 		Set_BodyCollider(COLLIDER_SPHERE, 1.f, 0.f, 2.f);
 		m_fSize = 2.f;
 	}
-	else if (wstrModelProtoTag == TEXT("StarBlockL"))
+	else if (wstrModelName == TEXT("StarBlockL"))
 	{
 		Set_BodyCollider(COLLIDER_SPHERE, 1.25f, 0.f, 2.5f);
 		m_fSize = 2.5f;

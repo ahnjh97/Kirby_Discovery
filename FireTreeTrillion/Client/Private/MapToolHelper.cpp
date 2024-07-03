@@ -149,7 +149,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "DsPalmABottomL", "DsPalmAMiddleL", "DsPalmATopL", "DsPalmBL", "DsPalmCL"
 
 		, "GsCarBaseAL", "GsCarCounterAL", "GsCarDirtyRack01L", "GsCarDisplayRack", "GsCarHoistCrane01L"
-		, "GsCarMachineAL", "GsCarMeshRack", "GsCarStop"
+		, "GsCarMachineAL", "GsCarMeshRack", "GsCarSteelPartsAL", "GsCarStop"
 		, "GsRubbleAsphalt01L", "GsRubbleAsphalt02L", "GsRubbleAsphalt03L", "GsRubbleAsphalt04L"
 		, "GsRubbleAsphalt05L", "GsRubbleAsphalt06L", "GsRubbleAsphalt07L", "GsRubbleAsphalt08L"
 		, "GsRubbleAsphalt09L", "GsScrappedCar"

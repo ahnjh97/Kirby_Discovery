@@ -315,6 +315,11 @@ PxRigidDynamic* CMesh::ReturnDynamicActor(_float4x4& matWorld)
 	return m_pGameInstance->CreateDynamicActor(matWorld, m_pVerticesPos, m_iNumVertices, m_pIndices, m_iNumIndices);
 }
 
+PxTriangleMesh* CMesh::CreateTriangleMesh()
+{
+	return m_pGameInstance->CreateTriangleMesh(m_pVerticesPos, m_iNumVertices, m_pIndices, m_iNumIndices);
+}
+
 PxConvexMesh* CMesh::CreateConvexMesh()
 {
 	return m_pGameInstance->CreateConvexMesh(m_pVerticesPos, m_iNumVertices);

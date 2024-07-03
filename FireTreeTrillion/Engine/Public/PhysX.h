@@ -52,6 +52,8 @@ public:
     void            Add_Force(PxRigidDynamic* pDynamicActor, _float3 vForce);
     PxRigidDynamic* CreateDynamicActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
     PxRigidStatic*  CreateStaticActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
+    
+    PxTriangleMesh* CreateTriangleMesh(_float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
     PxConvexMesh*   CreateConvexMesh(_float3* pVerticesPos, _uint iNumVertices, PxMaterial* pMaterial);
 
 private:

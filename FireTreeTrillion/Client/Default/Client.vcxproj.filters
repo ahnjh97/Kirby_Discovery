@@ -460,6 +460,9 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\BossMonster\Gully">
       <UniqueIdentifier>{3e784411-9f95-46ab-b0a1-aa64e4492765}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\Box">
+      <UniqueIdentifier>{6fd437c6-b749-4061-b0ec-e63bd2ffb9ce}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -937,6 +940,9 @@
     <ClInclude Include="..\Public\Level_GamePlay.h">
       <Filter>01.Levels\99. GamePlay</Filter>
     </ClInclude>
+    <ClInclude Include="Box.h">
+      <Filter>02.GameObjects\Map\Box</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1394,6 +1400,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Level_GamePlay.cpp">
       <Filter>01.Levels\99. GamePlay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Box.cpp">
+      <Filter>02.GameObjects\Map\Box</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
