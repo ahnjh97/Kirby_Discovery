@@ -309,11 +309,6 @@ void CHungryDee::OnNotify()
 	// 효선아 여기야
 }
 
-void CHungryDee::Set_MaskValueUI(_float _fMaskValue)
-{
-	m_pDialogUI->Set_Mask(_fMaskValue);
-}
-
 //맨 앞자리 디
 void CHungryDee::Bring_Food(PARTTIME_ITEM eITEM)
 {

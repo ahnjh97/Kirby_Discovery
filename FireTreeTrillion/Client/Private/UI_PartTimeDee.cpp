@@ -131,6 +131,12 @@ HRESULT CUI_PartTimeDee::Render()
 				m_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fMask, sizeof(_float));
 				m_pTexMask->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", 0);
 			}
+			else
+			{
+				_float fMask = 1.f;
+				m_pShaderCom->Bind_RawValue("g_fMaskRatio", &fMask, sizeof(_float));
+				m_pTexMask->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", 0);
+			}
 			
 			hr = m_pShaderCom->Begin(POSTEX_ALPHATEST_COLOR_VERTICALCUT);
 			CHECK_FAILED(hr);

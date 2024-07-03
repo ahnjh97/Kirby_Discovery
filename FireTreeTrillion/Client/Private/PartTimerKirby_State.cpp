@@ -155,6 +155,7 @@ void CPartTimerKirby_Grab_State::OnStateUpdate(CGameObject* pGameObject, _float 
 			}
 			pAlbaKirby->Render_Food(false, PARTTIME_ITEM::ITEM_END);
 			pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_SELECT, 50.f, true, true);
+			CPartTimeHelper::Get_Instance()->Make_RandomItem();
 		}
 		else if (pAlbaKirby->Get_State() == CPartTimerKirby::FOODSHOP_INCORRECTSTART)
 			pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_INCORRECT, 2.f, false, true);
@@ -213,7 +214,6 @@ void CPartTimerKirby_Grab_State::OnStateUpdate(CGameObject* pGameObject, _float 
  
 void CPartTimerKirby_Grab_State::OnStateExit()
 {
-	CPartTimeHelper::Get_Instance()->Make_RandomItem();
 }
 
 PARTTIME_ITEM CPartTimerKirby_Grab_State::Get_CurrentFood(_float4 vPos)
