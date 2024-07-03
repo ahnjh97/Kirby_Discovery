@@ -275,7 +275,7 @@ HRESULT CModel::Play_Animation(_float fTimeDelta)
 	m_Animations[m_iCurrentAnimIndex]->Invalidate_TransformationMatrix(fTimeDelta, m_Bones, m_isLoop, this);
 
 	for (auto& pBone : m_Bones)
-		pBone->Invalidate_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_TransformMatrix));
+		pBone->Invalidate_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_TransformMatrix), m_Animations[m_iCurrentAnimIndex]->Is_Ratio());
 	
 	return S_OK;
 }
@@ -648,11 +648,11 @@ HRESULT CModel::Bind_WorldMatrixForOctree(CShader* pShader, string& strConstantN
 }
 
 
-void CModel::Invalidate_Bones()
-{
-	for (auto& pBone : m_Bones)
-		pBone->Invalidate_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_TransformMatrix));
-}
+//void CModel::Invalidate_Bones()
+//{
+//	for (auto& pBone : m_Bones)
+//		pBone->Invalidate_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_TransformMatrix));
+//}
 
 _uint CModel::Find_MeshIndex(const string& _strMeshName)
 {

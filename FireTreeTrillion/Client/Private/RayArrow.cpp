@@ -2,14 +2,15 @@
 #include "RayArrow.h"
 #include "FinalBoss.h"
 #include "Kirby.h"
+#include "HitBox.h"
 
 CRayArrow::CRayArrow(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CGameObject{ pDevice, pContext }
+	: CPhysXObject{ pDevice, pContext }
 {
 }
 
 CRayArrow::CRayArrow(const CRayArrow& rhs)
-	: CGameObject{ rhs }
+	: CPhysXObject{ rhs }
 {
 }
 
@@ -226,6 +227,10 @@ void CRayArrow::Render_IMGUI()
 	__super::Render_IMGUI();
 }
 
+void CRayArrow::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
+{
+}
+
 #endif
 
 HRESULT CRayArrow::Add_Components()
@@ -240,6 +245,14 @@ HRESULT CRayArrow::Add_Components()
 	hr = __super::Add_Component(TEXT("Prototype_Component_Model_RayArrow"),
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
+
+	CHitBox::HITBOX_DESC HitBox{};
+	HitBox.pOwner = this;
+	HitBox.pDesc = &m_tColliderDesc[BODY];
+	HitBox.pCollisionType = MONSTER;
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
+		return E_FAIL;
+	Set_BodyCollider(COLLIDER_SPHERE, 0.f, 1.5f, 1.f);
 
 	return S_OK;
 }

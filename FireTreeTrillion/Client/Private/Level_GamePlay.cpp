@@ -29,7 +29,6 @@ HRESULT CLevel_GamePlay::Initialize()
 {
 	m_pGameInstance->Set_RenderMode(CRenderer::MODE_TOOL);
 
-
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
 
@@ -134,7 +133,7 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 
 HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
 {
-	LEVEL eLevel = LEVEL_GAMEPLAY;
+	
 	
 	CCamera_Main::CAMERA_KIRBY_DESC		MainCamDesc{};
 	MainCamDesc.fFovy = XMConvertToRadians(30.0f);
@@ -147,7 +146,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
 	MainCamDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	MainCamDesc.fOrigDistance = 20.f;
 	MainCamDesc.fCamSensor = .3f;
-	if (FAILED(m_pGameInstance->Add_Clone(eLevel, strLayerTag, TEXT("Prototype_GameObject_Camera_Main"), &MainCamDesc)))
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_Camera_Main"), &MainCamDesc)))
 		return E_FAIL;
 
 	CCamera_Free::CAMERA_FREE_DESC		CameraDesc{};
@@ -160,7 +159,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
 	CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
 	CameraDesc.fSpeedPerSec = 10.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
-	if (FAILED(m_pGameInstance->Add_Clone(eLevel, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
 		return E_FAIL;
 	
 	return S_OK;
@@ -171,7 +170,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const wstring& strLayerTag)
 	CSkySphere::SKYSPHERE_DESC GPSkyDesc{};
 	GPSkyDesc.strModelTag = { "SkySphere_Stage1_Day" };
 
-	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_SkySphere"), &GPSkyDesc);
+	HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_SkySphere"), &GPSkyDesc);
 	CHECK_FAILED(hr);
 
 	return S_OK;
@@ -200,20 +199,18 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& _wstrLayerTag)
 			return E_FAIL;
 	}
 
-	LEVEL eLevel = LEVEL_GAMEPLAY;
 	CUIObject::UIOBJ_DESC DiscardUIDesc{};
 	DiscardUIDesc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f, 0.f };
 	DiscardUIDesc.vPos = { DiscardUIDesc.vCenter.x, DiscardUIDesc.vCenter.y, 0.f };
 	DiscardUIDesc.vSize = { 260.f * 0.8f, 120.f * 0.8f, 1.f };
 
-	HRESULT hr = m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_UI_HUD"), TEXT("Prototype_GameObject_HUD_AbilityDiscard"), &DiscardUIDesc);
+	HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_HUD"), TEXT("Prototype_GameObject_HUD_AbilityDiscard"), &DiscardUIDesc);
 
 	return S_OK;
 }
 
 HRESULT CLevel_GamePlay::Ready_Map()
 {
-	LEVEL eLevel = LEVEL_GAMEPLAY;
 	string strFileName = "../../../objects_txt/Stage1_Map.txt";
 	ifstream fileInput(strFileName, ios::binary);
 	if (fileInput.is_open() == false)
@@ -251,7 +248,7 @@ HRESULT CLevel_GamePlay::Ready_Map()
 		else
 			wstrGameObjectTag = TEXT("BasicMap");
 
-		if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tMapDesc)))
+		if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tMapDesc)))
 		{
 			wstring wstrErrorMsg = TEXT("Failed to Clone: ") + wstrGameObjectTag;
 			MSG_BOX(wstrErrorMsg.c_str());
@@ -267,7 +264,7 @@ HRESULT CLevel_GamePlay::Ready_Map()
 
 HRESULT CLevel_GamePlay::Ready_Triggers()
 {
-	LEVEL eLevel = LEVEL_GAMEPLAY;
+	
 	string strFileName = "../../../objects_txt/Stage1_Triggers.txt";
 	ifstream fileInput(strFileName, ios::binary);
 	if (fileInput.is_open() == false)
@@ -332,7 +329,7 @@ HRESULT CLevel_GamePlay::Ready_Triggers()
 			tTriggerDesc.iTriggerIndex = iTriggerIndex;
 			tTriggerDesc.iTriggerType = triggerType;
 
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Trigger"), TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Trigger"), TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc)))
 				return E_FAIL;
 		}
 		else if ("NonAnim_Kirby" == strModelName)
@@ -346,7 +343,7 @@ HRESULT CLevel_GamePlay::Ready_Triggers()
 				if ("NonAnim" == strModelName.substr(0, 7))
 					tempDesc.wstrModelName.erase(0, 8);
 			}
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby"), &tempDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby"), &tempDesc)))
 				return E_FAIL;
 		}
 		else if ("Ladder" == strModelName)
@@ -356,19 +353,19 @@ HRESULT CLevel_GamePlay::Ready_Triggers()
 			tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
 			tDesc.iShaderVars = iShaderVars;
 			tDesc.fRimWidth = fRimWidth;
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Ladder"), TEXT("Prototype_GameObject_Ladder"), &tDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Ladder"), TEXT("Prototype_GameObject_Ladder"), &tDesc)))
 				return E_FAIL;
 		}
 		else if ("Fog" == strModelName)
 		{
 			CGameObject::GAMEOBJECT_DESC tDesc{};
 			tDesc.matWorld = matWorld;
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_TerrainFog"), &tDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_TerrainFog"), &tDesc)))
 				return E_FAIL;
 		}
 	}
 
-	CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(eLevel, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+	CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(m_iLevel, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
 	if (nullptr == pCamera)
 		return E_FAIL;
 
@@ -398,7 +395,7 @@ HRESULT CLevel_GamePlay::Ready_Triggers()
 
 HRESULT CLevel_GamePlay::Ready_Monsters()
 {
-	LEVEL eLevel = LEVEL_GAMEPLAY;
+	
 	string strFileName = "../../../objects_txt/Stage1_Monsters.txt";
 
 	ifstream fileInput(strFileName, ios::binary);
@@ -459,7 +456,7 @@ HRESULT CLevel_GamePlay::Ready_Monsters()
 			MonsterDesc.iShaderVars = iShaderVars;
 			MonsterDesc.fRimWidth = fRimWidth;
 			MonsterDesc.eMonState = CMonster::MONSTER_STATE(iTriggerIndex);
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Awoofy"), &MonsterDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Awoofy"), &MonsterDesc)))
 				return E_FAIL;
 		}
 		else if (L"Rabbit" == tempDesc.wstrModelName)
@@ -470,17 +467,17 @@ HRESULT CLevel_GamePlay::Ready_Monsters()
 			RabbitDesc.iShaderVars = iShaderVars;
 			RabbitDesc.fRimWidth = fRimWidth;
 			RabbitDesc.eRabbitState = CRabbit::RABBIT_STATE(iTriggerIndex);
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Rabbit"), &RabbitDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Rabbit"), &RabbitDesc)))
 				return E_FAIL;
 		}
 		else if (L"Buffahorn" == tempDesc.wstrModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Buffahorn"), &tempDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Buffahorn"), &tempDesc)))
 				return E_FAIL;
 		}
 		else if (L"BladeKnight" == tempDesc.wstrModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BladeKnight"), &tempDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BladeKnight"), &tempDesc)))
 				return E_FAIL;
 		}
 		else if (L"PoppyBrosJr" == tempDesc.wstrModelName)
@@ -491,17 +488,17 @@ HRESULT CLevel_GamePlay::Ready_Monsters()
 			PoppyDesc.iShaderVars = iShaderVars;
 			PoppyDesc.fRimWidth = fRimWidth;
 			PoppyDesc.ePoppyState = CPoppyBrosJr::POPPY_STATE(iTriggerIndex);
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_PoppyBrosJr"), &PoppyDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_PoppyBrosJr"), &PoppyDesc)))
 				return E_FAIL;
 		}
 		else if (L"CappyBody" == tempDesc.wstrModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_CappyBody"), &tempDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_CappyBody"), &tempDesc)))
 				return E_FAIL;
 		}
 		else if (L"FinalBoss" == tempDesc.wstrModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_FinalBoss"), &tempDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_FinalBoss"), &tempDesc)))
 				return E_FAIL;
 		}
 		else if (L"Kabu" == tempDesc.wstrModelName)
@@ -513,7 +510,7 @@ HRESULT CLevel_GamePlay::Ready_Monsters()
 			KabuDesc.fRimWidth = fRimWidth;
 			KabuDesc.eMonState = CKabu::MONSTER_STATE(iTriggerIndex);
 			KabuDesc.vecRallyPoints = vecRallyPoints;
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Kabu"), &KabuDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Kabu"), &KabuDesc)))
 				return E_FAIL;
 		}
 		else if (strModelName == "NonAnim_BrontoBurt")
@@ -525,7 +522,7 @@ HRESULT CLevel_GamePlay::Ready_Monsters()
 			BrontoBurtDesc.fRimWidth = fRimWidth;
 			BrontoBurtDesc.eMonState = CBrontoBurt::MONSTER_STATE(iTriggerIndex);
 			BrontoBurtDesc.vecRallyPoints = vecRallyPoints;
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BrontoBurt"), &BrontoBurtDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BrontoBurt"), &BrontoBurtDesc)))
 				return E_FAIL;
 		}
 	}
@@ -537,7 +534,7 @@ HRESULT CLevel_GamePlay::Ready_Monsters()
 
 HRESULT CLevel_GamePlay::Ready_Items()
 {
-	LEVEL eLevel = LEVEL_GAMEPLAY;
+	
 	string strFileName = "../../../objects_txt/Stage1_Items.txt";
 
 	ifstream fileInput(strFileName, ios::binary);
@@ -573,7 +570,7 @@ HRESULT CLevel_GamePlay::Ready_Items()
 
 		if ("Item_Coin" == strModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Item"), TEXT("Prototype_GameObject_Coin"), &tDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Item"), TEXT("Prototype_GameObject_Coin"), &tDesc)))
 				return E_FAIL;
 		}
 	}
@@ -584,7 +581,7 @@ HRESULT CLevel_GamePlay::Ready_Items()
 
 HRESULT CLevel_GamePlay::Ready_Kickables()
 {
-	LEVEL eLevel = LEVEL_GAMEPLAY;
+	
 	string strFileName = "../../../objects_txt/Stage1_Kickables.txt";
 
 	ifstream fileInput(strFileName, ios::binary);
@@ -618,7 +615,7 @@ HRESULT CLevel_GamePlay::Ready_Kickables()
 		tDesc.iShaderVars = iShaderVars;
 		tDesc.fRimWidth = fRimWidth;
 
-		if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Item"), TEXT("Prototype_GameObject_KickableRock"), &tDesc)))
+		if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Item"), TEXT("Prototype_GameObject_KickableRock"), &tDesc)))
 			return E_FAIL;
 	}
 
@@ -698,7 +695,7 @@ HRESULT CLevel_GamePlay::Load_FileData(const string& _strFilePath, FILE_TYPE _eF
 			strProtoTag += strUITag;
 		}
 
- 		HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, _wstrLayerTag, CUtils::StrToWstr(strProtoTag), &LayerUIDesc);
+ 		HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, _wstrLayerTag, CUtils::StrToWstr(strProtoTag), &LayerUIDesc);
 		CHECK_FAILED(hr);
 	}
 

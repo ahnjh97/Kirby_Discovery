@@ -1600,7 +1600,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("DimensionGateL", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("BigDebris", TYPE_NONANIM, 0.8f, 180.f);
 		m_vecModelInfo.emplace_back("SmallDebris", TYPE_NONANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("MoundPiece", TYPE_NONANIM, 0.1f, 180.f);
+		m_vecModelInfo.emplace_back("MoundPiece", TYPE_NONANIM, 0.2f, 180.f);
 	}
 	else if (eLevel == LEVEL_GAMEPLAY)
 	{

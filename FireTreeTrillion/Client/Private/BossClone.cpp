@@ -1,14 +1,15 @@
 #include "stdafx.h"
 #include "BossClone.h"
 #include "FinalBoss.h"
+#include "HitBox.h"
 
 CBossClone::CBossClone(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CGameObject{ pDevice, pContext }
+	: CPhysXObject{ pDevice, pContext }
 {
 }
 
 CBossClone::CBossClone(const CBossClone& rhs)
-	: CGameObject{ rhs }
+	: CPhysXObject{ rhs }
 {
 }
 
@@ -193,8 +194,11 @@ void CBossClone::Render_IMGUI()
 	//	ImGui::Text("TargetDir X : %.2f \tTargetDir Y : %.2f \tTargetDir Z : %.2f ", INFO(m_vTargetDir).x, INFO(m_vTargetDir).y, INFO(m_vTargetDir).z);
 	__super::Render_IMGUI();
 }
-
 #endif
+
+void CBossClone::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
+{
+}
 
 HRESULT CBossClone::Add_Components()
 {
@@ -208,6 +212,14 @@ HRESULT CBossClone::Add_Components()
 	hr = __super::Add_Component(TEXT("Prototype_Component_Model_FinalBoss"),
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
+
+	CHitBox::HITBOX_DESC HitBox{};
+	HitBox.pOwner = this;
+	HitBox.pDesc = &m_tColliderDesc[BODY];
+	HitBox.pCollisionType = MONSTER;
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
+		return E_FAIL;
+	Set_BodyCollider(COLLIDER_SPHERE, 2.5f, 1.f, 2.5f);
 
 	return S_OK;
 }

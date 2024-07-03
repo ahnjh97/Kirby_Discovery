@@ -14,9 +14,9 @@ HRESULT CBone::Initialize(ifstream& fileStream)
 	return S_OK;
 }
 
-void CBone::Invalidate_CombinedTransformationMatrix(const vector<CBone*>& Bones, _fmatrix TransformatrixMatrix)
+void CBone::Invalidate_CombinedTransformationMatrix(const vector<CBone*>& Bones, _fmatrix TransformatrixMatrix, _bool isRatio)
 {
-	if (m_EditMatrx != _float4x4::Identity)
+	if (m_EditMatrx != _float4x4::Identity && isRatio == false)
 	{
 		m_TransformationMatrix *= m_EditMatrx;
 		//_matrix			TransformationMatrix = { XMLoadFloat4x4(&m_TransformationMatrix) };

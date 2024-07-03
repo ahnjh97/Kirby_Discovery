@@ -469,6 +469,15 @@
     <Filter Include="02.GameObjects\UI\MessageWindow">
       <UniqueIdentifier>{bcd8d01b-4475-4a52-aafd-de2aee6510c4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyDump_State">
+      <UniqueIdentifier>{8ce43134-70bd-4e9a-84fa-af301762dfac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyGun_State">
+      <UniqueIdentifier>{a88b1b9f-6498-430b-9234-dce1f19a7962}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyCrash_State">
+      <UniqueIdentifier>{2b564633-9ff1-4590-9555-1e64d92e3ea2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -952,6 +961,9 @@
     <ClInclude Include="..\Public\UI_BtnIcon.h">
       <Filter>02.GameObjects\UI</Filter>
     </ClInclude>
+    <ClInclude Include="CKirbyDump_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyDump_State</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1415,6 +1427,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\UI_BtnIcon.cpp">
       <Filter>02.GameObjects\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="CKirbyDump_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyDump_State</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
