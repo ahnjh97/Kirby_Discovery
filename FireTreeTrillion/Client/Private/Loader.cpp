@@ -1590,6 +1590,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("BigDebris", TYPE_NONANIM, 0.8f, 180.f);
 		m_vecModelInfo.emplace_back("SmallDebris", TYPE_NONANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("MoundPiece", TYPE_NONANIM, 0.2f, 180.f);
+
+		// For Item
+		Load_ItemModels();
 	}
 	else if (eLevel == LEVEL_GAMEPLAY)
 	{
@@ -1975,6 +1978,7 @@ void CLoader::Load_ItemModels()
 	m_vecModelInfo.emplace_back("Item_Sword", TYPE_NONANIM, 1.f, 0.f);
 	m_vecModelInfo.emplace_back("Item_Bomb", TYPE_NONANIM, 1.f, 0.f);
 	m_vecModelInfo.emplace_back("Item_Hammer", TYPE_NONANIM, 1.f, 0.f);
+	m_vecModelInfo.emplace_back("Item_Star", TYPE_NONANIM, 0.5f, 0.f);
 }
 
 void CLoader::Load_KirbyBodyModels()
