@@ -45,7 +45,6 @@ HRESULT CUI_BtnIcon::Initialize(void* _pArg)
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 
 	m_fBlinkAlpha = 0.f;
-	m_fBtnAlpha = 1.f;
 	m_eCurState = BTN_IDLE;
 
 	LEVEL eLevel = (LEVEL)*m_pGameInstance->Get_CurrentLevelID();

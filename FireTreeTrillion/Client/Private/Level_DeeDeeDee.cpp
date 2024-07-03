@@ -199,7 +199,6 @@ HRESULT CLevel_DeeDeeDee::Ready_Layer_UI(const wstring& _wstrLayerTag)
 		CHECK_FAILED(hr);
 	}
 
-
 	CUIObject::UIOBJ_DESC DiscardUIDesc{};
 	DiscardUIDesc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f, 0.f };
 	DiscardUIDesc.vPos = { DiscardUIDesc.vCenter.x, DiscardUIDesc.vCenter.y, 0.f };
@@ -212,8 +211,8 @@ HRESULT CLevel_DeeDeeDee::Ready_Layer_UI(const wstring& _wstrLayerTag)
 	MessageWindowDesc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f, 0.f };
 	MessageWindowDesc.vPos = { 0.f, -325.f, 1.f, 1.f };
 	MessageWindowDesc.vSize = { 1300.f * 0.8f, 288.f * 0.8f, 1.f };
-	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_MESSAGEWINDOW"), TEXT("Prototype_GameObject_UI_MessageWindow"), &MessageWindowDesc);
-	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_MESSAGEWINDOW"), TEXT("Prototype_GameObject_UI_BtnIcon"));
+	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_MessageWindow"), TEXT("Prototype_GameObject_UI_MessageWindow"), &MessageWindowDesc);
+	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_MessageWindow"), TEXT("Prototype_GameObject_UI_BtnIcon"));
 
 	return S_OK;
 }

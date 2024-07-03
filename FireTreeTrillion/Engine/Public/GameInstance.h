@@ -223,6 +223,10 @@ public: /* For. TimeController */
 public: // For Collision
 	_bool	Is_PassingGroup(class CGameObject* pObj);
 
+#pragma region DIALOG_MANAGER
+
+#pragma endregion
+
 
 private:
 	class CGraphic_Device*			m_pGraphic_Device = { nullptr };
@@ -245,6 +249,7 @@ private:
 	class CPhysX*					m_pPhysx = { nullptr };
 	class CPicking*					m_pPicking = { nullptr };
 	class CTimeController*			m_pTimeController = { nullptr };
+	class CDialog_Manager*			m_pDialog_Manager = { nullptr };
 
 	_uint	m_iCurrentLevelID		= { 0 };
 	_uint	g_iNumOctree			= {};

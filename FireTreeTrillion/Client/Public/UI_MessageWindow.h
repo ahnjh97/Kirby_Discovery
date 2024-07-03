@@ -12,13 +12,20 @@ END
 BEGIN(Client)
 class CUI_MessageWindow : public CUIObject
 {
-private:
+public:
 	enum TEX_MESSAGEWINDOW { TEXMW_BASE, TEXMW_BTNBASE, TEXMW_NONE };
+	enum MESSAGEWINDOW_STATE { WINDOW_IDLE, WINDOW_HIDE, WINDOW_SHOW, WINDOW_NONE	};
 
 private:
 	CUI_MessageWindow(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CUI_MessageWindow(const CUI_MessageWindow& rhs);
 	virtual ~CUI_MessageWindow() = default;
+
+#pragma region GETTER/SETTER
+public:
+	MESSAGEWINDOW_STATE Get_MWindowState() { return m_eCurState; }
+#pragma endregion
+
 
 public:
 	virtual HRESULT				Initialize_Prototype()						override;
@@ -47,5 +54,7 @@ private:
 	CShader*					m_pShaderCom = { nullptr };
 	CTexture*					m_pTextureCom = { nullptr };
 	CVIBuffer_Rect*				m_pVIBufferCom = { nullptr };
+
+	MESSAGEWINDOW_STATE			m_eCurState = { WINDOW_NONE };
 };
 END

@@ -102,10 +102,10 @@ _int CHUD_AbilityDiscard::Tick(_float fTimeDelta)
 	//버튼 입력X
 	//m_IsGaugeBLINK = FALSE;
 	//m_fHIDEAnimTime += fTimeDelta;
+
 	//m_UIObjDesc.fAlpha -= fTimeDelta * 5.f;
 	//if (m_fHIDEAnimTime > 5.f) //시간 경과할 경우 idle 상태로 변경
 	//	m_fHIDEAnimTime = 0.f;
-
 }
 
 void CHUD_AbilityDiscard::Late_Tick(_float fTimeDelta)
@@ -171,42 +171,37 @@ void CHUD_AbilityDiscard::ChaseUI_To_Player()
 
 void CHUD_AbilityDiscard::Compute_PlayerDumpAbiliyTime()
 {
-	if (m_pKirby == nullptr)
-		return;
+	//if (m_pKirby == nullptr)
+	//	return;
+
+	//m_fGaugeRatio = m_fDumpAbilityTime / 1.f; //게이지 비율
 	m_fDumpAbilityTime = m_pKirby->Get_KirbyInfo()->m_fDumpAbilityTime; //덤프시간 체크
 
 	if (m_fDumpAbilityTime > 1.f)
 		m_fDumpAbilityTime = 1.f;
+
 	else if (m_fDumpAbilityTime < 0.f)
 		m_fDumpAbilityTime = 0.f;
-
-	//m_fGaugeRatio = m_fDumpAbilityTime / 1.f; //게이지 비율
 }
 
 _bool CHUD_AbilityDiscard::Key_InputSystem(_float fTimeDelta)
 {
+	//보유 어빌이 없을 경우를 덤프시간으로 체크 (어떤 상황에서나 V키를 입력할 경우에 대한 예외처리)
+	//이는 덤프시간 MAX치 오버될 경우 (value >= 1.f)와 이어지며, 값이 1로 넘어가자마자 0으로 변경됨
 	if (m_pGameInstance->Get_DIKeyState(DIK_V, KEY_PRESS) && m_fDumpAbilityTime > 0.f)
 	{
 		if (m_pKirby == nullptr)
 			return false;
 
 		m_UIObjDesc.fAlpha += fTimeDelta * 5.f;
+
 		if (m_UIObjDesc.fAlpha > 1.f)
 			m_UIObjDesc.fAlpha = 1.f;
-
-		//보유 어빌이 없을 경우를 덤프시간으로 체크 (어떤 상황에서나 V키를 입력할 경우에 대한 예외처리)
-		//이는 덤프시간 MAX치 오버될 경우 (value >= 1.f)와 이어지며, 값이 1로 넘어가자마자 0으로 변경됨
-		//if (m_fDumpAbilityTime <= 0)
-		//{
-		//	m_UIObjDesc.fAlpha = 0.f;
-		//	return OBJ_NOEVENT;
-		//}
-		//else if (m_fDumpAbilityTime > 0.9f)
-		//	m_IsGaugeBLINK = TRUE;
 	}
 	else if (m_pGameInstance->Get_DIKeyState(DIK_V, KEY_PRESS) == false || m_fDumpAbilityTime <= 0.f)
 	{
 		m_UIObjDesc.fAlpha -= fTimeDelta * 5.f;
+
 		if (m_UIObjDesc.fAlpha < 0.f) //시간 경과할 경우 idle 상태로 변경
 			m_UIObjDesc.fAlpha = 0.f;
 	}
