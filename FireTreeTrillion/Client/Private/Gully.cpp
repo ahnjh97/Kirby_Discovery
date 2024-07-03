@@ -1,13 +1,14 @@
 #include "stdafx.h"
 #include "Gully.h"
+#include "HitBox.h"
 
 CGully::CGully(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CGameObject{ pDevice, pContext }
+	: CPhysXObject{ pDevice, pContext }
 {
 }
 
 CGully::CGully(const CGully& rhs)
-	: CGameObject{ rhs }
+	: CPhysXObject{ rhs }
 {
 }
 
@@ -37,37 +38,49 @@ HRESULT CGully::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
+	m_vPosition.m128_f32[1] -= 5.f;
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vPosition);
 	m_pTransformCom->Turn(CUtils::Make_Random_Vector(1.f), 1.f);
 
-	m_bDead = true;
+	m_bPoolingDead = true;
 
 	return S_OK;
 }
 
 _int CGully::Tick(_float fTimeDelta)
 {
-	if (true == m_bDead)
+	if (true == m_bPoolingDead)
 		return OBJ_NOEVENT;
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
-	if (0.0f < m_fLifeTime)
+	if (0.f < m_fLifeTime)
 	{
 		m_fLifeTime -= m_fTimeDelta;
 	}
 	else
 	{
-		m_fLifeTime = 0.f;
-		m_bDead = true;
+		if (0.2f < m_fScale)
+		{
+			m_fScale -= m_fTimeDelta;
+			m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
+		}
+		else
+		{
+			m_vPosition.m128_f32[1] -= 5.f;
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vPosition);
+			m_pTransformCom->Set_Scaled(1.f, 1.f, 1.f);
+			m_fLifeTime = 0.f;
+			m_bPoolingDead = true;
+		}
 	}
-
+	
 	return OBJ_NOEVENT;
 }
 
 void CGully::Late_Tick(_float fTimeDelta)
 {
-	if (true == m_bDead)
+	if (true == m_bPoolingDead)
 		return;
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 100.0f))
@@ -79,7 +92,7 @@ void CGully::Late_Tick(_float fTimeDelta)
 
 HRESULT CGully::Render()
 {
-	if (true == m_bDead)
+	if (true == m_bPoolingDead)
 		return S_OK;
 
 	if (FAILED(Bind_ShaderResources()))
@@ -143,6 +156,10 @@ void CGully::Render_IMGUI()
 }
 #endif
 
+void CGully::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
+{
+}
+
 HRESULT CGully::Add_Components()
 {
 	HRESULT hr;
@@ -155,6 +172,14 @@ HRESULT CGully::Add_Components()
 	hr = __super::Add_Component(TEXT("Prototype_Component_Model_MoundPiece"),
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
+
+	CHitBox::HITBOX_DESC HitBox{};
+	HitBox.pOwner = this;
+	HitBox.pDesc = &m_tColliderDesc[BODY];
+	HitBox.pCollisionType = MONSTER;
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
+		return E_FAIL;
+	Set_BodyCollider(COLLIDER_CYLINDER, 0.5f, 1.5f, 0.85f);
 
 	return S_OK;
 }

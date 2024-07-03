@@ -11,6 +11,7 @@
 #include "Level_Racing.h"
 #include "Level_FinalBoss.h"
 #include "Level_Town.h"
+#include "Level_Finale.h"
 
 #include "Level_GamePlay.h"
 
@@ -73,10 +74,10 @@ void CLevel_Loading::Tick(_float fTimeDelta)
 		case LEVEL_FINALBOSS:
 			pLevel = CLevel_FinalBoss::Create(m_pDevice, m_pContext);
 			break;
-		///////////////////////////////////////////////////////////////
-		case LEVEL_GAMEPLAY:
-			pLevel = CLevel_GamePlay::Create(m_pDevice, m_pContext);
+		case LEVEL_FINALE:
+			pLevel = CLevel_Finale::Create(m_pDevice, m_pContext);
 			break;
+		///////////////////////////////////////////////////////////////
 		case LEVEL_TOOL_FX:
 			pLevel = CLevel_Tool_FX::Create(m_pDevice, m_pContext);
 			break;
@@ -88,6 +89,10 @@ void CLevel_Loading::Tick(_float fTimeDelta)
 			break;
 		case LEVEL_TOOL_MAP:
 			pLevel = CLevel_Tool_Map::Create(m_pDevice, m_pContext);
+			break;
+		///////////////////////////////////////////////////////////////
+		case LEVEL_GAMEPLAY:
+			pLevel = CLevel_GamePlay::Create(m_pDevice, m_pContext);
 			break;
 		}
 

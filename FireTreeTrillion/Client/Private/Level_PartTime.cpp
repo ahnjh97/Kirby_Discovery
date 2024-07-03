@@ -119,7 +119,7 @@ HRESULT CLevel_PartTime::Ready_Lights()
 
 HRESULT CLevel_PartTime::Ready_Layer_Camera(const wstring& strLayerTag)
 {
-	LEVEL eLevel = LEVEL_PARTTIME;
+	
 
 
 
@@ -134,7 +134,7 @@ HRESULT CLevel_PartTime::Ready_Layer_Camera(const wstring& strLayerTag)
 	CameraDesc.fSpeedPerSec = 10.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
-	if (FAILED(m_pGameInstance->Add_Clone(eLevel, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
 		return E_FAIL;
 
 	CCamera_Main::CAMERA_KIRBY_DESC		MainCamDesc{};
@@ -149,7 +149,7 @@ HRESULT CLevel_PartTime::Ready_Layer_Camera(const wstring& strLayerTag)
 	MainCamDesc.fOrigDistance = 28.f;
 	MainCamDesc.fCamSensor = .3f;
 
-	if (FAILED(m_pGameInstance->Add_Clone(eLevel, strLayerTag, TEXT("Prototype_GameObject_Camera_Main"), &MainCamDesc)))
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_Camera_Main"), &MainCamDesc)))
 		return E_FAIL;
 
 	return S_OK;
@@ -160,7 +160,7 @@ HRESULT CLevel_PartTime::Ready_Layer_BackGround(const wstring& strLayerTag)
 	CSkySphere::SKYSPHERE_DESC PartTimeSkyDesc{};
 	PartTimeSkyDesc.strModelTag = { "SkySphere_Stage1_Day" };
 
-	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_PARTTIME, strLayerTag, TEXT("Prototype_GameObject_SkySphere"), &PartTimeSkyDesc);
+	HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_SkySphere"), &PartTimeSkyDesc);
 	CHECK_FAILED(hr);
 
 	return S_OK;
@@ -177,7 +177,7 @@ void CLevel_PartTime::Ready_Layer_Player(const wstring& strLayerTag)
 	_float4x4 matFinal = matRot * matPos;
 
 	KirbyDesc.matWorld = matFinal;
-	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Player"), TEXT("Prototype_GameObject_PartTimerKirby"), &KirbyDesc);
+	HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Player"), TEXT("Prototype_GameObject_PartTimerKirby"), &KirbyDesc);
 	CHECK_FAILED(hr);
 }
 
@@ -196,7 +196,7 @@ void CLevel_PartTime::Ready_Layer_Food(const wstring& strLayerTag)
 	FoodDesc.bRender = true;
 	FoodDesc.uItem = 0;
 	FoodDesc.fSpeedPerSec = 5;
-	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Food"), TEXT("Prototype_GameObject_PartTimeFood"), &FoodDesc);
+	HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Food"), TEXT("Prototype_GameObject_PartTimeFood"), &FoodDesc);
 	CHECK_FAILED(hr);
 
 	// 돔마도
@@ -209,7 +209,7 @@ void CLevel_PartTime::Ready_Layer_Food(const wstring& strLayerTag)
 	FoodDesc.matWorld = matFinal;
 	FoodDesc.bRender = true;
 	FoodDesc.uItem = 1;
-	hr = m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Food"), TEXT("Prototype_GameObject_PartTimeFood"), &FoodDesc);
+	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Food"), TEXT("Prototype_GameObject_PartTimeFood"), &FoodDesc);
 	CHECK_FAILED(hr);
 
 	// 야구르트
@@ -224,7 +224,7 @@ void CLevel_PartTime::Ready_Layer_Food(const wstring& strLayerTag)
 	FoodDesc.matWorld = matFinal;
 	FoodDesc.bRender = true;
 	FoodDesc.uItem = 2;
-	hr = m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Food"), TEXT("Prototype_GameObject_PartTimeFood"), &FoodDesc);
+	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Food"), TEXT("Prototype_GameObject_PartTimeFood"), &FoodDesc);
 	CHECK_FAILED(hr);
 
 	// 함바그
@@ -241,22 +241,22 @@ void CLevel_PartTime::Ready_Layer_Food(const wstring& strLayerTag)
 	FoodDesc.matWorld = matFinal;
 	FoodDesc.bRender = true;
 	FoodDesc.uItem = 3;
-	hr = m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Food"), TEXT("Prototype_GameObject_PartTimeFood"), &FoodDesc);
+	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Food"), TEXT("Prototype_GameObject_PartTimeFood"), &FoodDesc);
 	CHECK_FAILED(hr);
 }
 
 HRESULT CLevel_PartTime::Ready_Layer_UI(const wstring& _wstrLayerTag)
 {
-	HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_PARTTIME, _wstrLayerTag, TEXT("Prototype_GameObject_UI_PartTime"));
+	HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, _wstrLayerTag, TEXT("Prototype_GameObject_UI_PartTime"));
 	CHECK_FAILED(hr);
-	//hr = m_pGameInstance->Add_Clone(LEVEL_PARTTIME, _wstrLayerTag, TEXT("Prototype_GameObject_UI_PartTimeDee"));
-	//CHECK_FAILED(hr);
+	hr = m_pGameInstance->Add_Clone(LEVEL_PARTTIME, _wstrLayerTag, TEXT("Prototype_GameObject_UI_PartTimeResult"));
+	CHECK_FAILED(hr);
 	return S_OK;
 }
 
 HRESULT CLevel_PartTime::Ready_Map()
 {
-	LEVEL eLevel = LEVEL_PARTTIME;
+
 
 	string strFileName = "../../../objects_txt/PartTime_Map.txt";
 	ifstream fileInput(strFileName, ios::binary);
@@ -298,7 +298,7 @@ HRESULT CLevel_PartTime::Ready_Map()
 
 		if (wstrGameObjectTag == TEXT("BasicMap"))
 			int a = 0;
-		if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tMapDesc)))
+		if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tMapDesc)))
 		{
 			wstring wstrErrorMsg = TEXT("Failed to Clone: ") + wstrGameObjectTag;
 			MSG_BOX(wstrErrorMsg.c_str());
@@ -314,7 +314,7 @@ HRESULT CLevel_PartTime::Ready_Map()
 
 HRESULT CLevel_PartTime::Ready_Triggers()
 {
-	LEVEL eLevel = LEVEL_PARTTIME;
+
 	string strFileName = "../../../objects_txt/PartTime_Triggers.txt";
 	ifstream fileInput(strFileName, ios::binary);
 	if (fileInput.is_open() == false)
@@ -379,7 +379,7 @@ HRESULT CLevel_PartTime::Ready_Triggers()
 			tTriggerDesc.iTriggerIndex = iTriggerIndex;
 			tTriggerDesc.iTriggerType = triggerType;
 
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Trigger"), TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Trigger"), TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc)))
 				return E_FAIL;
 			continue;
 		}
@@ -394,7 +394,7 @@ HRESULT CLevel_PartTime::Ready_Triggers()
 				if ("NonAnim" == strModelName.substr(0, 7))
 					tempDesc.wstrModelName.erase(0, 8);
 			}
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Player"), TEXT("Prototype_GameObject_PartTimerKirby"), &tempDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Player"), TEXT("Prototype_GameObject_PartTimerKirby"), &tempDesc)))
 				return E_FAIL;
 		}
 		else if ("Ladder" == strModelName)
@@ -404,19 +404,19 @@ HRESULT CLevel_PartTime::Ready_Triggers()
 			tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
 			tDesc.iShaderVars = iShaderVars;
 			tDesc.fRimWidth = fRimWidth;
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Ladder"), TEXT("Prototype_GameObject_Ladder"), &tDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Ladder"), TEXT("Prototype_GameObject_Ladder"), &tDesc)))
 				return E_FAIL;
 		}
 		else if ("Fog" == strModelName)
 		{
 			CGameObject::GAMEOBJECT_DESC tDesc{};
 			tDesc.matWorld = matWorld;
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_TerrainFog"), &tDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_TerrainFog"), &tDesc)))
 				return E_FAIL;
 		}
 	}
 
-	CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(eLevel, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+	CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(m_iLevel, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
 	if (nullptr == pCamera)
 		return E_FAIL;
 
@@ -446,7 +446,7 @@ HRESULT CLevel_PartTime::Ready_Triggers()
 
 HRESULT CLevel_PartTime::Ready_Dees()
 {
-	LEVEL eLevel = LEVEL_PARTTIME;
+
 
 
 	CWaddleDee::DEE_DESC ObjDesc{};
@@ -456,7 +456,7 @@ HRESULT CLevel_PartTime::Ready_Dees()
 	InitMat.Translation({ 10.2f, 24.7f, 26.f });
 	ObjDesc.matWorld = InitMat;
 
-	if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NPC"), TEXT("Prototype_GameObject_FoodShopDee"), &ObjDesc)))
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_NPC"), TEXT("Prototype_GameObject_FoodShopDee"), &ObjDesc)))
 		return E_FAIL;
 
 
@@ -471,7 +471,7 @@ HRESULT CLevel_PartTime::Ready_Dees()
 	{
 		HungryDeeDesc.iIdx = i;
 
-		if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Dee"), TEXT("Prototype_GameObject_HungryDee"), &HungryDeeDesc)))
+		if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Dee"), TEXT("Prototype_GameObject_HungryDee"), &HungryDeeDesc)))
 			return E_FAIL;
 	}
 
@@ -538,7 +538,7 @@ HRESULT CLevel_PartTime::Ready_Dees()
 			MonsterDesc.iShaderVars = iShaderVars;
 			MonsterDesc.fRimWidth = fRimWidth;
 			MonsterDesc.eMonState = CMonster::MONSTER_STATE(iTriggerIndex);
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_PartTimerKirby"), &MonsterDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_PartTimerKirby"), &MonsterDesc)))
 				return E_FAIL;
 		}
 		/*else if (L"Rabbit" == tempDesc.wstrModelName)
@@ -549,7 +549,7 @@ HRESULT CLevel_PartTime::Ready_Dees()
 			RabbitDesc.iShaderVars = iShaderVars;
 			RabbitDesc.fRimWidth = fRimWidth;
 			RabbitDesc.eRabbitState = CRabbit::RABBIT_STATE(iTriggerIndex);
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Rabbit"), &RabbitDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Rabbit"), &RabbitDesc)))
 				return E_FAIL;
 		}*/
 	}
@@ -562,7 +562,7 @@ HRESULT CLevel_PartTime::Ready_Dees()
 
 HRESULT CLevel_PartTime::Ready_Items()
 {
-	LEVEL eLevel = LEVEL_PARTTIME;
+
 	string strFileName = "../../../objects_txt/PartTime_Items.txt";
 
 	ifstream fileInput(strFileName, ios::binary);
@@ -598,12 +598,12 @@ HRESULT CLevel_PartTime::Ready_Items()
 
 		if ("Item_Coin" == strModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NoVacuumItem"), TEXT("Prototype_GameObject_Coin"), &tDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_NoVacuumItem"), TEXT("Prototype_GameObject_Coin"), &tDesc)))
 				return E_FAIL;
 		}
 		else if ("Item_EnergyDrink" == strModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_NoVacuumItem"), TEXT("Prototype_GameObject_Food"), &tDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_NoVacuumItem"), TEXT("Prototype_GameObject_Food"), &tDesc)))
 				return E_FAIL;
 		}
 	}
@@ -615,7 +615,7 @@ HRESULT CLevel_PartTime::Ready_Items()
 
 HRESULT CLevel_PartTime::Ready_Kickables()
 {
-	LEVEL eLevel = LEVEL_PARTTIME;
+
 	string strFileName = "../../../objects_txt/PartTime_Kickables.txt";
 
 	ifstream fileInput(strFileName, ios::binary);
@@ -649,7 +649,7 @@ HRESULT CLevel_PartTime::Ready_Kickables()
 		tDesc.iShaderVars = iShaderVars;
 		tDesc.fRimWidth = fRimWidth;
 
-		if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_Item"), TEXT("Prototype_GameObject_KickableRock"), &tDesc)))
+		if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Item"), TEXT("Prototype_GameObject_KickableRock"), &tDesc)))
 			return E_FAIL;
 	}
 

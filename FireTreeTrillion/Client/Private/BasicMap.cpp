@@ -36,9 +36,8 @@ HRESULT CBasicMap::Initialize(void* pArg)
 
     wstring wstrModelTag = GameObjectDesc.wstrModelName;
 
-
     if (wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("DeeDeeDeeMap") && wstrModelTag != TEXT("Land_LbLastBossBeforeStep") && 
-        wstrModelTag != TEXT("TownShop")  && wstrModelTag.substr(wstrModelTag.length() - 5) == TEXT("Blend"))
+        wstrModelTag != TEXT("TownShop")  && wstrModelTag != TEXT("LevelFinale_LbLastBuilding") && wstrModelTag.substr(wstrModelTag.length() - 5) == TEXT("Blend"))
     {
         m_bBlendMap = true;
         m_eRenderGroup = CRenderer::RENDER_BLEND;
@@ -62,7 +61,8 @@ HRESULT CBasicMap::Initialize(void* pArg)
     }
 
     if(wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("DeeDeeDeeMap") &&
-       wstrModelTag != TEXT("Land_LbLastBossBeforeStep") && wstrModelTag != TEXT("TownShop") && false == m_bBlendMap)
+       wstrModelTag != TEXT("Land_LbLastBossBeforeStep") && wstrModelTag != TEXT("TownShop") && 
+       wstrModelTag != TEXT("LevelFinale_LbLastBuilding") && false == m_bBlendMap)
     {
         TraverseBlendDecoInfoTxts(m_mapBlendMeshesIndices, m_mapBlendObjStaticActor);
 
@@ -87,7 +87,9 @@ HRESULT CBasicMap::Initialize(void* pArg)
         InsertMapDecos();
     }
 
-    if (wstrModelTag == TEXT("Town") ||  wstrModelTag == TEXT("DeeDeeDeeMap") || wstrModelTag == TEXT("TownShop")|| wstrModelTag == TEXT("Land_LbLastBossBeforeStep")) 
+    if (wstrModelTag == TEXT("Town") ||  wstrModelTag == TEXT("DeeDeeDeeMap") || 
+        wstrModelTag == TEXT("TownShop")|| wstrModelTag == TEXT("Land_LbLastBossBeforeStep") ||
+        wstrModelTag == TEXT("LevelFinale_LbLastBuilding"))
     {
         if (LEVEL_TOOL_MAP != *m_pCurrentLevelID) 
         {

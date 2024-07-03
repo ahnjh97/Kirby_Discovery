@@ -79,6 +79,7 @@ public:
 #ifdef _DEBUG
 	virtual void	Render_IMGUI() override;
 #endif
+	virtual void	Add_AnimEvent()						override;
 	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
 public:
@@ -102,7 +103,6 @@ private:
 	_bool				m_bGully = { false };
 
 	_float				m_fGlideTime = { 0.f };
-	_float				m_fLifeTime = { 0.f };
 
 	_uint				m_iGullyCnt = { 0 };
 
@@ -115,6 +115,7 @@ private:
 
 	// FSM
 	void SetUp_FSM();
+	void HitBoxChanger(_uint eState);
 
 public:
 	static CFinalBoss* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

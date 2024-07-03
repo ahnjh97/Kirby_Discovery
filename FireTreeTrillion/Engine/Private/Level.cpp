@@ -14,6 +14,7 @@ CLevel::CLevel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 HRESULT CLevel::Initialize()
 {
+	m_iLevel = *m_pGameInstance->Get_CurrentLevelID();
 	return S_OK;
 }
 

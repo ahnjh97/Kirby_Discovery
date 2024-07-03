@@ -165,6 +165,11 @@ _int CHungryDee::Tick(_float fTimeDelta)
 	return OBJ_NOEVENT;
 }
 
+void CHungryDee::Erase_DialogUI()
+{
+	Safe_Release(m_pDialogUI);
+}
+
 void CHungryDee::Swap_WatingPosition()
 {
 	m_iMyIdx = (m_iMyIdx + LAST_WAITPOS) % m_iWatingNum;
@@ -300,7 +305,8 @@ void CHungryDee::Change_Dialog(PARTTIME_ITEM eItem)
 
 void CHungryDee::OnNotify()
 {
-	// 특정 시간일때 와들디 처리
+	// 특정 시간일때 와들디 처리 >> 점심시간에 화내기 시작하는걸 여기서 처리해주면 될것같유
+	// 효선아 여기야
 }
 
 //맨 앞자리 디

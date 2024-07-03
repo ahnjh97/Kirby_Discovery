@@ -41,6 +41,7 @@ private:
 	HRESULT Loading_For_Town();
 	HRESULT Loading_For_Parttime();
 	HRESULT Loading_For_FinalBoss();
+	HRESULT Loading_For_Finale();
 
 	HRESULT Loading_For_GamePlay();
 	HRESULT Loading_For_Tool_UI();

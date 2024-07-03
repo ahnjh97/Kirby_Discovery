@@ -13,6 +13,8 @@ class CAbility final : public CItemObject
 {
 public:
 	struct ABILITYITEM_DESC : public CGameObject::GAMEOBJECT_DESC {
+		_float fRotateDir = { 0.f };
+		_vector	vDir = {};
 		_float4 vPosition = {};
 		ABILITYTYPE eAbilityType = {};
 	};
@@ -50,15 +52,21 @@ private:
 	CModel*					m_pModelCom = { nullptr };
 
 private:
+	_vector					m_vDir = { 0.f };
+
 	_float4					m_vPosition = {};
 	_float4					m_vLookDir = { 0.f, 0.f, 0.f, 0.f };
 
 	_bool					m_bRender = { false };
+	_bool					m_bTurn = { false };
 
 	_uint					m_iDeathCount = { 0 };
 
 	_float					m_fJumpPower = { 0.f };
+	_float					m_fJumpPowerTemp = { 0.f };
 	_float					m_fPower = { 0.f };
+	_float					m_fSpeed = { 0.f };
+	_float					m_fRotateDir = { 0.f };
 	_float					m_fLifeTime = { 0.f };
 	_float					m_fRenderTime = { 0.f };
 

@@ -57,6 +57,10 @@ HRESULT CPartTimerKirby::Initialize(void* pArg)
 	if (FAILED(Make_TargetToCams()))
 		return E_FAIL;
 
+	// 완전히 기본상태로 먼저 세팅한다.
+	m_eMouthState = MOUTH_IDLE;
+	m_eEyeState = EYE_IDLE;
+
 	CPartTimeHelper::Get_Instance()->Register_PartTimerKirby(this);
 
 	return S_OK;
@@ -115,6 +119,9 @@ HRESULT CPartTimerKirby::Render()
 
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
+		if (Custom_Face(i) == true)
+			continue;
+
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
 			return E_FAIL;
 
@@ -209,6 +216,61 @@ HRESULT CPartTimerKirby::Make_TargetToCams()
 	return S_OK;
 }
 
+// 0 : 입, 3 : 눈
+_bool CPartTimerKirby::Custom_Face(_uint iMeshIndex)
+{
+	HRESULT hr(S_OK);
+
+	if (iMeshIndex == 0) 
+	{
+		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", iMeshIndex, TextureType_DIFFUSE);
+		CHECK_FAILED(hr);
+
+		hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", iMeshIndex);
+		CHECK_FAILED(hr);
+
+		hr = m_pMouthTexture[m_eMouthState]->Bind_ShaderResource(m_pShaderCom, "g_KirbyMouthTexture", 0);
+		CHECK_FAILED(hr);
+
+		_bool bStencil = true;
+		_bool bRimLight = true;
+		_bool bMotionBlur = true;
+		m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
+
+		m_pShaderCom->Begin(ANIMMODEL_MOUTH);
+		m_pModelCom->Render(iMeshIndex);
+
+		return true;
+	}
+	else if (iMeshIndex == 3) // 0 : 입, 3 : 눈
+	{
+		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", iMeshIndex, TextureType_DIFFUSE);
+		CHECK_FAILED(hr);
+
+		hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", iMeshIndex);
+		CHECK_FAILED(hr);
+
+		hr = m_pEyeTexture[m_eEyeState]->Bind_ShaderResource(m_pShaderCom, "g_KirbyEyeTexture", 0);
+		CHECK_FAILED(hr);
+
+		_bool bStencil = true;
+		_bool bRimLight = true;
+		_bool bMotionBlur = true;
+		m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
+
+		m_pShaderCom->Begin(ANIMMODEL_EYE);
+		m_pModelCom->Render(iMeshIndex);
+
+		return true;
+	}
+
+	return false;
+}
+
 HRESULT CPartTimerKirby::Add_Components()
 {
 	HRESULT hr;
@@ -226,18 +288,44 @@ HRESULT CPartTimerKirby::Add_Components()
 	// FOR ANIMTOOL
 	m_ppModelForAnimTool = &m_pModelCom;
 
+	#pragma region Kirby Eye
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_idle"),
+		TEXT("Com_Texture_Eye_Idle"), (CComponent**)&m_pEyeTexture[EYE_IDLE]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_doubt"),
+		TEXT("Com_Texture_Eye_Doubt"), (CComponent**)&m_pEyeTexture[EYE_SADNESS]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_close"),
+		TEXT("Com_Texture_Eye_Close"), (CComponent**)&m_pEyeTexture[EYE_CLOSE]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_blink"),
+		TEXT("Com_Texture_Eye_Blink"), (CComponent**)&m_pEyeTexture[EYE_BLINK]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_anger"),
+		TEXT("Com_Texture_Eye_Anger"), (CComponent**)&m_pEyeTexture[EYE_ANGER]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_pupil"),
+		TEXT("Com_Texture_Eye_Pupil"), (CComponent**)&m_pEyeTexture[EYE_PUPIL]);
+	                                                                                                                                                                                                                                 CHECK_FAILED(hr);
+	#pragma endregion
 
-	/* For.Com_CharacterController */
-	//_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
-	//CCharacterController::CONTROLLER_DESC desc{};
-	//desc.vInitialPos = vPos;
-	//desc.fOffset = 0.5f;
-	//desc.tCapsuleShape.fHeight = 0.4f;// 1.f;
-	//desc.tCapsuleShape.fRadius = 0.4f;// 0.5f;
-	//hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
-	//	TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
-	//CHECK_FAILED(hr);
-
+	#pragma region Kirby Mouth
+		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_base"),
+			TEXT("Com_Texture_Mouth_Idle"), (CComponent**)&m_pMouthTexture[MOUTH_IDLE]);
+		CHECK_FAILED(hr);
+		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_anger"),
+			TEXT("Com_Texture_Mouth_Anger"), (CComponent**)&m_pMouthTexture[MOUTH_ANGER]);
+		CHECK_FAILED(hr);
+		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_happy"),
+			TEXT("Com_Texture_Mouth_Happy"), (CComponent**)&m_pMouthTexture[MOUTH_HAPPY]);
+		CHECK_FAILED(hr);
+		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_smile"),
+			TEXT("Com_Texture_Mouth_Smile"), (CComponent**)&m_pMouthTexture[MOUTH_SMILE]);
+		CHECK_FAILED(hr);
+		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_surprise"),
+			TEXT("Com_Texture_Mouth_Surprise"), (CComponent**)&m_pMouthTexture[MOUTH_SURPRISE]);
+		CHECK_FAILED(hr);
+	#pragma endregion
 
 	/* For.HitBox */
 	CHitBox::HITBOX_DESC HitBox{};
@@ -344,6 +432,9 @@ void CPartTimerKirby::SetUp_FSM()
 	m_pFSM->Add_State(HANDOVERSHORTL,			CPartTimerKirby_Grab_State::Create());
 	m_pFSM->Add_State(FOODSHOP_INCORRECTSTART,  CPartTimerKirby_Grab_State::Create());
 	m_pFSM->Add_State(FOODSHOP_INCORRECT,		CPartTimerKirby_Grab_State::Create());
+
+	m_pFSM->Add_State(FOODSHOP_RESULTWINSTART,	CPartTimerKirby_Win_State::Create());
+	m_pFSM->Add_State(FOODSHOP_RESULTWIN,		CPartTimerKirby_Win_State::Create());
 	
 	//상태 Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};

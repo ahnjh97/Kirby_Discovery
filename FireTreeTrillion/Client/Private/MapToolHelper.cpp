@@ -99,12 +99,12 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 	m_vecLevelName = { "Level_Static", "Level_Loading", "Level_Logo", "GamePlay",
 			"Level_Tool_UI", "Level_Tool_FX", "Level_Tool_Anim", "Level_Tool_Map",
-		"Intro", "Racing", "DeeDeeDee", "Town", "PartTime", "FinalBoss", "Level_End" };
+		"Intro", "Racing", "DeeDeeDee", "Town", "PartTime", "FinalBoss", "Finale", "Level_End" };
 
 	//UV 조절 가능
 	//BasicMap (UV 편집 가능)
-	m_vecMapModelNames = { "Level0Stage1Step01", "Level0Stage1Step02",  "Level1Stage1Step01", "DeeDeeDeeMap", "Town"
-			, "TownShop", "Land_VcLabo", "Land_LbLastBossBeforeStep" };
+	m_vecMapModelNames = { "Level0Stage1Step01", "Level0Stage1Step02",  "Level1Stage1Step01", "DeeDeeDeeMap", "Town", "TownShop"
+		, "Land_VcLabo", "Land_LbLastBossBeforeStep", "LevelFinale_LbLastBuilding" };
 
 	vector<string> vecBGs = { "BG0", "BG1" };
 	m_setMapNames.insert(vecBGs.begin(), vecBGs.end());
@@ -402,7 +402,7 @@ void CMapToolHelper::Menu_Level()
 {
 	ImGui::SeparatorText("Level");
 
-	for (_int i = LEVEL_INTRO; i <= LEVEL_FINALBOSS; i++)
+	for (_int i = LEVEL_INTRO; i <= LEVEL_FINALE; i++)
 	{
 		if (ImGui::RadioButton(m_vecLevelName[i].c_str(), s_iLevelIndex == i - LEVEL_INTRO)) {
 			ImGui::OpenPopup("Level Change");

@@ -47,11 +47,11 @@ _int CKirbyWeapons::Tick(_float fTimeDelta)
 
     m_fTimeDelta = m_pGameInstance->Get_FirstTimer();
 
-    CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
-    m_isAnim = pKirby->Get_AbilityType() == ABILITY_HAMMER ? true : false;
+    //CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
+    //m_isAnim = pKirby->Get_AbilityType() == ABILITY_HAMMER ? true : false;
 
-    if (m_isAnim == true)
-        Change_Animation(pKirby);
+    //if (m_isAnim == true)
+    //    Change_Animation(pKirby);
 
     Compute_MotionBlur();
     m_WorldMatrix = m_pTransformCom->Get_WorldMatrix() * *m_pBoneMatrix * *m_pParentMatrix;

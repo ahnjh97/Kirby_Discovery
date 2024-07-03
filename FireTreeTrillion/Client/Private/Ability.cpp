@@ -4,6 +4,7 @@
 #include "HitBox.h"
 #include "Kirby.h"
 #include "MultiEffect.h"
+#include "Camera_Main.h"
 
 CAbility::CAbility(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CItemObject{ pDevice, pContext }
@@ -32,6 +33,8 @@ HRESULT CAbility::Initialize(void* pArg)
 
 		pAbilityItemDesc->fSpeedPerSec = 7.f;
 		pAbilityItemDesc->fRotationPerSec = XMConvertToRadians(90.0f);
+		m_fRotateDir = pAbilityItemDesc->fRotateDir;
+		m_vDir = pAbilityItemDesc->vDir;
 		m_vPosition = pAbilityItemDesc->vPosition;
 		m_eAbilityType = pAbilityItemDesc->eAbilityType;
 	}
@@ -45,8 +48,18 @@ HRESULT CAbility::Initialize(void* pArg)
 		return E_FAIL;
 	
 	m_eItemType = ITEM_FOOD;
-	m_fJumpPower = 7.f;
-	m_fPower = 2.f;
+	if (ABILITY_DEFAULT == m_eAbilityType)
+	{
+		m_fJumpPower = 8.f;
+		m_fJumpPowerTemp = m_fJumpPower;
+		m_fPower = 2.f;
+		m_fSpeed = 3.f;
+	}
+	else
+	{
+		m_fJumpPower = 7.f;
+		m_fPower = 2.f;
+	}
 
 	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
 	CTransform* pTransform = pKirby->Get_TransformCom();
@@ -65,60 +78,108 @@ HRESULT CAbility::Initialize(void* pArg)
 
 _int CAbility::Tick(_float fTimeDelta)
 {
-	if (m_bDead == true)
+	if (true == m_bDead)
 		return OBJ_DEAD;
-
-	// 미친 데카
-	if (25 == m_iDeathCount)
-		m_bDead = true;
-
-	if (m_ePhyXState == PO_KIRBYMOUTH)
-		Delete_AllEffect();
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
-	m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), m_fTimeDelta * 2.5f);
-
-	if (-2.6f < m_fJumpPower)
+	if (ABILITY_DEFAULT == m_eAbilityType)
 	{
-		CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
-		CTransform* pTransform = pKirby->Get_TransformCom();
+		CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+		CHECK_NULLPTR(pCameraMain);
 
-		// 이제 날아가는 것을 구현해보자.
-		m_pControllerCom->Move_Dir(m_pTransformCom, -m_vLookDir * m_fTimeDelta * 2.f, m_fTimeDelta);
+		CTransform* pCameraTransform = pCameraMain->Get_TransformCom();
+		_vector vCameraLook = pCameraTransform->Get_State_Vector(CTransform::STATE_LOOK);
+		vCameraLook.m128_f32[1] = 0.f;
+		//m_pTransformCom->Look_At_Axis(pCameraTransform->Get_State_Vector(CTransform::STATE_LOOK));
+		_vector		vLook = vCameraLook;
+		_vector		vRight = XMVector3Cross(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), vLook);
+		_vector		vUp = XMVector3Cross(vLook, vRight);
 
-		// 점프되는 체공시간을 구현해보자.
-		m_pControllerCom->Jump(m_pTransformCom, m_fJumpPower, m_fTimeDelta);
-		m_fJumpPower -= GRAVITY * m_fTimeDelta * m_fPower;
+		_float3		vScaled = m_pTransformCom->Get_Scaled();
 
-		if (0.4f < m_fPower)
-			m_fPower -= m_fTimeDelta * 3.f;
+		m_pTransformCom->Set_State(CTransform::STATE_RIGHT, XMVector3Normalize(vRight) * vScaled.x);
+		m_pTransformCom->Set_State(CTransform::STATE_UP, XMVector3Normalize(vUp) * vScaled.y);
+		m_pTransformCom->Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLook) * vScaled.z);
+
+		m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * m_fRotateDir, m_fTimeDelta * 3.f);
+
+		if(0.f < m_fSpeed)
+		{
+			m_fSpeed -= m_fTimeDelta;
+			m_pControllerCom->Move_Dir(m_pTransformCom, m_vDir * m_fTimeDelta * m_fSpeed, m_fTimeDelta);
+		}
 		else
-			m_fPower = 0.4f;
-		//m_fPower -= m_fTimeDelta;
-		m_pControllerCom->Set_FallVelocity(m_fJumpPower);
+			m_fSpeed = 0.f;
+
+		if (false == m_pControllerCom->Jump(m_pTransformCom, m_fJumpPower, m_fTimeDelta))
+		{
+			if(0 < m_fJumpPowerTemp)
+			{
+				--m_fJumpPowerTemp;
+				m_fJumpPower = m_fJumpPowerTemp;
+			}
+			else
+			{
+				m_fLifeTime += m_fTimeDelta;
+				if (0.2f < m_fLifeTime)
+					m_bDead = true;
+			}
+		}
+		m_fJumpPower -= GRAVITY * m_fTimeDelta * m_fPower;
 	}
 	else
 	{
-		m_pControllerCom->FreeFall(m_pTransformCom, m_fTimeDelta, m_fPower);
-	
-		if (0.1f < m_fPower)
-			m_fPower -= m_fTimeDelta * 3.f;
-		else
-			m_fPower = 0.1f;
+		// 데카
+		if (25 == m_iDeathCount)
+			m_bDead = true;
 
-		// n초후 깜빡이면서 사라짐
-		m_fLifeTime += m_fTimeDelta;
-		if (4.f < m_fLifeTime)
+		if (m_ePhyXState == PO_KIRBYMOUTH)
+			Delete_AllEffect();
+
+		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), m_fTimeDelta * 2.5f);
+
+		if (-2.6f < m_fJumpPower)
 		{
-			m_fRenderTime += m_fTimeDelta;
-			if (0.1f > m_fRenderTime)
-				m_bRender = true;
+			CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
+			CTransform* pTransform = pKirby->Get_TransformCom();
+
+			// 이제 날아가는 것을 구현해보자.
+			m_pControllerCom->Move_Dir(m_pTransformCom, -m_vLookDir * m_fTimeDelta * 2.f, m_fTimeDelta);
+
+			// 점프되는 체공시간을 구현해보자.
+			m_pControllerCom->Jump(m_pTransformCom, m_fJumpPower, m_fTimeDelta);
+			m_fJumpPower -= GRAVITY * m_fTimeDelta * m_fPower;
+
+			if (0.4f < m_fPower)
+				m_fPower -= m_fTimeDelta * 3.f;
 			else
+				m_fPower = 0.4f;
+			//m_fPower -= m_fTimeDelta;
+			m_pControllerCom->Set_FallVelocity(m_fJumpPower);
+		}
+		else
+		{
+			m_pControllerCom->FreeFall(m_pTransformCom, m_fTimeDelta, m_fPower);
+
+			if (0.1f < m_fPower)
+				m_fPower -= m_fTimeDelta * 3.f;
+			else
+				m_fPower = 0.1f;
+
+			// n초후 깜빡이면서 사라짐
+			m_fLifeTime += m_fTimeDelta;
+			if (4.f < m_fLifeTime)
 			{
-				m_fRenderTime = 0.f;
-				m_bRender = false;
-				++m_iDeathCount;
+				m_fRenderTime += m_fTimeDelta;
+				if (0.1f > m_fRenderTime)
+					m_bRender = true;
+				else
+				{
+					m_fRenderTime = 0.f;
+					m_bRender = false;
+					++m_iDeathCount;
+				}
 			}
 		}
 	}
@@ -191,7 +252,6 @@ HRESULT CAbility::Render_LightDepth()
 #ifdef _DEBUG
 void CAbility::Render_IMGUI()
 {
-
 }
 #endif
 
@@ -260,6 +320,9 @@ void CAbility::AbilityType(ABILITYTYPE eAbilityType)
 {
 	switch (eAbilityType)
 	{
+	case ABILITY_DEFAULT:
+		m_strComponentTag = TEXT("Prototype_Component_Model_Item_Star");
+		break;
 	case ABILITY_SWORD:
 		m_strComponentTag = TEXT("Prototype_Component_Model_Item_Sword");
 		m_pTransformCom->Turn(XMVectorSet(1.f, 0.f, 0.f, 0.f), 1.f);

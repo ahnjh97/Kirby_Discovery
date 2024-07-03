@@ -16,6 +16,8 @@ CMultiEffect::CMultiEffect(const CMultiEffect& rhs)
 {
 }
 
+
+
 void CMultiEffect::Fill_SaveData(MULTI_FX_DATA* pFXData)
 {
 	pFXData->iNameStrLen = (_uint)m_strFXName.size();
@@ -149,13 +151,17 @@ void CMultiEffect::Late_Tick(_float fTimeDelta)
 	}
 
 
-	//if (0.f < m_fStartDelay || m_bDead ||
-	//	(m_fDuration.second - .05f <= m_fDuration.first && (*m_pCurrentLevelID) != LEVEL_TOOL_FX))
-	//	return;
-
 	for (auto& pEffect : m_FXs)
 	{
 		pEffect->Late_Tick(fTimeDelta);
+	}
+}
+
+void CMultiEffect::Add_RenderGroup()
+{
+	for (auto& pEffect : m_FXs)
+	{
+		pEffect->Add_RenderGroup();
 	}
 }
 

@@ -3,6 +3,7 @@
 #include "Kirby.h"
 #include "PartTimerKirby.h"
 #include "EventCenter.h"
+#include "PartTimeHelper.h"
 
 CCamera_Main::CCamera_Main(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CCamera{ pDevice, pContext }
