@@ -481,6 +481,9 @@
     <Filter Include="01.Levels\12. Finale">
       <UniqueIdentifier>{48c88699-1c49-4542-a934-ae4b16595516}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Levels\10. Simba">
+      <UniqueIdentifier>{54872277-bc89-4a13-9bfa-6cf99310be0e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -967,6 +970,9 @@
     <ClInclude Include="..\Public\Level_Finale.h">
       <Filter>01.Levels\12. Finale</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Level_Simba.h">
+      <Filter>01.Levels\10. Simba</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1433,6 +1439,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Level_Finale.cpp">
       <Filter>01.Levels\12. Finale</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Simba.cpp">
+      <Filter>01.Levels\10. Simba</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

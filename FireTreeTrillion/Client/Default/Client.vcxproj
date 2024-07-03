@@ -279,6 +279,7 @@
     <ClInclude Include="..\Public\Level_Logo.h" />
     <ClInclude Include="..\Public\Level_PartTime.h" />
     <ClInclude Include="..\Public\Level_Racing.h" />
+    <ClInclude Include="..\Public\Level_Simba.h" />
     <ClInclude Include="..\Public\Level_Tool_Anim.h" />
     <ClInclude Include="..\Public\Level_Tool_FX.h" />
     <ClInclude Include="..\Public\Level_Tool_Map.h" />
@@ -454,6 +455,7 @@
     <ClCompile Include="..\Private\Level_Logo.cpp" />
     <ClCompile Include="..\Private\Level_PartTime.cpp" />
     <ClCompile Include="..\Private\Level_Racing.cpp" />
+    <ClCompile Include="..\Private\Level_Simba.cpp" />
     <ClCompile Include="..\Private\Level_Tool_Anim.cpp" />
     <ClCompile Include="..\Private\Level_Tool_FX.cpp" />
     <ClCompile Include="..\Private\Level_Tool_Map.cpp" />
