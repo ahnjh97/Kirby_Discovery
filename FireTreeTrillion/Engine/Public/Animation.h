@@ -30,6 +30,7 @@ public:
 
 	void Reset_Ratio() { m_bRatio = true; }
 	void Remove_Ratio() { m_bRatio = false; }
+	_bool Is_Ratio() { return m_bRatio; }
 
 	_float Get_Duration() {	return m_fDuration; }
 	_float Get_TrackPosition() { return m_fTrackPosition; }

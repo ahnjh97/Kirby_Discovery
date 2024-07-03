@@ -30,6 +30,8 @@ public:
 		//제일 긴 놈의 duration으로 정해진다.
 		m_fDuration.second = pEffect->Get_BiggerDuration(m_fDuration.second);
 	}
+	virtual void Add_RenderGroup() override;
+
 	virtual _int Get_Size() { return m_FXs.size(); }
 	virtual void Reset_Duration() override
 	{

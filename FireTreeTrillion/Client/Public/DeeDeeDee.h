@@ -123,6 +123,8 @@ private:
 	class CDeeDeeDeeHammer* m_pWeapons = { nullptr };
 
 
+	_float					m_ftext = { 0.f };
+
 
 
 

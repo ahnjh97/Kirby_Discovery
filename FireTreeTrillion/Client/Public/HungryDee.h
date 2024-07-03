@@ -38,6 +38,8 @@ public:
 	_float			Get_WaitingTime() {return m_fWaitingTime;}
 	_bool			IsFrontWaiting() { return m_iMyIdx == WAITPOS_FRONT; }
 	void			Set_RenderPartObj(_bool bRender) { m_bRenderPartObj = bRender; }
+	
+	void			Erase_DialogUI(); //{ m_pDialogUI = nullptr; }
 
 	void			Swap_WatingPosition();
 	void			Ready_OrderUI();

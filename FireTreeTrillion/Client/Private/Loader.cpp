@@ -133,6 +133,7 @@
 #include "HUD_AbilityDiscard.h"
 #include "UI_PartTime.h"
 #include "UI_PartTimeDee.h"
+#include "UI_PartTimeResult.h"
 #include "HUD_BossHpBar.h"
 #include "TransingStar.h"
 
@@ -310,6 +311,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_PartTime"), CUI_PartTime);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_PartTimeDee"), CUI_PartTimeDee);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_PartTimeResult"), CUI_PartTimeResult);
 	
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_TransingStar"), CTransingStar);
 
@@ -834,6 +836,14 @@ HRESULT CLoader::Loading_For_Parttime()
 	hr = Add_Texture(eLevel, "GameFoodUI_energydrink",		"UI/MGameFood/energydrink.png");
 	hr = Add_Texture(eLevel, "GameFoodUI_burger",			"UI/MGameFood/burger.png");
 
+	// 결과 안내
+	hr = Add_Texture(eLevel, "GameFoodUI_FoodGameTextMask",	"UI/MGameFood/FoodGameTextMask.png");
+	hr = Add_Texture(eLevel, "Fade",						"UI/Fade.png");
+
+	// 결과창
+	hr = Add_Texture(eLevel, "GameFoodUI_ResultBar",		"UI/MGameFood/result bar.png");
+	//hr = Add_Texture(eLevel, "GameFoodUI_ResultBar",		"UI/MGameFood/ClearText.png");
+	
 #pragma endregion
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
@@ -928,7 +938,7 @@ HRESULT CLoader::Loading_For_FinalBoss()
 
 HRESULT CLoader::Loading_For_Tool_FX()
 {
-	HRESULT hr = S_OK;
+	HRESULT  hr = S_OK;
 	LEVEL eLevel = LEVEL_TOOL_FX;
 
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
@@ -1222,6 +1232,8 @@ HRESULT CLoader::Add_FXTexture()
 	hr = Add_Texture(LEVEL_STATIC, "FX_Food_ResultBottom", "Effects/UI/MGameFood/result bottom.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_TitleLogo", "Effects/UI/TitleLogo.png");	CHECK_FAILED(hr);
 
+	//파티클
+	hr = Add_Texture(LEVEL_STATIC, "FX_Rock", "Effects/Particle/rock_%d.png", 4);	CHECK_FAILED(hr);
 
 	return S_OK;
 }

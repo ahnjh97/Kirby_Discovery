@@ -463,8 +463,20 @@
     <Filter Include="02.GameObjects\UI\TransingStar">
       <UniqueIdentifier>{5d5b209e-634e-4099-a2ae-a86fa9e7139c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\PhysXObject\Character\BossMonster\Gully">
+    <Filter Include="02.GameObjects\UI\PartTime\Result">
+      <UniqueIdentifier>{6bfb944e-4c8c-4592-88d2-10aed3c5b9f4}</UniqueIdentifier>
+	</Filter>
+	<Filter Include="02.GameObjects\PhysXObject\Character\BossMonster\Gully">
       <UniqueIdentifier>{3e784411-9f95-46ab-b0a1-aa64e4492765}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyDump_State">
+      <UniqueIdentifier>{8ce43134-70bd-4e9a-84fa-af301762dfac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyGun_State">
+      <UniqueIdentifier>{a88b1b9f-6498-430b-9234-dce1f19a7962}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyCrash_State">
+      <UniqueIdentifier>{2b564633-9ff1-4590-9555-1e64d92e3ea2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -940,8 +952,14 @@
     <ClInclude Include="..\Public\TransingStar.h">
       <Filter>02.GameObjects\UI\TransingStar</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Gully.h">
+    <ClInclude Include="..\Public\UI_PartTimeResult.h">
+      <Filter>02.GameObjects\UI\PartTime\Result</Filter>
+	</ClInclude>
+	<ClInclude Include="..\Public\Gully.h">
       <Filter>02.GameObjects\PhysXObject\Character\BossMonster\Gully</Filter>
+    </ClInclude>
+    <ClInclude Include="CKirbyDump_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyDump_State</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1398,8 +1416,14 @@
     <ClCompile Include="..\Private\TransingStar.cpp">
       <Filter>02.GameObjects\UI\TransingStar</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Gully.cpp">
+    <ClCompile Include="..\Private\UI_PartTimeResult.cpp">
+      <Filter>02.GameObjects\UI\PartTime\Result</Filter>
+	</ClCompile>
+	<ClCompile Include="..\Private\Gully.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\BossMonster\Gully</Filter>
+    </ClCompile>
+    <ClCompile Include="CKirbyDump_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyDump_State</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

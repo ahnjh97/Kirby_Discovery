@@ -77,7 +77,6 @@ void CKirbyGet_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 
 		if (pKirby->isAnimFinish())
 		{
-			// 어빌리티 타입에 맞는 아이템 드랍. (미구현)
 			HRESULT hr = S_OK;
 
 			CAbility::ABILITYITEM_DESC AbilityItemDesc = {};

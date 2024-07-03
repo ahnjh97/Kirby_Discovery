@@ -2,6 +2,7 @@
 #include "Camera_Free.h"
 #include "Kirby.h"
 #include "EventCenter.h"
+#include "PartTimeHelper.h"
 
 CCamera_Free::CCamera_Free(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CCamera{ pDevice, pContext }
@@ -42,8 +43,12 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 
 	if (*m_pCurrentLevelID == LEVEL_PARTTIME)
 	{
-		Lock_Camera({ 16.4f, 25.7f, 35.75f }, { .16f, -.08f, -1.f }, 38.f);
+		__super::Lock_Camera({ 16.4f, 25.7f, 35.75f }, { .16f, -.08f, -1.f }, 38.f);
 	}
+
+	//// 파트타임헬퍼에 옵저버로 카메라를 알게하고 있습니다. JYWI's ps : 카메라 클래스 하나 더 팔걸~~
+	if(LEVEL_PARTTIME == *m_pGameInstance->Get_CurrentLevelID())
+		CPartTimeHelper::Get_Instance()->Register_Camera(this);
 
 	return S_OK;
 }

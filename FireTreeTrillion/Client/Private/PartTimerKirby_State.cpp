@@ -20,6 +20,9 @@ void CPartTimerKirby_Idle_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex
 void CPartTimerKirby_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
 	CPartTimerKirby* pAlbaKirby = static_cast<CPartTimerKirby*>(pGameObject);
+	pAlbaKirby->Set_MouthState(CPartTimerKirby::MOUTH_IDLE);
+	pAlbaKirby->Set_EyeState(CPartTimerKirby::EYE_IDLE);
+
 	if (m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_DOWN))
 		pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_MOVEL, 50.f, false, true);
 	else if (m_pGameInstance->Get_DIKeyState(DIK_RIGHT, KEY_DOWN))
@@ -91,8 +94,9 @@ void CPartTimerKirby_Move_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex
 void CPartTimerKirby_Move_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
 	CPartTimerKirby* pAlbaKirby = static_cast<CPartTimerKirby*>(pGameObject);
-	CTransform* pTransform = pAlbaKirby->Get_TransformCom();
+	pAlbaKirby->Set_MouthState(CPartTimerKirby::MOUTH_IDLE);
 
+	CTransform* pTransform = pAlbaKirby->Get_TransformCom();
 	// 커비를 앞에서 보는 기준이라, 관념과 반대로 이동 방향 셋업
 	if (m_uDir == LEFT) pTransform->Go_Right(fTimeDelta);
 	else pTransform->Go_Left(fTimeDelta);
@@ -163,6 +167,9 @@ void CPartTimerKirby_Grab_State::OnStateUpdate(CGameObject* pGameObject, _float 
 	{
 		if (pAlbaKirby->Get_State() == CPartTimerKirby::FOODSHOP_INCORRECT)
 		{
+			pAlbaKirby->Set_EyeState(CPartTimerKirby::EYE_BLINK);
+			pAlbaKirby->Set_MouthState(CPartTimerKirby::MOUTH_ANGER);
+
 			// 현재 내가 밀어버린 아이템을 가져온다.
 			PARTTIME_ITEM curItem = Get_CurrentFood(pAlbaKirby->Get_PrePosition());//TransformCom()->Get_State_Float4(CTransform::STATE_POSITION));
 
@@ -188,6 +195,18 @@ void CPartTimerKirby_Grab_State::OnStateUpdate(CGameObject* pGameObject, _float 
 			if (m_fSpeed < 0.f) m_fSpeed = 0.f;
 			pTransform->Go_Straight(fTimeDelta * m_fSpeed);
 			m_fSpeed -= fTimeDelta * 20.f;
+		}
+		else if (pAlbaKirby->Get_State() == CPartTimerKirby::FOODSHOP_CORRECT)
+			pAlbaKirby->Set_MouthState(CPartTimerKirby::MOUTH_HAPPY);
+		else if (pAlbaKirby->Get_State() == CPartTimerKirby::FOODSHOP_INCORRECTSTART)
+		{
+			pAlbaKirby->Set_EyeState(CPartTimerKirby::EYE_BLINK);
+			pAlbaKirby->Set_MouthState(CPartTimerKirby::MOUTH_ANGER);
+		}
+		else
+		{
+			pAlbaKirby->Set_MouthState(CPartTimerKirby::MOUTH_SMILE);
+			pAlbaKirby->Set_EyeState(CPartTimerKirby::EYE_IDLE);
 		}
 	}
 }
@@ -224,5 +243,53 @@ void CPartTimerKirby_Grab_State::Free()
 	Safe_Release(m_pFood);
 }
 
+#pragma endregion
+
+
+#pragma region WIN STATE
+//*********************************
+//			WIN STATE
+//*********************************
+CPartTimerKirby_Win_State::CPartTimerKirby_Win_State()
+{
+}
+
+void CPartTimerKirby_Win_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
+}
+
+void CPartTimerKirby_Win_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CPartTimerKirby* pAlbaKirby = static_cast<CPartTimerKirby*>(pGameObject);
+	pAlbaKirby->Set_MouthState(CPartTimerKirby::MOUTH_HAPPY);
+
+	if (pAlbaKirby->Get_State() == CPartTimerKirby::FOODSHOP_RESULTWINSTART)
+	{
+		if (pAlbaKirby->IsAnimFinished())
+			pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_RESULTWIN, 50.f, true, true);
+	}
+	else
+	{
+		if (pAlbaKirby->IsAnimFinished())
+			pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_SELECT, 50.f, true, true);
+	}
+}
+
+void CPartTimerKirby_Win_State::OnStateExit()
+{
+
+}
+
+CPartTimerKirby_Win_State* CPartTimerKirby_Win_State::Create()
+{
+	CPartTimerKirby_Win_State* pInstance = new CPartTimerKirby_Win_State();
+	return pInstance;
+}
+
+void CPartTimerKirby_Win_State::Free()
+{
+	__super::Free();
+}
 #pragma endregion
 
