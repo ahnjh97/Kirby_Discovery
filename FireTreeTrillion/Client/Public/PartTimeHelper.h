@@ -17,7 +17,7 @@ class CPartTimeHelper final : public CBase
 	DECLARE_SINGLETON(CPartTimeHelper)
 
 public:
-	enum TYPE { GAMEOVER, OVER, ETC, TYPE_END };
+	enum TYPE { GAMEOVER, OVER, START, TYPE_END };
 private:
 	CPartTimeHelper();
 	virtual ~ CPartTimeHelper() = default;
@@ -38,6 +38,8 @@ public:
 	PARTTIME_ITEM		Get_PartTimeItem() const { return m_eFood; }
 
 	// 게임 흐름에 따른 이벤트들을 관할합니다.
+	void				Initialize_GameStart();
+	_bool				Handle_GameStart();
 	_bool				Handle_LunchTime();
 	_bool				Handle_GameOver();
 	void				Handle_UI(TYPE eContent);

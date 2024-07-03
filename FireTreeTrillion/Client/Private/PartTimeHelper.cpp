@@ -88,6 +88,26 @@ void CPartTimeHelper::NotifyObserver()
 		m_pPartTimerKirby->OnNotify();
 }
 
+void CPartTimeHelper::Initialize_GameStart()
+{
+	m_pCamera->Lock_Camera({ 21.44f, 28.98f, 8.84f }, { -0.13f, -0.29f, 0.95f }, 33.f);
+
+	// Player 세팅
+	CTransform* pTransform = m_pPartTimerKirby->Get_TransformCom();
+	pTransform->Rotation(_float3{ 0.f, 1.f, 0.f }, ToRadian(170.f));
+
+}
+
+_bool CPartTimeHelper::Handle_GameStart()
+{
+
+
+	// 효선아 여기야
+	// 카메라 다 내려오고 나서 카메라 전환~ 까지 다하면 true 반환
+	
+	return true;
+}
+
 /// <summary> 점심시간 안내에 대한 이벤트 처리 </summary>
 /// <returns> true : 얼음 땡, false : 얼음 중 </returns>
 _bool CPartTimeHelper::Handle_LunchTime()

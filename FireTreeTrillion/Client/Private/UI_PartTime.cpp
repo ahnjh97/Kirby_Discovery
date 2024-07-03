@@ -58,7 +58,9 @@ HRESULT CUI_PartTime::Initialize_Prototype()
 	_int iZero(0);
 	fill(m_arrScoreDigits.begin(), m_arrScoreDigits.end(), iZero);
 	
-	fill(m_arrRenderState.begin(), m_arrRenderState.end(), true);
+	m_arrRenderState[START] = true;
+	m_arrRenderState[BASIC] = false;
+	m_arrRenderState[FADE] = false;
 
 	m_arrTimerDigits[0] = 5;
 	m_arrTimerDigits[1] = 0;
@@ -76,6 +78,7 @@ HRESULT CUI_PartTime::Initialize(void* _pArg)
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 
+	CPartTimeHelper::Get_Instance()->Initialize_GameStart();
 	CPartTimeHelper::Get_Instance()->Register_UI(this);
 
 	m_bIsRender = true;
@@ -87,7 +90,12 @@ _int CUI_PartTime::Tick(_float fTimeDelta)
 {
 	if (m_arrRenderState[BASIC] == false && m_arrRenderState[FADE] == false)
 		return S_OK;
-	
+	if (m_arrRenderState[START] == true)
+	{
+		if (CPartTimeHelper::Get_Instance()->Handle_GameStart())
+			m_arrRenderState[START] = false;
+	}
+
 	m_fTimeDelta = fTimeDelta;
 	__super::Tick(fTimeDelta);
 

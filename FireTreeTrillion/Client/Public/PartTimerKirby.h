@@ -60,6 +60,9 @@ public:
 	_float4			Get_PrePosition() const { return m_prePosition; }
 	void			Set_PrePosition(_float4 _preposition) { m_prePosition = _preposition; }
 
+	void			Set_EyeState(EYESTATE eEyeState) { m_eEyeState = eEyeState; }
+	void			Set_MouthState(MOUTHSTATE eMouthState) { m_eMouthState = eMouthState; }
+
 private:
 	HRESULT			Add_Components();
 	HRESULT			Add_PartObjects();
@@ -72,6 +75,7 @@ private:
 	// set-up camera
 	HRESULT			Make_TargetToCams();
 	_bool			Custom_Face(_uint iMeshIndex);
+
 
 private:
 	CModel*					m_pModelCom   = { nullptr };
