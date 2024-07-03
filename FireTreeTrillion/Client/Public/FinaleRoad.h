@@ -11,6 +11,11 @@ BEGIN(Client)
 
 class CFinaleRoad final : public CPhysXObject
 {
+public:
+	struct ROAD_DESC
+	{
+
+	};
 private:
 	CFinaleRoad(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CFinaleRoad(const CFinaleRoad& rhs);
@@ -37,7 +42,6 @@ private:
 	void			Make_Particles();
 
 	_float			m_fWhiteColorDiffuse = {};
-
 
 	CModel*			m_pModelCom = { nullptr };
 	CShader*		m_pShaderCom = { nullptr };
