@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Client_Defines.h"
-#include "GameObject.h"
+#include "PhysXObject.h"
 
 BEGIN(Engine)
 class CModel;
@@ -10,7 +10,7 @@ END
 
 BEGIN(Client)
 
-class CRayArrow final : public CGameObject
+class CRayArrow final : public CPhysXObject
 {
 public:
 	struct RAYARROW_DESC : public CGameObject::GAMEOBJECT_DESC {
@@ -41,6 +41,7 @@ public:
 #ifdef _DEBUG
 	virtual	void Render_IMGUI()			override;
 #endif
+	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
 private:
 	CModel*			m_pModelCom = { nullptr };

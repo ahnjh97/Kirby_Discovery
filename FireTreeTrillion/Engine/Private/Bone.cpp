@@ -14,24 +14,19 @@ HRESULT CBone::Initialize(ifstream& fileStream)
 	return S_OK;
 }
 
-void CBone::Invalidate_CombinedTransformationMatrix(const vector<CBone*>& Bones, _fmatrix TransformatrixMatrix)
+void CBone::Invalidate_CombinedTransformationMatrix(const vector<CBone*>& Bones, _fmatrix TransformatrixMatrix, _bool isRatio)
 {
-	if (m_EditMatrx != _float4x4::Identity)
+	if (m_EditMatrx != _float4x4::Identity && isRatio == false)
 	{
 		m_TransformationMatrix *= m_EditMatrx;
 		//_matrix			TransformationMatrix = { XMLoadFloat4x4(&m_TransformationMatrix) };
 		//_matrix			EditMatrix = { XMLoadFloat4x4(&m_EditMatrx) };
-
 		//_vector			vScaleSrc, vQuaternionSrc, vTranslationSrc;
 		//_vector			vScaleDst, vQuaternionDst, vTranslationDst;
-
 		//XMMatrixDecompose(&vScaleSrc, &vQuaternionSrc, &vTranslationSrc, TransformationMatrix);
 		//XMMatrixDecompose(&vScaleDst, &vQuaternionDst, &vTranslationDst, EditMatrix);
-
 		//_vector			vResultQuaternion = { XMQuaternionMultiply(XMQuaternionNormalize(vQuaternionSrc), XMQuaternionNormalize(vQuaternionDst)) };
-
 		//_matrix			ResultMatrix = { XMMatrixAffineTransformation(vScaleSrc, XMVectorSet(0.f, 0.f, 0.f, 1.f), vResultQuaternion, vTranslationSrc) };
-
 		//XMStoreFloat4x4(&m_TransformationMatrix, ResultMatrix);
 	}
 

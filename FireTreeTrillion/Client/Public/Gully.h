@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Client_Defines.h"
-#include "GameObject.h"
+#include "PhysXObject.h"
 
 BEGIN(Engine)
 class CModel;
@@ -10,7 +10,7 @@ END
 
 BEGIN(Client)
 
-class CGully final : public CGameObject
+class CGully final : public CPhysXObject
 {
 public:
 	struct GULLY_DESC : public CGameObject::GAMEOBJECT_DESC {
@@ -26,8 +26,8 @@ public:
 	void Set_Gully(_fvector vPos, _float fLifeTime) {
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 		m_fLifeTime = fLifeTime;
-		//m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fLifeTime);
-		m_bDead = false;
+		m_fScale = 1.f;
+		m_bPoolingDead = false;
 	}
 
 public:
@@ -38,8 +38,9 @@ public:
 	virtual HRESULT Render()						override;
 	virtual HRESULT Render_LightDepth()				override;
 #ifdef _DEBUG
-	virtual	void Render_IMGUI()			override;
+	virtual	void	Render_IMGUI()			override;
 #endif
+	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
 private:
 	CModel* m_pModelCom = { nullptr };
@@ -49,6 +50,8 @@ private:
 	
 	_float	m_fTimeDelta = { 0.f };
 	_float	m_fLifeTime = { 0.f };
+	
+	_float	m_fScale = { 0.f };
 
 private:
 	HRESULT Add_Components();

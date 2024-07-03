@@ -1,14 +1,15 @@
 #include "stdafx.h"
 #include "Laser.h"
 #include "Kirby.h"
+#include "HitBox.h"
 
 CLaser::CLaser(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CGameObject{ pDevice, pContext }
+	: CPhysXObject{ pDevice, pContext }
 {
 }
 
 CLaser::CLaser(const CLaser& rhs)
-	: CGameObject{ rhs }
+	: CPhysXObject{ rhs }
 {
 }
 
@@ -46,6 +47,8 @@ HRESULT CLaser::Initialize(void* pArg)
 
 	//m_pTransformCom->Look_At(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
 
+	m_fAttack = 20.f;
+
 	return S_OK;
 }
 
@@ -63,6 +66,7 @@ _int CLaser::Tick(_float fTimeDelta)
 
 	m_pTransformCom->Look_At_Interpolate(vKirbyPos, m_fTimeDelta * 0.2f);
 	//m_pTransformCom->Look_At(-pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
+	Activate_FrustumCollider(0.f, 200.f, 5.f);
 
 	if (true == m_bEnd)
 	{
@@ -150,8 +154,11 @@ void CLaser::Render_IMGUI()
 	//	ImGui::Text("TargetDir X : %.2f \tTargetDir Y : %.2f \tTargetDir Z : %.2f ", INFO(m_vTargetDir).x, INFO(m_vTargetDir).y, INFO(m_vTargetDir).z);
 	__super::Render_IMGUI();
 }
-
 #endif
+
+void CLaser::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
+{
+}
 
 HRESULT CLaser::Add_Components()
 {
@@ -165,6 +172,21 @@ HRESULT CLaser::Add_Components()
 	hr = __super::Add_Component(TEXT("Prototype_Component_Model_DimensionLaser"),
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
+
+	CHitBox::HITBOX_DESC HitBox{};
+	//HitBox.pOwner = this;
+	//HitBox.pDesc = &m_tColliderDesc[BODY];
+	//HitBox.pCollisionType = MONSTER;
+	//if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
+	//	return E_FAIL;
+	//Set_BodyCollider(COLLIDER_CYLINDER, 0.5f, 1.f, 0.85f);
+
+	HitBox.pOwner = this;
+	HitBox.pDesc = &m_tColliderDesc[ATTACK];
+	HitBox.pCollisionType = HITBOX_MONSTER;
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
+		return E_FAIL;
+	//Set_BodyCollider(COLLIDER_FRUSTUM, 0.5f, 1.5f, 0.85f);
 
 	return S_OK;
 }

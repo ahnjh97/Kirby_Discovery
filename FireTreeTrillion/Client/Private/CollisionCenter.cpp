@@ -50,6 +50,9 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 		// 디디디와 싸우는 특수한 충돌로직들 모아두었습니다.
 		DeeDeeDee_Battle();
 
+	if (*GAMEINSTANCE Get_CurrentLevelID() == LEVEL_FINALBOSS)
+		FinalStage_Battle();
+
 
 
 	for (auto& ObjectVector : m_GameObjects)
@@ -586,6 +589,27 @@ void CCollisionCenter::DeeDeeDee_Battle()
 
 }
 
+void CCollisionCenter::FinalStage_Battle()
+{
+	// 플레이어 공격에 대한 처리.
+	Collision_Collider(m_GameObjects[HITBOX_PLYAER], m_GameObjects[BOSS_FINALBOSS], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CKirby* pKirby = static_cast<CKirby*>(Dst);
+			CPhysXObject* pMonster = static_cast<CPhysXObject*>(Src);
+
+			// 데미지 공식과 이펙트, 쉐이킹, 히트스탑 등 시스템적인 요소들이 잔뜩 들어가있다.
+			pthis->Damage_And_Effect_For_Monster(pKirby, pMonster, 1.2f);
+			DstHit->Set_Alive(false);
+		});
+
+}
+
 void CCollisionCenter::Body_To_Body_Collision()
 {
 	// 깔끔하게 완료되었음 : 플레이어 X 몬스터
@@ -924,8 +948,8 @@ void CCollisionCenter::Hitbox_Collision()
 				return;
 
 
-			CKirby* pKirby = static_cast<CKirby*>(Dst);
-			CMonster* pMonster = static_cast<CMonster*>(Src);
+			CKirby* pKirby = static_cast<CKirby*>(Src);
+			CMonster* pMonster = static_cast<CMonster*>(Dst);
 
 			// 커비가 혹시 닷지를 하였는가? 만약 닷지를 했다면 충돌이 발생하지않는다.
 			if (pthis->Kirby_Dodge_SlowMotionSystem(pKirby) == true)

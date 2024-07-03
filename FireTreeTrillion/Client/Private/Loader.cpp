@@ -1232,6 +1232,8 @@ HRESULT CLoader::Add_FXTexture()
 	hr = Add_Texture(LEVEL_STATIC, "FX_Food_ResultBottom", "Effects/UI/MGameFood/result bottom.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_TitleLogo", "Effects/UI/TitleLogo.png");	CHECK_FAILED(hr);
 
+	//ÆÄÆ¼Å¬
+	hr = Add_Texture(LEVEL_STATIC, "FX_Rock", "Effects/Particle/rock_%d.png", 4);	CHECK_FAILED(hr);
 
 	return S_OK;
 }
@@ -1599,7 +1601,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("DimensionGateL", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("BigDebris", TYPE_NONANIM, 0.8f, 180.f);
 		m_vecModelInfo.emplace_back("SmallDebris", TYPE_NONANIM, 1.f, 180.f);
-		m_vecModelInfo.emplace_back("MoundPiece", TYPE_NONANIM, 0.1f, 180.f);
+		m_vecModelInfo.emplace_back("MoundPiece", TYPE_NONANIM, 0.2f, 180.f);
 	}
 	else if (eLevel == LEVEL_GAMEPLAY)
 	{
@@ -1999,6 +2001,9 @@ void CLoader::Load_KirbyBodyModels()
 	m_vecModelInfo.emplace_back("KirbyCarDefault", TYPE_ANIM, 1.f, 180.f);
 	m_vecModelInfo.emplace_back("KirbyCarVacuum", TYPE_ANIM, 1.f, 180.f);
 	m_vecModelInfo.emplace_back("KirbyHammerDefault", TYPE_ANIM, 1.f, 180.f);
+	m_vecModelInfo.emplace_back("KirbyDumpDefault", TYPE_ANIM, 1.f, 180.f);
+	m_vecModelInfo.emplace_back("KirbyDumpVacuum", TYPE_ANIM, 1.f, 180.f);
+
 }
 
 void CLoader::Load_KirbyWeaponModels()

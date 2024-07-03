@@ -58,6 +58,8 @@ _int CHitBox::Tick(_float fTimeDelta)
 
 void CHitBox::Late_Tick(_float fTimeDelta)
 {
+	if (m_pGameInstance->Get_HitBoxRender() == false)
+		return;
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_UI, this);
@@ -234,7 +236,14 @@ void CHitBox::Restore_Logic(_float fTimeDelta)
 	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	_float4 vPlayerPos = pPlayer->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
 
-	if ((vPlayerPos - vPos).Length() > 70.f)
+	_float fLength = { 0.f };
+
+	if (LEVEL_FINALBOSS == *m_pCurrentLevelID)
+		fLength = 200.f;
+	else
+		fLength = 70.f;
+
+	if ((vPlayerPos - vPos).Length() > fLength)
 		bDontAddCollisionCenter = true;
 
 	// 몸통 전용 콜라이더 일 경우. (내가 가지고 있는 구조체 벨류 값)

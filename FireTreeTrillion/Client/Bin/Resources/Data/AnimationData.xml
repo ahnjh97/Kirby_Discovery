@@ -42,6 +42,26 @@
         <Data0 EventName="Bboong" StartFrame="2" EndFrame="3"/>
         <Data1 EventName="PlaySound" StartFrame="19" EndFrame="40"/>
     </ModelName>
+    <ModelName>FinalBoss
+        <Animation>SwingRightStart</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>SwingLeft</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="Attack" StartFrame="8" EndFrame="9"/>
+        <Animation>SwingRight</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="Attack" StartFrame="8" EndFrame="9"/>
+        <Animation>SwingFinishLeftEnd</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>SwingFinishLeft</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="Attack" StartFrame="31" EndFrame="33"/>
+    </ModelName>
     <ModelName>KirbySwordDefault
         <Animation>SwordDive</Animation>
         <AnimSpeed>60</AnimSpeed>
@@ -110,10 +130,6 @@
         <Animation>WheelHammer</Animation>
         <AnimSpeed>60</AnimSpeed>
         <Count>1</Count>
-        <Data0 EventName="ApplyDamage" StartFrame="1" EndFrame="2"/>
-        <Animation>WheelHammer</Animation>
-        <AnimSpeed>60</AnimSpeed>
-        <Count>1</Count>
         <Data0 EventName="ApplyDamage" StartFrame="6" EndFrame="7"/>
         <Animation>HammerAttackFinalRock</Animation>
         <AnimSpeed>60</AnimSpeed>
@@ -132,14 +148,10 @@
         <Animation>OnigorosiHammerFirst</Animation>
         <AnimSpeed>60</AnimSpeed>
         <Count>1</Count>
-        <Data0 EventName="ApplyDamage" StartFrame="12" EndFrame="13"/>
+        <Data0 EventName="ApplyDamage" StartFrame="10" EndFrame="11"/>
         <Animation>OnigorosiHammerEnd</Animation>
         <AnimSpeed>60</AnimSpeed>
         <Count>1</Count>
         <Data0 EventName="ApplyDamage" StartFrame="27" EndFrame="28"/>
-        <Animation>OnigorosiHammerFirst</Animation>
-        <AnimSpeed>60</AnimSpeed>
-        <Count>1</Count>
-        <Data0 EventName="ApplyDamage" StartFrame="10" EndFrame="11"/>
     </ModelName>
 </Root>

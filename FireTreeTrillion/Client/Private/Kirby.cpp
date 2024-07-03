@@ -25,6 +25,8 @@
 
 #include "EventCenter.h"
 
+#include "Ability.h"
+
 
 
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -109,7 +111,8 @@ void CKirby::Late_Tick(_float fTimeDelta)
 	if (INFO(m_eBodyState) != BODY_DEFAULT)
 		m_pModelCom[BODY_DEFAULT]->Play_Animation(m_fTimeDelta);
 
-	if ((INFO(m_eBodyState) == BODY_CARDEFAULT || INFO(m_eBodyState) == BODY_CARVACUUM) == false)
+	if ((INFO(m_eBodyState) == BODY_CARDEFAULT || INFO(m_eBodyState) == BODY_CARVACUUM ||
+		INFO(m_eBodyState) == BODY_DUMPDEFAULT || INFO(m_eBodyState) == BODY_DUMPVACUUM) == false)
 		m_pWeapons->Late_Tick(m_fTimeDelta);
 
 	m_pArmours->Late_Tick(m_fTimeDelta);
@@ -353,6 +356,18 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 			if (m_bOverPower == true)
 				return;
 
+			if (pObject->Get_Attack() > 10.f && m_eAbilityType != ABILITY_DEFAULT)
+			{
+				HRESULT hr = S_OK;
+				CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
+				AbilityItemDesc.vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+				AbilityItemDesc.eAbilityType = m_eAbilityType;
+				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+				CHECK_FAILED(hr);
+
+				m_eAbilityType = ABILITY_DEFAULT;
+			}
+
 			// 먹은 상태인 경우
 			if (INFO(m_isEat) == true)
 			{
@@ -441,6 +456,19 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 		{
 			if (m_bOverPower == true)
 				return;
+
+			if (pObject->Get_Attack() > 10.f && m_eAbilityType != ABILITY_DEFAULT)
+			{
+				HRESULT hr = S_OK;
+				CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
+				AbilityItemDesc.vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+				AbilityItemDesc.eAbilityType = m_eAbilityType;
+				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+				CHECK_FAILED(hr);
+
+				m_eAbilityType = ABILITY_DEFAULT;
+			}
+
 
 			// 먹은 상태인 경우
 			if (INFO(m_isEat) == true)
@@ -852,6 +880,17 @@ HRESULT CKirby::Add_Components()
 	hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyHammerDefault"),
 		TEXT("Com_Model_HammerDefault"), (CComponent**)&m_pModelCom[BODY_HAMMER]);
 	CHECK_FAILED(hr);
+
+	// 커비의 Dump Default 상태 모델
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyDumpDefault"),
+		TEXT("Com_Model_DumpDefault"), (CComponent**)&m_pModelCom[BODY_DUMPDEFAULT]);
+	CHECK_FAILED(hr);
+
+	// 커비의 Dump Vacuum 상태 모델
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyDumpVacuum"),
+		TEXT("Com_Model_DumpVacuum"), (CComponent**)&m_pModelCom[BODY_DUMPVACUUM]);
+	CHECK_FAILED(hr);
+
 
 #pragma endregion
 
@@ -1353,11 +1392,13 @@ void CKirby::HitBoxChanger(_uint eState)
 
 void CKirby::Update_PartObjectMatrix()
 {
-	if ((INFO(m_eBodyState) == BODY_CARDEFAULT || INFO(m_eBodyState) == BODY_CARVACUUM) 
+	if ((INFO(m_eBodyState) == BODY_CARDEFAULT || INFO(m_eBodyState) == BODY_CARVACUUM ||
+		INFO(m_eBodyState) == BODY_DUMPDEFAULT || INFO(m_eBodyState) == BODY_DUMPVACUUM)
 		== false)
 		m_WeaponMatrix = *(m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("RHaveL")->Get_CombinedTransformationMatrix());
 
-	m_ArmourMatrix = *(m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("HatL")->Get_CombinedTransformationMatrix());
+	if ((INFO(m_eBodyState) == BODY_DUMPDEFAULT || INFO(m_eBodyState) == BODY_DUMPVACUUM) == false)
+		m_ArmourMatrix = *(m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("HatL")->Get_CombinedTransformationMatrix());
 }
 
 void CKirby::Bone_Rotation(_float fTimeDelta)

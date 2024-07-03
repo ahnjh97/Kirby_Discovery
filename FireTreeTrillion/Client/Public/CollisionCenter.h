@@ -50,6 +50,7 @@ private:
     void Ladder_Collider();
 
     void DeeDeeDee_Battle();
+    void FinalStage_Battle();
     void Body_To_Body_Collision();
     void Hitbox_Collision();
 
