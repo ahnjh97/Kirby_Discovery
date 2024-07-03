@@ -199,7 +199,6 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& _wstrLayerTag)
 			return E_FAIL;
 	}
 
-
 	CUIObject::UIOBJ_DESC DiscardUIDesc{};
 	DiscardUIDesc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f, 0.f };
 	DiscardUIDesc.vPos = { DiscardUIDesc.vCenter.x, DiscardUIDesc.vCenter.y, 0.f };
