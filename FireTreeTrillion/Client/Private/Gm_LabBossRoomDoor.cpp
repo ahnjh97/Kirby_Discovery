@@ -51,7 +51,7 @@ _int CGm_LabBossRoomDoor::Tick(_float fTimeDelta)
 	//	return OBJ_DEAD;
 
 	//컷씬에서 특정 시간 경과할 경우 애님 변경
-	if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD1, KEY_DOWN)) //테스트용. 현재는 키입력으로 확인 가능
+	if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD9, KEY_DOWN)) //테스트용. 현재는 키입력으로 확인 가능
 		m_bStartAnim = TRUE;
 
 	if (m_bStartAnim)

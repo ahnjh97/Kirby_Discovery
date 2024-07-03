@@ -10,16 +10,22 @@ class CVIBuffer_Rect;
 END
 
 BEGIN(Client)
-class CHUD_AbilityDiscard : public CUIObject
+class CUI_MessageWindow : public CUIObject
 {
 public:
-	//enum TEX_STATE { DISCARD_IDLE, DISCARD_HIDE, DISCARD_SHOW, DISCARD_NONE	};
-	enum TEX_DISCARD { TEXDC_BASE, TEXDC_GAUGE, TEXDC_BTN, TEXDC_NONE };
+	enum TEX_MESSAGEWINDOW { TEXMW_BASE, TEXMW_BTNBASE, TEXMW_NONE };
+	enum MESSAGEWINDOW_STATE { WINDOW_IDLE, WINDOW_HIDE, WINDOW_SHOW, WINDOW_NONE	};
 
 private:
-	CHUD_AbilityDiscard(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CHUD_AbilityDiscard(const CHUD_AbilityDiscard& rhs);
-	virtual ~CHUD_AbilityDiscard() = default;
+	CUI_MessageWindow(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CUI_MessageWindow(const CUI_MessageWindow& rhs);
+	virtual ~CUI_MessageWindow() = default;
+
+#pragma region GETTER/SETTER
+public:
+	MESSAGEWINDOW_STATE Get_MWindowState() { return m_eCurState; }
+#pragma endregion
+
 
 public:
 	virtual HRESULT				Initialize_Prototype()						override;
@@ -32,35 +38,23 @@ public:
 	//virtual void				Render_IMGUI()								override;
 #endif
 
-	void						ChaseUI_To_Player();
-	void						Compute_PlayerDumpAbiliyTime();
-	_bool						Key_InputSystem(_float fTimeDelta);
-
 private:
+	HRESULT						Add_Transform(void* _pArg);
 	HRESULT						Add_Components();
 	HRESULT						Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTexture* _pTextureCom, _uint _iTexIndex);
 	HRESULT						Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom);
 
 public:
-	static CHUD_AbilityDiscard*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CUI_MessageWindow*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject*			Clone(void* pArg) override;
 	virtual void					Free() override;
 
 private:
+	CTransform*					m_pTransCom[TEXMW_NONE] = { nullptr };
 	CShader*					m_pShaderCom = { nullptr };
-	CTexture*					m_pTextureCom[TEX_NONE] = { nullptr };
+	CTexture*					m_pTextureCom = { nullptr };
 	CVIBuffer_Rect*				m_pVIBufferCom = { nullptr };
-	//TEX_STATE					m_eTexState = { DISCARD_NONE };
-	class CKirby*				m_pKirby = { nullptr };
-	
-	_bool						m_IsGaugeBLINK = { FALSE };
 
-	_float						m_fGaugeRatio = { 0.f };
-	_float						m_fDumpAbilityTime = { 0.f };
-	_float						m_fHIDEAnimTime = { 0.f };
-	_float						m_fBLINKAnimTime = { 0.f };
-
+	MESSAGEWINDOW_STATE			m_eCurState = { WINDOW_NONE };
 };
-
-
 END
