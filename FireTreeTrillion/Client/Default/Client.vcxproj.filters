@@ -478,6 +478,9 @@
     <Filter Include="01.Levels\12. Finale">
       <UniqueIdentifier>{48c88699-1c49-4542-a934-ae4b16595516}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\Deco\DecoShadow">
+      <UniqueIdentifier>{af0b42ac-2606-411c-a9ea-4ca6880cde91}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -967,6 +970,9 @@
     <ClInclude Include="..\Public\Level_Finale.h">
       <Filter>01.Levels\12. Finale</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\ShadowDeco.h">
+      <Filter>02.GameObjects\Map\Deco\DecoShadow</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1436,6 +1442,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Level_Finale.cpp">
       <Filter>01.Levels\12. Finale</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ShadowDeco.cpp">
+      <Filter>02.GameObjects\Map\Deco\DecoShadow</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

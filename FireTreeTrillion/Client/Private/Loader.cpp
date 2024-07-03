@@ -12,6 +12,7 @@
 #include "MapToolObject.h"
 #include "NonRenderWall.h"
 #include "NonAnimDeco.h"
+#include "ShadowDeco.h"
 #include "AnimDeco.h"
 #include "BasicMap.h"
 #include "Trigger.h"
@@ -300,6 +301,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("NonAnimDeco"), CNonAnimDeco);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("NonRenderWall"), CNonRenderWall);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PortalSoftEffect"), CPortalSoftEffect);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ShadowDeco"), CShadowDeco);
 
 	// For HitBox
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HitBox"), CHitBox);
@@ -1671,9 +1673,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("BigDebris", TYPE_NONANIM, 0.8f, 180.f);
 		m_vecModelInfo.emplace_back("SmallDebris", TYPE_NONANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("MoundPiece", TYPE_NONANIM, 0.2f, 180.f);
-
-		// For Item
-		Load_ItemModels();
 	}
 	else if (eLevel == LEVEL_FINALE)
 	{

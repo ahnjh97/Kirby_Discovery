@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "BlendMapObject.h"
 #include "MapToolObject.h"
+#include "ShadowDeco.h"
 #include "BasicMap.h"
 #include "AnimDeco.h"
 #include "HitBox.h"
@@ -33,6 +34,9 @@ HRESULT CBasicMap::Initialize(void* pArg)
 
     if (FAILED(__super::Initialize(&GameObjectDesc)))
         return E_FAIL;
+
+    m_setShadowDecos = { "CmStreetLampA", "CmStreetLampD", "GsTreeA", "GsTreeB", "GsTreeC", "GsTelephonePoleB"
+    , "GsTrafficSignalAL" };
 
     wstring wstrModelTag = GameObjectDesc.wstrModelName;
 
@@ -127,6 +131,12 @@ void CBasicMap::Late_Tick(_float fTimeDelta)
     if (nullptr != m_pBlendMap)
         m_pBlendMap->Late_Tick(fTimeDelta);
 
+    for (auto& blendDeco : m_vecBlendObjects)
+        blendDeco->Late_Tick(fTimeDelta);
+
+    for (auto& shadowDeco : m_vecShadowObjects)
+        shadowDeco->Late_Tick(fTimeDelta);
+
     m_pGameInstance->Add_RenderGroup(m_eRenderGroup, this);
 }
 
@@ -148,8 +158,8 @@ HRESULT CBasicMap::Render()
         m_pOcTree->Culling(m_pGameInstance, m_pShaderCom, m_pNonAnimShaderCom, m_pAnimShaderCom
             , m_iRenderAll, m_iRenderMyMesh);
 
-        for (auto& blendDeco : m_vecBlendObjects)
-            blendDeco->Late_Tick(m_pGameInstance->Get_FirstTimer());
+       /* for (auto& blendDeco : m_vecBlendObjects)
+            blendDeco->Late_Tick(m_pGameInstance->Get_FirstTimer());*/
     }
     else
     {
@@ -193,21 +203,6 @@ HRESULT CBasicMap::Render()
 #ifdef _DEBUG
 void CBasicMap::Render_IMGUI()
 {
-    /*HRESULT hr;
-    static _bool bRabbit = false;
-    static _bool bCow = false;
-    if (ImGui::Checkbox("rabbit", &bRabbit))
-    {
-        hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, L"Layer_Monster", TEXT("Prototype_GameObject_Rabbit"));
-        CHECK_FAILED(hr);
-    }
-    if (ImGui::Checkbox("cow", &bCow))
-    {
-        hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, L"Layer_Monster", TEXT("Prototype_GameObject_Buffahorn"));
-
-        CHECK_FAILED(hr);
-    }*/
-
     ImGui::Text("Octrees: %d", m_pGameInstance->Get_NumOctree());
     ImGui::Text("RenderAll: %d", m_iRenderAll);
     ImGui::Text("RenderMyMesh: %d", m_iRenderMyMesh);
@@ -365,12 +360,6 @@ void CBasicMap::InsertMapDecos()
         strLevel = "Racing";
     else
         return;
-
-    //_float fXOffset{}, fZOffset{};
-    //if (LEVEL_RACING == *m_pCurrentLevelID) {
-    //    /*fXOffset = -200.f;
-    //    fZOffset = 1200.f;*/
-    //}
         
     string strPath = "../../../objects_txt/" + strLevel + "_DecoObjs.txt";
 
@@ -404,8 +393,6 @@ void CBasicMap::InsertMapDecos()
         strModelName.resize(iStrLength);
         fileInput.read(&strModelName[0], iStrLength);
         fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
-        //matWorld._41 = matWorld._41 + fXOffset;
-        //matWorld._43 = matWorld._43 + fZOffset;
         fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
         fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
         fileInput.read(reinterpret_cast<char*>(&iPassIndex), sizeof(iPassIndex));
@@ -446,6 +433,15 @@ void CBasicMap::InsertMapDecos()
                 pModel->Set_BlendObject(pBlendMapObj);
             }
             pModel->RemoveBlendMeshes(mapIter->second);
+        }
+
+        if (true == IsShadowDeco(strModelName))
+        {
+            CShadowDeco::SHADOWDECO_DESC tShadowDecoDesc{};
+            tShadowDecoDesc.pDecoModel = pModel;
+            CShadowDeco* pShadowDeco = dynamic_cast<CShadowDeco*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_ShadowDeco"), &tShadowDecoDesc));
+            m_vecShadowObjects.push_back(pShadowDeco);
+            iShaderVars |= 4;
         }
 
         if (CMapToolObject::MAPOBJ_NONCOL == iMapObjType)
@@ -659,9 +655,22 @@ void CBasicMap::ReadDecos_ForSmallLevels()
 
 void CBasicMap::Release_MapDecos()
 {
+    for (auto& shadowObj : m_vecShadowObjects)
+        Safe_Release(shadowObj);
+    m_vecShadowObjects.clear();
+
+    for (auto& blendObj : m_vecBlendObjects)
+        Safe_Release(blendObj);
+    m_vecBlendObjects.clear();
+
+    for (auto& animDecoObj : m_vecAnimDecoGameObjs)
+        Safe_Release(animDecoObj);
+    m_vecAnimDecoGameObjs.clear();
+
     for (auto& nonAnimDeco : m_vecNonAnimDecos)
         Safe_Release(nonAnimDeco);
     m_vecNonAnimDecos.clear();
+
     for (auto& animDeco : m_vecAnimDecos)
         Safe_Release(animDeco);
     m_vecAnimDecos.clear();
@@ -726,8 +735,8 @@ HRESULT CBasicMap::Render_NonOctreeMapDecos()
         }
     }
 
-    for (auto& blendDeco : m_vecBlendObjects)
-        blendDeco->Late_Tick(m_pGameInstance->Get_FirstTimer());
+    /*for (auto& blendDeco : m_vecBlendObjects)
+        blendDeco->Late_Tick(m_pGameInstance->Get_FirstTimer());*/
 
     return S_OK;
 }
@@ -828,6 +837,14 @@ _bool CBasicMap::ReadBlendMeshesIndices(const string& _strFullPath, const string
     return true;
 }
 
+_bool CBasicMap::IsShadowDeco(const string& _strModelName)
+{
+    if (m_setShadowDecos.end() != m_setShadowDecos.find(_strModelName))
+        return true;
+
+    return _bool();
+}
+
 void CBasicMap::Save_OctreeData(const string& strLevel)
 {
     string tempFileName = "temp_" + strLevel + "_Octree.txt";
@@ -911,14 +928,6 @@ CGameObject* CBasicMap::Clone(void* pArg)
 void CBasicMap::Free()
 {
     __super::Free();
-
-    for (auto& blendObj : m_vecBlendObjects)
-        Safe_Release(blendObj);
-    m_vecBlendObjects.clear();
-
-    for (auto& animDecoObj : m_vecAnimDecoGameObjs)
-        Safe_Release(animDecoObj);
-    m_vecAnimDecoGameObjs.clear();
 
     Release_MapDecos();
 
