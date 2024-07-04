@@ -55,6 +55,19 @@ HRESULT CLevel_Finale::Initialize()
 	CHECK_FAILED(hr);
 	hr = Ready_UI();
 	CHECK_FAILED(hr);
+
+
+	CGameObject::GAMEOBJECT_DESC ObjDesc{};
+	ObjDesc.fSpeedPerSec = 5.f;
+	ObjDesc.fRotationPerSec = ToRadian(90.f);
+	_float4x4 InitMat = _float4x4::Identity;
+	InitMat.Translation({ 0.f, 0.f, 0.f });
+	ObjDesc.matWorld = InitMat;
+
+	// Car Test
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Deform"), TEXT("Prototype_GameObject_DumpCar"), &ObjDesc)))
+		return E_FAIL;
+
 	
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
@@ -303,7 +316,7 @@ HRESULT CLevel_Finale::Ready_Triggers()
 				if ("NonAnim" == strModelName.substr(0, 7))
 					tempDesc.wstrModelName.erase(0, 8);
 			}
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby"), &tempDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Player"), TEXT("Prototype_GameObject_FinaleKirby"), &tempDesc)))
 				return E_FAIL;
 		}
 		else if ("Ladder" == strModelName)

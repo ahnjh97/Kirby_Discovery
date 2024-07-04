@@ -1145,7 +1145,8 @@ void CKirbyDefault_Slide_State::OnStateUpdate(CGameObject* pGameObject, _float f
 			else
 			{
 				DESC(m_eEyeState) = CKirby::EYE_IDLE;
-				pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, false, CKirby::BODY_DEFAULT);
+				//pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, false, CKirby::BODY_DEFAULT);
+				Kirby_AbilityType_Assist(pKirby, CKirby::STATE_IDLE);
 				return;
 			}
 		}
