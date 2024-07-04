@@ -29,6 +29,7 @@ struct VS_IN
 struct VS_OUT
 {
     float4 vPosition : POSITION;
+    row_major float4x4 TransformMatrix : WORLD;
     float2 vPSize : PSIZE;
     bool bAlive : COLOR0;
     float4 vProjPos : TEXCOORD1;
@@ -42,6 +43,71 @@ struct VS_OUT
 //    float4 vProjPos : TEXCOORD1;
 //};
 
+float2 RotateZ(float2 vVec, float fAngle)
+{
+    float fSin = sin(fAngle);
+    float fCos = cos(fAngle);
+    
+    return float2(vVec.x * fCos - vVec.y * fSin, vVec.x * fSin + vVec.y * fCos);
+}
+
+matrix CreateZRotationMatrix(float fAngle)
+{
+    fAngle = radians(fAngle);
+    
+    float fSin = sin(fAngle);
+    float fCos = cos(fAngle);
+
+    return matrix(
+        fCos, -fSin, 0, 0,
+        fSin, fCos, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+    );
+}
+
+matrix CreateRotationMatrix(float3 axis, float angle)
+{
+    float cosTheta = cos(angle);
+    float sinTheta = sin(angle);
+    float oneMinusCosTheta = 1.0 - cosTheta;
+
+    float3 normalizedAxis = normalize(axis);
+
+    float xx = normalizedAxis.x * normalizedAxis.x;
+    float yy = normalizedAxis.y * normalizedAxis.y;
+    float zz = normalizedAxis.z * normalizedAxis.z;
+    float xy = normalizedAxis.x * normalizedAxis.y;
+    float xz = normalizedAxis.x * normalizedAxis.z;
+    float yz = normalizedAxis.y * normalizedAxis.z;
+    float xs = normalizedAxis.x * sinTheta;
+    float ys = normalizedAxis.y * sinTheta;
+    float zs = normalizedAxis.z * sinTheta;
+
+    matrix rotationMatrix;
+    rotationMatrix[0][0] = cosTheta + xx * oneMinusCosTheta;
+    rotationMatrix[0][1] = xy * oneMinusCosTheta - zs;
+    rotationMatrix[0][2] = xz * oneMinusCosTheta + ys;
+    rotationMatrix[0][3] = 0.0;
+
+    rotationMatrix[1][0] = xy * oneMinusCosTheta + zs;
+    rotationMatrix[1][1] = cosTheta + yy * oneMinusCosTheta;
+    rotationMatrix[1][2] = yz * oneMinusCosTheta - xs;
+    rotationMatrix[1][3] = 0.0;
+
+    rotationMatrix[2][0] = xz * oneMinusCosTheta - ys;
+    rotationMatrix[2][1] = yz * oneMinusCosTheta + xs;
+    rotationMatrix[2][2] = cosTheta + zz * oneMinusCosTheta;
+    rotationMatrix[2][3] = 0.0;
+
+    rotationMatrix[3][0] = 0.0;
+    rotationMatrix[3][1] = 0.0;
+    rotationMatrix[3][2] = 0.0;
+    rotationMatrix[3][3] = 1.0;
+
+    return rotationMatrix;
+}
+
 /* ¡§¡° Ω¶¿Ã¥ı */
 VS_OUT VS_MAIN(VS_IN In)
 {
@@ -52,7 +118,7 @@ VS_OUT VS_MAIN(VS_IN In)
     Out.vPosition = mul(vPosition, g_WorldMatrix);
     Out.vPSize = float2(In.TransformMatrix._11, In.TransformMatrix._22);
     Out.bAlive = In.bAlive;
-    
+    Out.TransformMatrix = In.TransformMatrix;
   
     matrix matWV, matWVP;
     matWV = mul(g_WorldMatrix, g_ViewMatrix);
@@ -80,6 +146,7 @@ VS_OUT VS_MAIN(VS_IN In)
 struct GS_IN
 {
     float4 vPosition : POSITION;
+    row_major float4x4 TransformMatrix : WORLD;
     float2 vPSize : PSIZE;
     bool bAlive : COLOR0;
     float4 vProjPos : TEXCOORD1;
@@ -99,12 +166,25 @@ void GS_MAIN(point GS_IN In[1], inout TriangleStream<GS_OUT> Vertices)
 {
     GS_OUT Out[4];
 
-    //float3 vLook = normalize((g_vCamPosition - In[0].vPosition).xyz);
+    
+
     float3 vLook = normalize(-g_vCamLook).xyz;
     float3 vRight = normalize(cross(float3(0.f, 1.f, 0.f), vLook.xyz)) * In[0].vPSize.x * 0.5f;
     float3 vUp = normalize(cross(vLook, vRight)) * In[0].vPSize.y * 0.5f;
     
-    //vRight = normalize(cross(vRight, vUp)) * In[0].vPSize.y * 0.5f;
+    
+    float fZAngle = atan2(In[0].TransformMatrix._21, In[0].TransformMatrix._11);
+    
+    matrix ZRotMatrix = CreateRotationMatrix(vLook, fZAngle);
+
+    
+    vRight = mul(float4(vRight, 0), ZRotMatrix).xyz;
+    vUp = mul(float4(vUp, 0), ZRotMatrix).xyz;
+    
+    
+    //vRight.xy = RotateZ(vRight.xy, fZAngle);
+    //vUp.xy = RotateZ(vUp.xy, fZAngle);6
+
     
     matrix matVP = mul(g_ViewMatrix, g_ProjMatrix);
 

@@ -136,7 +136,9 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 
 	//트리거 세팅
 	_uint iLevel = *m_pGameInstance->Get_CurrentLevelID();
-	if (iLevel >= LEVEL_INTRO && iLevel < LEVEL_END) {
+
+	if (iLevel >= LEVEL_INTRO && iLevel < LEVEL_END)
+	{
 		function<void(_int)> func = bind(&CCamera_Main::StartLerpByTriggerInfo, this, placeholders::_1);
 		m_pGameInstance->Emplace_TriggerFunc(TRIGGER_CAMERA, func);
 
@@ -144,6 +146,9 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 		m_pGameInstance->Emplace_ExitFunc(TRIGGER_CAMERA, exitFunc);
 	}
 
+	//// 파트타임헬퍼에 옵저버로 카메라를 알게하고 있습니다. JYWI's ps : 카메라 클래스 하나 더 팔걸~~
+	if (iLevel == LEVEL_PARTTIME)
+		CPartTimeHelper::Get_Instance()->Register_Camera(this);
 
 	m_fDestDistance = m_fOrigDistance;
 	m_fCurDistance = m_fOrigDistance;
@@ -958,6 +963,38 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction.eCamCut = CUT_INTERPOLATE;
 		newAction.eEase = EASE_INOUT_FAST;
 		newAction.fInterpolateSpeed = 7.f;
+
+		newAction.eCamPos = POS_ABSOLUTE;
+		newAction.vPos = _float3{ 19.6f, 26.f, 12.2f };
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.15f, 0.f, 1.f };
+		m_CamSeq.push_back(newAction);
+
+	}
+	break;
+
+	case SEQ_LUNCHTIME:
+	{
+		//이벤트 호출
+		//m_fSeqEventTime = 7.f;
+
+		CAMACTION newAction = {};
+
+		newAction.fTime = 0.f;
+		newAction.eCamCut = CUT_INTERPOLATE;
+		newAction.eEase = EASE_INOUT_FAST;
+		newAction.fInterpolateSpeed = 1.f;
+
+		newAction.eCamPos = POS_ABSOLUTE;
+		newAction.vPos = _float3{ 19.6f, 26.f, 15.2f };
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.15f, 0.f, 1.f };
+		m_CamSeq.push_back(newAction);
+
+		newAction.fTime = 2.f;
+		newAction.eCamCut = CUT_INTERPOLATE;
+		newAction.eEase = EASE_INOUT_FAST;
+		newAction.fInterpolateSpeed = 1.f;
 
 		newAction.eCamPos = POS_ABSOLUTE;
 		newAction.vPos = _float3{ 19.6f, 26.f, 12.2f };

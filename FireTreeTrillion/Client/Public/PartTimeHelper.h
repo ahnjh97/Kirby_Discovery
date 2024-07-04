@@ -27,7 +27,7 @@ public:
 	void				Register_PartTimerKirby(class CPartTimerKirby* pKirby);
 	void				Register_UI(class CUI_PartTime* pUI);
 	void				Register_PartTimeResult(class CUI_PartTimeResult* pUI);
-	void				Register_Camera(class CCamera* pCamera);
+	void				Register_Camera(class CCamera_Main* pCamera);
 	void				NotifyObserver();
 
 	// ¹®Á¦ ³À´Ï´Ù.
@@ -45,7 +45,7 @@ public:
 	void				Handle_UI(TYPE eContent);
 
 private:
-	class CCamera*				m_pCamera			 = nullptr;
+	class CCamera_Main*			m_pCamera			 = nullptr;
 	class CHungryDee*			m_pHungryDee		 = nullptr;
 	class CPartTimerKirby*		m_pPartTimerKirby	 = nullptr;
 	class CUI_PartTime*			m_pUI_PartTime		 = nullptr;
