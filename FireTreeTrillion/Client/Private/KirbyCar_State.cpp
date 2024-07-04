@@ -3,6 +3,7 @@
 #include "Kirby_State_Function.h"
 #include "ToppleableBridge.h"
 #include "StarBlock.h"
+#include "Box.h"
 
 #pragma region 차량 아이들 상태
 
@@ -620,16 +621,43 @@ void CKirbyCar_Boost_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		// 충돌하는지 지속적인 검사.
 		_vector vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
 
-		if (pController->Compute_Wall(vLook) < 3.f)
+		
+
+		if (pController->RayCastToDynamicActor(vLook) < 3.f 
+			|| pController->RayCastToDynamicActor(vLook, _float3(0,2,0)) < 3.f
+			|| pController->RayCastToDynamicActor(vLook, _float3(-2, 0, 0)) < 3.f 
+			|| pController->RayCastToDynamicActor(vLook, _float3(2, 0, 0)) < 3.f
+			|| pController->RayCastToDynamicActor(vLook, _float3(-2, 2, 0)) < 3.f
+			|| pController->RayCastToDynamicActor(vLook, _float3(2, 2, 0)) < 3.f)
+		{
+			CGameObject* pObj = pKirby->FindBox(pController->Get_MostRecentActor());
+			if (nullptr != pObj) {
+				CBox* pBox = static_cast<CBox*>(pObj);
+				pBox->Break_From_Car();
+				return;
+			}
+		}
+
+		if (pController->Compute_Wall(vLook, -1.f) < 3.f
+			|| pController->Compute_Wall(vLook, 1.f) < 3.f)
 		{
 			CGameObject* pObj = pKirby->FindStarBox(pController->Get_MostRecentActor());
-
 			if (nullptr != pObj) {
 				CStarBlock* pStarBlock = static_cast<CStarBlock*>(pObj);
 				pStarBlock->Break_From_Car();
 				return;
 			}
+		}
 
+		if (pController->Compute_Wall(vLook) < 3.f)
+		{
+			CGameObject* pObj = pKirby->FindStarBox(pController->Get_MostRecentActor());
+			if (nullptr != pObj) {
+				CStarBlock* pStarBlock = static_cast<CStarBlock*>(pObj);
+				pStarBlock->Break_From_Car();
+				return;
+			}
+			
 			pKirby->Change_State(CKirby::CARSTATE_CRASH, 60.f, false, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 			DESC(m_fBoosterTime) = 0.f;
 			DESC(m_bBooster) = false;

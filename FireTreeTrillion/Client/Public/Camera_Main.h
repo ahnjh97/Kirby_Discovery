@@ -16,6 +16,7 @@ public:
 		SEQ_SOFTCUT_TEST,
 		SEQ_BREAKCARSHOP,
 		SEQ_BREAKRACINGMAP,
+		SEQ_PARTTIMESTART,
 		SEQ_END
 	};
 
@@ -258,7 +259,7 @@ private:
 
 	//현재 시퀀스 모드
 	CAMSEQ m_eSpecialSeq = { SEQ_END };
-	_float m_fStartAudioTime = { 0.f };
+	_float m_fSeqEventTime = { 0.f };
 	//시퀀스 웨이팅 목록
 	list<CAMACTION> m_CamSeq;
 

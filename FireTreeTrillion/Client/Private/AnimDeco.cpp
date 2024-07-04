@@ -45,25 +45,25 @@ HRESULT CAnimDeco::Initialize(void* pArg)
 	_float fOffSetY{}, fRadius{};
 	if ("BushL" == strModelName) {
 		fOffSetY = 0.5f;
-		fRadius = 1.2f;
+		fRadius = 0.8f;
 		m_wstrNonAnimDecoName = TEXT("BushLRemainder");
 	}
 	else if ("BushM" == strModelName) {
 		fOffSetY = 0.4f;
-		fRadius = 1.f;
+		fRadius = 0.6f;
 		m_wstrNonAnimDecoName = TEXT("BushMRemainder");
 	}
 	else if ("BushS" == strModelName) {
 		fOffSetY = 0.3f;
-		fRadius = 0.8f;
+		fRadius = 0.4f;
 		m_wstrNonAnimDecoName = TEXT("BushSRemainder");
 	}
 	else if ("PopFlower" == strModelName) {
 		return S_OK;
 	}
-	else if ("WoodParts" == strModelName) {
-		return S_OK;
-	}
+	//else if ("BoxWood" == strModelName || "BoxPlastic" == strModelName) {
+	//	return S_OK;
+	//}
 
 
 	Set_BodyCollider(COLLIDER_SPHERE, fOffSetY, 0.f, fRadius);

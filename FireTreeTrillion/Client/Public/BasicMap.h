@@ -81,7 +81,10 @@ private:
 	unordered_map<string, unordered_set<_uint>> m_mapBlendMeshesIndices;
 	unordered_map<string, _bool> m_mapBlendObjStaticActor;
 	vector<CGameObject*> m_vecBlendObjects;
-	
+
+	unordered_set<string> m_setShadowDecos;
+	vector<CGameObject*> m_vecShadowObjects;
+
 private:
 	HRESULT Add_Components(const wstring& _wstrModelTag);
 	HRESULT Bind_ShaderResources();
@@ -107,6 +110,8 @@ private:
 			, unordered_map<string, _bool>& _mapBlendObjStaticActor);
 	_bool	ReadBlendMeshesIndices(const string& _strFullPath, const string& _strModelName
 			, unordered_set<_uint>& _setMeshIndices, _bool& _bStaticActor);
+
+	_bool	IsShadowDeco(const string& _strModelName);
 		
 public:
 	static CBasicMap* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

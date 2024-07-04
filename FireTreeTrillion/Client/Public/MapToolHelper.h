@@ -97,7 +97,7 @@ private:
 	_bool IsDeco(const string& _strModelName);
 	_bool IsItem(const string& _strModelName);
 	_bool IsRallyingMonster(const string& _strModelName);
-	_bool IsKickble(const string& _strModelName);
+	_bool IsKickable(const string& _strModelName);
 	_bool IsTree(const string& _strModelName);
 	_bool IsBlendDeco(const string& _strModelName);
 

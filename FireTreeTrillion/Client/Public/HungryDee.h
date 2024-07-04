@@ -1,6 +1,7 @@
 #pragma once
 #include "Client_Defines.h"
 #include "WaddleDee.h"
+#include "UI_PartTimeDee.h"
 
 BEGIN(Engine)
 class CModel;
@@ -38,12 +39,16 @@ public:
 	_float3			Get_DestWaitingPos() { return m_WaitingList.first + m_WaitingList.second[m_iMyIdx].vPos; }
 	_float			Get_WaitingTime() {return m_fWaitingTime;}
 	_bool			IsFrontWaiting() { return m_iMyIdx == WAITPOS_FRONT; }
+	_bool			IsSecondWaiting() { return m_iMyIdx == (WAITPOS_FRONT + 1); }
+
 	void			Set_RenderPartObj(_bool bRender) { m_bRenderPartObj = bRender; }
 	
 	void			Erase_DialogUI(); //{ m_pDialogUI = nullptr; }
 
 	void			Swap_WatingPosition();
-	void			Ready_OrderUI();
+
+	void			Ready_OrderUI(CUI_PartTimeDee::TYPE eType = CUI_PartTimeDee::ORDER);
+
 
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;

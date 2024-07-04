@@ -12,6 +12,7 @@
 #include "MapToolObject.h"
 #include "NonRenderWall.h"
 #include "NonAnimDeco.h"
+#include "ShadowDeco.h"
 #include "AnimDeco.h"
 #include "BasicMap.h"
 #include "Trigger.h"
@@ -91,6 +92,9 @@
 #include "DeeDeeDee.h"
 #include "DeeDeeDeeHammer.h"
 
+// 피날레
+#include "FinaleRoad.h"
+
 //와들디
 #include "Dee_Part.h"
 #include "OriginalDee.h"
@@ -118,6 +122,7 @@
 #include "TunnelRock.h"
 #include "Radio.h"
 #include "Fog_Instance.h"
+#include "Box.h"
 
 //기믹
 #include "Gm_LabAntenna.h"
@@ -305,6 +310,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("NonAnimDeco"), CNonAnimDeco);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("NonRenderWall"), CNonRenderWall);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PortalSoftEffect"), CPortalSoftEffect);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ShadowDeco"), CShadowDeco);
 
 	// For HitBox
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HitBox"), CHitBox);
@@ -354,6 +360,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PoppyBomb"), CPoppyBomb);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CappyBody"), CCappyBody);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CappyHat"), CCappyHat);
+
 	// FinalBoss
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalBoss"), CFinalBoss);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalBossSpear"), CFinalBossSpear);
@@ -364,6 +371,9 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Meteor"), CMeteor);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BossClone"), CBossClone);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gully"), CGully);
+
+	// Finale
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleRoad"), CFinaleRoad);
 
 	//Dee
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeePart"), CDee_Part);
@@ -407,6 +417,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Tunnel"), CTunnel);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TunnelRock"), CTunnelRock);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Fog_Instance"), CFog_Instance);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Box"), CBox);
 
 	#pragma region GIMMICK::LEVEL_FINALBOSS
 
@@ -1502,21 +1513,20 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("DeeDeeDeeHammer", TYPE_NONANIM, 1.0f);
 
 		// For Map Interactive Object
-		m_vecModelInfo.emplace_back("GsPebble", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("SeShell", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("StarBlockS", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("StarBlockM", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("StarBlockL", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("StarBlockPiece", TYPE_NONANIM, 0.5f, 180.f);
-		m_vecModelInfo.emplace_back("StarBlockPieceStar", TYPE_NONANIM, 0.5f, 180.f);
 		m_vecModelInfo.emplace_back("Ladder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("BoxWood", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("BoxWood_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 		// For Item
 		Load_ItemModels();
 
+		// For Kickables
+		Load_KickableModels();
+
+		// For StarBlocks
+		Load_StarBlockModels();
+
 		// For Interaction Decor
-		m_vecModelInfo.emplace_back("WoodParts", TYPE_ANIM, 1.f, 0.f, 0, string("MapDeco/"));
 		m_vecModelInfo.emplace_back("BushLRemainder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapDeco/"));
 		m_vecModelInfo.emplace_back("BushMRemainder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapDeco/"));
 		m_vecModelInfo.emplace_back("BushSRemainder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapDeco/"));
@@ -1579,9 +1589,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("BG0", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("Town", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
-		m_vecModelInfo.emplace_back("StarBlockS", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("StarBlockM", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("StarBlockL", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 
 		m_vecModelInfo.emplace_back("Kirby", TYPE_ANIM, 1.f, 180.f);
@@ -1606,13 +1613,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("CappyBody", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("CappyHat", TYPE_ANIM, 1.f, 180.f);
 
-		// For Map Interactive Object
-		m_vecModelInfo.emplace_back("GsPebble", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("SeShell", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-
-
-
 		// 자동차 관련 (자동차와 부수는 돌멩이들)
 		m_vecModelInfo.emplace_back("Car", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("RockA", TYPE_NONANIM, 1.f);
@@ -1629,10 +1629,14 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		// For Item
 		Load_ItemModels();
 
+		// For Kickables
+		Load_KickableModels();
+
+		// For StarBlocks
+		Load_StarBlockModels();
 
 		// For Interaction Decor
 		m_vecModelInfo.emplace_back("Ladder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("WoodParts", TYPE_ANIM, 1.f, 0.f, 0, string("MapDeco/"));
 		m_vecModelInfo.emplace_back("BushLRemainder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapDeco/"));
 		m_vecModelInfo.emplace_back("BushMRemainder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapDeco/"));
 		m_vecModelInfo.emplace_back("BushSRemainder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapDeco/"));
@@ -1647,6 +1651,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 			string strTunnelRock = "TunnelRock" + to_string(i);
 			m_vecModelInfo.emplace_back(strTunnelRock, TYPE_NONANIM);
 		}
+		m_vecModelInfo.emplace_back("BoxPlastic", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("BoxPlastic_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 	}
 	else if (eLevel == LEVEL_DEEDEEDEE)
 	{
@@ -1767,6 +1773,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		// For Kirby Armour
 		Load_KirbyArmourModels();
 
+		Load_ItemModels();
+		Load_KickableModels();
+
 		// For Boss 
 		m_vecModelInfo.emplace_back("FinalBoss", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("FinalBossSpear", TYPE_ANIM, 1.f);
@@ -1776,9 +1785,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("BigDebris", TYPE_NONANIM, 0.8f, 180.f);
 		m_vecModelInfo.emplace_back("SmallDebris", TYPE_NONANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("MoundPiece", TYPE_NONANIM, 0.2f, 180.f);
-
-		// For Item
-		Load_ItemModels();
 	}
 	else if (eLevel == LEVEL_FINALE)
 	{
@@ -1790,10 +1796,39 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Land_LbLastBossBeforeStep", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("Land_LbLastBossBeforeStep_Blend", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("LevelFinale_LbLastBuilding", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("FinaleCave", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 		//기믹 오브젝트
 		m_vecModelInfo.emplace_back("LbAntenna_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("LbBossRoomDoor_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+
+		//피날레 오브젝트들
+		m_vecModelInfo.emplace_back("PopStar", TYPE_ANIM, 1.f, 0.f, 0);
+
+
+		m_vecModelInfo.emplace_back("Baum", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("BaumPieceA", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("BaumPieceB", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("BaumPieceC", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("BaumPieceD", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("BaumPieceE", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("BaumPieceF", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("BuildingPiece", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("StarPiece", TYPE_NONANIM, 1.f, 0.f, 0);
+
+		m_vecModelInfo.emplace_back("MovableBuildingA", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("MovableBuildingB", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("MovableBuildingC", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("MovableBuildingD", TYPE_NONANIM, 1.f, 0.f, 0);
+
+
+		m_vecModelInfo.emplace_back("Road", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("RoadEnd", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("RoadParticle", TYPE_NONANIM, 1.f, 0.f, 0);
+
+		m_vecModelInfo.emplace_back("RoadBreak", TYPE_ANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("RoadLBreak", TYPE_ANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("RoadLongBreak", TYPE_ANIM, 1.f, 0.f, 0);
 
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("BG1", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
@@ -1861,22 +1896,19 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// For Mab Interactive Object
 		m_vecModelInfo.emplace_back("Ladder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("GsPebble", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("SeShell", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 		//GAMEPLAY 크래시로 인한 임시 처리 MapDeco > MapObj
 		m_vecModelInfo.emplace_back("StarBlockL", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("StarBlockM", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("StarBlockS", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
-		m_vecModelInfo.emplace_back("WoodParts", TYPE_ANIM, 1.f, 0.f, 0, string("MapDeco/"));
 		m_vecModelInfo.emplace_back("StarBlockPiece", TYPE_NONANIM, 0.5f, 180.f);
 		m_vecModelInfo.emplace_back("StarBlockPieceStar", TYPE_NONANIM, 0.5f, 180.f);
 
 
 		// For Item
 		Load_ItemModels();
+		Load_KickableModels();
 
 		// 와들디
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
@@ -2202,6 +2234,28 @@ void CLoader::Load_ItemModels()
 	m_vecModelInfo.emplace_back("Item_Bomb", TYPE_NONANIM, 1.f, 0.f);
 	m_vecModelInfo.emplace_back("Item_Hammer", TYPE_NONANIM, 1.f, 0.f);
 	m_vecModelInfo.emplace_back("Item_Star", TYPE_NONANIM, 0.5f, 0.f);
+}
+
+void CLoader::Load_KickableModels()
+{
+	m_vecModelInfo.emplace_back("GsPebble", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+	m_vecModelInfo.emplace_back("GsRubbleA", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+	m_vecModelInfo.emplace_back("GsRubbleB", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+	m_vecModelInfo.emplace_back("GsRubbleC", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+	m_vecModelInfo.emplace_back("GsTireAL", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+	m_vecModelInfo.emplace_back("GsTireBL", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+	m_vecModelInfo.emplace_back("GsTireCL", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+	m_vecModelInfo.emplace_back("SeShell", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+	m_vecModelInfo.emplace_back("WasteCanYellow", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+}
+
+void CLoader::Load_StarBlockModels()
+{
+	m_vecModelInfo.emplace_back("StarBlockS", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+	m_vecModelInfo.emplace_back("StarBlockM", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+	m_vecModelInfo.emplace_back("StarBlockL", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+	m_vecModelInfo.emplace_back("StarBlockPiece", TYPE_NONANIM, 0.5f, 180.f);
+	m_vecModelInfo.emplace_back("StarBlockPieceStar", TYPE_NONANIM, 0.5f, 180.f);
 }
 
 void CLoader::Load_KirbyBodyModels()
