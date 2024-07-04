@@ -33,7 +33,7 @@ HRESULT CDump::Initialize(void* pArg)
 		return E_FAIL;
 
 
-	m_pModelCom->Set_Animation(DUMP_CUTDUMP1, 30.f, false, false);
+	m_pModelCom->Set_Animation(DUMP_CUTDUMP1, 45.f, false, false);
 	m_eCurAnim = DUMP_CUTDUMP1;
 
 	m_bRimLight = false;
@@ -52,7 +52,7 @@ _int CDump::Tick(_float fTimeDelta)
 
 	if (m_eCurAnim == DUMP_CUTDUMP1 && m_pModelCom->IsFinished())
 	{
-		m_pModelCom->Set_Animation(DUMP_CUTDUMP2, 30.f, false, false);
+		m_pModelCom->Set_Animation(DUMP_CUTDUMP2, 45.f, false, false);
 		m_eCurAnim = DUMP_CUTDUMP2;
 	}
 	else if (m_eCurAnim == DUMP_CUTDUMP2 && m_pModelCom->IsFinished())

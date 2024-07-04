@@ -1024,6 +1024,12 @@
     <ClInclude Include="..\Public\ShadowDeco.h">
       <Filter>02.GameObjects\Map\Deco\ShadowDeco</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\FinaleKirby.h">
+      <Filter>02.GameObjects\PhysXObject\Character\FinaleKirby</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Dump.h">
+      <Filter>02.GameObjects\Map\Dump</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">

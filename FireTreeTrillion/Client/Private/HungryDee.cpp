@@ -130,7 +130,7 @@ _int CHungryDee::Tick(_float fTimeDelta)
 
 
 	//지영아 여기야
-	/* 점심시간이다ㅏ~~
+
 	if (m_pGameInstance->Get_KeyState(DIK_S, KEY_DOWN) && m_iMyIdx == 0)
 	{
 		CHungryDee::HUNGRYDEE_DESC HungryDeeDesc{};
@@ -148,7 +148,7 @@ _int CHungryDee::Tick(_float fTimeDelta)
 			m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Dee"), TEXT("Prototype_GameObject_HungryDee"), &HungryDeeDesc);
 		}
 	}
-	*/
+	
 
 	//나머지 슈퍼틱, 파트 틱 처리
 	__super::Tick(m_fTimeDelta);
