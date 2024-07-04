@@ -39,7 +39,6 @@ HRESULT CFinaleRoad::Initialize(void* pArg)
 	m_bMotionBlur = true;
 	m_bStencil = true;
 	m_bRimLight = false;
-	m_fRimWidth = .2f;
 
 
 	m_pDynamicActor = m_pModelCom->ReturnDynamicActor(m_pTransformCom->Get_WorldMatrix());
@@ -54,7 +53,7 @@ _int CFinaleRoad::Tick(_float fTimeDelta)
 
 	__super::Tick(m_fTimeDelta);
 
-	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fTimeDelta);
+	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fTimeDelta * .2f);
 
 	Compute_MotionBlur();
 
@@ -93,8 +92,8 @@ HRESULT CFinaleRoad::Render()
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
 		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE); CHECK_FAILED(hr);
-		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_NORMALS); CHECK_FAILED(hr);
-		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_METALNESS); CHECK_FAILED(hr);
+		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS); CHECK_FAILED(hr);
+		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS); CHECK_FAILED(hr);
 
 
 		//만약 애님모델이라면 뼈까지 바인딩하고 Anim Model Pass
