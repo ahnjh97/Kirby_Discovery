@@ -14,7 +14,7 @@ class CFinaleRoad final : public CPhysXObject
 public:
 	struct ROAD_DESC : public GAMEOBJECT_DESC
 	{
-		wstring strModelTag = { L"NONE" };
+		//wstring strModelTag = { L"NONE" };
 		_bool	bIsAnimModel = { false };
 	};
 

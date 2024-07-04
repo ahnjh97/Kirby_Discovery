@@ -83,8 +83,8 @@ public:
 
 	virtual void	Reset_Duration();
 	virtual void	Fill_SaveData(_Out_ SINGLE_FX_DATA* pFXData);
-	virtual void	Fill_SaveData(_Out_ PARTICLE_DATA* pFXData) {}
-	virtual void	Fill_SaveData(_Out_ MULTI_FX_DATA* pFXData) {}
+	virtual void	Fill_SaveData(PARTICLE_DATA* pFXData) {}
+	virtual void	Fill_SaveData(MULTI_FX_DATA* pFXData) {}
 
 
 	//키프레임 추가(단일 이펙트 용)

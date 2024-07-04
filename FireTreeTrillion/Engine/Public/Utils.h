@@ -68,7 +68,9 @@ public:
 	static PxVec3			To_PxVec3(const _fvector& vector);
 	static _vector			To_Vector(const PxVec3 pxVec3);
 	static PxTransform		mat44ToTransform(const PxMat44& mat);
-		
+	static PxTransform		TransformToPxTransform(class CTransform* pTransform);
+
+
 	//이펙트 관련 함수
 	static HRESULT Load_Effect(path _FilePath, _Out_ SINGLE_FX_DATA* _pData);
 	static HRESULT Load_Effect(path _FilePath, _Out_ PARTICLE_DATA* _pData);

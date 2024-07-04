@@ -28,20 +28,20 @@ HRESULT CFinaleRoad::Initialize(void* pArg)
 	RoadDesc.fSpeedPerSec = 5.f;
 	RoadDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
-
 	HRESULT hr;
 
 	hr = __super::Initialize(&RoadDesc);
 	CHECK_FAILED(hr);
 
-	hr = Add_Components(RoadDesc.strModelTag, RoadDesc.bIsAnimModel);
+	hr = Add_Components(RoadDesc.wstrModelName, RoadDesc.bIsAnimModel);
 	CHECK_FAILED(hr);
 
 	m_bMotionBlur = true;
-	m_bRimLight = true;
 	m_bStencil = true;
+	m_bRimLight = false;
+	m_fRimWidth = .2f;
 
-	
+
 	m_pDynamicActor = m_pModelCom->ReturnDynamicActor(m_pTransformCom->Get_WorldMatrix());
 	m_pDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
 
@@ -51,7 +51,10 @@ HRESULT CFinaleRoad::Initialize(void* pArg)
 _int CFinaleRoad::Tick(_float fTimeDelta)
 {
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+
 	__super::Tick(m_fTimeDelta);
+
+	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fTimeDelta);
 
 	Compute_MotionBlur();
 
@@ -60,6 +63,24 @@ _int CFinaleRoad::Tick(_float fTimeDelta)
 
 void CFinaleRoad::Late_Tick(_float fTimeDelta)
 {
+	__super::Late_Tick(m_fTimeDelta);
+
+	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+
+	//if (nullptr != m_pDynamicActor)
+	//{
+	//	m_pTransformCom->Set_WorldMatrix(m_pGameInstance->GetActorAverageMatrix(m_pDynamicActor));
+	//}
+
+	m_pDynamicActor->setGlobalPose(CUtils::TransformToPxTransform(m_pTransformCom));
+
+	//시야 벗어나면 컬링
+	if (m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State(CTransform::STATE_POSITION), 2.0f))
+	{
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
+	}
+
 }
 
 HRESULT CFinaleRoad::Render()
@@ -71,7 +92,23 @@ HRESULT CFinaleRoad::Render()
 
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
+		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE); CHECK_FAILED(hr);
+		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_NORMALS); CHECK_FAILED(hr);
+		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_METALNESS); CHECK_FAILED(hr);
 
+
+		//만약 애님모델이라면 뼈까지 바인딩하고 Anim Model Pass
+		if (m_bIsAnimModel)
+		{
+			hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i); CHECK_FAILED(hr);
+			hr = m_pShaderCom->Begin(ANIMMODEL_NORMAL_O); CHECK_FAILED(hr);
+		}
+		else
+		{
+			hr = m_pShaderCom->Begin(MODEL_NORMAL_O); CHECK_FAILED(hr);
+		}
+
+		m_pModelCom->Render(i);
 	}
 
 	return S_OK;
@@ -79,6 +116,9 @@ HRESULT CFinaleRoad::Render()
 
 HRESULT CFinaleRoad::Render_LightDepth()
 {
+	if (FAILED(m_pGameInstance->Render_LightDepth_For_GameObject(m_pShaderCom, m_pTransformCom, m_pModelCom)))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -109,19 +149,21 @@ HRESULT CFinaleRoad::Add_Components(wstring _strModelTag, _bool _bIsAnimModel)
 	hr = __super::Add_Component(LEVEL_STATIC,
 		_bIsAnimModel ? TEXT("Prototype_Component_Shader_VtxAnimModel") : TEXT("Prototype_Component_Shader_VtxModel"),
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
-
 	CHECK_FAILED(hr);
 
 	hr = __super::Add_Component(TEXT("Prototype_Component_Model_") + _strModelTag,
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
+
 	CHitBox::HITBOX_DESC HitBox{};
 	HitBox.pOwner = this;
 	HitBox.pDesc = &m_tColliderDesc[BODY];
 	HitBox.pCollisionType = OBJECT;
-	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
-		return E_FAIL;
+
+	hr = m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox);
+	CHECK_FAILED(hr);
+
 	Set_BodyCollider(COLLIDER_SPHERE, 0.f, 0.f, 1.f);
 
 	return S_OK;

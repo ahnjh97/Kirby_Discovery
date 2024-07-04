@@ -332,6 +332,15 @@ PxTransform CUtils::mat44ToTransform(const PxMat44& mat)
 	return PxTransform(position, rotation);
 }
 
+PxTransform CUtils::TransformToPxTransform(CTransform* pTransform)
+{
+	_matrix worldMat = pTransform->Get_WorldMatrix();
+	PxMat44 pxMat = CUtils::To_Float4x4(worldMat);
+	PxTransform transform = CUtils::mat44ToTransform(pxMat);
+
+	return PxTransform();
+}
+
 HRESULT CUtils::Load_Effect(path _FilePath, SINGLE_FX_DATA* _pData)
 {
 	ifstream InputFile(_FilePath, ios::binary | ios::in);

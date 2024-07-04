@@ -12,6 +12,7 @@
 #include "BrontoBurt.h"
 #include "PoppyBrosJr.h"
 #include "FinalBoss.h"
+#include "FinaleRoad.h"
 
 #include "BG.h"
 #include "HUD.h"
@@ -612,6 +613,18 @@ HRESULT CLevel_Finale::Ready_Kickables()
 HRESULT CLevel_Finale::Ready_Objects()
 {
 	//Map, Triggers, Kickables.. 분류 제외 잔존 오브젝트들
+
+	CFinaleRoad::ROAD_DESC roadDesc{};
+	roadDesc.wstrModelName = TEXT("MovableBuildingA");
+
+	_float4x4 InitMat = _float4x4::Identity;
+	InitMat.Translation({ 40.f, 10.f, 0.f });
+	CUtils::Turn_OtherMatrix(InitMat, _float3::Up, 1.f, 45.f);
+	roadDesc.matWorld = InitMat;
+
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
+		return E_FAIL;
+
 
 	string strFileName = "../../../objects_txt/Finale.txt";
 
