@@ -598,8 +598,6 @@ void CBasicMap::ReadDecos_ForSmallLevels()
             return;
         }
 
-        pModel->SetUpStencilRimLightMotionBlurPassIndex(iShaderVars, fRimWidth, iPassIndex);
-
         PxRigidStatic* pRigidStatic = { nullptr };
         pModel->Set_WorldMatrixForOctree(matWorld);
 
@@ -620,6 +618,8 @@ void CBasicMap::ReadDecos_ForSmallLevels()
             }
             pModel->RemoveBlendMeshes(mapIter->second);
         }
+
+        pModel->SetUpStencilRimLightMotionBlurPassIndex(iShaderVars, fRimWidth, iPassIndex);
 
         if (CMapToolObject::MAPOBJ_NONCOL == iMapObjType)
             m_vecNonAnimDecos.push_back(pModel);
