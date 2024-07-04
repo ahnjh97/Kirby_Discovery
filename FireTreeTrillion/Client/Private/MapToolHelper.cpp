@@ -99,7 +99,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 	m_vecLevelName = { "Level_Static", "Level_Loading", "Level_Logo", "GamePlay",
 			"Level_Tool_UI", "Level_Tool_FX", "Level_Tool_Anim", "Level_Tool_Map",
-		"Intro", "Racing", "DeeDeeDee", "Town", "PartTime", "FinalBoss", "Finale", "Level_End" };
+		"Intro", "Racing", "DeeDeeDee", "Town", "PartTime", "Simba", "FinalBoss", "Finale", "Level_End" };
 
 	//UV 조절 가능
 	//BasicMap (UV 편집 가능)
@@ -441,7 +441,7 @@ void CMapToolHelper::Menu_Level()
 			ImGui::EndPopup();
 		}
 
-		if (i % 2 == 0 && i != LEVEL_FINALBOSS)
+		if (i % 2 == 0 && i != LEVEL_FINALE)
 			ImGui::SameLine();
 	}
 	//ImGui::NewLine(); 
