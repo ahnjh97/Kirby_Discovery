@@ -476,7 +476,9 @@ _bool CFinaleKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
     }
     // Default 상태의 눈 부위 // Vacuum 상태의 눈 부위 // Balloon 상태의 눈 부위
     else if ((_eBodyState == BODY_DEFAULT && _iMeshIndex == 3) ||
-        (_eBodyState == BODY_VACUUM && _iMeshIndex == 2))
+        (_eBodyState == BODY_VACUUM && _iMeshIndex == 2 ||
+            _eBodyState == BODY_DUMPVACUUM && _iMeshIndex == 7 ||
+            _eBodyState == BODY_DUMPDEFAULT && _iMeshIndex == 7))
     {
         m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
         m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
@@ -525,6 +527,7 @@ void CFinaleKirby::SetUp_FSM()
     m_pFSM->Add_State(STATE_VACUUM, CKirbyDump_Cut_State::Create());
 
     //m_pFSM->Add_State(DUMPSTATE_DAMAGE, CKirbyDump_Cut_State::Create());
+    m_pFSM->Add_State(DUMPTSTATE_CUT, CKirbyDump_Cut_State::Create());
     m_pFSM->Add_State(DUMPSTATE_IDLING, CKirbyDump_Run_State::Create());
     m_pFSM->Add_State(DUMPSTATE_JUMP, CKirbyDump_Jump_State::Create());
     m_pFSM->Add_State(DUMPSTATE_LANDING, CKirbyDump_Jump_State::Create());

@@ -57,6 +57,7 @@ public:
 
 public:
 	_float	m_fRunTime = { 0.f };
+	_bool	m_bShakeTrigger = { true };
 	static	CKirbyDump_Cut_State* Create();
 	virtual void				  Free() override;
 };

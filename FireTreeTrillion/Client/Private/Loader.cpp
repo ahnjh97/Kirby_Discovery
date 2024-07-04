@@ -1847,7 +1847,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		Load_KirbyArmourModels();
 
 		// Deform
-		m_vecModelInfo.emplace_back("DumpCar", TYPE_ANIM, 1.f, 90.f);
+		m_vecModelInfo.emplace_back("DumpCar", TYPE_ANIM, 0.8f, 90.f);
 
 		// For Boss 
 		m_vecModelInfo.emplace_back("FinalBoss", TYPE_ANIM, 1.f, 180.f);
@@ -2277,8 +2277,8 @@ void CLoader::Load_KirbyBodyModels()
 	m_vecModelInfo.emplace_back("KirbyCarDefault", TYPE_ANIM, 1.f, 180.f);
 	m_vecModelInfo.emplace_back("KirbyCarVacuum", TYPE_ANIM, 1.f, 180.f);
 	m_vecModelInfo.emplace_back("KirbyHammerDefault", TYPE_ANIM, 1.f, 180.f);
-	m_vecModelInfo.emplace_back("KirbyDumpDefault", TYPE_ANIM, 1.f, 180.f);
-	m_vecModelInfo.emplace_back("KirbyDumpVacuum", TYPE_ANIM, 1.f);
+	m_vecModelInfo.emplace_back("KirbyDumpDefault", TYPE_ANIM, 0.8f, 180.f);
+	m_vecModelInfo.emplace_back("KirbyDumpVacuum", TYPE_ANIM, 0.8f);
 
 }
 
