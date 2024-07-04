@@ -52,6 +52,7 @@ HRESULT CFinalBoss::Initialize(void* pArg)
 	m_fAttack = 10.f;
 	m_eVacuumSize = SIZE_BIG;
 	m_eBossState = STATE_FLYING;
+	m_fTimeDelay = 1.f;
 
 	m_pModelCom->Set_Animation(FINALBOSS_DEMOAPPEARCUT5, 70.f, false, true);
 
@@ -86,19 +87,19 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return Ready_Dead();
 
-	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+	m_fTimeDelta = m_pGameInstance->Get_SecondTimer() * m_fTimeDelay;
 
-	//if (m_pGameInstance->Get_KeyState(DIK_K, KEY_DOWN))
-	//{
-	//	Set_BossState(STATE_2PAZE);
-	//	m_pControllerCom->Set_Position(m_pTransformCom, m_vecRallyPoint[1]);
-	//	m_pTransformCom->Look_At(m_vecRallyPoint[0]);
-	//	Change_State(FINALBOSS_DAMAGE, 50.f, false, true);
-	//}
-	//else if (m_pGameInstance->Get_KeyState(DIK_L, KEY_DOWN))
-	//{
-	//	Change_State(FINALBOSS_DAMAGE, 50.f, false, true);
-	//}
+	if (m_pGameInstance->Get_KeyState(DIK_K, KEY_DOWN) || m_fHp < m_fMaxHp * 0.45f)
+	{
+		Set_BossState(STATE_2PAZE);
+		m_pControllerCom->Set_Position(m_pTransformCom, m_vecRallyPoint[1]);
+		m_pTransformCom->Look_At(m_vecRallyPoint[0]);
+		Change_State(FINALBOSS_DAMAGE, 50.f, false, true);
+	}
+	else if (m_pGameInstance->Get_KeyState(DIK_L, KEY_DOWN))
+	{
+		Change_State(FINALBOSS_DAMAGE, 50.f, false, true);
+	}
 
 	if (true == m_bGlide)
 	{
@@ -119,20 +120,41 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 	else
 		m_fGlideTime = 0.f;
 
-	// 풀링임
+	////풀링임
 	//if (true == m_bGully)
 	//{
-	//	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 0.8f;
-	//	vPos.m128_f32[1] = 0.f;
-	//	m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f);
-	//	++m_iGullyCnt;
-	//	vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 0.8f;
+	//	//m_fGullyTime += m_fTimeDelta;
 
-	//	vPos.m128_f32[1] = 0.f;
-	//	m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f);
-	//	++m_iGullyCnt;
-	//	if (m_vecGully.size() <= m_iGullyCnt)
-	//		m_iGullyCnt = 0;
+	//	if (false == m_bShake)
+	//	{
+	//		m_fTimeDelay = 0.8f;
+	//		m_bShake = true;
+	//		CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+	//		if (pCamera != nullptr)
+	//			pCamera->Make_Shake(1.f, 1.f);
+	//	}
+
+	//	//if(0.1f < m_fGullyTime)
+	//	//{
+	//		//m_fGullyTime = 0.f;
+
+	//		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 0.8f;
+	//		vPos.m128_f32[1] = 0.f;
+	//		m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f);
+	//		++m_iGullyCnt;
+	//		vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 0.8f;
+
+	//		vPos.m128_f32[1] = 0.f;
+	//		m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f);
+	//		++m_iGullyCnt;
+	//		if (m_vecGully.size() <= m_iGullyCnt)
+	//			m_iGullyCnt = 0;
+	//	//}
+	//}
+	//else
+	//{
+	//	m_fTimeDelay = 1.f;
+	//	m_bShake = false;
 	//}
 
 	__super::Tick(m_fTimeDelta);
@@ -473,15 +495,28 @@ void CFinalBoss::SetUp_FSM()
 
 void CFinalBoss::HitBoxChanger(_uint eState)
 {
+	CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+
 	switch (eState)
 	{
 	case FINALBOSS_SWINGRIGHT:
+	{
+		if (pCamera != nullptr)
+			pCamera->Make_Shake(0.3f, 0.5f);
+
 		Activate_FrustumCollider(0.5f, 10.f, 180.f);
+	}
 		break;
 	case FINALBOSS_SWINGLEFT:
+		if (pCamera != nullptr)
+			pCamera->Make_Shake(0.3f, 0.5f);
+
 		Activate_FrustumCollider(0.5f, 10.f, 180.f);
 		break;
 	case FINALBOSS_SWINGFINISHLEFT:
+		if (pCamera != nullptr)
+			pCamera->Make_Shake(0.3f, 0.5f);
+
 		Activate_FrustumCollider(0.5f, 10.f, 180.f);
 		break;
 	default:

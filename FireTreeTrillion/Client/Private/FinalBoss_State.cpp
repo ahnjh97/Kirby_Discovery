@@ -121,15 +121,15 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			//{
 			//	++m_iCnt;
 				// Stab 패턴
-				m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
-				pFinalBoss->Set_Direction(m_vLook);
-				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
+				//m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
+				//pFinalBoss->Set_Direction(m_vLook);
+				//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
 			//}
 			//else if (m_iCnt == 4)
 			//{
 			//	++m_iCnt;
 			//	// Slash 패턴
-				//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHREADY, 50.f, false, true);
+				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHREADY, 50.f, false, true);
 			//}
 			//else if (m_iCnt == 6)
 			//{
@@ -341,7 +341,7 @@ void CFinalBoss_Stab_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 				CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 				if (pCamera != nullptr)
-					pCamera->Make_Shake(1.f, 2.5f);
+					pCamera->Make_Shake(0.5f, 1.f);
 
 				pFinalBoss->Activate_FrustumCollider(0.5f, 8.f, 120.f);
 				pFinalBoss->Set_BossState(CFinalBoss::STATE_GROUND);
@@ -543,6 +543,7 @@ void CFinalBoss_Slash_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _f
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 
 	m_fTimeDelta = 0.f;
+	m_fSpeed = 70.f;
 	m_bChain = false;
 }
 
@@ -606,12 +607,18 @@ void CFinalBoss_Slash_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 	}
 	else if (CFinalBoss::FINALBOSS_SLASH == pFinalBoss->Get_State())
 	{
-		pController->Move_Dir(pTransformCom, XMVector3Normalize(pFinalBoss->Get_Direction()) * fTimeDelta * 70.f, fTimeDelta);
+		pController->Move_Dir(pTransformCom, XMVector3Normalize(pFinalBoss->Get_Direction()) * fTimeDelta * m_fSpeed, fTimeDelta);
 
 		if (5.f > pController->Compute_Height(XMVectorSet(0.f, -1.f, 0.f, 0.f)))
+		{
 			pFinalBoss->Set_Gully(true);
+			//m_fSpeed = 10.f;
+		}
 		else
+		{
 			pFinalBoss->Set_Gully(false);
+			//m_fSpeed = 70.f;
+		}
 
 		m_fTimeDelta += fTimeDelta;
 		if (4.f < m_fTimeDelta)
@@ -1357,11 +1364,25 @@ CFinalBoss_Roar_State::CFinalBoss_Roar_State()
 void CFinalBoss_Roar_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
+
+	m_bShake = false;
 }
 
 void CFinalBoss_Roar_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
 	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(pGameObject);
+
+	if(0.35f < pFinalBoss->Get_AnimRatio())
+	{
+		if(false == m_bShake)
+		{
+			m_bShake = true;
+
+			CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+			if (pCamera != nullptr)
+				pCamera->Make_Shake(0.5f, 3.5f);
+		}
+	}
 
 	if (true == pFinalBoss->IsAnimFinished())
 	{
