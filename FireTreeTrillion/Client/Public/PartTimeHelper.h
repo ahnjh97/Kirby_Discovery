@@ -52,6 +52,7 @@ private:
 	class CUI_PartTimeResult*	m_pUI_PartTimeResult = nullptr;
 
 	PARTTIME_ITEM				m_eFood	= PARTTIME_ITEM::CAKE;
+	_float						m_fScore = 0.f;
 
 public:
 	virtual void Free() override;

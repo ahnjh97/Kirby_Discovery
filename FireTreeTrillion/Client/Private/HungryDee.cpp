@@ -129,27 +129,6 @@ _int CHungryDee::Tick(_float fTimeDelta)
 		m_fWaitingTime -= m_fTimeDelta;
 
 
-	//지영아 여기야
-	/* 점심시간이다ㅏ~~
-	if (m_pGameInstance->Get_KeyState(DIK_S, KEY_DOWN) && m_iMyIdx == 0)
-	{
-		CHungryDee::HUNGRYDEE_DESC HungryDeeDesc{};
-		HungryDeeDesc.fSpeedPerSec = 5.f;
-		HungryDeeDesc.fRotationPerSec = ToRadian(90.f);
-		_float4x4 InitMat = _float4x4::Identity;
-		InitMat.Translation(m_WaitingList.first);
-		HungryDeeDesc.matWorld = InitMat;
-
-		_int iStartIdx = m_iWatingNum;
-
-		for (_int i = 0; i < 10; ++i)
-		{
-			HungryDeeDesc.iIdx = iStartIdx + i;
-			m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Dee"), TEXT("Prototype_GameObject_HungryDee"), &HungryDeeDesc);
-		}
-	}
-	*/
-
 	//나머지 슈퍼틱, 파트 틱 처리
 	__super::Tick(m_fTimeDelta);
 	for (auto& Pair : m_PartObjects)
@@ -167,6 +146,7 @@ _int CHungryDee::Tick(_float fTimeDelta)
 		if (m_pDialogUI != nullptr)
 		{
 			m_pDialogUI->Tick(m_fTimeDelta);
+
 		}
 	}
 
@@ -176,9 +156,9 @@ _int CHungryDee::Tick(_float fTimeDelta)
 	return OBJ_NOEVENT;
 }
 
-void CHungryDee::Erase_DialogUI()
+void CHungryDee::Set_RenderDialog(_bool bRender)
 {
-	Safe_Release(m_pDialogUI);
+	m_pDialogUI->Set_IsRender(bRender);
 }
 
 void CHungryDee::Swap_WatingPosition()
@@ -213,15 +193,13 @@ void CHungryDee::Swap_WatingPosition()
 void CHungryDee::Ready_OrderUI(CUI_PartTimeDee::TYPE eType)
 {
 	if (m_pDialogUI == nullptr) return;
-	m_pDialogUI->Set_IsRender(true);
-
+	//m_pDialogUI->Set_IsRender(true);
 	m_pDialogUI->Set_Type(eType);
 
 	_float4 vRevisedPos = GET_POS;
 	vRevisedPos.y += fOffsetInteract;
 	m_pDialogUI->Update_Pos(_float3{ vRevisedPos.x, vRevisedPos.y, vRevisedPos.z });
 }
-
 
 void CHungryDee::Late_Tick(_float fTimeDelta)
 {
@@ -232,18 +210,19 @@ void CHungryDee::Late_Tick(_float fTimeDelta)
 	if (!m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State(CTransform::STATE_POSITION), 2.0f))
 		return;
 
-
 	if (m_bRenderPartObj)
 	{
 		for (auto& Pair : m_PartObjects)
 			Pair.second->Late_Tick(m_fTimeDelta);
 	}
-	if(m_pDialogUI != nullptr)
+	if (m_pDialogUI != nullptr)
+	{
 		m_pDialogUI->Late_Tick(m_fTimeDelta);
 
-	//_float4 vRevisedPos = GET_POS;
-	//vRevisedPos.y += fOffsetInteract;
-	//m_pDialogUI->Update_Pos(_float3{ vRevisedPos.x, vRevisedPos.y, vRevisedPos.z });
+		_float4 vRevisedPos = GET_POS;
+		vRevisedPos.y += fOffsetInteract;
+		m_pDialogUI->Update_Pos(_float3{ vRevisedPos.x, vRevisedPos.y, vRevisedPos.z });
+	}
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
@@ -322,9 +301,19 @@ void CHungryDee::Change_Dialog(PARTTIME_ITEM eItem)
 
 void CHungryDee::OnNotify()
 {
+	CHungryDee::HUNGRYDEE_DESC HungryDeeDesc{};
+	HungryDeeDesc.fSpeedPerSec = 5.f;
+	HungryDeeDesc.fRotationPerSec = ToRadian(90.f);
+	_float4x4 InitMat = _float4x4::Identity;
+	InitMat.Translation(m_WaitingList.first);
+	HungryDeeDesc.matWorld = InitMat;
 
-	// 특정 시간일때 와들디 처리 >> 점심시간에 화내기 시작하는걸 여기서 처리해주면 될것같유
-	// 효선아 여기야
+	_int iStartIdx = m_iWatingNum;
+	for (_int i = 0; i < 10; ++i)
+	{
+		HungryDeeDesc.iIdx = iStartIdx + i;
+		//m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Dee"), TEXT("Prototype_GameObject_HungryDee"), &HungryDeeDesc);
+	}
 }
 
 //맨 앞자리 디
@@ -441,10 +430,8 @@ void CHungryDee::Bring_Food(PARTTIME_ITEM eITEM)
 */
 HRESULT CHungryDee::Add_Components()
 {
-
 	HRESULT hr;
-
-
+	
 	//쉐이더
 	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimModel"),
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);

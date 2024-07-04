@@ -8,7 +8,7 @@ class CTexture;
 class CVIBuffer_Rect;
 END
 
-#define TEXTURECNT	17
+#define PARTTIME_TEX_CNT	19
 
 BEGIN(Client)
 class CUI_PartTime : public CUIObject
@@ -37,6 +37,8 @@ public:
 
 	void						Set_PreRatioBar() { m_fRatioBarSub = m_fRatioTimeBar; }
 	void						Set_RenderState(STATE _eState, _bool _bState);
+
+	_bool						Get_TimeStart() const { return m_bTimeStart; }
 	
 private:
 	HRESULT						Add_Components();
@@ -49,20 +51,23 @@ private:
 	void						Compute_TimeScore(_float fTimeDelta);
 	void						Change_TimeTexures(_float _fTime);
 
+	void						Render_READY();
+	void						Render_GO();
 	void						Render_GameOver();
 	void						Render_Fade();
+
 	void						Reset_ShaderValue();
 	_float						EaseOutBounce(_float _value);
 
 private:
-	array<CTexture*, TEXTURECNT>		m_arrTexures;
-	array<_float2,	 TEXTURECNT>		m_arrSize;
-	array<_float2,	 TEXTURECNT>		m_arrPosition;
+	array<CTexture*, PARTTIME_TEX_CNT>		m_arrTexures;
+	array<_float2,	 PARTTIME_TEX_CNT>		m_arrSize;
+	array<_float2,	 PARTTIME_TEX_CNT>		m_arrPosition;
 
 	// -------------- for IMGUI
-	array<_float2,	 TEXTURECNT>		m_arrOriginalSize;
-	array<_float,	 TEXTURECNT>		m_arrSizeRatio;
-	array<_float3,	 TEXTURECNT>		m_arrColor;
+	array<_float2,	 PARTTIME_TEX_CNT>		m_arrOriginalSize;
+	array<_float,	 PARTTIME_TEX_CNT>		m_arrSizeRatio;
+	array<_float3,	 PARTTIME_TEX_CNT>		m_arrColor;
 
 	CTexture*					m_pTexMask = { nullptr }; // 마스킹을 위한 텍스쳐
 
@@ -90,14 +95,19 @@ private:
 	// Score-Digits
 	array<_int, 3>				m_arrScoreDigits;
 
-	// GAME-OVER 텍스트
 	_float						m_fTimeDelta = 0.f;
+	
+	// GAME-OVER 텍스트
 	_float						m_fSizeRatio = 0.f;
 	_float2						m_fStandardSize2D = _float2();
 	_float2						m_fRealTimeSize2D = _float2();
+	// 시작할 때 텍스트
+	_float						m_fMoveRatio = 0.f;
+	_float2						m_fMovePosition2D = _float2(); // this
 
 	_bool						m_bOnce = false;
 	array<_bool, STATE_END>		m_arrRenderState;
+	_bool						m_bTimeStart = false;
 
 public:
 	static CUI_PartTime*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
