@@ -829,12 +829,24 @@ void CFinalBoss_Swing_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 
 	if (true == pFinalBoss->IsAnimFinished())
 	{
+		HRESULT hr;
+
+		// 별 아이템 떨굼
+		CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
+
 		switch (pFinalBoss->Get_State())
 		{
 		case CFinalBoss::FINALBOSS_SWINGRIGHTSTART:
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SWINGRIGHT, 60.f, false, true);
 			break;
 		case CFinalBoss::FINALBOSS_SWINGRIGHT:
+			AbilityItemDesc.fRotateDir = -1.f;																	// 별 회전 방향 오른쪽																// 별 회전 방향 왼쪽
+			AbilityItemDesc.fAngle = 0.f;													// 별의 진행 방향의 각도
+			AbilityItemDesc.vDir = XMVectorSet(0.f, 0.f, 0.f, 0.f);							// 별의 진행 방향
+			AbilityItemDesc.vPosition = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 0.4f - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 6.f;	// 별의 생성 위치
+			AbilityItemDesc.eAbilityType = ABILITY_DEFAULT;
+			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+			CHECK_FAILED(hr);
 			if(rand() % 2 == 0)
 				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SWINGFINISHLEFT, 30.f, false, true);
 			else
@@ -847,6 +859,13 @@ void CFinalBoss_Swing_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_WAIT, 60.f, false, true);
 			break;
 		case CFinalBoss::FINALBOSS_SWINGLEFT:
+			AbilityItemDesc.fRotateDir = 1.f;																	// 별 회전 방향 오른쪽																// 별 회전 방향 왼쪽
+			AbilityItemDesc.fAngle = 0.f;													// 별의 진행 방향의 각도
+			AbilityItemDesc.vDir = XMVectorSet(0.f, 0.f, 0.f, 0.f);							// 별의 진행 방향
+			AbilityItemDesc.vPosition = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 2.5f - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 6.f;	// 별의 생성 위치
+			AbilityItemDesc.eAbilityType = ABILITY_DEFAULT;
+			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+			CHECK_FAILED(hr);
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SWINGLEFTEND, 50.f, false, true);
 			break;
 		case CFinalBoss::FINALBOSS_SWINGLEFTEND:

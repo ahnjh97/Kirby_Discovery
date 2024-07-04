@@ -143,7 +143,7 @@ _int CAbility::Tick(_float fTimeDelta)
 			if (0.f < m_fSpeed)
 			{
 				m_fSpeed -= m_fTimeDelta;
-				m_pControllerCom->Move_Dir(m_pTransformCom, XMVector3Normalize(m_vDir) * m_fTimeDelta * m_fSpeed, m_fTimeDelta);
+				m_pControllerCom->Move_Dir(m_pTransformCom, m_vDir * m_fTimeDelta * m_fSpeed, m_fTimeDelta);
 			}
 			else
 				m_fSpeed = 0.f;
