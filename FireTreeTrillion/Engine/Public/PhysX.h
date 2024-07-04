@@ -19,8 +19,6 @@ public:
 
     // test 
     void CheckPvdConnection(PxPvd* pvd);
-    void Test();
-    _float4x4 Update(_fmatrix matrix);
 
     // Actor °ü¸®
     void AddActor(physx::PxActor& pActor);
@@ -38,6 +36,8 @@ public:
     PxMaterial*                         Get_Material() { return m_pMaterial; }
     PxScene*                            Get_Scene() { return m_pScene; }
     PxControllerManager*                Get_ControllerManager() { return m_pControllerManager; }
+
+    void ResetScene();
     
     // NOT YET
     //PxMaterial*                       FindMaterial(const string& strMtrlTag);
@@ -45,10 +45,12 @@ public:
     //class CComponent*                 Get_Component(physx::PxActor* pActor);
 
 public:
-    void            Kick_DynamicActor(_float3 _kickDirection, _float impulseMagnitude);
     void            Add_Force(_float3 _kickDirection);
     PxRigidDynamic* CreateDynamicActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
     PxRigidStatic*  CreateStaticActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
+    
+    PxTriangleMesh* CreateTriangleMesh(_float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
+    PxConvexMesh*   CreateConvexMesh(_float3* pVerticesPos, _uint iNumVertices, PxMaterial* pMaterial);
 
 private:
     PxDefaultAllocator          mDefaultAllocatorCallback;

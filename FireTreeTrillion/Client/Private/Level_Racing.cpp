@@ -171,7 +171,7 @@ HRESULT CLevel_Racing::Ready_Layer_BackGround(const wstring& strLayerTag)
 	ObjDesc.fSpeedPerSec = 5.f;
 	ObjDesc.fRotationPerSec = ToRadian(90.f);
 	_float4x4 InitMat = _float4x4::Identity;
-	InitMat.Translation({ 48.f, 24.75f, 65.5f });
+	InitMat.Translation({ 48.1f, 24.78f, 65.8f });
 	ObjDesc.matWorld = InitMat;
 
 	// Car Test
@@ -720,7 +720,13 @@ HRESULT CLevel_Racing::Ready_Objects(_float fXOffset, _float fZOffset)
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, g_strLayerMapObject, TEXT("Prototype_GameObject_StarBlock"), &tDesc)))
 				continue;
 		}
-
+		else if ("BoxWood" == strModelName || "BoxPlastic" == strModelName)
+		{
+			strModelName += "_Anim";
+			tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Box"), TEXT("Prototype_GameObject_Box"), &tDesc)))
+				continue;
+		}
 	}
 	fileInput.close();
 

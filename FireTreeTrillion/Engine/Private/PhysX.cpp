@@ -102,39 +102,11 @@ void CPhysX::CheckPvdConnection(PxPvd* pvd)
     }
 }
 
-
 /// physX에 영향을 받는 테스트용 Ground를 만들어줍니다.
 void CPhysX::Ready_TestGround()
 {
     PxRigidStatic* groundPlane = PxCreatePlane(*m_pPhysics, PxPlane(0, 1, 0, 0), *m_pMaterial);
     m_pScene->addActor(*groundPlane);
-}
-
-void CPhysX::Test()
-{
-//    // create simulation
-//    m_pMaterial = m_pPhysics->createMaterial(0.5f, 0.5f, 0.6f);
-//    PxRigidStatic* groundPlane = PxCreatePlane(*m_pPhysics, PxPlane(0, 1, 0, 0), *m_pMaterial);
-//    m_pScene->addActor(*groundPlane);
-//
-//    float halfExtent = .5f;
-//    m_pShape = m_pPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *m_pMaterial);
-//    PxU32 size = 30;
-//    PxTransform t(PxVec3(0));
-//
-//    PxTransform localTm(PxVec3(0, 0, 0) * halfExtent);
-//    m_pRigidDynamic = m_pPhysics->createRigidDynamic(t.transform(localTm));
-//    m_pRigidDynamic->attachShape(*m_pShape);
-//    PxRigidBodyExt::updateMassAndInertia(*m_pRigidDynamic, 10.0f);
-//    m_pScene->addActor(*m_pRigidDynamic);
-}
-
-_float4x4 CPhysX::Update(_fmatrix matrix)
-{
-    //PxTransform trans = m_pRigidDynamic->getGlobalPose();
-    //_float4x4 matPos = CUtils::To_Float4x4(trans);
-    //return matPos;
-    return _float4x4();
 }
 
 void CPhysX::AddActor(physx::PxActor& pActor)
@@ -199,6 +171,31 @@ void CPhysX::Clear_EventCallBack()
         return;
 
     m_pEventCallBack->Clear_EventCallBack();
+}
+
+void CPhysX::ResetScene()
+{
+    //// 기존 Scene의 모든 Actor를 제거
+    //PxU32 actorCount = m_pScene->getNbActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC);
+    //PxActor** actors = new PxActor * [actorCount];
+    //m_pScene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC, actors, actorCount);
+    //for (PxU32 i = 0; i < actorCount; ++i) {
+    //    m_pScene->removeActor(*actors[i]);
+    //    actors[i]->release();
+    //}
+    //delete[] actors;
+    //Safe_Delete(m_pEventCallBack);
+
+    //// 새로운 Scene 생성
+    //m_pScene->release();
+    //PxSceneDesc sceneDesc(mToleranceScale);
+    //sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
+    //sceneDesc.cpuDispatcher = m_pDispatcher;
+    //sceneDesc.filterShader = PxDefaultSimulationFilterShader;
+    //sceneDesc.broadPhaseType = PxBroadPhaseType::eSAP; // 또는 eMBP
+    //m_pEventCallBack = new CEventCallBack();
+    //sceneDesc.simulationEventCallback = m_pEventCallBack;
+    //m_pScene = m_pPhysics->createScene(sceneDesc);
 }
 
 //physx::PxMaterial* CPhysX::FindMaterial(const string& strMtrlTag)
@@ -267,21 +264,6 @@ PxRigidDynamic* CPhysX::CreateDynamicActor(_float4x4& matWorld, _float3* pVertic
     return pDynamicActor;
 }
 
-void CPhysX::Add_Force(_float3 vForce)
-{
-    if (m_pRigidDynamic == nullptr) return;
-
-    PxVec3 PxForce = physx::PxVec3(vForce.x, vForce.y, vForce.z);
-    m_pRigidDynamic->addForce(PxForce, physx::PxForceMode::eFORCE);
-}
-
-void CPhysX::Kick_DynamicActor(_float3 _kickDirection, _float impulseMagnitude)
-{
-    PxVec3 kickDirection(_kickDirection.x, _kickDirection.y, _kickDirection.z);
-    PxVec3 impulse = kickDirection * impulseMagnitude;
-    m_pRigidDynamic->addForce(impulse, PxForceMode::eIMPULSE);
-}
-
 PxRigidStatic* CPhysX::CreateStaticActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)
 {
     PxCookingParams tParams(mToleranceScale);
@@ -336,6 +318,35 @@ PxRigidStatic* CPhysX::CreateStaticActor(_float4x4& matWorld, _float3* pVertices
     return pStaticActor;
 }
 
+PxTriangleMesh* CPhysX::CreateTriangleMesh(_float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)
+{
+    PxCookingParams tParams(mToleranceScale);
+    tParams.buildTriangleAdjacencies = true;
+
+    PxTriangleMeshDesc triDesc;
+    triDesc.points.count = iNumVertices;
+    triDesc.points.stride = sizeof(PxVec3);
+    triDesc.points.data = pVerticesPos;
+    triDesc.triangles.count = iNumIndices / 3;  // 삼각형 개수
+    triDesc.triangles.stride = 3 * sizeof(PxU32);
+    triDesc.triangles.data = pIndices;
+
+    return PxCreateTriangleMesh(tParams, triDesc);;
+}
+
+PxConvexMesh* CPhysX::CreateConvexMesh(_float3* pVerticesPos, _uint iNumVertices, PxMaterial* pMaterial)
+{
+    PxCookingParams tParams(mToleranceScale);
+
+    PxConvexMeshDesc meshDesc;
+    meshDesc.points.count = iNumVertices;
+    meshDesc.points.stride = sizeof(PxVec3);
+    meshDesc.points.data = pVerticesPos;
+    meshDesc.flags = PxConvexFlag::eCOMPUTE_CONVEX | PxConvexFlag::eSHIFT_VERTICES;
+
+    return PxCreateConvexMesh(tParams, meshDesc);;
+}
+
 
 CPhysX* CPhysX::Create()
 {
@@ -359,7 +370,8 @@ void CPhysX::Free()
     if(nullptr != m_pShape)
         m_pShape->release();
 
-    m_pControllerManager->release();
+    if(m_pControllerManager != nullptr)
+        m_pControllerManager->release();
 
     Safe_Delete(m_pEventCallBack);
 

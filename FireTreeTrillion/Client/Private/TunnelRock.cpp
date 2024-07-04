@@ -85,7 +85,7 @@ _int CTunnelRock::Tick(_float fTimeDelta)
     m_pTransformCom->Turn(m_vRotationAxis, fTimeDelta * 8.f);
 
     //m_fY = m_fY * cos(m_fTime * XM_PI / (m_fTotalTime * 2.f)) * fTimeDelta
-    m_fY -= m_fTime * GRAVITY * 0.3;
+    m_fY -= m_fTime * GRAVITY * 0.3f;
 
     _float4 vDir = _float4(m_fX * fTimeDelta, m_fY * fTimeDelta, m_fZ * fTimeDelta, 0);
     m_pTransformCom->Move(vDir);

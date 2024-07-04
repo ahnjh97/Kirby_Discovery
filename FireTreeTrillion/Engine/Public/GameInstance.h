@@ -147,21 +147,6 @@ public: /* For.Frustum */
 public: /* For.Extractor */
 	_vector Compute_WorldPos(const _float2& vViewportPos, const wstring& strZRenderTargetTag, _uint iOffset = 0);
 
-public: /* For.PhysX */
-	PxScene*				Get_Scene();
-	PxPhysics*				Get_Physics();
-	PxMaterial*				Get_Material();
-	PxControllerManager*	Get_ControllerManager();
-	void					AddActor(PxActor& pActor);
-	void					RemoveActor(PxActor& pActor);
-	void					Add_Force(_float3 vForce);
-	void					Kick_DynamicActor(_float3 _kickDirection, _float impulseMagnitude);
-
-	void		Test();
-	_float4x4	Update(_fmatrix matrix);
-	void		Ready_TestGround();
-	//void		Overlap_Hitbox(CGameObject* pGameObject, _float4 vPos, _float fRadius);
-
 #ifdef _DEBUG
 	HRESULT Ready_RTVDebug(const wstring& strRenderTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY);
 	HRESULT Draw_RTVDebug(const wstring& strMRTTag, class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
@@ -195,14 +180,32 @@ public: /* For.ImGui_Manager */
 #endif
 
 public: /* For.PhysX */
-	PxRigidDynamic* CreateDynamicActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial = nullptr);
-	PxRigidStatic* CreateStaticActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial = nullptr);
+	PxScene*				Get_Scene();
+	PxPhysics*				Get_Physics();
+	PxMaterial*				Get_Material();
+	PxControllerManager*	Get_ControllerManager();
+
+	PxRigidDynamic*	CreateDynamicActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial = nullptr);
+	PxRigidStatic*	CreateStaticActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial = nullptr);
+	PxTriangleMesh*	CreateTriangleMesh(_float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial = nullptr);
+	PxConvexMesh*	CreateConvexMesh(_float3* pVerticesPos, _uint iNumVertices, PxMaterial* pMaterial = nullptr);
+
+	_float4x4		GetActorAverageMatrix(PxRigidActor* pActor);
+
+	void AddActor(PxActor& pActor);
+	void RemoveActor(PxActor& pActor);
+	void Ready_TestGround();
+
 	void Register_Player(PxActor* pPlayerActor);
 	void Register_Trigger(PxActor* pTriggerActor, _int iTriggerType, _int iTriggerIndex);
 	void Emplace_TriggerFunc(_int iTriggerType, function<void(_int)> func);
 	void Emplace_ExitFunc(_int iTriggerType, function<void(void)> exitFunc);
 	void Emplace_MapDecoTrigger(PxActor* pTriggerActor, class CModel* pMapDecoModel, _uint iAnimIdx, _float fTickPerSec);
 	void Clear_EventCallBack();
+	void ResetScene();
+
+	void DisableActor(PxActor* pActor);
+	void ReleaseActor(PxActor* pActor);
 
 public: /* For. Picking */
 	void Transform_PickingToLocalSpace(const class CTransform* pTransform, _Out_ _float3* pRayDir, _Out_ _float3* pRayPos);

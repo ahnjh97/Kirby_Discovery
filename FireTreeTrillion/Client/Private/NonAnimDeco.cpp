@@ -41,7 +41,8 @@ _int CNonAnimDeco::Tick(_float fTimeDelta)
 
 void CNonAnimDeco::Late_Tick(_float fTimeDelta)
 {
-	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 3.0f))
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
 
 HRESULT CNonAnimDeco::Render()
@@ -72,6 +73,11 @@ HRESULT CNonAnimDeco::Render()
 
 HRESULT CNonAnimDeco::Add_Components(const wstring& _wstrModelTag)
 {
+	/* For.Com_Shader */
+	wstring wstrShaderTag = TEXT("Prototype_Component_Shader_VtxModel");
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, wstrShaderTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
+		return E_FAIL;
+
 	/* For.Com_Model */
 	wstring wstrModelTag = TEXT("Prototype_Component_Model_") + _wstrModelTag;
 	if (FAILED(__super::Add_Component(wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom)))

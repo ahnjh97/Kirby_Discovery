@@ -31,9 +31,33 @@ HRESULT CKickableRock::Initialize(void* pArg)
 		Add_Components(pGameObjectDesc->wstrModelName);
 
 	m_eAbilityType = ABILITY_DEFAULT;
-	m_bMotionBlur = true;
+	m_bMotionBlur = false;
 	m_bRimLight = true;
 	m_bStencil = true;
+
+	m_pDynamicActor = m_pModelCom->ReturnDynamicActor(m_pTransformCom->Get_WorldFloat4x4());
+	m_pDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+
+	string strModelName = CUtils::WstrToStr(pGameObjectDesc->wstrModelName);
+
+	m_mapPowers = {
+		{"SeShell", 10.f},
+		{"GsPebble", 20.f},
+		{"WasteCanYellow", 85.f},
+		{"GsRubbleA", 15.f},
+		{"GsRubbleB", 40.f},
+		{"GsRubbleC", 45.f},
+		{"GsRubbleC", 45.f},
+		{"GsTireAL", 130.f},
+		{"GsTireBL", 130.f},
+		{"GsTireCL", 85.f}
+	};
+
+	auto mapIter = m_mapPowers.find(strModelName);
+	if (m_mapPowers.end() != mapIter)
+		m_fPower = mapIter->second;
+	else
+		m_fPower = 50.f;
 
 	return S_OK;
 }
@@ -101,8 +125,15 @@ void CKickableRock::Late_Tick(_float fTimeDelta)
 	{
 		// 커비에게 빨려들어가지 않게 END로 한다.
 		m_ePhyXState = PO_END;
-		m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
-		m_pRigidBodyCom->Add_Force(_float3(0.f, -0.5f, 0.f));
+		if (nullptr != m_pDynamicActor) {
+			m_pTransformCom->Set_WorldMatrix(m_pGameInstance->GetActorAverageMatrix(m_pDynamicActor));
+
+			PxVec3 PxForce = PxVec3(0.f, -0.5f, 0.f);
+			m_pDynamicActor->addForce(PxForce, PxForceMode::eFORCE);
+		}
+		
+		/*m_pRigidBodyCom->Update_PhysX(m_pTransformCom);
+		m_pRigidBodyCom->Add_Force(_float3(0.f, -0.5f, 0.f));*/
 
 		m_fLifeTime += m_fTimeDelta;
 		if (m_fLifeTime >= 1.5f)
@@ -179,7 +210,7 @@ void CKickableRock::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObj
 		// 노말 상태일 경우에만 톡 쳤을때 반응하게 하고, 나머진 서로 충돌이 되면 안 된다.
 		if (m_ePhyXState == PO_NORMAL && m_bLockCollision == false)
 		{
-			m_pRigidBodyCom->Activate(true);
+			//m_pRigidBodyCom->Activate(true);
 			CGameObject* pPlayer = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"));
 			_float4 vPlayerPos = static_cast<CTransform*>(pPlayer->Get_TransformCom())->Get_State(CTransform::STATE_POSITION);
 			_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
@@ -190,7 +221,20 @@ void CKickableRock::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObj
 			vDir.y += 1.f;
 			vDir.Normalize();
 			_float3 force = vDir;
-			m_pRigidBodyCom->Kick_RigidBody(XMVector3Normalize(force), 480.f);
+			force = XMVector3Normalize(force);
+			PxVec3 kickDirection(force.x, force.y, force.z);
+
+			PxVec3 impulse = kickDirection * m_fPower;
+
+			m_pDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, false);
+			m_pDynamicActor->addForce(impulse, PxForceMode::eIMPULSE);
+
+			_float fMin = 0.2f;
+			_float fMax = 0.8f;
+			PxVec3 PxTorque = PxVec3(CUtils::Make_RandomFloat(fMin, fMax), CUtils::Make_RandomFloat(fMin, fMax)
+				, CUtils::Make_RandomFloat(fMin, fMax));
+			m_pDynamicActor->addTorque(PxTorque, PxForceMode::eIMPULSE);
+			//m_pRigidBodyCom->Kick_RigidBody(XMVector3Normalize(force), 480.f);
 
 			// 힘이 한번만 작용되게 한다.
 			m_bLockCollision = true;
@@ -215,20 +259,20 @@ HRESULT CKickableRock::Add_Components(const wstring& wstrModelName)
 	hr = __super::Add_Component(wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
-	/* For.Com_RigidBody */
-	CRigidBody::RIGIDBODY_DESC rigidDesc {};
-	rigidDesc.bTrigger = false;
-	rigidDesc.bDynamic = true;
-	rigidDesc.bKinematic = false;
-	rigidDesc.eShapeType = RIGID_SPHERE;
-	rigidDesc.fOffsetSize = { 0.5f, 0.5f, 0.5f };
-	rigidDesc.vMaterial = _float3(10.f, 1.f, 0.85f);
-	rigidDesc.fDensity = 800.f;
-	rigidDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
-	hr = __super::Add_Component(TEXT("Prototype_Component_RigidBody"),
-		TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &rigidDesc);
-	CHECK_FAILED(hr);
-	m_pRigidBodyCom->Activate(false);
+	///* For.Com_RigidBody */
+	//CRigidBody::RIGIDBODY_DESC rigidDesc {};
+	//rigidDesc.bTrigger = false;
+	//rigidDesc.bDynamic = true;
+	//rigidDesc.bKinematic = false;
+	//rigidDesc.eShapeType = RIGID_SPHERE;
+	//rigidDesc.fOffsetSize = { 0.5f, 0.5f, 0.5f };
+	//rigidDesc.vMaterial = _float3(10.f, 1.f, 0.85f);
+	//rigidDesc.fDensity = 800.f;
+	//rigidDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
+	//hr = __super::Add_Component(TEXT("Prototype_Component_RigidBody"),
+	//	TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &rigidDesc);
+	//CHECK_FAILED(hr);
+	//m_pRigidBodyCom->Activate(false);
 
 
 	CHitBox::HITBOX_DESC HitBox{};
@@ -344,6 +388,9 @@ CGameObject* CKickableRock::Clone(void* pArg)
 void CKickableRock::Free()
 {
 	__super::Free();
+
+	m_pGameInstance->ReleaseActor(m_pDynamicActor);
+
 	Safe_Release(m_pRigidBodyCom);
 	Safe_Release(m_pModelCom);
 } 

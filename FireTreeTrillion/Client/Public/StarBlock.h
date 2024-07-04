@@ -1,6 +1,6 @@
 #pragma once
 #include "Client_Defines.h"
-#include "MapObject.h"
+#include "PhysXObject.h"
 
 BEGIN(Engine)
 class CModel;
@@ -31,7 +31,7 @@ public:
 	void				Break_From_Car();
 
 private:
-	HRESULT				Add_Components(wstring wstrModelProtoTag);
+	HRESULT				Add_Components(wstring& wstrModelName);
 	HRESULT				Bind_ShaderResources();
 
 	_int				Make_Partical();
@@ -42,17 +42,17 @@ private:
 	_float2				m_vPreScreenPos = { 0.f, 0.f };
 	_float4				m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
 
-
 private:
-	CShader*				m_pShaderCom = { nullptr };
-	CModel*					m_pModelCom = { nullptr };
+	CShader*			m_pShaderCom = { nullptr };
+	CModel*				m_pModelCom = { nullptr };
+	PxRigidStatic*		m_pStaticActor = { nullptr };
 
-	_float					m_fFlyTime = { 0.f };
-	_float					m_fHitPower = { 0.f };
+	_float				m_fFlyTime = { 0.f };
+	_float				m_fHitPower = { 0.f };
 
-	_bool					m_bStaticOffTrigger = { true };
+	_bool				m_bStaticOffTrigger = { true };
 
-	_float					m_fSize = { 0.f };
+	_float				m_fSize = { 0.f };
 	
 public:
 	static CStarBlock*	 Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
