@@ -267,7 +267,7 @@ protected:
 
 	DEEEYESTATE		m_eEyeState = { DEEEYE_END };
 
-	map<const wstring, CPartObject*>	m_PartObjects;
+	map<const wstring, class CPartObject*>	m_PartObjects;
 	CModel*			m_pModelCom = { nullptr };
 	CTexture*		m_pEyeTextureCom = { nullptr };
 

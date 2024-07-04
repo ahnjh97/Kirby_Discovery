@@ -281,7 +281,7 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 		m_eCurSeqEase = EASE_END;
 		m_fSeqInterpolateTime = { 0.f, 0.f };
 
-		m_vDestCamPos = m_vCurCamPos;
+		//m_vDestCamPos = m_vCurCamPos;
 		m_vDestCamDir = m_vCurCamDir;
 		m_fDestFovy = m_fFovy;
 		m_fDestZAngle = m_fCurZAngle;
