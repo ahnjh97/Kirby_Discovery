@@ -101,9 +101,13 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 			"Level_Tool_UI", "Level_Tool_FX", "Level_Tool_Anim", "Level_Tool_Map",
 		"Intro", "Racing", "DeeDeeDee", "Town", "PartTime", "FinalBoss", "Finale", "Level_End" };
 
-	//UV 조절 가능
-	//BasicMap (UV 편집 가능)
-	m_vecMapModelNames = { "Level0Stage1Step01", "Level0Stage1Step02",  "Level1Stage1Step01", "DeeDeeDeeMap", "Town", "TownShop", "Land_VcLabo", "Land_LbLastBossBeforeStep", "LevelFinale_LbLastBuilding" };
+#pragma region BASIC MAP
+
+	m_vecMapModelNames = { "Level0Stage1Step01", "Level0Stage1Step02",  "Level1Stage1Step01", "DeeDeeDeeMap", "Town", "TownShop"
+		,"Land_LbLastBossBeforeStep" //,"LevelFinale_LbLastBuilding" :: 텍스처 및 모델 수정으로 사용안함
+		,"Land_LbLastBossStage" };
+
+#pragma endregion
 
 	vector<string> vecBGs = { "BG0", "BG1" };
 	m_setMapNames.insert(vecBGs.begin(), vecBGs.end());
@@ -135,7 +139,6 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "TwGougeGround01", "TwGougeGround02"
 #pragma endregion
 
-
 #pragma region LEVEL_RACING OBJECT
 		, "CMBuildingFenceA01","CMBuildingFenceA02", "CmFillerObjectD", "CmFillerObjectG", "CmFillerObjectH"
 		, "CmFillerObjectH02", "CmFillerObjectI"
@@ -158,14 +161,12 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "MlFlowerPot01L"
 #pragma endregion
 
-
 #pragma region TOWN OBJECT
 		, "TwArena", "TwArenaA", "TwArenaB", "TwArenaClerk", "TwDeliveryService", "TwFoodStore", "TwFoodStoreChair", "TwFoodStoreTable"
 		, "TwKirbyHouse", "TwPharmacy", "TwPlanterA", "TwPlanterB", "TwRollingBallBooth", "TwSideHouseA", "TwSideHouseC", "TwSideHouseD"
 		, "TwSignboardStreetLive", "TwSlope", "TwBenchA", "TwBenchB", "TwBenchC", "TwBenchD", "TwFishingPartsA", "TwFishingPartsB", "TwFishingPartsC"
 		,"TwCentralSquare","TwStreetLiveSetC", "TwSideBridge", "TwConstructionAreaStepway", "TwConstructionAreaPond"
 #pragma endregion
-
 
 #pragma region LEVEL_FINALBOSS (LAB_DISCOVERA) OBJECT
 		// 보스전 필드
@@ -186,6 +187,11 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "MlBossBenchL", "MlBossChairL", "MlFlowerPot01L", "MlSofaFL"
 
 #pragma endregion
+
+#pragma region LEVEL_FINALE OBJECT
+
+#pragma endregion
+
 	};
 	
 	m_setKickables = { "GsPebble", "SeShell", "WasteCanYellow" };
