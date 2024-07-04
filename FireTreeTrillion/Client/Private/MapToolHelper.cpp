@@ -168,18 +168,20 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 
 #pragma region LEVEL_FINALBOSS (LAB_DISCOVERA) OBJECT
-		//Field 
-		, "LbBossRoom", "LbLastBossStage", "LbLastBuilding", "Land_LbLastBossBeforeStep"
+		// 보스전 필드
+		//"LbLastBuilding", "LbLastBossStage" :: 텍스처 및 모델 수정으로 사용안함
+		, "LbBossRoom", "Land_LbLastBossBeforeStep", "LbLastBossStage"
 
-		//LbLastBuilding Object :: 보스전 필드의 오브젝트
-		,"LbLastStairs"//, "LbLastTank", "LbLastOutFrame1", "LbLastOutFrame2", :: 준수 오더로 삭제. 이제 Anim으로 대체되어 사용안함
+		// 보스전 필드의 오브젝트
+		// "LbLastTank", "LbLastOutFrame1", "LbLastOutFrame2", :: 준수 오더로 삭제. 이제 Anim으로 대체되어 사용안함
+		,"LbLastStairs"
 		,"LbBossRoomDoorAL","LbBossRoomDoorBL", "LbOutBuildingWallL"
 
 		//LbLastBossBeforeStep Object :: Rubble 
 		, "LbRubble01L", "LbRubble02L", "LbRubble03L", "LbRubble04L", "LbRubble05L", "LbRubble06L", "LbRubble07L", "LbRubble08L", "LbRubbleTile01L", "LbRubbleTile02L", "LbRubbleTile03L"
 		, "GsRubbleA", 	"GsRubbleB", "GsRubbleC", "GsRubbleD", "GsRubbleE", "GsRubbleF", "GsRubbleG"
 		
-		//CmFillerObject, Ml~ :: 채우기용 잡오브젝트
+		// [Common] CmFillerObject, [Mall] Ml~ :: 채우기용 잡오브젝트
 		, "CmFillerObjectAL", "CmFillerObjectA02L", "CmFillerObjectA03L", "CmFillerObjectBL", "CmFillerObjectCL", "CmFillerObjectEL", "CmFillerObjectFL"
 		, "MlBossBenchL", "MlBossChairL", "MlFlowerPot01L", "MlSofaFL"
 
