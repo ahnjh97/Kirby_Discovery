@@ -671,20 +671,20 @@ void CUI_PartTime::Reset_ShaderValue()
 // ≈¡≈¡≈∏∂Û∂Û∂Û...
 _float CUI_PartTime::EaseOutBounce(_float _value)
 {
-	const _float n1 = 7.5625;
-	const _float d1 = 2.75;
+	const _float n1 = 7.5625f;
+	const _float d1 = 2.75f;
 
 	if (_value < 1 / d1) {
 		return n1 * _value * _value;
 	}
 	else if (_value < 2 / d1) {
-		return n1 * (_value -= 1.5 / d1) * _value + 0.75;
+		return n1 * (_value -= 1.5f / d1) * _value + 0.75f;
 	}
 	else if (_value < 2.5 / d1) {
-		return n1 * (_value -= 2.25 / d1) * _value + 0.9375;
+		return n1 * (_value -= 2.25f / d1) * _value + 0.9375f;
 	}
 	else {
-		return n1 * (_value -= 2.625 / d1) * _value + 0.984375;
+		return n1 * (_value -= 2.625f / d1) * _value + 0.984375f;
 	}
 }
 

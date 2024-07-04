@@ -19,8 +19,6 @@ public:
 
     // test 
     void CheckPvdConnection(PxPvd* pvd);
-    void Test();
-    _float4x4 Update(_fmatrix matrix);
 
     // Actor °ü¸®
     void AddActor(physx::PxActor& pActor);
@@ -47,9 +45,7 @@ public:
     //class CComponent*                 Get_Component(physx::PxActor* pActor);
 
 public:
-    void            Kick_DynamicActor(_float3 _kickDirection, _float impulseMagnitude);
     void            Add_Force(_float3 _kickDirection);
-    void            Add_Force(PxRigidDynamic* pDynamicActor, _float3 vForce);
     PxRigidDynamic* CreateDynamicActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
     PxRigidStatic*  CreateStaticActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
     

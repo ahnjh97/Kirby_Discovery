@@ -72,7 +72,7 @@ _int CUI_BtnIcon::Tick(_float fTimeDelta)
 		m_eCurState = BTN_SELECT;
 
 	_float3 vOrigScale = m_pTransformCom->Get_Scaled();
-	_float3 vOffset = { 1.f, 1.f, 1.f };
+	_float3 vOffset = { 1.1f, 1.1f, 1.f };
 	switch (m_eCurState)
 	{
 	case BTN_IDLE:
@@ -115,6 +115,8 @@ _int CUI_BtnIcon::Tick(_float fTimeDelta)
 		m_fBtnAlpha = 0.f;
 		return OBJ_NOEVENT;
 	}
+
+	return OBJ_NOEVENT;
 }
 
 void CUI_BtnIcon::Late_Tick(_float fTimeDelta)

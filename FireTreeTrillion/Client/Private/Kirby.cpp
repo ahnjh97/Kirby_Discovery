@@ -1517,7 +1517,7 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 	// 그림자는 무조건 커비를 따라간다.
 	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 	_vector vLightPos = vPos;
-	vLightPos.m128_f32[1] += 60.f;
+	vLightPos.m128_f32[1] += 100.f;
 	vLightPos.m128_f32[2] -= 1.f;
 	m_pGameInstance->Update_LightShadow(vLightPos, vPos);
 

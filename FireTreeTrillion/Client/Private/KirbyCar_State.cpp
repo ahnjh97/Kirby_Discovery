@@ -639,7 +639,9 @@ void CKirbyCar_Boost_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		}
 
 		if (pController->Compute_Wall(vLook, -1.f) < 3.f
-			|| pController->Compute_Wall(vLook, 1.f) < 3.f)
+			|| pController->Compute_Wall(vLook, 1.f) < 3.f
+			|| pController->Compute_Wall(vLook, _float3(-1.f, 0.f, 0.f)) < 3.f
+			|| pController->Compute_Wall(vLook, _float3(1.f, 0.f, 0.f)) < 3.f)
 		{
 			CGameObject* pObj = pKirby->FindStarBox(pController->Get_MostRecentActor());
 			if (nullptr != pObj) {

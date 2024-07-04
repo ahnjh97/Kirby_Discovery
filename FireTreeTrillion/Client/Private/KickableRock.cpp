@@ -42,15 +42,15 @@ HRESULT CKickableRock::Initialize(void* pArg)
 
 	m_mapPowers = {
 		{"SeShell", 10.f},
-		{"GsPebble", 25.f},
-		{"WasteCanYellow", 80.f},
-		{"GsRubbleA", 20.f},
-		{"GsRubbleB", 60.f},
-		{"GsRubbleC", 60.f},
-		{"GsRubbleC", 60.f},
-		{"GsTireAL", 140.f},
-		{"GsTireBL", 140.f},
-		{"GsTireCL", 90.f}
+		{"GsPebble", 20.f},
+		{"WasteCanYellow", 85.f},
+		{"GsRubbleA", 15.f},
+		{"GsRubbleB", 40.f},
+		{"GsRubbleC", 45.f},
+		{"GsRubbleC", 45.f},
+		{"GsTireAL", 130.f},
+		{"GsTireBL", 130.f},
+		{"GsTireCL", 85.f}
 	};
 
 	auto mapIter = m_mapPowers.find(strModelName);

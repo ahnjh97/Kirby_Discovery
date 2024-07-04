@@ -155,7 +155,9 @@ public:
 
 private:
 	_float	m_fTimeDelta = { 0.f };
+	_float	m_fSpeed = { 0.f };
 	_bool	m_bChain = { false };
+
 public:
 	static	CFinalBoss_Slash_State* Create();
 	virtual void Free() override;
@@ -373,6 +375,9 @@ public:
 	// 상태 진입되어 있는 상태에서 매 tick마다 호출
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
 	virtual void OnStateExit()														override;
+
+private:
+	_float	m_bShake = { false };
 
 public:
 	static	CFinalBoss_Roar_State* Create();

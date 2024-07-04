@@ -53,9 +53,6 @@ void CShadowDeco::Late_Tick(_float fTimeDelta)
 
 HRESULT CShadowDeco::Render_LightDepth()
 {
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool))))
-		return E_FAIL;
-
 	if (FAILED(m_pGameInstance->Render_LightDepth_For_GameObject(m_pShaderCom, m_pTransformCom, m_pModelCom)))
 		return E_FAIL;
 

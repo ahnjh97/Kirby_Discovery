@@ -388,6 +388,7 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
     }
 	else if (pKirby->Get_State() == CFinaleKirby::STATE_INHALESTART)
 	{
+		Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
 		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
 
 		if (pKirby->isAnimFinish())
@@ -428,6 +429,7 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	}
 	else if (pKirby->Get_State() == CFinaleKirby::DUMPSTATE_CUTDEMOKIRBY)
 	{
+		Kirbydesc->m_fMoveSpeed = 0.f;
 		m_fRunTime += fTimeDelta;
 		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
 

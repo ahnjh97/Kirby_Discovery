@@ -27,6 +27,7 @@ public:
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 		m_fLifeTime = fLifeTime;
 		m_fScale = 1.f;
+		m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
 		m_bPoolingDead = false;
 	}
 
