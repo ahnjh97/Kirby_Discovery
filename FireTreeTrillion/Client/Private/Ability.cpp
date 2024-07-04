@@ -34,6 +34,7 @@ HRESULT CAbility::Initialize(void* pArg)
 		pAbilityItemDesc->fSpeedPerSec = 7.f;
 		pAbilityItemDesc->fRotationPerSec = XMConvertToRadians(90.0f);
 		m_fRotateDir = pAbilityItemDesc->fRotateDir;
+		m_fAngle = pAbilityItemDesc->fAngle;
 		m_vDir = pAbilityItemDesc->vDir;
 		m_vPosition = pAbilityItemDesc->vPosition;
 		m_eAbilityType = pAbilityItemDesc->eAbilityType;
@@ -50,6 +51,9 @@ HRESULT CAbility::Initialize(void* pArg)
 	m_eItemType = ITEM_FOOD;
 	if (ABILITY_DEFAULT == m_eAbilityType)
 	{
+		_matrix matRotate = XMMatrixRotationY(ToRadian(m_fAngle));
+		m_vDir = XMVector3TransformNormal(m_vDir, matRotate);
+
 		m_fJumpPower = 8.f;
 		m_fJumpPowerTemp = m_fJumpPower;
 		m_fPower = 2.f;
@@ -134,12 +138,12 @@ _int CAbility::Tick(_float fTimeDelta)
 			m_pTransformCom->Set_State(CTransform::STATE_UP, XMVector3Normalize(vUp) * vScaled.y);
 			m_pTransformCom->Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLook) * vScaled.z);
 
-			m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * m_fRotateDir, m_fTimeDelta * 3.f);
+			m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * m_fRotateDir, m_fTimeDelta * 3.5f);
 
 			if (0.f < m_fSpeed)
 			{
 				m_fSpeed -= m_fTimeDelta;
-				m_pControllerCom->Move_Dir(m_pTransformCom, m_vDir * m_fTimeDelta * m_fSpeed, m_fTimeDelta);
+				m_pControllerCom->Move_Dir(m_pTransformCom, XMVector3Normalize(m_vDir) * m_fTimeDelta * m_fSpeed, m_fTimeDelta);
 			}
 			else
 				m_fSpeed = 0.f;
@@ -205,7 +209,7 @@ _int CAbility::Tick(_float fTimeDelta)
 			if (4.f < m_fLifeTime)
 			{
 				m_fRenderTime += m_fTimeDelta;
-				if (0.1f > m_fRenderTime)
+				if (0.05f > m_fRenderTime)
 					m_bRender = true;
 				else
 				{

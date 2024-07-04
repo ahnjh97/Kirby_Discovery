@@ -121,15 +121,15 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			//{
 			//	++m_iCnt;
 				// Stab 패턴
-				//m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
-				//pFinalBoss->Set_Direction(m_vLook);
-				//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
+				m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
+				pFinalBoss->Set_Direction(m_vLook);
+				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
 			//}
 			//else if (m_iCnt == 4)
 			//{
 			//	++m_iCnt;
 			//	// Slash 패턴
-				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHREADY, 50.f, false, true);
+				//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHREADY, 50.f, false, true);
 			//}
 			//else if (m_iCnt == 6)
 			//{
@@ -168,7 +168,7 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			//	else if (rand() % 4 == 2)
 			//	{
 			//		// 화살 패턴
-			//		pFinalBoss->Change_State(CFinalBoss::FINALBOSS_RAYARROWREADYAIR, 50.f, false, true);
+					//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_RAYARROWREADYAIR, 50.f, false, true);
 			//	}
 			//	else
 			//	{
@@ -329,15 +329,26 @@ void CFinalBoss_Stab_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		{
 			if(pController->Is_Terrain())
 			{
+				_vector vLook = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+				vLook.m128_f32[1] = 0.f;
 				HRESULT hr = S_OK;
 
-				CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
-				AbilityItemDesc.fRotateDir = 1.f;
-				AbilityItemDesc.vDir = pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT);
-				AbilityItemDesc.vPosition = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-				AbilityItemDesc.eAbilityType = ABILITY_DEFAULT;
-				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
-				CHECK_FAILED(hr);
+				// 별 아이템 떨굼
+				_uint iItemCnt = { 6 };
+				for(_uint i = 0; i < iItemCnt; ++i)
+				{
+					CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
+					if(i < iItemCnt / 2)
+						AbilityItemDesc.fRotateDir = 1.f;																	// 별 회전 방향 오른쪽
+					else
+						AbilityItemDesc.fRotateDir = -1.f;																	// 별 회전 방향 왼쪽
+					AbilityItemDesc.fAngle = 360.f / (_float)iItemCnt * i;													// 별의 진행 방향의 각도
+					AbilityItemDesc.vDir = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);							// 별의 진행 방향
+					AbilityItemDesc.vPosition = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + vLook * 5.5f;	// 별의 생성 위치
+					AbilityItemDesc.eAbilityType = ABILITY_DEFAULT;
+					hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+					CHECK_FAILED(hr);
+				}
 
 				CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 				if (pCamera != nullptr)

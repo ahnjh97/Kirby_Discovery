@@ -14,6 +14,7 @@ class CAbility final : public CItemObject
 public:
 	struct ABILITYITEM_DESC : public CGameObject::GAMEOBJECT_DESC {
 		_float fRotateDir = { 0.f };
+		_float fAngle = { 0.f };
 		_vector	vDir = {};
 		_float4 vPosition = {};
 		ABILITYTYPE eAbilityType = {};
@@ -68,6 +69,8 @@ private:
 	_float					m_fJumpPowerTemp = { 0.f };
 	_float					m_fPower = { 0.f };
 	_float					m_fSpeed = { 0.f };
+	_float					m_fAngle = { 0.f };
+
 	_float					m_fRotateDir = { 0.f };
 	_float					m_fLifeTime = { 0.f };
 	_float					m_fRenderTime = { 0.f };
