@@ -266,6 +266,11 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 				Lock_All({ 16.4f, 25.7f, 35.75f }, { .16f, -.08f, -1.f });
 				Set_FOVY(38.f);
 			}
+
+			if (m_eSpecialSeq == SEQ_FINALESTART)
+			{
+				m_fCurShakeTime = m_fInitialShakeTime = 0.f;
+			}
 		}
 	}
 
@@ -281,6 +286,8 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 		m_fDestFovy = m_fFovy;
 		m_fDestZAngle = m_fCurZAngle;
 		m_fDestZoomOffset = m_fCurZoomOffset;
+
+		m_fDestDistance = m_fCurDistance = _float3::Distance(F4toF3(m_pFirstTarget->Get_State(CTransform::STATE_POSITION)), GET_POS);
 
 		return;
 	}
@@ -958,6 +965,151 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction.vDir = _float3{ -.15f, 0.f, 1.f };
 		m_CamSeq.push_back(newAction);
 
+	}
+	break;
+	case SEQ_FINALESTART:
+	{
+		//이벤트 호출
+		m_fSeqEventTime = 7.15f;
+
+		_float fCutStartTime = 0.f;
+
+		CAMACTION newAction = {};
+
+		newAction.fTime = 0.f;
+		newAction.eCamCut = CUT_HARD;
+		newAction.fFOVY = 45.f;
+		newAction.eCamPos = POS_ABSOLUTE;
+		newAction.vPos = _float3{ -22.37f, 6.9f, -10.5f };
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ .96f, -.11f, .26f };
+		m_CamSeq.push_back(newAction);
+
+		newAction = {};
+		newAction.fTime = 0.f;
+		newAction.eCamCut = CUT_INTERPOLATE;
+		newAction.eEase = EASE_INOUT;
+		newAction.fInterpolateSpeed = 1.5f;
+
+		newAction.eCamPos = POS_ABSOLUTE;
+		newAction.vPos = _float3{ -14.57f, 3.9f, -7.25f };
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ .95f, -.02f, .3f };
+		m_CamSeq.push_back(newAction);
+
+
+		newAction = {};
+		newAction.fTime = 1.5f;
+		newAction.eCamCut = CUT_INTERPOLATE;
+		newAction.eEase = EASE_INOUT;
+		newAction.fInterpolateSpeed = 2.f;
+
+		newAction.eCamPos = POS_ABSOLUTE;
+		newAction.vPos = _float3{-10.17f, 2.f, -5.87f };
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ .93f, .05f, .35f };
+		m_CamSeq.push_back(newAction);
+
+		//Cut 2
+		fCutStartTime = 5.1f;
+
+		newAction.fTime = fCutStartTime;
+		newAction.eCamCut = CUT_HARD;
+
+		newAction.eCamPos = POS_ABSOLUTE;
+		newAction.vPos = _float3{ 41.81f, .56f, -3.f};
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.96f, .13f, .23f };
+		m_CamSeq.push_back(newAction);
+
+
+		newAction = {};
+		newAction.fTime = fCutStartTime;
+		newAction.eCamCut = CUT_INTERPOLATE;
+		newAction.eEase = EASE_IN;
+		newAction.fInterpolateSpeed = 2.f;
+
+		newAction.eCamPos = POS_ABSOLUTE;
+		newAction.vPos = _float3{11.17f, .71f, -1.97f };
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.94f, .12f, .31f };
+		m_CamSeq.push_back(newAction);
+
+		//Cut 3
+		fCutStartTime = 7.15f;
+
+		newAction.fTime = fCutStartTime;
+		newAction.eCamCut = CUT_HARD;
+		newAction.fFOVY = 45.f;
+
+		newAction.eCamPos = POS_ABSOLUTE;
+		newAction.vPos = _float3{ 2.57f, 3.63f, -7.63f };
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.72f, -.14f, .68f };
+		m_CamSeq.push_back(newAction);
+
+
+		newAction = {};
+		newAction.fTime = fCutStartTime;
+		newAction.eCamCut = CUT_INTERPOLATE;
+		newAction.eEase = EASE_INOUT;
+		newAction.fInterpolateSpeed = 2.f;
+		newAction.fFOVY = 50.f;
+
+		newAction.eCamPos = POS_ABSOLUTE;
+		newAction.vPos = _float3{ 6.f, 2.9f, -3.24f };
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.93f, .13f, .35f };
+		m_CamSeq.push_back(newAction);
+
+
+		newAction = {};
+		newAction.fTime = fCutStartTime + 2.f;
+		newAction.eCamCut = CUT_INTERPOLATE;
+		newAction.eEase = EASE_OUT;
+		newAction.fInterpolateSpeed = .6f;
+
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{-.87f, .3f, .4f };
+		m_CamSeq.push_back(newAction);
+
+		//쾅
+		newAction = {};
+		newAction.fTime = fCutStartTime + 2.8f;
+		newAction.eCamCut = CUT_INTERPOLATE;
+		newAction.eEase = EASE_OUT;
+		newAction.fInterpolateSpeed = .6f;
+
+
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.87f, -.2f, .4f };
+		m_CamSeq.push_back(newAction);
+
+		//Cut 4
+
+		newAction = {};
+		newAction.fTime = fCutStartTime + 5.f;
+		newAction.eCamCut = CUT_HARD;
+		newAction.fFOVY = 55.f;
+
+		newAction.eCamPos = POS_ABSOLUTE;
+		newAction.vPos = _float3{ -9.69f, 9.11f, .12f };
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ .89f, -.45f, 0.f };
+
+		m_CamSeq.push_back(newAction);
+
+		newAction = {};
+		newAction.fTime = fCutStartTime + 6.f;
+		newAction.eCamCut = CUT_HARD;
+		newAction.fFOVY = 62.f;
+
+		newAction.eCamPos = POS_ABSOLUTE;
+		newAction.vPos = _float3{ -9.69f, 9.11f, .12f };
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ .89f, -.45f, 0.f };
+
+		m_CamSeq.push_back(newAction);
 	}
 	break;
 	default:

@@ -163,7 +163,7 @@ HRESULT CLevel_Finale::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
 	CSkySphere::SKYSPHERE_DESC LabSkyDesc{};
 	LabSkyDesc.strModelTag = { "SkySphere_Stage1_Day" };
-	LabSkyDesc.strTextureTag = { "SkySphere_Lab_Diffuse" };
+	LabSkyDesc.strTextureTag = { "SkySphere_LabBoss_2Pase_Normal" };
 	HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_SkySphere"), &LabSkyDesc);
 	CHECK_FAILED(hr);
 
@@ -618,8 +618,8 @@ HRESULT CLevel_Finale::Ready_Objects()
 	roadDesc.wstrModelName = TEXT("MovableBuildingA");
 
 	_float4x4 InitMat = _float4x4::Identity;
-	InitMat.Translation({ 110.f, -100.f, 0.f });
-	CUtils::Turn_OtherMatrix(InitMat, _float3::Up, 1.f, 90.f);
+	InitMat.Translation({ 110.f, -50.f, 0.f });
+	CUtils::Turn_OtherMatrix(InitMat, _float3::Up, 1.f, 80.f);
 	roadDesc.matWorld = InitMat;
 
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
