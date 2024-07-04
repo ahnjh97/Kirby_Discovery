@@ -1065,7 +1065,7 @@ HRESULT CLoader::Loading_For_Finale()
 	//HUD_BOSSHPBAR
 	hr = Add_Texture(eLevel, "HUD_BossBar", "UI/HUD/Boss/BossBar_%d.png", 5);
 
-#pragma region SKYSPHERE::LEVEL_FINALBOSS
+#pragma region SKYSPHERE::LEVEL_FINALE
 
 	//FIELD
 	hr = Add_Texture(eLevel, "SkySphere_Lab_CloudNoize", "SkySphere/SkySphere_Lab_CloudNoizeC_MRA.dds"); CHECK_FAILED(hr);
@@ -1611,7 +1611,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("BladeKnight", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("BladeKnightSword", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("Kabu", TYPE_ANIM, 2.f, 180.f);
-		m_vecModelInfo.emplace_back("BrontoBurt", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("BrontoBurt", TYPE_ANIM, 1.3f, 180.f);
 		m_vecModelInfo.emplace_back("PoppyBrosJr", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_ANIM, 1.3f, 180.f);
 		m_vecModelInfo.emplace_back("CappyBody", TYPE_ANIM, 1.f, 180.f);
@@ -1796,19 +1796,20 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("LbBuildingFrame", TYPE_NONANIM, 1.f, 0.f);
 		m_vecModelInfo.emplace_back("LbFarPiller", TYPE_NONANIM, 1.f, 76.117f);
 		
-		//보스전 진입 전 필드
-		m_vecModelInfo.emplace_back("Land_LbLastBossBeforeStep", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("Land_LbLastBossBeforeStep_Blend", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("LevelFinale_LbLastBuilding", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		//보스전 필드
+		m_vecModelInfo.emplace_back("Land_LbLastBossStage", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("FinaleCave", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-
-		//기믹 오브젝트
-		m_vecModelInfo.emplace_back("LbAntenna_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("LbBossRoomDoor_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 		//피날레 오브젝트들
 		m_vecModelInfo.emplace_back("PopStar", TYPE_ANIM, 1.f, 0.f, 0);
 
+		//보스전 진입 전 필드
+		//m_vecModelInfo.emplace_back("Land_LbLastBossBeforeStep", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		//m_vecModelInfo.emplace_back("Land_LbLastBossBeforeStep_Blend", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+
+		//기믹 오브젝트
+		//m_vecModelInfo.emplace_back("LbAntenna_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		//m_vecModelInfo.emplace_back("LbBossRoomDoor_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 		m_vecModelInfo.emplace_back("Baum", TYPE_NONANIM, 1.f, 0.f, 0);
 		m_vecModelInfo.emplace_back("BaumPieceA", TYPE_NONANIM, 1.f, 0.f, 0);

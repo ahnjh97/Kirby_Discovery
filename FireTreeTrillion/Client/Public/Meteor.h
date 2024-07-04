@@ -57,6 +57,7 @@ private:
 	_float	m_fMeteorSpeed = { 0.f };
 
 	_bool	m_bBig = { false };
+	_bool	m_bShake = { false };
 
 	_vector	m_vPosition = {};
 	_vector	m_vAxis = {};

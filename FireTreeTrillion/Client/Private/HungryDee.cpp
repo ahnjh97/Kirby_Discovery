@@ -188,7 +188,6 @@ void CHungryDee::Swap_WatingPosition()
 	//바뀐 자리가 앞자리라면, 나를 등록
 	if (m_iMyIdx == FRONT_WAITPOS)
 	{
-		Set_MaskValueUI(0.f);
 		m_pDialogUI->Set_IsRender(false);
 
 		CPartTimeHelper::Get_Instance()->Register_FirstDee(this);
@@ -326,11 +325,6 @@ void CHungryDee::OnNotify()
 
 	// 특정 시간일때 와들디 처리 >> 점심시간에 화내기 시작하는걸 여기서 처리해주면 될것같유
 	// 효선아 여기야
-}
-
-void CHungryDee::Set_MaskValueUI(_float _fMaskValue)
-{
-	m_pDialogUI->Set_Mask(_fMaskValue);
 }
 
 //맨 앞자리 디

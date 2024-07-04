@@ -71,7 +71,10 @@ public:
 	PxVec3			Compute_Slope(CTransform* pTransform);												// 경사면의 노말벡터 계산
 	PxVec3			Compute_PureSlope();																// 경사면의 노말벡터 계산
 	_float			Compute_Height(_fvector vAxis = XMVectorSet(0.f, 0.f, 0.f, 0.f));					// 경사면의 높이 계산
+
 	_float			Compute_Wall(_fvector vLook, _float fOffSet = 1.f);									// StaticActor에 Raycast
+	_float			Compute_Wall(_fvector vLook, _float3 vOffset);									// StaticActor에 Raycast
+
 	_float			RayCastToDynamicActor(_fvector vLook, _float3 vOffset = _float3());
 	PxVec3			Compute_TerrainPosition();
 	_vector			Compute_TerrainPosition_Vector();

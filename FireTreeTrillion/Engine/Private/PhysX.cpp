@@ -102,39 +102,11 @@ void CPhysX::CheckPvdConnection(PxPvd* pvd)
     }
 }
 
-
 /// physX에 영향을 받는 테스트용 Ground를 만들어줍니다.
 void CPhysX::Ready_TestGround()
 {
     PxRigidStatic* groundPlane = PxCreatePlane(*m_pPhysics, PxPlane(0, 1, 0, 0), *m_pMaterial);
     m_pScene->addActor(*groundPlane);
-}
-
-void CPhysX::Test()
-{
-//    // create simulation
-//    m_pMaterial = m_pPhysics->createMaterial(0.5f, 0.5f, 0.6f);
-//    PxRigidStatic* groundPlane = PxCreatePlane(*m_pPhysics, PxPlane(0, 1, 0, 0), *m_pMaterial);
-//    m_pScene->addActor(*groundPlane);
-//
-//    float halfExtent = .5f;
-//    m_pShape = m_pPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *m_pMaterial);
-//    PxU32 size = 30;
-//    PxTransform t(PxVec3(0));
-//
-//    PxTransform localTm(PxVec3(0, 0, 0) * halfExtent);
-//    m_pRigidDynamic = m_pPhysics->createRigidDynamic(t.transform(localTm));
-//    m_pRigidDynamic->attachShape(*m_pShape);
-//    PxRigidBodyExt::updateMassAndInertia(*m_pRigidDynamic, 10.0f);
-//    m_pScene->addActor(*m_pRigidDynamic);
-}
-
-_float4x4 CPhysX::Update(_fmatrix matrix)
-{
-    //PxTransform trans = m_pRigidDynamic->getGlobalPose();
-    //_float4x4 matPos = CUtils::To_Float4x4(trans);
-    //return matPos;
-    return _float4x4();
 }
 
 void CPhysX::AddActor(physx::PxActor& pActor)
@@ -290,27 +262,6 @@ PxRigidDynamic* CPhysX::CreateDynamicActor(_float4x4& matWorld, _float3* pVertic
     pShape->release(); 
     m_pRigidDynamic = pDynamicActor;
     return pDynamicActor;
-}
-
-void CPhysX::Add_Force(_float3 vForce)
-{
-    if (m_pRigidDynamic == nullptr) return;
-
-    PxVec3 PxForce = physx::PxVec3(vForce.x, vForce.y, vForce.z);
-    m_pRigidDynamic->addForce(PxForce, physx::PxForceMode::eFORCE);
-}
-
-void CPhysX::Add_Force(PxRigidDynamic* pDynamicActor, _float3 vForce)
-{
-    PxVec3 PxForce = physx::PxVec3(vForce.x, vForce.y, vForce.z);
-    pDynamicActor->addForce(PxForce, physx::PxForceMode::eFORCE);
-}
-
-void CPhysX::Kick_DynamicActor(_float3 _kickDirection, _float impulseMagnitude)
-{
-    PxVec3 kickDirection(_kickDirection.x, _kickDirection.y, _kickDirection.z);
-    PxVec3 impulse = kickDirection * impulseMagnitude;
-    m_pRigidDynamic->addForce(impulse, PxForceMode::eIMPULSE);
 }
 
 PxRigidStatic* CPhysX::CreateStaticActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)

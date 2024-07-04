@@ -47,7 +47,7 @@ _int CWasteCan::Tick(_float fTimeDelta)
 	if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD6, KEY_DOWN))
 	{
 		_float3 force = _float3{ 0.5f, 3.f , 0.5f };
-		m_pGameInstance->Kick_DynamicActor(force, 500.f);
+		//m_pGameInstance->Kick_DynamicActor(force, 500.f);
 	}
 
 	return OBJ_NOEVENT;
@@ -60,7 +60,7 @@ void CWasteCan::Late_Tick(_float fTimeDelta)
 	if (m_bActivatePhysX)
 	{
 		m_pModelCom->Update_ActorTransform(m_pTransformCom);
-		m_pGameInstance->Add_Force(_float3(0.f, -0.5f, 0.f));
+		//m_pGameInstance->Add_Force(_float3(0.f, -0.5f, 0.f));
 
 		m_fLifeTime += m_fTimeDelta;
 		if (m_fLifeTime >= 1.f)

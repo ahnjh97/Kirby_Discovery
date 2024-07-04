@@ -118,26 +118,26 @@ void CGm_LabAntenna::Render_IMGUI()
 
 void CGm_LabAntenna::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
-	/*
+	
 	if (true == m_bStartAnimation)
 		return;
 
-	CKirby* pKirby = static_cast<CKirby*>(pObject);
-	if (pKirby->Get_KirbyInfo()->m_bBooster == false)
-		return;
+	//CKirby* pKirby = static_cast<CKirby*>(pObject);
+	//if (pKirby->Get_KirbyInfo()->m_bBooster == false)
+	//	return;
 
-	pKirby->Set_HitStop();
-	m_pModelCom->Set_Animation(0, 60.f, false, false);
-	m_bStartAnimation = true;
-	SwitchAfterBefore();
+	//pKirby->Set_HitStop();
+	//m_pModelCom->Set_Animation(0, 60.f, false, false);
+	//m_bStartAnimation = true;
+	//SwitchAfterBefore();
 
-	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-	_float4 vPlayerPos = pObject->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
-	_float4 vDir = vPos - vPlayerPos;
-	vDir.Normalize();
-	m_vDamegeDir = (_float3)vDir;
-	m_fHitPower = pKirby->Get_KirbyInfo()->m_fMoveSpeed;
-	*/
+	//_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	//_float4 vPlayerPos = pObject->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
+	//_float4 vDir = vPos - vPlayerPos;
+	//vDir.Normalize();
+	//m_vDamegeDir = (_float3)vDir;
+	//m_fHitPower = pKirby->Get_KirbyInfo()->m_fMoveSpeed;
+	
 }
 
 HRESULT CGm_LabAntenna::Add_Components()
@@ -158,7 +158,7 @@ HRESULT CGm_LabAntenna::Add_Components()
 	CHitBox::HITBOX_DESC HitBox{};
 	HitBox.pOwner = this;
 	HitBox.pDesc = &m_tColliderDesc[BODY];
-	HitBox.pCollisionType = ANIMDECO;
+	HitBox.pCollisionType = OBJECT;
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
 

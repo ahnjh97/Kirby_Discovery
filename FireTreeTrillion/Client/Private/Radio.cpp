@@ -45,7 +45,7 @@ HRESULT CRadio::Initialize(void* pArg)
 	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	m_fSaveY = vPos.y;
 
-	m_pTransformCom->Turn(_float4(0.f, 1.f, 0.f, 0.f), 1.f, 45.f);
+	m_pTransformCom->Turn(_float4(0.f, 1.f, 0.f, 0.f), 1.f, 71.f);
 
 	return S_OK;
 }

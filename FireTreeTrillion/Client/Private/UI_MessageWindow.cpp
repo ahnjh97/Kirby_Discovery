@@ -88,6 +88,8 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 		m_UIObjDesc.fAlpha = 0.f;
 		return OBJ_NOEVENT;
 	}
+
+	return OBJ_NOEVENT;
 }
 
 void CUI_MessageWindow::Late_Tick(_float fTimeDelta)

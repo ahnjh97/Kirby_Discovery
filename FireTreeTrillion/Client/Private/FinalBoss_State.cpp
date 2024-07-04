@@ -7,6 +7,7 @@
 #include "Meteor.h"
 #include "BossClone.h"
 #include "Ability.h"
+#include "Camera_Main.h"
 //#include "SpikeSpear.h"
 
 #pragma region APPEAR STATE
@@ -29,7 +30,13 @@ void CFinalBoss_Appear_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 
 	if(pFinalBoss->IsAnimFinished())
+	{
+		HRESULT hr;
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_BossUI"), TEXT("Prototype_GameObject_HUD_BossHpBar"), pFinalBoss);
+		CHECK_FAILED(hr);
+
 		pFinalBoss->Change_State(CFinalBoss::FINALBOSS_WAITAIR, 50.f, false, true);
+	}
 }
 
 void CFinalBoss_Appear_State::OnStateExit()
@@ -161,7 +168,7 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			//	else if (rand() % 4 == 2)
 			//	{
 			//		// 화살 패턴
-			//		pFinalBoss->Change_State(CFinalBoss::FINALBOSS_RAYARROWREADYAIR, 50.f, false, true);
+					//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_RAYARROWREADYAIR, 50.f, false, true);
 			//	}
 			//	else
 			//	{
@@ -322,17 +329,32 @@ void CFinalBoss_Stab_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		{
 			if(pController->Is_Terrain())
 			{
+				_vector vLook = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+				vLook.m128_f32[1] = 0.f;
 				HRESULT hr = S_OK;
 
-				CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
-				AbilityItemDesc.fRotateDir = 1.f;
-				AbilityItemDesc.vDir = pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT);
-				AbilityItemDesc.vPosition = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-				AbilityItemDesc.eAbilityType = ABILITY_DEFAULT;
-				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
-				CHECK_FAILED(hr);
+				// 별 아이템 떨굼
+				_uint iItemCnt = { 6 };
+				for(_uint i = 0; i < iItemCnt; ++i)
+				{
+					CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
+					if(i < iItemCnt / 2)
+						AbilityItemDesc.fRotateDir = 1.f;																	// 별 회전 방향 오른쪽
+					else
+						AbilityItemDesc.fRotateDir = -1.f;																	// 별 회전 방향 왼쪽
+					AbilityItemDesc.fAngle = 360.f / (_float)iItemCnt * i;													// 별의 진행 방향의 각도
+					AbilityItemDesc.vDir = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);							// 별의 진행 방향
+					AbilityItemDesc.vPosition = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + vLook * 5.5f;	// 별의 생성 위치
+					AbilityItemDesc.eAbilityType = ABILITY_DEFAULT;
+					hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+					CHECK_FAILED(hr);
+				}
 
-				pFinalBoss->Activate_FrustumCollider(0.5f, 10.f, 180.f);
+				CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+				if (pCamera != nullptr)
+					pCamera->Make_Shake(0.5f, 1.f);
+
+				pFinalBoss->Activate_FrustumCollider(0.5f, 8.f, 120.f);
 				pFinalBoss->Set_BossState(CFinalBoss::STATE_GROUND);
 				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STAB, 50.f, false, true);
 			}
@@ -532,6 +554,7 @@ void CFinalBoss_Slash_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _f
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 
 	m_fTimeDelta = 0.f;
+	m_fSpeed = 70.f;
 	m_bChain = false;
 }
 
@@ -595,12 +618,18 @@ void CFinalBoss_Slash_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 	}
 	else if (CFinalBoss::FINALBOSS_SLASH == pFinalBoss->Get_State())
 	{
-		pController->Move_Dir(pTransformCom, XMVector3Normalize(pFinalBoss->Get_Direction()) * fTimeDelta * 70.f, fTimeDelta);
+		pController->Move_Dir(pTransformCom, XMVector3Normalize(pFinalBoss->Get_Direction()) * fTimeDelta * m_fSpeed, fTimeDelta);
 
 		if (5.f > pController->Compute_Height(XMVectorSet(0.f, -1.f, 0.f, 0.f)))
+		{
 			pFinalBoss->Set_Gully(true);
+			//m_fSpeed = 10.f;
+		}
 		else
+		{
 			pFinalBoss->Set_Gully(false);
+			//m_fSpeed = 70.f;
+		}
 
 		m_fTimeDelta += fTimeDelta;
 		if (4.f < m_fTimeDelta)
@@ -1346,11 +1375,25 @@ CFinalBoss_Roar_State::CFinalBoss_Roar_State()
 void CFinalBoss_Roar_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
+
+	m_bShake = false;
 }
 
 void CFinalBoss_Roar_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
 	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(pGameObject);
+
+	if(0.35f < pFinalBoss->Get_AnimRatio())
+	{
+		if(false == m_bShake)
+		{
+			m_bShake = true;
+
+			CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+			if (pCamera != nullptr)
+				pCamera->Make_Shake(0.5f, 3.5f);
+		}
+	}
 
 	if (true == pFinalBoss->IsAnimFinished())
 	{
