@@ -103,10 +103,10 @@ HRESULT CBasicMap::Initialize(void* pArg)
             ReadDecos_ForSmallLevels();
         }
     }
- 
-    if (FAILED(m_pModelCom->CreateStaticActor(GameObjectDesc.matWorld)))
-        return E_FAIL;
 
+    if(LEVEL_TOOL_MAP != *m_pCurrentLevelID)
+        m_pStaticActor = m_pModelCom->ReturnStaticActor(GameObjectDesc.matWorld);
+ 
     return S_OK;
 }
 
@@ -491,7 +491,7 @@ void CBasicMap::InsertMapDecos()
 PxRigidStatic* CBasicMap::AddTriggerActorForAnimDeco(const string& _strModelName, _float4x4& _matWorld)
 {
     auto pPhysics = m_pGameInstance->Get_Physics();
-    PxMaterial* pMtrl = m_pGameInstance->Get_Physics()->createMaterial(0.5f, 0.5f, 0.6f);
+    PxMaterial* pMtrl = m_pGameInstance->Get_Material();
 
     auto iter = m_ModelShapeRadiiMap.find(_strModelName);
     if (iter == m_ModelShapeRadiiMap.end()) {
@@ -519,7 +519,8 @@ PxRigidStatic* CBasicMap::AddTriggerActorForAnimDeco(const string& _strModelName
     }
     m_pGameInstance->AddActor(*pStaticActor);
     m_vecAnimDecoTriggersActors.emplace_back(pStaticActor);
-    m_vecShapes.emplace_back(pShape);
+    pShape->release();
+    //m_vecShapes.emplace_back(pShape);
     return pStaticActor;
 }
 
@@ -619,6 +620,15 @@ void CBasicMap::ReadDecos_ForSmallLevels()
             pModel->RemoveBlendMeshes(mapIter->second);
         }
 
+        if (true == IsShadowDeco(strModelName))
+        {
+            CShadowDeco::SHADOWDECO_DESC tShadowDecoDesc{};
+            tShadowDecoDesc.pDecoModel = pModel;
+            CShadowDeco* pShadowDeco = dynamic_cast<CShadowDeco*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_ShadowDeco"), &tShadowDecoDesc));
+            m_vecShadowObjects.push_back(pShadowDeco);
+            iShaderVars |= 4;
+        }
+
         pModel->SetUpStencilRimLightMotionBlurPassIndex(iShaderVars, fRimWidth, iPassIndex);
 
         if (CMapToolObject::MAPOBJ_NONCOL == iMapObjType)
@@ -646,7 +656,7 @@ void CBasicMap::ReadDecos_ForSmallLevels()
         }
         else if (CMapToolObject::MAPOBJ_ACTOR == iMapObjType)
         {
-            pModel->CreateStaticActor(matWorld);
+            m_vecDecoStaticActors.push_back(pModel->ReturnStaticActor(matWorld));
             m_vecNonAnimDecos.push_back(pModel);
         }
     }
@@ -931,27 +941,17 @@ void CBasicMap::Free()
     __super::Free();
 
     Release_MapDecos();
-
-    for (_uint iActorIdx = 0; iActorIdx < m_vecAnimDecoTriggersActors.size(); iActorIdx++)
-    {
-        PxRigidStatic* pActor = m_vecAnimDecoTriggersActors[iActorIdx];
-        if (nullptr != pActor)
-        {
-            auto pScene = pActor->getScene();
-            pScene->removeActor(*pActor);
-
-            PxShape* pShape = m_vecShapes[iActorIdx];
-            pActor->detachShape(*pShape);
-            pShape->release();
-            pShape = nullptr;
-
-            pActor->release();
-            pActor = nullptr;
-        }
-    }
+    
+    for (auto& trigger : m_vecAnimDecoTriggersActors)
+        m_pGameInstance->ReleaseActor(trigger);
     m_vecAnimDecoTriggersActors.clear();
-    m_vecShapes.clear();
-        
+
+    for (auto& staticActor : m_vecDecoStaticActors)
+        m_pGameInstance->ReleaseActor(staticActor);
+    m_vecDecoStaticActors.clear();
+
+    m_pGameInstance->ReleaseActor(m_pStaticActor);
+
     Safe_Release(m_pOcTree);
     Safe_Release(m_pBlendMap);
 

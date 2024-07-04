@@ -115,6 +115,8 @@ _int CUI_BtnIcon::Tick(_float fTimeDelta)
 		m_fBtnAlpha = 0.f;
 		return OBJ_NOEVENT;
 	}
+
+	return OBJ_NOEVENT;
 }
 
 void CUI_BtnIcon::Late_Tick(_float fTimeDelta)
