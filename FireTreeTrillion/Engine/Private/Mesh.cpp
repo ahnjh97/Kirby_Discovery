@@ -295,14 +295,34 @@ void CMesh::ReAddActor(PxScene* pScene)
 
 HRESULT CMesh::CreateStaticActor(_float4x4& matWorld)
 {
-	//if (nullptr != m_pActor)
-	//	m_pActor->release();
+	/*if (nullptr != m_pActor)
+		m_pActor->release();*/
 
 	m_pActor = m_pGameInstance->CreateStaticActor(matWorld, m_pVerticesPos, m_iNumVertices, m_pIndices, m_iNumIndices);
 	if (m_pActor == nullptr)
 		return E_FAIL;
 
 	return S_OK;
+}
+
+PxRigidActor* CMesh::ReturnStaticActor(_float4x4& matWorld)
+{
+	return m_pGameInstance->CreateStaticActor(matWorld, m_pVerticesPos, m_iNumVertices, m_pIndices, m_iNumIndices);
+}
+
+PxRigidDynamic* CMesh::ReturnDynamicActor(_float4x4& matWorld)
+{
+	return m_pGameInstance->CreateDynamicActor(matWorld, m_pVerticesPos, m_iNumVertices, m_pIndices, m_iNumIndices);
+}
+
+PxTriangleMesh* CMesh::CreateTriangleMesh()
+{
+	return m_pGameInstance->CreateTriangleMesh(m_pVerticesPos, m_iNumVertices, m_pIndices, m_iNumIndices);
+}
+
+PxConvexMesh* CMesh::CreateConvexMesh()
+{
+	return m_pGameInstance->CreateConvexMesh(m_pVerticesPos, m_iNumVertices);
 }
 
 _float4 CMesh::Get_PickPos(const CTransform* pTransform) const
@@ -553,7 +573,7 @@ void CMesh::Free()
 	}
 
 	if (nullptr != m_pActor) {
-		PxScene* scene = m_pActor->getScene();
+		PxScene* scene = m_pGameInstance->Get_Scene();
 		if (nullptr != scene) {
 			scene->removeActor(*m_pActor);
 			m_pActor->release();

@@ -108,5 +108,6 @@ CLevel_Tool_UI* CLevel_Tool_UI::Create(ID3D11Device* pDevice, ID3D11DeviceContex
 
 void CLevel_Tool_UI::Free()
 {
+	m_pGameInstance->Clear_EventCallBack();
 	__super::Free();
 }

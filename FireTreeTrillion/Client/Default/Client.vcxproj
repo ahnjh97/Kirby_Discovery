@@ -211,6 +211,7 @@
     <ClInclude Include="..\Public\Coin.h" />
     <ClInclude Include="..\Public\CollisionCenter.h" />
     <ClInclude Include="..\public\DecoObject.h" />
+    <ClInclude Include="..\Public\ShadowDeco.h" />
     <ClInclude Include="..\Public\DeeDeeDee.h" />
     <ClInclude Include="..\Public\DeeDeeDeeHammer.h" />
     <ClInclude Include="..\Public\DeeDeeDee_State.h" />
@@ -259,6 +260,7 @@
     <ClInclude Include="..\Public\Laser.h" />
     <ClInclude Include="..\Public\Level_DeeDeeDee.h" />
     <ClInclude Include="..\Public\Level_FinalBoss.h" />
+    <ClInclude Include="..\Public\Level_GamePlay.h" />
     <ClInclude Include="..\Public\Level_Finale.h" />
     <ClInclude Include="..\Public\Level_Intro.h" />
     <ClInclude Include="..\Public\LevelChanger.h" />
@@ -276,7 +278,6 @@
     <ClInclude Include="..\Public\Kirby_Enums.h" />
     <ClInclude Include="..\Public\Kirby_State_Function.h" />
     <ClInclude Include="..\Public\LayerUI.h" />
-    <ClInclude Include="..\Public\Level_GamePlay.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
     <ClInclude Include="..\Public\Level_Logo.h" />
     <ClInclude Include="..\Public\Level_PartTime.h" />
@@ -347,6 +348,7 @@
     <ClInclude Include="..\Public\UI_PartTimeResult.h" />
     <ClInclude Include="..\public\WaddleDee.h" />
     <ClInclude Include="..\Public\WasteCan.h" />
+    <ClInclude Include="Box.h" />
     <ClInclude Include="CKirbyDump_State.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="Resource.h" />
@@ -376,6 +378,7 @@
     <ClCompile Include="..\Private\BombOrbit.cpp" />
     <ClCompile Include="..\Private\BombOrbitGlow.cpp" />
     <ClCompile Include="..\Private\BossClone.cpp" />
+    <ClCompile Include="..\Private\Box.cpp" />
     <ClCompile Include="..\Private\BreakableRock.cpp" />
     <ClCompile Include="..\Private\BreakableRockParticle.cpp" />
     <ClCompile Include="..\Private\BrontoBurt.cpp" />
@@ -395,6 +398,7 @@
     <ClCompile Include="..\Private\Coin.cpp" />
     <ClCompile Include="..\Private\CollisionCenter.cpp" />
     <ClCompile Include="..\private\DecoObject.cpp" />
+    <ClCompile Include="..\Private\ShadowDeco.cpp" />
     <ClCompile Include="..\Private\DeeDeeDee.cpp" />
     <ClCompile Include="..\Private\DeeDeeDeeHammer.cpp" />
     <ClCompile Include="..\Private\DeeDeeDee_State.cpp" />
@@ -442,6 +446,7 @@
     <ClCompile Include="..\Private\Laser.cpp" />
     <ClCompile Include="..\Private\Level_DeeDeeDee.cpp" />
     <ClCompile Include="..\Private\Level_FinalBoss.cpp" />
+    <ClCompile Include="..\Private\Level_GamePlay.cpp" />
     <ClCompile Include="..\Private\Level_Finale.cpp" />
     <ClCompile Include="..\Private\Level_Intro.cpp" />
     <ClCompile Include="..\Private\LevelChanger.cpp" />
@@ -457,7 +462,6 @@
     <ClCompile Include="..\Private\KirbyDefault_State.cpp" />
     <ClCompile Include="..\Private\KirbyVacuum_State.cpp" />
     <ClCompile Include="..\Private\LayerUI.cpp" />
-    <ClCompile Include="..\Private\Level_GamePlay.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
     <ClCompile Include="..\Private\Level_Logo.cpp" />
     <ClCompile Include="..\Private\Level_PartTime.cpp" />

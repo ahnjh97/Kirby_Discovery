@@ -256,9 +256,6 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\BossMonster\FinalBoss">
       <UniqueIdentifier>{fd728b3f-fd47-41c8-9494-e1b5e0112910}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Levels\GamePlay">
-      <UniqueIdentifier>{dd50ce2d-1d5c-4b85-b72c-8e83d466312d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\BossMonster\State">
       <UniqueIdentifier>{b88a2aa6-514a-4a22-bd29-90fec4ffcb2e}</UniqueIdentifier>
     </Filter>
@@ -270,9 +267,6 @@
     </Filter>
     <Filter Include="01.Levels\GamePlay">
       <UniqueIdentifier>{4547c314-4c9e-474f-bf8e-dd8eb6143161}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Levels\Town">
-      <UniqueIdentifier>{235eccae-385e-4844-8a46-caf8091cd645}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword\State">
       <UniqueIdentifier>{c3509440-bbe1-439c-b743-a205693e77b6}</UniqueIdentifier>
@@ -469,6 +463,9 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\BossMonster\Gully">
       <UniqueIdentifier>{3e784411-9f95-46ab-b0a1-aa64e4492765}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\Box">
+      <UniqueIdentifier>{6fd437c6-b749-4061-b0ec-e63bd2ffb9ce}</UniqueIdentifier>
+    </Filter>
     <Filter Include="02.GameObjects\UI\MessageWindow">
       <UniqueIdentifier>{bcd8d01b-4475-4a52-aafd-de2aee6510c4}</UniqueIdentifier>
     </Filter>
@@ -501,6 +498,9 @@
     </Filter>
     <Filter Include="02.GameObjects\Map\FinaleRoad">
       <UniqueIdentifier>{4b701e1c-0a8a-4c87-9d85-34140b695c97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Deco\ShadowDeco">
+      <UniqueIdentifier>{af0b42ac-2606-411c-a9ea-4ca6880cde91}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -801,9 +801,6 @@
     <ClInclude Include="..\Public\FinalBoss.h">
       <Filter>02.GameObjects\PhysXObject\Character\BossMonster\FinalBoss</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Level_GamePlay.h">
-      <Filter>01.Levels\GamePlay</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\FinalBoss_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\BossMonster\State</Filter>
     </ClInclude>
@@ -982,6 +979,12 @@
     <ClInclude Include="..\Public\Gully.h">
       <Filter>02.GameObjects\PhysXObject\Character\BossMonster\Gully</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Level_GamePlay.h">
+      <Filter>01.Levels\99. GamePlay</Filter>
+    </ClInclude>
+    <ClInclude Include="Box.h">
+      <Filter>02.GameObjects\Map\Box</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\UI_MessageWindow.h">
       <Filter>02.GameObjects\UI\MessageWindow</Filter>
     </ClInclude>
@@ -1005,6 +1008,9 @@
     </ClInclude>
     <ClInclude Include="..\public\FinaleRoad.h">
       <Filter>02.GameObjects\Map\FinaleRoad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ShadowDeco.h">
+      <Filter>02.GameObjects\Map\Deco\ShadowDeco</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1287,9 +1293,6 @@
     <ClCompile Include="..\Private\FinalBoss.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\BossMonster\FinalBoss</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Level_GamePlay.cpp">
-      <Filter>01.Levels\GamePlay</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\FinalBoss_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\BossMonster\State</Filter>
     </ClCompile>
@@ -1467,6 +1470,12 @@
     <ClCompile Include="..\Private\Gully.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\BossMonster\Gully</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Level_GamePlay.cpp">
+      <Filter>01.Levels\99. GamePlay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Box.cpp">
+      <Filter>02.GameObjects\Map\Box</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\UI_MessageWindow.cpp">
       <Filter>02.GameObjects\UI\MessageWindow</Filter>
     </ClCompile>
@@ -1490,6 +1499,9 @@
     </ClCompile>
     <ClCompile Include="..\private\FinaleRoad.cpp">
       <Filter>02.GameObjects\Map\FinaleRoad</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ShadowDeco.cpp">
+      <Filter>02.GameObjects\Map\Deco\ShadowDeco</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

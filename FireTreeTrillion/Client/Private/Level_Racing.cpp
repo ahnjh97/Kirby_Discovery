@@ -720,7 +720,13 @@ HRESULT CLevel_Racing::Ready_Objects(_float fXOffset, _float fZOffset)
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, g_strLayerMapObject, TEXT("Prototype_GameObject_StarBlock"), &tDesc)))
 				continue;
 		}
-
+		else if ("BoxWood" == strModelName || "BoxPlastic" == strModelName)
+		{
+			strModelName += "_Anim";
+			tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Box"), TEXT("Prototype_GameObject_Box"), &tDesc)))
+				continue;
+		}
 	}
 	fileInput.close();
 

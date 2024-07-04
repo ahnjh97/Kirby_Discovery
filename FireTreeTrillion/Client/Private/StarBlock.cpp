@@ -44,15 +44,13 @@ HRESULT CStarBlock::Initialize(void* pArg)
 
 	CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
 
-	if (FAILED(m_pModelCom->CreateStaticActor(m_pTransformCom->Get_WorldFloat4x4())))
-		return E_FAIL;
+	m_vecStaticActors = m_pModelCom->ReturnStaticActors(m_pTransformCom->Get_WorldFloat4x4());
 
-	/*vector<PxRigidActor*> vecActors = m_pModelCom->Get_Actors();
 	if (pKirby != nullptr)
 	{
-		for (auto& actor : vecActors)
+		for (auto& actor : m_vecStaticActors)
 			pKirby->RegisterActorsToPlayer_ForStarBox(actor, this);
-	}*/
+	}
 
 	return S_OK;
 }
@@ -61,7 +59,9 @@ _int CStarBlock::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
 	{
-		m_pModelCom->DisableActors();
+		for (auto& actor : m_vecStaticActors)
+			m_pGameInstance->DisableActor(actor);
+
 		return Make_Partical();
 	}
 
@@ -72,7 +72,9 @@ _int CStarBlock::Tick(_float fTimeDelta)
 
 	if (m_ePhyXState == PO_VACUUMING && m_bStaticOffTrigger == true)
 	{
-		m_pModelCom->DisableActors();
+		for (auto& actor : m_vecStaticActors)
+			m_pGameInstance->DisableActor(actor);
+
 		m_bStaticOffTrigger = false;
 	}
 
@@ -199,12 +201,14 @@ void CStarBlock::Break_From_Car()
 	if (pKirby != nullptr)
 		pKirby->Set_HitStop();
 	m_pGameInstance->Setting_RadialBlur(10.f, 10.f);
-	m_pModelCom->DisableActors();
+
+	for (auto& actor : m_vecStaticActors)
+		m_pGameInstance->DisableActor(actor);
 
 	m_bDead = true;
 }
 
-HRESULT CStarBlock::Add_Components(wstring wstrModelProtoTag)
+HRESULT CStarBlock::Add_Components(wstring& wstrModelName)
 {
 	HRESULT hr;
 	/* For.Com_Shader */
@@ -220,22 +224,22 @@ HRESULT CStarBlock::Add_Components(wstring wstrModelProtoTag)
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
 
-	wstring wstrModeltag = TEXT("Prototype_Component_Model_") + wstrModelProtoTag;
+	wstring wstrModeltag = TEXT("Prototype_Component_Model_") + wstrModelName;
 	hr = __super::Add_Component(wstrModeltag,
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
-	if (wstrModelProtoTag == TEXT("StarBlockS"))
+	if (wstrModelName == TEXT("StarBlockS"))
 	{
 		Set_BodyCollider(COLLIDER_SPHERE, 0.5f, 0.f, 1.f);
 		m_fSize = 1.f;
 	}
-	else if (wstrModelProtoTag == TEXT("StarBlockM"))
+	else if (wstrModelName == TEXT("StarBlockM"))
 	{
 		Set_BodyCollider(COLLIDER_SPHERE, 1.f, 0.f, 2.f);
 		m_fSize = 2.f;
 	}
-	else if (wstrModelProtoTag == TEXT("StarBlockL"))
+	else if (wstrModelName == TEXT("StarBlockL"))
 	{
 		Set_BodyCollider(COLLIDER_SPHERE, 1.25f, 0.f, 2.5f);
 		m_fSize = 2.5f;
@@ -381,7 +385,10 @@ void CStarBlock::Free()
 {
 	__super::Free();
 
-	//m_pModelCom->DisableActors();
+	for (auto& actor : m_vecStaticActors)
+		m_pGameInstance->ReleaseActor(actor);
+	m_vecStaticActors.clear();
+
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 }

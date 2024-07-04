@@ -38,6 +38,8 @@ public:
     PxMaterial*                         Get_Material() { return m_pMaterial; }
     PxScene*                            Get_Scene() { return m_pScene; }
     PxControllerManager*                Get_ControllerManager() { return m_pControllerManager; }
+
+    void ResetScene();
     
     // NOT YET
     //PxMaterial*                       FindMaterial(const string& strMtrlTag);
@@ -47,8 +49,12 @@ public:
 public:
     void            Kick_DynamicActor(_float3 _kickDirection, _float impulseMagnitude);
     void            Add_Force(_float3 _kickDirection);
+    void            Add_Force(PxRigidDynamic* pDynamicActor, _float3 vForce);
     PxRigidDynamic* CreateDynamicActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
     PxRigidStatic*  CreateStaticActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
+    
+    PxTriangleMesh* CreateTriangleMesh(_float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial);
+    PxConvexMesh*   CreateConvexMesh(_float3* pVerticesPos, _uint iNumVertices, PxMaterial* pMaterial);
 
 private:
     PxDefaultAllocator          mDefaultAllocatorCallback;
