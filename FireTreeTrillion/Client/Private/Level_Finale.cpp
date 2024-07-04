@@ -71,8 +71,7 @@ HRESULT CLevel_Finale::Initialize()
 
 	
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
-
-
+	m_pGameInstance->Set_ColorSet_ByIndex(5);
 	return S_OK;
 }
 
@@ -109,16 +108,16 @@ HRESULT CLevel_Finale::Ready_Lights()
 	//// 예시코드 1 : 태양광
 	LIGHT_DESC			LightDesc{};
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
-	LightDesc.vDirection = _float4(0.f, -1.f, 0.f, 0.f);
+	LightDesc.vDirection = _float4(0.f, -1.f, -.3f, 0.f);
 
-	LightDesc.vDiffuse = _float4(0.8f, 0.8f, 0.8f, 1.f);
-	LightDesc.vAmbient = _float4(0.6f, 0.6f, 0.6f, 1.f);
+	LightDesc.vDiffuse = _float4(0.6f, 0.5f, 0.3f, 1.f);
+	LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
 	LightDesc.vSpecular = _float4(0.2f, 0.2f, 0.2f, 1.f);
 
 	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
 		return E_FAIL;
 
-	CGameInstance::Get_Instance()->Setting_GodRay({-650.f, 300.f, 1200.f, 1.f});
+	CGameInstance::Get_Instance()->Setting_GodRay({-650.f, 5000.f, 1200.f, 1.f});
 
 	return S_OK;
 }
@@ -163,7 +162,7 @@ HRESULT CLevel_Finale::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
 	CSkySphere::SKYSPHERE_DESC LabSkyDesc{};
 	LabSkyDesc.strModelTag = { "SkySphere_Stage1_Day" };
-	LabSkyDesc.strTextureTag = { "SkySphere_LabBoss_2Pase_Normal" };
+	LabSkyDesc.strTextureTag = { "SkySphere_Lab_Diffuse" };
 	HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_SkySphere"), &LabSkyDesc);
 	CHECK_FAILED(hr);
 

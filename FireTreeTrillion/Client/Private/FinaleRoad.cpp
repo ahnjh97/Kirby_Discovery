@@ -36,7 +36,7 @@ HRESULT CFinaleRoad::Initialize(void* pArg)
 	hr = Add_Components(RoadDesc.wstrModelName, RoadDesc.bIsAnimModel);
 	CHECK_FAILED(hr);
 
-	m_bMotionBlur = true;
+	m_bMotionBlur = false;
 	m_bStencil = true;
 	m_bRimLight = false;
 
@@ -76,7 +76,7 @@ void CFinaleRoad::Late_Tick(_float fTimeDelta)
 	//m_pDynamicActor->setGlobalPose(CUtils::TransformToPxTransform(m_pTransformCom));
 
 	//시야 벗어나면 컬링
-	if (m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State(CTransform::STATE_POSITION), 40.0f))
+	if (m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State(CTransform::STATE_POSITION), 100.0f))
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);

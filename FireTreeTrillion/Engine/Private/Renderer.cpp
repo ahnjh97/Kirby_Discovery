@@ -448,6 +448,11 @@ void CRenderer::Color_Initialize()
 		0.99115f, 0.00976099f, 0.199837f, 0.350306f
 		});
 
+	Save_ColorSet("Finale",
+		COLOR_DATA{
+1.54028f, 1.f, 1.08018f, 1.08951f, 0.559999f, 1.10999f, 1.50095f, 0.919976f, 0.969425f, 0.969425f, 1.01024f, 0.819999f, 1.23982f, 0.366863f, 0.0322149f, 0.319418f, 0.02978f, 0.579137f, 0.633162f, 0.769912f, 0.0295837f, 1.f, 0.847059f, 0.254902f, 0.0295075f, 0.280444f, 0.670456
+		});
+
 	//쉐이더 타입 트리거는 idx 1, 접촉하면 해당 함수를 호출!
 	function<void(_int)> TriggerFunc = bind(&CRenderer::Set_ColorSet_ByIndex, this, placeholders::_1);
 	m_pGameInstance->Emplace_TriggerFunc(1, TriggerFunc);
@@ -741,6 +746,10 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 	break;
 	case 4:
 		m_DestColorData = Find_ColorSet("Town");
+		m_fRimLightRatio.second = .7f;
+		break;
+	case 5:
+		m_DestColorData = Find_ColorSet("Finale");
 		m_fRimLightRatio.second = .7f;
 		break;
 	default:

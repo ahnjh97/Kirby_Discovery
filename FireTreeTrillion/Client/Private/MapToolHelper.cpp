@@ -105,7 +105,10 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 	m_vecMapModelNames = { "Level0Stage1Step01", "Level0Stage1Step02",  "Level1Stage1Step01", "DeeDeeDeeMap", "Town", "TownShop"
 		,"Land_LbLastBossBeforeStep" //,"LevelFinale_LbLastBuilding" :: 텍스처 및 모델 수정으로 사용안함
-		,"Land_LbLastBossStage" };
+		,"Land_LbLastBossStage"
+		//피날레
+		, "FinaleCave"
+	};
 
 #pragma endregion
 
@@ -192,7 +195,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 #pragma endregion
 
 #pragma region LEVEL_FINALE OBJECT
-
+		, "FinaleCave"
 #pragma endregion
 
 	};

@@ -136,7 +136,7 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 
 	//트리거 세팅
 	_uint iLevel = *m_pGameInstance->Get_CurrentLevelID();
-	if (iLevel >= LEVEL_INTRO && iLevel <= LEVEL_FINALBOSS) {
+	if (iLevel >= LEVEL_INTRO && iLevel < LEVEL_END) {
 		function<void(_int)> func = bind(&CCamera_Main::StartLerpByTriggerInfo, this, placeholders::_1);
 		m_pGameInstance->Emplace_TriggerFunc(TRIGGER_CAMERA, func);
 
@@ -1075,14 +1075,14 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 		//쾅
 		newAction = {};
-		newAction.fTime = fCutStartTime + 2.8f;
+		newAction.fTime = fCutStartTime + 2.6f;
 		newAction.eCamCut = CUT_INTERPOLATE;
-		newAction.eEase = EASE_OUT;
+		newAction.eEase = EASE_IN;
 		newAction.fInterpolateSpeed = .6f;
 
 
 		newAction.eCamDir = DIR_ABSOLUTE;
-		newAction.vDir = _float3{ -.87f, -.2f, .4f };
+		newAction.vDir = _float3{ -.87f, -.05f, .4f };
 		m_CamSeq.push_back(newAction);
 
 		//Cut 4
@@ -1099,17 +1099,17 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 		m_CamSeq.push_back(newAction);
 
-		newAction = {};
-		newAction.fTime = fCutStartTime + 6.f;
-		newAction.eCamCut = CUT_HARD;
-		newAction.fFOVY = 62.f;
+		//newAction = {};
+		//newAction.fTime = fCutStartTime + 6.f;
+		//newAction.eCamCut = CUT_HARD;
+		//newAction.fFOVY = 62.f;
 
-		newAction.eCamPos = POS_ABSOLUTE;
-		newAction.vPos = _float3{ -9.69f, 9.11f, .12f };
-		newAction.eCamDir = DIR_ABSOLUTE;
-		newAction.vDir = _float3{ .89f, -.45f, 0.f };
+		//newAction.eCamPos = POS_ABSOLUTE;
+		//newAction.vPos = _float3{ -9.69f, 9.11f, .12f };
+		//newAction.eCamDir = DIR_ABSOLUTE;
+		//newAction.vDir = _float3{ .89f, -.45f, 0.f };
 
-		m_CamSeq.push_back(newAction);
+		//m_CamSeq.push_back(newAction);
 	}
 	break;
 	default:
@@ -1240,11 +1240,16 @@ void CCamera_Main::Update_Anchor(_float fTimeDelta)
 		+ (m_pSecondTarget->Get_State(CTransform::STATE_POSITION) - m_pFirstTarget->Get_State(CTransform::STATE_POSITION)) * .4f;
 
 
+
+	_float4x4 RotMat = m_pFirstTarget->Get_WorldMatrix();
+	RotMat._41 = RotMat._42 = RotMat._43 = 0.f;
+	_float3 vAnchorOffset = CUtils::Make_Local_ToWorld(m_vAnchorOffset, RotMat);
+
 	//실제 타겟 위치에서 조금 위로 기준점 정하기
 	_float fYOffset = m_fCurUpOffset + (m_fCurDistance / 40.f);
 
 	//기준점 저장
-	m_vAnchor = F4toF3(vTargetPos) + _float3(0.f, fYOffset, 0.f);
+	m_vAnchor = F4toF3(vTargetPos) + vAnchorOffset + _float3(0.f, fYOffset, 0.f);
 }
 
 

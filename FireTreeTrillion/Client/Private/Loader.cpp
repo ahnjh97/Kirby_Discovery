@@ -1800,6 +1800,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Land_LbLastBossStage", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("FinaleCave", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
+
 		//피날레 오브젝트들
 		m_vecModelInfo.emplace_back("PopStar", TYPE_ANIM, 1.f, 0.f, 0);
 

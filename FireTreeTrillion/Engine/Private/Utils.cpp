@@ -233,6 +233,22 @@ void CUtils::Rotation(_Inout_ _float4x4& matrix, _fvector vAxis, _float fRadian)
 }
 
 
+_float3 CUtils::Make_Local_ToWorld(_float3 vPos, _float4x4& matWorld)
+{
+	_float4 vRight = matWorld.Right();
+	_float4 vUp = matWorld.Up();
+	_float4 vLook = matWorld.Backward();
+	vRight.Normalize();
+	vUp.Normalize();
+	vLook.Normalize();
+
+	CUtils::Set_State_Matrix(matWorld, CUtils::STATE_RIGHT, Dir(vRight));
+	CUtils::Set_State_Matrix(matWorld, CUtils::STATE_UP, Dir(vUp));
+	CUtils::Set_State_Matrix(matWorld, CUtils::STATE_LOOK, Dir(vLook));
+
+	return _float3::Transform(vPos, matWorld);
+}
+
 _float3 CUtils::Make_World_ToScreen(_float3 vPos)
 {
 	vPos = _float3::Transform(vPos, CGameInstance::Get_Instance()->Get_Transform(CPipeLine::D3DTS_VIEW));
