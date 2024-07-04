@@ -1794,7 +1794,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		
 		//보스전 필드
 		m_vecModelInfo.emplace_back("Land_LbLastBossStage", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("LevelFinale_LbLastBuilding", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("FinaleCave", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 		//피날레 오브젝트들
