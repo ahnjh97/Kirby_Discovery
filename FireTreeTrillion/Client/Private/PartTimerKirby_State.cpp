@@ -33,6 +33,8 @@ void CPartTimerKirby_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float 
 		PARTTIME_ITEM curItem = Get_CurrentFood(pAlbaKirby->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION));
 		if (CPartTimeHelper::Get_Instance()->Check_Item(curItem))
 		{
+			_uint uItem = static_cast<_uint>(curItem);
+			RenderOff_Food(uItem);
 			pAlbaKirby->Render_Food(true, curItem);
 			pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_CORRECT, 50.f, false, true);
 		}
@@ -42,13 +44,13 @@ void CPartTimerKirby_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float 
 			pAlbaKirby->Set_PrePosition(pTransform->Get_State(CTransform::STATE_POSITION));
 			pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_INCORRECTSTART, 50.f, false, true);
 		}
+
 	}
 }
 
 void CPartTimerKirby_Idle_State::OnStateExit()
 {
 }
-
 
 PARTTIME_ITEM CPartTimerKirby_Idle_State::Get_CurrentFood(_float4 vPos)
 {
@@ -62,6 +64,18 @@ PARTTIME_ITEM CPartTimerKirby_Idle_State::Get_CurrentFood(_float4 vPos)
 		return PARTTIME_ITEM::BURGER;
 
 	return PARTTIME_ITEM::ITEM_END;
+}
+
+void CPartTimerKirby_Idle_State::RenderOff_Food(_uint uFoodIdx)
+{
+	_uint uCurLevel = *CGameInstance::Get_Instance()->Get_CurrentLevelID();
+	auto food = m_pGameInstance->Get_GameObject(uCurLevel, TEXT("Layer_Food"), uFoodIdx);
+	//auto listFood = m_pGameInstance->Get_List(uCurLevel, TEXT("Layer_Food"));
+	//for (auto& food : *listFood)
+	//{
+	CPartTimeFood* pFood = static_cast<CPartTimeFood*>(food);
+	pFood->Set_Render(false);
+	//}
 }
 
 CPartTimerKirby_Idle_State* CPartTimerKirby_Idle_State::Create()
@@ -143,13 +157,20 @@ void CPartTimerKirby_Grab_State::OnStateUpdate(CGameObject* pGameObject, _float 
 	CTransform* pTransform = pAlbaKirby->Get_TransformCom();
 	if (pAlbaKirby->IsAnimFinished())
 	{
-		if (pAlbaKirby->Get_State() == CPartTimerKirby::HANDOVERSHORT || pAlbaKirby->Get_State() == CPartTimerKirby::HANDOVERSHORTL|| pAlbaKirby->Get_State() == CPartTimerKirby::FOODSHOP_INCORRECT)
+		switch (pAlbaKirby->Get_State())
+		{
+		case CPartTimerKirby::HANDOVERSHORT:
+		case CPartTimerKirby::HANDOVERSHORTL:
+		{
+			RenderOn_AllFood();
+		}
+		case CPartTimerKirby::FOODSHOP_INCORRECT:
 		{
 			if (pAlbaKirby->Get_State() == CPartTimerKirby::FOODSHOP_INCORRECT)
 			{
 				_float4 vPrePos = pAlbaKirby->Get_PrePosition();
 				pTransform->Set_State(CTransform::STATE_POSITION, _float4(vPrePos.x, vPrePos.y, vPrePos.z, 1.f));
-				
+
 				_float4 vOriginPos = m_pFood->Get_OriginPosition();
 				m_pFood->Get_TransformCom()->Set_State(CTransform::STATE_POSITION, vOriginPos);
 			}
@@ -157,16 +178,39 @@ void CPartTimerKirby_Grab_State::OnStateUpdate(CGameObject* pGameObject, _float 
 			pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_SELECT, 50.f, true, true);
 			CPartTimeHelper::Get_Instance()->Make_RandomItem();
 		}
-		else if (pAlbaKirby->Get_State() == CPartTimerKirby::FOODSHOP_INCORRECTSTART)
+		break;
+		case CPartTimerKirby::FOODSHOP_INCORRECTSTART:
+		{
 			pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_INCORRECT, 2.f, false, true);
-		else if(CPartTimeHelper::Get_Instance()->Get_PartTimeItem() == PARTTIME_ITEM::CAKE || CPartTimeHelper::Get_Instance()->Get_PartTimeItem() == PARTTIME_ITEM::TOMATO)
-			pAlbaKirby->Change_State(CPartTimerKirby::HANDOVERSHORT, 80.f, false, true);
-		else if(CPartTimeHelper::Get_Instance()->Get_PartTimeItem() == PARTTIME_ITEM::DRINK || CPartTimeHelper::Get_Instance()->Get_PartTimeItem() == PARTTIME_ITEM::BURGER)
-			pAlbaKirby->Change_State(CPartTimerKirby::HANDOVERSHORTL, 80.f, false, true);
+		}
+		break;
+		case CPartTimerKirby::FOODSHOP_CORRECT:
+		{
+			auto item = CPartTimeHelper::Get_Instance()->Get_PartTimeItem();
+			switch (item)
+			{
+			case PARTTIME_ITEM::CAKE:
+			case PARTTIME_ITEM::TOMATO:
+			{
+				pAlbaKirby->Change_State(CPartTimerKirby::HANDOVERSHORT, 80.f, false, true);
+			}
+			break;
+			case PARTTIME_ITEM::DRINK:
+			case PARTTIME_ITEM::BURGER:
+			{
+				pAlbaKirby->Change_State(CPartTimerKirby::HANDOVERSHORTL, 80.f, false, true);
+			}
+			break;
+			}
+		}
+		break;
+		}
 	}
 	else
 	{
-		if (pAlbaKirby->Get_State() == CPartTimerKirby::FOODSHOP_INCORRECT)
+		switch (pAlbaKirby->Get_State())
+		{
+		case CPartTimerKirby::FOODSHOP_INCORRECT:
 		{
 			pAlbaKirby->Set_EyeState(CPartTimerKirby::EYE_BLINK);
 			pAlbaKirby->Set_MouthState(CPartTimerKirby::MOUTH_ANGER);
@@ -197,23 +241,41 @@ void CPartTimerKirby_Grab_State::OnStateUpdate(CGameObject* pGameObject, _float 
 			pTransform->Go_Straight(fTimeDelta * m_fSpeed);
 			m_fSpeed -= fTimeDelta * 20.f;
 		}
-		else if (pAlbaKirby->Get_State() == CPartTimerKirby::FOODSHOP_CORRECT)
+		break;
+		case CPartTimerKirby::FOODSHOP_CORRECT:
+		{
 			pAlbaKirby->Set_MouthState(CPartTimerKirby::MOUTH_HAPPY);
-		else if (pAlbaKirby->Get_State() == CPartTimerKirby::FOODSHOP_INCORRECTSTART)
+		}
+		break;
+		case CPartTimerKirby::FOODSHOP_INCORRECTSTART:
 		{
 			pAlbaKirby->Set_EyeState(CPartTimerKirby::EYE_BLINK);
 			pAlbaKirby->Set_MouthState(CPartTimerKirby::MOUTH_ANGER);
 		}
-		else
+		break;
+		default:
 		{
 			pAlbaKirby->Set_MouthState(CPartTimerKirby::MOUTH_SMILE);
 			pAlbaKirby->Set_EyeState(CPartTimerKirby::EYE_IDLE);
+		}
+		break;
 		}
 	}
 }
  
 void CPartTimerKirby_Grab_State::OnStateExit()
 {
+}
+
+void CPartTimerKirby_Grab_State::RenderOn_AllFood()
+{
+	_uint uCurLevel = *CGameInstance::Get_Instance()->Get_CurrentLevelID();
+	auto listFood = m_pGameInstance->Get_List(uCurLevel, TEXT("Layer_Food"));
+	for (auto& food : *listFood)
+	{
+		CPartTimeFood* pFood = static_cast<CPartTimeFood*>(food);
+		pFood->Set_Render(true);
+	}
 }
 
 PARTTIME_ITEM CPartTimerKirby_Grab_State::Get_CurrentFood(_float4 vPos)
