@@ -188,7 +188,6 @@ void CHungryDee::Swap_WatingPosition()
 	//바뀐 자리가 앞자리라면, 나를 등록
 	if (m_iMyIdx == FRONT_WAITPOS)
 	{
-		Set_MaskValueUI(0.f);
 		m_pDialogUI->Set_IsRender(false);
 
 		CPartTimeHelper::Get_Instance()->Register_FirstDee(this);
