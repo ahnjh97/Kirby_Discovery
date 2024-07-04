@@ -499,7 +499,7 @@
     <Filter Include="02.GameObjects\Map\FinaleRoad">
       <UniqueIdentifier>{4b701e1c-0a8a-4c87-9d85-34140b695c97}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Map\Deco\DecoShadow">
+    <Filter Include="02.GameObjects\Map\Deco\ShadowDeco">
       <UniqueIdentifier>{af0b42ac-2606-411c-a9ea-4ca6880cde91}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -1010,7 +1010,7 @@
       <Filter>02.GameObjects\Map\FinaleRoad</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\ShadowDeco.h">
-      <Filter>02.GameObjects\Map\Deco\DecoShadow</Filter>
+      <Filter>02.GameObjects\Map\Deco\ShadowDeco</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1501,7 +1501,7 @@
       <Filter>02.GameObjects\Map\FinaleRoad</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\ShadowDeco.cpp">
-      <Filter>02.GameObjects\Map\Deco\DecoShadow</Filter>
+      <Filter>02.GameObjects\Map\Deco\ShadowDeco</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
