@@ -810,7 +810,7 @@ _bool CEditor_UI::Edit_Transform(CUIObject* _pUIObj)
 	_float Translate[3]{}, Rotate[3]{}, Scale[3]{};
 	
 	UIOBJ_DESC LayerUIDesc = _pUIObj->Get_UIObj_Desc();
-	(_float3)Translate = LayerUIDesc.vPos;
+	(_float3)Translate = (_float3)LayerUIDesc.vPos;
 	(_float3)Rotate = LayerUIDesc.vDegree;
 	(_float3)Scale = LayerUIDesc.vSize;
 
@@ -842,7 +842,7 @@ _bool CEditor_UI::Edit_Transform(CUIObject* _pUIObj)
 	ImGui::SameLine(fTextWidth + 35);
 	ImGui::DragFloat3("##Size", (_float*)&Scale, 0.001f, 0.f, g_iWinSizeX, "%.2f");
 
-	LayerUIDesc.vPos = (_float3)Translate;
+	(_float3)LayerUIDesc.vPos = (_float3)Translate;
 	LayerUIDesc.vDegree = (_float3)Rotate;
 	LayerUIDesc.vSize = (_float3)Scale;
 

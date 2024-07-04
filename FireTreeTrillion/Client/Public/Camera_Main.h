@@ -16,6 +16,7 @@ public:
 		SEQ_SOFTCUT_TEST,
 		SEQ_BREAKCARSHOP,
 		SEQ_BREAKRACINGMAP,
+		SEQ_PARTTIMESTART,
 		SEQ_END
 	};
 
@@ -248,8 +249,8 @@ private:
 	_float2 m_vPreShakeDir = { 0.f, 0.f };
 
 	//카메라 움직임 관련 변수들
-	_float m_fShakeAmplitude = { .5f };
-	_float m_fShakeFrequency = { 20.f };
+	_float m_fShakeAmplitude = { .3f };
+	_float m_fShakeFrequency = { 60.f };
 	_float m_fInitialShakeTime = { 0.f };
 	_float m_fCurShakeTime = { 0.f };
 
@@ -258,7 +259,7 @@ private:
 
 	//현재 시퀀스 모드
 	CAMSEQ m_eSpecialSeq = { SEQ_END };
-	_float m_fStartAudioTime = { 0.f };
+	_float m_fSeqEventTime = { 0.f };
 	//시퀀스 웨이팅 목록
 	list<CAMACTION> m_CamSeq;
 

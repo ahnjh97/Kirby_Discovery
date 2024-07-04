@@ -13,7 +13,7 @@ BEGIN(Client)
 class CHUD_AbilityDiscard : public CUIObject
 {
 public:
-	enum TEX_STATE { DISCARD_IDLE, DISCARD_HIDE, DISCARD_SHOW, DISCARD_NONE	};
+	//enum TEX_STATE { DISCARD_IDLE, DISCARD_HIDE, DISCARD_SHOW, DISCARD_NONE	};
 	enum TEX_DISCARD { TEXDC_BASE, TEXDC_GAUGE, TEXDC_BTN, TEXDC_NONE };
 
 private:
@@ -50,11 +50,8 @@ private:
 	CShader*					m_pShaderCom = { nullptr };
 	CTexture*					m_pTextureCom[TEX_NONE] = { nullptr };
 	CVIBuffer_Rect*				m_pVIBufferCom = { nullptr };
-
-	TEX_STATE					m_eTexState = { DISCARD_NONE };
-
+	//TEX_STATE					m_eTexState = { DISCARD_NONE };
 	class CKirby*				m_pKirby = { nullptr };
-	//_bool						m_IsKirbyExist = { FALSE };
 	
 	_bool						m_IsGaugeBLINK = { FALSE };
 

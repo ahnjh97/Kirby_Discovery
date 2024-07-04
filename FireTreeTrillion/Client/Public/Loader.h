@@ -40,6 +40,7 @@ private:
 	HRESULT Loading_For_DeeDeeDee();
 	HRESULT Loading_For_Town();
 	HRESULT Loading_For_Parttime();
+	HRESULT Loading_For_Simba();
 	HRESULT Loading_For_FinalBoss();
 	HRESULT Loading_For_Finale();
 

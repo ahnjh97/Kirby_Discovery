@@ -466,6 +466,9 @@
     <Filter Include="02.GameObjects\Map\Box">
       <UniqueIdentifier>{6fd437c6-b749-4061-b0ec-e63bd2ffb9ce}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\UI\MessageWindow">
+      <UniqueIdentifier>{bcd8d01b-4475-4a52-aafd-de2aee6510c4}</UniqueIdentifier>
+    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyDump_State">
       <UniqueIdentifier>{8ce43134-70bd-4e9a-84fa-af301762dfac}</UniqueIdentifier>
     </Filter>
@@ -477,6 +480,24 @@
     </Filter>
     <Filter Include="01.Levels\12. Finale">
       <UniqueIdentifier>{48c88699-1c49-4542-a934-ae4b16595516}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\10. Simba">
+      <UniqueIdentifier>{54872277-bc89-4a13-9bfa-6cf99310be0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PopStar">
+      <UniqueIdentifier>{4879bc6f-b75f-44bf-8f7d-c2d226a8cc11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\DecoObject">
+      <UniqueIdentifier>{aae835b0-4a08-4f27-88da-102e823f0326}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\Common">
+      <UniqueIdentifier>{4f767e85-c26b-46c4-8211-99e97c2cf716}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\Common\Button">
+      <UniqueIdentifier>{5c28ba1c-7f5f-4de8-8c6f-aff62071063b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\FinaleRoad">
+      <UniqueIdentifier>{4b701e1c-0a8a-4c87-9d85-34140b695c97}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Map\Deco\DecoShadow">
       <UniqueIdentifier>{af0b42ac-2606-411c-a9ea-4ca6880cde91}</UniqueIdentifier>
@@ -964,11 +985,29 @@
     <ClInclude Include="Box.h">
       <Filter>02.GameObjects\Map\Box</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\UI_MessageWindow.h">
+      <Filter>02.GameObjects\UI\MessageWindow</Filter>
+    </ClInclude>
     <ClInclude Include="CKirbyDump_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyDump_State</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Finale.h">
       <Filter>01.Levels\12. Finale</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_Simba.h">
+      <Filter>01.Levels\10. Simba</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PopStar.h">
+      <Filter>02.GameObjects\PopStar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\DecoObject.h">
+      <Filter>02.GameObjects\DecoObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UI_BtnIcon.h">
+      <Filter>02.GameObjects\UI\Common\Button</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\FinaleRoad.h">
+      <Filter>02.GameObjects\Map\FinaleRoad</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\ShadowDeco.h">
       <Filter>02.GameObjects\Map\Deco\DecoShadow</Filter>
@@ -1437,11 +1476,29 @@
     <ClCompile Include="..\Private\Box.cpp">
       <Filter>02.GameObjects\Map\Box</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\UI_MessageWindow.cpp">
+      <Filter>02.GameObjects\UI\MessageWindow</Filter>
+    </ClCompile>
     <ClCompile Include="CKirbyDump_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyDump_State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Finale.cpp">
       <Filter>01.Levels\12. Finale</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Simba.cpp">
+      <Filter>01.Levels\10. Simba</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PopStar.cpp">
+      <Filter>02.GameObjects\PopStar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\DecoObject.cpp">
+      <Filter>02.GameObjects\DecoObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UI_BtnIcon.cpp">
+      <Filter>02.GameObjects\UI\Common\Button</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\FinaleRoad.cpp">
+      <Filter>02.GameObjects\Map\FinaleRoad</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\ShadowDeco.cpp">
       <Filter>02.GameObjects\Map\Deco\DecoShadow</Filter>

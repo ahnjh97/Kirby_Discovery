@@ -169,7 +169,7 @@ _int CCamera_Main::Tick(_float fTimeDelta)
 	//타임 델타를 보정한다.
 	_float fRealTimeDelta = fTimeDelta;
 	if (.1f < fRealTimeDelta)
-		fRealTimeDelta = 1.f / 30.f;
+		fRealTimeDelta = 1.f / 60.f;
 
 
 	Control(fRealTimeDelta);
@@ -192,7 +192,8 @@ _int CCamera_Main::Tick(_float fTimeDelta)
 	}
 
 	//후보정
-	m_pTransformCom->Move(Dir(Make_ShakeDir(fRealTimeDelta)));
+	_float4 vDir = Make_ShakeDir(fRealTimeDelta);
+	m_pTransformCom->Move(vDir);
 
 
 	return OBJ_NOEVENT;
@@ -243,20 +244,28 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 	if (m_eSpecialSeq == SEQ_END)
 		return;
 
-	if (0.f < m_fStartAudioTime)
+	if (0.f < m_fSeqEventTime)
 	{
-		m_fStartAudioTime -= fTimeDelta;
+		m_fSeqEventTime -= fTimeDelta;
 
-		if (m_fStartAudioTime < 0.f)
+		//시퀀스 시간 다 깠았다~~
+		if (m_fSeqEventTime < 0.f)
 		{
-			m_fStartAudioTime = 0.f;
-			
+			m_fSeqEventTime = 0.f;
+
 			if (m_eSpecialSeq == SEQ_BREAKRACINGMAP)
 			{
 				m_pGameInstance->StopSound(CHANNEL_BGM);
 				m_pGameInstance->PlayBGM(L"Welcome to the New World!.mp3");
 			}
 
+
+			if (m_eSpecialSeq == SEQ_PARTTIMESTART)
+			{
+				CPartTimeHelper::Get_Instance()->Handle_GameStart();
+				Lock_All({ 16.4f, 25.7f, 35.75f }, { .16f, -.08f, -1.f });
+				Set_FOVY(38.f);
+			}
 		}
 	}
 
@@ -817,7 +826,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction.vDir = _float3{ -.45f, 0.f, -.9f };
 		m_CamSeq.push_back(newAction);
 
-		m_fStartAudioTime = 8.08f;
+		m_fSeqEventTime = 8.08f;
 
 		//라디오 보기
 		newAction = {};
@@ -921,6 +930,36 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 	}
 	break;
+	case SEQ_PARTTIMESTART:
+	{
+		//이벤트 호출
+		m_fSeqEventTime = 7.f;
+
+		CAMACTION newAction = {};
+
+		newAction.fTime = 0.f;
+		newAction.eCamCut = CUT_HARD;
+		newAction.fFOVY = 30.f;
+		newAction.eCamPos = POS_ABSOLUTE;
+		newAction.vPos = _float3{ 19.6f, 30.5f, 12.2f };
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.15f, 0.f, 1.f };
+		m_CamSeq.push_back(newAction);
+
+		newAction = {};
+		newAction.fTime = 0.f;
+		newAction.eCamCut = CUT_INTERPOLATE;
+		newAction.eEase = EASE_INOUT_FAST;
+		newAction.fInterpolateSpeed = 7.f;
+
+		newAction.eCamPos = POS_ABSOLUTE;
+		newAction.vPos = _float3{ 19.6f, 26.f, 12.2f };
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.15f, 0.f, 1.f };
+		m_CamSeq.push_back(newAction);
+
+	}
+	break;
 	default:
 		break;
 	}
@@ -996,16 +1035,21 @@ void CCamera_Main::Control(_float fTimeDelta)
 
 		if (m_pGameInstance->Get_KeyState(DIK_8, KEY_DOWN))
 		{
-			Make_Shake(1.f, .8f);
+			Make_Shake(1.f, 2.f);
 		}
 
 
 		if (m_pGameInstance->Get_KeyState(DIK_U, KEY_DOWN))
 		{
-			CEffect::FX_DESC FXDesc{};
 
-			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Kirby Title Logo"), &FXDesc)))
-				return;
+			Lock_All({ 16.4f, 25.7f, 35.75f }, { .16f, -.08f, -1.f });
+			Set_FOVY(38.f);
+
+
+			//CEffect::FX_DESC FXDesc{};
+
+			//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Kirby Title Logo"), &FXDesc)))
+			//	return;
 		}
 	}
 }
@@ -1242,6 +1286,7 @@ void CCamera_Main::Render_IMGUI()
 	//ImGui::Text("LerpedRadius: %.2f", m_fLerpedRadius);
 	ImGui::Dummy(ImVec2(0, 20));
 
+	ImGui::Text(u8"쉐이크 시간: %.2f", m_fCurShakeTime);
 
 	ImGui::Text(u8"보간 시간: %.2f", m_fSeqInterpolateTime.first);
 	ImGui::Text(u8"목표 보간 시간: %.2f", m_fSeqInterpolateTime.second);

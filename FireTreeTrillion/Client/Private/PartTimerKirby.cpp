@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "PartTimerKirby.h"
 #include "FSM.h"
-#include "Camera.h"
+#include "Camera_Main.h"
 
 #include "PartTimeFood.h"
 #include "PartTimerKirby_State.h"
@@ -204,6 +204,7 @@ HRESULT CPartTimerKirby::Make_TargetToCams()
 	}
 
 	m_pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FIRST);
+	static_cast<CCamera_Main*>(m_pCamera)->Make_Sequence(CCamera_Main::SEQ_PARTTIMESTART);
 
 	//게임 레벨에 free camera 있다면 그놈에게도 타겟 등록해 준다.
 	if (LEVEL_INTRO <= *m_pCurrentLevelID && *m_pCurrentLevelID < LEVEL_END)

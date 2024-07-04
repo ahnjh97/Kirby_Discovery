@@ -105,6 +105,7 @@ HRESULT CHungryDee::Initialize(void* pArg)
 	CHECK_FAILED(hr);
 
 	// 배고픈 Dee는 언제든지 음식을 요구할 준비가 되어있읍니다. JYWI
+	// 맛있겟다
 	if (*m_pCurrentLevelID != LEVEL_TOOL_ANIM)
 	{
 		m_pDialogUI = static_cast<CUI_PartTimeDee*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_UI_PartTimeDee")));
@@ -128,6 +129,8 @@ _int CHungryDee::Tick(_float fTimeDelta)
 		m_fWaitingTime -= m_fTimeDelta;
 
 
+	//지영아 여기야
+	/* 점심시간이다ㅏ~~
 	if (m_pGameInstance->Get_KeyState(DIK_S, KEY_DOWN) && m_iMyIdx == 0)
 	{
 		CHungryDee::HUNGRYDEE_DESC HungryDeeDesc{};
@@ -145,7 +148,7 @@ _int CHungryDee::Tick(_float fTimeDelta)
 			m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Dee"), TEXT("Prototype_GameObject_HungryDee"), &HungryDeeDesc);
 		}
 	}
-
+	*/
 
 	//나머지 슈퍼틱, 파트 틱 처리
 	__super::Tick(m_fTimeDelta);
@@ -157,6 +160,14 @@ _int CHungryDee::Tick(_float fTimeDelta)
 	{
 		if (m_pDialogUI != nullptr)
 			m_pDialogUI->Tick(m_fTimeDelta);
+	}
+	//내가 앞자리 직전이고, 주문하는 애니메이션일 때
+	else if ( m_iMyIdx == FRONT_WAITPOS + 1 && (m_pFSM->Get_State() == DEESHOPANIM_GUESTNORMAL || m_pFSM->Get_State() == DEESHOPANIM_GUESTANGER))
+	{
+		if (m_pDialogUI != nullptr)
+		{
+			m_pDialogUI->Tick(m_fTimeDelta);
+		}
 	}
 
 	//공통된 디 관련 변수를 업데이트 - 초기화한다
@@ -177,6 +188,9 @@ void CHungryDee::Swap_WatingPosition()
 	//바뀐 자리가 앞자리라면, 나를 등록
 	if (m_iMyIdx == FRONT_WAITPOS)
 	{
+		Set_MaskValueUI(0.f);
+		m_pDialogUI->Set_IsRender(false);
+
 		CPartTimeHelper::Get_Instance()->Register_FirstDee(this);
 	}
 
@@ -184,6 +198,7 @@ void CHungryDee::Swap_WatingPosition()
 	//이 때 리셋해야 될 값들도 다 초기화해줍니다.
 	if (m_iMyIdx == LAST_WAITPOS)
 	{
+
 		_float3 vDestPos = m_WaitingList.first + m_WaitingList.second[m_iMyIdx].vPos + _float3{ 18.f, 0.f, -2.f };
 		m_pControllerCom->Set_Position(m_pTransformCom, Pos(vDestPos));
 		Set_DeeEyeState(DEEEYE_IDLE);
@@ -196,15 +211,18 @@ void CHungryDee::Swap_WatingPosition()
 	}
 }
 
-void CHungryDee::Ready_OrderUI()
+void CHungryDee::Ready_OrderUI(CUI_PartTimeDee::TYPE eType)
 {
 	if (m_pDialogUI == nullptr) return;
 	m_pDialogUI->Set_IsRender(true);
+
+	m_pDialogUI->Set_Type(eType);
 
 	_float4 vRevisedPos = GET_POS;
 	vRevisedPos.y += fOffsetInteract;
 	m_pDialogUI->Update_Pos(_float3{ vRevisedPos.x, vRevisedPos.y, vRevisedPos.z });
 }
+
 
 void CHungryDee::Late_Tick(_float fTimeDelta)
 {
@@ -305,8 +323,14 @@ void CHungryDee::Change_Dialog(PARTTIME_ITEM eItem)
 
 void CHungryDee::OnNotify()
 {
+
 	// 특정 시간일때 와들디 처리 >> 점심시간에 화내기 시작하는걸 여기서 처리해주면 될것같유
 	// 효선아 여기야
+}
+
+void CHungryDee::Set_MaskValueUI(_float _fMaskValue)
+{
+	m_pDialogUI->Set_Mask(_fMaskValue);
 }
 
 //맨 앞자리 디
