@@ -50,6 +50,8 @@ HRESULT CCarShopWall::Initialize(void* pArg)
 	m_setNormalXMesh.insert(iA);
 	//m_setNormalXMesh.insert(iB);
 
+	m_pStaticActor = m_pNonAnimModelCom->ReturnStaticActor(m_pTransformCom->Get_WorldFloat4x4());
+
 	return S_OK;
 }
 
@@ -69,7 +71,8 @@ void CCarShopWall::Late_Tick(_float fTimeDelta)
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 50.0f))
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
-		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
+		if (false == m_bStartAnimation)
+			m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 	}
 
 	if (true == m_pModelCom->IsFinished())
@@ -106,7 +109,7 @@ HRESULT CCarShopWall::Render()
 				return E_FAIL;
 		}
 		
-		if (m_bStartAnimation)
+		if (true == m_bStartAnimation)
 		{
 			if (m_setBeforeMeshIndices.end() != m_setBeforeMeshIndices.find(i))
 				continue;
@@ -147,7 +150,9 @@ void CCarShopWall::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObje
 	pKirby->Set_HitStop();
 	m_pModelCom->Set_Animation(0, 60.f, false, false);
 	m_bStartAnimation = true;
+
 	SwitchAfterBefore();
+	m_pGameInstance->DisableActor(m_pStaticActor);
 
 	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	_float4 vPlayerPos = pObject->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
@@ -174,10 +179,14 @@ HRESULT CCarShopWall::Add_Components()
 	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimModel"),
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
+
 	wstring wstrModelTag = TEXT("Prototype_Component_Model_CarShopBreakableWall");
 	hr = __super::Add_Component(wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
+	wstring wstrNonAnimModelTag = TEXT("Prototype_Component_Model_CarShopFrameBefore");
+	hr = __super::Add_Component(wstrNonAnimModelTag, TEXT("Com_NonAnimModel"), (CComponent**)&m_pNonAnimModelCom);
+	CHECK_FAILED(hr);
 
 	CHitBox::HITBOX_DESC HitBox{};
 	HitBox.pOwner = this;
@@ -304,6 +313,9 @@ CGameObject* CCarShopWall::Clone(void* pArg)
 void CCarShopWall::Free()
 {
 	__super::Free();
+
+	m_pGameInstance->ReleaseActor(m_pStaticActor);
+	Safe_Release(m_pNonAnimModelCom);
 
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);

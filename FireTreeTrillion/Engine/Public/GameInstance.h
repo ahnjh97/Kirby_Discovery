@@ -155,6 +155,7 @@ public: /* For.PhysX */
 	void					AddActor(PxActor& pActor);
 	void					RemoveActor(PxActor& pActor);
 	void					Add_Force(_float3 vForce);
+	void					Add_Force(PxRigidDynamic* pDynamicActor, _float3 vForce);
 	void					Kick_DynamicActor(_float3 _kickDirection, _float impulseMagnitude);
 
 	void		Test();
@@ -197,12 +198,19 @@ public: /* For.ImGui_Manager */
 public: /* For.PhysX */
 	PxRigidDynamic* CreateDynamicActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial = nullptr);
 	PxRigidStatic* CreateStaticActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial = nullptr);
+	PxTriangleMesh* CreateTriangleMesh(_float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial = nullptr);
+	PxConvexMesh* CreateConvexMesh(_float3* pVerticesPos, _uint iNumVertices, PxMaterial* pMaterial = nullptr);
 	void Register_Player(PxActor* pPlayerActor);
 	void Register_Trigger(PxActor* pTriggerActor, _int iTriggerType, _int iTriggerIndex);
 	void Emplace_TriggerFunc(_int iTriggerType, function<void(_int)> func);
 	void Emplace_ExitFunc(_int iTriggerType, function<void(void)> exitFunc);
 	void Emplace_MapDecoTrigger(PxActor* pTriggerActor, class CModel* pMapDecoModel, _uint iAnimIdx, _float fTickPerSec);
 	void Clear_EventCallBack();
+	void ResetScene();
+
+	_float4x4 GetActorAverageMatrix(PxRigidActor* pActor);
+	void DisableActor(PxActor* pActor);
+	void ReleaseActor(PxActor* pActor);
 
 public: /* For. Picking */
 	void Transform_PickingToLocalSpace(const class CTransform* pTransform, _Out_ _float3* pRayDir, _Out_ _float3* pRayPos);
@@ -222,6 +230,10 @@ public: /* For. TimeController */
 
 public: // For Collision
 	_bool	Is_PassingGroup(class CGameObject* pObj);
+
+#pragma region DIALOG_MANAGER
+
+#pragma endregion
 
 
 private:
@@ -245,6 +257,7 @@ private:
 	class CPhysX*					m_pPhysx = { nullptr };
 	class CPicking*					m_pPicking = { nullptr };
 	class CTimeController*			m_pTimeController = { nullptr };
+	class CDialog_Manager*			m_pDialog_Manager = { nullptr };
 
 	_uint	m_iCurrentLevelID		= { 0 };
 	_uint	g_iNumOctree			= {};

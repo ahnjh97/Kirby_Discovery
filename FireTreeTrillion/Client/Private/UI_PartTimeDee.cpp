@@ -69,6 +69,7 @@ _int CUI_PartTimeDee::Tick(_float fTimeDelta)
 	// for masking
 	m_fMask += fTimeDelta * 0.1f;
 	if (1.f < m_fMask) m_fMask = 1.f;
+	m_fTimeDelta = fTimeDelta;
 
 	return OBJ_NOEVENT;
 }
@@ -86,12 +87,16 @@ HRESULT CUI_PartTimeDee::Render()
 	hr = Bind_ShaderResources();
 	CHECK_FAILED(hr);
 
+	// 해당 클래스에서 Thinking 말풍선이 테마일 경우
+	if (m_eDialogTheme == THINKING)
+	{
+		Render_Thinking();
+		return S_OK;
+	}
+
 	for (_int i = 0; i < m_arrTexures.size(); ++i)
 	{
-		if (m_eDialogTheme == THINKING) // dirty
-			if (i != 1) continue;
-		else
-			if (i == 1) continue;
+		if (i == 1) continue;
 
 		if (i >= 2) // 4개의 음식중 true처리가 되어있는 음식만 렌더합니다.
 		{
@@ -109,8 +114,11 @@ HRESULT CUI_PartTimeDee::Render()
 		{
 			_float fAlpha = 1.f;
 			m_pShaderCom->Bind_RawValue("g_fAlpha", &fAlpha, sizeof(_float));
-			if(m_bRandomColor)
+			if (m_bRandomColor)
+			{
+				m_vFoodColor = _float3(0.45f, 0.45f, 0.45f);
 				m_pShaderCom->Bind_RawValue("g_vRColor", &m_vFoodColor, sizeof(_float3));
+			}
 			
 			// Binding DIFFUSE
 			hr = m_arrTexures[i]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
@@ -119,9 +127,21 @@ HRESULT CUI_PartTimeDee::Render()
 			// Binding MASK
 			if (m_bRandomMask)
 			{
+				// for masking
+				m_fMask += m_fTimeDelta * 0.1f;
+				if (1.f < m_fMask) m_fMask = 1.f;
+
 				_int iMask = 2;
 				m_pShaderCom->Bind_RawValue("g_iMasking",   &iMask,   sizeof(_int));
 				m_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fMask, sizeof(_float));
+				m_pTexMask->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", 0);
+			}
+			else
+			{
+				_int iMask = 1;
+				_float fMask = 1.f;
+				m_pShaderCom->Bind_RawValue("g_iMasking", &iMask, sizeof(_int));
+				m_pShaderCom->Bind_RawValue("g_fMaskRatio", &fMask, sizeof(_float));
 				m_pTexMask->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", 0);
 			}
 			
@@ -130,6 +150,9 @@ HRESULT CUI_PartTimeDee::Render()
 		}
 		else
 		{
+			m_vFoodColor = _float3(1.f, 1.f, 1.f);
+			m_pShaderCom->Bind_RawValue("g_vRColor", &m_vFoodColor, sizeof(_float3));
+
 			hr = m_arrTexures[i]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
 			hr = m_pShaderCom->Begin(POSTEX_ALPHATEST_COLOR_HORIZONTALCUT);
 			CHECK_FAILED(hr);
@@ -143,6 +166,31 @@ HRESULT CUI_PartTimeDee::Render()
 	}
 
 	return S_OK;
+}
+
+void CUI_PartTimeDee::Render_Thinking()
+{
+	HRESULT hr(S_OK);
+	_int iTextureNum = 1;
+
+	// UI별 포지션, 사이즈, 컬러 조정
+	Setup_PosSizeColor(iTextureNum);
+
+	hr = m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix");
+	CHECK_FAILED(hr);
+
+	m_vFoodColor = _float3(1.f, 1.f, 1.f);
+	m_pShaderCom->Bind_RawValue("g_vRColor", &m_vFoodColor, sizeof(_float3));
+
+	hr = m_arrTexures[iTextureNum]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
+	hr = m_pShaderCom->Begin(POSTEX_ALPHATEST_COLOR_HORIZONTALCUT);
+	CHECK_FAILED(hr);
+
+	hr = m_pVIBufferCom->Bind_Buffers();
+	CHECK_FAILED(hr);
+
+	hr = m_pVIBufferCom->Render();
+	CHECK_FAILED(hr);
 }
 
 #ifdef _DEBUG
@@ -282,6 +330,7 @@ void CUI_PartTimeDee::Change_Dialog(PARTTIME_ITEM eItem)
 	Make_RandomImg();
 }
 
+// 새로 음식 결정하는 함수
 void CUI_PartTimeDee::Make_RandomImg()
 {
 	// Random Color
@@ -291,6 +340,9 @@ void CUI_PartTimeDee::Make_RandomImg()
 	// Random Masking
 	_int iRandomMask = CUtils::Make_RandomInt(0, 1);
 	m_bRandomMask = iRandomMask;
+
+	// 새로 결정한 음식을 어떻게 출력할 것인지 마스킹 초기화
+	m_fMask = 0.f;
 }
 
 void CUI_PartTimeDee::Update_Pos(_float3 _vPosition)
@@ -301,12 +353,13 @@ void CUI_PartTimeDee::Update_Pos(_float3 _vPosition)
 	_matrix ViewMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW);
 	_matrix ProjMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
 	_matrix ComMatrix = ViewMatrix * ProjMatrix;
+
 	// 뿅
 	m_vFinPos = XMVector3TransformCoord(XMLoadFloat4(&vNewPosition), ComMatrix);
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
-		XMVectorSet( (m_vFinPos.x * g_iWinSizeX) * 0.5f,
-			(m_vFinPos.y * g_iWinSizeY) * 0.5f,
+		XMVectorSet((m_vFinPos.x * g_iWinSizeX) * 0.5f,
+					(m_vFinPos.y * g_iWinSizeY) * 0.5f,
 					0.f,
 					1.f));
 }

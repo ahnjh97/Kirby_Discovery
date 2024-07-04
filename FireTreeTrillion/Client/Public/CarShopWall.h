@@ -38,6 +38,8 @@ private:
 
 	CModel*			m_pModelCom = { nullptr };
 	CShader*		m_pShaderCom = { nullptr };
+	CModel*			m_pNonAnimModelCom = { nullptr };
+	PxRigidStatic*	m_pStaticActor = { nullptr };
 
 	_float			m_fHitPower = {};
 	_float			m_fWhiteColorDiffuse = {};

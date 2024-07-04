@@ -47,10 +47,10 @@ _int CGm_LabAntenna::Tick(_float fTimeDelta)
 
 void CGm_LabAntenna::Late_Tick(_float fTimeDelta)
 {
-	//에피리스 공격패턴에 해당 오브젝트가 피격당할 경우, Break 애님 재생
 	m_pModelCom->Play_Animation(m_pGameInstance->Get_SecondTimer());
 
-	if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD1, KEY_DOWN)) //테스트용. 현재는 키입력으로 확인 가능
+	//에피리스 공격패턴에 해당 오브젝트가 피격당할 경우, Break 애님 재생
+	if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD9, KEY_DOWN)) //테스트용. 현재는 키입력으로 확인 가능
 		m_pModelCom->Set_Animation(STATE_BREAK, 100.f, FALSE);
 
 #pragma region FRUSTUM_CULLING

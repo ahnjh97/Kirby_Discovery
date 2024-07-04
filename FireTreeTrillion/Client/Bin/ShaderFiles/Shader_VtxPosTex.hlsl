@@ -771,11 +771,11 @@ technique11 DefaultTechnique
         SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
-        VertexShader = compile vs_5_0 VS_MAIN_ALPHABLEND();
+        VertexShader   = compile vs_5_0 VS_MAIN_ALPHABLEND();
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
-        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
-        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 PS_MAIN_ALPHATEST_COLOR_VERTICALCUT();
+        HullShader     = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader   = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader    = compile ps_5_0 PS_MAIN_ALPHATEST_COLOR_VERTICALCUT();
     }
 
 	// UI_LEVEL_CHANGER 전용. 마스크와 색상 ( 17 )

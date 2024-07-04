@@ -850,6 +850,11 @@ void CGameInstance::Add_Force(_float3 vForce)
 	m_pPhysx->Add_Force(vForce);
 }
 
+void CGameInstance::Add_Force(PxRigidDynamic* pDynamicActor, _float3 vForce)
+{
+	m_pPhysx->Add_Force(pDynamicActor, vForce);
+}
+
 void CGameInstance::Kick_DynamicActor(_float3 _kickDirection, _float impulseMagnitude)
 {
 	m_pPhysx->Kick_DynamicActor(_kickDirection, impulseMagnitude);
@@ -1005,6 +1010,22 @@ PxRigidStatic* CGameInstance::CreateStaticActor(_float4x4& matWorld, _float3* pV
 	return m_pPhysx->CreateStaticActor(matWorld, pVerticesPos, iNumVertices, pIndices, iNumIndices, pMaterial);
 }
 
+PxTriangleMesh* CGameInstance::CreateTriangleMesh(_float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)
+{
+	if (nullptr == m_pPhysx)
+		return nullptr;
+
+	return m_pPhysx->CreateTriangleMesh(pVerticesPos, iNumVertices, pIndices, iNumIndices, pMaterial);
+}
+
+PxConvexMesh* CGameInstance::CreateConvexMesh(_float3* pVerticesPos, _uint iNumVertices, PxMaterial* pMaterial)
+{
+	if (nullptr == m_pPhysx)
+		return nullptr;
+
+	return m_pPhysx->CreateConvexMesh(pVerticesPos, iNumVertices, pMaterial);
+}
+
 void CGameInstance::Register_Player(PxActor* pPlayerActor)
 {
 	if (nullptr != m_pPhysx)
@@ -1039,6 +1060,71 @@ void CGameInstance::Clear_EventCallBack()
 {
 	if (nullptr != m_pPhysx)
 		m_pPhysx->Clear_EventCallBack();
+}
+
+void CGameInstance::ResetScene()
+{
+	if (nullptr != m_pPhysx)
+		m_pPhysx->ResetScene();
+}
+
+_float4x4 CGameInstance::GetActorAverageMatrix(PxRigidActor* pActor)
+{
+	_vector vTotalTranslation = XMVectorZero();
+	_vector vTotalRotation = XMVectorZero();
+	_vector vTotalScale = XMVectorZero();
+
+	PxU32 numShapes = pActor->getNbShapes();
+	vector<PxShape*> vecShapes(numShapes);
+	pActor->getShapes(vecShapes.data(), numShapes);
+
+	for (PxShape* shape : vecShapes) {
+		PxMat44 pos(PxShapeExt::getGlobalPose(*shape, *pActor));
+		_matrix matWorld = CUtils::To_Float4x4(pos);
+		_vector translation, rotation, scale;
+		XMMatrixDecompose(&scale, &rotation, &translation, matWorld);
+
+		vTotalTranslation += translation;
+		vTotalRotation += rotation;
+		vTotalScale += scale;
+	}
+
+	_int iCount = vecShapes.size();
+	_vector avgTranslation = vTotalTranslation / static_cast<float>(iCount);
+	_vector avgRotation = vTotalRotation / static_cast<float>(iCount);
+	_vector avgScale = vTotalScale / static_cast<float>(iCount);
+
+	_matrix matAverage = XMMatrixAffineTransformation(avgScale, XMVectorZero(), avgRotation, avgTranslation);
+	_float4x4 matResult{};
+	XMStoreFloat4x4(&matResult, matAverage);
+
+	return matResult;
+}
+
+void CGameInstance::DisableActor(PxActor* pActor)
+{
+	if (nullptr == pActor)
+		return;
+
+	PxScene* pScene = Get_Scene();
+	if (nullptr == pScene)
+		return;
+
+	pScene->removeActor(*pActor);
+}
+
+void CGameInstance::ReleaseActor(PxActor* pActor)
+{
+	if (nullptr == pActor)
+		return;
+
+	PxScene* pScene = Get_Scene();
+	if (nullptr == pScene)
+		return;
+
+	pScene->removeActor(*pActor);
+	pActor->release();
+	pActor = nullptr;
 }
 
 void CGameInstance::Transform_PickingToLocalSpace(const CTransform* pTransform, _float3* pRayDir, _float3* pRayPos)

@@ -28,16 +28,18 @@ public:
 	virtual void				Late_Tick(_float fTimeDelta)				override;
 	virtual HRESULT				Render()									override;
 
-
 #ifdef _DEBUG
 	virtual void				Render_IMGUI()								override;
 #endif
+	
+	void						Render_Thinking();
+
 	void						Change_Dialog(enum class PARTTIME_ITEM eItem);
 	void						Make_RandomImg();
 	void						Update_Pos(_float3 _vPosition);
 
 	void						Set_Type(TYPE _eType) { m_eDialogTheme = _eType; }
-
+	
 private:
 	HRESULT						Add_Components();
 	HRESULT						Bind_ShaderResources();
@@ -65,7 +67,8 @@ private:
 	_float2			 m_SizeFood2D   = _float2(292.f * 0.5f, 292.f * 0.5f);
 	_float4			 m_vFinPos = _float4();
 
-	TYPE			 m_eDialogTheme = ORDER;
+	_float			 m_fTimeDelta = 0.f;
+	TYPE			 m_eDialogTheme = THINKING;
 
 public:
 	static CUI_PartTimeDee*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
