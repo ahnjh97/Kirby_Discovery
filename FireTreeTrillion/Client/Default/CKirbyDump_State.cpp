@@ -144,7 +144,51 @@ _bool JoyStick_controller(CFinaleKirby::FINALEKIRBY_INFODESC* Kirbydesc, CGameOb
 
 	return false;
 }
+void Turn_InterPolate_OtherVector(_float4& vDstDir, _float4& vSrcDir, CTransform* pTransformCom, _float fTimeDelta, _float fInterpolateSpeed = 12.f)
+{
+	if (vSrcDir == vDstDir)
+		return;
 
+	///////// 보간 속도 조정임
+	_float fInterpolate = fTimeDelta * fInterpolateSpeed;
+	_vector vTargetDir = vDstDir;
+	_vector vMoveDir = vSrcDir;
+	_vector vTargetDirXZ = XMVectorSet(XMVectorGetX(vTargetDir), 0.0f, XMVectorGetZ(vTargetDir), 0.0f);
+	_vector vMoveDirXZ = XMVectorSet(XMVectorGetX(vMoveDir), 0.0f, XMVectorGetZ(vMoveDir), 0.0f);
+	vTargetDirXZ = XMVector3Normalize(vTargetDirXZ);
+	vMoveDirXZ = XMVector3Normalize(vMoveDirXZ);
+	_float fcosTheta = XMVectorGetX(XMVector4Dot(vTargetDirXZ, vMoveDirXZ));
+
+	if (fcosTheta < -0.9995f || fcosTheta > 0.9995f)
+	{
+		// 180도로 NaN 방지 랜덤으로 -1, 1도 틀어줌
+		_float4x4 rotationMatrix;
+		XMStoreFloat4x4(&rotationMatrix, XMMatrixIdentity());
+		CUtils::Turn_OtherMatrix(rotationMatrix, XMVectorSet(0.f, 1.f, 0.f, 0.f), 1.f, CUtils::Make_RandomInt(0, 1) == 1 ? 1.f : -1.f);
+		vSrcDir = XMVector3Transform(vSrcDir, XMLoadFloat4x4(&rotationMatrix));
+		vSrcDir = XMVectorSetW(vSrcDir, 0.0f);
+	}
+	else
+	{
+		_float ftheta = acos(fcosTheta);
+		_float fAngleDegrees = XMConvertToDegrees(ftheta);
+
+		if (fAngleDegrees < 3.0f)
+		{
+			vSrcDir = vDstDir;
+		}
+		else
+		{
+			_float fsinTheta = sqrt(1.0f - fcosTheta * fcosTheta);
+			_float fAlpha = sin((1 - fInterpolate) * ftheta) / fsinTheta;
+			_float fBeta = sin(fInterpolate * ftheta) / fsinTheta;
+			_float4 vResult = vMoveDirXZ * fAlpha + vTargetDirXZ * fBeta;
+			vSrcDir = XMVector4Normalize(vResult);
+			vSrcDir = XMVector3Normalize(vSrcDir);
+
+		}
+	}
+}
 
 #pragma region 차량 운전 상태
 
@@ -168,39 +212,27 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 	pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
 
-	if (JoyStick_controller(Kirbydesc, pCamera) == true)
-	{
-		Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta, 7.f);
-
-		// 10도 안쪽으로 각도가 좁혀졌을 때,
-		if (ToDegree(acos(DESC(m_vMoveDir).Dot(DESC(m_vTargetDir)))) < 11.f)
-		{
-			Kirbydesc->m_fMoveSpeed += fTimeDelta * 30.f;
-			if (Kirbydesc->m_fMoveSpeed > 30.f)
-				Kirbydesc->m_fMoveSpeed = 30.f;
-		}
-		else
-		{
-			Kirbydesc->m_fMoveSpeed += (10.f - Kirbydesc->m_fMoveSpeed) * fTimeDelta * 1.5f;
-		}
-		_vector vMoveDelta = Kirbydesc->m_vMoveDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
-		pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
-
-	}
-	else
-	{
-		// 0.1초간 풀 감속 (최대 속도 8이라 가정)
-		if (Kirbydesc->m_fMoveSpeed > 0.f)
-			Kirbydesc->m_fMoveSpeed -= 25.f * fTimeDelta;
-		if (Kirbydesc->m_fMoveSpeed < 0.f)
-			Kirbydesc->m_fMoveSpeed = 0.f;
-		// Z 회전 복구 (최대 회전 각도 10도)
-		Kirbydesc->m_fZAngle -= Kirbydesc->m_fZAngle / 4.f;
-		_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-		_vector vMoveDelta = Kirbydesc->m_vMoveDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
-		pTransformCom->Turn(Kirbydesc->m_vMoveDir, 1.f, Kirbydesc->m_fZAngle);
-		pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
-	}
+	//if (m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_PRESS) == true)
+	//{
+	//	Kirbydesc->m_vTargetDir = _float4(0.5f, 0.f, 0.5f, 0.f);
+	//	Kirbydesc->m_vTargetDir.Normalize();
+	//	Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vHandleDir, pTransformCom, fTimeDelta, 3.f);
+	//	Turn_InterPolate_OtherVector(Kirbydesc->m_vHandleDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 1.5f);
+	//}
+	//else if (m_pGameInstance->Get_DIKeyState(DIK_RIGHT, KEY_PRESS) == true)
+	//{
+	//	Kirbydesc->m_vTargetDir = _float4(0.5f, 0.f, -0.5f, 0.f);
+	//	Kirbydesc->m_vTargetDir.Normalize();
+	//	Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vHandleDir, pTransformCom, fTimeDelta, 3.f);
+	//	Turn_InterPolate_OtherVector(Kirbydesc->m_vHandleDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 1.5f);
+	//}
+	//else
+	//{
+	//	Kirbydesc->m_vTargetDir = _float4(1.f, 0.f, 0.f, 0.f);
+	//	Kirbydesc->m_vTargetDir.Normalize();
+	//	Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vHandleDir, pTransformCom, fTimeDelta, 3.f);
+	//	Turn_InterPolate_OtherVector(Kirbydesc->m_vHandleDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 1.5f);
+	//}
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
 	{
@@ -250,43 +282,16 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 	if (JoyStick_controller(Kirbydesc, pCamera) == true)
 	{
-		Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta, 7.f);
 
-		// 10도 안쪽으로 각도가 좁혀졌을 때,
-		if (ToDegree(acos(DESC(m_vMoveDir).Dot(DESC(m_vTargetDir)))) < 11.f)
-		{
-			Kirbydesc->m_fMoveSpeed += fTimeDelta * 30.f;
-			if (Kirbydesc->m_fMoveSpeed > 30.f)
-				Kirbydesc->m_fMoveSpeed = 30.f;
-		}
-		else
-		{
-			Kirbydesc->m_fMoveSpeed += (10.f - Kirbydesc->m_fMoveSpeed) * fTimeDelta * 1.5f;
-		}
-		_vector vMoveDelta = Kirbydesc->m_vMoveDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
-		pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
 	}
 	else
 	{
-		// 0.1초간 풀 감속 (최대 속도 8이라 가정)
-		if (Kirbydesc->m_fMoveSpeed > 0.f)
-			Kirbydesc->m_fMoveSpeed -= 25.f * fTimeDelta;
-		if (Kirbydesc->m_fMoveSpeed < 0.f)
-			Kirbydesc->m_fMoveSpeed = 0.f;
 
-		// Z 회전 복구 (최대 회전 각도 10도)
-		Kirbydesc->m_fZAngle -= Kirbydesc->m_fZAngle / 4.f;
-		_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-		_vector vMoveDelta = Kirbydesc->m_vMoveDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
-		pTransformCom->Turn(Kirbydesc->m_vMoveDir, 1.f, Kirbydesc->m_fZAngle);
-		pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
 	}
 
 
 	if (pKirby->Get_State() == CFinaleKirby::DUMPSTATE_JUMP)
 	{
-
-
 		DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
 		pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
 		if (pController->Is_Terrain())
@@ -352,7 +357,6 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
     if (pKirby->Get_State() == CFinaleKirby::STATE_IDLE)
     {
-
 		Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
 		Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
 		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
@@ -381,7 +385,7 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
-			pCamera->Make_Shake(0.3f, 8.f);
+			pCamera->Make_Shake(0.3f, 100.f);
 
 			return;
 		}
@@ -412,7 +416,9 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 
 		if (pKirby->isAnimFinish())
+		{
 			pKirby->Change_State(CFinaleKirby::STATE_VACUUM, 50.f, true, true, CFinaleKirby::BODY_VACUUM);
+		}
 
 	}
 	else if (pKirby->Get_State() == CFinaleKirby::STATE_VACUUM)
@@ -422,6 +428,8 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 		if (DESC(m_bVacuumComplete) == true)
 		{
+			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
+			pCamera->Make_Shake(0.3f, 0.05f);
 			pKirby->Change_State(CFinaleKirby::DUMPSTATE_CUTDEMOKIRBY, 50.f, false, false, CFinaleKirby::BODY_DUMPVACUUM, CFinaleKirby::OFFSET_DUMPVACUUM);
 			pKirby->Delete_AllEffect();
 			return;
@@ -454,7 +462,10 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset), -1.f);
 
 		if (pKirby->isAnimFinish())
+		{
+			DESC(m_vHandleDir) = DESC(m_vMoveDir);
 			pKirby->Change_State(CFinaleKirby::DUMPSTATE_IDLING, 50.f, true, true, CFinaleKirby::BODY_DUMPDEFAULT, CFinaleKirby::OFFSET_DUMP);
+		}
 	}
 }
 

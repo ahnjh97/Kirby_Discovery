@@ -221,29 +221,45 @@ void CFinaleKirby::Bone_Rotation(_float fTimeDelta)
     {
         _float fTurnAngle = -INFO(m_fMoveSpeed) * 100.f;
 
-        CBone* pBone = m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("C_WheelBJ");
+        CBone* pBone = m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("L_WheelAJ");
         _float4x4* BoneMatrix = pBone->Get_EditMatrixPtr();
-        CUtils::Turn_OtherMatrix(*BoneMatrix, _float4(1.f, 0.f, 0.f, 0.f), fTimeDelta, fTurnAngle);
-
-        //pBone = m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("C_WheelCJ");
-        //BoneMatrix = pBone->Get_EditMatrixPtr();
-        //CUtils::Turn_OtherMatrix(*BoneMatrix, _float4(1.f, 0.f, 0.f, 0.f), fTimeDelta, fTurnAngle);
-
-        //pBone = m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("C_WheelDJ");
-        //BoneMatrix = pBone->Get_EditMatrixPtr();
-        //CUtils::Turn_OtherMatrix(*BoneMatrix, _float4(1.f, 0.f, 0.f, 0.f), fTimeDelta, fTurnAngle);
-
-
-
-        pBone = m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("L_WheelAJ");
-        BoneMatrix = pBone->Get_EditMatrixPtr();
         CUtils::Turn_OtherMatrix(*BoneMatrix, _float4(1.f, 0.f, 0.f, 0.f), fTimeDelta, fTurnAngle);
 
         pBone = m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("R_WheelAJ");
         BoneMatrix = pBone->Get_EditMatrixPtr();
         CUtils::Turn_OtherMatrix(*BoneMatrix, _float4(1.f, 0.f, 0.f, 0.f), fTimeDelta, fTurnAngle);
 
-        //pBone
+
+
+
+        //pBone = m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("C_FrontBodyJ");
+        //BoneMatrix = pBone->Get_EditMatrixPtr();
+
+        //_float fHandleAngle = ToDegree(acos(_float4(1.f, 0.f,0.f,0.f).Dot(INFO(m_vHandleDir))));
+        //if (INFO(m_vTargetDir) != INFO(m_vMoveDir))
+        //{
+        //    // 좌회전
+        //    if (XMVector3Cross(INFO(m_vTargetDir), INFO(m_vMoveDir)).m128_f32[1] > 0.f)
+        //    {
+        //        fHandleAngle *= -1.f;
+        //    }
+        //}
+
+        //_float fHandleSubAngle = ToDegree(acos(INFO(m_vMoveDir).Dot(INFO(m_vHandleDir))));
+        //if (INFO(m_vMoveDir) != INFO(m_vHandleDir))
+        //{
+        //    // 우측으로 가려했다.
+        //    if (XMVector3Cross(INFO(m_vHandleDir), INFO(m_vMoveDir)).m128_f32[1] > 0.f)
+        //    {
+        //        fHandleSubAngle *= -1.f;
+        //    }
+        //}
+
+        //fHandleAngle += fHandleSubAngle;
+
+        //_float4x4 RotationMatrix = _float4x4::Identity;
+        //CUtils::Turn_OtherMatrix(RotationMatrix, _float4(0.f, 1.f, 0.f, 0.f), 1.f, fHandleAngle);
+        //*BoneMatrix = RotationMatrix;
 
     }
 }
