@@ -39,7 +39,6 @@ HRESULT CFinaleRoad::Initialize(void* pArg)
 	m_bMotionBlur = true;
 	m_bStencil = true;
 	m_bRimLight = false;
-	m_fRimWidth = .2f;
 
 
 	m_pDynamicActor = m_pModelCom->ReturnDynamicActor(m_pTransformCom->Get_WorldMatrix());
@@ -54,7 +53,7 @@ _int CFinaleRoad::Tick(_float fTimeDelta)
 
 	__super::Tick(m_fTimeDelta);
 
-	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fTimeDelta);
+	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fTimeDelta * .3f);
 
 	Compute_MotionBlur();
 
