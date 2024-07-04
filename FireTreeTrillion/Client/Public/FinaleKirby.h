@@ -53,6 +53,7 @@ public:
 		_float			m_fZAngle = { 0.f };
 		_float4			m_vMoveDir = { 0.f, 0.f, 0.f, 0.f };
 		_float4			m_vTargetDir = { 0.f, 0.f, 0.f, 0.f };
+		_float4			m_vHandleDir = { 0.f, 0.f, 0.f, 0.f };
 
 		// 눈, 입, 몸체의 상태를 담당한다.
 		EYESTATE		m_eEyeState = { EYE_END };
