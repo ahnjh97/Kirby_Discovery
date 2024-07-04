@@ -53,12 +53,16 @@ public:
 	static void		Rotation(_Inout_ _float4x4& matrix, _fvector vAxis, _float fRadian);
 
 
+	//로컬 포지션을 월드 포지션으로 변환시킨다.
+	static _float3		Make_Local_ToWorld(_float3 vPos, _float4x4& matWorld);
+
 	//월드 포지션을 투영 포지션로 변환시킨다.
-	static void		Make_World_ToScreen(_Inout_ _float3& vPos);
+	static _float3		Make_World_ToScreen(_float3 vPos);
+
 	//투영 포지션을 월드 포지션로 변환시킨다.
-	static void		Make_Screen_ToWorld(_Inout_ _float3& vPos);
-	//월드 포지션을 imgui 투영 포지션으로 변환시킨다.
+	static _float3		Make_Screen_ToWorld(_float3 vPos);
 #ifdef _DEBUG
+	//월드 포지션을 imgui 투영 포지션으로 변환시킨다.
 	static ImVec2	WorldPosTo_ImguiProjPos(_float3 vWorldPos);
 #endif
 
@@ -68,7 +72,9 @@ public:
 	static PxVec3			To_PxVec3(const _fvector& vector);
 	static _vector			To_Vector(const PxVec3 pxVec3);
 	static PxTransform		mat44ToTransform(const PxMat44& mat);
-		
+	static PxTransform		TransformToPxTransform(class CTransform* pTransform);
+
+
 	//이펙트 관련 함수
 	static HRESULT Load_Effect(path _FilePath, _Out_ SINGLE_FX_DATA* _pData);
 	static HRESULT Load_Effect(path _FilePath, _Out_ PARTICLE_DATA* _pData);

@@ -45,6 +45,8 @@
 
 #define EASE_IN_SINE(t) cos((t * 3.14159f) / 2)
 
+#define EASE_OUT_CIRC(t) sqrt(1 - pow(t - 1, 2))
+
 //일반 각도를 라디안 각도로 변환한다.
 #define ToRadian(degree)			(XMConvertToRadians(degree))
 //라디안 각도를 일반 각도로 변환한다.

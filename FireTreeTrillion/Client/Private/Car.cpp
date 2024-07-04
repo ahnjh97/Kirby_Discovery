@@ -93,7 +93,6 @@ _int CCar::Tick(_float fTimeDelta)
 
 void CCar::Late_Tick(_float fTimeDelta)
 {
-
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 5.0f))
 	{
 		if (Compute_OptimizationAnimation(m_fTimeDelta) == true)
@@ -119,7 +118,6 @@ HRESULT CCar::Render()
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
 			return E_FAIL;
-
 		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
 
@@ -288,7 +286,6 @@ CGameObject* CCar::Clone(void* pArg)
 void CCar::Free()
 {
 	__super::Free();
-
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pControllerCom);
 	Safe_Release(m_pShaderCom);

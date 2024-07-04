@@ -143,6 +143,24 @@ void CPhysXObject::Set_PhyXState(PHYXOBJECT_CURSTATE eState)
 	}
 }
 
+
+void CPhysXObject::Add_Effect(string strName, CEffect::FX_DESC fxDesc, _bool bAddToList)
+{
+	wstring strProtoTag = TEXT("Prototype_GameObject_");
+	strProtoTag += CUtils::StrToWstr(strName);
+
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), strProtoTag, &fxDesc)))
+		return;
+
+	if(bAddToList)
+		Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+
+}
+
+void CPhysXObject::Add_Effect(string strName, CMultiEffect::MULTI_FX_DESC fxDesc, _bool bAddToList)
+{
+}
+
 void CPhysXObject::Add_Effect(CEffect* pEffect)
 {
 	m_FXList.emplace_back(pEffect);

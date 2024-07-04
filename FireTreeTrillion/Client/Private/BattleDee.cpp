@@ -101,7 +101,7 @@ HRESULT CBattleDee::Initialize(void* pArg)
 
 	//m_pTransformCom->Rotation({ 0.f, 1.f, 0.f, 0.f }, ToRadian(180.f));
 
-		//디디디 전투 시작
+	//디디디 전투 시작
 	function<void(CGameObject*)> func = bind(&CBattleDee::Start_Battle, this, placeholders::_1);
 	CEventCenter::Get_Instance()->Subscribe(KEVENT_DDD_BATTLESTART, this, func);
 
@@ -482,12 +482,12 @@ CGameObject* CBattleDee::Clone(void* pArg)
 
 void CBattleDee::Free()
 {
-	Safe_Release(m_pEyeTextureCom);
+	/*Safe_Release(m_pEyeTextureCom);
 
 	for (auto& Pair : m_PartObjects)
 		Safe_Release(Pair.second);
 
-	m_PartObjects.clear();
+	m_PartObjects.clear();*/
 
 	__super::Free();
 }
