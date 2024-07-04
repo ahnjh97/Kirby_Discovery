@@ -250,8 +250,6 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 	if (pKirby->Get_State() == CFinaleKirby::DUMPSTATE_JUMP)
 	{
-		DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
-		pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
 
 		if (JoyStick_controller(Kirbydesc, pCamera) == true)
 		{
@@ -287,6 +285,8 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
 		}
 
+		DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
+		pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
 		if (pController->Is_Terrain())
 		{
 			pKirby->Change_State(CFinaleKirby::DUMPSTATE_LANDING, 60.f, false, false, CFinaleKirby::BODY_DUMPDEFAULT, CFinaleKirby::OFFSET_DUMP);
