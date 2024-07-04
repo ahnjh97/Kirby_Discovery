@@ -32,8 +32,8 @@ HRESULT CUI_BtnIcon::Initialize(void* _pArg)
 
 	_float3 vScale = { 128.f, 128.f, 1.f };
 	_float3 vOffset = { 0.9f, 0.9f, 1.f };
-	
-	m_pTransformCom->Set_Scaled(vScale * vOffset);
+	m_vOrigScale = vScale * vOffset;
+	m_pTransformCom->Set_Scaled(m_vOrigScale);
 
 	_float4 vTrans = { 478.f, -388.f, 1.f, 1.f };
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vTrans);
@@ -63,16 +63,34 @@ _int CUI_BtnIcon::Tick(_float fTimeDelta)
 	{
 	case CUI_MessageWindow::WINDOW_IDLE: break;
 	case CUI_MessageWindow::WINDOW_HIDE: m_eCurState = BTN_IDLE;	break;
-	case CUI_MessageWindow::WINDOW_SHOW: m_eCurState = BTN_BLINK;	break;
+	case CUI_MessageWindow::WINDOW_SHOW:
+		if (BTN_SELECT_UP == m_eCurState)
+			m_eCurState = BTN_SELECT_DOWN;
+
+		if (BTN_SELECT_DOWN == m_ePreState)
+			m_eCurState = BTN_SELECT_UP;
+		else
+			m_eCurState = BTN_BLINK;	
+		break;
 	case CUI_MessageWindow::WINDOW_NONE: default:	break;
 	}
 
 	//버튼 선택 시 다음 스크립트를 출력. Button UI 스케일 증감
-	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN) && BTN_BLINK == m_eCurState) //테스트용
-		m_eCurState = BTN_SELECT;
+	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN)) //테스트용
+	{
+		m_eCurState = BTN_SELECT_DOWN;
+		m_ePreState = BTN_SELECT_UP;
+	}
 
-	_float3 vOrigScale = m_pTransformCom->Get_Scaled();
-	_float3 vOffset = { 1.1f, 1.1f, 1.f };
+
+	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_UP)) //테스트용
+	{
+		m_eCurState = BTN_SELECT_UP;
+		m_ePreState = BTN_SELECT_DOWN;
+	}
+
+	//_float3 vTranscale = m_pTransformCom->Get_Scaled();
+	_float3 vOffset = { 0.8f, 0.8f, 1.f };
 	switch (m_eCurState)
 	{
 	case BTN_IDLE:
@@ -81,10 +99,12 @@ _int CUI_BtnIcon::Tick(_float fTimeDelta)
 		break;
 
 	case BTN_BLINK:
-		m_fBlinkAlpha = 0.5f;
 		m_fBtnAlpha = 1.f;
-
 		m_fBlinkTime += fTimeDelta;
+
+		if (m_fBlinkTime > 0.5f && m_fBlinkTime < 1.f)
+			m_fBlinkAlpha = 0.5f;
+
 		if (m_fBlinkTime > 1.f)
 		{
 			m_fBlinkAlpha = 0.f;
@@ -92,20 +112,38 @@ _int CUI_BtnIcon::Tick(_float fTimeDelta)
 		}
 		break;
 		
-	case BTN_SELECT:
+	case BTN_SELECT_DOWN:
 		m_fBlinkAlpha = 0.f;
+		m_fSelectTime += fTimeDelta * 2.f;
 		
-		m_fSelectTime += fTimeDelta;
-		m_pTransformCom->Set_Scaled(vOrigScale * vOffset);
-		//vOrigScale.x += EASE_OUT(fTimeDelta * 2.f); //그래프 MAX값은 1이어야하며, 범위는 0 ~ 1로 설정되어야함
-		//vOrigScale.y += EASE_OUT(fTimeDelta * 2.f);
-		if (m_fSelectTime > 0.5f)
+		if (m_fSelectTime > 0.5f && m_fSelectTime < 1.f)
+			m_pTransformCom->Set_Scaled(m_vOrigScale * vOffset);
+		break;
+
+	case BTN_SELECT_UP:
+		if (m_fSelectTime > 1.f) //초기화
 		{
 			m_fSelectTime = 0.f;
 			m_eCurState = BTN_BLINK;
-			m_pTransformCom->Set_Scaled(vOrigScale);
+			m_pTransformCom->Set_Scaled(m_vOrigScale);
 		}
 		break;
+
+		/*
+		if (m_fSelectTime < 0.5f)
+		{
+			//그래프 MAX값은 1이어야하며, 범위는 0 ~ 1로 설정되어야함
+			vOffset.x = EASE_OUT(m_fSelectTime * 2.f);
+			vOffset.y = EASE_OUT(m_fSelectTime * 2.f);
+			m_pTransformCom->Set_Scaled(m_vOrigScale * vOffset);
+		}
+		else if (m_fSelectTime > 0.5f && m_fSelectTime < 1.f)
+		{
+			vOffset.x = EASE_OUT(1 - m_fSelectTime * 2.f);
+			vOffset.y = EASE_OUT(1 - m_fSelectTime * 2.f);
+			m_pTransformCom->Set_Scaled(m_vOrigScale * vOffset);
+		}
+		*/
 
 	case BTN_NONE:	default:	break;
 	}
@@ -169,10 +207,11 @@ void CUI_BtnIcon::Render_IMGUI()
 {
 	switch (m_eCurState)
 	{
-	case BTN_IDLE:	ImGui::Text(u8"BTN_IDLE");	break;
-	case BTN_BLINK:	ImGui::Text(u8"BTN_BLINK"); break;
-	case BTN_SELECT:ImGui::Text(u8"BTN_SELECT"); break;
-	case BTN_NONE:default: ImGui::Text(u8"BTN_NONE"); break;
+	case BTN_IDLE:		ImGui::Text(u8"BTN_IDLE");	break;
+	case BTN_BLINK:		ImGui::Text(u8"BTN_BLINK"); break;
+	case BTN_SELECT_DOWN:	ImGui::Text(u8"BTN_SELECT_DOWN"); break;
+	case BTN_SELECT_UP:		ImGui::Text(u8"BTN_SELECT_UP"); break;
+	case BTN_NONE:		default: ImGui::Text(u8"BTN_NONE"); break;
 	}
 }
 #endif

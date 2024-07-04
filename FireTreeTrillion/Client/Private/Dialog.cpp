@@ -36,6 +36,25 @@ HRESULT CDialog::Display_Message(const wstring& _wstrMessage, _float _fDisplayTi
 		_wstrMessage.substr(iIndex, 1);
 	}
 
+	//SpriteFont 폰트 수정 필요.
+	wstring wstrFontTag = { TEXT("Font_HUDSub_KR15") };
+	//wstring wstrText = { TEXT("???") };
+	_float2 vFontPos = { 410.f, 725.f };
+	//_float4 vFontRGBA = { m_UIObjDesc.vColorRGB };
+	//_float4 vFontRGBA = { 176.f / 255.f, 12.f / 255.f, 24.f / 255.f, m_UIObjDesc.fAlpha };
+	_float4 vFontRGBA = {	0.f / 255.f, 
+							138.f / 255.f, 
+							121.f / 255.f, 
+							1.f };
+
+	//vFontRGBA.w = m_UIObjDesc.fAlpha;
+
+	_float2 vFontOrig = { 1.f, 1.f };
+	_float2 vFontScale = { 1.2f, 1.2f };
+	_float fRadian = { XMConvertToRadians(0.f) };
+
+	m_pGameInstance->Render_Font(wstrFontTag, _wstrMessage, vFontPos, vFontRGBA, fRadian, vFontOrig, vFontScale);
+
 	return S_OK;
 }
 

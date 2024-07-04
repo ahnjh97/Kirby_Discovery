@@ -79,7 +79,7 @@ HRESULT CSkySphere::Render()
 		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DepthTexture", i, TextureType_HEIGHT);
 		CHECK_FAILED(hr);
 
-#pragma region LEVEL_FINALBOSS::TEXTURE SWAP 
+#pragma region LEVEL_FINALBOSS & LEVEL_FINALE ::TEXTURE SWAP 
 
 		//1) 현재 해당 레벨 진입 시에 임시로 설정. 추후 FIELD/1PASE/2PASE 시점에 스왑하는 방식으로 변경 필요
 		// ex) 에피리스 HP 45% 일 경우, 2페이즈 시작 (SKY_LAB_2PASE)

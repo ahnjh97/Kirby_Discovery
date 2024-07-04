@@ -1,7 +1,7 @@
 #pragma once
 #include "Client_Defines.h"
 #include "UIObject.h"
-#include "HUD.h"
+#include "Dialog.h"
 
 BEGIN(Engine)
 class CShader;
@@ -35,11 +35,12 @@ public:
 	virtual HRESULT				Render()									override;
 
 #ifdef _DEBUG
-	//virtual void				Render_IMGUI()								override;
+	virtual void				Render_IMGUI()								override;
 #endif
 
 private:
 	HRESULT						Add_Transform(void* _pArg);
+	HRESULT						Add_Dialog(void* _pArg);
 	HRESULT						Add_Components();
 	HRESULT						Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTexture* _pTextureCom, _uint _iTexIndex);
 	HRESULT						Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom);
@@ -51,6 +52,7 @@ public:
 
 private:
 	CTransform*					m_pTransCom[TEXMW_NONE] = { nullptr };
+	CDialog*					m_pDialog = { nullptr };
 
 	MESSAGEWINDOW_STATE			m_eCurState = { WINDOW_NONE };
 };
