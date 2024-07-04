@@ -29,15 +29,16 @@ public:
 #endif
 
 	void							Initialize_TexturePos();
-
+	void							Set_Score(_float _fScore) { m_fScore = _fScore; }
 private:
 	HRESULT							Add_Components();
 	HRESULT							Bind_ShaderResources();
 
 private:
 	array<CTexture*, TEXTURECNT>	m_arrTexures;
+	CTexture*						m_pTexMask = { nullptr }; // 마스킹을 위한 텍스쳐
 
-	array<_float2,	 TEXTURECNT>	m_arrPosition;
+	array<_float2,	 TEXTURECNT>	m_arrPosition; 
 	array<_float2,	 TEXTURECNT>	m_arrSize;	
 
 	// -------------- for IMGUI
@@ -48,8 +49,8 @@ private:
 	_float2							m_SizeScoreBar2D = _float2(438.f, 156.f);
 	_float2							m_SizeScoreResult2D = _float2(720.f, 102.f);
 	_float2							m_SizeDigits2D = _float2(50.f, 60.f);
+	_float							m_fScore = _float();
 
-	CTexture*						m_pTexMask = { nullptr }; // 마스킹을 위한 텍스쳐
 
 public:
 	static CUI_PartTimeResult*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

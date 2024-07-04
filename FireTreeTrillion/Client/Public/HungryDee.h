@@ -42,13 +42,13 @@ public:
 	_bool			IsSecondWaiting() { return m_iMyIdx == (WAITPOS_FRONT + 1); }
 
 	void			Set_RenderPartObj(_bool bRender) { m_bRenderPartObj = bRender; }
+	void			Set_RenderDialog(_bool bRender);
 	
 	void			Erase_DialogUI(); //{ m_pDialogUI = nullptr; }
 
 	void			Swap_WatingPosition();
 
 	void			Ready_OrderUI(CUI_PartTimeDee::TYPE eType = CUI_PartTimeDee::ORDER);
-
 
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
@@ -73,6 +73,7 @@ private:
 	DEE_SHOPANIM	m_eMyState = { DEESHOPANIM_END };
 	_int			m_iMyIdx = { -1 };
 	_bool			m_bRenderPartObj = { false };
+	_bool			m_bRenderDialog = { false };
 
 	class CUI_PartTimeDee* m_pDialogUI = { nullptr };
 
