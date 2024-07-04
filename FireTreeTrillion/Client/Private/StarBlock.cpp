@@ -44,13 +44,10 @@ HRESULT CStarBlock::Initialize(void* pArg)
 
 	CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
 
-	m_vecStaticActors = m_pModelCom->ReturnStaticActors(m_pTransformCom->Get_WorldFloat4x4());
+	m_pStaticActor = m_pModelCom->ReturnStaticActor(m_pTransformCom->Get_WorldFloat4x4());
 
 	if (pKirby != nullptr)
-	{
-		for (auto& actor : m_vecStaticActors)
-			pKirby->RegisterActorsToPlayer_ForStarBox(actor, this);
-	}
+		pKirby->RegisterActorsToPlayer_ForStarBox(m_pStaticActor, this);
 
 	return S_OK;
 }
@@ -59,9 +56,7 @@ _int CStarBlock::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
 	{
-		for (auto& actor : m_vecStaticActors)
-			m_pGameInstance->DisableActor(actor);
-
+		m_pGameInstance->DisableActor(m_pStaticActor);
 		return Make_Partical();
 	}
 
@@ -72,9 +67,7 @@ _int CStarBlock::Tick(_float fTimeDelta)
 
 	if (m_ePhyXState == PO_VACUUMING && m_bStaticOffTrigger == true)
 	{
-		for (auto& actor : m_vecStaticActors)
-			m_pGameInstance->DisableActor(actor);
-
+		m_pGameInstance->DisableActor(m_pStaticActor);
 		m_bStaticOffTrigger = false;
 	}
 
@@ -202,9 +195,7 @@ void CStarBlock::Break_From_Car()
 		pKirby->Set_HitStop();
 	m_pGameInstance->Setting_RadialBlur(10.f, 10.f);
 
-	for (auto& actor : m_vecStaticActors)
-		m_pGameInstance->DisableActor(actor);
-
+	m_pGameInstance->DisableActor(m_pStaticActor);
 	m_bDead = true;
 }
 
@@ -353,8 +344,6 @@ _bool CStarBlock::RayCast_Terrain(const _float3 vMoveDir)
 	return false;
 }
 
-
-
 CStarBlock* CStarBlock::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CStarBlock* pInstance = new CStarBlock(pDevice, pContext);
@@ -385,9 +374,7 @@ void CStarBlock::Free()
 {
 	__super::Free();
 
-	for (auto& actor : m_vecStaticActors)
-		m_pGameInstance->ReleaseActor(actor);
-	m_vecStaticActors.clear();
+	m_pGameInstance->ReleaseActor(m_pStaticActor);
 
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);

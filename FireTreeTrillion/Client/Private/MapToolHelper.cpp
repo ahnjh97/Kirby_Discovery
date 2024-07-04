@@ -101,10 +101,13 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 			"Level_Tool_UI", "Level_Tool_FX", "Level_Tool_Anim", "Level_Tool_Map",
 		"Intro", "Racing", "DeeDeeDee", "Town", "PartTime", "FinalBoss", "Finale", "Level_End" };
 
-	//UV 조절 가능
-	//BasicMap (UV 편집 가능)
+#pragma region BASIC MAP
+
 	m_vecMapModelNames = { "Level0Stage1Step01", "Level0Stage1Step02",  "Level1Stage1Step01", "DeeDeeDeeMap", "Town", "TownShop"
-		, "Land_VcLabo", "Land_LbLastBossBeforeStep", "LevelFinale_LbLastBuilding" };
+		,"Land_LbLastBossBeforeStep" //,"LevelFinale_LbLastBuilding" :: 텍스처 및 모델 수정으로 사용안함
+		,"Land_LbLastBossStage" };
+
+#pragma endregion
 
 	vector<string> vecBGs = { "BG0", "BG1" };
 	m_setMapNames.insert(vecBGs.begin(), vecBGs.end());
@@ -136,7 +139,6 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "TwGougeGround01", "TwGougeGround02"
 #pragma endregion
 
-
 #pragma region LEVEL_RACING OBJECT
 		, "CMBuildingFenceA01","CMBuildingFenceA02", "CmFillerObjectD", "CmFillerObjectG", "CmFillerObjectH"
 		, "CmFillerObjectH02", "CmFillerObjectI"
@@ -161,7 +163,6 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "MlFlowerPot01L"
 #pragma endregion
 
-
 #pragma region TOWN OBJECT
 		, "TwArena", "TwArenaA", "TwArenaB", "TwArenaClerk", "TwDeliveryService", "TwFoodStore", "TwFoodStoreChair", "TwFoodStoreTable"
 		, "TwKirbyHouse", "TwPharmacy", "TwPlanterA", "TwPlanterB", "TwRollingBallBooth", "TwSideHouseA", "TwSideHouseC", "TwSideHouseD"
@@ -169,13 +170,14 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		,"TwCentralSquare","TwStreetLiveSetC", "TwSideBridge", "TwConstructionAreaStepway", "TwConstructionAreaPond"
 #pragma endregion
 
-
 #pragma region LEVEL_FINALBOSS (LAB_DISCOVERA) OBJECT
-		//Field 
-		, "LbBossRoom", "LbLastBossStage", "LbLastBuilding", "Land_LbLastBossBeforeStep"
+		// 보스전 필드
+		//"LbLastBuilding", "LbLastBossStage" :: 텍스처 및 모델 수정으로 사용안함
+		, "LbBossRoom", "Land_LbLastBossBeforeStep", "LbLastBossStage"
 
-		//LbLastBuilding Object :: 보스전 필드의 오브젝트
-		,"LbLastStairs"//, "LbLastTank", "LbLastOutFrame1", "LbLastOutFrame2", :: 준수 오더로 삭제. 이제 Anim으로 대체되어 사용안함
+		// 보스전 필드의 오브젝트
+		// "LbLastTank", "LbLastOutFrame1", "LbLastOutFrame2", :: 준수 오더로 삭제. 이제 Anim으로 대체되어 사용안함
+		,"LbLastStairs"
 		,"LbBossRoomDoorAL","LbBossRoomDoorBL", "LbOutBuildingWallL"
 
 		//LbLastBossBeforeStep Object :: Rubble 
@@ -183,11 +185,16 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "LbRubbleTile01L", "LbRubbleTile02L", "LbRubbleTile03L"
 		, "GsRubbleD", "GsRubbleE", "GsRubbleF", "GsRubbleG"
 		
-		//CmFillerObject, Ml~ :: 채우기용 잡오브젝트
+		// [Common] CmFillerObject, [Mall] Ml~ :: 채우기용 잡오브젝트
 		, "CmFillerObjectAL", "CmFillerObjectA02L", "CmFillerObjectA03L", "CmFillerObjectBL", "CmFillerObjectCL", "CmFillerObjectEL", "CmFillerObjectFL"
 		, "MlBossBenchL", "MlBossChairL", "MlFlowerPot01L", "MlSofaFL"
 
 #pragma endregion
+
+#pragma region LEVEL_FINALE OBJECT
+
+#pragma endregion
+
 	};
 	
 	m_setKickables = { "GsRubbleA", "GsRubbleB", "GsRubbleC", "GsPebble", "GsTireAL", "GsTireBL", "GsTireCL",  "SeShell", "WasteCanYellow" };

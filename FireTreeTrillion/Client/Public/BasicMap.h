@@ -50,6 +50,8 @@ private:
 	CShader* m_pAnimShaderCom = { nullptr };
 	CTexture* m_pTextureCom = { nullptr };
 	CGameObject* m_pBlendMap = { nullptr };
+	PxRigidStatic* m_pStaticActor = { nullptr };
+	vector<PxRigidStatic*> m_vecDecoStaticActors = { nullptr };
 
 	vector<_uint> m_vecPassIndices;
 	vector<_float> m_vecSamplingFactors;

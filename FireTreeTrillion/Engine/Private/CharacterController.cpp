@@ -406,6 +406,36 @@ _float CCharacterController::Compute_Wall(_fvector vLook, _float fOffSet)
 	return fDistance;
 }
 
+_float CCharacterController::Compute_Wall(_fvector vLook, _float3 vOffset)
+{
+	PxExtendedVec3 position = m_pController->getPosition();
+	PxVec3 rayOrigin = PxVec3((_float)position.x + vOffset.x, (_float)position.y + vOffset.y, (_float)position.z + vOffset.z);
+
+	PxVec3 rayDirection = CUtils::To_PxVec3(vLook);
+	_float fMaxDistance = 10.f;
+
+	_float fDistance = { 0.f };
+	PxRaycastHit hit;
+	PxRaycastBuffer hitBuffer;
+	PxQueryFilterData filterData(PxQueryFlag::eSTATIC);
+
+	_bool isRayCast = m_pGameInstance->Get_Scene()->raycast(rayOrigin, rayDirection, fMaxDistance, hitBuffer, PxHitFlag::eNORMAL, filterData);
+
+	if (isRayCast)
+	{
+		// 첫 번째 히트 결과
+		hit = hitBuffer.block;
+
+		m_pMostRecentActor = hit.actor;
+
+		fDistance = (rayOrigin - hit.position).magnitude();
+	}
+	else
+		return 20.f;
+
+	return fDistance;
+}
+
 _float CCharacterController::RayCastToDynamicActor(_fvector vLook, _float3 vOffset)
 {
 	PxExtendedVec3 position = m_pController->getPosition();

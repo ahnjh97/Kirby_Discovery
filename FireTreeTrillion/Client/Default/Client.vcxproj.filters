@@ -265,9 +265,6 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BladeKnight\State">
       <UniqueIdentifier>{c3509440-bbe1-439c-b743-a205693e77b6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Levels\GamePlay">
-      <UniqueIdentifier>{4547c314-4c9e-474f-bf8e-dd8eb6143161}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword\State">
       <UniqueIdentifier>{c3509440-bbe1-439c-b743-a205693e77b6}</UniqueIdentifier>
     </Filter>
@@ -498,6 +495,9 @@
     </Filter>
     <Filter Include="02.GameObjects\Map\FinaleRoad">
       <UniqueIdentifier>{4b701e1c-0a8a-4c87-9d85-34140b695c97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\MessageWindow\Dialog">
+      <UniqueIdentifier>{82ad8f74-ac86-4162-a213-43bd7f6a55d8}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Map\Deco\ShadowDeco">
       <UniqueIdentifier>{af0b42ac-2606-411c-a9ea-4ca6880cde91}</UniqueIdentifier>
@@ -1009,6 +1009,9 @@
     <ClInclude Include="..\public\FinaleRoad.h">
       <Filter>02.GameObjects\Map\FinaleRoad</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Dialog.h">
+      <Filter>02.GameObjects\UI\MessageWindow\Dialog</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\ShadowDeco.h">
       <Filter>02.GameObjects\Map\Deco\ShadowDeco</Filter>
     </ClInclude>
@@ -1499,6 +1502,9 @@
     </ClCompile>
     <ClCompile Include="..\private\FinaleRoad.cpp">
       <Filter>02.GameObjects\Map\FinaleRoad</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Dialog.cpp">
+      <Filter>02.GameObjects\UI\MessageWindow\Dialog</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\ShadowDeco.cpp">
       <Filter>02.GameObjects\Map\Deco\ShadowDeco</Filter>
