@@ -103,6 +103,7 @@ public:
 
 	_bool					isAnimFinish();
 	_float					Get_AnimTrackPosition();
+	void					Bone_Rotation(_float fTimeDelta);
 
 	void					Set_HitStop(_float fHitStopMaxTime = 0.12f) { 
 		m_bHitStop = true; m_fHitStopMaxTime = fHitStopMaxTime; }

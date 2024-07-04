@@ -11,6 +11,8 @@
 #include "LevelChanger.h"
 
 #include "CKirbyDump_State.h"
+#include "Hitbox.h"
+#include "Bone.h"
 
 
 CFinaleKirby::CFinaleKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -49,7 +51,6 @@ HRESULT CFinaleKirby::Initialize(void* pArg)
     Kirby_StateInitialize();
 
     m_pControllerCom->RegisterAsPlayer();
-    Set_BodyCollider(COLLIDER_SPHERE, 1.f, 0.f, 2.f);
 
     return S_OK;
 }
@@ -60,10 +61,14 @@ _int CFinaleKirby::Tick(_float fTimeDelta)
         return OBJ_DEAD;
 
     m_fTimeDelta = m_pGameInstance->Get_FirstTimer();
-    HitStop_System(fTimeDelta);
+
+    HitStop_System(m_fTimeDelta);
 
     // 커비의 기본적인 축 보정, 밸런스 보정을 담당한다.
     Setting_KirbyBalance();
+
+    // 특정 상황에서 뼈를 돌려준다.
+    Bone_Rotation(m_fTimeDelta);
 
     // 유틸업데이트가 들어가있다. (FSM)
     __super::Tick(m_fTimeDelta);
@@ -207,6 +212,40 @@ _bool CFinaleKirby::isAnimFinish()
 _float CFinaleKirby::Get_AnimTrackPosition()
 {
     return m_pModelCom[m_tKirbyInfo.m_eBodyState]->Get_AnimTrackPosition();
+}
+
+void CFinaleKirby::Bone_Rotation(_float fTimeDelta)
+{
+    // 자동차일때,
+    if (INFO(m_eBodyState) == BODY_DUMPDEFAULT)
+    {
+        _float fTurnAngle = -INFO(m_fMoveSpeed) * 100.f;
+
+        CBone* pBone = m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("C_WheelBJ");
+        _float4x4* BoneMatrix = pBone->Get_EditMatrixPtr();
+        CUtils::Turn_OtherMatrix(*BoneMatrix, _float4(1.f, 0.f, 0.f, 0.f), fTimeDelta, fTurnAngle);
+
+        //pBone = m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("C_WheelCJ");
+        //BoneMatrix = pBone->Get_EditMatrixPtr();
+        //CUtils::Turn_OtherMatrix(*BoneMatrix, _float4(1.f, 0.f, 0.f, 0.f), fTimeDelta, fTurnAngle);
+
+        //pBone = m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("C_WheelDJ");
+        //BoneMatrix = pBone->Get_EditMatrixPtr();
+        //CUtils::Turn_OtherMatrix(*BoneMatrix, _float4(1.f, 0.f, 0.f, 0.f), fTimeDelta, fTurnAngle);
+
+
+
+        pBone = m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("L_WheelAJ");
+        BoneMatrix = pBone->Get_EditMatrixPtr();
+        CUtils::Turn_OtherMatrix(*BoneMatrix, _float4(1.f, 0.f, 0.f, 0.f), fTimeDelta, fTurnAngle);
+
+        pBone = m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("R_WheelAJ");
+        BoneMatrix = pBone->Get_EditMatrixPtr();
+        CUtils::Turn_OtherMatrix(*BoneMatrix, _float4(1.f, 0.f, 0.f, 0.f), fTimeDelta, fTurnAngle);
+
+        //pBone
+
+    }
 }
 
 void CFinaleKirby::Setting_KirbyBalance()
@@ -428,6 +467,14 @@ HRESULT CFinaleKirby::Add_Components()
     m_ppModelForAnimTool = &m_pModelCom[BODY_DEFAULT];
     m_uModelCnt = BODY_END;
 
+    CHitBox::HITBOX_DESC HitBox{};
+    HitBox.pOwner = this;
+    HitBox.pDesc = &m_tColliderDesc[BODY];
+    HitBox.pCollisionType = PLAYER;
+    if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
+        return E_FAIL;
+    Set_BodyCollider(COLLIDER_SPHERE, 1.f, 0.f, 2.f);
+
     /* FSM */
     SetUp_FSM();
 
@@ -477,7 +524,7 @@ _bool CFinaleKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
     // Default 상태의 눈 부위 // Vacuum 상태의 눈 부위 // Balloon 상태의 눈 부위
     else if ((_eBodyState == BODY_DEFAULT && _iMeshIndex == 3) ||
         (_eBodyState == BODY_VACUUM && _iMeshIndex == 2 ||
-            _eBodyState == BODY_DUMPVACUUM && _iMeshIndex == 7 ||
+            /*_eBodyState == BODY_DUMPVACUUM && _iMeshIndex == 6 ||*/
             _eBodyState == BODY_DUMPDEFAULT && _iMeshIndex == 7))
     {
         m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
