@@ -153,7 +153,7 @@ HRESULT CUI_BtnIcon::Render()
 		if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 			return E_FAIL;
 
-		hr = Bind_ShaderResources(m_pShaderCom, ePassType, m_pTextureCom[iTEXIx], 0);
+		hr = Bind_ShaderResources(m_pShaderCom, ePassType, m_pTexCom[iTEXIx], 0);
 		CHECK_FAILED(hr);
 
 #pragma endregion
@@ -183,11 +183,11 @@ HRESULT CUI_BtnIcon::Add_Components()
 		return E_FAIL;
 
   	if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Texture_UI_BtnIconBase"),
-		TEXT("Com_TextBase"), (CComponent**)&m_pTextureCom[TEXBTN_BASE])))
+		TEXT("Com_TextBase"), (CComponent**)&m_pTexCom[TEXBTN_BASE])))
 		return E_FAIL;
 
 	if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Texture_UI_BtnIconBright"),
-		TEXT("Com_TexBright"), (CComponent**)&m_pTextureCom[TEXBTN_BRIGHT])))
+		TEXT("Com_TexBright"), (CComponent**)&m_pTexCom[TEXBTN_BRIGHT])))
 		return E_FAIL;
 
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),
@@ -256,11 +256,8 @@ void CUI_BtnIcon::Free()
 {
 	__super::Free();
 	
-	for (auto& iTex : m_pTextureCom)
+	for (auto& iTex : m_pTexCom)
 		Safe_Release(iTex);
-
-	Safe_Release(m_pVIBufferCom);
-	Safe_Release(m_pShaderCom);
 
 	Safe_Release(m_pMWindow);
 }

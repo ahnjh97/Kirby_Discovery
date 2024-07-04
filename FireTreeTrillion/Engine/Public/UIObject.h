@@ -103,7 +103,6 @@ protected:
 	CShader*							m_pShaderCom = { nullptr };
 	CVIBuffer_Rect*						m_pVIBufferCom = { nullptr };
 	CTexture*							m_pTextureCom = { nullptr };
-	CTexture*							m_pTextures[TEX_NONE] = {nullptr};
 
 	ID3D11RenderTargetView*				m_pRTV = { nullptr };
 	ID3D11Texture2D*					m_pTexture2D = { nullptr };

@@ -118,7 +118,7 @@ HRESULT CHUD_AbilityDiscard::Render()
 	HRESULT hr;
 
 	//For.Mask
-	if (FAILED(m_pTextureCom[TEX_MASK]->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", 0)))
+	if (FAILED(m_pTexCom[TEX_MASK]->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", 0)))
 		return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fDumpAbilityTime, sizeof(_float))))
@@ -144,7 +144,7 @@ HRESULT CHUD_AbilityDiscard::Render()
 		if (TEXDC_BTN == iTexIndex)
 			ePassType = POSTEX_UIWHITEALPHA;
 
-		hr = Bind_ShaderResources(m_pShaderCom, ePassType, m_pTextureCom[TEX_DIFFUSE], iTexIndex); 
+		hr = Bind_ShaderResources(m_pShaderCom, ePassType, m_pTexCom[TEX_DIFFUSE], iTexIndex);
 		CHECK_FAILED(hr);
 	}
 
@@ -216,11 +216,11 @@ HRESULT CHUD_AbilityDiscard::Add_Components()
 		return E_FAIL;
 
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_HUD_AbilityDiscard"),
-		TEXT("Com_TexDiffuse"), (CComponent**)&m_pTextureCom[TEX_DIFFUSE])))
+		TEXT("Com_TexDiffuse"), (CComponent**)&m_pTexCom[TEX_DIFFUSE])))
 		return E_FAIL;
 
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_HUD_AbilityDiscard_Mask"),
-		TEXT("Com_TexMask"), (CComponent**)&m_pTextureCom[TEX_MASK])))
+		TEXT("Com_TexMask"), (CComponent**)&m_pTexCom[TEX_MASK])))
 		return E_FAIL;
 
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),
@@ -290,13 +290,11 @@ CGameObject* CHUD_AbilityDiscard::Clone(void* pArg)
 void CHUD_AbilityDiscard::Free()
 {
 	__super::Free();
-	for (auto& iTex : m_pTextureCom)
+
+	for (auto& iTex : m_pTexCom)
 		Safe_Release(iTex);
 
-	Safe_Release(m_pVIBufferCom);
-	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pKirby);
-
 }
 
 
