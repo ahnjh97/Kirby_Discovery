@@ -37,6 +37,9 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 	if (FAILED(Add_Dialog(_pArg)))
 		return E_FAIL;
 
+	// Add_Button
+	hr = m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_UI_MessageWindow"), TEXT("Prototype_GameObject_UI_BtnIcon"));
+
 #pragma region MESSAGEWINDOW BASE
 
 	m_pTransCom[TEXMW_BASE]->Set_Scaled(m_UIObjDesc.vSize);
@@ -104,8 +107,6 @@ HRESULT CUI_MessageWindow::Render()
 {
 	HRESULT hr;
 
-	m_pDialog->Start_Message();
-
 #pragma region RENDER_BINDSET
 	
 	for (_uint iTEXIx = 0; iTEXIx < TEXMW_NONE; ++iTEXIx)
@@ -123,10 +124,11 @@ HRESULT CUI_MessageWindow::Render()
 		PASS_POSTEX ePassType = { POSTEX_ALPHABLEND_NOTEST };
 		hr = Bind_ShaderResources(m_pShaderCom, ePassType, m_pTextureCom, iTEXIx);
 		CHECK_FAILED(hr);
-
+	}
 #pragma endregion
 
-	}
+	m_pDialog->Start_Message();
+
 	return S_OK;
 }
 
@@ -164,6 +166,7 @@ HRESULT CUI_MessageWindow::Add_Transform(void* _pArg)
 
 HRESULT CUI_MessageWindow::Add_Dialog(void* _pArg)
 {
+
 	m_pDialog = CDialog::Create(m_pDevice, m_pContext);
 	if (nullptr == m_pDialog)
 		return E_FAIL;
@@ -257,6 +260,8 @@ void CUI_MessageWindow::Free()
 
 	for (auto& iTrans : m_pTransCom)
 		Safe_Release(iTrans);
+
+	Safe_Release(m_pDialog);
 }
 
 

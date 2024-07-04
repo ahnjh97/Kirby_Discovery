@@ -46,9 +46,9 @@ private:
 	HRESULT						Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom);
 
 public:
-	static CUI_MessageWindow*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	virtual CGameObject*			Clone(void* pArg) override;
-	virtual void					Free() override;
+	static CUI_MessageWindow*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	virtual CGameObject*		Clone(void* pArg) override;
+	virtual void				Free() override;
 
 private:
 	CTransform*					m_pTransCom[TEXMW_NONE] = { nullptr };
