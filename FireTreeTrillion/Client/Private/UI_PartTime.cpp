@@ -792,8 +792,8 @@ void CUI_PartTime::Reset_ShaderValue()
 // ≈¡≈¡≈∏∂Û∂Û∂Û...
 _float CUI_PartTime::EaseOutBounce(_float _value)
 {
-	const _float n1 = 7.5625;
-	const _float d1 = 2.75;
+	const _float n1 = 7.5625f;
+	const _float d1 = 2.75f;
 
 	if (_value < 1.f / d1) {
 		return n1 * _value * _value;

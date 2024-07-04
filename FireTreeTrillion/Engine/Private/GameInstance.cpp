@@ -815,67 +815,6 @@ _vector CGameInstance::Compute_WorldPos(const _float2& vViewportPos, const wstri
 	return m_pExtractor->Compute_WorldPos(vViewportPos, strZRenderTargetTag, iOffset);
 }
 
-PxPhysics* CGameInstance::Get_Physics()
-{
-	return m_pPhysx->Get_Physics();
-}
-
-PxScene* CGameInstance::Get_Scene()
-{
-	return m_pPhysx->Get_Scene();
-}
-
-PxMaterial* CGameInstance::Get_Material()
-{
-	return m_pPhysx->Get_Material();
-}
-
-PxControllerManager* CGameInstance::Get_ControllerManager()
-{
-	return m_pPhysx->Get_ControllerManager();
-}
-
-void CGameInstance::AddActor(physx::PxActor& pActor)
-{
-	m_pPhysx->AddActor(pActor);
-}
-
-void CGameInstance::RemoveActor(physx::PxActor& pActor)
-{
-	m_pPhysx->RemoveActor(pActor);
-}
-
-void CGameInstance::Add_Force(_float3 vForce)
-{
-	m_pPhysx->Add_Force(vForce);
-}
-
-void CGameInstance::Add_Force(PxRigidDynamic* pDynamicActor, _float3 vForce)
-{
-	m_pPhysx->Add_Force(pDynamicActor, vForce);
-}
-
-void CGameInstance::Kick_DynamicActor(_float3 _kickDirection, _float impulseMagnitude)
-{
-	m_pPhysx->Kick_DynamicActor(_kickDirection, impulseMagnitude);
-}
-
-void CGameInstance::Test()
-{
-	m_pPhysx->Test();
-}
-
-_float4x4 CGameInstance::Update(_fmatrix matrix)
-{
-	return m_pPhysx->Update(matrix);
-}
-
-
-void CGameInstance::Ready_TestGround()
-{
-	m_pPhysx->Ready_TestGround();
-}
-
 //void CGameInstance::Overlap_Hitbox(CGameObject* pGameObject, _float4 vPos, _float fRadius)
 //{
 //	m_pPhysx->Overlap_Hitbox(pGameObject, vPos, fRadius);
@@ -994,6 +933,56 @@ void CGameInstance::Set_IMGUIStyle(_uint uStyle)
 }
 #endif
 
+PxPhysics* CGameInstance::Get_Physics()
+{
+	if (nullptr == m_pPhysx)
+		return nullptr;
+
+	return m_pPhysx->Get_Physics();
+}
+
+PxScene* CGameInstance::Get_Scene()
+{
+	if (nullptr == m_pPhysx)
+		return nullptr;
+
+	return m_pPhysx->Get_Scene();
+}
+
+PxMaterial* CGameInstance::Get_Material()
+{
+	if (nullptr == m_pPhysx)
+		return nullptr;
+
+	return m_pPhysx->Get_Material();
+}
+
+PxControllerManager* CGameInstance::Get_ControllerManager()
+{
+	if (nullptr == m_pPhysx)
+		return nullptr;
+
+	return m_pPhysx->Get_ControllerManager();
+}
+
+void CGameInstance::AddActor(physx::PxActor& pActor)
+{
+	if (nullptr != m_pPhysx)
+		m_pPhysx->AddActor(pActor);
+}
+
+void CGameInstance::RemoveActor(physx::PxActor& pActor)
+{
+	if (nullptr != m_pPhysx)
+		m_pPhysx->RemoveActor(pActor);
+}
+
+void CGameInstance::Ready_TestGround()
+{
+	if (nullptr != m_pPhysx)
+		m_pPhysx->Ready_TestGround();
+}
+
 PxRigidDynamic* CGameInstance::CreateDynamicActor(_float4x4& matWorld, _float3* pVerticesPos, _uint iNumVertices, _uint* pIndices, _int iNumIndices, PxMaterial* pMaterial)
 {
 	if (nullptr == m_pPhysx)
@@ -1090,9 +1079,9 @@ _float4x4 CGameInstance::GetActorAverageMatrix(PxRigidActor* pActor)
 	}
 
 	_int iCount = vecShapes.size();
-	_vector avgTranslation = vTotalTranslation / static_cast<float>(iCount);
-	_vector avgRotation = vTotalRotation / static_cast<float>(iCount);
-	_vector avgScale = vTotalScale / static_cast<float>(iCount);
+	_vector avgTranslation = vTotalTranslation / static_cast<_float>(iCount);
+	_vector avgRotation = vTotalRotation / static_cast<_float>(iCount);
+	_vector avgScale = vTotalScale / static_cast<_float>(iCount);
 
 	_matrix matAverage = XMMatrixAffineTransformation(avgScale, XMVectorZero(), avgRotation, avgTranslation);
 	_float4x4 matResult{};

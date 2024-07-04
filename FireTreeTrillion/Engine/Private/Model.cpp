@@ -321,58 +321,6 @@ HRESULT CModel::CreateStaticActor(_float4x4& matWorld)
 	return S_OK;
 }
 
-vector<PxRigidActor*> CModel::ReturnStaticActors(_float4x4& matWorld)
-{
-	vector<PxRigidActor*> vecStaticActors;
-
-	for (auto& mesh : m_Meshes)
-	{
-		if (nullptr == mesh)
-			continue;
-
-		PxRigidActor* pStaticActor = mesh->ReturnStaticActor(matWorld);
-		if (nullptr == pStaticActor)
-			continue;
-
-		vecStaticActors.push_back(pStaticActor);
-	}
-		
-	return vecStaticActors;
-}
-
-vector<PxRigidActor*> CModel::ReturnStaticActors_ExcludeByKeyword(_float4x4& matWorld, vector<string>& _vecKeyWords)
-{
-	vector<PxRigidActor*> vecStaticActors;
-
-	for (auto& mesh : m_Meshes)
-	{
-		if (nullptr == mesh)
-			continue;
-
-		string strMeshName = mesh->Get_Name();
-		_bool bSkip = false;
-
-		for (auto& keyword : _vecKeyWords)
-		{
-			if (strMeshName.find(keyword) != string::npos) {
-				bSkip = true;
-				break;
-			}
-		}
-
-		if (true == bSkip)
-			continue;
-		
-		PxRigidActor* pStaticActor = mesh->ReturnStaticActor(matWorld);
-		if (nullptr == pStaticActor)
-			continue;
-
-		vecStaticActors.push_back(pStaticActor);
-	}
-
-	return vecStaticActors;
-}
-
 PxRigidStatic* CModel::ReturnStaticActor(_float4x4& matWorld)
 {
 	PxPhysics* pPhysics = m_pGameInstance->Get_Physics();

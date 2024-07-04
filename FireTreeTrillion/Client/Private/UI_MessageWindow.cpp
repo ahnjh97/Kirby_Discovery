@@ -88,6 +88,8 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 		m_UIObjDesc.fAlpha = 0.f;
 		return OBJ_NOEVENT;
 	}
+
+	return OBJ_NOEVENT;
 }
 
 void CUI_MessageWindow::Late_Tick(_float fTimeDelta)
@@ -153,8 +155,8 @@ HRESULT CUI_MessageWindow::Add_Transform(void* _pArg)
 		if (FAILED(m_pTransCom[iTrans]->Initialize(_pArg)))
 			return E_FAIL;
 
-		//m_Components.emplace(g_strTransformTag, m_pTransformCom);
-		Safe_AddRef(m_pTransCom[iTrans]);
+		//m_Components.emplace(g_strTransformTag, m_pTransCom[iTrans]);
+		//Safe_AddRef(m_pTransCom[iTrans]);
 	}
 
 	return S_OK;
@@ -167,7 +169,7 @@ HRESULT CUI_MessageWindow::Add_Components()
 		return E_FAIL;
 
 	//대화하는 대상에 따라 텍스처를 변경하여 출력 (현재는 한 장)
-	if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Texture_UI_MessageWindow"),
+	if (FAILED(__super::Add_Component(LEVEL_DEEDEEDEE, TEXT("Prototype_Component_Texture_UI_MessageWindow"),
 		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
 		return E_FAIL;
 
@@ -241,10 +243,6 @@ void CUI_MessageWindow::Free()
 
 	for (auto& iTrans : m_pTransCom)
 		Safe_Release(iTrans);
-
-	Safe_Release(m_pTextureCom);
-	Safe_Release(m_pVIBufferCom);
-	Safe_Release(m_pShaderCom);
 }
 
 

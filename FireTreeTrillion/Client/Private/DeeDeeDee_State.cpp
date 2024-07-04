@@ -4,6 +4,7 @@
 #include "Kirby.h"
 #include "Camera_Main.h"
 #include "MultiEffect.h"
+#include "Ability.h"
 
 #define DESC(Dst) DDDDesc->Dst
 
@@ -577,6 +578,27 @@ void CDeeDeeDee_Slide_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 
 		if (pDee->IsAnimFinished())
 		{
+			vLook.y = 0.f;
+			HRESULT hr;
+			// 별 아이템 떨굼
+			_uint iItemCnt = 2;
+			for (_uint i = 0; i < iItemCnt; ++i)
+			{
+				CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
+				if (i < iItemCnt / 2)
+					AbilityItemDesc.fRotateDir = 1.f;															// 별 회전 방향 오른쪽
+				else
+					AbilityItemDesc.fRotateDir = -1.f;															// 별 회전 방향 왼쪽
+				if (0 == i)
+					AbilityItemDesc.fAngle = -15.f;																// 별의 진행 방향의 각도
+				else
+					AbilityItemDesc.fAngle = 15.f;																// 별의 진행 방향의 각도
+				AbilityItemDesc.vDir = XMVector3Normalize(vLook) * 3.f;					// 별의 진행 방향
+				AbilityItemDesc.vPosition = pTransformCom->Get_State(CTransform::STATE_POSITION) + vLook * 3.f;		// 별의 생성 위치
+				AbilityItemDesc.eAbilityType = ABILITY_DEFAULT;
+				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+				CHECK_FAILED(hr);
+			}
 			pDee->Change_State(CDeeDeeDee::STATE_SLIDINGEND, 60.f, false, false);
 		}
 	}

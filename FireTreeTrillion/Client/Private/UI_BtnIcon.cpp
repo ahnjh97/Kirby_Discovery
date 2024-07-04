@@ -72,7 +72,7 @@ _int CUI_BtnIcon::Tick(_float fTimeDelta)
 		m_eCurState = BTN_SELECT;
 
 	_float3 vOrigScale = m_pTransformCom->Get_Scaled();
-	_float3 vOffset = { 1.f, 1.f, 1.f };
+	_float3 vOffset = { 1.1f, 1.1f, 1.f };
 	switch (m_eCurState)
 	{
 	case BTN_IDLE:
@@ -103,6 +103,7 @@ _int CUI_BtnIcon::Tick(_float fTimeDelta)
 		{
 			m_fSelectTime = 0.f;
 			m_eCurState = BTN_BLINK;
+			m_pTransformCom->Set_Scaled(vOrigScale);
 		}
 		break;
 
@@ -115,6 +116,8 @@ _int CUI_BtnIcon::Tick(_float fTimeDelta)
 		m_fBtnAlpha = 0.f;
 		return OBJ_NOEVENT;
 	}
+
+	return OBJ_NOEVENT;
 }
 
 void CUI_BtnIcon::Late_Tick(_float fTimeDelta)
@@ -151,7 +154,7 @@ HRESULT CUI_BtnIcon::Render()
 		if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 			return E_FAIL;
 
-		hr = Bind_ShaderResources(m_pShaderCom, ePassType, m_pTextureCom[iTEXIx], 0);
+		hr = Bind_ShaderResources(m_pShaderCom, ePassType, m_pTexCom[iTEXIx], 0);
 		CHECK_FAILED(hr);
 
 #pragma endregion
@@ -181,11 +184,11 @@ HRESULT CUI_BtnIcon::Add_Components()
 		return E_FAIL;
 
   	if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Texture_UI_BtnIconBase"),
-		TEXT("Com_TextBase"), (CComponent**)&m_pTextureCom[TEXBTN_BASE])))
+		TEXT("Com_TextBase"), (CComponent**)&m_pTexCom[TEXBTN_BASE])))
 		return E_FAIL;
 
 	if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Texture_UI_BtnIconBright"),
-		TEXT("Com_TexBright"), (CComponent**)&m_pTextureCom[TEXBTN_BRIGHT])))
+		TEXT("Com_TexBright"), (CComponent**)&m_pTexCom[TEXBTN_BRIGHT])))
 		return E_FAIL;
 
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),
@@ -254,11 +257,8 @@ void CUI_BtnIcon::Free()
 {
 	__super::Free();
 	
-	for (auto& iTex : m_pTextureCom)
+	for (auto& iTex : m_pTexCom)
 		Safe_Release(iTex);
-
-	Safe_Release(m_pVIBufferCom);
-	Safe_Release(m_pShaderCom);
 
 	Safe_Release(m_pMWindow);
 }

@@ -151,7 +151,7 @@ void CCharacter::Character_SystemTick(_float fTimeDelta)
 	if (m_fWhiteColorDiffuse > 0.f)
 	{
 		// 0.2초만에 다시 원래 색상으로 복귀한다.
-		m_fWhiteColorDiffuse -= fTimeDelta * 5.f;
+		m_fWhiteColorDiffuse -= fTimeDelta * 4.f;
 
 		if (m_fWhiteColorDiffuse < 0.f)
 			m_fWhiteColorDiffuse = 0.f;

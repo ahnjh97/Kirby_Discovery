@@ -101,8 +101,11 @@ private:
 	_bool				m_bGlide = { false };
 	_bool				m_bChain = { false };
 	_bool				m_bGully = { false };
+	_bool				m_bShake = { false };
 
 	_float				m_fGlideTime = { 0.f };
+	//_float				m_fGullyTime = { 0.f };
+	_float				m_fTimeDelay = { 0.f };
 
 	_uint				m_iGullyCnt = { 0 };
 

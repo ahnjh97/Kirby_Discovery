@@ -2,6 +2,7 @@
 #include "Meteor.h"
 #include "Kirby.h"
 #include "HitBox.h"
+#include "Camera_Main.h"
 
 CMeteor::CMeteor(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
@@ -89,6 +90,14 @@ _int CMeteor::Tick(_float fTimeDelta)
 			}
 			else if (1.5f < fDistance)
 			{
+				if (false == m_bShake)
+				{
+					m_bShake = true;
+					CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+					if (pCamera != nullptr)
+						pCamera->Make_Shake(0.7f, 2.f);
+				}
+
 				// 브레이크 : 제곱 감속
 				_float fDeceleration = m_fDecreSpeed * m_fDecreSpeed;
 
@@ -130,6 +139,14 @@ _int CMeteor::Tick(_float fTimeDelta)
 			}
 			else
 			{
+				if (false == m_bShake)
+				{
+					m_bShake = true;
+					CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+					if (pCamera != nullptr)
+						pCamera->Make_Shake(0.5f, 0.2f);
+				}
+
 				m_fDeadTime += m_fTimeDelta;
 				if (0.2f < m_fDeadTime)
 					m_bDead = true;
@@ -290,7 +307,7 @@ _float CMeteor::EaseInQuart(_float fNumber)
 
 _float CMeteor::EaseOutCubic(_float fNumber)
 {
-	return fNumber == 1 ? 1 : 1 - pow(2, -10 * fNumber);
+	return fNumber == 1 ? 1 : 1 - (_float)pow(2, -10 * fNumber);
 }
 
 CMeteor* CMeteor::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

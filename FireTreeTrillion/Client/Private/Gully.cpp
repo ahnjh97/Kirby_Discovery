@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Gully.h"
 #include "HitBox.h"
+#include "Camera_Main.h"
 
 CGully::CGully(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
@@ -69,7 +70,6 @@ _int CGully::Tick(_float fTimeDelta)
 		{
 			m_vPosition.m128_f32[1] -= 5.f;
 			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vPosition);
-			m_pTransformCom->Set_Scaled(1.f, 1.f, 1.f);
 			m_fLifeTime = 0.f;
 			m_bPoolingDead = true;
 		}

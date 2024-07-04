@@ -9,6 +9,8 @@
 #include "Camera_Main.h"
 #include "EventCenter.h"
 
+#include "Ability.h"
+
 #define INFO(Dst) m_tInfo.Dst
 
 CDeeDeeDee::CDeeDeeDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -506,18 +508,71 @@ void CDeeDeeDee::SetUp_FSM()
 
 void CDeeDeeDee::HitBoxChanger(_uint eState)
 {
+	_uint iItemCnt = { 0 };
+	HRESULT hr;
+	_vector vLook = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+	vLook.m128_f32[1] = 0.f;
+
 	switch (eState)
 	{
 	case STATE_SLIDING:
 		Activate_SphereCollider(0.5f, 5.f);
 		break;
 	case STATE_LANDING:
+		// 별 아이템 떨굼
+		iItemCnt = 5;
+		for (_uint i = 0; i < iItemCnt; ++i)
+		{
+			CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
+			if (i < iItemCnt / 2)
+				AbilityItemDesc.fRotateDir = 1.f;															// 별 회전 방향 오른쪽
+			else
+				AbilityItemDesc.fRotateDir = -1.f;															// 별 회전 방향 왼쪽
+			AbilityItemDesc.fAngle = 360.f / (_float)iItemCnt * i;											// 별의 진행 방향의 각도
+			AbilityItemDesc.vDir = XMVector3Normalize(vLook) * 2.f;					// 별의 진행 방향
+			AbilityItemDesc.vPosition = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + vLook * 2.f;		// 별의 생성 위치
+			AbilityItemDesc.eAbilityType = ABILITY_DEFAULT;
+			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+			CHECK_FAILED(hr);
+		}
 		Activate_SphereCollider(0.5f, 7.f);
 		break;
 	case STATE_HAMMERSIDEATTACK:
+		// 별 아이템 떨굼
+		iItemCnt = 5;
+		for (_uint i = 0; i < iItemCnt; ++i)
+		{
+			CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
+			if (i < iItemCnt / 2)
+				AbilityItemDesc.fRotateDir = 1.f;															// 별 회전 방향 오른쪽
+			else
+				AbilityItemDesc.fRotateDir = -1.f;															// 별 회전 방향 왼쪽
+			AbilityItemDesc.fAngle = 360.f / (_float)iItemCnt * i;											// 별의 진행 방향의 각도
+			AbilityItemDesc.vDir = XMVector3Normalize(vLook) * 2.f;					// 별의 진행 방향
+			AbilityItemDesc.vPosition = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + vLook * 2.f;		// 별의 생성 위치
+			AbilityItemDesc.eAbilityType = ABILITY_DEFAULT;
+			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+			CHECK_FAILED(hr);
+		}
 		Activate_SphereCollider(0.5f, 10.f);
 		break;
 	case STATE_HAMMERATTACKHIT:
+		// 별 아이템 떨굼
+		iItemCnt = 1;
+		for (_uint i = 0; i < iItemCnt; ++i)
+		{
+			CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
+			if (i < iItemCnt / 2)
+				AbilityItemDesc.fRotateDir = 1.f;															// 별 회전 방향 오른쪽
+			else
+				AbilityItemDesc.fRotateDir = -1.f;															// 별 회전 방향 왼쪽
+			AbilityItemDesc.fAngle = 360.f / (_float)iItemCnt * i;											// 별의 진행 방향의 각도
+			AbilityItemDesc.vDir = XMVector3Normalize(vLook) * 2.f;					// 별의 진행 방향
+			AbilityItemDesc.vPosition = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + vLook * 10.f;		// 별의 생성 위치
+			AbilityItemDesc.eAbilityType = ABILITY_DEFAULT;
+			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+			CHECK_FAILED(hr);
+		}
 		Activate_FrustumCollider(0.5f, 10.f, 90.f);
 		break;
 	case STATE_SHOUTSTART:

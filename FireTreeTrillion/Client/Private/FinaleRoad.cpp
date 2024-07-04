@@ -44,9 +44,11 @@ HRESULT CFinaleRoad::Render_LightDepth()
 	return S_OK;
 }
 
+#ifdef DEBUG
 void CFinaleRoad::Render_IMGUI()
 {
 }
+#endif // DEBUG
 
 HRESULT CFinaleRoad::Add_Components()
 {
