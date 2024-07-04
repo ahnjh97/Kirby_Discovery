@@ -68,6 +68,7 @@ private:
 	_float4			 m_vFinPos = _float4();
 
 	TYPE			 m_eDialogTheme = ORDER;
+	_float			 m_fTimeDelta = 0.f;
 
 public:
 	static CUI_PartTimeDee*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
