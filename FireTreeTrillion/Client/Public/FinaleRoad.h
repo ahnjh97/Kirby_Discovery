@@ -12,10 +12,12 @@ BEGIN(Client)
 class CFinaleRoad final : public CPhysXObject
 {
 public:
-	struct ROAD_DESC
+	struct ROAD_DESC : public GAMEOBJECT_DESC
 	{
-
+		wstring strModelTag = { L"NONE" };
+		_bool	bIsAnimModel = { false };
 	};
+
 private:
 	CFinaleRoad(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CFinaleRoad(const CFinaleRoad& rhs);
@@ -23,8 +25,6 @@ private:
 
 public:
 	void OnCollision();
-
-
 
 	virtual HRESULT Initialize_Prototype()						override;
 	virtual HRESULT Initialize(void* pArg)						override;
@@ -37,12 +37,14 @@ public:
 #endif
 
 private:
-	HRESULT			Add_Components();
+	HRESULT			Add_Components(wstring _strModelTag, _bool _bIsAnimModel);
 	HRESULT			Bind_ShaderResources();
 	void			Make_Particles();
 
-	_float			m_fWhiteColorDiffuse = {};
+	_bool			m_bIsAnimModel = { false };
 
+
+	_float			m_fWhiteColorDiffuse = {};
 	CModel*			m_pModelCom = { nullptr };
 	CShader*		m_pShaderCom = { nullptr };
 

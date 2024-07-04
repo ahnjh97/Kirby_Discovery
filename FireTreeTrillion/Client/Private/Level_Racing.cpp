@@ -171,7 +171,7 @@ HRESULT CLevel_Racing::Ready_Layer_BackGround(const wstring& strLayerTag)
 	ObjDesc.fSpeedPerSec = 5.f;
 	ObjDesc.fRotationPerSec = ToRadian(90.f);
 	_float4x4 InitMat = _float4x4::Identity;
-	InitMat.Translation({ 48.f, 24.75f, 65.5f });
+	InitMat.Translation({ 48.5f, 24.75f, 65.5f });
 	ObjDesc.matWorld = InitMat;
 
 	// Car Test

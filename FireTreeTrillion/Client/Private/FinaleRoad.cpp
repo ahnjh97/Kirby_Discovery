@@ -48,15 +48,19 @@ void CFinaleRoad::Render_IMGUI()
 {
 }
 
-HRESULT CFinaleRoad::Add_Components()
+HRESULT CFinaleRoad::Add_Components(wstring _strModelTag, _bool _bIsAnimModel)
 {
 	HRESULT hr;
 
-	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"),
+	hr = __super::Add_Component(LEVEL_STATIC,
+		_bIsAnimModel ? TEXT("Prototype_Component_Shader_VtxAnimModel") : TEXT("Prototype_Component_Shader_VtxModel"),
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
+
 	CHECK_FAILED(hr);
 
-
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_") + _strModelTag,
+		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+	CHECK_FAILED(hr);
 
 
 	return S_OK;
