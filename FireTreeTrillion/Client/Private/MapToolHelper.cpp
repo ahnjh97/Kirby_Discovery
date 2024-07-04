@@ -179,8 +179,8 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "LbBossRoom", "Land_LbLastBossBeforeStep", "LbLastBossStage"
 
 		// 보스전 필드의 오브젝트
-		// "LbLastTank", "LbLastOutFrame1", "LbLastOutFrame2", :: 준수 오더로 삭제. 이제 Anim으로 대체되어 사용안함
-		,"LbLastStairs"
+		// "LbLastTank", "LbLastOutFrame1", :: 준수 오더로 삭제.
+		,"LbLastOutFrame2","LbLastStairs"
 		,"LbBossRoomDoorAL","LbBossRoomDoorBL", "LbOutBuildingWallL"
 
 		//LbLastBossBeforeStep Object :: Rubble 

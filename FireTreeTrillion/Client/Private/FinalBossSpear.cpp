@@ -4,6 +4,7 @@
 #include "RayArrow.h"
 #include "FinalBoss.h"
 #include "DimensionGate.h"
+#include "Ability.h"
 
 CFinalBossSpear::CFinalBossSpear(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPartObject{ pDevice, pContext }
@@ -46,7 +47,7 @@ HRESULT CFinalBossSpear::Initialize(void* pArg)
 
 _int CFinalBossSpear::Tick(_float fTimeDelta)
 {
-	if (m_bDead)
+	if (true == m_bDead)
 		return OBJ_DEAD;
 
 	//Compute_MotionBlur();
@@ -193,11 +194,11 @@ void CFinalBossSpear::Late_Tick(_float fTimeDelta)
 
 HRESULT CFinalBossSpear::Render()
 {
-	//CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Monster")));
-	//if (CFinalBoss::FINALBOSS_RECOVERYSTART == pFinalBoss->Get_State() ||
-	//	CFinalBoss::FINALBOSS_RECOVERYWAIT == pFinalBoss->Get_State() ||
-	//	CFinalBoss::FINALBOSS_RECOVERYEND == pFinalBoss->Get_State())
-	//	return S_OK;
+	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Monster")));
+	if (CFinalBoss::FINALBOSS_RECOVERYSTART == pFinalBoss->Get_State() ||
+		CFinalBoss::FINALBOSS_RECOVERYWAIT == pFinalBoss->Get_State() ||
+		CFinalBoss::FINALBOSS_RECOVERYEND == pFinalBoss->Get_State())
+		return S_OK;
 
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;

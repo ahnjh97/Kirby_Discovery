@@ -45,9 +45,9 @@ public:
 
 private:
 	//CTransform*				m_pTransCom[TEXBTN_NONE] = { nullptr };
-	CShader*					m_pShaderCom = { nullptr };
-	CTexture*					m_pTextureCom[TEXBTN_NONE] = {nullptr};
-	CVIBuffer_Rect*				m_pVIBufferCom = { nullptr };
+	//CShader*					m_pShaderCom = { nullptr };
+	CTexture*					m_pTexCom[TEXBTN_NONE] = {nullptr};
+	//CVIBuffer_Rect*				m_pVIBufferCom = { nullptr };
 	CUI_MessageWindow*			m_pMWindow = { nullptr };
 	
 	_float						m_fBtnAlpha = { 0.f };

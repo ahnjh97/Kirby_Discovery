@@ -47,12 +47,10 @@ public:
 	virtual void					Free() override;
 
 private:
-	CShader*					m_pShaderCom = { nullptr };
-	CTexture*					m_pTextureCom[TEX_NONE] = { nullptr };
-	CVIBuffer_Rect*				m_pVIBufferCom = { nullptr };
-	//TEX_STATE					m_eTexState = { DISCARD_NONE };
+	CTexture*					m_pTexCom[TEX_NONE] = { nullptr };
 	class CKirby*				m_pKirby = { nullptr };
 	
+	//TEX_STATE					m_eTexState = { DISCARD_NONE };
 	_bool						m_IsGaugeBLINK = { FALSE };
 
 	_float						m_fGaugeRatio = { 0.f };
