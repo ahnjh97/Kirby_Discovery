@@ -54,9 +54,9 @@ public:
 
 
 	//월드 포지션을 투영 포지션로 변환시킨다.
-	static void		Make_World_ToScreen(_Inout_ _float3& vPos);
+	static _float3		Make_World_ToScreen(_float3 vPos);
 	//투영 포지션을 월드 포지션로 변환시킨다.
-	static void		Make_Screen_ToWorld(_Inout_ _float3& vPos);
+	static _float3		Make_Screen_ToWorld(_float3 vPos);
 	//월드 포지션을 imgui 투영 포지션으로 변환시킨다.
 #ifdef _DEBUG
 	static ImVec2	WorldPosTo_ImguiProjPos(_float3 vWorldPos);

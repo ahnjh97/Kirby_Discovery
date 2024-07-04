@@ -233,16 +233,20 @@ void CUtils::Rotation(_Inout_ _float4x4& matrix, _fvector vAxis, _float fRadian)
 }
 
 
-void CUtils::Make_World_ToScreen(_Inout_ _float3& vPos)
+_float3 CUtils::Make_World_ToScreen(_float3 vPos)
 {
 	vPos = _float3::Transform(vPos, CGameInstance::Get_Instance()->Get_Transform(CPipeLine::D3DTS_VIEW));
 	vPos = _float3::Transform(vPos, CGameInstance::Get_Instance()->Get_Transform(CPipeLine::D3DTS_PROJ));
+
+	return vPos;
 }
  
-void CUtils::Make_Screen_ToWorld(_Inout_ _float3& vPos)
+_float3 CUtils::Make_Screen_ToWorld(_float3 vPos)
 {
 	vPos = _float3::Transform(vPos, CGameInstance::Get_Instance()->Get_Transform_Inv(CPipeLine::D3DTS_PROJ));
 	vPos = _float3::Transform(vPos, CGameInstance::Get_Instance()->Get_Transform_Inv(CPipeLine::D3DTS_VIEW));
+
+	return vPos;
 }
 
 #ifdef _DEBUG

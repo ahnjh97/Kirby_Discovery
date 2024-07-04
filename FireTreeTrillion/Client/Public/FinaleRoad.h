@@ -24,7 +24,6 @@ private:
 	virtual ~CFinaleRoad() = default;
 
 public:
-	void OnCollision();
 
 	virtual HRESULT Initialize_Prototype()						override;
 	virtual HRESULT Initialize(void* pArg)						override;
@@ -36,15 +35,26 @@ public:
 	virtual void	Render_IMGUI()								override;
 #endif
 
+	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
+
+
 private:
 	HRESULT			Add_Components(wstring _strModelTag, _bool _bIsAnimModel);
 	HRESULT			Bind_ShaderResources();
 	void			Make_Particles();
 
+
 	_bool			m_bIsAnimModel = { false };
 
+	
+	void			Compute_MotionBlur();
+	_float2			m_vPreScreenPos = { 0.f, 0.f };
+	_float4			m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
 
 	_float			m_fWhiteColorDiffuse = {};
+
+
+	PxRigidDynamic* m_pDynamicActor = { nullptr };
 	CModel*			m_pModelCom = { nullptr };
 	CShader*		m_pShaderCom = { nullptr };
 

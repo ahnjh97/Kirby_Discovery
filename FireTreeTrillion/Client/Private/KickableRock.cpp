@@ -186,7 +186,7 @@ HRESULT CKickableRock::Render_LightDepth()
 
 #ifdef _DEBUG
 void CKickableRock::Render_IMGUI()
-{
+{	
 	if (ImGui::TreeNode("Guizmo"))
 	{
 		_float4x4 matWorld = m_pTransformCom->Get_WorldFloat4x4();

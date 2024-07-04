@@ -557,9 +557,9 @@ HRESULT COriginalDee::Bind_ShaderResources()
 
 	hr = m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix");
 	CHECK_FAILED(hr);
-	hr = m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW));
+	hr = m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform(CPipeLine::D3DTS_VIEW));
 	CHECK_FAILED(hr);
-	hr = m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ));
+	hr = m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform(CPipeLine::D3DTS_PROJ));
 	CHECK_FAILED(hr);
 
 
@@ -723,7 +723,7 @@ void COriginalDee::Draw_TownPoints()
 	for (const auto& point : m_TownPoints.second)
 	{
 		_float3 vWorldPos = m_TownPoints.first + point.vPosOffset;
-		CUtils::Make_World_ToScreen(vWorldPos);
+		vWorldPos = CUtils::Make_World_ToScreen(vWorldPos);
 		ImVec2 vMyPos = { vWorldPos.x, vWorldPos.y };
 		drawList->AddCircleFilled(vMyPos, 5.0f, IM_COL32(255, 0, 0, 255));
 
@@ -731,7 +731,7 @@ void COriginalDee::Draw_TownPoints()
 		for (const auto& conn : point.NearPoint)
 		{
 			_float3 vTargetWorldPos = m_TownPoints.first + m_TownPoints.second[conn].vPosOffset;
-			CUtils::Make_World_ToScreen(vTargetWorldPos);
+			vTargetWorldPos = CUtils::Make_World_ToScreen(vTargetWorldPos);
 			ImVec2 vTargetPos = { vTargetWorldPos.x, vTargetWorldPos.y };
 
 			drawList->AddLine(vMyPos, vTargetPos, IM_COL32(255, 255, 255, 255), 2.0f);
