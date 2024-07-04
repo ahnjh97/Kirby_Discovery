@@ -44,6 +44,7 @@ HRESULT CFinaleRoad::Initialize(void* pArg)
 	m_pDynamicActor = m_pModelCom->ReturnDynamicActor(m_pTransformCom->Get_WorldMatrix());
 	m_pDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
 
+
 	return S_OK;
 }
 
@@ -53,7 +54,7 @@ _int CFinaleRoad::Tick(_float fTimeDelta)
 
 	__super::Tick(m_fTimeDelta);
 
-	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fTimeDelta * .2f);
+	m_pTransformCom->Turn( {0.f, 1.f, 0.f, 0.f} , m_fTimeDelta * .2f);
 
 	Compute_MotionBlur();
 
@@ -71,10 +72,11 @@ void CFinaleRoad::Late_Tick(_float fTimeDelta)
 	//	m_pTransformCom->Set_WorldMatrix(m_pGameInstance->GetActorAverageMatrix(m_pDynamicActor));
 	//}
 
-	m_pDynamicActor->setGlobalPose(CUtils::TransformToPxTransform(m_pTransformCom));
+	m_pDynamicActor->setKinematicTarget(CUtils::TransformToPxTransform(m_pTransformCom));
+	//m_pDynamicActor->setGlobalPose(CUtils::TransformToPxTransform(m_pTransformCom));
 
 	//시야 벗어나면 컬링
-	if (m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State(CTransform::STATE_POSITION), 20.0f))
+	if (m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State(CTransform::STATE_POSITION), 40.0f))
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);

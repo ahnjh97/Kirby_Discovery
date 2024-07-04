@@ -618,7 +618,7 @@ HRESULT CLevel_Finale::Ready_Objects()
 	roadDesc.wstrModelName = TEXT("MovableBuildingA");
 
 	_float4x4 InitMat = _float4x4::Identity;
-	InitMat.Translation({ 100.f, 0.f, 0.f });
+	InitMat.Translation({ 110.f, -100.f, 0.f });
 	CUtils::Turn_OtherMatrix(InitMat, _float3::Up, 1.f, 90.f);
 	roadDesc.matWorld = InitMat;
 

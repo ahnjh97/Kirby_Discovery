@@ -334,11 +334,31 @@ PxTransform CUtils::mat44ToTransform(const PxMat44& mat)
 
 PxTransform CUtils::TransformToPxTransform(CTransform* pTransform)
 {
-	_matrix worldMat = pTransform->Get_WorldMatrix();
-	PxMat44 pxMat = CUtils::To_Float4x4(worldMat);
-	PxTransform transform = CUtils::mat44ToTransform(pxMat);
+	_float4x4 worldMat = pTransform->Get_WorldMatrix();
+	//PxMat44 pxMat = CUtils::To_Float4x4(worldMat);
 
-	return PxTransform();
+
+	//_float3 vScale{};
+	//_float4 vQuaternion{};
+
+	_float3 vScale, vTrans;
+	Quaternion vRotQuat;
+	worldMat.Decompose(vScale, vRotQuat, vTrans);
+
+	//vScale = vScaleVector;
+	//XMStoreFloat3(&vScale, vScaleVector);
+	//XMStoreFloat4(&vQuaternion, vRotQuat);
+
+	PxMeshScale meshScale(PxVec3(vScale.x, vScale.y, vScale.z));
+	PxConvexMeshGeometryFlags meshFlags = PxConvexMeshGeometryFlags();
+
+	PxTransform pxTransform(PxVec3(worldMat._41, worldMat._42, worldMat._43), PxQuat(vRotQuat.x, vRotQuat.y, vRotQuat.z, vRotQuat.w));
+
+
+
+	//PxTransform transform = CUtils::mat44ToTransform(pxMat);
+
+	return pxTransform;
 }
 
 HRESULT CUtils::Load_Effect(path _FilePath, SINGLE_FX_DATA* _pData)
