@@ -67,6 +67,8 @@ CGameObject* CDialog::Clone(void* pArg)
 
 void CDialog::Free()
 {
+	__super::Free();
+
 	//for (auto& Message : m_vecMessage)
 	//	Safe_Release(Message);
 	//m_vecMessage.clear();
