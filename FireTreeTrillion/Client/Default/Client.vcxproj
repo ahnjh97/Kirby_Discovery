@@ -216,6 +216,7 @@
     <ClInclude Include="..\Public\DeeDeeDee_State.h" />
     <ClInclude Include="..\public\Dee_Part.h" />
     <ClInclude Include="..\public\Dee_State.h" />
+    <ClInclude Include="..\Public\Dialog.h" />
     <ClInclude Include="..\Public\DimensionGate.h" />
     <ClInclude Include="..\Public\FinalBoss.h" />
     <ClInclude Include="..\Public\FinalBossSpear.h" />
@@ -400,6 +401,7 @@
     <ClCompile Include="..\Private\DeeDeeDee_State.cpp" />
     <ClCompile Include="..\private\Dee_Part.cpp" />
     <ClCompile Include="..\private\Dee_State.cpp" />
+    <ClCompile Include="..\Private\Dialog.cpp" />
     <ClCompile Include="..\Private\DimensionGate.cpp" />
     <ClCompile Include="..\Private\FinalBoss.cpp" />
     <ClCompile Include="..\Private\FinalBossSpear.cpp" />
