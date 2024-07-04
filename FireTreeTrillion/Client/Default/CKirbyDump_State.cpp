@@ -435,6 +435,8 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		{
 			DESC(m_eEyeState) = CFinaleKirby::EYE_IDLE;
 			pKirby->Change_State(CFinaleKirby::DUMPTSTATE_CUT, 50.f, false, false, CFinaleKirby::BODY_DUMPDEFAULT, CFinaleKirby::OFFSET_DUMP);
+			_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+			pController->Set_Position(pTransformCom, vPos + _float4(-4.f, 0.f, 0.f, 0.f));
 		}
 	}
 	else if (pKirby->Get_State() == CFinaleKirby::DUMPTSTATE_CUT)
