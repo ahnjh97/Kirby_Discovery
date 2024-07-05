@@ -28,10 +28,15 @@ public:
 	virtual void					Render_IMGUI()								override;
 #endif
 
+	void							Render_Digits();
+	void							Render_TotalScore();
+
 	void							Initialize_TexturePos();
 	void							Set_Score(_float _fScore) { m_fScore = _fScore; }
+
 private:
 	HRESULT							Add_Components();
+	_int							Change_ScoreTextures(_int iNum);
 	HRESULT							Bind_ShaderResources();
 
 private:
@@ -49,8 +54,15 @@ private:
 	_float2							m_SizeScoreBar2D = _float2(438.f, 156.f);
 	_float2							m_SizeScoreResult2D = _float2(720.f, 102.f);
 	_float2							m_SizeDigits2D = _float2(50.f, 60.f);
+	// Score-Digits
 	_float							m_fScore = _float();
+	array<_int, 3>					m_arrScoreDigits;
 
+	_float							m_fTimeDelta = _float();
+	_float							m_fMoveRatio = 0.f;
+	_float2							m_fMovePosition2D = _float2();
+	_float							m_fSizeRatio = 0.f;
+	_float2							m_fSize2D = _float2();
 
 public:
 	static CUI_PartTimeResult*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

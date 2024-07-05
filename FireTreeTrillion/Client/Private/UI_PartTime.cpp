@@ -498,7 +498,7 @@ void CUI_PartTime::Compute_Timer(_float fTimeDelta)
 	m_fStandardTime += fTimeDelta;
 	if (m_fStandardTime - m_fBeforeTime >= 1.f)
 	{
-		m_fCurTime = 25.f - m_fStandardTime;
+		m_fCurTime = 5.f - m_fStandardTime;
 		//m_fCurTime = 50.f - m_fStandardTime;
 		if (m_fCurTime <= 0.f) m_fCurTime = 0.f;
 		Change_TimeTexures(m_fCurTime);
@@ -611,7 +611,6 @@ void CUI_PartTime::Render_READY()
 	_float2 standardPos2D = _float2(830.f, 200.f);
 	_float fPosRatio = EASE_OUT_CIRC(m_fMoveRatio); // m_fRealTimeSize2D
 	m_fMovePosition2D = _float2(standardPos2D.x * fPosRatio, standardPos2D.y);
-	//m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(m_fMovePosition2D.x, m_fMovePosition2D.y, 1.f, 0.f));
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
 								XMVectorSet(m_fMovePosition2D.x - g_iWinSizeX * 0.5f,
 											- m_fMovePosition2D.y + g_iWinSizeY * 0.5f,

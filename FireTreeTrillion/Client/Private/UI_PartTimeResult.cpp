@@ -12,6 +12,7 @@ CUI_PartTimeResult::CUI_PartTimeResult(const CUI_PartTimeResult& rhs)
 	: CUIObject{ rhs }
 	, m_arrTexures(rhs.m_arrTexures)
 	//, m_arrayStarMatrix(rhs.m_arrayStarMatrix)
+	, m_arrScoreDigits(rhs.m_arrScoreDigits)
 
 	, m_arrPosition(rhs.m_arrPosition)
 	, m_arrSize(rhs.m_arrSize)
@@ -28,6 +29,8 @@ HRESULT CUI_PartTimeResult::Initialize_Prototype()
 	_float2 temp2D = _float2();
 	fill(m_arrPosition.begin(), m_arrPosition.end(), temp2D);
 	fill(m_arrSize.begin(), m_arrSize.end(), temp2D);
+	_int iZero(0);
+	fill(m_arrScoreDigits.begin(), m_arrScoreDigits.end(), iZero);
 
 	m_arrSize[0] = m_SizeScoreBar2D * 0.9f;
 	m_arrSize[1] = m_arrSize[2] = m_arrSize[3] = m_SizeDigits2D;
@@ -64,6 +67,8 @@ _int CUI_PartTimeResult::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
+	m_fTimeDelta = fTimeDelta;
+
 	return OBJ_NOEVENT;
 }
 
@@ -82,6 +87,7 @@ HRESULT CUI_PartTimeResult::Render()
 
 	for (_int i = 0; i < m_arrTexures.size(); ++i)
 	{
+		if (i != 0 && i != 4) continue;
 
 		m_pTransformCom->Set_Scaled(m_arrSize[i].x, m_arrSize[i].y, 1.f);
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION,
@@ -102,9 +108,11 @@ HRESULT CUI_PartTimeResult::Render()
 		hr = m_pVIBufferCom->Bind_Buffers();
 		CHECK_FAILED(hr);
 
-		hr = m_pVIBufferCom->Render();
+		hr = m_pVIBufferCom->Render(); 
 		CHECK_FAILED(hr);
 	}
+
+	Render_Digits();
 
 	return S_OK;
 }
@@ -144,6 +152,105 @@ void CUI_PartTimeResult::Render_IMGUI()
 }
 #endif
 
+void CUI_PartTimeResult::Render_Digits()
+{
+	HRESULT hr(S_OK);
+
+	static _float fTimeAcc = 0.f;
+	m_fMoveRatio += m_fTimeDelta * 3.f;
+	if (m_fMoveRatio >= 1.f)
+	{
+		m_fMoveRatio = 1.f;
+		fTimeAcc += m_fTimeDelta;
+		if (fTimeAcc >= 1.f)
+		{
+			// 1. 30만큼 점수판 += 점수
+			if (m_fScore == Change_ScoreTextures(1))
+			{
+
+			}
+			// 2. 와들디 한마리 등장
+			fTimeAcc = 0.f;
+
+			//if(m_fScore만큼 다 불렀니?)
+			//Render_TotalScore();
+		}
+	}
+
+	for (_int i = 5; i <= 7; ++i)
+	{
+		_float fPosRatio = sin(m_fMoveRatio * 3.14159f);
+		m_fMovePosition2D = _float2(m_arrPosition[i].x, m_arrPosition[i].y - fPosRatio * 30.f);
+		m_pTransformCom->Set_Scaled(m_arrSize[i].x, m_arrSize[i].y, 1.f);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION,
+								   XMVectorSet(m_fMovePosition2D.x - g_iWinSizeX * 0.5f,
+								   			   - m_fMovePosition2D.y + g_iWinSizeY * 0.5f,
+								   			   0.f, 1.f));
+
+		hr = m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix");
+		CHECK_FAILED(hr);
+
+		hr = m_arrTexures[i]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", m_arrScoreDigits[i - 5]);
+		CHECK_FAILED(hr);
+
+		hr = m_pShaderCom->Begin(POSTEX_ALPHATEST_COLOR_HORIZONTALCUT);
+		CHECK_FAILED(hr);
+
+		hr = m_pVIBufferCom->Bind_Buffers();
+		CHECK_FAILED(hr);
+
+		hr = m_pVIBufferCom->Render();
+		CHECK_FAILED(hr);
+	}
+}
+
+void CUI_PartTimeResult::Render_TotalScore()
+{
+	HRESULT hr(S_OK);
+
+	static _float fTimeAcc = 0.f;
+	m_fSizeRatio += m_fTimeDelta * 3.f;
+	if (m_fSizeRatio >= 1.f)
+	{
+		m_fSizeRatio = 1.f;
+		fTimeAcc += m_fTimeDelta;
+		if (fTimeAcc >= 1.f)
+		{
+			// 효선아 여기야 >> 게임 점수 다 뜨고 이펙트 나오는 구간
+			// QZR 다이얼로그 출력 : 게임 수고했습니다 어쩌구
+		}
+	}
+
+	for (_int i = 1; i <= 3; ++i)
+	{
+		_float fSizeRatio = sin(m_fSizeRatio * 3.14159f);
+		m_fSize2D = _float2(m_arrSize[i].x + fSizeRatio * 10.f, m_arrSize[i].y + fSizeRatio * 10.f);
+		m_pTransformCom->Set_Scaled(m_fSize2D.x, m_fSize2D.y, 1.f);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION,
+								   XMVectorSet(m_arrPosition[i].x - g_iWinSizeX * 0.5f,
+								   			   - m_arrPosition[i].y + g_iWinSizeY * 0.5f,
+								   			   0.f, 1.f));
+
+		hr = m_arrTexures[i]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", m_arrScoreDigits[i - 1]);
+		CHECK_FAILED(hr);
+
+		hr = m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix");
+		CHECK_FAILED(hr);
+
+		hr = m_arrTexures[i]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
+		CHECK_FAILED(hr);
+
+		hr = m_pShaderCom->Begin(POSTEX_ALPHATEST_COLOR_HORIZONTALCUT);
+		CHECK_FAILED(hr);
+
+		hr = m_pVIBufferCom->Bind_Buffers();
+		CHECK_FAILED(hr);
+
+		hr = m_pVIBufferCom->Render();
+		CHECK_FAILED(hr);
+	}
+}
+
 void CUI_PartTimeResult::Initialize_TexturePos()
 {
 	m_arrPosition[0] = _float2(800.f,  222.f);
@@ -157,6 +264,27 @@ void CUI_PartTimeResult::Initialize_TexturePos()
 	m_arrPosition[5] = _float2(960.f,  482.f);
 	m_arrPosition[6] = _float2(1010.f, 482.f);
 	m_arrPosition[7] = _float2(1060.f, 482.f);
+}
+
+// 받은 스코어 점수를 출력합니다.
+_int CUI_PartTimeResult::Change_ScoreTextures(_int iNum)
+{
+	static _int iScoreAccum = 0.f;
+	//_int iScore = (_int)m_fScore;
+	iScoreAccum += 30 * iNum;
+
+	_int iShareHund = (iScoreAccum / 100);
+	if (iShareHund < 10)
+		m_arrScoreDigits[0] = iShareHund;
+
+	_int iShareTen = ((iScoreAccum % 100) / 10);
+	if (iShareTen < 10)
+		m_arrScoreDigits[1] = iShareTen;
+
+	_int iRest = (iScoreAccum % 10);
+	m_arrScoreDigits[2] = iRest;
+
+	return iScoreAccum;
 }
 
 HRESULT CUI_PartTimeResult::Add_Components()
@@ -173,7 +301,7 @@ HRESULT CUI_PartTimeResult::Add_Components()
 		TEXT("Com_Texture_ScoreBar"), (CComponent**)&m_arrTexures[0]);
 	CHECK_FAILED(hr);
 
-	// 스코어 관리하는 숫자 텍스쳐
+	// 총 토탈 점수판
 	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_TempRedDigits"),
 		TEXT("Com_Texture_ScoreDigits_000"), (CComponent**)&m_arrTexures[1]);
 	CHECK_FAILED(hr);
@@ -189,7 +317,7 @@ HRESULT CUI_PartTimeResult::Add_Components()
 		TEXT("Com_Texture_ResultBar"), (CComponent**)&m_arrTexures[4]);
 	CHECK_FAILED(hr);
 
-	// 총 점수판 숫자 텍스쳐
+	// 올라간 숫자판
 	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_TempRedDigits"),
 		TEXT("Com_Texture_TotalScoreDigits_000"), (CComponent**)&m_arrTexures[5]);
 	CHECK_FAILED(hr);
