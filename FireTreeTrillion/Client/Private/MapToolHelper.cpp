@@ -104,7 +104,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	//UV 조절 가능
 	//BasicMap (UV 편집 가능)
 	m_vecMapModelNames = { "Level0Stage1Step01", "Level0Stage1Step02",  "Level1Stage1Step01", "DeeDeeDeeMap", "Town", "TownShop"
-		, "Land_VcLabo", "Land_LbLastBossBeforeStep", "LevelFinale_LbLastBuilding" };
+		, "Land_VcLabo", "Land_LbLastBossBeforeStep", "LevelFinale_LbLastBuilding", "LbBossLoom01L"};
 
 	vector<string> vecBGs = { "BG0", "BG1" };
 	m_setMapNames.insert(vecBGs.begin(), vecBGs.end());
