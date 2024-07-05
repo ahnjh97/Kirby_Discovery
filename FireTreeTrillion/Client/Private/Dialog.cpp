@@ -11,6 +11,40 @@ CDialog::CDialog(const CDialog& _rhs)
 {
 }
 
+HRESULT CDialog::Initialize_Prototype()
+{
+	return S_OK;
+}
+
+HRESULT CDialog::Initialize(void* pArg)
+{
+	CUIObject::UIOBJ_DESC MessageWindowDesc{};
+	MessageWindowDesc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f, 0.f };
+	MessageWindowDesc.vPos = { 0.f, -325.f, 1.f, 1.f };
+	MessageWindowDesc.vSize = { 1300.f * 0.8f, 288.f * 0.8f, 1.f };
+	
+	m_pCurrentLevelID = m_pGameInstance->Get_CurrentLevelID();
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_UI_Dialog"),
+		TEXT("Prototype_GameObject_UI_MessageWindow"), &MessageWindowDesc)))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+_int CDialog::Tick(_float fTimeDelta)
+{
+	return OBJ_NOEVENT;
+}
+
+void CDialog::Late_Tick(_float fTimeDelta)
+{
+}
+
+HRESULT CDialog::Render()
+{
+	return S_OK;
+}
+
 // 파싱해서 가져온 대화내용들을 vector안에 넣어줍니다.
 HRESULT CDialog::Add_Message(const wstring& _wstrMessage, _float _fDisplayTime)
 {
@@ -21,8 +55,11 @@ HRESULT CDialog::Add_Message(const wstring& _wstrMessage, _float _fDisplayTime)
 // 다이얼로그 호출 : vec에 담아둔 메세지를 출력합니다.
 HRESULT CDialog::Start_Message()
 {
-	for (auto& Message : m_vecMessage)
-		Display_Message(Message.wstrMessage, Message.fDisplayTime);
+	if (!m_vecMessage.empty())
+	{
+		for (auto& Message : m_vecMessage)
+			Display_Message(Message.wstrMessage, Message.fDisplayTime);
+	}
 	
 	return S_OK;
 }

@@ -22,6 +22,13 @@ private:
 	virtual ~CDialog() = default;
 
 public:
+	virtual HRESULT				Initialize_Prototype()						override;
+	virtual HRESULT				Initialize(void* pArg)						override;
+	virtual _int				Tick(_float fTimeDelta)						override;
+	virtual void				Late_Tick(_float fTimeDelta)				override;
+	virtual HRESULT				Render()									override;
+
+public:
 	HRESULT Add_Message(const wstring& _wstrMessage, _float _fDisplayTime);
 	HRESULT Start_Message();
 	HRESULT	Display_Message(const wstring& _wstrMessage, _float _fDisplayTime);

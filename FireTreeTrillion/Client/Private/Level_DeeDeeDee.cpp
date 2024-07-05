@@ -205,11 +205,8 @@ HRESULT CLevel_DeeDeeDee::Ready_Layer_UI(const wstring& _wstrLayerTag)
 	DiscardUIDesc.vSize = { 260.f * 0.8f, 120.f * 0.8f, 1.f };
 	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_HUD"), TEXT("Prototype_GameObject_HUD_AbilityDiscard"), &DiscardUIDesc);
 
-	CUIObject::UIOBJ_DESC MessageWindowDesc{};
-	MessageWindowDesc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f, 0.f };
-	MessageWindowDesc.vPos = { 0.f, -325.f, 1.f, 1.f };
-	MessageWindowDesc.vSize = { 1300.f * 0.8f, 288.f * 0.8f, 1.f };
-	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_MessageWindow"), TEXT("Prototype_GameObject_UI_MessageWindow"), &MessageWindowDesc);
+	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_Dialog"), TEXT("Prototype_GameObject_Dialog"));
+
 
 	return S_OK; 
 }

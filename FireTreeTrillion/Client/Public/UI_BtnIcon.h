@@ -14,7 +14,7 @@ class CUI_BtnIcon : public CUIObject
 {
 private:
 	enum TEX_BTNICON { TEXBTN_BASE, TEXBTN_BRIGHT, TEXBTN_NONE };
-	enum BTN_STATE { BTN_IDLE, BTN_BLINK, BTN_SELECT_DOWN, BTN_SELECT_UP, BTN_NONE };
+	enum BTN_STATE { BTN_IDLE, BTN_HIDE, BTN_BLINK, BTN_SELECT, BTN_NONE };
 
 private:
 	CUI_BtnIcon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -46,15 +46,14 @@ public:
 private:
 	CTexture*					m_pTexCom[TEXBTN_NONE] = {nullptr};
 	CUI_MessageWindow*			m_pMWindow = { nullptr };
-	
-	_float						m_fBtnAlpha = { 0.f };
+	_bool						m_IsSelected = { FALSE };
 
+	_float						m_fBtnAlpha = { 0.f };
 	_float						m_fBlinkAlpha = { 0.f };
 	_float						m_fBlinkTime = { 0.f };
 	_float						m_fSelectTime = { 0.f };
-	_float3						m_vOrigScale = { };
+	_float3						m_vOrigScale = { 0.f, 0.f, 1.f };
 
-	BTN_STATE					m_ePreState = { BTN_NONE };
 	BTN_STATE					m_eCurState = { BTN_NONE };
 		
 };

@@ -38,14 +38,16 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 		return E_FAIL;
 
 	// Add_Button
-	hr = m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_UI_MessageWindow"), TEXT("Prototype_GameObject_UI_BtnIcon"));
+	//hr = m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_UI_MessageWindow"), TEXT("Prototype_GameObject_UI_BtnIcon"));
 
 #pragma region MESSAGEWINDOW BASE
 
-	m_pTransCom[TEXMW_BASE]->Set_Scaled(m_UIObjDesc.vSize);
 	_float4 vBaseTrans = { m_UIObjDesc.vPos };
 	vBaseTrans.w = 1.f;
 	m_pTransCom[TEXMW_BASE]->Set_State(CTransform::STATE_POSITION, vBaseTrans);
+
+	m_pTransCom[TEXMW_BASE]->Set_Scaled(m_UIObjDesc.vSize);
+	m_vOrigScale = m_pTransCom[TEXMW_BASE]->Get_Scaled();
 
 #pragma endregion
 
@@ -67,6 +69,10 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 	m_UIObjDesc.fAlpha = 0.f;
 	m_eCurState = WINDOW_HIDE;
 
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_UI_Dialog"),
+		TEXT("Prototype_GameObject_UI_BtnIcon"))))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -83,18 +89,41 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 	else if (m_pGameInstance->Get_DIKeyState(DIK_GRAVE, KEY_DOWN) && WINDOW_SHOW == m_eCurState) //테스트용
 		m_eCurState = WINDOW_HIDE;
 
+	_float3 vOffset = { 0.9f, 0.9f, 1.f };
 	switch (m_eCurState)
 	{
-	case WINDOW_HIDE: m_UIObjDesc.fAlpha -= fTimeDelta * 5.f;	break;
-	case WINDOW_SHOW: m_UIObjDesc.fAlpha = 1.f;	break;
-	case WINDOW_IDLE: default:	break;
+	case WINDOW_IDLE: 
+		break;
+
+	case WINDOW_HIDE: //알파 값 및 스케일 감소
+		m_UIObjDesc.fAlpha -= fTimeDelta * 5.f;	
+
+		vOffset.y -= EASE_OUT(fTimeDelta * 2.5f);
+		m_pTransCom[TEXMW_BASE]->Set_Scaled(m_vOrigScale * vOffset);
+
+		break;
+
+	case WINDOW_SHOW: //알파 값 및 스케일 증가
+		m_UIObjDesc.fAlpha += fTimeDelta * 5.f;	
+		vOffset.y += EASE_OUT(fTimeDelta * 2.5f);
+		_float3 vShowScale = m_vOrigScale * vOffset;
+		m_pTransCom[TEXMW_BASE]->Set_Scaled(vShowScale);
+
+		if (vShowScale > m_vOrigScale)
+			m_pTransCom[TEXMW_BASE]->Set_Scaled(m_vOrigScale);
+		break;
+	default:	break;
 	}
+
+	if (m_UIObjDesc.fAlpha > 1.f)
+		m_UIObjDesc.fAlpha = 1.f;
 
 	if (m_UIObjDesc.fAlpha <= 0.f) //알파 값 보정 및 업데이트 중지
 	{
 		m_UIObjDesc.fAlpha = 0.f;
 		return OBJ_NOEVENT;
 	}
+
 	return OBJ_NOEVENT;
 }
 
@@ -127,7 +156,7 @@ HRESULT CUI_MessageWindow::Render()
 	}
 #pragma endregion
 
-	m_pDialog->Start_Message();
+	//m_pDialog->Start_Message();
 
 	return S_OK;
 }
@@ -166,15 +195,11 @@ HRESULT CUI_MessageWindow::Add_Transform(void* _pArg)
 
 HRESULT CUI_MessageWindow::Add_Dialog(void* _pArg)
 {
-
 	m_pDialog = CDialog::Create(m_pDevice, m_pContext);
 	if (nullptr == m_pDialog)
 		return E_FAIL;
-
-
-
+	
 	m_pDialog->Add_Message(TEXT("고마워, 덕분에 살았어~!"), 5.f);
-
 
 	return S_OK;
 }

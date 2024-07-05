@@ -42,10 +42,7 @@ HRESULT CUI_BtnIcon::Initialize(void* _pArg)
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 
 	m_eCurState = BTN_IDLE;
-
-	LEVEL eLevel = (LEVEL)*m_pGameInstance->Get_CurrentLevelID();
-	m_pMWindow = static_cast<CUI_MessageWindow*>(m_pGameInstance->Get_GameObject(eLevel, TEXT("Layer_UI_MessageWindow"), 0));
-	Safe_AddRef(m_pMWindow);
+	m_pCurrentLevelID = m_pGameInstance->Get_CurrentLevelID();
 
 	return S_OK;
 }
@@ -53,97 +50,80 @@ HRESULT CUI_BtnIcon::Initialize(void* _pArg)
 _int CUI_BtnIcon::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
-
-	if (nullptr == m_pMWindow)
+	
+	//MessageWindow 상태를 저장
+	CUI_MessageWindow* pMWindow = static_cast<CUI_MessageWindow*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_Dialog"), 1));
+	if (nullptr == pMWindow)
 		return OBJ_NOEVENT;
+	//Safe_AddRef(m_pMWindow);
+
+	_float4 vTrans = { 478.f, 0.f, 1.f, 1.f };
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vTrans);
 
 	//MessageWindow 상태와 동기화
-	CUI_MessageWindow::MESSAGEWINDOW_STATE eMWState = m_pMWindow->Get_MWindowState();
+	CUI_MessageWindow::MESSAGEWINDOW_STATE eMWState = pMWindow->Get_MWindowState();
 	switch (eMWState)
 	{
 	case CUI_MessageWindow::WINDOW_IDLE: break;
-	case CUI_MessageWindow::WINDOW_HIDE: m_eCurState = BTN_IDLE;	break;
+	case CUI_MessageWindow::WINDOW_HIDE: m_eCurState = BTN_HIDE;	break;
 	case CUI_MessageWindow::WINDOW_SHOW:
-		if (BTN_SELECT_UP == m_eCurState)
-			m_eCurState = BTN_SELECT_DOWN;
+		if (m_IsSelected) //==TRUE;
+			m_eCurState = BTN_SELECT;
 
-		if (BTN_SELECT_DOWN == m_ePreState)
-			m_eCurState = BTN_SELECT_UP;
-		else
+		else //m_IsSelected == FALSE;
 			m_eCurState = BTN_BLINK;	
 		break;
 	case CUI_MessageWindow::WINDOW_NONE: default:	break;
 	}
 
-	//버튼 선택 시 다음 스크립트를 출력. Button UI 스케일 증감
+	//버튼 선택 시 다음 스크립트를 출력
 	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN)) //테스트용
-	{
-		m_eCurState = BTN_SELECT_DOWN;
-		m_ePreState = BTN_SELECT_UP;
-	}
+		m_eCurState = BTN_SELECT;
 
-
-	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_UP)) //테스트용
-	{
-		m_eCurState = BTN_SELECT_UP;
-		m_ePreState = BTN_SELECT_DOWN;
-	}
-
-	//_float3 vTranscale = m_pTransformCom->Get_Scaled();
-	_float3 vOffset = { 0.8f, 0.8f, 1.f };
+	_float3 vOffset = { 0.6f, 0.6f, 1.f };
 	switch (m_eCurState)
 	{
-	case BTN_IDLE:
+	case BTN_HIDE:
 		m_fBlinkAlpha -= fTimeDelta * 5.f;
 		m_fBtnAlpha -= fTimeDelta * 5.f;
 		break;
 
-	case BTN_BLINK:
+	case BTN_BLINK: //알파 값 증감
 		m_fBtnAlpha = 1.f;
 		m_fBlinkTime += fTimeDelta;
 
 		if (m_fBlinkTime > 0.5f && m_fBlinkTime < 1.f)
 			m_fBlinkAlpha = 0.5f;
 
-		if (m_fBlinkTime > 1.f)
+		if (m_fBlinkTime > 1.f) //초기화
 		{
 			m_fBlinkAlpha = 0.f;
 			m_fBlinkTime = 0.f;
 		}
 		break;
 		
-	case BTN_SELECT_DOWN:
+	case BTN_SELECT: //스케일 증감
+		m_IsSelected = TRUE;
 		m_fBlinkAlpha = 0.f;
 		m_fSelectTime += fTimeDelta * 2.f;
+		m_pTransformCom->Set_Scaled(m_vOrigScale * vOffset);
 		
-		if (m_fSelectTime > 0.5f && m_fSelectTime < 1.f)
-			m_pTransformCom->Set_Scaled(m_vOrigScale * vOffset);
-		break;
-
-	case BTN_SELECT_UP:
-		if (m_fSelectTime > 1.f) //초기화
-		{
-			m_fSelectTime = 0.f;
-			m_eCurState = BTN_BLINK;
-			m_pTransformCom->Set_Scaled(m_vOrigScale);
-		}
-		break;
-
-		/*
-		if (m_fSelectTime < 0.5f)
+		if (m_fSelectTime > 0.1f && m_fSelectTime < 0.2f)
 		{
 			//그래프 MAX값은 1이어야하며, 범위는 0 ~ 1로 설정되어야함
-			vOffset.x = EASE_OUT(m_fSelectTime * 2.f);
-			vOffset.y = EASE_OUT(m_fSelectTime * 2.f);
+			vOffset.x += EASE_OUT(fTimeDelta * 5.f);
+			vOffset.y += EASE_OUT(fTimeDelta * 5.f);
 			m_pTransformCom->Set_Scaled(m_vOrigScale * vOffset);
 		}
-		else if (m_fSelectTime > 0.5f && m_fSelectTime < 1.f)
+
+		if (m_fSelectTime > 0.2f) //초기화
 		{
-			vOffset.x = EASE_OUT(1 - m_fSelectTime * 2.f);
-			vOffset.y = EASE_OUT(1 - m_fSelectTime * 2.f);
-			m_pTransformCom->Set_Scaled(m_vOrigScale * vOffset);
+			m_fSelectTime = 0.f;
+			m_pTransformCom->Set_Scaled(m_vOrigScale);
+			m_IsSelected = FALSE;
+			m_eCurState = BTN_BLINK;
 		}
-		*/
+		break;
 
 	case BTN_NONE:	default:	break;
 	}
@@ -208,9 +188,9 @@ void CUI_BtnIcon::Render_IMGUI()
 	switch (m_eCurState)
 	{
 	case BTN_IDLE:		ImGui::Text(u8"BTN_IDLE");	break;
+	case BTN_HIDE:		ImGui::Text(u8"BTN_HIDE");	break;
 	case BTN_BLINK:		ImGui::Text(u8"BTN_BLINK"); break;
-	case BTN_SELECT_DOWN:	ImGui::Text(u8"BTN_SELECT_DOWN"); break;
-	case BTN_SELECT_UP:		ImGui::Text(u8"BTN_SELECT_UP"); break;
+	case BTN_SELECT:	ImGui::Text(u8"BTN_SELECT"); break;
 	case BTN_NONE:		default: ImGui::Text(u8"BTN_NONE"); break;
 	}
 }
@@ -299,7 +279,7 @@ void CUI_BtnIcon::Free()
 	for (auto& iTex : m_pTexCom)
 		Safe_Release(iTex);
 
-	Safe_Release(m_pMWindow);
+	//Safe_Release(m_pMWindow);
 }
 
 

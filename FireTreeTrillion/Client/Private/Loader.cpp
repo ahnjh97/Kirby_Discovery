@@ -332,7 +332,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_TransingStar"), CTransingStar);
 
-	//LEVEL_DEEDEEDEE
+	//DIALOG
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Dialog"), CDialog);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_MessageWindow"), CUI_MessageWindow);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_BtnIcon"), CUI_BtnIcon);
 
