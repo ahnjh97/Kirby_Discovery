@@ -45,6 +45,7 @@ private:
 
 	_float			m_fDelayTime = { 0.f };
 	_float			m_fCreateTime = { 0.f };
+	_float			m_fItemTime = { 0.f };
 	_float			m_fFirstFireTime = { 4.f };
 	_float			m_fSecondFireTime = { 3.8f };
 
