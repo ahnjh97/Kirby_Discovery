@@ -133,19 +133,19 @@ static void Landing(_float fTimeDelta, CTransform* pTransformCom)
 		return;
 
 
-	CMultiEffect::MULTI_FX_DESC FXDesc{};
-	FXDesc.vInitPos = vMyPos + pTransformCom->Get_State(CTransform::STATE_LOOK);
-	FXDesc.vInitScale = { 4.f, 4.f, 4.f };
+	//CMultiEffect::MULTI_FX_DESC FXDesc{};
+	//FXDesc.vInitPos = vMyPos + pTransformCom->Get_State(CTransform::STATE_LOOK);
+	//FXDesc.vInitScale = { 4.f, 4.f, 4.f };
 
-	for (_uint i = 0; i < 3; ++i)
-	{
-		FXDesc.fStartDelay = CUtils::Make_RandomFloat(0.f, .2f);
-		_float vOffset = CUtils::Make_RandomFloat(-1.f, .5f);
-		FXDesc.vInitScale += {vOffset, vOffset, vOffset};
-		FXDesc.vInitRot = CUtils::Make_Degree_FromDir( (_float3)CUtils::Make_RandomAngle_Vector(80.f, _float4{ 0.f, 1.f, 0.f, 0.f }));
-		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_explode lines"), &FXDesc)))
-			return;
-	}
+	//for (_uint i = 0; i < 3; ++i)
+	//{
+	//	FXDesc.fStartDelay = CUtils::Make_RandomFloat(0.f, .2f);
+	//	_float vOffset = CUtils::Make_RandomFloat(-1.f, .5f);
+	//	FXDesc.vInitScale += {vOffset, vOffset, vOffset};
+	//	FXDesc.vInitRot = CUtils::Make_Degree_FromDir( (_float3)CUtils::Make_RandomAngle_Vector(80.f, _float4{ 0.f, 1.f, 0.f, 0.f }));
+	//	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_explode lines"), &FXDesc)))
+	//		return;
+	//}
 
 }
 
@@ -167,6 +167,11 @@ static void Sliding(_float fTimeDelta, CTransform* pTransformCom)
 		fBbongTime = 0.f;
 	}
 }
+
+//static void Rock_Particle()
+//{
+//
+//}
 
 static void Shout(_float fTimeDelta, CTransform* pTransformCom)
 {

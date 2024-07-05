@@ -3,6 +3,7 @@
 #include "Kirby.h"
 #include "HitBox.h"
 #include "Camera_Main.h"
+#include "Ability.h"
 
 CMeteor::CMeteor(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
@@ -64,7 +65,41 @@ HRESULT CMeteor::Initialize(void* pArg)
 _int CMeteor::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
+	{
+		if (true == m_bBig)
+		{
+			_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+			vPos.m128_f32[1] += 10.f;
+			for(_uint i = 0; i < 6; ++i)
+			{
+				HRESULT hr;
+				// 별 아이템 떨굼
+				CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
+				AbilityItemDesc.fRotateDir = 1.f;																	// 별 회전 방향 오른쪽															// 별 회전 방향 왼쪽
+				AbilityItemDesc.fAngle = 360.f / 6.f * i;													// 별의 진행 방향의 각도
+				AbilityItemDesc.vDir = XMVectorSet(1.f, 0.f, 0.f, 0.f) * 4.f;							// 별의 진행 방향
+				AbilityItemDesc.vPosition = vPos;	// 별의 생성 위치
+				AbilityItemDesc.eAbilityType = ABILITY_DEFAULT;
+				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+				CHECK_FAILED(hr);
+			}
+		}
+		else
+		{
+			HRESULT hr;
+			// 별 아이템 떨굼
+			CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
+			AbilityItemDesc.fRotateDir = 1.f;																	// 별 회전 방향 오른쪽															// 별 회전 방향 왼쪽
+			AbilityItemDesc.fAngle = 0.f;													// 별의 진행 방향의 각도
+			AbilityItemDesc.vDir = XMVectorSet(0.f, 0.f, 0.f, 0.f);							// 별의 진행 방향
+			AbilityItemDesc.vPosition = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);	// 별의 생성 위치
+			AbilityItemDesc.eAbilityType = ABILITY_DEFAULT;
+			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+			CHECK_FAILED(hr);
+		}
+
 		return OBJ_DEAD;
+	}
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 

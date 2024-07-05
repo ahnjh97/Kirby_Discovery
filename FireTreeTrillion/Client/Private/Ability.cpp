@@ -43,12 +43,6 @@ HRESULT CAbility::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pAbilityItemDesc)))
 		return E_FAIL;
 
-	AbilityType(m_eAbilityType);
-
-	if (FAILED(Add_Components()))
-		return E_FAIL;
-	
-	m_eItemType = ITEM_FOOD;
 	if (ABILITY_DEFAULT == m_eAbilityType)
 	{
 		_matrix matRotate = XMMatrixRotationY(ToRadian(m_fAngle));
@@ -58,6 +52,7 @@ HRESULT CAbility::Initialize(void* pArg)
 		m_fJumpPowerTemp = m_fJumpPower;
 		m_fPower = 2.f;
 		m_fSpeed = 3.f;
+		m_fScale = 1.f;
 	}
 	else
 	{
@@ -65,10 +60,18 @@ HRESULT CAbility::Initialize(void* pArg)
 		m_fPower = 2.f;
 	}
 
+	AbilityType(m_eAbilityType);
+
+	if (FAILED(Add_Components()))
+		return E_FAIL;
+	
+	m_eItemType = ITEM_FOOD;
+
 	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
 	CTransform* pTransform = pKirby->Get_TransformCom();
 	m_vLookDir = pTransform->Get_State_Vector(CTransform::STATE_LOOK);
 
+	/*
 	CMultiEffect::MULTI_FX_DESC FXDesc{};
 	FXDesc.vInitPos = { 0.f, .3f, 0.f };
 	FXDesc.pSocketMatrix = &m_EffectSocket;
@@ -76,7 +79,7 @@ HRESULT CAbility::Initialize(void* pArg)
 	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_ItemBubble1"), &FXDesc)))
 		return E_FAIL;
 	Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
-
+	*/
 	return S_OK;
 }
 
@@ -158,7 +161,12 @@ _int CAbility::Tick(_float fTimeDelta)
 				else
 				{
 					m_fLifeTime += m_fTimeDelta;
-					if (0.2f < m_fLifeTime)
+					if (0.2f > m_fLifeTime)
+					{
+						m_fScale -= m_fTimeDelta * 4.f;
+						m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
+					}
+					else
 						m_bDead = true;
 				}
 			}

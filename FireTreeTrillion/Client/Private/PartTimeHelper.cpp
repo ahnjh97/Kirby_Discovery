@@ -7,6 +7,7 @@
 #include "UI_PartTimeDee.h"
 #include "UI_PartTimeResult.h"
 #include "Camera_Free.h"
+#include "Camera_Main.h"
 
 IMPLEMENT_SINGLETON(CPartTimeHelper)
 
@@ -42,7 +43,7 @@ void CPartTimeHelper::Register_PartTimeResult(CUI_PartTimeResult* pResult)
 	Safe_AddRef(m_pUI_PartTimeResult);
 }
 
-void CPartTimeHelper::Register_Camera(CCamera* pCamera)
+void CPartTimeHelper::Register_Camera(CCamera_Main* pCamera)
 {
 	Safe_Release(m_pCamera);
 	m_pCamera = pCamera;
@@ -116,13 +117,15 @@ _bool CPartTimeHelper::Handle_LunchTime()
 	// 카메라이동하고 ui띄우고 다시 카메라 돌아오면 true반환해주시면 됩니다.
 	// true를 받으면 secondTimer로 돌아가고 있던 커비와 디가 다시 움직이기 시작합니다~
 
+	m_pCamera->Make_Sequence(CCamera_Main::SEQ_LUNCHTIME);
+
 	return true;
 }
 
 _bool CPartTimeHelper::Handle_GameOver()
 {
-	m_pCamera->Lock_Camera({ 21.44f, 28.98f, 8.84f }, { -0.13f, -0.29f, 0.95f }, 33.f);
-	
+	//m_pCamera->Lock_Camera({ 21.44f, 28.98f, 8.84f }, { -0.13f, -0.29f, 0.95f }, 33.f);
+	m_pCamera->Lock_All({ 21.44f, 28.98f, 8.84f }, { -0.13f, -0.29f, 0.95f });
 	// Player 세팅
 	CTransform* pTransform = m_pPartTimerKirby->Get_TransformCom();
 	pTransform->Set_State(CTransform::STATE_POSITION, _float4(17.85f, 23.8f, 27.f, 1.f));
