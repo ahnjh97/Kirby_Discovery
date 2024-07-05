@@ -164,16 +164,21 @@ void CUI_PartTimeResult::Render_Digits()
 		fTimeAcc += m_fTimeDelta;
 		if (fTimeAcc >= 1.f)
 		{
-			// 1. 30만큼 점수판 += 점수
-			if (m_fScore == Change_ScoreTextures(1))
+			_int iAddNum = 1;
+			// 와들디 iAddNum 마리만큼 등장 // 효선아 여기야
+
+			// 30만큼 점수판 += 점수
+			if (m_fScore < Change_ScoreTextures(iAddNum))
 			{
-
+				// 최종 점수만큼 ScoreTextures가 채워져 있다.
+				Render_TotalScore();
 			}
-			// 2. 와들디 한마리 등장
-			fTimeAcc = 0.f;
+			else
+			{
+				//해당 m_arrScoreDigits 만큼 숫자 뾰로로로롱
+			}
 
-			//if(m_fScore만큼 다 불렀니?)
-			//Render_TotalScore();
+			fTimeAcc = 0.f;
 		}
 	}
 
