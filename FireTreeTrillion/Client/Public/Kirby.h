@@ -81,7 +81,7 @@ public:
 		_float			m_fObjectDistance = { 0.f };
 
 		// 방향 키 컨트롤러를 만지고 있는가?
-		_bool			m_isController = { false };
+		//_bool			m_isController = { false };
 
 		// Fly
 		_float			m_fFlyTime = { 0.f };
@@ -195,7 +195,6 @@ public:
 	CGameObject*	FindStarBox(PxRigidActor* pActor);
 	CGameObject*	FindBox(PxRigidActor* pActor);
 	void			Set_WeaponAnim(_uint index);
-
 
 	// 기타 세부적인 제어
 private:

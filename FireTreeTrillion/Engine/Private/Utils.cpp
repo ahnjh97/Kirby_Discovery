@@ -233,16 +233,36 @@ void CUtils::Rotation(_Inout_ _float4x4& matrix, _fvector vAxis, _float fRadian)
 }
 
 
-void CUtils::Make_World_ToScreen(_Inout_ _float3& vPos)
+_float3 CUtils::Make_Local_ToWorld(_float3 vPos, _float4x4& matWorld)
+{
+	_float4 vRight = matWorld.Right();
+	_float4 vUp = matWorld.Up();
+	_float4 vLook = matWorld.Backward();
+	vRight.Normalize();
+	vUp.Normalize();
+	vLook.Normalize();
+
+	CUtils::Set_State_Matrix(matWorld, CUtils::STATE_RIGHT, Dir(vRight));
+	CUtils::Set_State_Matrix(matWorld, CUtils::STATE_UP, Dir(vUp));
+	CUtils::Set_State_Matrix(matWorld, CUtils::STATE_LOOK, Dir(vLook));
+
+	return _float3::Transform(vPos, matWorld);
+}
+
+_float3 CUtils::Make_World_ToScreen(_float3 vPos)
 {
 	vPos = _float3::Transform(vPos, CGameInstance::Get_Instance()->Get_Transform(CPipeLine::D3DTS_VIEW));
 	vPos = _float3::Transform(vPos, CGameInstance::Get_Instance()->Get_Transform(CPipeLine::D3DTS_PROJ));
+
+	return vPos;
 }
  
-void CUtils::Make_Screen_ToWorld(_Inout_ _float3& vPos)
+_float3 CUtils::Make_Screen_ToWorld(_float3 vPos)
 {
 	vPos = _float3::Transform(vPos, CGameInstance::Get_Instance()->Get_Transform_Inv(CPipeLine::D3DTS_PROJ));
 	vPos = _float3::Transform(vPos, CGameInstance::Get_Instance()->Get_Transform_Inv(CPipeLine::D3DTS_VIEW));
+
+	return vPos;
 }
 
 #ifdef _DEBUG
@@ -326,6 +346,35 @@ PxTransform CUtils::mat44ToTransform(const PxMat44& mat)
 		rotation = PxQuat(PxIdentity);
 	}
 	return PxTransform(position, rotation);
+}
+
+PxTransform CUtils::TransformToPxTransform(CTransform* pTransform)
+{
+	_float4x4 worldMat = pTransform->Get_WorldMatrix();
+	//PxMat44 pxMat = CUtils::To_Float4x4(worldMat);
+
+
+	//_float3 vScale{};
+	//_float4 vQuaternion{};
+
+	_float3 vScale, vTrans;
+	Quaternion vRotQuat;
+	worldMat.Decompose(vScale, vRotQuat, vTrans);
+
+	//vScale = vScaleVector;
+	//XMStoreFloat3(&vScale, vScaleVector);
+	//XMStoreFloat4(&vQuaternion, vRotQuat);
+
+	PxMeshScale meshScale(PxVec3(vScale.x, vScale.y, vScale.z));
+	PxConvexMeshGeometryFlags meshFlags = PxConvexMeshGeometryFlags();
+
+	PxTransform pxTransform(PxVec3(worldMat._41, worldMat._42, worldMat._43), PxQuat(vRotQuat.x, vRotQuat.y, vRotQuat.z, vRotQuat.w));
+
+
+
+	//PxTransform transform = CUtils::mat44ToTransform(pxMat);
+
+	return pxTransform;
 }
 
 HRESULT CUtils::Load_Effect(path _FilePath, SINGLE_FX_DATA* _pData)

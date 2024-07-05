@@ -502,6 +502,18 @@
     <Filter Include="02.GameObjects\Map\Deco\ShadowDeco">
       <UniqueIdentifier>{af0b42ac-2606-411c-a9ea-4ca6880cde91}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\Dump">
+      <UniqueIdentifier>{db971a15-b7f0-4afa-b440-2a7475cb9a21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\FinaleKirby">
+      <UniqueIdentifier>{d5000452-94d8-4432-a9d4-64684abab4f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\FinaleKirby\State">
+      <UniqueIdentifier>{1f8f3e98-7e83-4492-9fd2-34507b39c862}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\FinaleKirby\State\KirbyDump_State">
+      <UniqueIdentifier>{8ce43134-70bd-4e9a-84fa-af301762dfac}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -989,7 +1001,7 @@
       <Filter>02.GameObjects\UI\MessageWindow</Filter>
     </ClInclude>
     <ClInclude Include="CKirbyDump_State.h">
-      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyDump_State</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\FinaleKirby\State\KirbyDump_State</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Finale.h">
       <Filter>01.Levels\12. Finale</Filter>
@@ -1014,6 +1026,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\ShadowDeco.h">
       <Filter>02.GameObjects\Map\Deco\ShadowDeco</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\FinaleKirby.h">
+      <Filter>02.GameObjects\PhysXObject\Character\FinaleKirby</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Dump.h">
+      <Filter>02.GameObjects\Map\Dump</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1483,7 +1501,7 @@
       <Filter>02.GameObjects\UI\MessageWindow</Filter>
     </ClCompile>
     <ClCompile Include="CKirbyDump_State.cpp">
-      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyDump_State</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\FinaleKirby\State\KirbyDump_State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Finale.cpp">
       <Filter>01.Levels\12. Finale</Filter>
@@ -1508,6 +1526,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\ShadowDeco.cpp">
       <Filter>02.GameObjects\Map\Deco\ShadowDeco</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Dump.cpp">
+      <Filter>02.GameObjects\Map\Dump</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FinaleKirby.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\FinaleKirby</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -57,6 +57,7 @@
 #include "TestModel.h"
 #include "TestTerrain.h"
 #include "Kirby.h"
+#include "FinaleKirby.h"
 #include "BombOrbitGlow.h"
 #include "BombOrbit.h"
 #include "KirbyBomb.h"
@@ -112,6 +113,7 @@
 #include "BreakableRock.h"
 #include "BreakableRockParticle.h"
 #include "Car.h"
+#include "Dump.h"
 #include "CarShopWall.h"
 #include "CarShopWallFrame.h"
 #include "ToppleableBridge.h"
@@ -338,6 +340,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	
 #pragma region FOR CLIENT
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kirby"), CKirby);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleKirby"), CFinaleKirby);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KirbyWeapons"), CKirbyWeapons);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KirbyArmours"), CKirbyArmours);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BombOrbit"), CBombOrbit);
@@ -347,6 +350,7 @@ HRESULT CLoader::Loading_ObjectAll()
 
 	// Deform
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Car"), CCar);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DumpCar"), CDump);
 
 	// Monster
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Awoofy"), CAwoofy);
@@ -1796,6 +1800,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Land_LbLastBossStage", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("FinaleCave", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
+
 		//피날레 오브젝트들
 		m_vecModelInfo.emplace_back("PopStar", TYPE_ANIM, 1.f, 0.f, 0);
 
@@ -1834,7 +1839,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("BG1", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
-		m_vecModelInfo.emplace_back("Kirby", TYPE_ANIM, 1.f, 180.f);
+		//m_vecModelInfo.emplace_back("Kirby", TYPE_ANIM, 1.f, 180.f);
 
 		// For Kirby Body
 		Load_KirbyBodyModels();
@@ -1842,6 +1847,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		Load_KirbyWeaponModels();
 		// For Kirby Armour
 		Load_KirbyArmourModels();
+
+		// Deform
+		m_vecModelInfo.emplace_back("DumpCar", TYPE_ANIM, 0.8f, 90.f);
 
 		// For Boss 
 		m_vecModelInfo.emplace_back("FinalBoss", TYPE_ANIM, 1.f, 180.f);
@@ -2271,8 +2279,8 @@ void CLoader::Load_KirbyBodyModels()
 	m_vecModelInfo.emplace_back("KirbyCarDefault", TYPE_ANIM, 1.f, 180.f);
 	m_vecModelInfo.emplace_back("KirbyCarVacuum", TYPE_ANIM, 1.f, 180.f);
 	m_vecModelInfo.emplace_back("KirbyHammerDefault", TYPE_ANIM, 1.f, 180.f);
-	m_vecModelInfo.emplace_back("KirbyDumpDefault", TYPE_ANIM, 1.f, 180.f);
-	m_vecModelInfo.emplace_back("KirbyDumpVacuum", TYPE_ANIM, 1.f, 180.f);
+	m_vecModelInfo.emplace_back("KirbyDumpDefault", TYPE_ANIM, 0.8f, 180.f);
+	m_vecModelInfo.emplace_back("KirbyDumpVacuum", TYPE_ANIM, 0.8f);
 
 }
 

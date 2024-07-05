@@ -41,16 +41,16 @@ HRESULT CKickableRock::Initialize(void* pArg)
 	string strModelName = CUtils::WstrToStr(pGameObjectDesc->wstrModelName);
 
 	m_mapPowers = {
-		{"SeShell", 10.f},
-		{"GsPebble", 20.f},
-		{"WasteCanYellow", 85.f},
+		{"SeShell", 7.5f},
+		{"GsPebble", 18.f},
+		{"WasteCanYellow", 50.f},
 		{"GsRubbleA", 15.f},
-		{"GsRubbleB", 40.f},
-		{"GsRubbleC", 45.f},
-		{"GsRubbleC", 45.f},
-		{"GsTireAL", 130.f},
-		{"GsTireBL", 130.f},
-		{"GsTireCL", 85.f}
+		{"GsRubbleB", 35.f},
+		{"GsRubbleC", 35.f},
+		{"GsRubbleC", 35.f},
+		{"GsTireAL", 80.f},
+		{"GsTireBL", 80.f},
+		{"GsTireCL", 60.f}
 	};
 
 	auto mapIter = m_mapPowers.find(strModelName);
@@ -186,7 +186,7 @@ HRESULT CKickableRock::Render_LightDepth()
 
 #ifdef _DEBUG
 void CKickableRock::Render_IMGUI()
-{
+{	
 	if (ImGui::TreeNode("Guizmo"))
 	{
 		_float4x4 matWorld = m_pTransformCom->Get_WorldFloat4x4();

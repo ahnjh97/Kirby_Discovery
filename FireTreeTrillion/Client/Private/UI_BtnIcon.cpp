@@ -103,6 +103,7 @@ _int CUI_BtnIcon::Tick(_float fTimeDelta)
 		{
 			m_fSelectTime = 0.f;
 			m_eCurState = BTN_BLINK;
+			m_pTransformCom->Set_Scaled(vOrigScale);
 		}
 		break;
 

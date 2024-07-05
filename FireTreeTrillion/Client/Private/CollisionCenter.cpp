@@ -640,6 +640,7 @@ void CCollisionCenter::Body_To_Body_Collision()
 				if (pKirby->Get_KirbyInfo()->m_bBooster == true)
 				{
 					pMonster->Set_PhyXState(PO_PRESSED);
+
 					pKirby->Set_HitStop();
 					pthis->Camera_Shaking(1.2f);
 					return;

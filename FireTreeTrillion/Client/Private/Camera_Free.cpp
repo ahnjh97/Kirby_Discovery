@@ -47,8 +47,8 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 	}
 
 	//// 파트타임헬퍼에 옵저버로 카메라를 알게하고 있습니다. JYWI's ps : 카메라 클래스 하나 더 팔걸~~
-	if(LEVEL_PARTTIME == *m_pGameInstance->Get_CurrentLevelID())
-		CPartTimeHelper::Get_Instance()->Register_Camera(this);
+	//if(LEVEL_PARTTIME == *m_pGameInstance->Get_CurrentLevelID())
+	//	CPartTimeHelper::Get_Instance()->Register_Camera(this);
 
 	return S_OK;
 }

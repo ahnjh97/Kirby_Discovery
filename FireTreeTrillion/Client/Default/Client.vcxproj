@@ -219,9 +219,11 @@
     <ClInclude Include="..\public\Dee_State.h" />
     <ClInclude Include="..\Public\Dialog.h" />
     <ClInclude Include="..\Public\DimensionGate.h" />
+    <ClInclude Include="..\Public\Dump.h" />
     <ClInclude Include="..\Public\FinalBoss.h" />
     <ClInclude Include="..\Public\FinalBossSpear.h" />
     <ClInclude Include="..\Public\FinalBoss_State.h" />
+    <ClInclude Include="..\Public\FinaleKirby.h" />
     <ClInclude Include="..\public\FinaleRoad.h" />
     <ClInclude Include="..\Public\Fog_Instance.h" />
     <ClInclude Include="..\Public\Food.h" />
@@ -407,9 +409,11 @@
     <ClCompile Include="..\private\Dee_State.cpp" />
     <ClCompile Include="..\Private\Dialog.cpp" />
     <ClCompile Include="..\Private\DimensionGate.cpp" />
+    <ClCompile Include="..\Private\Dump.cpp" />
     <ClCompile Include="..\Private\FinalBoss.cpp" />
     <ClCompile Include="..\Private\FinalBossSpear.cpp" />
     <ClCompile Include="..\Private\FinalBoss_State.cpp" />
+    <ClCompile Include="..\Private\FinaleKirby.cpp" />
     <ClCompile Include="..\private\FinaleRoad.cpp" />
     <ClCompile Include="..\Private\Fog_Instance.cpp" />
     <ClCompile Include="..\Private\Food.cpp" />
