@@ -99,13 +99,14 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 	m_vecLevelName = { "Level_Static", "Level_Loading", "Level_Logo", "GamePlay",
 			"Level_Tool_UI", "Level_Tool_FX", "Level_Tool_Anim", "Level_Tool_Map",
-		"Intro", "Racing", "DeeDeeDee", "Town", "PartTime", "FinalBoss", "Finale", "Level_End" };
+		"Intro", "Racing", "DeeDeeDee", "Town", "PartTime", "Park", "FinalBoss", "Finale", "Level_End" };
 
 #pragma region BASIC MAP
 
 	m_vecMapModelNames = { "Level0Stage1Step01", "Level0Stage1Step02",  "Level1Stage1Step01", "DeeDeeDeeMap", "Town", "TownShop"
-		,"Land_LbLastBossBeforeStep" //,"LevelFinale_LbLastBuilding" :: 텍스처 및 모델 수정으로 사용안함
-		,"Land_LbLastBossStage"
+		, "PkFunHouse"
+		, "Land_LbLastBossBeforeStep" //,"LevelFinale_LbLastBuilding" :: 텍스처 및 모델 수정으로 사용안함
+		, "Land_LbLastBossStage"
 		//피날레
 		, "FinaleCave"
 	};
@@ -2212,6 +2213,9 @@ void CMapToolHelper::Load_Map(const string& _strLevel)
 
 	_uint iNumObjects{};
 	fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
+
+	if (fileInput.eof())
+		return;
 
 	_uint iStrLength{};
 	string strModelName;

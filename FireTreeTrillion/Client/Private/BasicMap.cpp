@@ -39,9 +39,9 @@ HRESULT CBasicMap::Initialize(void* pArg)
     , "GsTrafficSignalAL" };
 
     wstring wstrModelTag = GameObjectDesc.wstrModelName;
-
     if (wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("DeeDeeDeeMap") && wstrModelTag != TEXT("Land_LbLastBossBeforeStep") && 
-        wstrModelTag != TEXT("FinaleCave") && wstrModelTag != TEXT("TownShop")  && wstrModelTag != TEXT("LevelFinale_LbLastBuilding") && wstrModelTag.substr(wstrModelTag.length() - 5) == TEXT("Blend"))
+        wstrModelTag != TEXT("FinaleCave") && wstrModelTag != TEXT("TownShop")  && wstrModelTag != TEXT("LevelFinale_LbLastBuilding") &&
+        wstrModelTag != TEXT("PkFunHouse") && wstrModelTag.substr(wstrModelTag.length() - 5) == TEXT("Blend")) 
     {
         m_bBlendMap = true;
         m_eRenderGroup = CRenderer::RENDER_BLEND;
@@ -66,7 +66,7 @@ HRESULT CBasicMap::Initialize(void* pArg)
 
     if(wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("DeeDeeDeeMap") && wstrModelTag != TEXT("FinaleCave") &&
        wstrModelTag != TEXT("Land_LbLastBossBeforeStep") && wstrModelTag != TEXT("TownShop") && 
-       wstrModelTag != TEXT("LevelFinale_LbLastBuilding") && false == m_bBlendMap)
+       wstrModelTag != TEXT("LevelFinale_LbLastBuilding") && wstrModelTag != TEXT("PkFunHouse") && false == m_bBlendMap)
     {
         TraverseBlendDecoInfoTxts(m_mapBlendMeshesIndices, m_mapBlendObjStaticActor);
 
@@ -92,8 +92,8 @@ HRESULT CBasicMap::Initialize(void* pArg)
     }
 
     if (wstrModelTag == TEXT("Town") ||  wstrModelTag == TEXT("DeeDeeDeeMap") || wstrModelTag == TEXT("FinaleCave") ||
-        wstrModelTag == TEXT("TownShop")|| wstrModelTag == TEXT("Land_LbLastBossBeforeStep") ||
-        wstrModelTag == TEXT("LevelFinale_LbLastBuilding"))
+        wstrModelTag == TEXT("TownShop")|| wstrModelTag == TEXT("Land_LbLastBossBeforeStep") || 
+        wstrModelTag == TEXT("PkFunHouse") || wstrModelTag == TEXT("LevelFinale_LbLastBuilding"))
     {
         if (LEVEL_TOOL_MAP != *m_pCurrentLevelID) 
         {
@@ -303,7 +303,6 @@ void CBasicMap::SetUpShaderInfo(const wstring& _wstrModelTag)
     if (fileStream.is_open() == false)
     {
         wstring wstrError = TEXT("Failed to Open: ") + _wstrModelTag + L"_ShaderInfo.txt";
-        //MSG_BOX(wstrError.c_str());
         return;
     }
 

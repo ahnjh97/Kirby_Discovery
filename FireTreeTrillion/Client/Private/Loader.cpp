@@ -258,6 +258,9 @@ HRESULT CLoader::Start()
 	case LEVEL_PARTTIME:
 		hr = Loading_For_Parttime();
 		break;
+	case LEVEL_PARK:
+		hr = Loading_For_Park();
+		break;
 
 	case LEVEL_SIMBA:
 		hr = Loading_For_Simba();
@@ -776,7 +779,6 @@ HRESULT CLoader::Loading_For_Town()
 	CHECK_FAILED(hr);
 #pragma endregion
 
-
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 	m_IsFinished = true;
 
@@ -845,7 +847,6 @@ HRESULT CLoader::Loading_For_Parttime()
 
 #pragma endregion
 
-
 #pragma region UI
 
 	// 타임 바
@@ -890,6 +891,61 @@ HRESULT CLoader::Loading_For_Parttime()
 
 	m_strLoadingText = TEXT("물리 컴포넌트(을) 로딩 중 입니다.");
 	#pragma region 물리 컴포넌트
+	/* 리지드바디 */
+	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_RigidBody"), CRigidBody::Create(m_pDevice, m_pContext));
+	CHECK_FAILED(hr);
+	/* 캐릭터 컨트롤러 */
+	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_CharacterController"), CCharacterController::Create(m_pDevice, m_pContext));
+	CHECK_FAILED(hr);
+#pragma endregion
+
+	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
+	m_IsFinished = true;
+
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_For_Park()
+{
+	HRESULT hr = S_OK;
+	LEVEL eLevel = LEVEL_PARK;
+
+	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
+
+#pragma region 텍스쳐
+	if (FAILED(Add_Texture(eLevel, "Logo", "Logo/Logo.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Moon", "Moon.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Level_0_Env", "Map/Level_0_Env.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "BRDF_LUT", "Map/BRDF_LUT.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "RandomNormal", "Map/RandomNormal.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Terrain_Fog", "Map/Fog/Sand_%d.png", 4)))
+		return E_FAIL;
+
+	hr = Add_Texture(eLevel, "FX_Mask_Bubble2", "Effects/Mask/noise_bubble_%d.png", 4);	CHECK_FAILED(hr);
+
+	//HUD_BOSSHPBAR
+	hr = Add_Texture(eLevel, "HUD_BossBar", "UI/HUD/Boss/BossBar_%d.png", 5);
+
+	// 커비 얼굴 텍스쳐 로드
+	Add_KirbyFaceTexture(eLevel);
+#pragma endregion
+
+	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
+#pragma region 모델
+	Load_AnimToolInfo();
+	// 모아놓은 Model 한번에 생성.
+	hr = Add_Models(eLevel);
+	CHECK_FAILED(hr);
+#pragma endregion
+
+	m_strLoadingText = TEXT("물리 컴포넌트(을) 로딩 중 입니다.");
+
+#pragma region 물리 컴포넌트
 	/* 리지드바디 */
 	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_RigidBody"), CRigidBody::Create(m_pDevice, m_pContext));
 	CHECK_FAILED(hr);
@@ -966,9 +1022,6 @@ HRESULT CLoader::Loading_For_Simba()
 
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 	m_IsFinished = true;
-
-	return S_OK;
-
 
 	return S_OK;
 }

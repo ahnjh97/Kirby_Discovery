@@ -11,6 +11,7 @@
 #include "Level_Racing.h"
 #include "Level_FinalBoss.h"
 #include "Level_Town.h"
+#include "Level_Park.h"
 #include "Level_Simba.h"
 #include "Level_Finale.h"
 
@@ -72,6 +73,9 @@ void CLevel_Loading::Tick(_float fTimeDelta)
 			break;
 		case LEVEL_PARTTIME:
 			pLevel = CLevel_PartTime::Create(m_pDevice, m_pContext);
+			break;
+		case LEVEL_PARK:
+			pLevel = CLevel_Park::Create(m_pDevice, m_pContext);
 			break;
 		///////////////////////////////////////////////////////////////
 		case LEVEL_SIMBA:

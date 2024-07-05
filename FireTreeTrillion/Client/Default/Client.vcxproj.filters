@@ -514,6 +514,9 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\FinaleKirby\State\KirbyDump_State">
       <UniqueIdentifier>{8ce43134-70bd-4e9a-84fa-af301762dfac}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Levels\5. Park">
+      <UniqueIdentifier>{b7bfcb13-2e50-4821-b899-af7cb6e3737a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -1033,6 +1036,9 @@
     <ClInclude Include="..\Public\Dump.h">
       <Filter>02.GameObjects\Map\Dump</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Level_Park.h">
+      <Filter>01.Levels\5. Park</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1532,6 +1538,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\FinaleKirby.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\FinaleKirby</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Park.cpp">
+      <Filter>01.Levels\5. Park</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
