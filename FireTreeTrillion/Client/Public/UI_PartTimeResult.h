@@ -59,15 +59,18 @@ private:
 	array<_int, 3>					m_arrScoreDigits;
 
 	_float							m_fTimeDelta = _float();
-	_float							m_fMoveRatio = 0.f;
+	_float							m_fMoveRatio = 1.f;
 	_float2							m_fMovePosition2D = _float2();
 	_float							m_fSizeRatio = 0.f;
 	_float2							m_fSize2D = _float2();
+
+	_bool							m_bRenderTotalScore = false;
 
 public:
 	static CUI_PartTimeResult*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject*			Clone(void* pArg) override;
 	virtual void					Free() override;
+
 };
 
 

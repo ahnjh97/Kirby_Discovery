@@ -114,6 +114,7 @@ HRESULT CUI_PartTimeResult::Render()
 
 	Render_Digits();
 
+
 	return S_OK;
 }
 
@@ -155,7 +156,6 @@ void CUI_PartTimeResult::Render_IMGUI()
 void CUI_PartTimeResult::Render_Digits()
 {
 	HRESULT hr(S_OK);
-
 	static _float fTimeAcc = 0.f;
 	m_fMoveRatio += m_fTimeDelta * 3.f;
 	if (m_fMoveRatio >= 1.f)
@@ -165,20 +165,35 @@ void CUI_PartTimeResult::Render_Digits()
 		if (fTimeAcc >= 1.f)
 		{
 			_int iAddNum = 1;
-			// 와들디 iAddNum 마리만큼 등장 // 효선아 여기야
+			// 와들디 iAddNum만큼 등장 // 효선아 여기야
 
 			// 30만큼 점수판 += 점수
 			if (m_fScore < Change_ScoreTextures(iAddNum))
 			{
-				// 최종 점수만큼 ScoreTextures가 채워져 있다.
-				Render_TotalScore();
-			}
-			else
-			{
-				//해당 m_arrScoreDigits 만큼 숫자 뾰로로로롱
+				m_bRenderTotalScore = true;
+				if (fTimeAcc >= 2.f)
+				{
+					// 최종 점수만큼 ScoreTextures가 채워져 있다.
+					if (m_bRenderTotalScore)
+						Render_TotalScore();
+				}
+				if (fTimeAcc >= 2.5f)
+				{
+					// 이펙트 넣기 // 여기야 효선아
+				}
+
+				// 다이얼로그 생성
+				if (fTimeAcc >= 4.f)
+				{
+					// 다이얼로그 띄우기 // 이거 a버튼 누르면 town으로 돌아가기
+				}
 			}
 
-			fTimeAcc = 0.f;
+			if (false == m_bRenderTotalScore)
+			{
+				fTimeAcc = 0.f;
+				m_fMoveRatio = 0.f;
+			}
 		}
 	}
 
@@ -207,6 +222,8 @@ void CUI_PartTimeResult::Render_Digits()
 		hr = m_pVIBufferCom->Render();
 		CHECK_FAILED(hr);
 	}
+
+
 }
 
 void CUI_PartTimeResult::Render_TotalScore()
@@ -242,7 +259,7 @@ void CUI_PartTimeResult::Render_TotalScore()
 		hr = m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix");
 		CHECK_FAILED(hr);
 
-		hr = m_arrTexures[i]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
+		hr = m_arrTexures[i]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", m_arrScoreDigits[i - 1]);
 		CHECK_FAILED(hr);
 
 		hr = m_pShaderCom->Begin(POSTEX_ALPHATEST_COLOR_HORIZONTALCUT);
@@ -275,8 +292,9 @@ void CUI_PartTimeResult::Initialize_TexturePos()
 _int CUI_PartTimeResult::Change_ScoreTextures(_int iNum)
 {
 	static _int iScoreAccum = 0.f;
-	//_int iScore = (_int)m_fScore;
 	iScoreAccum += 30 * iNum;
+	if (iScoreAccum > m_fScore)
+		return iScoreAccum;
 
 	_int iShareHund = (iScoreAccum / 100);
 	if (iShareHund < 10)
