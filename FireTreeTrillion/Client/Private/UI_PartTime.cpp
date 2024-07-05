@@ -528,7 +528,12 @@ void CUI_PartTime::Compute_Timer(_float fTimeDelta)
 // 쫓아가는 것을 핸들하는 변수는 m_fRatioBarSub입니다.
 void CUI_PartTime::Compute_TimerBar(_float fTimeDelta)
 {
-	_float fSpeed = g_fTimeSpeed * 5.f;
+	_float fSpeed(0.f);
+	if(m_fCurTime < 20.f)
+		fSpeed = g_fTimeSpeed * 10.f;
+	else
+		fSpeed = g_fTimeSpeed * 5.f;
+	
 	m_fRatioBarSub += fTimeDelta * fSpeed;
 	if(m_fRatioBarSub >= m_fGoalTimeBar)
 	{

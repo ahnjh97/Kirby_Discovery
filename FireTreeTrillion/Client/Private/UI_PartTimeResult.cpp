@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "UI_PartTimeResult.h"
 
+#include "Level_Loading.h"
 #include "PartTimeHelper.h"
 
 CUI_PartTimeResult::CUI_PartTimeResult(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext)
@@ -186,6 +187,11 @@ void CUI_PartTimeResult::Render_Digits()
 				if (fTimeAcc >= 4.f)
 				{
 					// 다이얼로그 띄우기 // 이거 a버튼 누르면 town으로 돌아가기
+					if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_A, KEY_DOWN))
+					{
+						hr = m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_TOWN));
+						CHECK_FAILED(hr);
+					}
 				}
 			}
 
