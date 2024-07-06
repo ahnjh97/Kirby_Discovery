@@ -41,7 +41,6 @@ public:
 #endif
 	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
-
 private:
 	HRESULT			Add_Components();
 	HRESULT			Bind_ShaderResources();

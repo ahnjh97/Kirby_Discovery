@@ -207,19 +207,12 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 	pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
 
-	//if (pController->Compute_Height() > 2.f)
-	//{
-	//	DESC(m_fJumpVelocity) = 0.f;
-	//	pKirby->Change_State(CFinaleKirby::DUMPSTATE_JUMP, 60.f, true, false, CFinaleKirby::BODY_DUMPDEFAULT, CFinaleKirby::OFFSET_DUMP);
-	//	return;
-	//}
-
-	//if (pController->RayCastToDynamicActor(_float4(0.f, -1.f, 0.f, 0.f)) > 2.f)
-	//{
-	//	DESC(m_fJumpVelocity) = 0.f;
-	//	pKirby->Change_State(CFinaleKirby::DUMPSTATE_JUMP, 60.f, true, false, CFinaleKirby::BODY_DUMPDEFAULT, CFinaleKirby::OFFSET_DUMP);
-	//	return;
-	//}
+	if ((pController->Compute_Height() < 1.5f || pController->RayCastToDynamicActor(_float4(0.f, -1.f, 0.f, 0.f)) < 1.5f) == false)
+	{
+		DESC(m_fJumpVelocity) = 0.f;
+		pKirby->Change_State(CFinaleKirby::DUMPSTATE_JUMP, 60.f, true, false, CFinaleKirby::BODY_DUMPDEFAULT, CFinaleKirby::OFFSET_DUMP);
+		return;
+	}
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_PRESS) == true)
 	{
@@ -244,8 +237,16 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	}
 
 	Kirbydesc->m_fMoveSpeed += fTimeDelta * 10.f;
-	if (Kirbydesc->m_fMoveSpeed > 20.f)
-		Kirbydesc->m_fMoveSpeed = 20.f;
+	if (DESC(m_bBooster) == true)
+	{
+		if (Kirbydesc->m_fMoveSpeed > 40.f)
+			Kirbydesc->m_fMoveSpeed = 40.f;
+	}
+	else
+	{
+		if (Kirbydesc->m_fMoveSpeed > 20.f)
+			Kirbydesc->m_fMoveSpeed = 20.f;
+	}
 
 	// ≈∏∞Ÿ±‚¡ÿ
 	_vector vMoveDelta = Kirbydesc->m_vMoveDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
@@ -257,6 +258,33 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		DESC(m_fJumpVelocity) = 20.f;
 		pKirby->Change_State(CFinaleKirby::DUMPSTATE_JUMP, 60.f, true, false, CFinaleKirby::BODY_DUMPDEFAULT, CFinaleKirby::OFFSET_DUMP);
 		return;
+	}
+
+	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN) && DESC(m_bBooster) == false)
+	{
+		//∫Œö¿ ¿Ã∆Â∆Æ
+		ComeOn_Dash_For_Dump(pTransformCom);
+		DESC(m_bBooster) = true;
+		CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
+		pCamera->Make_Shake(0.6f, 2.f);
+	}
+
+	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS))
+	{
+		DESC(m_fBoosterTime) = 5.f;
+	}
+	else
+	{
+		if (DESC(m_fBoosterTime) > 0.f)
+			DESC(m_fBoosterTime) -= fTimeDelta;
+		if (DESC(m_fBoosterTime) < 0.f)
+			DESC(m_fBoosterTime) = 0.f;
+	}
+
+	if (DESC(m_fBoosterTime) <= 0.f)
+	{
+		DESC(m_bBooster) = false;
+		pKirby->Delete_Effect("Come On Dash");
 	}
 }
 
@@ -298,6 +326,33 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	CFinaleKirby::FINALEKIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
+	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN) && DESC(m_bBooster) == false)
+	{
+		//∫Œö¿ ¿Ã∆Â∆Æ
+		ComeOn_Dash_For_Dump(pTransformCom);
+		DESC(m_bBooster) = true;
+		CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
+		pCamera->Make_Shake(0.6f, 2.f);
+	}
+
+	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS))
+	{
+		DESC(m_fBoosterTime) = 5.f;
+	}
+	else
+	{
+		if (DESC(m_fBoosterTime) > 0.f)
+			DESC(m_fBoosterTime) -= fTimeDelta;
+		if (DESC(m_fBoosterTime) < 0.f)
+			DESC(m_fBoosterTime) = 0.f;
+	}
+
+	if (DESC(m_fBoosterTime) <= 0.f)
+	{
+		DESC(m_bBooster) = false;
+		pKirby->Delete_Effect("Come On Dash");
+	}
+
 	if (m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_PRESS) == true)
 	{
 		Kirbydesc->m_vTargetDir = _float4(1.f, 0.f, 0.3f, 0.f);
@@ -321,8 +376,16 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	}
 
 	Kirbydesc->m_fMoveSpeed += fTimeDelta * 10.f;
-	if (Kirbydesc->m_fMoveSpeed > 20.f)
-		Kirbydesc->m_fMoveSpeed = 20.f;
+	if (DESC(m_bBooster) == true)
+	{
+		if (Kirbydesc->m_fMoveSpeed > 40.f)
+			Kirbydesc->m_fMoveSpeed = 40.f;
+	}
+	else
+	{
+		if (Kirbydesc->m_fMoveSpeed > 20.f)
+			Kirbydesc->m_fMoveSpeed = 20.f;
+	}
 
 	// ≈∏∞Ÿ±‚¡ÿ
 	_vector vMoveDelta = Kirbydesc->m_vMoveDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;

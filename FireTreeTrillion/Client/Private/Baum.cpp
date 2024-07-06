@@ -15,9 +15,7 @@ CBaum::CBaum(const CBaum& rhs)
 
 HRESULT CBaum::Initialize_Prototype()
 {
-
 	return S_OK;
-
 }
 
 HRESULT CBaum::Initialize(void* pArg)
@@ -36,6 +34,7 @@ HRESULT CBaum::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_bMotionBlur = true;
+	m_bRimLight = false;
 
 	m_fBaumSpeed =  Desc.fBaumSpeed;
 	m_vBaumMoveDir = Desc.vBaumMoveDir;
@@ -43,12 +42,13 @@ HRESULT CBaum::Initialize(void* pArg)
 	_float4 vNewUp = m_vBaumMoveDir * -1.f;
 	vNewUp.Normalize();
 	_float4 vNewRight = { 0.f, 0.f, 0.f, 0.f };
+
 	vNewUp == _float4(0.f, 1.f, 0.f, 0.f) ?
-		vNewRight = XMVector3Cross(vNewUp, _float4(0.f, 1.00001f, 0.f, 0.f)) :
-		vNewRight = XMVector3Cross(vNewUp, _float4(0.f, 1.f, 0.f, 0.f));
+		vNewRight = XMVector3Cross(_float4(0.001f, 1.f, 0.f, 0.f), vNewUp) :
+		vNewRight = XMVector3Cross(_float4(0.f, 1.f, 0.f, 0.f), vNewUp);
 
 	vNewRight.Normalize();
-	_float4 vNewLook = XMVector3Cross(vNewUp, vNewRight);
+	_float4 vNewLook = XMVector3Cross(vNewRight, vNewUp);
 	vNewLook.Normalize();
 
 	m_pTransformCom->Set_State(CTransform::STATE_UP, vNewUp);
@@ -84,8 +84,7 @@ _int CBaum::Tick(_float fTimeDelta)
 
 		// 파티클을 만든다.
 		//Make_Partical();
-		m_bDead = true;
-		//m_bOnTerrain = true;
+		m_bOnTerrain = true;
 	}
 
 	Compute_MotionBlur();
@@ -95,7 +94,7 @@ _int CBaum::Tick(_float fTimeDelta)
 
 void CBaum::Late_Tick(_float fTimeDelta)
 {
-	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 5.0f))
+	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 20.0f))
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
@@ -111,6 +110,7 @@ HRESULT CBaum::Render()
 
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
+
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
