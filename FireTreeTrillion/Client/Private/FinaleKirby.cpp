@@ -313,7 +313,18 @@ void CFinaleKirby::Kirby_SystemTick(_float fTimeDelta)
             _float fRadialPower = INFO(m_fMoveSpeed) * 0.2f;
             m_pGameInstance->Setting_RadialBlur(fRadialPower, fRadialPower);
         }
+
+        if (Get_State() == DUMPTSTATE_CUT)
+        {
+            m_bMotionBlur = false;
+        }
+        else
+        {
+            m_bMotionBlur = true;
+        }
     }
+
+
 }
 
 HRESULT CFinaleKirby::Kirby_SystemInitialize()

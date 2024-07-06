@@ -53,7 +53,9 @@ private:
 	_float			m_fBaumSpeed = { 0.f };
 	_bool			m_bOnTerrain = { false };
 	// 붙어먹을 로드 클래스
-	// class Load   m_Load 
+	class CFinaleRoad* m_pMyRoad = { nullptr };
+	_float4x4		m_HitWorld = {};
+	void			Find_MyRoad();
 
 
 private:
