@@ -196,7 +196,7 @@ void CLevel_PartTime::Ready_Layer_Food(const wstring& strLayerTag)
 	FoodDesc.bRender = true;
 	FoodDesc.uItem = 0;
 	FoodDesc.fSpeedPerSec = 5;
-	HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Food"), TEXT("Prototype_GameObject_PartTimeFood"), &FoodDesc);
+	HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_PartTimeFood"), &FoodDesc);
 	CHECK_FAILED(hr);
 
 	// 돔마도
@@ -209,7 +209,7 @@ void CLevel_PartTime::Ready_Layer_Food(const wstring& strLayerTag)
 	FoodDesc.matWorld = matFinal;
 	FoodDesc.bRender = true;
 	FoodDesc.uItem = 1;
-	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Food"), TEXT("Prototype_GameObject_PartTimeFood"), &FoodDesc);
+	hr = m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_PartTimeFood"), &FoodDesc);
 	CHECK_FAILED(hr);
 
 	// 야구르트
@@ -224,7 +224,7 @@ void CLevel_PartTime::Ready_Layer_Food(const wstring& strLayerTag)
 	FoodDesc.matWorld = matFinal;
 	FoodDesc.bRender = true;
 	FoodDesc.uItem = 2;
-	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Food"), TEXT("Prototype_GameObject_PartTimeFood"), &FoodDesc);
+	hr = m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_PartTimeFood"), &FoodDesc);
 	CHECK_FAILED(hr);
 
 	// 함바그

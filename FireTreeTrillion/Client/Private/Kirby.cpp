@@ -111,8 +111,7 @@ void CKirby::Late_Tick(_float fTimeDelta)
 	if (INFO(m_eBodyState) != BODY_DEFAULT)
 		m_pModelCom[BODY_DEFAULT]->Play_Animation(m_fTimeDelta);
 
-	if ((INFO(m_eBodyState) == BODY_CARDEFAULT || INFO(m_eBodyState) == BODY_CARVACUUM ||
-		INFO(m_eBodyState) == BODY_DUMPDEFAULT || INFO(m_eBodyState) == BODY_DUMPVACUUM) == false)
+	if ((INFO(m_eBodyState) == BODY_CARDEFAULT || INFO(m_eBodyState) == BODY_CARVACUUM ) == false)
 		m_pWeapons->Late_Tick(m_fTimeDelta);
 
 	m_pArmours->Late_Tick(m_fTimeDelta);
@@ -881,17 +880,6 @@ HRESULT CKirby::Add_Components()
 		TEXT("Com_Model_HammerDefault"), (CComponent**)&m_pModelCom[BODY_HAMMER]);
 	CHECK_FAILED(hr);
 
-	// 커비의 Dump Default 상태 모델
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyDumpDefault"),
-		TEXT("Com_Model_DumpDefault"), (CComponent**)&m_pModelCom[BODY_DUMPDEFAULT]);
-	CHECK_FAILED(hr);
-
-	// 커비의 Dump Vacuum 상태 모델
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyDumpVacuum"),
-		TEXT("Com_Model_DumpVacuum"), (CComponent**)&m_pModelCom[BODY_DUMPVACUUM]);
-	CHECK_FAILED(hr);
-
-
 #pragma endregion
 
 #pragma region Kirby Eye
@@ -1392,13 +1380,10 @@ void CKirby::HitBoxChanger(_uint eState)
 
 void CKirby::Update_PartObjectMatrix()
 {
-	if ((INFO(m_eBodyState) == BODY_CARDEFAULT || INFO(m_eBodyState) == BODY_CARVACUUM ||
-		INFO(m_eBodyState) == BODY_DUMPDEFAULT || INFO(m_eBodyState) == BODY_DUMPVACUUM)
-		== false)
+	if ((INFO(m_eBodyState) == BODY_CARDEFAULT || INFO(m_eBodyState) == BODY_CARVACUUM) == false)
 		m_WeaponMatrix = *(m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("RHaveL")->Get_CombinedTransformationMatrix());
 
-	if ((INFO(m_eBodyState) == BODY_DUMPDEFAULT || INFO(m_eBodyState) == BODY_DUMPVACUUM) == false)
-		m_ArmourMatrix = *(m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("HatL")->Get_CombinedTransformationMatrix());
+	m_ArmourMatrix = *(m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("HatL")->Get_CombinedTransformationMatrix());
 }
 
 void CKirby::Bone_Rotation(_float fTimeDelta)
@@ -1532,7 +1517,7 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 	// 그림자는 무조건 커비를 따라간다.
 	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 	_vector vLightPos = vPos;
-	vLightPos.m128_f32[1] += 60.f;
+	vLightPos.m128_f32[1] += 100.f;
 	vLightPos.m128_f32[2] -= 1.f;
 	m_pGameInstance->Update_LightShadow(vLightPos, vPos);
 

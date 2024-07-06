@@ -2,7 +2,7 @@
 #include "Client_Defines.h"
 #include "GameObject.h"
 #include "CollisionCenter.h"
-#include "Effect.h"
+#include "MultiEffect.h"
 
 BEGIN(Client)
 
@@ -56,6 +56,10 @@ public:
 
 	//이펙트를 자신의 리스트에 추가한다.
 	void	Add_Effect(CEffect* pEffect);
+
+	void	Add_Effect(string strName, CEffect::FX_DESC fxDesc, _bool bAddToList = false);
+	void	Add_Effect(string strName, CMultiEffect::MULTI_FX_DESC fxDesc, _bool bAddToList = false);
+
 	void	Delete_AllEffect();
 	void	Delete_Effect(string strTag);
 
@@ -63,6 +67,7 @@ public:
 	_float	Get_Attack() { return m_fAttack; }
 	_float	m_fAttack = { 0.f };
 
+	_bool	Get_NonDead() { return m_bNonDead; }
 
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;
@@ -88,6 +93,9 @@ protected:
 
 	// 피직스 오브젝트들의 현재 큰 상태를 의미한다.
 	PHYXOBJECT_CURSTATE m_ePhyXState = { PO_NORMAL };
+
+	// Bullet인데, 파괴되지 않을 애들임
+	_bool	m_bNonDead = { false };
 
 	//피직스 오브젝트들에게 귀속되어 움직이는 이펙트들
 	list<CEffect*>	m_FXList;

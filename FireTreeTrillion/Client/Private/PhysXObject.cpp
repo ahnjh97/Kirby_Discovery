@@ -141,6 +141,33 @@ void CPhysXObject::Set_PhyXState(PHYXOBJECT_CURSTATE eState)
 		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
 			return;
 	}
+	else if (eState == PO_PRESSED)
+	{
+		CEffect::FX_DESC FXDesc{};
+
+		FXDesc.vInitPos = static_cast<_float3>(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+		FXDesc.vInitScale = { 1.8f, 1.8f, 1.8f };
+		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_start particle test A"), &FXDesc)))
+			return;
+	}
+}
+
+
+void CPhysXObject::Add_Effect(string strName, CEffect::FX_DESC fxDesc, _bool bAddToList)
+{
+	wstring strProtoTag = TEXT("Prototype_GameObject_");
+	strProtoTag += CUtils::StrToWstr(strName);
+
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), strProtoTag, &fxDesc)))
+		return;
+
+	if(bAddToList)
+		Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+
+}
+
+void CPhysXObject::Add_Effect(string strName, CMultiEffect::MULTI_FX_DESC fxDesc, _bool bAddToList)
+{
 }
 
 void CPhysXObject::Add_Effect(CEffect* pEffect)

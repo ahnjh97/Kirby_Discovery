@@ -12,6 +12,7 @@
 #include "BrontoBurt.h"
 #include "PoppyBrosJr.h"
 #include "FinalBoss.h"
+#include "FinaleRoad.h"
 
 #include "BG.h"
 #include "HUD.h"
@@ -55,10 +56,22 @@ HRESULT CLevel_Finale::Initialize()
 	CHECK_FAILED(hr);
 	hr = Ready_UI();
 	CHECK_FAILED(hr);
+
+
+	CGameObject::GAMEOBJECT_DESC ObjDesc{};
+	ObjDesc.fSpeedPerSec = 5.f;
+	ObjDesc.fRotationPerSec = ToRadian(90.f);
+	_float4x4 InitMat = _float4x4::Identity;
+	InitMat.Translation({ 0.f, 0.f, 0.f });
+	ObjDesc.matWorld = InitMat;
+
+	// Car Test
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Deform"), TEXT("Prototype_GameObject_DumpCar"), &ObjDesc)))
+		return E_FAIL;
+
 	
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
-
-
+	m_pGameInstance->Set_ColorSet_ByIndex(5);
 	return S_OK;
 }
 
@@ -95,16 +108,16 @@ HRESULT CLevel_Finale::Ready_Lights()
 	//// 예시코드 1 : 태양광
 	LIGHT_DESC			LightDesc{};
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
-	LightDesc.vDirection = _float4(0.f, -1.f, 0.f, 0.f);
+	LightDesc.vDirection = _float4(0.f, -1.f, -.3f, 0.f);
 
-	LightDesc.vDiffuse = _float4(0.8f, 0.8f, 0.8f, 1.f);
-	LightDesc.vAmbient = _float4(0.6f, 0.6f, 0.6f, 1.f);
+	LightDesc.vDiffuse = _float4(0.6f, 0.5f, 0.3f, 1.f);
+	LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
 	LightDesc.vSpecular = _float4(0.2f, 0.2f, 0.2f, 1.f);
 
 	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
 		return E_FAIL;
 
-	CGameInstance::Get_Instance()->Setting_GodRay({-650.f, 300.f, 1200.f, 1.f});
+	CGameInstance::Get_Instance()->Setting_GodRay({-650.f, 5000.f, 1200.f, 1.f});
 
 	return S_OK;
 }
@@ -303,7 +316,7 @@ HRESULT CLevel_Finale::Ready_Triggers()
 				if ("NonAnim" == strModelName.substr(0, 7))
 					tempDesc.wstrModelName.erase(0, 8);
 			}
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby"), &tempDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Player"), TEXT("Prototype_GameObject_FinaleKirby"), &tempDesc)))
 				return E_FAIL;
 		}
 		else if ("Ladder" == strModelName)
@@ -600,6 +613,18 @@ HRESULT CLevel_Finale::Ready_Objects()
 {
 	//Map, Triggers, Kickables.. 분류 제외 잔존 오브젝트들
 
+	CFinaleRoad::ROAD_DESC roadDesc{};
+	roadDesc.wstrModelName = TEXT("MovableBuildingA");
+
+	_float4x4 InitMat = _float4x4::Identity;
+	InitMat.Translation({ 110.f, -50.f, 0.f });
+	CUtils::Turn_OtherMatrix(InitMat, _float3::Up, 1.f, 80.f);
+	roadDesc.matWorld = InitMat;
+
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
+		return E_FAIL;
+
+
 	string strFileName = "../../../objects_txt/Finale.txt";
 
 	ifstream fileInput(strFileName, ios::binary);
@@ -656,12 +681,12 @@ HRESULT CLevel_Finale::Ready_Objects()
 
 HRESULT CLevel_Finale::Ready_UI()
 {
-	CUIObject::UIOBJ_DESC DiscardUIDesc{};
+	/*CUIObject::UIOBJ_DESC DiscardUIDesc{};
 	DiscardUIDesc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f, 0.f };
 	DiscardUIDesc.vPos = { DiscardUIDesc.vCenter.x, DiscardUIDesc.vCenter.y, 0.f };
 	DiscardUIDesc.vSize = { 260.f * 0.8f, 120.f * 0.8f, 1.f };
 
-	HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_HUD"), TEXT("Prototype_GameObject_HUD_AbilityDiscard"), &DiscardUIDesc);
+	HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_HUD"), TEXT("Prototype_GameObject_HUD_AbilityDiscard"), &DiscardUIDesc);*/
 
 	return S_OK;
 }

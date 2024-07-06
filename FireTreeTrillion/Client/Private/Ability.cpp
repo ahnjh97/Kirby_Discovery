@@ -71,6 +71,7 @@ HRESULT CAbility::Initialize(void* pArg)
 	CTransform* pTransform = pKirby->Get_TransformCom();
 	m_vLookDir = pTransform->Get_State_Vector(CTransform::STATE_LOOK);
 
+	/*
 	CMultiEffect::MULTI_FX_DESC FXDesc{};
 	FXDesc.vInitPos = { 0.f, .3f, 0.f };
 	FXDesc.pSocketMatrix = &m_EffectSocket;
@@ -78,7 +79,7 @@ HRESULT CAbility::Initialize(void* pArg)
 	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_ItemBubble1"), &FXDesc)))
 		return E_FAIL;
 	Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
-
+	*/
 	return S_OK;
 }
 
@@ -101,22 +102,19 @@ _int CAbility::Tick(_float fTimeDelta)
 		// 날아가는 도중이다.  1초에 360도 회전하며, 30의 거리로 날아간다.
 		if (m_ePhyXState == PO_FLYAWAY)
 		{
-			_vector		vLook = vCameraLook;
+			/*_vector		vLook = vCameraLook;
 			_vector		vRight = XMVector3Cross(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), vLook);
 			_vector		vUp = XMVector3Cross(vLook, vRight);
-
 			_float3		vScaled = m_pTransformCom->Get_Scaled();
-
 			m_pTransformCom->Set_State(CTransform::STATE_RIGHT, XMVector3Normalize(vRight) * vScaled.x);
 			m_pTransformCom->Set_State(CTransform::STATE_UP, XMVector3Normalize(vUp) * vScaled.y);
-			m_pTransformCom->Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLook) * vScaled.z);
+			m_pTransformCom->Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLook) * vScaled.z);*/
 
 			_float3 vDamegeDir = m_vDamegeDir;
 			_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vDamegeDir * m_fTimeDelta * 30.f);
-			m_pTransformCom->Turn(vCameraLook, m_fTimeDelta, 360.f);
+			m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), m_fTimeDelta, 360.f);
 			m_fFlyTime += m_fTimeDelta;
-
 
 			if (RayCast_Terrain(XMVector3Normalize(vDamegeDir)) == true)
 				m_bDead = true;

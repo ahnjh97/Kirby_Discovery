@@ -183,6 +183,11 @@
     <ClInclude Include="..\public\BackGround.h" />
     <ClInclude Include="..\Public\BasicMap.h" />
     <ClInclude Include="..\public\BattleDee.h" />
+    <ClInclude Include="..\Public\Baum.h" />
+    <ClInclude Include="..\Public\BaumPiece.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="..\Public\BG.h" />
     <ClInclude Include="..\Public\BladeKnight.h" />
     <ClInclude Include="..\Public\BladeKnightSword.h" />
@@ -212,6 +217,7 @@
     <ClInclude Include="..\Public\CollisionCenter.h" />
     <ClInclude Include="..\Public\Debris.h" />
     <ClInclude Include="..\public\DecoObject.h" />
+    <ClInclude Include="..\Public\Disaster_Master.h" />
     <ClInclude Include="..\Public\ShadowDeco.h" />
     <ClInclude Include="..\Public\DeeDeeDee.h" />
     <ClInclude Include="..\Public\DeeDeeDeeHammer.h" />
@@ -220,9 +226,11 @@
     <ClInclude Include="..\public\Dee_State.h" />
     <ClInclude Include="..\Public\Dialog.h" />
     <ClInclude Include="..\Public\DimensionGate.h" />
+    <ClInclude Include="..\Public\Dump.h" />
     <ClInclude Include="..\Public\FinalBoss.h" />
     <ClInclude Include="..\Public\FinalBossSpear.h" />
     <ClInclude Include="..\Public\FinalBoss_State.h" />
+    <ClInclude Include="..\Public\FinaleKirby.h" />
     <ClInclude Include="..\public\FinaleRoad.h" />
     <ClInclude Include="..\Public\Fog_Instance.h" />
     <ClInclude Include="..\Public\Food.h" />
@@ -372,6 +380,11 @@
     <ClCompile Include="..\private\BackGround.cpp" />
     <ClCompile Include="..\Private\BasicMap.cpp" />
     <ClCompile Include="..\private\BattleDee.cpp" />
+    <ClCompile Include="..\Private\Baum.cpp" />
+    <ClCompile Include="..\Private\BaumPiece.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\Private\BG.cpp" />
     <ClCompile Include="..\Private\BladeKnight.cpp" />
     <ClCompile Include="..\Private\BladeKnightSword.cpp" />
@@ -401,6 +414,7 @@
     <ClCompile Include="..\Private\CollisionCenter.cpp" />
     <ClCompile Include="..\Private\Debris.cpp" />
     <ClCompile Include="..\private\DecoObject.cpp" />
+    <ClCompile Include="..\Private\Disaster_Master.cpp" />
     <ClCompile Include="..\Private\ShadowDeco.cpp" />
     <ClCompile Include="..\Private\DeeDeeDee.cpp" />
     <ClCompile Include="..\Private\DeeDeeDeeHammer.cpp" />
@@ -409,9 +423,11 @@
     <ClCompile Include="..\private\Dee_State.cpp" />
     <ClCompile Include="..\Private\Dialog.cpp" />
     <ClCompile Include="..\Private\DimensionGate.cpp" />
+    <ClCompile Include="..\Private\Dump.cpp" />
     <ClCompile Include="..\Private\FinalBoss.cpp" />
     <ClCompile Include="..\Private\FinalBossSpear.cpp" />
     <ClCompile Include="..\Private\FinalBoss_State.cpp" />
+    <ClCompile Include="..\Private\FinaleKirby.cpp" />
     <ClCompile Include="..\private\FinaleRoad.cpp" />
     <ClCompile Include="..\Private\Fog_Instance.cpp" />
     <ClCompile Include="..\Private\Food.cpp" />
