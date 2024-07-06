@@ -643,8 +643,8 @@ HRESULT CLevel_Finale::Ready_Objects()
 	roadDesc.wstrModelName = TEXT("MovableBuildingC");
 
 	InitMat = _float4x4::Identity;
-	InitMat.Translation({ 390.1f, -15.5f, -22.9f });
-	 vQuat = CUtils::Make_Quat_FromDir({ 1.f, -.3f, -.05f });
+	InitMat.Translation({ 384.1f, -18.8f, -69.6f });
+	 vQuat = CUtils::Make_Quat_FromDir({ 1.f, -.1f, -.05f });
 	CUtils::Rotation(InitMat, vQuat);
 	roadDesc.matWorld = InitMat;
 
