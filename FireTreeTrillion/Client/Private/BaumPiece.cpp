@@ -33,18 +33,13 @@ HRESULT CBaumPiece::Initialize(void* pArg)
 	m_bRimLight = false;
 	m_bStencil = true;
 
-	PxVec3 kickDirection(pGameObjectDesc->vParticalMoveDir.x, pGameObjectDesc->vParticalMoveDir.y, pGameObjectDesc->vParticalMoveDir.z);
-	PxVec3 impulse = kickDirection * pGameObjectDesc->fParticalSpeed;
-	m_pDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, false);
-	m_pDynamicActor->addForce(impulse, PxForceMode::eIMPULSE);
+	m_vFlyDir = pGameObjectDesc->vParticalMoveDir;
+	m_vFlyDir.w = 0.f;
+	m_vFlyDir.Normalize();
+	m_fFlyPower = pGameObjectDesc->fParticalSpeed;
 
-	_float fMin = 0.2f;
-	_float fMax = 0.8f;
-	PxVec3 PxTorque = PxVec3(CUtils::Make_RandomFloat(fMin, fMax), CUtils::Make_RandomFloat(fMin, fMax)
-		, CUtils::Make_RandomFloat(fMin, fMax));
-
-	m_pDynamicActor->addTorque(PxTorque, PxForceMode::eIMPULSE);
-
+	m_vTurnSpeed = CUtils::Make_RandomFloat(10.f, 720.f);
+	m_vTurnAxis = CUtils::Make_Random_Vector(1.f);
 	return S_OK;
 }
 
@@ -56,8 +51,16 @@ _int CBaumPiece::Tick(_float fTimeDelta)
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 	Compute_MotionBlur();
 
+	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	m_fGravityPower += 4.5f * m_fTimeDelta;
+	m_vGravity.y = m_fGravityPower;
+
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + (m_vFlyDir * m_fTimeDelta * m_fFlyPower) - m_vGravity);
+	m_pTransformCom->Turn(m_vTurnAxis, m_fTimeDelta, m_vTurnSpeed);
+
 
 	m_fDeathTime += m_fTimeDelta;
+	m_pTransformCom->Set_Scaled((4.f - m_fDeathTime) / 4.f, (4.f - m_fDeathTime) / 4.f, (4.f - m_fDeathTime) / 4.f);
 	if (m_fDeathTime > 4.f)
 	{
 		return OBJ_DEAD;
@@ -68,14 +71,6 @@ _int CBaumPiece::Tick(_float fTimeDelta)
 
 void CBaumPiece::Late_Tick(_float fTimeDelta)
 {
-	if (nullptr != m_pDynamicActor) {
-		m_pTransformCom->Set_WorldMatrix(m_pGameInstance->GetActorAverageMatrix(m_pDynamicActor));
-
-		PxVec3 PxForce = PxVec3(0.f, -0.5f, 0.f);
-		m_pDynamicActor->addForce(PxForce, PxForceMode::eFORCE);
-	}
-
-
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 20.0f))
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
@@ -143,9 +138,6 @@ HRESULT CBaumPiece::Add_Components(const wstring& wstrModelName)
 	wstring wstrModelTag = TEXT("Prototype_Component_Model_") + wstrModelName;
 	hr = __super::Add_Component(wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
-
-	m_pDynamicActor = m_pModelCom->ReturnDynamicActor(m_pTransformCom->Get_WorldFloat4x4());
-	m_pDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
 
 	return S_OK;
 }

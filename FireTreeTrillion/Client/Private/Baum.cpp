@@ -32,7 +32,7 @@ HRESULT CBaum::Initialize(void* pArg)
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, Desc.vPos);
 
-	if (FAILED(Add_Components()))
+	if (FAILED(Add_Components(Desc.wstrModelName)))
 		return E_FAIL;
 
 	m_bMotionBlur = true;
@@ -56,6 +56,8 @@ HRESULT CBaum::Initialize(void* pArg)
 	m_pTransformCom->Set_State(CTransform::STATE_UP, vNewUp);
 	m_pTransformCom->Set_State(CTransform::STATE_RIGHT, vNewRight);
 	m_pTransformCom->Set_State(CTransform::STATE_LOOK, vNewLook);
+
+	m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
 	
 	return S_OK;
 }
@@ -72,15 +74,28 @@ _int CBaum::Tick(_float fTimeDelta)
 	{
 		m_pControllerCom->Move_Dir(m_pTransformCom, m_vBaumMoveDir * m_fTimeDelta * m_fBaumSpeed, m_fTimeDelta);
 		m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_UP), m_fTimeDelta, 180.f);
+
+		m_fScale += m_fTimeDelta * 5.f;
+		if (m_fScale > 1.f)
+			m_fScale = 1.f;
+		m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
+		if (m_pTransformCom->Get_State(CTransform::STATE_POSITION).y < -50.f)
+		{
+			return OBJ_DEAD;
+		}
+
 	}
 	else if (m_bOnTerrain == true)
 	{
 		// 지형에 붙어 따라가는 기능
-		CTransform* pRoadTransform = m_pMyRoad->Get_TransformCom();
-		_float4x4 NewWorldmatrix = m_HitWorld * pRoadTransform->Get_WorldFloat4x4();
-		m_pTransformCom->Set_WorldMatrix(NewWorldmatrix);
-		_float4 NewPos = CUtils::Get_State_Vector_Matrix(NewWorldmatrix, CUtils::STATE_POSITION);
-		m_pControllerCom->Set_Position(m_pTransformCom, NewPos);
+		if (m_pMyRoad != nullptr)
+		{
+			CTransform* pRoadTransform = m_pMyRoad->Get_TransformCom();
+			_float4x4 NewWorldmatrix = m_HitWorld * pRoadTransform->Get_WorldFloat4x4();
+			m_pTransformCom->Set_WorldMatrix(NewWorldmatrix);
+			_float4 NewPos = CUtils::Get_State_Vector_Matrix(NewWorldmatrix, CUtils::STATE_POSITION);
+			m_pControllerCom->Set_Position(m_pTransformCom, NewPos);
+		}
 	}
 
 	// 구현부
@@ -167,11 +182,13 @@ void CBaum::Render_IMGUI()
 
 void CBaum::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
-
-
+	if (eContent == CCollisionCenter::CONTENT_BODY)
+	{
+		m_bDead = true;
+	}
 }
 
-HRESULT CBaum::Add_Components()
+HRESULT CBaum::Add_Components(wstring wstrModelProtoTag)
 {
 	HRESULT hr;
 	/* For.Com_Shader */
@@ -179,8 +196,9 @@ HRESULT CBaum::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Baum"),
-		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+	/* For.Com_Model */
+	wstring wstrModelTag = TEXT("Prototype_Component_Model_") + wstrModelProtoTag;
+	hr = __super::Add_Component(wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
@@ -196,10 +214,10 @@ HRESULT CBaum::Add_Components()
 	CHitBox::HITBOX_DESC HitBox{};
 	HitBox.pOwner = this;
 	HitBox.pDesc = &m_tColliderDesc[BODY];
-	HitBox.pCollisionType = DEFORMOBJECT;
+	HitBox.pCollisionType = FINALE_BAUM;
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
-	Set_BodyCollider(COLLIDER_SPHERE, 1.f, 2.f, 7.f);
+	Set_BodyCollider(COLLIDER_SPHERE, 1.f, 2.f, 14.f);
 
 	return S_OK;
 
@@ -264,6 +282,7 @@ void CBaum::Find_MyRoad()
 		Safe_AddRef(m_pMyRoad);
 		_float4x4 RoadInvMatrix = m_pMyRoad->Get_TransformCom()->Get_WorldFloat4x4_Inverse();
 		m_HitWorld = m_pTransformCom->Get_WorldMatrix() * RoadInvMatrix;
+		m_HitWorld._42 -= 1.5f;
 	}
 }
 
@@ -282,14 +301,10 @@ _int CBaum::Make_Partical()
 	for (_int i = 0; i < 6; ++i)
 	{
 		_float4x4 matrix = m_pTransformCom->Get_WorldFloat4x4();
-		_float4 vDir = XMVector3Normalize(m_vBaumMoveDir);
+		_float4 vDir = /*XMVector3Normalize(m_vBaumMoveDir * -1.f)*/ _float4(0.f, 1.f, 0.f, 0.f);
 		
 		vDir = CUtils::Make_RandomAngle_Vector(120.f, vDir);
 		vDir.Normalize();
-		_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-		vPos += vDir * 2.f;
-
-		CUtils::Set_State_Matrix(matrix, CUtils::STATE_POSITION, vPos);
 		CUtils::Turn_OtherMatrix(matrix, _float4(0.f, 1.f, 0.f, 0.f), 1.f, CUtils::Make_RandomFloat(0.f, 360.f));
 		CUtils::Turn_OtherMatrix(matrix, _float4(1.f, 0.f, 0.f, 0.f), 1.f, CUtils::Make_RandomFloat(0.f, 360.f));
 		CUtils::Turn_OtherMatrix(matrix, _float4(0.f, 0.f, 1.f, 0.f), 1.f, CUtils::Make_RandomFloat(0.f, 360.f));
@@ -301,7 +316,7 @@ _int CBaum::Make_Partical()
 		vDir.y += 0.5f;
 		desc.wstrModelName = wstrModelName[i];
 		desc.vParticalMoveDir = vDir;
-		desc.fParticalSpeed = 250.f;
+		desc.fParticalSpeed = CUtils::Make_RandomFloat(70.f, 150.f);
 		// Car Test
 		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_BaumPiece"), TEXT("Prototype_GameObject_BaumPiece"), &desc)))
 			return OBJ_DEAD;
@@ -340,9 +355,9 @@ CGameObject* CBaum::Clone(void* pArg)
 void CBaum::Free()
 {
 	__super::Free();
+
 	Safe_Release(m_pControllerCom);
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
-
 	Safe_Release(m_pMyRoad);
 }

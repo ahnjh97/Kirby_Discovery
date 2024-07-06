@@ -61,33 +61,35 @@ void CDisaster_Master::Make_MissBaum()
 {
 	// 운석은 2.5초 간격으로 생성되며
 	// 운석은 2초동안 공중에서 날아든다.
-	if (m_fMakeBaumDelay > 2.5f)
+	if (m_fMakeBaumDelay > 1.8f)
 	{
 		_float4 vKirbyPos = m_pKirby->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
 		_float fKirbySpeed = m_pKirby->Get_KirbyInfo()->m_fMoveSpeed;
-		_float4 vNewMyPos = _float4(vKirbyPos.x + 40.f, vKirbyPos.y + 40.f, vKirbyPos.z, 1.f);
+		_float4 vNewMyPos = _float4(vKirbyPos.x + 170.f, vKirbyPos.y + 40.f, vKirbyPos.z, 1.f);
 
 		_float fZOffSet = { 0.f };
-		fZOffSet = CUtils::Make_RandomInt(0, 1) == 0 ? CUtils::Make_RandomFloat(-60.f, -40.f) : CUtils::Make_RandomFloat(40.f, 60.f);
+		fZOffSet = CUtils::Make_RandomInt(0, 1) == 0 ? CUtils::Make_RandomFloat(-70.f, -50.f) : CUtils::Make_RandomFloat(50.f, 70.f);
 		_float fXOffSet = { 0.f };
 		fXOffSet = CUtils::Make_RandomFloat(0.f, 40.f);
 
+		wstring wstrtag = CUtils::Make_RandomInt(0, 1) == 0 ? TEXT("Baum") : TEXT("StarPiece");
 		CBaum::BAUMDESC baumdesc = {};
 		baumdesc.vBaumMoveDir = vKirbyPos - vNewMyPos;
-		baumdesc.fBaumSpeed = 0.5f;
+		baumdesc.fBaumSpeed = 1.f;
 		vNewMyPos.x += (fKirbySpeed * 2.f) + fXOffSet;
 		vNewMyPos.z += fZOffSet;
 		baumdesc.vPos = vNewMyPos;
+		baumdesc.wstrModelName = wstrtag;
 		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Baum"), TEXT("Prototype_GameObject_Baum"), &baumdesc)))
 			return;
-		m_fMakeBaumDelay -= 2.5f;
+		m_fMakeBaumDelay = 0.f;
 
 		//_float4 vKirbyPos = m_pKirby->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
 		//_float fKirbySpeed = m_pKirby->Get_KirbyInfo()->m_fMoveSpeed;
 		//_float4 vNewMyPos = _float4(vKirbyPos.x + 40.f, vKirbyPos.y + 40.f, vKirbyPos.z, 1.f);
 
 		//// 임시
-		//_float fXOffSet = { 10.f };
+		//_float fXOffSet = { 20.f };
 
 		//CBaum::BAUMDESC baumdesc = {};
 		//baumdesc.vBaumMoveDir = vKirbyPos - vNewMyPos;
@@ -97,7 +99,7 @@ void CDisaster_Master::Make_MissBaum()
 		//if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Baum"), TEXT("Prototype_GameObject_Baum"), &baumdesc)))
 		//	return;
 
-		//m_fMakeBaumDelay -= 10.5f;
+		//m_fMakeBaumDelay = 0.f;
 	}
 
 

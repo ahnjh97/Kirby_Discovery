@@ -131,5 +131,9 @@ enum COLLISION_TYPE
     HITBOX_DEEDEEDEE,
     ANIMDECO, // 애니메이션 있는 풀, 상자 등등
 
+    FINALE_PLAYER,
+    FINALE_BAUM,
+    FINALE_BIGBAUM,
+
     COLLISION_END
 };

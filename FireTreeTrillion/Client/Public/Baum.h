@@ -42,7 +42,7 @@ public:
 	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
 private:
-	HRESULT			Add_Components();
+	HRESULT			Add_Components(wstring wstrModelProtoTag);
 	HRESULT			Bind_ShaderResources();
 	_int			Make_Partical();
 	void			Compute_MotionBlur();
@@ -51,6 +51,7 @@ private:
 
 	_float4			m_vBaumMoveDir = { 0.f, 0.f, 0.f, 0.f };
 	_float			m_fBaumSpeed = { 0.f };
+	_float			m_fScale = { 0.01f };
 	_bool			m_bOnTerrain = { false };
 	// 붙어먹을 로드 클래스
 	class CFinaleRoad* m_pMyRoad = { nullptr };
