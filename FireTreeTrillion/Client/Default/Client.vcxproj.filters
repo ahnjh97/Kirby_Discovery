@@ -502,6 +502,9 @@
     <Filter Include="02.GameObjects\Map\Deco\ShadowDeco">
       <UniqueIdentifier>{af0b42ac-2606-411c-a9ea-4ca6880cde91}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Effect\Particle_Debris">
+      <UniqueIdentifier>{0dae7cd1-de4a-44d9-9812-18d9a566388f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -1015,6 +1018,9 @@
     <ClInclude Include="..\Public\ShadowDeco.h">
       <Filter>02.GameObjects\Map\Deco\ShadowDeco</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Debris.h">
+      <Filter>02.GameObjects\Effect\Particle_Debris</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1508,6 +1514,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\ShadowDeco.cpp">
       <Filter>02.GameObjects\Map\Deco\ShadowDeco</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Debris.cpp">
+      <Filter>02.GameObjects\Effect\Particle_Debris</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

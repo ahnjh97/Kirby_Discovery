@@ -240,12 +240,11 @@ void CRayArrow::Render_IMGUI()
 	//	ImGui::Text("TargetDir X : %.2f \tTargetDir Y : %.2f \tTargetDir Z : %.2f ", INFO(m_vTargetDir).x, INFO(m_vTargetDir).y, INFO(m_vTargetDir).z);
 	__super::Render_IMGUI();
 }
+#endif
 
 void CRayArrow::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
 }
-
-#endif
 
 HRESULT CRayArrow::Add_Components()
 {

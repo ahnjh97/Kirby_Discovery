@@ -7,6 +7,7 @@
 #include "Camera_Main.h"
 #include "Gully.h"
 #include "HitBox.h"
+#include "Debris.h"
 
 CFinalBoss::CFinalBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -53,31 +54,49 @@ HRESULT CFinalBoss::Initialize(void* pArg)
 	m_eVacuumSize = SIZE_BIG;
 	m_eBossState = STATE_FLYING;
 	m_fTimeDelay = 1.f;
+	m_iDebrsiMaxCnt = 0;
 
 	m_pModelCom->Set_Animation(FINALBOSS_DEMOAPPEARCUT5, 70.f, false, true);
 
 	Make_TargetToCams();
 	Add_AnimEvent();
 
-	//// 도랑 풀링
-	//for (size_t i = 0; i < 120; i++)
-	//{
-	//	HRESULT hr;
-	//	hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Gully"), TEXT("Prototype_GameObject_Gully"));
-	//	CHECK_FAILED(hr);
+	// 도랑 풀링
+	for (size_t i = 0; i < 120; i++)
+	{
+		HRESULT hr;
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Gully"), TEXT("Prototype_GameObject_Gully"));
+		CHECK_FAILED(hr);
 
-	//	list<CGameObject*>* pList = m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_Gully")); // Get_Layer(LEVEL_STATIC, TEXT("Layer_Gully"))->Get_List();
+		CGully* pGully = dynamic_cast<CGully*>(m_pGameInstance->Get_LastGameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Gully")));
+		m_vecGully.push_back(pGully);
+		Safe_AddRef(pGully);
+	}
 
-	//	if (nullptr != pList)
-	//	{
-	//		auto iter = pList->end();
-	//		--iter;
+	// 파티클 풀링
+	for (_uint j = 0; j < 20; j++)
+	{
+		for (_uint i = 0; i < DEBRISCNT; i++)
+		{
+			HRESULT hr;
+			GAMEOBJECT_DESC tDesc{};
+			tDesc.wstrModelName = TEXT("TunnelRock") + to_wstring(i);
+			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_ParticleDebris"), TEXT("Prototype_GameObject_Debris"), &tDesc);
+			CHECK_FAILED(hr);
 
-	//		CGully* pGully = dynamic_cast<CGully*>((*iter));
-	//		m_vecGully.emplace_back(pGully);
-	//		Safe_AddRef(pGully);
-	//	}
-	//}
+			list<CGameObject*>* pList = m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_ParticleDebris"));
+
+			if (nullptr != pList)
+			{
+				auto iter = pList->end();
+				--iter;
+
+				CDebris* pDebris = dynamic_cast<CDebris*>((*iter));
+				m_vecDebris.emplace_back(pDebris);
+				Safe_AddRef(pDebris);
+			}
+		}
+	}
 
 	return S_OK;
 }
@@ -120,42 +139,65 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 	else
 		m_fGlideTime = 0.f;
 
-	////풀링임
-	//if (true == m_bGully)
-	//{
-	//	//m_fGullyTime += m_fTimeDelta;
+	//풀링임
+	if (true == m_bGully)
+	{
+		//m_fGullyTime += m_fTimeDelta;
 
-	//	if (false == m_bShake)
-	//	{
-	//		m_fTimeDelay = 0.8f;
-	//		m_bShake = true;
-	//		CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
-	//		if (pCamera != nullptr)
-	//			pCamera->Make_Shake(1.f, 1.f);
-	//	}
+		if (false == m_bShake)
+		{
+			m_fTimeDelay = 0.8f;
+			m_bShake = true;
+			CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+			if (pCamera != nullptr)
+				pCamera->Make_Shake(1.f, 1.f);
+		}
 
-	//	//if(0.1f < m_fGullyTime)
-	//	//{
-	//		//m_fGullyTime = 0.f;
+		//if(0.1f < m_fGullyTime)
+		//{
+			//m_fGullyTime = 0.f;
 
-	//		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 0.8f;
-	//		vPos.m128_f32[1] = 0.f;
-	//		m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f);
-	//		++m_iGullyCnt;
-	//		vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 0.8f;
+		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 0.8f;
+		vPos.m128_f32[1] = 0.f;
+		m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f);
+		++m_iGullyCnt;
+		vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 0.8f;
 
-	//		vPos.m128_f32[1] = 0.f;
-	//		m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f);
-	//		++m_iGullyCnt;
-	//		if (m_vecGully.size() <= m_iGullyCnt)
-	//			m_iGullyCnt = 0;
-	//	//}
-	//}
-	//else
-	//{
-	//	m_fTimeDelay = 1.f;
-	//	m_bShake = false;
-	//}
+		vPos.m128_f32[1] = 0.f;
+		m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f);
+		++m_iGullyCnt;
+		if (m_vecGully.size() <= m_iGullyCnt)
+			m_iGullyCnt = 0;
+
+		vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+		vPos.m128_f32[1] -= 6.f;
+
+		if (m_vecDebris.size() > m_iDebrsiMaxCnt)
+			m_iDebrsiMaxCnt += DEBRISCNT;
+		else
+		{
+			m_iDebrsiMaxCnt = DEBRISCNT;
+			m_iDebrisCnt = 0;
+		}
+
+		for (m_iDebrisCnt; m_iDebrisCnt < m_iDebrsiMaxCnt; ++m_iDebrisCnt)
+			m_vecDebris[m_iDebrisCnt]->Set_ParticleDebris(vPos);
+
+		//}
+	}
+	else
+	{
+		m_fTimeDelay = 1.f;
+		m_bShake = false;
+	}
+
+	if (true == m_bEffect)
+	{
+		m_bEffect = false;
+
+		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+		m_vecGully[m_iGullyCnt]->Set_Effect(vPos, 6.f, 0.5f);
+	}
 
 	__super::Tick(m_fTimeDelta);
 
@@ -562,4 +604,8 @@ void CFinalBoss::Free()
 	for (auto iter : m_vecGully)
 		Safe_Release(iter);
 	m_vecGully.clear();
+
+	for (auto iter : m_vecDebris)
+		Safe_Release(iter);
+	m_vecDebris.clear();
 }

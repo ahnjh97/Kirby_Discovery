@@ -44,6 +44,7 @@ HRESULT CGully::Initialize(void* pArg)
 	m_pTransformCom->Turn(CUtils::Make_Random_Vector(1.f), 1.f);
 
 	m_bPoolingDead = true;
+	m_bDead = false;
 
 	return S_OK;
 }
@@ -176,7 +177,7 @@ HRESULT CGully::Add_Components()
 	CHitBox::HITBOX_DESC HitBox{};
 	HitBox.pOwner = this;
 	HitBox.pDesc = &m_tColliderDesc[BODY];
-	HitBox.pCollisionType = MONSTER;
+	HitBox.pCollisionType = MONSTERBULLET;
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
 	Set_BodyCollider(COLLIDER_CYLINDER, 0.5f, 1.5f, 0.85f);

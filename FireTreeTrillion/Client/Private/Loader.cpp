@@ -123,6 +123,7 @@
 #include "Radio.h"
 #include "Fog_Instance.h"
 #include "Box.h"
+#include "Debris.h"
 
 //기믹
 #include "Gm_LabAntenna.h"
@@ -418,6 +419,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TunnelRock"), CTunnelRock);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Fog_Instance"), CFog_Instance);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Box"), CBox);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Debris"), CDebris);
 
 	#pragma region GIMMICK::LEVEL_FINALBOSS
 
@@ -1749,6 +1751,11 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	}
 	else if (eLevel == LEVEL_FINALBOSS)
 	{
+		for (_uint i = 0; i <= 16; i++) {
+			string strTunnelRock = "TunnelRock" + to_string(i);
+			m_vecModelInfo.emplace_back(strTunnelRock, TYPE_NONANIM);
+		}
+
 		//보스전 필드에서만 생성하는 SUB_SKYSPHERE (BackGround 요소)
 		m_vecModelInfo.emplace_back("LbBuildingFrame", TYPE_NONANIM, 1.f, 0.f);
 		m_vecModelInfo.emplace_back("LbFarPiller", TYPE_NONANIM, 1.f, 76.117f);

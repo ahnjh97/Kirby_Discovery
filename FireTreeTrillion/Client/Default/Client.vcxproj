@@ -210,6 +210,7 @@
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\Coin.h" />
     <ClInclude Include="..\Public\CollisionCenter.h" />
+    <ClInclude Include="..\Public\Debris.h" />
     <ClInclude Include="..\public\DecoObject.h" />
     <ClInclude Include="..\Public\ShadowDeco.h" />
     <ClInclude Include="..\Public\DeeDeeDee.h" />
@@ -398,6 +399,7 @@
     <ClCompile Include="..\Private\Character.cpp" />
     <ClCompile Include="..\Private\Coin.cpp" />
     <ClCompile Include="..\Private\CollisionCenter.cpp" />
+    <ClCompile Include="..\Private\Debris.cpp" />
     <ClCompile Include="..\private\DecoObject.cpp" />
     <ClCompile Include="..\Private\ShadowDeco.cpp" />
     <ClCompile Include="..\Private\DeeDeeDee.cpp" />

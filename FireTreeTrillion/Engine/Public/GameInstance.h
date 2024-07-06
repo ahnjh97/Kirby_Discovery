@@ -80,7 +80,7 @@ public: /* For.Object_Manager */
 	class CGameObject*	Get_GameObject(_uint iLevelIndex, const wstring& strLayerTag, _uint iIndex);
 	class CGameObject*	Get_GameObject(_uint iLevelIndex, const wstring& wstrLayerTag);
 	class CGameObject*	Get_GameObject_ByTag(_uint iLevelIndex, const wstring& strLayerTag, wstring _tag);
-
+	class CGameObject*	Get_LastGameObject(_uint iLevelIndex, const wstring& strLayerTag);
 	class CGameObject* Find_Prototype(const wstring& strPrototypeTag);
 
 	void				Set_CurrentLevel(_int CurrentLevel);

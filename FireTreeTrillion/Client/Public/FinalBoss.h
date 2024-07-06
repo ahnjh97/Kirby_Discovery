@@ -9,6 +9,8 @@ class CShader;
 class CPartObject;
 END
 
+#define DEBRISCNT 6
+
 BEGIN(Client)
 
 class CFinalBoss final : public CMonster
@@ -61,6 +63,7 @@ public:
 	void Set_TickPerSecond(_float TickPerSecond) { m_pModelCom->Set_TickPerSecond(TickPerSecond); }
 	void Set_Position(_vector vPosition) { m_vPosition = vPosition; }
 	void Set_Gully(_bool bGully) { m_bGully = bGully; }
+	void Set_Particle(_bool bParticle) { m_bEffect = bParticle; }
 
 	_vector Get_Direction() { return m_vDir; }
 	_vector Get_Position() { return m_vPosition; }
@@ -79,7 +82,7 @@ public:
 #ifdef _DEBUG
 	virtual void	Render_IMGUI() override;
 #endif
-	virtual void	Add_AnimEvent()						override;
+	virtual void	Add_AnimEvent() override;
 	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
 public:
@@ -89,6 +92,7 @@ public:
 private:
 	map<const wstring, CPartObject*>	m_PartObjects = {};
 	vector<class CGully*>				m_vecGully = {};
+	vector<class CDebris*>				m_vecDebris = {};
 
 	FINALBOSS_ANIM		m_eCurrentState = { FINALBOSS_END };
 	FINALBOSS_STATE		m_eBossState = { STATE_END };
@@ -102,12 +106,15 @@ private:
 	_bool				m_bChain = { false };
 	_bool				m_bGully = { false };
 	_bool				m_bShake = { false };
+	_bool				m_bEffect = { false };
 
 	_float				m_fGlideTime = { 0.f };
 	//_float				m_fGullyTime = { 0.f };
 	_float				m_fTimeDelay = { 0.f };
 
 	_uint				m_iGullyCnt = { 0 };
+	_uint				m_iDebrisCnt = { 0 };
+	_uint				m_iDebrsiMaxCnt = { 0 };
 
 private:
 	HRESULT	Make_TargetToCams();

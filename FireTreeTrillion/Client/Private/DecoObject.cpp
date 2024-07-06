@@ -40,9 +40,11 @@ HRESULT CDecoObject::Render_LightDepth()
 	return S_OK;
 }
 
+#ifdef _DEBUG
 void CDecoObject::Render_IMGUI()
 {
 }
+#endif
 
 void CDecoObject::Set_Animation(_int iAnimIndex)
 {
