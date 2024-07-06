@@ -523,6 +523,9 @@
     <Filter Include="02.GameObjects\Map\Baum\BaumPiece">
       <UniqueIdentifier>{4a53b512-3057-4457-a0d7-74a2c49bb988}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\UI\HUD\AbilityDiscard">
+      <UniqueIdentifier>{3abd31c8-721b-4dcd-8517-1b33f8985469}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -813,9 +816,6 @@
     <ClInclude Include="..\Public\HUD_StarPoint.h">
       <Filter>02.GameObjects\UI\HUD\StarPoint</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\HUD_AbilityDiscard.h">
-      <Filter>02.GameObjects\UI\HUD</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\KirbyCar_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyCar_State</Filter>
     </ClInclude>
@@ -1050,6 +1050,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Disaster_Master.h">
       <Filter>02.GameObjects\Map\Baum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\HUD_AbilityDiscard.h">
+      <Filter>02.GameObjects\UI\HUD\AbilityDiscard</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1323,9 +1326,6 @@
     <ClCompile Include="..\Private\HUD_StarPoint.cpp">
       <Filter>02.GameObjects\UI\HUD\StarPoint</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\HUD_AbilityDiscard.cpp">
-      <Filter>02.GameObjects\UI\HUD</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\KirbyCar_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyCar_State</Filter>
     </ClCompile>
@@ -1559,6 +1559,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Disaster_Master.cpp">
       <Filter>02.GameObjects\Map\Baum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HUD_AbilityDiscard.cpp">
+      <Filter>02.GameObjects\UI\HUD\AbilityDiscard</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

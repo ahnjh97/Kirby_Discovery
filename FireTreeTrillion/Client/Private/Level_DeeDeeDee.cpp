@@ -46,9 +46,6 @@ HRESULT CLevel_DeeDeeDee::Initialize()
 	hr = Ready_Layer_BackGround(TEXT("Layer_BackGround"));
 	CHECK_FAILED(hr);
 
-	hr = Ready_Layer_UI(TEXT("Layer_UI"));
-	CHECK_FAILED(hr);
-
 	hr = Ready_Map();
 	CHECK_FAILED(hr);
 
@@ -58,8 +55,10 @@ HRESULT CLevel_DeeDeeDee::Initialize()
 	hr = Ready_Dees();
 	CHECK_FAILED(hr);
 
-
 	hr = Ready_Objects();
+	CHECK_FAILED(hr);
+
+	hr = Ready_Layer_UI(TEXT("Layer_UI"));
 	CHECK_FAILED(hr);
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);

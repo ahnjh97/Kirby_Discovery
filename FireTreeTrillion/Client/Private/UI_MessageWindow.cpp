@@ -66,6 +66,7 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 	m_UIObjDesc.fAlpha = 0.f;
 	m_eCurState = WINDOW_HIDE;
 
+	//
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_UI_Dialog"),
 		TEXT("Prototype_GameObject_UI_BtnIcon"))))
 		return E_FAIL;
