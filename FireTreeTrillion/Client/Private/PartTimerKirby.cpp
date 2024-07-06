@@ -48,6 +48,8 @@ HRESULT CPartTimerKirby::Initialize(void* pArg)
 
 	if (*m_pCurrentLevelID == LEVEL_TOWN)
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(2.f, 15.f, 3.f, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(17.8f, 24.f, 28.9f, 1.f));
+	m_pTransformCom->Rotation(_float3{ 0.f, 1.f, 0.f }, ToRadian(180.f));
 
 	m_fScore = 10.f;
 	m_bMotionBlur = true;
@@ -58,7 +60,7 @@ HRESULT CPartTimerKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// 완전히 기본상태로 먼저 세팅한다.
-	m_eMouthState = MOUTH_IDLE;
+	m_eMouthState = MOUTH_HAPPY;
 	m_eEyeState = EYE_IDLE;
 
 	CPartTimeHelper::Get_Instance()->Register_PartTimerKirby(this);

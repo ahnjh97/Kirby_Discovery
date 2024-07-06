@@ -35,7 +35,7 @@ HRESULT CSkySphere::Initialize(void* pArg)
 	hr = Add_Components();
 	CHECK_FAILED(hr);
 
-	if (LEVEL_FINALBOSS == m_eCurLevel)
+	if (LEVEL_FINALBOSS <= m_eCurLevel)
 		m_pTransformCom->Set_Scaled(_float3{ 0.1f, 0.1f, 0.1f });
 	
 	else
@@ -71,7 +71,7 @@ HRESULT CSkySphere::Render()
 
 		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS);
 		CHECK_FAILED(hr);
-		
+
 		//TextureType_HEIGHT, TextureType_EMISSIVE
 		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS);
 		CHECK_FAILED(hr);
@@ -84,15 +84,17 @@ HRESULT CSkySphere::Render()
 		//1) 현재 해당 레벨 진입 시에 임시로 설정. 추후 FIELD/1PASE/2PASE 시점에 스왑하는 방식으로 변경 필요
 		// ex) 에피리스 HP 45% 일 경우, 2페이즈 시작 (SKY_LAB_2PASE)
 		//2) 추후 일렁일렁 움직이는 효과 셰이더로 세팅 필요
-		if (LEVEL_FINALBOSS == m_eCurLevel)
+		SKY_TYPE eSkyType = { SKY_LAB_1PASE };
+		if (LEVEL_FINALBOSS <= m_eCurLevel)
 		{
-			// 변경이 필요할 경우, 조건에 따라 TexCom[Diffuse]의 TEX이넘 값을 변경하면 스왑 
-			hr = m_pTextureCom[TEX_DIFFUSE]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", SKY_LAB_1PASE);
+			if (LEVEL_FINALE == m_eCurLevel) //피날레 레벨에서는 스피어 텍스처 교체
+				eSkyType = SKY_LAB_2PASE;
+
+			hr = m_pTextureCom[TEX_DIFFUSE]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", eSkyType);
 			CHECK_FAILED(hr);
 
 			hr = m_pTextureCom[TEX_NORMAL]->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", SKY_LAB_2PASE);
 			CHECK_FAILED(hr);
-
 			//TEX_EMISSIVE :: 방출 옵션. 임시로 MRA에 연결
 			hr = m_pTextureCom[TEX_EMISSIVE]->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", SKY_LAB_2PASE);
 			CHECK_FAILED(hr);
@@ -127,27 +129,27 @@ HRESULT CSkySphere::Add_Components()
 
 #pragma region LAB_DISCOVERA
 	
-	//FINALBOSS일 경우, 텍스처 별도 처리. 추후 레벨 별 세부 디자인이 필요할 경우 코드 수정 예정
-	if (LEVEL_FINALBOSS == m_eCurLevel)
+	//LEVEL_FINALBOSS & LEVEL_FINALE일 경우 해당 텍스처를 세팅
+	if (LEVEL_FINALBOSS <= m_eCurLevel)
 	{
 		wstring wstrProtoTagTex = TEXT("Prototype_Component_Texture_") + CUtils::StrToWstr(m_strTextureTag);
-		hr = __super::Add_Component(LEVEL_FINALBOSS, wstrProtoTagTex,
+		hr = __super::Add_Component(wstrProtoTagTex,
 			TEXT("Com_Tex_Lab_Diffuse"), (CComponent**)&m_pTextureCom[TEX_DIFFUSE]);
 		CHECK_FAILED(hr);
 
-		hr = __super::Add_Component(LEVEL_FINALBOSS, TEXT("Prototype_Component_Texture_SkySphere_Lab_CloudNoize"),
+		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_SkySphere_Lab_CloudNoize"),
 			TEXT("Com_Tex_Lab_CloudNoize"), (CComponent**)&m_pTextureCom[TEX_MRA]);
 		CHECK_FAILED(hr);
 
-		hr = __super::Add_Component(LEVEL_FINALBOSS, TEXT("Prototype_Component_Texture_SkySphere_LabBoss_2Pase_Normal"),
+		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_SkySphere_LabBoss_2Pase_Normal"),
 			TEXT("Com_Tex_LabBoss_Normal"), (CComponent**)&m_pTextureCom[TEX_NORMAL]);
 		CHECK_FAILED(hr);
 
-		hr = __super::Add_Component(LEVEL_FINALBOSS, TEXT("Prototype_Component_Texture_SkySphere_LabBoss_2Pase_Emissive"),
+		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_SkySphere_LabBoss_2Pase_Emissive"),
 			TEXT("Com_Tex_LabBoss_Emissive"), (CComponent**)&m_pTextureCom[TEX_EMISSIVE]);
 		CHECK_FAILED(hr);
 
-		hr = __super::Add_Component(LEVEL_FINALBOSS, TEXT("Prototype_Component_Texture_SkySphere_LabBoss_2Pase_Height"),
+		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_SkySphere_LabBoss_2Pase_Height"),
 			TEXT("Com_Tex_LabBoss_Height"), (CComponent**)&m_pTextureCom[TEX_HEIGHT]);
 		CHECK_FAILED(hr);
 	}

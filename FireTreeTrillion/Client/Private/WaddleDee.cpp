@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "WaddleDee.h"
 #include "FSM.h"
+#include "PartObject.h"
 
 CWaddleDee::CWaddleDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CCharacter{ pDevice, pContext }
@@ -98,9 +99,16 @@ void CWaddleDee::Dee_SystemTick(_float fTimeDelta)
 
 void CWaddleDee::Free()
 {
-	__super::Free();
 
 	Safe_Release(m_pModelCom);
-	//Safe_Release(m_pEyeTextureCom);
+	Safe_Release(m_pEyeTextureCom);
+
+	for (auto& Pair : m_PartObjects)
+		Safe_Release(Pair.second);
+	m_PartObjects.clear();
+
+	__super::Free();
+
+
 	//Safe_Release(m_pTestTextureCom);
 }

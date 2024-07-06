@@ -155,7 +155,9 @@ public:
 
 private:
 	_float	m_fTimeDelta = { 0.f };
+	_float	m_fSpeed = { 0.f };
 	_bool	m_bChain = { false };
+
 public:
 	static	CFinalBoss_Slash_State* Create();
 	virtual void Free() override;
@@ -204,6 +206,7 @@ public:
 	virtual void OnStateExit()														override;
 
 private:
+	_bool	m_bItem = { false };
 	_float	m_fSpeed = { 0.f };
 	_float	m_fTimeDelta = { 0.f };
 
@@ -252,7 +255,9 @@ public:
 	virtual void OnStateExit()														override;
 
 private:
+	_float	m_fTimeDelta = { 0.f };
 	_float	m_fSpeed = { 0.f };
+	_bool	m_bItem = { false };
 
 public:
 	static	CFinalBoss_Thrust_State* Create();
@@ -374,6 +379,9 @@ public:
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
 	virtual void OnStateExit()														override;
 
+private:
+	_bool	m_bShake = { false };
+
 public:
 	static	CFinalBoss_Roar_State* Create();
 	virtual void Free() override;
@@ -425,6 +433,8 @@ private:
 	_float	m_fSpeed = { 0.f };
 	_float	m_fSecondSpeed = { 0.f };
 	_float	m_fDelayTime = { 0.f };
+	_float	m_fItemCycle = { 0.f };
+	_float	m_fItemTime = { 0.f };
 
 	_bool	m_bMove = { false };
 

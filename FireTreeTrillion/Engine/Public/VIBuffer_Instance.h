@@ -32,6 +32,9 @@ public:
 	virtual VTXMATRIX* Map();
 	virtual void Unmap();
 
+	void Compute_AllLifeTime( _float fTimeDelta);
+	void Apply_Velocity(_float fTimeDelta, VTXMATRIX* pVertices);
+
 	virtual void Drop(_float fTimeDelta, VTXMATRIX* pVertices);
 	virtual void Spread(_float fTimeDelta, VTXMATRIX* pVertices);
 	virtual void Decelerate(_float fTimeDelta, VTXMATRIX* pVertices);
@@ -40,7 +43,9 @@ public:
 	virtual void Wiggle(_float fTimeDelta, VTXMATRIX* pVertices);
 	virtual void Tail(_float fTimeDelta, VTXMATRIX* pVertices);
 
-	void Compute_AllLifeTime( _float fTimeDelta);
+	//중력을 적용한다.(velocity에 중력 값을 부여한다)
+	virtual void Gravity(_float fTimeDelta);
+
 
 
 	void Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceIndex, _float fTimeDelta);
@@ -80,7 +85,10 @@ protected:
 	_float3*					m_pDirections = { nullptr };
 	_float3*					m_pInitialScales = { nullptr };
 	_float*						m_pInitialSpeeds = { nullptr };
+
 	_float3*					m_pPrePositions = { nullptr };
+	_float3*					m_pVelocities = { nullptr };
+
 	_float*						m_pSpeeds = { nullptr };
 	_float3*					m_pColors = { nullptr };
 	_float*						m_pAlphas = { nullptr };

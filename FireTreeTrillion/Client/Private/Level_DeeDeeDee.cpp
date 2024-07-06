@@ -51,14 +51,14 @@ HRESULT CLevel_DeeDeeDee::Initialize()
 
 	hr = Ready_Map();
 	CHECK_FAILED(hr);
+
 	hr = Ready_Triggers();
 	CHECK_FAILED(hr);
+
 	hr = Ready_Dees();
 	CHECK_FAILED(hr);
-	//hr = Ready_Items();
-	//CHECK_FAILED(hr);
-	//hr = Ready_Kickables();
-	//CHECK_FAILED(hr);
+
+
 	hr = Ready_Objects();
 	CHECK_FAILED(hr);
 
@@ -203,7 +203,6 @@ HRESULT CLevel_DeeDeeDee::Ready_Layer_UI(const wstring& _wstrLayerTag)
 	DiscardUIDesc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f, 0.f };
 	DiscardUIDesc.vPos = { DiscardUIDesc.vCenter.x, DiscardUIDesc.vCenter.y, 0.f };
 	DiscardUIDesc.vSize = { 260.f * 0.8f, 120.f * 0.8f, 1.f };
-
 	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_HUD"), TEXT("Prototype_GameObject_HUD_AbilityDiscard"), &DiscardUIDesc);
 
 	//UI_MESSAGEWINDOW + UI_BTNICON

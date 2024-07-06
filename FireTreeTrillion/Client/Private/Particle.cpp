@@ -249,6 +249,11 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_TAIL])
 		m_pVIBufferCom->Tail(fMyTimeDelta, pVertices);
 
+	if (m_InstanceDesc.vecMoveCommands[INSTANCE_GRAVITY])
+		m_pVIBufferCom->Gravity(fMyTimeDelta);
+
+	m_pVIBufferCom->Apply_Velocity(fMyTimeDelta, pVertices);
+
 	m_pVIBufferCom->Unmap();
 
 

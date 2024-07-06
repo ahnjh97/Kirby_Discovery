@@ -1625,6 +1625,14 @@ void CFXToolDirector::Render_FXProperty()
 		bEdited = true;
 	}
 
+	_bool bGravity = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_GRAVITY];
+	if (Checkbox(u8"Gravity", &bGravity))
+	{
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_GRAVITY] = bGravity;
+		bEdited = true;
+	}
+	SameLine();
+
 	Separator();
 
 	if (DragFloat(u8"½ÃÀÛ µô·¹ÀÌ", &pCurParticle->m_InstanceDesc.fStartDelay, .1f, 0.f, 100.f, "%.2f"))

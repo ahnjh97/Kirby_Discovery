@@ -32,7 +32,12 @@ HRESULT CGm_LabAntenna::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
+	m_eAnimState = STATE_WAIT;
 	m_pModelCom->Set_Animation(STATE_WAIT, 0.f, TRUE /*_bool bInterpolation = false, _float fLerpTime = 0.1f*/);
+
+	//잔존 메쉬 검색하여 저장
+	m_setDebrisMeshs.insert(m_pModelCom->Find_MeshIndex(string("DebrisMesh__LbLastBossOutFrameC")));
+	m_setDebrisMeshs.insert(m_pModelCom->Find_MeshIndex(string("DebrisMesh__LbLastBossOutFrame2C")));
 
 	return S_OK;
 }
@@ -64,10 +69,10 @@ void CGm_LabAntenna::Late_Tick(_float fTimeDelta)
 
 #pragma endregion
 
-	//애니메이션 재생종료 시 Set_Dead
-	// 현재는 동일한 위치의 NONANIM 으로 떼우고있지만 추후 렌더할 메쉬만 남기고 나머지 렌더x
+	//애니메이션 재생종료 시 Set_Dead >> 디졸브 효과 추가 필요
 	if (TRUE == m_pModelCom->IsFinished())
-		Set_Dead();
+		m_eAnimState = STATE_BREAK;
+		//Set_Dead();
 }
 
 HRESULT CGm_LabAntenna::Render()
@@ -78,25 +83,55 @@ HRESULT CGm_LabAntenna::Render()
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 	HRESULT hr;
 
-	for (size_t i = 0; i < iNumMeshes; i++)
+	//특정 애님 상태에 따라 렌더할 메쉬를 체크
+	if (STATE_BREAK == m_eAnimState)
 	{
-		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE);
-		CHECK_FAILED(hr);
+		for (size_t i = 0; i < iNumMeshes; i++)
+		{
+			if (m_setDebrisMeshs.find(i) == m_setDebrisMeshs.end())
+				continue;
+			
+			hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE);
+			CHECK_FAILED(hr);
 
-		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS);
-		CHECK_FAILED(hr);
+			hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS);
+			CHECK_FAILED(hr);
 
-		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS);
-		CHECK_FAILED(hr);
+			hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS);
+			CHECK_FAILED(hr);
 
-		hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i);
-		CHECK_FAILED(hr);
+			hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i);
+			CHECK_FAILED(hr);
 
-		hr = m_pShaderCom->Begin(ANIMMODEL_NORMAL_O);
-		CHECK_FAILED(hr);
+			hr = m_pShaderCom->Begin(ANIMMODEL_NORMAL_O);
+			CHECK_FAILED(hr);
 
-		hr = m_pModelCom->Render(i);
-		CHECK_FAILED(hr);
+			hr = m_pModelCom->Render(i);
+			CHECK_FAILED(hr);
+		}
+	}
+	else
+	{
+		for (size_t i = 0; i < iNumMeshes; i++)
+		{
+			hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE);
+			CHECK_FAILED(hr);
+
+			hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS);
+			CHECK_FAILED(hr);
+
+			hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS);
+			CHECK_FAILED(hr);
+
+			hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i);
+			CHECK_FAILED(hr);
+
+			hr = m_pShaderCom->Begin(ANIMMODEL_NORMAL_O);
+			CHECK_FAILED(hr);
+
+			hr = m_pModelCom->Render(i);
+			CHECK_FAILED(hr);
+		}
 	}
 
 	return S_OK;
@@ -118,26 +153,26 @@ void CGm_LabAntenna::Render_IMGUI()
 
 void CGm_LabAntenna::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
-	/*
+	
 	if (true == m_bStartAnimation)
 		return;
 
-	CKirby* pKirby = static_cast<CKirby*>(pObject);
-	if (pKirby->Get_KirbyInfo()->m_bBooster == false)
-		return;
+	//CKirby* pKirby = static_cast<CKirby*>(pObject);
+	//if (pKirby->Get_KirbyInfo()->m_bBooster == false)
+	//	return;
 
-	pKirby->Set_HitStop();
-	m_pModelCom->Set_Animation(0, 60.f, false, false);
-	m_bStartAnimation = true;
-	SwitchAfterBefore();
+	//pKirby->Set_HitStop();
+	//m_pModelCom->Set_Animation(0, 60.f, false, false);
+	//m_bStartAnimation = true;
+	//SwitchAfterBefore();
 
-	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-	_float4 vPlayerPos = pObject->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
-	_float4 vDir = vPos - vPlayerPos;
-	vDir.Normalize();
-	m_vDamegeDir = (_float3)vDir;
-	m_fHitPower = pKirby->Get_KirbyInfo()->m_fMoveSpeed;
-	*/
+	//_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	//_float4 vPlayerPos = pObject->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
+	//_float4 vDir = vPos - vPlayerPos;
+	//vDir.Normalize();
+	//m_vDamegeDir = (_float3)vDir;
+	//m_fHitPower = pKirby->Get_KirbyInfo()->m_fMoveSpeed;
+	
 }
 
 HRESULT CGm_LabAntenna::Add_Components()
@@ -158,7 +193,7 @@ HRESULT CGm_LabAntenna::Add_Components()
 	CHitBox::HITBOX_DESC HitBox{};
 	HitBox.pOwner = this;
 	HitBox.pDesc = &m_tColliderDesc[BODY];
-	HitBox.pCollisionType = ANIMDECO;
+	HitBox.pCollisionType = OBJECT;
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
 

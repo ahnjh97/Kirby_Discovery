@@ -35,14 +35,18 @@ private:
 	HRESULT			Add_Components();
 	HRESULT			Bind_ShaderResources();
 
-	CModel*			m_pModelCom = { nullptr };
-	CShader*		m_pShaderCom = { nullptr };
+	unordered_set<_uint>	m_setDebrisMeshs;
 
-	_float			m_fHitPower = {};
-	_float			m_fWhiteColorDiffuse = {};
+	CModel*					m_pModelCom = { nullptr };
+	CShader*				m_pShaderCom = { nullptr };
+
+	ANIM_STATE				m_eAnimState = { STATE_NONE };
+
+	_float					m_fHitPower = {};
+	_float					m_fWhiteColorDiffuse = {};
 	
-	_bool			m_bStartAnimation = { false };
-	_float4			m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
+	_bool					m_bStartAnimation = { false };
+	_float4					m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
 
 public:
 	static CGm_LabAntenna* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

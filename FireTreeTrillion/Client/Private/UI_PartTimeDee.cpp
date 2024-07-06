@@ -38,6 +38,7 @@ HRESULT CUI_PartTimeDee::Initialize_Prototype()
 	_float3 vInitialValue = {0.f, 0.f, 0.f};
 	fill(m_arrColor.begin(), m_arrColor.end(), vInitialValue);
 
+	//m_bIsRender = true;
 	return S_OK;
 }
 
@@ -51,8 +52,6 @@ HRESULT CUI_PartTimeDee::Initialize(void* _pArg)
 
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
-
-	m_bIsRender = true;
 
 	fill(m_arrFoodRender.begin(), m_arrFoodRender.end(), false);
 	PARTTIME_ITEM eItem = CPartTimeHelper::Get_Instance()->Get_PartTimeItem();
@@ -302,7 +301,14 @@ void CUI_PartTimeDee::Setup_PosSizeColor(_int iTextureNum)
 	}
 	break;
 	case 1: // 고민하는 말풍선
-		m_arrSize[iTextureNum] = m_arrSize[0] * 0.8f;
+	{
+		m_arrSize[iTextureNum] = m_arrSize[0] * 0.5f;
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION,
+			XMVectorSet((m_vFinPos.x * g_iWinSizeX) * 0.5f,
+						(m_vFinPos.y * g_iWinSizeY) * 0.5f + fOffsetY,
+						0.f,
+						1.f));
+	}
 	break;
 	case 2: // 음식 : 케이크
 	case 3: // 음식 : 토마토

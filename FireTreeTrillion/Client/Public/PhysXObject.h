@@ -2,7 +2,7 @@
 #include "Client_Defines.h"
 #include "GameObject.h"
 #include "CollisionCenter.h"
-#include "Effect.h"
+#include "MultiEffect.h"
 
 BEGIN(Client)
 
@@ -56,6 +56,10 @@ public:
 
 	//이펙트를 자신의 리스트에 추가한다.
 	void	Add_Effect(CEffect* pEffect);
+
+	void	Add_Effect(string strName, CEffect::FX_DESC fxDesc, _bool bAddToList = false);
+	void	Add_Effect(string strName, CMultiEffect::MULTI_FX_DESC fxDesc, _bool bAddToList = false);
+
 	void	Delete_AllEffect();
 	void	Delete_Effect(string strTag);
 

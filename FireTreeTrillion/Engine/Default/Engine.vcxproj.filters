@@ -193,9 +193,6 @@
     <Filter Include="01.Utility\12.TimeController">
       <UniqueIdentifier>{bcf5e0f1-895c-4733-bd87-8aca7e79dfb9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Utility\13. Dialog">
-      <UniqueIdentifier>{c3a26c4e-c392-4d25-95cb-6e8f7000e386}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Base.cpp">
@@ -404,9 +401,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\TimeController.cpp">
       <Filter>01.Utility\12.TimeController</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Dialog_Manager.cpp">
-      <Filter>01.Utility\13. Dialog</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -643,9 +637,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\TimeController.h">
       <Filter>01.Utility\12.TimeController</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Dialog_Manager.h">
-      <Filter>01.Utility\13. Dialog</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -4,6 +4,7 @@
 #include "Kirby.h"
 #include "Camera_Main.h"
 #include "MultiEffect.h"
+#include "Ability.h"
 
 #define DESC(Dst) DDDDesc->Dst
 
@@ -132,19 +133,19 @@ static void Landing(_float fTimeDelta, CTransform* pTransformCom)
 		return;
 
 
-	CMultiEffect::MULTI_FX_DESC FXDesc{};
-	FXDesc.vInitPos = vMyPos + pTransformCom->Get_State(CTransform::STATE_LOOK);
-	FXDesc.vInitScale = { 4.f, 4.f, 4.f };
+	//CMultiEffect::MULTI_FX_DESC FXDesc{};
+	//FXDesc.vInitPos = vMyPos + pTransformCom->Get_State(CTransform::STATE_LOOK);
+	//FXDesc.vInitScale = { 4.f, 4.f, 4.f };
 
-	for (_uint i = 0; i < 3; ++i)
-	{
-		FXDesc.fStartDelay = CUtils::Make_RandomFloat(0.f, .2f);
-		_float vOffset = CUtils::Make_RandomFloat(-1.f, .5f);
-		FXDesc.vInitScale += {vOffset, vOffset, vOffset};
-		FXDesc.vInitRot = CUtils::Make_Degree_FromDir( (_float3)CUtils::Make_RandomAngle_Vector(80.f, _float4{ 0.f, 1.f, 0.f, 0.f }));
-		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_explode lines"), &FXDesc)))
-			return;
-	}
+	//for (_uint i = 0; i < 3; ++i)
+	//{
+	//	FXDesc.fStartDelay = CUtils::Make_RandomFloat(0.f, .2f);
+	//	_float vOffset = CUtils::Make_RandomFloat(-1.f, .5f);
+	//	FXDesc.vInitScale += {vOffset, vOffset, vOffset};
+	//	FXDesc.vInitRot = CUtils::Make_Degree_FromDir( (_float3)CUtils::Make_RandomAngle_Vector(80.f, _float4{ 0.f, 1.f, 0.f, 0.f }));
+	//	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_explode lines"), &FXDesc)))
+	//		return;
+	//}
 
 }
 
@@ -166,6 +167,11 @@ static void Sliding(_float fTimeDelta, CTransform* pTransformCom)
 		fBbongTime = 0.f;
 	}
 }
+
+//static void Rock_Particle()
+//{
+//
+//}
 
 static void Shout(_float fTimeDelta, CTransform* pTransformCom)
 {
@@ -577,6 +583,27 @@ void CDeeDeeDee_Slide_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 
 		if (pDee->IsAnimFinished())
 		{
+			vLook.y = 0.f;
+			HRESULT hr;
+			// 별 아이템 떨굼
+			_uint iItemCnt = 2;
+			for (_uint i = 0; i < iItemCnt; ++i)
+			{
+				CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
+				if (i < iItemCnt / 2)
+					AbilityItemDesc.fRotateDir = 1.f;															// 별 회전 방향 오른쪽
+				else
+					AbilityItemDesc.fRotateDir = -1.f;															// 별 회전 방향 왼쪽
+				if (0 == i)
+					AbilityItemDesc.fAngle = -15.f;																// 별의 진행 방향의 각도
+				else
+					AbilityItemDesc.fAngle = 15.f;																// 별의 진행 방향의 각도
+				AbilityItemDesc.vDir = XMVector3Normalize(vLook) * 3.f;					// 별의 진행 방향
+				AbilityItemDesc.vPosition = pTransformCom->Get_State(CTransform::STATE_POSITION) + vLook * 3.f;		// 별의 생성 위치
+				AbilityItemDesc.eAbilityType = ABILITY_DEFAULT;
+				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+				CHECK_FAILED(hr);
+			}
 			pDee->Change_State(CDeeDeeDee::STATE_SLIDINGEND, 60.f, false, false);
 		}
 	}

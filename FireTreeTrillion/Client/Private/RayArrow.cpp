@@ -3,6 +3,7 @@
 #include "FinalBoss.h"
 #include "Kirby.h"
 #include "HitBox.h"
+#include "Ability.h"
 
 CRayArrow::CRayArrow(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
@@ -71,7 +72,20 @@ HRESULT CRayArrow::Initialize(void* pArg)
 _int CRayArrow::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
+	{
+		HRESULT hr;
+		// 별 아이템 떨굼
+		CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
+		AbilityItemDesc.fRotateDir = 1.f;																	// 별 회전 방향 오른쪽															// 별 회전 방향 왼쪽
+		AbilityItemDesc.fAngle = 0.f;													// 별의 진행 방향의 각도
+		AbilityItemDesc.vDir = m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * (_float)((rand() % 2) * 2 - 1) * 0.5f;							// 별의 진행 방향
+		AbilityItemDesc.vPosition = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);	// 별의 생성 위치
+		AbilityItemDesc.eAbilityType = ABILITY_DEFAULT;
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+		CHECK_FAILED(hr);
+
 		return OBJ_DEAD;
+	}
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
@@ -226,12 +240,12 @@ void CRayArrow::Render_IMGUI()
 	//	ImGui::Text("TargetDir X : %.2f \tTargetDir Y : %.2f \tTargetDir Z : %.2f ", INFO(m_vTargetDir).x, INFO(m_vTargetDir).y, INFO(m_vTargetDir).z);
 	__super::Render_IMGUI();
 }
+#endif
 
 void CRayArrow::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
 }
 
-#endif
 
 HRESULT CRayArrow::Add_Components()
 {

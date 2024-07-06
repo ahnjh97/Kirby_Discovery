@@ -13,7 +13,8 @@ class CAbility final : public CItemObject
 {
 public:
 	struct ABILITYITEM_DESC : public CGameObject::GAMEOBJECT_DESC {
-		_float fRotateDir = { 0.f };
+		_float	fRotateDir = { 0.f };
+		_float	fAngle = { 0.f };
 		_vector	vDir = {};
 		_float4 vPosition = {};
 		ABILITYTYPE eAbilityType = {};
@@ -44,6 +45,8 @@ private:
 
 	void AbilityType(ABILITYTYPE eAbilityType);
 
+	_bool RayCast_Terrain(const _float3 vMoveDir);
+
 	// Sphere 충돌 밀어내기
 	void Sphere_Collision();
 	_bool Check_Sphere(CTransform* pTransform, _float* fDist);
@@ -66,9 +69,15 @@ private:
 	_float					m_fJumpPowerTemp = { 0.f };
 	_float					m_fPower = { 0.f };
 	_float					m_fSpeed = { 0.f };
+	_float					m_fAngle = { 0.f };
+	_float					m_fScale = { 0.f };
+
 	_float					m_fRotateDir = { 0.f };
 	_float					m_fLifeTime = { 0.f };
 	_float					m_fRenderTime = { 0.f };
+
+	_float					m_fFlyTime = { 0.f };
+	_float					m_fHitPower = { 0.f };
 
 	wstring					m_strComponentTag = { L"" };
 
