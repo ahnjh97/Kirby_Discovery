@@ -90,17 +90,6 @@ struct PS_OUT_LIGHTDEPTH
     float4 vLightDepth : SV_TARGET0;
 };
 
-struct PS_OUT_EMISSIVE
-{
-    float4 vDiffuse : SV_TARGET0;
-    float4 vNormal : SV_TARGET1;
-    float4 vDepth : SV_TARGET2;
-    float4 vRimLight : SV_TARGET3;
-    float4 vFieldDepth : SV_TARGET4;
-    float4 vStencil : SV_TARGET5;
-    float4 vMotionBlur : SV_TARGET6;
-    float4 vMRA : SV_TARGET7;
-};
 
 PS_OUT_LIGHTDEPTH PS_MAIN_LIGHTDEPTH(PS_IN In)
 {
@@ -246,9 +235,9 @@ PS_OUT PS_MASKED_NORMAL_O(PS_IN In)
     return Out;
 }
 
-PS_OUT_EMISSIVE PS_EMISSIVE(PS_IN In)
+PS_OUT PS_EMISSIVE(PS_IN In)
 {
-    PS_OUT_EMISSIVE Out = (PS_OUT_EMISSIVE) 0;
+    PS_OUT Out = (PS_OUT)0;
     
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
     if (0.3f >= vMtrlDiffuse.a)
@@ -277,7 +266,7 @@ PS_OUT_EMISSIVE PS_EMISSIVE(PS_IN In)
     //    discard;
     
     float4 finalColor = Out.vDiffuse + vEmissive;
-    Out.vDiffuse = finalColor; //saturate(finalColor);
+    Out.vDiffuse = saturate(finalColor); //finalColor;
     return Out;
 }
 
