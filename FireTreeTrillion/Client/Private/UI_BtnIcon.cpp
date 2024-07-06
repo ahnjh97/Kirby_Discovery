@@ -57,9 +57,6 @@ _int CUI_BtnIcon::Tick(_float fTimeDelta)
 		return OBJ_NOEVENT;
 	//Safe_AddRef(m_pMWindow);
 
-	_float4 vTrans = { 478.f, 0.f, 1.f, 1.f };
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vTrans);
-
 	//MessageWindow 상태와 동기화
 	CUI_MessageWindow::MESSAGEWINDOW_STATE eMWState = pMWindow->Get_MWindowState();
 	switch (eMWState)

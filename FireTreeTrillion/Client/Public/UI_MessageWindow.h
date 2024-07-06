@@ -55,7 +55,8 @@ private:
 	CDialog*					m_pDialog = { nullptr };
 	
 	_float						m_fHideTime = { 0.f };
-	_float3						m_vOrigScale = { 0.f, 0.f, 1.f };
+	_float3						m_vBaseScale = { 0.f, 0.f, 1.f };
+	_float3						m_vBtnScale = { 0.f, 0.f, 1.f };
 
 	MESSAGEWINDOW_STATE			m_eCurState = { WINDOW_NONE };
 };

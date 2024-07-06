@@ -70,6 +70,7 @@ HRESULT CDialog::Display_Message(const wstring& _wstrMessage, _float _fDisplayTi
 {
 	for (size_t iIndex = 0; iIndex < _wstrMessage.length(); ++iIndex)
 	{
+		//문자열 시작 위치/문자열 길이
 		_wstrMessage.substr(iIndex, 1);
 	}
 

@@ -37,9 +37,6 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 	if (FAILED(Add_Dialog(_pArg)))
 		return E_FAIL;
 
-	// Add_Button
-	//hr = m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_UI_MessageWindow"), TEXT("Prototype_GameObject_UI_BtnIcon"));
-
 #pragma region MESSAGEWINDOW BASE
 
 	_float4 vBaseTrans = { m_UIObjDesc.vPos };
@@ -47,7 +44,6 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 	m_pTransCom[TEXMW_BASE]->Set_State(CTransform::STATE_POSITION, vBaseTrans);
 
 	m_pTransCom[TEXMW_BASE]->Set_Scaled(m_UIObjDesc.vSize);
-	m_vOrigScale = m_pTransCom[TEXMW_BASE]->Get_Scaled();
 
 #pragma endregion
 
@@ -55,8 +51,8 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 
 	_float3 vScale = { 76.f, 76.f, 1.f };
 	m_pTransCom[TEXMW_BTNBASE]->Set_Scaled(vScale);
+	m_vBtnScale = m_pTransCom[TEXMW_BTNBASE]->Get_Scaled();
 
-	//_float4 vBtnTrans = { 480.f, -390.f, 1.f, 1.f };
 	_float4 vBtnTrans = { 479.f, -390.f, 1.f, 1.f };
 	m_pTransCom[TEXMW_BTNBASE]->Set_State(CTransform::STATE_POSITION, vBtnTrans);
 
@@ -65,6 +61,7 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 	//m_pTransformCom->Rotation(XMVectorSet(AXIS_Z), XMConvertToRadians(m_UIObjDesc.vDegree.z));
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
+	m_vBaseScale = m_pTransformCom->Get_Scaled();
 
 	m_UIObjDesc.fAlpha = 0.f;
 	m_eCurState = WINDOW_HIDE;
@@ -90,6 +87,7 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 		m_eCurState = WINDOW_HIDE;
 
 	_float3 vOffset = { 0.9f, 0.9f, 1.f };
+	_float3 vShowScale{};
 	switch (m_eCurState)
 	{
 	case WINDOW_IDLE: 
@@ -97,20 +95,21 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 
 	case WINDOW_HIDE: //알파 값 및 스케일 감소
 		m_UIObjDesc.fAlpha -= fTimeDelta * 5.f;	
-
-		vOffset.y -= EASE_OUT(fTimeDelta * 2.5f);
-		m_pTransCom[TEXMW_BASE]->Set_Scaled(m_vOrigScale * vOffset);
-
+		//vOffset.y -= EASE_OUT(fTimeDelta * 2.5f);
+		//m_pTransCom[TEXMW_BASE]->Set_Scaled(m_vBaseScale * vOffset);
+		//m_pTransCom[TEXMW_BTNBASE]->Set_Scaled(m_vBtnScale * vOffset);
 		break;
 
 	case WINDOW_SHOW: //알파 값 및 스케일 증가
 		m_UIObjDesc.fAlpha += fTimeDelta * 5.f;	
-		vOffset.y += EASE_OUT(fTimeDelta * 2.5f);
-		_float3 vShowScale = m_vOrigScale * vOffset;
-		m_pTransCom[TEXMW_BASE]->Set_Scaled(vShowScale);
 
-		if (vShowScale > m_vOrigScale)
-			m_pTransCom[TEXMW_BASE]->Set_Scaled(m_vOrigScale);
+		//vOffset.y += EASE_OUT(fTimeDelta * 5.f);
+		//vShowScale = m_vBaseScale * vOffset;
+		//m_pTransCom[TEXMW_BASE]->Set_Scaled(vShowScale);
+
+		//if (vShowScale.y > m_vBaseScale.y)
+			//m_pTransCom[TEXMW_BASE]->Set_Scaled(m_vBaseScale);
+			//m_pTransCom[TEXMW_BTNBASE]->Set_Scaled(m_vBtnScale);
 		break;
 	default:	break;
 	}
