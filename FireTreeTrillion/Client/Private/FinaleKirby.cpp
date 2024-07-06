@@ -52,10 +52,6 @@ HRESULT CFinaleKirby::Initialize(void* pArg)
 
     m_pControllerCom->RegisterAsPlayer();
 
-    // 마지막 스테이지에서 운석을 지속적으로 날려주는 기능을 가진 클래스를 생성한다.
-    if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Disaster_Master"), TEXT("Prototype_GameObject_Disaster_Master"), this)))
-        return E_FAIL;
-
     m_bSlope = false;
 
     return S_OK;
@@ -82,6 +78,16 @@ _int CFinaleKirby::Tick(_float fTimeDelta)
     PxVec3 slope = m_pControllerCom->Compute_Slope_DynamicActor(m_pTransformCom);
     _vector vTerrainNormal = CUtils::To_Vector(slope);
     Lerp_UpVector(vTerrainNormal, 20.f, fTimeDelta);
+
+
+    if (m_bMakeDisaster == true && m_pTransformCom->Get_State(CTransform::STATE_POSITION).x > 15.f)
+    {
+        // 마지막 스테이지에서 운석을 지속적으로 날려주는 기능을 가진 클래스를 생성한다.
+        if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Disaster_Master"), TEXT("Prototype_GameObject_Disaster_Master"), this)))
+            return E_FAIL;
+
+        m_bMakeDisaster = false;
+    }
 
 
     Kirby_SystemTick(m_fTimeDelta);

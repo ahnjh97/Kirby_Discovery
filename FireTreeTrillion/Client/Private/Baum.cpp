@@ -32,7 +32,7 @@ HRESULT CBaum::Initialize(void* pArg)
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, Desc.vPos);
 
-	if (FAILED(Add_Components()))
+	if (FAILED(Add_Components(Desc.wstrModelName)))
 		return E_FAIL;
 
 	m_bMotionBlur = true;
@@ -56,6 +56,8 @@ HRESULT CBaum::Initialize(void* pArg)
 	m_pTransformCom->Set_State(CTransform::STATE_UP, vNewUp);
 	m_pTransformCom->Set_State(CTransform::STATE_RIGHT, vNewRight);
 	m_pTransformCom->Set_State(CTransform::STATE_LOOK, vNewLook);
+
+	m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
 	
 	return S_OK;
 }
@@ -73,7 +75,10 @@ _int CBaum::Tick(_float fTimeDelta)
 		m_pControllerCom->Move_Dir(m_pTransformCom, m_vBaumMoveDir * m_fTimeDelta * m_fBaumSpeed, m_fTimeDelta);
 		m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_UP), m_fTimeDelta, 180.f);
 
-
+		m_fScale += m_fTimeDelta * 5.f;
+		if (m_fScale > 1.f)
+			m_fScale = 1.f;
+		m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
 		if (m_pTransformCom->Get_State(CTransform::STATE_POSITION).y < -50.f)
 		{
 			return OBJ_DEAD;
@@ -183,7 +188,7 @@ void CBaum::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pOb
 	}
 }
 
-HRESULT CBaum::Add_Components()
+HRESULT CBaum::Add_Components(wstring wstrModelProtoTag)
 {
 	HRESULT hr;
 	/* For.Com_Shader */
@@ -191,8 +196,9 @@ HRESULT CBaum::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Baum"),
-		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+	/* For.Com_Model */
+	wstring wstrModelTag = TEXT("Prototype_Component_Model_") + wstrModelProtoTag;
+	hr = __super::Add_Component(wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
