@@ -298,6 +298,15 @@ void CFinaleKirby::Kirby_SystemTick(_float fTimeDelta)
 
     // 公利 惑怕 包府家
     OverPower();
+
+    if (INFO(m_eBodyState) == BODY_DUMPDEFAULT)
+    {
+        if (INFO(m_fMoveSpeed) > 0.f)
+        {
+            _float fRadialPower = INFO(m_fMoveSpeed) * 0.3f;
+            m_pGameInstance->Setting_RadialBlur(fRadialPower, fRadialPower);
+        }
+    }
 }
 
 HRESULT CFinaleKirby::Kirby_SystemInitialize()
