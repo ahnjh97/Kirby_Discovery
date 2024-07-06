@@ -232,6 +232,17 @@ void CUtils::Rotation(_Inout_ _float4x4& matrix, _fvector vAxis, _float fRadian)
 	}
 }
 
+void CUtils::Rotation(_Inout_ _float4x4& matrix, Quaternion vQuat)
+{
+
+	_float4x4 RotMat = _float4x4::CreateFromQuaternion(vQuat);
+	_float3	vScale = Get_Scaled_Matrix(matrix);
+	_float3 vPos = Get_State_Vector_Matrix(matrix, STATE_POSITION);
+
+	//_float4x4 ResultWorld = 
+	matrix = _float4x4::CreateScale(vScale) * RotMat * _float4x4::CreateTranslation(vPos);
+}
+
 
 _float3 CUtils::Make_Local_ToWorld(_float3 vPos, _float4x4& matWorld)
 {

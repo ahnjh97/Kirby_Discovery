@@ -51,6 +51,7 @@ public:
 	static _float3	Get_Scaled_Matrix(_Inout_ _float4x4& matrix);
 	static void		Turn_OtherMatrix(_Inout_ _float4x4& matrix, _fvector vAxis, _float fTimeDelta, _float fAngle);
 	static void		Rotation(_Inout_ _float4x4& matrix, _fvector vAxis, _float fRadian);
+	static void		Rotation(_Inout_ _float4x4& matrix, Quaternion vQuat);
 
 
 	//로컬 포지션을 월드 포지션으로 변환시킨다.

@@ -69,9 +69,9 @@ HRESULT CLevel_Finale::Initialize()
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Deform"), TEXT("Prototype_GameObject_DumpCar"), &ObjDesc)))
 		return E_FAIL;
 
-	
+
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
-	m_pGameInstance->Set_ColorSet_ByIndex(5);
+	m_pGameInstance->Set_ColorSet_ByIndex(4);
 	return S_OK;
 }
 
@@ -117,7 +117,7 @@ HRESULT CLevel_Finale::Ready_Lights()
 	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
 		return E_FAIL;
 
-	CGameInstance::Get_Instance()->Setting_GodRay({-650.f, 5000.f, 1200.f, 1.f});
+	CGameInstance::Get_Instance()->Setting_GodRay({ -650.f, 5000.f, 1200.f, 1.f });
 
 	return S_OK;
 }
@@ -617,12 +617,56 @@ HRESULT CLevel_Finale::Ready_Objects()
 	roadDesc.wstrModelName = TEXT("MovableBuildingA");
 
 	_float4x4 InitMat = _float4x4::Identity;
-	InitMat.Translation({ 110.f, -50.f, 0.f });
-	CUtils::Turn_OtherMatrix(InitMat, _float3::Up, 1.f, 80.f);
+	InitMat.Translation({ 139.f, -26.f, 4.8f });
+	Quaternion vQuat = CUtils::Make_Quat_FromDir({ .98f, .21f, .07f });
+	CUtils::Rotation(InitMat, vQuat);
 	roadDesc.matWorld = InitMat;
 
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
 		return E_FAIL;
+
+
+	roadDesc = {};
+	roadDesc.wstrModelName = TEXT("MovableBuildingC");
+
+	InitMat = _float4x4::Identity;
+	InitMat.Translation({ 268.1f, -15.5f, -22.9f });
+	 vQuat = CUtils::Make_Quat_FromDir({ 1.f, .08f, -.05f });
+	CUtils::Rotation(InitMat, vQuat);
+	roadDesc.matWorld = InitMat;
+
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
+		return E_FAIL;
+
+
+	roadDesc = {};
+	roadDesc.wstrModelName = TEXT("MovableBuildingC");
+
+	InitMat = _float4x4::Identity;
+	InitMat.Translation({ 390.1f, -15.5f, -22.9f });
+	 vQuat = CUtils::Make_Quat_FromDir({ 1.f, -.3f, -.05f });
+	CUtils::Rotation(InitMat, vQuat);
+	roadDesc.matWorld = InitMat;
+
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
+		return E_FAIL;
+
+	//for (_int i = 0; i < 2; ++i)
+	//{
+
+	//	roadDesc = {};
+	//	roadDesc.wstrModelName = TEXT("MovableBuildingC");
+
+	//	InitMat = _float4x4::Identity;
+	//	InitMat.Translation({ 135.f, -8.5f, -21.f });
+	//	Quaternion vQuat = Quaternion::CreateFromYawPitchRoll({ 87.f, 8.f, 100.f });
+	//	CUtils::Rotation(InitMat, vQuat);
+	//	roadDesc.matWorld = InitMat;
+
+	//	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
+	//		return E_FAIL;
+	//}
+
 
 
 	string strFileName = "../../../objects_txt/Finale.txt";
