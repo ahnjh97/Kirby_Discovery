@@ -1275,7 +1275,8 @@ HRESULT CLoader::Loading_For_Tool_Map()
 
 	if (FAILED(Add_AllModelTxts(eLevel, TYPE_NONANIM, L"TownDeco/")))
 		return E_FAIL;
-
+	if (FAILED(Add_AllModelTxts(eLevel, TYPE_NONANIM, L"ParkDeco/")))
+		return E_FAIL;
 	//LEVEL_FINALBOSS (MapName :: LAB_Discovera)
 	if (FAILED(Add_AllModelTxts(eLevel, TYPE_NONANIM, L"LabDiscovera_Deco/")))
 		return E_FAIL;
