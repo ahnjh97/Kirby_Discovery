@@ -28,29 +28,30 @@ void CCollisionCenter::Initialize()
 
 void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 {
+	LEVEL eLevel = (LEVEL)*GAMEINSTANCE Get_CurrentLevelID();
+
 	// 게임 흐름에 있어서 필요한 슬로우 모션을 충돌에 따라 이곳에서 관리한다.
 	Dodge_Timer_System(fTimeDelta);
 
 	// 게임 흐름에 있어서 필요한 슬로우 모션을 충돌에 따라 이곳에서 관리한다.
 	Hit_Timer_System(fTimeDelta);
 
-
 	// 게임 흐름에 있어서 필요한 사다리 등 충돌에 따라 Kirby가 작동하도록 이곳에서 관리한다.
-	Ladder_Collider();
+	if (eLevel >= LEVEL_INTRO && eLevel <= LEVEL_FINALBOSS)
+	{
+		Ladder_Collider();
+		// 몸통 박치기 및 몸끼리으로 상호작용하는 콜리전 검사 진행. (보스 제외)
+		Body_To_Body_Collision();
+		// 히트박스 또는 불릿(투사체) 관련 상호작용 콜리전 검사 진행. (보스 제외)
+		Hitbox_Collision();
+	}
 
 
-	// 몸통 박치기 및 몸끼리으로 상호작용하는 콜리전 검사 진행. (보스 제외)
-	Body_To_Body_Collision();
-
-
-	// 히트박스 또는 불릿(투사체) 관련 상호작용 콜리전 검사 진행. (보스 제외)
-	Hitbox_Collision();
-
-	if (*GAMEINSTANCE Get_CurrentLevelID() == LEVEL_DEEDEEDEE)
+	if (eLevel == LEVEL_DEEDEEDEE)
 		// 디디디와 싸우는 특수한 충돌로직들 모아두었습니다.
 		DeeDeeDee_Battle();
 
-	if (*GAMEINSTANCE Get_CurrentLevelID() == LEVEL_FINALBOSS)
+	if (eLevel == LEVEL_FINALBOSS)
 		FinalStage_Battle();
 
 
@@ -404,7 +405,6 @@ void CCollisionCenter::Ladder_Collider()
 
 	if (nullptr == pKirby)
 		return;
-
 
 	_vector vKirbyPos = pKirby->Get_TransformCom()->Get_State_Vector(CTransform::STATE_POSITION);
 	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
@@ -1054,7 +1054,10 @@ void CCollisionCenter::Hitbox_Collision()
 				pthis->Player_Monster_Knock_back(pKirby, pMonsterBullet);
 				_float fAttack = pMonsterBullet->Get_Attack();
 				pKirby->Minus_Hp(fAttack);
-				Dst->Set_Dead();
+
+				if (pMonsterBullet->Get_NonDead() == false)
+					Dst->Set_Dead();
+
 				DstHit->Set_Alive(false);
 				SrcHit->Set_Alive(false);
 			}

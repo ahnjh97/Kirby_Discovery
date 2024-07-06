@@ -52,6 +52,10 @@ HRESULT CFinaleKirby::Initialize(void* pArg)
 
     m_pControllerCom->RegisterAsPlayer();
 
+    // 마지막 스테이지에서 운석을 지속적으로 날려주는 기능을 가진 클래스를 생성한다.
+    if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Disaster_Master"), TEXT("Prototype_GameObject_Disaster_Master"), this)))
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -468,13 +472,13 @@ HRESULT CFinaleKirby::Add_Components()
     m_ppModelForAnimTool = &m_pModelCom[BODY_DEFAULT];
     m_uModelCnt = BODY_END;
 
-    CHitBox::HITBOX_DESC HitBox{};
-    HitBox.pOwner = this;
-    HitBox.pDesc = &m_tColliderDesc[BODY];
-    HitBox.pCollisionType = PLAYER;
-    if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
-        return E_FAIL;
-    Set_BodyCollider(COLLIDER_SPHERE, 1.f, 0.f, 2.f);
+    //CHitBox::HITBOX_DESC HitBox{};
+    //HitBox.pOwner = this;
+    //HitBox.pDesc = &m_tColliderDesc[BODY];
+    //HitBox.pCollisionType = PLAYER;
+    //if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
+    //    return E_FAIL;
+    //Set_BodyCollider(COLLIDER_SPHERE, 1.f, 0.f, 2.f);
 
     /* FSM */
     SetUp_FSM();

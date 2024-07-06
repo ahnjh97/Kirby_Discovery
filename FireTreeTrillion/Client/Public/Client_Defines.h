@@ -13,17 +13,15 @@ namespace Client
                  LEVEL_TOOL_ANIM = 6, // ANIM툴은 6으로 고정 ! 부탁드립니댜
                  LEVEL_TOOL_MAP,
 
+                 LEVEL_PARTTIME,
                 //============ GAME
                  LEVEL_INTRO,
                  LEVEL_RACING,
                  LEVEL_DEEDEEDEE,
 
                  LEVEL_TOWN,
-                 LEVEL_PARTTIME,
-
                  //LEVEL_GAMBLE,
                  //LEVEL_PARK,
-
                  LEVEL_SIMBA,
                  LEVEL_FINALBOSS, // 리소스명 LAB_DISCOVERA
                  LEVEL_FINALE,
