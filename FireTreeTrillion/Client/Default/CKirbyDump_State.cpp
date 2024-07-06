@@ -239,8 +239,8 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	Kirbydesc->m_fMoveSpeed += fTimeDelta * 10.f;
 	if (DESC(m_bBooster) == true)
 	{
-		if (Kirbydesc->m_fMoveSpeed > 40.f)
-			Kirbydesc->m_fMoveSpeed = 40.f;
+		if (Kirbydesc->m_fMoveSpeed > 30.f)
+			Kirbydesc->m_fMoveSpeed = 30.f;
 	}
 	else
 	{
@@ -264,6 +264,7 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	{
 		//ºÎšÀ ÀÌÆåÆ®
 		ComeOn_Dash_For_Dump(pTransformCom);
+		pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 		DESC(m_bBooster) = true;
 		CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 		pCamera->Make_Shake(0.6f, 2.f);
@@ -330,6 +331,7 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	{
 		//ºÎšÀ ÀÌÆåÆ®
 		ComeOn_Dash_For_Dump(pTransformCom);
+		pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 		DESC(m_bBooster) = true;
 		CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 		pCamera->Make_Shake(0.6f, 2.f);
@@ -378,8 +380,8 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	Kirbydesc->m_fMoveSpeed += fTimeDelta * 10.f;
 	if (DESC(m_bBooster) == true)
 	{
-		if (Kirbydesc->m_fMoveSpeed > 40.f)
-			Kirbydesc->m_fMoveSpeed = 40.f;
+		if (Kirbydesc->m_fMoveSpeed > 30.f)
+			Kirbydesc->m_fMoveSpeed = 30.f;
 	}
 	else
 	{

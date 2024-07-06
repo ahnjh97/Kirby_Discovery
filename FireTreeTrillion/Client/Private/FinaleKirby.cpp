@@ -56,6 +56,8 @@ HRESULT CFinaleKirby::Initialize(void* pArg)
     if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Disaster_Master"), TEXT("Prototype_GameObject_Disaster_Master"), this)))
         return E_FAIL;
 
+    m_bSlope = false;
+
     return S_OK;
 }
 
@@ -76,6 +78,11 @@ _int CFinaleKirby::Tick(_float fTimeDelta)
 
     // 유틸업데이트가 들어가있다. (FSM)
     __super::Tick(m_fTimeDelta);
+    // 지면의 up벡터
+    PxVec3 slope = m_pControllerCom->Compute_Slope_DynamicActor(m_pTransformCom);
+    _vector vTerrainNormal = CUtils::To_Vector(slope);
+    Lerp_UpVector(vTerrainNormal, 20.f, fTimeDelta);
+
 
     Kirby_SystemTick(m_fTimeDelta);
 
@@ -303,7 +310,7 @@ void CFinaleKirby::Kirby_SystemTick(_float fTimeDelta)
     {
         if (INFO(m_fMoveSpeed) > 0.f)
         {
-            _float fRadialPower = INFO(m_fMoveSpeed) * 0.3f;
+            _float fRadialPower = INFO(m_fMoveSpeed) * 0.2f;
             m_pGameInstance->Setting_RadialBlur(fRadialPower, fRadialPower);
         }
     }
