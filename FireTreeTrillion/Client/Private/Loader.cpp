@@ -128,6 +128,7 @@
 
 // 피날레 스테이지 기믹들
 #include "Baum.h"
+#include "BaumPiece.h"
 #include "Disaster_Master.h"
 
 //기믹
@@ -383,6 +384,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	// Finale
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleRoad"), CFinaleRoad);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Baum"), CBaum);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BaumPiece"), CBaumPiece);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Disaster_Master"), CDisaster_Master);
 
 	//Dee

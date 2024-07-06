@@ -2,6 +2,7 @@
 #include "Baum.h"
 #include "HitBox.h"
 #include "Camera_Main.h"
+#include "BaumPiece.h"
 
 CBaum::CBaum(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
@@ -83,8 +84,9 @@ _int CBaum::Tick(_float fTimeDelta)
 		pCamera->Make_Shake();
 
 		// 파티클을 만든다.
-		//Make_Partical();
-		m_bOnTerrain = true;
+		Make_Partical();
+		m_bDead = true;
+		//m_bOnTerrain = true;
 	}
 
 	Compute_MotionBlur();
@@ -232,7 +234,46 @@ void CBaum::Compute_MotionBlur()
 
 _int CBaum::Make_Partical()
 {
+	wstring wstrModelName[6] = {
+		TEXT("BaumPieceA"),
+		TEXT("BaumPieceB"),
+		TEXT("BaumPieceC"),
+		TEXT("BaumPieceD"),
+		TEXT("BaumPieceE"),
+		TEXT("BaumPieceF")
+	};
+
 	// 파티클을 만드는 함수
+	for (_int i = 0; i < 6; ++i)
+	{
+		_float4x4 matrix = m_pTransformCom->Get_WorldFloat4x4();
+		_float4 vDir = XMVector3Normalize(m_vBaumMoveDir);
+		
+		vDir = CUtils::Make_RandomAngle_Vector(120.f, vDir);
+		vDir.Normalize();
+		_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		vPos += vDir * 2.f;
+
+		CUtils::Set_State_Matrix(matrix, CUtils::STATE_POSITION, vPos);
+		CUtils::Turn_OtherMatrix(matrix, _float4(0.f, 1.f, 0.f, 0.f), 1.f, CUtils::Make_RandomFloat(0.f, 360.f));
+		CUtils::Turn_OtherMatrix(matrix, _float4(1.f, 0.f, 0.f, 0.f), 1.f, CUtils::Make_RandomFloat(0.f, 360.f));
+		CUtils::Turn_OtherMatrix(matrix, _float4(0.f, 0.f, 1.f, 0.f), 1.f, CUtils::Make_RandomFloat(0.f, 360.f));
+		_float fRandomscale = CUtils::Make_RandomFloat(0.6f, 1.6f);
+		CUtils::Set_Scaled_Matrix(matrix, fRandomscale, fRandomscale, fRandomscale);
+
+		CBaumPiece::BAUMPIECEDESC desc = {};
+		desc.matWorld = matrix;
+		vDir.y += 0.5f;
+		desc.wstrModelName = wstrModelName[i];
+		desc.vParticalMoveDir = vDir;
+		desc.fParticalSpeed = 250.f;
+		// Car Test
+		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_BaumPiece"), TEXT("Prototype_GameObject_BaumPiece"), &desc)))
+			return OBJ_DEAD;
+	}
+
+
+
 
 	return OBJ_DEAD;
 }
