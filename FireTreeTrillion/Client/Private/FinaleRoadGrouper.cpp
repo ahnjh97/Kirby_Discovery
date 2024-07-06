@@ -12,6 +12,29 @@ CFinaleRoadGrouper::CFinaleRoadGrouper(const CFinaleRoadGrouper& rhs)
 {
 }
 
+_bool CFinaleRoadGrouper::Make_CollideReaction(CFinaleRoad* pRoad)
+{
+	_bool bIsMyCollision{ false };
+
+	for (auto& road : m_pRoads)
+	{
+		if (pRoad == road)
+		{
+			bIsMyCollision = true;
+			break;
+		}
+	}
+
+	if (bIsMyCollision)
+	{ 
+		for (auto& road : m_pRoads)
+		{
+			road->Make_CollisionEvent();
+		}
+	}
+	return _bool();
+}
+
 HRESULT CFinaleRoadGrouper::Initialize_Prototype()
 {
 	return S_OK;
@@ -19,6 +42,53 @@ HRESULT CFinaleRoadGrouper::Initialize_Prototype()
 
 HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 {
+	ROADGROUPER_DESC RoadGroupDesc{};
+
+	if (nullptr != pArg)
+		RoadGroupDesc = *(ROADGROUPER_DESC*)pArg;
+
+	RoadGroupDesc.fSpeedPerSec = 5.f;
+	RoadGroupDesc.fRotationPerSec = XMConvertToRadians(90.0f);
+
+	switch (RoadGroupDesc.eRoadType)
+	{
+	case RTYPE_BUILDINGA:
+	{
+
+	}
+	break;
+	case RTYPE_BUILDINGB:
+	{
+
+	}
+	break;
+	case RTYPE_BUILDINGC:
+	{
+
+	}
+	break;
+	case RTYPE_BUILDINGD:
+	{
+
+	}
+	break;
+	case RTYPE_ROADA:
+	{
+
+	}
+	break;
+	case RTYPE_ROADB:
+	{
+
+	}
+	break;
+
+	default:
+		break;
+	}
+
+
+
 	return S_OK;
 }
 

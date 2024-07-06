@@ -7,11 +7,29 @@ BEGIN(Client)
 class CFinaleRoadGrouper final : public CGameObject
 {
 public:
-	enum MOVECMD { MOVECMD_STOP, MOVECMD_ROTATE, MOVECMD_END };
-	struct ROADGROUP_DESC : public GAMEOBJECT_DESC
+	enum ROADTYPE
 	{
-		MOVECMD eMoveCommand = { MOVECMD_STOP };
-		_bool	bIsAnimModel = { false };
+		RTYPE_BUILDINGA,
+		RTYPE_BUILDINGB,
+		RTYPE_BUILDINGC,
+		RTYPE_BUILDINGD,
+		RTYPE_ROADA, RTYPE_ROADB, RTYPE_ROADC,
+		RTYPE_END
+	};
+
+	enum MOVECMD
+	{
+		MOVECMD_STOP,
+		MOVECMD_ROTATE,
+		MOVECMD_COLLIDE,
+		MOVECMD_END
+	};
+
+	struct ROADGROUPER_DESC : public GAMEOBJECT_DESC
+	{
+		ROADTYPE	eRoadType = { RTYPE_END };
+		MOVECMD		eMoveCommand = { MOVECMD_STOP };
+		_bool		bIsAnimModel = { false };
 	};
 
 private:
@@ -20,6 +38,11 @@ private:
 	virtual ~CFinaleRoadGrouper() = default;
 
 public:
+
+	//충돌한 도로 놈이 Road Groupder의 함수를 호출하면, 자신이 가지고 있는 road의 주소를 확인하여 내 산하의 충돌인지 판별한다.
+	//내 충돌이 맞다면, 가지고 있는 road들에게 작동 명령을 내린다.
+	//자신도 유형에 따라 transform 이동을 한다.
+	_bool			Make_CollideReaction(class CFinaleRoad* pRoad);
 
 	virtual HRESULT Initialize_Prototype()						override;
 	virtual HRESULT Initialize(void* pArg)						override;
@@ -31,7 +54,10 @@ public:
 #endif
 
 private:
-	vector<class CFinaleRoad*> m_pRoads;
+
+	_float3 m_vDestPos = { 0.f, 0.f, 0.f };
+
+	vector<CFinaleRoad*> m_pRoads;
 
 public:
 	static CFinaleRoadGrouper* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

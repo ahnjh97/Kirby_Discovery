@@ -13,6 +13,11 @@ CFinaleRoad::CFinaleRoad(const CFinaleRoad& rhs)
 }
 
 
+void CFinaleRoad::Make_CollisionEvent(/*CFinaleRoadGrouper::MOVECMD eMove*/)
+{
+
+}
+
 HRESULT CFinaleRoad::Initialize_Prototype()
 {
 	return S_OK;

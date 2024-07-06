@@ -19,6 +19,7 @@ private:
 	HRESULT Ready_Lights();
 	HRESULT Ready_Layer_Camera(const wstring& strLayerTag);
 	HRESULT Ready_Layer_BackGround(const wstring& strLayerTag);
+	HRESULT Ready_FinaleRoad();
 	HRESULT Ready_Map();
 	HRESULT Ready_Triggers();
 	HRESULT Ready_Monsters();

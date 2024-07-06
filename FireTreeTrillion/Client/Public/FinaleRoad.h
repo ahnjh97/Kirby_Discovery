@@ -1,6 +1,7 @@
 #pragma once
 #include "Client_Defines.h"
 #include "PhysXObject.h"
+#include "FinaleRoadGrouper.h"
 
 BEGIN(Engine)
 class CModel;
@@ -13,6 +14,14 @@ class CFinaleRoad final : public CPhysXObject
 {
 public:
 	//enum MOVECMD { MOVECMD_STOP, MOVECMD_ROTATE, MOVECMD_END};
+	enum COLLIDETYPE
+	{
+		CTYPE_NONE,
+		CTYPE_DOWN,
+		CTYPE_BREAK,
+		CTYPE_END
+	};
+
 	struct ROAD_DESC : public GAMEOBJECT_DESC
 	{
 		//MOVECMD eMoveCommand = { MOVECMD_STOP };
@@ -27,6 +36,7 @@ private:
 	virtual ~CFinaleRoad() = default;
 
 public:
+	void			Make_CollisionEvent(/*CFinaleRoadGrouper::MOVECMD eMove*/);
 
 	virtual HRESULT Initialize_Prototype()						override;
 	virtual HRESULT Initialize(void* pArg)						override;

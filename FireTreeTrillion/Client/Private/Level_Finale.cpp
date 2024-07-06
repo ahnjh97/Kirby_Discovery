@@ -54,6 +54,8 @@ HRESULT CLevel_Finale::Initialize()
 	CHECK_FAILED(hr);
 	hr = Ready_Objects();
 	CHECK_FAILED(hr);
+	hr = Ready_FinaleRoad();
+	CHECK_FAILED(hr);
 	hr = Ready_UI();
 	CHECK_FAILED(hr);
 
@@ -175,6 +177,53 @@ HRESULT CLevel_Finale::Ready_Layer_BackGround(const wstring& strLayerTag)
 	hr = m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_SkySphereSub"), &LabSkySubDesc);
 	CHECK_FAILED(hr);
 
+	return S_OK;
+}
+
+HRESULT CLevel_Finale::Ready_FinaleRoad()
+{
+
+#pragma region 처음 빌딩들
+
+	CFinaleRoad::ROAD_DESC roadDesc{};
+	roadDesc.wstrModelName = TEXT("MovableBuildingA");
+
+	_float4x4 InitMat = _float4x4::Identity;
+	InitMat.Translation({ 139.f, -26.f, 4.8f });
+	Quaternion vQuat = CUtils::Make_Quat_FromDir({ .98f, .21f, .07f });
+	CUtils::Rotation(InitMat, vQuat);
+	roadDesc.matWorld = InitMat;
+
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleRoad"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
+		return E_FAIL;
+
+
+	roadDesc = {};
+	roadDesc.wstrModelName = TEXT("MovableBuildingC");
+
+	InitMat = _float4x4::Identity;
+	InitMat.Translation({ 268.1f, -15.5f, -22.9f });
+	vQuat = CUtils::Make_Quat_FromDir({ 1.f, .08f, -.05f });
+	CUtils::Rotation(InitMat, vQuat);
+	roadDesc.matWorld = InitMat;
+
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleRoad"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
+		return E_FAIL;
+
+
+	roadDesc = {};
+	roadDesc.wstrModelName = TEXT("MovableBuildingC");
+
+	InitMat = _float4x4::Identity;
+	InitMat.Translation({ 384.1f, -18.8f, -52.f });
+	vQuat = CUtils::Make_Quat_FromDir({ 1.f, -.1f, -.05f });
+	CUtils::Rotation(InitMat, vQuat);
+	roadDesc.matWorld = InitMat;
+
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleRoad"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
+		return E_FAIL;
+
+#pragma endregion
 	return S_OK;
 }
 
@@ -612,62 +661,6 @@ HRESULT CLevel_Finale::Ready_Kickables()
 HRESULT CLevel_Finale::Ready_Objects()
 {
 	//Map, Triggers, Kickables.. 분류 제외 잔존 오브젝트들
-
-	CFinaleRoad::ROAD_DESC roadDesc{};
-	roadDesc.wstrModelName = TEXT("MovableBuildingA");
-
-	_float4x4 InitMat = _float4x4::Identity;
-	InitMat.Translation({ 139.f, -26.f, 4.8f });
-	Quaternion vQuat = CUtils::Make_Quat_FromDir({ .98f, .21f, .07f });
-	CUtils::Rotation(InitMat, vQuat);
-	roadDesc.matWorld = InitMat;
-
-	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
-		return E_FAIL;
-
-
-	roadDesc = {};
-	roadDesc.wstrModelName = TEXT("MovableBuildingC");
-
-	InitMat = _float4x4::Identity;
-	InitMat.Translation({ 268.1f, -15.5f, -22.9f });
-	 vQuat = CUtils::Make_Quat_FromDir({ 1.f, .08f, -.05f });
-	CUtils::Rotation(InitMat, vQuat);
-	roadDesc.matWorld = InitMat;
-
-	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
-		return E_FAIL;
-
-
-	roadDesc = {};
-	roadDesc.wstrModelName = TEXT("MovableBuildingC");
-
-	InitMat = _float4x4::Identity;
-	InitMat.Translation({ 384.1f, -18.8f, -69.6f });
-	 vQuat = CUtils::Make_Quat_FromDir({ 1.f, -.1f, -.05f });
-	CUtils::Rotation(InitMat, vQuat);
-	roadDesc.matWorld = InitMat;
-
-	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
-		return E_FAIL;
-
-	//for (_int i = 0; i < 2; ++i)
-	//{
-
-	//	roadDesc = {};
-	//	roadDesc.wstrModelName = TEXT("MovableBuildingC");
-
-	//	InitMat = _float4x4::Identity;
-	//	InitMat.Translation({ 135.f, -8.5f, -21.f });
-	//	Quaternion vQuat = Quaternion::CreateFromYawPitchRoll({ 87.f, 8.f, 100.f });
-	//	CUtils::Rotation(InitMat, vQuat);
-	//	roadDesc.matWorld = InitMat;
-
-	//	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
-	//		return E_FAIL;
-	//}
-
-
 
 	string strFileName = "../../../objects_txt/Finale.txt";
 
