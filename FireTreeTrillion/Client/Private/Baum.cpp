@@ -3,6 +3,7 @@
 #include "HitBox.h"
 #include "Camera_Main.h"
 #include "BaumPiece.h"
+#include "FinaleRoad.h"
 
 CBaum::CBaum(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
@@ -75,6 +76,11 @@ _int CBaum::Tick(_float fTimeDelta)
 	else if (m_bOnTerrain == true)
 	{
 		// 지형에 붙어 따라가는 기능
+		CTransform* pRoadTransform = m_pMyRoad->Get_TransformCom();
+		_float4x4 NewWorldmatrix = m_HitWorld * pRoadTransform->Get_WorldFloat4x4();
+		m_pTransformCom->Set_WorldMatrix(NewWorldmatrix);
+		_float4 NewPos = CUtils::Get_State_Vector_Matrix(NewWorldmatrix, CUtils::STATE_POSITION);
+		m_pControllerCom->Set_Position(m_pTransformCom, NewPos);
 	}
 
 	// 구현부
@@ -85,8 +91,9 @@ _int CBaum::Tick(_float fTimeDelta)
 
 		// 파티클을 만든다.
 		Make_Partical();
-		m_bDead = true;
-		//m_bOnTerrain = true;
+		//m_bDead = true;
+		m_bOnTerrain = true;
+		Find_MyRoad();
 	}
 
 	Compute_MotionBlur();
@@ -232,6 +239,34 @@ void CBaum::Compute_MotionBlur()
 	m_vPreScreenPos = vCurScreenPos;
 }
 
+void CBaum::Find_MyRoad()
+{
+	if (m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad")) == nullptr)
+		return;
+	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	_float	fMinDistance = { 1000.f };
+
+	for (auto& pRoad : *m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad")))
+	{
+		_float4 vRoadPos = pRoad->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
+		
+		_float fDistance = (vRoadPos - vPos).Length();
+
+		if (fMinDistance > fDistance)
+		{
+			m_pMyRoad = static_cast<CFinaleRoad*>(pRoad);
+			fMinDistance = fDistance;
+		}
+	}
+
+	if (fMinDistance != 1000.f)
+	{
+		Safe_AddRef(m_pMyRoad);
+		_float4x4 RoadInvMatrix = m_pMyRoad->Get_TransformCom()->Get_WorldFloat4x4_Inverse();
+		m_HitWorld = m_pTransformCom->Get_WorldMatrix() * RoadInvMatrix;
+	}
+}
+
 _int CBaum::Make_Partical()
 {
 	wstring wstrModelName[6] = {
@@ -273,8 +308,6 @@ _int CBaum::Make_Partical()
 	}
 
 
-
-
 	return OBJ_DEAD;
 }
 
@@ -310,4 +343,6 @@ void CBaum::Free()
 	Safe_Release(m_pControllerCom);
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
+
+	Safe_Release(m_pMyRoad);
 }
