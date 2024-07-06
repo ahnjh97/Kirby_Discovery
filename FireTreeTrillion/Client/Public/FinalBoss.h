@@ -93,6 +93,7 @@ private:
 	map<const wstring, CPartObject*>	m_PartObjects = {};
 	vector<class CGully*>				m_vecGully = {};
 	vector<class CDebris*>				m_vecDebris = {};
+	vector<class CDebris*>				m_vecMagneticDebris = {};
 
 	FINALBOSS_ANIM		m_eCurrentState = { FINALBOSS_END };
 	FINALBOSS_STATE		m_eBossState = { STATE_END };

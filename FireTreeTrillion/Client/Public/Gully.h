@@ -31,14 +31,6 @@ public:
 		m_bPoolingDead = false;
 	}
 
-	void Set_Effect(_fvector vPos, _float fLifeTime, _float fScale) {
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
-		m_fLifeTime = fLifeTime;
-		m_fScale = fScale;
-		m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
-		m_bPoolingDead = false;
-	}
-
 public:
 	virtual HRESULT Initialize_Prototype()			override;
 	virtual HRESULT Initialize(void* pArg)			override;

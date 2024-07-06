@@ -1761,9 +1761,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	}
 	else if (eLevel == LEVEL_FINALBOSS)
 	{
-		for (_uint i = 0; i <= 16; i++) {
+		for (_uint i = 0; i <= 17; i++) {
 			string strTunnelRock = "TunnelRock" + to_string(i);
-			m_vecModelInfo.emplace_back(strTunnelRock, TYPE_NONANIM);
+			m_vecModelInfo.emplace_back(strTunnelRock, TYPE_NONANIM, 0.1f);
 		}
 
 		//보스전 필드에서만 생성하는 SUB_SKYSPHERE (BackGround 요소)

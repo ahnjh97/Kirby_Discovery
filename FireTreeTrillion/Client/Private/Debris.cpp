@@ -12,26 +12,40 @@ CDebris::CDebris(const CDebris& rhs)
 {
 }
 
-void CDebris::Set_ParticleDebris(_fvector vPosition)
+void CDebris::Set_ParticleDebris(_fvector vPosition, _float fScale, _float2 fRandY, _float2 fRandXZ)
 {
-    m_fSamplingFactor = 0.1f;
     m_vRotationAxis = CUtils::Make_Random_Vector(1);
 
-    m_fX = CUtils::Make_RandomFloat(5, 10);
+    m_fX = CUtils::Make_RandomFloat(fRandXZ.x, fRandXZ.y);
     _int iRand = CUtils::Make_RandomInt(0, 1);
     if (0 == iRand)
         m_fX *= -1;
 
-    m_fY = CUtils::Make_RandomFloat(10, 20);
-    m_fZ = CUtils::Make_RandomFloat(5, 10);
+    m_fY = CUtils::Make_RandomFloat(fRandY.x, fRandY.y);
+    m_fZ = CUtils::Make_RandomFloat(fRandXZ.x, fRandXZ.y);
     _int iRand2 = CUtils::Make_RandomInt(0, 1);
     if (0 == iRand2)
         m_fZ *= -1;
 
+    m_fScale = fScale;
     m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
+    m_pTransformCom->Set_Scaled(1.f * fScale, 1.f * fScale, 1.f * fScale);
 
     m_fTime = 0.f;
     m_bDead = false;
+    m_bSwap = false;
+}
+
+void CDebris::Set_ParticleEffect(_fvector vPosition, _float fScale)
+{
+    m_fScale = fScale;
+    m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
+    m_pTransformCom->Set_Scaled(1.f * fScale, 1.f * fScale, 1.f * fScale);
+
+    m_fTotalTime = 3.f;
+    m_fTime = 0.f;
+    m_bDead = false;
+    m_bSwap = true;
 }
 
 HRESULT CDebris::Initialize_Prototype()
@@ -54,10 +68,13 @@ HRESULT CDebris::Initialize(void* pArg)
     if (FAILED(Add_Components(GameObjectDesc.wstrModelName)))
         return E_FAIL;
 
-    m_pTransformCom->Set_Scaled(0.07f, 0.07f, 0.07f);
+    m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), 1.f);
+
+   // m_pTransformCom->Set_Scaled(0.07f, 0.07f, 0.07f);
 
     m_bDead = true;
 
+    m_fSamplingFactor = 0.1f;
     m_fTotalTime = 1.f;
 
     return S_OK;
@@ -68,23 +85,38 @@ _int CDebris::Tick(_float fTimeDelta)
     if (true == m_bDead)
         return OBJ_NOEVENT;
 
-    m_fTime += fTimeDelta;
+    m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+    m_fTime += m_fTimeDelta;
 
-    if (m_fTotalTime > m_fTime)
+    if (true == m_bSwap)
     {
-        m_pTransformCom->Turn(m_vRotationAxis, fTimeDelta * 8.f);
-
-        //m_fY = m_fY * cos(m_fTime * XM_PI / (m_fTotalTime * 2.f)) * fTimeDelta
-        m_fY -= m_fTime * GRAVITY * 0.3f;
-
-        _float4 vDir = _float4(m_fX * fTimeDelta, m_fY * fTimeDelta, m_fZ * fTimeDelta, 0);
-        m_pTransformCom->Move(vDir);
-
-        //_float fScale = 1.f - (m_fTime / m_fTotalTime);
-        //m_pTransformCom->Set_Scaled(fScale, fScale, fScale);
+        if (m_fTotalTime + 2.f < m_fTime)
+            m_bDead = true;
+        else if (m_fTotalTime < m_fTime)
+        {
+            _vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+            vPos.m128_f32[1] -= m_fTimeDelta;
+            m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+        }
     }
     else
-        m_bDead = true;
+    {
+        if (m_fTotalTime > m_fTime)
+        {
+            m_pTransformCom->Turn(m_vRotationAxis, m_fTimeDelta * 8.f);
+
+            //m_fY = m_fY * cos(m_fTime * XM_PI / (m_fTotalTime * 2.f)) * fTimeDelta
+            m_fY -= m_fTime * GRAVITY * 0.3f;
+
+            _float4 vDir = _float4(m_fX * m_fTimeDelta, m_fY * m_fTimeDelta, m_fZ * m_fTimeDelta, 0);
+            m_pTransformCom->Move(vDir);
+
+            _float fScale = m_fScale - (m_fTime / m_fTotalTime) * 0.5f * m_fScale;
+            m_pTransformCom->Set_Scaled(fScale, fScale, fScale);
+        }
+        else
+            m_bDead = true;
+    }
 
     return OBJ_NOEVENT;
 }

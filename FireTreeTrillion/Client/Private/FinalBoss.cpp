@@ -84,19 +84,22 @@ HRESULT CFinalBoss::Initialize(void* pArg)
 			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_ParticleDebris"), TEXT("Prototype_GameObject_Debris"), &tDesc);
 			CHECK_FAILED(hr);
 
-			list<CGameObject*>* pList = m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_ParticleDebris"));
 
-			if (nullptr != pList)
-			{
-				auto iter = pList->end();
-				--iter;
-
-				CDebris* pDebris = dynamic_cast<CDebris*>((*iter));
-				m_vecDebris.emplace_back(pDebris);
-				Safe_AddRef(pDebris);
-			}
+			CDebris* pDebris = dynamic_cast<CDebris*>(m_pGameInstance->Get_LastGameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_ParticleDebris")));
+			m_vecDebris.push_back(pDebris);
+			Safe_AddRef(pDebris);
 		}
 	}
+
+	HRESULT hr;
+	GAMEOBJECT_DESC tDesc{};
+	tDesc.wstrModelName = TEXT("TunnelRock") + to_wstring(17);
+	hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_ParticleDebris"), TEXT("Prototype_GameObject_Debris"), &tDesc);
+	CHECK_FAILED(hr);
+
+	CDebris* pMagneticDebris = dynamic_cast<CDebris*>(m_pGameInstance->Get_LastGameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_ParticleDebris")));
+	m_vecMagneticDebris.push_back(pMagneticDebris);
+	Safe_AddRef(pMagneticDebris);
 
 	return S_OK;
 }
@@ -157,6 +160,7 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 		//{
 			//m_fGullyTime = 0.f;
 
+		// 쟁기질
 		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 0.8f;
 		vPos.m128_f32[1] = 0.f;
 		m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f);
@@ -180,6 +184,7 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 			m_iDebrisCnt = 0;
 		}
 
+		// 파티클 살리기
 		for (m_iDebrisCnt; m_iDebrisCnt < m_iDebrsiMaxCnt; ++m_iDebrisCnt)
 			m_vecDebris[m_iDebrisCnt]->Set_ParticleDebris(vPos);
 
@@ -194,9 +199,9 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 	if (true == m_bEffect)
 	{
 		m_bEffect = false;
-
-		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
-		m_vecGully[m_iGullyCnt]->Set_Effect(vPos, 6.f, 0.5f);
+		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
+		vPos.m128_f32[1] -= 0.5f;
+		m_vecMagneticDebris[0]->Set_ParticleEffect(XMVectorSetW(vPos, 1.f), 2.5f);
 	}
 
 	__super::Tick(m_fTimeDelta);
@@ -608,4 +613,8 @@ void CFinalBoss::Free()
 	for (auto iter : m_vecDebris)
 		Safe_Release(iter);
 	m_vecDebris.clear();
+
+	for (auto iter : m_vecMagneticDebris)
+		Safe_Release(iter);
+	m_vecMagneticDebris.clear();
 }

@@ -144,7 +144,6 @@ void CFinaleRoad::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObjec
 {
 
 }
-#endif
 
 HRESULT CFinaleRoad::Add_Components(wstring _strModelTag, _bool _bIsAnimModel)
 {

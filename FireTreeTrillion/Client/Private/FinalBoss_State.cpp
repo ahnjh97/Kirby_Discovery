@@ -122,9 +122,9 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			//{
 			//	++m_iCnt;
 				// Stab 패턴
-				//m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
-				//pFinalBoss->Set_Direction(m_vLook);
-				//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
+				m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
+				pFinalBoss->Set_Direction(m_vLook);
+				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
 			//}
 			//else if (m_iCnt == 4)
 			//{
@@ -163,8 +163,8 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			//}
 			//	else if (rand() % 4 == 1)
 			//	{
-					// Slash 패턴
-					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHREADY, 50.f, false, true);
+					//// Slash 패턴
+					//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHREADY, 50.f, false, true);
 			//	}
 			//	else if (rand() % 4 == 2)
 			//	{

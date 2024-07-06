@@ -23,7 +23,8 @@ private:
 	virtual ~CDebris() = default;
 
 public:
-	void Set_ParticleDebris(_fvector vPosition);
+	void Set_ParticleDebris(_fvector vPosition, _float fScale = 1.f, _float2 fRandY = _float2(10.f, 20.f), _float2 fRandXZ = _float2(5.f, 10.f));
+	void Set_ParticleEffect(_fvector vPosition, _float fScale);
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -39,12 +40,18 @@ private:
 	//_bool m_bDirectionDetermined = { false };
 
 	_float m_fSamplingFactor = { 1.f };
-	_float m_fZero = {};
+	_float m_fZero = { 0.f };
+	_float m_fScale = { 0.f };
+	_float m_fTimeDelta = { 0.f };
 
 	_vector m_vRotationAxis = {};
-	_float m_fTotalTime = {};
-	_float m_fTime = {};
+
+	_float m_fTotalTime = { 0.f };
+	_float m_fTime = { 0.f };
 	_float m_fX{}, m_fY{}, m_fZ{};
+
+	_bool m_bSwap = { false };
+	_bool m_bDrain = { false };
 
 private:
 	HRESULT Add_Components(const wstring& _wstrModelTag);
