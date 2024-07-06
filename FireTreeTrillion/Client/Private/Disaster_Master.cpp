@@ -45,10 +45,6 @@ _int CDisaster_Master::Tick(_float fTimeDelta)
 	// 헛방 바움을 생성한다.
 	Make_MissBaum();
 
-	// 캐릭터가 트리거를 밟으면 리얼 지형에 충돌하는 미친 바움을 생성한다.
-	//Make_OnTerrainBaum();
-
-
 	return OBJ_NOEVENT;
 }
 
@@ -83,40 +79,22 @@ void CDisaster_Master::Make_MissBaum()
 		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Baum"), TEXT("Prototype_GameObject_Baum"), &baumdesc)))
 			return;
 		m_fMakeBaumDelay = 0.f;
-
-		//_float4 vKirbyPos = m_pKirby->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
-		//_float fKirbySpeed = m_pKirby->Get_KirbyInfo()->m_fMoveSpeed;
-		//_float4 vNewMyPos = _float4(vKirbyPos.x + 40.f, vKirbyPos.y + 40.f, vKirbyPos.z, 1.f);
-
-		//// 임시
-		//_float fXOffSet = { 20.f };
-
-		//CBaum::BAUMDESC baumdesc = {};
-		//baumdesc.vBaumMoveDir = vKirbyPos - vNewMyPos;
-		//baumdesc.fBaumSpeed = 0.5f;
-		//vNewMyPos.x += (fKirbySpeed * 2.f) + fXOffSet;
-		//baumdesc.vPos = vNewMyPos;
-		//if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Baum"), TEXT("Prototype_GameObject_Baum"), &baumdesc)))
-		//	return;
-
-		//m_fMakeBaumDelay = 0.f;
 	}
-
-
 }
 
-void CDisaster_Master::Make_OnTerrainBaum()
-{
 
-	_float4 vKirbyPos = m_pKirby->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
+// 1초 후에 정확히 그 위치에 떨어지는 운석을 만든다.
+void CDisaster_Master::Make_OnTerrainBaum(_float4 _vTargetPos, _bool _bBaum)
+{
+	_float4 vTargetPos = _vTargetPos;
 	_float fKirbySpeed = m_pKirby->Get_KirbyInfo()->m_fMoveSpeed;
-	_float4 vNewMyPos = _float4(vKirbyPos.x + 40.f, vKirbyPos.y + 40.f, vKirbyPos.z, 1.f);
+	_float4 vNewMyPos = _float4(vTargetPos.x + 100.f, vTargetPos.y + 60.f, vTargetPos.z, 1.f);
 
 	CBaum::BAUMDESC baumdesc = {};
-	baumdesc.vBaumMoveDir = vKirbyPos - vNewMyPos;
-	baumdesc.fBaumSpeed = 0.5f;
-	vNewMyPos.x += (fKirbySpeed * 2.f);
+	baumdesc.vBaumMoveDir = vTargetPos - vNewMyPos;
+	baumdesc.fBaumSpeed = 1.f;
 	baumdesc.vPos = vNewMyPos;
+	baumdesc.wstrModelName = _bBaum == true ? TEXT("Baum") : TEXT("StarPiece");
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Baum"), TEXT("Prototype_GameObject_Baum"), &baumdesc)))
 		return;
 }
