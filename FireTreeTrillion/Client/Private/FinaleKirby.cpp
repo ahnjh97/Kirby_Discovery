@@ -52,6 +52,10 @@ HRESULT CFinaleKirby::Initialize(void* pArg)
 
     m_pControllerCom->RegisterAsPlayer();
 
+    // 마지막 스테이지에서 운석을 지속적으로 날려주는 기능을 가진 클래스를 생성한다.
+    if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Disaster_Master"), TEXT("Prototype_GameObject_Disaster_Master"), this)))
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -217,7 +221,7 @@ _float CFinaleKirby::Get_AnimTrackPosition()
 void CFinaleKirby::Bone_Rotation(_float fTimeDelta)
 {
     // 자동차일때,
-    if (INFO(m_eBodyState) == BODY_DUMPDEFAULT)
+    if (INFO(m_eBodyState) == BODY_DUMPDEFAULT && Get_State() != DUMPTSTATE_CUT)
     {
         _float fTurnAngle = -INFO(m_fMoveSpeed) * 100.f;
 
@@ -232,35 +236,19 @@ void CFinaleKirby::Bone_Rotation(_float fTimeDelta)
 
 
 
-        //pBone = m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("C_FrontBodyJ");
-        //BoneMatrix = pBone->Get_EditMatrixPtr();
+        pBone = m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("C_FrontBodyJ");
+        BoneMatrix = pBone->Get_EditMatrixPtr();
+        _float fHandleAngle = ToDegree(acos(_float4(1.f, 0.f, 0.f, 0.f).Dot(INFO(m_vHandleDir))));
 
-        //_float fHandleAngle = ToDegree(acos(_float4(1.f, 0.f,0.f,0.f).Dot(INFO(m_vHandleDir))));
-        //if (INFO(m_vTargetDir) != INFO(m_vMoveDir))
-        //{
-        //    // 좌회전
-        //    if (XMVector3Cross(INFO(m_vTargetDir), INFO(m_vMoveDir)).m128_f32[1] > 0.f)
-        //    {
-        //        fHandleAngle *= -1.f;
-        //    }
-        //}
+        // 좌회전을 한다.
+        if (XMVector3Cross(_float4(1.f, 0.f, 0.f, 0.f), INFO(m_vHandleDir)).m128_f32[1] < 0.f)
+        {
+            fHandleAngle *= -1.f;
+        }
 
-        //_float fHandleSubAngle = ToDegree(acos(INFO(m_vMoveDir).Dot(INFO(m_vHandleDir))));
-        //if (INFO(m_vMoveDir) != INFO(m_vHandleDir))
-        //{
-        //    // 우측으로 가려했다.
-        //    if (XMVector3Cross(INFO(m_vHandleDir), INFO(m_vMoveDir)).m128_f32[1] > 0.f)
-        //    {
-        //        fHandleSubAngle *= -1.f;
-        //    }
-        //}
-
-        //fHandleAngle += fHandleSubAngle;
-
-        //_float4x4 RotationMatrix = _float4x4::Identity;
-        //CUtils::Turn_OtherMatrix(RotationMatrix, _float4(0.f, 1.f, 0.f, 0.f), 1.f, fHandleAngle);
-        //*BoneMatrix = RotationMatrix;
-
+        _float4x4 RotationMatrix = _float4x4::Identity;
+        CUtils::Turn_OtherMatrix(RotationMatrix, _float4(0.f, 1.f, 0.f, 0.f), 1.f, fHandleAngle);
+        *BoneMatrix = RotationMatrix;
     }
 }
 
@@ -484,13 +472,13 @@ HRESULT CFinaleKirby::Add_Components()
     m_ppModelForAnimTool = &m_pModelCom[BODY_DEFAULT];
     m_uModelCnt = BODY_END;
 
-    CHitBox::HITBOX_DESC HitBox{};
-    HitBox.pOwner = this;
-    HitBox.pDesc = &m_tColliderDesc[BODY];
-    HitBox.pCollisionType = PLAYER;
-    if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
-        return E_FAIL;
-    Set_BodyCollider(COLLIDER_SPHERE, 1.f, 0.f, 2.f);
+    //CHitBox::HITBOX_DESC HitBox{};
+    //HitBox.pOwner = this;
+    //HitBox.pDesc = &m_tColliderDesc[BODY];
+    //HitBox.pCollisionType = PLAYER;
+    //if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
+    //    return E_FAIL;
+    //Set_BodyCollider(COLLIDER_SPHERE, 1.f, 0.f, 2.f);
 
     /* FSM */
     SetUp_FSM();

@@ -84,6 +84,9 @@ HRESULT CDump::Render()
 
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
+		if (i == 1   )
+			continue;
+
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
@@ -120,10 +123,11 @@ HRESULT CDump::Render_LightDepth()
 	return S_OK;
 }
 
+#ifdef _DEBUG
 void CDump::Render_IMGUI()
 {
 }
-
+#endif
 void CDump::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
 

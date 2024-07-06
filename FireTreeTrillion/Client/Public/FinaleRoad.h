@@ -12,10 +12,13 @@ BEGIN(Client)
 class CFinaleRoad final : public CPhysXObject
 {
 public:
+	enum MOVECMD { MOVECMD_STOP, MOVECMD_ROTATE, MOVECMD_END};
 	struct ROAD_DESC : public GAMEOBJECT_DESC
 	{
+		MOVECMD eMoveCommand = { MOVECMD_STOP };
 		//wstring strModelTag = { L"NONE" };
 		_bool	bIsAnimModel = { false };
+
 	};
 
 private:

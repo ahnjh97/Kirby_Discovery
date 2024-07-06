@@ -22,6 +22,7 @@ public:
 	virtual void OnStateExit()														override;
 
 	enum class PARTTIME_ITEM Get_CurrentFood(_float4 vPos);
+	void RenderOff_Food(_uint uFoodIdx);
 
 public:
 	static	CPartTimerKirby_Idle_State* Create();
@@ -70,6 +71,7 @@ public:
 	// 상태 진입되어 있는 상태에서 매 tick마다 호출
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
 	virtual void OnStateExit()														override;
+	void RenderOn_AllFood();
 
 	enum class PARTTIME_ITEM Get_CurrentFood(_float4 vPos);
 

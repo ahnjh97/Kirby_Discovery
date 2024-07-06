@@ -42,6 +42,8 @@ private:
 	_float	m_fSpikeTime = { 0.f };
 	_float	m_fLifeTime = { 0.f };
 
+	_bool	m_bItem = { 0.f };
+
 	_vector	m_vPosition = {};
 
 private:

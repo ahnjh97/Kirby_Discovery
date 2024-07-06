@@ -514,6 +514,15 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\FinaleKirby\State\KirbyDump_State">
       <UniqueIdentifier>{8ce43134-70bd-4e9a-84fa-af301762dfac}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\Baum">
+      <UniqueIdentifier>{05ab6fbc-cc3d-448f-972e-09c450a5189e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Baum\Baum">
+      <UniqueIdentifier>{5630ddae-8009-42c2-a91c-ccf211e93562}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Baum\BaumPiece">
+      <UniqueIdentifier>{4a53b512-3057-4457-a0d7-74a2c49bb988}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -1033,6 +1042,15 @@
     <ClInclude Include="..\Public\Dump.h">
       <Filter>02.GameObjects\Map\Dump</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Baum.h">
+      <Filter>02.GameObjects\Map\Baum\Baum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BaumPiece.h">
+      <Filter>02.GameObjects\Map\Baum\BaumPiece</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Disaster_Master.h">
+      <Filter>02.GameObjects\Map\Baum</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1532,6 +1550,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\FinaleKirby.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\FinaleKirby</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Baum.cpp">
+      <Filter>02.GameObjects\Map\Baum\Baum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BaumPiece.cpp">
+      <Filter>02.GameObjects\Map\Baum\BaumPiece</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Disaster_Master.cpp">
+      <Filter>02.GameObjects\Map\Baum</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

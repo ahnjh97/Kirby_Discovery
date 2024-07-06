@@ -37,7 +37,7 @@ private:
 	void						Update_UIState(_float _fTimeDelta);
 	void						Play_Animation(_float _fAccTime, KIRBYHP_STATE _eCurState);
 
-	void						Compute_Player_Hp(_float fTimeDelta, class CKirby* pKirby);
+	void						Compute_Player_Hp(_float fTimeDelta, _float _fKirbyHpMax, _float _fKirbyHp);
 	void						Disappear_HpBar(_float fTimeDelta);
 
 private:

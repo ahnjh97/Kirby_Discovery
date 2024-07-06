@@ -54,7 +54,7 @@ _int CFinaleRoad::Tick(_float fTimeDelta)
 
 	__super::Tick(m_fTimeDelta);
 
-	m_pTransformCom->Turn( {0.f, 1.f, 0.f, 0.f} , m_fTimeDelta * .01f);
+	//m_pTransformCom->Turn( {0.f, 1.f, 0.f, 0.f} , m_fTimeDelta * .01f);
 
 	Compute_MotionBlur();
 

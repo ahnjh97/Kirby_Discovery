@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "HUD_StarPoint.h"
 #include "Kirby.h"
+#include "FinaleKirby.h"
 
 CHUD_StarPoint::CHUD_StarPoint(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext)
 	: CHUD{ _pDevice, _pContext }
@@ -388,12 +389,22 @@ HRESULT CHUD_StarPoint::Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom)
 
 void CHUD_StarPoint::Compute_Coin(_float _fTimeDelta)
 {
-	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+	if (*m_pCurrentLevelID != LEVEL_FINALE)
+	{
+		CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+		if (pKirby == nullptr)
+			return;
 
-	if (pKirby == nullptr)
-		return;
+		m_iCurCoin = pKirby->Get_Coin();
+	}
+	else if (*m_pCurrentLevelID == LEVEL_FINALE)
+	{
+		CFinaleKirby* pKirby = static_cast<CFinaleKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+		if (pKirby == nullptr)
+			return;
 
-	m_iCurCoin = pKirby->Get_Coin();
+		m_iCurCoin = pKirby->Get_Coin();
+	}
 
 	if (m_bInitializeCoin == true)
 	{
