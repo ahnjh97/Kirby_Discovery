@@ -161,6 +161,43 @@ HRESULT CBasicMap::Render()
        /* for (auto& blendDeco : m_vecBlendObjects)
             blendDeco->Late_Tick(m_pGameInstance->Get_FirstTimer());*/
     }
+    else if (LEVEL_PARK == *m_pCurrentLevelID)
+    {
+        _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
+
+        for (size_t i = 0; i < iNumMeshes; i++)
+        {
+            if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
+                return E_FAIL;
+            if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
+                return E_FAIL;
+            if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
+                return E_FAIL;
+            if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_EmissiveTexture", i, TextureType_EMISSIVE)))
+                return E_FAIL;
+
+            if (FAILED(m_pShaderCom->Bind_RawValue("g_fSamplingFactor", &m_vecSamplingFactors[i], sizeof(_float))))
+                return E_FAIL;
+
+            if (i == m_iMeshIndex) {
+                if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fTime, sizeof(_float))))
+                    return E_FAIL;
+            }
+            else {
+                if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fNonMatchTime, sizeof(_float))))
+                    return E_FAIL;
+            }
+
+            if (FAILED(m_pShaderCom->Begin(m_vecPassIndices[i])))
+                return E_FAIL;
+
+            if (FAILED(m_pModelCom->Render(i)))
+                return E_FAIL;
+        }
+
+        if (false == m_bBlendMap && LEVEL_TOOL_MAP != *m_pCurrentLevelID)
+            Render_NonOctreeMapDecos();
+    }
     else
     {
         _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
@@ -211,31 +248,34 @@ void CBasicMap::Render_IMGUI()
 
 HRESULT CBasicMap::Add_Components(const wstring& _wstrModelTag)
 {
+    HRESULT hr(S_OK);
+
     /* For.Com_Shader */
-    if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel_Map"),
-        TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
-        return E_FAIL;
+    hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel_Map"),
+                                TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
+    CHECK_FAILED(hr);
 
     /* For.Com_Model */
-    if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Model_") + _wstrModelTag,
-        TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
-        return E_FAIL;
+    hr = __super::Add_Component(TEXT("Prototype_Component_Model_") + _wstrModelTag,
+                                TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+    CHECK_FAILED(hr);
 
     if (*m_pCurrentLevelID != LEVEL_TOOL_MAP)
     {
         /* For.Com_Shader */
-        if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"),
-            TEXT("Com_Shader_NonAnim"), (CComponent**)&m_pNonAnimShaderCom)))
-            return E_FAIL;
+        hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"),
+                                    TEXT("Com_Shader_NonAnim"), (CComponent**)&m_pNonAnimShaderCom);
+        CHECK_FAILED(hr);
 
         /* For.Com_Shader */
-        if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimModel"),
-            TEXT("Com_Shader_Anim"), (CComponent**)&m_pAnimShaderCom)))
-            return E_FAIL;
+        hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimModel"),
+                                    TEXT("Com_Shader_Anim"), (CComponent**)&m_pAnimShaderCom);
+        CHECK_FAILED(hr);
+
 
         /* For.Com_Texture */
-        HRESULT hr = __super::Add_Component(TEXT("Prototype_Component_Texture_FX_Mask_Bubble2"),
-            TEXT("Com_Texture"), (CComponent**)&m_pTextureCom);
+        hr = __super::Add_Component(TEXT("Prototype_Component_Texture_FX_Mask_Bubble2"),
+                                    TEXT("Com_Texture"), (CComponent**)&m_pTextureCom);
         CHECK_FAILED(hr);
     }
 
@@ -317,7 +357,7 @@ void CBasicMap::SetUpShaderInfo(const wstring& _wstrModelTag)
             return;
         }
             
-        m_vecPassIndices[i] = iPassIndex;
+        m_vecPassIndices[i] = 8;//iPassIndex;
         m_vecSamplingFactors[i] = fSamplingFactor;
     }
 

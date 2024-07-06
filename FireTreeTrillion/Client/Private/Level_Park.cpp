@@ -157,20 +157,20 @@ HRESULT CLevel_Park::Ready_Layer_Camera(const wstring& strLayerTag)
 
 HRESULT CLevel_Park::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
-	CSkySphere::SKYSPHERE_DESC LabSkyDesc{};
-	LabSkyDesc.strModelTag = { "SkySphere_Stage1_Day" };
-	LabSkyDesc.strTextureTag = { "SkySphere_Lab_Diffuse" };
-	HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_SkySphere"), &LabSkyDesc);
-	CHECK_FAILED(hr);
+	//CSkySphere::SKYSPHERE_DESC LabSkyDesc{};
+	//LabSkyDesc.strModelTag = { "SkySphere_Stage1_Day" };
+	//LabSkyDesc.strTextureTag = { "SkySphere_Lab_Diffuse" };
+	//HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_SkySphere"), &LabSkyDesc);
+	//CHECK_FAILED(hr);
 
-	//SUB_SKYSPHERE
-	CSkySphere::SKYSPHERE_DESC LabSkySubDesc{};
-	_float4x4 InitMat = _float4x4::Identity;
-	InitMat.Translation({ 0.f, -50.f, -0.f });
-	LabSkySubDesc.matWorld = InitMat;
+	////SUB_SKYSPHERE
+	//CSkySphere::SKYSPHERE_DESC LabSkySubDesc{};
+	//_float4x4 InitMat = _float4x4::Identity;
+	//InitMat.Translation({ 0.f, -50.f, -0.f });
+	//LabSkySubDesc.matWorld = InitMat;
 
-	hr = m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_SkySphereSub"), &LabSkySubDesc);
-	CHECK_FAILED(hr);
+	//hr = m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_SkySphereSub"), &LabSkySubDesc);
+	//CHECK_FAILED(hr);
 
 	return S_OK;
 }
@@ -313,7 +313,7 @@ HRESULT CLevel_Park::Ready_Triggers()
 				if ("NonAnim" == strModelName.substr(0, 7))
 					tempDesc.wstrModelName.erase(0, 8);
 			}
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Player"), TEXT("Prototype_GameObject_ParkKirby"), &tempDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby"), &tempDesc)))
 				return E_FAIL;
 		}
 		else if ("Ladder" == strModelName)
@@ -345,7 +345,7 @@ HRESULT CLevel_Park::Ready_Triggers()
 		for (auto& pair : camMatrices)
 			pCamera->EmplaceBackCamMatrix(pair.second);
 
-		pCamera->Set_MatrixIndex(0);
+	 	pCamera->Set_MatrixIndex(0);
 	}
 
 	for (auto& pair : frontDirRadii)

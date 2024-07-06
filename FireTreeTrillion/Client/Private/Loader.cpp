@@ -925,7 +925,7 @@ HRESULT CLoader::Loading_For_Park()
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Terrain_Fog", "Map/Fog/Sand_%d.png", 4)))
 		return E_FAIL;
-
+	
 	hr = Add_Texture(eLevel, "FX_Mask_Bubble2", "Effects/Mask/noise_bubble_%d.png", 4);	CHECK_FAILED(hr);
 
 	//HUD_BOSSHPBAR
@@ -1783,6 +1783,24 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("FoodBurger", TYPE_NONANIM, 0.6f);
 		m_vecModelInfo.emplace_back("FoodCake", TYPE_NONANIM, 0.6f);
 		m_vecModelInfo.emplace_back("FoodTomato", TYPE_NONANIM, 1.6f);
+	}
+	else if (eLevel == LEVEL_PARK)
+	{
+		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("BG1", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+
+		// For Map
+		m_vecModelInfo.emplace_back("PkFunHouse", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+
+		// For Kirby Body
+		Load_KirbyBodyModels();
+		// For Kirby Weapon
+		Load_KirbyWeaponModels();
+		// For Kirby Armour
+		Load_KirbyArmourModels();
+
+		// Deform
+		m_vecModelInfo.emplace_back("DumpCar", TYPE_ANIM, 0.8f, 90.f);
 	}
 	else if (eLevel == LEVEL_SIMBA)
 	{
