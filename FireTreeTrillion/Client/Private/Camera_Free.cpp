@@ -163,7 +163,7 @@ void CCamera_Free::LerpByTriggerInfo(_int iTriggerIndex)
 	if (0 > m_fTriggerRatio || 1 < m_fTriggerRatio)
 		return;
 
-	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0));
+	CGameObject* pKirby = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0);
 	if (nullptr == pKirby)
 		return;
 	CTransform* pKirbyTransform = static_cast<CTransform*>(pKirby->Get_Component(g_strTransformTag));
@@ -185,7 +185,7 @@ _float CCamera_Free::Compute_TriggerPosRatio(_int iTriggerIndex)
 	if (m_vecTriggerInfo.empty())
 		return _float();
 
-	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0));
+	CGameObject* pKirby = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0);
 	CTransform* pKirbyTransform = static_cast<CTransform*>(pKirby->Get_Component(g_strTransformTag));
 	_float fZ = XMVectorGetZ(XMVector4Transform(pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION)
 		, m_vecTriggerInfo[iTriggerIndex].first));
@@ -220,7 +220,7 @@ void CCamera_Free::Track_Target(_float fTimeDelta)
 
 	if (*m_pCurrentLevelID == LEVEL_GAMEPLAY)
 	{
-		_float4 vTerrainPos = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0))->Compute_TerrainPosition();
+		_float4 vTerrainPos = static_cast<CCharacter*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0))->Compute_TerrainPosition();
 		vTargetPos.y = vTerrainPos.y;
 	}
 

@@ -388,7 +388,7 @@ HRESULT CFinaleKirby::Make_TargetToCams()
         Safe_AddRef(m_pCamera);
     }
 
-    m_pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FIRST, {0.f, 4.f, 0.f});
+    m_pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FIRST, { 0.f, 5.f, 4.f }, 5.f);
     static_cast<CCamera_Main*>(m_pCamera)->Make_Sequence(CCamera_Main::SEQ_FINALESTART);
 
     //게임 레벨에 free camera 있다면 그놈에게도 타겟 등록해 준다.

@@ -19,6 +19,9 @@ public:
 		SEQ_PARTTIMESTART,
 		SEQ_FINALESTART,
 		SEQ_LUNCHTIME,
+
+		//단독으로 하나를 즉시 넣어 사용하는 시퀀스
+		SEQ_ONE,
 		SEQ_END
 	};
 
@@ -90,6 +93,8 @@ public:
 	//FOV를 세팅한다.
 	void Set_FOVY(_float fFOVYDegree) { m_fDestFovy = XMConvertToRadians(fFOVYDegree); }
 
+	void Set_ZAngle(_float fZAngle) { m_fDestZAngle = fZAngle; }
+
 	//줌 수치를 설정한다.
 	void Zoom(_float fZoom)	{ m_fCurZoomOffset = fZoom; }
 
@@ -99,10 +104,12 @@ public:
 	//카메라 쉐이크 주기
 	void Make_Shake(_float fPower = 1.f, _float fTime = .5f, _float2 vDir = _float2(0.f, -1.f));
 
+	//void Make_Sequence_FromAngle(EASING eEaseFlag, _float fDuration, _float3 fDestAngle, _float fDestZoom = -1.f);
+	//void Make_Sequence_FromDir(EASING eEaseFlag, _float fDuration, _float3 fDestDir, _float fDestZoom = -1.f);
+	//void Make_Sequence_FromQuat(EASING eEaseFlag, _float fDuration, _vector vDestQuat, _float fDestZoom = -1.f);
+
 	//카메라에게 동작을 수행시킨다.
-	void Make_Sequence_FromAngle(EASING eEaseFlag, _float fDuration, _float3 fDestAngle, _float fDestZoom = -1.f);
-	void Make_Sequence_FromDir(EASING eEaseFlag, _float fDuration, _float3 fDestDir, _float fDestZoom = -1.f);
-	void Make_Sequence_FromQuat(EASING eEaseFlag, _float fDuration, _vector vDestQuat, _float fDestZoom = -1.f);
+	void Make_One_Sequence(CAMACTION newAction);
 
 	//카메라의 이벤트 함수들
 	void Ready_Cam_DeeDeeDee(CGameObject* pNotifier);
@@ -179,7 +186,7 @@ private:
 
 	_float			m_fDestUpOffset = { 0.f };
 	_float			m_fCurUpOffset = { 0.f };
-	vector<_float>	m_CamTriggerUpOffsets = { 0.f, 0.f, 0.f, .15f, .15f, 0.f, 0.f, 0.f };
+	vector<vector<_float>>	m_CamTriggerUpOffsets;
 
 /*타겟 트래킹*/
 
@@ -219,6 +226,11 @@ private:
 	//시작 dir과 목표 dir. 시퀀스 용과 상시 보간 용 둘 다 사용된다.
 	_float3 m_vDestCamDir = { 0.f, 0.f, 0.f };
 	_float3 m_vStartCamDir = { 0.f, 0.f, 0.f };
+
+
+/*Z 앵글*/
+	//이전 프레임의 z 값을 저장.
+	_float m_fPreZAngle = { 0.f};
 
 	_float m_fCurZAngle = { 0.f };
 	_float m_fStartZAngle = { 0.f };
@@ -272,6 +284,7 @@ private:
 
 private:
 	void Reset_DeferredCamSet();
+	void Set_DeferredCamSet(_float fTimeDelta);
 
 	void Play_Sequence(_float fTimeDelta);
 	void Control(_float fTimeDelta);
