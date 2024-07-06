@@ -93,8 +93,6 @@
 #include "DeeDeeDee.h"
 #include "DeeDeeDeeHammer.h"
 
-// 피날레
-#include "FinaleRoad.h"
 
 //와들디
 #include "Dee_Part.h"
@@ -130,6 +128,8 @@
 #include "Baum.h"
 #include "BaumPiece.h"
 #include "Disaster_Master.h"
+#include "FinaleRoad.h"
+#include "FinaleRoadGrouper.h"
 
 //기믹
 #include "Gm_LabAntenna.h"
@@ -382,10 +382,11 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gully"), CGully);
 
 	// Finale
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleRoad"), CFinaleRoad);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Baum"), CBaum);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BaumPiece"), CBaumPiece);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Disaster_Master"), CDisaster_Master);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleRoad"), CFinaleRoad);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleRoadGrouper"), CFinaleRoadGrouper);
 
 	//Dee
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeePart"), CDee_Part);

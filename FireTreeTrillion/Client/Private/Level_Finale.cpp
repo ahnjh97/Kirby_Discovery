@@ -185,12 +185,29 @@ HRESULT CLevel_Finale::Ready_FinaleRoad()
 
 #pragma region Ã³À½ ºôµùµé
 
+	CFinaleRoadGrouper::ROADGROUPER_DESC roadGrouperDesc{};
+	//roadGrouperDesc.eRoadType = CFinaleRoadGrouper::RTYPE_BUILDINGA;
+	//roadGrouperDesc.eMoveCommand = CFinaleRoadGrouper::MOVECMD_COLLIDE;
+
+	//_float4x4 InitMat = _float4x4::Identity;
+	//InitMat.Translation({ 139.f, -26.f, 4.8f });
+	//CUtils::Rotation(InitMat, CUtils::Make_Quat_FromDir({ .98f, .21f, .07f }));
+	//roadGrouperDesc.matWorld = InitMat;
+
+	//roadGrouperDesc.vDestPos = { 139.f, -42.f, 4.8f };
+	//roadGrouperDesc.vDestDir = { 1.f, -.04f, .07f };
+
+	//if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleRoadGrouper"),
+	//	TEXT("Prototype_GameObject_FinaleRoadGrouper"), &roadGrouperDesc)))
+	//	return E_FAIL;
+
+	/*
 	CFinaleRoad::ROAD_DESC roadDesc{};
 	roadDesc.wstrModelName = TEXT("MovableBuildingA");
 
-	_float4x4 InitMat = _float4x4::Identity;
+	InitMat = _float4x4::Identity;
 	InitMat.Translation({ 139.f, -26.f, 4.8f });
-	Quaternion vQuat = CUtils::Make_Quat_FromDir({ .98f, .21f, .07f });
+	vQuat = CUtils::Make_Quat_FromDir({ .98f, .21f, .07f });
 	CUtils::Rotation(InitMat, vQuat);
 	roadDesc.matWorld = InitMat;
 
@@ -221,6 +238,24 @@ HRESULT CLevel_Finale::Ready_FinaleRoad()
 	roadDesc.matWorld = InitMat;
 
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleRoad"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
+		return E_FAIL;
+		*/
+
+
+	roadGrouperDesc = {};
+	roadGrouperDesc.eRoadType = CFinaleRoadGrouper::RTYPE_ROADA;
+	roadGrouperDesc.eMoveCommand = CFinaleRoadGrouper::MOVECMD_COLLIDE;
+
+	_float4x4 InitMat = _float4x4::Identity;
+	InitMat.Translation({ 139.f, -26.f, 4.8f });
+	CUtils::Rotation(InitMat, CUtils::Make_Quat_FromDir({ .98f, .21f, .07f }));
+	roadGrouperDesc.matWorld = InitMat;
+
+	roadGrouperDesc.vDestPos = { 139.f, -42.f, 4.8f };
+	roadGrouperDesc.vDestDir = { 1.f, -.04f, .07f };
+
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleRoadGrouper"),
+		TEXT("Prototype_GameObject_FinaleRoadGrouper"), &roadGrouperDesc)))
 		return E_FAIL;
 
 #pragma endregion

@@ -12,10 +12,28 @@ CFinaleRoad::CFinaleRoad(const CFinaleRoad& rhs)
 {
 }
 
-
-void CFinaleRoad::Make_CollisionEvent(/*CFinaleRoadGrouper::MOVECMD eMove*/)
+void CFinaleRoad::Make_CollisionEvent()
 {
+	switch (m_eCollideType)
+	{
+	case CTYPE_NONE:
+	{
 
+	}
+	break;
+	case CTYPE_DOWN:
+	{
+
+	}
+	break;
+	case CTYPE_BREAK:
+	{
+
+	}
+	break;
+	default:
+		break;
+	}
 }
 
 HRESULT CFinaleRoad::Initialize_Prototype()
@@ -41,14 +59,20 @@ HRESULT CFinaleRoad::Initialize(void* pArg)
 	hr = Add_Components(RoadDesc.wstrModelName, RoadDesc.bIsAnimModel);
 	CHECK_FAILED(hr);
 
+
 	m_bMotionBlur = false;
 	m_bStencil = true;
 	m_bRimLight = false;
 
+	m_wstrModelName = RoadDesc.wstrModelName;
+	m_pSocketMatrix = RoadDesc.pSocketMat;
+	m_bIsAnimModel = RoadDesc.bIsAnimModel;
 
 	m_pDynamicActor = m_pModelCom->ReturnDynamicActor(m_pTransformCom->Get_WorldMatrix());
 	m_pDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
 
+	if(m_bIsAnimModel)
+		m_pModelCom->Set_Animation(0, 60.f, true, false);
 
 	return S_OK;
 }
@@ -60,8 +84,9 @@ _int CFinaleRoad::Tick(_float fTimeDelta)
 	__super::Tick(m_fTimeDelta);
 
 	//m_pTransformCom->Turn( {0.f, 1.f, 0.f, 0.f} , m_fTimeDelta * .01f);
+	
+	m_WorldMatrix = m_pTransformCom->Get_WorldMatrix() * *m_pSocketMatrix;
 
-	Compute_MotionBlur();
 
 	return _int();
 }
@@ -72,16 +97,13 @@ void CFinaleRoad::Late_Tick(_float fTimeDelta)
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
-	//if (nullptr != m_pDynamicActor)
-	//{
-	//	m_pTransformCom->Set_WorldMatrix(m_pGameInstance->GetActorAverageMatrix(m_pDynamicActor));
-	//}
+	if(m_bIsAnimModel)
+		m_pModelCom->Play_Animation(m_fTimeDelta);
 
 	m_pDynamicActor->setKinematicTarget(CUtils::TransformToPxTransform(m_pTransformCom));
-	//m_pDynamicActor->setGlobalPose(CUtils::TransformToPxTransform(m_pTransformCom));
 
 	//시야 벗어나면 컬링
-	if (m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State(CTransform::STATE_POSITION), 100.0f))
+	if (m_pGameInstance->isInFrustum_WorldSpace(CUtils::Get_State_Vector_Matrix(m_WorldMatrix, CUtils::STATE_POSITION), 100.0f))
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
@@ -92,12 +114,20 @@ void CFinaleRoad::Late_Tick(_float fTimeDelta)
 HRESULT CFinaleRoad::Render()
 {
 	HRESULT hr;
+
 	hr = Bind_ShaderResources(); CHECK_FAILED(hr);
 
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
+		//애니메이션 도로들
+		if (m_wstrModelName == TEXT("RoadBreak") || m_wstrModelName == TEXT("RoadLBreak") || m_wstrModelName == TEXT("RoadLongBreak"))
+		{
+			if (i == 1)
+				continue;
+		}
+
 		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE); CHECK_FAILED(hr);
 		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS); CHECK_FAILED(hr);
 		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS); CHECK_FAILED(hr);
@@ -107,7 +137,7 @@ HRESULT CFinaleRoad::Render()
 		if (m_bIsAnimModel)
 		{
 			hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i); CHECK_FAILED(hr);
-			hr = m_pShaderCom->Begin(ANIMMODEL_NORMAL_O); CHECK_FAILED(hr);
+			hr = m_pShaderCom->Begin(ANIMMODEL_NORMAL_X); CHECK_FAILED(hr);
 		}
 		else
 		{
@@ -163,9 +193,10 @@ HRESULT CFinaleRoad::Add_Components(wstring _strModelTag, _bool _bIsAnimModel)
 {
 	HRESULT hr;
 
-	hr = __super::Add_Component(LEVEL_STATIC,
-		_bIsAnimModel ? TEXT("Prototype_Component_Shader_VtxAnimModel") : TEXT("Prototype_Component_Shader_VtxModel"),
-		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
+	wstring strTag = TEXT("Prototype_Component_Shader_Vtx");
+	strTag += _bIsAnimModel ? TEXT("AnimModel") : TEXT("Model");
+
+	hr = __super::Add_Component(LEVEL_STATIC, strTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
 	hr = __super::Add_Component(TEXT("Prototype_Component_Model_") + _strModelTag,
@@ -192,7 +223,8 @@ HRESULT CFinaleRoad::Bind_ShaderResources()
 
 	HRESULT hr;
 
-	hr = m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix"); CHECK_FAILED(hr);
+	//hr = m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix"); CHECK_FAILED(hr);
+	hr = m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix);	CHECK_FAILED(hr);
 	hr = m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform(CPipeLine::D3DTS_VIEW));	CHECK_FAILED(hr);
 	hr = m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform(CPipeLine::D3DTS_PROJ));	CHECK_FAILED(hr);
 

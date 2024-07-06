@@ -24,10 +24,9 @@ public:
 
 	struct ROAD_DESC : public GAMEOBJECT_DESC
 	{
-		//MOVECMD eMoveCommand = { MOVECMD_STOP };
-		//wstring strModelTag = { L"NONE" };
-		_bool	bIsAnimModel = { false };
-		const _float4x4* pSocketMat = { nullptr };
+		COLLIDETYPE			eCollideType = { CTYPE_END };
+		_bool				bIsAnimModel = { false };
+		const _float4x4*	pSocketMat = { nullptr };
 	};
 
 private:
@@ -36,6 +35,10 @@ private:
 	virtual ~CFinaleRoad() = default;
 
 public:
+	_float4x4		Get_WorldMatrix() { return m_WorldMatrix; }
+	_float4			Get_WorldPos() { return CUtils::Get_State_Vector_Matrix(m_WorldMatrix, CUtils::STATE_POSITION); }
+
+
 	void			Make_CollisionEvent(/*CFinaleRoadGrouper::MOVECMD eMove*/);
 
 	virtual HRESULT Initialize_Prototype()						override;
@@ -57,20 +60,22 @@ private:
 	void			Make_Particles();
 
 
+	COLLIDETYPE		m_eCollideType = { CTYPE_END };
 	_bool			m_bIsAnimModel = { false };
 
-	
 	void			Compute_MotionBlur();
 	_float2			m_vPreScreenPos = { 0.f, 0.f };
 	_float4			m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
 
 	_float			m_fWhiteColorDiffuse = {};
+	wstring			m_wstrModelName = { L"NONE" };
 
-	const _float4x4* m_pSocketMatrix;
+	_float4x4			m_WorldMatrix;
+	const _float4x4*	m_pSocketMatrix;
 
-	PxRigidDynamic* m_pDynamicActor = { nullptr };
-	CModel*			m_pModelCom = { nullptr };
-	CShader*		m_pShaderCom = { nullptr };
+	PxRigidDynamic*		m_pDynamicActor = { nullptr };
+	CModel*				m_pModelCom = { nullptr };
+	CShader*			m_pShaderCom = { nullptr };
 
 public:
 	static CFinaleRoad* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
