@@ -514,6 +514,15 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\FinaleKirby\State\KirbyDump_State">
       <UniqueIdentifier>{8ce43134-70bd-4e9a-84fa-af301762dfac}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\SimbaObjects">
+      <UniqueIdentifier>{b6c6ebf1-2bc6-47c5-9ff2-5da187edc050}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\SimbaObjects\Turbine">
+      <UniqueIdentifier>{dc7a1e67-f235-4307-977e-9a6dafd3403c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\SimbaObjects\SimbaRoomGlass">
+      <UniqueIdentifier>{ff31fade-0ffa-44ae-8397-2b4bf316491a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -1033,6 +1042,12 @@
     <ClInclude Include="..\Public\Dump.h">
       <Filter>02.GameObjects\Map\Dump</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Turbine.h">
+      <Filter>02.GameObjects\Map\SimbaObjects\Turbine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SimbaRoomGlass.h">
+      <Filter>02.GameObjects\Map\SimbaObjects\SimbaRoomGlass</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1532,6 +1547,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\FinaleKirby.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\FinaleKirby</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Turbine.cpp">
+      <Filter>02.GameObjects\Map\SimbaObjects\Turbine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SimbaRoomGlass.cpp">
+      <Filter>02.GameObjects\Map\SimbaObjects\SimbaRoomGlass</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -53,6 +53,9 @@ private:
 	PxRigidStatic* m_pStaticActor = { nullptr };
 	vector<PxRigidStatic*> m_vecDecoStaticActors = { nullptr };
 
+	unordered_set<wstring> m_setOctreeMaps;
+	unordered_set<wstring> m_setNonOctreeMaps;
+
 	vector<_uint> m_vecPassIndices;
 	vector<_float> m_vecSamplingFactors;
 	CRenderer::RENDERGROUP m_eRenderGroup = { CRenderer::RENDER_NONBLEND };
@@ -95,12 +98,13 @@ private:
 	void SetUpShaderInfo(const wstring& _wstrModelTag);
 	_bool CheckIfBlendMapExists(const wstring& _wstrModelTag);
 
-	void InsertMapDecos();
+	void InsertMapDecos(); // For Octree Decos
 	PxRigidStatic* AddTriggerActorForAnimDeco(const string& _strModelName, _float4x4& _matWorld);
 	void SetUpAnimDecoInfo(const string& _strModelName, _float _fTriggerRadius, _uint iIdleIndex, _float fIdleAnimSpeed
 		, _uint iActionIndex, _float fActionAnimSpeed);
 
-	void ReadDecos_ForSmallLevels();
+	void ReadDecos_ForSmallLevels(); // For NonOctree Decos;
+
 	void Release_MapDecos();
 	HRESULT Render_NonOctreeMapDecos();
 
@@ -114,6 +118,8 @@ private:
 			, unordered_set<_uint>& _setMeshIndices, _bool& _bStaticActor);
 
 	_bool	IsShadowDeco(const string& _strModelName);
+	
+	_bool	IsOctreeMapModel(const wstring& _wstrModelName);
 		
 public:
 	static CBasicMap* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

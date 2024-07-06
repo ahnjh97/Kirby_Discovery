@@ -208,16 +208,14 @@ HRESULT CBox::Add_Components(wstring& wstrModelName)
 		return E_FAIL;
 
 	wstring wstrModeltag = TEXT("Prototype_Component_Model_") + wstrModelName;
-	hr = __super::Add_Component(wstrModeltag,
-		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+	hr = __super::Add_Component(wstrModeltag, TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
 	_uint iWstrLength = wstrModelName.length();
 	if (iWstrLength > 5)
 	{
 		wstring wstrNonAnimModelTag = TEXT("Prototype_Component_Model_") + wstrModelName.substr(0, iWstrLength - 5);
-		hr = __super::Add_Component(wstrNonAnimModelTag,
-			TEXT("Com_NonAnimModel"), (CComponent**)&m_pNonAnimModelCom);
+		hr = __super::Add_Component(wstrNonAnimModelTag, TEXT("Com_NonAnimModel"), (CComponent**)&m_pNonAnimModelCom);
 		CHECK_FAILED(hr);
 	}
 	
@@ -248,11 +246,8 @@ HRESULT CBox::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool))))
 		return E_FAIL;
-
-	_float fWhiteColor = 0.f;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &fWhiteColor, sizeof(_float))))
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
 		return E_FAIL;
-
 
 	return S_OK;
 }

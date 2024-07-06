@@ -38,10 +38,13 @@ HRESULT CBasicMap::Initialize(void* pArg)
     m_setShadowDecos = { "CmStreetLampA", "CmStreetLampD", "GsTreeA", "GsTreeB", "GsTreeC", "GsTelephonePoleB"
     , "GsTrafficSignalAL" };
 
+    // 옥트리를 생성하는 맵
+    m_setOctreeMaps = { L"Level0Stage1Step01", L"Level0Stage1Step02", L"Level1Stage1Step01" };
+
     wstring wstrModelTag = GameObjectDesc.wstrModelName;
 
-    if (wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("DeeDeeDeeMap") && wstrModelTag != TEXT("Land_LbLastBossBeforeStep") && 
-        wstrModelTag != TEXT("FinaleCave") && wstrModelTag != TEXT("TownShop")  && wstrModelTag != TEXT("LevelFinale_LbLastBuilding") && wstrModelTag.substr(wstrModelTag.length() - 5) == TEXT("Blend"))
+    // 이 객체가 BlendMap인지 아닌지 검사
+    if (wstrModelTag.length() > 5 && wstrModelTag.substr(wstrModelTag.length() - 5) == TEXT("Blend"))
     {
         m_bBlendMap = true;
         m_eRenderGroup = CRenderer::RENDER_BLEND;
@@ -56,17 +59,23 @@ HRESULT CBasicMap::Initialize(void* pArg)
 
     m_vecConstantNames = { "g_DiffuseTexture", "g_NormalTexture", "g_MRATexture", "g_fSamplingFactor"
     , "g_bStencil", "g_bRimLight", "m_fRimWidth", "g_bMotionBlur", "g_BoneMatrices" };
+
     m_vecStencilRimLightMotionBlurNames = { "g_bStencil", "g_bRimLight", "m_fRimWidth", "g_bMotionBlur" };
 
-    if (true == CheckIfBlendMapExists(GameObjectDesc.wstrModelName)) 
+    if (true == CheckIfBlendMapExists(wstrModelTag))
     {
         if (FAILED(Add_BlendMap(wstrModelTag)))
             return E_FAIL;
     }
 
-    if(wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("DeeDeeDeeMap") && wstrModelTag != TEXT("FinaleCave") &&
-       wstrModelTag != TEXT("Land_LbLastBossBeforeStep") && wstrModelTag != TEXT("TownShop") && 
-       wstrModelTag != TEXT("LevelFinale_LbLastBuilding") && false == m_bBlendMap)
+    if (LEVEL_TOOL_MAP != *m_pCurrentLevelID)
+        m_pStaticActor = m_pModelCom->ReturnStaticActor(GameObjectDesc.matWorld);
+
+    if (true == m_bBlendMap)
+        return S_OK;
+
+    // 옥트리를 생성하는 레벨들의 맵
+    if(IsOctreeMapModel(wstrModelTag))
     {
         TraverseBlendDecoInfoTxts(m_mapBlendMeshesIndices, m_mapBlendObjStaticActor);
 
@@ -90,12 +99,9 @@ HRESULT CBasicMap::Initialize(void* pArg)
 
         InsertMapDecos();
     }
-
-    if (wstrModelTag == TEXT("Town") ||  wstrModelTag == TEXT("DeeDeeDeeMap") || wstrModelTag == TEXT("FinaleCave") ||
-        wstrModelTag == TEXT("TownShop")|| wstrModelTag == TEXT("Land_LbLastBossBeforeStep") ||
-        wstrModelTag == TEXT("LevelFinale_LbLastBuilding"))
+    else
     {
-        if (LEVEL_TOOL_MAP != *m_pCurrentLevelID) 
+        if (LEVEL_TOOL_MAP != *m_pCurrentLevelID)
         {
             TraverseBlendDecoInfoTxts(m_mapBlendMeshesIndices, m_mapBlendObjStaticActor);
 
@@ -104,9 +110,6 @@ HRESULT CBasicMap::Initialize(void* pArg)
         }
     }
 
-    if(LEVEL_TOOL_MAP != *m_pCurrentLevelID)
-        m_pStaticActor = m_pModelCom->ReturnStaticActor(GameObjectDesc.matWorld);
- 
     return S_OK;
 }
 
@@ -116,18 +119,15 @@ _int CBasicMap::Tick(_float fTimeDelta)
         return OBJ_DEAD;
 
     m_fTime += fTimeDelta;
-
-    if (m_pGameInstance->Get_KeyState(DIK_Q, KEY_DOWN))
-        m_bCull = !m_bCull;
-       
-    if (nullptr != m_pBlendMap)
-        m_pBlendMap->Tick(fTimeDelta);
-       
+  
     return OBJ_NOEVENT;
 }
 
 void CBasicMap::Late_Tick(_float fTimeDelta)
 {
+    if(true == m_bBlendMap)
+        Compute_ViewZ();
+
     if (nullptr != m_pBlendMap)
         m_pBlendMap->Late_Tick(fTimeDelta);
 
@@ -430,7 +430,11 @@ void CBasicMap::InsertMapDecos()
                 m_vecBlendObjects.push_back(pBlendMapObj);
                 pModel->Set_BlendObject(pBlendMapObj);
             }
+
             pModel->RemoveBlendMeshes(mapIter->second);
+
+            if (pModel->Get_NumMeshes() == 0)
+                continue;
         }
 
         if (true == IsShadowDeco(strModelName))
@@ -538,10 +542,12 @@ void CBasicMap::ReadDecos_ForSmallLevels()
     string strLevel;
     if (LEVEL_TOWN == *m_pCurrentLevelID)
         strLevel = "Town";
-    else if(LEVEL_DEEDEEDEE == *m_pCurrentLevelID)
+    else if (LEVEL_DEEDEEDEE == *m_pCurrentLevelID)
         strLevel = "DeeDeeDee";
     else if (LEVEL_PARTTIME == *m_pCurrentLevelID)
         strLevel = "PartTime";
+    else if (LEVEL_SIMBA == *m_pCurrentLevelID)
+        strLevel = "Simba";
     else if (LEVEL_FINALBOSS == *m_pCurrentLevelID)
         strLevel = "FinalBoss";
     else
@@ -583,7 +589,7 @@ void CBasicMap::ReadDecos_ForSmallLevels()
         string strFolder;
         if (LEVEL_TOWN == *m_pCurrentLevelID || LEVEL_PARTTIME == *m_pCurrentLevelID || LEVEL_DEEDEEDEE == *m_pCurrentLevelID)
             strFolder = string("TownDeco/");
-        else if (LEVEL_FINALBOSS == *m_pCurrentLevelID)
+        else if (LEVEL_FINALBOSS == *m_pCurrentLevelID || LEVEL_SIMBA == *m_pCurrentLevelID)
             strFolder = string("LabDiscovera_Deco/");
 
         if (true == IsMapDeco(strModelName))
@@ -617,7 +623,11 @@ void CBasicMap::ReadDecos_ForSmallLevels()
                 m_vecBlendObjects.push_back(pBlendMapObj);
                 pModel->Set_BlendObject(pBlendMapObj);
             }
+
             pModel->RemoveBlendMeshes(mapIter->second);
+
+            if (pModel->Get_NumMeshes() == 0)
+                continue;
         }
 
         if (true == IsShadowDeco(strModelName))
@@ -851,6 +861,14 @@ _bool CBasicMap::ReadBlendMeshesIndices(const string& _strFullPath, const string
 _bool CBasicMap::IsShadowDeco(const string& _strModelName)
 {
     if (m_setShadowDecos.end() != m_setShadowDecos.find(_strModelName))
+        return true;
+
+    return _bool();
+}
+
+_bool CBasicMap::IsOctreeMapModel(const wstring& _wstrModelName)
+{
+    if (m_setOctreeMaps.end() != m_setOctreeMaps.find(_wstrModelName))
         return true;
 
     return _bool();

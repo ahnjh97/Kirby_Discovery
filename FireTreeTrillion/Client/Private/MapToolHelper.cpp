@@ -45,9 +45,9 @@ static _bool s_bHideDecos = { false };
 static _bool s_bHideWalls = { false };
 
 static _int s_iConnectedMonster = -1;
-static const _char* s_ModelPassIndices[] = { "0. NORMAL_0", "1. NORMAL_X", "2. SHADOW", "3. SKY", "4. BLOOM", "5. NON_BLUR"
-	,"6. TRIGGER", "7.DEFAULTFX", "8. BLENDFX", "9. DEFERREDINFO", "10. WHITEFX", "11. KIRBYPART", "12. NEARCLIP",
-	/*"12. NORMAL_O AND NONCULL", */"13. BLEND O, NORMAL O", "14. MONSTERPARTOBJECT" };
+static const _char* s_ModelPassIndices[] = { "0. NORMAL_0", "1. NORMAL_X", "2. LIGHTDEPTH", "3. SKY", "4. BLOOM", "5. NON_BLUR"
+	,"6. TRIGGER", "7. ALPHABLEND", "8. DEFERREDINFO", "9. NEARCLIP", "10. KIRBYPART", "11. MONSTERPARTOBJECT", "12. DEFAULT_FX"
+	,"13. BLEND_FX", "14. WHITE_FX_LINEAR", "15. WHITE_FX_CLAMP" };
 
 static const _char* s_PosTexPasses[] = { "0. DEFAULT", "1. ALPHABLEND", "2. BLENDFX", "3. BLOOM", "4. DEFAULTFX", "5. BLEND_NOZTEXT"
 	,"6. WHITEFX", "7. UI_MASK", "8. UI_MASK2", "9. SOFTFX", "10. SOFTALPHAFX"};
@@ -175,6 +175,11 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		,"TwCentralSquare","TwStreetLiveSetC", "TwSideBridge", "TwConstructionAreaStepway", "TwConstructionAreaPond"
 #pragma endregion
 
+		#pragma region SIMBA OBJECTS
+		, "LbBossCapsule01L", "LbBossCapsule02L", "LbBossField01L", "LbBossSmallRoom01L"
+		, "VpControlBoxChairL", "VpControlBoxEL", "VpStairsAL"
+		#pragma endregion
+
 #pragma region LEVEL_FINALBOSS (LAB_DISCOVERA) OBJECT
 		// 보스전 필드
 		//"LbLastBuilding", "LbLastBossStage" :: 텍스처 및 모델 수정으로 사용안함
@@ -212,7 +217,8 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "GsCarSteelPartsAL", "GsScrappedCar", "GsCarHoistCrane01L", "CvSteelPartsDL" };
 
 	//블렌드 적용이 필요한 데코오브젝트
-	m_setBlendDecos = {"LbOutBuildingWallL", "LbOutBuildingFenceL", "GsCarFloor" };
+	m_setBlendDecos = { "LbOutBuildingWallL", "LbOutBuildingFenceL", "GsCarFloor", "LbBossCapsule02L"
+		, "LbBossCapsuleGlass01L", "LbBossCapsuleGlass02L", "LbBossCapsuleGlass03L" };
 
 	s_vecPassIndices.resize(m_vecMapModelNames.size());
 	s_vecSamplingFactors.resize(m_vecMapModelNames.size());
