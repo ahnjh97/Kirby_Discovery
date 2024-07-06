@@ -141,6 +141,15 @@ void CPhysXObject::Set_PhyXState(PHYXOBJECT_CURSTATE eState)
 		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
 			return;
 	}
+	else if (eState == PO_PRESSED)
+	{
+		CEffect::FX_DESC FXDesc{};
+
+		FXDesc.vInitPos = static_cast<_float3>(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+		FXDesc.vInitScale = { 1.8f, 1.8f, 1.8f };
+		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_start particle test A"), &FXDesc)))
+			return;
+	}
 }
 
 

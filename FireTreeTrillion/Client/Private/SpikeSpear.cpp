@@ -2,6 +2,7 @@
 #include "SpikeSpear.h"
 #include "FinalBoss.h"
 #include "HitBox.h"
+#include "Ability.h"
 
 CSpikeSpear::CSpikeSpear(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
@@ -83,6 +84,29 @@ _int CSpikeSpear::Tick(_float fTimeDelta)
 		{
 			m_vPosition.m128_f32[1] -= m_fTimeDelta * 80.f;
 			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vPosition);
+		}
+		else
+		{
+			if(false == m_bItem)
+			{
+				m_bItem = true;
+
+				_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+				vPos.m128_f32[1] -= 10.f;
+				for (_uint i = 0; i < 3; ++i)
+				{
+					HRESULT hr;
+					// 별 아이템 떨굼
+					CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
+					AbilityItemDesc.fRotateDir = 1.f;																	// 별 회전 방향 오른쪽															// 별 회전 방향 왼쪽
+					AbilityItemDesc.fAngle = 360.f / 3.f * i;													// 별의 진행 방향의 각도
+					AbilityItemDesc.vDir = XMVectorSet(1.f, 0.f, 0.f, 0.f);							// 별의 진행 방향
+					AbilityItemDesc.vPosition = vPos;	// 별의 생성 위치
+					AbilityItemDesc.eAbilityType = ABILITY_DEFAULT;
+					hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+					CHECK_FAILED(hr);
+				}
+			}
 		}
 	}
 	else if (3.35f < m_fSpikeTime && 3.45f > m_fSpikeTime)
