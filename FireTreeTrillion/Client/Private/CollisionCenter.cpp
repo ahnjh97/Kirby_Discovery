@@ -8,11 +8,10 @@
 #include "Monster.h"
 #include "AnimDeco.h"
 #include "DeeDeeDee.h"
-
 #include "HUD_StarPoint.h"
 #include "Kirby_State_Function.h"
-
 #include "HitBox.h"
+#include "FinaleKirby.h"
 
 #define GAMEINSTANCE CGameInstance::Get_Instance()->
 
@@ -46,7 +45,6 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 		Hitbox_Collision();
 	}
 
-
 	if (eLevel == LEVEL_DEEDEEDEE)
 		// 디디디와 싸우는 특수한 충돌로직들 모아두었습니다.
 		DeeDeeDee_Battle();
@@ -54,7 +52,8 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 	if (eLevel == LEVEL_FINALBOSS)
 		FinalStage_Battle();
 
-
+	if (eLevel == LEVEL_FINALE)
+		RealFinaleStage_Battle();
 
 	for (auto& ObjectVector : m_GameObjects)
 	{
@@ -606,6 +605,27 @@ void CCollisionCenter::FinalStage_Battle()
 			// 데미지 공식과 이펙트, 쉐이킹, 히트스탑 등 시스템적인 요소들이 잔뜩 들어가있다.
 			pthis->Damage_And_Effect_For_Monster(pKirby, pMonster, 1.2f);
 			DstHit->Set_Alive(false);
+		});
+
+}
+
+void CCollisionCenter::RealFinaleStage_Battle()
+{
+	Collision_Collider(m_GameObjects[FINALE_PLAYER], m_GameObjects[FINALE_BAUM], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CFinaleKirby* pKirby = static_cast<CFinaleKirby*>(Dst);
+			CPhysXObject* pBaum = static_cast<CPhysXObject*>(Src);
+
+			pKirby->Collision(CONTENT_BODY, pBaum);
+			pKirby->Set_HitStop(0.15f);
+			pthis->Camera_Shaking(1.5f, 1.f);
+			pBaum->Collision(CONTENT_BODY, pKirby);
 		});
 
 }

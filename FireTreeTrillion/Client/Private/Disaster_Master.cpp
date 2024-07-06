@@ -61,7 +61,7 @@ void CDisaster_Master::Make_MissBaum()
 {
 	// 운석은 2.5초 간격으로 생성되며
 	// 운석은 2초동안 공중에서 날아든다.
-	if (m_fMakeBaumDelay > 2.5f)
+	if (m_fMakeBaumDelay > 1.8f)
 	{
 		_float4 vKirbyPos = m_pKirby->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
 		_float fKirbySpeed = m_pKirby->Get_KirbyInfo()->m_fMoveSpeed;
@@ -80,14 +80,14 @@ void CDisaster_Master::Make_MissBaum()
 		baumdesc.vPos = vNewMyPos;
 		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Baum"), TEXT("Prototype_GameObject_Baum"), &baumdesc)))
 			return;
-		m_fMakeBaumDelay -= 2.5f;
+		m_fMakeBaumDelay = 0.f;
 
 		//_float4 vKirbyPos = m_pKirby->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
 		//_float fKirbySpeed = m_pKirby->Get_KirbyInfo()->m_fMoveSpeed;
 		//_float4 vNewMyPos = _float4(vKirbyPos.x + 40.f, vKirbyPos.y + 40.f, vKirbyPos.z, 1.f);
 
 		//// 임시
-		//_float fXOffSet = { 10.f };
+		//_float fXOffSet = { 20.f };
 
 		//CBaum::BAUMDESC baumdesc = {};
 		//baumdesc.vBaumMoveDir = vKirbyPos - vNewMyPos;
@@ -97,7 +97,7 @@ void CDisaster_Master::Make_MissBaum()
 		//if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Baum"), TEXT("Prototype_GameObject_Baum"), &baumdesc)))
 		//	return;
 
-		//m_fMakeBaumDelay -= 10.5f;
+		//m_fMakeBaumDelay = 0.f;
 	}
 
 
