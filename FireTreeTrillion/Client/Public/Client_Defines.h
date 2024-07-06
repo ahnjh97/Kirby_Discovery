@@ -20,7 +20,6 @@ namespace Client
                  LEVEL_DEEDEEDEE,
 
                  LEVEL_TOWN,
-                 LEVEL_PARTTIME,
                  LEVEL_PARK,
 
                  LEVEL_SIMBA,

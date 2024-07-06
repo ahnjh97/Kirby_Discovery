@@ -356,7 +356,7 @@ void CBasicMap::SetUpShaderInfo(const wstring& _wstrModelTag)
             return;
         }
             
-        m_vecPassIndices[i] = 8;//iPassIndex;
+        m_vecPassIndices[i] = iPassIndex;
         m_vecSamplingFactors[i] = fSamplingFactor;
     }
 
@@ -584,6 +584,8 @@ void CBasicMap::ReadDecos_ForSmallLevels()
         strLevel = "DeeDeeDee";
     else if (LEVEL_PARTTIME == *m_pCurrentLevelID)
         strLevel = "PartTime";
+    else if (LEVEL_PARK == *m_pCurrentLevelID)
+        strLevel = "Park";
     else if (LEVEL_SIMBA == *m_pCurrentLevelID)
         strLevel = "Simba";
     else if (LEVEL_FINALBOSS == *m_pCurrentLevelID)
