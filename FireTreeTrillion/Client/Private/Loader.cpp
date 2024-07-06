@@ -125,6 +125,12 @@
 #include "Radio.h"
 #include "Fog_Instance.h"
 #include "Box.h"
+#include "Turbine.h"
+#include "SimbaRoomGlass.h"
+
+// 피날레 스테이지 기믹들
+#include "Baum.h"
+#include "Disaster_Master.h"
 
 //기믹
 #include "Gm_LabAntenna.h"
@@ -381,6 +387,8 @@ HRESULT CLoader::Loading_ObjectAll()
 
 	// Finale
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleRoad"), CFinaleRoad);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Baum"), CBaum);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Disaster_Master"), CDisaster_Master);
 
 	//Dee
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeePart"), CDee_Part);
@@ -435,6 +443,12 @@ HRESULT CLoader::Loading_ObjectAll()
 
 	// 미니게임 in 와들디마을
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PartTimeFood"), CPartTimeFood);
+
+	#pragma region LEVEL_SIMBA
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Turbine"), CTurbine);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SimbaRoomGlass"), CSimbaRoomGlass);
+	#pragma endregion
+
 #pragma endregion
 
 	return S_OK;
@@ -1806,9 +1820,17 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	else if (eLevel == LEVEL_SIMBA)
 	{
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("BG1", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 		m_vecModelInfo.emplace_back("Kirby", TYPE_ANIM, 1.f, 180.f);
+
+		// Level_Simba 맵
+		m_vecModelInfo.emplace_back("LbBossLoom01L", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("LbBossLoom01L_Blend", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		
+		// 맵 오브젝트
+		m_vecModelInfo.emplace_back("LbBossTurbine01L_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("LbBossRing01L_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("JhGlass", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 		// For Kirby Body
 		Load_KirbyBodyModels();

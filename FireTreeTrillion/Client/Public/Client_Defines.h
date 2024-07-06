@@ -13,6 +13,7 @@ namespace Client
                  LEVEL_TOOL_ANIM = 6, // ANIM툴은 6으로 고정 ! 부탁드립니댜
                  LEVEL_TOOL_MAP,
 
+                 LEVEL_PARTTIME,
                 //============ GAME
                  LEVEL_INTRO,
                  LEVEL_RACING,

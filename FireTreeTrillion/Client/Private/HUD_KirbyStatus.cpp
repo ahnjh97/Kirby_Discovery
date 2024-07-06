@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "HUD_KirbyStatus.h"
 #include "Kirby.h"
+#include "FinaleKirby.h"
 
 CHUD_KirbyStatus::CHUD_KirbyStatus(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext)
 	: CHUD{ _pDevice, _pContext }
@@ -92,19 +93,35 @@ _int CHUD_KirbyStatus::Tick(_float fTimeDelta)
 
 	m_fTimeDelta = fTimeDelta;
 
-	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+	_float fHpMax = { 0.f };
+	_float fHp = { 0.f };
 
-	if (pKirby == nullptr)
-		return OBJ_NOEVENT;
+	if (*m_pCurrentLevelID == LEVEL_FINALE)
+	{
+		CFinaleKirby* pKirby = static_cast<CFinaleKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+		if (pKirby == nullptr)
+			return OBJ_NOEVENT;
+
+		fHp = pKirby->Get_Hp();
+		fHpMax = pKirby->Get_MaxHp();
+	}
+	else
+	{
+		CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+		if (pKirby == nullptr)
+			return OBJ_NOEVENT;
+
+		fHp = pKirby->Get_Hp();
+		fHpMax = pKirby->Get_MaxHp();
+	}
 
 	// 피를 닳게 하는 기능을 가진 함수
-	Compute_Player_Hp(fTimeDelta, pKirby);
+	Compute_Player_Hp(fTimeDelta, fHpMax, fHp);
 
 	// 아무 이상이 없을 때, 자동으로 사라지게 하는 기능을 가진 함수
 	Disappear_HpBar(fTimeDelta);
 
 	return OBJ_NOEVENT;
-	//Update_UIState(fTimeDelta);
 }
 
 void CHUD_KirbyStatus::Late_Tick(_float fTimeDelta)
@@ -374,14 +391,14 @@ void CHUD_KirbyStatus::Play_Animation(_float _fAccTime, KIRBYHP_STATE _eCurState
 	}
 }
 
-void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta, CKirby* pKirby)
+void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta, _float _fKirbyHpMax, _float _fKirbyHp)
 {
 
 #pragma region 분홍색 게이지 공식
 
 	// 현재 커비의 HP 맥스치
-	_float fKirbyHpMax = pKirby->Get_MaxHp();
-	_float fKirbyHp = pKirby->Get_Hp();
+	_float fKirbyHpMax = _fKirbyHpMax;
+	_float fKirbyHp = _fKirbyHp;
 
 	// 이 비율은 0 ~ 1 사이에 있어야 한다.
 	m_fCurHpRatio = (fKirbyHp / fKirbyHpMax);

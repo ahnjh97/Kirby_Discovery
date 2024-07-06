@@ -183,6 +183,11 @@
     <ClInclude Include="..\public\BackGround.h" />
     <ClInclude Include="..\Public\BasicMap.h" />
     <ClInclude Include="..\public\BattleDee.h" />
+    <ClInclude Include="..\Public\Baum.h" />
+    <ClInclude Include="..\Public\BaumPiece.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="..\Public\BG.h" />
     <ClInclude Include="..\Public\BladeKnight.h" />
     <ClInclude Include="..\Public\BladeKnightSword.h" />
@@ -212,6 +217,7 @@
     <ClInclude Include="..\Public\CollisionCenter.h" />
     <ClInclude Include="..\public\DecoObject.h" />
     <ClInclude Include="..\Public\Level_Park.h" />
+    <ClInclude Include="..\Public\Disaster_Master.h" />
     <ClInclude Include="..\Public\ShadowDeco.h" />
     <ClInclude Include="..\Public\DeeDeeDee.h" />
     <ClInclude Include="..\Public\DeeDeeDeeHammer.h" />
@@ -325,6 +331,7 @@
     <ClInclude Include="..\Public\Radio.h" />
     <ClInclude Include="..\Public\RayArrow.h" />
     <ClInclude Include="..\Public\RigidObject.h" />
+    <ClInclude Include="..\Public\SimbaRoomGlass.h" />
     <ClInclude Include="..\Public\SingleEffect.h" />
     <ClInclude Include="..\public\SkySphere.h" />
     <ClInclude Include="..\Public\SpikeSpear.h" />
@@ -345,6 +352,7 @@
     <ClInclude Include="..\Public\Trigger.h" />
     <ClInclude Include="..\Public\Tunnel.h" />
     <ClInclude Include="..\Public\TunnelRock.h" />
+    <ClInclude Include="..\Public\Turbine.h" />
     <ClInclude Include="..\Public\UI_BtnIcon.h" />
     <ClInclude Include="..\Public\UI_MessageWindow.h" />
     <ClInclude Include="..\Public\UI_PartTime.h" />
@@ -374,6 +382,11 @@
     <ClCompile Include="..\private\BackGround.cpp" />
     <ClCompile Include="..\Private\BasicMap.cpp" />
     <ClCompile Include="..\private\BattleDee.cpp" />
+    <ClCompile Include="..\Private\Baum.cpp" />
+    <ClCompile Include="..\Private\BaumPiece.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\Private\BG.cpp" />
     <ClCompile Include="..\Private\BladeKnight.cpp" />
     <ClCompile Include="..\Private\BladeKnightSword.cpp" />
@@ -403,6 +416,7 @@
     <ClCompile Include="..\Private\CollisionCenter.cpp" />
     <ClCompile Include="..\private\DecoObject.cpp" />
     <ClCompile Include="..\Private\Level_Park.cpp" />
+    <ClCompile Include="..\Private\Disaster_Master.cpp" />
     <ClCompile Include="..\Private\ShadowDeco.cpp" />
     <ClCompile Include="..\Private\DeeDeeDee.cpp" />
     <ClCompile Include="..\Private\DeeDeeDeeHammer.cpp" />
@@ -513,6 +527,7 @@
     <ClCompile Include="..\Private\Radio.cpp" />
     <ClCompile Include="..\Private\RayArrow.cpp" />
     <ClCompile Include="..\Private\RigidObject.cpp" />
+    <ClCompile Include="..\Private\SimbaRoomGlass.cpp" />
     <ClCompile Include="..\Private\SingleEffect.cpp" />
     <ClCompile Include="..\private\SkySphere.cpp" />
     <ClCompile Include="..\Private\SpikeSpear.cpp" />
@@ -533,6 +548,7 @@
     <ClCompile Include="..\Private\Trigger.cpp" />
     <ClCompile Include="..\Private\Tunnel.cpp" />
     <ClCompile Include="..\Private\TunnelRock.cpp" />
+    <ClCompile Include="..\Private\Turbine.cpp" />
     <ClCompile Include="..\Private\UI_BtnIcon.cpp" />
     <ClCompile Include="..\Private\UI_MessageWindow.cpp" />
     <ClCompile Include="..\Private\UI_PartTime.cpp" />
