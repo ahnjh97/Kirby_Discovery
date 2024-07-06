@@ -104,7 +104,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 #pragma region BASIC MAP
 
 	m_vecMapModelNames = { "Level0Stage1Step01", "Level0Stage1Step02",  "Level1Stage1Step01", "DeeDeeDeeMap", "Town", "TownShop"
-		, "Land_VcLabo",
+		, "Land_VcLabo"
 		,"Land_LbLastBossBeforeStep" //,"LevelFinale_LbLastBuilding" :: 텍스처 및 모델 수정으로 사용안함
 		,"Land_LbLastBossStage"
 		, "LbBossLoom01L" // 심바
