@@ -69,17 +69,38 @@ void CDisaster_Master::Make_MissBaum()
 
 		_float fZOffSet = { 0.f };
 		fZOffSet = CUtils::Make_RandomInt(0, 1) == 0 ? CUtils::Make_RandomFloat(-60.f, -40.f) : CUtils::Make_RandomFloat(40.f, 60.f);
+		_float fXOffSet = { 0.f };
+		fXOffSet = CUtils::Make_RandomFloat(0.f, 40.f);
 
 		CBaum::BAUMDESC baumdesc = {};
 		baumdesc.vBaumMoveDir = vKirbyPos - vNewMyPos;
 		baumdesc.fBaumSpeed = 0.5f;
-		vNewMyPos.x += (fKirbySpeed * 2.f);
+		vNewMyPos.x += (fKirbySpeed * 2.f) + fXOffSet;
 		vNewMyPos.z += fZOffSet;
 		baumdesc.vPos = vNewMyPos;
 		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Baum"), TEXT("Prototype_GameObject_Baum"), &baumdesc)))
 			return;
 		m_fMakeBaumDelay -= 2.5f;
+
+		//_float4 vKirbyPos = m_pKirby->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
+		//_float fKirbySpeed = m_pKirby->Get_KirbyInfo()->m_fMoveSpeed;
+		//_float4 vNewMyPos = _float4(vKirbyPos.x + 40.f, vKirbyPos.y + 40.f, vKirbyPos.z, 1.f);
+
+		//// юс╫ц
+		//_float fXOffSet = { 10.f };
+
+		//CBaum::BAUMDESC baumdesc = {};
+		//baumdesc.vBaumMoveDir = vKirbyPos - vNewMyPos;
+		//baumdesc.fBaumSpeed = 0.5f;
+		//vNewMyPos.x += (fKirbySpeed * 2.f) + fXOffSet;
+		//baumdesc.vPos = vNewMyPos;
+		//if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Baum"), TEXT("Prototype_GameObject_Baum"), &baumdesc)))
+		//	return;
+
+		//m_fMakeBaumDelay -= 10.5f;
 	}
+
+
 }
 
 void CDisaster_Master::Make_OnTerrainBaum()
@@ -96,8 +117,6 @@ void CDisaster_Master::Make_OnTerrainBaum()
 	baumdesc.vPos = vNewMyPos;
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Baum"), TEXT("Prototype_GameObject_Baum"), &baumdesc)))
 		return;
-	m_fMakeBaumDelay -= 2.5f;
-
 }
 
 CDisaster_Master* CDisaster_Master::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

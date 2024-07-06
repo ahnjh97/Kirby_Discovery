@@ -185,8 +185,8 @@
     <ClInclude Include="..\public\BattleDee.h" />
     <ClInclude Include="..\Public\Baum.h" />
     <ClInclude Include="..\Public\BaumPiece.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\Public\BG.h" />
     <ClInclude Include="..\Public\BladeKnight.h" />
@@ -382,8 +382,8 @@
     <ClCompile Include="..\private\BattleDee.cpp" />
     <ClCompile Include="..\Private\Baum.cpp" />
     <ClCompile Include="..\Private\BaumPiece.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\Private\BG.cpp" />
     <ClCompile Include="..\Private\BladeKnight.cpp" />
