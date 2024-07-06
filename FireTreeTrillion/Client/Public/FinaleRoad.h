@@ -12,13 +12,13 @@ BEGIN(Client)
 class CFinaleRoad final : public CPhysXObject
 {
 public:
-	enum MOVECMD { MOVECMD_STOP, MOVECMD_ROTATE, MOVECMD_END};
+	//enum MOVECMD { MOVECMD_STOP, MOVECMD_ROTATE, MOVECMD_END};
 	struct ROAD_DESC : public GAMEOBJECT_DESC
 	{
-		MOVECMD eMoveCommand = { MOVECMD_STOP };
+		//MOVECMD eMoveCommand = { MOVECMD_STOP };
 		//wstring strModelTag = { L"NONE" };
 		_bool	bIsAnimModel = { false };
-
+		const _float4x4* pSocketMat = { nullptr };
 	};
 
 private:
@@ -56,6 +56,7 @@ private:
 
 	_float			m_fWhiteColorDiffuse = {};
 
+	const _float4x4* m_pSocketMatrix;
 
 	PxRigidDynamic* m_pDynamicActor = { nullptr };
 	CModel*			m_pModelCom = { nullptr };

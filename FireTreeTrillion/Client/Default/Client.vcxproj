@@ -217,6 +217,7 @@
     <ClInclude Include="..\Public\CollisionCenter.h" />
     <ClInclude Include="..\public\DecoObject.h" />
     <ClInclude Include="..\Public\Disaster_Master.h" />
+    <ClInclude Include="..\public\FinaleRoadGrouper.h" />
     <ClInclude Include="..\Public\ShadowDeco.h" />
     <ClInclude Include="..\Public\DeeDeeDee.h" />
     <ClInclude Include="..\Public\DeeDeeDeeHammer.h" />
@@ -413,6 +414,7 @@
     <ClCompile Include="..\Private\CollisionCenter.cpp" />
     <ClCompile Include="..\private\DecoObject.cpp" />
     <ClCompile Include="..\Private\Disaster_Master.cpp" />
+    <ClCompile Include="..\private\FinaleRoadGrouper.cpp" />
     <ClCompile Include="..\Private\ShadowDeco.cpp" />
     <ClCompile Include="..\Private\DeeDeeDee.cpp" />
     <ClCompile Include="..\Private\DeeDeeDeeHammer.cpp" />

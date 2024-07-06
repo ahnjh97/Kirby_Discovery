@@ -93,7 +93,13 @@ public:
 	//FOV를 세팅한다.
 	void Set_FOVY(_float fFOVYDegree) { m_fDestFovy = XMConvertToRadians(fFOVYDegree); }
 
-	void Set_ZAngle(_float fZAngle) { m_fDestZAngle = fZAngle; }
+	void Set_ZAngle(_float fZAngle, _float fInterpolateSpeed = -1.f)
+	{
+		m_fZAngleInterpolateSpeed = (fInterpolateSpeed != -1.f) ?
+									3.f : fInterpolateSpeed;
+
+		m_fDestZAngle = fZAngle;
+	}
 
 	//줌 수치를 설정한다.
 	void Zoom(_float fZoom)	{ m_fCurZoomOffset = fZoom; }
@@ -235,6 +241,8 @@ private:
 	_float m_fCurZAngle = { 0.f };
 	_float m_fStartZAngle = { 0.f };
 	_float m_fDestZAngle = { 0.f };
+
+	_float m_fZAngleInterpolateSpeed = { 3.f };
 
 	//카메라 움직임 감도
 	_float	m_fCamSensor = { 0.f };

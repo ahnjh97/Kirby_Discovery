@@ -1318,7 +1318,7 @@ void CCamera_Main::Interpolate_CamSet(_float fTimeDelta)
 
 	//z angle º¸°£
 	if(.001f < abs(m_fCurZAngle - m_fDestZAngle))
-		m_fCurZAngle += (m_fDestZAngle - m_fCurZAngle) * fTimeDelta * 2.f;
+		m_fCurZAngle += (m_fDestZAngle - m_fCurZAngle) * fTimeDelta * m_fZAngleInterpolateSpeed;
 
 }
 

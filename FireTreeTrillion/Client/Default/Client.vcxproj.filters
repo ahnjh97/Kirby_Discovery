@@ -1051,6 +1051,7 @@
     <ClInclude Include="..\Public\Disaster_Master.h">
       <Filter>02.GameObjects\Map\Baum</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\FinaleRoadGrouper.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1560,6 +1561,7 @@
     <ClCompile Include="..\Private\Disaster_Master.cpp">
       <Filter>02.GameObjects\Map\Baum</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\FinaleRoadGrouper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
