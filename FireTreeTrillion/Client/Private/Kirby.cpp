@@ -66,7 +66,7 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// 디버깅 용
-	m_eAbilityType = ABILITY_BOMB;
+	m_eAbilityType = ABILITY_HAMMER;
 
 	// 커비의 상태에 따라, 애니메이션이 시작된다.
 	Kirby_StateInitialize();

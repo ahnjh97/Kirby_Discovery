@@ -67,6 +67,7 @@ public:
 	_float	Get_Attack() { return m_fAttack; }
 	_float	m_fAttack = { 0.f };
 
+	_bool	Get_NonDead() { return m_bNonDead; }
 
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;
@@ -92,6 +93,9 @@ protected:
 
 	// 피직스 오브젝트들의 현재 큰 상태를 의미한다.
 	PHYXOBJECT_CURSTATE m_ePhyXState = { PO_NORMAL };
+
+	// Bullet인데, 파괴되지 않을 애들임
+	_bool	m_bNonDead = { false };
 
 	//피직스 오브젝트들에게 귀속되어 움직이는 이펙트들
 	list<CEffect*>	m_FXList;

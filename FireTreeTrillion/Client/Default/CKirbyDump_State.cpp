@@ -161,19 +161,14 @@ void Turn_InterPolate_OtherVector(_float4& vDstDir, _float4& vSrcDir, CTransform
 
 	if (fcosTheta < -0.9995f || fcosTheta > 0.9995f)
 	{
-		// 180도로 NaN 방지 랜덤으로 -1, 1도 틀어줌
-		_float4x4 rotationMatrix;
-		XMStoreFloat4x4(&rotationMatrix, XMMatrixIdentity());
-		CUtils::Turn_OtherMatrix(rotationMatrix, XMVectorSet(0.f, 1.f, 0.f, 0.f), 1.f, CUtils::Make_RandomInt(0, 1) == 1 ? 1.f : -1.f);
-		vSrcDir = XMVector3Transform(vSrcDir, XMLoadFloat4x4(&rotationMatrix));
-		vSrcDir = XMVectorSetW(vSrcDir, 0.0f);
+		return;
 	}
 	else
 	{
 		_float ftheta = acos(fcosTheta);
 		_float fAngleDegrees = XMConvertToDegrees(ftheta);
 
-		if (fAngleDegrees < 3.0f)
+		if (fAngleDegrees < 0.5f)
 		{
 			vSrcDir = vDstDir;
 		}
@@ -212,32 +207,55 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 	pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
 
-	//if (m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_PRESS) == true)
+	//if (pController->Compute_Height() > 2.f)
 	//{
-	//	Kirbydesc->m_vTargetDir = _float4(0.5f, 0.f, 0.5f, 0.f);
-	//	Kirbydesc->m_vTargetDir.Normalize();
-	//	Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vHandleDir, pTransformCom, fTimeDelta, 3.f);
-	//	Turn_InterPolate_OtherVector(Kirbydesc->m_vHandleDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 1.5f);
+	//	DESC(m_fJumpVelocity) = 0.f;
+	//	pKirby->Change_State(CFinaleKirby::DUMPSTATE_JUMP, 60.f, true, false, CFinaleKirby::BODY_DUMPDEFAULT, CFinaleKirby::OFFSET_DUMP);
+	//	return;
 	//}
-	//else if (m_pGameInstance->Get_DIKeyState(DIK_RIGHT, KEY_PRESS) == true)
+
+	//if (pController->RayCastToDynamicActor(_float4(0.f, -1.f, 0.f, 0.f)) > 2.f)
 	//{
-	//	Kirbydesc->m_vTargetDir = _float4(0.5f, 0.f, -0.5f, 0.f);
-	//	Kirbydesc->m_vTargetDir.Normalize();
-	//	Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vHandleDir, pTransformCom, fTimeDelta, 3.f);
-	//	Turn_InterPolate_OtherVector(Kirbydesc->m_vHandleDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 1.5f);
+	//	DESC(m_fJumpVelocity) = 0.f;
+	//	pKirby->Change_State(CFinaleKirby::DUMPSTATE_JUMP, 60.f, true, false, CFinaleKirby::BODY_DUMPDEFAULT, CFinaleKirby::OFFSET_DUMP);
+	//	return;
 	//}
-	//else
-	//{
-	//	Kirbydesc->m_vTargetDir = _float4(1.f, 0.f, 0.f, 0.f);
-	//	Kirbydesc->m_vTargetDir.Normalize();
-	//	Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vHandleDir, pTransformCom, fTimeDelta, 3.f);
-	//	Turn_InterPolate_OtherVector(Kirbydesc->m_vHandleDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 1.5f);
-	//}
+
+	if (m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_PRESS) == true)
+	{
+		Kirbydesc->m_vTargetDir = _float4(1.f, 0.f, 0.3f, 0.f);
+		Kirbydesc->m_vTargetDir.Normalize();
+		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vHandleDir, pTransformCom, fTimeDelta, 3.f);
+		Turn_InterPolate_OtherVector(Kirbydesc->m_vHandleDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 1.5f);
+	}
+	else if (m_pGameInstance->Get_DIKeyState(DIK_RIGHT, KEY_PRESS) == true)
+	{
+		Kirbydesc->m_vTargetDir = _float4(1.f, 0.f, -0.3f, 0.f);
+		Kirbydesc->m_vTargetDir.Normalize();
+		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vHandleDir, pTransformCom, fTimeDelta, 3.f);
+		Turn_InterPolate_OtherVector(Kirbydesc->m_vHandleDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 1.5f);
+	}
+	else
+	{
+		Kirbydesc->m_vTargetDir = _float4(1.f, 0.f, 0.f, 0.f);
+		Kirbydesc->m_vTargetDir.Normalize();
+		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vHandleDir, pTransformCom, fTimeDelta, 3.f);
+		Turn_InterPolate_OtherVector(Kirbydesc->m_vHandleDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 1.5f);
+	}
+
+	Kirbydesc->m_fMoveSpeed += fTimeDelta * 10.f;
+	if (Kirbydesc->m_fMoveSpeed > 20.f)
+		Kirbydesc->m_fMoveSpeed = 20.f;
+
+	// 타겟기준
+	_vector vMoveDelta = Kirbydesc->m_vMoveDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
+	pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
 	{
 		DESC(m_fJumpVelocity) = 20.f;
-		pKirby->Change_State(CFinaleKirby::DUMPSTATE_JUMP, 60.f, false, false, CFinaleKirby::BODY_DUMPDEFAULT, CFinaleKirby::OFFSET_DUMP);
+		pKirby->Change_State(CFinaleKirby::DUMPSTATE_JUMP, 60.f, true, false, CFinaleKirby::BODY_DUMPDEFAULT, CFinaleKirby::OFFSET_DUMP);
 		return;
 	}
 }
@@ -280,14 +298,35 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	CFinaleKirby::FINALEKIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
-	if (JoyStick_controller(Kirbydesc, pCamera) == true)
+	if (m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_PRESS) == true)
 	{
-
+		Kirbydesc->m_vTargetDir = _float4(1.f, 0.f, 0.3f, 0.f);
+		Kirbydesc->m_vTargetDir.Normalize();
+		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vHandleDir, pTransformCom, fTimeDelta, 3.f);
+		Turn_InterPolate_OtherVector(Kirbydesc->m_vHandleDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 1.5f);
+	}
+	else if (m_pGameInstance->Get_DIKeyState(DIK_RIGHT, KEY_PRESS) == true)
+	{
+		Kirbydesc->m_vTargetDir = _float4(1.f, 0.f, -0.3f, 0.f);
+		Kirbydesc->m_vTargetDir.Normalize();
+		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vHandleDir, pTransformCom, fTimeDelta, 3.f);
+		Turn_InterPolate_OtherVector(Kirbydesc->m_vHandleDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 1.5f);
 	}
 	else
 	{
-
+		Kirbydesc->m_vTargetDir = _float4(1.f, 0.f, 0.f, 0.f);
+		Kirbydesc->m_vTargetDir.Normalize();
+		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vHandleDir, pTransformCom, fTimeDelta, 3.f);
+		Turn_InterPolate_OtherVector(Kirbydesc->m_vHandleDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 1.5f);
 	}
+
+	Kirbydesc->m_fMoveSpeed += fTimeDelta * 10.f;
+	if (Kirbydesc->m_fMoveSpeed > 20.f)
+		Kirbydesc->m_fMoveSpeed = 20.f;
+
+	// 타겟기준
+	_vector vMoveDelta = Kirbydesc->m_vMoveDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
+	pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
 
 
 	if (pKirby->Get_State() == CFinaleKirby::DUMPSTATE_JUMP)
@@ -308,7 +347,7 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 		if (pKirby->isAnimFinish())
 		{
-			pKirby->Change_State(CFinaleKirby::DUMPSTATE_IDLING, 60.f, true, true, CFinaleKirby::BODY_DUMPDEFAULT, CFinaleKirby::OFFSET_DUMP);
+			pKirby->Change_State(CFinaleKirby::DUMPSTATE_IDLING, 60.f, true, false, CFinaleKirby::BODY_DUMPDEFAULT, CFinaleKirby::OFFSET_DUMP);
 			return;
 		}
 	}

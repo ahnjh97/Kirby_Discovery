@@ -128,6 +128,10 @@
 #include "Turbine.h"
 #include "SimbaRoomGlass.h"
 
+// 피날레 스테이지 기믹들
+#include "Baum.h"
+#include "Disaster_Master.h"
+
 //기믹
 #include "Gm_LabAntenna.h"
 #include "Gm_LabBossRoomDoor.h"
@@ -380,6 +384,8 @@ HRESULT CLoader::Loading_ObjectAll()
 
 	// Finale
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleRoad"), CFinaleRoad);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Baum"), CBaum);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Disaster_Master"), CDisaster_Master);
 
 	//Dee
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeePart"), CDee_Part);
