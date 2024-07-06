@@ -34,9 +34,6 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 	
-	if (FAILED(Add_Dialog(_pArg)))
-		return E_FAIL;
-
 #pragma region MESSAGEWINDOW BASE
 
 	_float4 vBaseTrans = { m_UIObjDesc.vPos };
@@ -66,10 +63,15 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 	m_UIObjDesc.fAlpha = 0.f;
 	m_eCurState = WINDOW_HIDE;
 
-	//
-	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_UI_Dialog"),
-		TEXT("Prototype_GameObject_UI_BtnIcon"))))
+#pragma region UI_BUTTON
+
+	//UI_Button
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_UI_Dialog"), TEXT("Prototype_GameObject_UI_BtnIcon"))))
 		return E_FAIL;
+
+#pragma endregion
+
+	m_pCurrentLevelID = m_pGameInstance->Get_CurrentLevelID();
 
 	return S_OK;
 }
@@ -103,7 +105,6 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 
 	case WINDOW_SHOW: //알파 값 및 스케일 증가
 		m_UIObjDesc.fAlpha += fTimeDelta * 5.f;	
-
 		//vOffset.y += EASE_OUT(fTimeDelta * 5.f);
 		//vShowScale = m_vBaseScale * vOffset;
 		//m_pTransCom[TEXMW_BASE]->Set_Scaled(vShowScale);
@@ -115,7 +116,7 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 	default:	break;
 	}
 
-	if (m_UIObjDesc.fAlpha > 1.f)
+	if (m_UIObjDesc.fAlpha >= 1.f)
 		m_UIObjDesc.fAlpha = 1.f;
 
 	if (m_UIObjDesc.fAlpha <= 0.f) //알파 값 보정 및 업데이트 중지
@@ -155,8 +156,12 @@ HRESULT CUI_MessageWindow::Render()
 		CHECK_FAILED(hr);
 	}
 #pragma endregion
-
-	//m_pDialog->Start_Message();
+	
+	//CDialog* pDialog = static_cast<CDialog*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_Dialog"), 0));
+	//if (nullptr == pDialog)
+	//	return S_OK;
+	//if (WINDOW_SHOW == m_eCurState)
+	//	pDialog->Display_Message();
 
 	return S_OK;
 }
@@ -189,17 +194,6 @@ HRESULT CUI_MessageWindow::Add_Transform(void* _pArg)
 		//m_Components.emplace(g_strTransformTag, m_pTransCom[iTrans]);
 		//Safe_AddRef(m_pTransCom[iTrans]);
 	}
-
-	return S_OK;
-}
-
-HRESULT CUI_MessageWindow::Add_Dialog(void* _pArg)
-{
-	m_pDialog = CDialog::Create(m_pDevice, m_pContext);
-	if (nullptr == m_pDialog)
-		return E_FAIL;
-	
-	m_pDialog->Add_Message(TEXT("고마워, 덕분에 살았어~!"), 5.f);
 
 	return S_OK;
 }

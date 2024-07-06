@@ -24,41 +24,73 @@ HRESULT CDialog::Initialize(void* pArg)
 	MessageWindowDesc.vSize = { 1300.f * 0.8f, 288.f * 0.8f, 1.f };
 	
 	m_pCurrentLevelID = m_pGameInstance->Get_CurrentLevelID();
-	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_UI_Dialog"),
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_UI_Dialog"), 
 		TEXT("Prototype_GameObject_UI_MessageWindow"), &MessageWindowDesc)))
 		return E_FAIL;
+	
+	//json 파일 파싱 및 로드를 여기에서
+	Add_Message(TEXT("고마워, 덕분에 살았어~!"), 0.1f);
 
 	return S_OK;
 }
 
 _int CDialog::Tick(_float fTimeDelta)
 {
+	Display_Message(fTimeDelta);
+
 	return OBJ_NOEVENT;
 }
 
 void CDialog::Late_Tick(_float fTimeDelta)
 {
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_UI, this);
 }
 
 HRESULT CDialog::Render()
 {
+	if (!m_vecMessage.empty())
+	{
+		for (auto& Message : m_vecMessage)
+			Render_Message(Message.wstrMessage, Message.fDisplayTime);
+	}
+
 	return S_OK;
 }
 
 // 파싱해서 가져온 대화내용들을 vector안에 넣어줍니다.
 HRESULT CDialog::Add_Message(const wstring& _wstrMessage, _float _fDisplayTime)
 {
-	m_vecMessage.push_back({ _wstrMessage, _fDisplayTime });
+	m_vecMessage.push_back({_wstrMessage});
+	m_fDisplayTime = _fDisplayTime;
+	m_fElapsedTime = 0.f;
+
 	return S_OK;
 }
 
 // 다이얼로그 호출 : vec에 담아둔 메세지를 출력합니다.
-HRESULT CDialog::Start_Message()
+HRESULT CDialog::Display_Message(_float _fTimeDelta)
 {
 	if (!m_vecMessage.empty())
 	{
-		for (auto& Message : m_vecMessage)
-			Display_Message(Message.wstrMessage, Message.fDisplayTime);
+		m_fElapsedTime += _fTimeDelta;
+		if (m_fElapsedTime >= m_fDisplayTime) //경과시간 대비 출력시간 체크
+		{
+			m_fElapsedTime = 0.f;
+
+			if (m_iCurMessageIndex < m_vecMessage.size()) //벡터에 담긴 메시지들의 크기를 체크
+			{
+				DialogMessage tMessage = m_vecMessage[m_iCurMessageIndex];
+				if (m_iCurCharIndex < tMessage.wstrMessage.length()) //메시지 길이 체크
+					m_iCurCharIndex++;
+
+				else //메시지 길이를 넘겼을 경우, 초기화
+				{
+					m_iCurMessageIndex = 0.f;
+					m_iCurCharIndex = 0.f;
+				}
+			}
+
+		}
 	}
 	
 	return S_OK;
@@ -66,32 +98,31 @@ HRESULT CDialog::Start_Message()
 
 // 다이얼로그 출력합니다.
 // ps. 폰트하다가 안되면 이미지
-HRESULT CDialog::Display_Message(const wstring& _wstrMessage, _float _fDisplayTime)
+HRESULT CDialog::Render_Message(const wstring& _wstrMessage, _float _fDisplayTime)
 {
-	for (size_t iIndex = 0; iIndex < _wstrMessage.length(); ++iIndex)
-	{
-		//문자열 시작 위치/문자열 길이
-		_wstrMessage.substr(iIndex, 1);
-	}
-
 	//SpriteFont 폰트 수정 필요.
 	wstring wstrFontTag = { TEXT("Font_HUDSub_KR15") };
-	//wstring wstrText = { TEXT("???") };
 	_float2 vFontPos = { 410.f, 725.f };
-	//_float4 vFontRGBA = { m_UIObjDesc.vColorRGB };
-	//_float4 vFontRGBA = { 176.f / 255.f, 12.f / 255.f, 24.f / 255.f, m_UIObjDesc.fAlpha };
 	_float4 vFontRGBA = {	0.f / 255.f, 
 							138.f / 255.f, 
 							121.f / 255.f, 
 							1.f };
-
+	//wstring wstrText = { TEXT("???") };
+	//_float4 vFontRGBA = { m_UIObjDesc.vColorRGB };
+	//_float4 vFontRGBA = { 176.f / 255.f, 12.f / 255.f, 24.f / 255.f, m_UIObjDesc.fAlpha };
 	//vFontRGBA.w = m_UIObjDesc.fAlpha;
 
 	_float2 vFontOrig = { 1.f, 1.f };
 	_float2 vFontScale = { 1.2f, 1.2f };
 	_float fRadian = { XMConvertToRadians(0.f) };
 
-	m_pGameInstance->Render_Font(wstrFontTag, _wstrMessage, vFontPos, vFontRGBA, fRadian, vFontOrig, vFontScale);
+	if (m_iCurMessageIndex < m_vecMessage.size())
+	{
+		DialogMessage tMessage = m_vecMessage[m_iCurMessageIndex];
+		wstring& wstrSubstrMessage = tMessage.wstrMessage.substr(0, m_iCurCharIndex);
+
+		m_pGameInstance->Render_Font(wstrFontTag, wstrSubstrMessage, vFontPos, vFontRGBA, fRadian, vFontOrig, vFontScale);
+	}
 
 	return S_OK;
 }
@@ -126,8 +157,11 @@ void CDialog::Free()
 {
 	__super::Free();
 
-	//for (auto& Message : m_vecMessage)
-	//	Safe_Release(Message);
-	//m_vecMessage.clear();
+	if (!m_vecMessage.empty())
+	{
+		for (auto& Message : m_vecMessage)
+			m_vecMessage.clear();
+	//	//	Safe_Release(Message);
+	}
 }
 

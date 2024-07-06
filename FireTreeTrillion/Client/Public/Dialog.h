@@ -30,8 +30,8 @@ public:
 
 public:
 	HRESULT Add_Message(const wstring& _wstrMessage, _float _fDisplayTime);
-	HRESULT Start_Message();
-	HRESULT	Display_Message(const wstring& _wstrMessage, _float _fDisplayTime);
+	HRESULT Display_Message(_float _fTimeDelta);
+	HRESULT	Render_Message(const wstring& _wstrMessage, _float _fDisplayTime);
 
 private:
 	vector<DialogMessage>	m_vecMessage;
@@ -40,5 +40,11 @@ public:
 	static CDialog* Create(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
+
+private:
+	_float					m_fElapsedTime = { 0.f }; //경과 시간
+	_float					m_fDisplayTime = { 0.f }; //출력 시간
+	_uint					m_iCurMessageIndex = { 0 }; 
+	_uint					m_iCurCharIndex = { 0 };
 };
 END
