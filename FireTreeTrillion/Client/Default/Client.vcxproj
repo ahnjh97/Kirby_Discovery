@@ -217,6 +217,7 @@
     <ClInclude Include="..\Public\CollisionCenter.h" />
     <ClInclude Include="..\Public\Debris.h" />
     <ClInclude Include="..\public\DecoObject.h" />
+    <ClInclude Include="..\Public\Level_Park.h" />
     <ClInclude Include="..\Public\Disaster_Master.h" />
     <ClInclude Include="..\Public\ShadowDeco.h" />
     <ClInclude Include="..\Public\DeeDeeDee.h" />
@@ -331,6 +332,7 @@
     <ClInclude Include="..\Public\Radio.h" />
     <ClInclude Include="..\Public\RayArrow.h" />
     <ClInclude Include="..\Public\RigidObject.h" />
+    <ClInclude Include="..\Public\SimbaRoomGlass.h" />
     <ClInclude Include="..\Public\SingleEffect.h" />
     <ClInclude Include="..\public\SkySphere.h" />
     <ClInclude Include="..\Public\SpikeSpear.h" />
@@ -351,6 +353,7 @@
     <ClInclude Include="..\Public\Trigger.h" />
     <ClInclude Include="..\Public\Tunnel.h" />
     <ClInclude Include="..\Public\TunnelRock.h" />
+    <ClInclude Include="..\Public\Turbine.h" />
     <ClInclude Include="..\Public\UI_BtnIcon.h" />
     <ClInclude Include="..\Public\UI_MessageWindow.h" />
     <ClInclude Include="..\Public\UI_PartTime.h" />
@@ -414,6 +417,7 @@
     <ClCompile Include="..\Private\CollisionCenter.cpp" />
     <ClCompile Include="..\Private\Debris.cpp" />
     <ClCompile Include="..\private\DecoObject.cpp" />
+    <ClCompile Include="..\Private\Level_Park.cpp" />
     <ClCompile Include="..\Private\Disaster_Master.cpp" />
     <ClCompile Include="..\Private\ShadowDeco.cpp" />
     <ClCompile Include="..\Private\DeeDeeDee.cpp" />
@@ -525,6 +529,7 @@
     <ClCompile Include="..\Private\Radio.cpp" />
     <ClCompile Include="..\Private\RayArrow.cpp" />
     <ClCompile Include="..\Private\RigidObject.cpp" />
+    <ClCompile Include="..\Private\SimbaRoomGlass.cpp" />
     <ClCompile Include="..\Private\SingleEffect.cpp" />
     <ClCompile Include="..\private\SkySphere.cpp" />
     <ClCompile Include="..\Private\SpikeSpear.cpp" />
@@ -545,6 +550,7 @@
     <ClCompile Include="..\Private\Trigger.cpp" />
     <ClCompile Include="..\Private\Tunnel.cpp" />
     <ClCompile Include="..\Private\TunnelRock.cpp" />
+    <ClCompile Include="..\Private\Turbine.cpp" />
     <ClCompile Include="..\Private\UI_BtnIcon.cpp" />
     <ClCompile Include="..\Private\UI_MessageWindow.cpp" />
     <ClCompile Include="..\Private\UI_PartTime.cpp" />

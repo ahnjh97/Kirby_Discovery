@@ -408,7 +408,7 @@ PS_OUT PS_MAIN_ALPHATEST_COLOR_HORIZONTALCUT(PS_IN In)
 {
 	PS_OUT			Out = (PS_OUT)0;
     vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord);
-    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    Out.vColor   = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
 
 	//알파 테스트
 	if(Out.vColor.a < .6f)

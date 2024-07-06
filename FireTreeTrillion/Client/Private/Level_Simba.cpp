@@ -633,22 +633,19 @@ HRESULT CLevel_Simba::Ready_Objects()
 		tDesc.iShaderVars = iShaderVars;
 		tDesc.fRimWidth = fRimWidth;
 
-#pragma region GIMMICK_OBJECT
-
-		if ("LbAntenna_NonAnim" == strModelName)
+		if ("LbBossTurbine01L" == strModelName || "LbBossRing01L" == strModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_LabAntenna"), &tDesc)))
+			tDesc.wstrModelName += L"_Anim";
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_MapDeco"), TEXT("Prototype_GameObject_Turbine"), &tDesc)))
 				continue;
 		}
-
-		if ("LbBossRoomDoor_NonAnim" == strModelName)
+		else if ("JhGlass" == strModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_LabBossRoomDoor"), &tDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_MapDeco"), TEXT("Prototype_GameObject_SimbaRoomGlass"), &tDesc)))
 				continue;
 		}
-
-#pragma endregion
 	}
+
 	fileInput.close();
 
 	return S_OK;
