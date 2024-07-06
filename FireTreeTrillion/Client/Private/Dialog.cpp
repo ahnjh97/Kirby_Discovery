@@ -28,8 +28,24 @@ HRESULT CDialog::Initialize(void* pArg)
 		TEXT("Prototype_GameObject_UI_MessageWindow"), &MessageWindowDesc)))
 		return E_FAIL;
 	
-	//json 파일 파싱 및 로드를 여기에서
-	Add_Message(TEXT("고마워, 덕분에 살았어~!"), 0.1f);
+	//json or csv 파일 파싱 및 로드를 여기에서.
+	//Load_FileData();
+
+
+	//Font에 대한 정보를 던짐
+	MESSAGE_DESC FontDesc{};
+	FontDesc.wstrFontTag = { TEXT("Font_HUDSub_KR15") };
+	FontDesc.wstrMessage = { TEXT("고마워~ 덕분에 살았어~!") };
+	FontDesc.fFontPos = { 410.f, 725.f };
+	FontDesc.fFontRGBA = { 0.f / 255.f, 138.f / 255.f, 121.f / 255.f, 1.f };
+	FontDesc.fFontSize = { 1.f, 1.f };
+	FontDesc.fFontScale = { 1.2f, 1.2f };
+	FontDesc.fRadian = { XMConvertToRadians(0.f) };
+
+	FontDesc.fDisplayTime = 0.1f;
+	FontDesc.fElapsedyTime = 0.f;
+
+	Add_Message(/*FontDesc.wstrMessage, 0.1f, */&FontDesc);
 
 	return S_OK;
 }
@@ -51,18 +67,20 @@ HRESULT CDialog::Render()
 	if (!m_vecMessage.empty())
 	{
 		for (auto& Message : m_vecMessage)
-			Render_Message(Message.wstrMessage, Message.fDisplayTime);
+			Render_Message(Message.wstrMessage);
 	}
 
 	return S_OK;
 }
 
 // 파싱해서 가져온 대화내용들을 vector안에 넣어줍니다.
-HRESULT CDialog::Add_Message(const wstring& _wstrMessage, _float _fDisplayTime)
+HRESULT CDialog::Add_Message(/*const wstring& _wstrMessage, _float _fDisplayTime, */void* _pArg)
 {
-	m_vecMessage.push_back({_wstrMessage});
-	m_fDisplayTime = _fDisplayTime;
-	m_fElapsedTime = 0.f;
+	MESSAGE_DESC* pMessage_Desc = (MESSAGE_DESC*)_pArg;
+
+	m_vecMessage.push_back({ pMessage_Desc->wstrMessage});
+	m_fDisplayTime = pMessage_Desc->fDisplayTime;
+	m_fElapsedTime = pMessage_Desc->fElapsedyTime;
 
 	return S_OK;
 }
@@ -92,25 +110,22 @@ HRESULT CDialog::Display_Message(_float _fTimeDelta)
 
 		}
 	}
+
+	//추후, A버튼 입력 전까지 대기하는 로직 필요
+	//iCurCharIndex 비교 체크하여 동일/초과할 경우 대기.
+	//A버튼 입력 상태를 확인할 경우, 다음 iCurMeesageIndex로 변경하여 스크립트 문단을 넘긴다.
 	
 	return S_OK;
 }
 
 // 다이얼로그 출력합니다.
 // ps. 폰트하다가 안되면 이미지
-HRESULT CDialog::Render_Message(const wstring& _wstrMessage, _float _fDisplayTime)
+HRESULT CDialog::Render_Message(const wstring& _wstrMessage)
 {
 	//SpriteFont 폰트 수정 필요.
 	wstring wstrFontTag = { TEXT("Font_HUDSub_KR15") };
 	_float2 vFontPos = { 410.f, 725.f };
-	_float4 vFontRGBA = {	0.f / 255.f, 
-							138.f / 255.f, 
-							121.f / 255.f, 
-							1.f };
-	//wstring wstrText = { TEXT("???") };
-	//_float4 vFontRGBA = { m_UIObjDesc.vColorRGB };
-	//_float4 vFontRGBA = { 176.f / 255.f, 12.f / 255.f, 24.f / 255.f, m_UIObjDesc.fAlpha };
-	//vFontRGBA.w = m_UIObjDesc.fAlpha;
+	_float4 vFontRGBA = {	0.f / 255.f, 138.f / 255.f, 121.f / 255.f, 1.f };
 
 	_float2 vFontOrig = { 1.f, 1.f };
 	_float2 vFontScale = { 1.2f, 1.2f };

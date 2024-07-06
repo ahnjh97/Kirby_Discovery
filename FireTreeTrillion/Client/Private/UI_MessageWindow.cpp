@@ -156,12 +156,6 @@ HRESULT CUI_MessageWindow::Render()
 		CHECK_FAILED(hr);
 	}
 #pragma endregion
-	
-	//CDialog* pDialog = static_cast<CDialog*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_Dialog"), 0));
-	//if (nullptr == pDialog)
-	//	return S_OK;
-	//if (WINDOW_SHOW == m_eCurState)
-	//	pDialog->Display_Message();
 
 	return S_OK;
 }
