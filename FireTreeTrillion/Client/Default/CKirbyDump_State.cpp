@@ -236,19 +236,19 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		Turn_InterPolate_OtherVector(Kirbydesc->m_vHandleDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 2.f);
 	}
 
-	return;
+	
 	Kirbydesc->m_fMoveSpeed += fTimeDelta * 10.f;
 
-	//if (DESC(m_bBooster) == true)
-	//{
-	//	if (Kirbydesc->m_fMoveSpeed > 30.f)
-	//		Kirbydesc->m_fMoveSpeed = 30.f;
-	//}
-	//else
-	//{
-	//	if (Kirbydesc->m_fMoveSpeed > 20.f)
-	//		Kirbydesc->m_fMoveSpeed = 20.f;
-	//}
+	if (DESC(m_bBooster) == true)
+	{
+		if (Kirbydesc->m_fMoveSpeed > 30.f)
+			Kirbydesc->m_fMoveSpeed = 30.f;
+	}
+	else
+	{
+		if (Kirbydesc->m_fMoveSpeed > 20.f)
+			Kirbydesc->m_fMoveSpeed = 20.f;
+	}
 
 	// Å¸°Ù±âÁØ
 	_vector vMoveDelta = Kirbydesc->m_vMoveDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;

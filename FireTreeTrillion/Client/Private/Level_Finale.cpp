@@ -241,6 +241,7 @@ HRESULT CLevel_Finale::Ready_FinaleRoad()
 
 	InitMat = _float4x4::Identity;
 	InitMat.Translation({389.f, -12.5f, -9.f});
+
 	CUtils::Rotation(InitMat, CUtils::Make_Quat_FromDir({ .93f, -.25f, -.27f }));
 	roadGrouperDesc.matWorld = InitMat;
 
