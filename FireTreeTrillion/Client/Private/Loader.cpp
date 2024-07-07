@@ -125,6 +125,9 @@
 #include "Radio.h"
 #include "Fog_Instance.h"
 #include "Box.h"
+#include "Debris.h"
+#include "Turbine.h"
+#include "SimbaRoomGlass.h"
 
 // 피날레 스테이지 기믹들
 #include "Baum.h"
@@ -261,6 +264,9 @@ HRESULT CLoader::Start()
 		break;
 	case LEVEL_PARTTIME:
 		hr = Loading_For_Parttime();
+		break;
+	case LEVEL_PARK:
+		hr = Loading_For_Park();
 		break;
 
 	case LEVEL_SIMBA:
@@ -429,6 +435,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TunnelRock"), CTunnelRock);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Fog_Instance"), CFog_Instance);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Box"), CBox);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Debris"), CDebris);
 
 	#pragma region GIMMICK::LEVEL_FINALBOSS
 
@@ -439,6 +446,12 @@ HRESULT CLoader::Loading_ObjectAll()
 
 	// 미니게임 in 와들디마을
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PartTimeFood"), CPartTimeFood);
+
+	#pragma region LEVEL_SIMBA
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Turbine"), CTurbine);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SimbaRoomGlass"), CSimbaRoomGlass);
+	#pragma endregion
+
 #pragma endregion
 
 	return S_OK;
@@ -783,7 +796,6 @@ HRESULT CLoader::Loading_For_Town()
 	CHECK_FAILED(hr);
 #pragma endregion
 
-
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 	m_IsFinished = true;
 
@@ -852,7 +864,6 @@ HRESULT CLoader::Loading_For_Parttime()
 
 #pragma endregion
 
-
 #pragma region UI
 
 	// 타임 바
@@ -897,6 +908,61 @@ HRESULT CLoader::Loading_For_Parttime()
 
 	m_strLoadingText = TEXT("물리 컴포넌트(을) 로딩 중 입니다.");
 	#pragma region 물리 컴포넌트
+	/* 리지드바디 */
+	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_RigidBody"), CRigidBody::Create(m_pDevice, m_pContext));
+	CHECK_FAILED(hr);
+	/* 캐릭터 컨트롤러 */
+	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_CharacterController"), CCharacterController::Create(m_pDevice, m_pContext));
+	CHECK_FAILED(hr);
+#pragma endregion
+
+	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
+	m_IsFinished = true;
+
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_For_Park()
+{
+	HRESULT hr = S_OK;
+	LEVEL eLevel = LEVEL_PARK;
+
+	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
+
+#pragma region 텍스쳐
+	if (FAILED(Add_Texture(eLevel, "Logo", "Logo/Logo.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Moon", "Moon.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Level_0_Env", "Map/Level_0_Env.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "BRDF_LUT", "Map/BRDF_LUT.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "RandomNormal", "Map/RandomNormal.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Terrain_Fog", "Map/Fog/Sand_%d.png", 4)))
+		return E_FAIL;
+	
+	hr = Add_Texture(eLevel, "FX_Mask_Bubble2", "Effects/Mask/noise_bubble_%d.png", 4);	CHECK_FAILED(hr);
+
+	//HUD_BOSSHPBAR
+	hr = Add_Texture(eLevel, "HUD_BossBar", "UI/HUD/Boss/BossBar_%d.png", 5);
+
+	// 커비 얼굴 텍스쳐 로드
+	Add_KirbyFaceTexture(eLevel);
+#pragma endregion
+
+	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
+#pragma region 모델
+	Load_AnimToolInfo();
+	// 모아놓은 Model 한번에 생성.
+	hr = Add_Models(eLevel);
+	CHECK_FAILED(hr);
+#pragma endregion
+
+	m_strLoadingText = TEXT("물리 컴포넌트(을) 로딩 중 입니다.");
+
+#pragma region 물리 컴포넌트
 	/* 리지드바디 */
 	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_RigidBody"), CRigidBody::Create(m_pDevice, m_pContext));
 	CHECK_FAILED(hr);
@@ -973,9 +1039,6 @@ HRESULT CLoader::Loading_For_Simba()
 
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 	m_IsFinished = true;
-
-	return S_OK;
-
 
 	return S_OK;
 }
@@ -1229,7 +1292,8 @@ HRESULT CLoader::Loading_For_Tool_Map()
 
 	if (FAILED(Add_AllModelTxts(eLevel, TYPE_NONANIM, L"TownDeco/")))
 		return E_FAIL;
-
+	if (FAILED(Add_AllModelTxts(eLevel, TYPE_NONANIM, L"ParkDeco/")))
+		return E_FAIL;
 	//LEVEL_FINALBOSS (MapName :: LAB_Discovera)
 	if (FAILED(Add_AllModelTxts(eLevel, TYPE_NONANIM, L"LabDiscovera_Deco/")))
 		return E_FAIL;
@@ -1738,12 +1802,38 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("FoodCake", TYPE_NONANIM, 0.6f);
 		m_vecModelInfo.emplace_back("FoodTomato", TYPE_NONANIM, 1.6f);
 	}
-	else if (eLevel == LEVEL_SIMBA)
+	else if (eLevel == LEVEL_PARK)
 	{
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("BG1", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
+		// For Map
+		m_vecModelInfo.emplace_back("PkFunHouse", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+
+		// For Kirby Body
+		Load_KirbyBodyModels();
+		// For Kirby Weapon
+		Load_KirbyWeaponModels();
+		// For Kirby Armour
+		Load_KirbyArmourModels();
+
+		// Deform
+		m_vecModelInfo.emplace_back("DumpCar", TYPE_ANIM, 0.8f, 90.f);
+	}
+	else if (eLevel == LEVEL_SIMBA)
+	{
+		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, string("MapObjs/"));
+
 		m_vecModelInfo.emplace_back("Kirby", TYPE_ANIM, 1.f, 180.f);
+
+		// Level_Simba 맵
+		m_vecModelInfo.emplace_back("LbBossLoom01L", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("LbBossLoom01L_Blend", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		
+		// 맵 오브젝트
+		m_vecModelInfo.emplace_back("LbBossTurbine01L_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("LbBossRing01L_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("JhGlass", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 		// For Kirby Body
 		Load_KirbyBodyModels();
@@ -1760,6 +1850,11 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	}
 	else if (eLevel == LEVEL_FINALBOSS)
 	{
+		for (_uint i = 0; i <= 17; i++) {
+			string strTunnelRock = "TunnelRock" + to_string(i);
+			m_vecModelInfo.emplace_back(strTunnelRock, TYPE_NONANIM, 0.1f);
+		}
+
 		//보스전 필드에서만 생성하는 SUB_SKYSPHERE (BackGround 요소)
 		m_vecModelInfo.emplace_back("LbBuildingFrame", TYPE_NONANIM, 1.f, 0.f);
 		m_vecModelInfo.emplace_back("LbFarPiller", TYPE_NONANIM, 1.f, 76.117f);

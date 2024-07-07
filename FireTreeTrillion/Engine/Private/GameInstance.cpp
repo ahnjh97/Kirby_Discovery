@@ -518,6 +518,12 @@ CGameObject* CGameInstance::Get_GameObject_ByTag(_uint iLevelIndex, const wstrin
 	return m_pObject_Manager->Get_GameObject_ByTag(iLevelIndex, strLayerTag, _tag);
 }
 
+CGameObject* CGameInstance::Get_LastGameObject(_uint iLevelIndex, const wstring& strLayerTag)
+{
+	CHECK_NULLPTR(m_pObject_Manager);
+	return m_pObject_Manager->Get_LastGameObject(iLevelIndex, strLayerTag);
+}
+
 CGameObject* CGameInstance::Find_Prototype(const wstring& strPrototypeTag)
 {
 	CHECK_NULLPTR(m_pObject_Manager);

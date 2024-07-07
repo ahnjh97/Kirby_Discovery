@@ -70,6 +70,11 @@ CGameObject* CLayer::Get_GameObject_ByTag(wstring _tag)
 	return nullptr;
 }
 
+CGameObject* CLayer::Get_LastGameObject()
+{
+	return m_GameObjects.back();
+}
+
 void CLayer::Tick(_float fTimeDelta)
 {
 	for (auto iter = m_GameObjects.begin(); iter != m_GameObjects.end();)
