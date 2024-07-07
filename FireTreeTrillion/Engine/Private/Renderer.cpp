@@ -813,11 +813,22 @@ void CRenderer::Update_DofFocus(_fvector vWorldPos)
 	m_vDofFocus = _float2(fScreenX, 1.f - fScreenY);
 }
 
-void CRenderer::Setting_GodRay(_fvector vWorldPos)
+void CRenderer::Setting_GodRay(_fvector vWorldPos, _float fRayExposure, _float fRayDecay, _float fRayIlluminationDecay, _float fRayDensity, _float fWeight)
 {
 	m_vGodPos = vWorldPos;
 
 	if (FAILED(m_pShader->Bind_RawValue("g_vGodPos", &m_vGodPos, sizeof(_float4))))
+		return;
+
+	if (FAILED(m_pShader->Bind_RawValue("g_fRayExposure", &fRayExposure, sizeof(_float))))
+		return;
+	if (FAILED(m_pShader->Bind_RawValue("g_fRayDecay", &fRayDecay, sizeof(_float))))
+		return;
+	if (FAILED(m_pShader->Bind_RawValue("g_fRayIlluminationDecay", &fRayIlluminationDecay, sizeof(_float))))
+		return;
+	if (FAILED(m_pShader->Bind_RawValue("g_fRayDensity", &fRayDensity, sizeof(_float))))
+		return;
+	if (FAILED(m_pShader->Bind_RawValue("g_fWeight", &fWeight, sizeof(_float))))
 		return;
 }
 
@@ -1026,6 +1037,8 @@ HRESULT CRenderer::Render_Lights()
 	if (FAILED(m_pShader->Bind_RawValue("g_sample_radius", &m_fSSAOSampleRadius, sizeof(_float))))
 		return E_FAIL;
 	if (FAILED(m_pShader->Bind_RawValue("g_intensity", &m_fSSAOIntensity, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_bLensFlare", &m_bLensFlare, sizeof(_bool))))
 		return E_FAIL;
 
 	_float fFar = 1000.f;
