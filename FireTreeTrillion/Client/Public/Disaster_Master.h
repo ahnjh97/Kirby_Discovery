@@ -26,6 +26,8 @@ public:
 private:
 	void			Make_MissBaum();
 	void			Make_OnTerrainBaum(_float4 vTargetPos, _bool bBaum);
+	void			Make_FinaleRoad(_float4 vTargetPos);
+
 
 	void			Moving_FinaleRoad(_float fKirbyX);
 	_bool			m_bRoadTrigger[10] = { true, true, true, true, true, true, true, true, true, true };

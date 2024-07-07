@@ -132,7 +132,7 @@ HRESULT CLevel_Finale::Ready_Lights()
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
 	LightDesc.vDirection = _float4(0.f, -1.f, -.3f, 0.f);
 
-	LightDesc.vDiffuse = _float4(.062f, .062f, .39f, 1.f);
+	LightDesc.vDiffuse = _float4(.095f, .024f, .365f, 1.f);
 	LightDesc.vAmbient = _float4(.23f, .27f, .47f, 1.f);
 
 	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
@@ -231,7 +231,7 @@ HRESULT CLevel_Finale::Ready_FinaleRoad()
 	CUtils::Rotation(InitMat, CUtils::Make_Quat_FromDir({ .98f, .21f, .07f }));
 	roadGrouperDesc.matWorld = InitMat;
 
-	roadGrouperDesc.vDestPos = { 139.f, -42.f, 4.8f };
+	roadGrouperDesc.vDestPos = { 139.f, -52.f, 4.8f };
 	roadGrouperDesc.vDestDir = { 1.f, -.04f, .07f };
 
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleRoadGrouper"),
@@ -275,13 +275,15 @@ HRESULT CLevel_Finale::Ready_FinaleRoad()
 	//µµ·Î
 	roadGrouperDesc = {};
 	roadGrouperDesc.eRoadType = CFinaleRoadGrouper::RTYPE_ROADA;
-	roadGrouperDesc.eMoveCommand = CFinaleRoadGrouper::MOVECMD_STOP;
+	roadGrouperDesc.eMoveCommand = CFinaleRoadGrouper::MOVECMD_COLLIDE;
 
 	InitMat = _float4x4::Identity;
 	InitMat.Translation({ 620.f, -22.f, -82.f });
 	CUtils::Rotation(InitMat, CUtils::Make_Quat_FromDir({ .98f, -.16f, -.15f }));
 	roadGrouperDesc.matWorld = InitMat;
 
+	roadGrouperDesc.vDestPos = { 620.f, -32.f, -82.f };
+	roadGrouperDesc.vDestDir = { .98f, -.16f, -.15f };
 
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleRoadGrouper"),
 		TEXT("Prototype_GameObject_FinaleRoadGrouper"), &roadGrouperDesc)))
