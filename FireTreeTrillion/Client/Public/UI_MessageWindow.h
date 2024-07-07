@@ -21,7 +21,7 @@ public:
 
 		_float2 fFontSize = { 0.f, 0.f }; //원본 사이즈
 		_float2 fFontScale = { 0.f, 0.f }; //원본대비 키울 스케일 비율
-		_float fRadian = { XMConvertToRadians(0.f) };
+		_float  fRadian = { XMConvertToRadians(0.f) };
 
 		_float fDisplayTime = { 0.f }; //출력 시간
 		_float fElapsedyTime = { 0.f }; //경과 시간
@@ -42,7 +42,6 @@ private:
 public:
 	MESSAGEWINDOW_STATE Get_MWindowState() { return m_eCurState; }
 #pragma endregion
-
 
 public:
 	virtual HRESULT				Initialize_Prototype()						override;

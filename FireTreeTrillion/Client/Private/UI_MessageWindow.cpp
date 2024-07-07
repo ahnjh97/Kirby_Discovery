@@ -24,11 +24,7 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 	CHECK_FAILED(hr);
 
 	MESSAGE_DESC* MessageWindowDesc{};
-	MessageWindowDesc = (MESSAGE_DESC*)_pArg;
-	
-	m_tMessageDesc = *MessageWindowDesc;
-	/*if (m_tMessageDesc.vecMsg.empty())
-		ALARM_FAIL("다이얼로그 내용물이 없는디");*/
+	m_tMessageDesc = *(MESSAGE_DESC*)_pArg;
 
 	if (FAILED(Add_Transform(_pArg)))
 		return E_FAIL;
@@ -312,7 +308,7 @@ HRESULT CUI_MessageWindow::Render_Message()
 
 	_float2 vFontSize = m_tMessageDesc.fFontSize;
 	_float2 vFontScale = m_tMessageDesc.fFontScale;
-	_float fRadian = m_tMessageDesc.fRadian;
+	_float fRadian = XMConvertToRadians(m_tMessageDesc.fRadian);
 
 	if (m_iCurMessageIndex < m_tMessageDesc.vecMsg.size())
 	{
