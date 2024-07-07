@@ -148,25 +148,25 @@ void CDisaster_Master::Moving_TargetBaum(_float fKirbyX)
 	_float fKirbySpeed = m_pKirby->Get_KirbyInfo()->m_fMoveSpeed;
 
 	// 그 위치에 커비는 약 2초후에 도달할 것이다.
-	if (m_bBaumTrigger[0] == true && fKirbyX + (fKirbySpeed * 2.f) > 365.4f)
+	if (m_bBaumTrigger[0] == true && fKirbyX + (fKirbySpeed * 4.f) > 365.4f)
 	{
 		Make_OnTerrainBaum(_float4(365.4f, 39.3f, 1.93f, 1.f), true);
 		m_bBaumTrigger[0] = false;
 	}
 
-	else if (m_bBaumTrigger[1] == true && fKirbyX + (fKirbySpeed * 2.f) > 471.f)
+	else if (m_bBaumTrigger[1] == true && fKirbyX + (fKirbySpeed * 4.f) > 471.f)
 	{
 		Make_OnTerrainBaum(_float4(471.f, 8.15f, -69.7f, 1.f), true);
 		m_bBaumTrigger[1] = false;
 	}
 
-	else if (m_bBaumTrigger[2] == true && fKirbyX + (fKirbySpeed * 2.f) > 583.25f)
+	else if (m_bBaumTrigger[2] == true && fKirbyX + (fKirbySpeed * 4.f) > 583.25f)
 	{
 		Make_OnTerrainBaum(_float4(583.25f, .08f, -91.f, 1.f), false);
 		m_bBaumTrigger[2] = false;
 	}
 
-	else if (m_bBaumTrigger[3] == true && fKirbyX + (fKirbySpeed * 2.f) > 681.f)
+	else if (m_bBaumTrigger[3] == true && fKirbyX + (fKirbySpeed * 4.f) > 681.f)
 	{
 		Make_OnTerrainBaum(_float4(681.f, -15.9f, -91.8f, 1.f), false);
 		m_bBaumTrigger[3] = false;
