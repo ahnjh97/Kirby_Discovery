@@ -553,6 +553,7 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
 
 	// 최종적인 결과물
         directLighting = (diffuseBRDF + specularBRDF) * Lradiance * cosLi;
+        directLighting *= g_vLightDiffuse;
     }
     //////////////////    // Ambient lighting (IBL).
     
@@ -562,7 +563,7 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
         float3 F = fresnelSchlick(F0, cosLo);
         float3 kd = lerp(1.0 - F, 0.0, fMetalness);
         float3 diffuseIBL = kd * vDiffuse.rgb * irradiance + 0.001;
-        
+
         float2 specularBRDF = g_LUTTexture.Sample(LinearSampler, float2(cosLo, fRoughness)).rg;
         
         //float2 specularBRDF = float2(1.0, 0.0);
@@ -573,6 +574,7 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
         
         
         ambientLighting = diffuseIBL + specularIBL;
+        ambientLighting *= g_vLightAmbient;
     }
     
     float4 vLightspecular = 0.0;
@@ -771,10 +773,116 @@ PS_OUT_LIGHT PS_MAIN_POINT(PS_IN In)
     vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
     float fMetalness = g_MRATexture.Sample(LinearSampler, In.vTexcoord).x;
     float fRoughness = g_MRATexture.Sample(LinearSampler, In.vTexcoord).y;
-
+    float fAmbientOcclusion = g_MRATexture.Sample(LinearSampler, In.vTexcoord).z;
+    
+    vector vDepthDesc = g_DepthTexture.Sample(LinearSampler, In.vTexcoord);
+    float fViewZ = vDepthDesc.y * g_fFar;
+    
     vDiffuse = pow(vDiffuse, 2.2f);
-       
+    
+    float4 vWorldPos;
+   /* 로컬위치 * 월드행렬 * 뷰행렬 * 투영행렬 / View.z */
+    vWorldPos.x = In.vTexcoord.x * 2.f - 1.f;
+    vWorldPos.y = In.vTexcoord.y * -2.f + 1.f;
+    vWorldPos.z = vDepthDesc.x;
+    vWorldPos.w = 1.f;
+   /* 로컬위치 * 월드행렬 * 뷰행렬 * 투영행렬 */
+    vWorldPos *= fViewZ;
+   /* 로컬위치 * 월드행렬 * 뷰행렬 */
+    vWorldPos = mul(vWorldPos, g_ProjMatrixInv);
+   /* 로컬위치 * 월드행렬 */
+    vWorldPos = mul(vWorldPos, g_ViewMatrixInv);
+    
+    // 월드 포지션에서 빛이 반사되어 우리 눈에 들어오는 방향 벡터
+    float3 Lo = normalize(g_vCamPosition - vWorldPos);
+    
+    vector vNormalDesc = g_NormalTexture.Sample(PointSampler, In.vTexcoord);
+    // 월드 상의 노말벡터를 가져온다.
+    float3 N = vNormalDesc.xyz * 2.f - 1.f;
+    
+    
+    // 표면의 법선벡터와 빛이 반사되어 우리 눈에 들어오는 방향 벡터간의 내적
+    float cosLo = max(0.0, dot(N, Lo));
+    
+    // 리플렉트
+    float3 Lr = 2.0 * cosLo * N - Lo;
+    
+    // Fresnel reflectance at normal incidence (for metals use albedo color).
+    float3 F0 = lerp(Fdielectric, vDiffuse.rgb, fMetalness);
+    
+    
+    float4 vLightDir = vWorldPos - g_vLightPos;
+    float fDistance = length(vLightDir);
+    float fAtt = saturate((g_fLightRange - fDistance) / g_fLightRange);
+    
+    // Direct lighting calculation for analytical lights.
+    float3 directLighting = 0.0;
+    {
+    
+        float3 Li = -1.f * normalize(vLightDir);
+        float3 Lradiance = 1.f;
 
+	// Half-vector between Li and Lo.
+        float3 Lh = normalize(Li + Lo);
+
+    
+	// Calculate angles between surface normal and various light vectors.
+        float cosLi = max(0.1, saturate(dot(N, Li) + 0.7f));
+        float cosLh = max(0.0, dot(N, Lh));
+
+        float3 F = fresnelSchlick(F0, max(0.0, dot(Lh, Lo)));
+        float D = ndfGGX(cosLh, fRoughness);
+        float G = gaSchlickGGX(cosLi, cosLo, fRoughness);
+    
+    
+        float3 kd = lerp(1.0 - F, 0.0, fMetalness);
+
+
+    // 스페큘러가 높을수록 Diffuse를 잃는다.
+        float3 diffuseBRDF = kd * vDiffuse.rgb;
+
+	// Cook-Torrance specular BRDF. (공식임 ㅎㅎ)
+        float3 specularBRDF = (F * D * G) / max(Epsilon, 4.0 * cosLi * cosLo);
+
+	// 최종적인 결과물
+        directLighting = (diffuseBRDF + specularBRDF) * Lradiance * cosLi;
+        directLighting *= g_vLightDiffuse;
+    }
+    //////////////////    // Ambient lighting (IBL).
+    
+    float3 ambientLighting = 0.0;
+    {
+        float3 irradiance = g_EnvTexture.Sample(LinearSampler, N).rgb * fMetalness;
+        float3 F = fresnelSchlick(F0, cosLo);
+        float3 kd = lerp(1.0 - F, 0.0, fMetalness);
+        float3 diffuseIBL = kd * vDiffuse.rgb * irradiance + 0.001;
+        
+        float2 specularBRDF = g_LUTTexture.Sample(LinearSampler, float2(cosLo, fRoughness)).rg;
+        
+        //float2 specularBRDF = float2(1.0, 0.0);
+        
+        //float3 specularIBL = (F0 * 1.0 + 0.0) * irradiance; // Adjusted for simplification
+        float3 specularIBL = (F0 * specularBRDF.x + specularBRDF.y) * irradiance;
+        //specularIBL = (F0 * specularBRDF.x + specularBRDF.y) * irradiance;
+        
+        
+        ambientLighting = diffuseIBL + specularIBL;
+        ambientLighting *= g_vLightAmbient;
+    }
+    
+    float4 vLightspecular = 0.0;
+    {
+        float3 vReflect = reflect(normalize(vLightDir.xyz), N);
+        float fLightspecular = saturate(pow(max(dot(normalize(vReflect), normalize(Lo)), 0.0), 20.f * (max(0.5, 1.f - fRoughness * 2.f))) * saturate(1.f - fRoughness * 1.05f));
+        vLightspecular = fLightspecular;
+
+        vLightspecular += vDiffuse * vLightspecular.a;
+    }
+
+    
+    Out.vResultColor = saturate(float4(directLighting + ambientLighting, 1.f) * fAmbientOcclusion) * fAtt;
+    Out.vSpecular = saturate(vLightspecular) * fAtt;
+    
     return Out;
 }
 
