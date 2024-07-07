@@ -46,6 +46,15 @@ CGameObject* CObject_Manager::Get_GameObject_ByTag(_uint iLevelIndex, const wstr
 	return pLayer->Get_GameObject_ByTag(_tag);
 }
 
+CGameObject* CObject_Manager::Get_LastGameObject(_uint iLevelIndex, const wstring& wstrLayerTag)
+{
+	CLayer* pLayer = Find_Layer(iLevelIndex, wstrLayerTag);
+	if (nullptr == pLayer)
+		return nullptr;
+
+	return pLayer->Get_LastGameObject();
+}
+
 _uint CObject_Manager::Get_GameObject_Num(_uint _iLevelIndex, const wstring& _strLayerTag)
 {
 	//레이어 검색 후 오브젝트 개수 리턴

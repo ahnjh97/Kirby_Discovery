@@ -43,6 +43,8 @@ HRESULT CSpikeSpear::Initialize(void* pArg)
 	m_pTransformCom->Set_Scaled(2.f, 2.f, 2.f);
 	m_pTransformCom->Turn(XMVectorSet(-1.f, 0.f, 0.f, 0.f), 1.f);
 
+	m_bNonDead = true;
+
 	return S_OK;                                                                                                                                                                                                                          
 }
 
@@ -216,7 +218,7 @@ HRESULT CSpikeSpear::Add_Components()
 	CHitBox::HITBOX_DESC HitBox{};
 	HitBox.pOwner = this;
 	HitBox.pDesc = &m_tColliderDesc[BODY];
-	HitBox.pCollisionType = MONSTER;
+	HitBox.pCollisionType = MONSTERBULLET;
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
 	Set_BodyCollider(COLLIDER_SPHERE, -11.f, 1.f, 2.f);

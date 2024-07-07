@@ -629,7 +629,7 @@ void CBasicMap::ReadDecos_ForSmallLevels()
         string strFolder;
         if (LEVEL_TOWN == *m_pCurrentLevelID || LEVEL_PARTTIME == *m_pCurrentLevelID || LEVEL_DEEDEEDEE == *m_pCurrentLevelID)
             strFolder = string("TownDeco/");
-        else if(LEVEL_PARK)
+        else if(LEVEL_PARK == *m_pCurrentLevelID)
             strFolder = string("ParkDeco/");
         else if (LEVEL_FINALBOSS == *m_pCurrentLevelID || LEVEL_SIMBA == *m_pCurrentLevelID)
             strFolder = string("LabDiscovera_Deco/");
