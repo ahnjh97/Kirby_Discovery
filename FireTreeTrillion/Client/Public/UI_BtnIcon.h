@@ -50,7 +50,6 @@ public:
 
 private:
 	CTexture*					m_pTexCom[TEXBTN_NONE] = {nullptr};
-	CUI_MessageWindow*			m_pMWindow = { nullptr };
 
 	_float						m_fBtnAlpha = { 0.f };
 	_float						m_fBlinkAlpha = { 0.f };

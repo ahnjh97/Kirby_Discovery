@@ -53,6 +53,8 @@ public:
 #ifdef _DEBUG
 	virtual void				Render_IMGUI()								override;
 #endif
+	
+	void						ShowDialog();
 
 private:
 	HRESULT						Add_Transform(void* _pArg);
@@ -70,7 +72,6 @@ public:
 
 private:
 	CTransform*					m_pTransCom[TEXMW_NONE] = { nullptr };
-	CDialog*					m_pDialog = { nullptr };
 	class CUI_BtnIcon*			m_pUIBtn = { nullptr };
 	
 	MESSAGEWINDOW_STATE			m_eCurState = { WINDOW_NONE };

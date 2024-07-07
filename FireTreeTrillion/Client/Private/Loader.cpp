@@ -774,6 +774,12 @@ HRESULT CLoader::Loading_For_Town()
 
 	// ¾ó±¼, ´« ÅØ½ºÃÄ ·Îµå
 	Add_KirbyFaceTexture(eLevel);
+
+	//UI_MessageWindow, Button
+	hr = Add_Texture(eLevel, "UI_MessageWindow", "UI/MessageWindow/MessageWindow_Base_%d.dds", 2);
+	hr = Add_Texture(eLevel, "UI_BtnIconBase", "UI/BtnIcon/BtnIcon_Base.dds");
+	hr = Add_Texture(eLevel, "UI_BtnIconBright", "UI/BtnIcon/BtnIcon_Bright.dds");
+
 #pragma endregion
 
 

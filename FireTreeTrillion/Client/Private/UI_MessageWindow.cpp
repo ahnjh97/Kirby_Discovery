@@ -193,7 +193,14 @@ void CUI_MessageWindow::Render_IMGUI()
 	case WINDOW_NONE:	default: ImGui::Text(u8"WINDOW_NONE"); break;
 	}
 }
+
 #endif // DEBUG
+
+void CUI_MessageWindow::ShowDialog()
+{
+	m_eCurState = WINDOW_SHOW;
+	m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_BLINK);	//버튼 상태 동기화
+}
 
 HRESULT CUI_MessageWindow::Add_Transform(void* _pArg)
 {
@@ -349,7 +356,6 @@ void CUI_MessageWindow::Free()
 	for (auto& iTrans : m_pTransCom)
 		Safe_Release(iTrans);
 
-	Safe_Release(m_pDialog);
 	Safe_Release(m_pUIBtn);
 }
 
