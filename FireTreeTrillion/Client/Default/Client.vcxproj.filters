@@ -516,8 +516,8 @@
     </Filter>
     <Filter Include="01.Levels\5. Park">
       <UniqueIdentifier>{b7bfcb13-2e50-4821-b899-af7cb6e3737a}</UniqueIdentifier>
-	</Filter>
-	<Filter Include="02.GameObjects\Map\Baum">
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Baum">
       <UniqueIdentifier>{05ab6fbc-cc3d-448f-972e-09c450a5189e}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Map\Baum\Baum">
@@ -1056,8 +1056,8 @@
     </ClInclude>
     <ClInclude Include="..\Public\Level_Park.h">
       <Filter>01.Levels\5. Park</Filter>
-	</ClInclude>
-	<ClInclude Include="..\Public\Baum.h">
+    </ClInclude>
+    <ClInclude Include="..\Public\Baum.h">
       <Filter>02.GameObjects\Map\Baum\Baum</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BaumPiece.h">
@@ -1574,8 +1574,8 @@
     </ClCompile>
     <ClCompile Include="..\Private\Level_Park.cpp">
       <Filter>01.Levels\5. Park</Filter>
-	</ClCompile>
-	<ClCompile Include="..\Private\Baum.cpp">
+    </ClCompile>
+    <ClCompile Include="..\Private\Baum.cpp">
       <Filter>02.GameObjects\Map\Baum\Baum</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BaumPiece.cpp">
