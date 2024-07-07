@@ -523,6 +523,9 @@
     <Filter Include="02.GameObjects\Map\Baum\BaumPiece">
       <UniqueIdentifier>{4a53b512-3057-4457-a0d7-74a2c49bb988}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\BreakableBlock">
+      <UniqueIdentifier>{7235d034-6f27-4610-91d3-ceea38305009}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -1054,6 +1057,9 @@
     <ClInclude Include="..\public\FinaleRoadGrouper.h">
       <Filter>02.GameObjects\Map\FinaleRoad</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\BreakableBlock.h">
+      <Filter>02.GameObjects\Map\BreakableBlock</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1565,6 +1571,9 @@
     </ClCompile>
     <ClCompile Include="..\private\FinaleRoadGrouper.cpp">
       <Filter>02.GameObjects\Map\FinaleRoad</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BreakableBlock.cpp">
+      <Filter>02.GameObjects\Map\BreakableBlock</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

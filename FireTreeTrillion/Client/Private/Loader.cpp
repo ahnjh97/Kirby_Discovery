@@ -130,6 +130,7 @@
 #include "Disaster_Master.h"
 #include "FinaleRoad.h"
 #include "FinaleRoadGrouper.h"
+#include "PopStar.h"
 
 //±â¹Í
 #include "Gm_LabAntenna.h"
@@ -387,6 +388,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Disaster_Master"), CDisaster_Master);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleRoad"), CFinaleRoad);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleRoadGrouper"), CFinaleRoadGrouper);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PopStar"), CPopStar);
 
 	//Dee
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeePart"), CDee_Part);
@@ -1841,6 +1843,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Road", TYPE_NONANIM, 1.f, 0.f, 0);
 		m_vecModelInfo.emplace_back("RoadEnd", TYPE_NONANIM, 1.f, 0.f, 0);
 		m_vecModelInfo.emplace_back("RoadParticle", TYPE_NONANIM, 1.f, 0.f, 0);
+
+		m_vecModelInfo.emplace_back("BreakableBlock", TYPE_ANIM, 1.f, 0.f, 0);
 
 		m_vecModelInfo.emplace_back("RoadBreak", TYPE_NONANIM, 1.f, 0.f, 0);
 		m_vecModelInfo.emplace_back("RoadLBreak", TYPE_NONANIM, 1.f, 0.f, 0);

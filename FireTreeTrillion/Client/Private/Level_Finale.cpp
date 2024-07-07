@@ -28,6 +28,7 @@ CLevel_Finale::CLevel_Finale(ID3D11Device* pDevice, ID3D11DeviceContext* pContex
 HRESULT CLevel_Finale::Initialize()
 {
 	m_pGameInstance->Set_RenderMode(CRenderer::MODE_GAMEPLAY);
+	m_pGameInstance->Setting_LensFlare(false);
 
 	HRESULT hr;
 	hr = __super::Initialize();
@@ -66,11 +67,20 @@ HRESULT CLevel_Finale::Initialize()
 	_float4x4 InitMat = _float4x4::Identity;
 	InitMat.Translation({ 0.f, 0.f, 0.f });
 	ObjDesc.matWorld = InitMat;
-
 	// Car Test
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Deform"), TEXT("Prototype_GameObject_DumpCar"), &ObjDesc)))
 		return E_FAIL;
 
+	ObjDesc.fSpeedPerSec = 5.f;
+	ObjDesc.fRotationPerSec = ToRadian(90.f);
+	InitMat = _float4x4::Identity;
+	InitMat.Translation({ 5000.f, 800.f, 0.f });
+	ObjDesc.matWorld = InitMat;
+	// PopStar Test
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_PopStar"), TEXT("Prototype_GameObject_PopStar"), &ObjDesc)))
+		return E_FAIL;
+
+	m_pGameInstance->Setting_GodRay(_float4(0.f, 100000.f, 0.f, 1.f), 0.2f);
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 	m_pGameInstance->Set_ColorSet_ByIndex(4);
@@ -114,12 +124,11 @@ HRESULT CLevel_Finale::Ready_Lights()
 
 	LightDesc.vDiffuse = _float4(.062f, .062f, .39f, 1.f);
 	LightDesc.vAmbient = _float4(.23f, .27f, .47f, 1.f);
-	//LightDesc.vSpecular = _float4(0.2f, 0.2f, 0.2f, 1.f);
 
 	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
 		return E_FAIL;
 
-	CGameInstance::Get_Instance()->Setting_GodRay({ -650.f, 5000.f, 1200.f, 1.f });
+	//CGameInstance::Get_Instance()->Setting_GodRay({ -650.f, 5000.f, 1200.f, 1.f });
 
 	return S_OK;
 }
@@ -131,7 +140,7 @@ HRESULT CLevel_Finale::Ready_Layer_Camera(const wstring& strLayerTag)
 	MainCamDesc.fFovy = XMConvertToRadians(30.0f);
 	MainCamDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	MainCamDesc.fNear = 0.1f;
-	MainCamDesc.fFar = 1000.0f;
+	MainCamDesc.fFar = g_fCamFar;
 	MainCamDesc.vEye = _float4(0.f, 0.f, 0.f, 1.f);
 	MainCamDesc.vAt = _float4(0.f, -.2f, 1.f, 1.f);
 	MainCamDesc.fSpeedPerSec = 10.f;
@@ -148,7 +157,7 @@ HRESULT CLevel_Finale::Ready_Layer_Camera(const wstring& strLayerTag)
 	CameraDesc.fFovy = XMConvertToRadians(30.0f);
 	CameraDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	CameraDesc.fNear = 0.1f;
-	CameraDesc.fFar = 1000.0f;
+	CameraDesc.fFar = g_fCamFar;
 	CameraDesc.vEye = _float4(0.f, .5f, -1.f, 1.f);
 	CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
 	CameraDesc.fSpeedPerSec = 10.f;

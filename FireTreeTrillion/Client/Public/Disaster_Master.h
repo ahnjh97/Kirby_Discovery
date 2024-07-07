@@ -27,8 +27,14 @@ private:
 	void			Make_MissBaum();
 	void			Make_OnTerrainBaum(_float4 vTargetPos, _bool bBaum);
 
+	void			Moving_FinaleRoad(_float fKirbyX);
+	_bool			m_bRoadTrigger[10] = { true, true, true, true, true, true, true, true, true, true };
+	void			Moving_TargetBaum(_float fKirbyX);
+	_bool			m_bBaumTrigger[10] = { true, true, true, true, true, true, true, true, true, true };
+
 	class CFinaleKirby*	m_pKirby = { nullptr };
-	_float			m_fMakeBaumDelay = { 0.f };
+	_float				m_fMakeBaumDelay = { 0.f };
+	class CLight*		m_pLight = { nullptr };
 
 
 public:

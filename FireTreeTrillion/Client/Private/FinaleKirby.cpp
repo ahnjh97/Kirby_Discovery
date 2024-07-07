@@ -53,6 +53,12 @@ HRESULT CFinaleKirby::Initialize(void* pArg)
     m_pControllerCom->RegisterAsPlayer();
 
     m_bSlope = false;
+    m_bRimLight = false;
+
+    // 마지막 스테이지에서 운석을 지속적으로 날려주는 기능을 가진 클래스를 생성한다.
+    if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Disaster_Master"), TEXT("Prototype_GameObject_Disaster_Master"), this)))
+        return E_FAIL;
+
 
     return S_OK;
 }
@@ -88,16 +94,6 @@ _int CFinaleKirby::Tick(_float fTimeDelta)
 
     _float fZRotAngle = ToDegree(atan2(vRight.y, vRight.x)) * .1f;
     static_cast<CCamera_Main*>(m_pCamera)->Set_ZAngle(fZRotAngle, .1f);
-
-    if (m_bMakeDisaster == true && m_pTransformCom->Get_State(CTransform::STATE_POSITION).x > 15.f)
-    {
-        // 마지막 스테이지에서 운석을 지속적으로 날려주는 기능을 가진 클래스를 생성한다.
-        if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Disaster_Master"), TEXT("Prototype_GameObject_Disaster_Master"), this)))
-            return E_FAIL;
-
-        m_bMakeDisaster = false;
-    }
-
 
     Kirby_SystemTick(m_fTimeDelta);
 
