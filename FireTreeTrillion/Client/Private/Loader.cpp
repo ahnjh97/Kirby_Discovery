@@ -131,6 +131,7 @@
 #include "FinaleRoad.h"
 #include "FinaleRoadGrouper.h"
 #include "PopStar.h"
+#include "BreakableBlock.h"
 
 //±â¹Í
 #include "Gm_LabAntenna.h"
@@ -389,6 +390,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleRoad"), CFinaleRoad);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleRoadGrouper"), CFinaleRoadGrouper);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PopStar"), CPopStar);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BreakableBlock"), CBreakableBlock);
 
 	//Dee
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeePart"), CDee_Part);
@@ -1844,7 +1846,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("RoadEnd", TYPE_NONANIM, 1.f, 0.f, 0);
 		m_vecModelInfo.emplace_back("RoadParticle", TYPE_NONANIM, 1.f, 0.f, 0);
 
-		m_vecModelInfo.emplace_back("BreakableBlock", TYPE_ANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("BreakableBlock", TYPE_ANIM, 0.3f, 0.f, 0);
 
 		m_vecModelInfo.emplace_back("RoadBreak", TYPE_NONANIM, 1.f, 0.f, 0);
 		m_vecModelInfo.emplace_back("RoadLBreak", TYPE_NONANIM, 1.f, 0.f, 0);
@@ -1983,6 +1985,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("DeeDeeDeeHammer", TYPE_NONANIM, 1.0f);
 
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
+
+		m_vecModelInfo.emplace_back("BreakableBlock", TYPE_ANIM, 0.3f, 0.f, 0);
 	}
 }
 

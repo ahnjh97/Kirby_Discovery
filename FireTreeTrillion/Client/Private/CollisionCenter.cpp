@@ -626,8 +626,26 @@ void CCollisionCenter::RealFinaleStage_Battle()
 			pKirby->Set_HitStop(0.15f);
 			pthis->Camera_Shaking(1.5f, 1.f);
 			pBaum->Collision(CONTENT_BODY, pKirby);
+
+			DstHit->Set_Alive(false);
+			SrcHit->Set_Alive(false);
 		});
 
+	Collision_Collider(m_GameObjects[FINALE_PLAYER], m_GameObjects[FINALE_BREAKABLEBLOCK], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CFinaleKirby* pKirby = static_cast<CFinaleKirby*>(Dst);
+			CPhysXObject* pBreakable = static_cast<CPhysXObject*>(Src);
+
+			pBreakable->Collision(CONTENT_BODY, pKirby);
+			pthis->Camera_Shaking(1.5f, 2.f);
+
+		});
 }
 
 void CCollisionCenter::Body_To_Body_Collision()
