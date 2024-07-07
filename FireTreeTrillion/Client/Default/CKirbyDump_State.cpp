@@ -216,14 +216,14 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_PRESS) == true)
 	{
-		Kirbydesc->m_vTargetDir = _float4(1.f, 0.f, 0.35f, 0.f);
+		Kirbydesc->m_vTargetDir = _float4(1.f, 0.f, 0.4f, 0.f);
 		Kirbydesc->m_vTargetDir.Normalize();
 		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vHandleDir, pTransformCom, fTimeDelta, 3.f);
 		Turn_InterPolate_OtherVector(Kirbydesc->m_vHandleDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 2.f);
 	}
 	else if (m_pGameInstance->Get_DIKeyState(DIK_RIGHT, KEY_PRESS) == true)
 	{
-		Kirbydesc->m_vTargetDir = _float4(1.f, 0.f, -0.35f, 0.f);
+		Kirbydesc->m_vTargetDir = _float4(1.f, 0.f, -0.4f, 0.f);
 		Kirbydesc->m_vTargetDir.Normalize();
 		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vHandleDir, pTransformCom, fTimeDelta, 3.f);
 		Turn_InterPolate_OtherVector(Kirbydesc->m_vHandleDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 2.f);

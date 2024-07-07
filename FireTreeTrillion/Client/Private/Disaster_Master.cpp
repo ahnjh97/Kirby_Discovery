@@ -2,6 +2,7 @@
 #include "Disaster_Master.h"
 #include "Baum.h"
 #include "FinaleKirby.h"
+#include "Light.h"
 
 CDisaster_Master::CDisaster_Master(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -30,6 +31,20 @@ HRESULT CDisaster_Master::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(&Desc)))
 		return E_FAIL;
 
+	LIGHT_DESC			LightDesc{};
+	LightDesc.eType = LIGHT_DESC::TYPE_POINT;
+	LightDesc.vPosition = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+	LightDesc.fRange = 90.f;
+	LightDesc.vDiffuse = _float4(0.5f, 0.5f, 0.1f, 1.f);
+	LightDesc.vAmbient = _float4(0.3f, .3f, .3f, 1.f);
+	LightDesc.vSpecular = _float4(0.f, 0.f, 0.0f, 1.f);
+	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
+		return E_FAIL;
+	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
+		return E_FAIL;
+	m_pLight = CGameInstance::Get_Instance()->Get_LightLastAddress();
+	Safe_AddRef(m_pLight);
+
 	return S_OK;
 }
 
@@ -40,10 +55,24 @@ _int CDisaster_Master::Tick(_float fTimeDelta)
 	if (m_pKirby == nullptr)
 		return OBJ_DEAD;
 
-	m_fMakeBaumDelay += fTimeDelta;
+	_float4 vKirbyPos = m_pKirby->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
+
+	if (m_pLight != nullptr)
+	{
+		_float4 vLightPos = vKirbyPos;
+		vLightPos.x += 50.f;
+		vLightPos.y += 20.f;
+		m_pLight->Update_LightPos(vLightPos);
+	}
+
+	if (vKirbyPos.x > 15.f)
+		m_fMakeBaumDelay += fTimeDelta;
 
 	// 헛방 바움을 생성한다.
 	Make_MissBaum();
+
+	Moving_FinaleRoad(vKirbyPos.x);
+	Moving_TargetBaum(vKirbyPos.x);
 
 	return OBJ_NOEVENT;
 }
@@ -99,6 +128,52 @@ void CDisaster_Master::Make_OnTerrainBaum(_float4 _vTargetPos, _bool _bBaum)
 		return;
 }
 
+void CDisaster_Master::Moving_FinaleRoad(_float fKirbyX)
+{
+	if (m_bRoadTrigger[0] == true && fKirbyX > 100.f)
+	{
+
+		m_bRoadTrigger[0] = false;
+	}
+	else if (m_bRoadTrigger[1] == true && fKirbyX > 200.f)
+	{
+
+
+		m_bRoadTrigger[1] = false;
+	}
+}
+
+void CDisaster_Master::Moving_TargetBaum(_float fKirbyX)
+{
+	_float fKirbySpeed = m_pKirby->Get_KirbyInfo()->m_fMoveSpeed;
+
+	// 그 위치에 커비는 약 2초후에 도달할 것이다.
+	if (m_bBaumTrigger[0] == true && fKirbyX + (fKirbySpeed * 2.f) > 365.4f)
+	{
+		Make_OnTerrainBaum(_float4(365.4f, 39.3f, 1.93f, 1.f), true);
+		m_bBaumTrigger[0] = false;
+	}
+
+	else if (m_bBaumTrigger[1] == true && fKirbyX + (fKirbySpeed * 2.f) > 471.f)
+	{
+		Make_OnTerrainBaum(_float4(471.f, 8.15f, -69.7f, 1.f), true);
+		m_bBaumTrigger[1] = false;
+	}
+
+	else if (m_bBaumTrigger[2] == true && fKirbyX + (fKirbySpeed * 2.f) > 583.25f)
+	{
+		Make_OnTerrainBaum(_float4(583.25f, .08f, -91.f, 1.f), false);
+		m_bBaumTrigger[2] = false;
+	}
+
+	else if (m_bBaumTrigger[3] == true && fKirbyX + (fKirbySpeed * 2.f) > 681.f)
+	{
+		Make_OnTerrainBaum(_float4(681.f, -15.9f, -91.8f, 1.f), false);
+		m_bBaumTrigger[3] = false;
+
+	}
+}
+
 CDisaster_Master* CDisaster_Master::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CDisaster_Master* pInstance = new CDisaster_Master(pDevice, pContext);
@@ -129,4 +204,5 @@ void CDisaster_Master::Free()
 {
 	__super::Free();
 	Safe_Release(m_pKirby);
+	Safe_Release(m_pLight);
 }

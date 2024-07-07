@@ -221,7 +221,7 @@ PS_OUT PS_MAIN_BLEND_FX(PS_IN_ALPHABLEND In)
     vTexcoord.y = (In.vProjPos.y / In.vProjPos.w) * -0.5f + 0.5f;
 
     float4 vDepthDesc = g_DepthTexture.Sample(PointSampler, vTexcoord);
-    float fOldViewZ = vDepthDesc.y * 1000.f;
+    float fOldViewZ = vDepthDesc.y * g_fFar;
 
     Out.vColor.a = Out.vColor.a * saturate(fOldViewZ - In.vProjPos.w);
     

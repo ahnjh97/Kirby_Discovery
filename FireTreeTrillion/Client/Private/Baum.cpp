@@ -5,6 +5,8 @@
 #include "BaumPiece.h"
 #include "FinaleRoad.h"
 
+#include "Light.h"
+
 CBaum::CBaum(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
 {
@@ -58,6 +60,8 @@ HRESULT CBaum::Initialize(void* pArg)
 	m_pTransformCom->Set_State(CTransform::STATE_LOOK, vNewLook);
 
 	m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
+
+
 	
 	return S_OK;
 }
@@ -68,6 +72,9 @@ _int CBaum::Tick(_float fTimeDelta)
 		return Make_Partical();
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+
+	if (m_pLight != nullptr)
+		m_pLight->Update_LightPos(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
 
 	// 지형에 박히지 않았을 때
 	if (m_bOnTerrain == false)
@@ -228,6 +235,24 @@ HRESULT CBaum::Add_Components(wstring wstrModelProtoTag)
 		return E_FAIL;
 	Set_BodyCollider(COLLIDER_SPHERE, 1.f, 2.f, 14.f);
 
+
+
+	if (m_eBaumType == BAUM_STARPIECE)
+	{
+		LIGHT_DESC			LightDesc{};
+		LightDesc.eType = LIGHT_DESC::TYPE_POINT;
+		LightDesc.vPosition = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+		LightDesc.fRange = 30.f;
+		LightDesc.vDiffuse = _float4(1.f, 1.f, 0.f, 1.f);
+		LightDesc.vAmbient = _float4(.5f, .5f, .5f, 1.f);
+		LightDesc.vSpecular = _float4(0.f, 0.f, 0.0f, 1.f);
+		if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
+			 return E_FAIL;
+		m_pLight = CGameInstance::Get_Instance()->Get_LightLastAddress();
+		Safe_AddRef(m_pLight);
+
+	}
+
 	return S_OK;
 
 }
@@ -377,4 +402,5 @@ void CBaum::Free()
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pMyRoad);
+	Safe_Release(m_pLight);
 }
