@@ -84,7 +84,13 @@ public:
 	// DOF 초점을 업데이트한다.
 	void Update_DofFocus(_fvector vWorldPos);
 	// GodRay 위치를 설정한다.
-	void Setting_GodRay(_fvector vWorldPos);
+	void Setting_GodRay(_fvector vWorldPos, 
+		_float fRayExposure = 0.15f, _float fRayDecay = 0.96815f, _float fRayIlluminationDecay = 0.8f, _float fRayDensity = 0.5f, _float fWeight = 0.5f);
+	// 랜즈 플레어를 끄고 킨다.
+	void Setting_LensFlare(_bool bOnOff) {
+		m_bLensFlare = bOnOff;
+	}
+	_bool	m_bLensFlare = { true };
 
 	HRESULT Render_LightDepth_For_GameObject(class CShader* pShader, class CTransform* pTransform, class CModel* pModel);
 	HRESULT Render_LightDepth_For_PartObject(class CShader* pShader, const _float4x4* pMatrix, class CModel* pModel);
