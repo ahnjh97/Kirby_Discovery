@@ -6,6 +6,7 @@
 #include "FinaleRoad.h"
 
 #include "Light.h"
+#include "Particle.h"
 
 CBaum::CBaum(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
@@ -358,6 +359,7 @@ _int CBaum::Make_Partical()
 			if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_BaumPiece"), TEXT("Prototype_GameObject_BaumPiece"), &desc)))
 				return OBJ_DEAD;
 		}
+
 	}
 	else if (m_eBaumType == BAUM_STARPIECE)
 	{
@@ -365,6 +367,14 @@ _int CBaum::Make_Partical()
 
 
 	}
+
+	//debris explode
+	//CParticle::PARTICLE_DESC FXDesc{};
+	//FXDesc.vInitPos = GET_POS;
+	////FXDesc.vInitScale = { 25.f, 25.f, 25.f };
+
+	//if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_debris explode"), &FXDesc)))
+	//	return E_FAIL;
 
 	return OBJ_DEAD;
 }

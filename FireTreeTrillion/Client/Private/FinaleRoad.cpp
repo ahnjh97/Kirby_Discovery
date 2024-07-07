@@ -33,7 +33,23 @@ void CFinaleRoad::Start_CollisionEvent()
 		m_bCollided = true;
 
 		if (m_wstrModelName == L"RoadLongBreak")
-			m_pModelCom->DisableActors();
+		{
+			m_pDynamicActor->userData = nullptr;
+			if (m_pDynamicActor->getScene())
+			{
+				auto pScene = m_pGameInstance->Get_Scene();
+				pScene->removeActor(*m_pDynamicActor);
+			}
+		}
+		//m_pModelCom->DisableActors();
+
+
+	//m_pStaticActor->userData = nullptr;
+	//if (m_pStaticActor->getScene())
+	//{
+	//	auto pScene = m_pGameInstance->Get_Scene();
+	//	pScene->removeActor(*m_pStaticActor);
+	//}
 	}
 	break;
 	default:
@@ -53,7 +69,7 @@ void CFinaleRoad::Start_CollisionEvent()
 
 void CFinaleRoad::Make_CollisionEvent()
 {
-	
+
 }
 
 HRESULT CFinaleRoad::Initialize_Prototype()
@@ -111,14 +127,6 @@ _int CFinaleRoad::Tick(_float fTimeDelta)
 
 	m_WorldMatrix = m_pTransformCom->Get_WorldMatrix() * *m_pSocketMatrix;
 
-
-	//if (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
-	//{
-	//	if (m_pGameInstance->Get_KeyState(DIK_P, KEY_DOWN))
-	//	{
-	//		m_bCollided = true;
-	//	}
-	//}
 
 	return _int();
 }

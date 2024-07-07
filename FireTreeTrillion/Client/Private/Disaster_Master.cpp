@@ -3,6 +3,7 @@
 #include "Baum.h"
 #include "FinaleKirby.h"
 #include "Light.h"
+#include "Particle.h"
 
 CDisaster_Master::CDisaster_Master(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -34,7 +35,7 @@ HRESULT CDisaster_Master::Initialize(void* pArg)
 	LIGHT_DESC			LightDesc{};
 	LightDesc.eType = LIGHT_DESC::TYPE_POINT;
 	LightDesc.vPosition = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
-	LightDesc.fRange = 50.f;
+	LightDesc.fRange = 60.f;
 	LightDesc.vDiffuse = _float4(.8f, .3f, .06f, 1.f);
 	LightDesc.vAmbient = _float4(0.3f, .3f, .3f, 1.f);
 	LightDesc.vSpecular = _float4(0.f, 0.f, 0.0f, 1.f);
@@ -43,6 +44,7 @@ HRESULT CDisaster_Master::Initialize(void* pArg)
 
 	m_pLight = CGameInstance::Get_Instance()->Get_LightLastAddress();
 	Safe_AddRef(m_pLight);
+
 
 	return S_OK;
 }
@@ -170,7 +172,7 @@ void CDisaster_Master::Moving_TargetBaum(_float fKirbyX)
 		m_bBaumTrigger[2] = false;
 	}
 
-	else if (m_bBaumTrigger[3] == true && fKirbyX + (fKirbySpeed * 2.f) > 681.f)
+	else if (m_bBaumTrigger[3] == true && fKirbyX + (fKirbySpeed * 2.5f) > 681.f)
 	{
 		Make_OnTerrainBaum(_float4(681.f, -15.9f, -91.8f, 1.f), false);
 		m_bBaumTrigger[3] = false;

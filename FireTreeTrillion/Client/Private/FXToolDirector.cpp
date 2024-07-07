@@ -2444,6 +2444,7 @@ HRESULT CFXToolDirector::Ready_FXPrototypeVector()
 
 	Ready_Ingredient(strModelTag + L"FX", &m_FXBufferList, pStaticProtoMap);
 
+	Ready_Ingredient(strModelTag + L"PopStar", &m_FXBufferList, pStaticProtoMap);
 
 	return S_OK;
 }

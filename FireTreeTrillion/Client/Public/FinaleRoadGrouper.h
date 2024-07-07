@@ -21,6 +21,7 @@ public:
 	{
 		MOVECMD_STOP,
 		MOVECMD_ROTATE,
+		MOVECMD_FLY,
 		MOVECMD_COLLIDE,
 		MOVECMD_END
 	};
@@ -62,7 +63,7 @@ private:
 	MOVECMD		m_eCollideMove = { MOVECMD_END };
 	_float		m_fCollideTime = { 1.f };
 
-
+	_float3		m_vStartPos = { 0.f, 0.f, 0.f };
 	_float3		m_vDestPos = { 0.f, 0.f, 0.f };
 
 

@@ -96,7 +96,18 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 	break;
 	case RTYPE_BUILDINGB:
 	{
+		CFinaleRoad::ROAD_DESC roadDesc{};
+		roadDesc.wstrModelName = TEXT("MovableBuildingB");
+		roadDesc.pSocketMat = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+		roadDesc.eCollideType = CFinaleRoad::CTYPE_NONE;
 
+
+		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
+			return E_FAIL;
+
+		CFinaleRoad* pRoad = dynamic_cast<CFinaleRoad*>(m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"))->back());
+		if (pRoad != nullptr)
+			m_pRoads.emplace_back(pRoad);
 	}
 	break;
 	case RTYPE_BUILDINGC:
@@ -117,7 +128,18 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 	break;
 	case RTYPE_BUILDINGD:
 	{
+		CFinaleRoad::ROAD_DESC roadDesc{};
+		roadDesc.wstrModelName = TEXT("MovableBuildingD");
+		roadDesc.pSocketMat = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+		roadDesc.eCollideType = CFinaleRoad::CTYPE_NONE;
 
+
+		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
+			return E_FAIL;
+
+		CFinaleRoad* pRoad = dynamic_cast<CFinaleRoad*>(m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"))->back());
+		if (pRoad != nullptr)
+			m_pRoads.emplace_back(pRoad);
 	}
 	break;
 	case RTYPE_ROADA:
@@ -207,10 +229,122 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 	break;
 	case RTYPE_ROADB:
 	{
+		//기본 도로
+		CFinaleRoad::ROAD_DESC roadDesc{};
+		roadDesc.wstrModelName = TEXT("Road");
+		_float4x4 InitMat = _float4x4::Identity;
+		InitMat.Translation({ 0.f, 0.f, -60.f });
+		roadDesc.matWorld = InitMat;
+		roadDesc.pSocketMat = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+		roadDesc.eCollideType = CFinaleRoad::CTYPE_NONE;
+		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
+			return E_FAIL;
 
+		CFinaleRoad* pRoad = dynamic_cast<CFinaleRoad*>(m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"))->back());
+		if (pRoad != nullptr)
+			m_pRoads.emplace_back(pRoad);
+
+
+		//기본 도로
+		roadDesc = {};
+		roadDesc.wstrModelName = TEXT("Road");
+		InitMat = _float4x4::Identity;
+		InitMat.Translation({ 0.f, 0.f, 0.f });
+		roadDesc.matWorld = InitMat;
+		roadDesc.pSocketMat = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+		roadDesc.eCollideType = CFinaleRoad::CTYPE_NONE;
+		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
+			return E_FAIL;
+
+		pRoad = dynamic_cast<CFinaleRoad*>(m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"))->back());
+		if (pRoad != nullptr)
+			m_pRoads.emplace_back(pRoad);
+
+
+		//부서지는 도로
+		roadDesc = {};
+		roadDesc.wstrModelName = TEXT("RoadLBreak");
+		InitMat = _float4x4::Identity;
+		InitMat.Translation({ 0.f, 0.f, 60.f });
+		roadDesc.matWorld = InitMat;
+		roadDesc.pSocketMat = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+
+		roadDesc.bIsAnimModel = true;
+		roadDesc.eCollideType = CFinaleRoad::CTYPE_BREAK;
+
+		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
+			return E_FAIL;
+
+		pRoad = dynamic_cast<CFinaleRoad*>(m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"))->back());
+		if (pRoad != nullptr)
+			m_pRoads.emplace_back(pRoad);
 	}
 	break;
+	case RTYPE_ROADC:
+	{
+		//기본 도로
+		CFinaleRoad::ROAD_DESC roadDesc{};
+		roadDesc.wstrModelName = TEXT("Road");
+		_float4x4 InitMat = _float4x4::Identity;
+		InitMat.Translation({ 0.f, 0.f, -90.f });
+		roadDesc.matWorld = InitMat;
+		roadDesc.pSocketMat = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+		roadDesc.eCollideType = CFinaleRoad::CTYPE_NONE;
+		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
+			return E_FAIL;
 
+		CFinaleRoad* pRoad = dynamic_cast<CFinaleRoad*>(m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"))->back());
+		if (pRoad != nullptr)
+			m_pRoads.emplace_back(pRoad);
+
+		//부서지는 도로
+		roadDesc = {};
+		roadDesc.wstrModelName = TEXT("RoadLBreak");
+		InitMat = _float4x4::Identity;
+		InitMat.Translation({ 0.f, 0.f, -30.f });
+		roadDesc.matWorld = InitMat;
+		roadDesc.pSocketMat = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+
+		roadDesc.bIsAnimModel = true;
+		roadDesc.eCollideType = CFinaleRoad::CTYPE_BREAK;
+
+		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
+			return E_FAIL;
+
+		pRoad = dynamic_cast<CFinaleRoad*>(m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"))->back());
+		if (pRoad != nullptr)
+			m_pRoads.emplace_back(pRoad);
+
+		//기본 도로
+		roadDesc = {};
+		roadDesc.wstrModelName = TEXT("Road");
+		InitMat = _float4x4::Identity;
+		InitMat.Translation({ 0.f, 0.f, 30.f });
+		roadDesc.matWorld = InitMat;
+		roadDesc.pSocketMat = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+		roadDesc.eCollideType = CFinaleRoad::CTYPE_NONE;
+		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
+			return E_FAIL;
+
+		pRoad = dynamic_cast<CFinaleRoad*>(m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"))->back());
+		if (pRoad != nullptr)
+			m_pRoads.emplace_back(pRoad);
+
+		roadDesc = {};
+		roadDesc.wstrModelName = TEXT("RoadEnd");
+		InitMat = _float4x4::Identity;
+		InitMat.Translation({ 0.f, 0.f, 90.f });
+		roadDesc.matWorld = InitMat;
+		roadDesc.pSocketMat = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+		roadDesc.eCollideType = CFinaleRoad::CTYPE_NONE;
+		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
+			return E_FAIL;
+
+		pRoad = dynamic_cast<CFinaleRoad*>(m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"))->back());
+		if (pRoad != nullptr)
+			m_pRoads.emplace_back(pRoad);
+	}
+	break;
 	default:
 	/*	CFinaleRoad::ROAD_DESC roadDesc{};
 		roadDesc.wstrModelName = TEXT("MovableBuildingA");
@@ -258,6 +392,18 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 		m_vDestDir = RoadGroupDesc.vDestDir;
 	}
 	break;
+	case MOVECMD_FLY:
+	{
+		//부딪혔을 때 만들 상태
+		_float3 vMyPos = GET_POS;
+		m_vStartDir = (_float3)m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+		m_vDestPos = RoadGroupDesc.vDestPos;
+		m_vDestDir = RoadGroupDesc.vDestDir;
+
+		m_bStartCollideEvent = true;
+		m_fCollideTime = 1.f;
+	}
+	break;
 	default:
 		break;
 	}
@@ -273,8 +419,8 @@ _int CFinaleRoadGrouper::Tick(_float fTimeDelta)
 	_float fRealTimeDelta = m_pGameInstance->Get_SecondTimer();
 
 
-
-	if (m_bStartCollideEvent && 0.f < m_fCollideTime )
+	//특정 목표로 가야 할 때
+	if ( m_bStartCollideEvent && 0.f < m_fCollideTime )
 	{
 
 		m_fCollideTime -= fTimeDelta;

@@ -4,6 +4,8 @@
 #include "FSM.h"
 #include "Camera_Free.h"
 #include "MultiEffect.h"
+#include "Particle.h"
+
 #include "Utils.h"
 #include "Camera_Main.h"
 #include "EventCenter.h"
@@ -59,6 +61,13 @@ HRESULT CFinaleKirby::Initialize(void* pArg)
     if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Disaster_Master"), TEXT("Prototype_GameObject_Disaster_Master"), this)))
         return E_FAIL;
 
+    //BDBY
+    CParticle::PARTICLE_DESC FXDesc{};
+    FXDesc.pSocketMatrix = &m_EffectSocket;
+    FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
+
+    if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_bdby2"), &FXDesc)))
+        return E_FAIL;
 
     return S_OK;
 }

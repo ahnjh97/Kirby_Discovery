@@ -195,16 +195,16 @@ HRESULT CLevel_Finale::Ready_FinaleRoad()
 #pragma region 처음 빌딩들
 
 	//CFinaleRoadGrouper::ROADGROUPER_DESC roadGrouperDesc{};
-	//roadGrouperDesc.eRoadType = CFinaleRoadGrouper::RTYPE_ROADA;
-	//roadGrouperDesc.eMoveCommand = CFinaleRoadGrouper::MOVECMD_COLLIDE;
+	//roadGrouperDesc.eRoadType = CFinaleRoadGrouper::RTYPE_BUILDINGA;
+	//roadGrouperDesc.eMoveCommand = CFinaleRoadGrouper::MOVECMD_STOP;
 
 	//_float4x4 InitMat = _float4x4::Identity;
-	//InitMat.Translation({ 269.f, -26.f, 4.8f });
-	//CUtils::Rotation(InitMat, CUtils::Make_Quat_FromDir({ .98f, .21f, .07f }));
+	//InitMat.Translation({ 740.f, -22.f, -82.f });
+	//CUtils::Rotation(InitMat, CUtils::Make_Quat_FromDir({ .98f, -.16f, -.15f }));
 	//roadGrouperDesc.matWorld = InitMat;
 
-	//roadGrouperDesc.vDestPos = { 269.f, -42.f, 4.8f };
-	//roadGrouperDesc.vDestDir = { 1.f, -.04f, .07f };
+	////roadGrouperDesc.vDestPos = { 740.f, -32.f, -82.f };
+	////roadGrouperDesc.vDestDir = { .98f, -.16f, -.15f };
 
 	//if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleRoadGrouper"),
 	//	TEXT("Prototype_GameObject_FinaleRoadGrouper"), &roadGrouperDesc)))
@@ -212,7 +212,7 @@ HRESULT CLevel_Finale::Ready_FinaleRoad()
 
 	
 	
-	CFinaleRoadGrouper::ROADGROUPER_DESC roadGrouperDesc{};
+	CFinaleRoadGrouper::ROADGROUPER_DESC roadGrouperDesc = {};
 	roadGrouperDesc.eRoadType = CFinaleRoadGrouper::RTYPE_BUILDINGA;
 	roadGrouperDesc.eMoveCommand = CFinaleRoadGrouper::MOVECMD_STOP;
 
@@ -262,7 +262,7 @@ HRESULT CLevel_Finale::Ready_FinaleRoad()
 		return E_FAIL;
 
 
-	//도로
+	//도로 A
 	roadGrouperDesc = {};
 	roadGrouperDesc.eRoadType = CFinaleRoadGrouper::RTYPE_ROADA;
 	roadGrouperDesc.eMoveCommand = CFinaleRoadGrouper::MOVECMD_COLLIDE;
@@ -280,7 +280,116 @@ HRESULT CLevel_Finale::Ready_FinaleRoad()
 		return E_FAIL;
 		
 
+	//도로 B
+	roadGrouperDesc = {};
+	roadGrouperDesc.eRoadType = CFinaleRoadGrouper::RTYPE_ROADB;
+	roadGrouperDesc.eMoveCommand = CFinaleRoadGrouper::MOVECMD_STOP;
+
+	InitMat = _float4x4::Identity;
+	InitMat.Translation({ 829.5f, -157.023f, -138.310f });
+	CUtils::Rotation(InitMat, CUtils::Make_Quat_FromDir({ .99f, .01f, -.12f }));
+	roadGrouperDesc.matWorld = InitMat;
+
+	roadGrouperDesc.vDestPos = { 829.5f, -197.023f, -138.310f };
+	roadGrouperDesc.vDestDir = { .98f, -.16f, -.15f };
+
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleRoadGrouper"),
+		TEXT("Prototype_GameObject_FinaleRoadGrouper"), &roadGrouperDesc)))
+		return E_FAIL;
+
+	//도로 C
+	roadGrouperDesc = {};
+	roadGrouperDesc.eRoadType = CFinaleRoadGrouper::RTYPE_ROADC;
+	roadGrouperDesc.eMoveCommand = CFinaleRoadGrouper::MOVECMD_STOP;
+
+	InitMat = _float4x4::Identity;
+	InitMat.Translation({ 1037.942f, -154.713f,-163.430f });
+	CUtils::Rotation(InitMat, CUtils::Make_Quat_FromDir({ .99f, .01f, -.12f }));
+	roadGrouperDesc.matWorld = InitMat;
+
+	roadGrouperDesc.vDestPos = { 1037.942f, -184.713f,-163.430f };
+	roadGrouperDesc.vDestDir = { .98f, -.16f, -.15f };
+
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleRoadGrouper"),
+		TEXT("Prototype_GameObject_FinaleRoadGrouper"), &roadGrouperDesc)))
+		return E_FAIL;
+
 #pragma endregion
+
+
+#pragma region 중간 길
+	roadGrouperDesc = {};
+	roadGrouperDesc.eRoadType = CFinaleRoadGrouper::RTYPE_BUILDINGA;
+	roadGrouperDesc.eMoveCommand = CFinaleRoadGrouper::MOVECMD_STOP;
+
+	InitMat = _float4x4::Identity;
+	InitMat.Translation({ 1193.f, -190.f,-158.f });
+	CUtils::Rotation(InitMat, CUtils::Make_Quat_FromDir({ .98f, .22f, -.03f }));
+	roadGrouperDesc.matWorld = InitMat;
+
+	roadGrouperDesc.vDestPos = { 1137.f, -184.f,-163.f };
+	roadGrouperDesc.vDestDir = { .98f, -.16f, -.15f };
+
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleRoadGrouper"),
+		TEXT("Prototype_GameObject_FinaleRoadGrouper"), &roadGrouperDesc)))
+		return E_FAIL;
+
+
+	roadGrouperDesc = {};
+	roadGrouperDesc.eRoadType = CFinaleRoadGrouper::RTYPE_BUILDINGA;
+	roadGrouperDesc.eMoveCommand = CFinaleRoadGrouper::MOVECMD_STOP;
+
+	InitMat = _float4x4::Identity;
+	InitMat.Translation({ 1326.f, -174.f,-164.f });
+	CUtils::Rotation(InitMat, CUtils::Make_Quat_FromDir({ .9f, .33f, .28f }));
+	roadGrouperDesc.matWorld = InitMat;
+
+	roadGrouperDesc.vDestPos = { 1237.f, -184.f,-163.f };
+	roadGrouperDesc.vDestDir = { .98f, -.16f, -.15f };
+
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleRoadGrouper"),
+		TEXT("Prototype_GameObject_FinaleRoadGrouper"), &roadGrouperDesc)))
+		return E_FAIL;
+
+	roadGrouperDesc = {};
+	roadGrouperDesc.eRoadType = CFinaleRoadGrouper::RTYPE_BUILDINGC;
+	roadGrouperDesc.eMoveCommand = CFinaleRoadGrouper::MOVECMD_STOP;
+
+	InitMat = _float4x4::Identity;
+	InitMat.Translation({ 1526.f, -174.f,-164.f });
+	CUtils::Rotation(InitMat, CUtils::Make_Quat_FromDir({ .9f, .33f, .28f }));
+	roadGrouperDesc.matWorld = InitMat;
+
+	roadGrouperDesc.vDestPos = { 1237.f, -184.f,-163.f };
+	roadGrouperDesc.vDestDir = { .98f, -.16f, -.15f };
+
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleRoadGrouper"),
+		TEXT("Prototype_GameObject_FinaleRoadGrouper"), &roadGrouperDesc)))
+		return E_FAIL;
+
+	roadGrouperDesc = {};
+	roadGrouperDesc.eRoadType = CFinaleRoadGrouper::RTYPE_BUILDINGA;
+	roadGrouperDesc.eMoveCommand = CFinaleRoadGrouper::MOVECMD_STOP;
+
+	InitMat = _float4x4::Identity;
+
+	InitMat.Translation({ 1726.f, -174.f,-164.f });
+	CUtils::Rotation(InitMat, CUtils::Make_Quat_FromDir({ .9f, .33f, .28f }));
+	roadGrouperDesc.matWorld = InitMat;
+
+	roadGrouperDesc.vDestPos = { 1237.f, -184.f,-163.f };
+	roadGrouperDesc.vDestDir = { .98f, -.16f, -.15f };
+
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleRoadGrouper"),
+		TEXT("Prototype_GameObject_FinaleRoadGrouper"), &roadGrouperDesc)))
+		return E_FAIL;
+#pragma endregion
+
+
+#pragma region 마지막 구역
+
+#pragma endregion
+
 	return S_OK;
 }
 

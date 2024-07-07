@@ -1415,6 +1415,11 @@ HRESULT CLoader::Add_FXTexture()
 	//파티클
 	hr = Add_Texture(LEVEL_STATIC, "FX_Rock", "Effects/Particle/rock_%d.png", 4);	CHECK_FAILED(hr);
 
+	//팝스타
+	hr = Add_Texture(LEVEL_STATIC, "FX_PopstarFallWind", "Effects/Popstar/PopStarFallEffectWind.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_PopstarSkyCloud", "Effects/Popstar/PopStarSkyCloud.dds");	CHECK_FAILED(hr);
+
+
 	return S_OK;
 }
 
@@ -1478,6 +1483,12 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		//토루스
 		m_vecModelInfo.emplace_back("Torus", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("TorusHalf", TYPE_NONANIM);
+
+		//팝스타
+		m_vecModelInfo.emplace_back("PopStar_Debris", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("PopStar_StarRiver", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("PopStar_StarSmall", TYPE_NONANIM);
+
 
 
 	}

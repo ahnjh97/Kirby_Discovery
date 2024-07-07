@@ -180,9 +180,14 @@ _bool CEffect::Calculate_Duration(_float _fTimeDelta)
     if (m_fDuration.second <= m_fDuration.first)
     {
         m_fDuration.first = m_fDuration.second;
+
+        if (m_fDuration.second == FX_MAXDURATION)
+        {
+            m_fDuration.first = 0.f;
+            return false;
+        }
         return true;
     }
-
     return false;
 }
 
@@ -193,7 +198,7 @@ _bool CEffect::Calculate_Lifetime(_float _fTimeDelta)
     
     if (m_fLifetime.second <= m_fDuration.first)
     {
-        if (m_bIsLoop)
+        if (m_bIsLoop || m_fDuration.second == FX_MAXDURATION)
         {
             _float fLength = m_fLifetime.second - m_fLifetime.first;
             m_fLifetime.first += fLength;

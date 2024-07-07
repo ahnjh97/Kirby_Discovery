@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "PopStar.h"
-
+#include "MultiEffect.h"
+#include "Particle.h"
 CPopStar::CPopStar(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
 {
@@ -41,6 +42,19 @@ HRESULT CPopStar::Initialize(void* pArg)
 	m_pTransformCom->Turn(_float4(0.f, 0.f, 1.f, 0.f), 1.f, 50.f);
 
 	m_pTransformCom->Set_Scaled(10.f, 10.f, 10.f);
+
+	//StarRiver
+	CEffect::FX_DESC FXDesc{};
+
+	FXDesc.vInitPos = _float3{15.f, -30.f, 0.f};
+	FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	FXDesc.vInitScale = { 1.3f, 1.3f, 1.3f };
+	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_StarRiver"), &FXDesc)))
+		return E_FAIL;
+
+	FXDesc.vInitScale = { 6.f, 6.f, 6.f };
+	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_star dash test 3"), &FXDesc)))
+		return E_FAIL;
 
 	return S_OK;
 }
