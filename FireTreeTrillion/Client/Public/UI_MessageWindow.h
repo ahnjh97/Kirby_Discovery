@@ -13,6 +13,23 @@ BEGIN(Client)
 class CUI_MessageWindow : public CUIObject
 {
 public:
+	struct MESSAGE_DESC
+	{
+		wstring wstrFontTag = { TEXT("") };
+		_float2	fFontPos = { 0.f, 0.f };
+		_float4	fFontRGBA = { 0.f, 0.f, 0.f, 0.f };
+
+		_float2 fFontSize = { 0.f, 0.f }; //원본 사이즈
+		_float2 fFontScale = { 0.f, 0.f }; //원본대비 키울 스케일 비율
+		_float fRadian = { XMConvertToRadians(0.f) };
+
+		_float fDisplayTime = { 0.f }; //출력 시간
+		_float fElapsedyTime = { 0.f }; //경과 시간
+
+		vector<wstring> vecMsg;
+	};
+
+public:
 	enum TEX_MESSAGEWINDOW { TEXMW_BASE, TEXMW_BTNBASE, TEXMW_NONE };
 	enum MESSAGEWINDOW_STATE { WINDOW_IDLE, WINDOW_HIDE, WINDOW_SHOW, WINDOW_NONE	};
 
@@ -44,6 +61,9 @@ private:
 	HRESULT						Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTexture* _pTextureCom, _uint _iTexIndex);
 	HRESULT						Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom);
 
+	HRESULT						Display_Message(_float _fTimeDelta);
+	HRESULT						Render_Message();
+
 public:
 	static CUI_MessageWindow*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject*		Clone(void* pArg) override;
@@ -54,10 +74,19 @@ private:
 	CDialog*					m_pDialog = { nullptr };
 	class CUI_BtnIcon*			m_pUIBtn = { nullptr };
 	
+	MESSAGEWINDOW_STATE			m_eCurState = { WINDOW_NONE };
+	MESSAGE_DESC				m_tMessageDesc;
+	
+	// BTN
 	_float						m_fHideTime = { 0.f };
 	_float3						m_vBaseScale = { 0.f, 0.f, 1.f };
 	_float3						m_vBtnScale = { 0.f, 0.f, 1.f };
 
-	MESSAGEWINDOW_STATE			m_eCurState = { WINDOW_NONE };
+	// FONT
+	_float						m_fElapsedTime = { 0.f }; //경과 시간
+	_float						m_fDisplayTime = { 0.f }; //출력 시간
+	_uint						m_iCurMessageIndex = { 0 };
+	_uint						m_iCurCharIndex = { 0 };
+
 };
 END

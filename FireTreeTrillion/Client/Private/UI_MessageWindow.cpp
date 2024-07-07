@@ -23,11 +23,12 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 	HRESULT hr = __super::Initialize(_pArg);
 	CHECK_FAILED(hr);
 
-	UIOBJ_DESC* MessageWindowDesc{};
-	if (_pArg != nullptr)
-		MessageWindowDesc = (UIOBJ_DESC*)_pArg;
+	MESSAGE_DESC* MessageWindowDesc{};
+	MessageWindowDesc = (MESSAGE_DESC*)_pArg;
 	
-	m_UIObjDesc = *MessageWindowDesc;
+	m_tMessageDesc = *MessageWindowDesc;
+	/*if (m_tMessageDesc.vecMsg.empty())
+		ALARM_FAIL("다이얼로그 내용물이 없는디");*/
 
 	if (FAILED(Add_Transform(_pArg)))
 		return E_FAIL;
@@ -36,6 +37,10 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 		return E_FAIL;
 	
 #pragma region MESSAGEWINDOW BASE
+
+	m_UIObjDesc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f, 0.f };
+	m_UIObjDesc.vPos = { 0.f, -325.f, 1.f, 1.f };
+	m_UIObjDesc.vSize = { 1300.f * 0.8f, 288.f * 0.8f, 1.f };
 
 	_float4 vBaseTrans = { m_UIObjDesc.vPos };
 	vBaseTrans.w = 1.f;
@@ -88,13 +93,18 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 		m_eCurState = WINDOW_SHOW;
 		m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_BLINK);
 	}
-	
 	//Window UI 출력은 스크립트가 종료될때까지 유지
 	//스크립트 인덱스가 종료될 경우, State를 변경
 	else if (m_pGameInstance->Get_DIKeyState(DIK_GRAVE, KEY_DOWN) && WINDOW_SHOW == m_eCurState) //테스트용
 	{
 		m_eCurState = WINDOW_HIDE;
 		m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_HIDE);
+	}
+
+	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN)) // RESET
+	{
+		m_iCurMessageIndex = 0.f;
+		m_iCurCharIndex = 0.f;
 	}
 
 	_float3 vOffset = { 0.9f, 0.9f, 1.f };
@@ -133,6 +143,9 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 		return OBJ_NOEVENT;
 	}
 
+	if(m_eCurState != HIDE_WINDOW)
+		Display_Message(fTimeDelta);
+
 	return OBJ_NOEVENT;
 }
 
@@ -144,7 +157,6 @@ void CUI_MessageWindow::Late_Tick(_float fTimeDelta)
 
 HRESULT CUI_MessageWindow::Render()
 {
-
 	HRESULT hr;
 #pragma region RENDER_BINDSET
 	
@@ -167,7 +179,14 @@ HRESULT CUI_MessageWindow::Render()
 #pragma endregion
 	
 	m_pUIBtn->Render();
-	
+
+	// 폰트 출력
+	if (m_eCurState != WINDOW_HIDE)
+	{
+		for (auto& Message : m_tMessageDesc.vecMsg)
+			Render_Message();
+	}
+
 	return S_OK;
 }
 
@@ -252,6 +271,60 @@ HRESULT CUI_MessageWindow::Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom)
 	return S_OK;
 }
 
+// 다이얼로그 호출 : vec에 담아둔 메세지를 출력합니다.
+HRESULT CUI_MessageWindow::Display_Message(_float _fTimeDelta)
+{
+	if (m_tMessageDesc.wstrFontTag.empty())
+		return S_OK;
+
+	m_fElapsedTime += _fTimeDelta;
+	if (m_fElapsedTime >= m_fDisplayTime) //경과시간 대비 출력시간 체크
+	{
+		m_fElapsedTime = 0.f;
+
+		if (m_iCurMessageIndex < m_tMessageDesc.vecMsg.size()) //벡터에 담긴 메시지들의 크기를 체크
+		{
+			wstring wstrMsg = m_tMessageDesc.vecMsg[m_iCurMessageIndex];
+			if (m_iCurCharIndex < wstrMsg.length()) //메시지 길이 체크
+				m_iCurCharIndex++;
+			else //메시지 길이를 넘겼을 경우, 초기화
+			{
+				//m_iCurMessageIndex = 0.f;
+				//m_iCurCharIndex = 0.f;
+			}
+		}
+	}
+
+	//추후, A버튼 입력 전까지 대기하는 로직 필요
+	//iCurCharIndex 비교 체크하여 동일/초과할 경우 대기.
+	//A버튼 입력 상태를 확인할 경우, 다음 iCurMeesageIndex로 변경하여 스크립트 문단을 넘긴다.
+
+	return S_OK;
+}
+
+// 다이얼로그 메시지 출력
+HRESULT CUI_MessageWindow::Render_Message()
+{
+	//Actor(NPC) 대상 별 SpriteFont 폰트 수정 필요
+	wstring wstrFontTag = m_tMessageDesc.wstrFontTag;
+	_float2 vFontPos = m_tMessageDesc.fFontPos;
+	_float4 vFontRGBA = m_tMessageDesc.fFontRGBA;
+
+	_float2 vFontSize = m_tMessageDesc.fFontSize;
+	_float2 vFontScale = m_tMessageDesc.fFontScale;
+	_float fRadian = m_tMessageDesc.fRadian;
+
+	if (m_iCurMessageIndex < m_tMessageDesc.vecMsg.size())
+	{
+		wstring wstrMsg = m_tMessageDesc.vecMsg[m_iCurMessageIndex];
+		wstring& wstrSubstrMessage = wstrMsg.substr(0, m_iCurCharIndex);
+
+		m_pGameInstance->Render_Font(wstrFontTag, wstrSubstrMessage, vFontPos, vFontRGBA, fRadian, vFontSize, vFontScale);
+	}
+
+	return S_OK;
+}
+
 CUI_MessageWindow* CUI_MessageWindow::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CUI_MessageWindow* pInstance = new CUI_MessageWindow(pDevice, pContext);
@@ -282,10 +355,13 @@ void CUI_MessageWindow::Free()
 {
 	__super::Free();
 
+	m_tMessageDesc.vecMsg.clear();
+
 	for (auto& iTrans : m_pTransCom)
 		Safe_Release(iTrans);
 
 	Safe_Release(m_pDialog);
+	Safe_Release(m_pUIBtn);
 }
 
 

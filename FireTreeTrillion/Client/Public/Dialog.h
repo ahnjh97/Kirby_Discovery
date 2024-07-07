@@ -10,23 +10,25 @@
 BEGIN(Client)
 class CDialog : public CUIObject
 {
-	typedef struct DialogMessage {
-		wstring wstrFontTag = { TEXT("") };
-		wstring wstrMessage = { TEXT("") };
-		_float2	fFontPos = { 0.f, 0.f };
-		_float4	fFontRGBA = { 0.f, 0.f, 0.f, 0.f };
+public:
+	typedef struct DialogMessage
+	{
+		//wstring wstrFontTag = { TEXT("") };
+		//_float2	fFontPos = { 0.f, 0.f };
+		//_float4	fFontRGBA = { 0.f, 0.f, 0.f, 0.f };
 
-		_float2 fFontSize = { 0.f, 0.f }; //원본 사이즈
-		_float2 fFontScale = { 0.f, 0.f }; //원본대비 키울 스케일 비율
-		_float fRadian = { XMConvertToRadians(0.f) };
+		//_float2 fFontSize = { 0.f, 0.f }; //원본 사이즈
+		//_float2 fFontScale = { 0.f, 0.f }; //원본대비 키울 스케일 비율
+		//_float fRadian = { XMConvertToRadians(0.f) };
 		
-		_float fDisplayTime = { 0.f }; //출력 시간
-		_float fElapsedyTime = { 0.f }; //경과 시간
+		//_float fDisplayTime = { 0.f }; //출력 시간
+		//_float fElapsedyTime = { 0.f }; //경과 시간
 		//size_t	iCurIndex = { 0 }; 
 
 		_uint	uLevel = LEVEL_END;
 		wstring wstrNPC = { TEXT("") };
-	}MESSAGE_DESC;
+		string strPath = "";
+	}DIALOG_DESC;
 
 private:
 	CDialog(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext);
@@ -40,11 +42,6 @@ public:
 	virtual void				Late_Tick(_float fTimeDelta)				override;
 	virtual HRESULT				Render()									override;
 
-public:
-	HRESULT Add_Message(/*const wstring& _wstrMessage, _float _fDisplayTime, */void* _pArg);
-	HRESULT Display_Message(_float _fTimeDelta);
-	HRESULT	Render_Message(MESSAGE_DESC _tMessageDesc);
-
 
 public:
 	string  utf8_encode(const wstring& wstr);
@@ -54,8 +51,6 @@ public:
 	void	Load(string strPath);
 
 private:
-	vector<DialogMessage>	m_vecMessage;
-	vector<wstring>			m_vecMsg;
 
 public:
 	static CDialog* Create(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext);
@@ -63,11 +58,7 @@ public:
 	virtual void Free() override;
 
 private:
-	MESSAGE_DESC			m_tMessage_Desc{};
+	DIALOG_DESC			m_tMessage_Desc{};
 
-	_float					m_fElapsedTime = { 0.f }; //경과 시간
-	_float					m_fDisplayTime = { 0.f }; //출력 시간
-	_uint					m_iCurMessageIndex = { 0 }; 
-	_uint					m_iCurCharIndex = { 0 };
 };
 END
