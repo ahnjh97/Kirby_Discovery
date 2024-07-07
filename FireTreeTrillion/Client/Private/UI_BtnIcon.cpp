@@ -41,7 +41,7 @@ HRESULT CUI_BtnIcon::Initialize(void* _pArg)
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 
-	m_eCurState = BTN_IDLE;
+	m_eBtnState = BTN_IDLE;
 	m_pCurrentLevelID = m_pGameInstance->Get_CurrentLevelID();
 
 	return S_OK;
@@ -50,35 +50,13 @@ HRESULT CUI_BtnIcon::Initialize(void* _pArg)
 _int CUI_BtnIcon::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
-	
-	//MessageWindow 상태를 저장
-	CUI_MessageWindow* pMWindow = static_cast<CUI_MessageWindow*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_Dialog"), 1));
-	if (nullptr == pMWindow)
-		return OBJ_NOEVENT;
-	//Safe_AddRef(m_pMWindow);
-
-	//MessageWindow 상태와 동기화
-	CUI_MessageWindow::MESSAGEWINDOW_STATE eMWState = pMWindow->Get_MWindowState();
-	switch (eMWState)
-	{
-	case CUI_MessageWindow::WINDOW_IDLE: break;
-	case CUI_MessageWindow::WINDOW_HIDE: m_eCurState = BTN_HIDE;	break;
-	case CUI_MessageWindow::WINDOW_SHOW:
-		if (m_IsSelected) //==TRUE;
-			m_eCurState = BTN_SELECT;
-
-		else //m_IsSelected == FALSE;
-			m_eCurState = BTN_BLINK;	
-		break;
-	case CUI_MessageWindow::WINDOW_NONE: default:	break;
-	}
 
 	//버튼 선택 시 다음 스크립트를 출력
 	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN)) //테스트용
-		m_eCurState = BTN_SELECT;
+		m_eBtnState = BTN_SELECT;
 
 	_float3 vOffset = { 0.6f, 0.6f, 1.f };
-	switch (m_eCurState)
+	switch (m_eBtnState)
 	{
 	case BTN_HIDE:
 		m_fBlinkAlpha -= fTimeDelta * 5.f;
@@ -100,7 +78,6 @@ _int CUI_BtnIcon::Tick(_float fTimeDelta)
 		break;
 		
 	case BTN_SELECT: //스케일 증감
-		m_IsSelected = TRUE;
 		m_fBlinkAlpha = 0.f;
 		m_fSelectTime += fTimeDelta * 2.f;
 		m_pTransformCom->Set_Scaled(m_vOrigScale * vOffset);
@@ -117,8 +94,7 @@ _int CUI_BtnIcon::Tick(_float fTimeDelta)
 		{
 			m_fSelectTime = 0.f;
 			m_pTransformCom->Set_Scaled(m_vOrigScale);
-			m_IsSelected = FALSE;
-			m_eCurState = BTN_BLINK;
+			m_eBtnState = BTN_BLINK;
 		}
 		break;
 
@@ -182,7 +158,7 @@ HRESULT CUI_BtnIcon::Render()
 #ifdef _DEBUG
 void CUI_BtnIcon::Render_IMGUI()
 {
-	switch (m_eCurState)
+	switch (m_eBtnState)
 	{
 	case BTN_IDLE:		ImGui::Text(u8"BTN_IDLE");	break;
 	case BTN_HIDE:		ImGui::Text(u8"BTN_HIDE");	break;
@@ -275,8 +251,6 @@ void CUI_BtnIcon::Free()
 	
 	for (auto& iTex : m_pTexCom)
 		Safe_Release(iTex);
-
-	//Safe_Release(m_pMWindow);
 }
 
 

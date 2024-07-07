@@ -43,7 +43,7 @@ public:
 public:
 	HRESULT Add_Message(/*const wstring& _wstrMessage, _float _fDisplayTime, */void* _pArg);
 	HRESULT Display_Message(_float _fTimeDelta);
-	HRESULT	Render_Message(const wstring& _wstrMessage);
+	HRESULT	Render_Message(MESSAGE_DESC _tMessageDesc);
 
 
 public:
@@ -63,7 +63,7 @@ public:
 	virtual void Free() override;
 
 private:
-	MESSAGE_DESC*			m_pMessage_Desc{};
+	MESSAGE_DESC			m_tMessage_Desc{};
 
 	_float					m_fElapsedTime = { 0.f }; //경과 시간
 	_float					m_fDisplayTime = { 0.f }; //출력 시간

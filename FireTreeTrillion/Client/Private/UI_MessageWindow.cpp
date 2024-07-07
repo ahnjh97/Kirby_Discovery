@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "UI_MessageWindow.h"
+#include "UI_BtnIcon.h"
 #include "Kirby.h"
 
 CUI_MessageWindow::CUI_MessageWindow(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext)
@@ -65,8 +66,8 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 
 #pragma region UI_BUTTON
 
-	//UI_Button
-	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_UI_Dialog"), TEXT("Prototype_GameObject_UI_BtnIcon"))))
+	m_pUIBtn = static_cast<CUI_BtnIcon*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_UI_BtnIcon")));
+	if (nullptr == m_pUIBtn)
 		return E_FAIL;
 
 #pragma endregion
@@ -79,15 +80,22 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 _int CUI_MessageWindow::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
+	m_pUIBtn->Tick(fTimeDelta);
 
-	//Æ¯Á¤ Æ®¸®°Å°¡ ¹ßµ¿ÇÒ °æ¿ì, ÇØ´ç Window UI¸¦ Ãâ·Â
-	//if (m_pGameInstance->Get_DIKeyState(DIK_GRAVE, KEY_DOWN) && WINDOW_HIDE == m_eCurState) //Å×½ºÆ®¿ë
-	//	m_eCurState = WINDOW_SHOW;
+	//íŠ¹ì • íŠ¸ë¦¬ê±°ê°€ ë°œë™í•  ê²½ìš°, í•´ë‹¹ Window UIë¥¼ ì¶œë ¥
+	if (m_pGameInstance->Get_DIKeyState(DIK_GRAVE, KEY_DOWN) && WINDOW_HIDE == m_eCurState) //í…ŒìŠ¤íŠ¸ìš©
+	{
+		m_eCurState = WINDOW_SHOW;
+		m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_BLINK);
+	}
 	
-	//Window UI Ãâ·ÂÀº ½ºÅ©¸³Æ®°¡ Á¾·áµÉ¶§±îÁö À¯Áö
-	//½ºÅ©¸³Æ® ÀÎµ¦½º°¡ Á¾·áµÉ °æ¿ì, State¸¦ º¯°æ
-	//else if (m_pGameInstance->Get_DIKeyState(DIK_GRAVE, KEY_DOWN) && WINDOW_SHOW == m_eCurState) //Å×½ºÆ®¿ë
-	//	m_eCurState = WINDOW_HIDE;
+	//Window UI ì¶œë ¥ì€ ìŠ¤í¬ë¦½íŠ¸ê°€ ì¢…ë£Œë ë•Œê¹Œì§€ ìœ ì§€
+	//ìŠ¤í¬ë¦½íŠ¸ ì¸ë±ìŠ¤ê°€ ì¢…ë£Œë  ê²½ìš°, Stateë¥¼ ë³€ê²½
+	else if (m_pGameInstance->Get_DIKeyState(DIK_GRAVE, KEY_DOWN) && WINDOW_SHOW == m_eCurState) //í…ŒìŠ¤íŠ¸ìš©
+	{
+		m_eCurState = WINDOW_HIDE;
+		m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_HIDE);
+	}
 
 	_float3 vOffset = { 0.9f, 0.9f, 1.f };
 	_float3 vShowScale{};
@@ -96,14 +104,14 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 	case WINDOW_IDLE: 
 		break;
 
-	case WINDOW_HIDE: //¾ËÆÄ °ª ¹× ½ºÄÉÀÏ °¨¼Ò
+	case WINDOW_HIDE: //ì•ŒíŒŒ ê°’ ë° ìŠ¤ì¼€ì¼ ê°ì†Œ
 		m_UIObjDesc.fAlpha -= fTimeDelta * 5.f;	
 		//vOffset.y -= EASE_OUT(fTimeDelta * 2.5f);
 		//m_pTransCom[TEXMW_BASE]->Set_Scaled(m_vBaseScale * vOffset);
 		//m_pTransCom[TEXMW_BTNBASE]->Set_Scaled(m_vBtnScale * vOffset);
 		break;
 
-	case WINDOW_SHOW: //¾ËÆÄ °ª ¹× ½ºÄÉÀÏ Áõ°¡
+	case WINDOW_SHOW: //ì•ŒíŒŒ ê°’ ë° ìŠ¤ì¼€ì¼ ì¦ê°€
 		m_UIObjDesc.fAlpha += fTimeDelta * 5.f;	
 		//vOffset.y += EASE_OUT(fTimeDelta * 5.f);
 		//vShowScale = m_vBaseScale * vOffset;
@@ -119,7 +127,7 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 	if (m_UIObjDesc.fAlpha >= 1.f)
 		m_UIObjDesc.fAlpha = 1.f;
 
-	if (m_UIObjDesc.fAlpha <= 0.f) //¾ËÆÄ °ª º¸Á¤ ¹× ¾÷µ¥ÀÌÆ® ÁßÁö
+	if (m_UIObjDesc.fAlpha <= 0.f) //ì•ŒíŒŒ ê°’ ë³´ì • ë° ì—…ë°ì´íŠ¸ ì¤‘ì§€
 	{
 		m_UIObjDesc.fAlpha = 0.f;
 		return OBJ_NOEVENT;
@@ -130,13 +138,14 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 
 void CUI_MessageWindow::Late_Tick(_float fTimeDelta)
 {
+	m_pUIBtn->Late_Tick(fTimeDelta);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_UI, this);
 }
 
 HRESULT CUI_MessageWindow::Render()
 {
-	HRESULT hr;
 
+	HRESULT hr;
 #pragma region RENDER_BINDSET
 	
 	for (_uint iTEXIx = 0; iTEXIx < TEXMW_NONE; ++iTEXIx)
@@ -144,7 +153,7 @@ HRESULT CUI_MessageWindow::Render()
 		if (FAILED(m_pTransCom[iTEXIx]->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 			return E_FAIL;
 
-		//¼ÎÀÌ´õ ÆÄÀÏÀÇ ¸ÅÆ®¸¯½º Á¤º¸¸¦ °¡Á®¿Í ¹ÙÀÎµù
+		//ì…°ì´ë” íŒŒì¼ì˜ ë§¤íŠ¸ë¦­ìŠ¤ ì •ë³´ë¥¼ ê°€ì ¸ì™€ ë°”ì¸ë”©
 		if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
 			return E_FAIL;
 
@@ -156,7 +165,9 @@ HRESULT CUI_MessageWindow::Render()
 		CHECK_FAILED(hr);
 	}
 #pragma endregion
-
+	
+	m_pUIBtn->Render();
+	
 	return S_OK;
 }
 
@@ -198,7 +209,7 @@ HRESULT CUI_MessageWindow::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-	//´ëÈ­ÇÏ´Â ´ë»ó¿¡ µû¶ó ÅØ½ºÃ³¸¦ º¯°æÇÏ¿© Ãâ·Â (ÇöÀç´Â ÇÑ Àå)
+	//ëŒ€í™”í•˜ëŠ” ëŒ€ìƒì— ë”°ë¼ í…ìŠ¤ì²˜ë¥¼ ë³€ê²½í•˜ì—¬ ì¶œë ¥ (í˜„ìž¬ëŠ” í•œ ìž¥)
 	if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Texture_UI_MessageWindow"),
 		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
 		return E_FAIL;
@@ -212,15 +223,15 @@ HRESULT CUI_MessageWindow::Add_Components()
 
 HRESULT CUI_MessageWindow::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTexture* _pTextureCom, _uint _iTexIndex)
 {
-	//¼ÎÀÌ´õ ÆÄÀÏÀÇ ÅØ½ºÃ³ Á¤º¸¸¦ °¡Á®¿Í ¹ÙÀÎµù
+	//ì…°ì´ë” íŒŒì¼ì˜ í…ìŠ¤ì²˜ ì •ë³´ë¥¼ ê°€ì ¸ì™€ ë°”ì¸ë”©
 	_pTextureCom->Bind_ShaderResource(_pShaderCom, "g_DiffuseTexture", _iTexIndex);
 
-	//¼ÎÀÌ´õÀÇ ¿ø½Ãµ¥ÀÌÅÍ °¡Á®¿Í ÀúÀå
+	//ì…°ì´ë”ì˜ ì›ì‹œë°ì´í„° ê°€ì ¸ì™€ ì €ìž¥
 	_pShaderCom->Bind_RawValue("g_vRColor", &m_UIObjDesc.vColorRGB, sizeof(_float3));
 
 	_pShaderCom->Bind_RawValue("g_fAlpha", &m_UIObjDesc.fAlpha, sizeof(_float));
 
-	//Begin() > Apply() ÇÔ¼ö È£Ãâ Àü ¼ÎÀÌ´õ Àü¿ª µ¥ÀÌÅÍ¸¦ ÀúÀåÇØ¾ßÇÔ
+	//Begin() > Apply() í•¨ìˆ˜ í˜¸ì¶œ ì „ ì…°ì´ë” ì „ì—­ ë°ì´í„°ë¥¼ ì €ìž¥í•´ì•¼í•¨
 	if (FAILED(_pShaderCom->Begin(_iPassIndex)))
 		return E_FAIL;
 

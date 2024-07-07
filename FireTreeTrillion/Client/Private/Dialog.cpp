@@ -30,24 +30,23 @@ HRESULT CDialog::Initialize(void* pArg)
 		TEXT("Prototype_GameObject_UI_MessageWindow"), &MessageWindowDesc)))
 		return E_FAIL;
 	
-	//json or csv 파일 파싱 및 로드를 여기에서.
+	//json or csv 파일 파싱 및 로드를 여기에서. 파싱 데이터는 사실상 Message(Text) 내용만 파싱하면 됨
 	//Load_FileData();
 
 
-	//Font에 대한 정보를 던짐
-	MESSAGE_DESC FontDesc{};
-	FontDesc.wstrFontTag = { TEXT("Font_HUDSub_KR15") };
-	FontDesc.wstrMessage = { TEXT("고마워~ 덕분에 살았어~!") };
-	FontDesc.fFontPos = { 410.f, 725.f };
-	FontDesc.fFontRGBA = { 0.f / 255.f, 138.f / 255.f, 121.f / 255.f, 1.f };
-	FontDesc.fFontSize = { 1.f, 1.f };
-	FontDesc.fFontScale = { 1.2f, 1.2f };
-	FontDesc.fRadian = { XMConvertToRadians(0.f) };
+	MESSAGE_DESC tFontDesc{};
+	tFontDesc.wstrFontTag = { TEXT("Font_HUDSub_KR15") };
+	tFontDesc.wstrMessage = { TEXT("고마워~ 덕분에 살았어~!") };
+	tFontDesc.fFontPos = { 410.f, 725.f };
+	tFontDesc.fFontRGBA = { 0.f / 255.f, 138.f / 255.f, 121.f / 255.f, 1.f };
+	tFontDesc.fFontSize = { 1.f, 1.f };
+	tFontDesc.fFontScale = { 1.2f, 1.2f };
+	tFontDesc.fRadian = { XMConvertToRadians(0.f) };
 
-	FontDesc.fDisplayTime = 0.1f;
-	FontDesc.fElapsedyTime = 0.f;
+	tFontDesc.fDisplayTime = 0.1f;
+	tFontDesc.fElapsedyTime = 0.f;
 
-	Add_Message(/*FontDesc.wstrMessage, 0.1f, */&FontDesc);
+	Add_Message(&tFontDesc);
 
 	return S_OK;
 }
@@ -73,20 +72,25 @@ HRESULT CDialog::Render()
 	if (!m_vecMessage.empty())
 	{
 		for (auto& Message : m_vecMessage)
-			Render_Message(Message.wstrMessage);
+			Render_Message(m_tMessage_Desc);
 	}
 
 	return S_OK;
 }
 
 // 파싱해서 가져온 대화내용들을 vector안에 넣어줍니다.
-HRESULT CDialog::Add_Message(/*const wstring& _wstrMessage, _float _fDisplayTime, */void* _pArg)
+HRESULT CDialog::Add_Message(void* _pArg)
 {
-	MESSAGE_DESC* pMessage_Desc = (MESSAGE_DESC*)_pArg;
+	MESSAGE_DESC* tMessageDesc{};
+	if (_pArg != nullptr)
+		tMessageDesc = (MESSAGE_DESC*)_pArg;
 
-	m_vecMessage.push_back({ pMessage_Desc->wstrMessage});
-	m_fDisplayTime = pMessage_Desc->fDisplayTime;
-	m_fElapsedTime = pMessage_Desc->fElapsedyTime;
+	m_tMessage_Desc = *tMessageDesc;
+
+	m_vecMessage.push_back(m_tMessage_Desc);
+
+	m_fDisplayTime = m_tMessage_Desc.fDisplayTime;
+	m_fElapsedTime = m_tMessage_Desc.fElapsedyTime;
 
 	return S_OK;
 }
@@ -124,25 +128,24 @@ HRESULT CDialog::Display_Message(_float _fTimeDelta)
 	return S_OK;
 }
 
-// 다이얼로그 출력합니다.
-// ps. 폰트하다가 안되면 이미지
-HRESULT CDialog::Render_Message(const wstring& _wstrMessage)
+// 다이얼로그 메시지 출력
+HRESULT CDialog::Render_Message(MESSAGE_DESC _tMessageDesc)
 {
-	//SpriteFont 폰트 수정 필요.
-	wstring wstrFontTag = { TEXT("Font_HUDSub_KR15") };
-	_float2 vFontPos = { 410.f, 725.f };
-	_float4 vFontRGBA = {	0.f / 255.f, 138.f / 255.f, 121.f / 255.f, 1.f };
+	//Actor(NPC) 대상 별 SpriteFont 폰트 수정 필요
+	wstring wstrFontTag = m_tMessage_Desc.wstrFontTag;
+	_float2 vFontPos = m_tMessage_Desc.fFontPos;
+	_float4 vFontRGBA = m_tMessage_Desc.fFontRGBA;
 
-	_float2 vFontOrig = { 1.f, 1.f };
-	_float2 vFontScale = { 1.2f, 1.2f };
-	_float fRadian = { XMConvertToRadians(0.f) };
+	_float2 vFontSize = m_tMessage_Desc.fFontSize;
+	_float2 vFontScale = m_tMessage_Desc.fFontScale;
+	_float fRadian = m_tMessage_Desc.fRadian;
 
 	if (m_iCurMessageIndex < m_vecMessage.size())
 	{
 		DialogMessage tMessage = m_vecMessage[m_iCurMessageIndex];
 		wstring& wstrSubstrMessage = tMessage.wstrMessage.substr(0, m_iCurCharIndex);
 
-		m_pGameInstance->Render_Font(wstrFontTag, wstrSubstrMessage, vFontPos, vFontRGBA, fRadian, vFontOrig, vFontScale);
+		m_pGameInstance->Render_Font(wstrFontTag, wstrSubstrMessage, vFontPos, vFontRGBA, fRadian, vFontSize, vFontScale);
 	}
 
 	return S_OK;

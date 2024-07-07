@@ -12,7 +12,7 @@ END
 BEGIN(Client)
 class CUI_BtnIcon : public CUIObject
 {
-private:
+public:
 	enum TEX_BTNICON { TEXBTN_BASE, TEXBTN_BRIGHT, TEXBTN_NONE };
 	enum BTN_STATE { BTN_IDLE, BTN_HIDE, BTN_BLINK, BTN_SELECT, BTN_NONE };
 
@@ -20,6 +20,11 @@ private:
 	CUI_BtnIcon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CUI_BtnIcon(const CUI_BtnIcon& rhs);
 	virtual ~CUI_BtnIcon() = default;
+
+#pragma region GETTER/SETTER
+public:
+	void Set_BtnState(BTN_STATE _eBtnState) { m_eBtnState = _eBtnState;	}
+#pragma endregion
 
 public:
 	virtual HRESULT				Initialize_Prototype()						override;
@@ -46,7 +51,6 @@ public:
 private:
 	CTexture*					m_pTexCom[TEXBTN_NONE] = {nullptr};
 	CUI_MessageWindow*			m_pMWindow = { nullptr };
-	_bool						m_IsSelected = { FALSE };
 
 	_float						m_fBtnAlpha = { 0.f };
 	_float						m_fBlinkAlpha = { 0.f };
@@ -54,7 +58,7 @@ private:
 	_float						m_fSelectTime = { 0.f };
 	_float3						m_vOrigScale = { 0.f, 0.f, 1.f };
 
-	BTN_STATE					m_eCurState = { BTN_NONE };
+	BTN_STATE					m_eBtnState = { BTN_NONE };
 		
 };
 END

@@ -52,6 +52,7 @@ public:
 private:
 	CTransform*					m_pTransCom[TEXMW_NONE] = { nullptr };
 	CDialog*					m_pDialog = { nullptr };
+	class CUI_BtnIcon*			m_pUIBtn = { nullptr };
 	
 	_float						m_fHideTime = { 0.f };
 	_float3						m_vBaseScale = { 0.f, 0.f, 1.f };
