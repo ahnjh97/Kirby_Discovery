@@ -245,6 +245,7 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 	{
 		//ºÎµúÇûÀ» ¶§ ¸¸µé »óÅÂ
 		_float3 vMyPos = GET_POS;
+		m_vStartDir = (_float3)m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 		m_vDestPos = vMyPos + _float3{ 0.f, -30.f, 0.f };
 		m_vDestPos = RoadGroupDesc.vDestPos;
 		m_vDestDir = RoadGroupDesc.vDestDir;
@@ -262,6 +263,8 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 
 _int CFinaleRoadGrouper::Tick(_float fTimeDelta)
 {
+	_float fRealTimeDelta = m_pGameInstance->Get_SecondTimer();
+
 	if (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
 	{
 		if (m_pGameInstance->Get_KeyState(DIK_P, KEY_DOWN))
@@ -270,24 +273,42 @@ _int CFinaleRoadGrouper::Tick(_float fTimeDelta)
 		}
 	}
 
-	if (m_bStartCollideEvent)
+	if (m_bStartCollideEvent && 0.f < m_fCollideTime )
 	{
+
+		m_fCollideTime -= fTimeDelta;
+		if (m_fCollideTime < 0.f)
+			m_fCollideTime = 0.f;
 
 		_float3 vMyPos = GET_POS;
 		_float fDist = _float3::Distance(vMyPos, m_vDestPos);
+		_float fTime = 1.f - pow(m_fCollideTime, 2.f);
 
 		if (.1f < fDist)
 		{
-			vMyPos += (m_vDestPos - vMyPos) * fTimeDelta;
+			vMyPos += (m_vDestPos - vMyPos) * fRealTimeDelta;
 			if (_float3::Distance(vMyPos, m_vDestPos) < .1f)
 				vMyPos = m_vDestPos;
 
 			SET_POS(Pos(vMyPos));
 		}
 
-		_float3 vMyDir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-		_float3 vCurRot = CUtils::SlerpDirVec(vMyDir, m_vDestDir, clamp(fTimeDelta * 3.f, 0.f, 1.f));
-		m_pTransformCom->Set_State(CTransform::STATE_LOOK, Dir(vCurRot));
+
+		Quaternion vFirstQuat, vSecondQuat, vResultQuat;
+		
+		vFirstQuat = CUtils::Make_Quat_FromDir(m_vStartDir);
+		vSecondQuat = CUtils::Make_Quat_FromDir(m_vDestDir);
+
+		vResultQuat = Quaternion::Slerp(vFirstQuat, vSecondQuat, clamp(fTime, 0.f, 1.f));
+		m_pTransformCom->Turn_Absolute(vResultQuat);
+
+		//_float3 vRadianEuler = vResultQuat.ToEuler();
+		//_float3 vCurRot = { ToDegree(vRadianEuler.x), ToDegree(vRadianEuler.y), ToDegree(vRadianEuler.z) };
+
+
+		////_float3 vMyDir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+		////_float3 vCurRot = CUtils::SlerpDirVec(m_vStartDir, m_vDestDir, clamp(fTime, 0.f, 1.f));
+		//m_pTransformCom->Set_State(CTransform::STATE_LOOK, Dir(vCurRot));
 	}
 
 	return OBJ_NOEVENT;
