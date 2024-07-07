@@ -68,10 +68,13 @@ HRESULT CFinaleRoad::Initialize(void* pArg)
 	m_pSocketMatrix = RoadDesc.pSocketMat;
 	m_bIsAnimModel = RoadDesc.bIsAnimModel;
 
-	m_pDynamicActor = m_pModelCom->ReturnDynamicActor(m_pTransformCom->Get_WorldMatrix());
-	m_pDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+	if (*m_pCurrentLevelID != LEVEL_TOOL_ANIM)
+	{
+		m_pDynamicActor = m_pModelCom->ReturnDynamicActor(m_pTransformCom->Get_WorldMatrix());
+		m_pDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+	}
 
-	if(m_bIsAnimModel)
+	if (m_bIsAnimModel)
 		m_pModelCom->Set_Animation(0, 60.f, true, false);
 
 	return S_OK;
@@ -84,7 +87,7 @@ _int CFinaleRoad::Tick(_float fTimeDelta)
 	__super::Tick(m_fTimeDelta);
 
 	//m_pTransformCom->Turn( {0.f, 1.f, 0.f, 0.f} , m_fTimeDelta * .01f);
-	
+
 	m_WorldMatrix = m_pTransformCom->Get_WorldMatrix() * *m_pSocketMatrix;
 
 
@@ -98,7 +101,7 @@ void CFinaleRoad::Late_Tick(_float fTimeDelta)
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
 
-	if(m_bIsAnimModel)
+	if (m_bIsAnimModel)
 		m_pModelCom->Play_Animation(m_fTimeDelta);
 
 
@@ -209,10 +212,17 @@ HRESULT CFinaleRoad::Add_Components(wstring _strModelTag, _bool _bIsAnimModel)
 	hr = __super::Add_Component(LEVEL_STATIC, strTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
+
+	if (*m_pCurrentLevelID == LEVEL_TOOL_ANIM)
+		_strModelTag = L"RoadBreak";
+
 	hr = __super::Add_Component(TEXT("Prototype_Component_Model_") + _strModelTag,
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
+
+	// FOR ANIMTOOL
+	//m_ppModelForAnimTool = &m_pModelCom;
 
 	CHitBox::HITBOX_DESC HitBox{};
 	HitBox.pOwner = this;
