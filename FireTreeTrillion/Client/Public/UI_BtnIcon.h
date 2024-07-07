@@ -15,6 +15,7 @@ class CUI_BtnIcon : public CUIObject
 public:
 	enum TEX_BTNICON { TEXBTN_BASE, TEXBTN_BRIGHT, TEXBTN_NONE };
 	enum BTN_STATE { BTN_IDLE, BTN_HIDE, BTN_BLINK, BTN_SELECT, BTN_NONE };
+	enum TEX_BTNTYPE { TYPE_DEFAULT, TYPE_BOSS, TYPE_NONE };
 
 private:
 	CUI_BtnIcon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -153,6 +153,20 @@ HRESULT CUI_MessageWindow::Render()
 	
 	for (_uint iTEXIx = 0; iTEXIx < TEXMW_NONE; ++iTEXIx)
 	{
+		TEX_MWTYPE eTexType = { TYPE_ELFILIN };
+		switch (*m_pCurrentLevelID)
+		{
+		case LEVEL_TOWN: 
+			eTexType = TYPE_NPC; 
+			break;
+
+		case LEVEL_DEEDEEDEE: case LEVEL_SIMBA: case LEVEL_FINALBOSS: case LEVEL_FINALE:
+			eTexType = TYPE_BOSS;
+			break;
+
+		default: break;
+		}
+	
 		if (FAILED(m_pTransCom[iTEXIx]->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 			return E_FAIL;
 
@@ -164,7 +178,7 @@ HRESULT CUI_MessageWindow::Render()
 			return E_FAIL;
 
 		PASS_POSTEX ePassType = { POSTEX_ALPHABLEND_NOTEST };
-		hr = Bind_ShaderResources(m_pShaderCom, ePassType, m_pTextureCom, iTEXIx);
+		hr = Bind_ShaderResources(m_pShaderCom, ePassType, m_pTexCom[iTEXIx], eTexType);
 		CHECK_FAILED(hr);
 	}
 
@@ -227,9 +241,12 @@ HRESULT CUI_MessageWindow::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-	//대화하는 대상에 따라 텍스처를 변경하여 출력 (현재는 한 장)
-	if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Texture_UI_MessageWindow"),
-		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_UI_MessageWindow_Base"),
+		TEXT("Com_TexBase"), (CComponent**)&m_pTexCom[TEXMW_BASE])))
+		return E_FAIL;
+
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_UI_MessageWindow_BtnBase"),
+		TEXT("Com_TexBtnBase"), (CComponent**)&m_pTexCom[TEXMW_BTNBASE])))
 		return E_FAIL;
 
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),
@@ -277,7 +294,7 @@ HRESULT CUI_MessageWindow::Display_Message(_float _fTimeDelta)
 		return S_OK;
 
 	m_fElapsedTime += _fTimeDelta;
-	if (m_fElapsedTime >= m_fDisplayTime) //경과시간 대비 출력시간 체크
+	if (m_fElapsedTime >= m_tMessageDesc.fDisplayTime) //경과시간 대비 출력시간 체크
 	{
 		m_fElapsedTime = 0.f;
 
@@ -355,6 +372,9 @@ void CUI_MessageWindow::Free()
 
 	for (auto& iTrans : m_pTransCom)
 		Safe_Release(iTrans);
+
+	for (auto& iTex : m_pTexCom)
+		Safe_Release(iTex);
 
 	Safe_Release(m_pUIBtn);
 }

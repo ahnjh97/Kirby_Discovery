@@ -659,7 +659,7 @@ HRESULT CLevel_FinalBoss::Ready_Objects()
 
 HRESULT CLevel_FinalBoss::Ready_UI()
 {
-
+	//능력버리기
 	CUIObject::UIOBJ_DESC DiscardUIDesc{};
 	DiscardUIDesc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f, 0.f };
 	DiscardUIDesc.vPos = { DiscardUIDesc.vCenter.x, DiscardUIDesc.vCenter.y, 0.f };

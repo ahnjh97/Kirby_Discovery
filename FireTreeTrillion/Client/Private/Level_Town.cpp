@@ -200,8 +200,7 @@ HRESULT CLevel_Town::Ready_Layer_UI(const wstring& _wstrLayerTag)
 		CHECK_FAILED(hr);
 	}
 
-
-
+	//능력버리기
 	CUIObject::UIOBJ_DESC DiscardUIDesc{};
 	DiscardUIDesc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f, 0.f };
 	DiscardUIDesc.vPos = { DiscardUIDesc.vCenter.x, DiscardUIDesc.vCenter.y, 0.f };
@@ -209,7 +208,7 @@ HRESULT CLevel_Town::Ready_Layer_UI(const wstring& _wstrLayerTag)
 
 	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_HUD"), TEXT("Prototype_GameObject_HUD_AbilityDiscard"), &DiscardUIDesc);
 
-
+	//다이얼로그 
 	CDialog::DIALOG_DESC tDialogDesc{};
 	tDialogDesc.strPath = "../Bin/Resources/Data/Dialog_Town.json";
 	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_Dialog"), TEXT("Prototype_GameObject_Dialog"), &tDialogDesc);

@@ -716,11 +716,6 @@ HRESULT CLoader::Loading_For_DeeDeeDee()
 	//HUD_BOSSHPBAR
 	hr = Add_Texture(eLevel, "HUD_BossBar", "UI/HUD/Boss/BossBar_%d.png", 5);
 
-	//UI_MessageWindow, Button
-	hr = Add_Texture(eLevel, "UI_MessageWindow", "UI/MessageWindow/MessageWindow_Base_%d.dds", 2);
-	hr = Add_Texture(eLevel, "UI_BtnIconBase", "UI/BtnIcon/BtnIcon_Base.dds");
-	hr = Add_Texture(eLevel, "UI_BtnIconBright", "UI/BtnIcon/BtnIcon_Bright.dds");
-
 	// 얼굴, 눈 텍스쳐 로드
 	Add_KirbyFaceTexture(eLevel);
 
@@ -775,12 +770,7 @@ HRESULT CLoader::Loading_For_Town()
 	// 얼굴, 눈 텍스쳐 로드
 	Add_KirbyFaceTexture(eLevel);
 
-	//UI_MessageWindow, Button
-	hr = Add_Texture(eLevel, "UI_MessageWindow", "UI/MessageWindow/MessageWindow_Base_%d.dds", 2);
-	hr = Add_Texture(eLevel, "UI_BtnIconBase", "UI/BtnIcon/BtnIcon_Base.dds");
-	hr = Add_Texture(eLevel, "UI_BtnIconBright", "UI/BtnIcon/BtnIcon_Bright.dds");
-
-#pragma endregion
+	#pragma endregion
 
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
@@ -1498,6 +1488,15 @@ HRESULT CLoader::Add_StaticUITexture()
 	//Ability Discard
 	hr = Add_Texture(LEVEL_STATIC, "HUD_AbilityDiscard", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_%d.dds", 3);	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "HUD_AbilityDiscard_Mask", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_Mask.dds");	CHECK_FAILED(hr);
+
+
+	//UI_MessageWindow
+	hr = Add_Texture(LEVEL_STATIC, "UI_MessageWindow_Base", "UI/MessageWindow/MessageWindow_Base_%d.dds", 3); CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "UI_MessageWindow_BtnBase", "UI/MessageWindow/MessageWindow_BtnBase_%d.dds", 3); CHECK_FAILED(hr);
+
+	//UI_Button
+	hr = Add_Texture(LEVEL_STATIC, "UI_BtnIconBase", "UI/BtnIcon/BtnIcon_Base_%d.dds", 3); CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "UI_BtnIconBright", "UI/BtnIcon/BtnIcon_Bright.dds"); CHECK_FAILED(hr);
 
 	return S_OK;
 }

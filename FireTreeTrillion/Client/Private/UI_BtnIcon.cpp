@@ -125,15 +125,33 @@ HRESULT CUI_BtnIcon::Render()
 	for (_uint iTEXIx = 0; iTEXIx < TEXBTN_NONE; ++iTEXIx)
 	{
 		PASS_POSTEX ePassType = { POSTEX_ALPHABLEND_NOTEST };
+		TEX_BTNTYPE eTexType = { TYPE_DEFAULT };
+
 		if (TEXBTN_BASE == iTEXIx)
 		{
 			ePassType = POSTEX_UIWHITEALPHA;
 			m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fBtnAlpha, sizeof(_float)); //알파를 별개로 조정
 			m_fAlpha = 1.f;
+			
+			switch (*m_pCurrentLevelID)
+			{
+			case LEVEL_TOWN:
+				eTexType = TYPE_DEFAULT;
+				break;
+
+			case LEVEL_DEEDEEDEE: case LEVEL_SIMBA: case LEVEL_FINALBOSS: case LEVEL_FINALE:
+				eTexType = TYPE_BOSS;
+				break;
+
+			default: break;
+			}
 		}
 
 		if (TEXBTN_BRIGHT == iTEXIx)
+		{
 			m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fBlinkAlpha, sizeof(_float));
+			eTexType = TYPE_DEFAULT;
+		}
 
 		if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 			return E_FAIL;
@@ -145,9 +163,9 @@ HRESULT CUI_BtnIcon::Render()
 		if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 			return E_FAIL;
 
-		hr = Bind_ShaderResources(m_pShaderCom, ePassType, m_pTexCom[iTEXIx], 0);
+		hr = Bind_ShaderResources(m_pShaderCom, ePassType, m_pTexCom[iTEXIx], eTexType);
 		CHECK_FAILED(hr);
-
+			
 #pragma endregion
 
 	}
@@ -175,11 +193,11 @@ HRESULT CUI_BtnIcon::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-  	if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Texture_UI_BtnIconBase"),
-		TEXT("Com_TextBase"), (CComponent**)&m_pTexCom[TEXBTN_BASE])))
+  	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_UI_BtnIconBase"),
+		TEXT("Com_TexBase"), (CComponent**)&m_pTexCom[TEXBTN_BASE])))
 		return E_FAIL;
 
-	if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Texture_UI_BtnIconBright"),
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_UI_BtnIconBright"),
 		TEXT("Com_TexBright"), (CComponent**)&m_pTexCom[TEXBTN_BRIGHT])))
 		return E_FAIL;
 

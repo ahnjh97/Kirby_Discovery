@@ -31,6 +31,8 @@ public:
 
 public:
 	enum TEX_MESSAGEWINDOW { TEXMW_BASE, TEXMW_BTNBASE, TEXMW_NONE };
+	enum TEX_MWTYPE { TYPE_ELFILIN, TYPE_NPC, TYPE_BOSS, TYPE_NONE };
+
 	enum MESSAGEWINDOW_STATE { WINDOW_IDLE, WINDOW_HIDE, WINDOW_SHOW, WINDOW_NONE	};
 
 private:
@@ -72,6 +74,8 @@ public:
 
 private:
 	CTransform*					m_pTransCom[TEXMW_NONE] = { nullptr };
+	CTexture*					m_pTexCom[TEXMW_NONE] = { nullptr };
+
 	class CUI_BtnIcon*			m_pUIBtn = { nullptr };
 	
 	MESSAGEWINDOW_STATE			m_eCurState = { WINDOW_NONE };
