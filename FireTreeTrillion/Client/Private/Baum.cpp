@@ -243,7 +243,7 @@ HRESULT CBaum::Add_Components(wstring wstrModelProtoTag)
 		LightDesc.eType = LIGHT_DESC::TYPE_POINT;
 		LightDesc.vPosition = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 		LightDesc.fRange = 30.f;
-		LightDesc.vDiffuse = _float4(1.f, 1.f, 0.f, 1.f);
+		LightDesc.vDiffuse = _float4(7.f, .5f, 0.f, 1.f);
 		LightDesc.vAmbient = _float4(.5f, .5f, .5f, 1.f);
 		LightDesc.vSpecular = _float4(0.f, 0.f, 0.0f, 1.f);
 		if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))

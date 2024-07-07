@@ -122,7 +122,7 @@ HRESULT CLevel_Finale::Ready_Lights()
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
 	LightDesc.vDirection = _float4(0.f, -1.f, -.3f, 0.f);
 
-	LightDesc.vDiffuse = _float4(.062f, .062f, .39f, 1.f);
+	LightDesc.vDiffuse = _float4(.095f, .024f, .365f, 1.f);
 	LightDesc.vAmbient = _float4(.23f, .27f, .47f, 1.f);
 
 	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
