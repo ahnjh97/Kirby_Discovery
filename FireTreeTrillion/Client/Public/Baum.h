@@ -52,6 +52,8 @@ private:
 	_float4			m_vBaumMoveDir = { 0.f, 0.f, 0.f, 0.f };
 	_float			m_fBaumSpeed = { 0.f };
 	_float			m_fScale = { 0.01f };
+	enum BAUMTYPE { BAUM_BAUM, BAUM_STARPIECE, BAUM_END };
+	BAUMTYPE		m_eBaumType = { BAUM_END };
 	_bool			m_bOnTerrain = { false };
 	// 붙어먹을 로드 클래스
 	class CFinaleRoad* m_pMyRoad = { nullptr };

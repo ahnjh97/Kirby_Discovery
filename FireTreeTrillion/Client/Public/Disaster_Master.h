@@ -25,7 +25,7 @@ public:
 
 private:
 	void			Make_MissBaum();
-	void			Make_OnTerrainBaum();
+	void			Make_OnTerrainBaum(_float4 vTargetPos, _bool bBaum);
 
 	class CFinaleKirby*	m_pKirby = { nullptr };
 	_float			m_fMakeBaumDelay = { 0.f };

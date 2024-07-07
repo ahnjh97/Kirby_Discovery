@@ -106,7 +106,14 @@ _int CBaum::Tick(_float fTimeDelta)
 
 		// 파티클을 만든다.
 		Make_Partical();
-		//m_bDead = true;
+
+		// 스타피스면 바로 죽는다.
+		if (m_eBaumType == BAUM_STARPIECE)
+		{
+			m_bDead = true;
+			return OBJ_NOEVENT;
+		}
+
 		m_bOnTerrain = true;
 		Find_MyRoad();
 	}
@@ -201,6 +208,8 @@ HRESULT CBaum::Add_Components(wstring wstrModelProtoTag)
 	hr = __super::Add_Component(wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
+	m_eBaumType = wstrModelProtoTag == TEXT("Baum") ? BAUM_BAUM : BAUM_STARPIECE;
+
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
@@ -288,40 +297,48 @@ void CBaum::Find_MyRoad()
 
 _int CBaum::Make_Partical()
 {
-	wstring wstrModelName[6] = {
-		TEXT("BaumPieceA"),
-		TEXT("BaumPieceB"),
-		TEXT("BaumPieceC"),
-		TEXT("BaumPieceD"),
-		TEXT("BaumPieceE"),
-		TEXT("BaumPieceF")
-	};
-
-	// 파티클을 만드는 함수
-	for (_int i = 0; i < 6; ++i)
+	if (m_eBaumType == BAUM_BAUM)
 	{
-		_float4x4 matrix = m_pTransformCom->Get_WorldFloat4x4();
-		_float4 vDir = /*XMVector3Normalize(m_vBaumMoveDir * -1.f)*/ _float4(0.f, 1.f, 0.f, 0.f);
-		
-		vDir = CUtils::Make_RandomAngle_Vector(120.f, vDir);
-		vDir.Normalize();
-		CUtils::Turn_OtherMatrix(matrix, _float4(0.f, 1.f, 0.f, 0.f), 1.f, CUtils::Make_RandomFloat(0.f, 360.f));
-		CUtils::Turn_OtherMatrix(matrix, _float4(1.f, 0.f, 0.f, 0.f), 1.f, CUtils::Make_RandomFloat(0.f, 360.f));
-		CUtils::Turn_OtherMatrix(matrix, _float4(0.f, 0.f, 1.f, 0.f), 1.f, CUtils::Make_RandomFloat(0.f, 360.f));
-		_float fRandomscale = CUtils::Make_RandomFloat(0.6f, 1.6f);
-		CUtils::Set_Scaled_Matrix(matrix, fRandomscale, fRandomscale, fRandomscale);
+		wstring wstrModelName[6] = {
+			TEXT("BaumPieceA"),
+			TEXT("BaumPieceB"),
+			TEXT("BaumPieceC"),
+			TEXT("BaumPieceD"),
+			TEXT("BaumPieceE"),
+			TEXT("BaumPieceF")
+		};
 
-		CBaumPiece::BAUMPIECEDESC desc = {};
-		desc.matWorld = matrix;
-		vDir.y += 0.5f;
-		desc.wstrModelName = wstrModelName[i];
-		desc.vParticalMoveDir = vDir;
-		desc.fParticalSpeed = CUtils::Make_RandomFloat(70.f, 150.f);
-		// Car Test
-		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_BaumPiece"), TEXT("Prototype_GameObject_BaumPiece"), &desc)))
-			return OBJ_DEAD;
+		// 파티클을 만드는 함수
+		for (_int i = 0; i < 6; ++i)
+		{
+			_float4x4 matrix = m_pTransformCom->Get_WorldFloat4x4();
+			_float4 vDir = /*XMVector3Normalize(m_vBaumMoveDir * -1.f)*/ _float4(0.f, 1.f, 0.f, 0.f);
+
+			vDir = CUtils::Make_RandomAngle_Vector(120.f, vDir);
+			vDir.Normalize();
+			CUtils::Turn_OtherMatrix(matrix, _float4(0.f, 1.f, 0.f, 0.f), 1.f, CUtils::Make_RandomFloat(0.f, 360.f));
+			CUtils::Turn_OtherMatrix(matrix, _float4(1.f, 0.f, 0.f, 0.f), 1.f, CUtils::Make_RandomFloat(0.f, 360.f));
+			CUtils::Turn_OtherMatrix(matrix, _float4(0.f, 0.f, 1.f, 0.f), 1.f, CUtils::Make_RandomFloat(0.f, 360.f));
+			_float fRandomscale = CUtils::Make_RandomFloat(0.6f, 1.6f);
+			CUtils::Set_Scaled_Matrix(matrix, fRandomscale, fRandomscale, fRandomscale);
+
+			CBaumPiece::BAUMPIECEDESC desc = {};
+			desc.matWorld = matrix;
+			vDir.y += 0.5f;
+			desc.wstrModelName = wstrModelName[i];
+			desc.vParticalMoveDir = vDir;
+			desc.fParticalSpeed = CUtils::Make_RandomFloat(70.f, 150.f);
+			// Car Test
+			if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_BaumPiece"), TEXT("Prototype_GameObject_BaumPiece"), &desc)))
+				return OBJ_DEAD;
+		}
 	}
+	else if (m_eBaumType == BAUM_STARPIECE)
+	{
 
+
+
+	}
 
 	return OBJ_DEAD;
 }
