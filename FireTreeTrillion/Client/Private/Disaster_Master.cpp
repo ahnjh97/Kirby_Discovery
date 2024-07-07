@@ -128,6 +128,11 @@ void CDisaster_Master::Make_OnTerrainBaum(_float4 _vTargetPos, _bool _bBaum)
 		return;
 }
 
+void CDisaster_Master::Make_FinaleRoad(_float4 vTargetPos)
+{
+
+}
+
 void CDisaster_Master::Moving_FinaleRoad(_float fKirbyX)
 {
 	if (m_bRoadTrigger[0] == true && fKirbyX > 100.f)
@@ -166,7 +171,7 @@ void CDisaster_Master::Moving_TargetBaum(_float fKirbyX)
 		m_bBaumTrigger[2] = false;
 	}
 
-	else if (m_bBaumTrigger[3] == true && fKirbyX + (fKirbySpeed * 4.f) > 681.f)
+	else if (m_bBaumTrigger[3] == true && fKirbyX + (fKirbySpeed * 1.5f) > 681.f)
 	{
 		Make_OnTerrainBaum(_float4(681.f, -15.9f, -91.8f, 1.f), false);
 		m_bBaumTrigger[3] = false;

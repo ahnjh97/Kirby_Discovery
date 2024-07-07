@@ -15,19 +15,7 @@ CFinaleRoad::CFinaleRoad(const CFinaleRoad& rhs)
 //충돌한 도로가 도로 그룹들에게 
 void CFinaleRoad::Start_CollisionEvent()
 {
-	list<CGameObject*>* pList = m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoadGrouper"));
-	if (nullptr == pList)
-		return;
 
-	for (auto& grouper : *pList)
-	{
-		if (true == static_cast<CFinaleRoadGrouper*>(grouper)->Make_CollideReaction(this))
-			break;
-	}
-}
-
-void CFinaleRoad::Make_CollisionEvent()
-{
 	switch (m_eCollideType)
 	{
 	case CTYPE_NONE:
@@ -42,12 +30,30 @@ void CFinaleRoad::Make_CollisionEvent()
 	break;
 	case CTYPE_BREAK:
 	{
+		m_bCollided = true;
+
+		if (m_wstrModelName == L"RoadLongBreak")
+			m_pModelCom->DisableActors();
 	}
 	break;
 	default:
-		m_bCollided = true;
 		break;
 	}
+
+	list<CGameObject*>* pList = m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoadGrouper"));
+	if (nullptr == pList)
+		return;
+
+	for (auto& grouper : *pList)
+	{
+		if (true == static_cast<CFinaleRoadGrouper*>(grouper)->Make_CollideReaction(this))
+			break;
+	}
+}
+
+void CFinaleRoad::Make_CollisionEvent()
+{
+	
 }
 
 HRESULT CFinaleRoad::Initialize_Prototype()
@@ -106,6 +112,14 @@ _int CFinaleRoad::Tick(_float fTimeDelta)
 	m_WorldMatrix = m_pTransformCom->Get_WorldMatrix() * *m_pSocketMatrix;
 
 
+	//if (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
+	//{
+	//	if (m_pGameInstance->Get_KeyState(DIK_P, KEY_DOWN))
+	//	{
+	//		m_bCollided = true;
+	//	}
+	//}
+
 	return _int();
 }
 
@@ -132,7 +146,6 @@ void CFinaleRoad::Late_Tick(_float fTimeDelta)
 	if (m_pGameInstance->isInFrustum_WorldSpace(CUtils::Get_State_Vector_Matrix(m_WorldMatrix, CUtils::STATE_POSITION), 100.0f))
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
-		//m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 	}
 
 }
@@ -148,7 +161,6 @@ HRESULT CFinaleRoad::Render()
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
 		//애니메이션 도로들
-		
 		if (m_eCollideType == CTYPE_BREAK)
 		{
 			if (m_bCollided)
@@ -162,7 +174,7 @@ HRESULT CFinaleRoad::Render()
 					continue;
 			}
 		}
-		
+
 		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE); CHECK_FAILED(hr);
 		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS); CHECK_FAILED(hr);
 		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS); CHECK_FAILED(hr);
@@ -221,8 +233,8 @@ HRESULT CFinaleRoad::Add_Components(wstring _strModelTag, _bool _bIsAnimModel)
 {
 	HRESULT hr;
 
-	wstring strTag = TEXT("Prototype_Component_Shader_VtxModel");
-	hr = __super::Add_Component(LEVEL_STATIC, strTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
+	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"),
+		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
 
@@ -232,7 +244,6 @@ HRESULT CFinaleRoad::Add_Components(wstring _strModelTag, _bool _bIsAnimModel)
 
 
 	// FOR ANIMTOOL
-	//m_ppModelForAnimTool = &m_pModelCom;
 
 	CHitBox::HITBOX_DESC HitBox{};
 	HitBox.pOwner = this;

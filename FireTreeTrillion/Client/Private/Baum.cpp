@@ -40,7 +40,7 @@ HRESULT CBaum::Initialize(void* pArg)
 	m_bMotionBlur = true;
 	m_bRimLight = false;
 
-	m_fBaumSpeed =  Desc.fBaumSpeed;
+	m_fBaumSpeed = Desc.fBaumSpeed;
 	m_vBaumMoveDir = Desc.vBaumMoveDir;
 
 	_float4 vNewUp = m_vBaumMoveDir * -1.f;
@@ -62,7 +62,7 @@ HRESULT CBaum::Initialize(void* pArg)
 	m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
 
 
-	
+
 	return S_OK;
 }
 
@@ -97,8 +97,7 @@ _int CBaum::Tick(_float fTimeDelta)
 		// 지형에 붙어 따라가는 기능
 		if (m_pMyRoad != nullptr)
 		{
-			CTransform* pRoadTransform = m_pMyRoad->Get_TransformCom();
-			_float4x4 NewWorldmatrix = m_HitWorld * pRoadTransform->Get_WorldFloat4x4();
+			_float4x4 NewWorldmatrix = m_HitWorld * m_pMyRoad->Get_WorldMatrix();
 			m_pTransformCom->Set_WorldMatrix(NewWorldmatrix);
 			_float4 NewPos = CUtils::Get_State_Vector_Matrix(NewWorldmatrix, CUtils::STATE_POSITION);
 			m_pControllerCom->Set_Position(m_pTransformCom, NewPos);
@@ -114,15 +113,16 @@ _int CBaum::Tick(_float fTimeDelta)
 		// 파티클을 만든다.
 		Make_Partical();
 
+
+		m_bOnTerrain = true;
+		Find_MyRoad();
+
 		// 스타피스면 바로 죽는다.
 		if (m_eBaumType == BAUM_STARPIECE)
 		{
 			m_bDead = true;
 			return OBJ_NOEVENT;
 		}
-
-		m_bOnTerrain = true;
-		Find_MyRoad();
 	}
 
 	Compute_MotionBlur();
@@ -247,7 +247,7 @@ HRESULT CBaum::Add_Components(wstring wstrModelProtoTag)
 		LightDesc.vAmbient = _float4(.5f, .5f, .5f, 1.f);
 		LightDesc.vSpecular = _float4(0.f, 0.f, 0.0f, 1.f);
 		if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
-			 return E_FAIL;
+			return E_FAIL;
 		m_pLight = CGameInstance::Get_Instance()->Get_LightLastAddress();
 		Safe_AddRef(m_pLight);
 
@@ -300,14 +300,13 @@ void CBaum::Find_MyRoad()
 
 	for (auto& pRoad : *m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad")))
 	{
-		_float4 vRoadPos = pRoad->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
-		
+		_float4 vRoadPos = static_cast<CFinaleRoad*>(pRoad)->Get_WorldPos();
+
 		_float fDistance = (vRoadPos - vPos).Length();
 
 		if (fMinDistance > fDistance)
 		{
 			m_pMyRoad = static_cast<CFinaleRoad*>(pRoad);
-			m_pMyRoad->Start_CollisionEvent();
 			fMinDistance = fDistance;
 		}
 	}
@@ -315,7 +314,8 @@ void CBaum::Find_MyRoad()
 	if (fMinDistance != 1000.f)
 	{
 		Safe_AddRef(m_pMyRoad);
-		_float4x4 RoadInvMatrix = m_pMyRoad->Get_TransformCom()->Get_WorldFloat4x4_Inverse();
+		m_pMyRoad->Start_CollisionEvent();
+		_float4x4 RoadInvMatrix = m_pMyRoad->Get_WorldMatrix().Invert();
 		m_HitWorld = m_pTransformCom->Get_WorldMatrix() * RoadInvMatrix;
 		m_HitWorld._42 -= 1.5f;
 	}

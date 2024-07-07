@@ -23,7 +23,7 @@ _bool CFinaleRoadGrouper::Make_CollideReaction(CFinaleRoad* pRoad)
 
 	for (auto& road : m_pRoads)
 	{
-		if (pRoad == road)
+		if ( _float4::Distance( road->Get_WorldPos() , pRoad->Get_WorldPos()) < 5.f )
 		{
 			bIsMyCollision = true;
 			break;
@@ -46,6 +46,7 @@ _bool CFinaleRoadGrouper::Make_CollideReaction(CFinaleRoad* pRoad)
 	default:
 		break;
 	}
+
 	for (auto& road : m_pRoads)
 	{
 		road->Make_CollisionEvent();
@@ -271,13 +272,7 @@ _int CFinaleRoadGrouper::Tick(_float fTimeDelta)
 {
 	_float fRealTimeDelta = m_pGameInstance->Get_SecondTimer();
 
-	if (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
-	{
-		if (m_pGameInstance->Get_KeyState(DIK_P, KEY_DOWN))
-		{
-			Make_CollideReaction();
-		}
-	}
+
 
 	if (m_bStartCollideEvent && 0.f < m_fCollideTime )
 	{
