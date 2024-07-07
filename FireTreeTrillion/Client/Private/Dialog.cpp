@@ -26,7 +26,6 @@ HRESULT CDialog::Initialize(void* pArg)
 
 	// 레벨마다 다른 path를 받아 해당 정보에 맞는 Messgae Window를 생성합니다.
 	Load(desc.strPath);
-	//Save(); //for test
 
 	return S_OK;
 }

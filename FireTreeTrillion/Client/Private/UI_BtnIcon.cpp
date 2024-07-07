@@ -41,7 +41,7 @@ HRESULT CUI_BtnIcon::Initialize(void* _pArg)
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 
-	m_eBtnState = BTN_IDLE;
+	m_eCurState = BTN_IDLE;
 	m_pCurrentLevelID = m_pGameInstance->Get_CurrentLevelID();
 
 	return S_OK;
@@ -51,12 +51,8 @@ _int CUI_BtnIcon::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
-	//버튼 선택 시 다음 스크립트를 출력
-	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN)) //테스트용
-		m_eBtnState = BTN_SELECT;
-
 	_float3 vOffset = { 0.6f, 0.6f, 1.f };
-	switch (m_eBtnState)
+	switch (m_eCurState)
 	{
 	case BTN_HIDE:
 		m_fBlinkAlpha -= fTimeDelta * 5.f;
@@ -94,7 +90,7 @@ _int CUI_BtnIcon::Tick(_float fTimeDelta)
 		{
 			m_fSelectTime = 0.f;
 			m_pTransformCom->Set_Scaled(m_vOrigScale);
-			m_eBtnState = BTN_BLINK;
+			m_eCurState = BTN_BLINK;
 		}
 		break;
 
@@ -121,7 +117,11 @@ HRESULT CUI_BtnIcon::Render()
 	HRESULT hr;
 
 #pragma region RENDER_BINDSET
-	
+
+	//렌더 OFF
+	if (BTN_HIDE == m_eCurState && 0.f == m_fBlinkAlpha == m_fBtnAlpha)
+		return S_OK;
+
 	for (_uint iTEXIx = 0; iTEXIx < TEXBTN_NONE; ++iTEXIx)
 	{
 		PASS_POSTEX ePassType = { POSTEX_ALPHABLEND_NOTEST };
@@ -158,7 +158,7 @@ HRESULT CUI_BtnIcon::Render()
 #ifdef _DEBUG
 void CUI_BtnIcon::Render_IMGUI()
 {
-	switch (m_eBtnState)
+	switch (m_eCurState)
 	{
 	case BTN_IDLE:		ImGui::Text(u8"BTN_IDLE");	break;
 	case BTN_HIDE:		ImGui::Text(u8"BTN_HIDE");	break;

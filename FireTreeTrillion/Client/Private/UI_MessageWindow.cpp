@@ -84,23 +84,20 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 	m_pUIBtn->Tick(fTimeDelta);
 
 	//특정 트리거가 발동할 경우, 해당 Window UI를 출력
+	//Window UI 출력은 스크립트가 종료될때까지 유지
 	if (m_pGameInstance->Get_DIKeyState(DIK_GRAVE, KEY_DOWN) && WINDOW_HIDE == m_eCurState) //테스트용
 	{
 		m_eCurState = WINDOW_SHOW;
-		m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_BLINK);
-	}
-	//Window UI 출력은 스크립트가 종료될때까지 유지
-	//스크립트 인덱스가 종료될 경우, State를 변경
-	else if (m_pGameInstance->Get_DIKeyState(DIK_GRAVE, KEY_DOWN) && WINDOW_SHOW == m_eCurState) //테스트용
-	{
-		m_eCurState = WINDOW_HIDE;
-		m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_HIDE);
+		m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_BLINK);	//버튼 상태 동기화
 	}
 
-	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN)) // RESET
+	//A 버튼 입력 시, 다음 스크립트 문단을 준비하여 출력
+	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN) && WINDOW_SHOW == m_eCurState)
 	{
-		m_iCurMessageIndex = 0.f;
-		m_iCurCharIndex = 0.f;
+		m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_SELECT); //버튼 상태 동기화
+
+		m_iCurMessageIndex += 1; //벡터의 다음 문단 줄로 넘김
+		m_iCurCharIndex = 0; //글자 수는 초기화
 	}
 
 	_float3 vOffset = { 0.9f, 0.9f, 1.f };
@@ -119,13 +116,6 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 
 	case WINDOW_SHOW: //알파 값 및 스케일 증가
 		m_UIObjDesc.fAlpha += fTimeDelta * 5.f;	
-		//vOffset.y += EASE_OUT(fTimeDelta * 5.f);
-		//vShowScale = m_vBaseScale * vOffset;
-		//m_pTransCom[TEXMW_BASE]->Set_Scaled(vShowScale);
-
-		//if (vShowScale.y > m_vBaseScale.y)
-			//m_pTransCom[TEXMW_BASE]->Set_Scaled(m_vBaseScale);
-			//m_pTransCom[TEXMW_BTNBASE]->Set_Scaled(m_vBtnScale);
 		break;
 	default:	break;
 	}
@@ -139,7 +129,7 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 		return OBJ_NOEVENT;
 	}
 
-	if(m_eCurState != HIDE_WINDOW)
+	if(WINDOW_HIDE != m_eCurState)
 		Display_Message(fTimeDelta);
 
 	return OBJ_NOEVENT;
@@ -154,7 +144,12 @@ void CUI_MessageWindow::Late_Tick(_float fTimeDelta)
 HRESULT CUI_MessageWindow::Render()
 {
 	HRESULT hr;
+
 #pragma region RENDER_BINDSET
+
+	//렌더 OFF
+	if (WINDOW_HIDE == m_eCurState && 0.f == m_UIObjDesc.fAlpha)
+		return S_OK;
 	
 	for (_uint iTEXIx = 0; iTEXIx < TEXMW_NONE; ++iTEXIx)
 	{
@@ -172,12 +167,13 @@ HRESULT CUI_MessageWindow::Render()
 		hr = Bind_ShaderResources(m_pShaderCom, ePassType, m_pTextureCom, iTEXIx);
 		CHECK_FAILED(hr);
 	}
+
 #pragma endregion
 	
+	//버튼 렌더링
 	m_pUIBtn->Render();
 
-	// 폰트 출력
-	if (m_eCurState != WINDOW_HIDE)
+	if (WINDOW_HIDE != m_eCurState)
 	{
 		for (auto& Message : m_tMessageDesc.vecMsg)
 			Render_Message();
@@ -267,7 +263,7 @@ HRESULT CUI_MessageWindow::Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom)
 	return S_OK;
 }
 
-// 다이얼로그 호출 : vec에 담아둔 메세지를 출력합니다.
+//다이얼로그 메시지 글자/문단 출력 로직
 HRESULT CUI_MessageWindow::Display_Message(_float _fTimeDelta)
 {
 	if (m_tMessageDesc.wstrFontTag.empty())
@@ -281,27 +277,24 @@ HRESULT CUI_MessageWindow::Display_Message(_float _fTimeDelta)
 		if (m_iCurMessageIndex < m_tMessageDesc.vecMsg.size()) //벡터에 담긴 메시지들의 크기를 체크
 		{
 			wstring wstrMsg = m_tMessageDesc.vecMsg[m_iCurMessageIndex];
+
 			if (m_iCurCharIndex < wstrMsg.length()) //메시지 길이 체크
 				m_iCurCharIndex++;
-			else //메시지 길이를 넘겼을 경우, 초기화
-			{
-				//m_iCurMessageIndex = 0.f;
-				//m_iCurCharIndex = 0.f;
-			}
+		}
+
+		else //m_iCurMessageIndex 범위를 벗어날 경우, UI 숨김
+		{
+			m_eCurState = WINDOW_HIDE;
+			m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_HIDE);
 		}
 	}
-
-	//추후, A버튼 입력 전까지 대기하는 로직 필요
-	//iCurCharIndex 비교 체크하여 동일/초과할 경우 대기.
-	//A버튼 입력 상태를 확인할 경우, 다음 iCurMeesageIndex로 변경하여 스크립트 문단을 넘긴다.
 
 	return S_OK;
 }
 
-// 다이얼로그 메시지 출력
+// 다이얼로그 메시지 렌더
 HRESULT CUI_MessageWindow::Render_Message()
 {
-	//Actor(NPC) 대상 별 SpriteFont 폰트 수정 필요
 	wstring wstrFontTag = m_tMessageDesc.wstrFontTag;
 	_float2 vFontPos = m_tMessageDesc.fFontPos;
 	_float4 vFontRGBA = m_tMessageDesc.fFontRGBA;

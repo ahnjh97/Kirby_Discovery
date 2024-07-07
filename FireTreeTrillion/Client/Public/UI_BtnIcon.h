@@ -23,7 +23,7 @@ private:
 
 #pragma region GETTER/SETTER
 public:
-	void Set_BtnState(BTN_STATE _eBtnState) { m_eBtnState = _eBtnState;	}
+	void Set_BtnState(BTN_STATE _eBtnState) { m_eCurState = _eBtnState;	}
 #pragma endregion
 
 public:
@@ -58,7 +58,7 @@ private:
 	_float						m_fSelectTime = { 0.f };
 	_float3						m_vOrigScale = { 0.f, 0.f, 1.f };
 
-	BTN_STATE					m_eBtnState = { BTN_NONE };
+	BTN_STATE					m_eCurState = { BTN_NONE };
 		
 };
 END
