@@ -1835,6 +1835,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("MovableBuildingB", TYPE_NONANIM, 1.f, 0.f, 0);
 		m_vecModelInfo.emplace_back("MovableBuildingC", TYPE_NONANIM, 1.f, 0.f, 0);
 		m_vecModelInfo.emplace_back("MovableBuildingD", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
 
 
 		m_vecModelInfo.emplace_back("Road", TYPE_NONANIM, 1.f, 0.f, 0);

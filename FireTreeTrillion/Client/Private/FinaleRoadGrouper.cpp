@@ -87,7 +87,6 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
 			return E_FAIL;
 
-
 		CFinaleRoad* pRoad = dynamic_cast<CFinaleRoad*>(m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"))->back());
 		if (pRoad != nullptr)
 			m_pRoads.emplace_back(pRoad);
@@ -113,18 +112,18 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 	{
 		//기본 도로
 		CFinaleRoad::ROAD_DESC roadDesc{};
-		roadDesc.wstrModelName = TEXT("Road");
+		//roadDesc.wstrModelName = TEXT("Road");
 		_float4x4 InitMat = _float4x4::Identity;
-		InitMat.Translation({ 0.f, 0.f, -20.f });
-		roadDesc.matWorld = InitMat;
-		roadDesc.pSocketMat = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-		roadDesc.eCollideType = CFinaleRoad::CTYPE_NONE;
-		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
-			return E_FAIL;
+		//InitMat.Translation({ 0.f, 0.f, -20.f });
+		//roadDesc.matWorld = InitMat;
+		//roadDesc.pSocketMat = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+		//roadDesc.eCollideType = CFinaleRoad::CTYPE_NONE;
+		//if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
+		//	return E_FAIL;
 
-		CFinaleRoad* pRoad = dynamic_cast<CFinaleRoad*>(m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"))->back());
-		if (pRoad != nullptr)
-			m_pRoads.emplace_back(pRoad);
+		//CFinaleRoad* pRoad = dynamic_cast<CFinaleRoad*>(m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"))->back());
+		//if (pRoad != nullptr)
+		//	m_pRoads.emplace_back(pRoad);
 
 
 		////기본 도로
@@ -145,7 +144,7 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 
 		//부서지는 도로
 		roadDesc = {};
-		roadDesc.wstrModelName = TEXT("KirbyDefault");
+		roadDesc.wstrModelName = TEXT("WaddleDeeBase");
 		roadDesc.bIsAnimModel = true;
 		InitMat = _float4x4::Identity;
 		InitMat.Translation({ 0.f, 0.f, 60.f });
@@ -155,7 +154,7 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
 			return E_FAIL;
 
-		pRoad = dynamic_cast<CFinaleRoad*>(m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"))->back());
+		CFinaleRoad* pRoad = dynamic_cast<CFinaleRoad*>(m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"))->back());
 		if (pRoad != nullptr)
 			m_pRoads.emplace_back(pRoad);
 	}
@@ -229,8 +228,6 @@ _int CFinaleRoadGrouper::Tick(_float fTimeDelta)
 			Make_CollideReaction();
 		}
 	}
-
-
 
 	if (m_bStartCollideEvent)
 	{

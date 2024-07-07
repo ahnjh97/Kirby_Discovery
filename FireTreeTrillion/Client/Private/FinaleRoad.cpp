@@ -97,16 +97,26 @@ void CFinaleRoad::Late_Tick(_float fTimeDelta)
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
+
 	if(m_bIsAnimModel)
 		m_pModelCom->Play_Animation(m_fTimeDelta);
 
-	m_pDynamicActor->setKinematicTarget(CUtils::TransformToPxTransform(m_pTransformCom));
+
+	_float3 vScale, vTrans;
+	Quaternion vRotQuat;
+	m_WorldMatrix.Decompose(vScale, vRotQuat, vTrans);
+
+	PxMeshScale meshScale(PxVec3(vScale.x, vScale.y, vScale.z));
+	PxConvexMeshGeometryFlags meshFlags = PxConvexMeshGeometryFlags();
+	PxTransform pxTransform(PxVec3(m_WorldMatrix._41, m_WorldMatrix._42, m_WorldMatrix._43), PxQuat(vRotQuat.x, vRotQuat.y, vRotQuat.z, vRotQuat.w));
+	m_pDynamicActor->setKinematicTarget(pxTransform);
+
 
 	//시야 벗어나면 컬링
 	if (m_pGameInstance->isInFrustum_WorldSpace(CUtils::Get_State_Vector_Matrix(m_WorldMatrix, CUtils::STATE_POSITION), 100.0f))
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
-		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
+		//m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 	}
 
 }
@@ -137,7 +147,7 @@ HRESULT CFinaleRoad::Render()
 		if (m_bIsAnimModel)
 		{
 			hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i); CHECK_FAILED(hr);
-			hr = m_pShaderCom->Begin(ANIMMODEL_NORMAL_X); CHECK_FAILED(hr);
+			hr = m_pShaderCom->Begin(ANIMMODEL_KIRBY); CHECK_FAILED(hr);
 		}
 		else
 		{
