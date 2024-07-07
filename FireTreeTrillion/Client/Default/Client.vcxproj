@@ -220,8 +220,8 @@
     <ClInclude Include="..\Public\Disaster_Master.h" />
     <ClInclude Include="..\Public\FinalePartical.h" />
     <ClInclude Include="..\Public\FinalePartical_Maker.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\public\FinaleRoadGrouper.h" />
     <ClInclude Include="..\Public\ShadowDeco.h" />
@@ -423,8 +423,8 @@
     <ClCompile Include="..\Private\Disaster_Master.cpp" />
     <ClCompile Include="..\Private\FinalePartical.cpp" />
     <ClCompile Include="..\Private\FinalePartical_Maker.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\private\FinaleRoadGrouper.cpp" />
     <ClCompile Include="..\Private\KirbyBoom_State.cpp" />

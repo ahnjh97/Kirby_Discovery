@@ -48,8 +48,18 @@ _int CFinalePartical::Tick(_float fTimeDelta)
     m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
     Compute_MotionBlur();
 
+    _float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+    m_fGravity += 3.5f * m_fTimeDelta;
+    _float4 vDelta = (m_vDir * m_fTimeDelta * m_fSpeed);
+    _float4 vGravity = _float4(0.f, m_fGravity, 0.f, 0.f);
+    m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vDelta - vGravity);
+    m_pTransformCom->Turn(m_fTurnAxis, m_fTimeDelta, m_fTurn);
 
-
+    m_fActiveTime += m_fTimeDelta;
+    if (m_fActiveTime > 5.f)
+    {
+        m_bActive = false;
+    }
 
 
     return OBJ_NOEVENT;
@@ -57,6 +67,9 @@ _int CFinalePartical::Tick(_float fTimeDelta)
 
 void CFinalePartical::Late_Tick(_float fTimeDelta)
 {
+    if (m_bActive == false)
+        return;
+
     if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 5.0f))
     {
         m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
@@ -74,11 +87,11 @@ HRESULT CFinalePartical::Render()
 
     for (size_t i = 0; i < iNumMeshes; i++)
     {
-        if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
+        if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", m_iRandomTexture * 3)))
             return E_FAIL;
-        if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
+        if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", m_iRandomTexture * 3 + 1)))
             return E_FAIL;
-        if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
+        if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", m_iRandomTexture * 3 + 2)))
             return E_FAIL;
         if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool))))
             return E_FAIL;
@@ -112,14 +125,19 @@ HRESULT CFinalePartical::Render_LightDepth()
     return S_OK;
 }
 
-void CFinalePartical::Set_Partical(_float4 vPos, _float4 vDir, _float fSpeed)
+void CFinalePartical::Set_Partical(_float4 vPos, _float fScale, _float4 vDir, _float fSpeed)
 {
     m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
     m_vDir = vDir;
     m_fSpeed = fSpeed;
     m_bActive = true;
     m_fGravity = 0.f;
+    m_pTransformCom->Set_Scaled(fScale, fScale, fScale);
     m_iRandomTexture = CUtils::Make_RandomInt(0, 2);
+    m_fTurn = CUtils::Make_RandomFloat(10.f, 720.f);
+    m_fTurnAxis = CUtils::Make_Random_Vector(1.f);
+    m_fTurnAxis.w = 0.f;
+    m_fActiveTime = 0.f;
 }
 
 HRESULT CFinalePartical::Add_Components()
@@ -132,6 +150,10 @@ HRESULT CFinalePartical::Add_Components()
 
     hr = __super::Add_Component(TEXT("Prototype_Component_Model_RoadParticle"),
         TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+    CHECK_FAILED(hr);
+
+    hr = __super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_FinalePartical"),
+        TEXT("Com_Texture"), (CComponent**)&m_pTextureCom);
     CHECK_FAILED(hr);
 
     // 텍스쳐 준비할 것.

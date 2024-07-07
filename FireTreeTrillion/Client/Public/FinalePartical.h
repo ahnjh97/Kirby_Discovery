@@ -26,7 +26,7 @@ public:
 	virtual HRESULT Render_LightDepth()							override;
 
 
-	void Set_Partical(_float4 vPos, _float4 vDir, _float fSpeed);
+	void Set_Partical(_float4 vPos, _float fScale, _float4 vDir, _float fSpeed);
 
 private:
 	HRESULT			Add_Components();
@@ -49,12 +49,15 @@ private:
 	_float4			m_vDir = { 0.f, 0.f, 0.f, 0.f };
 	_float			m_fSpeed = { 0.f };
 	_bool			m_bActive = { false };
+	_float			m_fActiveTime = { 0.f };
 
 	_float			m_fGravity = { 0.f };
 	_int			m_iRandomTexture = { 0 };
 	
-
 	_float			m_fTimeDelta = { 0.f };
+
+	_float			m_fTurn = { 0.f };
+	_float4			m_fTurnAxis = { 0.f, 0.f, 0.f, 0.f };
 
 public:
 	static CFinalePartical* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
