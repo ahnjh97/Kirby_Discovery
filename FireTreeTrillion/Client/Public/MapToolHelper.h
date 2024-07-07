@@ -117,6 +117,8 @@ private:
 	void ClearSearchFilter(_char* _filterBuf, _bool& bWasOpen);
 	void FilterListBoxStrings(const _char* _filterBuf, vector<const _char*>& _vecNames, vector<string>& _vecTxts);
 
+	_bool CheckEnumStrings();
+
 private:
 	vector<string>	m_vecLevelName; 
 	vector<string>	m_vecMapModelNames;

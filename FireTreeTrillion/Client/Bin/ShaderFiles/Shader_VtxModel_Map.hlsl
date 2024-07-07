@@ -164,7 +164,6 @@ PS_OUT_EFFECT NONBLUR(PS_IN In)
     if (0.0f >= vMtrlDiffuse.a)
         discard;
 
-    
     Out.vColor = vMtrlDiffuse;
     Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
     return Out;
@@ -175,8 +174,6 @@ PS_OUT PS_NORMAL_O_DISCARD_X(PS_IN In)
     PS_OUT Out = (PS_OUT) 0;
     
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
-    if (0.3f >= vMtrlDiffuse.a)
-        discard;
 
     vector vNormalTex = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
 
@@ -274,21 +271,8 @@ technique11 DefaultTechnique
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_LIGHTDEPTH();
     }
-	// 노말이 있는 일반 블렌딩 객체 ( 3 )
+	// AlphaBlend (3)
     pass AlphaBlend
-    {
-        SetRasterizerState(RS_Default);
-        SetDepthStencilState(DSS_Default, 0);
-        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-
-        VertexShader = compile vs_5_0 VS_MAIN();
-        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
-        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
-        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 PS_MAIN();
-    }
-	// 노말이 없는 일반 블렌딩 객체 ( 4 )
-    pass NonNormal_AlphaBlend
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -301,7 +285,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 NONBLUR();
     }
 
-    // 블렌딩 X, 노말 O, 알파값기준 DISCARD 안함 (5)
+    // 블렌딩 X, 노말 O, 알파값기준 DISCARD 안함 (4)
     pass BLEND_X_NORMAL_O_NONDISCARD
     {
         SetRasterizerState(RS_Default);
@@ -315,21 +299,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_NORMAL_O_DISCARD_X();
     }
 
-    // 블렌딩 O, 노말 O, 알파값기준 DISCARD 안함 (6)
-    pass BLEND_O_NORMAL_O_NONDISCARD
-    {
-        SetRasterizerState(RS_Default);
-        SetDepthStencilState(DSS_Default, 0);
-        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-
-        VertexShader = compile vs_5_0 VS_MAIN();
-        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
-        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
-        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 PS_NORMAL_O_DISCARD_X();
-    }
-
-    // 블렌딩 X, 노말 O, 마스킹 O (7)
+    // 블렌딩 X, 노말 O, 마스킹 O (5)
     pass MASKED_NORMAL_O
     {
         SetRasterizerState(RS_Default);

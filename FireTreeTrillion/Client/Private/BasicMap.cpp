@@ -293,7 +293,7 @@ void CBasicMap::SetUpShaderInfo(const wstring& _wstrModelTag)
     fill(m_vecSamplingFactors.begin(), m_vecSamplingFactors.end(), 1.f);
 
     if (true == m_bBlendMap) {
-        fill(m_vecPassIndices.begin(), m_vecPassIndices.end(), 4);
+        fill(m_vecPassIndices.begin(), m_vecPassIndices.end(), MAP_ALPHABLEND);
         return;
     }
 
