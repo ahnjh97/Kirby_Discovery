@@ -236,6 +236,7 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		Turn_InterPolate_OtherVector(Kirbydesc->m_vHandleDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 2.f);
 	}
 
+	
 	Kirbydesc->m_fMoveSpeed += fTimeDelta * 10.f;
 
 	if (DESC(m_bBooster) == true)

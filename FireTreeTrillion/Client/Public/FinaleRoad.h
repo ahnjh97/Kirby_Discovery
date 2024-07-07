@@ -39,6 +39,7 @@ public:
 	_float4			Get_WorldPos() { return CUtils::Get_State_Vector_Matrix(m_WorldMatrix, CUtils::STATE_POSITION); }
 
 
+	void			Start_CollisionEvent();
 	void			Make_CollisionEvent(/*CFinaleRoadGrouper::MOVECMD eMove*/);
 
 	virtual HRESULT Initialize_Prototype()						override;
@@ -60,10 +61,14 @@ private:
 	void			Make_Particles();
 
 
-	COLLIDETYPE		m_eCollideType = { CTYPE_END };
 	_bool			m_bIsAnimModel = { false };
 
-	void			Compute_MotionBlur();
+	COLLIDETYPE		m_eCollideType = { CTYPE_END };
+	_bool			m_bCollided = { true };
+
+
+
+
 	_float2			m_vPreScreenPos = { 0.f, 0.f };
 	_float4			m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
 
@@ -77,6 +82,7 @@ private:
 	CModel*				m_pModelCom = { nullptr };
 	CShader*			m_pShaderCom = { nullptr };
 
+	void			Compute_MotionBlur();
 public:
 	static CFinaleRoad* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

@@ -60,9 +60,15 @@ public:
 private:
 	_bool		m_bStartCollideEvent = { false };
 	MOVECMD		m_eCollideMove = { MOVECMD_END };
+	_float		m_fCollideTime = { 1.f };
+
 
 	_float3		m_vDestPos = { 0.f, 0.f, 0.f };
+
+
+	_float3		m_vStartDir = { 0.f, 0.f, 0.f };
 	_float3		m_vDestDir = { 0.f, 0.f, 0.f };
+
 
 	vector<CFinaleRoad*> m_pRoads;
 

@@ -12,6 +12,20 @@ CFinaleRoad::CFinaleRoad(const CFinaleRoad& rhs)
 {
 }
 
+//충돌한 도로가 도로 그룹들에게 
+void CFinaleRoad::Start_CollisionEvent()
+{
+	list<CGameObject*>* pList = m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoadGrouper"));
+	if (nullptr == pList)
+		return;
+
+	for (auto& grouper : *pList)
+	{
+		if (true == static_cast<CFinaleRoadGrouper*>(grouper)->Make_CollideReaction(this))
+			break;
+	}
+}
+
 void CFinaleRoad::Make_CollisionEvent()
 {
 	switch (m_eCollideType)
@@ -28,10 +42,10 @@ void CFinaleRoad::Make_CollisionEvent()
 	break;
 	case CTYPE_BREAK:
 	{
-
 	}
 	break;
 	default:
+		m_bCollided = true;
 		break;
 	}
 }
@@ -67,7 +81,7 @@ HRESULT CFinaleRoad::Initialize(void* pArg)
 	m_wstrModelName = RoadDesc.wstrModelName;
 	m_pSocketMatrix = RoadDesc.pSocketMat;
 	m_bIsAnimModel = RoadDesc.bIsAnimModel;
-
+	m_eCollideType = RoadDesc.eCollideType;
 
 	m_WorldMatrix = m_pTransformCom->Get_WorldMatrix() * *m_pSocketMatrix;
 
@@ -102,10 +116,6 @@ void CFinaleRoad::Late_Tick(_float fTimeDelta)
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
 
-	if (m_bIsAnimModel)
-		m_pModelCom->Play_Animation(m_fTimeDelta);
-
-
 	_float3 vScale, vTrans;
 	Quaternion vRotQuat;
 	m_WorldMatrix.Decompose(vScale, vRotQuat, vTrans);
@@ -114,6 +124,8 @@ void CFinaleRoad::Late_Tick(_float fTimeDelta)
 	PxConvexMeshGeometryFlags meshFlags = PxConvexMeshGeometryFlags();
 	PxTransform pxTransform(PxVec3(m_WorldMatrix._41, m_WorldMatrix._42, m_WorldMatrix._43), PxQuat(vRotQuat.x, vRotQuat.y, vRotQuat.z, vRotQuat.w));
 	m_pDynamicActor->setKinematicTarget(pxTransform);
+
+
 
 
 	//시야 벗어나면 컬링
@@ -136,12 +148,21 @@ HRESULT CFinaleRoad::Render()
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
 		//애니메이션 도로들
-		if (m_wstrModelName == TEXT("RoadBreak") || m_wstrModelName == TEXT("RoadLBreak") || m_wstrModelName == TEXT("RoadLongBreak"))
+		
+		if (m_eCollideType == CTYPE_BREAK)
 		{
-			if (i == 1)
-				continue;
+			if (m_bCollided)
+			{
+				if (i != 0)
+					continue;
+			}
+			else
+			{
+				if (i != 1)
+					continue;
+			}
 		}
-
+		
 		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE); CHECK_FAILED(hr);
 		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS); CHECK_FAILED(hr);
 		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS); CHECK_FAILED(hr);
@@ -200,9 +221,7 @@ HRESULT CFinaleRoad::Add_Components(wstring _strModelTag, _bool _bIsAnimModel)
 {
 	HRESULT hr;
 
-	wstring strTag = TEXT("Prototype_Component_Shader_Vtx");
-	strTag += _bIsAnimModel ? TEXT("AnimModel") : TEXT("Model");
-
+	wstring strTag = TEXT("Prototype_Component_Shader_VtxModel");
 	hr = __super::Add_Component(LEVEL_STATIC, strTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
