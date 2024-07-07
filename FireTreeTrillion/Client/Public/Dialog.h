@@ -23,6 +23,9 @@ class CDialog : public CUIObject
 		_float fDisplayTime = { 0.f }; //출력 시간
 		_float fElapsedyTime = { 0.f }; //경과 시간
 		//size_t	iCurIndex = { 0 }; 
+
+		_uint	uLevel = LEVEL_END;
+		wstring wstrNPC = { TEXT("") };
 	}MESSAGE_DESC;
 
 private:
@@ -42,8 +45,17 @@ public:
 	HRESULT Display_Message(_float _fTimeDelta);
 	HRESULT	Render_Message(const wstring& _wstrMessage);
 
+
+public:
+	string  utf8_encode(const wstring& wstr);
+	wstring utf8_decode(const string& str);
+
+	void	Save();
+	void	Load(string strPath);
+
 private:
 	vector<DialogMessage>	m_vecMessage;
+	vector<wstring>			m_vecMsg;
 
 public:
 	static CDialog* Create(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext);

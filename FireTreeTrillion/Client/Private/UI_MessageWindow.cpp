@@ -81,13 +81,13 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 	__super::Tick(fTimeDelta);
 
 	//특정 트리거가 발동할 경우, 해당 Window UI를 출력
-	if (m_pGameInstance->Get_DIKeyState(DIK_GRAVE, KEY_DOWN) && WINDOW_HIDE == m_eCurState) //테스트용
-		m_eCurState = WINDOW_SHOW;
+	//if (m_pGameInstance->Get_DIKeyState(DIK_GRAVE, KEY_DOWN) && WINDOW_HIDE == m_eCurState) //테스트용
+	//	m_eCurState = WINDOW_SHOW;
 	
 	//Window UI 출력은 스크립트가 종료될때까지 유지
 	//스크립트 인덱스가 종료될 경우, State를 변경
-	else if (m_pGameInstance->Get_DIKeyState(DIK_GRAVE, KEY_DOWN) && WINDOW_SHOW == m_eCurState) //테스트용
-		m_eCurState = WINDOW_HIDE;
+	//else if (m_pGameInstance->Get_DIKeyState(DIK_GRAVE, KEY_DOWN) && WINDOW_SHOW == m_eCurState) //테스트용
+	//	m_eCurState = WINDOW_HIDE;
 
 	_float3 vOffset = { 0.9f, 0.9f, 1.f };
 	_float3 vShowScale{};

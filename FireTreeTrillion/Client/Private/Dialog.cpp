@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "Dialog.h"
+#include <codecvt>
+#include <locale>
 
 CDialog::CDialog(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext)
 	: CUIObject{ _pDevice, _pContext }
@@ -54,6 +56,10 @@ _int CDialog::Tick(_float fTimeDelta)
 {
 	Display_Message(fTimeDelta);
 
+	if (m_pGameInstance->Get_DIKeyState(DIK_GRAVE, KEY_DOWN)) //테스트용
+		Load("");
+
+	//Save();
 	return OBJ_NOEVENT;
 }
 
@@ -140,6 +146,99 @@ HRESULT CDialog::Render_Message(const wstring& _wstrMessage)
 	}
 
 	return S_OK;
+}
+
+// UTF-16 문자열을 UTF-8 문자열로 변환하는 함수
+string CDialog::utf8_encode(const wstring& wstr) 
+{
+	if (wstr.empty()) return std::string();
+	int size_needed = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
+	string strTo(size_needed, 0);
+	WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &strTo[0], size_needed, NULL, NULL);
+	return strTo;
+}
+
+// UTF-8 문자열을 UTF-16 문자열로 변환하는 함수
+wstring CDialog::utf8_decode(const string& str) 
+{
+	if (str.empty()) return std::wstring();
+	int size_needed = MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), NULL, 0);
+	wstring wstrTo(size_needed, 0);
+	MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), &wstrTo[0], size_needed);
+	return wstrTo;
+}
+
+void CDialog::Save()
+{
+	json data;
+	data["Level"] = LEVEL_DEEDEEDEE;
+	data["NPC"] = "Parttimer_Dee";
+
+	vector<wstring> messages = {
+		L"안녕 나는 위지영이야.",
+		L"오늘의 점심은 무얼까.",
+		L"두부일까 짬뽕일까?"
+	};
+
+	for (const auto& message : messages) 
+	{
+		data["Messages"].push_back(utf8_encode(message));
+	}
+
+	string file_path = "../Bin/Resources/Data/Dialog.json";
+	ofstream output_file(file_path);
+	if (!output_file.is_open())
+	{
+		MSG_BOX(TEXT("파일을 열 수 없습니다: Save"));
+		return;
+	}
+
+    // JSON 데이터를 파일에 저장
+	try {
+		output_file << data.dump(4); // .dump(4) == JSON을 예쁘게 출력하기 위한 들여쓰기 설정
+	}
+	catch (const exception& e) 
+	{
+		MSG_BOX(TEXT("JSON 파일 쓰기 중 에러 발생: "));
+		return;
+	}
+
+	output_file.close();
+	MSG_BOX(TEXT("JSON 파일이 생성되었습니다: "));
+}
+
+void CDialog::Load(string strPath)
+{
+	strPath = "../Bin/Resources/Data/Dialog.json";
+	ifstream input_file(strPath);
+	if (!input_file.is_open()) 
+	{
+		MSG_BOX(TEXT("파일을 열 수 없습니다: Load"));
+		return;
+	}
+
+	json data;
+	try 
+	{
+		input_file >> data;
+	}
+	catch (const exception& e) 
+	{
+		MSG_BOX(TEXT("JSON 파일 읽기 중 에러 발생: "));
+		return;
+	}
+	input_file.close();
+
+	MESSAGE_DESC msgDesc{};
+	msgDesc.uLevel  = data.value("Level", 0);
+	//msgDesc.wstrNPC = data.value("NPC", 0);
+
+	string npc = data.value("NPC", "");
+	msgDesc.wstrNPC = utf8_decode(npc);
+	for (auto& msg : data["Messages"]) 
+	{
+		m_vecMsg.push_back(utf8_decode(msg));
+	}
 }
 
 CDialog* CDialog::Create(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext)
