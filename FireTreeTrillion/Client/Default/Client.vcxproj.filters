@@ -526,6 +526,12 @@
     <Filter Include="02.GameObjects\Map\BreakableBlock">
       <UniqueIdentifier>{7235d034-6f27-4610-91d3-ceea38305009}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\FinalePartical">
+      <UniqueIdentifier>{2428c5ef-024f-417a-b4e4-84355b32b6d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\FinalePartical\FinalePartical">
+      <UniqueIdentifier>{11823e14-4791-4db8-a6fb-b739d71d6102}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -1060,6 +1066,12 @@
     <ClInclude Include="..\Public\BreakableBlock.h">
       <Filter>02.GameObjects\Map\BreakableBlock</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\FinalePartical_Maker.h">
+      <Filter>02.GameObjects\Map\FinalePartical</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\FinalePartical.h">
+      <Filter>02.GameObjects\Map\FinalePartical\FinalePartical</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1250,9 +1262,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\Level_Intro.cpp">
       <Filter>01.Levels\1. Intro</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Public\KirbyBoom_State.cpp">
-      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyBoom_State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BrontoBurt.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\BrontoBurt</Filter>
@@ -1574,6 +1583,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\BreakableBlock.cpp">
       <Filter>02.GameObjects\Map\BreakableBlock</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KirbyBoom_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyBoom_State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FinalePartical_Maker.cpp">
+      <Filter>02.GameObjects\Map\FinalePartical</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FinalePartical.cpp">
+      <Filter>02.GameObjects\Map\FinalePartical\FinalePartical</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

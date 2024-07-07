@@ -80,6 +80,19 @@ HRESULT CLevel_Finale::Initialize()
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_PopStar"), TEXT("Prototype_GameObject_PopStar"), &ObjDesc)))
 		return E_FAIL;
 
+	ObjDesc.fSpeedPerSec = 5.f;
+	ObjDesc.fRotationPerSec = ToRadian(90.f);
+	InitMat = _float4x4::Identity;
+	InitMat.Translation({ 58.5f, 4.f, 2.27f });
+	ObjDesc.matWorld = InitMat;
+	// PopStar Test
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_BreakableBlock"), TEXT("Prototype_GameObject_BreakableBlock"), &ObjDesc)))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinalePartical_Maker"), TEXT("Prototype_GameObject_FinalePartical_Maker"))))
+		return E_FAIL;
+
+
 	m_pGameInstance->Setting_GodRay(_float4(0.f, 100000.f, 0.f, 1.f), 0.2f);
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);

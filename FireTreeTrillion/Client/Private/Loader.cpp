@@ -131,6 +131,9 @@
 #include "FinaleRoad.h"
 #include "FinaleRoadGrouper.h"
 #include "PopStar.h"
+#include "BreakableBlock.h"
+#include "FinalePartical.h"
+#include "FinalePartical_Maker.h"
 
 //±â¹Í
 #include "Gm_LabAntenna.h"
@@ -389,6 +392,10 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleRoad"), CFinaleRoad);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleRoadGrouper"), CFinaleRoadGrouper);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PopStar"), CPopStar);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BreakableBlock"), CBreakableBlock);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalePartical_Maker"), CFinalePartical_Maker);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalePartical"), CFinalePartical);
+
 
 	//Dee
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeePart"), CDee_Part);
@@ -1070,6 +1077,9 @@ HRESULT CLoader::Loading_For_Finale()
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Terrain_Fog", "Map/Fog/Sand_%d.png", 4)))
 		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "FinalePartical", "FinalePartical/Finale_%d.dds", 9)))
+		return E_FAIL;
+
 
 	hr = Add_Texture(eLevel, "FX_Mask_Bubble2", "Effects/Mask/noise_bubble_%d.png", 4);	CHECK_FAILED(hr);
 
@@ -1853,9 +1863,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		m_vecModelInfo.emplace_back("Road", TYPE_NONANIM, 1.f, 0.f, 0);
 		m_vecModelInfo.emplace_back("RoadEnd", TYPE_NONANIM, 1.f, 0.f, 0);
-		m_vecModelInfo.emplace_back("RoadParticle", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("RoadParticle", TYPE_NONANIM, 0.2f, 0.f, 0);
 
-		m_vecModelInfo.emplace_back("BreakableBlock", TYPE_ANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("BreakableBlock", TYPE_ANIM, 0.2f, 0.f, 0);
 
 		m_vecModelInfo.emplace_back("RoadBreak", TYPE_NONANIM, 1.f, 0.f, 0);
 		m_vecModelInfo.emplace_back("RoadLBreak", TYPE_NONANIM, 1.f, 0.f, 0);
@@ -1994,6 +2004,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("DeeDeeDeeHammer", TYPE_NONANIM, 1.0f);
 
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
+
+		m_vecModelInfo.emplace_back("BreakableBlock", TYPE_ANIM, 0.5f, 0.f, 0);
 	}
 }
 

@@ -53,6 +53,8 @@ private:
 	_float			m_vTurnSpeed = { 0.f };
 	_float4			m_vTurnAxis = { 0.f, 0.f, 0.f, 0.f };
 
+	_bool			m_bBloom = { false };
+
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
