@@ -185,9 +185,27 @@ HRESULT CLevel_Finale::Ready_FinaleRoad()
 
 #pragma region Ã³À½ ºôµùµé
 
+	//CFinaleRoadGrouper::ROADGROUPER_DESC roadGrouperDesc{};
+	//roadGrouperDesc.eRoadType = CFinaleRoadGrouper::RTYPE_ROADA;
+	//roadGrouperDesc.eMoveCommand = CFinaleRoadGrouper::MOVECMD_COLLIDE;
+
+	//_float4x4 InitMat = _float4x4::Identity;
+	//InitMat.Translation({ 269.f, -26.f, 4.8f });
+	//CUtils::Rotation(InitMat, CUtils::Make_Quat_FromDir({ .98f, .21f, .07f }));
+	//roadGrouperDesc.matWorld = InitMat;
+
+	//roadGrouperDesc.vDestPos = { 269.f, -42.f, 4.8f };
+	//roadGrouperDesc.vDestDir = { 1.f, -.04f, .07f };
+
+	//if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleRoadGrouper"),
+	//	TEXT("Prototype_GameObject_FinaleRoadGrouper"), &roadGrouperDesc)))
+	//	return E_FAIL;
+
+	
+	
 	CFinaleRoadGrouper::ROADGROUPER_DESC roadGrouperDesc{};
-	roadGrouperDesc.eRoadType = CFinaleRoadGrouper::RTYPE_ROADA;
-	roadGrouperDesc.eMoveCommand = CFinaleRoadGrouper::MOVECMD_COLLIDE;
+	roadGrouperDesc.eRoadType = CFinaleRoadGrouper::RTYPE_BUILDINGA;
+	roadGrouperDesc.eMoveCommand = CFinaleRoadGrouper::MOVECMD_STOP;
 
 	_float4x4 InitMat = _float4x4::Identity;
 	InitMat.Translation({ 139.f, -26.f, 4.8f });
@@ -201,62 +219,51 @@ HRESULT CLevel_Finale::Ready_FinaleRoad()
 		TEXT("Prototype_GameObject_FinaleRoadGrouper"), &roadGrouperDesc)))
 		return E_FAIL;
 
-	/*
-	CFinaleRoad::ROAD_DESC roadDesc{};
-	roadDesc.wstrModelName = TEXT("MovableBuildingA");
-
-	InitMat = _float4x4::Identity;
-	InitMat.Translation({ 139.f, -26.f, 4.8f });
-	vQuat = CUtils::Make_Quat_FromDir({ .98f, .21f, .07f });
-	CUtils::Rotation(InitMat, vQuat);
-	roadDesc.matWorld = InitMat;
-
-	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleRoad"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
-		return E_FAIL;
-
-
-	roadDesc = {};
-	roadDesc.wstrModelName = TEXT("MovableBuildingC");
+	
+	roadGrouperDesc = {};
+	roadGrouperDesc.eRoadType = CFinaleRoadGrouper::RTYPE_BUILDINGC;
+	roadGrouperDesc.eMoveCommand = CFinaleRoadGrouper::MOVECMD_STOP;
 
 	InitMat = _float4x4::Identity;
 	InitMat.Translation({ 268.1f, -15.5f, -22.9f });
-	vQuat = CUtils::Make_Quat_FromDir({ 1.f, .08f, -.05f });
-	CUtils::Rotation(InitMat, vQuat);
-	roadDesc.matWorld = InitMat;
+	CUtils::Rotation(InitMat, CUtils::Make_Quat_FromDir({ 1.f, .08f, -.05f }));
+	roadGrouperDesc.matWorld = InitMat;
 
-	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleRoad"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleRoadGrouper"),
+		TEXT("Prototype_GameObject_FinaleRoadGrouper"), &roadGrouperDesc)))
 		return E_FAIL;
 
-
-	roadDesc = {};
-	roadDesc.wstrModelName = TEXT("MovableBuildingC");
+	roadGrouperDesc = {};
+	roadGrouperDesc.eRoadType = CFinaleRoadGrouper::RTYPE_BUILDINGC;
+	roadGrouperDesc.eMoveCommand = CFinaleRoadGrouper::MOVECMD_COLLIDE;
 
 	InitMat = _float4x4::Identity;
-	InitMat.Translation({ 384.1f, -18.8f, -52.f });
-	vQuat = CUtils::Make_Quat_FromDir({ 1.f, -.1f, -.05f });
-	CUtils::Rotation(InitMat, vQuat);
-	roadDesc.matWorld = InitMat;
+	InitMat.Translation({389.f, -12.5f, -9.f});
+	CUtils::Rotation(InitMat, CUtils::Make_Quat_FromDir({ .93f, -.25f, -.27f }));
+	roadGrouperDesc.matWorld = InitMat;
 
-	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleRoad"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
+	roadGrouperDesc.vDestPos = {389.2f, -15.8f, -8.1f };
+	roadGrouperDesc.vDestDir = { .96f, -.06f, -.3f };
+
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleRoadGrouper"),
+		TEXT("Prototype_GameObject_FinaleRoadGrouper"), &roadGrouperDesc)))
 		return E_FAIL;
-		*/
 
 
-	//roadGrouperDesc = {};
-	//roadGrouperDesc.eRoadType = CFinaleRoadGrouper::RTYPE_BUILDINGA;
-	//roadGrouperDesc.eMoveCommand = CFinaleRoadGrouper::MOVECMD_COLLIDE;
+	roadGrouperDesc = {};
+	roadGrouperDesc.eRoadType = CFinaleRoadGrouper::RTYPE_ROADA;
+	roadGrouperDesc.eMoveCommand = CFinaleRoadGrouper::MOVECMD_COLLIDE;
 
-	//_float4x4 InitMat = _float4x4::Identity;
-	//InitMat.Translation({ 139.f, -26.f, 4.8f });
-	//CUtils::Rotation(InitMat, CUtils::Make_Quat_FromDir({ .98f, .21f, .07f }));
-	//roadGrouperDesc.matWorld = InitMat;
+	InitMat = _float4x4::Identity;
+	InitMat.Translation({ 620.f, -32.f, -82.f });
+	CUtils::Rotation(InitMat, CUtils::Make_Quat_FromDir({ .98f, -.16f, -.15f }));
+	roadGrouperDesc.matWorld = InitMat;
 
-	//roadGrouperDesc.vDestPos = { 139.f, -42.f, 4.8f };
-	//roadGrouperDesc.vDestDir = { 1.f, -.04f, .07f };
 
-	//if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleRoadGrouper"),
-	//	TEXT("Prototype_GameObject_FinaleRoadGrouper"), &roadGrouperDesc)))
-	//	return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleRoadGrouper"),
+		TEXT("Prototype_GameObject_FinaleRoadGrouper"), &roadGrouperDesc)))
+		return E_FAIL;
+		
 
 #pragma endregion
 	return S_OK;

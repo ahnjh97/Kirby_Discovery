@@ -68,14 +68,15 @@ HRESULT CFinaleRoad::Initialize(void* pArg)
 	m_pSocketMatrix = RoadDesc.pSocketMat;
 	m_bIsAnimModel = RoadDesc.bIsAnimModel;
 
+
+	m_WorldMatrix = m_pTransformCom->Get_WorldMatrix() * *m_pSocketMatrix;
+
 	if (*m_pCurrentLevelID != LEVEL_TOOL_ANIM)
 	{
-		m_pDynamicActor = m_pModelCom->ReturnDynamicActor(m_pTransformCom->Get_WorldMatrix());
+		m_pDynamicActor = m_pModelCom->ReturnDynamicActor(m_WorldMatrix);
 		m_pDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
 	}
 
-	if (m_bIsAnimModel)
-		m_pModelCom->Set_Animation(0, 60.f, true, false);
 
 	return S_OK;
 }
@@ -147,15 +148,8 @@ HRESULT CFinaleRoad::Render()
 
 
 		//만약 애님모델이라면 뼈까지 바인딩하고 Anim Model Pass
-		if (m_bIsAnimModel)
-		{
-			hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i); CHECK_FAILED(hr);
-			hr = m_pShaderCom->Begin(ANIMMODEL_KIRBY); CHECK_FAILED(hr);
-		}
-		else
-		{
-			hr = m_pShaderCom->Begin(MODEL_NORMAL_O); CHECK_FAILED(hr);
-		}
+		hr = m_pShaderCom->Begin(MODEL_NORMAL_O); CHECK_FAILED(hr);
+
 
 		m_pModelCom->Render(i);
 	}
@@ -212,9 +206,6 @@ HRESULT CFinaleRoad::Add_Components(wstring _strModelTag, _bool _bIsAnimModel)
 	hr = __super::Add_Component(LEVEL_STATIC, strTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
-
-	if (*m_pCurrentLevelID == LEVEL_TOOL_ANIM)
-		_strModelTag = L"RoadBreak";
 
 	hr = __super::Add_Component(TEXT("Prototype_Component_Model_") + _strModelTag,
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
