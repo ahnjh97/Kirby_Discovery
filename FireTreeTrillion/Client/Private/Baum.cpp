@@ -282,6 +282,7 @@ void CBaum::Find_MyRoad()
 		if (fMinDistance > fDistance)
 		{
 			m_pMyRoad = static_cast<CFinaleRoad*>(pRoad);
+			m_pMyRoad->Start_CollisionEvent();
 			fMinDistance = fDistance;
 		}
 	}

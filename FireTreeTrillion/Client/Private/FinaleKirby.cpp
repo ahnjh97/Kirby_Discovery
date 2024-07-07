@@ -80,6 +80,15 @@ _int CFinaleKirby::Tick(_float fTimeDelta)
     Lerp_UpVector(vTerrainNormal, 20.f, fTimeDelta);
 
 
+    //카메라에 전달해줄 z 앵글을 구하고, 세팅한다.
+    _float3 vUp = m_pTransformCom->Get_State(CTransform::STATE_UP);
+    _float3 vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+    _float3 vRight = vUp.Cross(vLook);
+    vRight.Normalize();
+
+    _float fZRotAngle = ToDegree(atan2(vRight.y, vRight.x)) * .1f;
+    static_cast<CCamera_Main*>(m_pCamera)->Set_ZAngle(fZRotAngle, .1f);
+
     if (m_bMakeDisaster == true && m_pTransformCom->Get_State(CTransform::STATE_POSITION).x > 15.f)
     {
         // 마지막 스테이지에서 운석을 지속적으로 날려주는 기능을 가진 클래스를 생성한다.

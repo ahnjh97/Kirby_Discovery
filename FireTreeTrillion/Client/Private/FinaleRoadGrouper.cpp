@@ -14,7 +14,7 @@ CFinaleRoadGrouper::CFinaleRoadGrouper(const CFinaleRoadGrouper& rhs)
 
 _bool CFinaleRoadGrouper::Make_CollideReaction(CFinaleRoad* pRoad)
 {
-	/*
+	
 	//내가 움직이는 놈 아니면 나가기
 	if (m_eCollideMove == MOVECMD_END)
 		return false;
@@ -34,7 +34,7 @@ _bool CFinaleRoadGrouper::Make_CollideReaction(CFinaleRoad* pRoad)
 	if (!bIsMyCollision)
 		return false;
 
-*/
+
 
 	switch (m_eCollideMove)
 	{
@@ -160,7 +160,10 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 		InitMat.Translation({ 0.f, 0.f, -30.f });
 		roadDesc.matWorld = InitMat;
 		roadDesc.pSocketMat = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-		roadDesc.eCollideType = CFinaleRoad::CTYPE_NONE;
+
+		roadDesc.bIsAnimModel = true;
+		roadDesc.eCollideType = CFinaleRoad::CTYPE_BREAK;
+
 		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
 			return E_FAIL;
 
@@ -175,7 +178,10 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 		InitMat.Translation({ 0.f, 0.f, 60.f });
 		roadDesc.matWorld = InitMat;
 		roadDesc.pSocketMat = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-		roadDesc.eCollideType = CFinaleRoad::CTYPE_NONE;
+
+		roadDesc.bIsAnimModel = true;
+		roadDesc.eCollideType = CFinaleRoad::CTYPE_BREAK;
+
 		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
 			return E_FAIL;
 
