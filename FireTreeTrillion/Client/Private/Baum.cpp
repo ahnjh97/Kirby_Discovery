@@ -136,6 +136,10 @@ void CBaum::Late_Tick(_float fTimeDelta)
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
+		if (m_eBaumType == BAUM_STARPIECE)
+		{
+			m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
+		}
 	}
 }
 
@@ -353,7 +357,7 @@ _int CBaum::Make_Partical()
 			vDir.y += 0.5f;
 			desc.wstrModelName = wstrModelName[i];
 			desc.vParticalMoveDir = vDir;
-			desc.fParticalSpeed = CUtils::Make_RandomFloat(70.f, 150.f);
+			desc.fParticalSpeed = CUtils::Make_RandomFloat(100.f, 200.f);
 			// Car Test
 			if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_BaumPiece"), TEXT("Prototype_GameObject_BaumPiece"), &desc)))
 				return OBJ_DEAD;
@@ -389,7 +393,7 @@ _int CBaum::Make_Partical()
 			vDir.y += 0.5f;
 			desc.wstrModelName = wstrModelName[i];
 			desc.vParticalMoveDir = vDir;
-			desc.fParticalSpeed = CUtils::Make_RandomFloat(70.f, 150.f);
+			desc.fParticalSpeed = CUtils::Make_RandomFloat(100.f, 200.f);
 			// Car Test
 			if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_BaumPiece"), TEXT("Prototype_GameObject_BaumPiece"), &desc)))
 				return OBJ_DEAD;

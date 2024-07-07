@@ -323,11 +323,11 @@ void CFinaleKirby::Kirby_SystemTick(_float fTimeDelta)
 
     if (INFO(m_eBodyState) == BODY_DUMPDEFAULT)
     {
-        if (INFO(m_fMoveSpeed) > 0.f)
-        {
-            _float fRadialPower = INFO(m_fMoveSpeed) * 0.2f;
-            m_pGameInstance->Setting_RadialBlur(fRadialPower, fRadialPower);
-        }
+        //if (INFO(m_fMoveSpeed) > 0.f)
+        //{
+        //    _float fRadialPower = INFO(m_fMoveSpeed) * 0.2f;
+        //    m_pGameInstance->Setting_RadialBlur(fRadialPower, fRadialPower);
+        //}
 
         if (Get_State() == DUMPTSTATE_CUT)
         {

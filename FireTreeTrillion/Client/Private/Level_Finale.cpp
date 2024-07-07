@@ -83,7 +83,7 @@ HRESULT CLevel_Finale::Initialize()
 	ObjDesc.fSpeedPerSec = 5.f;
 	ObjDesc.fRotationPerSec = ToRadian(90.f);
 	InitMat = _float4x4::Identity;
-	InitMat.Translation({ 41.5f, -1.5f, 2.27f });
+	InitMat.Translation({ 58.5f, 4.f, 2.27f });
 	ObjDesc.matWorld = InitMat;
 	// PopStar Test
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_BreakableBlock"), TEXT("Prototype_GameObject_BreakableBlock"), &ObjDesc)))

@@ -1846,7 +1846,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("RoadEnd", TYPE_NONANIM, 1.f, 0.f, 0);
 		m_vecModelInfo.emplace_back("RoadParticle", TYPE_NONANIM, 1.f, 0.f, 0);
 
-		m_vecModelInfo.emplace_back("BreakableBlock", TYPE_ANIM, 0.3f, 0.f, 0);
+		m_vecModelInfo.emplace_back("BreakableBlock", TYPE_ANIM, 0.2f, 0.f, 0);
 
 		m_vecModelInfo.emplace_back("RoadBreak", TYPE_NONANIM, 1.f, 0.f, 0);
 		m_vecModelInfo.emplace_back("RoadLBreak", TYPE_NONANIM, 1.f, 0.f, 0);
@@ -1986,7 +1986,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
 
-		m_vecModelInfo.emplace_back("BreakableBlock", TYPE_ANIM, 0.3f, 0.f, 0);
+		m_vecModelInfo.emplace_back("BreakableBlock", TYPE_ANIM, 0.5f, 0.f, 0);
 	}
 }
 

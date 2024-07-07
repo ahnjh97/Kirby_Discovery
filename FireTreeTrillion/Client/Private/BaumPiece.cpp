@@ -75,6 +75,11 @@ void CBaumPiece::Late_Tick(_float fTimeDelta)
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
+
+		if (m_bBloom == true)
+		{
+			m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
+		}
 	}
 }
 
@@ -138,6 +143,9 @@ HRESULT CBaumPiece::Add_Components(const wstring& wstrModelName)
 	wstring wstrModelTag = TEXT("Prototype_Component_Model_") + wstrModelName;
 	hr = __super::Add_Component(wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
+
+	if (wstrModelName == TEXT("BaumPieceE") || wstrModelName == TEXT("BaumPieceF"))
+		m_bBloom = true;
 
 	return S_OK;
 }
