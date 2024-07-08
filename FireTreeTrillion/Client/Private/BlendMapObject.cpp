@@ -35,6 +35,8 @@ HRESULT CBlendMapObject::Initialize(void* pArg)
 	m_setBlendMeshIndices = tDesc.setBlendMeshIndices;
 	m_pModelCom->RemoveNonBlendMeshes(m_setBlendMeshIndices);
 
+	m_pStaticActor = m_pModelCom->ReturnStaticActor(m_pTransformCom->Get_WorldFloat4x4());
+
 	// Normal 유무 검사해서 PassIndex 지정하는 작업
 	//m_pModelCom->DeterminePassIndices(m_vecPassIndices);
 
@@ -151,6 +153,8 @@ CGameObject* CBlendMapObject::Clone(void* pArg)
 void CBlendMapObject::Free()
 {
 	__super::Free();
+
+	m_pGameInstance->ReleaseActor(m_pStaticActor);
 
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModelCom);

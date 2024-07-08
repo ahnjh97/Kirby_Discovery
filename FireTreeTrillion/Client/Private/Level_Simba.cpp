@@ -17,6 +17,7 @@
 #include "HUD.h"
 #include "SkySphere.h"
 //#include "Kirby.h"
+#include "EventCenter.h"
 
 CLevel_Simba::CLevel_Simba(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -66,8 +67,16 @@ void CLevel_Simba::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 	m_fAccDelta += fTimeDelta;
-}
 
+	if (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
+	{
+		if (m_pGameInstance->Get_KeyState(DIK_1, KEY_DOWN))
+			CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_THRONEBREAK);
+		if (m_pGameInstance->Get_KeyState(DIK_2, KEY_DOWN))
+			CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_GLASSBREAK);
+	}
+}
+		
 HRESULT CLevel_Simba::Render()
 {
 	if (FAILED(__super::Render()))
@@ -633,7 +642,7 @@ HRESULT CLevel_Simba::Ready_Objects()
 		tDesc.iShaderVars = iShaderVars;
 		tDesc.fRimWidth = fRimWidth;
 
-		if ("LbBossTurbine01L" == strModelName || "LbBossRing01L" == strModelName)
+		if ("LbBossTurbine01L" == strModelName || "LbBossRing01L" == strModelName /*|| "OriginCage" == strModelName*/)
 		{
 			tDesc.wstrModelName += L"_Anim";
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_MapDeco"), TEXT("Prototype_GameObject_Turbine"), &tDesc)))
@@ -643,6 +652,24 @@ HRESULT CLevel_Simba::Ready_Objects()
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_MapDeco"), TEXT("Prototype_GameObject_SimbaRoomGlass"), &tDesc)))
 				continue;
+		}
+		else if ("RoomGlass" == strModelName)
+		{
+			tDesc.wstrModelName += L"_Anim";
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_MapDeco"), TEXT("Prototype_GameObject_RoomGlass"), &tDesc)))
+				continue;
+		}
+		else if ("Throne" == strModelName)
+		{
+			tDesc.wstrModelName += L"_Anim";
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_MapDeco"), TEXT("Prototype_GameObject_Throne"), &tDesc)))
+				continue;
+		}
+		else if ("OriginCage" == strModelName)
+		{
+			/*tDesc.wstrModelName += L"_Anim";
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_MapDeco"), TEXT("Prototype_GameObject_OriginCage"), &tDesc)))
+				continue;*/
 		}
 	}
 

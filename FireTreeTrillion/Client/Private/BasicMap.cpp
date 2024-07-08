@@ -428,13 +428,15 @@ void CBasicMap::InsertMapDecos()
 
             if (nullptr != pBlendMapObj) {
                 m_vecBlendObjects.push_back(pBlendMapObj);
-                pModel->Set_BlendObject(pBlendMapObj);
+                //pModel->Set_BlendObject(pBlendMapObj);
             }
 
             pModel->RemoveBlendMeshes(mapIter->second);
 
-            if (pModel->Get_NumMeshes() == 0)
+            if (pModel->Get_NumMeshes() == 0) {
+                Safe_Release(pModel);
                 continue;
+            }
         }
 
         if (true == IsShadowDeco(strModelName))
@@ -621,13 +623,15 @@ void CBasicMap::ReadDecos_ForSmallLevels()
 
             if (nullptr != pBlendMapObj) {
                 m_vecBlendObjects.push_back(pBlendMapObj);
-                pModel->Set_BlendObject(pBlendMapObj);
+                //pModel->Set_BlendObject(pBlendMapObj);
             }
 
             pModel->RemoveBlendMeshes(mapIter->second);
 
-            if (pModel->Get_NumMeshes() == 0)
+            if (pModel->Get_NumMeshes() == 0) {
+                Safe_Release(pModel);
                 continue;
+            }
         }
 
         if (true == IsShadowDeco(strModelName))

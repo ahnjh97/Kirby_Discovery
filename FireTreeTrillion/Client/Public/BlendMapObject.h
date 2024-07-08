@@ -35,6 +35,7 @@ public:
 private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
+	PxRigidStatic* m_pStaticActor = { nullptr };
 
 	_float m_fWhiteColorDiffuse = {};
 

@@ -114,19 +114,25 @@
 #include "BreakableRockParticle.h"
 #include "Car.h"
 #include "Dump.h"
+#include "BlendMapObject.h"
+#include "PortalSoftEffect.h"
+
+// Racing Gimmick Objects
 #include "CarShopWall.h"
 #include "CarShopWallFrame.h"
 #include "ToppleableBridge.h"
-#include "BlendMapObject.h"
-#include "PortalSoftEffect.h"
 #include "AnimBridge.h"
 #include "Tunnel.h"
 #include "TunnelRock.h"
 #include "Radio.h"
 #include "Fog_Instance.h"
 #include "Box.h"
+
+// Simba Gimmick Objects
 #include "Turbine.h"
 #include "SimbaRoomGlass.h"
+#include "RoomGlass.h"
+#include "Throne.h"
 
 // 피날레 스테이지 기믹들
 #include "Baum.h"
@@ -444,6 +450,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	#pragma region LEVEL_SIMBA
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Turbine"), CTurbine);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SimbaRoomGlass"), CSimbaRoomGlass);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("RoomGlass"), CRoomGlass);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Throne"), CThrone);
 	#pragma endregion
 
 #pragma endregion
@@ -1759,6 +1767,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("LbBossTurbine01L_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("LbBossRing01L_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("JhGlass", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("RoomGlass_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Throne_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("OriginCage_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 		// For Kirby Body
 		Load_KirbyBodyModels();

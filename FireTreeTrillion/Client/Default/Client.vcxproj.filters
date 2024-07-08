@@ -526,11 +526,20 @@
     <Filter Include="02.GameObjects\Map\SimbaObjects">
       <UniqueIdentifier>{b6c6ebf1-2bc6-47c5-9ff2-5da187edc050}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\SimbaObjects\OriginCage">
+      <UniqueIdentifier>{bf2be153-8c01-4ddb-acd2-7bef457664f6}</UniqueIdentifier>
+    </Filter>
     <Filter Include="02.GameObjects\Map\SimbaObjects\Turbine">
       <UniqueIdentifier>{dc7a1e67-f235-4307-977e-9a6dafd3403c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\SimbaObjects\Throne">
+      <UniqueIdentifier>{6fedc350-b6f5-45f5-9002-a61ba0bc6eb5}</UniqueIdentifier>
+    </Filter>
     <Filter Include="02.GameObjects\Map\SimbaObjects\SimbaRoomGlass">
       <UniqueIdentifier>{ff31fade-0ffa-44ae-8397-2b4bf316491a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\SimbaObjects\RoomGlass">
+      <UniqueIdentifier>{1aa4a53b-c1d7-43fd-b993-6b79f9ea8e33}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1066,6 +1075,15 @@
     <ClInclude Include="..\Public\SimbaRoomGlass.h">
       <Filter>02.GameObjects\Map\SimbaObjects\SimbaRoomGlass</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\RoomGlass.h">
+      <Filter>02.GameObjects\Map\SimbaObjects\RoomGlass</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Throne.h">
+      <Filter>02.GameObjects\Map\SimbaObjects\Throne</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\OriginCage.h">
+      <Filter>02.GameObjects\Map\SimbaObjects\OriginCage</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1580,6 +1598,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\SimbaRoomGlass.cpp">
       <Filter>02.GameObjects\Map\SimbaObjects\SimbaRoomGlass</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RoomGlass.cpp">
+      <Filter>02.GameObjects\Map\SimbaObjects\RoomGlass</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Throne.cpp">
+      <Filter>02.GameObjects\Map\SimbaObjects\Throne</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\OriginCage.cpp">
+      <Filter>02.GameObjects\Map\SimbaObjects\OriginCage</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

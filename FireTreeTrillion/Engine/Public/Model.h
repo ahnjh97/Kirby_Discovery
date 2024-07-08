@@ -63,6 +63,7 @@ public:
 	_float Get_AnimTrackPosition() { return m_Animations[m_iCurrentAnimIndex]->Get_AnimTrackPosition(); }
 	_uint Get_AnimCnt() const { return m_Animations.size(); }
 	vector<class CAnimation*>* const Get_Animations() { return &m_Animations; }
+	_uint Get_CurAnimIndex() { return m_iCurrentAnimIndex; }
 	
 public:
 	virtual HRESULT Initialize_Prototype(MODEL tModel);

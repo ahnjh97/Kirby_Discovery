@@ -217,6 +217,8 @@
     <ClInclude Include="..\Public\CollisionCenter.h" />
     <ClInclude Include="..\public\DecoObject.h" />
     <ClInclude Include="..\Public\Disaster_Master.h" />
+    <ClInclude Include="..\Public\OriginCage.h" />
+    <ClInclude Include="..\Public\RoomGlass.h" />
     <ClInclude Include="..\Public\ShadowDeco.h" />
     <ClInclude Include="..\Public\DeeDeeDee.h" />
     <ClInclude Include="..\Public\DeeDeeDeeHammer.h" />
@@ -341,6 +343,7 @@
     <ClInclude Include="..\Public\TestModel.h" />
     <ClInclude Include="..\Public\TestModel_State.h" />
     <ClInclude Include="..\Public\TestTerrain.h" />
+    <ClInclude Include="..\Public\Throne.h" />
     <ClInclude Include="..\Public\tinyxml2.h" />
     <ClInclude Include="..\Public\ToolHelper.h" />
     <ClInclude Include="..\Public\Editor_UI.h">
@@ -415,6 +418,8 @@
     <ClCompile Include="..\Private\CollisionCenter.cpp" />
     <ClCompile Include="..\private\DecoObject.cpp" />
     <ClCompile Include="..\Private\Disaster_Master.cpp" />
+    <ClCompile Include="..\Private\OriginCage.cpp" />
+    <ClCompile Include="..\Private\RoomGlass.cpp" />
     <ClCompile Include="..\Private\ShadowDeco.cpp" />
     <ClCompile Include="..\Private\DeeDeeDee.cpp" />
     <ClCompile Include="..\Private\DeeDeeDeeHammer.cpp" />
@@ -536,6 +541,7 @@
     <ClCompile Include="..\Private\TestModel.cpp" />
     <ClCompile Include="..\Private\TestModel_State.cpp" />
     <ClCompile Include="..\Private\TestTerrain.cpp" />
+    <ClCompile Include="..\Private\Throne.cpp" />
     <ClCompile Include="..\Private\tinyxml2.cpp" />
     <ClCompile Include="..\Private\ToolHelper.cpp" />
     <ClCompile Include="..\Private\Editor_UI.cpp">
