@@ -113,7 +113,7 @@ _int CBaum::Tick(_float fTimeDelta)
 	}
 
 	// ±¸ÇöºÎ
-	if ((m_pControllerCom->Is_Terrain() == true || m_pControllerCom->RayCastToDynamicActor(m_vBaumMoveDir) < 2.f) && m_bOnTerrain == false)
+	if ((m_pControllerCom->Is_Terrain() == true || m_pControllerCom->RayCastToDynamicActor(_float4(0.f, -1.f, 0.f, 0.f)) < 5.f) && m_bOnTerrain == false)
 	{
 		CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 		pCamera->Make_Shake();
@@ -258,8 +258,8 @@ HRESULT CBaum::Add_Components(wstring wstrModelProtoTag)
 		LIGHT_DESC			LightDesc{};
 		LightDesc.eType = LIGHT_DESC::TYPE_POINT;
 		LightDesc.vPosition = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
-		LightDesc.fRange = 30.f;
-		LightDesc.vDiffuse = _float4(7.f, .5f, 0.f, 1.f);
+		LightDesc.fRange = 50.f;
+		LightDesc.vDiffuse = _float4(.7f, .5f, 0.f, 1.f);
 		LightDesc.vAmbient = _float4(.5f, .5f, .5f, 1.f);
 		LightDesc.vSpecular = _float4(0.f, 0.f, 0.0f, 1.f);
 		if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
