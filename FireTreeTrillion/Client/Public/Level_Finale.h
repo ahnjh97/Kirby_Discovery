@@ -1,6 +1,7 @@
 #pragma once
 #include "Client_Defines.h"
 #include "Level.h"
+#include "FinaleRoadGrouper.h"
 
 BEGIN(Client)
 
@@ -28,6 +29,7 @@ private:
 	HRESULT Ready_Objects();
 	HRESULT Ready_UI();
 
+	void Make_FinaleRoad(ROADTYPE eType, MOVECMD eMoveType, _float3 vTargetPos, _float3 vLookDir, _float3 vDestPos, _float3 vDestDir);
 public:
 	static CLevel_Finale* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual void Free() override;

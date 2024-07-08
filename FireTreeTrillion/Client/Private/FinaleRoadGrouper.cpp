@@ -15,7 +15,7 @@ CFinaleRoadGrouper::CFinaleRoadGrouper(const CFinaleRoadGrouper& rhs)
 
 _bool CFinaleRoadGrouper::Make_CollideReaction(CFinaleRoad* pRoad)
 {
-	
+
 	//내가 움직이는 놈 아니면 나가기
 	if (m_eCollideMove == MOVECMD_END)
 		return false;
@@ -24,7 +24,7 @@ _bool CFinaleRoadGrouper::Make_CollideReaction(CFinaleRoad* pRoad)
 
 	for (auto& road : m_pRoads)
 	{
-		if ( _float4::Distance( road->Get_WorldPos() , pRoad->Get_WorldPos()) < 5.f )
+		if (_float4::Distance(road->Get_WorldPos(), pRoad->Get_WorldPos()) < 5.f)
 		{
 			bIsMyCollision = true;
 			break;
@@ -53,6 +53,9 @@ _bool CFinaleRoadGrouper::Make_CollideReaction(CFinaleRoad* pRoad)
 	{
 		road->Make_CollisionEvent();
 	}
+
+	//m_fDestZAngle = CUtils::Make_RandomInt(0, 1) ? 10.f : -10.f;
+	m_fDestZAngle = CUtils::Make_RandomFloat(-15.f, 15.f);
 
 	return true;
 }
@@ -301,7 +304,7 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 
 		//부서지는 도로
 		roadDesc = {};
-		roadDesc.wstrModelName = TEXT("RoadLBreak");
+		roadDesc.wstrModelName = TEXT("RoadBreak");
 		InitMat = _float4x4::Identity;
 		InitMat.Translation({ 0.f, 0.f, -30.f });
 		roadDesc.matWorld = InitMat;
@@ -399,8 +402,12 @@ _int CFinaleRoadGrouper::Tick(_float fTimeDelta)
 	_float fRealTimeDelta = m_pGameInstance->Get_SecondTimer();
 
 
+	//z 앵글을 초기화한다.
+	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_LOOK), 1.f, -m_fPreZAngle);
+
+
 	//특정 목표로 가야 할 때
-	if ( m_bStartCollideEvent && 0.f < m_fCollideTime )
+	if (m_bStartCollideEvent && 0.f < m_fCollideTime)
 	{
 		//충돌 시간을 깎는다.
 		m_fCollideTime -= fRealTimeDelta;
@@ -413,7 +420,7 @@ _int CFinaleRoadGrouper::Tick(_float fTimeDelta)
 			{
 				CCamera_Main* pCamera = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 
-				if(nullptr != pCamera)
+				if (nullptr != pCamera)
 					pCamera->Make_Shake(3.f, .8f);
 			}
 		}
@@ -444,13 +451,34 @@ _int CFinaleRoadGrouper::Tick(_float fTimeDelta)
 
 		//회전 보간
 		Quaternion vFirstQuat, vSecondQuat, vResultQuat;
-		
+
 		vFirstQuat = CUtils::Make_Quat_FromDir(m_vStartDir);
 		vSecondQuat = CUtils::Make_Quat_FromDir(m_vDestDir);
 
 		vResultQuat = Quaternion::Slerp(vFirstQuat, vSecondQuat, clamp(fTime, 0.f, 1.f));
 		m_pTransformCom->Turn_Absolute(vResultQuat);
+
+		//z 앵글 보간
+		if (.001f < abs(m_fCurZAngle - m_fDestZAngle))
+			m_fCurZAngle = LERP(m_fStartZAngle, m_fDestZAngle, fTime);
+
+
+
 	}
+	else
+	{
+		//평소
+		if (m_eCollideMove == MOVECMD_FLY)
+		{
+
+		}
+	}
+
+
+
+	//Z 앵글
+	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_LOOK), 1.f, m_fCurZAngle);
+	m_fPreZAngle = m_fCurZAngle;
 
 	return OBJ_NOEVENT;
 }

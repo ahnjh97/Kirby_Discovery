@@ -236,7 +236,7 @@ private:
 
 /*Z 앵글*/
 	//이전 프레임의 z 값을 저장.
-	_float m_fPreZAngle = { 0.f};
+	_float m_fPreZAngle = { 0.f };
 
 	_float m_fCurZAngle = { 0.f };
 	_float m_fStartZAngle = { 0.f };
@@ -289,6 +289,9 @@ private:
 	//보간 시간
 	EASING m_eCurSeqEase = { EASE_END };
 	pair<_float, _float> m_fSeqInterpolateTime = { 0.f, 0.f };
+
+	//이펙트 소켓
+	_float4x4		m_EffectSocket;
 
 private:
 	void Reset_DeferredCamSet();

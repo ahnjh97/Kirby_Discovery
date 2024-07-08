@@ -176,7 +176,7 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 
 	//별 이펙트 테스트용
 	CParticle::PARTICLE_DESC FXDesc{};
-	FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	FXDesc.pSocketMatrix = &m_EffectSocket;
 
 	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_night star test 2"), &FXDesc)))
 		return E_FAIL;
@@ -214,6 +214,9 @@ _int CCamera_Main::Tick(_float fTimeDelta)
 	//후보정
 	Set_DeferredCamSet(fRealTimeDelta);
 
+
+	m_EffectSocket = _float4x4::Identity;
+	CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
 	return OBJ_NOEVENT;
 }

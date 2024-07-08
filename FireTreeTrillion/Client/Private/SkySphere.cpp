@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "GameInstance.h"
 #include "SkySphere.h"
+#include "Particle.h"
 
 CSkySphere::CSkySphere(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CGameObject{ pDevice, pContext }
@@ -37,10 +38,16 @@ HRESULT CSkySphere::Initialize(void* pArg)
 
 	if (LEVEL_FINALBOSS == m_eCurLevel)
 		m_pTransformCom->Set_Scaled(_float3{ 0.1f, 0.1f, 0.1f });
-	
+	else if (LEVEL_FINALE == m_eCurLevel)
+	{
+		m_pTransformCom->Set_Scaled(_float3{ .6f, .6f, .6f });
+
+	}
 	else
 		m_pTransformCom->Set_Scaled(_float3{ .6f, .6f, .6f });
 
+
+	
 	return S_OK;
 }
 

@@ -76,9 +76,10 @@ private:
 	_float3		m_vStartDir = { 0.f, 0.f, 0.f };
 	_float3		m_vDestDir = { 0.f, 0.f, 0.f };
 
-	_float m_fCurZAngle = { 0.f };
-	_float m_fStartZAngle = { 0.f };
-	_float m_fDestZAngle = { 0.f };
+	_float		m_fCurZAngle = { 0.f };
+	_float		m_fStartZAngle = { 0.f };
+	_float		m_fDestZAngle = { 0.f };
+	_float		m_fPreZAngle = { 0.f };
 
 	vector<CFinaleRoad*> m_pRoads;
 

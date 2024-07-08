@@ -186,7 +186,7 @@ void CDisaster_Master::Moving_FinaleRoad(_float fKirbyX)
 	_float fKirbySpeed = m_pKirby->Get_KirbyInfo()->m_fMoveSpeed;
 
 
-	if (m_bRoadTrigger[0] == true && fKirbyX + (fKirbySpeed * 8.f) > 1083.f)
+	if (m_bRoadTrigger[0] == true && fKirbyX + (fKirbySpeed * 6.f) > 1083.f)
 	{
 		_float3 vDestPos = { 1083.f, -190.f, -158.f };
 		_float3 vStartPos = vDestPos + _float3(100.f, 200.f, 200.f);
@@ -197,7 +197,7 @@ void CDisaster_Master::Moving_FinaleRoad(_float fKirbyX)
 
 		m_bRoadTrigger[0] = false;
 	}
-	else if (m_bRoadTrigger[1] == true && fKirbyX + (fKirbySpeed * 8.f) > 1215.f)
+	else if (m_bRoadTrigger[1] == true && fKirbyX + (fKirbySpeed * 6.f) > 1215.f)
 	{
 		_float3 vDestPos = { 1215.f, -164.001f, -129.f };
 		_float3 vStartPos = vDestPos + _float3(100.f, 200.f, -200.f);
@@ -208,7 +208,7 @@ void CDisaster_Master::Moving_FinaleRoad(_float fKirbyX)
 
 		m_bRoadTrigger[1] = false;
 	}
-	else if (m_bRoadTrigger[2] == true && fKirbyX + (fKirbySpeed * 8.f) > 1362.651f)
+	else if (m_bRoadTrigger[2] == true && fKirbyX + (fKirbySpeed * 6.f) > 1362.651f)
 	{
 		_float3 vDestPos = { 1362.651f,-123.036f,-111.231f };
 		_float3 vStartPos = vDestPos + _float3(100.f, 200.f, 200.f);
@@ -219,7 +219,7 @@ void CDisaster_Master::Moving_FinaleRoad(_float fKirbyX)
 
 		m_bRoadTrigger[2] = false;
 	}
-	else if (m_bRoadTrigger[3] == true && fKirbyX + (fKirbySpeed * 8.f) > 1488.866f)
+	else if (m_bRoadTrigger[3] == true && fKirbyX + (fKirbySpeed * 6.f) > 1488.866f)
 	{
 		_float3 vDestPos = { 1488.866f,-98.833f,-140.250f };
 		_float3 vStartPos = vDestPos + _float3(100.f, 200.f, -200.f);
@@ -244,7 +244,7 @@ void CDisaster_Master::Moving_TargetBaum(_float fKirbyX)
 	}
 
 	//맨 처음 도로
-	else if (m_bBaumTrigger[1] == true && fKirbyX + (fKirbySpeed * 3.f) > 471.f)
+	else if (m_bBaumTrigger[1] == true && fKirbyX + (fKirbySpeed * 5.f) > 471.f)
 	{
 		Make_OnTerrainBaum(_float4(471.f, 8.15f, -69.7f, 1.f), true);
 		m_bBaumTrigger[1] = false;
@@ -261,6 +261,32 @@ void CDisaster_Master::Moving_TargetBaum(_float fKirbyX)
 		Make_OnTerrainBaum(_float4(689.f, -25.9f, -93.f, 1.f), false);
 		m_bBaumTrigger[3] = false;
 	}
+
+	//밑 도로
+	else if (m_bBaumTrigger[4] == true && fKirbyX + (fKirbySpeed * 3.f) > 782.f)
+	{
+		Make_OnTerrainBaum(_float4(782.f, -151.8f, -122.6f, 1.f), false);
+		m_bBaumTrigger[4] = false;
+	}
+
+	else if (m_bBaumTrigger[5] == true && fKirbyX + (fKirbySpeed * 6.f) > 916.f)
+	{
+		Make_OnTerrainBaum(_float4(916.f, -150.8f, -120.f, 1.f), false);
+		m_bBaumTrigger[5] = false;
+	}
+
+
+	//else if (m_bBaumTrigger[6] == true && fKirbyX + (fKirbySpeed * 2.5f) > 689.f)
+	//{
+	//	Make_OnTerrainBaum(_float4(689.f, -25.9f, -93.f, 1.f), false);
+	//	m_bBaumTrigger[6] = false;
+	//}
+
+	//else if (m_bBaumTrigger[7] == true && fKirbyX + (fKirbySpeed * 2.5f) > 689.f)
+	//{
+	//	Make_OnTerrainBaum(_float4(689.f, -25.9f, -93.f, 1.f), false);
+	//	m_bBaumTrigger[7] = false;
+	//}
 }
 
 CDisaster_Master* CDisaster_Master::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
