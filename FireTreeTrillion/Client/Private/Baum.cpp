@@ -7,8 +7,23 @@
 
 #include "Light.h"
 #include "Particle.h"
+#include "MultiEffect.h"
 
 #include "FinalePartical_Maker.h"
+
+static void DebrisCloud(CTransform* pTransformCom)
+{
+	CEffect::FX_DESC FXDesc{};
+
+	FXDesc.vInitPos = static_cast<_float3>(pTransformCom->Get_State(CTransform::STATE_POSITION)) + (_float3)CUtils::Make_Random_Vector(2.f);
+	//FXDesc.vInitRot = CUtils::Make_Random_Vector(.5f);
+
+	_float fScale = CUtils::Make_RandomFloat(10.f, 20.f);
+	FXDesc.vInitScale = { fScale, fScale, fScale };
+
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_debris smoke"), &FXDesc)))
+		return;
+}
 
 CBaum::CBaum(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
@@ -69,7 +84,13 @@ HRESULT CBaum::Initialize(void* pArg)
 		m_fRimWidth = 0.5f;
 
 
+	CEffect::FX_DESC FXDesc{};
+	FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	FXDesc.vInitPos = { 0.f, 1.4f, -.8f };
+	FXDesc.vInitScale = { 20.f, 20.f, 20.f };
+	FXDesc.vInitRot = { 90.f, 0.f, 0.f };
 
+	Add_Effect("come on dash white", FXDesc, true);
 	return S_OK;
 }
 
@@ -94,6 +115,17 @@ _int CBaum::Tick(_float fTimeDelta)
 			m_fScale = 1.f;
 		m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
 
+
+		//이펙트
+
+		//smoke
+		m_fBbongTime += m_fTimeDelta;
+		if (.05f < m_fBbongTime)
+		{
+			DebrisCloud(m_pTransformCom);
+			m_fBbongTime = 0.f;
+		}
+
 		if (m_pTransformCom->Get_State(CTransform::STATE_POSITION).y < -300.f)
 		{
 			return OBJ_DEAD;
@@ -117,6 +149,7 @@ _int CBaum::Tick(_float fTimeDelta)
 	{
 		CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 		pCamera->Make_Shake();
+		Delete_AllEffect();
 
 		// 파티클을 만든다.
 		Make_Partical();

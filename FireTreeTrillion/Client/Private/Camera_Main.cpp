@@ -171,7 +171,7 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 	m_CamTriggerUpOffsets.reserve(LEVEL_END);
 	m_CamTriggerUpOffsets.resize(LEVEL_END);
 	m_CamTriggerUpOffsets[LEVEL_INTRO] = { 0.f, 0.f, 0.f, .15f, .15f, 0.f, 0.f, 0.f };
-	m_CamTriggerUpOffsets[LEVEL_FINALE] = { .3f };
+	m_CamTriggerUpOffsets[LEVEL_FINALE] = { .3f, 0.f, .3f };
 
 
 	//별 이펙트 테스트용
@@ -296,7 +296,7 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 	}
 
 	//예약 동작이 모두 끝나면 다시 기본 상태로 만든다.
-	if (m_CamSeq.empty() && m_fSeqInterpolateTime.first == m_fSeqInterpolateTime.second)
+	if (m_CamSeq.empty() && abs( m_fSeqInterpolateTime.first - m_fSeqInterpolateTime.second) < .01f)
 	{
 		m_eSpecialSeq = SEQ_END;
 		m_eCurSeqEase = EASE_END;
@@ -1150,7 +1150,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction.fTime = fCutStartTime + 3.5f;
 		newAction.eCamCut = CUT_INTERPOLATE;
 		newAction.eEase = EASE_OUT;
-		newAction.fInterpolateSpeed = 1.5f;
+		newAction.fInterpolateSpeed = 1.3f;
 		newAction.fFOVY = 55.f;
 		newAction.eCamDir = DIR_ABSOLUTE;
 		newAction.vDir = _float3{ -.86f, .08f, .5f };

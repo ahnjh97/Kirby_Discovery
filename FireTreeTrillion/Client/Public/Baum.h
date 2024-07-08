@@ -52,6 +52,9 @@ private:
 	_float4			m_vBaumMoveDir = { 0.f, 0.f, 0.f, 0.f };
 	_float			m_fBaumSpeed = { 0.f };
 	_float			m_fScale = { 0.01f };
+	_float			m_fBbongTime = { 0.f };
+
+
 	enum BAUMTYPE { BAUM_BAUM, BAUM_STARPIECE, BAUM_END };
 	BAUMTYPE		m_eBaumType = { BAUM_END };
 	_bool			m_bOnTerrain = { false };

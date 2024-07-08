@@ -223,24 +223,26 @@ HRESULT CLevel_Finale::Ready_FinaleRoad()
 
 	Make_FinaleRoad(RTYPE_BUILDINGC, MOVECMD_COLLIDE,
 		{ 389.2f, -12.5f, -19.1f }, { .93f, -.25f, -.27f },
-		{ 389.2f, -12.5f, -19.1f }, { 1.f, .06f, -.13f });
+		{ 389.2f, -12.5f, -19.1f }, { 1.f, .06f, -.13f }, 10.f);
 
 
 	//µµ·Î
 	Make_FinaleRoad(RTYPE_ROADA, MOVECMD_COLLIDE,
 		{ 620.f, -22.f, -82.f }, { .98f, -.16f, -.15f },
-		{ 620.f, -37.f, -82.f }, { .98f, -.16f, -.15f });
+		{ 620.f, -37.f, -82.f }, { .98f, -.16f, -.15f }, -5.f);
 
 
 	//¹Ø µµ·Î
 	Make_FinaleRoad(RTYPE_ROADB, MOVECMD_COLLIDE,
 		{ 737.14f, -157.96f, -107.11f }, { .99f, .01f, -.12f },
-		{ 737.14f, -172.96f, -107.11f }, { .99f, .01f, -.12f });
+		{ 737.14f, -167.96f, -107.11f }, { .99f, .01f, -.12f },
+		15.f);
 
 
 	Make_FinaleRoad(RTYPE_ROADC, MOVECMD_COLLIDE,
 		{ 945.440f, -155.647f, -132.218f }, { .99f, .01f, -.12f },
-		{ 945.440f, -172.647f, -132.218f }, { .99f, .01f, -.12f });
+		{ 945.440f, -172.647f, -132.218f }, { .99f, .01f, -.12f },
+		-10.f);
 
 
 	
@@ -793,13 +795,14 @@ HRESULT CLevel_Finale::Ready_UI()
 	return S_OK;
 }
 
-void CLevel_Finale::Make_FinaleRoad(ROADTYPE eType, MOVECMD eMoveType, _float3 vTargetPos, _float3 vLookDir, _float3 vDestPos, _float3 vDestDir)
+void CLevel_Finale::Make_FinaleRoad(ROADTYPE eType, MOVECMD eMoveType, _float3 vTargetPos, _float3 vLookDir, _float3 vDestPos, _float3 vDestDir, _float fDestZAngle)
 {
 
 	CFinaleRoadGrouper::ROADGROUPER_DESC roadGrouperDesc = {};
 
 	roadGrouperDesc.eRoadType = eType;
 	roadGrouperDesc.eMoveCommand = eMoveType;
+	roadGrouperDesc.fDestZAngle = fDestZAngle;
 
 	_float4x4 InitMat = _float4x4::Identity;
 	InitMat.Translation(vTargetPos);

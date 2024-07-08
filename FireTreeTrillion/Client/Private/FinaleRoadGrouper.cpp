@@ -478,15 +478,15 @@ _int CFinaleRoadGrouper::Tick(_float fTimeDelta)
 				m_fCurZAngle = m_fDestZAngle;
 		}
 
-
-
 	}
 	else
 	{
 		//Æò¼Ò
 		if (m_eCollideMove == MOVECMD_FLY)
 		{
-
+			m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_RIGHT), fRealTimeDelta, 2.f);
+			/*m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_UP), fRealTimeDelta, 1.f);*/
+			m_pTransformCom->Move( _float4{ 0.f, -1.f, 0.f, 0.f } * fRealTimeDelta );
 		}
 	}
 
