@@ -2,7 +2,7 @@
 
 #include "Client_Defines.h"
 #include "GameObject.h"
-
+#include "FinaleRoadGrouper.h"
 BEGIN(Engine)
 END
 
@@ -26,7 +26,7 @@ public:
 private:
 	void			Make_MissBaum();
 	void			Make_OnTerrainBaum(_float4 vTargetPos, _bool bBaum);
-	void			Make_FinaleRoad(_float4 vTargetPos);
+	void			Make_FinaleRoad(CFinaleRoadGrouper::ROADTYPE eType, CFinaleRoadGrouper::MOVECMD eMoveType, _float3 vTargetPos, _float3 vLookDir, _float3 vDestPos, _float3 vDestDir);
 
 
 	void			Moving_FinaleRoad(_float fKirbyX);

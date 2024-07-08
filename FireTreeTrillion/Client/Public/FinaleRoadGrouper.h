@@ -3,28 +3,30 @@
 #include "GameObject.h"
 
 BEGIN(Client)
+//BEGIN(Finale)
+
+enum ROADTYPE
+{
+	RTYPE_BUILDINGA,
+	RTYPE_BUILDINGB,
+	RTYPE_BUILDINGC,
+	RTYPE_BUILDINGD,
+	RTYPE_ROADA, RTYPE_ROADB, RTYPE_ROADC,
+	RTYPE_END
+};
+
+enum MOVECMD
+{
+	MOVECMD_STOP,
+	MOVECMD_ROTATE,
+	MOVECMD_FLY,
+	MOVECMD_COLLIDE,
+	MOVECMD_END
+};
 
 class CFinaleRoadGrouper final : public CGameObject
 {
 public:
-	enum ROADTYPE
-	{
-		RTYPE_BUILDINGA,
-		RTYPE_BUILDINGB,
-		RTYPE_BUILDINGC,
-		RTYPE_BUILDINGD,
-		RTYPE_ROADA, RTYPE_ROADB, RTYPE_ROADC,
-		RTYPE_END
-	};
-
-	enum MOVECMD
-	{
-		MOVECMD_STOP,
-		MOVECMD_ROTATE,
-		MOVECMD_FLY,
-		MOVECMD_COLLIDE,
-		MOVECMD_END
-	};
 
 	struct ROADGROUPER_DESC : public GAMEOBJECT_DESC
 	{
@@ -79,4 +81,5 @@ public:
 	virtual void Free() override;
 };
 
+//END
 END

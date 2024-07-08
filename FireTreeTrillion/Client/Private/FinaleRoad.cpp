@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FinaleRoad.h"
 #include "HitBox.h"
+#include "FinalePartical_Maker.h"
 
 CFinaleRoad::CFinaleRoad(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CPhysXObject{ pDevice ,pContext }
@@ -32,6 +33,7 @@ void CFinaleRoad::Start_CollisionEvent()
 	{
 		m_bCollided = true;
 
+
 		if (m_wstrModelName == L"RoadLongBreak")
 		{
 			m_pDynamicActor->userData = nullptr;
@@ -40,6 +42,9 @@ void CFinaleRoad::Start_CollisionEvent()
 				auto pScene = m_pGameInstance->Get_Scene();
 				pScene->removeActor(*m_pDynamicActor);
 			}
+
+			CFinalePartical_Maker* pMaker = static_cast<CFinalePartical_Maker*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinalePartical_Maker")));
+			pMaker->Make_Partical(50, GET_POS, 10.f, 1.5f, 1.f, _float4(0.f, -1.f, 0.f, 0.f), 120.f, 1.f);
 		}
 		//m_pModelCom->DisableActors();
 
