@@ -18,6 +18,7 @@ public:
 	virtual void OnStateExit()														override;
 
 public:
+	_float	m_fParticalDelay = { 0.f };
 	static	CKirbyDump_Run_State* Create();
 	virtual void				  Free() override;
 };

@@ -2,6 +2,7 @@
 #include "CKirbyDump_State.h"
 #include "Kirby_State_Function.h"
 #include "FinaleKirby.h"
+#include "FinalePartical_Maker.h"
 
 void Turn_Interpolate(CFinaleKirby::FINALEKIRBY_INFODESC* Kirbydesc, CTransform* pTransformCom, _float fTimeDelta, _float fInterpolateSpeed = 12.f)
 {
@@ -206,6 +207,17 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
 	pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
+
+	m_fParticalDelay += fTimeDelta;
+	if (m_fParticalDelay > 0.2f)
+	{
+		CFinalePartical_Maker* pMaker = static_cast<CFinalePartical_Maker*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinalePartical_Maker")));
+		_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+		_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+		pMaker->Make_Partical(3, vPos + (vLook * 3.f), 3.f, 0.1f, 0.05f, XMVector3Normalize(_float4(0.f, 1.f, 0.f, 0.f) + vLook), 120.f, CUtils::Make_RandomFloat(80.f, 120.f));
+		m_fParticalDelay = 0.f;
+	}
+
 
 	if ((pController->Compute_Height() < 1.5f || pController->RayCastToDynamicActor(_float4(0.f, -1.f, 0.f, 0.f)) < 1.5f) == false)
 	{
@@ -561,8 +573,22 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		{
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 			pCamera->Make_Shake();
+
+			CFinalePartical_Maker* pMaker = static_cast<CFinalePartical_Maker*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinalePartical_Maker")));
+			_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+			_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+			pMaker->Make_Partical(50, vPos, 3.f, 0.1f, 0.05f, _float4(0.f, 1.f, 0.f, 0.f), 120.f, CUtils::Make_RandomFloat(80.f, 120.f));
+
 			m_bShakeTrigger = false;
 		}
+
+		if (m_fRunTime > 1.7f && m_fRunTime < 1.8f)
+			DESC(m_eEyeState) = CFinaleKirby::EYE_BLINK;
+		else if (m_fRunTime > 1.9f && m_fRunTime < 2.f)
+			DESC(m_eEyeState) = CFinaleKirby::EYE_BLINK;
+		else
+			DESC(m_eEyeState) = CFinaleKirby::EYE_IDLE;
+
 
 		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset), -1.f);
 

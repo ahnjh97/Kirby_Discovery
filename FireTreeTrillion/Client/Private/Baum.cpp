@@ -8,6 +8,8 @@
 #include "Light.h"
 #include "Particle.h"
 
+#include "FinalePartical_Maker.h"
+
 CBaum::CBaum(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
 {
@@ -83,11 +85,12 @@ _int CBaum::Tick(_float fTimeDelta)
 		m_pControllerCom->Move_Dir(m_pTransformCom, m_vBaumMoveDir * m_fTimeDelta * m_fBaumSpeed, m_fTimeDelta);
 		m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_UP), m_fTimeDelta, 180.f);
 
-		m_fScale += m_fTimeDelta * 5.f;
+		m_fScale += m_fTimeDelta * 4.f;
 		if (m_fScale > 1.f)
 			m_fScale = 1.f;
 		m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
-		if (m_pTransformCom->Get_State(CTransform::STATE_POSITION).y < -50.f)
+
+		if (m_pTransformCom->Get_State(CTransform::STATE_POSITION).y < -300.f)
 		{
 			return OBJ_DEAD;
 		}
@@ -113,6 +116,10 @@ _int CBaum::Tick(_float fTimeDelta)
 
 		// 파티클을 만든다.
 		Make_Partical();
+
+		CFinalePartical_Maker* pMaker = static_cast<CFinalePartical_Maker*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_FinalePartical_Maker")));
+		_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		pMaker->Make_Partical(40, vPos, 5.f, 0.3f, 0.2f, _float4(0.f, 1.f, 0.f, 0.f), 180.f, CUtils::Make_RandomFloat(100.f, 150.f));
 
 
 		m_bOnTerrain = true;
@@ -320,6 +327,11 @@ void CBaum::Find_MyRoad()
 	{
 		Safe_AddRef(m_pMyRoad);
 		m_pMyRoad->Start_CollisionEvent();
+		CFinalePartical_Maker* pMaker = static_cast<CFinalePartical_Maker*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_FinalePartical_Maker")));
+		_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		pMaker->Make_Partical(30, vPos, 13.f, 1.5f, 0.5f, _float4(0.f, -1.f, 0.f, 0.f), 180.f, 1.f);
+
+
 		_float4x4 RoadInvMatrix = m_pMyRoad->Get_WorldMatrix().Invert();
 		m_HitWorld = m_pTransformCom->Get_WorldMatrix() * RoadInvMatrix;
 		m_HitWorld._42 -= 1.5f;
