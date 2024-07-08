@@ -206,7 +206,6 @@ _int CCamera_Main::Tick(_float fTimeDelta)
 	Set_DeferredCamSet(fRealTimeDelta);
 
 
-
 	return OBJ_NOEVENT;
 }
 
@@ -1113,22 +1112,34 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction.fTime = fCutStartTime + 2.f;
 		newAction.eCamCut = CUT_INTERPOLATE;
 		newAction.eEase = EASE_OUT;
-		newAction.fInterpolateSpeed = .6f;
+		newAction.fInterpolateSpeed = .5f;
 		newAction.fFOVY = 45.f;
-		newAction.fZAngle = 10.f;
+		newAction.fZAngle = 30.f;
 		newAction.eCamDir = DIR_ABSOLUTE;
 		newAction.vDir = _float3{ -.84f, .31f, .44f };
 		m_CamSeq.push_back(newAction);
 
 		//Äç
 		newAction = {};
-		newAction.fTime = fCutStartTime + 2.8f;
+		newAction.fTime = fCutStartTime + 2.7f;
+		newAction.eCamCut = CUT_INTERPOLATE;
+		newAction.eEase = EASE_IN;
+		newAction.fInterpolateSpeed = .5f;
+		newAction.fFOVY = 48.f;
+		newAction.fZAngle = 0.f;
+		newAction.eCamPos = POS_ABSOLUTE;
+		newAction.vPos = _float3{ 4.64f, 2.44f, -5.56f };
+		newAction.eCamDir = DIR_ABSOLUTE;
+		newAction.vDir = _float3{ -.86f, .08f, .5f };
+		m_CamSeq.push_back(newAction);
+
+
+		newAction = {};
+		newAction.fTime = fCutStartTime + 3.5f;
 		newAction.eCamCut = CUT_INTERPOLATE;
 		newAction.eEase = EASE_OUT;
-		newAction.fInterpolateSpeed = .3f;
+		newAction.fInterpolateSpeed = 1.5f;
 		newAction.fFOVY = 55.f;
-		newAction.fZAngle = 0.f;
-
 		newAction.eCamDir = DIR_ABSOLUTE;
 		newAction.vDir = _float3{ -.86f, .08f, .5f };
 		m_CamSeq.push_back(newAction);
@@ -1530,6 +1541,7 @@ void CCamera_Main::Render_IMGUI()
 		m_fDestFovy = ToRadian(fFOVY);
 
 	ImGui::Separator();
+	ImGui::Text(u8"ÇöÀç Z ¾Þ±Û: %.2f", &m_fCurZAngle);
 	ImGui::DragFloat(u8"¸ñÇ¥ Z ¾Þ±Û", &m_fDestZAngle, .05f, -90.f, 90.f, "%.2f");
 
 	ImGui::Separator();
