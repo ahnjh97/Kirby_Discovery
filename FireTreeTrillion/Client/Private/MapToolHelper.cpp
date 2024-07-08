@@ -184,6 +184,28 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "VpControlBoxChairL", "VpControlBoxEL", "VpStairsAL"
 		#pragma endregion
 
+#pragma region LEVEL_PARK (WONDARIA REMAINS) OBJECT
+
+		// 필드 오브젝트
+		, "FhArchWayAL", "FhArchWayBL", "FhArchWayCL", "FhArchWayDL" 
+		, "FhFence01L", "FhFence02L", "FhFence03L", "FhFence04L", "FhFence05L", "FhFence06L" 
+		, "FhOrnamentGroundAL", "FhOrnamentGroundBL"
+		, "FhOrnamentRoofAL", "FhOrnamentRoofBL", "FhOrnamentRoofCL", "FhOrnamentRoofDL", "FhOrnamentRoofEL"
+		, "FhPillarAL", "FhPillarATopDec2L", "FhPillarBL", "FhPillarBTopDec2L", "FhPillarCL", "FhPillarCTopDec2L"
+		, "FhPlanetOrnamentAL"
+		, "FhStackOrnamentAL", "FhStackOrnamentBL", "FhStackOrnamentCL", "FhStackOrnamentDL", "FhStackOrnamentEL"
+		
+		// 채우기용 잡오브젝트
+		, "DollKirby"
+		, "PkParkShowWindowObj01AL", "PkParkShowWindowObj01BL", "PkParkShowWindowObj02AL", "PkParkShowWindowObj02BL"
+		, "PkParkShowWindowObj03AL", "PkParkShowWindowObj03BL", "PkParkShowWindowObj04AL", "PkParkShowWindowObj04BL"
+		, "PkParkShowWindowObj05AL", "PkParkShowWindowObj05BL", "PkParkShowWindowObj06L"
+		, "PkParkShowWindowObj07AL", "PkParkShowWindowObj07BL", "PkParkShowWindowObj08AL", "PkParkShowWindowObj08BL"
+		, "ParkOutsideDoor", "PkRoof01"
+		, "CmLightFollowParts01L", "CmLightFollowParts02L"
+
+#pragma endregion
+
 #pragma region LEVEL_FINALBOSS (LAB_DISCOVERA) OBJECT
 		// 보스전 필드
 		//"LbLastBuilding", "LbLastBossStage" :: 텍스처 및 모델 수정으로 사용안함
