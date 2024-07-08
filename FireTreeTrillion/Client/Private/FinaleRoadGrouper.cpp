@@ -82,6 +82,14 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 	hr = __super::Initialize(&RoadGroupDesc);
 	CHECK_FAILED(hr);
 
+	//충돌 판정 시 어떻게 움직이는가?
+	m_eCollideMove = RoadGroupDesc.eMoveCommand;
+	if (false == ISDEFAULTFLOAT(RoadGroupDesc.fDestZAngle))
+	{
+		m_fDestZAngle = RoadGroupDesc.fDestZAngle;
+	}
+
+
 	switch (RoadGroupDesc.eRoadType)
 	{
 	case RTYPE_BUILDINGA:
@@ -371,7 +379,7 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 
 		m_vStartDir = (_float3)m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 		m_vDestDir = RoadGroupDesc.vDestDir;
-		m_fDestZAngle = CUtils::Make_RandomFloat(-15.f, 15.f);
+		//m_fDestZAngle = CUtils::Make_RandomFloat(-15.f, 15.f);
 
 	}
 	break;
@@ -388,7 +396,7 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 		m_bStartCollideEvent = true;
 		m_fCollideTime = 1.5f;
 		m_fMaxDuration = m_fCollideTime;
-		m_fDestZAngle = CUtils::Make_RandomFloat(-15.f, 15.f);
+		//m_fDestZAngle = CUtils::Make_RandomFloat(-15.f, 15.f);
 
 	}
 	break;
@@ -396,8 +404,6 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 		break;
 	}
 
-	//충돌 판정 시 어떻게 움직이는가?
-	m_eCollideMove = RoadGroupDesc.eMoveCommand;
 
 	return S_OK;
 }

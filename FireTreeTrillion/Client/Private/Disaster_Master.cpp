@@ -136,13 +136,13 @@ void CDisaster_Master::Make_OnTerrainBaum(_float4 _vTargetPos, _bool _bBaum)
 		return;
 }
 
-void CDisaster_Master::Make_FinaleRoad(ROADTYPE eType, MOVECMD eMoveType, _float3 vTargetPos, _float3 vLookDir, _float3 vDestPos, _float3 vDestDir)
+void CDisaster_Master::Make_FinaleRoad(ROADTYPE eType, MOVECMD eMoveType, _float3 vTargetPos, _float3 vLookDir, _float3 vDestPos, _float3 vDestDir, _float fDestZAngle)
 {
 	CFinaleRoadGrouper::ROADGROUPER_DESC roadGrouperDesc = {};
 
 	roadGrouperDesc.eRoadType = eType;
 	roadGrouperDesc.eMoveCommand = eMoveType;
-
+	roadGrouperDesc.fDestZAngle = fDestZAngle;
 	_float4x4 InitMat = _float4x4::Identity;
 	InitMat.Translation(vTargetPos);
 	CUtils::Rotation(InitMat, CUtils::Make_Quat_FromDir(vLookDir));

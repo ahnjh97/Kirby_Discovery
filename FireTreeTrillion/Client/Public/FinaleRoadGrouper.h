@@ -3,7 +3,6 @@
 #include "GameObject.h"
 
 BEGIN(Client)
-//BEGIN(Finale)
 
 enum ROADTYPE
 {
@@ -36,6 +35,8 @@ public:
 
 		_float3		vDestPos = { -1.f, -1.f, -1.f };
 		_float3		vDestDir = { -1.f, -1.f, -1.f };
+
+		_float		fDestZAngle = { -1.f };
 	};
 
 private:
