@@ -41,7 +41,7 @@ HRESULT CPopStar::Initialize(void* pArg)
 	m_pTransformCom->Turn(_float4(0.f, 1.f, 0.f, 0.f), 1.f, 90.f);
 	m_pTransformCom->Turn(_float4(0.f, 0.f, 1.f, 0.f), 1.f, 50.f);
 
-	m_pTransformCom->Set_Scaled(10.f, 10.f, 10.f);
+	m_pTransformCom->Set_Scaled(8.f, 8.f, 8.f);
 
 	//StarRiver
 	CEffect::FX_DESC FXDesc{};

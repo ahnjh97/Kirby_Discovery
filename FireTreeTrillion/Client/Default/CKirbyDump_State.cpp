@@ -418,10 +418,10 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 	if (pKirby->Get_State() == CFinaleKirby::DUMPSTATE_JUMP)
 	{
+		m_fFallTime += fTimeDelta;
+
 		DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
 		pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
-
-		m_fFallTime += fTimeDelta;
 
 		if (pController->Is_Terrain())
 		{

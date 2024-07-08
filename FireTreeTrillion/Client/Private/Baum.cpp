@@ -149,10 +149,10 @@ _int CBaum::Tick(_float fTimeDelta)
 
 
 	// 구현부
-	if ((m_pControllerCom->Is_Terrain() == true || m_pControllerCom->RayCastToDynamicActor(_float4(0.f, -1.f, 0.f, 0.f)) < 5.f) && m_bOnTerrain == false)
+	if ((m_pControllerCom->Is_Terrain() == true || m_pControllerCom->RayCastToDynamicActor(_float4(0.f, -1.f, 0.f, 0.f)) < 3.5f) && m_bOnTerrain == false)
 	{
 		CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
-		pCamera->Make_Shake();
+		pCamera->Make_Shake(2.5f);
 		Delete_AllEffect();
 
 		// 파티클을 만든다.
