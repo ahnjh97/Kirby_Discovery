@@ -99,11 +99,8 @@ _int CFinaleKirby::Tick(_float fTimeDelta)
 
     //카메라에 전달해줄 z 앵글을 구하고, 세팅한다.
     _float3 vUp = m_pTransformCom->Get_State(CTransform::STATE_UP);
-    _float3 vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-    _float3 vRight = vUp.Cross(vLook);
-    vRight.Normalize();
 
-    _float fZRotAngle = ToDegree(atan2(vRight.y, vRight.x)) * .1f;
+    _float fZRotAngle = ToDegree(atan2(vUp.x, vUp.y)) /** .2f*/;
     static_cast<CCamera_Main*>(m_pCamera)->Set_ZAngle(fZRotAngle, .1f);
 
     Kirby_SystemTick(m_fTimeDelta);

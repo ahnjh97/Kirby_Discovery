@@ -35,7 +35,7 @@ HRESULT CSkySphere::Initialize(void* pArg)
 	hr = Add_Components();
 	CHECK_FAILED(hr);
 
-	if (LEVEL_FINALBOSS <= m_eCurLevel)
+	if (LEVEL_FINALBOSS == m_eCurLevel)
 		m_pTransformCom->Set_Scaled(_float3{ 0.1f, 0.1f, 0.1f });
 	
 	else
@@ -52,6 +52,7 @@ _int CSkySphere::Tick(_float fTimeDelta)
 void CSkySphere::Late_Tick(_float fTimeDelta)
 {
 	_float4 vCamPos = m_pGameInstance->Get_CamPosition();
+	vCamPos.y -= 100.f;
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vCamPos);
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this);

@@ -136,9 +136,25 @@ void CDisaster_Master::Make_OnTerrainBaum(_float4 _vTargetPos, _bool _bBaum)
 		return;
 }
 
-void CDisaster_Master::Make_FinaleRoad(_float4 vTargetPos)
+void CDisaster_Master::Make_FinaleRoad(ROADTYPE eType, MOVECMD eMoveType, _float3 vTargetPos, _float3 vLookDir, _float3 vDestPos, _float3 vDestDir)
 {
+	CFinaleRoadGrouper::ROADGROUPER_DESC roadGrouperDesc = {};
 
+	roadGrouperDesc.eRoadType = eType;
+	roadGrouperDesc.eMoveCommand = eMoveType;
+
+	_float4x4 InitMat = _float4x4::Identity;
+	InitMat.Translation(vTargetPos);
+	CUtils::Rotation(InitMat, CUtils::Make_Quat_FromDir(vLookDir));
+	roadGrouperDesc.matWorld = InitMat;
+
+	roadGrouperDesc.vDestPos = vDestPos;
+	roadGrouperDesc.vDestDir = vDestDir;
+
+
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_FinaleRoadGrouper"),
+		TEXT("Prototype_GameObject_FinaleRoadGrouper"), &roadGrouperDesc)))
+		return;
 }
 
 void CDisaster_Master::Make_AirParticle()
@@ -168,14 +184,28 @@ void CDisaster_Master::Make_AirParticle()
 
 void CDisaster_Master::Moving_FinaleRoad(_float fKirbyX)
 {
-	if (m_bRoadTrigger[0] == true && fKirbyX > 100.f)
+
+	_float fKirbySpeed = m_pKirby->Get_KirbyInfo()->m_fMoveSpeed;
+
+	if (m_bRoadTrigger[0] == true && fKirbyX + (fKirbySpeed * 4.f) > 1083.f)
 	{
+		_float3 vStartPos = { 1083.f, -190.f,-158.f };
+		_float3 vDestPos = { 1083.f, -190.f,-158.f };
+
+		Make_FinaleRoad(RTYPE_BUILDINGA, MOVECMD_FLY,
+			vStartPos,	{ .98f, .22f, -.03f },
+			vDestPos ,	{ .9f, .22f, -.03f });
 
 		m_bRoadTrigger[0] = false;
 	}
-	else if (m_bRoadTrigger[1] == true && fKirbyX > 200.f)
+	else if (m_bRoadTrigger[1] == true && fKirbyX + (fKirbySpeed * 4.f) > 1234.6f)
 	{
+		_float3 vStartPos = { 1234.6f,-170.001f,-141.846f };
+		_float3 vDestPos = { 1234.6f,-170.001f,-141.846f };
 
+		Make_FinaleRoad(RTYPE_BUILDINGA, MOVECMD_FLY,
+			vStartPos, { .88f, .41f, .25f },
+			vDestPos, { .98f, -.16f, -.15f });
 
 		m_bRoadTrigger[1] = false;
 	}
@@ -192,7 +222,8 @@ void CDisaster_Master::Moving_TargetBaum(_float fKirbyX)
 		m_bBaumTrigger[0] = false;
 	}
 
-	else if (m_bBaumTrigger[1] == true && fKirbyX + (fKirbySpeed * 4.f) > 471.f)
+	//맨 처음 도로
+	else if (m_bBaumTrigger[1] == true && fKirbyX + (fKirbySpeed * 3.f) > 471.f)
 	{
 		Make_OnTerrainBaum(_float4(471.f, 8.15f, -69.7f, 1.f), true);
 		m_bBaumTrigger[1] = false;

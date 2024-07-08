@@ -605,6 +605,15 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			pMaker->Make_Partical(50, vPos, 3.f, 0.1f, 0.05f, _float4(0.f, 1.f, 0.f, 0.f), 120.f, CUtils::Make_RandomFloat(30.f, 70.f));
 
 			m_bShakeTrigger = false;
+
+			//랜딩 스모크
+			_float3 vMyPos = (_float3)pTransformCom->Get_State(CTransform::STATE_POSITION);
+
+			CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+			MultiFXDesc.vInitPos = vMyPos;
+			MultiFXDesc.vInitScale = { 4.f, 4.f, 4.f };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_DDD land smoke"), &MultiFXDesc)))
+				return;
 		}
 
 		if (m_fRunTime > 1.7f && m_fRunTime < 1.8f)
