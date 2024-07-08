@@ -97,7 +97,7 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 		CFinaleRoad::ROAD_DESC roadDesc{};
 		roadDesc.wstrModelName = TEXT("MovableBuildingA");
 		roadDesc.pSocketMat = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-		roadDesc.eCollideType = CFinaleRoad::CTYPE_NONE;
+		roadDesc.eCollideType = CFinaleRoad::CTYPE_STOP;
 
 
 		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
@@ -114,7 +114,7 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 		CFinaleRoad::ROAD_DESC roadDesc{};
 		roadDesc.wstrModelName = TEXT("MovableBuildingB");
 		roadDesc.pSocketMat = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-		roadDesc.eCollideType = CFinaleRoad::CTYPE_NONE;
+		roadDesc.eCollideType = CFinaleRoad::CTYPE_STOP;
 
 
 		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
@@ -130,7 +130,7 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 		CFinaleRoad::ROAD_DESC roadDesc{};
 		roadDesc.wstrModelName = TEXT("MovableBuildingC");
 		roadDesc.pSocketMat = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-		roadDesc.eCollideType = CFinaleRoad::CTYPE_NONE;
+		roadDesc.eCollideType = CFinaleRoad::CTYPE_STOP;
 
 
 		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
@@ -146,7 +146,7 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 		CFinaleRoad::ROAD_DESC roadDesc{};
 		roadDesc.wstrModelName = TEXT("MovableBuildingD");
 		roadDesc.pSocketMat = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-		roadDesc.eCollideType = CFinaleRoad::CTYPE_NONE;
+		roadDesc.eCollideType = CFinaleRoad::CTYPE_STOP;
 
 
 		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
@@ -166,7 +166,7 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 		InitMat.Translation({ 0.f, 0.f, -150.f });
 		roadDesc.matWorld = InitMat;
 		roadDesc.pSocketMat = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-		roadDesc.eCollideType = CFinaleRoad::CTYPE_NONE;
+		roadDesc.eCollideType = CFinaleRoad::CTYPE_STOP;
 		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
 			return E_FAIL;
 
@@ -477,7 +477,6 @@ _int CFinaleRoadGrouper::Tick(_float fTimeDelta)
 			if (abs(m_fCurZAngle - m_fDestZAngle) < .05f)
 				m_fCurZAngle = m_fDestZAngle;
 		}
-
 	}
 	else
 	{

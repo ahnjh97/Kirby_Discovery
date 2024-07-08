@@ -274,9 +274,9 @@ void CDisaster_Master::Moving_TargetBaum(_float fKirbyX)
 		m_bBaumTrigger[1] = false;
 	}
 
-	else if (m_bBaumTrigger[2] == true && fKirbyX + (fKirbySpeed * 5.f) > 585.25f)
+	else if (m_bBaumTrigger[2] == true && fKirbyX + (fKirbySpeed * 5.f) > 588.25f)
 	{
-		Make_OnTerrainBaum(_float4(585.25f, -.9f, -84.f, 1.f), false);
+		Make_OnTerrainBaum(_float4(588.25f, -18.7f, -102.f, 1.f), false);
 		m_bBaumTrigger[2] = false;
 	}
 

@@ -536,7 +536,7 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	else if (pKirby->Get_State() == CFinaleKirby::STATE_INHALESTART)
 	{
 		Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
-		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
+		//pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
 
 		if (pKirby->isAnimFinish())
 		{
@@ -546,7 +546,7 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	else if (pKirby->Get_State() == CFinaleKirby::STATE_INHALE)
 	{
 		DESC(m_eEyeState) = CFinaleKirby::EYE_CLOSE;
-		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
+		//pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
 
 
 		if (pKirby->isAnimFinish())

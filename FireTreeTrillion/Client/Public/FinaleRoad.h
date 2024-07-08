@@ -19,6 +19,7 @@ public:
 		CTYPE_NONE,
 		CTYPE_DOWN,
 		CTYPE_BREAK,
+		CTYPE_STOP,
 		CTYPE_END
 	};
 
@@ -41,6 +42,7 @@ public:
 
 	void			Start_CollisionEvent();
 	void			Make_CollisionEvent(/*CFinaleRoadGrouper::MOVECMD eMove*/);
+	_bool			Is_Breakable() { return m_eCollideType != CTYPE_NONE; }
 
 	virtual HRESULT Initialize_Prototype()						override;
 	virtual HRESULT Initialize(void* pArg)						override;
@@ -64,7 +66,7 @@ private:
 	_bool			m_bIsAnimModel = { false };
 
 	COLLIDETYPE		m_eCollideType = { CTYPE_END };
-	_bool			m_bCollided = { false };
+	_bool			m_bCollided = { true };
 
 
 	_float2			m_vPreScreenPos = { 0.f, 0.f };

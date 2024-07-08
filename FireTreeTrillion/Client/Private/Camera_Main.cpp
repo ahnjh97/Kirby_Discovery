@@ -171,7 +171,7 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 	m_CamTriggerUpOffsets.reserve(LEVEL_END);
 	m_CamTriggerUpOffsets.resize(LEVEL_END);
 	m_CamTriggerUpOffsets[LEVEL_INTRO] = { 0.f, 0.f, 0.f, .15f, .15f, 0.f, 0.f, 0.f };
-	m_CamTriggerUpOffsets[LEVEL_FINALE] = { .3f, 0.f, .3f };
+	m_CamTriggerUpOffsets[LEVEL_FINALE] = { .4f, 0.f, .4f };
 
 
 	//별 이펙트 테스트용
@@ -1163,9 +1163,9 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction.eCamCut = CUT_HARD;
 		newAction.fFOVY = 55.f;
 		newAction.eCamPos = POS_ABSOLUTE;
-		newAction.vPos = _float3{ -9.69f, 9.11f, .12f };
-		newAction.eCamDir = DIR_ABSOLUTE;
-		newAction.vDir = _float3{ .89f, -.45f, 0.f };
+		newAction.vPos = _float3{ -12.69f, 10.11f, .12f };
+		//newAction.eCamDir = DIR_ABSOLUTE;
+		//newAction.vDir = _float3{ .89f, -.45f, 0.f };
 
 		m_CamSeq.push_back(newAction);
 
