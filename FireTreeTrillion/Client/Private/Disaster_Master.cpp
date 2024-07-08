@@ -168,16 +168,15 @@ void CDisaster_Master::Make_AirParticle()
 		_float fZOffSet = { 0.f };
 		fZOffSet = CUtils::Make_RandomInt(0, 1) == 0 ? CUtils::Make_RandomFloat(-200.f, -50.f) : CUtils::Make_RandomFloat(50.f, 200.f);
 		_float fXOffSet = { 0.f };
-		fXOffSet = vKirbyPos.x > 15.f ? CUtils::Make_RandomFloat(0.f, 200.f) : CUtils::Make_RandomFloat(-100.f, 100.f);
+		fXOffSet = vKirbyPos.x > 15.f ? CUtils::Make_RandomFloat(0.f, 400.f) : CUtils::Make_RandomFloat(-100.f, 100.f);
 		_float fYOffSet = { -50.f };
 
 		vKirbyPos.x += fXOffSet;
 		vKirbyPos.y += fYOffSet;
 		vKirbyPos.z += fZOffSet;
-		pMaker->Make_Partical(1, vKirbyPos, 0.f, 2.f, 1.f, _float4(0.f, 1.f, 0.f, 0.f), 10.f, CUtils::Make_RandomFloat(10.f, 30.f), true);
+		pMaker->Make_Partical(1, vKirbyPos, 0.f, 2.f, 1.f, _float4(0.f, 1.f, 0.f, 0.f), 10.f, CUtils::Make_RandomFloat(10.f, 20.f), true);
 		m_fAirParticleDelay = 0.f;
 	}
-
 }
 
 void CDisaster_Master::Moving_FinaleRoad(_float fKirbyX)
