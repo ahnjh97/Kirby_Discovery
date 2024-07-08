@@ -236,7 +236,8 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		Turn_InterPolate_OtherVector(Kirbydesc->m_vHandleDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 2.f);
 	}
 
-	
+	return;
+
 	Kirbydesc->m_fMoveSpeed += fTimeDelta * 10.f;
 
 	if (DESC(m_bBooster) == true)
@@ -546,7 +547,6 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		Kirbydesc->m_fMoveSpeed = 0.f;
 		m_fRunTime += fTimeDelta;
 		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
-
 		if (m_fRunTime > 1.7f)
 		{
 			DESC(m_eEyeState) = CFinaleKirby::EYE_IDLE;
