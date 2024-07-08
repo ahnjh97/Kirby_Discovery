@@ -136,6 +136,7 @@
 //기믹
 #include "Gm_LabAntenna.h"
 #include "Gm_LabBossRoomDoor.h"
+#include "Gm_ParkFhEntranceAlien.h"
 
 //UI
 #include "BackGround.h"
@@ -443,6 +444,13 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_LabBossRoomDoor"), CGm_LabBossRoomDoor);
 
 	#pragma endregion
+
+	#pragma region GIMMICK::LEVEL_PARK
+
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_ParkFhEntranceAlien"), CGm_ParkFhEntranceAlien);
+
+	#pragma endregion
+
 
 	// 미니게임 in 와들디마을
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PartTimeFood"), CPartTimeFood);
@@ -1817,6 +1825,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		//기믹 오브젝트
 		m_vecModelInfo.emplace_back("FhEntranceAlien_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("FhEntranceAlien_NonAnim", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+
 		m_vecModelInfo.emplace_back("WarpStar_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("SolarPanelOnce_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("SolarPanelCharge_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));

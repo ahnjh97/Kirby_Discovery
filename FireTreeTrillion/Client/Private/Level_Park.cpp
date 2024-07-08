@@ -634,15 +634,9 @@ HRESULT CLevel_Park::Ready_Objects()
 
 #pragma region GIMMICK_OBJECT
 
-		if ("LbAntenna_NonAnim" == strModelName)
+		if ("FhEntranceAlien_NonAnim" == strModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_LabAntenna"), &tDesc)))
-				continue;
-		}
-
-		if ("LbBossRoomDoor_NonAnim" == strModelName)
-		{
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_LabBossRoomDoor"), &tDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_ParkFhEntranceAlien"), &tDesc)))
 				continue;
 		}
 
