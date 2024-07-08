@@ -383,8 +383,8 @@ HRESULT CLevel_Finale::Ready_FinaleRoad()
 		return E_FAIL;
 
 	roadGrouperDesc = {};
-	roadGrouperDesc.eRoadType = CFinaleRoadGrouper::RTYPE_BUILDINGA;
-	roadGrouperDesc.eMoveCommand = CFinaleRoadGrouper::MOVECMD_STOP;
+	roadGrouperDesc.eRoadType = RTYPE_BUILDINGA;
+	roadGrouperDesc.eMoveCommand = MOVECMD_STOP;
 
 	InitMat = _float4x4::Identity;
 

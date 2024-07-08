@@ -1094,7 +1094,7 @@ HRESULT CLoader::Loading_For_Finale()
 	hr = Add_Texture(eLevel, "SkySphere_LabBoss_2Pase_Normal", "SkySphere/SkySphere_LabBoss_2Pase_Normal.dds");	CHECK_FAILED(hr);
 	hr = Add_Texture(eLevel, "SkySphere_LabBoss_2Pase_Emissive", "SkySphere/SkySphere_LabBoss_2Pase_Emissive.dds");	CHECK_FAILED(hr);
 	hr = Add_Texture(eLevel, "SkySphere_LabBoss_2Pase_Height", "SkySphere/SkySphere_LabBoss_2Pase_Height.dds");	CHECK_FAILED(hr);
-	hr = Add_Texture(eLevel, "SkySphere_Space", "SkySphere/Space.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "SkySphere_Space", "SkySphere/SkySphere_Space2.dds");	CHECK_FAILED(hr);
 
 #pragma endregion
 
