@@ -239,7 +239,7 @@ void CSurprisedBoard::SetUp_FSM()
 	//m_pFSM->Add_State(AWOOFY_LOOKAROUND, CAwoofy_Idle_State::Create());
 	//m_pFSM->Add_State(AWOOFY_SLEEP, CAwoofy_Idle_State::Create());
 
-	//m_pFSM->Add_State(AWOOFY_RUN, CAwoofy_Run_State::Create());
+	//m_pFSM->Add_State(AWOOFY_RUN, CAwoofy_Run_State::Create()); 
 	//m_pFSM->Add_State(AWOOFY_FIND, CAwoofy_Find_State::Create());
 	//m_pFSM->Add_State(AWOOFY_BRAKE, CAwoofy_Brake_State::Create());
 	//m_pFSM->Add_State(AWOOFY_LOOKAROUNDAFTERBRAKE, CAwoofy_LookAroundAfterBrake_State::Create());
