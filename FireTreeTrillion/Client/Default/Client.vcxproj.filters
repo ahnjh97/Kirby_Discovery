@@ -532,6 +532,9 @@
     <Filter Include="02.GameObjects\Map\FinalePartical\FinalePartical">
       <UniqueIdentifier>{11823e14-4791-4db8-a6fb-b739d71d6102}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\FinalePartical\FinaleBuildingPartical">
+      <UniqueIdentifier>{285a0ad8-d35f-4aa3-be67-69ad46f14b72}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -1072,6 +1075,9 @@
     <ClInclude Include="..\Public\FinalePartical.h">
       <Filter>02.GameObjects\Map\FinalePartical\FinalePartical</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\FinaleBuildingPartical.h">
+      <Filter>02.GameObjects\Map\FinalePartical\FinaleBuildingPartical</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1592,6 +1598,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\FinalePartical.cpp">
       <Filter>02.GameObjects\Map\FinalePartical\FinalePartical</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FinaleBuildingPartical.cpp">
+      <Filter>02.GameObjects\Map\FinalePartical\FinaleBuildingPartical</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

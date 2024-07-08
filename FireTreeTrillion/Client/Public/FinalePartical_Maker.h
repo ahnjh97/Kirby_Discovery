@@ -3,6 +3,7 @@
 #include "Client_Defines.h"
 #include "GameObject.h"
 #include "FinalePartical.h"
+#include "FinaleBuildingPartical.h"
 
 BEGIN(Engine)
 END
@@ -29,11 +30,16 @@ public:
 		_float4 vDir, _float fRandomAngle, _float fPower,
 		_bool bNoGravity = false);
 
+	void Make_BuildingPartical(_float4 vPos);
 
 private:
 	vector<CFinalePartical*> m_FinaleParticals;
-	_int					m_iCount = { 0 };
+	vector<CFinaleBuildingPartical*> m_FinaleBuildingParticals;
 
+	_int					m_iCount = { 0 };
+	_int					m_iBuildingCount = { 0 };
+
+	_float					m_fTimeDelta = { 0.f };
 
 public:
 	static CFinalePartical_Maker* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

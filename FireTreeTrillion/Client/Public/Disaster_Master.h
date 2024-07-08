@@ -36,10 +36,12 @@ private:
 	_bool			m_bBaumTrigger[10] = { true, true, true, true, true, true, true, true, true, true };
 
 	class CFinaleKirby*	m_pKirby = { nullptr };
+	class CFinalePartical_Maker* m_pMaker = { nullptr };
 	_float				m_fMakeBaumDelay = { 0.f };
 	class CLight*		m_pLight = { nullptr };
 
 	_float				m_fAirParticleDelay = { 0.f };
+	_float				m_fBuildingParticleDelay = { 0.f };
 
 
 public:

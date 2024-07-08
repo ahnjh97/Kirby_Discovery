@@ -162,7 +162,6 @@ HRESULT CFinalePartical::Add_Components()
         TEXT("Com_Texture"), (CComponent**)&m_pTextureCom);
     CHECK_FAILED(hr);
 
-    // 텍스쳐 준비할 것.
     return S_OK;
 }
 

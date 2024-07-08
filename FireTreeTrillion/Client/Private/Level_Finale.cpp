@@ -30,9 +30,13 @@ HRESULT CLevel_Finale::Initialize()
 	m_pGameInstance->Set_RenderMode(CRenderer::MODE_GAMEPLAY);
 	m_pGameInstance->Setting_LensFlare(false);
 
+
 	HRESULT hr;
 	hr = __super::Initialize();
 	CHECK_FAILED(hr);
+
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinalePartical_Maker"), TEXT("Prototype_GameObject_FinalePartical_Maker"))))
+		return E_FAIL;
 
 	hr = Ready_Lights();
 	CHECK_FAILED(hr);
@@ -88,10 +92,6 @@ HRESULT CLevel_Finale::Initialize()
 	// PopStar Test
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_BreakableBlock"), TEXT("Prototype_GameObject_BreakableBlock"), &ObjDesc)))
 		return E_FAIL;
-
-	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinalePartical_Maker"), TEXT("Prototype_GameObject_FinalePartical_Maker"))))
-		return E_FAIL;
-
 
 	m_pGameInstance->Setting_GodRay(_float4(5500.f, 850.f, 0.f, 1.f), 0.05f, 0.96815f, 0.9f, 0.9f, 0.9f);
 
