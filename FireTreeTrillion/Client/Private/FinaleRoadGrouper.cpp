@@ -24,7 +24,7 @@ _bool CFinaleRoadGrouper::Make_CollideReaction(CFinaleRoad* pRoad)
 
 	for (auto& road : m_pRoads)
 	{
-		if (_float4::Distance(road->Get_WorldPos(), pRoad->Get_WorldPos()) < 5.f)
+		if (_float4::Distance(road->Get_WorldPos(), pRoad->Get_WorldPos()) < 10.f)
 		{
 			bIsMyCollision = true;
 			break;
@@ -44,6 +44,9 @@ _bool CFinaleRoadGrouper::Make_CollideReaction(CFinaleRoad* pRoad)
 		m_bStartCollideEvent = true;
 		m_fCollideTime = 1.f;
 		m_fMaxDuration = m_fCollideTime;
+
+	//m_fDestZAngle = CUtils::Make_RandomFloat(-15.f, 15.f);
+
 		break;
 	default:
 		break;
@@ -55,7 +58,6 @@ _bool CFinaleRoadGrouper::Make_CollideReaction(CFinaleRoad* pRoad)
 	}
 
 	//m_fDestZAngle = CUtils::Make_RandomInt(0, 1) ? 10.f : -10.f;
-	m_fDestZAngle = CUtils::Make_RandomFloat(-15.f, 15.f);
 
 	return true;
 }
@@ -369,6 +371,7 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 
 		m_vStartDir = (_float3)m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 		m_vDestDir = RoadGroupDesc.vDestDir;
+		m_fDestZAngle = CUtils::Make_RandomFloat(-15.f, 15.f);
 
 	}
 	break;
@@ -385,6 +388,8 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 		m_bStartCollideEvent = true;
 		m_fCollideTime = 1.5f;
 		m_fMaxDuration = m_fCollideTime;
+		m_fDestZAngle = CUtils::Make_RandomFloat(-15.f, 15.f);
+
 	}
 	break;
 	default:
@@ -459,8 +464,13 @@ _int CFinaleRoadGrouper::Tick(_float fTimeDelta)
 		m_pTransformCom->Turn_Absolute(vResultQuat);
 
 		//z ¾Þ±Û º¸°£
-		if (.001f < abs(m_fCurZAngle - m_fDestZAngle))
+		if (.05f < abs(m_fCurZAngle - m_fDestZAngle))
+		{
 			m_fCurZAngle = LERP(m_fStartZAngle, m_fDestZAngle, fTime);
+
+			if (abs(m_fCurZAngle - m_fDestZAngle) < .05f)
+				m_fCurZAngle = m_fDestZAngle;
+		}
 
 
 
