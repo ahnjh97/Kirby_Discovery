@@ -30,7 +30,7 @@ HRESULT CBaumPiece::Initialize(void* pArg)
 		Add_Components(pGameObjectDesc->wstrModelName);
 
 	m_bMotionBlur = true;
-	m_bRimLight = false;
+	m_bRimLight = true;
 	m_bStencil = true;
 
 	m_vFlyDir = pGameObjectDesc->vParticalMoveDir;
@@ -75,11 +75,6 @@ void CBaumPiece::Late_Tick(_float fTimeDelta)
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
-
-		if (m_bBloom == true)
-		{
-			m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
-		}
 	}
 }
 
@@ -145,7 +140,7 @@ HRESULT CBaumPiece::Add_Components(const wstring& wstrModelName)
 	CHECK_FAILED(hr);
 
 	if (wstrModelName == TEXT("BaumPieceE") || wstrModelName == TEXT("BaumPieceF"))
-		m_bBloom = true;
+		m_fRimWidth = 5.f;
 
 	return S_OK;
 }

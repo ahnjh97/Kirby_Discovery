@@ -125,7 +125,7 @@ void CDisaster_Master::Make_OnTerrainBaum(_float4 _vTargetPos, _bool _bBaum)
 {
 	_float4 vTargetPos = _vTargetPos;
 	_float fKirbySpeed = m_pKirby->Get_KirbyInfo()->m_fMoveSpeed;
-	_float4 vNewMyPos = _float4(vTargetPos.x + 100.f, vTargetPos.y + 60.f, vTargetPos.z, 1.f);
+	_float4 vNewMyPos = _float4(vTargetPos.x + 100.f, vTargetPos.y + 70.f, vTargetPos.z, 1.f);
 
 	CBaum::BAUMDESC baumdesc = {};
 	baumdesc.vBaumMoveDir = vTargetPos - vNewMyPos;
@@ -255,7 +255,7 @@ void CDisaster_Master::Moving_TargetBaum(_float fKirbyX)
 		m_bBaumTrigger[2] = false;
 	}
 
-	else if (m_bBaumTrigger[3] == true && fKirbyX + (fKirbySpeed * 2.5f) > 689.f)
+	else if (m_bBaumTrigger[3] == true && fKirbyX + (fKirbySpeed * 4.f) > 689.f)
 	{
 		Make_OnTerrainBaum(_float4(689.f, -25.9f, -93.f, 1.f), false);
 		m_bBaumTrigger[3] = false;
