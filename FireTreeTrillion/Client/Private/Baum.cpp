@@ -447,5 +447,9 @@ void CBaum::Free()
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pMyRoad);
+
+	if (m_pLight != nullptr)
+		m_pLight->Set_DeadLight(true);
+
 	Safe_Release(m_pLight);
 }

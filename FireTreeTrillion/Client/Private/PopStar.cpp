@@ -34,8 +34,8 @@ HRESULT CPopStar::Initialize(void* pArg)
 	m_pModelCom->Set_Animation(1, 10.f, false, false);
 
 	m_bMotionBlur = false;
-	m_bRimLight = false;
-	//m_fRimWidth = 0.1f;
+	m_bRimLight = true;
+	m_fRimWidth = 5.f;
 	m_bStencil = true;
 
 	m_pTransformCom->Turn(_float4(0.f, 1.f, 0.f, 0.f), 1.f, 90.f);
@@ -48,11 +48,11 @@ HRESULT CPopStar::Initialize(void* pArg)
 
 	FXDesc.vInitPos = _float3{15.f, -30.f, 0.f};
 	FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-	FXDesc.vInitScale = { 1.3f, 1.3f, 1.3f };
+	FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
 	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_StarRiver"), &FXDesc)))
 		return E_FAIL;
 
-	FXDesc.vInitScale = { 6.f, 6.f, 6.f };
+	FXDesc.vInitScale = { 6.5f, 6.5f, 6.5f };
 	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_star dash test 3"), &FXDesc)))
 		return E_FAIL;
 
@@ -74,7 +74,7 @@ void CPopStar::Late_Tick(_float fTimeDelta)
 {
 	m_pModelCom->Play_Animation(fTimeDelta);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
-	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
+	//m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
 
 }
 

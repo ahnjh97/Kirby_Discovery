@@ -1041,9 +1041,6 @@ HRESULT CRenderer::Render_Lights()
 	if (FAILED(m_pShader->Bind_RawValue("g_bLensFlare", &m_bLensFlare, sizeof(_bool))))
 		return E_FAIL;
 
-	_float fFar = 1000.f;
-	if (FAILED(m_pShader->Bind_RawValue("g_fFar", &fFar, sizeof(_float))))
-		return E_FAIL;
 
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Normal"), "g_NormalTexture")))
 		return E_FAIL;

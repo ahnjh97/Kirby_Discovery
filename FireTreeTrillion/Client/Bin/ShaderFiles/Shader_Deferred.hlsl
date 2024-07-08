@@ -1061,7 +1061,24 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
     float4 vNormal = float4(vNormalDesc.xyz * 2.f - 1.f, 0.f);
     
     if (vRimLightDesc.g > 0.01f && vRimLightDesc.b == 1.f)
-        Out.vColor += (1.f - (clamp(pow(dot(normalize(vLook), normalize(vNormal)), vRimLightDesc.g), 0.f, 1.f))) * g_fRimLightRatio;
+    {
+        
+        float vDot = dot(normalize(vLook), normalize(vNormal));
+        
+        vDot = pow(vDot, vRimLightDesc.g);
+        
+        vector vRimLightColor = 1.f - saturate(vDot);
+        
+        
+        //림 라이트 전역 배율
+        vRimLightColor *= g_fRimLightRatio;
+        
+        Out.vColor += vRimLightColor * float4(1, 0.5, 0, 1);
+        Out.vColor = saturate(Out.vColor);
+
+    }
+    
+    
     /////////
     
         

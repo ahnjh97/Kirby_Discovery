@@ -299,7 +299,7 @@ HRESULT CLevel_Finale::Ready_FinaleRoad()
 	roadGrouperDesc.eMoveCommand = CFinaleRoadGrouper::MOVECMD_STOP;
 
 	InitMat = _float4x4::Identity;
-	InitMat.Translation({ 829.5f, -157.023f, -138.310f });
+	InitMat.Translation({ 737.14f, -157.96f, -127.11f });
 	CUtils::Rotation(InitMat, CUtils::Make_Quat_FromDir({ .99f, .01f, -.12f }));
 	roadGrouperDesc.matWorld = InitMat;
 
@@ -316,7 +316,7 @@ HRESULT CLevel_Finale::Ready_FinaleRoad()
 	roadGrouperDesc.eMoveCommand = CFinaleRoadGrouper::MOVECMD_STOP;
 
 	InitMat = _float4x4::Identity;
-	InitMat.Translation({ 1037.942f, -154.713f,-163.430f });
+	InitMat.Translation({ 945.440f, -155.647f,-152.218f });
 	CUtils::Rotation(InitMat, CUtils::Make_Quat_FromDir({ .99f, .01f, -.12f }));
 	roadGrouperDesc.matWorld = InitMat;
 
@@ -336,12 +336,12 @@ HRESULT CLevel_Finale::Ready_FinaleRoad()
 	roadGrouperDesc.eMoveCommand = CFinaleRoadGrouper::MOVECMD_STOP;
 
 	InitMat = _float4x4::Identity;
-	InitMat.Translation({ 1193.f, -190.f,-158.f });
+	InitMat.Translation({ 1083.f, -190.f,-158.f });
 	CUtils::Rotation(InitMat, CUtils::Make_Quat_FromDir({ .98f, .22f, -.03f }));
 	roadGrouperDesc.matWorld = InitMat;
 
-	roadGrouperDesc.vDestPos = { 1137.f, -184.f,-163.f };
-	roadGrouperDesc.vDestDir = { .98f, -.16f, -.15f };
+	roadGrouperDesc.vDestPos = { 1100.311f,-196.760f,-164.158f };
+	roadGrouperDesc.vDestDir = { .9f, .22f, -.03f };
 
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleRoadGrouper"),
 		TEXT("Prototype_GameObject_FinaleRoadGrouper"), &roadGrouperDesc)))
@@ -353,8 +353,8 @@ HRESULT CLevel_Finale::Ready_FinaleRoad()
 	roadGrouperDesc.eMoveCommand = CFinaleRoadGrouper::MOVECMD_STOP;
 
 	InitMat = _float4x4::Identity;
-	InitMat.Translation({ 1326.f, -174.f,-164.f });
-	CUtils::Rotation(InitMat, CUtils::Make_Quat_FromDir({ .9f, .33f, .28f }));
+	InitMat.Translation({ 1238.627f,-167.001f,-137.846f });
+	CUtils::Rotation(InitMat, CUtils::Make_Quat_FromDir({ .85f, .43f,.31f }));
 	roadGrouperDesc.matWorld = InitMat;
 
 	roadGrouperDesc.vDestPos = { 1237.f, -184.f,-163.f };
@@ -369,8 +369,8 @@ HRESULT CLevel_Finale::Ready_FinaleRoad()
 	roadGrouperDesc.eMoveCommand = CFinaleRoadGrouper::MOVECMD_STOP;
 
 	InitMat = _float4x4::Identity;
-	InitMat.Translation({ 1526.f, -174.f,-164.f });
-	CUtils::Rotation(InitMat, CUtils::Make_Quat_FromDir({ .9f, .33f, .28f }));
+	InitMat.Translation({ 1362.651f, -123.036f,-111.231f });
+	CUtils::Rotation(InitMat, CUtils::Make_Quat_FromDir({ .92f, .39f, .06f }));
 	roadGrouperDesc.matWorld = InitMat;
 
 	roadGrouperDesc.vDestPos = { 1237.f, -184.f,-163.f };
@@ -386,8 +386,8 @@ HRESULT CLevel_Finale::Ready_FinaleRoad()
 
 	InitMat = _float4x4::Identity;
 
-	InitMat.Translation({ 1726.f, -174.f,-164.f });
-	CUtils::Rotation(InitMat, CUtils::Make_Quat_FromDir({ .9f, .33f, .28f }));
+	InitMat.Translation({ 1488.866f, -98.833f,-140.250f });
+	CUtils::Rotation(InitMat, CUtils::Make_Quat_FromDir({ .95f, .25f, -.18f }));
 	roadGrouperDesc.matWorld = InitMat;
 
 	roadGrouperDesc.vDestPos = { 1237.f, -184.f,-163.f };
