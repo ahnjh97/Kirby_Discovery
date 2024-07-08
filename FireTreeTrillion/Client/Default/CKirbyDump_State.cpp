@@ -421,11 +421,21 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
 		pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
 
+		m_fFallTime += fTimeDelta;
+
 		if (pController->Is_Terrain())
 		{
 			pKirby->Change_State(CFinaleKirby::DUMPSTATE_LANDING, 60.f, false, false, CFinaleKirby::BODY_DUMPDEFAULT, CFinaleKirby::OFFSET_DUMP);
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
-			pCamera->Make_Shake(1.5f);
+			if (m_fFallTime < 1.5f)
+				pCamera->Make_Shake(1.5f);
+			else
+			{
+				if (m_fFallTime > 3.f)
+					pCamera->Make_Shake(3.f, 2.f);
+				else
+					pCamera->Make_Shake(m_fFallTime, 2.f);
+			}
 
 			CFinalePartical_Maker* pMaker = static_cast<CFinalePartical_Maker*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinalePartical_Maker")));
 			_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
@@ -450,6 +460,7 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 void CKirbyDump_Jump_State::OnStateExit()
 {
+	m_fFallTime = 0.f;
 }
 
 CKirbyDump_Jump_State* CKirbyDump_Jump_State::Create()

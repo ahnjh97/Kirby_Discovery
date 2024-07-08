@@ -128,7 +128,7 @@ void CBreakableBlock::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXO
 
 		CFinalePartical_Maker* pMaker = static_cast<CFinalePartical_Maker*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinalePartical_Maker")));
 		_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-		pMaker->Make_Partical(40, vPos, 4.5f, 1.f, 0.2f, _float4(2.f, 1.f, 0.f, 0.f), 180.f, CUtils::Make_RandomFloat(100.f, 150.f));
+		pMaker->Make_Partical(40, vPos, 4.5f, 1.f, 0.2f, _float4(2.f, 1.f, 0.f, 0.f), 180.f, CUtils::Make_RandomFloat(30.f, 70.f));
 
 	}
 }

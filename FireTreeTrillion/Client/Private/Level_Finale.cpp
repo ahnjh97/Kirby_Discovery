@@ -93,7 +93,7 @@ HRESULT CLevel_Finale::Initialize()
 		return E_FAIL;
 
 
-	m_pGameInstance->Setting_GodRay(_float4(5500.f, 850.f, 0.f, 1.f), 0.1f, 0.96815f, 0.9f, 0.9f, 0.9f);
+	m_pGameInstance->Setting_GodRay(_float4(5500.f, 850.f, 0.f, 1.f), 0.05f, 0.96815f, 0.9f, 0.9f, 0.9f);
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 	m_pGameInstance->Set_ColorSet_ByIndex(4);
@@ -184,11 +184,11 @@ HRESULT CLevel_Finale::Ready_Layer_Camera(const wstring& strLayerTag)
 
 HRESULT CLevel_Finale::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
-	CSkySphere::SKYSPHERE_DESC LabSkyDesc{};
-	LabSkyDesc.strModelTag = { "SkySphere_Stage1_Day" };
-	LabSkyDesc.strTextureTag = {/* "SkySphere_Lab_Diffuse"*/ "SkySphere_Space"};
-	HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_SkySphere"), &LabSkyDesc);
-	CHECK_FAILED(hr);
+	//CSkySphere::SKYSPHERE_DESC LabSkyDesc{};
+	//LabSkyDesc.strModelTag = { "SkySphere_Stage1_Day" };
+	//LabSkyDesc.strTextureTag = {/* "SkySphere_Lab_Diffuse"*/ "SkySphere_Space"};
+	//HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_SkySphere"), &LabSkyDesc);
+	//CHECK_FAILED(hr);
 
 	////SUB_SKYSPHERE
 	//CSkySphere::SKYSPHERE_DESC LabSkySubDesc{};

@@ -153,8 +153,17 @@ HRESULT CFinaleKirby::Render()
 
 
         /* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-        if (FAILED(m_pShaderCom->Begin(ANIMMODEL_KIRBY)))
-            return E_FAIL;
+
+        if (INFO(m_eBodyState) == BODY_DUMPDEFAULT || Get_State() == DUMPTSTATE_CUT)
+        {
+            if (FAILED(m_pShaderCom->Begin(/*ANIMMODEL_KIRBY*/14)))
+                return E_FAIL;
+        }
+        else
+        {
+            if (FAILED(m_pShaderCom->Begin(ANIMMODEL_KIRBY)))
+                return E_FAIL;
+        }
 
         m_pModelCom[INFO(m_eBodyState)]->Render(i);
     }
