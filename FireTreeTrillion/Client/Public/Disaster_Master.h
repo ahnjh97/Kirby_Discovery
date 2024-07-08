@@ -27,6 +27,7 @@ private:
 	void			Make_MissBaum();
 	void			Make_OnTerrainBaum(_float4 vTargetPos, _bool bBaum);
 	void			Make_FinaleRoad(_float4 vTargetPos);
+	void			Make_AirParticle();
 
 
 	void			Moving_FinaleRoad(_float fKirbyX);
@@ -37,6 +38,8 @@ private:
 	class CFinaleKirby*	m_pKirby = { nullptr };
 	_float				m_fMakeBaumDelay = { 0.f };
 	class CLight*		m_pLight = { nullptr };
+
+	_float				m_fAirParticleDelay = { 0.f };
 
 
 public:

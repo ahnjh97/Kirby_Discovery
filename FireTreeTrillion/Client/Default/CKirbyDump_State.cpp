@@ -214,7 +214,7 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		CFinalePartical_Maker* pMaker = static_cast<CFinalePartical_Maker*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinalePartical_Maker")));
 		_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
 		_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
-		pMaker->Make_Partical(3, vPos + (vLook * 3.f), 3.f, 0.1f, 0.05f, XMVector3Normalize(_float4(0.f, 1.f, 0.f, 0.f) + vLook), 120.f, CUtils::Make_RandomFloat(80.f, 120.f));
+		pMaker->Make_Partical(3, vPos + (vLook * 3.f), 3.f, 0.2f, 0.1f, XMVector3Normalize(_float4(0.f, 1.f, 0.f, 0.f) + vLook), 120.f, CUtils::Make_RandomFloat(40.f, 80.f));
 		m_fParticalDelay = 0.f;
 	}
 
@@ -231,22 +231,30 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		Kirbydesc->m_vTargetDir = _float4(1.f, 0.f, 0.4f, 0.f);
 		Kirbydesc->m_vTargetDir.Normalize();
 		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vHandleDir, pTransformCom, fTimeDelta, 3.f);
-		Turn_InterPolate_OtherVector(Kirbydesc->m_vHandleDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 2.f);
+		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 2.f);
 	}
 	else if (m_pGameInstance->Get_DIKeyState(DIK_RIGHT, KEY_PRESS) == true)
 	{
 		Kirbydesc->m_vTargetDir = _float4(1.f, 0.f, -0.4f, 0.f);
 		Kirbydesc->m_vTargetDir.Normalize();
 		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vHandleDir, pTransformCom, fTimeDelta, 3.f);
-		Turn_InterPolate_OtherVector(Kirbydesc->m_vHandleDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 2.f);
+		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 2.f);
 	}
 	else
 	{
 		Kirbydesc->m_vTargetDir = _float4(1.f, 0.f, 0.f, 0.f);
 		Kirbydesc->m_vTargetDir.Normalize();
 		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vHandleDir, pTransformCom, fTimeDelta, 3.f);
-		Turn_InterPolate_OtherVector(Kirbydesc->m_vHandleDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 2.f);
+		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 2.f);
 	}
+
+	if (m_pGameInstance->Get_DIKeyState(DIK_SPACE, KEY_DOWN))
+	{
+		m_bBreak = !m_bBreak;
+	}
+
+	if (m_bBreak == true)
+		return;
 
 
 	Kirbydesc->m_fMoveSpeed += fTimeDelta * 10.f;
@@ -348,7 +356,7 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 		DESC(m_bBooster) = true;
 		CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
-		pCamera->Make_Shake(0.6f, 2.f);
+		pCamera->Make_Shake(1.f, 2.f);
 	}
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS))
@@ -374,21 +382,21 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		Kirbydesc->m_vTargetDir = _float4(1.f, 0.f, 0.3f, 0.f);
 		Kirbydesc->m_vTargetDir.Normalize();
 		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vHandleDir, pTransformCom, fTimeDelta, 3.f);
-		Turn_InterPolate_OtherVector(Kirbydesc->m_vHandleDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 2.f);
+		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 2.f);
 	}
 	else if (m_pGameInstance->Get_DIKeyState(DIK_RIGHT, KEY_PRESS) == true)
 	{
 		Kirbydesc->m_vTargetDir = _float4(1.f, 0.f, -0.3f, 0.f);
 		Kirbydesc->m_vTargetDir.Normalize();
 		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vHandleDir, pTransformCom, fTimeDelta, 3.f);
-		Turn_InterPolate_OtherVector(Kirbydesc->m_vHandleDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 2.f);
+		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 2.f);
 	}
 	else
 	{
 		Kirbydesc->m_vTargetDir = _float4(1.f, 0.f, 0.f, 0.f);
 		Kirbydesc->m_vTargetDir.Normalize();
 		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vHandleDir, pTransformCom, fTimeDelta, 3.f);
-		Turn_InterPolate_OtherVector(Kirbydesc->m_vHandleDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 2.f);
+		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 2.f);
 	}
 
 	Kirbydesc->m_fMoveSpeed += fTimeDelta * 10.f;
@@ -412,11 +420,17 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	{
 		DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
 		pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
+
 		if (pController->Is_Terrain())
 		{
 			pKirby->Change_State(CFinaleKirby::DUMPSTATE_LANDING, 60.f, false, false, CFinaleKirby::BODY_DUMPDEFAULT, CFinaleKirby::OFFSET_DUMP);
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
-			pCamera->Make_Shake();
+			pCamera->Make_Shake(1.5f);
+
+			CFinalePartical_Maker* pMaker = static_cast<CFinalePartical_Maker*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinalePartical_Maker")));
+			_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+			_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+			pMaker->Make_Partical(20, vPos + (vLook * 3.f), 3.f, 0.2f, 0.1f, XMVector3Normalize(_float4(0.f, 1.f, 0.f, 0.f) + vLook * 2.f), 120.f, CUtils::Make_RandomFloat(40.f, 80.f));
 			return;
 		}
 	}
@@ -577,7 +591,7 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			CFinalePartical_Maker* pMaker = static_cast<CFinalePartical_Maker*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinalePartical_Maker")));
 			_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
 			_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
-			pMaker->Make_Partical(50, vPos, 3.f, 0.1f, 0.05f, _float4(0.f, 1.f, 0.f, 0.f), 120.f, CUtils::Make_RandomFloat(80.f, 120.f));
+			pMaker->Make_Partical(50, vPos, 3.f, 0.1f, 0.05f, _float4(0.f, 1.f, 0.f, 0.f), 120.f, CUtils::Make_RandomFloat(30.f, 70.f));
 
 			m_bShakeTrigger = false;
 		}

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "BreakableBlock.h"
 #include "Hitbox.h"
+#include "FinalePartical_Maker.h"
 
 CBreakableBlock::CBreakableBlock(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
@@ -124,6 +125,11 @@ void CBreakableBlock::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXO
 	{
 		m_pModelCom->Set_Animation(0, 60.f, false, false);
 		m_bHit = true;
+
+		CFinalePartical_Maker* pMaker = static_cast<CFinalePartical_Maker*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinalePartical_Maker")));
+		_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		pMaker->Make_Partical(40, vPos, 4.5f, 1.f, 0.2f, _float4(2.f, 1.f, 0.f, 0.f), 180.f, CUtils::Make_RandomFloat(100.f, 150.f));
+
 	}
 }
 

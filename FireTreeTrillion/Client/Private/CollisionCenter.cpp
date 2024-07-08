@@ -643,7 +643,7 @@ void CCollisionCenter::RealFinaleStage_Battle()
 			CPhysXObject* pBreakable = static_cast<CPhysXObject*>(Src);
 
 			pBreakable->Collision(CONTENT_BODY, pKirby);
-			pthis->Camera_Shaking(1.5f, 2.f);
+			pthis->Camera_Shaking(2.5f, 3.f);
 
 		});
 }
