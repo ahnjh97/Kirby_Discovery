@@ -5,6 +5,7 @@
 #include "Light.h"
 #include "Particle.h"
 
+#include "FinalePartical_Maker.h"
 
 CDisaster_Master::CDisaster_Master(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -36,7 +37,7 @@ HRESULT CDisaster_Master::Initialize(void* pArg)
 	LIGHT_DESC			LightDesc{};
 	LightDesc.eType = LIGHT_DESC::TYPE_POINT;
 	LightDesc.vPosition = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
-	LightDesc.fRange = 60.f;
+	LightDesc.fRange = 90.f;
 	LightDesc.vDiffuse = _float4(.8f, .3f, .06f, 1.f);
 	LightDesc.vAmbient = _float4(0.3f, .3f, .3f, 1.f);
 	LightDesc.vSpecular = _float4(0.f, 0.f, 0.0f, 1.f);
@@ -63,15 +64,20 @@ _int CDisaster_Master::Tick(_float fTimeDelta)
 	{
 		_float4 vLightPos = vKirbyPos;
 		vLightPos.x += 50.f;
-		vLightPos.y += 20.f;
+		vLightPos.y += 40.f;
 		m_pLight->Update_LightPos(vLightPos);
 	}
 
 	if (vKirbyPos.x > 15.f)
 		m_fMakeBaumDelay += fTimeDelta;
 
+	m_fAirParticleDelay += fTimeDelta;
+
 	// 헛방 바움을 생성한다.
 	Make_MissBaum();
+
+	// 공기 중에 날아댕기는 파티클을 구현하였다.
+	Make_AirParticle();
 
 	Moving_FinaleRoad(vKirbyPos.x);
 	Moving_TargetBaum(vKirbyPos.x);
@@ -149,6 +155,31 @@ void CDisaster_Master::Make_FinaleRoad(CFinaleRoadGrouper::ROADTYPE eType, CFina
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_FinaleRoadGrouper"),
 		TEXT("Prototype_GameObject_FinaleRoadGrouper"), &roadGrouperDesc)))
 		return;
+}
+
+void CDisaster_Master::Make_AirParticle()
+{
+	if (m_fAirParticleDelay > 0.1f)
+	{
+		CFinalePartical_Maker* pMaker = static_cast<CFinalePartical_Maker*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinalePartical_Maker")));
+		_float4 vKirbyPos = m_pKirby->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
+		_float fKirbySpeed = m_pKirby->Get_KirbyInfo()->m_fMoveSpeed;
+
+		_float fZOffSet = { 0.f };
+		fZOffSet = CUtils::Make_RandomInt(0, 1) == 0 ? CUtils::Make_RandomFloat(-200.f, -50.f) : CUtils::Make_RandomFloat(50.f, 200.f);
+		_float fXOffSet = { 0.f };
+		fXOffSet = vKirbyPos.x > 15.f ? CUtils::Make_RandomFloat(0.f, 200.f) : CUtils::Make_RandomFloat(-100.f, 100.f);
+		_float fYOffSet = { -50.f };
+
+		vKirbyPos.x += fXOffSet;
+		vKirbyPos.y += fYOffSet;
+		vKirbyPos.z += fZOffSet;
+		pMaker->Make_Partical(1, vKirbyPos, 0.f, 2.f, 1.f, _float4(0.f, 1.f, 0.f, 0.f), 10.f, CUtils::Make_RandomFloat(10.f, 30.f), true);
+		m_fAirParticleDelay = 0.f;
+	}
+
+
+
 }
 
 void CDisaster_Master::Moving_FinaleRoad(_float fKirbyX)

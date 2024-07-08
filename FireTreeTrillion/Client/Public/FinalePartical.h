@@ -26,7 +26,7 @@ public:
 	virtual HRESULT Render_LightDepth()							override;
 
 
-	void Set_Partical(_float4 vPos, _float fScale, _float4 vDir, _float fSpeed);
+	void Set_Partical(_float4 vPos, _float fScale, _float4 vDir, _float fSpeed, _bool bNoGravity = false);
 
 private:
 	HRESULT			Add_Components();
@@ -58,6 +58,8 @@ private:
 
 	_float			m_fTurn = { 0.f };
 	_float4			m_fTurnAxis = { 0.f, 0.f, 0.f, 0.f };
+
+	_bool			m_bNoGravity = { false };
 
 public:
 	static CFinalePartical* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

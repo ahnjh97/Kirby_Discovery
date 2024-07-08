@@ -26,6 +26,7 @@ public:
 private:
 	void			Make_MissBaum();
 	void			Make_OnTerrainBaum(_float4 vTargetPos, _bool bBaum);
+	void			Make_AirParticle();
 	void			Make_FinaleRoad(CFinaleRoadGrouper::ROADTYPE eType, CFinaleRoadGrouper::MOVECMD eMoveType, _float3 vTargetPos, _float3 vLookDir, _float3 vDestPos, _float3 vDestDir);
 
 
@@ -37,6 +38,8 @@ private:
 	class CFinaleKirby*	m_pKirby = { nullptr };
 	_float				m_fMakeBaumDelay = { 0.f };
 	class CLight*		m_pLight = { nullptr };
+
+	_float				m_fAirParticleDelay = { 0.f };
 
 
 public:

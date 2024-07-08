@@ -26,7 +26,7 @@ HRESULT CFinalePartical_Maker::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(Desc)))
 		return E_FAIL;
 
-	for (_int i = 0; i < 300; ++i)
+	for (_int i = 0; i < 400; ++i)
 	{
 		CFinalePartical* pObj = static_cast<CFinalePartical*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_FinalePartical")));
 		m_FinaleParticals.push_back(pObj);
@@ -61,7 +61,7 @@ HRESULT CFinalePartical_Maker::Render()
 	return S_OK;
 }
 
-void CFinalePartical_Maker::Make_Partical(_int iNum, _float4 vPos, _float fPosOffset, _float vScale, _float fScaleOffset, _float4 vDir, _float fRandomAngle, _float fPower)
+void CFinalePartical_Maker::Make_Partical(_int iNum, _float4 vPos, _float fPosOffset, _float vScale, _float fScaleOffset, _float4 vDir, _float fRandomAngle, _float fPower, _bool bNoGravity)
 {
 	for (_int i = 0; i < iNum; ++i)
 	{
@@ -74,10 +74,10 @@ void CFinalePartical_Maker::Make_Partical(_int iNum, _float4 vPos, _float fPosOf
 
 		_float vNewScale = vScale + CUtils::Make_RandomFloat(-fScaleOffset, fScaleOffset);
 		
-		m_FinaleParticals[m_iCount]->Set_Partical(vNewPos, vNewScale, vNewDir, fPower);
+		m_FinaleParticals[m_iCount]->Set_Partical(vNewPos, vNewScale, vNewDir, fPower, bNoGravity);
 		m_iCount++;
 
-		if (m_iCount >= 300)
+		if (m_iCount >= 400)
 			m_iCount = 0;
 	}
 }

@@ -19,6 +19,7 @@ public:
 
 public:
 	_float	m_fParticalDelay = { 0.f };
+	_bool	m_bBreak = { false };
 	static	CKirbyDump_Run_State* Create();
 	virtual void				  Free() override;
 };

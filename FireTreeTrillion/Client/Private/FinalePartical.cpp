@@ -49,14 +49,16 @@ _int CFinalePartical::Tick(_float fTimeDelta)
     Compute_MotionBlur();
 
     _float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-    m_fGravity += 3.5f * m_fTimeDelta;
+    m_fGravity += 1.5f * m_fTimeDelta;
     _float4 vDelta = (m_vDir * m_fTimeDelta * m_fSpeed);
-    _float4 vGravity = _float4(0.f, m_fGravity, 0.f, 0.f);
+    _float4 vGravity = m_bNoGravity == false ? _float4(0.f, m_fGravity, 0.f, 0.f) : _float4(0.f, 0.f, 0.f, 0.f);
     m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vDelta - vGravity);
     m_pTransformCom->Turn(m_fTurnAxis, m_fTimeDelta, m_fTurn);
 
     m_fActiveTime += m_fTimeDelta;
-    if (m_fActiveTime > 5.f)
+
+    _float fActiveMaxTime = m_bNoGravity == false ? 5.f : 20.f;
+    if (m_fActiveTime > fActiveMaxTime)
     {
         m_bActive = false;
     }
@@ -73,7 +75,8 @@ void CFinalePartical::Late_Tick(_float fTimeDelta)
     if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 5.0f))
     {
         m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
-        m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
+        if (m_bNoGravity == false)
+            m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
     }
 
 }
@@ -125,7 +128,7 @@ HRESULT CFinalePartical::Render_LightDepth()
     return S_OK;
 }
 
-void CFinalePartical::Set_Partical(_float4 vPos, _float fScale, _float4 vDir, _float fSpeed)
+void CFinalePartical::Set_Partical(_float4 vPos, _float fScale, _float4 vDir, _float fSpeed, _bool bNoGravity)
 {
     m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
     m_vDir = vDir;
@@ -138,6 +141,9 @@ void CFinalePartical::Set_Partical(_float4 vPos, _float fScale, _float4 vDir, _f
     m_fTurnAxis = CUtils::Make_Random_Vector(1.f);
     m_fTurnAxis.w = 0.f;
     m_fActiveTime = 0.f;
+
+    // 중력을 먹이지 않을 것인가?
+    m_bNoGravity = bNoGravity;
 }
 
 HRESULT CFinalePartical::Add_Components()

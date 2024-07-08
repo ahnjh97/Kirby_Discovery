@@ -26,7 +26,8 @@ public:
 	void Make_Partical(_int iNum, 
 		_float4 vPos, _float fPosOffset, 
 		_float vScale, _float fScaleOffset, 
-		_float4 vDir, _float fRandomAngle, _float fPower);
+		_float4 vDir, _float fRandomAngle, _float fPower,
+		_bool bNoGravity = false);
 
 
 private:
