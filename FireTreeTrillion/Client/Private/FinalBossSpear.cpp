@@ -54,6 +54,9 @@ _int CFinalBossSpear::Tick(_float fTimeDelta)
 
 	XMStoreFloat4x4(&m_WorldMatrix, m_pTransformCom->Get_WorldMatrix() * XMLoadFloat4x4(m_pSocket->Get_CombinedTransformationMatrix()) * XMLoadFloat4x4(m_pParentMatrix));
 
+	if (*m_pCurrentLevelID == LEVEL_TOOL_ANIM)
+		return OBJ_NOEVENT;
+
 	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Monster")));
 	if (CFinalBoss::FINALBOSS_RAYARROWSTART == pFinalBoss->Get_State() || CFinalBoss::FINALBOSS_RAYARROWSTARTAIR == pFinalBoss->Get_State())
 	{
@@ -194,11 +197,14 @@ void CFinalBossSpear::Late_Tick(_float fTimeDelta)
 
 HRESULT CFinalBossSpear::Render()
 {
-	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Monster")));
-	if (CFinalBoss::FINALBOSS_RECOVERYSTART == pFinalBoss->Get_State() ||
-		CFinalBoss::FINALBOSS_RECOVERYWAIT == pFinalBoss->Get_State() ||
-		CFinalBoss::FINALBOSS_RECOVERYEND == pFinalBoss->Get_State())
-		return S_OK;
+	if (*m_pCurrentLevelID != LEVEL_TOOL_ANIM)
+	{
+		CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Monster")));
+		if (CFinalBoss::FINALBOSS_RECOVERYSTART == pFinalBoss->Get_State() ||
+			CFinalBoss::FINALBOSS_RECOVERYWAIT == pFinalBoss->Get_State() ||
+			CFinalBoss::FINALBOSS_RECOVERYEND == pFinalBoss->Get_State())
+			return S_OK;
+	}
 
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
