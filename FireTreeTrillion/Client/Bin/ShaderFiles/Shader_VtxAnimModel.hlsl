@@ -208,6 +208,30 @@ PS_OUT FOR_KIRBY_PS_MAIN(PS_IN In)
     return Out;
 }
 
+PS_OUT FOR_FINALEKIRBY_PS_MAIN(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord);
+    if (0.3f >= vMtrlDiffuse.a)
+        discard;
+
+    Out.vDiffuse = vMtrlDiffuse + g_fWhiteColorDiffuse + g_fOverPowerColor;
+    Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
+    Out.vMRA = vector(0.f, 0.3f, 1.f, 1.f);
+    
+    if (g_bStencil == true)
+        Out.vStencil = vector(1.f, 0.f, 0.0f, 1.f);
+    if (g_bRimLight == true)
+        Out.vRimLight = vector(0.f, m_fRimWidth, 1.f, 1.f);
+    if (g_bMotionBlur == true)
+        Out.vMotionBlur = g_vMotionVelocity;
+
+    return Out;
+}
+
+
 PS_OUT FOR_KIRBY_PS_HAMMER_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
@@ -678,6 +702,20 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 FOR_KIRBY_PS_HAMMER_MAIN();
+    }
+
+    // 피날레 커비 실험용 ( 14 )
+    pass For_FinaleKirby_Weapons
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 FOR_FINALEKIRBY_PS_MAIN();
     }
 
 

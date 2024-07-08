@@ -39,6 +39,7 @@ public:
 	virtual void OnStateExit()														override;
 
 public:
+	_float	m_fFallTime = { 0.f };
 	static	CKirbyDump_Jump_State* Create();
 	virtual void				  Free() override;
 };
