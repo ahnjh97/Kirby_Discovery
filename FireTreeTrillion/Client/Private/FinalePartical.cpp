@@ -30,7 +30,7 @@ HRESULT CFinalePartical::Initialize(void* pArg)
         return E_FAIL;
 
     m_bMotionBlur = true;
-    m_bRimLight = false;
+    m_bRimLight = true;
     m_bStencil = true;
 
 

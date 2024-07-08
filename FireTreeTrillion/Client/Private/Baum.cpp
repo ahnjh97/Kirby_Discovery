@@ -41,7 +41,7 @@ HRESULT CBaum::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_bMotionBlur = true;
-	m_bRimLight = false;
+	m_bRimLight = true;
 
 	m_fBaumSpeed = Desc.fBaumSpeed;
 	m_vBaumMoveDir = Desc.vBaumMoveDir;
@@ -65,6 +65,10 @@ HRESULT CBaum::Initialize(void* pArg)
 	m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
 
 
+	if (m_eBaumType == BAUM_STARPIECE)
+		m_fRimWidth = 0.5f;
+
+
 
 	return S_OK;
 }
@@ -82,8 +86,8 @@ _int CBaum::Tick(_float fTimeDelta)
 	// 지형에 박히지 않았을 때
 	if (m_bOnTerrain == false)
 	{
-		m_pControllerCom->Move_Dir(m_pTransformCom, m_vBaumMoveDir * m_fTimeDelta * m_fBaumSpeed, m_fTimeDelta);
 		m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_UP), m_fTimeDelta, 180.f);
+		m_pControllerCom->Move_Dir(m_pTransformCom, m_vBaumMoveDir * m_fTimeDelta * m_fBaumSpeed, m_fTimeDelta);
 
 		m_fScale += m_fTimeDelta * 4.f;
 		if (m_fScale > 1.f)
@@ -109,7 +113,7 @@ _int CBaum::Tick(_float fTimeDelta)
 	}
 
 	// 구현부
-	if (m_pControllerCom->Is_Terrain() && m_bOnTerrain == false)
+	if ((m_pControllerCom->Is_Terrain() == true || m_pControllerCom->RayCastToDynamicActor(m_vBaumMoveDir) < 2.f) && m_bOnTerrain == false)
 	{
 		CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 		pCamera->Make_Shake();
@@ -144,10 +148,10 @@ void CBaum::Late_Tick(_float fTimeDelta)
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
-		if (m_eBaumType == BAUM_STARPIECE)
+	/*	if (m_eBaumType == BAUM_STARPIECE)
 		{
 			m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
-		}
+		}*/
 	}
 }
 
