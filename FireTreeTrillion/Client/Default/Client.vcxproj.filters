@@ -535,6 +535,9 @@
     <Filter Include="02.GameObjects\Map\FinalePartical\FinaleBuildingPartical">
       <UniqueIdentifier>{285a0ad8-d35f-4aa3-be67-69ad46f14b72}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PopStar\PopStar_StarSmall">
+      <UniqueIdentifier>{3f4c06c4-3f4b-4e0b-80ae-b78275764df3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -1078,6 +1081,9 @@
     <ClInclude Include="..\Public\FinaleBuildingPartical.h">
       <Filter>02.GameObjects\Map\FinalePartical\FinaleBuildingPartical</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\PopStar_StarSmall.h">
+      <Filter>02.GameObjects\PopStar\PopStar_StarSmall</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1601,6 +1607,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\FinaleBuildingPartical.cpp">
       <Filter>02.GameObjects\Map\FinalePartical\FinaleBuildingPartical</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PopStar_StarSmall.cpp">
+      <Filter>02.GameObjects\PopStar\PopStar_StarSmall</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

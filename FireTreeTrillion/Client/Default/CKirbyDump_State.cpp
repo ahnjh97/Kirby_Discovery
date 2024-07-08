@@ -228,17 +228,21 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_PRESS) == true)
 	{
-		Kirbydesc->m_vTargetDir = _float4(1.f, 0.f, 0.4f, 0.f);
+		Kirbydesc->m_vTargetDir = _float4(1.f, 0.f, 0.3f, 0.f);
 		Kirbydesc->m_vTargetDir.Normalize();
+		_float4 vMoveTarget = _float4(1.f, 0.f, 0.6f, 0.f);
+		vMoveTarget.Normalize();
 		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vHandleDir, pTransformCom, fTimeDelta, 3.f);
-		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 2.f);
+		Turn_InterPolate_OtherVector(vMoveTarget, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 1.f);
 	}
 	else if (m_pGameInstance->Get_DIKeyState(DIK_RIGHT, KEY_PRESS) == true)
 	{
-		Kirbydesc->m_vTargetDir = _float4(1.f, 0.f, -0.4f, 0.f);
+		Kirbydesc->m_vTargetDir = _float4(1.f, 0.f, -0.3f, 0.f);
 		Kirbydesc->m_vTargetDir.Normalize();
+		_float4 vMoveTarget = _float4(1.f, 0.f, -0.6f, 0.f);
+		vMoveTarget.Normalize();
 		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vHandleDir, pTransformCom, fTimeDelta, 3.f);
-		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 2.f);
+		Turn_InterPolate_OtherVector(vMoveTarget, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 1.f);
 	}
 	else
 	{
@@ -261,8 +265,8 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 	if (DESC(m_bBooster) == true)
 	{
-		if (Kirbydesc->m_fMoveSpeed > 30.f)
-			Kirbydesc->m_fMoveSpeed = 30.f;
+		if (Kirbydesc->m_fMoveSpeed > 36.f)
+			Kirbydesc->m_fMoveSpeed = 36.f;
 	}
 	else
 	{
@@ -381,15 +385,19 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	{
 		Kirbydesc->m_vTargetDir = _float4(1.f, 0.f, 0.3f, 0.f);
 		Kirbydesc->m_vTargetDir.Normalize();
+		_float4 vMoveTarget = _float4(1.f, 0.f, 0.6f, 0.f);
+		vMoveTarget.Normalize();
 		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vHandleDir, pTransformCom, fTimeDelta, 3.f);
-		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 2.f);
+		Turn_InterPolate_OtherVector(vMoveTarget, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 1.f);
 	}
 	else if (m_pGameInstance->Get_DIKeyState(DIK_RIGHT, KEY_PRESS) == true)
 	{
 		Kirbydesc->m_vTargetDir = _float4(1.f, 0.f, -0.3f, 0.f);
 		Kirbydesc->m_vTargetDir.Normalize();
+		_float4 vMoveTarget = _float4(1.f, 0.f, -0.6f, 0.f);
+		vMoveTarget.Normalize();
 		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vHandleDir, pTransformCom, fTimeDelta, 3.f);
-		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 2.f);
+		Turn_InterPolate_OtherVector(vMoveTarget, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 1.f);
 	}
 	else
 	{
@@ -402,8 +410,8 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	Kirbydesc->m_fMoveSpeed += fTimeDelta * 10.f;
 	if (DESC(m_bBooster) == true)
 	{
-		if (Kirbydesc->m_fMoveSpeed > 30.f)
-			Kirbydesc->m_fMoveSpeed = 30.f;
+		if (Kirbydesc->m_fMoveSpeed > 36.f)
+			Kirbydesc->m_fMoveSpeed = 36.f;
 	}
 	else
 	{

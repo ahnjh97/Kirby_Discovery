@@ -131,6 +131,7 @@
 #include "FinaleRoad.h"
 #include "FinaleRoadGrouper.h"
 #include "PopStar.h"
+#include "PopStar_StarSmall.h"
 #include "BreakableBlock.h"
 #include "FinalePartical.h"
 #include "FinaleBuildingPartical.h"
@@ -393,6 +394,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleRoad"), CFinaleRoad);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleRoadGrouper"), CFinaleRoadGrouper);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PopStar"), CPopStar);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PopStar_StarSmall"), CPopStar_StarSmall);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BreakableBlock"), CBreakableBlock);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalePartical_Maker"), CFinalePartical_Maker);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalePartical"), CFinalePartical);
@@ -1837,6 +1839,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		//피날레 오브젝트들
 		m_vecModelInfo.emplace_back("PopStar", TYPE_ANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("PopStar_StarSmall", TYPE_NONANIM, 1.f, 0.f, 0);
 
 		//보스전 진입 전 필드
 		//m_vecModelInfo.emplace_back("Land_LbLastBossBeforeStep", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));

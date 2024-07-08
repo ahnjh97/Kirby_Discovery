@@ -5,7 +5,6 @@
 BEGIN(Engine)
 class CModel;
 class CShader;
-class CTexture;
 END
 
 class CPopStar final : public CGameObject

@@ -350,15 +350,25 @@ void CBaum::Find_MyRoad()
 	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	_float	fMinDistance = { 1000.f };
 
+	_bool bStarPiece = m_eBaumType == BAUM_STARPIECE ? true : false;
+
 	for (auto& pRoad : *m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad")))
 	{
-		_float4 vRoadPos = static_cast<CFinaleRoad*>(pRoad)->Get_WorldPos();
+		CFinaleRoad* pFinaleRoad = static_cast<CFinaleRoad*>(pRoad);
 
+		// 스타피스 일 경우, 어짜피 스타피스는 바로 부숴지며, 가장 근처에 있는 BREAK 타입의 FinaleRoad를 찾는다.
+		if (bStarPiece == true && pFinaleRoad->Is_Breakable() == false)
+			continue;
+
+		_float4 vRoadPos = pFinaleRoad->Get_WorldPos();
 		_float fDistance = (vRoadPos - vPos).Length();
+
+		if (fDistance > 60.f)
+			continue;
 
 		if (fMinDistance > fDistance)
 		{
-			m_pMyRoad = static_cast<CFinaleRoad*>(pRoad);
+			m_pMyRoad = pFinaleRoad;
 			fMinDistance = fDistance;
 		}
 	}
@@ -453,6 +463,16 @@ _int CBaum::Make_Partical()
 				return OBJ_DEAD;
 		}
 	}
+
+	LIGHT_DESC			LightDesc{};
+	LightDesc.eType = LIGHT_DESC::TYPE_FLASH;
+	LightDesc.vPosition = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+	LightDesc.fRange = 85.f;
+	LightDesc.vDiffuse = _float4(.8f, .6f, 0.f, 1.f);
+	LightDesc.vAmbient = _float4(.5f, .5f, .5f, 1.f);
+	LightDesc.vSpecular = _float4(0.f, 0.f, 0.0f, 1.f);
+	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
+		return E_FAIL;
 
 	//debris explode
 	//CParticle::PARTICLE_DESC FXDesc{};

@@ -66,7 +66,7 @@ private:
 	_bool			m_bIsAnimModel = { false };
 
 	COLLIDETYPE		m_eCollideType = { CTYPE_END };
-	_bool			m_bCollided = { true };
+	_bool			m_bCollided = { false };
 
 
 	_float2			m_vPreScreenPos = { 0.f, 0.f };

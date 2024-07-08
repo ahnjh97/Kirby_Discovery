@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "PopStar.h"
 #include "MultiEffect.h"
-#include "Particle.h"
+
 CPopStar::CPopStar(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
 {
@@ -57,6 +57,17 @@ HRESULT CPopStar::Initialize(void* pArg)
 	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_star dash test 3"), &FXDesc)))
 		return E_FAIL;
 
+	GAMEOBJECT_DESC Smalldesc = {};
+	Smalldesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
+	_float4 vSmallLook = CUtils::Get_State_Vector_Matrix(Smalldesc.matWorld, CUtils::STATE_LOOK);
+	_float4 vSmallRight = CUtils::Get_State_Vector_Matrix(Smalldesc.matWorld, CUtils::STATE_RIGHT);
+	_float4 vSmallPos = CUtils::Get_State_Vector_Matrix(Smalldesc.matWorld, CUtils::STATE_POSITION);
+
+	_float4 vNewSmallPos = vSmallPos + (vSmallLook * -200.f) + vSmallRight * 30.f; //+ (vSmallUp * -50.f);
+	CUtils::Set_State_Matrix(Smalldesc.matWorld, CUtils::STATE_POSITION, vNewSmallPos);
+	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_PopStar"), TEXT("Prototype_GameObject_PopStar_StarSmall"), &Smalldesc)))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -76,7 +87,6 @@ void CPopStar::Late_Tick(_float fTimeDelta)
 	m_pModelCom->Play_Animation(fTimeDelta);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 	//m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
-
 }
 
 HRESULT CPopStar::Render()

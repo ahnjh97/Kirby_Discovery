@@ -225,6 +225,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\public\FinaleRoadGrouper.h" />
+    <ClInclude Include="..\Public\PopStar_StarSmall.h" />
     <ClInclude Include="..\Public\ShadowDeco.h" />
     <ClInclude Include="..\Public\DeeDeeDee.h" />
     <ClInclude Include="..\Public\DeeDeeDeeHammer.h" />
@@ -430,6 +431,7 @@
     </ClCompile>
     <ClCompile Include="..\private\FinaleRoadGrouper.cpp" />
     <ClCompile Include="..\Private\KirbyBoom_State.cpp" />
+    <ClCompile Include="..\Private\PopStar_StarSmall.cpp" />
     <ClCompile Include="..\Private\ShadowDeco.cpp" />
     <ClCompile Include="..\Private\DeeDeeDee.cpp" />
     <ClCompile Include="..\Private\DeeDeeDeeHammer.cpp" />

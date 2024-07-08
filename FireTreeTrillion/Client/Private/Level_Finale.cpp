@@ -93,7 +93,7 @@ HRESULT CLevel_Finale::Initialize()
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_BreakableBlock"), TEXT("Prototype_GameObject_BreakableBlock"), &ObjDesc)))
 		return E_FAIL;
 
-	m_pGameInstance->Setting_GodRay(_float4(5500.f, 850.f, 0.f, 1.f), 0.05f, 0.96815f, 0.9f, 0.9f, 0.9f);
+	m_pGameInstance->Setting_GodRay(_float4(5500.f, 850.f, 0.f, 1.f), 0.05f, 0.96815f, 0.9f, 0.9f, 0.5f);
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 	m_pGameInstance->Set_ColorSet_ByIndex(4);
