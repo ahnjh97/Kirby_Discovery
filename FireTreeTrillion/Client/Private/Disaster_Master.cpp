@@ -47,6 +47,8 @@ HRESULT CDisaster_Master::Initialize(void* pArg)
 	m_pLight = CGameInstance::Get_Instance()->Get_LightLastAddress();
 	Safe_AddRef(m_pLight);
 
+	m_pMaker = static_cast<CFinalePartical_Maker*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinalePartical_Maker")));
+	Safe_AddRef(m_pMaker);
 
 	return S_OK;
 }
@@ -66,12 +68,14 @@ _int CDisaster_Master::Tick(_float fTimeDelta)
 		vLightPos.x += 50.f;
 		vLightPos.y += 40.f;
 		m_pLight->Update_LightPos(vLightPos);
+		m_pGameInstance->Update_LightShadow(vLightPos, vKirbyPos);
 	}
 
 	if (vKirbyPos.x > 15.f)
 		m_fMakeBaumDelay += fTimeDelta;
 
 	m_fAirParticleDelay += fTimeDelta;
+	m_fBuildingParticleDelay += fTimeDelta;
 
 	// 헛방 바움을 생성한다.
 	Make_MissBaum();
@@ -161,7 +165,6 @@ void CDisaster_Master::Make_AirParticle()
 {
 	if (m_fAirParticleDelay > 0.1f)
 	{
-		CFinalePartical_Maker* pMaker = static_cast<CFinalePartical_Maker*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinalePartical_Maker")));
 		_float4 vKirbyPos = m_pKirby->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
 		_float fKirbySpeed = m_pKirby->Get_KirbyInfo()->m_fMoveSpeed;
 
@@ -174,8 +177,27 @@ void CDisaster_Master::Make_AirParticle()
 		vKirbyPos.x += fXOffSet;
 		vKirbyPos.y += fYOffSet;
 		vKirbyPos.z += fZOffSet;
-		pMaker->Make_Partical(1, vKirbyPos, 0.f, 2.f, 1.f, _float4(0.f, 1.f, 0.f, 0.f), 10.f, CUtils::Make_RandomFloat(10.f, 20.f), true);
+		m_pMaker->Make_Partical(1, vKirbyPos, 0.f, 2.f, 1.f, _float4(0.f, 1.f, 0.f, 0.f), 10.f, CUtils::Make_RandomFloat(10.f, 20.f), true);
 		m_fAirParticleDelay = 0.f;
+	}
+
+
+	if (m_fBuildingParticleDelay > 5.f)
+	{
+		_float4 vKirbyPos = m_pKirby->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
+
+		_float fZOffSet = { 0.f };
+		fZOffSet = CUtils::Make_RandomInt(0, 1) == 0 ? CUtils::Make_RandomFloat(-400.f, -150.f) : CUtils::Make_RandomFloat(150.f, 400.f);
+		_float fXOffSet = { 0.f };
+		fXOffSet = vKirbyPos.x > 15.f ? CUtils::Make_RandomFloat(0.f, 1000.f) : CUtils::Make_RandomFloat(-100.f, 100.f);
+		_float fYOffSet = { -50.f };
+
+		vKirbyPos.x += fXOffSet;
+		vKirbyPos.y += fYOffSet;
+		vKirbyPos.z += fZOffSet;
+
+		m_pMaker->Make_BuildingPartical(vKirbyPos);
+		m_fBuildingParticleDelay = 0.f;
 	}
 }
 
@@ -319,4 +341,5 @@ void CDisaster_Master::Free()
 	__super::Free();
 	Safe_Release(m_pKirby);
 	Safe_Release(m_pLight);
+	Safe_Release(m_pMaker);
 }

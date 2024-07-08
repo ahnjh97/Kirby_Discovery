@@ -32,6 +32,12 @@ HRESULT CFinalePartical_Maker::Initialize(void* pArg)
 		m_FinaleParticals.push_back(pObj);
 	}
 
+	for (_int i = 0; i < 50; ++i)
+	{
+		CFinaleBuildingPartical* pObj = static_cast<CFinaleBuildingPartical*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_FinaleBuildingPartical")));
+		m_FinaleBuildingParticals.push_back(pObj);
+	}
+
 	return S_OK;
 }
 
@@ -40,9 +46,17 @@ _int CFinalePartical_Maker::Tick(_float fTimeDelta)
 	if (m_bDead == true)
 		return OBJ_DEAD;
 
+	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+
+
 	for (auto& pPartical : m_FinaleParticals)
 	{
-		pPartical->Tick(fTimeDelta);
+		pPartical->Tick(m_fTimeDelta);
+	}
+
+	for (auto& pPartical : m_FinaleBuildingParticals)
+	{
+		pPartical->Tick(m_fTimeDelta);
 	}
 
 	return OBJ_NOEVENT;
@@ -52,8 +66,14 @@ void CFinalePartical_Maker::Late_Tick(_float fTimeDelta)
 {
 	for (auto& pPartical : m_FinaleParticals)
 	{
-		pPartical->Late_Tick(fTimeDelta);
+		pPartical->Late_Tick(m_fTimeDelta);
 	}
+
+	for (auto& pPartical : m_FinaleBuildingParticals)
+	{
+		pPartical->Late_Tick(m_fTimeDelta);
+	}
+
 }
 
 HRESULT CFinalePartical_Maker::Render()
@@ -80,6 +100,15 @@ void CFinalePartical_Maker::Make_Partical(_int iNum, _float4 vPos, _float fPosOf
 		if (m_iCount >= 400)
 			m_iCount = 0;
 	}
+}
+
+void CFinalePartical_Maker::Make_BuildingPartical(_float4 vPos)
+{
+	m_FinaleBuildingParticals[m_iBuildingCount]->Set_BuildingPartical(vPos);
+	m_iBuildingCount++;
+
+	if (m_iBuildingCount >= 50)
+		m_iBuildingCount = 0;
 }
 
 CFinalePartical_Maker* CFinalePartical_Maker::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -113,8 +142,11 @@ void CFinalePartical_Maker::Free()
 	__super::Free();
 
 	for (auto& Partical : m_FinaleParticals)
-	{
 		Safe_Release(Partical);
-	}
 	m_FinaleParticals.clear();
+
+	for (auto& BuildingPartical : m_FinaleBuildingParticals)
+		Safe_Release(BuildingPartical);
+	m_FinaleBuildingParticals.clear();
+
 }

@@ -83,6 +83,7 @@ _int CBaum::Tick(_float fTimeDelta)
 	if (m_pLight != nullptr)
 		m_pLight->Update_LightPos(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
 
+
 	// 지형에 박히지 않았을 때
 	if (m_bOnTerrain == false)
 	{
@@ -94,9 +95,10 @@ _int CBaum::Tick(_float fTimeDelta)
 			m_fScale = 1.f;
 		m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
 
-		if (m_pTransformCom->Get_State(CTransform::STATE_POSITION).y < -300.f)
+		if (m_pTransformCom->Get_State(CTransform::STATE_POSITION).y < -250.f)
 		{
-			return OBJ_DEAD;
+			m_bDead = true;
+			return OBJ_NOEVENT;
 		}
 
 	}	
@@ -111,6 +113,8 @@ _int CBaum::Tick(_float fTimeDelta)
 			m_pControllerCom->Set_Position(m_pTransformCom, NewPos);
 		}
 	}
+
+
 
 	// 구현부
 	if ((m_pControllerCom->Is_Terrain() == true || m_pControllerCom->RayCastToDynamicActor(_float4(0.f, -1.f, 0.f, 0.f)) < 5.f) && m_bOnTerrain == false)
@@ -266,7 +270,6 @@ HRESULT CBaum::Add_Components(wstring wstrModelProtoTag)
 			return E_FAIL;
 		m_pLight = CGameInstance::Get_Instance()->Get_LightLastAddress();
 		Safe_AddRef(m_pLight);
-
 	}
 
 	return S_OK;
@@ -359,7 +362,7 @@ _int CBaum::Make_Partical()
 		for (_int i = 0; i < 6; ++i)
 		{
 			_float4x4 matrix = m_pTransformCom->Get_WorldFloat4x4();
-			_float4 vDir = /*XMVector3Normalize(m_vBaumMoveDir * -1.f)*/ _float4(0.f, 1.f, 0.f, 0.f);
+			_float4 vDir = /*XMVector3Normalize(m_vBaumMoveDir * -1.f)*/ _float4(1.f, 1.f, 0.f, 0.f);
 
 			vDir = CUtils::Make_RandomAngle_Vector(120.f, vDir);
 			vDir.Normalize();
@@ -466,6 +469,5 @@ void CBaum::Free()
 
 	if (m_pLight != nullptr)
 		m_pLight->Set_DeadLight(true);
-
 	Safe_Release(m_pLight);
 }
