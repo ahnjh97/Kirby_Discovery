@@ -122,31 +122,31 @@ HRESULT CUI_PartTimeResult::Render()
 #ifdef _DEBUG
 void CUI_PartTimeResult::Render_IMGUI()
 {
-	char ratio[16];
-	//ImGui::DragFloat(ratio, (_float*)&m_fRatioTimeBar, 0.01f, 0.01f, 1.f);
-	ImGui::Separator(); ImGui::NewLine();
+	//char ratio[16];
+	////ImGui::DragFloat(ratio, (_float*)&m_fRatioTimeBar, 0.01f, 0.01f, 1.f);
+	//ImGui::Separator(); ImGui::NewLine();
 
-	for (_int i = 0; i < m_arrPosition.size(); ++i)
-	{
-		char name[16], size[16], color[16];
-		sprintf_s(name,  "pos%d",   i);
-		//sprintf_s(size,  "size%d",  i);
+	//for (_int i = 0; i < m_arrPosition.size(); ++i)
+	//{
+	//	char name[16], size[16], color[16];
+	//	sprintf_s(name,  "pos%d",   i);
+	//	//sprintf_s(size,  "size%d",  i);
 
-		ImGui::DragFloat2(name,  (_float*)&m_arrPosition[i]);
-		//ImGui::DragFloat(size,   (_float*)&m_arrSizeRatio[i], 0.05f, 0.1f, 2.f);
+	//	ImGui::DragFloat2(name,  (_float*)&m_arrPosition[i]);
+	//	//ImGui::DragFloat(size,   (_float*)&m_arrSizeRatio[i], 0.05f, 0.1f, 2.f);
 
-		m_arrSize[i].x = m_arrOriginalSize[i].x * m_arrSizeRatio[i];
-		m_arrSize[i].y = m_arrOriginalSize[i].y * m_arrSizeRatio[i];
+	//	m_arrSize[i].x = m_arrOriginalSize[i].x * m_arrSizeRatio[i];
+	//	m_arrSize[i].y = m_arrOriginalSize[i].y * m_arrSizeRatio[i];
 
-		m_pTransformCom->Set_Scaled(m_arrSize[i].x, m_arrSize[i].y, 1.f);
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION,
-			XMVectorSet(m_arrPosition[i].x   - g_iWinSizeX * 0.5f,
-						- m_arrPosition[i].y + g_iWinSizeY * 0.5f,
-						0.f,
-						1.f));
+	//	m_pTransformCom->Set_Scaled(m_arrSize[i].x, m_arrSize[i].y, 1.f);
+	//	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
+	//		XMVectorSet(m_arrPosition[i].x   - g_iWinSizeX * 0.5f,
+	//					- m_arrPosition[i].y + g_iWinSizeY * 0.5f,
+	//					0.f,
+	//					1.f));
 
-		ImGui::NewLine();
-	}
+	//	ImGui::NewLine();
+	//}
 
 	//char test[16], test2[16];
 	//ImGui::DragFloat3(test, (_float*)&m_vTESTCOLOR, 0.01f, 0.f, 1.f);
@@ -297,7 +297,7 @@ void CUI_PartTimeResult::Initialize_TexturePos()
 // 받은 스코어 점수를 출력합니다.
 _int CUI_PartTimeResult::Change_ScoreTextures(_int iNum)
 {
-	static _int iScoreAccum = 0.f;
+	static _int iScoreAccum = 0;
 	iScoreAccum += 30 * iNum;
 	if (iScoreAccum > m_fScore)
 		return iScoreAccum;

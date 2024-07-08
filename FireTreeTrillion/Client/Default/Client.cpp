@@ -277,6 +277,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 CHECK_FAILED(hr);
             }
             break;
+            case PARK:
+            {
+                hr = pMainApp->Open_Level(LEVEL_PARK);
+                CHECK_FAILED(hr);
+            }
+            break;
             case SIMBA:
             {
                 hr = pMainApp->Open_Level(LEVEL_SIMBA);

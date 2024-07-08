@@ -5,6 +5,7 @@ matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 texture2D	g_DiffuseTexture;
 texture2D	g_NormalTexture;
 texture2D   g_MRATexture;
+texture2D   g_EmissiveTexture;
 texture2D   g_NoiseTexture;
 texture2D   g_MaskBaseTex;
 texture2D   g_MaskNormalTex;
@@ -88,6 +89,7 @@ struct PS_OUT_LIGHTDEPTH
 {
     float4 vLightDepth : SV_TARGET0;
 };
+
 
 PS_OUT_LIGHTDEPTH PS_MAIN_LIGHTDEPTH(PS_IN In)
 {
@@ -230,6 +232,42 @@ PS_OUT PS_MASKED_NORMAL_O(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_EMISSIVE(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT)0;
+    
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    if (0.3f >= vMtrlDiffuse.a)
+        discard;
+    vector vNormalTex = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
+    vector vEmissive = g_EmissiveTexture.Sample(LinearSampler, In.vTexcoord);
+
+    float3 vNormal = vNormalTex.xyz * 2.f - 1.f;
+    float3x3 WorldMatrix = float3x3(In.vTangent, In.vBinormal, In.vNormal);
+
+    float3 vWorldNormal = mul(vNormal, WorldMatrix);
+
+    Out.vDiffuse = vMtrlDiffuse;
+    Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vFieldDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 0.0f);
+    Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
+    if (Out.vMRA.z == 0)
+        Out.vMRA.z = 0.001f;
+    
+    //if (g_fTime < 0.5f)
+    //    Out.vDiffuse.rgb += vDamageColor * smoothstep(0.0f, 1.0f, g_fTime);
+    //else if (g_fTime < 1.f)
+    //    Out.vDiffuse.rgb += vDamageColor * smoothstep(0.0f, 1.0f, (1 - g_fTime));
+    //if (Out.vDiffuse.a != 0 && Out.vDiffuse.r < 0.06f)
+    //    discard;
+    
+    float4 finalColor = Out.vDiffuse + vEmissive;
+    Out.vDiffuse = saturate(finalColor); //finalColor;
+    return Out;
+}
+
+
 technique11 DefaultTechnique
 {
 	// 노말이 있는 일반 논 애님 모델 ( 0 )
@@ -311,5 +349,19 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MASKED_NORMAL_O();
+    }
+
+	// 노말이 있는 일반 논 애님 모델 + Emissive 적용 ( 8 )
+    pass Default_EMISSIVE
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_EMISSIVE();
     }
 }

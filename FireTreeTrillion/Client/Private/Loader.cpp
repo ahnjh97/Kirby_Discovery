@@ -127,6 +127,7 @@
 #include "Radio.h"
 #include "Fog_Instance.h"
 #include "Box.h"
+#include "Debris.h"
 
 // Simba Gimmick Objects
 #include "Turbine.h"
@@ -270,6 +271,9 @@ HRESULT CLoader::Start()
 	case LEVEL_PARTTIME:
 		hr = Loading_For_Parttime();
 		break;
+	case LEVEL_PARK:
+		hr = Loading_For_Park();
+		break;
 
 	case LEVEL_SIMBA:
 		hr = Loading_For_Simba();
@@ -344,7 +348,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_TransingStar"), CTransingStar);
 
-	//LEVEL_DEEDEEDEE
+	//DIALOG
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Dialog"), CDialog);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_MessageWindow"), CUI_MessageWindow);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_BtnIcon"), CUI_BtnIcon);
 
@@ -436,6 +441,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TunnelRock"), CTunnelRock);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Fog_Instance"), CFog_Instance);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Box"), CBox);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Debris"), CDebris);
 
 	#pragma region GIMMICK::LEVEL_FINALBOSS
 
@@ -718,11 +724,6 @@ HRESULT CLoader::Loading_For_DeeDeeDee()
 	//HUD_BOSSHPBAR
 	hr = Add_Texture(eLevel, "HUD_BossBar", "UI/HUD/Boss/BossBar_%d.png", 5);
 
-	//UI_MessageWindow, Button
-	hr = Add_Texture(eLevel, "UI_MessageWindow", "UI/MessageWindow/MessageWindow_Base_%d.dds", 2);
-	hr = Add_Texture(eLevel, "UI_BtnIconBase", "UI/BtnIcon/BtnIcon_Base.dds");
-	hr = Add_Texture(eLevel, "UI_BtnIconBright", "UI/BtnIcon/BtnIcon_Bright.dds");
-
 	// 얼굴, 눈 텍스쳐 로드
 	Add_KirbyFaceTexture(eLevel);
 
@@ -776,7 +777,8 @@ HRESULT CLoader::Loading_For_Town()
 
 	// 얼굴, 눈 텍스쳐 로드
 	Add_KirbyFaceTexture(eLevel);
-#pragma endregion
+
+	#pragma endregion
 
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
@@ -797,7 +799,6 @@ HRESULT CLoader::Loading_For_Town()
 	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_CharacterController"), CCharacterController::Create(m_pDevice, m_pContext));
 	CHECK_FAILED(hr);
 #pragma endregion
-
 
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 	m_IsFinished = true;
@@ -867,7 +868,6 @@ HRESULT CLoader::Loading_For_Parttime()
 
 #pragma endregion
 
-
 #pragma region UI
 
 	// 타임 바
@@ -912,6 +912,61 @@ HRESULT CLoader::Loading_For_Parttime()
 
 	m_strLoadingText = TEXT("물리 컴포넌트(을) 로딩 중 입니다.");
 	#pragma region 물리 컴포넌트
+	/* 리지드바디 */
+	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_RigidBody"), CRigidBody::Create(m_pDevice, m_pContext));
+	CHECK_FAILED(hr);
+	/* 캐릭터 컨트롤러 */
+	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_CharacterController"), CCharacterController::Create(m_pDevice, m_pContext));
+	CHECK_FAILED(hr);
+#pragma endregion
+
+	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
+	m_IsFinished = true;
+
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_For_Park()
+{
+	HRESULT hr = S_OK;
+	LEVEL eLevel = LEVEL_PARK;
+
+	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
+
+#pragma region 텍스쳐
+	if (FAILED(Add_Texture(eLevel, "Logo", "Logo/Logo.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Moon", "Moon.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Level_0_Env", "Map/Level_0_Env.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "BRDF_LUT", "Map/BRDF_LUT.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "RandomNormal", "Map/RandomNormal.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Terrain_Fog", "Map/Fog/Sand_%d.png", 4)))
+		return E_FAIL;
+	
+	hr = Add_Texture(eLevel, "FX_Mask_Bubble2", "Effects/Mask/noise_bubble_%d.png", 4);	CHECK_FAILED(hr);
+
+	//HUD_BOSSHPBAR
+	hr = Add_Texture(eLevel, "HUD_BossBar", "UI/HUD/Boss/BossBar_%d.png", 5);
+
+	// 커비 얼굴 텍스쳐 로드
+	Add_KirbyFaceTexture(eLevel);
+#pragma endregion
+
+	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
+#pragma region 모델
+	Load_AnimToolInfo();
+	// 모아놓은 Model 한번에 생성.
+	hr = Add_Models(eLevel);
+	CHECK_FAILED(hr);
+#pragma endregion
+
+	m_strLoadingText = TEXT("물리 컴포넌트(을) 로딩 중 입니다.");
+
+#pragma region 물리 컴포넌트
 	/* 리지드바디 */
 	hr = m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_RigidBody"), CRigidBody::Create(m_pDevice, m_pContext));
 	CHECK_FAILED(hr);
@@ -988,9 +1043,6 @@ HRESULT CLoader::Loading_For_Simba()
 
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 	m_IsFinished = true;
-
-	return S_OK;
-
 
 	return S_OK;
 }
@@ -1244,7 +1296,8 @@ HRESULT CLoader::Loading_For_Tool_Map()
 
 	if (FAILED(Add_AllModelTxts(eLevel, TYPE_NONANIM, L"TownDeco/")))
 		return E_FAIL;
-
+	if (FAILED(Add_AllModelTxts(eLevel, TYPE_NONANIM, L"ParkDeco/")))
+		return E_FAIL;
 	//LEVEL_FINALBOSS (MapName :: LAB_Discovera)
 	if (FAILED(Add_AllModelTxts(eLevel, TYPE_NONANIM, L"LabDiscovera_Deco/")))
 		return E_FAIL;
@@ -1443,6 +1496,15 @@ HRESULT CLoader::Add_StaticUITexture()
 	//Ability Discard
 	hr = Add_Texture(LEVEL_STATIC, "HUD_AbilityDiscard", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_%d.dds", 3);	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "HUD_AbilityDiscard_Mask", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_Mask.dds");	CHECK_FAILED(hr);
+
+
+	//UI_MessageWindow
+	hr = Add_Texture(LEVEL_STATIC, "UI_MessageWindow_Base", "UI/MessageWindow/MessageWindow_Base_%d.dds", 3); CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "UI_MessageWindow_BtnBase", "UI/MessageWindow/MessageWindow_BtnBase_%d.dds", 3); CHECK_FAILED(hr);
+
+	//UI_Button
+	hr = Add_Texture(LEVEL_STATIC, "UI_BtnIconBase", "UI/BtnIcon/BtnIcon_Base_%d.dds", 3); CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "UI_BtnIconBright", "UI/BtnIcon/BtnIcon_Bright.dds"); CHECK_FAILED(hr);
 
 	return S_OK;
 }
@@ -1753,6 +1815,31 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("FoodCake", TYPE_NONANIM, 0.6f);
 		m_vecModelInfo.emplace_back("FoodTomato", TYPE_NONANIM, 1.6f);
 	}
+	else if (eLevel == LEVEL_PARK)
+	{
+		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("BG1", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+
+		// For Map
+		m_vecModelInfo.emplace_back("PkFunHouse", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+
+		//기믹 오브젝트
+		m_vecModelInfo.emplace_back("FhEntranceAlien_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("WarpStar_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("SolarPanelOnce_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("SolarPanelCharge_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+
+
+		// For Kirby Body
+		Load_KirbyBodyModels();
+		// For Kirby Weapon
+		Load_KirbyWeaponModels();
+		// For Kirby Armour
+		Load_KirbyArmourModels();
+
+		// Deform
+		m_vecModelInfo.emplace_back("DumpCar", TYPE_ANIM, 0.8f, 90.f);
+	}
 	else if (eLevel == LEVEL_SIMBA)
 	{
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, string("MapObjs/"));
@@ -1771,6 +1858,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Throne_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("OriginCage_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
+
 		// For Kirby Body
 		Load_KirbyBodyModels();
 		// For Kirby Weapon
@@ -1786,6 +1874,11 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	}
 	else if (eLevel == LEVEL_FINALBOSS)
 	{
+		for (_uint i = 0; i <= 17; i++) {
+			string strTunnelRock = "TunnelRock" + to_string(i);
+			m_vecModelInfo.emplace_back(strTunnelRock, TYPE_NONANIM, 0.1f);
+		}
+
 		//보스전 필드에서만 생성하는 SUB_SKYSPHERE (BackGround 요소)
 		m_vecModelInfo.emplace_back("LbBuildingFrame", TYPE_NONANIM, 1.f, 0.f);
 		m_vecModelInfo.emplace_back("LbFarPiller", TYPE_NONANIM, 1.f, 76.117f);
@@ -2001,6 +2094,10 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("DeeDeeDeeHammer", TYPE_NONANIM, 1.0f);
 
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
+
+		m_vecModelInfo.emplace_back("SurprisedBoardBlue", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("SurprisedBoardGreen", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("SurprisedBoardRed", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 	}
 }
 

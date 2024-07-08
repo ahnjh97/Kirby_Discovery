@@ -48,6 +48,7 @@ HRESULT CLaser::Initialize(void* pArg)
 	//m_pTransformCom->Look_At(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
 
 	m_fAttack = 20.f;
+	m_bNonDead = true;
 
 	return S_OK;
 }
@@ -183,7 +184,7 @@ HRESULT CLaser::Add_Components()
 
 	HitBox.pOwner = this;
 	HitBox.pDesc = &m_tColliderDesc[ATTACK];
-	HitBox.pCollisionType = HITBOX_MONSTER;
+	HitBox.pCollisionType = MONSTERBULLET;
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
 	//Set_BodyCollider(COLLIDER_FRUSTUM, 0.5f, 1.5f, 0.85f);

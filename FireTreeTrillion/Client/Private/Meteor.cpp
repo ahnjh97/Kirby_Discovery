@@ -4,6 +4,7 @@
 #include "HitBox.h"
 #include "Camera_Main.h"
 #include "Ability.h"
+#include "Debris.h"
 
 CMeteor::CMeteor(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
@@ -51,13 +52,51 @@ HRESULT CMeteor::Initialize(void* pArg)
 		Set_BodyCollider(COLLIDER_SPHERE, 0.f, 1.5f, 18.f);
 		m_fTurnSpeed = 0.1f;
 		m_fMeteorSpeed = 130.f;
+
+		// 파티클 풀링
+		for (_uint j = 0; j < 10; j++)
+		{
+			for (_uint i = 0; i < DEBRISCNT; i++)
+			{
+				HRESULT hr;
+				GAMEOBJECT_DESC tDesc{};
+				tDesc.wstrModelName = TEXT("TunnelRock") + to_wstring(i + 6);
+				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_ParticleDebris"), TEXT("Prototype_GameObject_Debris"), &tDesc);
+				CHECK_FAILED(hr);
+
+
+				CDebris* pDebris = dynamic_cast<CDebris*>(m_pGameInstance->Get_LastGameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_ParticleDebris")));
+				m_vecDebris.push_back(pDebris);
+				Safe_AddRef(pDebris);
+			}
+		}
 	}
 	else
 	{
 		Set_BodyCollider(COLLIDER_SPHERE, 0.f, 1.5f, 5.f);
 		m_fTurnSpeed = 0.5f;
 		m_fMeteorSpeed = 150.f;
+
+		// 파티클 풀링
+		for (_uint j = 0; j < 2; j++)
+		{
+			for (_uint i = 0; i < DEBRISCNT; i++)
+			{
+				HRESULT hr;
+				GAMEOBJECT_DESC tDesc{};
+				tDesc.wstrModelName = TEXT("TunnelRock") + to_wstring(i + 6);
+				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_ParticleDebris"), TEXT("Prototype_GameObject_Debris"), &tDesc);
+				CHECK_FAILED(hr);
+
+
+				CDebris* pDebris = dynamic_cast<CDebris*>(m_pGameInstance->Get_LastGameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_ParticleDebris")));
+				m_vecDebris.push_back(pDebris);
+				Safe_AddRef(pDebris);
+			}
+		}
 	}
+
+	m_bNonDead = true;
 
 	return S_OK;
 }
@@ -75,7 +114,7 @@ _int CMeteor::Tick(_float fTimeDelta)
 				HRESULT hr;
 				// 별 아이템 떨굼
 				CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
-				AbilityItemDesc.fRotateDir = 1.f;																	// 별 회전 방향 오른쪽															// 별 회전 방향 왼쪽
+				AbilityItemDesc.fRotateDir = 1.f;																	// 별 회전 방향 오른쪽
 				AbilityItemDesc.fAngle = 360.f / 6.f * i;													// 별의 진행 방향의 각도
 				AbilityItemDesc.vDir = XMVectorSet(1.f, 0.f, 0.f, 0.f) * 4.f;							// 별의 진행 방향
 				AbilityItemDesc.vPosition = vPos;	// 별의 생성 위치
@@ -89,13 +128,17 @@ _int CMeteor::Tick(_float fTimeDelta)
 			HRESULT hr;
 			// 별 아이템 떨굼
 			CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
-			AbilityItemDesc.fRotateDir = 1.f;																	// 별 회전 방향 오른쪽															// 별 회전 방향 왼쪽
+			AbilityItemDesc.fRotateDir = 1.f;																	// 별 회전 방향 오른쪽
 			AbilityItemDesc.fAngle = 0.f;													// 별의 진행 방향의 각도
 			AbilityItemDesc.vDir = XMVectorSet(0.f, 0.f, 0.f, 0.f);							// 별의 진행 방향
 			AbilityItemDesc.vPosition = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);	// 별의 생성 위치
 			AbilityItemDesc.eAbilityType = ABILITY_DEFAULT;
 			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 			CHECK_FAILED(hr);
+
+			// 파티클 살리기
+			for (_uint i = 0; i < DEBRISCNT; ++i)
+				m_vecDebris[i]->Set_ParticleDebris(AbilityItemDesc.vPosition, 7.f, _float2(10.f, 30.f));
 		}
 
 		return OBJ_DEAD;
@@ -148,6 +191,33 @@ _int CMeteor::Tick(_float fTimeDelta)
 				_vector vRight = XMVector3Cross(XMVector3Normalize(m_vTargetPos - vPos), XMVectorSet(0.f, 1.f, 0.f, 0.f));
 				if (!XMVector3Equal(vRight, XMVectorZero()))
 					m_pTransformCom->Turn(-vRight, m_fTimeDelta * fDeceleration * 0.8f);
+
+				// 파티클 살리기
+				m_fParticleDelayTime += m_fTimeDelta;
+				m_fOffsetTime += m_fTimeDelta;
+				if(0.1f < m_fParticleDelayTime)
+				{
+					if (m_vecDebris.size() > m_iDebrsiMaxCnt)
+						m_iDebrsiMaxCnt += DEBRISCNT;
+					else
+					{
+						m_iDebrsiMaxCnt = DEBRISCNT;
+						m_iDebrisCnt = 0;
+					}
+
+					m_fParticleDelayTime = 0.f;
+					_float fAngle = { 0.f };
+					_vector vNewPos = {};
+					for (m_iDebrisCnt; m_iDebrisCnt < m_iDebrsiMaxCnt; ++m_iDebrisCnt)
+					{
+						fAngle += 36.f;
+						vNewPos.m128_f32[0] = vPos.m128_f32[0] + (20.f * sin(XMConvertToRadians(fAngle)));
+						vNewPos.m128_f32[1] = vPos.m128_f32[1] - 4.5f + m_fOffsetTime * 7.f;
+						vNewPos.m128_f32[2] = vPos.m128_f32[2] - (20.f * cos(XMConvertToRadians(fAngle)));
+
+						m_vecDebris[m_iDebrisCnt]->Set_ParticleDebris(vNewPos, 10.f + m_fOffsetTime, _float2(10.f, 20.f), _float2(5.f, 15.f));
+					}
+				}
 			}
 			else
 			{
@@ -159,7 +229,7 @@ _int CMeteor::Tick(_float fTimeDelta)
 		else
 		{
 			_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(vPos, m_vTargetPos)));
-			if (1.5f < fDistance)
+			if (2.f < fDistance)
 			{
 				m_fTurnSpeed += m_fTimeDelta;
 
@@ -182,9 +252,9 @@ _int CMeteor::Tick(_float fTimeDelta)
 						pCamera->Make_Shake(0.5f, 0.2f);
 				}
 
-				m_fDeadTime += m_fTimeDelta;
-				if (0.2f < m_fDeadTime)
-					m_bDead = true;
+				//m_fDeadTime += m_fTimeDelta;
+				//if (0.1f < m_fDeadTime)
+				m_bDead = true;
 			}
 		}
 	}
@@ -299,7 +369,7 @@ HRESULT CMeteor::Add_Components()
 	CHitBox::HITBOX_DESC HitBox{};
 	HitBox.pOwner = this;
 	HitBox.pDesc = &m_tColliderDesc[BODY];
-	HitBox.pCollisionType = MONSTER;
+	HitBox.pCollisionType = MONSTERBULLET;
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
 
@@ -378,4 +448,8 @@ void CMeteor::Free()
 
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
+
+	for (auto iter : m_vecDebris)
+		Safe_Release(iter);
+	m_vecDebris.clear();
 }

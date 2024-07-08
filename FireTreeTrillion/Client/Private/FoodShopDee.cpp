@@ -4,6 +4,7 @@
 #include "FoodShopDee.h"
 #include "Dee_Part.h"
 #include "Dee_State.h"
+#include "UI_MessageWindow.h"
 
 CFoodShopDee::CFoodShopDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CWaddleDee{ pDevice, pContext }
@@ -147,8 +148,13 @@ void CFoodShopDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObje
 	m_bIsKirbyInZone = true;
 	m_fResetHiTime = 5.f;
 
-	//if(m_pGameInstance->Get_KeyState(DIK_LCONTROL, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_1, KEY_DOWN))
-	//m_pModelCom->Set_Animation(27, 50.f, true, true);
+	if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
+	{
+		//Prototype_GameObject_UI_MessageWindow
+		CUI_MessageWindow* pMessageWindow =  dynamic_cast<CUI_MessageWindow*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_Dialog"), 0));
+		CHECK_NULLPTR(pMessageWindow);
+		pMessageWindow->ShowDialog();
+	}
 }
 
 HRESULT CFoodShopDee::Add_Components()
@@ -192,7 +198,6 @@ HRESULT CFoodShopDee::Add_Components()
 	HitBox.pCollisionType = NPC;
 	hr = m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox);
 	CHECK_FAILED(hr);
-
 	Set_BodyCollider(COLLIDER_CYLINDER, 0.6f, 1.2f, 5.f);
 
 	SetUp_FSM();

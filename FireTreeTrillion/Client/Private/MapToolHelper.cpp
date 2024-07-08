@@ -14,6 +14,7 @@ static _int s_iKickableIdx = -1;
 
 static _int s_iTownDecoIdx = -1;
 static _int s_iLabDecoIdx = -1;
+static _int s_iParkDecoIdx = -1;
 
 static _int s_iLevelIndex = 0;
 static _int s_iTempLevelIdx = -1;
@@ -56,10 +57,12 @@ static _char s_ObjectsFilter[MAX_PATH] = "";
 static _char s_MapDecoFilter[MAX_PATH] = "";
 static _char s_TownDecoFilter[MAX_PATH] = "";
 static _char s_LabDecoFilter[MAX_PATH] = "";
+static _char s_ParkDecoFilter[MAX_PATH] = "";
 static _bool s_bWasObjectsOpen = false;
 static _bool s_bWasMapDecosOpen = false;
 static _bool s_bWasTownDecosOpen = false;
 static _bool s_bWasLabDecosOpen = false;
+static _bool s_bWasParkDecosOpen = false;
 
 static void HelpMarker(const char* desc)
 {
@@ -101,7 +104,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	}
 
 	m_vecTxtIndices = { &s_iMapTxtIdx, &s_iTriggerTxtIdx, &s_iMonsterTxtIdx, &s_iObjectIdx
-		, &s_iMapDecoIdx, &s_iItemIdx, &s_iKickableIdx, &s_iTownDecoIdx, &s_iLabDecoIdx };
+		, &s_iMapDecoIdx, &s_iItemIdx, &s_iKickableIdx, &s_iTownDecoIdx, &s_iLabDecoIdx, &s_iParkDecoIdx };
 
 	m_vecLevelName = { "Level_Static", "Level_Loading", "Level_Logo", "GamePlay",
 			"Level_Tool_UI", "Level_Tool_FX", "Level_Tool_Anim", "Level_Tool_Map",
@@ -110,9 +113,10 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 #pragma region BASIC MAP
 
 	m_vecMapModelNames = { "Level0Stage1Step01", "Level0Stage1Step02",  "Level1Stage1Step01", "DeeDeeDeeMap", "Town", "TownShop"
+		, "PkFunHouse"
 		, "Land_VcLabo"
-		,"Land_LbLastBossBeforeStep" //,"LevelFinale_LbLastBuilding" :: 텍스처 및 모델 수정으로 사용안함
-		,"Land_LbLastBossStage"
+		, "Land_LbLastBossBeforeStep" //,"LevelFinale_LbLastBuilding" :: 텍스처 및 모델 수정으로 사용안함
+		, "Land_LbLastBossStage"
 		, "LbBossLoom01L" // 심바
 		//피날레
 		, "FinaleCave"
@@ -186,6 +190,28 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "VpControlBoxChairL", "VpControlBoxEL", "VpStairsAL"
 		#pragma endregion
 
+#pragma region LEVEL_PARK (WONDARIA REMAINS) OBJECT
+
+		// 필드 오브젝트
+		, "FhArchWayAL", "FhArchWayBL", "FhArchWayCL", "FhArchWayDL" 
+		, "FhFence01L", "FhFence02L", "FhFence03L", "FhFence04L", "FhFence05L", "FhFence06L" 
+		, "FhOrnamentGroundAL", "FhOrnamentGroundBL"
+		, "FhOrnamentRoofAL", "FhOrnamentRoofBL", "FhOrnamentRoofCL", "FhOrnamentRoofDL", "FhOrnamentRoofEL"
+		, "FhPillarAL", "FhPillarATopDec2L", "FhPillarBL", "FhPillarBTopDec2L", "FhPillarCL", "FhPillarCTopDec2L"
+		, "FhPlanetOrnamentAL"
+		, "FhStackOrnamentAL", "FhStackOrnamentBL", "FhStackOrnamentCL", "FhStackOrnamentDL", "FhStackOrnamentEL"
+		
+		// 채우기용 잡오브젝트
+		, "DollKirby"
+		, "PkParkShowWindowObj01AL", "PkParkShowWindowObj01BL", "PkParkShowWindowObj02AL", "PkParkShowWindowObj02BL"
+		, "PkParkShowWindowObj03AL", "PkParkShowWindowObj03BL", "PkParkShowWindowObj04AL", "PkParkShowWindowObj04BL"
+		, "PkParkShowWindowObj05AL", "PkParkShowWindowObj05BL", "PkParkShowWindowObj06L"
+		, "PkParkShowWindowObj07AL", "PkParkShowWindowObj07BL", "PkParkShowWindowObj08AL", "PkParkShowWindowObj08BL"
+		, "ParkOutsideDoor", "PkRoof01"
+		, "CmLightFollowParts01L", "CmLightFollowParts02L"
+
+#pragma endregion
+
 #pragma region LEVEL_FINALBOSS (LAB_DISCOVERA) OBJECT
 		// 보스전 필드
 		//"LbLastBuilding", "LbLastBossStage" :: 텍스처 및 모델 수정으로 사용안함
@@ -235,6 +261,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 	ReadTownDecoTxts();
 	ReadLabDecoTxts();
+	ReadParkDecoTxts();
 
 	TraverseBlendDecoInfoTxts();
 
@@ -420,6 +447,26 @@ void CMapToolHelper::ReadLabDecoTxts()
 
 	for (auto& objTxt : m_vecLabDecoTxts)
 		m_setLabDecoTxts.insert(objTxt);
+}
+
+void CMapToolHelper::ReadParkDecoTxts()
+{
+	string strPath = "../../../model_txt/ParkDeco/NonAnim/";
+
+	directory_iterator end_iter;  // 디렉토리 순회의 끝을 나타내는 iterator
+	directory_iterator dir_iter(strPath);  // 지정된 경로의 시작 iterator
+
+	while (dir_iter != end_iter) {
+		if (is_regular_file(*dir_iter)) {
+			string strFilePath = dir_iter->path().filename().string();
+			string strModelName = strFilePath.substr(0, strFilePath.length() - 4);
+			m_vecParkDecoTxts.emplace_back(strModelName);
+		}
+		++dir_iter;
+	}
+
+	for (auto& objTxt : m_vecParkDecoTxts)
+		m_setParkDecoTxts.insert(objTxt);
 }
 
 void CMapToolHelper::Menu_Level()
@@ -624,6 +671,22 @@ void CMapToolHelper::Menu_NonAnimModels()
 	}
 	else
 		ClearSearchFilter(s_LabDecoFilter, s_bWasLabDecosOpen);
+
+	if (ImGui::CollapsingHeader("ParkDecos"))
+	{
+		ImGui::InputText("##ParkDecoFilter", s_ParkDecoFilter, IM_ARRAYSIZE(s_ParkDecoFilter)); // 필터 입력받기
+		ImGui::SetNextItemWidth(200.0f);
+		vector<const _char*> vecParkDecoNames;
+		FilterListBoxStrings(s_ParkDecoFilter, vecParkDecoNames, m_vecParkDecoTxts);
+
+		if (ImGui::ListBox("##ParkDecos", &s_iParkDecoIdx, vecParkDecoNames.data(), vecParkDecoNames.size(), 13)) {
+			DisableOtherGroups(&s_iParkDecoIdx);
+			m_strSelectedTxt = string(vecParkDecoNames[s_iParkDecoIdx]);
+		}
+		s_bWasParkDecosOpen = true;
+	}
+	else
+		ClearSearchFilter(s_ParkDecoFilter, s_bWasParkDecosOpen);
 }
 
 void CMapToolHelper::Menu_TriggerInfo()
@@ -1565,6 +1628,9 @@ _bool CMapToolHelper::IsDeco(const string& _strModelName)
 	if (m_setLabDecoTxts.end() != m_setLabDecoTxts.find(_strModelName))
 		return true;
 
+	if (m_setParkDecoTxts.end() != m_setParkDecoTxts.find(_strModelName))
+		return true;
+
 	return _bool();
 }
 
@@ -2248,6 +2314,9 @@ void CMapToolHelper::Load_Map(const string& _strLevel)
 
 	_uint iNumObjects{};
 	fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
+
+	if (fileInput.eof())
+		return;
 
 	_uint iStrLength{};
 	string strModelName;
