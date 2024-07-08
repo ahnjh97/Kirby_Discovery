@@ -65,7 +65,7 @@ HRESULT CLevel_Finale::Initialize()
 	ObjDesc.fSpeedPerSec = 5.f;
 	ObjDesc.fRotationPerSec = ToRadian(90.f);
 	_float4x4 InitMat = _float4x4::Identity;
-	InitMat.Translation({ 0.f, 0.f, 0.f });
+	InitMat.Translation({ 3.f, 0.f, 0.f });
 	ObjDesc.matWorld = InitMat;
 	// Car Test
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Deform"), TEXT("Prototype_GameObject_DumpCar"), &ObjDesc)))
