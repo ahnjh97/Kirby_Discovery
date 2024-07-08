@@ -340,6 +340,7 @@
     <ClInclude Include="..\Public\StarBlock.h" />
     <ClInclude Include="..\Public\StarBlockPiece.h" />
     <ClInclude Include="..\Public\SurprisedBoard.h" />
+    <ClInclude Include="..\Public\SurprisedBoard_State.h" />
     <ClInclude Include="..\Public\TerrainFog.h" />
     <ClInclude Include="..\Public\TestModel.h" />
     <ClInclude Include="..\Public\TestModel_State.h" />
@@ -538,6 +539,7 @@
     <ClCompile Include="..\Private\StarBlock.cpp" />
     <ClCompile Include="..\Private\StarBlockPiece.cpp" />
     <ClCompile Include="..\Private\SurprisedBoard.cpp" />
+    <ClCompile Include="..\Private\SurprisedBoard_State.cpp" />
     <ClCompile Include="..\Private\TerrainFog.cpp" />
     <ClCompile Include="..\Private\TestModel.cpp" />
     <ClCompile Include="..\Private\TestModel_State.cpp" />

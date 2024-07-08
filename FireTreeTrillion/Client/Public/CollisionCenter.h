@@ -27,7 +27,7 @@ public:
 
         CONTENT_INTERACT,	    
         CONTENT_ITEM,	        // 아이템 습득관련
-        CONTENT_NONEVENT,	    
+        CONTENT_TRIGGER,	    // 피직스 사용하지 않는 트리거용
         CONTENT_END
     };
 

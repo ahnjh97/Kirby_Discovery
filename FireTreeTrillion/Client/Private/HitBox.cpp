@@ -32,6 +32,8 @@ HRESULT CHitBox::Initialize(void* pArg)
 	m_pOwnerTransform = m_pOwner->Get_TransformCom();
 	Safe_AddRef(m_pOwnerTransform);
 	m_pOwnerCollisionDesc = pDesc->pDesc;
+	if (pDesc->matObjectPosition != _float4x4())
+		m_pTransformCom->Set_WorldMatrix(pDesc->matObjectPosition);
 
 	m_eCollisionGroup = pDesc->pCollisionType;
 

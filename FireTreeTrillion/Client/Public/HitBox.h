@@ -11,10 +11,12 @@ class CHitBox final : public CGameObject
 public:
 	struct HITBOX_DESC
 	{
-		CGameObject* pOwner;
+		CGameObject*	pOwner;
 		COLLISION_DESC* pDesc;
-		_uint		 pCollisionType;
+		_uint			pCollisionType;
+		_float4x4		matObjectPosition = _float4x4(); // 정적으로 고정해야하는 위치일 경우 사용합니다.
 	};
+
 private:
 	CHitBox(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CHitBox(const CHitBox& rhs);
