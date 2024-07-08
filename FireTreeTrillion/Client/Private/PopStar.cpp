@@ -46,13 +46,14 @@ HRESULT CPopStar::Initialize(void* pArg)
 	//StarRiver
 	CEffect::FX_DESC FXDesc{};
 
-	FXDesc.vInitPos = _float3{15.f, -30.f, 0.f};
+	FXDesc.vInitPos = _float3{15.f, -10.f, 0.f};
 	FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 	FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
 	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_StarRiver"), &FXDesc)))
 		return E_FAIL;
 
-	FXDesc.vInitScale = { 6.5f, 6.5f, 6.5f };
+	FXDesc.vInitPos = _float3{ 15.f, -40.f, 0.f };
+	FXDesc.vInitScale = { 6.f, 6.f, 6.f };
 	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_star dash test 3"), &FXDesc)))
 		return E_FAIL;
 

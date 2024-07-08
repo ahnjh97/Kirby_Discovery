@@ -178,8 +178,6 @@ void CDisaster_Master::Make_AirParticle()
 		m_fAirParticleDelay = 0.f;
 	}
 
-
-
 }
 
 void CDisaster_Master::Moving_FinaleRoad(_float fKirbyX)
@@ -187,32 +185,33 @@ void CDisaster_Master::Moving_FinaleRoad(_float fKirbyX)
 
 	_float fKirbySpeed = m_pKirby->Get_KirbyInfo()->m_fMoveSpeed;
 
-	if (m_bRoadTrigger[0] == true && fKirbyX + (fKirbySpeed * 7.f) > 1083.f)
+
+	if (m_bRoadTrigger[0] == true && fKirbyX + (fKirbySpeed * 8.f) > 1083.f)
 	{
 		_float3 vDestPos = { 1083.f, -190.f, -158.f };
-		_float3 vStartPos = { 1083.f, -190.f, -158.f };
+		_float3 vStartPos = vDestPos + _float3(100.f, 200.f, 200.f);
 
 		Make_FinaleRoad(RTYPE_BUILDINGA, MOVECMD_FLY,
-			vStartPos,	{ .98f, .22f, -.03f },
-			vDestPos ,	{ .9f, .22f, -.03f });
+			vStartPos,	{ .4f, .1f, -.03f },
+			vDestPos ,	{ .98f, .22f, -.03f });
 
 		m_bRoadTrigger[0] = false;
 	}
-	else if (m_bRoadTrigger[1] == true && fKirbyX + (fKirbySpeed * 7.f) > 1234.6f)
+	else if (m_bRoadTrigger[1] == true && fKirbyX + (fKirbySpeed * 8.f) > 1215.f)
 	{
-		_float3 vStartPos = { 1234.6f,-170.001f,-141.846f };
-		_float3 vDestPos = { 1234.6f,-170.001f,-141.846f };
+		_float3 vDestPos = { 1215.f, -164.001f, -129.f };
+		_float3 vStartPos = vDestPos + _float3(100.f, 200.f, -200.f);
 
 		Make_FinaleRoad(RTYPE_BUILDINGA, MOVECMD_FLY,
-			vStartPos, { .88f, .41f, .25f },
-			vDestPos, { .98f, -.16f, -.15f });
+			vStartPos, { .31f, .42f, -.85f },
+			vDestPos, { .91f, .31f, .26f });
 
 		m_bRoadTrigger[1] = false;
 	}
-	else if (m_bRoadTrigger[2] == true && fKirbyX + (fKirbySpeed * 7.f) > 1362.651f)
+	else if (m_bRoadTrigger[2] == true && fKirbyX + (fKirbySpeed * 8.f) > 1362.651f)
 	{
-		_float3 vStartPos = { 1362.651f,-123.036f,-111.231f };
 		_float3 vDestPos = { 1362.651f,-123.036f,-111.231f };
+		_float3 vStartPos = vDestPos + _float3(100.f, 200.f, 200.f);
 
 		Make_FinaleRoad(RTYPE_BUILDINGA, MOVECMD_FLY,
 			vStartPos, { .92f, .39f, .06f },
@@ -220,10 +219,10 @@ void CDisaster_Master::Moving_FinaleRoad(_float fKirbyX)
 
 		m_bRoadTrigger[2] = false;
 	}
-	else if (m_bRoadTrigger[3] == true && fKirbyX + (fKirbySpeed * 4.f) > 1488.866f)
+	else if (m_bRoadTrigger[3] == true && fKirbyX + (fKirbySpeed * 8.f) > 1488.866f)
 	{
-		_float3 vStartPos = { 1488.866f,-98.833f,-140.250f };
 		_float3 vDestPos = { 1488.866f,-98.833f,-140.250f };
+		_float3 vStartPos = vDestPos + _float3(100.f, 200.f, -200.f);
 
 		Make_FinaleRoad(RTYPE_BUILDINGA, MOVECMD_FLY,
 			vStartPos, { .95f, .25f, -.18f },
@@ -251,15 +250,15 @@ void CDisaster_Master::Moving_TargetBaum(_float fKirbyX)
 		m_bBaumTrigger[1] = false;
 	}
 
-	else if (m_bBaumTrigger[2] == true && fKirbyX + (fKirbySpeed * 4.f) > 583.25f)
+	else if (m_bBaumTrigger[2] == true && fKirbyX + (fKirbySpeed * 4.f) > 585.25f)
 	{
-		Make_OnTerrainBaum(_float4(583.25f, .08f, -91.f, 1.f), false);
+		Make_OnTerrainBaum(_float4(585.25f, -.9f, -84.f, 1.f), false);
 		m_bBaumTrigger[2] = false;
 	}
 
-	else if (m_bBaumTrigger[3] == true && fKirbyX + (fKirbySpeed * 2.5f) > 681.f)
+	else if (m_bBaumTrigger[3] == true && fKirbyX + (fKirbySpeed * 2.5f) > 689.f)
 	{
-		Make_OnTerrainBaum(_float4(681.f, -15.9f, -91.8f, 1.f), false);
+		Make_OnTerrainBaum(_float4(689.f, -25.9f, -93.f, 1.f), false);
 		m_bBaumTrigger[3] = false;
 	}
 }

@@ -4,6 +4,7 @@
 #include "PartTimerKirby.h"
 #include "EventCenter.h"
 #include "PartTimeHelper.h"
+#include "Particle.h"
 
 CCamera_Main::CCamera_Main(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CCamera{ pDevice, pContext }
@@ -174,6 +175,12 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 
 
 	//별 이펙트 테스트용
+	CParticle::PARTICLE_DESC FXDesc{};
+	FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+
+	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_night star test 2"), &FXDesc)))
+		return E_FAIL;
+
 	return S_OK;
 }
 

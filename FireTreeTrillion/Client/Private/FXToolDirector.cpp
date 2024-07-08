@@ -1395,6 +1395,13 @@ void CFXToolDirector::Render_FXProperty()
 		}
 		SameLine();
 
+		if (RadioButton(u8"Priority", m_iCurRenderGroup == CRenderer::RENDER_PRIORITY))
+		{
+			m_iCurRenderGroup = CRenderer::RENDER_PRIORITY;
+			pCurFX->m_eRenderGroup = CRenderer::RENDER_PRIORITY;
+		}
+		SameLine();
+
 		if (RadioButton(u8"NonBlend", m_iCurRenderGroup == CRenderer::RENDER_NONBLEND))
 		{
 			m_iCurRenderGroup = CRenderer::RENDER_NONBLEND;
@@ -1422,6 +1429,14 @@ void CFXToolDirector::Render_FXProperty()
 		{
 			m_iCurRenderGroup = CRenderer::RENDER_UI;
 			pCurFX->m_eRenderGroup = CRenderer::RENDER_UI;
+		}
+
+		SameLine();
+
+		if (RadioButton(u8"Super UI", m_iCurRenderGroup == CRenderer::RENDER_SUPERUI))
+		{
+			m_iCurRenderGroup = CRenderer::RENDER_SUPERUI;
+			pCurFX->m_eRenderGroup = CRenderer::RENDER_SUPERUI;
 		}
 
 		Spacing();

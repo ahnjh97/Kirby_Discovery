@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FinaleRoadGrouper.h"
 #include "FinaleRoad.h"
+#include "Camera_Main.h"
 
 CFinaleRoadGrouper::CFinaleRoadGrouper(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CGameObject{ pDevice, pContext }
@@ -35,13 +36,14 @@ _bool CFinaleRoadGrouper::Make_CollideReaction(CFinaleRoad* pRoad)
 		return false;
 
 
-
 	switch (m_eCollideMove)
 	{
 	case MOVECMD_ROTATE:
 		break;
 	case MOVECMD_COLLIDE:
 		m_bStartCollideEvent = true;
+		m_fCollideTime = 1.f;
+		m_fMaxDuration = m_fCollideTime;
 		break;
 	default:
 		break;
@@ -346,32 +348,6 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 	}
 	break;
 	default:
-	/*	CFinaleRoad::ROAD_DESC roadDesc{};
-		roadDesc.wstrModelName = TEXT("MovableBuildingA");
-		roadDesc.pSocketMat = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-		roadDesc.eCollideType = CFinaleRoad::CTYPE_NONE;
-		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
-			return E_FAIL;
-
-		CFinaleRoad* pRoad = dynamic_cast<CFinaleRoad*>(m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"))->back());
-		if (pRoad != nullptr)
-			m_pRoads.emplace_back(pRoad);
-
-
-		roadDesc.wstrModelName = TEXT("Road");
-		_float4x4 InitMat = _float4x4::Identity;
-		InitMat.Translation({ 50.f, 0.f, -50.f });
-		roadDesc.matWorld = InitMat;
-
-
-		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
-			return E_FAIL;
-
-
-		pRoad = dynamic_cast<CFinaleRoad*>(m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"))->back());
-		if (pRoad != nullptr)
-			m_pRoads.emplace_back(pRoad);*/
-
 		break;
 	}
 
@@ -385,23 +361,27 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 	case MOVECMD_COLLIDE:
 	{
 		//부딪혔을 때 만들 상태
-		_float3 vMyPos = GET_POS;
-		m_vStartDir = (_float3)m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-		m_vDestPos = vMyPos + _float3{ 0.f, -30.f, 0.f };
+		m_vStartPos = GET_POS;
 		m_vDestPos = RoadGroupDesc.vDestPos;
+
+		m_vStartDir = (_float3)m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 		m_vDestDir = RoadGroupDesc.vDestDir;
+
 	}
 	break;
+	//등장 시에 날라오는 놈
 	case MOVECMD_FLY:
 	{
 		//부딪혔을 때 만들 상태
-		_float3 vMyPos = GET_POS;
-		m_vStartDir = (_float3)m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+		m_vStartPos = GET_POS;
 		m_vDestPos = RoadGroupDesc.vDestPos;
+
+		m_vStartDir = (_float3)m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 		m_vDestDir = RoadGroupDesc.vDestDir;
 
 		m_bStartCollideEvent = true;
-		m_fCollideTime = 1.f;
+		m_fCollideTime = 1.5f;
+		m_fMaxDuration = m_fCollideTime;
 	}
 	break;
 	default:
@@ -422,25 +402,47 @@ _int CFinaleRoadGrouper::Tick(_float fTimeDelta)
 	//특정 목표로 가야 할 때
 	if ( m_bStartCollideEvent && 0.f < m_fCollideTime )
 	{
-
-		m_fCollideTime -= fTimeDelta;
+		//충돌 시간을 깎는다.
+		m_fCollideTime -= fRealTimeDelta;
 		if (m_fCollideTime < 0.f)
+		{
 			m_fCollideTime = 0.f;
 
-		_float3 vMyPos = GET_POS;
-		_float fDist = _float3::Distance(vMyPos, m_vDestPos);
-		_float fTime = 1.f - pow(m_fCollideTime, 2.f);
+			//날아와서 부딪히는 놈이면 shake 하기
+			if (m_eCollideMove == MOVECMD_FLY)
+			{
+				CCamera_Main* pCamera = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 
-		if (.1f < fDist)
-		{
-			vMyPos += (m_vDestPos - vMyPos) * fRealTimeDelta;
-			if (_float3::Distance(vMyPos, m_vDestPos) < .1f)
-				vMyPos = m_vDestPos;
-
-			SET_POS(Pos(vMyPos));
+				if(nullptr != pCamera)
+					pCamera->Make_Shake(3.f, .8f);
+			}
 		}
 
 
+		_float3 vMyPos = GET_POS;
+		_float fDist = _float3::Distance(vMyPos, m_vDestPos);
+
+
+		_float fTime = 0.f;
+
+		if (m_eCollideMove == MOVECMD_FLY)
+			fTime = (m_fMaxDuration - m_fCollideTime) / m_fMaxDuration;
+		else if (m_eCollideMove == MOVECMD_COLLIDE)
+			fTime = EASE_OUT((m_fMaxDuration - m_fCollideTime) / m_fMaxDuration);
+
+
+		//거리 스냅
+		if (.1f < fDist)
+		{
+			_float3 vResultPos = _float3::Lerp(m_vStartPos, m_vDestPos, fTime);
+
+			if (_float3::Distance(vResultPos, m_vDestPos) < .1f)
+				vResultPos = m_vDestPos;
+
+			SET_POS(Pos(vResultPos));
+		}
+
+		//회전 보간
 		Quaternion vFirstQuat, vSecondQuat, vResultQuat;
 		
 		vFirstQuat = CUtils::Make_Quat_FromDir(m_vStartDir);
@@ -448,14 +450,6 @@ _int CFinaleRoadGrouper::Tick(_float fTimeDelta)
 
 		vResultQuat = Quaternion::Slerp(vFirstQuat, vSecondQuat, clamp(fTime, 0.f, 1.f));
 		m_pTransformCom->Turn_Absolute(vResultQuat);
-
-		//_float3 vRadianEuler = vResultQuat.ToEuler();
-		//_float3 vCurRot = { ToDegree(vRadianEuler.x), ToDegree(vRadianEuler.y), ToDegree(vRadianEuler.z) };
-
-
-		////_float3 vMyDir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-		////_float3 vCurRot = CUtils::SlerpDirVec(m_vStartDir, m_vDestDir, clamp(fTime, 0.f, 1.f));
-		//m_pTransformCom->Set_State(CTransform::STATE_LOOK, Dir(vCurRot));
 	}
 
 	return OBJ_NOEVENT;

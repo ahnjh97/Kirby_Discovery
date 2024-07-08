@@ -46,15 +46,6 @@ void CFinaleRoad::Start_CollisionEvent()
 			CFinalePartical_Maker* pMaker = static_cast<CFinalePartical_Maker*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinalePartical_Maker")));
 			pMaker->Make_Partical(50, GET_POS, 10.f, 1.5f, 1.f, _float4(0.f, -1.f, 0.f, 0.f), 120.f, 1.f);
 		}
-		//m_pModelCom->DisableActors();
-
-
-	//m_pStaticActor->userData = nullptr;
-	//if (m_pStaticActor->getScene())
-	//{
-	//	auto pScene = m_pGameInstance->Get_Scene();
-	//	pScene->removeActor(*m_pStaticActor);
-	//}
 	}
 	break;
 	default:

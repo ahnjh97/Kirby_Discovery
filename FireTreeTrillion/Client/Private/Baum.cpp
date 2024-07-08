@@ -95,7 +95,7 @@ _int CBaum::Tick(_float fTimeDelta)
 			return OBJ_DEAD;
 		}
 
-	}
+	}	
 	else if (m_bOnTerrain == true)
 	{
 		// 지형에 붙어 따라가는 기능
