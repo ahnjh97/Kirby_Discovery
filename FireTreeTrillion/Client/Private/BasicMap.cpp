@@ -544,6 +544,8 @@ void CBasicMap::ReadDecos_ForSmallLevels()
         strLevel = "PartTime";
     else if (LEVEL_FINALBOSS == *m_pCurrentLevelID)
         strLevel = "FinalBoss";
+    else if (LEVEL_FINALE == *m_pCurrentLevelID)
+        strLevel = "Finale";
     else
         return;
 
@@ -583,7 +585,7 @@ void CBasicMap::ReadDecos_ForSmallLevels()
         string strFolder;
         if (LEVEL_TOWN == *m_pCurrentLevelID || LEVEL_PARTTIME == *m_pCurrentLevelID || LEVEL_DEEDEEDEE == *m_pCurrentLevelID)
             strFolder = string("TownDeco/");
-        else if (LEVEL_FINALBOSS == *m_pCurrentLevelID)
+        else if (LEVEL_FINALBOSS == *m_pCurrentLevelID || LEVEL_FINALE == *m_pCurrentLevelID)
             strFolder = string("LabDiscovera_Deco/");
 
         if (true == IsMapDeco(strModelName))
