@@ -50,6 +50,24 @@ HRESULT CDisaster_Master::Initialize(void* pArg)
 	m_pMaker = static_cast<CFinalePartical_Maker*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinalePartical_Maker")));
 	Safe_AddRef(m_pMaker);
 
+
+	for (_int i = 0; i < 20; ++i)
+	{
+		_float4 vKirbyPos = m_pKirby->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
+		_float fZOffSet = { 0.f };
+		fZOffSet = CUtils::Make_RandomInt(0, 1) == 0 ? CUtils::Make_RandomFloat(-700.f, -200.f) : CUtils::Make_RandomFloat(200.f, 700.f);
+		_float fXOffSet = { 0.f };
+		fXOffSet = CUtils::Make_RandomFloat(-300.f, 300.f);
+		_float fYOffSet = { 0.f };
+		fYOffSet = CUtils::Make_RandomFloat(-50.f, 50.f);
+
+		vKirbyPos.x += fXOffSet;
+		vKirbyPos.y += fYOffSet;
+		vKirbyPos.z += fZOffSet;
+		m_pMaker->Make_BuildingPartical(vKirbyPos);
+	}
+
+
 	return S_OK;
 }
 
@@ -98,7 +116,7 @@ void CDisaster_Master::Make_MissBaum()
 {
 	// 운석은 2.5초 간격으로 생성되며
 	// 운석은 2초동안 공중에서 날아든다.
-	if (m_fMakeBaumDelay > 1.8f)
+	if (m_fMakeBaumDelay > 1.1f)
 	{
 		_float4 vKirbyPos = m_pKirby->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
 		_float fKirbySpeed = m_pKirby->Get_KirbyInfo()->m_fMoveSpeed;

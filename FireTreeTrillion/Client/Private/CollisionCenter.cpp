@@ -623,7 +623,7 @@ void CCollisionCenter::RealFinaleStage_Battle()
 			CPhysXObject* pBaum = static_cast<CPhysXObject*>(Src);
 
 			pKirby->Collision(CONTENT_BODY, pBaum);
-			pKirby->Set_HitStop(0.15f);
+			pKirby->Set_HitStop(0.2f);
 			pthis->Camera_Shaking(1.5f, 1.f);
 			pBaum->Collision(CONTENT_BODY, pKirby);
 
@@ -643,7 +643,6 @@ void CCollisionCenter::RealFinaleStage_Battle()
 			CPhysXObject* pBreakable = static_cast<CPhysXObject*>(Src);
 
 			pBreakable->Collision(CONTENT_BODY, pKirby);
-			pthis->Camera_Shaking(2.5f, 3.f);
 
 		});
 }
