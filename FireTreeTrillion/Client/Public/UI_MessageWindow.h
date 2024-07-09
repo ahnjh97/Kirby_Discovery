@@ -16,24 +16,42 @@ public:
 	struct MESSAGE_DESC
 	{
 		wstring wstrFontTag = { TEXT("") };
-		_float2	fFontPos = { 0.f, 0.f };
-		_float4	fFontRGBA = { 0.f, 0.f, 0.f, 0.f };
+		_float2	vFontPos = { 0.f, 0.f };
+		_float4	vFontRGBA = { 0.f, 0.f, 0.f, 0.f };
 
-		_float2 fFontSize = { 0.f, 0.f }; //원본 사이즈
-		_float2 fFontScale = { 0.f, 0.f }; //원본대비 키울 스케일 비율
+		_float2 vFontSize = { 0.f, 0.f }; //원본 사이즈
+		_float2 vFontScale = { 0.f, 0.f }; //원본대비 키울 스케일 비율
 		_float  fRadian = { XMConvertToRadians(0.f) };
 
 		_float fDisplayTime = { 0.f }; //출력 시간
 		_float fElapsedyTime = { 0.f }; //경과 시간
 
 		vector<wstring> vecMsg;
+
+#pragma region HIGHLIGHT
+
+		vector<wstring> vecHighlight;
+		_float4	vHighlightRGBA = { 0.f, 0.f, 0.f, 0.f };
+#pragma endregion
+
+#pragma region TITLE
+
+		wstring wstrTitleTag = { TEXT("") };
+		wstring wstrTitleText = { TEXT("") };
+		_float2	vTitlePos = { 0.f, 0.f };
+		_float4	vTitleRGBA = { 0.f, 0.f, 0.f, 0.f };
+		_float2 vTitleSize = { 0.f, 0.f }; //원본 사이즈
+		_float2 vTitleScale = { 0.f, 0.f }; //원본대비 키울 스케일 비율
+
+#pragma endregion
 	};
 
 public:
 	enum TEX_MESSAGEWINDOW { TEXMW_BASE, TEXMW_BTNBASE, TEXMW_NONE };
 	enum TEX_MWTYPE { TYPE_ELFILIN, TYPE_DEFAULT, TYPE_BOSS, TYPE_NONE };
-
-	enum MESSAGEWINDOW_STATE { WINDOW_IDLE, WINDOW_HIDE, WINDOW_SHOW, WINDOW_NONE	};
+	
+	enum MESSAGEWINDOW_STATE { WINDOW_IDLE, WINDOW_HIDE, WINDOW_SHOW, WINDOW_NONE };
+	enum MWFONT_TYPE { MWFONT_TITLE, MWFONT_TEXT, MWFONT_NONE };
 
 private:
 	CUI_MessageWindow(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -51,12 +69,12 @@ public:
 	virtual _int				Tick(_float fTimeDelta)						override;
 	virtual void				Late_Tick(_float fTimeDelta)				override;
 	virtual HRESULT				Render()									override;
+	void						Show_DialogMessage();
 
 #ifdef _DEBUG
 	virtual void				Render_IMGUI()								override;
 #endif
 	
-	void						ShowDialog();
 
 private:
 	HRESULT						Add_Transform(void* _pArg);

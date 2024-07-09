@@ -64,7 +64,7 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 	m_vBaseScale = m_pTransformCom->Get_Scaled();
 
 	m_UIObjDesc.fAlpha = 0.f;
-	m_eCurState = WINDOW_HIDE;
+	m_eCurState = WINDOW_IDLE;
 
 #pragma region UI_BUTTON
 
@@ -84,14 +84,9 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 	__super::Tick(fTimeDelta);
 	m_pUIBtn->Tick(fTimeDelta);
 
-	//특정 트리거가 발동할 경우, 해당 Window UI를 출력
-	//Window UI 출력은 스크립트가 종료될때까지 유지
-	if (m_pGameInstance->Get_DIKeyState(DIK_GRAVE, KEY_DOWN) && WINDOW_HIDE == m_eCurState) //테스트용
-	{
-		m_eCurState = WINDOW_SHOW;
-		m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_BLINK);	//버튼 상태 동기화
-	}
-
+	if (m_pGameInstance->Get_DIKeyState(DIK_GRAVE, KEY_DOWN) && WINDOW_IDLE == m_eCurState) //테스트용
+		Show_DialogMessage();
+	
 	//A 버튼 입력 시, 다음 스크립트 문단을 준비하여 출력
 	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN) && WINDOW_SHOW == m_eCurState)
 	{
@@ -106,10 +101,12 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 	switch (m_eCurState)
 	{
 	case WINDOW_IDLE: 
+		m_UIObjDesc.fAlpha = 0.f;
 		break;
 
 	case WINDOW_HIDE: //알파 값 및 스케일 감소
 		m_UIObjDesc.fAlpha -= fTimeDelta * 5.f;	
+
 		//vOffset.y -= EASE_OUT(fTimeDelta * 2.5f);
 		//m_pTransCom[TEXMW_BASE]->Set_Scaled(m_vBaseScale * vOffset);
 		//m_pTransCom[TEXMW_BTNBASE]->Set_Scaled(m_vBtnScale * vOffset);
@@ -117,7 +114,9 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 
 	case WINDOW_SHOW: //알파 값 및 스케일 증가
 		m_UIObjDesc.fAlpha += fTimeDelta * 5.f;	
+		Display_Message(fTimeDelta);
 		break;
+
 	default:	break;
 	}
 
@@ -128,10 +127,7 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 	{
 		m_UIObjDesc.fAlpha = 0.f;
 		return OBJ_NOEVENT;
-	}
-
-	if(WINDOW_HIDE != m_eCurState)
-		Display_Message(fTimeDelta);
+	}	
 
 	return OBJ_NOEVENT;
 }
@@ -148,10 +144,9 @@ HRESULT CUI_MessageWindow::Render()
 
 #pragma region RENDER_BINDSET
 
-	//렌더 OFF
 	if (WINDOW_HIDE == m_eCurState && 0.f == m_UIObjDesc.fAlpha)
 		return S_OK;
-	
+
 	for (_uint iTEXIx = 0; iTEXIx < TEXMW_NONE; ++iTEXIx)
 	{
 		TEX_MWTYPE eTexType = { TYPE_DEFAULT };
@@ -163,11 +158,10 @@ HRESULT CUI_MessageWindow::Render()
 
 		case LEVEL_DEEDEEDEE: case LEVEL_SIMBA: case LEVEL_FINALBOSS: case LEVEL_FINALE:
 			if (TEXMW_BTNBASE == iTEXIx)
-				m_UIObjDesc.fAlpha = 0.f;
+				continue;
+
 			else
-				m_UIObjDesc.fAlpha = 1.f;
-			
-			eTexType = TYPE_BOSS;
+				eTexType = TYPE_BOSS;
 			break;
 
 		default: break;
@@ -192,12 +186,10 @@ HRESULT CUI_MessageWindow::Render()
 	
 	//버튼 렌더링
 	m_pUIBtn->Render();
-
-	if (WINDOW_HIDE != m_eCurState)
-	{
-		for (auto& Message : m_tMessageDesc.vecMsg)
-			Render_Message();
-	}
+	
+	//폰트 렌더링
+	for (auto& Message : m_tMessageDesc.vecMsg)
+		Render_Message();
 
 	return S_OK;
 }
@@ -216,8 +208,13 @@ void CUI_MessageWindow::Render_IMGUI()
 
 #endif // DEBUG
 
-void CUI_MessageWindow::ShowDialog()
+void CUI_MessageWindow::Show_DialogMessage()
 {
+	//특정 트리거가 발동할 경우, 해당 Window UI를 출력
+	//Window UI 출력은 스크립트가 종료될때까지 유지
+	if (WINDOW_HIDE == m_eCurState) //단, idle 상태일 경우는 트리거 시점에 show해야하므로 hide만 처리
+		return;
+	
 	m_eCurState = WINDOW_SHOW;
 	m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_BLINK);	//버튼 상태 동기화
 }
@@ -325,21 +322,86 @@ HRESULT CUI_MessageWindow::Display_Message(_float _fTimeDelta)
 // 다이얼로그 메시지 렌더
 HRESULT CUI_MessageWindow::Render_Message()
 {
-	wstring wstrFontTag = m_tMessageDesc.wstrFontTag;
-	_float2 vFontPos = m_tMessageDesc.fFontPos;
-	_float4 vFontRGBA = m_tMessageDesc.fFontRGBA;
+	if (WINDOW_HIDE == m_eCurState || WINDOW_IDLE == m_eCurState)
+		return S_OK;
 
-	_float2 vFontSize = m_tMessageDesc.fFontSize;
-	_float2 vFontScale = m_tMessageDesc.fFontScale;
+	wstring wstrFontTag = m_tMessageDesc.wstrFontTag;
+	_float2 vFontPos = m_tMessageDesc.vFontPos;
+	_float4 vFontRGBA = m_tMessageDesc.vFontRGBA;
+
+	_float2 vFontSize = m_tMessageDesc.vFontSize;
+	_float2 vFontScale = m_tMessageDesc.vFontScale;
 	_float fRadian = XMConvertToRadians(m_tMessageDesc.fRadian);
 
+	//하이라이트 정보
+
+	//스크립트
 	if (m_iCurMessageIndex < m_tMessageDesc.vecMsg.size())
 	{
 		wstring wstrMsg = m_tMessageDesc.vecMsg[m_iCurMessageIndex];
 		wstring& wstrSubstrMessage = wstrMsg.substr(0, m_iCurCharIndex);
 
+		//스크립트 그림자
+		_float2 vOffset[] = { {-2.f, 0.f},
+							{2.f, 0.f},
+							{0.f, -2.f} ,
+							{0.f, 2.f} };
+		
+		_float4 vMessageShadowRGBA = { 0.025f, 0.025f, 0.025f, 0.025f };
+		_float2 vMessageShadowScale = { 1.01f, 1.01f };
+
+		for (_uint i = 0; i < 4; ++i)
+		{
+			_float2 vMessageShadowPos = { vFontPos.x + vOffset[i].x, vFontPos.y + vOffset[i].y };
+			m_pGameInstance->Render_Font(wstrFontTag, wstrSubstrMessage, vMessageShadowPos, vMessageShadowRGBA, fRadian, vFontSize, vMessageShadowScale);
+		}
+
+#pragma region HIGHLIGHT
+		//스크립트 하이라이트
+		wstring wstrHighlight = m_tMessageDesc.vecHighlight[m_iCurMessageIndex];
+		size_t FindHighlightPos = wstrMsg.find(wstrHighlight);
+		size_t wstrHighlightLength = wstrHighlight.length();
+
+		if (FindHighlightPos != string::npos) //문자열 검색 성공할 경우
+		{
+			wstring wstrHighlightMessage = wstrMsg.substr(FindHighlightPos, wstrHighlightLength); //substr(start, length)
+			_float4 vHighlightRGBA = m_tMessageDesc.vHighlightRGBA;
+			m_pGameInstance->Render_Font(wstrFontTag, wstrHighlightMessage, vFontPos, vHighlightRGBA, fRadian, vFontSize, vFontScale);
+		}
+
+#pragma endregion
+		
+		//스크립트
 		m_pGameInstance->Render_Font(wstrFontTag, wstrSubstrMessage, vFontPos, vFontRGBA, fRadian, vFontSize, vFontScale);
 	}
+
+	if (LEVEL_TOWN == *m_pCurrentLevelID)
+	{
+		wstring wstrTitleTag = m_tMessageDesc.wstrTitleTag;
+		wstring wstrTitleText = m_tMessageDesc.wstrTitleText;
+		_float2	vTitlePos = m_tMessageDesc.vTitlePos;
+		_float4	vTitleRGBA = { 1.f, 1.f, 1.f, 1.f };
+
+		_float2 vTitleSize = m_tMessageDesc.vTitleSize;
+		_float2 vTitleScale = m_tMessageDesc.vTitleScale;
+
+		//타이틀 그림자
+		_float2 vOffset[] = { {-2.f, 0.f},
+							{2.f, 0.f},
+							{0.f, -2.f} ,
+							{0.f, 2.f} };
+
+		_float4 vTitleShadowRGBA = m_tMessageDesc.vTitleRGBA;
+		_float2 vTitleShadowScale = { 1.01f, 1.01f };
+		for (_uint i = 0; i < 4; ++i)
+		{
+			_float2 vTitleShadowPos = { vTitlePos.x + vOffset[i].x, vTitlePos.y + vOffset[i].y };
+			m_pGameInstance->Render_Font(wstrTitleTag, wstrTitleText, vTitleShadowPos, vTitleShadowRGBA, fRadian, vTitleSize, vTitleShadowScale);
+		}
+		//타이틀
+		m_pGameInstance->Render_Font(wstrTitleTag, wstrTitleText, vTitlePos, vTitleRGBA, 0.f, vTitleSize, vTitleScale);
+	}
+
 
 	return S_OK;
 }

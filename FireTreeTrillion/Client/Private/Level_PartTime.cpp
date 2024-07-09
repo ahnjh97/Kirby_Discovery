@@ -48,9 +48,6 @@ HRESULT CLevel_PartTime::Initialize()
 	hr = Ready_Layer_BackGround(TEXT("Layer_BackGround"));
 	CHECK_FAILED(hr);
 
-	hr = Ready_Layer_UI(TEXT("Layer_UI"));
-	CHECK_FAILED(hr);
-
 	hr = Ready_Map();
 	CHECK_FAILED(hr);
 	hr = Ready_Triggers();
@@ -60,6 +57,9 @@ HRESULT CLevel_PartTime::Initialize()
 	hr = Ready_Items();
 	CHECK_FAILED(hr);
 	hr = Ready_Kickables();
+	CHECK_FAILED(hr);
+
+	hr = Ready_Layer_UI(TEXT("Layer_UI"));
 	CHECK_FAILED(hr);
 
 	Ready_Layer_Player(TEXT("Layer_Player"));

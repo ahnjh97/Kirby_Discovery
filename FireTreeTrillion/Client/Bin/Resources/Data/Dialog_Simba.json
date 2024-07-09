@@ -35,5 +35,34 @@
         , "야수들의 먹잇감이 되어라!!"
     ],
     "NPC": "Parttimer_Dee",
-    "Radian": 0.0
+    "Radian": 0.0,
+    "TitleText": "",
+    "TitleTag" : "",
+    "TitlePos": [
+        0.0,
+        0.0 
+    ],
+    "TitleRGBA": [
+        0.0, 
+        0.0,
+        0.0,
+        1.0
+    ],
+    "TitleSize": [
+        1.0,
+        1.0
+    ],
+    "TitleScale": [
+        1.0,
+        1.0
+    ],
+    "HighLight": [
+        "핑크"
+    ],
+    "HighLightRGBA": [
+        0.921, 
+        0.686,
+        0.0,
+        1.0
+    ]
 }

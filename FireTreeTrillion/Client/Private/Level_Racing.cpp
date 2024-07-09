@@ -46,9 +46,6 @@ HRESULT CLevel_Racing::Initialize()
 	hr = Ready_Layer_BackGround(TEXT("Layer_BackGround"));
 	CHECK_FAILED(hr);
 
-	hr = Ready_Layer_UI(TEXT("Layer_UI"));
-	CHECK_FAILED(hr);
-
 	_float fXOffset = -200.f;
 	_float fZOffset = 1200.f;
 	fXOffset = fZOffset = 0;
@@ -64,6 +61,9 @@ HRESULT CLevel_Racing::Initialize()
 	hr = Ready_Kickables(fXOffset, fZOffset);
 	CHECK_FAILED(hr);
 	hr = Ready_Objects(fXOffset, fZOffset);
+	CHECK_FAILED(hr);
+
+	hr = Ready_Layer_UI(TEXT("Layer_UI"));
 	CHECK_FAILED(hr);
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
