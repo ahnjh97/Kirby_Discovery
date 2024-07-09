@@ -248,7 +248,21 @@ HRESULT CLevel_Finale::Ready_FinaleRoad()
 		-10.f);
 
 
-	
+	//Make_FinaleRoad(RTYPE_BUILDINGC, MOVECMD_FLY,
+	//	{ 1493.8f, -125.9f, -123.f }, { .77f, .15f, -.59f },
+	//	{ 1493.8f, -125.9f, -123.f }, { .95f, .15f, -.18f }, -5.f);
+
+
+	//cut scene start building
+	Make_FinaleRoad(RTYPE_BUILDINGC, MOVECMD_FLY,
+		{ 1619.6f, -80.37f, -152.71f }, { .78f, .62f, .04f },
+		{ 1619.6f, -80.37f, -152.71f }, { .78f, .62f, .04f }, 0.f);
+
+
+	//Make_FinaleRoad(RTYPE_BUILDINGA, MOVECMD_ROTATE,
+	//	{ 1619.6f, -80.37f, -152.71f }, { .78f, .62f, .04f },
+	//	{ 1619.6f, -80.37f, -152.71f }, { .78f, .62f, .04f }, 0.f);
+
 	/*
 	//(아래) 도로 B
 	roadGrouperDesc = {};

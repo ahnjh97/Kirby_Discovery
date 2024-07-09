@@ -232,7 +232,7 @@ void CDisaster_Master::Moving_FinaleRoad(_float fKirbyX)
 		_float3 vDestPos = { 1098.9f, -193.6f, -158.3f };
 		_float3 vStartPos = vDestPos + _float3(100.f, 200.f, 200.f);
 
-		Make_FinaleRoad(RTYPE_BUILDINGA, MOVECMD_FLY,
+		Make_FinaleRoad(RTYPE_BUILDINGC, MOVECMD_FLY,
 			vStartPos,	{ .4f, .1f, -.03f },
 			vDestPos ,	{ .98f, .22f, -.03f },
 			25.f);
@@ -266,12 +266,23 @@ void CDisaster_Master::Moving_FinaleRoad(_float fKirbyX)
 		_float3 vDestPos = { 1493.8f, -125.9f, -123.f };
 		_float3 vStartPos = vDestPos + _float3(100.f, 200.f, -200.f);
 
-		Make_FinaleRoad(RTYPE_BUILDINGA, MOVECMD_FLY,
+		Make_FinaleRoad(RTYPE_BUILDINGC, MOVECMD_FLY,
 			vStartPos, { .77f, .15f, -.59f },
 			vDestPos, { .95f, .15f, -.18f }, -5.f);
 		
 		m_bRoadTrigger[3] = false;
 	}
+	//else if (m_bRoadTrigger[4] == true && fKirbyX + (fKirbySpeed * 5.f) > 1619.6f)
+	//{
+	//	_float3 vDestPos = { 1619.6f, -80.37f, -152.71f };
+	//	_float3 vStartPos = vDestPos + _float3(100.f, 200.f, 100.f);
+
+	//	Make_FinaleRoad(RTYPE_BUILDINGC, MOVECMD_FLY,
+	//		vStartPos, { .49f, -.19f, .85f },
+	//		vDestPos, {.78f, .62f, .04f }, 0.f);
+	
+	//	m_bRoadTrigger[4] = false;
+	//}
 }
 
 void CDisaster_Master::Moving_TargetBaum(_float fKirbyX)
