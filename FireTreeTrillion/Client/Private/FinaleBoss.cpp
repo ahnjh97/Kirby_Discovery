@@ -2,7 +2,7 @@
 #include "FinaleBoss.h"
 #include "FSM.h"
 #include "FinaleBoss_State.h"
-#include "Bone"
+#include "Bone.h"
 
 CFinaleBoss::CFinaleBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
