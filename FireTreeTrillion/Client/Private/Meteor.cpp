@@ -95,6 +95,7 @@ HRESULT CMeteor::Initialize(void* pArg)
 			}
 		}
 	}
+	m_pTransformCom->Set_Scaled(0.001f, 0.001f, 0.001f);
 
 	m_bNonDead = true;
 
@@ -149,6 +150,11 @@ _int CMeteor::Tick(_float fTimeDelta)
 	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 
 	m_fRunTime += m_fTimeDelta;
+
+	_float fRatio = m_fRunTime / m_fDelayTime * 0.7f;
+
+	m_pTransformCom->Set_Scaled(1.f * fRatio, 1.f * fRatio, 1.f * fRatio);
+
 	if (m_fDelayTime < m_fRunTime)
 	{
 		if (true == m_bBig)
@@ -173,7 +179,7 @@ _int CMeteor::Tick(_float fTimeDelta)
 					m_bShake = true;
 					CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 					if (pCamera != nullptr)
-						pCamera->Make_Shake(0.7f, 2.f);
+						pCamera->Make_Shake(1.f, 2.5f);
 				}
 
 				// 브레이크 : 제곱 감속
@@ -396,6 +402,8 @@ HRESULT CMeteor::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
 		return E_FAIL;
 
 	return S_OK;

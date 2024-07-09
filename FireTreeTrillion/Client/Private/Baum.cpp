@@ -24,6 +24,19 @@ static void DebrisCloud(CTransform* pTransformCom)
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_debris smoke"), &FXDesc)))
 		return;
 }
+void FinaleCollideCloud(CTransform* pTransformCom)
+{
+	CEffect::FX_DESC FXDesc{};
+
+	FXDesc.vInitPos = static_cast<_float3>(pTransformCom->Get_State(CTransform::STATE_POSITION)) + (_float3)CUtils::Make_Random_Vector(2.f);
+	FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_Random_Vector(1.f));
+
+	_float fScale = CUtils::Make_RandomFloat(20.f, 30.f);
+	FXDesc.vInitScale = { fScale, fScale, fScale };
+
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_finale collide smoke test3"), &FXDesc)))
+		return;
+}
 
 CBaum::CBaum(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
@@ -390,6 +403,11 @@ void CBaum::Find_MyRoad()
 
 _int CBaum::Make_Partical()
 {
+	for (_int i = 0; i < 15; ++i)
+	{
+		FinaleCollideCloud(m_pTransformCom);
+	}
+
 	if (m_eBaumType == BAUM_BAUM)
 	{
 		wstring wstrModelName[6] = {
