@@ -129,6 +129,9 @@
 #include "Box.h"
 #include "Debris.h"
 
+// Park Gimmick Objects
+#include "Crumble.h"
+
 // Simba Gimmick Objects
 #include "Turbine.h"
 #include "SimbaRoomGlass.h"
@@ -392,7 +395,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CappyHat"), CCappyHat);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Phanta"), CPhanta);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SurprisedBoard"), CSurprisedBoard);
-
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Crumble"), CCrumble);
+	
 	// FinalBoss
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalBoss"), CFinalBoss);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalBossSpear"), CFinalBossSpear);
@@ -1881,6 +1885,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("SurprisedBoardGreen", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("SurprisedBoardRed", TYPE_ANIM, 1.f, 180.f);
 
+		// Gimmick
+		m_vecModelInfo.emplace_back("Crumble", TYPE_ANIM);
 	}
 	else if (eLevel == LEVEL_SIMBA)
 	{
@@ -2155,6 +2161,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("SurprisedBoardRed", TYPE_ANIM, 1.f, 0.f);
 
 		m_vecModelInfo.emplace_back("BreakableBlock", TYPE_ANIM, 0.5f, 0.f, 0);
+		m_vecModelInfo.emplace_back("Crumble", TYPE_ANIM);
 	}
 }
 

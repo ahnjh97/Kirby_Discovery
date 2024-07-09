@@ -558,8 +558,8 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Monster\SurprisedBoard\State">
       <UniqueIdentifier>{e79782c6-0b75-470d-8c32-900d86ca63a0}</UniqueIdentifier>
-	</Filter>
-	<Filter Include="02.GameObjects\Map\Gimmick\Lab_Discovera">
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Gimmick\Lab_Discovera">
       <UniqueIdentifier>{4c39de13-368d-45e1-886a-30d944f3cc82}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Map\SimbaObjects\RoomGlass">
@@ -579,6 +579,9 @@
     </Filter>
     <Filter Include="02.GameObjects\PopStar\PopStar_StarSmall">
       <UniqueIdentifier>{a6a867cc-1e47-427c-90a9-bd5185b502ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\MapObject\Crumble">
+      <UniqueIdentifier>{366fdf1d-19e9-414d-a2be-7baa585b0a58}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1159,6 +1162,7 @@
     <ClInclude Include="..\Public\PopStar_StarSmall.h">
       <Filter>02.GameObjects\PopStar\PopStar_StarSmall</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Crumble.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1719,6 +1723,7 @@
     <ClCompile Include="..\Private\PopStar_StarSmall.cpp">
       <Filter>02.GameObjects\PopStar\PopStar_StarSmall</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Crumble.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

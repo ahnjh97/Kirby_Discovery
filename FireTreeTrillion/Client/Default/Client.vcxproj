@@ -216,6 +216,7 @@
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\Coin.h" />
     <ClInclude Include="..\Public\CollisionCenter.h" />
+    <ClInclude Include="..\Public\Crumble.h" />
     <ClInclude Include="..\Public\Debris.h" />
     <ClInclude Include="..\public\DecoObject.h" />
     <ClInclude Include="..\Public\Level_Park.h" />
@@ -432,6 +433,7 @@
     <ClCompile Include="..\Private\Character.cpp" />
     <ClCompile Include="..\Private\Coin.cpp" />
     <ClCompile Include="..\Private\CollisionCenter.cpp" />
+    <ClCompile Include="..\Private\Crumble.cpp" />
     <ClCompile Include="..\Private\Debris.cpp" />
     <ClCompile Include="..\private\DecoObject.cpp" />
     <ClCompile Include="..\Private\Level_Park.cpp" />
