@@ -147,7 +147,7 @@ void CFinaleRoad::Late_Tick(_float fTimeDelta)
 
 
 	//시야 벗어나면 컬링
-	if (m_pGameInstance->isInFrustum_WorldSpace(CUtils::Get_State_Vector_Matrix(m_WorldMatrix, CUtils::STATE_POSITION), 100.0f))
+	if (m_pGameInstance->isInFrustum_WorldSpace(CUtils::Get_State_Vector_Matrix(m_WorldMatrix, CUtils::STATE_POSITION), 150.0f))
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 	}
