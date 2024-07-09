@@ -249,7 +249,29 @@ HRESULT CLevel_Finale::Ready_FinaleRoad()
 		-10.f);
 
 
-	
+	//Make_FinaleRoad(RTYPE_BUILDINGC, MOVECMD_FLY,
+	//	{ 1493.8f, -125.9f, -123.f }, { .77f, .15f, -.59f },
+	//	{ 1493.8f, -125.9f, -123.f }, { .95f, .15f, -.18f }, -5.f);
+
+
+	//cut scene start building
+	Make_FinaleRoad(RTYPE_BUILDINGC, MOVECMD_FLY,
+		{ 1619.6f, -80.37f, -152.71f }, { .78f, .62f, .04f },
+		{ 1619.6f, -80.37f, -152.71f }, { .87f, .5f, .02f }, 30.f);
+
+	//발판 1. 이후 start, dest position 반대로
+	Make_FinaleRoad(RTYPE_BUILDINGB, MOVECMD_ROTATE,
+		{ 1692.6f, -137.7f, -173.f }, { -.22f, .96f, -.16f },
+		{ 1692.6f, -137.7f, -173.f }, { -.34f, .7f, .63f }, 15.f);
+
+	Make_FinaleRoad(RTYPE_BUILDINGC, MOVECMD_ROTATE,
+		{ 1747.6f, -7.f, -149.3f }, { .89f, .2f, -.4f },
+		{ 1747.6f, -7.f, -149.3f }, { .89f, .2f, -.4f }, 180.f);
+
+	Make_FinaleRoad(RTYPE_BUILDINGC, MOVECMD_ROTATE,
+		{ 1842.2f, 7.f, -211.8f }, { .92f, .18f, .36f },
+		{ 1842.2f, 7.f, -211.8f }, { .92f, .18f, .36f }, -120.f);
+
 	/*
 	//(아래) 도로 B
 	roadGrouperDesc = {};

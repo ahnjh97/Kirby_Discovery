@@ -34,7 +34,6 @@ void CFinaleRoad::Start_CollisionEvent()
 	{
 		m_bCollided = true;
 
-
 		if (m_wstrModelName == L"RoadLongBreak")
 		{
 			m_pDynamicActor->userData = nullptr;
@@ -184,9 +183,18 @@ HRESULT CFinaleRoad::Render()
 		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS); CHECK_FAILED(hr);
 		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS); CHECK_FAILED(hr);
 
-
-		//만약 애님모델이라면 뼈까지 바인딩하고 Anim Model Pass
-		hr = m_pShaderCom->Begin(MODEL_NORMAL_O); CHECK_FAILED(hr);
+		//투명 패스
+		if ((m_wstrModelName == L"MovableBuildingA" || m_wstrModelName == L"MovableBuildingB" || m_wstrModelName == L"MovableBuildingC"|| m_wstrModelName == L"MovableBuildingD")
+			&& i == 0)
+		{
+			continue;
+		}
+			//만약 애님모델이라면 뼈까지 바인딩하고 Anim Model Pass
+		else
+		{
+			hr = m_pShaderCom->Begin(MODEL_NORMAL_O);
+			CHECK_FAILED(hr);
+		}
 
 
 		m_pModelCom->Render(i);
