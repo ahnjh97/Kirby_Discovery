@@ -146,6 +146,7 @@
 #include "FinalePartical.h"
 #include "FinaleBuildingPartical.h"
 #include "FinalePartical_Maker.h"
+#include "FinaleCut_ControlCenter.h"
 
 //±â¹Í
 #include "Gm_LabAntenna.h"
@@ -414,6 +415,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalePartical_Maker"), CFinalePartical_Maker);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalePartical"), CFinalePartical);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleBuildingPartical"), CFinaleBuildingPartical);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleCut_ControlCenter"), CFinaleCut_ControlCenter);
 
 	//Dee
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeePart"), CDee_Part);
