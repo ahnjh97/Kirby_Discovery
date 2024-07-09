@@ -154,6 +154,16 @@ void CDialog::Load(string strPath)
 	tMessage_Desc.fRadian	    = data.value("Radian", 0.f);
 	tMessage_Desc.fDisplayTime  = data.value("DisplayTime", 0.f);
 	tMessage_Desc.fElapsedyTime = data.value("ElapsedyTime", 0.f);
+
+	//Title
+	//tMessage_Desc.fElapsedyTime = data.value("ElapsedyTime", 0.f); //TitleTag
+	//tMessage_Desc.fElapsedyTime = data.value("ElapsedyTime", 0.f); //TitlePos
+	//tMessage_Desc.fElapsedyTime = data.value("ElapsedyTime", 0.f); //TitleRGBA
+	//tMessage_Desc.fElapsedyTime = data.value("ElapsedyTime", 0.f); //TitleSize
+
+	//Highlight
+
+	
 	tMessage_Desc.vecMsg		= vecMsg;
 	hr = m_pGameInstance->Add_Clone(m_tMessage_Desc.uLevel, TEXT("Layer_UI_Dialog"),
 									TEXT("Prototype_GameObject_UI_MessageWindow"), &tMessage_Desc);

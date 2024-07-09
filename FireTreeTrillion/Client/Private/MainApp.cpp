@@ -174,6 +174,27 @@ HRESULT CMainApp::Ready_Fonts()
 		TEXT("../Bin/Resources/Fonts/HUD_StarPoint_NUM30.spritefont"))))
 		return E_FAIL;
 
+	// [공통 Flag]
+	// /CharacterRegion: 0x0030-0x0039(숫자) 0xAC00-0xD7AF(한글) 0x0020-0x007E(영어 + 특문)
+	
+	// a대한늬우스L, a대한늬우스M :: 보스 대사 폰트
+	// /Fontsize: 22 /LineSpacing: 10
+	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_Dialog_Boss_KR22spac10"),
+		TEXT("../Bin/Resources/Fonts/Dialog_Boss_KR22spac10.spritefont"))))
+		return E_FAIL;
+
+	// a신고딕 :: 일반 다이얼로그 대사 폰트
+	// /Fontsize: 20 /LineSpacing: 10
+	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_Dialog_KR18spac10"),
+		TEXT("../Bin/Resources/Fonts/Dialog_KR18spac10.spritefont"))))
+		return E_FAIL;
+
+	// a둥근헤드 :: 일반 다이얼로그 타이틀 폰트
+	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_Dialog_Title_KR22spac10"),
+		TEXT("../Bin/Resources/Fonts/Dialog_Title_KR22spac10.spritefont"))))
+		return E_FAIL;
+
+
 	return S_OK;
 }
 

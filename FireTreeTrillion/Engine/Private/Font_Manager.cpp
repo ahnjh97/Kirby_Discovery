@@ -30,13 +30,14 @@ HRESULT CFont_Manager::Render(const wstring & strFontTag, const wstring & strTex
 	return pFont->Render(strText, vPosition, vColor, fRadian);	
 }
 
-HRESULT CFont_Manager::Render(const wstring& strFontTag, const wstring& strText, const _float2& vPosition, _fvector vColor, _float fRadian, _fvector vOrigin, _gvector vScale)
+HRESULT CFont_Manager::Render(const wstring& strFontTag, const wstring& strText, const _float2& vPosition, _fvector vColor, 
+	_float fRadian, _fvector vOrigin, _gvector vScale, _float fLineSpacing)
 {
 	CCustomFont* pFont = Find_Font(strFontTag);
 	if (nullptr == pFont)
 		return E_FAIL;
 
-	return pFont->Render(strText, vPosition, vColor, fRadian, vOrigin, vScale);
+	return pFont->Render(strText, vPosition, vColor, fRadian, vOrigin, vScale, fLineSpacing);
 }
 
 HRESULT CFont_Manager::Render_Proj(_matrix _matrix, const wstring& strFontTag, const wstring& strText, const _float2& vPosition, _fvector vColor, _float fRadian, _fvector vOrigin, _gvector vScale)

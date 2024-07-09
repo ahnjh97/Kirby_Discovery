@@ -123,12 +123,17 @@ public: /* For.Light_Manager */
 	void Clear_Light();
 	class CLight* Get_LightLastAddress();
 
+#pragma region FONT_MANAGER
 
 public: /* For.Font_Manager */
 	HRESULT Add_Font(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const wstring& strFontTag, const wstring& strFontFilePath);
 	HRESULT Render_Font(const wstring& strFontTag, const wstring & strText, const _float2 & vPosition, _fvector vColor, _float fRadian);
-	HRESULT Render_Font(const wstring& strFontTag, const wstring & strText, const _float2 & vPosition, _fvector vColor, _float fRadian, _fvector vOrigin, _gvector vScale);
+	HRESULT Render_Font(const wstring& strFontTag, const wstring & strText, const _float2 & vPosition, _fvector vColor, _float fRadian, 
+		_fvector vOrigin, _gvector vScale, _float fLineSpacing = 0.f);
+
 	HRESULT Render_ProjFont(_matrix _matrix, const wstring& strFontTag, const wstring& strText, const _float2& vPosition, _fvector vColor, _float fRadian, _fvector vOrigin, _gvector vScale);
+
+#pragma endregion
 
 
 public: /* For.Target_Manager */

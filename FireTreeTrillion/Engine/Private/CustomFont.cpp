@@ -27,9 +27,14 @@ HRESULT CCustomFont::Render(const wstring& strText, const _float2& vPosition, _f
 	return S_OK;
 }
 
-HRESULT CCustomFont::Render(const wstring& strText, const _float2& vPosition, _fvector vColor, _float fRadian, _fvector vOrigin, _gvector vScale)
+//스케일 옵션, 줄 간격 옵션 설정
+HRESULT CCustomFont::Render(const wstring& strText, const _float2& vPosition, _fvector vColor, _float fRadian, 
+	_fvector vOrigin, _gvector vScale, _float fLineSpacing)
 {
 	m_pBatch->Begin();
+	
+	_float fCurLineSpacing = m_pFont->GetLineSpacing(); //현재 줄 간격
+	m_pFont->SetLineSpacing(fCurLineSpacing + fLineSpacing);
 
 	m_pFont->DrawString(m_pBatch, strText.c_str(), vPosition, vColor, fRadian, vOrigin, vScale);
 

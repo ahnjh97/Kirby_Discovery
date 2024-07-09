@@ -27,6 +27,10 @@ private:
 	HRESULT Ready_Objects();
 	HRESULT Ready_UI();
 
+	HRESULT Add_EnvMap();
+	enum TEXTURETYPE { TYPE_ENV, TYPE_LUT, TYPE_NORMAL, TYPE_END };
+	CTexture* m_pEnvTexture[TYPE_END] = { nullptr, nullptr, nullptr };
+
 public:
 	static CLevel_Simba* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual void Free() override;

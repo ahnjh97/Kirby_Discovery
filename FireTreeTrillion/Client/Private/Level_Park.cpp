@@ -33,6 +33,10 @@ HRESULT CLevel_Park::Initialize()
 	hr = __super::Initialize();
 	CHECK_FAILED(hr);
 
+	// 환경맵을 추가한다.
+	if (FAILED(Add_EnvMap()))
+		return E_FAIL;
+
 	hr = Ready_Lights();
 	CHECK_FAILED(hr);
 
@@ -751,15 +755,9 @@ HRESULT CLevel_Park::Ready_Objects()
 
 #pragma region GIMMICK_OBJECT
 
-		if ("LbAntenna_NonAnim" == strModelName)
+		if ("FhEntranceAlien_NonAnim" == strModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_LabAntenna"), &tDesc)))
-				continue;
-		}
-
-		if ("LbBossRoomDoor_NonAnim" == strModelName)
-		{
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_LabBossRoomDoor"), &tDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_ParkFhEntranceAlien"), &tDesc)))
 				continue;
 		}
 
@@ -782,6 +780,11 @@ HRESULT CLevel_Park::Ready_UI()
 	return S_OK;
 }
 
+HRESULT CLevel_Park::Add_EnvMap()
+{
+	return S_OK;
+}
+
 CLevel_Park* CLevel_Park::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CLevel_Park* pInstance = new CLevel_Park(pDevice, pContext);
@@ -797,8 +800,11 @@ CLevel_Park* CLevel_Park::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 
 void CLevel_Park::Free()
 {
+	m_pGameInstance->Clear_EventCallBack();
 	__super::Free();
 
+	for (auto& tex : m_pEnvTexture)
+		Safe_Release(tex);
 }
 
 
