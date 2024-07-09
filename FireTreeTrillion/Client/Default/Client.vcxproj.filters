@@ -529,21 +529,6 @@
     <Filter Include="02.GameObjects\Map\Baum\BaumPiece">
       <UniqueIdentifier>{4a53b512-3057-4457-a0d7-74a2c49bb988}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Map\BreakableBlock">
-      <UniqueIdentifier>{7235d034-6f27-4610-91d3-ceea38305009}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Map\FinalePartical">
-      <UniqueIdentifier>{2428c5ef-024f-417a-b4e4-84355b32b6d4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Map\FinalePartical\FinalePartical">
-      <UniqueIdentifier>{11823e14-4791-4db8-a6fb-b739d71d6102}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Map\FinalePartical\FinaleBuildingPartical">
-      <UniqueIdentifier>{285a0ad8-d35f-4aa3-be67-69ad46f14b72}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\PopStar\PopStar_StarSmall">
-      <UniqueIdentifier>{3f4c06c4-3f4b-4e0b-80ae-b78275764df3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\UI\HUD\AbilityDiscard">
       <UniqueIdentifier>{3abd31c8-721b-4dcd-8517-1b33f8985469}</UniqueIdentifier>
     </Filter>
@@ -573,6 +558,21 @@
     </Filter>
     <Filter Include="02.GameObjects\Map\SimbaObjects\RoomGlass">
       <UniqueIdentifier>{1aa4a53b-c1d7-43fd-b993-6b79f9ea8e33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\BreakableBlock">
+      <UniqueIdentifier>{ec3cdc26-af1a-4b0c-a936-dc0728b1d346}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\FinalePartical">
+      <UniqueIdentifier>{7111e563-875c-48cc-9dfa-673cdd43cec6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\FinalePartical\FinaleBuildingPartical">
+      <UniqueIdentifier>{2b718661-f57a-45e7-b4dd-a0354916597b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\FinalePartical\FinalePartical">
+      <UniqueIdentifier>{1d52cb6b-5f54-45c4-a816-238a9ba1d635}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PopStar\PopStar_StarSmall">
+      <UniqueIdentifier>{a6a867cc-1e47-427c-90a9-bd5185b502ac}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1099,24 +1099,6 @@
     <ClInclude Include="..\Public\Disaster_Master.h">
       <Filter>02.GameObjects\Map\Baum</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\FinaleRoadGrouper.h">
-      <Filter>02.GameObjects\Map\FinaleRoad</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\BreakableBlock.h">
-      <Filter>02.GameObjects\Map\BreakableBlock</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\FinalePartical_Maker.h">
-      <Filter>02.GameObjects\Map\FinalePartical</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\FinalePartical.h">
-      <Filter>02.GameObjects\Map\FinalePartical\FinalePartical</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\FinaleBuildingPartical.h">
-      <Filter>02.GameObjects\Map\FinalePartical\FinaleBuildingPartical</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\PopStar_StarSmall.h">
-      <Filter>02.GameObjects\PopStar\PopStar_StarSmall</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\HUD_AbilityDiscard.h">
       <Filter>02.GameObjects\UI\HUD\AbilityDiscard</Filter>
     </ClInclude>
@@ -1143,6 +1125,24 @@
     </ClInclude>
     <ClInclude Include="..\Public\OriginCage.h">
       <Filter>02.GameObjects\Map\SimbaObjects\OriginCage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BreakableBlock.h">
+      <Filter>02.GameObjects\Map\BreakableRock</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\FinalePartical_Maker.h">
+      <Filter>02.GameObjects\Map\FinalePartical</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\FinaleBuildingPartical.h">
+      <Filter>02.GameObjects\Map\FinalePartical\FinaleBuildingPartical</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\FinalePartical.h">
+      <Filter>02.GameObjects\Map\FinalePartical\FinalePartical</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\FinaleRoadGrouper.h">
+      <Filter>02.GameObjects\Map\FinaleRoad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PopStar_StarSmall.h">
+      <Filter>02.GameObjects\PopStar\PopStar_StarSmall</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1647,27 +1647,6 @@
     <ClCompile Include="..\Private\Disaster_Master.cpp">
       <Filter>02.GameObjects\Map\Baum</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\FinaleRoadGrouper.cpp">
-      <Filter>02.GameObjects\Map\FinaleRoad</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\BreakableBlock.cpp">
-      <Filter>02.GameObjects\Map\BreakableBlock</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\KirbyBoom_State.cpp">
-      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyBoom_State</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\FinalePartical_Maker.cpp">
-      <Filter>02.GameObjects\Map\FinalePartical</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\FinalePartical.cpp">
-      <Filter>02.GameObjects\Map\FinalePartical\FinalePartical</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\FinaleBuildingPartical.cpp">
-      <Filter>02.GameObjects\Map\FinalePartical\FinaleBuildingPartical</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\PopStar_StarSmall.cpp">
-      <Filter>02.GameObjects\PopStar\PopStar_StarSmall</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\HUD_AbilityDiscard.cpp">
       <Filter>02.GameObjects\UI\HUD\AbilityDiscard</Filter>
     </ClCompile>
@@ -1694,6 +1673,27 @@
     </ClCompile>
     <ClCompile Include="..\Private\OriginCage.cpp">
       <Filter>02.GameObjects\Map\SimbaObjects\OriginCage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KirbyBoom_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyBoom_State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BreakableBlock.cpp">
+      <Filter>02.GameObjects\Map\BreakableRock</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FinalePartical_Maker.cpp">
+      <Filter>02.GameObjects\Map\FinalePartical</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FinaleBuildingPartical.cpp">
+      <Filter>02.GameObjects\Map\FinalePartical\FinaleBuildingPartical</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FinalePartical.cpp">
+      <Filter>02.GameObjects\Map\FinalePartical\FinalePartical</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\FinaleRoadGrouper.cpp">
+      <Filter>02.GameObjects\Map\FinaleRoad</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PopStar_StarSmall.cpp">
+      <Filter>02.GameObjects\PopStar\PopStar_StarSmall</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -36,9 +36,9 @@ HRESULT CSkySphere::Initialize(void* pArg)
 	hr = Add_Components();
 	CHECK_FAILED(hr);
 
-	if (LEVEL_FINALBOSS == m_eCurLevel)
+	if (LEVEL_FINALBOSS == *m_pCurrentLevelID)
 		m_pTransformCom->Set_Scaled(_float3{ 0.1f, 0.1f, 0.1f });
-	else if (LEVEL_FINALE == m_eCurLevel)
+	else if (LEVEL_FINALE == *m_pCurrentLevelID)
 	{
 		m_pTransformCom->Set_Scaled(_float3{ .6f, .6f, .6f });
 
