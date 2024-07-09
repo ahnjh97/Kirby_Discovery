@@ -334,7 +334,9 @@
     <ClInclude Include="..\Public\Radio.h" />
     <ClInclude Include="..\Public\RayArrow.h" />
     <ClInclude Include="..\Public\RigidObject.h" />
+    <ClInclude Include="..\Public\Simba.h" />
     <ClInclude Include="..\Public\SimbaRoomGlass.h" />
+    <ClInclude Include="..\Public\Simba_State.h" />
     <ClInclude Include="..\Public\SingleEffect.h" />
     <ClInclude Include="..\public\SkySphere.h" />
     <ClInclude Include="..\Public\SpikeSpear.h" />
@@ -535,7 +537,9 @@
     <ClCompile Include="..\Private\Radio.cpp" />
     <ClCompile Include="..\Private\RayArrow.cpp" />
     <ClCompile Include="..\Private\RigidObject.cpp" />
+    <ClCompile Include="..\Private\Simba.cpp" />
     <ClCompile Include="..\Private\SimbaRoomGlass.cpp" />
+    <ClCompile Include="..\Private\Simba_State.cpp" />
     <ClCompile Include="..\Private\SingleEffect.cpp" />
     <ClCompile Include="..\private\SkySphere.cpp" />
     <ClCompile Include="..\Private\SpikeSpear.cpp" />

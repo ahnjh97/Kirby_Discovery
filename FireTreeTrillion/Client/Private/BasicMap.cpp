@@ -136,7 +136,7 @@ void CBasicMap::Late_Tick(_float fTimeDelta)
     for (auto& shadowDeco : m_vecShadowObjects)
         shadowDeco->Late_Tick(fTimeDelta);
 
-    m_pGameInstance->Add_RenderGroup(m_eRenderGroup, this);
+    //m_pGameInstance->Add_RenderGroup(m_eRenderGroup, this);
 }
 
 HRESULT CBasicMap::Render()

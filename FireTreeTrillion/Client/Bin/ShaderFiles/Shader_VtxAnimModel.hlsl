@@ -124,10 +124,7 @@ PS_OUT PS_MAIN(PS_IN In)
         discard;
 
     vector vWhite = vector(1.f, 1.f, 1.f, 1.f);
-
-    if (0.3f >= vMtrlDiffuse.a)
-        discard;
-
+    
     vector mixedColor = lerp(vMtrlDiffuse, vWhite, g_fWhiteColorDiffuse);
     
     vector vNormalDesc = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);

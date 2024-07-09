@@ -146,9 +146,6 @@ HRESULT CAwoofy::Render()
 			if (FAILED(m_pModelCom->Render(i)))
 				return E_FAIL;
 		}
-
-
-		m_pModelCom->Render(i);
 	}
 
 	return S_OK;

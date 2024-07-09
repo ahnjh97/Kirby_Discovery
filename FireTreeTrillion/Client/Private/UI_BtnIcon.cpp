@@ -119,7 +119,7 @@ HRESULT CUI_BtnIcon::Render()
 #pragma region RENDER_BINDSET
 
 	//·»´õ OFF
-	if (BTN_HIDE == m_eCurState && 0.f == m_fBlinkAlpha == m_fBtnAlpha)
+	if (BTN_HIDE == m_eCurState && 0.f == m_fBlinkAlpha && 0.f == m_fBtnAlpha)
 		return S_OK;
 
 	for (_uint iTEXIx = 0; iTEXIx < TEXBTN_NONE; ++iTEXIx)
