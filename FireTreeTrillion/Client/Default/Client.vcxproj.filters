@@ -582,8 +582,8 @@
     </Filter>
     <Filter Include="02.GameObjects\FinaleCut_ControlCenter">
       <UniqueIdentifier>{d924ae26-28e6-40af-8f42-f13ea9943530}</UniqueIdentifier>
-	</Filter>
-	<Filter Include="02.GameObjects\PhysXObject\MapObject\Crumble">
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\MapObject\Crumble">
       <UniqueIdentifier>{366fdf1d-19e9-414d-a2be-7baa585b0a58}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Simba">
@@ -1182,8 +1182,8 @@
     </ClInclude>
     <ClInclude Include="..\Public\FinaleCut_ControlCenter.h">
       <Filter>02.GameObjects\FinaleCut_ControlCenter</Filter>
-	</ClInclude>
-	<ClInclude Include="..\Public\Simba.h">
+    </ClInclude>
+    <ClInclude Include="..\Public\Simba.h">
       <Filter>02.GameObjects\PhysXObject\Character\Simba</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Simba_State.h">
@@ -1195,6 +1195,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\FinaleBoss.h">
       <Filter>02.GameObjects\PhysXObject\Character\FinaleBoss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\FinaleBoss_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\FinaleBoss\State</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1758,8 +1761,8 @@
     </ClCompile>
     <ClCompile Include="..\Private\FinaleCut_ControlCenter.cpp">
       <Filter>02.GameObjects\FinaleCut_ControlCenter</Filter>
-	</ClCompile>
-	<ClCompile Include="..\Private\Simba.cpp">
+    </ClCompile>
+    <ClCompile Include="..\Private\Simba.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Simba</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Simba_State.cpp">
@@ -1771,6 +1774,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\FinaleBoss.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\FinaleBoss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FinaleBoss_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\FinaleBoss\State</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

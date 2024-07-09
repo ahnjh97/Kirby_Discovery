@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "FinaleBoss.h"
 #include "FSM.h"
+#include "FinaleBoss_State.h"
+#include "Bone"
 
 CFinaleBoss::CFinaleBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -32,7 +34,7 @@ HRESULT CFinaleBoss::Initialize(void* pArg)
     if (FAILED(Add_Components()))
         return E_FAIL;
 
-	m_pModelCom->Set_Animation(FINALEBOSS_CUT1, 70.f, false, true);
+	m_pModelCom->Set_Animation(FINALEBOSS_DEMOWAITAIR, 50.f, true, true);
 
     return S_OK;
 }
@@ -43,6 +45,13 @@ _int CFinaleBoss::Tick(_float fTimeDelta)
 		return OBJ_DEAD;
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+
+	if (*m_pCurrentLevelID != LEVEL_TOOL_ANIM)
+	{
+		// FSM 제어
+		if (m_pFSM != nullptr)
+			m_pFSM->Update(this, m_fTimeDelta);
+	}
 
 	return OBJ_NOEVENT;
 }
@@ -138,6 +147,14 @@ _bool CFinaleBoss::IsAnimFinished()
 	return m_pModelCom->IsFinished();
 }
 
+_float4 CFinaleBoss::Compute_RootPos()
+{
+	CBone* pBone = m_pModelCom->Get_BonePtr("TopL");
+	_float4x4 pBoneLocalMatrix = *pBone->Get_CombinedTransformationMatrix();
+	_float4x4 pBoneWorldMatrix = pBoneLocalMatrix * m_pTransformCom->Get_WorldFloat4x4();
+	return CUtils::Get_State_Vector_Matrix(pBoneWorldMatrix, CUtils::STATE_POSITION);
+}
+
 HRESULT CFinaleBoss::Add_Components()
 {
 	HRESULT hr;
@@ -154,15 +171,15 @@ HRESULT CFinaleBoss::Add_Components()
 	// FOR ANIMTOOL
 	m_ppModelForAnimTool = &m_pModelCom;
 
-	/* For.Com_CharacterController */
+	///* For.Com_CharacterController */
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
-	CCharacterController::CONTROLLER_DESC desc{};
-	desc.vInitialPos = vPos;
-	desc.fOffset = 1.f;
-	desc.tCapsuleShape.fHeight = 1.f;
-	desc.tCapsuleShape.fRadius = 1.f;
-	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
-		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
+	//CCharacterController::CONTROLLER_DESC desc{};
+	//desc.vInitialPos = vPos;
+	//desc.fOffset = 1.f;
+	//desc.tCapsuleShape.fHeight = 1.f;
+	//desc.tCapsuleShape.fRadius = 1.f;
+	//hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
+	//	TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	//m_pControllerCom->Set_Object(this);
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
@@ -205,11 +222,11 @@ void CFinaleBoss::SetUp_FSM()
 {
 	// FSM 상태 초기화
 	m_pFSM = CFSM::Create();
-	//m_pFSM->Add_State(FINALBOSS_DEMOAPPEARCUT5, CFinalBoss_Appear_State::Create());
+	m_pFSM->Add_State(FINALEBOSS_DEMOWAITAIR, CFinaleBoss_Idle_State::Create());
 
 	//상태 Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};
-	FSM_Desc.iState = FINALEBOSS_CUT1;
+	FSM_Desc.iState = FINALEBOSS_DEMOWAITAIR;
 	FSM_Desc.pModel = &m_pModelCom;
 	m_pFSM->Initialize(&FSM_Desc);
 }

@@ -220,6 +220,7 @@
     <ClInclude Include="..\Public\Debris.h" />
     <ClInclude Include="..\public\DecoObject.h" />
     <ClInclude Include="..\Public\FinaleBoss.h" />
+    <ClInclude Include="..\Public\FinaleBoss_State.h" />
     <ClInclude Include="..\Public\FinaleCut_ControlCenter.h" />
     <ClInclude Include="..\Public\Gm_ParkFhEntranceAlien.h" />
     <ClInclude Include="..\Public\Level_Park.h" />
@@ -442,6 +443,7 @@
     <ClCompile Include="..\Private\Debris.cpp" />
     <ClCompile Include="..\private\DecoObject.cpp" />
     <ClCompile Include="..\Private\FinaleBoss.cpp" />
+    <ClCompile Include="..\Private\FinaleBoss_State.cpp" />
     <ClCompile Include="..\Private\FinaleCut_ControlCenter.cpp" />
     <ClCompile Include="..\Private\Gm_ParkFhEntranceAlien.cpp" />
     <ClCompile Include="..\Private\Level_Park.cpp" />
