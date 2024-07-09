@@ -31,11 +31,12 @@ HRESULT CUI_BtnIcon::Initialize(void* _pArg)
 		return E_FAIL;
 
 	_float3 vScale = { 128.f, 128.f, 1.f };
-	_float3 vOffset = { 0.9f, 0.9f, 1.f };
+	_float3 vOffset = { 0.65f, 0.65f, 1.f };
 	m_vOrigScale = vScale * vOffset;
 	m_pTransformCom->Set_Scaled(m_vOrigScale);
 
-	_float4 vTrans = { 478.f, -388.f, 1.f, 1.f };
+	//_float4 vTrans = { 478.f, -388.f, 1.f, 1.f };
+	_float4 vTrans = { 508.f, -393.f, 1.f, 1.f };
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vTrans);
 
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());

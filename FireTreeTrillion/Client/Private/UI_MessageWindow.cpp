@@ -36,23 +36,24 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 
 	m_UIObjDesc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f, 0.f };
 	m_UIObjDesc.vPos = { 0.f, -325.f, 1.f, 1.f };
-	m_UIObjDesc.vSize = { 1300.f * 0.8f, 288.f * 0.8f, 1.f };
+
+	m_UIObjDesc.vSize = { 1360.f * 0.8f, 288.f * 0.8f, 1.f };
 
 	_float4 vBaseTrans = { m_UIObjDesc.vPos };
 	vBaseTrans.w = 1.f;
 	m_pTransCom[TEXMW_BASE]->Set_State(CTransform::STATE_POSITION, vBaseTrans);
-
 	m_pTransCom[TEXMW_BASE]->Set_Scaled(m_UIObjDesc.vSize);
 
 #pragma endregion
 
 #pragma region MESSAGEWINDOW BTN BASE
 
-	_float3 vScale = { 76.f, 76.f, 1.f };
+	_float3 vScale = { 76.f * 0.8f, 76.f * 0.8f, 1.f };
 	m_pTransCom[TEXMW_BTNBASE]->Set_Scaled(vScale);
 	m_vBtnScale = m_pTransCom[TEXMW_BTNBASE]->Get_Scaled();
 
-	_float4 vBtnTrans = { 479.f, -390.f, 1.f, 1.f };
+	//_float4 vBtnTrans = { 479.f, -390.f, 1.f, 1.f };
+	_float4 vBtnTrans = { 509.f, -394.f, 1.f, 1.f };
 	m_pTransCom[TEXMW_BTNBASE]->Set_State(CTransform::STATE_POSITION, vBtnTrans);
 
 #pragma endregion
@@ -153,14 +154,19 @@ HRESULT CUI_MessageWindow::Render()
 	
 	for (_uint iTEXIx = 0; iTEXIx < TEXMW_NONE; ++iTEXIx)
 	{
-		TEX_MWTYPE eTexType = { TYPE_ELFILIN };
+		TEX_MWTYPE eTexType = { TYPE_DEFAULT };
 		switch (*m_pCurrentLevelID)
 		{
 		case LEVEL_TOWN: 
-			eTexType = TYPE_NPC; 
+			eTexType = TYPE_DEFAULT;
 			break;
 
 		case LEVEL_DEEDEEDEE: case LEVEL_SIMBA: case LEVEL_FINALBOSS: case LEVEL_FINALE:
+			if (TEXMW_BTNBASE == iTEXIx)
+				m_UIObjDesc.fAlpha = 0.f;
+			else
+				m_UIObjDesc.fAlpha = 1.f;
+			
 			eTexType = TYPE_BOSS;
 			break;
 

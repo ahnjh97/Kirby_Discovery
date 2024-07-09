@@ -54,11 +54,8 @@ _int CGm_ParkFhEntranceAlien::Tick(_float fTimeDelta)
 	//	return OBJ_DEAD;
 
 	/*
-	//컷씬에서 특정 시간 경과할 경우 애님 변경
-	if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD9, KEY_DOWN)) //테스트용. 현재는 키입력으로 확인 가능
-		m_bStartAnim = TRUE;
-
-	if (m_bStartAnim)
+	// 트리거 발동 시에 카메라 컷씬과 함께 커비 위치를 이동하며, 해당 트리거 발동 시점에 진입하면 해당 모델의 애님 정지
+		if (m_bStartAnim)
 	{
 		m_fBreakAnimTime += fTimeDelta;
 		m_pModelCom->Set_Animation(STATE_LOOP, 100.f, TRUE);
@@ -93,8 +90,8 @@ void CGm_ParkFhEntranceAlien::Late_Tick(_float fTimeDelta)
 #pragma endregion
 
 	//애니메이션 재생종료 시 Set_Dead
-	//if (TRUE == m_pModelCom->IsFinished())
-	//	Set_Dead();
+	if (TRUE == m_pModelCom->IsFinished())
+		Set_Dead();
 }
 
 HRESULT CGm_ParkFhEntranceAlien::Render()
