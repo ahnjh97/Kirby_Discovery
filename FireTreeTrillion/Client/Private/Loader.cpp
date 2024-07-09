@@ -90,6 +90,8 @@
 #include "BossClone.h"
 #include "Gully.h"
 
+#include "FinaleBoss.h"
+
 // º¸½º
 #include "DeeDeeDee.h"
 #include "DeeDeeDeeHammer.h"
@@ -402,6 +404,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Meteor"), CMeteor);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BossClone"), CBossClone);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gully"), CGully);
+
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleBoss"), CFinaleBoss);
 
 	// Finale
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Baum"), CBaum);
@@ -2030,6 +2034,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("DumpCar", TYPE_ANIM, 0.8f, 90.f);
 
 		// For Boss 
+		m_vecModelInfo.emplace_back("FinaleBoss", TYPE_ANIM, 1.f, 180.f);
+
 		m_vecModelInfo.emplace_back("FinalBoss", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("FinalBossSpear", TYPE_ANIM, 1.f);
 		m_vecModelInfo.emplace_back("RayArrow", TYPE_NONANIM, 1.f);
@@ -2141,6 +2147,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("FinalBoss", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("FinalBossSpear", TYPE_NONANIM, 1.f);
 
+		m_vecModelInfo.emplace_back("FinaleBoss", TYPE_ANIM, 1.f, 180.f);
 		// Boss
 		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 180.f);
 		m_vecModelInfo.emplace_back("DeeDeeDeeHammer", TYPE_NONANIM, 1.0f);

@@ -577,6 +577,12 @@
     <Filter Include="02.GameObjects\FinaleCut_ControlCenter">
       <UniqueIdentifier>{d924ae26-28e6-40af-8f42-f13ea9943530}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\FinaleBoss">
+      <UniqueIdentifier>{cc4aa8d1-5dcf-4336-965a-bea04b26bdd5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\FinaleBoss\State">
+      <UniqueIdentifier>{771fd3c6-8505-4fe9-a53a-6d224433b9e6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -1153,6 +1159,9 @@
     <ClInclude Include="..\Public\FinaleCut_ControlCenter.h">
       <Filter>02.GameObjects\FinaleCut_ControlCenter</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\FinaleBoss.h">
+      <Filter>02.GameObjects\PhysXObject\Character\FinaleBoss</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1709,6 +1718,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\FinaleCut_ControlCenter.cpp">
       <Filter>02.GameObjects\FinaleCut_ControlCenter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FinaleBoss.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\FinaleBoss</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
