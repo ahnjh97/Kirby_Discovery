@@ -267,8 +267,6 @@ PS_OUT FOR_KIRBY_PS_HAMMER_MAIN(PS_IN In)
     return Out;
 }
 
-
-
 PS_OUT FOR_MOUTH_PS_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
@@ -322,7 +320,6 @@ PS_OUT FOR_KIRBYMOUTH_PS_MAIN(PS_IN In)
     return Out;
 
 }
-
 
 PS_OUT FOR_EYE_PS_MAIN(PS_IN In)
 {
@@ -378,7 +375,6 @@ PS_OUT FOR_KIRBYEYE_PS_MAIN(PS_IN In)
 
 }
 
-
 PS_OUT_LIGHTDEPTH PS_MAIN_LIGHTDEPTH(PS_IN In)
 {
 	PS_OUT_LIGHTDEPTH		Out = (PS_OUT_LIGHTDEPTH)0;
@@ -399,7 +395,6 @@ PS_OUT_LIGHTDEPTH PS_MAIN_DEFERREDINFO(PS_IN In)
     Out.vLightDepth = float4(0.f, 1.f, 0.f, 1.f);
     return Out;
 }
-
 
 PS_OUT_EFFECT PS_MAIN_BLUR(PS_IN In)
 {
@@ -508,6 +503,19 @@ PS_OUT PS_LINEAR_NORMAL_O(PS_IN In)
     if (g_bMotionBlur == true)
         Out.vMotionBlur = g_vMotionVelocity;
 
+    return Out;
+}
+
+PS_OUT_EFFECT PS_ALPHABLEND(PS_IN In)
+{
+    PS_OUT_EFFECT Out = (PS_OUT_EFFECT) 0;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord);
+    if (0.0f >= vMtrlDiffuse.a)
+        discard;
+
+    Out.vColor = vMtrlDiffuse;
+    Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
     return Out;
 }
 
@@ -718,5 +726,17 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 FOR_FINALEKIRBY_PS_MAIN();
     }
 
+    // ¾ËÆÄºí·»µù (14)
+    pass AlphaBlend
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_ALPHABLEND();
+    }
 }

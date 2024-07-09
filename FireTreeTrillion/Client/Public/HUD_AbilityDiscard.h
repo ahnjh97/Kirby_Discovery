@@ -48,7 +48,7 @@ public:
 
 private:
 	CTexture*					m_pTexCom[TEX_NONE] = { nullptr };
-	class CKirby*				m_pKirby = { nullptr };
+	class CCharacter*			m_pKirby = { nullptr };
 	
 	//TEX_STATE					m_eTexState = { DISCARD_NONE };
 	_bool						m_IsGaugeBLINK = { FALSE };

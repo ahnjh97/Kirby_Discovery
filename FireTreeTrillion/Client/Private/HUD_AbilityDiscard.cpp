@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "HUD_AbilityDiscard.h"
 #include "Kirby.h"
+#include "FinaleKirby.h"
 
 CHUD_AbilityDiscard::CHUD_AbilityDiscard(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext)
 	: CUIObject { _pDevice, _pContext }
@@ -40,10 +41,19 @@ HRESULT CHUD_AbilityDiscard::Initialize(void* _pArg)
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 
 	//m_eTexState = DISCARD_IDLE;
+	LEVEL eLevel = (LEVEL)*m_pGameInstance->Get_CurrentLevelID();
 
-	m_pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
-	Safe_AddRef(m_pKirby);
-
+	if (LEVEL_FINALE != *m_pCurrentLevelID)
+	{
+		m_pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(eLevel, TEXT("Layer_Player")));
+		Safe_AddRef(m_pKirby);
+	}
+	
+	if (LEVEL_FINALE == *m_pCurrentLevelID) //피날레 레벨에 대한 처리. 다만 현재 피날레 레벨은 어빌 덤프타임 정보가 없는 상태
+	{
+		m_pKirby = static_cast<CFinaleKirby*>(m_pGameInstance->Get_GameObject(eLevel, TEXT("Layer_Player")));
+		Safe_AddRef(m_pKirby);
+	}
 
 	return S_OK;
 }
@@ -52,19 +62,12 @@ _int CHUD_AbilityDiscard::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
-	if (m_pKirby == nullptr)
-	{
-		m_pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
-		Safe_AddRef(m_pKirby);
-	}
+	if (nullptr == m_pKirby)
+		return OBJ_NOEVENT;
 
-
-	// 여기에서 항상 플레이어의 덤프 타임을 측정한다.
-	// 0.f ~ 1.f 수가 계산될 것이다.
-	Compute_PlayerDumpAbiliyTime();
+	Compute_PlayerDumpAbiliyTime(); //덤프타임 측정. (0.f ~ 1.f)
 	
-	// 단순히, 내가 키를 입력하면 알파값이 증가, 키를 입력하지 않으면 알파값이 감소하는 로직이다.
-	if (Key_InputSystem(fTimeDelta) == false)
+	if (Key_InputSystem(fTimeDelta) == false) //키입력 여부에 따라 알파 값 증감 
 		return OBJ_NOEVENT;
 
 	if (m_UIObjDesc.fAlpha <= 0.f) //알파 값 보정 및 알파 값 기준 업데이트 중지
@@ -73,39 +76,9 @@ _int CHUD_AbilityDiscard::Tick(_float fTimeDelta)
 		return OBJ_NOEVENT;
 	}
 	else
-	{
-		if (m_pKirby == nullptr) return OBJ_NOEVENT;
+		ChaseUI_To_Player(); 	//플레이어 위치를 기준으로 UI 위치도 보정
 
-		// UI 가 플레이어를 따라가는 로직이다.
-		ChaseUI_To_Player();
-	}
 	return OBJ_NOEVENT;
-
-#pragma region EASING 1 SCOOP
-	/*
-	if (m_IsGaugeBLINK) //게이지UI 애니메이션
-	{
-		if (m_fBLINKAnimTime < 0.5f)
-			m_fBLINKAnimTime += fTimeDelta;
-
-		else if (m_fBLINKAnimTime > 0.5f)
-			m_fBLINKAnimTime -= fTimeDelta;
-
-		_float3 vScale = { 1.1f, 1.1f, 1.f };
-		vScale.x += EASE_OUT(m_fBLINKAnimTime * 2.f); //그래프 MAX값은 1이어야하며, 범위는 0 ~ 1로 설정되어야함
-		vScale.y += EASE_OUT(m_fBLINKAnimTime * 2.f);
-		m_pTransformCom->Set_Scaled(vScale);
-	}
-	*/
-#pragma endregion
-	
-	//버튼 입력X
-	//m_IsGaugeBLINK = FALSE;
-	//m_fHIDEAnimTime += fTimeDelta;
-
-	//m_UIObjDesc.fAlpha -= fTimeDelta * 5.f;
-	//if (m_fHIDEAnimTime > 5.f) //시간 경과할 경우 idle 상태로 변경
-	//	m_fHIDEAnimTime = 0.f;
 }
 
 void CHUD_AbilityDiscard::Late_Tick(_float fTimeDelta)
@@ -171,11 +144,12 @@ void CHUD_AbilityDiscard::ChaseUI_To_Player()
 
 void CHUD_AbilityDiscard::Compute_PlayerDumpAbiliyTime()
 {
-	//if (m_pKirby == nullptr)
-	//	return;
-
 	//m_fGaugeRatio = m_fDumpAbilityTime / 1.f; //게이지 비율
-	m_fDumpAbilityTime = m_pKirby->Get_KirbyInfo()->m_fDumpAbilityTime; //덤프시간 체크
+	if (LEVEL_FINALE != *m_pCurrentLevelID)
+		m_fDumpAbilityTime = static_cast<CKirby*>(m_pKirby)->Get_KirbyInfo()->m_fDumpAbilityTime; //덤프타임 정보 저장
+
+	//if (LEVEL_FINALE == *m_pCurrentLevelID)
+	//	m_fDumpAbilityTime = static_cast<CFinaleKirby*>(m_pKirby)->Get_KirbyInfo()->m_fDumpAbilityTime; //피날레 커비는 해당 정보가 없음.
 
 	if (m_fDumpAbilityTime > 1.f)
 		m_fDumpAbilityTime = 1.f;
@@ -190,9 +164,6 @@ _bool CHUD_AbilityDiscard::Key_InputSystem(_float fTimeDelta)
 	//이는 덤프시간 MAX치 오버될 경우 (value >= 1.f)와 이어지며, 값이 1로 넘어가자마자 0으로 변경됨
 	if (m_pGameInstance->Get_DIKeyState(DIK_V, KEY_PRESS) && m_fDumpAbilityTime > 0.f)
 	{
-		if (m_pKirby == nullptr)
-			return false;
-
 		m_UIObjDesc.fAlpha += fTimeDelta * 5.f;
 
 		if (m_UIObjDesc.fAlpha > 1.f)

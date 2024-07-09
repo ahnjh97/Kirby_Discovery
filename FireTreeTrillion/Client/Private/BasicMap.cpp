@@ -38,10 +38,12 @@ HRESULT CBasicMap::Initialize(void* pArg)
     m_setShadowDecos = { "CmStreetLampA", "CmStreetLampD", "GsTreeA", "GsTreeB", "GsTreeC", "GsTelephonePoleB"
     , "GsTrafficSignalAL" };
 
-    wstring wstrModelTag = GameObjectDesc.wstrModelName;
+    // 옥트리를 생성하는 맵
+    m_setOctreeMaps = { L"Level0Stage1Step01", L"Level0Stage1Step02", L"Level1Stage1Step01" };
 
-    if (wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("DeeDeeDeeMap") && wstrModelTag != TEXT("Land_LbLastBossBeforeStep") && 
-        wstrModelTag != TEXT("FinaleCave") && wstrModelTag != TEXT("TownShop")  && wstrModelTag != TEXT("LevelFinale_LbLastBuilding") && wstrModelTag.substr(wstrModelTag.length() - 5) == TEXT("Blend"))
+    wstring wstrModelTag = GameObjectDesc.wstrModelName;
+    // 이 객체가 BlendMap인지 아닌지 검사
+    if (wstrModelTag.length() > 5 && wstrModelTag.substr(wstrModelTag.length() - 5) == TEXT("Blend"))
     {
         m_bBlendMap = true;
         m_eRenderGroup = CRenderer::RENDER_BLEND;
@@ -56,17 +58,23 @@ HRESULT CBasicMap::Initialize(void* pArg)
 
     m_vecConstantNames = { "g_DiffuseTexture", "g_NormalTexture", "g_MRATexture", "g_fSamplingFactor"
     , "g_bStencil", "g_bRimLight", "m_fRimWidth", "g_bMotionBlur", "g_BoneMatrices" };
+
     m_vecStencilRimLightMotionBlurNames = { "g_bStencil", "g_bRimLight", "m_fRimWidth", "g_bMotionBlur" };
 
-    if (true == CheckIfBlendMapExists(GameObjectDesc.wstrModelName)) 
+    if (true == CheckIfBlendMapExists(wstrModelTag))
     {
         if (FAILED(Add_BlendMap(wstrModelTag)))
             return E_FAIL;
     }
 
-    if(wstrModelTag != TEXT("Town") && wstrModelTag != TEXT("DeeDeeDeeMap") && wstrModelTag != TEXT("FinaleCave") &&
-       wstrModelTag != TEXT("Land_LbLastBossBeforeStep") && wstrModelTag != TEXT("TownShop") && 
-       wstrModelTag != TEXT("LevelFinale_LbLastBuilding") && false == m_bBlendMap)
+    if (LEVEL_TOOL_MAP != *m_pCurrentLevelID)
+        m_pStaticActor = m_pModelCom->ReturnStaticActor(GameObjectDesc.matWorld);
+
+    if (true == m_bBlendMap)
+        return S_OK;
+
+    // 옥트리를 생성하는 레벨들의 맵
+    if(IsOctreeMapModel(wstrModelTag))
     {
         TraverseBlendDecoInfoTxts(m_mapBlendMeshesIndices, m_mapBlendObjStaticActor);
 
@@ -90,12 +98,9 @@ HRESULT CBasicMap::Initialize(void* pArg)
 
         InsertMapDecos();
     }
-
-    if (wstrModelTag == TEXT("Town") ||  wstrModelTag == TEXT("DeeDeeDeeMap") || wstrModelTag == TEXT("FinaleCave") ||
-        wstrModelTag == TEXT("TownShop")|| wstrModelTag == TEXT("Land_LbLastBossBeforeStep") ||
-        wstrModelTag == TEXT("LevelFinale_LbLastBuilding"))
+    else
     {
-        if (LEVEL_TOOL_MAP != *m_pCurrentLevelID) 
+        if (LEVEL_TOOL_MAP != *m_pCurrentLevelID)
         {
             TraverseBlendDecoInfoTxts(m_mapBlendMeshesIndices, m_mapBlendObjStaticActor);
 
@@ -104,9 +109,6 @@ HRESULT CBasicMap::Initialize(void* pArg)
         }
     }
 
-    if(LEVEL_TOOL_MAP != *m_pCurrentLevelID)
-        m_pStaticActor = m_pModelCom->ReturnStaticActor(GameObjectDesc.matWorld);
- 
     return S_OK;
 }
 
@@ -116,18 +118,15 @@ _int CBasicMap::Tick(_float fTimeDelta)
         return OBJ_DEAD;
 
     m_fTime += fTimeDelta;
-
-    if (m_pGameInstance->Get_KeyState(DIK_Q, KEY_DOWN))
-        m_bCull = !m_bCull;
-       
-    if (nullptr != m_pBlendMap)
-        m_pBlendMap->Tick(fTimeDelta);
-       
+  
     return OBJ_NOEVENT;
 }
 
 void CBasicMap::Late_Tick(_float fTimeDelta)
 {
+    if(true == m_bBlendMap)
+        Compute_ViewZ();
+
     if (nullptr != m_pBlendMap)
         m_pBlendMap->Late_Tick(fTimeDelta);
 
@@ -160,6 +159,43 @@ HRESULT CBasicMap::Render()
 
        /* for (auto& blendDeco : m_vecBlendObjects)
             blendDeco->Late_Tick(m_pGameInstance->Get_FirstTimer());*/
+    }
+    else if (LEVEL_PARK == *m_pCurrentLevelID)
+    {
+        _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
+
+        for (size_t i = 0; i < iNumMeshes; i++)
+        {
+            if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
+                return E_FAIL;
+            if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
+                return E_FAIL;
+            if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
+                return E_FAIL;
+            if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_EmissiveTexture", i, TextureType_EMISSIVE)))
+                return E_FAIL;
+
+            if (FAILED(m_pShaderCom->Bind_RawValue("g_fSamplingFactor", &m_vecSamplingFactors[i], sizeof(_float))))
+                return E_FAIL;
+
+            if (i == m_iMeshIndex) {
+                if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fTime, sizeof(_float))))
+                    return E_FAIL;
+            }
+            else {
+                if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fNonMatchTime, sizeof(_float))))
+                    return E_FAIL;
+            }
+
+            if (FAILED(m_pShaderCom->Begin(m_vecPassIndices[i])))
+                return E_FAIL;
+
+            if (FAILED(m_pModelCom->Render(i)))
+                return E_FAIL;
+        }
+
+        if (false == m_bBlendMap && LEVEL_TOOL_MAP != *m_pCurrentLevelID)
+            Render_NonOctreeMapDecos();
     }
     else
     {
@@ -211,31 +247,34 @@ void CBasicMap::Render_IMGUI()
 
 HRESULT CBasicMap::Add_Components(const wstring& _wstrModelTag)
 {
+    HRESULT hr(S_OK);
+
     /* For.Com_Shader */
-    if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel_Map"),
-        TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
-        return E_FAIL;
+    hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel_Map"),
+                                TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
+    CHECK_FAILED(hr);
 
     /* For.Com_Model */
-    if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Model_") + _wstrModelTag,
-        TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
-        return E_FAIL;
+    hr = __super::Add_Component(TEXT("Prototype_Component_Model_") + _wstrModelTag,
+                                TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+    CHECK_FAILED(hr);
 
     if (*m_pCurrentLevelID != LEVEL_TOOL_MAP)
     {
         /* For.Com_Shader */
-        if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"),
-            TEXT("Com_Shader_NonAnim"), (CComponent**)&m_pNonAnimShaderCom)))
-            return E_FAIL;
+        hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"),
+                                    TEXT("Com_Shader_NonAnim"), (CComponent**)&m_pNonAnimShaderCom);
+        CHECK_FAILED(hr);
 
         /* For.Com_Shader */
-        if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimModel"),
-            TEXT("Com_Shader_Anim"), (CComponent**)&m_pAnimShaderCom)))
-            return E_FAIL;
+        hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimModel"),
+                                    TEXT("Com_Shader_Anim"), (CComponent**)&m_pAnimShaderCom);
+        CHECK_FAILED(hr);
+
 
         /* For.Com_Texture */
-        HRESULT hr = __super::Add_Component(TEXT("Prototype_Component_Texture_FX_Mask_Bubble2"),
-            TEXT("Com_Texture"), (CComponent**)&m_pTextureCom);
+        hr = __super::Add_Component(TEXT("Prototype_Component_Texture_FX_Mask_Bubble2"),
+                                    TEXT("Com_Texture"), (CComponent**)&m_pTextureCom);
         CHECK_FAILED(hr);
     }
 
@@ -293,7 +332,7 @@ void CBasicMap::SetUpShaderInfo(const wstring& _wstrModelTag)
     fill(m_vecSamplingFactors.begin(), m_vecSamplingFactors.end(), 1.f);
 
     if (true == m_bBlendMap) {
-        fill(m_vecPassIndices.begin(), m_vecPassIndices.end(), 4);
+        fill(m_vecPassIndices.begin(), m_vecPassIndices.end(), MAP_ALPHABLEND);
         return;
     }
 
@@ -303,7 +342,6 @@ void CBasicMap::SetUpShaderInfo(const wstring& _wstrModelTag)
     if (fileStream.is_open() == false)
     {
         wstring wstrError = TEXT("Failed to Open: ") + _wstrModelTag + L"_ShaderInfo.txt";
-        //MSG_BOX(wstrError.c_str());
         return;
     }
 
@@ -318,7 +356,7 @@ void CBasicMap::SetUpShaderInfo(const wstring& _wstrModelTag)
             return;
         }
             
-        m_vecPassIndices[i] = iPassIndex;
+        m_vecPassIndices[i] = iPassIndex; //8  JYWI QZR 지영아 여기야
         m_vecSamplingFactors[i] = fSamplingFactor;
     }
 
@@ -428,9 +466,15 @@ void CBasicMap::InsertMapDecos()
 
             if (nullptr != pBlendMapObj) {
                 m_vecBlendObjects.push_back(pBlendMapObj);
-                pModel->Set_BlendObject(pBlendMapObj);
+                //pModel->Set_BlendObject(pBlendMapObj);
             }
+
             pModel->RemoveBlendMeshes(mapIter->second);
+
+            if (pModel->Get_NumMeshes() == 0) {
+                Safe_Release(pModel);
+                continue;
+            }
         }
 
         if (true == IsShadowDeco(strModelName))
@@ -538,10 +582,14 @@ void CBasicMap::ReadDecos_ForSmallLevels()
     string strLevel;
     if (LEVEL_TOWN == *m_pCurrentLevelID)
         strLevel = "Town";
-    else if(LEVEL_DEEDEEDEE == *m_pCurrentLevelID)
+    else if (LEVEL_DEEDEEDEE == *m_pCurrentLevelID)
         strLevel = "DeeDeeDee";
     else if (LEVEL_PARTTIME == *m_pCurrentLevelID)
         strLevel = "PartTime";
+    else if (LEVEL_PARK == *m_pCurrentLevelID)
+        strLevel = "Park";
+    else if (LEVEL_SIMBA == *m_pCurrentLevelID)
+        strLevel = "Simba";
     else if (LEVEL_FINALBOSS == *m_pCurrentLevelID)
         strLevel = "FinalBoss";
     else if (LEVEL_FINALE == *m_pCurrentLevelID)
@@ -585,7 +633,9 @@ void CBasicMap::ReadDecos_ForSmallLevels()
         string strFolder;
         if (LEVEL_TOWN == *m_pCurrentLevelID || LEVEL_PARTTIME == *m_pCurrentLevelID || LEVEL_DEEDEEDEE == *m_pCurrentLevelID)
             strFolder = string("TownDeco/");
-        else if (LEVEL_FINALBOSS == *m_pCurrentLevelID || LEVEL_FINALE == *m_pCurrentLevelID)
+        else if(LEVEL_PARK == *m_pCurrentLevelID)
+            strFolder = string("ParkDeco/");
+        else if (LEVEL_FINALBOSS == *m_pCurrentLevelID || LEVEL_SIMBA == *m_pCurrentLevelID || LEVEL_FINALE == *m_pCurrentLevelID)
             strFolder = string("LabDiscovera_Deco/");
 
         if (true == IsMapDeco(strModelName))
@@ -617,9 +667,15 @@ void CBasicMap::ReadDecos_ForSmallLevels()
 
             if (nullptr != pBlendMapObj) {
                 m_vecBlendObjects.push_back(pBlendMapObj);
-                pModel->Set_BlendObject(pBlendMapObj);
+                //pModel->Set_BlendObject(pBlendMapObj);
             }
+
             pModel->RemoveBlendMeshes(mapIter->second);
+
+            if (pModel->Get_NumMeshes() == 0) {
+                Safe_Release(pModel);
+                continue;
+            }
         }
 
         if (true == IsShadowDeco(strModelName))
@@ -631,7 +687,7 @@ void CBasicMap::ReadDecos_ForSmallLevels()
             iShaderVars |= 4;
         }
 
-        pModel->SetUpStencilRimLightMotionBlurPassIndex(iShaderVars, fRimWidth, iPassIndex);
+        pModel->SetUpStencilRimLightMotionBlurPassIndex(iShaderVars, fRimWidth, iPassIndex); // 16 JYWI QZR 지영아 여기야
 
         if (CMapToolObject::MAPOBJ_NONCOL == iMapObjType)
             m_vecNonAnimDecos.push_back(pModel);
@@ -853,6 +909,14 @@ _bool CBasicMap::ReadBlendMeshesIndices(const string& _strFullPath, const string
 _bool CBasicMap::IsShadowDeco(const string& _strModelName)
 {
     if (m_setShadowDecos.end() != m_setShadowDecos.find(_strModelName))
+        return true;
+
+    return _bool();
+}
+
+_bool CBasicMap::IsOctreeMapModel(const wstring& _wstrModelName)
+{
+    if (m_setOctreeMaps.end() != m_setOctreeMaps.find(_wstrModelName))
         return true;
 
     return _bool();

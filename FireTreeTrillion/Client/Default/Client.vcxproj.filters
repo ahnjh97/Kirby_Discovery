@@ -502,6 +502,9 @@
     <Filter Include="02.GameObjects\Map\Deco\ShadowDeco">
       <UniqueIdentifier>{af0b42ac-2606-411c-a9ea-4ca6880cde91}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Effect\Particle_Debris">
+      <UniqueIdentifier>{0dae7cd1-de4a-44d9-9812-18d9a566388f}</UniqueIdentifier>
+    </Filter>
     <Filter Include="02.GameObjects\Map\Dump">
       <UniqueIdentifier>{db971a15-b7f0-4afa-b440-2a7475cb9a21}</UniqueIdentifier>
     </Filter>
@@ -513,6 +516,9 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\FinaleKirby\State\KirbyDump_State">
       <UniqueIdentifier>{8ce43134-70bd-4e9a-84fa-af301762dfac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\5. Park">
+      <UniqueIdentifier>{b7bfcb13-2e50-4821-b899-af7cb6e3737a}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Map\Baum">
       <UniqueIdentifier>{05ab6fbc-cc3d-448f-972e-09c450a5189e}</UniqueIdentifier>
@@ -537,6 +543,36 @@
     </Filter>
     <Filter Include="02.GameObjects\PopStar\PopStar_StarSmall">
       <UniqueIdentifier>{3f4c06c4-3f4b-4e0b-80ae-b78275764df3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\HUD\AbilityDiscard">
+      <UniqueIdentifier>{3abd31c8-721b-4dcd-8517-1b33f8985469}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\SimbaObjects">
+      <UniqueIdentifier>{b6c6ebf1-2bc6-47c5-9ff2-5da187edc050}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\SimbaObjects\OriginCage">
+      <UniqueIdentifier>{bf2be153-8c01-4ddb-acd2-7bef457664f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\SimbaObjects\Turbine">
+      <UniqueIdentifier>{dc7a1e67-f235-4307-977e-9a6dafd3403c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\SimbaObjects\Throne">
+      <UniqueIdentifier>{6fedc350-b6f5-45f5-9002-a61ba0bc6eb5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\SimbaObjects\SimbaRoomGlass">
+      <UniqueIdentifier>{ff31fade-0ffa-44ae-8397-2b4bf316491a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\MapGimmick">
+      <UniqueIdentifier>{c6a10304-9722-433c-995f-133fb2c00367}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\MapGimmick\SurprisedBoard">
+      <UniqueIdentifier>{2d4d87d4-16f0-421c-9139-7f0a183eccde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Gimmick\Lab_Discovera">
+      <UniqueIdentifier>{4c39de13-368d-45e1-886a-30d944f3cc82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\SimbaObjects\RoomGlass">
+      <UniqueIdentifier>{1aa4a53b-c1d7-43fd-b993-6b79f9ea8e33}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -828,9 +864,6 @@
     <ClInclude Include="..\Public\HUD_StarPoint.h">
       <Filter>02.GameObjects\UI\HUD\StarPoint</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\HUD_AbilityDiscard.h">
-      <Filter>02.GameObjects\UI\HUD</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\KirbyCar_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyCar_State</Filter>
     </ClInclude>
@@ -991,17 +1024,11 @@
     <ClInclude Include="..\Public\SkySphereSub.h">
       <Filter>02.GameObjects\Map\SkySphere</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Gm_LabAntenna.h">
-      <Filter>02.GameObjects\Map\Gimmick</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\KirbyHammer_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyHammer_State</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Radio.h">
       <Filter>02.GameObjects\Map\Radio</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Gm_LabBossRoomDoor.h">
-      <Filter>02.GameObjects\Map\Gimmick</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Fog_Instance.h">
       <Filter>02.GameObjects\Map\TerrainFog</Filter>
@@ -1051,11 +1078,17 @@
     <ClInclude Include="..\Public\ShadowDeco.h">
       <Filter>02.GameObjects\Map\Deco\ShadowDeco</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Debris.h">
+      <Filter>02.GameObjects\Effect\Particle_Debris</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\FinaleKirby.h">
       <Filter>02.GameObjects\PhysXObject\Character\FinaleKirby</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Dump.h">
       <Filter>02.GameObjects\Map\Dump</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_Park.h">
+      <Filter>01.Levels\5. Park</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Baum.h">
       <Filter>02.GameObjects\Map\Baum\Baum</Filter>
@@ -1083,6 +1116,33 @@
     </ClInclude>
     <ClInclude Include="..\Public\PopStar_StarSmall.h">
       <Filter>02.GameObjects\PopStar\PopStar_StarSmall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\HUD_AbilityDiscard.h">
+      <Filter>02.GameObjects\UI\HUD\AbilityDiscard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Turbine.h">
+      <Filter>02.GameObjects\Map\SimbaObjects\Turbine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SimbaRoomGlass.h">
+      <Filter>02.GameObjects\Map\SimbaObjects\SimbaRoomGlass</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SurprisedBoard.h">
+      <Filter>02.GameObjects\PhysXObject\Character\MapGimmick\SurprisedBoard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Gm_LabAntenna.h">
+      <Filter>02.GameObjects\Map\Gimmick\Lab_Discovera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Gm_LabBossRoomDoor.h">
+      <Filter>02.GameObjects\Map\Gimmick\Lab_Discovera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\RoomGlass.h">
+      <Filter>02.GameObjects\Map\SimbaObjects\RoomGlass</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Throne.h">
+      <Filter>02.GameObjects\Map\SimbaObjects\Throne</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\OriginCage.h">
+      <Filter>02.GameObjects\Map\SimbaObjects\OriginCage</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1353,9 +1413,6 @@
     <ClCompile Include="..\Private\HUD_StarPoint.cpp">
       <Filter>02.GameObjects\UI\HUD\StarPoint</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\HUD_AbilityDiscard.cpp">
-      <Filter>02.GameObjects\UI\HUD</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\KirbyCar_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyCar_State</Filter>
     </ClCompile>
@@ -1515,17 +1572,11 @@
     <ClCompile Include="..\Private\SkySphereSub.cpp">
       <Filter>02.GameObjects\Map\SkySphere</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Gm_LabAntenna.cpp">
-      <Filter>02.GameObjects\Map\Gimmick</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\KirbyHammer_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyHammer_State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Radio.cpp">
       <Filter>02.GameObjects\Map\Radio</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Gm_LabBossRoomDoor.cpp">
-      <Filter>02.GameObjects\Map\Gimmick</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Fog_Instance.cpp">
       <Filter>02.GameObjects\Map\TerrainFog</Filter>
@@ -1575,11 +1626,17 @@
     <ClCompile Include="..\Private\ShadowDeco.cpp">
       <Filter>02.GameObjects\Map\Deco\ShadowDeco</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Debris.cpp">
+      <Filter>02.GameObjects\Effect\Particle_Debris</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Dump.cpp">
       <Filter>02.GameObjects\Map\Dump</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\FinaleKirby.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\FinaleKirby</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Park.cpp">
+      <Filter>01.Levels\5. Park</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Baum.cpp">
       <Filter>02.GameObjects\Map\Baum\Baum</Filter>
@@ -1610,6 +1667,33 @@
     </ClCompile>
     <ClCompile Include="..\Private\PopStar_StarSmall.cpp">
       <Filter>02.GameObjects\PopStar\PopStar_StarSmall</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HUD_AbilityDiscard.cpp">
+      <Filter>02.GameObjects\UI\HUD\AbilityDiscard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Turbine.cpp">
+      <Filter>02.GameObjects\Map\SimbaObjects\Turbine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SimbaRoomGlass.cpp">
+      <Filter>02.GameObjects\Map\SimbaObjects\SimbaRoomGlass</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SurprisedBoard.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\MapGimmick\SurprisedBoard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Gm_LabAntenna.cpp">
+      <Filter>02.GameObjects\Map\Gimmick\Lab_Discovera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Gm_LabBossRoomDoor.cpp">
+      <Filter>02.GameObjects\Map\Gimmick\Lab_Discovera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RoomGlass.cpp">
+      <Filter>02.GameObjects\Map\SimbaObjects\RoomGlass</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Throne.cpp">
+      <Filter>02.GameObjects\Map\SimbaObjects\Throne</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\OriginCage.cpp">
+      <Filter>02.GameObjects\Map\SimbaObjects\OriginCage</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

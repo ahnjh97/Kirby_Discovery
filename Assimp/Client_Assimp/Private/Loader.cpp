@@ -142,6 +142,7 @@ HRESULT CLoader::Loading_For_GamePlay()
 
 	TraverseNonAnimModels(wstrRootPath, wstring(L"Monsters/"));
 	TraverseNonAnimModels(wstrRootPath, wstring(L"TownDeco/"));
+	TraverseNonAnimModels(wstrRootPath, wstring(L"ParkDeco/"));
 
 	//LEVEL_FINALBOSS :: LAB_DISCOVERA
 	TraverseNonAnimModels(wstrRootPath, wstring(L"LabDiscovera_Deco/"));

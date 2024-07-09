@@ -216,7 +216,9 @@
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\Coin.h" />
     <ClInclude Include="..\Public\CollisionCenter.h" />
+    <ClInclude Include="..\Public\Debris.h" />
     <ClInclude Include="..\public\DecoObject.h" />
+    <ClInclude Include="..\Public\Level_Park.h" />
     <ClInclude Include="..\Public\Disaster_Master.h" />
     <ClInclude Include="..\Public\FinaleBuildingPartical.h" />
     <ClInclude Include="..\Public\FinalePartical.h" />
@@ -226,6 +228,8 @@
     </ClInclude>
     <ClInclude Include="..\public\FinaleRoadGrouper.h" />
     <ClInclude Include="..\Public\PopStar_StarSmall.h" />
+    <ClInclude Include="..\Public\OriginCage.h" />
+    <ClInclude Include="..\Public\RoomGlass.h" />
     <ClInclude Include="..\Public\ShadowDeco.h" />
     <ClInclude Include="..\Public\DeeDeeDee.h" />
     <ClInclude Include="..\Public\DeeDeeDeeHammer.h" />
@@ -339,16 +343,19 @@
     <ClInclude Include="..\Public\Radio.h" />
     <ClInclude Include="..\Public\RayArrow.h" />
     <ClInclude Include="..\Public\RigidObject.h" />
+    <ClInclude Include="..\Public\SimbaRoomGlass.h" />
     <ClInclude Include="..\Public\SingleEffect.h" />
     <ClInclude Include="..\public\SkySphere.h" />
     <ClInclude Include="..\Public\SpikeSpear.h" />
     <ClInclude Include="..\Public\SkySphereSub.h" />
     <ClInclude Include="..\Public\StarBlock.h" />
     <ClInclude Include="..\Public\StarBlockPiece.h" />
+    <ClInclude Include="..\Public\SurprisedBoard.h" />
     <ClInclude Include="..\Public\TerrainFog.h" />
     <ClInclude Include="..\Public\TestModel.h" />
     <ClInclude Include="..\Public\TestModel_State.h" />
     <ClInclude Include="..\Public\TestTerrain.h" />
+    <ClInclude Include="..\Public\Throne.h" />
     <ClInclude Include="..\Public\tinyxml2.h" />
     <ClInclude Include="..\Public\ToolHelper.h" />
     <ClInclude Include="..\Public\Editor_UI.h">
@@ -359,6 +366,7 @@
     <ClInclude Include="..\Public\Trigger.h" />
     <ClInclude Include="..\Public\Tunnel.h" />
     <ClInclude Include="..\Public\TunnelRock.h" />
+    <ClInclude Include="..\Public\Turbine.h" />
     <ClInclude Include="..\Public\UI_BtnIcon.h" />
     <ClInclude Include="..\Public\UI_MessageWindow.h" />
     <ClInclude Include="..\Public\UI_PartTime.h" />
@@ -421,7 +429,9 @@
     <ClCompile Include="..\Private\Character.cpp" />
     <ClCompile Include="..\Private\Coin.cpp" />
     <ClCompile Include="..\Private\CollisionCenter.cpp" />
+    <ClCompile Include="..\Private\Debris.cpp" />
     <ClCompile Include="..\private\DecoObject.cpp" />
+    <ClCompile Include="..\Private\Level_Park.cpp" />
     <ClCompile Include="..\Private\Disaster_Master.cpp" />
     <ClCompile Include="..\Private\FinaleBuildingPartical.cpp" />
     <ClCompile Include="..\Private\FinalePartical.cpp" />
@@ -432,6 +442,8 @@
     <ClCompile Include="..\private\FinaleRoadGrouper.cpp" />
     <ClCompile Include="..\Private\KirbyBoom_State.cpp" />
     <ClCompile Include="..\Private\PopStar_StarSmall.cpp" />
+    <ClCompile Include="..\Private\OriginCage.cpp" />
+    <ClCompile Include="..\Private\RoomGlass.cpp" />
     <ClCompile Include="..\Private\ShadowDeco.cpp" />
     <ClCompile Include="..\Private\DeeDeeDee.cpp" />
     <ClCompile Include="..\Private\DeeDeeDeeHammer.cpp" />
@@ -542,16 +554,19 @@
     <ClCompile Include="..\Private\Radio.cpp" />
     <ClCompile Include="..\Private\RayArrow.cpp" />
     <ClCompile Include="..\Private\RigidObject.cpp" />
+    <ClCompile Include="..\Private\SimbaRoomGlass.cpp" />
     <ClCompile Include="..\Private\SingleEffect.cpp" />
     <ClCompile Include="..\private\SkySphere.cpp" />
     <ClCompile Include="..\Private\SpikeSpear.cpp" />
     <ClCompile Include="..\Private\SkySphereSub.cpp" />
     <ClCompile Include="..\Private\StarBlock.cpp" />
     <ClCompile Include="..\Private\StarBlockPiece.cpp" />
+    <ClCompile Include="..\Private\SurprisedBoard.cpp" />
     <ClCompile Include="..\Private\TerrainFog.cpp" />
     <ClCompile Include="..\Private\TestModel.cpp" />
     <ClCompile Include="..\Private\TestModel_State.cpp" />
     <ClCompile Include="..\Private\TestTerrain.cpp" />
+    <ClCompile Include="..\Private\Throne.cpp" />
     <ClCompile Include="..\Private\tinyxml2.cpp" />
     <ClCompile Include="..\Private\ToolHelper.cpp" />
     <ClCompile Include="..\Private\Editor_UI.cpp">
@@ -562,6 +577,7 @@
     <ClCompile Include="..\Private\Trigger.cpp" />
     <ClCompile Include="..\Private\Tunnel.cpp" />
     <ClCompile Include="..\Private\TunnelRock.cpp" />
+    <ClCompile Include="..\Private\Turbine.cpp" />
     <ClCompile Include="..\Private\UI_BtnIcon.cpp" />
     <ClCompile Include="..\Private\UI_MessageWindow.cpp" />
     <ClCompile Include="..\Private\UI_PartTime.cpp" />

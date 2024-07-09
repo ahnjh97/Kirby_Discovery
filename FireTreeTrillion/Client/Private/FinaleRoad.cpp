@@ -202,7 +202,7 @@ HRESULT CFinaleRoad::Render_LightDepth()
 	return S_OK;
 }
 
-#ifdef DEBUG
+#ifdef _DEBUG
 void CFinaleRoad::Render_IMGUI()
 {
 	if (ImGui::TreeNode("Guizmo"))
@@ -226,7 +226,7 @@ void CFinaleRoad::Render_IMGUI()
 
 	__super::Render_IMGUI();
 }
-#endif // DEBUG
+#endif 
 
 void CFinaleRoad::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {

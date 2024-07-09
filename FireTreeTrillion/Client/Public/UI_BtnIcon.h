@@ -12,14 +12,20 @@ END
 BEGIN(Client)
 class CUI_BtnIcon : public CUIObject
 {
-private:
+public:
 	enum TEX_BTNICON { TEXBTN_BASE, TEXBTN_BRIGHT, TEXBTN_NONE };
-	enum BTN_STATE { BTN_IDLE, BTN_BLINK, BTN_SELECT, BTN_NONE };
+	enum BTN_STATE { BTN_IDLE, BTN_HIDE, BTN_BLINK, BTN_SELECT, BTN_NONE };
+	enum TEX_BTNTYPE { TYPE_DEFAULT, TYPE_BOSS, TYPE_NONE };
 
 private:
 	CUI_BtnIcon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CUI_BtnIcon(const CUI_BtnIcon& rhs);
 	virtual ~CUI_BtnIcon() = default;
+
+#pragma region GETTER/SETTER
+public:
+	void Set_BtnState(BTN_STATE _eBtnState) { m_eCurState = _eBtnState;	}
+#pragma endregion
 
 public:
 	virtual HRESULT				Initialize_Prototype()						override;
@@ -44,17 +50,13 @@ public:
 	virtual void				Free() override;
 
 private:
-	//CTransform*				m_pTransCom[TEXBTN_NONE] = { nullptr };
-	//CShader*					m_pShaderCom = { nullptr };
 	CTexture*					m_pTexCom[TEXBTN_NONE] = {nullptr};
-	//CVIBuffer_Rect*				m_pVIBufferCom = { nullptr };
-	CUI_MessageWindow*			m_pMWindow = { nullptr };
-	
-	_float						m_fBtnAlpha = { 0.f };
 
+	_float						m_fBtnAlpha = { 0.f };
 	_float						m_fBlinkAlpha = { 0.f };
 	_float						m_fBlinkTime = { 0.f };
 	_float						m_fSelectTime = { 0.f };
+	_float3						m_vOrigScale = { 0.f, 0.f, 1.f };
 
 	BTN_STATE					m_eCurState = { BTN_NONE };
 		

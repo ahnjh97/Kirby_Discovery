@@ -18,6 +18,7 @@
 
 #include "BG.h"
 #include "HUD.h"
+#include "Dialog.h"
 
 
 CLevel_DeeDeeDee::CLevel_DeeDeeDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -46,9 +47,6 @@ HRESULT CLevel_DeeDeeDee::Initialize()
 	hr = Ready_Layer_BackGround(TEXT("Layer_BackGround"));
 	CHECK_FAILED(hr);
 
-	hr = Ready_Layer_UI(TEXT("Layer_UI"));
-	CHECK_FAILED(hr);
-
 	hr = Ready_Map();
 	CHECK_FAILED(hr);
 
@@ -58,8 +56,10 @@ HRESULT CLevel_DeeDeeDee::Initialize()
 	hr = Ready_Dees();
 	CHECK_FAILED(hr);
 
-
 	hr = Ready_Objects();
+	CHECK_FAILED(hr);
+
+	hr = Ready_Layer_UI(TEXT("Layer_UI"));
 	CHECK_FAILED(hr);
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
@@ -185,9 +185,7 @@ HRESULT CLevel_DeeDeeDee::Ready_Layer_UI(const wstring& _wstrLayerTag)
 	{
 		{CHUD::HUD_KIRBYHP, "HUD_KirbyStatus"},
 		{CHUD::HUD_STARPOINT, "HUD_StarPoint"},
-		//{CHUD::HUD_ABILITYDISCARD, "HUD_AbilityDiscard"},
 	};
-
 
 	for (const auto& [eHUDType, strUITag] : HUDmap)
 	{
@@ -199,21 +197,19 @@ HRESULT CLevel_DeeDeeDee::Ready_Layer_UI(const wstring& _wstrLayerTag)
 		CHECK_FAILED(hr);
 	}
 
+	//능력버리기
 	CUIObject::UIOBJ_DESC DiscardUIDesc{};
 	DiscardUIDesc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f, 0.f };
 	DiscardUIDesc.vPos = { DiscardUIDesc.vCenter.x, DiscardUIDesc.vCenter.y, 0.f };
 	DiscardUIDesc.vSize = { 260.f * 0.8f, 120.f * 0.8f, 1.f };
 	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_HUD"), TEXT("Prototype_GameObject_HUD_AbilityDiscard"), &DiscardUIDesc);
 
-	//UI_MESSAGEWINDOW + UI_BTNICON
-	CUIObject::UIOBJ_DESC MessageWindowDesc{};
-	MessageWindowDesc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f, 0.f };
-	MessageWindowDesc.vPos = { 0.f, -325.f, 1.f, 1.f };
-	MessageWindowDesc.vSize = { 1300.f * 0.8f, 288.f * 0.8f, 1.f };
-	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_MessageWindow"), TEXT("Prototype_GameObject_UI_MessageWindow"), &MessageWindowDesc);
-	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_MessageWindow"), TEXT("Prototype_GameObject_UI_BtnIcon"));
+	//다이얼로그 
+	CDialog::DIALOG_DESC tDialogDesc{};
+	tDialogDesc.strPath = "../Bin/Resources/Data/Dialog_DeeDeeDee.json";
+	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_Dialog"), TEXT("Prototype_GameObject_Dialog"), &tDialogDesc);
 
-	return S_OK;
+	return S_OK; 
 }
 
 HRESULT CLevel_DeeDeeDee::Ready_Map()

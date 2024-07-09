@@ -16,7 +16,9 @@
 #include "BG.h"
 #include "HUD.h"
 #include "SkySphere.h"
+#include "Dialog.h"
 //#include "Kirby.h"
+#include "EventCenter.h"
 
 CLevel_Simba::CLevel_Simba(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -66,8 +68,16 @@ void CLevel_Simba::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 	m_fAccDelta += fTimeDelta;
-}
 
+	if (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
+	{
+		if (m_pGameInstance->Get_KeyState(DIK_1, KEY_DOWN))
+			CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_THRONEBREAK);
+		if (m_pGameInstance->Get_KeyState(DIK_2, KEY_DOWN))
+			CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_GLASSBREAK);
+	}
+}
+		
 HRESULT CLevel_Simba::Render()
 {
 	if (FAILED(__super::Render()))
@@ -633,22 +643,37 @@ HRESULT CLevel_Simba::Ready_Objects()
 		tDesc.iShaderVars = iShaderVars;
 		tDesc.fRimWidth = fRimWidth;
 
-#pragma region GIMMICK_OBJECT
-
-		if ("LbAntenna_NonAnim" == strModelName)
+		if ("LbBossTurbine01L" == strModelName || "LbBossRing01L" == strModelName /*|| "OriginCage" == strModelName*/)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_LabAntenna"), &tDesc)))
+			tDesc.wstrModelName += L"_Anim";
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_MapDeco"), TEXT("Prototype_GameObject_Turbine"), &tDesc)))
 				continue;
 		}
-
-		if ("LbBossRoomDoor_NonAnim" == strModelName)
+		else if ("JhGlass" == strModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_LabBossRoomDoor"), &tDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_MapDeco"), TEXT("Prototype_GameObject_SimbaRoomGlass"), &tDesc)))
 				continue;
 		}
-
-#pragma endregion
+		else if ("RoomGlass" == strModelName)
+		{
+			tDesc.wstrModelName += L"_Anim";
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_MapDeco"), TEXT("Prototype_GameObject_RoomGlass"), &tDesc)))
+				continue;
+		}
+		else if ("Throne" == strModelName)
+		{
+			tDesc.wstrModelName += L"_Anim";
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_MapDeco"), TEXT("Prototype_GameObject_Throne"), &tDesc)))
+				continue;
+		}
+		else if ("OriginCage" == strModelName)
+		{
+			/*tDesc.wstrModelName += L"_Anim";
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_MapDeco"), TEXT("Prototype_GameObject_OriginCage"), &tDesc)))
+				continue;*/
+		}
 	}
+
 	fileInput.close();
 
 	return S_OK;
@@ -656,12 +681,18 @@ HRESULT CLevel_Simba::Ready_Objects()
 
 HRESULT CLevel_Simba::Ready_UI()
 {
+	//능력버리기
 	CUIObject::UIOBJ_DESC DiscardUIDesc{};
 	DiscardUIDesc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f, 0.f };
 	DiscardUIDesc.vPos = { DiscardUIDesc.vCenter.x, DiscardUIDesc.vCenter.y, 0.f };
 	DiscardUIDesc.vSize = { 260.f * 0.8f, 120.f * 0.8f, 1.f };
 
 	HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_HUD"), TEXT("Prototype_GameObject_HUD_AbilityDiscard"), &DiscardUIDesc);
+	
+	//다이얼로그 
+	CDialog::DIALOG_DESC tDialogDesc{};
+	tDialogDesc.strPath = "../Bin/Resources/Data/Dialog_Simba.json";
+	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_Dialog"), TEXT("Prototype_GameObject_Dialog"), &tDialogDesc);
 
 	return S_OK;
 }

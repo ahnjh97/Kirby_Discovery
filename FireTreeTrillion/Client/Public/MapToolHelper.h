@@ -38,6 +38,7 @@ private:
 	//마을 오브젝트를 로드함.
 	void	ReadTownDecoTxts();
 	void	ReadLabDecoTxts();
+	void	ReadParkDecoTxts();
 
 	// ImGui
 	void	Menu_Level();
@@ -117,6 +118,8 @@ private:
 	void ClearSearchFilter(_char* _filterBuf, _bool& bWasOpen);
 	void FilterListBoxStrings(const _char* _filterBuf, vector<const _char*>& _vecNames, vector<string>& _vecTxts);
 
+	_bool CheckEnumStrings();
+
 private:
 	vector<string>	m_vecLevelName; 
 	vector<string>	m_vecMapModelNames;
@@ -139,6 +142,7 @@ private:
 
 	unordered_set<string>	m_setTownDecoTxts;
 	unordered_set<string>	m_setLabDecoTxts;
+	unordered_set<string>	m_setParkDecoTxts;
 
 	vector<string>	m_vecMapTxts;
 	vector<string>	m_vecTriggerTxts;
@@ -153,6 +157,7 @@ private:
 	//마을을 위한 txts
 	vector<string>	m_vecTownDecoTxts;
 	vector<string>	m_vecLabDecoTxts;
+	vector<string>	m_vecParkDecoTxts;
 
 	unordered_map<string, unordered_set<_uint>> m_mapBlendDecoInfos;
 

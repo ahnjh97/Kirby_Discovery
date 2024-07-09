@@ -8,6 +8,8 @@ class CModel;
 class CShader;
 END
 
+#define DEBRISCNT 6
+
 BEGIN(Client)
 
 class CMeteor final : public CPhysXObject
@@ -43,18 +45,24 @@ public:
 	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
 private:
-	CModel* m_pModelCom = { nullptr };
-	CShader* m_pShaderCom = { nullptr };
+	CModel*					m_pModelCom = { nullptr };
+	CShader*				m_pShaderCom = { nullptr };
+	vector<class CDebris*>	m_vecDebris = {};
 
 	_float	m_fTimeDelta = { 0.f };
 	_float	m_fRunTime = { 0.f };
 	_float	m_fDelayTime = { 0.f };
 	_float	m_fDeadTime = { 0.f };
+	_float	m_fParticleDelayTime = { 0.f };
+	_float	m_fOffsetTime = { 0.f };
 
 	_float	m_fTurnSpeed = { 0.f };
 	_float	m_fIncreSpeed = { 0.f };
 	_float	m_fDecreSpeed = { 1.f };
 	_float	m_fMeteorSpeed = { 0.f };
+
+	_uint	m_iDebrisCnt = { 0 };
+	_uint	m_iDebrsiMaxCnt = { 0 };
 
 	_bool	m_bBig = { false };
 	_bool	m_bShake = { false };
