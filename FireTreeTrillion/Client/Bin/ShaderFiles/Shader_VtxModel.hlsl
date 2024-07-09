@@ -188,7 +188,7 @@ PS_OUT PS_MAIN(PS_IN In)
 
     Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
     Out.vFieldDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 0.0f);
     Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
     
@@ -225,7 +225,7 @@ PS_OUT FOR_KIRBY_PARTOBJECT(PS_IN In)
 
     Out.vDiffuse = vMtrlDiffuse + g_fWhiteColorDiffuse + g_fOverPowerColor;
     Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
     Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
     
     if (g_bStencil == true)
@@ -261,7 +261,7 @@ PS_OUT FOR_BOSS_OBJECT(PS_IN In)
 
     Out.vDiffuse = vMtrlDiffuse + g_fWhiteColorDiffuse;
     Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
     Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
     
     if (g_bStencil == true)
@@ -289,7 +289,7 @@ PS_OUT NO_NORMALMAP_PS_MAIN(PS_IN In)
 
     Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
     Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
 
     if (g_bStencil == true)
@@ -364,7 +364,7 @@ PS_OUT TRIGGER(PS_IN In)
         Out.vDiffuse = vector(1, 1, 1, 1);
     
     Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
     
     return Out;
 }
@@ -413,7 +413,7 @@ PS_OUT_EFFECT PS_MAIN_BLEND_FX(PS_IN In)
 
     //소프트 이펙트 보정
     Out.vColor.a = SoftEffect(Out.vColor.a, In.vProjPos);
-
+    Out.vNonBlur = vector(0, 1, 0, 1);
     return Out;
 }
 
@@ -507,7 +507,7 @@ PS_OUT PS_MAIN_NEARCLIP(PS_IN In)
     
     Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
     Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
     
     

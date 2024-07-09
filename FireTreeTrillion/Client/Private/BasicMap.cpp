@@ -332,7 +332,7 @@ void CBasicMap::SetUpShaderInfo(const wstring& _wstrModelTag)
     fill(m_vecSamplingFactors.begin(), m_vecSamplingFactors.end(), 1.f);
 
     if (true == m_bBlendMap) {
-        fill(m_vecPassIndices.begin(), m_vecPassIndices.end(), 4);
+        fill(m_vecPassIndices.begin(), m_vecPassIndices.end(), MAP_ALPHABLEND);
         return;
     }
 
@@ -356,7 +356,7 @@ void CBasicMap::SetUpShaderInfo(const wstring& _wstrModelTag)
             return;
         }
             
-        m_vecPassIndices[i] = iPassIndex; //8  JYWI QZR 지영아 여기야
+        m_vecPassIndices[i] = iPassIndex;  // 8; JYWI QZR 지영아 여기야
         m_vecSamplingFactors[i] = fSamplingFactor;
     }
 
@@ -466,13 +466,15 @@ void CBasicMap::InsertMapDecos()
 
             if (nullptr != pBlendMapObj) {
                 m_vecBlendObjects.push_back(pBlendMapObj);
-                pModel->Set_BlendObject(pBlendMapObj);
+                //pModel->Set_BlendObject(pBlendMapObj);
             }
 
             pModel->RemoveBlendMeshes(mapIter->second);
 
-            if (pModel->Get_NumMeshes() == 0)
+            if (pModel->Get_NumMeshes() == 0) {
+                Safe_Release(pModel);
                 continue;
+            }
         }
 
         if (true == IsShadowDeco(strModelName))
@@ -590,6 +592,8 @@ void CBasicMap::ReadDecos_ForSmallLevels()
         strLevel = "Simba";
     else if (LEVEL_FINALBOSS == *m_pCurrentLevelID)
         strLevel = "FinalBoss";
+    else if (LEVEL_FINALE == *m_pCurrentLevelID)
+        strLevel = "Finale";
     else
         return;
 
@@ -631,7 +635,7 @@ void CBasicMap::ReadDecos_ForSmallLevels()
             strFolder = string("TownDeco/");
         else if(LEVEL_PARK == *m_pCurrentLevelID)
             strFolder = string("ParkDeco/");
-        else if (LEVEL_FINALBOSS == *m_pCurrentLevelID || LEVEL_SIMBA == *m_pCurrentLevelID)
+        else if (LEVEL_FINALBOSS == *m_pCurrentLevelID || LEVEL_SIMBA == *m_pCurrentLevelID || LEVEL_FINALE == *m_pCurrentLevelID)
             strFolder = string("LabDiscovera_Deco/");
 
         if (true == IsMapDeco(strModelName))
@@ -663,13 +667,15 @@ void CBasicMap::ReadDecos_ForSmallLevels()
 
             if (nullptr != pBlendMapObj) {
                 m_vecBlendObjects.push_back(pBlendMapObj);
-                pModel->Set_BlendObject(pBlendMapObj);
+                //pModel->Set_BlendObject(pBlendMapObj);
             }
 
             pModel->RemoveBlendMeshes(mapIter->second);
 
-            if (pModel->Get_NumMeshes() == 0)
+            if (pModel->Get_NumMeshes() == 0) {
+                Safe_Release(pModel);
                 continue;
+            }
         }
 
         if (true == IsShadowDeco(strModelName))

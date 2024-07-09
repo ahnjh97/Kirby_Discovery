@@ -332,6 +332,39 @@ PxVec3 CCharacterController::Compute_Slope(CTransform* pTransform)
 	return normal;
 }
 
+PxVec3 CCharacterController::Compute_Slope_DynamicActor(CTransform* pTransform)
+{
+	PxExtendedVec3 position = m_pController->getPosition();
+	PxVec3 rayOrigin = PxVec3((_float)position.x, (_float)position.y, (_float)position.z);
+
+	_vector vRight = pTransform->Get_State_Vector(CTransform::STATE_RIGHT);
+	vRight = XMVector3Normalize(vRight);
+	_vector vLook = pTransform->Get_State_Vector(CTransform::STATE_LOOK);
+	vLook = XMVector3Normalize(vLook);
+
+	PxVec3 right = CUtils::To_PxVec3(vRight * 0.5f);
+	PxVec3 look = CUtils::To_PxVec3(vLook * 0.5f);
+
+	// 객체 중심 위치에서 동서남북방향으로 살짝 움직인 position을 지정
+	PxVec3 rayOriginRight = rayOrigin + right;	// 오른쪽, 왼쪽 레이캐스트
+	PxVec3 rayOriginLeft = rayOrigin - right;
+	PxVec3 rayOriginFront = rayOrigin + look;	// 앞, 뒤 레이캐스트
+	PxVec3 rayOriginBack = rayOrigin - look;
+
+	PxVec3 rayDirection = PxVec3(0.f, -1.f, 0.f);
+	_float fMaxDistance = 5.f;
+
+	PxVec3	normal(0.f);
+	normal += TerrainRayCast_Collision_Dynamic(rayOriginRight, rayDirection, fMaxDistance);
+	normal += TerrainRayCast_Collision_Dynamic(rayOriginLeft, rayDirection, fMaxDistance);
+	normal += TerrainRayCast_Collision_Dynamic(rayOriginFront, rayDirection, fMaxDistance);
+	normal += TerrainRayCast_Collision_Dynamic(rayOriginBack, rayDirection, fMaxDistance);
+
+	normal.normalize();
+	return normal;
+}
+
+
 PxVec3 CCharacterController::Compute_PureSlope()
 {
 	PxExtendedVec3 position = m_pController->getPosition();
@@ -518,6 +551,24 @@ PxVec3 CCharacterController::TerrainRayCast_Collision(PxVec3 _rayOrigin, PxVec3 
 	else
 		return PxVec3(0.0f, 1.0f, 0.0f);
 }
+
+PxVec3 CCharacterController::TerrainRayCast_Collision_Dynamic(PxVec3 _rayOrigin, PxVec3 _rayDirection, _float _fMaxDistance)
+{
+	PxRaycastHit hit;
+	PxRaycastBuffer hitBuffer;
+	PxQueryFilterData filterData(PxQueryFlag::eDYNAMIC);
+
+	_bool isRayCast = m_pGameInstance->Get_Scene()->raycast(_rayOrigin, _rayDirection, _fMaxDistance, hitBuffer, PxHitFlag::eDEFAULT, filterData);
+	// 충돌이 발생한 경우 법선 벡터 반환
+	if (isRayCast && hitBuffer.hasBlock)
+	{
+		hit = hitBuffer.block;
+		return hit.normal;
+	}
+	else
+		return PxVec3(0.0f, 1.0f, 0.0f);
+}
+
 
 
 _bool CCharacterController::Is_Activated()

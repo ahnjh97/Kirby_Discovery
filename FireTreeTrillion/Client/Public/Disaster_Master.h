@@ -2,7 +2,7 @@
 
 #include "Client_Defines.h"
 #include "GameObject.h"
-
+#include "FinaleRoadGrouper.h"
 BEGIN(Engine)
 END
 
@@ -25,10 +25,23 @@ public:
 
 private:
 	void			Make_MissBaum();
-	void			Make_OnTerrainBaum();
+	void			Make_OnTerrainBaum(_float4 vTargetPos, _bool bBaum);
+	void			Make_AirParticle();
+	void			Make_FinaleRoad(ROADTYPE eType, MOVECMD eMoveType, _float3 vTargetPos, _float3 vLookDir, _float3 vDestPos, _float3 vDestDir, _float fDestZAngle = -1.f);
+
+
+	void			Moving_FinaleRoad(_float fKirbyX);
+	_bool			m_bRoadTrigger[10] = { true, true, true, true, true, true, true, true, true, true };
+	void			Moving_TargetBaum(_float fKirbyX);
+	_bool			m_bBaumTrigger[10] = { true, true, true, true, true, true, true, true, true, true };
 
 	class CFinaleKirby*	m_pKirby = { nullptr };
-	_float			m_fMakeBaumDelay = { 0.f };
+	class CFinalePartical_Maker* m_pMaker = { nullptr };
+	_float				m_fMakeBaumDelay = { 0.f };
+	class CLight*		m_pLight = { nullptr };
+
+	_float				m_fAirParticleDelay = { 0.f };
+	_float				m_fBuildingParticleDelay = { 0.f };
 
 
 public:

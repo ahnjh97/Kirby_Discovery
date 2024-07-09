@@ -48,7 +48,7 @@ HRESULT CTunnel::Initialize(void* pArg)
             
         else if ("GsDefault_3__GsDefaultCeilingC" == strMeshName)
         {
-            m_vecPassIndices.push_back(MAP_BLEND_NONDISCARD);
+            m_vecPassIndices.push_back(MAP_NONBLEND_NONDISCARD);
             //setNonParticleMeshes.insert(i);
         }
         else

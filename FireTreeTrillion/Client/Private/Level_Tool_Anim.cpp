@@ -75,7 +75,7 @@ HRESULT CLevel_Tool_Anim::Ready_Layer_Camera(const wstring & strLayerTag)
 	CameraDesc.fFovy = XMConvertToRadians(60.0f);
 	CameraDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	CameraDesc.fNear = 0.1f;
-	CameraDesc.fFar = 1000.0f;
+	CameraDesc.fFar = g_fCamFar;
 	CameraDesc.vEye = _float4(0.f, 2.f, -1.f, 1.f);
 	CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
 	CameraDesc.fSpeedPerSec = 10.f;

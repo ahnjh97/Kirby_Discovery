@@ -1207,6 +1207,16 @@ static void ComeOn_Dash(CTransform* pTransformCom)
 		return;
 }
 
+static void ComeOn_Dash_For_Dump(CTransform* pTransformCom)
+{
+	CEffect::FX_DESC FXDesc{};
+	FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+	FXDesc.vInitPos = { 0.f, 3.5f, -10.f };
+	FXDesc.vInitScale = { 15.f, 15.f, 30.f };
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Come On Dash"), &FXDesc)))
+		return;
+}
+
 static void LadderStart_FX(CTransform* pTransformCom)
 {
 	CMultiEffect::MULTI_FX_DESC FXDesc{};

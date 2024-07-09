@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "DimensionGate.h"
 #include "SpikeSpear.h"
+#include "Camera_Main.h"
 
 CDimensionGate::CDimensionGate(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -28,6 +29,7 @@ HRESULT CDimensionGate::Initialize(void* pArg)
 		pDimensionGateDesc->fSpeedPerSec = 7.f;
 		pDimensionGateDesc->fRotationPerSec = XMConvertToRadians(90.0f);
 		m_bSwitch = pDimensionGateDesc->bSwitch;
+		m_bCamera = pDimensionGateDesc->bCamera;
 		m_vPosition = pDimensionGateDesc->vPosition;
 		m_fScale = pDimensionGateDesc->fScale;
 	}
@@ -53,6 +55,8 @@ HRESULT CDimensionGate::Initialize(void* pArg)
 	else
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vPosition);
 
+	if(true == m_bCamera)
+		m_pTransformCom->Turn(XMVectorSet(1.f, 0.f, 0.f, 0.f), 1.25f);
 	m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
 
 	m_pModelCom->Set_Animation(1, 60.f, false, false);
@@ -69,10 +73,40 @@ _int CDimensionGate::Tick(_float fTimeDelta)
 
 	m_fLifeTime += m_fTimeDelta;
 
-	if (6.f < m_fLifeTime)
+	//if (true == m_bCamera)
+	//{
+	//	CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+	//	CHECK_NULLPTR(pCameraMain);
+
+	//	CTransform* pCameraTransform = pCameraMain->Get_TransformCom();
+	//	_vector vCameraLook = -pCameraTransform->Get_State_Vector(CTransform::STATE_LOOK);
+
+	//	_vector		vLook = vCameraLook;
+	//	_vector		vRight = XMVector3Cross(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), vLook);
+	//	_vector		vUp = XMVector3Cross(vLook, vRight);
+
+	//	_float3		vScaled = m_pTransformCom->Get_Scaled();
+
+	//	m_pTransformCom->Set_State(CTransform::STATE_RIGHT, XMVector3Normalize(vRight) * vScaled.x);
+	//	m_pTransformCom->Set_State(CTransform::STATE_UP, XMVector3Normalize(vUp) * vScaled.y);
+	//	m_pTransformCom->Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLook) * vScaled.z);
+	//}
+
+	if(true == m_bCamera)
 	{
-		m_fLifeTime = 0.f;
-		m_bSetAnim = true;
+		if (18.f < m_fLifeTime)
+		{
+			m_fLifeTime = 0.f;
+			m_bSetAnim = true;
+		}
+	}
+	else
+	{
+		if (6.f < m_fLifeTime)
+		{
+			m_fLifeTime = 0.f;
+			m_bSetAnim = true;
+		}
 	}
 	
 	if(true == m_bSetAnim)
@@ -110,8 +144,8 @@ HRESULT CDimensionGate::Render()
 	{
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
 			return E_FAIL;
-		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
-			return E_FAIL;
+		//if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
+		//	return E_FAIL;
 		//if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
 		//	return E_FAIL;
 
@@ -119,7 +153,7 @@ HRESULT CDimensionGate::Render()
 			return E_FAIL;
 
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
+		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_X)))
 			return E_FAIL;
 
 		m_pModelCom->Render(i);
@@ -200,6 +234,8 @@ HRESULT CDimensionGate::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
 		return E_FAIL;
 
 	return S_OK;

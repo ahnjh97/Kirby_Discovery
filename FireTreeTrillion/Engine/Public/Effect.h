@@ -4,6 +4,8 @@
 
 BEGIN(Engine)
 
+#define FX_MAXDURATION 99.f
+
 class ENGINE_DLL CEffect : public CGameObject
 {
 #ifdef _DEBUG

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "GameInstance.h"
 #include "SkySphere.h"
+#include "Particle.h"
 
 CSkySphere::CSkySphere(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CGameObject{ pDevice, pContext }
@@ -35,12 +36,18 @@ HRESULT CSkySphere::Initialize(void* pArg)
 	hr = Add_Components();
 	CHECK_FAILED(hr);
 
-	if (LEVEL_FINALBOSS <= *m_pCurrentLevelID)
+	if (LEVEL_FINALBOSS == *m_pCurrentLevelID)
 		m_pTransformCom->Set_Scaled(_float3{ 0.1f, 0.1f, 0.1f });
-	
+	else if (LEVEL_FINALE == *m_pCurrentLevelID)
+	{
+		m_pTransformCom->Set_Scaled(_float3{ .6f, .6f, .6f });
+
+	}
 	else
 		m_pTransformCom->Set_Scaled(_float3{ .6f, .6f, .6f });
 
+
+	
 	return S_OK;
 }
 
@@ -52,6 +59,7 @@ _int CSkySphere::Tick(_float fTimeDelta)
 void CSkySphere::Late_Tick(_float fTimeDelta)
 {
 	_float4 vCamPos = m_pGameInstance->Get_CamPosition();
+	vCamPos.y -= 100.f;
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vCamPos);
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this);

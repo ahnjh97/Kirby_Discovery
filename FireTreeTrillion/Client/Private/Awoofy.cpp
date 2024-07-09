@@ -126,8 +126,6 @@ HRESULT CAwoofy::Render()
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
 			return E_FAIL;
-
-
 		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
 
@@ -146,9 +144,6 @@ HRESULT CAwoofy::Render()
 			if (FAILED(m_pModelCom->Render(i)))
 				return E_FAIL;
 		}
-
-
-		m_pModelCom->Render(i);
 	}
 
 	return S_OK;

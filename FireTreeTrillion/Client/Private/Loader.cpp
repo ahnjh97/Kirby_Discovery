@@ -77,6 +77,8 @@
 #include "PoppyBomb.h"
 #include "CappyBody.h"
 #include "CappyHat.h"
+#include "Phanta.h"
+#include "SurprisedBoard.h"
 
 // 보스 몬스터
 #include "FinalBoss.h"
@@ -93,8 +95,6 @@
 #include "DeeDeeDee.h"
 #include "DeeDeeDeeHammer.h"
 
-// 피날레
-#include "FinaleRoad.h"
 
 //와들디
 #include "Dee_Part.h"
@@ -114,11 +114,13 @@
 #include "BreakableRockParticle.h"
 #include "Car.h"
 #include "Dump.h"
+#include "BlendMapObject.h"
+#include "PortalSoftEffect.h"
+
+// Racing Gimmick Objects
 #include "CarShopWall.h"
 #include "CarShopWallFrame.h"
 #include "ToppleableBridge.h"
-#include "BlendMapObject.h"
-#include "PortalSoftEffect.h"
 #include "AnimBridge.h"
 #include "Tunnel.h"
 #include "TunnelRock.h"
@@ -126,12 +128,28 @@
 #include "Fog_Instance.h"
 #include "Box.h"
 #include "Debris.h"
+
+// Park Gimmick Objects
+#include "Crumble.h"
+
+// Simba Gimmick Objects
 #include "Turbine.h"
 #include "SimbaRoomGlass.h"
+#include "RoomGlass.h"
+#include "Throne.h"
 
 // 피날레 스테이지 기믹들
 #include "Baum.h"
+#include "BaumPiece.h"
 #include "Disaster_Master.h"
+#include "FinaleRoad.h"
+#include "FinaleRoadGrouper.h"
+#include "PopStar.h"
+#include "PopStar_StarSmall.h"
+#include "BreakableBlock.h"
+#include "FinalePartical.h"
+#include "FinaleBuildingPartical.h"
+#include "FinalePartical_Maker.h"
 
 //기믹
 #include "Gm_LabAntenna.h"
@@ -376,7 +394,10 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PoppyBomb"), CPoppyBomb);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CappyBody"), CCappyBody);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CappyHat"), CCappyHat);
-
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Phanta"), CPhanta);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SurprisedBoard"), CSurprisedBoard);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Crumble"), CCrumble);
+	
 	// FinalBoss
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalBoss"), CFinalBoss);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalBossSpear"), CFinalBossSpear);
@@ -389,9 +410,17 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gully"), CGully);
 
 	// Finale
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleRoad"), CFinaleRoad);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Baum"), CBaum);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BaumPiece"), CBaumPiece);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Disaster_Master"), CDisaster_Master);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleRoad"), CFinaleRoad);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleRoadGrouper"), CFinaleRoadGrouper);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PopStar"), CPopStar);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PopStar_StarSmall"), CPopStar_StarSmall);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BreakableBlock"), CBreakableBlock);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalePartical_Maker"), CFinalePartical_Maker);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalePartical"), CFinalePartical);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleBuildingPartical"), CFinaleBuildingPartical);
 
 	//Dee
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeePart"), CDee_Part);
@@ -458,6 +487,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	#pragma region LEVEL_SIMBA
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Turbine"), CTurbine);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SimbaRoomGlass"), CSimbaRoomGlass);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("RoomGlass"), CRoomGlass);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Throne"), CThrone);
 	#pragma endregion
 
 #pragma endregion
@@ -1133,6 +1164,9 @@ HRESULT CLoader::Loading_For_Finale()
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Terrain_Fog", "Map/Fog/Sand_%d.png", 4)))
 		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "FinalePartical", "FinalePartical/Finale_%d.dds", 9)))
+		return E_FAIL;
+
 
 	hr = Add_Texture(eLevel, "FX_Mask_Bubble2", "Effects/Mask/noise_bubble_%d.png", 4);	CHECK_FAILED(hr);
 
@@ -1147,6 +1181,7 @@ HRESULT CLoader::Loading_For_Finale()
 	hr = Add_Texture(eLevel, "SkySphere_LabBoss_2Pase_Normal", "SkySphere/SkySphere_LabBoss_2Pase_Normal.dds");	CHECK_FAILED(hr);
 	hr = Add_Texture(eLevel, "SkySphere_LabBoss_2Pase_Emissive", "SkySphere/SkySphere_LabBoss_2Pase_Emissive.dds");	CHECK_FAILED(hr);
 	hr = Add_Texture(eLevel, "SkySphere_LabBoss_2Pase_Height", "SkySphere/SkySphere_LabBoss_2Pase_Height.dds");	CHECK_FAILED(hr);
+	//hr = Add_Texture(eLevel, "SkySphere_Space", "SkySphere/SkySphere_Space2.dds");	CHECK_FAILED(hr);
 
 #pragma endregion
 
@@ -1479,6 +1514,11 @@ HRESULT CLoader::Add_FXTexture()
 	//파티클
 	hr = Add_Texture(LEVEL_STATIC, "FX_Rock", "Effects/Particle/rock_%d.png", 4);	CHECK_FAILED(hr);
 
+	//팝스타
+	hr = Add_Texture(LEVEL_STATIC, "FX_PopstarFallWind", "Effects/Popstar/PopStarFallEffectWind.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_PopstarSkyCloud", "Effects/Popstar/PopStarSkyCloud.dds");	CHECK_FAILED(hr);
+
+
 	return S_OK;
 }
 
@@ -1551,6 +1591,12 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		//토루스
 		m_vecModelInfo.emplace_back("Torus", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("TorusHalf", TYPE_NONANIM);
+
+		//팝스타
+		m_vecModelInfo.emplace_back("PopStar_Debris", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("PopStar_StarRiver", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("PopStar_StarSmall", TYPE_NONANIM);
+
 
 
 	}
@@ -1786,6 +1832,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("PoppyBrosJr", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_ANIM, 1.3f, 180.f);
 
+
 		// For Item
 		Load_ItemModels();
 
@@ -1819,7 +1866,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	{
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("BG1", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-
+		
 		// For Map
 		m_vecModelInfo.emplace_back("PkFunHouse", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
@@ -1841,6 +1888,15 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// Deform
 		m_vecModelInfo.emplace_back("DumpCar", TYPE_ANIM, 0.8f, 90.f);
+
+		// Monster
+		m_vecModelInfo.emplace_back("Phanta", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("SurprisedBoardBlue", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("SurprisedBoardGreen", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("SurprisedBoardRed", TYPE_ANIM, 1.f, 180.f);
+
+		// Gimmick
+		m_vecModelInfo.emplace_back("Crumble", TYPE_ANIM);
 	}
 	else if (eLevel == LEVEL_SIMBA)
 	{
@@ -1856,6 +1912,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("LbBossTurbine01L_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("LbBossRing01L_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("JhGlass", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("RoomGlass_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Throne_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("OriginCage_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 
 		// For Kirby Body
@@ -1928,6 +1987,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		//피날레 오브젝트들
 		m_vecModelInfo.emplace_back("PopStar", TYPE_ANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("PopStar_StarSmall", TYPE_NONANIM, 1.f, 0.f, 0);
 
 		//보스전 진입 전 필드
 		//m_vecModelInfo.emplace_back("Land_LbLastBossBeforeStep", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
@@ -1951,15 +2011,25 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("MovableBuildingB", TYPE_NONANIM, 1.f, 0.f, 0);
 		m_vecModelInfo.emplace_back("MovableBuildingC", TYPE_NONANIM, 1.f, 0.f, 0);
 		m_vecModelInfo.emplace_back("MovableBuildingD", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
+
+		m_vecModelInfo.emplace_back("LbBrokenBuildingAC", TYPE_NONANIM, 1.f, 0.f, 0, string("LabDiscovera_Deco/"));
+		m_vecModelInfo.emplace_back("LbBrokenBuildingBL", TYPE_NONANIM, 1.f, 0.f, 0, string("LabDiscovera_Deco/"));
+		m_vecModelInfo.emplace_back("LbBrokenBuildingCL", TYPE_NONANIM, 1.f, 0.f, 0, string("LabDiscovera_Deco/"));
+		m_vecModelInfo.emplace_back("LbBrokenBuildingDL", TYPE_NONANIM, 1.f, 0.f, 0, string("LabDiscovera_Deco/"));
+
 
 
 		m_vecModelInfo.emplace_back("Road", TYPE_NONANIM, 1.f, 0.f, 0);
 		m_vecModelInfo.emplace_back("RoadEnd", TYPE_NONANIM, 1.f, 0.f, 0);
-		m_vecModelInfo.emplace_back("RoadParticle", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("RoadParticle", TYPE_NONANIM, 0.2f, 0.f, 0);
 
-		m_vecModelInfo.emplace_back("RoadBreak", TYPE_ANIM, 1.f, 0.f, 0);
-		m_vecModelInfo.emplace_back("RoadLBreak", TYPE_ANIM, 1.f, 0.f, 0);
-		m_vecModelInfo.emplace_back("RoadLongBreak", TYPE_ANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("BreakableBlock", TYPE_ANIM, 0.2f, 0.f, 0);
+
+		m_vecModelInfo.emplace_back("RoadBreak", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("RoadLBreak", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("RoadLongBreak", TYPE_NONANIM, 1.f, 0.f, 0);
+
 
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("BG1", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
@@ -2087,6 +2157,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_ANIM, 1.3f, 0.f);
 		m_vecModelInfo.emplace_back("FinalBoss", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("FinalBossSpear", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("Phanta", TYPE_ANIM, 1.f, 180.f);
 
 		// Boss
 		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 180.f);
@@ -2094,9 +2165,13 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
 
-		m_vecModelInfo.emplace_back("SurprisedBoardBlue", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("SurprisedBoardGreen", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("SurprisedBoardRed", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		// Monster
+		m_vecModelInfo.emplace_back("SurprisedBoardBlue", TYPE_ANIM, 1.f, 0.f);
+		m_vecModelInfo.emplace_back("SurprisedBoardGreen", TYPE_ANIM, 1.f, 0.f);
+		m_vecModelInfo.emplace_back("SurprisedBoardRed", TYPE_ANIM, 1.f, 0.f);
+
+		m_vecModelInfo.emplace_back("BreakableBlock", TYPE_ANIM, 0.5f, 0.f, 0);
+		m_vecModelInfo.emplace_back("Crumble", TYPE_ANIM);
 	}
 }
 

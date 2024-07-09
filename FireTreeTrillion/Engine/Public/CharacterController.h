@@ -69,6 +69,8 @@ public:
 	void			FreeFall(CTransform* pTransform, _float fTimeDelta, _float fGravityOffset = 6.f, _float fHeightOffset  = 0.f);	// 자유 낙하
 	void			Reset_FallVelocity() { m_fFallVelocity = 0.f; }										// 자유 낙하 중력값 초기화
 	PxVec3			Compute_Slope(CTransform* pTransform);												// 경사면의 노말벡터 계산
+	PxVec3			Compute_Slope_DynamicActor(CTransform* pTransform);									// 경사면의 노말벡터 계산
+
 	PxVec3			Compute_PureSlope();																// 경사면의 노말벡터 계산
 	_float			Compute_Height(_fvector vAxis = XMVectorSet(0.f, 0.f, 0.f, 0.f));					// 경사면의 높이 계산
 
@@ -79,6 +81,7 @@ public:
 	PxVec3			Compute_TerrainPosition();
 	_vector			Compute_TerrainPosition_Vector();
 	PxVec3			TerrainRayCast_Collision(PxVec3 _rayOrigin, PxVec3 _rayDirection, _float _fMaxDistance);
+	PxVec3			TerrainRayCast_Collision_Dynamic(PxVec3 _rayOrigin, PxVec3 _rayDirection, _float _fMaxDistance);
 
 
 	/*physx::PxControllerCollisionFlags Move(_float3 vVelocity, _float fTimeDelta, _float minDist = 0.001f);

@@ -535,23 +535,56 @@
     <Filter Include="02.GameObjects\Map\SimbaObjects">
       <UniqueIdentifier>{b6c6ebf1-2bc6-47c5-9ff2-5da187edc050}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\SimbaObjects\OriginCage">
+      <UniqueIdentifier>{bf2be153-8c01-4ddb-acd2-7bef457664f6}</UniqueIdentifier>
+    </Filter>
     <Filter Include="02.GameObjects\Map\SimbaObjects\Turbine">
       <UniqueIdentifier>{dc7a1e67-f235-4307-977e-9a6dafd3403c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\SimbaObjects\Throne">
+      <UniqueIdentifier>{6fedc350-b6f5-45f5-9002-a61ba0bc6eb5}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Map\SimbaObjects\SimbaRoomGlass">
       <UniqueIdentifier>{ff31fade-0ffa-44ae-8397-2b4bf316491a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\PhysXObject\Character\MapGimmick">
-      <UniqueIdentifier>{c6a10304-9722-433c-995f-133fb2c00367}</UniqueIdentifier>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Phanta">
+      <UniqueIdentifier>{70c3c5fc-bbe3-4f64-9910-9f5f6c3fca0c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\PhysXObject\Character\MapGimmick\SurprisedBoard">
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Phanta\State">
+      <UniqueIdentifier>{90b696ec-e03b-4d92-a5e5-1f914b62ec97}</UniqueIdentifier>
+	</Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\SurprisedBoard">
       <UniqueIdentifier>{2d4d87d4-16f0-421c-9139-7f0a183eccde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\SurprisedBoard\State">
+      <UniqueIdentifier>{e79782c6-0b75-470d-8c32-900d86ca63a0}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Map\Gimmick\Lab_Discovera">
       <UniqueIdentifier>{4c39de13-368d-45e1-886a-30d944f3cc82}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Map\Gimmick\Park_Wondaria">
       <UniqueIdentifier>{8a33b20b-e9a5-41ac-83c4-3349fa722281}</UniqueIdentifier>
+    </Filter>    
+    <Filter Include="02.GameObjects\Map\SimbaObjects\RoomGlass">
+      <UniqueIdentifier>{1aa4a53b-c1d7-43fd-b993-6b79f9ea8e33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\BreakableBlock">
+      <UniqueIdentifier>{ec3cdc26-af1a-4b0c-a936-dc0728b1d346}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\FinalePartical">
+      <UniqueIdentifier>{7111e563-875c-48cc-9dfa-673cdd43cec6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\FinalePartical\FinaleBuildingPartical">
+      <UniqueIdentifier>{2b718661-f57a-45e7-b4dd-a0354916597b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\FinalePartical\FinalePartical">
+      <UniqueIdentifier>{1d52cb6b-5f54-45c4-a816-238a9ba1d635}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PopStar\PopStar_StarSmall">
+      <UniqueIdentifier>{a6a867cc-1e47-427c-90a9-bd5185b502ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\MapObject\Crumble">
+      <UniqueIdentifier>{366fdf1d-19e9-414d-a2be-7baa585b0a58}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1087,8 +1120,17 @@
     <ClInclude Include="..\Public\SimbaRoomGlass.h">
       <Filter>02.GameObjects\Map\SimbaObjects\SimbaRoomGlass</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Phanta.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Phanta</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Phanta_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Phanta\State</Filter>
+	</ClInclude>
     <ClInclude Include="..\Public\SurprisedBoard.h">
-      <Filter>02.GameObjects\PhysXObject\Character\MapGimmick\SurprisedBoard</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\SurprisedBoard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SurprisedBoard_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\SurprisedBoard\State</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Gm_LabAntenna.h">
       <Filter>02.GameObjects\Map\Gimmick\Lab_Discovera</Filter>
@@ -1098,6 +1140,35 @@
     </ClInclude>
     <ClInclude Include="..\Public\Gm_ParkFhEntranceAlien.h">
       <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\RoomGlass.h">
+      <Filter>02.GameObjects\Map\SimbaObjects\RoomGlass</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Throne.h">
+      <Filter>02.GameObjects\Map\SimbaObjects\Throne</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\OriginCage.h">
+      <Filter>02.GameObjects\Map\SimbaObjects\OriginCage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BreakableBlock.h">
+      <Filter>02.GameObjects\Map\BreakableRock</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\FinalePartical_Maker.h">
+      <Filter>02.GameObjects\Map\FinalePartical</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\FinaleBuildingPartical.h">
+      <Filter>02.GameObjects\Map\FinalePartical\FinaleBuildingPartical</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\FinalePartical.h">
+      <Filter>02.GameObjects\Map\FinalePartical\FinalePartical</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\FinaleRoadGrouper.h">
+      <Filter>02.GameObjects\Map\FinaleRoad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PopStar_StarSmall.h">
+      <Filter>02.GameObjects\PopStar\PopStar_StarSmall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Crumble.h" />
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1289,9 +1360,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\Level_Intro.cpp">
       <Filter>01.Levels\1. Intro</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Public\KirbyBoom_State.cpp">
-      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyBoom_State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BrontoBurt.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\BrontoBurt</Filter>
@@ -1614,8 +1682,17 @@
     <ClCompile Include="..\Private\SimbaRoomGlass.cpp">
       <Filter>02.GameObjects\Map\SimbaObjects\SimbaRoomGlass</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Phanta.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Phanta</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Phanta_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Phanta\State</Filter>
+	</ClCompile>
     <ClCompile Include="..\Private\SurprisedBoard.cpp">
-      <Filter>02.GameObjects\PhysXObject\Character\MapGimmick\SurprisedBoard</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\SurprisedBoard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SurprisedBoard_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\SurprisedBoard\State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Gm_LabAntenna.cpp">
       <Filter>02.GameObjects\Map\Gimmick\Lab_Discovera</Filter>
@@ -1625,6 +1702,38 @@
     </ClCompile>
     <ClCompile Include="..\Private\Gm_ParkFhEntranceAlien.cpp">
       <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RoomGlass.cpp">
+      <Filter>02.GameObjects\Map\SimbaObjects\RoomGlass</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Throne.cpp">
+      <Filter>02.GameObjects\Map\SimbaObjects\Throne</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\OriginCage.cpp">
+      <Filter>02.GameObjects\Map\SimbaObjects\OriginCage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KirbyBoom_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyBoom_State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BreakableBlock.cpp">
+      <Filter>02.GameObjects\Map\BreakableRock</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FinalePartical_Maker.cpp">
+      <Filter>02.GameObjects\Map\FinalePartical</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FinaleBuildingPartical.cpp">
+      <Filter>02.GameObjects\Map\FinalePartical\FinaleBuildingPartical</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FinalePartical.cpp">
+      <Filter>02.GameObjects\Map\FinalePartical\FinalePartical</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\FinaleRoadGrouper.cpp">
+      <Filter>02.GameObjects\Map\FinaleRoad</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PopStar_StarSmall.cpp">
+      <Filter>02.GameObjects\PopStar\PopStar_StarSmall</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Crumble.cpp" />
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

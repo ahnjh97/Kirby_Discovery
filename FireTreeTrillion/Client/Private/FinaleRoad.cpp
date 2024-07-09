@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "FinaleRoad.h"
 #include "HitBox.h"
+#include "FinalePartical_Maker.h"
+
 
 CFinaleRoad::CFinaleRoad(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CPhysXObject{ pDevice ,pContext }
@@ -12,6 +14,60 @@ CFinaleRoad::CFinaleRoad(const CFinaleRoad& rhs)
 {
 }
 
+//충돌한 도로가 도로 그룹들에게 
+void CFinaleRoad::Start_CollisionEvent()
+{
+
+	switch (m_eCollideType)
+	{
+	case CTYPE_NONE:
+	{
+
+	}
+	break;
+	case CTYPE_DOWN:
+	{
+
+	}
+	break;
+	case CTYPE_BREAK:
+	{
+		m_bCollided = true;
+
+
+		if (m_wstrModelName == L"RoadLongBreak")
+		{
+			m_pDynamicActor->userData = nullptr;
+			if (m_pDynamicActor->getScene())
+			{
+				auto pScene = m_pGameInstance->Get_Scene();
+				pScene->removeActor(*m_pDynamicActor);
+			}
+
+			CFinalePartical_Maker* pMaker = static_cast<CFinalePartical_Maker*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinalePartical_Maker")));
+			pMaker->Make_Partical(50, GET_POS, 10.f, 1.5f, 1.f, _float4(0.f, -1.f, 0.f, 0.f), 120.f, 1.f);
+		}
+	}
+	break;
+	default:
+		break;
+	}
+
+	list<CGameObject*>* pList = m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoadGrouper"));
+	if (nullptr == pList)
+		return;
+
+	for (auto& grouper : *pList)
+	{
+		if (true == static_cast<CFinaleRoadGrouper*>(grouper)->Make_CollideReaction(this))
+			break;
+	}
+}
+
+void CFinaleRoad::Make_CollisionEvent()
+{
+
+}
 
 HRESULT CFinaleRoad::Initialize_Prototype()
 {
@@ -36,13 +92,23 @@ HRESULT CFinaleRoad::Initialize(void* pArg)
 	hr = Add_Components(RoadDesc.wstrModelName, RoadDesc.bIsAnimModel);
 	CHECK_FAILED(hr);
 
+
 	m_bMotionBlur = false;
 	m_bStencil = true;
 	m_bRimLight = false;
 
+	m_wstrModelName = RoadDesc.wstrModelName;
+	m_pSocketMatrix = RoadDesc.pSocketMat;
+	m_bIsAnimModel = RoadDesc.bIsAnimModel;
+	m_eCollideType = RoadDesc.eCollideType;
 
-	m_pDynamicActor = m_pModelCom->ReturnDynamicActor(m_pTransformCom->Get_WorldMatrix());
-	m_pDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+	m_WorldMatrix = m_pTransformCom->Get_WorldMatrix() * *m_pSocketMatrix;
+
+	if (*m_pCurrentLevelID != LEVEL_TOOL_ANIM)
+	{
+		m_pDynamicActor = m_pModelCom->ReturnDynamicActor(m_WorldMatrix);
+		m_pDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+	}
 
 
 	return S_OK;
@@ -56,7 +122,8 @@ _int CFinaleRoad::Tick(_float fTimeDelta)
 
 	//m_pTransformCom->Turn( {0.f, 1.f, 0.f, 0.f} , m_fTimeDelta * .01f);
 
-	Compute_MotionBlur();
+	m_WorldMatrix = m_pTransformCom->Get_WorldMatrix() * *m_pSocketMatrix;
+
 
 	return _int();
 }
@@ -67,19 +134,23 @@ void CFinaleRoad::Late_Tick(_float fTimeDelta)
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
-	//if (nullptr != m_pDynamicActor)
-	//{
-	//	m_pTransformCom->Set_WorldMatrix(m_pGameInstance->GetActorAverageMatrix(m_pDynamicActor));
-	//}
 
-	m_pDynamicActor->setKinematicTarget(CUtils::TransformToPxTransform(m_pTransformCom));
-	//m_pDynamicActor->setGlobalPose(CUtils::TransformToPxTransform(m_pTransformCom));
+	_float3 vScale, vTrans;
+	Quaternion vRotQuat;
+	m_WorldMatrix.Decompose(vScale, vRotQuat, vTrans);
+
+	PxMeshScale meshScale(PxVec3(vScale.x, vScale.y, vScale.z));
+	PxConvexMeshGeometryFlags meshFlags = PxConvexMeshGeometryFlags();
+	PxTransform pxTransform(PxVec3(m_WorldMatrix._41, m_WorldMatrix._42, m_WorldMatrix._43), PxQuat(vRotQuat.x, vRotQuat.y, vRotQuat.z, vRotQuat.w));
+	m_pDynamicActor->setKinematicTarget(pxTransform);
+
+
+
 
 	//시야 벗어나면 컬링
-	if (m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State(CTransform::STATE_POSITION), 100.0f))
+	if (m_pGameInstance->isInFrustum_WorldSpace(CUtils::Get_State_Vector_Matrix(m_WorldMatrix, CUtils::STATE_POSITION), 100.0f))
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
-		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 	}
 
 }
@@ -87,27 +158,36 @@ void CFinaleRoad::Late_Tick(_float fTimeDelta)
 HRESULT CFinaleRoad::Render()
 {
 	HRESULT hr;
+
 	hr = Bind_ShaderResources(); CHECK_FAILED(hr);
 
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
+		//애니메이션 도로들
+		if (m_eCollideType == CTYPE_BREAK)
+		{
+			if (m_bCollided)
+			{
+				if (i != 0)
+					continue;
+			}
+			else
+			{
+				if (i != 1)
+					continue;
+			}
+		}
+
 		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE); CHECK_FAILED(hr);
 		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS); CHECK_FAILED(hr);
 		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS); CHECK_FAILED(hr);
 
 
 		//만약 애님모델이라면 뼈까지 바인딩하고 Anim Model Pass
-		if (m_bIsAnimModel)
-		{
-			hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i); CHECK_FAILED(hr);
-			hr = m_pShaderCom->Begin(ANIMMODEL_NORMAL_O); CHECK_FAILED(hr);
-		}
-		else
-		{
-			hr = m_pShaderCom->Begin(MODEL_NORMAL_O); CHECK_FAILED(hr);
-		}
+		hr = m_pShaderCom->Begin(MODEL_NORMAL_O); CHECK_FAILED(hr);
+
 
 		m_pModelCom->Render(i);
 	}
@@ -134,7 +214,16 @@ void CFinaleRoad::Render_IMGUI()
 		ImGui::Separator(); ImGui::NewLine();
 		ImGui::TreePop();
 	}
+
 	ImGui::Separator(); ImGui::NewLine();
+
+	_float4x4 WorldMat = m_pTransformCom->Get_WorldMatrix();
+	//_float4 vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+
+	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._11, WorldMat._12, WorldMat._13, WorldMat._14);
+	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._21, WorldMat._22, WorldMat._23, WorldMat._24);
+	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._31, WorldMat._32, WorldMat._33, WorldMat._34);
+	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._41, WorldMat._42, WorldMat._43, WorldMat._44);
 
 	__super::Render_IMGUI();
 }
@@ -149,15 +238,17 @@ HRESULT CFinaleRoad::Add_Components(wstring _strModelTag, _bool _bIsAnimModel)
 {
 	HRESULT hr;
 
-	hr = __super::Add_Component(LEVEL_STATIC,
-		_bIsAnimModel ? TEXT("Prototype_Component_Shader_VtxAnimModel") : TEXT("Prototype_Component_Shader_VtxModel"),
+	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"),
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
+
 
 	hr = __super::Add_Component(TEXT("Prototype_Component_Model_") + _strModelTag,
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
+
+	// FOR ANIMTOOL
 
 	CHitBox::HITBOX_DESC HitBox{};
 	HitBox.pOwner = this;
@@ -178,7 +269,8 @@ HRESULT CFinaleRoad::Bind_ShaderResources()
 
 	HRESULT hr;
 
-	hr = m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix"); CHECK_FAILED(hr);
+	//hr = m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix"); CHECK_FAILED(hr);
+	hr = m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix);	CHECK_FAILED(hr);
 	hr = m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform(CPipeLine::D3DTS_VIEW));	CHECK_FAILED(hr);
 	hr = m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform(CPipeLine::D3DTS_PROJ));	CHECK_FAILED(hr);
 
