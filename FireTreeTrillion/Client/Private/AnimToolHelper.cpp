@@ -210,6 +210,10 @@ void CAnimToolHelper::Ready_AnimObjects(const wstring& strLayerTag)
 	//pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_FinaleRoad")));
 	//CHECK_NULLPTR(pCharacter);
 	//m_vecCharacter.push_back(pCharacter);
+
+	pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Simba")));
+	CHECK_NULLPTR(pCharacter);
+	m_vecCharacter.push_back(pCharacter);
 }
 
 void CAnimToolHelper::Render_ObjectList()

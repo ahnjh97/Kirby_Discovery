@@ -131,6 +131,36 @@ void CChannel::Ratio_TransformationMatrix(const vector<class CBone*>& Bones, _fl
 	Bones[m_iBoneIndex]->Set_TransformationMatrix(TransformationMatrix);
 }
 
+_bool CChannel::IsValid()
+{
+	_bool bValid = false;
+
+	for (_uint i = 1; i < m_iNumKeyFrames; i++) {
+		if (m_KeyFrames[i].vScale.x != m_KeyFrames[i - 1].vScale.x)
+			return true;
+		if (m_KeyFrames[i].vScale.y != m_KeyFrames[i - 1].vScale.y)
+			return true;
+		if (m_KeyFrames[i].vScale.z != m_KeyFrames[i - 1].vScale.z)
+			return true;
+		if (m_KeyFrames[i].vRotation.x != m_KeyFrames[i - 1].vRotation.x)
+			return true;   
+		if (m_KeyFrames[i].vRotation.y != m_KeyFrames[i - 1].vRotation.y)
+			return true;   
+		if (m_KeyFrames[i].vRotation.z != m_KeyFrames[i - 1].vRotation.z)
+			return true;  
+		if (m_KeyFrames[i].vRotation.w != m_KeyFrames[i - 1].vRotation.w)
+			return true;
+		if (m_KeyFrames[i].vTranslation.x != m_KeyFrames[i - 1].vTranslation.x)
+			return true;
+		if (m_KeyFrames[i].vTranslation.y != m_KeyFrames[i - 1].vTranslation.y)
+			return true;
+		if (m_KeyFrames[i].vTranslation.z != m_KeyFrames[i - 1].vTranslation.z)
+			return true;
+	}
+
+	return _bool();
+}
+
 CChannel* CChannel::Create(const vector<class CBone*>& Bones, ifstream& fileStream)
 {
 	CChannel* pInstance = new CChannel();

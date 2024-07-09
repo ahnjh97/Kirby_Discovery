@@ -1278,6 +1278,12 @@ HRESULT CLoader::Loading_For_Tool_Anim()
 	CHECK_FAILED(hr);
 	hr = Add_Texture(eLevel, "energydrink", "UI/MGameFood/energydrink.png");
 	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "SimbaEye_Diffuse", "SimbaEye/Eye_BaseColor%d.dds", 3);
+	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "SimbaEye_Normal", "SimbaEye/Eye_Normal%d.dds", 3);
+	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "SimbaEye_MRA", "SimbaEye/BaseMRA.dds");
+	CHECK_FAILED(hr);
 	#pragma endregion
 #pragma endregion
 
@@ -2182,6 +2188,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		m_vecModelInfo.emplace_back("BreakableBlock", TYPE_ANIM, 0.5f, 0.f, 0);
 		m_vecModelInfo.emplace_back("Crumble", TYPE_ANIM);
+		m_vecModelInfo.emplace_back("Simba", TYPE_ANIM);
 	}
 }
 

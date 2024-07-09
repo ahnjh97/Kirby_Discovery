@@ -33,6 +33,16 @@ void CAnimation::Set_AnimEventData(ANIM_INFO tAnimInfo)
 	m_vecEventInfo = tAnimInfo.vecEventInfo;
 }
 
+vector<_uint> CAnimation::Get_ValidBoneIndices()
+{
+	vector<_uint> vecValidChannelIndices;
+	for (auto& channel : m_Channels)
+		if (true == channel->IsValid())
+			vecValidChannelIndices.push_back(channel->Get_ChannelBoneIndex());
+
+	return vecValidChannelIndices;
+}
+
 HRESULT CAnimation::Initialize(const vector<class CBone*>& Bones, ifstream& fileStream)
 {
 	Read_AnimationData(fileStream);
@@ -46,6 +56,19 @@ HRESULT CAnimation::Initialize(const vector<class CBone*>& Bones, ifstream& file
 
 		m_Channels.emplace_back(pChannel);
 	}
+
+	//string strName = m_szName;
+	//if (strName.find(string("DamageFaceSub")) != string::npos)
+	//{
+	//	vector<CChannel*> vecValidChannels;
+	//	for (auto& channel : m_Channels) {
+	//		if (channel->IsValid())
+	//			vecValidChannels.push_back(channel);
+	//	}
+	//		
+	//	_int a = 0;
+	//	_int b = 0;
+	//}
 
 	return S_OK;
 }

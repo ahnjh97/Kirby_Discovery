@@ -78,8 +78,13 @@ public:
 	HRESULT Bind_ShaderResource(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, _uint iTextureType);
 	
 	HRESULT Play_Animation(_float fTimeDelta);
+	HRESULT Play_PartialAnimation(_uint iAnimIndex, vector<_uint>& _vecValidBoneIndices, _float fTimeDelta, _bool bLoop = false);
+
 	void	Stop_Animation() { m_bStop = true; }
 	void	Replay_Animation() { m_bStop = false; }
+
+	vector<_uint> Get_ValidBoneIndices(_uint iAnimIndex);
+
 	HRESULT Render(_uint iMeshIndex);
 	HRESULT RenderMergedMesh();
 

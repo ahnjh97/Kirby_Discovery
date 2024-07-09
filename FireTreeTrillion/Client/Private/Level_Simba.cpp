@@ -75,10 +75,8 @@ void CLevel_Simba::Tick(_float fTimeDelta)
 
 	if (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
 	{
-		if (m_pGameInstance->Get_KeyState(DIK_1, KEY_DOWN))
+		if (m_pGameInstance->Get_KeyState(DIK_C, KEY_DOWN))
 			CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_THRONEBREAK);
-		if (m_pGameInstance->Get_KeyState(DIK_2, KEY_DOWN))
-			CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_GLASSBREAK);
 	}
 }
 		

@@ -57,9 +57,10 @@ HRESULT CSimba::Initialize(void* pArg)
 	{
 		if (i == m_iEyeMesh || i == m_iEyeLidMesh)
 			continue;
-
 		m_vecMeshes.push_back(i);
 	}
+
+	m_vecValidBoneIndices = m_pModelCom->Get_ValidBoneIndices(SIMBA_DAMAGEFACESUB);
 
 	Add_AnimEvent();
 
@@ -75,6 +76,9 @@ _int CSimba::Tick(_float fTimeDelta)
 
 	__super::Tick(m_fTimeDelta);
 
+	if (true == m_pFaceModelCom->IsFinished())
+		m_bPlayFaceAnim = false;
+
 	return OBJ_NOEVENT;
 }
 
@@ -82,6 +86,11 @@ void CSimba::Late_Tick(_float fTimeDelta)
 {
 	m_pModelCom->Play_Animation(m_fTimeDelta);
 
+	if (true == m_bPlayFaceAnim) {
+		m_pModelCom->Play_PartialAnimation(SIMBA_DAMAGEFACESUB, m_vecValidBoneIndices, m_fTimeDelta, false);
+		m_pFaceModelCom->Play_Animation(m_fTimeDelta);
+	}
+	
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 }
@@ -172,7 +181,11 @@ void CSimba::Render_IMGUI()
 
 void CSimba::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
-	
+	if (true == m_bPlayFaceAnim)
+		return;
+
+	m_pFaceModelCom->Set_Animation(SIMBA_DAMAGEFACESUB, 50.f, false, false);
+	m_bPlayFaceAnim = true;
 }
 
 void CSimba::Change_State(SIMBA_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
@@ -189,6 +202,10 @@ HRESULT CSimba::Add_Components()
 
 	/* For.Com_Model */
 	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Simba"), TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+	CHECK_FAILED(hr);
+
+	/* For.Com_Model_Face */
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Simba"), TEXT("Com_Model_Face"), (CComponent**)&m_pFaceModelCom);
 	CHECK_FAILED(hr);
 
 	// FOR ANIMTOOL
@@ -222,7 +239,7 @@ HRESULT CSimba::Add_Components()
 	CHitBox::HITBOX_DESC HitBox{};
 	HitBox.pOwner = this;
 	HitBox.pDesc = &m_tColliderDesc[BODY];
-	HitBox.pCollisionType = BOSS_FINALBOSS;
+	HitBox.pCollisionType = BOSS_SIMBA;
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
 	Set_BodyCollider(COLLIDER_CYLINDER, 1.f, 1.5f, 0.85f);
@@ -303,6 +320,8 @@ CGameObject* CSimba::Clone(void* pArg)
 void CSimba::Free()
 {
 	__super::Free();
+
+	Safe_Release(m_pFaceModelCom);
 
 	for(_uint i = 0; i < EYETEX_END; i++)
 		Safe_Release(m_pEyeTextureCom[i]);

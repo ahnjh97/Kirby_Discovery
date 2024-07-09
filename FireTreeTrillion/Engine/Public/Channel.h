@@ -23,6 +23,8 @@ public:
 
 	void Ratio_TransformationMatrix(const vector<class CBone*>& Bones, _float fTrackPosition, _uint* pCurrentKeyFrameIndex);
 
+	_bool IsValid();
+	_uint Get_ChannelBoneIndex() { return m_iBoneIndex; }
 
 private:
 	_char				m_szName[MAX_PATH] = { "" };

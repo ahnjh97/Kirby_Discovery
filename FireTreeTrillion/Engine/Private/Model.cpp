@@ -281,6 +281,26 @@ HRESULT CModel::Play_Animation(_float fTimeDelta)
 	return S_OK;
 }
 
+HRESULT CModel::Play_PartialAnimation(_uint iAnimIndex, vector<_uint>& _vecValidBoneIndices, _float fTimeDelta, _bool bLoop)
+{
+	if (true == m_bStop) 
+		return S_OK;
+
+	m_Animations[iAnimIndex]->Invalidate_TransformationMatrix(fTimeDelta, m_Bones, bLoop, this);
+
+	for (_uint i = 0; i < _vecValidBoneIndices.size(); i++) {
+		m_Bones[_vecValidBoneIndices[i]]->Invalidate_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_TransformMatrix)
+			, m_Animations[m_iCurrentAnimIndex]->Is_Ratio());
+	}
+	
+	return S_OK;
+}
+
+vector<_uint> CModel::Get_ValidBoneIndices(_uint iAnimIndex)
+{
+	return m_Animations[iAnimIndex]->Get_ValidBoneIndices();
+}
+
 HRESULT CModel::Render(_uint iMeshIndex)
 {
 	m_Meshes[iMeshIndex]->Bind_Buffers();
