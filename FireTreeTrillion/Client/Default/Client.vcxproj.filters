@@ -589,6 +589,9 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\Simba\State">
       <UniqueIdentifier>{1b55321b-4009-45c7-8ce3-87f841ff410e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\Gimmick\Park_Wondaria">
+      <UniqueIdentifier>{27194b3b-3a4c-4942-8b16-645f028d9080}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -1175,6 +1178,9 @@
       <Filter>02.GameObjects\PhysXObject\Character\Simba\State</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Crumble.h" />
+    <ClInclude Include="..\Public\Gm_ParkFhEntranceAlien.h">
+      <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1742,6 +1748,9 @@
       <Filter>02.GameObjects\PhysXObject\Character\Simba\State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Crumble.cpp" />
+    <ClCompile Include="..\Private\Gm_ParkFhEntranceAlien.cpp">
+      <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
