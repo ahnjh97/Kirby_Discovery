@@ -49,6 +49,17 @@ void CFinaleBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 
 	if(1 == iAnimIndex)
 	{
+		_float4 NewLook = _float4(1.f, 0.f, 0.f, 0.f);
+		_float4 NewUp = _float4(0.f, 1.f, 0.f, 0.f);
+		_float4 NewRight = XMVector3Cross(NewLook, NewUp);
+		_float4 NewLook = _float4(1.f, 0.f, 0.f, 0.f);
+		_float4 NewUp = _float4(0.f, 1.f, 0.f, 0.f);
+		_float4 NewRight = XMVector3Cross(NewLook, NewUp);
+
+		pTransformCom->Set_State(CTransform::STATE_LOOK, NewLook);
+		pTransformCom->Set_State(CTransform::STATE_UP, NewUp);
+		pTransformCom->Set_State(CTransform::STATE_RIGHT, NewRight);
+
 		pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(2550.f, 239.f, -136.f, 1.f));
 		pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT1, 50.f, false, false);
 	}
