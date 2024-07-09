@@ -18,7 +18,6 @@ public:
 
         CONTENT_ATTACK,         // 플레이어의 히트박스 X 몬스터
         CONTENT_DAMAGE,         // 몬스터와의 히트박스 X 플레이어
-        //CONTENT_DAMAGEBULLET,   // 몹 불릿 X 플레이어
         CONTENT_DEFORM,
 
         CONTENT_VACUUMOBJECT,   // 커비가 흡수 후 날리는 것들과의 충돌
@@ -27,7 +26,7 @@ public:
 
         CONTENT_INTERACT,	    
         CONTENT_ITEM,	        // 아이템 습득관련
-        CONTENT_NONEVENT,	    
+        CONTENT_TRIGGER,	    // 피직스 사용하지 않는 트리거용
         CONTENT_END
     };
 
@@ -51,6 +50,7 @@ private:
 
     void DeeDeeDee_Battle();
     void FinalStage_Battle();
+    void RealFinaleStage_Battle();
     void Body_To_Body_Collision();
     void Hitbox_Collision();
 

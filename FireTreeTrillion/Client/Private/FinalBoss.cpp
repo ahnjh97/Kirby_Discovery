@@ -61,45 +61,48 @@ HRESULT CFinalBoss::Initialize(void* pArg)
 	Make_TargetToCams();
 	Add_AnimEvent();
 
-	//// 도랑 풀링
-	//for (size_t i = 0; i < 120; i++)
-	//{
-	//	HRESULT hr;
-	//	hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Gully"), TEXT("Prototype_GameObject_Gully"));
-	//	CHECK_FAILED(hr);
+	if (*m_pCurrentLevelID != LEVEL_TOOL_ANIM)
+	{
+		// 도랑 풀링
+		for (size_t i = 0; i < 120; i++)
+		{
+			HRESULT hr;
+			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Gully"), TEXT("Prototype_GameObject_Gully"));
+			CHECK_FAILED(hr);
 
-	//	CGully* pGully = dynamic_cast<CGully*>(m_pGameInstance->Get_LastGameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Gully")));
-	//	m_vecGully.push_back(pGully);
-	//	Safe_AddRef(pGully);
-	//}
+			CGully* pGully = dynamic_cast<CGully*>(m_pGameInstance->Get_LastGameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Gully")));
+			m_vecGully.push_back(pGully);
+			Safe_AddRef(pGully);
+		}
 
-	//// 파티클 풀링
-	//for (_uint j = 0; j < 20; j++)
-	//{
-	//	for (_uint i = 0; i < DEBRISCNT; i++)
-	//	{
-	//		HRESULT hr;
-	//		GAMEOBJECT_DESC tDesc{};
-	//		tDesc.wstrModelName = TEXT("TunnelRock") + to_wstring(i);
-	//		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_ParticleDebris"), TEXT("Prototype_GameObject_Debris"), &tDesc);
-	//		CHECK_FAILED(hr);
+		// 파티클 풀링
+		for (_uint j = 0; j < 20; j++)
+		{
+			for (_uint i = 0; i < DEBRISCNT; i++)
+			{
+				HRESULT hr;
+				GAMEOBJECT_DESC tDesc{};
+				tDesc.wstrModelName = TEXT("TunnelRock") + to_wstring(i);
+				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_ParticleDebris"), TEXT("Prototype_GameObject_Debris"), &tDesc);
+				CHECK_FAILED(hr);
 
 
-	//		CDebris* pDebris = dynamic_cast<CDebris*>(m_pGameInstance->Get_LastGameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_ParticleDebris")));
-	//		m_vecDebris.push_back(pDebris);
-	//		Safe_AddRef(pDebris);
-	//	}
-	//}
+				CDebris* pDebris = dynamic_cast<CDebris*>(m_pGameInstance->Get_LastGameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_ParticleDebris")));
+				m_vecDebris.push_back(pDebris);
+				Safe_AddRef(pDebris);
+			}
+		}
 
-	/*HRESULT hr;
-	GAMEOBJECT_DESC tDesc{};
-	tDesc.wstrModelName = TEXT("TunnelRock") + to_wstring(17);
-	hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_ParticleDebris"), TEXT("Prototype_GameObject_Debris"), &tDesc);
-	CHECK_FAILED(hr);
+		HRESULT hr;
+		GAMEOBJECT_DESC tDesc{};
+		tDesc.wstrModelName = TEXT("TunnelRock") + to_wstring(17);
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_ParticleDebris"), TEXT("Prototype_GameObject_Debris"), &tDesc);
+		CHECK_FAILED(hr);
 
-	CDebris* pMagneticDebris = dynamic_cast<CDebris*>(m_pGameInstance->Get_LastGameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_ParticleDebris")));
-	m_vecMagneticDebris.push_back(pMagneticDebris);
-	Safe_AddRef(pMagneticDebris);*/
+		CDebris* pMagneticDebris = dynamic_cast<CDebris*>(m_pGameInstance->Get_LastGameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_ParticleDebris")));
+		m_vecMagneticDebris.push_back(pMagneticDebris);
+		Safe_AddRef(pMagneticDebris);
+	}
 
 	return S_OK;
 }

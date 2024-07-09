@@ -28,8 +28,9 @@ public:
 	virtual HRESULT Render_LightDepth()				override;
 
 	// 충돌처리 함수 ( 피직스를 사용하는 것들 끼리 충돌했을 때 발생하는 함수이다. )
-	virtual void		Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) {}
-	virtual void		Collision_Hitbox(CPhysXObject* pGameObject) {}
+	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) {}
+	virtual void	Collision_Hitbox(CPhysXObject* pGameObject) {}
+	virtual void	Add_AnimEvent() {}
 
 #ifdef _DEBUG
 	virtual void	Render_IMGUI()					override;

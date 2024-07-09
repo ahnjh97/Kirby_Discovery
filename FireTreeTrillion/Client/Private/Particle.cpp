@@ -10,8 +10,8 @@ CParticle::CParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 CParticle::CParticle(const CParticle& rhs)
 	:CEffect{ rhs }
-	,m_FXDesc{rhs.m_FXDesc}
-	,m_InstanceDesc{rhs.m_InstanceDesc}
+	, m_FXDesc{ rhs.m_FXDesc }
+	, m_InstanceDesc{ rhs.m_InstanceDesc }
 {
 }
 
@@ -219,6 +219,12 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 	if (m_fDuration.second <= m_fDuration.first)
 	{
 		m_fDuration.first = m_fDuration.second;
+
+		if (m_fDuration.second == FX_MAXDURATION)
+		{
+			m_fDuration.first = 0.f;
+			m_fLifetime.first = 0.f;
+		}
 		return;
 	}
 

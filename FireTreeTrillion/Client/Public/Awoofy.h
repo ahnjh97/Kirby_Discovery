@@ -32,24 +32,23 @@ public:
 	_float4 Get_Pos() { return m_vPos; }
 
 public:
-	virtual HRESULT Initialize_Prototype()	override;
-	virtual HRESULT Initialize(void* pArg)	override;
-	virtual _int	Tick(_float fTimeDelta) override;
-	virtual void	Late_Tick(_float fTimeDelta) override;
-	virtual HRESULT Render()				override;
-	virtual HRESULT Render_LightDepth()		override;
+	virtual HRESULT Initialize_Prototype()			override;
+	virtual HRESULT Initialize(void* pArg)			override;
+	virtual _int	Tick(_float fTimeDelta)			override;
+	virtual void	Late_Tick(_float fTimeDelta)	override;
+	virtual HRESULT Render()						override;
+	virtual HRESULT Render_LightDepth()				override;
 #ifdef _DEBUG
-	virtual void	Render_IMGUI() override;
+	virtual void	Render_IMGUI()					override;
 #endif
-	virtual void	Add_AnimEvent()			override;
+	virtual void	Add_AnimEvent()					override;
 	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
-
 public:
-	void Change_State(AWOOFY_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
-	_bool IsAnimFinished();
-	_bool IsAnimFinished(_uint iCurrentAnimIndex);
-	void Compute_Angle(_vector vOrginLook, _vector vTargetLook);
+	void			Change_State(AWOOFY_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
+	_bool			IsAnimFinished();
+	_bool			IsAnimFinished(_uint iCurrentAnimIndex);
+	void			Compute_Angle(_vector vOrginLook, _vector vTargetLook);
 
 private:
 	CTexture*			m_pEyeTextureCom = { nullptr };
@@ -64,12 +63,12 @@ private:
 	_bool				m_bRenderBody = { true };
 
 private:
-	HRESULT Add_Components();
-	HRESULT Bind_ShaderResources();
+	HRESULT			Add_Components();
+	HRESULT			Bind_ShaderResources();
 
 	// FSM
-	void SetUp_FSM();
-	_bool Custom_Face(_uint iMeshIndex);
+	void			SetUp_FSM();
+	_bool			Custom_Face(_uint iMeshIndex);
 
 public:
 	static CAwoofy* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

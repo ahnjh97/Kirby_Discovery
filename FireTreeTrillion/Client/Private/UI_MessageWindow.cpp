@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "UI_MessageWindow.h"
+#include "UI_BtnIcon.h"
 #include "Kirby.h"
 
 CUI_MessageWindow::CUI_MessageWindow(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext)
@@ -22,11 +23,8 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 	HRESULT hr = __super::Initialize(_pArg);
 	CHECK_FAILED(hr);
 
-	UIOBJ_DESC* MessageWindowDesc{};
-	if (_pArg != nullptr)
-		MessageWindowDesc = (UIOBJ_DESC*)_pArg;
-	
-	m_UIObjDesc = *MessageWindowDesc;
+	MESSAGE_DESC* MessageWindowDesc{};
+	m_tMessageDesc = *(MESSAGE_DESC*)_pArg;
 
 	if (FAILED(Add_Transform(_pArg)))
 		return E_FAIL;
@@ -36,10 +34,15 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 	
 #pragma region MESSAGEWINDOW BASE
 
-	m_pTransCom[TEXMW_BASE]->Set_Scaled(m_UIObjDesc.vSize);
+	m_UIObjDesc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f, 0.f };
+	m_UIObjDesc.vPos = { 0.f, -325.f, 1.f, 1.f };
+	m_UIObjDesc.vSize = { 1300.f * 0.8f, 288.f * 0.8f, 1.f };
+
 	_float4 vBaseTrans = { m_UIObjDesc.vPos };
 	vBaseTrans.w = 1.f;
 	m_pTransCom[TEXMW_BASE]->Set_State(CTransform::STATE_POSITION, vBaseTrans);
+
+	m_pTransCom[TEXMW_BASE]->Set_Scaled(m_UIObjDesc.vSize);
 
 #pragma endregion
 
@@ -47,8 +50,9 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 
 	_float3 vScale = { 76.f, 76.f, 1.f };
 	m_pTransCom[TEXMW_BTNBASE]->Set_Scaled(vScale);
+	m_vBtnScale = m_pTransCom[TEXMW_BTNBASE]->Get_Scaled();
 
-	_float4 vBtnTrans = { 480.f, -390.f, 1.f, 1.f };
+	_float4 vBtnTrans = { 479.f, -390.f, 1.f, 1.f };
 	m_pTransCom[TEXMW_BTNBASE]->Set_State(CTransform::STATE_POSITION, vBtnTrans);
 
 #pragma endregion
@@ -56,9 +60,20 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 	//m_pTransformCom->Rotation(XMVectorSet(AXIS_Z), XMConvertToRadians(m_UIObjDesc.vDegree.z));
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
+	m_vBaseScale = m_pTransformCom->Get_Scaled();
 
 	m_UIObjDesc.fAlpha = 0.f;
 	m_eCurState = WINDOW_HIDE;
+
+#pragma region UI_BUTTON
+
+	m_pUIBtn = static_cast<CUI_BtnIcon*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_UI_BtnIcon")));
+	if (nullptr == m_pUIBtn)
+		return E_FAIL;
+
+#pragma endregion
+
+	m_pCurrentLevelID = m_pGameInstance->Get_CurrentLevelID();
 
 	return S_OK;
 }
@@ -66,34 +81,63 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 _int CUI_MessageWindow::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
+	m_pUIBtn->Tick(fTimeDelta);
 
-	//Æ¯Á¤ Æ®¸®°Å°¡ ¹ßµ¿ÇÒ °æ¿ì, ÇØ´ç Window UI¸¦ Ãâ·Â
-	if (m_pGameInstance->Get_DIKeyState(DIK_GRAVE, KEY_DOWN) && WINDOW_HIDE == m_eCurState) //Å×½ºÆ®¿ë
-		m_eCurState = WINDOW_SHOW;
-	
-	//Window UI Ãâ·ÂÀº ½ºÅ©¸³Æ®°¡ Á¾·áµÉ¶§±îÁö À¯Áö
-	//½ºÅ©¸³Æ® ÀÎµ¦½º°¡ Á¾·áµÉ °æ¿ì, State¸¦ º¯°æ
-	else if (m_pGameInstance->Get_DIKeyState(DIK_GRAVE, KEY_DOWN) && WINDOW_SHOW == m_eCurState) //Å×½ºÆ®¿ë
-		m_eCurState = WINDOW_HIDE;
-
-	switch (m_eCurState)
+	//íŠ¹ì • íŠ¸ë¦¬ê±°ê°€ ë°œë™í•  ê²½ìš°, í•´ë‹¹ Window UIë¥¼ ì¶œë ¥
+	//Window UI ì¶œë ¥ì€ ìŠ¤í¬ë¦½íŠ¸ê°€ ì¢…ë£Œë ë•Œê¹Œì§€ ìœ ì§€
+	if (m_pGameInstance->Get_DIKeyState(DIK_GRAVE, KEY_DOWN) && WINDOW_HIDE == m_eCurState) //í…ŒìŠ¤íŠ¸ìš©
 	{
-	case WINDOW_HIDE: m_UIObjDesc.fAlpha -= fTimeDelta * 5.f;	break;
-	case WINDOW_SHOW: m_UIObjDesc.fAlpha = 1.f;	break;
-	case WINDOW_IDLE: default:	break;
+		m_eCurState = WINDOW_SHOW;
+		m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_BLINK);	//ë²„íŠ¼ ìƒíƒœ ë™ê¸°í™”
 	}
 
-	if (m_UIObjDesc.fAlpha <= 0.f) //¾ËÆÄ °ª º¸Á¤ ¹× ¾÷µ¥ÀÌÆ® ÁßÁö
+	//A ë²„íŠ¼ ì…ë ¥ ì‹œ, ë‹¤ìŒ ìŠ¤í¬ë¦½íŠ¸ ë¬¸ë‹¨ì„ ì¤€ë¹„í•˜ì—¬ ì¶œë ¥
+	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN) && WINDOW_SHOW == m_eCurState)
+	{
+		m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_SELECT); //ë²„íŠ¼ ìƒíƒœ ë™ê¸°í™”
+
+		m_iCurMessageIndex += 1; //ë²¡í„°ì˜ ë‹¤ìŒ ë¬¸ë‹¨ ì¤„ë¡œ ë„˜ê¹€
+		m_iCurCharIndex = 0; //ê¸€ì ìˆ˜ëŠ” ì´ˆê¸°í™”
+	}
+
+	_float3 vOffset = { 0.9f, 0.9f, 1.f };
+	_float3 vShowScale{};
+	switch (m_eCurState)
+	{
+	case WINDOW_IDLE: 
+		break;
+
+	case WINDOW_HIDE: //ì•ŒíŒŒ ê°’ ë° ìŠ¤ì¼€ì¼ ê°ì†Œ
+		m_UIObjDesc.fAlpha -= fTimeDelta * 5.f;	
+		//vOffset.y -= EASE_OUT(fTimeDelta * 2.5f);
+		//m_pTransCom[TEXMW_BASE]->Set_Scaled(m_vBaseScale * vOffset);
+		//m_pTransCom[TEXMW_BTNBASE]->Set_Scaled(m_vBtnScale * vOffset);
+		break;
+
+	case WINDOW_SHOW: //ì•ŒíŒŒ ê°’ ë° ìŠ¤ì¼€ì¼ ì¦ê°€
+		m_UIObjDesc.fAlpha += fTimeDelta * 5.f;	
+		break;
+	default:	break;
+	}
+
+	if (m_UIObjDesc.fAlpha >= 1.f)
+		m_UIObjDesc.fAlpha = 1.f;
+
+	if (m_UIObjDesc.fAlpha <= 0.f) //ì•ŒíŒŒ ê°’ ë³´ì • ë° ì—…ë°ì´íŠ¸ ì¤‘ì§€
 	{
 		m_UIObjDesc.fAlpha = 0.f;
 		return OBJ_NOEVENT;
 	}
+
+	if(WINDOW_HIDE != m_eCurState)
+		Display_Message(fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
 
 void CUI_MessageWindow::Late_Tick(_float fTimeDelta)
 {
+	m_pUIBtn->Late_Tick(fTimeDelta);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_UI, this);
 }
 
@@ -102,13 +146,31 @@ HRESULT CUI_MessageWindow::Render()
 	HRESULT hr;
 
 #pragma region RENDER_BINDSET
+
+	//ë Œë” OFF
+	if (WINDOW_HIDE == m_eCurState && 0.f == m_UIObjDesc.fAlpha)
+		return S_OK;
 	
 	for (_uint iTEXIx = 0; iTEXIx < TEXMW_NONE; ++iTEXIx)
 	{
+		TEX_MWTYPE eTexType = { TYPE_ELFILIN };
+		switch (*m_pCurrentLevelID)
+		{
+		case LEVEL_TOWN: 
+			eTexType = TYPE_NPC; 
+			break;
+
+		case LEVEL_DEEDEEDEE: case LEVEL_SIMBA: case LEVEL_FINALBOSS: case LEVEL_FINALE:
+			eTexType = TYPE_BOSS;
+			break;
+
+		default: break;
+		}
+	
 		if (FAILED(m_pTransCom[iTEXIx]->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 			return E_FAIL;
 
-		//¼ÎÀÌ´õ ÆÄÀÏÀÇ ¸ÅÆ®¸¯½º Á¤º¸¸¦ °¡Á®¿Í ¹ÙÀÎµù
+		//ì…°ì´ë” íŒŒì¼ì˜ ë§¤íŠ¸ë¦­ìŠ¤ ì •ë³´ë¥¼ ê°€ì ¸ì™€ ë°”ì¸ë”©
 		if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
 			return E_FAIL;
 
@@ -116,31 +178,42 @@ HRESULT CUI_MessageWindow::Render()
 			return E_FAIL;
 
 		PASS_POSTEX ePassType = { POSTEX_ALPHABLEND_NOTEST };
-		hr = Bind_ShaderResources(m_pShaderCom, ePassType, m_pTextureCom, iTEXIx);
+		hr = Bind_ShaderResources(m_pShaderCom, ePassType, m_pTexCom[iTEXIx], eTexType);
 		CHECK_FAILED(hr);
-
-#pragma endregion
-
 	}
 
-	/*
-	//SpriteFont ÆùÆ® ¼öÁ¤ ÇÊ¿ä. ÀÓ½Ã ÁÖ¼®Ã³¸®
-	wstring wstrFontTag = { TEXT("Font_HUDSub_KR15") };
-	wstring wstrText = { TEXT("???") };
-	_float2 vFontPos = { 410.f, 660.f };
-	//_float4 vFontRGBA = { 176.f / 255.f, 12.f / 255.f, 24.f / 255.f, m_UIObjDesc.fAlpha };
+#pragma endregion
 	
-	_float4 vFontRGBA = { m_UIObjDesc.vColorRGB};
-	vFontRGBA.w = m_UIObjDesc.fAlpha;
+	//ë²„íŠ¼ ë Œë”ë§
+	m_pUIBtn->Render();
 
-	_float2 vFontOrig = { 1.f, 1.f };
-	_float2 vFontScale = { 1.2f, 1.2f };
-	_float fRadian = { XMConvertToRadians(0.f) };
-
-	m_pGameInstance->Render_Font(wstrFontTag, wstrText, vFontPos, vFontRGBA, fRadian, vFontOrig, vFontScale);
-	*/
+	if (WINDOW_HIDE != m_eCurState)
+	{
+		for (auto& Message : m_tMessageDesc.vecMsg)
+			Render_Message();
+	}
 
 	return S_OK;
+}
+
+#ifdef DEBUG
+void CUI_MessageWindow::Render_IMGUI()
+{
+	switch (m_eCurState)
+	{
+	case WINDOW_IDLE:	ImGui::Text(u8"WINDOW_IDLE");	break;
+	case WINDOW_HIDE:	ImGui::Text(u8"WINDOW_HIDE"); break;
+	case WINDOW_SHOW:	ImGui::Text(u8"WINDOW_SHOW"); break;
+	case WINDOW_NONE:	default: ImGui::Text(u8"WINDOW_NONE"); break;
+	}
+}
+
+#endif // DEBUG
+
+void CUI_MessageWindow::ShowDialog()
+{
+	m_eCurState = WINDOW_SHOW;
+	m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_BLINK);	//ë²„íŠ¼ ìƒíƒœ ë™ê¸°í™”
 }
 
 HRESULT CUI_MessageWindow::Add_Transform(void* _pArg)
@@ -168,9 +241,12 @@ HRESULT CUI_MessageWindow::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-	//´ëÈ­ÇÏ´Â ´ë»ó¿¡ µû¶ó ÅØ½ºÃ³¸¦ º¯°æÇÏ¿© Ãâ·Â (ÇöÀç´Â ÇÑ Àå)
-	if (FAILED(__super::Add_Component(LEVEL_DEEDEEDEE, TEXT("Prototype_Component_Texture_UI_MessageWindow"),
-		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_UI_MessageWindow_Base"),
+		TEXT("Com_TexBase"), (CComponent**)&m_pTexCom[TEXMW_BASE])))
+		return E_FAIL;
+
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_UI_MessageWindow_BtnBase"),
+		TEXT("Com_TexBtnBase"), (CComponent**)&m_pTexCom[TEXMW_BTNBASE])))
 		return E_FAIL;
 
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),
@@ -182,15 +258,15 @@ HRESULT CUI_MessageWindow::Add_Components()
 
 HRESULT CUI_MessageWindow::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTexture* _pTextureCom, _uint _iTexIndex)
 {
-	//¼ÎÀÌ´õ ÆÄÀÏÀÇ ÅØ½ºÃ³ Á¤º¸¸¦ °¡Á®¿Í ¹ÙÀÎµù
+	//ì…°ì´ë” íŒŒì¼ì˜ í…ìŠ¤ì²˜ ì •ë³´ë¥¼ ê°€ì ¸ì™€ ë°”ì¸ë”©
 	_pTextureCom->Bind_ShaderResource(_pShaderCom, "g_DiffuseTexture", _iTexIndex);
 
-	//¼ÎÀÌ´õÀÇ ¿ø½Ãµ¥ÀÌÅÍ °¡Á®¿Í ÀúÀå
+	//ì…°ì´ë”ì˜ ì›ì‹œë°ì´í„° ê°€ì ¸ì™€ ì €ì¥
 	_pShaderCom->Bind_RawValue("g_vRColor", &m_UIObjDesc.vColorRGB, sizeof(_float3));
 
 	_pShaderCom->Bind_RawValue("g_fAlpha", &m_UIObjDesc.fAlpha, sizeof(_float));
 
-	//Begin() > Apply() ÇÔ¼ö È£Ãâ Àü ¼ÎÀÌ´õ Àü¿ª µ¥ÀÌÅÍ¸¦ ÀúÀåÇØ¾ßÇÔ
+	//Begin() > Apply() í•¨ìˆ˜ í˜¸ì¶œ ì „ ì…°ì´ë” ì „ì—­ ë°ì´í„°ë¥¼ ì €ì¥í•´ì•¼í•¨
 	if (FAILED(_pShaderCom->Begin(_iPassIndex)))
 		return E_FAIL;
 
@@ -207,6 +283,57 @@ HRESULT CUI_MessageWindow::Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom)
 
 	if (FAILED(_pVIBufferCom->Render()))
 		return E_FAIL;
+
+	return S_OK;
+}
+
+//ë‹¤ì´ì–¼ë¡œê·¸ ë©”ì‹œì§€ ê¸€ì/ë¬¸ë‹¨ ì¶œë ¥ ë¡œì§
+HRESULT CUI_MessageWindow::Display_Message(_float _fTimeDelta)
+{
+	if (m_tMessageDesc.wstrFontTag.empty())
+		return S_OK;
+
+	m_fElapsedTime += _fTimeDelta;
+	if (m_fElapsedTime >= m_tMessageDesc.fDisplayTime) //ê²½ê³¼ì‹œê°„ ëŒ€ë¹„ ì¶œë ¥ì‹œê°„ ì²´í¬
+	{
+		m_fElapsedTime = 0.f;
+
+		if (m_iCurMessageIndex < m_tMessageDesc.vecMsg.size()) //ë²¡í„°ì— ë‹´ê¸´ ë©”ì‹œì§€ë“¤ì˜ í¬ê¸°ë¥¼ ì²´í¬
+		{
+			wstring wstrMsg = m_tMessageDesc.vecMsg[m_iCurMessageIndex];
+
+			if (m_iCurCharIndex < wstrMsg.length()) //ë©”ì‹œì§€ ê¸¸ì´ ì²´í¬
+				m_iCurCharIndex++;
+		}
+
+		else //m_iCurMessageIndex ë²”ìœ„ë¥¼ ë²—ì–´ë‚  ê²½ìš°, UI ìˆ¨ê¹€
+		{
+			m_eCurState = WINDOW_HIDE;
+			m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_HIDE);
+		}
+	}
+
+	return S_OK;
+}
+
+// ë‹¤ì´ì–¼ë¡œê·¸ ë©”ì‹œì§€ ë Œë”
+HRESULT CUI_MessageWindow::Render_Message()
+{
+	wstring wstrFontTag = m_tMessageDesc.wstrFontTag;
+	_float2 vFontPos = m_tMessageDesc.fFontPos;
+	_float4 vFontRGBA = m_tMessageDesc.fFontRGBA;
+
+	_float2 vFontSize = m_tMessageDesc.fFontSize;
+	_float2 vFontScale = m_tMessageDesc.fFontScale;
+	_float fRadian = XMConvertToRadians(m_tMessageDesc.fRadian);
+
+	if (m_iCurMessageIndex < m_tMessageDesc.vecMsg.size())
+	{
+		wstring wstrMsg = m_tMessageDesc.vecMsg[m_iCurMessageIndex];
+		wstring& wstrSubstrMessage = wstrMsg.substr(0, m_iCurCharIndex);
+
+		m_pGameInstance->Render_Font(wstrFontTag, wstrSubstrMessage, vFontPos, vFontRGBA, fRadian, vFontSize, vFontScale);
+	}
 
 	return S_OK;
 }
@@ -241,8 +368,15 @@ void CUI_MessageWindow::Free()
 {
 	__super::Free();
 
+	m_tMessageDesc.vecMsg.clear();
+
 	for (auto& iTrans : m_pTransCom)
 		Safe_Release(iTrans);
+
+	for (auto& iTex : m_pTexCom)
+		Safe_Release(iTex);
+
+	Safe_Release(m_pUIBtn);
 }
 
 

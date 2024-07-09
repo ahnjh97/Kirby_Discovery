@@ -75,18 +75,24 @@ void CLight_Manager::IMGUI_Tick()
 
 		// 태양광은 IMGUI에서 조절하지 않습니다.
 		if (pLightDesc->eType == LIGHT_DESC::TYPE_DIRECTIONAL)
-			continue;
+		{
+			ImGui::SeparatorText("Directional Light");
+		}
 
 		// light numbering
 		string strLightName = "LIGHT_" + to_string(iIDX);
 		ImGui::SeparatorText(strLightName.c_str());
 
-		// POSITION
-		string strLightPos = "POSITION_" + to_string(iIDX);
-		ImGui::DragFloat3(strLightPos.c_str(), &pLightDesc->vPosition.x, -200.f, 500.f);
-		// RANGE
-		string strLightRange = "RANGE_" + to_string(iIDX);
-		ImGui::SliderFloat(strLightRange.c_str(), &pLightDesc->fRange, 0.f, 200.f);
+		if (pLightDesc->eType != LIGHT_DESC::TYPE_DIRECTIONAL)
+		{
+			// POSITION
+			string strLightPos = "POSITION_" + to_string(iIDX);
+			ImGui::DragFloat3(strLightPos.c_str(), &pLightDesc->vPosition.x, -200.f, 500.f);
+			// RANGE
+			string strLightRange = "RANGE_" + to_string(iIDX);
+			ImGui::SliderFloat(strLightRange.c_str(), &pLightDesc->fRange, 0.f, 200.f);
+		}
+
 		// DIFFUSE
 		string strLightDiffuse = "DIFFUSE_" + to_string(iIDX);
 		ImGui::SliderFloat3(strLightDiffuse.c_str(), &pLightDesc->vDiffuse.x, 0.f, 1.f);

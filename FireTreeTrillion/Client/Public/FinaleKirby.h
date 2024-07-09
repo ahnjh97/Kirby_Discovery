@@ -148,6 +148,8 @@ private:
 	_float				  m_fHitStopTime = { 0.f };
 	_float				  m_fHitStopMaxTime = { 0.f };
 
+	_bool				  m_bMakeDisaster = { true };
+
 public:
 	static CFinaleKirby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

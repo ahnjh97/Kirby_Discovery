@@ -97,12 +97,18 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	hr = __super::Initialize(pArg);
 	CHECK_FAILED(hr);
 
+	if (false == CheckEnumStrings())
+	{
+		MSG_BOX(TEXT("MapToolHelper: Edit m_vecLevelName."));
+		return E_FAIL;
+	}
+
 	m_vecTxtIndices = { &s_iMapTxtIdx, &s_iTriggerTxtIdx, &s_iMonsterTxtIdx, &s_iObjectIdx
 		, &s_iMapDecoIdx, &s_iItemIdx, &s_iKickableIdx, &s_iTownDecoIdx, &s_iLabDecoIdx, &s_iParkDecoIdx };
 
 	m_vecLevelName = { "Level_Static", "Level_Loading", "Level_Logo", "GamePlay",
 			"Level_Tool_UI", "Level_Tool_FX", "Level_Tool_Anim", "Level_Tool_Map",
-		"Intro", "Racing", "DeeDeeDee", "Town", "PartTime", "Park", "Simba", "FinalBoss", "Finale", "Level_End" };
+		"PartTime", "Intro", "Racing", "DeeDeeDee", "Town", "Simba", "FinalBoss", "Finale", "Level_End" };
 
 #pragma region BASIC MAP
 
@@ -184,6 +190,28 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "VpControlBoxChairL", "VpControlBoxEL", "VpStairsAL"
 		#pragma endregion
 
+#pragma region LEVEL_PARK (WONDARIA REMAINS) OBJECT
+
+		// 필드 오브젝트
+		, "FhArchWayAL", "FhArchWayBL", "FhArchWayCL", "FhArchWayDL" 
+		, "FhFence01L", "FhFence02L", "FhFence03L", "FhFence04L", "FhFence05L", "FhFence06L" 
+		, "FhOrnamentGroundAL", "FhOrnamentGroundBL"
+		, "FhOrnamentRoofAL", "FhOrnamentRoofBL", "FhOrnamentRoofCL", "FhOrnamentRoofDL", "FhOrnamentRoofEL"
+		, "FhPillarAL", "FhPillarATopDec2L", "FhPillarBL", "FhPillarBTopDec2L", "FhPillarCL", "FhPillarCTopDec2L"
+		, "FhPlanetOrnamentAL"
+		, "FhStackOrnamentAL", "FhStackOrnamentBL", "FhStackOrnamentCL", "FhStackOrnamentDL", "FhStackOrnamentEL"
+		
+		// 채우기용 잡오브젝트
+		, "DollKirby"
+		, "PkParkShowWindowObj01AL", "PkParkShowWindowObj01BL", "PkParkShowWindowObj02AL", "PkParkShowWindowObj02BL"
+		, "PkParkShowWindowObj03AL", "PkParkShowWindowObj03BL", "PkParkShowWindowObj04AL", "PkParkShowWindowObj04BL"
+		, "PkParkShowWindowObj05AL", "PkParkShowWindowObj05BL", "PkParkShowWindowObj06L"
+		, "PkParkShowWindowObj07AL", "PkParkShowWindowObj07BL", "PkParkShowWindowObj08AL", "PkParkShowWindowObj08BL"
+		, "ParkOutsideDoor", "PkRoof01"
+		, "CmLightFollowParts01L", "CmLightFollowParts02L"
+
+#pragma endregion
+
 #pragma region LEVEL_FINALBOSS (LAB_DISCOVERA) OBJECT
 		// 보스전 필드
 		//"LbLastBuilding", "LbLastBossStage" :: 텍스처 및 모델 수정으로 사용안함
@@ -206,7 +234,10 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 #pragma endregion
 
 #pragma region LEVEL_FINALE OBJECT
-		, "FinaleCave"
+		, "FinaleCave", "GsFarBuildingA", "GsFarBuildingB", "GsFarBuildingC"
+		, "LbBrokenBuildingAC", "LbBrokenBuildingBL", "LbBrokenBuildingCL", "LbBrokenBuildingDL"
+		, "LbBuildingAL", "LbBuildingBL", "LbBuildingCL"
+		, "LbFarBuildingAL", "LbFarBuildingBL", "LbFarBuildingCL"
 #pragma endregion
 
 	};
@@ -484,7 +515,7 @@ void CMapToolHelper::Menu_Level()
 			ImGui::EndPopup();
 		}
 
-		if (i % 2 == 0 && i != LEVEL_FINALE)
+		if (i % 2 == 1 && i != LEVEL_FINALE)
 			ImGui::SameLine();
 	}
 	//ImGui::NewLine(); 
@@ -1876,6 +1907,28 @@ void CMapToolHelper::FilterListBoxStrings(const _char* _filterBuf, vector<const 
 				_vecNames.push_back(objTxt.c_str());
 		}
 	}
+}
+
+_bool CMapToolHelper::CheckEnumStrings()
+{
+	if (LEVEL_END - LEVEL_INTRO != 7)
+		return false;
+	if (LEVEL_RACING != LEVEL_INTRO + 1)
+		return false;
+	if (LEVEL_DEEDEEDEE != LEVEL_RACING + 1)
+		return false;
+	if (LEVEL_TOWN != LEVEL_DEEDEEDEE + 1)
+		return false;
+	if (LEVEL_SIMBA != LEVEL_TOWN + 1)
+		return false;
+	if (LEVEL_FINALBOSS != LEVEL_SIMBA + 1)
+		return false;
+	if (LEVEL_FINALE != LEVEL_FINALBOSS + 1)
+		return false;
+	if (LEVEL_END != LEVEL_FINALE + 1)
+		return false;
+
+	return true;
 }
 
 void CMapToolHelper::Reset_MapShaderInfo()

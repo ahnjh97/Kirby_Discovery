@@ -11,6 +11,7 @@
 #include "Kabu.h"
 #include "BrontoBurt.h"
 #include "PoppyBrosJr.h"
+#include "SurprisedBoard.h"
 
 #include "BG.h"
 #include "HUD.h"
@@ -496,8 +497,93 @@ HRESULT CLevel_Park::Ready_Monsters()
 				return E_FAIL;
 		}
 	}
-
 	fileInput.close();
+
+
+
+	// ------------------ 맨 앞 SurprisedBoard ------------------
+	// 위치 행렬을 만든다. 
+	_float4x4 translationMatrix = XMMatrixTranslation(19.6f, 5.f, -143.f);
+
+	// 회전 행렬을 만든다. X축과 Z축으로 -180도 (PI 라디안).
+	_float4x4 rotationMatrixX = XMMatrixRotationX(XM_PI); // XM_PI == -180.f
+	_float4x4 rotationMatrixZ = XMMatrixRotationZ(XM_PI);
+
+	// 회전 행렬들을 결합한다.
+	_float4x4 rotationMatrix = rotationMatrixX * rotationMatrixZ;
+	_float4x4 transformationMatrix = rotationMatrix * translationMatrix;
+
+	// 해당 위치의 행렬을 넘긴다.
+	CSurprisedBoard::SURPRISED_DESC surprisedDesc = {};
+	surprisedDesc.matWorld = transformationMatrix;
+	
+	surprisedDesc.eColor = CSurprisedBoard::RED;
+	surprisedDesc.eStartState = CSurprisedBoard::WAIT_L;
+	surprisedDesc.vPosition = _float3(15.4f, 5.f, -155.f);
+	HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
+	CHECK_FAILED(hr);
+
+
+	// ------------------ 두 번째 SurprisedBoard ------------------
+	// 위치 수정
+	translationMatrix = XMMatrixTranslation(44.54f, 4.97f, -113.189f);
+	// 회전값은 그대로 사용
+	transformationMatrix = rotationMatrix * translationMatrix;
+
+	// 해당 위치의 행렬을 넘긴다.
+	surprisedDesc.matWorld = transformationMatrix;
+	surprisedDesc.eColor = CSurprisedBoard::GREEN;
+	surprisedDesc.eStartState = CSurprisedBoard::WAIT_R;
+	surprisedDesc.vPosition = _float3(48.f, 5.1f, -127.f);
+	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
+	CHECK_FAILED(hr);
+
+
+	// ------------------ 세 번째 SurprisedBoard ------------------
+	// 위치 수정
+	translationMatrix = XMMatrixTranslation(21.39f, 5.08f, -89.f);
+	// 회전 행렬을 만든다.
+	_float4x4 rotationMatrixY = XMMatrixRotationY(XM_PI / 2);
+	// 회전값은 그대로 사용
+	transformationMatrix = rotationMatrixY * translationMatrix;
+
+	// 해당 위치의 행렬을 넘긴다.
+	surprisedDesc.matWorld = transformationMatrix;
+	surprisedDesc.eColor = CSurprisedBoard::RED;
+	surprisedDesc.eStartState = CSurprisedBoard::WAIT_L;
+	surprisedDesc.vPosition = _float3(32.f, 5.1f, -92.f);//21.39f, 5.08f, -87.56f);
+	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
+	CHECK_FAILED(hr);
+
+
+	// ------------------ 네 번째(1) 오른쪽 SurprisedBoard ------------------
+	// 위치 수정
+	translationMatrix = XMMatrixTranslation(12.f, 4.5f, -68.5f);
+	// 회전값은 그대로 사용
+	transformationMatrix = rotationMatrix * translationMatrix;
+
+	// 해당 위치의 행렬을 넘긴다.
+	surprisedDesc.matWorld = transformationMatrix;
+	surprisedDesc.eColor = CSurprisedBoard::BLUE;
+	surprisedDesc.eStartState = CSurprisedBoard::WAIT_L;
+	surprisedDesc.vPosition = _float3(4.5f, 4.f, -82.5f);
+	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
+	CHECK_FAILED(hr);
+
+
+	// ------------------ 네 번째(2) 왼쪽 SurprisedBoard ------------------
+	// 위치 수정
+	translationMatrix = XMMatrixTranslation(-1.62f, 4.5f, -69.5f);
+	// 회전값은 그대로 사용
+	transformationMatrix = rotationMatrix * translationMatrix;
+
+	// 해당 위치의 행렬을 넘긴다.
+	surprisedDesc.matWorld = transformationMatrix;
+	surprisedDesc.eColor = CSurprisedBoard::BLUE;
+	surprisedDesc.eStartState = CSurprisedBoard::WAIT_R;
+	surprisedDesc.vPosition = _float3(4.5f, 4.f, -82.5f);
+	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
+	CHECK_FAILED(hr);
 
 
 	return S_OK;

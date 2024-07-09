@@ -31,7 +31,6 @@ public:
 #ifdef _DEBUG
 	virtual void	Render_IMGUI()					override;
 #endif
-	virtual void	Add_AnimEvent(){}
 
 
 

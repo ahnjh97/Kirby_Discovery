@@ -57,8 +57,8 @@ public: /* For.Renderer */
 	void Bind_RendererFunc(_int iTriggerType);
 	void Set_ColorSet_ByIndex(_int iSetIdx);
 
-	void Setting_GodRay(_fvector vWorldPos);
-
+	void Setting_GodRay(_fvector vWorldPos, _float fRayExposure = 0.15f, _float fRayDecay = 0.96815f, _float fRayIlluminationDecay = 0.8f, _float fRayDensity = 0.5f, _float fWeight = 0.5f);
+	void Setting_LensFlare(_bool bOnOff);
 #ifdef _DEBUG
 public:
 	HRESULT Add_DebugComponents(class CComponent* pRenderComponent);
@@ -226,10 +226,6 @@ public: /* For. TimeController */
 public: // For Collision
 	_bool	Is_PassingGroup(class CGameObject* pObj);
 
-#pragma region DIALOG_MANAGER
-
-#pragma endregion
-
 
 private:
 	class CGraphic_Device*			m_pGraphic_Device = { nullptr };
@@ -252,7 +248,6 @@ private:
 	class CPhysX*					m_pPhysx = { nullptr };
 	class CPicking*					m_pPicking = { nullptr };
 	class CTimeController*			m_pTimeController = { nullptr };
-	class CDialog_Manager*			m_pDialog_Manager = { nullptr };
 
 	_uint	m_iCurrentLevelID		= { 0 };
 	_uint	g_iNumOctree			= {};
