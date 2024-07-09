@@ -33,6 +33,8 @@ HRESULT CSimbaRoomGlass::Initialize(void* pArg)
 	if (FAILED(Add_Components(GameObjectDesc.wstrModelName)))
 		return E_FAIL;
 
+	m_bRimLight = false;
+
 	function<void(CGameObject*)> func = bind(&CSimbaRoomGlass::Set_Dead, this, placeholders::_1);
 	CEventCenter::Get_Instance()->Subscribe(KEVENT_SIMBA_GLASSBREAK, this, func);
 
