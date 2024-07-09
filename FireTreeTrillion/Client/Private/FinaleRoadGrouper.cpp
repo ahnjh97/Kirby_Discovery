@@ -452,7 +452,6 @@ _int CFinaleRoadGrouper::Tick(_float fTimeDelta)
 					if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_finale collide smoke test3"), &FXDesc)))
 						return E_FAIL;
 				}
-
 			}
 		}
 
