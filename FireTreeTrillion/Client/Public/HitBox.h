@@ -52,7 +52,7 @@ private:
 
 	COLLISION_DESC*		m_pOwnerCollisionDesc = { nullptr };
 	COLLISION_VALUE     m_eValue = { VALUE_END };
-
+	_float4x4			m_matFixed = _float4x4();
 
 public:
 	static CHitBox* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

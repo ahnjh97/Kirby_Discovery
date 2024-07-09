@@ -514,7 +514,7 @@ HRESULT CLevel_Park::Ready_Monsters()
 	
 	surprisedDesc.eColor = CSurprisedBoard::RED;
 	surprisedDesc.eStartState = CSurprisedBoard::WAIT_L;
-	surprisedDesc.vPosition = _float3(14.f, 5.f, -147.f);
+	surprisedDesc.vPosition = _float3(15.4f, 5.f, -155.f);
 	HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
 	CHECK_FAILED(hr);
 
@@ -529,7 +529,7 @@ HRESULT CLevel_Park::Ready_Monsters()
 	surprisedDesc.matWorld = transformationMatrix;
 	surprisedDesc.eColor = CSurprisedBoard::GREEN;
 	surprisedDesc.eStartState = CSurprisedBoard::WAIT_R;
-	surprisedDesc.vPosition = _float3(46.f, 5.1f, -130.f);
+	surprisedDesc.vPosition = _float3(48.f, 5.1f, -127.f);
 	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
 	CHECK_FAILED(hr);
 
@@ -546,7 +546,7 @@ HRESULT CLevel_Park::Ready_Monsters()
 	surprisedDesc.matWorld = transformationMatrix;
 	surprisedDesc.eColor = CSurprisedBoard::RED;
 	surprisedDesc.eStartState = CSurprisedBoard::WAIT_L;
-	surprisedDesc.vPosition = _float3(40.f, 5.1f, -94.f);//21.39f, 5.08f, -87.56f);
+	surprisedDesc.vPosition = _float3(32.f, 5.1f, -92.f);//21.39f, 5.08f, -87.56f);
 	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
 	CHECK_FAILED(hr);
 
@@ -561,7 +561,7 @@ HRESULT CLevel_Park::Ready_Monsters()
 	surprisedDesc.matWorld = transformationMatrix;
 	surprisedDesc.eColor = CSurprisedBoard::BLUE;
 	surprisedDesc.eStartState = CSurprisedBoard::WAIT_L;
-	surprisedDesc.vPosition = _float3(14.85f, 8.f, -75.f);
+	surprisedDesc.vPosition = _float3(4.5f, 4.f, -82.5f);
 	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
 	CHECK_FAILED(hr);
 
@@ -576,7 +576,7 @@ HRESULT CLevel_Park::Ready_Monsters()
 	surprisedDesc.matWorld = transformationMatrix;
 	surprisedDesc.eColor = CSurprisedBoard::BLUE;
 	surprisedDesc.eStartState = CSurprisedBoard::WAIT_R;
-	surprisedDesc.vPosition = _float3(-2.09f, 8.f, -76.f);
+	surprisedDesc.vPosition = _float3(4.5f, 4.f, -82.5f);
 	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
 	CHECK_FAILED(hr);
 

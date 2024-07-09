@@ -219,7 +219,7 @@ HRESULT CSurprisedBoard::Add_HitBoxes(_float3 vPos)
 	HitBox.matObjectPosition = XMMatrixTranslation(vPos.x , vPos.y, vPos.z);
 	hr = m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox);
 	CHECK_FAILED(hr);
-	Set_BodyCollider(COLLIDER_CYLINDER, 0.f, 4.f, 8.f);
+	Set_BodyCollider(COLLIDER_CYLINDER, 0.f, 4.f, 5.f);
 
 	return S_OK;
 }
