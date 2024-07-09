@@ -407,7 +407,6 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 		break;
 	}
 
-
 	return S_OK;
 }
 
