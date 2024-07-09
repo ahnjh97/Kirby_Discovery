@@ -2,6 +2,7 @@
 #include "FinaleBoss_State.h"
 #include "FinaleBoss.h"
 #include "FinaleKirby.h"
+#include "FinaleCut_ControlCenter.h"
 
 #pragma region IDLE STATE
 //*********************************
@@ -21,6 +22,8 @@ void CFinaleBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 	CFinaleBoss* pFinaleBoss = static_cast<CFinaleBoss*>(pGameObject);
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+
+	CFinaleCut_ControlCenter* pCenter = static_cast<CFinaleCut_ControlCenter*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinaleCut_ControlCenter")));
 
 	CFinaleKirby* pFinaleKirby = static_cast<CFinaleKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player")));
 	CTransform* pKirbyTransformCom = pFinaleKirby->Get_TransformCom();
@@ -42,6 +45,13 @@ void CFinaleBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 		pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 	}
 
+	_int iAnimIndex = pCenter->Get_CutScene();
+
+	if(1 == iAnimIndex)
+	{
+		pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(2550.f, 239.f, -136.f, 1.f));
+		pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT1, 50.f, false, false);
+	}
 	//else if (fDistance <= fMaxDist)
 	//{
 	//	// 대상 객체에 가까워지는 방향으로 이동
@@ -62,6 +72,137 @@ CFinaleBoss_Idle_State* CFinaleBoss_Idle_State::Create()
 }
 
 void CFinaleBoss_Idle_State::Free()
+{
+	__super::Free();
+}
+#pragma endregion
+
+
+#pragma region CUTSCENE STATE
+//*********************************
+//			 CUTSCENE STATE
+//*********************************
+CFinaleBoss_CutScene_State::CFinaleBoss_CutScene_State()
+{
+}
+
+void CFinaleBoss_CutScene_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
+}
+
+void CFinaleBoss_CutScene_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CFinaleBoss* pFinaleBoss = static_cast<CFinaleBoss*>(pGameObject);
+	CTransform* pTransform = pFinaleBoss->Get_TransformCom();
+	CFinaleCut_ControlCenter* pCenter = static_cast<CFinaleCut_ControlCenter*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinaleCut_ControlCenter")));
+
+	_int iAnimIndex = pCenter->Get_CutScene();
+
+	pFinaleBoss->Change_State((CFinaleBoss::FINALEBOSS_ANIM)iAnimIndex, 50.f, false, false);
+	/*if (iAnimIndex == 1)
+		pFinaleBoss->Change_State(CFinaleBoss::DUMPCUTSTATE_CUT1, 50.f, false, false, CFinaleBoss::BODY_DUMPCUT, CFinaleBoss::OFFSET_DUMPCUT);
+	else if (iAnimIndex == 2)
+		pFinaleBoss->Change_State(CFinaleBoss::DUMPCUTSTATE_CUT2, 50.f, false, false, CFinaleBoss::BODY_DUMPCUT, CFinaleBoss::OFFSET_DUMPCUT);*/
+	//else if (iAnimIndex == 6)
+	//	pFinaleBoss->Change_State(CFinaleBoss::DUMPCUTSTATE_CUT6, 50.f, false, false, CFinaleBoss::BODY_DUMPCUT, CFinaleBoss::OFFSET_DUMPCUT);
+
+
+	if (true == pFinaleBoss->IsAnimFinished())
+	{
+		switch (pFinaleBoss->Get_State())
+		{
+		case CFinaleBoss::FINALEBOSS_CUT1:
+			pCenter->Set_CutScene(2);
+			pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT2, 50.f, false, false);
+			break;
+		case CFinaleBoss::FINALEBOSS_CUT2:
+			pCenter->Set_CutScene(3);
+			pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT3, 50.f, false, false);
+			break;
+		case CFinaleBoss::FINALEBOSS_CUT3:
+			pCenter->Set_CutScene(4);
+			pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT4, 50.f, false, false);
+			break;
+		case CFinaleBoss::FINALEBOSS_CUT4:
+			pCenter->Set_CutScene(5);
+			pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT5, 50.f, false, false);
+			break;
+		case CFinaleBoss::FINALEBOSS_CUT5:
+			pCenter->Set_CutScene(6);
+			pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT6, 50.f, false, false);
+			break;
+		case CFinaleBoss::FINALEBOSS_CUT6:
+			pCenter->Set_CutScene(7);
+			pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT7, 50.f, false, false);
+			break;
+		case CFinaleBoss::FINALEBOSS_CUT7:
+			pCenter->Set_CutScene(8);
+			pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT8, 50.f, false, false);
+			break;
+		case CFinaleBoss::FINALEBOSS_CUT8:
+			pCenter->Set_CutScene(9);
+			pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT9, 50.f, false, false);
+			break;
+		case CFinaleBoss::FINALEBOSS_CUT9:
+			pCenter->Set_CutScene(10);
+			pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT10, 50.f, false, false);
+			break;
+		case CFinaleBoss::FINALEBOSS_CUT10:
+			pCenter->Set_CutScene(11);
+			pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT11, 50.f, false, false);
+			break;
+		case CFinaleBoss::FINALEBOSS_CUT11:
+			pCenter->Set_CutScene(12);
+			pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT12, 50.f, false, false);
+			break;
+		case CFinaleBoss::FINALEBOSS_CUT12:
+			pCenter->Set_CutScene(13);
+			pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT13, 50.f, false, false);
+			break;
+		case CFinaleBoss::FINALEBOSS_CUT13:
+			pCenter->Set_CutScene(14);
+			pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT14, 50.f, false, false);
+			break;
+		case CFinaleBoss::FINALEBOSS_CUT14:
+			pCenter->Set_CutScene(15);
+			pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT15, 50.f, false, false);
+			break;
+		case CFinaleBoss::FINALEBOSS_CUT15:
+			pCenter->Set_CutScene(16);
+			pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT16, 50.f, false, false);
+			break;
+		case CFinaleBoss::FINALEBOSS_CUT16:
+			pCenter->Set_CutScene(17);
+			pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT17, 50.f, false, false);
+			break;
+		case CFinaleBoss::FINALEBOSS_CUT17:
+			pCenter->Set_CutScene(18);
+			pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT18, 50.f, false, false);
+			break;
+		case CFinaleBoss::FINALEBOSS_CUT18:
+			pCenter->Set_CutScene(19);
+			pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT19, 50.f, false, false);
+			break;
+		case CFinaleBoss::FINALEBOSS_CUT19:
+			pCenter->Set_CutScene(20);
+			pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT20, 50.f, false, false);
+			break;
+		}
+	}
+}
+
+void CFinaleBoss_CutScene_State::OnStateExit()
+{
+}
+
+CFinaleBoss_CutScene_State* CFinaleBoss_CutScene_State::Create()
+{
+	CFinaleBoss_CutScene_State* pInstance = new CFinaleBoss_CutScene_State();
+	return pInstance;
+}
+
+void CFinaleBoss_CutScene_State::Free()
 {
 	__super::Free();
 }

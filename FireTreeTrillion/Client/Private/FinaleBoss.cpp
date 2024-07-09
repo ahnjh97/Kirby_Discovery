@@ -224,6 +224,27 @@ void CFinaleBoss::SetUp_FSM()
 	m_pFSM = CFSM::Create();
 	m_pFSM->Add_State(FINALEBOSS_DEMOWAITAIR, CFinaleBoss_Idle_State::Create());
 
+	m_pFSM->Add_State(FINALEBOSS_CUT1, CFinaleBoss_CutScene_State::Create());
+	m_pFSM->Add_State(FINALEBOSS_CUT2, CFinaleBoss_CutScene_State::Create());
+	m_pFSM->Add_State(FINALEBOSS_CUT3, CFinaleBoss_CutScene_State::Create());
+	m_pFSM->Add_State(FINALEBOSS_CUT4, CFinaleBoss_CutScene_State::Create());
+	m_pFSM->Add_State(FINALEBOSS_CUT5, CFinaleBoss_CutScene_State::Create());
+	m_pFSM->Add_State(FINALEBOSS_CUT6, CFinaleBoss_CutScene_State::Create());
+	m_pFSM->Add_State(FINALEBOSS_CUT7, CFinaleBoss_CutScene_State::Create());
+	m_pFSM->Add_State(FINALEBOSS_CUT8, CFinaleBoss_CutScene_State::Create());
+	m_pFSM->Add_State(FINALEBOSS_CUT9, CFinaleBoss_CutScene_State::Create());
+	m_pFSM->Add_State(FINALEBOSS_CUT10, CFinaleBoss_CutScene_State::Create());
+	m_pFSM->Add_State(FINALEBOSS_CUT11, CFinaleBoss_CutScene_State::Create());
+	m_pFSM->Add_State(FINALEBOSS_CUT12, CFinaleBoss_CutScene_State::Create());
+	m_pFSM->Add_State(FINALEBOSS_CUT13, CFinaleBoss_CutScene_State::Create());
+	m_pFSM->Add_State(FINALEBOSS_CUT14, CFinaleBoss_CutScene_State::Create());
+	m_pFSM->Add_State(FINALEBOSS_CUT15, CFinaleBoss_CutScene_State::Create());
+	m_pFSM->Add_State(FINALEBOSS_CUT16, CFinaleBoss_CutScene_State::Create());
+	m_pFSM->Add_State(FINALEBOSS_CUT17, CFinaleBoss_CutScene_State::Create());
+	m_pFSM->Add_State(FINALEBOSS_CUT18, CFinaleBoss_CutScene_State::Create());
+	m_pFSM->Add_State(FINALEBOSS_CUT19, CFinaleBoss_CutScene_State::Create());
+	m_pFSM->Add_State(FINALEBOSS_CUT20, CFinaleBoss_CutScene_State::Create());
+
 	//ป๓ลย Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};
 	FSM_Desc.iState = FINALEBOSS_DEMOWAITAIR;
