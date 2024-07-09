@@ -10,11 +10,14 @@
 BEGIN(Client)
 class CDialog : public CUIObject
 {
-	struct DialogMessage {
-		wstring wstrMessage = { L"" };
-		_float fDisplayTime = { 0.f }; //메시지 표시 속도
-		//size_t	iCurIndex = { 0 }; 
-	};
+public:
+	typedef struct DialogMessage
+	{
+		_uint	uLevel = LEVEL_END;
+		wstring wstrNPC = { TEXT("") };
+		string strPath = "";
+
+	}DIALOG_DESC;
 
 private:
 	CDialog(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext);
@@ -22,16 +25,29 @@ private:
 	virtual ~CDialog() = default;
 
 public:
-	HRESULT Add_Message(const wstring& _wstrMessage, _float _fDisplayTime);
-	HRESULT Start_Message();
-	HRESULT	Display_Message(const wstring& _wstrMessage, _float _fDisplayTime);
+	virtual HRESULT				Initialize_Prototype()						override;
+	virtual HRESULT				Initialize(void* pArg)						override;
+	virtual _int				Tick(_float fTimeDelta)						override;
+	virtual void				Late_Tick(_float fTimeDelta)				override;
+	virtual HRESULT				Render()									override;
+
+
+public:
+	string  utf8_encode(const wstring& wstr);
+	wstring utf8_decode(const string& str);
+
+	void	Save();
+	void	Load(string strPath);
 
 private:
-	vector<DialogMessage>	m_vecMessage;
 
 public:
 	static CDialog* Create(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
+
+private:
+	DIALOG_DESC			m_tMessage_Desc{};
+
 };
 END

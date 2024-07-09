@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "SimbaRoomGlass.h"
+#include "EventCenter.h"
 
 CSimbaRoomGlass::CSimbaRoomGlass(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -31,6 +32,9 @@ HRESULT CSimbaRoomGlass::Initialize(void* pArg)
 
 	if (FAILED(Add_Components(GameObjectDesc.wstrModelName)))
 		return E_FAIL;
+
+	function<void(CGameObject*)> func = bind(&CSimbaRoomGlass::Set_Dead, this, placeholders::_1);
+	CEventCenter::Get_Instance()->Subscribe(KEVENT_SIMBA_GLASSBREAK, this, func);
 
 	return S_OK;
 }
@@ -66,10 +70,11 @@ HRESULT CSimbaRoomGlass::Render()
 		CHECK_FAILED(hr);
 		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS);
 		CHECK_FAILED(hr);
+
 		hr = m_pShaderCom->Begin(MODEL_ALPHABLEND);
 		CHECK_FAILED(hr);
-
-		m_pModelCom->Render(i);
+		hr = m_pModelCom->Render(i);
+		CHECK_FAILED(hr);
 	}
 
 	return S_OK;
@@ -148,6 +153,7 @@ void CSimbaRoomGlass::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_pShaderCom);
+	CEventCenter::Get_Instance()->Unsubscribe(KEVENT_SIMBA_GLASSBREAK, this);
 	Safe_Release(m_pModelCom);
+	Safe_Release(m_pShaderCom);
 }

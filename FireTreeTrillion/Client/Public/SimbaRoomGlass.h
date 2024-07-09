@@ -17,6 +17,9 @@ private:
 	virtual ~CSimbaRoomGlass() = default;
 
 public:
+	void Set_Dead(CGameObject* pObj) { m_bDead = true; }
+
+public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual _int Tick(_float fTimeDelta) override;
@@ -33,7 +36,6 @@ private:
 private:
 	HRESULT Add_Components(const wstring& _wstrModelTag);
 	HRESULT Bind_ShaderResources();
-	HRESULT Add_PartObject();
 
 public:
 	static CSimbaRoomGlass* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

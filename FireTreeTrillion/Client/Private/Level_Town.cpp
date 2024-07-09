@@ -17,7 +17,7 @@
 
 #include "BG.h"
 #include "HUD.h"
-
+#include "Dialog.h"
 
 CLevel_Town::CLevel_Town(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -135,7 +135,7 @@ HRESULT CLevel_Town::Ready_Layer_Camera(const wstring& strLayerTag)
 	MainCamDesc.fFovy = XMConvertToRadians(30.0f);
 	MainCamDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	MainCamDesc.fNear = 0.1f;
-	MainCamDesc.fFar = 1000.0f;
+	MainCamDesc.fFar = g_fCamFar;
 	MainCamDesc.vEye = _float4(0.f, 0.f, 0.f, 1.f);
 	MainCamDesc.vAt = MainCamDesc.vEye + _float4(0.f, -.15f, 1.f, 1.f);
 	MainCamDesc.fSpeedPerSec = 10.f;
@@ -152,7 +152,7 @@ HRESULT CLevel_Town::Ready_Layer_Camera(const wstring& strLayerTag)
 	CameraDesc.fFovy = XMConvertToRadians(30.0f);
 	CameraDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	CameraDesc.fNear = 0.1f;
-	CameraDesc.fFar = 1000.0f;
+	CameraDesc.fFar = g_fCamFar;
 	CameraDesc.vEye = _float4(0.f, 0.f, 0.f, 1.f);
 	CameraDesc.vAt = _float4(0.f, -1.f, 1.f, 1.f);
 	CameraDesc.fSpeedPerSec = 10.f;
@@ -200,14 +200,18 @@ HRESULT CLevel_Town::Ready_Layer_UI(const wstring& _wstrLayerTag)
 		CHECK_FAILED(hr);
 	}
 
-
-
+	//능력버리기
 	CUIObject::UIOBJ_DESC DiscardUIDesc{};
 	DiscardUIDesc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f, 0.f };
 	DiscardUIDesc.vPos = { DiscardUIDesc.vCenter.x, DiscardUIDesc.vCenter.y, 0.f };
 	DiscardUIDesc.vSize = { 260.f * 0.8f, 120.f * 0.8f, 1.f };
 
 	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_HUD"), TEXT("Prototype_GameObject_HUD_AbilityDiscard"), &DiscardUIDesc);
+
+	//다이얼로그 
+	CDialog::DIALOG_DESC tDialogDesc{};
+	tDialogDesc.strPath = "../Bin/Resources/Data/Dialog_Town.json";
+	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_Dialog"), TEXT("Prototype_GameObject_Dialog"), &tDialogDesc);
 
 	return S_OK;
 }

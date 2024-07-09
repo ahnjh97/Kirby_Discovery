@@ -28,10 +28,15 @@ CLevel_Finale::CLevel_Finale(ID3D11Device* pDevice, ID3D11DeviceContext* pContex
 HRESULT CLevel_Finale::Initialize()
 {
 	m_pGameInstance->Set_RenderMode(CRenderer::MODE_GAMEPLAY);
+	m_pGameInstance->Setting_LensFlare(false);
+
 
 	HRESULT hr;
 	hr = __super::Initialize();
 	CHECK_FAILED(hr);
+
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinalePartical_Maker"), TEXT("Prototype_GameObject_FinalePartical_Maker"))))
+		return E_FAIL;
 
 	hr = Ready_Lights();
 	CHECK_FAILED(hr);
@@ -54,6 +59,8 @@ HRESULT CLevel_Finale::Initialize()
 	CHECK_FAILED(hr);
 	hr = Ready_Objects();
 	CHECK_FAILED(hr);
+	hr = Ready_FinaleRoad();
+	CHECK_FAILED(hr);
 	hr = Ready_UI();
 	CHECK_FAILED(hr);
 
@@ -62,16 +69,34 @@ HRESULT CLevel_Finale::Initialize()
 	ObjDesc.fSpeedPerSec = 5.f;
 	ObjDesc.fRotationPerSec = ToRadian(90.f);
 	_float4x4 InitMat = _float4x4::Identity;
-	InitMat.Translation({ 0.f, 0.f, 0.f });
+	InitMat.Translation({ 3.f, 0.f, 0.f });
 	ObjDesc.matWorld = InitMat;
-
 	// Car Test
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Deform"), TEXT("Prototype_GameObject_DumpCar"), &ObjDesc)))
 		return E_FAIL;
 
-	
+	ObjDesc.fSpeedPerSec = 5.f;
+	ObjDesc.fRotationPerSec = ToRadian(90.f);
+	InitMat = _float4x4::Identity;
+	InitMat.Translation({ 5000.f, 800.f, 0.f });
+	ObjDesc.matWorld = InitMat;
+	// PopStar Test
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_PopStar"), TEXT("Prototype_GameObject_PopStar"), &ObjDesc)))
+		return E_FAIL;
+
+	ObjDesc.fSpeedPerSec = 5.f;
+	ObjDesc.fRotationPerSec = ToRadian(90.f);
+	InitMat = _float4x4::Identity;
+	InitMat.Translation({ 58.5f, 4.f, 2.27f });
+	ObjDesc.matWorld = InitMat;
+	// PopStar Test
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_BreakableBlock"), TEXT("Prototype_GameObject_BreakableBlock"), &ObjDesc)))
+		return E_FAIL;
+
+	m_pGameInstance->Setting_GodRay(_float4(5500.f, 850.f, 0.f, 1.f), 0.05f, 0.96815f, 0.9f, 0.9f, 0.5f);
+
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
-	m_pGameInstance->Set_ColorSet_ByIndex(5);
+	m_pGameInstance->Set_ColorSet_ByIndex(4);
 	return S_OK;
 }
 
@@ -110,14 +135,13 @@ HRESULT CLevel_Finale::Ready_Lights()
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
 	LightDesc.vDirection = _float4(0.f, -1.f, -.3f, 0.f);
 
-	LightDesc.vDiffuse = _float4(0.6f, 0.5f, 0.3f, 1.f);
-	LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
-	LightDesc.vSpecular = _float4(0.2f, 0.2f, 0.2f, 1.f);
+	LightDesc.vDiffuse = _float4(.095f, .024f, .365f, 1.f);
+	LightDesc.vAmbient = _float4(.23f, .27f, .47f, 1.f);
 
 	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
 		return E_FAIL;
 
-	CGameInstance::Get_Instance()->Setting_GodRay({-650.f, 5000.f, 1200.f, 1.f});
+	//CGameInstance::Get_Instance()->Setting_GodRay({ -650.f, 5000.f, 1200.f, 1.f });
 
 	return S_OK;
 }
@@ -129,7 +153,7 @@ HRESULT CLevel_Finale::Ready_Layer_Camera(const wstring& strLayerTag)
 	MainCamDesc.fFovy = XMConvertToRadians(30.0f);
 	MainCamDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	MainCamDesc.fNear = 0.1f;
-	MainCamDesc.fFar = 1000.0f;
+	MainCamDesc.fFar = g_fCamFar;
 	MainCamDesc.vEye = _float4(0.f, 0.f, 0.f, 1.f);
 	MainCamDesc.vAt = _float4(0.f, -.2f, 1.f, 1.f);
 	MainCamDesc.fSpeedPerSec = 10.f;
@@ -146,7 +170,7 @@ HRESULT CLevel_Finale::Ready_Layer_Camera(const wstring& strLayerTag)
 	CameraDesc.fFovy = XMConvertToRadians(30.0f);
 	CameraDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	CameraDesc.fNear = 0.1f;
-	CameraDesc.fFar = 1000.0f;
+	CameraDesc.fFar = g_fCamFar;
 	CameraDesc.vEye = _float4(0.f, .5f, -1.f, 1.f);
 	CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
 	CameraDesc.fSpeedPerSec = 10.f;
@@ -160,20 +184,112 @@ HRESULT CLevel_Finale::Ready_Layer_Camera(const wstring& strLayerTag)
 
 HRESULT CLevel_Finale::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
-	CSkySphere::SKYSPHERE_DESC LabSkyDesc{};
-	LabSkyDesc.strModelTag = { "SkySphere_Stage1_Day" };
-	LabSkyDesc.strTextureTag = { "SkySphere_Lab_Diffuse" };
-	HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_SkySphere"), &LabSkyDesc);
-	CHECK_FAILED(hr);
+	//CSkySphere::SKYSPHERE_DESC LabSkyDesc{};
+	//LabSkyDesc.strModelTag = { "SkySphere_Stage1_Day" };
+	//LabSkyDesc.strTextureTag = {/* "SkySphere_Lab_Diffuse"*/ "SkySphere_Space"};
+	//HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_SkySphere"), &LabSkyDesc);
+	//CHECK_FAILED(hr);
 
-	//SUB_SKYSPHERE
-	CSkySphere::SKYSPHERE_DESC LabSkySubDesc{};
-	_float4x4 InitMat = _float4x4::Identity;
-	InitMat.Translation({ 0.f, -50.f, -0.f });
-	LabSkySubDesc.matWorld = InitMat;
+	////SUB_SKYSPHERE
+	//CSkySphere::SKYSPHERE_DESC LabSkySubDesc{};
+	//_float4x4 InitMat = _float4x4::Identity;
+	//InitMat.Translation({ 0.f, -50.f, -0.f });
+	//LabSkySubDesc.matWorld = InitMat;
 
-	hr = m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_SkySphereSub"), &LabSkySubDesc);
-	CHECK_FAILED(hr);
+	//hr = m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_SkySphereSub"), &LabSkySubDesc);
+	//CHECK_FAILED(hr);
+
+	return S_OK;
+}
+
+HRESULT CLevel_Finale::Ready_FinaleRoad()
+{
+
+#pragma region 처음 빌딩들
+
+
+	//_float3 vDestPos{ 139.f, -26.f, 4.8f };
+	//_float3 vStartPos{ 139.f, -26.f, 4.8f };
+
+	Make_FinaleRoad(RTYPE_BUILDINGA, MOVECMD_STOP,
+		{ 139.f, -26.f, 4.8f },	{ .98f, .21f, .07f },
+		{ 139.f, -26.f, 4.8f },	{ 1.f, -.04f, .7f });
+
+
+	Make_FinaleRoad(RTYPE_BUILDINGC, MOVECMD_STOP,
+		{ 268.1f, -15.5f, -22.9f }, { 1.f, .08f, -.05f },
+		{ 268.1f, -15.5f, -22.9f }, { 1.f, .08f, -.05f });
+
+
+	Make_FinaleRoad(RTYPE_BUILDINGC, MOVECMD_COLLIDE,
+		{ 389.2f, -12.5f, -19.1f }, { .93f, -.25f, -.27f },
+		{ 389.2f, -12.5f, -19.1f }, { 1.f, .06f, -.13f }, 10.f);
+
+
+	//도로
+	Make_FinaleRoad(RTYPE_ROADA, MOVECMD_COLLIDE,
+		{ 620.f, -22.f, -82.f }, { .98f, -.16f, -.15f },
+		{ 620.f, -37.f, -82.f }, { .98f, -.16f, -.15f }, -5.f);
+
+
+	//밑 도로
+	Make_FinaleRoad(RTYPE_ROADB, MOVECMD_COLLIDE,
+		{ 737.14f, -157.96f, -107.11f }, { .99f, .01f, -.12f },
+		{ 737.14f, -167.96f, -107.11f }, { .99f, .01f, -.12f },
+		15.f);
+
+
+	Make_FinaleRoad(RTYPE_ROADC, MOVECMD_COLLIDE,
+		{ 945.440f, -155.647f, -132.218f }, { .99f, .01f, -.12f },
+		{ 945.440f, -172.647f, -132.218f }, { .99f, .01f, -.12f },
+		-10.f);
+
+
+	
+	/*
+	//(아래) 도로 B
+	roadGrouperDesc = {};
+	roadGrouperDesc.eRoadType = RTYPE_ROADB;
+	roadGrouperDesc.eMoveCommand = MOVECMD_COLLIDE;
+
+	InitMat = _float4x4::Identity;
+
+
+	InitMat.Translation({ 737.14f, -157.96f, -107.11f });
+	CUtils::Rotation(InitMat, CUtils::Make_Quat_FromDir({ .99f, .01f, -.12f }));
+	roadGrouperDesc.matWorld = InitMat;
+
+	roadGrouperDesc.vDestPos = { 829.5f, -197.023f, -138.310f };
+	roadGrouperDesc.vDestDir = { .98f, -.16f, -.15f };
+
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleRoadGrouper"),
+		TEXT("Prototype_GameObject_FinaleRoadGrouper"), &roadGrouperDesc)))
+		return E_FAIL;
+
+	//도로 C
+	roadGrouperDesc = {};
+	roadGrouperDesc.eRoadType = RTYPE_ROADC;
+	roadGrouperDesc.eMoveCommand = MOVECMD_STOP;
+
+	InitMat = _float4x4::Identity;
+	InitMat.Translation({ 945.440f, -155.647f,-132.218f });
+	CUtils::Rotation(InitMat, CUtils::Make_Quat_FromDir({ .99f, .01f, -.12f }));
+	roadGrouperDesc.matWorld = InitMat;
+
+	roadGrouperDesc.vDestPos = { 1037.942f, -184.713f,-163.430f };
+	roadGrouperDesc.vDestDir = { .98f, -.16f, -.15f };
+
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleRoadGrouper"),
+		TEXT("Prototype_GameObject_FinaleRoadGrouper"), &roadGrouperDesc)))
+		return E_FAIL;
+*/
+
+#pragma endregion
+
+
+#pragma region 마지막 구역
+
+#pragma endregion
 
 	return S_OK;
 }
@@ -613,18 +729,6 @@ HRESULT CLevel_Finale::Ready_Objects()
 {
 	//Map, Triggers, Kickables.. 분류 제외 잔존 오브젝트들
 
-	CFinaleRoad::ROAD_DESC roadDesc{};
-	roadDesc.wstrModelName = TEXT("MovableBuildingA");
-
-	_float4x4 InitMat = _float4x4::Identity;
-	InitMat.Translation({ 110.f, -50.f, 0.f });
-	CUtils::Turn_OtherMatrix(InitMat, _float3::Up, 1.f, 80.f);
-	roadDesc.matWorld = InitMat;
-
-	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_FinaleRoad"), &roadDesc)))
-		return E_FAIL;
-
-
 	string strFileName = "../../../objects_txt/Finale.txt";
 
 	ifstream fileInput(strFileName, ios::binary);
@@ -681,14 +785,42 @@ HRESULT CLevel_Finale::Ready_Objects()
 
 HRESULT CLevel_Finale::Ready_UI()
 {
-	/*CUIObject::UIOBJ_DESC DiscardUIDesc{};
+	//피날레 레벨에서도 어빌 덤프 사용가능하게 처리해두었음. 
+	//주석 해제해도 되나, 어빌덤프타임 정보가 없어서 UI만 출력하는게 어색하여 주석 처리.
+	/*
+	CUIObject::UIOBJ_DESC DiscardUIDesc{};
 	DiscardUIDesc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f, 0.f };
 	DiscardUIDesc.vPos = { DiscardUIDesc.vCenter.x, DiscardUIDesc.vCenter.y, 0.f };
 	DiscardUIDesc.vSize = { 260.f * 0.8f, 120.f * 0.8f, 1.f };
 
-	HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_HUD"), TEXT("Prototype_GameObject_HUD_AbilityDiscard"), &DiscardUIDesc);*/
+	HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_HUD"), TEXT("Prototype_GameObject_HUD_AbilityDiscard"), &DiscardUIDesc);
+	*/
 
 	return S_OK;
+}
+
+void CLevel_Finale::Make_FinaleRoad(ROADTYPE eType, MOVECMD eMoveType, _float3 vTargetPos, _float3 vLookDir, _float3 vDestPos, _float3 vDestDir, _float fDestZAngle)
+{
+
+	CFinaleRoadGrouper::ROADGROUPER_DESC roadGrouperDesc = {};
+
+	roadGrouperDesc.eRoadType = eType;
+	roadGrouperDesc.eMoveCommand = eMoveType;
+	roadGrouperDesc.fDestZAngle = fDestZAngle;
+
+	_float4x4 InitMat = _float4x4::Identity;
+	InitMat.Translation(vTargetPos);
+	CUtils::Rotation(InitMat, CUtils::Make_Quat_FromDir(vLookDir));
+	roadGrouperDesc.matWorld = InitMat;
+
+	roadGrouperDesc.vDestPos = vDestPos;
+	roadGrouperDesc.vDestDir = vDestDir;
+
+
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_FINALE, TEXT("Layer_FinaleRoadGrouper"),
+		TEXT("Prototype_GameObject_FinaleRoadGrouper"), &roadGrouperDesc)))
+		return;
+
 }
 
 CLevel_Finale* CLevel_Finale::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

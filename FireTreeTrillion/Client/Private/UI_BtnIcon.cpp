@@ -32,8 +32,8 @@ HRESULT CUI_BtnIcon::Initialize(void* _pArg)
 
 	_float3 vScale = { 128.f, 128.f, 1.f };
 	_float3 vOffset = { 0.9f, 0.9f, 1.f };
-	
-	m_pTransformCom->Set_Scaled(vScale * vOffset);
+	m_vOrigScale = vScale * vOffset;
+	m_pTransformCom->Set_Scaled(m_vOrigScale);
 
 	_float4 vTrans = { 478.f, -388.f, 1.f, 1.f };
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vTrans);
@@ -42,10 +42,7 @@ HRESULT CUI_BtnIcon::Initialize(void* _pArg)
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 
 	m_eCurState = BTN_IDLE;
-
-	LEVEL eLevel = (LEVEL)*m_pGameInstance->Get_CurrentLevelID();
-	m_pMWindow = static_cast<CUI_MessageWindow*>(m_pGameInstance->Get_GameObject(eLevel, TEXT("Layer_UI_MessageWindow"), 0));
-	Safe_AddRef(m_pMWindow);
+	m_pCurrentLevelID = m_pGameInstance->Get_CurrentLevelID();
 
 	return S_OK;
 }
@@ -54,56 +51,46 @@ _int CUI_BtnIcon::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
-	if (nullptr == m_pMWindow)
-		return OBJ_NOEVENT;
-
-	//MessageWindow 상태와 동기화
-	CUI_MessageWindow::MESSAGEWINDOW_STATE eMWState = m_pMWindow->Get_MWindowState();
-	switch (eMWState)
-	{
-	case CUI_MessageWindow::WINDOW_IDLE: break;
-	case CUI_MessageWindow::WINDOW_HIDE: m_eCurState = BTN_IDLE;	break;
-	case CUI_MessageWindow::WINDOW_SHOW: m_eCurState = BTN_BLINK;	break;
-	case CUI_MessageWindow::WINDOW_NONE: default:	break;
-	}
-
-	//버튼 선택 시 다음 스크립트를 출력. Button UI 스케일 증감
-	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN) && BTN_BLINK == m_eCurState) //테스트용
-		m_eCurState = BTN_SELECT;
-
-	_float3 vOrigScale = m_pTransformCom->Get_Scaled();
-	_float3 vOffset = { 1.1f, 1.1f, 1.f };
+	_float3 vOffset = { 0.6f, 0.6f, 1.f };
 	switch (m_eCurState)
 	{
-	case BTN_IDLE:
+	case BTN_HIDE:
 		m_fBlinkAlpha -= fTimeDelta * 5.f;
 		m_fBtnAlpha -= fTimeDelta * 5.f;
 		break;
 
-	case BTN_BLINK:
-		m_fBlinkAlpha = 0.5f;
+	case BTN_BLINK: //알파 값 증감
 		m_fBtnAlpha = 1.f;
-
 		m_fBlinkTime += fTimeDelta;
-		if (m_fBlinkTime > 1.f)
+
+		if (m_fBlinkTime > 0.5f && m_fBlinkTime < 1.f)
+			m_fBlinkAlpha = 0.5f;
+
+		if (m_fBlinkTime > 1.f) //초기화
 		{
 			m_fBlinkAlpha = 0.f;
 			m_fBlinkTime = 0.f;
 		}
 		break;
 		
-	case BTN_SELECT:
+	case BTN_SELECT: //스케일 증감
 		m_fBlinkAlpha = 0.f;
+		m_fSelectTime += fTimeDelta * 2.f;
+		m_pTransformCom->Set_Scaled(m_vOrigScale * vOffset);
 		
-		m_fSelectTime += fTimeDelta;
-		m_pTransformCom->Set_Scaled(vOrigScale * vOffset);
-		//vOrigScale.x += EASE_OUT(fTimeDelta * 2.f); //그래프 MAX값은 1이어야하며, 범위는 0 ~ 1로 설정되어야함
-		//vOrigScale.y += EASE_OUT(fTimeDelta * 2.f);
-		if (m_fSelectTime > 0.5f)
+		if (m_fSelectTime > 0.1f && m_fSelectTime < 0.2f)
+		{
+			//그래프 MAX값은 1이어야하며, 범위는 0 ~ 1로 설정되어야함
+			vOffset.x += EASE_OUT(fTimeDelta * 5.f);
+			vOffset.y += EASE_OUT(fTimeDelta * 5.f);
+			m_pTransformCom->Set_Scaled(m_vOrigScale * vOffset);
+		}
+
+		if (m_fSelectTime > 0.2f) //초기화
 		{
 			m_fSelectTime = 0.f;
+			m_pTransformCom->Set_Scaled(m_vOrigScale);
 			m_eCurState = BTN_BLINK;
-			m_pTransformCom->Set_Scaled(vOrigScale);
 		}
 		break;
 
@@ -130,19 +117,41 @@ HRESULT CUI_BtnIcon::Render()
 	HRESULT hr;
 
 #pragma region RENDER_BINDSET
-	
+
+	//렌더 OFF
+	if (BTN_HIDE == m_eCurState && 0.f == m_fBlinkAlpha == m_fBtnAlpha)
+		return S_OK;
+
 	for (_uint iTEXIx = 0; iTEXIx < TEXBTN_NONE; ++iTEXIx)
 	{
 		PASS_POSTEX ePassType = { POSTEX_ALPHABLEND_NOTEST };
+		TEX_BTNTYPE eTexType = { TYPE_DEFAULT };
+
 		if (TEXBTN_BASE == iTEXIx)
 		{
 			ePassType = POSTEX_UIWHITEALPHA;
 			m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fBtnAlpha, sizeof(_float)); //알파를 별개로 조정
 			m_fAlpha = 1.f;
+			
+			switch (*m_pCurrentLevelID)
+			{
+			case LEVEL_TOWN:
+				eTexType = TYPE_DEFAULT;
+				break;
+
+			case LEVEL_DEEDEEDEE: case LEVEL_SIMBA: case LEVEL_FINALBOSS: case LEVEL_FINALE:
+				eTexType = TYPE_BOSS;
+				break;
+
+			default: break;
+			}
 		}
 
 		if (TEXBTN_BRIGHT == iTEXIx)
+		{
 			m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fBlinkAlpha, sizeof(_float));
+			eTexType = TYPE_DEFAULT;
+		}
 
 		if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 			return E_FAIL;
@@ -154,9 +163,9 @@ HRESULT CUI_BtnIcon::Render()
 		if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 			return E_FAIL;
 
-		hr = Bind_ShaderResources(m_pShaderCom, ePassType, m_pTexCom[iTEXIx], 0);
+		hr = Bind_ShaderResources(m_pShaderCom, ePassType, m_pTexCom[iTEXIx], eTexType);
 		CHECK_FAILED(hr);
-
+			
 #pragma endregion
 
 	}
@@ -169,10 +178,11 @@ void CUI_BtnIcon::Render_IMGUI()
 {
 	switch (m_eCurState)
 	{
-	case BTN_IDLE:	ImGui::Text(u8"BTN_IDLE");	break;
-	case BTN_BLINK:	ImGui::Text(u8"BTN_BLINK"); break;
-	case BTN_SELECT:ImGui::Text(u8"BTN_SELECT"); break;
-	case BTN_NONE:default: ImGui::Text(u8"BTN_NONE"); break;
+	case BTN_IDLE:		ImGui::Text(u8"BTN_IDLE");	break;
+	case BTN_HIDE:		ImGui::Text(u8"BTN_HIDE");	break;
+	case BTN_BLINK:		ImGui::Text(u8"BTN_BLINK"); break;
+	case BTN_SELECT:	ImGui::Text(u8"BTN_SELECT"); break;
+	case BTN_NONE:		default: ImGui::Text(u8"BTN_NONE"); break;
 	}
 }
 #endif
@@ -183,11 +193,11 @@ HRESULT CUI_BtnIcon::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-  	if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Texture_UI_BtnIconBase"),
-		TEXT("Com_TextBase"), (CComponent**)&m_pTexCom[TEXBTN_BASE])))
+  	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_UI_BtnIconBase"),
+		TEXT("Com_TexBase"), (CComponent**)&m_pTexCom[TEXBTN_BASE])))
 		return E_FAIL;
 
-	if (FAILED(__super::Add_Component(TEXT("Prototype_Component_Texture_UI_BtnIconBright"),
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_UI_BtnIconBright"),
 		TEXT("Com_TexBright"), (CComponent**)&m_pTexCom[TEXBTN_BRIGHT])))
 		return E_FAIL;
 
@@ -259,8 +269,6 @@ void CUI_BtnIcon::Free()
 	
 	for (auto& iTex : m_pTexCom)
 		Safe_Release(iTex);
-
-	Safe_Release(m_pMWindow);
 }
 
 

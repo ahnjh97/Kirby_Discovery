@@ -1,4 +1,7 @@
 #pragma once
+
+
+#include "Client_Defines.h"
 #include "PhysXObject.h"
 
 
@@ -13,12 +16,12 @@ BEGIN(Client)
 class CBaumPiece final : public CPhysXObject
 {
 public:
-	typedef struct BAUMDESC
+	struct BAUMPIECEDESC : public GAMEOBJECT_DESC
 	{
 		wstring strModelName;
 		_float	fParticalSpeed = { 0.f };
 		_float4 vParticalMoveDir = { 0.f, 0.f, 0.f, 0.f };
-	}BAUMDESC;
+	};
 
 private:
 	CBaumPiece(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -34,17 +37,25 @@ public:
 	virtual HRESULT Render_LightDepth()							override;
 
 private:
-	HRESULT			Add_Components();
+	HRESULT			Add_Components(const wstring& wstrModelName);
 	HRESULT			Bind_ShaderResources();
 
 	void			Compute_MotionBlur();
 	_float2			m_vPreScreenPos = { 0.f, 0.f };
 	_float4			m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
 
+	_float			m_fDeathTime = { 0.f };
+
+	_float4			m_vFlyDir = { 0.f, 0.f, 0.f, 0.f };
+	_float			m_fFlyPower = { 0.f };
+	_float4			m_vGravity = { 0.f, 0.f, 0.f, 0.f };
+	_float			m_fGravityPower = { 0.f };
+	_float			m_vTurnSpeed = { 0.f };
+	_float4			m_vTurnAxis = { 0.f, 0.f, 0.f, 0.f };
+
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
-	PxRigidDynamic* m_pDynamicActor = { nullptr };
 
 public:
 	static CBaumPiece* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

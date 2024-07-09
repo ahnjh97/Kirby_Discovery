@@ -43,7 +43,7 @@ public:
 	virtual void			Free() override;
 
 private:
-	LEVEL					m_eCurLevel = { LEVEL_END };
+	//LEVEL					m_eCurLevel = { LEVEL_END }; //m_pCurrentLevelID∑Œ ¥Î√º
 	string					m_strModelTag = { "" };
 	string					m_strTextureTag = { "" };
 };

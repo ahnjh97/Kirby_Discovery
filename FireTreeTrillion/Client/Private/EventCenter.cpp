@@ -12,7 +12,7 @@ HRESULT CEventCenter::Subscribe(KIRBY_EVENT eEvent, CGameObject* pObj, function<
 {
 	if (KEVENT_END <= eEvent)
 		return E_FAIL;
-
+	
 	m_pListeners[eEvent].emplace(LISTENER{ iPriority, func, pObj });
 	//Safe_AddRef(pObj);
 

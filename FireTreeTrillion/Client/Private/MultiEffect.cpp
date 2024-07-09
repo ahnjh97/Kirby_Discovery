@@ -139,11 +139,11 @@ void CMultiEffect::Late_Tick(_float fTimeDelta)
 
 	m_fDuration.first += fTimeDelta;
 
-	if (m_fDuration.second - .05f <= m_fDuration.first && (*m_pCurrentLevelID) != LEVEL_TOOL_FX)
+	if (m_fDuration.second - .05f <= m_fDuration.first && (*m_pCurrentLevelID) != LEVEL_TOOL_FX && m_fDuration.second != FX_MAXDURATION)
 	{
 		m_bDead = true;
 	}
-	else if (m_bIsLoop)
+	else if (m_bIsLoop || m_fDuration.second == FX_MAXDURATION)
 	{
 		m_fDuration.first = 0.f;
 		for (auto& pEffect : m_FXs)

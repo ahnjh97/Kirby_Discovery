@@ -2,6 +2,7 @@
 #include "CKirbyDump_State.h"
 #include "Kirby_State_Function.h"
 #include "FinaleKirby.h"
+#include "FinalePartical_Maker.h"
 
 void Turn_Interpolate(CFinaleKirby::FINALEKIRBY_INFODESC* Kirbydesc, CTransform* pTransformCom, _float fTimeDelta, _float fInterpolateSpeed = 12.f)
 {
@@ -207,45 +208,71 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 	pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
 
-	//if (pController->Compute_Height() > 2.f)
-	//{
-	//	DESC(m_fJumpVelocity) = 0.f;
-	//	pKirby->Change_State(CFinaleKirby::DUMPSTATE_JUMP, 60.f, true, false, CFinaleKirby::BODY_DUMPDEFAULT, CFinaleKirby::OFFSET_DUMP);
-	//	return;
-	//}
+	m_fParticalDelay += fTimeDelta;
+	if (m_fParticalDelay > 0.2f)
+	{
+		CFinalePartical_Maker* pMaker = static_cast<CFinalePartical_Maker*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinalePartical_Maker")));
+		_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+		_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+		pMaker->Make_Partical(3, vPos + (vLook * 3.f), 3.f, 0.2f, 0.1f, XMVector3Normalize(_float4(0.f, 1.f, 0.f, 0.f) + vLook), 120.f, CUtils::Make_RandomFloat(40.f, 80.f));
+		m_fParticalDelay = 0.f;
+	}
 
-	//if (pController->RayCastToDynamicActor(_float4(0.f, -1.f, 0.f, 0.f)) > 2.f)
-	//{
-	//	DESC(m_fJumpVelocity) = 0.f;
-	//	pKirby->Change_State(CFinaleKirby::DUMPSTATE_JUMP, 60.f, true, false, CFinaleKirby::BODY_DUMPDEFAULT, CFinaleKirby::OFFSET_DUMP);
-	//	return;
-	//}
+
+	if ((pController->Compute_Height() < 1.5f || pController->RayCastToDynamicActor(_float4(0.f, -1.f, 0.f, 0.f)) < 1.5f) == false)
+	{
+		DESC(m_fJumpVelocity) = 0.f;
+		pKirby->Change_State(CFinaleKirby::DUMPSTATE_JUMP, 60.f, true, false, CFinaleKirby::BODY_DUMPDEFAULT, CFinaleKirby::OFFSET_DUMP);
+		return;
+	}
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_PRESS) == true)
 	{
 		Kirbydesc->m_vTargetDir = _float4(1.f, 0.f, 0.3f, 0.f);
 		Kirbydesc->m_vTargetDir.Normalize();
+		_float4 vMoveTarget = _float4(1.f, 0.f, 0.6f, 0.f);
+		vMoveTarget.Normalize();
 		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vHandleDir, pTransformCom, fTimeDelta, 3.f);
-		Turn_InterPolate_OtherVector(Kirbydesc->m_vHandleDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 1.5f);
+		Turn_InterPolate_OtherVector(vMoveTarget, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 1.f);
 	}
 	else if (m_pGameInstance->Get_DIKeyState(DIK_RIGHT, KEY_PRESS) == true)
 	{
 		Kirbydesc->m_vTargetDir = _float4(1.f, 0.f, -0.3f, 0.f);
 		Kirbydesc->m_vTargetDir.Normalize();
+		_float4 vMoveTarget = _float4(1.f, 0.f, -0.6f, 0.f);
+		vMoveTarget.Normalize();
 		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vHandleDir, pTransformCom, fTimeDelta, 3.f);
-		Turn_InterPolate_OtherVector(Kirbydesc->m_vHandleDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 1.5f);
+		Turn_InterPolate_OtherVector(vMoveTarget, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 1.f);
 	}
 	else
 	{
 		Kirbydesc->m_vTargetDir = _float4(1.f, 0.f, 0.f, 0.f);
 		Kirbydesc->m_vTargetDir.Normalize();
 		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vHandleDir, pTransformCom, fTimeDelta, 3.f);
-		Turn_InterPolate_OtherVector(Kirbydesc->m_vHandleDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 1.5f);
+		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 2.f);
 	}
 
+	if (m_pGameInstance->Get_DIKeyState(DIK_SPACE, KEY_DOWN))
+	{
+		m_bBreak = !m_bBreak;
+	}
+
+	if (m_bBreak == true)
+		return;
+
+
 	Kirbydesc->m_fMoveSpeed += fTimeDelta * 10.f;
-	if (Kirbydesc->m_fMoveSpeed > 20.f)
-		Kirbydesc->m_fMoveSpeed = 20.f;
+
+	if (DESC(m_bBooster) == true)
+	{
+		if (Kirbydesc->m_fMoveSpeed > 36.f)
+			Kirbydesc->m_fMoveSpeed = 36.f;
+	}
+	else
+	{
+		if (Kirbydesc->m_fMoveSpeed > 20.f)
+			Kirbydesc->m_fMoveSpeed = 20.f;
+	}
 
 	// 타겟기준
 	_vector vMoveDelta = Kirbydesc->m_vMoveDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
@@ -257,6 +284,64 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		DESC(m_fJumpVelocity) = 20.f;
 		pKirby->Change_State(CFinaleKirby::DUMPSTATE_JUMP, 60.f, true, false, CFinaleKirby::BODY_DUMPDEFAULT, CFinaleKirby::OFFSET_DUMP);
 		return;
+	}
+
+	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN) && DESC(m_bBooster) == false)
+	{
+		//부슽 이펙트
+		ComeOn_Dash_For_Dump(pTransformCom);
+		pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+		DESC(m_bBooster) = true;
+		CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
+		pCamera->Make_Shake(0.6f, 2.f);
+	}
+
+	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS))
+	{
+		DESC(m_fBoosterTime) = 5.f;
+	}
+	else
+	{
+		if (DESC(m_fBoosterTime) > 0.f)
+			DESC(m_fBoosterTime) -= fTimeDelta;
+
+		if (DESC(m_fBoosterTime) < 0.f)
+			DESC(m_fBoosterTime) = 0.f;
+	}
+
+	if (DESC(m_fBoosterTime) <= 0.f)
+	{
+		DESC(m_bBooster) = false;
+		pKirby->Delete_Effect("Come On Dash");
+	}
+	//트럭방구
+	else
+	{
+		static _float fBoostTime = 0.f;
+		fBoostTime += fTimeDelta;
+		if (.05f < fBoostTime)
+		{
+			CEffect::FX_DESC fxDesc{};
+			fxDesc.vInitRot = CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK));
+
+			_float3 vCenterPos = (_float3)pTransformCom->Get_State(CTransform::STATE_POSITION);
+			fxDesc.vInitPos = vCenterPos;
+			fxDesc.vInitPos += (_float3)pTransformCom->Get_State(CTransform::STATE_RIGHT) * (2.3f + CUtils::Make_RandomFloat(-.2f, .2f));
+			fxDesc.vInitPos += (_float3)pTransformCom->Get_State(CTransform::STATE_UP) * 7.2f;
+
+			_float fScale = CUtils::Make_RandomFloat( 1.5f, 3.f);
+			fxDesc.vInitScale = { fScale, fScale, fScale };
+			pKirby->Add_Effect("dump dash smoke", fxDesc);
+
+			fxDesc.vInitPos = vCenterPos;
+			fxDesc.vInitPos -= (_float3)pTransformCom->Get_State(CTransform::STATE_RIGHT) * (2.3f + CUtils::Make_RandomFloat(-.2f, .2f));
+			fxDesc.vInitPos += (_float3)pTransformCom->Get_State(CTransform::STATE_UP) * 7.2f;
+
+			fScale = CUtils::Make_RandomFloat( 1.5f, 3.f);
+			fxDesc.vInitScale = { fScale, fScale, fScale };
+			pKirby->Add_Effect("dump dash smoke", fxDesc);
+			fBoostTime = 0.f;
+		}
 	}
 }
 
@@ -298,31 +383,71 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	CFinaleKirby::FINALEKIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
+	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN) && DESC(m_bBooster) == false)
+	{
+		//부슽 이펙트
+		ComeOn_Dash_For_Dump(pTransformCom);
+		pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+		DESC(m_bBooster) = true;
+		CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
+		pCamera->Make_Shake(1.f, 2.f);
+	}
+
+	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS))
+	{
+		DESC(m_fBoosterTime) = 5.f;
+	}
+	else
+	{
+		if (DESC(m_fBoosterTime) > 0.f)
+			DESC(m_fBoosterTime) -= fTimeDelta;
+		if (DESC(m_fBoosterTime) < 0.f)
+			DESC(m_fBoosterTime) = 0.f;
+	}
+
+	if (DESC(m_fBoosterTime) <= 0.f)
+	{
+		DESC(m_bBooster) = false;
+		pKirby->Delete_Effect("Come On Dash");
+	}
+
 	if (m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_PRESS) == true)
 	{
 		Kirbydesc->m_vTargetDir = _float4(1.f, 0.f, 0.3f, 0.f);
 		Kirbydesc->m_vTargetDir.Normalize();
+		_float4 vMoveTarget = _float4(1.f, 0.f, 0.6f, 0.f);
+		vMoveTarget.Normalize();
 		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vHandleDir, pTransformCom, fTimeDelta, 3.f);
-		Turn_InterPolate_OtherVector(Kirbydesc->m_vHandleDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 1.5f);
+		Turn_InterPolate_OtherVector(vMoveTarget, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 1.f);
 	}
 	else if (m_pGameInstance->Get_DIKeyState(DIK_RIGHT, KEY_PRESS) == true)
 	{
 		Kirbydesc->m_vTargetDir = _float4(1.f, 0.f, -0.3f, 0.f);
 		Kirbydesc->m_vTargetDir.Normalize();
+		_float4 vMoveTarget = _float4(1.f, 0.f, -0.6f, 0.f);
+		vMoveTarget.Normalize();
 		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vHandleDir, pTransformCom, fTimeDelta, 3.f);
-		Turn_InterPolate_OtherVector(Kirbydesc->m_vHandleDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 1.5f);
+		Turn_InterPolate_OtherVector(vMoveTarget, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 1.f);
 	}
 	else
 	{
 		Kirbydesc->m_vTargetDir = _float4(1.f, 0.f, 0.f, 0.f);
 		Kirbydesc->m_vTargetDir.Normalize();
 		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vHandleDir, pTransformCom, fTimeDelta, 3.f);
-		Turn_InterPolate_OtherVector(Kirbydesc->m_vHandleDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 1.5f);
+		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 2.f);
 	}
 
 	Kirbydesc->m_fMoveSpeed += fTimeDelta * 10.f;
-	if (Kirbydesc->m_fMoveSpeed > 20.f)
-		Kirbydesc->m_fMoveSpeed = 20.f;
+	if (DESC(m_bBooster) == true)
+	{
+		if (Kirbydesc->m_fMoveSpeed > 36.f)
+			Kirbydesc->m_fMoveSpeed = 36.f;
+	}
+	else
+	{
+		if (Kirbydesc->m_fMoveSpeed > 20.f)
+			Kirbydesc->m_fMoveSpeed = 20.f;
+	}
 
 	// 타겟기준
 	_vector vMoveDelta = Kirbydesc->m_vMoveDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
@@ -331,13 +456,29 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 	if (pKirby->Get_State() == CFinaleKirby::DUMPSTATE_JUMP)
 	{
+		m_fFallTime += fTimeDelta;
+
 		DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
 		pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
+
 		if (pController->Is_Terrain())
 		{
 			pKirby->Change_State(CFinaleKirby::DUMPSTATE_LANDING, 60.f, false, false, CFinaleKirby::BODY_DUMPDEFAULT, CFinaleKirby::OFFSET_DUMP);
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
-			pCamera->Make_Shake();
+			if (m_fFallTime < 1.5f)
+				pCamera->Make_Shake(1.5f);
+			else
+			{
+				if (m_fFallTime > 3.f)
+					pCamera->Make_Shake(3.f, 2.f);
+				else
+					pCamera->Make_Shake(m_fFallTime, 2.f);
+			}
+
+			CFinalePartical_Maker* pMaker = static_cast<CFinalePartical_Maker*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinalePartical_Maker")));
+			_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+			_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+			pMaker->Make_Partical(20, vPos + (vLook * 3.f), 3.f, 0.2f, 0.1f, XMVector3Normalize(_float4(0.f, 1.f, 0.f, 0.f) + vLook * 2.f), 120.f, CUtils::Make_RandomFloat(40.f, 80.f));
 			return;
 		}
 	}
@@ -357,6 +498,7 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 void CKirbyDump_Jump_State::OnStateExit()
 {
+	m_fFallTime = 0.f;
 }
 
 CKirbyDump_Jump_State* CKirbyDump_Jump_State::Create()
@@ -432,7 +574,7 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	else if (pKirby->Get_State() == CFinaleKirby::STATE_INHALESTART)
 	{
 		Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
-		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
+		//pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
 
 		if (pKirby->isAnimFinish())
 		{
@@ -442,7 +584,7 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	else if (pKirby->Get_State() == CFinaleKirby::STATE_INHALE)
 	{
 		DESC(m_eEyeState) = CFinaleKirby::EYE_CLOSE;
-		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
+		//pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
 
 
 		if (pKirby->isAnimFinish())
@@ -451,7 +593,7 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	else if (pKirby->Get_State() == CFinaleKirby::STATE_SUPERINHALESTART)
 	{
 		DESC(m_eEyeState) = CFinaleKirby::EYE_CLOSE;
-		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
+		//pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
 
 
 		if (pKirby->isAnimFinish())
@@ -463,7 +605,7 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	else if (pKirby->Get_State() == CFinaleKirby::STATE_VACUUM)
 	{
 		DESC(m_eEyeState) = CFinaleKirby::EYE_CLOSE;
-		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
+		//pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
 
 		if (DESC(m_bVacuumComplete) == true)
 		{
@@ -479,7 +621,6 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		Kirbydesc->m_fMoveSpeed = 0.f;
 		m_fRunTime += fTimeDelta;
 		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
-
 		if (m_fRunTime > 1.7f)
 		{
 			DESC(m_eEyeState) = CFinaleKirby::EYE_IDLE;
@@ -495,8 +636,31 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		{
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 			pCamera->Make_Shake();
+
+			CFinalePartical_Maker* pMaker = static_cast<CFinalePartical_Maker*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinalePartical_Maker")));
+			_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+			_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+			pMaker->Make_Partical(50, vPos, 3.f, 0.1f, 0.05f, _float4(0.f, 1.f, 0.f, 0.f), 120.f, CUtils::Make_RandomFloat(30.f, 70.f));
+
 			m_bShakeTrigger = false;
+
+			//랜딩 스모크
+			_float3 vMyPos = (_float3)pTransformCom->Get_State(CTransform::STATE_POSITION);
+
+			CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+			MultiFXDesc.vInitPos = vMyPos;
+			MultiFXDesc.vInitScale = { 4.f, 4.f, 4.f };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_dump smoke"), &MultiFXDesc)))
+				return;
 		}
+
+		if (m_fRunTime > 1.7f && m_fRunTime < 1.8f)
+			DESC(m_eEyeState) = CFinaleKirby::EYE_BLINK;
+		else if (m_fRunTime > 1.9f && m_fRunTime < 2.f)
+			DESC(m_eEyeState) = CFinaleKirby::EYE_BLINK;
+		else
+			DESC(m_eEyeState) = CFinaleKirby::EYE_IDLE;
+
 
 		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset), -1.f);
 

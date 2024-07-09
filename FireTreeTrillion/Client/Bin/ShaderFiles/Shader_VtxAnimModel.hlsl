@@ -141,7 +141,7 @@ PS_OUT PS_MAIN(PS_IN In)
     Out.vDiffuse = mixedColor;
     //Out.vDiffuse = vMtrlDiffuse + g_fWhiteColorDiffuse;
     Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
     Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
     if (Out.vMRA.z == 0)
         Out.vMRA.z = 0.001f;
@@ -168,7 +168,7 @@ PS_OUT NO_NORMALMAP_PS_MAIN(PS_IN In)
 
     Out.vDiffuse = vMtrlDiffuse + g_fWhiteColorDiffuse;
     Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
     //Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
     Out.vMRA = vector(0.f, 0.f, 1.f, 1.f);
     
@@ -195,7 +195,7 @@ PS_OUT FOR_KIRBY_PS_MAIN(PS_IN In)
 
     Out.vDiffuse = vMtrlDiffuse + g_fWhiteColorDiffuse + g_fOverPowerColor;
     Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
     Out.vMRA = vector(0.f, 1.f, 1.f, 1.f);
     
     if (g_bStencil == true)
@@ -207,6 +207,30 @@ PS_OUT FOR_KIRBY_PS_MAIN(PS_IN In)
 
     return Out;
 }
+
+PS_OUT FOR_FINALEKIRBY_PS_MAIN(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord);
+    if (0.3f >= vMtrlDiffuse.a)
+        discard;
+
+    Out.vDiffuse = vMtrlDiffuse + g_fWhiteColorDiffuse + g_fOverPowerColor;
+    Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
+    Out.vMRA = vector(0.f, 0.3f, 1.f, 1.f);
+    
+    if (g_bStencil == true)
+        Out.vStencil = vector(1.f, 0.f, 0.0f, 1.f);
+    if (g_bRimLight == true)
+        Out.vRimLight = vector(0.f, m_fRimWidth, 1.f, 1.f);
+    if (g_bMotionBlur == true)
+        Out.vMotionBlur = g_vMotionVelocity;
+
+    return Out;
+}
+
 
 PS_OUT FOR_KIRBY_PS_HAMMER_MAIN(PS_IN In)
 {
@@ -226,7 +250,7 @@ PS_OUT FOR_KIRBY_PS_HAMMER_MAIN(PS_IN In)
 
     Out.vDiffuse = vMtrlDiffuse + g_fWhiteColorDiffuse + g_fOverPowerColor;
     Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
     Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
     if (Out.vMRA.z == 0)
         Out.vMRA.z = 0.001f;
@@ -243,8 +267,6 @@ PS_OUT FOR_KIRBY_PS_HAMMER_MAIN(PS_IN In)
     return Out;
 }
 
-
-
 PS_OUT FOR_MOUTH_PS_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
@@ -255,7 +277,7 @@ PS_OUT FOR_MOUTH_PS_MAIN(PS_IN In)
 
     Out.vDiffuse = vMtrlDiffuse + g_fWhiteColorDiffuse;
     Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
     Out.vMRA = vector(0.f, 1.f, 1.f, 1.f);
     
     if (g_bStencil == true)
@@ -282,7 +304,7 @@ PS_OUT FOR_KIRBYMOUTH_PS_MAIN(PS_IN In)
 
     Out.vDiffuse = vMtrlDiffuse + g_fWhiteColorDiffuse + g_fOverPowerColor;
     Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
     Out.vMRA = vector(0.f, 1.f, 1.f, 1.f);
     
     if (g_bStencil == true)
@@ -299,7 +321,6 @@ PS_OUT FOR_KIRBYMOUTH_PS_MAIN(PS_IN In)
 
 }
 
-
 PS_OUT FOR_EYE_PS_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
@@ -310,7 +331,7 @@ PS_OUT FOR_EYE_PS_MAIN(PS_IN In)
 
     Out.vDiffuse = vMtrlDiffuse + g_fWhiteColorDiffuse;
     Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
     Out.vMRA = vector(0.f, 1.f, 1.f, 1.f);
 
   
@@ -337,7 +358,7 @@ PS_OUT FOR_KIRBYEYE_PS_MAIN(PS_IN In)
 
     Out.vDiffuse = vMtrlDiffuse + g_fWhiteColorDiffuse + g_fOverPowerColor;
     Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
     Out.vMRA = vector(0.f, 1.f, 1.f, 1.f);
 
   
@@ -353,7 +374,6 @@ PS_OUT FOR_KIRBYEYE_PS_MAIN(PS_IN In)
     return Out;
 
 }
-
 
 PS_OUT_LIGHTDEPTH PS_MAIN_LIGHTDEPTH(PS_IN In)
 {
@@ -375,7 +395,6 @@ PS_OUT_LIGHTDEPTH PS_MAIN_DEFERREDINFO(PS_IN In)
     Out.vLightDepth = float4(0.f, 1.f, 0.f, 1.f);
     return Out;
 }
-
 
 PS_OUT_EFFECT PS_MAIN_BLUR(PS_IN In)
 {
@@ -435,7 +454,7 @@ PS_OUT PS_MAIN_NEARCLIP(PS_IN In)
 
     Out.vDiffuse = vMtrlDiffuse + g_fWhiteColorDiffuse;
     Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
     Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
     if (Out.vMRA.z == 0)
         Out.vMRA.z = 0.001f;
@@ -470,7 +489,7 @@ PS_OUT PS_LINEAR_NORMAL_O(PS_IN In)
 
     Out.vDiffuse = vMtrlDiffuse + g_fWhiteColorDiffuse;
     Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
     Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
     if (Out.vMRA.z == 0)
         Out.vMRA.z = 0.001f;
@@ -484,6 +503,19 @@ PS_OUT PS_LINEAR_NORMAL_O(PS_IN In)
     if (g_bMotionBlur == true)
         Out.vMotionBlur = g_vMotionVelocity;
 
+    return Out;
+}
+
+PS_OUT_EFFECT PS_ALPHABLEND(PS_IN In)
+{
+    PS_OUT_EFFECT Out = (PS_OUT_EFFECT) 0;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord);
+    if (0.0f >= vMtrlDiffuse.a)
+        discard;
+
+    Out.vColor = vMtrlDiffuse;
+    Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
     return Out;
 }
 
@@ -680,5 +712,31 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 FOR_KIRBY_PS_HAMMER_MAIN();
     }
 
+    // 피날레 커비 실험용 ( 14 )
+    pass For_FinaleKirby_Weapons
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 FOR_FINALEKIRBY_PS_MAIN();
+    }
+
+    // 알파블렌딩 (14)
+    pass AlphaBlend
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_ALPHABLEND();
+    }
 }

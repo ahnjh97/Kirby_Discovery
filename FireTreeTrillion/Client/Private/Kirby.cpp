@@ -27,6 +27,8 @@
 
 #include "Ability.h"
 
+#include "Light.h"
+
 
 
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -74,6 +76,18 @@ HRESULT CKirby::Initialize(void* pArg)
 	m_pControllerCom->RegisterAsPlayer();
 	Set_WeaponAnim(3);
 
+	//LIGHT_DESC			LightDesc{};
+	//LightDesc.eType = LIGHT_DESC::TYPE_POINT;
+	//LightDesc.vPosition = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+	//LightDesc.fRange = 5.f;
+	//LightDesc.vDiffuse = _float4(.5f, 0.5f, 0.5f, 1.f);
+	//LightDesc.vAmbient = _float4(.5f, .5f, .5f, 1.f);
+	//LightDesc.vSpecular = _float4(0.f, 0.f, 0.0f, 1.f);
+	//if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
+	//	 return E_FAIL;
+	//m_pLight = CGameInstance::Get_Instance()->Get_LightLastAddress();
+	//Safe_AddRef(m_pLight);
+
 	return S_OK;
 }
 
@@ -81,6 +95,10 @@ _int CKirby::Tick(_float fTimeDelta)
 {
 	if (m_bDead == true)
 		return OBJ_DEAD;
+
+	//if (m_pLight != nullptr)
+	//	m_pLight->Update_LightPos(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
+
 
 	m_fTimeDelta = m_pGameInstance->Get_FirstTimer();
 	HitStop_System(fTimeDelta);
@@ -1834,5 +1852,6 @@ void CKirby::Free()
 		Safe_Release(Glow);
 	m_OrbitGlows.clear();
 
+	//Safe_Release(m_pLight);
 }
 

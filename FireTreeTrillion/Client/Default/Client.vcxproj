@@ -185,8 +185,8 @@
     <ClInclude Include="..\public\BattleDee.h" />
     <ClInclude Include="..\Public\Baum.h" />
     <ClInclude Include="..\Public\BaumPiece.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\Public\BG.h" />
     <ClInclude Include="..\Public\BladeKnight.h" />
@@ -196,6 +196,7 @@
     <ClInclude Include="..\Public\BombOrbit.h" />
     <ClInclude Include="..\Public\BombOrbitGlow.h" />
     <ClInclude Include="..\Public\BossClone.h" />
+    <ClInclude Include="..\Public\BreakableBlock.h" />
     <ClInclude Include="..\Public\BreakableRock.h" />
     <ClInclude Include="..\Public\BreakableRockParticle.h" />
     <ClInclude Include="..\Public\BrontoBurt.h" />
@@ -219,6 +220,16 @@
     <ClInclude Include="..\public\DecoObject.h" />
     <ClInclude Include="..\Public\Level_Park.h" />
     <ClInclude Include="..\Public\Disaster_Master.h" />
+    <ClInclude Include="..\Public\FinaleBuildingPartical.h" />
+    <ClInclude Include="..\Public\FinalePartical.h" />
+    <ClInclude Include="..\Public\FinalePartical_Maker.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\public\FinaleRoadGrouper.h" />
+    <ClInclude Include="..\Public\PopStar_StarSmall.h" />
+    <ClInclude Include="..\Public\OriginCage.h" />
+    <ClInclude Include="..\Public\RoomGlass.h" />
     <ClInclude Include="..\Public\ShadowDeco.h" />
     <ClInclude Include="..\Public\DeeDeeDee.h" />
     <ClInclude Include="..\Public\DeeDeeDeeHammer.h" />
@@ -345,6 +356,7 @@
     <ClInclude Include="..\Public\TestModel.h" />
     <ClInclude Include="..\Public\TestModel_State.h" />
     <ClInclude Include="..\Public\TestTerrain.h" />
+    <ClInclude Include="..\Public\Throne.h" />
     <ClInclude Include="..\Public\tinyxml2.h" />
     <ClInclude Include="..\Public\ToolHelper.h" />
     <ClInclude Include="..\Public\Editor_UI.h">
@@ -387,8 +399,8 @@
     <ClCompile Include="..\private\BattleDee.cpp" />
     <ClCompile Include="..\Private\Baum.cpp" />
     <ClCompile Include="..\Private\BaumPiece.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\Private\BG.cpp" />
     <ClCompile Include="..\Private\BladeKnight.cpp" />
@@ -399,6 +411,7 @@
     <ClCompile Include="..\Private\BombOrbitGlow.cpp" />
     <ClCompile Include="..\Private\BossClone.cpp" />
     <ClCompile Include="..\Private\Box.cpp" />
+    <ClCompile Include="..\Private\BreakableBlock.cpp" />
     <ClCompile Include="..\Private\BreakableRock.cpp" />
     <ClCompile Include="..\Private\BreakableRockParticle.cpp" />
     <ClCompile Include="..\Private\BrontoBurt.cpp" />
@@ -421,6 +434,17 @@
     <ClCompile Include="..\private\DecoObject.cpp" />
     <ClCompile Include="..\Private\Level_Park.cpp" />
     <ClCompile Include="..\Private\Disaster_Master.cpp" />
+    <ClCompile Include="..\Private\FinaleBuildingPartical.cpp" />
+    <ClCompile Include="..\Private\FinalePartical.cpp" />
+    <ClCompile Include="..\Private\FinalePartical_Maker.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\private\FinaleRoadGrouper.cpp" />
+    <ClCompile Include="..\Private\KirbyBoom_State.cpp" />
+    <ClCompile Include="..\Private\PopStar_StarSmall.cpp" />
+    <ClCompile Include="..\Private\OriginCage.cpp" />
+    <ClCompile Include="..\Private\RoomGlass.cpp" />
     <ClCompile Include="..\Private\ShadowDeco.cpp" />
     <ClCompile Include="..\Private\DeeDeeDee.cpp" />
     <ClCompile Include="..\Private\DeeDeeDeeHammer.cpp" />
@@ -544,6 +568,7 @@
     <ClCompile Include="..\Private\TestModel.cpp" />
     <ClCompile Include="..\Private\TestModel_State.cpp" />
     <ClCompile Include="..\Private\TestTerrain.cpp" />
+    <ClCompile Include="..\Private\Throne.cpp" />
     <ClCompile Include="..\Private\tinyxml2.cpp" />
     <ClCompile Include="..\Private\ToolHelper.cpp" />
     <ClCompile Include="..\Private\Editor_UI.cpp">
@@ -562,7 +587,6 @@
     <ClCompile Include="..\Private\UI_PartTimeResult.cpp" />
     <ClCompile Include="..\private\WaddleDee.cpp" />
     <ClCompile Include="..\Private\WasteCan.cpp" />
-    <ClCompile Include="..\Public\KirbyBoom_State.cpp" />
     <ClCompile Include="CKirbyDump_State.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="stdafx.cpp">

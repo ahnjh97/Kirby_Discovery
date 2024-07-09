@@ -148,6 +148,13 @@ HRESULT CGm_LabBossRoomDoor::Render_LightDepth()
 #ifdef _DEBUG
 void CGm_LabBossRoomDoor::Render_IMGUI()
 {
+	switch (m_eAnimState)
+	{
+	case STATE_WAIT:	ImGui::Text(u8"STATE_WAIT");	break;
+	case STATE_JOLT:	ImGui::Text(u8"STATE_JOLT");	break;
+	case STATE_BREAK:	ImGui::Text(u8"STATE_BREAK"); break;
+	case STATE_NONE:	default: ImGui::Text(u8"STATE_NONE"); break;
+	}
 }
 #endif
 
