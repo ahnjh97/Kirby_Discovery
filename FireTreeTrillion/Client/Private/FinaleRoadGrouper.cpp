@@ -3,7 +3,7 @@
 #include "FinaleRoad.h"
 #include "Camera_Main.h"
 #include "Effect.h"
-
+#include "FinalePartical_Maker.h"
 
 
 CFinaleRoadGrouper::CFinaleRoadGrouper(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -407,7 +407,6 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 		break;
 	}
 
-
 	return S_OK;
 }
 
@@ -439,6 +438,9 @@ _int CFinaleRoadGrouper::Tick(_float fTimeDelta)
 				if (nullptr != pCamera)
 					pCamera->Make_Shake(3.f, .8f);
 
+				CFinalePartical_Maker* pMaker = static_cast<CFinalePartical_Maker*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_FinalePartical_Maker")));
+				_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 50.f;
+				pMaker->Make_Partical(20, vPos, 5.f, 0.3f, 1.5f, _float4(0.f, 1.f, 0.f, 0.f), 120.f, CUtils::Make_RandomFloat(80.f, 120.f));
 
 				CEffect::FX_DESC FXDesc{};
 

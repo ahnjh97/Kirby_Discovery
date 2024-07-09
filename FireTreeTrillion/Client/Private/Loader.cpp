@@ -77,6 +77,7 @@
 #include "PoppyBomb.h"
 #include "CappyBody.h"
 #include "CappyHat.h"
+#include "Phanta.h"
 #include "SurprisedBoard.h"
 
 // 보스 몬스터
@@ -130,11 +131,17 @@
 #include "Box.h"
 #include "Debris.h"
 
+// Park Gimmick Objects
+#include "Crumble.h"
+
 // Simba Gimmick Objects
 #include "Turbine.h"
 #include "SimbaRoomGlass.h"
 #include "RoomGlass.h"
 #include "Throne.h"
+
+// Simba
+#include "Simba.h"
 
 // 피날레 스테이지 기믹들
 #include "Baum.h"
@@ -153,6 +160,7 @@
 //기믹
 #include "Gm_LabAntenna.h"
 #include "Gm_LabBossRoomDoor.h"
+#include "Gm_ParkFhEntranceAlien.h"
 
 //UI
 #include "BackGround.h"
@@ -392,8 +400,10 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PoppyBomb"), CPoppyBomb);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CappyBody"), CCappyBody);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CappyHat"), CCappyHat);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Phanta"), CPhanta);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SurprisedBoard"), CSurprisedBoard);
-
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Crumble"), CCrumble);
+	
 	// FinalBoss
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalBoss"), CFinalBoss);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalBossSpear"), CFinalBossSpear);
@@ -473,6 +483,13 @@ HRESULT CLoader::Loading_ObjectAll()
 
 	#pragma endregion
 
+	#pragma region GIMMICK::LEVEL_PARK
+
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_ParkFhEntranceAlien"), CGm_ParkFhEntranceAlien);
+
+	#pragma endregion
+
+
 	// 미니게임 in 와들디마을
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PartTimeFood"), CPartTimeFood);
 
@@ -481,6 +498,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SimbaRoomGlass"), CSimbaRoomGlass);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("RoomGlass"), CRoomGlass);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Throne"), CThrone);
+
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Simba"), CSimba);
 	#pragma endregion
 
 #pragma endregion
@@ -1016,7 +1035,7 @@ HRESULT CLoader::Loading_For_Simba()
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Moon", "Moon.png")))
 		return E_FAIL;
-	if (FAILED(Add_Texture(eLevel, "Level_0_Env", "Map/Level_0_Env.dds")))
+	if (FAILED(Add_Texture(eLevel, "Level_Simba_Env", "Map/Level_Simba_Env.dds")))
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "BRDF_LUT", "Map/BRDF_LUT.png")))
 		return E_FAIL;
@@ -1030,15 +1049,20 @@ HRESULT CLoader::Loading_For_Simba()
 	//HUD_BOSSHPBAR
 	hr = Add_Texture(eLevel, "HUD_BossBar", "UI/HUD/Boss/BossBar_%d.png", 5);
 
-#pragma region SKYSPHERE::LEVEL_FINALBOSS
+	if (FAILED(Add_Texture(eLevel, "SimbaEye_Diffuse", "SimbaEye/Eye_BaseColor%d.dds", 3)))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "SimbaEye_Normal", "SimbaEye/Eye_Normal%d.dds", 3)))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "SimbaEye_MRA", "SimbaEye/BaseMRA.dds")))
+		return E_FAIL;
 
+#pragma region SKYSPHERE::LEVEL_SIMBA
 	////FIELD
 	//hr = Add_Texture(eLevel, "SkySphere_Lab_CloudNoize", "SkySphere/SkySphere_Lab_CloudNoizeC_MRA.dds"); CHECK_FAILED(hr);
 	//hr = Add_Texture(eLevel, "SkySphere_Lab_Diffuse", "SkySphere/SkySphere_Lab_Diffuse_%d.dds", 3);	CHECK_FAILED(hr);
 	//hr = Add_Texture(eLevel, "SkySphere_LabBoss_2Pase_Normal", "SkySphere/SkySphere_LabBoss_2Pase_Normal.dds");	CHECK_FAILED(hr);
 	//hr = Add_Texture(eLevel, "SkySphere_LabBoss_2Pase_Emissive", "SkySphere/SkySphere_LabBoss_2Pase_Emissive.dds");	CHECK_FAILED(hr);
 	//hr = Add_Texture(eLevel, "SkySphere_LabBoss_2Pase_Height", "SkySphere/SkySphere_LabBoss_2Pase_Height.dds");	CHECK_FAILED(hr);
-
 #pragma endregion
 
 	// 커비 얼굴 텍스쳐 로드
@@ -1864,6 +1888,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		//기믹 오브젝트
 		m_vecModelInfo.emplace_back("FhEntranceAlien_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("FhEntranceAlien_NonAnim", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+
 		m_vecModelInfo.emplace_back("WarpStar_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("SolarPanelOnce_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("SolarPanelCharge_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
@@ -1880,10 +1906,13 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("DumpCar", TYPE_ANIM, 0.8f, 90.f);
 
 		// Monster
+		m_vecModelInfo.emplace_back("Phanta", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("SurprisedBoardBlue", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("SurprisedBoardGreen", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("SurprisedBoardRed", TYPE_ANIM, 1.f, 180.f);
 
+		// Gimmick
+		m_vecModelInfo.emplace_back("Crumble", TYPE_ANIM);
 	}
 	else if (eLevel == LEVEL_SIMBA)
 	{
@@ -1912,7 +1941,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		Load_KirbyArmourModels();
 
 		// For Boss 
-		
+		m_vecModelInfo.emplace_back("Simba", TYPE_ANIM, 1.f, 180.f);
 
 		// For Item
 		Load_ItemModels();
@@ -2146,6 +2175,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_ANIM, 1.3f, 0.f);
 		m_vecModelInfo.emplace_back("FinalBoss", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("FinalBossSpear", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("Phanta", TYPE_ANIM, 1.f, 180.f);
 
 		m_vecModelInfo.emplace_back("FinaleBoss", TYPE_ANIM, 1.f, 180.f);
 		// Boss
@@ -2160,6 +2190,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("SurprisedBoardRed", TYPE_ANIM, 1.f, 0.f);
 
 		m_vecModelInfo.emplace_back("BreakableBlock", TYPE_ANIM, 0.5f, 0.f, 0);
+		m_vecModelInfo.emplace_back("Crumble", TYPE_ANIM);
 	}
 }
 
@@ -2473,6 +2504,7 @@ void CLoader::Load_KirbyBodyModels()
 	m_vecModelInfo.emplace_back("KirbyHammerDefault", TYPE_ANIM, 1.f, 180.f);
 	m_vecModelInfo.emplace_back("KirbyDumpDefault", TYPE_ANIM, 0.8f, 180.f);
 	m_vecModelInfo.emplace_back("KirbyDumpVacuum", TYPE_ANIM, 0.8f);
+	m_vecModelInfo.emplace_back("KirbyDumpCut", TYPE_ANIM, 0.8f, 180.f);
 
 }
 

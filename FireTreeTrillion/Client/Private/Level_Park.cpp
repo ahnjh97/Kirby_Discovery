@@ -26,11 +26,15 @@ CLevel_Park::CLevel_Park(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 HRESULT CLevel_Park::Initialize()
 {
-	m_pGameInstance->Set_RenderMode(CRenderer::MODE_GAMEPLAY);
+	m_pGameInstance->Set_RenderMode(CRenderer::MODE_TOOL);
 
 	HRESULT hr;
 	hr = __super::Initialize();
 	CHECK_FAILED(hr);
+
+	// 환경맵을 추가한다.
+	if (FAILED(Add_EnvMap()))
+		return E_FAIL;
 
 	hr = Ready_Lights();
 	CHECK_FAILED(hr);
@@ -70,6 +74,18 @@ HRESULT CLevel_Park::Initialize()
 	
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 	m_pGameInstance->Set_ColorSet_ByIndex(5);
+
+
+	// 해당 위치의 행렬을 넘긴다.
+	//surprisedDesc.matWorld = transformationMatrix;
+	//surprisedDesc.eColor = CSurprisedBoard::RED;
+	//surprisedDesc.eStartState = CSurprisedBoard::WAIT_L;
+	//surprisedDesc.vPosition = _float3(32.f, 5.1f, -92.f);//21.39f, 5.08f, -87.56f);
+	//hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
+	//CHECK_FAILED(hr);
+
+
+
 	return S_OK;
 }
 
@@ -467,6 +483,11 @@ HRESULT CLevel_Park::Ready_Monsters()
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_CappyBody"), &tempDesc)))
 				return E_FAIL;
 		}
+		else if (L"Phanta" == tempDesc.wstrModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Phanta"), &tempDesc)))
+				return E_FAIL;
+		}
 		else if (L"Kabu" == tempDesc.wstrModelName)
 		{
 			CKabu::KABU_DESC KabuDesc = {};
@@ -720,15 +741,9 @@ HRESULT CLevel_Park::Ready_Objects()
 
 #pragma region GIMMICK_OBJECT
 
-		if ("LbAntenna_NonAnim" == strModelName)
+		if ("FhEntranceAlien_NonAnim" == strModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_LabAntenna"), &tDesc)))
-				continue;
-		}
-
-		if ("LbBossRoomDoor_NonAnim" == strModelName)
-		{
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_LabBossRoomDoor"), &tDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_ParkFhEntranceAlien"), &tDesc)))
 				continue;
 		}
 
@@ -751,6 +766,11 @@ HRESULT CLevel_Park::Ready_UI()
 	return S_OK;
 }
 
+HRESULT CLevel_Park::Add_EnvMap()
+{
+	return S_OK;
+}
+
 CLevel_Park* CLevel_Park::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CLevel_Park* pInstance = new CLevel_Park(pDevice, pContext);
@@ -766,8 +786,11 @@ CLevel_Park* CLevel_Park::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 
 void CLevel_Park::Free()
 {
+	m_pGameInstance->Clear_EventCallBack();
 	__super::Free();
 
+	for (auto& tex : m_pEnvTexture)
+		Safe_Release(tex);
 }
 
 
