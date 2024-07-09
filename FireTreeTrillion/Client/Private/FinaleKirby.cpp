@@ -476,6 +476,11 @@ HRESULT CFinaleKirby::Add_Components()
         TEXT("Com_Model_DumpVacuum"), (CComponent**)&m_pModelCom[BODY_DUMPVACUUM]);
     CHECK_FAILED(hr);
 
+    // 커비의 Dump Cut 상태 모델
+    hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyDumpCut"),
+        TEXT("Com_Model_DumpCut"), (CComponent**)&m_pModelCom[BODY_DUMPCUT]);
+    CHECK_FAILED(hr);
+
 
 #pragma endregion
 

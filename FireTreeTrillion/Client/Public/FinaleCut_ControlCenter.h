@@ -23,7 +23,7 @@ public:
 	void			Set_CutScene(_uint iScene) { m_iCutScene = iScene; }
 
 private:
-	_uint					m_iCutScene = { 0 };
+	_uint					m_iCutScene = { 1 };
 	_float					m_fTimeDelta = { 0.f };
 
 public:

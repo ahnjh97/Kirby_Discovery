@@ -557,7 +557,7 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 		if (m_fRunTime > 1.35f)
 		{
-			pKirby->Change_State(CFinaleKirby::STATE_INHALESTART, 60.f, false, true, CFinaleKirby::BODY_VACUUM);
+			pKirby->Change_State(CFinaleKirby::STATE_INHALESTART, 60.f, false, false, CFinaleKirby::BODY_VACUUM);
 			CMultiEffect::MULTI_FX_DESC FXDesc{};
 			FXDesc.vInitPos = { 0.f, .6f, .4f };
 			FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
@@ -578,7 +578,7 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 		if (pKirby->isAnimFinish())
 		{
-			pKirby->Change_State(CFinaleKirby::STATE_INHALE, 50.f, false, true, CFinaleKirby::BODY_VACUUM);
+			pKirby->Change_State(CFinaleKirby::STATE_INHALE, 50.f, false, false, CFinaleKirby::BODY_VACUUM);
 		}
 	}
 	else if (pKirby->Get_State() == CFinaleKirby::STATE_INHALE)
@@ -588,7 +588,7 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 
 		if (pKirby->isAnimFinish())
-			pKirby->Change_State(CFinaleKirby::STATE_SUPERINHALESTART, 60.f, false, true, CFinaleKirby::BODY_VACUUM);
+			pKirby->Change_State(CFinaleKirby::STATE_SUPERINHALESTART, 60.f, false, false, CFinaleKirby::BODY_VACUUM);
 	}
 	else if (pKirby->Get_State() == CFinaleKirby::STATE_SUPERINHALESTART)
 	{
@@ -598,7 +598,7 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 		if (pKirby->isAnimFinish())
 		{
-			pKirby->Change_State(CFinaleKirby::STATE_VACUUM, 50.f, true, true, CFinaleKirby::BODY_VACUUM);
+			pKirby->Change_State(CFinaleKirby::STATE_VACUUM, 50.f, true, false, CFinaleKirby::BODY_VACUUM);
 		}
 
 	}
