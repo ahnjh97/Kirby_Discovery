@@ -39,7 +39,7 @@ HRESULT CRoomGlass::Initialize(void* pArg)
 		Add_Components(desc->wstrModelName);
 
 	m_bMotionBlur = false;
-	m_bRimLight = true;
+	m_bRimLight = false;
 	m_bStencil = true;
 
 	_uint iWrongMesh = m_pModelCom->Find_MeshIndex(string("MainGlass01M__GlassFrontC"));

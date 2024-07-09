@@ -2,8 +2,8 @@
     "DisplayTime": 0.12,
     "ElapsedyTime": 0.0,
     "FontPos": [
-        410.0,
-        725.0
+        390.0,
+        715.0 
     ],
     "FontRGBA": [
         0.168, 
@@ -19,8 +19,8 @@
         1.0,
         1.0
     ],
-    "FontTag": "Font_HUDSub_KR15",
-    "Level": 12,
+    "FontTag": "Font_Dialog_Boss_KR22spac10",
+    "Level": 14,
     "Messages": [
         "아름답지 않은가...? \n핑크색 불청객이여."
         , "하지만 이분은 아직 \n완전하지 못하시다... \n파편을 잃으셨기 때문이지."

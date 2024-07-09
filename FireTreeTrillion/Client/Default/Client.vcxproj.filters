@@ -547,6 +547,12 @@
     <Filter Include="02.GameObjects\Map\SimbaObjects\SimbaRoomGlass">
       <UniqueIdentifier>{ff31fade-0ffa-44ae-8397-2b4bf316491a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Phanta">
+      <UniqueIdentifier>{70c3c5fc-bbe3-4f64-9910-9f5f6c3fca0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Phanta\State">
+      <UniqueIdentifier>{90b696ec-e03b-4d92-a5e5-1f914b62ec97}</UniqueIdentifier>
+    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Monster\SurprisedBoard">
       <UniqueIdentifier>{2d4d87d4-16f0-421c-9139-7f0a183eccde}</UniqueIdentifier>
     </Filter>
@@ -576,6 +582,18 @@
     </Filter>
     <Filter Include="02.GameObjects\FinaleCut_ControlCenter">
       <UniqueIdentifier>{d924ae26-28e6-40af-8f42-f13ea9943530}</UniqueIdentifier>
+	</Filter>
+	<Filter Include="02.GameObjects\PhysXObject\MapObject\Crumble">
+      <UniqueIdentifier>{366fdf1d-19e9-414d-a2be-7baa585b0a58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Simba">
+      <UniqueIdentifier>{7a9549db-9d12-4407-9f7e-638ad80a7ef1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Simba\State">
+      <UniqueIdentifier>{1b55321b-4009-45c7-8ce3-87f841ff410e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Gimmick\Park_Wondaria">
+      <UniqueIdentifier>{27194b3b-3a4c-4942-8b16-645f028d9080}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1111,6 +1129,12 @@
     <ClInclude Include="..\Public\SimbaRoomGlass.h">
       <Filter>02.GameObjects\Map\SimbaObjects\SimbaRoomGlass</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Phanta.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Phanta</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Phanta_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Phanta\State</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\SurprisedBoard.h">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\SurprisedBoard</Filter>
     </ClInclude>
@@ -1152,6 +1176,16 @@
     </ClInclude>
     <ClInclude Include="..\Public\FinaleCut_ControlCenter.h">
       <Filter>02.GameObjects\FinaleCut_ControlCenter</Filter>
+	</ClInclude>
+	<ClInclude Include="..\Public\Simba.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Simba</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Simba_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Simba\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Crumble.h" />
+    <ClInclude Include="..\Public\Gm_ParkFhEntranceAlien.h">
+      <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1665,6 +1699,12 @@
     <ClCompile Include="..\Private\SimbaRoomGlass.cpp">
       <Filter>02.GameObjects\Map\SimbaObjects\SimbaRoomGlass</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Phanta.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Phanta</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Phanta_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Phanta\State</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\SurprisedBoard.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\SurprisedBoard</Filter>
     </ClCompile>
@@ -1709,6 +1749,16 @@
     </ClCompile>
     <ClCompile Include="..\Private\FinaleCut_ControlCenter.cpp">
       <Filter>02.GameObjects\FinaleCut_ControlCenter</Filter>
+	</ClCompile>
+	<ClCompile Include="..\Private\Simba.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Simba</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Simba_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Simba\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Crumble.cpp" />
+    <ClCompile Include="..\Private\Gm_ParkFhEntranceAlien.cpp">
+      <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

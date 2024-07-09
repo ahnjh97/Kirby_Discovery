@@ -806,7 +806,6 @@ void CLevel_Intro::Free()
 
 	for (auto& tex : m_pEnvTexture)
 		Safe_Release(tex);
-
 }
 
 HRESULT CLevel_Intro::Load_FileData(const string& _strFilePath, FILE_TYPE _eFileType, const wstring& _wstrLayerTag)

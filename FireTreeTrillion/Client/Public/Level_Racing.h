@@ -32,7 +32,7 @@ private:
 
 	HRESULT Add_EnvMap();
 	enum TEXTURETYPE { TYPE_ENV, TYPE_LUT, TYPE_NORMAL, TYPE_END };
-	CTexture* m_pEnvTexture[TYPE_END] = { nullptr };
+	CTexture* m_pEnvTexture[TYPE_END] = { nullptr, nullptr, nullptr };
 
 public:
 	static CLevel_Racing* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

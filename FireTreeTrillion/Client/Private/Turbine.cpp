@@ -32,7 +32,7 @@ HRESULT CTurbine::Initialize(void* pArg)
 		Add_Components(desc->wstrModelName);
 
 	m_bMotionBlur = false;
-	m_bRimLight = true;
+	m_bRimLight = false;
 	m_bStencil = true;
 
 	m_pModelCom->Set_Animation(0, 50.f, true, false);
