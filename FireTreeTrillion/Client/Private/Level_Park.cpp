@@ -70,6 +70,18 @@ HRESULT CLevel_Park::Initialize()
 	
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 	m_pGameInstance->Set_ColorSet_ByIndex(5);
+
+
+	// 해당 위치의 행렬을 넘긴다.
+	//surprisedDesc.matWorld = transformationMatrix;
+	//surprisedDesc.eColor = CSurprisedBoard::RED;
+	//surprisedDesc.eStartState = CSurprisedBoard::WAIT_L;
+	//surprisedDesc.vPosition = _float3(32.f, 5.1f, -92.f);//21.39f, 5.08f, -87.56f);
+	//hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
+	//CHECK_FAILED(hr);
+
+
+
 	return S_OK;
 }
 

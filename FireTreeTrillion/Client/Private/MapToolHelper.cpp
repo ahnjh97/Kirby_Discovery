@@ -108,7 +108,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 	m_vecLevelName = { "Level_Static", "Level_Loading", "Level_Logo", "GamePlay",
 			"Level_Tool_UI", "Level_Tool_FX", "Level_Tool_Anim", "Level_Tool_Map",
-		"PartTime", "Intro", "Racing", "DeeDeeDee", "Town", "Simba", "FinalBoss", "Finale", "Level_End" };
+		"PartTime", "Intro", "Racing", "DeeDeeDee", "Town", "Park", "Simba", "FinalBoss", "Finale", "Level_End" };
 
 #pragma region BASIC MAP
 
@@ -1911,7 +1911,7 @@ void CMapToolHelper::FilterListBoxStrings(const _char* _filterBuf, vector<const 
 
 _bool CMapToolHelper::CheckEnumStrings()
 {
-	if (LEVEL_END - LEVEL_INTRO != 7)
+	if (LEVEL_END - LEVEL_INTRO != 8)
 		return false;
 	if (LEVEL_RACING != LEVEL_INTRO + 1)
 		return false;
@@ -1919,7 +1919,9 @@ _bool CMapToolHelper::CheckEnumStrings()
 		return false;
 	if (LEVEL_TOWN != LEVEL_DEEDEEDEE + 1)
 		return false;
-	if (LEVEL_SIMBA != LEVEL_TOWN + 1)
+	if (LEVEL_PARK != LEVEL_TOWN + 1)
+		return false;
+	if (LEVEL_SIMBA != LEVEL_PARK + 1)
 		return false;
 	if (LEVEL_FINALBOSS != LEVEL_SIMBA + 1)
 		return false;
