@@ -77,6 +77,7 @@
 #include "PoppyBomb.h"
 #include "CappyBody.h"
 #include "CappyHat.h"
+#include "Phanta.h"
 
 // 보스 몬스터
 #include "FinalBoss.h"
@@ -374,6 +375,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PoppyBomb"), CPoppyBomb);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CappyBody"), CCappyBody);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CappyHat"), CCappyHat);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Phanta"), CPhanta);
 
 	// FinalBoss
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalBoss"), CFinalBoss);
@@ -1818,6 +1820,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// Deform
 		m_vecModelInfo.emplace_back("DumpCar", TYPE_ANIM, 0.8f, 90.f);
+
+		// Monster
+		m_vecModelInfo.emplace_back("Phanta", TYPE_ANIM, 1.f, 180.f);
 	}
 	else if (eLevel == LEVEL_SIMBA)
 	{
@@ -2063,6 +2068,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_ANIM, 1.3f, 0.f);
 		m_vecModelInfo.emplace_back("FinalBoss", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("FinalBossSpear", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("Phanta", TYPE_ANIM, 1.f, 180.f);
 
 		// Boss
 		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 180.f);

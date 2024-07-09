@@ -519,8 +519,8 @@
     </Filter>
     <Filter Include="01.Levels\5. Park">
       <UniqueIdentifier>{b7bfcb13-2e50-4821-b899-af7cb6e3737a}</UniqueIdentifier>
-	</Filter>
-	<Filter Include="02.GameObjects\Map\Baum">
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Baum">
       <UniqueIdentifier>{05ab6fbc-cc3d-448f-972e-09c450a5189e}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Map\Baum\Baum">
@@ -537,6 +537,12 @@
     </Filter>
     <Filter Include="02.GameObjects\Map\SimbaObjects\SimbaRoomGlass">
       <UniqueIdentifier>{ff31fade-0ffa-44ae-8397-2b4bf316491a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Phanta">
+      <UniqueIdentifier>{70c3c5fc-bbe3-4f64-9910-9f5f6c3fca0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Phanta\State">
+      <UniqueIdentifier>{90b696ec-e03b-4d92-a5e5-1f914b62ec97}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1062,8 +1068,8 @@
     </ClInclude>
     <ClInclude Include="..\Public\Level_Park.h">
       <Filter>01.Levels\5. Park</Filter>
-	</ClInclude>
-	<ClInclude Include="..\Public\Baum.h">
+    </ClInclude>
+    <ClInclude Include="..\Public\Baum.h">
       <Filter>02.GameObjects\Map\Baum\Baum</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BaumPiece.h">
@@ -1077,6 +1083,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\SimbaRoomGlass.h">
       <Filter>02.GameObjects\Map\SimbaObjects\SimbaRoomGlass</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Phanta.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Phanta</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Phanta_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Phanta\State</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1583,8 +1595,8 @@
     </ClCompile>
     <ClCompile Include="..\Private\Level_Park.cpp">
       <Filter>01.Levels\5. Park</Filter>
-	</ClCompile>
-	<ClCompile Include="..\Private\Baum.cpp">
+    </ClCompile>
+    <ClCompile Include="..\Private\Baum.cpp">
       <Filter>02.GameObjects\Map\Baum\Baum</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BaumPiece.cpp">
@@ -1598,6 +1610,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\SimbaRoomGlass.cpp">
       <Filter>02.GameObjects\Map\SimbaObjects\SimbaRoomGlass</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Phanta.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Phanta</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Phanta_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Phanta\State</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

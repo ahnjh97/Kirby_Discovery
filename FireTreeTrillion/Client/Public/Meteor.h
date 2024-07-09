@@ -60,6 +60,7 @@ private:
 	_float	m_fIncreSpeed = { 0.f };
 	_float	m_fDecreSpeed = { 1.f };
 	_float	m_fMeteorSpeed = { 0.f };
+	_float			m_fWhiteColorDiffuse = { 0.f };
 
 	_uint	m_iDebrisCnt = { 0 };
 	_uint	m_iDebrsiMaxCnt = { 0 };

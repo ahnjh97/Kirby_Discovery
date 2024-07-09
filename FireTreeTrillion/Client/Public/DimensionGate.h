@@ -15,6 +15,7 @@ class CDimensionGate final : public CGameObject
 public:
 	struct DIMENSIONGATE_DESC : public CGameObject::GAMEOBJECT_DESC {
 		_bool	bSwitch = { false };
+		_bool	bCamera = { false };
 		_float	fScale = {};
 		_vector	vPosition = {};
 	};
@@ -43,9 +44,11 @@ private:
 	_float		m_fLifeTime = { 0.f };
 
 	_float		m_fScale = { 0.f };
+	_float			m_fWhiteColorDiffuse = { 0.f };
 
 	_bool		m_bSetAnim = { false };
 	_bool		m_bSwitch = { false };
+	_bool		m_bCamera = { false };
 
 	_vector		m_vPosition = {};
 

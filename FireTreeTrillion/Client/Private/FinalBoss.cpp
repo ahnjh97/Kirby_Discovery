@@ -61,37 +61,37 @@ HRESULT CFinalBoss::Initialize(void* pArg)
 	Make_TargetToCams();
 	Add_AnimEvent();
 
-	// 도랑 풀링
-	for (size_t i = 0; i < 120; i++)
-	{
-		HRESULT hr;
-		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Gully"), TEXT("Prototype_GameObject_Gully"));
-		CHECK_FAILED(hr);
+	//// 도랑 풀링
+	//for (size_t i = 0; i < 120; i++)
+	//{
+	//	HRESULT hr;
+	//	hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Gully"), TEXT("Prototype_GameObject_Gully"));
+	//	CHECK_FAILED(hr);
 
-		CGully* pGully = dynamic_cast<CGully*>(m_pGameInstance->Get_LastGameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Gully")));
-		m_vecGully.push_back(pGully);
-		Safe_AddRef(pGully);
-	}
+	//	CGully* pGully = dynamic_cast<CGully*>(m_pGameInstance->Get_LastGameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Gully")));
+	//	m_vecGully.push_back(pGully);
+	//	Safe_AddRef(pGully);
+	//}
 
-	// 파티클 풀링
-	for (_uint j = 0; j < 20; j++)
-	{
-		for (_uint i = 0; i < DEBRISCNT; i++)
-		{
-			HRESULT hr;
-			GAMEOBJECT_DESC tDesc{};
-			tDesc.wstrModelName = TEXT("TunnelRock") + to_wstring(i);
-			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_ParticleDebris"), TEXT("Prototype_GameObject_Debris"), &tDesc);
-			CHECK_FAILED(hr);
+	//// 파티클 풀링
+	//for (_uint j = 0; j < 20; j++)
+	//{
+	//	for (_uint i = 0; i < DEBRISCNT; i++)
+	//	{
+	//		HRESULT hr;
+	//		GAMEOBJECT_DESC tDesc{};
+	//		tDesc.wstrModelName = TEXT("TunnelRock") + to_wstring(i);
+	//		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_ParticleDebris"), TEXT("Prototype_GameObject_Debris"), &tDesc);
+	//		CHECK_FAILED(hr);
 
 
-			CDebris* pDebris = dynamic_cast<CDebris*>(m_pGameInstance->Get_LastGameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_ParticleDebris")));
-			m_vecDebris.push_back(pDebris);
-			Safe_AddRef(pDebris);
-		}
-	}
+	//		CDebris* pDebris = dynamic_cast<CDebris*>(m_pGameInstance->Get_LastGameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_ParticleDebris")));
+	//		m_vecDebris.push_back(pDebris);
+	//		Safe_AddRef(pDebris);
+	//	}
+	//}
 
-	HRESULT hr;
+	/*HRESULT hr;
 	GAMEOBJECT_DESC tDesc{};
 	tDesc.wstrModelName = TEXT("TunnelRock") + to_wstring(17);
 	hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_ParticleDebris"), TEXT("Prototype_GameObject_Debris"), &tDesc);
@@ -99,7 +99,7 @@ HRESULT CFinalBoss::Initialize(void* pArg)
 
 	CDebris* pMagneticDebris = dynamic_cast<CDebris*>(m_pGameInstance->Get_LastGameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_ParticleDebris")));
 	m_vecMagneticDebris.push_back(pMagneticDebris);
-	Safe_AddRef(pMagneticDebris);
+	Safe_AddRef(pMagneticDebris);*/
 
 	return S_OK;
 }
@@ -142,67 +142,81 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 	else
 		m_fGlideTime = 0.f;
 
-	//풀링임
-	if (true == m_bGully)
-	{
-		//m_fGullyTime += m_fTimeDelta;
+	////풀링임
+	//if (true == m_bGully)
+	//{
+	//	//m_fGullyTime += m_fTimeDelta;
 
-		if (false == m_bShake)
-		{
-			m_fTimeDelay = 0.8f;
-			m_bShake = true;
-			CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
-			if (pCamera != nullptr)
-				pCamera->Make_Shake(1.f, 1.f);
-		}
+	//	if (false == m_bShake)
+	//	{
+	//		m_fTimeDelay = 0.8f;
+	//		m_bShake = true;
+	//		CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+	//		if (pCamera != nullptr)
+	//			pCamera->Make_Shake(1.f, 1.f);
+	//	}
 
-		//if(0.1f < m_fGullyTime)
-		//{
-			//m_fGullyTime = 0.f;
+	//	//if(0.1f < m_fGullyTime)
+	//	//{
+	//		//m_fGullyTime = 0.f;
 
-		// 쟁기질
-		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 0.8f;
-		vPos.m128_f32[1] = 0.f;
-		m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f);
-		++m_iGullyCnt;
-		vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 0.8f;
+	//	// 쟁기질
+	//	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 0.8f;
+	//	vPos.m128_f32[1] = 0.f;
+	//	m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f);
+	//	++m_iGullyCnt;
+	//	vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 0.8f;
 
-		vPos.m128_f32[1] = 0.f;
-		m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f);
-		++m_iGullyCnt;
-		if (m_vecGully.size() <= m_iGullyCnt)
-			m_iGullyCnt = 0;
+	//	vPos.m128_f32[1] = 0.f;
+	//	m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f);
+	//	++m_iGullyCnt;
+	//	if (m_vecGully.size() <= m_iGullyCnt)
+	//		m_iGullyCnt = 0;
 
-		vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-		vPos.m128_f32[1] -= 6.f;
+	//	vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	//	vPos.m128_f32[1] -= 6.f;
 
-		if (m_vecDebris.size() > m_iDebrsiMaxCnt)
-			m_iDebrsiMaxCnt += DEBRISCNT;
-		else
-		{
-			m_iDebrsiMaxCnt = DEBRISCNT;
-			m_iDebrisCnt = 0;
-		}
+	//	// 파편 파티클 튀는거 
+	//	if (m_vecDebris.size() > m_iDebrsiMaxCnt)
+	//		m_iDebrsiMaxCnt += DEBRISCNT;
+	//	else
+	//	{
+	//		m_iDebrsiMaxCnt = DEBRISCNT;
+	//		m_iDebrisCnt = 0;
+	//	}
 
-		// 파티클 살리기
-		for (m_iDebrisCnt; m_iDebrisCnt < m_iDebrsiMaxCnt; ++m_iDebrisCnt)
-			m_vecDebris[m_iDebrisCnt]->Set_ParticleDebris(vPos);
+	//	// 파편 파티클 살리기
+	//	for (m_iDebrisCnt; m_iDebrisCnt < m_iDebrsiMaxCnt; ++m_iDebrisCnt)
+	//		m_vecDebris[m_iDebrisCnt]->Set_ParticleDebris(vPos);
 
-		//}
-	}
-	else
-	{
-		m_fTimeDelay = 1.f;
-		m_bShake = false;
-	}
+	//	//}
+	//}
+	//else
+	//{
+	//	m_fTimeDelay = 1.f;
+	//	m_bShake = false;
+	//}
 
-	if (true == m_bEffect)
-	{
-		m_bEffect = false;
-		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
-		vPos.m128_f32[1] -= 0.5f;
-		m_vecMagneticDebris[0]->Set_ParticleEffect(XMVectorSetW(vPos, 1.f), 2.5f);
-	}
+	//if (true == m_bEffect)
+	//{
+	//	m_bEffect = false;
+	//	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
+	//	vPos.m128_f32[1] -= 0.5f;
+	//	m_vecMagneticDebris[0]->Set_ParticleEffect(XMVectorSetW(vPos, 1.f), 2.5f);
+
+	//	// 파편 파티클 튀는거 
+	//	if (m_vecDebris.size() > m_iDebrsiMaxCnt)
+	//		m_iDebrsiMaxCnt += DEBRISCNT;
+	//	else
+	//	{
+	//		m_iDebrsiMaxCnt = DEBRISCNT;
+	//		m_iDebrisCnt = 0;
+	//	}
+
+	//	// 파편 파티클 살리기
+	//	for (m_iDebrisCnt; m_iDebrisCnt < m_iDebrsiMaxCnt; ++m_iDebrisCnt)
+	//		m_vecDebris[m_iDebrisCnt]->Set_ParticleDebris(vPos, 1.f, _float2(5.f , 10.f));
+	//}
 
 	__super::Tick(m_fTimeDelta);
 

@@ -1,59 +1,57 @@
 #include "stdafx.h"
-#include "PoppyBrosJr.h"
+#include "Phanta.h"
 #include "FSM.h"
-#include "PoppyBrosJr_State.h"
-#include "Bone.h"
 #include "HitBox.h"
+#include "Phanta_State.h"
 
-CPoppyBrosJr::CPoppyBrosJr(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CPhanta::CPhanta(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
 {
 }
 
-CPoppyBrosJr::CPoppyBrosJr(const CPoppyBrosJr& rhs)
+CPhanta::CPhanta(const CPhanta& rhs)
 	: CMonster{ rhs }
 {
 }
 
-HRESULT CPoppyBrosJr::Initialize_Prototype()
+HRESULT CPhanta::Initialize_Prototype()
 {
 	m_eCollisionGroup = MONSTER;
 
 	return S_OK;
 }
 
-HRESULT CPoppyBrosJr::Initialize(void* pArg)
+HRESULT CPhanta::Initialize(void* pArg)
 {
-	POPPY_DESC* pPoppySDesc = nullptr;
+	PHANTA_DESC* pPhantaDesc = nullptr;
 
 	if (nullptr != pArg)
 	{
-		pPoppySDesc = (POPPY_DESC*)pArg;
+		pPhantaDesc = (PHANTA_DESC*)pArg;
 
-		pPoppySDesc->fSpeedPerSec = 7.f;
-		pPoppySDesc->fRotationPerSec = XMConvertToRadians(90.0f);
-		m_ePoppyState = pPoppySDesc->ePoppyState;
+		pPhantaDesc->fSpeedPerSec = 7.f;
+		pPhantaDesc->fRotationPerSec = XMConvertToRadians(90.0f);
 	}
 
-	if (FAILED(__super::Initialize(pPoppySDesc)))
+	if (FAILED(__super::Initialize(pPhantaDesc)))
 		return E_FAIL;
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	m_pModelCom->Set_Animation(POPPY_ENEMYWAIT2, 50.f, true, true);
+	m_pModelCom->Set_Animation(PHANTA_APPEAR, 50.f, false, true);
 
 
-	m_fMaxHp = 10.f;
-	m_fHp = 10.f;
+	m_fMaxHp = 5.f;
+	m_fHp = 5.f;
 	m_fAttack = 10.f;
 	m_eVacuumSize = SIZE_SMALL;
-	m_eAbilityType = ABILITY_BOMB;
+	m_eAbilityType = ABILITY_DEFAULT;
 
 	return S_OK;
 }
 
-_int CPoppyBrosJr::Tick(_float fTimeDelta)
+_int CPhanta::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
 		return Ready_Dead();
@@ -74,13 +72,13 @@ _int CPoppyBrosJr::Tick(_float fTimeDelta)
 	__super::Tick(m_fTimeDelta);
 
 	if (m_ePhyXState == PO_VACUUMING || m_ePhyXState == PO_FLYDEADAWAY)
-		Change_State(POPPY_DAMAGE, 50.f, false, true);
+		Change_State(PHANTA_DAMAGE, 50.f, false, true);
 
 
 	return OBJ_NOEVENT;
 }
 
-void CPoppyBrosJr::Late_Tick(_float fTimeDelta)
+void CPhanta::Late_Tick(_float fTimeDelta)
 {
 	// 커비 입 안에 있고, Fly가 아닐땐 입 안에 있는 상황이므로, Render되지않는다.
 	if (m_ePhyXState == PO_KIRBYMOUTH)
@@ -99,7 +97,7 @@ void CPoppyBrosJr::Late_Tick(_float fTimeDelta)
 	}
 }
 
-HRESULT CPoppyBrosJr::Render()
+HRESULT CPhanta::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
@@ -108,9 +106,6 @@ HRESULT CPoppyBrosJr::Render()
 
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
-		//if (Custom_Face(i) == true)
-		//	continue;
-
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
@@ -131,7 +126,7 @@ HRESULT CPoppyBrosJr::Render()
 	return S_OK;
 }
 
-HRESULT CPoppyBrosJr::Render_LightDepth()
+HRESULT CPhanta::Render_LightDepth()
 {
 	if (FAILED(m_pGameInstance->Render_LightDepth_For_GameObject(m_pShaderCom, m_pTransformCom, m_pModelCom)))
 		return E_FAIL;
@@ -140,7 +135,7 @@ HRESULT CPoppyBrosJr::Render_LightDepth()
 }
 
 #ifdef _DEBUG
-void CPoppyBrosJr::Render_IMGUI()
+void CPhanta::Render_IMGUI()
 {
 	if (ImGui::TreeNode("Guizmo"))
 	{
@@ -166,13 +161,13 @@ void CPoppyBrosJr::Render_IMGUI()
 }
 #endif
 
-void CPoppyBrosJr::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
+void CPhanta::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
 	if (eContent == CCollisionCenter::CONTENT_BODY)
 	{
 		if (m_ePhyXState == PO_NORMAL)
 		{
-			Change_State(POPPY_DAMAGE, 50.f, false, true);
+			Change_State(PHANTA_DAMAGE, 50.f, false, true);
 		}
 	}
 	else if (eContent == CCollisionCenter::CONTENT_VACUUMOBJECT)
@@ -183,22 +178,22 @@ void CPoppyBrosJr::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObje
 	{
 		if (m_ePhyXState == PO_NORMAL)
 		{
-			Change_State(POPPY_DAMAGE, 50.f, false, true);
+			Change_State(PHANTA_DAMAGE, 50.f, false, true);
 		}
 	}
 }
 
-void CPoppyBrosJr::Change_State(POPPY_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CPhanta::Change_State(PHANTA_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
 {
 	m_pFSM->ChangeState((_uint)eState, _fAnimSpeed, _bLoop, _bInterpolation);
 }
 
-_bool CPoppyBrosJr::IsAnimFinished()
+_bool CPhanta::IsAnimFinished()
 {
 	return m_pModelCom->IsFinished();
 }
 
-HRESULT CPoppyBrosJr::Add_Components()
+HRESULT CPhanta::Add_Components()
 {
 	HRESULT hr;
 	/* For.Com_Shader */
@@ -207,23 +202,18 @@ HRESULT CPoppyBrosJr::Add_Components()
 	CHECK_FAILED(hr);
 
 	/* For.Com_Model */
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_PoppyBrosJr"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Phanta"),
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
 	// FOR ANIMTOOL
 	m_ppModelForAnimTool = &m_pModelCom;
 
-	///* For.Com_Texture */
-	//hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Buffahorn_Eye"),
-	//	TEXT("Com_Texture"), (CComponent**)&m_pEyeTextureCom);
-	//CHECK_FAILED(hr);
-
 	/* For.Com_CharacterController */
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
-	desc.fOffset = 0.8f;
+	desc.fOffset = 0.5f;
 	desc.tCapsuleShape.fHeight = 0.4f;
 	desc.tCapsuleShape.fHeight = 0.4f;
 	desc.uCollisionType = m_eCollisionGroup;
@@ -248,7 +238,7 @@ HRESULT CPoppyBrosJr::Add_Components()
 	return S_OK;
 }
 
-HRESULT CPoppyBrosJr::Bind_ShaderResources()
+HRESULT CPhanta::Bind_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
@@ -277,41 +267,34 @@ HRESULT CPoppyBrosJr::Bind_ShaderResources()
 	return S_OK;
 }
 
-void CPoppyBrosJr::SetUp_FSM()
+void CPhanta::SetUp_FSM()
 {
 	// FSM 상태 초기화
 	m_pFSM = CFSM::Create();
 
 	//상태 Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};
-	m_pFSM->Add_State(POPPY_ENEMYWAIT2, CPoppyBrosJr_Idle_State::Create());
-	m_pFSM->Add_State(POPPY_THROW, CPoppyBrosJr_Attack_State::Create());
+	m_pFSM->Add_State(PHANTA_APPEAR, CPhanta_Idle_State::Create());
+	m_pFSM->Add_State(PHANTA_FLYINGFIND, CPhanta_Idle_State::Create());
 
-	m_pFSM->Add_State(POPPY_DAMAGE, CPoppyBrosJr_Damage_State::Create());
+	m_pFSM->Add_State(PHANTA_ATTACK, CPhanta_Move_State::Create());
 
-	FSM_Desc.iState = POPPY_ENEMYWAIT2;
+	m_pFSM->Add_State(PHANTA_DAMAGE, CPhanta_Damage_State::Create());
+
+	m_pFSM->Add_State(PHANTA_BRAKE, CPhanta_Brake_State::Create());
+
+	FSM_Desc.iState = PHANTA_APPEAR;
 	FSM_Desc.pModel = &m_pModelCom;
 	m_pFSM->Initialize(&FSM_Desc);
 }
 
-_float4 CPoppyBrosJr::Compute_BoneWorldMatrix()
+CPhanta* CPhanta::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	CBone* pBone = m_pModelCom->Get_BonePtr("RHaveL");
-
-	_float4x4 WorldMatrix = m_pTransformCom->Get_WorldFloat4x4();
-
-	XMStoreFloat4x4(&m_WorldMatrix, XMLoadFloat4x4(pBone->Get_CombinedTransformationMatrix()) * XMLoadFloat4x4(&WorldMatrix));
-
-	return _float4(m_WorldMatrix._41, m_WorldMatrix._42 + 1.5f, m_WorldMatrix._43, m_WorldMatrix._44);
-}
-
-CPoppyBrosJr* CPoppyBrosJr::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-{
-	CPoppyBrosJr* pInstance = new CPoppyBrosJr(pDevice, pContext);
+	CPhanta* pInstance = new CPhanta(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Create : CPoppyBrosJr"));
+		MSG_BOX(TEXT("Failed To Create : CPhanta"));
 
 		Safe_Release(pInstance);
 	}
@@ -319,20 +302,20 @@ CPoppyBrosJr* CPoppyBrosJr::Create(ID3D11Device* pDevice, ID3D11DeviceContext* p
 	return pInstance;
 }
 
-CGameObject* CPoppyBrosJr::Clone(void* pArg)
+CGameObject* CPhanta::Clone(void* pArg)
 {
-	CPoppyBrosJr* pInstance = new CPoppyBrosJr(*this);
+	CPhanta* pInstance = new CPhanta(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Clone : CPoppyBrosJr"));
+		MSG_BOX(TEXT("Failed To Clone : CPhanta"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CPoppyBrosJr::Free()
+void CPhanta::Free()
 {
 	__super::Free();
 }
