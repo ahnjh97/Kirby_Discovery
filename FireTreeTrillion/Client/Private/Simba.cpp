@@ -41,6 +41,7 @@ HRESULT CSimba::Initialize(void* pArg)
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;
+
 	m_pModelCom->Set_Animation(0, 1.f, true, true);
 	m_fMaxHp = 500.f;
 	m_fHp = 500.f;
@@ -117,7 +118,7 @@ HRESULT CSimba::Render()
 	if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", m_iEyeMesh)))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
+	if (FAILED(m_pShaderCom->Begin(ANIMMODEL_SIMBAEYE)))
 		return E_FAIL;
 	if (FAILED(m_pModelCom->Render(m_iEyeMesh)))
 		return E_FAIL;
