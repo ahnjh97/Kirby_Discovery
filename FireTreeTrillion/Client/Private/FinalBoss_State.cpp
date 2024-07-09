@@ -1486,6 +1486,7 @@ void CFinalBoss_Roar_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _fl
 void CFinalBoss_Roar_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
 	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(pGameObject);
+	CTransform* pTransform = pFinalBoss->Get_TransformCom();
 
 	if(0.35f < pFinalBoss->Get_AnimRatio())
 	{
@@ -1501,9 +1502,19 @@ void CFinalBoss_Roar_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 	if (true == pFinalBoss->IsAnimFinished())
 	{
+		HRESULT hr;
 		switch (pFinalBoss->Get_State())
 		{
 		case CFinalBoss::FINALBOSS_ROAR:
+			CDimensionGate::DIMENSIONGATE_DESC DimensionGateDesc = {};
+			_vector vPos = pTransform->Get_State_Vector(CTransform::STATE_POSITION);
+			_vector vLook = pTransform->Get_State_Vector(CTransform::STATE_LOOK);
+			DimensionGateDesc.vPosition = vPos - vLook * 80.f + XMVectorSet(0.f, 1.f, 0.f, 0.f) * 40.f;
+			DimensionGateDesc.fScale = 0.4f;
+			DimensionGateDesc.bSwitch = true;
+			DimensionGateDesc.bCamera = true;
+			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Gate"), TEXT("Prototype_GameObject_DimensionGate"), &DimensionGateDesc);
+			CHECK_FAILED(hr);
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SUMMONSTART, 50.f, false, true);
 			break;
 		}
