@@ -2497,7 +2497,7 @@ void CLoader::Load_KirbyBodyModels()
 	m_vecModelInfo.emplace_back("KirbyHammerDefault", TYPE_ANIM, 1.f, 180.f);
 	m_vecModelInfo.emplace_back("KirbyDumpDefault", TYPE_ANIM, 0.8f, 180.f);
 	m_vecModelInfo.emplace_back("KirbyDumpVacuum", TYPE_ANIM, 0.8f);
-	m_vecModelInfo.emplace_back("KirbyDumpCut", TYPE_ANIM, 0.8f, 180.f);
+	m_vecModelInfo.emplace_back("KirbyDumpCut", TYPE_ANIM, 0.8f);
 
 }
 

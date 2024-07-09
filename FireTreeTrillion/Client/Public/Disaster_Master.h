@@ -43,6 +43,8 @@ private:
 	_float				m_fAirParticleDelay = { 0.f };
 	_float				m_fBuildingParticleDelay = { 0.f };
 
+	_bool				m_bKirbyCutSceneStart = { false };
+
 
 public:
 	static CDisaster_Master* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -80,29 +80,55 @@ _int CDisaster_Master::Tick(_float fTimeDelta)
 
 	_float4 vKirbyPos = m_pKirby->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
 
-	if (m_pLight != nullptr)
+	if (m_bKirbyCutSceneStart == false)
 	{
-		_float4 vLightPos = vKirbyPos;
-		vLightPos.x += 50.f;
-		vLightPos.y += 40.f;
-		m_pLight->Update_LightPos(vLightPos);
-		m_pGameInstance->Update_LightShadow(vLightPos, vKirbyPos);
+		if (m_pLight != nullptr)
+		{
+			_float4 vLightPos = vKirbyPos;
+			vLightPos.x += 50.f;
+			vLightPos.y += 40.f;
+			m_pLight->Update_LightPos(vLightPos);
+			m_pGameInstance->Update_LightShadow(vLightPos, vKirbyPos);
+		}
+
+		if (vKirbyPos.x > 15.f)
+			m_fMakeBaumDelay += fTimeDelta;
+
+		m_fAirParticleDelay += fTimeDelta;
+		m_fBuildingParticleDelay += fTimeDelta;
+
+		// 헛방 바움을 생성한다.
+		Make_MissBaum();
+
+		// 공기 중에 날아댕기는 파티클을 구현하였다.
+		Make_AirParticle();
+
+		Moving_FinaleRoad(vKirbyPos.x);
+		Moving_TargetBaum(vKirbyPos.x);
+
+		if (vKirbyPos.x > 1550.f)
+		{
+			m_bKirbyCutSceneStart = true;
+
+
+			// 1틱 파편을 대량 생산,
+			// 1틱 건물을 대량 생산.
+		}
 	}
+	else if (m_bKirbyCutSceneStart == true)
+	{
+		if (m_pLight != nullptr)
+		{
+			_float4 vLightPos = vKirbyPos;
+			vLightPos.x += 50.f;
+			vLightPos.y += 40.f;
+			m_pLight->Update_LightPos(vLightPos);
+			m_pGameInstance->Update_LightShadow(vLightPos, vKirbyPos);
+		}
 
-	if (vKirbyPos.x > 15.f)
-		m_fMakeBaumDelay += fTimeDelta;
+		
 
-	m_fAirParticleDelay += fTimeDelta;
-	m_fBuildingParticleDelay += fTimeDelta;
-
-	// 헛방 바움을 생성한다.
-	Make_MissBaum();
-
-	// 공기 중에 날아댕기는 파티클을 구현하였다.
-	Make_AirParticle();
-
-	Moving_FinaleRoad(vKirbyPos.x);
-	Moving_TargetBaum(vKirbyPos.x);
+	}
 
 	return OBJ_NOEVENT;
 }

@@ -3,6 +3,7 @@
 #include "Kirby_State_Function.h"
 #include "FinaleKirby.h"
 #include "FinalePartical_Maker.h"
+#include "FinaleCut_ControlCenter.h"
 
 void Turn_Interpolate(CFinaleKirby::FINALEKIRBY_INFODESC* Kirbydesc, CTransform* pTransformCom, _float fTimeDelta, _float fInterpolateSpeed = 12.f)
 {
@@ -185,6 +186,20 @@ void Turn_InterPolate_OtherVector(_float4& vDstDir, _float4& vSrcDir, CTransform
 		}
 	}
 }
+void ToCut_Reset_Kirby(CTransform* pTransformCom, CCharacterController* pController)
+{
+	pController->Set_Position(pTransformCom, _float4(2550.f, 239.f, -136.f, 1.f));
+	_float4 NewLook = _float4(1.f, 0.f, 0.f, 0.f);
+	_float4 NewUp = _float4(0.f, 1.f, 0.f, 0.f);
+	_float4 NewRight = XMVector3Cross(NewLook, NewUp);
+
+	pTransformCom->Set_State(CTransform::STATE_LOOK, NewLook);
+	pTransformCom->Set_State(CTransform::STATE_UP, NewUp);
+	pTransformCom->Set_State(CTransform::STATE_RIGHT, NewRight);
+
+	CFinaleCut_ControlCenter* pCenter = static_cast<CFinaleCut_ControlCenter*>(GAMEINSTANCE Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinaleCut_ControlCenter")));
+	pCenter->Set_CutScene(1);
+}
 
 #pragma region 차량 운전 상태
 
@@ -209,6 +224,16 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
 
 	m_fParticalDelay += fTimeDelta;
+
+	if (pTransformCom->Get_State(CTransform::STATE_POSITION).x > 1550.f)
+	{
+		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT1, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
+		ToCut_Reset_Kirby(pTransformCom, pController);
+		pKirby->Start_CutScene();
+		return;
+	}
+
+
 	if (m_fParticalDelay > 0.2f)
 	{
 		CFinalePartical_Maker* pMaker = static_cast<CFinalePartical_Maker*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinalePartical_Maker")));
@@ -382,6 +407,16 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CFinaleKirby::FINALEKIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
+
+
+	if (pTransformCom->Get_State(CTransform::STATE_POSITION).x > 1550.f)
+	{
+		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT1, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
+		ToCut_Reset_Kirby(pTransformCom, pController);
+		pKirby->Start_CutScene();
+		return;
+	}
+
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN) && DESC(m_bBooster) == false)
 	{
@@ -675,6 +710,7 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 void CKirbyDump_Cut_State::OnStateExit()
 {
 	m_fRunTime = 0.f;
+	m_bShakeTrigger = true;
 }
 
 CKirbyDump_Cut_State* CKirbyDump_Cut_State::Create()
@@ -686,6 +722,138 @@ CKirbyDump_Cut_State* CKirbyDump_Cut_State::Create()
 void CKirbyDump_Cut_State::Free()
 {
     __super::Free();
+}
+
+#pragma endregion
+
+
+
+#pragma region 차량 컷씬 상태 2
+
+CKirbyDump_Cut2_State::CKirbyDump_Cut2_State()
+{
+}
+
+void CKirbyDump_Cut2_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+}
+
+void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CFinaleKirby* pKirby = static_cast<CFinaleKirby*>(pGameObject);
+	CFinaleKirby::FINALEKIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+	CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
+	CFinaleCut_ControlCenter* pCenter = static_cast<CFinaleCut_ControlCenter*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinaleCut_ControlCenter")));
+
+	_int iAnimIndex = pCenter->Get_CutScene();
+
+	if (iAnimIndex == 1)
+		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT1, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
+	else if (iAnimIndex == 2)
+		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT2, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
+	else if (iAnimIndex == 6)
+		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT6, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
+
+
+	// 컷씬 진입소. 점프 점프
+	if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT1)
+	{
+
+
+		if (pKirby->isAnimFinish())
+		{
+			pCenter->Set_CutScene(2);
+		}
+	}
+	// 멀리서 부릉부릉
+	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT2)
+	{
+
+
+		if (pKirby->isAnimFinish())
+		{
+			pCenter->Set_CutScene(3);
+		}
+	}
+	// 큐티 모션 후 점프
+	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT6)
+	{
+
+	}
+	//
+	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT7)
+	{
+
+	}
+	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT8)
+	{
+
+	}
+	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT9)
+	{
+
+	}
+	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT10)
+	{
+
+	}
+	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT11)
+	{
+
+	}
+	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT12)
+	{
+
+	}
+	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT13)
+	{
+
+	}
+	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT14)
+	{
+
+	}
+	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT15)
+	{
+
+	}
+	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT16)
+	{
+
+	}
+	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT17)
+	{
+
+	}
+	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT18)
+	{
+
+	}
+	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT19)
+	{
+
+	}
+	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT20)
+	{
+
+	}
+}
+
+void CKirbyDump_Cut2_State::OnStateExit()
+{
+	m_fTime = 0.f;
+}
+
+CKirbyDump_Cut2_State* CKirbyDump_Cut2_State::Create()
+{
+	CKirbyDump_Cut2_State* pInstance = new CKirbyDump_Cut2_State();
+	return pInstance;
+}
+
+void CKirbyDump_Cut2_State::Free()
+{
+	__super::Free();
 }
 
 #pragma endregion
