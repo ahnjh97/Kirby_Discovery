@@ -16,7 +16,7 @@ static void DebrisCloud(CTransform* pTransformCom)
 	CEffect::FX_DESC FXDesc{};
 
 	FXDesc.vInitPos = static_cast<_float3>(pTransformCom->Get_State(CTransform::STATE_POSITION)) + (_float3)CUtils::Make_Random_Vector(2.f);
-	//FXDesc.vInitRot = CUtils::Make_Random_Vector(.5f);
+	FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_Random_Vector(1.f));
 
 	_float fScale = CUtils::Make_RandomFloat(10.f, 20.f);
 	FXDesc.vInitScale = { fScale, fScale, fScale };

@@ -305,7 +305,6 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 		InstanceDesc.vecMoveCommands = FXData.vecMoveCommands;
 
 
-
 		InstanceDesc.fLifetime = FXData.fLifetime;
 		InstanceDesc.fLifetimeRandomOffset = FXData.fLifetimeRandomOffset;
 		InstanceDesc.fStartDelay = FXData.fStartDelay;

@@ -304,6 +304,7 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	{
 		if (DESC(m_fBoosterTime) > 0.f)
 			DESC(m_fBoosterTime) -= fTimeDelta;
+
 		if (DESC(m_fBoosterTime) < 0.f)
 			DESC(m_fBoosterTime) = 0.f;
 	}
@@ -312,6 +313,35 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	{
 		DESC(m_bBooster) = false;
 		pKirby->Delete_Effect("Come On Dash");
+	}
+	//트럭방구
+	else
+	{
+		static _float fBoostTime = 0.f;
+		fBoostTime += fTimeDelta;
+		if (.05f < fBoostTime)
+		{
+			CEffect::FX_DESC fxDesc{};
+			fxDesc.vInitRot = CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK));
+
+			_float3 vCenterPos = (_float3)pTransformCom->Get_State(CTransform::STATE_POSITION);
+			fxDesc.vInitPos = vCenterPos;
+			fxDesc.vInitPos += (_float3)pTransformCom->Get_State(CTransform::STATE_RIGHT) * (2.3f + CUtils::Make_RandomFloat(-.2f, .2f));
+			fxDesc.vInitPos += (_float3)pTransformCom->Get_State(CTransform::STATE_UP) * 7.2f;
+
+			_float fScale = CUtils::Make_RandomFloat( 1.5f, 3.f);
+			fxDesc.vInitScale = { fScale, fScale, fScale };
+			pKirby->Add_Effect("dump dash smoke", fxDesc);
+
+			fxDesc.vInitPos = vCenterPos;
+			fxDesc.vInitPos -= (_float3)pTransformCom->Get_State(CTransform::STATE_RIGHT) * (2.3f + CUtils::Make_RandomFloat(-.2f, .2f));
+			fxDesc.vInitPos += (_float3)pTransformCom->Get_State(CTransform::STATE_UP) * 7.2f;
+
+			fScale = CUtils::Make_RandomFloat( 1.5f, 3.f);
+			fxDesc.vInitScale = { fScale, fScale, fScale };
+			pKirby->Add_Effect("dump dash smoke", fxDesc);
+			fBoostTime = 0.f;
+		}
 	}
 }
 
@@ -620,7 +650,7 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
 			MultiFXDesc.vInitPos = vMyPos;
 			MultiFXDesc.vInitScale = { 4.f, 4.f, 4.f };
-			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_DDD land smoke"), &MultiFXDesc)))
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_dump smoke"), &MultiFXDesc)))
 				return;
 		}
 
