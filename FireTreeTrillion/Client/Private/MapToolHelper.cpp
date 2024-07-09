@@ -185,7 +185,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		,"TwCentralSquare","TwStreetLiveSetC", "TwSideBridge", "TwConstructionAreaStepway", "TwConstructionAreaPond"
 #pragma endregion
 
-		#pragma region SIMBA OBJECTS
+#pragma region SIMBA OBJECTS
 		, "LbBossCapsule01L", "LbBossCapsule02L", "LbBossField01L", "LbBossSmallRoom01L"
 		, "VpControlBoxChairL", "VpControlBoxEL", "VpStairsAL"
 		#pragma endregion
