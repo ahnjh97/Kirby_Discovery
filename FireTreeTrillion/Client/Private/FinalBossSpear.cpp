@@ -93,95 +93,95 @@ _int CFinalBossSpear::Tick(_float fTimeDelta)
 					return E_FAIL;
 				}
 
-	//			m_fAngle += 13.f;
-	//			m_fSide -= 20.f;
-	//			m_fHeight -= 5.f;
-	//			m_fFirstFireTime -= 0.4f;
+				m_fAngle += 13.f;
+				m_fSide -= 20.f;
+				m_fHeight -= 5.f;
+				m_fFirstFireTime -= 0.4f;
 
-	//			if (1 == m_iCnt)
-	//				m_fCreateTime = 0.16f;
-	//			else if (2 == m_iCnt)
-	//				m_fCreateTime = 0.08f;
-	//			else
-	//				m_fCreateTime = 0.11f;
-	//		}
-	//	}
-	//	else if (0.47f < pFinalBoss->Get_AnimRatio() && 0.65f > pFinalBoss->Get_AnimRatio())
-	//	{
-	//		m_fDelayTime += fTimeDelta;
-	//		if (m_fCreateTime < m_fDelayTime)
-	//		{
-	//			m_fAngle -= 13.f;
-	//			m_fSide += 20.f;
-	//			m_fHeight -= 5.f;
-	//			m_fSecondFireTime -= 0.4f;
-	//			++m_iCnt;
-	//			m_fDelayTime = 0.f;
-	//			CRayArrow::RAYARROW_DESC RayArrow = {};
-	//			_float4x4 WorldMatrix = m_WorldMatrix;
-	//			WorldMatrix._41 -= m_WorldMatrix._31 * 4.5f;
-	//			WorldMatrix._42 -= m_WorldMatrix._32 * 4.5f;
-	//			WorldMatrix._43 -= m_WorldMatrix._33 * 4.5f;
-	//			RayArrow.vPosition = _float4(WorldMatrix._41, WorldMatrix._42, WorldMatrix._43, 1.f);
-	//			RayArrow.fAngle = m_fAngle;
-	//			if (CFinalBoss::FINALBOSS_RAYARROWSTART == pFinalBoss->Get_State())
-	//			{
-	//				RayArrow.fHeight = 30.f;
-	//				RayArrow.fSpeedWeight = 1.f;
-	//			}
-	//			else
-	//			{
-	//				RayArrow.fHeight = m_fHeight;
-	//				RayArrow.fSpeedWeight = 0.65f;
-	//			}
-	//			RayArrow.vSide = pFinalBoss->Get_TransformCom()->Get_State_Vector(CTransform::STATE_RIGHT) * m_fSide;
-	//			RayArrow.fDelayTime = m_fSecondFireTime;
-	//			//RayArrow.vLook = _float3(m_pParentMatrix->_21, m_pParentMatrix->_22, m_pParentMatrix->_23);
-	//			if (FAILED(m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Arrow"), TEXT("Prototype_GameObject_RayArrow"), &RayArrow)))
-	//			{
-	//				MSG_BOX(TEXT("Failed to Clone : CRayArrow"));
-	//				return E_FAIL;
-	//			}
+				if (1 == m_iCnt)
+					m_fCreateTime = 0.16f;
+				else if (2 == m_iCnt)
+					m_fCreateTime = 0.08f;
+				else
+					m_fCreateTime = 0.11f;
+			}
+		}
+		else if (0.47f < pFinalBoss->Get_AnimRatio() && 0.65f > pFinalBoss->Get_AnimRatio())
+		{
+			m_fDelayTime += fTimeDelta;
+			if (m_fCreateTime < m_fDelayTime)
+			{
+				m_fAngle -= 13.f;
+				m_fSide += 20.f;
+				m_fHeight -= 5.f;
+				m_fSecondFireTime -= 0.4f;
+				++m_iCnt;
+				m_fDelayTime = 0.f;
+				CRayArrow::RAYARROW_DESC RayArrow = {};
+				_float4x4 WorldMatrix = m_WorldMatrix;
+				WorldMatrix._41 -= m_WorldMatrix._31 * 4.5f;
+				WorldMatrix._42 -= m_WorldMatrix._32 * 4.5f;
+				WorldMatrix._43 -= m_WorldMatrix._33 * 4.5f;
+				RayArrow.vPosition = _float4(WorldMatrix._41, WorldMatrix._42, WorldMatrix._43, 1.f);
+				RayArrow.fAngle = m_fAngle;
+				if (CFinalBoss::FINALBOSS_RAYARROWSTART == pFinalBoss->Get_State())
+				{
+					RayArrow.fHeight = 30.f;
+					RayArrow.fSpeedWeight = 1.f;
+				}
+				else
+				{
+					RayArrow.fHeight = m_fHeight;
+					RayArrow.fSpeedWeight = 0.65f;
+				}
+				RayArrow.vSide = pFinalBoss->Get_TransformCom()->Get_State_Vector(CTransform::STATE_RIGHT) * m_fSide;
+				RayArrow.fDelayTime = m_fSecondFireTime;
+				//RayArrow.vLook = _float3(m_pParentMatrix->_21, m_pParentMatrix->_22, m_pParentMatrix->_23);
+				if (FAILED(m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Arrow"), TEXT("Prototype_GameObject_RayArrow"), &RayArrow)))
+				{
+					MSG_BOX(TEXT("Failed to Clone : CRayArrow"));
+					return E_FAIL;
+				}
 
-	//			if (6 == m_iCnt)
-	//				m_fCreateTime = 0.08f;
-	//			else
-	//				m_fCreateTime = 0.1f;
-	//		}
-	//	}
-	//	else
-	//	{
-	//		m_fAngle = 0.f;
-	//		m_fSide = 0.f;
-	//		m_fHeight = 70.f;
-	//		m_fFirstFireTime = 4.f;
-	//		m_fSecondFireTime = 3.8f;
-	//	}
-	//}
-	//else if (CFinalBoss::FINALBOSS_DIMENSIONSPIKEREADY == pFinalBoss->Get_State())
-	//{
-	//	if(0.65f < pFinalBoss->Get_AnimRatio())
-	//	{
-	//		if (false == m_bGate)
-	//		{
-	//			m_bGate = true;
+				if (6 == m_iCnt)
+					m_fCreateTime = 0.08f;
+				else
+					m_fCreateTime = 0.1f;
+			}
+		}
+		else
+		{
+			m_fAngle = 0.f;
+			m_fSide = 0.f;
+			m_fHeight = 70.f;
+			m_fFirstFireTime = 4.f;
+			m_fSecondFireTime = 3.8f;
+		}
+	}
+	else if (CFinalBoss::FINALBOSS_DIMENSIONSPIKEREADY == pFinalBoss->Get_State())
+	{
+		if(0.65f < pFinalBoss->Get_AnimRatio())
+		{
+			if (false == m_bGate)
+			{
+				m_bGate = true;
 
-	//			CDimensionGate::DIMENSIONGATE_DESC DimensionGateDesc = {};
-	//			_vector vPos = XMLoadFloat4x4(&m_WorldMatrix).r[3];
-	//			vPos.m128_f32[1] += -4.6f;
-	//			DimensionGateDesc.vPosition = vPos;
-	//			DimensionGateDesc.fScale = 0.02f;
-	//			DimensionGateDesc.bSwitch = true;
-	//			if (FAILED(m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Gate"), TEXT("Prototype_GameObject_DimensionGate"), &DimensionGateDesc)))
-	//				return E_FAIL;
-	//		}
-	//	}
-	//}
-	//else
-	//{
-	//	m_iCnt = 0;
-	//	m_fDelayTime = 0.f;
-	//}
+				CDimensionGate::DIMENSIONGATE_DESC DimensionGateDesc = {};
+				_vector vPos = XMLoadFloat4x4(&m_WorldMatrix).r[3];
+				vPos.m128_f32[1] += -4.6f;
+				DimensionGateDesc.vPosition = vPos;
+				DimensionGateDesc.fScale = 0.02f;
+				DimensionGateDesc.bSwitch = true;
+				if (FAILED(m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Gate"), TEXT("Prototype_GameObject_DimensionGate"), &DimensionGateDesc)))
+					return E_FAIL;
+			}
+		}
+	}
+	else
+	{
+		m_iCnt = 0;
+		m_fDelayTime = 0.f;
+	}
 
 	return OBJ_NOEVENT;
 }
