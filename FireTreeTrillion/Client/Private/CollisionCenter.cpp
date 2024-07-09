@@ -49,7 +49,7 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 		// 디디디와 싸우는 특수한 충돌로직들 모아두었습니다.
 		DeeDeeDee_Battle();
 
-	if (eLevel == LEVEL_FINALBOSS)
+	if (eLevel == LEVEL_FINALBOSS || LEVEL_SIMBA == eLevel)
 		FinalStage_Battle();
 
 	if (eLevel == LEVEL_FINALE)
