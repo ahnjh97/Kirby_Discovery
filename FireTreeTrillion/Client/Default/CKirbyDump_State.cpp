@@ -621,7 +621,7 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		Kirbydesc->m_fMoveSpeed = 0.f;
 		m_fRunTime += fTimeDelta;
 		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
-		if (m_fRunTime > 1.7f)
+		if (m_fRunTime > 2.f)
 		{
 			DESC(m_eEyeState) = CFinaleKirby::EYE_IDLE;
 			pKirby->Change_State(CFinaleKirby::DUMPTSTATE_CUT, 50.f, false, false, CFinaleKirby::BODY_DUMPDEFAULT, CFinaleKirby::OFFSET_DUMP);

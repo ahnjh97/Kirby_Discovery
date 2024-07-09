@@ -413,7 +413,7 @@ PS_OUT_EFFECT PS_MAIN_BLEND_FX(PS_IN In)
 
     //소프트 이펙트 보정
     Out.vColor.a = SoftEffect(Out.vColor.a, In.vProjPos);
-
+    Out.vNonBlur = vector(0, 1, 0, 1);
     return Out;
 }
 

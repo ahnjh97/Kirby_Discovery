@@ -1121,7 +1121,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		//m_CamSeq.push_back(newAction);
 
 		newAction = {};
-		newAction.fTime = fCutStartTime + 2.f;
+		newAction.fTime = fCutStartTime + 2.3f;
 		newAction.eCamCut = CUT_INTERPOLATE;
 		newAction.eEase = EASE_OUT;
 		newAction.fInterpolateSpeed = .5f;
@@ -1133,7 +1133,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 		//Äç
 		newAction = {};
-		newAction.fTime = fCutStartTime + 2.7f;
+		newAction.fTime = fCutStartTime + 3.f;
 		newAction.eCamCut = CUT_INTERPOLATE;
 		newAction.eEase = EASE_IN;
 		newAction.fInterpolateSpeed = .5f;
@@ -1147,7 +1147,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 
 		newAction = {};
-		newAction.fTime = fCutStartTime + 3.5f;
+		newAction.fTime = fCutStartTime + 3.8f;
 		newAction.eCamCut = CUT_INTERPOLATE;
 		newAction.eEase = EASE_OUT;
 		newAction.fInterpolateSpeed = 1.3f;
@@ -1159,7 +1159,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		//Cut 4
 
 		newAction = {};
-		newAction.fTime = fCutStartTime + 5.f;
+		newAction.fTime = fCutStartTime + 5.3f;
 		newAction.eCamCut = CUT_HARD;
 		newAction.fFOVY = 55.f;
 		newAction.eCamPos = POS_ABSOLUTE;

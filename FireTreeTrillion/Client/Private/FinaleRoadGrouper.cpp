@@ -2,6 +2,9 @@
 #include "FinaleRoadGrouper.h"
 #include "FinaleRoad.h"
 #include "Camera_Main.h"
+#include "Effect.h"
+
+
 
 CFinaleRoadGrouper::CFinaleRoadGrouper(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CGameObject{ pDevice, pContext }
@@ -45,7 +48,7 @@ _bool CFinaleRoadGrouper::Make_CollideReaction(CFinaleRoad* pRoad)
 		m_fCollideTime = 1.f;
 		m_fMaxDuration = m_fCollideTime;
 
-	//m_fDestZAngle = CUtils::Make_RandomFloat(-15.f, 15.f);
+		//m_fDestZAngle = CUtils::Make_RandomFloat(-15.f, 15.f);
 
 		break;
 	default:
@@ -422,6 +425,8 @@ _int CFinaleRoadGrouper::Tick(_float fTimeDelta)
 	{
 		//충돌 시간을 깎는다.
 		m_fCollideTime -= fRealTimeDelta;
+
+		//충돌!!
 		if (m_fCollideTime < 0.f)
 		{
 			m_fCollideTime = 0.f;
@@ -433,6 +438,21 @@ _int CFinaleRoadGrouper::Tick(_float fTimeDelta)
 
 				if (nullptr != pCamera)
 					pCamera->Make_Shake(3.f, .8f);
+
+
+				CEffect::FX_DESC FXDesc{};
+
+				for (_int i = 0; i < 15; ++i)
+				{
+					FXDesc.vInitPos = static_cast<_float3>(GET_POS) - (_float3)m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 50.f + (_float3)CUtils::Make_Random_Vector(2.f) + _float4{0.f, 5.f, 0.f, 0.f};
+					FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_Random_Vector(1.f));
+
+					_float fScale = CUtils::Make_RandomFloat(30.f, 40.f);
+					FXDesc.vInitScale = { fScale, fScale, fScale };
+					if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_finale collide smoke test3"), &FXDesc)))
+						return E_FAIL;
+				}
+
 			}
 		}
 
