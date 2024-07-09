@@ -491,21 +491,10 @@ HRESULT CLevel_Park::Ready_Monsters()
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BrontoBurt"), &BrontoBurtDesc)))
 				return E_FAIL;
 		}
-		//else if (strModelName == "NonAnim_SurprisedBoardRed")
-		//{
-		//	// SurprisedBoard
-		//	CSurprisedBoard::SURPRISED_DESC surprisedDesc = {};
-		//	surprisedDesc.eColor = CSurprisedBoard::RED;
-		//	surprisedDesc.matWorld = matWorld;
-		//	surprisedDesc.wstrModelName = CUtils::StrToWstr(strModelName);
-		//	surprisedDesc.iShaderVars = iShaderVars;
-		//	surprisedDesc.fRimWidth = fRimWidth;
-		//	surprisedDesc.eStartState = CSurprisedBoard::ANIM_STATE(iTriggerIndex);
-		//	HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
-		//	CHECK_FAILED(hr);
-		//}
 	}
 	fileInput.close();
+
+
 
 	// ------------------ 맨 앞 SurprisedBoard ------------------
 	// 위치 행렬을 만든다. 
@@ -525,7 +514,7 @@ HRESULT CLevel_Park::Ready_Monsters()
 	
 	surprisedDesc.eColor = CSurprisedBoard::RED;
 	surprisedDesc.eStartState = CSurprisedBoard::WAIT_L;
-	surprisedDesc.vPosition = _float3(14.5f, 5.f, -154.f);
+	surprisedDesc.vPosition = _float3(14.f, 5.f, -147.f);
 	HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
 	CHECK_FAILED(hr);
 
@@ -540,7 +529,7 @@ HRESULT CLevel_Park::Ready_Monsters()
 	surprisedDesc.matWorld = transformationMatrix;
 	surprisedDesc.eColor = CSurprisedBoard::GREEN;
 	surprisedDesc.eStartState = CSurprisedBoard::WAIT_R;
-	surprisedDesc.vPosition = _float3(44.54f, 4.97f, -113.189f);
+	surprisedDesc.vPosition = _float3(46.f, 5.1f, -130.f);
 	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
 	CHECK_FAILED(hr);
 
@@ -557,7 +546,7 @@ HRESULT CLevel_Park::Ready_Monsters()
 	surprisedDesc.matWorld = transformationMatrix;
 	surprisedDesc.eColor = CSurprisedBoard::RED;
 	surprisedDesc.eStartState = CSurprisedBoard::WAIT_L;
-	surprisedDesc.vPosition = _float3(21.39f, 5.08f, -87.56f);
+	surprisedDesc.vPosition = _float3(40.f, 5.1f, -94.f);//21.39f, 5.08f, -87.56f);
 	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
 	CHECK_FAILED(hr);
 
@@ -572,7 +561,7 @@ HRESULT CLevel_Park::Ready_Monsters()
 	surprisedDesc.matWorld = transformationMatrix;
 	surprisedDesc.eColor = CSurprisedBoard::BLUE;
 	surprisedDesc.eStartState = CSurprisedBoard::WAIT_L;
-	surprisedDesc.vPosition = _float3(14.85f, 8.f, -69.5f);
+	surprisedDesc.vPosition = _float3(14.85f, 8.f, -75.f);
 	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
 	CHECK_FAILED(hr);
 
@@ -587,9 +576,10 @@ HRESULT CLevel_Park::Ready_Monsters()
 	surprisedDesc.matWorld = transformationMatrix;
 	surprisedDesc.eColor = CSurprisedBoard::BLUE;
 	surprisedDesc.eStartState = CSurprisedBoard::WAIT_R;
-	surprisedDesc.vPosition = _float3(-2.09f, 8.f, -69.5f);
+	surprisedDesc.vPosition = _float3(-2.09f, 8.f, -76.f);
 	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
 	CHECK_FAILED(hr);
+
 
 	return S_OK;
 }
