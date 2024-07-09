@@ -106,7 +106,8 @@ void CFinaleBoss_CutScene_State::OnStateUpdate(CGameObject* pGameObject, _float 
 	CTransform* pTransform = pFinaleBoss->Get_TransformCom();
 	CFinaleCut_ControlCenter* pCenter = static_cast<CFinaleCut_ControlCenter*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinaleCut_ControlCenter")));
 
-	//_int iAnimIndex = pCenter->Get_CutScene();
+
+	_int iAnimIndex = pCenter->Get_CutScene();
 
 	if (19 == pCenter->Get_CutScene())
 		pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT19, 50.f, false, false);
