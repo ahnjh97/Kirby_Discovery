@@ -18,6 +18,8 @@ public:
 	virtual void OnStateExit()														override;
 
 public:
+	_float	m_fParticalDelay = { 0.f };
+	_bool	m_bBreak = { false };
 	static	CKirbyDump_Run_State* Create();
 	virtual void				  Free() override;
 };
@@ -37,6 +39,7 @@ public:
 	virtual void OnStateExit()														override;
 
 public:
+	_float	m_fFallTime = { 0.f };
 	static	CKirbyDump_Jump_State* Create();
 	virtual void				  Free() override;
 };

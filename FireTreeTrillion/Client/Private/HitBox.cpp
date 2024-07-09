@@ -32,6 +32,13 @@ HRESULT CHitBox::Initialize(void* pArg)
 	m_pOwnerTransform = m_pOwner->Get_TransformCom();
 	Safe_AddRef(m_pOwnerTransform);
 	m_pOwnerCollisionDesc = pDesc->pDesc;
+	if (pDesc->matObjectPosition != _float4x4())
+	{
+		m_matFixed = pDesc->matObjectPosition;
+		m_pTransformCom->Set_WorldMatrix(pDesc->matObjectPosition);
+	}
+	else
+		m_pTransformCom->Set_WorldMatrix(m_pOwnerTransform->Get_WorldFloat4x4());
 
 	m_eCollisionGroup = pDesc->pCollisionType;
 
@@ -43,12 +50,19 @@ _int CHitBox::Tick(_float fTimeDelta)
 	if (m_pOwner == nullptr || m_pOwner->Get_Dead() == true)
 		return OBJ_DEAD;
 
-
-	_float4x4 pWorldMatrix = m_pOwnerTransform->Get_WorldFloat4x4();
-	CUtils::Set_Scaled_Matrix(pWorldMatrix, 1.f, 1.f, 1.f);
-	pWorldMatrix._42 += m_pOwnerCollisionDesc->fOffSetY;
+	_float4x4 pWorldMatrix = _float4x4();
+	if (m_matFixed != _float4x4())
+	{
+		pWorldMatrix = m_matFixed;
+		CUtils::Set_Scaled_Matrix(pWorldMatrix, 1.f, 1.f, 1.f);
+	}
+	else
+	{
+		pWorldMatrix = m_pOwnerTransform->Get_WorldFloat4x4();
+		CUtils::Set_Scaled_Matrix(pWorldMatrix, 1.f, 1.f, 1.f);
+		pWorldMatrix._42 += m_pOwnerCollisionDesc->fOffSetY;
+	}
 	m_pTransformCom->Set_WorldMatrix(pWorldMatrix);
-
 
 	// 여기서 콜리전 센터에게 등록한다.
 	Restore_Logic(fTimeDelta);

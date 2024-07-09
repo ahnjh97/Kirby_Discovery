@@ -169,6 +169,16 @@ _float3 CUtils::Make_Degree_FromDir(const _float3& _dir)
 	return _float3(ToDegree(vEulerAngle.x), ToDegree(vEulerAngle.y), ToDegree(vEulerAngle.z));
 }
 
+_float3 CUtils::SlerpDirVec(_float3 vStart, _float3 vEnd, _float fRatio)
+{
+	_float fDot = vStart.Dot(vEnd);
+	fDot = clamp(fDot, -1.f, 1.f);
+	_float fTheta = acosf(fDot) * fRatio;
+	_float3 vRelative = XMVector3Normalize(vEnd - vStart * fRatio);
+
+	return XMVector3Normalize( vStart * cosf(fTheta) + vRelative * sinf(fTheta) );
+}
+
 void CUtils::Set_State_Matrix(_Inout_ _float4x4& matrix, STATE eState, _fvector vState)
 {
 	_float4		vTemp;
@@ -230,6 +240,20 @@ void CUtils::Rotation(_Inout_ _float4x4& matrix, _fvector vAxis, _float fRadian)
 		Set_State_Matrix(matrix, STATE(i),
 			XMVector4Transform(vState[(STATE)i], RotationMatrix));
 	}
+}
+
+void CUtils::Rotation(_Inout_ _float4x4& matrix, Quaternion vQuat)
+{
+
+	//XMVECTOR quat = XMLoadFloat4(reinterpret_cast<const XMFLOAT4*>(&quaternion));
+	//mat = XMMatrixRotationQuaternion(quat);
+
+	_float4x4 RotMat = _float4x4::CreateFromQuaternion(vQuat);
+	_float3	vScale = Get_Scaled_Matrix(matrix);
+	_float3 vPos = Get_State_Vector_Matrix(matrix, STATE_POSITION);
+
+	//_float4x4 ResultWorld = 
+	matrix = _float4x4::CreateScale(vScale) * RotMat * _float4x4::CreateTranslation(vPos);
 }
 
 

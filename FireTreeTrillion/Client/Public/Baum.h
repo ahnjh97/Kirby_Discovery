@@ -41,9 +41,8 @@ public:
 #endif
 	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
-
 private:
-	HRESULT			Add_Components();
+	HRESULT			Add_Components(wstring wstrModelProtoTag);
 	HRESULT			Bind_ShaderResources();
 	_int			Make_Partical();
 	void			Compute_MotionBlur();
@@ -52,15 +51,25 @@ private:
 
 	_float4			m_vBaumMoveDir = { 0.f, 0.f, 0.f, 0.f };
 	_float			m_fBaumSpeed = { 0.f };
+	_float			m_fScale = { 0.01f };
+	_float			m_fBbongTime = { 0.f };
+
+
+	enum BAUMTYPE { BAUM_BAUM, BAUM_STARPIECE, BAUM_END };
+	BAUMTYPE		m_eBaumType = { BAUM_END };
 	_bool			m_bOnTerrain = { false };
 	// 붙어먹을 로드 클래스
-	// class Load   m_Load 
+	class CFinaleRoad* m_pMyRoad = { nullptr };
+	_float4x4		m_HitWorld = {};
+	void			Find_MyRoad();
 
 
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
 	CCharacterController* m_pControllerCom = { nullptr };
+
+	class CLight* m_pLight = { nullptr };
 
 public:
 	static CBaum* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

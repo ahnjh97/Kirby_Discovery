@@ -356,7 +356,7 @@ void CBasicMap::SetUpShaderInfo(const wstring& _wstrModelTag)
             return;
         }
             
-        m_vecPassIndices[i] = iPassIndex; //8  JYWI QZR 지영아 여기야
+        m_vecPassIndices[i] = iPassIndex;  // 8; JYWI QZR 지영아 여기야
         m_vecSamplingFactors[i] = fSamplingFactor;
     }
 
@@ -592,6 +592,8 @@ void CBasicMap::ReadDecos_ForSmallLevels()
         strLevel = "Simba";
     else if (LEVEL_FINALBOSS == *m_pCurrentLevelID)
         strLevel = "FinalBoss";
+    else if (LEVEL_FINALE == *m_pCurrentLevelID)
+        strLevel = "Finale";
     else
         return;
 
@@ -633,7 +635,7 @@ void CBasicMap::ReadDecos_ForSmallLevels()
             strFolder = string("TownDeco/");
         else if(LEVEL_PARK == *m_pCurrentLevelID)
             strFolder = string("ParkDeco/");
-        else if (LEVEL_FINALBOSS == *m_pCurrentLevelID || LEVEL_SIMBA == *m_pCurrentLevelID)
+        else if (LEVEL_FINALBOSS == *m_pCurrentLevelID || LEVEL_SIMBA == *m_pCurrentLevelID || LEVEL_FINALE == *m_pCurrentLevelID)
             strFolder = string("LabDiscovera_Deco/");
 
         if (true == IsMapDeco(strModelName))

@@ -133,7 +133,7 @@ HRESULT CLevel_Intro::Ready_Layer_Camera(const wstring& strLayerTag)
 	MainCamDesc.fFovy = XMConvertToRadians(30.0f);
 	MainCamDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	MainCamDesc.fNear = 0.1f;
-	MainCamDesc.fFar = 1000.0f;
+	MainCamDesc.fFar = g_fCamFar;
 	MainCamDesc.vEye = _float4(-129.f, 10.f, -120.f, 1.f);
 	MainCamDesc.vAt = MainCamDesc.vEye + _float4(0.f, -.15f, 1.f, 1.f);
 	MainCamDesc.fSpeedPerSec = 10.f;
@@ -150,7 +150,7 @@ HRESULT CLevel_Intro::Ready_Layer_Camera(const wstring& strLayerTag)
 	CameraDesc.fFovy = XMConvertToRadians(30.0f);
 	CameraDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	CameraDesc.fNear = 0.1f;
-	CameraDesc.fFar = 1000.0f;
+	CameraDesc.fFar = g_fCamFar;
 	CameraDesc.vEye = _float4(0.f, .5f, -1.f, 1.f);
 	CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
 	CameraDesc.fSpeedPerSec = 10.f;

@@ -47,6 +47,8 @@ namespace Client
     const unsigned int	g_iWinSizeX = 1600; //1280;
     const unsigned int	g_iWinSizeY = 900; //720;
 
+    const float g_fCamFar = 20000.f;
+
     const wstring g_strLayerMonster = TEXT("Layer_Monster");
     const wstring g_strLayerItem = TEXT("Layer_Item");
     const wstring g_strLayerMapObject = TEXT("Layer_MapObject");
@@ -131,6 +133,12 @@ enum COLLISION_TYPE
     HITBOX_MONSTER,
     HITBOX_DEEDEEDEE,
     ANIMDECO, // 애니메이션 있는 풀, 상자 등등
+    TRIGGER_FOR_NOT_PHYSX,
+
+    FINALE_PLAYER,
+    FINALE_BAUM,
+    FINALE_BREAKABLEBLOCK,
+    FINALE_BIGBAUM,
 
     COLLISION_END
 };

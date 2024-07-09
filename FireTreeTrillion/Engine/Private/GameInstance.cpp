@@ -398,12 +398,20 @@ void CGameInstance::Update_Option(CRenderer::OPTION Option, _bool bOn)
 	m_pRenderer->Update_Option(Option, bOn);
 }
 
-void CGameInstance::Setting_GodRay(_fvector vWorldPos)
+void CGameInstance::Setting_GodRay(_fvector vWorldPos, _float fRayExposure, _float fRayDecay, _float fRayIlluminationDecay, _float fRayDensity, _float fWeight)
 {
 	if (nullptr == m_pRenderer)
 		return;
 
-	m_pRenderer->Setting_GodRay(vWorldPos);
+	m_pRenderer->Setting_GodRay(vWorldPos, fRayExposure, fRayDecay, fRayIlluminationDecay, fRayDensity, fWeight);
+}
+
+void CGameInstance::Setting_LensFlare(_bool bOnOff)
+{
+	if (nullptr == m_pRenderer)
+		return;
+
+	m_pRenderer->Setting_LensFlare(bOnOff);
 }
 
 #ifdef _DEBUG

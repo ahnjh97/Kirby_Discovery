@@ -122,7 +122,7 @@ void CSingleEffect::Late_Tick(_float _fTimeDelta)
 	if (Calculate_Duration(fMyTimeDelta))
 	{
 		//툴에서는 다시 시작하기
-		if (*m_pCurrentLevelID != LEVEL_TOOL_FX)
+		if (*m_pCurrentLevelID != LEVEL_TOOL_FX && m_fDuration.second != FX_MAXDURATION)
 		{
 			m_bDead = true;
 		}

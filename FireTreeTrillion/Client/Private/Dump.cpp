@@ -53,6 +53,9 @@ _int CDump::Tick(_float fTimeDelta)
 	if (m_eCurAnim == DUMP_CUTDUMP1 && m_pModelCom->IsFinished())
 	{
 		m_pModelCom->Set_Animation(DUMP_CUTDUMP2, 45.f, false, false);
+		_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		vPos.y += 1.f;
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 		m_eCurAnim = DUMP_CUTDUMP2;
 	}
 	else if (m_eCurAnim == DUMP_CUTDUMP2 && m_pModelCom->IsFinished())

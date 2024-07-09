@@ -95,7 +95,7 @@ PS_OUT_LIGHTDEPTH PS_MAIN_LIGHTDEPTH(PS_IN In)
 {
     PS_OUT_LIGHTDEPTH Out = (PS_OUT_LIGHTDEPTH) 0;
 
-    Out.vLightDepth = float4(In.vProjPos.w / 1000.f, 0.f, 0.f, 0.f);
+    Out.vLightDepth = float4(In.vProjPos.w / g_fFar, 0.f, 0.f, 0.f);
 
     return Out;
 }
@@ -119,7 +119,7 @@ PS_OUT PS_MAIN(PS_IN In)
 
 	Out.vDiffuse = vMtrlDiffuse;
 	Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
-	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
     Out.vFieldDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 0.0f);
     Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
     if (Out.vMRA.z == 0)
@@ -146,7 +146,7 @@ PS_OUT NO_NORMALMAP_PS_MAIN(PS_IN In)
 
     Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
     Out.vFieldDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 0.0f);
     Out.vMRA = vector(0, 1, 1, 1);
 
@@ -186,7 +186,7 @@ PS_OUT PS_NORMAL_O_DISCARD_X(PS_IN In)
 
     Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
     Out.vFieldDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 0.0f);
     Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
     if (Out.vMRA.z == 0)
@@ -222,7 +222,7 @@ PS_OUT PS_MASKED_NORMAL_O(PS_IN In)
     Out.vDiffuse = vMtrlDiffuse;
     Out.vDiffuse.xyz *= vMaskBaseColor.r;
     Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 1000.0f, 0.0f, 0.0f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
     Out.vFieldDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 0.0f);
     Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
     Out.vMRA = lerp(Out.vMRA, vMaskMRA, vMaskBaseColor.r);
@@ -351,7 +351,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MASKED_NORMAL_O();
     }
 
-	// 노말이 있는 일반 논 애님 모델 + Emissive 적용 ( 8 )
+	// 노말이 있는 일반 논 애님 모델 + Emissive 적용 ( 6 )
     pass Default_EMISSIVE
     {
         SetRasterizerState(RS_Default);

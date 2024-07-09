@@ -234,7 +234,10 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 #pragma endregion
 
 #pragma region LEVEL_FINALE OBJECT
-		, "FinaleCave"
+		, "FinaleCave", "GsFarBuildingA", "GsFarBuildingB", "GsFarBuildingC"
+		, "LbBrokenBuildingAC", "LbBrokenBuildingBL", "LbBrokenBuildingCL", "LbBrokenBuildingDL"
+		, "LbBuildingAL", "LbBuildingBL", "LbBuildingCL"
+		, "LbFarBuildingAL", "LbFarBuildingBL", "LbFarBuildingCL"
 #pragma endregion
 
 	};
