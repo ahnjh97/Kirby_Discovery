@@ -77,6 +77,7 @@
 #include "PoppyBomb.h"
 #include "CappyBody.h"
 #include "CappyHat.h"
+#include "SurprisedBoard.h"
 
 // 보스 몬스터
 #include "FinalBoss.h"
@@ -388,6 +389,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PoppyBomb"), CPoppyBomb);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CappyBody"), CCappyBody);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CappyHat"), CCappyHat);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SurprisedBoard"), CSurprisedBoard);
 
 	// FinalBoss
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalBoss"), CFinalBoss);
@@ -1816,6 +1818,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("PoppyBrosJr", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_ANIM, 1.3f, 180.f);
 
+
 		// For Item
 		Load_ItemModels();
 
@@ -1849,7 +1852,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	{
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("BG1", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
-
+		
 		// For Map
 		m_vecModelInfo.emplace_back("PkFunHouse", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
@@ -1869,6 +1872,12 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// Deform
 		m_vecModelInfo.emplace_back("DumpCar", TYPE_ANIM, 0.8f, 90.f);
+
+		// Monster
+		m_vecModelInfo.emplace_back("SurprisedBoardBlue", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("SurprisedBoardGreen", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("SurprisedBoardRed", TYPE_ANIM, 1.f, 180.f);
+
 	}
 	else if (eLevel == LEVEL_SIMBA)
 	{
@@ -2136,9 +2145,10 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
 
-		m_vecModelInfo.emplace_back("SurprisedBoardBlue", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("SurprisedBoardGreen", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("SurprisedBoardRed", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		// Monster
+		m_vecModelInfo.emplace_back("SurprisedBoardBlue", TYPE_ANIM, 1.f, 0.f);
+		m_vecModelInfo.emplace_back("SurprisedBoardGreen", TYPE_ANIM, 1.f, 0.f);
+		m_vecModelInfo.emplace_back("SurprisedBoardRed", TYPE_ANIM, 1.f, 0.f);
 
 		m_vecModelInfo.emplace_back("BreakableBlock", TYPE_ANIM, 0.5f, 0.f, 0);
 	}

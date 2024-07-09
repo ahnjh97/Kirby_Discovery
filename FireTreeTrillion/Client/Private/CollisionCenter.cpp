@@ -1122,6 +1122,29 @@ void CCollisionCenter::Hitbox_Collision()
 			pAnimDeco->HideModel();
 		});
 
+	// PhysX의 트리거 외에 객체호출 등 작은 단위의 트리거용
+	Collision_Collider(m_GameObjects[PLAYER], m_GameObjects[TRIGGER_FOR_NOT_PHYSX], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CPhysXObject* pPlayer = static_cast<CPhysXObject*>(Dst);
+			CPhysXObject* pMonster = static_cast<CDeeDeeDee*>(Src);
+
+			//if (pNpc->Get_PhyXState() != PO_NORMAL)
+			//	return;
+			//_float4 vNpcPos = pNpc->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
+			//_float4 vDeeDeeDeePos = pMonster->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
+			//_float3 vKnockDir = XMVector3Normalize(vNpcPos - vDeeDeeDeePos);
+			//pthis->Knock_back(pNpc, vKnockDir * 5.f, CUtils::Make_RandomFloat(15.f, 28.f));
+			//DstHit->Set_Alive(false);
+			//SrcHit->Set_Alive(false);
+
+			pMonster->Collision(CONTENT_TRIGGER, pPlayer);
+		});
 }
 
 _bool CCollisionCenter::Small_KnockBack(_uint uKirbyState)

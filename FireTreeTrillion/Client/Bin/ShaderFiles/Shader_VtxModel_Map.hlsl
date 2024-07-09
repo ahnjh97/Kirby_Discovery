@@ -351,7 +351,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MASKED_NORMAL_O();
     }
 
-	// 노말이 있는 일반 논 애님 모델 + Emissive 적용 ( 8 )
+	// 노말이 있는 일반 논 애님 모델 + Emissive 적용 ( 6 )
     pass Default_EMISSIVE
     {
         SetRasterizerState(RS_Default);
