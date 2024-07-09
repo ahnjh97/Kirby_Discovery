@@ -17,7 +17,6 @@
 #include "BG.h"
 #include "HUD.h"
 #include "SkySphere.h"
-//#include "Kirby.h"
 
 CLevel_Finale::CLevel_Finale(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -37,6 +36,10 @@ HRESULT CLevel_Finale::Initialize()
 
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinalePartical_Maker"), TEXT("Prototype_GameObject_FinalePartical_Maker"))))
 		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleCut_ControlCenter"), TEXT("Prototype_GameObject_FinaleCut_ControlCenter"))))
+		return E_FAIL;
+
 
 	hr = Ready_Lights();
 	CHECK_FAILED(hr);

@@ -552,8 +552,8 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Monster\SurprisedBoard\State">
       <UniqueIdentifier>{e79782c6-0b75-470d-8c32-900d86ca63a0}</UniqueIdentifier>
-	</Filter>
-	<Filter Include="02.GameObjects\Map\Gimmick\Lab_Discovera">
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Gimmick\Lab_Discovera">
       <UniqueIdentifier>{4c39de13-368d-45e1-886a-30d944f3cc82}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Map\SimbaObjects\RoomGlass">
@@ -573,6 +573,9 @@
     </Filter>
     <Filter Include="02.GameObjects\PopStar\PopStar_StarSmall">
       <UniqueIdentifier>{a6a867cc-1e47-427c-90a9-bd5185b502ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\FinaleCut_ControlCenter">
+      <UniqueIdentifier>{d924ae26-28e6-40af-8f42-f13ea9943530}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1129,9 +1132,6 @@
     <ClInclude Include="..\Public\OriginCage.h">
       <Filter>02.GameObjects\Map\SimbaObjects\OriginCage</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\BreakableBlock.h">
-      <Filter>02.GameObjects\Map\BreakableRock</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\FinalePartical_Maker.h">
       <Filter>02.GameObjects\Map\FinalePartical</Filter>
     </ClInclude>
@@ -1146,6 +1146,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\PopStar_StarSmall.h">
       <Filter>02.GameObjects\PopStar\PopStar_StarSmall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BreakableBlock.h">
+      <Filter>02.GameObjects\Map\BreakableBlock</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\FinaleCut_ControlCenter.h">
+      <Filter>02.GameObjects\FinaleCut_ControlCenter</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1683,9 +1689,6 @@
     <ClCompile Include="..\Private\KirbyBoom_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyBoom_State</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\BreakableBlock.cpp">
-      <Filter>02.GameObjects\Map\BreakableRock</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\FinalePartical_Maker.cpp">
       <Filter>02.GameObjects\Map\FinalePartical</Filter>
     </ClCompile>
@@ -1700,6 +1703,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\PopStar_StarSmall.cpp">
       <Filter>02.GameObjects\PopStar\PopStar_StarSmall</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BreakableBlock.cpp">
+      <Filter>02.GameObjects\Map\BreakableBlock</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FinaleCut_ControlCenter.cpp">
+      <Filter>02.GameObjects\FinaleCut_ControlCenter</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
