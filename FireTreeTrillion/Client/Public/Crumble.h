@@ -5,12 +5,20 @@
 BEGIN(Engine)
 class CModel;
 class CShader;
+class CRigidBody;
 END
 
 BEGIN(Client)
 
 class CCrumble final : public CPhysXObject
 {
+public:
+	enum ANIM_STATE { APPEAR, DISAPPEAR, PREDISAPPEAR, WAIT, ANIM_END };
+	struct CRUMBLE_DESC : public GAMEOBJECT_DESC
+	{
+		_uint uInitialState = WAIT;
+	};
+
 private:
 	CCrumble(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CCrumble(const CCrumble& rhs);
@@ -28,6 +36,9 @@ public:
 #endif
 	virtual void		Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
+	void				Change_State();
+	void				Break_Crumble();
+
 private:
 	void				Add_Components(wstring& wstrModelName);
 	HRESULT				Bind_ShaderResources();
@@ -37,8 +48,11 @@ private:
 	CModel*				m_pModelCom = { nullptr };
 	CModel*				m_pNonAnimModelCom = { nullptr }; // actor 생성 역할
 	PxRigidDynamic*		m_pDynamicActor = { nullptr };
-	
-	_bool				m_bPlayAnim = { false };
+
+	_float				m_fAccTimeDisappear = 0.f;
+	_float				m_fAccTimePreDisappear = 0.f;
+	_float4				m_vOriginPosition = _float4();
+	_bool				m_bOnce = { false };
 
 public:
 	static CCrumble*	 Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
