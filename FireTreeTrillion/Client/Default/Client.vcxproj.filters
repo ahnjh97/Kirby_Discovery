@@ -562,9 +562,6 @@
     <Filter Include="02.GameObjects\Map\Gimmick\Lab_Discovera">
       <UniqueIdentifier>{4c39de13-368d-45e1-886a-30d944f3cc82}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Map\Gimmick\Park_Wondaria">
-      <UniqueIdentifier>{8a33b20b-e9a5-41ac-83c4-3349fa722281}</UniqueIdentifier>
-    </Filter>    
     <Filter Include="02.GameObjects\Map\SimbaObjects\RoomGlass">
       <UniqueIdentifier>{1aa4a53b-c1d7-43fd-b993-6b79f9ea8e33}</UniqueIdentifier>
     </Filter>
@@ -1138,9 +1135,6 @@
     <ClInclude Include="..\Public\Gm_LabBossRoomDoor.h">
       <Filter>02.GameObjects\Map\Gimmick\Lab_Discovera</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Gm_ParkFhEntranceAlien.h">
-      <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\RoomGlass.h">
       <Filter>02.GameObjects\Map\SimbaObjects\RoomGlass</Filter>
     </ClInclude>
@@ -1169,7 +1163,6 @@
       <Filter>02.GameObjects\PopStar\PopStar_StarSmall</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Crumble.h" />
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1700,9 +1693,6 @@
     <ClCompile Include="..\Private\Gm_LabBossRoomDoor.cpp">
       <Filter>02.GameObjects\Map\Gimmick\Lab_Discovera</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Gm_ParkFhEntranceAlien.cpp">
-      <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\RoomGlass.cpp">
       <Filter>02.GameObjects\Map\SimbaObjects\RoomGlass</Filter>
     </ClCompile>
@@ -1734,7 +1724,6 @@
       <Filter>02.GameObjects\PopStar\PopStar_StarSmall</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Crumble.cpp" />
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
