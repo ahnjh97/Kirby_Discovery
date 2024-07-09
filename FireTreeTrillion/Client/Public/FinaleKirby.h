@@ -117,6 +117,9 @@ public:
 	void					Set_HitStop(_float fHitStopMaxTime = 0.12f) { 
 		m_bHitStop = true; m_fHitStopMaxTime = fHitStopMaxTime; }
 
+	void					Start_CutScene();
+	_float4					m_vBonePos = { 0.f, 0.f, 0.f, 0.f };
+	_float4					Compute_RootPos();
 
 private:
 	// 커비의 움직임을 담은 구조체

@@ -582,8 +582,8 @@
     </Filter>
     <Filter Include="02.GameObjects\FinaleCut_ControlCenter">
       <UniqueIdentifier>{d924ae26-28e6-40af-8f42-f13ea9943530}</UniqueIdentifier>
-	</Filter>
-	<Filter Include="02.GameObjects\PhysXObject\MapObject\Crumble">
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\MapObject\Crumble">
       <UniqueIdentifier>{366fdf1d-19e9-414d-a2be-7baa585b0a58}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Simba">
@@ -594,6 +594,12 @@
     </Filter>
     <Filter Include="02.GameObjects\Map\Gimmick\Park_Wondaria">
       <UniqueIdentifier>{27194b3b-3a4c-4942-8b16-645f028d9080}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\FinaleBoss">
+      <UniqueIdentifier>{cc4aa8d1-5dcf-4336-965a-bea04b26bdd5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\FinaleBoss\State">
+      <UniqueIdentifier>{771fd3c6-8505-4fe9-a53a-6d224433b9e6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1176,8 +1182,8 @@
     </ClInclude>
     <ClInclude Include="..\Public\FinaleCut_ControlCenter.h">
       <Filter>02.GameObjects\FinaleCut_ControlCenter</Filter>
-	</ClInclude>
-	<ClInclude Include="..\Public\Simba.h">
+    </ClInclude>
+    <ClInclude Include="..\Public\Simba.h">
       <Filter>02.GameObjects\PhysXObject\Character\Simba</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Simba_State.h">
@@ -1186,6 +1192,12 @@
     <ClInclude Include="..\Public\Crumble.h" />
     <ClInclude Include="..\Public\Gm_ParkFhEntranceAlien.h">
       <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\FinaleBoss.h">
+      <Filter>02.GameObjects\PhysXObject\Character\FinaleBoss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\FinaleBoss_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\FinaleBoss\State</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1749,8 +1761,8 @@
     </ClCompile>
     <ClCompile Include="..\Private\FinaleCut_ControlCenter.cpp">
       <Filter>02.GameObjects\FinaleCut_ControlCenter</Filter>
-	</ClCompile>
-	<ClCompile Include="..\Private\Simba.cpp">
+    </ClCompile>
+    <ClCompile Include="..\Private\Simba.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Simba</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Simba_State.cpp">
@@ -1759,6 +1771,12 @@
     <ClCompile Include="..\Private\Crumble.cpp" />
     <ClCompile Include="..\Private\Gm_ParkFhEntranceAlien.cpp">
       <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FinaleBoss.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\FinaleBoss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FinaleBoss_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\FinaleBoss\State</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -100,6 +100,7 @@ HRESULT CLevel_Finale::Initialize()
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 	m_pGameInstance->Set_ColorSet_ByIndex(4);
+
 	return S_OK;
 }
 
@@ -592,6 +593,11 @@ HRESULT CLevel_Finale::Ready_Monsters()
 		else if (L"BladeKnight" == tempDesc.wstrModelName)
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BladeKnight"), &tempDesc)))
+				return E_FAIL;
+		}
+		else if (L"FinaleBoss" == tempDesc.wstrModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_FinaleBoss"), &tempDesc)))
 				return E_FAIL;
 		}
 		else if (L"PoppyBrosJr" == tempDesc.wstrModelName)
