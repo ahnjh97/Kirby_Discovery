@@ -138,6 +138,9 @@
 #include "RoomGlass.h"
 #include "Throne.h"
 
+// Simba
+#include "Simba.h"
+
 // 피날레 스테이지 기믹들
 #include "Baum.h"
 #include "BaumPiece.h"
@@ -489,6 +492,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SimbaRoomGlass"), CSimbaRoomGlass);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("RoomGlass"), CRoomGlass);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Throne"), CThrone);
+
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Simba"), CSimba);
 	#pragma endregion
 
 #pragma endregion
@@ -1024,7 +1029,7 @@ HRESULT CLoader::Loading_For_Simba()
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Moon", "Moon.png")))
 		return E_FAIL;
-	if (FAILED(Add_Texture(eLevel, "Level_0_Env", "Map/Level_0_Env.dds")))
+	if (FAILED(Add_Texture(eLevel, "Level_Simba_Env", "Map/Level_Simba_Env.dds")))
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "BRDF_LUT", "Map/BRDF_LUT.png")))
 		return E_FAIL;
@@ -1038,15 +1043,20 @@ HRESULT CLoader::Loading_For_Simba()
 	//HUD_BOSSHPBAR
 	hr = Add_Texture(eLevel, "HUD_BossBar", "UI/HUD/Boss/BossBar_%d.png", 5);
 
-#pragma region SKYSPHERE::LEVEL_FINALBOSS
+	if (FAILED(Add_Texture(eLevel, "SimbaEye_Diffuse", "SimbaEye/Eye_BaseColor%d.dds", 3)))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "SimbaEye_Normal", "SimbaEye/Eye_Normal%d.dds", 3)))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "SimbaEye_MRA", "SimbaEye/BaseMRA.dds")))
+		return E_FAIL;
 
+#pragma region SKYSPHERE::LEVEL_SIMBA
 	////FIELD
 	//hr = Add_Texture(eLevel, "SkySphere_Lab_CloudNoize", "SkySphere/SkySphere_Lab_CloudNoizeC_MRA.dds"); CHECK_FAILED(hr);
 	//hr = Add_Texture(eLevel, "SkySphere_Lab_Diffuse", "SkySphere/SkySphere_Lab_Diffuse_%d.dds", 3);	CHECK_FAILED(hr);
 	//hr = Add_Texture(eLevel, "SkySphere_LabBoss_2Pase_Normal", "SkySphere/SkySphere_LabBoss_2Pase_Normal.dds");	CHECK_FAILED(hr);
 	//hr = Add_Texture(eLevel, "SkySphere_LabBoss_2Pase_Emissive", "SkySphere/SkySphere_LabBoss_2Pase_Emissive.dds");	CHECK_FAILED(hr);
 	//hr = Add_Texture(eLevel, "SkySphere_LabBoss_2Pase_Height", "SkySphere/SkySphere_LabBoss_2Pase_Height.dds");	CHECK_FAILED(hr);
-
 #pragma endregion
 
 	// 커비 얼굴 텍스쳐 로드
@@ -1925,7 +1935,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		Load_KirbyArmourModels();
 
 		// For Boss 
-		
+		m_vecModelInfo.emplace_back("Simba", TYPE_ANIM, 1.f, 180.f);
 
 		// For Item
 		Load_ItemModels();

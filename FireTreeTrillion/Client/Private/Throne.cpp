@@ -34,7 +34,7 @@ HRESULT CThrone::Initialize(void* pArg)
 		Add_Components(desc->wstrModelName);
 
 	m_bMotionBlur = false;
-	m_bRimLight = true;
+	m_bRimLight = false;
 	m_bStencil = true;
 
 	CBone* pPieceManager = m_pModelCom->Get_BonePtr("PieceAllL");
