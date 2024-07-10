@@ -34,6 +34,7 @@ HRESULT CFinaleBoss::Initialize(void* pArg)
     if (FAILED(Add_Components()))
         return E_FAIL;
 
+	//m_bRimLight = false;
 	m_pModelCom->Set_Animation(FINALEBOSS_DEMOWAITAIR, 50.f, true, true);
 
     return S_OK;
@@ -51,6 +52,8 @@ _int CFinaleBoss::Tick(_float fTimeDelta)
 		// FSM Á¦¾î
 		if (m_pFSM != nullptr)
 			m_pFSM->Update(this, m_fTimeDelta);
+
+		m_vBonePos = Compute_RootPos();
 	}
 
 	return OBJ_NOEVENT;
@@ -113,6 +116,9 @@ void CFinaleBoss::Render_IMGUI()
 		ImGui::Separator(); ImGui::NewLine();
 		ImGui::TreePop();
 	}
+
+	ImGui::Text("Bone Pos : %.2f %.2f %.2f", m_vBonePos.x, m_vBonePos.y, m_vBonePos.z);
+
 
 	//ImGui::Text("RePress : %d", m_bRePressBlock);
 	//ImGui::Text("Land : %d", INFO(m_isLanding));

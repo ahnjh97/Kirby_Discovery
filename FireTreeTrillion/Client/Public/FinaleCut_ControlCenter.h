@@ -20,7 +20,7 @@ public:
 	virtual HRESULT Render()									override;
 
 	_uint			Get_CutScene() { return m_iCutScene; }
-	void			Set_CutScene(_uint iScene) { m_iCutScene = iScene; }
+	void			Set_CutScene(_uint iScene);
 
 private:
 	_uint					m_iCutScene = { 0 };

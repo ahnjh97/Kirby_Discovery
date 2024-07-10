@@ -57,7 +57,7 @@ HRESULT CFinaleKirby::Initialize(void* pArg)
     m_pControllerCom->RegisterAsPlayer();
 
     m_bSlope = false;
-    m_bRimLight = false;
+    //m_bRimLight = false;
 
     // 마지막 스테이지에서 운석을 지속적으로 날려주는 기능을 가진 클래스를 생성한다.
     if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Disaster_Master"), TEXT("Prototype_GameObject_Disaster_Master"), this)))
@@ -170,7 +170,7 @@ HRESULT CFinaleKirby::Render()
 
         if (INFO(m_eBodyState) == BODY_DUMPDEFAULT || Get_State() == DUMPTSTATE_CUT)
         {
-            if (FAILED(m_pShaderCom->Begin(/*ANIMMODEL_KIRBY*/14)))
+            if (FAILED(m_pShaderCom->Begin(/*ANIMMODEL_KIRBY*//*14*/ANIMMODEL_FINALEKIRBY_WEAPONS)))
                 return E_FAIL;
         }
         else

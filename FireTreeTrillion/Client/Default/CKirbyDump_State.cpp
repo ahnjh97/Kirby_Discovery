@@ -191,7 +191,7 @@ void ToCut_Reset_Kirby(CTransform* pTransformCom, CCharacterController* pControl
 	pController->Set_Position(pTransformCom, _float4(2550.f, 239.f, -136.f, 1.f));
 	_float4 NewLook = _float4(1.f, 0.f, 0.f, 0.f);
 	_float4 NewUp = _float4(0.f, 1.f, 0.f, 0.f);
-	_float4 NewRight = XMVector3Cross(NewLook, NewUp);
+	_float4 NewRight = XMVector3Cross(NewUp, NewLook);
 
 	pTransformCom->Set_State(CTransform::STATE_LOOK, NewLook);
 	pTransformCom->Set_State(CTransform::STATE_UP, NewUp);
@@ -225,7 +225,7 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 	m_fParticalDelay += fTimeDelta;
 
-	if (pTransformCom->Get_State(CTransform::STATE_POSITION).x > 1550.f)
+	if (pTransformCom->Get_State(CTransform::STATE_POSITION).x > 1550.f || (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_8, KEY_DOWN)))
 	{
 		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT1, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
 		ToCut_Reset_Kirby(pTransformCom, pController);
@@ -409,7 +409,7 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
 
-	if (pTransformCom->Get_State(CTransform::STATE_POSITION).x > 1550.f)
+	if (pTransformCom->Get_State(CTransform::STATE_POSITION).x > 1550.f || m_pGameInstance->Get_KeyState(DIK_F10, KEY_DOWN))
 	{
 		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT1, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
 		ToCut_Reset_Kirby(pTransformCom, pController);

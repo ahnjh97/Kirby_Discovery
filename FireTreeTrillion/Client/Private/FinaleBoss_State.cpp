@@ -51,7 +51,7 @@ void CFinaleBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 	{
 		_float4 NewLook = _float4(1.f, 0.f, 0.f, 0.f);
 		_float4 NewUp = _float4(0.f, 1.f, 0.f, 0.f);
-		_float4 NewRight = XMVector3Cross(NewLook, NewUp);
+		_float4 NewRight = XMVector3Cross(NewUp, NewLook);
 
 		pTransformCom->Set_State(CTransform::STATE_LOOK, NewLook);
 		pTransformCom->Set_State(CTransform::STATE_UP, NewUp);

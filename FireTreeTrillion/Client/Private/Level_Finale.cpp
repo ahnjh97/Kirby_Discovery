@@ -216,8 +216,8 @@ HRESULT CLevel_Finale::Ready_FinaleRoad()
 	//_float3 vStartPos{ 139.f, -26.f, 4.8f };
 
 	Make_FinaleRoad(RTYPE_BUILDINGA, MOVECMD_STOP,
-		{ 139.f, -26.f, 4.8f },	{ .98f, .21f, .07f },
-		{ 139.f, -26.f, 4.8f },	{ 1.f, -.04f, .7f });
+		{ 137.f, -28.f, 4.8f },	{ .98f, .21f, .07f },
+		{ 137.f, -28.f, 4.8f },	{ 1.f, -.04f, .7f });
 
 
 	Make_FinaleRoad(RTYPE_BUILDINGC, MOVECMD_STOP,
@@ -249,15 +249,16 @@ HRESULT CLevel_Finale::Ready_FinaleRoad()
 		-10.f);
 
 
-	//Make_FinaleRoad(RTYPE_BUILDINGC, MOVECMD_FLY,
-	//	{ 1493.8f, -125.9f, -123.f }, { .77f, .15f, -.59f },
-	//	{ 1493.8f, -125.9f, -123.f }, { .95f, .15f, -.18f }, -5.f);
-
 
 	//cut scene start building
-	Make_FinaleRoad(RTYPE_BUILDINGC, MOVECMD_FLY,
-		{ 1619.6f, -80.37f, -152.71f }, { .78f, .62f, .04f },
-		{ 1619.6f, -80.37f, -152.71f }, { .87f, .5f, .02f }, 30.f);
+	Make_FinaleRoad(RTYPE_BUILDINGC, MOVECMD_STOP,
+		{ 1619.6f, -84.37f, -152.71f }, { .87f, .5f, .02f },
+		{ 1619.6f, -84.37f, -152.71f }, { .87f, .5f, .02f }, 30.f);
+
+	//Make_FinaleRoad(RTYPE_BUILDINGC, MOVECMD_COLLIDE,
+	//	{ 1619.6f, -84.37f, -152.71f }, { .78f, .62f, .04f },
+	//	{ 1619.6f, -84.37f, -152.71f }, { .87f, .5f, .02f }, 30.f);
+
 
 	//발판 1. 이후 start, dest position 반대로
 	Make_FinaleRoad(RTYPE_BUILDINGB, MOVECMD_ROTATE,

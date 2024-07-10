@@ -46,10 +46,13 @@ public:
 private:
 	FINALEBOSS_ANIM		m_eCurrentState = { FINALEBOSS_END };
 
+
+	//컷신 위치 확인을 위해 조금 넣어 사용하것습니다
+	_float4				m_vBonePos = { 0.f, 0.f, 0.f, 0.f };
+
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
-
 	// FSM
 	void SetUp_FSM();
 
