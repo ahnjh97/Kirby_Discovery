@@ -66,8 +66,9 @@ private:
 
 public:
 	void Set_SimbaEye(SIMBA_EYESTATE eEyeState) { m_eEyeState = eEyeState; }
-
 	_float4 Get_Pos() { return m_vPos; }
+
+	void InsertHitboxActivationTiming(_uint iAnimIdx, vector<tuple<_float, _bool, COLLISION_VALUE>>& _vecTimings);
 
 public:
 	virtual HRESULT Initialize_Prototype()			override;
@@ -89,7 +90,6 @@ public:
 
 private:
 	CTexture*		m_pEyeTextureCom[EYETEX_END] = { nullptr, nullptr, nullptr };
-	CModel*			m_pFaceModelCom = { nullptr };
 
 	SIMBA_ANIM		m_eCurrentState = { SIMBA_END };
 	SIMBA_EYESTATE	m_eEyeState = { SIMBAEYE_END };
@@ -98,19 +98,33 @@ private:
 	_uint			m_iEyeMesh = {};
 	_uint			m_iEyeLidMesh = {};
 
-	_bool			m_bPlayFaceAnim = { false };
+	_bool			m_bPlayDamageFaceSub = { false };
+	_bool			m_bPlayLipSyncSub = { false };
+	_bool			m_bPlayLipSyncSubA = { false };
+
+	vector<_uint>	m_vecDamageFaceSubBones;
+	vector<_uint>	m_vecLipSyncSubBones;
+	vector<_uint>	m_vecLipSyncSubABones;
+
+	unordered_map<_uint, vector<tuple<_float, _bool, COLLISION_VALUE>>> m_mapHitBoxTiming; // 애니메이션 인덱스와, 활성화시킬 KeyFrame들.
 
 	_float			m_fAngle = { 0.f };
 	_float4			m_vPos = {};
 
-	vector<_uint>	m_vecValidBoneIndices;
-
 private:
-	HRESULT			Add_Components();
-	HRESULT			Bind_ShaderResources();
+	HRESULT		Add_Components();
+	HRESULT		Bind_ShaderResources();
 
 	// FSM
-	void			SetUp_FSM();
+	void		SetUp_FSM();
+
+	void		Check_HitBoxActivation();
+	void		Reset_HitBoxTimingMap(_uint iAnimIdx);
+
+	void		OnAppearStart(CGameObject* pObj);
+	void		OnAppearEnd(CGameObject* pObj);
+	void		OnWave1Dead(CGameObject* pObj);
+	void		OnWave2Dead(CGameObject* pObj);
 
 public:
 	static CSimba* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

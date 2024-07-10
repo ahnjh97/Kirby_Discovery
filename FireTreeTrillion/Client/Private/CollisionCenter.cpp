@@ -1023,8 +1023,9 @@ void CCollisionCenter::Hitbox_Collision()
 
 			if (pKirby->isOverPower() == false)
 			{
-				// 넉백방향을 정해주기 위한 과정이다.
 				CTransform* pMonsterTransformCom = pMonster->Get_TransformCom();
+				if (LEVEL_SIMBA == *GAMEINSTANCE Get_CurrentLevelID())
+					pMonsterTransformCom = DstHit->Get_TransformCom();
 				_vector vMonsterPos = pMonsterTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 				CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
 				_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);

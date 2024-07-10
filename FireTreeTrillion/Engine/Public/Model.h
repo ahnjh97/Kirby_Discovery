@@ -79,6 +79,7 @@ public:
 	
 	HRESULT Play_Animation(_float fTimeDelta);
 	HRESULT Play_PartialAnimation(_uint iAnimIndex, vector<_uint>& _vecValidBoneIndices, _float fTimeDelta, _bool bLoop = false);
+	void	Reset_PartialAnimation(_uint iAnimIndex, _float fTickPerSecond, _bool bIsLooping, _bool bInterpolation = false, _float fLerpTime = 0.1f);
 
 	void	Stop_Animation() { m_bStop = true; }
 	void	Replay_Animation() { m_bStop = false; }
@@ -145,6 +146,8 @@ public:
 
 	void AlignMeshMaterialIndicesWithMeshIndices();
 	string ExtractDigitsAfterUnderScore(_uint iMeshIndex);
+
+	_float Get_CurTrackPosition() { return m_Animations[m_iCurrentAnimIndex]->Get_TrackPosition(); }
 
 private:
 	_uint						m_iNumMeshes = { 0 };

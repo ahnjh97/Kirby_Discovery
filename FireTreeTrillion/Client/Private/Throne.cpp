@@ -234,9 +234,10 @@ CGameObject* CThrone::Clone(void* pArg)
 
 void CThrone::Free()
 {
+	CEventCenter::Get_Instance()->Unsubscribe(KEVENT_SIMBA_THRONEBREAK, this);
+
 	__super::Free();
 
-	CEventCenter::Get_Instance()->Unsubscribe(KEVENT_SIMBA_THRONEBREAK, this);
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 }

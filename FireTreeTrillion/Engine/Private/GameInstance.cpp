@@ -1200,6 +1200,23 @@ _bool CGameInstance::Is_PassingGroup(CGameObject* pObj)
 	return pObj->Get_CollisionType() >= PASSING_GROUP;
 }
 
+_float CGameInstance::Compute_Distance(CGameObject* pDst, CGameObject* pSrc)
+{
+	if (nullptr == pDst || nullptr == pSrc)
+		return FLT_MAX;
+
+	CTransform* pDstTransform = pDst->Get_TransformCom();
+	CTransform* pSrcTransform = pSrc->Get_TransformCom();
+
+	if (nullptr == pDstTransform || nullptr == pSrcTransform)
+		return FLT_MAX;
+
+	_vector vDstPos = pDstTransform->Get_State(CTransform::STATE_POSITION);
+	_vector vSrcPos = pSrcTransform->Get_State(CTransform::STATE_POSITION);
+
+	return XMVectorGetX(XMVector4Length(vDstPos - vSrcPos));
+}
+
 void CGameInstance::Release_Engine()
 {
 	CGameInstance::Get_Instance()->Free();

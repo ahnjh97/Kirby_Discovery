@@ -1,5 +1,6 @@
 #include "..\Public\Transform.h"
 #include "Shader.h"
+#include "Bone.h"
 
 CTransform::CTransform(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CComponent(pDevice, pContext)
@@ -27,9 +28,33 @@ void CTransform::Set_Scaled(_float3 vScale)
 	Set_Scaled(vScale.x, vScale.y, vScale.z);
 }
 
+_float4x4 CTransform::ComputeBoneWorldMatrix(CBone* pBone, _bool bMultiplyScale)
+{
+	if (nullptr == pBone)
+		return _float4x4();
+
+	_float4x4 matResult{};
+	_float4x4 matBoneCombined = *pBone->Get_CombinedTransformationMatrix();
+	Safe_AddRef(pBone);
+	if (true == bMultiplyScale) // »À Scale ¹Ý¿µ
+		XMStoreFloat4x4(&matResult, XMLoadFloat4x4(&matBoneCombined) * XMLoadFloat4x4(&m_WorldMatrix));
+	else
+	{
+		_vector vScale{}, vRotQuat{}, vTrans{};
+		::XMMatrixDecompose(&vScale, &vRotQuat, &vTrans, XMLoadFloat4x4(&matBoneCombined));
+
+		_vector vUnitScale = XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f);
+		_matrix matNew = ::XMMatrixAffineTransformation(vUnitScale, XMVectorZero(), vRotQuat, vTrans);
+
+		XMStoreFloat4x4(&matResult, matNew * XMLoadFloat4x4(&m_WorldMatrix));
+	}
+	Safe_Release(pBone);
+	return matResult;
+}
+
 HRESULT CTransform::Initialize_Prototype()
 {
-	XMStoreFloat4x4(&m_WorldMatrix, XMMatrixIdentity());
+	XMStoreFloat4x4(&m_WorldMatrix, ::XMMatrixIdentity());
 
 	return S_OK;
 }

@@ -204,44 +204,44 @@ HRESULT CGameObject::Compute_ViewZ()
 	return S_OK;
 }
 
-void CGameObject::Activate_CylinderCollider(_float fOffSetY, _float fHeight, _float fRadius)
+void CGameObject::Activate_CylinderCollider(_float fOffSetY, _float fHeight, _float fRadius, COLLISION_VALUE eColVal)
 {
-	m_tColliderDesc[ATTACK].bAlive = true;
-	m_tColliderDesc[ATTACK].eValue = ATTACK;
-	m_tColliderDesc[ATTACK].eHitbox = COLLIDER_CYLINDER;
-	m_tColliderDesc[ATTACK].fOffSetY = fOffSetY;
-	m_tColliderDesc[ATTACK].fHeight = fHeight;
-	m_tColliderDesc[ATTACK].fRadius = fRadius;
+	m_tColliderDesc[eColVal].bAlive = true;
+	m_tColliderDesc[eColVal].eValue = eColVal;
+	m_tColliderDesc[eColVal].eHitbox = COLLIDER_CYLINDER;
+	m_tColliderDesc[eColVal].fOffSetY = fOffSetY;
+	m_tColliderDesc[eColVal].fHeight = fHeight;
+	m_tColliderDesc[eColVal].fRadius = fRadius;
 }
 
-void CGameObject::Activate_SphereCollider(_float fOffSetY, _float fRadius)
+void CGameObject::Activate_SphereCollider(_float fOffSetY, _float fRadius, COLLISION_VALUE eColVal)
 {
-	m_tColliderDesc[ATTACK].bAlive = true;
-	m_tColliderDesc[ATTACK].eValue = ATTACK;
-	m_tColliderDesc[ATTACK].eHitbox = COLLIDER_SPHERE;
-	m_tColliderDesc[ATTACK].fOffSetY = fOffSetY;
-	m_tColliderDesc[ATTACK].fRadius = fRadius;
+	m_tColliderDesc[eColVal].bAlive = true;
+	m_tColliderDesc[eColVal].eValue = eColVal;
+	m_tColliderDesc[eColVal].eHitbox = COLLIDER_SPHERE;
+	m_tColliderDesc[eColVal].fOffSetY = fOffSetY;
+	m_tColliderDesc[eColVal].fRadius = fRadius;
 }
 
-void CGameObject::Activate_FrustumCollider(_float fOffSetY, _float fRadius, _float fAngle)
+void CGameObject::Activate_FrustumCollider(_float fOffSetY, _float fRadius, _float fAngle, COLLISION_VALUE eColVal)
 {
-	m_tColliderDesc[ATTACK].bAlive = true;
-	m_tColliderDesc[ATTACK].eValue = ATTACK;
-	m_tColliderDesc[ATTACK].eHitbox = COLLIDER_FRUSTUM;
-	m_tColliderDesc[ATTACK].fOffSetY = fOffSetY;
-	m_tColliderDesc[ATTACK].fRadius = fRadius;
-	m_tColliderDesc[ATTACK].fAngle = fAngle;
+	m_tColliderDesc[eColVal].bAlive = true;
+	m_tColliderDesc[eColVal].eValue = eColVal;
+	m_tColliderDesc[eColVal].eHitbox = COLLIDER_FRUSTUM;
+	m_tColliderDesc[eColVal].fOffSetY = fOffSetY;
+	m_tColliderDesc[eColVal].fRadius = fRadius;
+	m_tColliderDesc[eColVal].fAngle = fAngle;
 }
 
-void CGameObject::Activate_TubeCollider(_float fOffSetY, _float fHeight, _float fMinRadius, _float fMaxRadius)
+void CGameObject::Activate_TubeCollider(_float fOffSetY, _float fHeight, _float fMinRadius, _float fMaxRadius, COLLISION_VALUE eColVal)
 {
-	m_tColliderDesc[ATTACK].bAlive = true;
-	m_tColliderDesc[ATTACK].eValue = ATTACK;
-	m_tColliderDesc[ATTACK].eHitbox = COLLIDER_CYLINDER;
-	m_tColliderDesc[ATTACK].fOffSetY = fOffSetY;
-	m_tColliderDesc[ATTACK].fHeight = fHeight;
-	m_tColliderDesc[ATTACK].fMinRadius = fMinRadius;
-	m_tColliderDesc[ATTACK].fMaxRadius = fMaxRadius;
+	m_tColliderDesc[eColVal].bAlive = true;
+	m_tColliderDesc[eColVal].eValue = eColVal;
+	m_tColliderDesc[eColVal].eHitbox = COLLIDER_CYLINDER;
+	m_tColliderDesc[eColVal].fOffSetY = fOffSetY;
+	m_tColliderDesc[eColVal].fHeight = fHeight;
+	m_tColliderDesc[eColVal].fMinRadius = fMinRadius;
+	m_tColliderDesc[eColVal].fMaxRadius = fMaxRadius;
 }
 
 void CGameObject::Set_BodyCollider(HITBOX eType, _float fOffSetY, _float fHeight, _float fRadius)

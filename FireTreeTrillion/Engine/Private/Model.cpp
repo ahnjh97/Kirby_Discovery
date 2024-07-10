@@ -296,6 +296,21 @@ HRESULT CModel::Play_PartialAnimation(_uint iAnimIndex, vector<_uint>& _vecValid
 	return S_OK;
 }
 
+void CModel::Reset_PartialAnimation(_uint iAnimIndex, _float fTickPerSecond, _bool bIsLooping, _bool bInterpolation, _float fLerpTime)
+{
+	m_Animations[iAnimIndex]->Reset_TrackPosition();
+	m_Animations[iAnimIndex]->Reset_Finished();
+	m_Animations[iAnimIndex]->Set_TickPerSecond(fTickPerSecond);
+
+	if (bInterpolation)
+	{
+		// 바뀔 애니메이션을 대상으로 선형보간 ON
+		m_Animations[iAnimIndex]->Reset_Ratio();
+		m_Animations[iAnimIndex]->Reset_RatioTime();
+		m_Animations[iAnimIndex]->Set_LerpTime(fLerpTime);
+	}
+}
+
 vector<_uint> CModel::Get_ValidBoneIndices(_uint iAnimIndex)
 {
 	return m_Animations[iAnimIndex]->Get_ValidBoneIndices();

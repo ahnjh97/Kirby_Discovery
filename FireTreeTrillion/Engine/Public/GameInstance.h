@@ -225,12 +225,15 @@ public: /* For. TimeController */
 	void	Restore_SecondTimer(_float fRestoreRatio = 1.f);
 
 
+	/* For. OcTree */
 	_uint Get_NumOctree() { return g_iNumOctree; }
 	void IncreaseIndex() { g_iNumOctree++; }
 
 public: // For Collision
 	_bool	Is_PassingGroup(class CGameObject* pObj);
 
+public: // For GameObject Distance
+	_float Compute_Distance(CGameObject* pDst, CGameObject* pSrc);
 
 private:
 	class CGraphic_Device*			m_pGraphic_Device = { nullptr };

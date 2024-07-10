@@ -556,11 +556,11 @@ PS_OUT PS_SIMBAEYE(PS_IN In)
 
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord);
     if (0.3f >= vMtrlDiffuse.a)
-        vMtrlDiffuse.rgb = float3(0, 0, 0);
+        vMtrlDiffuse.rgb = float3(1, 1, 1);
 
     vector vWhite = vector(1.f, 1.f, 1.f, 1.f);
     
-    vector mixedColor = lerp(vMtrlDiffuse, vWhite, g_fWhiteColorDiffuse);
+    //vector mixedColor = lerp(vMtrlDiffuse, vWhite, g_fWhiteColorDiffuse);
     
     vector vNormalDesc = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
 
@@ -570,7 +570,7 @@ PS_OUT PS_SIMBAEYE(PS_IN In)
 
     float3 vWorldNormal = mul(vNormal, WorldMatrix);
 
-    Out.vDiffuse = mixedColor;
+    Out.vDiffuse = vMtrlDiffuse;
     //Out.vDiffuse = vMtrlDiffuse + g_fWhiteColorDiffuse;
     Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
@@ -824,7 +824,6 @@ technique11 DefaultTechnique
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_LINEAR_NORMAL_O_NONDISCARD();
     }
-
 
     // SimbaEye (17)
     pass SimbaEye
