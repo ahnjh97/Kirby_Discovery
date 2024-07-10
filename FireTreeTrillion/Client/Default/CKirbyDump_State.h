@@ -81,7 +81,10 @@ public:
 
 public:
 	_float	m_fTime = { 0.f };
-	_bool	m_bShakeTrigger = { true };
+	_bool	m_bShakeTrigger1 = { true };
+	_bool	m_bShakeTrigger2 = { true };
+
+	_uint	m_iQTECount = { 0 };
 
 	static	CKirbyDump_Cut2_State* Create();
 	virtual void				  Free() override;

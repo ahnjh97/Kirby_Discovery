@@ -2063,7 +2063,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("DumpCar", TYPE_ANIM, 0.8f, 90.f);
 
 		// For Boss 
-		m_vecModelInfo.emplace_back("FinaleBoss", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("FinaleBoss", TYPE_ANIM, 1.f);
 
 		m_vecModelInfo.emplace_back("FinalBoss", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("FinalBossSpear", TYPE_ANIM, 1.f);
@@ -2177,7 +2177,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("FinalBossSpear", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("Phanta", TYPE_ANIM, 1.f, 180.f);
 
-		m_vecModelInfo.emplace_back("FinaleBoss", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("FinaleBoss", TYPE_ANIM, 1.f);
 		// Boss
 		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 180.f);
 		m_vecModelInfo.emplace_back("DeeDeeDeeHammer", TYPE_NONANIM, 1.0f);
