@@ -70,7 +70,7 @@ HRESULT CLevel_Racing::Initialize()
 
 	CGameObject* pGameObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar"));
 	CTransingStar* pTransingStar = static_cast<CTransingStar*>(pGameObj);
-	//pTransingStar->Activate(CTransingStar::OPEN);
+	pTransingStar->Activate(CTransingStar::OPEN);
 
 	return S_OK;
 }
@@ -90,7 +90,7 @@ HRESULT CLevel_Racing::Render()
 	++m_iFPS;
 
 	_tchar szFPS[MAX_PATH] = TEXT("");
-	wsprintf(szFPS, TEXT("Level Intro, %d FPS"), m_iFPS);
+	wsprintf(szFPS, TEXT("Level Racing, %d FPS"), m_iFPS);
 
 	if (m_fAccDelta >= 1.f)
 	{
@@ -110,8 +110,8 @@ HRESULT CLevel_Racing::Ready_Lights()
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
 	LightDesc.vDirection = _float4(0.f, -1.f, 0.f, 0.f);
 
-	LightDesc.vDiffuse = _float4(0.8f, 0.8f, 0.8f, 1.f);
-	LightDesc.vAmbient = _float4(0.6f, 0.6f, 0.6f, 1.f);
+	LightDesc.vDiffuse  = _float4(0.8f, 0.8f, 0.8f, 1.f);
+	LightDesc.vAmbient  = _float4(0.6f, 0.6f, 0.6f, 1.f);
 	LightDesc.vSpecular = _float4(0.2f, 0.2f, 0.2f, 1.f);
 
 	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))

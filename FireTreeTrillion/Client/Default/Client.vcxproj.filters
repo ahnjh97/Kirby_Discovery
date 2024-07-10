@@ -1177,9 +1177,11 @@
     <ClInclude Include="..\Public\Simba_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\Simba\State</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Crumble.h" />
     <ClInclude Include="..\Public\Gm_ParkFhEntranceAlien.h">
       <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Crumble.h">
+      <Filter>02.GameObjects\PhysXObject\MapObject\Crumble</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1747,9 +1749,11 @@
     <ClCompile Include="..\Private\Simba_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Simba\State</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Crumble.cpp" />
     <ClCompile Include="..\Private\Gm_ParkFhEntranceAlien.cpp">
       <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Crumble.cpp">
+      <Filter>02.GameObjects\PhysXObject\MapObject\Crumble</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
