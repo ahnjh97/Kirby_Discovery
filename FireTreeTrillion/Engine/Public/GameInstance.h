@@ -68,6 +68,7 @@ public:
 
 public: /* For.Level_Manager */
 	HRESULT Open_Level(_uint iNewLevelID, class CLevel* pNewLevel);
+	void Reserve_Open_Level(_uint iNewLevelID, class CLevel* pNewLevel);
 
 public: /* For.Object_Manager */
 	HRESULT Add_Prototype(const wstring& strPrototypeTag, class CGameObject* pPrototype);
@@ -258,6 +259,9 @@ private:
 	_uint	m_iCurrentLevelID		= { 0 };
 	_uint	g_iNumOctree			= {};
 	_float2 m_fWinSize				= { 0.f , 0.f };
+
+	_uint	m_NewLevelID			= { 0 };
+	CLevel* m_pNewLevel				= nullptr;
 
 public:		
 	static void Release_Engine();
