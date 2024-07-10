@@ -45,6 +45,7 @@ public:
 	void						Tick_OpenAlphaStar(_float fTimeDelta);
 	void						RenderOpen();
 
+	void						Change_Level(LEVEL eLevel);
 
 private:
 	HRESULT						Add_Components();

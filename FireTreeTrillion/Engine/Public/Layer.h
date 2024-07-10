@@ -20,6 +20,7 @@ public:
 	HRESULT Initialize();
 	HRESULT	Add_GameObject(class CGameObject* pGameObject);
 	void	Tick(_float fTimeDelta);
+	void	Event_Tick(_float fTimeDelta);
 	void	Late_Tick(_float fTimeDelta);
 
 public:

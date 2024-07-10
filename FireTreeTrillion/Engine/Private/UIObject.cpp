@@ -34,6 +34,10 @@ _int CUIObject::Tick(_float fTimeDelta)
 	return OBJ_NOEVENT;
 }
 
+void CUIObject::Event_Tick(_float fTimeDelta)
+{
+}
+
 void CUIObject::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);

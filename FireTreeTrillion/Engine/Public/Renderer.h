@@ -226,6 +226,7 @@ private:
 
 	pair<_float, _float> m_fRimLightRatio = { 1.f, 1.f };
 
+
 	_float m_fSSAOScale = { 0.5f };
 	_float m_fSSAOBias = { 0.f };
 	_float m_fSSAOSampleRadius = { 2.85f };

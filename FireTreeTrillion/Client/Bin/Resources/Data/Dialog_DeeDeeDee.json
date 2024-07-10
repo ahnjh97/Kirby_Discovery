@@ -7,25 +7,56 @@
     ],
     "FontRGBA": [
         0.0,
-        0.5411764979362488,
-        0.4745098054409027,
+        0.541,
+        0.474,
         1.0
     ],
     "FontScale": [
-        1.2000000476837158,
-        1.2000000476837158
+        1.200,
+        1.200
     ],
     "FontSize": [
         1.0,
         1.0
     ],
-    "FontTag": "Font_HUDSub_KR15",
+    "FontTag": "Font_Dialog_SubKR18spac10",
     "Level": 11,
     "Messages": [
-        "안녕 나는 위지영이야.",
-        "오늘의 점심은 무얼까.",
-        "두부일까 짬뽕일까?"
+        "안녕 나는 커비야. \n디디디야, 함께 마을복귀에 힘을 써주련.",
+        "마을이 엉망이 됐네.",
+        "마을 청소하자!"
     ],
     "NPC": "Parttimer_Dee",
-    "Radian": 0.0
+    "Radian": 0.0,
+    "TitleText": "카페 점장 웨이들 디",
+    "TitleTag" : "Font_Dialog_Title_KR22spac10",
+    "TitlePos": [
+        370.0,
+        670.0 
+    ],
+    "TitleRGBA": [
+        0.691, 
+        0.047,
+        0.094,
+        1.0
+    ],
+    "TitleSize": [
+        1.0,
+        1.0
+    ],
+    "TitleScale": [
+        1.0,
+        1.0
+    ],
+    "HighLight": [
+        "\n디디디",
+		"-",
+		"-"
+    ],
+    "HighLightRGBA": [
+        0.921, 
+        0.686,
+        0.0,
+        1.0
+    ]
 }

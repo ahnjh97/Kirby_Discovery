@@ -3,6 +3,7 @@
 #include "Kirby_State_Function.h"
 #include "FinaleKirby.h"
 #include "FinalePartical_Maker.h"
+#include "FinaleCut_ControlCenter.h"
 
 void Turn_Interpolate(CFinaleKirby::FINALEKIRBY_INFODESC* Kirbydesc, CTransform* pTransformCom, _float fTimeDelta, _float fInterpolateSpeed = 12.f)
 {
@@ -185,6 +186,20 @@ void Turn_InterPolate_OtherVector(_float4& vDstDir, _float4& vSrcDir, CTransform
 		}
 	}
 }
+void ToCut_Reset_Kirby(CTransform* pTransformCom, CCharacterController* pController)
+{
+	pController->Set_Position(pTransformCom, _float4(2550.f, 239.f, -136.f, 1.f));
+	_float4 NewLook = _float4(1.f, 0.f, 0.f, 0.f);
+	_float4 NewUp = _float4(0.f, 1.f, 0.f, 0.f);
+	_float4 NewRight = XMVector3Cross(NewUp, NewLook);
+
+	pTransformCom->Set_State(CTransform::STATE_LOOK, NewLook);
+	pTransformCom->Set_State(CTransform::STATE_UP, NewUp);
+	pTransformCom->Set_State(CTransform::STATE_RIGHT, NewRight);
+
+	CFinaleCut_ControlCenter* pCenter = static_cast<CFinaleCut_ControlCenter*>(GAMEINSTANCE Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinaleCut_ControlCenter")));
+	pCenter->Set_CutScene(1);
+}
 
 #pragma region 차량 운전 상태
 
@@ -209,6 +224,18 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
 
 	m_fParticalDelay += fTimeDelta;
+
+	if (pTransformCom->Get_State(CTransform::STATE_POSITION).x > 1550.f || (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_8, KEY_DOWN)))
+	{
+		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT1, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
+		ToCut_Reset_Kirby(pTransformCom, pController);
+		pKirby->Start_CutScene();
+		DESC(m_bBooster) = false;
+		pKirby->Delete_Effect("Come On Dash");
+		return;
+	}
+
+
 	if (m_fParticalDelay > 0.2f)
 	{
 		CFinalePartical_Maker* pMaker = static_cast<CFinalePartical_Maker*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinalePartical_Maker")));
@@ -382,6 +409,18 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CFinaleKirby::FINALEKIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
+
+
+	if (pTransformCom->Get_State(CTransform::STATE_POSITION).x > 1550.f || m_pGameInstance->Get_KeyState(DIK_F10, KEY_DOWN))
+	{
+		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT1, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
+		ToCut_Reset_Kirby(pTransformCom, pController);
+		pKirby->Start_CutScene();
+		DESC(m_bBooster) = false;
+		pKirby->Delete_Effect("Come On Dash");
+		return;
+	}
+
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN) && DESC(m_bBooster) == false)
 	{
@@ -557,7 +596,7 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 		if (m_fRunTime > 1.35f)
 		{
-			pKirby->Change_State(CFinaleKirby::STATE_INHALESTART, 60.f, false, true, CFinaleKirby::BODY_VACUUM);
+			pKirby->Change_State(CFinaleKirby::STATE_INHALESTART, 60.f, false, false, CFinaleKirby::BODY_VACUUM);
 			CMultiEffect::MULTI_FX_DESC FXDesc{};
 			FXDesc.vInitPos = { 0.f, .6f, .4f };
 			FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
@@ -578,7 +617,7 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 		if (pKirby->isAnimFinish())
 		{
-			pKirby->Change_State(CFinaleKirby::STATE_INHALE, 50.f, false, true, CFinaleKirby::BODY_VACUUM);
+			pKirby->Change_State(CFinaleKirby::STATE_INHALE, 50.f, false, false, CFinaleKirby::BODY_VACUUM);
 		}
 	}
 	else if (pKirby->Get_State() == CFinaleKirby::STATE_INHALE)
@@ -588,7 +627,7 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 
 		if (pKirby->isAnimFinish())
-			pKirby->Change_State(CFinaleKirby::STATE_SUPERINHALESTART, 60.f, false, true, CFinaleKirby::BODY_VACUUM);
+			pKirby->Change_State(CFinaleKirby::STATE_SUPERINHALESTART, 60.f, false, false, CFinaleKirby::BODY_VACUUM);
 	}
 	else if (pKirby->Get_State() == CFinaleKirby::STATE_SUPERINHALESTART)
 	{
@@ -598,7 +637,7 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 		if (pKirby->isAnimFinish())
 		{
-			pKirby->Change_State(CFinaleKirby::STATE_VACUUM, 50.f, true, true, CFinaleKirby::BODY_VACUUM);
+			pKirby->Change_State(CFinaleKirby::STATE_VACUUM, 50.f, true, false, CFinaleKirby::BODY_VACUUM);
 		}
 
 	}
@@ -675,6 +714,7 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 void CKirbyDump_Cut_State::OnStateExit()
 {
 	m_fRunTime = 0.f;
+	m_bShakeTrigger = true;
 }
 
 CKirbyDump_Cut_State* CKirbyDump_Cut_State::Create()
@@ -686,6 +726,307 @@ CKirbyDump_Cut_State* CKirbyDump_Cut_State::Create()
 void CKirbyDump_Cut_State::Free()
 {
     __super::Free();
+}
+
+#pragma endregion
+
+
+
+#pragma region 차량 컷씬 상태 2
+
+CKirbyDump_Cut2_State::CKirbyDump_Cut2_State()
+{
+}
+
+void CKirbyDump_Cut2_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+}
+
+void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CFinaleKirby* pKirby = static_cast<CFinaleKirby*>(pGameObject);
+	CFinaleKirby::FINALEKIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+	CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
+	CFinaleCut_ControlCenter* pCenter = static_cast<CFinaleCut_ControlCenter*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinaleCut_ControlCenter")));
+
+	_int iAnimIndex = pCenter->Get_CutScene();
+
+
+	if (iAnimIndex == 1)
+		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT1, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
+	else if (iAnimIndex == 2)
+		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT2, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
+	else if (iAnimIndex == 6)
+		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT6, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
+	else if (iAnimIndex == 7)
+		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT7, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
+	else if (iAnimIndex == 8)
+		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT8, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
+	else if (iAnimIndex == 9)
+		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT9, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
+	else if (iAnimIndex == 10)
+		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT10, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
+	else if (iAnimIndex == 11)
+		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT11, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
+	else if (iAnimIndex == 12)
+		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT12, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
+	else if (iAnimIndex == 13)
+		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT13, 50.f, true, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
+	else if (iAnimIndex == 14)
+		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT14, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
+	else if (iAnimIndex == 15)
+		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT15, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
+	else if (iAnimIndex == 16)
+		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT16, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
+	else if (iAnimIndex == 17)
+		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT17, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
+	else if (iAnimIndex == 18)
+		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT18, 50.f, true, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
+	else if (iAnimIndex == 19)
+		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT19, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
+	else if (iAnimIndex == 20)
+		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT20, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
+
+
+
+
+	// 컷씬 진입소. 점프 점프
+	if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT1)
+	{
+
+
+
+
+
+		if (pKirby->isAnimFinish())
+		{
+			pCenter->Set_CutScene(2);
+		}
+	}
+	// 멀리서 부릉부릉
+	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT2)
+	{
+
+
+
+
+
+		if (pKirby->isAnimFinish())
+		{
+			pCenter->Set_CutScene(3);
+		}
+	}
+	// 큐티 모션 후 점프
+	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT6)
+	{
+
+
+
+
+
+		if (pKirby->isAnimFinish())
+		{
+			pCenter->Set_CutScene(7);
+		}
+	}
+	//
+	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT7)
+	{
+
+
+
+
+		if (pKirby->isAnimFinish())
+		{
+			pCenter->Set_CutScene(8);
+		}
+	}
+	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT8)
+	{
+
+
+
+
+
+		if (pKirby->isAnimFinish())
+		{
+			pCenter->Set_CutScene(9);
+		}
+
+	}
+	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT9)
+	{
+
+
+
+
+	}
+	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT10)
+	{
+
+
+
+
+	}
+	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT11)
+	{
+		if (pKirby->isAnimFinish())
+		{
+			pCenter->Set_CutScene(12);
+		}
+
+	}
+	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT12)
+	{
+
+
+
+		if (pKirby->isAnimFinish())
+		{
+			pCenter->Set_CutScene(13);
+		}
+
+	}
+	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT13)
+	{
+		m_fTime += fTimeDelta;
+
+		if (m_bShakeTrigger1 == true)
+		{
+			pCamera->Make_Shake(2.5f, 0.5f);
+			m_bShakeTrigger1 = false;
+		}
+		else if (m_fTime > 0.3f && m_bShakeTrigger2 == true)
+		{
+			pCamera->Make_Shake(0.3f, 1000.f);
+			m_bShakeTrigger2 = false;
+		}
+
+
+		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN) == true)
+		{
+			m_iQTECount++;
+		}
+
+
+		if (m_iQTECount > 14)
+		{
+			pCenter->Set_CutScene(14);
+		}
+
+	}
+	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT14)
+	{
+
+
+
+
+
+	}
+	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT15)
+	{
+
+
+
+
+		if (pKirby->isAnimFinish())
+		{
+			pCenter->Set_CutScene(16);
+		}
+
+	}
+	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT16)
+	{
+
+
+
+
+		if (pKirby->isAnimFinish())
+		{
+			pCenter->Set_CutScene(17);
+		}
+
+	}
+	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT17)
+	{
+
+
+
+
+
+		if (pKirby->isAnimFinish())
+		{
+			pCenter->Set_CutScene(18);
+		}
+
+	}
+	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT18)
+	{
+		m_fTime += fTimeDelta;
+
+		if (m_bShakeTrigger1 == true)
+		{
+			pCamera->Make_Shake(2.5f, 0.5f);
+			m_bShakeTrigger1 = false;
+		}
+		else if (m_fTime > 0.3f && m_bShakeTrigger2 == true)
+		{
+			pCamera->Make_Shake(0.3f, 1000.f);
+			m_bShakeTrigger2 = false;
+		}
+
+
+		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN) == true)
+		{
+			m_iQTECount++;
+		}
+
+
+		if (m_iQTECount > 14)
+		{
+			pCenter->Set_CutScene(19);
+		}
+
+	}
+	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT19)
+	{
+
+
+
+
+		if (pKirby->isAnimFinish())
+		{
+			pCenter->Set_CutScene(20);
+		}
+	}
+	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT20)
+	{
+
+
+
+		// 고생하셨습니다.
+	}
+
+}
+
+void CKirbyDump_Cut2_State::OnStateExit()
+{
+	m_fTime = 0.f;
+	m_iQTECount = 0;
+	m_bShakeTrigger1 = true;
+	m_bShakeTrigger2 = true;
+}
+
+CKirbyDump_Cut2_State* CKirbyDump_Cut2_State::Create()
+{
+	CKirbyDump_Cut2_State* pInstance = new CKirbyDump_Cut2_State();
+	return pInstance;
+}
+
+void CKirbyDump_Cut2_State::Free()
+{
+	__super::Free();
 }
 
 #pragma endregion

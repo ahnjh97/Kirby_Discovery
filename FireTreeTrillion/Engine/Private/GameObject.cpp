@@ -88,6 +88,12 @@ _int CGameObject::Tick(_float fTimeDelta)
 	return OBJ_NOEVENT;
 }
 
+void CGameObject::Event_Tick(_float fTimeDelta)
+{
+
+}
+
+
 void CGameObject::Late_Tick(_float fTimeDelta)
 {
 

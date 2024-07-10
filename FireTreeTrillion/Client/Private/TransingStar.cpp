@@ -288,6 +288,13 @@ void CTransingStar::RenderOpen()
     }
 }
 
+void CTransingStar::Change_Level(LEVEL eLevel)
+{
+    HRESULT hr(S_OK);
+    hr = m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, eLevel));
+    CHECK_FAILED(hr);
+}
+
 HRESULT CTransingStar::Add_Components()
 {
     HRESULT hr(S_OK);

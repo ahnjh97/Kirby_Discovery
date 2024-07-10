@@ -91,6 +91,8 @@
 #include "BossClone.h"
 #include "Gully.h"
 
+#include "FinaleBoss.h"
+
 // º¸½º
 #include "DeeDeeDee.h"
 #include "DeeDeeDeeHammer.h"
@@ -114,6 +116,7 @@
 #include "BreakableRockParticle.h"
 #include "Car.h"
 #include "Dump.h"
+#include "Bulb.h"
 #include "BlendMapObject.h"
 #include "PortalSoftEffect.h"
 
@@ -153,6 +156,7 @@
 #include "FinalePartical.h"
 #include "FinaleBuildingPartical.h"
 #include "FinalePartical_Maker.h"
+#include "FinaleCut_ControlCenter.h"
 
 //±â¹Í
 #include "Gm_LabAntenna.h"
@@ -384,6 +388,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	// Deform
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Car"), CCar);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DumpCar"), CDump);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Bulb"), CBulb);
 
 	// Monster
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Awoofy"), CAwoofy);
@@ -412,6 +417,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BossClone"), CBossClone);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gully"), CGully);
 
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleBoss"), CFinaleBoss);
+
 	// Finale
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Baum"), CBaum);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BaumPiece"), CBaumPiece);
@@ -424,6 +431,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalePartical_Maker"), CFinalePartical_Maker);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalePartical"), CFinalePartical);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleBuildingPartical"), CFinaleBuildingPartical);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleCut_ControlCenter"), CFinaleCut_ControlCenter);
 
 	//Dee
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeePart"), CDee_Part);
@@ -1166,7 +1174,7 @@ HRESULT CLoader::Loading_For_Finale()
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Moon", "Moon.png")))
 		return E_FAIL;
-	if (FAILED(Add_Texture(eLevel, "Level_0_Env", "Map/Level_0_Env.dds")))
+	if (FAILED(Add_Texture(eLevel, "Level_FInale_Env", "Map/Level_FInale_Env.dds")))
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "BRDF_LUT", "Map/BRDF_LUT.png")))
 		return E_FAIL;
@@ -1634,7 +1642,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Car", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("RockA", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("RockB", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("RockPartical", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("RockPartical", TYPE_NONANIM, 1.f);		
 
 		// For Monster
 		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.2f, 180.f);
@@ -2058,6 +2066,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("DumpCar", TYPE_ANIM, 0.8f, 90.f);
 
 		// For Boss 
+		m_vecModelInfo.emplace_back("FinaleBoss", TYPE_ANIM, 1.f);
+
 		m_vecModelInfo.emplace_back("FinalBoss", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("FinalBossSpear", TYPE_ANIM, 1.f);
 		m_vecModelInfo.emplace_back("RayArrow", TYPE_NONANIM, 1.f);
@@ -2170,6 +2180,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("FinalBossSpear", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("Phanta", TYPE_ANIM, 1.f, 180.f);
 
+		m_vecModelInfo.emplace_back("FinaleBoss", TYPE_ANIM, 1.f);
 		// Boss
 		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 180.f);
 		m_vecModelInfo.emplace_back("DeeDeeDeeHammer", TYPE_NONANIM, 1.0f);
@@ -2495,7 +2506,14 @@ void CLoader::Load_KirbyBodyModels()
 	m_vecModelInfo.emplace_back("KirbyCarVacuum", TYPE_ANIM, 1.f, 180.f);
 	m_vecModelInfo.emplace_back("KirbyHammerDefault", TYPE_ANIM, 1.f, 180.f);
 	m_vecModelInfo.emplace_back("KirbyDumpDefault", TYPE_ANIM, 0.8f, 180.f);
+	m_vecModelInfo.emplace_back("KirbyBulbDefault", TYPE_ANIM, 1.f, 180.f);
+	m_vecModelInfo.emplace_back("KirbyBulbVacuum", TYPE_ANIM, 1.f, 180.f);
+
 	m_vecModelInfo.emplace_back("KirbyDumpVacuum", TYPE_ANIM, 0.8f);
+	m_vecModelInfo.emplace_back("KirbyDumpCut", TYPE_ANIM, 0.8f);
+
+	// Deform
+	m_vecModelInfo.emplace_back("Bulb", TYPE_ANIM, 1.f, 180.f);
 
 }
 
