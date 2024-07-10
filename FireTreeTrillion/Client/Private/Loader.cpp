@@ -158,6 +158,8 @@
 #include "Gm_LabAntenna.h"
 #include "Gm_LabBossRoomDoor.h"
 #include "Gm_ParkFhEntranceAlien.h"
+#include "Gm_ParkSolarPanelCharge.h"
+//#include "Gm_ParkSolarPanelOnce.h"
 
 //UI
 #include "BackGround.h"
@@ -480,6 +482,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	#pragma region GIMMICK::LEVEL_PARK
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_ParkFhEntranceAlien"), CGm_ParkFhEntranceAlien);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_ParkSolarPanelCharge"), CGm_ParkSolarPanelCharge);
 
 	#pragma endregion
 
@@ -1884,10 +1887,11 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("FhEntranceAlien_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("FhEntranceAlien_NonAnim", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
+		m_vecModelInfo.emplace_back("SolarPanelCharge_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("SolarPanelCharge_NonAnim", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+
 		m_vecModelInfo.emplace_back("WarpStar_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("SolarPanelOnce_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("SolarPanelCharge_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
-
 
 		// For Kirby Body
 		Load_KirbyBodyModels();

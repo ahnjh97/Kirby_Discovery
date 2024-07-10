@@ -19,10 +19,10 @@
         1.0,
         1.0
     ],
-    "FontTag": "Font_HUDSub_KR15",
+    "FontTag": "Font_Dialog_SubKR18spac10",
     "Level": 11,
     "Messages": [
-        "안녕 나는 위지영이야.",
+        "안녕 나는 위지영이야. \n테스트",
         "오늘의 점심은 무얼까.",
         "두부일까 짬뽕일까?"
     ],

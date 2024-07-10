@@ -165,8 +165,7 @@ void CDialog::Load(string strPath)
 
 	
 	tMessage_Desc.vecMsg		= vecMsg;
-	hr = m_pGameInstance->Add_Clone(m_tMessage_Desc.uLevel, TEXT("Layer_UI_Dialog"),
-									TEXT("Prototype_GameObject_UI_MessageWindow"), &tMessage_Desc);
+	hr = m_pGameInstance->Add_Clone(m_tMessage_Desc.uLevel, TEXT("Layer_UI_Dialog"), TEXT("Prototype_GameObject_UI_MessageWindow"), &tMessage_Desc);
 	CHECK_FAILED(hr);
 }
 

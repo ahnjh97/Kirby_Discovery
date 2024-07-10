@@ -220,6 +220,7 @@
     <ClInclude Include="..\Public\Debris.h" />
     <ClInclude Include="..\public\DecoObject.h" />
     <ClInclude Include="..\Public\Gm_ParkFhEntranceAlien.h" />
+    <ClInclude Include="..\Public\Gm_ParkSolarPanelCharge.h" />
     <ClInclude Include="..\Public\Level_Park.h" />
     <ClInclude Include="..\Public\Disaster_Master.h" />
     <ClInclude Include="..\Public\Phanta.h" />
@@ -440,6 +441,7 @@
     <ClCompile Include="..\Private\Debris.cpp" />
     <ClCompile Include="..\private\DecoObject.cpp" />
     <ClCompile Include="..\Private\Gm_ParkFhEntranceAlien.cpp" />
+    <ClCompile Include="..\Private\Gm_ParkSolarPanelCharge.cpp" />
     <ClCompile Include="..\Private\Level_Park.cpp" />
     <ClCompile Include="..\Private\Disaster_Master.cpp" />
     <ClCompile Include="..\Private\Phanta.cpp" />

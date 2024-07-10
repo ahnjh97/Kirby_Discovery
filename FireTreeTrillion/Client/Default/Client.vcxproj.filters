@@ -1181,6 +1181,9 @@
     <ClInclude Include="..\Public\Gm_ParkFhEntranceAlien.h">
       <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Gm_ParkSolarPanelCharge.h">
+      <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1749,6 +1752,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Crumble.cpp" />
     <ClCompile Include="..\Private\Gm_ParkFhEntranceAlien.cpp">
+      <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Gm_ParkSolarPanelCharge.cpp">
       <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria</Filter>
     </ClCompile>
   </ItemGroup>
