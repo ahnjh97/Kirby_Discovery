@@ -230,6 +230,8 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT1, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
 		ToCut_Reset_Kirby(pTransformCom, pController);
 		pKirby->Start_CutScene();
+		DESC(m_bBooster) = false;
+		pKirby->Delete_Effect("Come On Dash");
 		return;
 	}
 
@@ -414,6 +416,8 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT1, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
 		ToCut_Reset_Kirby(pTransformCom, pController);
 		pKirby->Start_CutScene();
+		DESC(m_bBooster) = false;
+		pKirby->Delete_Effect("Come On Dash");
 		return;
 	}
 
