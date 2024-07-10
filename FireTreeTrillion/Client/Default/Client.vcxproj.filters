@@ -292,9 +292,6 @@
     <Filter Include="02.GameObjects\Map\BreakableRock">
       <UniqueIdentifier>{1804a8b8-0c68-4296-836c-c88b4878fba8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Map\Car">
-      <UniqueIdentifier>{6a3a0e35-9a08-4f88-9aa3-377662595d38}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee">
       <UniqueIdentifier>{e785f913-87d7-41e1-bd17-d70a1c0e8458}</UniqueIdentifier>
     </Filter>
@@ -466,9 +463,6 @@
     <Filter Include="02.GameObjects\UI\MessageWindow">
       <UniqueIdentifier>{bcd8d01b-4475-4a52-aafd-de2aee6510c4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyDump_State">
-      <UniqueIdentifier>{8ce43134-70bd-4e9a-84fa-af301762dfac}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyGun_State">
       <UniqueIdentifier>{a88b1b9f-6498-430b-9234-dce1f19a7962}</UniqueIdentifier>
     </Filter>
@@ -504,9 +498,6 @@
     </Filter>
     <Filter Include="02.GameObjects\Effect\Particle_Debris">
       <UniqueIdentifier>{0dae7cd1-de4a-44d9-9812-18d9a566388f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Map\Dump">
-      <UniqueIdentifier>{db971a15-b7f0-4afa-b440-2a7475cb9a21}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\FinaleKirby">
       <UniqueIdentifier>{d5000452-94d8-4432-a9d4-64684abab4f1}</UniqueIdentifier>
@@ -600,6 +591,21 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\FinaleBoss\State">
       <UniqueIdentifier>{771fd3c6-8505-4fe9-a53a-6d224433b9e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Deform">
+      <UniqueIdentifier>{e5460747-d9fe-46de-8d23-719df794f32d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Deform\Car">
+      <UniqueIdentifier>{6a3a0e35-9a08-4f88-9aa3-377662595d38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Deform\Dump">
+      <UniqueIdentifier>{db971a15-b7f0-4afa-b440-2a7475cb9a21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Deform\Bulb">
+      <UniqueIdentifier>{975a52a6-2c4b-4f12-bac4-8976a217ecba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyBulb_State">
+      <UniqueIdentifier>{8ce43134-70bd-4e9a-84fa-af301762dfac}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -943,7 +949,7 @@
       <Filter>02.GameObjects\Map\BreakableRock</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Car.h">
-      <Filter>02.GameObjects\Map\Car</Filter>
+      <Filter>02.GameObjects\PhysXObject\Deform\Car</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\AnimDeco.h">
       <Filter>02.GameObjects\Map\Deco\AnimDeco</Filter>
@@ -1112,7 +1118,7 @@
       <Filter>02.GameObjects\PhysXObject\Character\FinaleKirby</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Dump.h">
-      <Filter>02.GameObjects\Map\Dump</Filter>
+      <Filter>02.GameObjects\PhysXObject\Deform\Dump</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Park.h">
       <Filter>01.Levels\5. Park</Filter>
@@ -1198,6 +1204,15 @@
     </ClInclude>
     <ClInclude Include="..\Public\FinaleBoss_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\FinaleBoss\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Bulb.h">
+      <Filter>02.GameObjects\PhysXObject\Deform\Bulb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Deform.h">
+      <Filter>02.GameObjects\PhysXObject\Deform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KirbyBulb_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyBulb_State</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1517,7 +1532,7 @@
       <Filter>01.Levels\2. Racing</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Car.cpp">
-      <Filter>02.GameObjects\Map\Car</Filter>
+      <Filter>02.GameObjects\PhysXObject\Deform\Car</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BreakableRock.cpp">
       <Filter>02.GameObjects\Map\BreakableRock</Filter>
@@ -1685,7 +1700,7 @@
       <Filter>02.GameObjects\Effect\Particle_Debris</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Dump.cpp">
-      <Filter>02.GameObjects\Map\Dump</Filter>
+      <Filter>02.GameObjects\PhysXObject\Deform\Dump</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\FinaleKirby.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\FinaleKirby</Filter>
@@ -1777,6 +1792,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\FinaleBoss_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\FinaleBoss\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Bulb.cpp">
+      <Filter>02.GameObjects\PhysXObject\Deform\Bulb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Deform.cpp">
+      <Filter>02.GameObjects\PhysXObject\Deform</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KirbyBulb_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyBulb_State</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

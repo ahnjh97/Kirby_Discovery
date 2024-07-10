@@ -13,6 +13,7 @@
 #include "KirbyBoom_State.h"
 #include "KirbyCar_State.h"
 #include "KirbyHammer_State.h"
+#include "KirbyBulb_State.h"
 
 #include "KirbyWeapons.h"
 #include "KirbyArmours.h"
@@ -22,12 +23,10 @@
 #include "Bone.h"
 #include "HitBox.h"
 #include "Camera_Main.h"
-
 #include "EventCenter.h"
 
 #include "Ability.h"
-
-#include "Light.h"
+#include "Deform.h"
 
 
 
@@ -80,7 +79,7 @@ HRESULT CKirby::Initialize(void* pArg)
 	//LightDesc.eType = LIGHT_DESC::TYPE_POINT;
 	//LightDesc.vPosition = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	//LightDesc.fRange = 5.f;
-	//LightDesc.vDiffuse = _float4(.5f, 0.5f, 0.5f, 1.f);
+	//LightDesc.vDiffuse = _float4(.7f, 0.2f, 0.2f, 1.f);
 	//LightDesc.vAmbient = _float4(.5f, .5f, .5f, 1.f);
 	//LightDesc.vSpecular = _float4(0.f, 0.f, 0.0f, 1.f);
 	//if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
@@ -129,7 +128,8 @@ void CKirby::Late_Tick(_float fTimeDelta)
 	if (INFO(m_eBodyState) != BODY_DEFAULT)
 		m_pModelCom[BODY_DEFAULT]->Play_Animation(m_fTimeDelta);
 
-	if ((INFO(m_eBodyState) == BODY_CARDEFAULT || INFO(m_eBodyState) == BODY_CARVACUUM ) == false)
+	if ((INFO(m_eBodyState) == BODY_CARDEFAULT || INFO(m_eBodyState) == BODY_CARVACUUM ||
+		INFO(m_eBodyState) == BODY_BULBDEFAULT || INFO(m_eBodyState) == BODY_BULBVACUUM) == false)
 		m_pWeapons->Late_Tick(m_fTimeDelta);
 
 	m_pArmours->Late_Tick(m_fTimeDelta);
@@ -513,7 +513,15 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 
 		if (pObject->Get_PhyXState() == PO_VACUUMING)
 		{
-			Change_State(CARVACUUMSTATE_DEFORM, 60.f, false, false, BODY_CARVACUUM, OFFSET_CARVACUUM);
+			if (static_cast<CDeform*>(pObject)->Get_DeformType() == CDeform::DEFORM_CAR)
+			{
+				Change_State(CARVACUUMSTATE_DEFORM, 60.f, false, false, BODY_CARVACUUM, OFFSET_CARVACUUM);
+			}
+			else if (static_cast<CDeform*>(pObject)->Get_DeformType() == CDeform::DEFORM_BULB)
+			{
+				Change_State(BULBVACUUMSTATE_DEFORM, 60.f, false, false, BODY_BULBVACUUM, OFFSET_BULBVACUUM);
+			}
+
 			INFO(m_pObject)->Set_Dead();
 			Safe_Release(INFO(m_pObject));
 			INFO(m_pObject) = nullptr;
@@ -788,11 +796,11 @@ void CKirby::Key_Input(_float fTimeDelta)
 	//특정 레벨에서 덤프할 경우 크래시 발생으로 예외 처리
 	//디버깅이 필요할 경우 레벨 별 조건 처리하면 됨
 	LEVEL eCurLevel = (LEVEL)*m_pGameInstance->Get_CurrentLevelID();
-	if (LEVEL_RACING == eCurLevel || LEVEL_GAMEPLAY == eCurLevel)
+	if (LEVEL_INTRO == eCurLevel || LEVEL_GAMEPLAY == eCurLevel)
 	{
 		if (m_pGameInstance->Get_DIKeyState(DIK_B, KEY_DOWN))
 		{
-			Change_State(CARVACUUMSTATE_DEFORM, 60.f, false, false, BODY_CARVACUUM, OFFSET_CARVACUUM);
+			Change_State(BULBVACUUMSTATE_DEFORM, 60.f, false, false, BODY_BULBVACUUM, OFFSET_BULBVACUUM);
 		}
 		if (m_pGameInstance->Get_DIKeyState(DIK_N, KEY_DOWN))
 		{
@@ -897,6 +905,17 @@ HRESULT CKirby::Add_Components()
 	hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyHammerDefault"),
 		TEXT("Com_Model_HammerDefault"), (CComponent**)&m_pModelCom[BODY_HAMMER]);
 	CHECK_FAILED(hr);
+
+	// 커비의 Bulb Default 상태 모델
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyBulbDefault"),
+		TEXT("Com_Model_BulbDefault"), (CComponent**)&m_pModelCom[BODY_BULBDEFAULT]);
+	CHECK_FAILED(hr);
+
+	// 커비의 Bulb Vacuum 상태 모델
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyBulbVacuum"),
+		TEXT("Com_Model_BulbVacuum"), (CComponent**)&m_pModelCom[BODY_BULBVACUUM]);
+	CHECK_FAILED(hr);
+
 
 #pragma endregion
 
@@ -1284,6 +1303,31 @@ void CKirby::SetUp_FSM()
 	m_pFSM->Add_State(HAMMERSTATE_WHEELHAMMEREND, CKirbyHammer_JumpAttack_State::Create()); //
 #pragma endregion
 
+#pragma region 전구 애니메이션
+	m_pFSM->Add_State(BULBSTATE_DAMAGE, CKirbyBulb_Damage_State::Create());
+
+	m_pFSM->Add_State(BULBSTATE_DEMOENDFIRST, CKirbyBulb_Vacuum_State::Create());
+	m_pFSM->Add_State(BULBVACUUMSTATE_DEFORM, CKirbyBulb_Vacuum_State::Create());
+
+	m_pFSM->Add_State(BULBSTATE_WAIT, CKirbyBulb_Idle_State::Create());
+	m_pFSM->Add_State(BULBSTATE_WAITBRIGHT, CKirbyBulb_Idle_State::Create());
+
+	m_pFSM->Add_State(BULBSTATE_MOVE, CKirbyBulb_Run_State::Create());
+	m_pFSM->Add_State(BULBSTATE_MOVEBRIGHT, CKirbyBulb_Run_State::Create());
+	m_pFSM->Add_State(BULBSTATE_STOP, CKirbyBulb_Run_State::Create());
+	m_pFSM->Add_State(BULBSTATE_STOPBRIGHT, CKirbyBulb_Run_State::Create());
+
+	m_pFSM->Add_State(BULBSTATE_LIGHTON, CKirbyBulb_Light_State::Create());
+	m_pFSM->Add_State(BULBSTATE_LIGHTONAIR, CKirbyBulb_Light_State::Create());
+	m_pFSM->Add_State(BULBSTATE_LIGHTOFF, CKirbyBulb_Light_State::Create());
+
+	m_pFSM->Add_State(BULBSTATE_JUMP, CKirbyBulb_Jump_State::Create());
+	m_pFSM->Add_State(BULBSTATE_LANDING, CKirbyBulb_Jump_State::Create());
+	m_pFSM->Add_State(BULBSTATE_LANDINGBRIGHT, CKirbyBulb_Jump_State::Create());
+	m_pFSM->Add_State(BULBSTATE_LANDINGEND, CKirbyBulb_Jump_State::Create());
+	m_pFSM->Add_State(BULBSTATE_LANDINGENDBRIGHT, CKirbyBulb_Jump_State::Create());
+	m_pFSM->Add_State(BULBSTATE_FALL, CKirbyBulb_Jump_State::Create());
+#pragma endregion
 
 
 	CFSM::FSM_INFO		FSM_Info_Desc = {};
@@ -1398,7 +1442,8 @@ void CKirby::HitBoxChanger(_uint eState)
 
 void CKirby::Update_PartObjectMatrix()
 {
-	if ((INFO(m_eBodyState) == BODY_CARDEFAULT || INFO(m_eBodyState) == BODY_CARVACUUM) == false)
+	if ((INFO(m_eBodyState) == BODY_CARDEFAULT || INFO(m_eBodyState) == BODY_CARVACUUM || 
+		INFO(m_eBodyState) == BODY_BULBDEFAULT || INFO(m_eBodyState) == BODY_BULBVACUUM) == false)
 		m_WeaponMatrix = *(m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("RHaveL")->Get_CombinedTransformationMatrix());
 
 	m_ArmourMatrix = *(m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("HatL")->Get_CombinedTransformationMatrix());
@@ -1852,6 +1897,7 @@ void CKirby::Free()
 		Safe_Release(Glow);
 	m_OrbitGlows.clear();
 
-	//Safe_Release(m_pLight);
+	if (INFO(m_pLight) != nullptr)
+		Safe_Release(INFO(m_pLight));
 }
 
