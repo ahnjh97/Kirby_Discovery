@@ -144,9 +144,13 @@ float4 g_vLightAmbient;
 float4 g_vLightSpecular;
 
 
-bool g_bRimTest;
 //전역 림 라이트 적용 배율
 float g_fRimLightRatio;
+//전역 림 라이트 범위
+float g_fRimLightRadius = 1.f;
+//림 라이트 컬러
+float3 g_vRimColor = { 1.f, 1.f, 1.f };
+
 
 float g_fBlackBackGround;
 
@@ -587,6 +591,7 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
         vLightspecular = fLightspecular;
 
         vLightspecular += vDiffuse * vLightspecular.a;
+        vLightspecular *= g_vLightDiffuse;
 
     }
     
@@ -764,7 +769,7 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
     }
           
     
-    Out.vResultColor = saturate (float4(directLighting + ambientLighting, 1.f) * fAmbientOcclusion);
+    Out.vResultColor = saturate(float4(directLighting + ambientLighting, 1.f) * fAmbientOcclusion);
     Out.vSpecular = saturate(vLightspecular);
     Out.vLensFlare = saturate(vLensFlare);
     Out.vSSAO = saturate(Out.vSSAO);
@@ -1065,7 +1070,7 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
         
         float vDot = dot(normalize(vLook), normalize(vNormal));
         
-        vDot = pow(vDot, vRimLightDesc.g);
+        vDot = pow(vDot, vRimLightDesc.g * g_fRimLightRadius);
         
         vector vRimLightColor = 1.f - saturate(vDot);
         
@@ -1073,7 +1078,7 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
         //림 라이트 전역 배율
         vRimLightColor *= g_fRimLightRatio;
         
-        Out.vColor += vRimLightColor * float4(1, 0.5, 0, 1);
+        Out.vColor += vRimLightColor * float4(g_vRimColor, 1);
         Out.vColor = saturate(Out.vColor);
 
     }

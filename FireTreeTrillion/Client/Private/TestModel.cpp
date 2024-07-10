@@ -320,7 +320,8 @@ HRESULT CTestModel::Add_Components()
     CHECK_FAILED(hr);
 
     /* For.Com_Model */
-    hr = __super::Add_Component(TEXT("Prototype_Component_Model_Crumble"),
+    hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyDumpCut"),
+    //hr = __super::Add_Component(TEXT("Prototype_Component_Model_Crumble"),
         TEXT("Com_Model"), (CComponent**)&m_pModelCom);
     CHECK_FAILED(hr);
     // for animTool

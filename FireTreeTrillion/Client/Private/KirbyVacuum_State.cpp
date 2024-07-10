@@ -110,30 +110,58 @@ void CKirbyVacuum_Spit_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
 		if (m_bSpitTrigger == true)
 		{
-			// 자동차 등을 뱉는다. 이쪽에서.
-			_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+			if (DESC(m_pLight) == nullptr)
+			{
+				_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
 
-			pController->Set_Position(pTransformCom, vPos + _float4(0.f, 4.f, 0.f, 0.f));
+				pController->Set_Position(pTransformCom, vPos + _float4(0.f, 4.f, 0.f, 0.f));
 
-			// Car Spit
-			// 추후, 전 상태를 받고 있다가 뱉을 것 정해주면 될것같다.
-			CGameObject::GAMEOBJECT_DESC ObjDesc{};
-			ObjDesc.fSpeedPerSec = 5.f;
-			ObjDesc.fRotationPerSec = ToRadian(90.f);
-			_float4x4 InitMat = _float4x4::Identity;
-			InitMat = pTransformCom->Get_WorldFloat4x4();
-			CUtils::Set_State_Matrix(InitMat, CUtils::STATE_POSITION, vPos + _float4(0.f, 3.f, 0.f, 0.f));
+				// Car Spit
+				// 추후, 전 상태를 받고 있다가 뱉을 것 정해주면 될것같다.
+				CGameObject::GAMEOBJECT_DESC ObjDesc{};
+				ObjDesc.fSpeedPerSec = 5.f;
+				ObjDesc.fRotationPerSec = ToRadian(90.f);
+				_float4x4 InitMat = _float4x4::Identity;
+				InitMat = pTransformCom->Get_WorldFloat4x4();
+				CUtils::Set_State_Matrix(InitMat, CUtils::STATE_POSITION, vPos + _float4(0.f, 3.f, 0.f, 0.f));
 
-			CCamera_Main* pCamMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
-			if (pCamMain == nullptr)
-				ALARM_FAIL("망했다 카메라 없다");
+				CCamera_Main* pCamMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+				if (pCamMain == nullptr)
+					ALARM_FAIL("망했다 카메라 없다");
 
-			pCamMain->Set_Target(pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FIRST, { 0.f, 0.f, 0.f }, 2.f);
+				pCamMain->Set_Target(pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FIRST, { 0.f, 0.f, 0.f }, 2.f);
 
 
-			ObjDesc.matWorld = InitMat;
-			if (FAILED(m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Deform"), TEXT("Prototype_GameObject_Car"), &ObjDesc)))
-				return;
+				ObjDesc.matWorld = InitMat;
+				if (FAILED(m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Deform"), TEXT("Prototype_GameObject_Car"), &ObjDesc)))
+					return;
+			}
+			else
+			{
+				DESC(m_pLight)->Set_DeadLight(true);
+				Safe_Release(DESC(m_pLight));
+				DESC(m_pLight) = nullptr;
+				_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+				pController->Set_Position(pTransformCom, vPos + _float4(0.f, 3.f, 0.f, 0.f));
+
+				CGameObject::GAMEOBJECT_DESC ObjDesc{};
+				ObjDesc.fSpeedPerSec = 5.f;
+				ObjDesc.fRotationPerSec = ToRadian(90.f);
+				_float4x4 InitMat = _float4x4::Identity;
+				InitMat = pTransformCom->Get_WorldFloat4x4();
+				CUtils::Set_State_Matrix(InitMat, CUtils::STATE_POSITION, vPos + _float4(0.f, 3.f, 0.f, 0.f));
+
+				CCamera_Main* pCamMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+				if (pCamMain == nullptr)
+					ALARM_FAIL("망했다 카메라 없다");
+
+				pCamMain->Set_Target(pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FIRST, { 0.f, 0.f, 0.f }, 2.f);
+
+
+				ObjDesc.matWorld = InitMat;
+				if (FAILED(m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Deform"), TEXT("Prototype_GameObject_Bulb"), &ObjDesc)))
+					return;
+			}
 
 			m_bSpitTrigger = false;
 		}

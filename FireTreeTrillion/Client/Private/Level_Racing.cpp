@@ -72,6 +72,10 @@ HRESULT CLevel_Racing::Initialize()
 	CTransingStar* pTransingStar = static_cast<CTransingStar*>(pGameObj);
 	//pTransingStar->Activate(CTransingStar::OPEN);
 
+	hr = Ready_Layer_UI(TEXT("Layer_UI"));
+	CHECK_FAILED(hr);
+
+
 	return S_OK;
 }
 
@@ -134,7 +138,7 @@ HRESULT CLevel_Racing::Ready_Layer_Camera(const wstring& strLayerTag)
 	MainCamDesc.vAt = _float4(0.f, -.2f, -1.f, 1.f);
 	MainCamDesc.fSpeedPerSec = 10.f;
 	MainCamDesc.fRotationPerSec = XMConvertToRadians(90.0f);
-	MainCamDesc.fOrigDistance = 25.f;
+	MainCamDesc.fOrigDistance = 20.f;
 	MainCamDesc.fCamSensor = .3f;
 
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_Camera_Main"), &MainCamDesc)))

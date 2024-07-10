@@ -587,6 +587,15 @@ PS_OUT PS_EMISSIVE(PS_IN In)
 }
 
 
+PS_OUT PS_UNKNOWN(PS_IN In)
+{
+    discard;
+    
+    PS_OUT Out = (PS_OUT) 0; 
+    
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
 	// 노말이 있는 일반 논 애님 모델 ( 0 )
@@ -820,4 +829,16 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_EMISSIVE();
     }
 
+    pass Unknown_Pass
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_UNKNOWN();
+    }
 }
