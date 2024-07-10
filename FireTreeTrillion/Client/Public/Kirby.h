@@ -263,6 +263,9 @@ private:
 	_float				  m_fHitStopTime = { 0.f };
 	_float				  m_fHitStopMaxTime = { 0.f };
 
+	// For Bulb
+	_int				  m_iRenderCount = { 0 };
+	_float4				  m_vBulbColor = { 0.f, 0.f, 0.f, 0.f };
 
 	// For Bomb
 	vector<CBombOrbitGlow*> m_OrbitGlows;

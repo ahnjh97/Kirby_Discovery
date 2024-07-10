@@ -152,6 +152,12 @@ void CKirby::Late_Tick(_float fTimeDelta)
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND,	 this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW,		 this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_DEFERREDINFO, this);
+
+	if (INFO(m_eBodyState) == BODY_BULBDEFAULT || INFO(m_eBodyState) == BODY_BULBVACUUM)
+	{
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
+		m_iRenderCount = 1;
+	}
 }
 
 HRESULT CKirby::Render()
@@ -164,6 +170,9 @@ HRESULT CKirby::Render()
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
 		if (Kirby_FaceCustom(INFO(m_eBodyState), i) == true)
+			continue;
+
+		if (m_iRenderCount == 0)
 			continue;
 
 		if (FAILED(m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
@@ -195,6 +204,8 @@ HRESULT CKirby::Render()
 		m_pModelCom[INFO(m_eBodyState)]->Render(i);
 	}
 
+
+	m_iRenderCount--;
 	return S_OK;
 }
 
@@ -804,31 +815,10 @@ void CKirby::Key_Input(_float fTimeDelta)
 		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
 	}
 
-	//특정 레벨에서 덤프할 경우 크래시 발생으로 예외 처리
-	//디버깅이 필요할 경우 레벨 별 조건 처리하면 됨
-	LEVEL eCurLevel = (LEVEL)*m_pGameInstance->Get_CurrentLevelID();
-	if (LEVEL_INTRO == eCurLevel || LEVEL_GAMEPLAY == eCurLevel)
+	if (m_pGameInstance->Get_DIKeyState(DIK_B, KEY_DOWN))
 	{
-		if (m_pGameInstance->Get_DIKeyState(DIK_B, KEY_DOWN))
-		{
-			Change_State(BULBVACUUMSTATE_DEFORM, 60.f, false, false, BODY_BULBVACUUM, OFFSET_BULBVACUUM);
-		}
-		if (m_pGameInstance->Get_DIKeyState(DIK_N, KEY_DOWN))
-		{
-			CGameObject::GAMEOBJECT_DESC ObjDesc{};
-
-			ObjDesc.fSpeedPerSec = 5.f;
-			ObjDesc.fRotationPerSec = ToRadian(90.f);
-			_float4x4 InitMat = _float4x4::Identity;
-			InitMat.Translation({ -50.f, 5.f, -6.5f });
-			ObjDesc.matWorld = InitMat;
-			ObjDesc.wstrModelName = TEXT("RockA");
-			// Car Test
-			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Rock"), TEXT("Prototype_GameObject_BreakableRock"), &ObjDesc)))
-				return;
-		}
-	}
-
+		Change_State(BULBVACUUMSTATE_DEFORM, 60.f, false, false, BODY_BULBVACUUM, OFFSET_BULBVACUUM);
+	}	
 #pragma endregion
 }
 
@@ -1053,69 +1043,112 @@ HRESULT CKirby::Bind_ShaderResources()
 
 _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 {
-	// Default 상태의 입 부위 // Balloon 상태의 입 부위
-	if ((_eBodyState == BODY_DEFAULT && _iMeshIndex == 0) ||
-		(_eBodyState == BODY_BALLOON && _iMeshIndex == 4) ||
-		(_eBodyState == BODY_SWORDDEFAULT && _iMeshIndex == 0) ||
-		(_eBodyState == BODY_SWORDBALLOON && _iMeshIndex == 4) ||
-		(_eBodyState == BODY_BOOMDEFAULT && _iMeshIndex == 0) ||
-		(_eBodyState == BODY_HAMMER && _iMeshIndex == 0))
+	if (m_iRenderCount == 0)
 	{
-		m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
-		m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
-		m_pMouthTexture[INFO(m_eMouthState)]->Bind_ShaderResource(m_pShaderCom, "g_KirbyMouthTexture", 0);
+		if ((_eBodyState == BODY_BULBDEFAULT && _iMeshIndex == 2) ||
+			(_eBodyState == BODY_BULBDEFAULT && _iMeshIndex == 3) ||
+			(_eBodyState == BODY_BULBDEFAULT && _iMeshIndex == 1))
+		{
+			//m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
+			m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
+			_bool bRimLight = false;
+			m_pShaderCom->Bind_RawValue("g_vBulbColor", &m_vBulbColor, sizeof(_float4));
+			m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
 
-		m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float));
-		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
-
-
-		m_pShaderCom->Begin(ANIMMODEL_KIRBYMOUTH);
-		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
-		return true;
+			m_pShaderCom->Begin(ANIMMODEL_BULBLIGHT);
+			m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
+			return true;
+		}
 	}
-	// Default 상태의 눈 부위 // Vacuum 상태의 눈 부위 // Balloon 상태의 눈 부위
-	else if ((_eBodyState == BODY_DEFAULT && _iMeshIndex == 3) ||
-		(_eBodyState == BODY_VACUUM && _iMeshIndex == 2) ||
-		(_eBodyState == BODY_BALLOON && _iMeshIndex == 3) ||
-		(_eBodyState == BODY_SWORDDEFAULT && _iMeshIndex == 3) ||
-		(_eBodyState == BODY_SWORDBALLOON && _iMeshIndex == 3) ||
-		(_eBodyState == BODY_BOOMDEFAULT && _iMeshIndex == 3) ||
-		(_eBodyState == BODY_CARDEFAULT && _iMeshIndex == 3) ||
-		(_eBodyState == BODY_HAMMER && _iMeshIndex == 3) ||
-		(_eBodyState == BODY_BULBDEFAULT && _iMeshIndex == 4))
+	else
 	{
-		m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
-		m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
-		m_pEyeTexture[INFO(m_eEyeState)]->Bind_ShaderResource(m_pShaderCom, "g_KirbyEyeTexture", 0);
+		// Default 상태의 입 부위 // Balloon 상태의 입 부위
+		if ((_eBodyState == BODY_DEFAULT && _iMeshIndex == 0) ||
+			(_eBodyState == BODY_BALLOON && _iMeshIndex == 4) ||
+			(_eBodyState == BODY_SWORDDEFAULT && _iMeshIndex == 0) ||
+			(_eBodyState == BODY_SWORDBALLOON && _iMeshIndex == 4) ||
+			(_eBodyState == BODY_BOOMDEFAULT && _iMeshIndex == 0) ||
+			(_eBodyState == BODY_HAMMER && _iMeshIndex == 0))
+		{
+			m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
+			m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
+			m_pMouthTexture[INFO(m_eMouthState)]->Bind_ShaderResource(m_pShaderCom, "g_KirbyMouthTexture", 0);
 
-		m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float));
-		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
+			m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float));
+			m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
 
-		m_pShaderCom->Begin(ANIMMODEL_KIRBYEYE);
-		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
-		return true;
-	}
-	// Vacuum 상태의 구강 부위
-	else if (_eBodyState == BODY_VACUUM && _iMeshIndex == 3)
-	{
-		m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
-		m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
 
-		_bool bRimLight = false;
-		m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
+			m_pShaderCom->Begin(ANIMMODEL_KIRBYMOUTH);
+			m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
+			return true;
+		}
+		// Default 상태의 눈 부위 // Vacuum 상태의 눈 부위 // Balloon 상태의 눈 부위
+		else if ((_eBodyState == BODY_DEFAULT && _iMeshIndex == 3) ||
+			(_eBodyState == BODY_VACUUM && _iMeshIndex == 2) ||
+			(_eBodyState == BODY_BALLOON && _iMeshIndex == 3) ||
+			(_eBodyState == BODY_SWORDDEFAULT && _iMeshIndex == 3) ||
+			(_eBodyState == BODY_SWORDBALLOON && _iMeshIndex == 3) ||
+			(_eBodyState == BODY_BOOMDEFAULT && _iMeshIndex == 3) ||
+			(_eBodyState == BODY_CARDEFAULT && _iMeshIndex == 3) ||
+			(_eBodyState == BODY_HAMMER && _iMeshIndex == 3) ||
+			(_eBodyState == BODY_BULBDEFAULT && _iMeshIndex == 4))
+		{
+			m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
+			m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
+			m_pEyeTexture[INFO(m_eEyeState)]->Bind_ShaderResource(m_pShaderCom, "g_KirbyEyeTexture", 0);
 
-		m_pShaderCom->Begin(ANIMMODEL_NORMAL_X);
-		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
-		return true;
+			m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float));
+			m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
+
+			m_pShaderCom->Begin(ANIMMODEL_KIRBYEYE);
+			m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
+			return true;
+		}
+		// Vacuum 상태의 구강 부위
+		else if (_eBodyState == BODY_VACUUM && _iMeshIndex == 3)
+		{
+			m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
+			m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
+
+			_bool bRimLight = false;
+			m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
+
+			m_pShaderCom->Begin(ANIMMODEL_NORMAL_X);
+			m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
+			return true;
+		}
+		else if (
+			(_eBodyState == BODY_BULBDEFAULT && _iMeshIndex == 2) ||
+			(_eBodyState == BODY_BULBDEFAULT && _iMeshIndex == 3)
+			)
+
+		{
+			m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
+			m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
+
+			_bool bRimLight = false;
+			m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
+
+			m_pShaderCom->Begin(ANIMMODEL_ALPHABLEND);
+			m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
+			return true;
+		}
+
 	}
 
 	return false;
@@ -1703,6 +1736,19 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 		m_bMotionBlur = true;
 
 
+	if (INFO(m_eBodyState) == BODY_BULBDEFAULT)
+	{
+		if (INFO(m_bLightOn) == true)
+		{
+			_float4 vTargetColor = { 1.f, 1.f, 1.f, 1.f };
+			m_vBulbColor += (vTargetColor - m_vBulbColor) / (fTimeDelta * 300.f);
+		}
+		else if (INFO(m_bLightOn) == false)
+		{
+			_float4 vTargetColor = { 0.3f, 0.1f, 0.1f, 0.25f };
+			m_vBulbColor += (vTargetColor - m_vBulbColor) / (fTimeDelta * 300.f);
+		}
+	}
 
 
 	if (INFO(m_bDumpAbilityPress) == true &&

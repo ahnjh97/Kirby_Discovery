@@ -99,6 +99,7 @@ public:
 	virtual void OnStateExit()														override;
 public:
 	_float m_fTime = { 0.f };
+	_bool m_bLightReset = { true };
 	static	CKirbyBulb_Vacuum_State* Create();
 	virtual void				   Free() override;
 };

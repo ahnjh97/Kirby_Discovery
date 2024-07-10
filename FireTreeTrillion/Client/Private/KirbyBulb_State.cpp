@@ -805,6 +805,16 @@ void CKirbyBulb_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
     if (pKirby->Get_State() == CKirby::BULBVACUUMSTATE_DEFORM)
     {
+        if (m_bLightReset == true)
+        {
+            if (DESC(m_pLight) != nullptr)
+            {
+                DESC(m_pLight)->Set_DeadLight(true);
+                Safe_Release(DESC(m_pLight));
+                DESC(m_pLight) = nullptr;
+            }
+            m_bLightReset = false;
+        }
         m_fTime += fTimeDelta;
 
         if (m_fTime > 0.36666666666666666666f)
@@ -812,14 +822,17 @@ void CKirbyBulb_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
             LIGHT_DESC			LightDesc{};
             LightDesc.eType = LIGHT_DESC::TYPE_POINT;
             LightDesc.vPosition = pTransformCom->Get_State_Float4(CTransform::STATE_POSITION) + pTransformCom->Get_State(CTransform::STATE_UP) * 2.f;
-            LightDesc.fRange = 3.f;
-            LightDesc.vDiffuse = _float4(.7f, 0.2f, 0.2f, 1.f);
+            LightDesc.fRange = 7.f;
+            LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
             LightDesc.vAmbient = _float4(.5f, .5f, .5f, 1.f);
             LightDesc.vSpecular = _float4(0.f, 0.f, 0.0f, 1.f);
             if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
                 return;
             DESC(m_pLight) = CGameInstance::Get_Instance()->Get_LightLastAddress();
             Safe_AddRef(DESC(m_pLight));
+
+
+            DESC(m_bLightOn) = true;
 
             pKirby->Change_State(CKirby::BULBSTATE_DEMOENDFIRST, 60.f, false, false, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
             return;
@@ -841,6 +854,10 @@ void CKirbyBulb_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
             pCamMain->Set_FOVY(30.f);
             pKirby->Change_State(CKirby::BULBSTATE_WAIT, 60.f, true, false, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
+
+            DESC(m_bLightOn) = false;
+            DESC(m_pLight)->Interpolate_Light(_float4(0.7f, 0.2f, 0.2f, 0.f), 3.f, 1.f);
+
             return;
         }
     }
@@ -849,6 +866,7 @@ void CKirbyBulb_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 void CKirbyBulb_Vacuum_State::OnStateExit()
 {
     m_fTime = 0.f;
+    m_bLightReset = true;
 }
 
 CKirbyBulb_Vacuum_State* CKirbyBulb_Vacuum_State::Create()

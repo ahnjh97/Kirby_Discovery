@@ -591,6 +591,7 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
         vLightspecular = fLightspecular;
 
         vLightspecular += vDiffuse * vLightspecular.a;
+        vLightspecular *= g_vLightDiffuse;
 
     }
     

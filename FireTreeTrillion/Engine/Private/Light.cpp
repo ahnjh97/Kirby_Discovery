@@ -66,9 +66,9 @@ HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer, _bool bFor
 	}
 	else if (LIGHT_DESC::TYPE_FLASH == m_LightDesc.eType)
 	{
-		m_LightDesc.fRange -= (m_LightDesc.fRange / (fTimeDelta * 1250.f));
+		m_LightDesc.fRange -= (m_LightDesc.fRange / (fTimeDelta * 700.f));
 		_vector vLightAmbient = XMLoadFloat4(&m_LightDesc.vAmbient);
-		vLightAmbient -= (vLightAmbient / (fTimeDelta * 1875.f));
+		vLightAmbient -= (vLightAmbient / (fTimeDelta * 800.f));
 		XMStoreFloat4(&m_LightDesc.vAmbient, vLightAmbient);
 
 		if (m_LightDesc.fRange < 0.1f)
