@@ -50,6 +50,7 @@ public:
 	virtual void OnStateExit()														override;
 public:
 	_float m_fFallTime = { 0.f };
+	_float m_fChangeRunTime = { 0.f };
 	static	CKirbyBulb_Jump_State* Create();
 	virtual void				   Free() override;
 };

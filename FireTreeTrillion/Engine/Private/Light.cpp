@@ -16,6 +16,29 @@ HRESULT CLight::Initialize(const LIGHT_DESC & LightDesc)
 HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer, _bool bForTool)
 {
 	_uint		iPassIndex = { 0 };
+	_float		fTimeDelta = CGameInstance::Get_Instance()->Get_SecondTimer();
+
+	if (m_bInterpolate == true)
+	{
+		m_fInterpolateTime -= fTimeDelta;
+		_float fInverseRatio = 1.f - (m_fInterpolateTime * m_fRatioTime);
+
+		_float Easing = EASE_OUT(fInverseRatio);
+		_float SaturateEasing = SATURATE(Easing);
+
+		_float4 vDiffuse = m_vCurDiffuse + (m_vTargetDiffuse - m_vCurDiffuse) * SaturateEasing;
+		_float fRange = m_fCurRange + (m_fTargetRange - m_fCurRange) * SaturateEasing;
+
+		m_LightDesc.vDiffuse = vDiffuse;
+		m_LightDesc.fRange = fRange;
+
+		if (m_fInterpolateTime <= 0.f)
+		{
+			m_bInterpolate = false;
+			m_LightDesc.vDiffuse = m_vTargetDiffuse;
+			m_LightDesc.fRange = m_fTargetRange;
+		}
+	}
 
 	if (LIGHT_DESC::TYPE_DIRECTIONAL == m_LightDesc.eType)
 	{
@@ -31,6 +54,7 @@ HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer, _bool bFor
 
 	else if (LIGHT_DESC::TYPE_POINT == m_LightDesc.eType)
 	{
+
 		if (FAILED(pShader->Bind_RawValue("g_vLightPos", &m_LightDesc.vPosition, sizeof(_float4))))
 			return E_FAIL;
 
@@ -42,9 +66,9 @@ HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer, _bool bFor
 	}
 	else if (LIGHT_DESC::TYPE_FLASH == m_LightDesc.eType)
 	{
-		m_LightDesc.fRange -= (m_LightDesc.fRange / 20.f);
+		m_LightDesc.fRange -= (m_LightDesc.fRange / (fTimeDelta * 1250.f));
 		_vector vLightAmbient = XMLoadFloat4(&m_LightDesc.vAmbient);
-		vLightAmbient -= (vLightAmbient / 30.f);
+		vLightAmbient -= (vLightAmbient / (fTimeDelta * 1875.f));
 		XMStoreFloat4(&m_LightDesc.vAmbient, vLightAmbient);
 
 		if (m_LightDesc.fRange < 0.1f)
@@ -100,6 +124,17 @@ HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer, _bool bFor
 void CLight::Update_LightPos(_fvector vPos)
 {
 	XMStoreFloat4(&m_LightDesc.vPosition, vPos);
+}
+
+void CLight::Interpolate_Light(_float4 vTargetDiffuse, _float fTargetRange, _float fInterpolateTime)
+{
+	m_vTargetDiffuse = vTargetDiffuse;
+	m_vCurDiffuse = m_LightDesc.vDiffuse;
+	m_fTargetRange = fTargetRange;
+	m_fCurRange = m_LightDesc.fRange;
+	m_fInterpolateTime = fInterpolateTime;
+	m_fRatioTime = 1.f / m_fInterpolateTime;
+	m_bInterpolate = true;
 }
 
 _bool CLight::Compute_RenderCull()

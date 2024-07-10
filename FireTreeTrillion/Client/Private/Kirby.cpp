@@ -405,6 +405,12 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 					Change_State(CARSTATE_DAMAGE, 60.f, false, false, BODY_CARDEFAULT, OFFSET_CAR);
 				}
 			}
+			else if (INFO(m_eBodyState) == BODY_BULBDEFAULT)
+			{
+				Change_State(BULBSTATE_DAMAGE, 60.f, false, false, BODY_BULBDEFAULT, OFFSET_BULB);
+				INFO(m_pLight)->Interpolate_Light(_float4(0.7f, 0.2f, 0.2f, 0.f), 3.f, 1.f);
+				INFO(m_bLightOn) = false;
+			}
 			else
 			{
 				Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
@@ -1073,7 +1079,8 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 		(_eBodyState == BODY_SWORDBALLOON && _iMeshIndex == 3) ||
 		(_eBodyState == BODY_BOOMDEFAULT && _iMeshIndex == 3) ||
 		(_eBodyState == BODY_CARDEFAULT && _iMeshIndex == 3) ||
-		(_eBodyState == BODY_HAMMER && _iMeshIndex == 3))
+		(_eBodyState == BODY_HAMMER && _iMeshIndex == 3) ||
+		(_eBodyState == BODY_BULBDEFAULT && _iMeshIndex == 4))
 	{
 		m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
 		m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
@@ -1318,9 +1325,9 @@ void CKirby::SetUp_FSM()
 	m_pFSM->Add_State(BULBSTATE_STOPBRIGHT, CKirbyBulb_Run_State::Create());
 
 	m_pFSM->Add_State(BULBSTATE_LIGHTON, CKirbyBulb_Light_State::Create());
-	m_pFSM->Add_State(BULBSTATE_LIGHTONAIR, CKirbyBulb_Light_State::Create());
 	m_pFSM->Add_State(BULBSTATE_LIGHTOFF, CKirbyBulb_Light_State::Create());
 
+	m_pFSM->Add_State(BULBSTATE_LIGHTONAIR, CKirbyBulb_Jump_State::Create());
 	m_pFSM->Add_State(BULBSTATE_JUMP, CKirbyBulb_Jump_State::Create());
 	m_pFSM->Add_State(BULBSTATE_LANDING, CKirbyBulb_Jump_State::Create());
 	m_pFSM->Add_State(BULBSTATE_LANDINGBRIGHT, CKirbyBulb_Jump_State::Create());
@@ -1680,7 +1687,8 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 		(m_pFSM->Get_State() == CKirby::STATE_IDLE || m_pFSM->Get_State() == CKirby::STATE_RUN ||
 			m_pFSM->Get_State() == CKirby::STATE_RUNSTART || m_pFSM->Get_State() == CKirby::SWORDSTATE_RUN ||
 			m_pFSM->Get_State() == CKirby::SWORDSTATE_WAIT || m_pFSM->Get_State() == CKirby::CARSTATE_IDLING ||
-			m_pFSM->Get_State() == CKirby::HAMMERSTATE_IDLE || m_pFSM->Get_State() == CKirby::HAMMERSTATE_RUN) == false)
+			m_pFSM->Get_State() == CKirby::HAMMERSTATE_IDLE || m_pFSM->Get_State() == CKirby::HAMMERSTATE_RUN ||
+			m_pFSM->Get_State() == CKirby::BULBSTATE_WAIT || m_pFSM->Get_State() == CKirby::BULBSTATE_MOVE) == false)
 		INFO(m_bDumpAbilityPress) = false;
 
 

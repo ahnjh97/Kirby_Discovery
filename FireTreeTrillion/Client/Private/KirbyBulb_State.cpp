@@ -2,6 +2,14 @@
 #include "KirbyBulb_State.h"
 #include "Kirby_State_Function.h"
 
+void Kirby_EyeState_Assist(CKirby::KIRBY_INFODESC* Kirbydesc)
+{
+    if (DESC(m_bLightOn) == true)
+        DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+    else
+        DESC(m_eEyeState) = CKirby::EYE_IDLE;
+}
+
 #pragma region IDLE STATE
 
 CKirbyBulb_Idle_State::CKirbyBulb_Idle_State()
@@ -20,6 +28,7 @@ void CKirbyBulb_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
     CTransform* pTransformCom = pGameObject->Get_TransformCom();
     CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
     CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
+    Kirby_EyeState_Assist(Kirbydesc);
 
     pController->FreeFall(pTransformCom, fTimeDelta);
     Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
@@ -30,16 +39,38 @@ void CKirbyBulb_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
     if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == true && DESC(m_bLightOn) == false)
     {
+        DESC(m_pLight)->Interpolate_Light(_float4(1.f, 1.f, 1.f, 0.f), 7.f, 0.2f);
         pKirby->Change_State(CKirby::BULBSTATE_LIGHTON, 400.f, false, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
         DESC(m_bLightOn) = true;
         return;
     }
     else if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == false && DESC(m_bLightOn) == true)
     {
+        DESC(m_pLight)->Interpolate_Light(_float4(0.7f, 0.2f, 0.2f, 0.f), 3.f, 1.f);
         pKirby->Change_State(CKirby::BULBSTATE_LIGHTOFF, 400.f, false, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
         DESC(m_bLightOn) = false;
         return;
     }
+
+    // 차량을 땅에 버리는 로직이다.
+    if (m_pGameInstance->Get_DIKeyState(DIK_V, KEY_PRESS))
+    {
+        DESC(m_bDumpAbilityPress) = true;
+        DESC(m_fDumpAbilityTime) += fTimeDelta;
+
+        if (DESC(m_fDumpAbilityTime) > 1.f)
+        {
+            DESC(m_fDumpAbilityTime) = 0.f;
+            DESC(m_fJumpVelocity) = 15.f;
+            pKirby->Change_State(CKirby::STATE_SPITDEFORM, 60.f, false, false, CKirby::BODY_VACUUM);
+            return;
+        }
+    }
+    else
+    {
+        DESC(m_bDumpAbilityPress) = false;
+    }
+
 
     if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN) == true)
     {
@@ -109,22 +140,62 @@ void CKirbyBulb_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
     CTransform* pTransformCom = pGameObject->Get_TransformCom();
     CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
     CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
+    Kirby_EyeState_Assist(Kirbydesc);
 
     if (DESC(m_pLight) != nullptr)
         DESC(m_pLight)->Update_LightPos(pTransformCom->Get_State(CTransform::STATE_POSITION) +pTransformCom->Get_State(CTransform::STATE_UP) * 2.f);
 
     if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == true && DESC(m_bLightOn) == false)
     {
+        DESC(m_pLight)->Interpolate_Light(_float4(1.f, 1.f, 1.f, 0.f), 7.f, 0.2f);
         pKirby->Change_State(CKirby::BULBSTATE_LIGHTON, 400.f, false, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
         DESC(m_bLightOn) = true;
         return;
     }
     else if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == false && DESC(m_bLightOn) == true)
     {
+        DESC(m_pLight)->Interpolate_Light(_float4(0.7f, 0.2f, 0.2f, 0.f), 3.f, 1.f);
         pKirby->Change_State(CKirby::BULBSTATE_LIGHTOFF, 400.f, false, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
         DESC(m_bLightOn) = false;
         return;
     }
+
+    // 차량을 땅에 버리는 로직이다.
+    if (m_pGameInstance->Get_DIKeyState(DIK_V, KEY_PRESS))
+    {
+        DESC(m_bDumpAbilityPress) = true;
+        DESC(m_fDumpAbilityTime) += fTimeDelta;
+
+        if (DESC(m_fDumpAbilityTime) > 1.f)
+        {
+            DESC(m_fDumpAbilityTime) = 0.f;
+            DESC(m_fJumpVelocity) = 15.f;
+            pKirby->Change_State(CKirby::STATE_SPITDEFORM, 60.f, false, false, CKirby::BODY_VACUUM);
+            return;
+        }
+    }
+    else
+    {
+        DESC(m_bDumpAbilityPress) = false;
+    }
+
+    if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN) == true)
+    {
+        // 점프의 초기 파워
+        DESC(m_fJumpVelocity) = 22.f;
+        DESC(m_eEyeState) = CKirby::EYE_IDLE;
+        DESC(m_fChangeVelocityZeroTime) = 0.f;
+        // 공중에서 체공하는 시간 0.15초
+        DESC(m_fHoldAirTime) = 0.f;
+        // 점프키를 누르는 시간
+        DESC(m_fJumpHoldTime) = 0.f;
+        // 재입력 블락기능 초기화
+        DESC(m_bRePressBlock) = false;
+
+        pKirby->Change_State(CKirby::BULBSTATE_JUMP, 60.f, false, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
+        return;
+    }
+
 
     pController->FreeFall(pTransformCom, fTimeDelta);
     Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
@@ -240,13 +311,16 @@ void CKirbyBulb_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
     CTransform* pTransformCom = pGameObject->Get_TransformCom();
     CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
     CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
+    Kirby_EyeState_Assist(Kirbydesc);
+
+    if (DESC(m_pLight) != nullptr)
+        DESC(m_pLight)->Update_LightPos(pTransformCom->Get_State(CTransform::STATE_POSITION) + pTransformCom->Get_State(CTransform::STATE_UP) * 2.f);
 
     if (pKirby->Get_State() == CKirby::BULBSTATE_LANDING || pKirby->Get_State() == CKirby::BULBSTATE_LANDINGBRIGHT ||
         pKirby->Get_State() == CKirby::BULBSTATE_LANDINGEND || pKirby->Get_State() == CKirby::BULBSTATE_LANDINGENDBRIGHT)
         Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
     else
         Jump_Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
-
 
     if (JoyStick_controller(Kirbydesc, pCamera))
     {
@@ -265,14 +339,23 @@ void CKirbyBulb_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
     if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == true && DESC(m_bLightOn) == false)
     {
-        pKirby->Change_State(CKirby::BULBSTATE_LIGHTONAIR, 400.f, false, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
+        if (pKirby->Get_State() == CKirby::BULBSTATE_JUMP)
+            pKirby->Change_State(CKirby::BULBSTATE_LIGHTONAIR, 400.f, false, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
+        else
+            pKirby->Change_State(CKirby::BULBSTATE_LIGHTON, 400.f, false, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
         DESC(m_bLightOn) = true;
-        return;
+        DESC(m_pLight)->Interpolate_Light(_float4(1.f, 1.f, 1.f, 0.f), 7.f, 0.2f);
+
     }
     else if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == false && DESC(m_bLightOn) == true)
     {
+        if (pKirby->Get_State() != CKirby::BULBSTATE_JUMP)
+            pKirby->Change_State(CKirby::BULBSTATE_LIGHTOFF, 400.f, false, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
         DESC(m_bLightOn) = false;
+        DESC(m_pLight)->Interpolate_Light(_float4(0.7f, 0.2f, 0.2f, 0.f), 3.f, 1.f);
+
     }
+
 
     if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_UP))
     {
@@ -295,7 +378,7 @@ void CKirbyBulb_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
     }
 
 
-    if (pKirby->Get_State() == CKirby::BULBSTATE_JUMP)
+    if (pKirby->Get_State() == CKirby::BULBSTATE_JUMP || pKirby->Get_State() == CKirby::BULBSTATE_LIGHTONAIR)
     {
         // 0.3초 동안만 누적이 된다.
         if (DESC(m_bRePressBlock) == false && m_pGameInstance->Get_DIKeyState(DIK_C, KEY_PRESS) && DESC(m_fJumpHoldTime) < 0.3f)
@@ -346,6 +429,12 @@ void CKirbyBulb_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
             pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
         }
 
+        if (pKirby->Get_State() == CKirby::BULBSTATE_LIGHTONAIR && pKirby->isAnimFinish())
+        {
+            pKirby->Change_State(CKirby::BULBSTATE_JUMP, 60.f, false, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
+            return;
+        }
+
         // 만약, 땅에 안전하게 착지했을 경우, 홀딩 시간에 따라 뽀잉 애니메이션이 분기된다.
         if (pController->Is_Terrain())
         {
@@ -391,15 +480,19 @@ void CKirbyBulb_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
             return;
         }
     }
-    else if (pKirby->Get_State() == CKirby::BULBSTATE_LANDING)
+    else if (pKirby->Get_State() == CKirby::BULBSTATE_LANDING || pKirby->Get_State() == CKirby::BULBSTATE_LANDINGBRIGHT)
     {
+        // 최소 애니메이션이 재생되는 시간이다. ( 방향키를 누르면 0.2초 후 바로 Run 상태가 됨 )
+        _float fChangeRunTime = 0.08f;
+
+        m_fChangeRunTime += fTimeDelta;
+
+
         if (DESC(m_bReserveJumpKey) == true)
         {
             // 점프의 초기 파워
             DESC(m_fJumpVelocity) = 22.f;
             DESC(m_eEyeState) = CKirby::EYE_IDLE;
-
-            DESC(m_eJumpState) == CKirby::STATE_JUMPL ? DESC(m_eJumpState) = CKirby::STATE_JUMPR : DESC(m_eJumpState) = CKirby::STATE_JUMPL;
 
             DESC(m_fChangeVelocityZeroTime) = 0.f;
             // 공중에서 체공하는 시간 0.15초
@@ -414,41 +507,87 @@ void CKirbyBulb_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
             pKirby->Change_State(CKirby::BULBSTATE_JUMP, 60.f, false, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
         }
 
-
-
-    }
-    else if (pKirby->Get_State() == CKirby::BULBSTATE_LANDINGBRIGHT)
-    {
-        if (DESC(m_bReserveJumpKey) == true)
+        // Idle일 때, C를 누르면 점프를 한다.
+        if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
         {
+            DESC(m_eEyeState) = CKirby::EYE_IDLE;
             // 점프의 초기 파워
             DESC(m_fJumpVelocity) = 22.f;
-            DESC(m_eEyeState) = CKirby::EYE_IDLE;
-
-            DESC(m_eJumpState) == CKirby::STATE_JUMPL ? DESC(m_eJumpState) = CKirby::STATE_JUMPR : DESC(m_eJumpState) = CKirby::STATE_JUMPL;
 
             DESC(m_fChangeVelocityZeroTime) = 0.f;
             // 공중에서 체공하는 시간 0.15초
             DESC(m_fHoldAirTime) = 0.f;
             // 점프키를 누르는 시간
             DESC(m_fJumpHoldTime) = 0.f;
-
             // 재입력 블락기능 초기화
             DESC(m_bRePressBlock) = false;
-            // 예약 초기화
-            DESC(m_bReserveJumpKey) = false;
             pKirby->Change_State(CKirby::BULBSTATE_JUMP, 60.f, false, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
         }
 
-    }
-    else if (pKirby->Get_State() == CKirby::BULBSTATE_LANDINGEND)
-    {
+        // 바로 방향키를 갈겼다면
+        if (m_fChangeRunTime > fChangeRunTime && JoyStick_controller(Kirbydesc, pCamera))
+        {
+            if (DESC(m_bLightOn) == true)
+                pKirby->Change_State(CKirby::BULBSTATE_MOVEBRIGHT, 60.f, true, false, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
+            else
+                pKirby->Change_State(CKirby::BULBSTATE_MOVE, 60.f, true, false, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
+
+            return;
+        }
+
+
+        if (pKirby->isAnimFinish())
+        {
+            if (DESC(m_bLightOn) == true)
+                pKirby->Change_State(CKirby::BULBSTATE_LANDINGENDBRIGHT, 60.f, false, false, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
+            else
+                pKirby->Change_State(CKirby::BULBSTATE_LANDINGEND, 60.f, false, false, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
+        }
 
     }
-    else if (pKirby->Get_State() == CKirby::BULBSTATE_LANDINGBRIGHT)
+    else if (pKirby->Get_State() == CKirby::BULBSTATE_LANDINGEND || pKirby->Get_State() == CKirby::BULBSTATE_LANDINGENDBRIGHT)
     {
+        // 최소 애니메이션이 재생되는 시간이다. ( 방향키를 누르면 0.2초 후 바로 Run 상태가 됨 )
+        _float fChangeRunTime = 0.08f;
+
+        m_fChangeRunTime += fTimeDelta;
 
 
+        // Idle일 때, C를 누르면 점프를 한다.
+        if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
+        {
+            DESC(m_eEyeState) = CKirby::EYE_IDLE;
+            // 점프의 초기 파워
+            DESC(m_fJumpVelocity) = 22.f;
+
+            DESC(m_fChangeVelocityZeroTime) = 0.f;
+            // 공중에서 체공하는 시간 0.15초
+            DESC(m_fHoldAirTime) = 0.f;
+            // 점프키를 누르는 시간
+            DESC(m_fJumpHoldTime) = 0.f;
+            // 재입력 블락기능 초기화
+            DESC(m_bRePressBlock) = false;
+            pKirby->Change_State(CKirby::BULBSTATE_JUMP, 60.f, false, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
+        }
+
+        // 바로 방향키를 갈겼다면
+        if (m_fChangeRunTime > fChangeRunTime && JoyStick_controller(Kirbydesc, pCamera))
+        {
+            if (DESC(m_bLightOn) == true)
+                pKirby->Change_State(CKirby::BULBSTATE_MOVEBRIGHT, 60.f, true, false, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
+            else
+                pKirby->Change_State(CKirby::BULBSTATE_MOVE, 60.f, true, false, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
+
+            return;
+        }
+
+        if (pKirby->isAnimFinish())
+        {
+            if (DESC(m_bLightOn) == true)
+                pKirby->Change_State(CKirby::BULBSTATE_WAITBRIGHT, 60.f, true, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
+            else
+                pKirby->Change_State(CKirby::BULBSTATE_WAIT, 60.f, true, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
+        }
     }
     else if (pKirby->Get_State() == CKirby::BULBSTATE_FALL)
     {
@@ -470,6 +609,7 @@ void CKirbyBulb_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 void CKirbyBulb_Jump_State::OnStateExit()
 {
     m_fFallTime = 0.f;
+    m_fChangeRunTime = 0.f;
 }
 
 CKirbyBulb_Jump_State* CKirbyBulb_Jump_State::Create()
@@ -506,51 +646,59 @@ void CKirbyBulb_Light_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
     CTransform* pTransformCom = pGameObject->Get_TransformCom();
     CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
     CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
+    Kirby_EyeState_Assist(Kirbydesc);
+
+    if (DESC(m_pLight) != nullptr)
+        DESC(m_pLight)->Update_LightPos(pTransformCom->Get_State(CTransform::STATE_POSITION) + pTransformCom->Get_State(CTransform::STATE_UP) * 2.f);
+
 
     if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == true && DESC(m_bLightOn) == false)
     {
         pKirby->Change_State(CKirby::BULBSTATE_LIGHTON, 400.f, false, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
         DESC(m_bLightOn) = true;
+        DESC(m_pLight)->Interpolate_Light(_float4(1.f, 1.f, 1.f, 0.f), 7.f, 0.2f);
+
         return;
     }
     else if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == false && DESC(m_bLightOn) == true)
     {
         pKirby->Change_State(CKirby::BULBSTATE_LIGHTOFF, 400.f, false, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
         DESC(m_bLightOn) = false;
+        DESC(m_pLight)->Interpolate_Light(_float4(0.7f, 0.2f, 0.2f, 0.f), 3.f, 1.f);
         return;
     }
 
-    pController->FreeFall(pTransformCom, fTimeDelta);
-    Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
-
-    if (JoyStick_controller(Kirbydesc, pCamera) == true)
-    {
-        Moving_Logic(Kirbydesc, pTransformCom, pController, fTimeDelta);
-    }
-    else
-    {
-        Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
-    }
-
-
-
     if (pKirby->Get_State() == CKirby::BULBSTATE_LIGHTON)
     {
+        pController->FreeFall(pTransformCom, fTimeDelta);
+        Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
+        if (JoyStick_controller(Kirbydesc, pCamera) == true)
+            Moving_Logic(Kirbydesc, pTransformCom, pController, fTimeDelta);
+        else
+            Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
+
+
         if (pKirby->isAnimFinish())
         {
             pKirby->Change_State(CKirby::BULBSTATE_WAITBRIGHT, 60.f, true, false, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
             return;
         }
     }
-    if (pKirby->Get_State() == CKirby::BULBSTATE_LIGHTOFF)
+    else if (pKirby->Get_State() == CKirby::BULBSTATE_LIGHTOFF)
     {
+        pController->FreeFall(pTransformCom, fTimeDelta);
+        Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
+        if (JoyStick_controller(Kirbydesc, pCamera) == true)
+            Moving_Logic(Kirbydesc, pTransformCom, pController, fTimeDelta);
+        else
+            Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
+
         if (pKirby->isAnimFinish())
         {
-            pKirby->Change_State(CKirby::BULBSTATE_WAIT, 60.f, true, false, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
+            pKirby->Change_State(CKirby::BULBSTATE_WAIT, 60.f, true, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
             return;
         }
     }
-
 }
 
 void CKirbyBulb_Light_State::OnStateExit()
@@ -590,7 +738,22 @@ void CKirbyBulb_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
     CTransform* pTransformCom = pGameObject->Get_TransformCom();
     CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
     CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
+    Kirby_EyeState_Assist(Kirbydesc);
 
+
+    DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+    _float fDamageJumpPower = pKirby->Get_DamageJumpPower();
+    pController->Jump(pTransformCom, fDamageJumpPower, fTimeDelta);
+    fDamageJumpPower -= GRAVITY * fTimeDelta * 3.f;
+    pKirby->Set_DamageJumpPower(fDamageJumpPower);
+
+    if (pController->Is_Terrain() || pKirby->isAnimFinish())
+    {
+        DESC(m_bCarJump) = false;
+        DESC(m_eEyeState) = CKirby::EYE_IDLE;
+        pKirby->Change_State(CKirby::BULBSTATE_WAIT, 60.f, true, false, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
+        return;
+    }
 }
 
 void CKirbyBulb_Damage_State::OnStateExit()
@@ -636,6 +799,7 @@ void CKirbyBulb_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
     CTransform* pTransformCom = pGameObject->Get_TransformCom();
     CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
     CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
+    Kirby_EyeState_Assist(Kirbydesc);
 
     Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
 
@@ -645,6 +809,18 @@ void CKirbyBulb_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
         if (m_fTime > 0.36666666666666666666f)
         {
+            LIGHT_DESC			LightDesc{};
+            LightDesc.eType = LIGHT_DESC::TYPE_POINT;
+            LightDesc.vPosition = pTransformCom->Get_State_Float4(CTransform::STATE_POSITION) + pTransformCom->Get_State(CTransform::STATE_UP) * 2.f;
+            LightDesc.fRange = 3.f;
+            LightDesc.vDiffuse = _float4(.7f, 0.2f, 0.2f, 1.f);
+            LightDesc.vAmbient = _float4(.5f, .5f, .5f, 1.f);
+            LightDesc.vSpecular = _float4(0.f, 0.f, 0.0f, 1.f);
+            if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
+                return;
+            DESC(m_pLight) = CGameInstance::Get_Instance()->Get_LightLastAddress();
+            Safe_AddRef(DESC(m_pLight));
+
             pKirby->Change_State(CKirby::BULBSTATE_DEMOENDFIRST, 60.f, false, false, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
             return;
         }
@@ -658,18 +834,6 @@ void CKirbyBulb_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
         {
             m_pGameInstance->Set_BlackBackGround(false);
             m_pGameInstance->Set_SecondTimerRatio(1.f);
-
-            LIGHT_DESC			LightDesc{};
-            LightDesc.eType = LIGHT_DESC::TYPE_POINT;
-            LightDesc.vPosition = pTransformCom->Get_State_Float4(CTransform::STATE_POSITION) + pTransformCom->Get_State(CTransform::STATE_UP) * 2.f;
-            LightDesc.fRange = 5.f;
-            LightDesc.vDiffuse = _float4(.7f, 0.2f, 0.2f, 1.f);
-            LightDesc.vAmbient = _float4(.5f, .5f, .5f, 1.f);
-            LightDesc.vSpecular = _float4(0.f, 0.f, 0.0f, 1.f);
-            if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
-	            return;
-            DESC(m_pLight) = CGameInstance::Get_Instance()->Get_LightLastAddress();
-            Safe_AddRef(DESC(m_pLight));
 
             CCamera_Main* pCamMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
             if (pCamMain == nullptr)
