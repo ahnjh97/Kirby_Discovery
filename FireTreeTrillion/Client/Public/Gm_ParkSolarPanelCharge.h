@@ -46,14 +46,15 @@ private:
 	CShader*				m_pShaderCom = { nullptr };
 	PxRigidStatic*			m_pStaticActor = { nullptr };
 
-	ANIM_STATE				m_eAnimState = { STATE_NONE };
+	ANIM_STATE				m_eCurState = { STATE_NONE };
 
-	_float					m_fBreakAnimTime = { 0.f };
+	_float					m_fDecreasesTime = { 0.f };
 	_float					m_fWhiteColorDiffuse = { 0.f };
 	_float4					m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
 	//_float				m_fHitPower = {};
 	
-	_bool					m_bStartAnim = { FALSE };
+	_bool					m_IsInteraction = { FALSE };
+	_bool					m_bStartCharge = { FALSE };
 
 public:
 	static CGm_ParkSolarPanelCharge* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

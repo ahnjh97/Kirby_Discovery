@@ -63,13 +63,9 @@ _int CGm_ParkSolarPanelCharge::Tick(_float fTimeDelta)
 		}
 		break;
 	case STATE_CHARGEDSTART: //충전 완료
-		if (TRUE == m_pModelCom->IsFinished())
-		{
-			m_pModelCom->Set_Animation(STATE_CHARGEDWAIT, 60.f, FALSE);
-			m_eCurState = STATE_CHARGEDWAIT;
-		}
 		break;
-	case STATE_CHARGEDWAIT: break;//충전 완료 대기
+	case STATE_CHARGEDWAIT: //충전 완료 대기
+		break;
 	case STATE_DECREASES: //충전 해제
 		if (TRUE == m_pModelCom->IsFinished()) //충전 해제 중 애님 종료 시 충전 전 상태 변경
 		{
@@ -84,7 +80,8 @@ _int CGm_ParkSolarPanelCharge::Tick(_float fTimeDelta)
 			m_eCurState = STATE_OFFWAIT;
 		}
 		break;
-	case STATE_OFFWAIT: break;//충전 전 대기
+	case STATE_OFFWAIT: //충전 전 대기
+		break;
 	case STATE_NONE:	default:	break;
 	}
 
@@ -187,7 +184,7 @@ void CGm_ParkSolarPanelCharge::Collision(CCollisionCenter::CONTENT_TYPE eContent
 		m_pModelCom->Set_Animation(STATE_CHARGE, 60.f, FALSE);
 		m_eCurState = STATE_CHARGE;
 	}
-	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_UP) && STATE_CHARGE == m_eCurState)
+	else //if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_UP) && STATE_CHARGE == m_eCurState)
 	{
 		m_pModelCom->Set_Animation(STATE_DECREASES, 60.f, FALSE);
 		m_eCurState = STATE_DECREASES;
@@ -220,7 +217,7 @@ HRESULT CGm_ParkSolarPanelCharge::Add_Components()
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
 
-	Set_BodyCollider(COLLIDER_CYLINDER, 0.f, 2.5f, 5.f);
+	Set_BodyCollider(COLLIDER_CYLINDER, 0.f, 2.5f, 2.5f);
 
 #pragma endregion
 
