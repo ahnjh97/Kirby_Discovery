@@ -28,6 +28,7 @@
 #include "Ability.h"
 
 #include "Light.h"
+#include "Crumble.h"
 
 
 
@@ -118,6 +119,9 @@ _int CKirby::Tick(_float fTimeDelta)
 
 	m_pWeapons->Tick(m_fTimeDelta);
 	m_pArmours->Tick(m_fTimeDelta);
+
+	if (*m_pCurrentLevelID == LEVEL_PARK)
+		RayCast_Crumbles();
 
 	return OBJ_NOEVENT;
 }
@@ -1394,6 +1398,23 @@ void CKirby::HitBoxChanger(_uint eState)
 		break;
 	}
 	m_isKirbyAttacking = true;
+}
+
+void CKirby::RayCast_Crumbles()
+{
+	if (m_pControllerCom == nullptr) return;
+
+	_float4 vDown = _float4(0.f, 1.f, 0.f, 0.f);
+	if (m_pControllerCom->RayCastToDynamicActor(vDown, _float3(0, -1, 0)) < 0.5f)
+	{
+		CGameObject* pObj = FindBox(m_pControllerCom->Get_MostRecentActor());
+		if (nullptr != pObj)
+		{
+			CCrumble* pCrumble = static_cast<CCrumble*>(pObj);
+			pCrumble->Break_Crumble();
+			return;
+		}
+	}
 }
 
 void CKirby::Update_PartObjectMatrix()

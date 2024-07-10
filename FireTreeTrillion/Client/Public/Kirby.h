@@ -225,6 +225,9 @@ private:
 	_bool			m_isKirbyAttacking = { false };
 	_float			m_fIsAttackTime = { 0.f };
 
+	// 파크에서의 커비 행동 감지
+	void			RayCast_Crumbles();
+
 private:
 	CModel*					m_pModelCom[BODY_END] = {nullptr};
 

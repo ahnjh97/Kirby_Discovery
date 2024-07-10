@@ -1907,6 +1907,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// Gimmick
 		m_vecModelInfo.emplace_back("Crumble", TYPE_ANIM);
+		m_vecModelInfo.emplace_back("NonAnim_Crumble", TYPE_NONANIM, 1.f, 0.f, 0, string("Monsters/"));
 	}
 	else if (eLevel == LEVEL_SIMBA)
 	{

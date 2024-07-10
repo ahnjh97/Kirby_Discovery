@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Crumble.h"
+
 #include "HitBox.h"
+#include "Kirby.h"
 
 CCrumble::CCrumble(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
@@ -19,12 +21,11 @@ HRESULT CCrumble::Initialize_Prototype()
 
 HRESULT CCrumble::Initialize(void* pArg)
 {
-	GAMEOBJECT_DESC* desc = {};
-
-	if (pArg != nullptr)
-		desc = (GAMEOBJECT_DESC*)pArg;
-
 	HRESULT hr;
+	CRUMBLE_DESC* desc = {};
+	if (pArg != nullptr)
+		desc = (CRUMBLE_DESC*)pArg;
+
 	hr = __super::Initialize(desc);
 	CHECK_FAILED(hr);
 
@@ -34,8 +35,17 @@ HRESULT CCrumble::Initialize(void* pArg)
 	m_bMotionBlur = false;
 	m_bRimLight = true;
 	m_bStencil = true;
+
 	m_pDynamicActor = m_pNonAnimModelCom->ReturnDynamicActor(m_pTransformCom->Get_WorldFloat4x4());
 	m_pDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+
+	CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
+	if (pKirby != nullptr)
+		pKirby->RegisterActorsToPlayer_ForBox(m_pDynamicActor, this);
+
+	m_vOriginPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	_uint uAnim = desc->uInitialState;
+	m_pModelCom->Set_Animation(uAnim, 30.f, true, false);
 
 	return S_OK;
 }
@@ -44,14 +54,21 @@ _int CCrumble::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
 		return OBJ_DEAD;
+	
+	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+	
+	Change_State();
 
-	m_pModelCom->Play_Animation(fTimeDelta);
+	_float4 vPos = GET_POS;
+	m_pDynamicActor->setKinematicTarget(PxTransform{ vPos.x, vPos.y, vPos.z });
 
 	return OBJ_NOEVENT;
 }
 
 void CCrumble::Late_Tick(_float fTimeDelta)
 {
+	m_pModelCom->Play_Animation(m_fTimeDelta);
+	
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
 
@@ -108,6 +125,64 @@ void CCrumble::Render_IMGUI()
 
 void CCrumble::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
+
+}
+
+void CCrumble::Change_State()
+{
+	if (m_pModelCom->IsFinished())
+	{
+		switch (m_pModelCom->Get_CurAnimIndex())
+		{
+		case APPEAR:
+		{
+			m_pModelCom->Set_Animation(WAIT, 30.f, true, false);
+			m_bOnce = false;
+		}
+		break;
+		case DISAPPEAR:
+		{
+			m_fAccTimeDisappear += m_fTimeDelta;
+			if (m_fAccTimeDisappear >= 3.f)
+			{
+				m_pModelCom->Set_Animation(APPEAR, 30.f, false, false);
+				m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vOriginPosition);
+				m_fAccTimeDisappear = 0.f;
+			}
+		}
+		break;
+		}
+	}
+	else
+	{
+		switch (m_pModelCom->Get_CurAnimIndex())
+		{
+		case PREDISAPPEAR:
+		{
+			m_fAccTimePreDisappear += m_fTimeDelta;
+			if (m_fAccTimePreDisappear >= 2.f)
+			{
+				m_pModelCom->Set_Animation(DISAPPEAR, 30.f, false, false);
+				m_fAccTimePreDisappear = 0.f;
+			}
+		}
+		break;
+		case DISAPPEAR:
+		{
+			m_pTransformCom->Go_Down(m_fTimeDelta);
+		}
+		break;
+		}
+	}
+}
+
+void CCrumble::Break_Crumble()
+{
+	if (false == m_bOnce)
+	{
+		m_pModelCom->Set_Animation(PREDISAPPEAR, 30.f, true, false);
+		m_bOnce = true;
+	}
 }
 
 void CCrumble::Add_Components(wstring& wstrModelName)
@@ -118,26 +193,11 @@ void CCrumble::Add_Components(wstring& wstrModelName)
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
-
-	CHitBox::HITBOX_DESC HitBox{};
-	HitBox.pOwner = this;
-	HitBox.pDesc = &m_tColliderDesc[BODY];
-	HitBox.pCollisionType = OBJECT;
-	hr = m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox);
-	CHECK_FAILED(hr);
-	Set_BodyCollider(COLLIDER_SPHERE, 1.f, 0.f, 1.f);
-
-	wstring wstrModeltag = TEXT("Prototype_Component_Model_") + wstrModelName;
-	hr = __super::Add_Component(wstrModeltag, TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Crumble"), TEXT("Com_Model_Anim"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
-	_uint iWstrLength = wstrModelName.length();
-	if (iWstrLength > 5)
-	{
-		wstring wstrNonAnimModelTag = TEXT("Prototype_Component_Model_") + wstrModelName.substr(0, iWstrLength - 5);
-		hr = __super::Add_Component(wstrNonAnimModelTag, TEXT("Com_NonAnimModel"), (CComponent**)&m_pNonAnimModelCom);
-		CHECK_FAILED(hr);
-	}
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_NonAnim_Crumble"), TEXT("Com_Model_NonAnim"), (CComponent**)&m_pNonAnimModelCom);
+	CHECK_FAILED(hr);
 }
 
 HRESULT CCrumble::Bind_ShaderResources()
