@@ -746,6 +746,14 @@ HRESULT CGameInstance::Render_ProjFont(_matrix _matrix, const wstring& strFontTa
 	return m_pFont_Manager->Render_Proj(_matrix, strFontTag, strText, vPosition, vColor, fRadian, vOrigin, vScale);
 }
 
+XMVECTOR CGameInstance::Measure_String(const wstring& strFontTag, const wstring& strText)
+{
+	if (m_pFont_Manager == nullptr)
+		return XMVECTOR();
+
+	return m_pFont_Manager->Measure_String(strFontTag, strText);
+}
+
 #pragma endregion
 
 #pragma region TARGET_MANAGER
@@ -1229,3 +1237,4 @@ void CGameInstance::Free()
 	Safe_Release(m_pPhysx);
 	Safe_Release(m_pGraphic_Device);
 }
+

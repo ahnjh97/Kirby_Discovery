@@ -49,6 +49,15 @@ HRESULT CFont_Manager::Render_Proj(_matrix _matrix, const wstring& strFontTag, c
 	return pFont->Render_Proj(_matrix, strText, vPosition, vColor, fRadian, vOrigin, vScale);
 }
 
+XMVECTOR CFont_Manager::Measure_String(const wstring& strFontTag, const wstring& strText)
+{
+	CCustomFont* pFont = Find_Font(strFontTag);
+	if (nullptr == pFont)
+		return _float2();
+
+	return pFont->Measure_String(strFontTag, strText);
+}
+
 CCustomFont * CFont_Manager::Find_Font(const wstring & strFontTag)
 {
 	auto	iter = m_Fonts.find(strFontTag);

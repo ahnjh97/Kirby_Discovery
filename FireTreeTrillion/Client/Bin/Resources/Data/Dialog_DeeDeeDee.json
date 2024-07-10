@@ -47,5 +47,14 @@
     "TitleScale": [
         1.0,
         1.0
+    ],
+    "HighLight": [
+        "핑크"
+    ],
+    "HighLightRGBA": [
+        0.921, 
+        0.686,
+        0.0,
+        1.0
     ]
 }

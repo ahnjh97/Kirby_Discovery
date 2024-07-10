@@ -146,35 +146,34 @@ void CDialog::Load(string strPath)
 
 	vector<wstring> vecHighlight;
 	for (auto& Highlight : data["HighLight"])
-		vecHighlight.push_back(utf8_decode(Highlight));
+		Highlight.push_back(utf8_decode(Highlight));
 
-	CUI_MessageWindow::MESSAGE_DESC tMessage_Desc = {};
-	tMessage_Desc.wstrFontTag   = utf8_decode(data.value("FontTag", ""));
+	CUI_MessageWindow::MESSAGE_DESC tMessageDesc = {};
+	tMessageDesc.wstrFontTag   = utf8_decode(data.value("FontTag", ""));
 
-	tMessage_Desc.vFontPos      = { data["FontPos"][0], data["FontPos"][1] };
-	tMessage_Desc.vFontRGBA     = { data["FontRGBA"][0], data["FontRGBA"][1], data["FontRGBA"][2], data["FontRGBA"][3] };
-	tMessage_Desc.vFontSize     = { data["FontSize"][0], data["FontSize"][1] };
-	tMessage_Desc.vFontScale    = { data["FontScale"][0], data["FontScale"][1] };
-	tMessage_Desc.fRadian	    = data.value("Radian", 0.f);
-
-	tMessage_Desc.fDisplayTime  = data.value("DisplayTime", 0.f);
-	tMessage_Desc.fElapsedyTime = data.value("ElapsedyTime", 0.f);
-	tMessage_Desc.vecMsg		= vecMsg;
+	tMessageDesc.vFontPos = { data["FontPos"][0], data["FontPos"][1] };
+	tMessageDesc.vFontRGBA = { data["FontRGBA"][0], data["FontRGBA"][1], data["FontRGBA"][2], data["FontRGBA"][3] };
+	tMessageDesc.vFontSize = { data["FontSize"][0], data["FontSize"][1] };
+	tMessageDesc.vFontScale = { data["FontScale"][0], data["FontScale"][1] };
+	tMessageDesc.fRadian = data.value("Radian", 0.f);
+	tMessageDesc.fDisplayTime = data.value("DisplayTime", 0.f);
+	tMessageDesc.fElapsedyTime = data.value("ElapsedyTime", 0.f);
+	tMessageDesc.vecMsg		= vecMsg;
 
 	//Title
-	tMessage_Desc.wstrTitleTag = utf8_decode(data.value("TitleTag", ""));
-	tMessage_Desc.wstrTitleText = utf8_decode(data.value("TitleText", ""));
-	tMessage_Desc.vTitlePos = { data["TitlePos"][0], data["TitlePos"][1] };
-	tMessage_Desc.vTitleRGBA = { data["TitleRGBA"][0], data["TitleRGBA"][1], data["TitleRGBA"][2], data["TitleRGBA"][3] };
-	tMessage_Desc.vTitleSize = { data["TitleSize"][0], data["TitleSize"][1] };
-	tMessage_Desc.vTitleScale = { data["TitleScale"][0], data["TitleScale"][1] };
+	tMessageDesc.wstrTitleTag = utf8_decode(data.value("TitleTag", ""));
+	tMessageDesc.wstrTitleText = utf8_decode(data.value("TitleText", ""));
+	tMessageDesc.vTitlePos = { data["TitlePos"][0], data["TitlePos"][1] };
+	tMessageDesc.vTitleRGBA = { data["TitleRGBA"][0], data["TitleRGBA"][1], data["TitleRGBA"][2], data["TitleRGBA"][3] };
+	tMessageDesc.vTitleSize = { data["TitleSize"][0], data["TitleSize"][1] };
+	tMessageDesc.vTitleScale = { data["TitleScale"][0], data["TitleScale"][1] };
 
 	//Highlight
-	tMessage_Desc.vecHighlight	= vecHighlight;
-	tMessage_Desc.vHighlightRGBA = { data["HighLightRGBA"][0], data["HighLightRGBA"][1], data["HighLightRGBA"][2], data["HighLightRGBA"][3] };
+	tMessageDesc.vecHighlight	= vecHighlight;
+	tMessageDesc.vHighlightRGBA = { data["HighLightRGBA"][0], data["HighLightRGBA"][1], data["HighLightRGBA"][2], data["HighLightRGBA"][3] };
 	
 	hr = m_pGameInstance->Add_Clone(m_tMessage_Desc.uLevel, TEXT("Layer_UI_Dialog"),
-									TEXT("Prototype_GameObject_UI_MessageWindow"), &tMessage_Desc);
+									TEXT("Prototype_GameObject_UI_MessageWindow"), &tMessageDesc);
 	CHECK_FAILED(hr);
 }
 

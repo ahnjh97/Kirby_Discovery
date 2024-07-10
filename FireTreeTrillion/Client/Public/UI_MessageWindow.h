@@ -28,22 +28,26 @@ public:
 
 		vector<wstring> vecMsg;
 
-#pragma region HIGHLIGHT
+		//struct TITLE_DESC
+		//{
+			wstring wstrTitleTag = { TEXT("") };
+			wstring wstrTitleText = { TEXT("") };
+			_float2	vTitlePos = { 0.f, 0.f };
+			_float4	vTitleRGBA = { 0.f, 0.f, 0.f, 0.f };
 
-		vector<wstring> vecHighlight;
-		_float4	vHighlightRGBA = { 0.f, 0.f, 0.f, 0.f };
-#pragma endregion
+			_float2 vTitleSize = { 0.f, 0.f }; //원본 사이즈
+			_float2 vTitleScale = { 0.f, 0.f }; //원본대비 키울 스케일 비율
+		//};
+		//TITLE_DESC tTitleDesc{};
 
-#pragma region TITLE
-
-		wstring wstrTitleTag = { TEXT("") };
-		wstring wstrTitleText = { TEXT("") };
-		_float2	vTitlePos = { 0.f, 0.f };
-		_float4	vTitleRGBA = { 0.f, 0.f, 0.f, 0.f };
-		_float2 vTitleSize = { 0.f, 0.f }; //원본 사이즈
-		_float2 vTitleScale = { 0.f, 0.f }; //원본대비 키울 스케일 비율
-
-#pragma endregion
+		//struct HIGHLIGHT_DESC
+		//{
+			wstring wstrHighlightText = { TEXT("") };
+			_float4	vHighlightRGBA = { 0.f, 0.f, 0.f, 0.f };
+			_float2 vHighlightScale = { 0.f, 0.f };
+			vector<wstring> vecHighlight;
+		//};
+		//HIGHLIGHT_DESC tHighlightDesc{};
 	};
 
 public:
@@ -97,8 +101,9 @@ private:
 	class CUI_BtnIcon*			m_pUIBtn = { nullptr };
 	
 	MESSAGEWINDOW_STATE			m_eCurState = { WINDOW_NONE };
-	MESSAGE_DESC				m_tMessageDesc;
-	
+	MESSAGE_DESC				m_tMessageDesc{};
+
+
 	// BTN
 	_float						m_fHideTime = { 0.f };
 	_float3						m_vBaseScale = { 0.f, 0.f, 1.f };

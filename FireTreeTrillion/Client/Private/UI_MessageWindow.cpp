@@ -333,8 +333,6 @@ HRESULT CUI_MessageWindow::Render_Message()
 	_float2 vFontScale = m_tMessageDesc.vFontScale;
 	_float fRadian = XMConvertToRadians(m_tMessageDesc.fRadian);
 
-	//하이라이트 정보
-
 	//스크립트
 	if (m_iCurMessageIndex < m_tMessageDesc.vecMsg.size())
 	{
@@ -355,8 +353,12 @@ HRESULT CUI_MessageWindow::Render_Message()
 			_float2 vMessageShadowPos = { vFontPos.x + vOffset[i].x, vFontPos.y + vOffset[i].y };
 			m_pGameInstance->Render_Font(wstrFontTag, wstrSubstrMessage, vMessageShadowPos, vMessageShadowRGBA, fRadian, vFontSize, vMessageShadowScale);
 		}
+		
+		//스크립트
+		m_pGameInstance->Render_Font(wstrFontTag, wstrSubstrMessage, vFontPos, vFontRGBA, fRadian, vFontSize, vFontScale);
 
 #pragma region HIGHLIGHT
+
 		//스크립트 하이라이트
 		wstring wstrHighlight = m_tMessageDesc.vecHighlight[m_iCurMessageIndex];
 		size_t FindHighlightPos = wstrMsg.find(wstrHighlight);
@@ -364,15 +366,20 @@ HRESULT CUI_MessageWindow::Render_Message()
 
 		if (FindHighlightPos != string::npos) //문자열 검색 성공할 경우
 		{
-			wstring wstrHighlightMessage = wstrMsg.substr(FindHighlightPos, wstrHighlightLength); //substr(start, length)
+			//substr(start, length)
+			wstring wstrPreHighlight = wstrMsg.substr(0, FindHighlightPos); //하이라이트 전 부분
+			wstring wstrHighlightMessage = wstrMsg.substr(FindHighlightPos, wstrHighlightLength); //하이라이트 부분
+			wstring wstrPostHighlight = wstrMsg.substr(FindHighlightPos + wstrHighlightLength); //하이라이트 이후 부분
+
+			//XMVECTOR xmHighlightPos = m_pGameInstance->Measure_String(wstrFontTag, wstrPreHighlight);
+			//_float2 vHighlightPos = vFontPos;
+			//vHighlightPos.x += XMVectorGetX(xmHighlightPos);
+
 			_float4 vHighlightRGBA = m_tMessageDesc.vHighlightRGBA;
 			m_pGameInstance->Render_Font(wstrFontTag, wstrHighlightMessage, vFontPos, vHighlightRGBA, fRadian, vFontSize, vFontScale);
 		}
 
 #pragma endregion
-		
-		//스크립트
-		m_pGameInstance->Render_Font(wstrFontTag, wstrSubstrMessage, vFontPos, vFontRGBA, fRadian, vFontSize, vFontScale);
 	}
 
 	if (LEVEL_TOWN == *m_pCurrentLevelID)
@@ -401,7 +408,6 @@ HRESULT CUI_MessageWindow::Render_Message()
 		//타이틀
 		m_pGameInstance->Render_Font(wstrTitleTag, wstrTitleText, vTitlePos, vTitleRGBA, 0.f, vTitleSize, vTitleScale);
 	}
-
 
 	return S_OK;
 }
