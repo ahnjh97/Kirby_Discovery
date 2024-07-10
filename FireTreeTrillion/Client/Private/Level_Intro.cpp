@@ -46,9 +46,6 @@ HRESULT CLevel_Intro::Initialize()
 	hr = Ready_Layer_BackGround(TEXT("Layer_BackGround"));
 	CHECK_FAILED(hr);
 
-	hr = Ready_Layer_UI(TEXT("Layer_UI"));
-	CHECK_FAILED(hr);
-
 	hr = Ready_Map();
 	CHECK_FAILED(hr);
 	hr = Ready_Triggers();
@@ -60,6 +57,9 @@ HRESULT CLevel_Intro::Initialize()
 	hr = Ready_Kickables();
 	CHECK_FAILED(hr);
 	hr = Ready_Objects();
+	CHECK_FAILED(hr);
+
+	hr = Ready_Layer_UI(TEXT("Layer_UI"));
 	CHECK_FAILED(hr);
 
 	// 셰이더 트리거
