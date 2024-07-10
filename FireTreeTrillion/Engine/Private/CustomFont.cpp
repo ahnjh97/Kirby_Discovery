@@ -57,11 +57,11 @@ HRESULT CCustomFont::Render_Proj(_matrix _matrix, const wstring& strText, const 
 }
 
 //텍스트 길이 측정
-XMVECTOR CCustomFont::Measure_String(const wstring& strFontTag, const wstring& strText)
+_float4 CCustomFont::Measure_String(const wstring& strFontTag, const wstring& strText)
 {
 	m_pBatch->Begin();
 
-	XMVECTOR XMMeasureString = m_pFont->MeasureString(strText.c_str());
+	_float4 XMMeasureString = m_pFont->MeasureString(strText.c_str());
 
 	return XMMeasureString;
 }

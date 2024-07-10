@@ -2,6 +2,7 @@
 #include "UI_MessageWindow.h"
 #include "UI_BtnIcon.h"
 #include "Kirby.h"
+#include "Level_Loading.h"
 
 CUI_MessageWindow::CUI_MessageWindow(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext)
 	: CUIObject { _pDevice, _pContext }
@@ -76,6 +77,9 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 
 	m_pCurrentLevelID = m_pGameInstance->Get_CurrentLevelID();
 
+	// 하이라이트 처리를 하기 위한 문자열 정리하는 함수
+	Split_Message();
+
 	return S_OK;
 }
 
@@ -88,12 +92,23 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 		Show_DialogMessage();
 	
 	//A 버튼 입력 시, 다음 스크립트 문단을 준비하여 출력
-	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN) && WINDOW_SHOW == m_eCurState)
+	if (m_pGameInstance->Get_DIKeyState(DIK_4, KEY_DOWN) && WINDOW_SHOW == m_eCurState)
 	{
 		m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_SELECT); //버튼 상태 동기화
 
 		m_iCurMessageIndex += 1; //벡터의 다음 문단 줄로 넘김
-		m_iCurCharIndex = 0; //글자 수는 초기화
+		m_iCurCharIndex = m_iCurCharIndexHightlight = m_iCurCharIdxPostHightlight = 0; //글자 수는 초기화
+		m_bSignalHightlight = m_bSignalPostHightlight = false;
+		
+		if (m_iCurMessageIndex == m_tMessageDesc.vecMsg.size()) //벡터에 담긴 메시지들의 크기를 체크
+		{
+			m_eCurState = WINDOW_HIDE;
+			m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_HIDE);
+
+			if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN))
+			{
+			}
+		}
 	}
 
 	_float3 vOffset = { 0.9f, 0.9f, 1.f };
@@ -132,10 +147,13 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 	return OBJ_NOEVENT;
 }
 
+
+
 void CUI_MessageWindow::Late_Tick(_float fTimeDelta)
 {
 	m_pUIBtn->Late_Tick(fTimeDelta);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_UI, this);
+
 }
 
 HRESULT CUI_MessageWindow::Render()
@@ -197,13 +215,6 @@ HRESULT CUI_MessageWindow::Render()
 #ifdef DEBUG
 void CUI_MessageWindow::Render_IMGUI()
 {
-	switch (m_eCurState)
-	{
-	case WINDOW_IDLE:	ImGui::Text(u8"WINDOW_IDLE");	break;
-	case WINDOW_HIDE:	ImGui::Text(u8"WINDOW_HIDE"); break;
-	case WINDOW_SHOW:	ImGui::Text(u8"WINDOW_SHOW"); break;
-	case WINDOW_NONE:	default: ImGui::Text(u8"WINDOW_NONE"); break;
-	}
 }
 
 #endif // DEBUG
@@ -230,9 +241,6 @@ HRESULT CUI_MessageWindow::Add_Transform(void* _pArg)
 
 		if (FAILED(m_pTransCom[iTrans]->Initialize(_pArg)))
 			return E_FAIL;
-
-		//m_Components.emplace(g_strTransformTag, m_pTransCom[iTrans]);
-		//Safe_AddRef(m_pTransCom[iTrans]);
 	}
 
 	return S_OK;
@@ -309,10 +317,20 @@ HRESULT CUI_MessageWindow::Display_Message(_float _fTimeDelta)
 				m_iCurCharIndex++;
 		}
 
-		else //m_iCurMessageIndex 범위를 벗어날 경우, UI 숨김
+		// for hight-light
+		const auto& wstrHighlightMsg = get<1>(m_vecSplitMsg[m_iCurMessageIndex]);
+		if (m_bSignalHightlight)
 		{
-			m_eCurState = WINDOW_HIDE;
-			m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_HIDE);
+			if (m_iCurCharIndexHightlight < wstrHighlightMsg.length()) //메시지 길이 체크
+				m_iCurCharIndexHightlight++;
+		}
+
+		// for post hight-light
+		const auto& wstrPostHighlightMsg = get<2>(m_vecSplitMsg[m_iCurMessageIndex]);
+		if (m_bSignalPostHightlight)
+		{
+			if (m_iCurCharIdxPostHightlight < wstrPostHighlightMsg.length()) //메시지 길이 체크
+				m_iCurCharIdxPostHightlight++;
 		}
 	}
 
@@ -337,49 +355,65 @@ HRESULT CUI_MessageWindow::Render_Message()
 	if (m_iCurMessageIndex < m_tMessageDesc.vecMsg.size())
 	{
 		wstring wstrMsg = m_tMessageDesc.vecMsg[m_iCurMessageIndex];
-		wstring& wstrSubstrMessage = wstrMsg.substr(0, m_iCurCharIndex);
 
 		//스크립트 그림자
 		_float2 vOffset[] = { {-2.f, 0.f},
 							{2.f, 0.f},
 							{0.f, -2.f} ,
 							{0.f, 2.f} };
-		
+
 		_float4 vMessageShadowRGBA = { 0.025f, 0.025f, 0.025f, 0.025f };
 		_float2 vMessageShadowScale = { 1.01f, 1.01f };
 
-		for (_uint i = 0; i < 4; ++i)
+		// 스크립트 그림자
+		//for (_uint i = 0; i < 4; ++i)
+		//{
+		//	_float2 vMessageShadowPos = { vFontPos.x + vOffset[i].x, vFontPos.y + vOffset[i].y };
+		//	m_pGameInstance->Render_Font(wstrFontTag, wstrSubstrMessage, vMessageShadowPos, vMessageShadowRGBA, fRadian, vFontSize, vMessageShadowScale);
+		//}
+
+		const auto& wstrPreHighlightMsg  = get<0>(m_vecSplitMsg[m_iCurMessageIndex]);
+		const auto& wstrHighlightMsg	 = get<1>(m_vecSplitMsg[m_iCurMessageIndex]);
+		const auto& wstrPostHighlightMsg = get<2>(m_vecSplitMsg[m_iCurMessageIndex]);
+
+		wstring& wstrSubstrMessage = wstrMsg.substr(0, m_iCurCharIndex);
+		if (m_iCurCharIndex < wstrPreHighlightMsg.size())	//하이라이트 포지션전까지
+			m_pGameInstance->Render_Font(wstrFontTag, wstrSubstrMessage, vFontPos, vFontRGBA, fRadian, vFontSize, vFontScale);
+		else
 		{
-			_float2 vMessageShadowPos = { vFontPos.x + vOffset[i].x, vFontPos.y + vOffset[i].y };
-			m_pGameInstance->Render_Font(wstrFontTag, wstrSubstrMessage, vMessageShadowPos, vMessageShadowRGBA, fRadian, vFontSize, vMessageShadowScale);
-		}
-		
-		//스크립트
-		m_pGameInstance->Render_Font(wstrFontTag, wstrSubstrMessage, vFontPos, vFontRGBA, fRadian, vFontSize, vFontScale);
-
-#pragma region HIGHLIGHT
-
-		//스크립트 하이라이트
-		wstring wstrHighlight = m_tMessageDesc.vecHighlight[m_iCurMessageIndex];
-		size_t FindHighlightPos = wstrMsg.find(wstrHighlight);
-		size_t wstrHighlightLength = wstrHighlight.length();
-
-		if (FindHighlightPos != string::npos) //문자열 검색 성공할 경우
-		{
-			//substr(start, length)
-			wstring wstrPreHighlight = wstrMsg.substr(0, FindHighlightPos); //하이라이트 전 부분
-			wstring wstrHighlightMessage = wstrMsg.substr(FindHighlightPos, wstrHighlightLength); //하이라이트 부분
-			wstring wstrPostHighlight = wstrMsg.substr(FindHighlightPos + wstrHighlightLength); //하이라이트 이후 부분
-
-			//XMVECTOR xmHighlightPos = m_pGameInstance->Measure_String(wstrFontTag, wstrPreHighlight);
-			//_float2 vHighlightPos = vFontPos;
-			//vHighlightPos.x += XMVectorGetX(xmHighlightPos);
-
-			_float4 vHighlightRGBA = m_tMessageDesc.vHighlightRGBA;
-			m_pGameInstance->Render_Font(wstrFontTag, wstrHighlightMessage, vFontPos, vHighlightRGBA, fRadian, vFontSize, vFontScale);
+			m_pGameInstance->Render_Font(wstrFontTag, wstrPreHighlightMsg, vFontPos, vFontRGBA, fRadian, vFontSize, vFontScale);
+			// 다음 튜플 원소 내용 시그널 부울 값
+			m_bSignalHightlight = true;
 		}
 
-#pragma endregion
+		// 하이라이트 스크립트
+		if (m_bSignalHightlight)
+		{
+			if (m_iCurCharIndexHightlight < wstrHighlightMsg.size())	// 포스트 하이라이트 포지션전까지
+			{
+				wstring& wstrSubstrHightlightMsg = wstrHighlightMsg.substr(0, m_iCurCharIndexHightlight);
+				m_pGameInstance->Render_Font(wstrFontTag, wstrSubstrHightlightMsg, vFontPos, m_tMessageDesc.vHighlightRGBA, fRadian, vFontSize, vFontScale);
+			}
+			else
+			{
+				m_pGameInstance->Render_Font(wstrFontTag, wstrHighlightMsg, vFontPos, m_tMessageDesc.vHighlightRGBA, fRadian, vFontSize, vFontScale);
+				m_bSignalPostHightlight = true;
+			}
+		}
+
+		// 하이라이트 하고 난 이후의 스크립트
+		if (m_bSignalPostHightlight)
+		{
+			_float2 pos2D = Repose_Fonts(vFontPos, wstrHighlightMsg);
+			//_float2 pos2D = _float2(vFontPos.x + wstrHighlightMsg.size() * 18.4, vFontPos.y + 36.8f);
+			if (m_iCurCharIdxPostHightlight < wstrPostHighlightMsg.size())
+			{
+				wstring& wstrSubstrPostHightlightMsg = wstrPostHighlightMsg.substr(0, m_iCurCharIdxPostHightlight);
+				m_pGameInstance->Render_Font(wstrFontTag, wstrSubstrPostHightlightMsg, pos2D, vFontRGBA, fRadian, vFontSize, vFontScale);
+			}
+			else
+				m_pGameInstance->Render_Font(wstrFontTag, wstrPostHighlightMsg, pos2D, vFontRGBA, fRadian, vFontSize, vFontScale);
+		}
 	}
 
 	if (LEVEL_TOWN == *m_pCurrentLevelID)
@@ -410,6 +444,63 @@ HRESULT CUI_MessageWindow::Render_Message()
 	}
 
 	return S_OK;
+}
+
+void CUI_MessageWindow::Split_Message()
+{
+	for (_int i = 0; i < m_tMessageDesc.vecMsg.size();++i)
+	{
+		// 하이라이트를 확인하고자 하는 메세지
+		wstring wstrMsg = m_tMessageDesc.vecMsg[i];
+
+		// 해당 메세지(스크립트)에서 하이라이트 하기전/ 하이라이트/ 하이라이트 하고난 이후 메세지 3개로 쪼갠다.
+		wstring wstrHighlight = m_tMessageDesc.vecHighlight[i];
+		size_t FindHighlightPos = wstrMsg.find(wstrHighlight); // 하이라이트 포지션
+		size_t wstrHighlightLength = wstrHighlight.length();   // 하이라이트 길이
+
+		tuple<wstring, wstring, wstring> tupleMsgs;
+		if (FindHighlightPos != string::npos) // 하이라이트 문자열이 존재할 경우
+		{
+			//substr(start, length)
+			wstring wstrPreHighlightMsg		= wstrMsg.substr(0, FindHighlightPos); //하이라이트 전 부분
+			wstring wstrHighlightMsg		= wstrMsg.substr(FindHighlightPos, wstrHighlightLength); //하이라이트 부분
+			wstring wstrPostHighlightMsg	= wstrMsg.substr(FindHighlightPos + wstrHighlightLength); //하이라이트 이후 부분
+			tupleMsgs = { wstrPreHighlightMsg, wstrHighlightMsg, wstrPostHighlightMsg };
+		}
+		else
+			tupleMsgs = { wstrMsg, L"", L"" };
+
+		// 실질적으로 나눠진 message를 출력하는 vector
+		m_vecSplitMsg.push_back(tupleMsgs);
+	}
+}
+
+// 글꼴별 위치 재조정
+_float2 CUI_MessageWindow::Repose_Fonts(_float2 fontPos, wstring wstrHighlightMsg)
+{
+	_float2 pos2D = _float2();
+	if (m_tMessageDesc.wstrFontTag == L"Font_Dialog_SubKR18spac10")
+	{
+		if(*m_pCurrentLevelID == LEVEL_DEEDEEDEE)
+			pos2D = _float2(fontPos.x + wstrHighlightMsg.size() * 18.4f, fontPos.y + 44.8f);
+		else if (*m_pCurrentLevelID == LEVEL_TOWN)
+		{
+			if(wstrHighlightMsg.size() == 9)
+				pos2D = _float2(fontPos.x + wstrHighlightMsg.size() * 22.1f, fontPos.y + 44.8f);
+			if(wstrHighlightMsg.size() == 6)
+				pos2D = _float2(fontPos.x + wstrHighlightMsg.size() * 19.8f, fontPos.y + 44.8f);
+		}
+	}
+	else if (m_tMessageDesc.wstrFontTag == L"Font_Dialog_Boss_KR22spac10")
+	{
+		pos2D = _float2(fontPos.x + wstrHighlightMsg.size() * 14.2f, fontPos.y + 45.f);
+		if (wstrHighlightMsg.size() == 7)
+			pos2D = _float2(fontPos.x + wstrHighlightMsg.size() * 17.92f, fontPos.y + 45.f);
+		if (wstrHighlightMsg.size() == 15)
+			pos2D = _float2(fontPos.x + wstrHighlightMsg.size() * 19.2f, fontPos.y + 45.f);
+	}
+
+	return pos2D;
 }
 
 CUI_MessageWindow* CUI_MessageWindow::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

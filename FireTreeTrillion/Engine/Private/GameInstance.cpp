@@ -157,6 +157,7 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 
 void CGameInstance::LateTick_Engine(_float fTimeDelta)
 {
+	m_pObject_Manager->Event_Tick(fTimeDelta);
 	m_pObject_Manager->Late_Tick(fTimeDelta);
 }
 
@@ -466,6 +467,12 @@ HRESULT CGameInstance::Add_Clone(_uint iLevelIndex, const wstring& strLayerTag, 
 	return m_pObject_Manager->Add_Clone(iLevelIndex, strLayerTag, strPrototypeTag, pArg);
 }
 
+CGameObject* CGameInstance::Add_CloneReturn(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strPrototypeTag, void* pArg)
+{
+	CHECK_NULLPTR(m_pObject_Manager);
+	return m_pObject_Manager->Add_CloneReturn(iLevelIndex, strLayerTag, strPrototypeTag, pArg);
+}
+
 CGameObject* CGameInstance::Clone_GameObject(const wstring& strPrototypeTag, void* pArg)
 {
 	if (nullptr == m_pObject_Manager)
@@ -746,10 +753,10 @@ HRESULT CGameInstance::Render_ProjFont(_matrix _matrix, const wstring& strFontTa
 	return m_pFont_Manager->Render_Proj(_matrix, strFontTag, strText, vPosition, vColor, fRadian, vOrigin, vScale);
 }
 
-XMVECTOR CGameInstance::Measure_String(const wstring& strFontTag, const wstring& strText)
+_float4 CGameInstance::Measure_String(const wstring& strFontTag, const wstring& strText)
 {
 	if (m_pFont_Manager == nullptr)
-		return XMVECTOR();
+		return _float4();
 
 	return m_pFont_Manager->Measure_String(strFontTag, strText);
 }

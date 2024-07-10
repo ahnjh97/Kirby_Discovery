@@ -78,7 +78,6 @@ public:
 #ifdef _DEBUG
 	virtual void				Render_IMGUI()								override;
 #endif
-	
 
 private:
 	HRESULT						Add_Transform(void* _pArg);
@@ -88,6 +87,8 @@ private:
 
 	HRESULT						Display_Message(_float _fTimeDelta);
 	HRESULT						Render_Message();
+	void						Split_Message();
+	_float2						Repose_Fonts(_float2 fontPos, wstring wstrHighlightMsg);
 
 public:
 	static CUI_MessageWindow*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -102,7 +103,7 @@ private:
 	
 	MESSAGEWINDOW_STATE			m_eCurState = { WINDOW_NONE };
 	MESSAGE_DESC				m_tMessageDesc{};
-
+	vector <tuple<wstring, wstring, wstring>> m_vecSplitMsg;
 
 	// BTN
 	_float						m_fHideTime = { 0.f };
@@ -114,6 +115,11 @@ private:
 	_float						m_fDisplayTime = { 0.f }; //출력 시간
 	_uint						m_iCurMessageIndex = { 0 };
 	_uint						m_iCurCharIndex = { 0 };
+	_uint						m_iCurCharIndexHightlight = { 0 };
+	_uint						m_iCurCharIdxPostHightlight = { 0 };
+
+	_bool						m_bSignalHightlight = false;
+	_bool						m_bSignalPostHightlight = false;
 
 };
 END

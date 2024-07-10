@@ -235,7 +235,6 @@ void CTransingStar::RenderClose()
         hr = m_pVIBufferCom->Render();
         CHECK_FAILED(hr);
     }
-
 }
 
 void CTransingStar::Tick_OpenAlphaStar(_float fTimeDelta)
@@ -282,6 +281,13 @@ void CTransingStar::RenderOpen()
         hr = m_pVIBufferCom->Render();
         CHECK_FAILED(hr);
     }
+}
+
+void CTransingStar::Change_Level(LEVEL eLevel)
+{
+    HRESULT hr(S_OK);
+    hr = m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, eLevel));
+    CHECK_FAILED(hr);
 }
 
 HRESULT CTransingStar::Add_Components()

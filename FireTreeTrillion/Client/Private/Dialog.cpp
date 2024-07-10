@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Dialog.h"
 #include "UI_MessageWindow.h"
+#include "Level_Loading.h"
 
 #include <codecvt>
 #include <locale>
@@ -146,7 +147,7 @@ void CDialog::Load(string strPath)
 
 	vector<wstring> vecHighlight;
 	for (auto& Highlight : data["HighLight"])
-		Highlight.push_back(utf8_decode(Highlight));
+		vecHighlight.push_back(utf8_decode(Highlight));
 
 	CUI_MessageWindow::MESSAGE_DESC tMessageDesc = {};
 	tMessageDesc.wstrFontTag   = utf8_decode(data.value("FontTag", ""));

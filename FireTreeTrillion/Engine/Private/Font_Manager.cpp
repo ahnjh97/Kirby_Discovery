@@ -49,7 +49,7 @@ HRESULT CFont_Manager::Render_Proj(_matrix _matrix, const wstring& strFontTag, c
 	return pFont->Render_Proj(_matrix, strText, vPosition, vColor, fRadian, vOrigin, vScale);
 }
 
-XMVECTOR CFont_Manager::Measure_String(const wstring& strFontTag, const wstring& strText)
+_float4 CFont_Manager::Measure_String(const wstring& strFontTag, const wstring& strText)
 {
 	CCustomFont* pFont = Find_Font(strFontTag);
 	if (nullptr == pFont)

@@ -17,7 +17,7 @@ public:
 		_fvector vOrigin, _gvector vScale, _float _fLineSpacing = 0.f);
 
 	HRESULT Render_Proj(_matrix _matrix, const wstring& strFontTag, const wstring& strText, const _float2& vPosition, _fvector vColor, _float fRadian, _fvector vOrigin, _gvector vScale);
-	XMVECTOR Measure_String(const wstring& strFontTag, const wstring& strText);
+	_float4 Measure_String(const wstring& strFontTag, const wstring& strText);
 
 private:
 	map<const wstring, class CCustomFont*>		m_Fonts;

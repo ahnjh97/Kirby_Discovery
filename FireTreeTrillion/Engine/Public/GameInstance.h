@@ -72,7 +72,7 @@ public: /* For.Level_Manager */
 public: /* For.Object_Manager */
 	HRESULT Add_Prototype(const wstring& strPrototypeTag, class CGameObject* pPrototype);
 	HRESULT Add_Clone(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strPrototypeTag, void* pArg = nullptr);
-
+	CGameObject* Add_CloneReturn(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strPrototypeTag, void* pArg = nullptr);
 	class CGameObject* Clone_GameObject(const wstring& strPrototypeTag, void* pArg = nullptr);
 	const CComponent* Get_Component(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strComTag, _uint iIndex = 0);
 	list<CGameObject*>* Get_List(_uint iLevelIndex, const wstring& strLayerTag);
@@ -132,7 +132,7 @@ public: /* For.Font_Manager */
 		_fvector vOrigin, _gvector vScale, _float fLineSpacing = 0.f);
 
 	HRESULT Render_ProjFont(_matrix _matrix, const wstring& strFontTag, const wstring& strText, const _float2& vPosition, _fvector vColor, _float fRadian, _fvector vOrigin, _gvector vScale);
-	XMVECTOR Measure_String(const wstring& strFontTag, const wstring& strText);
+	_float4 Measure_String(const wstring& strFontTag, const wstring& strText);
 
 #pragma endregion
 
