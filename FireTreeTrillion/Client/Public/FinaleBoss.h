@@ -26,6 +26,9 @@ private:
 	virtual ~CFinaleBoss() = default;
 
 public:
+	_float4	Get_RootPos() { return m_vBonePos; }
+
+
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual _int	Tick(_float fTimeDelta) override;

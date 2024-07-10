@@ -21,23 +21,23 @@ HRESULT CFinaleBoss::Initialize_Prototype()
 
 HRESULT CFinaleBoss::Initialize(void* pArg)
 {
-    GAMEOBJECT_DESC		GameObjectDesc{};
-    if (nullptr != pArg)
-        GameObjectDesc = *(GAMEOBJECT_DESC*)pArg;
+	GAMEOBJECT_DESC		GameObjectDesc{};
+	if (nullptr != pArg)
+		GameObjectDesc = *(GAMEOBJECT_DESC*)pArg;
 
-    GameObjectDesc.fSpeedPerSec = 7.f;
-    GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
+	GameObjectDesc.fSpeedPerSec = 7.f;
+	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
-    if (FAILED(__super::Initialize(&GameObjectDesc)))
-        return E_FAIL;
+	if (FAILED(__super::Initialize(&GameObjectDesc)))
+		return E_FAIL;
 
-    if (FAILED(Add_Components()))
-        return E_FAIL;
+	if (FAILED(Add_Components()))
+		return E_FAIL;
 
 	//m_bRimLight = false;
 	m_pModelCom->Set_Animation(FINALEBOSS_DEMOWAITAIR, 50.f, true, true);
 
-    return S_OK;
+	return S_OK;
 }
 
 _int CFinaleBoss::Tick(_float fTimeDelta)
@@ -52,9 +52,8 @@ _int CFinaleBoss::Tick(_float fTimeDelta)
 		// FSM Á¦¾î
 		if (m_pFSM != nullptr)
 			m_pFSM->Update(this, m_fTimeDelta);
-
-		m_vBonePos = Compute_RootPos();
 	}
+	m_vBonePos = Compute_RootPos();
 
 	return OBJ_NOEVENT;
 }
@@ -155,7 +154,7 @@ _bool CFinaleBoss::IsAnimFinished()
 
 _float4 CFinaleBoss::Compute_RootPos()
 {
-	CBone* pBone = m_pModelCom->Get_BonePtr("TopL");
+	CBone* pBone = m_pModelCom->Get_BonePtr("C_HipJ");
 	_float4x4 pBoneLocalMatrix = *pBone->Get_CombinedTransformationMatrix();
 	_float4x4 pBoneWorldMatrix = pBoneLocalMatrix * m_pTransformCom->Get_WorldFloat4x4();
 	return CUtils::Get_State_Vector_Matrix(pBoneWorldMatrix, CUtils::STATE_POSITION);
