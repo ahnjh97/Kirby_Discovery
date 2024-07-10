@@ -291,8 +291,17 @@ void CCamera_Free::Control(_float fTimeDelta)
 				m_pTransformCom->Go_Right(fTimeDelta * -MouseMove * m_fCamSpeed * m_fMouseSensor);
 
 			if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMMS_Y))
-				m_pTransformCom->Go_Up(fTimeDelta * MouseMove * m_fCamSpeed * m_fMouseSensor);
+				m_pTransformCom->Go_Up(fTimeDelta * MouseMove  * m_fCamSpeed * m_fMouseSensor);
 		}
+
+		if (m_pGameInstance->Get_KeyState(DIK_W, KEY_PRESS))
+			m_pTransformCom->Go_Straight(fTimeDelta * m_fCamSpeed);
+		if (m_pGameInstance->Get_KeyState(DIK_A, KEY_PRESS))
+			m_pTransformCom->Go_Left(fTimeDelta * m_fCamSpeed);
+		if (m_pGameInstance->Get_KeyState(DIK_S, KEY_PRESS))
+			m_pTransformCom->Go_Backward(fTimeDelta * m_fCamSpeed);
+		if (m_pGameInstance->Get_KeyState(DIK_D, KEY_PRESS))
+			m_pTransformCom->Go_Right(fTimeDelta * m_fCamSpeed);
 
 		//전후진
 		if ((MouseMove = m_pGameInstance->Get_DIMouseMove(DIMMS_WHEEL)) && m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
@@ -304,16 +313,9 @@ void CCamera_Free::Control(_float fTimeDelta)
 		}
 
 		//우측 마우스 누른 채로 공전
-
 		if (m_pGameInstance->Get_KeyState(DIMKS_RBUTTON, KEY_PRESS))
 		{
 			_float3 vTargetPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Float4(CTransform::STATE_LOOK) * 10.f;
-
-
-			// 05.22) LEVEL_TOOL_UI에는 카메라 회전 기능 제외
-			//if (*m_pCurrentLevelID == LEVEL_TOOL_UI)
-			//	return;
-
 			if (*m_pCurrentLevelID == LEVEL_TOOL_FX)
 				vTargetPos = _float3::Zero;
 
