@@ -1646,6 +1646,12 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		//{ 2550.f, 242.f, -136.f };
 		//_float fTotalDuration = 5.32f;
 
+		//5.32ÃÊ
+		//Ä¿ºñ ½ÃÀÛ
+		_float3 vStartPos =
+		{ 2463.f, 175.f, -136.f };
+		_float fTotalDuration = 5.32f;
+
 		////¾ó±¼ ÄÆ
 		//CAMACTION newAction = {};
 		//newAction.fTime = 0.f;
