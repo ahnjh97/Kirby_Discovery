@@ -214,7 +214,7 @@ HRESULT CPhanta::Add_Components()
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
 	desc.fOffset = 0.5f;
-	desc.tCapsuleShape.fHeight = 0.4f;
+	desc.tCapsuleShape.fRadius = 0.4f;
 	desc.tCapsuleShape.fHeight = 0.4f;
 	desc.uCollisionType = m_eCollisionGroup;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
