@@ -582,8 +582,11 @@ void CCamera_Main::Compute_Set_Trigger(_int iTriggerIndex)
 		return;
 
 	m_fTriggerRatio = Compute_TriggerPosRatio(m_iMatrixIndex);
-	if (0 > m_fTriggerRatio || 1 < m_fTriggerRatio)
+
+	if (m_fTriggerRatio < 0.f || 1.f < m_fTriggerRatio)
 		return;
+
+	m_fTriggerRatio = SATURATE(m_fTriggerRatio);
 
 	CGameObject* pKirby = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0);
 	if (nullptr == pKirby)
@@ -593,9 +596,8 @@ void CCamera_Main::Compute_Set_Trigger(_int iTriggerIndex)
 		return;
 	_vector pKirbyPos = pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION);
 
-	m_vSlerpedDir = SlerpDirVec(m_vecFrontDirRadius[m_iMatrixIndex].first, m_vecRearDirRadius[m_iMatrixIndex].first, m_fTriggerRatio);
+	m_vSlerpedDir = _float3::Lerp(m_vecFrontDirRadius[m_iMatrixIndex].first, m_vecRearDirRadius[m_iMatrixIndex].first, m_fTriggerRatio);
 	m_fLerpedRadius = LERP(m_vecFrontDirRadius[m_iMatrixIndex].second, m_vecRearDirRadius[m_iMatrixIndex].second, m_fTriggerRatio);
-
 
 	m_vDestCamDir = m_vSlerpedDir;
 	m_fDestDistance = m_fLerpedRadius;
@@ -605,7 +607,6 @@ void CCamera_Main::Compute_Set_Trigger(_int iTriggerIndex)
 	if (*m_pCurrentLevelID == LEVEL_INTRO || *m_pCurrentLevelID == LEVEL_FINALE)
 	{
 		m_fDestUpOffset = m_CamTriggerUpOffsets[*m_pCurrentLevelID][m_iMatrixIndex];
-
 	}
 	// = { 0.f, 0.f, 0.f, .15f, .15f, 0.f, 0.f, 0.f }
 	//m_fDestUpOffset = m_CamTriggerUpOffsets[m_iMatrixIndex];
@@ -1639,7 +1640,7 @@ void CCamera_Main::Interpolate_CamSet(_float fTimeDelta)
 
 	//각도 보간
 	fSlerpSpeed = (m_eCamFocus == FOCUS_BOTH) ? 12.f : 4.f;
-	m_vCurCamDir = SlerpDirVec(m_vCurCamDir, m_vDestCamDir, clamp(fTimeDelta * fSlerpSpeed, 0.f, 1.f));
+	m_vCurCamDir = CUtils::SlerpDirVec(m_vCurCamDir, m_vDestCamDir, clamp(fTimeDelta * fSlerpSpeed, 0.f, 1.f));
 
 	//z angle 보간
 	if (.001f < abs(m_fCurZAngle - m_fDestZAngle))
@@ -1821,9 +1822,23 @@ void CCamera_Main::Render_IMGUI()
 	ImGui::Text(u8"보간 시간: %.2f", m_fSeqInterpolateTime.first);
 	ImGui::Text(u8"목표 보간 시간: %.2f", m_fSeqInterpolateTime.second);
 
-
+	ImGui::Dummy(ImVec2(0, 10));
+	ImGui::SeparatorText(u8"카메라 트리거 설정");
 	ImGui::Text(u8"보간 ratio: %.2f", m_fTriggerRatio);
+
+
+	_float3 vFrontDir = m_vecFrontDirRadius[m_iMatrixIndex].first;
+	_float3 vRearDir = m_vecRearDirRadius[m_iMatrixIndex].first;
+
+	ImGui::Text(u8" 앞 Dir %.2f\t%.2f\t%.2f", vFrontDir.x, vFrontDir.y, vFrontDir.z);
+	ImGui::Text(u8" 뒤 Dir %.2f\t%.2f\t%.2f", vRearDir.x, vRearDir.y, vRearDir.z);
+	
+	ImGui::Dummy(ImVec2(0, 10));
 	ImGui::Text(u8"현재 up offset: %.2f", m_fCurUpOffset);
+
+
+	ImGui::Dummy(ImVec2(0, 10));
+	ImGui::SeparatorText(u8"FOV");
 
 	ImGui::Text(u8"현재 FOV: %.2f", ToDegree(m_fFovy));
 	static _float fFOVY = ToDegree(m_fDestFovy);

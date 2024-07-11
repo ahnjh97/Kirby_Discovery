@@ -94,7 +94,7 @@ HRESULT CCamera_Free::Render()
 void CCamera_Free::Render_IMGUI()
 {
 
-	ImGui::DragFloat(u8"카메라 이동 속도", &m_fCamSpeed, .05f, 0.f, 50.f, "%.2f");
+	ImGui::DragFloat(u8"카메라 이동 속도", &m_fCamSpeed, .01f, 0.f, 500.f, "%.2f");
 
 	ImGui::Separator();
 

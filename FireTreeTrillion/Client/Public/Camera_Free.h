@@ -66,7 +66,7 @@ public:
 private:
 	_bool			m_bWasMainCamera = { false };
 	_float			m_fMouseSensor = { 0.0f };
-	_float			m_fCamSpeed = { 5.f };
+	_float			m_fCamSpeed = { 1.f };
 	CTransform*		m_pTarget = { nullptr };
 	_bool			m_bTrackTarget = { false };
 	_float			m_fTrackDistance = { 40.f };

@@ -141,7 +141,7 @@ HRESULT CLevel_Park::Ready_Layer_Camera(const wstring& strLayerTag)
 {
 
 	CCamera_Main::CAMERA_KIRBY_DESC		MainCamDesc{};
-	MainCamDesc.fFovy = XMConvertToRadians(30.0f);
+	MainCamDesc.fFovy = XMConvertToRadians(38.0f);
 	MainCamDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	MainCamDesc.fNear = 0.1f;
 	MainCamDesc.fFar = 1000.0f;

@@ -198,6 +198,7 @@ void CTransingStar::Tick_YeonDooStar(_float fTimeDelta)
         if (m_InitialSize.x <= m_fDecreaseValue)
         {
             CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[1], 0.f, 0.f, 1.f);
+            m_pGameInstance->Reserve_Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, m_eNextLevel));
             //HRESULT hr = m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, m_eNextLevel));
             //CHECK_FAILED(hr);
         }
@@ -259,6 +260,8 @@ void CTransingStar::Tick_OpenAlphaStar(_float fTimeDelta)
     }
 
     // ---- 초록 별에 대한 처리 ----------------------------
+    _float4 vFinalPoswithZ = _float4(0.f, 0.f, 0.2f, 1.f);
+    CUtils::Set_State_Matrix(m_arrayStarMatrix[2], CUtils::STATE_POSITION, vFinalPoswithZ);
     CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[2], m_InitialSize.x, m_InitialSize.y, 1.f);
 }
 
@@ -271,6 +274,7 @@ void CTransingStar::RenderOpen()
         if (i == 1) continue;
 
         m_pShaderCom->Bind_RawValue("g_iMasking", &i, sizeof(_int));
+
         // 사이즈, 위치 다르게 주는 곳
         hr = m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_arrayStarMatrix[i]);
         CHECK_FAILED(hr);
@@ -304,12 +308,15 @@ HRESULT CTransingStar::Add_Components()
     CHECK_FAILED(hr);
 
 #pragma region 텍스쳐 컴포넌트
+    // 알파 스타
     hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_FX_Star"),
         TEXT("Com_Texture_AlphaStar"), (CComponent**)&m_arrTextures[0]);
     CHECK_FAILED(hr);
+    // 연두 스타
     hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_FX_Star"),
         TEXT("Com_Texture_SubStar"), (CComponent**)&m_arrTextures[1]);
     CHECK_FAILED(hr);
+    // 초록 스타
     hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_FX_Star"),
         TEXT("Com_Texture_LastStar"), (CComponent**)&m_arrTextures[2]);
     CHECK_FAILED(hr);

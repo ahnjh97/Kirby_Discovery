@@ -38,9 +38,16 @@ void CLevel_Tool_Map::Tick(_float fTimeDelta)
 
 HRESULT CLevel_Tool_Map::Render()
 {
+#ifdef _DEBUG
+	ImGui::Begin(u8"프리 카메라 설정");
+
+	CCamera* pCameraFree = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(LEVEL_TOOL_MAP, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Free")));
+	pCameraFree->Render_IMGUI();
+
+	ImGui::End();
+#endif
 	if (FAILED(__super::Render()))
 		return E_FAIL;
-
 	SetWindowText(g_hWnd, TEXT("Map Tool"));
 
 	return S_OK;
