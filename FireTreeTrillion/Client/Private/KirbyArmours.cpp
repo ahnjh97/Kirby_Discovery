@@ -151,6 +151,10 @@ HRESULT CKirbyArmours::Add_Components()
         TEXT("Com_Model_Hammer"), (CComponent**)&m_pModelCom[ABILITY_HAMMER]);
     CHECK_FAILED(hr);
 
+    /* For.Com_Model */
+    hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyArmour_Crash"),
+        TEXT("Com_Model_Crash"), (CComponent**)&m_pModelCom[ABILITY_CRASH]);
+    CHECK_FAILED(hr);
 
     return S_OK;
 }

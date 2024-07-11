@@ -14,6 +14,7 @@
 #include "KirbyCar_State.h"
 #include "KirbyHammer_State.h"
 #include "KirbyBulb_State.h"
+#include "KirbyCrash_State.h"
 
 #include "KirbyWeapons.h"
 #include "KirbyArmours.h"
@@ -70,7 +71,7 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// 디버깅 용
-	m_eAbilityType = ABILITY_HAMMER;
+	m_eAbilityType = ABILITY_CRASH;
 
 	// 커비의 상태에 따라, 애니메이션이 시작된다.
 	Kirby_StateInitialize();
@@ -921,6 +922,10 @@ HRESULT CKirby::Add_Components()
 		TEXT("Com_Model_BulbVacuum"), (CComponent**)&m_pModelCom[BODY_BULBVACUUM]);
 	CHECK_FAILED(hr);
 
+	// 커비의 Crash Default 상태 모델
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyCrashDefault"),
+		TEXT("Com_Model_CrashDefault"), (CComponent**)&m_pModelCom[BODY_CRASHDEFAULT]);
+	CHECK_FAILED(hr);
 
 #pragma endregion
 
@@ -1393,6 +1398,25 @@ void CKirby::SetUp_FSM()
 	m_pFSM->Add_State(BULBSTATE_LANDINGEND, CKirbyBulb_Jump_State::Create());
 	m_pFSM->Add_State(BULBSTATE_LANDINGENDBRIGHT, CKirbyBulb_Jump_State::Create());
 	m_pFSM->Add_State(BULBSTATE_FALL, CKirbyBulb_Jump_State::Create());
+#pragma endregion
+
+#pragma region 크래쉬 애니메이션
+	m_pFSM->Add_State(CRASHSTATE_ATTACKCHARGE, CKirbyCrash_Charge_State::Create());
+	m_pFSM->Add_State(CRASHSTATE_ATTACKCHARGEMOVE, CKirbyCrash_Charge_State::Create());
+	m_pFSM->Add_State(CRASHSTATE_ATTACKCHARGESTART, CKirbyCrash_Charge_State::Create());
+	m_pFSM->Add_State(CRASHSTATE_ATTACK, CKirbyCrash_Attack_State::Create());
+	m_pFSM->Add_State(CRASHSTATE_ATTACKEND, CKirbyCrash_Attack_State::Create());
+	m_pFSM->Add_State(CRASHSTATE_ATTACKSTART, CKirbyCrash_Attack_State::Create());
+
+	m_pFSM->Add_State(CRASHSTATE_BIGATTACKCHARGE, CKirbyCrash_BigCharge_State::Create());
+	m_pFSM->Add_State(CRASHSTATE_BIGATTACKCHARGEMOVE, CKirbyCrash_BigCharge_State::Create());
+	m_pFSM->Add_State(CRASHSTATE_BIGATTACKCHARGESTART, CKirbyCrash_BigCharge_State::Create());
+	m_pFSM->Add_State(CRASHSTATE_BIGATTACK, CKirbyCrash_BigAttack_State::Create());
+	m_pFSM->Add_State(CRASHSTATE_BIGATTACKEND, CKirbyCrash_BigAttack_State::Create());
+	m_pFSM->Add_State(CRASHSTATE_BIGATTACKSTART, CKirbyCrash_BigAttack_State::Create());
+
+	// 이게 왜있어??
+	m_pFSM->Add_State(CRASHSTATE_BIGATTACKFIRE, CKirbyCrash_BigAttack_State::Create());
 #pragma endregion
 
 
