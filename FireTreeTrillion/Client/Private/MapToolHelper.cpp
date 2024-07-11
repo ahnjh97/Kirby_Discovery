@@ -28,8 +28,8 @@ static _int s_iTriggerIdx = -1;
 static _int s_iMapMeshIndex = -1;
 static _int s_iSelectedMeshIndex = -1; 
 
-static const _char* s_ShaderPasses[] = { "0. Blend X, NormalO", "1. Blend X, Normal X", "2. LightDepth", "3. Blend O, Normal O", "4. Blend O, Normal X"
-		, "5. BLEND X, DISCARD X", "6. BLEND O, DISCARD X" };
+static const _char* s_ShaderPasses[] = { "0. Normal O", "1. Normal X", "2. LightDepth", "3. AlphaBlend", 
+	"4. Discard X" , "5. Masked, NormalO" };
 static vector<vector<_int>> s_vecPassIndices;
 static vector<vector<_float>> s_vecSamplingFactors;
 static _int s_iMapIndex = 0;
@@ -93,9 +93,18 @@ HRESULT CMapToolHelper::Initialize_Prototype()
 
 HRESULT CMapToolHelper::Initialize(void* pArg)
 {
+	m_bisClone = true;
+
 	HRESULT hr;
 	hr = __super::Initialize(pArg);
 	CHECK_FAILED(hr);
+
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"), TEXT("Com_ShaderModel"), (CComponent**)&m_pModelShaderCom)))
+		return E_FAIL;
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel_Map"), TEXT("Com_ShaderMap"), (CComponent**)&m_pMapShaderCom)))
+		return E_FAIL;
+	Bind_boolToShader(true);
+	m_pGameInstance->Set_IsMaptool(true);
 
 	if (false == CheckEnumStrings())
 	{
@@ -1111,7 +1120,7 @@ void CMapToolHelper::OnRightClick()
 		return;
 
 	_float2 vMouseViewPortPos = m_pGameInstance->Get_MouseViewPortPos();
-	_vector vWorldPos = m_pGameInstance->Compute_WorldPos(vMouseViewPortPos, TEXT("Target_FieldDepth"));
+	_vector vWorldPos = m_pGameInstance->Compute_WorldPos(vMouseViewPortPos, TEXT("Target_Emissive"));
 
 	if (false == XMVector4Equal(vWorldPos, XMVectorZero())) 
 		m_vPickPos = vWorldPos;
@@ -1933,6 +1942,17 @@ _bool CMapToolHelper::CheckEnumStrings()
 	return true;
 }
 
+HRESULT CMapToolHelper::Bind_boolToShader(_bool _bMaptool)
+{
+	_bool bMaptool = _bMaptool;
+	if (FAILED(m_pModelShaderCom->Bind_RawValue("g_bMaptool", &bMaptool, sizeof(_bool))))
+		return E_FAIL;
+	if (FAILED(m_pMapShaderCom->Bind_RawValue("g_bMaptool", &bMaptool, sizeof(_bool))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
 void CMapToolHelper::Reset_MapShaderInfo()
 {
 	if (nullptr == m_pPickedObject)
@@ -1944,6 +1964,7 @@ void CMapToolHelper::Reset_MapShaderInfo()
 
 	_int iNumMesh = pModel->Get_NumMeshes();
 	s_vecPassIndices[s_iMapIndex].resize(iNumMesh);
+	fill(s_vecPassIndices[s_iMapIndex].begin(), s_vecPassIndices[s_iMapIndex].end(), MAP_NONBLEND_NONDISCARD);
 	s_vecSamplingFactors[s_iMapIndex].resize(iNumMesh);
 	fill(s_vecSamplingFactors[s_iMapIndex].begin(), s_vecSamplingFactors[s_iMapIndex].end(), 1.f);
 }
@@ -3031,5 +3052,14 @@ void CMapToolHelper::Free()
 	__super::Free();
 
 	Safe_Release(m_pPickedObject);
+
+	if (m_bisClone == true)
+	{
+		Bind_boolToShader(false);
+		m_pGameInstance->Set_IsMaptool(false);
+	}
+
+	Safe_Release(m_pModelShaderCom);
+	Safe_Release(m_pMapShaderCom);
 }
 

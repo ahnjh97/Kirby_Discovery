@@ -586,6 +586,24 @@
     <Filter Include="02.GameObjects\Map\Gimmick\Park_Wondaria">
       <UniqueIdentifier>{27194b3b-3a4c-4942-8b16-645f028d9080}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\SpookStep">
+      <UniqueIdentifier>{e1072303-8d7b-4eca-bc25-a94faf3c407c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\SpookStep\State">
+      <UniqueIdentifier>{181e8f38-0225-4006-b4da-23149e283ce8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\GhostGordo">
+      <UniqueIdentifier>{2deb1166-163f-49f7-8349-6e88a39bee90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\GhostGordo\State">
+      <UniqueIdentifier>{f4458e88-18b8-4019-9964-c866dab59beb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Bomber">
+      <UniqueIdentifier>{f5a4ea54-4dc7-4856-ba75-241c77caf87e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Bomber\State">
+      <UniqueIdentifier>{e59dfdcb-8da1-475b-a1ef-1b21830b87df}</UniqueIdentifier>
+    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\FinaleBoss">
       <UniqueIdentifier>{cc4aa8d1-5dcf-4336-965a-bea04b26bdd5}</UniqueIdentifier>
     </Filter>
@@ -606,6 +624,18 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyBulb_State">
       <UniqueIdentifier>{8ce43134-70bd-4e9a-84fa-af301762dfac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\Kirby\Bulb">
+      <UniqueIdentifier>{7d1ae9eb-d8d7-4527-bb38-2addfde86962}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Gimmick\Park_Wondaria\SolarPanel">
+      <UniqueIdentifier>{43ee93c0-63c1-4576-978a-7563a27f3fd9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Gimmick\Park_Wondaria\SolarPanel\Charge">
+      <UniqueIdentifier>{00a283b2-0004-46c8-9bed-6c971e961a7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Gimmick\Park_Wondaria\SolarPanel\Once">
+      <UniqueIdentifier>{1d07bb83-aab5-4f0c-9c11-2c69099db84d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1198,10 +1228,28 @@
     <ClInclude Include="..\Public\Gm_ParkFhEntranceAlien.h">
       <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\SpookStep.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\SpookStep</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SpookStep_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\SpookStep\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\GhostGordo.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\GhostGordo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\GhostGordo_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\GhostGordo\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Bomber.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Bomber</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Bomber_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Bomber\State</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Crumble.h">
       <Filter>02.GameObjects\PhysXObject\MapObject\Crumble</Filter>
-	</ClInclude>
-	<ClInclude Include="..\Public\FinaleBoss.h">
+    </ClInclude>
+    <ClInclude Include="..\Public\FinaleBoss.h">
       <Filter>02.GameObjects\PhysXObject\Character\FinaleBoss</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\FinaleBoss_State.h">
@@ -1215,6 +1263,15 @@
     </ClInclude>
     <ClInclude Include="..\Public\KirbyBulb_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyBulb_State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BulbFlare.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\Bulb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Gm_ParkSolarPanelCharge.h">
+      <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria\SolarPanel\Charge</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Gm_ParkSolarPanelOnce.h">
+      <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria\SolarPanel\Once</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1788,10 +1845,28 @@
     <ClCompile Include="..\Private\Gm_ParkFhEntranceAlien.cpp">
       <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\SpookStep.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\SpookStep</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SpookStep_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\SpookStep\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\GhostGordo.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\GhostGordo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\GhostGordo_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\GhostGordo\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Bomber.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Bomber</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Bomber_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Bomber\State</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Crumble.cpp">
       <Filter>02.GameObjects\PhysXObject\MapObject\Crumble</Filter>
-	</ClCompile>
-	<ClCompile Include="..\Private\FinaleBoss.cpp">
+    </ClCompile>
+    <ClCompile Include="..\Private\FinaleBoss.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\FinaleBoss</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\FinaleBoss_State.cpp">
@@ -1805,6 +1880,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\KirbyBulb_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyBulb_State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BulbFlare.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\Bulb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Gm_ParkSolarPanelCharge.cpp">
+      <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria\SolarPanel\Charge</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Gm_ParkSolarPanelOnce.cpp">
+      <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria\SolarPanel\Once</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -6,7 +6,6 @@
 BEGIN(Engine)
 class CModel;
 class CShader;
-class CTexture;
 END
 
 BEGIN(Client)
@@ -18,9 +17,8 @@ public:
 		PHANTA_APPEAR, PHANTA_ATTACK, PHANTA_BRAKE, PHANTA_DAMAGE, PHANTA_DISAPPEAR, PHANTA_FIND, PHANTA_FLYINGATTACK, PHANTA_FLYINGFIND, PHANTA_MOVE, PHANTA_WAIT, PHANTA_END
 	};
 
-	struct PHANTA_DESC : public CMonster::MONSTER_DESC {
-		//POPPY_STATE ePoppyState = { PS_END };
-	};
+	//struct PHANTA_DESC : public CMonster::MONSTER_DESC {
+	//};
 
 private:
 	CPhanta(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

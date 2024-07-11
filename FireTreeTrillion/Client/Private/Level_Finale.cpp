@@ -102,7 +102,7 @@ HRESULT CLevel_Finale::Initialize()
 	m_pGameInstance->Setting_GodRay(_float4(5500.f, 850.f, 0.f, 1.f), 0.05f, 0.96815f, 0.9f, 0.9f, 0.5f);
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
-	m_pGameInstance->Set_ColorSet_ByIndex(4);
+	m_pGameInstance->Set_ColorSet_ByIndex(5);
 
 	return S_OK;
 }

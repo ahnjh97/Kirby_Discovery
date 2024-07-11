@@ -2,6 +2,11 @@
 #include "Client_Defines.h"
 #include "GameObject.h"
 
+BEGIN(Engine)
+class CShader;
+END
+
+
 BEGIN(Client)
 
 class CMapToolHelper final : public CGameObject
@@ -120,6 +125,8 @@ private:
 
 	_bool CheckEnumStrings();
 
+	HRESULT Bind_boolToShader(_bool bMaptool);
+
 private:
 	vector<string>	m_vecLevelName; 
 	vector<string>	m_vecMapModelNames;
@@ -166,6 +173,9 @@ private:
 	CGameObject* m_pPickedObject = { nullptr };
 	_float3 m_vPickPos = {};
 
+	class CShader* m_pModelShaderCom = { nullptr };
+	class CShader* m_pMapShaderCom = { nullptr };
+	_bool		   m_bisClone = { false };
 public:
 	static	CMapToolHelper*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject*	Clone(void* pArg) override;

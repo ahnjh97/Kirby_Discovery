@@ -7,6 +7,8 @@ matrix	g_BoneMatrices[512];
 texture2D	g_DiffuseTexture;
 texture2D	g_NormalTexture;
 texture2D   g_MRATexture;
+texture2D   g_EmissiveTexture;
+
 
 texture2D g_KirbyMouthTexture;
 texture2D g_KirbyEyeTexture;
@@ -99,7 +101,7 @@ struct PS_OUT
 	float4		vNormal : SV_TARGET1;
 	float4		vDepth : SV_TARGET2;
     float4		vRimLight : SV_TARGET3;
-    float4		vFieldDepth : SV_TARGET4;
+    float4		vEmissive : SV_TARGET4;
     float4		vStencil : SV_TARGET5;
     float4      vMotionBlur : SV_TARGET6;
     float4      vMRA : SV_TARGET7;
@@ -115,6 +117,13 @@ struct PS_OUT_EFFECT
 struct PS_OUT_LIGHTDEPTH
 {
     float4 vLightDepth : SV_TARGET0;
+};
+
+struct PS_OUT_DEFERRED
+{
+    float4 vDeferredInfo : SV_TARGET0;
+    float4 vEmissive : SV_TARGET1;
+
 };
 
 PS_OUT PS_MAIN(PS_IN In)
@@ -382,15 +391,16 @@ PS_OUT_LIGHTDEPTH PS_MAIN_LIGHTDEPTH(PS_IN In)
 	return Out;	
 }
 
-PS_OUT_LIGHTDEPTH PS_MAIN_DEFERREDINFO(PS_IN In)
+PS_OUT_DEFERRED PS_MAIN_DEFERREDINFO(PS_IN In)
 {
-    PS_OUT_LIGHTDEPTH Out = (PS_OUT_LIGHTDEPTH) 0;
+    PS_OUT_DEFERRED Out = (PS_OUT_DEFERRED) 0;
     
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord);
     if (vMtrlDiffuse.a == 0.f)
         discard;
 
-    Out.vLightDepth = float4(0.f, 1.f, 0.f, 1.f);
+    Out.vDeferredInfo = float4(0.f, 1.f, 0.f, 1.f);
+
     return Out;
 }
 
