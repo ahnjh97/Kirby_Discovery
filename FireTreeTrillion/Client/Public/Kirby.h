@@ -266,6 +266,7 @@ private:
 	// For Bulb
 	_int				  m_iRenderCount = { 0 };
 	_float4				  m_vBulbColor = { 0.f, 0.f, 0.f, 0.f };
+	class CBulbFlare*	  m_pBulbFlare = { nullptr };
 
 	// For Bomb
 	vector<CBombOrbitGlow*> m_OrbitGlows;

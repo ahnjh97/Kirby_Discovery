@@ -30,6 +30,7 @@
 
 #include "Light.h"
 #include "Crumble.h"
+#include "BulbFlare.h"
 
 
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -77,17 +78,6 @@ HRESULT CKirby::Initialize(void* pArg)
 	m_pControllerCom->RegisterAsPlayer();
 	Set_WeaponAnim(3);
 
-	//LIGHT_DESC			LightDesc{};
-	//LightDesc.eType = LIGHT_DESC::TYPE_POINT;
-	//LightDesc.vPosition = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
-	//LightDesc.fRange = 5.f;
-	//LightDesc.vDiffuse = _float4(.7f, 0.2f, 0.2f, 1.f);
-	//LightDesc.vAmbient = _float4(.5f, .5f, .5f, 1.f);
-	//LightDesc.vSpecular = _float4(0.f, 0.f, 0.0f, 1.f);
-	//if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
-	//	 return E_FAIL;
-	//m_pLight = CGameInstance::Get_Instance()->Get_LightLastAddress();
-	//Safe_AddRef(m_pLight);
 
 	return S_OK;
 }
@@ -96,10 +86,6 @@ _int CKirby::Tick(_float fTimeDelta)
 {
 	if (m_bDead == true)
 		return OBJ_DEAD;
-
-	//if (m_pLight != nullptr)
-	//	m_pLight->Update_LightPos(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
-
 
 	m_fTimeDelta = m_pGameInstance->Get_FirstTimer();
 	HitStop_System(fTimeDelta);
@@ -1742,12 +1728,20 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 		{
 			_float4 vTargetColor = { 1.f, 1.f, 1.f, 1.f };
 			m_vBulbColor += (vTargetColor - m_vBulbColor) / (fTimeDelta * 300.f);
+
+			m_pBulbFlare->Set_Position(m_pTransformCom->Get_State(CTransform::STATE_POSITION), true);
 		}
 		else if (INFO(m_bLightOn) == false)
 		{
 			_float4 vTargetColor = { 0.3f, 0.1f, 0.1f, 0.25f };
 			m_vBulbColor += (vTargetColor - m_vBulbColor) / (fTimeDelta * 300.f);
+
+			m_pBulbFlare->Set_Position(m_pTransformCom->Get_State(CTransform::STATE_POSITION), false);
 		}
+
+		m_pBulbFlare->Tick(fTimeDelta);
+		m_pBulbFlare->Late_Tick(fTimeDelta);
+
 	}
 
 
@@ -1817,6 +1811,9 @@ HRESULT CKirby::Kirby_SystemInitialize()
 	Add_AnimEvent();
 	// 혹여나, 버그가 발생할까봐 확실하게 블러 true화
 	m_bMotionBlur = true;
+
+	m_pBulbFlare = static_cast<CBulbFlare*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_BulbFlare")));
+
 
 	return S_OK;
 }
@@ -1975,5 +1972,7 @@ void CKirby::Free()
 
 	if (INFO(m_pLight) != nullptr)
 		Safe_Release(INFO(m_pLight));
+
+	Safe_Release(m_pBulbFlare);
 }
 

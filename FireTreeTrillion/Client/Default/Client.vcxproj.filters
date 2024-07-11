@@ -607,6 +607,9 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyBulb_State">
       <UniqueIdentifier>{8ce43134-70bd-4e9a-84fa-af301762dfac}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\Kirby\Bulb">
+      <UniqueIdentifier>{7d1ae9eb-d8d7-4527-bb38-2addfde86962}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -1214,6 +1217,9 @@
     <ClInclude Include="..\Public\KirbyBulb_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyBulb_State</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\BulbFlare.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\Bulb</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1801,6 +1807,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\KirbyBulb_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyBulb_State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BulbFlare.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\Bulb</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
