@@ -12,20 +12,51 @@
         1.0
     ],
     "FontScale": [
-        1.0,
-        1.0
+        1.200,
+        1.200
     ],
     "FontSize": [
         1.0,
         1.0
     ],
-    "FontTag": "Font_Dialog_KR18spac10",
+    "FontTag": "Font_Dialog_SubKR18spac10",
     "Level": 12,
     "Messages": [
         "앗, 커비 씨!"
         , "이번에 웨이들 디 카페 오픈과 동시에 \n아르바이트 모집을 시작했답니다!"
-        , "커비 씨도 카페 점원이 되어 \n함께 일해 보지 않으시겠어요?"
+        , "커비 씨 여유가 되시면, \n카페 점원이 되어 함께 일해 보지 않으시겠어요?"
     ],
     "NPC": "Parttimer_Dee",
-    "Radian": 0.0
+    "Radian": 0.0,
+    "TitleText": "카페 점장 웨이들 디",
+    "TitleTag" : "Font_Dialog_Title_KR22spac10",
+    "TitlePos": [
+        370.0,
+        670.0 
+    ],
+    "TitleRGBA": [
+        0.691, 
+        0.047,
+        0.094,
+        1.0
+    ],
+    "TitleSize": [
+        1.0,
+        1.0
+    ],
+    "TitleScale": [
+        1.0,
+        1.0
+    ],
+    "HighLight": [
+        "-",
+		"\n아르바이트 모집",
+		"\n카페 점원"
+    ],
+    "HighLightRGBA": [
+        0.921, 
+        0.686,
+        0.0,
+        1.0
+    ]
 }

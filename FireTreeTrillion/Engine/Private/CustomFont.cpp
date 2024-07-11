@@ -33,8 +33,8 @@ HRESULT CCustomFont::Render(const wstring& strText, const _float2& vPosition, _f
 {
 	m_pBatch->Begin();
 	
-	_float fCurLineSpacing = m_pFont->GetLineSpacing(); //현재 줄 간격
-	m_pFont->SetLineSpacing(fCurLineSpacing + fLineSpacing);
+	//_float fCurLineSpacing = m_pFont->GetLineSpacing(); //현재 줄 간격
+	//m_pFont->SetLineSpacing(fCurLineSpacing + fLineSpacing);
 
 	m_pFont->DrawString(m_pBatch, strText.c_str(), vPosition, vColor, fRadian, vOrigin, vScale);
 
@@ -52,8 +52,18 @@ HRESULT CCustomFont::Render_Proj(_matrix _matrix, const wstring& strText, const 
 	m_pFont->DrawString(m_pBatch, strText.c_str(), vPosition, vColor, fRadian, vOrigin, vScale);
 
 	m_pBatch->End();
-
+	 
 	return S_OK;
+}
+
+//텍스트 길이 측정
+_float4 CCustomFont::Measure_String(const wstring& strFontTag, const wstring& strText)
+{
+	m_pBatch->Begin();
+
+	_float4 XMMeasureString = m_pFont->MeasureString(strText.c_str());
+
+	return XMMeasureString;
 }
 
 CCustomFont * CCustomFont::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const wstring & strFontFilePath)

@@ -153,10 +153,17 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 
 #endif	
 
+	if (m_pNewLevel)
+	{
+		HRESULT hr = Open_Level(m_NewLevelID, m_pNewLevel);
+		CHECK_FAILED(hr);
+		m_pNewLevel = nullptr;
+	}
 }
 
 void CGameInstance::LateTick_Engine(_float fTimeDelta)
 {
+	m_pObject_Manager->Event_Tick(fTimeDelta);
 	m_pObject_Manager->Late_Tick(fTimeDelta);
 }
 
@@ -450,6 +457,12 @@ HRESULT CGameInstance::Open_Level(_uint iNewLevelID, CLevel* pNewLevel)
 	return m_pLevel_Manager->Open_Level(iNewLevelID, pNewLevel);
 }
 
+void CGameInstance::Reserve_Open_Level(_uint iNewLevelID, CLevel* pNewLevel)
+{
+	m_NewLevelID = iNewLevelID;
+	m_pNewLevel = pNewLevel;
+}
+
 HRESULT CGameInstance::Add_Prototype(const wstring& strPrototypeTag, CGameObject* pPrototype)
 {
 	if (nullptr == m_pObject_Manager)
@@ -464,6 +477,12 @@ HRESULT CGameInstance::Add_Clone(_uint iLevelIndex, const wstring& strLayerTag, 
 		return E_FAIL;
 
 	return m_pObject_Manager->Add_Clone(iLevelIndex, strLayerTag, strPrototypeTag, pArg);
+}
+
+CGameObject* CGameInstance::Add_CloneReturn(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strPrototypeTag, void* pArg)
+{
+	CHECK_NULLPTR(m_pObject_Manager);
+	return m_pObject_Manager->Add_CloneReturn(iLevelIndex, strLayerTag, strPrototypeTag, pArg);
 }
 
 CGameObject* CGameInstance::Clone_GameObject(const wstring& strPrototypeTag, void* pArg)
@@ -744,6 +763,14 @@ HRESULT CGameInstance::Render_ProjFont(_matrix _matrix, const wstring& strFontTa
 		return E_FAIL;
 
 	return m_pFont_Manager->Render_Proj(_matrix, strFontTag, strText, vPosition, vColor, fRadian, vOrigin, vScale);
+}
+
+_float4 CGameInstance::Measure_String(const wstring& strFontTag, const wstring& strText)
+{
+	if (m_pFont_Manager == nullptr)
+		return _float4();
+
+	return m_pFont_Manager->Measure_String(strFontTag, strText);
 }
 
 #pragma endregion
@@ -1246,3 +1273,4 @@ void CGameInstance::Free()
 	Safe_Release(m_pPhysx);
 	Safe_Release(m_pGraphic_Device);
 }
+

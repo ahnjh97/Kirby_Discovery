@@ -148,12 +148,13 @@ void CFoodShopDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObje
 	m_bIsKirbyInZone = true;
 	m_fResetHiTime = 5.f;
 
-	if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
+	//DEE NPC 상호작용 시, MessageWindow UI 출력
+	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN))
 	{
 		//Prototype_GameObject_UI_MessageWindow
-		CUI_MessageWindow* pMessageWindow =  dynamic_cast<CUI_MessageWindow*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_Dialog"), 0));
-		CHECK_NULLPTR(pMessageWindow);
-		pMessageWindow->ShowDialog();
+		CUI_MessageWindow* pMWindow =  dynamic_cast<CUI_MessageWindow*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_Dialog"), 0));
+		CHECK_NULLPTR(pMWindow);
+		pMWindow->Show_DialogMessage();
 	}
 }
 

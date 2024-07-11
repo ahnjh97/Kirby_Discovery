@@ -68,11 +68,12 @@ public:
 
 public: /* For.Level_Manager */
 	HRESULT Open_Level(_uint iNewLevelID, class CLevel* pNewLevel);
+	void Reserve_Open_Level(_uint iNewLevelID, class CLevel* pNewLevel);
 
 public: /* For.Object_Manager */
 	HRESULT Add_Prototype(const wstring& strPrototypeTag, class CGameObject* pPrototype);
 	HRESULT Add_Clone(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strPrototypeTag, void* pArg = nullptr);
-
+	CGameObject* Add_CloneReturn(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strPrototypeTag, void* pArg = nullptr);
 	class CGameObject* Clone_GameObject(const wstring& strPrototypeTag, void* pArg = nullptr);
 	const CComponent* Get_Component(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strComTag, _uint iIndex = 0);
 	list<CGameObject*>* Get_List(_uint iLevelIndex, const wstring& strLayerTag);
@@ -132,6 +133,7 @@ public: /* For.Font_Manager */
 		_fvector vOrigin, _gvector vScale, _float fLineSpacing = 0.f);
 
 	HRESULT Render_ProjFont(_matrix _matrix, const wstring& strFontTag, const wstring& strText, const _float2& vPosition, _fvector vColor, _float fRadian, _fvector vOrigin, _gvector vScale);
+	_float4 Measure_String(const wstring& strFontTag, const wstring& strText);
 
 #pragma endregion
 
@@ -260,6 +262,9 @@ private:
 	_uint	m_iCurrentLevelID		= { 0 };
 	_uint	g_iNumOctree			= {};
 	_float2 m_fWinSize				= { 0.f , 0.f };
+
+	_uint	m_NewLevelID			= { 0 };
+	CLevel* m_pNewLevel				= nullptr;
 
 public:		
 	static void Release_Engine();

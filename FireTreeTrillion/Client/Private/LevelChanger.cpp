@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "LevelChanger.h"
 
+#include "Level_Loading.h"
 #include "Kirby.h"
 
 IMPLEMENT_SINGLETON(CLevelChanger)

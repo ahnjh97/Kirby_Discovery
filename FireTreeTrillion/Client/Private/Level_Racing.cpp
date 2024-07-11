@@ -63,6 +63,9 @@ HRESULT CLevel_Racing::Initialize()
 	hr = Ready_Objects(fXOffset, fZOffset);
 	CHECK_FAILED(hr);
 
+	hr = Ready_Layer_UI(TEXT("Layer_UI"));
+	CHECK_FAILED(hr);
+
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
 	CGameObject* pGameObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar"));

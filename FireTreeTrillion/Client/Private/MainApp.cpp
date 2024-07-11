@@ -194,6 +194,11 @@ HRESULT CMainApp::Ready_Fonts()
 		TEXT("../Bin/Resources/Fonts/Dialog_Title_KR22spac10.spritefont"))))
 		return E_FAIL;
 
+	// 
+	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_Dialog_SubKR18spac10"),
+		TEXT("../Bin/Resources/Fonts/Dialog_SubKR18spac10.spritefont"))))
+		return E_FAIL;
+
 
 	return S_OK;
 }
