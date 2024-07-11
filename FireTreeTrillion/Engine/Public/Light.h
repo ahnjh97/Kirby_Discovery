@@ -26,6 +26,7 @@ public:
 
 	// 따라다니게 하는 빛을 만든다.
 	void	Update_LightPos(_fvector vPos);
+	void	Interpolate_Light(_float4 vTargetDiffuse, _float fTargetRange, _float fInterpolateSpeed);
 	// 빛 컬링
 	_bool	Compute_RenderCull();
 
@@ -34,6 +35,15 @@ private:
 	LIGHT_DESC			m_LightDesc = {};
 	_bool				m_bDead = { false };
 	_int				m_iLifeTime = { 0 };
+
+
+	_float4				m_vTargetDiffuse = { 0.f, 0.f, 0.f, 0.f };
+	_float4				m_vCurDiffuse = { 0.f, 0.f, 0.f, 0.f };
+	_float				m_fTargetRange = { 0.f };
+	_float				m_fCurRange = { 0.f };
+	_float				m_fInterpolateTime = { 0.f };
+	_float				m_fRatioTime = { 0.f };
+	_bool				m_bInterpolate = { false };
 
 public:
 	static CLight* Create(const LIGHT_DESC& LightDesc);

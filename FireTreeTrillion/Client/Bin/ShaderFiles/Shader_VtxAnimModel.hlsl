@@ -21,6 +21,8 @@ float4 g_vMotionVelocity;
 float g_fWhiteColorDiffuse;
 float g_fOverPowerColor;
 
+float4 g_vBulbColor;
+
 
 struct VS_IN
 {
@@ -589,6 +591,31 @@ PS_OUT PS_SIMBAEYE(PS_IN In)
 
     return Out;
 }
+PS_OUT PS_BULBLIGHT(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrlDiffuse = g_vBulbColor;
+
+    Out.vDiffuse = vMtrlDiffuse + g_fWhiteColorDiffuse + g_fOverPowerColor;
+    Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
+    Out.vMRA = vector(0.f, 1.f, 1.f, 1.f);
+
+  
+    if (g_bStencil == true)
+        Out.vStencil = vector(1.f, 0.f, 0.0f, 1.f);
+    
+    if (g_bRimLight == true)
+        Out.vRimLight = vector(0.f, m_fRimWidth, 1.f, 1.f);
+
+    if (g_bMotionBlur == true)
+        Out.vMotionBlur = g_vMotionVelocity;
+    
+    return Out;
+
+}
+
 
 technique11 DefaultTechnique
 {
@@ -702,7 +729,7 @@ technique11 DefaultTechnique
     // 커비 전용 랜더 ( 8 )
     pass Kirby_Default
     {
-        SetRasterizerState(RS_Default);
+        SetRasterizerState(RS_NonCull);
         SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
@@ -838,4 +865,18 @@ technique11 DefaultTechnique
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_SIMBAEYE();
     }
+    // Bulb Light ( 18 )
+    pass BulbLight
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_BULBLIGHT();
+    }
+
 }

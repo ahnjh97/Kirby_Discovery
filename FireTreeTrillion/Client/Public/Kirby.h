@@ -5,6 +5,7 @@
 #include "Effect.h"
 #include "BombOrbitGlow.h"
 #include "BombOrbit.h"
+#include "Light.h"
 
 #define	INFO(state) m_tKirbyInfo.state
 
@@ -130,7 +131,11 @@ public:
 		_int			m_iHammerHit = { 0 };
 		_float			m_fHammerChargeTime = { 0.f };
 
+		// 전구 폼
+		_bool			m_bLightOn = { false };
+		_bool			m_bBulbJump = { false };
 
+		class CLight*	m_pLight = { nullptr };
 	}KIRBY_INFODESC;
 
 
@@ -225,6 +230,9 @@ private:
 	_bool			m_isKirbyAttacking = { false };
 	_float			m_fIsAttackTime = { 0.f };
 
+	// 파크에서의 커비 행동 감지
+	void			RayCast_Crumbles();
+
 private:
 	CModel*					m_pModelCom[BODY_END] = {nullptr};
 
@@ -255,6 +263,9 @@ private:
 	_float				  m_fHitStopTime = { 0.f };
 	_float				  m_fHitStopMaxTime = { 0.f };
 
+	// For Bulb
+	_int				  m_iRenderCount = { 0 };
+	_float4				  m_vBulbColor = { 0.f, 0.f, 0.f, 0.f };
 
 	// For Bomb
 	vector<CBombOrbitGlow*> m_OrbitGlows;
@@ -273,7 +284,6 @@ private:
 	unordered_map<PxRigidActor*, CGameObject*> m_mapStarBoxes;
 	unordered_map<PxRigidActor*, CGameObject*> m_mapBoxes;
 	void ReleaseAndClearMap(unordered_map<PxRigidActor*, CGameObject*> _map);
-	class CLight*	m_pLight = { nullptr };
 
 public:
 	static CKirby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

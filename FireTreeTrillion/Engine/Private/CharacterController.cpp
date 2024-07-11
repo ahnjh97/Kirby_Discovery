@@ -489,7 +489,8 @@ _float CCharacterController::RayCastToDynamicActor(_fvector vLook, _float3 vOffs
 		// 첫 번째 히트 결과
 		hit = hitBuffer.block;
 
-		m_pMostRecentActor = hit.actor;
+		if(m_pController->getActor() != hit.actor)
+			m_pMostRecentActor = hit.actor;
 
 		fDistance = (rayOrigin - hit.position).magnitude();
 	}

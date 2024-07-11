@@ -203,6 +203,7 @@
     <ClInclude Include="..\Public\BrontoBurt_State.h" />
     <ClInclude Include="..\Public\Buffahorn.h" />
     <ClInclude Include="..\Public\Buffahorn_State.h" />
+    <ClInclude Include="..\Public\Bulb.h" />
     <ClInclude Include="..\public\Camera_Free.h" />
     <ClInclude Include="..\public\Camera_Main.h" />
     <ClInclude Include="..\Public\CappyBody.h" />
@@ -219,7 +220,12 @@
     <ClInclude Include="..\Public\Crumble.h" />
     <ClInclude Include="..\Public\Debris.h" />
     <ClInclude Include="..\public\DecoObject.h" />
+    <ClInclude Include="..\Public\Deform.h" />
+    <ClInclude Include="..\Public\FinaleBoss.h" />
+    <ClInclude Include="..\Public\FinaleBoss_State.h" />
+    <ClInclude Include="..\Public\FinaleCut_ControlCenter.h" />
     <ClInclude Include="..\Public\Gm_ParkFhEntranceAlien.h" />
+    <ClInclude Include="..\Public\KirbyBulb_State.h" />
     <ClInclude Include="..\Public\Level_Park.h" />
     <ClInclude Include="..\Public\Disaster_Master.h" />
     <ClInclude Include="..\Public\Phanta.h" />
@@ -424,6 +430,7 @@
     <ClCompile Include="..\Private\BrontoBurt_State.cpp" />
     <ClCompile Include="..\Private\Buffahorn.cpp" />
     <ClCompile Include="..\Private\Buffahorn_State.cpp" />
+    <ClCompile Include="..\Private\Bulb.cpp" />
     <ClCompile Include="..\private\Camera_Free.cpp" />
     <ClCompile Include="..\private\Camera_Main.cpp" />
     <ClCompile Include="..\Private\CappyBody.cpp" />
@@ -439,7 +446,12 @@
     <ClCompile Include="..\Private\Crumble.cpp" />
     <ClCompile Include="..\Private\Debris.cpp" />
     <ClCompile Include="..\private\DecoObject.cpp" />
+    <ClCompile Include="..\Private\Deform.cpp" />
+    <ClCompile Include="..\Private\FinaleBoss.cpp" />
+    <ClCompile Include="..\Private\FinaleBoss_State.cpp" />
+    <ClCompile Include="..\Private\FinaleCut_ControlCenter.cpp" />
     <ClCompile Include="..\Private\Gm_ParkFhEntranceAlien.cpp" />
+    <ClCompile Include="..\Private\KirbyBulb_State.cpp" />
     <ClCompile Include="..\Private\Level_Park.cpp" />
     <ClCompile Include="..\Private\Disaster_Master.cpp" />
     <ClCompile Include="..\Private\Phanta.cpp" />
