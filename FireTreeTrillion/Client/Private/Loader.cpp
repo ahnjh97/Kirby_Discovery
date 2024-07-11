@@ -62,6 +62,7 @@
 #include "BombOrbit.h"
 #include "KirbyBomb.h"
 #include "PartTimerKirby.h"
+#include "BulbFlare.h"
 
 // 몬스터
 #include "KirbyWeapons.h"
@@ -384,6 +385,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BombOrbitGlow"), CBombOrbitGlow);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KirbyBomb"), CKirbyBomb);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PartTimerKirby"), CPartTimerKirby);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BulbFlare"), CBulbFlare);
 
 	// Deform
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Car"), CCar);
@@ -900,9 +902,9 @@ HRESULT CLoader::Loading_For_Parttime()
 	CHECK_FAILED(hr);
 
 	// 게임 DIGITS
-	hr = Add_Texture(eLevel, "TempWhiteDigits", "UI/TempDigits/timer_num_%d.png", 10);
+	hr = Add_Texture(eLevel, "TimeDigits", "UI/Parttime/TimeDigits/%d.png", 10);
 	CHECK_FAILED(hr);
-	hr = Add_Texture(eLevel, "TempRedDigits", "UI/TempDigits/red_num_%d.png", 10);
+	hr = Add_Texture(eLevel, "ScoreDigits", "UI/Parttime/ScoreDigits/%d.png", 10);
 	CHECK_FAILED(hr);
 
 #pragma endregion
@@ -936,13 +938,16 @@ HRESULT CLoader::Loading_For_Parttime()
 	hr = Add_Texture(eLevel, "GameFoodUI_energydrink",		"UI/MGameFood/energydrink.png");
 	hr = Add_Texture(eLevel, "GameFoodUI_burger",			"UI/MGameFood/burger.png");
 
+	// 시작 안내
+	hr = Add_Texture(eLevel, "Parttime_Ready",				"UI/Parttime/Text/Ready.png");
+	hr = Add_Texture(eLevel, "Parttime_Go",					"UI/Parttime/Text/Go.png");
+
 	// 결과 안내
-	hr = Add_Texture(eLevel, "GameFoodUI_FoodGameTextMask",	"UI/MGameFood/FoodGameTextMask.png");
+	hr = Add_Texture(eLevel, "Parttime_Finish",				"UI/Parttime/Text/Finish.png");
 	hr = Add_Texture(eLevel, "Fade",						"UI/Fade.png");
 
 	// 결과창
 	hr = Add_Texture(eLevel, "GameFoodUI_ResultBar",		"UI/MGameFood/result bar.png");
-	//hr = Add_Texture(eLevel, "GameFoodUI_ResultBar",		"UI/MGameFood/ClearText.png");
 	
 #pragma endregion
 
@@ -2243,6 +2248,10 @@ HRESULT CLoader::Add_KirbyFaceTexture(LEVEL eLevel)
 	if (FAILED(Add_Texture(eLevel, "mouth_surprise", "KirbyFace/mouth_surprise.png")))
 		return E_FAIL;
 
+	if (FAILED(Add_Texture(eLevel, "BulbFlare", "KirbyBulbFlare/BulbFlare.dds")))
+		return E_FAIL;
+
+
 	// Kirby Guide UI
 	if (FAILED(Add_Texture(eLevel, "BombOrbit", "KirbyBombOrbit/BombOrbit.dds")))
 		return E_FAIL;
@@ -2522,7 +2531,6 @@ void CLoader::Load_KirbyBodyModels()
 
 	// Deform
 	m_vecModelInfo.emplace_back("Bulb", TYPE_ANIM, 1.f, 180.f);
-
 }
 
 void CLoader::Load_KirbyWeaponModels()

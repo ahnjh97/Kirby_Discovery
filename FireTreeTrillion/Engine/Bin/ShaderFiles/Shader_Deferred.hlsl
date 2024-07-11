@@ -60,6 +60,9 @@ texture2D g_Texture;
 texture2D g_NormalTexture;
 texture2D g_DiffuseTexture;
 
+texture2D g_EmissiveTexture;
+bool g_bMapTool;
+
 texture2D g_LinearTexture;
 texture2D g_SpecularTexture;
 texture2D g_LensFlareTexture;
@@ -241,14 +244,18 @@ float4 Blur_X(float2 vTexCoord)
         return vOut;
     
     float fTotal = 0.0;
-
+    float4 vEmissivedesc = 0.0;
     for (int i = -6; i < 7; ++i)
     {
         vUV = vTexCoord + float2(1.f / (g_fTexW / 2) * i, 0);
         if (1.f == g_BlendTexture.Sample(ClampSampler, vUV).g)
             continue;
 
-        vOut += fWeight[6 + i] * (g_EffectTexture.Sample(ClampSampler, vUV) + g_SpecularTexture.Sample(ClampSampler, vUV));
+        //¸ÊÅøÀÌ ¾Æ´Ò ¶§.
+        if (g_bMapTool == false)
+            vEmissivedesc = g_EmissiveTexture.Sample(ClampSampler, vUV);
+        
+        vOut += fWeight[6 + i] * (g_EffectTexture.Sample(ClampSampler, vUV) + g_SpecularTexture.Sample(ClampSampler, vUV) + vEmissivedesc);
         fTotal += fWeight[6 + i];
     }
 
@@ -888,10 +895,12 @@ PS_OUT_LIGHT PS_MAIN_POINT(PS_IN In)
         vLightspecular = fLightspecular;
 
         vLightspecular += vDiffuse * vLightspecular.a;
+        vLightspecular *= g_vLightDiffuse;
+
     }
 
     
-    Out.vResultColor = saturate(float4(directLighting + ambientLighting, 1.f) * fAmbientOcclusion) * fAtt;
+    Out.vResultColor = saturate(float4(directLighting + ambientLighting, 1.f) * fAmbientOcclusion * fAtt);
     Out.vSpecular = saturate(vLightspecular) * fAtt;
     
     return Out;
@@ -1004,7 +1013,7 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
     PS_OUT Out = (PS_OUT) 0;
 
     vector vDiffuse = g_LinearTexture.Sample(LinearSampler, In.vTexcoord);
-    
+        
     Out.vColor.rgb = pow(vDiffuse, 1.0f / 2.2f);
 
 
