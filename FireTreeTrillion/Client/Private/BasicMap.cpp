@@ -100,6 +100,9 @@ HRESULT CBasicMap::Initialize(void* pArg)
     }
     else
     {
+        //if ( == wstrModelTag) //∏  ¿Ã∏ß¿Ã ∏Ω√≤§¿Ã∏È 
+        //    return S_OK;
+
         if (LEVEL_TOOL_MAP != *m_pCurrentLevelID)
         {
             TraverseBlendDecoInfoTxts(m_mapBlendMeshesIndices, m_mapBlendObjStaticActor);
