@@ -249,11 +249,9 @@ CGameObject* CRadio::Clone(void* pArg)
 
 void CRadio::Free()
 {
+	CEventCenter::Get_Instance()->Unsubscribe(this);
+
 	__super::Free();
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
-
-	CEventCenter::Get_Instance()->Unsubscribe(this);
-
-
 }

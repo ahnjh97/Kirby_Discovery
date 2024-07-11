@@ -82,6 +82,12 @@ _int CThrone::Tick(_float fTimeDelta)
 		m_pModelCom->RemoveBlendMeshes(tempSet);
 	}
 
+	if (m_pModelCom->Get_AnimRatio() > 0.59f && false == m_bGlassBreak)
+	{
+		m_bGlassBreak = true;
+		CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_GLASSBREAK);
+	}
+
 	//if (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_SPACE, KEY_DOWN))
 	//{
 	//	_uint iCurAnimIndex = m_pModelCom->Get_CurAnimIndex();
@@ -228,9 +234,10 @@ CGameObject* CThrone::Clone(void* pArg)
 
 void CThrone::Free()
 {
+	CEventCenter::Get_Instance()->Unsubscribe(KEVENT_SIMBA_THRONEBREAK, this);
+
 	__super::Free();
 
-	CEventCenter::Get_Instance()->Unsubscribe(KEVENT_SIMBA_THRONEBREAK, this);
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 }

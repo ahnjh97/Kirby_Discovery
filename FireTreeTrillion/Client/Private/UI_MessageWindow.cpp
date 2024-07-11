@@ -105,10 +105,13 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 			m_eCurState = WINDOW_HIDE;
 			m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_HIDE);
 
-			if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN))
-			{
-			}
+			
 		}
+	}
+
+	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN))
+	{
+		m_pGameInstance->Reserve_Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_TOOL_ANIM));
 	}
 
 	_float3 vOffset = { 0.9f, 0.9f, 1.f };

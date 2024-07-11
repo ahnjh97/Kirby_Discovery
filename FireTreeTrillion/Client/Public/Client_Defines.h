@@ -37,6 +37,10 @@ namespace Client
         KEVENT_DDD_DEAD,
         KEVENT_BREAK_CARSHOP,
         KEVENT_BREAK_RACINGMAP,
+        KEVENT_SIMBA_APPEAR_START,
+        KEVENT_SIMBA_APPEAR_END,
+        KEVENT_SIMBA_WAVE1DEAD,
+        KEVENT_SIMBA_WAVE2DEAD,
         KEVENT_SIMBA_THRONEBREAK,
         KEVENT_SIMBA_GLASSBREAK,
         KEVENT_END
@@ -123,6 +127,7 @@ enum COLLISION_TYPE
     MONSTERBULLET,
     BOSS_DEEDEEDEE,
     BOSS_FINALBOSS,
+    BOSS_SIMBA,
     OBJECT, // 돌멩이 등 사물이다.
     ITEM, // 일반 먹는 아이템이다.
     ABILITYITEM, // 흡수해야 먹을 수 있는 능력 아이템이다.

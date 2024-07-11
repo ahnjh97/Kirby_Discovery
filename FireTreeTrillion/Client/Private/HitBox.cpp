@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "HitBox.h"
 #include "CollisionCenter.h"
+#include "Bone.h"
 
 CHitBox::CHitBox(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -32,11 +33,16 @@ HRESULT CHitBox::Initialize(void* pArg)
 	m_pOwnerTransform = m_pOwner->Get_TransformCom();
 	Safe_AddRef(m_pOwnerTransform);
 	m_pOwnerCollisionDesc = pDesc->pDesc;
+	m_pSocket = pDesc->pSocket;
+	Safe_AddRef(m_pSocket);
+
 	if (pDesc->matObjectPosition != _float4x4())
 	{
 		m_matFixed = pDesc->matObjectPosition;
 		m_pTransformCom->Set_WorldMatrix(pDesc->matObjectPosition);
 	}
+	else if (nullptr != m_pSocket)
+		m_pTransformCom->Set_WorldMatrix(m_pOwnerTransform->ComputeBoneWorldMatrix(m_pSocket));
 	else
 		m_pTransformCom->Set_WorldMatrix(m_pOwnerTransform->Get_WorldFloat4x4());
 
@@ -55,6 +61,11 @@ _int CHitBox::Tick(_float fTimeDelta)
 	{
 		pWorldMatrix = m_matFixed;
 		CUtils::Set_Scaled_Matrix(pWorldMatrix, 1.f, 1.f, 1.f);
+	}
+	else if (nullptr != m_pSocket) {
+		pWorldMatrix = m_pOwnerTransform->ComputeBoneWorldMatrix(m_pSocket);
+		CUtils::Set_Scaled_Matrix(pWorldMatrix, 1.f, 1.f, 1.f);
+		pWorldMatrix._42 += m_pOwnerCollisionDesc->fOffSetY;
 	}
 	else
 	{
@@ -282,7 +293,9 @@ void CHitBox::Restore_Logic(_float fTimeDelta)
 		}
 	}
 	// 공격 전용 콜라이더 일 경우. (내가 가지고 있는 구조체 벨류 값)
-	else if (m_pOwnerCollisionDesc->eValue == ATTACK)
+	else if (m_pOwnerCollisionDesc->eValue == ATTACK 
+		|| ATTACK2 == m_pOwnerCollisionDesc->eValue
+		|| ATTACK3 == m_pOwnerCollisionDesc->eValue)
 	{
 		if (m_pOwnerCollisionDesc->bAlive == false)
 		{
@@ -357,6 +370,8 @@ CGameObject* CHitBox::Clone(void* pArg)
 void CHitBox::Free()
 {
 	__super::Free();
+
+	Safe_Release(m_pSocket);
 	Safe_Release(m_pOwner);
 	Safe_Release(m_pOwnerTransform);
 }

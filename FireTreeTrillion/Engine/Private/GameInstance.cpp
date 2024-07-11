@@ -153,6 +153,12 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 
 #endif	
 
+	if (m_pNewLevel)
+	{
+		HRESULT hr = Open_Level(m_NewLevelID, m_pNewLevel);
+		CHECK_FAILED(hr);
+		m_pNewLevel = nullptr;
+	}
 }
 
 void CGameInstance::LateTick_Engine(_float fTimeDelta)
@@ -449,6 +455,12 @@ HRESULT CGameInstance::Open_Level(_uint iNewLevelID, CLevel* pNewLevel)
 		return E_FAIL;
 
 	return m_pLevel_Manager->Open_Level(iNewLevelID, pNewLevel);
+}
+
+void CGameInstance::Reserve_Open_Level(_uint iNewLevelID, CLevel* pNewLevel)
+{
+	m_NewLevelID = iNewLevelID;
+	m_pNewLevel = pNewLevel;
 }
 
 HRESULT CGameInstance::Add_Prototype(const wstring& strPrototypeTag, CGameObject* pPrototype)
@@ -1213,6 +1225,23 @@ void CGameInstance::Restore_SecondTimer(_float fRestoreRatio)
 _bool CGameInstance::Is_PassingGroup(CGameObject* pObj)
 {
 	return pObj->Get_CollisionType() >= PASSING_GROUP;
+}
+
+_float CGameInstance::Compute_Distance(CGameObject* pDst, CGameObject* pSrc)
+{
+	if (nullptr == pDst || nullptr == pSrc)
+		return FLT_MAX;
+
+	CTransform* pDstTransform = pDst->Get_TransformCom();
+	CTransform* pSrcTransform = pSrc->Get_TransformCom();
+
+	if (nullptr == pDstTransform || nullptr == pSrcTransform)
+		return FLT_MAX;
+
+	_vector vDstPos = pDstTransform->Get_State(CTransform::STATE_POSITION);
+	_vector vSrcPos = pSrcTransform->Get_State(CTransform::STATE_POSITION);
+
+	return XMVectorGetX(XMVector4Length(vDstPos - vSrcPos));
 }
 
 void CGameInstance::Release_Engine()

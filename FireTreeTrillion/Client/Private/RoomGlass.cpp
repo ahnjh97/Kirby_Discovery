@@ -176,9 +176,10 @@ CGameObject* CRoomGlass::Clone(void* pArg)
 
 void CRoomGlass::Free()
 {
+	CEventCenter::Get_Instance()->Unsubscribe(KEVENT_SIMBA_GLASSBREAK, this);
+
 	__super::Free();
 
-	CEventCenter::Get_Instance()->Unsubscribe(KEVENT_SIMBA_GLASSBREAK, this);
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 }

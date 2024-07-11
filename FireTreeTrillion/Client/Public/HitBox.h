@@ -15,6 +15,7 @@ public:
 		COLLISION_DESC* pDesc;
 		_uint			pCollisionType;
 		_float4x4		matObjectPosition = _float4x4(); // 정적으로 고정해야하는 위치일 경우 사용합니다.
+		class CBone*	pSocket = { false };
 	};
 
 private:
@@ -45,8 +46,9 @@ private:
 	HRESULT			Bind_ShaderResources();
 
 private:
-	class CGameObject*	m_pOwner			= nullptr;
-	class CTransform*	m_pOwnerTransform	= nullptr;
+	class CGameObject*	m_pOwner			= { nullptr };
+	class CTransform*	m_pOwnerTransform	= { nullptr };
+	class CBone*		m_pSocket			= { nullptr };
 
 	_float				m_fCollisionTime = { 0.f };
 

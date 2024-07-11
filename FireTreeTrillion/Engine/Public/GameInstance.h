@@ -68,6 +68,7 @@ public:
 
 public: /* For.Level_Manager */
 	HRESULT Open_Level(_uint iNewLevelID, class CLevel* pNewLevel);
+	void Reserve_Open_Level(_uint iNewLevelID, class CLevel* pNewLevel);
 
 public: /* For.Object_Manager */
 	HRESULT Add_Prototype(const wstring& strPrototypeTag, class CGameObject* pPrototype);
@@ -226,12 +227,15 @@ public: /* For. TimeController */
 	void	Restore_SecondTimer(_float fRestoreRatio = 1.f);
 
 
+	/* For. OcTree */
 	_uint Get_NumOctree() { return g_iNumOctree; }
 	void IncreaseIndex() { g_iNumOctree++; }
 
 public: // For Collision
 	_bool	Is_PassingGroup(class CGameObject* pObj);
 
+public: // For GameObject Distance
+	_float Compute_Distance(CGameObject* pDst, CGameObject* pSrc);
 
 private:
 	class CGraphic_Device*			m_pGraphic_Device = { nullptr };
@@ -258,6 +262,9 @@ private:
 	_uint	m_iCurrentLevelID		= { 0 };
 	_uint	g_iNumOctree			= {};
 	_float2 m_fWinSize				= { 0.f , 0.f };
+
+	_uint	m_NewLevelID			= { 0 };
+	CLevel* m_pNewLevel				= nullptr;
 
 public:		
 	static void Release_Engine();
