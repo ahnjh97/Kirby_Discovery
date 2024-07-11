@@ -1152,6 +1152,10 @@ HRESULT CRenderer::Render_Effect()
 		return E_FAIL;
 
 
+
+
+
+
 	// Åõ¸íÇÑ °´Ã¼ + ºí·ë
 	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_Effect"))))
 		return E_FAIL;

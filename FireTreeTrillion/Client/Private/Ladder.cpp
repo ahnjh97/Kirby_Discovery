@@ -205,6 +205,9 @@ CGameObject* CLadder::Clone(void* pArg)
 void CLadder::Free()
 {
 	__super::Free();
+
+	m_pGameInstance->ReleaseActor(m_pStaticActor);
+
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 
