@@ -42,8 +42,8 @@ HRESULT CBuffahorn::Initialize(void* pArg)
 	m_pModelCom->Set_Animation(BUFFAHORN_CHARGEWAIT, 50.f, true, true);
 
 
-	m_fMaxHp = 15.f;
-	m_fHp = 15.f;
+	m_fMaxHp = 10.f;
+	m_fHp = 10.f;
 	m_fAttack = 10.f;
 	m_eVacuumSize = SIZE_BIG;
 	m_eAbilityType = ABILITY_DEFAULT;

@@ -34,7 +34,7 @@ void CGhostGordo_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 	// 일정 거리 안으로 플레이어가 들어오면 상태 전환
 	if (7.f > fDistance)
 	{
-		if(true == pGhostGordo->Get_Light())
+		if(/*true == pGhostGordo->Get_Light()*/true == pKirby->Get_KirbyInfo()->m_bLightOn)
 			pGhostGordo->Change_State(CGhostGordo::GORDO_EYEOPENSTART, 40.f, false, true);
 	}
 
@@ -100,7 +100,7 @@ void CGhostGordo_Move_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 	// 플레이어를 향해 바라본다
 	if(true == pGhostGordo->Get_R2B())
 	{
-		if(true == pGhostGordo->Get_Light())
+		if(/*true == pGhostGordo->Get_Light()*/true == pKirby->Get_KirbyInfo()->m_bLightOn)
 		{
 			pGhostGordo->Set_R2B(false);
 			pGhostGordo->Change_State(CGhostGordo::GORDO_EYEOPENSTART, 40.f, false, true);
@@ -131,7 +131,7 @@ void CGhostGordo_Move_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 	{
 		pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 8.f);
 
-		if (false == pGhostGordo->Get_Light())
+		if (/*false == pGhostGordo->Get_Light()*/false == pKirby->Get_KirbyInfo()->m_bLightOn)
 			pGhostGordo->Change_State(CGhostGordo::GORDO_LOOK, 40.f, false, true);
 	
 		_vector vLook = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
