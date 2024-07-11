@@ -1,26 +1,26 @@
 #include "stdafx.h"
-#include "Gm_ParkSolarPanelCharge.h"
+#include "Gm_ParkSolarPanelOnce.h"
 
 #include "HitBox.h"
 #include "Kirby.h"
 //#include "BreakableRockParticle.h"
 
-CGm_ParkSolarPanelCharge::CGm_ParkSolarPanelCharge(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CGm_ParkSolarPanelOnce::CGm_ParkSolarPanelOnce(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
 {
 }
 
-CGm_ParkSolarPanelCharge::CGm_ParkSolarPanelCharge(const CGm_ParkSolarPanelCharge& rhs)
+CGm_ParkSolarPanelOnce::CGm_ParkSolarPanelOnce(const CGm_ParkSolarPanelOnce& rhs)
 	: CPhysXObject{ rhs }
 {
 }
 
-HRESULT CGm_ParkSolarPanelCharge::Initialize_Prototype()
+HRESULT CGm_ParkSolarPanelOnce::Initialize_Prototype()
 {
 	return S_OK;
 }
 
-HRESULT CGm_ParkSolarPanelCharge::Initialize(void* pArg)
+HRESULT CGm_ParkSolarPanelOnce::Initialize(void* pArg)
 {
 	GAMEOBJECT_DESC* Desc = { nullptr };
 
@@ -38,9 +38,6 @@ HRESULT CGm_ParkSolarPanelCharge::Initialize(void* pArg)
 
 	m_IsInteraction = FALSE;
 
-	//숨길 메쉬 검색하여 저장
-	m_setUpdateMeshs.insert(m_pModelCom->Find_MeshIndex(string("LightM__LampC.002")));
-
 	//피직스 추가
 	m_pStaticActor = m_pNonAnimModelCom->ReturnStaticActor(m_pTransformCom->Get_WorldFloat4x4());
 
@@ -50,7 +47,7 @@ HRESULT CGm_ParkSolarPanelCharge::Initialize(void* pArg)
 	return S_OK;
 }
 
-_int CGm_ParkSolarPanelCharge::Tick(_float fTimeDelta)
+_int CGm_ParkSolarPanelOnce::Tick(_float fTimeDelta)
 {
 	//if (TRUE == m_bDead)
 	//	return OBJ_DEAD;
@@ -58,50 +55,30 @@ _int CGm_ParkSolarPanelCharge::Tick(_float fTimeDelta)
 	switch (m_eCurState)
 	{
 	case STATE_OFFWAIT: break;//충전 전 대기
-	case STATE_OFFWAITSTART: //충전 전
-		if (TRUE == m_pModelCom->IsFinished())
-		{
-			m_pModelCom->Set_Animation(STATE_OFFWAIT, 30.f, FALSE, TRUE);
-			m_eCurState = STATE_OFFWAIT;
-		}
-		break;
-
 	case STATE_CHARGE: //충전 중
 		if (TRUE == m_pModelCom->IsFinished()) //충전 중 애님 종료 시 충전 완료 상태 변경
 		{
-			m_pModelCom->Set_Animation(STATE_CHARGEDSTART, 30.f, FALSE, TRUE);
-			m_eCurState = STATE_CHARGEDSTART;
+			m_pModelCom->Set_Animation(STATE_ONWAITSTART, 30.f, FALSE, TRUE);
+			m_eCurState = STATE_ONWAITSTART;
+		}
+		break;
+
+	case STATE_ONWAITSTART: //충전 시작
+		if (TRUE == m_pModelCom->IsFinished())
+		{
+			m_pModelCom->Set_Animation(STATE_ONWAIT, 30.f, FALSE, TRUE);
+			m_eCurState = STATE_ONWAIT;
 		}
 		break;
 		
-	case STATE_CHARGEDSTART: //충전 완료
-		if (TRUE == m_pModelCom->IsFinished())
-		{
-			m_pModelCom->Set_Animation(STATE_CHARGEDWAIT, 30.f, FALSE, TRUE);
-			m_eCurState = STATE_CHARGEDWAIT;
-		}
-		break;
-
-	case STATE_CHARGEDWAIT: //충전 완료 대기
-		//해당 애니메이션 재생 시간 동안 관련 기믹 활성화
-		m_pModelCom->Set_Animation(STATE_DECREASES, 15.f, FALSE, TRUE);
-		m_eCurState = STATE_DECREASES;
-		break;
-
-	case STATE_DECREASES: //충전 해제
-		if (TRUE == m_pModelCom->IsFinished()) //충전 해제 중 애님 종료 시 충전 전 상태 변경
-		{
-			m_pModelCom->Set_Animation(STATE_OFFWAITSTART, 30.f, FALSE, TRUE);
-			m_eCurState = STATE_OFFWAITSTART;
-		}
-		break;
+	case STATE_ONWAIT: break; //충전 완료
 	case STATE_NONE:	default:	break;
 	}
 
 	return OBJ_NOEVENT;
 }
 
-void CGm_ParkSolarPanelCharge::Late_Tick(_float fTimeDelta)
+void CGm_ParkSolarPanelOnce::Late_Tick(_float fTimeDelta)
 {
 	m_pModelCom->Play_Animation(m_pGameInstance->Get_SecondTimer());
 
@@ -121,7 +98,7 @@ void CGm_ParkSolarPanelCharge::Late_Tick(_float fTimeDelta)
 	//	Set_Dead();
 }
 
-HRESULT CGm_ParkSolarPanelCharge::Render()
+HRESULT CGm_ParkSolarPanelOnce::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
@@ -149,17 +126,17 @@ HRESULT CGm_ParkSolarPanelCharge::Render()
 		hr = m_pShaderCom->Begin(ANIMMODEL_LINEAR_NORMAL_O);
 		CHECK_FAILED(hr);
 
-		LAMP_TYPE eLampType = { LAMP_RED };
+		//LAMP_TYPE eLampType = { LAMP_RED };
 
-		//특정 애님 상태에 따라 텍스처 변경할 메쉬를 체크
-		if (STATE_OFFWAIT == m_eCurState)
-		{
-			if (m_setUpdateMeshs.find(i) != m_setUpdateMeshs.end())
-			{
-				hr = m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", eLampType);
-				CHECK_FAILED(hr);
-			}
-		}
+		////특정 애님 상태에 따라 텍스처 변경할 메쉬를 체크
+		//if (STATE_OFFWAIT == m_eCurState)
+		//{
+		//	if (m_setUpdateMeshs.find(i) != m_setUpdateMeshs.end())
+		//	{
+		//		hr = m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", eLampType);
+		//		CHECK_FAILED(hr);
+		//	}
+		//}
 		
 		hr = m_pModelCom->Render(i);
 		CHECK_FAILED(hr);
@@ -168,7 +145,7 @@ HRESULT CGm_ParkSolarPanelCharge::Render()
 	return S_OK;
 }
 
-HRESULT CGm_ParkSolarPanelCharge::Render_LightDepth()
+HRESULT CGm_ParkSolarPanelOnce::Render_LightDepth()
 {
 	if (FAILED(m_pGameInstance->Render_LightDepth_For_GameObject(m_pShaderCom, m_pTransformCom, m_pModelCom)))
 		return E_FAIL;
@@ -177,16 +154,14 @@ HRESULT CGm_ParkSolarPanelCharge::Render_LightDepth()
 }
 
 #ifdef _DEBUG
-void CGm_ParkSolarPanelCharge::Render_IMGUI()
+void CGm_ParkSolarPanelOnce::Render_IMGUI()
 {
 	switch (m_eCurState)
 	{
-	case STATE_CHARGE:			ImGui::Text(u8"STATE_CHARGE"); break;
-	case STATE_CHARGEDSTART:	ImGui::Text(u8"STATE_CHARGEDSTART"); break;
-	case STATE_CHARGEDWAIT:		ImGui::Text(u8"STATE_CHARGEDWAIT"); break;
-	case STATE_DECREASES:		ImGui::Text(u8"STATE_DECREASES"); break;
 	case STATE_OFFWAIT:			ImGui::Text(u8"STATE_OFFWAIT"); break;
-	case STATE_OFFWAITSTART:	ImGui::Text(u8"STATE_OFFWAITSTART"); break;
+	case STATE_CHARGE:			ImGui::Text(u8"STATE_CHARGE"); break;
+	case STATE_ONWAITSTART:	ImGui::Text(u8"STATE_ONWAITSTART"); break;
+	case STATE_ONWAIT:		ImGui::Text(u8"STATE_ONWAIT"); break;
 	case STATE_NONE:	default: ImGui::Text(u8"STATE_NONE"); break;
 	}
 	
@@ -195,7 +170,7 @@ void CGm_ParkSolarPanelCharge::Render_IMGUI()
 }
 #endif
 
-void CGm_ParkSolarPanelCharge::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
+void CGm_ParkSolarPanelOnce::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
 	m_IsInteraction = TRUE;
 
@@ -231,25 +206,25 @@ void CGm_ParkSolarPanelCharge::Collision(CCollisionCenter::CONTENT_TYPE eContent
 
 }
 
-HRESULT CGm_ParkSolarPanelCharge::Add_Components()
+HRESULT CGm_ParkSolarPanelOnce::Add_Components()
 {
 	HRESULT hr;
 
 	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimModel"),
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_SolarPanelCharge_Anim"), 
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_SolarPanelOnce_Anim"), 
 		TEXT("Com_Model_Anim"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_SolarPanelCharge_NonAnim"), 
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_SolarPanelOnce_NonAnim"), 
 		TEXT("Com_Model_NonAnim"), (CComponent**)&m_pNonAnimModelCom);
 	CHECK_FAILED(hr);
 
 	//TEXTURE :: Lamp에 붙일 텍스처
-	CHECK_FAILED(hr);	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_SolarPanelCharge_Lamp"),
-		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom);
-	CHECK_FAILED(hr);
+	//CHECK_FAILED(hr);	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_SolarPanelCharge_Lamp"),
+	//	TEXT("Com_Texture"), (CComponent**)&m_pTextureCom);
+	//CHECK_FAILED(hr);
 
 #pragma region HITBOX
 
@@ -268,7 +243,7 @@ HRESULT CGm_ParkSolarPanelCharge::Add_Components()
 	return S_OK;
 }
 
-HRESULT CGm_ParkSolarPanelCharge::Bind_ShaderResources()
+HRESULT CGm_ParkSolarPanelOnce::Bind_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
@@ -303,33 +278,33 @@ HRESULT CGm_ParkSolarPanelCharge::Bind_ShaderResources()
 	return S_OK;
 }
 
-CGm_ParkSolarPanelCharge* CGm_ParkSolarPanelCharge::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CGm_ParkSolarPanelOnce* CGm_ParkSolarPanelOnce::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	CGm_ParkSolarPanelCharge* pInstance = new CGm_ParkSolarPanelCharge(pDevice, pContext);
+	CGm_ParkSolarPanelOnce* pInstance = new CGm_ParkSolarPanelOnce(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Create : CGm_ParkSolarPanelCharge"));
+		MSG_BOX(TEXT("Failed To Create : CGm_ParkSolarPanelOnce"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CGameObject* CGm_ParkSolarPanelCharge::Clone(void* pArg)
+CGameObject* CGm_ParkSolarPanelOnce::Clone(void* pArg)
 {
-	CGm_ParkSolarPanelCharge* pInstance = new CGm_ParkSolarPanelCharge(*this);
+	CGm_ParkSolarPanelOnce* pInstance = new CGm_ParkSolarPanelOnce(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Clone : CGm_ParkSolarPanelCharge"));
+		MSG_BOX(TEXT("Failed To Clone : CGm_ParkSolarPanelOnce"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CGm_ParkSolarPanelCharge::Free()
+void CGm_ParkSolarPanelOnce::Free()
 {
 	__super::Free();
 

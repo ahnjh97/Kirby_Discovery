@@ -9,20 +9,21 @@ END
 
 BEGIN(Client)
 
-class CGm_ParkSolarPanelCharge final : public CPhysXObject
+class CGm_ParkSolarPanelOnce final : public CPhysXObject
 {
 public: //괄호의 숫자는 실제 인게임의 기믹 애님 순서. index는 아님
-	enum ANIM_STATE {	STATE_CHARGE, STATE_CHARGEDSTART, STATE_CHARGEDWAIT, //충전 중(3), 충전 완료(4), 충전 완료 대기(5)
-						STATE_DECREASES, //충전 해제 (6)
-						STATE_OFFWAIT, STATE_OFFWAITSTART, //충전 전 대기(2), 대기 시작(1)
+	enum ANIM_STATE {	STATE_ONWAITSTART, //충전 시작 (3)
+						STATE_CHARGE, //충전 중 (2)
+						STATE_ONWAIT, //충전 완료 (4)
+						STATE_OFFWAIT, //충전 전 대기 (1)
 						STATE_NONE };
 
 	enum LAMP_TYPE { LAMP_GREEN, LAMP_RED, LAMP_YELLOW, LAMP_NONE };
 
 private:
-	CGm_ParkSolarPanelCharge(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CGm_ParkSolarPanelCharge(const CGm_ParkSolarPanelCharge& rhs);
-	virtual ~CGm_ParkSolarPanelCharge() = default;
+	CGm_ParkSolarPanelOnce(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CGm_ParkSolarPanelOnce(const CGm_ParkSolarPanelOnce& rhs);
+	virtual ~CGm_ParkSolarPanelOnce() = default;
 
 public:
 	virtual HRESULT		Initialize_Prototype()						override;
@@ -62,7 +63,7 @@ private:
 	_bool					m_bStartCharge = { FALSE };
 
 public:
-	static CGm_ParkSolarPanelCharge* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CGm_ParkSolarPanelOnce* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 };

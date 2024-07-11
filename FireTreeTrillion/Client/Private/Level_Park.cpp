@@ -767,6 +767,12 @@ HRESULT CLevel_Park::Ready_Objects()
 				continue;
 		}
 
+		if ("SolarPanelOnce_NonAnim" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_ParkSolarPanelOnce"), &tDesc)))
+				continue;
+		}
+
 #pragma endregion
 	}
 	fileInput.close();

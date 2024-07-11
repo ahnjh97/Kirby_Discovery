@@ -610,6 +610,15 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\Player\Kirby\Bulb">
       <UniqueIdentifier>{7d1ae9eb-d8d7-4527-bb38-2addfde86962}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\Gimmick\Park_Wondaria\SolarPanel">
+      <UniqueIdentifier>{43ee93c0-63c1-4576-978a-7563a27f3fd9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Gimmick\Park_Wondaria\SolarPanel\Charge">
+      <UniqueIdentifier>{00a283b2-0004-46c8-9bed-6c971e961a7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Gimmick\Park_Wondaria\SolarPanel\Once">
+      <UniqueIdentifier>{1d07bb83-aab5-4f0c-9c11-2c69099db84d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -1203,8 +1212,8 @@
     </ClInclude>
     <ClInclude Include="..\Public\Crumble.h">
       <Filter>02.GameObjects\PhysXObject\MapObject\Crumble</Filter>
-	</ClInclude>
-	<ClInclude Include="..\Public\FinaleBoss.h">
+    </ClInclude>
+    <ClInclude Include="..\Public\FinaleBoss.h">
       <Filter>02.GameObjects\PhysXObject\Character\FinaleBoss</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\FinaleBoss_State.h">
@@ -1223,7 +1232,10 @@
       <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\Bulb</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Gm_ParkSolarPanelCharge.h">
-      <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria</Filter>
+      <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria\SolarPanel\Charge</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Gm_ParkSolarPanelOnce.h">
+      <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria\SolarPanel\Once</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1799,8 +1811,8 @@
     </ClCompile>
     <ClCompile Include="..\Private\Crumble.cpp">
       <Filter>02.GameObjects\PhysXObject\MapObject\Crumble</Filter>
-	</ClCompile>
-	<ClCompile Include="..\Private\FinaleBoss.cpp">
+    </ClCompile>
+    <ClCompile Include="..\Private\FinaleBoss.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\FinaleBoss</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\FinaleBoss_State.cpp">
@@ -1819,7 +1831,10 @@
       <Filter>02.GameObjects\PhysXObject\Character\Player\Kirby\Bulb</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Gm_ParkSolarPanelCharge.cpp">
-      <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria</Filter>
+      <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria\SolarPanel\Charge</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Gm_ParkSolarPanelOnce.cpp">
+      <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria\SolarPanel\Once</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

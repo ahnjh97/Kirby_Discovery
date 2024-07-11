@@ -164,7 +164,7 @@
 #include "Gm_LabBossRoomDoor.h"
 #include "Gm_ParkFhEntranceAlien.h"
 #include "Gm_ParkSolarPanelCharge.h"
-//#include "Gm_ParkSolarPanelOnce.h"
+#include "Gm_ParkSolarPanelOnce.h"
 
 //UI
 #include "BackGround.h"
@@ -493,6 +493,7 @@ HRESULT CLoader::Loading_ObjectAll()
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_ParkFhEntranceAlien"), CGm_ParkFhEntranceAlien);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_ParkSolarPanelCharge"), CGm_ParkSolarPanelCharge);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_ParkSolarPanelOnce"), CGm_ParkSolarPanelOnce);
 
 	#pragma endregion
 
@@ -1006,6 +1007,10 @@ HRESULT CLoader::Loading_For_Park()
 
 	// 커비 얼굴 텍스쳐 로드
 	Add_KirbyFaceTexture(eLevel);
+
+	//Gm_ParkSolarPanelCharge
+	hr = Add_Texture(eLevel, "SolarPanelCharge_Lamp", "Gimmick/ParkSolarPanelCharge/AOsubC._%d.dds", 3);
+
 #pragma endregion
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
@@ -1909,8 +1914,10 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("SolarPanelCharge_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("SolarPanelCharge_NonAnim", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
-		m_vecModelInfo.emplace_back("WarpStar_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("SolarPanelOnce_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("SolarPanelOnce_NonAnim", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+
+		m_vecModelInfo.emplace_back("WarpStar_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 		// For Kirby Body
 		Load_KirbyBodyModels();

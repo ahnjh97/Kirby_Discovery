@@ -227,6 +227,7 @@
     <ClInclude Include="..\Public\FinaleCut_ControlCenter.h" />
     <ClInclude Include="..\Public\Gm_ParkFhEntranceAlien.h" />
     <ClInclude Include="..\Public\Gm_ParkSolarPanelCharge.h" />
+    <ClInclude Include="..\Public\Gm_ParkSolarPanelOnce.h" />
     <ClInclude Include="..\Public\KirbyBulb_State.h" />
     <ClInclude Include="..\Public\Level_Park.h" />
     <ClInclude Include="..\Public\Disaster_Master.h" />
@@ -455,6 +456,7 @@
     <ClCompile Include="..\Private\FinaleCut_ControlCenter.cpp" />
     <ClCompile Include="..\Private\Gm_ParkFhEntranceAlien.cpp" />
     <ClCompile Include="..\Private\Gm_ParkSolarPanelCharge.cpp" />
+    <ClCompile Include="..\Private\Gm_ParkSolarPanelOnce.cpp" />
     <ClCompile Include="..\Private\KirbyBulb_State.cpp" />
     <ClCompile Include="..\Private\Level_Park.cpp" />
     <ClCompile Include="..\Private\Disaster_Master.cpp" />
