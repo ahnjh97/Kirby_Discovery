@@ -41,9 +41,6 @@ _int CFinaleCut_ControlCenter::Tick(_float fTimeDelta)
 	if (m_pGameInstance->Get_KeyState(DIK_LCONTROL, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
 	{
 
-		if (m_pGameInstance->Get_KeyState(DIK_1, KEY_DOWN))
-			Set_CutScene(1);
-
 		if (m_pGameInstance->Get_KeyState(DIK_2, KEY_DOWN))
 			Set_CutScene(2);
 

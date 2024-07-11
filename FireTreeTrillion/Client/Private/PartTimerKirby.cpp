@@ -213,7 +213,7 @@ HRESULT CPartTimerKirby::Make_TargetToCams()
 	{
 		CCamera* pCameraFree = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Free")));
 		if (pCameraFree != nullptr)
-			m_pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FIRST);
+			pCameraFree->Set_Target(m_pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FIRST);
 	}
 
 	return S_OK;

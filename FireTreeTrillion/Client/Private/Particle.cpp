@@ -214,6 +214,8 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 		}
 	}
 
+	Compute_ViewZ();
+
 	m_pVIBufferCom->Compute_AllLifeTime(fMyTimeDelta);
 
 	if (m_fDuration.second <= m_fDuration.first)
