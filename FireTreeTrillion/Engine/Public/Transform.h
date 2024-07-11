@@ -68,6 +68,8 @@ public:
 
 	const _float4x4* Get_WorldFloat4x4_Ptr() const {return &m_WorldMatrix;}
 
+	_float4x4	ComputeBoneWorldMatrix(class CBone* pBone, _bool bMultiplyScale = false);
+
 
 	//±¸¹öÀü
 	_vector Get_State_Vector(STATE eState) {return XMLoadFloat4x4(&m_WorldMatrix).r[eState];}
