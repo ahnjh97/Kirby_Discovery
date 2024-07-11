@@ -141,7 +141,7 @@ HRESULT CLevel_Park::Ready_Layer_Camera(const wstring& strLayerTag)
 {
 
 	CCamera_Main::CAMERA_KIRBY_DESC		MainCamDesc{};
-	MainCamDesc.fFovy = XMConvertToRadians(30.0f);
+	MainCamDesc.fFovy = XMConvertToRadians(38.0f);
 	MainCamDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	MainCamDesc.fNear = 0.1f;
 	MainCamDesc.fFar = 1000.0f;
@@ -489,6 +489,21 @@ HRESULT CLevel_Park::Ready_Monsters()
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Phanta"), &tempDesc)))
 				return E_FAIL;
 		}
+		else if (L"SpookStep" == tempDesc.wstrModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SpookStep"), &tempDesc)))
+				return E_FAIL;
+		}
+		else if (L"GhostGordo" == tempDesc.wstrModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_GhostGordo"), &tempDesc)))
+				return E_FAIL;
+		}
+		else if (L"Bomber" == tempDesc.wstrModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Bomber"), &tempDesc)))
+				return E_FAIL;
+		}
 		else if (L"Kabu" == tempDesc.wstrModelName)
 		{
 			CKabu::KABU_DESC KabuDesc = {};
@@ -758,6 +773,18 @@ HRESULT CLevel_Park::Ready_Objects()
 		if ("FhEntranceAlien_NonAnim" == strModelName)
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_ParkFhEntranceAlien"), &tDesc)))
+				continue;
+		}
+
+		if ("SolarPanelCharge_NonAnim" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_ParkSolarPanelCharge"), &tDesc)))
+				continue;
+		}
+
+		if ("SolarPanelOnce_NonAnim" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_ParkSolarPanelOnce"), &tDesc)))
 				continue;
 		}
 

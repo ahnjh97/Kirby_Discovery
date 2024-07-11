@@ -1191,13 +1191,6 @@ HRESULT CRenderer::Render_EffectResult()
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_SSAO"), "g_SSAOTexture")))
 		return E_FAIL;
 
-	if (m_bMaptool == false)
-	{
-		// 이미시브도 문댄다.
-		if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Emissive"), "g_EmissiveTexture")))
-			return E_FAIL;
-	}
-
 	if (FAILED(m_pShader->Bind_RawValue("g_bMapTool", &m_bMaptool, sizeof(_bool))))
 		return E_FAIL;
 
@@ -1282,6 +1275,14 @@ HRESULT CRenderer::Render_Result()
 	// 그림자 안 그려지게끔 하는 용도이다.
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Stencil"), "g_StencilTexture")))
 		return E_FAIL;
+
+	if (m_bMaptool == false)
+	{
+		// 이미시브도 문댄다.
+		if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Emissive"), "g_EmissiveTexture")))
+			return E_FAIL;
+	}
+
 
 	// 섞을 이펙트들 (빛 상관 없는 애들)
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Blur_Y"), "g_BlurTexture")))

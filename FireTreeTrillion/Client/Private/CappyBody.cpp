@@ -45,8 +45,8 @@ HRESULT CCappyBody::Initialize(void* pArg)
 	m_pModelCom->Set_Animation(CAPPYBODY_HIDINGWAITA, 60.f, false, true);
 
 
-	m_fMaxHp = 15.f;
-	m_fHp = 15.f;
+	m_fMaxHp = 10.f;
+	m_fHp = 10.f;
 	m_fAttack = 10.f;
 	m_eVacuumSize = SIZE_SMALL;
 	m_eAbilityType = ABILITY_DEFAULT;
@@ -258,7 +258,7 @@ HRESULT CCappyBody::Add_Components()
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
 	desc.fOffset = 0.8f;
-	desc.tCapsuleShape.fHeight = 0.4f;
+	desc.tCapsuleShape.fRadius = 0.4f;
 	desc.tCapsuleShape.fHeight = 0.4f;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);

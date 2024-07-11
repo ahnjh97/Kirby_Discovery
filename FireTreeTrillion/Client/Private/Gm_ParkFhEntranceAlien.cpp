@@ -3,7 +3,7 @@
 
 #include "HitBox.h"
 #include "Kirby.h"
-#include "BreakableRockParticle.h"
+//#include "BreakableRockParticle.h"
 
 CGm_ParkFhEntranceAlien::CGm_ParkFhEntranceAlien(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }

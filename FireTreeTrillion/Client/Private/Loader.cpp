@@ -80,6 +80,9 @@
 #include "CappyHat.h"
 #include "Phanta.h"
 #include "SurprisedBoard.h"
+#include "SpookStep.h"
+#include "GhostGordo.h"
+#include "Bomber.h"
 
 // 보스 몬스터
 #include "FinalBoss.h"
@@ -163,6 +166,8 @@
 #include "Gm_LabAntenna.h"
 #include "Gm_LabBossRoomDoor.h"
 #include "Gm_ParkFhEntranceAlien.h"
+#include "Gm_ParkSolarPanelCharge.h"
+#include "Gm_ParkSolarPanelOnce.h"
 
 //UI
 #include "BackGround.h"
@@ -407,6 +412,9 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Phanta"), CPhanta);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SurprisedBoard"), CSurprisedBoard);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Crumble"), CCrumble);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SpookStep"), CSpookStep);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("GhostGordo"), CGhostGordo);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Bomber"), CBomber);
 	
 	// FinalBoss
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalBoss"), CFinalBoss);
@@ -490,6 +498,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	#pragma region GIMMICK::LEVEL_PARK
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_ParkFhEntranceAlien"), CGm_ParkFhEntranceAlien);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_ParkSolarPanelCharge"), CGm_ParkSolarPanelCharge);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_ParkSolarPanelOnce"), CGm_ParkSolarPanelOnce);
 
 	#pragma endregion
 
@@ -1003,6 +1013,10 @@ HRESULT CLoader::Loading_For_Park()
 
 	// 커비 얼굴 텍스쳐 로드
 	Add_KirbyFaceTexture(eLevel);
+
+	//Gm_ParkSolarPanelCharge
+	hr = Add_Texture(eLevel, "SolarPanelCharge_Lamp", "Gimmick/ParkSolarPanelCharge/AOsubC._%d.dds", 3);
+
 #pragma endregion
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
@@ -1903,10 +1917,13 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("FhEntranceAlien_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("FhEntranceAlien_NonAnim", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
-		m_vecModelInfo.emplace_back("WarpStar_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
-		m_vecModelInfo.emplace_back("SolarPanelOnce_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("SolarPanelCharge_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("SolarPanelCharge_NonAnim", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
+		m_vecModelInfo.emplace_back("SolarPanelOnce_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("SolarPanelOnce_NonAnim", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+
+		m_vecModelInfo.emplace_back("WarpStar_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 		// For Kirby Body
 		Load_KirbyBodyModels();
@@ -1920,6 +1937,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// Monster
 		m_vecModelInfo.emplace_back("Phanta", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("SpookStep", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("GhostGordo", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("Bomber", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("SurprisedBoardBlue", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("SurprisedBoardGreen", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("SurprisedBoardRed", TYPE_ANIM, 1.f, 180.f);
@@ -2191,6 +2211,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("FinalBoss", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("FinalBossSpear", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("Phanta", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("SpookStep", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("GhostGordo", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("Bomber", TYPE_ANIM, 1.f, 180.f);
 
 		m_vecModelInfo.emplace_back("FinaleBoss", TYPE_ANIM, 1.f);
 		// Boss

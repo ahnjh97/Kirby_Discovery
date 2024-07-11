@@ -244,18 +244,14 @@ float4 Blur_X(float2 vTexCoord)
         return vOut;
     
     float fTotal = 0.0;
-    float4 vEmissivedesc = 0.0;
+    
     for (int i = -6; i < 7; ++i)
     {
         vUV = vTexCoord + float2(1.f / (g_fTexW / 2) * i, 0);
         if (1.f == g_BlendTexture.Sample(ClampSampler, vUV).g)
             continue;
-
-        //맵툴이 아닐 때.
-        if (g_bMapTool == false)
-            vEmissivedesc = g_EmissiveTexture.Sample(ClampSampler, vUV);
         
-        vOut += fWeight[6 + i] * (g_EffectTexture.Sample(ClampSampler, vUV) + g_SpecularTexture.Sample(ClampSampler, vUV) + vEmissivedesc);
+        vOut += fWeight[6 + i] * (g_EffectTexture.Sample(ClampSampler, vUV) + g_SpecularTexture.Sample(ClampSampler, vUV));
         fTotal += fWeight[6 + i];
     }
 
@@ -1074,6 +1070,7 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
     vector vNormalDesc = g_NormalTexture.Sample(PointSampler, In.vTexcoord);
     float4 vNormal = float4(vNormalDesc.xyz * 2.f - 1.f, 0.f);
     
+    
     if (vRimLightDesc.g > 0.01f && vRimLightDesc.b == 1.f)
     {
         
@@ -1117,6 +1114,12 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
 
     // 기존 디퓨즈와 가산되어 그려진다.
     Out.vColor += vEffect + vBlur;
+    
+    //맵툴이 아닐 때.
+    if (g_bMapTool == false)
+        Out.vColor += g_EmissiveTexture.Sample(ClampSampler, In.vTexcoord);
+
+    
     
     if (g_DeferredInfoTexture.Sample(LinearSampler, In.vTexcoord).g == 1.f && g_StencilTexture.Sample(LinearSampler, In.vTexcoord).r != 1.f)
     {
