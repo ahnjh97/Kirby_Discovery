@@ -212,6 +212,23 @@ void CTransform::Look_At_Rotate(_vector vAt, _float fTimeDelta, _bool bXZ)
 	Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLerpLook) * vScaled.z);
 }
 
+void CTransform::Look_At_Rotate_Dir(_vector vDir, _float fTimeDelta)
+{
+	_vector vLook = Get_State_Vector(CTransform::STATE_LOOK);
+	_vector vTargetLook = vDir;
+
+	_vector vLerpLook = XMVectorLerp(XMVector3Normalize(vLook), XMVector3Normalize(vTargetLook), m_fRotationPerSec * fTimeDelta);
+
+	_vector vLerpRight = XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 0.f), vLerpLook);
+	_vector vLerpUp = XMVector3Cross(vLerpLook, vLerpRight);
+
+	_float3 vScaled = Get_Scaled();
+
+	Set_State(CTransform::STATE_RIGHT, XMVector3Normalize(vLerpRight) * vScaled.x);
+	Set_State(CTransform::STATE_UP, XMVector3Normalize(vLerpUp) * vScaled.y);
+	Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLerpLook) * vScaled.z);
+}
+
 void CTransform::Look_At_Interpolate(_vector vAt, _float fTimeDelta)
 {
 	_vector vLook = Get_State_Vector(CTransform::STATE_LOOK);

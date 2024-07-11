@@ -193,6 +193,8 @@
     <ClInclude Include="..\Public\BladeKnightSword.h" />
     <ClInclude Include="..\Public\BladeKnight_State.h" />
     <ClInclude Include="..\Public\BlendMapObject.h" />
+    <ClInclude Include="..\Public\Bomber.h" />
+    <ClInclude Include="..\Public\Bomber_State.h" />
     <ClInclude Include="..\Public\BombOrbit.h" />
     <ClInclude Include="..\Public\BombOrbitGlow.h" />
     <ClInclude Include="..\Public\BossClone.h" />
@@ -221,6 +223,8 @@
     <ClInclude Include="..\Public\Crumble.h" />
     <ClInclude Include="..\Public\Debris.h" />
     <ClInclude Include="..\public\DecoObject.h" />
+    <ClInclude Include="..\Public\GhostGordo.h" />
+    <ClInclude Include="..\Public\GhostGordo_State.h" />
     <ClInclude Include="..\Public\Deform.h" />
     <ClInclude Include="..\Public\FinaleBoss.h" />
     <ClInclude Include="..\Public\FinaleBoss_State.h" />
@@ -363,6 +367,8 @@
     <ClInclude Include="..\public\SkySphere.h" />
     <ClInclude Include="..\Public\SpikeSpear.h" />
     <ClInclude Include="..\Public\SkySphereSub.h" />
+    <ClInclude Include="..\Public\SpookStep.h" />
+    <ClInclude Include="..\Public\SpookStep_State.h" />
     <ClInclude Include="..\Public\StarBlock.h" />
     <ClInclude Include="..\Public\StarBlockPiece.h" />
     <ClInclude Include="..\Public\SurprisedBoard.h" />
@@ -422,6 +428,8 @@
     <ClCompile Include="..\Private\BladeKnightSword.cpp" />
     <ClCompile Include="..\Private\BladeKnight_State.cpp" />
     <ClCompile Include="..\Private\BlendMapObject.cpp" />
+    <ClCompile Include="..\Private\Bomber.cpp" />
+    <ClCompile Include="..\Private\Bomber_State.cpp" />
     <ClCompile Include="..\Private\BombOrbit.cpp" />
     <ClCompile Include="..\Private\BombOrbitGlow.cpp" />
     <ClCompile Include="..\Private\BossClone.cpp" />
@@ -450,6 +458,8 @@
     <ClCompile Include="..\Private\Crumble.cpp" />
     <ClCompile Include="..\Private\Debris.cpp" />
     <ClCompile Include="..\private\DecoObject.cpp" />
+    <ClCompile Include="..\Private\GhostGordo.cpp" />
+    <ClCompile Include="..\Private\GhostGordo_State.cpp" />
     <ClCompile Include="..\Private\Deform.cpp" />
     <ClCompile Include="..\Private\FinaleBoss.cpp" />
     <ClCompile Include="..\Private\FinaleBoss_State.cpp" />
@@ -590,6 +600,8 @@
     <ClCompile Include="..\private\SkySphere.cpp" />
     <ClCompile Include="..\Private\SpikeSpear.cpp" />
     <ClCompile Include="..\Private\SkySphereSub.cpp" />
+    <ClCompile Include="..\Private\SpookStep.cpp" />
+    <ClCompile Include="..\Private\SpookStep_State.cpp" />
     <ClCompile Include="..\Private\StarBlock.cpp" />
     <ClCompile Include="..\Private\StarBlockPiece.cpp" />
     <ClCompile Include="..\Private\SurprisedBoard.cpp" />
