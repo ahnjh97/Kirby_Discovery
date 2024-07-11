@@ -900,9 +900,9 @@ HRESULT CLoader::Loading_For_Parttime()
 	CHECK_FAILED(hr);
 
 	// 게임 DIGITS
-	hr = Add_Texture(eLevel, "TempWhiteDigits", "UI/TempDigits/timer_num_%d.png", 10);
+	hr = Add_Texture(eLevel, "TimeDigits", "UI/Parttime/TimeDigits/%d.png", 10);
 	CHECK_FAILED(hr);
-	hr = Add_Texture(eLevel, "TempRedDigits", "UI/TempDigits/red_num_%d.png", 10);
+	hr = Add_Texture(eLevel, "ScoreDigits", "UI/Parttime/ScoreDigits/%d.png", 10);
 	CHECK_FAILED(hr);
 
 #pragma endregion
@@ -936,13 +936,16 @@ HRESULT CLoader::Loading_For_Parttime()
 	hr = Add_Texture(eLevel, "GameFoodUI_energydrink",		"UI/MGameFood/energydrink.png");
 	hr = Add_Texture(eLevel, "GameFoodUI_burger",			"UI/MGameFood/burger.png");
 
+	// 시작 안내
+	hr = Add_Texture(eLevel, "Parttime_Ready",				"UI/Parttime/Text/Ready.png");
+	hr = Add_Texture(eLevel, "Parttime_Go",					"UI/Parttime/Text/Go.png");
+
 	// 결과 안내
-	hr = Add_Texture(eLevel, "GameFoodUI_FoodGameTextMask",	"UI/MGameFood/FoodGameTextMask.png");
+	hr = Add_Texture(eLevel, "Parttime_Finish",				"UI/Parttime/Text/Finish.png");
 	hr = Add_Texture(eLevel, "Fade",						"UI/Fade.png");
 
 	// 결과창
 	hr = Add_Texture(eLevel, "GameFoodUI_ResultBar",		"UI/MGameFood/result bar.png");
-	//hr = Add_Texture(eLevel, "GameFoodUI_ResultBar",		"UI/MGameFood/ClearText.png");
 	
 #pragma endregion
 
