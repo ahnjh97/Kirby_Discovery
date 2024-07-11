@@ -36,6 +36,7 @@ private:
 
 	_bool m_bPlayAnimation = { false };
 	_bool m_bMeshesRemoved = { false };
+	_bool m_bGlassBreak = { false };
 
 	_float m_fWhiteColorDiffuse = {};
 

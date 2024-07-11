@@ -13,6 +13,7 @@
 #include "KirbyBoom_State.h"
 #include "KirbyCar_State.h"
 #include "KirbyHammer_State.h"
+#include "KirbyBulb_State.h"
 
 #include "KirbyWeapons.h"
 #include "KirbyArmours.h"
@@ -22,14 +23,14 @@
 #include "Bone.h"
 #include "HitBox.h"
 #include "Camera_Main.h"
-
 #include "EventCenter.h"
 
 #include "Ability.h"
+#include "Deform.h"
 
 #include "Light.h"
 #include "Crumble.h"
-
+#include "BulbFlare.h"
 
 
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -77,17 +78,6 @@ HRESULT CKirby::Initialize(void* pArg)
 	m_pControllerCom->RegisterAsPlayer();
 	Set_WeaponAnim(3);
 
-	//LIGHT_DESC			LightDesc{};
-	//LightDesc.eType = LIGHT_DESC::TYPE_POINT;
-	//LightDesc.vPosition = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
-	//LightDesc.fRange = 5.f;
-	//LightDesc.vDiffuse = _float4(.5f, 0.5f, 0.5f, 1.f);
-	//LightDesc.vAmbient = _float4(.5f, .5f, .5f, 1.f);
-	//LightDesc.vSpecular = _float4(0.f, 0.f, 0.0f, 1.f);
-	//if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
-	//	 return E_FAIL;
-	//m_pLight = CGameInstance::Get_Instance()->Get_LightLastAddress();
-	//Safe_AddRef(m_pLight);
 
 	return S_OK;
 }
@@ -96,10 +86,6 @@ _int CKirby::Tick(_float fTimeDelta)
 {
 	if (m_bDead == true)
 		return OBJ_DEAD;
-
-	//if (m_pLight != nullptr)
-	//	m_pLight->Update_LightPos(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
-
 
 	m_fTimeDelta = m_pGameInstance->Get_FirstTimer();
 	HitStop_System(fTimeDelta);
@@ -133,7 +119,8 @@ void CKirby::Late_Tick(_float fTimeDelta)
 	if (INFO(m_eBodyState) != BODY_DEFAULT)
 		m_pModelCom[BODY_DEFAULT]->Play_Animation(m_fTimeDelta);
 
-	if ((INFO(m_eBodyState) == BODY_CARDEFAULT || INFO(m_eBodyState) == BODY_CARVACUUM ) == false)
+	if ((INFO(m_eBodyState) == BODY_CARDEFAULT || INFO(m_eBodyState) == BODY_CARVACUUM ||
+		INFO(m_eBodyState) == BODY_BULBDEFAULT || INFO(m_eBodyState) == BODY_BULBVACUUM) == false)
 		m_pWeapons->Late_Tick(m_fTimeDelta);
 
 	m_pArmours->Late_Tick(m_fTimeDelta);
@@ -151,6 +138,12 @@ void CKirby::Late_Tick(_float fTimeDelta)
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND,	 this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW,		 this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_DEFERREDINFO, this);
+
+	if (INFO(m_eBodyState) == BODY_BULBDEFAULT || INFO(m_eBodyState) == BODY_BULBVACUUM)
+	{
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
+		m_iRenderCount = 1;
+	}
 }
 
 HRESULT CKirby::Render()
@@ -163,6 +156,9 @@ HRESULT CKirby::Render()
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
 		if (Kirby_FaceCustom(INFO(m_eBodyState), i) == true)
+			continue;
+
+		if (m_iRenderCount == 0)
 			continue;
 
 		if (FAILED(m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
@@ -194,6 +190,8 @@ HRESULT CKirby::Render()
 		m_pModelCom[INFO(m_eBodyState)]->Render(i);
 	}
 
+
+	m_iRenderCount--;
 	return S_OK;
 }
 
@@ -409,6 +407,12 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 					Change_State(CARSTATE_DAMAGE, 60.f, false, false, BODY_CARDEFAULT, OFFSET_CAR);
 				}
 			}
+			else if (INFO(m_eBodyState) == BODY_BULBDEFAULT)
+			{
+				Change_State(BULBSTATE_DAMAGE, 60.f, false, false, BODY_BULBDEFAULT, OFFSET_BULB);
+				INFO(m_pLight)->Interpolate_Light(_float4(0.7f, 0.2f, 0.2f, 0.f), 3.f, 1.f);
+				INFO(m_bLightOn) = false;
+			}
 			else
 			{
 				Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
@@ -517,7 +521,15 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 
 		if (pObject->Get_PhyXState() == PO_VACUUMING)
 		{
-			Change_State(CARVACUUMSTATE_DEFORM, 60.f, false, false, BODY_CARVACUUM, OFFSET_CARVACUUM);
+			if (static_cast<CDeform*>(pObject)->Get_DeformType() == CDeform::DEFORM_CAR)
+			{
+				Change_State(CARVACUUMSTATE_DEFORM, 60.f, false, false, BODY_CARVACUUM, OFFSET_CARVACUUM);
+			}
+			else if (static_cast<CDeform*>(pObject)->Get_DeformType() == CDeform::DEFORM_BULB)
+			{
+				Change_State(BULBVACUUMSTATE_DEFORM, 60.f, false, false, BODY_BULBVACUUM, OFFSET_BULBVACUUM);
+			}
+
 			INFO(m_pObject)->Set_Dead();
 			Safe_Release(INFO(m_pObject));
 			INFO(m_pObject) = nullptr;
@@ -789,31 +801,10 @@ void CKirby::Key_Input(_float fTimeDelta)
 		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
 	}
 
-	//특정 레벨에서 덤프할 경우 크래시 발생으로 예외 처리
-	//디버깅이 필요할 경우 레벨 별 조건 처리하면 됨
-	LEVEL eCurLevel = (LEVEL)*m_pGameInstance->Get_CurrentLevelID();
-	if (LEVEL_RACING == eCurLevel || LEVEL_GAMEPLAY == eCurLevel)
+	if (m_pGameInstance->Get_DIKeyState(DIK_B, KEY_DOWN))
 	{
-		if (m_pGameInstance->Get_DIKeyState(DIK_B, KEY_DOWN))
-		{
-			Change_State(CARVACUUMSTATE_DEFORM, 60.f, false, false, BODY_CARVACUUM, OFFSET_CARVACUUM);
-		}
-		if (m_pGameInstance->Get_DIKeyState(DIK_N, KEY_DOWN))
-		{
-			CGameObject::GAMEOBJECT_DESC ObjDesc{};
-
-			ObjDesc.fSpeedPerSec = 5.f;
-			ObjDesc.fRotationPerSec = ToRadian(90.f);
-			_float4x4 InitMat = _float4x4::Identity;
-			InitMat.Translation({ -50.f, 5.f, -6.5f });
-			ObjDesc.matWorld = InitMat;
-			ObjDesc.wstrModelName = TEXT("RockA");
-			// Car Test
-			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_INTRO, TEXT("Layer_Rock"), TEXT("Prototype_GameObject_BreakableRock"), &ObjDesc)))
-				return;
-		}
-	}
-
+		Change_State(BULBVACUUMSTATE_DEFORM, 60.f, false, false, BODY_BULBVACUUM, OFFSET_BULBVACUUM);
+	}	
 #pragma endregion
 }
 
@@ -901,6 +892,17 @@ HRESULT CKirby::Add_Components()
 	hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyHammerDefault"),
 		TEXT("Com_Model_HammerDefault"), (CComponent**)&m_pModelCom[BODY_HAMMER]);
 	CHECK_FAILED(hr);
+
+	// 커비의 Bulb Default 상태 모델
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyBulbDefault"),
+		TEXT("Com_Model_BulbDefault"), (CComponent**)&m_pModelCom[BODY_BULBDEFAULT]);
+	CHECK_FAILED(hr);
+
+	// 커비의 Bulb Vacuum 상태 모델
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyBulbVacuum"),
+		TEXT("Com_Model_BulbVacuum"), (CComponent**)&m_pModelCom[BODY_BULBVACUUM]);
+	CHECK_FAILED(hr);
+
 
 #pragma endregion
 
@@ -1027,68 +1029,112 @@ HRESULT CKirby::Bind_ShaderResources()
 
 _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 {
-	// Default 상태의 입 부위 // Balloon 상태의 입 부위
-	if ((_eBodyState == BODY_DEFAULT && _iMeshIndex == 0) ||
-		(_eBodyState == BODY_BALLOON && _iMeshIndex == 4) ||
-		(_eBodyState == BODY_SWORDDEFAULT && _iMeshIndex == 0) ||
-		(_eBodyState == BODY_SWORDBALLOON && _iMeshIndex == 4) ||
-		(_eBodyState == BODY_BOOMDEFAULT && _iMeshIndex == 0) ||
-		(_eBodyState == BODY_HAMMER && _iMeshIndex == 0))
+	if (m_iRenderCount == 0)
 	{
-		m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
-		m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
-		m_pMouthTexture[INFO(m_eMouthState)]->Bind_ShaderResource(m_pShaderCom, "g_KirbyMouthTexture", 0);
+		if ((_eBodyState == BODY_BULBDEFAULT && _iMeshIndex == 2) ||
+			(_eBodyState == BODY_BULBDEFAULT && _iMeshIndex == 3) ||
+			(_eBodyState == BODY_BULBDEFAULT && _iMeshIndex == 1))
+		{
+			//m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
+			m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
+			_bool bRimLight = false;
+			m_pShaderCom->Bind_RawValue("g_vBulbColor", &m_vBulbColor, sizeof(_float4));
+			m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
 
-		m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float));
-		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
-
-
-		m_pShaderCom->Begin(ANIMMODEL_KIRBYMOUTH);
-		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
-		return true;
+			m_pShaderCom->Begin(ANIMMODEL_BULBLIGHT);
+			m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
+			return true;
+		}
 	}
-	// Default 상태의 눈 부위 // Vacuum 상태의 눈 부위 // Balloon 상태의 눈 부위
-	else if ((_eBodyState == BODY_DEFAULT && _iMeshIndex == 3) ||
-		(_eBodyState == BODY_VACUUM && _iMeshIndex == 2) ||
-		(_eBodyState == BODY_BALLOON && _iMeshIndex == 3) ||
-		(_eBodyState == BODY_SWORDDEFAULT && _iMeshIndex == 3) ||
-		(_eBodyState == BODY_SWORDBALLOON && _iMeshIndex == 3) ||
-		(_eBodyState == BODY_BOOMDEFAULT && _iMeshIndex == 3) ||
-		(_eBodyState == BODY_CARDEFAULT && _iMeshIndex == 3) ||
-		(_eBodyState == BODY_HAMMER && _iMeshIndex == 3))
+	else
 	{
-		m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
-		m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
-		m_pEyeTexture[INFO(m_eEyeState)]->Bind_ShaderResource(m_pShaderCom, "g_KirbyEyeTexture", 0);
+		// Default 상태의 입 부위 // Balloon 상태의 입 부위
+		if ((_eBodyState == BODY_DEFAULT && _iMeshIndex == 0) ||
+			(_eBodyState == BODY_BALLOON && _iMeshIndex == 4) ||
+			(_eBodyState == BODY_SWORDDEFAULT && _iMeshIndex == 0) ||
+			(_eBodyState == BODY_SWORDBALLOON && _iMeshIndex == 4) ||
+			(_eBodyState == BODY_BOOMDEFAULT && _iMeshIndex == 0) ||
+			(_eBodyState == BODY_HAMMER && _iMeshIndex == 0))
+		{
+			m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
+			m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
+			m_pMouthTexture[INFO(m_eMouthState)]->Bind_ShaderResource(m_pShaderCom, "g_KirbyMouthTexture", 0);
 
-		m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float));
-		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
+			m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float));
+			m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
 
-		m_pShaderCom->Begin(ANIMMODEL_KIRBYEYE);
-		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
-		return true;
-	}
-	// Vacuum 상태의 구강 부위
-	else if (_eBodyState == BODY_VACUUM && _iMeshIndex == 3)
-	{
-		m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
-		m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
 
-		_bool bRimLight = false;
-		m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
+			m_pShaderCom->Begin(ANIMMODEL_KIRBYMOUTH);
+			m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
+			return true;
+		}
+		// Default 상태의 눈 부위 // Vacuum 상태의 눈 부위 // Balloon 상태의 눈 부위
+		else if ((_eBodyState == BODY_DEFAULT && _iMeshIndex == 3) ||
+			(_eBodyState == BODY_VACUUM && _iMeshIndex == 2) ||
+			(_eBodyState == BODY_BALLOON && _iMeshIndex == 3) ||
+			(_eBodyState == BODY_SWORDDEFAULT && _iMeshIndex == 3) ||
+			(_eBodyState == BODY_SWORDBALLOON && _iMeshIndex == 3) ||
+			(_eBodyState == BODY_BOOMDEFAULT && _iMeshIndex == 3) ||
+			(_eBodyState == BODY_CARDEFAULT && _iMeshIndex == 3) ||
+			(_eBodyState == BODY_HAMMER && _iMeshIndex == 3) ||
+			(_eBodyState == BODY_BULBDEFAULT && _iMeshIndex == 4))
+		{
+			m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
+			m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
+			m_pEyeTexture[INFO(m_eEyeState)]->Bind_ShaderResource(m_pShaderCom, "g_KirbyEyeTexture", 0);
 
-		m_pShaderCom->Begin(ANIMMODEL_NORMAL_X);
-		m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
-		return true;
+			m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float));
+			m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
+
+			m_pShaderCom->Begin(ANIMMODEL_KIRBYEYE);
+			m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
+			return true;
+		}
+		// Vacuum 상태의 구강 부위
+		else if (_eBodyState == BODY_VACUUM && _iMeshIndex == 3)
+		{
+			m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
+			m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
+
+			_bool bRimLight = false;
+			m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
+
+			m_pShaderCom->Begin(ANIMMODEL_NORMAL_X);
+			m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
+			return true;
+		}
+		else if (
+			(_eBodyState == BODY_BULBDEFAULT && _iMeshIndex == 2) ||
+			(_eBodyState == BODY_BULBDEFAULT && _iMeshIndex == 3)
+			)
+
+		{
+			m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
+			m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
+
+			_bool bRimLight = false;
+			m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
+
+			m_pShaderCom->Begin(ANIMMODEL_ALPHABLEND);
+			m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
+			return true;
+		}
+
 	}
 
 	return false;
@@ -1288,6 +1334,31 @@ void CKirby::SetUp_FSM()
 	m_pFSM->Add_State(HAMMERSTATE_WHEELHAMMEREND, CKirbyHammer_JumpAttack_State::Create()); //
 #pragma endregion
 
+#pragma region 전구 애니메이션
+	m_pFSM->Add_State(BULBSTATE_DAMAGE, CKirbyBulb_Damage_State::Create());
+
+	m_pFSM->Add_State(BULBSTATE_DEMOENDFIRST, CKirbyBulb_Vacuum_State::Create());
+	m_pFSM->Add_State(BULBVACUUMSTATE_DEFORM, CKirbyBulb_Vacuum_State::Create());
+
+	m_pFSM->Add_State(BULBSTATE_WAIT, CKirbyBulb_Idle_State::Create());
+	m_pFSM->Add_State(BULBSTATE_WAITBRIGHT, CKirbyBulb_Idle_State::Create());
+
+	m_pFSM->Add_State(BULBSTATE_MOVE, CKirbyBulb_Run_State::Create());
+	m_pFSM->Add_State(BULBSTATE_MOVEBRIGHT, CKirbyBulb_Run_State::Create());
+	m_pFSM->Add_State(BULBSTATE_STOP, CKirbyBulb_Run_State::Create());
+	m_pFSM->Add_State(BULBSTATE_STOPBRIGHT, CKirbyBulb_Run_State::Create());
+
+	m_pFSM->Add_State(BULBSTATE_LIGHTON, CKirbyBulb_Light_State::Create());
+	m_pFSM->Add_State(BULBSTATE_LIGHTOFF, CKirbyBulb_Light_State::Create());
+
+	m_pFSM->Add_State(BULBSTATE_LIGHTONAIR, CKirbyBulb_Jump_State::Create());
+	m_pFSM->Add_State(BULBSTATE_JUMP, CKirbyBulb_Jump_State::Create());
+	m_pFSM->Add_State(BULBSTATE_LANDING, CKirbyBulb_Jump_State::Create());
+	m_pFSM->Add_State(BULBSTATE_LANDINGBRIGHT, CKirbyBulb_Jump_State::Create());
+	m_pFSM->Add_State(BULBSTATE_LANDINGEND, CKirbyBulb_Jump_State::Create());
+	m_pFSM->Add_State(BULBSTATE_LANDINGENDBRIGHT, CKirbyBulb_Jump_State::Create());
+	m_pFSM->Add_State(BULBSTATE_FALL, CKirbyBulb_Jump_State::Create());
+#pragma endregion
 
 
 	CFSM::FSM_INFO		FSM_Info_Desc = {};
@@ -1419,7 +1490,8 @@ void CKirby::RayCast_Crumbles()
 
 void CKirby::Update_PartObjectMatrix()
 {
-	if ((INFO(m_eBodyState) == BODY_CARDEFAULT || INFO(m_eBodyState) == BODY_CARVACUUM) == false)
+	if ((INFO(m_eBodyState) == BODY_CARDEFAULT || INFO(m_eBodyState) == BODY_CARVACUUM || 
+		INFO(m_eBodyState) == BODY_BULBDEFAULT || INFO(m_eBodyState) == BODY_BULBVACUUM) == false)
 		m_WeaponMatrix = *(m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("RHaveL")->Get_CombinedTransformationMatrix());
 
 	m_ArmourMatrix = *(m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("HatL")->Get_CombinedTransformationMatrix());
@@ -1650,13 +1722,35 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 		m_bMotionBlur = true;
 
 
+	if (INFO(m_eBodyState) == BODY_BULBDEFAULT)
+	{
+		if (INFO(m_bLightOn) == true)
+		{
+			_float4 vTargetColor = { 1.f, 1.f, 1.f, 1.f };
+			m_vBulbColor += (vTargetColor - m_vBulbColor) / (fTimeDelta * 300.f);
+
+			m_pBulbFlare->Set_Position(m_pTransformCom->Get_State(CTransform::STATE_POSITION), true);
+		}
+		else if (INFO(m_bLightOn) == false)
+		{
+			_float4 vTargetColor = { 0.3f, 0.1f, 0.1f, 0.25f };
+			m_vBulbColor += (vTargetColor - m_vBulbColor) / (fTimeDelta * 300.f);
+
+			m_pBulbFlare->Set_Position(m_pTransformCom->Get_State(CTransform::STATE_POSITION), false);
+		}
+
+		m_pBulbFlare->Tick(fTimeDelta);
+		m_pBulbFlare->Late_Tick(fTimeDelta);
+
+	}
 
 
 	if (INFO(m_bDumpAbilityPress) == true &&
 		(m_pFSM->Get_State() == CKirby::STATE_IDLE || m_pFSM->Get_State() == CKirby::STATE_RUN ||
 			m_pFSM->Get_State() == CKirby::STATE_RUNSTART || m_pFSM->Get_State() == CKirby::SWORDSTATE_RUN ||
 			m_pFSM->Get_State() == CKirby::SWORDSTATE_WAIT || m_pFSM->Get_State() == CKirby::CARSTATE_IDLING ||
-			m_pFSM->Get_State() == CKirby::HAMMERSTATE_IDLE || m_pFSM->Get_State() == CKirby::HAMMERSTATE_RUN) == false)
+			m_pFSM->Get_State() == CKirby::HAMMERSTATE_IDLE || m_pFSM->Get_State() == CKirby::HAMMERSTATE_RUN ||
+			m_pFSM->Get_State() == CKirby::BULBSTATE_WAIT || m_pFSM->Get_State() == CKirby::BULBSTATE_MOVE) == false)
 		INFO(m_bDumpAbilityPress) = false;
 
 
@@ -1717,6 +1811,9 @@ HRESULT CKirby::Kirby_SystemInitialize()
 	Add_AnimEvent();
 	// 혹여나, 버그가 발생할까봐 확실하게 블러 true화
 	m_bMotionBlur = true;
+
+	m_pBulbFlare = static_cast<CBulbFlare*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_BulbFlare")));
+
 
 	return S_OK;
 }
@@ -1873,6 +1970,9 @@ void CKirby::Free()
 		Safe_Release(Glow);
 	m_OrbitGlows.clear();
 
-	//Safe_Release(m_pLight);
+	if (INFO(m_pLight) != nullptr)
+		Safe_Release(INFO(m_pLight));
+
+	Safe_Release(m_pBulbFlare);
 }
 

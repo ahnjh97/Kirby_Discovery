@@ -3,12 +3,12 @@
 #include "HitBox.h"
 
 CCar::CCar(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CPhysXObject{ pDevice, pContext }
+	: CDeform{ pDevice, pContext }
 {
 }
 
 CCar::CCar(const CCar& rhs)
-	: CPhysXObject{ rhs }
+	: CDeform{ rhs }
 {
 }
 
@@ -30,7 +30,7 @@ HRESULT CCar::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-
+	m_eDeformType = DEFORM_CAR;
 	m_eAnimIndex = CAR_FALL;
 	m_pModelCom->Set_Animation(m_eAnimIndex, 60.f, true, false);
 
@@ -215,23 +215,6 @@ HRESULT CCar::Bind_ShaderResources()
 	return S_OK;
 }
 
-void CCar::Compute_MotionBlur()
-{
-	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-	_matrix ViewProjectionMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW) * m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
-	_vector vScreenPos = XMVector3TransformCoord(vPos, ViewProjectionMatrix);
-	_float fScreenX = (XMVectorGetX(vScreenPos) + 1.f) * 0.5f;
-	_float fScreenY = (XMVectorGetY(vScreenPos) + 1.f) * 0.5f;
-
-	_float2 vCurScreenPos = _float2(fScreenX, 1.f - fScreenY);
-
-	m_vMotionVelocity.x = (m_vPreScreenPos - vCurScreenPos).x;
-	m_vMotionVelocity.y = (m_vPreScreenPos - vCurScreenPos).y;
-	m_vMotionVelocity.z = m_ePhyXState != PO_NORMAL ? 1.f : 0.f;
-
-	m_vPreScreenPos = vCurScreenPos;
-}
-
 void CCar::Set_Animation()
 {
 	if (m_ePreAnimIndex == m_eAnimIndex)
@@ -287,6 +270,4 @@ void CCar::Free()
 {
 	__super::Free();
 	Safe_Release(m_pModelCom);
-	Safe_Release(m_pControllerCom);
-	Safe_Release(m_pShaderCom);
 }

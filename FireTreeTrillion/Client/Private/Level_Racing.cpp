@@ -46,9 +46,6 @@ HRESULT CLevel_Racing::Initialize()
 	hr = Ready_Layer_BackGround(TEXT("Layer_BackGround"));
 	CHECK_FAILED(hr);
 
-	hr = Ready_Layer_UI(TEXT("Layer_UI"));
-	CHECK_FAILED(hr);
-
 	_float fXOffset = -200.f;
 	_float fZOffset = 1200.f;
 	fXOffset = fZOffset = 0;
@@ -66,11 +63,18 @@ HRESULT CLevel_Racing::Initialize()
 	hr = Ready_Objects(fXOffset, fZOffset);
 	CHECK_FAILED(hr);
 
+	hr = Ready_Layer_UI(TEXT("Layer_UI"));
+	CHECK_FAILED(hr);
+
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
 	CGameObject* pGameObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar"));
 	CTransingStar* pTransingStar = static_cast<CTransingStar*>(pGameObj);
-	//pTransingStar->Activate(CTransingStar::OPEN);
+	pTransingStar->Activate(CTransingStar::OPEN);
+
+	hr = Ready_Layer_UI(TEXT("Layer_UI"));
+	CHECK_FAILED(hr);
+
 
 	return S_OK;
 }
@@ -90,7 +94,7 @@ HRESULT CLevel_Racing::Render()
 	++m_iFPS;
 
 	_tchar szFPS[MAX_PATH] = TEXT("");
-	wsprintf(szFPS, TEXT("Level Intro, %d FPS"), m_iFPS);
+	wsprintf(szFPS, TEXT("Level Racing, %d FPS"), m_iFPS);
 
 	if (m_fAccDelta >= 1.f)
 	{
@@ -110,8 +114,8 @@ HRESULT CLevel_Racing::Ready_Lights()
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
 	LightDesc.vDirection = _float4(0.f, -1.f, 0.f, 0.f);
 
-	LightDesc.vDiffuse = _float4(0.8f, 0.8f, 0.8f, 1.f);
-	LightDesc.vAmbient = _float4(0.6f, 0.6f, 0.6f, 1.f);
+	LightDesc.vDiffuse  = _float4(0.8f, 0.8f, 0.8f, 1.f);
+	LightDesc.vAmbient  = _float4(0.6f, 0.6f, 0.6f, 1.f);
 	LightDesc.vSpecular = _float4(0.2f, 0.2f, 0.2f, 1.f);
 
 	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
@@ -134,7 +138,7 @@ HRESULT CLevel_Racing::Ready_Layer_Camera(const wstring& strLayerTag)
 	MainCamDesc.vAt = _float4(0.f, -.2f, -1.f, 1.f);
 	MainCamDesc.fSpeedPerSec = 10.f;
 	MainCamDesc.fRotationPerSec = XMConvertToRadians(90.0f);
-	MainCamDesc.fOrigDistance = 25.f;
+	MainCamDesc.fOrigDistance = 20.f;
 	MainCamDesc.fCamSensor = .3f;
 
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_Camera_Main"), &MainCamDesc)))

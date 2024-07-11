@@ -57,7 +57,7 @@ HRESULT CFinaleKirby::Initialize(void* pArg)
     m_pControllerCom->RegisterAsPlayer();
 
     m_bSlope = false;
-    m_bRimLight = false;
+    //m_bRimLight = false;
 
     // 마지막 스테이지에서 운석을 지속적으로 날려주는 기능을 가진 클래스를 생성한다.
     if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Disaster_Master"), TEXT("Prototype_GameObject_Disaster_Master"), this)))
@@ -85,27 +85,42 @@ _int CFinaleKirby::Tick(_float fTimeDelta)
 
     HitStop_System(m_fTimeDelta);
 
-    // 커비의 기본적인 축 보정, 밸런스 보정을 담당한다.
-    Setting_KirbyBalance();
 
-    // 특정 상황에서 뼈를 돌려준다.
-    Bone_Rotation(m_fTimeDelta);
+    if (INFO(m_eBodyState) != BODY_DUMPCUT)
+    {
+        // 커비의 기본적인 축 보정, 밸런스 보정을 담당한다.
+        Setting_KirbyBalance();
 
-    // 유틸업데이트가 들어가있다. (FSM)
-    __super::Tick(m_fTimeDelta);
-    // 지면의 up벡터
-    PxVec3 slope = m_pControllerCom->Compute_Slope_DynamicActor(m_pTransformCom);
-    _vector vTerrainNormal = CUtils::To_Vector(slope);
-    Lerp_UpVector(vTerrainNormal, 20.f, fTimeDelta);
+        // 특정 상황에서 뼈를 돌려준다.
+        Bone_Rotation(m_fTimeDelta);
+
+        // 유틸업데이트가 들어가있다. (FSM)
+        __super::Tick(m_fTimeDelta);
+
+        // 지면의 up벡터
+        PxVec3 slope = m_pControllerCom->Compute_Slope_DynamicActor(m_pTransformCom);
+        _vector vTerrainNormal = CUtils::To_Vector(slope);
+        Lerp_UpVector(vTerrainNormal, 20.f, fTimeDelta);
+
+        //카메라에 전달해줄 z 앵글을 구하고, 세팅한다.
+        _float3 vUp = m_pTransformCom->Get_State(CTransform::STATE_UP);
+
+        _float fZRotAngle = ToDegree(atan2(vUp.x, vUp.y)) /** .2f*/;
+        static_cast<CCamera_Main*>(m_pCamera)->Set_ZAngle(fZRotAngle, .1f);
+
+        Kirby_SystemTick(m_fTimeDelta);
+
+        //확인을 위해 계속 갱신하겠슴_HS
+        m_vBonePos = Compute_RootPos();
+    }
+    else if (INFO(m_eBodyState) == BODY_DUMPCUT)
+    {
+        // 유틸업데이트가 들어가있다. (FSM)
+        __super::Tick(m_fTimeDelta);
+        m_vBonePos = Compute_RootPos();
+    }
 
 
-    //카메라에 전달해줄 z 앵글을 구하고, 세팅한다.
-    _float3 vUp = m_pTransformCom->Get_State(CTransform::STATE_UP);
-
-    _float fZRotAngle = ToDegree(atan2(vUp.x, vUp.y)) /** .2f*/;
-    static_cast<CCamera_Main*>(m_pCamera)->Set_ZAngle(fZRotAngle, .1f);
-
-    Kirby_SystemTick(m_fTimeDelta);
 
     return OBJ_NOEVENT;
 }
@@ -158,7 +173,7 @@ HRESULT CFinaleKirby::Render()
 
         if (INFO(m_eBodyState) == BODY_DUMPDEFAULT || Get_State() == DUMPTSTATE_CUT)
         {
-            if (FAILED(m_pShaderCom->Begin(/*ANIMMODEL_KIRBY*/14)))
+            if (FAILED(m_pShaderCom->Begin(/*ANIMMODEL_KIRBY*//*14*/ANIMMODEL_FINALEKIRBY_WEAPONS)))
                 return E_FAIL;
         }
         else
@@ -188,6 +203,7 @@ void CFinaleKirby::Render_IMGUI()
 
     _float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
     ImGui::Text("m_vPos.x : %.2f, m_vPos.y : %.2f m_vPos.z : %.2f", vPos.x, vPos.y, vPos.z);
+    ImGui::Text("m_vRPos.x : %.2f, m_vRPos.y : %.2f m_vRPos.z : %.2f", m_vBonePos.x, m_vBonePos.y, m_vBonePos.z);
     __super::Render_IMGUI();
 
 }
@@ -342,12 +358,6 @@ void CFinaleKirby::Kirby_SystemTick(_float fTimeDelta)
 
     if (INFO(m_eBodyState) == BODY_DUMPDEFAULT)
     {
-        //if (INFO(m_fMoveSpeed) > 0.f)
-        //{
-        //    _float fRadialPower = INFO(m_fMoveSpeed) * 0.2f;
-        //    m_pGameInstance->Setting_RadialBlur(fRadialPower, fRadialPower);
-        //}
-
         if (Get_State() == DUMPTSTATE_CUT)
         {
             m_bMotionBlur = false;
@@ -415,6 +425,18 @@ void CFinaleKirby::Kirby_StateInitialize()
     m_pModelCom[BODY_DEFAULT]->Set_Animation(STATE_IDLE, 60.f, true, true);
 }
 
+void CFinaleKirby::Start_CutScene()
+{
+    m_bMotionBlur = false;
+    m_bSlope = false;
+
+    // 카메라의 타겟을 바꿀까요?
+    CBone* pBone = m_pModelCom[BODY_DUMPCUT]->Get_BonePtr("TopL");
+    _float4x4 pBoneLocalMatrix = *pBone->Get_CombinedTransformationMatrix();
+    _float4x4 pBoneWorldMatrix = pBoneLocalMatrix * m_pTransformCom->Get_WorldFloat4x4();
+    m_vBonePos = CUtils::Get_State_Vector_Matrix(pBoneWorldMatrix, CUtils::STATE_POSITION);
+}
+
 HRESULT CFinaleKirby::Make_TargetToCams()
 {
     // 첫 카메라 기준으로 움직이기에 미리 받아둔다.
@@ -433,7 +455,7 @@ HRESULT CFinaleKirby::Make_TargetToCams()
         Safe_AddRef(m_pCamera);
     }
 
-    m_pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FIRST, { 0.f, 2.f, 3.f }, 5.f);
+    m_pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FINALE, /*{ 0.f, 2.f, 3.f }*/{0.f, 2.f, 0.f}, 5.f);
     static_cast<CCamera_Main*>(m_pCamera)->Make_Sequence(CCamera_Main::SEQ_FINALESTART);
 
     //게임 레벨에 free camera 있다면 그놈에게도 타겟 등록해 준다.
@@ -474,6 +496,11 @@ HRESULT CFinaleKirby::Add_Components()
     // 커비의 Dump Vacuum 상태 모델
     hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyDumpVacuum"),
         TEXT("Com_Model_DumpVacuum"), (CComponent**)&m_pModelCom[BODY_DUMPVACUUM]);
+    CHECK_FAILED(hr);
+
+    // 커비의 Dump Cut 상태 모델
+    hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyDumpCut"),
+        TEXT("Com_Model_DumpCut"), (CComponent**)&m_pModelCom[BODY_DUMPCUT]);
     CHECK_FAILED(hr);
 
 
@@ -548,6 +575,14 @@ HRESULT CFinaleKirby::Add_Components()
     SetUp_Event();
 
     return S_OK;
+}
+
+_float4 CFinaleKirby::Compute_RootPos()
+{
+    CBone* pBone = m_pModelCom[BODY_DUMPCUT]->Get_BonePtr("TopL");
+    _float4x4 pBoneLocalMatrix = *pBone->Get_CombinedTransformationMatrix();
+    _float4x4 pBoneWorldMatrix = pBoneLocalMatrix * m_pTransformCom->Get_WorldFloat4x4();
+    return CUtils::Get_State_Vector_Matrix(pBoneWorldMatrix, CUtils::STATE_POSITION);
 }
 
 HRESULT CFinaleKirby::Bind_ShaderResources()
@@ -638,14 +673,30 @@ void CFinaleKirby::SetUp_FSM()
     m_pFSM->Add_State(STATE_INHALE, CKirbyDump_Cut_State::Create());
     m_pFSM->Add_State(STATE_SUPERINHALESTART, CKirbyDump_Cut_State::Create());
     m_pFSM->Add_State(STATE_VACUUM, CKirbyDump_Cut_State::Create());
-
-    //m_pFSM->Add_State(DUMPSTATE_DAMAGE, CKirbyDump_Cut_State::Create());
     m_pFSM->Add_State(DUMPTSTATE_CUT, CKirbyDump_Cut_State::Create());
+    m_pFSM->Add_State(DUMPSTATE_CUTDEMOKIRBY, CKirbyDump_Cut_State::Create());
+
     m_pFSM->Add_State(DUMPSTATE_IDLING, CKirbyDump_Run_State::Create());
     m_pFSM->Add_State(DUMPSTATE_JUMP, CKirbyDump_Jump_State::Create());
     m_pFSM->Add_State(DUMPSTATE_LANDING, CKirbyDump_Jump_State::Create());
 
-    m_pFSM->Add_State(DUMPSTATE_CUTDEMOKIRBY, CKirbyDump_Cut_State::Create());
+    m_pFSM->Add_State(DUMPCUTSTATE_CUT1, CKirbyDump_Cut2_State::Create());
+    m_pFSM->Add_State(DUMPCUTSTATE_CUT2, CKirbyDump_Cut2_State::Create());
+    m_pFSM->Add_State(DUMPCUTSTATE_CUT6, CKirbyDump_Cut2_State::Create());
+    m_pFSM->Add_State(DUMPCUTSTATE_CUT7, CKirbyDump_Cut2_State::Create());
+    m_pFSM->Add_State(DUMPCUTSTATE_CUT8, CKirbyDump_Cut2_State::Create());
+    m_pFSM->Add_State(DUMPCUTSTATE_CUT9, CKirbyDump_Cut2_State::Create());
+    m_pFSM->Add_State(DUMPCUTSTATE_CUT10, CKirbyDump_Cut2_State::Create());
+    m_pFSM->Add_State(DUMPCUTSTATE_CUT11, CKirbyDump_Cut2_State::Create());
+    m_pFSM->Add_State(DUMPCUTSTATE_CUT12, CKirbyDump_Cut2_State::Create());
+    m_pFSM->Add_State(DUMPCUTSTATE_CUT13, CKirbyDump_Cut2_State::Create());
+    m_pFSM->Add_State(DUMPCUTSTATE_CUT14, CKirbyDump_Cut2_State::Create());
+    m_pFSM->Add_State(DUMPCUTSTATE_CUT15, CKirbyDump_Cut2_State::Create());
+    m_pFSM->Add_State(DUMPCUTSTATE_CUT16, CKirbyDump_Cut2_State::Create());
+    m_pFSM->Add_State(DUMPCUTSTATE_CUT17, CKirbyDump_Cut2_State::Create());
+    m_pFSM->Add_State(DUMPCUTSTATE_CUT18, CKirbyDump_Cut2_State::Create());
+    m_pFSM->Add_State(DUMPCUTSTATE_CUT19, CKirbyDump_Cut2_State::Create());
+    m_pFSM->Add_State(DUMPCUTSTATE_CUT20, CKirbyDump_Cut2_State::Create());
 
     CFSM::FSM_INFO		FSM_Info_Desc = {};
     FSM_Info_Desc.iState = STATE_IDLE;

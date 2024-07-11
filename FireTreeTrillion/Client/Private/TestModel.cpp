@@ -207,7 +207,7 @@ void CTestModel::Late_Tick(_float fTimeDelta)
 
     //SetOn_Slope(fTimeDelta);
 
-    if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
+    //if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
     {
         //m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
         m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
@@ -320,7 +320,8 @@ HRESULT CTestModel::Add_Components()
     CHECK_FAILED(hr);
 
     /* For.Com_Model */
-    hr = __super::Add_Component(TEXT("Prototype_Component_Model_Crumble"),
+    hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyDumpCut"),
+    //hr = __super::Add_Component(TEXT("Prototype_Component_Model_Crumble"),
         TEXT("Com_Model"), (CComponent**)&m_pModelCom);
     CHECK_FAILED(hr);
     // for animTool

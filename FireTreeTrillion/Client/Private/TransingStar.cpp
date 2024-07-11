@@ -42,13 +42,18 @@ HRESULT CTransingStar::Initialize(void* pArg)
 
 _int CTransingStar::Tick(_float fTimeDelta)
 {
+    m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+
     // FOR TEST
-    //if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD1, KEY_DOWN))
-    //    Activate(CTransingStar::CLOSE);
-    //if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD2, KEY_DOWN))
-    //    Deactivate();
-    //if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD3, KEY_DOWN))
-    //    Activate(CTransingStar::OPEN);
+    if (m_pGameInstance->Get_DIKeyState(DIK_LALT, KEY_PRESS))
+    {
+        if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD1, KEY_DOWN))
+            Activate(CTransingStar::CLOSE);
+        if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD2, KEY_DOWN))
+            Deactivate();
+        if (m_pGameInstance->Get_DIKeyState(DIK_NUMPAD3, KEY_DOWN))
+            Activate(CTransingStar::OPEN);
+    }
 
 	if (m_eActivateType == TYPE_END) return OBJ_NOEVENT;
     switch (m_eActivateType)
@@ -60,14 +65,14 @@ _int CTransingStar::Tick(_float fTimeDelta)
             Tick_AlphaStar(fTimeDelta);
 
         if (CUtils::Get_Scaled_Matrix(m_arrayStarMatrix[1]).x != 0.f)
-            Tick_YeonDooStar(fTimeDelta);
+            Tick_YeonDooStar(m_fTimeDelta);
 
-        Tick_GreenStar(fTimeDelta);
+        Tick_GreenStar(m_fTimeDelta);
     }
     break;
     case OPEN:
     {
-        Tick_OpenAlphaStar(fTimeDelta);
+        Tick_OpenAlphaStar(m_fTimeDelta);
     }
     break;
     }
@@ -157,7 +162,7 @@ void CTransingStar::Deactivate()
 void CTransingStar::Tick_AlphaStar(_float fTimeDelta)
 {
     if (m_fAlphaTime > 0.f)
-        m_fAlphaTime -= fTimeDelta * TIMEDELTA_OFFSET;
+        m_fAlphaTime -= m_fTimeDelta * TIMEDELTA_OFFSET;
     else
         m_fAlphaTime = 0.f;
 
@@ -176,25 +181,25 @@ void CTransingStar::Tick_YeonDooStar(_float fTimeDelta)
     {
         // 연두 돌아가유
         if (m_bDeadYeonDoo)
-            CUtils::Turn_OtherMatrix(m_arrayStarMatrix[1], _float4(0.f, 0.f, 1.f, 0.f), fTimeDelta, 720.f);
+            CUtils::Turn_OtherMatrix(m_arrayStarMatrix[1], _float4(0.f, 0.f, 1.f, 0.f), m_fTimeDelta, 720.f);
         else
-            CUtils::Turn_OtherMatrix(m_arrayStarMatrix[1], _float4(0.f, 0.f, 1.f, 0.f), fTimeDelta * TIMEDELTA_OFFSET, g_fTurnOffset);
+            CUtils::Turn_OtherMatrix(m_arrayStarMatrix[1], _float4(0.f, 0.f, 1.f, 0.f), m_fTimeDelta * TIMEDELTA_OFFSET, g_fTurnOffset);
 
         // 연두 사이즈 감소
-        m_fDecreaseValue += fTimeDelta * m_fDecreaseOffset * TIMEDELTA_OFFSET;
+        m_fDecreaseValue += m_fTimeDelta * m_fDecreaseOffset * TIMEDELTA_OFFSET;
         CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[1], m_InitialSize.x - m_fDecreaseValue, m_InitialSize.y - m_fDecreaseValue, 1.f);
 
         // 연두가 투명해지는 조건 == m_fYeonDooTime(1초)가 되었을때
         if (m_fYeonDooTime <= 0.f)
             m_bDeadYeonDoo = true;
-        m_fYeonDooTime -= fTimeDelta * TIMEDELTA_OFFSET;
+        m_fYeonDooTime -= m_fTimeDelta * TIMEDELTA_OFFSET;
 
         // 사이즈가 다시 커지는 것에 대한 예외처리
-        if (m_InitialSize.x < m_fDecreaseValue)
+        if (m_InitialSize.x <= m_fDecreaseValue)
         {
             CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[1], 0.f, 0.f, 1.f);
-            HRESULT hr = m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, m_eNextLevel));
-            CHECK_FAILED(hr);
+            //HRESULT hr = m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, m_eNextLevel));
+            //CHECK_FAILED(hr);
         }
     }
     else // 연두별 배경 대기
@@ -235,7 +240,6 @@ void CTransingStar::RenderClose()
         hr = m_pVIBufferCom->Render();
         CHECK_FAILED(hr);
     }
-
 }
 
 void CTransingStar::Tick_OpenAlphaStar(_float fTimeDelta)
@@ -249,9 +253,9 @@ void CTransingStar::Tick_OpenAlphaStar(_float fTimeDelta)
         CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], m_InitialSize.x * 1.5f, m_InitialSize.y * 1.5f, 1.f);
     else // 커지면서 돌리기
     {
-        m_fAlphaTime += fTimeDelta * TIMEDELTA_OFFSET * 1.5f;
+        m_fAlphaTime += m_fTimeDelta * TIMEDELTA_OFFSET; // *1.5f;
         CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], m_InitialSize.x * m_fAlphaTime, m_InitialSize.y * m_fAlphaTime, 1.f);
-        CUtils::Turn_OtherMatrix(m_arrayStarMatrix[0], _float4(0.f, 0.f, 1.f, 0.f), fTimeDelta, 135.f);
+        CUtils::Turn_OtherMatrix(m_arrayStarMatrix[0], _float4(0.f, 0.f, 1.f, 0.f), m_fTimeDelta, 135.f);
     }
 
     // ---- 초록 별에 대한 처리 ----------------------------
@@ -282,6 +286,13 @@ void CTransingStar::RenderOpen()
         hr = m_pVIBufferCom->Render();
         CHECK_FAILED(hr);
     }
+}
+
+void CTransingStar::Change_Level(LEVEL eLevel)
+{
+    HRESULT hr(S_OK);
+    hr = m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, eLevel));
+    CHECK_FAILED(hr);
 }
 
 HRESULT CTransingStar::Add_Components()

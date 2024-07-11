@@ -17,7 +17,6 @@
 #include "BG.h"
 #include "HUD.h"
 #include "SkySphere.h"
-//#include "Kirby.h"
 
 CLevel_Finale::CLevel_Finale(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -37,6 +36,13 @@ HRESULT CLevel_Finale::Initialize()
 
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinalePartical_Maker"), TEXT("Prototype_GameObject_FinalePartical_Maker"))))
 		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleCut_ControlCenter"), TEXT("Prototype_GameObject_FinaleCut_ControlCenter"))))
+		return E_FAIL;
+
+	// 환경맵을 추가한다.
+	hr = Add_EnvMap();
+	CHECK_FAILED(hr);
 
 	hr = Ready_Lights();
 	CHECK_FAILED(hr);
@@ -96,7 +102,8 @@ HRESULT CLevel_Finale::Initialize()
 	m_pGameInstance->Setting_GodRay(_float4(5500.f, 850.f, 0.f, 1.f), 0.05f, 0.96815f, 0.9f, 0.9f, 0.5f);
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
-	m_pGameInstance->Set_ColorSet_ByIndex(4);
+	m_pGameInstance->Set_ColorSet_ByIndex(5);
+
 	return S_OK;
 }
 
@@ -212,8 +219,8 @@ HRESULT CLevel_Finale::Ready_FinaleRoad()
 	//_float3 vStartPos{ 139.f, -26.f, 4.8f };
 
 	Make_FinaleRoad(RTYPE_BUILDINGA, MOVECMD_STOP,
-		{ 139.f, -26.f, 4.8f },	{ .98f, .21f, .07f },
-		{ 139.f, -26.f, 4.8f },	{ 1.f, -.04f, .7f });
+		{ 137.f, -28.f, 4.8f },	{ .98f, .21f, .07f },
+		{ 137.f, -28.f, 4.8f },	{ 1.f, -.04f, .7f });
 
 
 	Make_FinaleRoad(RTYPE_BUILDINGC, MOVECMD_STOP,
@@ -245,7 +252,30 @@ HRESULT CLevel_Finale::Ready_FinaleRoad()
 		-10.f);
 
 
-	
+
+	//cut scene start building
+	Make_FinaleRoad(RTYPE_BUILDINGC, MOVECMD_STOP,
+		{ 1619.6f, -84.37f, -152.71f }, { .87f, .5f, .02f },
+		{ 1619.6f, -84.37f, -152.71f }, { .87f, .5f, .02f }, 30.f);
+
+	//Make_FinaleRoad(RTYPE_BUILDINGC, MOVECMD_COLLIDE,
+	//	{ 1619.6f, -84.37f, -152.71f }, { .78f, .62f, .04f },
+	//	{ 1619.6f, -84.37f, -152.71f }, { .87f, .5f, .02f }, 30.f);
+
+
+	//발판 1. 이후 start, dest position 반대로
+	Make_FinaleRoad(RTYPE_BUILDINGB, MOVECMD_ROTATE,
+		{ 1692.6f, -137.7f, -173.f }, { -.22f, .96f, -.16f },
+		{ 1692.6f, -137.7f, -173.f }, { -.34f, .7f, .63f }, 15.f);
+
+	Make_FinaleRoad(RTYPE_BUILDINGC, MOVECMD_ROTATE,
+		{ 1747.6f, -7.f, -149.3f }, { .89f, .2f, -.4f },
+		{ 1747.6f, -7.f, -149.3f }, { .89f, .2f, -.4f }, 180.f);
+
+	Make_FinaleRoad(RTYPE_BUILDINGC, MOVECMD_ROTATE,
+		{ 1842.2f, 7.f, -211.8f }, { .92f, .18f, .36f },
+		{ 1842.2f, 7.f, -211.8f }, { .92f, .18f, .36f }, -120.f);
+
 	/*
 	//(아래) 도로 B
 	roadGrouperDesc = {};
@@ -569,6 +599,11 @@ HRESULT CLevel_Finale::Ready_Monsters()
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BladeKnight"), &tempDesc)))
 				return E_FAIL;
 		}
+		else if (L"FinaleBoss" == tempDesc.wstrModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_FinaleBoss"), &tempDesc)))
+				return E_FAIL;
+		}
 		else if (L"PoppyBrosJr" == tempDesc.wstrModelName)
 		{
 			CPoppyBrosJr::POPPY_DESC PoppyDesc = {};
@@ -823,6 +858,38 @@ void CLevel_Finale::Make_FinaleRoad(ROADTYPE eType, MOVECMD eMoveType, _float3 v
 
 }
 
+HRESULT CLevel_Finale::Add_EnvMap()
+{
+	HRESULT hr;
+
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Level_FInale_Env"),
+		TEXT("Com_Texture1"), (CComponent**)&m_pEnvTexture[TYPE_ENV]);
+	CHECK_FAILED(hr);
+
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_BRDF_LUT"),
+		TEXT("Com_Texture2"), (CComponent**)&m_pEnvTexture[TYPE_LUT]);
+	CHECK_FAILED(hr);
+
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_RandomNormal"),
+		TEXT("Com_Texture3"), (CComponent**)&m_pEnvTexture[TYPE_NORMAL]);
+	CHECK_FAILED(hr);
+
+
+	// 환경맵을 던진다.
+	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture[TYPE_ENV], "g_EnvTexture")))
+		return E_FAIL;
+
+	//LUT 던진다.
+	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture[TYPE_LUT], "g_LUTTexture")))
+		return E_FAIL;
+
+	//Normal 던진다.
+	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture[TYPE_NORMAL], "g_RandomNormalTexture")))
+		return E_FAIL;
+
+	return S_OK;
+}
+
 CLevel_Finale* CLevel_Finale::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CLevel_Finale* pInstance = new CLevel_Finale(pDevice, pContext);
@@ -839,6 +906,8 @@ CLevel_Finale* CLevel_Finale::Create(ID3D11Device* pDevice, ID3D11DeviceContext*
 void CLevel_Finale::Free()
 {
 	__super::Free();
+	for (auto& tex : m_pEnvTexture)
+		Safe_Release(tex);
 
 }
 

@@ -7,6 +7,8 @@ matrix	g_BoneMatrices[512];
 texture2D	g_DiffuseTexture;
 texture2D	g_NormalTexture;
 texture2D   g_MRATexture;
+texture2D   g_EmissiveTexture;
+
 
 texture2D g_KirbyMouthTexture;
 texture2D g_KirbyEyeTexture;
@@ -20,6 +22,8 @@ bool g_bMotionBlur;
 float4 g_vMotionVelocity;
 float g_fWhiteColorDiffuse;
 float g_fOverPowerColor;
+
+float4 g_vBulbColor;
 
 
 struct VS_IN
@@ -97,7 +101,7 @@ struct PS_OUT
 	float4		vNormal : SV_TARGET1;
 	float4		vDepth : SV_TARGET2;
     float4		vRimLight : SV_TARGET3;
-    float4		vFieldDepth : SV_TARGET4;
+    float4		vEmissive : SV_TARGET4;
     float4		vStencil : SV_TARGET5;
     float4      vMotionBlur : SV_TARGET6;
     float4      vMRA : SV_TARGET7;
@@ -113,6 +117,13 @@ struct PS_OUT_EFFECT
 struct PS_OUT_LIGHTDEPTH
 {
     float4 vLightDepth : SV_TARGET0;
+};
+
+struct PS_OUT_DEFERRED
+{
+    float4 vDeferredInfo : SV_TARGET0;
+    float4 vEmissive : SV_TARGET1;
+
 };
 
 PS_OUT PS_MAIN(PS_IN In)
@@ -380,15 +391,16 @@ PS_OUT_LIGHTDEPTH PS_MAIN_LIGHTDEPTH(PS_IN In)
 	return Out;	
 }
 
-PS_OUT_LIGHTDEPTH PS_MAIN_DEFERREDINFO(PS_IN In)
+PS_OUT_DEFERRED PS_MAIN_DEFERREDINFO(PS_IN In)
 {
-    PS_OUT_LIGHTDEPTH Out = (PS_OUT_LIGHTDEPTH) 0;
+    PS_OUT_DEFERRED Out = (PS_OUT_DEFERRED) 0;
     
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord);
     if (vMtrlDiffuse.a == 0.f)
         discard;
 
-    Out.vLightDepth = float4(0.f, 1.f, 0.f, 1.f);
+    Out.vDeferredInfo = float4(0.f, 1.f, 0.f, 1.f);
+
     return Out;
 }
 
@@ -556,11 +568,11 @@ PS_OUT PS_SIMBAEYE(PS_IN In)
 
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord);
     if (0.3f >= vMtrlDiffuse.a)
-        vMtrlDiffuse.rgb = float3(0, 0, 0);
+        vMtrlDiffuse.rgb = float3(1, 1, 1);
 
     vector vWhite = vector(1.f, 1.f, 1.f, 1.f);
     
-    vector mixedColor = lerp(vMtrlDiffuse, vWhite, g_fWhiteColorDiffuse);
+    //vector mixedColor = lerp(vMtrlDiffuse, vWhite, g_fWhiteColorDiffuse);
     
     vector vNormalDesc = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
 
@@ -570,7 +582,7 @@ PS_OUT PS_SIMBAEYE(PS_IN In)
 
     float3 vWorldNormal = mul(vNormal, WorldMatrix);
 
-    Out.vDiffuse = mixedColor;
+    Out.vDiffuse = vMtrlDiffuse;
     //Out.vDiffuse = vMtrlDiffuse + g_fWhiteColorDiffuse;
     Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
@@ -589,6 +601,31 @@ PS_OUT PS_SIMBAEYE(PS_IN In)
 
     return Out;
 }
+PS_OUT PS_BULBLIGHT(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrlDiffuse = g_vBulbColor;
+
+    Out.vDiffuse = vMtrlDiffuse + g_fWhiteColorDiffuse + g_fOverPowerColor;
+    Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
+    Out.vMRA = vector(0.f, 1.f, 1.f, 1.f);
+
+  
+    if (g_bStencil == true)
+        Out.vStencil = vector(1.f, 0.f, 0.0f, 1.f);
+    
+    if (g_bRimLight == true)
+        Out.vRimLight = vector(0.f, m_fRimWidth, 1.f, 1.f);
+
+    if (g_bMotionBlur == true)
+        Out.vMotionBlur = g_vMotionVelocity;
+    
+    return Out;
+
+}
+
 
 technique11 DefaultTechnique
 {
@@ -702,7 +739,7 @@ technique11 DefaultTechnique
     // 커비 전용 랜더 ( 8 )
     pass Kirby_Default
     {
-        SetRasterizerState(RS_Default);
+        SetRasterizerState(RS_NonCull);
         SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
@@ -825,7 +862,6 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_LINEAR_NORMAL_O_NONDISCARD();
     }
 
-
     // SimbaEye (17)
     pass SimbaEye
     {
@@ -839,4 +875,18 @@ technique11 DefaultTechnique
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_SIMBAEYE();
     }
+    // Bulb Light ( 18 )
+    pass BulbLight
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_BULBLIGHT();
+    }
+
 }

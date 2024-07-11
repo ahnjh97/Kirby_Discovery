@@ -45,6 +45,7 @@ public:
 	void						Tick_OpenAlphaStar(_float fTimeDelta);
 	void						RenderOpen();
 
+	void						Change_Level(LEVEL eLevel);
 
 private:
 	HRESULT						Add_Components();
@@ -72,6 +73,8 @@ private:
 
 	// 연두별 셰이더 처리
 	_bool						m_bDeadYeonDoo = false;
+
+	_float						m_fTimeDelta = _float();
 
 
 public:

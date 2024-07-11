@@ -20,6 +20,28 @@ public:
 		SEQ_FINALESTART,
 		SEQ_LUNCHTIME,
 
+		SEQ_FINALECUT1,
+		SEQ_FINALECUT2,
+		SEQ_FINALECUT3,
+		SEQ_FINALECUT4,
+		SEQ_FINALECUT5,
+		SEQ_FINALECUT6,
+		SEQ_FINALECUT7,
+		SEQ_FINALECUT8,
+		SEQ_FINALECUT9,
+		SEQ_FINALECUT10,
+		SEQ_FINALECUT11,
+		SEQ_FINALECUT12,
+		SEQ_FINALECUT13,
+		SEQ_FINALECUT14,
+		SEQ_FINALECUT15,
+		SEQ_FINALECUT16,
+		SEQ_FINALECUT17,
+		SEQ_FINALECUT18,
+		SEQ_FINALECUT19,
+		SEQ_FINALECUT20,
+
+
 		//단독으로 하나를 즉시 넣어 사용하는 시퀀스
 		SEQ_ONE,
 		SEQ_END
@@ -93,6 +115,7 @@ public:
 	//FOV를 세팅한다.
 	void Set_FOVY(_float fFOVYDegree) { m_fDestFovy = XMConvertToRadians(fFOVYDegree); }
 
+	//z 각도와, z 각도 보간 속도를 설정한다.
 	void Set_ZAngle(_float fZAngle, _float fInterpolateSpeed = -1.f)
 	{
 		m_fZAngleInterpolateSpeed = (fInterpolateSpeed != -1.f) ?
@@ -104,15 +127,12 @@ public:
 	//줌 수치를 설정한다.
 	void Zoom(_float fZoom)	{ m_fCurZoomOffset = fZoom; }
 
-	//카메라에게 특정 동작들을 시퀀스로 선예약한다.
-	void Make_Sequence(CAMSEQ eSeq);
 
 	//카메라 쉐이크 주기
-	void Make_Shake(_float fPower = 1.f, _float fTime = .5f, _float2 vDir = _float2(0.f, -1.f));
+	virtual void Make_Shake(_float fPower = 1.f, _float fTime = .5f, _float2 vDir = _float2(0.f, -1.f));
 
-	//void Make_Sequence_FromAngle(EASING eEaseFlag, _float fDuration, _float3 fDestAngle, _float fDestZoom = -1.f);
-	//void Make_Sequence_FromDir(EASING eEaseFlag, _float fDuration, _float3 fDestDir, _float fDestZoom = -1.f);
-	//void Make_Sequence_FromQuat(EASING eEaseFlag, _float fDuration, _vector vDestQuat, _float fDestZoom = -1.f);
+	//카메라에게 특정 동작들을 시퀀스로 선예약한다.
+	void Make_Sequence(CAMSEQ eSeq);
 
 	//카메라에게 동작을 수행시킨다.
 	void Make_One_Sequence(CAMACTION newAction);
@@ -126,11 +146,9 @@ public:
 	void EventFunc(CGameObject* pObj);
 
 
-
 	virtual void Lock_Position(_float3 vPos = { -1.f, -1.f, -1.f }, _bool bInterpolate = false) override;
 	virtual void Lock_Direction(_float3 vLook = { -1.f, -1.f, -1.f }, _bool bInterpolate = false) override;
 	virtual void Lock_All(_float3 vPos = { -1.f, -1.f, -1.f }, _float3 vLook = { -1.f, -1.f, -1.f }, _bool bInterpolate = false) override;
-
 
 
 	//카메라 목표 수치 계산
@@ -292,6 +310,10 @@ private:
 
 	//이펙트 소켓
 	_float4x4		m_EffectSocket;
+
+	_float			m_fSeqCheckTime = { 0.f };
+	_float			m_fSeqPlayedTime = { 0.f };
+	_float			m_fSeqTotalTime = { 0.f };
 
 private:
 	void Reset_DeferredCamSet();

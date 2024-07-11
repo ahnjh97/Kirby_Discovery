@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Client_Defines.h"
-#include "PhysXObject.h"
+#include "Deform.h"
 
 BEGIN(Engine)
 class CModel;
@@ -11,7 +11,7 @@ END
 
 BEGIN(Client)
 
-class CCar final : public CPhysXObject
+class CCar final : public CDeform
 {
 private:
 	CCar(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -39,13 +39,7 @@ private:
 	HRESULT			Add_Components();
 	HRESULT			Bind_ShaderResources();
 
-	void			Compute_MotionBlur();
-	_float2			m_vPreScreenPos = { 0.f, 0.f };
-	_float4			m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
-
 	CModel*						m_pModelCom = { nullptr };
-	CCharacterController*		m_pControllerCom = { nullptr };
-	CShader*					m_pShaderCom = { nullptr };
 
 	ANIMINDEX					m_eAnimIndex = { CAR_END };
 	ANIMINDEX					m_ePreAnimIndex = { CAR_END };

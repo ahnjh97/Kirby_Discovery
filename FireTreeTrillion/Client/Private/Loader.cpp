@@ -62,6 +62,7 @@
 #include "BombOrbit.h"
 #include "KirbyBomb.h"
 #include "PartTimerKirby.h"
+#include "BulbFlare.h"
 
 // 몬스터
 #include "KirbyWeapons.h"
@@ -94,6 +95,8 @@
 #include "BossClone.h"
 #include "Gully.h"
 
+#include "FinaleBoss.h"
+
 // 보스
 #include "DeeDeeDee.h"
 #include "DeeDeeDeeHammer.h"
@@ -117,6 +120,7 @@
 #include "BreakableRockParticle.h"
 #include "Car.h"
 #include "Dump.h"
+#include "Bulb.h"
 #include "BlendMapObject.h"
 #include "PortalSoftEffect.h"
 
@@ -156,6 +160,7 @@
 #include "FinalePartical.h"
 #include "FinaleBuildingPartical.h"
 #include "FinalePartical_Maker.h"
+#include "FinaleCut_ControlCenter.h"
 
 //기믹
 #include "Gm_LabAntenna.h"
@@ -383,10 +388,12 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BombOrbitGlow"), CBombOrbitGlow);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KirbyBomb"), CKirbyBomb);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PartTimerKirby"), CPartTimerKirby);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BulbFlare"), CBulbFlare);
 
 	// Deform
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Car"), CCar);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DumpCar"), CDump);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Bulb"), CBulb);
 
 	// Monster
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Awoofy"), CAwoofy);
@@ -418,6 +425,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BossClone"), CBossClone);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gully"), CGully);
 
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleBoss"), CFinaleBoss);
+
 	// Finale
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Baum"), CBaum);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BaumPiece"), CBaumPiece);
@@ -430,6 +439,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalePartical_Maker"), CFinalePartical_Maker);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalePartical"), CFinalePartical);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleBuildingPartical"), CFinaleBuildingPartical);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleCut_ControlCenter"), CFinaleCut_ControlCenter);
 
 	//Dee
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeePart"), CDee_Part);
@@ -898,9 +908,9 @@ HRESULT CLoader::Loading_For_Parttime()
 	CHECK_FAILED(hr);
 
 	// 게임 DIGITS
-	hr = Add_Texture(eLevel, "TempWhiteDigits", "UI/TempDigits/timer_num_%d.png", 10);
+	hr = Add_Texture(eLevel, "TimeDigits", "UI/Parttime/TimeDigits/%d.png", 10);
 	CHECK_FAILED(hr);
-	hr = Add_Texture(eLevel, "TempRedDigits", "UI/TempDigits/red_num_%d.png", 10);
+	hr = Add_Texture(eLevel, "ScoreDigits", "UI/Parttime/ScoreDigits/%d.png", 10);
 	CHECK_FAILED(hr);
 
 #pragma endregion
@@ -934,13 +944,16 @@ HRESULT CLoader::Loading_For_Parttime()
 	hr = Add_Texture(eLevel, "GameFoodUI_energydrink",		"UI/MGameFood/energydrink.png");
 	hr = Add_Texture(eLevel, "GameFoodUI_burger",			"UI/MGameFood/burger.png");
 
+	// 시작 안내
+	hr = Add_Texture(eLevel, "Parttime_Ready",				"UI/Parttime/Text/Ready.png");
+	hr = Add_Texture(eLevel, "Parttime_Go",					"UI/Parttime/Text/Go.png");
+
 	// 결과 안내
-	hr = Add_Texture(eLevel, "GameFoodUI_FoodGameTextMask",	"UI/MGameFood/FoodGameTextMask.png");
+	hr = Add_Texture(eLevel, "Parttime_Finish",				"UI/Parttime/Text/Finish.png");
 	hr = Add_Texture(eLevel, "Fade",						"UI/Fade.png");
 
 	// 결과창
 	hr = Add_Texture(eLevel, "GameFoodUI_ResultBar",		"UI/MGameFood/result bar.png");
-	//hr = Add_Texture(eLevel, "GameFoodUI_ResultBar",		"UI/MGameFood/ClearText.png");
 	
 #pragma endregion
 
@@ -1172,7 +1185,7 @@ HRESULT CLoader::Loading_For_Finale()
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Moon", "Moon.png")))
 		return E_FAIL;
-	if (FAILED(Add_Texture(eLevel, "Level_0_Env", "Map/Level_0_Env.dds")))
+	if (FAILED(Add_Texture(eLevel, "Level_FInale_Env", "Map/Level_FInale_Env.dds")))
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "BRDF_LUT", "Map/BRDF_LUT.png")))
 		return E_FAIL;
@@ -1283,6 +1296,12 @@ HRESULT CLoader::Loading_For_Tool_Anim()
 	hr = Add_Texture(eLevel, "cake", "UI/MGameFood/cake.png");
 	CHECK_FAILED(hr);
 	hr = Add_Texture(eLevel, "energydrink", "UI/MGameFood/energydrink.png");
+	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "SimbaEye_Diffuse", "SimbaEye/Eye_BaseColor%d.dds", 3);
+	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "SimbaEye_Normal", "SimbaEye/Eye_Normal%d.dds", 3);
+	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "SimbaEye_MRA", "SimbaEye/BaseMRA.dds");
 	CHECK_FAILED(hr);
 	#pragma endregion
 #pragma endregion
@@ -1640,7 +1659,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Car", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("RockA", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("RockB", TYPE_NONANIM, 1.f);
-		m_vecModelInfo.emplace_back("RockPartical", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("RockPartical", TYPE_NONANIM, 1.f);		
 
 		// For Monster
 		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.2f, 180.f);
@@ -1921,6 +1940,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	else if (eLevel == LEVEL_SIMBA)
 	{
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("NonRenderWall", TYPE_NONANIM, 0.01f, 1.f, 0, string("MapObjs/"));
 
 		m_vecModelInfo.emplace_back("Kirby", TYPE_ANIM, 1.f, 180.f);
 
@@ -2067,6 +2087,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("DumpCar", TYPE_ANIM, 0.8f, 90.f);
 
 		// For Boss 
+		m_vecModelInfo.emplace_back("FinaleBoss", TYPE_ANIM, 1.f);
+
 		m_vecModelInfo.emplace_back("FinalBoss", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("FinalBossSpear", TYPE_ANIM, 1.f);
 		m_vecModelInfo.emplace_back("RayArrow", TYPE_NONANIM, 1.f);
@@ -2182,6 +2204,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("GhostGordo", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("Bomber", TYPE_ANIM, 1.f, 180.f);
 
+		m_vecModelInfo.emplace_back("FinaleBoss", TYPE_ANIM, 1.f);
 		// Boss
 		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 180.f);
 		m_vecModelInfo.emplace_back("DeeDeeDeeHammer", TYPE_NONANIM, 1.0f);
@@ -2195,6 +2218,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		m_vecModelInfo.emplace_back("BreakableBlock", TYPE_ANIM, 0.5f, 0.f, 0);
 		m_vecModelInfo.emplace_back("Crumble", TYPE_ANIM);
+		m_vecModelInfo.emplace_back("Simba", TYPE_ANIM);
 	}
 }
 
@@ -2235,6 +2259,10 @@ HRESULT CLoader::Add_KirbyFaceTexture(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "mouth_surprise", "KirbyFace/mouth_surprise.png")))
 		return E_FAIL;
+
+	if (FAILED(Add_Texture(eLevel, "BulbFlare", "KirbyBulbFlare/BulbFlare.dds")))
+		return E_FAIL;
+
 
 	// Kirby Guide UI
 	if (FAILED(Add_Texture(eLevel, "BombOrbit", "KirbyBombOrbit/BombOrbit.dds")))
@@ -2507,8 +2535,14 @@ void CLoader::Load_KirbyBodyModels()
 	m_vecModelInfo.emplace_back("KirbyCarVacuum", TYPE_ANIM, 1.f, 180.f);
 	m_vecModelInfo.emplace_back("KirbyHammerDefault", TYPE_ANIM, 1.f, 180.f);
 	m_vecModelInfo.emplace_back("KirbyDumpDefault", TYPE_ANIM, 0.8f, 180.f);
-	m_vecModelInfo.emplace_back("KirbyDumpVacuum", TYPE_ANIM, 0.8f);
+	m_vecModelInfo.emplace_back("KirbyBulbDefault", TYPE_ANIM, 1.f, 180.f);
+	m_vecModelInfo.emplace_back("KirbyBulbVacuum", TYPE_ANIM, 1.f, 180.f);
 
+	m_vecModelInfo.emplace_back("KirbyDumpVacuum", TYPE_ANIM, 0.8f);
+	m_vecModelInfo.emplace_back("KirbyDumpCut", TYPE_ANIM, 0.8f);
+
+	// Deform
+	m_vecModelInfo.emplace_back("Bulb", TYPE_ANIM, 1.f, 180.f);
 }
 
 void CLoader::Load_KirbyWeaponModels()

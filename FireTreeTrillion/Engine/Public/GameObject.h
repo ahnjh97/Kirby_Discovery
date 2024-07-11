@@ -15,7 +15,7 @@ public:
 		_float		fRimWidth = { 0.2f };
 	}GAMEOBJECT_DESC;
 
-	enum COLLISION_VALUE { BODY, ATTACK, VALUE_END };
+	enum COLLISION_VALUE { BODY, ATTACK, ATTACK2, ATTACK3, VALUE_END };
 
 protected:
 	CGameObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -56,6 +56,7 @@ public:
 	virtual HRESULT		Initialize_Prototype();
 	virtual HRESULT		Initialize(void* pArg);
 	virtual _int		Tick(_float fTimeDelta);
+	virtual void		Event_Tick(_float fTimeDelta);
 	virtual void		Late_Tick(_float fTimeDelta);
 	virtual HRESULT		Render();
 	virtual HRESULT		Render_LightDepth() { return S_OK; }
@@ -67,16 +68,17 @@ public:
 
 public:
 	// 원기둥 (CYLINDER 전용)
-	void		Activate_CylinderCollider(_float fOffSetY, _float fHeight, _float fRadius);
+	void		Activate_CylinderCollider(_float fOffSetY, _float fHeight, _float fRadius, COLLISION_VALUE eColVal = ATTACK);
 	// 구 (SPHERE 전용)
-	void		Activate_SphereCollider(_float fOffSetY, _float fRadius);
+	void		Activate_SphereCollider(_float fOffSetY, _float fRadius, COLLISION_VALUE eColVal = ATTACK);
 	// 절두체 (FRUSTUM 전용)
-	void		Activate_FrustumCollider(_float fOffSetY, _float fRadius, _float fAngle);
+	void		Activate_FrustumCollider(_float fOffSetY, _float fRadius, _float fAngle, COLLISION_VALUE eColVal = ATTACK);
 	// 튜브 형태 전용
-	void		Activate_TubeCollider(_float fOffSetY, _float fHeight, _float fMinRadius, _float fMaxRadius);
+	void		Activate_TubeCollider(_float fOffSetY, _float fHeight, _float fMinRadius, _float fMaxRadius, COLLISION_VALUE eColVal = ATTACK);
 	// 몸 콜라이더 전용
 	void		Set_BodyCollider(HITBOX eType, _float fOffSetY, _float fHeight, _float fRadius);
 
+	void		Activate_Attack(COLLISION_VALUE eColVal = ATTACK) { m_tColliderDesc[eColVal].bAlive = true; }
 
 protected:
 	HRESULT				Add_Component(_uint iLevelIndex, const wstring& strPrototypeTag, const wstring& strComponentTag, class CComponent** ppOut, void* pArg = nullptr);
