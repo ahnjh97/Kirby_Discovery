@@ -1,27 +1,27 @@
 #include "stdafx.h"
-#include "Phanta.h"
+#include "Bomber.h"
 #include "FSM.h"
 #include "HitBox.h"
-#include "Phanta_State.h"
+#include "Bomber_State.h"
 
-CPhanta::CPhanta(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CBomber::CBomber(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
 {
 }
 
-CPhanta::CPhanta(const CPhanta& rhs)
+CBomber::CBomber(const CBomber& rhs)
 	: CMonster{ rhs }
 {
 }
 
-HRESULT CPhanta::Initialize_Prototype()
+HRESULT CBomber::Initialize_Prototype()
 {
 	m_eCollisionGroup = MONSTER;
 
 	return S_OK;
 }
 
-HRESULT CPhanta::Initialize(void* pArg)
+HRESULT CBomber::Initialize(void* pArg)
 {
 	GAMEOBJECT_DESC* pGameObjectDesc = nullptr;
 
@@ -39,7 +39,7 @@ HRESULT CPhanta::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	m_pModelCom->Set_Animation(PHANTA_APPEAR, 50.f, false, true);
+	m_pModelCom->Set_Animation(BOMBER_WAIT, 50.f, true, true);
 
 
 	m_fMaxHp = 5.f;
@@ -51,40 +51,29 @@ HRESULT CPhanta::Initialize(void* pArg)
 	return S_OK;
 }
 
-_int CPhanta::Tick(_float fTimeDelta)
+_int CBomber::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
 		return Ready_Dead();
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
-	// 만약, 밟히면 그 순간 그냥 찐빵되고 죽는다.
-	if (m_ePhyXState == PO_PRESSED)
-	{
-		m_pTransformCom->Set_Scaled(1.f, 0.1f, 1.f);
-		m_fPressedTime += m_fTimeDelta;
-
-		if (m_fPressedTime > 1.5f)
-			m_bDead = true;
-		return OBJ_NOEVENT;
-	}
-
 	__super::Tick(m_fTimeDelta);
 
 	if (m_ePhyXState == PO_VACUUMING || m_ePhyXState == PO_FLYDEADAWAY)
-		Change_State(PHANTA_DAMAGE, 50.f, false, true);
+		Change_State(BOMBER_DAMAGE, 50.f, false, true);
 
 
 	return OBJ_NOEVENT;
 }
 
-void CPhanta::Late_Tick(_float fTimeDelta)
+void CBomber::Late_Tick(_float fTimeDelta)
 {
 	// 커비 입 안에 있고, Fly가 아닐땐 입 안에 있는 상황이므로, Render되지않는다.
 	if (m_ePhyXState == PO_KIRBYMOUTH)
 		return;
 
-	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
+	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 20.0f))
 	{
 		// 날아갈 땐, 애니메이션 재생이 되지 않는다.
 		if (m_ePhyXState != PO_FLYAWAY)
@@ -97,7 +86,7 @@ void CPhanta::Late_Tick(_float fTimeDelta)
 	}
 }
 
-HRESULT CPhanta::Render()
+HRESULT CBomber::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
@@ -126,7 +115,7 @@ HRESULT CPhanta::Render()
 	return S_OK;
 }
 
-HRESULT CPhanta::Render_LightDepth()
+HRESULT CBomber::Render_LightDepth()
 {
 	if (FAILED(m_pGameInstance->Render_LightDepth_For_GameObject(m_pShaderCom, m_pTransformCom, m_pModelCom)))
 		return E_FAIL;
@@ -135,7 +124,7 @@ HRESULT CPhanta::Render_LightDepth()
 }
 
 #ifdef _DEBUG
-void CPhanta::Render_IMGUI()
+void CBomber::Render_IMGUI()
 {
 	if (ImGui::TreeNode("Guizmo"))
 	{
@@ -161,13 +150,13 @@ void CPhanta::Render_IMGUI()
 }
 #endif
 
-void CPhanta::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
+void CBomber::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
 	if (eContent == CCollisionCenter::CONTENT_BODY)
 	{
 		if (m_ePhyXState == PO_NORMAL)
 		{
-			Change_State(PHANTA_DAMAGE, 50.f, false, true);
+			Change_State(BOMBER_DAMAGE, 50.f, false, true);
 		}
 	}
 	else if (eContent == CCollisionCenter::CONTENT_VACUUMOBJECT)
@@ -178,22 +167,22 @@ void CPhanta::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* p
 	{
 		if (m_ePhyXState == PO_NORMAL)
 		{
-			Change_State(PHANTA_DAMAGE, 50.f, false, true);
+			Change_State(BOMBER_DAMAGE, 50.f, false, true);
 		}
 	}
 }
 
-void CPhanta::Change_State(PHANTA_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CBomber::Change_State(BOMBER_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
 {
 	m_pFSM->ChangeState((_uint)eState, _fAnimSpeed, _bLoop, _bInterpolation);
 }
 
-_bool CPhanta::IsAnimFinished()
+_bool CBomber::IsAnimFinished()
 {
 	return m_pModelCom->IsFinished();
 }
 
-HRESULT CPhanta::Add_Components()
+HRESULT CBomber::Add_Components()
 {
 	HRESULT hr;
 	/* For.Com_Shader */
@@ -202,7 +191,7 @@ HRESULT CPhanta::Add_Components()
 	CHECK_FAILED(hr);
 
 	/* For.Com_Model */
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Phanta"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Bomber"),
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
@@ -223,7 +212,6 @@ HRESULT CPhanta::Add_Components()
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 
-
 	CHitBox::HITBOX_DESC HitBox{};
 	HitBox.pOwner = this;
 	HitBox.pDesc = &m_tColliderDesc[BODY];
@@ -232,13 +220,14 @@ HRESULT CPhanta::Add_Components()
 		return E_FAIL;
 	Set_BodyCollider(COLLIDER_CYLINDER, 1.f, 2.f, 0.85f);
 
-
 	SetUp_FSM();
+
+	Set_Slope(false);
 
 	return S_OK;
 }
 
-HRESULT CPhanta::Bind_ShaderResources()
+HRESULT CBomber::Bind_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
@@ -267,34 +256,36 @@ HRESULT CPhanta::Bind_ShaderResources()
 	return S_OK;
 }
 
-void CPhanta::SetUp_FSM()
+void CBomber::SetUp_FSM()
 {
 	// FSM 상태 초기화
 	m_pFSM = CFSM::Create();
 
 	//상태 Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};
-	m_pFSM->Add_State(PHANTA_APPEAR, CPhanta_Idle_State::Create());
-	m_pFSM->Add_State(PHANTA_FLYINGFIND, CPhanta_Idle_State::Create());
+	m_pFSM->Add_State(BOMBER_WAIT, CBomber_Idle_State::Create());
 
-	m_pFSM->Add_State(PHANTA_ATTACK, CPhanta_Move_State::Create());
+	m_pFSM->Add_State(BOMBER_WALK, CBomber_Walk_State::Create());
 
-	m_pFSM->Add_State(PHANTA_DAMAGE, CPhanta_Damage_State::Create());
+	m_pFSM->Add_State(BOMBER_CLIFFFALLSTART, CBomber_Suicide_State::Create());
+	m_pFSM->Add_State(BOMBER_CLIFFFALL, CBomber_Suicide_State::Create());
+	m_pFSM->Add_State(BOMBER_CLIFFFALLLANDING, CBomber_Suicide_State::Create());
+	m_pFSM->Add_State(BOMBER_CLIFFFALLEND, CBomber_Suicide_State::Create());
 
-	m_pFSM->Add_State(PHANTA_BRAKE, CPhanta_Brake_State::Create());
+	m_pFSM->Add_State(BOMBER_EXPLOSION, CBomber_Explosion_State::Create());
 
-	FSM_Desc.iState = PHANTA_APPEAR;
+	FSM_Desc.iState = BOMBER_WAIT;
 	FSM_Desc.pModel = &m_pModelCom;
 	m_pFSM->Initialize(&FSM_Desc);
 }
 
-CPhanta* CPhanta::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CBomber* CBomber::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	CPhanta* pInstance = new CPhanta(pDevice, pContext);
+	CBomber* pInstance = new CBomber(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Create : CPhanta"));
+		MSG_BOX(TEXT("Failed To Create : CBomber"));
 
 		Safe_Release(pInstance);
 	}
@@ -302,20 +293,20 @@ CPhanta* CPhanta::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	return pInstance;
 }
 
-CGameObject* CPhanta::Clone(void* pArg)
+CGameObject* CBomber::Clone(void* pArg)
 {
-	CPhanta* pInstance = new CPhanta(*this);
+	CBomber* pInstance = new CBomber(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Clone : CPhanta"));
+		MSG_BOX(TEXT("Failed To Clone : CBomber"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CPhanta::Free()
+void CBomber::Free()
 {
 	__super::Free();
 }

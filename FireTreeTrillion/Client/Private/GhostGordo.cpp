@@ -1,27 +1,27 @@
 #include "stdafx.h"
-#include "Phanta.h"
+#include "GhostGordo.h"
 #include "FSM.h"
 #include "HitBox.h"
-#include "Phanta_State.h"
+#include "GhostGordo_State.h"
 
-CPhanta::CPhanta(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CGhostGordo::CGhostGordo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
 {
 }
 
-CPhanta::CPhanta(const CPhanta& rhs)
-	: CMonster{ rhs }
+CGhostGordo::CGhostGordo(const CGhostGordo& rhs)
+	: CMonster { rhs }
 {
 }
 
-HRESULT CPhanta::Initialize_Prototype()
+HRESULT CGhostGordo::Initialize_Prototype()
 {
 	m_eCollisionGroup = MONSTER;
 
 	return S_OK;
 }
 
-HRESULT CPhanta::Initialize(void* pArg)
+HRESULT CGhostGordo::Initialize(void* pArg)
 {
 	GAMEOBJECT_DESC* pGameObjectDesc = nullptr;
 
@@ -39,11 +39,11 @@ HRESULT CPhanta::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	m_pModelCom->Set_Animation(PHANTA_APPEAR, 50.f, false, true);
+	m_pModelCom->Set_Animation(GORDO_APPEAR, 50.f, false, true);
 
 
-	m_fMaxHp = 5.f;
-	m_fHp = 5.f;
+	//m_fMaxHp = 5.f;
+	//m_fHp = 5.f;
 	m_fAttack = 10.f;
 	m_eVacuumSize = SIZE_SMALL;
 	m_eAbilityType = ABILITY_DEFAULT;
@@ -51,34 +51,27 @@ HRESULT CPhanta::Initialize(void* pArg)
 	return S_OK;
 }
 
-_int CPhanta::Tick(_float fTimeDelta)
+_int CGhostGordo::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
 		return Ready_Dead();
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
-	// 만약, 밟히면 그 순간 그냥 찐빵되고 죽는다.
-	if (m_ePhyXState == PO_PRESSED)
-	{
-		m_pTransformCom->Set_Scaled(1.f, 0.1f, 1.f);
-		m_fPressedTime += m_fTimeDelta;
-
-		if (m_fPressedTime > 1.5f)
-			m_bDead = true;
-		return OBJ_NOEVENT;
-	}
+	if (m_pGameInstance->Get_DIKeyState(DIK_M, KEY_PRESS))
+		m_bLight = true;
+	else
+		m_bLight = false;
 
 	__super::Tick(m_fTimeDelta);
 
-	if (m_ePhyXState == PO_VACUUMING || m_ePhyXState == PO_FLYDEADAWAY)
-		Change_State(PHANTA_DAMAGE, 50.f, false, true);
-
+	//if (m_ePhyXState == PO_VACUUMING || m_ePhyXState == PO_FLYDEADAWAY)
+	//	Change_State(PHANTA_DAMAGE, 50.f, false, true);
 
 	return OBJ_NOEVENT;
 }
 
-void CPhanta::Late_Tick(_float fTimeDelta)
+void CGhostGordo::Late_Tick(_float fTimeDelta)
 {
 	// 커비 입 안에 있고, Fly가 아닐땐 입 안에 있는 상황이므로, Render되지않는다.
 	if (m_ePhyXState == PO_KIRBYMOUTH)
@@ -97,7 +90,7 @@ void CPhanta::Late_Tick(_float fTimeDelta)
 	}
 }
 
-HRESULT CPhanta::Render()
+HRESULT CGhostGordo::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
@@ -126,7 +119,7 @@ HRESULT CPhanta::Render()
 	return S_OK;
 }
 
-HRESULT CPhanta::Render_LightDepth()
+HRESULT CGhostGordo::Render_LightDepth()
 {
 	if (FAILED(m_pGameInstance->Render_LightDepth_For_GameObject(m_pShaderCom, m_pTransformCom, m_pModelCom)))
 		return E_FAIL;
@@ -135,7 +128,7 @@ HRESULT CPhanta::Render_LightDepth()
 }
 
 #ifdef _DEBUG
-void CPhanta::Render_IMGUI()
+void CGhostGordo::Render_IMGUI()
 {
 	if (ImGui::TreeNode("Guizmo"))
 	{
@@ -161,39 +154,39 @@ void CPhanta::Render_IMGUI()
 }
 #endif
 
-void CPhanta::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
+void CGhostGordo::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
-	if (eContent == CCollisionCenter::CONTENT_BODY)
-	{
-		if (m_ePhyXState == PO_NORMAL)
-		{
-			Change_State(PHANTA_DAMAGE, 50.f, false, true);
-		}
-	}
-	else if (eContent == CCollisionCenter::CONTENT_VACUUMOBJECT)
-	{
+	//if (eContent == CCollisionCenter::CONTENT_BODY)
+	//{
+	//	if (m_ePhyXState == PO_NORMAL)
+	//	{
+	//		Change_State(PHANTA_DAMAGE, 50.f, false, true);
+	//	}
+	//}
+	//else if (eContent == CCollisionCenter::CONTENT_VACUUMOBJECT)
+	//{
 
-	}
-	else if (eContent == CCollisionCenter::CONTENT_ATTACK)
-	{
-		if (m_ePhyXState == PO_NORMAL)
-		{
-			Change_State(PHANTA_DAMAGE, 50.f, false, true);
-		}
-	}
+	//}
+	//else if (eContent == CCollisionCenter::CONTENT_ATTACK)
+	//{
+	//	if (m_ePhyXState == PO_NORMAL)
+	//	{
+	//		Change_State(PHANTA_DAMAGE, 50.f, false, true);
+	//	}
+	//}
 }
 
-void CPhanta::Change_State(PHANTA_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CGhostGordo::Change_State(GORDO_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
 {
 	m_pFSM->ChangeState((_uint)eState, _fAnimSpeed, _bLoop, _bInterpolation);
 }
 
-_bool CPhanta::IsAnimFinished()
+_bool CGhostGordo::IsAnimFinished()
 {
 	return m_pModelCom->IsFinished();
 }
 
-HRESULT CPhanta::Add_Components()
+HRESULT CGhostGordo::Add_Components()
 {
 	HRESULT hr;
 	/* For.Com_Shader */
@@ -202,7 +195,7 @@ HRESULT CPhanta::Add_Components()
 	CHECK_FAILED(hr);
 
 	/* For.Com_Model */
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Phanta"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_GhostGordo"),
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
@@ -210,10 +203,10 @@ HRESULT CPhanta::Add_Components()
 	m_ppModelForAnimTool = &m_pModelCom;
 
 	/* For.Com_CharacterController */
-	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+	m_vOriginPosition = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
-	desc.vInitialPos = vPos;
-	desc.fOffset = 0.5f;
+	desc.vInitialPos = m_vOriginPosition;
+	desc.fOffset = 0.f;
 	desc.tCapsuleShape.fHeight = 0.4f;
 	desc.tCapsuleShape.fHeight = 0.4f;
 	desc.uCollisionType = m_eCollisionGroup;
@@ -221,8 +214,7 @@ HRESULT CPhanta::Add_Components()
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	//m_pControllerCom->Set_Object(this);
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
-
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vOriginPosition);
 
 	CHitBox::HITBOX_DESC HitBox{};
 	HitBox.pOwner = this;
@@ -232,13 +224,15 @@ HRESULT CPhanta::Add_Components()
 		return E_FAIL;
 	Set_BodyCollider(COLLIDER_CYLINDER, 1.f, 2.f, 0.85f);
 
+	m_vOriginLook = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+	m_vOriginLook.m128_f32[1] = 0.f;
 
 	SetUp_FSM();
 
 	return S_OK;
 }
 
-HRESULT CPhanta::Bind_ShaderResources()
+HRESULT CGhostGordo::Bind_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
@@ -261,40 +255,41 @@ HRESULT CPhanta::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
+
+	_float fWhite = { 0.f };
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &fWhite, sizeof(_float))))
 		return E_FAIL;
 
 	return S_OK;
 }
-
-void CPhanta::SetUp_FSM()
+ 
+void CGhostGordo::SetUp_FSM()
 {
 	// FSM 상태 초기화
 	m_pFSM = CFSM::Create();
 
 	//상태 Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};
-	m_pFSM->Add_State(PHANTA_APPEAR, CPhanta_Idle_State::Create());
-	m_pFSM->Add_State(PHANTA_FLYINGFIND, CPhanta_Idle_State::Create());
+	m_pFSM->Add_State(GORDO_APPEAR, CGhostGordo_Idle_State::Create());
+	m_pFSM->Add_State(GORDO_EYECLOSEWAIT, CGhostGordo_Idle_State::Create());
+	m_pFSM->Add_State(GORDO_EYEOPENSTART, CGhostGordo_Idle_State::Create());
 
-	m_pFSM->Add_State(PHANTA_ATTACK, CPhanta_Move_State::Create());
+	m_pFSM->Add_State(GORDO_EYEOPENWAIT, CGhostGordo_Move_State::Create());
 
-	m_pFSM->Add_State(PHANTA_DAMAGE, CPhanta_Damage_State::Create());
+	m_pFSM->Add_State(GORDO_LOOK, CGhostGordo_Look_State::Create());
 
-	m_pFSM->Add_State(PHANTA_BRAKE, CPhanta_Brake_State::Create());
-
-	FSM_Desc.iState = PHANTA_APPEAR;
+	FSM_Desc.iState = GORDO_APPEAR;
 	FSM_Desc.pModel = &m_pModelCom;
 	m_pFSM->Initialize(&FSM_Desc);
 }
 
-CPhanta* CPhanta::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CGhostGordo* CGhostGordo::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	CPhanta* pInstance = new CPhanta(pDevice, pContext);
+	CGhostGordo* pInstance = new CGhostGordo(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Create : CPhanta"));
+		MSG_BOX(TEXT("Failed To Create : CGhostGordo"));
 
 		Safe_Release(pInstance);
 	}
@@ -302,20 +297,20 @@ CPhanta* CPhanta::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	return pInstance;
 }
 
-CGameObject* CPhanta::Clone(void* pArg)
+CGameObject* CGhostGordo::Clone(void* pArg)
 {
-	CPhanta* pInstance = new CPhanta(*this);
+	CGhostGordo* pInstance = new CGhostGordo(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Clone : CPhanta"));
+		MSG_BOX(TEXT("Failed To Clone : CGhostGordo"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CPhanta::Free()
+void CGhostGordo::Free()
 {
 	__super::Free();
 }

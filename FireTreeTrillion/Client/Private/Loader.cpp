@@ -79,6 +79,9 @@
 #include "CappyHat.h"
 #include "Phanta.h"
 #include "SurprisedBoard.h"
+#include "SpookStep.h"
+#include "GhostGordo.h"
+#include "Bomber.h"
 
 // 보스 몬스터
 #include "FinalBoss.h"
@@ -400,6 +403,9 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Phanta"), CPhanta);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SurprisedBoard"), CSurprisedBoard);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Crumble"), CCrumble);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SpookStep"), CSpookStep);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("GhostGordo"), CGhostGordo);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Bomber"), CBomber);
 	
 	// FinalBoss
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalBoss"), CFinalBoss);
@@ -1901,6 +1907,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// Monster
 		m_vecModelInfo.emplace_back("Phanta", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("SpookStep", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("GhostGordo", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("Bomber", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("SurprisedBoardBlue", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("SurprisedBoardGreen", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("SurprisedBoardRed", TYPE_ANIM, 1.f, 180.f);
@@ -2169,6 +2178,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("FinalBoss", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("FinalBossSpear", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("Phanta", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("SpookStep", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("GhostGordo", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("Bomber", TYPE_ANIM, 1.f, 180.f);
 
 		// Boss
 		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 180.f);

@@ -10,20 +10,21 @@ END
 
 BEGIN(Client)
 
-class CPhanta final : public CMonster
+class CBomber final : public CMonster
 {
 public:
-	enum PHANTA_ANIM {
-		PHANTA_APPEAR, PHANTA_ATTACK, PHANTA_BRAKE, PHANTA_DAMAGE, PHANTA_DISAPPEAR, PHANTA_FIND, PHANTA_FLYINGATTACK, PHANTA_FLYINGFIND, PHANTA_MOVE, PHANTA_WAIT, PHANTA_END
+	enum BOMBER_ANIM {
+		BOMBER_CLIFFFALL, BOMBER_CLIFFFALLEND, BOMBER_CLIFFFALLLANDING, BOMBER_CLIFFFALLSTART, BOMBER_DAMAGE, BOMBER_EXPLOSION, BOMBER_FALL, BOMBER_FIND, 
+		BOMBER_FINDWAIT, BOMBER_WAIT, BOMBER_WALK, BOMBER_WALKFALL, BOMBER_END
 	};
 
-	//struct PHANTA_DESC : public CMonster::MONSTER_DESC {
+	//struct BOMBER_DESC : public CMonster::MONSTER_DESC {
 	//};
 
 private:
-	CPhanta(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CPhanta(const CPhanta& rhs);
-	virtual ~CPhanta() = default;
+	CBomber(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CBomber(const CBomber& rhs);
+	virtual ~CBomber() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -38,11 +39,11 @@ public:
 	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
 public:
-	void Change_State(PHANTA_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
+	void Change_State(BOMBER_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
 	_bool IsAnimFinished();
 
 private:
-	PHANTA_ANIM		m_eCurrentState = { PHANTA_END };
+	BOMBER_ANIM		m_eCurrentState = { BOMBER_END };
 
 private:
 	HRESULT Add_Components();
@@ -52,7 +53,7 @@ private:
 	void SetUp_FSM();
 
 public:
-	static CPhanta* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CBomber* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 };

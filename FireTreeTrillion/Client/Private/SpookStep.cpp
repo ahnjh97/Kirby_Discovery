@@ -1,27 +1,27 @@
 #include "stdafx.h"
-#include "Phanta.h"
+#include "SpookStep.h"
 #include "FSM.h"
 #include "HitBox.h"
-#include "Phanta_State.h"
+#include "SpookStep_State.h"
 
-CPhanta::CPhanta(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CSpookStep::CSpookStep(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
 {
 }
 
-CPhanta::CPhanta(const CPhanta& rhs)
+CSpookStep::CSpookStep(const CSpookStep& rhs)
 	: CMonster{ rhs }
 {
 }
 
-HRESULT CPhanta::Initialize_Prototype()
+HRESULT CSpookStep::Initialize_Prototype()
 {
 	m_eCollisionGroup = MONSTER;
 
 	return S_OK;
 }
 
-HRESULT CPhanta::Initialize(void* pArg)
+HRESULT CSpookStep::Initialize(void* pArg)
 {
 	GAMEOBJECT_DESC* pGameObjectDesc = nullptr;
 
@@ -39,7 +39,7 @@ HRESULT CPhanta::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	m_pModelCom->Set_Animation(PHANTA_APPEAR, 50.f, false, true);
+	m_pModelCom->Set_Animation(SPOOKSTEP_APPEAR, 30.f, false, true);
 
 
 	m_fMaxHp = 5.f;
@@ -51,7 +51,7 @@ HRESULT CPhanta::Initialize(void* pArg)
 	return S_OK;
 }
 
-_int CPhanta::Tick(_float fTimeDelta)
+_int CSpookStep::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
 		return Ready_Dead();
@@ -72,13 +72,13 @@ _int CPhanta::Tick(_float fTimeDelta)
 	__super::Tick(m_fTimeDelta);
 
 	if (m_ePhyXState == PO_VACUUMING || m_ePhyXState == PO_FLYDEADAWAY)
-		Change_State(PHANTA_DAMAGE, 50.f, false, true);
+		Change_State(SPOOKSTEP_DAMAGE, 50.f, false, true);
 
 
 	return OBJ_NOEVENT;
 }
 
-void CPhanta::Late_Tick(_float fTimeDelta)
+void CSpookStep::Late_Tick(_float fTimeDelta)
 {
 	// 커비 입 안에 있고, Fly가 아닐땐 입 안에 있는 상황이므로, Render되지않는다.
 	if (m_ePhyXState == PO_KIRBYMOUTH)
@@ -97,7 +97,7 @@ void CPhanta::Late_Tick(_float fTimeDelta)
 	}
 }
 
-HRESULT CPhanta::Render()
+HRESULT CSpookStep::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
@@ -126,7 +126,7 @@ HRESULT CPhanta::Render()
 	return S_OK;
 }
 
-HRESULT CPhanta::Render_LightDepth()
+HRESULT CSpookStep::Render_LightDepth()
 {
 	if (FAILED(m_pGameInstance->Render_LightDepth_For_GameObject(m_pShaderCom, m_pTransformCom, m_pModelCom)))
 		return E_FAIL;
@@ -135,7 +135,7 @@ HRESULT CPhanta::Render_LightDepth()
 }
 
 #ifdef _DEBUG
-void CPhanta::Render_IMGUI()
+void CSpookStep::Render_IMGUI()
 {
 	if (ImGui::TreeNode("Guizmo"))
 	{
@@ -161,13 +161,13 @@ void CPhanta::Render_IMGUI()
 }
 #endif
 
-void CPhanta::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
+void CSpookStep::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
 	if (eContent == CCollisionCenter::CONTENT_BODY)
 	{
 		if (m_ePhyXState == PO_NORMAL)
 		{
-			Change_State(PHANTA_DAMAGE, 50.f, false, true);
+			Change_State(SPOOKSTEP_DAMAGE, 50.f, false, true);
 		}
 	}
 	else if (eContent == CCollisionCenter::CONTENT_VACUUMOBJECT)
@@ -178,22 +178,22 @@ void CPhanta::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* p
 	{
 		if (m_ePhyXState == PO_NORMAL)
 		{
-			Change_State(PHANTA_DAMAGE, 50.f, false, true);
+			Change_State(SPOOKSTEP_DAMAGE, 50.f, false, true);
 		}
 	}
 }
 
-void CPhanta::Change_State(PHANTA_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
+void CSpookStep::Change_State(SPOOKSTEP_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
 {
 	m_pFSM->ChangeState((_uint)eState, _fAnimSpeed, _bLoop, _bInterpolation);
 }
 
-_bool CPhanta::IsAnimFinished()
+_bool CSpookStep::IsAnimFinished()
 {
 	return m_pModelCom->IsFinished();
 }
 
-HRESULT CPhanta::Add_Components()
+HRESULT CSpookStep::Add_Components()
 {
 	HRESULT hr;
 	/* For.Com_Shader */
@@ -202,7 +202,7 @@ HRESULT CPhanta::Add_Components()
 	CHECK_FAILED(hr);
 
 	/* For.Com_Model */
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Phanta"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_SpookStep"),
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
@@ -238,7 +238,7 @@ HRESULT CPhanta::Add_Components()
 	return S_OK;
 }
 
-HRESULT CPhanta::Bind_ShaderResources()
+HRESULT CSpookStep::Bind_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
@@ -267,34 +267,31 @@ HRESULT CPhanta::Bind_ShaderResources()
 	return S_OK;
 }
 
-void CPhanta::SetUp_FSM()
+void CSpookStep::SetUp_FSM()
 {
 	// FSM 상태 초기화
 	m_pFSM = CFSM::Create();
 
 	//상태 Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};
-	m_pFSM->Add_State(PHANTA_APPEAR, CPhanta_Idle_State::Create());
-	m_pFSM->Add_State(PHANTA_FLYINGFIND, CPhanta_Idle_State::Create());
+	m_pFSM->Add_State(SPOOKSTEP_APPEAR, CSpookStep_Idle_State::Create());
 
-	m_pFSM->Add_State(PHANTA_ATTACK, CPhanta_Move_State::Create());
+	m_pFSM->Add_State(SPOOKSTEP_MOVE, CSpookStep_Move_State::Create());
 
-	m_pFSM->Add_State(PHANTA_DAMAGE, CPhanta_Damage_State::Create());
+	m_pFSM->Add_State(SPOOKSTEP_DAMAGE, CSpookStep_Damage_State::Create());
 
-	m_pFSM->Add_State(PHANTA_BRAKE, CPhanta_Brake_State::Create());
-
-	FSM_Desc.iState = PHANTA_APPEAR;
+	FSM_Desc.iState = SPOOKSTEP_APPEAR;
 	FSM_Desc.pModel = &m_pModelCom;
 	m_pFSM->Initialize(&FSM_Desc);
 }
 
-CPhanta* CPhanta::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CSpookStep* CSpookStep::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	CPhanta* pInstance = new CPhanta(pDevice, pContext);
+	CSpookStep* pInstance = new CSpookStep(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Create : CPhanta"));
+		MSG_BOX(TEXT("Failed To Create : CSpookStep"));
 
 		Safe_Release(pInstance);
 	}
@@ -302,20 +299,20 @@ CPhanta* CPhanta::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	return pInstance;
 }
 
-CGameObject* CPhanta::Clone(void* pArg)
+CGameObject* CSpookStep::Clone(void* pArg)
 {
-	CPhanta* pInstance = new CPhanta(*this);
+	CSpookStep* pInstance = new CSpookStep(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Clone : CPhanta"));
+		MSG_BOX(TEXT("Failed To Clone : CSpookStep"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CPhanta::Free()
+void CSpookStep::Free()
 {
 	__super::Free();
 }
