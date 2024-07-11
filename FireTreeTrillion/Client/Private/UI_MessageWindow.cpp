@@ -506,12 +506,13 @@ void CUI_MessageWindow::OnEvent()
 	{
 	case LEVEL_DEEDEEDEE:
 	{
-		//Fade-out
+		//Fade-out 처리
 		m_pGameInstance->Reserve_Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_TOOL_FX));
 	}
 	break;
 	case LEVEL_TOWN:
 	{
+		//Fade-out 처리
 		m_pGameInstance->Reserve_Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_TOOL_ANIM));
 	}
 	break;

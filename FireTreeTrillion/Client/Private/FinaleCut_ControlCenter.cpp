@@ -41,9 +41,6 @@ _int CFinaleCut_ControlCenter::Tick(_float fTimeDelta)
 	if (m_pGameInstance->Get_KeyState(DIK_LCONTROL, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
 	{
 
-		if (m_pGameInstance->Get_KeyState(DIK_1, KEY_DOWN))
-			Set_CutScene(1);
-
 		if (m_pGameInstance->Get_KeyState(DIK_2, KEY_DOWN))
 			Set_CutScene(2);
 
@@ -118,13 +115,12 @@ void CFinaleCut_ControlCenter::Set_CutScene(_uint iScene)
 {
 	m_iCutScene = iScene;
 
-	if (iScene != 6)
+	if (iScene != 6 && iScene != 8)
 	{
 		//Ä«¸Þ¶ó ÄÆ½Å
 		CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
 		CHECK_NULLPTR(pCameraMain);
 		pCameraMain->Make_Sequence(CCamera_Main::CAMSEQ((_uint)CCamera_Main::SEQ_FINALECUT1 - 1 + iScene));
-
 	}
 	/*
 	else if (iScene == 6)

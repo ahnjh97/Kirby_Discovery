@@ -259,6 +259,8 @@ PS_OUT PS_MAIN_ALPHA_SOFTFX(PS_IN_ALPHABLEND In)
 	
     vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
 
+    if (vDiffuse.a < 0.03f)
+        discard;
 	 //소프트 이펙트 보정
     float2 vTexcoord = (float2) 0.f;
 
@@ -270,7 +272,7 @@ PS_OUT PS_MAIN_ALPHA_SOFTFX(PS_IN_ALPHABLEND In)
 
     Out.vColor.a = vDiffuse.a * saturate(fOldViewZ - In.vProjPos.w) * g_fAlpha;
     Out.vColor.rgb = vDiffuse.rgb;
-    Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
+    //Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
     
     return Out;
 }
@@ -494,31 +496,31 @@ PS_OUT PS_FOCUSING_UI(PS_IN_ALPHABLEND In)
     {
         case 0: // 첫 번째 포커싱 별
         {
-                if (vDiffuse.r >= .6f) // 1은 하양
-                    Out.vColor.a = 0.f;
-                else
-                    discard;
-       }
-       break;
+            if (vDiffuse.r >= .6f) // 1은 하양
+                Out.vColor.a = 0.f;
+            else
+                discard;
+        }
+        break;
         case 1: // 연두
         {
-                if (vDiffuse.r >= .9f) // 하양별부분 연두
-                {
-                    Out.vColor.r = 160.f / 255.f;
-                    Out.vColor.g = 212.f / 255.f;
-                    Out.vColor.b = 104.f / 255.f;
-                }
-                else // 검정배경부분 찐연두
-                    discard;
+            if (vDiffuse.r >= .9f) // 하양별부분 연두
+            {
+                Out.vColor.r = 160.f / 255.f;
+                Out.vColor.g = 212.f / 255.f;
+                Out.vColor.b = 104.f / 255.f;
             }
-            break;
+            else // 검정배경부분 찐연두
+                discard;
+        }
+        break;
         case 2: // 찐연두
         {
-                Out.vColor.r = 91.f / 255.f;
-                Out.vColor.g = 121.f / 255.f;
-                Out.vColor.b = 59.f / 255.f;
-            }
-            break;
+            Out.vColor.r = 91.f / 255.f;
+            Out.vColor.g = 121.f / 255.f;
+            Out.vColor.b = 59.f / 255.f;
+        }
+        break;
     }
     
     return Out;
@@ -785,11 +787,11 @@ technique11 DefaultTechnique
         SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
-        VertexShader = compile vs_5_0 VS_MAIN_ALPHABLEND();
+        VertexShader   = compile vs_5_0 VS_MAIN_ALPHABLEND();
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
         HullShader     = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader   = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 PS_FOCUSING_UI();
+        PixelShader    = compile ps_5_0 PS_FOCUSING_UI();
     }
 
     // FADE-IN-OUT ( 18 )
