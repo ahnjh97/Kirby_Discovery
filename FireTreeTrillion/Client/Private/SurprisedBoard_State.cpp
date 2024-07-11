@@ -60,6 +60,8 @@ void CSurprisedBoard_Popout_State::OnStateEnter(CModel* _pModel, _uint _iAnimInd
 void CSurprisedBoard_Popout_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
 	CSurprisedBoard* pSurprisedBoard = static_cast<CSurprisedBoard*>(pGameObject);
+	CTransform* pTransform = pSurprisedBoard->Get_TransformCom();
+	_float fSecondTimeDelta = m_pGameInstance->Get_SecondTimer();
 	if (pSurprisedBoard->IsAnimFinished())
 	{
 		switch (pSurprisedBoard->Get_State())
@@ -72,7 +74,7 @@ void CSurprisedBoard_Popout_State::OnStateUpdate(CGameObject* pGameObject, _floa
 			break;
 		case CSurprisedBoard::POP_OUT_L:
 			pSurprisedBoard->Change_State(CSurprisedBoard::ARM_MOVE_L, 50.f, false, true);
-			break;
+		break;
 		case CSurprisedBoard::POP_OUT_R:
 			pSurprisedBoard->Change_State(CSurprisedBoard::ARM_MOVE_R, 50.f, false, true);
 			break;
@@ -81,6 +83,17 @@ void CSurprisedBoard_Popout_State::OnStateUpdate(CGameObject* pGameObject, _floa
 			break;
 		case CSurprisedBoard::PREPOP_OUT_R:
 			pSurprisedBoard->Change_State(CSurprisedBoard::POP_OUT_R, 50.f, false, true);
+			break;
+		}
+	}
+	else
+	{
+		switch (pSurprisedBoard->Get_State())
+		{
+		case CSurprisedBoard::POP_OUT_L:
+			//pTransform->Go_Right(fSecondTimeDelta); // 서프라이즈 보드 기점으로 오른쪽 이동
+			break;
+		case CSurprisedBoard::POP_OUT_R:
 			break;
 		}
 	}
@@ -119,6 +132,9 @@ void CSurprisedBoard_Return_State::OnStateEnter(CModel* _pModel, _uint _iAnimInd
 void CSurprisedBoard_Return_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
 	CSurprisedBoard* pSurprisedBoard = static_cast<CSurprisedBoard*>(pGameObject);
+	CTransform* pTransform = pSurprisedBoard->Get_TransformCom();
+	_float fSecondTimeDelta = m_pGameInstance->Get_SecondTimer();
+
 	if (pSurprisedBoard->IsAnimFinished())
 	{
 		switch (pSurprisedBoard->Get_State())
@@ -131,7 +147,17 @@ void CSurprisedBoard_Return_State::OnStateUpdate(CGameObject* pGameObject, _floa
 			break;
 		}
 	}
-
+	else
+	{
+		switch (pSurprisedBoard->Get_State())
+		{
+		case CSurprisedBoard::RETURN_L:
+			//pTransform->Go_Left(fSecondTimeDelta); // 서프라이즈 보드 기점으로 오른쪽 이동
+			break;
+		case CSurprisedBoard::RETURN_R:
+			break;
+		}
+	}
 }
 
 void CSurprisedBoard_Return_State::OnStateExit()

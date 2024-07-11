@@ -63,8 +63,13 @@ private:
 	void				SetUp_FSM(ANIM_STATE eSta);
 
 private:
+	PxRigidDynamic*		m_pDynamicActor = { nullptr };
+	CRigidBody*			m_pRigidBodyCom = { nullptr };
 	array<CModel*, 3>	m_arrModelCom;
+	array<CModel*, 3>	m_arrNonModelCom;
+
 	MODEL_COLOR			m_eModelColor;
+	_float4x4			m_matWorld;
 
 public:
 	static CSurprisedBoard* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

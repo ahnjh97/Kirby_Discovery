@@ -15,6 +15,7 @@ CSurprisedBoard::CSurprisedBoard(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 CSurprisedBoard::CSurprisedBoard(const CSurprisedBoard& rhs)
 	: CMonster(rhs)
 	, m_arrModelCom(rhs.m_arrModelCom)
+	, m_arrNonModelCom(rhs.m_arrNonModelCom)
 {
 }
 
@@ -23,6 +24,7 @@ HRESULT CSurprisedBoard::Initialize_Prototype()
 	m_eCollisionGroup = TRIGGER_FOR_NOT_PHYSX;
 
 	fill(m_arrModelCom.begin(), m_arrModelCom.end(), nullptr);
+	fill(m_arrNonModelCom.begin(), m_arrNonModelCom.end(), nullptr);
 
 	return S_OK;
 }
@@ -42,13 +44,17 @@ HRESULT CSurprisedBoard::Initialize(void* pArg)
 		_float3 vPos = tDesc.vPosition;	//15.f, 5.f, -159.f
 		Add_HitBoxes(vPos);
 	}
-	
+
 	/* FSM */
 	SetUp_FSM(tDesc.eStartState);
 	m_arrModelCom[m_eModelColor]->Set_Animation(tDesc.eStartState, 45.f, true, true);
-
+	//if (*m_pCurrentLevelID != LEVEL_TOOL_ANIM)
+	//{
+	//	m_pDynamicActor = m_arrNonModelCom[m_eModelColor]->ReturnDynamicActor(m_pTransformCom->Get_WorldFloat4x4());
+	//	m_pDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+	//}
+	m_matWorld = _float4x4(); // 지영아 여기야
 	m_fAttack = 8.f;
-
 	Add_AnimEvent();
 
 	return S_OK;
@@ -64,12 +70,28 @@ _int CSurprisedBoard::Tick(_float fTimeDelta)
 		if (m_pFSM != nullptr)
 			m_pFSM->Update(this, fTimeDelta);
 	}
+
+	//if (m_pDynamicActor)
+	//{
+	//	_float3 vScale, vTrans;
+	//	Quaternion vRotQuat;
+	//	_float4x4 matWorld = m_pTransformCom->Get_WorldFloat4x4();
+	//	matWorld.Decompose(vScale, vRotQuat, vTrans);
+
+	//	PxMeshScale meshScale(PxVec3(vScale.x, vScale.y, vScale.z));
+	//	PxConvexMeshGeometryFlags meshFlags = PxConvexMeshGeometryFlags();
+	//	PxTransform pxTransform(PxVec3(matWorld._41, matWorld._42, matWorld._43), PxQuat(vRotQuat.x, vRotQuat.y, vRotQuat.z, vRotQuat.w));
+	//	m_pDynamicActor->setKinematicTarget(pxTransform);
+	//}
+
 	return OBJ_NOEVENT;
 }
 
 void CSurprisedBoard::Late_Tick(_float fTimeDelta)
 {
 	m_arrModelCom[m_eModelColor]->Play_Animation(m_fTimeDelta);
+
+	m_pRigidBodyCom->Update(m_pTransformCom->Get_WorldFloat4x4());
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
@@ -201,8 +223,36 @@ HRESULT CSurprisedBoard::Add_Components()
 	hr = __super::Add_Component(TEXT("Prototype_Component_Model_SurprisedBoardBlue"),
 								TEXT("Com_Model_BLUE"), (CComponent**)&m_arrModelCom[BLUE]);
 	CHECK_FAILED(hr);
+
+	/* For.Com_NonAnim_Model */
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_NonAnim_SurprisedBoardRed"),
+								TEXT("Com_NonAnimModel_RED"), (CComponent**)&m_arrNonModelCom[RED]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_NonAnim_SurprisedBoardGreen"),
+								TEXT("Com_NonAnimModel_GREEN"), (CComponent**)&m_arrNonModelCom[GREEN]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_NonAnim_SurprisedBoardBlue"),
+								TEXT("Com_NonAnimModel_BLUE"), (CComponent**)&m_arrNonModelCom[BLUE]);
+	CHECK_FAILED(hr);
+
 	// FOR ANIMTOOL
 	m_ppModelForAnimTool = &m_arrModelCom[m_eModelColor];
+
+	/* For.Com_RigidBody */
+	CRigidBody::RIGIDBODY_DESC rigidDesc{};
+	rigidDesc.bTrigger = false;
+	rigidDesc.bDynamic = true;
+	rigidDesc.bKinematic = true;
+	rigidDesc.eShapeType = RIGID_BOX;
+	rigidDesc.fOffsetSize = { 5.f, 10.f, 0.5f };
+	rigidDesc.vMaterial = _float3(10.f, 1.f, 0.85f);
+	rigidDesc.fDensity = 800.f;
+	rigidDesc.matWorld = m_matWorld;
+	hr = __super::Add_Component(TEXT("Prototype_Component_RigidBody"),
+								TEXT("Com_RigidBody"), (CComponent**)&m_pRigidBodyCom, &rigidDesc);
+	CHECK_FAILED(hr);
+	m_pRigidBodyCom->Activate(true);
+
 
 	return S_OK;
 }
@@ -308,8 +358,13 @@ CGameObject* CSurprisedBoard::Clone(void* pArg)
 void CSurprisedBoard::Free()
 {
 	__super::Free();
-	
+	//m_pGameInstance->ReleaseActor(m_pDynamicActor);
+
+	Safe_Release(m_pRigidBodyCom);
+
 	for (auto& pModel : m_arrModelCom)
 		Safe_Release(pModel);
+	for (auto& pNonAnimModel : m_arrNonModelCom)
+		Safe_Release(pNonAnimModel);
 }
 

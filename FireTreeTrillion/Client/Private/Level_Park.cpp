@@ -559,6 +559,7 @@ HRESULT CLevel_Park::Ready_Monsters()
 
 		// 해당 위치의 행렬을 넘긴다.
 		CSurprisedBoard::SURPRISED_DESC surprisedDesc = {};
+		surprisedDesc.fSpeedPerSec = 7.f;
 		surprisedDesc.matWorld = transformationMatrix;
 	
 		surprisedDesc.eColor = CSurprisedBoard::RED;
