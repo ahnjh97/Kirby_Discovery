@@ -34,7 +34,9 @@ HRESULT CGm_ParkSolarPanelCharge::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_eCurState = STATE_OFFWAIT;
-	m_pModelCom->Set_Animation(STATE_OFFWAIT, 60.f, TRUE /*_bool bInterpolation = false, _float fLerpTime = 0.1f*/);
+
+	m_pModelCom->Set_Animation(STATE_DECREASES, 60.f, FALSE, FALSE);
+	m_pModelCom->Set_Animation(STATE_OFFWAIT, 60.f, TRUE, FALSE);
 
 	//숨길 메쉬 검색하여 저장
 	//m_setBeforeHideMeshs.insert(m_pModelCom->Find_MeshIndex(string("TnnelWallM__FhEntranceAlienTunnelWallC")));
@@ -58,14 +60,14 @@ _int CGm_ParkSolarPanelCharge::Tick(_float fTimeDelta)
 	case STATE_CHARGE: //충전 중
 		if (TRUE == m_pModelCom->IsFinished()) //충전 중 애님 종료 시 충전 완료 상태 변경
 		{
-			m_pModelCom->Set_Animation(STATE_CHARGEDSTART, 60.f, FALSE);
+			m_pModelCom->Set_Animation(STATE_CHARGEDSTART, 60.f, FALSE, TRUE);
 			m_eCurState = STATE_CHARGEDSTART;
 		}
 		break;
 	case STATE_CHARGEDSTART: //충전 완료
 		if (TRUE == m_pModelCom->IsFinished())
 		{
-			m_pModelCom->Set_Animation(STATE_CHARGEDWAIT, 60.f, FALSE);
+			m_pModelCom->Set_Animation(STATE_CHARGEDWAIT, 60.f, FALSE, TRUE);
 			m_eCurState = STATE_CHARGEDWAIT;
 		}
 		break;
@@ -73,14 +75,14 @@ _int CGm_ParkSolarPanelCharge::Tick(_float fTimeDelta)
 	case STATE_DECREASES: //충전 해제
 		if (TRUE == m_pModelCom->IsFinished()) //충전 해제 중 애님 종료 시 충전 전 상태 변경
 		{
-			m_pModelCom->Set_Animation(STATE_OFFWAITSTART, 60.f, FALSE);
+			m_pModelCom->Set_Animation(STATE_OFFWAITSTART, 60.f, FALSE, TRUE);
 			m_eCurState = STATE_OFFWAITSTART;
 		}
 		break;
 	case STATE_OFFWAITSTART: //충전 전
 		if (TRUE == m_pModelCom->IsFinished())
 		{
-			m_pModelCom->Set_Animation(STATE_OFFWAIT, 60.f, FALSE);
+			m_pModelCom->Set_Animation(STATE_OFFWAIT, 60.f, FALSE, TRUE);
 			m_eCurState = STATE_OFFWAIT;
 		}
 		break;
@@ -181,16 +183,27 @@ void CGm_ParkSolarPanelCharge::Collision(CCollisionCenter::CONTENT_TYPE eContent
 {
 	m_IsInteraction = TRUE;
 
-	//충전 중 대기 상태에서 키꾹 > 충전 시작
-	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_PRESS) && STATE_OFFWAIT == m_eCurState)
+	//충전 대기 상태에서 키꾹 > 충전 시작
+	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_PRESS))
 	{
-		m_pModelCom->Set_Animation(STATE_CHARGE, 60.f, FALSE);
-		m_eCurState = STATE_CHARGE;
+		if (STATE_OFFWAIT == m_eCurState)
+		{
+			m_pModelCom->Set_Animation(STATE_CHARGE, 60.f, FALSE, TRUE);
+			m_eCurState = STATE_CHARGE;
+		}
 	}
-	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_UP) && STATE_CHARGE == m_eCurState)
+	else //키꾹 해제 시 충전 해제
 	{
-		m_pModelCom->Set_Animation(STATE_DECREASES, 60.f, FALSE);
-		m_eCurState = STATE_DECREASES;
+		if (STATE_CHARGE == m_pModelCom->Get_CurAnimIndex())
+		{
+			_float fDuration = m_pModelCom->Get_Duration(); //전체 재생길이에서 현재 재생시점을 체크
+			_float fTrackPos = m_pModelCom->Get_Trackposition();
+			_float fSubTrackPos = fDuration - fTrackPos; //감산하여 충전 해제 애니메이션 자연스럽게 보정
+
+			m_pModelCom->Set_Animation(STATE_DECREASES, 60.f, FALSE, FALSE);
+			m_pModelCom->Set_TrackPosition(fSubTrackPos);
+			m_eCurState = STATE_DECREASES;
+		}
 	}
 }
 
