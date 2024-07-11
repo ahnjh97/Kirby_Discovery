@@ -4,6 +4,8 @@
 #include "FinalePartical_Maker.h"
 #include "Camera_Main.h"
 #include "FinaleKirby.h"
+#include "Effect.h"
+
 
 CBreakableBlock::CBreakableBlock(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
@@ -138,6 +140,20 @@ void CBreakableBlock::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXO
 
 		CFinaleKirby* pKirby = static_cast<CFinaleKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
 		pKirby->Set_HitStop(0.2f);
+
+		CEffect::FX_DESC FXDesc{};
+
+		for (_int i = 0; i < 15; ++i)
+		{
+			FXDesc.vInitPos = (_float3)vPos + (_float3)CUtils::Make_Random_Vector(2.f);
+			FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_Random_Vector(1.f));
+
+			_float fScale = CUtils::Make_RandomFloat(10.f, 15.f);
+			FXDesc.vInitScale = { fScale, fScale, fScale };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_finale collide smoke test3"), &FXDesc)))
+				return;
+		}
+
 	}
 }
 

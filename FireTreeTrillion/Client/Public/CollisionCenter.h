@@ -49,6 +49,7 @@ private:
     void Ladder_Collider();
 
     void DeeDeeDee_Battle();
+    void Simba_Battle();
     void FinalStage_Battle();
     void RealFinaleStage_Battle();
     void Body_To_Body_Collision();

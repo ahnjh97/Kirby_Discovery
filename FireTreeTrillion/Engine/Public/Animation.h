@@ -53,6 +53,8 @@ public:
 	// 애님툴에서 작업한 데이터 가져오기
 	void		 Set_AnimEventData(ANIM_INFO tAnimInfo);
 
+	vector<_uint> Get_ValidBoneIndices();
+
 public:
 	HRESULT		Initialize(const vector<class CBone*>& Bones, ifstream& fileStream);
 	void		Invalidate_TransformationMatrix(_float fTimeDelta, const vector<class CBone*>& Bones, _bool bIsLooping, class CModel* model);

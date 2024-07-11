@@ -116,6 +116,34 @@ HRESULT CObject_Manager::Add_Clone(_uint iLevelIndex, const wstring & strLayerTa
 	return S_OK;
 }
 
+
+CGameObject* CObject_Manager::Add_CloneReturn(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strPrototypeTag, void* pArg)
+{
+	CGameObject* pPrototype = Find_Prototype(strPrototypeTag);
+	CHECK_NULLPTR(pPrototype);
+
+	CGameObject* pGameObject = pPrototype->Clone(pArg);
+	CHECK_NULLPTR(pGameObject);
+
+	CLayer* pLayer = Find_Layer(iLevelIndex, strLayerTag);
+
+	if (nullptr == pLayer)
+	{
+		pLayer = CLayer::Create();
+		CHECK_NULLPTR(pLayer);
+		pLayer->Add_GameObject(pGameObject);
+
+		m_pLayers[iLevelIndex].emplace(strLayerTag, pLayer);
+	}
+	else
+		pLayer->Add_GameObject(pGameObject);
+
+	m_mapCloneObjs.emplace(pGameObject, strPrototypeTag);
+
+	return pGameObject;
+}
+
+
 CGameObject * CObject_Manager::Clone_GameObject(const wstring & strPrototypeTag, void * pArg)
 {
 	/* 복제해야할 원형객체를 검색한다. */
@@ -139,6 +167,19 @@ void CObject_Manager::Tick(_float fTimeDelta)
 		}		
 	}
 }
+
+void CObject_Manager::Event_Tick(_float fTimeDelta)
+{
+	for (size_t i = 0; i < m_iNumLevels; i++)
+	{
+		for (auto& Pair : m_pLayers[i])
+		{
+			/* 필요한 위치의 갱신작어블 수행한다. */
+			Pair.second->Event_Tick(fTimeDelta);
+		}
+	}
+}
+
 
 void CObject_Manager::Late_Tick(_float fTimeDelta)
 {
