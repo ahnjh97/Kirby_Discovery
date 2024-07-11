@@ -259,6 +259,8 @@ PS_OUT PS_MAIN_ALPHA_SOFTFX(PS_IN_ALPHABLEND In)
 	
     vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
 
+    if (vDiffuse.a < 0.03f)
+        discard;
 	 //소프트 이펙트 보정
     float2 vTexcoord = (float2) 0.f;
 
@@ -270,7 +272,7 @@ PS_OUT PS_MAIN_ALPHA_SOFTFX(PS_IN_ALPHABLEND In)
 
     Out.vColor.a = vDiffuse.a * saturate(fOldViewZ - In.vProjPos.w) * g_fAlpha;
     Out.vColor.rgb = vDiffuse.rgb;
-    Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
+    //Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
     
     return Out;
 }
