@@ -182,6 +182,24 @@ HRESULT CKirby::Render()
 		if (FAILED(m_pShaderCom->Bind_RawValue("g_fOverPowerColor", &m_fOverPowerColor, sizeof(_float))))
 			return E_FAIL;
 
+		if (INFO(m_eBodyState) == BODY_BULBDEFAULT)
+		{
+			_bool bOn = true;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_isBulb", &bOn, sizeof(_bool))))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_bBulbOn", &INFO(m_bLightOn), sizeof(_bool))))
+				return E_FAIL;
+			_float4 vBulbPos = Get_BulbLightPos();
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_BulbPosition", &vBulbPos, sizeof(_float4))))
+				return E_FAIL;
+		}
+		else
+		{
+			_bool bOff = false;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_isBulb", &bOff, sizeof(_bool))))
+				return E_FAIL;
+		}
+
 
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
 		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_KIRBY)))
@@ -1031,9 +1049,11 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 {
 	if (m_iRenderCount == 0)
 	{
-		if ((_eBodyState == BODY_BULBDEFAULT && _iMeshIndex == 2) ||
+		if (
+			(_eBodyState == BODY_BULBDEFAULT && _iMeshIndex == 2) ||
 			(_eBodyState == BODY_BULBDEFAULT && _iMeshIndex == 3) ||
-			(_eBodyState == BODY_BULBDEFAULT && _iMeshIndex == 1))
+			(_eBodyState == BODY_BULBDEFAULT && _iMeshIndex == 1)
+			)
 		{
 			//m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
 			m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
@@ -1047,6 +1067,21 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 			m_pShaderCom->Begin(ANIMMODEL_BULBLIGHT);
 			m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
 			return true;
+		}
+		else if ((_eBodyState == BODY_BULBDEFAULT && _iMeshIndex == 4))
+		{
+			m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
+			m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
+			m_pEyeTexture[INFO(m_eEyeState)]->Bind_ShaderResource(m_pShaderCom, "g_KirbyEyeTexture", 0);
+
+			m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float));
+			m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
+
+			m_pShaderCom->Begin(ANIMMODEL_KIRBYEYE);
+			m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
 		}
 	}
 	else
@@ -1529,6 +1564,16 @@ void CKirby::Set_WeaponAnim(_uint index)
 	m_pWeapons->Change_My_WeaponAnim((CKirbyWeapons::ANIM_TYPE)index);
 }
 
+_float4 CKirby::Get_BulbLightPos()
+{
+	CBone* pBone = m_pModelCom[BODY_BULBDEFAULT]->Get_BonePtr("LightL");
+	_float4x4 CombineMatrix = *pBone->Get_CombinedTransformationMatrix();
+	_float4 vPos = CUtils::Get_State_Vector_Matrix(CombineMatrix, CUtils::STATE_POSITION);
+	vPos = _float4::Transform(vPos, m_pTransformCom->Get_WorldFloat4x4());
+
+	return vPos;
+}
+
 void CKirby::OverPower()
 {
 	if (m_fPreHp > m_fHp)
@@ -1730,6 +1775,7 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 			m_vBulbColor += (vTargetColor - m_vBulbColor) / (fTimeDelta * 300.f);
 
 			m_pBulbFlare->Set_Position(m_pTransformCom->Get_State(CTransform::STATE_POSITION), true);
+
 		}
 		else if (INFO(m_bLightOn) == false)
 		{

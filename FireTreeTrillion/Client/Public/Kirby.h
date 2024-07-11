@@ -200,6 +200,7 @@ public:
 	CGameObject*	FindStarBox(PxRigidActor* pActor);
 	CGameObject*	FindBox(PxRigidActor* pActor);
 	void			Set_WeaponAnim(_uint index);
+	_float4			Get_BulbLightPos();
 
 	// 扁鸥 技何利牢 力绢
 private:
