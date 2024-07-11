@@ -115,13 +115,12 @@ void CFinaleCut_ControlCenter::Set_CutScene(_uint iScene)
 {
 	m_iCutScene = iScene;
 
-	if (iScene != 6)
+	if (iScene != 6 && iScene != 8)
 	{
 		//Ä«¸Þ¶ó ÄÆ½Å
 		CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
 		CHECK_NULLPTR(pCameraMain);
 		pCameraMain->Make_Sequence(CCamera_Main::CAMSEQ((_uint)CCamera_Main::SEQ_FINALECUT1 - 1 + iScene));
-
 	}
 	/*
 	else if (iScene == 6)

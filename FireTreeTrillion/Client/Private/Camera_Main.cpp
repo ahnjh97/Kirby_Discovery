@@ -1518,8 +1518,10 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	}
 	break;
 	*/
+	//커비를 왼쪽에서 본다. 원경
 	case SEQ_FINALECUT7:
 	{
+		//1.17초
 		_float3 vStartPos =
 		{ 2392.1f, 180.f, -136.f };
 
@@ -1529,10 +1531,10 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction.fFOVY = 45.f;
 
 		newAction.eCamPos = POS_ABSOLUTE;
-		newAction.vPos = vStartPos + _float3{ -10.f, -5.f, 60.f };
+		newAction.vPos = vStartPos + _float3{ -10.f, -5.f, 80.f };
 
 		newAction.eCamDir = DIR_ABSOLUTE;
-		newAction.vDir = _float3{ -10.f, -5.f, 60.f } * -1.f;
+		newAction.vDir = _float3{ -10.f, -5.f, 80.f } * -1.f;
 		newAction.vDir.Normalize();
 
 		m_CamSeq.push_back(newAction);
@@ -1543,21 +1545,13 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction.eCamCut = CUT_INTERPOLATE;
 
 		newAction.eEase = EASE_LINEAR;
-		newAction.fInterpolateSpeed = 1.3f;
+		newAction.fInterpolateSpeed = 1.5f;
 
 		m_CamSeq.push_back(newAction);
 
-
-		//newAction.eCamPos = POS_ABSOLUTE;
-		//newAction.vPos = vStartPos + _float3{ -10.f, -5.f, 60.f };
-
-		//newAction.eCamDir = DIR_ABSOLUTE;
-		//newAction.vDir = _float3{ -10.f, -5.f, 60.f } * -1.f;
-		//newAction.vDir.Normalize();
-
-
 	}
 	break;
+	//보스 얼굴 줌인
 	case SEQ_FINALECUT9:
 	{
 		//2.32초
@@ -1570,7 +1564,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction.fFOVY = 45.f;
 
 		newAction.eCamPos = POS_ABSOLUTE;
-		newAction.vPos = vStartPos + _float3{ -20.f, 0.f, 0.f };
+		newAction.vPos = vStartPos + _float3{ -10.f, 0.f, 0.f };
 
 		newAction.eCamDir = DIR_ABSOLUTE;
 		newAction.vDir = _float3{ 1.f, 0.f, 0.f};
@@ -1583,7 +1577,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction.eCamCut = CUT_INTERPOLATE;
 
 		newAction.eEase = EASE_LINEAR;
-		newAction.fInterpolateSpeed = 2.32f;
+		newAction.fInterpolateSpeed = 2.6f;
 
 		m_CamSeq.push_back(newAction);
 	}
@@ -1631,15 +1625,69 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction.fTime = 1.f;
 		newAction.eCamCut = CUT_INTERPOLATE;
 
-		newAction.eEase = EASE_INOUT;
-		newAction.fInterpolateSpeed = 5.32f - 1.f;
+		newAction.eEase = EASE_INOUT_FAST;
+		newAction.fInterpolateSpeed = fTotalDuration - .9f;
 
 		newAction.eCamPos = POS_ABSOLUTE;
-		newAction.vPos = vStartPos + _float3{ -50.f, 10.f, 0.f };
+		newAction.vPos = vStartPos + _float3{ -60.f, 10.f, 0.f };
 
 		newAction.eCamDir = DIR_ABSOLUTE;
 		newAction.vDir = _float3{ 1.f, 0.f, 0.f };
 		m_CamSeq.push_back(newAction);
+	}
+	break;
+	case SEQ_FINALECUT11:
+	{
+
+		////5.32초
+		////보스 시작
+		//_float3 vStartPos =
+		//{ 2550.f, 242.f, -136.f };
+		//_float fTotalDuration = 5.32f;
+
+		////얼굴 컷
+		//CAMACTION newAction = {};
+		//newAction.fTime = 0.f;
+		//newAction.eCamCut = CUT_HARD;
+		//newAction.fFOVY = 45.f;
+
+		//newAction.eCamPos = POS_ABSOLUTE;
+		//newAction.vPos = vStartPos + _float3{ -5.f, 2.f, 0.f };
+
+		//newAction.eCamDir = DIR_ABSOLUTE;
+		//newAction.vDir = _float3{ 1.f, 0.f, 0.f };
+
+		//m_CamSeq.push_back(newAction);
+
+		////원경
+		//newAction = {};
+		//newAction.fTime = 0.f;
+		//newAction.eCamCut = CUT_INTERPOLATE;
+
+		//newAction.eEase = EASE_INOUT;
+		//newAction.fInterpolateSpeed = 1.f;
+
+		//newAction.eCamPos = POS_ABSOLUTE;
+		//newAction.vPos = vStartPos + _float3{ -10.f, 2.f, 0.f };
+
+		//newAction.eCamDir = DIR_ABSOLUTE;
+		//newAction.vDir = _float3{ 1.f, 0.f, 0.f };
+		//m_CamSeq.push_back(newAction);
+
+		////원경
+		//newAction = {};
+		//newAction.fTime = 1.f;
+		//newAction.eCamCut = CUT_INTERPOLATE;
+
+		//newAction.eEase = EASE_INOUT_FAST;
+		//newAction.fInterpolateSpeed = fTotalDuration - .9f;
+
+		//newAction.eCamPos = POS_ABSOLUTE;
+		//newAction.vPos = vStartPos + _float3{ -60.f, 10.f, 0.f };
+
+		//newAction.eCamDir = DIR_ABSOLUTE;
+		//newAction.vDir = _float3{ 1.f, 0.f, 0.f };
+		//m_CamSeq.push_back(newAction);
 	}
 	break;
 	default:
