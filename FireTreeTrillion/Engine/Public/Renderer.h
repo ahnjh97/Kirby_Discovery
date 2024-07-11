@@ -111,6 +111,7 @@ public:
 	HRESULT Add_DebugComponents(class CComponent* pRenderObject);
 	_bool	Get_HitBoxRender() { return m_IsRenderHitBox; }
 	_bool	Get_IsRenderRTV() { return m_IsRenderRTV; }
+	void	Set_IsMaptool(_bool bMaptool) { m_bMaptool = bMaptool; }
 #endif
 
 private:
@@ -225,12 +226,17 @@ private:
 	_int					m_iCurColorIdx = { -1 };
 
 	pair<_float, _float> m_fRimLightRatio = { 1.f, 1.f };
+	pair<_float, _float> m_fRimLightRadius = { 1.f, 1.f };
+	pair<_float3, _float3> m_vRimColor = {_float3(1.f, 1.f, 1.f), _float3(1.f, 1.f, 1.f)};
 
 
 	_float m_fSSAOScale = { 0.5f };
 	_float m_fSSAOBias = { 0.f };
 	_float m_fSSAOSampleRadius = { 2.85f };
 	_float m_fSSAOIntensity = { 2.5f };
+
+
+	_bool  m_bMaptool = { false };
 
 
 #ifdef _DEBUG

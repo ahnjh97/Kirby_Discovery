@@ -225,13 +225,14 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 	m_fParticalDelay += fTimeDelta;
 
-	if (pTransformCom->Get_State(CTransform::STATE_POSITION).x > 1550.f || (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_8, KEY_DOWN)))
+	if (pTransformCom->Get_State(CTransform::STATE_POSITION).x > 1550.f)
 	{
 		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT1, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
 		ToCut_Reset_Kirby(pTransformCom, pController);
 		pKirby->Start_CutScene();
 		DESC(m_bBooster) = false;
-		pKirby->Delete_Effect("Come On Dash");
+		//pKirby->Delete_Effect("Come On Dash");
+		pKirby->Delete_AllEffect();
 		return;
 	}
 
@@ -411,13 +412,15 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
 
-	if (pTransformCom->Get_State(CTransform::STATE_POSITION).x > 1550.f || m_pGameInstance->Get_KeyState(DIK_F10, KEY_DOWN))
+	if (pTransformCom->Get_State(CTransform::STATE_POSITION).x > 1550.f)
 	{
 		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT1, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
 		ToCut_Reset_Kirby(pTransformCom, pController);
 		pKirby->Start_CutScene();
 		DESC(m_bBooster) = false;
-		pKirby->Delete_Effect("Come On Dash");
+		//pKirby->Delete_Effect("Come On Dash");
+		pKirby->Delete_AllEffect();
+
 		return;
 	}
 
@@ -795,10 +798,6 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT1)
 	{
 
-
-
-
-
 		if (pKirby->isAnimFinish())
 		{
 			pCenter->Set_CutScene(2);
@@ -812,10 +811,10 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 
 
-		if (pKirby->isAnimFinish())
-		{
-			pCenter->Set_CutScene(3);
-		}
+		//if (pKirby->isAnimFinish())
+		//{
+		//	pCenter->Set_CutScene(3);
+		//}
 	}
 	// 큐티 모션 후 점프
 	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT6)

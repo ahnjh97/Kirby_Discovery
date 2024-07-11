@@ -204,6 +204,7 @@
     <ClInclude Include="..\Public\Buffahorn.h" />
     <ClInclude Include="..\Public\Buffahorn_State.h" />
     <ClInclude Include="..\Public\Bulb.h" />
+    <ClInclude Include="..\Public\BulbFlare.h" />
     <ClInclude Include="..\public\Camera_Free.h" />
     <ClInclude Include="..\public\Camera_Main.h" />
     <ClInclude Include="..\Public\CappyBody.h" />
@@ -432,6 +433,7 @@
     <ClCompile Include="..\Private\Buffahorn.cpp" />
     <ClCompile Include="..\Private\Buffahorn_State.cpp" />
     <ClCompile Include="..\Private\Bulb.cpp" />
+    <ClCompile Include="..\Private\BulbFlare.cpp" />
     <ClCompile Include="..\private\Camera_Free.cpp" />
     <ClCompile Include="..\private\Camera_Main.cpp" />
     <ClCompile Include="..\Private\CappyBody.cpp" />

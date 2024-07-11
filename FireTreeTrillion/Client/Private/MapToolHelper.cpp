@@ -93,9 +93,18 @@ HRESULT CMapToolHelper::Initialize_Prototype()
 
 HRESULT CMapToolHelper::Initialize(void* pArg)
 {
+	m_bisClone = true;
+
 	HRESULT hr;
 	hr = __super::Initialize(pArg);
 	CHECK_FAILED(hr);
+
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"), TEXT("Com_ShaderModel"), (CComponent**)&m_pModelShaderCom)))
+		return E_FAIL;
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel_Map"), TEXT("Com_ShaderMap"), (CComponent**)&m_pMapShaderCom)))
+		return E_FAIL;
+	Bind_boolToShader(true);
+	m_pGameInstance->Set_IsMaptool(true);
 
 	if (false == CheckEnumStrings())
 	{
@@ -1111,7 +1120,7 @@ void CMapToolHelper::OnRightClick()
 		return;
 
 	_float2 vMouseViewPortPos = m_pGameInstance->Get_MouseViewPortPos();
-	_vector vWorldPos = m_pGameInstance->Compute_WorldPos(vMouseViewPortPos, TEXT("Target_FieldDepth"));
+	_vector vWorldPos = m_pGameInstance->Compute_WorldPos(vMouseViewPortPos, TEXT("Target_Emissive"));
 
 	if (false == XMVector4Equal(vWorldPos, XMVectorZero())) 
 		m_vPickPos = vWorldPos;
@@ -1931,6 +1940,17 @@ _bool CMapToolHelper::CheckEnumStrings()
 		return false;
 
 	return true;
+}
+
+HRESULT CMapToolHelper::Bind_boolToShader(_bool _bMaptool)
+{
+	_bool bMaptool = _bMaptool;
+	if (FAILED(m_pModelShaderCom->Bind_RawValue("g_bMaptool", &bMaptool, sizeof(_bool))))
+		return E_FAIL;
+	if (FAILED(m_pMapShaderCom->Bind_RawValue("g_bMaptool", &bMaptool, sizeof(_bool))))
+		return E_FAIL;
+
+	return S_OK;
 }
 
 void CMapToolHelper::Reset_MapShaderInfo()
@@ -3031,5 +3051,14 @@ void CMapToolHelper::Free()
 	__super::Free();
 
 	Safe_Release(m_pPickedObject);
+
+	if (m_bisClone == true)
+	{
+		Bind_boolToShader(false);
+		m_pGameInstance->Set_IsMaptool(false);
+	}
+
+	Safe_Release(m_pModelShaderCom);
+	Safe_Release(m_pMapShaderCom);
 }
 
