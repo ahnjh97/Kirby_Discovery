@@ -109,6 +109,9 @@ _int CFinaleKirby::Tick(_float fTimeDelta)
         static_cast<CCamera_Main*>(m_pCamera)->Set_ZAngle(fZRotAngle, .1f);
 
         Kirby_SystemTick(m_fTimeDelta);
+
+        //확인을 위해 계속 갱신하겠슴_HS
+        m_vBonePos = Compute_RootPos();
     }
     else if (INFO(m_eBodyState) == BODY_DUMPCUT)
     {
@@ -452,7 +455,7 @@ HRESULT CFinaleKirby::Make_TargetToCams()
         Safe_AddRef(m_pCamera);
     }
 
-    m_pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FIRST, { 0.f, 2.f, 3.f }, 5.f);
+    m_pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FINALE, /*{ 0.f, 2.f, 3.f }*/{0.f, 2.f, 0.f}, 5.f);
     static_cast<CCamera_Main*>(m_pCamera)->Make_Sequence(CCamera_Main::SEQ_FINALESTART);
 
     //게임 레벨에 free camera 있다면 그놈에게도 타겟 등록해 준다.
