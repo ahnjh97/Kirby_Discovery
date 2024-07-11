@@ -225,6 +225,8 @@ private:
 	_int					m_iCurColorIdx = { -1 };
 
 	pair<_float, _float> m_fRimLightRatio = { 1.f, 1.f };
+	pair<_float, _float> m_fRimLightRadius = { 1.f, 1.f };
+	pair<_float3, _float3> m_vRimColor = {_float3(1.f, 1.f, 1.f), _float3(1.f, 1.f, 1.f)};
 
 
 	_float m_fSSAOScale = { 0.5f };

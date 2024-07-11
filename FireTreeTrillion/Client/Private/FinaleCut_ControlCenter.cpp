@@ -35,6 +35,72 @@ _int CFinaleCut_ControlCenter::Tick(_float fTimeDelta)
 {
 	if (m_bDead == true)
 		return OBJ_DEAD;
+
+
+	if (m_pGameInstance->Get_KeyState(DIK_LCONTROL, KEY_PRESS) &&  m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
+	{
+
+		if (m_pGameInstance->Get_KeyState(DIK_1, KEY_DOWN))
+			Set_CutScene(1);
+
+		if (m_pGameInstance->Get_KeyState(DIK_2, KEY_DOWN))
+			Set_CutScene(2);
+
+		if (m_pGameInstance->Get_KeyState(DIK_3, KEY_DOWN))
+			Set_CutScene(3);
+		
+		if (m_pGameInstance->Get_KeyState(DIK_4, KEY_DOWN))
+			Set_CutScene(4);
+		
+		if (m_pGameInstance->Get_KeyState(DIK_5, KEY_DOWN))
+			Set_CutScene(5);
+		
+		if (m_pGameInstance->Get_KeyState(DIK_6, KEY_DOWN))
+			Set_CutScene(6);
+		
+		if (m_pGameInstance->Get_KeyState(DIK_7, KEY_DOWN))
+			Set_CutScene(7);
+		
+		if (m_pGameInstance->Get_KeyState(DIK_8, KEY_DOWN))
+			Set_CutScene(8);
+
+		if (m_pGameInstance->Get_KeyState(DIK_9, KEY_DOWN))
+			Set_CutScene(9);
+
+		if (m_pGameInstance->Get_KeyState(DIK_0, KEY_DOWN))
+			Set_CutScene(10);
+
+		if (m_pGameInstance->Get_KeyState(DIK_Q, KEY_DOWN))
+			Set_CutScene(11);
+
+		if (m_pGameInstance->Get_KeyState(DIK_W, KEY_DOWN))
+			Set_CutScene(12);
+
+		if (m_pGameInstance->Get_KeyState(DIK_E, KEY_DOWN))
+			Set_CutScene(13);
+
+		if (m_pGameInstance->Get_KeyState(DIK_R, KEY_DOWN))
+			Set_CutScene(14);
+
+		if (m_pGameInstance->Get_KeyState(DIK_T, KEY_DOWN))
+			Set_CutScene(15);
+
+		if (m_pGameInstance->Get_KeyState(DIK_Y, KEY_DOWN))
+			Set_CutScene(16);
+
+		if (m_pGameInstance->Get_KeyState(DIK_U, KEY_DOWN))
+			Set_CutScene(17);
+
+		if (m_pGameInstance->Get_KeyState(DIK_I, KEY_DOWN))
+			Set_CutScene(18);
+
+		if (m_pGameInstance->Get_KeyState(DIK_O, KEY_DOWN))
+			Set_CutScene(19);
+
+		if (m_pGameInstance->Get_KeyState(DIK_P, KEY_DOWN))
+			Set_CutScene(20);
+	}
+
 	return OBJ_NOEVENT;
 }
 
@@ -56,7 +122,6 @@ void CFinaleCut_ControlCenter::Set_CutScene(_uint iScene)
 	CHECK_NULLPTR(pCameraMain);
 
 	pCameraMain->Make_Sequence(CCamera_Main::CAMSEQ((_uint)CCamera_Main::SEQ_FINALECUT1 - 1 + iScene));
-
 }
 
 CFinaleCut_ControlCenter* CFinaleCut_ControlCenter::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

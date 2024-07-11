@@ -667,19 +667,25 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 	{
 	case 0:
 		m_DestColorData = Find_ColorSet("Tutorial");
+		Update_Option(OPTION_DOF, true);
+
 		m_fRimLightRatio.second = .7f;
 		break;
 	case 1:
 		m_DestColorData = Find_ColorSet("Forest");
+		Update_Option(OPTION_DOF, true);
+
 		m_fRimLightRatio.second = .3f;
 		break;
 	case 2:
 		m_DestColorData = Find_ColorSet("Night");
+		Update_Option(OPTION_DOF, true);
 		break;
 	case 3:
 	{
 		m_DestColorData = Find_ColorSet("Stage1");
 		m_fRimLightRatio.second = 1.f;
+		m_bRenderOption[OPTION_DOF] = true;
 
 		if (m_iCurColorIdx != iSetIdx)
 		{
@@ -749,14 +755,22 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 	break;
 	case 4:
 		m_DestColorData = Find_ColorSet("Town");
+		Update_Option(OPTION_DOF, true);
 		m_fRimLightRatio.second = .7f;
 		break;
 	case 5:
-		m_DestColorData = Find_ColorSet("Finale");
+	{
+		//m_DestColorData = Find_ColorSet("Finale");
+		m_DestColorData = Find_ColorSet("Town");
 		m_fRimLightRatio.second = .7f;
-		break;
+		m_vRimColor.second = _float3(1.f, .5f, 0.f);
+		Update_Option(OPTION_DOF, false);
+	}
+	break;
 	default:
 		m_DestColorData = Find_ColorSet("Tutorial");
+		Update_Option(OPTION_DOF, true);
+
 		break;
 	}
 
@@ -1281,8 +1295,16 @@ HRESULT CRenderer::Render_Result()
 	if (FAILED(m_pShader->Bind_RawValue("g_fBlackBackGround", &m_fBlackBackground, sizeof(_float))))
 		return E_FAIL;
 
-	// 검은 배경의 color 배율
+	// 림 라이트 배율
 	if (FAILED(m_pShader->Bind_RawValue("g_fRimLightRatio", &m_fRimLightRatio.first, sizeof(_float))))
+		return E_FAIL;
+
+	// 림 라이트 범위
+	if (FAILED(m_pShader->Bind_RawValue("g_fRimLightRadius", &m_fRimLightRadius.first, sizeof(_float))))
+		return E_FAIL;
+
+	// 림 라이트 컬러
+	if (FAILED(m_pShader->Bind_RawValue("g_vRimColor", &m_vRimColor.first, sizeof(_float3))))
 		return E_FAIL;
 
 	// 섞을 스카이 박스
@@ -1790,6 +1812,8 @@ void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 
 	_float fInterpolateSpeed = 2.f * _fTimeDelta;
 
+
+	//림 라이트 배율
 	if (.001f < abs(m_fRimLightRatio.second - m_fRimLightRatio.first))
 	{
 		m_fRimLightRatio.first += (m_fRimLightRatio.second - m_fRimLightRatio.first) * fInterpolateSpeed;
@@ -1798,6 +1822,28 @@ void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 			m_fRimLightRatio.first = m_fRimLightRatio.second;
 		}
 	}
+	//림 라이트 반경
+	if (.001f < abs(m_fRimLightRadius.second - m_fRimLightRadius.first))
+	{
+		m_fRimLightRadius.first += (m_fRimLightRadius.second - m_fRimLightRadius.first) * fInterpolateSpeed;
+		if (abs(m_fRimLightRadius.first - m_fRimLightRadius.second) < 0.001f)
+		{
+			m_fRimLightRadius.first = m_fRimLightRadius.second;
+		}
+	}
+	//림 라이트 색
+	if (.01f < _float3::Distance(m_vRimColor.first, m_vRimColor.second))
+	{
+		m_vRimColor.first = _float3::Lerp(m_vRimColor.first, m_vRimColor.second, fInterpolateSpeed);
+
+
+		if (_float3::Distance(m_vRimColor.first, m_vRimColor.second) < 0.01f)
+		{
+			m_vRimColor.first = m_vRimColor.second;
+		}
+	}
+
+
 
 	if (.01f < abs(m_fExposure - m_DestColorData.fExposure))
 	{
@@ -1922,10 +1968,7 @@ void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 
 		if (abs(m_vWhiteBalance[0] - m_DestColorData.vWhiteBalance[0]) < 0.001f)
 		{
-
 			memcpy(m_vWhiteBalance, m_DestColorData.vWhiteBalance, sizeof(_float3));
-
-
 		}
 	}
 
