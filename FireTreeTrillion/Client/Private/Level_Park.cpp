@@ -74,7 +74,7 @@ HRESULT CLevel_Park::Initialize()
 		return E_FAIL;
 	
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
-	m_pGameInstance->Set_ColorSet_ByIndex(5);
+	m_pGameInstance->Set_ColorSet_ByIndex(6);
 
 
 	// 해당 위치의 행렬을 넘긴다.
@@ -125,9 +125,9 @@ HRESULT CLevel_Park::Ready_Lights()
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
 	LightDesc.vDirection = _float4(0.f, -1.f, -.3f, 0.f);
 
-	LightDesc.vDiffuse = _float4(0.6f, 0.5f, 0.3f, 1.f);
-	LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
-	LightDesc.vSpecular = _float4(0.2f, 0.2f, 0.2f, 1.f);
+	LightDesc.vDiffuse = _float4(0.f, 0.f, 0.f, 1.f);
+	//LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
+	//LightDesc.vSpecular = _float4(0.2f, 0.2f, 0.2f, 1.f);
 
 	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
 		return E_FAIL;

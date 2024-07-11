@@ -71,6 +71,9 @@ public:
 	void InsertHitboxActivationTiming(_uint iAnimIdx, vector<tuple<_float, _bool, COLLISION_VALUE>>& _vecTimings);
 	void TransformToDefault();
 
+	SIMBA_ANIM Get_PreState() { return m_ePreState; }
+	void Set_PreState(_uint _ePreState) { m_ePreState = SIMBA_ANIM(_ePreState); }
+
 public:
 	virtual HRESULT Initialize_Prototype()			override;
 	virtual HRESULT Initialize(void* pArg)			override;
@@ -91,8 +94,10 @@ public:
 
 private:
 	CTexture*		m_pEyeTextureCom[EYETEX_END] = { nullptr, nullptr, nullptr };
+	CGameObject*	m_pKirby = { nullptr };
 
 	SIMBA_ANIM		m_eCurrentState = { SIMBA_END };
+	SIMBA_ANIM		m_ePreState = { SIMBA_END };
 	SIMBA_EYESTATE	m_eEyeState = { SIMBAEYE_END };
 
 	vector<_uint>	m_vecMeshes;

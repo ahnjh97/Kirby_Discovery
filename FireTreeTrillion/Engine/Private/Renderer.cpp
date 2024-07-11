@@ -456,6 +456,13 @@ void CRenderer::Color_Initialize()
 0.280444f, 0.670456f
 		});
 
+	Save_ColorSet("Horror",
+		COLOR_DATA{
+1.50967f, 1.f, 1.00975f, 1.00983f, 0.990212f, 1.20989f, 1.20994f, 0.709838f, 0.699999f, 0.700001f,
+0.99009f, 0.999997f, 1.f, 0.0848762f, 0.0345318f, 0.177767f, 0.00976206f, 0.466084f, 0.676991f,
+0.218674f, 0.00988089f, 0.499961f, 0.912908f, 0.99115f, 0.00997962f, 0.189991f, 0.360167f
+		});
+
 	//쉐이더 타입 트리거는 idx 1, 접촉하면 해당 함수를 호출!
 	function<void(_int)> TriggerFunc = bind(&CRenderer::Set_ColorSet_ByIndex, this, placeholders::_1);
 	m_pGameInstance->Emplace_TriggerFunc(1, TriggerFunc);
@@ -765,6 +772,14 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 		m_fRimLightRatio.second = .7f;
 		m_vRimColor.second = _float3(1.f, .5f, 0.f);
 		Update_Option(OPTION_DOF, false);
+	}
+	break;
+	case 6:
+	{
+		m_DestColorData = Find_ColorSet("Horror");
+		m_fRimLightRatio.second = 0.f;
+		//m_vRimColor.second = _float3(1.f, .5f, 0.f);
+		Update_Option(OPTION_DOF, true);
 	}
 	break;
 	default:
@@ -1135,6 +1150,10 @@ HRESULT CRenderer::Render_Effect()
 
 	if (FAILED(m_pGameInstance->End_MRT()))
 		return E_FAIL;
+
+
+
+
 
 
 	// 투명한 객체 + 블룸

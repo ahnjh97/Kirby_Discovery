@@ -34,20 +34,20 @@ void CKirbyBulb_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
     Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
 
     if (DESC(m_pLight) != nullptr)
-        DESC(m_pLight)->Update_LightPos(pTransformCom->Get_State(CTransform::STATE_POSITION) + pTransformCom->Get_State(CTransform::STATE_UP) * 2.f);
+        DESC(m_pLight)->Update_LightPos(pKirby->Get_BulbLightPos());
 
 
     if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == true && DESC(m_bLightOn) == false)
     {
-        DESC(m_pLight)->Interpolate_Light(_float4(1.f, 1.f, 1.f, 0.f), 7.f, 0.2f);
-        pKirby->Change_State(CKirby::BULBSTATE_LIGHTON, 400.f, false, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
+        DESC(m_pLight)->Interpolate_Light(_float4(1.f, 1.f, 1.f, 0.f), 14.f, 0.2f);
+        pKirby->Change_State(CKirby::BULBSTATE_LIGHTON, 300.f, false, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
         DESC(m_bLightOn) = true;
         return;
     }
     else if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == false && DESC(m_bLightOn) == true)
     {
-        DESC(m_pLight)->Interpolate_Light(_float4(0.7f, 0.2f, 0.2f, 0.f), 3.f, 1.f);
-        pKirby->Change_State(CKirby::BULBSTATE_LIGHTOFF, 400.f, false, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
+        DESC(m_pLight)->Interpolate_Light(_float4(0.7f, 0.2f, 0.2f, 0.f), 6.f, 1.f);
+        pKirby->Change_State(CKirby::BULBSTATE_WAIT, 60.f, true, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
         DESC(m_bLightOn) = false;
         return;
     }
@@ -143,19 +143,19 @@ void CKirbyBulb_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
     Kirby_EyeState_Assist(Kirbydesc);
 
     if (DESC(m_pLight) != nullptr)
-        DESC(m_pLight)->Update_LightPos(pTransformCom->Get_State(CTransform::STATE_POSITION) +pTransformCom->Get_State(CTransform::STATE_UP) * 2.f);
+        DESC(m_pLight)->Update_LightPos(pKirby->Get_BulbLightPos());
 
     if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == true && DESC(m_bLightOn) == false)
     {
-        DESC(m_pLight)->Interpolate_Light(_float4(1.f, 1.f, 1.f, 0.f), 7.f, 0.2f);
-        pKirby->Change_State(CKirby::BULBSTATE_LIGHTON, 400.f, false, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
+        DESC(m_pLight)->Interpolate_Light(_float4(1.f, 1.f, 1.f, 0.f), 14.f, 0.2f);
+        pKirby->Change_State(CKirby::BULBSTATE_LIGHTON, 300.f, false, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
         DESC(m_bLightOn) = true;
         return;
     }
     else if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == false && DESC(m_bLightOn) == true)
     {
-        DESC(m_pLight)->Interpolate_Light(_float4(0.7f, 0.2f, 0.2f, 0.f), 3.f, 1.f);
-        pKirby->Change_State(CKirby::BULBSTATE_LIGHTOFF, 400.f, false, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
+        DESC(m_pLight)->Interpolate_Light(_float4(0.7f, 0.2f, 0.2f, 0.f), 6.f, 1.f);
+        pKirby->Change_State(CKirby::BULBSTATE_WAIT, 60.f, true, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
         DESC(m_bLightOn) = false;
         return;
     }
@@ -314,7 +314,7 @@ void CKirbyBulb_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
     Kirby_EyeState_Assist(Kirbydesc);
 
     if (DESC(m_pLight) != nullptr)
-        DESC(m_pLight)->Update_LightPos(pTransformCom->Get_State(CTransform::STATE_POSITION) + pTransformCom->Get_State(CTransform::STATE_UP) * 2.f);
+        DESC(m_pLight)->Update_LightPos(pKirby->Get_BulbLightPos());
 
     if (pKirby->Get_State() == CKirby::BULBSTATE_LANDING || pKirby->Get_State() == CKirby::BULBSTATE_LANDINGBRIGHT ||
         pKirby->Get_State() == CKirby::BULBSTATE_LANDINGEND || pKirby->Get_State() == CKirby::BULBSTATE_LANDINGENDBRIGHT)
@@ -340,19 +340,19 @@ void CKirbyBulb_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
     if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == true && DESC(m_bLightOn) == false)
     {
         if (pKirby->Get_State() == CKirby::BULBSTATE_JUMP)
-            pKirby->Change_State(CKirby::BULBSTATE_LIGHTONAIR, 400.f, false, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
+            pKirby->Change_State(CKirby::BULBSTATE_LIGHTONAIR, 400.f, true, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
         else
-            pKirby->Change_State(CKirby::BULBSTATE_LIGHTON, 400.f, false, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
+            pKirby->Change_State(CKirby::BULBSTATE_LIGHTON, 300.f, false, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
         DESC(m_bLightOn) = true;
-        DESC(m_pLight)->Interpolate_Light(_float4(1.f, 1.f, 1.f, 0.f), 7.f, 0.2f);
+        DESC(m_pLight)->Interpolate_Light(_float4(1.f, 1.f, 1.f, 0.f), 14.f, 0.2f);
 
     }
     else if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == false && DESC(m_bLightOn) == true)
     {
         if (pKirby->Get_State() != CKirby::BULBSTATE_JUMP)
-            pKirby->Change_State(CKirby::BULBSTATE_LIGHTOFF, 400.f, false, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
+            pKirby->Change_State(CKirby::BULBSTATE_WAIT, 60.f, true, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
         DESC(m_bLightOn) = false;
-        DESC(m_pLight)->Interpolate_Light(_float4(0.7f, 0.2f, 0.2f, 0.f), 3.f, 1.f);
+        DESC(m_pLight)->Interpolate_Light(_float4(0.7f, 0.2f, 0.2f, 0.f), 6.f, 1.f);
 
     }
 
@@ -649,22 +649,22 @@ void CKirbyBulb_Light_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
     Kirby_EyeState_Assist(Kirbydesc);
 
     if (DESC(m_pLight) != nullptr)
-        DESC(m_pLight)->Update_LightPos(pTransformCom->Get_State(CTransform::STATE_POSITION) + pTransformCom->Get_State(CTransform::STATE_UP) * 2.f);
+        DESC(m_pLight)->Update_LightPos(pKirby->Get_BulbLightPos());
 
 
     if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == true && DESC(m_bLightOn) == false)
     {
-        pKirby->Change_State(CKirby::BULBSTATE_LIGHTON, 400.f, false, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
+        pKirby->Change_State(CKirby::BULBSTATE_LIGHTON, 300.f, false, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
         DESC(m_bLightOn) = true;
-        DESC(m_pLight)->Interpolate_Light(_float4(1.f, 1.f, 1.f, 0.f), 7.f, 0.2f);
+        DESC(m_pLight)->Interpolate_Light(_float4(1.f, 1.f, 1.f, 0.f), 14.f, 0.2f);
 
         return;
     }
     else if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == false && DESC(m_bLightOn) == true)
     {
-        pKirby->Change_State(CKirby::BULBSTATE_LIGHTOFF, 400.f, false, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
+        pKirby->Change_State(CKirby::BULBSTATE_WAIT, 60.f, true, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
         DESC(m_bLightOn) = false;
-        DESC(m_pLight)->Interpolate_Light(_float4(0.7f, 0.2f, 0.2f, 0.f), 3.f, 1.f);
+        DESC(m_pLight)->Interpolate_Light(_float4(0.7f, 0.2f, 0.2f, 0.f), 6.f, 1.f);
         return;
     }
 
@@ -832,6 +832,8 @@ void CKirbyBulb_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
             Safe_AddRef(DESC(m_pLight));
 
 
+            if (DESC(m_pLight) != nullptr)
+                DESC(m_pLight)->Update_LightPos(pKirby->Get_BulbLightPos());
             DESC(m_bLightOn) = true;
 
             pKirby->Change_State(CKirby::BULBSTATE_DEMOENDFIRST, 60.f, false, false, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
@@ -842,6 +844,8 @@ void CKirbyBulb_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
     else if (pKirby->Get_State() == CKirby::BULBSTATE_DEMOENDFIRST)
     {
         Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
+        if (DESC(m_pLight) != nullptr)
+            DESC(m_pLight)->Update_LightPos(pKirby->Get_BulbLightPos());
 
         if (pKirby->isAnimFinish())
         {
@@ -856,7 +860,7 @@ void CKirbyBulb_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
             pKirby->Change_State(CKirby::BULBSTATE_WAIT, 60.f, true, false, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
 
             DESC(m_bLightOn) = false;
-            DESC(m_pLight)->Interpolate_Light(_float4(0.7f, 0.2f, 0.2f, 0.f), 3.f, 1.f);
+            DESC(m_pLight)->Interpolate_Light(_float4(0.7f, 0.2f, 0.2f, 0.f), 6.f, 1.f);
 
             return;
         }
