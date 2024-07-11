@@ -175,8 +175,7 @@ public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual _int Tick(_float fTimeDelta) override;
-	//virtual _int Tick(_float fTimeDelta) override;
-	virtual void Late_Tick(_float fTimeDelta) override {}
+	virtual void Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 #ifdef _DEBUG
 	virtual void Render_IMGUI() override;
@@ -185,6 +184,15 @@ public:
 
 
 private:
+
+	//for Finale
+	_int				m_iPreSceneIdx =	{ 0 };
+	_int				m_iCurSceneIdx =	{ 0 };
+
+	//_bool				m_bChangedScene = { false };
+	_int				m_iSceneCnt =		{ -1 };
+
+
 /*카메라 트리거*/
 	vector<_float4x4>	m_vecCamMatrices;
 	_int				m_iMatrixIndex = { -1 };
@@ -334,6 +342,8 @@ private:
 	void MoveTo_CurCamPos_Interpolate(_float fTimeDelta);
 	void MoveTo_CurCamPos_Absolute(_float fTimeDelta);
 
+	void System_Tick(_float fTimeDelta);
+	void Check_FinaleScene(_float fTimeDelta);
 	//void Orbit_Target(_float fTimeDelta);
 
 

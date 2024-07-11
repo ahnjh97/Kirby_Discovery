@@ -8,12 +8,14 @@
 #include "EventCenter.h"
 #include "PartTimeHelper.h"
 #include "Particle.h"
+#include "FinaleCut_ControlCenter.h"
 
-#define ORIG_POS _float3(2525.f, 242.f, -136.f)
+
+#define ORIG_POS _float3(2550.f, 242.f, -136.f)
 #define BATTLE_POS _float3(2525.f, 220.f, -136.f)
-
 #define BOSS_POS _float3(2548.f, 242.f, -136.f)
-//#define KIRBY_POS _float3(2525.f, 220.f, -136.f)
+
+#define ISDEFAULTCNT(intvalue) (intvalue == -1)
 
 CCamera_Main::CCamera_Main(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CCamera{ pDevice, pContext }
@@ -193,6 +195,60 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 	return S_OK;
 }
 
+void CCamera_Main::System_Tick(_float fTimeDelta)
+{
+	//이펙트 소켓 업데이트
+	m_EffectSocket = _float4x4::Identity;
+	CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+
+	Check_FinaleScene(fTimeDelta);
+}
+
+void CCamera_Main::Check_FinaleScene(_float fTimeDelta)
+{
+
+	CFinaleCut_ControlCenter* pCenter =
+		static_cast<CFinaleCut_ControlCenter*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinaleCut_ControlCenter")));
+	if (nullptr == pCenter)
+		return;
+
+
+	//이전 인덱스 갱신하는데
+	m_iPreSceneIdx = m_iCurSceneIdx;
+
+	//지금 신 변화 안 했고, 현재 인덱스와 동일하다면 아무런 변화 없음.
+	m_iCurSceneIdx = pCenter->Get_CutScene();
+
+	if (ISDEFAULTCNT(m_iSceneCnt) && m_iPreSceneIdx == m_iCurSceneIdx)
+		return;
+
+
+	//만약에 받았는데 다르다면, 카운트 값 초기화한다.
+	if (m_iPreSceneIdx != m_iCurSceneIdx)
+		m_iSceneCnt = 2;
+
+
+	if (ISDEFAULTCNT(m_iSceneCnt))
+		return;
+
+
+	//지금 신 변화 하는 중이면 카운트 깎는다.
+	//다 깎였으면(2틱 돌았으면 여기서 시퀀스 세팅한다.)
+	if (0 < m_iSceneCnt)
+		m_iSceneCnt--;
+	else
+	{
+		//여기에서 make seq 한다. 6, 8번 컷신은 패스
+		if (m_iCurSceneIdx != 6 && m_iCurSceneIdx != 8)
+			Make_Sequence(CAMSEQ((_uint)SEQ_FINALECUT1 + (-1 + m_iCurSceneIdx)));
+
+		//값 초기화
+		m_iSceneCnt = -1;
+	}
+
+
+}
+
 _int CCamera_Main::Tick(_float fTimeDelta)
 {
 
@@ -201,6 +257,7 @@ _int CCamera_Main::Tick(_float fTimeDelta)
 	if (.1f < fRealTimeDelta)
 		fRealTimeDelta = 1.f / 60.f;
 
+	System_Tick(fTimeDelta);
 
 	Control(fRealTimeDelta);
 
@@ -224,10 +281,13 @@ _int CCamera_Main::Tick(_float fTimeDelta)
 	Set_DeferredCamSet(fRealTimeDelta);
 
 
-	m_EffectSocket = _float4x4::Identity;
-	CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+
 
 	return OBJ_NOEVENT;
+}
+
+void CCamera_Main::Late_Tick(_float fTimeDelta)
+{
 }
 
 //타겟 위치로부터 카메라 위치를 갱신, 보간한다.
@@ -1645,10 +1705,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	// 커비 뒤에서 보스 봄
 	case SEQ_FINALECUT11:
 	{
-		//1.8초
-		//커비 시작
-		_float3 vStartPos =
-		{ 2463.f, 175.f, -136.f };
+		_float3 vStartPos = ORIG_POS - _float3{ -90.f, -45.f, 0.f };
 
 		_float fTotalDuration = 110.f / 60.f;
 
@@ -1679,10 +1736,8 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	//커비 다가옴
 	case SEQ_FINALECUT12:
 	{
-		//70f 1.7
-		//커비 시작
-		_float3 vStartPos =
-		{ 2463.f, 175.f, -136.f };
+		_float3 vStartPos = ORIG_POS - _float3{ -90.f, -45.f, 0.f };
+
 		_float fTotalDuration = 1.7f;
 
 		CAMACTION newAction = {};
@@ -1705,7 +1760,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 		newAction.fTime = 0.f;
 		newAction.fInterpolateSpeed = fTotalDuration;
-		
+
 		newAction.eCamCut = CUT_INTERPOLATE;
 		newAction.eEase = EASE_INOUT;
 
@@ -1729,7 +1784,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 			BATTLE_POS + _float3(-25.f, -10.f, 0.f);
 
 		_float3 vBossStartPos =
-			BATTLE_POS + _float3(25.f, 20.f, 0.f); 
+			BATTLE_POS + _float3(25.f, 20.f, 0.f);
 
 
 		_float fTotalDuration = 5.32f;
@@ -1740,7 +1795,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction.fFOVY = 45.f;
 
 		newAction.eCamDir = DIR_ABSOLUTE;
-		newAction.vDir = _float3{ -.23f, -.34f, -.91f};
+		newAction.vDir = _float3{ -.23f, -.34f, -.91f };
 		newAction.vDir.Normalize();
 
 
@@ -1895,7 +1950,6 @@ void CCamera_Main::Start_BridgeSeq(CGameObject* pNotifier)
 	Make_Sequence(SEQ_BREAKRACINGMAP);
 }
 
-
 HRESULT CCamera_Main::Render()
 {
 	return S_OK;
@@ -1919,6 +1973,7 @@ void CCamera_Main::Set_DeferredCamSet(_float fTimeDelta)
 	//카메라 쉐이크
 	_float4 vDir = Make_ShakeDir(fTimeDelta);
 	m_pTransformCom->Move(vDir);
+
 }
 
 
@@ -1955,8 +2010,6 @@ void CCamera_Main::Control(_float fTimeDelta)
 	}
 	*/
 }
-
-
 
 void CCamera_Main::Update_Anchor(_float fTimeDelta)
 {
@@ -2305,3 +2358,5 @@ void CCamera_Main::Free()
 
 	__super::Free();
 }
+
+
