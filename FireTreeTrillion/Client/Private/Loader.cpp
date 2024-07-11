@@ -62,6 +62,7 @@
 #include "BombOrbit.h"
 #include "KirbyBomb.h"
 #include "PartTimerKirby.h"
+#include "BulbFlare.h"
 
 // ∏ÛΩ∫≈Õ
 #include "KirbyWeapons.h"
@@ -384,6 +385,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BombOrbitGlow"), CBombOrbitGlow);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KirbyBomb"), CKirbyBomb);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PartTimerKirby"), CPartTimerKirby);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BulbFlare"), CBulbFlare);
 
 	// Deform
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Car"), CCar);
@@ -2246,6 +2248,10 @@ HRESULT CLoader::Add_KirbyFaceTexture(LEVEL eLevel)
 	if (FAILED(Add_Texture(eLevel, "mouth_surprise", "KirbyFace/mouth_surprise.png")))
 		return E_FAIL;
 
+	if (FAILED(Add_Texture(eLevel, "BulbFlare", "KirbyBulbFlare/BulbFlare.dds")))
+		return E_FAIL;
+
+
 	// Kirby Guide UI
 	if (FAILED(Add_Texture(eLevel, "BombOrbit", "KirbyBombOrbit/BombOrbit.dds")))
 		return E_FAIL;
@@ -2525,7 +2531,6 @@ void CLoader::Load_KirbyBodyModels()
 
 	// Deform
 	m_vecModelInfo.emplace_back("Bulb", TYPE_ANIM, 1.f, 180.f);
-
 }
 
 void CLoader::Load_KirbyWeaponModels()

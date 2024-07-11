@@ -64,6 +64,7 @@ public:
 	HRESULT Add_DebugComponents(class CComponent* pRenderComponent);
 	_bool	Get_HitBoxRender();
 	_bool   Get_IsRenderRTV();
+	void	Set_IsMaptool(_bool bMaptool);
 #endif
 
 public: /* For.Level_Manager */

@@ -12,7 +12,7 @@ class ENGINE_DLL CCamera abstract : public CGameObject
 {
 public:
 	enum CAMTARGET	{ TARGET_FIRST, TARGET_SECOND, TARGET_END };
-	enum CAMFOCUS	{ FOCUS_FIRST, FOCUS_SECOND, FOCUS_BOTH, FOCUS_END };
+	enum CAMFOCUS	{ FOCUS_FIRST, FOCUS_SECOND, FOCUS_BOTH, FOCUS_FINALE, FOCUS_END };
 	enum CAMLOCK	{ LOCK_POS, LOCK_DIR, LOCK_ALL, LOCK_END};
 
 	typedef struct : public CGameObject::GAMEOBJECT_DESC
@@ -37,9 +37,13 @@ public:
 	virtual void Lock_Position(_float3 vPos = {-1.f, -1.f, -1.f}, _bool bInterpolate = false);
 	virtual void Lock_Direction(_float3 vLook = { -1.f, -1.f, -1.f }, _bool bInterpolate = false);
 	virtual void Lock_All(_float3 vPos = { -1.f, -1.f, -1.f }, _float3 vLook = { -1.f, -1.f, -1.f }, _bool bInterpolate = false);
+	
+	virtual void Make_Shake(_float fPower = 1.f, _float fTime = .5f, _float2 vDir = _float2(0.f, -1.f)) {}
+	
 	void Set_FOVY(_float fFOVY) { m_fFovy = ToRadian(m_fFovy); }
-	void Unlock() { m_eCamLockMode = LOCK_END; }
 
+	//카메라 프리용 락.
+	void Unlock() { m_eCamLockMode = LOCK_END; }
 	void LockToggle() { m_bLockCamera = !m_bLockCamera; }
 	void Lock_Camera(_float3 vPos, _float3 vLook, _float fFOVY);
 

@@ -447,6 +447,13 @@ _bool CGameInstance::Get_IsRenderRTV()
 
 	return m_pRenderer->Get_IsRenderRTV();
 }
+void CGameInstance::Set_IsMaptool(_bool bMaptool)
+{
+	if (nullptr == m_pRenderer)
+		return;
+
+	return m_pRenderer->Set_IsMaptool(bMaptool);
+}
 #endif
 
 HRESULT CGameInstance::Open_Level(_uint iNewLevelID, CLevel* pNewLevel)
