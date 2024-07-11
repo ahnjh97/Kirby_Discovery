@@ -89,6 +89,7 @@ private:
 	HRESULT						Render_Message();
 	void						Split_Message();
 	_float2						Repose_Fonts(_float2 fontPos, wstring wstrHighlightMsg);
+	void						OnEvent();
 
 public:
 	static CUI_MessageWindow*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

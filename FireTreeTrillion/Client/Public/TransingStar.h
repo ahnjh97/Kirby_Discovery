@@ -74,6 +74,8 @@ private:
 	// 연두별 셰이더 처리
 	_bool						m_bDeadYeonDoo = false;
 
+	_float						m_fTimeDelta = _float();
+
 
 public:
 	static CTransingStar* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
