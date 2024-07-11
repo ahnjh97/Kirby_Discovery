@@ -293,27 +293,27 @@ HRESULT CUI_PartTime::Add_Components()
 		return E_FAIL;
 
 	// 시간 카운트 다운하는 숫자 텍스쳐
-	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_TempWhiteDigits"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_TimeDigits"),
 		TEXT("Com_Texture_TimeDigits_00"), (CComponent**)&m_arrTexures[10]);
 	CHECK_FAILED(hr);
-	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_TempWhiteDigits"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_TimeDigits"),
 		TEXT("Com_Texture_TimeDigits_0"), (CComponent**)&m_arrTexures[11]);
 	CHECK_FAILED(hr);
 
 	// 스코어 관리하는 숫자 텍스쳐
-	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_TempRedDigits"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_ScoreDigits"),
 		TEXT("Com_Texture_ScoreDigits_000"), (CComponent**)&m_arrTexures[12]);
 	CHECK_FAILED(hr);
-	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_TempRedDigits"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_ScoreDigits"),
 		TEXT("Com_Texture_ScoreDigits_00"), (CComponent**)&m_arrTexures[13]);
 	CHECK_FAILED(hr);
-	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_TempRedDigits"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_ScoreDigits"),
 		TEXT("Com_Texture_ScoreDigits_0"), (CComponent**)&m_arrTexures[14]);
 	CHECK_FAILED(hr);
 
-	// GAME-OVER 텍스쳐
-	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_GameFoodUI_FoodGameTextMask"),
-		TEXT("Com_Texture_Gameover"), (CComponent**)&m_arrTexures[15]);
+	// FINISH 텍스쳐
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Parttime_Finish"),
+		TEXT("Com_Texture_Finish"), (CComponent**)&m_arrTexures[15]);
 	CHECK_FAILED(hr);
 
 	// FADE 텍스쳐
@@ -322,12 +322,12 @@ HRESULT CUI_PartTime::Add_Components()
 	CHECK_FAILED(hr);
 
 	// READY 텍스쳐
-	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_GameFoodUI_FoodGameTextMask"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Parttime_Ready"),
 		TEXT("Com_Texture_Ready"), (CComponent**)&m_arrTexures[17]);
 	CHECK_FAILED(hr);
 	
 	// GO 텍스쳐
-	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_GameFoodUI_FoodGameTextMask"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Parttime_Go"),
 		TEXT("Com_Texture_Go"), (CComponent**)&m_arrTexures[18]);
 	CHECK_FAILED(hr);
 

@@ -80,7 +80,6 @@ HRESULT CSkySphere::Render()
 		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS);
 		CHECK_FAILED(hr);
 
-		//TextureType_HEIGHT, TextureType_EMISSIVE
 		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS);
 		CHECK_FAILED(hr);
 
@@ -103,8 +102,9 @@ HRESULT CSkySphere::Render()
 
 			hr = m_pTextureCom[TEX_NORMAL]->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", SKY_LAB_2PASE);
 			CHECK_FAILED(hr);
-			//TEX_EMISSIVE :: 방출 옵션. 임시로 MRA에 연결
-			hr = m_pTextureCom[TEX_EMISSIVE]->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", SKY_LAB_2PASE);
+
+			//TEX_EMISSIVE :: 방출 옵션
+			hr = m_pTextureCom[TEX_EMISSIVE]->Bind_ShaderResource(m_pShaderCom, "g_EmissiveTexture", SKY_LAB_2PASE);
 			CHECK_FAILED(hr);
 
 			hr = m_pTextureCom[TEX_HEIGHT]->Bind_ShaderResource(m_pShaderCom, "g_DepthTexture", SKY_LAB_2PASE);

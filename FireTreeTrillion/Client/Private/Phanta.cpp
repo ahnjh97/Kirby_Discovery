@@ -23,17 +23,17 @@ HRESULT CPhanta::Initialize_Prototype()
 
 HRESULT CPhanta::Initialize(void* pArg)
 {
-	PHANTA_DESC* pPhantaDesc = nullptr;
+	GAMEOBJECT_DESC* pGameObjectDesc = nullptr;
 
 	if (nullptr != pArg)
 	{
-		pPhantaDesc = (PHANTA_DESC*)pArg;
+		pGameObjectDesc = (GAMEOBJECT_DESC*)pArg;
 
-		pPhantaDesc->fSpeedPerSec = 7.f;
-		pPhantaDesc->fRotationPerSec = XMConvertToRadians(90.0f);
+		pGameObjectDesc->fSpeedPerSec = 7.f;
+		pGameObjectDesc->fRotationPerSec = XMConvertToRadians(90.0f);
 	}
 
-	if (FAILED(__super::Initialize(pPhantaDesc)))
+	if (FAILED(__super::Initialize(pGameObjectDesc)))
 		return E_FAIL;
 
 	if (FAILED(Add_Components()))
@@ -214,7 +214,7 @@ HRESULT CPhanta::Add_Components()
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
 	desc.fOffset = 0.5f;
-	desc.tCapsuleShape.fHeight = 0.4f;
+	desc.tCapsuleShape.fRadius = 0.4f;
 	desc.tCapsuleShape.fHeight = 0.4f;
 	desc.uCollisionType = m_eCollisionGroup;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),

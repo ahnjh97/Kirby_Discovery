@@ -104,14 +104,8 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 		{
 			m_eCurState = WINDOW_HIDE;
 			m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_HIDE);
-
-			
+			OnEvent();
 		}
-	}
-
-	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN))
-	{
-		m_pGameInstance->Reserve_Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_TOOL_ANIM));
 	}
 
 	_float3 vOffset = { 0.9f, 0.9f, 1.f };
@@ -505,6 +499,28 @@ _float2 CUI_MessageWindow::Repose_Fonts(_float2 fontPos, wstring wstrHighlightMs
 
 	return pos2D;
 }
+
+void CUI_MessageWindow::OnEvent()
+{
+	switch(*m_pCurrentLevelID)
+	{
+	case LEVEL_DEEDEEDEE:
+	{
+		//Fade-out
+		m_pGameInstance->Reserve_Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_TOOL_FX));
+	}
+	break;
+	case LEVEL_TOWN:
+	{
+		m_pGameInstance->Reserve_Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_TOOL_ANIM));
+	}
+	break;
+	case LEVEL_SIMBA:
+	{}
+	break;
+	}
+}
+
 
 CUI_MessageWindow* CUI_MessageWindow::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

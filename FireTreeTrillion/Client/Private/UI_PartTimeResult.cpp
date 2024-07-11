@@ -331,13 +331,13 @@ HRESULT CUI_PartTimeResult::Add_Components()
 	CHECK_FAILED(hr);
 
 	// 총 토탈 점수판
-	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_TempRedDigits"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_ScoreDigits"),
 		TEXT("Com_Texture_ScoreDigits_000"), (CComponent**)&m_arrTexures[1]);
 	CHECK_FAILED(hr);
-	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_TempRedDigits"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_ScoreDigits"),
 		TEXT("Com_Texture_ScoreDigits_00"), (CComponent**)&m_arrTexures[2]);
 	CHECK_FAILED(hr);
-	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_TempRedDigits"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_ScoreDigits"),
 		TEXT("Com_Texture_ScoreDigits_0"), (CComponent**)&m_arrTexures[3]);
 	CHECK_FAILED(hr);
 
@@ -347,13 +347,13 @@ HRESULT CUI_PartTimeResult::Add_Components()
 	CHECK_FAILED(hr);
 
 	// 올라간 숫자판
-	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_TempRedDigits"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_ScoreDigits"),
 		TEXT("Com_Texture_TotalScoreDigits_000"), (CComponent**)&m_arrTexures[5]);
 	CHECK_FAILED(hr);
-	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_TempRedDigits"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_ScoreDigits"),
 		TEXT("Com_Texture_TotalScoreDigits_00"), (CComponent**)&m_arrTexures[6]);
 	CHECK_FAILED(hr);
-	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_TempRedDigits"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_ScoreDigits"),
 		TEXT("Com_Texture_TotalScoreDigits_0"), (CComponent**)&m_arrTexures[7]);
 	CHECK_FAILED(hr);
 
