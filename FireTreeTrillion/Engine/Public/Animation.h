@@ -23,9 +23,7 @@ public:
 		m_fTrackPosition = 0.f;
 		m_preTrackPosition = 0.f;
 		for (_uint i = 0; i < m_iNumChannels; ++i)
-		{
 			m_CurrentKeyFrameIndices[i] = 0;
-		}
 	}
 
 	void Reset_Ratio() { m_bRatio = true; }
@@ -58,7 +56,7 @@ public:
 public:
 	HRESULT		Initialize(const vector<class CBone*>& Bones, ifstream& fileStream);
 	void		Invalidate_TransformationMatrix(_float fTimeDelta, const vector<class CBone*>& Bones, _bool bIsLooping, class CModel* model);
-
+	void		Lerp_TransformMatrix(_float fTimeDelta, const vector<class CBone*>& Bones, _float& fPartialAnimLerpTime, CModel* pModel, unordered_set<_uint>& _setValidBones);
 	void		Read_AnimationData(ifstream& fileStream);
 
 private:

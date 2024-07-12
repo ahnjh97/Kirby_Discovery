@@ -30,6 +30,7 @@ void CSimba::TransformToDefault()
 {
 	m_pTransformCom->Set_WorldMatrix(m_matDefault);
 	m_pControllerCom->Set_Position(m_pTransformCom, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+	m_bRenderMant = true;
 }
 
 HRESULT CSimba::Initialize_Prototype()
@@ -69,20 +70,23 @@ HRESULT CSimba::Initialize(void* pArg)
 
 	m_iEyeMesh = m_pModelCom->Find_MeshIndex(string("BodyM__EyeC"));
 	m_iEyeLidMesh = m_pModelCom->Find_MeshIndex(string("EyelidM__EyelidC"));
+	_uint iMantIndex = m_pModelCom->Find_MeshIndex(string("MantM__MantC"));
+	_uint iFurIndex = m_pModelCom->Find_MeshIndex(string("FurL__MantC"));
+	m_vecMantMeshes = { iMantIndex, iFurIndex };
 
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 	for (_uint i = 0; i < iNumMeshes; i++)
 	{
-		if (i == m_iEyeMesh || i == m_iEyeLidMesh)
+		if (i == m_iEyeMesh || i == m_iEyeLidMesh || i == iMantIndex || i == iFurIndex)
 			continue;
 		m_vecMeshes.push_back(i);
 	}
 
 	m_pModelCom->Set_Animation(Simba_DemoAppear1Cut2, 66.66f, false, true);
 
-	m_vecDamageFaceSubBones = m_pModelCom->Get_ValidBoneIndices(Simba_DamageFaceSub);
-	m_vecLipSyncSubBones = m_pModelCom->Get_ValidBoneIndices(Simba_LipSyncSub);
-	m_vecLipSyncSubABones = m_pModelCom->Get_ValidBoneIndices(Simba_LipSyncSubA);
+	m_pModelCom->EmplaceBackPartialAnim(Simba_DamageFaceSub);
+	m_pModelCom->EmplaceBackPartialAnim(Simba_LipSyncSub);
+	m_pModelCom->EmplaceBackPartialAnim(Simba_LipSyncSubA);
 
 	CEventCenter* pEventCenter = CEventCenter::Get_Instance();
 
@@ -123,13 +127,21 @@ _int CSimba::Tick(_float fTimeDelta)
 
 	__super::Tick(m_fTimeDelta);
 
-	if (true == m_pModelCom->IsFinished(Simba_DamageFaceSub))
+	if (true == m_pModelCom->IsFinished(Simba_DamageFaceSub)) {
 		m_bPlayDamageFaceSub = false;
-	if (true == m_pModelCom->IsFinished(Simba_LipSyncSub))
+		m_pModelCom->Set_LerpPartialAnim(true);
+	}
+		
+	if (true == m_pModelCom->IsFinished(Simba_LipSyncSub)) {
 		m_bPlayLipSyncSub = false;
-	if (true == m_pModelCom->IsFinished(Simba_LipSyncSubA))
+		m_pModelCom->Set_LerpPartialAnim(true);
+	}
+		
+	if (true == m_pModelCom->IsFinished(Simba_LipSyncSubA)) {
 		m_bPlayLipSyncSubA = false;
-
+		m_pModelCom->Set_LerpPartialAnim(true);
+	}
+		
 	if (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
 	{
 		if (m_pGameInstance->Get_KeyState(DIK_SPACE, KEY_DOWN))
@@ -170,13 +182,12 @@ void CSimba::Late_Tick(_float fTimeDelta)
 
 	if (false == bIsFinished)
 	{
-		if (true == m_bPlayDamageFaceSub)
-			m_pModelCom->Play_PartialAnimation(Simba_DamageFaceSub, m_vecDamageFaceSubBones, m_fTimeDelta, false);
-		else if (true == m_bPlayLipSyncSub)
-			m_pModelCom->Play_PartialAnimation(Simba_LipSyncSub, m_vecLipSyncSubBones, m_fTimeDelta, false);
-		else if (true == m_bPlayLipSyncSubA)
-			m_pModelCom->Play_PartialAnimation(Simba_LipSyncSubA, m_vecLipSyncSubABones, m_fTimeDelta, false);
+		if (true == m_bPlayDamageFaceSub || true == m_bPlayLipSyncSub || true == m_bPlayLipSyncSubA)
+			m_pModelCom->Play_PartialAnimation(m_fTimeDelta);
 	}
+
+	/*if (true == m_pModelCom->Get_LerpPartialAnim())
+		m_pModelCom->Lerp_PartialAnim(m_fTimeDelta);*/
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
@@ -218,6 +229,30 @@ HRESULT CSimba::Render()
 	if (FAILED(m_pModelCom->Render(m_iEyeMesh)))
 		return E_FAIL;
 
+	if (true == m_bRenderMant) // Render Mant Mesh 
+	{
+		_bool bFalse = { false };
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &bFalse, sizeof(_bool))))
+			return E_FAIL;
+
+		for (auto& idx : m_vecMantMeshes)
+		{
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", idx, TextureType_DIFFUSE)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", idx, TextureType_NORMALS)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", idx, TextureType_METALNESS)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", idx)))
+				return E_FAIL;
+
+			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Render(idx)))
+				return E_FAIL;
+		}
+	}
+	
 	return S_OK;
 }
 

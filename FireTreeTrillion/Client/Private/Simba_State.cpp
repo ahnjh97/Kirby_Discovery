@@ -53,6 +53,8 @@ void CSimba_Appear2::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 			pSimba->Change_State(CSimba::Simba_DemoAppear2Cut2, 66.66f, false, true);
 			break;
 		case CSimba::Simba_DemoAppear2Cut2:
+			if (true == pSimba->Get_RenderMant())
+				pSimba->Set_RenderMant(false);
 			m_fTime += fTimeDelta;
 			if (m_fTime > 1.5f) {
 				pSimba->Change_State(CSimba::Simba_Walk, 66.66f, true, false);
