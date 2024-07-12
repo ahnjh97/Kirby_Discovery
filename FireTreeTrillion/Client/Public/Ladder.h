@@ -37,11 +37,13 @@ private:
 
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
+	PxRigidStatic* m_pStaticActor = { nullptr };
 
 	_float	m_fHeight = { 8.5f };
 	_float	m_fRadius = { 1.3f };
 	_float4 m_vLadderPoint = { 0.f, 0.f, 0.f, 0.f };
 	_float4 m_vLadderOriginalPos = { 0.f, 0.f, 0.f, 0.f };
+
 
 
 

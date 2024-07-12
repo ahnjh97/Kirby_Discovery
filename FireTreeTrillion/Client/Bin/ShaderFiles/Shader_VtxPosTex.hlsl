@@ -161,7 +161,7 @@ PS_OUT PS_MAIN_SOLIDALPHABLEND(PS_IN_ALPHABLEND In)
 	PS_OUT			Out = (PS_OUT)0;
     vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord);
     Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
-    
+
     Out.vColor.rgb = g_vRColor;
     Out.vColor.a *= g_fAlpha;
 
@@ -260,7 +260,7 @@ PS_OUT PS_MAIN_ALPHA_SOFTFX(PS_IN_ALPHABLEND In)
 
     Out.vColor.a = vDiffuse.a * saturate(fOldViewZ - In.vProjPos.w) * g_fAlpha;
     Out.vColor.rgb = vDiffuse.rgb;
-    //Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
+    Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
     
     return Out;
 }

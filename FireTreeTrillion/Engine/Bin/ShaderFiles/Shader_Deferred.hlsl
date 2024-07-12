@@ -827,7 +827,7 @@ PS_OUT_LIGHT PS_MAIN_POINT(PS_IN In)
     
     float4 vLightDir = vWorldPos - g_vLightPos;
     float fDistance = length(vLightDir);
-    float fAtt = saturate((g_fLightRange - fDistance) / g_fLightRange);
+    float fAtt = pow(saturate((g_fLightRange - fDistance) / g_fLightRange), 3.f);
     
     // Direct lighting calculation for analytical lights.
     float3 directLighting = 0.0;
