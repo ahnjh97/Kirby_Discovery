@@ -124,8 +124,6 @@ PS_OUT PS_MAIN(PS_IN In)
 
     if (g_bMaptool == true)
         Out.vEmissive = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 0.0f);
-    else
-        Out.vEmissive = g_EmissiveTexture.Sample(LinearSampler, In.vTexcoord);
 
     Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
     if (Out.vMRA.z == 0)
@@ -155,8 +153,7 @@ PS_OUT NO_NORMALMAP_PS_MAIN(PS_IN In)
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
     if (g_bMaptool)
         Out.vEmissive = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 0.0f);
-    else
-        Out.vEmissive = g_EmissiveTexture.Sample(LinearSampler, In.vTexcoord);
+
     Out.vMRA = vector(0, 1, 1, 1);
 
     if (g_fTime < 0.5f)
@@ -198,8 +195,7 @@ PS_OUT PS_NORMAL_O_DISCARD_X(PS_IN In)
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
     if (g_bMaptool)
         Out.vEmissive = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 0.0f);
-    else
-        Out.vEmissive = g_EmissiveTexture.Sample(LinearSampler, In.vTexcoord);
+
     Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
     if (Out.vMRA.z == 0)
         Out.vMRA.z = 0.001f;
@@ -238,13 +234,72 @@ PS_OUT PS_MASKED_NORMAL_O(PS_IN In)
     
     if (g_bMaptool)
         Out.vEmissive = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 0.0f);
-    else
-        Out.vEmissive = g_EmissiveTexture.Sample(LinearSampler, In.vTexcoord);
     
     Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
     Out.vMRA = lerp(Out.vMRA, vMaskMRA, vMaskBaseColor.r);
     if (Out.vMRA.z == 0)
         Out.vMRA.z = 0.001f;
+    
+    return Out;
+}
+
+PS_OUT PS_EMISSIVE_NORMAL_O(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    if (0.0f >= vMtrlDiffuse.a)
+        discard;
+    
+    vector vNormalTex = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
+
+    float3 vNormal = vNormalTex.xyz * 2.f - 1.f;
+    float3x3 WorldMatrix = float3x3(In.vTangent, In.vBinormal, In.vNormal);
+
+    float3 vWorldNormal = mul(vNormal, WorldMatrix);
+
+    Out.vDiffuse = vMtrlDiffuse;
+    Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
+    if (g_bMaptool)
+        Out.vEmissive = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 0.0f);
+    else
+        Out.vEmissive = g_EmissiveTexture.Sample(LinearSampler, In.vTexcoord);
+    
+    Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
+    if (Out.vMRA.z == 0)
+        Out.vMRA.z = 0.001f;
+    
+    if (g_fTime < 0.5f)
+        Out.vDiffuse.rgb += vDamageColor * smoothstep(0.0f, 1.0f, g_fTime);
+    else if (g_fTime < 1.f)
+        Out.vDiffuse.rgb += vDamageColor * smoothstep(0.0f, 1.0f, (1 - g_fTime));
+    
+    return Out;
+}
+
+PS_OUT PS_EMISSIVE_NORMAL_X(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    if (0.0f >= vMtrlDiffuse.a)
+        discard;
+    
+    Out.vDiffuse = vMtrlDiffuse;
+    Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
+    if (g_bMaptool)
+        Out.vEmissive = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 0.0f);
+    else
+        Out.vEmissive = g_EmissiveTexture.Sample(LinearSampler, In.vTexcoord);
+    
+    Out.vMRA = vector(0, 1, 1, 1);
+    
+    if (g_fTime < 0.5f)
+        Out.vDiffuse.rgb += vDamageColor * smoothstep(0.0f, 1.0f, g_fTime);
+    else if (g_fTime < 1.f)
+        Out.vDiffuse.rgb += vDamageColor * smoothstep(0.0f, 1.0f, (1 - g_fTime));
     
     return Out;
 }
@@ -330,5 +385,33 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MASKED_NORMAL_O();
+    }
+    
+    // Emmissive, Normal O  (6)
+    pass Emissive_Normal_O
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_EMISSIVE_NORMAL_O();
+    }
+
+   // Emmissive, Normal X  (7)
+    pass Emissive_Normal_X
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_EMISSIVE_NORMAL_X();
     }
 }

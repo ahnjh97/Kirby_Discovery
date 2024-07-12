@@ -28,8 +28,7 @@ HRESULT CNonRenderWall::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	if(FAILED(m_pModelCom->CreateStaticActor(m_pTransformCom->Get_WorldFloat4x4())))
-		return E_FAIL;
+	m_pStaticActor = m_pModelCom->ReturnStaticActor(m_pTransformCom->Get_WorldFloat4x4());
 
 	return S_OK;
 }
@@ -40,11 +39,6 @@ _int CNonRenderWall::Tick(_float fTimeDelta)
 		return OBJ_DEAD;
 
 	return OBJ_NOEVENT;
-}
-
-HRESULT CNonRenderWall::Render()
-{
-	return S_OK;
 }
 
 HRESULT CNonRenderWall::Add_Components()
@@ -88,6 +82,8 @@ CGameObject* CNonRenderWall::Clone(void* pArg)
 void CNonRenderWall::Free()
 {
 	__super::Free();
+
+	m_pGameInstance->ReleaseActor(m_pStaticActor);
 
 	Safe_Release(m_pModelCom);
 }

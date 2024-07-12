@@ -523,7 +523,7 @@ void CBasicMap::InsertMapDecos()
         }
         else if (CMapToolObject::MAPOBJ_ACTOR == iMapObjType)
         {
-            pModel->CreateStaticActor(matWorld);
+            m_vecDecoStaticActors.push_back(pModel->ReturnStaticActor(matWorld));
             vecActors.push_back(pModel);
         }
     }
@@ -567,7 +567,7 @@ PxRigidStatic* CBasicMap::AddTriggerActorForAnimDeco(const string& _strModelName
     m_pGameInstance->AddActor(*pStaticActor);
     m_vecAnimDecoTriggersActors.emplace_back(pStaticActor);
     pShape->release();
-    //m_vecShapes.emplace_back(pShape);
+
     return pStaticActor;
 }
 
@@ -668,10 +668,8 @@ void CBasicMap::ReadDecos_ForSmallLevels()
             tBlendObjDesc.setBlendMeshIndices = mapIter->second;
             CBlendMapObject* pBlendMapObj =  dynamic_cast<CBlendMapObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_BlendMapObject"), &tBlendObjDesc));
 
-            if (nullptr != pBlendMapObj) {
+            if (nullptr != pBlendMapObj)
                 m_vecBlendObjects.push_back(pBlendMapObj);
-                //pModel->Set_BlendObject(pBlendMapObj);
-            }
 
             pModel->RemoveBlendMeshes(mapIter->second);
 
@@ -806,9 +804,6 @@ HRESULT CBasicMap::Render_NonOctreeMapDecos()
                 return E_FAIL;
         }
     }
-
-    /*for (auto& blendDeco : m_vecBlendObjects)
-        blendDeco->Late_Tick(m_pGameInstance->Get_FirstTimer());*/
 
     return S_OK;
 }
