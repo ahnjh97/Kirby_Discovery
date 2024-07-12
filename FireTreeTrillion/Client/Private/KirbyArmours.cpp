@@ -110,7 +110,8 @@ HRESULT CKirbyArmours::Render()
 
     for (size_t i = 0; i < iNumMeshes; i++)
     {
-        if (m_iRenderCount == 0)
+        // For Crash
+        if (m_iRenderCount == 0 && *m_pAbilityType == ABILITY_CRASH)
         {
             if (i == 0)
             {
